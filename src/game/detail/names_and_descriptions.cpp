@@ -23,12 +23,6 @@ std::wstring get_bbcoded_item_categories(const item_category_flagset& flags) {
 	if (flags.test(item_category::TORSO_ARMOR)) {
 		result += L"Torso armor, ";
 	}
-	if (flags.test(item_category::ARM_BACK)) {
-		result += L"Arm's back, ";
-	}
-	if (flags.test(item_category::ARM_FRONT)) {
-		result += L"Arm's front, ";
-	}
 
 	if (!result.empty()) {
 		result = result.substr(0, result.length() - 2);
@@ -62,15 +56,11 @@ std::wstring get_bbcoded_slot_function_name(const slot_function f) {
 		return{
 			L"Muzzle",
 		};
-	case slot_function::WIELDED_ITEM:
-		return{
-			L"Hand",
-		};
-	case slot_function::PRIMARY_ARM_BACK:
+	case slot_function::PRIMARY_HAND:
 		return{
 			L"Primary arm",
 		};
-	case slot_function::SECONDARY_ARM_BACK:
+	case slot_function::SECONDARY_HAND:
 		return{
 			L"Secondary arm",
 		};
@@ -81,10 +71,6 @@ std::wstring get_bbcoded_slot_function_name(const slot_function f) {
 	case slot_function::SHOULDER:
 		return{
 			L"Shoulder",
-		};
-	case slot_function::ARM_FRONT:
-		return{
-			L"Arm's front",
 		};
 	default: return{ L"Unknown" };
 	}
@@ -112,17 +98,13 @@ std::wstring get_bbcoded_slot_function_description(const slot_function f) {
 		return{
 			L"Various gunshot modifiers go here."
 		};
-	case slot_function::WIELDED_ITEM:
+	case slot_function::PRIMARY_HAND:
 		return{
-			L"For holding of almost every item."
+			L"Primary hand."
 		};
-	case slot_function::PRIMARY_ARM_BACK:
+	case slot_function::SECONDARY_HAND:
 		return{
-			L"Primary arm component."
-		};
-	case slot_function::SECONDARY_ARM_BACK:
-		return{
-			L"Secondary arm component."
+			L"Secondary hand."
 		};
 	case slot_function::TORSO_ARMOR:
 		return{

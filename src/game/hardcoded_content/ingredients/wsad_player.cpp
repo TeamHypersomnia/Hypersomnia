@@ -182,33 +182,6 @@ namespace prefabs {
 
 		character.add_standard_components(step);
 
-		if (create_arm_count > 0) {
-			const auto primary_arm = prefabs::create_sample_complete_arm(
-				step,
-				vec2(50, 20),
-				vec2(70, 20)
-			);
-
-			item_slot_transfer_request r;
-			r.item = primary_arm;
-			r.target_slot = character[slot_function::PRIMARY_ARM_BACK];
-			perform_transfer(r, step);
-		}
-
-		if (create_arm_count > 1) {
-			const auto secondary_arm = prefabs::create_sample_complete_arm(
-				step,
-				vec2(50, 20),
-				vec2(70, 20),
-				false
-			);
-
-			item_slot_transfer_request r;
-			r.item = secondary_arm;
-			r.target_slot = character[slot_function::SECONDARY_ARM_BACK];
-			perform_transfer(r, step);
-		}
-
 		// LOG("Character mass: %x", character.get<components::rigid_body>().get_mass());
 		return character;
 	}

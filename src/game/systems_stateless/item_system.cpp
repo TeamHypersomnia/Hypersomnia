@@ -74,30 +74,6 @@ void item_system::pick_up_touching_items(const logic_step step) {
 		if (maybe_item != nullptr && item.get_owning_transfer_capability().dead()) {
 			auto* maybe_transfers = picker.find<components::item_slot_transfers>();
 
-			if (maybe_transfers == nullptr) {
-				const auto* const maybe_item_of_picker = picker.find<components::item>();
-
-				if (maybe_item_of_picker != nullptr) {
-					const auto categories = maybe_item_of_picker->categories_for_slot_compatibility;
-
-					const bool is_it_arm_touching =
-						categories.test(item_category::ARM_BACK)
-						|| categories.test(item_category::ARM_FRONT)
-					;
-
-					if (is_it_arm_touching) {
-						picker_id = picker.get_owning_transfer_capability();
-
-						const bool is_it_arm_of_somebody = cosmos[picker_id].alive();
-						
-						if (is_it_arm_of_somebody) {
-							maybe_transfers = cosmos[picker_id].find<components::item_slot_transfers>();
-							ensure(maybe_transfers != nullptr);
-						}
-					}
-				}
-			}
-
 			if (
 				maybe_transfers != nullptr
 				&& maybe_transfers->picking_up_touching_items_enabled	

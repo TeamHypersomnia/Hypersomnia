@@ -237,7 +237,8 @@ std::optional<drag_and_drop_result> prepare_drag_and_drop_result(
 						case slot_function::GUN_RAIL: drop.hint_text += L"Install"; break;
 						case slot_function::TORSO_ARMOR: drop.hint_text += L"Wear"; break;
 						case slot_function::SHOULDER: drop.hint_text += L"Wear"; break;
-						case slot_function::WIELDED_ITEM: drop.hint_text += L"Wield"; break;
+						case slot_function::PRIMARY_HAND: drop.hint_text += L"Wield"; break;
+						case slot_function::SECONDARY_HAND: drop.hint_text += L"Wield"; break;
 						case slot_function::GUN_MUZZLE: drop.hint_text += L"Install"; break;
 						default: drop.hint_text += L"Unknown slot"; break;
 						}

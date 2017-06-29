@@ -49,19 +49,7 @@ typename basic_inventory_mixin<C, D>::inventory_slot_handle_type basic_inventory
 	auto& cosmos = self.get_cosmos();
 	ensure(self.has<components::sentience>());
 
-	inventory_slot_id hand;
-
-	const auto arm_back = self[slot_function::PRIMARY_ARM_BACK];
-
-	if (arm_back.has_items()) {
-		const auto arm_front = cosmos[arm_back.get_items_inside()[0]][slot_function::ARM_FRONT];
-
-		if (arm_front.has_items()) {
-			hand = cosmos[arm_front.get_items_inside()[0]][slot_function::WIELDED_ITEM];
-		}
-	}
-
-	return cosmos[hand];
+	return self[slot_function::PRIMARY_HAND];
 }
 
 template <bool C, class D>
@@ -70,19 +58,7 @@ typename basic_inventory_mixin<C, D>::inventory_slot_handle_type basic_inventory
 	auto& cosmos = self.get_cosmos();
 	ensure(self.has<components::sentience>());
 
-	inventory_slot_id hand;
-
-	const auto arm_back = self[slot_function::SECONDARY_ARM_BACK];
-
-	if (arm_back.has_items()) {
-		const auto arm_front = cosmos[arm_back.get_items_inside()[0]][slot_function::ARM_FRONT];
-
-		if (arm_front.has_items()) {
-			hand = cosmos[arm_front.get_items_inside()[0]][slot_function::WIELDED_ITEM];
-		}
-	}
-
-	return cosmos[hand];
+	return self[slot_function::SECONDARY_HAND];
 }
 
 template <bool C, class D>

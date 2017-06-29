@@ -24,23 +24,15 @@ bool basic_inventory_slot_handle<C>::is_hand_slot() const {
 
 template <bool C>
 std::size_t basic_inventory_slot_handle<C>::get_hand_index() const {
-	const auto arm_front_slot = get_container().get_current_slot();
-
 	std::size_t index = 0xdeadbeef;
 
-	if (arm_front_slot.alive() && arm_front_slot.raw_id.type == slot_function::ARM_FRONT) {
-		const auto arm_back_slot = arm_front_slot.get_container().get_current_slot();
-
-		if (arm_back_slot.alive()) {
-			if (arm_back_slot.raw_id.type == slot_function::PRIMARY_ARM_BACK) {
-				index = 0;
-			}
-			else if (arm_back_slot.raw_id.type == slot_function::SECONDARY_ARM_BACK) {
-				index = 1;
-			}
-		}
+	if (raw_id.type == slot_function::PRIMARY_HAND) {
+		index = 0;
 	}
-	
+	else if (raw_id.type == slot_function::SECONDARY_HAND) {
+		index = 1;
+	}
+
 	return index;
 }
 

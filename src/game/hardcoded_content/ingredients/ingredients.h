@@ -90,13 +90,6 @@ namespace prefabs {
 		const std::string name = "character_unnamed",
 		const int create_arm_count = 2
 	);
-	
-	entity_handle create_sample_complete_arm(
-		const logic_step,
-		const vec2 back_arm_size,
-		const vec2 front_arm_size,
-		const bool primary = true
-	);
 
 	entity_handle create_crate(const logic_step, const components::transform pos, const vec2 size = vec2());
 	entity_handle create_brick_wall(const logic_step, const components::transform pos, const vec2 size = vec2());

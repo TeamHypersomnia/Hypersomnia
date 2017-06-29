@@ -12,9 +12,6 @@ enum class item_category {
 	SHOT_CHARGE,
 	ROCKET,
 
-	ARM_BACK,
-	ARM_FRONT,
-
 	COUNT
 };
 
