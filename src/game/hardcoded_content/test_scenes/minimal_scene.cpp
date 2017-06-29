@@ -105,9 +105,9 @@ namespace test_scenes {
 
 		//const auto backpack = prefabs::create_sample_backpack(step, vec2(100, -150));
 
-		//const auto rifle2 = prefabs::create_sample_rifle(step, vec2(100, -500 + 50),
-		//	prefabs::create_sample_magazine(step, vec2(100, -650), false ? "10" : "0.3",
-		//		prefabs::create_cyan_charge(step, vec2(0, 0), false ? 1000 : 5)));
+		const auto rifle2 = prefabs::create_sample_rifle(step, vec2(100, -500 + 50),
+			prefabs::create_sample_magazine(step, vec2(100, -650), true ? "10" : "0.3",
+				prefabs::create_cyan_charge(step, vec2(0, 0), true ? 1000 : 5)));
 		
 		//prefabs::create_rocket_launcher(step, { -100, 0, -180 }, prefabs::create_force_rocket(step, {}));
 		prefabs::create_motorcycle(step, {0, 0, -90});
