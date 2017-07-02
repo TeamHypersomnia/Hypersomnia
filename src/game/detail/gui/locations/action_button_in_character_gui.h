@@ -4,7 +4,7 @@ class action_button;
 
 struct action_button_in_character_gui {
 public:
-	typedef action_button dereferenced_type;
+	using dereferenced_type = action_button;
 
 	int index = -1;
 

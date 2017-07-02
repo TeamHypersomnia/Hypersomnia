@@ -13,7 +13,7 @@ constexpr std::size_t value_bar_count =
 
 struct value_bar_in_character_gui {
 public:
-	typedef value_bar dereferenced_type;
+	using dereferenced_type = value_bar;
 
 	unsigned vertical_index = 0xdeadbeef;
 

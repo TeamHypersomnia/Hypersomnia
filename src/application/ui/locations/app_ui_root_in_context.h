@@ -3,7 +3,7 @@ class app_ui_root;
 
 class app_ui_root_in_context {
 public:
-	typedef app_ui_root dereferenced_type;
+	using dereferenced_type = app_ui_root;
 
 	bool operator==(app_ui_root_in_context b) const {
 		return true;

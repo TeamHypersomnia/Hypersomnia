@@ -4,7 +4,7 @@ struct drag_and_drop_target_drop_item;
 
 struct drag_and_drop_target_drop_item_in_character_gui {
 public:
-	typedef drag_and_drop_target_drop_item dereferenced_type;
+	using dereferenced_type = drag_and_drop_target_drop_item;
 
 	bool operator==(const drag_and_drop_target_drop_item_in_character_gui b) const {
 		return true;

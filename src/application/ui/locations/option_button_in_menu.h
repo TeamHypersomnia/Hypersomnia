@@ -6,8 +6,8 @@ class option_button;
 
 class option_button_in_menu {
 public:
-	typedef option_button dereferenced_type;
-	menu_button_type type;
+	using dereferenced_type = option_button;
+	menu_button_type type = menu_button_type::COUNT;
 
 	const option_button_in_menu& get_location() const {
 		return *this;
@@ -19,7 +19,7 @@ public:
 
 	template <class C>
 	bool alive(const C context) const {
-		return true;
+		return type != menu_button_type::COUNT;
 	}
 
 	template <class C>

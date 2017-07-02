@@ -4,7 +4,7 @@ class root_of_inventory_gui;
 
 class root_of_inventory_gui_in_context {
 public:
-	typedef root_of_inventory_gui dereferenced_type;
+	using dereferenced_type = root_of_inventory_gui;
 
 	bool operator==(root_of_inventory_gui_in_context b) const {
 		return true;

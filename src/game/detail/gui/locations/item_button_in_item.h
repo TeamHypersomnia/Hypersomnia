@@ -6,7 +6,7 @@ struct item_button;
 
 class item_button_in_item {
 public:
-	typedef item_button dereferenced_type;
+	using dereferenced_type = item_button;
 
 	entity_id item_id;
 

@@ -6,7 +6,7 @@ struct slot_button;
 
 class slot_button_in_container {
 public:
-	typedef slot_button dereferenced_type;
+	using dereferenced_type = slot_button;
 
 	inventory_slot_id slot_id;
 

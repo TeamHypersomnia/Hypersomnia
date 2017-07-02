@@ -4,7 +4,7 @@ class hotbar_button;
 
 struct hotbar_button_in_character_gui {
 public:
-	typedef hotbar_button dereferenced_type;
+	using dereferenced_type = hotbar_button;
 
 	int index = -1;
 
