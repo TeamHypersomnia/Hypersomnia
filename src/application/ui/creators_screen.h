@@ -79,12 +79,12 @@ struct creators_screen {
 		}
 	}
 
-	void setup(const style s, const style task_st, const vec2i screen_size) {
+	void setup(const style person_style, const style task_style, const vec2i screen_size) {
 		{
 			entry c;
 
-			c.set_task(format(L"Founder & Programmer", task_st));
-			c.add_person(format(L"Patryk B. Czachurski", s));
+			c.set_task(format(L"Founder & Programmer", task_style));
+			c.add_person(format(L"Patryk B. Czachurski", person_style));
 
 			add_entry(c);
 		}
@@ -92,8 +92,8 @@ struct creators_screen {
 		{
 			entry c;
 
-			c.set_task(format(L"Linux port", task_st));
-			c.add_person(format(L"Adam Piekarczyk", s));
+			c.set_task(format(L"Linux port", task_style));
+			c.add_person(format(L"Adam Piekarczyk", person_style));
 
 			add_entry(c);
 		}
@@ -101,9 +101,9 @@ struct creators_screen {
 		{
 			entry c;
 
-			c.set_task(format(L"Pixel art", task_st));
-			c.add_person(format(L"Michal Kawczynski", s));
-			c.add_person(format(L"Patryk B. Czachurski", s));
+			c.set_task(format(L"Pixel art", task_style));
+			c.add_person(format(L"Michal Kawczynski", person_style));
+			c.add_person(format(L"Patryk B. Czachurski", person_style));
 
 			add_entry(c);
 		}
@@ -111,9 +111,9 @@ struct creators_screen {
 		{
 			entry c;
 
-			c.set_task(format(L"Occasional helping hands", task_st));
-			c.add_person(format(L"DaTa-", s));
-			c.add_person(format(L"Bartosz P. Grzelak", s));
+			c.set_task(format(L"Occasional helping hands", task_style));
+			c.add_person(format(L"DaTa-", person_style));
+			c.add_person(format(L"Bartosz P. Grzelak", person_style));
 
 			add_entry(c);
 		}
@@ -121,16 +121,16 @@ struct creators_screen {
 		center_all(screen_size);
 
 		afterword.target_text[0] = format(L"\
-What stands before your eyes is an outcome of a man's burning passion,\n\
-a digital inamorata, chef d'oeuvre of a single coder, masterful musicians and a champion at pixel art.\n\n", s);
+What stands before your eyes is an outcome of a man'person_style burning passion,\n\
+a digital inamorata, chef d'oeuvre of a single coder, masterful musicians and a champion at pixel art.\n\n", person_style);
 
 		afterword.target_text[1] = format(L"\
 Its history of making recounts profound hopes,\n\
 disillusions, crises and divine moments of joy.\n\
 Cherish your ambitions for the immaterial.\n\
 In the end you will either conquer that which you dreamed of,\n\
-or tell a beautiful story of a man devastated by struggle.\n", s)
-+ format(L"    ~Founder of the Hypersomnia Universe", task_st);
+or tell a beautiful story of a man devastated by struggle.\n", person_style)
++ format(L"    ~Founder of the Hypersomnia Universe", task_style);
 
 		afterword.target_pos.set(screen_size.x / 2 - get_text_bbox(afterword.get_total_target_text(), 0u).x / 2, screen_size.y / 2 + column_height + 50);
 

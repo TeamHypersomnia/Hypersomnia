@@ -55,7 +55,7 @@ void menu_setup::process(
 	const auto metas_of_assets = get_assets_manager().generate_logical_metas_of_assets();
 
 	const vec2i screen_size = vec2i(window.get_screen_size());
-	
+
 	auto center = [&](auto& t) {
 		t.target_pos = screen_size / 2 - get_text_bbox(t.get_total_target_text(), 0)*0.5f;
 	};
@@ -105,7 +105,7 @@ void menu_setup::process(
 
 		str_ops(result)
 			.multi_replace_all({ "\r", "\n" }, "")
-		;
+			;
 
 		if (result.size() > 0) {
 			const auto wresult = to_wstring(result);
@@ -117,7 +117,7 @@ void menu_setup::process(
 
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 	timer.set_stepping_speed_multiplier(session.config.recording_replay_speed);
-	
+
 	// TODO: actually load a cosmos with its resources from a file/folder
 	const bool is_intro_scene_available = session.config.menu_intro_scene_cosmos_path.size() > 0;
 
@@ -134,10 +134,10 @@ void menu_setup::process(
 		intro_scene.set_fixed_delta(session.config.default_tickrate);
 	}
 
-	const auto character_in_focus = is_intro_scene_available ? 
+	const auto character_in_focus = is_intro_scene_available ?
 		intro_scene.get_entity_by_name(L"player0")
 		: intro_scene[entity_id()]
-	;
+		;
 
 	const auto title_size = metas_of_assets[assets::game_image_id::MENU_GAME_LOGO].get_size();
 
@@ -148,13 +148,6 @@ void menu_setup::process(
 	rgba fade_overlay_color = { 0, 2, 2, 255 };
 	rgba title_text_color = { 255, 255, 255, 0 };
 
-	appearing_text credits1;
-	credits1.target_text[0] = format(L"hypernet community presents", textes_style);
-	center(credits1);
-
-	appearing_text credits2;
-	credits2.target_text = { format(L"A universe founded by\n", textes_style), format(L"Patryk B. Czachurski", textes_style) };
-	center(credits2);
 
 	rgba tweened_menu_button_color = cyan;
 	tweened_menu_button_color.a = 0;
@@ -163,10 +156,10 @@ void menu_setup::process(
 
 	app_ui_rect_world menu_ui_rect_world;
 	menu_ui_rect_world.last_state.screen_size = screen_size;
-	
+
 	app_ui_root_in_context menu_ui_root_id;
 	app_ui_root menu_ui_root = screen_size;
-	
+
 	for (auto& m : menu_ui_root.menu_buttons) {
 		m.hover_highlight_maximum_distance = 10.f;
 		m.hover_highlight_duration_ms = 300.f;
@@ -187,26 +180,39 @@ void menu_setup::process(
 
 	menu_ui_root.set_menu_buttons_positions(screen_size);
 
-	appearing_text developer_welcome;
-	developer_welcome.population_interval = 60.f;
+	appearing_text credits1;
+	credits1.target_text[0] = format(L"hypernet community presents", textes_style);
+	center(credits1);
 
-	developer_welcome.should_disappear = false;
-	developer_welcome.target_text[0] = format(L"Thank you for building Hypersomnia.\n", textes_style);
-	developer_welcome.target_text[1] = format(L"This message is not included in distributed executables.\n\
-Our collective welcomes all of your suggestions and contributions.\n\
-We wish you an exciting journey through architecture of our cosmos.\n", textes_style) +
-format(L"    ~hypernet community", style(assets::font_id::GUI_FONT, { 0, 180, 255, 255 }));
-
-	developer_welcome.target_pos += screen_size - get_text_bbox(developer_welcome.get_total_target_text(), 0) - vec2(70.f, 70.f);
-
-	appearing_text hypersomnia_description;
-	hypersomnia_description.population_interval = 60.f;
-
-	hypersomnia_description.should_disappear = false;
-	hypersomnia_description.target_text[0] = format(L"- tendency of the omnipotent deity to immerse into inferior simulations,\nin spite of countless deaths experienced as a consequence.", { assets::font_id::GUI_FONT, {200, 200, 200, 255} });
-	hypersomnia_description.target_pos = title_rect.left_bottom() + vec2(20, 20);
+	appearing_text credits2;
+	credits2.target_text = { format(L"A universe founded by\n", textes_style), format(L"Patryk B. Czachurski", textes_style) };
+	center(credits2);
 
 	std::vector<appearing_text*> intro_texts = { &credits1, &credits2 };
+
+	appearing_text developer_welcome;
+	{
+		developer_welcome.population_interval = 60.f;
+
+		developer_welcome.should_disappear = false;
+		developer_welcome.target_text[0] = format(L"Thank you for building Hypersomnia.\n", textes_style);
+		developer_welcome.target_text[1] = format(L"This message is not included in distributed executables.\n\
+Our collective welcomes all of your suggestions and contributions.\n\
+We wish you an exciting journey through architecture of our cosmos.\n", textes_style) +
+		format(L"    ~hypernet community", style(assets::font_id::GUI_FONT, { 0, 180, 255, 255 }));
+
+		developer_welcome.target_pos += screen_size - get_text_bbox(developer_welcome.get_total_target_text(), 0) - vec2(70.f, 70.f);
+	}
+
+	appearing_text hypersomnia_description;
+	{
+		hypersomnia_description.population_interval = 60.f;
+
+		hypersomnia_description.should_disappear = false;
+		hypersomnia_description.target_text[0] = format(L"- tendency of the omnipotent deity to immerse into inferior simulations,\nin spite of countless deaths experienced as a consequence.", { assets::font_id::GUI_FONT, {200, 200, 200, 255} });
+		hypersomnia_description.target_pos = title_rect.left_bottom() + vec2(20, 20);
+	}
+
 	std::vector<appearing_text*> title_texts = { &developer_welcome, &hypersomnia_description };
 
 	vec2i tweened_menu_button_size;
@@ -216,7 +222,6 @@ format(L"    ~hypernet community", style(assets::font_id::GUI_FONT, { 0, 180, 25
 	creators.setup(textes_style, style(assets::font_id::GUI_FONT, { 0, 180, 255, 255 }), screen_size);
 
 	augs::action_list intro_actions;
-	augs::action_list credits_actions;
 
 	{
 		const bool play_credits = !session.config.skip_credits;
@@ -284,6 +289,8 @@ format(L"    ~hypernet community", style(assets::font_id::GUI_FONT, { 0, 180, 25
 	timer.reset_timer();
 
 	const auto initial_step_number = intro_scene.get_total_steps_passed();
+
+	augs::action_list credits_actions;
 
 	auto menu_callback = [&](const menu_button_type t){
 		switch (t) {
