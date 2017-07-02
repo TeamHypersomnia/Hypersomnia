@@ -176,7 +176,7 @@ void menu_setup::process(
 	developer_welcome.should_disappear = false;
 	developer_welcome.target_text[0] = format(L"Thank you for building Hypersomnia.\n", textes_style);
 	developer_welcome.target_text[1] = format(L"This message is not included in distributed executables.\n\
-All your suggestions and contributions are very much welcomed by our collective.\n\
+Our collective welcomes all of your suggestions and contributions.\n\
 We wish you an exciting journey through architecture of our cosmos.\n", textes_style) +
 format(L"    ~hypernet community", style(assets::font_id::GUI_FONT, { 0, 180, 255, 255 }));
 
@@ -199,11 +199,12 @@ format(L"    ~hypernet community", style(assets::font_id::GUI_FONT, { 0, 180, 25
 		m.click_sound.set_gain(session.config.sound_effects_volume);
 	}
 
-	menu_ui_root.menu_buttons[menu_button_type::CONNECT_TO_OFFICIAL_UNIVERSE].set_appearing_caption(format(L"Login to\nofficial universe", textes_style));
-	menu_ui_root.menu_buttons[menu_button_type::BROWSE_UNOFFICIAL_UNIVERSES].set_appearing_caption(format(L"Browse\nunofficial universes", textes_style));
-	menu_ui_root.menu_buttons[menu_button_type::HOST_UNIVERSE].set_appearing_caption(format(L"Host\nuniverse", textes_style));
-	menu_ui_root.menu_buttons[menu_button_type::CONNECT_TO_UNIVERSE].set_appearing_caption(format(L"Connect to\nuniverse", textes_style));
-	menu_ui_root.menu_buttons[menu_button_type::LOCAL_UNIVERSE].set_appearing_caption(format(L"Local\nuniverse", textes_style));
+	menu_ui_root.menu_buttons[menu_button_type::CONNECT_TO_OFFICIAL_UNIVERSE].set_appearing_caption(format(L"Login to official universe", textes_style));
+	menu_ui_root.menu_buttons[menu_button_type::BROWSE_UNOFFICIAL_UNIVERSES].set_appearing_caption(format(L"Browse unofficial universes", textes_style));
+	menu_ui_root.menu_buttons[menu_button_type::HOST_UNIVERSE].set_appearing_caption(format(L"Host universe", textes_style));
+	menu_ui_root.menu_buttons[menu_button_type::CONNECT_TO_UNIVERSE].set_appearing_caption(format(L"Connect to universe", textes_style));
+	menu_ui_root.menu_buttons[menu_button_type::LOCAL_UNIVERSE].set_appearing_caption(format(L"Local universe", textes_style));
+	menu_ui_root.menu_buttons[menu_button_type::EDITOR].set_appearing_caption(format(L"Editor", textes_style));
 	menu_ui_root.menu_buttons[menu_button_type::SETTINGS].set_appearing_caption(format(L"Settings", textes_style));
 	menu_ui_root.menu_buttons[menu_button_type::CREATORS].set_appearing_caption(format(L"Creators", textes_style));
 	menu_ui_root.menu_buttons[menu_button_type::QUIT].set_appearing_caption(format(L"Quit", textes_style));

@@ -12,12 +12,12 @@ app_ui_root::app_ui_root(const vec2i screen_size) {
 void app_ui_root::set_menu_buttons_positions(const vec2i screen_size) {
 	set_menu_buttons_sizes(get_max_menu_button_size());
 
-	for (size_t i = 0; i < menu_buttons.size(); ++i) {
-		if (i == 0) {
-			menu_buttons[i].rc.set_position(vec2(70.f, screen_size.y - 70.f * menu_buttons.size()));
+	for (size_t i = menu_buttons.size() - 1; i != size_t(-1); --i) {
+		if (i == menu_buttons.size() - 1) {
+			menu_buttons[i].rc.set_position(vec2(70.f, screen_size.y - 70.f - menu_buttons[i].rc.h()));
 		}
 		else {
-			menu_buttons[i].rc.set_position(vec2(70.f, menu_buttons[i - 1].rc.b + 28));
+			menu_buttons[i].rc.set_position(vec2(70.f, menu_buttons[i + 1].rc.t - 22 - menu_buttons[i].rc.h()));
 		}
 	}
 }

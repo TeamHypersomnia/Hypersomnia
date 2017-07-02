@@ -6,6 +6,7 @@ enum class menu_button_type {
 	HOST_UNIVERSE,
 	CONNECT_TO_UNIVERSE,
 	LOCAL_UNIVERSE,
+	EDITOR,
 	SETTINGS,
 	CREATORS,
 	QUIT,
