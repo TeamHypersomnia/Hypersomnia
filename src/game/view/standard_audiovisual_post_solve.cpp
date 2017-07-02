@@ -44,12 +44,13 @@ void viewing_session::standard_audiovisual_post_solve(const const_logic_step ste
 
 	auto& thunders = systems_audiovisual.get<thunder_system>();
 	auto& exploding_rings = systems_audiovisual.get<exploding_ring_system>();
-	auto& flying_numbers = systems_audiovisual.get<vertically_flying_number_system>();
+	auto& flying_numbers = systems_audiovisual.get<flying_number_indicator_system>();
 	auto& highlights = systems_audiovisual.get<pure_color_highlight_system>();
 
 	for (const auto& h : healths) {
-		vertically_flying_number_system::number::input vn;
+		flying_number_indicator_system::number::input vn;
 
+		vn.impact_velocity = h.impact_velocity;
 		vn.maximum_duration_seconds = 0.7f;
 		vn.value = h.effective_amount;
 

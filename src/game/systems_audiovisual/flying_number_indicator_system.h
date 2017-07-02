@@ -1,11 +1,13 @@
 #pragma once
+#include <optional>
+
 #include "augs/gui/text_drawer.h"
 #include "augs/math/vec2.h"
 #include "augs/graphics/vertex.h"
 
 struct camera_cone;
 
-class vertically_flying_number_system {
+class flying_number_indicator_system {
 public:
 	struct number {
 		struct input {
@@ -14,9 +16,12 @@ public:
 			float maximum_duration_seconds = 0.f;
 			
 			float value = 0.f;
+
+			vec2 impact_velocity;
 			vec2 pos;
 		} in;
 
+		mutable std::optional<vec2> first_camera_space_pos;
 		double time_of_occurence_seconds = 0.0;
 	};
 

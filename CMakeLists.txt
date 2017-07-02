@@ -258,7 +258,7 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/game/systems_audiovisual/pure_color_highlight_system.cpp"
 	"src/game/systems_audiovisual/sound_system.cpp"
 	"src/game/systems_audiovisual/thunder_system.cpp"
-	"src/game/systems_audiovisual/vertically_flying_number_system.cpp"
+	"src/game/systems_audiovisual/flying_number_indicator_system.cpp"
 	"src/game/systems_audiovisual/wandering_pixels_system.cpp"
 	"src/game/systems_inferred/physics_system.cpp"
 	"src/game/systems_inferred/processing_lists_system.cpp"

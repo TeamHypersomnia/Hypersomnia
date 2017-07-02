@@ -208,7 +208,7 @@ void viewing_session::advance_audiovisual_systems(
 ) {
 	auto& thunders = systems_audiovisual.get<thunder_system>();
 	auto& exploding_rings = systems_audiovisual.get<exploding_ring_system>();
-	auto& flying_numbers = systems_audiovisual.get<vertically_flying_number_system>();
+	auto& flying_numbers = systems_audiovisual.get<flying_number_indicator_system>();
 	auto& highlights = systems_audiovisual.get<pure_color_highlight_system>();
 	auto& interp = systems_audiovisual.get<interpolation_system>();
 	auto& particles = systems_audiovisual.get<particles_simulation_system>();

@@ -107,7 +107,7 @@ namespace rendering_scripts {
 
 		default_shader.use();
 
-		// hud.draw_vertically_flying_numbers(step);
+		// hud.draw_flying_number_indicators(step);
 
 		renderer.bind_texture(manager[assets::gl_texture_id::GAME_WORLD_ATLAS]);
 
