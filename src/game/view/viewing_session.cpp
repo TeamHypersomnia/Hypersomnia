@@ -156,7 +156,25 @@ void viewing_session::perform_imgui_pass(
 	ImGui::Render();
 }
 
+void viewing_session::control_open_developer_console(game_intent_vector& intents) {
+	erase_if(intents, [&](const game_intent& intent) {
+		bool fetch = false;
+
+		if (intent.intent == intent_type::OPEN_DEVELOPER_CONSOLE) {
+			fetch = true;
+
+			if (intent.is_pressed) {
+				config.drawing_settings.show_profile_details = !config.drawing_settings.show_profile_details;
+			}
+		}
+
+		return fetch;
+	});
+}
+
 void viewing_session::control_and_remove_fetched_intents(game_intent_vector& intents) {
+	control_open_developer_console(intents);
+
 	erase_if(intents, [&](const game_intent& intent) {
 		bool fetch = false;
 

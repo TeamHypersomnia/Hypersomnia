@@ -90,6 +90,7 @@ public:
 		const augs::delta dt
 	);
 
+	void control_open_developer_console(game_intent_vector&);
 	void control_and_remove_fetched_intents(game_intent_vector&);
 	void standard_audiovisual_post_solve(const const_logic_step);
 	void spread_past_infection(const const_logic_step);

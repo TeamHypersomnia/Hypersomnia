@@ -496,6 +496,8 @@ void director_setup::view(
 		timer.fraction_of_step_until_next_step(hypersomnia.get_fixed_delta()),
 		get_status_text()
 	);
+
+	renderer.draw_imgui(get_assets_manager());
 }
 
 void director_setup::save_unsaved_changes() {

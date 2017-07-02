@@ -14,6 +14,7 @@
 #include "augs/misc/timer.h"
 #include "augs/templates/settable_as_current_mixin.h"
 
+class assets_manager;
 struct camera_cone;
 struct debug_drawing_settings;
 
@@ -104,6 +105,8 @@ namespace augs {
 		void clear_logic_lines();
 		void clear_frame_lines();
 		
+		void draw_imgui(const assets_manager&);
+
 		void draw_debug_info(
 			const camera_cone,
 			const assets::game_image_id line_texture, 

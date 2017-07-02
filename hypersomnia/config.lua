@@ -101,7 +101,7 @@ return {
   interpolation_speed = 525,
   jitter_buffer_ms = 0,
   last_session_update_link = "",
-  latest_news_url = "",
+  latest_news_url = "http://hypersomnia.pl/latest_post/",
   launch_mode = "MAIN_MENU",
   max_number_of_sound_sources = 0,
   menu_intro_scene_entropy_path = "",
@@ -130,7 +130,7 @@ return {
   survey_num_file_path = "",
   window_border = true,
   window_name = "example",
-  window_pos = {x = 100, y = 10 },
+  window_pos = {x = 100, y = 20 },
 
   hotbar_button = {
     border_color = "255 255 255 255",

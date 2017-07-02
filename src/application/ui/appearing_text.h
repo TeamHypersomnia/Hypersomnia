@@ -12,7 +12,7 @@ namespace augs {
 using act = std::unique_ptr<augs::action>;
 
 struct appearing_text {
-	typedef augs::gui::text::formatted_string formatted_string;
+	using formatted_string = augs::gui::text::formatted_string;
 
 	augs::gui::text::style st = augs::gui::text::style(assets::font_id::GUI_FONT, cyan);
 	rgba_channel alpha = 0;
@@ -42,7 +42,9 @@ struct appearing_text {
 		push(act(new augs::delay_action(500.f)));
 	}
 
-	void push_actions(augs::action_list& into, size_t& rng) {
+	void push_actions(augs::action_list& into) {
+		static size_t rng = 0;
+
 		auto push = [&](act a) {
 			into.push_blocking(std::move(a));
 		};
