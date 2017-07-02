@@ -134,9 +134,11 @@ void menu_setup::process(
 		: intro_scene[entity_id()]
 	;
 
+	const auto title_size = metas_of_assets[assets::game_image_id::MENU_GAME_LOGO].get_size();
+
 	ltrb title_rect;
-	title_rect.set_position({ 100, 100 });
-	title_rect.set_size(metas_of_assets[assets::game_image_id::MENU_GAME_LOGO].get_size());
+	title_rect.set_position({ screen_size.x / 2.f - title_size.x / 2.f, 50.f });
+	title_rect.set_size(title_size);
 
 	rgba fade_overlay_color = { 0, 2, 2, 255 };
 	rgba title_text_color = { 255, 255, 255, 0 };
@@ -178,7 +180,7 @@ All your suggestions and contributions are very much welcomed by our collective.
 We wish you an exciting journey through architecture of our cosmos.\n", textes_style) +
 format(L"    ~hypernet community", style(assets::font_id::GUI_FONT, { 0, 180, 255, 255 }));
 
-	developer_welcome.target_pos += screen_size - get_text_bbox(developer_welcome.get_total_target_text(), 0) - vec2(100, 100);
+	developer_welcome.target_pos += screen_size - get_text_bbox(developer_welcome.get_total_target_text(), 0) - vec2(70.f, 70.f);
 	title_texts.push_back(&developer_welcome);
 
 	appearing_text hypersomnia_description;
@@ -186,7 +188,7 @@ format(L"    ~hypernet community", style(assets::font_id::GUI_FONT, { 0, 180, 25
 
 	hypersomnia_description.should_disappear = false;
 	hypersomnia_description.target_text[0] = format(L"- tendency of the omnipotent deity to immerse into inferior simulations,\nin spite of countless deaths experienced as a consequence.", { assets::font_id::GUI_FONT, {200, 200, 200, 255} });
-	hypersomnia_description.target_pos = title_rect.right_top() + vec2(20, 20);
+	hypersomnia_description.target_pos = title_rect.left_bottom() + vec2(20, 20);
 	title_texts.push_back(&hypersomnia_description);
 
 	for (auto& m : menu_ui_root.menu_buttons) {
@@ -581,7 +583,21 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 			augs::draw_rect_with_border(renderer.get_triangle_buffer(),
 				ltrb(developer_welcome.target_pos, tweened_welcome_message_bg_size).expand_from_center(vec2(6, 6)),
 				{ 0, 0, 0, 180 },
-				slightly_visible_white);
+				slightly_visible_white
+			);
+		}
+
+		if (tweened_menu_button_size.non_zero()) {
+			ltrb buttons_bg;
+			buttons_bg.set_position(menu_ui_root.menu_buttons.front().rc.left_top());
+			buttons_bg.b = menu_ui_root.menu_buttons.back().rc.b;
+			buttons_bg.w(tweened_menu_button_size.x);
+
+			augs::draw_rect_with_border(renderer.get_triangle_buffer(),
+				buttons_bg.expand_from_center(vec2(14, 10)),
+				{ 0, 0, 0, 180 },
+				slightly_visible_white
+			);
 		}
 
 		for (auto& t : intro_texts) {

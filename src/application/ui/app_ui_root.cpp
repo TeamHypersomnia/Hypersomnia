@@ -14,10 +14,10 @@ void app_ui_root::set_menu_buttons_positions(const vec2i screen_size) {
 
 	for (size_t i = 0; i < menu_buttons.size(); ++i) {
 		if (i == 0) {
-			menu_buttons[i].rc.set_position(vec2(100, screen_size.y - 70.f * menu_buttons.size()));
+			menu_buttons[i].rc.set_position(vec2(70.f, screen_size.y - 70.f * menu_buttons.size()));
 		}
 		else {
-			menu_buttons[i].rc.set_position(vec2(100, menu_buttons[i - 1].rc.b + 28));
+			menu_buttons[i].rc.set_position(vec2(70.f, menu_buttons[i - 1].rc.b + 28));
 		}
 	}
 }
