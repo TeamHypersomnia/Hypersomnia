@@ -253,8 +253,6 @@ atlases_regeneration_output regenerate_atlases(
 				}
 			}
 
-			atlas_image.swap_red_and_blue();
-
 			if (save_atlases_as_binary) {
 				atlas_image.save_as_binary_file(atlas_image_path);
 			}

@@ -255,7 +255,10 @@ void client_setup::process_once(
 	}
 
 	if (!still_downloading) {
-		const auto vdt = session.frame_timer.extract_variable_delta(extrapolated_hypersomnia.get_fixed_delta(), timer);
+		const augs::delta vdt =
+			timer.get_stepping_speed_multiplier()
+			* session.frame_timer.extract<std::chrono::milliseconds>()
+		;
 		
 		thread_local visible_entities all_visible;
 		session.get_visible_entities(all_visible, hypersomnia);

@@ -102,7 +102,7 @@ return {
   jitter_buffer_ms = 0,
   last_session_update_link = "",
   latest_news_url = "",
-  launch_mode = "LOCAL",
+  launch_mode = "DIRECTOR",
   max_number_of_sound_sources = 0,
   menu_intro_scene_entropy_path = "",
   menu_intro_scene_cosmos_path = "abc", -- paste whatever to work
@@ -150,5 +150,5 @@ return {
     make_lb_complement = false
   },
 
-  debug_minimal_test_scene = true
+  debug_minimal_test_scene = false
 }

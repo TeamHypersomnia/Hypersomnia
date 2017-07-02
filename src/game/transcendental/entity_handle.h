@@ -306,30 +306,25 @@ public:
 	}
 };
 
-template <bool is_const>
-std::vector<entity_id> to_id_vector(std::vector<basic_entity_handle<is_const>> vec) {
-	return std::vector<entity_id>(vec.begin(), vec.end());
-}
-
 template <class id_type>
 bool is_valid_cache_id(const id_type id) {
 	return id.indirection_index >= 0;
 }
 
-size_t make_cache_id(const unversioned_entity_id id);
-size_t make_cache_id(const entity_id id);
-size_t make_cache_id(const const_entity_handle handle);
+std::size_t make_cache_id(const unversioned_entity_id id);
+std::size_t make_cache_id(const entity_id id);
+std::size_t make_cache_id(const const_entity_handle handle);
 
-inline size_t make_cache_id(const entity_id id) {
+inline std::size_t make_cache_id(const entity_id id) {
 	ensure(is_valid_cache_id(id));
 	return id.indirection_index;
 }
 
-inline size_t make_cache_id(const unversioned_entity_id id) {
+inline std::size_t make_cache_id(const unversioned_entity_id id) {
 	ensure(is_valid_cache_id(id));
 	return id.indirection_index;
 }
 
-inline size_t make_cache_id(const const_entity_handle handle) {
+inline std::size_t make_cache_id(const const_entity_handle handle) {
 	return make_cache_id(handle.get_id());
 }

@@ -19,6 +19,7 @@
 #include "application/game_window.h"
 #include "application/config_lua_table.h"
 #include "game/hardcoded_content/test_scenes/testbed.h"
+#include "game/hardcoded_content/test_scenes/minimal_scene.h"
 
 #define LOG_REWINDING 0
 
@@ -44,11 +45,20 @@ void director_setup::init(
 	if (!hypersomnia.load_from_file("save.state")) {
 		hypersomnia.set_fixed_delta(session.config.default_tickrate);
 
-		test_scenes::testbed().populate_world_with_entities(
-			hypersomnia,
-			metas_of_assets,
-			session.get_standard_post_solve()
-		);
+		if (session.config.debug_minimal_test_scene) {
+			test_scenes::minimal_scene().populate_world_with_entities(
+				hypersomnia,
+				metas_of_assets,
+				session.get_standard_post_solve()
+			);
+		}
+		else {
+			test_scenes::testbed().populate_world_with_entities(
+				hypersomnia,
+				metas_of_assets,
+				session.get_standard_post_solve()
+			);
+		}
 	}
 
 	characters.acquire_available_characters(hypersomnia);
@@ -141,7 +151,7 @@ void director_setup::clear_accumulated_inputs() {
 	total_collected_entropy.clear();
 }
 
-void director_setup::control_player(
+augs::machine_entropy director_setup::control_player(
 	game_window& window,
 	viewing_session& session
 ) {
@@ -209,11 +219,11 @@ void director_setup::control_player(
 				clear_accumulated_inputs();
 			}
 			if (raw_input.key == key::NUMPAD5) {
-				requested_playing_speed = 1.;
+				requested_playing_speed = 1.0;
 				clear_accumulated_inputs();
 			}
 			if (raw_input.key == key::NUMPAD6) {
-				requested_playing_speed = 6.;
+				requested_playing_speed = 6.0;
 				clear_accumulated_inputs();
 			}
 			if (raw_input.key == key::NUMPAD9) {
@@ -234,6 +244,12 @@ void director_setup::control_player(
 		hypersomnia[characters.get_selected_character()],
 		new_machine_entropy.local
 	);
+
+	//if (should_show_editor_gui()) {
+	//	for (const auto l : new_machine_entropy.local) {
+	//		session.perform_imgui_pass({ l }, 0.f);
+	//	}
+	//}
 
 	characters.control_character_selection_numeric(new_machine_entropy.local);
 
@@ -264,6 +280,8 @@ void director_setup::control_player(
 		const unsigned seeked_step = current_step + static_cast<unsigned>(advance_steps_forward);
 		seek_to_step(seeked_step, session);
 	}
+
+	return new_machine_entropy;
 }
 
 void director_setup::seek_to_step(
@@ -314,7 +332,22 @@ void director_setup::process(
 	init(window, session);
 
 	while (!should_quit) {
-		control_player(window, session);
+		const auto entropy = control_player(window, session);
+
+		if (should_show_editor_gui()) {
+			//for (const auto l : entropy.local) {
+			//	session.perform_imgui_pass(
+			//		{ l },
+			//		0.f
+			//	);
+			//}
+			
+			session.perform_imgui_pass(
+				entropy.local, 
+				session.imgui_timer.extract<std::chrono::milliseconds>()
+			);
+		}
+
 		advance_player(session);
 		view(session);
 		window.swap_buffers();
@@ -433,8 +466,11 @@ void director_setup::advance_audiovisuals(
 	viewing_session& session
 ) {
 	session.get_visible_entities(all_visible, hypersomnia);
-
-	const auto vdt = session.frame_timer.extract_variable_delta(hypersomnia.get_fixed_delta(), timer);
+	
+	const augs::delta vdt =
+		timer.get_stepping_speed_multiplier()
+		* session.frame_timer.extract<std::chrono::milliseconds>()
+	;
 
 	session.advance_audiovisual_systems(
 		hypersomnia,
@@ -470,4 +506,8 @@ void director_setup::save_unsaved_changes() {
 
 director_setup::~director_setup() {
 	save_unsaved_changes();
+}
+
+bool director_setup::should_show_editor_gui() const {
+	return requested_playing_speed == 0.0;
 }

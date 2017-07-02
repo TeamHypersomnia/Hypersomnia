@@ -154,7 +154,7 @@ void action_button::draw(
 						);
 
 						bound_key_caption.bottom_right(absolute_rect);
-						bound_key_caption.pos.x -= 3;
+						bound_key_caption.pos.x -= 4;
 						bound_key_caption.draw_stroke(info.v);
 						bound_key_caption.draw(info.v);
 					}
@@ -196,6 +196,7 @@ void action_button::draw(
 			);
 
 			bound_key_caption.center(absolute_rect);
+			bound_key_caption.pos.y += 2;
 			bound_key_caption.draw_stroke(info.v);
 			bound_key_caption.draw(info.v);
 		}

@@ -76,6 +76,8 @@ namespace augs {
 		unsigned int triangle_buffer_id;
 		unsigned int special_buffer_id;
 
+		unsigned int imgui_elements_id;
+
 		vertex_triangle_buffer triangles;
 		vertex_line_buffer lines;
 		special_buffer specials;

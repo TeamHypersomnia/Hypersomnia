@@ -25,7 +25,7 @@ namespace augs {
 				source.get_size().x, 
 				source.get_size().y, 
 				0, 
-				GL_BGRA, 
+				GL_RGBA, 
 				GL_UNSIGNED_BYTE, 
 				source.get_data()
 			); glerr;

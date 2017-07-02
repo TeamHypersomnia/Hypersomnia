@@ -288,7 +288,6 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/augs/misc/delta.cpp"
 	"src/augs/misc/stepped_timing.cpp"
 	"src/augs/misc/measurements.cpp"
-	"src/augs/misc/variable_delta_timer.cpp"
 	"src/augs/templates/templates.cpp"
 	"src/augs/window_framework/colored_print.cpp"
 	"src/augs/window_framework/platform_utils.cpp"
@@ -428,6 +427,9 @@ set(HYPERSOMNIA_TRIVIAL_3RDPARTY_SRCS
 	"src/3rdparty/lodepng/lodepng.cpp"
 	"src/3rdparty/polypartition/src/polypartition.cpp"
 	"src/3rdparty/rectpack2D/src/pack.cpp"
+	"src/3rdparty/imgui/imgui.cpp"
+	"src/3rdparty/imgui/imgui_draw.cpp"
+	"src/3rdparty/imgui/imgui_demo.cpp"
 )
 
 set(HYPERSOMNIA_SRCS

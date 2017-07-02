@@ -150,10 +150,10 @@ void local_setup::process(
 		auto advance_audiovisuals = [&](){
 			session.get_visible_entities(all_visible, hypersomnia);
 
-			const auto vdt = session.frame_timer.extract_variable_delta(
-				hypersomnia.get_fixed_delta(), 
-				timer
-			);
+			const augs::delta vdt = 
+				timer.get_stepping_speed_multiplier() 
+				* session.frame_timer.extract<std::chrono::milliseconds>()
+			;
 
 			session.advance_audiovisual_systems(
 				hypersomnia, 

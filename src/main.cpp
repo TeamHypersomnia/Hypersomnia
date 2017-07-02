@@ -22,6 +22,8 @@
 
 #include "augs/misc/script_utils.h"
 
+#include <imgui/imgui.h>
+
 /*
 	The usage of std::make_unique calls in main is to prevent stack overflow
 	due to otherwise there possibly being many cosmoi and resources on the stack.
@@ -112,6 +114,7 @@ int main(int argc, char** argv) {
 	gl.initialize_fbos(window.get_screen_size());
 
 	regeneration_thread.join();
+
 	load_requisite_atlases(*resources, cfg);
 	load_requisite_shaders(*resources);
 

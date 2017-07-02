@@ -44,6 +44,8 @@ namespace augs {
 		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE); glerr;
 		glClearColor(0.0, 0.0, 0.0, 1.0); glerr;
 
+		glGenBuffers(1, &imgui_elements_id); glerr;
+
 		glGenBuffers(1, &triangle_buffer_id); glerr;
 		glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer_id); glerr;
 

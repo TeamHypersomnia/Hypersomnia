@@ -125,6 +125,9 @@ namespace augs {
 	}
 }
 
+struct b2Vec2;
+struct ImVec2;
+
 template <class type>
 struct vec2t {
 	// GEN INTROSPECTOR struct vec2t class type
@@ -181,6 +184,31 @@ struct vec2t {
 		x(static_cast<type>(v.x)), 
 		y(static_cast<type>(v.y)) 
 	{}
+
+	vec2t(
+		const b2Vec2& v
+	) :
+		x(static_cast<type>(v.x)),
+		y(static_cast<type>(v.y))
+	{}
+
+	vec2t(
+		const ImVec2& v
+	) :
+		x(static_cast<type>(v.x)),
+		y(static_cast<type>(v.y))
+	{}
+
+	template <
+		class T,
+		class = std::enable_if_t<
+			std::is_same_v<T, b2Vec2>
+		|| std::is_same_v<T, ImVec2>
+		>
+	>
+	operator T() const {
+		return { x, y };
+	}
 
 	template <class t>
 	vec2t& operator=(const vec2t<t>& v) {

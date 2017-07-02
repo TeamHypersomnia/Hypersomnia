@@ -182,8 +182,11 @@ void determinism_test_setup::process(
 
 		thread_local visible_entities all_visible;
 		session.get_visible_entities(all_visible, hypersomnias[currently_viewn_cosmos]);
-
-		const auto vdt = session.frame_timer.extract_variable_delta(hypersomnias[currently_viewn_cosmos].get_fixed_delta(), timer);
+		
+		const augs::delta vdt =
+			timer.get_stepping_speed_multiplier()
+			* session.frame_timer.extract<std::chrono::milliseconds>()
+		;
 
 		session.advance_audiovisual_systems(
 			hypersomnias[currently_viewn_cosmos],

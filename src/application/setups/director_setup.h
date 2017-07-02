@@ -64,7 +64,7 @@ public:
 	std::vector<cosmos> snapshots_for_rewinding;
 	unsigned initial_step_number = 0u;
 	unsigned snapshot_frequency_in_steps = 0u;
-
+	
 	unsigned get_step_number(const cosmos&) const;
 
 	void set_snapshot_frequency_in_seconds(const double);
@@ -76,7 +76,7 @@ public:
 		viewing_session&
 	);
 
-	void control_player(
+	augs::machine_entropy control_player(
 		game_window& window,
 		viewing_session& session
 	);
@@ -102,6 +102,8 @@ public:
 	void view(
 		viewing_session&
 	);
+	
+	bool should_show_editor_gui() const;
 
 	void save_unsaved_changes();
 

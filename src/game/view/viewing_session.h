@@ -1,9 +1,10 @@
 #pragma once
 #include "game/view/world_camera.h"
-#include "augs/misc/variable_delta_timer.h"
 #include "augs/misc/measurements.h"
 
 #include "augs/misc/basic_input_context.h"
+#include "augs/misc/fixed_delta_timer.h"
+
 #include "game/detail/gui/aabb_highlighter.h"
 
 #include "augs/gui/formatted_text.h"
@@ -53,7 +54,9 @@ public:
 
 	bool gui_look_enabled = false;
 
-	augs::variable_delta_timer frame_timer;
+	augs::timer frame_timer;
+	augs::timer imgui_timer;
+
 	mutable augs::measurements fps_profiler = augs::measurements(L"FPS");
 	mutable augs::measurements frame_profiler = augs::measurements(L"Frame");
 	mutable augs::measurements local_entropy_profiler = augs::measurements(L"Acquiring local entropy");
@@ -80,6 +83,11 @@ public:
 	void control_gui_and_remove_fetched_events(
 		const const_entity_handle root,
 		augs::machine_entropy::local_type&
+	);
+	
+	void perform_imgui_pass(
+		const augs::machine_entropy::local_type&,
+		const augs::delta dt
 	);
 
 	void control_and_remove_fetched_intents(game_intent_vector&);

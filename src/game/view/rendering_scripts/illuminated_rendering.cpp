@@ -21,6 +21,8 @@
 
 #include "augs/graphics/OpenGL_includes.h"
 
+#include <imgui/imgui.h>
+
 namespace rendering_scripts {
 	void illuminated_rendering(const viewing_step step) {
 		auto& renderer = step.renderer;
@@ -391,5 +393,45 @@ namespace rendering_scripts {
 			{},
 			step.get_interpolation_ratio()
 		);
+
+		{
+			const auto* const draw_data = ImGui::GetDrawData();
+
+			if (draw_data != nullptr) {
+				ImGuiIO& io = ImGui::GetIO();
+				const int fb_width = int(io.DisplaySize.x * io.DisplayFramebufferScale.x);
+				const int fb_height = int(io.DisplaySize.y * io.DisplayFramebufferScale.y);
+
+				glEnable(GL_SCISSOR_TEST);
+
+				for (int n = 0; n < draw_data->CmdListsCount; ++n) {
+					const ImDrawList* cmd_list = draw_data->CmdLists[n];
+					const ImDrawIdx* idx_buffer_offset = 0;
+
+					glBindBuffer(GL_ARRAY_BUFFER, renderer.triangle_buffer_id);
+					glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr)cmd_list->VtxBuffer.Size * sizeof(ImDrawVert), (const GLvoid*)cmd_list->VtxBuffer.Data, GL_STREAM_DRAW);
+
+					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, renderer.imgui_elements_id);
+					glBufferData(GL_ELEMENT_ARRAY_BUFFER, (GLsizeiptr)cmd_list->IdxBuffer.Size * sizeof(ImDrawIdx), (const GLvoid*)cmd_list->IdxBuffer.Data, GL_STREAM_DRAW);
+
+					for (int cmd_i = 0; cmd_i < cmd_list->CmdBuffer.Size; cmd_i++) {
+						const ImDrawCmd* pcmd = &cmd_list->CmdBuffer[cmd_i];
+						if (pcmd->UserCallback) {
+							pcmd->UserCallback(cmd_list, pcmd);
+						}
+						else {
+							renderer.bind_texture(manager[assets::gl_texture_id { reinterpret_cast<intptr_t>(pcmd->TextureId) }]);
+							glScissor((int)pcmd->ClipRect.x, (int)(fb_height - pcmd->ClipRect.w), (int)(pcmd->ClipRect.z - pcmd->ClipRect.x), (int)(pcmd->ClipRect.w - pcmd->ClipRect.y));
+							glDrawElements(GL_TRIANGLES, (GLsizei)pcmd->ElemCount, sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, idx_buffer_offset);
+						}
+						idx_buffer_offset += pcmd->ElemCount;
+					}
+				}
+
+				glDisable(GL_SCISSOR_TEST);
+			}
+		}
+
+		renderer.bind_texture(manager[assets::gl_texture_id::GAME_WORLD_ATLAS]);
 	}
 }

@@ -379,7 +379,7 @@ void physics_system::step_and_set_new_transforms(const logic_step step) {
 		
 		body.transform = b->m_xf;
 		body.sweep = b->m_sweep;
-		body.velocity = b->GetLinearVelocity();
+		body.velocity = vec2(b->GetLinearVelocity());
 		body.angular_velocity = b->GetAngularVelocity();
 	}
 }

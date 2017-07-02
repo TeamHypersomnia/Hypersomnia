@@ -542,10 +542,10 @@ or tell a beautiful story of a man devastated by struggle.\n", s)
 		thread_local visible_entities all_visible;
 		session.get_visible_entities(all_visible, intro_scene);
 
-		const auto vdt = session.frame_timer.extract_variable_delta(
-			intro_scene.get_fixed_delta(), 
-			timer
-		);
+		const augs::delta vdt =
+			timer.get_stepping_speed_multiplier()
+			* session.frame_timer.extract<std::chrono::milliseconds>()
+		;
 
 		session.advance_audiovisual_systems(
 			intro_scene, 

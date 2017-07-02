@@ -280,7 +280,11 @@ namespace augs {
 				}
 			}
 		}
+		else if (channels == 4 && pitch == 0) {
+			std::memcpy(v.data(), ptr, new_size.area() * 4);
+		}
 		else {
+			// TODO: Not implemented
 			ensure(false);
 		}
 	}

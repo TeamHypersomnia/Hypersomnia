@@ -201,3 +201,4 @@ alsoft.ini
 *.db-wal
 build
 dev/
+imgui.ini
