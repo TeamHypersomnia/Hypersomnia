@@ -24,7 +24,7 @@ public:
 
 	template <class C>
 	decltype(auto) dereference(const C context) const {
-		return &context.get_root_of_app_ui().menu_buttons.at(static_cast<size_t>(type));
+		return &context.get_root_of_menu_ui().menu_buttons.at(static_cast<size_t>(type));
 	}
 };
 

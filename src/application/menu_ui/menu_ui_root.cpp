@@ -1,7 +1,7 @@
 #include <tuple>
-#include "app_ui_root.h"
+#include "menu_ui_root.h"
 
-app_ui_root::app_ui_root(const vec2i screen_size) {
+menu_ui_root::menu_ui_root(const vec2i screen_size) {
 	unset_flag(augs::gui::flag::CLIP);
 	set_flag(augs::gui::flag::ENABLE_DRAWING_OF_CHILDREN);
 	set_flag(augs::gui::flag::DISABLE_HOVERING);
@@ -9,7 +9,7 @@ app_ui_root::app_ui_root(const vec2i screen_size) {
 	rc = xywh(0, 0, 0, 0);
 }
 
-void app_ui_root::set_menu_buttons_positions(const vec2i screen_size) {
+void menu_ui_root::set_menu_buttons_positions(const vec2i screen_size) {
 	set_menu_buttons_sizes(get_max_menu_button_size());
 
 	for (size_t i = menu_buttons.size() - 1; i != size_t(-1); --i) {
@@ -22,7 +22,7 @@ void app_ui_root::set_menu_buttons_positions(const vec2i screen_size) {
 	}
 }
 
-void app_ui_root::set_menu_buttons_sizes(const vec2i size) {
+void menu_ui_root::set_menu_buttons_sizes(const vec2i size) {
 	for (size_t i = 0; i < menu_buttons.size(); ++i) {
 		auto this_size = size;
 		
@@ -35,7 +35,7 @@ void app_ui_root::set_menu_buttons_sizes(const vec2i size) {
 	}
 }
 
-vec2i app_ui_root::get_max_menu_button_size() const {
+vec2i menu_ui_root::get_max_menu_button_size() const {
 	vec2i s;
 
 	for (size_t i = 0; i < menu_buttons.size(); ++i) {
@@ -48,7 +48,7 @@ vec2i app_ui_root::get_max_menu_button_size() const {
 	return s;
 }
 
-void app_ui_root::set_menu_buttons_colors(const rgba col) {
+void menu_ui_root::set_menu_buttons_colors(const rgba col) {
 	for (size_t i = 0; i < menu_buttons.size(); ++i) {
 		menu_buttons[i].colorize = col;
 	}

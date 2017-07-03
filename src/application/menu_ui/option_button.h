@@ -1,5 +1,5 @@
 #pragma once
-#include "app_ui_element_location.h"
+#include "menu_ui_element_location.h"
 #include "augs/gui/appearance_detector.h"
 #include "augs/gui/material.h"
 
@@ -8,11 +8,11 @@
 #include "game/assets/game_image_id.h"
 
 #include "augs/gui/button_corners.h"
-#include "application/ui/appearing_text.h"
+#include "application/menu_ui/appearing_text.h"
 
 #include "augs/audio/sound_source.h"
 
-class option_button : public app_ui_rect_node {
+class option_button : public menu_ui_rect_node {
 public:
 	augs::gui::appearance_detector detector;
 	augs::gui::text::formatted_string caption;
@@ -31,7 +31,7 @@ public:
 	bool click_callback_required = false;
 	pad_bytes<3> pad;
 
-	using base = app_ui_rect_node;
+	using base = menu_ui_rect_node;
 	using gui_entropy = base::gui_entropy;
 
 	option_button();

@@ -27,11 +27,11 @@
 
 #include "augs/gui/text/caret.h"
 
-#include "application/ui/app_ui_root.h"
-#include "application/ui/app_ui_context.h"
+#include "application/menu_ui/menu_ui_root.h"
+#include "application/menu_ui/menu_ui_context.h"
 
-#include "application/ui/appearing_text.h"
-#include "application/ui/creators_screen.h"
+#include "application/menu_ui/appearing_text.h"
+#include "application/menu_ui/creators_screen.h"
 
 #include "augs/misc/http_requests.h"
 #include "augs/templates/string_templates.h"
@@ -154,11 +154,11 @@ void menu_setup::process(
 
 	vec2i tweened_welcome_message_bg_size;
 
-	app_ui_rect_world menu_ui_rect_world;
+	menu_ui_rect_world menu_ui_rect_world;
 	menu_ui_rect_world.last_state.screen_size = screen_size;
 
-	app_ui_root_in_context menu_ui_root_id;
-	app_ui_root menu_ui_root = screen_size;
+	menu_ui_root_in_context menu_ui_root_id;
+	menu_ui_root menu_ui_root = screen_size;
 
 	for (auto& m : menu_ui_root.menu_buttons) {
 		m.hover_highlight_maximum_distance = 10.f;
@@ -448,10 +448,10 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 		renderer.clear_triangles();
 
 		{
-			app_ui_rect_world::gui_entropy gui_entropies;
+			menu_ui_rect_world::gui_entropy gui_entropies;
 
-			app_ui_rect_tree menu_ui_tree;
-			app_ui_context menu_ui_context(menu_ui_rect_world, menu_ui_tree, menu_ui_root);
+			menu_ui_rect_tree menu_ui_tree;
+			menu_ui_context menu_ui_context(menu_ui_rect_world, menu_ui_tree, menu_ui_root);
 
 			menu_ui_rect_world.build_tree_data_into_context(menu_ui_context, menu_ui_root_id);
 

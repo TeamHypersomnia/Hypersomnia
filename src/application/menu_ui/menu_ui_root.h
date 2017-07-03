@@ -1,13 +1,13 @@
 #pragma once
-#include "application/ui/app_ui_element_location.h"
-#include "application/ui/option_button.h"
+#include "application/menu_ui/menu_ui_element_location.h"
+#include "application/menu_ui/option_button.h"
 #include "application/menu_button_type.h"
 #include "augs/gui/dereferenced_location.h"
 #include "augs/misc/enum_array.h"
 
-class app_ui_root : public app_ui_rect_node {
+class menu_ui_root : public menu_ui_rect_node {
 public:
-	app_ui_root(const vec2i screen_size);
+	menu_ui_root(const vec2i screen_size);
 
 	augs::enum_array<option_button, menu_button_type> menu_buttons;
 
