@@ -57,6 +57,7 @@ viewing_session::viewing_session(
 
 	io.IniFilename = "generated/imgui.ini";
 	io.LogFilename = "generated/imgui_log.txt";
+	io.MouseDoubleClickMaxDist = 100.f;
 
 	augs::load_from_lua_table(
 		gui_style,
@@ -135,7 +136,7 @@ void viewing_session::perform_imgui_pass(
 		if (in.msg == message::mousemotion) {
 			io.MousePos = (vec2(in.mouse.rel) + io.MousePos).clamp_from_zero_to(size);
 		}
-		else if (in.msg == message::ldown || in.msg == message::ldoubleclick) {
+		else if (in.msg == message::ldown || in.msg == message::ldoubleclick || in.msg == message::ltripleclick) {
 			io.MouseDown[0] = true;
 		}
 		else if (in.msg == message::lup) {
