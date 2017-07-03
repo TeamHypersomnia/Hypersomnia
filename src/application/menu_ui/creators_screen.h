@@ -121,7 +121,7 @@ struct creators_screen {
 		center_all(screen_size);
 
 		afterword.target_text[0] = format(L"\
-What stands before your eyes is an outcome of a man'person_style burning passion,\n\
+What stands before your eyes is an outcome of a man's burning passion,\n\
 a digital inamorata, chef d'oeuvre of a single coder, masterful musicians and a champion at pixel art.\n\n", person_style);
 
 		afterword.target_text[1] = format(L"\

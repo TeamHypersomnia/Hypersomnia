@@ -170,20 +170,36 @@ void viewing_session::perform_imgui_pass(
 	io.DisplaySize = size;
 
 	ImGui::NewFrame();
-	ImGuiStyle passed_style = gui_style;
-	ImGui::ShowStyleEditor(&passed_style);
+	
+	if (show_style_editor) {
+		ImGuiStyle passed_style = gui_style;
+		ImGui::Begin("Style editor", &show_style_editor);
+		ImGui::ShowStyleEditor(&passed_style);
+		ImGui::End();
 
-	const bool has_style_changed =
-		!augs::introspective_compare(
-			passed_style,
-			gui_style
-		)
-	;
+		const bool has_style_changed =
+			!augs::introspective_compare(
+				passed_style,
+				gui_style
+			)
+		;
 
-	if (has_style_changed) {
-		gui_style = passed_style;
-		ImGui::GetStyle() = gui_style;
-		augs::save_as_lua_table(gui_style, "gui_style.local.lua");
+		if (has_style_changed) {
+			gui_style = passed_style;
+			ImGui::GetStyle() = gui_style;
+			augs::save_as_lua_table(gui_style, "gui_style.local.lua");
+		}
+	}
+
+	if (show_settings) {
+		ImGui::Begin("Settings", &show_settings);
+
+		if (ImGui::Button("Style editor")) {
+			ImGui::SetWindowFocus("Style editor");
+			show_style_editor = true;
+		}
+
+		ImGui::End();
 	}
 
 	ImGui::Render();

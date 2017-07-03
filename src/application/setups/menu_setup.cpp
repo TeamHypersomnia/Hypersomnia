@@ -299,6 +299,11 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 			should_quit = true;
 			break;
 
+		case menu_button_type::SETTINGS:
+			session.show_settings = true;
+			ImGui::SetWindowFocus("Settings");
+			break;
+
 		case menu_button_type::CREATORS:
 			if (credits_actions.is_complete()) {
 				credits_actions.push_blocking(act(new augs::tween_value_action<rgba_channel>(fade_overlay_color.a, 170, 500.f)));
@@ -330,6 +335,11 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 		new_machine_entropy.local = window.collect_entropy(!session.config.debug_disable_cursor_clipping);
 		session.local_entropy_profiler.end_measurement();
 		
+		session.perform_imgui_pass(
+			new_machine_entropy.local,
+			session.imgui_timer.extract<std::chrono::milliseconds>()
+		);
+
 		process_exit_key(new_machine_entropy.local);
 
 		{

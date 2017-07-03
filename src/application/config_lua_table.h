@@ -73,7 +73,7 @@ public:
 	bool debug_break_on_unit_test_failure = false;
 
 	bool enable_hrtf = true;
-	unsigned max_number_of_sound_sources = 0u;
+	unsigned max_number_of_sound_sources = 4096u;
 
 	std::string audio_output_device;
 

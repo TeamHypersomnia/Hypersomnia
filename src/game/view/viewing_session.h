@@ -56,6 +56,8 @@ public:
 	storage_for_all_systems_audiovisual systems_audiovisual;
 
 	bool gui_look_enabled = false;
+	bool show_settings = false;
+	bool show_style_editor = false;
 
 	augs::timer frame_timer;
 	augs::timer imgui_timer;
