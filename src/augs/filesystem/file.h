@@ -24,21 +24,29 @@ namespace augs {
 	}
 
 	template <class P>
-	auto switch_file(
-		const P& filename, 
-		const P& official_directory, 
-		const P& custom_directory
+	auto switch_path(
+		const P official_path,
+		const P custom_path
 	) {
-		const auto custom = custom_directory + filename;
-
-		if (file_exists(custom)) {
-			return custom;
+		if (file_exists(custom_path)) {
+			return custom_path;
 		}
 		else {
-			const auto official = official_directory + filename;
-			ensure(file_exists(official));
-			return official;
+			ensure(file_exists(official_path));
+			return official_path;
 		}
+	}
+
+	template <class P>
+	auto switch_dir(
+		const P filename, 
+		const P official_directory, 
+		const P custom_directory
+	) {
+		return switch_file(
+			official_directory + filename, 
+			custom_directory + filename
+		);
 	}
 
 	template <class P>

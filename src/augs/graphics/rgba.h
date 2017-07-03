@@ -13,6 +13,16 @@ struct hsv {
 	hsv operator+(hsv b) const;
 };
 
+inline auto to_0_1(const rgba_channel c) {
+	return c / 255.f;
+}
+
+inline auto to_0_255(const float c) {
+	return static_cast<rgba_channel>(c * 255.f);
+}
+
+struct ImVec4;
+
 struct rgba {
 	struct rgb_type {
 		rgba_channel r;
@@ -29,6 +39,9 @@ struct rgba {
 
 	explicit rgba(const console_color);
 	
+	rgba(const ImVec4&);
+	operator ImVec4() const;
+
 	rgba(
 		const rgb_type, 
 		const rgba_channel alpha = 255

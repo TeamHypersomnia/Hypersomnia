@@ -67,6 +67,10 @@ namespace augs {
 	}
 }
 
+struct ImGuiStyle;
+struct ImVec2;
+struct ImVec4;
+
 %xnamespace augs {
 	/* Hand-written enum introspectors that do not fit into the standard schema begin here */
 
@@ -130,6 +134,105 @@ namespace augs {
 				std::index_sequence_for<Types...>{},
 				std::forward<Instances>(t)...
 			);
+		}
+
+		template <class F, class... Instances>
+		static void introspect_body(
+			const ImVec2* const,
+			F f,
+			Instances&&... _t_
+		) {
+			FIELD(x);
+			FIELD(y);
+		}
+
+		template <class F, class... Instances>
+		static void introspect_body(
+			const ImVec4* const,
+			F f,
+			Instances&&... _t_
+		) {
+			FIELD(x);
+			FIELD(y);
+			FIELD(z);
+			FIELD(w);
+		}
+
+		template <class F, class... Instances>
+		static void introspect_body(
+			const ImGuiStyle* const,
+			F f,
+			Instances&&... _t_
+		) {
+#define imcol(x) f(#x, _t_.Colors[x]...)
+			FIELD(Alpha);                      
+			FIELD(WindowPadding);              
+			FIELD(WindowMinSize);              
+			FIELD(WindowRounding);             
+			FIELD(WindowTitleAlign);           
+			FIELD(ChildWindowRounding);        
+			FIELD(FramePadding);               
+			FIELD(FrameRounding);              
+			FIELD(ItemSpacing);                
+			FIELD(ItemInnerSpacing);           
+			FIELD(TouchExtraPadding);         
+			FIELD(IndentSpacing);              
+			FIELD(ColumnsMinSpacing);          
+			FIELD(ScrollbarSize);              
+			FIELD(ScrollbarRounding);          
+			FIELD(GrabMinSize);                
+			FIELD(GrabRounding);               
+			FIELD(ButtonTextAlign);            
+			FIELD(DisplayWindowPadding);       
+			FIELD(DisplaySafeAreaPadding);     
+			FIELD(AntiAliasedLines);           
+			FIELD(AntiAliasedShapes);          
+			FIELD(CurveTessellationTol);
+			
+			imcol(ImGuiCol_Text);
+			imcol(ImGuiCol_TextDisabled);
+			imcol(ImGuiCol_WindowBg);              
+			imcol(ImGuiCol_ChildWindowBg);         
+			imcol(ImGuiCol_PopupBg);               
+			imcol(ImGuiCol_Border);
+			imcol(ImGuiCol_BorderShadow);
+			imcol(ImGuiCol_FrameBg);               
+			imcol(ImGuiCol_FrameBgHovered);
+			imcol(ImGuiCol_FrameBgActive);
+			imcol(ImGuiCol_TitleBg);
+			imcol(ImGuiCol_TitleBgCollapsed);
+			imcol(ImGuiCol_TitleBgActive);
+			imcol(ImGuiCol_MenuBarBg);
+			imcol(ImGuiCol_ScrollbarBg);
+			imcol(ImGuiCol_ScrollbarGrab);
+			imcol(ImGuiCol_ScrollbarGrabHovered);
+			imcol(ImGuiCol_ScrollbarGrabActive);
+			imcol(ImGuiCol_ComboBg);
+			imcol(ImGuiCol_CheckMark);
+			imcol(ImGuiCol_SliderGrab);
+			imcol(ImGuiCol_SliderGrabActive);
+			imcol(ImGuiCol_Button);
+			imcol(ImGuiCol_ButtonHovered);
+			imcol(ImGuiCol_ButtonActive);
+			imcol(ImGuiCol_Header);
+			imcol(ImGuiCol_HeaderHovered);
+			imcol(ImGuiCol_HeaderActive);
+			imcol(ImGuiCol_Column);
+			imcol(ImGuiCol_ColumnHovered);
+			imcol(ImGuiCol_ColumnActive);
+			imcol(ImGuiCol_ResizeGrip);
+			imcol(ImGuiCol_ResizeGripHovered);
+			imcol(ImGuiCol_ResizeGripActive);
+			imcol(ImGuiCol_CloseButton);
+			imcol(ImGuiCol_CloseButtonHovered);
+			imcol(ImGuiCol_CloseButtonActive);
+			imcol(ImGuiCol_PlotLines);
+			imcol(ImGuiCol_PlotLinesHovered);
+			imcol(ImGuiCol_PlotHistogram);
+			imcol(ImGuiCol_PlotHistogramHovered);
+			imcol(ImGuiCol_TextSelectedBg);
+			imcol(ImGuiCol_ModalWindowDarkening);
+#undef imcol
 		}
 
 		/* Generated introspectors begin here */

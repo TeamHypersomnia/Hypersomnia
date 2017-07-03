@@ -39,11 +39,7 @@ enum class launch_type {
 class config_lua_table {
 public:
 	config_lua_table() = default;
-
-	config_lua_table(
-		const std::string& config_lua_path, 
-		const std::string& config_local_lua_path
-	);
+	config_lua_table(const std::string& config_lua_path);
 
 	void save(
 		const std::string& target_path

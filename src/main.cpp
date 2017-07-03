@@ -21,8 +21,10 @@
 #include "augs/window_framework/platform_utils.h"
 
 #include "augs/misc/script_utils.h"
+#include "augs/misc/lua_readwrite.h"
 
 #include <imgui/imgui.h>
+#include "generated/introspectors.h"
 
 /*
 	The usage of std::make_unique calls in main is to prevent stack overflow
@@ -34,7 +36,12 @@ int main(int argc, char** argv) {
 
 	augs::global_libraries::init();
 	
-	auto cfg = config_lua_table("config.lua", "config.local.lua");
+	auto cfg = config_lua_table(
+		augs::switch_path(
+			"config.lua", 
+			"config.local.lua"
+		)
+	);
 	
 	if (cfg.debug_run_unit_tests) {
 		augs::global_libraries::run_unit_tests(

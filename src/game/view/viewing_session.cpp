@@ -11,6 +11,10 @@
 #include "hypersomnia_version.h"
 #include "game/build_settings.h"
 
+#include "augs/misc/lua_readwrite.h"
+#include "generated/introspectors.h"
+#include "augs/filesystem/file.h"
+
 #include <imgui/imgui.h>
 
 viewing_session::viewing_session(
@@ -50,6 +54,19 @@ viewing_session::viewing_session(
 	map_key(ImGuiKey_X, key::X);
 	map_key(ImGuiKey_Y, key::Y);
 	map_key(ImGuiKey_Z, key::Z);
+
+	io.IniFilename = "generated/imgui.ini";
+	io.LogFilename = "generated/imgui_log.txt";
+
+	augs::load_from_lua_table(
+		gui_style,
+		augs::switch_path(
+			"gui_style.lua",
+			"gui_style.local.lua"
+		)
+	);
+
+	ImGui::GetStyle() = gui_style;
 }
 
 void viewing_session::set_screen_size(const vec2i new_size) {
@@ -152,7 +169,22 @@ void viewing_session::perform_imgui_pass(
 	io.DisplaySize = size;
 
 	ImGui::NewFrame();
-	ImGui::ShowTestWindow();
+	ImGuiStyle passed_style = gui_style;
+	ImGui::ShowStyleEditor(&passed_style);
+
+	const bool has_style_changed =
+		!augs::introspective_compare(
+			passed_style,
+			gui_style
+		)
+	;
+
+	if (has_style_changed) {
+		gui_style = passed_style;
+		ImGui::GetStyle() = gui_style;
+		augs::save_as_lua_table(gui_style, "gui_style.local.lua");
+	}
+
 	ImGui::Render();
 }
 

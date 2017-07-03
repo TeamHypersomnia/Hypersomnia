@@ -1,5 +1,6 @@
 #include <limits>
 #include <algorithm>
+#include <imgui/imgui.h>
 #include "augs/ensure.h"
 #include "augs/graphics/rgba.h"
 
@@ -112,6 +113,24 @@ rgb hsv2rgb(const hsv in)
 	return out;
 }
 
+rgba::rgba(const ImVec4& v) :
+	rgba(
+		to_0_255(v.x),
+		to_0_255(v.y),
+		to_0_255(v.z),
+		to_0_255(v.w)
+	)
+{}
+
+rgba::operator ImVec4() const {
+	return { 
+		to_0_1(r),
+		to_0_1(g),
+		to_0_1(b),
+		to_0_1(a)
+	};
+}
+
 rgba::rgba(const console_color c) {
 	switch (c) {
 	case console_color::WHITE: set(white); break;
@@ -182,10 +201,10 @@ void rgba::set(const rgba col) {
 
 rgba rgba::operator*(const rgba s) const {
 	return rgba(
-		static_cast<rgba_channel>((s.r / 255.*r / 255.) * 255),
-		static_cast<rgba_channel>((s.g / 255.*g / 255.) * 255),
-		static_cast<rgba_channel>((s.b / 255.*b / 255.) * 255),
-		static_cast<rgba_channel>((s.a / 255.*a / 255.) * 255)
+		static_cast<rgba_channel>(to_0_255((to_0_1(s.r) * to_0_1(r)))),
+		static_cast<rgba_channel>(to_0_255((to_0_1(s.g) * to_0_1(g)))),
+		static_cast<rgba_channel>(to_0_255((to_0_1(s.b) * to_0_1(b)))),
+		static_cast<rgba_channel>(to_0_255((to_0_1(s.a) * to_0_1(a))))
 	);
 }
 

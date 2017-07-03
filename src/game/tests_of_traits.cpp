@@ -12,6 +12,8 @@
 #include "game/components/pathfinding_component.h"
 
 #include "augs/pad_bytes.h"
+#include "augs/misc/custom_lua_representations.h"
+#include "augs/misc/lua_readwrite.h"
 
 namespace templates_detail {
 	template <class T>
@@ -189,6 +191,17 @@ struct tests_of_traits {
 	static_assert(std::is_same_v<unsigned int, get_index_type_for_size_of_t<F>>, "Trait has failed");
 
 	static_assert(sizeof(cosmos) < 1000000, "Possible stack overflow due to cosmos on the stack");
+
+	static_assert(is_introspective_leaf_v<launch_type>);
+	static_assert(has_enum_to_string_v<launch_type>);
+	static_assert(has_enum_to_string_v<launch_type>);
+	static_assert(has_for_each_enum_v<launch_type>);
+	static_assert(has_for_each_enum_v<input_recording_type>);
+	static_assert(is_container_v<decltype(input_context::key_to_intent)>);
+
+	static_assert(augs::has_custom_to_lua_value_v<rgba>);
+	static_assert(augs::has_custom_to_lua_value_v<ImVec4>);
+
 };
 
 /*

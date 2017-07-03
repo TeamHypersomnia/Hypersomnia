@@ -1,4 +1,6 @@
 #pragma once
+#include <imgui/imgui.h>
+
 #include "game/view/world_camera.h"
 #include "augs/misc/measurements.h"
 
@@ -46,6 +48,7 @@ namespace augs {
 class viewing_session {
 public:
 	config_lua_table config;
+	ImGuiStyle gui_style;
 
 	world_camera camera;
 	vec2i viewport_coordinates;

@@ -1,6 +1,7 @@
 #pragma once
 #include <type_traits>
 #include "augs/templates/introspection_traits.h"
+#include "augs/templates/recursive.h"
 
 namespace augs {
 	struct introspection_access;
@@ -69,5 +70,33 @@ namespace augs {
 				}
 			}
 		);
+	}
+
+	template <class A, class B>
+	bool introspective_compare(
+		const A& a,
+		const B& b
+	) {
+		bool are_same = true;
+
+		augs::introspect(
+			augs::recursive([&are_same](
+				auto&& self,
+				const auto label,
+				const auto& aa, 
+				const auto& bb
+			) {
+				if constexpr(is_comparable_v<decltype(aa), decltype(bb)>) {
+					are_same = are_same && aa == bb;
+				}
+				else {
+					augs::introspect(augs::recursive(self), aa, bb);
+				}
+			}),
+			a,
+			b
+		);
+		
+		return are_same;
 	}
 }
