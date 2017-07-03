@@ -25,7 +25,6 @@
 #include "augs/filesystem/file.h"
 #include "augs/window_framework/log_color.h"
 #include "local_setup.h"
-#include "augs/tweaker.h"
 #include "game/detail/visible_entities.h"
 #include "application/config_lua_table.h"
 
@@ -97,7 +96,6 @@ void local_setup::process(
 			session.local_entropy_profiler.end_measurement();
 			
 			process_exit_key(new_machine_entropy.local);
-			control_tweaker(new_machine_entropy.local);
 
 			if (debug_control_timing) {
 				for (const auto& raw_input : new_machine_entropy.local) {
@@ -195,7 +193,7 @@ void local_setup::process(
 			characters.get_selected_character(), 
 			all_visible,
 			timer.fraction_of_step_until_next_step(hypersomnia.get_fixed_delta()),
-			augs::gui::text::format(write_tweaker_report().c_str(), augs::gui::text::style(assets::font_id::GUI_FONT))
+			augs::gui::text::format(L"", augs::gui::text::style(assets::font_id::GUI_FONT))
 		);
 
 		window.swap_buffers();

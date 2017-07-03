@@ -8,7 +8,6 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
 #include "game/systems_audiovisual/gui_element_system.h"
-#include "augs/tweaker.h"
 #include "augs/gui/text_drawer.h"
 #include "augs/gui/stroke.h"
 #include "augs/templates/visit_gettable.h"

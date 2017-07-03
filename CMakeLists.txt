@@ -195,7 +195,6 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/application/setups/client_setup.cpp"
 	"src/application/setups/determinism_test_setup.cpp"
 	"src/augs/texture_atlas/texture_atlas_entry.cpp"
-	"src/augs/tweaker.cpp"
 	"src/augs/window_framework/translate_windows_enums.cpp"
 	"src/game/assets/animation.cpp"
 	"src/game/assets/assets_manager.cpp"
