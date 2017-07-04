@@ -175,7 +175,7 @@ void menu_setup::process(
 	menu_ui_root.menu_buttons[menu_button_type::LOCAL_UNIVERSE].set_appearing_caption(format(L"Local universe", textes_style));
 	menu_ui_root.menu_buttons[menu_button_type::EDITOR].set_appearing_caption(format(L"Editor", textes_style));
 	menu_ui_root.menu_buttons[menu_button_type::SETTINGS].set_appearing_caption(format(L"Settings", textes_style));
-	menu_ui_root.menu_buttons[menu_button_type::CREATORS].set_appearing_caption(format(L"Creators", textes_style));
+	menu_ui_root.menu_buttons[menu_button_type::CREATORS].set_appearing_caption(format(L"Founders", textes_style));
 	menu_ui_root.menu_buttons[menu_button_type::QUIT].set_appearing_caption(format(L"Quit", textes_style));
 
 	menu_ui_root.set_menu_buttons_positions(screen_size);
@@ -335,10 +335,12 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 		new_machine_entropy.local = window.collect_entropy(!session.config.debug_disable_cursor_clipping);
 		session.local_entropy_profiler.end_measurement();
 		
-		session.perform_imgui_pass(
-			new_machine_entropy.local,
-			session.imgui_timer.extract<std::chrono::milliseconds>()
-		);
+		if (draw_cursor) {
+			session.perform_imgui_pass(
+				new_machine_entropy.local,
+				session.imgui_timer.extract<std::chrono::milliseconds>()
+			);
+		}
 
 		process_exit_key(new_machine_entropy.local);
 
@@ -457,7 +459,6 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 		renderer.call_triangles();
 		renderer.clear_triangles();
 
-		{
 			menu_ui_rect_world::gui_entropy gui_entropies;
 
 			menu_ui_rect_tree menu_ui_tree;
@@ -469,6 +470,8 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 				for (const auto& ch : new_machine_entropy.local) {
 					menu_ui_rect_world.consume_raw_input_and_generate_gui_events(menu_ui_context, menu_ui_root_id, ch, gui_entropies);
 				}
+
+				ImGui::GetIO().MousePos = vec2(menu_ui_rect_world.last_state.mouse.pos);
 
 				menu_ui_rect_world.call_idle_mousemotion_updater(menu_ui_context, menu_ui_root_id, gui_entropies);
 			}
@@ -489,24 +492,29 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 				}
 			}
 
-			if (draw_cursor) {
-				const auto mouse_pos = menu_ui_rect_world.last_state.mouse.pos;
-				const auto gui_cursor_color = cyan;
+			renderer.call_triangles();
+			renderer.clear_triangles();
 
-				auto gui_cursor = assets::game_image_id::GUI_CURSOR;
-
-				if (menu_ui_context.alive(menu_ui_rect_world.rect_hovered)) {
-					gui_cursor = assets::game_image_id::GUI_CURSOR_HOVER;
-				}
-
-				augs::draw_rect(renderer.get_triangle_buffer(), mouse_pos, gui_cursor, gui_cursor_color);
+		renderer.draw_imgui(get_assets_manager());
+		
+		if (draw_cursor) {
+			const auto mouse_pos = menu_ui_rect_world.last_state.mouse.pos;
+			const auto gui_cursor_color = white;
+		
+			auto gui_cursor = assets::game_image_id::GUI_CURSOR;
+		
+			if (menu_ui_context.alive(menu_ui_rect_world.rect_hovered)) {
+				gui_cursor = assets::game_image_id::GUI_CURSOR_HOVER;
 			}
 
+			if (ImGui::GetMouseCursor() == ImGuiMouseCursor_ResizeNWSE) {
+				gui_cursor = assets::game_image_id::GUI_CURSOR_RESIZE_NWSE;
+			}
+		
+			augs::draw_rect(renderer.get_triangle_buffer(), mouse_pos, gui_cursor, gui_cursor_color);
 			renderer.call_triangles();
 			renderer.clear_triangles();
 		}
-
-		renderer.draw_imgui(get_assets_manager());
 
 		intro_actions.update(vdt);
 		credits_actions.update(vdt);

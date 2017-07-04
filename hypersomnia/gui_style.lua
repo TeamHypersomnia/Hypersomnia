@@ -65,7 +65,7 @@ return {
   ImGuiCol_TextSelectedBg = "0 0 255 89",
   ImGuiCol_TitleBg = "27 59 165 179",
   ImGuiCol_TitleBgActive = "0 81 165 221",
-  ImGuiCol_TitleBgCollapsed = "0 81 165 221",
+  ImGuiCol_TitleBgCollapsed = "35 44 165 151",
   ImGuiCol_WindowBg = "0 0 0 178",
   IndentSpacing = 21,
   ItemInnerSpacing = {

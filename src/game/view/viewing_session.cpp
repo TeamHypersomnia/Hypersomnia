@@ -130,7 +130,7 @@ void viewing_session::perform_imgui_pass(
 	using namespace augs::window::event;
 	using namespace augs::window::event::keys;
 	
-	io.MouseDrawCursor = true;
+	io.MouseDrawCursor = false;
 
 	for (const auto& in : window_inputs) {
 		if (in.msg == message::mousemotion) {

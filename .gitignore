@@ -183,7 +183,7 @@ Makefile
 *.opendb
 *.iobj
 *.ipdb
-config.local.lua
+*.local.lua
 *.inputs
 
 CMakeCache.txt
