@@ -40,22 +40,21 @@ namespace augs {
 			reserve(slot_count);
 		}
 
-		/* right now that call overwrites of free_indirectors */
-		void reserve(const std::size_t slot_count) {
-			pooled.clear();
-			indirectors.clear();
-			slots.clear();
-			free_indirectors.clear();
+		void reserve(const std::size_t new_capacity) {
+			const auto old_capacity = capacity();
+			if(new_capacity <= old_capacity) {
+				return;
+			}
 
-			pooled.reserve(slot_count);
-			slots.reserve(slot_count);
+			pooled.reserve(new_capacity);
+			slots.reserve(new_capacity);
 
-			indirectors.resize(slot_count);
+			indirectors.resize(new_capacity);
 
-			free_indirectors.resize(slot_count);
+			free_indirectors.reserve(new_capacity);
 
-			for (std::size_t i = 0; i < slot_count; ++i) {
-				free_indirectors[i] = i;
+			for (std::size_t i = old_capacity; i != new_capacity; ++i) {
+				free_indirectors.push_back(i);
 			}
 		}
 
