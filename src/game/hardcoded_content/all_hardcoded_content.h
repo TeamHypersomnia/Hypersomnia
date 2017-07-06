@@ -22,3 +22,4 @@ void load_test_scene_physical_materials(assets_manager&);
 void load_test_scene_sentience_properties(cosmos_global_state&);
 void load_test_scene_sound_buffers(assets_manager&);
 void load_test_scene_tile_layers(assets_manager&);
+void load_test_scene_recoil_players(assets_manager&);

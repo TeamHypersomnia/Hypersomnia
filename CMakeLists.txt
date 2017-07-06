@@ -404,6 +404,7 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/game/hardcoded_content/requisite/requisite_atlases.cpp"
 	"src/game/hardcoded_content/requisite/requisite_shaders.cpp"
 	"src/game/hardcoded_content/requisite/requisite_sound_buffers.cpp"
+	"src/game/hardcoded_content/test_scenes/test_scene_recoil_players.cpp"
 )
 
 if(MSVC)

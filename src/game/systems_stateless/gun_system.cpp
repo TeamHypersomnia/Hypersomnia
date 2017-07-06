@@ -170,7 +170,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 				response.muzzle_transform = muzzle_transform;
 				response.subject = gun_entity;
 
-				float total_recoil_amount = 0.f;
+				float recoil_scale = 1.f;
 
 				if (is_magic_launcher) {
 					const auto round_entity = cosmos.clone_entity(magic_missile_def); //??
@@ -179,7 +179,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					sender.set(gun_entity);
 
 					auto& missile = round_entity.get<components::missile>();
-					total_recoil_amount += missile.recoil_multiplier;
+					recoil_scale *= missile.recoil_multiplier;
 
 					round_entity.set_logic_transform(step, muzzle_transform);
 
@@ -243,7 +243,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 							auto& missile = round_entity.get<components::missile>();
 							missile.damage_amount *= gun.damage_multiplier;
 							missile.impulse_upon_hit *= gun.damage_multiplier;
-							total_recoil_amount += missile.recoil_multiplier;
+							recoil_scale *= missile.recoil_multiplier;
 
 							if (round_entity.has<components::explosive>()) {
 								auto& explosive = round_entity.get<components::explosive>();
@@ -305,29 +305,54 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					}
 				}
 
-				if (total_recoil_amount > 0.f) {
-					auto& rigid_body_of_gun = gun_entity.get<components::rigid_body>();
-					const auto recoil_dir = vec2().set_from_degrees(muzzle_transform.rotation);
+				if (recoil_scale != 0.f) {
+					if (const auto* recoil_player = step.input.metas_of_assets.find(gun.recoil.id)) {
+						const auto recoil_value = recoil_scale * gun.recoil.shoot_and_get_impulse(*recoil_player).rotate(muzzle_transform.rotation, vec2{0, 0});
 
-					if (rigid_body_of_gun.is_activated()) {
-						rigid_body_of_gun.apply_impulse(
-							recoil_dir * (-total_recoil_amount) * 800.f * rigid_body_of_gun.get_mass()
-						);
+						auto& rigid_body_of_gun = gun_entity.get<components::rigid_body>();
 
-						rigid_body_of_gun.apply_impulse(
-							recoil_dir.perpendicular_cw() * (-total_recoil_amount) * 380.f * rigid_body_of_gun.get_mass(),
-							-recoil_dir * 55.f
-						);
-					}
-					else {
-						const auto recoil_body = owning_sentience
-							[child_entity_name::CHARACTER_CROSSHAIR]
-							[child_entity_name::CROSSHAIR_RECOIL_BODY]
-						.get<components::rigid_body>();
+						//const auto recoil_dir = vec2().set_from_degrees(muzzle_transform.rotation);
+						//if (rigid_body_of_gun.is_activated()) {
+						//	rigid_body_of_gun.apply_impulse(
+						//		recoil_dir * (-recoil_scale) * 800.f * rigid_body_of_gun.get_mass()
+						//	);
 
-						recoil_body.apply_angular_impulse(
-							total_recoil_amount * recoil_body.get_inertia() * 10.f
-						);
+						//	rigid_body_of_gun.apply_impulse(
+						//		recoil_dir.perpendicular_cw() * (-recoil_scale) * 380.f * rigid_body_of_gun.get_mass(),
+						//		-recoil_dir * 55.f
+						//	);
+						//}
+						//else {
+						//	const auto recoil_body = owning_sentience
+						//		[child_entity_name::CHARACTER_CROSSHAIR]
+						//		[child_entity_name::CROSSHAIR_RECOIL_BODY]
+						//	.get<components::rigid_body>();
+
+						//	recoil_body.apply_angular_impulse(
+						//		recoil_scale * recoil_body.get_inertia() * 10.f
+						//	);
+						//}
+
+						if (rigid_body_of_gun.is_activated()) {
+							rigid_body_of_gun.apply_impulse(
+								recoil_value * rigid_body_of_gun.get_mass()
+							);
+						}
+						else {
+							const auto recoil_body = owning_sentience
+								[child_entity_name::CHARACTER_CROSSHAIR]
+								[child_entity_name::CROSSHAIR_RECOIL_BODY]
+							.get<components::rigid_body>();
+
+							const auto recoil_length = recoil_value.length();
+							auto recoil_direction = recoil_value;
+							recoil_direction.normalize_hint(recoil_length);
+
+							const auto recoil_angle = 10 * recoil_direction.y;
+							recoil_body.apply_angular_impulse(
+								recoil_angle * recoil_body.get_inertia() * recoil_length / 800
+							);
+						}
 					}
 
 					gun.current_heat = std::min(gun.maximum_heat, gun.current_heat + gun.gunshot_adds_heat);

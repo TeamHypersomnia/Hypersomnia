@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include "augs/pad_bytes.h"
 
 #include "augs/audio/sound_effect_modifier.h"
@@ -12,10 +13,25 @@
 #include "game/transcendental/step_declaration.h"
 #include "game/assets/sound_buffer_id.h"
 #include "game/components/render_component.h"
+#include "game/assets/recoil_player.h"
+#include "game/assets/recoil_player_id.h"
 
 namespace augs {
 	struct introspection_access;
 }
+
+struct recoil_player_instance {
+	// GEN INTROSPECTOR struct recoil_player_instance
+	assets::recoil_player_id id = assets::recoil_player_id::INVALID;
+	std::size_t index = 0;
+	// END GEN INTROSPECTOR
+
+	vec2 shoot_and_get_impulse(const recoil_player& meta) {
+		const auto result = meta.offsets[index++];
+		index %= meta.offsets.size();
+		return result;
+	}
+};
 
 namespace components {
 	struct gun  {
@@ -63,6 +79,8 @@ namespace components {
 		augs::stepped_timestamp when_began_pulling_cocking_handle;
 	public:
 		float cocking_handle_pull_duration_ms = 500.f;
+
+		recoil_player_instance recoil;
 		// END GEN INTROSPECTOR
 
 		static void load_next_round(

@@ -269,6 +269,8 @@ namespace prefabs {
 
 		add_muzzle_particles(weapon, gun, step);
 
+		gun.recoil.id = assets::recoil_player_id::GENERIC;
+
 		weapon.add_standard_components(step);
 
 		if (load_mag.alive()) {
@@ -307,6 +309,8 @@ namespace prefabs {
 		gun.camera_shake_spread_degrees = 45.f;
 
 		gun.damage_multiplier = 1.f;
+
+		gun.recoil.id = assets::recoil_player_id::GENERIC;
 
 		weapon.add_standard_components(step);
 

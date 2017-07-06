@@ -141,5 +141,6 @@ void load_all_requisite(const config_lua_table& cfg) {
 	load_test_scene_particle_effects(manager);
 	load_test_scene_physical_materials(manager);
 	load_test_scene_tile_layers(manager);
+	load_test_scene_recoil_players(manager);
 #endif
 }
