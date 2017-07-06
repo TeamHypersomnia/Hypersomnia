@@ -94,7 +94,7 @@ namespace augs {
 			const auto dead_index = get_real_index(object);
 
 			// add dead object's indirector to the list of free indirectors
-			free_indirectors.push_back(slots[dead_index].pointing_indirector);
+			free_indirectors.push_back(object.indirection_index);
 
 			// therefore we must increase version of the dead indirector
 			++indirectors[object.indirection_index].version;
