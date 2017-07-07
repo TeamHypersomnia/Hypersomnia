@@ -42,7 +42,8 @@ namespace augs {
 
 		void reserve(const std::size_t new_capacity) {
 			const auto old_capacity = capacity();
-			if(new_capacity <= old_capacity) {
+
+			if (new_capacity <= old_capacity) {
 				return;
 			}
 
@@ -53,7 +54,7 @@ namespace augs {
 
 			free_indirectors.reserve(new_capacity);
 
-			for (std::size_t i = old_capacity; i != new_capacity; ++i) {
+			for (std::size_t i = old_capacity; i < new_capacity; ++i) {
 				free_indirectors.push_back(i);
 			}
 		}
