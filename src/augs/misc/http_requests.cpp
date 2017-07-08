@@ -1,4 +1,3 @@
-#include "augs/build_settings/setting_build_http_requests.h"
 #include "http_requests.h"
 
 #if BUILD_HTTP_REQUESTS

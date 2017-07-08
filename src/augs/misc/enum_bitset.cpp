@@ -1,4 +1,3 @@
-#include "generated/setting_build_unit_tests.h"
 
 #if BUILD_UNIT_TESTS
 #include "augs/misc/enum_bitset.h"

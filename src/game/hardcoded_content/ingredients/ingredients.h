@@ -1,5 +1,4 @@
 #pragma once
-#include "generated/setting_build_test_scenes.h"
 
 #if BUILD_TEST_SCENES
 #include "augs/math/vec2.h"

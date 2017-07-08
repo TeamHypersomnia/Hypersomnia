@@ -4,7 +4,6 @@
 	argv: %x*/
 
 #include "hypersomnia_version.h"
-#include "generated/setting_was_version_generator_built.h"
 
 #if WAS_VERSION_GENERATOR_BUILT
 

@@ -13,6 +13,7 @@ option(BUILD_OPENAL "Build OpenAL Soft." ON)
 option(BUILD_UNIT_TESTS "Build unit tests that are run on game startup." ON)
 option(BUILD_VERSION_FILE_GENERATOR "Build version file generator to generate commit information." ON)
 option(BUILD_ENET "Build ENet networking library." ON)
+option(BUILD_HTTP_REQUESTS "Build simple http requests, e.g. for latest news bar in the main menu." ON)
 option(BUILD_TEST_SCENES "Build unscripted test scenes hardcoded in C++." ON)
 option(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE "Add command to archive builds in Release." ON)
 
@@ -637,18 +638,35 @@ file(MAKE_DIRECTORY ${GENERATED_SOURCES_PATH})
 
 include_directories("${PROJECT_BINARY_DIR}/generators_output")
 
-# First we configure the headers with defines in accordance with the currently set options.
-# We could just add the preprocessor definitions as flags,
-# but this has the advantage that testing a change to a flag does not incur recompilation of the whole project.
+# We configure the C++ defines in accordance with the currently set options.
 
-configure_file("src/augs/build_settings/setting_build_openal.h.in" "${GENERATED_SOURCES_PATH}/setting_build_openal.h") 
-configure_file("src/augs/build_settings/setting_build_sound_format_decoders.h.in" "${GENERATED_SOURCES_PATH}/setting_build_sound_format_decoders.h") 
-configure_file("src/augs/build_settings/setting_build_enet.h.in" "${GENERATED_SOURCES_PATH}/setting_build_enet.h") 
-configure_file("src/augs/build_settings/setting_build_unit_tests.h.in" "${GENERATED_SOURCES_PATH}/setting_build_unit_tests.h")
-configure_file("src/game/setting_build_test_scenes.h.in" "${GENERATED_SOURCES_PATH}/setting_build_test_scenes.h") 
-# Just a different name for the variable
-set(WAS_VERSION_GENERATOR_BUILT ${BUILD_VERSION_FILE_GENERATOR})
-configure_file("src/augs/build_settings/setting_was_version_generator_built.h.in" "${GENERATED_SOURCES_PATH}/setting_was_version_generator_built.h") 
+if(BUILD_OPENAL) 
+	add_definitions(-DBUILD_OPENAL=1) 
+endif()
+
+if(BUILD_SOUND_FORMAT_DECODERS) 
+	add_definitions(-DBUILD_SOUND_FORMAT_DECODERS=1)
+endif()
+
+if(BUILD_ENET) 
+	add_definitions(-DBUILD_ENET=1)
+endif()
+
+if(BUILD_UNIT_TESTS) 
+	add_definitions(-DBUILD_UNIT_TESTS=1)
+endif()
+
+if(BUILD_TEST_SCENES) 
+	add_definitions(-DBUILD_TEST_SCENES=1)
+endif()
+
+if(BUILD_HTTP_REQUESTS) 
+	add_definitions(-DBUILD_HTTP_REQUESTS=1)
+endif()
+
+if(BUILD_VERSION_FILE_GENERATOR) 
+	add_definitions(-DWAS_VERSION_GENERATOR_BUILT=1)
+endif()
 
 # We build the generator of type information required for introspection.
 
@@ -767,7 +785,9 @@ if(BUILD_SOUND_FORMAT_DECODERS)
 endif()
 
 if(MSVC)
-	if(BUILD_ENET)
+	if(BUILD_ENET OR BUILD_HTTP_REQUESTS)
+		message("Appending winsock libraries")
+		
 		list(APPEND HYPERSOMNIA_LIBS
 			"Ws2_32.lib" 		# for ENet
 			"winmm.lib"  		# for ENet

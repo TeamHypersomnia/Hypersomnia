@@ -1,2 +1,0 @@
-#pragma once
-#cmakedefine01 WAS_VERSION_GENERATOR_BUILT

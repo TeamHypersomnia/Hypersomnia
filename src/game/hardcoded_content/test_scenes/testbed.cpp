@@ -1,4 +1,3 @@
-#include "generated/setting_build_test_scenes.h"
 #include "testbed.h"
 
 #if BUILD_TEST_SCENES

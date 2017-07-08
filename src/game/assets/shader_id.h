@@ -1,6 +1,5 @@
 #pragma once
 #include "game/container_sizes.h"
-#include "generated/setting_build_test_scenes.h"
 
 namespace assets {
 	enum class shader_id {

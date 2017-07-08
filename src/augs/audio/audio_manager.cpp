@@ -1,7 +1,6 @@
 #include "audio_manager.h"
 
 #include "augs/al_log.h"
-#include "generated/setting_build_openal.h"
 
 #if BUILD_OPENAL
 extern "C" {

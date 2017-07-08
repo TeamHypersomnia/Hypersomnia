@@ -1,4 +1,3 @@
-#include "generated/setting_build_test_scenes.h"
 #include "game/hardcoded_content/all_hardcoded_content.h"
 #include "game/assets/assets_manager.h"
 

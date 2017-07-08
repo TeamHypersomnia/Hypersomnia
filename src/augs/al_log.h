@@ -1,6 +1,5 @@
 #pragma once
 #include "log.h"
-#include "generated/setting_build_openal.h"
 
 #if BUILD_OPENAL
 const char * GetOpenALErrorString(int errID);

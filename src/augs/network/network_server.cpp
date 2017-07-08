@@ -1,4 +1,3 @@
-#include "generated/setting_build_enet.h"
 #if BUILD_ENET
 #include <enet/enet.h>
 #undef min

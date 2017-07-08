@@ -5,7 +5,6 @@
 #include "augs/audio/sound_samples_from_file.h"
 
 #include "augs/build_settings/setting_log_audio_files.h"
-#include "generated/setting_build_sound_format_decoders.h"
 
 #if BUILD_SOUND_FORMAT_DECODERS
 

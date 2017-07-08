@@ -102,7 +102,7 @@ return {
   jitter_buffer_ms = 0,
   last_session_update_link = "",
   latest_news_url = "http://hypersomnia.pl/latest_post/",
-  launch_mode = "LOCAL",
+  launch_mode = "MAIN_MENU",
   max_number_of_sound_sources = 4096,
   menu_intro_scene_entropy_path = "",
   menu_intro_scene_cosmos_path = "abc", -- paste whatever to work

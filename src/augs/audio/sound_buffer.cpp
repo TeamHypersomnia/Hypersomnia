@@ -1,6 +1,5 @@
 #include <array>
 
-#include "generated/setting_build_openal.h"
 
 #if BUILD_OPENAL
 #include <AL/al.h>
