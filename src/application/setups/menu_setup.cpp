@@ -509,6 +509,10 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 			if (ImGui::GetMouseCursor() == ImGuiMouseCursor_ResizeNWSE) {
 				gui_cursor = assets::game_image_id::GUI_CURSOR_RESIZE_NWSE;
 			}
+
+			if (ImGui::GetMouseCursor() == ImGuiMouseCursor_TextInput) {
+				gui_cursor = assets::game_image_id::GUI_CURSOR_TEXT_INPUT;
+			}
 		
 			augs::draw_cursor(renderer.get_triangle_buffer(), mouse_pos, gui_cursor, gui_cursor_color);
 			renderer.call_triangles();
