@@ -40,8 +40,6 @@ void director_setup::init(
 ) {
 	metas_of_assets = get_assets_manager().generate_logical_metas_of_assets();
 
-	session.reserve_caches_for_entities(3000);
-	
 	if (!hypersomnia.load_from_file("save.state")) {
 		hypersomnia.set_fixed_delta(session.config.default_tickrate);
 

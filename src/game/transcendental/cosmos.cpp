@@ -180,19 +180,17 @@ void cosmos::complete_reinference(const const_entity_handle h) {
 	create_inferred_state_for(h);
 }
 
-void cosmos::reserve_storage_for_entities(const size_t n) {
+void cosmos::reserve_storage_for_entities(const std::size_t n) {
 	get_aggregate_pool().reserve(n);
 	reserve_storage_for_all_components(n);
 
-	auto reservation_lambda = [n](auto& sys) {
+	systems_inferred.for_each([n](auto& sys) {
 		sys.reserve_caches_for_entities(n);
-	};
-
-	systems_inferred.for_each(reservation_lambda);
+	});
 }
 
 std::wstring cosmos::summary() const {
-	return typesafe_sprintf(L"Entities: %x\n", entities_count());
+	return typesafe_sprintf(L"Entities: %x\n", get_entities_count());
 }
 
 rng_seed_type cosmos::get_rng_seed_for(const entity_id id) const {
@@ -236,6 +234,10 @@ void cosmos::set_fixed_delta(const unsigned steps_per_second) {
 }
 
 entity_handle cosmos::allocate_new_entity() {
+	if (get_aggregate_pool().full()) {
+		throw std::runtime_error("Entities should be controllably reserved to avoid invalidation of entity_handles.");
+	}
+
 	return { *this, get_aggregate_pool().allocate() };
 }
 

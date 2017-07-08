@@ -16,8 +16,6 @@ namespace augs {
 		using handle_type = handle_for_pool_container<false, pool<T>, T>;
 		using const_handle_type = handle_for_pool_container<true, pool<T>, T>;
 
-		using pooled_container_type = std::vector<T>;
-
 		using element_type = T;
 	
 	protected:
@@ -30,7 +28,7 @@ namespace augs {
 			unsigned version = 1;
 		};
 
-		pooled_container_type pooled;
+		std::vector<T> pooled;
 		std::vector<metadata> slots;
 		std::vector<indirector> indirectors;
 		std::vector<std::size_t> free_indirectors;
@@ -59,28 +57,32 @@ namespace augs {
 			}
 		}
 
-		template <typename... Args>
+		template <
+			std::size_t expansion_mult = 2, 
+			std::size_t expansion_add = 1, 
+			class... Args
+		>
 		id_type allocate(Args&&... args) {
-			if (free_indirectors.empty()) {
-				throw std::runtime_error("Pool is full!");
+			if (full()) {
+				reserve(size() * expansion_mult + expansion_add);
 			}
 
 			const auto next_free_indirector = free_indirectors.back();
 			free_indirectors.pop_back();
-
-			indirector& indirector = indirectors[next_free_indirector];
-
+			
 			const std::size_t new_slot_index = size();
 
-			metadata new_slot;
-			new_slot.pointing_indirector = next_free_indirector;
-			indirector.real_index = new_slot_index;
+			indirector& allocated_indirector = indirectors[next_free_indirector];
+			allocated_indirector.real_index = new_slot_index;
+
+			metadata allocated_slot;
+			allocated_slot.pointing_indirector = next_free_indirector;
 
 			id_type allocated_id;
-			allocated_id.version = indirector.version;
+			allocated_id.version = allocated_indirector.version;
 			allocated_id.indirection_index = next_free_indirector;
 
-			slots.push_back(new_slot);
+			slots.push_back(allocated_slot);
 			pooled.emplace_back(std::forward<Args>(args)...);
 
 			return allocated_id;
@@ -100,13 +102,13 @@ namespace augs {
 			++indirectors[object.indirection_index].version;
 
 			if (dead_index != size() - 1) {
-				const auto indirector_of_last_element = slots[size() - 1].pointing_indirector;
+				const auto indirector_of_last_element = slots.back().pointing_indirector;
 
 				// change last element's indirector - set it to the dead element's index
 				indirectors[indirector_of_last_element].real_index = dead_index;
 
-				slots[dead_index] = std::move(slots[size() - 1]);
-				pooled[dead_index] = std::move(pooled[size() - 1]);
+				slots[dead_index] = std::move(slots.back());
+				pooled[dead_index] = std::move(pooled.back());
 			}
 
 			slots.pop_back();
@@ -155,6 +157,7 @@ namespace augs {
 				f(pooled[i], id);
 			}
 		}
+
 		template<class Pred>
 		void for_each_id(Pred f) {
 			id_type id;
@@ -217,7 +220,7 @@ namespace augs {
 			return object.indirection_index >= 0 && indirectors[object.indirection_index].version == object.version;
 		}
 
-		const pooled_container_type& get_pooled() const {
+		const auto& get_pooled() const {
 			return pooled;
 		}
 
@@ -239,6 +242,10 @@ namespace augs {
 
 		bool empty() const {
 			return size() == 0;
+		}
+
+		bool full() const {
+			return size() == capacity();
 		}
 
 		template <class Archive>

@@ -13,9 +13,6 @@ void two_clients_and_server_setup::process(
 
 	viewing_session sessions[2] = { { window.get_screen_size(), cfg }, { window.get_screen_size(), cfg} };
 	
-	sessions[0].reserve_caches_for_entities(3000);
-	sessions[1].reserve_caches_for_entities(3000);
-
 	std::thread server_thread([&]() {
 		serv_setup.process(cfg, window, true);
 	});

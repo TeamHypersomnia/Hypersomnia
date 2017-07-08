@@ -8,6 +8,8 @@
 
 void viewing_session::standard_audiovisual_post_solve(const const_logic_step step) {
 	const auto& cosmos = step.cosm;
+	reserve_caches_for_entities(cosmos.get_aggregate_pool().capacity());
+	
 	const auto& healths = step.transient.messages.get_queue<messages::health_event>();
 	const auto& new_thunders = step.transient.messages.get_queue<thunder_input>();
 	auto new_rings = step.transient.messages.get_queue<exploding_ring_input>();

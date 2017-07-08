@@ -221,8 +221,8 @@ TEST_CASE("CosmicDelta4 EmptyAndTwoNew") {
 	// check if components are intact after encode/decode cycle
 
 
-	REQUIRE(2 == c1.entities_count());
-	REQUIRE(2 == c2.entities_count());
+	REQUIRE(2 == c1.get_entities_count());
+	REQUIRE(2 == c2.get_entities_count());
 	REQUIRE(ent1.has<components::transform>());
 	const bool transform_intact = ent1.get<components::transform>() == first_transform;
 	REQUIRE(transform_intact);
@@ -333,8 +333,8 @@ TEST_CASE("CosmicDelta5 EmptyAndCreatedThreeEntitiesWithReferences") {
 		REQUIRE(c1 != c2);
 	}
 
-	REQUIRE(3 == c1.entities_count());
-	REQUIRE(3 == c2.entities_count());
+	REQUIRE(3 == c1.get_entities_count());
+	REQUIRE(3 == c2.get_entities_count());
 
 	const auto deco_ent1 = c1.get_handle(first_guid);
 	const auto deco_ent2 = c1.get_handle(second_guid);
@@ -427,8 +427,8 @@ TEST_CASE("CosmicDelta6 ThreeEntitiesWithReferencesAndDestroyedChild") {
 	REQUIRE(c1_second_guid == c2_second_guid);
 	REQUIRE(c1_third_guid == c2_third_guid);
 
-	REQUIRE(3 == c1.entities_count());
-	REQUIRE(3 == c2.entities_count());
+	REQUIRE(3 == c1.get_entities_count());
+	REQUIRE(3 == c2.get_entities_count());
 
 	{
 		augs::stream comparatory;
@@ -439,7 +439,7 @@ TEST_CASE("CosmicDelta6 ThreeEntitiesWithReferencesAndDestroyedChild") {
 	}
 
 	c2.delete_entity(c2.get_handle(c2_second_guid));
-	REQUIRE(2 == c2.entities_count());
+	REQUIRE(2 == c2.get_entities_count());
 
 	{
 		augs::stream s;
@@ -464,7 +464,7 @@ TEST_CASE("CosmicDelta6 ThreeEntitiesWithReferencesAndDestroyedChild") {
 		cosmic_delta::encode(c1, c2, s);
 		cosmic_delta::decode(c1, s);
 	}
-	REQUIRE(2 == c1.entities_count());
+	REQUIRE(2 == c1.get_entities_count());
 
 	{
 		augs::stream comparatory;

@@ -273,6 +273,8 @@ void viewing_session::advance_audiovisual_systems(
 	const visible_entities& all_visible,
 	const augs::delta dt
 ) {
+	reserve_caches_for_entities(cosm.get_aggregate_pool().capacity());
+
 	auto& thunders = systems_audiovisual.get<thunder_system>();
 	auto& exploding_rings = systems_audiovisual.get<exploding_ring_system>();
 	auto& flying_numbers = systems_audiovisual.get<flying_number_indicator_system>();
@@ -431,7 +433,7 @@ void viewing_session::view(
 		const auto lt_text_formatted = revision_info + format(
 			typesafe_sprintf(
 				L"Entities: %x\nX: %f2\nY: %f2\nRot: %f2\nVelX: %x\nVelY: %x\n",
-				cosmos.entities_count(),
+				cosmos.get_entities_count(),
 				coords.x,
 				coords.y,
 				rot,

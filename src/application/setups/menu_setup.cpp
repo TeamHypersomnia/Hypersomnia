@@ -62,7 +62,6 @@ void menu_setup::process(
 
 	cosmos intro_scene(3000);
 
-	session.reserve_caches_for_entities(3000);
 	augs::load_from_lua_table(session.config, "content/menu/config.lua");
 
 	augs::single_sound_buffer menu_theme;

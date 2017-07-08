@@ -42,8 +42,6 @@ void determinism_test_setup::process(
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 	std::vector<debug_character_selection> characters(cosmoi_count);
 
-	session.reserve_caches_for_entities(3000);
-
 	if (augs::file_exists("save.state")) {
 		for (auto& h : hypersomnias) {
 			ensure(h.load_from_file("save.state"));

@@ -117,7 +117,7 @@ public:
 
 	void advance_deterministic_schemata(const logic_step_input input);
 
-	void reserve_storage_for_entities(const size_t);
+	void reserve_storage_for_entities(const std::size_t);
 
 	entity_handle create_entity(const std::wstring& name);
 	entity_handle create_entity(const std::string& name);
@@ -131,11 +131,6 @@ public:
 	void destroy_inferred_state_of(const const_entity_handle);
 	void create_inferred_state_for(const const_entity_handle);
 	
-	//void set_name(
-	//	const entity_id, 
-	//	const std::string new_name
-	//);
-
 	template <class System>
 	void partial_reinference(const entity_handle handle) {
 		auto& sys = systems_inferred.get<System>();
@@ -247,7 +242,7 @@ public:
 	entity_handle get_entity_by_name(const entity_name_type&);
 	const_entity_handle get_entity_by_name(const entity_name_type&) const;
 	
-	std::size_t entities_count() const;
+	std::size_t get_entities_count() const;
 	std::size_t get_maximum_entities() const;
 	std::wstring summary() const;
 
@@ -406,7 +401,7 @@ inline randomization cosmos::get_rng_for(const entity_id id) const {
 	return{ static_cast<std::size_t>(get_rng_seed_for(id)) };
 }
 
-inline std::size_t cosmos::entities_count() const {
+inline std::size_t cosmos::get_entities_count() const {
 	return significant.pool_for_aggregates.size();
 }
 

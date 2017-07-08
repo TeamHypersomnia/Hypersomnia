@@ -38,8 +38,6 @@ void local_setup::process(
 ) {
 	cosmos hypersomnia(3000);
 	
-	session.reserve_caches_for_entities(3000);
-
 	cosmic_entropy total_collected_entropy;
 	augs::debug_entropy_player<cosmic_entropy> player;
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
@@ -176,7 +174,7 @@ void local_setup::process(
 
 			hypersomnia.advance_deterministic_schemata(
 				{ total_collected_entropy, metas_of_assets },
-				[](const auto) {},
+				[](auto) {},
 				session.get_standard_post_solve()
 			);
 
