@@ -35,7 +35,15 @@ void mParseUrl(string url, string &serverName, string &filepath, string &filenam
 #include "augs/log.h"
 namespace augs {
 	std::string http_post_request(const std::string& url, const std::string& additional_headers, const std::string& post_data) {
+		WSADATA wsaData;
+
+		if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
+			LOG("WSAStartup failed.");
+			return {};
+		}
+
 		SOCKET Socket;
+
 		SOCKADDR_IN SockAddr;
 		int lineCount = 0;
 		int rowCount = 0;
@@ -96,6 +104,13 @@ namespace augs {
 	}
 
 	std::string http_get_request(const std::string& url) {
+		WSADATA wsaData;
+
+		if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
+			LOG("WSAStartup failed.");
+			return {};
+		}
+
 		SOCKET Socket;
 		SOCKADDR_IN SockAddr;
 		int lineCount = 0;
