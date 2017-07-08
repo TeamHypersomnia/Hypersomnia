@@ -26,6 +26,7 @@ struct game_image_gui_usage {
 	bool flip_horizontally = false;
 	bool flip_vertically = false;
 	vec2 bbox_expander;
+	vec2 cursor_offset;
 	// END GEN INTROSPECTOR
 };
 

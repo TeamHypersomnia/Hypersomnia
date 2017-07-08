@@ -510,7 +510,7 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 				gui_cursor = assets::game_image_id::GUI_CURSOR_RESIZE_NWSE;
 			}
 		
-			augs::draw_rect(renderer.get_triangle_buffer(), mouse_pos, gui_cursor, gui_cursor_color);
+			augs::draw_cursor(renderer.get_triangle_buffer(), mouse_pos, gui_cursor, gui_cursor_color);
 			renderer.call_triangles();
 			renderer.clear_triangles();
 		}
