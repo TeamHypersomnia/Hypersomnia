@@ -502,7 +502,10 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 		
 			auto gui_cursor = assets::game_image_id::GUI_CURSOR;
 		
-			if (menu_ui_context.alive(menu_ui_rect_world.rect_hovered)) {
+			if (
+				menu_ui_context.alive(menu_ui_rect_world.rect_hovered)
+				|| ImGui::IsAnyItemHoveredWithHandCursor()
+			) {
 				gui_cursor = assets::game_image_id::GUI_CURSOR_HOVER;
 			}
 
@@ -513,7 +516,7 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 			if (ImGui::GetMouseCursor() == ImGuiMouseCursor_TextInput) {
 				gui_cursor = assets::game_image_id::GUI_CURSOR_TEXT_INPUT;
 			}
-		
+			
 			augs::draw_cursor(renderer.get_triangle_buffer(), mouse_pos, gui_cursor, gui_cursor_color);
 			renderer.call_triangles();
 			renderer.clear_triangles();
