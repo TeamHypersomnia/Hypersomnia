@@ -408,6 +408,7 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 			title_text_color
 		);
 
+#if !IS_PRODUCTION_BUILD
 		if (tweened_welcome_message_bg_size.non_zero()) {
 			augs::draw_rect_with_border(renderer.get_triangle_buffer(),
 				ltrb(developer_welcome.target_pos, tweened_welcome_message_bg_size).expand_from_center(vec2(6, 6)),
@@ -415,6 +416,7 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 				slightly_visible_white
 			);
 		}
+#endif
 
 		if (tweened_menu_button_size.non_zero()) {
 			ltrb buttons_bg;
