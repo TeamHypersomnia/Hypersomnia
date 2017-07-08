@@ -28,8 +28,8 @@ if (NOT HYPERSOMNIA_RUNTIME_ARCHIVE_DIR)
 	file(MAKE_DIRECTORY ${HYPERSOMNIA_RUNTIME_ARCHIVE_DIR})
 endif()
 
-set(RESOURCE_FOLDER_NAME "hypersomnia")
-set(HYPERSOMNIA_EXE_RESOURCES_DIR "${PROJECT_SOURCE_DIR}/${RESOURCE_FOLDER_NAME}")
+set(RESOURCES_FOLDER_NAME "hypersomnia")
+set(HYPERSOMNIA_EXE_RESOURCES_DIR "${PROJECT_SOURCE_DIR}/${RESOURCES_FOLDER_NAME}")
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
@@ -124,7 +124,7 @@ set(HYPERSOMNIA_BOX2D_SRCS
 	"src/3rdparty/Box2D/Rope/b2Rope.cpp"
 )
 
-# We don't care about alphabetical order. Put new files to the very bottom.
+# Test scene sources that whose inclusion is conditional on the value of BUILD_TEST_SCENES.
 
 set(HYPERSOMNIA_TEST_SCENES_SRCS
 	"src/game/hardcoded_content/ingredients/artificial_life.cpp"
@@ -146,7 +146,10 @@ set(HYPERSOMNIA_TEST_SCENES_SRCS
 	"src/game/hardcoded_content/test_scenes/test_scene_tile_layers.cpp"
 	"src/game/hardcoded_content/test_scenes/test_scene_animations.cpp"
 	"src/game/hardcoded_content/test_scenes/test_scene_sound_buffers.cpp"
+	"src/game/hardcoded_content/test_scenes/test_scene_recoil_players.cpp"
 )
+
+# We don't care about alphabetical order. Put new files to the very bottom.
 
 set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/application/config_lua_table.cpp"
@@ -405,8 +408,9 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/game/hardcoded_content/requisite/requisite_atlases.cpp"
 	"src/game/hardcoded_content/requisite/requisite_shaders.cpp"
 	"src/game/hardcoded_content/requisite/requisite_sound_buffers.cpp"
-	"src/game/hardcoded_content/test_scenes/test_scene_recoil_players.cpp"
 )
+
+# natvis files for easier debugging in Visual Studio.
 
 if(MSVC)
 	list(APPEND HYPERSOMNIA_CODEBASE_SRCS
@@ -423,6 +427,8 @@ if(BUILD_TEST_SCENES)
 
 	message("Building of test scenes is enabled.")
 endif()
+
+# The rest of 3rdparty libraries with minimal amount of source files.
 
 set(HYPERSOMNIA_TRIVIAL_3RDPARTY_SRCS
 	"src/3rdparty/lodepng/lodepng.cpp"
@@ -787,7 +793,7 @@ endif()
 if(MSVC)
 	if(BUILD_ENET OR BUILD_HTTP_REQUESTS)
 		message("Appending winsock libraries")
-		
+
 		list(APPEND HYPERSOMNIA_LIBS
 			"Ws2_32.lib" 		# for ENet
 			"winmm.lib"  		# for ENet
@@ -818,7 +824,7 @@ if(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE)
 			-DPYTHON_EXE=${PYTHON_EXECUTABLE}
 			-DGIT_EXE=${GIT_EXECUTABLE}
 			-DCREATE_ARCHIVE_PY_PATH=${CMAKE_MODULE_PATH}/create_archive.py.in
-			-DRESOURCE_FOLDER_NAME=${RESOURCE_FOLDER_NAME}
+			-DRESOURCE_FOLDER_NAME=${RESOURCES_FOLDER_NAME}
 			-P ${CMAKE_MODULE_PATH}/create_build_archive.cmake
 		DEPENDS ${CMAKE_MODULE_PATH}/create_build_archive.cmake
 		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
