@@ -62,6 +62,7 @@ void standard_explosion_input::instantiate(
 
 	const auto effective_radius_sq = effective_radius*effective_radius;
 	const auto subject = cosmos[subject_if_any];
+	const auto subject_alive = subject.alive();
 
 	messages::visibility_information_request request;
 	request.eye_transform = explosion_location;
@@ -95,8 +96,11 @@ void standard_explosion_input::instantiate(
 			) {
 				const auto body_entity_id = get_id_of_entity_of_body(fix);
 				const bool is_self = 
-					body_entity_id == subject.get_id()
-					|| cosmos[body_entity_id].get_owning_transfer_capability() == subject.get_id()
+					subject_alive
+					&& (
+						body_entity_id == subject.get_id()
+						|| cosmos[body_entity_id].get_owning_transfer_capability() == subject.get_id()
+					)
 				;
 
 				if (is_self) {
