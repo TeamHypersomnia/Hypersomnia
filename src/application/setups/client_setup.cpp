@@ -35,7 +35,7 @@ void client_setup::process(
 
 	while (!should_quit) {
 		session.local_entropy_profiler.new_measurement();
-		auto precollected = window.collect_entropy(!session.config.debug_disable_cursor_clipping);
+		auto precollected = window.collect_entropy(session.config.enable_cursor_clipping);
 		session.local_entropy_profiler.end_measurement();
 
 		if (process_exit_key(precollected))

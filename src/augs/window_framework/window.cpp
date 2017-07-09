@@ -202,9 +202,13 @@ namespace augs {
 			triple_click_delay = GetDoubleClickTime();
 		}
 
+		void glwindow::set_window_name(const std::string& name) {
+			SetWindowText(hwnd, to_wstring(name).c_str());
+		}
+
 		void glwindow::create(
 			const xywhi crect, 
-			const int enable_window_border, 
+			const bool enable_window_border, 
 			const std::string name,
 			const int doublebuffer, 
 			const int bpp
@@ -228,19 +232,10 @@ namespace augs {
 				window_class_registered = true;
 			}
 
-			enum flag {
-				CAPTION = WS_CAPTION,
-				MENU = CAPTION | WS_SYSMENU,
-				ALL_WINDOW_ELEMENTS = CAPTION | MENU
-			};
-
-			const auto menu = enable_window_border ? ALL_WINDOW_ELEMENTS : 0; 
-
-			style = menu ? (WS_OVERLAPPED | menu) | WS_CLIPSIBLINGS | WS_CLIPCHILDREN : WS_POPUP;
-			exstyle = menu ? WS_EX_WINDOWEDGE : WS_EX_APPWINDOW;
+			ensure((hwnd = CreateWindowEx(0, L"AugmentedWindow", L"invalid_name", 0, 0, 0, 0, 0, 0, 0, GetModuleHandle(NULL), this)));
 			
-			ensure((hwnd = CreateWindowEx(exstyle, L"AugmentedWindow", to_wstring(name).c_str(), style, 0, 0, 0, 0, 0, 0, GetModuleHandle(NULL), this)));
-
+			set_window_border_enabled(enable_window_border);
+			set_window_name(name);
 			set_window_rect(crect);
 
 			PIXELFORMATDESCRIPTOR p;
@@ -262,8 +257,8 @@ namespace augs {
 
 			ensure(hglrc = wglCreateContext(hdc));
 
-				set_as_current();
-			ShowWindow(hwnd, SW_SHOW);
+			set_as_current();
+			show();
 
 			SetLastError(0);
 			ensure(!(SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)this) == 0 && GetLastError() != 0));
@@ -283,9 +278,27 @@ namespace augs {
 			RegisterRawInputDevices(Rid, 1, sizeof(Rid[0]));
 		}
 
+		void glwindow::set_window_border_enabled(const bool f) {
+			const auto menu = f ? WS_CAPTION | WS_SYSMENU : 0;
+
+			style = menu ? (WS_OVERLAPPED | menu) | WS_CLIPSIBLINGS | WS_CLIPCHILDREN : WS_POPUP;
+			exstyle = menu ? WS_EX_WINDOWEDGE : WS_EX_APPWINDOW;
+
+			SetWindowLongPtr(hwnd, GWL_EXSTYLE, exstyle);
+			SetWindowLongPtr(hwnd, GWL_STYLE, style);
+			
+			SetWindowPos(hwnd, NULL, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOOWNERZORDER);
+			set_window_rect(get_window_rect());
+			show();
+		}
+
 		bool glwindow::swap_buffers() {
 			if (this != context) set_as_current();
 			return SwapBuffers(hdc) != FALSE;
+		}
+		
+		void glwindow::show() {
+			ShowWindow(hwnd, SW_SHOW);
 		}
 
 		void glwindow::set_as_current_impl() {

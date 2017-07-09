@@ -1,6 +1,8 @@
 #pragma once
 #include "augs/math/vec2.h"
 #include "augs/templates/string_templates.h"
+#include "augs/templates/maybe_const.h"
+#include "augs/templates/corresponding_field.h"
 #include <imgui/imgui.h>
 
 namespace augs {
@@ -94,16 +96,8 @@ namespace augs {
 		template <class T>
 		auto make_revert_button_lambda(T& edited_config, const T& last_saved_config) {
 			return [&](auto& field) {
-				using F = std::decay_t<decltype(field)>;
-
-				const F& corresponding_last_saved_field =
-					*reinterpret_cast<const F*>(
-						reinterpret_cast<const char*>(&last_saved_config)
-						+ (
-							reinterpret_cast<char*>(&field)
-							- reinterpret_cast<char*>(&edited_config)
-						)
-					)
+				const auto& corresponding_last_saved_field = 
+					get_corresponding_field(field, edited_config, last_saved_config)
 				;
 
 				bool changed = false;

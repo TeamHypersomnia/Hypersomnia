@@ -58,13 +58,18 @@ namespace augs {
 
 			void create(
 				const xywhi client_rectangle, 
-				const int enable_window_border = 0, 
+				const bool enable_window_border = false, 
 				const std::string name = "Window", 
 				const int doublebuffer = 1, 
 				const int bitsperpixel = 24
 			);
+
+			void set_window_name(const std::string& name);
+			void set_window_border_enabled(bool);
 			
 			bool swap_buffers();
+
+			void show();
 
 			void destroy();
 

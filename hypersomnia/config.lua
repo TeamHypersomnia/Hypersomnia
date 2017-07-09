@@ -72,7 +72,7 @@ return {
     drawing_enabled = false
   },
   debug_break_on_unit_test_failure = false,
-  debug_disable_cursor_clipping = false,
+  enable_cursor_clipping = true,
   debug_log_successful_unit_tests = false,
   debug_randomize_entropies_in_client_setup = false,
   debug_randomize_entropies_in_client_setup_once_every_steps = 0,

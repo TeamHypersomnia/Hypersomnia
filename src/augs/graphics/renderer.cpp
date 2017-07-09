@@ -72,6 +72,10 @@ namespace augs {
 	void renderer::initialize_fbos(const vec2i screen_size) {
 		const auto sz = vec2u(screen_size);
 
+		illuminating_smoke_fbo.destroy();
+		smoke_fbo.destroy();
+		light_fbo.destroy();
+
 		illuminating_smoke_fbo.create(sz.x, sz.y);
 		smoke_fbo.create(sz.x, sz.y);
 		light_fbo.create(sz.x, sz.y);

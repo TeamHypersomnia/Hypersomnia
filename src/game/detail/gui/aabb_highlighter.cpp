@@ -32,8 +32,6 @@ bool aabb_highlighter::is_hoverable(const const_entity_handle e) {
 		return false;
 	}
 
-	LOG_NVPS(to_string(e.get_name()));
-
 	return true;
 }
 

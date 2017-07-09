@@ -123,5 +123,5 @@ auto to_uppercase(S s) {
 template <class S>
 auto format_field_name(S s) {
 	s[0] = ::toupper(s[0]);
-	return str_ops(s).replace_all("_", " ").subject;
+	return str_ops(s).multi_replace_all( { "_", "." }, " ").subject;
 }

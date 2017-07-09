@@ -1,6 +1,7 @@
 #include "augs/misc/imgui_utils.h"
 #include "viewing_session.h"
 #include "augs/window_framework/platform_utils.h"
+#include "augs/window_framework/window.h"
 #include "generated/introspectors.h"
 
 static void ShowHelpMarker(const char* desc)
@@ -22,7 +23,10 @@ static bool operator==(const ImVec2 a, const ImVec2 b) {
 
 #define CONFIG_NVP(x) format_field_name(std::string(#x)) + "##" + std::to_string(field_id++), config.x
 
-void viewing_session::perform_settings_gui() {
+void viewing_session::perform_settings_gui(
+	augs::window::glwindow& window
+) {
+	const auto config_before_change = config;
 	auto& state = config_gui;
 
 	if (show_settings) {
@@ -56,13 +60,28 @@ void viewing_session::perform_settings_gui() {
 			checkbox(CONFIG_NVP(fullscreen)); revert(config.fullscreen);
 			if (!config.fullscreen) {
 				ImGui::Indent();
-				drag(CONFIG_NVP(window_position), 0.3f, 0, 10000); revert(config.window_position);
-				drag(CONFIG_NVP(windowed_size), 1.f, 100, 10000); revert(config.windowed_size);
-				checkbox(CONFIG_NVP(window_border)); revert(config.window_border);
-				ImGui::Unindent();
 
-				input_text<100>(CONFIG_NVP(window_name), ImGuiInputTextFlags_EnterReturnsTrue); revert(config.window_name);
+				{
+					vec2i lower;
+					vec2i upper = disp.get_size();
+					ImGui::DragIntN("Window position", &config.window_position.x, 2, 0.3f, &lower.x, &upper.x, "%.0f");
+					revert(config.window_position);
+				}
+
+				{
+					vec2i lower;
+					vec2i upper = disp.get_size();
+					ImGui::DragIntN("Windowed size", &config.windowed_size.x, 2, 0.3f, &lower.x, &upper.x, "%.0f");
+					revert(config.windowed_size);
+				}
+
+				checkbox(CONFIG_NVP(window_border)); revert(config.window_border);
+				checkbox(CONFIG_NVP(enable_cursor_clipping)); revert(config.enable_cursor_clipping);
+				ImGui::Unindent();
 			}
+
+			input_text<100>(CONFIG_NVP(window_name));
+			revert(config.window_name);
 		}
 		else if (state.active_pane == pane++) {
 
@@ -164,7 +183,7 @@ void viewing_session::perform_settings_gui() {
 					config,
 					last_saved_config
 				)
-				;
+			;
 
 			ImGui::BeginChild("save revert");
 
@@ -191,6 +210,12 @@ void viewing_session::perform_settings_gui() {
 
 		ImGui::End();
 	}
+
+	/* Update non-immediate values */
+
+	apply_changes(config, config_before_change, window);
+	apply_changes(config, config_before_change, *this);
+	apply_changes(config, config_before_change, augs::renderer::get_current());
 }
 
 #undef CONFIG_NVP

@@ -64,7 +64,7 @@ public:
 	bool window_border = 1;
 	vec2i window_position = vec2i(100, 10);
 	unsigned bpp = 24;
-	vec2u windowed_size = vec2u(1280, 768);
+	vec2i windowed_size = vec2i(1280, 768);
 	bool doublebuffer = true;
 
 	bool check_content_integrity_every_launch = true;
@@ -86,7 +86,7 @@ public:
 	double sound_effects_volume = 1.0;
 	double music_volume = 1.0;
 
-	bool debug_disable_cursor_clipping = false;
+	bool enable_cursor_clipping = false;
 
 	std::string connect_address;
 	unsigned short connect_port = 0;
@@ -144,6 +144,8 @@ public:
 	ImGuiStyle gui_style;
 	// END GEN INTROSPECTOR
 
+	vec2i get_screen_size() const;
+
 	void perform_settings_gui(
 		config_gui_state&,
 		const config_lua_table& last_saved
@@ -152,3 +154,39 @@ public:
 	launch_type get_launch_mode() const;
 	input_recording_type get_input_recording_mode() const;
 };
+
+class viewing_session;
+
+namespace augs {
+	class renderer;
+
+	namespace window {
+		class glwindow;
+	}
+}
+
+void apply_changes(
+	const config_lua_table&,
+	const config_lua_table&,
+	viewing_session&,
+	const bool force = false
+);
+
+void apply_changes(
+	const config_lua_table&,
+	const config_lua_table&,
+	augs::window::glwindow&,
+	const bool force = false
+);
+
+void apply_changes(
+	const config_lua_table&,
+	const config_lua_table&,
+	augs::renderer&,
+	const bool force = false
+);
+
+template <class... Args>
+void force_apply_changes(const config_lua_table& c, Args&&... args) {
+	apply_changes(c, config_lua_table(), std::forward<Args>(args)..., true);
+}

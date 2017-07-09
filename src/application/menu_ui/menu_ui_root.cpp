@@ -1,7 +1,7 @@
 #include <tuple>
 #include "menu_ui_root.h"
 
-menu_ui_root::menu_ui_root(const vec2i screen_size) {
+menu_ui_root::menu_ui_root() {
 	unset_flag(augs::gui::flag::CLIP);
 	set_flag(augs::gui::flag::ENABLE_DRAWING_OF_CHILDREN);
 	set_flag(augs::gui::flag::DISABLE_HOVERING);

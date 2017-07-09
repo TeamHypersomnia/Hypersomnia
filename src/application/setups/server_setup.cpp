@@ -146,7 +146,7 @@ void server_setup::process(const config_lua_table& cfg, game_window& window, con
 	while (!should_quit) {
 		augs::machine_entropy new_entropy;
 
-		new_entropy.local = window.collect_entropy(!cfg.debug_disable_cursor_clipping);
+		new_entropy.local = window.collect_entropy(cfg.enable_cursor_clipping);
 		new_entropy.remote = serv.collect_entropy();
 
 		if (start_alternative_server) {

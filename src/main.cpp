@@ -80,45 +80,21 @@ int main(int argc, char** argv) {
 	});
 
 	{
-		augs::window::set_cursor_visible(cfg.debug_disable_cursor_clipping);
-
-		xywhi screen_rect = {
-			static_cast<int>(cfg.window_position.x),	
-			static_cast<int>(cfg.window_position.y),	
-			static_cast<int>(cfg.windowed_size.x),	
-			static_cast<int>(cfg.windowed_size.y)	
-		};
-
-		if (cfg.fullscreen) {
-			const auto display = augs::window::get_display();
-
-			screen_rect.x = 0;
-			screen_rect.y = 0;
-			screen_rect.w = display.w;
-			screen_rect.h = display.h;
-
-			augs::window::set_display(display.w, display.h, cfg.bpp);
-		}
-
-		bool enable_window_border = cfg.window_border;
-
-		if (cfg.fullscreen) {
-			enable_window_border = false;
-		}
-
 		window.window.create(
-			screen_rect,
-			enable_window_border,
+			{ 0, 0, 0, 0 },
+			false,
 			cfg.window_name,
 			cfg.doublebuffer,
 			cfg.bpp
 		);
 
+		force_apply_changes(cfg, window.window);
+
 		window.window.set_as_current();
 	}
 
 	gl.initialize();
-	gl.initialize_fbos(window.get_screen_size());
+	force_apply_changes(cfg, gl);
 
 	regeneration_thread.join();
 
@@ -142,6 +118,7 @@ int main(int argc, char** argv) {
 	
 	{
 		auto session = viewing_session(window.get_screen_size(), cfg);
+		force_apply_changes(cfg, session);
 
 		switch (mode) {
 		case launch_type::MAIN_MENU:

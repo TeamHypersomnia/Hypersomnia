@@ -7,7 +7,7 @@
 
 class menu_ui_root : public menu_ui_rect_node {
 public:
-	menu_ui_root(const vec2i screen_size);
+	menu_ui_root();
 
 	augs::enum_array<option_button, menu_button_type> menu_buttons;
 

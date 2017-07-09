@@ -77,6 +77,8 @@ struct creators_screen {
 				p.target_pos.x = screen_size.x / 2.f + 60.f;
 			}
 		}
+		
+		afterword.target_pos.set(screen_size.x / 2 - get_text_bbox(afterword.get_total_target_text(), 0u).x / 2, screen_size.y / 2 + column_height + 50);
 	}
 
 	void setup(const style person_style, const style task_style, const vec2i screen_size) {
@@ -118,8 +120,6 @@ struct creators_screen {
 			add_entry(c);
 		}
 
-		center_all(screen_size);
-
 		afterword.target_text[0] = format(L"\
 What stands before your eyes is an outcome of a man's burning passion,\n\
 a digital inamorata, chef d'oeuvre of a single coder, masterful musicians and a champion at pixel art.\n\n", person_style);
@@ -132,11 +132,11 @@ In the end you will either conquer that which you dreamed of,\n\
 or tell a beautiful story of a man devastated by struggle.\n", person_style)
 + format(L"    ~Founder of the Hypersomnia Universe", task_style);
 
-		afterword.target_pos.set(screen_size.x / 2 - get_text_bbox(afterword.get_total_target_text(), 0u).x / 2, screen_size.y / 2 + column_height + 50);
-
 		afterword.should_disappear = false;
 		afterword.population_interval = 50.f;
 		afterword.population_variation = 0.7f;
+
+		center_all(screen_size);
 	}
 
 	void push_into(augs::action_list& into) {

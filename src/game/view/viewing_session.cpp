@@ -114,6 +114,7 @@ void viewing_session::control_gui_and_remove_fetched_events(
 }
 
 void viewing_session::perform_imgui_pass(
+	augs::window::glwindow& window,
 	const augs::machine_entropy::local_type& window_inputs,
 	const augs::delta dt
 ) {
@@ -165,7 +166,7 @@ void viewing_session::perform_imgui_pass(
 
 	ImGui::NewFrame();
 	
-	perform_settings_gui();
+	perform_settings_gui(window);
 
 	ImGui::Render();
 }

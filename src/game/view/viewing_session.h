@@ -91,11 +91,12 @@ public:
 	);
 	
 	void perform_imgui_pass(
+		augs::window::glwindow&,
 		const augs::machine_entropy::local_type&,
 		const augs::delta dt
 	);
 
-	void perform_settings_gui();
+	void perform_settings_gui(augs::window::glwindow&);
 
 	void control_open_developer_console(game_intent_vector&);
 	void control_and_remove_fetched_intents(game_intent_vector&);

@@ -142,7 +142,6 @@ void menu_setup::process(
 	const auto title_size = metas_of_assets[assets::game_image_id::MENU_GAME_LOGO].get_size();
 
 	ltrb title_rect;
-	title_rect.set_position({ screen_size.x / 2.f - title_size.x / 2.f, 50.f });
 	title_rect.set_size(title_size);
 
 	rgba fade_overlay_color = { 0, 2, 2, 255 };
@@ -155,10 +154,8 @@ void menu_setup::process(
 	vec2i tweened_welcome_message_bg_size;
 
 	menu_ui_rect_world menu_ui_rect_world;
-	menu_ui_rect_world.last_state.screen_size = screen_size;
-
 	menu_ui_root_in_context menu_ui_root_id;
-	menu_ui_root menu_ui_root = screen_size;
+	menu_ui_root menu_ui_root;
 
 	for (auto& m : menu_ui_root.menu_buttons) {
 		m.hover_highlight_maximum_distance = 10.f;
@@ -177,8 +174,6 @@ void menu_setup::process(
 	menu_ui_root.menu_buttons[menu_button_type::SETTINGS].set_appearing_caption(format(L"Settings", textes_style));
 	menu_ui_root.menu_buttons[menu_button_type::CREATORS].set_appearing_caption(format(L"Founders", textes_style));
 	menu_ui_root.menu_buttons[menu_button_type::QUIT].set_appearing_caption(format(L"Quit", textes_style));
-
-	menu_ui_root.set_menu_buttons_positions(screen_size);
 
 	appearing_text credits1;
 	credits1.target_text[0] = format(L"hypernet community presents", textes_style);
@@ -200,8 +195,6 @@ void menu_setup::process(
 Our collective welcomes all of your suggestions and contributions.\n\
 We wish you an exciting journey through architecture of our cosmos.\n", textes_style) +
 		format(L"    ~hypernet community", style(assets::font_id::GUI_FONT, { 0, 180, 255, 255 }));
-
-		developer_welcome.target_pos += screen_size - get_text_bbox(developer_welcome.get_total_target_text(), 0) - vec2(70.f, 70.f);
 	}
 
 	appearing_text hypersomnia_description;
@@ -219,7 +212,6 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 	vec2i target_tweened_menu_button_size = menu_ui_root.get_max_menu_button_size();
 
 	creators_screen creators;
-	creators.setup(textes_style, style(assets::font_id::GUI_FONT, { 0, 180, 255, 255 }), screen_size);
 
 	augs::action_list intro_actions;
 
@@ -306,6 +298,9 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 
 		case menu_button_type::CREATORS:
 			if (credits_actions.is_complete()) {
+				creators = creators_screen();
+				creators.setup(textes_style, style(assets::font_id::GUI_FONT, { 0, 180, 255, 255 }), window.window.get_screen_size());
+
 				credits_actions.push_blocking(act(new augs::tween_value_action<rgba_channel>(fade_overlay_color.a, 170, 500.f)));
 				creators.push_into(credits_actions);
 				credits_actions.push_blocking(act(new augs::tween_value_action<rgba_channel>(fade_overlay_color.a, 20, 500.f)));
@@ -329,14 +324,20 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 	}
 
 	while (!should_quit) {
+		const auto screen_size = window.window.get_screen_size();
+		title_rect.set_position({ screen_size.x / 2.f - title_size.x / 2.f, 50.f });
+		menu_ui_rect_world.last_state.screen_size = screen_size;
+		developer_welcome.target_pos = screen_size - get_text_bbox(developer_welcome.get_total_target_text(), 0) - vec2(70.f, 70.f);
+
 		augs::machine_entropy new_machine_entropy;
 
 		session.local_entropy_profiler.new_measurement();
-		new_machine_entropy.local = window.collect_entropy(!session.config.debug_disable_cursor_clipping);
+		new_machine_entropy.local = window.collect_entropy(session.config.enable_cursor_clipping);
 		session.local_entropy_profiler.end_measurement();
 		
 		if (draw_menu_gui) {
 			session.perform_imgui_pass(
+				window.window,
 				new_machine_entropy.local,
 				session.imgui_timer.extract<std::chrono::milliseconds>()
 			);
@@ -468,6 +469,8 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 
 		renderer.call_triangles();
 		renderer.clear_triangles();
+		
+			menu_ui_root.set_menu_buttons_positions(screen_size);
 
 			menu_ui_rect_world::gui_entropy gui_entropies;
 

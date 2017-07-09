@@ -56,7 +56,7 @@ struct ltrbt {
 		*this = ltrbt(_l, _t, _r, _b);
 	}
 
-	ltrbt& set_position(const vec2t<T> v) {
+	auto& set_position(const vec2t<T> v) {
 		const auto old_w = w();
 		const auto old_h = h();
 
@@ -68,21 +68,21 @@ struct ltrbt {
 		return *this;
 	}
 
-	ltrbt& set_size(const vec2t<T> v) {
+	auto& set_size(const vec2t<T> v) {
 		w(v.x);
 		h(v.y);
 
 		return *this;
 	}
 
-	ltrbt& set_size(const T x, const T y) {
+	auto& set_size(const T x, const T y) {
 		w(x);
 		h(y);
 
 		return *this;
 	}
 
-	ltrbt& contain(const ltrbt rc) {
+	auto& contain(const ltrbt rc) {
 		l = std::min(l, rc.l);
 		t = std::min(t, rc.t);
 		contain_positive(rc);
@@ -90,7 +90,7 @@ struct ltrbt {
 		return *this;
 	}
 
-	ltrbt& contain_positive(const ltrbt rc) {
+	auto& contain_positive(const ltrbt rc) {
 		r = std::max(r, rc.r);
 		b = std::max(b, rc.b);
 
@@ -318,6 +318,17 @@ struct xywht {
 		*this = xywht(_x, _y, _w, _h);
 	}
 
+	auto& set_position(const vec2t<T> v) {
+		x = v.x;
+		y = v.y;
+
+		return *this;
+	}
+
+	vec2t<T> get_position() const {
+		return { x, y } 
+	}
+
 	bool clip(const xywht& rc) {
 		if (x >= rc.r() || y >= rc.b() || r() <= rc.x || b() <= rc.y) {
 			*this = xywht();
@@ -357,6 +368,13 @@ struct xywht {
 
 	vec2t<T> center() const {
 		return{ x + this->w / 2, y + this->h / 2 };
+	}
+
+	auto& set_size(const vec2t<T> v) {
+		w = v.x;
+		h = v.y;
+
+		return *this;
 	}
 
 	vec2t<T> get_size() const {

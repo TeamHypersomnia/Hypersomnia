@@ -158,7 +158,7 @@ augs::machine_entropy director_setup::control_player(
 	augs::machine_entropy new_machine_entropy;
 
 	session.local_entropy_profiler.new_measurement();
-	new_machine_entropy.local = window.collect_entropy(!session.config.debug_disable_cursor_clipping);
+	new_machine_entropy.local = window.collect_entropy(session.config.enable_cursor_clipping);
 	session.local_entropy_profiler.end_measurement();
 
 	process_exit_key(new_machine_entropy.local);
@@ -341,7 +341,8 @@ void director_setup::process(
 			//}
 			
 			session.perform_imgui_pass(
-				entropy.local, 
+				window.window,
+				entropy.local,
 				session.imgui_timer.extract<std::chrono::milliseconds>()
 			);
 		}

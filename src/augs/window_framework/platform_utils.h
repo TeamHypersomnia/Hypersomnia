@@ -1,11 +1,12 @@
 #pragma once
 #include "augs/math/rects.h"
+#include "augs/math/vec2.h"
 
 namespace augs {
 	namespace window {
-		bool set_display(int width, int height, int bpp);
+		bool set_display(const vec2i, int bpp);
 		xywhi get_display();
-		void set_cursor_visible(int flag);
+		void set_cursor_visible(const bool flag);
 
 		void set_clipboard_data(std::string);
 		std::string get_data_from_clipboard();
