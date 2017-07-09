@@ -472,6 +472,7 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 		renderer.clear_triangles();
 		
 			menu_ui_root.set_menu_buttons_positions(screen_size);
+			menu_ui_root.set_menu_buttons_sizes(tweened_menu_button_size);
 
 			menu_ui_rect_world::gui_entropy gui_entropies;
 
@@ -493,7 +494,6 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 			menu_ui_rect_world.respond_to_events(menu_ui_context, menu_ui_root_id, gui_entropies);
 			menu_ui_rect_world.advance_elements(menu_ui_context, menu_ui_root_id, vdt);
 
-			menu_ui_root.set_menu_buttons_sizes(tweened_menu_button_size);
 			menu_ui_root.set_menu_buttons_colors(tweened_menu_button_color);
 			menu_ui_rect_world.rebuild_layouts(menu_ui_context, menu_ui_root_id);
 
