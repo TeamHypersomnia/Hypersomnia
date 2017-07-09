@@ -350,7 +350,7 @@ namespace augs {
 		const std::string& target_path, 
 		SaverArgs&&... args
 	) {
-		auto lua = augs::create_lua_state();
+		auto& lua = augs::get_thread_local_lua_state();
 
 		auto output_table = lua.create_named_table("my_table");
 		augs::write(output_table, std::forward<T>(object));
@@ -369,9 +369,7 @@ namespace augs {
 		T& object,
 		const std::string& source_path
 	) {
-		auto lua = augs::create_lua_state();
-
-		sol::table input_table = lua.script(
+		sol::table input_table = get_thread_local_lua_state().script(
 			augs::get_file_contents(source_path), 
 			augs::lua_error_callback
 		);

@@ -41,4 +41,9 @@ namespace augs {
 
 		return lua;
 	}
+
+	sol::state& get_thread_local_lua_state() {
+		thread_local sol::state lua = create_lua_state();
+		return lua;
+	}
 }

@@ -16,6 +16,8 @@
 #include "application/config_structs/hotbar_settings.h"
 #include "application/config_structs/debug_drawing_settings.h"
 
+#include <imgui/imgui.h>
+
 enum class launch_type {
 	// GEN INTROSPECTOR enum class launch_type
 	MAIN_MENU,
@@ -34,6 +36,10 @@ enum class launch_type {
 
 	COUNT
 	// END GEN INTROSPECTOR
+};
+
+struct config_gui_state {
+	int active_pane = 0;
 };
 
 class config_lua_table {
@@ -56,9 +62,9 @@ public:
 	std::string window_name = "example";
 	bool fullscreen = false;
 	bool window_border = 1;
-	vec2i window_pos = vec2i(100, 10);
+	vec2i window_position = vec2i(100, 10);
 	unsigned bpp = 24;
-	vec2u resolution = vec2u(1280, 768);
+	vec2u windowed_size = vec2u(1280, 768);
 	bool doublebuffer = true;
 
 	bool check_content_integrity_every_launch = true;
@@ -134,8 +140,15 @@ public:
 
 	button_with_corners_input menu_button;
 	button_with_corners_input hotbar_button;
+
+	ImGuiStyle gui_style;
 	// END GEN INTROSPECTOR
 
+	void perform_settings_gui(
+		config_gui_state&,
+		const config_lua_table& last_saved
+	);
+	
 	launch_type get_launch_mode() const;
 	input_recording_type get_input_recording_mode() const;
 };

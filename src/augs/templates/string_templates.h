@@ -119,3 +119,9 @@ template <class S>
 auto to_uppercase(S s) {
 	return str_ops(s).to_uppercase().subject;
 }
+
+template <class S>
+auto format_field_name(S s) {
+	s[0] = ::toupper(s[0]);
+	return str_ops(s).replace_all("_", " ").subject;
+}

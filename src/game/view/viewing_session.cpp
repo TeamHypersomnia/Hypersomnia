@@ -14,13 +14,15 @@
 #include "augs/misc/lua_readwrite.h"
 #include "generated/introspectors.h"
 #include "augs/filesystem/file.h"
-
-#include <imgui/imgui.h>
+#include "augs/misc/imgui_utils.h"
 
 viewing_session::viewing_session(
 	const vec2i screen_size,
 	const config_lua_table& config
-) : config(config) {
+) : 
+	config(config), 
+	last_saved_config(config) 
+{
 	systems_audiovisual.get<sound_system>().initialize_sound_sources(32u);
 	
 	set_screen_size(screen_size);
@@ -59,15 +61,7 @@ viewing_session::viewing_session(
 	io.LogFilename = "generated/imgui_log.txt";
 	io.MouseDoubleClickMaxDist = 100.f;
 
-	augs::load_from_lua_table(
-		gui_style,
-		augs::switch_path(
-			"gui_style.lua",
-			"gui_style.local.lua"
-		)
-	);
-
-	ImGui::GetStyle() = gui_style;
+	ImGui::GetStyle() = config.gui_style;
 }
 
 void viewing_session::set_screen_size(const vec2i new_size) {
@@ -171,36 +165,7 @@ void viewing_session::perform_imgui_pass(
 
 	ImGui::NewFrame();
 	
-	if (show_style_editor) {
-		ImGuiStyle passed_style = gui_style;
-		ImGui::Begin("Style editor", &show_style_editor);
-		ImGui::ShowStyleEditor(&passed_style);
-		ImGui::End();
-
-		const bool has_style_changed =
-			!augs::introspective_compare(
-				passed_style,
-				gui_style
-			)
-		;
-
-		if (has_style_changed) {
-			gui_style = passed_style;
-			ImGui::GetStyle() = gui_style;
-			augs::save_as_lua_table(gui_style, "gui_style.local.lua");
-		}
-	}
-
-	if (show_settings) {
-		ImGui::Begin("Settings", &show_settings);
-
-		if (ImGui::Button("Style editor")) {
-			ImGui::SetWindowFocus("Style editor");
-			show_style_editor = true;
-		}
-
-		ImGui::End();
-	}
+	perform_settings_gui();
 
 	ImGui::Render();
 }

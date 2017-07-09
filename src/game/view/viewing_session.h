@@ -46,9 +46,10 @@ namespace augs {
 }
 
 class viewing_session {
+	config_gui_state config_gui;
 public:
+	config_lua_table last_saved_config;
 	config_lua_table config;
-	ImGuiStyle gui_style;
 
 	world_camera camera;
 	vec2i viewport_coordinates;
@@ -57,7 +58,6 @@ public:
 
 	bool gui_look_enabled = false;
 	bool show_settings = false;
-	bool show_style_editor = false;
 
 	augs::timer frame_timer;
 	augs::timer imgui_timer;
@@ -94,6 +94,8 @@ public:
 		const augs::machine_entropy::local_type&,
 		const augs::delta dt
 	);
+
+	void perform_settings_gui();
 
 	void control_open_developer_console(game_intent_vector&);
 	void control_and_remove_fetched_intents(game_intent_vector&);

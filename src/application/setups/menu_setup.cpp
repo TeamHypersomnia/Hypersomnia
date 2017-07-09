@@ -62,7 +62,8 @@ void menu_setup::process(
 
 	cosmos intro_scene(3000);
 
-	augs::load_from_lua_table(session.config, "content/menu/config.lua");
+	auto& lua = augs::get_thread_local_lua_state();
+	sol::table menu_config_patch = lua.script(augs::get_file_contents("content/menu/config.lua"), augs::lua_error_callback);
 
 	augs::single_sound_buffer menu_theme;
 	augs::sound_source menu_theme_source;
@@ -85,7 +86,7 @@ void menu_setup::process(
 
 	std::mutex news_mut;
 
-	bool draw_cursor = false;
+	bool draw_menu_gui = false;
 	bool roll_news = false;
 	text_drawer latest_news_drawer;
 	vec2 news_pos = vec2(static_cast<float>(screen_size.x), 5.f);
@@ -261,7 +262,7 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 		
 		intro_actions.push_non_blocking(act(new augs::set_value_action<bool>(roll_news, true)));
 		intro_actions.push_non_blocking(act(new augs::set_value_action<vec2i>(menu_ui_rect_world.last_state.mouse.pos, window.get_screen_size()/2)));
-		intro_actions.push_non_blocking(act(new augs::set_value_action<bool>(draw_cursor, true)));
+		intro_actions.push_non_blocking(act(new augs::set_value_action<bool>(draw_menu_gui, true)));
 		
 		for (auto& t : title_texts) {
 			augs::action_list acts;
@@ -334,7 +335,7 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 		new_machine_entropy.local = window.collect_entropy(!session.config.debug_disable_cursor_clipping);
 		session.local_entropy_profiler.end_measurement();
 		
-		if (draw_cursor) {
+		if (draw_menu_gui) {
 			session.perform_imgui_pass(
 				new_machine_entropy.local,
 				session.imgui_timer.extract<std::chrono::milliseconds>()
@@ -367,7 +368,13 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 			}
 		}
 
-		session.set_master_gain(session.config.sound_effects_volume * 0.3f * gain_fade_multiplier);
+		const auto saved_config = session.config;
+		augs::read(menu_config_patch, session.config);
+		
+		// treat as multiplier
+		session.config.sound_effects_volume *= saved_config.sound_effects_volume;
+
+		session.set_master_gain(session.config.sound_effects_volume * gain_fade_multiplier);
 		menu_theme_source.set_gain(session.config.music_volume * gain_fade_multiplier);
 
 		thread_local visible_entities all_visible;
@@ -398,6 +405,8 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 			timer.fraction_of_step_until_next_step(intro_scene.get_fixed_delta()), 
 			augs::gui::text::format(typesafe_sprintf(L"Current time: %x", current_time_seconds), textes_style)
 		);
+
+		session.config = saved_config;
 		
 		session.draw_color_overlay(renderer, fade_overlay_color);
 
@@ -467,7 +476,7 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 
 			menu_ui_rect_world.build_tree_data_into_context(menu_ui_context, menu_ui_root_id);
 
-			if (draw_cursor) {
+			if (draw_menu_gui) {
 				for (const auto& ch : new_machine_entropy.local) {
 					menu_ui_rect_world.consume_raw_input_and_generate_gui_events(menu_ui_context, menu_ui_root_id, ch, gui_entropies);
 				}
@@ -498,7 +507,7 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 
 		renderer.draw_imgui(get_assets_manager());
 		
-		if (draw_cursor) {
+		if (draw_menu_gui) {
 			const auto mouse_pos = menu_ui_rect_world.last_state.mouse.pos;
 			const auto gui_cursor_color = white;
 		
