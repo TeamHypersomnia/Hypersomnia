@@ -89,7 +89,7 @@ void viewing_session::perform_settings_gui(
 		else if (state.active_pane == pane++) {
 			slider(CONFIG_NVP(music_volume), 0.f, 1.f); revert(config.music_volume);
 			slider(CONFIG_NVP(sound_effects_volume), 0.f, 1.f); revert(config.sound_effects_volume);
-			slider("GUI volume", config.gui_volume, 0.f, 1.f); revert(config.sound_effects_volume);
+			slider("GUI volume", config.gui_volume, 0.f, 1.f); revert(config.gui_volume);
 			checkbox("Enable HRTF", config.enable_hrtf); revert(config.enable_hrtf);
 		}
 		else if (state.active_pane == pane++) {
