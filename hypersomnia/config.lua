@@ -152,6 +152,8 @@ return {
 
   debug_minimal_test_scene = false,
 
+  gui_volume = 1.0,
+  
   gui_style = {
     Alpha = 1,
     AntiAliasedLines = false,

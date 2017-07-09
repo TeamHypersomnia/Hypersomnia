@@ -19,17 +19,23 @@ public:
 	typedef typename base::tree_ref tree_ref;
 
 	basic_menu_ui_context(
+		const config_lua_table& config,
 		rect_world_ref world,
 		tree_ref tree,
 		menu_ui_root_ref root
-	) : base(world, tree), root(root)
+	) : base(world, tree), config(config), root(root)
 	{}
 
+	const config_lua_table& config;
 	menu_ui_root_ref root;
 
 	template<class other_context>
 	operator other_context() const {
 		return other_context(world, tree, root);
+	}
+	
+	const config_lua_table& get_config() const {
+		return config;
 	}
 
 	menu_ui_root_ref get_root_of_menu_ui() const {

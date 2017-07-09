@@ -160,9 +160,6 @@ void menu_setup::process(
 	for (auto& m : menu_ui_root.menu_buttons) {
 		m.hover_highlight_maximum_distance = 10.f;
 		m.hover_highlight_duration_ms = 300.f;
-
-		m.hover_sound.set_gain(session.config.sound_effects_volume);
-		m.click_sound.set_gain(session.config.sound_effects_volume);
 	}
 
 	menu_ui_root.menu_buttons[menu_button_type::CONNECT_TO_OFFICIAL_UNIVERSE].set_appearing_caption(format(L"Login to official universe", textes_style));
@@ -479,7 +476,7 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 			menu_ui_rect_world::gui_entropy gui_entropies;
 
 			menu_ui_rect_tree menu_ui_tree;
-			menu_ui_context menu_ui_context(menu_ui_rect_world, menu_ui_tree, menu_ui_root);
+			menu_ui_context menu_ui_context(session.config, menu_ui_rect_world, menu_ui_tree, menu_ui_root);
 
 			menu_ui_rect_world.build_tree_data_into_context(menu_ui_context, menu_ui_root_id);
 

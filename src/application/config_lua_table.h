@@ -83,6 +83,7 @@ public:
 
 	std::string audio_output_device;
 
+	double gui_volume = 1.0;
 	double sound_effects_volume = 1.0;
 	double music_volume = 1.0;
 
