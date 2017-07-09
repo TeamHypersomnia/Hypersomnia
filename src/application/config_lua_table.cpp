@@ -118,6 +118,14 @@ void apply_changes(
 	const bool force
 ) {
 	if (force || config.get_screen_size() != origin.get_screen_size()) {
-		renderer.initialize_fbos(config.get_screen_size());
+		renderer.resize_fbos(config.get_screen_size());
 	}
+}
+
+void sync_config_back(config_lua_table& config, const augs::window::glwindow& window) {
+	if (!config.fullscreen) {
+		config.windowed_size = window.get_window_rect().get_size();
+	}
+
+	config.window_position = window.get_window_rect().get_position();
 }

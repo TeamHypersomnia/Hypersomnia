@@ -190,3 +190,5 @@ template <class... Args>
 void force_apply_changes(const config_lua_table& c, Args&&... args) {
 	apply_changes(c, config_lua_table(), std::forward<Args>(args)..., true);
 }
+
+void sync_config_back(config_lua_table&, const augs::window::glwindow&);

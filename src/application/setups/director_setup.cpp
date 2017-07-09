@@ -330,16 +330,15 @@ void director_setup::process(
 	init(window, session);
 
 	while (!should_quit) {
+		sync_config_back(session.config, window.window);
+
+		const auto screen_size = window.window.get_screen_size();
+		augs::renderer::get_current().resize_fbos(screen_size);
+		session.set_screen_size(screen_size);
+
 		const auto entropy = control_player(window, session);
 
 		if (should_show_editor_gui()) {
-			//for (const auto l : entropy.local) {
-			//	session.perform_imgui_pass(
-			//		{ l },
-			//		0.f
-			//	);
-			//}
-			
 			session.perform_imgui_pass(
 				window.window,
 				entropy.local,

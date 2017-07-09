@@ -326,7 +326,7 @@ struct xywht {
 	}
 
 	vec2t<T> get_position() const {
-		return { x, y } 
+		return { x, y };
 	}
 
 	bool clip(const xywht& rc) {

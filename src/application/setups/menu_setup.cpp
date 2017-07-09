@@ -323,7 +323,11 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 	}
 
 	while (!should_quit) {
+		sync_config_back(session.config, window.window);
+		
 		const auto screen_size = window.window.get_screen_size();
+		augs::renderer::get_current().resize_fbos(screen_size);
+		session.set_screen_size(screen_size);
 		title_rect.set_position({ screen_size.x / 2.f - title_size.x / 2.f, 50.f });
 		hypersomnia_description.target_pos = title_rect.left_bottom() + vec2(20, 20);
 		menu_ui_rect_world.last_state.screen_size = screen_size;

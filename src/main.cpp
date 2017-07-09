@@ -94,7 +94,7 @@ int main(int argc, char** argv) {
 	}
 
 	gl.initialize();
-	force_apply_changes(cfg, gl);
+	gl.resize_fbos(window.window.get_screen_size());
 
 	regeneration_thread.join();
 

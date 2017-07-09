@@ -93,7 +93,7 @@ namespace augs {
 		float max_visibility_expansion_distance = 1000.0f;
 		
 		void initialize();
-		void initialize_fbos(const vec2i screen_size);
+		void resize_fbos(const vec2i screen_size);
 
 		void bind_texture(const graphics::fbo&);
 		void bind_texture(const augs::graphics::texture&);

@@ -69,16 +69,21 @@ namespace augs {
 		glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer_id); glerr;
 	}
 
-	void renderer::initialize_fbos(const vec2i screen_size) {
-		const auto sz = vec2u(screen_size);
+	void renderer::resize_fbos(const vec2i screen_size) {
+		if (illuminating_smoke_fbo.get_size() != screen_size) {
+			illuminating_smoke_fbo.destroy();
+			illuminating_smoke_fbo.create(screen_size);
+		}
 
-		illuminating_smoke_fbo.destroy();
-		smoke_fbo.destroy();
-		light_fbo.destroy();
+		if (light_fbo.get_size() != screen_size) {
+			light_fbo.destroy();
+			light_fbo.create(screen_size);
+		}
 
-		illuminating_smoke_fbo.create(sz.x, sz.y);
-		smoke_fbo.create(sz.x, sz.y);
-		light_fbo.create(sz.x, sz.y);
+		if (smoke_fbo.get_size() != screen_size) {
+			smoke_fbo.destroy();
+			smoke_fbo.create(screen_size);
+		}
 	}
 
 	void renderer::enable_special_vertex_attribute() {

@@ -7,16 +7,15 @@ namespace augs {
 	namespace graphics {
 		GLuint fbo::currently_bound_fbo = 0u;
 
-		fbo::fbo(const GLuint w, const GLuint h) {
-			create(w, h);
+		fbo::fbo(const vec2u size) {
+			create(size);
 		}
 
-		void fbo::create(const GLuint w, const GLuint h) {
+		void fbo::create(const vec2u s) {
 			ensure(!created);
 
 			created = true;
-			width = w;
-			height = h;
+			size = s;
 
 			glGenTextures(1, &textureId); glerr
 			glBindTexture(GL_TEXTURE_2D, textureId); glerr
@@ -26,7 +25,7 @@ namespace augs {
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); glerr
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); glerr
 			//glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE); // automatic mipmap
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0,
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, size.x, size.y, 0,
 				GL_RGBA, GL_UNSIGNED_BYTE, 0); glerr
 			glBindTexture(GL_TEXTURE_2D, 0); glerr
 
@@ -67,24 +66,13 @@ namespace augs {
 			}
 		}
 
-		int fbo::get_width() const {
-			ensure(created);
-			return width;
-		}
-
-		int fbo::get_height() const {
-			ensure(created);
-			return height;
-		}
-
 		void fbo::destroy() {
 			if (created) {
 				glDeleteFramebuffers(1, &fboId); glerr
 				glDeleteTextures(1, &textureId); glerr
 
 				created = false;
-				width = 0;
-				height = 0;
+				size.reset();
 				fboId = 0;
 				textureId = 0;
 			}
@@ -92,6 +80,10 @@ namespace augs {
 
 		fbo::~fbo() {
 			destroy();
+		}
+
+		vec2u fbo::get_size() const {
+			return size;
 		}
 
 		GLuint fbo::get_texture_id() const {

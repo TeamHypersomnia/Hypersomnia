@@ -86,6 +86,13 @@ void local_setup::process(
 	const bool debug_control_timing = true;// player.is_replaying();
 
 	while (!should_quit) {
+		sync_config_back(session.config, window.window);
+		
+		const auto screen_size = window.window.get_screen_size();
+
+		augs::renderer::get_current().resize_fbos(screen_size);
+		session.set_screen_size(screen_size);
+
 		{
 			augs::machine_entropy new_machine_entropy;
 

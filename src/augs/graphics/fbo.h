@@ -1,4 +1,5 @@
 #pragma once
+#include "augs/math/vec2.h"
 
 typedef unsigned int GLuint;
 
@@ -10,8 +11,7 @@ namespace augs {
 			friend class ::augs::renderer;
 			GLuint fboId = 0u;
 			GLuint textureId = 0u;
-			GLuint width = 0u;
-			GLuint height = 0u;
+			vec2u size;
 			
 			bool created = false;
 
@@ -25,14 +25,14 @@ namespace augs {
 			fbo& operator=(const fbo&) = delete;
 			fbo& operator=(fbo&&) = delete;
 
-			fbo(const GLuint width, const GLuint height);
-			void create(const GLuint width, const GLuint height);
+			fbo(const vec2u size);
+			void create(const vec2u size);
 			void destroy();
 
 			void use() const;
 			void guarded_use() const;
 
-			int get_width() const, get_height() const;
+			vec2u get_size() const;
 			GLuint get_texture_id() const;
 
 			static void use_default();

@@ -281,13 +281,13 @@ namespace augs {
 		void glwindow::set_window_border_enabled(const bool f) {
 			const auto menu = f ? WS_CAPTION | WS_SYSMENU : 0;
 
-			style = menu ? (WS_OVERLAPPED | menu) | WS_CLIPSIBLINGS | WS_CLIPCHILDREN : WS_POPUP;
+			style = menu ? (WS_OVERLAPPED | menu) | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_THICKFRAME : WS_POPUP;
 			exstyle = menu ? WS_EX_WINDOWEDGE : WS_EX_APPWINDOW;
 
 			SetWindowLongPtr(hwnd, GWL_EXSTYLE, exstyle);
 			SetWindowLongPtr(hwnd, GWL_STYLE, style);
 			
-			SetWindowPos(hwnd, NULL, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOOWNERZORDER);
+			SetWindowPos(hwnd, NULL, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOZORDER | SWP_NOOWNERZORDER);
 			set_window_rect(get_window_rect());
 			show();
 		}
