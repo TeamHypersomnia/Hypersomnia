@@ -203,7 +203,6 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 
 		hypersomnia_description.should_disappear = false;
 		hypersomnia_description.target_text[0] = format(L"- tendency of the omnipotent deity to immerse into inferior simulations,\nin spite of countless deaths experienced as a consequence.", { assets::font_id::GUI_FONT, {200, 200, 200, 255} });
-		hypersomnia_description.target_pos = title_rect.left_bottom() + vec2(20, 20);
 	}
 
 	std::vector<appearing_text*> title_texts = { &developer_welcome, &hypersomnia_description };
@@ -326,6 +325,7 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 	while (!should_quit) {
 		const auto screen_size = window.window.get_screen_size();
 		title_rect.set_position({ screen_size.x / 2.f - title_size.x / 2.f, 50.f });
+		hypersomnia_description.target_pos = title_rect.left_bottom() + vec2(20, 20);
 		menu_ui_rect_world.last_state.screen_size = screen_size;
 		developer_welcome.target_pos = screen_size - get_text_bbox(developer_welcome.get_total_target_text(), 0) - vec2(70.f, 70.f);
 
