@@ -65,7 +65,6 @@ public:
 	vec2i window_position = vec2i(100, 10);
 	unsigned bpp = 24;
 	vec2i windowed_size = vec2i(1280, 768);
-	bool doublebuffer = true;
 
 	bool check_content_integrity_every_launch = true;
 	bool save_regenerated_atlases_as_binary = true;

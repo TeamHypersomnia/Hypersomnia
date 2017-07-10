@@ -125,7 +125,6 @@ void apply_changes(
 void sync_config_back(config_lua_table& config, const augs::window::glwindow& window) {
 	if (!config.fullscreen) {
 		config.windowed_size = window.get_window_rect().get_size();
+		config.window_position = window.get_window_rect().get_position();
 	}
-
-	config.window_position = window.get_window_rect().get_position();
 }

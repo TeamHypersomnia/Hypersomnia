@@ -207,10 +207,6 @@ namespace augs {
 		}
 
 		void glwindow::create(
-			const xywhi crect, 
-			const bool enable_window_border, 
-			const std::string name,
-			const int doublebuffer, 
 			const int bpp
 		) {
 			if(!window_class_registered) {
@@ -234,16 +230,12 @@ namespace augs {
 
 			ensure((hwnd = CreateWindowEx(0, L"AugmentedWindow", L"invalid_name", 0, 0, 0, 0, 0, 0, 0, GetModuleHandle(NULL), this)));
 			
-			set_window_border_enabled(enable_window_border);
-			set_window_name(name);
-			set_window_rect(crect);
-
 			PIXELFORMATDESCRIPTOR p;
 			ZeroMemory(&p, sizeof(p));
 
 			p.nSize = sizeof(p);
 			p.nVersion = 1;
-			p.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | (doublebuffer ? PFD_DOUBLEBUFFER : 0);
+			p.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
 			p.iPixelType = PFD_TYPE_RGBA;
 			p.cColorBits = bpp;
 			p.cAlphaBits = 8;

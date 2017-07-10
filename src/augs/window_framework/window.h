@@ -57,10 +57,6 @@ namespace augs {
 			~glwindow();
 
 			void create(
-				const xywhi client_rectangle, 
-				const bool enable_window_border = false, 
-				const std::string name = "Window", 
-				const int doublebuffer = 1, 
 				const int bitsperpixel = 24
 			);
 

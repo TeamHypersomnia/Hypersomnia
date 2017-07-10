@@ -80,14 +80,7 @@ int main(int argc, char** argv) {
 	});
 
 	{
-		window.window.create(
-			{ 0, 0, 0, 0 },
-			false,
-			cfg.window_name,
-			cfg.doublebuffer,
-			cfg.bpp
-		);
-
+		window.window.create(cfg.bpp);
 		force_apply_changes(cfg, window.window);
 
 		window.window.set_as_current();

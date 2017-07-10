@@ -82,7 +82,6 @@ return {
   default_tickrate = 60,
   determinism_test_cloned_cosmoi_count = 0,
   director_input_scene_entropy_path = "director/saved.scene",
-  doublebuffer = true,
   drawing_settings = {
     draw_character_gui = true,
     draw_crosshairs = true,
