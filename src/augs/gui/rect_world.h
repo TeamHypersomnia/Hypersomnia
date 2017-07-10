@@ -89,6 +89,39 @@ namespace augs {
 				}
 			}
 
+			template <class C>
+			void unhover_and_undrag(const C context, gui_entropy& entropies) {
+				if (context.alive(rect_hovered)) {
+					context(rect_hovered, [&](const auto& r) {
+						window::event::change ch;
+						event_traversal_flags dummy(ch);
+
+						r->unhover(context, r, dummy, entropies);
+					});
+
+					rect_hovered = gui_element_variant_id();
+				}
+
+				if (context.alive(rect_held_by_lmb)) {
+					generate_gui_event(entropies, rect_held_by_lmb, gui_event::loutup);
+
+					if (held_rect_is_dragged) {
+						generate_gui_event(entropies, rect_held_by_lmb, { gui_event::lfinisheddrag, 0, current_drag_amount });
+						held_rect_is_dragged = false;
+					}
+
+					current_drag_amount.set(0, 0);
+					rect_held_by_lmb = gui_element_variant_id();
+				}
+
+				if (context.alive(rect_held_by_rmb)) {
+					generate_gui_event(entropies, rect_held_by_rmb, gui_event::routup);
+
+					current_drag_amount.set(0, 0);
+					rect_held_by_rmb = gui_element_variant_id();
+				}
+			}
+
 			template <class C, class gui_element_id>
 			void consume_raw_input_and_generate_gui_events(const C context, const gui_element_id& root, const window::event::change new_state, gui_entropy& entropies) {
 				using namespace augs::window;
@@ -115,11 +148,11 @@ namespace augs {
 
 						if (held_rect_is_dragged) {
 							generate_gui_event(entropies, rect_held_by_lmb, { gui_event::lfinisheddrag, 0, current_drag_amount } );
+							held_rect_is_dragged = false;
 						}
 
 						current_drag_amount.set(0, 0);
 						rect_held_by_lmb = gui_element_variant_id();
-						held_rect_is_dragged = false;
 					}
 				}
 
@@ -249,10 +282,10 @@ namespace augs {
 			}
 			
 			template <class C, class gui_element_id>
-			void call_idle_mousemotion_updater(const C context, const gui_element_id& root, gui_entropy& entropy) {
+			void call_idle_mousemotion_updater(const C context, const gui_element_id& root, gui_entropy& entropy, const vec2t<short> mouse_delta = { 0, 0 }) {
 				window::event::change fabricated_state;
 				fabricated_state.msg = window::event::message::mousemotion;
-				fabricated_state.mouse.rel.set(0, 0);
+				fabricated_state.mouse.rel = mouse_delta;
 
 				event_traversal_flags mousemotion_updater(fabricated_state);
 

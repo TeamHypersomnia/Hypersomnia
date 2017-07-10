@@ -481,14 +481,25 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 
 			menu_ui_rect_world.build_tree_data_into_context(menu_ui_context, menu_ui_root_id);
 
+			vec2i cursor_drawing_pos;
+
 			if (draw_menu_gui) {
-				for (const auto& ch : new_machine_entropy.local) {
-					menu_ui_rect_world.consume_raw_input_and_generate_gui_events(menu_ui_context, menu_ui_root_id, ch, gui_entropies);
+				if (ImGui::GetIO().WantCaptureMouse) {
+					/* unhover anything that was hovered */
+					menu_ui_rect_world.unhover_and_undrag(menu_ui_context, gui_entropies);
+					menu_ui_rect_world.last_state.mouse.pos = ImGui::GetIO().MousePos;
+				}
+				else {
+					for (const auto& ch : new_machine_entropy.local) {
+						menu_ui_rect_world.consume_raw_input_and_generate_gui_events(menu_ui_context, menu_ui_root_id, ch, gui_entropies);
+					}
+				
+					ImGui::GetIO().MousePos = vec2(menu_ui_rect_world.last_state.mouse.pos);
+				
+					menu_ui_rect_world.call_idle_mousemotion_updater(menu_ui_context, menu_ui_root_id, gui_entropies);
 				}
 
-				ImGui::GetIO().MousePos = vec2(menu_ui_rect_world.last_state.mouse.pos);
-
-				menu_ui_rect_world.call_idle_mousemotion_updater(menu_ui_context, menu_ui_root_id, gui_entropies);
+				cursor_drawing_pos = ImGui::GetIO().MousePos;
 			}
 
 			menu_ui_rect_world.respond_to_events(menu_ui_context, menu_ui_root_id, gui_entropies);
@@ -512,7 +523,6 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 		renderer.draw_imgui(get_assets_manager());
 		
 		if (draw_menu_gui) {
-			const auto mouse_pos = menu_ui_rect_world.last_state.mouse.pos;
 			const auto gui_cursor_color = white;
 		
 			auto gui_cursor = assets::game_image_id::GUI_CURSOR;
@@ -532,7 +542,7 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 				gui_cursor = assets::game_image_id::GUI_CURSOR_TEXT_INPUT;
 			}
 			
-			augs::draw_cursor(renderer.get_triangle_buffer(), mouse_pos, gui_cursor, gui_cursor_color);
+			augs::draw_cursor(renderer.get_triangle_buffer(), cursor_drawing_pos, gui_cursor, gui_cursor_color);
 			renderer.call_triangles();
 			renderer.clear_triangles();
 		}
