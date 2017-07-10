@@ -177,7 +177,6 @@ namespace augs {
 				break;
 
 			case WM_SYSCOMMAND:
-				m = wParam;
 				switch (wParam) {
 				default: DefWindowProc(hwnd, m, wParam, lParam); break;
 				}
