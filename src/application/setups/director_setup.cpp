@@ -161,7 +161,7 @@ augs::machine_entropy director_setup::control_player(
 	new_machine_entropy.local = window.collect_entropy(session.config.enable_cursor_clipping);
 	session.local_entropy_profiler.end_measurement();
 
-	process_exit_key(new_machine_entropy.local);
+	process_exit(new_machine_entropy.local);
 
 	for (const auto& raw_input : new_machine_entropy.local) {
 		events.apply(raw_input);

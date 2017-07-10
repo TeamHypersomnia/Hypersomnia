@@ -344,7 +344,7 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 			);
 		}
 
-		process_exit_key(new_machine_entropy.local);
+		process_exit(new_machine_entropy.local);
 
 		{
 			auto translated = session.config.controls.translate(new_machine_entropy.local);

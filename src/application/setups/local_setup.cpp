@@ -100,7 +100,7 @@ void local_setup::process(
 			new_machine_entropy.local = window.collect_entropy(session.config.enable_cursor_clipping);
 			session.local_entropy_profiler.end_measurement();
 			
-			process_exit_key(new_machine_entropy.local);
+			process_exit(new_machine_entropy.local);
 
 			if (debug_control_timing) {
 				for (const auto& raw_input : new_machine_entropy.local) {

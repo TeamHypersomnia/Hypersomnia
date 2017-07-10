@@ -74,25 +74,21 @@ namespace augs {
 			case SC_CLOSE:
 				break;
 
-			case WM_SYSKEYUP:
-				m = WM_KEYUP;
-				events.repeated = ((lParam & (1 << 30)) != 0);
-			case WM_SYSKEYDOWN:
-				m = WM_KEYDOWN;
-				events.repeated = ((lParam & (1 << 30)) != 0);
-			case WM_KEYDOWN:
-			{
-				events.key.key = translate_key_with_lparam(lParam, wParam);
-				events.repeated = ((lParam & (1 << 30)) != 0);
-			}
-			break;
-
 			case WM_KEYUP:
-			{
 				events.key.key = translate_key_with_lparam(lParam, wParam);
-			}
+				break;
+			case WM_KEYDOWN:
+				events.key.key = translate_key_with_lparam(lParam, wParam);
+				events.repeated = ((lParam & (1 << 30)) != 0);
+				break;
 
-			break;
+			case WM_SYSKEYUP:
+				events.key.key = translate_key_with_lparam(lParam, wParam);
+				break;
+			case WM_SYSKEYDOWN:
+				events.key.key = translate_key_with_lparam(lParam, wParam);
+				events.repeated = ((lParam & (1 << 30)) != 0);
+				break;
 
 			case WM_MOUSEWHEEL:
 				events.scroll.amount = GET_WHEEL_DELTA_WPARAM(wParam) / WHEEL_DELTA;
@@ -181,10 +177,8 @@ namespace augs {
 				break;
 
 			case WM_SYSCOMMAND:
+				m = wParam;
 				switch (wParam) {
-				case SC_CLOSE: break;
-				case SC_MINIMIZE: break;
-				case SC_MAXIMIZE: break;
 				default: DefWindowProc(hwnd, m, wParam, lParam); break;
 				}
 				m = wParam;
@@ -273,7 +267,7 @@ namespace augs {
 		void glwindow::set_window_border_enabled(const bool f) {
 			const auto menu = f ? WS_CAPTION | WS_SYSMENU : 0;
 
-			style = menu ? (WS_OVERLAPPED | menu) | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_THICKFRAME : WS_POPUP;
+			style = menu ? (WS_OVERLAPPED | menu) | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_THICKFRAME | WS_SYSMENU | WS_MAXIMIZEBOX | WS_MINIMIZEBOX : WS_POPUP;
 			exstyle = menu ? WS_EX_WINDOWEDGE : WS_EX_APPWINDOW;
 
 			SetWindowLongPtr(hwnd, GWL_EXSTYLE, exstyle);

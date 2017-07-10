@@ -9,11 +9,14 @@ message translate_enum(UINT m) {
 	case UINT(message::ltripleclick):	return message::ltripleclick;
 	case SC_CLOSE:						return message::close; break;
 	case WM_MOVE:						return message::move; break;
+	case WM_QUIT:						return message::quit; break;
 	case WM_ACTIVATE:					return message::activate; break;
 	case SC_MINIMIZE:					return message::minimize; break;
 	case SC_MAXIMIZE:					return message::maximize; break;
 	case SC_RESTORE:					return message::restore;  break;
 	case WM_CLIPBOARDUPDATE:			return message::clipboard_change; break;
+	case WM_SYSKEYDOWN:					return message::syskeydown; break;
+	case WM_SYSKEYUP:					return message::syskeyup; break;
 	case WM_KEYDOWN:					return message::keydown; break;
 	case WM_KEYUP:						return message::keyup; break;
 	case WM_CHAR:						return message::character; break;

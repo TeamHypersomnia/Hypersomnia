@@ -81,7 +81,7 @@ void determinism_test_setup::process(
 
 		new_machine_entropy.local = window.collect_entropy(session.config.enable_cursor_clipping);
 		
-		if (process_exit_key(new_machine_entropy.local)) {
+		if (process_exit(new_machine_entropy.local)) {
 			break;
 		}
 

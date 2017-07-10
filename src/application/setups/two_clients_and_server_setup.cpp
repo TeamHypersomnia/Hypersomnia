@@ -40,7 +40,7 @@ void two_clients_and_server_setup::process(
 		sessions[0].local_entropy_profiler.end_measurement();
 		sessions[1].local_entropy_profiler.end_measurement();
 
-		if (process_exit_key(precollected))
+		if (process_exit(precollected))
 			break;
 
 		for (const auto& n : precollected) {

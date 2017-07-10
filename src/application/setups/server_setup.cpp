@@ -156,7 +156,7 @@ void server_setup::process(const config_lua_table& cfg, game_window& window, con
 			new_entropy += alt_entropy;
 		}
 	
-		process_exit_key(new_entropy.local);
+		process_exit(new_entropy.local);
 
 		for (auto& net_event : new_entropy.remote) {
 			if (detailed_step_log) {
