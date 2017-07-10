@@ -32,8 +32,8 @@ namespace augs {
 	{
 	}
 
-	void renderer::set_as_current_impl() {
-
+	bool renderer::set_as_current_impl() {
+		return true;
 	}
 
 	void renderer::initialize() {

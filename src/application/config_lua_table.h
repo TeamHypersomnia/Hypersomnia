@@ -159,11 +159,19 @@ class viewing_session;
 
 namespace augs {
 	class renderer;
+	class audio_device;
 
 	namespace window {
 		class glwindow;
 	}
 }
+
+void apply_changes(
+	const config_lua_table&,
+	const config_lua_table&,
+	augs::audio_device&,
+	const bool force = false
+);
 
 void apply_changes(
 	const config_lua_table&,

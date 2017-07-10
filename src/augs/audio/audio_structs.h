@@ -1,4 +1,6 @@
 #pragma once
+#include "augs/templates/settable_as_current_mixin.h"
+
 #include <string>
 
 /** Opaque device handle */
@@ -26,12 +28,16 @@ namespace augs {
 		auto* get() {
 			return device;
 		}
+		
+		void log_hrtf_status() const;
 
 		audio_device(const std::string& device_name = "");
+		void set_hrtf_enabled(const bool);
 		~audio_device();
 	};
 
-	class audio_context {
+	class audio_context : public augs::settable_as_current_mixin<audio_context> {
+		audio_device& device;
 		ALCcontext* context = nullptr;
 		
 		audio_context(const audio_context&) = delete;
@@ -40,9 +46,11 @@ namespace augs {
 		audio_context& operator=(audio_context&&) = delete;
 
 	public:
+		audio_device& get_device();
+
 		audio_context(audio_device& device);
 		~audio_context();
 
-		bool make_current();
+		bool set_as_current_impl();
 	};
 }

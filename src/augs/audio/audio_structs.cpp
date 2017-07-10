@@ -48,8 +48,6 @@ namespace augs {
 		alsoft_ini_file += "# Do not modify.";
 		alsoft_ini_file += "\n# Hypersomnia generates this file every launch to speak with OpenAL.";
 		alsoft_ini_file += "\n# Modification will have no effect.";
-		alsoft_ini_file += "\nhrtf = ";
-		alsoft_ini_file += hrtf_enabled ? "true" : "false";
 		alsoft_ini_file += "\nhrtf-paths = " + augs::get_executable_directory() + "\\hrtf";
 		alsoft_ini_file += typesafe_sprintf("\nsources = %x", max_number_of_sound_sources);
 
@@ -63,6 +61,7 @@ namespace augs {
 	}
 
 	void log_all_audio_devices(const std::string& output_path) {
+#if BUILD_OPENAL
 		const auto all_audio_devices = list_audio_devices(alcGetString(nullptr, ALC_ALL_DEVICES_SPECIFIER));
 
 		LOG(all_audio_devices);
@@ -72,25 +71,66 @@ namespace augs {
 			std::string(output_path),
 			all_audio_devices
 		);
+#endif
 	}
 	
 	audio_device::audio_device(const std::string& device_name) {
+#if BUILD_OPENAL
 		device = alcOpenDevice(device_name.size() > 0 ? device_name.c_str() : nullptr);
 		ensure(alcIsExtensionPresent(device, "ALC_EXT_EFX"));
+#endif
+	}
+	
+	void audio_device::log_hrtf_status() const {
+#if BUILD_OPENAL
+		ALint hrtf_status;
+		alcGetIntegerv(device, ALC_HRTF_STATUS_SOFT, 1, &hrtf_status);
+
+		std::string status;
+
+		switch (hrtf_status) {
+		case ALC_HRTF_DISABLED_SOFT: status = "ALC_HRTF_DISABLED_SOFT"; break;
+		case ALC_HRTF_ENABLED_SOFT: status = "ALC_HRTF_ENABLED_SOFT"; break;
+		case ALC_HRTF_DENIED_SOFT: status = "ALC_HRTF_DENIED_SOFT"; break;
+		case ALC_HRTF_REQUIRED_SOFT: status = "ALC_HRTF_REQUIRED_SOFT"; break;
+		case ALC_HRTF_HEADPHONES_DETECTED_SOFT: status = "ALC_HRTF_HEADPHONES_DETECTED_SOFT"; break;
+		case ALC_HRTF_UNSUPPORTED_FORMAT_SOFT: status = "ALC_HRTF_UNSUPPORTED_FORMAT_SOFT"; break;
+		default: status = "Unknown"; break;
+		}
+
+		LOG("HRTF status: %x", status);
+#endif
+	}
+
+	void audio_device::set_hrtf_enabled(const bool enabled) {
+#if BUILD_OPENAL
+		ALCint attrs[] = {
+			ALC_HRTF_SOFT, enabled, /* request HRTF */
+			0 /* end of list */
+		};
+
+		alcResetDeviceSOFT(device, attrs);
+		log_hrtf_status();
+#endif
 	}
 
 	audio_device::~audio_device() {
+#if BUILD_OPENAL
 		alcCloseDevice(device);
 		device = nullptr;
 		LOG("Destroyed OpenAL device: %x", device);
+#endif
 	}
 
-	audio_context::audio_context(audio_device& device) {
-#if BUILD_OPENAL
+	audio_device& audio_context::get_device() {
+		return device;
+	}
 
+	audio_context::audio_context(audio_device& device) : device(device) {
+#if BUILD_OPENAL
 		context = alcCreateContext(device.get(), nullptr);
 
-		if (!context || !make_current()) {
+		if (!context || !set_as_current()) {
 			if (context) {
 				alcDestroyContext(context);
 			}
@@ -102,14 +142,11 @@ namespace augs {
 		AL_CHECK(alDistanceModel(AL_LINEAR_DISTANCE_CLAMPED));
 		AL_CHECK(alListenerf(AL_METERS_PER_UNIT, 1.3f));
 
-		ALint hrtf_status;
-		alcGetIntegerv(device.get(), ALC_HRTF_STATUS_SOFT, 1, &hrtf_status);
-
-		LOG("HRTF status: %x", hrtf_status);
+		device.log_hrtf_status();
 #endif
 	}
 
-	bool audio_context::make_current() {
+	bool audio_context::set_as_current_impl() {
 #if BUILD_OPENAL
 		return (alcMakeContextCurrent(context)) == ALC_TRUE;
 #else

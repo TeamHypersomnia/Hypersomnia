@@ -51,7 +51,7 @@ namespace augs {
 			bool poll_event(UINT& out);
 
 			friend class augs::settable_as_current_mixin<glwindow>;
-			void set_as_current_impl();
+			bool set_as_current_impl();
 		public:
 			glwindow();
 			~glwindow();

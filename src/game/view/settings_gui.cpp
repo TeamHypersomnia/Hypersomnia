@@ -217,6 +217,7 @@ void viewing_session::perform_settings_gui(
 	apply_changes(config, config_before_change, window);
 	apply_changes(config, config_before_change, *this);
 	apply_changes(config, config_before_change, augs::renderer::get_current());
+	apply_changes(config, config_before_change, augs::audio_context::get_current().get_device());
 }
 
 #undef CONFIG_NVP

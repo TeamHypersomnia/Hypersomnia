@@ -293,8 +293,8 @@ namespace augs {
 			ShowWindow(hwnd, SW_SHOW);
 		}
 
-		void glwindow::set_as_current_impl() {
-			wglMakeCurrent(hdc, hglrc);
+		bool glwindow::set_as_current_impl() {
+			return wglMakeCurrent(hdc, hglrc);
 		}
 
 		bool glwindow::poll_event(UINT& out) {

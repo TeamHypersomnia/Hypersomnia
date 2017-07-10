@@ -5,8 +5,8 @@ namespace augs {
 	class settable_as_current_mixin {
 		static derived* current_instance;
 
-		void set_as_current_impl() {
-
+		bool set_as_current_impl() {
+			return true;
 		}
 
 	public:
@@ -28,13 +28,15 @@ namespace augs {
 			return current_instance == &self;
 		}
 
-		void set_as_current() {
+		bool set_as_current() {
 			auto& self = static_cast<derived&>(*this);
 
 			if (!is_current()) {
-				self.set_as_current_impl();
 				current_instance = &self;
+				return self.set_as_current_impl();
 			}
+
+			return true;
 		}
 	};
 

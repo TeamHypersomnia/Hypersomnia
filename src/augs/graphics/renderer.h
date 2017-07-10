@@ -31,7 +31,7 @@ namespace augs {
 	class renderer : public settable_as_current_mixin<renderer> {
 		friend class settable_as_current_mixin<renderer>;
 
-		void set_as_current_impl();
+		bool set_as_current_impl();
 	public:
 		struct debug_line {
 			debug_line(vec2 a = vec2(), vec2 b = vec2(), rgba col = rgba(255, 255, 255, 255)) : col(col), a(a), b(b) {}

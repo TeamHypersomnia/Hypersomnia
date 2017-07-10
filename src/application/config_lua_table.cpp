@@ -40,6 +40,23 @@ vec2i config_lua_table::get_screen_size() const {
 void apply_changes(
 	const config_lua_table& config,
 	const config_lua_table& origin,
+	augs::audio_device& device,
+	const bool force
+) {
+	auto changed = [&](auto& field) {
+		return !(field == augs::get_corresponding_field(field, config, origin));
+	};
+
+	if (force 
+		|| changed(config.enable_hrtf)
+	) {
+		device.set_hrtf_enabled(config.enable_hrtf);
+	}
+}
+
+void apply_changes(
+	const config_lua_table& config,
+	const config_lua_table& origin,
 	viewing_session& session,
 	const bool force
 ) {

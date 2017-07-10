@@ -60,6 +60,8 @@ int main(int argc, char** argv) {
 	);
 
 	augs::audio_device audio_device(cfg.audio_output_device);
+	force_apply_changes(cfg, audio_device);
+
 	augs::audio_context audio_context(audio_device);
 
 	game_window window;
