@@ -166,7 +166,7 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/augs/graphics/texture.cpp"
 	"src/augs/gui/button_corners.cpp"
 	"src/augs/al_log.cpp"
-	"src/augs/audio/audio_manager.cpp"
+	"src/augs/audio/audio_structs.cpp"
 	"src/augs/audio/sound_buffer.cpp"
 	"src/augs/audio/sound_source.cpp"
 	"src/augs/ensure.cpp"
@@ -649,7 +649,7 @@ include_directories("${PROJECT_BINARY_DIR}/generators_output")
 # We configure the C++ defines in accordance with the currently set options.
 
 if(BUILD_OPENAL) 
-	add_definitions(-DBUILD_OPENAL=1) 
+	add_definitions(-DBUILD_OPENAL=1 -DAL_ALEXT_PROTOTYPES)
 endif()
 
 if(BUILD_SOUND_FORMAT_DECODERS) 

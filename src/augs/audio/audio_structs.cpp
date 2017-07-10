@@ -1,4 +1,4 @@
-#include "audio_manager.h"
+#include "audio_structs.h"
 
 #include "augs/al_log.h"
 
@@ -39,7 +39,7 @@ static std::string list_audio_devices(const ALCchar * const devices) {
 #endif
 
 namespace augs {
-	void audio_manager::generate_alsoft_ini(
+	void generate_alsoft_ini(
 		const bool hrtf_enabled,
 		const unsigned max_number_of_sound_sources
 	) {
@@ -62,45 +62,54 @@ namespace augs {
 #endif
 	}
 
-	audio_manager::audio_manager(const std::string output_device_name) {
-#if BUILD_OPENAL
-		device = alcOpenDevice(output_device_name.size() > 0 ? output_device_name.c_str() : nullptr);
+	void log_all_audio_devices(const std::string& output_path) {
+		const auto all_audio_devices = list_audio_devices(alcGetString(nullptr, ALC_ALL_DEVICES_SPECIFIER));
 
-		context = alcCreateContext(device, nullptr);
-		
+		LOG(all_audio_devices);
+		LOG("Default device: %x", alcGetString(nullptr, ALC_DEFAULT_DEVICE_SPECIFIER));
+
+		augs::create_text_file(
+			std::string(output_path),
+			all_audio_devices
+		);
+	}
+	
+	audio_device::audio_device(const std::string& device_name) {
+		device = alcOpenDevice(device_name.size() > 0 ? device_name.c_str() : nullptr);
+		ensure(alcIsExtensionPresent(device, "ALC_EXT_EFX"));
+	}
+
+	audio_device::~audio_device() {
+		alcCloseDevice(device);
+		device = nullptr;
+		LOG("Destroyed OpenAL device: %x", device);
+	}
+
+	audio_context::audio_context(audio_device& device) {
+#if BUILD_OPENAL
+
+		context = alcCreateContext(device.get(), nullptr);
+
 		if (!context || !make_current()) {
 			if (context) {
 				alcDestroyContext(context);
 			}
 
-			alcCloseDevice(device);
-			LOG("\n!!! Failed to set a context !!!\n\n");
+			LOG("\nFailed to set an OpenAL context\n\n");
 		}
-
-		ensure(alcIsExtensionPresent(device, "ALC_EXT_EFX"));
 
 		AL_CHECK(alSpeedOfSound(100.f));
 		AL_CHECK(alDistanceModel(AL_LINEAR_DISTANCE_CLAMPED));
 		AL_CHECK(alListenerf(AL_METERS_PER_UNIT, 1.3f));
 
-		const auto all_audio_devices = list_audio_devices(alcGetString(nullptr, ALC_ALL_DEVICES_SPECIFIER));
-
-		LOG(all_audio_devices);
-
-		augs::create_text_file(
-			std::string("generated/logs/audio_devices.txt"), 
-			all_audio_devices
-		);
-
 		ALint hrtf_status;
-		alcGetIntegerv(device, ALC_HRTF_STATUS_SOFT, 1, &hrtf_status);
+		alcGetIntegerv(device.get(), ALC_HRTF_STATUS_SOFT, 1, &hrtf_status);
 
-		LOG("Default device: %x", alcGetString(nullptr, ALC_DEFAULT_DEVICE_SPECIFIER));
 		LOG("HRTF status: %x", hrtf_status);
 #endif
 	}
 
-	bool audio_manager::make_current() {
+	bool audio_context::make_current() {
 #if BUILD_OPENAL
 		return (alcMakeContextCurrent(context)) == ALC_TRUE;
 #else
@@ -108,14 +117,12 @@ namespace augs {
 #endif
 	}
 
-	audio_manager::~audio_manager() {
+	audio_context::~audio_context() {
 #if BUILD_OPENAL
 		AL_CHECK(alcMakeContextCurrent(nullptr));
 		alcDestroyContext(context);
-		alcCloseDevice(device);
-		LOG("Destroyed audio manager");
+		LOG("Destroyed OpenAL context: %x", context);
 		context = nullptr;
-		device = nullptr;
 #endif
 	}
 }

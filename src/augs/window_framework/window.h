@@ -10,7 +10,7 @@
 
 #include "augs/graphics/renderer.h"
 #include "colored_print.h"
-#include "augs/audio/audio_manager.h"
+#include "augs/audio/audio_structs.h"
 #include "augs/templates/settable_as_current_mixin.h"
 
 namespace augs {

@@ -52,12 +52,15 @@ int main(int argc, char** argv) {
 		);
 	}
 
-	augs::audio_manager::generate_alsoft_ini(
+	augs::log_all_audio_devices("generated/logs/audio_devices.txt");
+
+	augs::generate_alsoft_ini(
 		cfg.enable_hrtf,
 		cfg.max_number_of_sound_sources
 	);
 
-	augs::audio_manager audio(cfg.audio_output_device);
+	augs::audio_device audio_device(cfg.audio_output_device);
+	augs::audio_context audio_context(audio_device);
 
 	game_window window;
 	
