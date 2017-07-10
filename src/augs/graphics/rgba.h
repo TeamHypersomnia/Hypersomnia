@@ -115,28 +115,39 @@ struct rgba {
 	friend std::istream& operator>>(std::istream& out, rgba& x);
 };
 
-extern const rgba ltblue;
-extern const rgba blue;
+extern const rgba maroon;
 extern const rgba red;
-extern const rgba dark_green;
-extern const rgba green;
 extern const rgba orange;
+extern const rgba yellow;
+extern const rgba olive;
+extern const rgba purple;
+extern const rgba fuchsia;
+extern const rgba white;
+extern const rgba lime;
+extern const rgba green;
+extern const rgba navy;
+extern const rgba blue;
+extern const rgba aqua;
+extern const rgba teal;
+extern const rgba black;
+extern const rgba silver;
+extern const rgba gray;
+
+extern const rgba ltblue;
+extern const rgba dark_green;
 extern const rgba violet;
 extern const rgba red_violet;
 extern const rgba pink;
 extern const rgba darkred;
-extern const rgba black;
 extern const rgba darkgray;
 extern const rgba gray1;
 extern const rgba gray2;
 extern const rgba gray3;
 extern const rgba gray4;
 extern const rgba slightly_visible_white;
-extern const rgba white;
 extern const rgba darkblue;
 
 extern const rgba cyan;
-extern const rgba yellow;
 
 extern const rgba vsblue;
 extern const rgba vscyan;

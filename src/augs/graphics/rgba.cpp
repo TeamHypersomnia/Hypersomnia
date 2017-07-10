@@ -283,28 +283,39 @@ rgba& rgba::set_hsv(const hsv hsv) {
 	return (*this = rgba{ rgba_channel(res.r * 255), rgba_channel(res.g * 255), rgba_channel(res.b * 255), a });
 }
 
+const rgba maroon(0x80, 0x00, 0x00, 0xff);
+const rgba red(0xff, 0x00, 0x00, 0xff);
+const rgba orange(0xff, 0xA5, 0x00, 0xff);
+const rgba yellow(0xff, 0xff, 0x00, 0xff);
+const rgba olive(0x80, 0x80, 0x00, 0xff);
+const rgba purple(0x80, 0x00, 0x80, 0xff);
+const rgba fuchsia(0xff, 0x00, 0xff, 0xff);
+const rgba white(0xff, 0xff, 0xff, 0xff);
+const rgba lime(0x00, 0xff, 0x00, 0xff);
+const rgba green(0, 255, 0, 255); //(0x00, 0x80, 0x00, 0xff);
+const rgba navy(0x00, 0x00, 0x80, 0xff);
+const rgba blue(0x00, 0x00, 0xff, 0xff);
+const rgba aqua(0x00, 0xff, 0xff, 0xff);
+const rgba teal(0x00, 0x80, 0x80, 0xff);
+const rgba black(0x00, 0x00, 0x00, 0xff);
+const rgba silver(0xc0, 0xc0, 0xc0, 0xff);
+const rgba gray(0x80, 0x80, 0x80, 0xff);
+
 const rgba ltblue(0, 122, 204, 255);
-const rgba blue(0, 0, 255, 255);
-const rgba red(255, 0, 0, 255);
 const rgba dark_green(0, 144, 66, 255);
-const rgba green(0, 255, 0, 255);
-const rgba orange(255, 165, 0, 255);
 const rgba pink(255, 0, 255, 255);
 const rgba violet(164, 68, 195, 255);
 const rgba red_violet(200, 68, 195, 255);
 const rgba darkred(122, 0, 0, 255);
-const rgba black(0, 0, 0, 255);
 const rgba darkgray(30, 30, 30, 255);
 const rgba gray1(50, 50, 50, 255);
 const rgba gray2(62, 62, 62, 255);
 const rgba gray3(104, 104, 104, 255);
 const rgba gray4(180, 180, 180, 255);
-const rgba white(255, 255, 255, 255);
 const rgba slightly_visible_white(255, 255, 255, 15);
 const rgba darkblue(6, 5, 20, 255);
 
 const rgba cyan(0, 255, 255, 255);
-const rgba yellow(255, 255, 0, 255);
 
 const rgba vsgreen(87, 166, 74, 255);
 const rgba vsdarkgreen(0, 100, 0, 255);
