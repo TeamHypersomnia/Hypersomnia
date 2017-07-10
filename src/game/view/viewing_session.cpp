@@ -155,6 +155,17 @@ void viewing_session::perform_imgui_pass(
 		else if (in.msg == message::character) {
 			io.AddInputCharacter(in.character.utf16);
 		}
+		else if (in.msg == message::activate) {
+			for (auto& k : io.KeysDown) {
+				k = false;
+			}
+
+			for (auto& m : io.MouseDown) {
+				m = false;
+			}
+
+			io.MouseWheel = false;
+		}
 
 		io.KeyCtrl = io.KeysDown[int(keys::key::LCTRL)] || io.KeysDown[int(keys::key::RCTRL)];
 		io.KeyShift = io.KeysDown[int(keys::key::LSHIFT)] || io.KeysDown[int(keys::key::RSHIFT)];
