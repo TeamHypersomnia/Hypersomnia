@@ -24,6 +24,9 @@ namespace augs {
 			execute_on_destruction = false;
 		}
 
+		scope_guard(const scope_guard&) = delete;
+		scope_guard& operator =(const scope_guard&) = delete;
+
 	private:
 		F exit_function;
 		bool execute_on_destruction = true;
