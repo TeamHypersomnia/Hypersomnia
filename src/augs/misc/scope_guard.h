@@ -10,8 +10,8 @@ namespace augs {
 		{}
 
 		scope_guard(scope_guard&& f) :
-			exit_function(exit_function),
-			execute_on_destruction(execute_on_destruction) 
+			exit_function(std::move(f.exit_function)),
+			execute_on_destruction(f.execute_on_destruction) 
 		{
 			f.release();
 		}
