@@ -44,7 +44,8 @@ void local_setup::process(
 
 	debug_character_selection characters;
 
-	const auto metas_of_assets = get_assets_manager().generate_logical_metas_of_assets();
+	const auto metas_of_assets_unique = get_assets_manager().generate_logical_metas_of_assets();
+	const auto& metas_of_assets = *metas_of_assets_unique;
 
 	if (!hypersomnia.load_from_file("save.state")) {
 		hypersomnia.set_fixed_delta(session.config.default_tickrate);

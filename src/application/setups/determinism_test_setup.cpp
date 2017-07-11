@@ -30,7 +30,8 @@ void determinism_test_setup::process(
 	game_window& window,
 	viewing_session& session
 ) {
-	const auto metas_of_assets = get_assets_manager().generate_logical_metas_of_assets();
+	const auto metas_of_assets_unique = get_assets_manager().generate_logical_metas_of_assets();
+	const auto& metas_of_assets = *metas_of_assets_unique;
 
 	const vec2i screen_size = vec2i(window.get_screen_size());
 

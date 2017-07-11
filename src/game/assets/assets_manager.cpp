@@ -170,8 +170,8 @@ augs::graphics::shader_program& assets_manager::create(
 	return p;
 }
 
-all_logical_metas_of_assets assets_manager::generate_logical_metas_of_assets() const {
-	all_logical_metas_of_assets output;
+std::unique_ptr<all_logical_metas_of_assets> assets_manager::generate_logical_metas_of_assets() const {
+	auto output = std::make_unique<all_logical_metas_of_assets>();
 
 	augs::introspect(
 		[this](auto, auto& target_map_of_logical_metas) {
@@ -186,10 +186,10 @@ all_logical_metas_of_assets assets_manager::generate_logical_metas_of_assets() c
 				target_map_of_logical_metas[asset_entry.first] = asset_entry.second.get_logical_meta(*this);
 			}
 		},
-		output.all
+		output->all
 	);
 
-	return output;
+	return std::move(output);
 }
 
 void assets_manager::destroy_everything() {

@@ -38,7 +38,7 @@ void director_setup::init(
 	game_window& window,
 	viewing_session& session
 ) {
-	metas_of_assets = get_assets_manager().generate_logical_metas_of_assets();
+	metas_of_assets = *get_assets_manager().generate_logical_metas_of_assets();
 
 	if (!hypersomnia.load_from_file("save.state")) {
 		hypersomnia.set_fixed_delta(session.config.default_tickrate);

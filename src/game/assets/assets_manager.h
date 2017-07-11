@@ -3,6 +3,7 @@
 // Asset manager being global means one indirection less (and thus one cache fetch less) when accessing resources.
 // This may prove very beneficial, for example when rendering many sprites.
 #include <tuple>
+#include <memory>
 #include "game/build_settings.h"
 
 #include "augs/templates/settable_as_current_mixin.h"
@@ -160,7 +161,8 @@ public:
 		const assets::shader_id attach_fragment
 	);
 
-	all_logical_metas_of_assets generate_logical_metas_of_assets() const;
+	// unique_ptr to avoid accidental stack overflow
+	std::unique_ptr<all_logical_metas_of_assets> generate_logical_metas_of_assets() const;
 
 	void destroy_everything();
 

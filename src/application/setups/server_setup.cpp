@@ -82,7 +82,9 @@ augs::network::server& server_setup::choose_server(augs::network::endpoint_addre
 }
 
 void server_setup::process(const config_lua_table& cfg, game_window& window, const bool start_alternative_server) {
-	const auto metas_of_assets = get_assets_manager().generate_logical_metas_of_assets();
+	const auto metas_of_assets_unique = get_assets_manager().generate_logical_metas_of_assets();
+	const auto& metas_of_assets = *metas_of_assets_unique;
+
 
 	session_report rep;
 

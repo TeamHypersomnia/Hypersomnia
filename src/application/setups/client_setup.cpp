@@ -51,7 +51,7 @@ void client_setup::init(
 	const std::string recording_filename, 
 	const bool use_alternative_port
 ) {
-	metas_of_assets = get_assets_manager().generate_logical_metas_of_assets();
+	metas_of_assets = *get_assets_manager().generate_logical_metas_of_assets();
 
 	detailed_step_log = session.config.default_tickrate <= 2;
 

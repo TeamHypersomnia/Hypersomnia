@@ -44,6 +44,8 @@
 #include "augs/audio/sound_samples_from_file.h"
 #include "generated/introspectors.h"
 
+#include "application/setups/local_setup.h"
+
 using namespace augs::window::event::keys;
 using namespace augs::gui::text;
 using namespace augs::gui;
@@ -52,7 +54,8 @@ void menu_setup::process(
 	game_window& window,
 	viewing_session& session
 ) {
-	const auto metas_of_assets = get_assets_manager().generate_logical_metas_of_assets();
+	const auto metas_of_assets_unique = get_assets_manager().generate_logical_metas_of_assets();
+	const auto& metas_of_assets = *metas_of_assets_unique;
 
 	const vec2i screen_size = vec2i(window.get_screen_size());
 
@@ -301,6 +304,13 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 				creators.push_into(credits_actions);
 				credits_actions.push_blocking(act(new augs::tween_value_action<rgba_channel>(fade_overlay_color.a, 20, 500.f)));
 			}
+			break;
+
+		case menu_button_type::LOCAL_UNIVERSE:
+		{
+			auto setup = std::make_unique<local_setup>();
+			setup->process(window, session);
+		}
 			break;
 
 		default: break;
