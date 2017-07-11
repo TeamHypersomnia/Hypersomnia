@@ -20,19 +20,6 @@ namespace augs {
 	struct introspection_access;
 }
 
-struct recoil_player_instance {
-	// GEN INTROSPECTOR struct recoil_player_instance
-	assets::recoil_player_id id = assets::recoil_player_id::INVALID;
-	std::size_t index = 0;
-	// END GEN INTROSPECTOR
-
-	vec2 shoot_and_get_impulse(const recoil_player& meta) {
-		const auto result = meta.offsets[index++];
-		index %= meta.offsets.size();
-		return result;
-	}
-};
-
 namespace components {
 	struct gun  {
 		// GEN INTROSPECTOR struct components::gun
