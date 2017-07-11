@@ -17,7 +17,7 @@ void regenerate_desaturation(
 	desaturation_stamp new_stamp;
 	new_stamp.last_write_time_of_source = augs::last_write_time(source_path);
 
-	const auto desaturation_stamp_path = augs::replace_extension(source_path, ".stamp");
+	const auto desaturation_stamp_path = augs::replace_extension(output_path, ".stamp");
 
 	augs::stream new_stamp_stream;
 	augs::write(new_stamp_stream, new_stamp);
