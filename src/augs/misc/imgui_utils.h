@@ -93,6 +93,34 @@ namespace augs {
 			}
 		}
 
+		template <class T, class... Args>
+		auto enum_combo(const std::string& label, T& into, Args&&... args) {
+			thread_local std::vector<char> combo_names;
+
+			if (combo_names.empty()) {
+				for_each_enum<T>([](const T e) {
+					if (e == T::COUNT) {
+						return;
+					}
+
+					concatenate(
+						combo_names, 
+						format_field_name(to_lowercase(std::string(enum_to_string(e))))
+					);
+
+					combo_names.push_back('\0');
+				});
+				
+				combo_names.push_back('\0');
+			}
+
+			auto current = static_cast<int>(into);
+			const auto result = ImGui::Combo(label.c_str(), &current, combo_names.data());
+			into = static_cast<T>(current);
+
+			return result;
+		}
+
 		template <class T>
 		auto make_revert_button_lambda(T& edited_config, const T& last_saved_config) {
 			return [&](auto& field) {

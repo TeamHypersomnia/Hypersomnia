@@ -57,6 +57,8 @@ void viewing_session::perform_settings_gui(
 		int pane = 0;
 
 		if (state.active_pane == pane++) {
+			enum_combo("Launch on game's startup", config.launch_mode);
+
 			checkbox(CONFIG_NVP(fullscreen)); revert(config.fullscreen);
 			if (!config.fullscreen) {
 				ImGui::Indent();

@@ -105,7 +105,7 @@ namespace prefabs {
 
 		if (!meta.has_description()) {
 			meta.description =
-				L"Throwable explosive with a three seconds delay.\nDrains [color=cyan]Personal Electricity[/color].\nIf the subject has [color=turquoise]Electric Shield[/color] enabled,\n the effect is doubled."
+				L"Throwable explosive with a three seconds delay.\nDrains [color=cyan]Personal Electricity[/color].\nIf the subject has [color=turquoise]Electric Shield[/color] enabled,\nthe effect is doubled."
 				;
 		}
 
