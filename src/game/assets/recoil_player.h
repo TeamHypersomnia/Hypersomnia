@@ -22,9 +22,5 @@ struct recoil_player_instance {
 	std::size_t index = 0;
 	// END GEN INTROSPECTOR
 
-	vec2 shoot_and_get_impulse(const recoil_player& meta) {
-		const auto result = meta.offsets[index++];
-		index %= meta.offsets.size();
-		return result;
-	}
+	vec2 shoot_and_get_impulse(const recoil_player& meta);
 };
