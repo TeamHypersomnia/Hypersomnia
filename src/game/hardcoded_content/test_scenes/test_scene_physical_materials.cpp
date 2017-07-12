@@ -1,4 +1,3 @@
-#if BUILD_TEST_SCENES
 #include "game/hardcoded_content/all_hardcoded_content.h"
 
 #include "game/assets/physical_material.h"
@@ -22,4 +21,3 @@ void load_test_scene_physical_materials(assets_manager& assets) {
 	set_pair(assets::physical_material_id::GRENADE, assets::physical_material_id::METAL, assets::sound_buffer_id::COLLISION_GRENADE);
 	set_pair(assets::physical_material_id::GRENADE, assets::physical_material_id::GRENADE, assets::sound_buffer_id::COLLISION_GRENADE);
 }
-#endif

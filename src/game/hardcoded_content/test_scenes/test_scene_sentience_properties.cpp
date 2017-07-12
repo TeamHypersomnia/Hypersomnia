@@ -1,4 +1,3 @@
-#if BUILD_TEST_SCENES
 #include "game/hardcoded_content/all_hardcoded_content.h"
 #include "game/detail/spells/spell_structs.h"
 #include "game/transcendental/cosmos.h"
@@ -211,4 +210,3 @@ void load_test_scene_sentience_properties(
 		m.appearance.bar_color = orange - rgba(30, 30, 30, 0);
 	}
 }
-#endif

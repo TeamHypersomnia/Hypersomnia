@@ -1,4 +1,3 @@
-#if BUILD_TEST_SCENES
 #include "game/hardcoded_content/all_hardcoded_content.h"
 #include "game/assets/assets_manager.h"
 
@@ -143,4 +142,3 @@ void load_test_scene_sound_buffers(assets_manager& manager) {
 		buf.from_file("content/official/sfx/collision_grenade.wav");
 	}
 }
-#endif

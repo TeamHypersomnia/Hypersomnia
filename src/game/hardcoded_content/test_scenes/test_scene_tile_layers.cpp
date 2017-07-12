@@ -1,4 +1,3 @@
-#if BUILD_TEST_SCENES
 #include "game/hardcoded_content/all_hardcoded_content.h"
 #include "game/assets/assets_manager.h"
 
@@ -63,4 +62,3 @@ void load_test_scene_tile_layers(assets_manager& manager) {
 		metropolis_floor.set_tiles(xywhu(31 + 1, 30, 10, 1), nth_tile(3));
 	}
 }
-#endif

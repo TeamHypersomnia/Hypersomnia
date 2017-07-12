@@ -1,4 +1,3 @@
-#if BUILD_TEST_SCENES
 #include "game/hardcoded_content/all_hardcoded_content.h"
 
 #include "game/transcendental/cosmos.h"
@@ -15,4 +14,3 @@ void load_test_scene_animations(assets_manager& anims) {
 		);
 	} 
 }
-#endif

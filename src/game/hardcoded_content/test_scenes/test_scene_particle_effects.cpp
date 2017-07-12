@@ -1,4 +1,3 @@
-#if BUILD_TEST_SCENES
 #include "game/hardcoded_content/all_hardcoded_content.h"
 #include "game/assets/assets_manager.h"
 #include "game/assets/particle_effect.h"
@@ -1080,4 +1079,3 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 		effect.emissions.push_back(em);
 	}
 }
-#endif
