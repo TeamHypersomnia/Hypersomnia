@@ -52,8 +52,6 @@ int main(int argc, char** argv) {
 		);
 	}
 
-	augs::log_all_audio_devices("generated/logs/audio_devices.txt");
-
 	augs::generate_alsoft_ini(
 		cfg.enable_hrtf,
 		cfg.max_number_of_sound_sources

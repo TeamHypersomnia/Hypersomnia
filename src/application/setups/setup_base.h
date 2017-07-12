@@ -9,6 +9,7 @@ class setup_base {
 public:
 	augs::window::event::keys::key exit_key = augs::window::event::keys::key::ESC;
 	volatile bool should_quit = false;
+	volatile bool should_return_to_menu = false;
 
 	bool process_exit(const augs::machine_entropy::local_type&);
 };

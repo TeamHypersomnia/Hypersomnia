@@ -121,7 +121,7 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 					in.effect.modifier.gain = gain_mult;
 					in.effect.id = sound_id;
 
-					//in.create_sound_effect_entity(step, c.point, entity_id()).add_standard_components(step);
+					in.create_sound_effect_entity(step, c.point, entity_id()).add_standard_components(step);
 				}
 			}
 

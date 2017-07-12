@@ -24,7 +24,7 @@ class pure_color_highlight_system;
 class exploding_ring_system;
 class thunder_system;
 
-typedef augs::storage_for_systems <
+using storage_for_all_systems_inferred = augs::storage_for_systems<
 	// It is critical that the relational system is the first on this list
 	// so that it creates inferred state of relations before physics_system uses it for constructing
 	// bodies, fixtures and joints.
@@ -33,9 +33,9 @@ typedef augs::storage_for_systems <
 	physics_system,
 	tree_of_npo_system,
 	processing_lists_system
-> storage_for_all_systems_inferred;
+>;
 
-typedef augs::storage_for_systems <
+using storage_for_all_systems_audiovisual = augs::storage_for_systems<
 	interpolation_system,
 	past_infection_system,
 	light_system,
@@ -47,4 +47,4 @@ typedef augs::storage_for_systems <
 	pure_color_highlight_system,
 	exploding_ring_system,
 	thunder_system
-> storage_for_all_systems_audiovisual;
+>;

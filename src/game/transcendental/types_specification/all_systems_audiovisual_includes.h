@@ -1,0 +1,12 @@
+#pragma once
+#include "game/systems_audiovisual/interpolation_system.h"
+#include "game/systems_audiovisual/past_infection_system.h"
+#include "game/systems_audiovisual/light_system.h"
+#include "game/systems_audiovisual/particles_simulation_system.h"
+#include "game/systems_audiovisual/wandering_pixels_system.h"
+#include "game/systems_audiovisual/sound_system.h"
+#include "game/systems_audiovisual/gui_element_system.h"
+#include "game/systems_audiovisual/flying_number_indicator_system.h"
+#include "game/systems_audiovisual/pure_color_highlight_system.h"
+#include "game/systems_audiovisual/exploding_ring_system.h"
+#include "game/systems_audiovisual/thunder_system.h"

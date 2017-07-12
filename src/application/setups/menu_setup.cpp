@@ -310,6 +310,10 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 		{
 			auto setup = std::make_unique<local_setup>();
 			setup->process(window, session);
+
+			if (setup->should_quit) {
+				should_quit = true;
+			}
 		}
 			break;
 
