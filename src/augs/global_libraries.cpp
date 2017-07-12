@@ -12,16 +12,20 @@
 #include "augs/ensure.h"
 #include "augs/window_framework/platform_utils.h"
 
-void sigsegv_handler(const int signal) {
-	augs::window::disable_cursor_clipping();
-	throw "Access violation!";
-}
+std::unique_ptr<FT_Library> augs::global_libraries::freetype_library(new FT_Library);
 
 namespace augs {
-	std::unique_ptr<FT_Library> global_libraries::freetype_library(new FT_Library);
+	global_libraries::global_libraries(const library_flagset to_initialize) {
+		init(to_initialize);
+	}
 
 	void global_libraries::init(const library_flagset to_initialize) {
-		// signal(SIGSEGV, sigsegv_handler);
+#if 0
+		signal(SIGSEGV, [](const int signal) {
+			augs::window::disable_cursor_clipping();
+			throw "Access violation!";
+		});
+#endif
 
 		if(to_initialize.test(library::FREETYPE)) {
 			ensure(!FT_Init_FreeType(freetype_library.get()) && "freetype initialization");
@@ -51,6 +55,8 @@ namespace augs {
 #endif
 		}
 	}
-};
 
-augs::global_libraries::library_flagset augs::global_libraries::initialized;
+	global_libraries::~global_libraries() {
+		deinit();
+	}
+};

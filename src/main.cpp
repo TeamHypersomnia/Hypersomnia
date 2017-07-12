@@ -35,7 +35,7 @@
 int main(int argc, char** argv) {
 	augs::create_directories("generated/logs/");
 
-	augs::global_libraries::init();
+	augs::global_libraries libraries; 
 	
 	auto cfg = config_lua_table(
 		augs::switch_path(
@@ -199,8 +199,6 @@ int main(int argc, char** argv) {
 	*/
 	resources->destroy_everything();
 #endif
-
-	augs::global_libraries::deinit();
 	
 	global_log::save_complete_log("generated/logs/successful_exit_debug_log.txt");
 	return 0;
