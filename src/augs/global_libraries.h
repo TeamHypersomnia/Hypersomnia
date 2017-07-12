@@ -20,13 +20,6 @@ namespace augs {
 
 		static std::unique_ptr<FT_Library> freetype_library;
 
-		static void run_unit_tests(
-			const int argc, 
-			const char* const * const argv,
-			const bool show_successful,
-			const bool break_on_failure
-		);
-
 		static void init  (const library_flagset = { library::FREETYPE, library::ENET });
 		static void deinit(const library_flagset = { library::FREETYPE, library::ENET });
 	};

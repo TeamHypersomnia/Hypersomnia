@@ -12,11 +12,6 @@
 #include "augs/ensure.h"
 #include "augs/window_framework/platform_utils.h"
 
-#if BUILD_UNIT_TESTS
-#define CATCH_CONFIG_RUNNER
-#include <catch.hpp>
-#endif
-
 void sigsegv_handler(const int signal) {
 	augs::window::disable_cursor_clipping();
 	throw "Access violation!";
@@ -55,31 +50,6 @@ namespace augs {
 			initialized.set(library::ENET, false);
 #endif
 		}
-	}
-
-	void global_libraries::run_unit_tests(
-		const int argc, 
-		const char* const * const argv,
-		const bool show_successful,
-		const bool break_on_failure
-	) {
-#if BUILD_UNIT_TESTS
-		Catch::Session session;
-
-		{
-			auto& cfg = session.configData();
-
-			cfg.showSuccessfulTests = show_successful;
-			cfg.shouldDebugBreak = break_on_failure;
-			cfg.outputFilename = "generated/logs/unit_tests.txt";
-			cfg.runOrder = Catch::RunTests::InWhatOrder::InDeclarationOrder;
-		}
-
-		const auto result = session.run(argc, argv);
-		const bool was_catch_session_successful = result == 0;
-		
-		ensure(was_catch_session_successful);
-#endif
 	}
 };
 

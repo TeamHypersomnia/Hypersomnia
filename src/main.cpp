@@ -22,6 +22,7 @@
 
 #include "augs/misc/script_utils.h"
 #include "augs/misc/lua_readwrite.h"
+#include "augs/unit_tests.h"
 
 #include <imgui/imgui.h>
 #include "generated/introspectors.h"
@@ -44,11 +45,12 @@ int main(int argc, char** argv) {
 	);
 	
 	if (cfg.debug_run_unit_tests) {
-		augs::global_libraries::run_unit_tests(
-			argc, 
+		augs::run_unit_tests(
+			argc,
 			argv,
 			cfg.debug_log_successful_unit_tests,
-			cfg.debug_break_on_unit_test_failure
+			cfg.debug_break_on_unit_test_failure,
+			"generated/logs/unit_tests.txt"
 		);
 	}
 

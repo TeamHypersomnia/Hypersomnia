@@ -412,6 +412,7 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/game/view/settings_gui.cpp"
 	"src/game/assets/recoil_player.cpp"
 	"src/augs/gui/bbcode.cpp"
+	"src/augs/unit_tests.cpp"
 )
 
 # natvis files for easier debugging in Visual Studio.
