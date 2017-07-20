@@ -1,30 +1,26 @@
 #pragma once
-#include <imgui/imgui.h>
-
-#include "game/view/world_camera.h"
-#include "augs/misc/measurements.h"
-
-#include "augs/misc/basic_input_context.h"
-#include "augs/misc/fixed_delta_timer.h"
-
-#include "game/detail/gui/aabb_highlighter.h"
-
+#include "augs/global_libraries.h"
+#include "augs/window_framework/window.h"
 #include "augs/gui/formatted_text.h"
 
-#include "augs/entity_system/storage_for_systems.h"
+#include "application/menu_ui/menu_ui_root.h"
+#include "application/menu_ui/menu_ui_context.h"
 
-#include "game/transcendental/types_specification/all_systems_declaration.h"
-#include "game/transcendental/types_specification/all_systems_audiovisual_includes.h"
+#include "application/setups/menu_setup.h"
+#include "application/setups/local_setup.h"
+//#include "application/setups/determinism_test_setup.h"
+//#include "application/setups/two_clients_and_server_setup.h"
+//#include "application/setups/client_setup.h"
+//#include "application/setups/server_setup.h"
+//#include "application/setups/director_setup.h"
+//#include "application/setups/choreographic_setup.h"
 
-#include "game/transcendental/logic_step.h"
+#include "game/transcendental/types_specification/all_component_includes.h"
 
-#include "game/detail/gui/character_gui.h"
-#include "game/detail/gui/item_button.h"
-#include "game/detail/gui/slot_button.h"
+#include "game/assets/assets_manager.h"
+#include "game/view/audiovisual_state.h"
 
-#include "game/detail/particle_types.h"
-
-class game_window;
+using game_window = augs::window;
 
 namespace augs {
 	struct machine_entropy;
@@ -36,76 +32,76 @@ namespace augs {
 	class renderer;
 }
 
+struct settings_gui_state {
+	int active_pane = 0;
+};
+
 class viewing_session {
-	config_gui_state config_gui;
+	settings_gui_state settings_gui;
 public:
-	config_lua_table last_saved_config;
 	config_lua_table config;
+	config_lua_table last_saved_config;
+	
+	const std::string config_path_for_saving;
 
-	world_camera camera;
-	vec2i viewport_coordinates;
-	aabb_highlighter world_hover_highlighter;
-	storage_for_all_systems_audiovisual systems_audiovisual;
+	augs::global_libraries libraries;
+	game_window window;
+	augs::renderer gl;
+	augs::audio_context audio_context;
+#if !ONLY_ONE_GLOBAL_ASSETS_MANAGER
+	assets_manager manager;
+#endif
 
-	bool gui_look_enabled = false;
+	audiovisual_state audiovisuals;
+
+	using setup_variant = std::variant<local_setup>;
+	
+	std::optional<menu_setup> menu;
+	std::optional<setup_variant> current_setup;
+
 	bool show_settings = false;
+	bool show_ingame_menu = false;
 
-	augs::timer frame_timer;
+	augs::timer gui_timer;
 	augs::timer imgui_timer;
 
-	mutable augs::measurements fps_profiler = augs::measurements(L"FPS");
-	mutable augs::measurements frame_profiler = augs::measurements(L"Frame");
-	mutable augs::measurements local_entropy_profiler = augs::measurements(L"Acquiring local entropy");
-	mutable augs::measurements unpack_local_steps_profiler = augs::measurements(L"Unpacking local steps");
-	mutable augs::measurements unpack_remote_steps_profiler = augs::measurements(L"Unpacking remote steps");
-	mutable augs::measurements sending_commands_and_predict_profiler = augs::measurements(L"Sending and predicting commands");
-	mutable augs::measurements sending_packets_profiler = augs::measurements(L"Sending packets");
-	mutable augs::measurements remote_entropy_profiler = augs::measurements(L"Acquiring remote entropy");
-	mutable augs::measurements triangles = augs::measurements(L"Triangles", false);
+	augs::event::state state;
+	
+	mutable session_profiler profiler;
 
 	viewing_session(
-		const vec2i screen_size,
-		const config_lua_table&
+		const config_lua_table&,
+		const std::string& config_path_for_saving
 	);
 
 	void set_screen_size(const vec2i);
 
-	void set_interpolation_enabled(const bool);
-	void set_master_gain(const float);
-
-	void reserve_caches_for_entities(const size_t);
-	void switch_between_gui_and_back(const augs::machine_entropy::local_type&);
+	bool switch_between_gui_and_back(const augs::machine_entropy::local_type&);
 	
-	void control_gui_and_remove_fetched_events(
+	void perform_imgui_pass(
+		augs::machine_entropy::local_type&,
+		const augs::delta dt
+	);
+	
+	void perform_ingame_menu();
+	void perform_settings_gui();
+
+	void sync_back(config_lua_table& into);
+	void apply(const config_lua_table& new_config);
+
+	void fetch_gui_events(
 		const const_entity_handle root,
 		augs::machine_entropy::local_type&
 	);
-	
-	void perform_imgui_pass(
-		augs::window::glwindow&,
-		const augs::machine_entropy::local_type&,
-		const augs::delta dt
-	);
 
-	void perform_settings_gui(augs::window::glwindow&);
-
-	void control_open_developer_console(game_intent_vector&);
-	void control_and_remove_fetched_intents(game_intent_vector&);
-	void standard_audiovisual_post_solve(const const_logic_step);
-	void spread_past_infection(const const_logic_step);
+	void fetch_developer_console_intents(game_intent_vector&);
+	void fetch_session_intents(game_intent_vector&);
 
 	decltype(auto) get_standard_post_solve() {
 		return [this](const const_logic_step step) {
-			standard_audiovisual_post_solve(step);
+			audiovisuals.standard_post_solve(step);
 		};
 	}
-
-	void advance_audiovisual_systems(
-		const cosmos& cosm, 
-		const entity_id viewed_character,
-		const visible_entities&,
-		const augs::delta dt
-	);
 	
 	void view(
 		augs::renderer& renderer,
@@ -114,15 +110,6 @@ public:
 		const visible_entities&,
 		const double interpolation_ratio,
 		const augs::gui::text::formatted_string& custom_log = augs::gui::text::formatted_string()
-	) const;
-
-	void view(
-		augs::renderer& renderer,
-		const cosmos& cosmos,
-		const entity_id viewed_character,
-		const visible_entities&,
-		const double interpolation_ratio,
-		const augs::network::client& details
 	) const;
 
 	void draw_text_at_left_top(
@@ -135,10 +122,10 @@ public:
 		const cosmos&
 	);
 	
-	std::wstring summary() const;
+	std::wstring get_profile_summary() const;
 
 	void draw_color_overlay(
-		augs::renderer& renderer, 
+		augs::vertex_triangle_buffer&, 
 		const rgba
 	) const;
 };

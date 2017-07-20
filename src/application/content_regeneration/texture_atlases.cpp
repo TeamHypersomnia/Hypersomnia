@@ -111,7 +111,7 @@ atlases_regeneration_output regenerate_atlases(
 
 			for (const auto& input_img_id : input_for_this_atlas.second.images) {
 				auto& img = loaded_images[input_img_id];
-				img.from_file(input_img_id);
+				img = augs::image(input_img_id);
 
 				auto& out_entry = this_atlas_metadata.images[input_img_id];
 				out_entry.original_size_pixels = img.get_size();
@@ -127,8 +127,10 @@ atlases_regeneration_output regenerate_atlases(
 			}
 
 			for (const auto& input_fnt_id : input_for_this_atlas.second.fonts) {
-				auto& fnt = loaded_fonts[input_fnt_id];
-				fnt.from_file(input_fnt_id.path, input_fnt_id.input);
+				auto& fnt = (*loaded_fonts.try_emplace(
+					input_fnt_id, 
+					input_fnt_id.path, input_fnt_id.input
+				).first).second;
 				
 				auto& out_fnt = this_atlas_metadata.fonts[input_fnt_id];
 				out_fnt.meta_from_file = fnt.meta;
@@ -192,8 +194,7 @@ atlases_regeneration_output regenerate_atlases(
 
 			// translate pixels into atlas space and render the image
 
-			augs::image atlas_image;
-			atlas_image.create(atlas_size);
+			auto atlas_image = augs::image(atlas_size);
 			
 			size_t current_rect = 0u;
 
@@ -241,7 +242,7 @@ atlases_regeneration_output regenerate_atlases(
 					g.was_flipped = packed_rect.flipped;
 
 					atlas_image.blit(
-						loaded_fonts[input_font_id].glyph_bitmaps[glyph_index],
+						loaded_fonts.at(input_font_id).glyph_bitmaps[glyph_index],
 						{
 							static_cast<unsigned>(packed_rect.x),
 							static_cast<unsigned>(packed_rect.y)
@@ -253,12 +254,7 @@ atlases_regeneration_output regenerate_atlases(
 				}
 			}
 
-			if (save_atlases_as_binary) {
-				atlas_image.save_as_binary_file(atlas_image_path);
-			}
-			else {
-				atlas_image.save(atlas_image_path);
-			}
+			atlas_image.save(atlas_image_path);
 
 			{
 				augs::stream new_stamp_stream;

@@ -3,7 +3,7 @@
 #include "client_setup.h"
 #include "game/transcendental/types_specification/all_component_includes.h"
 
-#include "application/game_window.h"
+#include "augs/window_framework/window.h"
 
 void two_clients_and_server_setup::process(
 	config_lua_table& cfg, 
@@ -34,18 +34,16 @@ void two_clients_and_server_setup::process(
 	bool alive[2] = { true, true };
 
 	while (!should_quit) {
-		sessions[0].local_entropy_profiler.new_measurement();
-		sessions[1].local_entropy_profiler.new_measurement();
+		get_profiler().local_entropy.start();
 		auto precollected = window.collect_entropy(cfg.enable_cursor_clipping);
-		sessions[0].local_entropy_profiler.end_measurement();
-		sessions[1].local_entropy_profiler.end_measurement();
+		get_profiler().local_entropy.stop();
 
 		if (process_exit(precollected))
 			break;
 
 		for (const auto& n : precollected) {
 			if (n.was_any_key_pressed()) {
-				if (n.key == augs::window::event::keys::key::CAPSLOCK) {
+				if (n.key == augs::event::keys::key::CAPSLOCK) {
 					++current_window;
 					current_window %= 2;
 
@@ -55,12 +53,12 @@ void two_clients_and_server_setup::process(
 					}
 				}
 				
-				if (n.key == augs::window::event::keys::key::F1) {
+				if (n.key == augs::event::keys::key::F1) {
 					alive[0] = false;
 					current_window = 1;
 				}
 
-				if (n.key == augs::window::event::keys::key::F2) {
+				if (n.key == augs::event::keys::key::F2) {
 					alive[1] = false;
 					current_window = 0;
 				}

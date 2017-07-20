@@ -3,7 +3,7 @@
 
 template <bool C>
 bool basic_all_inferred_state_synchronizer<C>::is_activated() const {
-	return get_data().activated;
+	return get_raw_component().activated;
 }
 
 using A = components::all_inferred_state;
@@ -13,11 +13,11 @@ void component_synchronizer<false, A>::reinference() const {
 }
 
 void component_synchronizer<false, A>::set_activated(const bool flag) const {
-	if (flag == get_data().activated) {
+	if (flag == get_raw_component().activated) {
 		return;
 	}
 
-	get_data().activated = flag;
+	get_raw_component().activated = flag;
 	reinference();
 }
 

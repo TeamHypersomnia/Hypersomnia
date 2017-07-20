@@ -32,7 +32,7 @@ maybe_const_ref_t<C, entity_name_meta> basic_name_synchronizer<C>::get_meta() co
 
 template <bool C>
 entity_name_id basic_name_synchronizer<C>::get_name_id() const {
-	return get_data().name_id;
+	return get_raw_component().name_id;
 }
 
 template <bool C>
@@ -41,7 +41,7 @@ const entity_name_type& basic_name_synchronizer<C>::get_name() const {
 
 	return cosmos.systems_inferred.get<name_system>().get_name(
 		cosmos.get_global_state().name_metas,
-		get_data()
+		get_raw_component()
 	);
 }
 
@@ -51,7 +51,7 @@ void component_synchronizer<false, N>::set_name(const entity_name_type& full_nam
 	cosmos.systems_inferred.get<name_system>().set_name(
 		cosmos.get_global_state().name_metas,
 		full_name,
-		get_data(),
+		get_raw_component(),
 		handle
 	);
 
@@ -65,7 +65,7 @@ void component_synchronizer<false, N>::set_name(const entity_name_type& full_nam
 void component_synchronizer<false, N>::set_name_id(const entity_name_id id) const {
 	handle.get_cosmos().systems_inferred.get<name_system>().set_name_id(
 		id,
-		get_data(),
+		get_raw_component(),
 		handle
 	);
 

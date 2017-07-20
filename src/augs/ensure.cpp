@@ -2,7 +2,7 @@
 #include "augs/window_framework/platform_utils.h"
 
 void cleanup_proc() {
-	augs::window::disable_cursor_clipping();
+	augs::disable_cursor_clipping();
 	
 	global_log::save_complete_log("generated/logs/ensure_failed_debug_log.txt");
 

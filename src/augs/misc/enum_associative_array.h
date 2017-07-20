@@ -8,32 +8,49 @@ namespace augs {
 	struct introspection_access;
 
 	template <class Enum, class T>
-	class enum_associative_array {
+	class enum_associative_array_base {
 	public:
-		typedef Enum key_type;
-		typedef T mapped_type;
-	private:
-		static constexpr size_t max_n = static_cast<size_t>(key_type::COUNT);
+		using key_type = Enum;
+		using mapped_type = T;
+	protected:
+		using size_type = std::size_t;
 
-		typedef std::array<mapped_type, max_n> arr_type;
-		typedef augs::enum_boolset<Enum> flagset_type;
+		static constexpr size_type max_n = static_cast<size_type>(key_type::COUNT);
+		static constexpr bool is_trivially_copyable = std::is_trivially_copyable_v<mapped_type>;
+		
+		static_assert(
+			!is_trivially_copyable || std::is_default_constructible_v<mapped_type>,
+			"No support for a type that is trivially copyable but not default constructible."
+		);
 
-		// GEN INTROSPECTOR class augs::enum_associative_array class key_type class mapped_type
+		using storage_type = std::array<
+			std::conditional_t<is_trivially_copyable, 
+				mapped_type,
+				std::aligned_storage_t<sizeof(mapped_type), alignof(mapped_type)>
+			>,
+			max_n
+		>;
+
+		using flagset_type = augs::enum_boolset<Enum>;
+		friend struct augs::introspection_access;
+
+		/* Introspection will fail if the storage type involves an aligned storage */
+		// GEN INTROSPECTOR class augs::enum_associative_array_base class key_type class mapped_type
 		flagset_type is_value_set;
-		arr_type raw;
+		storage_type data;
 		// END GEN INTROSPECTOR
 		
-		bool is_set(const std::size_t index) const {
+		bool is_set(const size_type index) const {
 			return is_value_set.test(static_cast<Enum>(index));
 		}
 
-		void set(const std::size_t index) {
+		template <class... Args>
+		void set(const size_type index, Args&&... args) {
 			is_value_set.set(static_cast<Enum>(index));
+			new (&nth(index)) mapped_type(std::forward<Args>(args)...);
 		}
 
-		friend struct augs::introspection_access;
-
-		unsigned find_first_set_index(unsigned from) const {
+		const size_type find_first_set_index(size_type from) const {
 			while (from < max_n && !is_set(from)) {
 				++from;
 			}
@@ -41,29 +58,37 @@ namespace augs {
 			return from;
 		}
 
+		auto& nth(const size_type n) {
+			return *reinterpret_cast<mapped_type*>(&data[n]);
+		}
+
+		const auto& nth(const size_type n) const {
+			return *reinterpret_cast<const mapped_type*>(&data[n]);
+		}
+
 	public:
-		template<bool is_const>
+		template <bool is_const>
 		class basic_iterator {
-			typedef maybe_const_ptr_t<is_const, enum_associative_array> ptr_type;
-			typedef std::pair<const key_type, maybe_const_ref_t<is_const, mapped_type>> ref_type;
+			using ptr_type = maybe_const_ptr_t<is_const, enum_associative_array_base>;
+			using ref_type = std::pair<const key_type, maybe_const_ref_t<is_const, mapped_type>>;
 			
 			ptr_type ptr = nullptr;
-			size_t idx = 0;
+			size_type idx = 0;
 
-			friend class enum_associative_array<Enum, T>;
+			friend class enum_associative_array_base<Enum, T>;
 
 		public:
-			basic_iterator(const ptr_type ptr, const size_t idx) : ptr(ptr), idx(idx) {}
+			basic_iterator(const ptr_type ptr, const size_type idx) : ptr(ptr), idx(idx) {}
+
+			basic_iterator& operator++() {
+				idx = ptr->find_first_set_index(idx + 1);
+				return *this;
+			}
 
 			const basic_iterator operator++(int) {
 				const iterator temp = *this;
 				++*this;
 				return temp;
-			}
-
-			basic_iterator& operator++() {
-				idx = ptr->find_first_set_index(idx + 1);
-				return *this;
 			}
 
 			bool operator==(const basic_iterator& b) const {
@@ -76,104 +101,172 @@ namespace augs {
 
 			ref_type operator*() const {
 				ensure(idx < ptr->capacity());
-				return { static_cast<key_type>(idx), ptr->raw[idx] };
+				return { static_cast<key_type>(idx), ptr->nth(idx) };
 			}
 		};
 
-		typedef basic_iterator<false> iterator;
-		typedef basic_iterator<true> const_iterator;
+		using iterator = basic_iterator<false>;
+		using const_iterator = basic_iterator<true>;
 
-		template<bool>
+		template <bool>
 		friend class basic_iterator;
 
 		iterator begin() {
-			return iterator(this, find_first_set_index(0u));
+			return { this, find_first_set_index(0u) };
 		}
 
 		iterator end() {
-			return iterator(this, max_n);
+			return { this, max_n };
 		}
 
 		const_iterator begin() const {
-			return const_iterator(this, find_first_set_index(0));
+			return { this, find_first_set_index(0u) };
 		}
 
 		const_iterator end() const {
-			return const_iterator(this, max_n);
+			return { this, max_n };
 		}
 
 		iterator find(const key_type enum_idx) {
-			const size_t i = static_cast<size_t>(enum_idx);
+			const size_type i = static_cast<size_type>(enum_idx);
 			ensure(i < capacity());
 
 			if (is_set(i)) {
-				return iterator(this, i);
+				return { this, i };
 			}
 
 			return end();
 		}
 
-		iterator emplace(const key_type k, const mapped_type v) {
-			operator[](k) = v;
-			return find(k);
+		template <class... T>
+		trivially_copyable_pair<iterator, bool> try_emplace(const key_type k, T&&... t) {
+			if (is_set(static_cast<size_type>(k))) {
+				return { find(k), false };
+			}
+			else {
+				set(static_cast<size_type>(k), std::forward<T>(t)...);
+				return { find(k), true };
+			}
 		}
 
-		iterator emplace(const augs::trivially_copyable_pair<key_type, mapped_type> p) {
-			return emplace(p.first, p.second);
+		template <class T>
+		auto emplace(const key_type k, T&& t) {
+			return try_emplace(k, std::forward<T>(t));
 		}
 
 		const_iterator find(const key_type enum_idx) const {
-			const size_t i = static_cast<size_t>(enum_idx);
+			const size_type i = static_cast<size_type>(enum_idx);
 			ensure(i < capacity());
 
 			if (is_set(i)) {
-				return const_iterator(this, i);
+				return { this, i };
 			}
 
 			return end();
 		}
 
 		mapped_type& at(const key_type enum_idx) {
-			const auto i = static_cast<size_t>(enum_idx);
+			const auto i = static_cast<size_type>(enum_idx);
 			ensure(i < capacity());
 			ensure(is_set(i));
-			return raw[i];
+			return nth(i);
 		}
 
 		const mapped_type& at(const key_type enum_idx) const {
-			const auto i = static_cast<size_t>(enum_idx);
+			const auto i = static_cast<size_type>(enum_idx);
 			ensure(i < capacity());
 			ensure(is_set(i));
-			return raw[i];
+			return nth(i);
 		}
 
+		template <class = std::enable_if_t<std::is_default_constructible_v<mapped_type>>>
 		mapped_type& operator[](const key_type enum_idx) {
-			const auto i = static_cast<size_t>(enum_idx);
+			const auto i = static_cast<size_type>(enum_idx);
+			ensure(i < capacity());
 
 			if (!is_set(i)) {
 				set(i);
 			}
 
-			return raw[i];
+			return nth(i);
 		}
 
-		constexpr std::size_t capacity() const {
-			return raw.size();
+		constexpr size_type capacity() const {
+			return max_n;
 		}
 
-		constexpr std::size_t max_size() const {
-			return raw.max_size();
+		constexpr size_type max_size() const {
+			return max_n;
 		}
 
 		void clear() {
-			for (auto& v : raw) {
-				v.~mapped_type();
-				new (&v) mapped_type;
+			if constexpr(!is_trivially_copyable) {
+				for (auto& v : *this) {
+					v.second.~mapped_type();
+				}
 			}
 
-			// std::fill(is_set_buf.begin(), is_set_buf.end(), 0u);
-			// get_flags() = flagset_type();
 			is_value_set = flagset_type();
+		}
+	};
+
+	template <class Enum, class T, class = void>
+	class enum_associative_array;
+	
+	// GEN INTROSPECTOR class augs::enum_associative_array class key_type class mapped_type class dummy
+	// INTROSPECT BASE augs::enum_associative_array_base<key_type, mapped_type>
+	// END GEN INTROSPECTOR
+
+	template <class Enum, class T>
+	class enum_associative_array<Enum, T, std::enable_if_t<std::is_trivially_copyable_v<T>>>
+		: public enum_associative_array_base<Enum, T> {
+	public:
+	};
+
+	template <class Enum, class T>
+	class enum_associative_array<Enum, T, std::enable_if_t<!std::is_trivially_copyable_v<T>>>
+		: public enum_associative_array_base<Enum, T> {
+	public:
+		enum_associative_array() = default;
+		
+		enum_associative_array(const enum_associative_array& b) {
+			for (auto& v : b) {
+				emplace(v.first, v.second);
+			}
+		}
+
+		enum_associative_array& operator=(const enum_associative_array& b) {
+			clear();
+
+			for (auto& v : b) {
+				emplace(v.first, v.second);
+			}
+
+			return *this;
+		}
+
+		enum_associative_array(enum_associative_array&& b) {
+			for (auto& v : b) {
+				emplace(v.first, std::move(v.second));
+			}
+
+			b.is_value_set = flagset_type();
+		}
+
+		enum_associative_array& operator=(enum_associative_array&& b) {
+			clear();
+
+			for (auto& v : b) {
+				emplace(v.first, std::move(v.second));
+			}
+
+			b.is_value_set = flagset_type();
+
+			return *this;
+		}
+
+		~enum_associative_array() {
+			clear();
 		}
 	};
 }

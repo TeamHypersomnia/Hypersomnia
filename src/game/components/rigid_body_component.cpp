@@ -11,9 +11,9 @@
 #include "augs/math/vec2.h"
 #include "game/systems_inferred/physics_system.h"
 #include "augs/ensure.h"
-#include "application/config_structs/debug_drawing_settings.h"
+#include "game/view/debug_drawing_settings.h"
 
-typedef components::rigid_body P;
+using P = components::rigid_body;
 
 components::rigid_body::rigid_body(
 	const si_scaling si,
@@ -44,50 +44,50 @@ void component_synchronizer<false, P>::reinference() const {
 }
 
 void component_synchronizer<false, P>::set_body_type(const rigid_body_type t) const {
-	get_data().body_type = t;
+	get_raw_component().body_type = t;
 	reinference();
 }
 
 void component_synchronizer<false, P>::set_activated(const bool flag) const {
-	if (flag == get_data().activated) {
+	if (flag == get_raw_component().activated) {
 		return;
 	}
 
-	get_data().activated = flag;
+	get_raw_component().activated = flag;
 
 	if (!flag) {
-		get_data().velocity.reset();
-		get_data().angular_velocity = 0.f;
+		get_raw_component().velocity.reset();
+		get_raw_component().angular_velocity = 0.f;
 	}
 
 	reinference();
 }
 
 void component_synchronizer<false, P>::set_bullet_body(const bool flag) const {
-	get_data().bullet = flag;
+	get_raw_component().bullet = flag;
 	reinference();
 }
 
 void component_synchronizer<false, P>::set_velocity(const vec2 pixels) const {
-	get_data().velocity = to_meters(pixels);
+	get_raw_component().velocity = to_meters(pixels);
 
 	if (!is_constructed())
 		return;
 
-	get_cache().body->SetLinearVelocity(get_data().velocity);
+	get_cache().body->SetLinearVelocity(get_raw_component().velocity);
 }
 
 void component_synchronizer<false, P>::set_angular_velocity(const float degrees) const {
-	get_data().angular_velocity = DEG_TO_RAD<float> * degrees;
+	get_raw_component().angular_velocity = DEG_TO_RAD<float> * degrees;
 
 	if (!is_constructed())
 		return;
 
-	get_cache().body->SetLinearVelocity(get_data().velocity);
+	get_cache().body->SetLinearVelocity(get_raw_component().velocity);
 }
 
 void component_synchronizer<false, P>::set_linear_damping(const float damping) const {
-	get_data().linear_damping = damping;
+	get_raw_component().linear_damping = damping;
 
 	if (!is_constructed())
 		return;
@@ -97,7 +97,7 @@ void component_synchronizer<false, P>::set_linear_damping(const float damping) c
 
 
 void component_synchronizer<false, P>::set_angular_damping(const float damping) const {
-	get_data().angular_damping = damping;
+	get_raw_component().angular_damping = damping;
 
 	if (!is_constructed())
 		return;
@@ -106,7 +106,7 @@ void component_synchronizer<false, P>::set_angular_damping(const float damping) 
 }
 
 void component_synchronizer<false, P>::set_linear_damping_vec(const vec2 damping) const {
-	get_data().linear_damping_vec = damping;
+	get_raw_component().linear_damping_vec = damping;
 
 	if (!is_constructed())
 		return;
@@ -130,7 +130,7 @@ void component_synchronizer<false, P>::apply_force(
 	}
 
 	const auto body = get_cache().body;
-	auto& data = get_data();
+	auto& data = get_raw_component();
 
 	const auto force = handle.get_cosmos().get_fixed_delta().in_seconds() * to_meters(pixels);
 	const auto location = vec2(body->GetWorldCenter() + to_meters(center_offset));
@@ -144,7 +144,7 @@ void component_synchronizer<false, P>::apply_force(
 	data.angular_velocity = body->GetAngularVelocity();
 	data.velocity = body->GetLinearVelocity();
 
-	if (augs::renderer::get_current().debug.draw_forces && force.non_zero()) {
+	if (DEBUG_DRAWING.draw_forces && force.non_zero()) {
 		auto& lines = augs::renderer::get_current().logic_lines;
 		lines.draw_green(to_pixels(location) + to_pixels(force), to_pixels(location));
 	}
@@ -166,7 +166,7 @@ void component_synchronizer<false, P>::apply_impulse(
 	}
 
 	const auto body = get_cache().body;
-	auto& data = get_data();
+	auto& data = get_raw_component();
 
 	const vec2 force = to_meters(pixels);
 	const vec2 location = body->GetWorldCenter() + to_meters(center_offset);
@@ -175,7 +175,7 @@ void component_synchronizer<false, P>::apply_impulse(
 	data.angular_velocity = body->GetAngularVelocity();
 	data.velocity = body->GetLinearVelocity();
 
-	if (augs::renderer::get_current().debug.draw_forces && force.non_zero()) {
+	if (DEBUG_DRAWING.draw_forces && force.non_zero()) {
 		auto& lines = augs::renderer::get_current().persistent_lines;
 		lines.draw_green(to_pixels(location) + to_pixels(force), to_pixels(location));
 	}
@@ -184,7 +184,7 @@ void component_synchronizer<false, P>::apply_impulse(
 void component_synchronizer<false, P>::apply_angular_impulse(const float imp) const {
 	ensure(is_constructed());
 	const auto body = get_cache().body;
-	auto& data = get_data();
+	auto& data = get_raw_component();
 
 	body->ApplyAngularImpulse(imp, true);
 	data.angular_velocity = body->GetAngularVelocity();
@@ -198,12 +198,12 @@ float basic_physics_synchronizer<C>::get_mass() const {
 
 template<bool C>
 float basic_physics_synchronizer<C>::get_angle() const {
-	return get_data().sweep.a * RAD_TO_DEG<float>;
+	return get_raw_component().sweep.a * RAD_TO_DEG<float>;
 }
 
 template<bool C>
 float basic_physics_synchronizer<C>::get_angular_velocity() const {
-	return get_data().angular_velocity * RAD_TO_DEG<float>;
+	return get_raw_component().angular_velocity * RAD_TO_DEG<float>;
 }
 
 template<bool C>
@@ -214,7 +214,7 @@ float basic_physics_synchronizer<C>::get_inertia() const {
 
 template<bool C>
 vec2 basic_physics_synchronizer<C>::get_position() const {
-	return to_pixels(get_data().transform.p);
+	return to_pixels(get_raw_component().transform.p);
 }
 
 template<bool C>
@@ -225,7 +225,7 @@ vec2 basic_physics_synchronizer<C>::get_mass_position() const {
 
 template<bool C>
 vec2 basic_physics_synchronizer<C>::velocity() const {
-	return to_pixels(get_data().velocity);
+	return to_pixels(get_raw_component().velocity);
 }
 
 template<bool C>
@@ -236,12 +236,12 @@ vec2 basic_physics_synchronizer<C>::get_world_center() const {
 
 template<bool C>
 rigid_body_type basic_physics_synchronizer<C>::get_body_type() const {
-	return get_data().body_type;
+	return get_raw_component().body_type;
 }
 
 template<bool C>
 bool basic_physics_synchronizer<C>::is_activated() const {
-	return get_data().activated;
+	return get_raw_component().activated;
 }
 
 void component_synchronizer<false, P>::set_transform(const entity_id id) const {
@@ -250,7 +250,7 @@ void component_synchronizer<false, P>::set_transform(const entity_id id) const {
 
 void component_synchronizer<false, P>::set_transform(const components::transform& transform) const {
 	const auto body = get_cache().body;
-	auto& data = get_data();
+	auto& data = get_raw_component();
 
 	data.set_transform(
 		handle.get_cosmos().significant.meta.global.si,
@@ -261,8 +261,8 @@ void component_synchronizer<false, P>::set_transform(const components::transform
 		return;
 	}
 
-	body->m_xf = get_data().transform;
-	body->m_sweep = get_data().sweep;
+	body->m_xf = get_raw_component().transform;
+	body->m_sweep = get_raw_component().sweep;
 }
 
 template<bool C>

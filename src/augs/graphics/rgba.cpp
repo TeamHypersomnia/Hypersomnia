@@ -3,6 +3,7 @@
 #include <imgui/imgui.h>
 #include "augs/ensure.h"
 #include "augs/graphics/rgba.h"
+#include <array>
 
 namespace {
 	typedef struct {
@@ -111,6 +112,50 @@ rgb hsv2rgb(const hsv in)
 		break;
 	}
 	return out;
+}
+
+rgba::rgb_type::rgb_type(
+	const rgba_channel red,
+	const rgba_channel green,
+	const rgba_channel blue
+) :
+	r(red),
+	g(green),
+	b(blue)
+{}
+
+rgba::rgb_type::rgb_type(const std::array<float, 3>& v) :
+	rgb_type(
+		to_0_255(v[0]),
+		to_0_255(v[1]),
+		to_0_255(v[2])
+	)
+{}
+
+rgba::rgb_type::operator std::array<float, 3>() const {
+	return {
+		to_0_1(r),
+		to_0_1(g),
+		to_0_1(b)
+	};
+}
+
+rgba::rgba(const std::array<float, 4>& v) :
+	rgba(
+		to_0_255(v[0]),
+		to_0_255(v[1]),
+		to_0_255(v[2]),
+		to_0_255(v[3])
+	)
+{}
+
+rgba::operator std::array<float, 4>() const {
+	return {
+		to_0_1(r),
+		to_0_1(g),
+		to_0_1(b),
+		to_0_1(a)
+	};
 }
 
 rgba::rgba(const ImVec4& v) :

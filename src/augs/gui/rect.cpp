@@ -12,7 +12,7 @@ namespace augs {
 			const auto& manager = get_assets_manager();
 
 			set_default_flags();
-			rc.set_size(manager[id].get_size());
+			rc.set_size(manager.at(id).get_size());
 		}
 
 		void rect_node_data::set_default_flags() {

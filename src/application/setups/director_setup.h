@@ -6,8 +6,6 @@
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/cosmic_movie_director.h"
 
-class game_window;
-
 class director_setup : public setup_base {
 	void push_snapshot_if_needed();
 	void advance_player_by_single_step(viewing_session& session);
@@ -42,7 +40,7 @@ public:
 	director_state current_director_state = director_state::PLAYING;
 	recording_type recording_mode = recording_type::ALL;
 
-	augs::window::event::state events;
+	augs::event::state events;
 	cosmos hypersomnia = cosmos(3000);
 	debug_character_selection characters;
 

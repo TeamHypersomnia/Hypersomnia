@@ -8,7 +8,28 @@
 #include "augs/misc/subscript_operator_for_get_handle_mixin.h"
 
 namespace augs {
-	template<class T>
+	struct introspection_access;
+
+	/*	
+		We generate introspectors for the pool and its internal structures,
+		becasuse it will be very useful to be able to dump the values to lua files,
+		if some debugging is necessary.
+	*/
+
+	struct pool_metadata {
+		// GEN INTROSPECTOR struct augs::pool_metadata
+		std::size_t pointing_indirector = -1;
+		// END GEN INTROSPECTOR
+	};
+
+	struct pool_indirector {
+		// GEN INTROSPECTOR struct augs::pool_indirector
+		unsigned real_index = 0;
+		unsigned version = 1;
+		// END GEN INTROSPECTOR
+	};
+
+	template <class T>
 	class EMPTY_BASES pool : public subscript_operator_for_get_handle_mixin<pool<T>> {
 	public:
 		using id_type = pooled_object_id<T>;
@@ -19,19 +40,14 @@ namespace augs {
 		using element_type = T;
 	
 	protected:
-		struct metadata {
-			std::size_t pointing_indirector = -1;
-		};
+		friend struct introspection_access;
 
-		struct indirector {
-			unsigned real_index = 0;
-			unsigned version = 1;
-		};
-
+		// GEN INTROSPECTOR class augs::pool class T
 		std::vector<T> pooled;
-		std::vector<metadata> slots;
-		std::vector<indirector> indirectors;
+		std::vector<pool_metadata> slots;
+		std::vector<pool_indirector> indirectors;
 		std::vector<std::size_t> free_indirectors;
+		// END GEN INTROSPECTOR
 
 	public:
 		pool(const std::size_t slot_count = 0u) {
@@ -72,10 +88,10 @@ namespace augs {
 			
 			const std::size_t new_slot_index = size();
 
-			indirector& allocated_indirector = indirectors[next_free_indirector];
+			pool_indirector& allocated_indirector = indirectors[next_free_indirector];
 			allocated_indirector.real_index = new_slot_index;
 
-			metadata allocated_slot;
+			pool_metadata allocated_slot;
 			allocated_slot.pointing_indirector = next_free_indirector;
 
 			id_type allocated_id;
@@ -137,7 +153,7 @@ namespace augs {
 			id_type id;
 
 			for (std::size_t i = 0; i < size(); ++i) {
-				const metadata& s = slots[i];
+				const auto& s = slots[i];
 				id.indirection_index = s.pointing_indirector;
 				id.version = indirectors[s.pointing_indirector].version;
 
@@ -150,7 +166,7 @@ namespace augs {
 			id_type id;
 
 			for (std::size_t i = 0; i < size(); ++i) {
-				const metadata& s = slots[i];
+				const auto& s = slots[i];
 				id.indirection_index = s.pointing_indirector;
 				id.version = indirectors[s.pointing_indirector].version;
 
@@ -163,7 +179,7 @@ namespace augs {
 			id_type id;
 
 			for (std::size_t i = 0; i < size(); ++i) {
-				const metadata& s = slots[i];
+				const auto& s = slots[i];
 				id.indirection_index = s.pointing_indirector;
 				id.version = indirectors[s.pointing_indirector].version;
 
@@ -176,7 +192,7 @@ namespace augs {
 			id_type id;
 
 			for (std::size_t i = 0; i < size(); ++i) {
-				const metadata& s = slots[i];
+				const auto& s = slots[i];
 				id.indirection_index = s.pointing_indirector;
 				id.version = indirectors[s.pointing_indirector].version;
 

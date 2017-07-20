@@ -74,9 +74,7 @@ void regenerate_neon_map(
 	if (should_regenerate) {
 		LOG("Regenerating neon map for %x", source_image_path);
 
-		augs::image source_image;
-		source_image.from_file(source_image_path);
-
+		auto source_image = augs::image(source_image_path);
 		make_neon(new_stamp.input, source_image);
 
 		source_image.save(neon_map_path);
@@ -170,7 +168,7 @@ std::vector<std::vector<double>> generate_gauss_kernel(const neon_map_input& inp
 		radius_towards_y_axis = radius_towards_x_axis;
 	}
 
-	std::vector<std::vector<std::pair<int, int> > > index;
+	std::vector<std::vector<std::pair<int, int>>> index;
 
 	auto max_index_x = radius_towards_x_axis / 2;
 	auto max_index_y = radius_towards_y_axis / 2;
@@ -226,8 +224,7 @@ void resize_image(
 	size.x = image_to_resize.get_columns() + size.x * 2;
 	size.y = image_to_resize.get_rows() + size.y * 2;
 
-	augs::image copy_mat;
-	copy_mat.create(size);
+	auto copy_mat = augs::image(size);
 
 	auto offset_x = static_cast<int>(size.x - image_to_resize.get_columns()) / 2;
 
@@ -317,8 +314,7 @@ void cut_empty_edges(augs::image& source) {
 		return;
 	}
 
-	augs::image copy;
-	copy.create(output_size);
+	auto copy = augs::image(output_size);
 
 	for (size_t x = 0; x < copy.get_columns(); ++x) {
 		for (size_t y = 0; y < copy.get_rows(); ++y) {

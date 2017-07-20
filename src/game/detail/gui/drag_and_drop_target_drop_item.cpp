@@ -53,5 +53,5 @@ void drag_and_drop_target_drop_item::rebuild_layouts(const game_gui_context cont
 	}
 
 	this_id->rc.set_position(context.get_character_gui().get_initial_position_for(*this_id) - vec2(20, 20));
-	this_id->rc.set_size(manager[this_id->mat.tex].get_size() + vec2(40, 40));
+	this_id->rc.set_size(manager.at(this_id->mat.tex).get_size() + vec2(40, 40));
 }

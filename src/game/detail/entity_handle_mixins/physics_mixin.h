@@ -28,11 +28,11 @@ public:
 			const auto& cosm = handle.get_cosmos();
 			const auto sprite = handle.get<components::sprite>();
 
-			const auto image_size = metas[sprite.tex].get_size();
+			const auto image_size = metas.at(sprite.tex).get_size();
 			vec2 scale = sprite.get_size(metas) / image_size;
 
 			components::shape_polygon shape_polygon;
-			shape_polygon.shape = metas[sprite.tex].shape;
+			shape_polygon.shape = metas.at(sprite.tex).shape;
 			shape_polygon.shape.scale(scale);
 			
 			callback_for_created_component(shape_polygon);

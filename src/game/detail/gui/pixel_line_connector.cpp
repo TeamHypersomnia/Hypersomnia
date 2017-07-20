@@ -134,6 +134,6 @@ void draw_pixel_line_connector(
 	const auto& manager = get_assets_manager();
 
 	for (const auto l : get_connecting_pixel_lines(a, b)) {
-		augs::draw_line(in.v, l[0], l[1], 1, manager[assets::game_image_id::BLANK].texture_maps[texture_map_type::DIFFUSE], col);
+		augs::draw_line(in.v, l[0], l[1], 1, manager.at(assets::game_image_id::BLANK).texture_maps[texture_map_type::DIFFUSE], col);
 	}
 }

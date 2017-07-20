@@ -37,8 +37,8 @@ namespace prefabs {
 
 		const auto si = world.get_si();
 
-		const vec2 front_size = metas[assets::game_image_id::TRUCK_FRONT].get_size();
-		const vec2 interior_size = metas[assets::game_image_id::TRUCK_INSIDE].get_size();
+		const vec2 front_size = metas.at(assets::game_image_id::TRUCK_FRONT).get_size();
+		const vec2 interior_size = metas.at(assets::game_image_id::TRUCK_INSIDE).get_size();
 
 		{
 			//auto& sprite = front += components::sprite();
@@ -55,7 +55,7 @@ namespace prefabs {
 			car.acceleration_length = 4500 / 6.2f;
 			car.speed_for_pitch_unit = 2000.f;
 
-			poly.add_vertices_from(metas[assets::game_image_id::TRUCK_FRONT].shape);
+			poly.add_vertices_from(metas.at(assets::game_image_id::TRUCK_FRONT).shape);
 			poly.texture_map = assets::game_image_id::TRUCK_FRONT;
 			//sprite.set(assets::game_image_id::TRUCK_FRONT, world);
 			//sprite.get_size(metas).x = 200;
@@ -196,7 +196,7 @@ namespace prefabs {
 					this_engine_transform = engine_physical.get_logic_transform();
 				}
 
-				const vec2 engine_size = metas[assets::game_image_id::TRUCK_ENGINE].get_size();
+				const vec2 engine_size = metas.at(assets::game_image_id::TRUCK_ENGINE).get_size();
 
 				{
 					particles_existence_input input;

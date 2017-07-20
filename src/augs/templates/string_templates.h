@@ -123,5 +123,10 @@ auto to_uppercase(S s) {
 template <class S>
 auto format_field_name(S s) {
 	s[0] = ::toupper(s[0]);
-	return str_ops(s).multi_replace_all( { "_", "." }, " ").subject;
+	return str_ops(s).multi_replace_all({ "_", "." }, " ").subject;
+}
+
+template <class Enum>
+auto format_enum(const Enum e) {
+	return format_field_name(to_lowercase(std::string(augs::enum_to_string(e))));
 }

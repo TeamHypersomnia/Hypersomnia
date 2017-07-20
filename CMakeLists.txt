@@ -153,16 +153,11 @@ set(HYPERSOMNIA_TEST_SCENES_SRCS
 
 set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/application/config_lua_table.cpp"
-	"src/application/content_generation/desaturations.cpp"
-	"src/application/content_generation/buttons_with_corners.cpp"
-	"src/application/content_generation/scripted_images.cpp"
-	"src/application/content_generation/neon_maps.cpp"
-	"src/application/content_generation/texture_atlases.cpp"
-	"src/application/setups/choreographic_setup.cpp"
-	"src/application/setups/director_setup.cpp"
-	"src/application/setups/menu_setup.cpp"
-	"src/application/menu_ui/menu_ui_root.cpp"
-	"src/application/menu_ui/option_button.cpp"
+	"src/application/content_regeneration/desaturations.cpp"
+	"src/application/content_regeneration/buttons_with_corners.cpp"
+	"src/application/content_regeneration/scripted_images.cpp"
+	"src/application/content_regeneration/neon_maps.cpp"
+	"src/application/content_regeneration/texture_atlases.cpp"
 	"src/augs/graphics/texture.cpp"
 	"src/augs/gui/button_corners.cpp"
 	"src/augs/al_log.cpp"
@@ -196,8 +191,6 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/augs/network/network_server.cpp"
 	"src/augs/network/enet_raii.cpp"
 	"src/augs/network/reliable_channel.cpp"
-	"src/application/setups/client_setup.cpp"
-	"src/application/setups/determinism_test_setup.cpp"
 	"src/augs/texture_atlas/texture_atlas_entry.cpp"
 	"src/augs/window_framework/translate_windows_enums.cpp"
 	"src/game/assets/animation.cpp"
@@ -280,9 +273,7 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/game/transcendental/cosmic_entropy.cpp"
 	"src/game/components/processing_component.cpp"
 	"src/game/transcendental/cosmic_movie_director.cpp"
-	"src/game/transcendental/cosmic_profiler.cpp"
 	"src/game/detail/convex_partitioned_shape.cpp"
-	"src/application/game_window.cpp"
 	"src/game/transcendental/cosmic_step.cpp"
 	"src/game/transcendental/data_living_one_step.cpp"
 	"src/game/transcendental/entity_handle.cpp"
@@ -290,7 +281,6 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/augs/gui/appearance_detector.cpp"
 	"src/augs/misc/delta.cpp"
 	"src/augs/misc/stepped_timing.cpp"
-	"src/augs/misc/measurements.cpp"
 	"src/augs/templates/templates.cpp"
 	"src/augs/window_framework/colored_print.cpp"
 	"src/augs/window_framework/platform_utils.cpp"
@@ -346,19 +336,24 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/game/systems_stateless/sentience_system.cpp"
 	"src/game/systems_stateless/trace_system.cpp"
 	"src/game/systems_stateless/visibility_system.cpp"
-	"src/application/setups/local_setup.cpp"
 	"src/game/view/rendering_scripts/draw_circular_bars.cpp"
 	"src/game/view/rendering_scripts/draw_cast_spells_highlights.cpp"
 	"src/game/view/rendering_scripts/draw_crosshair_lasers.cpp"
 	"src/game/view/rendering_scripts/draw_hud_for_released_explosives.cpp"
 	"src/game/view/rendering_scripts/illuminated_rendering.cpp"
-	"src/game/view/rendering_scripts/standard_rendering.cpp"
-	"src/game/view/standard_audiovisual_post_solve.cpp"
+#	"src/game/view/rendering_scripts/standard_rendering.cpp"
 	"src/game/view/viewing_session.cpp"
 	"src/game/view/viewing_step.cpp"
 	"src/game/view/world_camera.cpp"
-	"src/application/setups/server_setup.cpp"
-	"src/application/setups/setup_base.cpp"
+#	"src/application/setups/server_setup.cpp" #
+#	"src/application/setups/setup_base.cpp" #
+#	"src/application/setups/two_clients_and_server_setup.cpp" #
+	"src/application/setups/local_setup.cpp"
+#	"src/application/setups/choreographic_setup.cpp" #
+#	"src/application/setups/director_setup.cpp" #
+	"src/application/setups/menu_setup.cpp"
+#	"src/application/setups/client_setup.cpp" #
+#	"src/application/setups/determinism_test_setup.cpp" #
 	"src/application/web_daemon/session_report.cpp"
 	"src/augs/global_libraries.cpp"
 	"src/augs/graphics/fbo.cpp"
@@ -387,7 +382,6 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/augs/log.cpp"
 	"src/augs/window_framework/event.cpp"
 	"src/augs/window_framework/window.cpp"
-	"src/application/setups/two_clients_and_server_setup.cpp"
 	"src/augs/graphics/OpenGL_error.cpp"
 	"src/augs/audio/sound_data.cpp"
 	"src/augs/audio/sound_samples_from_file.cpp"
@@ -413,6 +407,8 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/game/assets/recoil_player.cpp"
 	"src/augs/gui/bbcode.cpp"
 	"src/augs/unit_tests.cpp"
+	"src/game/transcendental/profiling.cpp"
+	"src/game/view/audiovisual_state.cpp"
 )
 
 # natvis files for easier debugging in Visual Studio.

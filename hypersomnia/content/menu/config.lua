@@ -1,13 +1,15 @@
 return {
-  drawing_settings = {
+  drawing = {
     draw_character_gui = false,
     draw_crosshairs = false,
     draw_weapon_laser = false
   },
 
-  sound_effects_volume = 0.3,
+  audio_volume = {
+    sound_effects = 0.3
+  },
 
-  camera_settings = {
+  camera = {
   	averages_per_sec = 12
   }
 }

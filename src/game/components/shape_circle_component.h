@@ -24,11 +24,11 @@ public:
 	using component_synchronizer_base<is_const, components::shape_circle>::component_synchronizer_base;
 
 	auto get_radius() const {
-		return get_data().radius;
+		return get_raw_component().radius;
 	}
 
 	bool is_activated() const {
-		return get_data().activated;
+		return get_raw_component().activated;
 	}
 };
 
@@ -41,11 +41,11 @@ public:
 	using basic_shape_circle_synchronizer<false>::basic_shape_circle_synchronizer;
 
 	void set_activated(const bool flag) const {
-		if (flag == get_data().activated) {
+		if (flag == get_raw_component().activated) {
 			return;
 		}
 
-		get_data().activated = flag;
+		get_raw_component().activated = flag;
 		reinference();
 	}
 };

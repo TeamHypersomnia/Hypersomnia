@@ -1,4 +1,4 @@
-#version 330
+#version 410
 layout(location = 0) in vec2 position;
 
 out vec2 theTexcoord;

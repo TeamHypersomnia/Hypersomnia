@@ -1,5 +1,6 @@
 #pragma once
 #include <type_traits>
+#include "augs/templates/maybe_const.h"
 
 namespace augs {
 	template <class T, class A, class B>
@@ -10,8 +11,8 @@ namespace augs {
 			*reinterpret_cast<maybe_const_ptr_t<C, std::remove_const_t<T>>>(
 				reinterpret_cast<maybe_const_ptr_t<C, char>>(&b)
 				+ (
-					reinterpret_cast<const char*>(&field_of_a)
-					- reinterpret_cast<const char*>(&a)
+					reinterpret_cast<const std::byte*>(&field_of_a)
+					- reinterpret_cast<const std::byte*>(&a)
 				)
 			)
 		;

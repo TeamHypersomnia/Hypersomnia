@@ -155,7 +155,8 @@ std::vector<misprediction_candidate_entry> simulation_receiver::acquire_potentia
 }
 
 void simulation_receiver::drag_mispredictions_into_past(
-	interpolation_system& interp, 
+	const simulation_receiver_settings& settings,
+	interpolation_system& interp,
 	past_infection_system& past, 
 	const cosmos& predicted_cosmos, 
 	const std::vector<misprediction_candidate_entry>& mispredictions
@@ -181,12 +182,12 @@ void simulation_receiver::drag_mispredictions_into_past(
 		const float num_predicted_steps = static_cast<float>(predicted_step_entropies.size());
 
 		if (!shouldnt_smooth && (reconciliated_transform.pos - e.transform.pos).length_sq() > 1.f) {
-			interp_data.positional_slowdown_multiplier = std::max(1.f, misprediction_smoothing_multiplier * num_predicted_steps);
+			interp_data.positional_slowdown_multiplier = std::max(1.f, settings.misprediction_smoothing_multiplier * num_predicted_steps);
 			misprediction_detected = true;
 		}
 
 		if (should_smooth_rotation && std::abs(reconciliated_transform.rotation - e.transform.rotation) > 1.f) {
-			interp_data.rotational_slowdown_multiplier = std::max(1.f, misprediction_smoothing_multiplier * num_predicted_steps);
+			interp_data.rotational_slowdown_multiplier = std::max(1.f, settings.misprediction_smoothing_multiplier * num_predicted_steps);
 			misprediction_detected = true;
 		}
 

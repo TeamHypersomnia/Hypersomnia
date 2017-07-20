@@ -46,7 +46,7 @@ void particles_existence_input::create_particle_effect_components(
 	out_existence.time_of_last_displacement = cosmos.get_timestamp();
 	out_existence.current_displacement_duration_bound_ms = 0;
 
-	const float duration_in_seconds = step.input.metas_of_assets[effect.id].max_duration_in_seconds;
+	const float duration_in_seconds = step.input.metas_of_assets.at(effect.id).max_duration_in_seconds;
 	out_existence.max_lifetime_in_steps = static_cast<unsigned>(duration_in_seconds / cosmos.get_fixed_delta().in_seconds()) + 1u;
 
 	const auto chased_subject = cosmos[chased_subject_id];

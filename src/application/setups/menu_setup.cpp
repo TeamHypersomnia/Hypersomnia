@@ -1,8 +1,10 @@
+#if 0
+
 #include <thread>
 #include <mutex>
 #include <array>
 #include "augs/global_libraries.h"
-#include "application/game_window.h"
+#include "augs/window_framework/window.h"
 
 #include "game/assets/assets_manager.h"
 
@@ -46,7 +48,7 @@
 
 #include "application/setups/local_setup.h"
 
-using namespace augs::window::event::keys;
+using namespace augs::event::keys;
 using namespace augs::gui::text;
 using namespace augs::gui;
 
@@ -119,28 +121,23 @@ void menu_setup::process(
 	});
 
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
-	timer.set_stepping_speed_multiplier(session.config.recording_replay_speed);
+	timer.set_stepping_speed_multiplier(1.f);
 
 	// TODO: actually load a cosmos with its resources from a file/folder
 	const bool is_intro_scene_available = session.config.menu_intro_scene_cosmos_path.size() > 0;
 
 	if (is_intro_scene_available) {
-		intro_scene.set_fixed_delta(session.config.default_tickrate);
-
 		test_scenes::testbed().populate_world_with_entities(
 			intro_scene,
 			metas_of_assets,
 			session.get_standard_post_solve()
 		);
 	}
-	else {
-		intro_scene.set_fixed_delta(session.config.default_tickrate);
-	}
 
 	const auto character_in_focus = is_intro_scene_available ?
 		intro_scene.get_entity_by_name(L"player0")
 		: intro_scene[entity_id()]
-		;
+	;
 
 	const auto title_size = metas_of_assets[assets::game_image_id::MENU_GAME_LOGO].get_size();
 
@@ -165,15 +162,15 @@ void menu_setup::process(
 		m.hover_highlight_duration_ms = 300.f;
 	}
 
-	menu_ui_root.menu_buttons[menu_button_type::CONNECT_TO_OFFICIAL_UNIVERSE].set_appearing_caption(format(L"Login to official universe", textes_style));
-	menu_ui_root.menu_buttons[menu_button_type::BROWSE_UNOFFICIAL_UNIVERSES].set_appearing_caption(format(L"Browse unofficial universes", textes_style));
-	menu_ui_root.menu_buttons[menu_button_type::HOST_UNIVERSE].set_appearing_caption(format(L"Host universe", textes_style));
-	menu_ui_root.menu_buttons[menu_button_type::CONNECT_TO_UNIVERSE].set_appearing_caption(format(L"Connect to universe", textes_style));
-	menu_ui_root.menu_buttons[menu_button_type::LOCAL_UNIVERSE].set_appearing_caption(format(L"Local universe", textes_style));
-	menu_ui_root.menu_buttons[menu_button_type::EDITOR].set_appearing_caption(format(L"Editor", textes_style));
-	menu_ui_root.menu_buttons[menu_button_type::SETTINGS].set_appearing_caption(format(L"Settings", textes_style));
-	menu_ui_root.menu_buttons[menu_button_type::CREATORS].set_appearing_caption(format(L"Founders", textes_style));
-	menu_ui_root.menu_buttons[menu_button_type::QUIT].set_appearing_caption(format(L"Quit", textes_style));
+	menu_ui_root.menu_buttons[main_menu_button_type::CONNECT_TO_OFFICIAL_UNIVERSE].set_appearing_caption(format(L"Login to official universe", textes_style));
+	menu_ui_root.menu_buttons[main_menu_button_type::BROWSE_UNOFFICIAL_UNIVERSES].set_appearing_caption(format(L"Browse unofficial universes", textes_style));
+	menu_ui_root.menu_buttons[main_menu_button_type::HOST_UNIVERSE].set_appearing_caption(format(L"Host universe", textes_style));
+	menu_ui_root.menu_buttons[main_menu_button_type::CONNECT_TO_UNIVERSE].set_appearing_caption(format(L"Connect to universe", textes_style));
+	menu_ui_root.menu_buttons[main_menu_button_type::LOCAL_UNIVERSE].set_appearing_caption(format(L"Local universe", textes_style));
+	menu_ui_root.menu_buttons[main_menu_button_type::EDITOR].set_appearing_caption(format(L"Editor", textes_style));
+	menu_ui_root.menu_buttons[main_menu_button_type::SETTINGS].set_appearing_caption(format(L"Settings", textes_style));
+	menu_ui_root.menu_buttons[main_menu_button_type::CREATORS].set_appearing_caption(format(L"Founders", textes_style));
+	menu_ui_root.menu_buttons[main_menu_button_type::QUIT].set_appearing_caption(format(L"Quit", textes_style));
 
 	appearing_text credits1;
 	credits1.target_text[0] = format(L"hypernet community presents", textes_style);
@@ -283,22 +280,22 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 
 	augs::action_list credits_actions;
 
-	auto menu_callback = [&](const menu_button_type t){
+	auto menu_callback = [&](const main_menu_button_type t){
 		switch (t) {
 
-		case menu_button_type::QUIT:
+		case main_menu_button_type::QUIT:
 			should_quit = true;
 			break;
 
-		case menu_button_type::SETTINGS:
+		case main_menu_button_type::SETTINGS:
 			session.show_settings = true;
 			ImGui::SetWindowFocus("Settings");
 			break;
 
-		case menu_button_type::CREATORS:
+		case main_menu_button_type::CREATORS:
 			if (credits_actions.is_complete()) {
 				creators = creators_screen();
-				creators.setup(textes_style, style(assets::font_id::GUI_FONT, { 0, 180, 255, 255 }), window.window.get_screen_size());
+				creators.setup(textes_style, style(assets::font_id::GUI_FONT, { 0, 180, 255, 255 }), window.get_screen_size());
 
 				credits_actions.push_blocking(act(new augs::tween_value_action<rgba_channel>(fade_overlay_color.a, 170, 500.f)));
 				creators.push_into(credits_actions);
@@ -306,7 +303,7 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 			}
 			break;
 
-		case menu_button_type::LOCAL_UNIVERSE:
+		case main_menu_button_type::LOCAL_UNIVERSE:
 		{
 			auto setup = std::make_unique<local_setup>();
 			setup->process(window, session);
@@ -334,9 +331,11 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 	}
 
 	while (!should_quit) {
-		sync_config_back(session.config, window.window);
+		sync_config_back(session.config, window);
 		
-		const auto screen_size = window.window.get_screen_size();
+		DEBUG_DRAWING = session.config.debug_drawing;
+
+		const auto screen_size = window.get_screen_size();
 		augs::renderer::get_current().resize_fbos(screen_size);
 		session.set_screen_size(screen_size);
 		title_rect.set_position({ screen_size.x / 2.f - title_size.x / 2.f, 50.f });
@@ -346,13 +345,14 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 
 		augs::machine_entropy new_machine_entropy;
 
-		session.local_entropy_profiler.new_measurement();
-		new_machine_entropy.local = window.collect_entropy(session.config.enable_cursor_clipping);
-		session.local_entropy_profiler.end_measurement();
+		{
+			auto scope = measure_scope(get_profiler().local_entropy);
+			new_machine_entropy.local = window.collect_entropy();
+		}
 		
 		if (draw_menu_gui) {
 			session.perform_imgui_pass(
-				window.window,
+				window,
 				new_machine_entropy.local,
 				session.imgui_timer.extract<std::chrono::milliseconds>()
 			);
@@ -362,7 +362,7 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 
 		{
 			auto translated = session.config.controls.translate(new_machine_entropy.local);
-			session.control_open_developer_console(translated.intents);
+			session.fetch_developer_console_intents(translated.intents);
 		}
 
 		auto steps = timer.count_logic_steps_to_perform(intro_scene.get_fixed_delta());
@@ -388,10 +388,8 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 		augs::read(menu_config_patch, session.config);
 		
 		// treat as multiplier
-		session.config.sound_effects_volume *= saved_config.sound_effects_volume;
-
-		session.set_master_gain(session.config.sound_effects_volume * gain_fade_multiplier);
-		menu_theme_source.set_gain(session.config.music_volume * gain_fade_multiplier);
+		session.config.audio_volume.sound_effects *= saved_config.audio_volume.sound_effects;
+		menu_theme_source.set_gain(session.config.audio_volume.music * gain_fade_multiplier);
 
 		thread_local visible_entities all_visible;
 		session.get_visible_entities(all_visible, intro_scene);
@@ -490,10 +488,10 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 
 			menu_ui_rect_world::gui_entropy gui_entropies;
 
-			menu_ui_rect_tree menu_ui_tree;
+			menu_ui_context::tree_type menu_ui_tree;
 			menu_ui_context menu_ui_context(session.config, menu_ui_rect_world, menu_ui_tree, menu_ui_root);
 
-			menu_ui_rect_world.build_tree_data_into_context(menu_ui_context, menu_ui_root_id);
+			menu_ui_rect_world.build_tree_data_into(menu_ui_context, menu_ui_root_id);
 
 			vec2i cursor_drawing_pos;
 
@@ -526,7 +524,7 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 
 			for (size_t i = 0; i < menu_ui_root.menu_buttons.size(); ++i) {
 				if (menu_ui_root.menu_buttons[i].click_callback_required) {
-					menu_callback(static_cast<menu_button_type>(i));
+					menu_callback(static_cast<main_menu_button_type>(i));
 					menu_ui_root.menu_buttons[i].click_callback_required = false;
 				}
 			}
@@ -534,7 +532,7 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 			renderer.call_triangles();
 			renderer.clear_triangles();
 
-		renderer.draw_imgui(get_assets_manager());
+		renderer.draw_call_imgui(get_assets_manager());
 		
 		if (draw_menu_gui) {
 			const auto gui_cursor_color = white;
@@ -569,3 +567,4 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 
 	latest_news_query.detach();
 }
+#endif

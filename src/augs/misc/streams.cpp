@@ -6,9 +6,9 @@ namespace augs {
 		ar.write(storage);
 	}
 
-	void stream::read(char* data, const size_t bytes) {
+	void stream::read(std::byte* data, const size_t bytes) {
 		if (!has_read_failed && read_pos + bytes <= size()) {
-			memcpy(data, buf.data() + read_pos, bytes);
+			std::memcpy(data, buf.data() + read_pos, bytes);
 			read_pos += bytes;
 		}
 		else {
@@ -46,19 +46,19 @@ namespace augs {
 		return !operator==(b);
 	}
 
-	char* stream::data() {
+	std::byte* stream::data() {
 		return buf.data();
 	}
 
-	const char* stream::data() const {
+	const std::byte* stream::data() const {
 		return buf.data();
 	}
 
-	char& stream::operator[](const size_t idx) {
+	std::byte& stream::operator[](const size_t idx) {
 		return data()[idx];
 	}
 
-	const char& stream::operator[](const size_t idx) const {
+	const std::byte& stream::operator[](const size_t idx) const {
 		return data()[idx];
 	}
 	
@@ -70,12 +70,17 @@ namespace augs {
 		return buf.size();
 	}
 
-	void stream::write(const char* const data, const size_t bytes) {
+	void stream::write(const std::byte* const data, const size_t bytes) {
+#if 0
+		if (write_pos + bytes >= 2663) {
+			__debugbreak();
+		}
+#endif
 		if (write_pos + bytes > capacity()) {
 			reserve((write_pos + bytes) * 2);
 		}
 
-		memcpy(buf.data() + write_pos, data, bytes);
+		std::memcpy(buf.data() + write_pos, data, bytes);
 		write_pos += bytes;
 	}
 
@@ -83,7 +88,7 @@ namespace augs {
 		write(s.data(), s.size());
 	}
 
-	void output_stream_reserver::write(const char* const, const size_t bytes) {
+	void output_stream_reserver::write(const std::byte* const, const size_t bytes) {
 		write_pos += bytes;
 	}
 

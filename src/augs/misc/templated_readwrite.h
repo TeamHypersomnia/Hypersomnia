@@ -8,6 +8,7 @@
 #include "augs/templates/introspect.h"
 #include "augs/templates/container_traits.h"
 #include "augs/templates/recursive.h"
+#include "augs/templates/byte_type_for.h"
 
 namespace augs {
 	class output_stream_reserver;
@@ -80,7 +81,9 @@ namespace augs {
 		const std::size_t object_count
 	) {
 		verify_byte_io_safety<Archive, Serialized>();
-		ar.read(reinterpret_cast<char*>(location), object_count * sizeof(Serialized));
+
+		const auto byte_count = object_count * sizeof(Serialized);
+		ar.read(reinterpret_cast<byte_type_for_t<Archive>*>(location), byte_count);
 	}
 
 	template<class Archive, class Serialized>
@@ -90,7 +93,9 @@ namespace augs {
 		const std::size_t object_count
 	) {
 		verify_byte_io_safety<Archive, Serialized>();
-		ar.write(reinterpret_cast<const char*>(location), object_count * sizeof(Serialized));
+		
+		const auto byte_count = object_count * sizeof(Serialized);
+		ar.write(reinterpret_cast<const byte_type_for_t<Archive>*>(location), byte_count);
 	}
 
 	template<class Archive, class Serialized>
@@ -275,11 +280,11 @@ namespace augs {
 	void read_flags(Archive& ar, std::array<bool, count>& storage) {
 		static_assert(count > 0, "Can't read a null array");
 
-		std::array<char, (count - 1) / 8 + 1> compressed_storage;
+		std::array<std::byte, (count - 1) / 8 + 1> compressed_storage;
 		read(ar, compressed_storage);
 
 		for (std::size_t bit = 0; bit < count; ++bit) {
-			storage[bit] = (compressed_storage[bit / 8] >> (bit % 8)) & 1;
+			storage[bit] = std::to_integer<int>((compressed_storage[bit / 8] >> (bit % 8)) & static_cast<std::byte>(1)) != 0;
 		}
 	}
 
@@ -287,12 +292,12 @@ namespace augs {
 	void write_flags(Archive& ar, const std::array<bool, count>& storage) {
 		static_assert(count > 0, "Can't write a null array");
 
-		std::array<char, (count - 1) / 8 + 1> compressed_storage;
-		std::fill(compressed_storage.begin(), compressed_storage.end(), 0);
+		std::array<std::byte, (count - 1) / 8 + 1> compressed_storage;
+		std::fill(compressed_storage.begin(), compressed_storage.end(), static_cast<std::byte>(0));
 
 		for (std::size_t bit = 0; bit < count; ++bit) {
 			if (storage[bit]) {
-				compressed_storage[bit / 8] |= 1 << (bit % 8);
+				compressed_storage[bit / 8] |= static_cast<std::byte>(1 << (bit % 8));
 			}
 		}
 

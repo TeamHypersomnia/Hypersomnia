@@ -1,16 +1,16 @@
 #pragma once
 #include <tuple>
-#include "application/content_generation/texture_atlases.h"
+#include "application/content_regeneration/texture_atlases.h"
 #include "game/assets/game_image_structs.h"
 
-class config_lua_table;
+struct content_regeneration_settings;
 class assets_manager;
 class cosmos;
 struct cosmos_global_state;
 
-void load_all_requisite(const config_lua_table&);
+void load_all_requisite(assets_manager&, const content_regeneration_settings&);
 void load_requisite_animations(assets_manager&);
-void load_requisite_atlases(assets_manager&, const config_lua_table&);
+void load_requisite_atlases(assets_manager&);
 void load_requisite_shaders(assets_manager&);
 void load_requisite_sound_buffers(assets_manager&);
 

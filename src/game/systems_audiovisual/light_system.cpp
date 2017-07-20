@@ -14,7 +14,6 @@
 #include "game/systems_stateless/visibility_system.h"
 #include "game/systems_stateless/render_system.h"
 
-#include "augs/graphics/OpenGL_includes.h"
 #include "game/enums/filters.h"
 
 void light_system::reserve_caches_for_entities(const size_t n) {
@@ -62,32 +61,32 @@ void light_system::render_all_lights(
 
 	ensure_eq(0, output.get_triangle_count());
 
-	output.light_fbo.use();
-	glClearColor(0.1f, 0.2f, 0.2f, 1.0f);
+	output.light_fbo.value().set_as_current();
+	output.set_clear_color({ 25, 51, 51, 255 });
 	output.clear_current_fbo();
-	glClearColor(0.f, 0.f, 0.f, 0.f);
+	output.set_clear_color({ 0, 0, 0, 0 });
 
 	const auto& manager = get_assets_manager();
 
-	const auto& light_program = manager[assets::program_id::LIGHT];
-	const auto& default_program = manager[assets::program_id::DEFAULT];
+	const auto& light_program = manager.at(assets::shader_program_id::LIGHT);
+	const auto& default_program = manager.at(assets::shader_program_id::DEFAULT);
 
-	light_program.use();
+	light_program.set_as_current();
 
-	const auto light_pos_uniform = glGetUniformLocation(light_program.id, "light_pos");
-	const auto light_max_distance_uniform = glGetUniformLocation(light_program.id, "max_distance");
-	const auto light_attenuation_uniform = glGetUniformLocation(light_program.id, "light_attenuation");
-	const auto light_multiply_color_uniform = glGetUniformLocation(light_program.id, "multiply_color");
-	const auto projection_matrix_uniform = glGetUniformLocation(light_program.id, "projection_matrix");
-	const auto& interp = step.session.systems_audiovisual.get<interpolation_system>();
-	const auto& particles = step.session.systems_audiovisual.get<particles_simulation_system>();
+	const auto light_pos_uniform = light_program.get_uniform_location("light_pos");
+	const auto light_max_distance_uniform = light_program.get_uniform_location("max_distance");
+	const auto light_attenuation_uniform = light_program.get_uniform_location("light_attenuation");
+	const auto light_multiply_color_uniform = light_program.get_uniform_location("multiply_color");
+	const auto projection_matrix_uniform = light_program.get_uniform_location("projection_matrix");
+	const auto& interp = step.audiovisuals.get<interpolation_system>();
+	const auto& particles = step.audiovisuals.get<particles_simulation_system>();
 	
 	const auto& visible_per_layer = step.visible.per_layer;
 
 	std::vector<messages::visibility_information_request> requests;
 	std::vector<messages::visibility_information_response> responses;
 
-	glUniformMatrix4fv(projection_matrix_uniform, 1, GL_FALSE, projection_matrix.data());
+	light_program.set_projection(projection_matrix);
 
 	cosmos.for_each(
 		processing_subjects::WITH_LIGHT,
@@ -111,7 +110,8 @@ void light_system::render_all_lights(
 		visibility_system().respond_to_visibility_information_requests(cosmos, {}, requests, dummy, responses);
 	}
 
-	glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE, GL_ONE, GL_ONE); glerr;
+	output.set_additive_blending();
+
 	for (size_t i = 0; i < responses.size(); ++i) {
 		const auto& r = responses[i];
 		const auto& light_entity = cosmos[requests[i].subject];
@@ -173,51 +173,55 @@ void light_system::render_all_lights(
 
 		const auto light_frag_pos = step.camera.get_screen_space_revert_y(world_light_pos);
 
-		glUniform2f(light_pos_uniform, light_frag_pos.x, light_frag_pos.y);
-
-		glUniform1f(light_max_distance_uniform, light.max_distance.base_value);
+		light_program.set_uniform(light_pos_uniform, light_frag_pos);
+		light_program.set_uniform(light_max_distance_uniform, light.max_distance.base_value);
 		
-		glUniform3f(light_attenuation_uniform,
-			cache.all_variation_values[0] + light.constant.base_value,
-			cache.all_variation_values[1] + light.linear.base_value,
-			cache.all_variation_values[2] + light.quadratic.base_value
+		light_program.set_uniform(
+			light_attenuation_uniform,
+			vec3 {
+				cache.all_variation_values[0] + light.constant.base_value,
+				cache.all_variation_values[1] + light.linear.base_value,
+				cache.all_variation_values[2] + light.quadratic.base_value
+			}
 		);
-
-		glUniform3f(light_multiply_color_uniform,
-			1.f,
-			1.f,
-			1.f);
+		
+		light_program.set_uniform(
+			light_multiply_color_uniform,
+			white.rgb()
+		);
 
 		output.call_triangles();
 		output.clear_triangles();
 		
-		light_program.use();
+		light_program.set_as_current();
 
-		glUniform1f(light_max_distance_uniform, light.wall_max_distance.base_value);
+		light_program.set_uniform(light_max_distance_uniform, light.wall_max_distance.base_value);
 		
-		glUniform3f(light_attenuation_uniform,
-			cache.all_variation_values[3] + light.wall_constant.base_value,
-			cache.all_variation_values[4] + light.wall_linear.base_value,
-			cache.all_variation_values[5] + light.wall_quadratic.base_value
+		light_program.set_uniform(light_attenuation_uniform,
+			vec3 {
+				cache.all_variation_values[3] + light.wall_constant.base_value,
+				cache.all_variation_values[4] + light.wall_linear.base_value,
+				cache.all_variation_values[5] + light.wall_quadratic.base_value
+			}
 		);
 		
-		glUniform3f(light_multiply_color_uniform,
-			light.color.r/255.f,
-			light.color.g/255.f,
-			light.color.b/255.f);
+		light_program.set_uniform(
+			light_multiply_color_uniform,
+			light.color.rgb()
+		);
 		
 		render_system().draw_entities(interp, global_time_seconds, output.triangles, cosmos, visible_per_layer[render_layer::DYNAMIC_BODY], step.camera, renderable_drawing_type::NORMAL);
 
 		output.call_triangles();
 		output.clear_triangles();
 
-		glUniform3f(light_multiply_color_uniform,
-			1.f,
-			1.f,
-			1.f);
+		light_program.set_uniform(
+			light_multiply_color_uniform,
+			white.rgb()
+		);
 	}
 
-	default_program.use();
+	default_program.set_as_current();
 
 	render_system().draw_entities(interp, global_time_seconds, output.triangles, cosmos, visible_per_layer[render_layer::DYNAMIC_BODY], step.camera, renderable_drawing_type::NEON_MAPS);
 	render_system().draw_entities(interp, global_time_seconds, output.triangles, cosmos, visible_per_layer[render_layer::SMALL_DYNAMIC_BODY], step.camera, renderable_drawing_type::NEON_MAPS);
@@ -242,11 +246,11 @@ void light_system::render_all_lights(
 	output.call_triangles();
 	output.clear_triangles();
 
-	glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE); glerr;
+	output.set_standard_blending();
 
-	augs::graphics::fbo::use_default();
+	augs::graphics::fbo::set_current_to_none();
 
 	output.set_active_texture(2);
-	output.bind_texture(output.light_fbo);
+	output.light_fbo.value().get_texture().bind();
 	output.set_active_texture(0);
 }

@@ -18,7 +18,7 @@ namespace components {
 		ltrbi visible_tiles;
 		const auto visible_aabb = in.camera.get_transformed_visible_world_area_aabb();
 		const auto& manager = get_assets_manager();
-		const auto& layer = manager[id];
+		const auto& layer = manager.at(id);
 		const auto tile_square_size = layer.get_tile_side(manager);
 
 		visible_tiles.l = static_cast<int>((visible_aabb.l - in.renderable_transform.pos.x) / tile_square_size);
@@ -39,7 +39,7 @@ namespace components {
 		const auto& manager = get_assets_manager();
 
 		const auto visible_aabb = in.camera.get_transformed_visible_world_area_aabb();
-		const auto& layer = manager[id];
+		const auto& layer = manager.at(id);
 		const auto tile_square_size = layer.get_tile_side(manager);
 		const auto size = layer.get_size();
 

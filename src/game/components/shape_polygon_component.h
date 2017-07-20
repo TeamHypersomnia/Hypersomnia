@@ -29,7 +29,7 @@ public:
 	using component_synchronizer_base<is_const, components::shape_polygon>::component_synchronizer_base;
 
 	bool is_activated() const {
-		return get_data().activated;
+		return get_raw_component().activated;
 	}
 };
 
@@ -44,15 +44,15 @@ public:
 	convex_poly_destruction_data& get_modifiable_destruction_data(
 		const b2Fixture_index_in_component indices
 	) const {
-		return get_data().destruction[indices.convex_shape_index];
+		return get_raw_component().destruction[indices.convex_shape_index];
 	}
 
 	void set_activated(const bool flag) const {
-		if (flag == get_data().activated) {
+		if (flag == get_raw_component().activated) {
 			return;
 		}
 
-		get_data().activated = flag;
+		get_raw_component().activated = flag;
 		reinference();
 	}
 };

@@ -1,5 +1,6 @@
 #pragma once
 #include "augs/math/vec2.h"
+#include "augs/misc/machine_entropy.h"
 #include "augs/templates/string_templates.h"
 #include "augs/templates/maybe_const.h"
 #include "augs/templates/corresponding_field.h"
@@ -105,7 +106,7 @@ namespace augs {
 
 					concatenate(
 						combo_names, 
-						format_field_name(to_lowercase(std::string(enum_to_string(e))))
+						format_enum(e)
 					);
 
 					combo_names.push_back('\0');
@@ -145,6 +146,72 @@ namespace augs {
 				return changed;
 			};
 		}
+	}
+
+	template <class game_image_id>
+	game_image_id get_imgui_cursor() {
+		auto gui_cursor = game_image_id::GUI_CURSOR;
+
+		if (ImGui::IsAnyItemHoveredWithHandCursor()) {
+			gui_cursor = game_image_id::GUI_CURSOR_HOVER;
+		}
+
+		if (ImGui::GetMouseCursor() == ImGuiMouseCursor_ResizeNWSE) {
+			gui_cursor = game_image_id::GUI_CURSOR_RESIZE_NWSE;
+		}
+
+		if (ImGui::GetMouseCursor() == ImGuiMouseCursor_TextInput) {
+			gui_cursor = game_image_id::GUI_CURSOR_TEXT_INPUT;
+		}
+
+		return gui_cursor;
+	}
+
+	inline auto filter_inputs_for_imgui(augs::machine_entropy::local_type local) {
+		const bool filter_mouse = ImGui::GetIO().WantCaptureMouse;
+		const bool filter_keyboard = ImGui::GetIO().WantTextInput;
+
+		erase_if(local, [filter_mouse, filter_keyboard](const augs::event::change ch) {
+			bool should_filter = false;
+
+			if (filter_mouse && ch.uses_mouse()) {
+				should_filter = true;
+			}
+
+			if (filter_keyboard && ch.uses_keyboard()) {
+				should_filter = true;
+			}
+
+			return should_filter;
+		});
+
+		return local;
+	}
+
+	template <class C, class G>
+	void sync_with_imgui(C& context, G& output_entropies) {
+		auto& world = context.get_rect_world();
+
+		if (ImGui::GetIO().WantCaptureMouse) {
+			world.unhover_and_undrag(context, output_entropies);
+		}
+	}
+
+	template <class C>
+	auto consume_inputs_with_imgui_sync(
+		C& context,
+		const augs::machine_entropy::local_type& local
+	) {
+		auto& world = context.get_rect_world();
+		std::decay_t<decltype(world)>::gui_entropy gui_entropies;
+
+		sync_with_imgui(context, gui_entropies);
+
+		for (const auto& ch : local) {
+			world.consume_raw_input_and_generate_gui_events(context, ch, gui_entropies);
+		}
+
+		return gui_entropies;
 	}
 }
 

@@ -12,129 +12,82 @@
 #include "colored_print.h"
 #include "augs/audio/audio_structs.h"
 #include "augs/templates/settable_as_current_mixin.h"
+#include "augs/window_framework/window_settings.h"
 
 namespace augs {
-	namespace window {
+	// extern LRESULT CALLBACK wndproc(HWND, UINT, WPARAM, LPARAM);
+	class window : public augs::settable_as_current_mixin<window> {
 #ifdef PLATFORM_WINDOWS
-    extern LRESULT CALLBACK wndproc(HWND, UINT, WPARAM, LPARAM);
+		friend int WINAPI::WinMain(HINSTANCE, HINSTANCE, LPSTR, int);
+		friend LRESULT CALLBACK wndproc(HWND, UINT, WPARAM, LPARAM);
 
-		class glwindow : public augs::settable_as_current_mixin<glwindow> {
-			friend int WINAPI ::WinMain (HINSTANCE, HINSTANCE, LPSTR, int);
-			friend LRESULT CALLBACK wndproc(HWND, UINT, WPARAM, LPARAM);
+		static bool window_class_registered;
 
-			static glwindow* context;
-			static bool window_class_registered;
+		HWND hwnd = nullptr;
+		HDC hdc = nullptr;
+		HGLRC hglrc = nullptr;
+		MSG wmsg;
+		
+		window_settings current_settings;
 
-			HWND hwnd = nullptr;
-			HDC hdc = nullptr;
-			HGLRC hglrc = nullptr;
-			MSG wmsg;
+		vec2i last_mouse_pos;
 
-			event::change latest_change;
-			vec2i last_mouse_pos;
+		vec2i min_window_size;
+		vec2i max_window_size;
 
-			vec2i min_window_size;
-			vec2i max_window_size;
+		int style = 0xdeadbeef;
+		int exstyle = 0xdeadbeef;
 
-			int style = 0xdeadbeef;
-			int exstyle = 0xdeadbeef;
-			
-			bool active = false;
-			
-			timer triple_timer;
-			bool doubled = false;
+		bool active = false;
+		bool double_click_occured = false;
+		bool clear_window_inputs_once = true;
+		bool raw_mouse_input = true;
 
-			bool raw_mouse_input = true;
-			unsigned triple_click_delay = 0xdeadbeef; /* maximum delay time for the next click (after doubleclick) to be considered tripleclick (in milliseconds) */
-			
-			void _poll(UINT&, WPARAM, LPARAM);
-			bool poll_event(UINT& out);
+		bool frozen = false;
 
-			friend class augs::settable_as_current_mixin<glwindow>;
-			bool set_as_current_impl();
-		public:
-			glwindow();
-			~glwindow();
+		timer triple_click_timer;
+		unsigned triple_click_delay = 0xdeadbeef; /* maximum delay time for the next click (after doubleclick) to be considered tripleclick (in milliseconds) */
 
-			void create(
-				const int bitsperpixel = 24
-			);
+		std::optional<event::change> handle_event(
+			const UINT, 
+			const WPARAM, 
+			const LPARAM
+		);
 
-			void set_window_name(const std::string& name);
-			void set_window_border_enabled(bool);
-			
-			bool swap_buffers();
-
-			void show();
-
-			void destroy();
-
-			std::vector<event::change> poll_events(const bool should_clip_cursor = true);
-
-			void set_window_rect(const xywhi);
-			vec2i get_screen_size() const;
-			xywhi get_window_rect() const;
-
-			bool is_active() const;
-			
-			glwindow(const glwindow&) = delete;
-			glwindow(glwindow&&) = delete;
-			glwindow& operator=(const glwindow&) = delete;
-		};
+		friend class settable_as_current_base;
+		bool set_as_current_impl();
+		static void set_current_to_none_impl();
 #elif PLATFORM_LINUX
-		// extern LRESULT CALLBACK wndproc(HWND, UINT, WPARAM, LPARAM);
 
-		class glwindow {
-			// friend int WINAPI ::WinMain (HINSTANCE, HINSTANCE, LPSTR, int);
-			// friend LRESULT CALLBACK wndproc(HWND, UINT, WPARAM, LPARAM);
-
-			// HWND hwnd = nullptr;
-			// HDC hdc = nullptr;
-			// HGLRC hglrc = nullptr;
-			// MSG wmsg;
-			// RECT srect;
-
-			event::state events;
-
-			int minw, minh, maxw, maxh, cminw, cminh, cmaxw, cmaxh;
-			int bpp = 0, style, exstyle, menu = 0, vsyn;
-			
-			std::string name;
-			bool active = false, transparent = false, doublebuf;
-			
-			
-			timer triple_timer;
-			bool doubled = false;
-
-			bool raw_mouse_input = true;
-			unsigned triple_click_delay; /* maximum delay time for the next click (after doubleclick) to be considered tripleclick (in milliseconds) */
-			
-			// void _poll(event::message&, WPARAM, LPARAM);
-			bool poll_event(event::message& out);
-		public:
-			renderer gl;
-			
-			glwindow();
-			~glwindow();
-
-			int create(xywhi client_rectangle, int enable_window_border = 0, std::string name = "Window", int doublebuffer = 1, int bitsperpixel = 24);
-			
-			bool swap_buffers();
-
-			void destroy();
-
-			std::vector<event::state> poll_events();
-
-			bool set_window_rect(const xywhi&);
-			vec2i get_screen_size() const;
-			xywhi get_window_rect() const;
-
-			bool is_active() const;
-			
-			glwindow(const glwindow&) = delete;
-			glwindow(glwindow&&) = delete;
-			glwindow& operator=(const glwindow&) = delete;
-		};
 #endif
-	}
+		void destroy();
+	public:
+		window(const window_settings&);
+		~window();
+
+		window(window&&) = delete;
+		window& operator=(window&&) = delete;
+
+		window(const window&) = delete;
+		window& operator=(const window&) = delete;
+
+		void set_window_name(const std::string& name);
+		void set_window_border_enabled(const bool);
+
+		bool swap_buffers();
+
+		void show();
+		void set_mouse_position_frozen(const bool);
+
+		void apply(const window_settings&, const bool force = false);
+		window_settings get_current_settings() const;
+
+		std::vector<event::change> collect_entropy();
+
+		void set_window_rect(const xywhi);
+		vec2i get_screen_size() const;
+		xywhi get_window_rect() const;
+
+		bool is_active() const;
+	};
 }

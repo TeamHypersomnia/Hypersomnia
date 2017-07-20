@@ -25,9 +25,9 @@ namespace augs {
 			}
 
 			template<class C>
-			bool handle_new_raw_state(const C context, const window::event::change& state) {
+			bool handle_new_raw_state(const C context, const event::change& state) {
 				if (context.alive(subject)) {
-					if (state.msg == window::event::message::mdown || state.msg == window::event::message::mdoubleclick)
+					if (state.msg == event::message::mdown || state.msg == event::message::mdoubleclick)
 						subject = gui_element_variant_id();
 
 					return true;

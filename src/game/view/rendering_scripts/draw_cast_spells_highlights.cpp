@@ -41,7 +41,7 @@ namespace rendering_scripts {
 								components::sprite spr;
 								spr.set(
 									assets::game_image_id::CAST_HIGHLIGHT, 
-									manager[assets::game_image_id::CAST_HIGHLIGHT].get_size(),
+									manager.at(assets::game_image_id::CAST_HIGHLIGHT).get_size(),
 									highlight_col
 								);
 

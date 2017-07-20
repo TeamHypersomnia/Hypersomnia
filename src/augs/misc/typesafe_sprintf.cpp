@@ -16,8 +16,8 @@ TEST_CASE("Type-safe sprintf", "Several tests") {
 	REQUIRE("Vector is equal to: (123;412)" == typesafe_sprintf("Vector is equal to: %x", test));
 
 	int errid = 1282;
-	std::string location = "augs::window::glwindow::create";
+	std::string location = "augs::create";
 
-	REQUIRE("OpenGL error 1282 in augs::window::glwindow::create" == typesafe_sprintf("OpenGL error %x in %x", errid, location));
+	REQUIRE("OpenGL error 1282 in augs::create" == typesafe_sprintf("OpenGL error %x in %x", errid, location));
 }
 #endif

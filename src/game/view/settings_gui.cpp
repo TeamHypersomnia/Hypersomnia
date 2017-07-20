@@ -23,11 +23,8 @@ static bool operator==(const ImVec2 a, const ImVec2 b) {
 
 #define CONFIG_NVP(x) format_field_name(std::string(#x)) + "##" + std::to_string(field_id++), config.x
 
-void viewing_session::perform_settings_gui(
-	augs::window::glwindow& window
-) {
-	const auto config_before_change = config;
-	auto& state = config_gui;
+void viewing_session::perform_settings_gui() {
+	auto& state = settings_gui;
 
 	if (show_settings) {
 		ImGui::Begin("Settings", &show_settings);
@@ -37,9 +34,9 @@ void viewing_session::perform_settings_gui(
 
 		int field_id = 0;
 		using namespace augs::imgui;
-		const auto disp = augs::window::get_display();
+		const auto disp = augs::get_display();
 
-		thread_local std::vector<const char*> tabs = { "Window", "Graphics", "Audio", "Controls", "GUI styles" };
+		thread_local std::vector<const char*> tabs = { "Window", "Graphics", "Audio", "Controls", "Gameplay", "GUI styles", "Debug" };
 
 		auto tab_padding = ImGui::GetStyle().FramePadding;
 		tab_padding.x *= 4;
@@ -59,43 +56,54 @@ void viewing_session::perform_settings_gui(
 		if (state.active_pane == pane++) {
 			enum_combo("Launch on game's startup", config.launch_mode);
 
-			checkbox(CONFIG_NVP(fullscreen)); revert(config.fullscreen);
-			if (!config.fullscreen) {
+			checkbox("Fullscreen", config.window.fullscreen); revert(config.window.fullscreen);
+			if (!config.window.fullscreen) {
 				ImGui::Indent();
 
 				{
 					vec2i lower;
 					vec2i upper = disp.get_size();
-					ImGui::DragIntN("Window position", &config.window_position.x, 2, 0.3f, &lower.x, &upper.x, "%.0f");
-					revert(config.window_position);
+					ImGui::DragIntN("Window position", &config.window.position.x, 2, 0.3f, &lower.x, &upper.x, "%.0f");
+					revert(config.window.position);
 				}
 
 				{
 					vec2i lower;
 					vec2i upper = disp.get_size();
-					ImGui::DragIntN("Windowed size", &config.windowed_size.x, 2, 0.3f, &lower.x, &upper.x, "%.0f");
-					revert(config.windowed_size);
+					ImGui::DragIntN("Windowed size", &config.window.size.x, 2, 0.3f, &lower.x, &upper.x, "%.0f");
+					revert(config.window.size);
 				}
 
-				checkbox(CONFIG_NVP(window_border)); revert(config.window_border);
-				checkbox(CONFIG_NVP(enable_cursor_clipping)); revert(config.enable_cursor_clipping);
+				checkbox(CONFIG_NVP(window.border)); revert(config.window.border);
+				checkbox("Enable cursor clipping", config.window.enable_cursor_clipping); revert(config.window.enable_cursor_clipping);
 				ImGui::Unindent();
 			}
 
-			input_text<100>(CONFIG_NVP(window_name));
-			revert(config.window_name);
+			input_text<100>(CONFIG_NVP(window.name));
+			revert(config.window.name);
 		}
 		else if (state.active_pane == pane++) {
 
 		}
 		else if (state.active_pane == pane++) {
-			slider(CONFIG_NVP(music_volume), 0.f, 1.f); revert(config.music_volume);
-			slider(CONFIG_NVP(sound_effects_volume), 0.f, 1.f); revert(config.sound_effects_volume);
-			slider("GUI volume", config.gui_volume, 0.f, 1.f); revert(config.gui_volume);
-			checkbox("Enable HRTF", config.enable_hrtf); revert(config.enable_hrtf);
+			slider("Music volume", config.audio_volume.music, 0.f, 1.f); revert(config.audio_volume.music);
+			slider("Sound effects volume", config.audio_volume.sound_effects, 0.f, 1.f); revert(config.audio_volume.sound_effects);
+			slider("GUI volume", config.audio_volume.gui, 0.f, 1.f); revert(config.audio_volume.gui);
+
+			checkbox("Enable HRTF", config.audio.enable_hrtf); revert(config.audio.enable_hrtf);
 		}
 		else if (state.active_pane == pane++) {
 
+		}
+		else if (state.active_pane == pane++) {
+			checkbox(CONFIG_NVP(camera.enable_smoothing)); revert(config.camera.enable_smoothing);
+			
+			if (config.camera.enable_smoothing) {
+				ImGui::Indent();
+
+				slider(CONFIG_NVP(camera.averages_per_sec), 0.f, 100.f); revert(config.camera.averages_per_sec);
+				slider(CONFIG_NVP(camera.smoothing_average_factor), 0.01f, 0.95f); revert(config.camera.smoothing_average_factor);
+			}
 		}
 		else if (state.active_pane == pane++) {
 			ImGuiStyle& style = config.gui_style;
@@ -176,6 +184,9 @@ void viewing_session::perform_settings_gui(
 
 			ImGui::GetStyle() = style;
 		}
+		else if (state.active_pane == pane++) {
+			checkbox("Show developer console", config.debug.show_developer_console); revert(config.debug.show_developer_console);
+		}
 
 		ImGui::PopItemWidth();
 		ImGui::EndChild();
@@ -196,7 +207,7 @@ void viewing_session::perform_settings_gui(
 				if (ImGui::Button("Save settings")) {
 					augs::timer save_timer;
 					last_saved_config = config;
-					config.save("config.local.lua");
+					config.save(config_path_for_saving);
 					LOG("Saved new config in: %x ms", save_timer.get<std::chrono::milliseconds>());
 				}
 
@@ -213,13 +224,6 @@ void viewing_session::perform_settings_gui(
 
 		ImGui::End();
 	}
-
-	/* Update non-immediate values */
-
-	apply_changes(config, config_before_change, window);
-	apply_changes(config, config_before_change, *this);
-	apply_changes(config, config_before_change, augs::renderer::get_current());
-	apply_changes(config, config_before_change, augs::audio_context::get_current().get_device());
 }
 
 #undef CONFIG_NVP

@@ -6,8 +6,8 @@
 
 namespace augs {
 	struct machine_entropy {
-		typedef std::vector<augs::window::event::change> local_type;
-		typedef std::vector<augs::network::message> remote_type;
+		using local_type = std::vector<augs::event::change>;
+		using remote_type = std::vector<augs::network::message>;
 
 		// GEN INTROSPECTOR struct augs::machine_entropy
 		local_type local;

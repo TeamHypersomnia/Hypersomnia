@@ -11,7 +11,7 @@ struct debug_character_selection {
 	std::vector<entity_id> characters;
 	unsigned current_character_index = 0;
 	entity_id selected_character;
-	augs::window::event::state state;
+	augs::event::state state;
 
 	void acquire_available_characters(const cosmos& cosm) {
 		int i = 0;
@@ -34,7 +34,7 @@ struct debug_character_selection {
 	void control_character_selection_numeric(
 		augs::machine_entropy::local_type& changes
 	) {
-		using namespace augs::window::event::keys;
+		using namespace augs::event::keys;
 
 		erase_if(
 			changes,

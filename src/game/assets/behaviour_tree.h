@@ -72,7 +72,7 @@ public:
 			SELECTOR,
 		} mode = type::SELECTOR;
 
-		std::vector<std::unique_ptr<node>> children;
+		std::vector<node> children;
 
 		node* create_branches();
 
@@ -105,7 +105,7 @@ private:
 		f(p);
 
 		for (auto& child : p.children) {
-			call_on_node_recursively(*child, f);
+			call_on_node_recursively(child, f);
 		}
 	}
 };

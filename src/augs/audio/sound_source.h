@@ -18,28 +18,14 @@ namespace augs {
 
 		void destroy();
 	public:
-		friend void swap(sound_source& a, sound_source& b) {
-			using std::swap;
-
-			swap(a.attached_buffer, b.attached_buffer);
-			swap(a.initialized, b.initialized);
-			swap(a.id, b.id);
-		}
-
 		sound_source();
 		~sound_source();
 
-		sound_source(sound_source&& b) 
-			: initialized(false) {
-			swap(*this, b);
-		}
-		
-		sound_source& operator=(sound_source b) {
-			swap(*this, b);
-			return *this;
-		}
+		sound_source(sound_source&&);
+		sound_source& operator=(sound_source&& b);
 
 		sound_source(const sound_source&) = delete;
+		sound_source& operator=(const sound_source& b) = delete;
 
 		void play() const;
 		void seek_to(const float seconds) const;

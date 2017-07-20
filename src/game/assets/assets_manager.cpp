@@ -2,7 +2,7 @@
 #include "augs/filesystem/file.h"
 #include "augs/image/font.h"
 #include "augs/window_framework/window.h"
-#include "application/content_generation/texture_atlases.h"
+#include "application/content_regeneration/texture_atlases.h"
 
 #include "game/transcendental/cosmos.h"
 
@@ -135,39 +135,19 @@ void assets_manager::load_baked_metadata(
 	}
 }
 
-void assets_manager::create(
-	const assets::gl_texture_id id,
-	const bool load_as_binary
-) {
-	auto& self = *this;
-	auto& tex = self[id];
+void assets_manager::load_requisite(const assets::gl_texture_id id) {
+	augs::enum_associative_array<assets::gl_texture_id, augs::graphics::texture> ch;
+	augs::constant_size_vector< augs::graphics::texture, 3> aaaaa;
 
-	augs::image atlas_image;
-
-	if (load_as_binary) {
-		atlas_image.from_binary_file(typesafe_sprintf("generated/atlases/%x.bin", augs::enum_to_string(id)));
-	}
-	else {
-		atlas_image.from_file(typesafe_sprintf("generated/atlases/%x.png", augs::enum_to_string(id)));
-	}
-
-	tex.create(atlas_image);
-}
-
-augs::graphics::shader_program& assets_manager::create(
-	const assets::program_id program_id, 
-	const assets::shader_id vertex_id, 
-	const assets::shader_id fragment_id
-) {
-	auto& self = *this;
-
-	auto& p = self[program_id];
-	p.create();
-	p.attach(self[vertex_id]);
-	p.attach(self[fragment_id]);
-	p.build();
-
-	return p;
+	get_store_by<assets::gl_texture_id>().emplace(
+		id,
+		augs::image(
+			typesafe_sprintf(
+				"generated/atlases/%x",
+				augs::enum_to_string(id)
+			)
+		)
+	);
 }
 
 std::unique_ptr<all_logical_metas_of_assets> assets_manager::generate_logical_metas_of_assets() const {
@@ -191,12 +171,3 @@ std::unique_ptr<all_logical_metas_of_assets> assets_manager::generate_logical_me
 
 	return std::move(output);
 }
-
-void assets_manager::destroy_everything() {
-	this->~assets_manager();
-	new (this) assets_manager;
-}
-
-#if ONLY_ONE_GLOBAL_ASSETS_MANAGER
-assets_manager assets_manager::global_instance;
-#endif

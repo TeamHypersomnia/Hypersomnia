@@ -1,5 +1,7 @@
 #pragma once
+#include <string>
 #include "augs/graphics/rgba.h"
+#include "augs/templates/string_templates.h"
 
 namespace augs {
 	inline auto to_lua_value(const rgba r) {
@@ -20,5 +22,14 @@ namespace augs {
 		rgba r;
 		r.from_stream(std::istringstream(in.as<std::string>()));
 		v = r;
+	}
+
+	inline auto to_lua_value(const std::wstring r) {
+		return to_string(r);
+	}
+
+	template <class I>
+	void from_lua_value(I& in, std::wstring& r) {
+		r = to_wstring(in.as<std::string>());
 	}
 }

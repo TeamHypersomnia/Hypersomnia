@@ -29,7 +29,7 @@
 #include "game/enums/render_layer.h"
 
 #include "game/transcendental/logic_step.h"
-#include "game/transcendental/cosmic_profiler.h"
+#include "game/transcendental/profiling.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/detail/inventory/inventory_slot_handle.h"
 #include "game/detail/inventory/item_slot_transfer_request.h"
@@ -46,15 +46,11 @@
 
 #include "game/components/fixtures_component.h"
 
-void create_standard_behaviour_trees(cosmos&);
-
 void cosmos::complete_reinference() {
-	profiler.complete_reinference.new_measurement();
+	auto scope = measure_scope(profiler.complete_reinference);
 	
 	destroy_inferred_state_completely();
 	create_inferred_state_completely();
-
-	profiler.complete_reinference.end_measurement();
 }
 
 void cosmos::destroy_inferred_state_completely() {
@@ -103,12 +99,6 @@ void cosmos::create_inferred_state_for(const const_entity_handle h) {
 cosmos::cosmos(const std::size_t reserved_entities) {
 	reserve_storage_for_entities(reserved_entities);
 	significant.meta.global.si.set_pixels_per_meter(100.f);
-
-	create_standard_behaviour_trees(*this);
-}
-
-cosmos::cosmos(const cosmos& b) {
-	*this = b;
 }
 
 bool cosmos::operator==(const cosmos& b) const {
@@ -120,28 +110,12 @@ bool cosmos::operator!=(const cosmos& b) const {
 }
 
 cosmos& cosmos::operator=(const cosmos_significant_state& b) {
-	profiler.duplication.new_measurement();
-	significant = b;
-	profiler.duplication.end_measurement();
-	refresh_for_new_significant_state();
-	return *this;
-}
+	{
+		auto scope = measure_scope(profiler.duplication);
+		significant = b;
+	}
 
-cosmos& cosmos::operator=(const cosmos& b) {
-	b.profiler.duplication.new_measurement();
-	profiler.duplication.new_measurement();
-	significant = b.significant;
-#if COSMOS_TRACKS_GUIDS
-	guid_to_id = b.guid_to_id;
-#endif
-	profiler.duplication.end_measurement();
-	b.profiler.duplication.end_measurement();
-	
-	//complete_reinference();
-	profiler.complete_reinference.new_measurement();
-	systems_inferred = b.systems_inferred;
-	//reserve_storage_for_entities(get_maximum_entities());
-	profiler.complete_reinference.end_measurement();
+	refresh_for_new_significant_state();
 	return *this;
 }
 
@@ -398,7 +372,7 @@ void cosmos::advance_deterministic_schemata_and_queue_destructions(const logic_s
 	const auto& delta = step.get_delta();
 	auto& performance = profiler;
 	
-	performance.start(meter_type::LOGIC);
+	auto logic_scope = measure_scope(performance.logic);
 
 	physics_system::contact_listener listener(step.cosm);
 	
@@ -430,11 +404,14 @@ void cosmos::advance_deterministic_schemata_and_queue_destructions(const logic_s
 	item_system().handle_throw_item_intents(step);
 	hand_fuse_system().detonate_fuses(step);
 
-	performance.start(meter_type::PHYSICS);
-	listener.during_step = true;
-	systems_inferred.get<physics_system>().step_and_set_new_transforms(step);
-	listener.during_step = false;
-	performance.stop(meter_type::PHYSICS);
+	{
+		auto scope = measure_scope(performance.physics);
+
+		listener.during_step = true;
+		systems_inferred.get<physics_system>().step_and_set_new_transforms(step);
+		listener.during_step = false;
+	}
+
 	rotation_copying_system().update_rotations(step.cosm);
 	position_copying_system().update_transforms(step);
 
@@ -469,17 +446,20 @@ void cosmos::advance_deterministic_schemata_and_queue_destructions(const logic_s
 	sound_existence_system().create_sounds_from_game_events(step);
 	// gui_system().translate_game_events_for_hud(step);
 
-	performance.start(meter_type::VISIBILITY);
-	visibility_system().respond_to_visibility_information_requests(step);
-	performance.stop(meter_type::VISIBILITY);
+	{
+		auto scope = measure_scope(performance.visibility);
+		visibility_system().respond_to_visibility_information_requests(step);
+	}
 
-	performance.start(meter_type::AI);
-	behaviour_tree_system().evaluate_trees(step);
-	performance.stop(meter_type::AI);
+	{
+		auto scope = measure_scope(performance.ai);
+		behaviour_tree_system().evaluate_trees(step);
+	}
 
-	performance.start(meter_type::PATHFINDING);
-	pathfinding_system().advance_pathfinding_sessions(step);
-	performance.stop(meter_type::PATHFINDING);
+	{
+		auto scope = measure_scope(performance.pathfinding);
+		pathfinding_system().advance_pathfinding_sessions(step);
+	}
 
 	auto& transfers = step.transient.messages.get_queue<item_slot_transfer_request>();
 	perform_transfers(transfers, step);
@@ -514,8 +494,6 @@ void cosmos::advance_deterministic_schemata_and_queue_destructions(const logic_s
 	const size_t queued_at_end_num = step.transient.messages.get_queue<messages::queue_destruction>().size();
 
 	ensure_eq(queued_at_end_num, queued_before_marking_num);
-
-	performance.stop(meter_type::LOGIC);
 }
 
 void cosmos::perform_deletions(const logic_step step) {

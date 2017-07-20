@@ -2,6 +2,7 @@
 #include "game/assets/behaviour_tree.h"
 #include "game/detail/ai/behaviours.h"
 
+#if TODO
 void create_standard_behaviour_trees(cosmos& manager) {
 	auto& soldier_movement = manager[assets::behaviour_tree_id::SOLDIER_MOVEMENT];
 
@@ -41,3 +42,4 @@ void create_standard_behaviour_trees(cosmos& manager) {
 	hostile_target_prioritization.root.create_branches(new behaviours::target_closest_enemy);
 	hostile_target_prioritization.build_tree();
 }
+#endif

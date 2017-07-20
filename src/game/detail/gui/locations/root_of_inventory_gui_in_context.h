@@ -17,7 +17,7 @@ public:
 
 	template <class C>
 	decltype(auto) dereference(const C context) const {
-		return &context.get_root_of_inventory_gui();
+		return &context.get_root();
 	}
 };
 

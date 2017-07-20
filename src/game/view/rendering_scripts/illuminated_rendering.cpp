@@ -11,15 +11,13 @@
 #include "game/assets/assets_manager.h"
 #include "augs/graphics/renderer.h"
 #include "game/view/viewing_step.h"
-#include "game/view/viewing_session.h"
 #include "game/components/item_slot_transfers_component.h"
 #include "game/components/render_component.h"
+#include "game/view/audiovisual_state.h"
 
 #include "augs/graphics/drawers.h"
 
 #include "augs/math/matrix.h"
-
-#include "augs/graphics/OpenGL_includes.h"
 
 #include <imgui/imgui.h>
 
@@ -31,51 +29,39 @@ namespace rendering_scripts {
 		const auto camera = step.camera;
 		const auto controlled_entity = cosmos[step.viewed_character];
 		const auto controlled_crosshair = controlled_entity.alive() ? controlled_entity[child_entity_name::CHARACTER_CROSSHAIR] : cosmos[entity_id()];
-		const auto& interp = step.session.systems_audiovisual.get<interpolation_system>();
-		const auto& particles = step.session.systems_audiovisual.get<particles_simulation_system>();
-		const auto& wandering_pixels = step.session.systems_audiovisual.get<wandering_pixels_system>();
-		const auto& exploding_rings = step.session.systems_audiovisual.get<exploding_ring_system>();
-		const auto& flying_numbers = step.session.systems_audiovisual.get<flying_number_indicator_system>();
-		const auto& highlights = step.session.systems_audiovisual.get<pure_color_highlight_system>();
-		const auto& thunders = step.session.systems_audiovisual.get<thunder_system>();
+		const auto& interp = step.audiovisuals.get<interpolation_system>();
+		const auto& particles = step.audiovisuals.get<particles_simulation_system>();
+		const auto& wandering_pixels = step.audiovisuals.get<wandering_pixels_system>();
+		const auto& exploding_rings = step.audiovisuals.get<exploding_ring_system>();
+		const auto& flying_numbers = step.audiovisuals.get<flying_number_indicator_system>();
+		const auto& highlights = step.audiovisuals.get<pure_color_highlight_system>();
+		const auto& thunders = step.audiovisuals.get<thunder_system>();
 		const auto global_time_seconds = (step.get_interpolated_total_time_passed_in_seconds());
-		const auto settings = step.session.config.drawing_settings;
+		const auto settings = step.drawing;
 
-		const auto screen_size = vec2i(camera.visible_world_area);
-
-		const auto matrix = augs::orthographic_projection<float>(
-			0.f, 
-			camera.visible_world_area.x, 
-			camera.visible_world_area.y, 
-			0.f, 
-			0.f, 
-			1.f
-		);
+		const auto matrix = augs::orthographic_projection(camera.visible_world_area);
 
 		const auto& visible_per_layer = step.visible.per_layer;
 
 		const auto& manager = get_assets_manager();
 
-		const auto& default_shader = manager[assets::program_id::DEFAULT];
-		const auto& illuminated_shader = manager[assets::program_id::DEFAULT_ILLUMINATED];
-		const auto& specular_highlights_shader = manager[assets::program_id::SPECULAR_HIGHLIGHTS];
-		const auto& pure_color_highlight_shader = manager[assets::program_id::PURE_COLOR_HIGHLIGHT];
+		const auto& default_shader = manager.at(assets::shader_program_id::DEFAULT);
+		const auto& illuminated_shader = manager.at(assets::shader_program_id::DEFAULT_ILLUMINATED);
+		const auto& specular_highlights_shader = manager.at(assets::shader_program_id::SPECULAR_HIGHLIGHTS);
+		const auto& pure_color_highlight_shader = manager.at(assets::shader_program_id::PURE_COLOR_HIGHLIGHT);
 		const auto& border_highlight_shader = pure_color_highlight_shader; // the same
-		const auto& circular_bars_shader = manager[assets::program_id::CIRCULAR_BARS];
-		const auto& smoke_shader = manager[assets::program_id::SMOKE];
-		const auto& illuminating_smoke_shader = manager[assets::program_id::ILLUMINATING_SMOKE];
-		const auto& exploding_rings_shader = manager[assets::program_id::EXPLODING_RING];
+		const auto& circular_bars_shader = manager.at(assets::shader_program_id::CIRCULAR_BARS);
+		const auto& smoke_shader = manager.at(assets::shader_program_id::SMOKE);
+		const auto& illuminating_smoke_shader = manager.at(assets::shader_program_id::ILLUMINATING_SMOKE);
+		const auto& exploding_rings_shader = manager.at(assets::shader_program_id::EXPLODING_RING);
 		
-		default_shader.use();
-		{
-			const auto projection_matrix_uniform = glGetUniformLocation(default_shader.id, "projection_matrix");
-			glUniformMatrix4fv(projection_matrix_uniform, 1, GL_FALSE, matrix.data());
-		}
+		default_shader.set_as_current();
+		default_shader.set_projection(matrix);
 
-		renderer.smoke_fbo.use();
-		glClear(GL_COLOR_BUFFER_BIT);
+		renderer.smoke_fbo->set_as_current();
+		renderer.clear_current_fbo();
+		renderer.set_additive_blending();
 
-		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE, GL_ONE, GL_ONE); glerr;
 		
 		{
 			particles.draw(
@@ -94,8 +80,8 @@ namespace rendering_scripts {
 		renderer.call_triangles();
 		renderer.clear_triangles();
 
-		renderer.illuminating_smoke_fbo.use();
-		glClear(GL_COLOR_BUFFER_BIT);
+		renderer.illuminating_smoke_fbo->set_as_current();
+		renderer.clear_current_fbo();
 
 		{
 			particles.draw(
@@ -107,14 +93,15 @@ namespace rendering_scripts {
 
 		renderer.call_triangles();
 		renderer.clear_triangles();
-
-		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE); glerr;
-
-		renderer.illuminating_smoke_fbo.use_default();
-
-		const auto& light = step.session.systems_audiovisual.get<light_system>();
 		
-		light.render_all_lights(renderer, matrix, step, [&]() {
+		renderer.set_standard_blending();
+
+		augs::graphics::fbo::set_current_to_none();
+
+		const auto& light = step.audiovisuals.get<light_system>();
+		
+		light.render_all_lights(renderer, matrix, step, 
+			[&]() {
 				if (controlled_entity.alive()) {
 					draw_crosshair_lasers(
 						[&](const vec2 from, const vec2 to, const rgba col) {
@@ -122,10 +109,10 @@ namespace rendering_scripts {
 								return;
 							}
 
-							const auto& edge_tex = manager[assets::game_image_id::LASER_GLOW_EDGE].texture_maps[texture_map_type::DIFFUSE];
+							const auto& edge_tex = manager.at(assets::game_image_id::LASER_GLOW_EDGE).texture_maps[texture_map_type::DIFFUSE];
 							const vec2 edge_size = static_cast<vec2>(edge_tex.get_size());
 
-							augs::draw_line(output, camera[from], camera[to], edge_size.y/3.f, manager[assets::game_image_id::LASER].texture_maps[texture_map_type::NEON], col);
+							augs::draw_line(output, camera[from], camera[to], edge_size.y/3.f, manager.at(assets::game_image_id::LASER).texture_maps[texture_map_type::NEON], col);
 
 							const auto edge_offset = (to - from).set_length(edge_size.x);
 
@@ -148,14 +135,14 @@ namespace rendering_scripts {
 				);
 
 				renderer.set_active_texture(3);
-				renderer.bind_texture(renderer.illuminating_smoke_fbo);
+				renderer.illuminating_smoke_fbo->get_texture().bind();
 				renderer.set_active_texture(0);
 				
-				illuminating_smoke_shader.use();
+				illuminating_smoke_shader.set_as_current();
 				
 				renderer.fullscreen_quad();
 				
-				default_shader.use();
+				default_shader.set_as_current();
 
 				exploding_rings.draw_highlights_of_rings(
 					output,
@@ -165,11 +152,8 @@ namespace rendering_scripts {
 			}
 		);
 
-		illuminated_shader.use();
-		{
-			const auto projection_matrix_uniform = glGetUniformLocation(illuminated_shader.id, "projection_matrix");
-			glUniformMatrix4fv(projection_matrix_uniform, 1, GL_FALSE, matrix.data());
-		}
+		illuminated_shader.set_as_current();
+		illuminated_shader.set_projection(matrix);
 
 		render_system().draw_entities(interp, global_time_seconds, output, cosmos, visible_per_layer[render_layer::UNDER_GROUND], camera, renderable_drawing_type::NORMAL);
 		render_system().draw_entities(interp, global_time_seconds, output, cosmos, visible_per_layer[render_layer::GROUND], camera, renderable_drawing_type::NORMAL);
@@ -179,18 +163,15 @@ namespace rendering_scripts {
 		renderer.call_triangles();
 		renderer.clear_triangles();
 
-		specular_highlights_shader.use();
-		{
-			const auto projection_matrix_uniform = glGetUniformLocation(specular_highlights_shader.id, "projection_matrix");
-			glUniformMatrix4fv(projection_matrix_uniform, 1, GL_FALSE, matrix.data());
-		}
+		specular_highlights_shader.set_as_current();
+		specular_highlights_shader.set_projection(matrix);
 
 		render_system().draw_entities(interp, global_time_seconds, output, cosmos, visible_per_layer[render_layer::TILED_FLOOR], camera, renderable_drawing_type::SPECULAR_HIGHLIGHTS);
 
 		renderer.call_triangles();
 		renderer.clear_triangles();
 
-		illuminated_shader.use();
+		illuminated_shader.set_as_current();
 
 		render_system().draw_entities(interp, global_time_seconds, output, cosmos, visible_per_layer[render_layer::ON_TILED_FLOOR], camera, renderable_drawing_type::NORMAL);
 		render_system().draw_entities(interp, global_time_seconds, output, cosmos, visible_per_layer[render_layer::CAR_INTERIOR], camera, renderable_drawing_type::NORMAL);
@@ -199,18 +180,15 @@ namespace rendering_scripts {
 		renderer.call_triangles();
 		renderer.clear_triangles();
 
-		border_highlight_shader.use();
-		{
-			const auto projection_matrix_uniform = glGetUniformLocation(border_highlight_shader.id, "projection_matrix");
-			glUniformMatrix4fv(projection_matrix_uniform, 1, GL_FALSE, matrix.data());
-		}
+		border_highlight_shader.set_as_current();
+		border_highlight_shader.set_projection(matrix);
 		
 		render_system().draw_entities(interp, global_time_seconds, output, cosmos, visible_per_layer[render_layer::SMALL_DYNAMIC_BODY], camera, renderable_drawing_type::BORDER_HIGHLIGHTS);
 		
 		renderer.call_triangles();
 		renderer.clear_triangles();
 		
-		illuminated_shader.use();
+		illuminated_shader.set_as_current();
 		
 		render_system().draw_entities(interp, global_time_seconds, output, cosmos, visible_per_layer[render_layer::DYNAMIC_BODY], camera, renderable_drawing_type::NORMAL);
 		render_system().draw_entities(interp, global_time_seconds, output, cosmos, visible_per_layer[render_layer::SMALL_DYNAMIC_BODY], camera, renderable_drawing_type::NORMAL);
@@ -219,14 +197,14 @@ namespace rendering_scripts {
 		renderer.clear_triangles();
 
 		renderer.set_active_texture(1);
-		renderer.bind_texture(renderer.smoke_fbo);
+		renderer.smoke_fbo->get_texture().bind();
 		renderer.set_active_texture(0);
 
-		smoke_shader.use();
+		smoke_shader.set_as_current();
 
 		renderer.fullscreen_quad();
 
-		default_shader.use();
+		default_shader.set_as_current();
 		
 		render_system().draw_entities(interp, global_time_seconds, output, cosmos, visible_per_layer[render_layer::FLYING_BULLETS], camera, renderable_drawing_type::NORMAL);
 		render_system().draw_entities(interp, global_time_seconds, output, cosmos, visible_per_layer[render_layer::NEON_CAPTIONS], camera, renderable_drawing_type::NORMAL);
@@ -244,7 +222,7 @@ namespace rendering_scripts {
 						renderer.lines, 
 						camera[from], 
 						camera[to], 
-						manager[assets::game_image_id::LASER].texture_maps[texture_map_type::DIFFUSE], 
+						manager.at(assets::game_image_id::LASER).texture_maps[texture_map_type::DIFFUSE],
 						col
 					);
 				},
@@ -254,7 +232,7 @@ namespace rendering_scripts {
 						renderer.lines,
 						camera[from],
 						camera[to],
-						manager[assets::game_image_id::LASER].texture_maps[texture_map_type::DIFFUSE],
+						manager.at(assets::game_image_id::LASER).texture_maps[texture_map_type::DIFFUSE],
 						white,
 						10.f,
 						40.f, 
@@ -291,19 +269,15 @@ namespace rendering_scripts {
 		renderer.call_triangles();
 		renderer.clear_triangles();
 
-		circular_bars_shader.use();
-		{
-			const auto projection_matrix_uniform = glGetUniformLocation(circular_bars_shader.id, "projection_matrix");
-			glUniformMatrix4fv(projection_matrix_uniform, 1, GL_FALSE, matrix.data());
-
-		}
+		circular_bars_shader.set_as_current();
+		circular_bars_shader.set_projection(matrix);
 
 		const auto set_center_uniform = [&](const auto image_id) {
-			const auto upper = manager[image_id].texture_maps[texture_map_type::DIFFUSE].get_atlas_space_uv({ 0.0f, 0.0f });
-			const auto lower = manager[image_id].texture_maps[texture_map_type::DIFFUSE].get_atlas_space_uv({ 1.f, 1.f });
+			const auto upper = manager.at(image_id).texture_maps[texture_map_type::DIFFUSE].get_atlas_space_uv({ 0.0f, 0.0f });
+			const auto lower = manager.at(image_id).texture_maps[texture_map_type::DIFFUSE].get_atlas_space_uv({ 1.f, 1.f });
 			const auto center = (upper + lower) / 2;
 
-			glUniform2f(glGetUniformLocation(circular_bars_shader.id, "texture_center"), center.x, center.y);
+			circular_bars_shader.set_uniform("texture_center", center);
 		};
 
 		set_center_uniform(assets::game_image_id::CIRCULAR_BAR_MEDIUM);
@@ -327,15 +301,12 @@ namespace rendering_scripts {
 		renderer.call_triangles();
 		renderer.clear_triangles();
 
-		default_shader.use();
+		default_shader.set_as_current();
 
 		renderer.call_triangles(textual_infos);
 
-		exploding_rings_shader.use();
-		{
-			const auto projection_matrix_uniform = glGetUniformLocation(exploding_rings_shader.id, "projection_matrix");
-			glUniformMatrix4fv(projection_matrix_uniform, 1, GL_FALSE, matrix.data());
-		}
+		exploding_rings_shader.set_as_current();
+		exploding_rings_shader.set_projection(matrix);
 
 		exploding_rings.draw_rings(
 			output,
@@ -347,7 +318,7 @@ namespace rendering_scripts {
 		renderer.call_triangles();
 		renderer.clear_triangles();
 
-		pure_color_highlight_shader.use();
+		pure_color_highlight_shader.set_as_current();
 
 		highlights.draw_highlights(
 			output,
@@ -366,7 +337,7 @@ namespace rendering_scripts {
 		renderer.clear_triangles();
 		renderer.clear_lines();
 
-		default_shader.use();
+		default_shader.set_as_current();
 
 		flying_numbers.draw_numbers(
 			output, 
@@ -375,23 +346,35 @@ namespace rendering_scripts {
 
 		if (settings.draw_character_gui && controlled_entity.alive()) {
 			if (controlled_entity.has<components::item_slot_transfers>()) {
-				step.session.systems_audiovisual.get<gui_element_system>().get_character_gui(controlled_entity).draw(
-					step,
-					step.session.config.hotbar
+				auto& gui = step.audiovisuals.get<gui_element_system>();
+
+				gui.get_character_gui(controlled_entity).draw({
+						gui,
+						interp,
+						controlled_entity,
+						step.audiovisuals.world_hover_highlighter,
+						step.hotbar,
+						step.interpolation_ratio,
+						step.input_information,
+						step.camera,
+						!step.is_ingame_menu_active && gui.gui_look_enabled && !ImGui::GetIO().WantCaptureMouse,
+						output
+					}
 				);
 			}
 		}
 
-		renderer.bind_texture(manager[assets::gl_texture_id::GAME_WORLD_ATLAS]);
+		manager.at(assets::gl_texture_id::GAME_WORLD_ATLAS).bind();
 
 		renderer.call_triangles();
 		renderer.clear_triangles();
 
-		renderer.draw_debug_info(
-			camera,
-			assets::game_image_id::BLANK,
-			{},
-			step.get_interpolation_ratio()
-		);
+		if (DEBUG_DRAWING.enabled) {
+			renderer.draw_debug_info(
+				camera,
+				assets::game_image_id::BLANK,
+				step.get_interpolation_ratio()
+			);
+		}
 	}
 }

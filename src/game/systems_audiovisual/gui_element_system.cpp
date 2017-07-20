@@ -17,7 +17,6 @@
 
 #include "augs/gui/rect_world.h"
 #include "game/enums/slot_function.h"
-#include "game/detail/gui/root_of_inventory_gui.h"
 
 #include "game/detail/inventory/inventory_utils.h"
 
@@ -25,6 +24,7 @@
 
 #include "game/detail/gui/slot_button.h"
 #include "game/detail/gui/item_button.h"
+#include "augs/misc/imgui_utils.h"
 
 static char intent_to_hotbar_index(const intent_type type) {
 	switch (type) {
@@ -60,6 +60,15 @@ static char intent_to_special_action_index(const intent_type type) {
 	}
 }
 
+void gui_element_system::set_screen_size(const vec2i screen_size) {
+	rect_world.set_screen_size(screen_size);
+	root.set_screen_size(screen_size);
+}
+
+vec2i gui_element_system::get_screen_size() const {
+	return rect_world.get_screen_size();
+}
+
 cosmic_entropy gui_element_system::get_and_clear_pending_events() {
 	cosmic_entropy out;
 
@@ -81,8 +90,7 @@ character_gui& gui_element_system::get_character_gui(const entity_id id) {
 	const auto it = character_guis.find(id);
 
 	if (it == character_guis.end()) {
-		auto& new_gui = character_guis[id];
-		new_gui.set_screen_size(screen_size_for_new_characters);
+		auto& new_gui = (*character_guis.try_emplace(id, rect_world).first).second;
 		
 		new_gui.action_buttons[0].bound_spell.set<haste_instance>();
 		new_gui.action_buttons[1].bound_spell.set<fury_of_the_aeons_instance>();
@@ -245,72 +253,57 @@ void gui_element_system::handle_hotbar_and_action_button_presses(
 	}
 }
 
+game_gui_context gui_element_system::create_context(
+	const const_entity_handle gui_entity, 
+	game_gui_rect_tree& tree
+) {
+	auto& element = get_character_gui(gui_entity);
+
+	return {
+		*this,
+		rect_world,
+		element,
+		gui_entity,
+		tree
+	};
+}
+
 void gui_element_system::advance_elements(
 	const const_entity_handle root_entity,
 	const augs::delta dt
 ) {
 	const auto& cosmos = root_entity.get_cosmos();
 
-	auto& element = get_character_gui(root_entity);
-	auto& rect_world = element.rect_world;
-	const auto screen_size = element.get_screen_size();
-
 	ensure(root_entity.has<components::item_slot_transfers>());
 
 	game_gui_rect_tree tree;
+	auto context = create_context(root_entity, tree);
 
-	root_of_inventory_gui root_of_gui(screen_size);
-
-	game_gui_context context(
-		*this,
-		element.rect_world,
-		element,
-		root_entity,
-		tree,
-		root_of_gui
-	);
-
-	root_of_inventory_gui_in_context root_location;
-
-	rect_world.advance_elements(
-		context,
-		root_location,
-		dt
-	);
+	rect_world.advance_elements(context, dt);
 }
 	
 void gui_element_system::control_gui(
 	const const_entity_handle root_entity,
-	std::vector<augs::window::event::change>& events
+	std::vector<augs::event::change>& events
 ) {
 	const auto& cosmos = root_entity.get_cosmos();
 
 	auto& element = get_character_gui(root_entity);
-	auto& rect_world = element.rect_world;
-	const auto screen_size = element.get_screen_size();
+	const auto screen_size = get_screen_size();
 
 	ensure(root_entity.has<components::item_slot_transfers>());
 	
 	game_gui_rect_tree tree;
 	augs::gui::gui_entropy<game_gui_element_location> gui_events;
 
-	root_of_inventory_gui root_of_gui(screen_size);
+	auto context = create_context(root_entity, tree);
 
-	game_gui_context context(
-		*this,
-		element.rect_world, 
-		element, 
-		root_entity, 
-		tree, 
-		root_of_gui
-	);
-
-	root_of_inventory_gui_in_context root_location;
-
-	rect_world.build_tree_data_into_context(context, root_location);
+	rect_world.build_tree_data_into(context);
+	
+	augs::sync_with_imgui(context, gui_events);
 
 	if (gui_look_enabled) {
-		erase_if(events, [&](const augs::window::event::change change) {
+		erase_if(events, [&](const augs::event::change change) {
 			bool fetched = false;
 
 			const auto held_rect = context.get_if<item_button_in_item>(rect_world.rect_held_by_lmb);
@@ -320,8 +313,8 @@ void gui_element_system::control_gui(
 				auto& dragged_charges = element.dragged_charges;
 
 				if (
-					change.msg == augs::window::event::message::rdown
-					|| change.msg == augs::window::event::message::rdoubleclick
+					change.msg == augs::event::message::rdown
+					|| change.msg == augs::event::message::rdoubleclick
 				) {
 					if (rect_world.held_rect_is_dragged) {
 						pending_transfers.push_back(item_slot_transfer_request { item_entity, cosmos[inventory_slot_id()], dragged_charges });
@@ -329,7 +322,7 @@ void gui_element_system::control_gui(
 					}
 				}
 
-				if (change.msg == augs::window::event::message::wheel) {
+				if (change.msg == augs::event::message::wheel) {
 					const auto& item = item_entity.get<components::item>();
 
 					const auto delta = change.scroll.amount;
@@ -348,7 +341,6 @@ void gui_element_system::control_gui(
 			if (!fetched) {
 				rect_world.consume_raw_input_and_generate_gui_events(
 					context,
-					root_location,
 					change,
 					gui_events
 				);
@@ -358,10 +350,9 @@ void gui_element_system::control_gui(
 		});
 	}
 
-	// rect_world.call_idle_mousemotion_updater(context, root_location, entropy);
+	// rect_world.call_idle_mousemotion_updater(context, entropy);
 	rect_world.respond_to_events(
 		context, 
-		root_location, 
 		gui_events
 	);
 }
@@ -369,26 +360,15 @@ void gui_element_system::control_gui(
 void gui_element_system::rebuild_layouts(
 	const const_entity_handle root_entity
 ) {
-	const auto& cosmos = root_entity.get_cosmos();
+	game_gui_rect_tree tree;
+	auto context = create_context(root_entity, tree);
 
+	const auto& cosmos = root_entity.get_cosmos();
 	auto& element = get_character_gui(root_entity);
-	auto& rect_world = element.rect_world;
-	const auto screen_size = element.get_screen_size();
 
 	ensure(root_entity.has<components::item_slot_transfers>());
 
-	game_gui_rect_tree tree;
-
-	root_of_inventory_gui root_of_gui(screen_size);
-
-	game_gui_context context(
-		*this,
-		element.rect_world,
-		element,
-		root_entity,
-		tree,
-		root_of_gui
-	);
+	const auto screen_size = get_screen_size();
 
 	int max_hotbar_height = 0;
 
@@ -448,8 +428,7 @@ void gui_element_system::rebuild_layouts(
 		}
 	}
 
-	root_of_inventory_gui_in_context root_location;
-	rect_world.rebuild_layouts(context, root_location);
+	rect_world.rebuild_layouts(context);
 }
 
 void gui_element_system::reposition_picked_up_and_transferred_items(const const_logic_step step) {

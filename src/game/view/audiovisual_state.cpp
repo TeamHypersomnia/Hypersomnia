@@ -1,4 +1,6 @@
-#include "viewing_session.h"
+#include "game/transcendental/cosmos.h"
+#include "audiovisual_state.h"
+
 #include "game/transcendental/logic_step.h"
 #include "game/transcendental/cosmos.h"
 #include "game/messages/health_event.h"
@@ -6,16 +8,122 @@
 #include "game/messages/interpolation_correction_request.h"
 #include "augs/templates/string_templates.h"
 
-void viewing_session::standard_audiovisual_post_solve(const const_logic_step step) {
+void audiovisual_state::set_screen_size(const vec2i new_size) {
+	get<gui_element_system>().set_screen_size(new_size);
+	camera.configure_size(new_size);
+}
+
+void audiovisual_state::reserve_caches_for_entities(const std::size_t n) {
+	systems.for_each([n](auto& sys) {
+		sys.reserve_caches_for_entities(n);
+	});
+}
+
+void audiovisual_state::advance(const audiovisual_advance_input input) {
+	const auto& cosm = input.cosm;
+	const auto& all_visible = input.all_visible;
+	const auto dt = augs::delta(static_cast<float>(timer.extract<std::chrono::milliseconds>() * input.speed_multiplier));
+	const auto viewed_character_id = input.viewed_character;
+
+	reserve_caches_for_entities(cosm.get_aggregate_pool().capacity());
+
+	auto& thunders = get<thunder_system>();
+	auto& exploding_rings = get<exploding_ring_system>();
+	auto& flying_numbers = get<flying_number_indicator_system>();
+	auto& highlights = get<pure_color_highlight_system>();
+	auto& interp = get<interpolation_system>();
+	auto& particles = get<particles_simulation_system>();
+
+	const auto viewed_character = cosm[viewed_character_id];
+
+	thunders.advance(cosm, dt, particles);
+	exploding_rings.advance(cosm, dt, particles);
+	flying_numbers.advance(dt);
+	highlights.advance(dt);
+
+	{
+		auto scope = measure_scope(cosm.profiler.interpolation);
+		interp.integrate_interpolated_transforms(input.interpolation, cosm, dt, cosm.get_fixed_delta());
+	}
+
+	particles.advance_visible_streams_and_all_particles(
+		camera.smoothed_camera,
+		cosm,
+		dt,
+		interp
+	);
+
+	get<light_system>().advance_attenuation_variations(cosm, dt);
+
+	camera.tick(
+		interp,
+		dt,
+		input.camera,
+		viewed_character
+	);
+
+	get<wandering_pixels_system>().advance_for_visible(
+		all_visible,
+		cosm,
+		dt
+	);
+
+	world_hover_highlighter.cycle_duration_ms = 400;
+	world_hover_highlighter.update(dt.in_milliseconds());
+
+	if (viewed_character.alive()) {
+		auto& gui = get<gui_element_system>();
+
+		gui.advance_elements(
+			viewed_character,
+			dt
+		);
+
+		gui.rebuild_layouts(
+			viewed_character
+		);
+
+		auto listener_cone = camera.smoothed_camera;
+		listener_cone.transform = viewed_character.get_viewing_transform(interp);
+
+		get<sound_system>().play_nearby_sound_existences(
+			input.audio_volume,
+			listener_cone,
+			viewed_character,
+			cosm,
+			interp,
+			dt
+		);
+	}
+}
+
+void audiovisual_state::spread_past_infection(const const_logic_step step) {
+	const auto& cosm = step.cosm;
+
+	const auto& events = step.transient.messages.get_queue<messages::collision_message>();
+
+	for (const auto& it : events) {
+		const const_entity_handle subject_owner_body = cosm[it.subject].get_owner_body();
+		const const_entity_handle collider_owner_body = cosm[it.collider].get_owner_body();
+
+		auto& past_system = get<past_infection_system>();
+
+		if (past_system.is_infected(subject_owner_body) && !collider_owner_body.get_flag(entity_flag::IS_IMMUNE_TO_PAST)) {
+			past_system.infect(collider_owner_body);
+		}
+	}
+}
+
+void audiovisual_state::standard_post_solve(const const_logic_step step) {
 	const auto& cosmos = step.cosm;
 	reserve_caches_for_entities(cosmos.get_aggregate_pool().capacity());
-	
+
 	const auto& healths = step.transient.messages.get_queue<messages::health_event>();
 	const auto& new_thunders = step.transient.messages.get_queue<thunder_input>();
 	auto new_rings = step.transient.messages.get_queue<exploding_ring_input>();
 
 	const auto& new_interpolation_corrections = step.transient.messages.get_queue<messages::interpolation_correction_request>();
-	auto& interp = systems_audiovisual.get<interpolation_system>();
+	auto& interp = get<interpolation_system>();
 
 	for (const auto& c : new_interpolation_corrections) {
 		const auto from = cosmos[c.set_previous_transform_from];
@@ -44,10 +152,10 @@ void viewing_session::standard_audiovisual_post_solve(const const_logic_step ste
 		}
 	}
 
-	auto& thunders = systems_audiovisual.get<thunder_system>();
-	auto& exploding_rings = systems_audiovisual.get<exploding_ring_system>();
-	auto& flying_numbers = systems_audiovisual.get<flying_number_indicator_system>();
-	auto& highlights = systems_audiovisual.get<pure_color_highlight_system>();
+	auto& thunders = get<thunder_system>();
+	auto& exploding_rings = get<exploding_ring_system>();
+	auto& flying_numbers = get<flying_number_indicator_system>();
+	auto& highlights = get<pure_color_highlight_system>();
 
 	for (const auto& h : healths) {
 		flying_number_indicator_system::number::input vn;
@@ -250,7 +358,7 @@ void viewing_session::standard_audiovisual_post_solve(const const_logic_step ste
 		);
 
 		vn.pos = h.point_of_impact;
-		
+
 		flying_numbers.add(vn);
 
 		pure_color_highlight_system::highlight::input new_highlight;
@@ -270,14 +378,14 @@ void viewing_session::standard_audiovisual_post_solve(const const_logic_step ste
 
 	exploding_rings.acquire_new_rings(new_rings);
 
-	auto& gui = systems_audiovisual.get<gui_element_system>();
+	auto& gui = get<gui_element_system>();
 
 	gui.reposition_picked_up_and_transferred_items(step);
 
 	gui.erase_caches_for_dead_entities(cosmos);
-	systems_audiovisual.get<sound_system>().erase_caches_for_dead_entities(cosmos);
-	systems_audiovisual.get<particles_simulation_system>().erase_caches_for_dead_entities(cosmos);
-	systems_audiovisual.get<wandering_pixels_system>().erase_caches_for_dead_entities(cosmos);
+	get<sound_system>().erase_caches_for_dead_entities(cosmos);
+	get<particles_simulation_system>().erase_caches_for_dead_entities(cosmos);
+	get<wandering_pixels_system>().erase_caches_for_dead_entities(cosmos);
 
 	for (const auto& pickup : step.transient.messages.get_queue<messages::item_picked_up_message>()) {
 		gui.get_character_gui(pickup.subject).assign_item_to_first_free_hotbar_button(

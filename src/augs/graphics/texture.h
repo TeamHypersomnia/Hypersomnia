@@ -1,23 +1,33 @@
 #pragma once
 #include "augs/image/image.h"
 
+using GLuint = unsigned int;
+
 namespace augs {
 	namespace graphics {
 		class texture {
-		public:
-			unsigned int id = 0xdeadbeef;
-			bool built = false;
+			friend class fbo;
 
-			texture() = default;
+			GLuint id = 0xdeadbeef;
+			bool built = false;
+			
+			void create(const vec2u size, const unsigned char* source = nullptr);
+			void destroy();
+		
+		public:
+			texture(const augs::image& rgba_source);
+			texture(const vec2u size);
+
 			~texture();
 
+			texture(texture&&);
+			texture& operator=(texture&&);
+			
 			texture(const texture&) = delete;
-			texture(texture&&) = delete;
 			texture& operator=(const texture&) = delete;
-			texture& operator=(texture&&) = delete;
 
-			void create(const augs::image& rgba_source);
-			void destroy();
+			static void unbind();
+			void bind() const;
 		};
 	}
 }

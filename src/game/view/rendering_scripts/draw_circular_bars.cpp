@@ -14,7 +14,7 @@ namespace rendering_scripts {
 		const auto& visible_entities = r.visible.all;
 		auto& target = r.renderer;
 		const auto& cosmos = r.cosm;
-		const auto& interp = r.session.systems_audiovisual.get<interpolation_system>();
+		const auto& interp = r.audiovisuals.get<interpolation_system>();
 		const auto& manager = get_assets_manager();
 
 		const auto& watched_character = cosmos[r.viewed_character];
@@ -47,13 +47,13 @@ namespace rendering_scripts {
 				
 				circle_hud.set(
 					assets::game_image_id::CIRCULAR_BAR_MEDIUM, 
-					manager[assets::game_image_id::CIRCULAR_BAR_MEDIUM].get_size(),
+					manager.at(assets::game_image_id::CIRCULAR_BAR_MEDIUM).get_size(),
 					health_col
 				);
 
 				circle_hud.draw(state);
 
-				const auto watched_character_transform = watched_character.get_viewing_transform(r.session.systems_audiovisual.get<interpolation_system>());
+				const auto watched_character_transform = watched_character.get_viewing_transform(r.audiovisuals.get<interpolation_system>());
 				float starting_health_angle = 0.f;
 				float ending_health_angle = 0.f;
 
@@ -137,7 +137,7 @@ namespace rendering_scripts {
 					examine_item_slot(v.get_primary_hand(), starting_health_angle - 22.5f - 45.f, 45.f, true);
 				}
 
-				const int radius = manager[assets::game_image_id::CIRCULAR_BAR_MEDIUM].get_size().x / 2;
+				const int radius = manager.at(assets::game_image_id::CIRCULAR_BAR_MEDIUM).get_size().x / 2;
 				const auto empty_health_amount = static_cast<int>((1 - health.get_ratio()) * 90);
 
 				textual_infos.push_back({

@@ -92,7 +92,7 @@ namespace augs {
 		font_metadata_from_file meta;
 		std::vector<augs::image> glyph_bitmaps;
 
-		void from_file(
+		font(
 			const std::string& source_font_path,
 			const font_loading_input&
 		);

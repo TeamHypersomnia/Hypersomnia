@@ -40,7 +40,7 @@ void trace_system::lengthen_sprites_of_traces(const logic_step step) const {
 				surplus_multiplier = (trace.chosen_multiplier + vec2(1, 1)) * (1.f - (trace.lengthening_time_passed_ms / trace.chosen_lengthening_duration_ms)) - vec2(1, 1);
 			}
 
-			const auto original_image_size = metas[sprite.tex].get_size();
+			const auto original_image_size = metas.at(sprite.tex).get_size();
 			const auto size_multiplier = trace.additional_multiplier + surplus_multiplier;
 
 			sprite.overridden_size = size_multiplier * original_image_size;

@@ -2,7 +2,7 @@
 #include "choreographic_structs.h"
 
 #include "augs/global_libraries.h"
-#include "application/game_window.h"
+#include "augs/window_framework/window.h"
 
 #include "game/assets/assets_manager.h"
 
@@ -44,7 +44,7 @@ using choreographic_command_variant = std::variant<
 
 using choreographic_command_tuple = replace_list_type_t<choreographic_command_variant, std::tuple>;
 
-using namespace augs::window::event::keys;
+using namespace augs::event::keys;
 
 void choreographic_setup::process(
 	game_window& window,
@@ -250,7 +250,7 @@ void choreographic_setup::process(
 		}
 
 		augs::machine_entropy new_machine_entropy;
-		new_machine_entropy.local = window.collect_entropy(session.config.enable_cursor_clipping);
+		new_machine_entropy.local = window.collect_entropy();
 		process_exit(new_machine_entropy.local);
 
 		session.switch_between_gui_and_back(new_machine_entropy.local);
@@ -272,7 +272,7 @@ void choreographic_setup::process(
 		if (currently_played_scene_index != -1) {
 			auto& scene = preloaded_scenes[currently_played_scene_index];
 			
-			session.control_gui_and_remove_fetched_events(
+			session.fetch_gui_events(
 				scene.scene.hypersomnia[scene.scene.characters.get_selected_character()],
 				new_machine_entropy.local
 			);

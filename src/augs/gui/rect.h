@@ -34,7 +34,7 @@ namespace augs {
 
 		template <class gui_element_variant_id>
 		struct rect_node : rect_node_data {
-			typedef augs::gui::gui_entropy<gui_element_variant_id> gui_entropy;
+			using gui_entropy = augs::gui::gui_entropy<gui_element_variant_id>;
 
 			using rect_node_data::rect_node_data;
 
@@ -94,10 +94,10 @@ namespace augs {
 			static void consume_raw_input_and_generate_gui_events(
 				const C context, 
 				const gui_element_id this_id, 
-				gui::event_traversal_flags& inf, 
+				gui::raw_input_traversal& inf, 
 				gui_entropy& entropies
 			) {
-				using namespace augs::window::event;
+				using namespace augs::event;
 				auto& gr = context.get_rect_world();
 				const auto& tree_entry = context.get_tree_entry(this_id);
 				const auto& state = gr.last_state;
@@ -297,7 +297,7 @@ namespace augs {
 			) {
 				const auto& manager = get_assets_manager();
 				const auto absolute = context.get_tree_entry(id).get_absolute_rect();
-				const auto tex_size = manager[mat.tex].get_size();
+				const auto tex_size = manager.at(mat.tex).get_size();
 				
 				auto tex_rc = ltrbi(vec2i(0, 0), tex_size).place_in_center_of(absolute);
 				tex_rc.set_position(tex_rc.get_position() + offset);
@@ -337,7 +337,7 @@ namespace augs {
 			static void unhover(
 				const C context, 
 				const gui_element_id this_id, 
-				gui::event_traversal_flags& inf, 
+				gui::raw_input_traversal& inf, 
 				gui_entropy& entropies
 			) {
 				auto& world = context.get_rect_world();
@@ -410,7 +410,7 @@ namespace augs {
 			//	};
 			//
 			//	if (e == gui_event::wheel) {
-			//		if (wnd.keys[augs::window::event::keys::key::SHIFT]) {
+			//		if (wnd.keys[augs::event::keys::key::SHIFT]) {
 			//			int temp = static_cast<int>(scroll.x);
 			//			if (scrollable) {
 			//

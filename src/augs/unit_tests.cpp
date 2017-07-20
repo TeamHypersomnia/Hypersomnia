@@ -6,24 +6,27 @@
 #endif
 
 #include "augs/ensure.h"
+#include "application/debug_settings.h"
 
 namespace augs {
 	void run_unit_tests(
 		const int argc,
 		const char* const * const argv,
-		const bool show_successful,
-		const bool break_on_failure,
-		const std::string& output_log_path
+		const unit_tests_settings& settings
 	) {
+		if (!settings.run) {
+			return;
+		}
+
 #if BUILD_UNIT_TESTS
 		Catch::Session session;
 
 		{
 			auto& cfg = session.configData();
 
-			cfg.showSuccessfulTests = show_successful;
-			cfg.shouldDebugBreak = break_on_failure;
-			cfg.outputFilename = output_log_path;
+			cfg.showSuccessfulTests = settings.log_successful;
+			cfg.shouldDebugBreak = settings.break_on_failure;
+			cfg.outputFilename = settings.output_log_path;
 			cfg.runOrder = Catch::RunTests::InWhatOrder::InDeclarationOrder;
 		}
 

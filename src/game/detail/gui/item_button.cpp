@@ -155,7 +155,7 @@ item_button::layout_with_attachments item_button::calculate_button_layout(
 		b += -origin;
 	}
 
-	const auto gui_def = manager[component_owner.get<components::sprite>().tex].gui_usage;
+	const auto gui_def = manager.at(component_owner.get<components::sprite>().tex).gui_usage;
 
 	if (gui_def.flip_horizontally) {
 		for (auto& b : output.boxes) {
@@ -410,7 +410,7 @@ void item_button::draw_proc(
 				container_icon = assets::game_image_id::CONTAINER_CLOSED_ICON;
 			}
 
-			const auto size = manager[container_icon].get_size();
+			const auto size = manager.at(container_icon).get_size();
 
 			augs::draw_rect(in.v, vec2(this_absolute_rect.r - size.x + 2, this_absolute_rect.t + 1), container_icon, border_col);
 		}
@@ -448,7 +448,7 @@ void item_button::rebuild_layouts(const game_gui_context context, const this_in_
 
 	if (sprite) {
 		vec2i rounded_size = calculate_button_layout(item, !this_id->is_container_open).aabb.get_size();
-		rounded_size = griddify_size(rounded_size, manager[item.get<components::sprite>().tex].gui_usage.bbox_expander);
+		rounded_size = griddify_size(rounded_size, manager.at(item.get<components::sprite>().tex).gui_usage.bbox_expander);
 		this_id->rc.set_size(rounded_size);
 	}
 

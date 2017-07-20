@@ -12,6 +12,7 @@ namespace augs {
 		using base::all;
 		using base::operator==;
 		using base::operator!=;
+		using base::size;
 
 		bool operator==(const enum_bitset& b) const {
 			return base::operator==(b);
@@ -23,6 +24,10 @@ namespace augs {
 
 		bool test(const _enum f) const {
 			return base::test(static_cast<size_t>(f));
+		}
+
+		decltype(auto) operator[](const _enum f) const {
+			return base::operator[](static_cast<size_t>(f));
 		}
 
 		decltype(auto) set(const _enum f, const bool value = true) {

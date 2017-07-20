@@ -65,7 +65,9 @@ struct tests_of_traits {
 	static_assert(!is_variable_size_container_v<decltype(pad_bytes<3>::pad)>, "Trait has failed");
 	static_assert(is_variable_size_container_v<augs::enum_associative_array<intent_type, vec2>>, "Trait has failed");
 
-
+	
+	static_assert(is_unary_container_v<augs::constant_size_vector<vec2, 20>>, "Trait has failed");
+	static_assert(is_variable_size_container_v<augs::constant_size_vector<vec2, 20>>, "Trait has failed");
 	static_assert(augs::has_io_overloads_v<augs::stream, augs::constant_size_vector<vec2, 20>>, "Trait has failed");
 	static_assert(augs::has_io_overloads_v<augs::stream, augs::enum_associative_array<intent_type, vec2>>, "Trait has failed");
 	static_assert(augs::has_io_overloads_v<augs::stream, std::vector<int>>, "Trait has failed");
@@ -201,7 +203,11 @@ struct tests_of_traits {
 
 	static_assert(augs::has_custom_to_lua_value_v<rgba>);
 	static_assert(augs::has_custom_to_lua_value_v<ImVec4>);
-
+	static_assert(augs::has_custom_to_lua_value_v<std::wstring>);
+	static_assert(augs::representable_as_lua_value_v<std::wstring>);
+	static_assert(augs::representable_as_lua_value_v<const std::wstring*>);
+	
+	static_assert(!augs::has_io_overloads_v<augs::stream, put_all_components_into_t<augs::component_aggregate>>);
 };
 
 /*
@@ -216,7 +222,7 @@ sizeof(augs::enum_associative_array<assets::particle_effect_id, particle_effect>
 sizeof(augs::enum_associative_array<assets::tile_layer_id, tile_layer>);
 sizeof(augs::enum_associative_array<assets::physical_material_id, physical_material>);
 sizeof(augs::enum_associative_array<assets::shader_id, augs::graphics::shader>);
-sizeof(augs::enum_associative_array<assets::program_id, augs::graphics::shader_program>);
+sizeof(augs::enum_associative_array<assets::shader_program_id, augs::graphics::shader_program>);
 sizeof(augs::enum_associative_array<assets::sound_buffer_id, augs::sound_buffer>);
 sizeof(augs::enum_associative_array<assets::gl_texture_id, augs::graphics::texture>);
 sizeof(particle_effect_logical_meta);

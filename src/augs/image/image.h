@@ -79,27 +79,28 @@ namespace augs {
 		std::vector<rgba> v;
 		vec2u size;
 
+		bool from_file(const std::string& path);
+		bool from_png(const std::string& path);
+		bool from_binary_file(const std::string& path);
+
+		void save_as_png(const std::string& path) const;
+		void save_as_binary_file(const std::string& path) const;
+
+		void resize(const vec2u image_size);
+
 	public:
-		void create(const vec2u image_size);
-
-		template <class A, class B>
-		void create(const A columns, const B rows) {
-			create({ columns, rows });
-		}
-
-		void create_from(
+		image(const vec2u image_size = {});
+		
+		image(
 			const rgba_channel* const ptr,
 			const unsigned channels,
 			const unsigned pitch,
 			const vec2u size
 		);
 		
-		void fill(const rgba fill_color);
+		image(const std::string& file_path);
 
-		bool from_file(const std::string& filename);
-		bool from_binary_file(const std::string& filename);
-		
-		bool from_clipboard();
+		void fill(const rgba fill_color);
 
 		void blit(
 			const image& source,
@@ -118,10 +119,7 @@ namespace augs {
 
 		rgba& pixel(const vec2u at_coordinates);
 
-		void destroy();
-		
-		void save(const std::string& filename) const;
-		void save_as_binary_file(const std::string& filename) const;
+		void save(const std::string& path) const;
 		
 		vec2u get_size() const;
 		unsigned get_rows() const;

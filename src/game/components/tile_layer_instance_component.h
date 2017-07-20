@@ -35,7 +35,7 @@ namespace components {
 			const T& metas,
 			const components::transform transform
 		) const {
-			const auto& layer = metas[id];
+			const auto& layer = metas.at(id);
 			const auto tile_square_size = layer.get_tile_side(metas);
 			const auto size = layer.get_size();
 

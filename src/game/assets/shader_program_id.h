@@ -2,8 +2,10 @@
 #include "game/container_sizes.h"
 
 namespace assets {
-	enum class program_id {
+	enum class shader_program_id {
+		// GEN INTROSPECTOR enum class assets::shader_program_id
 		INVALID,
+		
 		DEFAULT,
 		DEFAULT_ILLUMINATED,
 		LIGHT,
@@ -13,8 +15,9 @@ namespace assets {
 		SMOKE,
 		ILLUMINATING_SMOKE,
 		SPECULAR_HIGHLIGHTS,
-		FULLSCREEN,
+
 		REQUISITE_COUNT,
 		COUNT = MAX_SHADER_PROGRAM_COUNT + 1
+		// END GEN INTROSPECTOR
 	};
 }

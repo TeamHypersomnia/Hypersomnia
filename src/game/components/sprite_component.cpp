@@ -97,7 +97,7 @@ namespace components {
 		}
 
 		if (in.drawing_type == renderable_drawing_type::NEON_MAPS) {
-			const auto& maybe_neon_map = manager[tex].texture_maps[texture_map_type::NEON];
+			const auto& maybe_neon_map = manager.at(tex).texture_maps[texture_map_type::NEON];
 
 			if (maybe_neon_map.exists()) {
 				draw(
@@ -106,7 +106,7 @@ namespace components {
 					screen_space_pos,
 					final_rotation,
 					vec2(maybe_neon_map.original_size_pixels)
-					/ manager[tex].get_size() * drawn_size
+					/ manager.at(tex).get_size() * drawn_size
 				);
 			}
 		}
@@ -116,7 +116,7 @@ namespace components {
 		) {
 			draw(
 				in, 
-				manager[tex].texture_maps[texture_map_type::DIFFUSE],
+				manager.at(tex).texture_maps[texture_map_type::DIFFUSE],
 				screen_space_pos,
 				final_rotation, 
 				drawn_size
@@ -142,10 +142,10 @@ namespace components {
 
 				draw(
 					in, 
-					manager[target_frame].texture_maps[texture_map_type::DIFFUSE],
+					manager.at(target_frame).texture_maps[texture_map_type::DIFFUSE],
 					screen_space_pos + blink_offset,
 					final_rotation,
-					manager[target_frame].get_size()
+					manager.at(target_frame).get_size()
 				);
 			}
 		}

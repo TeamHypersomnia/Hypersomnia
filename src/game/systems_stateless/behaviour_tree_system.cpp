@@ -20,8 +20,11 @@ void behaviour_tree_system::evaluate_trees(const logic_step step) {
 			auto& behaviour_tree = target.get<components::behaviour_tree>();
 			
 			for (auto& concurrent_tree : behaviour_tree.concurrent_trees) {
+				// TODO: fix behaviour tree storage
+#if TODO
 				auto& tree = cosmos[concurrent_tree.tree_id];
 				tree.evaluate_instance_of_tree(step, target, concurrent_tree.state);
+#endif
 			}
 		}
 	);

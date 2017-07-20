@@ -16,7 +16,7 @@ void action_button::draw(
 	draw_info info
 ) {
 	const auto intent_for_this = static_cast<intent_type>(static_cast<int>(intent_type::SPECIAL_ACTION_BUTTON_1) + this_id.get_location().index);
-	const auto bound_key = context.input_information.get_bound_key_if_any(intent_for_this);
+	const auto bound_key = context.get_input_information().get_bound_key_if_any(intent_for_this);
 
 	const auto& cosmos = context.get_cosmos();
 	
@@ -25,7 +25,7 @@ void action_button::draw(
 
 	const auto absolute_rect = context.get_tree_entry(this_id).get_absolute_rect();
 
-	if (bound_key != augs::window::event::keys::key::INVALID) {
+	if (bound_key != augs::event::keys::key::INVALID) {
 		const auto& sentience = context.get_gui_element_entity().get<components::sentience>();
 		const auto bound_spell = get_bound_spell(context, this_id);
 
@@ -70,7 +70,7 @@ void action_button::draw(
 
 						const augs::gui::material inside_mat(inside_tex, inside_col);
 
-						const auto absolute_icon_rect = ltrbi(vec2i(0, 0), manager[inside_tex].get_size()).place_in_center_of(absolute_rect);
+						const auto absolute_icon_rect = ltrbi(vec2i(0, 0), manager.at(inside_tex).get_size()).place_in_center_of(absolute_rect);
 						const bool draw_partial_colorful_rect = false;
 
 						if (has_enough_mana) {

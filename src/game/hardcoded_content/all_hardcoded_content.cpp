@@ -1,15 +1,14 @@
 #include "game/hardcoded_content/all_hardcoded_content.h"
 #include "game/assets/assets_manager.h"
 
-#include "application/config_lua_table.h"
+#include "application/content_regeneration/content_regeneration_settings.h"
 
-#include "application/content_generation/texture_atlases.h"
-#include "application/content_generation/neon_maps.h"
-#include "application/content_generation/desaturations.h"
-#include "application/content_generation/buttons_with_corners.h"
-#include "application/content_generation/scripted_images.h"
+#include "application/content_regeneration/texture_atlases.h"
+#include "application/content_regeneration/neon_maps.h"
+#include "application/content_regeneration/desaturations.h"
+#include "application/content_regeneration/buttons_with_corners.h"
+#include "application/content_regeneration/scripted_images.h"
 
-#include "augs/graphics/OpenGL_includes.h"
 #include "augs/misc/lua_readwrite.h"
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
@@ -54,9 +53,7 @@ void add_definitions_recursively_from_dir(const std::string& dir_path, T& into) 
 	);
 }
 
-void load_all_requisite(const config_lua_table& cfg) {
-	auto& manager = get_assets_manager();
-	
+void load_all_requisite(assets_manager& manager, const content_regeneration_settings& cfg) {
 	game_image_definitions images;
 	game_font_definitions fonts;
 
@@ -85,14 +82,14 @@ void load_all_requisite(const config_lua_table& cfg) {
 
 	LOG("\n--------------------------------------------\nChecking content integrity...");
 
-	const bool force_regenerate = cfg.debug_regenerate_content_every_launch;
+	const bool force_regenerate = cfg.regenerate_every_launch;
 	
 	load_button_with_corners(
 		cfg.menu_button,
 		images,
 		assets::game_image_id::MENU_BUTTON_INSIDE,
 		"generated/content/requisite/gfx/buttons_with_corners/menu_button_%x.png",
-		cfg.debug_regenerate_content_every_launch
+		force_regenerate
 	);
 
 	load_button_with_corners(
@@ -100,7 +97,7 @@ void load_all_requisite(const config_lua_table& cfg) {
 		images,
 		assets::game_image_id::HOTBAR_BUTTON_INSIDE,
 		"generated/content/requisite/gfx/buttons_with_corners/hotbar_button_%x.png",
-		cfg.debug_regenerate_content_every_launch
+		force_regenerate
 	);
 
 	regenerate_what_is_needed_for(images, force_regenerate);
@@ -117,8 +114,8 @@ void load_all_requisite(const config_lua_table& cfg) {
 
 	const auto atlases = regenerate_atlases(
 		in,
-		cfg.debug_regenerate_content_every_launch,
-		cfg.check_content_integrity_every_launch,
+		force_regenerate,
+		cfg.check_integrity_every_launch,
 		cfg.save_regenerated_atlases_as_binary,
 		cfg.packer_detail_max_atlas_size
 	);

@@ -14,7 +14,7 @@
 #include "augs/graphics/renderer.h"
 #include "augs/templates/container_templates.h"
 #include "augs/templates/to_array.h"
-#include "application/config_structs/debug_drawing_settings.h"
+#include "game/view/debug_drawing_settings.h"
 
 #define FRICTION_FIELDS_COLLIDE 0
 
@@ -98,7 +98,7 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 
 						auto& renderer = augs::renderer::get_current();
 
-						if (renderer.debug.draw_friction_field_collisions_of_entering) {
+						if (DEBUG_DRAWING.draw_friction_field_collisions_of_entering) {
 							renderer.persistent_lines.draw_yellow(
 								si.get_pixels(worldManifold.points[i]), 
 								si.get_pixels(worldManifold.points[i]) + vec2(worldManifold.normal).set_length(150)

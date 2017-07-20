@@ -1,6 +1,7 @@
 #pragma once
 
-enum class menu_button_type {
+enum class main_menu_button_type {
+	// GEN INTROSPECTOR enum class main_menu_button_type
 	CONNECT_TO_OFFICIAL_UNIVERSE,
 	BROWSE_UNOFFICIAL_UNIVERSES,
 	HOST_UNIVERSE,
@@ -12,13 +13,5 @@ enum class menu_button_type {
 	QUIT,
 
 	COUNT
-};
-
-enum class local_submenu_button_type {
-	SINGLEPLAYER,
-	SCENE_DIRECTOR,
-	DETERMINISM_TEST,
-	BACK,
-
-	COUNT
+	// END GEN INTROSPECTOR
 };

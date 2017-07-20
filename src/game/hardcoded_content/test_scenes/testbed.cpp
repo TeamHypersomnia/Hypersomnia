@@ -46,6 +46,7 @@ namespace test_scenes {
 	void testbed::populate(const logic_step step) {
 #if BUILD_TEST_SCENES
 		auto& world = step.cosm;
+		world.set_fixed_delta(60);
 		const auto& metas = step.input.metas_of_assets;
 		
 		//const auto crate = prefabs::create_crate(step, vec2(200, 200 + 300), vec2i(100, 100) / 3);
@@ -630,7 +631,7 @@ namespace test_scenes {
 					prefabs::create_brick_wall(step, components::transform(-3 - 16 + 100 - 160, -32 - 96 + 160 - 160*b, 90), { 160, 160 });
 				}
 
-				const vec2 bg_size = metas[assets::game_image_id::TEST_BACKGROUND].get_size();
+				const vec2 bg_size = metas.at(assets::game_image_id::TEST_BACKGROUND).get_size();
 
 				const int num_floors = 10 * 10;
 				const int side = sqrt(num_floors) / 2;
@@ -654,7 +655,7 @@ namespace test_scenes {
 				}
 
 				{
-					const vec2 size = metas[assets::game_image_id::ROAD_FRONT_DIRT].get_size();
+					const vec2 size = metas.at(assets::game_image_id::ROAD_FRONT_DIRT).get_size();
 
 					auto road_dirt = world.create_entity("road_dirt[-]");
 					ingredients::add_sprite(road_dirt,
@@ -666,7 +667,7 @@ namespace test_scenes {
 				}
 
 				for (int r = 0; r < 38; ++r) {
-					const vec2 size = metas[assets::game_image_id::ROAD].get_size();
+					const vec2 size = metas.at(assets::game_image_id::ROAD).get_size();
 
 					auto road = world.create_entity("road[-]");
 					ingredients::add_sprite(road,

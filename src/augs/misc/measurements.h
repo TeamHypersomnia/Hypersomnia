@@ -1,39 +1,143 @@
 #pragma once
 #include <string>
+#include <algorithm>
+
+#include "augs/log.h"
+#include "augs/math/vec2.h"
+#include "augs/templates/container_templates.h"
 #include "augs/misc/timer.h"
 
 namespace augs {
+	template <class derived, class T = double>
 	class measurements {
-		size_t measurement_index = 0;
-		timer tm;
+	protected:
+		using base = measurements<derived, T>;
 
-		double last_average;
-		double last_minimum;
-		double last_maximum;
-		double last_measurement;
+		std::size_t measurement_index = 0;
+
+		T last_average = 1;
+		T last_minimum = 1;
+		T last_maximum = 1;
+		T last_measurement = 1;
 
 		bool measured = false;
-		bool measurements_are_time = false;
+
 	public:
-		measurements(std::wstring title = L"Untitled", bool measurements_are_time = true, size_t tracked_count = 20);
+		std::wstring title = L"Untitled";
+		std::vector<T> tracked;
 
-		std::wstring title;
+		measurements(const std::size_t tracked_count = 20u) {
+			last_average = 1.0;
+			last_maximum = 1.0;
+			last_minimum = 1.0;
+			last_measurement = 1.0;
+			tracked.resize(tracked_count, 0);
+		}
 
-		std::vector<double> tracked;
+		void measure(const T value) {
+			measured = true;
+			last_measurement = value;
 
-		std::wstring summary() const;
+			tracked[measurement_index] = last_measurement;
+			++measurement_index;
+			measurement_index %= tracked.size();
 
-		bool operator<(const measurements& b) const;
+			T avg = 0;
 
-		double get_average_units() const;
-		double get_maximum_units() const;
-		double get_minimum_units() const;
-		double get_last_measurement_units() const;
+			for (auto v : tracked) {
+				avg += v;
+			}
 
-		bool was_measured() const;
+			last_average = avg / tracked.size();
+			last_maximum = maximum_of(tracked);
+			last_minimum = minimum_of(tracked);
+		}
 
-		void measure(double);
-		void new_measurement();
-		void end_measurement();
+		std::wstring summary() const {
+			if (!was_measured()) {
+				return {};
+			}
+
+			const auto& self = *static_cast<const derived*>(this);
+			return self.summary_impl();
+		}
+
+		bool operator<(const measurements& b) const {
+			return get_average_units() < b.get_average_units();
+		}
+
+		T get_average_units() const {
+			return last_average;
+		}
+
+		T get_maximum_units() const {
+			return last_maximum;
+		}
+
+		T get_minimum_units() const {
+			return last_minimum;
+		}
+
+		T get_last_measurement_units() const {
+			return last_measurement;
+		}
+
+		bool was_measured() const {
+			return measured;
+		}
+	};
+
+	template <class T>
+	class amount_measurements : public measurements<amount_measurements<T>, T> {
+		friend class base;
+
+		auto summary_impl() const {
+			return typesafe_sprintf(L"%x: %f2\n", title, get_average_units());
+		}
+
+	public:
+		using base::operator<;
+		using base::base;
+	};
+
+	class time_measurements : public measurements<time_measurements, double> {
+		timer tm;
+
+		friend class base;
+
+		auto summary_impl() const {
+			const auto avg_secs = get_average_units();
+			const bool division_by_secs_safe = std::abs(avg_secs) > AUGS_EPSILON<double>;
+
+			if (division_by_secs_safe) {
+				return typesafe_sprintf(
+					L"%x: %f2 ms (%f2 FPS)\n", 
+					title,
+					avg_secs * 1000,
+					1 / avg_secs
+				);
+			}
+			else {
+				return typesafe_sprintf(
+					L"%x: %f2 ms\n", 
+					title,
+					avg_secs * 1000
+				);
+			}
+		}
+
+		using base::measure;
+
+	public:
+		using base::operator<;
+		using base::base;
+
+		void start() {
+			tm.reset();
+		}
+
+		void stop() {
+			measure(tm.get<std::chrono::seconds>());
+		}
 	};
 }

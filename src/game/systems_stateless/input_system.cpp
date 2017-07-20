@@ -19,7 +19,7 @@
 #include "game/transcendental/logic_step.h"
 #include "game/transcendental/entity_handle.h"
 
-using namespace augs::window;
+using namespace augs;
 
 void input_system::make_input_messages(const logic_step step) {
 	for (const auto& per_entity : step.input.entropy.intents_per_entity) {

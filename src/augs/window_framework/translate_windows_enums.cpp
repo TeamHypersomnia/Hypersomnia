@@ -1,8 +1,8 @@
 #include <Windows.h>
 #include "translate_windows_enums.h"
 
-using namespace augs::window::event;
-using namespace augs::window::event::keys;
+using namespace augs::event;
+using namespace augs::event::keys;
 
 message translate_enum(UINT m) {
 	switch (m) {
@@ -38,7 +38,7 @@ message translate_enum(UINT m) {
 	default: break;
 	}
 
-	return augs::window::event::message::unknown;
+	return augs::event::message::unknown;
 }
 
 key translate_virtual_key(const unsigned int m) {

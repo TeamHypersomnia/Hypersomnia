@@ -78,19 +78,19 @@ namespace augs {
 	void draw_rect(vertex_triangle_buffer& v, const ltrb origin, const assets::game_image_id id, const rgba color) {
 		const auto& manager = get_assets_manager();
 
-		draw_rect(v, origin, manager[id].texture_maps[texture_map_type::DIFFUSE], color);
+		draw_rect(v, origin, manager.at(id).texture_maps[texture_map_type::DIFFUSE], color);
 	}
 
 	void draw_rect(vertex_triangle_buffer& v, const vec2 origin, const assets::game_image_id id, const rgba color) {
 		const auto& manager = get_assets_manager();
-		const auto size = manager[id].get_size();
+		const auto size = manager.at(id).get_size();
 
-		draw_rect(v, xywh{ origin.x, origin.y, static_cast<float>(size.x), static_cast<float>(size.y) }, manager[id].texture_maps[texture_map_type::DIFFUSE], color);
+		draw_rect(v, xywh{ origin.x, origin.y, static_cast<float>(size.x), static_cast<float>(size.y) }, manager.at(id).texture_maps[texture_map_type::DIFFUSE], color);
 	}
 	
 	void draw_cursor(vertex_triangle_buffer& v, const vec2 origin, const assets::game_image_id id, const rgba color) {
 		const auto& manager = get_assets_manager();
-		draw_rect(v, origin + manager[id].gui_usage.cursor_offset, id, color);
+		draw_rect(v, origin + manager.at(id).gui_usage.cursor_offset, id, color);
 	}
 
 	void draw_rect(vertex_triangle_buffer& v, const ltrb origin, const texture_atlas_entry& tex, const rgba color) {

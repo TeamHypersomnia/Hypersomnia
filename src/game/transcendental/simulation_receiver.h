@@ -3,6 +3,7 @@
 #include "augs/misc/jitter_buffer.h"
 #include "game/components/transform_component.h"
 #include <unordered_set>
+#include "game/transcendental/simulation_receiver_settings.h"
 
 namespace augs {
 	namespace network {
@@ -37,7 +38,13 @@ class simulation_receiver {
 	) const;
 
 	steps_unpacking_result unpack_deterministic_steps(cosmos& referential_cosmos, cosmos& last_delta_unpacked);
-	void drag_mispredictions_into_past(interpolation_system&, past_infection_system&, const cosmos& predicted_cosmos, const std::vector<misprediction_candidate_entry>& mispredictions) const;
+	void drag_mispredictions_into_past(
+		const simulation_receiver_settings&,
+		interpolation_system&,
+		past_infection_system&, 
+		const cosmos& predicted_cosmos, 
+		const std::vector<misprediction_candidate_entry>& mispredictions
+	) const;
 
 	void predict_intents_of_remote_entities(
 		guid_mapped_entropy& adjusted_entropy, 
@@ -49,7 +56,6 @@ public:
 	std::vector<guid_mapped_entropy> predicted_step_entropies;
 
 	float reinfer_prediction_every_ms = 1000.f;
-	float misprediction_smoothing_multiplier = 0.5f;
 
 	void acquire_next_packaged_step(const step_packaged_for_network&);
 
@@ -74,6 +80,7 @@ public:
 
 	template<class Step>
 	steps_unpacking_result unpack_deterministic_steps(
+		const simulation_receiver_settings& settings,
 		interpolation_system& interp, 
 		past_infection_system& past,
 		const entity_id locally_controlled_entity, 
@@ -123,7 +130,7 @@ public:
 				);
 			}
 
-			drag_mispredictions_into_past(interp, past, predicted_cosmos, potential_mispredictions);
+			drag_mispredictions_into_past(settings, interp, past, predicted_cosmos, potential_mispredictions);
 		}
 
 		return result;

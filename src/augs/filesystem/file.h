@@ -8,6 +8,8 @@
 #include <fstream>
 #include <experimental\filesystem>
 
+#include "augs/ensure.h"
+
 namespace augs {
 	namespace fs = std::experimental::filesystem;
 	
@@ -149,7 +151,7 @@ namespace augs {
 	template <class P, class C>
 	void create_binary_file(const P& path, const C& content) {
 		std::ofstream out(path, std::ios::out | std::ios::binary);
-		out.write(content.data(), content.size());
+		out.write(reinterpret_cast<const byte_type_for_t<std::ofstream>*>(content.data()), content.size() * sizeof(content[0]));
 	}
 
 	template <class P, class S>
@@ -160,7 +162,7 @@ namespace augs {
 		file.seekg(0, std::ios::beg);
 
 		target.reserve(static_cast<unsigned>(size));
-		file.read(target.data(), size);
+		file.read(reinterpret_cast<byte_type_for_t<std::ifstream>*>(target.data()), size);
 		target.set_write_pos(static_cast<size_t>(size));
 	}
 

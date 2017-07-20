@@ -36,6 +36,9 @@ namespace augs {
 		|| std::is_enum_v<T>
 		|| has_custom_to_lua_value_v<T>
 	;
+	
+	template <class T>
+	constexpr bool representable_as_lua_value_v<T*> = representable_as_lua_value_v<std::remove_const_t<T>>;
 
 	template <class T, class = void>
 	struct key_representable_as_lua_value : std::false_type {};
@@ -50,7 +53,10 @@ namespace augs {
 
 	template <class T>
 	void general_from_lua_value(sol::object object, T& into) {
-		if constexpr(has_custom_to_lua_value_v<T>) {
+		if constexpr(std::is_pointer_v<T>) {
+			into = nullptr;
+		}
+		else if constexpr(has_custom_to_lua_value_v<T>) {
 			from_lua_value(object, into);
 		}
 		else if constexpr(std::is_same_v<T, std::string> || std::is_arithmetic_v<T>) {
@@ -222,7 +228,10 @@ namespace augs {
 
 	template <class T>
 	decltype(auto) general_to_lua_value(const T& field) {
-		if constexpr(has_custom_to_lua_value_v<T>) {
+		if constexpr(std::is_pointer_v<T>) {
+			return general_to_lua_value(*field);
+		}
+		else if constexpr(has_custom_to_lua_value_v<T>) {
 			return to_lua_value(field);
 		}
 		else if constexpr(std::is_same_v<T, std::string> || std::is_arithmetic_v<T>) {
@@ -327,7 +336,7 @@ namespace augs {
 		}
 		else {
 			augs::introspect(
-				[output_table](const auto label, const auto& field) mutable {
+				[output_table](const auto label, const auto& field) {
 					using T = std::decay_t<decltype(field)>;
 
 					if constexpr(is_optional_v<T>) {

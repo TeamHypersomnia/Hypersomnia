@@ -13,16 +13,12 @@ protected:
 	component_pointer component;
 	basic_entity_handle<is_const> handle;
 
-	maybe_const_ref_t<is_const, component_type>& get_data() const {
-		return *component;
-	}
-
 public:
 	auto get_handle() const {
 		return handle;
 	}
 
-	component_type get_raw_component() const {
+	auto& get_raw_component() const {
 		return *component;
 	}
 

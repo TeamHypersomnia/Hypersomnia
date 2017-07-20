@@ -48,7 +48,7 @@ namespace components {
 				return overridden_size;
 			}
 			else {
-				return metas[tex].get_size();
+				return metas.at(tex).get_size();
 			}
 		}
 

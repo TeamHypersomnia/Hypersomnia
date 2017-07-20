@@ -7,8 +7,11 @@
 #include "game/components/transform_component.h"
 #include "augs/misc/delta.h"
 
+struct interpolation_settings;
+
 class interpolation_system {
 	bool enabled = true;
+	void set_interpolation_enabled(const bool);
 
 public:
 	struct cache {
@@ -20,18 +23,16 @@ public:
 	};
 
 	std::vector<cache> per_entity_cache;
-	float interpolation_speed = 525.f;
 
 	void integrate_interpolated_transforms(
-		const cosmos&, 
+		const interpolation_settings&,
+		const cosmos&,
 		const augs::delta delta, 
 		const augs::delta fixed_delta_for_slowdowns
 	);
 
 	components::transform get_interpolated(const const_entity_handle) const;
 	components::transform& get_interpolated(const const_entity_handle);
-
-	void set_interpolation_enabled(const bool flag);
 
 	void reserve_caches_for_entities(const size_t);
 

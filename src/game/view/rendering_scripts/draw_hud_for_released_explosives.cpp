@@ -44,7 +44,7 @@ namespace rendering_scripts {
 
 						spr.set(
 							assets::game_image_id::CIRCULAR_BAR_SMALL, 
-							manager[assets::game_image_id::CIRCULAR_BAR_SMALL].get_size(),
+							manager.at(assets::game_image_id::CIRCULAR_BAR_SMALL).get_size(),
 							col
 						);
 

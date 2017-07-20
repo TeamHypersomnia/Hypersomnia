@@ -88,12 +88,12 @@ P P::get_default(const const_entity_handle id) {
 
 template<bool C>
 bool basic_processing_synchronizer<C>::is_activated() const {
-	return get_data().activated;
+	return get_raw_component().activated;
 }
 
 template<bool C>
 bool basic_processing_synchronizer<C>::is_in(const processing_subjects list) const {
-	return get_data().processing_subject_categories.test(list) && !get_data().disabled_categories.test(list);
+	return get_raw_component().processing_subject_categories.test(list) && !get_raw_component().disabled_categories.test(list);
 }
 
 void component_synchronizer<false, P>::reinference() const {
@@ -101,32 +101,32 @@ void component_synchronizer<false, P>::reinference() const {
 }
 
 void component_synchronizer<false, P>::disable_in(const processing_subjects list) const {
-	get_data().disabled_categories.set(list, true);
+	get_raw_component().disabled_categories.set(list, true);
 	reinference();
 }
 
 void component_synchronizer<false, P>::enable_in(const processing_subjects list) const {
-	get_data().disabled_categories.set(list, false);
+	get_raw_component().disabled_categories.set(list, false);
 	reinference();
 }
 
 template<bool C>
 P::flagset_type basic_processing_synchronizer<C>::get_disabled_categories() const {
-	return get_data().disabled_categories;
+	return get_raw_component().disabled_categories;
 }
 
 template<bool C>
 P::flagset_type basic_processing_synchronizer<C>::get_basic_categories() const {
-	return get_data().processing_subject_categories;
+	return get_raw_component().processing_subject_categories;
 }
 
 void component_synchronizer<false, P>::set_disabled_categories(const P::flagset_type& categories) const {
-	get_data().disabled_categories = categories;
+	get_raw_component().disabled_categories = categories;
 	reinference();
 }
 
 void component_synchronizer<false, P>::set_basic_categories(const P::flagset_type& categories) const {
-	get_data().processing_subject_categories = categories;
+	get_raw_component().processing_subject_categories = categories;
 	reinference();
 }
 

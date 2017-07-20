@@ -1,8 +1,15 @@
 return {
-  alternative_port = 0,
-  audio_output_device = "",
-  bpp = 24,
-  camera_settings = {
+  audio = {
+    enable_hrtf = false,
+    max_number_of_sound_sources = 4096,
+    output_device_name = ""
+  },
+  audio_volume = {
+    gui = 1,
+    music = 1,
+    sound_effects = 1
+  },
+  camera = {
     angled_look_length = 100,
     averages_per_sec = 25,
     enable_smoothing = true,
@@ -12,11 +19,28 @@ return {
     },
     smoothing_average_factor = 0.5
   },
-  check_content_integrity_every_launch = true,
-  choreographic_input_scenario_path = "",
-  client_commands_jitter_buffer_ms = 0,
-  connect_address = "",
-  connect_port = 0,
+  content_regeneration = {
+    check_integrity_every_launch = true,
+    hotbar_button = {
+      border_color = "255 255 255 255",
+      inside_color = "255 255 255 255",
+      lower_side = 20,
+      upper_side = 8,
+      inside_border_padding = 4,
+      make_lb_complement = true
+    },
+    menu_button = {
+      border_color = "255 255 255 255",
+      inside_color = "255 255 255 255",
+      lower_side = 12,
+      upper_side = 8,
+      inside_border_padding = 4,
+      make_lb_complement = false
+    },
+    packer_detail_max_atlas_size = 8192,
+    regenerate_every_launch = false,
+    save_regenerated_atlases_as_binary = true
+  },
   controls = {
     key_to_intent = {
       ["0"] = "HOTBAR_BUTTON_9",
@@ -62,97 +86,30 @@ return {
     },
     map_mouse_motion_to = "MOVE_CROSSHAIR"
   },
-  db_path = "",
   debug = {
+    create_minimal_test_scene = false,
+    determinism_test_cloned_cosmoi_count = 0,
+    input_recording_mode = "DISABLED"
+  },
+  debug_drawing = {
+    draw_cast_rays = false,
     draw_colinearization = false,
+    draw_discontinuities = false,
     draw_explosion_forces = false,
     draw_forces = false,
     draw_friction_field_collisions_of_entering = false,
-    draw_visibility = false,
-    drawing_enabled = false
+    draw_memorised_walls = false,
+    draw_triangle_edges = false,
+    draw_undiscovered_locations = false,
+    draw_visible_walls = false,
+    enabled = false
   },
-  debug_break_on_unit_test_failure = false,
-  enable_cursor_clipping = true,
-  debug_log_successful_unit_tests = false,
-  debug_randomize_entropies_in_client_setup = false,
-  debug_randomize_entropies_in_client_setup_once_every_steps = 0,
-  debug_regenerate_content_every_launch = false,
-  debug_run_unit_tests = false,
-  debug_second_nickname = "",
-  default_tickrate = 60,
-  determinism_test_cloned_cosmoi_count = 0,
-  director_input_scene_entropy_path = "director/saved.scene",
-  drawing_settings = {
+  drawing = {
     draw_character_gui = true,
     draw_crosshairs = true,
     draw_weapon_laser = true,
-    show_profile_details = false
+    show_profile_details = true
   },
-  enable_hrtf = true,
-  fullscreen = false,
-  hotbar = {
-    colorize_inside_when_selected = true,
-    increase_inside_alpha_when_selected = false,
-    primary_selected_color = "0 255 255 255",
-    secondary_selected_color = "86 156 214 255"
-  },
-  input_recording_mode = "DISABLED",
-  interpolation_speed = 525,
-  jitter_buffer_ms = 0,
-  last_session_update_link = "",
-  latest_news_url = "http://hypersomnia.pl/latest_post/",
-  launch_mode = "MAIN_MENU",
-  max_number_of_sound_sources = 4096,
-  menu_intro_scene_entropy_path = "",
-  menu_intro_scene_cosmos_path = "abc", -- paste whatever to work
-  menu_theme_path = "",
-  misprediction_smoothing_multiplier = 1.2000000476837158,
-  mouse_sensitivity = {
-    x = 0,
-    y = 0
-  },
-  music_volume = 1,
-  nickname = "",
-  packer_detail_max_atlas_size = 8192,
-  post_data_file_path = "",
-  recording_replay_speed = 1,
-  windowed_size = { x = 1280, y = 768 },
-  rewind_intro_scene_by_secs = 3.5,
-  save_regenerated_atlases_as_binary = true,
-  server_http_daemon_html_file_path = "",
-  server_http_daemon_port = 0,
-  server_launch_http_daemon = false,
-  server_port = 0,
-  skip_credits = true,
-  sound_effects_volume = 1,
-  start_menu_music_at_secs = 0,
-  survey_num_file_path = "",
-  window_border = true,
-  window_name = "Hypersomnia",
-  window_position = {x = 100, y = 20 },
-
-  hotbar_button = {
-    border_color = "255 255 255 255",
-    inside_color = "255 255 255 255",
-    lower_side = 20,
-    upper_side = 8,
-    inside_border_padding = 4,
-    make_lb_complement = true
-  },
-
-  menu_button = {
-    border_color = "255 255 255 255",
-    inside_color = "255 255 255 255",
-    lower_side = 12,
-    upper_side = 8,
-    inside_border_padding = 4,
-    make_lb_complement = false
-  },
-
-  debug_minimal_test_scene = false,
-
-  gui_volume = 1.0,
-  
   gui_style = {
     Alpha = 1,
     AntiAliasedLines = false,
@@ -249,6 +206,50 @@ return {
     WindowTitleAlign = {
       x = 0,
       y = 0.5
+    }
+  },
+  hotbar = {
+    colorize_inside_when_selected = true,
+    increase_inside_alpha_when_selected = false,
+    primary_selected_color = "0 255 255 255",
+    secondary_selected_color = "86 156 214 255"
+  },
+  interpolation = {
+    enabled = true,
+    speed = 525
+  },
+  launch_mode = "LOCAL",
+  main_menu = {
+    latest_news_url = "http://hypersomnia.pl/latest_post/",
+    menu_intro_scene_cosmos_path = "",
+    menu_intro_scene_entropy_path = "",
+    menu_theme_path = "",
+    rewind_intro_scene_by_secs = 3.5,
+    skip_credits = true,
+    start_menu_music_at_secs = 0
+  },
+  simulation_receiver = {
+    misprediction_smoothing_multiplier = 1.2
+  },
+  unit_tests = {
+    break_on_failure = true,
+    log_successful = false,
+    output_log_path = "generated/logs/unit_tests.txt",
+    run = true
+  },
+  window = {
+    border = true,
+    bpp = 24,
+    enable_cursor_clipping = true,
+    fullscreen = false,
+    name = "Hypersomnia",
+    position = {
+      x = 100,
+      y = 10
+    },
+    size = {
+      x = 1280,
+      y = 768
     }
   }
 }

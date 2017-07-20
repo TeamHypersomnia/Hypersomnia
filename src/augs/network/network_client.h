@@ -17,8 +17,9 @@ namespace augs {
 
 			reliable_channel redundancy;
 
-			augs::measurements sent_size = augs::measurements(L"", false, 1);
-			augs::measurements recv_size = augs::measurements(L"", false, 1);
+			augs::amount_measurements<std::size_t> sent_size = 1;
+			augs::amount_measurements<std::size_t> recv_size = 1;
+
 		public:
 			std::vector<message> collect_entropy();
 

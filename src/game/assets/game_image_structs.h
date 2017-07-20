@@ -1,5 +1,5 @@
 #pragma once
-#include "application/content_generation/atlas_content_structs.h"
+#include "application/content_regeneration/atlas_content_structs.h"
 
 struct game_image_definition;
 

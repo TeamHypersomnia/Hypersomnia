@@ -7,28 +7,28 @@ namespace augs {
 
 	class stream_position {
 	protected:
-		size_t read_pos = 0;
-		size_t write_pos = 0;
+		std::size_t read_pos = 0;
+		std::size_t write_pos = 0;
 	public:
 
-		size_t get_write_pos() const {
+		std::size_t get_write_pos() const {
 			return write_pos;
 		}
 
-		size_t get_read_pos() const {
+		std::size_t get_read_pos() const {
 			return read_pos;
 		}
 
-		size_t get_unread_bytes() const {
+		std::size_t get_unread_bytes() const {
 			ensure(read_pos <= write_pos);
 			return write_pos - read_pos;
 		}
 
-		void set_write_pos(const size_t new_pos) {
+		void set_write_pos(const std::size_t new_pos) {
 			write_pos = new_pos;
 		}
 
-		void set_read_pos(const size_t new_pos) {
+		void set_read_pos(const std::size_t new_pos) {
 			read_pos = new_pos;
 		}
 
@@ -40,13 +40,13 @@ namespace augs {
 			read_pos = 0;
 		}
 
-		size_t size() const {
+		std::size_t size() const {
 			return write_pos;
 		}
 	};
 
 	class stream : public stream_position {
-		std::vector<char> buf;
+		std::vector<std::byte> buf;
 	public:
 		bool has_read_failed = false;
 
@@ -59,15 +59,15 @@ namespace augs {
 		bool operator==(const stream&) const;
 		bool operator!=(const stream&) const;
 
-		char* data();
-		const char* data() const;
+		std::byte* data();
+		const std::byte* data() const;
 
-		char& operator[](const size_t);
-		const char& operator[](const size_t) const;
+		std::byte& operator[](const std::size_t);
+		const std::byte& operator[](const std::size_t) const;
 
 		std::string to_string() const;
 
-		size_t capacity() const;
+		std::size_t capacity() const;
 
 		template<class T>
 		T peek() const {
@@ -92,10 +92,10 @@ namespace augs {
 			augs::read(ar, read_pos);
 		}
 
-		void read(char* const data, const size_t bytes);
-		void write(const char* const data, const size_t bytes);
+		void read(std::byte* const data, const std::size_t bytes);
+		void write(const std::byte* const data, const std::size_t bytes);
 		void write(const augs::stream&);
-		void reserve(const size_t);
+		void reserve(const std::size_t);
 		void reserve(const output_stream_reserver&);
 	};
 
@@ -103,7 +103,7 @@ namespace augs {
 	public:
 		stream make_stream();
 
-		void write(const char* const data, const size_t bytes);
+		void write(const std::byte* const data, const std::size_t bytes);
 	};
 }
 

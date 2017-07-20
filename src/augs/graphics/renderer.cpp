@@ -1,7 +1,5 @@
 #include <tuple>
 
-#include "application/config_structs/debug_drawing_settings.h"
-
 #include "augs/graphics/OpenGL_includes.h"
 #include "augs/graphics/renderer.h"
 #include "augs/graphics/fbo.h"
@@ -23,27 +21,13 @@
 #include <imgui/imgui.h>
 
 namespace augs {
-	renderer::renderer(
-		window::glwindow& parent_window,
-		const debug_drawing_settings& debug
-	) : 
-		parent_window(parent_window),
-		debug(debug)
-	{
-	}
-
-	bool renderer::set_as_current_impl() {
-		return true;
-	}
-
-	void renderer::initialize() {
+	renderer::renderer(const vec2i screen_size) {
 		gladLoadGL();
 
 		glEnable(GL_TEXTURE_2D); glerr;
 		glEnable(GL_BLEND); glerr;
 
-		//glBlendFuncSeparate(GL_ONE, GL_ONE, GL_ZERO, GL_ONE);
-		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE); glerr;
+		set_standard_blending();
 		glClearColor(0.0, 0.0, 0.0, 1.0); glerr;
 
 		glGenBuffers(1, &imgui_elements_id); glerr;
@@ -67,22 +51,21 @@ namespace augs {
 		disable_special_vertex_attribute();
 
 		glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer_id); glerr;
+
+		resize_fbos(screen_size);
 	}
 
 	void renderer::resize_fbos(const vec2i screen_size) {
-		if (illuminating_smoke_fbo.get_size() != screen_size) {
-			illuminating_smoke_fbo.destroy();
-			illuminating_smoke_fbo.create(screen_size);
+		if (!illuminating_smoke_fbo || illuminating_smoke_fbo->get_size() != screen_size) {
+			illuminating_smoke_fbo.emplace(screen_size);
 		}
 
-		if (light_fbo.get_size() != screen_size) {
-			light_fbo.destroy();
-			light_fbo.create(screen_size);
+		if (!light_fbo || light_fbo->get_size() != screen_size) {
+			light_fbo.emplace(screen_size);
 		}
 
-		if (smoke_fbo.get_size() != screen_size) {
-			smoke_fbo.destroy();
-			smoke_fbo.create(screen_size);
+		if (!smoke_fbo || smoke_fbo->get_size() != screen_size) {
+			smoke_fbo.emplace(screen_size);
 		}
 	}
 
@@ -94,8 +77,21 @@ namespace augs {
 		glDisableVertexAttribArray(int(vertex_attribute::special)); glerr;
 	}
 
+	void renderer::set_clear_color(const rgba col) {
+		const auto v = vec4(col);
+		glClearColor(v[0], v[1], v[2], v[3]);
+	}
+
 	void renderer::clear_current_fbo() {
 		glClear(GL_COLOR_BUFFER_BIT);
+	}
+
+	void renderer::set_standard_blending() {
+		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE); glerr;
+	}
+
+	void renderer::set_additive_blending() {
+		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE, GL_ONE, GL_ONE); glerr;
 	}
 	
 	void renderer::set_active_texture(const unsigned n) {
@@ -242,7 +238,7 @@ namespace augs {
 	void renderer::line_channel::draw_yellow(const vec2 a, const vec2 b) { draw(a, b, yellow); }
 	void renderer::line_channel::draw_cyan(const vec2 a, const vec2 b) { draw(a, b, cyan); }
 
-	void renderer::draw_imgui(const assets_manager& manager) {
+	void renderer::draw_call_imgui(const assets_manager& manager) {
 		const auto* const draw_data = ImGui::GetDrawData();
 
 		if (draw_data != nullptr) {
@@ -268,7 +264,7 @@ namespace augs {
 						pcmd->UserCallback(cmd_list, pcmd);
 					}
 					else {
-						bind_texture(manager[assets::gl_texture_id{ reinterpret_cast<intptr_t>(pcmd->TextureId) }]);
+						manager.at(assets::gl_texture_id{ reinterpret_cast<intptr_t>(pcmd->TextureId) }).bind();
 						glScissor((int)pcmd->ClipRect.x, (int)(fb_height - pcmd->ClipRect.w), (int)(pcmd->ClipRect.z - pcmd->ClipRect.x), (int)(pcmd->ClipRect.w - pcmd->ClipRect.y));
 						glDrawElements(GL_TRIANGLES, (GLsizei)pcmd->ElemCount, sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, idx_buffer_offset);
 					}
@@ -279,71 +275,16 @@ namespace augs {
 			glDisable(GL_SCISSOR_TEST);
 		}
 		
-		bind_texture(manager[assets::gl_texture_id::GAME_WORLD_ATLAS]);
+		manager.at(assets::gl_texture_id::GAME_WORLD_ATLAS).bind();
 	}
 
 	void renderer::draw_debug_info(
 		const camera_cone camera,
 		const assets::game_image_id line_texture,
-		const std::vector<const_entity_handle>& target_entities,
 		const double interpolation_ratio
 	) {
-		
-		if (!debug.drawing_enabled) {
-			return;
-		}
-		
 		const auto& tex = get_assets_manager()[line_texture].texture_maps[texture_map_type::DIFFUSE];
 		
-		clear_triangles();
-
-		if (debug.draw_visibility) {
-			for (auto it : target_entities) {
-				//auto* visibility = it.find<components::visibility>();
-				//if (visibility) {
-				//	for (auto& entry : visibility->full_visibility_layers) {
-				//		/* shortcut */
-				//		auto& request = entry.second;
-				//		
-				//		auto origin = it.get_logic_transform().pos;
-				//
-				//		for (size_t i = 0; i < request.get_num_triangles(); ++i) {
-				//			auto tri = request.get_triangle(i, origin);
-				//
-				//			for (auto& p : tri.points) {
-				//				p -= origin;
-				//
-				//				float expansion = 0.f;
-				//				float distance_from_subject = (p - origin).length();
-				//
-				//				expansion = (distance_from_subject / max_visibility_expansion_distance) * visibility_expansion;
-				//
-				//				p *= std::min(visibility_expansion, expansion);
-				//			}
-				//
-				//			vertex_triangle verts;
-				//
-				//			for (int i = 0; i < 3; ++i) {
-				//
-				//				auto pos = tri.points[i] - camera_transform.pos + center + origin;
-				//
-				//				pos.rotate(camera_transform.rotation, center);
-				//				
-				//				vertex new_vertex;
-				//				new_vertex.texcoord.set(tex.get_u(i), tex.get_v(i));
-				//				new_vertex.pos = pos;
-				//				new_vertex.color = request.color;
-				//				verts.vertices[i] = new_vertex;
-				//			}
-				//		}
-				//	}
-				//}
-			}
-		}
-
-		call_triangles();
-		clear_triangles();
-
 		clear_lines();
 
 		auto line_lambda = [&](const debug_line line) {
@@ -386,14 +327,6 @@ namespace augs {
 
 	void renderer::clear_geometry() {
 		triangles.clear();
-	}
-
-	void renderer::bind_texture(const graphics::fbo& f) {
-		glBindTexture(GL_TEXTURE_2D, f.get_texture_id()); glerr;
-	}
-
-	void renderer::bind_texture(const augs::graphics::texture& atl) {
-		glBindTexture(GL_TEXTURE_2D, atl.id); glerr;
 	}
 
 	size_t renderer::get_max_texture_size() const {

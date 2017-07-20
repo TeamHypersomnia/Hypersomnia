@@ -7,6 +7,7 @@
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/transcendental/cosmic_entropy.h"
 #include "augs/graphics/renderer.h"
+#include "game/detail/gui/root_of_inventory_gui.h"
 
 struct character_gui;
 class viewing_step;
@@ -20,10 +21,17 @@ public:
 
 	augs::container_with_small_size<std::vector<item_slot_transfer_request>, unsigned short> pending_transfers;
 	augs::container_with_small_size<std::unordered_map<entity_id, spell_id>, unsigned char> spell_requests;
+	
+	game_gui_rect_world rect_world = vec2i {};
+	root_of_inventory_gui root = vec2i {};
 
 	bool gui_look_enabled = false;
-	vec2i screen_size_for_new_characters;
 	assets::game_image_id value_bar_background = assets::game_image_id::BLANK;
+
+	game_gui_context create_context(const const_entity_handle gui_entity, game_gui_rect_tree& tree);
+
+	void set_screen_size(const vec2i screen_size);
+	vec2i get_screen_size() const;
 
 	cosmic_entropy get_and_clear_pending_events();
 	void clear_all_pending_events();
@@ -42,7 +50,7 @@ public:
 
 	void control_gui(
 		const const_entity_handle root_entity,
-		std::vector<augs::window::event::change>& events
+		std::vector<augs::event::change>& events
 	);
 
 	void advance_elements(

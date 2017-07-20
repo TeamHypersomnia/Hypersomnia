@@ -8,6 +8,8 @@
 #include "game/systems_audiovisual/interpolation_system.h"
 #include "game/assets/assets_manager.h"
 
+#include "augs/audio/audio_settings.h"
+
 void sound_system::erase_caches_for_dead_entities(const cosmos& new_cosmos) {
 	std::vector<entity_id> to_erase;
 
@@ -30,10 +32,6 @@ void sound_system::erase_caches_for_dead_entities(const cosmos& new_cosmos) {
 	}
 }
 
-void sound_system::initialize_sound_sources(const size_t num_max_sources) {
-
-}
-
 sound_system::cache& sound_system::get_cache(const const_entity_handle id) {
 	return per_entity_cache[id.get_id()];
 }
@@ -43,7 +41,8 @@ const sound_system::cache& sound_system::get_cache(const const_entity_handle id)
 }
 
 void sound_system::play_nearby_sound_existences(
-	const camera_cone cone, 
+	const augs::audio_volume_settings& settings,
+	const camera_cone cone,
 	const entity_id listening_character, 
 	const cosmos& cosmos, 
 	const interpolation_system& sys,
@@ -73,7 +72,7 @@ void sound_system::play_nearby_sound_existences(
 			const auto& existence = it.get<components::sound_existence>();
 			auto& source = cache.source;
 
-			const auto& buffer = manager[existence.input.effect.id].get_variation(existence.input.variation_number);
+			const auto& buffer = manager.at(existence.input.effect.id).get_variation(existence.input.variation_number);
 
 			const auto& requested_buf = existence.input.direct_listener == listening_character ? buffer.request_stereo() : buffer.request_mono();
 
@@ -111,7 +110,7 @@ void sound_system::play_nearby_sound_existences(
 
 			source.set_air_absorption_factor(absorption);
 			source.set_pitch(existence.input.effect.modifier.pitch);
-			source.set_gain(existence.input.effect.modifier.gain * master_gain);
+			source.set_gain(existence.input.effect.modifier.gain * settings.sound_effects);
 			source.set_position(si, source_pos);
 			source.set_velocity(si, it.get_effective_velocity());
 		}

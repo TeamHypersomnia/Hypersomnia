@@ -57,7 +57,101 @@ static void Line(
 }
 
 namespace augs {
-	void image::create(const vec2u new_size) {
+	image::image(const vec2u new_size) {
+		resize(new_size);
+	}
+	
+	image::image(
+		const unsigned char* const ptr, 
+		const unsigned channels,
+		const unsigned pitch, 
+		const vec2u new_size
+	) {
+		resize(new_size);
+
+		const int wbytes = new_size.x*channels;
+
+		if (channels == 1) {
+			for (unsigned j = 0; j < new_size.y; ++j) {
+				for (unsigned i = 0; i < new_size.x; ++i) {
+					pixel({ i, j }) = { 255, 255, 255, ptr[pitch * j + i] };
+				}
+			}
+		}
+		else if (channels == 4 && pitch == 0) {
+			std::memcpy(v.data(), ptr, new_size.area() * 4);
+		}
+		else {
+			// TODO: Not implemented
+			ensure(false);
+		}
+	}
+
+	image::image(const std::string& path) {
+		from_file(path);
+	}
+	
+	bool image::from_file(const std::string& path) {
+		const auto extension = augs::get_extension(path);
+		bool success = false;
+
+		if (extension == "") {
+			success = from_file(augs::switch_path(
+				path + ".png",
+				path + ".bin"
+			));
+		}
+		else {
+			if (extension == ".png") {
+				success = from_png(path);
+			}
+			else if (extension == ".bin") {
+				success = from_binary_file(path);
+			}
+			else {
+				LOG("Unknown extension: %x!", extension);
+				ensure(false);
+			}
+		}
+	
+		return success;
+	}
+
+	bool image::from_binary_file(const std::string& filename) {
+		std::ifstream in(filename, std::ios::in | std::ios::binary);
+
+		if (in.good()) {
+			augs::read(in, size);
+			augs::read(in, v);
+
+			return !in.fail();
+		}
+		else {
+			LOG("Failed to open %x! Ensure that the file exists.", filename);
+		}
+
+		return false;
+	}
+
+	bool image::from_png(
+		const std::string& filename
+	) {
+		unsigned width;
+		unsigned height;
+
+		if (lodepng::decode(*reinterpret_cast<std::vector<unsigned char>*>(&v), width, height, filename)) {
+			LOG("Failed to open %x! Ensure that the file exists and has correct format.", filename);
+			ensure(false);
+			return false;
+		}
+
+		size.x = width;
+		size.y = height;
+
+		return true;
+	}
+
+	void image::resize(const vec2u new_size) {
 		size = new_size;
 		v.resize(new_size.area(), rgba(0, 0, 0, 0));
 	}
@@ -76,7 +170,7 @@ namespace augs {
 		image new_surface;
 		auto& surface = v.empty() ? *this : new_surface;
 		
-		surface.create({ std::max(size.x, side), std::max(size.y, side) });
+		surface = augs::image(vec2u { std::max(size.x, side), std::max(size.y, side) });
 
 		ensure(size.x >= side);
 		ensure(size.y >= side);
@@ -162,7 +256,7 @@ namespace augs {
 		const auto side = in.radius * 2 + 1;
 
 		if (v.empty()) {
-			create({ side, side });
+			resize({ side, side });
 		}
 		else {
 			ensure(size.x >= side);
@@ -201,58 +295,39 @@ namespace augs {
 		return p.x < size.x && p.y < size.y;
 	}
 
-	bool image::from_binary_file(const std::string& filename) {
-		std::ifstream in(filename, std::ios::in | std::ios::binary);
-
-		if (in.good()) {
-			augs::read(in, size);
-			augs::read(in, v);
-
-			return !in.fail();
-		}
-		else {
-			LOG("Failed to open %x! Ensure that the file exists.", filename);
-		}
-
-		return false;
-	}
-
-	bool image::from_file(
-		const std::string& filename
-	) {
-		unsigned width;
-		unsigned height;
-
-		if (lodepng::decode(*reinterpret_cast<std::vector<unsigned char>*>(&v), width, height, filename)) {
-			LOG("Failed to open %x! Ensure that the file exists and has correct format.", filename);
-			ensure(false);
-			return false;
-		}
-
-		size.x = width;
-		size.y = height;
-
-		return true;
-	}
-
 	void image::swap_red_and_blue() {
 		for (auto& p : v) {
 			std::swap(p.r, p.b);
 		}
 	}
+	
+	void image::save(const std::string& path) const {
+		const auto extension = augs::get_extension(path);
 
-	void image::save(const std::string& filename) const {
-		augs::create_directories(filename);
-
-		if (lodepng::encode(filename, *reinterpret_cast<const std::vector<unsigned char>*>(&v), size.x, size.y)) {
-			LOG("Could not encode %x! Ensure that the target directory exists.", filename);
+		if (extension == ".png") {
+			save_as_png(path);
+		}
+		else if (extension == ".bin") {
+			save_as_binary_file(path);
+		}
+		else {
+			LOG("Unknown extension: %x!", extension);
+			ensure(false);
 		}
 	}
 
-	void image::save_as_binary_file(const std::string& filename) const {
-		augs::create_directories(filename);
+	void image::save_as_png(const std::string& path) const {
+		augs::create_directories(path);
 
-		std::ofstream out(filename, std::ios::out | std::ios::binary);
+		if (lodepng::encode(path, *reinterpret_cast<const std::vector<unsigned char>*>(&v), size.x, size.y)) {
+			LOG("Could not encode %x! Ensure that the target directory exists.", path);
+		}
+	}
+
+	void image::save_as_binary_file(const std::string& path) const {
+		augs::create_directories(path);
+
+		std::ofstream out(path, std::ios::out | std::ios::binary);
 		augs::write(out, size);
 		augs::write(out, v);
 	}
@@ -260,32 +335,6 @@ namespace augs {
 	void image::fill(const rgba col) {
 		for (auto& p : v) {
 			p = col;
-		}
-	}
-
-	void image::create_from(
-		const unsigned char* const ptr, 
-		const unsigned channels,
-		const unsigned pitch, 
-		const vec2u new_size
-	) {
-		create(new_size);
-
-		const int wbytes = new_size.x*channels;
-
-		if (channels == 1) {
-			for (unsigned j = 0; j < new_size.y; ++j) {
-				for (unsigned i = 0; i < new_size.x; ++i) {
-					pixel({ i, j }) = { 255, 255, 255, ptr[pitch*j+i] };
-				}
-			}
-		}
-		else if (channels == 4 && pitch == 0) {
-			std::memcpy(v.data(), ptr, new_size.area() * 4);
-		}
-		else {
-			// TODO: Not implemented
-			ensure(false);
 		}
 	}
 
@@ -356,8 +405,7 @@ namespace augs {
 	}
 
 	image image::get_desaturated() const {
-		image desaturated;
-		desaturated.create(size);
+		auto desaturated = image(size);
 
 		for (unsigned y = 0; y < size.y; ++y) {
 			for (unsigned x = 0; x < size.x; ++x) {
@@ -366,12 +414,6 @@ namespace augs {
 		}
 
 		return desaturated;
-	}
-
-	void image::destroy() {
-		v.clear();
-		v.shrink_to_fit();
-		size.reset();
 	}
 }
 

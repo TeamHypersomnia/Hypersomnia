@@ -151,8 +151,9 @@ vec2i world_camera::get_camera_offset_due_to_character_crosshair(
 		if (crosshair.orbit_mode != components::crosshair::NONE) {
 			camera_crosshair_offset = components::crosshair::calculate_aiming_displacement(crosshair_entity, false);
 
-			if (crosshair.orbit_mode == crosshair.ANGLED)
+			if (crosshair.orbit_mode == crosshair.ANGLED) {
 				camera_crosshair_offset.set_length(settings.angled_look_length);
+			}
 
 			if (crosshair.orbit_mode == crosshair.LOOK) {
 				/* simple proportion */

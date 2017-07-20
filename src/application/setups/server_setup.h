@@ -12,8 +12,6 @@
 
 #include "setup_base.h"
 
-class game_window;
-
 class server_setup : public setup_base {
 	std::mutex mtx;
 	std::condition_variable cv;

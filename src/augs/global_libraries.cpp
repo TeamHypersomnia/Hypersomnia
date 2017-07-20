@@ -5,8 +5,6 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
-#include "augs/graphics/OpenGL_includes.h"
-
 #include "global_libraries.h"
 #include "augs/log.h"
 #include "augs/ensure.h"
@@ -22,7 +20,7 @@ namespace augs {
 	void global_libraries::init(const library_flagset to_initialize) {
 #if 0
 		signal(SIGSEGV, [](const int signal) {
-			augs::window::disable_cursor_clipping();
+			augs::disable_cursor_clipping();
 			throw "Access violation!";
 		});
 #endif

@@ -9,8 +9,8 @@
 
 template <class intent_enum_type, class motion_enum_type>
 struct basic_input_context {
-	typedef augs::window::event::keys::key key_type;
-	typedef augs::window::event::message message_type;
+	typedef augs::event::keys::key key_type;
+	typedef augs::event::message message_type;
 
 	// GEN INTROSPECTOR struct basic_input_context class intent_enum_type class motion_enum_type
 	augs::enum_associative_array<key_type, intent_enum_type> key_to_intent;
@@ -52,7 +52,7 @@ struct basic_input_context {
 					output.intents.push_back(intent);
 				}
 			}
-			else if (raw.msg == augs::window::event::message::mousemotion) {
+			else if (raw.msg == augs::event::message::mousemotion) {
 				basic_game_motion<motion_enum_type> motion;
 				motion.set_motion_type(map_mouse_motion_to);
 				motion.offset = raw.mouse.rel;

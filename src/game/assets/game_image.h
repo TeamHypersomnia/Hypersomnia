@@ -1,10 +1,10 @@
 #pragma once
 #include <optional>
 
-#include "application/content_generation/atlas_content_structs.h"
-#include "application/content_generation/neon_maps.h"
-#include "application/content_generation/buttons_with_corners.h"
-#include "application/content_generation/scripted_images.h"
+#include "application/content_regeneration/atlas_content_structs.h"
+#include "application/content_regeneration/neon_maps.h"
+#include "application/content_regeneration/buttons_with_corners.h"
+#include "application/content_regeneration/scripted_images.h"
 #include "game/detail/convex_partitioned_shape.h"
 #include "augs/misc/enum_array.h"
 #include "augs/misc/enum_associative_array.h"

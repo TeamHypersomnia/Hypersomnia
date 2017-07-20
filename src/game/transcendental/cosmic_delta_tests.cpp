@@ -72,13 +72,18 @@ TEST_CASE("CosmicDelta2 PaddingTest") {
 	std::string component_size_information;
 	std::size_t total_components_size = 0u;
 
-	auto padding_checker = [&](auto c) {
-		typedef decltype(c) checked_type;
-		static_assert(std::is_same_v<std::decay_t<checked_type>, checked_type>, "Something's wrong with the types");
+	auto assert_component_trivial = [](auto c) {
+		using checked_type = decltype(c);
+		
 		static_assert(
 			augs::is_byte_io_safe_v<augs::stream, checked_type> || allows_nontriviality_v<checked_type>,
 			"Non-trivially copyable component detected! If you need a non-trivial component, explicitly define static constexpr bool allow_nontriviality = true; within the class"
 		);
+	};
+
+	auto padding_checker = [&](auto c) {
+		using checked_type = decltype(c);
+		static_assert(std::is_same_v<std::decay_t<checked_type>, checked_type>, "Something's wrong with the types");
 
 		total_components_size += sizeof checked_type;
 		component_size_information += typesafe_sprintf("%x == sizeof %x\n", sizeof checked_type, typeid(checked_type).name());
@@ -111,14 +116,18 @@ TEST_CASE("CosmicDelta2 PaddingTest") {
 			}
 
 			if(!same) {
-				LOG("Object 1:\n%x\n Object 2:\n%x\n", describe_fields(*(checked_type*)buf1), describe_fields(*(checked_type*)buf2));
-
-				FAIL(typesafe_sprintf(
-					"Padding is wrong in %x\nsizeof: %x\nDivergence position: %x", 
+				const auto log_contents = typesafe_sprintf(
+					"Padding is wrong, or a variable is uninitialized in %x\nsizeof: %x\nDivergence position: %x",
 					typeid(checked_type).name(),
 					type_size,
 					iter
-				));
+				);
+
+				augs::create_text_file("generated/logs/object1.txt", describe_fields(*(checked_type*)buf1));
+				augs::create_text_file("generated/logs/object2.txt", describe_fields(*(checked_type*)buf2));
+
+				LOG(log_contents);
+				FAIL(log_contents);
 			}
 
 			// test by delta
@@ -129,14 +138,18 @@ TEST_CASE("CosmicDelta2 PaddingTest") {
 				const auto dt = augs::object_delta<checked_type>(a, b);
 
 				if (dt.has_changed()) {
-					LOG("Object 1:\n%x\n Object 2:\n%x\n", describe_fields(a), describe_fields(b));
-
-					FAIL(typesafe_sprintf(
-						"Padding is wrong in %x\nsizeof: %x\nDivergence position: %x", 
+					const auto log_contents = typesafe_sprintf(
+						"Padding is wrong, or a variable is uninitialized in %x\nsizeof: %x\nDivergence position: %x",
 						typeid(checked_type).name(),
 						type_size,
 						static_cast<int>(dt.get_first_divergence_pos())
-					));
+					);
+
+					augs::create_text_file("generated/logs/object1.txt", describe_fields(a));
+					augs::create_text_file("generated/logs/object2.txt", describe_fields(b));
+
+					LOG(log_contents);
+					FAIL(log_contents);
 				}
 			}
 
@@ -148,7 +161,7 @@ TEST_CASE("CosmicDelta2 PaddingTest") {
 				LOG(describe_fields(checked_type()));
 
 				FAIL(typesafe_sprintf(
-					"Padding is wrong in %x\nsizeof: %x\n", 
+					"Padding is wrong, or a variable is uninitialized in %x\nsizeof: %x\n", 
 					typeid(checked_type).name(),
 					type_size
 				));
@@ -156,10 +169,29 @@ TEST_CASE("CosmicDelta2 PaddingTest") {
 		}
 	};
 
+	for_each_through_std_get(put_all_components_into_t<std::tuple>(), assert_component_trivial);
 	for_each_through_std_get(put_all_components_into_t<std::tuple>(), padding_checker);
 
 	component_size_information += typesafe_sprintf("Total size in bytes: %x", total_components_size);
 	augs::create_text_file("generated/logs/components.txt", component_size_information);
+
+	/* Validate cosmos_metadata. It will also be written and compared. */
+
+	cosmos_metadata meta;
+
+	augs::introspect(
+		augs::recursive([&](auto&& self, auto, auto m) {
+			using T = std::decay_t<decltype(m)>;
+
+			if constexpr(augs::is_byte_io_safe_v<augs::stream, T> && !is_introspective_leaf_v<T>) {
+				padding_checker(m);
+			}
+			else if constexpr(has_introspect_v<T>){
+				augs::introspect(augs::recursive(self), m);
+			}
+		}),
+		meta
+	);
 }
 
 TEST_CASE("CosmicDelta3 GuidizeTests") {
@@ -184,10 +216,62 @@ TEST_CASE("CosmicDelta3 GuidizeTests") {
 	// sanity check
 	REQUIRE(dead == dt.target_slot.container_entity);
 }
+#include "augs/misc/lua_readwrite.h"
+
+TEST_CASE("Cosmos ComparisonTest") {
+	cosmos c1(2);
+	cosmos c2(2);
+
+	REQUIRE(c1 == c2);
+	REQUIRE(c1 == c1);
+	REQUIRE(c2 == c2);
+
+	{
+		const auto new_ent1 = c1.create_entity("e1");
+		const auto new_ent2 = c1.create_entity("e2");
+		
+		components::transform first_transform(21, 0, 12.4f);
+		
+		new_ent1 += first_transform;
+		new_ent1 += components::rigid_body();
+		new_ent1 += components::render();
+		new_ent1 += components::sprite();
+		
+		components::position_copying p;
+		p.target = new_ent1;
+		new_ent2 += components::transform();
+		new_ent2 += components::trace();
+		new_ent2 += p;
+	}
+
+	{
+		const auto new_ent1 = c2.create_entity("e1");
+		const auto new_ent2 = c2.create_entity("e2");
+		
+		components::transform first_transform(21, 0, 12.4f);
+		
+		new_ent1 += first_transform;
+		new_ent1 += components::rigid_body();
+		new_ent1 += components::render();
+		new_ent1 += components::sprite();
+		
+		components::position_copying p;
+		p.target = new_ent1;
+		new_ent2 += components::transform();
+		new_ent2 += components::trace();
+		new_ent2 += p;
+	}
+	
+	REQUIRE(c1 == c1);
+	REQUIRE(c2 == c2);
+	REQUIRE(c1 == c2);
+}
 
 TEST_CASE("CosmicDelta4 EmptyAndTwoNew") {
 	cosmos c1(2);
 	cosmos c2(2);
+	
+	REQUIRE(c1 == c2);
 
 	const auto new_ent1 = c2.create_entity("e1");
 	const auto new_ent2 = c2.create_entity("e2");

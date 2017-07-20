@@ -1,41 +1,40 @@
 #pragma once
 #include "augs/math/vec2.h"
+#include "augs/templates/settable_as_current_mixin.h"
+#include "augs/graphics/texture.h"
 
-typedef unsigned int GLuint;
+using GLuint = unsigned int;
 
 namespace augs {
 	class renderer;
 
 	namespace graphics {
-		class fbo {
-			friend class ::augs::renderer;
-			GLuint fboId = 0u;
-			GLuint textureId = 0u;
-			vec2u size;
-			
+		class fbo : public settable_as_current_mixin<const fbo> {
 			bool created = false;
+			texture tex;
+			GLuint id = 0xdeadbeef;
+			vec2u size;
 
-			static GLuint currently_bound_fbo;
+			friend class settable_as_current_base;
+
+			bool set_as_current_impl() const;
+			static void set_current_to_none_impl();
+
+			void destroy();
 		public:
-			fbo() = default;
+			fbo(const vec2u size);
 			~fbo();
 
-			fbo(fbo&&) = delete;
+			fbo(fbo&&);
+			fbo& operator=(fbo&&);
+			
 			fbo(const fbo&) = delete;
 			fbo& operator=(const fbo&) = delete;
-			fbo& operator=(fbo&&) = delete;
-
-			fbo(const vec2u size);
-			void create(const vec2u size);
-			void destroy();
-
-			void use() const;
-			void guarded_use() const;
 
 			vec2u get_size() const;
-			GLuint get_texture_id() const;
 
-			static void use_default();
+			texture& get_texture();
+			const texture& get_texture() const;
 		};
 	}
 }

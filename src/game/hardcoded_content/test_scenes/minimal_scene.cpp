@@ -46,6 +46,7 @@ namespace test_scenes {
 	void minimal_scene::populate(const logic_step step) {
 #if BUILD_TEST_SCENES
 		auto& world = step.cosm;
+		world.set_fixed_delta(60);
 
 		//prefabs::create_force_grenade(step, { 254, 611 });
 		//prefabs::create_force_grenade(step, { 254, 711 });

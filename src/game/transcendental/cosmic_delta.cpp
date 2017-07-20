@@ -98,7 +98,7 @@ bool cosmic_delta::encode(
 	const auto used_bits = out.size();
 	//should_eq(0, used_bits);
 
-	enco.profiler.delta_encoding.new_measurement();
+	auto scope = measure_scope(enco.profiler.delta_encoding);
 	
 	delted_stream_of_entities dt;
 
@@ -249,8 +249,6 @@ bool cosmic_delta::encode(
 		augs::write(out, false);
 	}
 
-	enco.profiler.delta_encoding.end_measurement();
-
 	enco.profiler.delta_bytes.measure(out.size());
 	base.profiler.delta_bytes.measure(out.size());
 
@@ -278,7 +276,7 @@ void cosmic_delta::decode(
 		return;
 	}
 	
-	deco.profiler.delta_decoding.new_measurement();
+	deco.profiler.delta_decoding.start();
 
 	deco.destroy_inferred_state_completely();
 
@@ -409,5 +407,5 @@ void cosmic_delta::decode(
 
 	deco.create_inferred_state_completely();
 
-	deco.profiler.delta_decoding.end_measurement();
+	deco.profiler.delta_decoding.stop();
 }

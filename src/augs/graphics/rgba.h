@@ -1,5 +1,12 @@
 #pragma once
 #include <iosfwd>
+
+namespace std {
+	template <class T, std::size_t I>
+	class array;
+}
+
+
 #include "augs/console_color.h"
 
 typedef unsigned char rgba_channel;
@@ -28,6 +35,15 @@ struct rgba {
 		rgba_channel r;
 		rgba_channel g;
 		rgba_channel b;
+
+		rgb_type(
+			const rgba_channel red = 255,
+			const rgba_channel green = 255,
+			const rgba_channel blue = 255
+		);
+
+		rgb_type(const std::array<float, 3>&);
+		operator std::array<float, 3>() const;
 	};
 
 	// GEN INTROSPECTOR struct rgba
@@ -39,8 +55,11 @@ struct rgba {
 
 	explicit rgba(const console_color);
 	
+	rgba(const std::array<float, 4>&);
 	rgba(const ImVec4&);
+
 	operator ImVec4() const;
+	operator std::array<float, 4>() const;
 
 	rgba(
 		const rgb_type, 

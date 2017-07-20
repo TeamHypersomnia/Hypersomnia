@@ -26,6 +26,7 @@
 #include "augs/graphics/renderer.h"
 
 #include "game/transcendental/logic_step.h"
+#include "game/view/debug_drawing_settings.h"
 
 using namespace augs;
 using namespace messages;
@@ -383,7 +384,7 @@ void visibility_system::respond_to_visibility_information_requests(
 		bounds[3].Set(vec2(whole_vision[3]) + vec2(0.f, moving_epsilon), vec2(whole_vision[0]) + vec2(0.f, -moving_epsilon));
 
 		/* debug drawing of the visibility square */
-		if (settings.draw_cast_rays || settings.draw_triangle_edges) {
+		if (DEBUG_DRAWING.draw_cast_rays || DEBUG_DRAWING.draw_triangle_edges) {
 			lines.draw(si.get_pixels(vec2(whole_vision[0]) + vec2(-moving_epsilon, 0.f)), si.get_pixels(vec2(whole_vision[1]) + vec2(moving_epsilon, 0.f)));
 			lines.draw(si.get_pixels(vec2(whole_vision[1]) + vec2(0.f, -moving_epsilon)), si.get_pixels(vec2(whole_vision[2]) + vec2(0.f, moving_epsilon)));
 			lines.draw(si.get_pixels(vec2(whole_vision[2]) + vec2(moving_epsilon, 0.f)),  si.get_pixels(vec2(whole_vision[3]) + vec2(-moving_epsilon, 0.f)));
@@ -418,7 +419,7 @@ void visibility_system::respond_to_visibility_information_requests(
 				}
 			}
 
-			if (settings.draw_cast_rays) {
+			if (DEBUG_DRAWING.draw_cast_rays) {
 				lines.draw(si.get_pixels(bound.m_vertex1), si.get_pixels(bound.m_vertex2), rgba(255, 0, 0, 255));
 			}
 
@@ -606,7 +607,7 @@ void visibility_system::respond_to_visibility_information_requests(
 				new_discontinuity.is_boundary = true;
 				//request.discontinuities.push_back(new_discontinuity);
 				if (push_double_ray(double_ray(vertex.pos, vertex.pos, true, true)))
-					if (settings.draw_cast_rays) draw_line(vertex.pos, rgba(255, 255, 0, 255));
+					if (DEBUG_DRAWING.draw_cast_rays) draw_line(vertex.pos, rgba(255, 255, 0, 255));
 			}
 			else if (!vertex.is_on_a_bound) {
 				/* if we did not intersect with anything */
@@ -630,7 +631,7 @@ void visibility_system::respond_to_visibility_information_requests(
 
 					if ((ray_callbacks[0].intersection - position_meters).length() + epsilon_threshold_obstacle_hit_meters < distance_from_origin &&
 						(ray_callbacks[1].intersection - position_meters).length() + epsilon_threshold_obstacle_hit_meters < distance_from_origin) {
-						if (settings.draw_cast_rays) draw_line(vertex.pos, rgba(255, 0, 0, 255));
+						if (DEBUG_DRAWING.draw_cast_rays) draw_line(vertex.pos, rgba(255, 0, 0, 255));
 					}
 					/* distance between both intersections fit in epsilon which means ray intersected with the same vertex */
 					else if ((ray_callbacks[0].intersection - ray_callbacks[1].intersection).length_sq() < epsilon_distance_vertex_hit_sq) {
@@ -639,7 +640,7 @@ void visibility_system::respond_to_visibility_information_requests(
 
 						if (push_double_ray(double_ray(vertex.pos, vertex.pos, true, true))) {
 							response.vertex_hits.push_back(std::make_pair(double_rays.size() - 1, si.get_pixels(vertex.pos)));
-							if (settings.draw_cast_rays) draw_line(vertex.pos, rgba(255, 255, 0, 255));
+							if (DEBUG_DRAWING.draw_cast_rays) draw_line(vertex.pos, rgba(255, 255, 0, 255));
 						}
 					}
 					/* we're here so:
@@ -671,7 +672,7 @@ void visibility_system::respond_to_visibility_information_requests(
 							new_discontinuity.points.second = ray_callbacks[1].intersection;
 							new_discontinuity.winding = discontinuity::RIGHT;
 							new_discontinuity.edge_index = double_rays.size() - 1;
-							if (settings.draw_cast_rays) draw_line(ray_callbacks[1].intersection, rgba(255, 0, 255, 255));
+							if (DEBUG_DRAWING.draw_cast_rays) draw_line(ray_callbacks[1].intersection, rgba(255, 0, 255, 255));
 						}
 						/* otherwise the free area is to the left */
 						else {
@@ -683,7 +684,7 @@ void visibility_system::respond_to_visibility_information_requests(
 							new_discontinuity.points.second = ray_callbacks[0].intersection;
 							new_discontinuity.winding = discontinuity::LEFT;
 							new_discontinuity.edge_index = double_rays.size();
-							if (settings.draw_cast_rays) draw_line(ray_callbacks[0].intersection, rgba(255, 0, 255, 255));
+							if (DEBUG_DRAWING.draw_cast_rays) draw_line(ray_callbacks[0].intersection, rgba(255, 0, 255, 255));
 						}
 
 						/* save new double ray */
@@ -736,7 +737,7 @@ void visibility_system::respond_to_visibility_information_requests(
 									/* save new double ray */
 									if (push_double_ray(new_double_ray)) {
 										response.discontinuities.push_back(new_discontinuity);
-										if (settings.draw_cast_rays) draw_line(actual_intersection, rgba(0, 0, 255, 255));
+										if (DEBUG_DRAWING.draw_cast_rays) draw_line(actual_intersection, rgba(0, 0, 255, 255));
 									}
 								}
 							}
@@ -757,7 +758,7 @@ void visibility_system::respond_to_visibility_information_requests(
 			vec2 p1 = si.get_pixels(ray_a.second);
 			vec2 p2 = si.get_pixels(ray_b.first);
 
-			//if (settings.draw_triangle_edges) {
+			//if (DEBUG_DRAWING.draw_triangle_edges) {
 			//	draw_line(si.get_pixels(p1), request.color);
 			//	draw_line(si.get_pixels(p2), request.color);
 			//	lines.draw(p1, p2, request.color);
@@ -846,7 +847,7 @@ void visibility_system::respond_to_visibility_information_requests(
 					/* denote the unreachable area by saving an edge from the closest point to the discontinuity */
 					marked_holes.push_back(edge(closest_point, d.points.first));
 
-					if (settings.draw_discontinuities)
+					if (DEBUG_DRAWING.draw_discontinuities)
 						lines.draw(closest_point, d.points.first);
 
 					/* remove this discontinuity */
@@ -894,7 +895,7 @@ void visibility_system::respond_to_visibility_information_requests(
 			response.discontinuities = discs_copy;
 		}
 
-		if (settings.draw_discontinuities) {
+		if (DEBUG_DRAWING.draw_discontinuities) {
 			for (const auto& disc : response.discontinuities) {
 				lines.draw(disc.points.first, disc.points.second, rgba(0, 127, 255, 255));
 			}

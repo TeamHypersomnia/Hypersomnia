@@ -8,7 +8,7 @@ namespace augs {
 		}
 
 		void paste_clipboard_formatted(text::formatted_string& out, text::formatted_char f) {
-			//auto w = window::get_data_from_clipboard();
+			//auto w = get_data_from_clipboard();
 			//size_t len = w.length();
 			//out.clear();
 			//out.reserve(len);
@@ -22,7 +22,7 @@ namespace augs {
 			contents = s;
 			own_copy = true;
 			own_clip = true;
-			// window::set_clipboard_data(formatted_string_to_wstring(s));
+			// set_clipboard_data(formatted_string_to_wstring(s));
 		}
 
 		void clipboard::change_clipboard() {

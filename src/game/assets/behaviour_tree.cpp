@@ -95,7 +95,7 @@ behaviour_tree::goal_availability behaviour_tree::node::evaluate_node(state_of_t
 		else {
 			if (mode == type::SEQUENCER) {
 				for (const auto& child : children) {
-					const auto child_availability = child->evaluate_node(traversal);
+					const auto child_availability = child.evaluate_node(traversal);
 
 					if (child_availability == goal_availability::ALREADY_ACHIEVED) {
 						continue;
@@ -112,7 +112,7 @@ behaviour_tree::goal_availability behaviour_tree::node::evaluate_node(state_of_t
 			}
 			else if (mode == type::SELECTOR) {
 				for (const auto& child : children) {
-					const auto child_availability = child->evaluate_node(traversal);
+					const auto child_availability = child.evaluate_node(traversal);
 
 					if (child_availability == goal_availability::ALREADY_ACHIEVED) {
 						continue;

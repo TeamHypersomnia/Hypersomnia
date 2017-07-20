@@ -28,7 +28,7 @@ namespace augs {
 		template <class gui_element_variant_id>
 		class rect_world {
 		public:
-			typedef augs::gui::gui_entropy<gui_element_variant_id> gui_entropy;
+			using gui_entropy = augs::gui::gui_entropy<gui_element_variant_id>;
 
 			template<class C, class gui_element_id>
 			bool is_hovered(const C context, const gui_element_id& id) {
@@ -37,7 +37,19 @@ namespace augs {
 				});
 			}
 
-			window::event::state last_state;
+			rect_world(const vec2i screen_size) {
+				set_screen_size(screen_size);
+			}
+
+			void set_screen_size(const vec2i screen_size) {
+				last_state.screen_size = screen_size;
+			}
+
+			auto get_screen_size() const {
+				return last_state.screen_size;
+			}
+
+			event::state last_state;
 
 			middlescrolling<gui_element_variant_id> middlescroll;
 			
@@ -93,8 +105,8 @@ namespace augs {
 			void unhover_and_undrag(const C context, gui_entropy& entropies) {
 				if (context.alive(rect_hovered)) {
 					context(rect_hovered, [&](const auto& r) {
-						window::event::change ch;
-						event_traversal_flags dummy(ch);
+						event::change ch;
+						raw_input_traversal dummy(ch);
 
 						r->unhover(context, r, dummy, entropies);
 					});
@@ -122,13 +134,14 @@ namespace augs {
 				}
 			}
 
-			template <class C, class gui_element_id>
-			void consume_raw_input_and_generate_gui_events(const C context, const gui_element_id& root, const window::event::change new_state, gui_entropy& entropies) {
-				using namespace augs::window;
+			template <class C>
+			void consume_raw_input_and_generate_gui_events(const C context, const event::change new_state, gui_entropy& entropies) {
+				using namespace augs;
+				const auto root = context.get_root_id();
 
 				last_state.apply(new_state);
 
-				event_traversal_flags in(new_state);
+				raw_input_traversal in(new_state);
 				bool pass = true;
 
 				if (middlescroll.handle_new_raw_state(context, new_state)) {
@@ -239,33 +252,31 @@ namespace augs {
 				}
 			}
 
-			template <class C, class gui_element_id>
-			void build_tree_data_into_context(const C context, const gui_element_id& root) const {
-				context(root, [&](const auto& r) { 
+			template <class C>
+			void build_tree_data_into(const C context) const {
+				context(context.get_root_id(), [&](const auto& r) { 
 					r->build_tree_data(context, r); 
 				});
 			}
 
-			template <class C, class gui_element_id>
+			template <class C>
 			void advance_elements(
-				const C context, 
-				const gui_element_id& root, 
+				const C context,
 				const augs::delta dt
 			) {
-				context(root, [&](const auto& r) {
+				context(context.get_root_id(), [&](const auto& r) {
 					r->advance_elements(context, r, dt);
 				});
 
 				middlescroll.advance_elements(context, dt);
 			}
 
-			template <class C, class gui_element_id>
+			template <class C>
 			void respond_to_events(
 				const C context, 
-				const gui_element_id& root, 
 				const gui_entropy& entropies
 			) {
-				context(root, [&](const auto& r) {
+				context(context.get_root_id(), [&](const auto& r) {
 					r->respond_to_events(
 						context, 
 						r, 
@@ -274,22 +285,22 @@ namespace augs {
 				});
 			}
 			
-			template <class C, class gui_element_id>
-			void rebuild_layouts(const C context, const gui_element_id& root) {
-				context(root, [&](const auto& r) {
+			template <class C>
+			void rebuild_layouts(const C context) {
+				context(context.get_root_id(), [&](const auto& r) {
 					r->rebuild_layouts(context, r);
 				});
 			}
 			
-			template <class C, class gui_element_id>
-			void call_idle_mousemotion_updater(const C context, const gui_element_id& root, gui_entropy& entropy, const vec2t<short> mouse_delta = { 0, 0 }) {
-				window::event::change fabricated_state;
-				fabricated_state.msg = window::event::message::mousemotion;
-				fabricated_state.mouse.rel = mouse_delta;
+			template <class C>
+			void call_idle_mousemotion_updater(const C context, gui_entropy& entropy) {
+				event::change fabricated_state;
+				fabricated_state.msg = event::message::mousemotion;
+				fabricated_state.mouse.pos = last_state.pos;
 
-				event_traversal_flags mousemotion_updater(fabricated_state);
+				raw_input_traversal mousemotion_updater(fabricated_state);
 
-				context(root, [&](const auto& r) {
+				context(context.get_root_id(), [&](const auto& r) {
 					r->consume_raw_input_and_generate_gui_events(context, r, mousemotion_updater, entropy);
 				});
 
@@ -298,11 +309,11 @@ namespace augs {
 				}
 			}
 
-			template <class C, class gui_element_id>
-			void draw(vertex_triangle_buffer& output_buffer, const C context, const gui_element_id& root) const {
+			template <class C>
+			void draw(vertex_triangle_buffer& output_buffer, const C context) const {
 				draw_info in(output_buffer);
 
-				context(root, [&](const auto& r) { 
+				context(context.get_root_id(), [&](const auto& r) {
 					r->draw_children(context, r, in);
 				});
 

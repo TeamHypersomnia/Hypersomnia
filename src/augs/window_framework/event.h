@@ -3,10 +3,10 @@
 #include <bitset>
 
 #include "augs/math/vec2.h"
+#include "augs/misc/enum_bitset.h"
 #include "augs/pad_bytes.h"
 
 namespace augs {
-	namespace window {
 		namespace event {
 			enum class message : unsigned char {
 				unknown,
@@ -206,6 +206,7 @@ namespace augs {
 				union {
 					struct mouse_data {
 						vec2t<short> rel;
+						vec2t<short> pos;
 					} mouse;
 
 					struct scroll_data {
@@ -231,6 +232,7 @@ namespace augs {
 
 				key_change get_key_change() const;
 				bool uses_mouse() const;
+				bool uses_keyboard() const;
 				bool was_any_key_pressed() const;
 				bool was_any_key_released() const;
 				bool was_key_pressed(const keys::key) const;
@@ -238,7 +240,7 @@ namespace augs {
 			};
 
 			struct state {
-				std::bitset<256> keys;
+				augs::enum_bitset<keys::key> keys;
 
 				struct mouse_info {
 					vec2i pos;
@@ -252,7 +254,10 @@ namespace augs {
 				void apply(const change&);
 				bool get_mouse_key(const unsigned) const;
 				bool is_set(const keys::key) const;
+
+				std::vector<change> generate_all_releasing_changes() const;
+				std::vector<change> generate_key_releasing_changes() const;
+				std::vector<change> generate_mouse_releasing_changes() const;
 			};
-		}
 	}
 }

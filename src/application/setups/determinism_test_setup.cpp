@@ -1,6 +1,6 @@
 #include <thread>
 #include "augs/global_libraries.h"
-#include "application/game_window.h"
+#include "augs/window_framework/window.h"
 
 #include "game/assets/assets_manager.h"
 
@@ -67,7 +67,7 @@ void determinism_test_setup::process(
 
 	if (session.config.get_input_recording_mode() != input_recording_type::DISABLED) {
 		if (player.try_to_load_or_save_new_session("generated/sessions/", "recorded.inputs")) {
-			timer.set_stepping_speed_multiplier(session.config.recording_replay_speed);
+			timer.set_stepping_speed_multiplier(1.f);
 		}
 	}
 
@@ -80,7 +80,7 @@ void determinism_test_setup::process(
 	while (!should_quit) {
 		augs::machine_entropy new_machine_entropy;
 
-		new_machine_entropy.local = window.collect_entropy(session.config.enable_cursor_clipping);
+		new_machine_entropy.local = window.collect_entropy();
 		
 		if (process_exit(new_machine_entropy.local)) {
 			break;
@@ -88,7 +88,7 @@ void determinism_test_setup::process(
 
 		for (auto& n : new_machine_entropy.local) {
 			if (n.was_any_key_pressed()) {
-				if (n.key == augs::window::event::keys::key::F3) {
+				if (n.key == augs::event::keys::key::F3) {
 					++currently_viewn_cosmos;
 					currently_viewn_cosmos %= cosmoi_count;
 				}
@@ -97,14 +97,14 @@ void determinism_test_setup::process(
 
 		session.switch_between_gui_and_back(new_machine_entropy.local);
 
-		session.control_gui_and_remove_fetched_events(
+		session.fetch_gui_events(
 			hypersomnias[0][characters[0].get_selected_character()],
 			new_machine_entropy.local
 		);
 
 		auto translated = session.config.controls.translate(new_machine_entropy.local);
 
-		session.control_and_remove_fetched_intents(translated.intents);
+		session.fetch_session_intents(translated.intents);
 
 		auto new_cosmic_entropy = cosmic_entropy(
 			hypersomnias[0][characters[0].get_selected_character()],

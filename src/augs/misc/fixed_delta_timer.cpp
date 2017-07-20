@@ -29,6 +29,10 @@ namespace augs {
 	}
 
 	float fixed_delta_timer::fraction_of_step_until_next_step(const delta basic_delta) const {
+		if (basic_delta.in_milliseconds() == 0.f) {
+			return 0.f;
+		}
+
 		return static_cast<float>(accumulator / basic_delta.in_milliseconds());
 	}
 

@@ -10,9 +10,13 @@ namespace augs {
 		template <class gui_element_variant_id, bool is_const, class derived>
 		class basic_context {
 		public:
-			typedef maybe_const_ref_t<is_const, rect_world<gui_element_variant_id>> rect_world_ref;
-			typedef maybe_const_ref_t<false, rect_tree<gui_element_variant_id>> tree_ref;
-			typedef maybe_const_ref_t<false, rect_tree_entry<gui_element_variant_id>> rect_tree_entry_ref;
+			using tree_type = rect_tree<gui_element_variant_id>;
+			using rect_world_type = rect_world<gui_element_variant_id>;
+			using base = basic_context<gui_element_variant_id, is_const, derived>;
+
+			using rect_world_ref = maybe_const_ref_t<is_const, rect_world_type>;
+			using tree_ref = maybe_const_ref_t<false, tree_type>;
+			using rect_tree_entry_ref = maybe_const_ref_t<false, rect_tree_entry<gui_element_variant_id>>;
 
 			rect_world_ref world;
 			tree_ref tree;

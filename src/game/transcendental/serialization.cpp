@@ -7,43 +7,39 @@
 #include "generated/introspectors.h"
 
 void cosmos::save_to_file(const std::string& filename) {
-	profiler.total_save.new_measurement();
+	auto scope = measure_scope(profiler.total_save);
 	
 	auto& reserved_memory = reserved_memory_for_serialization;
 
 	// memory reservation stage
 	{
-		profiler.size_calculation_pass.new_measurement();
 		augs::output_stream_reserver reserver;
-
-		augs::write(reserver, significant);
 		
-		profiler.size_calculation_pass.end_measurement();
-		profiler.memory_allocation_pass.new_measurement();
-
+		{
+			auto scope = measure_scope(profiler.size_calculation_pass);
+			augs::write(reserver, significant);
+		}
+		
+		auto scope = measure_scope(profiler.memory_allocation_pass);
 		reserved_memory.reserve(static_cast<size_t>(reserver.size() * 1.2));
-
-		profiler.memory_allocation_pass.end_measurement();
 	}
 
 	// writing stage
 
-	profiler.serialization_pass.new_measurement();
-
-	augs::write(reserved_memory, significant);
-
-	profiler.serialization_pass.end_measurement();
-	profiler.writing_savefile.new_measurement();
-
-	augs::create_binary_file(filename, reserved_memory);
-
-	profiler.writing_savefile.end_measurement();
-	profiler.total_save.end_measurement();
+	{
+		auto scope = measure_scope(profiler.serialization_pass);
+		augs::write(reserved_memory, significant);
+	}
+	
+	{
+		auto scope = measure_scope(profiler.writing_savefile);
+		augs::create_binary_file(filename, reserved_memory);
+	}
 }
 
 bool cosmos::load_from_file(const std::string& filename) {
 	if (augs::file_exists(filename)) {
-		profiler.total_load.new_measurement();
+		auto scope = measure_scope(profiler.total_load);
 
 		ensure(significant.pool_for_aggregates.empty());
 
@@ -52,20 +48,17 @@ bool cosmos::load_from_file(const std::string& filename) {
 
 		auto& stream = reserved_memory_for_serialization;
 
-		profiler.reading_savefile.new_measurement();
-
-		augs::get_file_contents_binary_into(filename, stream);
-
-		profiler.reading_savefile.end_measurement();
-		profiler.deserialization_pass.new_measurement();
-
-		augs::read(stream, significant);
-
-		profiler.deserialization_pass.end_measurement();
+		{
+			auto scope = measure_scope(profiler.reading_savefile);
+			augs::get_file_contents_binary_into(filename, stream);
+		}
+		
+		{
+			auto scope = measure_scope(profiler.deserialization_pass);
+			augs::read(stream, significant);
+		}
 
 		refresh_for_new_significant_state();
-
-		profiler.total_load.end_measurement();
 
 		return true;
 	}
@@ -73,10 +66,33 @@ bool cosmos::load_from_file(const std::string& filename) {
 	return false;
 }
 
+#if ENTITY_TRACKS_NAME_FOR_DEBUG
+/*
+	Provide an i/o overload only for this compilation unit,
+	where we need to write debug_name pointers as nullptrs,
+	so that the operator== does not return false negatives.
+*/
+
+namespace augs {
+	template <class... T>
+	void read_object(augs::stream& ar, augs::component_aggregate<T...>& aggr) {
+		ensure(false);
+	}
+
+	template <class... T>
+	void write_object(augs::stream& ar, augs::component_aggregate<T...> aggr) {
+		aggr.debug_name = nullptr;
+		write_bytes(ar, &aggr, 1);
+	}
+}
+
+static_assert(augs::has_io_overloads_v<augs::stream, put_all_components_into_t<augs::component_aggregate>>);
+#endif
+
 std::size_t cosmos_significant_state::get_first_mismatch_pos(const cosmos_significant_state& second) const {
 	/*
 		Notice that the comparison is performed by byte-wise serialization.
-		This means that even if entity_id's are internally defined as pointers, they will be written as some ids in a deterministic manner.
+		This means that it won't work if entity_ids are internally defined as pointers. The must be some ids assigned in a deterministic manner.
 		Thus, it makes sense to compare two cosmoi, if we apply the same operations upon both, as a determinism test.
 
 		It should not be, however, used to compare two cosmoi for whom there were different patterns of allocations,

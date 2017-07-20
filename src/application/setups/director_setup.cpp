@@ -16,14 +16,14 @@
 #include "game/transcendental/data_living_one_step.h"
 #include "game/detail/visible_entities.h"
 
-#include "application/game_window.h"
+#include "augs/window_framework/window.h"
 #include "application/config_lua_table.h"
 #include "game/hardcoded_content/test_scenes/testbed.h"
 #include "game/hardcoded_content/test_scenes/minimal_scene.h"
 
 #define LOG_REWINDING 0
 
-using namespace augs::window::event::keys;
+using namespace augs::event::keys;
 
 director_setup::recording_boolset director_setup::get_flags() {
 	switch (recording_mode) {
@@ -60,14 +60,6 @@ void director_setup::init(
 	}
 
 	characters.acquire_available_characters(hypersomnia);
-
-	hypersomnia.get_entity_by_name(L"player0").set_name(::to_wstring(session.config.nickname));
-
-	const auto player1 = hypersomnia.get_entity_by_name(L"player1");
-
-	if (player1.alive()) {
-		player1.set_name(::to_wstring(session.config.debug_second_nickname));
-	}
 
 	input_director_path = session.config.director_input_scene_entropy_path;
 	output_director_path = session.config.director_input_scene_entropy_path;
@@ -157,9 +149,10 @@ augs::machine_entropy director_setup::control_player(
 
 	augs::machine_entropy new_machine_entropy;
 
-	session.local_entropy_profiler.new_measurement();
-	new_machine_entropy.local = window.collect_entropy(session.config.enable_cursor_clipping);
-	session.local_entropy_profiler.end_measurement();
+	{
+		auto scope = measure_scope(get_profiler().local_entropy);
+		new_machine_entropy.local = window.collect_entropy();
+	}
 
 	process_exit(new_machine_entropy.local);
 
@@ -238,7 +231,7 @@ augs::machine_entropy director_setup::control_player(
 
 	session.switch_between_gui_and_back(new_machine_entropy.local);
 
-	session.control_gui_and_remove_fetched_events(
+	session.fetch_gui_events(
 		hypersomnia[characters.get_selected_character()],
 		new_machine_entropy.local
 	);
@@ -253,7 +246,7 @@ augs::machine_entropy director_setup::control_player(
 
 	auto translated = session.config.controls.translate(new_machine_entropy.local);
 
-	session.control_and_remove_fetched_intents(translated.intents);
+	session.fetch_session_intents(translated.intents);
 	characters.control_character_selection(translated.intents);
 
 	auto new_cosmic_entropy = cosmic_entropy(
@@ -330,9 +323,9 @@ void director_setup::process(
 	init(window, session);
 
 	while (!should_quit) {
-		sync_config_back(session.config, window.window);
+		sync_config_back(session.config, window);
 
-		const auto screen_size = window.window.get_screen_size();
+		const auto screen_size = window.get_screen_size();
 		augs::renderer::get_current().resize_fbos(screen_size);
 		session.set_screen_size(screen_size);
 
@@ -340,7 +333,7 @@ void director_setup::process(
 
 		if (should_show_editor_gui()) {
 			session.perform_imgui_pass(
-				window.window,
+				window,
 				entropy.local,
 				session.imgui_timer.extract<std::chrono::milliseconds>()
 			);

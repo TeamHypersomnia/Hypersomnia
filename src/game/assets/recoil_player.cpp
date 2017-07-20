@@ -22,6 +22,11 @@ float recoil_player_instance::shoot_and_get_impulse(const recoil_player& meta) {
 }
 
 void recoil_player_instance::cooldown(const float amount_ms) {
-	if(current_heat > 0) DEBUG_LOG("%x", current_heat);
+#if 0
+	if (current_heat > 0) {
+		DEBUG_LOG("%x", current_heat);
+	}
+#endif
+
 	current_heat -= std::min(current_heat, cooldown_speed * amount_ms);
 }

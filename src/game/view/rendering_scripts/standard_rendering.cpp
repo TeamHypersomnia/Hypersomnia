@@ -36,10 +36,10 @@ namespace rendering_scripts {
 
 		const auto& manager = get_assets_manager();
 
-		auto& default_shader = manager[assets::program_id::DEFAULT];
-		auto& pure_color_highlight_shader = manager[assets::program_id::PURE_COLOR_HIGHLIGHT];
+		auto& default_shader = manager[assets::shader_program_id::DEFAULT];
+		auto& pure_color_highlight_shader = manager[assets::shader_program_id::PURE_COLOR_HIGHLIGHT];
 		auto& border_highlight_shader = pure_color_highlight_shader; // the same
-		auto& circular_bars_shader = manager[assets::program_id::CIRCULAR_BARS];
+		auto& circular_bars_shader = manager[assets::shader_program_id::CIRCULAR_BARS];
 		
 		default_shader.use();
 		{
@@ -109,16 +109,17 @@ namespace rendering_scripts {
 
 		// hud.draw_flying_number_indicators(step);
 
-		renderer.bind_texture(manager[assets::gl_texture_id::GAME_WORLD_ATLAS]);
+		manager[assets::gl_texture_id::GAME_WORLD_ATLAS].bind();
 
 		renderer.call_triangles();
 		renderer.clear_triangles();
 
-		renderer.draw_debug_info(
-			camera,
-			assets::game_image_id::BLANK,
-			{},
-			step.get_interpolation_ratio()
-		);
+		if (DEBUG_DRAWING.enabled) {
+			renderer.draw_debug_info(
+				camera,
+				assets::game_image_id::BLANK,
+				step.get_interpolation_ratio()
+			);
+		}
 	}
 }

@@ -35,6 +35,30 @@ namespace augs {
 		initialized = true;
 	}
 
+	sound_source::~sound_source() {
+		destroy();
+	}
+	
+	sound_source::sound_source(sound_source&& b) :
+		initialized(b.initialized),
+		id(b.id),
+		attached_buffer(b.attached_buffer)
+	{
+		b.initialized = false;
+	}
+
+	sound_source& sound_source::operator=(sound_source&& b) {
+		destroy();
+
+		initialized = b.initialized;
+		id = b.id;
+		attached_buffer = b.attached_buffer;
+
+		b.initialized = false;
+
+		return *this;
+	}
+
 	void sound_source::destroy() {
 		if (initialized) {
 			stop();
@@ -46,10 +70,6 @@ namespace augs {
 			initialized = false;
 			attached_buffer = nullptr;
 		}
-	}
-
-	sound_source::~sound_source() {
-		destroy();
 	}
 
 	ALuint sound_source::get_id() const {

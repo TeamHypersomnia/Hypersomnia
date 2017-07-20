@@ -10,12 +10,12 @@ typedef components::motor_joint M;
 
 template <bool C>
 bool basic_motor_joint_synchronizer<C>::is_activated() const {
-	return get_data().activated;
+	return get_raw_component().activated;
 }
 
 template <bool C>
 decltype(M::target_bodies) basic_motor_joint_synchronizer<C>::get_target_bodies() const {
-	return get_data().target_bodies;
+	return get_raw_component().target_bodies;
 }
 
 void component_synchronizer<false, M>::reinference() const {
@@ -24,7 +24,7 @@ void component_synchronizer<false, M>::reinference() const {
 }
 
 const component_synchronizer<false, M>& component_synchronizer<false, M>::operator=(const M& m) const {
-	get_data() = m;
+	get_raw_component() = m;
 	reinference();
 	return *this;
 }

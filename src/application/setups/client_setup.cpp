@@ -1,7 +1,7 @@
 #include <thread>
 #include "game/transcendental/cosmos.h"
 #include "augs/global_libraries.h"
-#include "application/game_window.h"
+#include "augs/window_framework/window.h"
 
 #include "game/assets/assets_manager.h"
 
@@ -34,9 +34,9 @@ void client_setup::process(
 	init(window, session);
 
 	while (!should_quit) {
-		session.local_entropy_profiler.new_measurement();
-		auto precollected = window.collect_entropy(session.config.enable_cursor_clipping);
-		session.local_entropy_profiler.end_measurement();
+		get_profiler().local_entropy.start();
+		auto precollected = window.collect_entropy();
+		get_profiler().local_entropy.stop();
 
 		if (process_exit(precollected))
 			break;
@@ -61,7 +61,7 @@ void client_setup::init(
 
 	if (session.config.get_input_recording_mode() != input_recording_type::DISABLED) {
 		//if (player.try_to_load_or_save_new_session("generated/sessions/", recording_filename)) {
-		//	timer.set_stepping_speed_multiplier(session.config.recording_replay_speed);
+		//	timer.set_stepping_speed_multiplier(1.f);
 		//}
 	}
 
@@ -82,7 +82,7 @@ void client_setup::init(
 		
 		augs::stream welcome;
 		augs::write(welcome, network_command::CLIENT_WELCOME_MESSAGE);
-		augs::write(welcome, use_alternative_port ? session.config.debug_second_nickname : session.config.nickname);
+		augs::write(welcome, use_alternative_port ? "mysecondnickname" : "mynickname");
 
 		client.post_redundant(welcome);
 
@@ -127,22 +127,24 @@ void client_setup::process_once(
 	augs::machine_entropy new_machine_entropy;
 
 	new_machine_entropy.local = precollected;
-	session.remote_entropy_profiler.new_measurement();
-	new_machine_entropy.remote = client.collect_entropy();
-	session.remote_entropy_profiler.end_measurement();
+	
+	{
+		auto scope = measure_scope(get_profiler().remote_entropy);
+		new_machine_entropy.remote = client.collect_entropy();
+	}
 
 	const bool still_downloading = !complete_state_received || receiver.jitter_buffer.is_still_refilling();
 	
 	session.switch_between_gui_and_back(new_machine_entropy.local);
 
-	session.control_gui_and_remove_fetched_events(
+	session.fetch_gui_events(
 		hypersomnia[currently_controlled_character],
 		new_machine_entropy.local
 	);
 
 	auto translated = session.config.controls.translate(new_machine_entropy.local);
 
-	session.control_and_remove_fetched_intents(translated.intents);
+	session.fetch_session_intents(translated.intents);
 
 	auto new_cosmic_entropy = cosmic_entropy(
 		hypersomnia[currently_controlled_character],
@@ -212,32 +214,32 @@ void client_setup::process_once(
 
 	while (steps--) {
 		if (!still_downloading) {
-			session.sending_commands_and_predict_profiler.new_measurement();
-			
-			receiver.send_commands_and_predict(
-				client, 
-				total_collected_entropy,
-				extrapolated_hypersomnia, 
-				step_callback_with_audiovisual_response
-			);
-
-			session.sending_commands_and_predict_profiler.end_measurement();
+			{
+				auto scope = measure_scope(get_profiler().sending_commands_and_predict);
+				
+				receiver.send_commands_and_predict(
+					client,
+					total_collected_entropy,
+					extrapolated_hypersomnia,
+					step_callback_with_audiovisual_response
+				);
+			}
 
 			// LOG("Predicting to step: %x; predicted steps: %x", extrapolated_hypersomnia.get_total_steps_passed(), receiver.predicted_step_entropies.size());
 
-			session.unpack_remote_steps_profiler.new_measurement();
-			
-			receiver.unpack_deterministic_steps(
-				session.systems_audiovisual.get<interpolation_system>(),
-				session.systems_audiovisual.get<past_infection_system>(),
-				currently_controlled_character, 
-				hypersomnia, 
-				hypersomnia_last_snapshot, 
-				extrapolated_hypersomnia, 
-				step_callback
-			);
+			{
+				auto scope = measure_scope(get_profiler().unpack_remote_steps);
 
-			session.unpack_remote_steps_profiler.end_measurement();
+				receiver.unpack_deterministic_steps(
+					session.systems_audiovisual.get<interpolation_system>(),
+					session.systems_audiovisual.get<past_infection_system>(),
+					currently_controlled_character,
+					hypersomnia,
+					hypersomnia_last_snapshot,
+					extrapolated_hypersomnia,
+					step_callback
+				);
+			}
 		}
 		
 		if (client.has_timed_out(hypersomnia.get_fixed_delta().in_milliseconds(), 2000)) {
@@ -245,9 +247,10 @@ void client_setup::process_once(
 			client.forceful_disconnect();
 		}
 
-		session.sending_packets_profiler.new_measurement();
-		client.send_pending_redundant();
-		session.sending_packets_profiler.end_measurement();
+		{
+			auto scope = measure_scope(get_profiler().sending_packets);
+			client.send_pending_redundant();
+		}
 
 		total_collected_entropy.clear();
 	}

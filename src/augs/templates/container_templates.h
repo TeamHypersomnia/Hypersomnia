@@ -42,13 +42,21 @@ void add_element(Container& v, T&&... l) {
 }
 
 template<class Container, class T>
-void sort_container(Container& v, const T l) {
+auto& sort_container(Container& v, const T l) {
 	std::sort(v.begin(), v.end(), l);
+	return v;
 }
 
 template<class Container>
-void sort_container(Container& v) {
+auto& sort_container(Container& v) {
 	std::sort(v.begin(), v.end());
+	return v;
+}
+
+template<class Container>
+auto& reverse_container(Container& v) {
+	std::reverse(v.begin(), v.end());
+	return v;
 }
 
 template<class Container>
@@ -57,13 +65,15 @@ void remove_duplicates_from_sorted(Container& v, std::enable_if_t<can_access_dat
 }
 
 template<class A, class B>
-void concatenate(A& a, const B& b) {
+A& concatenate(A& a, const B& b) {
 	if constexpr(can_access_data_v<A>) {
 		a.insert(a.end(), b.begin(), b.end());
 	}
 	else {
 		a.insert(b.begin(), b.end());
 	}
+
+	return a;
 }
 
 template<class Container, class T>

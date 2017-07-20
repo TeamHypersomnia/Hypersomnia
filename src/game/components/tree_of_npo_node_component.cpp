@@ -20,8 +20,6 @@ namespace components {
 	tree_of_npo_node tree_of_npo_node::create_default_for(const logic_step step, const_entity_handle e) {
 		tree_of_npo_node result;
 
-		const auto* const render = e.find<components::render>();
-
 		result.aabb = e.get_aabb(step.input.metas_of_assets);
 
 		if (e.has<components::particles_existence>()) {
@@ -32,11 +30,11 @@ namespace components {
 	}
 }
 
-typedef components::tree_of_npo_node D;
+using D = components::tree_of_npo_node;
 
 template<bool C>
 bool basic_tree_of_npo_node_synchronizer<C>::is_activated() const {
-	return get_data().activated;
+	return get_raw_component().activated;
 }
 
 void component_synchronizer<false, D>::reinference() const {
@@ -45,27 +43,31 @@ void component_synchronizer<false, D>::reinference() const {
 
 void component_synchronizer<false, D>::update_proxy(const logic_step step) const {
 	const auto new_aabb = components::tree_of_npo_node::create_default_for(step, handle).aabb;
-	const vec2 displacement = new_aabb.center() - get_data().aabb.center();
-	get_data().aabb = new_aabb;
+	auto& data = get_raw_component();
+
+	const vec2 displacement = new_aabb.center() - data.aabb.center();
+	data.aabb = new_aabb;
 
 	auto& sys = handle.get_cosmos().systems_inferred.get<tree_of_npo_system>();
 	auto& cache = sys.get_cache(handle.get_id());
 	
-	if (cache.is_constructed() && !get_data().always_visible) {
+	if (cache.is_constructed() && !data.always_visible) {
 		b2AABB aabb;
-		aabb.lowerBound = get_data().aabb.left_top();
-		aabb.upperBound = get_data().aabb.right_bottom();
+		aabb.lowerBound = data.aabb.left_top();
+		aabb.upperBound = data.aabb.right_bottom();
 
 		sys.get_tree(cache).nodes.MoveProxy(cache.tree_proxy_id, aabb, displacement);
 	}
 }
 
-void component_synchronizer<false, D>::set_activated(bool flag) const {
-	if (flag == get_data().activated) {
+void component_synchronizer<false, D>::set_activated(const bool flag) const {
+	auto& data = get_raw_component();
+
+	if (flag == data.activated) {
 		return;
 	}
 
-	get_data().activated = flag;
+	data.activated = flag;
 	reinference();
 }
 

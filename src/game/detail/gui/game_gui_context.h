@@ -9,14 +9,12 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/detail/camera_cone.h"
 #include "game/detail/gui/game_gui_element_location.h"
+#include "game/detail/gui/character_gui_drawing_input.h"
 
 #include "application/config_lua_table.h"
 
 class root_of_inventory_gui;
 struct character_gui;
-struct aabb_highlighter;
-struct camera_cone;
-class gui_element_system;
 
 typedef augs::gui::rect_tree<game_gui_element_location> game_gui_rect_tree;
 
@@ -42,20 +40,17 @@ public:
 		rect_world_ref rect_world,
 		character_gui_ref char_gui,
 		const_entity_handle handle,
-		tree_ref tree, 
-		root_of_inventory_gui_ref root
+		tree_ref tree
 	) : 
 		base(rect_world, tree),
 		sys(sys),
 		handle(handle),
-		char_gui(char_gui),
-		root(root)
+		char_gui(char_gui)
 	{}
 
 	gui_element_system_ref sys;
 	const_entity_handle handle;
 	character_gui_ref char_gui;
-	root_of_inventory_gui_ref root;
 
 	template<class other_context>
 	operator other_context() const {
@@ -64,13 +59,16 @@ public:
 			get_rect_world(), 
 			get_character_gui(), 
 			handle,
-			tree,
-			root
+			tree
 		);
 	}
 
-	root_of_inventory_gui_ref get_root_of_inventory_gui() const {
-		return root;
+	auto get_root_id() const {
+		return root_of_inventory_gui_in_context();
+	}
+
+	auto& get_root() const {
+		return sys.root;
 	}
 
 	const_entity_handle get_gui_element_entity() const {
@@ -104,51 +102,39 @@ public:
 	typedef typename base::gui_element_system_ref gui_element_system_ref;
 
 	viewing_game_gui_context(
-		gui_element_system_ref sys,
 		rect_world_ref rect_world,
 		character_gui_ref char_gui,
 		const_entity_handle handle,
 		tree_ref tree,
-		root_of_inventory_gui_ref root,
-		const hotbar_settings& hotbar_settings,
-		camera_cone camera,
-		const aabb_highlighter& highlighter,
-		const interpolation_system& interp,
-		const double interpolation_ratio,
-		const input_context& input_information,
-		augs::vertex_triangle_buffer& output
+		const character_gui_drawing_input in
 	) :
-		base(sys, rect_world, char_gui, handle, tree, root),
-		hotbar_settings(hotbar_settings),
-		camera(camera),
-		output(output),
-		interp(interp),
-		interpolation_ratio(interpolation_ratio),
-		highlighter(highlighter),
-		input_information(input_information)
+		base(in.gui, rect_world, char_gui, handle, tree),
+		in(in)
 	{}
 
-	const hotbar_settings& hotbar_settings;
-	camera_cone camera;
-	augs::vertex_triangle_buffer& output;
-	const aabb_highlighter& highlighter;
-	const interpolation_system& interp;
-	const input_context& input_information;
-	const double interpolation_ratio;
+	const character_gui_drawing_input in;
 
 	augs::vertex_triangle_buffer& get_output_buffer() const {
-		return output;
+		return in.output;
 	}
 
 	const aabb_highlighter& get_aabb_highlighter() const {
-		return highlighter;
+		return in.world_hover_highlighter;
 	}
 
 	const interpolation_system& get_interpolation_system() const {
-		return interp;
+		return in.interpolation;
 	}
 
 	camera_cone get_camera_cone() const {
-		return camera;
+		return in.camera;
+	}
+
+	auto get_hotbar_settings() const {
+		return in.hotbar;
+	}
+
+	auto get_input_information() const {
+		return in.input_information;
 	}
 };

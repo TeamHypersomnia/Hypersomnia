@@ -139,7 +139,7 @@ namespace components {
 	
 	void polygon::draw(const drawing_input& in) const {
 		const auto& manager = get_assets_manager();
-		const auto& texture = manager[texture_map];
+		const auto& texture = manager.at(texture_map);
 
 		if (in.drawing_type == renderable_drawing_type::NEON_MAPS) {
 			components::sprite::drawing_input neon_in(in.target_buffer);

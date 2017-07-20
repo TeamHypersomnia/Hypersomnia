@@ -22,7 +22,7 @@
 #include "augs/entity_system/component_aggregate.h"
 
 #include "game/transcendental/cosmic_entropy.h"
-#include "game/transcendental/cosmic_profiler.h"
+#include "game/transcendental/profiling.h"
 #include "game/transcendental/types_specification/all_components_declaration.h"
 #include "game/transcendental/types_specification/all_messages_declaration.h"
 #include "game/transcendental/types_specification/all_systems_declaration.h"
@@ -59,8 +59,6 @@ public:
 
 	cosmos_significant_state significant;
 private:
-	augs::enum_associative_array<assets::behaviour_tree_id, behaviour_tree> unserializable_behaviour_trees;
-
 #if COSMOS_TRACKS_GUIDS
 	std::map<entity_guid, entity_id> guid_to_id;
 
@@ -90,9 +88,6 @@ private:
 
 public:
 	cosmos(const std::size_t reserved_entities = 0u);
-	cosmos(const cosmos&);
-
-	cosmos& operator=(const cosmos&);
 	cosmos& operator=(const cosmos_significant_state&);
 
 	bool operator==(const cosmos&) const;
@@ -141,9 +136,6 @@ public:
 			sys.create_inferred_state_for(handle);
 		}
 	}
-
-	behaviour_tree& get_handle(const assets::behaviour_tree_id);
-	const behaviour_tree& get_handle(const assets::behaviour_tree_id) const;
 
 #if COSMOS_TRACKS_GUIDS
 	entity_handle get_handle(const entity_guid);
@@ -297,14 +289,6 @@ public:
 
 inline si_scaling cosmos::get_si() const {
 	return significant.meta.global.si;
-}
-
-inline behaviour_tree& cosmos::get_handle(const assets::behaviour_tree_id id) {
-	return unserializable_behaviour_trees[id];
-}
-
-inline const behaviour_tree& cosmos::get_handle(const assets::behaviour_tree_id id) const {
-	return unserializable_behaviour_trees.at(id);
 }
 
 #if COSMOS_TRACKS_GUIDS

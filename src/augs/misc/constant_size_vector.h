@@ -4,6 +4,7 @@
 #include "augs/zeroed_pod.h"
 
 #include "augs/misc/trivially_copyable_pair.h"
+#include "augs/templates/type_matching_and_indexing.h"
 
 template<class ForwardIt, class T, class Compare = std::less<>>
 ForwardIt binary_find(ForwardIt first, ForwardIt last, const T& value, Compare comp = {})
@@ -19,52 +20,71 @@ ForwardIt binary_find(ForwardIt first, ForwardIt last, const T& value, Compare c
 namespace augs  {
 	struct introspection_access;
 
-	template<class T, size_t const_count>
-	class constant_size_vector {
-		typedef std::array<T, const_count> arr_type;
+	template <class T, std::size_t const_count>
+	class constant_size_vector_base {
+	public:
+		using value_type = T;
 
-		// GEN INTROSPECTOR class augs::constant_size_vector class T size_t const_count
-		size_t count;
-		arr_type raw;
+	protected:
+		using size_type = std::size_t;
+
+		static constexpr bool is_trivially_copyable = std::is_trivially_copyable_v<value_type>;
+
+		using value_array = std::array<T, const_count>;
+
+		using storage_type = std::array<
+			std::conditional_t<is_trivially_copyable, 
+				value_type,
+				std::aligned_storage_t<sizeof(value_type), alignof(value_type)>
+			>,
+			const_count
+		>;
+		
+		static_assert(
+			!is_trivially_copyable || std::is_default_constructible_v<value_type>,
+			"No support for a type that is trivially copyable but not default constructible."
+		);
+
+		// GEN INTROSPECTOR class augs::constant_size_vector_base class T std::size_t const_count
+		size_type count = 0;
+		storage_type raw;
 		// END GEN INTROSPECTOR
 
 		friend struct augs::introspection_access;
 
-	public:
-		typedef typename arr_type::iterator iterator;
-		typedef typename arr_type::const_iterator const_iterator;
-		static constexpr bool is_string_type = std::is_same<zeroed_pod_internal_type_t<T>, char>::value || std::is_same<zeroed_pod_internal_type_t<T>, wchar_t>::value;
-		typedef typename std::basic_string<zeroed_pod_internal_type_t<T>> string_type;
-		typedef T value_type;
-		static constexpr size_t array_size = sizeof(T) * const_count;
-		
-		constant_size_vector() : count(0) {
-
+		auto& as_value_array() {
+			return reinterpret_cast<value_array&>(raw);
 		}
 
+		const auto& as_value_array() const {
+			return reinterpret_cast<const value_array&>(raw);
+		}
+
+		auto& nth(const size_type n) {
+			return as_value_array()[n];
+		}
+
+		const auto& nth(const size_type n) const {
+			return as_value_array()[n];
+		}
+
+		template <class... Args>
+		void construct_at(const size_type n, Args&&... args) {
+			new (&nth(n)) value_type(std::forward<Args>(args)...);
+		}
+
+	public:
+		using iterator = typename value_array::iterator;
+		using const_iterator = typename value_array::const_iterator;
+
+		constant_size_vector_base() = default;
+
 		template <class Iter>
-		constant_size_vector(Iter first, Iter last) {
+		constant_size_vector_base(Iter first, Iter last) {
 			assign(first, last);
 		}
 
-		constant_size_vector(std::initializer_list<T> l) : constant_size_vector(l.begin(), l.end()) {}
-
-		template<bool _is_string_type = is_string_type, class = std::enable_if_t<_is_string_type>>
-		constant_size_vector(const std::basic_string<zeroed_pod_internal_type_t<T>>& s) : constant_size_vector(s.begin(), s.end()) {}
-
-		constant_size_vector& operator=(const constant_size_vector&) = default;
-
-		template<bool _is_string_type = is_string_type, class = std::enable_if_t<_is_string_type>>
-		constant_size_vector& operator=(const string_type& s) {
-			assign(s.begin(), s.end());
-			return *this;
-		}
-
-		template<bool _is_string_type = is_string_type, class = std::enable_if_t<_is_string_type>>
-		constant_size_vector& operator+=(const string_type& s) {
-			insert(end(), s.begin(), s.end());
-			return *this;
-		}
+		constant_size_vector_base(std::initializer_list<value_type> l) : constant_size_vector_base(l.begin(), l.end()) {}
 
 		template <class Iter>
 		void assign(const Iter first, const Iter last) {
@@ -72,104 +92,104 @@ namespace augs  {
 			insert(end(), first, last);
 		}
 
-		void push_back(const T& obj) {
+		void push_back(const value_type& obj) {
 			ensure(count < capacity());
-			raw[count++] = obj;
+			construct_at(count++, obj);
 		}
 
 		template <class... Args>
 		void emplace_back(Args&&... args) {
 			ensure(count < capacity());
-			raw[count++] = T(std::forward<Args>(args)...);
+			construct_at(count++, std::forward<Args>(args)...);
 		}
 
-		T& operator[](const size_t i) {
-			return raw[i];
+		value_type& operator[](const size_type i) {
+			return nth(i);
 		}
 
-		const T& operator[](const size_t i) const {
-			return raw[i];
+		const value_type& operator[](const size_type i) const {
+			return nth(i);
 		}
 
-		T& at(const size_t i) {
-			return raw.at(i);
+		value_type& at(const size_type i) {
+			ensure(i < count);
+			return nth(i);
 		}
 
-		const T& at(const size_t i) const {
-			return raw.at(i);
+		const value_type& at(const size_type i) const {
+			ensure(i < count);
+			return nth(i);
 		}
 
-		T& front() {
-			return raw[0];
+		value_type& front() {
+			return nth(0);
 		}
 
-		const T& front() const {
-			return raw[0];
+		const value_type& front() const {
+			return nth(0);
 		}
 
-		T& back() {
-			return raw[count - 1];
+		value_type& back() {
+			return nth(count - 1);
 		}
 
-		const T& back() const {
-			return raw[count - 1];
-		}
-
-		iterator begin() {
-			return raw.begin();
-		}
-
-		iterator end() {
-			return raw.begin() + size();
+		const value_type& back() const {
+			return nth(count - 1);
 		}
 
 		iterator erase(const iterator first, const iterator last) {
 			ensure(last >= first && first >= begin() && last <= end());
-			std::copy(last, end(), first);
+			std::move(last, end(), first);
 			resize(size() - (last - first));
 			return first;
 		}
 
 		iterator erase(const iterator position) {
 			ensure(position >= begin() && position <= end());
-			std::copy(position + 1, end(), position);
+			std::move(position + 1, end(), position);
 			resize(size() - 1);
 			return position;
 		}
 
-		void insert(const iterator where, const T& obj) {
+		void insert(const iterator where, const value_type& obj) {
 			const auto new_elements_count = 1;
 
 			ensure(where >= begin());
 			ensure(count + new_elements_count <= capacity());
 
-			std::copy(where, end(), where + 1);
-			*where = obj;
+			std::move(where, end(), where + 1);
+			construct_at(where - begin(), obj);
 
 			count += new_elements_count;
 		}
 
 		template <class Iter>
-		void insert(const iterator where, const Iter first, const Iter last) {
+		void insert(iterator where, Iter first, const Iter last) {
 			const auto new_elements_count = last - first;
 			
 			ensure(where >= begin());
 			ensure(count + new_elements_count <= capacity());
 
-			std::copy(where, end(), where + (last-first));
-			std::copy(first, last, where);
+			std::move(where, end(), where + (last - first));
+			
+			while (first != last) {
+				construct_at(where - begin(), *first);
+
+				++first;
+				++where;
+			}
 
 			count += new_elements_count;
 		}
 
-		void resize(const size_t s) {
+		void resize(const size_type s) {
 			ensure(s <= capacity());
 			int diff = s;
 			diff -= size();
 
 			if (diff > 0) {
 				while (diff--) {
-					push_back(T());
+					push_back(value_type());
 				}
 			}
 			else if (diff < 0) {
@@ -181,65 +201,171 @@ namespace augs  {
 			}
 		}
 
-		T* data() {
-			return &raw[0];
+		value_type* data() {
+			return &nth(0);
 		}
 
-		const T* data() const {
-			return &raw[0];
+		const value_type* data() const {
+			return &nth(0);
+		}
+
+		iterator begin() {
+			return as_value_array().begin();
+		}
+
+		iterator end() {
+			return as_value_array().begin() + size();
 		}
 
 		const_iterator begin() const {
-			return raw.begin();
+			return as_value_array().begin();
 		}
 
 		const_iterator end() const {
-			return raw.begin() + size();
+			return as_value_array().begin() + size();
 		}
 
-		std::size_t size() const {
+		size_type size() const {
 			return count;
 		}
 
-		constexpr std::size_t max_size() const {
-			return raw.max_size();
+		constexpr size_type max_size() const {
+			return data.max_size();
 		}
 
 		bool empty() const {
 			return size() == 0;
 		}
 
-		size_t capacity() const {
+		size_type capacity() const {
 			return const_count;
 		}
 
-		void reserve(const size_t) {
+		void reserve(const size_type) {
 			// no-op
 		}
 
 		void pop_back() {
 			ensure(count > 0);
-			raw[count-1] = T();
+			
+			if constexpr(!is_trivially_copyable) {
+				nth(count - 1).~value_type();
+			}
+
 			--count;
 		}
 
 		void clear() {
-			for (auto& e : raw) {
-				e = T();
+			if constexpr(!is_trivially_copyable) {
+				while (count) {
+					pop_back();
+				}
 			}
+			else {
+				count = 0;
+			}
+		}
+	};
 
-			count = 0;
+	template <class T, std::size_t, class = void>
+	class constant_size_vector;
+
+	// GEN INTROSPECTOR class augs::constant_size_vector class T std::size_t const_count class dummy
+	// INTROSPECT BASE augs::constant_size_vector_base<T, const_count>
+	// END GEN INTROSPECTOR
+
+	template <class T, std::size_t N>
+	class constant_size_vector<T, N, std::enable_if_t<std::is_trivially_copyable_v<T>>>
+		: public constant_size_vector_base<T, N> {
+		using underlying_char_type = zeroed_pod_internal_type_t<T>;
+
+		static constexpr bool should_act_like_string =
+			is_one_of_v<underlying_char_type, char, wchar_t>
+			;
+
+		using string_type = std::basic_string<underlying_char_type>;
+
+	public:
+		using constant_size_vector_base::constant_size_vector_base;
+
+		constant_size_vector() = default;
+
+		template <class = std::enable_if_t<should_act_like_string>>
+		constant_size_vector(const string_type& s) : constant_size_vector(s.begin(), s.end()) {}
+
+		template <class = std::enable_if_t<should_act_like_string>>
+		constant_size_vector& operator=(const string_type& s) {
+			assign(s.begin(), s.end());
+			return *this;
 		}
 
-		template<bool _is_string_type = is_string_type, class = std::enable_if_t<_is_string_type>>
+		template <class = std::enable_if_t<should_act_like_string>>
+		constant_size_vector& operator+=(const string_type& s) {
+			insert(end(), s.begin(), s.end());
+			return *this;
+		}
+
+		template <class = std::enable_if_t<should_act_like_string>>
 		operator string_type() const {
 			return{ begin(), end() };
 		}
 	};
 
-	template <size_t const_count>
+	template <class T, std::size_t N>
+	class constant_size_vector<T, N, std::enable_if_t<!std::is_trivially_copyable_v<T>>>
+		: public constant_size_vector_base<T, N> {
+	public:
+		using constant_size_vector_base::constant_size_vector_base;
+		
+		constant_size_vector() = default;
+
+		constant_size_vector(const constant_size_vector& b) {
+			insert(begin(), b.begin(), b.end());
+		}
+
+		constant_size_vector& operator=(const constant_size_vector& b) {
+			clear();
+			insert(begin(), b.begin(), b.end());
+		}
+
+		constant_size_vector(constant_size_vector&& b) {
+			insert(begin(), 
+				std::make_move_iterator(b.begin()), 
+				std::make_move_iterator(b.end())
+			);
+
+			b.count = 0;
+		}
+
+		constant_size_vector& operator=(constant_size_vector&& b) {
+			clear();
+
+			insert(begin(),
+				std::make_move_iterator(b.begin()),
+				std::make_move_iterator(b.end())
+			);
+
+			b.count = 0;
+
+			return *this;
+		}
+
+		~constant_size_vector() {
+			clear();
+		}
+	};
+
+	template <std::size_t const_count>
 	using constant_size_string = constant_size_vector<zeroed_pod<char>, const_count>;
 
-	template <size_t const_count>
+	template <std::size_t const_count>
 	using constant_size_wstring = constant_size_vector<zeroed_pod<wchar_t>, const_count>;
 }
+
+template <size_t I>
+struct of_size {
+	template <class T>
+	struct make_constant_vector {
+		typedef augs::constant_size_vector<T, I> type;
+	};
+};

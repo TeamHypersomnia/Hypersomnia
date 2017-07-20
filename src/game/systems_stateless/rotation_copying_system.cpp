@@ -22,7 +22,7 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/logic_step.h"
 #include "game/transcendental/cosmos.h"
-#include "application/config_structs/debug_drawing_settings.h"
+#include "game/view/debug_drawing_settings.h"
 
 using namespace augs;
 
@@ -58,7 +58,7 @@ float colinearize_AB_with_C(
 
 	const auto final_angle = 2 * (CG.degrees() - AG.degrees());
 	
-	if (augs::renderer::get_current().debug.draw_colinearization) {
+	if (DEBUG_DRAWING.draw_colinearization) {
 		auto& ln = augs::renderer::get_current().logic_lines;
 
 		ln.draw_cyan(O_center_of_rotation, C_crosshair);

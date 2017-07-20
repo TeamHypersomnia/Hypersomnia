@@ -19,7 +19,7 @@ namespace augs {
 	{
 	}
 
-	void font::from_file(
+	font::font(
 		const std::string& source_font_path,
 		const font_loading_input& in
 	) {
@@ -64,7 +64,7 @@ namespace augs {
 				if (face->glyph->bitmap.width) {
 					auto& g_img = *glyph_bitmaps.rbegin();
 
-					g_img.create_from(
+					g_img = augs::image(
 						face->glyph->bitmap.buffer, 
 						1, 
 						face->glyph->bitmap.pitch, 

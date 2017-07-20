@@ -1,4 +1,5 @@
 #include "interpolation_system.h"
+#include "game/systems_audiovisual/interpolation_settings.h"
 #include "game/components/interpolation_component.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
@@ -42,10 +43,13 @@ void interpolation_system::set_updated_interpolated_transform(
 }
 
 void interpolation_system::integrate_interpolated_transforms(
-	const cosmos& cosm, 
-	const augs::delta delta, 
+	const interpolation_settings& settings,
+	const cosmos& cosm,
+	const augs::delta delta,
 	const augs::delta fixed_delta_for_slowdowns
 ) {
+	set_interpolation_enabled(settings.enabled);
+
 	if (!enabled) {
 		return;
 	}
@@ -61,8 +65,8 @@ void interpolation_system::integrate_interpolated_transforms(
 			auto& integrated = get_interpolated(e);
 			auto& cache = per_entity_cache[make_cache_id(e)];
 
-			const float considered_positional_speed = interpolation_speed / (sqrt(cache.positional_slowdown_multiplier));
-			const float considered_rotational_speed = interpolation_speed / (sqrt(cache.rotational_slowdown_multiplier));
+			const float considered_positional_speed = settings.speed / (sqrt(cache.positional_slowdown_multiplier));
+			const float considered_rotational_speed = settings.speed / (sqrt(cache.rotational_slowdown_multiplier));
 
 			if (cache.positional_slowdown_multiplier > 1.f) {
 				cache.positional_slowdown_multiplier -= slowdown_multipliers_decrease / 4;

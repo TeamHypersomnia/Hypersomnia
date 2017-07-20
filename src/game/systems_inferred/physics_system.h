@@ -133,7 +133,7 @@ public:
 	void step_and_set_new_transforms(const logic_step);
 	void post_and_clear_accumulated_collision_messages(const logic_step);
 
-	mutable int ray_casts_since_last_step = 0;
+	mutable std::size_t ray_casts_since_last_step = 0u;
 
 	b2World& get_b2world() {
 		return *b2world.get();
@@ -146,9 +146,10 @@ public:
 	// b2World on stack causes a stack overflow due to a large stack allocator, therefore it must be dynamically allocated
 	std::unique_ptr<b2World> b2world;
 
+	physics_system(const physics_system&);
 	physics_system& operator=(const physics_system&);
+
 	physics_system& operator=(physics_system&&) = delete;
-	physics_system(const physics_system&) = delete;
 	physics_system(physics_system&&) = delete;
 private:	
 	struct raycast_input : public b2RayCastCallback {

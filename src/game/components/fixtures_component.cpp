@@ -28,7 +28,7 @@ ltrb basic_fixtures_synchronizer<C>::get_local_aabb() const {
 	return {};
 	//std::vector<vec2> all_verts;
 	//
-	//for (const auto& s : get_data().colliders) {
+	//for (const auto& s : get_raw_component().colliders) {
 	//	for (const auto& c : s.shape.convex_polys) {
 	//		for (const auto v : c.vertices) {
 	//			all_verts.push_back(v);
@@ -41,35 +41,35 @@ ltrb basic_fixtures_synchronizer<C>::get_local_aabb() const {
 
 template<bool C>
 bool basic_fixtures_synchronizer<C>::is_friction_ground() const {
-	return get_data().is_friction_ground;
+	return get_raw_component().is_friction_ground;
 }
 
 template<bool C>
 bool basic_fixtures_synchronizer<C>::is_destructible() const {
-	return get_data().destructible;
+	return get_raw_component().destructible;
 }
 
 template<bool C>
 bool basic_fixtures_synchronizer<C>::standard_collision_resolution_disabled() const {
-	return get_data().disable_standard_collision_resolution;
+	return get_raw_component().disable_standard_collision_resolution;
 }
 
 template<bool C>
 bool basic_fixtures_synchronizer<C>::can_driver_shoot_through() const {
-	return get_data().can_driver_shoot_through;
+	return get_raw_component().can_driver_shoot_through;
 }
 
 void component_synchronizer<false, F>::set_offset(
 	const colliders_offset_type t, 
 	const components::transform off
 ) const {
-	get_data().offsets_for_created_shapes[t] = off;
+	get_raw_component().offsets_for_created_shapes[t] = off;
 	reinference();
 }
 
 const component_synchronizer<false, F>& component_synchronizer<false, F>::operator=(const F& f) const {
 	set_owner_body(f.owner_body);
-	get_data() = f;
+	get_raw_component() = f;
 	reinference();
 	return *this;
 }
@@ -81,7 +81,7 @@ void component_synchronizer<false, F>::reinference() const {
 
 void component_synchronizer<false, F>::rebuild_density() const {
 	for (auto f : get_cache().all_fixtures_in_component) {
-		f->SetDensity(get_data().density * get_data().density_multiplier);
+		f->SetDensity(get_raw_component().density * get_raw_component().density_multiplier);
 	}
 
 	get_cache().all_fixtures_in_component[0]->GetBody()->ResetMassData();
@@ -90,7 +90,7 @@ void component_synchronizer<false, F>::rebuild_density() const {
 void component_synchronizer<false, F>::set_density(
 	const float d
 ) const {
-	get_data().density = d;
+	get_raw_component().density = d;
 
 	if (!is_constructed()) {
 		return;
@@ -102,7 +102,7 @@ void component_synchronizer<false, F>::set_density(
 void component_synchronizer<false, F>::set_density_multiplier(
 	const float mult
 ) const {
-	get_data().density_multiplier = mult;
+	get_raw_component().density_multiplier = mult;
 
 	if (!is_constructed()) {
 		return;
@@ -112,18 +112,18 @@ void component_synchronizer<false, F>::set_density_multiplier(
 }
 
 void component_synchronizer<false, F>::set_activated(const bool flag) const {
-	if (flag == get_data().activated) {
+	if (flag == get_raw_component().activated) {
 		return;
 	}
 
-	get_data().activated = flag;
+	get_raw_component().activated = flag;
 	reinference();
 }
 
 void component_synchronizer<false, F>::set_friction(
 	const float fr
 ) const {
-	get_data().friction = fr;
+	get_raw_component().friction = fr;
 
 	if (!is_constructed()) {
 		return;
@@ -137,7 +137,7 @@ void component_synchronizer<false, F>::set_friction(
 void component_synchronizer<false, F>::set_restitution(
 	const float r
 ) const {
-	get_data().restitution = r;
+	get_raw_component().restitution = r;
 
 	if (!is_constructed()) {
 		return;
@@ -151,7 +151,7 @@ void component_synchronizer<false, F>::set_restitution(
 void component_synchronizer<false, F>::set_physical_material(
 	const assets::physical_material_id m
 ) const {
-	get_data().material = m;
+	get_raw_component().material = m;
 }
 
 void component_synchronizer<false, F>::set_owner_body(const entity_id owner_id) const {
@@ -161,8 +161,8 @@ void component_synchronizer<false, F>::set_owner_body(const entity_id owner_id) 
 	const auto new_owner = cosmos[owner_id];
 	const auto this_id = self.get_id();
 
-	const auto former_owner = cosmos[get_data().owner_body];
-	get_data().owner_body = new_owner;
+	const auto former_owner = cosmos[get_raw_component().owner_body];
+	get_raw_component().owner_body = new_owner;
 
 	auto& relational = cosmos.systems_inferred.get<relational_system>().fixtures_of_bodies;
 	relational.set_parent(self, new_owner);
@@ -177,32 +177,32 @@ void component_synchronizer<false, F>::set_owner_body(const entity_id owner_id) 
 
 template<bool C>
 float basic_fixtures_synchronizer<C>::get_friction() const {
-	return get_data().friction;
+	return get_raw_component().friction;
 }
 
 template<bool C>
 float basic_fixtures_synchronizer<C>::get_restitution() const {
-	return get_data().restitution;
+	return get_raw_component().restitution;
 }
 
 template<bool C>
 float basic_fixtures_synchronizer<C>::get_density() const {
-	return get_base_density() * get_data().density_multiplier;
+	return get_base_density() * get_raw_component().density_multiplier;
 }
 
 template<bool C>
 float basic_fixtures_synchronizer<C>::get_base_density() const {
-	return get_data().density;
+	return get_raw_component().density;
 }
 
 template<bool C>
 float basic_fixtures_synchronizer<C>::get_density_multiplier() const {
-	return get_data().density_multiplier;
+	return get_raw_component().density_multiplier;
 }
 
 template<bool C>
 bool basic_fixtures_synchronizer<C>::is_activated() const {
-	return get_data().activated;
+	return get_raw_component().activated;
 }
 
 template<bool C>
@@ -212,12 +212,12 @@ bool basic_fixtures_synchronizer<C>::is_constructed() const {
 
 template<bool C>
 components::transform basic_fixtures_synchronizer<C>::get_offset(const colliders_offset_type t) const {
-	return get_data().offsets_for_created_shapes[t];
+	return get_raw_component().offsets_for_created_shapes[t];
 }
 
 template<bool C>
 components::transform basic_fixtures_synchronizer<C>::get_total_offset() const {
-	const auto& offsets = get_data().offsets_for_created_shapes;
+	const auto& offsets = get_raw_component().offsets_for_created_shapes;
 
 	return std::accumulate(
 		offsets.begin(), 
@@ -240,7 +240,7 @@ components::transform components::fixtures::transform_around_body(
 
 template<bool C>
 entity_id basic_fixtures_synchronizer<C>::get_owner_body() const {
-	return get_data().owner_body;
+	return get_raw_component().owner_body;
 }
 
 template class basic_fixtures_synchronizer<false>;

@@ -58,11 +58,9 @@ generated-file-format:
 // Forward declarations
 
 namespace augs {
-	namespace window {
-		namespace event {
-			namespace keys {
-				enum class key;
-			}
+	namespace event {
+		namespace keys {
+			enum class key;
 		}
 	}
 }
@@ -75,8 +73,8 @@ struct ImVec4;
 	/* Hand-written enum introspectors that do not fit into the standard schema begin here */
 
 	template <class... T>
-	std::string enum_to_string(const window::event::keys::key k, T...) {
-		auto wstr = window::event::keys::key_to_wstring(k);
+	std::string enum_to_string(const event::keys::key k, T...) {
+		auto wstr = event::keys::key_to_wstring(k);
 		str_ops(wstr).replace_all(L" ", L"");
 		return std::string(wstr.begin(), wstr.end());
 	}

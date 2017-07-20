@@ -47,7 +47,7 @@ namespace augs {
 		return output;
 	}
 
-	using delta_unit = char;
+	using delta_unit = std::byte;
 
 	template <class T, class = void>
 	class object_delta;

@@ -40,6 +40,30 @@ namespace augs {
 	}
 
 	single_sound_buffer::~single_sound_buffer() {
+		destroy();
+	}
+
+	single_sound_buffer::single_sound_buffer(single_sound_buffer&& b) : 
+		computed_length_in_seconds(b.computed_length_in_seconds),
+		id(b.id),
+		initialized(b.initialized)
+	{
+		b.initialized = false;
+	}
+
+	single_sound_buffer& single_sound_buffer::operator=(single_sound_buffer&& b) {
+		destroy();
+
+		computed_length_in_seconds = b.computed_length_in_seconds;
+		id = b.id;
+		initialized = b.initialized;
+
+		b.initialized = false;
+
+		return *this;
+	}
+
+	void single_sound_buffer::destroy() {
 		if (initialized) {
 #if TRACE_CONSTRUCTORS_DESTRUCTORS
 			--g_num_buffers;

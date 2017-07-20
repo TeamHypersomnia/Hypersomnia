@@ -3,7 +3,9 @@
 
 class root_of_inventory_gui : public game_gui_rect_node {
 public:
-	root_of_inventory_gui(const vec2 screen_size);
+	root_of_inventory_gui(const vec2i screen_size);
+
+	void set_screen_size(const vec2i);
 
 	template <class C, class gui_element_id, class L>
 	static void for_each_child(const C context, const gui_element_id this_id, L generic_call) {

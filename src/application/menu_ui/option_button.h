@@ -1,5 +1,4 @@
 #pragma once
-#include "menu_ui_element_location.h"
 #include "augs/gui/appearance_detector.h"
 #include "augs/gui/material.h"
 
@@ -12,10 +11,10 @@
 
 #include "augs/audio/sound_source.h"
 
-class option_button : public menu_ui_rect_node {
+template <class Enum>
+class option_button : public menu_ui_rect_node<Enum> {
 public:
 	augs::gui::appearance_detector detector;
-	augs::gui::text::formatted_string caption;
 
 	augs::sound_source hover_sound;
 	augs::sound_source click_sound;
@@ -31,18 +30,38 @@ public:
 	bool click_callback_required = false;
 	pad_bytes<3> pad;
 
-	using base = menu_ui_rect_node;
-	using gui_entropy = base::gui_entropy;
+	using base_node = menu_ui_rect_node<Enum>;
+	using gui_entropy = typename base_node::gui_entropy;
 
-	option_button();
+	option_button() {
+		corners.inside_texture = assets::game_image_id::MENU_BUTTON_INSIDE;
+	}
 
-	vec2i get_target_button_size() const;
-	void set_appearing_caption(const augs::gui::text::formatted_string text);
+	vec2i get_target_button_size() const {
+		return corners.internal_size_to_cornered_size(get_text_bbox(appearing_caption.get_total_target_text(), 0)) - vec2i(0, 3);
+	}
+
+	void set_complete_caption(const augs::gui::text::formatted_string& text) {
+		set_appearing_caption(text);
+		make_complete();
+	}
+
+	void set_appearing_caption(const augs::gui::text::formatted_string& text) {
+		appearing_caption.population_interval = 100.f;
+
+		appearing_caption.should_disappear = false;
+		appearing_caption.target_text[0] = text;
+	}
+
+	void make_complete() {
+		appearing_caption.text = appearing_caption.target_text[0];
+		appearing_caption.alpha = 255;
+	}
 
 	template <class C, class D>
 	static void advance_elements(const C context, const D this_id, const augs::delta dt) {
-		this_id->click_sound.set_gain(context.get_config().gui_volume);
-		this_id->hover_sound.set_gain(context.get_config().gui_volume);
+		this_id->click_sound.set_gain(context.audio_volume.gui);
+		this_id->hover_sound.set_gain(context.audio_volume.gui);
 
 		if (this_id->detector.is_hovered) {
 			this_id->elapsed_hover_time_ms += dt.in_milliseconds();
@@ -51,18 +70,22 @@ public:
 
 	template <class C, class D>
 	static void respond_to_events(const C context, const D this_id, const gui_entropy& entropies) {
+		const auto& manager = get_assets_manager();
+
 		for (const auto& info : entropies.get_events_for(this_id)) {
 			this_id->detector.update_appearance(info);
 
 			if (info.is_ldown_or_double_or_triple()) {
 				this_id->click_callback_required = true;
 				this_id->click_sound.stop();
+				this_id->click_sound.bind_buffer(manager.at(assets::sound_buffer_id::BUTTON_CLICK).get_variation(0).request_original());
 				this_id->click_sound.set_direct_channels(true);
 				this_id->click_sound.play();
 			}
 			if (info.msg == gui_event::hover) {
 				this_id->elapsed_hover_time_ms = 0.f;
 				this_id->hover_sound.stop();
+				this_id->hover_sound.bind_buffer(manager.at(assets::sound_buffer_id::BUTTON_HOVER).get_variation(0).request_original());
 				this_id->hover_sound.set_direct_channels(true);
 				this_id->hover_sound.play();
 			}

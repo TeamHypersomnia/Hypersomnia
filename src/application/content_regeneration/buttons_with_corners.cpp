@@ -76,8 +76,11 @@ void regenerate_button_with_corners(
 
 void create_and_save_button_with_corners(
 	const std::string& path_template,
-	const button_with_corners_stamp in
+	const button_with_corners_input in
 ) {
+	ensure(in.upper_side > 0);
+	ensure(in.lower_side > 0);
+
 	using img = augs::image;
 
 	const auto save = [&](const button_corner_type t, const img& im) {
@@ -85,22 +88,15 @@ void create_and_save_button_with_corners(
 	};
 
 	{
-		img l;
-		img t;
-		img r;
-		img b;
+		img l = vec2u(in.lower_side, 1u);
+		img t = vec2u(1u, in.upper_side);
+		img r = vec2u(in.upper_side, 1u);
+		img b = vec2u(1u, in.lower_side);
 
-		l.create(in.lower_side, 1u);
 		l.execute(augs::paint_line_command{ { 1, 0 }, { in.lower_side - 1, 0 }, in.inside_color });
-
-		r.create(in.upper_side, 1u);
+		t.execute(augs::paint_line_command{ { 0, 1 },{ 0, in.upper_side - 1 }, in.inside_color });
 		r.execute(augs::paint_line_command{ { in.upper_side - 2, 0 }, { 0, 0 }, in.inside_color } );
-
-		b.create(1u, in.lower_side);
 		b.execute(augs::paint_line_command{{ 0, in.lower_side - 2 }, { 0, 0 }, in.inside_color });
-
-		t.create(1u, in.upper_side);
-		t.execute(augs::paint_line_command{{ 0, 1 }, { 0, in.upper_side - 1 }, in.inside_color });
 
 		save(button_corner_type::L, l);
 		save(button_corner_type::T, t);
@@ -109,39 +105,32 @@ void create_and_save_button_with_corners(
 	}
 
 	{
-		img lt;
-		img rt;
-		img rb;
-		img lb;
+		img lt = vec2u(in.lower_side, in.upper_side);
+		img rt = vec2u(in.upper_side, in.upper_side);
+		img rb = vec2u(in.upper_side, in.lower_side);
+		img lb = vec2u(in.lower_side, in.lower_side);
 
-		img lb_complement;
-		img lb_complement_border;
+		img lb_complement = vec2u(in.lower_side, in.lower_side);
 
-		lt.create(in.lower_side, in.upper_side);
 		lt.fill(in.inside_color);
 		lt.execute(augs::paint_line_command{{ 0, 0 }, { in.lower_side - 1, 0 }, { 0, 0, 0, 0 }} );
 		lt.execute(augs::paint_line_command{{ 0, 0 }, { 0, in.upper_side - 1 }, { 0, 0, 0, 0 }} );
 
-		rt.create(in.upper_side, in.upper_side);
 		rt.fill({ 0, 0, 0, 0 });
 
 		for (unsigned i = 1; i < in.upper_side; ++i) {
 			rt.execute(augs::paint_line_command{{ 0, i }, { in.upper_side - i - 1, in.upper_side - 1 }, in.inside_color });
 		}
 
-		rb.create(in.upper_side, in.lower_side);
 		rb.fill(in.inside_color);
 		rb.execute(augs::paint_line_command{{ in.upper_side - 1, in.lower_side - 1 }, { 0, in.lower_side - 1 }, { 0, 0, 0, 0 }});
 		rb.execute(augs::paint_line_command{{ in.upper_side - 1, in.lower_side - 1 }, { in.upper_side - 1, 0 }, { 0, 0, 0, 0 }});
 
-		lb.create(in.lower_side, in.lower_side);
 		lb.fill({ 0, 0, 0, 0 });
 
 		for (unsigned i = 1; i < in.lower_side; ++i) {
 			lb.execute(augs::paint_line_command{ { i, 0 }, { in.lower_side - 1, in.lower_side - 1 - i }, in.inside_color });
 		}
-
-		lb_complement.create(in.lower_side, in.lower_side);
 
 		for (unsigned i = 1; i < in.lower_side; ++i) {
 			lb_complement.execute(augs::paint_line_command{{ 0, i }, { in.lower_side - 1 - i, in.lower_side - 1 }, in.inside_color });
@@ -158,22 +147,15 @@ void create_and_save_button_with_corners(
 	}
 
 	{
-		img l;
-		img t;
-		img r;
-		img b;
+		img l = vec2u(in.lower_side, 1u);
+		img t = vec2u(1u, in.upper_side);
+		img r = vec2u(in.upper_side, 1u);
+		img b = vec2u(1u, in.lower_side);
 
-		l.create(in.lower_side, 1u);
 		l.pixel({ 0, 0 }) = in.border_color;
-
-		r.create(in.upper_side, 1u);
-		r.pixel({ in.upper_side - 1, 0 }) = in.border_color;
-
-		b.create(1u, in.lower_side);
-		b.pixel({ 0, in.lower_side - 1 }) = in.border_color;
-
-		t.create(1u, in.upper_side);
 		t.pixel({ 0, 0 }) = in.border_color;
+		r.pixel({ in.upper_side - 1, 0 }) = in.border_color;
+		b.pixel({ 0, in.lower_side - 1 }) = in.border_color;
 
 		save(button_corner_type::L_BORDER, l);
 		save(button_corner_type::T_BORDER, t);
@@ -182,32 +164,26 @@ void create_and_save_button_with_corners(
 	}
 
 	{
-		img lt;
-		img rt;
-		img rb;
-		img lb;
+		img lt = vec2u(in.lower_side, in.upper_side);
+		img rt = vec2u(in.upper_side, in.upper_side);
+		img rb = vec2u(in.upper_side, in.lower_side);
+		img lb = vec2u(in.lower_side, in.lower_side);
+		img lb_complement = vec2u(in.lower_side, in.lower_side);
 
-		img lb_complement;
-
-		lt.create(in.lower_side, in.upper_side);
 		lt.execute(augs::paint_line_command{{ 0, 0 }, { 0, in.upper_side - 1 }, in.border_color});
 		lt.execute(augs::paint_line_command{{ 0, 0 }, { in.lower_side - 1, 0 }, in.border_color});
 
-		rt.create(in.upper_side, in.upper_side);
 		rt.fill({ 0, 0, 0, 0 });
 
 		rt.execute(augs::paint_line_command{ { 0, 0 }, { in.upper_side - 1, in.upper_side - 1 }, in.border_color });
 
-		rb.create(in.upper_side, in.lower_side);
 		rb.execute(augs::paint_line_command{{ in.upper_side - 1, in.lower_side - 1 }, { 0, in.lower_side - 1 }, in.border_color});
 		rb.execute(augs::paint_line_command{{ in.upper_side - 1, in.lower_side - 1 }, { in.upper_side - 1, 0 }, in.border_color});
 
-		lb.create(in.lower_side, in.lower_side);
 		lb.fill({ 0, 0, 0, 0 });
 
 		lb.execute(augs::paint_line_command{ { 0, 0 }, { in.lower_side - 1, in.lower_side - 1 }, in.border_color });
 
-		lb_complement.create(in.lower_side, in.lower_side);
 		lb_complement.execute(augs::paint_line_command{{ 0, in.lower_side - 1 }, { in.lower_side - 1, in.lower_side - 1 }, in.border_color });
 		lb_complement.execute(augs::paint_line_command{{ 0, in.lower_side - 1 }, { 0, 0 }, in.border_color });
 
@@ -222,26 +198,20 @@ void create_and_save_button_with_corners(
 	}
 
 	{
-		img lt;
-		img rt;
-		img rb;
-		img lb;
+		img lt = vec2u(in.lower_side, in.upper_side);
+		img rt = vec2u(in.upper_side, in.upper_side);
+		img rb = vec2u(in.upper_side, in.lower_side);
+		img lb = vec2u(in.lower_side, in.lower_side);
 
-		img lb_complement;
-
-		lt.create(in.lower_side, in.upper_side);
 		lt.execute(augs::paint_line_command{{ in.inside_border_padding, in.inside_border_padding }, { in.inside_border_padding, in.upper_side - 1 }, in.border_color});
 		lt.execute(augs::paint_line_command{{ in.inside_border_padding, in.inside_border_padding }, { in.lower_side - 1, in.inside_border_padding }, in.border_color});
 
-		rt.create(in.upper_side, in.upper_side);
 		rt.fill({ 0, 0, 0, 0 });
 		rt.execute(augs::paint_line_command{{ 0, in.inside_border_padding }, { in.upper_side - 1 - in.inside_border_padding, in.upper_side - 1 }, in.border_color });
 
-		rb.create(in.upper_side, in.lower_side);
 		rb.execute(augs::paint_line_command{{ in.upper_side - 1 - in.inside_border_padding, in.lower_side - 1 - in.inside_border_padding }, { 0, in.lower_side - 1 - in.inside_border_padding }, in.border_color});
 		rb.execute(augs::paint_line_command{{ in.upper_side - 1 - in.inside_border_padding, in.lower_side - 1 - in.inside_border_padding }, { in.upper_side - 1 - in.inside_border_padding, 0 }, in.border_color});
 
-		lb.create(in.lower_side, in.lower_side);
 		lb.fill({ 0, 0, 0, 0 });
 		lb.execute(augs::paint_line_command{{ in.inside_border_padding, 0 }, { in.lower_side - 1, in.lower_side - 1 - in.inside_border_padding }, in.border_color });
 
@@ -253,7 +223,7 @@ void create_and_save_button_with_corners(
 
 	{
 		img inside;
-		inside.create(100u, 100u);
+		inside = vec2u(100u, 100u);
 		inside.fill(in.inside_color);
 		save(button_corner_type::INSIDE, inside);
 	}

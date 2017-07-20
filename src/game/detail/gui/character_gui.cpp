@@ -17,7 +17,9 @@
 #include "game/components/item_component.h"
 #include "game/components/render_component.h"
 #include "game/systems_stateless/render_system.h"
+#include "game/systems_audiovisual/gui_element_system.h"
 
+#include "game/detail/gui/character_gui_drawing_input.h"
 #include "game/detail/gui/drag_and_drop.h"
 #include "game/detail/gui/aabb_highlighter.h"
 #include "augs/graphics/renderer.h"
@@ -26,8 +28,6 @@
 #include "game/detail/describers.h"
 
 #include "augs/templates/string_templates.h"
-
-#include "game/view/viewing_session.h"
 
 #include "augs/graphics/drawers.h"
 #include "augs/templates/visit_gettable.h"
@@ -62,7 +62,7 @@ vec2i character_gui::get_gui_crosshair_position() const {
 }
 
 void character_gui::set_screen_size(const vec2i s) {
-	rect_world.last_state.screen_size = s;
+	rect_world.set_screen_size(s);
 }
 
 vec2i character_gui::get_screen_size() const {
@@ -289,35 +289,24 @@ character_gui::hotbar_selection_setup character_gui::get_actual_selection_setup(
 	return output;
 }
 
-void character_gui::draw(
-	const viewing_step step,
-	const hotbar_settings hotbar
-) const {
-	const auto gui_entity = step.cosm[step.viewed_character];
+void character_gui::draw(const character_gui_drawing_input input) const {
+	const auto gui_entity = input.viewed_character;
 
 	root_of_inventory_gui root_of_gui(get_screen_size());
 	game_gui_rect_tree tree;
 
 	const auto context = viewing_game_gui_context(
-		step.session.systems_audiovisual.get<gui_element_system>(),
 		rect_world,
 		*this,
 		gui_entity,
 		tree,
-		root_of_gui,
-		hotbar,
-		step.camera,
-		step.session.world_hover_highlighter,
-		step.session.systems_audiovisual.get<interpolation_system>(),
-		step.get_interpolation_ratio(),
-		step.session.config.controls,
-		step.renderer.get_triangle_buffer()
+		input
 	);
 
-	rect_world.build_tree_data_into_context(context, root_of_inventory_gui_in_context());
-	rect_world.draw(context.get_output_buffer(), context, root_of_inventory_gui_in_context());
+	rect_world.build_tree_data_into(context);
+	rect_world.draw(context.get_output_buffer(), context);
 
-	if (context.get_gui_element_system().gui_look_enabled) {
+	if (input.should_draw_cursor_with_info) {
 		draw_cursor_with_information(context);
 	}
 }
@@ -328,11 +317,11 @@ void character_gui::draw_cursor_with_information(const viewing_game_gui_context 
 
 	auto& output_buffer = context.get_output_buffer();
 	auto gui_cursor = assets::game_image_id::GUI_CURSOR;
-	auto gui_cursor_color = cyan;
+	auto gui_cursor_color = white;
 	auto gui_cursor_position = get_gui_crosshair_position();
 
 	auto get_tooltip_position = [&]() {
-		return get_gui_crosshair_position() + manager[gui_cursor].get_size();
+		return get_gui_crosshair_position() + manager.at(gui_cursor).get_size();
 	};
 
 	auto draw_cursor_hint = [&](const auto& hint_text, const vec2i cursor_position, const vec2i cursor_size) {
@@ -397,7 +386,7 @@ void character_gui::draw_cursor_with_information(const viewing_game_gui_context 
 						gui_cursor = assets::game_image_id::GUI_CURSOR_MINUS;
 						gui_cursor_color = red;
 
-						gui_cursor_position = draw_cursor_hint(L"Clear assignment", get_gui_crosshair_position(), manager[gui_cursor].get_size());
+						gui_cursor_position = draw_cursor_hint(L"Clear assignment", get_gui_crosshair_position(), manager.at(gui_cursor).get_size());
 					}
 					else {
 						const auto drawn_pos = drag_amount;
@@ -409,7 +398,7 @@ void character_gui::draw_cursor_with_information(const viewing_game_gui_context 
 					const auto& item = context.get_cosmos()[dragged_item_button.get_location().item_id].get<components::item>();
 
 					if (item.charges > 1) {
-						const auto gui_cursor_size = manager[gui_cursor].get_size();
+						const auto gui_cursor_size = manager.at(gui_cursor).get_size();
 
 						const auto charges_text = to_wstring(dragged_charges);
 
@@ -442,7 +431,7 @@ void character_gui::draw_cursor_with_information(const viewing_game_gui_context 
 						gui_cursor_color = green;
 					}
 
-					gui_cursor_position = draw_cursor_hint(transfer_data.hint_text, get_gui_crosshair_position(), manager[gui_cursor].get_size());
+					gui_cursor_position = draw_cursor_hint(transfer_data.hint_text, get_gui_crosshair_position(), manager.at(gui_cursor).get_size());
 				}
 				else if constexpr (std::is_same_v<T, drop_for_item_slot_transfer>) {
 					const auto& dragged_item_button = context.dereference_location(item_button_in_item{ transfer_data.simulated_transfer.item });
@@ -473,7 +462,7 @@ void character_gui::draw_cursor_with_information(const viewing_game_gui_context 
 						gui_cursor_color = red;
 					}
 
-					gui_cursor_position = draw_cursor_hint(transfer_data.hint_text, get_gui_crosshair_position(), manager[gui_cursor].get_size());
+					gui_cursor_position = draw_cursor_hint(transfer_data.hint_text, get_gui_crosshair_position(), manager.at(gui_cursor).get_size());
 				}
 				else {
 					static_assert(always_false_v<T>);

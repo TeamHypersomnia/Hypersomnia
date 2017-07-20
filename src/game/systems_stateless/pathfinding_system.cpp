@@ -15,6 +15,7 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/detail/physics/physics_scripts.h"
 #include "game/messages/visibility_information.h"
+#include "game/view/debug_drawing_settings.h"
 
 void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 	auto& cosmos = step.cosm;
@@ -368,7 +369,7 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 				/* save only for queries within the function "exists_among_undiscovered_visible" */
 				pathfinding.session().undiscovered_visible = undiscovered_visible;
 
-				if (settings.draw_undiscovered) {
+				if (DEBUG_DRAWING.draw_undiscovered_locations) {
 					for (auto& disc : vertices)
 						lines.draw(disc.location, disc.sensor, rgba(0, 127, 255, 255));
 
@@ -473,7 +474,7 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 						pathfinding.session().navigate_to = current_target.sensor;
 
 
-					if (settings.draw_undiscovered) {
+					if (DEBUG_DRAWING.draw_undiscovered_locations) {
 						lines.draw(transform.pos, current_target.sensor, rgba(255, 255, 0, 255));
 						lines.draw(transform.pos, pathfinding.session().target, rgba(255, 0, 0, 255));
 					}

@@ -17,6 +17,8 @@ extern "C" {
 
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
+#include "augs/audio/audio_settings.h"
+#include "augs/templates/corresponding_field.h"
 
 #if BUILD_OPENAL
 static std::string list_audio_devices(const ALCchar * const devices) {
@@ -40,7 +42,6 @@ static std::string list_audio_devices(const ALCchar * const devices) {
 
 namespace augs {
 	void generate_alsoft_ini(
-		const bool hrtf_enabled,
 		const unsigned max_number_of_sound_sources
 	) {
 #if BUILD_OPENAL
@@ -73,14 +74,43 @@ namespace augs {
 		);
 #endif
 	}
-	
+
 	audio_device::audio_device(const std::string& device_name) {
 #if BUILD_OPENAL
 		device = alcOpenDevice(device_name.size() > 0 ? device_name.c_str() : nullptr);
 		ensure(alcIsExtensionPresent(device, "ALC_EXT_EFX"));
 #endif
 	}
-	
+
+	audio_device::~audio_device() {
+		destroy();
+	}
+
+	audio_device::audio_device(audio_device&& b) noexcept
+		: device(b.device)
+	{
+		b.device = nullptr;
+	}
+
+	audio_device& audio_device::operator=(audio_device&& b) noexcept {
+		destroy();
+
+		device = b.device;
+
+		b.device = nullptr;
+		return *this;
+	}
+
+	void audio_device::destroy() {
+		if (device != nullptr) {
+#if BUILD_OPENAL
+			alcCloseDevice(device);
+			device = nullptr;
+			LOG("Destroyed OpenAL device: %x", device);
+#endif
+		}
+	}
+
 	void audio_device::log_hrtf_status() const {
 #if BUILD_OPENAL
 		ALint hrtf_status;
@@ -114,21 +144,11 @@ namespace augs {
 #endif
 	}
 
-	audio_device::~audio_device() {
+	audio_context::audio_context(const audio_settings& settings) 
+		: device(settings.output_device_name) 
+	{
 #if BUILD_OPENAL
-		alcCloseDevice(device);
-		device = nullptr;
-		LOG("Destroyed OpenAL device: %x", device);
-#endif
-	}
-
-	audio_device& audio_context::get_device() {
-		return device;
-	}
-
-	audio_context::audio_context(audio_device& device) : device(device) {
-#if BUILD_OPENAL
-		context = alcCreateContext(device.get(), nullptr);
+		context = alcCreateContext(device, nullptr);
 
 		if (!context || !set_as_current()) {
 			if (context) {
@@ -143,6 +163,40 @@ namespace augs {
 		AL_CHECK(alListenerf(AL_METERS_PER_UNIT, 1.3f));
 
 		device.log_hrtf_status();
+		apply(settings, true);
+#endif
+	}
+
+	audio_context::~audio_context() {
+		destroy();
+	}
+
+	audio_context::audio_context(audio_context&& b) noexcept :
+		device(std::move(b.device)),
+		context(b.context)
+	{
+		b.context = nullptr;
+	}
+
+	audio_context& audio_context::operator=(audio_context&& b) noexcept {
+		destroy();
+
+		device = std::move(b.device);
+		context = b.context;
+
+		b.context = nullptr;
+
+		return *this;
+	}
+
+	void audio_context::destroy() {
+#if BUILD_OPENAL
+		if (context) {
+			AL_CHECK(alcMakeContextCurrent(nullptr));
+			alcDestroyContext(context);
+			LOG("Destroyed OpenAL context: %x", context);
+			context = nullptr;
+		}
 #endif
 	}
 
@@ -154,12 +208,15 @@ namespace augs {
 #endif
 	}
 
-	audio_context::~audio_context() {
-#if BUILD_OPENAL
-		AL_CHECK(alcMakeContextCurrent(nullptr));
-		alcDestroyContext(context);
-		LOG("Destroyed OpenAL context: %x", context);
-		context = nullptr;
-#endif
+	void audio_context::apply(const audio_settings& settings, const bool force) {
+		auto changed = [&](auto& field) {
+			return !(field == augs::get_corresponding_field(field, settings, current_settings));
+		};
+
+		if (force || changed(settings.enable_hrtf)) {
+			device.set_hrtf_enabled(settings.enable_hrtf);
+		}
+
+		current_settings = settings;
 	}
 }

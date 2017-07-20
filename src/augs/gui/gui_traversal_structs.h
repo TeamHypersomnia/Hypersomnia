@@ -6,8 +6,6 @@
 #include "augs/window_framework/event.h"
 #include "gui_event.h"
 
-class rect_world;
-
 namespace augs {
 	namespace gui {
 		struct draw_info {
@@ -15,13 +13,14 @@ namespace augs {
 			draw_info(vertex_triangle_buffer&);
 		};
 
-		struct event_traversal_flags {
-			const augs::window::event::change change;
+		struct raw_input_traversal {
+			const augs::event::change change;
 			
 			bool was_hovered_rect_visited = false;
 			bool mouse_fetched = false;
 			bool scroll_fetched = false;
-			event_traversal_flags(const augs::window::event::change);
+
+			raw_input_traversal(const augs::event::change);
 		};
 
 		struct event_info {
