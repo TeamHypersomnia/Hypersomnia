@@ -60,7 +60,7 @@ cmake ..
 If you are on Windows, resultant ```.sln``` and ```.vcxproj``` files should appear in the ```build/``` directory.
 Open ```Hypersomnia.sln``` file, select **Release** configuration and hit **F7** to build the game.
 
-As it currently stands, the game is known to build successfully only with Visual Studio 2017 under Win32. Compilers from Visual Studio 2015 do not support some of the C++ language features.
+As it currently stands, the game is known to build successfully only with Visual Studio 2017 **Preview** under Windows systems. Compilers from Visual Studio 2015 do not support some of the C++ language features.
 
 # Contributing
 
