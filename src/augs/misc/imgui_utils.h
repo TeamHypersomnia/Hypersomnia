@@ -1,6 +1,8 @@
 #pragma once
 #include "augs/math/vec2.h"
 #include "augs/misc/machine_entropy.h"
+#include "augs/misc/scope_guard.h"
+
 #include "augs/templates/string_templates.h"
 #include "augs/templates/maybe_const.h"
 #include "augs/templates/corresponding_field.h"
@@ -145,6 +147,12 @@ namespace augs {
 				
 				return changed;
 			};
+		}
+
+		auto scoped_indent() {
+			ImGui::Indent();
+
+			return augs::make_scope_guard([]() { ImGui::Unindent(); });
 		}
 	}
 

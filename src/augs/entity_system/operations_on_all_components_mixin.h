@@ -19,8 +19,9 @@ namespace augs {
 					typename aggregate_type::dynamic_components_list,
 					augs::make_pool
 				>, 
-			std::tuple
-		>;
+				std::tuple
+			>
+		;
 
 		using aggregate_pool_type = pool<aggregate_type>;
 

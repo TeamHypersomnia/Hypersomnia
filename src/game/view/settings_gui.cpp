@@ -58,7 +58,7 @@ void viewing_session::perform_settings_gui() {
 
 			checkbox("Fullscreen", config.window.fullscreen); revert(config.window.fullscreen);
 			if (!config.window.fullscreen) {
-				ImGui::Indent();
+				auto indent = scoped_indent();
 
 				{
 					vec2i lower;
@@ -76,7 +76,6 @@ void viewing_session::perform_settings_gui() {
 
 				checkbox(CONFIG_NVP(window.border)); revert(config.window.border);
 				checkbox("Enable cursor clipping", config.window.enable_cursor_clipping); revert(config.window.enable_cursor_clipping);
-				ImGui::Unindent();
 			}
 
 			input_text<100>(CONFIG_NVP(window.name));
@@ -99,11 +98,15 @@ void viewing_session::perform_settings_gui() {
 			checkbox(CONFIG_NVP(camera.enable_smoothing)); revert(config.camera.enable_smoothing);
 			
 			if (config.camera.enable_smoothing) {
-				ImGui::Indent();
+				auto indent = scoped_indent();
 
 				slider(CONFIG_NVP(camera.averages_per_sec), 0.f, 100.f); revert(config.camera.averages_per_sec);
 				slider(CONFIG_NVP(camera.smoothing_average_factor), 0.01f, 0.95f); revert(config.camera.smoothing_average_factor);
 			}
+
+			checkbox("Draw weapon laser", config.drawing.draw_weapon_laser); revert(config.drawing.draw_weapon_laser);
+			checkbox("Draw crosshairs", config.drawing.draw_crosshairs); revert(config.drawing.draw_crosshairs);
+			// checkbox("Draw gameplay GUI", config.drawing.draw_character_gui); revert(config.drawing.draw_character_gui);
 		}
 		else if (state.active_pane == pane++) {
 			ImGuiStyle& style = config.gui_style;
