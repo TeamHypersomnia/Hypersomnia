@@ -92,11 +92,12 @@ character_gui& gui_element_system::get_character_gui(const entity_id id) {
 	if (it == character_guis.end()) {
 		auto& new_gui = (*character_guis.try_emplace(id, rect_world).first).second;
 		
-		new_gui.action_buttons[0].bound_spell.set<haste_instance>();
+		new_gui.action_buttons[0].bound_spell.set<exaltation_instance>();
 		new_gui.action_buttons[1].bound_spell.set<fury_of_the_aeons_instance>();
 		new_gui.action_buttons[2].bound_spell.set<ultimate_wrath_of_the_aeons_instance>();
-		new_gui.action_buttons[3].bound_spell.set<electric_triad_instance>();
-		new_gui.action_buttons[4].bound_spell.set<electric_shield_instance>();
+		new_gui.action_buttons[3].bound_spell.set<haste_instance>();
+		new_gui.action_buttons[4].bound_spell.set<electric_triad_instance>();
+		new_gui.action_buttons[5].bound_spell.set<electric_shield_instance>();
 		
 		return new_gui;
 	}

@@ -1,6 +1,6 @@
 #pragma once
 
-typedef float meter_value_type;
+using meter_value_type = float;
 
 struct value_meter {
 	struct damage_result {

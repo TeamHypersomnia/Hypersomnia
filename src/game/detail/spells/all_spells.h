@@ -8,6 +8,7 @@
 #include "game/detail/spells/ultimate_wrath_of_the_aeons.h"
 #include "game/detail/spells/electric_shield.h"
 #include "game/detail/spells/electric_triad.h"
+#include "game/detail/spells/exaltation.h"
 
 template <template <typename...> class List>
 struct put_all_spells_into {
@@ -16,7 +17,8 @@ struct put_all_spells_into {
 		fury_of_the_aeons,
 		ultimate_wrath_of_the_aeons,
 		electric_shield,
-		electric_triad
+		electric_triad,
+		exaltation
 	>;
 };
 

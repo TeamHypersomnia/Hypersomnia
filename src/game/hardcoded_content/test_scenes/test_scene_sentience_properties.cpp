@@ -39,6 +39,29 @@ void load_test_scene_sentience_properties(
 	}
 
 	{
+		auto& d = std::get<exaltation>(spells);
+		d.common.cooldown_ms = 2000;
+		d.common.personal_electricity_required = 50;
+		d.common.associated_color = green_spell_color;
+
+		d.appearance.incantation = L"efforia";
+
+		d.appearance.name = L"[color=green]Exaltation[/color]";
+		d.appearance.description = typesafe_sprintf(
+			L"[color=vsdarkgray]Stabilizes functions of the physical body.[/color]"
+		);
+
+		d.appearance.icon = assets::game_image_id::SPELL_EXALTATION_ICON;
+		d.basic_healing_amount = 34;
+
+		d.common.cast_successful_sound.id = assets::sound_buffer_id::CAST_SUCCESSFUL;
+		d.common.cast_sparkles.id = assets::particle_effect_id::CAST_SPARKLES;
+		d.common.cast_sparkles.modifier.colorize = d.common.associated_color;
+		d.common.cast_sparkles.modifier.scale_amounts = 1.3f;
+		d.common.cast_sparkles.modifier.scale_lifetimes = 1.3f;
+	}
+
+	{
 		auto& d = std::get<fury_of_the_aeons>(spells);
 		d.common.cooldown_ms = 2000;
 		d.common.personal_electricity_required = 100;
