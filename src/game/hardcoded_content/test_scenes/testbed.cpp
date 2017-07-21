@@ -804,6 +804,10 @@ namespace test_scenes {
 		global_assets.cast_unsuccessful_sound.id = assets::sound_buffer_id::CAST_UNSUCCESSFUL;
 		global_assets.ped_shield_impact_sound.id = assets::sound_buffer_id::EXPLOSION;
 		global_assets.ped_shield_destruction_sound.id = assets::sound_buffer_id::GREAT_EXPLOSION;
+		global_assets.item_throw_sound.id = assets::sound_buffer_id::ITEM_THROW;
+		global_assets.item_throw_sound.modifier.pitch = 1.15f;
+		global_assets.item_throw_sound.modifier.gain = 0.8f;
+
 		global_assets.exhausted_smoke_particles.id = assets::particle_effect_id::EXHAUSTED_SMOKE;
 		global_assets.exploding_ring_smoke = assets::particle_effect_id::EXPLODING_RING_SMOKE;
 		global_assets.exploding_ring_sparkles = assets::particle_effect_id::EXPLODING_RING_SPARKLES;

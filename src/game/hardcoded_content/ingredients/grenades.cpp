@@ -43,6 +43,7 @@ namespace prefabs {
 		ingredients::add_see_through_dynamic_body(step, grenade_entity, pos);
 
 		explosive.released_image_id = assets::game_image_id::FORCE_GRENADE_RELEASED;
+		explosive.released_physical_material = assets::physical_material_id::GRENADE;
 
 		auto& item = ingredients::make_item(grenade_entity);
 		item.space_occupied_per_charge = to_space_units("0.6");
@@ -93,6 +94,7 @@ namespace prefabs {
 		item.space_occupied_per_charge = to_space_units("0.6");
 
 		explosive.released_image_id = assets::game_image_id::PED_GRENADE_RELEASED;
+		explosive.released_physical_material = assets::physical_material_id::GRENADE;
 
 		components::shape_circle shape_circle;
 		shape_circle.radius = 1.f;
@@ -140,6 +142,7 @@ namespace prefabs {
 		item.space_occupied_per_charge = to_space_units("0.6");
 		
 		explosive.released_image_id = assets::game_image_id::INTERFERENCE_GRENADE_RELEASED;
+		explosive.released_physical_material = assets::physical_material_id::GRENADE;
 
 		components::shape_circle shape_circle;
 		shape_circle.radius = 1.f;

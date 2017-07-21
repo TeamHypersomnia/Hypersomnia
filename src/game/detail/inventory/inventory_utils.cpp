@@ -9,6 +9,7 @@
 #include "game/components/item_slot_transfers_component.h"
 #include "game/components/name_component.h"
 #include "game/components/motor_joint_component.h"
+#include "game/components/sound_existence_component.h"
 #include "game/detail/gui/character_gui.h"
 #include "game/detail/entity_scripts.h"
 #include "game/messages/queue_destruction.h"
@@ -640,5 +641,16 @@ void perform_transfer(
 		auto& special_physics = grabbed_item_part_handle.get<components::special_physics>();
 		special_physics.dropped_or_created_cooldown.set(300, cosmos.get_timestamp());
 		special_physics.during_cooldown_ignore_collision_with = previous_slot_container;
+
+		sound_existence_input sound;
+		sound.delete_entity_after_effect_lifetime = true;
+		sound.direct_listener = previous_slot_container.get_owning_transfer_capability();
+		sound.effect = cosmos.get_global_assets().item_throw_sound;
+
+		sound.create_sound_effect_entity(
+			step,
+			initial_transform_of_transferred,
+			grabbed_item_part_handle
+		).add_standard_components(step);
 	}
 }

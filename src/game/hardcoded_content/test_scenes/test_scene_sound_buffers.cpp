@@ -124,7 +124,7 @@ void load_test_scene_sound_buffers(assets_manager& manager) {
 
 	{
 		auto& buf = manager[assets::sound_buffer_id::ITEM_THROW];
-		buf.from_file("content/official/sfx/item_throw.wav");
+		buf.from_file("content/official/sfx/item_throw_%x.wav");
 	}
 
 	{

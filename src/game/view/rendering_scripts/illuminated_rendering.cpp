@@ -212,7 +212,7 @@ namespace rendering_scripts {
 		
 		draw_layer(render_layer::OVER_CROSSHAIR);
 
-		if (settings.draw_crosshairs && settings.draw_weapon_laser && controlled_entity.alive()) {
+		if (settings.draw_weapon_laser && controlled_entity.alive()) {
 			draw_crosshair_lasers(
 				[&](const vec2 from, const vec2 to, const rgba col) {
 					augs::draw_line(

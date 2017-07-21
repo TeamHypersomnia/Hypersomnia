@@ -84,6 +84,7 @@ void release_or_throw_fused_object(
 			auto new_def = fixtures.get_raw_component();
 			new_def.restitution = 0.6f;
 			new_def.density = 10.f;
+			new_def.collision_sound_gain_mult = 0.01f;
 
 			const bool overwrite_physical_material = 
 				explosive.released_physical_material != assets::physical_material_id::INVALID

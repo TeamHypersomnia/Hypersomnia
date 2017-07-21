@@ -9,6 +9,8 @@ struct global_assets {
 	sound_effect_input ped_shield_destruction_sound;
 	sound_effect_input cast_unsuccessful_sound;
 
+	sound_effect_input item_throw_sound;
+
 	particle_effect_input exhausted_smoke_particles;
 
 	assets::particle_effect_id exploding_ring_smoke = assets::particle_effect_id::INVALID;
