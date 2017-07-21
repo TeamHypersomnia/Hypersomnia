@@ -6,8 +6,6 @@
 
 #include "game/transcendental/entity_id.h"
 
-#include "game/assets/spell_id.h"
-
 #include "game/assets/sound_buffer_id.h"
 #include "game/assets/particle_effect_id.h"
 

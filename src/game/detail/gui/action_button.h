@@ -3,7 +3,6 @@
 #include "game_gui_context.h"
 #include "augs/gui/appearance_detector.h"
 
-#include "game/assets/spell_id.h"
 #include "game/detail/spells/all_spells.h"
 #include "augs/audio/sound_source.h"
 

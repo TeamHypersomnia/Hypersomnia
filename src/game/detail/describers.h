@@ -8,7 +8,6 @@
 #include "game/enums/slot_function.h"
 #include "game/enums/item_category.h"
 
-#include "game/assets/spell_id.h"
 #include "game/components/name_component_declaration.h"
 #include "game/global_state/entity_name_metas.h"
 

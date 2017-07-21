@@ -21,7 +21,6 @@
 
 #include "game/assets/game_image_structs.h"
 
-#include "game/assets/spell_id.h"
 #include "game/assets/game_image.h"
 #include "game/assets/game_image_id.h"
 #include "game/assets/gl_texture_id.h"

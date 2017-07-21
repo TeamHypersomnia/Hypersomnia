@@ -11,7 +11,6 @@
 
 #include "augs/misc/machine_entropy.h"
 
-#include "game/assets/spell_id.h"
 #include "augs/misc/container_with_small_size.h"
 #include "game/components/sentience_component.h"
 #include "augs/misc/basic_input_context.h"

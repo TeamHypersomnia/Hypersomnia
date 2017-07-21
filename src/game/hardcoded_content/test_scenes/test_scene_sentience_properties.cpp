@@ -42,7 +42,7 @@ void load_test_scene_sentience_properties(
 		auto& d = std::get<exaltation>(spells);
 		d.common.cooldown_ms = 2000;
 		d.common.personal_electricity_required = 50;
-		d.common.associated_color = green_spell_color;
+		d.common.associated_color = green;
 
 		d.appearance.incantation = L"efforia";
 
