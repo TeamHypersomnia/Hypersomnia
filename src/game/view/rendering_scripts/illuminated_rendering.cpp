@@ -77,8 +77,7 @@ namespace rendering_scripts {
 			);
 		}
 
-		renderer.call_triangles();
-		renderer.clear_triangles();
+		renderer.call_and_clear_triangles();
 
 		renderer.illuminating_smoke_fbo->set_as_current();
 		renderer.clear_current_fbo();
@@ -91,8 +90,7 @@ namespace rendering_scripts {
 			);
 		}
 
-		renderer.call_triangles();
-		renderer.clear_triangles();
+		renderer.call_and_clear_triangles();
 		
 		renderer.set_standard_blending();
 
@@ -155,46 +153,45 @@ namespace rendering_scripts {
 		illuminated_shader.set_as_current();
 		illuminated_shader.set_projection(matrix);
 
-		render_system().draw_entities(interp, global_time_seconds, output, cosmos, visible_per_layer[render_layer::UNDER_GROUND], camera, renderable_drawing_type::NORMAL);
-		render_system().draw_entities(interp, global_time_seconds, output, cosmos, visible_per_layer[render_layer::GROUND], camera, renderable_drawing_type::NORMAL);
-		render_system().draw_entities(interp, global_time_seconds, output, cosmos, visible_per_layer[render_layer::ON_GROUND], camera, renderable_drawing_type::NORMAL);
-		render_system().draw_entities(interp, global_time_seconds, output, cosmos, visible_per_layer[render_layer::TILED_FLOOR], camera, renderable_drawing_type::NORMAL);
+		auto draw_layer = [&](const render_layer r, const renderable_drawing_type type = renderable_drawing_type::NORMAL) {
+			render_system().draw_entities(interp, global_time_seconds, output, cosmos, visible_per_layer[r], camera, type);
+		};
 
-		renderer.call_triangles();
-		renderer.clear_triangles();
+		draw_layer(render_layer::UNDER_GROUND);
+		draw_layer(render_layer::GROUND);
+		draw_layer(render_layer::ON_GROUND);
+		draw_layer(render_layer::TILED_FLOOR);
+
+		renderer.call_and_clear_triangles();
 
 		specular_highlights_shader.set_as_current();
 		specular_highlights_shader.set_projection(matrix);
 
-		render_system().draw_entities(interp, global_time_seconds, output, cosmos, visible_per_layer[render_layer::TILED_FLOOR], camera, renderable_drawing_type::SPECULAR_HIGHLIGHTS);
+		draw_layer(render_layer::TILED_FLOOR, renderable_drawing_type::SPECULAR_HIGHLIGHTS);
 
-		renderer.call_triangles();
-		renderer.clear_triangles();
+		renderer.call_and_clear_triangles();
 
 		illuminated_shader.set_as_current();
 
-		render_system().draw_entities(interp, global_time_seconds, output, cosmos, visible_per_layer[render_layer::ON_TILED_FLOOR], camera, renderable_drawing_type::NORMAL);
-		render_system().draw_entities(interp, global_time_seconds, output, cosmos, visible_per_layer[render_layer::CAR_INTERIOR], camera, renderable_drawing_type::NORMAL);
-		render_system().draw_entities(interp, global_time_seconds, output, cosmos, visible_per_layer[render_layer::CAR_WHEEL], camera, renderable_drawing_type::NORMAL);
+		draw_layer(render_layer::ON_TILED_FLOOR);
+		draw_layer(render_layer::CAR_INTERIOR);
+		draw_layer(render_layer::CAR_WHEEL);
 
-		renderer.call_triangles();
-		renderer.clear_triangles();
+		renderer.call_and_clear_triangles();
 
 		border_highlight_shader.set_as_current();
 		border_highlight_shader.set_projection(matrix);
 		
-		render_system().draw_entities(interp, global_time_seconds, output, cosmos, visible_per_layer[render_layer::SMALL_DYNAMIC_BODY], camera, renderable_drawing_type::BORDER_HIGHLIGHTS);
+		draw_layer(render_layer::SMALL_DYNAMIC_BODY, renderable_drawing_type::BORDER_HIGHLIGHTS);
 		
-		renderer.call_triangles();
-		renderer.clear_triangles();
+		renderer.call_and_clear_triangles();
 		
 		illuminated_shader.set_as_current();
 		
-		render_system().draw_entities(interp, global_time_seconds, output, cosmos, visible_per_layer[render_layer::DYNAMIC_BODY], camera, renderable_drawing_type::NORMAL);
-		render_system().draw_entities(interp, global_time_seconds, output, cosmos, visible_per_layer[render_layer::SMALL_DYNAMIC_BODY], camera, renderable_drawing_type::NORMAL);
+		draw_layer(render_layer::DYNAMIC_BODY);
+		draw_layer(render_layer::SMALL_DYNAMIC_BODY);
 		
-		renderer.call_triangles();
-		renderer.clear_triangles();
+		renderer.call_and_clear_triangles();
 
 		renderer.set_active_texture(1);
 		renderer.smoke_fbo->get_texture().bind();
@@ -206,14 +203,14 @@ namespace rendering_scripts {
 
 		default_shader.set_as_current();
 		
-		render_system().draw_entities(interp, global_time_seconds, output, cosmos, visible_per_layer[render_layer::FLYING_BULLETS], camera, renderable_drawing_type::NORMAL);
-		render_system().draw_entities(interp, global_time_seconds, output, cosmos, visible_per_layer[render_layer::NEON_CAPTIONS], camera, renderable_drawing_type::NORMAL);
+		draw_layer(render_layer::FLYING_BULLETS);
+		draw_layer(render_layer::NEON_CAPTIONS);
 		
 		if (settings.draw_crosshairs) {
-			render_system().draw_entities(interp, global_time_seconds, output, cosmos, visible_per_layer[render_layer::CROSSHAIR], camera, renderable_drawing_type::NORMAL);
+			draw_layer(render_layer::CROSSHAIR);
 		}
 		
-		render_system().draw_entities(interp, global_time_seconds, output, cosmos, visible_per_layer[render_layer::OVER_CROSSHAIR], camera, renderable_drawing_type::NORMAL);
+		draw_layer(render_layer::OVER_CROSSHAIR);
 
 		if (settings.draw_crosshairs && settings.draw_weapon_laser && controlled_entity.alive()) {
 			draw_crosshair_lasers(
@@ -266,8 +263,7 @@ namespace rendering_scripts {
 			}
 		}
 
-		renderer.call_triangles();
-		renderer.clear_triangles();
+		renderer.call_and_clear_triangles();
 
 		circular_bars_shader.set_as_current();
 		circular_bars_shader.set_projection(matrix);
@@ -284,8 +280,7 @@ namespace rendering_scripts {
 
 		const auto textual_infos = draw_circular_bars_and_get_textual_info(step);
 
-		renderer.call_triangles();
-		renderer.clear_triangles();
+		renderer.call_and_clear_triangles();
 		
 		set_center_uniform(assets::game_image_id::CIRCULAR_BAR_SMALL);
 
@@ -298,8 +293,7 @@ namespace rendering_scripts {
 			global_time_seconds
 		);
 
-		renderer.call_triangles();
-		renderer.clear_triangles();
+		renderer.call_and_clear_triangles();
 
 		default_shader.set_as_current();
 
@@ -315,8 +309,7 @@ namespace rendering_scripts {
 			cosmos
 		);
 
-		renderer.call_triangles();
-		renderer.clear_triangles();
+		renderer.call_and_clear_triangles();
 
 		pure_color_highlight_shader.set_as_current();
 
@@ -365,8 +358,7 @@ namespace rendering_scripts {
 
 		manager.at(assets::gl_texture_id::GAME_WORLD_ATLAS).bind();
 
-		renderer.call_triangles();
-		renderer.clear_triangles();
+		renderer.call_and_clear_triangles();
 
 		if (DEBUG_DRAWING.enabled) {
 			renderer.draw_debug_info(

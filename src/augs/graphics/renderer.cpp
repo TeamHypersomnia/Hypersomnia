@@ -167,6 +167,11 @@ namespace augs {
 		specials.clear();
 	}
 
+	void renderer::call_and_clear_triangles() {
+		call_triangles();
+		clear_triangles();
+	}
+
 	void renderer::clear_lines() {
 		lines.clear();
 	}

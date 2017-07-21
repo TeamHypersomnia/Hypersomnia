@@ -123,6 +123,8 @@ namespace augs {
 		void clear_triangles();
 		void clear_lines();
 
+		void call_and_clear_triangles();
+
 		size_t get_max_texture_size() const;
 
 		int get_triangle_count() const;

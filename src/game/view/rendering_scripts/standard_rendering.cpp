@@ -51,8 +51,7 @@ namespace rendering_scripts {
 			render_system().draw_entities(interp, global_time_seconds, output, cosmos, visible_per_layer[static_cast<render_layer>(i)], camera, renderable_drawing_type::NORMAL);
 		}
 
-		renderer.call_triangles();
-		renderer.clear_triangles();
+		renderer.call_and_clear_triangles();
 
 		border_highlight_shader.use();
 		{
@@ -62,8 +61,7 @@ namespace rendering_scripts {
 		
 		render_system().draw_entities(interp, global_time_seconds, output, cosmos, visible_per_layer[render_layer::SMALL_DYNAMIC_BODY], camera, renderable_drawing_type::BORDER_HIGHLIGHTS);
 
-		renderer.call_triangles();
-		renderer.clear_triangles();
+		renderer.call_and_clear_triangles();
 
 		default_shader.use();
 
@@ -71,8 +69,7 @@ namespace rendering_scripts {
 			render_system().draw_entities(interp, global_time_seconds, output, cosmos, visible_per_layer[render_layer(i)], camera, renderable_drawing_type::NORMAL);
 		}
 
-		renderer.call_triangles();
-		renderer.clear_triangles();
+		renderer.call_and_clear_triangles();
 
 		circular_bars_shader.use();
 		{
@@ -91,8 +88,7 @@ namespace rendering_scripts {
 
 		const auto& textual_infos = draw_circular_bars_and_get_textual_info(step);
 
-		renderer.call_triangles();
-		renderer.clear_triangles();
+		renderer.call_and_clear_triangles();
 
 		default_shader.use();
 
@@ -102,8 +98,7 @@ namespace rendering_scripts {
 
 		// hud.draw_pure_color_highlights(step);
 
-		renderer.call_triangles();
-		renderer.clear_triangles();
+		renderer.call_and_clear_triangles();
 
 		default_shader.use();
 
@@ -111,8 +106,7 @@ namespace rendering_scripts {
 
 		manager[assets::gl_texture_id::GAME_WORLD_ATLAS].bind();
 
-		renderer.call_triangles();
-		renderer.clear_triangles();
+		renderer.call_and_clear_triangles();
 
 		if (DEBUG_DRAWING.enabled) {
 			renderer.draw_debug_info(

@@ -310,8 +310,7 @@ void choreographic_setup::process(
 			)
 		);
 
-		renderer.call_triangles();
-		renderer.clear_triangles();
+		renderer.call_and_clear_triangles();
 
 		window.swap_buffers();
 	}

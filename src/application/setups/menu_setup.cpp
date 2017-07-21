@@ -480,8 +480,7 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 			}
 		}
 
-		renderer.call_triangles();
-		renderer.clear_triangles();
+		renderer.call_and_clear_triangles();
 		
 			menu_ui_root.set_menu_buttons_positions(screen_size);
 			menu_ui_root.set_menu_buttons_sizes(tweened_menu_button_size);
