@@ -17,6 +17,6 @@ return {
 
     gui_usage = {
     	flip_horizontally = true,
-    	flip_vertically = false
+    	flip_vertically = true
     }
 }

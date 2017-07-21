@@ -56,7 +56,8 @@ namespace ingredients {
 	void add_default_gun_container(
 		const logic_step, 
 		entity_handle, 
-		const float mag_rotation = -90.f
+		const float mag_rotation = -90.f,
+		const bool magazine_hidden = false
 	);
 
 	void add_standard_pathfinding_capability(entity_handle);
@@ -71,6 +72,7 @@ namespace prefabs {
 
 	entity_handle create_sample_magazine(const logic_step, components::transform pos, std::string space = "0.30", entity_id charge_inside = entity_id());
 	entity_handle create_sample_rifle(const logic_step, vec2 pos, entity_id load_mag = entity_id());
+	entity_handle create_sn69(const logic_step step, vec2 pos, entity_id load_mag_id);
 
 	entity_handle create_amplifier_arm(
 		const logic_step,

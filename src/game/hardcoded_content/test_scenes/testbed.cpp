@@ -725,6 +725,23 @@ namespace test_scenes {
 
 		const bool many_charges = false;
 
+
+		prefabs::create_sn69(step, vec2(-400, -100),
+			prefabs::create_sample_magazine(step, vec2(100, -650), many_charges ? "10" : "0.3",
+				prefabs::create_cyan_charge(step, vec2(0, 0), many_charges ? 1000 : 30)));
+		
+		prefabs::create_sn69(step, vec2(-400, -200),
+			prefabs::create_sample_magazine(step, vec2(100, -650), many_charges ? "10" : "0.3",
+				prefabs::create_cyan_charge(step, vec2(0, 0), many_charges ? 1000 : 30)));
+		
+		prefabs::create_sn69(step, vec2(-600, -300),
+			prefabs::create_sample_magazine(step, vec2(100, -650), many_charges ? "10" : "0.3",
+				prefabs::create_cyan_charge(step, vec2(0, 0), many_charges ? 1000 : 30)));
+		
+		prefabs::create_sn69(step, vec2(-600, -400),
+			prefabs::create_sample_magazine(step, vec2(100, -650), many_charges ? "10" : "0.3",
+				prefabs::create_cyan_charge(step, vec2(0, 0), many_charges ? 1000 : 30)));
+
 		const auto rifle = prefabs::create_sample_rifle(step, vec2(100, -500),
 			prefabs::create_sample_magazine(step, vec2(100, -650), many_charges ? "10" : "0.3",
 				prefabs::create_cyan_charge(step, vec2(0, 0), many_charges ? 1000 : 30)));

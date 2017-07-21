@@ -23,6 +23,11 @@ void load_test_scene_sound_buffers(assets_manager& manager) {
 	}
 
 	{
+		auto& buf = manager[assets::sound_buffer_id::SN69_MUZZLE];
+		buf.from_file("content/official/sfx/sn69_muzzle.wav");
+	}
+
+	{
 		auto& buf = manager[assets::sound_buffer_id::ROCKET_LAUNCHER_MUZZLE];
 		buf.from_file("content/official/sfx/rocket_launcher_muzzle.wav");
 	}

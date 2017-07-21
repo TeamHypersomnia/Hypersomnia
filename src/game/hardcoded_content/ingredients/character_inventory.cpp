@@ -21,8 +21,8 @@ namespace ingredients {
 			inventory_slot slot_def;
 			slot_def.physical_behaviour = slot_physical_behaviour::CONNECT_AS_FIXTURE_OF_BODY;
 			slot_def.always_allow_exactly_one_item = true;
-			slot_def.attachment_sticking_mode = rectangle_sticking::BOTTOM;
-			slot_def.attachment_offset.pos = { 0, 40 };
+			slot_def.attachment_sticking_mode = rectangle_sticking::RIGHT;
+			slot_def.attachment_offset.pos = { 0, 30 };
 			slot_def.attachment_offset.rotation = 0;
 			slot_def.category_allowed = item_category::GENERAL;
 			container.slots[slot_function::PRIMARY_HAND] = slot_def;
@@ -32,8 +32,8 @@ namespace ingredients {
 			inventory_slot slot_def;
 			slot_def.physical_behaviour = slot_physical_behaviour::CONNECT_AS_FIXTURE_OF_BODY;
 			slot_def.always_allow_exactly_one_item = true;
-			slot_def.attachment_sticking_mode = rectangle_sticking::TOP;
-			slot_def.attachment_offset.pos = { 0, -40 };
+			slot_def.attachment_sticking_mode = rectangle_sticking::RIGHT;
+			slot_def.attachment_offset.pos = { 0, -30 };
 			slot_def.attachment_offset.rotation = 0;
 			slot_def.category_allowed = item_category::GENERAL;
 			container.slots[slot_function::SECONDARY_HAND] = slot_def;
