@@ -452,10 +452,39 @@ viewing_session::viewing_session(
 				if (ImGui::GetIO().WantCaptureMouse) {
 					const vec2i cursor_drawing_pos = ImGui::GetIO().MousePos;
 					augs::draw_cursor(output, cursor_drawing_pos, augs::get_imgui_cursor<assets::game_image_id>(), white);
-				}
 
-				renderer.call_triangles();
-				renderer.clear_triangles();
+					renderer.call_triangles();
+					renderer.clear_triangles();
+				}
+				else {
+					if (gui.gui_look_enabled) {
+						const auto controlled_entity = std::visit(
+							[&](auto& setup) {
+							return setup.get_selected_character();
+						}, *current_setup);
+
+						const auto ratio = std::visit(
+							[&](auto& setup) {
+							return setup.get_interpolation_ratio();
+						}, *current_setup);
+
+						gui.get_character_gui(controlled_entity).draw_cursor_with_information(
+						{
+							gui,
+							audiovisuals.get<interpolation_system>(),
+							controlled_entity,
+							audiovisuals.world_hover_highlighter,
+							config.hotbar,
+							ratio,
+							config.controls,
+							audiovisuals.camera.smoothed_camera,
+							output
+						});
+
+						renderer.call_triangles();
+						renderer.clear_triangles();
+					}
+				}
 			}
 		}
 		else {

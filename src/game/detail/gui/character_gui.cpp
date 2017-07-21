@@ -305,10 +305,24 @@ void character_gui::draw(const character_gui_drawing_input input) const {
 
 	rect_world.build_tree_data_into(context);
 	rect_world.draw(context.get_output_buffer(), context);
+}
 
-	if (input.should_draw_cursor_with_info) {
-		draw_cursor_with_information(context);
-	}
+void character_gui::draw_cursor_with_information(const character_gui_drawing_input input) const {
+	const auto gui_entity = input.viewed_character;
+
+	root_of_inventory_gui root_of_gui(get_screen_size());
+	game_gui_rect_tree tree;
+
+	const auto context = viewing_game_gui_context(
+		rect_world,
+		*this,
+		gui_entity,
+		tree,
+		input
+	);
+
+	rect_world.build_tree_data_into(context);
+	draw_cursor_with_information(context);
 }
 
 void character_gui::draw_cursor_with_information(const viewing_game_gui_context context) const {

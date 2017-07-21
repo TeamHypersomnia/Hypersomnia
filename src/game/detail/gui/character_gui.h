@@ -124,6 +124,7 @@ struct character_gui {
 	);
 	
 	void draw(const character_gui_drawing_input) const;
+	void draw_cursor_with_information(const character_gui_drawing_input) const;
 
 	void draw_tooltip_from_hover_or_world_highlight(
 		const viewing_game_gui_context context,

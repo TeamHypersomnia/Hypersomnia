@@ -357,7 +357,6 @@ namespace rendering_scripts {
 						step.interpolation_ratio,
 						step.input_information,
 						step.camera,
-						!step.is_ingame_menu_active && gui.gui_look_enabled && !ImGui::GetIO().WantCaptureMouse,
 						output
 					}
 				);

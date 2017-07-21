@@ -19,7 +19,6 @@ struct character_gui_drawing_input {
 	const double interpolation_ratio = 0.0;
 	const input_context input_information;
 	const camera_cone camera;
-	const bool should_draw_cursor_with_info;
-
+	
 	augs::vertex_triangle_buffer& output;
 };
