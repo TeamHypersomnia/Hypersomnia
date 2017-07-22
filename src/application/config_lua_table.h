@@ -69,6 +69,7 @@ public:
 	input_context controls;
 	ImGuiStyle gui_style;
 	debug_settings debug;
+	viewing_session_settings session;
 
 #if TODO
 	std::string connect_address;
@@ -96,10 +97,6 @@ public:
 #endif
 
 	// END GEN INTROSPECTOR
-
-	auto get_viewing_session_settings() const {
-		return viewing_session_settings{ window.get_screen_size() };
-	}
 
 	launch_type get_launch_mode() const;
 	input_recording_type get_input_recording_mode() const;

@@ -140,7 +140,7 @@ viewing_session::viewing_session(
 		world.reserve_storage_for_entities(3000u);
 		audiovisuals.reserve_caches_for_entities(3000u);
 
-		if (config.debug.create_minimal_test_scene) {
+		if (config.session.create_minimal_test_scene) {
 			test_scenes::minimal_scene().populate_world_with_entities(
 				world,
 				metas_of_assets,
@@ -618,9 +618,9 @@ void viewing_session::sync_back(config_lua_table& into) {
 void viewing_session::apply(
 	const config_lua_table& new_config
 ) {
-	const auto settings = new_config.get_viewing_session_settings();
-	gl.resize_fbos(settings.screen_size);
-	set_screen_size(settings.screen_size);
+	const auto screen_size = new_config.window.get_screen_size();
+	gl.resize_fbos(screen_size);
+	set_screen_size(screen_size);
 
 	DEBUG_DRAWING = new_config.debug_drawing;
 	window.apply(new_config.window);
@@ -751,7 +751,7 @@ void viewing_session::fetch_developer_console_intents(game_intent_vector& intent
 			fetch = true;
 
 			if (intent.is_pressed) {
-				config.debug.show_developer_console = !config.debug.show_developer_console;
+				config.session.show_developer_console = !config.session.show_developer_console;
 			}
 		}
 
@@ -821,7 +821,7 @@ void viewing_session::view(
 
 	using namespace augs::gui::text;
 
-	if (config.debug.show_developer_console) {
+	if (config.session.show_developer_console) {
 		quick_print(
 			renderer.triangles, 
 			multiply_alpha(augs::gui::text::format_recent_global_log(assets::font_id::GUI_FONT), 150.f / 255), 

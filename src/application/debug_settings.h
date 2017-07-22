@@ -11,8 +11,6 @@ enum class input_recording_type {
 struct debug_settings {
 	// GEN INTROSPECTOR struct debug_settings
 	unsigned determinism_test_cloned_cosmoi_count = 0;
-	bool create_minimal_test_scene = false;
-	bool show_developer_console = false;
 	input_recording_type input_recording_mode = input_recording_type::DISABLED;
 	// END GEN INTROSPECTOR
 };

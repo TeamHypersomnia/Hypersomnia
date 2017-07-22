@@ -26,7 +26,17 @@ static bool operator==(const ImVec2 a, const ImVec2 b) {
 void viewing_session::perform_settings_gui() {
 	auto& state = settings_gui;
 
-	if (show_settings) {
+	bool should_show_settings = show_settings;
+
+	if (
+		config.session.automatically_hide_settings_ingame
+		&& current_setup.has_value()
+		&& !show_ingame_menu 
+	) {
+		should_show_settings = false;
+	}
+
+	if (should_show_settings) {
 		ImGui::Begin("Settings", &show_settings);
 
 		ImGui::BeginChild("settings view", ImVec2(0, -(ImGui::GetItemsLineHeightWithSpacing() + 4)));
@@ -78,8 +88,8 @@ void viewing_session::perform_settings_gui() {
 				checkbox("Enable cursor clipping", config.window.enable_cursor_clipping); revert(config.window.enable_cursor_clipping);
 			}
 
-			input_text<100>(CONFIG_NVP(window.name));
-			revert(config.window.name);
+			input_text<100>(CONFIG_NVP(window.name)); revert(config.window.name);
+			checkbox("Automatically hide settings in-game", config.session.automatically_hide_settings_ingame); revert(config.session.automatically_hide_settings_ingame);
 		}
 		else if (state.active_pane == pane++) {
 
@@ -188,7 +198,7 @@ void viewing_session::perform_settings_gui() {
 			ImGui::GetStyle() = style;
 		}
 		else if (state.active_pane == pane++) {
-			checkbox("Show developer console", config.debug.show_developer_console); revert(config.debug.show_developer_console);
+			checkbox("Show developer console", config.session.show_developer_console); revert(config.session.show_developer_console);
 		}
 
 		ImGui::PopItemWidth();
