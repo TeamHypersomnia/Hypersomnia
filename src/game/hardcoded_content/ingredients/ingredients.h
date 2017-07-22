@@ -73,6 +73,7 @@ namespace prefabs {
 	entity_handle create_sample_magazine(const logic_step, components::transform pos, std::string space = "0.30", entity_id charge_inside = entity_id());
 	entity_handle create_sample_rifle(const logic_step, vec2 pos, entity_id load_mag = entity_id());
 	entity_handle create_sn69(const logic_step step, vec2 pos, entity_id load_mag_id);
+	entity_handle create_kek9(const logic_step step, vec2 pos, entity_id load_mag_id);
 
 	entity_handle create_amplifier_arm(
 		const logic_step,
