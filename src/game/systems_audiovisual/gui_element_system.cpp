@@ -96,8 +96,9 @@ character_gui& gui_element_system::get_character_gui(const entity_id id) {
 		new_gui.action_buttons[1].bound_spell.set<fury_of_the_aeons_instance>();
 		new_gui.action_buttons[2].bound_spell.set<ultimate_wrath_of_the_aeons_instance>();
 		new_gui.action_buttons[3].bound_spell.set<haste_instance>();
-		new_gui.action_buttons[4].bound_spell.set<electric_triad_instance>();
-		new_gui.action_buttons[5].bound_spell.set<electric_shield_instance>();
+		new_gui.action_buttons[4].bound_spell.set<echoes_of_the_higher_realms_instance>();
+		new_gui.action_buttons[5].bound_spell.set<electric_triad_instance>();
+		new_gui.action_buttons[6].bound_spell.set<electric_shield_instance>();
 		
 		return new_gui;
 	}

@@ -129,18 +129,18 @@ void action_button::draw(
 						}
 
 						if (this_id->detector.is_hovered) {
-							border_col = rgba(180, 180, 180, 255);
+							border_col = rgba(220, 220, 220, 255);
 						}
 
 						if (is_pushed) {
-							border_col = rgba(220, 220, 220, 255);
+							border_col = white;
 						}
 
 						const augs::gui::material border_mat(border_tex, border_col);
 
 						draw_centered_texture(context, this_id, info, border_mat);
 
-						auto label_col = has_enough_mana ? cyan : white;
+						auto label_col = has_enough_mana ? border_col : white;
 						label_col.a = 255;
 						const auto label_style = augs::gui::text::style(assets::font_id::GUI_FONT, label_col );
 

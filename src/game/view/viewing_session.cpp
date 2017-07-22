@@ -156,7 +156,6 @@ viewing_session::viewing_session(
 		}
 	};
 
-
 	if (mode == launch_type::MAIN_MENU) {
 		menu.emplace(test_scene_populate);
 

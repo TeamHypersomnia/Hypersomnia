@@ -12,9 +12,9 @@ void load_test_scene_sentience_properties(
 	auto& spells = state.spells;
 	auto& meters = state.meters;
 
-	const rgba turqoise_spell_color = turquoise;
+	const rgba turqoise_spell_color = { 0, 225, 255 };
 	const rgba blue_spell_border = cyan; //{ 0, 128, 209, 255 };
-	const rgba green_spell_color = { 0, 200, 0, 255 };
+	const rgba green_spell_color = { 0, 255, 0, 255 };
 
 	{
 		auto& d = std::get<haste>(spells);
@@ -53,6 +53,29 @@ void load_test_scene_sentience_properties(
 
 		d.appearance.icon = assets::game_image_id::SPELL_EXALTATION_ICON;
 		d.basic_healing_amount = 34;
+
+		d.common.cast_successful_sound.id = assets::sound_buffer_id::CAST_SUCCESSFUL;
+		d.common.cast_sparkles.id = assets::particle_effect_id::CAST_SPARKLES;
+		d.common.cast_sparkles.modifier.colorize = d.common.associated_color;
+		d.common.cast_sparkles.modifier.scale_amounts = 1.3f;
+		d.common.cast_sparkles.modifier.scale_lifetimes = 1.3f;
+	}
+
+	{
+		auto& d = std::get<echoes_of_the_higher_realms>(spells);
+		d.common.cooldown_ms = 2000;
+		d.common.personal_electricity_required = 90;
+		d.common.associated_color = yellow;
+
+		d.appearance.incantation = L"armonia";
+
+		d.appearance.name = L"[color=yellow]Echoes of the higher realms[/color]";
+		d.appearance.description = typesafe_sprintf(
+			L"[color=vsdarkgray]Restores resonance of mind with the body.[/color]"
+		);
+
+		d.appearance.icon = assets::game_image_id::SPELL_ECHOES_OF_THE_HIGHER_REALMS_ICON;
+		d.basic_healing_amount = 132;
 
 		d.common.cast_successful_sound.id = assets::sound_buffer_id::CAST_SUCCESSFUL;
 		d.common.cast_sparkles.id = assets::particle_effect_id::CAST_SPARKLES;
