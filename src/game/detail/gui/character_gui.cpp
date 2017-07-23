@@ -17,7 +17,7 @@
 #include "game/components/item_component.h"
 #include "game/components/render_component.h"
 #include "game/systems_stateless/render_system.h"
-#include "game/systems_audiovisual/gui_element_system.h"
+#include "game/systems_audiovisual/game_gui_system.h"
 
 #include "game/detail/gui/character_gui_drawing_input.h"
 #include "game/detail/gui/drag_and_drop.h"

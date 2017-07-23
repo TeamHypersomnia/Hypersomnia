@@ -339,7 +339,7 @@ namespace rendering_scripts {
 
 		if (settings.draw_character_gui && controlled_entity.alive()) {
 			if (controlled_entity.has<components::item_slot_transfers>()) {
-				auto& gui = step.audiovisuals.get<gui_element_system>();
+				auto& gui = step.audiovisuals.get<game_gui_system>();
 
 				gui.get_character_gui(controlled_entity).draw({
 						gui,

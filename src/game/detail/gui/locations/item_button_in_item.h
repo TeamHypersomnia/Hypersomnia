@@ -28,7 +28,7 @@ public:
 	decltype(auto) dereference(const C context) const {
 		const auto handle = context.get_cosmos()[item_id];
 		ensure(context.get_gui_element_entity() == handle.get_owning_transfer_capability());
-		return &context.get_gui_element_system().get_item_button(item_id);
+		return &context.get_game_gui_system().get_item_button(item_id);
 	}
 };
 

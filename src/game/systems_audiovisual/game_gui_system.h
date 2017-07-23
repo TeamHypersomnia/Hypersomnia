@@ -12,7 +12,7 @@
 struct character_gui;
 class viewing_step;
 
-class gui_element_system {
+class game_gui_system {
 public:
 	std::unordered_map<entity_id, item_button> item_buttons;
 	std::unordered_map<inventory_slot_id, slot_button> slot_buttons;

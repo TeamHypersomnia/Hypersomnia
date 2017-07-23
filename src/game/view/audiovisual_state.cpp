@@ -9,7 +9,7 @@
 #include "augs/templates/string_templates.h"
 
 void audiovisual_state::set_screen_size(const vec2i new_size) {
-	get<gui_element_system>().set_screen_size(new_size);
+	get<game_gui_system>().set_screen_size(new_size);
 	camera.configure_size(new_size);
 }
 
@@ -72,7 +72,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 	world_hover_highlighter.update(dt.in_milliseconds());
 
 	if (viewed_character.alive()) {
-		auto& gui = get<gui_element_system>();
+		auto& gui = get<game_gui_system>();
 
 		gui.advance_elements(
 			viewed_character,
@@ -378,7 +378,7 @@ void audiovisual_state::standard_post_solve(const const_logic_step step) {
 
 	exploding_rings.acquire_new_rings(new_rings);
 
-	auto& gui = get<gui_element_system>();
+	auto& gui = get<game_gui_system>();
 
 	gui.reposition_picked_up_and_transferred_items(step);
 

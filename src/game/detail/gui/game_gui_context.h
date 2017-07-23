@@ -28,7 +28,7 @@ class basic_game_gui_context
 public:
 	typedef augs::gui::basic_context<game_gui_element_location, is_const, basic_game_gui_context<is_const>> base;
 	 
-	typedef maybe_const_ref_t<is_const, gui_element_system> gui_element_system_ref;
+	typedef maybe_const_ref_t<is_const, game_gui_system> game_gui_system_ref;
 	typedef maybe_const_ref_t<is_const, character_gui> character_gui_ref;
 	typedef maybe_const_ref_t<is_const, root_of_inventory_gui> root_of_inventory_gui_ref;
 
@@ -36,7 +36,7 @@ public:
 	typedef typename base::tree_ref tree_ref;
 
 	basic_game_gui_context(
-		gui_element_system_ref sys,
+		game_gui_system_ref sys,
 		rect_world_ref rect_world,
 		character_gui_ref char_gui,
 		const_entity_handle handle,
@@ -48,14 +48,14 @@ public:
 		char_gui(char_gui)
 	{}
 
-	gui_element_system_ref sys;
+	game_gui_system_ref sys;
 	const_entity_handle handle;
 	character_gui_ref char_gui;
 
 	template<class other_context>
 	operator other_context() const {
 		return other_context(
-			get_gui_element_system(),
+			get_game_gui_system(),
 			get_rect_world(), 
 			get_character_gui(), 
 			handle,
@@ -83,7 +83,7 @@ public:
 		return char_gui;
 	}
 
-	gui_element_system_ref get_gui_element_system() const {
+	game_gui_system_ref get_game_gui_system() const {
 		return sys;
 	}
 };
@@ -99,7 +99,7 @@ public:
 	typedef typename base::tree_ref tree_ref;
 	typedef typename base::character_gui_ref character_gui_ref;
 	typedef typename base::root_of_inventory_gui_ref root_of_inventory_gui_ref;
-	typedef typename base::gui_element_system_ref gui_element_system_ref;
+	typedef typename base::game_gui_system_ref game_gui_system_ref;
 
 	viewing_game_gui_context(
 		rect_world_ref rect_world,

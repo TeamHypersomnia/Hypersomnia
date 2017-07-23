@@ -3,7 +3,7 @@
 #include "augs/gui/stroke.h"
 #include "game/detail/gui/game_gui_context.h"
 #include "game/transcendental/cosmos.h"
-#include "game/systems_audiovisual/gui_element_system.h"
+#include "game/systems_audiovisual/game_gui_system.h"
 #include "game/components/sentience_component.h"
 #include "game/assets/assets_manager.h"
 
@@ -247,7 +247,7 @@ void action_button::respond_to_events(
 			const auto bound_spell = get_bound_spell(context, this_id);
 			
 			if (bound_spell.is_set()) {
-				context.get_gui_element_system().spell_requests[context.get_gui_element_entity()] = bound_spell;
+				context.get_game_gui_system().spell_requests[context.get_gui_element_entity()] = bound_spell;
 			}
 		}
 

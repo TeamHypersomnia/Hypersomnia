@@ -6,7 +6,7 @@
 #include "game/detail/gui/character_gui.h"
 #include "augs/gui/button_corners.h"
 #include "game/detail/gui/drag_and_drop.h"
-#include "game/systems_audiovisual/gui_element_system.h"
+#include "game/systems_audiovisual/game_gui_system.h"
 
 #include "game/detail/gui/hotbar_settings.h"
 
@@ -345,7 +345,7 @@ void hotbar_button::respond_to_events(
 
 				const auto next_wielding = gui.make_and_push_hotbar_selection_setup(setup, context.get_gui_element_entity());
 
-				context.get_gui_element_system().queue_transfers(next_wielding);
+				context.get_game_gui_system().queue_transfers(next_wielding);
 			}
 		}
 

@@ -20,7 +20,7 @@
 #include "game/components/fixtures_component.h"
 #include "game/systems_stateless/gui_system.h"
 #include "game/systems_stateless/input_system.h"
-#include "game/systems_audiovisual/gui_element_system.h"
+#include "game/systems_audiovisual/game_gui_system.h"
 #include "game/assets/assets_manager.h"
 #include "augs/graphics/drawers.h"
 
@@ -42,7 +42,7 @@ bool item_button::is_being_wholely_dragged_or_pending_finish(
 		return !is_drag_partial;
 	}
 	else {
-		for (const auto& r : context.get_gui_element_system().pending_transfers) {
+		for (const auto& r : context.get_game_gui_system().pending_transfers) {
 			if (r.item == this_id.get_location().item_id) {
 				return true;
 			}

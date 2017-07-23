@@ -247,7 +247,7 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/game/hardcoded_content/test_scenes/minimal_scene.cpp"
 	"src/game/hardcoded_content/test_scenes/testbed.cpp"
 	"src/game/systems_audiovisual/exploding_ring_system.cpp"
-	"src/game/systems_audiovisual/gameplay_gui_system.cpp"
+	"src/game/systems_audiovisual/game_gui_system.cpp"
 	"src/game/systems_audiovisual/interpolation_system.cpp"
 	"src/game/systems_audiovisual/particles_simulation_system.cpp"
 	"src/game/systems_audiovisual/past_infection_system.cpp"

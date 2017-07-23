@@ -8,7 +8,7 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/logic_step.h"
-#include "game/systems_audiovisual/gui_element_system.h"
+#include "game/systems_audiovisual/game_gui_system.h"
 
 drag_and_drop_target_drop_item::drag_and_drop_target_drop_item(const augs::gui::material new_mat) 
 	: mat(new_mat) {

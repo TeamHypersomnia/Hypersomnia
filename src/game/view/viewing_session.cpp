@@ -176,7 +176,7 @@ viewing_session::viewing_session(
 	bool should_quit = false;
 
 	auto get_character_gui_mouse_pos = [&]() -> vec2i& {
-		return audiovisuals.get<gui_element_system>().rect_world.last_state.mouse.pos;
+		return audiovisuals.get<game_gui_system>().rect_world.last_state.mouse.pos;
 	};
 
 	while (!should_quit) {
@@ -260,7 +260,7 @@ viewing_session::viewing_session(
 			// avoid cursor hopping
 			ingame_ui_world.last_state.mouse.pos = ImGui::GetIO().MousePos;
 			main_menu_ui_world.last_state.mouse.pos = ImGui::GetIO().MousePos;
-			audiovisuals.get<gui_element_system>().rect_world.last_state.mouse.pos = ImGui::GetIO().MousePos;
+			audiovisuals.get<game_gui_system>().rect_world.last_state.mouse.pos = ImGui::GetIO().MousePos;
 		//}
 
 		renderer.set_viewport({ { 0, 0 }, screen_size });
@@ -293,7 +293,7 @@ viewing_session::viewing_session(
 							);
 							
 							setup.control(
-								audiovisuals.get<gui_element_system>().get_and_clear_pending_events()
+								audiovisuals.get<game_gui_system>().get_and_clear_pending_events()
 							);
 						}
 
@@ -428,7 +428,7 @@ viewing_session::viewing_session(
 				renderer.clear_triangles();
 			}
 			else {
-				auto& gui = audiovisuals.get<gui_element_system>();
+				auto& gui = audiovisuals.get<game_gui_system>();
 
 				renderer.draw_call_imgui(resources);
 
@@ -632,7 +632,7 @@ void viewing_session::set_screen_size(const vec2i new_size) {
 }
 
 bool viewing_session::switch_between_gui_and_back(const augs::machine_entropy::local_type& local) {
-	auto& gui = audiovisuals.get<gui_element_system>();
+	auto& gui = audiovisuals.get<game_gui_system>();
 
 	bool has_changed = false;
 
@@ -651,7 +651,7 @@ void viewing_session::fetch_gui_events(
 	augs::machine_entropy::local_type& window_inputs
 ) {
 	if (root.alive()) {
-		auto& gui = audiovisuals.get<gui_element_system>();
+		auto& gui = audiovisuals.get<game_gui_system>();
 
 		gui.control_gui(
 			root, 
@@ -714,7 +714,7 @@ void viewing_session::perform_imgui_pass(
 	
 	const bool in_game_without_mouse =
 		current_setup.has_value()
-		&& !audiovisuals.get<gui_element_system>().gui_look_enabled
+		&& !audiovisuals.get<game_gui_system>().gui_look_enabled
 		&& !show_ingame_menu
 	;
 

@@ -1,4 +1,4 @@
-#include "gui_element_system.h"
+#include "game_gui_system.h"
 #include "game/detail/gui/game_gui_element_location.h"
 #include "game/detail/gui/character_gui.h"
 #include "augs/graphics/renderer.h"
@@ -60,16 +60,16 @@ static char intent_to_special_action_index(const intent_type type) {
 	}
 }
 
-void gui_element_system::set_screen_size(const vec2i screen_size) {
+void game_gui_system::set_screen_size(const vec2i screen_size) {
 	rect_world.set_screen_size(screen_size);
 	root.set_screen_size(screen_size);
 }
 
-vec2i gui_element_system::get_screen_size() const {
+vec2i game_gui_system::get_screen_size() const {
 	return rect_world.get_screen_size();
 }
 
-cosmic_entropy gui_element_system::get_and_clear_pending_events() {
+cosmic_entropy game_gui_system::get_and_clear_pending_events() {
 	cosmic_entropy out;
 
 	out.transfer_requests = pending_transfers;
@@ -81,12 +81,12 @@ cosmic_entropy gui_element_system::get_and_clear_pending_events() {
 	return out;
 }
 
-void gui_element_system::clear_all_pending_events() {
+void game_gui_system::clear_all_pending_events() {
 	pending_transfers.clear();
 	spell_requests.clear();
 }
 
-character_gui& gui_element_system::get_character_gui(const entity_id id) {
+character_gui& game_gui_system::get_character_gui(const entity_id id) {
 	const auto it = character_guis.find(id);
 
 	if (it == character_guis.end()) {
@@ -106,31 +106,31 @@ character_gui& gui_element_system::get_character_gui(const entity_id id) {
 	return (*it).second;
 }
 
-const character_gui& gui_element_system::get_character_gui(const entity_id id) const {
+const character_gui& game_gui_system::get_character_gui(const entity_id id) const {
 	return character_guis.at(id);
 }
 
-slot_button& gui_element_system::get_slot_button(const inventory_slot_id id) {
+slot_button& game_gui_system::get_slot_button(const inventory_slot_id id) {
 	return slot_buttons[id];
 }
 
-const slot_button& gui_element_system::get_slot_button(const inventory_slot_id id) const {
+const slot_button& game_gui_system::get_slot_button(const inventory_slot_id id) const {
 	return slot_buttons.at(id);
 }
 
-item_button& gui_element_system::get_item_button(const entity_id id) {
+item_button& game_gui_system::get_item_button(const entity_id id) {
 	return item_buttons[id];
 }
 
-const item_button& gui_element_system::get_item_button(const entity_id id) const {
+const item_button& game_gui_system::get_item_button(const entity_id id) const {
 	return item_buttons.at(id);
 }
 
-void gui_element_system::queue_transfer(const item_slot_transfer_request req) {
+void game_gui_system::queue_transfer(const item_slot_transfer_request req) {
 	pending_transfers.push_back(req);
 }
 
-void gui_element_system::queue_transfers(const wielding_result res) {
+void game_gui_system::queue_transfers(const wielding_result res) {
 	// ensure(res.successful());
 
 	if (res.successful()) {
@@ -138,7 +138,7 @@ void gui_element_system::queue_transfers(const wielding_result res) {
 	}
 }
 
-void gui_element_system::handle_hotbar_and_action_button_presses(
+void game_gui_system::handle_hotbar_and_action_button_presses(
 	const const_entity_handle gui_entity,
 	const game_intent_vector& intents
 ) {
@@ -255,7 +255,7 @@ void gui_element_system::handle_hotbar_and_action_button_presses(
 	}
 }
 
-game_gui_context gui_element_system::create_context(
+game_gui_context game_gui_system::create_context(
 	const const_entity_handle gui_entity, 
 	game_gui_rect_tree& tree
 ) {
@@ -270,7 +270,7 @@ game_gui_context gui_element_system::create_context(
 	};
 }
 
-void gui_element_system::advance_elements(
+void game_gui_system::advance_elements(
 	const const_entity_handle root_entity,
 	const augs::delta dt
 ) {
@@ -284,7 +284,7 @@ void gui_element_system::advance_elements(
 	rect_world.advance_elements(context, dt);
 }
 	
-void gui_element_system::control_gui(
+void game_gui_system::control_gui(
 	const const_entity_handle root_entity,
 	std::vector<augs::event::change>& events
 ) {
@@ -359,7 +359,7 @@ void gui_element_system::control_gui(
 	);
 }
 
-void gui_element_system::rebuild_layouts(
+void game_gui_system::rebuild_layouts(
 	const const_entity_handle root_entity
 ) {
 	game_gui_rect_tree tree;
@@ -433,11 +433,11 @@ void gui_element_system::rebuild_layouts(
 	rect_world.rebuild_layouts(context);
 }
 
-void gui_element_system::reposition_picked_up_and_transferred_items(const const_logic_step step) {
+void game_gui_system::reposition_picked_up_and_transferred_items(const const_logic_step step) {
 
 }
 
-void gui_element_system::erase_caches_for_dead_entities(const cosmos& new_cosmos) {
+void game_gui_system::erase_caches_for_dead_entities(const cosmos& new_cosmos) {
 	const auto eraser = [&](auto& caches) {
 		erase_if(caches, [&](const auto& it) {
 			return new_cosmos[it.first].dead();

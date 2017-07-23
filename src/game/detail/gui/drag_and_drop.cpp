@@ -12,7 +12,7 @@
 #include "augs/ensure.h"
 #include "augs/templates/string_templates.h"
 #include "game/detail/gui/game_gui_context.h"
-#include "game/systems_audiovisual/gui_element_system.h"
+#include "game/systems_audiovisual/game_gui_system.h"
 
 void drag_and_drop_callback(
 	game_gui_context context, 
@@ -31,7 +31,7 @@ void drag_and_drop_callback(
 
 		if constexpr (std::is_same_v<T, drop_for_item_slot_transfer>) {
 			if (transfer_data.result.result >= item_transfer_result_type::SUCCESSFUL_TRANSFER) {
-				context.get_gui_element_system().queue_transfer(transfer_data.simulated_transfer);
+				context.get_game_gui_system().queue_transfer(transfer_data.simulated_transfer);
 			}
 		}
 		else if constexpr (std::is_same_v<T, unfinished_drag_of_item>) {

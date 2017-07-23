@@ -6,12 +6,12 @@
 #include "augs/graphics/vertex.h"
 #include "augs/misc/basic_input_context.h"
 
-class gui_element_system;
+class game_gui_system;
 class interpolation_system;
 struct aabb_highlighter;
 
 struct character_gui_drawing_input {
-	const gui_element_system& gui;
+	const game_gui_system& gui;
 	const interpolation_system& interpolation;
 	const const_entity_handle viewed_character;
 	const aabb_highlighter& world_hover_highlighter;

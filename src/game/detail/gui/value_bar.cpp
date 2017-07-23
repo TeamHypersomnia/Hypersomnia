@@ -7,7 +7,7 @@
 #include "game/detail/inventory/inventory_slot_handle.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
-#include "game/systems_audiovisual/gui_element_system.h"
+#include "game/systems_audiovisual/game_gui_system.h"
 #include "augs/gui/text_drawer.h"
 #include "augs/gui/stroke.h"
 #include "augs/templates/visit_gettable.h"
@@ -341,7 +341,7 @@ augs::gui::material value_bar::get_bar_mat(
 	const auto& sentience = context.get_gui_element_entity().get<components::sentience>();
 
 	return { 
-		context.get_gui_element_system().value_bar_background, 
+		context.get_game_gui_system().value_bar_background, 
 		visit_by_vertical_index(
 			sentience,
 			cosmos,
