@@ -7,7 +7,7 @@
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/transcendental/cosmic_entropy.h"
 #include "augs/graphics/renderer.h"
-#include "game/detail/gui/root_of_inventory_gui.h"
+#include "game/detail/gui/game_gui_root.h"
 
 struct character_gui;
 class viewing_step;
@@ -23,7 +23,7 @@ public:
 	augs::container_with_small_size<std::unordered_map<entity_id, spell_id>, unsigned char> spell_requests;
 	
 	game_gui_rect_world rect_world = vec2i {};
-	root_of_inventory_gui root = vec2i {};
+	game_gui_root root = vec2i {};
 
 	bool gui_look_enabled = false;
 	assets::game_image_id value_bar_background = assets::game_image_id::BLANK;

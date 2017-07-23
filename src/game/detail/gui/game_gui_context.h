@@ -13,7 +13,7 @@
 
 #include "application/config_lua_table.h"
 
-class root_of_inventory_gui;
+class game_gui_root;
 struct character_gui;
 
 typedef augs::gui::rect_tree<game_gui_element_location> game_gui_rect_tree;
@@ -30,7 +30,7 @@ public:
 	 
 	typedef maybe_const_ref_t<is_const, game_gui_system> game_gui_system_ref;
 	typedef maybe_const_ref_t<is_const, character_gui> character_gui_ref;
-	typedef maybe_const_ref_t<is_const, root_of_inventory_gui> root_of_inventory_gui_ref;
+	typedef maybe_const_ref_t<is_const, game_gui_root> game_gui_root_ref;
 
 	typedef typename base::rect_world_ref rect_world_ref;
 	typedef typename base::tree_ref tree_ref;
@@ -64,7 +64,7 @@ public:
 	}
 
 	auto get_root_id() const {
-		return root_of_inventory_gui_in_context();
+		return game_gui_root_in_context();
 	}
 
 	auto& get_root() const {
@@ -98,7 +98,7 @@ public:
 	typedef typename base::rect_world_ref rect_world_ref;
 	typedef typename base::tree_ref tree_ref;
 	typedef typename base::character_gui_ref character_gui_ref;
-	typedef typename base::root_of_inventory_gui_ref root_of_inventory_gui_ref;
+	typedef typename base::game_gui_root_ref game_gui_root_ref;
 	typedef typename base::game_gui_system_ref game_gui_system_ref;
 
 	viewing_game_gui_context(

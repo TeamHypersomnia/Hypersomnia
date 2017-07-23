@@ -1,7 +1,7 @@
 #include <tuple>
-#include "root_of_inventory_gui.h"
+#include "game_gui_root.h"
 
-root_of_inventory_gui::root_of_inventory_gui(const vec2i screen_size) {
+game_gui_root::game_gui_root(const vec2i screen_size) {
 	unset_flag(augs::gui::flag::CLIP);
 	set_flag(augs::gui::flag::ENABLE_DRAWING_OF_CHILDREN);
 	set_flag(augs::gui::flag::DISABLE_HOVERING);
@@ -10,6 +10,6 @@ root_of_inventory_gui::root_of_inventory_gui(const vec2i screen_size) {
 	set_screen_size(screen_size);
 }
 
-void root_of_inventory_gui::set_screen_size(const vec2i screen_size) {
+void game_gui_root::set_screen_size(const vec2i screen_size) {
 
 }

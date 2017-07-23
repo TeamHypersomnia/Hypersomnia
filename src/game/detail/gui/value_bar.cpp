@@ -2,7 +2,7 @@
 #include "game/detail/gui/character_gui.h"
 #include "game/detail/gui/character_gui.h"
 #include "game/components/sentience_component.h"
-#include "game/detail/gui/root_of_inventory_gui.h"
+#include "game/detail/gui/game_gui_root.h"
 #include "game/detail/inventory/inventory_slot.h"
 #include "game/detail/inventory/inventory_slot_handle.h"
 #include "game/transcendental/entity_handle.h"

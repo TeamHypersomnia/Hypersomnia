@@ -1,9 +1,9 @@
 #pragma once
 #include "game/detail/gui/game_gui_element_location.h"
 
-class root_of_inventory_gui : public game_gui_rect_node {
+class game_gui_root : public game_gui_rect_node {
 public:
-	root_of_inventory_gui(const vec2i screen_size);
+	game_gui_root(const vec2i screen_size);
 
 	void set_screen_size(const vec2i);
 

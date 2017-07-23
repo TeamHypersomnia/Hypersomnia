@@ -5,7 +5,7 @@
 #include "game/view/viewing_step.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
-#include "game/detail/gui/root_of_inventory_gui.h"
+#include "game/detail/gui/game_gui_root.h"
 #include "game/detail/gui/drag_and_drop_target_drop_item.h"
 #include "game/detail/gui/item_button.h"
 #include "game/detail/gui/slot_button.h"
@@ -292,7 +292,7 @@ character_gui::hotbar_selection_setup character_gui::get_actual_selection_setup(
 void character_gui::draw(const character_gui_drawing_input input) const {
 	const auto gui_entity = input.viewed_character;
 
-	root_of_inventory_gui root_of_gui(get_screen_size());
+	game_gui_root root_of_gui(get_screen_size());
 	game_gui_rect_tree tree;
 
 	const auto context = viewing_game_gui_context(
@@ -310,7 +310,7 @@ void character_gui::draw(const character_gui_drawing_input input) const {
 void character_gui::draw_cursor_with_information(const character_gui_drawing_input input) const {
 	const auto gui_entity = input.viewed_character;
 
-	root_of_inventory_gui root_of_gui(get_screen_size());
+	game_gui_root root_of_gui(get_screen_size());
 	game_gui_rect_tree tree;
 
 	const auto context = viewing_game_gui_context(
@@ -555,7 +555,7 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 						);
 					}
 				}
-				else if constexpr(std::is_same_v<T, root_of_inventory_gui_in_context>) {
+				else if constexpr(std::is_same_v<T, game_gui_root_in_context>) {
 
 				}
 				else if constexpr(std::is_same_v<T, drag_and_drop_target_drop_item_in_character_gui>) {

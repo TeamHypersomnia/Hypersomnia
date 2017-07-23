@@ -3,7 +3,7 @@
 #include "game/detail/gui/grid.h"
 #include "game/detail/gui/game_gui_context.h"
 #include "game/detail/gui/drag_and_drop.h"
-#include "game/detail/gui/root_of_inventory_gui.h"
+#include "game/detail/gui/game_gui_root.h"
 
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"

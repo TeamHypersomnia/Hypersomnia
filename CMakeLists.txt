@@ -224,7 +224,7 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/game/detail/gui/item_button.cpp"
 	"src/game/detail/gui/pixel_line_connector.cpp"
 	"src/game/detail/gui/drag_and_drop_target_drop_item.cpp"
-	"src/game/detail/gui/root_of_inventory_gui.cpp"
+	"src/game/detail/gui/game_gui_root.cpp"
 	"src/game/detail/gui/value_bar.cpp"
 	"src/game/detail/gui/slot_button.cpp"
 	"src/game/detail/inventory/inventory_slot.cpp"
