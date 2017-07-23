@@ -91,16 +91,16 @@ viewing_session::viewing_session(
 	load_requisite_atlases(resources);
 	load_requisite_shaders(resources);
 
-	ingame_menu_context::root_type ingame_ui_root(screen_size);
+	ingame_menu_context::root_type ingame_menu_root(screen_size);
 
 	const auto gui_text_style = augs::gui::text::style(assets::font_id::GUI_FONT, cyan);
 
-	for (std::size_t i = 0; i < ingame_ui_root.buttons.size(); ++i) {
+	for (std::size_t i = 0; i < ingame_menu_root.buttons.size(); ++i) {
 		const auto e = static_cast<ingame_menu_button_type>(i);
-		ingame_ui_root.buttons[i].set_complete_caption(augs::gui::text::format(to_wstring(format_enum(e)), gui_text_style));
+		ingame_menu_root.buttons[i].set_complete_caption(augs::gui::text::format(to_wstring(format_enum(e)), gui_text_style));
 	}
 
-	ingame_menu_context::rect_world_type ingame_ui_world(screen_size);
+	ingame_menu_context::rect_world_type ingame_menu_world(screen_size);
 
 	main_menu_context::root_type main_menu_root(screen_size);
 
@@ -131,7 +131,7 @@ viewing_session::viewing_session(
 
 	auto emplace_setup = [&](auto&&... args) {
 		current_setup.emplace(std::forward<decltype(args)>(args)...);
-		menu.reset();
+		main_menu.reset();
 	};
 
 	auto test_scene_populate = [&](cosmos& world, auto& metas_of_assets) {
@@ -157,7 +157,7 @@ viewing_session::viewing_session(
 	};
 
 	if (mode == launch_type::MAIN_MENU) {
-		menu.emplace(test_scene_populate);
+		main_menu.emplace(test_scene_populate);
 
 		// play intro if not skipped
 		if (config.main_menu.skip_credits) {
@@ -258,7 +258,7 @@ viewing_session::viewing_session(
 
 		//if (ImGui::GetIO().WantCaptureMouse) {
 			// avoid cursor hopping
-			ingame_ui_world.last_state.mouse.pos = ImGui::GetIO().MousePos;
+			ingame_menu_world.last_state.mouse.pos = ImGui::GetIO().MousePos;
 			main_menu_world.last_state.mouse.pos = ImGui::GetIO().MousePos;
 			audiovisuals.get<game_gui_system>().rect_world.last_state.mouse.pos = ImGui::GetIO().MousePos;
 		//}
@@ -344,8 +344,8 @@ viewing_session::viewing_session(
 					)
 				);
 
-				auto& root = ingame_ui_root;
-				auto& world = ingame_ui_world;
+				auto& root = ingame_menu_root;
+				auto& world = ingame_menu_world;
 
 				root.set_screen_size(screen_size);
 				world.set_screen_size(screen_size);
@@ -491,8 +491,8 @@ viewing_session::viewing_session(
 
 			show_ingame_menu = false;
 
-			if (!menu.has_value()) {
-				menu.emplace(test_scene_populate);
+			if (!main_menu.has_value()) {
+				main_menu.emplace(test_scene_populate);
 				audiovisuals = decltype(audiovisuals)();
 				make_menu_gui_complete();
 			}
@@ -590,7 +590,7 @@ viewing_session::viewing_session(
 
 	audiovisuals.get<sound_system>() = sound_system();
 	main_menu_root = decltype(main_menu_root)({});
-	ingame_ui_root = decltype(ingame_ui_root)({});
+	ingame_menu_root = decltype(ingame_menu_root)({});
 
 	//	By now, all sound sources from the viewing session are released.
 
@@ -602,8 +602,6 @@ viewing_session::viewing_session(
 	resources = assets_manager();
 #endif
 }
-
-#include "application/menu/menu_context.h"
 
 void viewing_session::perform_ingame_menu() {
 

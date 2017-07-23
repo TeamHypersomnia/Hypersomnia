@@ -6,7 +6,7 @@
 #include "application/menu/menu_root.h"
 #include "application/menu/menu_context.h"
 
-#include "application/setups/menu_setup.h"
+#include "application/setups/main_menu_setup.h"
 #include "application/setups/local_setup.h"
 //#include "application/setups/determinism_test_setup.h"
 //#include "application/setups/two_clients_and_server_setup.h"
@@ -56,7 +56,7 @@ public:
 
 	using setup_variant = std::variant<local_setup>;
 	
-	std::optional<menu_setup> menu;
+	std::optional<main_menu_setup> main_menu;
 	std::optional<setup_variant> current_setup;
 
 	bool show_settings = false;

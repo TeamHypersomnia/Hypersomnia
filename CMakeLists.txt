@@ -351,7 +351,7 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/application/setups/local_setup.cpp"
 #	"src/application/setups/choreographic_setup.cpp" #
 #	"src/application/setups/director_setup.cpp" #
-	"src/application/setups/menu_setup.cpp"
+	"src/application/setups/main_menu_setup.cpp"
 #	"src/application/setups/client_setup.cpp" #
 #	"src/application/setups/determinism_test_setup.cpp" #
 	"src/application/web_daemon/session_report.cpp"

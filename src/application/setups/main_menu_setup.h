@@ -5,13 +5,13 @@
 #include "augs/misc/fixed_delta_timer.h"
 #include "game/transcendental/types_specification/all_component_includes.h"
 
-class menu_setup {
+class main_menu_setup {
 	cosmos hypersomnia;
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 	all_logical_metas_of_assets metas_of_assets;
 public:
 	template <class P>
-	menu_setup(P&& populate) {
+	main_menu_setup(P&& populate) {
 		populate(hypersomnia, metas_of_assets);
 		
 		timer.set_stepping_speed_multiplier(1.f);

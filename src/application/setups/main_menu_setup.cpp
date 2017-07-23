@@ -25,7 +25,7 @@
 #include "augs/filesystem/file.h"
 #include "augs/misc/action_list.h"
 #include "augs/misc/standard_actions.h"
-#include "menu_setup.h"
+#include "main_menu_setup.h"
 
 #include "augs/gui/text/caret.h"
 
@@ -52,7 +52,7 @@ using namespace augs::event::keys;
 using namespace augs::gui::text;
 using namespace augs::gui;
 
-void menu_setup::process(
+void main_menu_setup::process(
 	game_window& window,
 	viewing_session& session
 ) {
