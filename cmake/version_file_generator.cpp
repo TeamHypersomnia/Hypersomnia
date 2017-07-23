@@ -50,7 +50,7 @@ int main(int argc, char** argv) {
 	std::string git_working_tree_changes_lines;
 
 	for (std::string line; std::getline(git_working_tree_changes, line);) {
-		git_working_tree_changes_lines += "\t\"" + line + "\",\n";
+		git_working_tree_changes_lines += "\t\t\"" + line + "\",\n";
 	}
 
 	const auto output_file_contents = typesafe_sprintf(

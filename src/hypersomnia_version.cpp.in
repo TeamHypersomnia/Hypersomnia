@@ -7,19 +7,25 @@
 
 #if WAS_VERSION_GENERATOR_BUILT
 
-unsigned HYPERSOMNIA_COMMIT_NUMBER = %x;
-std::string HYPERSOMNIA_COMMIT_MESSAGE = "%x";
-std::string HYPERSOMNIA_COMMIT_DATE = "%x";
-std::string HYPERSOMNIA_COMMIT_HASH = "%x";
-std::vector<std::string> HYPERSOMNIA_WORKING_TREE_CHANGES = {
-%x};
+hypersomnia_version::hypersomnia_version() :
+	commit_number(%x),
+	commit_message("%x"),
+	commit_date("%x"),
+	commit_hash("%x"),
+	working_tree_changes({
+%x	})
+{
+}
 
 #else
 
-unsigned HYPERSOMNIA_COMMIT_NUMBER = 0;
-std::string HYPERSOMNIA_COMMIT_MESSAGE = "Unknown";
-std::string HYPERSOMNIA_COMMIT_DATE = "Unknown";
-std::string HYPERSOMNIA_COMMIT_HASH = "Unknown";
-std::vector<std::string> HYPERSOMNIA_WORKING_TREE_CHANGES = {};
+hypersomnia_version::hypersomnia_version() :
+	commit_number(0),
+	commit_message("Unknown"),
+	commit_date("Unknown"),
+	commit_hash("Unknown"),
+	working_tree_changes({})
+{
+}
 
 #endif

@@ -837,14 +837,16 @@ void viewing_session::view(
 			rgba(255, 255, 255, 150)
 		);
 
+		const auto version = hypersomnia_version();
+
 		const auto revision_info =
 			augs::gui::text::format_as_bbcode(
 				typesafe_sprintf(
 					"Revision no.: %x %x\nDate: %x\nMessage:\n%x\n",
-					HYPERSOMNIA_COMMIT_NUMBER ? std::to_string(HYPERSOMNIA_COMMIT_NUMBER) : "Unknown",
-					HYPERSOMNIA_COMMIT_NUMBER ? HYPERSOMNIA_WORKING_TREE_CHANGES.empty() ? "(clean)" : "(dirty)" : "", 
-					HYPERSOMNIA_COMMIT_DATE,
-					HYPERSOMNIA_COMMIT_MESSAGE.size() < 30 ? HYPERSOMNIA_COMMIT_MESSAGE : HYPERSOMNIA_COMMIT_MESSAGE.substr(0, 30) + "(...)"
+					version.commit_number ? std::to_string(version.commit_number) : "Unknown",
+					version.commit_number ? version.working_tree_changes.empty() ? "(clean)" : "(dirty)" : "",
+					version.commit_date,
+					version.commit_message.size() < 30 ? version.commit_message : version.commit_message.substr(0, 30) + "(...)"
 				),
 				gui_style
 			)
