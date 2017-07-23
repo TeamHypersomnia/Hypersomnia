@@ -91,31 +91,31 @@ viewing_session::viewing_session(
 	load_requisite_atlases(resources);
 	load_requisite_shaders(resources);
 
-	ingame_menu_ui_context::root_type ingame_ui_root(screen_size);
+	ingame_menu_context::root_type ingame_ui_root(screen_size);
 
 	const auto gui_text_style = augs::gui::text::style(assets::font_id::GUI_FONT, cyan);
 
-	for (std::size_t i = 0; i < ingame_ui_root.menu_buttons.size(); ++i) {
+	for (std::size_t i = 0; i < ingame_ui_root.buttons.size(); ++i) {
 		const auto e = static_cast<ingame_menu_button_type>(i);
-		ingame_ui_root.menu_buttons[i].set_complete_caption(augs::gui::text::format(to_wstring(format_enum(e)), gui_text_style));
+		ingame_ui_root.buttons[i].set_complete_caption(augs::gui::text::format(to_wstring(format_enum(e)), gui_text_style));
 	}
 
-	ingame_menu_ui_context::rect_world_type ingame_ui_world(screen_size);
+	ingame_menu_context::rect_world_type ingame_ui_world(screen_size);
 
-	main_menu_ui_context::root_type main_menu_ui_root(screen_size);
+	main_menu_context::root_type main_menu_root(screen_size);
 
-	for (std::size_t i = 0; i < main_menu_ui_root.menu_buttons.size(); ++i) {
+	for (std::size_t i = 0; i < main_menu_root.buttons.size(); ++i) {
 		const auto e = static_cast<main_menu_button_type>(i);
-		main_menu_ui_root.menu_buttons[i].set_complete_caption(augs::gui::text::format(to_wstring(format_enum(e)), gui_text_style));
+		main_menu_root.buttons[i].set_complete_caption(augs::gui::text::format(to_wstring(format_enum(e)), gui_text_style));
 	}
 
-	auto make_menu_gui_complete = [&main_menu_ui_root]() {
-		for (auto& m : main_menu_ui_root.menu_buttons) {
+	auto make_menu_gui_complete = [&main_menu_root]() {
+		for (auto& m : main_menu_root.buttons) {
 			m.make_complete();
 		}
 	};
 
-	main_menu_ui_context::rect_world_type main_menu_ui_world(screen_size);
+	main_menu_context::rect_world_type main_menu_world(screen_size);
 
 	const auto mode = config.get_launch_mode();
 	LOG("Launch mode: %x", static_cast<int>(mode));
@@ -259,7 +259,7 @@ viewing_session::viewing_session(
 		//if (ImGui::GetIO().WantCaptureMouse) {
 			// avoid cursor hopping
 			ingame_ui_world.last_state.mouse.pos = ImGui::GetIO().MousePos;
-			main_menu_ui_world.last_state.mouse.pos = ImGui::GetIO().MousePos;
+			main_menu_world.last_state.mouse.pos = ImGui::GetIO().MousePos;
 			audiovisuals.get<game_gui_system>().rect_world.last_state.mouse.pos = ImGui::GetIO().MousePos;
 		//}
 
@@ -350,8 +350,8 @@ viewing_session::viewing_session(
 				root.set_screen_size(screen_size);
 				world.set_screen_size(screen_size);
 
-				auto tree = ingame_menu_ui_context::tree_type();
-				auto context = ingame_menu_ui_context(config.audio_volume, world, tree, root);
+				auto tree = ingame_menu_context::tree_type();
+				auto context = ingame_menu_context(config.audio_volume, world, tree, root);
 
 				root.set_menu_buttons_sizes({ 1000, 1000 });
 
@@ -388,8 +388,8 @@ viewing_session::viewing_session(
 				augs::draw_cursor(output, cursor_drawing_pos, gui_cursor, white);
 
 				auto clicked = [&root](const ingame_menu_button_type t) {
-					if (root.menu_buttons[t].click_callback_required) {
-						root.menu_buttons[t].click_callback_required = false;
+					if (root.buttons[t].click_callback_required) {
+						root.buttons[t].click_callback_required = false;
 						return true;
 					}
 
@@ -418,7 +418,7 @@ viewing_session::viewing_session(
 
 				if (wont_receive_events_anymore) {
 					/* We must manually unhover "Resume" button */
-					ingame_menu_ui_context::rect_world_type::gui_entropy gui_entropies;
+					ingame_menu_context::rect_world_type::gui_entropy gui_entropies;
 
 					world.unhover_and_undrag(context, gui_entropies);
 					world.respond_to_events(context, gui_entropies);
@@ -503,14 +503,14 @@ viewing_session::viewing_session(
 				)
 			);
 
-			auto& root = main_menu_ui_root;
-			auto& world = main_menu_ui_world;
+			auto& root = main_menu_root;
+			auto& world = main_menu_world;
 
 			root.set_screen_size(screen_size);
 			world.set_screen_size(screen_size);
 
-			auto tree = main_menu_ui_context::tree_type();
-			auto context = main_menu_ui_context(config.audio_volume, world, tree, root);
+			auto tree = main_menu_context::tree_type();
+			auto context = main_menu_context(config.audio_volume, world, tree, root);
 
 			root.set_menu_buttons_sizes({ 1000, 1000 });
 
@@ -557,8 +557,8 @@ viewing_session::viewing_session(
 			augs::draw_cursor(output, cursor_drawing_pos, gui_cursor, white);
 
 			auto clicked = [&root](const main_menu_button_type t) {
-				if (root.menu_buttons[t].click_callback_required) {
-					root.menu_buttons[t].click_callback_required = false;
+				if (root.buttons[t].click_callback_required) {
+					root.buttons[t].click_callback_required = false;
 					return true;
 				}
 
@@ -589,7 +589,7 @@ viewing_session::viewing_session(
 	}
 
 	audiovisuals.get<sound_system>() = sound_system();
-	main_menu_ui_root = decltype(main_menu_ui_root)({});
+	main_menu_root = decltype(main_menu_root)({});
 	ingame_ui_root = decltype(ingame_ui_root)({});
 
 	//	By now, all sound sources from the viewing session are released.
@@ -603,7 +603,7 @@ viewing_session::viewing_session(
 #endif
 }
 
-#include "application/menu_ui/menu_ui_context.h"
+#include "application/menu/menu_context.h"
 
 void viewing_session::perform_ingame_menu() {
 

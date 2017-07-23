@@ -9,7 +9,7 @@ public:
 
 	template <class C, class gui_element_id, class L>
 	static void for_each_child(const C context, const gui_element_id this_id, L generic_call) {
-		const auto handle = context.get_gui_element_entity();
+		const auto handle = context.get_subject_entity();
 
 		// we do not dereference the gui element's entity location because it is possibly not an item;
 		// however it should be a container so we call the callback on the element's children

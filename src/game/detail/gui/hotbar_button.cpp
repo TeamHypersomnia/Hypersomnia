@@ -74,7 +74,7 @@ void hotbar_button::draw(
 	const auto& rect_world = context.get_rect_world();
 	const auto& this_tree_entry = context.get_tree_entry(this_id);
 	auto absolute_rc = this_tree_entry.get_absolute_rect();
-	const auto owner_transfer_capability = context.get_gui_element_entity();
+	const auto owner_transfer_capability = context.get_subject_entity();
 	const auto settings = context.get_hotbar_settings();
 
 	const int left_rc_spacing = 2;
@@ -337,13 +337,13 @@ void hotbar_button::respond_to_events(
 		this_id->detector.update_appearance(info);
 
 		if (info.msg == gui_event::lclick) {
-			const auto assigned_entity = this_id->get_assigned_entity(context.get_gui_element_entity());
+			const auto assigned_entity = this_id->get_assigned_entity(context.get_subject_entity());
 
 			if (assigned_entity.alive()) {
 				character_gui::hotbar_selection_setup setup;
 				setup.hand_selections[0] = assigned_entity;
 
-				const auto next_wielding = gui.make_and_push_hotbar_selection_setup(setup, context.get_gui_element_entity());
+				const auto next_wielding = gui.make_and_push_hotbar_selection_setup(setup, context.get_subject_entity());
 
 				context.get_game_gui_system().queue_transfers(next_wielding);
 			}

@@ -17,13 +17,13 @@ public:
 	template <class C>
 	bool alive(const C context) const {
 		const auto handle = context.get_cosmos()[slot_id];
-		return handle.alive() && context.get_gui_element_entity() == handle.get_container().get_owning_transfer_capability();
+		return handle.alive() && context.get_subject_entity() == handle.get_container().get_owning_transfer_capability();
 	}
 
 	template <class C>
 	decltype(auto) dereference(const C context) const {
 		const auto handle = context.get_cosmos()[slot_id];
-		ensure(context.get_gui_element_entity() == handle.get_container().get_owning_transfer_capability());
+		ensure(context.get_subject_entity() == handle.get_container().get_owning_transfer_capability());
 		return &context.get_game_gui_system().get_slot_button(slot_id);
 	}
 };

@@ -3,8 +3,8 @@
 #include "augs/window_framework/window.h"
 #include "augs/gui/formatted_text.h"
 
-#include "application/menu_ui/menu_ui_root.h"
-#include "application/menu_ui/menu_ui_context.h"
+#include "application/menu/menu_root.h"
+#include "application/menu/menu_context.h"
 
 #include "application/setups/menu_setup.h"
 #include "application/setups/local_setup.h"

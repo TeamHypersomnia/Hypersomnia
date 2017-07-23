@@ -26,7 +26,7 @@ void action_button::draw(
 	const auto absolute_rect = context.get_tree_entry(this_id).get_absolute_rect();
 
 	if (bound_key != augs::event::keys::key::INVALID) {
-		const auto& sentience = context.get_gui_element_entity().get<components::sentience>();
+		const auto& sentience = context.get_subject_entity().get<components::sentience>();
 		const auto bound_spell = get_bound_spell(context, this_id);
 
 		if (bound_spell.is_set()) {
@@ -208,7 +208,7 @@ spell_id action_button::get_bound_spell(
 	const const_this_in_item this_id
 ) {
 	const auto bound_spell = this_id->bound_spell;
-	const auto& sentience = context.get_gui_element_entity().get<components::sentience>();
+	const auto& sentience = context.get_subject_entity().get<components::sentience>();
 
 	if (bound_spell.is_set() && sentience.is_learned(bound_spell)) {
 		return bound_spell;
@@ -247,7 +247,7 @@ void action_button::respond_to_events(
 			const auto bound_spell = get_bound_spell(context, this_id);
 			
 			if (bound_spell.is_set()) {
-				context.get_game_gui_system().spell_requests[context.get_gui_element_entity()] = bound_spell;
+				context.get_game_gui_system().spell_requests[context.get_subject_entity()] = bound_spell;
 			}
 		}
 

@@ -7,12 +7,12 @@
 #include "game/assets/game_image_id.h"
 
 #include "augs/gui/button_corners.h"
-#include "application/menu_ui/appearing_text.h"
+#include "application/menu/appearing_text.h"
 
 #include "augs/audio/sound_source.h"
 
 template <class Enum>
-class option_button : public menu_ui_rect_node<Enum> {
+class option_button : public menu_rect_node<Enum> {
 public:
 	augs::gui::appearance_detector detector;
 
@@ -30,7 +30,7 @@ public:
 	bool click_callback_required = false;
 	pad_bytes<3> pad;
 
-	using base_node = menu_ui_rect_node<Enum>;
+	using base_node = menu_rect_node<Enum>;
 	using gui_entropy = typename base_node::gui_entropy;
 
 	option_button() {

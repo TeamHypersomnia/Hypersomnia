@@ -16,7 +16,7 @@
 class game_gui_root;
 struct character_gui;
 
-typedef augs::gui::rect_tree<game_gui_element_location> game_gui_rect_tree;
+using game_gui_rect_tree = augs::gui::rect_tree<game_gui_element_location>;
 
 template <bool is_const>
 class basic_game_gui_context 
@@ -26,14 +26,12 @@ class basic_game_gui_context
 		basic_game_gui_context<is_const>
 	> {
 public:
-	typedef augs::gui::basic_context<game_gui_element_location, is_const, basic_game_gui_context<is_const>> base;
-	 
-	typedef maybe_const_ref_t<is_const, game_gui_system> game_gui_system_ref;
-	typedef maybe_const_ref_t<is_const, character_gui> character_gui_ref;
-	typedef maybe_const_ref_t<is_const, game_gui_root> game_gui_root_ref;
-
-	typedef typename base::rect_world_ref rect_world_ref;
-	typedef typename base::tree_ref tree_ref;
+	using base = augs::gui::basic_context<game_gui_element_location, is_const, basic_game_gui_context<is_const>>;
+	using game_gui_system_ref = maybe_const_ref_t<is_const, game_gui_system>;
+	using character_gui_ref = maybe_const_ref_t<is_const, character_gui>;
+	using game_gui_root_ref = maybe_const_ref_t<is_const, game_gui_root>;
+	using rect_world_ref = typename base::rect_world_ref;
+	using tree_ref = typename base::tree_ref;
 
 	basic_game_gui_context(
 		game_gui_system_ref sys,
@@ -71,7 +69,7 @@ public:
 		return sys.root;
 	}
 
-	const_entity_handle get_gui_element_entity() const {
+	const_entity_handle get_subject_entity() const {
 		return handle;
 	}
 
@@ -88,18 +86,18 @@ public:
 	}
 };
 
-typedef basic_game_gui_context<false> game_gui_context;
-typedef basic_game_gui_context<true> const_game_gui_context;
+using game_gui_context = basic_game_gui_context<false>;
+using const_game_gui_context = basic_game_gui_context<true>;
 
 class viewing_game_gui_context : public const_game_gui_context {
 public:
-	typedef const_game_gui_context base;
+	using base = const_game_gui_context;
 
-	typedef typename base::rect_world_ref rect_world_ref;
-	typedef typename base::tree_ref tree_ref;
-	typedef typename base::character_gui_ref character_gui_ref;
-	typedef typename base::game_gui_root_ref game_gui_root_ref;
-	typedef typename base::game_gui_system_ref game_gui_system_ref;
+	using rect_world_ref = typename base::rect_world_ref;
+	using tree_ref = typename base::tree_ref;
+	using character_gui_ref = typename base::character_gui_ref;
+	using game_gui_root_ref = typename base::game_gui_root_ref;
+	using game_gui_system_ref = typename base::game_gui_system_ref;
 
 	viewing_game_gui_context(
 		rect_world_ref rect_world,

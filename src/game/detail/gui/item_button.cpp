@@ -420,7 +420,7 @@ void item_button::draw_proc(
 }
 
 bool item_button::is_inventory_root(const const_game_gui_context context, const const_this_in_item this_id) {
-	const bool result = this_id.get_location().item_id == context.get_gui_element_entity();
+	const bool result = this_id.get_location().item_id == context.get_subject_entity();
 	ensure(!result);
 	return result;
 }

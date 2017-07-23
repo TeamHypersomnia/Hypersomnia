@@ -71,10 +71,10 @@ std::wstring value_bar::get_description_for_hover(
 ) {
 	const auto& cosmos = context.get_cosmos();
 	const auto& metas = cosmos.get_global_state();
-	const auto& sentience = context.get_gui_element_entity().get<components::sentience>();
+	const auto& sentience = context.get_subject_entity().get<components::sentience>();
 
 	return visit_by_vertical_index(
-		context.get_gui_element_entity().get<components::sentience>(),
+		context.get_subject_entity().get<components::sentience>(),
 		cosmos,
 		self.get_location().vertical_index,
 		
@@ -142,7 +142,7 @@ void value_bar::draw(
 
 		const auto vertical_index = this_id.get_location().vertical_index;
 			
-		const auto& sentience = context.get_gui_element_entity().get<components::sentience>();
+		const auto& sentience = context.get_subject_entity().get<components::sentience>();
 		
 		const auto current_value_ratio = visit_by_vertical_index(
 			sentience,
@@ -320,7 +320,7 @@ augs::gui::material value_bar::get_icon_mat(
 ) {
 	const auto& cosmos = context.get_cosmos();
 	const auto& metas = cosmos.get_global_state();
-	const auto& sentience = context.get_gui_element_entity().get<components::sentience>();
+	const auto& sentience = context.get_subject_entity().get<components::sentience>();
 
 	return { visit_by_vertical_index(
 		sentience,
@@ -338,7 +338,7 @@ augs::gui::material value_bar::get_bar_mat(
 ) {
 	const auto& cosmos = context.get_cosmos();
 	const auto& metas = cosmos.get_global_state();
-	const auto& sentience = context.get_gui_element_entity().get<components::sentience>();
+	const auto& sentience = context.get_subject_entity().get<components::sentience>();
 
 	return { 
 		context.get_game_gui_system().value_bar_background, 
@@ -364,7 +364,7 @@ bool value_bar::is_enabled(
 
 	return 		
 		visit_by_vertical_index(
-			context.get_gui_element_entity().get<components::sentience>(),
+			context.get_subject_entity().get<components::sentience>(),
 			cosm,
 			vertical_index,
 
@@ -384,7 +384,7 @@ void value_bar::rebuild_layouts(
 	const this_pointer this_id
 ) {
 	const auto vertical_index = this_id.get_location().vertical_index;
-	const auto& sentience = context.get_gui_element_entity().get<components::sentience>();
+	const auto& sentience = context.get_subject_entity().get<components::sentience>();
 
 	const auto& cosmos = context.get_cosmos();
 	const auto& manager = get_assets_manager();

@@ -29,11 +29,11 @@
 
 #include "augs/gui/text/caret.h"
 
-#include "application/menu_ui/menu_ui_root.h"
-#include "application/menu_ui/menu_ui_context.h"
+#include "application/menu/menu_root.h"
+#include "application/menu/menu_context.h"
 
-#include "application/menu_ui/appearing_text.h"
-#include "application/menu_ui/creators_screen.h"
+#include "application/menu/appearing_text.h"
+#include "application/menu/creators_screen.h"
 
 #include "augs/misc/http_requests.h"
 #include "augs/templates/string_templates.h"
@@ -153,24 +153,24 @@ void menu_setup::process(
 
 	vec2i tweened_welcome_message_bg_size;
 
-	menu_ui_rect_world menu_ui_rect_world;
-	menu_ui_root_in_context menu_ui_root_id;
-	menu_ui_root menu_ui_root;
+	menu_rect_world menu_rect_world;
+	menu_root_in_context menu_root_id;
+	menu_root menu_root;
 
-	for (auto& m : menu_ui_root.menu_buttons) {
+	for (auto& m : menu_root.buttons) {
 		m.hover_highlight_maximum_distance = 10.f;
 		m.hover_highlight_duration_ms = 300.f;
 	}
 
-	menu_ui_root.menu_buttons[main_menu_button_type::CONNECT_TO_OFFICIAL_UNIVERSE].set_appearing_caption(format(L"Login to official universe", textes_style));
-	menu_ui_root.menu_buttons[main_menu_button_type::BROWSE_UNOFFICIAL_UNIVERSES].set_appearing_caption(format(L"Browse unofficial universes", textes_style));
-	menu_ui_root.menu_buttons[main_menu_button_type::HOST_UNIVERSE].set_appearing_caption(format(L"Host universe", textes_style));
-	menu_ui_root.menu_buttons[main_menu_button_type::CONNECT_TO_UNIVERSE].set_appearing_caption(format(L"Connect to universe", textes_style));
-	menu_ui_root.menu_buttons[main_menu_button_type::LOCAL_UNIVERSE].set_appearing_caption(format(L"Local universe", textes_style));
-	menu_ui_root.menu_buttons[main_menu_button_type::EDITOR].set_appearing_caption(format(L"Editor", textes_style));
-	menu_ui_root.menu_buttons[main_menu_button_type::SETTINGS].set_appearing_caption(format(L"Settings", textes_style));
-	menu_ui_root.menu_buttons[main_menu_button_type::CREATORS].set_appearing_caption(format(L"Founders", textes_style));
-	menu_ui_root.menu_buttons[main_menu_button_type::QUIT].set_appearing_caption(format(L"Quit", textes_style));
+	menu_root.buttons[main_menu_button_type::CONNECT_TO_OFFICIAL_UNIVERSE].set_appearing_caption(format(L"Login to official universe", textes_style));
+	menu_root.buttons[main_menu_button_type::BROWSE_UNOFFICIAL_UNIVERSES].set_appearing_caption(format(L"Browse unofficial universes", textes_style));
+	menu_root.buttons[main_menu_button_type::HOST_UNIVERSE].set_appearing_caption(format(L"Host universe", textes_style));
+	menu_root.buttons[main_menu_button_type::CONNECT_TO_UNIVERSE].set_appearing_caption(format(L"Connect to universe", textes_style));
+	menu_root.buttons[main_menu_button_type::LOCAL_UNIVERSE].set_appearing_caption(format(L"Local universe", textes_style));
+	menu_root.buttons[main_menu_button_type::EDITOR].set_appearing_caption(format(L"Editor", textes_style));
+	menu_root.buttons[main_menu_button_type::SETTINGS].set_appearing_caption(format(L"Settings", textes_style));
+	menu_root.buttons[main_menu_button_type::CREATORS].set_appearing_caption(format(L"Founders", textes_style));
+	menu_root.buttons[main_menu_button_type::QUIT].set_appearing_caption(format(L"Quit", textes_style));
 
 	appearing_text credits1;
 	credits1.target_text[0] = format(L"hypernet community presents", textes_style);
@@ -205,7 +205,7 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 	std::vector<appearing_text*> title_texts = { &developer_welcome, &hypersomnia_description };
 
 	vec2i tweened_menu_button_size;
-	vec2i target_tweened_menu_button_size = menu_ui_root.get_max_menu_button_size();
+	vec2i target_tweened_menu_button_size = menu_root.get_max_menu_button_size();
 
 	creators_screen creators;
 
@@ -249,7 +249,7 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 		intro_actions.push_non_blocking(act(new augs::tween_value_action<rgba_channel>(title_text_color.a, 255, 500.f)));
 		
 		intro_actions.push_non_blocking(act(new augs::set_value_action<bool>(roll_news, true)));
-		intro_actions.push_non_blocking(act(new augs::set_value_action<vec2i>(menu_ui_rect_world.last_state.mouse.pos, window.get_screen_size()/2)));
+		intro_actions.push_non_blocking(act(new augs::set_value_action<vec2i>(menu_rect_world.last_state.mouse.pos, window.get_screen_size()/2)));
 		intro_actions.push_non_blocking(act(new augs::set_value_action<bool>(draw_menu_gui, true)));
 		
 		for (auto& t : title_texts) {
@@ -261,7 +261,7 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 #endif
 		}
 
-		for (auto& m : menu_ui_root.menu_buttons) {
+		for (auto& m : menu_root.buttons) {
 			augs::action_list acts;
 			m.appearing_caption.push_actions(acts);
 
@@ -340,7 +340,7 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 		session.set_screen_size(screen_size);
 		title_rect.set_position({ screen_size.x / 2.f - title_size.x / 2.f, 50.f });
 		hypersomnia_description.target_pos = title_rect.left_bottom() + vec2(20, 20);
-		menu_ui_rect_world.last_state.screen_size = screen_size;
+		menu_rect_world.last_state.screen_size = screen_size;
 		developer_welcome.target_pos = screen_size - get_text_bbox(developer_welcome.get_total_target_text(), 0) - vec2(70.f, 70.f);
 
 		augs::machine_entropy new_machine_entropy;
@@ -443,8 +443,8 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 
 		if (tweened_menu_button_size.non_zero()) {
 			ltrb buttons_bg;
-			buttons_bg.set_position(menu_ui_root.menu_buttons.front().rc.left_top());
-			buttons_bg.b = menu_ui_root.menu_buttons.back().rc.b;
+			buttons_bg.set_position(menu_root.buttons.front().rc.left_top());
+			buttons_bg.b = menu_root.buttons.back().rc.b;
 			buttons_bg.w(tweened_menu_button_size.x);
 
 			augs::draw_rect_with_border(renderer.get_triangle_buffer(),
@@ -482,49 +482,49 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 
 		renderer.call_and_clear_triangles();
 		
-			menu_ui_root.set_menu_buttons_positions(screen_size);
-			menu_ui_root.set_menu_buttons_sizes(tweened_menu_button_size);
+			menu_root.set_menu_buttons_positions(screen_size);
+			menu_root.set_menu_buttons_sizes(tweened_menu_button_size);
 
-			menu_ui_rect_world::gui_entropy gui_entropies;
+			menu_rect_world::gui_entropy gui_entropies;
 
-			menu_ui_context::tree_type menu_ui_tree;
-			menu_ui_context menu_ui_context(session.config, menu_ui_rect_world, menu_ui_tree, menu_ui_root);
+			menu_context::tree_type menu_tree;
+			menu_context menu_context(session.config, menu_rect_world, menu_tree, menu_root);
 
-			menu_ui_rect_world.build_tree_data_into(menu_ui_context, menu_ui_root_id);
+			menu_rect_world.build_tree_data_into(menu_context, menu_root_id);
 
 			vec2i cursor_drawing_pos;
 
 			if (draw_menu_gui) {
 				if (ImGui::GetIO().WantCaptureMouse) {
 					/* unhover anything that was hovered */
-					menu_ui_rect_world.unhover_and_undrag(menu_ui_context, gui_entropies);
-					menu_ui_rect_world.last_state.mouse.pos = ImGui::GetIO().MousePos;
+					menu_rect_world.unhover_and_undrag(menu_context, gui_entropies);
+					menu_rect_world.last_state.mouse.pos = ImGui::GetIO().MousePos;
 				}
 				else {
 					for (const auto& ch : new_machine_entropy.local) {
-						menu_ui_rect_world.consume_raw_input_and_generate_gui_events(menu_ui_context, menu_ui_root_id, ch, gui_entropies);
+						menu_rect_world.consume_raw_input_and_generate_gui_events(menu_context, menu_root_id, ch, gui_entropies);
 					}
 				
-					ImGui::GetIO().MousePos = vec2(menu_ui_rect_world.last_state.mouse.pos);
+					ImGui::GetIO().MousePos = vec2(menu_rect_world.last_state.mouse.pos);
 				
-					menu_ui_rect_world.call_idle_mousemotion_updater(menu_ui_context, menu_ui_root_id, gui_entropies);
+					menu_rect_world.call_idle_mousemotion_updater(menu_context, menu_root_id, gui_entropies);
 				}
 
 				cursor_drawing_pos = ImGui::GetIO().MousePos;
 			}
 
-			menu_ui_rect_world.respond_to_events(menu_ui_context, menu_ui_root_id, gui_entropies);
-			menu_ui_rect_world.advance_elements(menu_ui_context, menu_ui_root_id, vdt);
+			menu_rect_world.respond_to_events(menu_context, menu_root_id, gui_entropies);
+			menu_rect_world.advance_elements(menu_context, menu_root_id, vdt);
 
-			menu_ui_root.set_menu_buttons_colors(tweened_menu_button_color);
-			menu_ui_rect_world.rebuild_layouts(menu_ui_context, menu_ui_root_id);
+			menu_root.set_menu_buttons_colors(tweened_menu_button_color);
+			menu_rect_world.rebuild_layouts(menu_context, menu_root_id);
 
-			menu_ui_rect_world.draw(renderer.get_triangle_buffer(), menu_ui_context, menu_ui_root_id);
+			menu_rect_world.draw(renderer.get_triangle_buffer(), menu_context, menu_root_id);
 
-			for (size_t i = 0; i < menu_ui_root.menu_buttons.size(); ++i) {
-				if (menu_ui_root.menu_buttons[i].click_callback_required) {
+			for (size_t i = 0; i < menu_root.buttons.size(); ++i) {
+				if (menu_root.buttons[i].click_callback_required) {
 					menu_callback(static_cast<main_menu_button_type>(i));
-					menu_ui_root.menu_buttons[i].click_callback_required = false;
+					menu_root.buttons[i].click_callback_required = false;
 				}
 			}
 
@@ -539,7 +539,7 @@ We wish you an exciting journey through architecture of our cosmos.\n", textes_s
 			auto gui_cursor = assets::game_image_id::GUI_CURSOR;
 		
 			if (
-				menu_ui_context.alive(menu_ui_rect_world.rect_hovered)
+				menu_context.alive(menu_rect_world.rect_hovered)
 				|| ImGui::IsAnyItemHoveredWithHandCursor()
 			) {
 				gui_cursor = assets::game_image_id::GUI_CURSOR_HOVER;

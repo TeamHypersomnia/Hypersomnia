@@ -92,7 +92,7 @@ void slot_button::draw(const viewing_game_gui_context context, const const_this_
 		}
 	}
 
-	const bool is_child_of_root = slot_id.get_container() == context.get_gui_element_entity();
+	const bool is_child_of_root = slot_id.get_container() == context.get_subject_entity();
 
 	if (!is_child_of_root) {
 		const_dereferenced_location<item_button_in_item> child_item_button

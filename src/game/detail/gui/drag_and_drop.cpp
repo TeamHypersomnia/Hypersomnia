@@ -40,7 +40,7 @@ void drag_and_drop_callback(
 			if (hotbar_location != nullptr) {
 				gui.clear_hotbar_button_assignment(
 					hotbar_location.get_location().index, 
-					context.get_gui_element_entity()
+					context.get_subject_entity()
 				);
 			}
 			else {
@@ -64,7 +64,7 @@ void drag_and_drop_callback(
 		else if constexpr (std::is_same_v<T, drop_for_hotbar_assignment>) {
 			const auto dereferenced_button = context.dereference_location(transfer_data.assign_to);
 			const auto new_assigned_item = cosmos[transfer_data.item_id];
-			const auto owner_transfer_capability = context.get_gui_element_entity();
+			const auto owner_transfer_capability = context.get_subject_entity();
 
 			ensure(dereferenced_button != nullptr);
 
@@ -97,7 +97,7 @@ std::optional<drag_and_drop_result> prepare_drag_and_drop_result(
 ) {
 	const auto& cosmos = context.get_cosmos();
 	const auto& element = context.get_character_gui();
-	const auto owning_transfer_capability = context.get_gui_element_entity();
+	const auto owning_transfer_capability = context.get_subject_entity();
 
 	std::optional<drag_and_drop_result> output;
 

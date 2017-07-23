@@ -494,7 +494,7 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 ) const {
 	const auto& rect_world = context.get_rect_world();
 	const auto& cosmos = context.get_cosmos();
-	const auto gui_entity = context.get_gui_element_entity();
+	const auto gui_entity = context.get_subject_entity();
 	auto& output_buffer = context.get_output_buffer();
 
 	gui::text::formatted_string tooltip_text;
