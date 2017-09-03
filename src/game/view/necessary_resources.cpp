@@ -6,7 +6,7 @@
 
 #include "game/view/game_drawing_settings.h"
 
-#include "game/hardcoded_content/necessary_collections.h"
+#include "game/view/necessary_resources.h"
 
 #include "application/content_regeneration/procedural_image.h"
 

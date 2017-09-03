@@ -7,7 +7,7 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
 
-#include "game/hardcoded_content/necessary_collections.h"
+#include "game/view/necessary_resources.h"
 
 #include "game/systems_stateless/render_system.h"
 

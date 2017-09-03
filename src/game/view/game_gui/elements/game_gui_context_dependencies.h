@@ -1,6 +1,6 @@
 #pragma once
 #include "game/assets/assets_declarations.h"
-#include "game/hardcoded_content/necessary_collections.h"
+#include "game/view/necessary_resources.h"
 
 namespace augs {
 	struct baked_font;

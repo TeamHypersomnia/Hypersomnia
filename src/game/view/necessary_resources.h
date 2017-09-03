@@ -10,7 +10,7 @@
 #include "augs/templates/exception_templates.h"
 
 #include "game/assets/game_image.h"
-#include "game/assets/game_image_id.h"
+#include "game/view/necessary_image_id.h"
 
 /*
 	Collections of resources that are necessary for the game to function properly,

@@ -2,7 +2,7 @@
 #include "augs/misc/machine_entropy.h"
 #include "augs/gui/formatted_string.h"
 
-#include "game/hardcoded_content/necessary_collections.h"
+#include "game/view/necessary_resources.h"
 
 #include "application/gui/ingame_menu_button_type.h"
 #include "application/gui/menu/menu_context.h"

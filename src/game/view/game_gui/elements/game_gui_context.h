@@ -6,7 +6,7 @@
 #include "augs/gui/basic_gui_context.h"
 #include "augs/math/camera_cone.h"
 
-#include "game/hardcoded_content/necessary_collections.h"
+#include "game/view/necessary_resources.h"
 #include "game/enums/input_context_enums.h"
 #include "game/transcendental/entity_handle.h"
 

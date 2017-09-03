@@ -7,7 +7,7 @@
 #include "application/gui/menu/menu_element_location.h"
 #include "application/gui/menu/menu_root.h"
 
-#include "game/hardcoded_content/necessary_collections.h"
+#include "game/view/necessary_resources.h"
 
 template <bool is_const, class Enum>
 class menu_context : public augs::gui::basic_context<menu_element_location<Enum>, is_const, menu_context<is_const, Enum>> {
