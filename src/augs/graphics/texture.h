@@ -15,7 +15,7 @@ namespace augs {
 			void destroy();
 		
 		public:
-			texture(const augs::image& rgba_source);
+			texture(const image& rgba_source);
 			texture(const vec2u size);
 
 			~texture();
@@ -26,8 +26,8 @@ namespace augs {
 			texture(const texture&) = delete;
 			texture& operator=(const texture&) = delete;
 
-			static void unbind();
 			void bind() const;
+			static void unbind();
 		};
 	}
 }

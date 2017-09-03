@@ -141,13 +141,12 @@ auto found_or_default(Container&& container, Key&& key) {
 }
 
 template <class Container, class Key>
-auto found_or_nullptr(Container&& container, Key&& key) {
+auto* found_or_nullptr(Container&& container, Key&& key) {
 	const auto it = find_in(std::forward<Container>(container), std::forward<Key>(key));
 
-	const bool found = it != container.end();
 	using ptr_type = decltype(std::addressof((*it).second));
 
-	if (found) {
+	if (const bool found = it != container.end()) {
 		return std::addressof((*it).second);
 	}
 
@@ -157,4 +156,28 @@ auto found_or_nullptr(Container&& container, Key&& key) {
 template <class Container, class T>
 void fill_container(Container& c, T&& val) {
 	std::fill(c.begin(), c.end(), std::forward<T>(val));
+}
+
+template <class Container>
+auto first_free_key(const Container& in) {
+	for (std::size_t candidate = 0;;++candidate) {
+		const auto key = static_cast<Container::key_type>(key);
+		const auto it = in.find(key);
+
+		if (it == in.end()) {
+			return key;
+		}
+	}
+}
+
+template <class Container, class F>
+void for_each_in(const Container& in, F callback) {
+	for (auto& element : in) {
+		callback(element);
+	}
+}
+
+template <class C1, class C2>
+auto compare_containers(const C1& c1, const C2& c2) {
+	return std::equal(std::begin(c1), std::end(c1), std::begin(c2));
 }

@@ -3,10 +3,11 @@
 #include "augs/misc/timer.h"
 
 namespace augs {
-	struct smooth_value_field_settings {
-		// GEN INTROSPECTOR struct smooth_value_field_settings
-		double averages_per_sec = 0.0;
-		double smoothing_average_factor = 0.5;
+	template <class T>
+	struct smoothing_settings {
+		// GEN INTROSPECTOR struct augs::smoothing_settings class T
+		T averages_per_sec = static_cast<T>(1.0);
+		T average_factor = static_cast<T>(0.5);
 		// END GEN INTROSPECTOR
 	};
 
@@ -15,6 +16,6 @@ namespace augs {
 		vec2 value;
 		vec2 target_value;
 
-		void tick(const double delta_seconds, const smooth_value_field_settings);
+		void tick(const double delta_seconds, const smoothing_settings<double>);
 	};
 }

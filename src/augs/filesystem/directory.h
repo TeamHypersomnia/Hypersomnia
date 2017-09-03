@@ -4,16 +4,17 @@
 
 #include <experimental/filesystem>
 
+#include "augs/filesystem/path.h"
+
 namespace augs {
+	bool create_directory(const path_type& dir_path);
+	bool create_directories(path_type dir_path);
 
-	bool create_directory(const std::string& dir_path);
-	bool create_directories(const std::string& dir_path);
+	std::vector<path_type> get_all_files_in_directory(const path_type& dir);
 
-	std::vector<std::string> get_all_files_in_directory(const std::string& dir);
-
-	template <class P, class F>
+	template <class F>
 	void for_each_file_in_dir_recursive(
-		const P& path,
+		const path_type& path,
 		F callback
 	) {
 		namespace fs = std::experimental::filesystem;
@@ -25,5 +26,5 @@ namespace augs {
 		}
 	}
 
-	std::string get_executable_directory();
+	path_type get_executable_directory();
 }

@@ -11,7 +11,7 @@
 
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/logic_step.h"
-#include "game/assets/assets_manager.h"
+#include "game/assets/all_assets.h"
 
 using namespace augs;
 
@@ -97,7 +97,7 @@ void components::animation::set_current_frame(unsigned number) {
 
 void animation_system::progress_animation_states(const logic_step step) {
 	auto& cosmos = step.cosm;
-	const auto& metas = step.input.metas_of_assets;
+	const auto& metas = step.input.logical_assets;
 	const auto& delta = step.get_delta();
 
 	cosmos.for_each(
@@ -169,7 +169,8 @@ void animation_system::progress_animation_states(const logic_step step) {
 				auto& sprite = it.get<components::sprite>();
 
 				sprite.set(
-					animation.frames[animation_state.get_current_frame()].image_id
+					animation.frames[animation_state.get_current_frame()].image_id,
+					metas
 				);
 			}
 		}

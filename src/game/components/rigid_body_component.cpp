@@ -146,7 +146,7 @@ void component_synchronizer<false, P>::apply_force(
 
 	if (DEBUG_DRAWING.draw_forces && force.non_zero()) {
 		auto& lines = augs::renderer::get_current().logic_lines;
-		lines.draw_green(to_pixels(location) + to_pixels(force), to_pixels(location));
+		lines.emplace_back(green, to_pixels(location) + to_pixels(force), to_pixels(location));
 	}
 }
 
@@ -177,7 +177,7 @@ void component_synchronizer<false, P>::apply_impulse(
 
 	if (DEBUG_DRAWING.draw_forces && force.non_zero()) {
 		auto& lines = augs::renderer::get_current().persistent_lines;
-		lines.draw_green(to_pixels(location) + to_pixels(force), to_pixels(location));
+		lines.emplace_back(green, to_pixels(location) + to_pixels(force), to_pixels(location));
 	}
 }
 

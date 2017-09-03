@@ -1,16 +1,13 @@
-#include "aabb_highlighter.h"
-#include "game/components/sprite_component.h"
-#include "game/components/crosshair_component.h"
+#include "augs/drawing/drawing.h"
+
 #include "game/transcendental/entity_handle.h"
-#include "game/view/viewing_session.h"
 #include "game/transcendental/cosmos.h"
-#include "game/systems_audiovisual/interpolation_system.h"
-
-#include "game/components/all_inferred_state_component.h"
-
 #include "game/transcendental/types_specification/all_component_includes.h"
+
+#include "game/systems_audiovisual/interpolation_system.h"
+#include "game/detail/gui/aabb_highlighter.h"
+
 #include "generated/introspectors.h"
-#include "augs/graphics/drawers.h"
 
 void aabb_highlighter::update(const float delta_ms) {
 	timer += delta_ms;
@@ -35,20 +32,15 @@ bool aabb_highlighter::is_hoverable(const const_entity_handle e) {
 	return true;
 }
 
-void aabb_highlighter::draw(
-	augs::vertex_triangle_buffer& output,
-	const const_entity_handle subject,
-	const interpolation_system& interp,
-	const camera_cone camera
-) const {
+void aabb_highlighter::draw(const aabb_highlighter_drawing_input in) const {
 	ltrb aabb;
 
-	const auto aabb_expansion_lambda = [&aabb, &interp](const const_entity_handle e) {
+	const auto aabb_expansion_lambda = [&aabb, in](const const_entity_handle e) {
 		if (!is_hoverable(e)) {
 			return false;
 		}
 
-		const auto new_aabb = e.get_aabb(get_assets_manager(), interp);
+		const auto new_aabb = e.get_aabb(in.interp);
 
 		if (aabb.good() && new_aabb.good()) {
 			aabb.contain(new_aabb);
@@ -60,8 +52,8 @@ void aabb_highlighter::draw(
 		return true;
 	};
 
-	aabb_expansion_lambda(subject);
-	subject.for_each_child_entity_recursive(aabb_expansion_lambda);
+	aabb_expansion_lambda(in.subject);
+	in.subject.for_each_child_entity_recursive(aabb_expansion_lambda);
 
 	const auto lesser_dimension = std::min(aabb.w(), aabb.h());
 	
@@ -77,55 +69,29 @@ void aabb_highlighter::draw(
 	const int current_length{ static_cast<int>(augs::interp(adjusted_biggest_length, adjusted_smallest, timer / cycle_duration_ms)) };
 	const int gap_animated_expansion{ static_cast<int>(current_length - adjusted_smallest) };
 
-	const float gap_x = base_gap + gap_animated_expansion+length_decrease;
-	const float gap_y = base_gap + gap_animated_expansion+length_decrease;
+	const vec2 gap = {
+		base_gap + gap_animated_expansion + length_decrease,
+		base_gap + gap_animated_expansion + length_decrease
+	};
 	
-	aabb.l -= gap_x;
-	aabb.r += gap_x;
-	aabb.t -= gap_y;
-	aabb.b += gap_y;
+	aabb.expand_from_center(gap);
 
-	vec2i as = aabb.get_size();
-	vec2i ap = aabb.get_position();
-
-	// const auto& manager = get_assets_manager();
+	const vec2i as = aabb.get_size();
+	const vec2i ap = in.camera[aabb.get_position()];
 
 	if (aabb.good()) {
-		components::sprite::drawing_input state(output);
-		state.camera = camera;
-		state.renderable_transform.rotation = 0;
+		in.output
+			.aabb(ltrb(ap, vec2i { current_length, 1 }), cyan)
+			.aabb(ltrb(ap, vec2i { 1, current_length }), cyan)
 
-		components::sprite border;
-		border.tex = assets::game_image_id::BLANK;
-		border.color = cyan;
+			.aabb(ltrb(ap + vec2i(as.x - current_length, 0), vec2i { current_length, 1 }), cyan)
+			.aabb(ltrb(ap + vec2i(as.x - 1, 0), vec2i { 1, current_length }), cyan)
 
-		auto& pos = state.renderable_transform.pos;
+			.aabb(ltrb(ap + vec2i(0, as.y - current_length), vec2i { 1, current_length }), cyan)
+			.aabb(ltrb(ap + vec2i(0, as.y - 1), vec2i { current_length, 1 }), cyan)
 
-		pos = ap;
-		border.overridden_size.set(current_length, 1);
-		border.draw_from_lt(state);
-		border.overridden_size.set(1, current_length);
-		border.draw_from_lt(state);
-
-		pos = ap + vec2i(as.x - current_length, 0);
-		border.overridden_size.set(current_length, 1);
-		border.draw_from_lt(state);
-		pos = ap + vec2i(as.x - 1, 0);
-		border.overridden_size.set(1, current_length);
-		border.draw_from_lt(state);
-
-		pos = ap + vec2i(0, as.y - current_length);
-		border.overridden_size.set(1, current_length);
-		border.draw_from_lt(state);
-		pos = ap + vec2i(0, as.y - 1);
-		border.overridden_size.set(current_length, 1);
-		border.draw_from_lt(state);
-
-		pos = ap + vec2i(as.x - current_length, as.y - 1);
-		border.overridden_size.set(current_length, 1);
-		border.draw_from_lt(state);
-		pos = ap + vec2i(as.x - 1, as.y - current_length);
-		border.overridden_size.set(1, current_length);
-		border.draw_from_lt(state);
+			.aabb(ltrb(ap + vec2i(as.x - current_length, as.y - 1), vec2i { current_length, 1 }), cyan)
+			.aabb(ltrb(ap + vec2i(as.x - 1, as.y - current_length), vec2i { 1, current_length }), cyan)
+		;
 	}
 }

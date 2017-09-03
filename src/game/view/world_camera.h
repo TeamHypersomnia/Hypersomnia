@@ -2,7 +2,7 @@
 #include "augs/math/vec2.h"
 #include "game/components/transform_component.h"
 #include "augs/misc/smooth_value_field.h"
-#include "game/detail/camera_cone.h"
+#include "augs/math/camera_cone.h"
 #include "game/transcendental/entity_handle_declaration.h"
 
 namespace augs {
@@ -13,10 +13,10 @@ class interpolation_system;
 
 struct world_camera_settings {
 	// GEN INTROSPECTOR struct world_camera_settings
-	augs::smooth_value_field_settings smooth_value_field_settings; 
+	augs::smoothing_settings<double> additional_position_smoothing;
+	augs::smoothing_settings<float> smoothing;
+
 	float angled_look_length = 100.f;
-	float smoothing_average_factor = 0.5;
-	float averages_per_sec = 25;
 	bool enable_smoothing = true;
 	// END GEN INTROSPECTOR
 };
@@ -33,11 +33,10 @@ struct world_camera {
 	vec2 player_position_previously_seen;
 	vec2 player_position_at_previous_step;
 
-	augs::smooth_value_field smoothing_player_pos;
-
-	void configure_size(vec2);
+	augs::smooth_value_field additional_position_smoothing;
 
 	void tick(
+		const vec2i screen_size,
 		const interpolation_system& interp, 
 		augs::delta dt,
 		world_camera_settings settings,

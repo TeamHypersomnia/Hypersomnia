@@ -4,13 +4,12 @@
 
 #include "augs/graphics/rgba.h"
 #include "augs/templates/settable_as_current_mixin.h"
+#include "augs/templates/exception_templates.h"
 #include "augs/math/vec2.h"
+#include "augs/filesystem/path.h"
 
 using GLuint = unsigned int;
 using GLint = int;
-
-using vec3 = std::array<float, 3>;
-using vec4 = std::array<float, 4>;
 
 #define STORE_SHADERS_IN_PROGRAM 0
 
@@ -31,7 +30,7 @@ namespace augs {
 
 			void create(
 				const type shader_type,
-				const std::string& path
+				const std::string& source_code
 			);
 
 			void destroy();
@@ -39,7 +38,7 @@ namespace augs {
 		public:
 			shader(
 				const type shader_type,
-				const std::string& file_path
+				const path_type& source_path
 			);
 
 			~shader();
@@ -73,8 +72,8 @@ namespace augs {
 			);
 
 			shader_program(
-				const std::string& vertex_shader_path,
-				const std::string& fragment_shader_path
+				const path_type& vertex_shader_path,
+				const path_type& fragment_shader_path
 			);
 
 			~shader_program();
@@ -103,6 +102,50 @@ namespace augs {
 			void set_uniform(const std::string& name, Args&&... args) const {
 				set_uniform(get_uniform_location(name), std::forward<Args>(args)...);
 			}
+		};
+
+		struct shader_error : error_with_typesafe_sprintf {
+			using error_with_typesafe_sprintf::error_with_typesafe_sprintf;
+		};
+
+		struct shader_compilation_error : shader_error {
+			static auto describe_shader_type(const shader::type t) {
+				std::string result;
+
+				switch (t) {
+				case shader::type::VERTEX: result = "a vertex shader";
+				case shader::type::FRAGMENT: result = "a fragment shader";
+				default: result = "an unknown shader";
+				}
+
+				return result;
+			}
+
+			explicit shader_compilation_error(
+				shader::type type,
+				const std::string& shader_source,
+				const std::string& error_message
+			) : 
+				shader_error(
+					"Failed to compile %x. Error message:\n%x\nSource code: %x",
+					describe_shader_type(type),
+					shader_source,
+					error_message
+				) 
+			{}
+		};
+
+		struct shader_program_build_error : shader_error {
+			explicit shader_program_build_error(
+				const GLuint id,
+				const std::string& error_message
+			) : 
+				shader_error(
+					"Failed to build shader program id: %x. Error message:\n%x",
+					id,
+					error_message
+				) 
+			{}
 		};
 	}
 }

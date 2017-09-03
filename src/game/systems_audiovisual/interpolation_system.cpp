@@ -93,7 +93,7 @@ void interpolation_system::integrate_interpolated_transforms(
 			const auto& ver = e.get_id().version;
 
 			if (recorded_pob == pob && recorded_ver == ver) {
-				integrated = actual.interpolated_separate(integrated, positional_averaging_constant, rotational_averaging_constant);
+				integrated = actual.interp_separate(integrated, positional_averaging_constant, rotational_averaging_constant);
 			}
 			else {
 				integrated = actual;

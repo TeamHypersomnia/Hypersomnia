@@ -2,7 +2,8 @@
 #include "game/detail/gui/game_gui_element_location.h"
 #include "character_gui.h"
 
-#include "game/view/viewing_step.h"
+#include "augs/gui/text/printer.h"
+
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/detail/gui/game_gui_root.h"
@@ -19,7 +20,7 @@
 #include "game/systems_stateless/render_system.h"
 #include "game/systems_audiovisual/game_gui_system.h"
 
-#include "game/detail/gui/character_gui_drawing_input.h"
+#include "game/detail/gui/viewing_game_gui_context_dependencies.h"
 #include "game/detail/gui/drag_and_drop.h"
 #include "game/detail/gui/aabb_highlighter.h"
 #include "augs/graphics/renderer.h"
@@ -29,7 +30,7 @@
 
 #include "augs/templates/string_templates.h"
 
-#include "augs/graphics/drawers.h"
+#include "augs/drawing/drawing.h"
 #include "augs/templates/visit_gettable.h"
 #include "game/detail/wielding_result.h"
 #include "game/detail/spells/spell_structs.h"
@@ -57,24 +58,12 @@ xywh character_gui::get_rectangle_for_slot_function(const slot_function f) {
 	return xywh(0, 0, 0, 0);
 }
 
-vec2i character_gui::get_gui_crosshair_position() const {
-	return rect_world.last_state.mouse.pos;
+vec2i character_gui::get_initial_position_for(const vec2i screen_size, const drag_and_drop_target_drop_item&) const {
+	return vec2i(screen_size.x - 150, 30);
 }
 
-void character_gui::set_screen_size(const vec2i s) {
-	rect_world.set_screen_size(s);
-}
-
-vec2i character_gui::get_screen_size() const {
-	return rect_world.last_state.screen_size;
-}
-
-vec2i character_gui::get_initial_position_for(const drag_and_drop_target_drop_item&) const {
-	return vec2i(get_screen_size().x - 150, 30);
-}
-
-vec2 character_gui::initial_inventory_root_position() const {
-	return vec2(get_screen_size().x - 250.f, get_screen_size().y - 200.f);
+vec2 character_gui::initial_inventory_root_position(const vec2i screen_size) const {
+	return vec2(screen_size.x - 250.f, screen_size.y - 200.f);
 }
 
 const character_gui::hotbar_selection_setup& character_gui::get_current_hotbar_selection_setup() const {
@@ -289,79 +278,46 @@ character_gui::hotbar_selection_setup character_gui::get_actual_selection_setup(
 	return output;
 }
 
-void character_gui::draw(const character_gui_drawing_input input) const {
-	const auto gui_entity = input.viewed_character;
-
-	game_gui_root root_of_gui(get_screen_size());
-	game_gui_rect_tree tree;
-
-	const auto context = viewing_game_gui_context(
-		rect_world,
-		*this,
-		gui_entity,
-		tree,
-		input
-	);
-
-	rect_world.build_tree_data_into(context);
-	rect_world.draw(context.get_output_buffer(), context);
-}
-
-void character_gui::draw_cursor_with_information(const character_gui_drawing_input input) const {
-	const auto gui_entity = input.viewed_character;
-
-	game_gui_root root_of_gui(get_screen_size());
-	game_gui_rect_tree tree;
-
-	const auto context = viewing_game_gui_context(
-		rect_world,
-		*this,
-		gui_entity,
-		tree,
-		input
-	);
-
-	rect_world.build_tree_data_into(context);
-	draw_cursor_with_information(context);
-}
-
 void character_gui::draw_cursor_with_information(const viewing_game_gui_context context) const {
 	const auto drag_amount = context.get_rect_world().current_drag_amount;
-	const auto& manager = get_assets_manager();
+	const auto& manager = context.get_requisite_images();
 
-	auto& output_buffer = context.get_output_buffer();
-	auto gui_cursor = assets::game_image_id::GUI_CURSOR;
+	const auto& rect_world = context.get_rect_world();
+	const auto output = context.get_output();
+	auto gui_cursor = assets::requisite_image_id::GUI_CURSOR;
 	auto gui_cursor_color = white;
+
+	auto get_gui_crosshair_position = [&rect_world]() {
+		return rect_world.last_state.mouse.pos;
+	};
+
 	auto gui_cursor_position = get_gui_crosshair_position();
+	const auto screen_size = context.screen_size;
 
 	auto get_tooltip_position = [&]() {
 		return get_gui_crosshair_position() + manager.at(gui_cursor).get_size();
 	};
 
 	auto draw_cursor_hint = [&](const auto& hint_text, const vec2i cursor_position, const vec2i cursor_size) {
-		vec2i bg_sprite_size;
+		const auto text = formatted_string(hint_text, context.get_gui_font());
 
-		augs::gui::text_drawer drop_hint_drawer;
-
-		drop_hint_drawer.set_text(gui::text::format(std::wstring(hint_text), gui::text::style()));
-
-		bg_sprite_size.set(drop_hint_drawer.get_bbox());
-		bg_sprite_size.y = std::max(cursor_size.y, drop_hint_drawer.get_bbox().y);
+		vec2i bg_sprite_size = get_text_bbox(text);
+		bg_sprite_size.y = std::max(cursor_size.y, bg_sprite_size.y);
 		bg_sprite_size.x += cursor_size.x;
 
-		const auto hint_rect = ltrbi(cursor_position, bg_sprite_size).snap_to_bounds(ltrbi(vec2i(0, 0), get_screen_size() - vec2i(1, 1)));
+		const auto hint_rect = ltrbi(cursor_position, bg_sprite_size).snap_to_bounds(ltrbi(vec2i(0, 0), screen_size - vec2i(1, 1)));
 
-		augs::draw_rect_with_border(
-			output_buffer,
+		output.aabb_with_border(
 			hint_rect,
-			{ 0, 0, 0, 180 },
+			rgba(0, 0, 0, 180),
 			rgba(255, 255, 255, 35)
 		);
 
-		drop_hint_drawer.pos = hint_rect.get_position() + vec2i(cursor_size.x + 2, 0);
-
-		drop_hint_drawer.draw_stroke(output_buffer, black);
-		drop_hint_drawer.draw(output_buffer);
+		augs::gui::text::print_stroked(
+			output,
+			hint_rect.get_position() + vec2i(cursor_size.x + 2, 0),
+			text
+		);
 
 		return hint_rect.get_position();
 	};
@@ -370,13 +326,11 @@ void character_gui::draw_cursor_with_information(const viewing_game_gui_context 
 		return context.get_tree_entry(l).get_absolute_pos();
 	};
 
-	const auto& rect_world = context.get_rect_world();
-
 	const bool is_dragging = rect_world.is_currently_dragging();
 
 	if (!is_dragging) {
 		if (context.alive(rect_world.rect_hovered)) {
-			gui_cursor = assets::game_image_id::GUI_CURSOR_HOVER;
+			gui_cursor = assets::requisite_image_id::GUI_CURSOR_HOVER;
 		}
 
 		draw_tooltip_from_hover_or_world_highlight(context, get_tooltip_position());
@@ -395,9 +349,9 @@ void character_gui::draw_cursor_with_information(const viewing_game_gui_context 
 					if (hotbar_location != nullptr) {
 						const auto drawn_pos = drag_amount + get_absolute_pos(hotbar_location) - get_absolute_pos(dragged_item_button);
 
-						dragged_item_button->draw_complete_dragged_ghost(context, dragged_item_button, output_buffer, drawn_pos);
+						dragged_item_button->draw_complete_dragged_ghost(context, dragged_item_button, drawn_pos);
 
-						gui_cursor = assets::game_image_id::GUI_CURSOR_MINUS;
+						gui_cursor = assets::requisite_image_id::GUI_CURSOR_MINUS;
 						gui_cursor_color = red;
 
 						gui_cursor_position = draw_cursor_hint(L"Clear assignment", get_gui_crosshair_position(), manager.at(gui_cursor).get_size());
@@ -405,8 +359,8 @@ void character_gui::draw_cursor_with_information(const viewing_game_gui_context 
 					else {
 						const auto drawn_pos = drag_amount;
 
-						dragged_item_button->draw_complete_dragged_ghost(context, dragged_item_button, output_buffer, drawn_pos);
-						dragged_item_button->draw_grid_border_ghost(context, dragged_item_button, output_buffer, drawn_pos);
+						dragged_item_button->draw_complete_dragged_ghost(context, dragged_item_button, drawn_pos);
+						dragged_item_button->draw_grid_border_ghost(context, dragged_item_button, drawn_pos);
 					}
 
 					const auto& item = context.get_cosmos()[dragged_item_button.get_location().item_id].get<components::item>();
@@ -416,13 +370,11 @@ void character_gui::draw_cursor_with_information(const viewing_game_gui_context 
 
 						const auto charges_text = to_wstring(dragged_charges);
 
-						augs::gui::text_drawer dragged_charges_drawer;
-
-						dragged_charges_drawer.set_text(augs::gui::text::format(charges_text, text::style()));
-						dragged_charges_drawer.pos = get_gui_crosshair_position() + vec2i(0, int(gui_cursor_size.y));
-
-						dragged_charges_drawer.draw_stroke(output_buffer, black);
-						dragged_charges_drawer.draw(output_buffer);
+						augs::gui::text::print_stroked(
+							output,
+							get_gui_crosshair_position() + vec2i(0, int(gui_cursor_size.y)),
+							{ charges_text, { context.get_gui_font(), white } }
+						);
 					}
 				}
 				else if constexpr (std::is_same_v<T, drop_for_hotbar_assignment>) {
@@ -433,15 +385,15 @@ void character_gui::draw_cursor_with_information(const viewing_game_gui_context 
 					if (hotbar_location != nullptr) {
 						const auto drawn_pos = drag_amount + get_absolute_pos(hotbar_location) - get_absolute_pos(dragged_item_button);
 
-						dragged_item_button->draw_complete_dragged_ghost(context, dragged_item_button, output_buffer, drawn_pos);
+						dragged_item_button->draw_complete_dragged_ghost(context, dragged_item_button, drawn_pos);
 					}
 					else {
 						const auto drawn_pos = drag_amount;
-						dragged_item_button->draw_complete_dragged_ghost(context, dragged_item_button, output_buffer, drag_amount);
+						dragged_item_button->draw_complete_dragged_ghost(context, dragged_item_button, drag_amount);
 					}
 
 					if (!(transfer_data.source_hotbar_button_id == transfer_data.assign_to)) {
-						gui_cursor = assets::game_image_id::GUI_CURSOR_ADD;
+						gui_cursor = assets::requisite_image_id::GUI_CURSOR_ADD;
 						gui_cursor_color = green;
 					}
 
@@ -453,26 +405,32 @@ void character_gui::draw_cursor_with_information(const viewing_game_gui_context 
 					const auto hotbar_location = context.dereference_location(transfer_data.source_hotbar_button_id);
 
 					if (hotbar_location != nullptr) {
-						dragged_item_button->draw_complete_dragged_ghost(context, dragged_item_button, output_buffer, drag_amount
-							+ get_absolute_pos(hotbar_location) - get_absolute_pos(dragged_item_button)
+						dragged_item_button->draw_complete_dragged_ghost(
+							context, 
+							dragged_item_button,
+							drag_amount + get_absolute_pos(hotbar_location) - get_absolute_pos(dragged_item_button)
 						);
 					}
 					else {
-						dragged_item_button->draw_complete_dragged_ghost(context, dragged_item_button, output_buffer, drag_amount);
+						dragged_item_button->draw_complete_dragged_ghost(
+							context, 
+							dragged_item_button, 
+							drag_amount
+						);
 					}
 
 					const auto& transfer_result = transfer_data.result.result;
 
 					if (transfer_result == item_transfer_result_type::SUCCESSFUL_DROP) {
-						gui_cursor = assets::game_image_id::GUI_CURSOR_MINUS;
+						gui_cursor = assets::requisite_image_id::GUI_CURSOR_MINUS;
 						gui_cursor_color = red;
 					}
 					else if (transfer_result == item_transfer_result_type::SUCCESSFUL_TRANSFER) {
-						gui_cursor = assets::game_image_id::GUI_CURSOR_ADD;
+						gui_cursor = assets::requisite_image_id::GUI_CURSOR_ADD;
 						gui_cursor_color = green;
 					}
 					else if (transfer_result != item_transfer_result_type::THE_SAME_SLOT) {
-						gui_cursor = assets::game_image_id::GUI_CURSOR_ERROR;
+						gui_cursor = assets::requisite_image_id::GUI_CURSOR_ERROR;
 						gui_cursor_color = red;
 					}
 
@@ -485,7 +443,7 @@ void character_gui::draw_cursor_with_information(const viewing_game_gui_context 
 		}
 	}
 
-	augs::draw_rect(output_buffer, gui_cursor_position, gui_cursor, gui_cursor_color);
+	output.aabb_lt(manager.at(gui_cursor), vec2(gui_cursor_position), gui_cursor_color);
 }
 
 void character_gui::draw_tooltip_from_hover_or_world_highlight(
@@ -495,11 +453,12 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 	const auto& rect_world = context.get_rect_world();
 	const auto& cosmos = context.get_cosmos();
 	const auto gui_entity = context.get_subject_entity();
-	auto& output_buffer = context.get_output_buffer();
+	const auto output = context.get_output();
+	const auto screen_size = context.screen_size;
 
-	gui::text::formatted_string tooltip_text;
+	formatted_string tooltip_text;
 
-	const auto description_style = text::style(assets::font_id::GUI_FONT, vslightgray);
+	const auto description_style = text::style(context.get_gui_font(), vslightgray);
 
 	const auto hovered = rect_world.rect_hovered;
 
@@ -511,23 +470,23 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 				using T = std::decay_t<decltype(location)>;
 
 				if constexpr(std::is_same_v<T, item_button_in_item>) {
-					tooltip_text = text::format_as_bbcode(get_bbcoded_entity_details(cosmos[location.item_id]), description_style);
+					tooltip_text = text::from_bbcode(get_bbcoded_entity_details(cosmos[location.item_id]), description_style);
 				}
 				else if constexpr(std::is_same_v<T, slot_button_in_container>) {
-					tooltip_text = text::format_as_bbcode(get_bbcoded_slot_details(cosmos[location.slot_id]), text::style());
+					tooltip_text = text::from_bbcode(get_bbcoded_slot_details(cosmos[location.slot_id]), context.get_gui_font());
 				}
 				else if constexpr(std::is_same_v<T, hotbar_button_in_character_gui>) {
 					const auto assigned_entity = dereferenced->get_assigned_entity(gui_entity);
 
 					if (assigned_entity.alive()) {
-						tooltip_text = text::format_as_bbcode(get_bbcoded_entity_details(assigned_entity), description_style);
+						tooltip_text = text::from_bbcode(get_bbcoded_entity_details(assigned_entity), description_style);
 					}
 					else {
-						tooltip_text = text::format(L"Empty slot", description_style);
+						tooltip_text = { L"Empty slot", description_style };
 					}
 				}
 				else if constexpr(std::is_same_v<T, value_bar_in_character_gui>) {
-					tooltip_text = text::format_as_bbcode(
+					tooltip_text = text::from_bbcode(
 						dereferenced->get_description_for_hover(context, dereferenced),
 						description_style
 					);
@@ -544,7 +503,7 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 							[&](const auto& spell) {
 								const auto& spell_data = get_meta_of(spell, cosmos.get_global_state().spells);
 
-								return text::format_as_bbcode(
+								return text::from_bbcode(
 									get_bbcoded_spell_description(
 										gui_entity,
 										spell_data
@@ -573,35 +532,37 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 		const auto hovered = cosmos[get_hovered_world_entity(cosmos, world_cursor_pos)];
 
 		if (hovered.alive()) {
-			context.get_aabb_highlighter().draw(
-				output_buffer, 
+			context.get_world_hover_highlighter().draw({
+				output, 
 				hovered, 
 				context.get_interpolation_system(), 
 				context.get_camera_cone()
-			);
+			});
 
-			tooltip_text = text::format_as_bbcode(
+			tooltip_text = from_bbcode(
 				get_bbcoded_entity_details(hovered), 
-				text::style(assets::font_id::GUI_FONT, vslightgray)
+				style(context.get_gui_font(), vslightgray)
 			);
 		}
 	}
 
 	if (tooltip_text.size() > 0) {
-		augs::gui::text_drawer description_drawer;
-		description_drawer.set_text(tooltip_text);
+		const auto tooltip_rect = ltrbi(
+			tooltip_pos, 
+			get_text_bbox(tooltip_text) + vec2i(10, 8)).snap_to_bounds(ltrb(vec2(0, 0), screen_size - vec2i(1, 1))
+		);
 
-		const auto tooltip_rect = ltrbi(tooltip_pos, description_drawer.get_bbox() + vec2i(10, 8)).snap_to_bounds(ltrb(vec2(0, 0), get_screen_size() - vec2i(1, 1)));
-
-		augs::draw_rect_with_border(
-			output_buffer,
+		output.aabb_with_border(
 			tooltip_rect,
-			{ 0, 0, 0, 180 },
+			rgba(0, 0, 0, 180),
 			rgba(255, 255, 255, 35)
 		);
 
-		description_drawer.pos = tooltip_rect.get_position() + vec2i(5, 4);
-		description_drawer.draw(output_buffer);
+		text::print(
+			output,
+			tooltip_rect.get_position() + vec2i(5, 4),
+			tooltip_text
+		);
 	}
 }
 

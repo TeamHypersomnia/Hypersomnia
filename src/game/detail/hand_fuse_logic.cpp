@@ -16,6 +16,7 @@
 #include "game/components/all_inferred_state_component.h"
 
 #include "game/systems_stateless/sound_existence_system.h"
+#include "game/assets/all_assets.h"
 
 void release_or_throw_fused_object(
 	const logic_step step,
@@ -24,6 +25,7 @@ void release_or_throw_fused_object(
 	bool is_pressed_flag
 ) {
 	auto& cosmos = step.cosm;
+	const auto& metas = step.input.logical_assets;
 	const auto now = cosmos.get_timestamp();
 	const auto delta = step.get_delta();
 	const auto thrower = cosmos[thrower_id];
@@ -65,7 +67,7 @@ void release_or_throw_fused_object(
 			in.create_sound_effect_entity(step, thrower_transform, thrower).add_standard_components(step);
 
 			fused_entity.get<components::sprite>().set(
-				explosive.released_image_id
+				explosive.released_image_id, metas
 			);
 
 			auto& rigid_body = fused_entity.get<components::rigid_body>();

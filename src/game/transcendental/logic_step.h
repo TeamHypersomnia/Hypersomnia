@@ -1,21 +1,21 @@
 #pragma once
 #include "augs/misc/delta.h"
-
-#include "game/transcendental/cosmic_step.h"
 #include "game/transcendental/cosmic_entropy.h"
 
 struct data_living_one_step;
-struct all_logical_metas_of_assets;
+class all_logical_assets;
 
 struct logic_step_input {
 	const cosmic_entropy& entropy;
-	const all_logical_metas_of_assets& metas_of_assets;
+	const all_logical_assets& logical_assets;
 };
 
 template <bool is_const>
-struct basic_logic_step : basic_cosmic_step<is_const> {
-	typedef maybe_const_ref_t<is_const, data_living_one_step> data_living_one_step_ref;
+struct basic_logic_step {
+	using data_living_one_step_ref = maybe_const_ref_t<is_const, data_living_one_step>;
+	using cosmos_ref = maybe_const_ref_t<is_const, cosmos>;
 	
+	cosmos_ref cosm;
 	data_living_one_step_ref transient;
 	const logic_step_input input;
 
@@ -24,6 +24,8 @@ struct basic_logic_step : basic_cosmic_step<is_const> {
 		const logic_step_input logic_step_input,
 		data_living_one_step_ref transient
 	);
+
+	cosmos_ref get_cosmos() const;
 
 	augs::delta get_delta() const;
 

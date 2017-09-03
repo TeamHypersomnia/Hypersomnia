@@ -1,19 +1,21 @@
 #pragma once
-#include <array>
 #include <unordered_map>
-
-#include "game/components/sound_existence_component.h"
-#include "game/transcendental/entity_id.h"
-#include "game/transcendental/entity_handle_declaration.h"
-#include "game/transcendental/step_declaration.h"
 
 #include "augs/misc/delta.h"
 
 #include "augs/audio/sound_source.h"
-struct camera_cone;
+#include "augs/math/camera_cone.h"
 
-class viewing_step;
+#include "game/transcendental/entity_id.h"
+#include "game/transcendental/entity_handle_declaration.h"
+#include "game/transcendental/step_declaration.h"
+
+#include "game/components/sound_existence_component.h"
+
+#include "game/assets/assets_declarations.h"
+
 class interpolation_system;
+class cosmos;
 
 namespace augs {
 	struct audio_volume_settings;
@@ -34,10 +36,11 @@ public:
 
 	std::vector<augs::sound_source> fading_sources;
 
-	void reserve_caches_for_entities(const size_t) const {}
+	void reserve_caches_for_entities(const std::size_t) const {}
 
 	void play_nearby_sound_existences(
 		const augs::audio_volume_settings&,
+		const loaded_sounds&,
 		const camera_cone,
 		const entity_id listening_character,
 		const cosmos&, 

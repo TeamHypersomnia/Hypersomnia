@@ -4,18 +4,28 @@
 
 #include "augs/misc/typesafe_sprintf.h"
 #include "augs/build_settings/setting_enable_debug_log.h"
+#include "augs/filesystem/path.h"
 
 struct log_entry {
 	console_color color;
 	std::string text;
 };
 
-struct global_log {
-	static std::vector<log_entry> all_entries;
-	static unsigned max_all_entries;
+class program_log {
+	static program_log global_instance;
+	unsigned max_all_entries;
 
-	static void push_entry(const log_entry&);
-	static void save_complete_log(const std::string& filename);
+public:
+	static auto& get_current() {
+		return global_instance;
+	}
+
+	program_log(const unsigned max_all_entries);
+
+	std::vector<log_entry> all_entries;
+
+	void push_entry(const log_entry&);
+	void save_complete_to(const augs::path_type& path);
 };
 
 template <typename... A>
@@ -57,9 +67,6 @@ std::ostream& write_nvps(
 }
 
 void CALL_SHELL(const std::string&);
-
-#define AS_INTV *(vec2i*)&
-#define AS_INT *(int*)&
 
 #if ENABLE_DEBUG_LOG
 #define DEBUG_LOG LOG

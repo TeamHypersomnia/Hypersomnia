@@ -4,6 +4,8 @@
 #include "augs/misc/enum_boolset.h"
 #include "augs/misc/trivially_copyable_pair.h"
 
+#include "augs/misc/declare_containers.h"
+
 namespace augs {
 	struct introspection_access;
 
@@ -17,19 +19,27 @@ namespace augs {
 
 		static constexpr size_type max_n = static_cast<size_type>(key_type::COUNT);
 		static constexpr bool is_trivially_copyable = std::is_trivially_copyable_v<mapped_type>;
+		static constexpr bool is_default_constructible = std::is_default_constructible_v<mapped_type>;
 		
+#if TODO
 		static_assert(
 			!is_trivially_copyable || std::is_default_constructible_v<mapped_type>,
 			"No support for a type that is trivially copyable but not default constructible."
 		);
+#endif
 
 		using storage_type = std::array<
-			std::conditional_t<is_trivially_copyable, 
+			std::conditional_t<is_trivially_copyable && is_default_constructible,
 				mapped_type,
 				std::aligned_storage_t<sizeof(mapped_type), alignof(mapped_type)>
 			>,
 			max_n
 		>;
+
+		//using storage_type = std::array<
+		//	std::aligned_storage_t<sizeof(mapped_type), alignof(mapped_type)>,
+		//	max_n
+		//>;
 
 		using flagset_type = augs::enum_boolset<Enum>;
 		friend struct augs::introspection_access;
@@ -199,6 +209,10 @@ namespace augs {
 			return max_n;
 		}
 
+		auto size() const {
+			return is_value_set.count();
+		}
+
 		void clear() {
 			if constexpr(!is_trivially_copyable) {
 				for (auto& v : *this) {
@@ -210,9 +224,6 @@ namespace augs {
 		}
 	};
 
-	template <class Enum, class T, class = void>
-	class enum_associative_array;
-	
 	// GEN INTROSPECTOR class augs::enum_associative_array class key_type class mapped_type class dummy
 	// INTROSPECT BASE augs::enum_associative_array_base<key_type, mapped_type>
 	// END GEN INTROSPECTOR
@@ -269,4 +280,24 @@ namespace augs {
 			clear();
 		}
 	};
+
+	template <class Enum, class T>
+	bool operator==(
+		const enum_associative_array<Enum, T>& left, 
+		const enum_associative_array<Enum, T>& right
+	) {
+		for (const auto& it : left) {
+			const auto ptr = found_or_nullptr(right, it.first);
+
+			if (ptr == nullptr) {
+				return false;
+			}
+
+			if (!(it.second == *ptr)) {
+				return false;
+			}
+		}
+
+		return true;
+	}
 }

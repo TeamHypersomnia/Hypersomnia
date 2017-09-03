@@ -16,7 +16,7 @@ namespace augs {
 	}
 
 	template <class T>
-	std::array<T, 16> orthographic_projection(const vec2t<T> visible_area) {
+	std::array<T, 16> orthographic_projection(const basic_vec2<T> visible_area) {
 		return augs::orthographic_projection<T>(
 			0.f,
 			visible_area.x,

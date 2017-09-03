@@ -13,7 +13,7 @@ struct scripted_image_input {
 using scripted_image_stamp = scripted_image_input;
 
 void regenerate_scripted_image(
-	const std::string& output_image_path,
+	const augs::path_type& output_image_path,
 	const scripted_image_input& input,
 	const bool force_regenerate
 );

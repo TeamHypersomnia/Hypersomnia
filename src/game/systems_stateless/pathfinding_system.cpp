@@ -31,7 +31,7 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 
 		auto& b = subject.get<components::rigid_body>();
 
-		const auto& verts = subject.get<components::shape_polygon>().get_raw_component().shape.convex_polys[fixture_num].vertices;
+		const auto& verts = subject.get<components::shape_polygon>().get_raw_component().shape.convex_polys[fixture_num];
 
 		/* for every vertex in given fixture's shape */
 		for (auto& v : verts) {
@@ -371,11 +371,11 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 
 				if (DEBUG_DRAWING.draw_undiscovered_locations) {
 					for (auto& disc : vertices)
-						lines.draw(disc.location, disc.sensor, rgba(0, 127, 255, 255));
+						lines.emplace_back(disc.location, disc.sensor, rgba(0, 127, 255, 255));
 
 					for (auto& disc : pathfinding.session().discovered_vertices)
 						//if(disc.sensor.non_zero())
-						lines.draw(disc.location, disc.location + vec2(0, pathfinding.target_offset), rgba(0, 255, 0, 255));
+						lines.emplace_back(disc.location, disc.location + vec2(0, pathfinding.target_offset), rgba(0, 255, 0, 255));
 				}
 
 				if (!vertices.empty()) {
@@ -475,8 +475,8 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 
 
 					if (DEBUG_DRAWING.draw_undiscovered_locations) {
-						lines.draw(transform.pos, current_target.sensor, rgba(255, 255, 0, 255));
-						lines.draw(transform.pos, pathfinding.session().target, rgba(255, 0, 0, 255));
+						lines.emplace_back(transform.pos, current_target.sensor, rgba(255, 255, 0, 255));
+						lines.emplace_back(transform.pos, pathfinding.session().target, rgba(255, 0, 0, 255));
 					}
 
 					bool rays_hit = false;

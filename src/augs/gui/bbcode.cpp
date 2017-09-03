@@ -1,4 +1,4 @@
-#include "formatted_text.h"
+#include "formatted_string.h"
 
 #include <algorithm>
 #include <cstring>
@@ -19,11 +19,11 @@
 namespace augs {
 	namespace gui {
 		namespace text {
-			formatted_string format_as_bbcode(
+			formatted_string from_bbcode(
 				const std::string& str, 
 				const style default_style
 			) {
-				return format_as_bbcode(to_wstring(str), default_style);
+				return from_bbcode(to_wstring(str), default_style);
 			}
 
 			namespace {
@@ -255,7 +255,7 @@ namespace augs {
 				};
 			} // anonymous namespace
 
-			formatted_string format_as_bbcode(
+			formatted_string from_bbcode(
 				const std::wstring& input_str_,
 				const style default_style
 			) {

@@ -4,7 +4,7 @@
 #include "game/transcendental/entity_handle.h"
 
 #include "game/components/position_copying_component.h"
-#include "game/assets/assets_manager.h"
+#include "game/assets/all_assets.h"
 
 entity_handle sound_existence_input::create_sound_effect_entity(
 	const logic_step step,
@@ -20,7 +20,7 @@ entity_handle sound_existence_input::create_sound_effect_entity(
 	existence.input = *this;
 	existence.time_of_birth = cosmos.get_timestamp();
 
-	const auto* const info = step.input.metas_of_assets.find(effect.id);
+	const auto* const info = step.input.logical_assets.find(effect.id);
 
 	if (info == nullptr) {
 		return cosmos[entity_id()];

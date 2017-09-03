@@ -205,8 +205,8 @@ namespace augs {
 				
 				union {
 					struct mouse_data {
-						vec2t<short> rel;
-						vec2t<short> pos;
+						basic_vec2<short> rel;
+						basic_vec2<short> pos;
 					} mouse;
 
 					struct scroll_data {
@@ -247,8 +247,6 @@ namespace augs {
 					vec2i ldrag;
 					vec2i rdrag;
 				} mouse;
-
-				vec2i screen_size;
 
 				void unset_keys();
 				void apply(const change&);

@@ -1,8 +1,9 @@
-#include "wandering_pixels_system.h"
-
-#include "game/detail/visible_entities.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
+
+#include "game/detail/visible_entities.h"
+
+#include "game/systems_audiovisual/wandering_pixels_system.h"
 
 void wandering_pixels_system::erase_caches_for_dead_entities(const cosmos& new_cosmos) {
 	std::vector<entity_id> to_erase;
@@ -26,7 +27,7 @@ const wandering_pixels_system::cache& wandering_pixels_system::get_cache(const c
 	return per_entity_cache.at(id.get_id());
 }
 
-void wandering_pixels_system::advance_for_visible(
+void wandering_pixels_system::advance_for(
 	const visible_entities& visible,
 	const cosmos& cosm,
 	const augs::delta dt
@@ -34,11 +35,11 @@ void wandering_pixels_system::advance_for_visible(
 	global_time_seconds += dt.in_seconds();
 
 	for (const auto e : visible.per_layer[render_layer::WANDERING_PIXELS_EFFECTS]) {
-		advance_wandering_pixels_for(cosm[e], dt);
+		advance_for(cosm[e], dt);
 	}
 }
 
-void wandering_pixels_system::advance_wandering_pixels_for(
+void wandering_pixels_system::advance_for(
 	const const_entity_handle it, 
 	const augs::delta dt
 ) {
@@ -124,33 +125,23 @@ void wandering_pixels_system::advance_wandering_pixels_for(
 		const auto vel = p.current_velocity;
 
 		p.pos += considered_direction * vel * dt.in_seconds();
+
+		const auto sin_secs = static_cast<float>(sin(global_time_seconds));
+		const auto cos_secs = static_cast<float>(cos(global_time_seconds));
+
 		if (considered_direction.x > 0) {
-			p.pos.y += considered_direction.x * sin(global_time_seconds) * vel * dt.in_seconds() * 1.2f;
+			p.pos.y += considered_direction.x * sin_secs * vel * dt.in_seconds() * 1.2f;
 		}
 		else if (considered_direction.x < 0) {
-			p.pos.y -= -considered_direction.x * sin(global_time_seconds) * vel * dt.in_seconds() * 1.2f;
+			p.pos.y -= -considered_direction.x * sin_secs * vel * dt.in_seconds() * 1.2f;
 		}
 		if (considered_direction.y > 0) {
-			p.pos.x += considered_direction.y * cos(global_time_seconds) * vel * dt.in_seconds() * 1.2f;
+			p.pos.x += considered_direction.y * cos_secs * vel * dt.in_seconds() * 1.2f;
 		}
 		else if (considered_direction.y < 0) {
-			p.pos.x -= -considered_direction.y * cos(global_time_seconds) * vel * dt.in_seconds() * 1.2f;
+			p.pos.x -= -considered_direction.y * cos_secs * vel * dt.in_seconds() * 1.2f;
 		}
 
 		//p.pos.x += cos(global_time_seconds) * 20 * dt.in_seconds() * 1.2;
-	}
-}
-
-void wandering_pixels_system::draw_wandering_pixels_for(const const_entity_handle it, const drawing_input& in) const {
-	const auto& wandering = it.get<components::wandering_pixels>();
-	const auto& cache = get_cache(it);
-
-	components::sprite::drawing_input pixel_input(in.target_buffer);
-	pixel_input.camera = in.camera;
-
-	for (const auto& p : cache.particles) {
-		pixel_input.renderable_transform = p.pos;
-
-		wandering.face.draw(pixel_input);
 	}
 }

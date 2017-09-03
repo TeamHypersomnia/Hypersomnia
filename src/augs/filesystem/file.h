@@ -4,103 +4,84 @@
 #include <fstream>
 #include <unordered_map>
 #include <chrono>
+#include <optional>
 
 #include <fstream>
 #include <experimental\filesystem>
 
+#include "augs/filesystem/path.h"
 #include "augs/ensure.h"
 
 namespace augs {
-	namespace fs = std::experimental::filesystem;
+	template <class T, class... Args>
+	auto with_exceptions(Args&&... args) {
+		auto stream = T(std::forward<Args>(args)...);
+		stream.exceptions(T::failbit | T::badbit);
+		return stream;
+	}
+
+	using ifstream_error = std::ifstream::failure;
 	
-	template <class P>
-	std::chrono::system_clock::time_point last_write_time(const P& path) {
-		ensure_existence(path);
-		return fs::last_write_time(path);
+	inline std::chrono::system_clock::time_point last_write_time(const path_type& path) {
+		return std::experimental::filesystem::last_write_time(path);
 	}
 
-	template <class P>
-	bool file_exists(const P& path) {
-		std::ifstream infile(path);
-		return infile.good();
+	inline bool file_exists(const path_type& path) {
+		return std::ifstream(path).good();
 	}
 
-	template <class P>
-	auto switch_path(
-		const P official_path,
-		const P custom_path
+	inline path_type switch_path(
+		const path_type canon_path,
+		const path_type local_path
 	) {
-		if (file_exists(custom_path)) {
-			return custom_path;
+		if (file_exists(local_path)) {
+			return local_path;
 		}
 		else {
-			ensure(file_exists(official_path));
-			return official_path;
+			return canon_path;
 		}
 	}
 
-	template <class P>
-	auto switch_dir(
-		const P filename, 
-		const P official_directory, 
-		const P custom_directory
-	) {
-		return switch_file(
-			official_directory + filename, 
-			custom_directory + filename
-		);
-	}
-
-	template <class P>
-	auto get_extension(const P& path) {
-		return fs::path(path).extension().string();
-	}
-
-	template <class P, class S>
-	auto replace_extension(const P& path, const S& new_ext) {
-		return fs::path(path).replace_extension(new_ext).string();
-	}
-
-	template <class P, class S>
-	auto replace_filename(const P& path, const S& new_fn) {
-		return fs::path(path).replace_filename(new_fn).string();
-	}
-
-	template <class P>
-	auto get_filename(const P& path) {
-		return fs::path(path).filename().string();
-	}
-
-	template <class P>
-	auto get_stem(const P& path) {
-		return fs::path(path).stem().string();
-	}
-
-	template <class P>
-	void ensure_existence(const P& path) {
-		const bool exists = file_exists(path);
-
-		if (!exists) {
-			LOG("File not found: %x", path);
-			ensure(exists);
-		}
-	}
+	/*
 	
-	template <class P, class C = char>
-	auto get_file_contents(const P& path, const C = C()) {
-		std::basic_ifstream<C> t(path);
+	
+	inline auto get_extension(const path_type& path) {
+		return path.extension().string();
+	}
+
+	inline auto replace_extension(const path_type& path, const path_type& new_ext) {
+		return path.replace_extension(new_ext).string();
+	}
+
+	inline auto replace_filename(const path_type& path, const path_type& new_fn) {
+		return path.replace_filename(new_fn).string();
+	}
+
+	inline auto get_filename(const path_type& path) {
+		return path.filename().string();
+	}
+
+	inline auto get_stem(const path_type& path) {
+		return path.stem().string();
+	}
+	*/
+	template <class C = char>
+	auto get_file_contents(const path_type& path, const C = C()) {
+		auto t = with_exceptions<std::basic_ifstream<C>>();
+		t.open(path);
+
 		std::basic_stringstream<C> buffer;
 		buffer << t.rdbuf();
 
 		return buffer.str();
 	}
 
-	template <class P>
-	std::vector<std::string> get_file_lines_without_blanks_and_comments(
-		const P& path,
+	inline std::vector<std::string> get_file_lines_without_blanks_and_comments(
+		const path_type& path,
 		const char comment_begin_character = '%'
 	) {
-		std::ifstream input(filename);
+		auto input = with_exceptions<std::ifstream>();
+		input.open(path);
 	
 		std::vector<std::string> out;
 	
@@ -118,12 +99,11 @@ namespace augs {
 		return out;
 	}
 
-	template <class P>
-	auto get_file_lines(const P& path) {
-		typedef std::string string_type;
+	inline auto get_file_lines(const path_type& path) {
+		using string_type = std::string;
 
-		ensure_existence(path);
-		std::ifstream input(path);
+		auto input = with_exceptions<std::ifstream>();
+		input.open(path);
 
 		std::vector<string_type> out;
 
@@ -134,30 +114,60 @@ namespace augs {
 		return out;
 	}
 
-	template <class P, class S>
-	void create_text_file(const P& path, const S& text) {
-		std::ofstream out(path, std::ios::out);
+	template <class S>
+	void create_text_file(const path_type& path, const S& text) {
+		auto out = with_exceptions<std::ofstream>();
+		out.open(path, std::ios::out);
 		out << text;
 	}
 
-	template <class P, class S>
-	void create_text_file_if_different(const P& path, const S& text) {
+	template <class S>
+	void create_text_file_if_different(const path_type& path, const S& text) {
 		if (!file_exists(path) || text != get_file_contents(path)) {
-			std::ofstream out(path, std::ios::out);
+			auto out = with_exceptions<std::ofstream>();
+			out.open(path, std::ios::out);
 			out << text;
 		}
 	}
 
-	template <class P, class C>
-	void create_binary_file(const P& path, const C& content) {
-		std::ofstream out(path, std::ios::out | std::ios::binary);
+	template <class C>
+	void create_binary_file(const path_type& path, const C& content) {
+		auto out = with_exceptions<std::ofstream>();
+		out.open(path, std::ios::out | std::ios::binary);
 		out.write(reinterpret_cast<const byte_type_for_t<std::ofstream>*>(content.data()), content.size() * sizeof(content[0]));
 	}
 
-	template <class P, class S>
-	void get_file_contents_binary_into(const P& path, S& target) {
-		ensure_existence(path);
-		std::ifstream file(path, std::ios::binary | std::ios::ate);
+	template <class O>
+	void save(const O& object, const path_type& path) {
+		augs::stream content;
+		write(content, object);
+
+		create_binary_file(path, content);
+	}
+
+	template <class O>
+	void load(O& object, const path_type& path) {
+		augs::stream content;
+		get_file_contents_binary_into(path, content);
+
+		read(content, object);
+	}
+
+	template <class O>
+	O load(const path_type& path) {
+		augs::stream content;
+		get_file_contents_binary_into(path, content);
+
+		O object;
+		read(content, object);
+		return object;
+	}
+
+	template <class S>
+	void get_file_contents_binary_into(const path_type& path, S& target) {
+		auto file = with_exceptions<std::ifstream>();
+		file.open(path, std::ios::binary | std::ios::ate);
+
 		const std::streamsize size = file.tellg();
 		file.seekg(0, std::ios::beg);
 
@@ -166,9 +176,10 @@ namespace augs {
 		target.set_write_pos(static_cast<size_t>(size));
 	}
 
-	template <class P, class ContainerType>
-	void read_map_until_eof(const P& path, ContainerType& into) {
-		std::ifstream source(path, std::ios::in | std::ios::binary);
+	template <class ContainerType>
+	void read_map_until_eof(const path_type& path, ContainerType& into) {
+		auto source = with_exceptions<std::ifstream>();
+		source.open(path, std::ios::binary | std::ios::in);
 
 		while (source.peek() != EOF) {
 			typename ContainerType::key_type key;

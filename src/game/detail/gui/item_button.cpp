@@ -1,3 +1,9 @@
+#include "augs/ensure.h"
+#include "augs/templates/string_templates.h"
+#include "augs/drawing/drawing.h"
+#include "augs/gui/text/printer.h"
+#include "augs/graphics/renderer.h"
+
 #include "game/detail/gui/item_button.h"
 #include "game/detail/gui/pixel_line_connector.h"
 #include "game/detail/gui/grid.h"
@@ -7,9 +13,6 @@
 
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
-#include "augs/graphics/renderer.h"
-
-#include "augs/gui/stroke.h"
 
 #include "game/enums/item_category.h"
 #include "game/detail/inventory/inventory_slot.h"
@@ -18,16 +21,13 @@
 #include "game/components/sprite_component.h"
 #include "game/components/item_component.h"
 #include "game/components/fixtures_component.h"
-#include "game/systems_stateless/gui_system.h"
 #include "game/systems_stateless/input_system.h"
 #include "game/systems_audiovisual/game_gui_system.h"
-#include "game/assets/assets_manager.h"
-#include "augs/graphics/drawers.h"
+#include "game/assets/all_assets.h"
 
 #include "game/detail/gui/slot_button.h"
 
-#include "augs/templates/string_templates.h"
-#include "augs/ensure.h"
+using namespace augs::gui::text;
 
 bool item_button::is_being_wholely_dragged_or_pending_finish(
 	const const_game_gui_context context, 
@@ -61,7 +61,6 @@ item_button::item_button(xywh rc) : base(rc) {
 void item_button::draw_dragged_ghost_inside(
 	const viewing_game_gui_context context, 
 	const const_this_in_item this_id, 
-	const draw_info in, 
 	const vec2 absolute_xy_offset
 ) {
 	drawing_settings f;
@@ -75,13 +74,12 @@ void item_button::draw_dragged_ghost_inside(
 	f.draw_charges = false;
 	f.absolute_xy_offset = absolute_xy_offset;
 
-	draw_proc(context, this_id, in, f);
+	draw_proc(context, this_id, f);
 }
 
 void item_button::draw_complete_with_children(
 	const viewing_game_gui_context context, 
-	const const_this_in_item this_id, 
-	draw_info in
+	const const_this_in_item this_id
 ) {
 	drawing_settings f;
 	f.draw_background = true;
@@ -93,14 +91,13 @@ void item_button::draw_complete_with_children(
 	f.draw_container_opened_mark = true;
 	f.draw_charges = true;
 
-	draw_children(context, this_id, in);
-	draw_proc(context, this_id, in, f);
+	draw_children(context, this_id);
+	draw_proc(context, this_id, f);
 }
 
 void item_button::draw_grid_border_ghost(
 	const viewing_game_gui_context context, 
 	const const_this_in_item this_id, 
-	const draw_info in, 
 	const vec2 absolute_xy_offset
 ) {
 	drawing_settings f;
@@ -114,34 +111,32 @@ void item_button::draw_grid_border_ghost(
 	f.draw_charges = true;
 	f.absolute_xy_offset = griddify(absolute_xy_offset);
 
-	draw_proc(context, this_id, in, f);
+	draw_proc(context, this_id, f);
 }
 
 void item_button::draw_complete_dragged_ghost(
 	const viewing_game_gui_context context, 
 	const const_this_in_item this_id, 
-	const draw_info in, 
 	const vec2 absolute_xy_offset
 ) {
-	draw_dragged_ghost_inside(context, this_id, in, absolute_xy_offset);
+	draw_dragged_ghost_inside(context, this_id, absolute_xy_offset);
 }
 
 item_button::layout_with_attachments item_button::calculate_button_layout(
 	const const_entity_handle component_owner,
+	const game_image_definitions& defs,
 	const bool include_attachments
 ) {
-	const auto& manager = get_assets_manager();
 	const auto& cosmos = component_owner.get_cosmos();
 	
 	layout_with_attachments output;
-	output.push(component_owner.get_aabb(manager, components::transform()));
+	output.push(component_owner.get_aabb(components::transform()));
 
 	if (include_attachments) {
 		component_owner.for_each_contained_item_recursive(
-			get_assets_manager(),
 			[&](const const_entity_handle desc, const inventory_traversal& traversal) {
 				if (traversal.item_remains_physical) {
-					output.push(desc.get_aabb(manager, traversal.attachment_offset));
+					output.push(desc.get_aabb(traversal.attachment_offset));
 				}
 
 				return recursive_callback_result::CONTINUE_AND_RECURSE;
@@ -155,9 +150,9 @@ item_button::layout_with_attachments item_button::calculate_button_layout(
 		b += -origin;
 	}
 
-	const auto gui_def = manager.at(component_owner.get<components::sprite>().tex).gui_usage;
+	const auto flip = defs.at(component_owner.get<components::sprite>().tex).gui_usage.flip;
 
-	if (gui_def.flip_horizontally) {
+	if (flip.horizontally()) {
 		for (auto& b : output.boxes) {
 			const auto old_b = b;
 			b.l = output.aabb.w() - old_b.r;
@@ -165,7 +160,7 @@ item_button::layout_with_attachments item_button::calculate_button_layout(
 		}
 	}
 
-	if (gui_def.flip_vertically) {
+	if (flip.vertically()) {
 		for (auto& b : output.boxes) {
 			const auto old_b = b;
 			b.t = output.aabb.h() - old_b.b;
@@ -190,23 +185,25 @@ vec2 item_button::griddify_size(const vec2 size, const vec2 expander) {
 void item_button::draw_proc(
 	const viewing_game_gui_context context, 
 	const const_this_in_item this_id, 
-	const draw_info in, 
 	const drawing_settings& f
 ) {
 	if (is_inventory_root(context, this_id)) {
 		return;
 	}
 
-	const auto& manager = get_assets_manager();
 	const auto& cosmos = context.get_cosmos();
 	const auto& item = cosmos[this_id.get_location().item_id];
 	const auto& detector = this_id->detector;
 	const auto& rect_world = context.get_rect_world();
 	const auto& element = context.get_character_gui();
+	const auto output = context.get_output();
+	const auto& requisites = context.get_requisite_images();
 	auto& this_tree_entry = context.get_tree_entry(this_id);
 
 	const auto former_absolute_pos = this_tree_entry.get_absolute_pos();
+#if TODO
 	this_tree_entry.set_absolute_pos(former_absolute_pos + f.absolute_xy_offset);
+#endif
 	const auto this_absolute_rect = context.get_tree_entry(this_id).get_absolute_rect();
 
 	auto parent_slot = cosmos[item.get<components::item>().current_slot];
@@ -241,16 +238,16 @@ void item_button::draw_proc(
 	}
 
 	if (f.draw_background) {
-		draw_stretched_texture(context, this_id, in, augs::gui::material(assets::game_image_id::BLANK, inside_col));
+		output.gui_box_stretch_tex(context, this_id, inside_col);
 	}
 
 	if (f.draw_item) {
 		{
 			const bool draw_attachments = !this_id->is_container_open || f.draw_attachments_even_if_open;
 			auto item_sprite = item.get<components::sprite>();
-			const auto gui_def = get_assets_manager()[item_sprite.tex].gui_usage;
+			const auto gui_def = context.get_game_image_definitions().at(item_sprite.tex).gui_usage;
 
-			const auto layout = calculate_button_layout(item, draw_attachments);
+			const auto layout = calculate_button_layout(item, context.get_game_image_definitions(), draw_attachments);
 			
 			vec2 expansion_offset;
 
@@ -259,10 +256,8 @@ void item_button::draw_proc(
 				expansion_offset = (rounded_size - layout.aabb.get_size()) / 2;
 			}
 
-			const auto flip_horizontally = gui_def.flip_horizontally;
-			const auto flip_vertically = gui_def.flip_vertically;
-			item_sprite.flip_horizontally = flip_horizontally;
-			item_sprite.flip_vertically = flip_vertically;
+			const auto flip = gui_def.flip;
+			item_sprite.flip = flip;
 
 			item_sprite.color.a = 255;
 			//item_sprite.color.a = border_col.a;
@@ -271,7 +266,7 @@ void item_button::draw_proc(
 				item_sprite.color.a = 255;
 			}
 
-			components::sprite::drawing_input state(in.v);
+			auto state = components::sprite::drawing_input{ augs::drawer (output) };
 
 			const auto rc_pos = this_absolute_rect.get_position();
 			state.renderable_transform.pos = layout.get_base_item_pos().center() + rc_pos + expansion_offset;
@@ -285,25 +280,24 @@ void item_button::draw_proc(
 					if (parent_slot.is_physically_connected_until(item)) {
 						auto attachment_sprite = desc.get<components::sprite>();
 
-						attachment_sprite.flip_horizontally = flip_horizontally;
-						attachment_sprite.flip_vertically = flip_vertically;
+						attachment_sprite.flip = flip;
 
 						attachment_sprite.color.a = item_sprite.color.a;
 
-						components::sprite::drawing_input attachment_state(in.v);
+						auto attachment_state = components::sprite::drawing_input(output);
 
 						attachment_state.renderable_transform.pos = rc_pos + layout.boxes[attachment_index].center() + expansion_offset;
 						attachment_state.renderable_transform.rotation = trav.attachment_offset.rotation;
 
-						if (flip_horizontally) {
+						if (flip.horizontally()) {
 							attachment_state.renderable_transform.flip_rotation();
 						}
 
-						if (flip_vertically) {
+						if (flip.vertically()) {
 							attachment_state.renderable_transform.flip_rotation();
 						}
 
-						attachment_sprite.draw(attachment_state);
+						attachment_sprite.draw(context.get_game_images(), attachment_state);
 
 						++attachment_index;
 					}
@@ -311,10 +305,10 @@ void item_button::draw_proc(
 					return recursive_callback_result::CONTINUE_AND_RECURSE;
 				};
 
-				item.for_each_contained_item_recursive(get_assets_manager(), iteration_lambda);
+				item.for_each_contained_item_recursive(iteration_lambda);
 			}
 
-			item_sprite.draw(state);
+			item_sprite.draw(context.get_game_images(), state);
 		}
 
 		if (f.draw_charges) {
@@ -379,44 +373,54 @@ void item_button::draw_proc(
 
 				// else label_wstr = L'{' + label_wstr + L'}';
 
-				auto bottom_number = augs::gui::text::format(label_wstr, augs::gui::text::style(assets::font_id::GUI_FONT, label_color));
+				const auto label_text = formatted_string {
+					label_wstr, { context.get_gui_font(), label_color }
+				};
 
-				augs::gui::text_drawer charges_caption;
-				charges_caption.set_text(bottom_number);
-				charges_caption.bottom_right(context.get_tree_entry(this_id).get_absolute_rect());
-				charges_caption.draw(in);
+				const auto label_bbox = get_text_bbox(label_text);
+
+				print_stroked(
+					output,
+					context.get_tree_entry(this_id).get_absolute_rect().right_bottom() - label_bbox,
+					label_text
+				);
 			}
 		}
 	}
 
 	if (f.draw_border) {
-		augs::gui::solid_stroke stroke;
-		stroke.set_material(augs::gui::material(assets::game_image_id::BLANK, border_col));
-		stroke.draw(in.v, this_absolute_rect);
+		output.border(this_absolute_rect, border_col);
 	}
 
 	if (f.draw_connector && parent_slot.get_container().get_owning_transfer_capability() != parent_slot.get_container()) {
-		draw_pixel_line_connector(this_absolute_rect, context.get_tree_entry(item_button_in_item{ parent_slot.get_container() }).get_absolute_rect(), in, border_col);
+		draw_pixel_line_connector(
+			output, 
+			this_absolute_rect, 
+			context.get_tree_entry(item_button_in_item{ parent_slot.get_container() }).get_absolute_rect(),
+			border_col
+		);
 	}
 
 	if (f.draw_container_opened_mark) {
 		if (item.find<components::container>()) {
-			assets::game_image_id container_icon;
+			assets::requisite_image_id container_icon;
 
 			if (this_id->is_container_open) {
-				container_icon = assets::game_image_id::CONTAINER_OPEN_ICON;
+				container_icon = assets::requisite_image_id::CONTAINER_OPEN_ICON;
 			}
 			else {
-				container_icon = assets::game_image_id::CONTAINER_CLOSED_ICON;
+				container_icon = assets::requisite_image_id::CONTAINER_CLOSED_ICON;
 			}
 
-			const auto size = manager.at(container_icon).get_size();
+			const auto size = requisites.at(container_icon).get_size();
 
-			augs::draw_rect(in.v, vec2(this_absolute_rect.r - size.x + 2, this_absolute_rect.t + 1), container_icon, border_col);
+			output.aabb_lt(requisites.at(container_icon), vec2(this_absolute_rect.r - size.x + 2, this_absolute_rect.t + 1), border_col);
 		}
 	}
 
+#if TODO
 	this_tree_entry.set_absolute_pos(former_absolute_pos);
+#endif
 }
 
 bool item_button::is_inventory_root(const const_game_gui_context context, const const_this_in_item this_id) {
@@ -444,10 +448,10 @@ void item_button::rebuild_layouts(const game_gui_context context, const this_in_
 
 	const auto* const sprite = item.find<components::sprite>();
 
-	const auto& manager = get_assets_manager();
+	const auto& manager = context.get_game_image_definitions();
 
 	if (sprite) {
-		vec2i rounded_size = calculate_button_layout(item, !this_id->is_container_open).aabb.get_size();
+		vec2i rounded_size = calculate_button_layout(item, manager, !this_id->is_container_open).aabb.get_size();
 		rounded_size = griddify_size(rounded_size, manager.at(item.get<components::sprite>().tex).gui_usage.bbox_expander);
 		this_id->rc.set_size(rounded_size);
 	}
@@ -493,12 +497,15 @@ void item_button::respond_to_events(const game_gui_context context, const this_i
 	}
 }
 
-void item_button::draw(const viewing_game_gui_context context, const const_this_in_item this_id, draw_info in) {
+void item_button::draw(
+	const viewing_game_gui_context context, 
+	const const_this_in_item this_id
+) {
 	if (!this_id->get_flag(augs::gui::flag::ENABLE_DRAWING)) {
 		return;
 	}
 
 	if (!is_being_wholely_dragged_or_pending_finish(context, this_id)) {
-		this_id->draw_complete_with_children(context, this_id, in);
+		this_id->draw_complete_with_children(context, this_id);
 	}
 }

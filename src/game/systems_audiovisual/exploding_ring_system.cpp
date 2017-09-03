@@ -1,12 +1,15 @@
-#include "exploding_ring_system.h"
 #include "augs/templates/container_templates.h"
-#include "game/assets/assets_manager.h"
-#include "game/systems_audiovisual/particles_simulation_system.h"
-#include "game/view/viewing_step.h"
-#include "game/detail/particle_types.h"
-#include "game/detail/camera_cone.h"
+
+#include "augs/math/camera_cone.h"
 #include "augs/graphics/renderer.h"
+
+#include "game/assets/all_assets.h"
+
 #include "game/transcendental/cosmos.h"
+#include "game/detail/particle_types.h"
+
+#include "game/systems_audiovisual/exploding_ring_system.h"
+#include "game/systems_audiovisual/particles_simulation_system.h"
 
 void exploding_ring_system::acquire_new_rings(const std::vector<exploding_ring_input>& new_rings) {
 	rings.reserve(rings.size() + new_rings.size());
@@ -21,6 +24,7 @@ void exploding_ring_system::acquire_new_rings(const std::vector<exploding_ring_i
 
 void exploding_ring_system::advance(
 	const cosmos& cosmos,
+	const particle_effect_definitions& manager,
 	const augs::delta dt,
 	particles_simulation_system& particles_output_for_effects
 ) {
@@ -28,8 +32,6 @@ void exploding_ring_system::advance(
 
 	global_time_seconds += dt.in_seconds();
 	auto rng = fast_randomization(static_cast<size_t>(global_time_seconds * 10000));
-
-	const auto& manager = get_assets_manager();
 
 	erase_if(rings, [&](ring& e) {
 		auto& r = e.in;
@@ -43,13 +45,13 @@ void exploding_ring_system::advance(
 				r.emit_particles_on_ring = false;
 				const auto minimum_spawn_radius = std::min(r.outer_radius_start_value, r.outer_radius_end_value);
 				const auto maximum_spawn_radius = std::max(r.outer_radius_start_value, r.outer_radius_end_value);
-				const auto spawn_radius_width = (maximum_spawn_radius - minimum_spawn_radius) / 2.4;
+				const auto spawn_radius_width = (maximum_spawn_radius - minimum_spawn_radius) / 2.4f;
 
 				const unsigned max_particles_to_spawn = 160;
 				const auto& global_assets = cosmos.get_global_assets();
 
-				const auto* const ring_smoke = manager.find(global_assets.exploding_ring_smoke);
-				const auto* const ring_sparkles = manager.find(global_assets.exploding_ring_sparkles);
+				const auto* const ring_smoke = found_or_nullptr(manager, global_assets.exploding_ring_smoke);
+				const auto* const ring_sparkles = found_or_nullptr(manager, global_assets.exploding_ring_sparkles);
 
 				if (ring_smoke != nullptr && ring_sparkles != nullptr) {
 					auto smokes_emission = ring_smoke->emissions.at(0);
@@ -134,7 +136,7 @@ void exploding_ring_system::advance(
 }
 
 void exploding_ring_system::draw_rings(
-	augs::vertex_triangle_buffer& triangles,
+	const augs::drawer_with_default output,
 	augs::special_buffer& specials,
 	const camera_cone camera,
 	const cosmos& cosmos
@@ -175,7 +177,7 @@ void exploding_ring_system::draw_rings(
 				renderable_tri.vertices[1].color = considered_color;
 				renderable_tri.vertices[2].color = considered_color;
 
-				triangles.push_back(renderable_tri);
+				output.push(renderable_tri);
 
 				for (int s = 0; s < 3; ++s) {
 					specials.push_back(sp);
@@ -183,19 +185,11 @@ void exploding_ring_system::draw_rings(
 			}
 		}
 		else {
-			components::sprite spr;
-			spr.set(
-				assets::game_image_id::BLANK, 
-				vec2(outer_radius_now * 2, outer_radius_now * 2), 
+			output.aabb_centered(
+				camera[world_explosion_center], 
+				vec2(outer_radius_now * 2, outer_radius_now * 2),
 				considered_color
 			);
-
-			components::sprite::drawing_input in(triangles);
-			in.renderable_transform.rotation = 0.f;
-			in.renderable_transform.pos = world_explosion_center;
-			in.camera = camera;
-
-			spr.draw(in);
 
 			for (int s = 0; s < 6; ++s) {
 				specials.push_back(sp);
@@ -205,7 +199,8 @@ void exploding_ring_system::draw_rings(
 }
 
 void exploding_ring_system::draw_highlights_of_rings(
-	augs::vertex_triangle_buffer& triangles,
+	const augs::drawer output,
+	const augs::texture_atlas_entry highlight_tex,
 	const camera_cone camera,
 	const cosmos& cosmos
 ) const {
@@ -219,20 +214,14 @@ void exploding_ring_system::draw_highlights_of_rings(
 		const auto highlight_amount = 1.f - ratio;
 
 		if (highlight_amount > 0.f) {
-			components::sprite::drawing_input highlight(triangles);
-			highlight.camera = camera;
-			highlight.renderable_transform.pos = r.in.center;
-
 			highlight_col.a = static_cast<rgba_channel>(255 * highlight_amount);
 
-			components::sprite spr;
-			spr.set(
-				assets::game_image_id::CAST_HIGHLIGHT, 
-				vec2(radius, radius), 
+			output.aabb_centered(
+				highlight_tex,
+				camera[r.in.center],
+				vec2(radius, radius),
 				highlight_col
 			);
-
-			spr.draw(highlight);
 		}
 	}
 }

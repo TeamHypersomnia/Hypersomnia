@@ -1,50 +1,74 @@
-#include "shader.h"
-
-#include "augs/graphics/OpenGL_includes.h"
-
+#include "augs/graphics/shader.h"
 #include "augs/ensure.h"
 #include "augs/filesystem/file.h"
 #include "augs/math/matrix.h"
 
+#include "augs/graphics/OpenGL_includes.h"
+
 namespace augs {
 	namespace graphics {
-		void log_shader(const GLuint obj, const std::string& source_code) {
-			int infologLength = 0;
-			int charsWritten = 0;
-			char *infoLog;
+		void log_shader(
+			const shader::type shader_type,
+			const GLuint obj, 
+			const std::string& source_code
+		) {
+			int info_log_length = 0;
 
-			glGetShaderiv(obj, GL_INFO_LOG_LENGTH, &infologLength); glerr
+			GL_CHECK(glGetShaderiv(obj, GL_INFO_LOG_LENGTH, &info_log_length));
 
-			if (infologLength > 1) {
-				infoLog = (char *) malloc(infologLength);
-				glGetShaderInfoLog(obj, infologLength, &charsWritten, infoLog); glerr
-				LOG("---------------------------------\n Source code: \n%x ---------------------------------\n%x\n", source_code.c_str(), infoLog);
-				free(infoLog);
-				ensure(false);
+			if (info_log_length > 1) {
+				std::string info_log;
+				info_log.resize(info_log_length);
+
+				int chars_written = 0;
+
+				GL_CHECK(glGetShaderInfoLog(
+					obj, 
+					info_log_length, 
+					&chars_written, 
+					info_log.data()
+				));
+
+				info_log.pop_back();
+
+				throw shader_compilation_error(shader_type, source_code, info_log);
 			}
 		}
 
 		void log_shader_program(const GLuint obj) {
-			int infologLength = 0;
-			int charsWritten = 0;
-			char *infoLog;
+			int info_log_length = 0;
 
-			glGetProgramiv(obj, GL_INFO_LOG_LENGTH, &infologLength); glerr
+			GL_CHECK(glGetProgramiv(obj, GL_INFO_LOG_LENGTH, &info_log_length));
 
-			if (infologLength > 1) {
-				infoLog = (char *) malloc(infologLength);
-				glGetProgramInfoLog(obj, infologLength, &charsWritten, infoLog); glerr
-				LOG("---------------------------------\n%x\n", infoLog);
-				free(infoLog);
-				ensure(false);
+			if (info_log_length > 1) {
+				std::string info_log;
+				info_log.resize(info_log_length);
+
+				int chars_written = 0;
+
+				GL_CHECK(glGetProgramInfoLog(
+					obj, 
+					info_log_length, 
+					&chars_written, 
+					info_log.data()
+				));
+				
+				info_log.pop_back();
+
+				throw shader_program_build_error(obj, info_log);
 			}
 		}
 
 		shader::shader(
 			const type shader_type,
-			const std::string& path
-		) {
-			create(shader_type, "// " + path + "\n" + get_file_contents(path));
+			const path_type& path
+		) try {
+			create(shader_type, "// " + path.string() + "\n" + get_file_contents(path));
+		}
+		catch (const augs::ifstream_error& err) {
+			throw shader_error(
+				"Error while loading shader file %x:\n%x", path, err.what()
+			);
 		}
 
 		shader::~shader() {
@@ -76,24 +100,22 @@ namespace augs {
 			built = true;
 
 			if (shader_type == type::VERTEX) {
-				id = glCreateShader(GL_VERTEX_SHADER); 
-				glerr;
+				GL_CHECK(id = glCreateShader(GL_VERTEX_SHADER)); 
 			}
 			if (shader_type == type::FRAGMENT) {
-				id = glCreateShader(GL_FRAGMENT_SHADER); 
-				glerr;
+				GL_CHECK(id = glCreateShader(GL_FRAGMENT_SHADER));
 			}
 
 			auto* const source_ptr = source_code.c_str();
-			glShaderSource(id, 1, &source_ptr, nullptr); glerr
-			glCompileShader(id); glerr
+			GL_CHECK(glShaderSource(id, 1, &source_ptr, nullptr));
+			GL_CHECK(glCompileShader(id));
 
-			log_shader(id, source_code);
+			log_shader(shader_type, id, source_code);
 		}
 
 		void shader::destroy() {
 			if (built) {
-				glDeleteShader(id); glerr
+				GL_CHECK(glDeleteShader(id));
 				built = false;
 			}
 		}
@@ -132,8 +154,8 @@ namespace augs {
 		}
 
 		shader_program::shader_program(
-			const std::string& vertex_shader_path,
-			const std::string& fragment_shader_path
+			const path_type& vertex_shader_path,
+			const path_type& fragment_shader_path
 		) : shader_program(
 			shader(shader::type::VERTEX, vertex_shader_path),
 			shader(shader::type::FRAGMENT, fragment_shader_path)
@@ -151,12 +173,12 @@ namespace augs {
 			fragment(std::move(new_fragment))
 #endif
 		{
-			id = glCreateProgram(); glerr
+			GL_CHECK(id = glCreateProgram());
 
-			glAttachShader(id, new_vertex.id); glerr
-			glAttachShader(id, new_fragment.id); glerr
+			GL_CHECK(glAttachShader(id, new_vertex.id));
+			GL_CHECK(glAttachShader(id, new_fragment.id));
 
-			glLinkProgram(id); glerr
+			GL_CHECK(glLinkProgram(id));
 			log_shader_program(id);
 
 #if !STORE_SHADERS_IN_PROGRAM
@@ -171,25 +193,29 @@ namespace augs {
 			if (built) {
 				built = false;
 
-				glDeleteProgram(id); glerr
+				GL_CHECK(glDeleteProgram(id));
 			}
 		}
 
 		void shader_program::set_current_to_none_impl() {
-			glUseProgram(0); glerr
+			GL_CHECK(glUseProgram(0));
 		}
 
 		bool shader_program::set_as_current_impl() const {
-			glUseProgram(id); glerr
+			GL_CHECK(glUseProgram(id));
 			return true;
 		}
 		
 		GLint shader_program::get_uniform_location(const std::string& uniform_name) const {
+#if BUILD_OPENGL
 			return glGetUniformLocation(id, uniform_name.c_str());
+#else
+			return 0xdeadbeef;
+#endif
 		}
 
 		void shader_program::set_projection(const std::array<float, 16> matrix) const {
-			glUniformMatrix4fv(get_uniform_location("projection_matrix"), 1, GL_FALSE, matrix.data());
+			GL_CHECK(glUniformMatrix4fv(get_uniform_location("projection_matrix"), 1, GL_FALSE, matrix.data()));
 		}
 
 		void shader_program::set_projection(const vec2 for_screen_size) const {
@@ -197,11 +223,11 @@ namespace augs {
 		}
 
 		void shader_program::set_uniform(const GLint id, const vec2 v) const {
-			glUniform2f(id, v.x, v.y);
+			GL_CHECK(glUniform2f(id, v.x, v.y));
 		}
 
 		void shader_program::set_uniform(const GLint id, const vec2i v) const {
-			glUniform2i(id, v.x, v.y);
+			GL_CHECK(glUniform2i(id, v.x, v.y));
 		}
 
 		void shader_program::set_uniform(const GLint id, const rgba r) const {
@@ -213,19 +239,19 @@ namespace augs {
 		}
 
 		void shader_program::set_uniform(const GLint id, const vec3 v) const {
-			glUniform3f(id, v[0], v[1], v[2]);
+			GL_CHECK(glUniform3f(id, v[0], v[1], v[2]));
 		}
 		
 		void shader_program::set_uniform(const GLint id, const vec4 v) const {
-			glUniform4f(id, v[0], v[1], v[2], v[3]);
+			GL_CHECK(glUniform4f(id, v[0], v[1], v[2], v[3]));
 		}
 
 		void shader_program::set_uniform(const GLint id, const float v) const {
-			glUniform1f(id, v);
+			GL_CHECK(glUniform1f(id, v));
 		}
 
 		void shader_program::set_uniform(const GLint id, const int v) const {
-			glUniform1i(id, v);
+			GL_CHECK(glUniform1i(id, v));
 		}
 	}
 }

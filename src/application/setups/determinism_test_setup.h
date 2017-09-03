@@ -4,7 +4,7 @@
 class determinism_test_setup : public setup_base {
 public:
 	void process(
-		game_window&,
+		augs::window&,
 		viewing_session&
 	);
 };

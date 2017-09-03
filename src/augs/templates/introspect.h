@@ -1,6 +1,8 @@
 #pragma once
 #include <type_traits>
+#include "augs/templates/container_templates.h"
 #include "augs/templates/introspection_traits.h"
+#include "augs/templates/enum_introspect.h"
 #include "augs/templates/recursive.h"
 
 namespace augs {
@@ -60,18 +62,6 @@ namespace augs {
 		}
 	}
 
-	template <class Enum, class F>
-	void for_each_enum(F callback) {
-		augs::enum_to_args_impl(
-			Enum(),
-			[callback](const auto... all_enums) {
-				for (const auto _enum : { all_enums... }) {
-					callback(_enum);
-				}
-			}
-		);
-	}
-
 	template <class A, class B>
 	bool introspective_compare(
 		const A& a,
@@ -86,7 +76,10 @@ namespace augs {
 				const auto& aa, 
 				const auto& bb
 			) {
-				if constexpr(is_comparable_v<decltype(aa), decltype(bb)>) {
+				using A = std::decay_t<decltype(aa)>;
+				using B = std::decay_t<decltype(bb)>;
+
+				if constexpr(is_comparable_v<A, B>) {
 					are_same = are_same && aa == bb;
 				}
 				else {

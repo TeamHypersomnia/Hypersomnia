@@ -6,6 +6,8 @@
 #include "augs/misc/trivially_copyable_pair.h"
 #include "augs/templates/type_matching_and_indexing.h"
 
+#include "augs/misc/declare_containers.h"
+
 template<class ForwardIt, class T, class Compare = std::less<>>
 ForwardIt binary_find(ForwardIt first, ForwardIt last, const T& value, Compare comp = {})
 {
@@ -266,9 +268,6 @@ namespace augs  {
 			}
 		}
 	};
-
-	template <class T, std::size_t, class = void>
-	class constant_size_vector;
 
 	// GEN INTROSPECTOR class augs::constant_size_vector class T std::size_t const_count class dummy
 	// INTROSPECT BASE augs::constant_size_vector_base<T, const_count>

@@ -1,11 +1,14 @@
 #pragma once
 #include "augs/misc/minmax.h"
-#include "game/components/transform_component.h"
-#include "augs/graphics/vertex.h"
 #include "augs/misc/delta.h"
-#include "game/messages/exploding_ring_input.h"
 
-struct camera_cone;
+#include "augs/drawing/drawing.h"
+
+#include "game/messages/exploding_ring_input.h"
+#include "game/components/transform_component.h"
+
+#include "augs/math/camera_cone.h"
+
 class cosmos;
 class particles_simulation_system;
 
@@ -24,19 +27,21 @@ public:
 
 	void advance(
 		const cosmos& cosmos,
+		const particle_effect_definitions&,
 		const augs::delta dt,
 		particles_simulation_system& particles_output_for_effects
 	);
 
 	void draw_rings(
-		augs::vertex_triangle_buffer& triangles,
+		const augs::drawer_with_default output,
 		augs::special_buffer& specials,
 		const camera_cone camera,
 		const cosmos& cosmos
 	) const;
 
 	void draw_highlights_of_rings(
-		augs::vertex_triangle_buffer& triangles,
+		const augs::drawer output,
+		const augs::texture_atlas_entry highlight_tex,
 		const camera_cone camera,
 		const cosmos& cosmos
 	) const;

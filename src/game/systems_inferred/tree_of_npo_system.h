@@ -7,9 +7,8 @@
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/components/tree_of_npo_node_component.h"
-#include "game/detail/camera_cone.h"
+#include "augs/math/camera_cone.h"
 
-class viewing_step;
 class physics_system;
 struct cosmos_global_state;
 

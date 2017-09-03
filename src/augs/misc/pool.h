@@ -2,7 +2,7 @@
 #include <vector>
 #include "augs/ensure.h"
 
-#include "augs/build_settings/setting_empty_bases.h"
+#include "augs/build_settings/platform_defines.h"
 
 #include "augs/misc/pool_handle.h"
 #include "augs/misc/subscript_operator_for_get_handle_mixin.h"
@@ -33,6 +33,7 @@ namespace augs {
 	class EMPTY_BASES pool : public subscript_operator_for_get_handle_mixin<pool<T>> {
 	public:
 		using id_type = pooled_object_id<T>;
+		using key_type = id_type;
 		using unversioned_id_type = unversioned_id<T>;
 		using handle_type = handle_for_pool_container<false, pool<T>, T>;
 		using const_handle_type = handle_for_pool_container<true, pool<T>, T>;

@@ -4,6 +4,14 @@
 
 #include "augs/templates/type_list.h"
 
+/*
+	These includes only contain using declarations
+*/
+
+#include "game/components/transform_component.h"
+#include "game/components/sprite_component.h"
+#include "game/components/polygon_component.h"
+
 namespace components {
 	struct tree_of_npo_node;
 	struct special_physics;
@@ -20,10 +28,6 @@ namespace components {
 	struct pathfinding;
 	struct rigid_body;
 	struct render;
-	struct transform;
-	struct sprite;
-	struct polygon;
-	struct tile_layer_instance;
 	struct car;
 	struct driver;
 	struct fixtures;
@@ -75,7 +79,6 @@ struct put_all_components_into {
 		components::transform,
 		components::sprite,
 		components::polygon,
-		components::tile_layer_instance,
 		components::car,
 		components::driver,
 		components::fixtures,

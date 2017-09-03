@@ -9,11 +9,11 @@
 #include "generated/introspectors.h"
 
 void regenerate_scripted_image(
-	const std::string& output_image_path,
+	const augs::path_type& output_image_path,
 	const scripted_image_input& input,
 	const bool force_regenerate
 ) {
-	const auto output_image_stamp_path = augs::replace_extension(output_image_path, ".stamp");
+	const auto output_image_stamp_path = augs::path_type(output_image_path).replace_extension(".stamp");
 
 	augs::stream new_stamp_stream;
 	augs::write(new_stamp_stream, input);

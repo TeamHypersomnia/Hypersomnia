@@ -1,12 +1,12 @@
-#include "window.h"
-
 #include <algorithm>
 
 #include "augs/log.h"
+
 #include "augs/templates/string_templates.h"
 #include "augs/templates/corresponding_field.h"
 
-#include "platform_utils.h"
+#include "augs/window_framework/window.h"
+#include "augs/window_framework/platform_utils.h"
 
 #ifdef PLATFORM_WINDOWS
 #include "augs/window_framework/translate_windows_enums.h"
@@ -132,7 +132,7 @@ namespace augs {
 			break;
 		case WM_MOUSEMOVE:
 			if (!raw_mouse_input) {
-				vec2t<short> new_pos;
+				basic_vec2<short> new_pos;
 
 				{
 					const auto p = MAKEPOINTS(lParam);
@@ -177,7 +177,7 @@ namespace augs {
 
 					const auto screen_size = current_settings.get_screen_size() - vec2i(1, 1);
 					last_mouse_pos.clamp_from_zero_to(screen_size);
-					change.mouse.pos = vec2t<short>(last_mouse_pos);
+					change.mouse.pos = basic_vec2<short>(last_mouse_pos);
 					change.msg = translate_enum(WM_MOUSEMOVE);
 				}
 			}
@@ -217,6 +217,8 @@ namespace augs {
 	window::window(
 		const window_settings& settings
 	) {
+		// TODO: throw an exception instead of ensuring
+
 		triple_click_delay = GetDoubleClickTime();
 
 		if (!window_class_registered) {
@@ -253,13 +255,16 @@ namespace augs {
 		p.iLayerType = PFD_MAIN_PLANE;
 		ensure(hdc = GetDC(hwnd));
 
-		GLuint pf;
-		ensure(pf = ChoosePixelFormat(hdc, &p));
+		const auto pf = ChoosePixelFormat(hdc, &p);
+		
+		ensure(pf);
 		ensure(SetPixelFormat(hdc, pf, &p));
 
+#if BUILD_OPENGL
 		ensure(hglrc = wglCreateContext(hdc));
+#endif
 
-		set_as_current();
+		ensure(set_as_current());
 		show();
 
 		SetLastError(0);
@@ -367,17 +372,27 @@ namespace augs {
 	}
 
 	bool window::set_as_current_impl() {
+#if BUILD_OPENGL
 		return wglMakeCurrent(hdc, hglrc);
+#else
+		return true;
+#endif
 	}
 
 	void window::set_current_to_none_impl() {
+#if BUILD_OPENGL
 		wglMakeCurrent(NULL, NULL);
+#endif
 	}
 
-	std::vector<event::change> window::collect_entropy() {
-		ensure(is_current());
+	local_entropy window::collect_entropy() {
+		local_entropy output;
+		collect_entropy(output);
+		return output;
+	}
 
-		std::vector<event::change> output;
+	void window::collect_entropy(local_entropy& output) {
+		ensure(is_current());
 
 		while (PeekMessageW(&wmsg, hwnd, 0, 0, PM_REMOVE)) {
 			const auto new_change = handle_event(
@@ -404,8 +419,6 @@ namespace augs {
 			current_settings.size = get_window_rect().get_size();
 			current_settings.position = get_window_rect().get_position();
 		}
-
-		return output;
 	}
 
 	void window::set_window_rect(const xywhi r) {
@@ -435,7 +448,9 @@ namespace augs {
 		if (hwnd) {
 			unset_if_current();
 
+#if BUILD_OPENGL
 			wglDeleteContext(hglrc);
+#endif
 			ReleaseDC(hwnd, hdc);
 			DestroyWindow(hwnd);
 

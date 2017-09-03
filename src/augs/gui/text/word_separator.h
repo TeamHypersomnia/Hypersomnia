@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/gui/formatted_text.h"
+#include "augs/gui/formatted_string.h"
 
 namespace augs {
 	namespace gui {

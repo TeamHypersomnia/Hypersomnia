@@ -1,6 +1,6 @@
 #include "audio_structs.h"
 
-#include "augs/al_log.h"
+#include "augs/audio/OpenAL_error.h"
 
 #if BUILD_OPENAL
 extern "C" {
@@ -12,8 +12,6 @@ extern "C" {
 #include <AL/efx.h>
 #include <AL/alext.h>
 #endif
-
-#include "augs/ensure.h"
 
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
@@ -49,19 +47,19 @@ namespace augs {
 		alsoft_ini_file += "# Do not modify.";
 		alsoft_ini_file += "\n# Hypersomnia generates this file every launch to speak with OpenAL.";
 		alsoft_ini_file += "\n# Modification will have no effect.";
-		alsoft_ini_file += "\nhrtf-paths = " + augs::get_executable_directory() + "\\hrtf";
+		alsoft_ini_file += "\nhrtf-paths = " + augs::get_executable_directory().string() + "\\hrtf";
 		alsoft_ini_file += typesafe_sprintf("\nsources = %x", max_number_of_sound_sources);
 
 		auto where_openal_expects_alsoft_ini = GetProcPath();
 		alstr_append_cstr(&where_openal_expects_alsoft_ini, "\\alsoft.ini");
 
-		const auto alsoft_ini_path = std::string(alstr_get_cstr(where_openal_expects_alsoft_ini));
+		const auto alsoft_ini_path = augs::path_type(alstr_get_cstr(where_openal_expects_alsoft_ini));
 
 		augs::create_text_file(alsoft_ini_path, alsoft_ini_file);
 #endif
 	}
 
-	void log_all_audio_devices(const std::string& output_path) {
+	void log_all_audio_devices(const path_type& output_path) {
 #if BUILD_OPENAL
 		const auto all_audio_devices = list_audio_devices(alcGetString(nullptr, ALC_ALL_DEVICES_SPECIFIER));
 
@@ -69,7 +67,7 @@ namespace augs {
 		LOG("Default device: %x", alcGetString(nullptr, ALC_DEFAULT_DEVICE_SPECIFIER));
 
 		augs::create_text_file(
-			std::string(output_path),
+			output_path,
 			all_audio_devices
 		);
 #endif
@@ -78,7 +76,12 @@ namespace augs {
 	audio_device::audio_device(const std::string& device_name) {
 #if BUILD_OPENAL
 		device = alcOpenDevice(device_name.size() > 0 ? device_name.c_str() : nullptr);
-		ensure(alcIsExtensionPresent(device, "ALC_EXT_EFX"));
+		
+		AL_CHECK_DEVICE(device);
+
+		if (!alcIsExtensionPresent(device, "ALC_EXT_EFX")) {
+			LOG("Warning! ALC_EXT_EFX extension is not present.");
+		}
 #endif
 	}
 
@@ -102,19 +105,20 @@ namespace augs {
 	}
 
 	void audio_device::destroy() {
-		if (device != nullptr) {
 #if BUILD_OPENAL
+		if (device != nullptr) {
 			alcCloseDevice(device);
-			device = nullptr;
 			LOG("Destroyed OpenAL device: %x", device);
-#endif
+			device = nullptr;
 		}
+#endif
 	}
 
 	void audio_device::log_hrtf_status() const {
 #if BUILD_OPENAL
 		ALint hrtf_status;
 		alcGetIntegerv(device, ALC_HRTF_STATUS_SOFT, 1, &hrtf_status);
+		AL_CHECK_DEVICE(device);
 
 		std::string status;
 
@@ -140,6 +144,7 @@ namespace augs {
 		};
 
 		alcResetDeviceSOFT(device, attrs);
+		AL_CHECK_DEVICE(device);
 		log_hrtf_status();
 #endif
 	}
@@ -152,10 +157,13 @@ namespace augs {
 
 		if (!context || !set_as_current()) {
 			if (context) {
-				alcDestroyContext(context);
+				AL_CHECK(alcDestroyContext(context));
 			}
 
-			LOG("\nFailed to set an OpenAL context\n\n");
+			throw audio_error(
+				"Failed to set an OpenAL context on device: %x", 
+				settings.output_device_name
+			);
 		}
 
 		AL_CHECK(alSpeedOfSound(100.f));
@@ -192,7 +200,7 @@ namespace augs {
 	void audio_context::destroy() {
 #if BUILD_OPENAL
 		if (context) {
-			AL_CHECK(alcMakeContextCurrent(nullptr));
+			alcMakeContextCurrent(nullptr);
 			alcDestroyContext(context);
 			LOG("Destroyed OpenAL context: %x", context);
 			context = nullptr;
@@ -200,9 +208,11 @@ namespace augs {
 #endif
 	}
 
-	bool audio_context::set_as_current_impl() {
+	bool audio_context::set_as_current() {
 #if BUILD_OPENAL
-		return (alcMakeContextCurrent(context)) == ALC_TRUE;
+		auto result = alcMakeContextCurrent(context);
+		AL_CHECK(1);
+		return result == ALC_TRUE;
 #else
 		return true;
 #endif

@@ -1,4 +1,5 @@
 #pragma once
+#include <array>
 
 template <class T, class = void>
 struct has_key_type : std::false_type {};
@@ -53,6 +54,14 @@ struct size_test : decltype(size_test_detail<Trait>::call()) {
 
 };
 
+template <class T>
+struct is_std_array : std::false_type {};
+
+template <class T, std::size_t I>
+struct is_std_array<std::array<T, I>> : std::true_type {};
+
+template <class T>
+constexpr bool is_std_array_v = is_std_array<T>::value;
 
 template <class T>
 constexpr bool has_key_type_v = has_key_type<T>::value;
@@ -73,7 +82,7 @@ template <class T>
 constexpr bool is_associative_container_v = has_key_type_v<T> && has_mapped_type_v<T>;
 
 template <class T>
-constexpr bool is_unary_container_v = has_value_type_v<T> && !is_associative_container_v<T>;
+constexpr bool is_unary_container_v = !is_std_array_v<T> && has_value_type_v<T> && !is_associative_container_v<T>;
 
 template <class T>
 constexpr bool is_constexpr_size_container_v = size_test<T>::value;

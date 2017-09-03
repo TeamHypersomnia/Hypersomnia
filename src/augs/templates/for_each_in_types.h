@@ -2,6 +2,8 @@
 #include <type_traits>
 #include <tuple>
 
+#include "augs/templates/transform_types.h"
+
 namespace templates_detail {
 	template <class F, class... Instances>
 	void for_each_through_std_get(F&& f, std::index_sequence<>, Instances&&... instances)
@@ -56,5 +58,8 @@ void for_each_type(F&& f) {
 
 template <class L, class F>
 void for_each_type_in_list(F&& f) {
-	for_each_through_std_get(replace_list_type_t<augs::paint_command_variant, std::tuple>(), std::forward<F>(f));
+	for_each_through_std_get(
+		replace_list_type_t<augs::paint_command_variant, std::tuple>(), 
+		std::forward<F>(f)
+	);
 }

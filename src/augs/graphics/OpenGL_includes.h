@@ -1,4 +1,7 @@
 #pragma once
+#include "OpenGL_error.h"
+
+#if BUILD_OPENGL
 #include <glad/glad.h>
 
 #ifdef PLATFORM_WINDOWS
@@ -8,12 +11,4 @@
 #elif PLATFORM_LINUX
 #include <GL/gl.h>
 #endif
-
-#include <string>
-
-void report_glerr(
-	const GLenum __error, 
-	const std::string& location
-);
-
-#define glerr { report_glerr(glGetError(), __FUNCTION__); };
+#endif

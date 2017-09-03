@@ -3,7 +3,11 @@
 
 #include "augs/templates/type_in_list_id.h"
 #include "augs/templates/instance_type.h"
+#include "augs/templates/transform_types.h"
+
 #include "augs/misc/value_meter.h"
+#include "augs/misc/trivially_copyable_tuple.h"
+
 #include "augs/graphics/rgba.h"
 
 #include "game/assets/game_image_id.h"

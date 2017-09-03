@@ -1,5 +1,4 @@
 #pragma once
-#include "material.h"
 #include "augs/math/rects.h"
 #include "rect.h"
 #include "augs/misc/delta.h"
@@ -9,7 +8,6 @@ namespace augs {
 	namespace gui {
 		template <class gui_element_variant_id>
 		struct middlescrolling {
-			material mat;
 			vec2 size = vec2(25, 25);
 			vec2i middlescroll_icon_position;
 			gui_element_variant_id subject;
@@ -34,15 +32,6 @@ namespace augs {
 				}
 
 				return false;
-			}
-
-			template<class C>
-			void draw(const C context, draw_info in) const {
-				if (context.alive(subject)) {
-					auto scroller = ltrb(vec2(), size);
-					scroller.center(middlescroll_icon_position);
-					draw_clipped_rect(mat, scroller, context, subject, in.v);
-				}
 			}
 		};
 	}

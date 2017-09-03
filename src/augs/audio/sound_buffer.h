@@ -1,10 +1,13 @@
 #pragma once
+#include <optional>
 #include <vector>
+
+#include "augs/filesystem/path.h"
 
 typedef unsigned int ALuint;
 typedef int ALenum;
 
-class assets_manager;
+class all_assets;
 
 namespace augs {
 	struct sound_data;
@@ -15,10 +18,11 @@ namespace augs {
 		double computed_length_in_seconds = 0.0;
 		ALuint id = 0;
 		bool initialized = false;
-
+		
+		void set_data(const sound_data&);
 		void destroy();
 	public:
-		single_sound_buffer() = default;
+		single_sound_buffer(const sound_data&);
 		~single_sound_buffer();
 
 		single_sound_buffer(single_sound_buffer&& b);
@@ -27,54 +31,47 @@ namespace augs {
 		single_sound_buffer(const single_sound_buffer&) = delete;
 		single_sound_buffer& operator=(const single_sound_buffer&) = delete;
 
-		void set_data(const sound_data&);
-		// data_type get_data() const;
-		bool is_set() const;
-
 		double get_length_in_seconds() const;
 
 		ALuint get_id() const;
 		operator ALuint() const;
 	};
 
-	struct sound_buffer_logical_meta {
-		// GEN INTROSPECTOR struct augs::sound_buffer_logical_meta
-		float max_duration_in_seconds = 0.f;
-		unsigned num_of_variations = 0xdeadbeef;
+	struct sound_buffer_loading_input {
+		// GEN INTROSPECTOR struct augs::sound_buffer_loading_input
+		augs::path_type path_template;
+		bool generate_mono = true;
 		// END GEN INTROSPECTOR
 	};
 
 	class sound_buffer {
+		void from_file(const sound_buffer_loading_input);
+
+	public:
 		struct variation {
-			int original_channels = 0;
-			single_sound_buffer mono;
-			single_sound_buffer stereo;
+			std::optional<single_sound_buffer> mono;
+			std::optional<single_sound_buffer> stereo;
 
-			void set_data(const sound_data&, const bool generate_mono);
+			variation(
+				const sound_data&, 
+				const bool generate_mono
+			);
 
-			single_sound_buffer& request_original();
-			single_sound_buffer& request_mono();
-			single_sound_buffer& request_stereo();
-			const single_sound_buffer& request_original() const;
-			const single_sound_buffer& request_mono() const;
-			const single_sound_buffer& request_stereo() const;
+			const single_sound_buffer& stereo_or_mono() const;
+			const single_sound_buffer& mono_or_stereo() const;
 		};
 
+		sound_buffer(const sound_buffer_loading_input);
+
 		std::vector<variation> variations;
-	
-	public:
-		void from_file(
-			const std::string& path, 
-			const bool generate_mono = true
-		);
+	};
 
-		size_t get_num_variations() const;
-		variation& get_variation(const size_t);
-		const variation& get_variation(const size_t) const;
+	struct sound_buffer_logical {
+		sound_buffer_logical(const sound_buffer&);
 
-		ALuint get_id() const;
-		operator ALuint() const;
-
-		sound_buffer_logical_meta get_logical_meta(const assets_manager& manager) const;
+		// GEN INTROSPECTOR struct augs::sound_buffer_logical
+		float max_duration_in_seconds = 0.f;
+		unsigned num_of_variations = 0xdeadbeef;
+		// END GEN INTROSPECTOR
 	};
 }

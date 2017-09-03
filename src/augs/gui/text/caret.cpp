@@ -3,7 +3,7 @@
 namespace augs {
 	namespace gui {
 		namespace text {
-			caret_info::caret_info(style default_style) : default_style(default_style), pos(0), selection_offset(0) {}
+			caret_info::caret_info(const style default_style) : default_style(default_style) {}
 
 			unsigned caret_info::get_left_selection() const {
 				return selection_offset < 0 ? (pos + selection_offset) : pos;

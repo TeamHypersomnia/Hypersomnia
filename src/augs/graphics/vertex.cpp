@@ -6,7 +6,3 @@ namespace augs {
 		texcoord = tex.get_atlas_space_uv(coord);
 	}
 }
-
-vertex_triangle_buffer_reference::vertex_triangle_buffer_reference(augs::vertex_triangle_buffer& target_buffer) : target_buffer(target_buffer) {
-
-}

@@ -1,20 +1,21 @@
 #pragma once
-#include "augs/misc/streams.h"
-#include "augs/window_framework/event.h"
 #include <unordered_map>
 #include <vector>
-#include "game/transcendental/entity_id.h"
-#include "game/messages/intent_message.h"
 
-#include "game/detail/inventory/item_slot_transfer_request.h"
 #include "augs/templates/container_templates.h"
 
+#include "augs/misc/streams.h"
 #include "augs/misc/machine_entropy.h"
-
 #include "augs/misc/container_with_small_size.h"
-#include "game/components/sentience_component.h"
 #include "augs/misc/basic_input_context.h"
+
+#include "augs/window_framework/event.h"
+
+#include "game/transcendental/entity_id.h"
 #include "game/enums/input_context_enums.h"
+#include "game/messages/intent_message.h"
+#include "game/detail/inventory/item_slot_transfer_request.h"
+#include "game/components/sentience_component.h"
 
 class cosmos;
 

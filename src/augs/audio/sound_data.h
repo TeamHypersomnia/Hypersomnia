@@ -1,19 +1,23 @@
 #pragma once
 #include <vector>
+#include "augs/filesystem/path.h"
+#include "augs/templates/exception_templates.h"
 
 namespace augs {
-	typedef int16_t sound_sample_type;
+	using sound_sample_type = int16_t;
+
+	struct sound_decoding_error : error_with_typesafe_sprintf {
+		using error_with_typesafe_sprintf::error_with_typesafe_sprintf;
+	};
 
 	struct sound_data {
 		std::vector<sound_sample_type> samples;
 		int frequency = 0;
 		int channels = 0;
 
-		double compute_length_in_seconds() const {
-			return static_cast<double>(samples.size()) / (frequency * channels);
-		}
-	};
+		sound_data(const path_type& path);
 
-	std::vector<sound_sample_type> mix_stereo_to_mono(const std::vector<sound_sample_type>&);
-	sound_data mix_stereo_to_mono(const sound_data& source);
+		double compute_length_in_seconds() const;
+		sound_data& to_mono();
+	};
 }

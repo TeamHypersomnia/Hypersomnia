@@ -1,14 +1,19 @@
 #pragma once
 #include "augs/misc/minmax.h"
-#include "game/components/transform_component.h"
-#include "augs/graphics/rgba.h"
 #include "augs/misc/delta.h"
-#include "augs/graphics/vertex.h"
-#include "game/messages/thunder_input.h"
+#include "augs/graphics/rgba.h"
+#include "augs/math/camera_cone.h"
 
-struct camera_cone;
+#include "game/messages/thunder_input.h"
+#include "game/components/transform_component.h"
+#include "game/assets/assets_declarations.h"
+
 class particles_simulation_system;
 class cosmos;
+
+namespace augs {
+	struct line_drawer_with_default;
+}
 
 class thunder_system {
 public:
@@ -41,14 +46,15 @@ public:
 
 	void advance(
 		const cosmos&,
+		const particle_effect_definitions&,
 		const augs::delta dt,
 		particles_simulation_system& particles_output_for_effects
 	);
 
 	void draw_thunders(
-		augs::vertex_line_buffer& lines,
+		const augs::line_drawer_with_default output,
 		const camera_cone camera
 	) const;
 
-	void reserve_caches_for_entities(const size_t) const {}
+	void reserve_caches_for_entities(const std::size_t) const {}
 };

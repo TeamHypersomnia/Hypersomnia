@@ -1,4 +1,5 @@
 #pragma once
+#include <array>
 #include "augs/math/vec2.h"
 
 typedef unsigned int ALuint;

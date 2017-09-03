@@ -17,23 +17,17 @@ constexpr std::size_t CONVEX_POLY_VERTEX_COUNT = b2_maxPolygonVertices;
 constexpr std::size_t ONLY_PICK_THESE_ITEMS_COUNT = 20;
 constexpr std::size_t MOVEMENT_RESPONSE_RECEIVERS_COUNT = 2;
 
+constexpr std::size_t RENDERING_POLYGON_VERTEX_COUNT = 20;
 constexpr std::size_t RENDERING_POLYGON_INDEX_COUNT = 20;
-constexpr std::size_t RENDERING_POLYGON_TRIANGULATED_VERTEX_COUNT = 20;
 
 constexpr std::size_t OWNER_FRICTION_GROUNDS_COUNT = 10;
 
 constexpr std::size_t RECOIL_OFFSET_COUNT = 50;
 
 constexpr std::size_t MAX_ANIMATION_COUNT = 20;
-constexpr std::size_t MAX_FONT_COUNT = 20;
 constexpr std::size_t MAX_GAME_IMAGE_COUNT = 500;
-constexpr std::size_t MAX_GL_TEXTURE_COUNT = 10;
 constexpr std::size_t MAX_PARTICLE_EFFECT_COUNT = 100;
 constexpr std::size_t MAX_PHYSICAL_MATERIAL_COUNT = 15;
-constexpr std::size_t MAX_SHADER_PROGRAM_COUNT = 50;
-constexpr std::size_t MAX_SHADER_COUNT = 100;
 constexpr std::size_t MAX_SOUND_BUFFER_COUNT = 1000;
-constexpr std::size_t MAX_SPELL_COUNT = 70;
-constexpr std::size_t MAX_TILE_LAYER_COUNT = 400;
 constexpr std::size_t MAX_RECOIL_PLAYER_COUNT = 100;
 

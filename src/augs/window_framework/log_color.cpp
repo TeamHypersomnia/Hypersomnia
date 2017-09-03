@@ -10,7 +10,7 @@ template<>
 void LOG_COLOR(const console_color c, const std::string& f) {
 	std::unique_lock<std::mutex> lock(log_mutex);
 
-	global_log::push_entry({ c, f });
+	program_log::get_current().push_entry({ c, f });
 
 	augs::colored_print(c, f.c_str());
 #if LOG_TO_FILE

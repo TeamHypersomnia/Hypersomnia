@@ -1,9 +1,12 @@
 #pragma once
 #include "augs/entity_system/storage_for_systems.h"
+
 #include "game/transcendental/types_specification/all_systems_audiovisual_includes.h"
 #include "game/transcendental/types_specification/all_systems_declaration.h"
 #include "game/transcendental/step_declaration.h"
 #include "game/transcendental/entity_id.h"
+
+#include "game/assets/assets_declarations.h"
 
 #include "game/detail/particle_types.h"
 
@@ -23,10 +26,14 @@ struct visible_entities;
 
 struct audiovisual_advance_input {
 	const cosmos& cosm;
-	const entity_id viewed_character;
+	const entity_id viewed_character_id;
 	const visible_entities& all_visible;
 	const float speed_multiplier;
+	const vec2i screen_size;
+	const particle_effect_definitions& particle_effects;
 
+	const loaded_sounds& sounds;
+	const game_gui_context_dependencies gui_deps;
 	const augs::audio_volume_settings audio_volume;
 	const interpolation_settings interpolation;
 	const world_camera_settings camera;
@@ -49,11 +56,20 @@ struct audiovisual_state {
 		return systems.get<T>();
 	}
 
+	auto get_standard_post_solve() {
+		return [this](const const_logic_step step) {
+			standard_post_solve(step);
+		};
+	}
+
+	auto get_viewing_camera() const {
+		return camera.smoothed_camera;
+	}
+
 	void advance(const audiovisual_advance_input);
 
 	void standard_post_solve(const const_logic_step);
 	void spread_past_infection(const const_logic_step);
 
 	void reserve_caches_for_entities(const std::size_t);
-	void set_screen_size(const vec2i);
 };

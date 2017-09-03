@@ -1,7 +1,8 @@
-#include "machine_entropy.h"
 #include "augs/templates/container_templates.h"
+#include "augs/misc/machine_entropy.h"
 
 namespace augs {
+#if 0
 	machine_entropy& machine_entropy::operator+=(const machine_entropy& b) {
 		concatenate(local, b.local);
 		concatenate(remote, b.remote);
@@ -13,6 +14,8 @@ namespace augs {
 		return local == b.local && remote == b.remote;
 	}
 
+	void machine_entropy::apply_to(event::state&) const;
+
 	bool machine_entropy::empty() const {
 		return local.empty() && remote.empty();
 	}
@@ -21,4 +24,5 @@ namespace augs {
 		local.clear();
 		remote.clear();
 	}
+#endif
 }

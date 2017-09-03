@@ -1,73 +1,98 @@
 #pragma once
-// got to revise gui systems in terms of rectangle update'ing
+#include <optional>
+
 #include "augs/misc/timer.h"
-#include "augs/gui/material.h"
+#include "augs/drawing/drawing.h"
+#include "augs/gui/formatted_string.h"
 
 namespace augs {
 	namespace gui {
 		namespace text {
 			struct caret_info;
 			struct drafter;
+
+			struct caret_blinker {
+				bool blink = true;
+				bool caret_visible = true;
+				unsigned interval_ms = 250;
+
+				timer timer;
+
+				void update();
+				void reset();
+			};
+
 			struct printer {
-				/* defines how the caret should blink and whether should blink at all */
-				struct blinker {
-					bool blink, caret_visible;
-					int interval_ms;
+				caret_blinker blink;
+				rgba selected_text_color = white;
 
-					//static void regular_blink(blinker&, quad& caret);
-					//void (*blink_func)(blinker&, quad&);
+				unsigned caret_width = 1;
 
-					timer timer;
-					blinker();
-					void update();
-					void reset();
-				};
+				bool active = false;
+				bool align_caret_height = true;
+				bool highlight_current_line = false;
+				bool highlight_during_selection = true;
 
-				blinker blink;
-				rgba selected_text_color;
-
-				unsigned caret_width;
-
-				bool active,
-					align_caret_height, /* whether caret should be always of line height */
-					highlight_current_line,
-					highlight_during_selection;
-
-				material caret_mat,
-					highlight_mat,
-					selection_bg_mat,
-					selection_inactive_bg_mat; /* material for line highlighting */
-
-				printer();
+				rgba caret_col = white;
+				rgba highlight_col = rgba(15, 15, 15, 255);
+				rgba selection_bg_col = rgba(128, 255, 255, 120);
+				rgba selection_inactive_bg_col = rgba(128, 255, 255, 40);
 
 				void draw_text(
-					std::vector<augs::vertex_triangle>& out,
+					const drawer out,
+					const vec2i pos,
 					const drafter&,
 					const formatted_string& colors,
-					const caret_info* const caret,
+					const ltrbi clipper = ltrbi()
+				) const;
+
+				void draw_text(
+					const drawer_with_default out,
 					const vec2i pos,
+					const drafter&,
+					const formatted_string& colors,
+					const caret_info caret,
 					const ltrbi clipper = ltrbi()
 				) const;
 			};
 
-			extern vec2i get_text_bbox(
+			vec2i get_text_bbox(
 				const formatted_string& str, 
-				const unsigned wrapping_width
+				const unsigned wrapping_width = 0
 			);
 
-			extern vec2 quick_print(
-				std::vector<augs::vertex_triangle>& v,
-				const formatted_string& str,
+			vec2i print(
+				const drawer out,
 				const vec2i pos,
+				const formatted_string& str,
 				const unsigned wrapping_width = 0,
 				const ltrbi clipper = ltrbi()
 			);
 
-			extern vec2 quick_print_format(
-				std::vector<augs::vertex_triangle>& v,
-				const std::wstring& wstr,
-				const style style,
+			vec2i print_stroked(
+				const drawer out,
 				const vec2i pos,
+				const formatted_string& str,
+				const rgba stroke_color = black,
+				const unsigned wrapping_width = 0,
+				const ltrbi clipper = ltrbi()
+			);
+
+			vec2i print(
+				const drawer_with_default out,
+				const vec2i pos,
+				const formatted_string& str,
+				const caret_info caret,
+				const unsigned wrapping_width = 0,
+				const ltrbi clipper = ltrbi()
+			);
+
+			vec2i print_stroked(
+				const drawer_with_default out,
+				const vec2i pos,
+				const formatted_string& str,
+				const caret_info caret,
+				const rgba stroke_color = black,
 				const unsigned wrapping_width = 0,
 				const ltrbi clipper = ltrbi()
 			);

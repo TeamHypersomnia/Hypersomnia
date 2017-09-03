@@ -76,7 +76,7 @@ basic_entity_handle<C> basic_entity_handle<C>::add_standard_components(const log
 		&& !has<components::rigid_body>() 
 		&& !has<components::tree_of_npo_node>()
 	) {
-		add(components::tree_of_npo_node::create_default_for(step, *this));
+		add(components::tree_of_npo_node::create_default_for(*this));
 	}
 
 	if (has<components::rigid_body>()) {

@@ -7,11 +7,11 @@ struct homing_animated_particle;
 
 template <template <class...> class List = type_list>
 struct list_of_particle_types {
-	typedef List<
+	using type = List<
 		general_particle,
 		animated_particle,
 		homing_animated_particle
-	> type;
+	>;
 };
 
 template <template<class...> class List = type_list>

@@ -2,6 +2,17 @@
 #include "game/detail/particle_types.h"
 #include "augs/templates/for_each_in_types.h"
 
+particle_effect_logical::particle_effect_logical(const particle_effect& effect) 
+	: max_duration_in_seconds(
+		maximum_of(
+			effect.emissions,
+			[](const particles_emission& a, const particles_emission& b) {
+				return a.stream_lifetime_ms.second < b.stream_lifetime_ms.second;
+			}
+		).stream_lifetime_ms.second
+	)
+{}
+
 void particles_emission::apply_modifier(const particle_effect_modifier m) {
 	for_each_through_std_get(particle_definitions, [&](auto& templates) {
 		for (auto& p : templates) {

@@ -26,8 +26,8 @@ struct neon_map_stamp {
 };
 
 void regenerate_neon_map(
-	const std::string& source_image_path,
-	const std::string& output_image_path,
+	const augs::path_type& source_image_path,
+	const augs::path_type& output_image_path,
 	const neon_map_input in,
 	const bool force_regenerate
 );

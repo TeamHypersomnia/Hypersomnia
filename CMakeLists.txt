@@ -10,6 +10,7 @@ project(Hypersomnia)
 
 option(BUILD_SOUND_FORMAT_DECODERS "Build ogg and vorbis. If this is off, there is also no point in enabling OpenAL." ON)
 option(BUILD_OPENAL "Build OpenAL Soft." ON)
+option(BUILD_OPENGL "Build OpenGL-related code." ON)
 option(BUILD_UNIT_TESTS "Build unit tests that are run on game startup." ON)
 option(BUILD_VERSION_FILE_GENERATOR "Build version file generator to generate commit information." ON)
 option(BUILD_ENET "Build ENet networking library." ON)
@@ -127,26 +128,30 @@ set(HYPERSOMNIA_BOX2D_SRCS
 # Test scene sources that whose inclusion is conditional on the value of BUILD_TEST_SCENES.
 
 set(HYPERSOMNIA_TEST_SCENES_SRCS
-	"src/game/hardcoded_content/ingredients/artificial_life.cpp"
-	"src/game/hardcoded_content/ingredients/backpack.cpp"
-	"src/game/hardcoded_content/ingredients/box_physics.cpp"
-	"src/game/hardcoded_content/ingredients/car.cpp"
-	"src/game/hardcoded_content/ingredients/character_inventory.cpp"
-	"src/game/hardcoded_content/ingredients/guns.cpp"
-	"src/game/hardcoded_content/ingredients/ingredients.cpp"
-	"src/game/hardcoded_content/ingredients/melee_weapons.cpp"
-	"src/game/hardcoded_content/ingredients/motorcycle.cpp"
-	"src/game/hardcoded_content/ingredients/obstacles.cpp"
-	"src/game/hardcoded_content/ingredients/sprite.cpp"
-	"src/game/hardcoded_content/ingredients/wsad_player.cpp"
-	"src/game/hardcoded_content/ingredients/grenades.cpp"
+	"src/game/hardcoded_content/test_scenes/ingredients/artificial_life.cpp"
+	"src/game/hardcoded_content/test_scenes/ingredients/backpack.cpp"
+	"src/game/hardcoded_content/test_scenes/ingredients/box_physics.cpp"
+	"src/game/hardcoded_content/test_scenes/ingredients/car.cpp"
+	"src/game/hardcoded_content/test_scenes/ingredients/character_inventory.cpp"
+	"src/game/hardcoded_content/test_scenes/ingredients/guns.cpp"
+	"src/game/hardcoded_content/test_scenes/ingredients/ingredients.cpp"
+	"src/game/hardcoded_content/test_scenes/ingredients/melee_weapons.cpp"
+	"src/game/hardcoded_content/test_scenes/ingredients/motorcycle.cpp"
+	"src/game/hardcoded_content/test_scenes/ingredients/obstacles.cpp"
+	"src/game/hardcoded_content/test_scenes/ingredients/sprite.cpp"
+	"src/game/hardcoded_content/test_scenes/ingredients/wsad_player.cpp"
+	"src/game/hardcoded_content/test_scenes/ingredients/grenades.cpp"
+	
+	"src/game/hardcoded_content/test_scenes/test_scene_images.cpp"
 	"src/game/hardcoded_content/test_scenes/test_scene_particle_effects.cpp"
 	"src/game/hardcoded_content/test_scenes/test_scene_physical_materials.cpp"
 	"src/game/hardcoded_content/test_scenes/test_scene_sentience_properties.cpp"
-	"src/game/hardcoded_content/test_scenes/test_scene_tile_layers.cpp"
 	"src/game/hardcoded_content/test_scenes/test_scene_animations.cpp"
 	"src/game/hardcoded_content/test_scenes/test_scene_sound_buffers.cpp"
 	"src/game/hardcoded_content/test_scenes/test_scene_recoil_players.cpp"
+
+	"src/game/hardcoded_content/test_scenes/scenes/minimal_scene.cpp"
+	"src/game/hardcoded_content/test_scenes/scenes/testbed.cpp"
 )
 
 # We don't care about alphabetical order. Put new files to the very bottom.
@@ -157,20 +162,17 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/application/content_regeneration/buttons_with_corners.cpp"
 	"src/application/content_regeneration/scripted_images.cpp"
 	"src/application/content_regeneration/neon_maps.cpp"
-	"src/application/content_regeneration/texture_atlases.cpp"
 	"src/augs/graphics/texture.cpp"
 	"src/augs/gui/button_corners.cpp"
-	"src/augs/al_log.cpp"
 	"src/augs/audio/audio_structs.cpp"
 	"src/augs/audio/sound_buffer.cpp"
 	"src/augs/audio/sound_source.cpp"
 	"src/augs/ensure.cpp"
-	"src/augs/graphics/drawers.cpp"
+	"src/augs/drawing/drawing.cpp"
 	"src/augs/gui/clipboard.cpp"
 	"src/augs/gui/gui_traversal_structs.cpp"
-	"src/augs/gui/formatted_text.cpp"
+	"src/augs/gui/formatted_string.cpp"
 	"src/augs/gui/rect.cpp"
-	"src/augs/gui/text_drawer.cpp"
 	"src/augs/image/font.cpp"
 	"src/augs/image/image.cpp"
 	"src/augs/window_framework/log_color.cpp"
@@ -192,14 +194,14 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/augs/network/enet_raii.cpp"
 	"src/augs/network/reliable_channel.cpp"
 	"src/augs/texture_atlas/texture_atlas_entry.cpp"
+	"src/augs/texture_atlas/texture_atlas.cpp"
 	"src/augs/window_framework/translate_windows_enums.cpp"
 	"src/game/assets/animation.cpp"
-	"src/game/assets/assets_manager.cpp"
+	"src/game/assets/all_assets.cpp"
 	"src/game/assets/behaviour_tree.cpp"
 	"src/game/assets/game_image.cpp"
 	"src/game/assets/particle_effect.cpp"
 	"src/game/assets/physical_material.cpp"
-	"src/game/assets/tile_layer.cpp"
 	"src/game/components/all_inferred_state_component.cpp"
 	"src/game/components/flags_component.cpp"
 	"src/game/components/light_component.cpp"
@@ -207,7 +209,6 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/game/components/sentience_component.cpp"
 	"src/game/components/sound_existence_component.cpp"
 	"src/game/components/tree_of_npo_node_component.cpp"
-	"src/game/detail/camera_cone.cpp"
 	"src/game/detail/entity_handle_mixins/inventory_mixin.cpp"
 	"src/game/detail/entity_handle_mixins/physics_mixin.cpp"
 	"src/game/detail/entity_handle_mixins/relations_mixin.cpp"
@@ -244,8 +245,6 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/game/enums/item_transfer_result_type.cpp"
 	"src/game/enums/slot_physical_behaviour.cpp"
 	"src/game/detail/ai/create_standard_behaviour_trees.cpp"
-	"src/game/hardcoded_content/test_scenes/minimal_scene.cpp"
-	"src/game/hardcoded_content/test_scenes/testbed.cpp"
 	"src/game/systems_audiovisual/exploding_ring_system.cpp"
 	"src/game/systems_audiovisual/game_gui_system.cpp"
 	"src/game/systems_audiovisual/interpolation_system.cpp"
@@ -261,7 +260,6 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/game/systems_inferred/tree_of_npo_system.cpp"
 	"src/game/systems_stateless/destruction_system.cpp"
 	"src/game/systems_stateless/hand_fuse_system.cpp"
-	"src/game/systems_stateless/gui_system.cpp"
 	"src/game/systems_audiovisual/light_system.cpp"
 	"src/game/systems_stateless/melee_system.cpp"
 	"src/game/systems_stateless/particles_existence_system.cpp"
@@ -273,8 +271,6 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/game/transcendental/cosmic_entropy.cpp"
 	"src/game/components/processing_component.cpp"
 	"src/game/transcendental/cosmic_movie_director.cpp"
-	"src/game/detail/convex_partitioned_shape.cpp"
-	"src/game/transcendental/cosmic_step.cpp"
 	"src/game/transcendental/data_living_one_step.cpp"
 	"src/game/transcendental/entity_handle.cpp"
 	"src/augs/filesystem/directory.cpp"
@@ -296,10 +292,6 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/game/components/name_component.cpp"
 	"src/game/components/particles_existence_component.cpp"
 	"src/game/components/pathfinding_component.cpp"
-	"src/game/components/polygon_component.cpp"
-	"src/game/components/sprite_component.cpp"
-	"src/game/components/tile_layer_instance_component.cpp"
-	"src/game/components/transform_component.cpp"
 	"src/game/transcendental/cosmos.cpp"
 	"src/game/detail/ai/behaviours.cpp"
 	"src/game/detail/ai/behaviours/explore_in_search_for_last_seen_target.cpp"
@@ -342,13 +334,12 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/game/view/rendering_scripts/draw_hud_for_released_explosives.cpp"
 	"src/game/view/rendering_scripts/illuminated_rendering.cpp"
 #	"src/game/view/rendering_scripts/standard_rendering.cpp"
-	"src/game/view/viewing_session.cpp"
-	"src/game/view/viewing_step.cpp"
 	"src/game/view/world_camera.cpp"
 #	"src/application/setups/server_setup.cpp" #
 #	"src/application/setups/setup_base.cpp" #
 #	"src/application/setups/two_clients_and_server_setup.cpp" #
 	"src/application/setups/local_setup.cpp"
+#	"src/application/setups/editor_setup.cpp"
 #	"src/application/setups/choreographic_setup.cpp" #
 #	"src/application/setups/director_setup.cpp" #
 	"src/application/setups/main_menu_setup.cpp"
@@ -363,14 +354,10 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/augs/graphics/vertex.cpp"
 	"src/augs/gui/dragger.cpp"
 	"src/augs/gui/rect_world.cpp"
-	"src/augs/gui/material.cpp"
-	"src/augs/gui/stroke.cpp"
-	"src/augs/gui/stylesheet.cpp"
 	"src/augs/gui/text/caret.cpp"
 	"src/augs/gui/text/drafter.cpp"
 	"src/augs/gui/text/draft_redrawer.cpp"
 	"src/augs/gui/text/printer.cpp"
-	"src/augs/gui/text/ui.cpp"
 	"src/augs/gui/text/word_separator.cpp"
 	"src/augs/math/rects.cpp"
 	"src/augs/math/vec2.cpp"
@@ -382,9 +369,7 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/augs/log.cpp"
 	"src/augs/window_framework/event.cpp"
 	"src/augs/window_framework/window.cpp"
-	"src/augs/graphics/OpenGL_error.cpp"
 	"src/augs/audio/sound_data.cpp"
-	"src/augs/audio/sound_samples_from_file.cpp"
 	"src/game/systems_inferred/relational_system.cpp"
 	"src/game/components/motor_joint_component.cpp"
 	"src/augs/misc/enum_boolset.cpp"
@@ -399,18 +384,23 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/game/detail/spells/exaltation.cpp"
 	"src/game/detail/spells/echoes_of_the_higher_realms.cpp"
 	"src/augs/misc/script_utils.cpp"
-	"src/game/hardcoded_content/all_hardcoded_content.cpp"
-	"src/game/hardcoded_content/requisite/requisite_animations.cpp"
-	"src/game/hardcoded_content/requisite/requisite_atlases.cpp"
-	"src/game/hardcoded_content/requisite/requisite_shaders.cpp"
-	"src/game/hardcoded_content/requisite/requisite_sound_buffers.cpp"
+	"src/game/hardcoded_content/test_scenes/test_scenes_content.cpp"
+	"src/game/hardcoded_content/requisite_collections.cpp"
 	"src/augs/misc/imgui_utils.cpp"
-	"src/game/view/settings_gui.cpp"
+	"src/application/gui/settings_gui.cpp"
 	"src/game/assets/recoil_player.cpp"
 	"src/augs/gui/bbcode.cpp"
 	"src/augs/unit_tests.cpp"
 	"src/game/transcendental/profiling.cpp"
 	"src/game/view/audiovisual_state.cpp"
+	"src/game/assets/loaded_sounds.cpp"
+	"src/application/content_regeneration/atlas_distributions.cpp"
+	"src/application/main/main_helpers.cpp"
+	"src/application/main/draw_debug_details.cpp"
+	"src/application/main/imgui_pass.cpp"
+	"src/application/main/release_flags.cpp"
+	"src/game/components/shape_polygon_component.cpp"
+	"src/game/components/shape_circle_component.cpp"
 )
 
 # natvis files for easier debugging in Visual Studio.
@@ -420,6 +410,18 @@ if(MSVC)
 		"src/game/transcendental/entity_handle.natvis"
 		"src/game/detail/inventory/inventory_slot_handle.natvis"
 		"src/augs/misc/pooled_object_id.natvis"
+	)
+endif()
+
+if(BUILD_OPENGL)
+	list(APPEND HYPERSOMNIA_CODEBASE_SRCS
+		"src/augs/graphics/OpenGL_error.cpp"
+	)
+endif()
+
+if(BUILD_OPENAL)
+	list(APPEND HYPERSOMNIA_CODEBASE_SRCS
+		"src/augs/audio/OpenAL_error.cpp"
 	)
 endif()
 
@@ -611,7 +613,10 @@ if(BUILD_ENET)
 endif()
 
 add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/freetype")
-add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/glad")
+
+if(BUILD_OPENGL)
+	add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/glad")
+endif()
 
 # As the following libraries do not use the preferred target_include_directories,
 # we must manually acquire the directories that they add via include_directories.
@@ -651,6 +656,10 @@ include_directories("${PROJECT_BINARY_DIR}/generators_output")
 
 if(BUILD_OPENAL) 
 	add_definitions(-DBUILD_OPENAL=1 -DAL_ALEXT_PROTOTYPES)
+endif()
+
+if(BUILD_OPENGL) 
+	add_definitions(-DBUILD_OPENGL=1)
 endif()
 
 if(BUILD_SOUND_FORMAT_DECODERS) 
@@ -767,19 +776,26 @@ add_custom_command(
 
 add_dependencies(Hypersomnia Introspector-generator)
 
-# Before Hypersomnia builds,
-# GLAD must first download and generate the source files.
+if(BUILD_OPENGL)
+	# Before Hypersomnia builds,
+	# GLAD must first download and generate the source files.
 
-add_dependencies(Hypersomnia glad)
+	add_dependencies(Hypersomnia glad)
+endif()
 
 # We define libraries upon which Hypersomnia depends.
 
 set(HYPERSOMNIA_LIBS
-	"OpenGL32.lib"
 	freetype
 	lua
-	glad
 )
+
+if(BUILD_OPENGL)
+	list(APPEND HYPERSOMNIA_LIBS
+		"OpenGL32.lib"
+		glad
+	)
+endif()
 
 if(BUILD_OPENAL)
 	list(APPEND HYPERSOMNIA_LIBS OpenAL)

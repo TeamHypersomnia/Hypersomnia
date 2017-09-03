@@ -367,9 +367,26 @@ void detail_remove_item(const inventory_slot_handle handle, const entity_handle 
 	removed_item.get<components::item>().current_slot.unset();
 }
 
+components::transform get_attachment_offset(
+	const inventory_slot& slot,
+	const components::transform container_transform,
+	const const_entity_handle item
+) {
+	ensure(slot.makes_physical_connection());
+
+	components::transform total;
+
+	const auto sticking = slot.attachment_sticking_mode;
+
+	total = slot.attachment_offset;
+	total.pos += item.get_aabb(components::transform()).get_size().get_sticking_offset(sticking);
+	total.pos.rotate(container_transform.rotation, vec2(0, 0));
+
+	return total;
+}
+
 components::transform sum_attachment_offsets(
 	const cosmos& cosm,
-	const all_logical_metas_of_assets& metas,
 	const inventory_item_address addr
 ) {
 	components::transform total;
@@ -387,7 +404,7 @@ components::transform sum_attachment_offsets(
 
 		const auto item_in_slot = slot_handle.get_items_inside()[0];
 
-		total += get_attachment_offset(metas, *slot_handle, total, cosm[item_in_slot]);
+		total += get_attachment_offset(*slot_handle, total, cosm[item_in_slot]);
 
 		current_slot.container_entity = item_in_slot;
 	}
@@ -533,7 +550,7 @@ void perform_transfer(
 			if (should_fixtures_persist) {
 				const auto first_with_body = slot.get_first_ancestor_with_body_connection();
 
-				fixtures_offset = sum_attachment_offsets(step.cosm, step.input.metas_of_assets, descendant.get_address_from_root(first_with_body));
+				fixtures_offset = sum_attachment_offsets(step.cosm, descendant.get_address_from_root(first_with_body));
 				
 				if (slot->physical_behaviour == slot_physical_behaviour::CONNECT_AS_JOINTED_BODY) {
 					slot_requests_connection_of_bodies = true;
@@ -596,7 +613,7 @@ void perform_transfer(
 	};
 
 	physics_updater(grabbed_item_part_handle);
-	grabbed_item_part_handle.for_each_contained_item_recursive(step.input.metas_of_assets, physics_updater);
+	grabbed_item_part_handle.for_each_contained_item_recursive(physics_updater);
 
 	if (is_pickup) {
 		const auto target_capability = target_slot_container.get_owning_transfer_capability();

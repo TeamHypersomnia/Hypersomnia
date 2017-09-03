@@ -1,7 +1,7 @@
 #pragma once
 #include "augs/math/vec2.h"
 
-using controller_motion = vec2t<short>;
+using controller_motion = basic_vec2<short>;
 
 template <class motion_type_enum>
 struct basic_game_motion {

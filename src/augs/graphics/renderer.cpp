@@ -1,101 +1,76 @@
-#include <tuple>
+#include <imgui/imgui.h>
+
+#include "augs/templates/container_templates.h"
 
 #include "augs/graphics/OpenGL_includes.h"
 #include "augs/graphics/renderer.h"
 #include "augs/graphics/fbo.h"
-#include "game/messages/visibility_information.h"
-#include "game/components/rigid_body_component.h"
-#include "augs/templates/container_templates.h"
 
-#include "game/transcendental/entity_handle.h"
-#include "game/transcendental/cosmos.h"
+#include "augs/drawing/drawing.h"
+#include "augs/math/camera_cone.h"
 
-#include "augs/graphics/fbo.h"
-
-#include "augs/window_framework/window.h"
-
-#include "game/assets/assets_manager.h"
-#include "augs/graphics/drawers.h"
-#include "game/detail/camera_cone.h"
-
-#include <imgui/imgui.h>
+#include "augs/texture_atlas/texture_atlas_entry.h"
 
 namespace augs {
-	renderer::renderer(const vec2i screen_size) {
-		gladLoadGL();
+	renderer::renderer() {
+		GL_CHECK(gladLoadGL());
 
-		glEnable(GL_TEXTURE_2D); glerr;
-		glEnable(GL_BLEND); glerr;
+		GL_CHECK(glEnable(GL_TEXTURE_2D));
+		GL_CHECK(glEnable(GL_BLEND));
 
 		set_standard_blending();
-		glClearColor(0.0, 0.0, 0.0, 1.0); glerr;
+		set_clear_color(black);
 
-		glGenBuffers(1, &imgui_elements_id); glerr;
+		GL_CHECK(glGenBuffers(1, &imgui_elements_id));
 
-		glGenBuffers(1, &triangle_buffer_id); glerr;
-		glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer_id); glerr;
+		GL_CHECK(glGenBuffers(1, &triangle_buffer_id));
+		GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer_id));
 
-		glEnableVertexAttribArray(int(vertex_attribute::position)); glerr;
-		glEnableVertexAttribArray(int(vertex_attribute::texcoord)); glerr;
-		glEnableVertexAttribArray(int(vertex_attribute::color)); glerr;
+		GL_CHECK(glEnableVertexAttribArray(static_cast<int>(vertex_attribute::position)));
+		GL_CHECK(glEnableVertexAttribArray(static_cast<int>(vertex_attribute::texcoord)));
+		GL_CHECK(glEnableVertexAttribArray(static_cast<int>(vertex_attribute::color)));
 
-		glVertexAttribPointer(int(vertex_attribute::position), 2, GL_FLOAT, GL_FALSE, sizeof(vertex), 0); glerr;
-		glVertexAttribPointer(int(vertex_attribute::texcoord), 2, GL_FLOAT, GL_FALSE, sizeof(vertex), (char*)(sizeof(float) * 2)); glerr;
-		glVertexAttribPointer(int(vertex_attribute::color), 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(vertex), (char*)(sizeof(float) * 2 + sizeof(float) * 2)); glerr;
+		GL_CHECK(glVertexAttribPointer(static_cast<int>(vertex_attribute::position), 2, GL_FLOAT, GL_FALSE, sizeof(vertex), nullptr));
+		GL_CHECK(glVertexAttribPointer(static_cast<int>(vertex_attribute::texcoord), 2, GL_FLOAT, GL_FALSE, sizeof(vertex), reinterpret_cast<char*>(sizeof(float) * 2)));
+		GL_CHECK(glVertexAttribPointer(static_cast<int>(vertex_attribute::color), 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(vertex), reinterpret_cast<char*>(sizeof(float) * 2 + sizeof(float) * 2)));
 
-		glGenBuffers(1, &special_buffer_id); glerr;
-		glBindBuffer(GL_ARRAY_BUFFER, special_buffer_id); glerr;
+		GL_CHECK(glGenBuffers(1, &special_buffer_id));
+		GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, special_buffer_id));
 
 		enable_special_vertex_attribute();
-		glVertexAttribPointer(int(vertex_attribute::special), sizeof(special)/sizeof(float), GL_FLOAT, GL_FALSE, sizeof(special), 0); glerr;
+		GL_CHECK(glVertexAttribPointer(static_cast<int>(vertex_attribute::special), sizeof(special) / sizeof(float), GL_FLOAT, GL_FALSE, sizeof(special), nullptr));
 		disable_special_vertex_attribute();
 
-		glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer_id); glerr;
-
-		resize_fbos(screen_size);
-	}
-
-	void renderer::resize_fbos(const vec2i screen_size) {
-		if (!illuminating_smoke_fbo || illuminating_smoke_fbo->get_size() != screen_size) {
-			illuminating_smoke_fbo.emplace(screen_size);
-		}
-
-		if (!light_fbo || light_fbo->get_size() != screen_size) {
-			light_fbo.emplace(screen_size);
-		}
-
-		if (!smoke_fbo || smoke_fbo->get_size() != screen_size) {
-			smoke_fbo.emplace(screen_size);
-		}
+		GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer_id));
 	}
 
 	void renderer::enable_special_vertex_attribute() {
-		glEnableVertexAttribArray(int(vertex_attribute::special)); glerr;
+		GL_CHECK(glEnableVertexAttribArray(static_cast<int>(vertex_attribute::special)));
 	}
 
 	void renderer::disable_special_vertex_attribute() {
-		glDisableVertexAttribArray(int(vertex_attribute::special)); glerr;
+		GL_CHECK(glDisableVertexAttribArray(static_cast<int>(vertex_attribute::special)));
 	}
 
 	void renderer::set_clear_color(const rgba col) {
 		const auto v = vec4(col);
-		glClearColor(v[0], v[1], v[2], v[3]);
+		GL_CHECK(glClearColor(v[0], v[1], v[2], v[3]));
 	}
 
 	void renderer::clear_current_fbo() {
-		glClear(GL_COLOR_BUFFER_BIT);
+		GL_CHECK(glClear(GL_COLOR_BUFFER_BIT));
 	}
 
 	void renderer::set_standard_blending() {
-		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE); glerr;
+		GL_CHECK(glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE));
 	}
 
 	void renderer::set_additive_blending() {
-		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE, GL_ONE, GL_ONE); glerr;
+		GL_CHECK(glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE, GL_ONE, GL_ONE));
 	}
-	
+
 	void renderer::set_active_texture(const unsigned n) {
-		glActiveTexture(GL_TEXTURE0 + n);
+		GL_CHECK(glActiveTexture(GL_TEXTURE0 + n));
 	}
 
 	void renderer::call_triangles() {
@@ -105,8 +80,8 @@ namespace augs {
 
 		if (!specials.empty()) {
 			enable_special_vertex_attribute();
-			glBindBuffer(GL_ARRAY_BUFFER, special_buffer_id); glerr;
-			glBufferData(GL_ARRAY_BUFFER, sizeof(special) * specials.size(), specials.data(), GL_STREAM_DRAW); glerr;
+			GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, special_buffer_id));
+			GL_CHECK(glBufferData(GL_ARRAY_BUFFER, sizeof(special) * specials.size(), specials.data(), GL_STREAM_DRAW));
 		}
 
 		call_triangles(triangles);
@@ -117,10 +92,10 @@ namespace augs {
 	}
 
 	void renderer::call_triangles(const vertex_triangle_buffer& buffer) {
-		glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer_id); glerr;
+		GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer_id));
 
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_triangle) * buffer.size(), buffer.data(), GL_STREAM_DRAW); glerr;
-		glDrawArrays(GL_TRIANGLES, 0, buffer.size() * 3); glerr;
+		GL_CHECK(glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_triangle) * buffer.size(), buffer.data(), GL_STREAM_DRAW));
+		GL_CHECK(glDrawArrays(GL_TRIANGLES, 0, buffer.size() * 3));
 		triangles_drawn_total += buffer.size();
 	}
 
@@ -131,9 +106,9 @@ namespace augs {
 	void renderer::call_lines() {
 		if (lines.empty()) return;
 
-		glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer_id); glerr;
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_line) * lines.size(), lines.data(), GL_STREAM_DRAW); glerr;
-		glDrawArrays(GL_LINES, 0, lines.size() * 2); glerr;
+		GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer_id));
+		GL_CHECK(glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_line) * lines.size(), lines.data(), GL_STREAM_DRAW));
+		GL_CHECK(glDrawArrays(GL_LINES, 0, lines.size() * 2));
 	}
 
 	void renderer::push_line(const vertex_line& line) {
@@ -141,23 +116,23 @@ namespace augs {
 	}
 
 	void renderer::set_viewport(const xywhi xywh) {
-		glViewport(xywh.x, xywh.y, xywh.w, xywh.h);
+		GL_CHECK(glViewport(xywh.x, xywh.y, xywh.w, xywh.h));
 	}
-	
+
 	void renderer::push_triangles(const vertex_triangle_buffer& added) {
 		concatenate(triangles, added);
 	}
 
 	void renderer::push_special_vertex_triangle(
-		const augs::special s1, 
-		const augs::special s2, 
+		const augs::special s1,
+		const augs::special s2,
 		const augs::special s3
 	) {
 		specials.push_back(s1);
 		specials.push_back(s2);
 		specials.push_back(s3);
 	}
-	
+
 	void renderer::clear_special_vertex_data() {
 		specials.clear();
 	}
@@ -172,6 +147,11 @@ namespace augs {
 		clear_triangles();
 	}
 
+	void renderer::call_and_clear_lines() {
+		call_lines();
+		clear_lines();
+	}
+
 	void renderer::clear_lines() {
 		lines.clear();
 	}
@@ -184,12 +164,20 @@ namespace augs {
 		return triangles[i];
 	}
 
-	std::vector<vertex_triangle>& renderer::get_triangle_buffer() {
+	vertex_triangle_buffer& renderer::get_triangle_buffer() {
 		return triangles;
 	}
 
+	vertex_line_buffer& renderer::get_line_buffer() {
+		return lines;
+	}
+
+	special_buffer& renderer::get_special_buffer() {
+		return specials;
+	}
+
 	void renderer::fullscreen_quad() {
-		static float vertices[] = {
+		static constexpr float vertices[] = {
 			1.f, 1.f,
 			1.f, 0.f,
 			0.f, 0.f,
@@ -199,22 +187,22 @@ namespace augs {
 			1.f, 1.f
 		};
 
-		glBindBuffer(GL_ARRAY_BUFFER, 0); glerr;
-		glDisableVertexAttribArray(int(vertex_attribute::texcoord)); glerr;
-		glDisableVertexAttribArray(int(vertex_attribute::color)); glerr;
-		glVertexAttribPointer(int(vertex_attribute::position), 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), vertices); glerr;
+		GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, 0));
+		GL_CHECK(glDisableVertexAttribArray(static_cast<int>(vertex_attribute::texcoord)));
+		GL_CHECK(glDisableVertexAttribArray(static_cast<int>(vertex_attribute::color)));
+		GL_CHECK(glVertexAttribPointer(static_cast<int>(vertex_attribute::position), 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), vertices));
 
-		glDrawArrays(GL_TRIANGLES, 0, 6); glerr;
+		GL_CHECK(glDrawArrays(GL_TRIANGLES, 0, 6));
 
-		glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer_id); glerr;
+		GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer_id));
 
-		glEnableVertexAttribArray(int(vertex_attribute::position)); glerr;
-		glEnableVertexAttribArray(int(vertex_attribute::texcoord)); glerr;
-		glEnableVertexAttribArray(int(vertex_attribute::color)); glerr;
+		GL_CHECK(glEnableVertexAttribArray(static_cast<int>(vertex_attribute::position)));
+		GL_CHECK(glEnableVertexAttribArray(static_cast<int>(vertex_attribute::texcoord)));
+		GL_CHECK(glEnableVertexAttribArray(static_cast<int>(vertex_attribute::color)));
 
-		glVertexAttribPointer(int(vertex_attribute::position), 2, GL_FLOAT, GL_FALSE, sizeof(vertex), 0); glerr;
-		glVertexAttribPointer(int(vertex_attribute::texcoord), 2, GL_FLOAT, GL_FALSE, sizeof(vertex), (char*)(sizeof(float) * 2)); glerr;
-		glVertexAttribPointer(int(vertex_attribute::color), 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(vertex), (char*)(sizeof(float) * 2 + sizeof(float) * 2)); glerr;
+		GL_CHECK(glVertexAttribPointer(static_cast<int>(vertex_attribute::position), 2, GL_FLOAT, GL_FALSE, sizeof(vertex), nullptr));
+		GL_CHECK(glVertexAttribPointer(static_cast<int>(vertex_attribute::texcoord), 2, GL_FLOAT, GL_FALSE, sizeof(vertex), reinterpret_cast<char*>(sizeof(float) * 2)));
+		GL_CHECK(glVertexAttribPointer(static_cast<int>(vertex_attribute::color), 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(vertex), reinterpret_cast<char*>(sizeof(float) * 2 + sizeof(float) * 2)));
 
 		//glBegin(GL_QUADS);
 		//glVertexAttrib2f(0u, 1.f, 1.f);
@@ -226,117 +214,109 @@ namespace augs {
 
 	void renderer::clear_logic_lines() {
 		prev_logic_lines = logic_lines;
-		logic_lines.lines.clear();
+		logic_lines.clear();
 	}
 
 	void renderer::clear_frame_lines() {
-		frame_lines.lines.clear();
+		frame_lines.clear();
 	}
 
-	void renderer::line_channel::draw(const vec2 a, const vec2 b, const rgba col) {
-		lines.push_back(debug_line(a, b, col));
-	}
-
-	void renderer::line_channel::draw_red(const vec2 a, const vec2 b) { draw(a, b, red); }
-	void renderer::line_channel::draw_green(const vec2 a, const vec2 b) { draw(a, b, dark_green); }
-	void renderer::line_channel::draw_blue(const vec2 a, const vec2 b) { draw(a, b, blue); }
-	void renderer::line_channel::draw_yellow(const vec2 a, const vec2 b) { draw(a, b, yellow); }
-	void renderer::line_channel::draw_cyan(const vec2 a, const vec2 b) { draw(a, b, cyan); }
-
-	void renderer::draw_call_imgui(const assets_manager& manager) {
+	void renderer::draw_call_imgui(
+		const graphics::texture& imgui_atlas,
+		const graphics::texture& game_world_atlas
+	) {
 		const auto* const draw_data = ImGui::GetDrawData();
 
 		if (draw_data != nullptr) {
 			ImGuiIO& io = ImGui::GetIO();
-			const int fb_width = int(io.DisplaySize.x * io.DisplayFramebufferScale.x);
-			const int fb_height = int(io.DisplaySize.y * io.DisplayFramebufferScale.y);
+			const int fb_width = static_cast<int>(io.DisplaySize.x * io.DisplayFramebufferScale.x);
+			const int fb_height = static_cast<int>(io.DisplaySize.y * io.DisplayFramebufferScale.y);
 
-			glEnable(GL_SCISSOR_TEST);
+			GL_CHECK(glEnable(GL_SCISSOR_TEST));
 
 			for (int n = 0; n < draw_data->CmdListsCount; ++n) {
 				const ImDrawList* cmd_list = draw_data->CmdLists[n];
 				const ImDrawIdx* idx_buffer_offset = 0;
 
-				glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer_id);
-				glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr)cmd_list->VtxBuffer.Size * sizeof(ImDrawVert), (const GLvoid*)cmd_list->VtxBuffer.Data, GL_STREAM_DRAW);
+				GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer_id));
+				GL_CHECK(glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr)cmd_list->VtxBuffer.Size * sizeof(ImDrawVert), (const GLvoid*)cmd_list->VtxBuffer.Data, GL_STREAM_DRAW));
 
-				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, imgui_elements_id);
-				glBufferData(GL_ELEMENT_ARRAY_BUFFER, (GLsizeiptr)cmd_list->IdxBuffer.Size * sizeof(ImDrawIdx), (const GLvoid*)cmd_list->IdxBuffer.Data, GL_STREAM_DRAW);
+				GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, imgui_elements_id));
+				GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, (GLsizeiptr)cmd_list->IdxBuffer.Size * sizeof(ImDrawIdx), (const GLvoid*)cmd_list->IdxBuffer.Data, GL_STREAM_DRAW));
 
-				for (int cmd_i = 0; cmd_i < cmd_list->CmdBuffer.Size; cmd_i++) {
-					const ImDrawCmd* pcmd = &cmd_list->CmdBuffer[cmd_i];
-					if (pcmd->UserCallback) {
+				for (int cmd_i = 0; cmd_i < cmd_list->CmdBuffer.Size; ++cmd_i) {
+					const ImDrawCmd* const pcmd = &cmd_list->CmdBuffer[cmd_i];
+
+					if (pcmd->UserCallback != nullptr) {
 						pcmd->UserCallback(cmd_list, pcmd);
 					}
 					else {
-						manager.at(assets::gl_texture_id{ reinterpret_cast<intptr_t>(pcmd->TextureId) }).bind();
-						glScissor((int)pcmd->ClipRect.x, (int)(fb_height - pcmd->ClipRect.w), (int)(pcmd->ClipRect.z - pcmd->ClipRect.x), (int)(pcmd->ClipRect.w - pcmd->ClipRect.y));
-						glDrawElements(GL_TRIANGLES, (GLsizei)pcmd->ElemCount, sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, idx_buffer_offset);
+						//manager.at(assets::gl_texture_id{ reinterpret_cast<intptr_t>(pcmd->TextureId) }).bind();
+						imgui_atlas.bind();
+
+						GL_CHECK(glScissor((int)pcmd->ClipRect.x, (int)(fb_height - pcmd->ClipRect.w), (int)(pcmd->ClipRect.z - pcmd->ClipRect.x), (int)(pcmd->ClipRect.w - pcmd->ClipRect.y)));
+						GL_CHECK(glDrawElements(GL_TRIANGLES, (GLsizei)pcmd->ElemCount, sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, idx_buffer_offset));
 					}
+
 					idx_buffer_offset += pcmd->ElemCount;
 				}
 			}
 
-			glDisable(GL_SCISSOR_TEST);
+			GL_CHECK(glDisable(GL_SCISSOR_TEST));
 		}
-		
-		manager.at(assets::gl_texture_id::GAME_WORLD_ATLAS).bind();
+
+		game_world_atlas.bind();
 	}
 
-	void renderer::draw_debug_info(
+	void renderer::draw_debug_lines(
 		const camera_cone camera,
-		const assets::game_image_id line_texture,
-		const double interpolation_ratio
+		const augs::texture_atlas_entry tex,
+		const float interpolation_ratio
 	) {
-		const auto& tex = get_assets_manager()[line_texture].texture_maps[texture_map_type::DIFFUSE];
-		
-		clear_lines();
+		const auto output = augs::line_drawer_with_default({ get_line_buffer(), tex });
 
 		auto line_lambda = [&](const debug_line line) {
-			augs::draw_line(
-				lines, camera[line.a], camera[line.b], tex, line.col 
-			);
+			output.line(camera[line.a], camera[line.b], line.col);
 		};
 
-		if (should_interpolate_debug_lines && logic_lines.lines.size() == prev_logic_lines.lines.size()) {
+		if (should_interpolate_debug_lines && logic_lines.size() == prev_logic_lines.size()) {
 			std::vector<debug_line> interpolated_logic_lines;
-			interpolated_logic_lines.resize(logic_lines.lines.size());
 
-			for (size_t i = 0; i < logic_lines.lines.size(); ++i) {
-				interpolated_logic_lines[i].a = prev_logic_lines.lines[i].a.lerp(logic_lines.lines[i].a, interpolation_ratio);
-				interpolated_logic_lines[i].b = prev_logic_lines.lines[i].b.lerp(logic_lines.lines[i].b, interpolation_ratio);
-				interpolated_logic_lines[i].col = logic_lines.lines[i].col;
+			interpolated_logic_lines.resize(logic_lines.size());
+
+			for (size_t i = 0; i < logic_lines.size(); ++i) {
+				interpolated_logic_lines[i].a = prev_logic_lines[i].a.lerp(logic_lines[i].a, interpolation_ratio);
+				interpolated_logic_lines[i].b = prev_logic_lines[i].b.lerp(logic_lines[i].b, interpolation_ratio);
+				interpolated_logic_lines[i].col = logic_lines[i].col;
 			}
 
-			std::for_each(interpolated_logic_lines.begin(), interpolated_logic_lines.end(), line_lambda);
+			for_each_in(interpolated_logic_lines, line_lambda);
 		}
-		else
-			std::for_each(logic_lines.lines.begin(), logic_lines.lines.end(), line_lambda);
-
-		std::for_each(frame_lines.lines.begin(), frame_lines.lines.end(), line_lambda);
-		std::for_each(persistent_lines.lines.begin(), persistent_lines.lines.end(), line_lambda);
-		
-		if (persistent_lines.lines.empty()) {
-			line_timer.reset();
-		}
-		else if(line_timer.get<std::chrono::seconds>() > 0.4) {
-			//persistent_lines.lines.erase(persistent_lines.lines.begin());
-			line_timer.reset();
+		else {
+			for_each_in(logic_lines, line_lambda);
 		}
 
-		call_lines();
-		clear_lines();
+		for_each_in(frame_lines, line_lambda);
+		for_each_in(persistent_lines, line_lambda);
+
+		if (persistent_lines.empty()) {
+			line_timer.reset();
+		}
+		else if (line_timer.get<std::chrono::seconds>() > 0.4) {
+			//persistent_lines.erase(persistent_lines.begin());
+			line_timer.reset();
+		}
 
 		clear_frame_lines();
 	}
 
-	void renderer::clear_geometry() {
-		triangles.clear();
-	}
-
-	size_t renderer::get_max_texture_size() const {
+	std::size_t renderer::get_max_texture_size() const {
+#if BUILD_OPENGL
 		GLint tsize;
-		glGetIntegerv(GL_MAX_TEXTURE_SIZE, &tsize); glerr;
+		GL_CHECK(glGetIntegerv(GL_MAX_TEXTURE_SIZE, &tsize));
 		return tsize;
+#else
+		return 8192u;
+#endif
 	}
 }

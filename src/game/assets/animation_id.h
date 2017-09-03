@@ -5,9 +5,6 @@ namespace assets {
 	enum class animation_id {
 		INVALID,
 
-		BLINK_ANIMATION,
-
-		REQUISITE_COUNT,
 #if BUILD_TEST_SCENES
 		CAST_BLINK_ANIMATION,
 #endif

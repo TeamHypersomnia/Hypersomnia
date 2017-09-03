@@ -1,11 +1,19 @@
-#include "gun_system.h"
+#include "augs/log.h"
+#include "augs/misc/randomization.h"
+
 #include "game/transcendental/cosmos.h"
+#include "game/transcendental/entity_handle.h"
+#include "game/transcendental/logic_step.h"
+
+#include "game/assets/all_assets.h"
 #include "game/messages/intent_message.h"
 #include "game/messages/damage_message.h"
 #include "game/messages/queue_destruction.h"
 #include "game/messages/gunshot_response.h"
 #include "game/messages/interpolation_correction_request.h"
+
 #include "game/detail/inventory/item_slot_transfer_request.h"
+#include "game/detail/inventory/inventory_utils.h"
 
 #include "game/components/rigid_body_component.h"
 #include "game/components/missile_component.h"
@@ -18,19 +26,11 @@
 #include "game/components/sound_existence_component.h"
 #include "game/components/explosive_component.h"
 #include "game/components/sender_component.h"
-
-#include "game/systems_inferred/physics_system.h"
-
-#include "game/detail/inventory/inventory_utils.h"
-
 #include "game/components/transform_component.h"
 #include "game/components/gun_component.h"
 
-#include "augs/misc/randomization.h"
-#include "augs/log.h"
-
-#include "game/transcendental/entity_handle.h"
-#include "game/transcendental/logic_step.h"
+#include "game/systems_stateless/gun_system.h"
+#include "game/systems_inferred/physics_system.h"
 
 using namespace augs;
 
@@ -306,7 +306,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 				}
 
 				if (total_recoil_scale != 0.f) {
-					if (const auto* recoil_player = step.input.metas_of_assets.find(gun.recoil.id)) {
+					if (const auto* recoil_player = step.input.logical_assets.find(gun.recoil.id)) {
 						const auto recoil_body = owning_sentience
 							[child_entity_name::CHARACTER_CROSSHAIR]
 							[child_entity_name::CROSSHAIR_RECOIL_BODY]

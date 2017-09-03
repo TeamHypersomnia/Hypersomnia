@@ -1,25 +1,22 @@
 #pragma once
 #include "augs/gui/rect.h"
-#include "augs/gui/text_drawer.h"
 #include "augs/gui/appearance_detector.h"
 
 #include "game/detail/inventory/inventory_slot_id.h"
 #include "game/transcendental/entity_handle.h"
-#include "game/assets/assets_manager.h"
+#include "game/assets/assets_declarations.h"
 
 #include "augs/pad_bytes.h"
-#include "game/assets/assets_manager.h"
 
 #include "game_gui_context.h"
 #include "game/detail/gui/game_gui_context.h"
 
 struct item_button : game_gui_rect_node {
-	typedef augs::gui::draw_info draw_info;
-	typedef game_gui_rect_node base;
-	typedef base::gui_entropy gui_entropy;
-
-	typedef dereferenced_location<item_button_in_item> this_in_item;
-	typedef const_dereferenced_location<item_button_in_item> const_this_in_item;
+	using base = game_gui_rect_node;
+	using gui_entropy = base::gui_entropy;
+	
+	using this_in_item = dereferenced_location<item_button_in_item>;
+	using const_this_in_item = const_dereferenced_location<item_button_in_item>;
 
 	augs::gui::appearance_detector detector;
 
@@ -45,6 +42,7 @@ struct item_button : game_gui_rect_node {
 
 	static layout_with_attachments calculate_button_layout(
 		const const_entity_handle component_owner,
+		const game_image_definitions&,
 		const bool include_attachments = true
 	);
 
@@ -89,7 +87,6 @@ struct item_button : game_gui_rect_node {
 
 	static vec2 griddify_size(const vec2 size, const vec2 expander);
 
-
 	static bool is_being_wholely_dragged_or_pending_finish(const const_game_gui_context, const const_this_in_item this_id);
 
 	static void respond_to_events(const game_gui_context, const this_in_item this_id, const gui_entropy& entropies);
@@ -99,38 +96,35 @@ struct item_button : game_gui_rect_node {
 	
 	static void draw(
 		const viewing_game_gui_context, 
-		const const_this_in_item this_id, 
-		draw_info
+		const const_this_in_item this_id
 	);
 
 	static void draw_proc(
 		const viewing_game_gui_context, 
 		const const_this_in_item, 
-		draw_info, 
 		const drawing_settings&
 	);
 
 	static void draw_dragged_ghost_inside(
 		const viewing_game_gui_context context, 
 		const const_this_in_item this_id, 
-		draw_info in,
 		const vec2 absolute_xy_offset
 	);
 
 	static void draw_grid_border_ghost(
 		const viewing_game_gui_context, 
 		const const_this_in_item, 
-		draw_info in,
 		const vec2 absolute_xy_offset
 	);
 
 	static void draw_complete_dragged_ghost(
 		const viewing_game_gui_context, 
 		const const_this_in_item, 
-		draw_info,
 		const vec2 absolute_xy_offset
 	);
 
-	static void draw_complete_with_children(const viewing_game_gui_context, const const_this_in_item this_id, augs::gui::draw_info in);
-
+	static void draw_complete_with_children(
+		const viewing_game_gui_context, 
+		const const_this_in_item this_id
+	);
 };

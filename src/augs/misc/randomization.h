@@ -46,7 +46,7 @@ struct basic_randomization {
 	}
 
 	template<class T>
-	vec2t<T> random_point_in_ring(
+	basic_vec2<T> random_point_in_ring(
 		const T min_radius,
 		const T max_radius
 	) {
@@ -58,16 +58,16 @@ struct basic_randomization {
 	}
 
 	template<class T>
-	vec2t<T> random_point_in_circle(
+	basic_vec2<T> random_point_in_circle(
 		const T max_radius
 	) {
 		return random_point_in_ring(static_cast<T>(0), max_radius);
 	}
 
 	template<class T>
-	vec2t<T> randval(
-		const vec2t<T> min_a, 
-		const vec2t<T> max_a
+	basic_vec2<T> randval(
+		const basic_vec2<T> min_a, 
+		const basic_vec2<T> max_a
 	) {
 		return { 
 			randval(min_a.x, max_a.x), 

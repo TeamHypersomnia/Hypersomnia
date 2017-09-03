@@ -1,9 +1,18 @@
 #pragma once
 #include "game/transcendental/entity_handle_declaration.h"
+#include "game/transcendental/entity_handle.h"
 #include "augs/graphics/vertex.h"
 
-struct camera_cone;
+#include "augs/math/camera_cone.h"
+
 class interpolation_system;
+
+struct aabb_highlighter_drawing_input {
+	const augs::drawer_with_default output;
+	const const_entity_handle subject;
+	const interpolation_system& interp;
+	const camera_cone camera;
+};
 
 struct aabb_highlighter {
 	float timer = 0.f;
@@ -17,11 +26,5 @@ struct aabb_highlighter {
 	static bool is_hoverable(const const_entity_handle);
 
 	void update(const float delta_ms);
-
-	void draw(
-		augs::vertex_triangle_buffer& output,
-		const const_entity_handle subject,
-		const interpolation_system& interp,
-		const camera_cone camera
-	) const;
+	void draw(const aabb_highlighter_drawing_input) const;
 };

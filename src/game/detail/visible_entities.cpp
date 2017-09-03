@@ -9,14 +9,14 @@
 
 #include "game/enums/filters.h"
 
-visible_entities::visible_entities(const camera_cone camera, const cosmos& cosmos) {
-	from_camera(camera, cosmos);
+visible_entities::visible_entities(const visible_entities_query input) {
+	reacquire(input);
 }
 
-void visible_entities::from_camera(
-	const camera_cone camera,
-	const cosmos& cosmos
-) {
+void visible_entities::reacquire(const visible_entities_query input) {
+	const auto& cosmos = input.cosm;
+	const auto camera = input.cone;
+
 	const auto& tree_of_npo = cosmos.systems_inferred.get<tree_of_npo_system>();
 	const auto& physics = cosmos.systems_inferred.get<physics_system>();
 

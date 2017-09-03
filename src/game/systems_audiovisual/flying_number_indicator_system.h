@@ -1,28 +1,34 @@
 #pragma once
 #include <optional>
 
-#include "augs/gui/text_drawer.h"
 #include "augs/math/vec2.h"
-#include "augs/graphics/vertex.h"
+#include "augs/misc/delta.h"
 
-struct camera_cone;
+#include "augs/graphics/rgba.h"
+#include "augs/math/camera_cone.h"
+
+namespace augs {
+	struct baked_font;
+	struct drawer;
+}
 
 class flying_number_indicator_system {
 public:
 	struct number {
 		struct input {
-			augs::gui::text_drawer text;
+			std::wstring text;
+			rgba color;
 			
 			float maximum_duration_seconds = 0.f;
-			
-			float value = 0.f;
 
 			vec2 impact_velocity;
 			vec2 pos;
-		} in;
+		};
+
+		input in;
+		double time_of_occurence_seconds = 0.0;
 
 		mutable std::optional<vec2> first_camera_space_pos;
-		double time_of_occurence_seconds = 0.0;
 	};
 
 	double global_time_seconds = 0.0;
@@ -31,11 +37,12 @@ public:
 
 	void reserve_caches_for_entities(const size_t) const {}
 
-	void add(number::input);
+	void add(const number::input);
 	void advance(const augs::delta dt);
 
 	void draw_numbers(
-		augs::vertex_triangle_buffer& triangles,
+		const augs::baked_font& font,
+		const augs::drawer output,
 		const camera_cone
 	) const;
 };

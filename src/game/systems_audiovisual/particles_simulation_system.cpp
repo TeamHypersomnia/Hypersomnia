@@ -1,39 +1,16 @@
-#include "particles_simulation_system.h"
-
+#include "augs/templates/container_templates.h"
 #include "augs/misc/randomization.h"
+
+#include "game/assets/all_assets.h"
 
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
+
 #include "game/components/position_copying_component.h"
 
-#include "augs/templates/container_templates.h"
 #include "game/detail/particle_types.h"
-#include "game/assets/assets_manager.h"
 
-void particles_simulation_system::draw(
-	augs::vertex_triangle_buffer& target_buffer,
-	const render_layer layer,
-	const camera_cone camera,
-	const renderable_drawing_type drawing_type
-) const {
-	components::sprite::drawing_input general_input(target_buffer);
-	general_input.camera = camera;
-	general_input.drawing_type = drawing_type;
-
-	for (const auto& it : general_particles[layer]) {
-		it.draw(general_input);
-	}
-
-	for (const auto& it : animated_particles[layer]) {
-		it.draw(general_input);
-	}
-
-	for (const auto& cluster : homing_animated_particles[layer]) {
-		for (const auto& it : cluster.second) {
-			it.draw(general_input);
-		}
-	}
-}
+#include "game/systems_audiovisual/particles_simulation_system.h"
 
 void particles_simulation_system::erase_caches_for_dead_entities(const cosmos& new_cosmos) {
 	std::vector<entity_id> to_erase;
@@ -68,7 +45,8 @@ void particles_simulation_system::add_particle(const render_layer l, const entit
 void particles_simulation_system::advance_visible_streams_and_all_particles(
 	camera_cone cone, 
 	const cosmos& cosmos, 
-	const augs::delta delta, 
+	const particle_effect_definitions& manager,
+	const augs::delta delta,
 	const interpolation_system& interp
 ) {
 	thread_local randomization rng;
@@ -136,7 +114,7 @@ void particles_simulation_system::advance_visible_streams_and_all_particles(
 			cache.recorded_existence = existence;
 			cache.emission_instances.clear();
 
-			for (auto emission : get_assets_manager()[existence.input.effect.id].emissions) {
+			for (auto emission : manager.at(existence.input.effect.id).emissions) {
 				emission.apply_modifier(existence.input.effect.modifier);
 
 				cache.emission_instances.push_back(emission_instance());

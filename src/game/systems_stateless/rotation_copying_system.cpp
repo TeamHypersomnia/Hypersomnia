@@ -61,21 +61,21 @@ float colinearize_AB_with_C(
 	if (DEBUG_DRAWING.draw_colinearization) {
 		auto& ln = augs::renderer::get_current().logic_lines;
 
-		ln.draw_cyan(O_center_of_rotation, C_crosshair);
-		ln.draw_red(O_center_of_rotation, A_barrel_center);
-		ln.draw_red(O_center_of_rotation, B_muzzle);
-		ln.draw_yellow(O_center_of_rotation, G);
+		ln.emplace_back(cyan, O_center_of_rotation, C_crosshair);
+		ln.emplace_back(red, O_center_of_rotation, A_barrel_center);
+		ln.emplace_back(red, O_center_of_rotation, B_muzzle);
+		ln.emplace_back(yellow, O_center_of_rotation, G);
 		
-		ln.draw_green(G, A_barrel_center);
-		ln.draw_green(G, C_crosshair);
+		ln.emplace_back(green, G, A_barrel_center);
+		ln.emplace_back(green, G, C_crosshair);
 
 		A_barrel_center.rotate(final_angle, O_center_of_rotation);
 		B_muzzle.rotate(final_angle, O_center_of_rotation);
 
-		ln.draw_red(O_center_of_rotation, A_barrel_center);
-		ln.draw_red(O_center_of_rotation, B_muzzle);
+		ln.emplace_back(red, O_center_of_rotation, A_barrel_center);
+		ln.emplace_back(red, O_center_of_rotation, B_muzzle);
 
-		ln.draw(A_barrel_center - (B_muzzle - A_barrel_center) * 100, B_muzzle + (B_muzzle - A_barrel_center)*100);
+		ln.emplace_back(white, A_barrel_center - (B_muzzle - A_barrel_center) * 100, B_muzzle + (B_muzzle - A_barrel_center)*100);
 	}
 
 	return final_angle;
@@ -161,7 +161,7 @@ float rotation_copying_system::resolve_rotation_copying_value(const const_entity
 	if (rotation_copying.easing_mode == components::rotation_copying::easing_type::EXPONENTIAL) {
 		ensure(false);
 		//float averaging_constant = static_cast<float>(
-		//	pow(rotation_copying.smoothing_average_factor, rotation_copying.averages_per_sec * delta_seconds())
+		//	pow(rotation_copying.average_factor, rotation_copying.averages_per_sec * delta_seconds())
 		//	);
 		//
 		//rotation_copying.last_rotation_interpolant = (rotation_copying.last_rotation_interpolant * averaging_constant + new_rotation * (1.0f - averaging_constant)).normalize();

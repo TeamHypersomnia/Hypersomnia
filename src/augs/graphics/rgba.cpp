@@ -13,11 +13,7 @@ namespace {
 	} rgb;
 }
 
-static hsv      rgb2hsv(const rgb in);
-static rgb      hsv2rgb(const hsv in);
-
-hsv rgb2hsv(const rgb in)
-{
+static hsv rgb2hsv(const rgb in) {
 	hsv         out;
 	double      min, max, delta;
 
@@ -55,9 +51,7 @@ hsv rgb2hsv(const rgb in)
 	return out;
 }
 
-
-rgb hsv2rgb(const hsv in)
-{
+static rgb hsv2rgb(const hsv in) {
 	double      hh, p, q, t, ff;
 	long        i;
 	rgb         out;
@@ -114,6 +108,16 @@ rgb hsv2rgb(const hsv in)
 	return out;
 }
 
+hsv::operator rgba::rgb_type() const {
+	const auto res = hsv2rgb({ h * 360, s, v });
+	
+	return { 
+		to_0_255(res.r), 
+		to_0_255(res.g), 
+		to_0_255(res.b) 
+	};
+}
+
 rgba::rgb_type::rgb_type(
 	const rgba_channel red,
 	const rgba_channel green,
@@ -124,7 +128,7 @@ rgba::rgb_type::rgb_type(
 	b(blue)
 {}
 
-rgba::rgb_type::rgb_type(const std::array<float, 3>& v) :
+rgba::rgb_type::rgb_type(const vec3& v) :
 	rgb_type(
 		to_0_255(v[0]),
 		to_0_255(v[1]),
@@ -132,7 +136,7 @@ rgba::rgb_type::rgb_type(const std::array<float, 3>& v) :
 	)
 {}
 
-rgba::rgb_type::operator std::array<float, 3>() const {
+rgba::rgb_type::operator vec3() const {
 	return {
 		to_0_1(r),
 		to_0_1(g),
@@ -140,7 +144,7 @@ rgba::rgb_type::operator std::array<float, 3>() const {
 	};
 }
 
-rgba::rgba(const std::array<float, 4>& v) :
+rgba::rgba(const vec4& v) :
 	rgba(
 		to_0_255(v[0]),
 		to_0_255(v[1]),
@@ -149,7 +153,7 @@ rgba::rgba(const std::array<float, 4>& v) :
 	)
 {}
 
-rgba::operator std::array<float, 4>() const {
+rgba::operator vec4() const {
 	return {
 		to_0_1(r),
 		to_0_1(g),
@@ -208,6 +212,12 @@ rgba::rgba(
 	a(alpha) 
 {}
 
+rgba::rgba(
+	const hsv h,
+	const rgba_channel alpha
+) : rgba(rgb_type(h), alpha) 
+{}
+
 hsv::hsv(
 	const double h, 
 	const double s, 
@@ -246,10 +256,10 @@ void rgba::set(const rgba col) {
 
 rgba rgba::operator*(const rgba s) const {
 	return rgba(
-		static_cast<rgba_channel>(to_0_255((to_0_1(s.r) * to_0_1(r)))),
-		static_cast<rgba_channel>(to_0_255((to_0_1(s.g) * to_0_1(g)))),
-		static_cast<rgba_channel>(to_0_255((to_0_1(s.b) * to_0_1(b)))),
-		static_cast<rgba_channel>(to_0_255((to_0_1(s.a) * to_0_1(a))))
+		static_cast<rgba_channel>(to_0_1(s.r) * r),
+		static_cast<rgba_channel>(to_0_1(s.g) * g),
+		static_cast<rgba_channel>(to_0_1(s.b) * b),
+		static_cast<rgba_channel>(to_0_1(s.a) * a)
 	);
 }
 
@@ -316,16 +326,16 @@ const rgba_channel& rgba::operator[](const size_t index) const {
 }
 
 rgba::rgb_type& rgba::rgb() {
-	return *(rgb_type*)this;
+	return *reinterpret_cast<rgb_type*>(this);
 }
 
 const rgba::rgb_type& rgba::rgb() const {
-	return *(rgb_type*)this;
+	return *reinterpret_cast<const rgb_type*>(this);
 }
 
 rgba& rgba::set_hsv(const hsv hsv) {
-	const auto res = hsv2rgb({ hsv.h * 360, hsv.s, hsv.v });
-	return (*this = rgba{ rgba_channel(res.r * 255), rgba_channel(res.g * 255), rgba_channel(res.b * 255), a });
+	rgb() = hsv;
+	return *this;
 }
 
 const rgba maroon(0x80, 0x00, 0x00, 0xff);

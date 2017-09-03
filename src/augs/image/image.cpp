@@ -57,6 +57,11 @@ static void Line(
 }
 
 namespace augs {
+	vec2u image::get_size(const path_type& file_path) {
+		// TODO: optimize this
+		return image(file_path).get_size();
+	}
+
 	image::image(const vec2u new_size) {
 		resize(new_size);
 	}
@@ -82,73 +87,68 @@ namespace augs {
 			std::memcpy(v.data(), ptr, new_size.area() * 4);
 		}
 		else {
-			// TODO: Not implemented
 			ensure(false);
 		}
 	}
 
-	image::image(const std::string& path) {
+	image::image(const path_type& path) {
 		from_file(path);
 	}
 	
-	bool image::from_file(const std::string& path) {
-		const auto extension = augs::get_extension(path);
-		bool success = false;
+	void image::from_file(const path_type& path) {
+		const auto extension = path.extension();
 
 		if (extension == "") {
-			success = from_file(augs::switch_path(
-				path + ".png",
-				path + ".bin"
-			));
+			const auto resolved_path = augs::switch_path(
+				augs::path_type(path) += ".png",
+				augs::path_type(path) += ".bin"
+			);
+
+			from_file(resolved_path);
 		}
 		else {
 			if (extension == ".png") {
-				success = from_png(path);
+				from_png(path);
 			}
 			else if (extension == ".bin") {
-				success = from_binary_file(path);
+				from_binary_file(path);
 			}
 			else {
-				LOG("Unknown extension: %x!", extension);
-				ensure(false);
+				throw image_loading_error(
+					"Failed to load image %x:\nUnknown image extension: %x!", path, extension
+				);
 			}
 		}
-	
-		return success;
 	}
 
-	bool image::from_binary_file(const std::string& filename) {
-		std::ifstream in(filename, std::ios::in | std::ios::binary);
+	void image::from_binary_file(const path_type& path) try {
+		auto in = with_exceptions<std::ifstream>();
+		in.open(path, std::ios::in | std::ios::binary);
 
-		if (in.good()) {
-			augs::read(in, size);
-			augs::read(in, v);
-
-			return !in.fail();
-		}
-		else {
-			LOG("Failed to open %x! Ensure that the file exists.", filename);
-		}
-
-		return false;
+		augs::read(in, size);
+		augs::read(in, v);
+	}
+	catch (const augs::ifstream_error& err) {
+		throw image_loading_error(
+			"Failed to load image %x:\n%x", path, err.what()
+		);
 	}
 
-	bool image::from_png(
-		const std::string& filename
-	) {
+	void image::from_png(const path_type& path) {
 		unsigned width;
 		unsigned height;
 
-		if (lodepng::decode(*reinterpret_cast<std::vector<unsigned char>*>(&v), width, height, filename)) {
-			LOG("Failed to open %x! Ensure that the file exists and has correct format.", filename);
-			ensure(false);
-			return false;
+		if (
+			const auto lodepng_result =
+			lodepng::decode(*reinterpret_cast<std::vector<unsigned char>*>(&v), width, height, path.string())
+		) {
+			throw image_loading_error(
+				"Failed to load image %x:\nlodepng returned %x", path, lodepng_result
+			);
 		}
 
 		size.x = width;
 		size.y = height;
-
-		return true;
 	}
 
 	void image::resize(const vec2u new_size) {
@@ -301,8 +301,8 @@ namespace augs {
 		}
 	}
 	
-	void image::save(const std::string& path) const {
-		const auto extension = augs::get_extension(path);
+	void image::save(const path_type& path) const {
+		const auto extension = path.extension();
 
 		if (extension == ".png") {
 			save_as_png(path);
@@ -311,20 +311,23 @@ namespace augs {
 			save_as_binary_file(path);
 		}
 		else {
-			LOG("Unknown extension: %x!", extension);
-			ensure(false);
+			LOG("Warning: %x has unknown extension: %x! Saving as binary.", path, extension);
+			save_as_binary_file(path);
 		}
 	}
 
-	void image::save_as_png(const std::string& path) const {
+	void image::save_as_png(const path_type& path) const {
 		augs::create_directories(path);
 
-		if (lodepng::encode(path, *reinterpret_cast<const std::vector<unsigned char>*>(&v), size.x, size.y)) {
-			LOG("Could not encode %x! Ensure that the target directory exists.", path);
+		if (
+			const auto lodepng_result = 
+			lodepng::encode(path.string(), *reinterpret_cast<const std::vector<unsigned char>*>(&v), size.x, size.y)
+		) {
+			LOG("Failed to save %x: lodepng returned %x. Ensure that the target directory exists.", path, lodepng_result);
 		}
 	}
 
-	void image::save_as_binary_file(const std::string& path) const {
+	void image::save_as_binary_file(const path_type& path) const {
 		augs::create_directories(path);
 
 		std::ofstream out(path, std::ios::out | std::ios::binary);

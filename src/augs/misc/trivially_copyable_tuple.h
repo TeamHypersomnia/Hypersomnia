@@ -1,22 +1,8 @@
 #pragma once
 #include "augs/templates/memcpy_safety.h"
 #include "augs/templates/type_list.h"
-
-template <std::size_t I, std::size_t Current, class List, class = void>
-struct sum_sizes_until_nth {
-	static constexpr std::size_t value = 0;
-};
-
-template <std::size_t I, std::size_t Current, template <class...> class List, class T, class... Args>
-struct sum_sizes_until_nth<I, Current, List<T, Args...>, std::enable_if_t<Current < I>>  {
-	static constexpr std::size_t value = sizeof T + sum_sizes_until_nth<I, Current + 1, List<Args...>>::value;
-};
-
-template <std::size_t I, class List>
-constexpr std::size_t sum_sizes_until_nth_v = sum_sizes_until_nth<I, 0, List>::value;
-
-template <class List>
-constexpr std::size_t sum_sizes_of_types_in_list_v = sum_sizes_until_nth<num_types_in_list_v<List> + 1, 0, List>::value;
+#include "augs/templates/for_each_in_types.h"
+#include "augs/templates/constexpr_arithmetic.h"
 
 namespace augs {
 	template <class... Types>

@@ -1,18 +1,20 @@
 #pragma once
 #include <unordered_map>
 #include "augs/math/vec2.h"
-#include "augs/image/image.h"
-
+#include "augs/templates/exception_templates.h"
 #include "augs/misc/trivially_copyable_pair.h"
-
+#include "augs/filesystem/path.h"
+#include "augs/image/image.h"
 #include "augs/texture_atlas/texture_atlas_entry.h"
-
-#include "game/assets/font_id.h"
 
 struct FT_Glyph_Metrics_;
 typedef FT_Glyph_Metrics_ FT_Glyph_Metrics;
 
 namespace augs {
+	struct font_loading_error : error_with_typesafe_sprintf {
+		using error_with_typesafe_sprintf::error_with_typesafe_sprintf;
+	};
+
 	struct font_glyph_metadata {
 		// GEN INTROSPECTOR struct augs::font_glyph_metadata
 		int adv = 0;
@@ -67,24 +69,21 @@ namespace augs {
 		font_metadata_from_file meta_from_file;
 		std::vector<augs::texture_atlas_entry> glyphs_in_atlas;
 		// END GEN INTROSPECTOR
-
-		bool can_be_bolded() const { return false; }
-		bool can_be_italicsed() const { return false; }
-		bool is_bolded() const { return false; }
-		bool is_italicsed() const { return false; }
-
-		assets::font_id get_bold(const bool flag) const { return assets::font_id::INVALID; }
-		assets::font_id get_italics(const bool flag) const { return assets::font_id::INVALID; }
 	};
 
 	struct font_loading_input {
 		// GEN INTROSPECTOR struct augs::font_loading_input
-		std::string charset_path;
+		path_type source_font_path;
+		path_type charset_path;
 		unsigned pt = 0u;
 		// END GEN INTROSPECTOR
 
 		bool operator==(const font_loading_input& b) const {
-			return charset_path == b.charset_path && pt == b.pt;
+			return 
+				source_font_path == b.source_font_path 
+				&& charset_path == b.charset_path 
+				&& pt == b.pt
+			;
 		}
 	};
 
@@ -92,10 +91,7 @@ namespace augs {
 		font_metadata_from_file meta;
 		std::vector<augs::image> glyph_bitmaps;
 
-		font(
-			const std::string& source_font_path,
-			const font_loading_input&
-		);
+		font(const font_loading_input&);
 	};
 }
 
@@ -103,7 +99,11 @@ namespace std {
 	template <>
 	struct hash<augs::font_loading_input> {
 		size_t operator()(const augs::font_loading_input& in) const {
-			return augs::simple_two_hash(in.pt, in.charset_path);
+			return augs::hash_multiple(
+				in.source_font_path.string(), 
+				in.charset_path.string(), 
+				in.pt
+			);
 		}
 	};
 }

@@ -3,25 +3,19 @@
 #include "augs/audio/sound_effect_modifier.h"
 
 namespace assets {
-	enum class sound_buffer_id : unsigned {
+	enum class sound_buffer_id {
+		// GEN INTROSPECTOR enum class assets::sound_buffer_id
 		INVALID,
-
-		BUTTON_HOVER,
-		BUTTON_CLICK,
-
-		REQUISITE_COUNT,
 
 #if BUILD_TEST_SCENES
 		BILMER2000_MUZZLE,
 		ASSAULT_RIFLE_MUZZLE,
 		SUBMACHINE_MUZZLE,
 		SN69_MUZZLE,
-		PISTOL_MUZZLE,
 		KEK9_MUZZLE,
 		ROCKET_LAUNCHER_MUZZLE,
 		ELECTRIC_PROJECTILE_FLIGHT,
 		ELECTRIC_DISCHARGE_EXPLOSION,
-		ELECTRIC_ENGINE,
 		MISSILE_THRUSTER,
 
 		IMPACT,
@@ -45,8 +39,6 @@ namespace assets {
 		INTERFERENCE_EXPLOSION,
 		PED_EXPLOSION,
 
-		ZAP,
-
 		GRENADE_UNPIN,
 		GRENADE_THROW,
 
@@ -57,6 +49,7 @@ namespace assets {
 		COLLISION_GRENADE,
 #endif
 		COUNT = MAX_SOUND_BUFFER_COUNT + 1
+		// END GEN INTROSPECTOR
 	};
 }
 

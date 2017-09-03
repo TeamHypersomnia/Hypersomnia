@@ -8,11 +8,6 @@
 
 namespace augs {
 	namespace gui {
-		struct draw_info {
-			vertex_triangle_buffer& v;
-			draw_info(vertex_triangle_buffer&);
-		};
-
 		struct raw_input_traversal {
 			const augs::event::change change;
 			

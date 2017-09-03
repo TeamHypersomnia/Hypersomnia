@@ -1,12 +1,13 @@
-#include "sound_system.h"
-
 #include "augs/audio/sound_buffer.h"
 
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 
 #include "game/systems_audiovisual/interpolation_system.h"
-#include "game/assets/assets_manager.h"
+#include "game/systems_audiovisual/sound_system.h"
+
+#include "game/assets/all_assets.h"
+#include "game/assets/loaded_sounds.h"
 
 #include "augs/audio/audio_settings.h"
 
@@ -42,6 +43,7 @@ const sound_system::cache& sound_system::get_cache(const const_entity_handle id)
 
 void sound_system::play_nearby_sound_existences(
 	const augs::audio_volume_settings& settings,
+	const loaded_sounds& manager,
 	const camera_cone cone,
 	const entity_id listening_character, 
 	const cosmos& cosmos, 
@@ -63,8 +65,6 @@ void sound_system::play_nearby_sound_existences(
 	augs::set_listener_velocity(si, subject.get_effective_velocity());
 	augs::set_listener_orientation({ 0.f, -1.f, 0.f, 0.f, 0.f, -1.f });
 
-	const auto& manager = get_assets_manager();
-
 	cosmos.for_each(
 		processing_subjects::WITH_SOUND_EXISTENCE, 
 		[&](const auto it) {
@@ -72,9 +72,13 @@ void sound_system::play_nearby_sound_existences(
 			const auto& existence = it.get<components::sound_existence>();
 			auto& source = cache.source;
 
-			const auto& buffer = manager.at(existence.input.effect.id).get_variation(existence.input.variation_number);
+			const auto& buffer = manager.at(existence.input.effect.id).variations[existence.input.variation_number];
 
-			const auto& requested_buf = existence.input.direct_listener == listening_character ? buffer.request_stereo() : buffer.request_mono();
+			const auto& requested_buf = 
+				existence.input.direct_listener == listening_character ? 
+				buffer.stereo_or_mono() : 
+				buffer.mono_or_stereo()
+			;
 
 			if (
 				cache.recorded_component.time_of_birth != existence.time_of_birth
@@ -88,11 +92,11 @@ void sound_system::play_nearby_sound_existences(
 				}
 
 				if (listening_character == existence.input.direct_listener) {
-					source.bind_buffer(buffer.request_stereo());
+					source.bind_buffer(buffer.stereo_or_mono());
 					source.set_direct_channels(true);
 				}
 				else {
-					source.bind_buffer(buffer.request_mono());
+					source.bind_buffer(buffer.mono_or_stereo());
 					source.set_direct_channels(false);
 				}
 

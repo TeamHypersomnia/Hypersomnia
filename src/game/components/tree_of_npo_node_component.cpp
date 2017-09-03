@@ -4,7 +4,6 @@
 
 #include "game/components/polygon_component.h"
 #include "game/components/sprite_component.h"
-#include "game/components/tile_layer_instance_component.h"
 #include "game/components/particles_existence_component.h"
 #include "game/components/transform_component.h"
 #include "game/components/all_inferred_state_component.h"
@@ -12,15 +11,15 @@
 #include "game/components/sound_existence_component.h"
 #include "game/components/render_component.h"
 #include "game/components/fixtures_component.h"
-#include "augs/graphics/drawers.h"
+#include "augs/drawing/drawing.h"
 
 #include "augs/ensure.h"
 
 namespace components {
-	tree_of_npo_node tree_of_npo_node::create_default_for(const logic_step step, const_entity_handle e) {
+	tree_of_npo_node tree_of_npo_node::create_default_for(const const_entity_handle e) {
 		tree_of_npo_node result;
 
-		result.aabb = e.get_aabb(step.input.metas_of_assets);
+		result.aabb = e.get_aabb();
 
 		if (e.has<components::particles_existence>()) {
 			result.type = tree_of_npo_type::PARTICLE_EXISTENCES;
@@ -42,7 +41,7 @@ void component_synchronizer<false, D>::reinference() const {
 }
 
 void component_synchronizer<false, D>::update_proxy(const logic_step step) const {
-	const auto new_aabb = components::tree_of_npo_node::create_default_for(step, handle).aabb;
+	const auto new_aabb = components::tree_of_npo_node::create_default_for(handle).aabb;
 	auto& data = get_raw_component();
 
 	const vec2 displacement = new_aabb.center() - data.aabb.center();

@@ -1,14 +1,30 @@
 #pragma once
+#include "augs/pad_bytes.h"
+
 #include "augs/misc/constant_size_vector.h"
 #include "augs/misc/enum_array.h"
-#include "game/detail/convex_partitioned_shape.h"
-#include "game/detail/physics/b2Fixture_index_in_component.h"
-#include "game/container_sizes.h"
+#include "augs/misc/convex_partitioned_shape.h"
+
+#include "game/assets/assets_declarations.h"
 
 #include "game/transcendental/component_synchronizer.h"
 
-#include "augs/pad_bytes.h"
 #include "game/components/all_inferred_state_component.h"
+
+struct b2Fixture_index_in_component;
+
+struct convex_poly_destruction_scar {
+	// GEN INTROSPECTOR struct convex_poly_destruction_scar
+	vec2 first_impact;
+	vec2 depth_point;
+	// END GEN INTROSPECTOR
+};
+
+struct convex_poly_destruction_data {
+	// GEN INTROSPECTOR struct convex_poly_destruction_data
+	augs::constant_size_vector<convex_poly_destruction_scar, DESTRUCTION_SCARS_COUNT> scars;
+	// END GEN INTROSPECTOR
+};
 
 namespace components {
 	struct shape_polygon {
@@ -28,33 +44,20 @@ class basic_shape_polygon_synchronizer : public component_synchronizer_base<is_c
 public:
 	using component_synchronizer_base<is_const, components::shape_polygon>::component_synchronizer_base;
 
-	bool is_activated() const {
-		return get_raw_component().activated;
-	}
+	bool is_activated() const;
 };
 
 template<>
 class component_synchronizer<false, components::shape_polygon> : public basic_shape_polygon_synchronizer<false> {
-	void reinference() const {
-		handle.get_cosmos().partial_reinference<physics_system>(handle);
-	}
+	void reinference() const;
 public:
 	using basic_shape_polygon_synchronizer<false>::basic_shape_polygon_synchronizer;
 
 	convex_poly_destruction_data& get_modifiable_destruction_data(
 		const b2Fixture_index_in_component indices
-	) const {
-		return get_raw_component().destruction[indices.convex_shape_index];
-	}
+	) const;
 
-	void set_activated(const bool flag) const {
-		if (flag == get_raw_component().activated) {
-			return;
-		}
-
-		get_raw_component().activated = flag;
-		reinference();
-	}
+	void set_activated(const bool flag) const;
 };
 
 template<>

@@ -2,7 +2,7 @@
 #include <mutex>
 #include <functional>
 
-class config_lua_table;
+struct config_lua_table;
 
 struct session_report {
 	struct MHD_Daemon *d = nullptr;

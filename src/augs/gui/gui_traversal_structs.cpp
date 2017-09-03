@@ -2,7 +2,6 @@
 
 namespace augs {
 	namespace gui {
-		draw_info::draw_info(vertex_triangle_buffer& v) : v(v) {}
 		raw_input_traversal::raw_input_traversal(const augs::event::change change) : change(change) {}
 		event_info::event_info(const gui_event msg, const int scroll_amount, vec2i total_dragged_amount) : msg(msg), scroll_amount(scroll_amount), total_dragged_amount(total_dragged_amount) {}
 		

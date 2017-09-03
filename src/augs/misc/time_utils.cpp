@@ -4,14 +4,13 @@
 #include <sstream>
 
 template<class T>
-static std::string leading_zero(T component)
-{
+static std::string leading_zero(const T component) {
 	std::stringstream out;
 	out << component;
 	std::string result = out.str();
 
 	if (result.length() == 1) {
-		result = "0" + result;
+		result = '0' + result;
 	}
 
 	return result;

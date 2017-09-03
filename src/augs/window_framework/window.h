@@ -4,14 +4,18 @@
 #undef min
 #undef max
 #endif
-#include "augs/math/rects.h"
-#include "event.h"
-#include "augs/misc/timer.h"
 
-#include "augs/graphics/renderer.h"
-#include "colored_print.h"
-#include "augs/audio/audio_structs.h"
+#include <optional>
+
+#include "augs/math/rects.h"
+
 #include "augs/templates/settable_as_current_mixin.h"
+
+#include "augs/misc/timer.h"
+#include "augs/misc/machine_entropy.h"
+
+#include "augs/window_framework/colored_print.h"
+#include "augs/window_framework/event.h"
 #include "augs/window_framework/window_settings.h"
 
 namespace augs {
@@ -82,7 +86,8 @@ namespace augs {
 		void apply(const window_settings&, const bool force = false);
 		window_settings get_current_settings() const;
 
-		std::vector<event::change> collect_entropy();
+		local_entropy collect_entropy();
+		void collect_entropy(local_entropy& into);
 
 		void set_window_rect(const xywhi);
 		vec2i get_screen_size() const;

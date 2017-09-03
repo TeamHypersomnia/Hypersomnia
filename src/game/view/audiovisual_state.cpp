@@ -1,17 +1,14 @@
-#include "game/transcendental/cosmos.h"
-#include "audiovisual_state.h"
+#include "augs/templates/string_templates.h"
 
+#include "game/transcendental/cosmos.h"
 #include "game/transcendental/logic_step.h"
 #include "game/transcendental/cosmos.h"
+
 #include "game/messages/health_event.h"
 #include "game/messages/item_picked_up_message.h"
 #include "game/messages/interpolation_correction_request.h"
-#include "augs/templates/string_templates.h"
 
-void audiovisual_state::set_screen_size(const vec2i new_size) {
-	get<game_gui_system>().set_screen_size(new_size);
-	camera.configure_size(new_size);
-}
+#include "game/view/audiovisual_state.h"
 
 void audiovisual_state::reserve_caches_for_entities(const std::size_t n) {
 	systems.for_each([n](auto& sys) {
@@ -23,7 +20,6 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 	const auto& cosm = input.cosm;
 	const auto& all_visible = input.all_visible;
 	const auto dt = augs::delta(static_cast<float>(timer.extract<std::chrono::milliseconds>() * input.speed_multiplier));
-	const auto viewed_character_id = input.viewed_character;
 
 	reserve_caches_for_entities(cosm.get_aggregate_pool().capacity());
 
@@ -34,10 +30,10 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 	auto& interp = get<interpolation_system>();
 	auto& particles = get<particles_simulation_system>();
 
-	const auto viewed_character = cosm[viewed_character_id];
+	const auto viewed_character = cosm[input.viewed_character_id];
 
-	thunders.advance(cosm, dt, particles);
-	exploding_rings.advance(cosm, dt, particles);
+	thunders.advance(cosm, input.particle_effects, dt, particles);
+	exploding_rings.advance(cosm, input.particle_effects, dt, particles);
 	flying_numbers.advance(dt);
 	highlights.advance(dt);
 
@@ -49,6 +45,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 	particles.advance_visible_streams_and_all_particles(
 		camera.smoothed_camera,
 		cosm,
+		input.particle_effects,
 		dt,
 		interp
 	);
@@ -56,13 +53,14 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 	get<light_system>().advance_attenuation_variations(cosm, dt);
 
 	camera.tick(
+		input.screen_size,
 		interp,
 		dt,
 		input.camera,
 		viewed_character
 	);
 
-	get<wandering_pixels_system>().advance_for_visible(
+	get<wandering_pixels_system>().advance_for(
 		all_visible,
 		cosm,
 		dt
@@ -74,20 +72,17 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 	if (viewed_character.alive()) {
 		auto& gui = get<game_gui_system>();
 
-		gui.advance_elements(
-			viewed_character,
-			dt
-		);
+		const auto context = gui.create_context(input.screen_size, viewed_character, input.gui_deps);
 
-		gui.rebuild_layouts(
-			viewed_character
-		);
+		gui.advance(context, dt);
+		gui.rebuild_layouts(context);
 
 		auto listener_cone = camera.smoothed_camera;
 		listener_cone.transform = viewed_character.get_viewing_transform(interp);
 
 		get<sound_system>().play_nearby_sound_existences(
 			input.audio_volume,
+			input.sounds,
 			listener_cone,
 			viewed_character,
 			cosm,
@@ -162,7 +157,6 @@ void audiovisual_state::standard_post_solve(const const_logic_step step) {
 
 		vn.impact_velocity = h.impact_velocity;
 		vn.maximum_duration_seconds = 0.7f;
-		vn.value = h.effective_amount;
 
 		rgba number_col;
 		rgba highlight_col;
@@ -175,8 +169,10 @@ void audiovisual_state::standard_post_solve(const const_logic_step step) {
 				const bool destroyed = h.special_result == messages::health_event::result_type::DEATH;
 
 				if (destroyed) {
-					vn.text.set_text(augs::gui::text::format(L"Death", augs::gui::text::style(assets::font_id::GUI_FONT, number_col)));
+					vn.text = L"Death";
+					vn.color = number_col;
 					vn.pos = cosmos[h.subject].get_logic_transform().pos;
+
 					flying_numbers.add(vn);
 				}
 
@@ -299,8 +295,10 @@ void audiovisual_state::standard_post_solve(const const_logic_step step) {
 				highlight_col = orange;
 
 				if (destroyed) {
-					vn.text.set_text(augs::gui::text::format(L"Unconscious", augs::gui::text::style(assets::font_id::GUI_FONT, number_col)));
+					vn.text = L"Unconscious";
+					vn.color = number_col;
 					vn.pos = cosmos[h.subject].get_logic_transform().pos;
+
 					flying_numbers.add(vn);
 				}
 
@@ -348,15 +346,11 @@ void audiovisual_state::standard_post_solve(const const_logic_step step) {
 			continue;
 		}
 
-		vn.text.set_text(
-			augs::gui::text::format(
-				to_wstring(
-					std::abs(int(vn.value) == 0 ? 1 : int(vn.value))
-				),
-				augs::gui::text::style(assets::font_id::GUI_FONT, number_col)
-			)
-		);
+		const auto number_value = static_cast<int>(h.effective_amount);
 
+		vn.text = to_wstring(std::abs(number_value ? number_value : 1));
+		vn.color = number_col;
+		
 		vn.pos = h.point_of_impact;
 
 		flying_numbers.add(vn);

@@ -10,7 +10,6 @@
 #include "game/detail/gui/game_gui_root.h"
 
 struct character_gui;
-class viewing_step;
 
 class game_gui_system {
 public:
@@ -22,16 +21,39 @@ public:
 	augs::container_with_small_size<std::vector<item_slot_transfer_request>, unsigned short> pending_transfers;
 	augs::container_with_small_size<std::unordered_map<entity_id, spell_id>, unsigned char> spell_requests;
 	
-	game_gui_rect_world rect_world = vec2i {};
-	game_gui_root root = vec2i {};
+	game_gui_rect_world world;
+	game_gui_rect_tree tree;
+	game_gui_root root;
 
-	bool gui_look_enabled = false;
-	assets::game_image_id value_bar_background = assets::game_image_id::BLANK;
+	bool active = false;
 
-	game_gui_context create_context(const const_entity_handle gui_entity, game_gui_rect_tree& tree);
+	game_gui_context create_context(
+		const vec2i screen_size,
+		const const_entity_handle gui_entity,
+		const game_gui_context_dependencies deps
+	) {
+		return {
+			{ world, tree, screen_size },
+			*this,
+			gui_entity,
+			get_character_gui(gui_entity),
+			deps
+		};
+	}
 
-	void set_screen_size(const vec2i screen_size);
-	vec2i get_screen_size() const;
+	const_game_gui_context create_context(
+		const vec2i screen_size,
+		const const_entity_handle gui_entity,
+		const game_gui_context_dependencies deps
+	) const {
+		return {
+			{ world, tree, screen_size },
+			*this,
+			gui_entity,
+			get_character_gui(gui_entity),
+			deps
+		};
+	}
 
 	cosmic_entropy get_and_clear_pending_events();
 	void clear_all_pending_events();
@@ -48,21 +70,21 @@ public:
 	item_button& get_item_button(const entity_id);
 	const item_button& get_item_button(const entity_id) const;
 
-	void control_gui(
-		const const_entity_handle root_entity,
+	void control(
+		const game_gui_context context,
 		std::vector<augs::event::change>& events
 	);
 
-	void advance_elements(
-		const const_entity_handle root_entity,
+	void advance(
+		const game_gui_context context,
 		const augs::delta dt
 	);
 
 	void rebuild_layouts(
-		const const_entity_handle root_entity
+		const game_gui_context context
 	);
 
-	void handle_hotbar_and_action_button_presses(
+	void control_hotbar_and_action_button(
 		const const_entity_handle root_entity,
 		const game_intent_vector& intents
 	);

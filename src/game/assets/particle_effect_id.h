@@ -3,7 +3,7 @@
 #include "game/assets/particle_effect.h"
 
 namespace assets {
-	enum class particle_effect_id : unsigned {
+	enum class particle_effect_id {
 		INVALID,
 #if BUILD_TEST_SCENES
 		HEALTH_DAMAGE_SPARKLES,

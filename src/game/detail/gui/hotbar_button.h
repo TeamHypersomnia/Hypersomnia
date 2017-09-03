@@ -1,19 +1,20 @@
 #pragma once
 #include "augs/math/vec2.h"
-#include "game_gui_context.h"
 #include "augs/gui/appearance_detector.h"
+#include "augs/gui/button_corners.h"
 
-struct button_corners_info;
+#include "game/detail/gui/game_gui_context.h"
+
+using button_corners_info = basic_button_corners_info<assets::requisite_image_id>;
 
 class hotbar_button : public game_gui_rect_node {
 public:
-	typedef augs::gui::draw_info draw_info;
-	typedef game_gui_rect_node base;
-	typedef base::gui_entropy gui_entropy;
+	using base = game_gui_rect_node;
+	using gui_entropy = base::gui_entropy;
 
-	typedef dereferenced_location<hotbar_button_in_character_gui> this_in_item;
-	typedef const_dereferenced_location<hotbar_button_in_character_gui> const_this_in_item;
-	
+	using this_in_item = dereferenced_location<hotbar_button_in_character_gui>;
+	using const_this_in_item = const_dereferenced_location<hotbar_button_in_character_gui>;
+
 	entity_id last_assigned_entity;
 
 	augs::gui::appearance_detector detector;
@@ -23,7 +24,11 @@ public:
 	float hover_highlight_maximum_distance = 8.f;
 	float hover_highlight_duration_ms = 400.f;
 
-	vec2i get_bbox(const const_entity_handle owner_transfer_capability) const;
+	vec2i get_bbox(
+		const requisite_images_in_atlas& requisites,
+		const game_image_definitions& defs,
+		const const_entity_handle owner_transfer_capability
+	) const;
 
 	button_corners_info get_button_corners_info() const;
 
@@ -33,7 +38,7 @@ public:
 	bool is_selected_as_primary(const const_entity_handle owner_transfer_capability) const;
 	bool is_selected_as_secondary(const const_entity_handle owner_transfer_capability) const;
 
-	static void draw(const viewing_game_gui_context, const const_this_in_item this_id, draw_info);
+	static void draw(const viewing_game_gui_context, const const_this_in_item this_id);
 
 	static void respond_to_events(const game_gui_context, const this_in_item this_id, const gui_entropy& entropies);
 	static void advance_elements(const game_gui_context, const this_in_item this_id, const augs::delta);

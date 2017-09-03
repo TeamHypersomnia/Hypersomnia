@@ -6,7 +6,7 @@
 #include "augs/filesystem/file.h"
 #include "generated/introspectors.h"
 
-void cosmos::save_to_file(const std::string& filename) {
+void cosmos::save_to_file(const augs::path_type& path) {
 	auto scope = measure_scope(profiler.total_save);
 	
 	auto& reserved_memory = reserved_memory_for_serialization;
@@ -33,37 +33,31 @@ void cosmos::save_to_file(const std::string& filename) {
 	
 	{
 		auto scope = measure_scope(profiler.writing_savefile);
-		augs::create_binary_file(filename, reserved_memory);
+		augs::create_binary_file(path, reserved_memory);
 	}
 }
 
-bool cosmos::load_from_file(const std::string& filename) {
-	if (augs::file_exists(filename)) {
-		auto scope = measure_scope(profiler.total_load);
+void cosmos::load_from_file(const augs::path_type& path) {
+	auto scope = measure_scope(profiler.total_load);
 
-		ensure(significant.pool_for_aggregates.empty());
+	ensure(significant.pool_for_aggregates.empty());
 
-		//ensure(cosmos() == cosmos());
-		//ensure(main_cosmos == cosmos());
+	//ensure(cosmos() == cosmos());
+	//ensure(main_cosmos == cosmos());
 
-		auto& stream = reserved_memory_for_serialization;
+	auto& stream = reserved_memory_for_serialization;
 
-		{
-			auto scope = measure_scope(profiler.reading_savefile);
-			augs::get_file_contents_binary_into(filename, stream);
-		}
-		
-		{
-			auto scope = measure_scope(profiler.deserialization_pass);
-			augs::read(stream, significant);
-		}
-
-		refresh_for_new_significant_state();
-
-		return true;
+	{
+		auto scope = measure_scope(profiler.reading_savefile);
+		augs::get_file_contents_binary_into(path, stream);
+	}
+	
+	{
+		auto scope = measure_scope(profiler.deserialization_pass);
+		augs::read(stream, significant);
 	}
 
-	return false;
+	refresh_for_new_significant_state();
 }
 
 #if ENTITY_TRACKS_NAME_FOR_DEBUG

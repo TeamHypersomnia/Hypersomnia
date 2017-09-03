@@ -3,6 +3,8 @@
 #include "augs/build_settings/setting_enable_ensure.h"
 
 void cleanup_proc();
+void press_any_key();
+void press_any_key_and_exit();
 
 #if ENABLE_ENSURE && !FORCE_DISABLE_ENSURE
 #define ensure(x) if(!(x))\

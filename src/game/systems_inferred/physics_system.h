@@ -14,11 +14,12 @@
 
 #include "game/messages/collision_message.h"
 
-#include "game/detail/convex_partitioned_shape.h"
+#include "augs/misc/convex_partitioned_shape.h"
 #include "game/detail/physics/physics_queries.h"
 
-#include "augs/build_settings/setting_empty_bases.h"
+#include "augs/build_settings/platform_defines.h"
 
+#include "game/assets/game_image.h"
 #include "game/container_sizes.h"
 
 class cosmos;

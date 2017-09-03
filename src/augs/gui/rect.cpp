@@ -1,18 +1,9 @@
-#include "rect.h"
-#include "stylesheet.h"
-#include "game/assets/assets_manager.h"
+#include "augs/gui/rect.h"
 
 namespace augs {
 	namespace gui {
 		rect_node_data::rect_node_data(const xywh& rc) : rc(rc) {
 			set_default_flags();
-		}
-
-		rect_node_data::rect_node_data(const assets::game_image_id& id) {
-			const auto& manager = get_assets_manager();
-
-			set_default_flags();
-			rc.set_size(manager.at(id).get_size());
 		}
 
 		void rect_node_data::set_default_flags() {
@@ -55,7 +46,7 @@ namespace augs {
 		//
 		//void rect_composite::clamp_scroll_to_right_down_corner() {
 
-		//void clamp_offset_to_right_down_corner_of(const wh& bigger, vec2t<T>& offset) const {
+		//void clamp_offset_to_right_down_corner_of(const wh& bigger, basic_vec2<T>& offset) const {
 		//	offset.x = std::min(offset.x, T(bigger.w - w));
 		//	offset.x = std::max(offset.x, 0.f);
 		//	offset.y = std::min(offset.y, T(bigger.h - h));

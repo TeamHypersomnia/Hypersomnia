@@ -1,9 +1,9 @@
-#include "game/hardcoded_content/all_hardcoded_content.h"
+#include "game/hardcoded_content/test_scenes/test_scenes_content.h"
 
 #include "game/assets/physical_material.h"
-#include "game/assets/assets_manager.h"
+#include "game/assets/all_assets.h"
 
-void load_test_scene_physical_materials(assets_manager& assets) {
+void load_test_scene_physical_materials(all_logical_assets& assets) {
 	const auto set_pair = [&](
 		const assets::physical_material_id a,
 		const assets::physical_material_id b,

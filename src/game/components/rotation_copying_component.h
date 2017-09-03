@@ -27,7 +27,7 @@ namespace components {
 		bool update_value = true;
 		pad_bytes<2> pad;
 		
-		float smoothing_average_factor = 0.5f;
+		float average_factor = 0.5f;
 		float averages_per_sec = 20.0f;
 		
 		vec2 last_rotation_interpolant;

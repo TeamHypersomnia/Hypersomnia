@@ -32,7 +32,7 @@ struct debug_character_selection {
 	}
 
 	void control_character_selection_numeric(
-		augs::machine_entropy::local_type& changes
+		augs::local_entropy& changes
 	) {
 		using namespace augs::event::keys;
 

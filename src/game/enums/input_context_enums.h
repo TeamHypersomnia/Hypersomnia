@@ -18,7 +18,7 @@ enum class intent_type {
 	// GEN INTROSPECTOR enum class intent_type
 	INVALID,
 
-	OPEN_DEVELOPER_CONSOLE,
+	SWITCH_DEVELOPER_CONSOLE,
 
 	THROW,
 	THROW_PRIMARY_ITEM,

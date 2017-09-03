@@ -13,35 +13,36 @@ enum rectangle_sticking {
 	TOP,
 	BOTTOM
 };
-template <class T> struct ltrbt;
-template <class T> struct xywht;
+
+template <class T> struct basic_ltrb;
+template <class T> struct basic_xywh;
 
 template <class T>
-struct ltrbt {
-	// GEN INTROSPECTOR struct ltrbt class T
+struct basic_ltrb {
+	// GEN INTROSPECTOR struct basic_ltrb class T
 	T l;
 	T t;
 	T r;
 	T b;
 	// END GEN INTROSPECTOR
 
-	ltrbt() : l(static_cast<T>(0)), t(static_cast<T>(0)), r(static_cast<T>(0)), b(static_cast<T>(0)) {}
+	basic_ltrb() : l(static_cast<T>(0)), t(static_cast<T>(0)), r(static_cast<T>(0)), b(static_cast<T>(0)) {}
 
 	template <class B>
-	ltrbt(const xywht<B>& rr) : l(static_cast<T>(rr.x)), t(static_cast<T>(rr.y)), r(static_cast<T>(rr.x + rr.w)), b(static_cast<T>(rr.y + rr.h)) {}
+	basic_ltrb(const basic_xywh<B>& rr) : l(static_cast<T>(rr.x)), t(static_cast<T>(rr.y)), r(static_cast<T>(rr.x + rr.w)), b(static_cast<T>(rr.y + rr.h)) {}
 
 	template <class B>
-	ltrbt(const ltrbt<B>& rr) : l(static_cast<T>(rr.l)), t(static_cast<T>(rr.t)), r(static_cast<T>(rr.r)), b(static_cast<T>(rr.b)) {}
+	basic_ltrb(const basic_ltrb<B>& rr) : l(static_cast<T>(rr.l)), t(static_cast<T>(rr.t)), r(static_cast<T>(rr.r)), b(static_cast<T>(rr.b)) {}
 
-	ltrbt(const T l, const T t, const T r, const T b) : l(l), t(t), r(r), b(b) {}
-	ltrbt(const vec2t<T> pos, const vec2t<T> size) : l(pos.x), t(pos.y), r(pos.x + size.x), b(pos.y + size.y) {}
+	basic_ltrb(const T l, const T t, const T r, const T b) : l(l), t(t), r(r), b(b) {}
+	basic_ltrb(const basic_vec2<T> pos, const basic_vec2<T> size) : l(pos.x), t(pos.y), r(pos.x + size.x), b(pos.y + size.y) {}
 
 	void x(const T xx) {
-		*this += (vec2t<T>(xx - l, 0));
+		*this += (basic_vec2<T>(xx - l, 0));
 	}
 
 	void y(const T yy) {
-		*this += (vec2t<T>(0, yy - t));
+		*this += (basic_vec2<T>(0, yy - t));
 	}
 
 	void w(const T ww) {
@@ -53,10 +54,10 @@ struct ltrbt {
 	}
 
 	void set(const T _l, const T _t, const T _r, const T _b) {
-		*this = ltrbt(_l, _t, _r, _b);
+		*this = basic_ltrb(_l, _t, _r, _b);
 	}
 
-	auto& set_position(const vec2t<T> v) {
+	auto& set_position(const basic_vec2<T> v) {
 		const auto old_w = w();
 		const auto old_h = h();
 
@@ -68,7 +69,7 @@ struct ltrbt {
 		return *this;
 	}
 
-	auto& set_size(const vec2t<T> v) {
+	auto& set_size(const basic_vec2<T> v) {
 		w(v.x);
 		h(v.y);
 
@@ -82,7 +83,7 @@ struct ltrbt {
 		return *this;
 	}
 
-	auto& contain(const ltrbt rc) {
+	auto& contain(const basic_ltrb rc) {
 		l = std::min(l, rc.l);
 		t = std::min(t, rc.t);
 		contain_positive(rc);
@@ -90,26 +91,26 @@ struct ltrbt {
 		return *this;
 	}
 
-	auto& contain_positive(const ltrbt rc) {
+	auto& contain_positive(const basic_ltrb rc) {
 		r = std::max(r, rc.r);
 		b = std::max(b, rc.b);
 
 		return *this;
 	}
 
-	bool clip_by(const ltrbt rc) {
+	bool clip_by(const basic_ltrb rc) {
 		if (l >= rc.r || t >= rc.b || r <= rc.l || b <= rc.t) {
-			*this = ltrbt();
+			*this = basic_ltrb();
 			return false;
 		}
-		*this = ltrbt(std::max(l, rc.l),
+		*this = basic_ltrb(std::max(l, rc.l),
 			std::max(t, rc.t),
 			std::min(r, rc.r),
 			std::min(b, rc.b));
 		return true;
 	}
 
-	ltrbt& expand_from_center(const vec2 amount) {
+	basic_ltrb& expand_from_center(const vec2 amount) {
 		l -= amount.x;
 		t -= amount.y;
 		r += amount.x;
@@ -118,8 +119,8 @@ struct ltrbt {
 		return *this;
 	}
 
-	ltrbt& snap_to_bounds(const ltrbt rc) {
-		vec2t<T> offset(0, 0);
+	basic_ltrb& snap_to_bounds(const basic_ltrb rc) {
+		basic_vec2<T> offset(0, 0);
 
 		if (l < rc.l) offset.x += rc.l - l;
 		if (r > rc.r) offset.x += rc.r - r;
@@ -131,7 +132,7 @@ struct ltrbt {
 		return *this;
 	}
 
-	ltrbt& place_in_center_of(ltrbt bigger) {
+	basic_ltrb& place_in_center_of(basic_ltrb bigger) {
 		bigger.l += static_cast<T>(bigger.w() / 2.f - w() / 2.f);
 		bigger.t += static_cast<T>(bigger.h() / 2.f - h() / 2.f);
 		bigger.w(w());
@@ -141,7 +142,7 @@ struct ltrbt {
 		return *this;
 	}
 
-	ltrbt& center_x(const T c) {
+	basic_ltrb& center_x(const T c) {
 		const T _w = w();
 		l = c - _w / 2;
 		r = l + _w;
@@ -149,7 +150,7 @@ struct ltrbt {
 		return *this;
 	}
 
-	ltrbt& center_y(const T c) {
+	basic_ltrb& center_y(const T c) {
 		const T _h = h();
 		t = c - _h / 2;
 		b = t + _h;
@@ -157,7 +158,7 @@ struct ltrbt {
 		return *this;
 	}
 
-	ltrbt& center(const vec2t<T> c) {
+	basic_ltrb& center(const basic_vec2<T> c) {
 		center_x(c.x);
 		center_y(c.y);
 
@@ -172,20 +173,24 @@ struct ltrbt {
 		return b - t;
 	}
 
-	vec2t<T> left_top() const {
-		return vec2t<T>(l, t);
+	basic_vec2<T> left_top() const {
+		return { l, t };
 	}
 
-	vec2t<T> right_bottom() const {
-		return vec2t<T>(r, b);
+	basic_vec2<T> right_bottom() const {
+		return { r, b };
 	}
 
-	vec2t<T> right_top() const {
-		return vec2t<T>(r, t);
+	basic_vec2<T> right_top() const {
+		return { r, t };
 	}
 
-	vec2t<T> left_bottom() const {
-		return vec2t<T>(l, b);
+	basic_vec2<T> left_bottom() const {
+		return { l, b };
+	}
+
+	basic_vec2<T> get_center() const {
+		return (left_top() + right_bottom()) / 2;
 	}
 
 	T perimeter() const {
@@ -196,50 +201,52 @@ struct ltrbt {
 		return std::max(w(), h());
 	}
 
-	bool hover(const ltrbt& rc) const {
+	bool hover(const basic_ltrb& rc) const {
 		return !(l >= rc.r || t >= rc.b || r <= rc.l || b <= rc.t);
 	}
 
-	bool hover(const xywht<T>& rc) const {
-		return hover(ltrbt(rc));
+	bool hover(const basic_xywh<T>& rc) const {
+		return hover(basic_ltrb(rc));
 	}
 
-	bool inside(const ltrbt& rc) const {
+	bool inside(const basic_ltrb& rc) const {
 		return l >= rc.l && r <= rc.r && t >= rc.t && b <= rc.b;
 	}
 
-	vec2t<T> get_sticking_offset(const rectangle_sticking mode) const {
-		vec2t<T> res;
+	basic_vec2<T> get_sticking_offset(const rectangle_sticking mode) const {
+		basic_vec2<T> res;
 		switch (mode) {
-		case rectangle_sticking::LEFT: res = vec2t<T>(-r, 0);	break;
-		case rectangle_sticking::RIGHT: res = vec2t<T>(-l, 0);	break;
-		case rectangle_sticking::TOP: res = vec2t<T>(0, -b);	break;
-		case rectangle_sticking::BOTTOM: res = vec2t<T>(0, -t);	break;
-		default: res = vec2t<T>(0, 0); break;
+		case rectangle_sticking::LEFT: res = basic_vec2<T>(-r, 0);	break;
+		case rectangle_sticking::RIGHT: res = basic_vec2<T>(-l, 0);	break;
+		case rectangle_sticking::TOP: res = basic_vec2<T>(0, -b);	break;
+		case rectangle_sticking::BOTTOM: res = basic_vec2<T>(0, -t);	break;
+		default: res = basic_vec2<T>(0, 0); break;
 		}
 
 		return res;
 	}
 
-	vec2t<T> center() const {
-		return vec2t<T>(l + w() / 2.f, t + h() / 2.f);
+	basic_vec2<T> center() const {
+		return { l + w() / 2.f, t + h() / 2.f };
 	}
 
 	template <typename S>
-	bool hover(const vec2t<S>& m) const {
+	bool hover(const basic_vec2<S>& m) const {
 		return m.x >= l && m.y >= t && m.x <= r && m.y <= b;
 	}
 
 	template <class S>
-	std::array<vec2t<S>, 4> get_vertices() const {
-		return{ vec2t<S>(l, t),
-		vec2t<S>(r, t),
-		vec2t<S>(r, b),
-		vec2t<S>(l, b) };
+	std::array<basic_vec2<S>, 4> get_vertices() const {
+		return {
+			basic_vec2<S>(l, t),
+			basic_vec2<S>(r, t),
+			basic_vec2<S>(r, b),
+			basic_vec2<S>(l, b)
+		};
 	}
 
 	template <typename type>
-	void snap_point(vec2t<type>& v) const {
+	void snap_point(basic_vec2<type>& v) const {
 		if (v.x < l) v.x = static_cast<type>(l);
 		if (v.y < t) v.y = static_cast<type>(t);
 		if (v.x > r) v.x = static_cast<type>(r);
@@ -258,16 +265,16 @@ struct ltrbt {
 		return w() > 0 && h() > 0;
 	}
 
-	vec2t<T> get_position() const {
-		return vec2t<T>(l, t);
+	basic_vec2<T> get_position() const {
+		return basic_vec2<T>(l, t);
 	}
 
-	vec2t<T> get_size() const {
-		return vec2t<T>(w(), h());
+	basic_vec2<T> get_size() const {
+		return basic_vec2<T>(w(), h());
 	}
 
 	template <class P>
-	ltrbt& operator+=(const P& p) {
+	basic_ltrb& operator+=(const P& p) {
 		l += T(p.x);
 		t += T(p.y);
 		r += T(p.x);
@@ -276,16 +283,16 @@ struct ltrbt {
 	}
 
 	template <class P>
-	ltrbt operator-(const P& p) const {
-		return ltrbt(l - T(p.x), t - T(p.y), r - T(p.x), b - T(p.y));
+	basic_ltrb operator-(const P& p) const {
+		return basic_ltrb(l - T(p.x), t - T(p.y), r - T(p.x), b - T(p.y));
 	}
 
 	template <class P>
-	ltrbt operator+(const P& p) const {
-		return ltrbt(l + T(p.x), t + T(p.y), r + T(p.x), b + T(p.y));
+	basic_ltrb operator+(const P& p) const {
+		return basic_ltrb(l + T(p.x), t + T(p.y), r + T(p.x), b + T(p.y));
 	}
 
-	ltrbt& scale(const T s) {
+	basic_ltrb& scale(const T s) {
 		l *= s;
 		t *= s;
 		r *= s;
@@ -294,47 +301,47 @@ struct ltrbt {
 		return *this;
 	}
 
-	bool operator==(const ltrbt& a) {
+	bool operator==(const basic_ltrb& a) {
 		return l == a.l && r == a.r && t == a.t && b == a.b;
 	}
 };
 
 template <class T>
-struct xywht {
-	// GEN INTROSPECTOR struct xywht class T
+struct basic_xywh {
+	// GEN INTROSPECTOR struct basic_xywh class T
 	T x;
 	T y;
 	T w;
 	T h;
 	// END GEN INTROSPECTOR
 
-	xywht() : x(static_cast<T>(0)), y(static_cast<T>(0)), w(static_cast<T>(0)), h(static_cast<T>(0)) {}
-	xywht(const ltrbt<T> rc) : x(rc.l), y(rc.t) { b(rc.b); r(rc.r); }
-	xywht(const T x, const T y, const T w, const T h) : x(x), y(y), w(w), h(h) {}
-	xywht(const T x, const T y, const vec2t<T>& s) : x(x), y(y), w(s.x), h(s.y) {}
-	xywht(const vec2t<T>& p, const vec2t<T>& s) : x(p.x), y(p.y), w(s.x), h(s.y) {}
+	basic_xywh() : x(static_cast<T>(0)), y(static_cast<T>(0)), w(static_cast<T>(0)), h(static_cast<T>(0)) {}
+	basic_xywh(const basic_ltrb<T> rc) : x(rc.l), y(rc.t) { b(rc.b); r(rc.r); }
+	basic_xywh(const T x, const T y, const T w, const T h) : x(x), y(y), w(w), h(h) {}
+	basic_xywh(const T x, const T y, const basic_vec2<T>& s) : x(x), y(y), w(s.x), h(s.y) {}
+	basic_xywh(const basic_vec2<T>& p, const basic_vec2<T>& s) : x(p.x), y(p.y), w(s.x), h(s.y) {}
 
 	void set(const T _x, const T _y, const T _w, const T _h) {
-		*this = xywht(_x, _y, _w, _h);
+		*this = basic_xywh(_x, _y, _w, _h);
 	}
 
-	auto& set_position(const vec2t<T> v) {
+	auto& set_position(const basic_vec2<T> v) {
 		x = v.x;
 		y = v.y;
 
 		return *this;
 	}
 
-	vec2t<T> get_position() const {
+	basic_vec2<T> get_position() const {
 		return { x, y };
 	}
 
-	bool clip(const xywht& rc) {
+	bool clip(const basic_xywh& rc) {
 		if (x >= rc.r() || y >= rc.b() || r() <= rc.x || b() <= rc.y) {
-			*this = xywht();
+			*this = basic_xywh();
 			return false;
 		}
-		*this = ltrbt<T>(std::max(x, rc.x),
+		*this = basic_ltrb<T>(std::max(x, rc.x),
 			std::max(y, rc.y),
 			std::min(r(), rc.r()),
 			std::min(b(), rc.b()));
@@ -349,7 +356,7 @@ struct xywht {
 		this->h = bottom - y;
 	}
 
-	xywht& expand_from_center(const vec2 amount) {
+	basic_xywh& expand_from_center(const vec2 amount) {
 		x -= amount.x;
 		y -= amount.y;
 		w += amount.x;
@@ -366,31 +373,31 @@ struct xywht {
 		return y + this->h;
 	}
 
-	vec2t<T> center() const {
+	basic_vec2<T> center() const {
 		return{ x + this->w / 2, y + this->h / 2 };
 	}
 
-	auto& set_size(const vec2t<T> v) {
+	auto& set_size(const basic_vec2<T> v) {
 		w = v.x;
 		h = v.y;
 
 		return *this;
 	}
 
-	vec2t<T> get_size() const {
+	basic_vec2<T> get_size() const {
 		return{ w, h };
 	}
 
-	bool hover(const vec2t<T> m) const {
+	bool hover(const basic_vec2<T> m) const {
 		return m.x >= x && m.y >= y && m.x <= r() && m.y <= b();
 	}
 
-	bool hover(const ltrbt<T> rc) const {
+	bool hover(const basic_ltrb<T> rc) const {
 		return rc.hover(*this);
 	}
 
-	bool hover(const xywht rc) const {
-		return ltrbt<T>(rc).hover(*this);
+	bool hover(const basic_xywh rc) const {
+		return basic_ltrb<T>(rc).hover(*this);
 	}
 
 	bool good() const {
@@ -409,24 +416,24 @@ struct xywht {
 		return std::max(w, h);
 	}
 
-	bool operator==(const xywht r) const {
+	bool operator==(const basic_xywh r) const {
 		return x == r.x && y == r.y && w == r.w && h == r.h;
 	}
 
 	template <class P>
-	xywht& operator+=(const P& p) {
+	basic_xywh& operator+=(const P& p) {
 		x += T(p.x);
 		y += T(p.y);
 		return *this;
 	}
 
 	template <class P>
-	xywht operator-(const P& p) const {
-		return xywht(x - T(p.x), y - T(p.y), this->w, this->h);
+	basic_xywh operator-(const P& p) const {
+		return basic_xywh(x - T(p.x), y - T(p.y), this->w, this->h);
 	}
 
 	template <class P>
-	xywht operator+(const P& p) const {
-		return xywht(x + T(p.x), y + T(p.y), this->w, this->h);
+	basic_xywh operator+(const P& p) const {
+		return basic_xywh(x + T(p.x), y + T(p.y), this->w, this->h);
 	}
 };

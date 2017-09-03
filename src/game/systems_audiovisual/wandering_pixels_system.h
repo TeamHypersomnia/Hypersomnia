@@ -1,17 +1,19 @@
 #pragma once
 #include <array>
 #include <unordered_map>
-#include "game/enums/render_layer.h"
-
-#include "game/components/wandering_pixels_component.h"
-#include "game/transcendental/entity_id.h"
-#include "game/transcendental/entity_handle_declaration.h"
-#include "game/transcendental/step_declaration.h"
 
 #include "augs/misc/delta.h"
 #include "augs/misc/randomization.h"
 
-class viewing_step;
+#include "game/enums/render_layer.h"
+
+#include "game/transcendental/entity_id.h"
+#include "game/transcendental/entity_handle_declaration.h"
+#include "game/transcendental/step_declaration.h"
+
+#include "game/components/wandering_pixels_component.h"
+#include "game/components/sprite_component.h"
+
 struct visible_entities;
 
 class interpolation_system;
@@ -19,14 +21,6 @@ struct particles_emission;
 
 class wandering_pixels_system {
 public:
-	struct drawing_input : vertex_triangle_buffer_reference {
-		using vertex_triangle_buffer_reference::vertex_triangle_buffer_reference;
-
-		camera_cone camera;
-		rgba colorize;
-		renderable_drawing_type drawing_type = renderable_drawing_type::NORMAL;
-	};
-
 	struct particle {
 		vec2 pos;
 		vec2 current_direction = vec2(1, 0);
@@ -50,21 +44,32 @@ public:
 	cache& get_cache(const const_entity_handle);
 	const cache& get_cache(const const_entity_handle) const;
 
-	void advance_for_visible(
-		const visible_entities&,
+	void advance_for(
+		const visible_entities& subjects,
 		const cosmos&,
 		const augs::delta dt
 	);
 
-	void advance_wandering_pixels_for(
-		const const_entity_handle, 
+	void advance_for(
+		const const_entity_handle subject,
 		const augs::delta dt
 	);
 
-	void draw_wandering_pixels_for(
-		const const_entity_handle, 
-		const drawing_input&
-	) const;
+	template <class M>
+	void draw_wandering_pixels_as_sprites(
+		const const_entity_handle subject,
+		const M& manager,
+		components::sprite::drawing_input basic_input
+	) const {
+		const auto& wandering = subject.get<components::wandering_pixels>();
+		const auto& cache = get_cache(subject);
+
+		for (const auto& p : cache.particles) {
+			basic_input.renderable_transform = p.pos;
+
+			wandering.face.draw(manager, basic_input);
+		}
+	}
 
 	void reserve_caches_for_entities(const size_t) const {}
 

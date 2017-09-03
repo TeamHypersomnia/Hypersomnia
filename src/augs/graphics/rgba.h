@@ -1,34 +1,18 @@
 #pragma once
 #include <iosfwd>
+#include "augs/console_color.h"
+
+struct ImVec4;
+struct hsv;
 
 namespace std {
 	template <class T, std::size_t I>
 	class array;
 }
 
-
-#include "augs/console_color.h"
-
-typedef unsigned char rgba_channel;
-
-struct hsv {
-	double h;       // angle in degrees
-	double s;       // percent
-	double v;       // percent
-	hsv(double = 0.0, double = 0.0, double = 0.0);
-	hsv operator*(float) const;
-	hsv operator+(hsv b) const;
-};
-
-inline auto to_0_1(const rgba_channel c) {
-	return c / 255.f;
-}
-
-inline auto to_0_255(const float c) {
-	return static_cast<rgba_channel>(c * 255.f);
-}
-
-struct ImVec4;
+using vec3 = std::array<float, 3>;
+using vec4 = std::array<float, 4>;
+using rgba_channel = unsigned char;
 
 struct rgba {
 	struct rgb_type {
@@ -42,8 +26,8 @@ struct rgba {
 			const rgba_channel blue = 255
 		);
 
-		rgb_type(const std::array<float, 3>&);
-		operator std::array<float, 3>() const;
+		rgb_type(const vec3&);
+		operator vec3() const;
 	};
 
 	// GEN INTROSPECTOR struct rgba
@@ -54,12 +38,14 @@ struct rgba {
 	// END GEN INTROSPECTOR
 
 	explicit rgba(const console_color);
-	
-	rgba(const std::array<float, 4>&);
+
+	rgba(const vec4&);
 	rgba(const ImVec4&);
 
-	operator ImVec4() const;
-	operator std::array<float, 4>() const;
+	rgba(
+		const hsv,
+		const rgba_channel alpha = 255
+	);
 
 	rgba(
 		const rgb_type, 
@@ -72,6 +58,9 @@ struct rgba {
 		const rgba_channel blue = 255, 
 		const rgba_channel alpha = 255
 	);
+
+	operator ImVec4() const;
+	operator vec4() const;
 
 	void set(
 		const rgba_channel red = 255, 
@@ -133,6 +122,29 @@ struct rgba {
 	friend std::ostream& operator<<(std::ostream& out, const rgba& x);
 	friend std::istream& operator>>(std::istream& out, rgba& x);
 };
+
+struct hsv {
+	double h;       // angle in degrees
+	double s;       // percent
+	double v;       // percent
+	hsv(double = 0.0, double = 0.0, double = 0.0);
+	hsv operator*(float) const;
+	hsv operator+(hsv b) const;
+
+	operator rgba::rgb_type() const;
+};
+
+inline auto to_0_1(const rgba_channel c) {
+	return c / 255.f;
+}
+
+inline auto to_0_255(const float c) {
+	return static_cast<rgba_channel>(c * 255.f);
+}
+
+inline auto to_0_255(const double c) {
+	return static_cast<rgba_channel>(c * 255);
+}
 
 extern const rgba maroon;
 extern const rgba red;

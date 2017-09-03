@@ -21,10 +21,7 @@ namespace components {
 		ltrb aabb;
 		// END GEN INTROSPECTOR
 
-		static tree_of_npo_node create_default_for(
-			const logic_step step,
-			const_entity_handle
-		);
+		static tree_of_npo_node create_default_for(const_entity_handle);
 	};
 }
 

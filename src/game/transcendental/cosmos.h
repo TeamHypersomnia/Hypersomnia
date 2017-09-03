@@ -1,6 +1,6 @@
 #pragma once
 #include <map>
-#include "augs/build_settings/setting_empty_bases.h"
+#include "augs/build_settings/platform_defines.h"
 
 #include "augs/templates/introspection_utils/rewrite_members.h"
 
@@ -78,7 +78,7 @@ private:
 	);
 #endif
 
-	void advance_deterministic_schemata_and_queue_destructions(const logic_step step_state);
+	void advance_and_queue_destructions(const logic_step step_state);
 	void perform_deletions(const logic_step);
 
 	void destroy_inferred_state_completely();
@@ -94,7 +94,7 @@ public:
 	bool operator!=(const cosmos&) const;
 
 	template <class Pre, class Post>
-	void advance_deterministic_schemata(
+	void advance(
 		const logic_step_input input,
 		Pre pre_solve,
 		Post post_solve
@@ -103,14 +103,14 @@ public:
 		logic_step step(*this, input, queues);
 
 		pre_solve(step);
-		advance_deterministic_schemata_and_queue_destructions(step);
+		advance_and_queue_destructions(step);
 		post_solve(const_logic_step(step));
 		
 		perform_deletions(step);
 		queues.clear_all();
 	}
 
-	void advance_deterministic_schemata(const logic_step_input input);
+	void advance(const logic_step_input input);
 
 	void reserve_storage_for_entities(const std::size_t);
 
@@ -255,8 +255,8 @@ public:
 	const global_assets& get_global_assets() const;
 
 	/* saving procedure is not const due to possible reinference of the universe */
-	void save_to_file(const std::string&);
-	bool load_from_file(const std::string&);
+	void save_to_file(const augs::path_type&);
+	void load_from_file(const augs::path_type&);
 
 	template <class D>
 	void for_each_entity_id(D pred) {

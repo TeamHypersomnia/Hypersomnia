@@ -11,8 +11,6 @@
 #include "augs/misc/pool.h"
 #include "augs/misc/subscript_operator_for_get_handle_mixin.h"
 
-#include "game/assets/font_id.h"
-
 #include "clipboard.h"
 #include "middlescrolling.h"
 
@@ -30,25 +28,6 @@ namespace augs {
 		public:
 			using gui_entropy = augs::gui::gui_entropy<gui_element_variant_id>;
 
-			template<class C, class gui_element_id>
-			bool is_hovered(const C context, const gui_element_id& id) {
-				return context(id, [&](const auto& p) {
-					return context.get_tree_entry(id).get_absolute_clipped_rect().hover(last_state.mouse.pos);
-				});
-			}
-
-			rect_world(const vec2i screen_size) {
-				set_screen_size(screen_size);
-			}
-
-			void set_screen_size(const vec2i screen_size) {
-				last_state.screen_size = screen_size;
-			}
-
-			auto get_screen_size() const {
-				return last_state.screen_size;
-			}
-
 			event::state last_state;
 
 			middlescrolling<gui_element_variant_id> middlescroll;
@@ -65,6 +44,13 @@ namespace augs {
 			vec2i ldrag_relative_anchor;
 			vec2i last_ldown_position;
 			vec2i current_drag_amount;
+
+			template <class C, class gui_element_id>
+			bool is_hovered(const C context, const gui_element_id& id) {
+				return context(id, [&](const auto& p) {
+					return context.get_tree_entry(id).get_absolute_clipped_rect().hover(last_state.mouse.pos);
+				});
+			}
 
 			template <class gui_element_id>
 			bool is_currently_dragging(const gui_element_id& id) const {
@@ -310,14 +296,10 @@ namespace augs {
 			}
 
 			template <class C>
-			void draw(vertex_triangle_buffer& output_buffer, const C context) const {
-				draw_info in(output_buffer);
-
+			void draw(const C context) const {
 				context(context.get_root_id(), [&](const auto& r) {
-					r->draw_children(context, r, in);
+					r->draw_children(context, r);
 				});
-
-				middlescroll.draw(context, in);
 			}
 		};
 	}

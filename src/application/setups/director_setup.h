@@ -1,6 +1,6 @@
 #pragma once
 #include "setup_base.h"
-#include "game/view/viewing_session.h"
+
 #include "game/view/debug_character_selection.h"
 
 #include "game/transcendental/cosmos.h"
@@ -35,7 +35,7 @@ public:
 		RECORDING
 	};
 	
-	all_logical_metas_of_assets metas_of_assets;
+	all_logical_assets logical_assets;
 
 	director_state current_director_state = director_state::PLAYING;
 	recording_type recording_mode = recording_type::ALL;
@@ -70,12 +70,12 @@ public:
 	augs::gui::text::formatted_string get_status_text() const;
 
 	void init(
-		game_window&,
+		augs::window&,
 		viewing_session&
 	);
 
 	augs::machine_entropy control_player(
-		game_window& window,
+		augs::window& window,
 		viewing_session& session
 	);
 
@@ -89,7 +89,7 @@ public:
 	void advance_player(viewing_session& session);
 
 	void process(
-		game_window&,
+		augs::window&,
 		viewing_session&
 	);
 

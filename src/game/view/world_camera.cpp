@@ -5,22 +5,21 @@
 #include "game/components/crosshair_component.h"
 #include "augs/misc/delta.h"
 
-void world_camera::configure_size(const vec2 size) {
-	camera.visible_world_area = size;
-}
-
 void world_camera::tick(
+	const vec2i screen_size,
 	const interpolation_system& interp,
 	const augs::delta dt,
 	world_camera_settings settings,
 	const const_entity_handle entity_to_chase
 ) {
+	camera.visible_world_area = screen_size;
+
 	const auto& cosm = entity_to_chase.get_cosmos();
 
 	const auto enable_smoothing = settings.enable_smoothing;
 	const auto angled_look_length = settings.angled_look_length;
-	const auto smoothing_average_factor = settings.smoothing_average_factor;
-	const auto averages_per_sec = settings.averages_per_sec;
+	const auto average_factor = settings.smoothing.average_factor;
+	const auto averages_per_sec = settings.smoothing.averages_per_sec;
 
 	/* we obtain transform as a copy because we'll be now offsetting it by crosshair position */
 	if (entity_to_chase.alive()) {
@@ -37,7 +36,7 @@ void world_camera::tick(
 
 	if (enable_smoothing) {
 		/* variable time step camera smoothing by averaging last position with the current */
-		float averaging_constant = 1.0f - static_cast<float>(pow(smoothing_average_factor, averages_per_sec * dt.in_seconds()));
+		float averaging_constant = 1.0f - static_cast<float>(pow(average_factor, averages_per_sec * dt.in_seconds()));
 
 		if (dont_smooth_once)
 			averaging_constant = 0.0f;
@@ -74,7 +73,7 @@ void world_camera::tick(
 		smoothed_camera.transform.pos = calculated_smoothed_pos;
 		smoothed_camera.transform.rotation = static_cast<float>(calculated_smoothed_rotation);
 
-		//smoothing_player_pos
+		//additional_position_smoothing
 
 		smoothed_camera.visible_world_area = last_ortho_interpolant;
 	}
@@ -97,12 +96,12 @@ void world_camera::tick(
 
 			target_value = (player_pos - player_position_previously_seen) * cosm.get_fixed_delta().in_milliseconds();
 
-			if (target_value.length() < smoothing_player_pos.value.length()) {
+			if (target_value.length() < additional_position_smoothing.value.length()) {
 				// braking
-				settings.smooth_value_field_settings.averages_per_sec += 3.5;
+				settings.additional_position_smoothing.averages_per_sec += 3.5;
 			}
 			else {
-				settings.smooth_value_field_settings.averages_per_sec += 1.5;
+				settings.additional_position_smoothing.averages_per_sec += 1.5;
 			}
 
 			if (target_value.length() > 50) {
@@ -114,15 +113,15 @@ void world_camera::tick(
 		//else {
 		//	target_value = chased_transform.interpolation_direction(previous);
 		//	target_value.set_length(100);
-		//	smoothing_player_pos.averages_per_sec = 5;
+		//	additional_position_smoothing.averages_per_sec = 5;
 		//}
 
-		smoothing_player_pos.target_value = target_value * (-1);
-		smoothing_player_pos.tick(dt.in_seconds(), settings.smooth_value_field_settings);
+		additional_position_smoothing.target_value = target_value * (-1);
+		additional_position_smoothing.tick(dt.in_seconds(), settings.additional_position_smoothing);
 	}
 
 	if (enable_smoothing) {
-		smoothed_camera.transform.pos = vec2i(smoothed_camera.transform.pos + smoothing_player_pos.value);
+		smoothed_camera.transform.pos = vec2i(smoothed_camera.transform.pos + additional_position_smoothing.value);
 	}
 	else {
 		smoothed_camera.transform.pos = vec2i(smoothed_camera.transform.pos);

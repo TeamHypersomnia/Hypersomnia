@@ -3,12 +3,19 @@
 #include <variant>
 
 #include "augs/pad_bytes.h"
+#include "augs/templates/exception_templates.h"
 #include "augs/templates/maybe_const.h"
 
 #include "augs/math/vec2.h"
 #include "augs/graphics/rgba.h"
 
+#include "augs/filesystem/path.h"
+
 namespace augs {
+	struct image_loading_error : error_with_typesafe_sprintf {
+		using error_with_typesafe_sprintf::error_with_typesafe_sprintf;
+	};
+
 	struct paint_circle_midpoint_command {
 		// GEN INTROSPECTOR struct augs::paint_circle_midpoint_command
 		unsigned radius = 0u;
@@ -78,17 +85,10 @@ namespace augs {
 	class image {
 		std::vector<rgba> v;
 		vec2u size;
-
-		bool from_file(const std::string& path);
-		bool from_png(const std::string& path);
-		bool from_binary_file(const std::string& path);
-
-		void save_as_png(const std::string& path) const;
-		void save_as_binary_file(const std::string& path) const;
-
-		void resize(const vec2u image_size);
-
 	public:
+
+		static vec2u get_size(const path_type& file_path);
+		
 		image(const vec2u image_size = {});
 		
 		image(
@@ -98,7 +98,7 @@ namespace augs {
 			const vec2u size
 		);
 		
-		image(const std::string& file_path);
+		image(const path_type& file_path);
 
 		void fill(const rgba fill_color);
 
@@ -116,10 +116,18 @@ namespace augs {
 		void execute(const paint_line_command&);
 		
 		void swap_red_and_blue();
+		void resize(const vec2u image_size);
 
 		rgba& pixel(const vec2u at_coordinates);
 
-		void save(const std::string& path) const;
+		void from_file(const path_type& path);
+		void from_png(const path_type& path);
+		void from_binary_file(const path_type& path);
+
+		void save_as_png(const path_type& path) const;
+		void save_as_binary_file(const path_type& path) const;
+
+		void save(const augs::path_type& path) const;
 		
 		vec2u get_size() const;
 		unsigned get_rows() const;

@@ -8,13 +8,24 @@ namespace augs {
 		bool was_flipped = false;
 		pad_bytes<3> pad;
 
-		vec2u original_size_pixels = vec2u(0xdeadbeef, 0xdeadbeef);
+		/*
+			Each atlas entry caches its original size 
+			to speed up calculations during drawing,
+			even though it could be calculated via multiplying atlas_space by the real atlas size.
+		*/
+
+		vec2u cached_original_size_pixels = vec2u(0xdeadbeef, 0xdeadbeef);
+
+		vec2u get_original_size() const {
+			return cached_original_size_pixels;
+		}
 
 		vec2u get_size() const {
-			return original_size_pixels;
+			return get_original_size();
 		}
 
 		vec2 get_atlas_space_uv(const vec2 entry_space) const;
+
 		bool exists() const;
 	};
 }

@@ -18,8 +18,8 @@
 
 #include "augs/window_framework/window.h"
 #include "application/config_lua_table.h"
-#include "game/hardcoded_content/test_scenes/testbed.h"
-#include "game/hardcoded_content/test_scenes/minimal_scene.h"
+#include "game/hardcoded_content/test_scenes/scenes/testbed.h"
+#include "game/hardcoded_content/test_scenes/scenes/minimal_scene.h"
 
 #define LOG_REWINDING 0
 

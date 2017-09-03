@@ -1,149 +1,48 @@
-#include "game/hardcoded_content/all_hardcoded_content.h"
-#include "game/assets/assets_manager.h"
+#include "augs/filesystem/file.h"
 
-void load_test_scene_sound_buffers(assets_manager& manager) {
-	{
-		auto& buf = manager[assets::sound_buffer_id::BILMER2000_MUZZLE];
-		buf.from_file("content/official/sfx/bilmer2000_muzzle.wav");
-	}
+#include "game/hardcoded_content/test_scenes/test_scenes_content.h"
+#include "game/assets/all_assets.h"
 
-	{
-		auto& buf = manager[assets::sound_buffer_id::ASSAULT_RIFLE_MUZZLE];
-		buf.from_file("content/official/sfx/assault_muzzle.wav");
-	}
+#include "generated/introspectors.h"
 
-	{
-		auto& buf = manager[assets::sound_buffer_id::SUBMACHINE_MUZZLE];
-		buf.from_file("content/official/sfx/submachine_muzzle.wav");
-	}
+void load_test_scene_sound_buffers(all_viewable_defs& manager) {
+	using id_type = assets::sound_buffer_id;
+	const auto directory = "content/official/sfx/";
 
-	{
-		auto& buf = manager[assets::sound_buffer_id::KEK9_MUZZLE];
-		buf.from_file("content/official/sfx/kek9_muzzle.wav");
-	}
+	auto& sounds = manager.get_store_by(id_type());
 
-	{
-		auto& buf = manager[assets::sound_buffer_id::SN69_MUZZLE];
-		buf.from_file("content/official/sfx/sn69_muzzle.wav");
-	}
+	augs::for_each_enum_except_bounds<id_type>([&](const id_type id) {
+		const auto stem = to_lowercase(augs::enum_to_string(id));
+		using path = augs::path_type;
 
-	{
-		auto& buf = manager[assets::sound_buffer_id::ROCKET_LAUNCHER_MUZZLE];
-		buf.from_file("content/official/sfx/rocket_launcher_muzzle.wav");
-	}
+		const auto without_ext = path(directory) += stem;
 
-	{
-		auto& buf = manager[assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT];
-		buf.from_file("content/official/sfx/electric_projectile_flight.wav");
-	}
-	
-	{
-		auto& buf = manager[assets::sound_buffer_id::MISSILE_THRUSTER];
-		buf.from_file("content/official/sfx/missile_thruster.wav");
-	}
-	
-	{
-		auto& buf = manager[assets::sound_buffer_id::BULLET_PASSES_THROUGH_HELD_ITEM];
-		buf.from_file("content/official/sfx/bullet_hits_held_item.wav");
-	}
+		augs::sound_buffer_loading_input def;
 
-	{
-		auto& buf = manager[assets::sound_buffer_id::IMPACT];
-		buf.from_file("content/official/sfx/impact_light_%x.wav");
-	}
+		if (augs::file_exists(path(without_ext) += ".ogg")) {
+			def.generate_mono = false;
+			def.path_template = path(without_ext) += ".ogg";
+		}
+		else {
+			if (augs::file_exists(path(without_ext) += ".wav")) {
+				def.path_template = path(without_ext) += ".wav";
+			}
+			else if (augs::file_exists(path(without_ext) += "_1.wav")) {
+				def.path_template = path(without_ext) += "_%x.wav";
+			}
 
-	{
-		auto& buf = manager[assets::sound_buffer_id::DEATH];
-		buf.from_file("content/official/sfx/impact_%x.wav");
-	}
+			def.generate_mono = true;
+		}
 
-	{
-		auto& buf = manager[assets::sound_buffer_id::ENGINE];
-		buf.from_file("content/official/sfx/engine.ogg");
-	}
-
-	{
-		auto& buf = manager[assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION];
-		buf.from_file("content/official/sfx/electric_discharge_explosion_%x.wav");
-	}
-
-	{
-		auto& buf = manager[assets::sound_buffer_id::WIND];
-		buf.from_file("content/official/sfx/wind_%x.ogg");
-	}
-
-	{
-		auto& buf = manager[assets::sound_buffer_id::LOW_AMMO_CUE];
-		buf.from_file("content/official/sfx/low_ammo_cue.wav");
-	}
-
-	{
-		auto& buf = manager[assets::sound_buffer_id::FIREARM_ENGINE];
-		buf.from_file("content/official/sfx/firearm_engine.wav");
-	}
-
-	{
-		auto& buf = manager[assets::sound_buffer_id::CAST_SUCCESSFUL];
-		buf.from_file("content/official/sfx/cast_successful.wav");
-	}
-
-	{
-		auto& buf = manager[assets::sound_buffer_id::CAST_UNSUCCESSFUL];
-		buf.from_file("content/official/sfx/cast_unsuccessful.wav");
-	}
-
-	{
-		auto& buf = manager[assets::sound_buffer_id::EXPLOSION];
-		buf.from_file("content/official/sfx/explosion.wav");
-	}
-
-	{
-		auto& buf = manager[assets::sound_buffer_id::GREAT_EXPLOSION];
-		buf.from_file("content/official/sfx/great_explosion.wav");
-	}
-
-	{
-		auto& buf = manager[assets::sound_buffer_id::PED_EXPLOSION];
-		buf.from_file("content/official/sfx/ped_explosion.wav");
-	}
-
-	{
-		auto& buf = manager[assets::sound_buffer_id::INTERFERENCE_EXPLOSION];
-		buf.from_file("content/official/sfx/interference_explosion.wav");
-	}
-
-	{
-		auto& buf = manager[assets::sound_buffer_id::CAST_CHARGING];
-		buf.from_file("content/official/sfx/cast_charging.wav");
-	}
-
-	{
-		auto& buf = manager[assets::sound_buffer_id::GRENADE_UNPIN];
-		buf.from_file("content/official/sfx/grenade_unpin.wav");
-	}
-
-	{
-		auto& buf = manager[assets::sound_buffer_id::GRENADE_THROW];
-		buf.from_file("content/official/sfx/grenade_throw.wav");
-	}
-
-	{
-		auto& buf = manager[assets::sound_buffer_id::ITEM_THROW];
-		buf.from_file("content/official/sfx/item_throw_%x.wav");
-	}
-
-	{
-		auto& buf = manager[assets::sound_buffer_id::COLLISION_METAL_METAL];
-		buf.from_file("content/official/sfx/collision_metal_metal_%x.wav");
-	}
-
-	{
-		auto& buf = manager[assets::sound_buffer_id::COLLISION_METAL_WOOD];
-		buf.from_file("content/official/sfx/collision_metal_wood_%x.wav");
-	}
-
-	{
-		auto& buf = manager[assets::sound_buffer_id::COLLISION_GRENADE];
-		buf.from_file("content/official/sfx/collision_grenade.wav");
-	}
+		if (def.path_template.string().size() > 0) {
+			sounds[id] = def;
+		}
+		else {
+			throw test_scene_asset_loading_error(
+				"Error loading %x: sound file was not found at %x.", 
+				stem, 
+				without_ext
+			);
+		}
+	});
 }

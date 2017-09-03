@@ -4,7 +4,7 @@
 #include "game/container_sizes.h"
 #include "game/assets/recoil_player_id.h"
 
-class assets_manager;
+class all_assets;
 
 struct recoil_player {
 	// GEN INTROSPECTOR struct recoil_player
@@ -12,7 +12,7 @@ struct recoil_player {
 	float fallback_random_magnitude = 90;
 	// END GEN INTROSPECTOR
 
-	recoil_player get_logical_meta(const assets_manager& manager) const {
+	recoil_player get_logical(const all_assets& manager) const {
 		return *this;
 	}
 };

@@ -27,12 +27,17 @@ namespace augs {
 	global_lookup<Enum> string_to_enum_lookup;
 
 	template <class Enum>
+	auto& get_string_to_enum_map() {
+		return string_to_enum_lookup<Enum>.enums;
+	}
+
+	template <class Enum>
 	Enum string_to_enum(const std::string& label) {
-		return string_to_enum_lookup<Enum>.enums.at(label);
+		return get_string_to_enum_map<Enum>().at(label);
 	}
 
 	template <class Enum>
 	Enum string_to_enum_or(const std::string& label, const Enum or = Enum::INVALID) {
-		return found_or(string_to_enum_lookup<Enum>.enums, label, or);
+		return found_or(get_string_to_enum_map<Enum>(), label, or);
 	}
 }

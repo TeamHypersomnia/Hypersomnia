@@ -42,7 +42,7 @@ namespace augs {
 			}
 
 			unsigned word_separator::get_right_word(const formatted_string& _str, int at, int max_right) const {
-				if (max_right == -1) max_right = _str.length();
+				if (max_right == -1) max_right = _str.size();
 				if (_str.empty() || at >= int(max_right)) return 0;
 
 				unsigned result = get_right_word(_str, at, max_right, word_type(_str[at].unicode));
@@ -68,7 +68,7 @@ namespace augs {
 			}
 
 			unsigned word_separator::get_right_word(const formatted_string& _str, int at, int max_right, int wordtype) const {
-				if (max_right == -1) max_right = _str.length();
+				if (max_right == -1) max_right = _str.size();
 				if (_str.empty() || at >= int(max_right)) return 0;
 
 				unsigned offset = 0;

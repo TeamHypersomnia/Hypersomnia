@@ -2,7 +2,6 @@
 #include "augs/templates/type_list.h"
 
 #include "augs/gui/rect.h"
-#include "augs/gui/material.h"
 #include "augs/gui/appearance_detector.h"
 
 #include "game/detail/gui/game_gui_context.h"
@@ -16,7 +15,7 @@ struct value_bar : game_gui_rect_node {
 	
 	struct effect_particle {
 		vec2i relative_pos;
-		augs::gui::material mat;
+		assets::requisite_image_id tex;
 	};
 
 	int border_width = 1;
@@ -32,12 +31,12 @@ struct value_bar : game_gui_rect_node {
 
 	value_bar();
 
-	static augs::gui::material get_icon_mat(
+	static assets::game_image_id get_bar_icon(
 		const const_game_gui_context context, 
 		const const_this_pointer this_id
 	);
 
-	static augs::gui::material get_bar_mat(
+	static rgba get_bar_col(
 		const const_game_gui_context context, 
 		const const_this_pointer this_id
 	);
@@ -64,8 +63,7 @@ struct value_bar : game_gui_rect_node {
 
 	static void draw(
 		const viewing_game_gui_context context, 
-		const const_this_pointer this_id, 
-		augs::gui::draw_info info
+		const const_this_pointer this_id
 	);
 
 	static void advance_elements(

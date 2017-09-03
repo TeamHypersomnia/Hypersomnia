@@ -4,14 +4,10 @@
 #include "game/transcendental/entity_id.h"
 #include "game/enums/slot_function.h"
 #include "game/detail/inventory/inventory_slot_id.h"
-
+#include "game/components/transform_component.h"
 #include "augs/templates/maybe_const.h"
 
 struct inventory_slot;
-
-namespace components {
-	struct transform;
-}
 
 class cosmos;
 

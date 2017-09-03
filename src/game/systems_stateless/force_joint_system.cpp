@@ -46,7 +46,11 @@ void force_joint_system::apply_forces_towards_target_entities(const logic_step s
 
 			if (force_joint.divide_transform_mode) {
 				const auto current_transform = it.get_logic_transform();
-				const auto interpolated = augs::interp(current_transform, chased_transform, 1.0 - 1.0 / (1.0 + delta.in_seconds() * (60.0)));
+				const auto interpolated = augs::interp(
+					current_transform, 
+					chased_transform, 
+					1.f - 1.f / (1.f + delta.in_seconds() * (60.f))
+				);
 				//LOG("Cur: %x,%x, Chas: %x,%x, Inter: %x,%x", current_transform.pos, current_transform.rotation, chased_entity_transform.pos, chased_entity_transform.rotation, interpolated.pos, interpolated.rotation);
 				rigid_body.set_transform(interpolated);
 			}
@@ -73,7 +77,7 @@ void force_joint_system::apply_forces_towards_target_entities(const logic_step s
 						rigid_body.apply_force(force_for_chaser * rigid_body.get_mass() / offsets_count, offset);
 					}
 
-					//LOG("F: %x, %x, %x", force_for_chaser, rigid_body.velocity(), AS_INTV rigid_body.get_position());
+					//LOG("F: %x, %x, %x", force_for_chaser, rigid_body.velocity(), rigid_body.get_position());
 				}
 				//else if (is_force_epsilon && rigid_body.velocity().is_epsilon(1.f)) {
 				//	rigid_body.set_velocity(vec2(0, 0));

@@ -1,6 +1,7 @@
 #pragma once
 #include <map>
-#include "cosmic_entropy.h"
+#include "augs/filesystem/path.h"
+#include "game/transcendental/cosmic_entropy.h"
 
 class cosmic_movie_director {
 public:
@@ -11,6 +12,6 @@ public:
 	guid_mapped_entropy get_entropy_for_step(const unsigned) const;
 
 	bool is_recording_available() const;
-	bool load_recording_from_file(const std::string&);
-	void save_recording_to_file(const std::string&) const;
+	bool load_recording_from_file(const augs::path_type&);
+	void save_recording_to_file(const augs::path_type&) const;
 };

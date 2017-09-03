@@ -1,13 +1,22 @@
 #pragma once
 #include <sol2/sol.hpp>
+
 #include "augs/templates/string_to_enum.h"
 #include "augs/templates/is_variant.h"
 #include "augs/templates/is_optional.h"
+#include "augs/templates/exception_templates.h"
+
 #include "augs/misc/templated_readwrite.h"
 #include "augs/misc/custom_lua_representations.h"
 #include "augs/misc/script_utils.h"
 
+#include "augs/filesystem/file.h"
+
 namespace augs {
+	struct lua_deserialization_error : error_with_typesafe_sprintf {
+		using error_with_typesafe_sprintf::error_with_typesafe_sprintf;
+	};
+
 	template <class T, class = void>
 	struct has_custom_to_lua_value : std::false_type {};
 
@@ -32,6 +41,7 @@ namespace augs {
 	template <class T>
 	constexpr bool representable_as_lua_value_v =
 		std::is_same_v<T, std::string>
+		|| std::is_same_v<T, path_type>
 		|| std::is_arithmetic_v<T>
 		|| std::is_enum_v<T>
 		|| has_custom_to_lua_value_v<T>
@@ -62,9 +72,28 @@ namespace augs {
 		else if constexpr(std::is_same_v<T, std::string> || std::is_arithmetic_v<T>) {
 			into = object.as<T>();
 		}
+		else if constexpr(std::is_same_v<T, path_type>) {
+			into = object.as<std::string>();
+		}
 		else if constexpr(std::is_enum_v<T>) {
 			if constexpr(has_enum_to_string_v<T>) {
-				into = string_to_enum<T>(object.as<std::string>());
+				const auto stringized_enum = object.as<std::string>();
+
+				if (
+					const auto* enumized = found_or_nullptr(
+						get_string_to_enum_map<T>(), 
+						stringized_enum
+					)
+				) {
+					into = *enumized;
+				}
+				else {
+					throw lua_deserialization_error(
+						"Failed to read \"%x\" into %x enum. Check if such option exists, or if spelling is correct.",
+						stringized_enum,
+						typeid(T).name()
+					);
+				}
 			}
 			else {
 				into = static_cast<T>(object.as<int>());
@@ -78,7 +107,8 @@ namespace augs {
 
 	/*
 		For correct overload resolution.
-		This prevents the compiler from picking the templated, byte-wise read.
+		This prevents the compiler from choosing the templated, byte-wise read
+		when the archive type is sol::table - obviously.
 	*/
 
 	template <class Serialized>
@@ -237,6 +267,9 @@ namespace augs {
 		else if constexpr(std::is_same_v<T, std::string> || std::is_arithmetic_v<T>) {
 			return field;
 		}
+		else if constexpr(std::is_same_v<T, augs::path_type>) {
+			return field.string();
+		}
 		else if constexpr(std::is_enum_v<T>) {
 			if constexpr(has_enum_to_string_v<T>) {
 				return enum_to_string(field);
@@ -356,7 +389,7 @@ namespace augs {
 	template <class T, class... SaverArgs>
 	void save_as_lua_table(
 		T&& object, 
-		const std::string& target_path, 
+		const path_type& target_path, 
 		SaverArgs&&... args
 	) {
 		auto& lua = augs::get_thread_local_lua_state();
@@ -376,22 +409,37 @@ namespace augs {
 	template <class T>
 	void load_from_lua_table(
 		T& object,
-		const std::string& source_path
+		const path_type& source_path
 	) {
-		sol::table input_table = get_thread_local_lua_state().script(
-			augs::get_file_contents(source_path), 
-			augs::lua_error_callback
-		);
-		
-		ensure(input_table.valid());
+		try {
+			auto pfr = get_thread_local_lua_state().do_string(
+				augs::get_file_contents(source_path)
+			);
 
-		augs::read(input_table, object);
+			if (!pfr.valid()) {
+				throw lua_deserialization_error(
+					"Failed to obtain table from %x:\n%x",
+					source_path,
+					pfr.operator std::string()
+				);
+			}
+
+			sol::table input_table = pfr;
+			augs::read(input_table, object);
+		}
+		catch (const ifstream_error& err) {
+			throw lua_deserialization_error(
+				"Failed to open file for reading the lua table: %x\n%x",
+				source_path,
+				err.what()
+			);
+		}
 	}
 
 	template <class T>
-	T load_from_lua_table(const std::string& source_path) {
+	T load_from_lua_table(const path_type& source_path) {
 		T object;
-		load_from_lua_table(object, source_path);
+		load_from_lua_table<T>(object, source_path);
 		return object;
 	}
 }

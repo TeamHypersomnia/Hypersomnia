@@ -4,6 +4,7 @@
 #include "game/messages/queue_destruction.h"
 
 #include "game/detail/entity_scripts.h"
+#include "game/assets/all_assets.h"
 
 #include "game/components/missile_component.h"
 #include "game/components/render_component.h"
@@ -100,8 +101,8 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 			const auto subject_coll = subject_fix.get_raw_component();
 			const auto collider_coll = collider_fix.get_raw_component();
 			
-			const auto* const subject_coll_material = step.input.metas_of_assets.find(subject_coll.material);
-			const auto* const collider_coll_material = step.input.metas_of_assets.find(collider_coll.material);
+			const auto* const subject_coll_material = step.input.logical_assets.find(subject_coll.material);
+			const auto* const collider_coll_material = step.input.logical_assets.find(collider_coll.material);
 
 			if (
 				subject_coll_material != nullptr

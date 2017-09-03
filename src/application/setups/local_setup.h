@@ -1,13 +1,17 @@
 #pragma once
-#include "application/debug_settings.h"
+#include "augs/misc/fixed_delta_timer.h"
+#include "augs/misc/debug_entropy_player.h"
 
+#include "game/assets/all_assets.h"
+#include "game/view/debug_character_selection.h"
+
+#include "game/transcendental/types_specification/all_component_includes.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
-#include "game/view/debug_character_selection.h"
-#include "augs/misc/debug_entropy_player.h"
-#include "game/assets/assets_manager.h"
-#include "augs/misc/fixed_delta_timer.h"
-#include "game/transcendental/types_specification/all_component_includes.h"
+
+#include "application/debug_settings.h"
+
+struct config_lua_table;
 
 class local_setup {
 	cosmos hypersomnia;
@@ -15,24 +19,18 @@ class local_setup {
 	augs::debug_entropy_player<cosmic_entropy> player;
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 	debug_character_selection characters;
-	all_logical_metas_of_assets metas_of_assets;
+
+	all_logical_assets logical_assets;
+	all_viewable_defs viewable_defs;
+
 public:
-	template <class P>
+	static constexpr auto loading_strategy = viewables_loading_type::ALWAYS_HAVE_ALL_LOADED;
+	static constexpr bool can_viewables_change = false;
+
 	local_setup(
-		P&& populate,
+		const bool make_minimal_test_scene,
 		const input_recording_type recording_type
-	) {
-		populate(hypersomnia, metas_of_assets);
-		characters.acquire_available_characters(hypersomnia);
-
-		if (recording_type != input_recording_type::DISABLED) {
-			if (player.try_to_load_or_save_new_session("generated/sessions/", "recorded.inputs")) {
-				timer.set_stepping_speed_multiplier(1.f);
-			}
-		}
-
-		timer.reset_timer();
-	}
+	);
 
 	auto get_audiovisual_speed() const {
 		return timer.get_stepping_speed_multiplier();
@@ -42,12 +40,32 @@ public:
 		return timer.fraction_of_step_until_next_step(hypersomnia.get_fixed_delta());
 	}
 
-	entity_handle get_selected_character() {
-		return hypersomnia[characters.get_selected_character()];
+	auto get_viewed_character_id() const {
+		return characters.get_selected_character();
 	}
 
-	const auto& get_viewing_cosmos() const {
+	const auto& get_viewed_cosmos() const {
 		return hypersomnia;
+	}
+
+	auto get_viewed_character() const {
+		return get_viewed_cosmos()[get_viewed_character_id()];
+	}
+
+	const auto& get_viewable_defs() const {
+		return viewable_defs;
+	}
+
+	void perform_custom_imgui() {
+		return;
+	}
+
+	void customize_for_viewing(config_lua_table&) {
+		return;
+	}
+
+	void apply(const config_lua_table&) {
+		return;
 	}
 
 	template <class F, class G>
@@ -66,8 +84,8 @@ public:
 
 			augs::renderer::get_current().clear_logic_lines();
 
-			hypersomnia.advance_deterministic_schemata(
-				{ total_collected_entropy, metas_of_assets },
+			hypersomnia.advance(
+				{ total_collected_entropy, logical_assets },
 				[](auto){},
 				std::forward<G>(step_post_solve)
 			);
@@ -78,11 +96,9 @@ public:
 	}
 
 	void control(
-		augs::machine_entropy::local_type& entropy,
+		augs::local_entropy& entropy,
 		const input_context&
 	);
 
-	void control(
-		const cosmic_entropy&
-	);
+	void accept_game_gui_events(const cosmic_entropy&);
 };

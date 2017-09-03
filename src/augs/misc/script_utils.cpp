@@ -1,12 +1,6 @@
 #include "script_utils.h"
 
 namespace augs {
-	sol::protected_function_result lua_error_callback(lua_State* s, sol::protected_function_result pfr) {
-		LOG(pfr.operator std::string());
-		ensure(pfr.valid());
-		return pfr;
-	}
-
 	sol::state create_lua_state() {
 		sol::state lua;
 
@@ -36,8 +30,16 @@ namespace augs {
 				ensure(false); 
 			} 
 		};
+
+		const auto utils_path = "scripts/utils.lua";
 		
-		lua.script_file("scripts/utils.lua", augs::lua_error_callback);
+		auto pfr = lua.do_file(utils_path);
+
+		if (!pfr.valid()) {
+			LOG("Fatal error: there was a problem building %x:\n%x", utils_path);
+			press_any_key();
+			cleanup_proc();
+		}
 
 		return lua;
 	}

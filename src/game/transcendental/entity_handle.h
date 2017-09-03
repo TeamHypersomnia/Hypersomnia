@@ -21,7 +21,7 @@
 #include "game/detail/entity_handle_mixins/spatial_properties_mixin.h"
 
 #include "game/enums/entity_flag.h"
-#include "augs/build_settings/setting_empty_bases.h"
+#include "augs/build_settings/platform_defines.h"
 #include "game/transcendental/step_declaration.h"
 #include "game/components/name_component_declaration.h"
 

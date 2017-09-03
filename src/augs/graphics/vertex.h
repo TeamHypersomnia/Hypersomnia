@@ -40,12 +40,7 @@ namespace augs {
 		// float v2;
 	};
 
-	typedef std::vector<vertex_triangle> vertex_triangle_buffer;
-	typedef std::vector<vertex_line> vertex_line_buffer;
-	typedef std::vector<special> special_buffer;
+	using vertex_triangle_buffer = std::vector<vertex_triangle>;
+	using vertex_line_buffer = std::vector<vertex_line>;
+	using special_buffer = std::vector<special>;
 }
-
-struct vertex_triangle_buffer_reference {
-	augs::vertex_triangle_buffer& target_buffer;
-	vertex_triangle_buffer_reference(augs::vertex_triangle_buffer&);
-};

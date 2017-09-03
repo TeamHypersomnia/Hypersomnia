@@ -8,25 +8,27 @@ namespace augs {
 		fbo::fbo(const vec2u size) : size(size), tex(size) {
 			created = true;
 
-			glGenFramebuffers(1, &id); glerr
+			GL_CHECK(glGenFramebuffers(1, &id));
+			
 			set_as_current();
 
-			glFramebufferTexture2D(
+			GL_CHECK(glFramebufferTexture2D(
 				GL_FRAMEBUFFER,
 				GL_COLOR_ATTACHMENT0,
 				GL_TEXTURE_2D,
 				tex.id,
 				0
-			);
+			));
 
-			glerr
-
+#if BUILD_OPENGL
 			// check FBO status
+
 			GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 
 			if (status != GL_FRAMEBUFFER_COMPLETE) {
 				LOG("An error occured during FBO creation!");
 			}
+#endif
 
 			set_current_to_none();
 		}
@@ -57,17 +59,17 @@ namespace augs {
 		}
 
 		bool fbo::set_as_current_impl() const {
-			glBindFramebuffer(GL_FRAMEBUFFER, id); glerr
+			GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, id));
 			return true;
 		}
 
 		void fbo::set_current_to_none_impl() {
-			glBindFramebuffer(GL_FRAMEBUFFER, 0); glerr
+			GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 		}
 
 		void fbo::destroy() {
 			if (created) {
-				glDeleteFramebuffers(1, &id); glerr
+				GL_CHECK(glDeleteFramebuffers(1, &id));
 				created = false;
 			}
 		}

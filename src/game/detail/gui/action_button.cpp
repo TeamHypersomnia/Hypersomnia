@@ -1,27 +1,32 @@
 #include "action_button.h"
-#include "augs/gui/text_drawer.h"
-#include "augs/gui/stroke.h"
 #include "game/detail/gui/game_gui_context.h"
 #include "game/transcendental/cosmos.h"
 #include "game/systems_audiovisual/game_gui_system.h"
 #include "game/components/sentience_component.h"
-#include "game/assets/assets_manager.h"
+#include "game/assets/all_assets.h"
 
-#include "augs/graphics/drawers.h"
+#include "augs/drawing/drawing.h"
+#include "augs/gui/text/printer.h"
 #include "augs/templates/visit_gettable.h"
+
+using namespace augs::gui::text;
 
 void action_button::draw(
 	const viewing_game_gui_context context,
-	const const_this_in_item this_id,
-	draw_info info
+	const const_this_in_item this_id
 ) {
 	const auto intent_for_this = static_cast<intent_type>(static_cast<int>(intent_type::SPECIAL_ACTION_BUTTON_1) + this_id.get_location().index);
 	const auto bound_key = context.get_input_information().get_bound_key_if_any(intent_for_this);
 
 	const auto& cosmos = context.get_cosmos();
 	
+	const auto output = context.get_output();
 	const auto now = cosmos.get_timestamp();
 	const auto dt = cosmos.get_fixed_delta();
+
+	const auto& requisites = context.get_requisite_images();
+	const auto& game_images = context.get_game_images();
+	const auto& gui_font = context.get_gui_font();
 
 	const auto absolute_rect = context.get_tree_entry(this_id).get_absolute_rect();
 
@@ -52,11 +57,9 @@ void action_button::draw(
 					}
 
 					assets::game_image_id inside_tex = assets::game_image_id::INVALID;
-					assets::game_image_id border_tex = assets::game_image_id::SPELL_BORDER;
+					const assets::requisite_image_id border_tex = assets::requisite_image_id::SPELL_BORDER;
 
 					rgba border_col;
-
-					const auto& manager = get_assets_manager();
 
 					inside_tex = spell_data.appearance.icon;
 					border_col = spell_data.common.associated_color;
@@ -66,29 +69,23 @@ void action_button::draw(
 					}
 
 					if (inside_tex != assets::game_image_id::INVALID) {
-						ensure(border_tex != assets::game_image_id::INVALID);
+						ensure(border_tex != assets::requisite_image_id::INVALID);
 
-						const augs::gui::material inside_mat(inside_tex, inside_col);
-
-						const auto absolute_icon_rect = ltrbi(vec2i(0, 0), manager.at(inside_tex).get_size()).place_in_center_of(absolute_rect);
+						const auto absolute_icon_rect = ltrb(vec2i(0, 0), game_images.at(inside_tex).get_size()).place_in_center_of(absolute_rect);
 						const bool draw_partial_colorful_rect = false;
 
 						if (has_enough_mana) {
-							draw_clipped_rect(
-								inside_mat,
+							output.aabb(
+								game_images.at(inside_tex).texture_maps[texture_map_type::DIFFUSE],
 								absolute_icon_rect,
-								context,
-								context.get_tree_entry(this_id).get_parent(),
-								info.v
+								inside_col
 							);
 						}
 						else {
-							augs::draw_clipped_rect(
-								info.v,
+							output.aabb(
+								game_images.at(inside_tex).texture_maps[texture_map_type::DESATURATED],
 								absolute_icon_rect,
-								get_assets_manager()[inside_mat.tex].texture_maps[texture_map_type::DESATURATED],
-								inside_mat.color,
-								ltrbi()
+								inside_col
 							);
 
 							if (draw_partial_colorful_rect) {
@@ -97,12 +94,11 @@ void action_button::draw(
 								colorful_rect.t = absolute_icon_rect.b - colorful_height;
 								colorful_rect.b = colorful_rect.t + colorful_height;
 
-								augs::draw_clipped_rect(
-									info.v,
-									absolute_icon_rect,
-									get_assets_manager()[inside_mat.tex].texture_maps[texture_map_type::DIFFUSE],
-									inside_mat.color,
-									colorful_rect
+								output.aabb_clipped(
+									game_images.at(inside_tex).texture_maps[texture_map_type::DIFFUSE],
+									ltrb(absolute_icon_rect),
+									ltrb(colorful_rect),
+									inside_col
 								);
 							}
 						}
@@ -119,7 +115,7 @@ void action_button::draw(
 								all_cooldown.get_ratio_of_remaining_time(now, dt) : this_cooldown.get_ratio_of_remaining_time(now, dt);
 
 							if (effective_cooldown_ratio > 0.f) {
-								augs::draw_rectangle_clock(info.v, effective_cooldown_ratio, absolute_icon_rect, { 0, 0, 0, 200 });
+								output.rectangular_clock(ltrb(absolute_icon_rect), rgba { 0, 0, 0, 200 }, effective_cooldown_ratio);
 								is_still_cooled_down = true;
 							}
 						}
@@ -136,27 +132,24 @@ void action_button::draw(
 							border_col = white;
 						}
 
-						const augs::gui::material border_mat(border_tex, border_col);
-
-						draw_centered_texture(context, this_id, info, border_mat);
+						output.gui_box_center_tex(
+							requisites.at(border_tex),
+							context,
+							this_id, 
+							border_col
+						);
 
 						auto label_col = has_enough_mana ? border_col : white;
 						label_col.a = 255;
-						const auto label_style = augs::gui::text::style(assets::font_id::GUI_FONT, label_col );
 
-						augs::gui::text_drawer bound_key_caption;
+						const auto label_text = formatted_string { key_to_wstring(bound_key), { gui_font, label_col } };
+						const auto label_bbox = get_text_bbox(label_text);
 
-						bound_key_caption.set_text(
-							augs::gui::text::format(
-								key_to_wstring(bound_key),
-								label_style
-							)
+						print_stroked(
+							output,
+							absolute_rect.right_bottom() - label_bbox - vec2(4, 0),
+							label_text
 						);
-
-						bound_key_caption.bottom_right(absolute_rect);
-						bound_key_caption.pos.x -= 4;
-						bound_key_caption.draw_stroke(info.v);
-						bound_key_caption.draw(info.v);
 					}
 				}
 			);
@@ -175,30 +168,20 @@ void action_button::draw(
 				border_col.a = 255;
 			}
 
-			const auto label_style = augs::gui::text::style(assets::font_id::GUI_FONT, border_col);
+			const auto inside_tex = assets::requisite_image_id::ACTION_BUTTON_FILLED;
+			const auto border_tex = assets::requisite_image_id::ACTION_BUTTON_BORDER;
 
-			const auto inside_tex = assets::game_image_id::ACTION_BUTTON_FILLED;
-			const auto border_tex = assets::game_image_id::ACTION_BUTTON_BORDER;
+			output.gui_box_center_tex(requisites.at(inside_tex), context, this_id, inside_col);
+			output.gui_box_center_tex(requisites.at(border_tex), context, this_id, border_col);
 
-			const augs::gui::material inside_mat(inside_tex, inside_col);
-			const augs::gui::material border_mat(border_tex, border_col);
-
-			draw_centered_texture(context, this_id, info, inside_mat);
-			draw_centered_texture(context, this_id, info, border_mat);
-
-			augs::gui::text_drawer bound_key_caption;
-
-			bound_key_caption.set_text(
-				augs::gui::text::format(
+			print_stroked(
+				output,
+				absolute_rect.get_center() + vec2(0, 2),
+				{
 					key_to_wstring(bound_key),
-					label_style
-				)
+					{ context.get_gui_font(), border_col }
+				}
 			);
-
-			bound_key_caption.center(absolute_rect);
-			bound_key_caption.pos.y += 2;
-			bound_key_caption.draw_stroke(info.v);
-			bound_key_caption.draw(info.v);
 		}
 	}
 }

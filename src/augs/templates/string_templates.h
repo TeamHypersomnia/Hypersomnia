@@ -38,15 +38,17 @@ T to_value(const std::basic_string<CharType> s) {
 	return val;
 }
 
-template <class Str>
+template <class StrSubject>
 struct str_ops_impl {
-	Str& subject;
-	using Ch = get_underlying_char_type_t<Str>;
+	using self = str_ops_impl&;
+	using Str = std::decay_t<StrSubject>;
 
-	auto replace_all(
+	StrSubject subject;
+
+	self replace_all(
 		const Str from,
 		const Str to
-	) const {
+	) {
 		ensure(from.size() > 0 && "The search pattern shall not be empty!");
 
 		std::size_t pos = 0;
@@ -60,10 +62,10 @@ struct str_ops_impl {
 	}
 
 	template <class Container>
-	auto multi_replace_all(
+	self multi_replace_all(
 		const Container& from,
 		const Str& to
-	) const {
+	) {
 		for (const auto& f : from) {
 			replace_all(f, to);
 		}
@@ -71,14 +73,14 @@ struct str_ops_impl {
 		return *this;
 	}
 
-	auto multi_replace_all(
+	self multi_replace_all(
 		const std::initializer_list<Str>& from,
 		const Str& to
-	) const {
+	) {
 		return multi_replace_all<decltype(from)>(from, to);
 	}
 
-	auto to_lowercase() const {
+	self to_lowercase() {
 		std::transform(
 			subject.begin(),
 			subject.end(),
@@ -89,7 +91,7 @@ struct str_ops_impl {
 		return *this;
 	}
 
-	auto to_uppercase() const {
+	self to_uppercase() {
 		std::transform(
 			subject.begin(),
 			subject.end(),
@@ -107,7 +109,17 @@ struct str_ops_impl {
 
 template <class Ch>
 auto str_ops(std::basic_string<Ch>& s) {
+	return str_ops_impl<std::basic_string<Ch>&> { s };
+}
+
+template <class Ch>
+auto str_ops(const std::basic_string<Ch>& s) {
 	return str_ops_impl<std::basic_string<Ch>> { s };
+}
+
+template <class Ch>
+auto str_ops(const Ch* const s) {
+	return str_ops(std::basic_string<Ch>(s));
 }
 
 template <class S>
@@ -128,5 +140,14 @@ auto format_field_name(S s) {
 
 template <class Enum>
 auto format_enum(const Enum e) {
-	return format_field_name(to_lowercase(std::string(augs::enum_to_string(e))));
+	return format_field_name(to_lowercase(augs::enum_to_string(e)));
+}
+
+inline bool ends_with(const std::string& value, const std::string& ending)
+{
+    if (ending.size() > value.size()) {
+    	return false;
+    }
+
+    return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
 }

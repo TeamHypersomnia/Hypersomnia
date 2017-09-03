@@ -4,7 +4,7 @@
 #include "game/transcendental/cosmos.h"
 
 #include "game/transcendental/simulation_receiver.h"
-#include "game/view/viewing_session.h"
+
 #include "augs/misc/debug_entropy_player.h"
 #include "augs/network/network_client.h"
 
@@ -12,7 +12,7 @@ class client_setup : public setup_base {
 public:
 	bool predict_entropy = true;
 
-	all_logical_metas_of_assets metas_of_assets;
+	all_logical_assets logical_assets;
 
 	cosmos hypersomnia = cosmos(3000);
 	cosmos initial_hypersomnia = cosmos(3000);
@@ -33,21 +33,21 @@ public:
 	simulation_receiver receiver;
 
 	void process(
-		game_window&,
+		augs::window&,
 		viewing_session&
 	);
 
 	void init(
-		game_window&, 
+		augs::window&, 
 		viewing_session&,
 		const std::string recording_filename = "recorded.inputs",
 		const bool use_alternative_port = false
 	);
 
 	void process_once(
-		game_window&,
+		augs::window&,
 		viewing_session&,
-		const augs::machine_entropy::local_type& precollected, 
+		const augs::local_entropy& precollected, 
 		const bool swap_buffers = true
 	);
 };

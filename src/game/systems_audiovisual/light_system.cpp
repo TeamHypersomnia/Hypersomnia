@@ -1,20 +1,25 @@
-#include <array>
-#include "light_system.h"
-#include "game/view/viewing_step.h"
+#include "augs/graphics/vertex.h"
+#include "augs/graphics/renderer.h"
+#include "augs/graphics/shader.h"
+#include "augs/graphics/fbo.h"
+
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
-#include "game/view/viewing_session.h"
+
+#include "game/enums/filters.h"
+
 #include "game/components/light_component.h"
-#include "game/components/polygon_component.h"
 #include "game/components/render_component.h"
 
-#include "game/assets/assets_manager.h"
 #include "game/messages/visibility_information.h"
+
+#include "game/systems_audiovisual/light_system.h"
 
 #include "game/systems_stateless/visibility_system.h"
 #include "game/systems_stateless/render_system.h"
 
-#include "game/enums/filters.h"
+#include "game/systems_audiovisual/interpolation_system.h"
+#include "game/systems_audiovisual/particles_simulation_system.h"
 
 void light_system::reserve_caches_for_entities(const size_t n) {
 	per_entity_cache.resize(n);
@@ -28,6 +33,8 @@ void light_system::advance_attenuation_variations(
 	const cosmos& cosmos,
 	const augs::delta dt
 ) {
+	global_time_seconds += dt.in_seconds();
+
 	cosmos.for_each(
 		processing_subjects::WITH_LIGHT,
 		[&](const auto it) {
@@ -50,46 +57,43 @@ void light_system::advance_attenuation_variations(
 	);
 }
 
-void light_system::render_all_lights(
-	augs::renderer& output, 
-	const std::array<float, 16> projection_matrix, 
-	const viewing_step step, 
-	std::function<void()> neon_callback
-) const {
-	const auto& cosmos = step.cosm;
-	const auto global_time_seconds = (step.get_interpolated_total_time_passed_in_seconds());
-
-	ensure_eq(0, output.get_triangle_count());
-
-	output.light_fbo.value().set_as_current();
-	output.set_clear_color({ 25, 51, 51, 255 });
-	output.clear_current_fbo();
-	output.set_clear_color({ 0, 0, 0, 0 });
-
-	const auto& manager = get_assets_manager();
-
-	const auto& light_program = manager.at(assets::shader_program_id::LIGHT);
-	const auto& default_program = manager.at(assets::shader_program_id::DEFAULT);
-
-	light_program.set_as_current();
-
-	const auto light_pos_uniform = light_program.get_uniform_location("light_pos");
-	const auto light_max_distance_uniform = light_program.get_uniform_location("max_distance");
-	const auto light_attenuation_uniform = light_program.get_uniform_location("light_attenuation");
-	const auto light_multiply_color_uniform = light_program.get_uniform_location("multiply_color");
-	const auto projection_matrix_uniform = light_program.get_uniform_location("projection_matrix");
-	const auto& interp = step.audiovisuals.get<interpolation_system>();
-	const auto& particles = step.audiovisuals.get<particles_simulation_system>();
+void light_system::render_all_lights(const light_system_input in) const {
+	auto& renderer = in.renderer;
 	
-	const auto& visible_per_layer = step.visible.per_layer;
+	const auto output = augs::drawer{ renderer.get_triangle_buffer() };
+	const auto& light_shader = in.light_shader;
+	const auto& standard_shader = in.standard_shader;
+	const auto projection_matrix = in.projection_matrix;
+
+	const auto& cosmos = in.cosm;
+
+	ensure_eq(0, renderer.get_triangle_count());
+
+	in.light_fbo.set_as_current();
+	
+	renderer.set_clear_color({ 25, 51, 51, 255 });
+	renderer.clear_current_fbo();
+	renderer.set_clear_color({ 0, 0, 0, 0 });
+
+	light_shader.set_as_current();
+
+	const auto light_pos_uniform = light_shader.get_uniform_location("light_pos");
+	const auto light_max_distance_uniform = light_shader.get_uniform_location("max_distance");
+	const auto light_attenuation_uniform = light_shader.get_uniform_location("light_attenuation");
+	const auto light_multiply_color_uniform = light_shader.get_uniform_location("multiply_color");
+	const auto projection_matrix_uniform = light_shader.get_uniform_location("projection_matrix");
+	const auto& interp = in.interpolation;
+	const auto& particles = in.particles;
+	
+	const auto& visible_per_layer = in.visible_per_layer;
 
 	std::vector<messages::visibility_information_request> requests;
 	std::vector<messages::visibility_information_response> responses;
 
-	light_program.set_projection(projection_matrix);
+	light_shader.set_projection(projection_matrix);
 
 	auto draw_layer = [&](const render_layer r, const renderable_drawing_type type = renderable_drawing_type::NEON_MAPS) {
-		render_system().draw_entities(interp, global_time_seconds, output.triangles, cosmos, visible_per_layer[r], step.camera, type);
+		render_system().draw_entities(visible_per_layer[r], cosmos, output, in.game_images, in.camera, global_time_seconds, in.interpolation, type);
 	};
 
 	cosmos.for_each(
@@ -114,7 +118,7 @@ void light_system::render_all_lights(
 		visibility_system().respond_to_visibility_information_requests(cosmos, {}, requests, dummy, responses);
 	}
 
-	output.set_additive_blending();
+	renderer.set_additive_blending();
 
 	for (size_t i = 0; i < responses.size(); ++i) {
 		const auto& r = responses[i];
@@ -126,9 +130,9 @@ void light_system::render_all_lights(
 			const auto world_light_tri = r.get_world_triangle(t, world_light_pos);
 			augs::vertex_triangle renderable_light_tri;
 
-			renderable_light_tri.vertices[0].pos = step.camera[world_light_tri[0]];
-			renderable_light_tri.vertices[1].pos = step.camera[world_light_tri[1]];
-			renderable_light_tri.vertices[2].pos = step.camera[world_light_tri[2]];
+			renderable_light_tri.vertices[0].pos = in.camera[world_light_tri[0]];
+			renderable_light_tri.vertices[1].pos = in.camera[world_light_tri[1]];
+			renderable_light_tri.vertices[2].pos = in.camera[world_light_tri[2]];
 
 			auto considered_color = light.color;
 			
@@ -140,7 +144,7 @@ void light_system::render_all_lights(
 			renderable_light_tri.vertices[1].color = considered_color;
 			renderable_light_tri.vertices[2].color = considered_color;
 
-			output.push_triangle(renderable_light_tri);
+			renderer.push_triangle(renderable_light_tri);
 		}
 
 		//for (size_t d = 0; d < r.get_num_discontinuities(); ++d) {
@@ -169,18 +173,18 @@ void light_system::render_all_lights(
 		//		renderable_light_tri.vertices[1].color = light.color;
 		//		renderable_light_tri.vertices[2].color = light.color;
 		//
-		//		output.push_triangle(renderable_light_tri);
+		//		renderer.push_triangle(renderable_light_tri);
 		//	}
 		//}
 
 		const auto& cache = per_entity_cache[make_cache_id(light_entity)];
 
-		const auto light_frag_pos = step.camera.get_screen_space_revert_y(world_light_pos);
+		const auto light_frag_pos = in.camera.get_screen_space_revert_y(world_light_pos);
 
-		light_program.set_uniform(light_pos_uniform, light_frag_pos);
-		light_program.set_uniform(light_max_distance_uniform, light.max_distance.base_value);
+		light_shader.set_uniform(light_pos_uniform, light_frag_pos);
+		light_shader.set_uniform(light_max_distance_uniform, light.max_distance.base_value);
 		
-		light_program.set_uniform(
+		light_shader.set_uniform(
 			light_attenuation_uniform,
 			vec3 {
 				cache.all_variation_values[0] + light.constant.base_value,
@@ -189,19 +193,19 @@ void light_system::render_all_lights(
 			}
 		);
 		
-		light_program.set_uniform(
+		light_shader.set_uniform(
 			light_multiply_color_uniform,
 			white.rgb()
 		);
 
-		output.call_triangles();
-		output.clear_triangles();
+		renderer.call_triangles();
+		renderer.clear_triangles();
 		
-		light_program.set_as_current();
+		light_shader.set_as_current();
 
-		light_program.set_uniform(light_max_distance_uniform, light.wall_max_distance.base_value);
+		light_shader.set_uniform(light_max_distance_uniform, light.wall_max_distance.base_value);
 		
-		light_program.set_uniform(light_attenuation_uniform,
+		light_shader.set_uniform(light_attenuation_uniform,
 			vec3 {
 				cache.all_variation_values[3] + light.wall_constant.base_value,
 				cache.all_variation_values[4] + light.wall_linear.base_value,
@@ -209,23 +213,23 @@ void light_system::render_all_lights(
 			}
 		);
 		
-		light_program.set_uniform(
+		light_shader.set_uniform(
 			light_multiply_color_uniform,
 			light.color.rgb()
 		);
 		
 		draw_layer(render_layer::DYNAMIC_BODY, renderable_drawing_type::NORMAL);
 
-		output.call_triangles();
-		output.clear_triangles();
+		renderer.call_triangles();
+		renderer.clear_triangles();
 
-		light_program.set_uniform(
+		light_shader.set_uniform(
 			light_multiply_color_uniform,
 			white.rgb()
 		);
 	}
 
-	default_program.set_as_current();
+	standard_shader.set_as_current();
 
 	draw_layer(render_layer::DYNAMIC_BODY);
 	draw_layer(render_layer::SMALL_DYNAMIC_BODY);
@@ -234,27 +238,29 @@ void light_system::render_all_lights(
 	draw_layer(render_layer::CAR_WHEEL);
 	draw_layer(render_layer::NEON_CAPTIONS);
 	draw_layer(render_layer::ON_GROUND);
-	draw_layer(render_layer::ON_TILED_FLOOR);
 
 	{
-		particles.draw(
-			output.triangles,
-			render_layer::ILLUMINATING_PARTICLES,
-			step.camera,
-			renderable_drawing_type::NEON_MAPS
+		components::sprite::drawing_input basic(output);
+		basic.camera = in.camera;
+		basic.use_neon_map = true;
+
+		particles.draw_particles_as_sprites(
+			in.game_images,
+			basic,
+			render_layer::ILLUMINATING_PARTICLES
 		);
 	}
 
-	neon_callback();
+	in.neon_callback();
 
-	output.call_triangles();
-	output.clear_triangles();
+	renderer.call_triangles();
+	renderer.clear_triangles();
 
-	output.set_standard_blending();
+	renderer.set_standard_blending();
 
 	augs::graphics::fbo::set_current_to_none();
 
-	output.set_active_texture(2);
-	output.light_fbo.value().get_texture().bind();
-	output.set_active_texture(0);
+	renderer.set_active_texture(2);
+	in.light_fbo.get_texture().bind();
+	renderer.set_active_texture(0);
 }

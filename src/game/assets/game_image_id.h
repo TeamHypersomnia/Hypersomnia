@@ -1,10 +1,12 @@
 #pragma once
+#include "augs/math/vec2.h"
 #include "game/container_sizes.h"
 
 namespace assets {
-	enum class game_image_id {
-		// GEN INTROSPECTOR enum class assets::game_image_id
+	enum class requisite_image_id {
+		// GEN INTROSPECTOR enum class assets::requisite_image_id
 		INVALID,
+
 		BLANK,
 
 		DROP_HAND_ICON,
@@ -19,7 +21,7 @@ namespace assets {
 
 		MENU_GAME_LOGO,
 
-		MENU_BUTTON_INSIDE,
+		MENU_BUTTON,
 
 		MENU_BUTTON_LT,
 		MENU_BUTTON_RT,
@@ -50,7 +52,7 @@ namespace assets {
 		MENU_BUTTON_RB_INTERNAL_BORDER,
 		MENU_BUTTON_LB_INTERNAL_BORDER,
 
-		HOTBAR_BUTTON_INSIDE,
+		HOTBAR_BUTTON,
 
 		HOTBAR_BUTTON_LT,
 		HOTBAR_BUTTON_RT,
@@ -85,6 +87,7 @@ namespace assets {
 		ACTION_BUTTON_BORDER,
 
 		LASER,
+		LASER_GLOW,
 		LASER_GLOW_EDGE,
 
 		CIRCULAR_BAR_MEDIUM,
@@ -113,12 +116,33 @@ namespace assets {
 
 		WANDERING_CROSS,
 		SPELL_BORDER,
-		
+
 		CAST_HIGHLIGHT,
-		
-		REQUISITE_COUNT,
+
+		COUNT
+		// END GEN INTROSPECTOR
+	};
+
+	inline auto get_cursor_offset(const requisite_image_id id) {
+		auto output = vec2i { 0, 0 };
+
+		switch (id) {
+		case requisite_image_id::GUI_CURSOR_HOVER: output = { -5, 0 }; break;
+		case requisite_image_id::GUI_CURSOR_RESIZE_NWSE: output = { -9, -9 }; break;
+		case requisite_image_id::GUI_CURSOR_TEXT_INPUT: output = { -4, -8 }; break;
+		default: break;
+		}
+
+		return output;
+	}
+
+	enum class game_image_id {
+		// GEN INTROSPECTOR enum class assets::game_image_id
+		INVALID,
 
 #if BUILD_TEST_SCENES
+		BLANK,
+
 		CRATE,
 		CAR_FRONT,
 

@@ -1,6 +1,6 @@
 #pragma once
 #include "game/transcendental/entity_handle_declaration.h"
-#include "augs/build_settings/setting_empty_bases.h"
+#include "augs/build_settings/platform_defines.h"
 #include "game/transcendental/step_declaration.h"
 
 struct fixture_group_data;
@@ -22,14 +22,14 @@ public:
 	) const {
 		const auto& handle = *static_cast<const entity_handle_type*>(this);
 		const auto& cosmos = step.cosm;
-		const auto& metas = step.input.metas_of_assets;
+		const auto& metas = step.input.logical_assets;
 
 		if (handle.has<components::sprite>()) {
 			const auto& cosm = handle.get_cosmos();
 			const auto sprite = handle.get<components::sprite>();
 
 			const auto image_size = metas.at(sprite.tex).get_size();
-			vec2 scale = sprite.get_size(metas) / image_size;
+			vec2 scale = sprite.get_size() / image_size;
 
 			components::shape_polygon shape_polygon;
 			shape_polygon.shape = metas.at(sprite.tex).shape;

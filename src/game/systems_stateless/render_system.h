@@ -3,44 +3,57 @@
 #include <algorithm>
 #include <vector>
 
+#include "augs/ensure.h"
+#include "augs/math/camera_cone.h"
+#include "augs/drawing/drawing.h"
+
 #include "game/enums/render_layer.h"
 
-#include "augs/graphics/vertex.h"
 #include "game/transcendental/entity_handle_declaration.h"
-#include "game/enums/renderable_drawing_type.h"
-#include "game/detail/camera_cone.h"
+#include "game/transcendental/cosmos.h"
+
+#include "game/assets/assets_declarations.h"
 
 #include "game/components/polygon_component.h"
 #include "game/components/sprite_component.h"
-#include "game/components/tile_layer_instance_component.h"
 #include "game/components/particles_existence_component.h"
 
-#include "game/transcendental/cosmos.h"
-#include "game/enums/filters.h"
-
-#include "augs/ensure.h"
 #include "game/detail/physics/physics_scripts.h"
 
 class interpolation_system;
 
+enum class renderable_drawing_type {
+	NORMAL,
+	BORDER_HIGHLIGHTS,
+	NEON_MAPS
+};
+
 class render_system {
 public:
-	static bool render_order_compare(const const_entity_handle a, const const_entity_handle b);
+	static bool render_order_compare(
+		const const_entity_handle a, 
+		const const_entity_handle b
+	);
 
-	template<class Container>
+	template <class Container>
 	void draw_entities(
-		const interpolation_system& interp,
-		const double global_time_seconds,
-		augs::vertex_triangle_buffer& output,
-		const cosmos& cosmos,
 		const Container& entities,
+		const cosmos& cosmos,
+
+		const augs::drawer output,
+		const game_images_in_atlas& manager,
+
 		const camera_cone in_camera,
+
+		const double global_time_seconds,
+		const interpolation_system& interp,
+
 		const renderable_drawing_type renderable_drawing_mode
 	) const {
 		for (const auto e_id : entities) {
 			const auto e = cosmos[e_id];
 
-			for_each_type<components::polygon, components::sprite, components::tile_layer_instance>([&](auto T) {
+			for_each_type<components::polygon, components::sprite>([&](auto T) {
 				typedef decltype(T) renderable_type;
 
 				if (e.has<renderable_type>()) {
@@ -49,12 +62,15 @@ public:
 					const auto& renderable = e.get<renderable_type>();
 
 					render_system().draw_renderable(
-						output,
-						global_time_seconds,
 						renderable,
 						renderable_transform,
 						render,
+
+						output,
+						manager,
+
 						in_camera,
+						global_time_seconds,
 						renderable_drawing_mode
 					);
 				}
@@ -62,24 +78,29 @@ public:
 		}
 	}
 
-	template<class renderable_type>
+	template <class renderable_type>
 	void draw_renderable(
-		augs::vertex_triangle_buffer& output,
-		const double global_time_seconds,
 		const renderable_type& renderable,
 		const components::transform& renderable_transform,
 		const components::render& render,
+
+		const augs::drawer output,
+		const game_images_in_atlas& manager,
+
 		const camera_cone camera,
+		const double global_time_seconds,
+
 		const renderable_drawing_type renderable_drawing_mode
 	) const {
-		typedef typename renderable_type::drawing_input input_type;
-		input_type in(output);
+		using input_type = typename renderable_type::drawing_input;
+		
+		auto in = input_type(output);
 
 		in.camera = camera;
 
 		in.renderable_transform = renderable_transform;
 		in.set_global_time_seconds(global_time_seconds);
-		in.drawing_type = renderable_drawing_mode;
+		in.use_neon_map = renderable_drawing_mode == renderable_drawing_type::NEON_MAPS;
 
 		if (renderable_drawing_mode == renderable_drawing_type::BORDER_HIGHLIGHTS) {
 			if (render.draw_border) {
@@ -91,12 +112,12 @@ public:
 
 				for (const auto o : offsets) {
 					in.renderable_transform.pos = renderable_transform.pos + o;
-					renderable.draw(in);
+					renderable.draw(manager, in);
 				}
 			}
 		}
 		else {
-			renderable.draw(in);
+			renderable.draw(manager, in);
 		}
 	}
 
@@ -106,8 +127,6 @@ public:
 		const InputContainer& entities,
 		OutputContainer& output_layers
 	) const {
-		typedef decltype(*entities.begin()) id_type;
-
 		if (entities.empty()) {
 			return;
 		}
@@ -122,9 +141,12 @@ public:
 		auto& car_interior_layer = output_layers[render_layer::CAR_INTERIOR];
 
 		if (car_interior_layer.size() > 1) {
-			sort_container(car_interior_layer, [&cosmos](const auto b, const auto a) {
-				return are_connected_by_friction(cosmos[a], cosmos[b]);
-			});
+			sort_container(
+				car_interior_layer, 
+				[&cosmos](const auto b, const auto a) {
+					return are_connected_by_friction(cosmos[a], cosmos[b]);
+				}
+			);
 		}
 	}
 };

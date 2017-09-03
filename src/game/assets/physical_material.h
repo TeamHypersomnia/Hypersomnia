@@ -4,7 +4,7 @@
 #include "game/assets/physical_material_id.h"
 #include "game/assets/sound_buffer_id.h"
 
-class assets_manager;
+class all_assets;
 
 struct physical_material {
 	typedef augs::enum_associative_array<
@@ -16,7 +16,7 @@ struct physical_material {
 	collision_sound_matrix_type collision_sound_matrix;
 	// END GEN INTROSPECTOR
 
-	physical_material get_logical_meta(const assets_manager& manager) const {
+	physical_material get_logical(const all_assets& manager) const {
 		return *this;
 	}
 };

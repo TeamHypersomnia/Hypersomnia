@@ -1,12 +1,10 @@
-#include "unit_tests.h"
-
 #if BUILD_UNIT_TESTS
 #define CATCH_CONFIG_RUNNER
 #include <catch.hpp>
 #endif
 
 #include "augs/ensure.h"
-#include "application/debug_settings.h"
+#include "augs/unit_tests.h"
 
 namespace augs {
 	void run_unit_tests(
@@ -22,12 +20,12 @@ namespace augs {
 		Catch::Session session;
 
 		{
-			auto& cfg = session.configData();
+			auto& config = session.configData();
 
-			cfg.showSuccessfulTests = settings.log_successful;
-			cfg.shouldDebugBreak = settings.break_on_failure;
-			cfg.outputFilename = settings.output_log_path;
-			cfg.runOrder = Catch::RunTests::InWhatOrder::InDeclarationOrder;
+			config.showSuccessfulTests = settings.log_successful;
+			config.shouldDebugBreak = settings.break_on_failure;
+			config.outputFilename = settings.output_log_path;
+			config.runOrder = Catch::RunTests::InWhatOrder::InDeclarationOrder;
 		}
 
 		const auto result = session.run(argc, argv);

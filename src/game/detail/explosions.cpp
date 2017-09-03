@@ -141,10 +141,10 @@ void standard_explosion_input::instantiate(
 									impact, center_offset
 								);
 
-								auto& r = augs::renderer::get_current();
-
 								if (DEBUG_DRAWING.draw_explosion_forces) {
-									r.persistent_lines.draw_cyan(
+									auto& r = augs::renderer::get_current();
+
+									r.persistent_lines.emplace_back(cyan,
 										affected_physics.get_mass_position() + center_offset,
 										affected_physics.get_mass_position() + center_offset + impact
 									);

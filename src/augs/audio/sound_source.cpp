@@ -1,7 +1,7 @@
 #include "sound_source.h"
 #include "sound_buffer.h"
 
-#include "augs/al_log.h"
+#include "augs/audio/OpenAL_error.h"
 
 #if BUILD_OPENAL
 #include <AL/al.h>

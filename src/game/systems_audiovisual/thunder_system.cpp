@@ -1,13 +1,18 @@
-#include "thunder_system.h"
-#include "game/detail/camera_cone.h"
 #include "augs/templates/container_templates.h"
-#include "augs/graphics/drawers.h"
-#include "game/assets/assets_manager.h"
-#include "game/systems_inferred/physics_system.h"
-#include "game/systems_audiovisual/particles_simulation_system.h"
+
+#include "augs/math/camera_cone.h"
+#include "augs/drawing/drawing.h"
+
+#include "game/assets/all_assets.h"
 #include "game/enums/filters.h"
+
 #include "game/transcendental/cosmos.h"
 #include "game/detail/particle_types.h"
+
+#include "game/systems_inferred/physics_system.h"
+
+#include "game/systems_audiovisual/particles_simulation_system.h"
+#include "game/systems_audiovisual/thunder_system.h"
 
 void thunder_system::thunder::create_root_branch() {
 	thread_local fast_randomization rng;
@@ -40,12 +45,11 @@ void thunder_system::add(const thunder_input in) {
 
 void thunder_system::advance(
 	const cosmos& cosmos,
+	const particle_effect_definitions& manager,
 	const augs::delta dt,
 	particles_simulation_system& particles_output_for_effects
 ) {
 	thread_local fast_randomization rng;
-
-	const auto& manager = get_assets_manager();
 
 	for (thunder& t : thunders) {
 		t.until_next_branching_ms -= dt.in_milliseconds();
@@ -115,7 +119,7 @@ void thunder_system::advance(
 				const bool is_leaf = b.children.empty();
 
 				if (is_leaf) {
-					const auto* const remnants = manager.find(cosmos.get_global_assets().thunder_remnants);
+					const auto* const remnants = found_or_nullptr(manager, cosmos.get_global_assets().thunder_remnants);
 
 					if (remnants != nullptr) {
 						const auto remnants_emission = remnants->emissions.at(0);
@@ -156,19 +160,13 @@ void thunder_system::advance(
 }
 
 void thunder_system::draw_thunders(
-	augs::vertex_line_buffer& lines,
+	const augs::line_drawer_with_default output,
 	const camera_cone camera
 ) const {
 	for (const auto& t : thunders) {
 		for (const auto& b : t.branches) {
 			if (b.activated) {
-				augs::draw_line(
-					lines, 
-					camera[b.from], 
-					camera[b.to], 
-					get_assets_manager()[assets::game_image_id::BLANK].texture_maps[texture_map_type::DIFFUSE], 
-					t.in.color
-				);
+				output.line(camera[b.from], camera[b.to], t.in.color);
 			}
 		}
 	}

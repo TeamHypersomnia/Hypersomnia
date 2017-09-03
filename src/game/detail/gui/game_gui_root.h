@@ -3,17 +3,20 @@
 
 class game_gui_root : public game_gui_rect_node {
 public:
-	game_gui_root(const vec2i screen_size);
-
-	void set_screen_size(const vec2i);
+	game_gui_root();
 
 	template <class C, class gui_element_id, class L>
-	static void for_each_child(const C context, const gui_element_id this_id, L generic_call) {
+	static void for_each_child(
+		const C context, 
+		const gui_element_id this_id, 
+		L generic_call
+	) {
 		const auto handle = context.get_subject_entity();
 
 		// we do not dereference the gui element's entity location because it is possibly not an item;
-		// however it should be a container so we call the callback on the element's children
+		// however it is assumed to be a container so we call the callback on the element's children
 		// i.e. the player has a gui element component and container component but not an item component.
+
 		item_button::for_each_child(context, item_button_in_item{ handle.get_id() }, generic_call);
 
 		context(drag_and_drop_target_drop_item_in_character_gui(), [&](const auto& dereferenced) {

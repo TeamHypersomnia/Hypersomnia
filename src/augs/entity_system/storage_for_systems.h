@@ -4,14 +4,14 @@
 namespace augs {
 	template<class... Systems>
 	class storage_for_systems {
-		std::tuple<Systems...> systems;
-
 		template <typename T>
 		static void check_valid() {
 			static_assert(is_one_of_v<T, Systems...>, "Unknown system type!");
 		}
 
 	public:
+		std::tuple<Systems...> systems;
+
 		template <typename T>
 		T& get() {
 			check_valid<T>();

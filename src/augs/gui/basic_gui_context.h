@@ -7,21 +7,41 @@
 
 namespace augs {
 	namespace gui {
+		template <class T = float>
+		struct drawing_rects {
+			basic_ltrb<T> absolute;
+			basic_ltrb<T> clipper;
+		};
+
 		template <class gui_element_variant_id, bool is_const, class derived>
 		class basic_context {
 		public:
 			using tree_type = rect_tree<gui_element_variant_id>;
 			using rect_world_type = rect_world<gui_element_variant_id>;
-			using base = basic_context<gui_element_variant_id, is_const, derived>;
+			using base = basic_context;
 
 			using rect_world_ref = maybe_const_ref_t<is_const, rect_world_type>;
-			using tree_ref = maybe_const_ref_t<false, tree_type>;
-			using rect_tree_entry_ref = maybe_const_ref_t<false, rect_tree_entry<gui_element_variant_id>>;
+			using tree_ref = maybe_const_ref_t<is_const, tree_type>;
+			using rect_tree_entry_ref = maybe_const_ref_t<is_const, rect_tree_entry<gui_element_variant_id>>;
 
 			rect_world_ref world;
 			tree_ref tree;
-			
-			basic_context(rect_world_ref world, tree_ref tree) : world(world), tree(tree) {}
+			const vec2i screen_size;
+
+			basic_context(
+				rect_world_ref world, 
+				tree_ref tree,
+				const vec2i screen_size
+			) : 
+				world(world), 
+				tree(tree),
+				screen_size(screen_size)
+			{}
+
+			template <class other_derived>
+			operator basic_context<gui_element_variant_id, true, other_derived>() const {
+				return { world, tree, screen_size };
+			};
 
 			rect_world_ref get_rect_world() const {
 				return world;
@@ -30,7 +50,11 @@ namespace augs {
 			rect_tree_entry_ref get_tree_entry(const gui_element_variant_id& id) const {
 				return tree.at(id);
 			}
-			
+
+			auto get_screen_size() const {
+				return screen_size;
+			}
+
 			template <class id_type, class = std::enable_if_t<!is_const_ref_v<rect_tree_entry_ref>>>
 			rect_tree_entry_ref make_tree_entry(const id_type& id) const {
 				//ensure(tree.find(id) == tree.end()) 
@@ -90,6 +114,38 @@ namespace augs {
 
 				return dereferenced_location_type();
 			}
+
+			template <class T = float>
+			auto get_drawing_rects(const gui_element_variant_id& id) const {
+				auto& entry = get_tree_entry(id);
+
+				return drawing_rects<T>{
+					entry.get_absolute_rect(),
+					get_tree_entry(entry.get_parent()).get_absolute_clipping_rect()
+				};
+			}
 		};
+
+#if 0
+		template <class gui_element_variant_id, class derived>
+		class basic_viewing_context : public basic_context<gui_element_variant_id, true, derived> {
+		public:
+			using base = basic_context<gui_element_variant_id, true, derived>;
+
+			basic_viewing_context(
+				const base b,
+				const augs::drawer_with_default output
+			) : 
+				base(b),
+				output(output)
+			{}
+
+			const augs::drawer_with_default output;
+
+			auto get_output() const {
+				return output;
+			}
+		};
+#endif
 	}
 }

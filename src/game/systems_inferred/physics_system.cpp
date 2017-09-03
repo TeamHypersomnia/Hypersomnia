@@ -210,7 +210,7 @@ void physics_system::create_inferred_state_for_fixtures(const const_entity_handl
 
 			for (std::size_t ci = 0; ci < transformed_shape.convex_polys.size(); ++ci) {
 				const auto& convex = transformed_shape.convex_polys[ci];
-				std::vector<b2Vec2> b2verts(convex.vertices.begin(), convex.vertices.end());
+				std::vector<b2Vec2> b2verts(convex.begin(), convex.end());
 
 				for (auto& v : b2verts) {
 					v = si.get_meters(v);
@@ -325,8 +325,9 @@ b2Fixture_index_in_component physics_system::get_index_in_component(
 	//return b2Fixture_index_in_component();
 }
 
-physics_system::physics_system() : 
-b2world(new b2World(b2Vec2(0.f, 0.f))), ray_casts_since_last_step(0) {
+physics_system::physics_system() :
+	b2world(new b2World(b2Vec2(0.f, 0.f))) 
+{
 	b2world->SetAllowSleeping(true);
 	b2world->SetAutoClearForces(false);
 }

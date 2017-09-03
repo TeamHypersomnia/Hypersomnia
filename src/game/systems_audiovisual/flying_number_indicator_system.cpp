@@ -1,6 +1,11 @@
-#include "flying_number_indicator_system.h"
 #include "augs/templates/container_templates.h"
-#include "game/detail/camera_cone.h"
+
+#include "augs/drawing/drawing.h"
+#include "augs/math/camera_cone.h"
+
+#include "augs/gui/text/printer.h"
+
+#include "game/systems_audiovisual/flying_number_indicator_system.h"
 
 void flying_number_indicator_system::add(const number::input new_in) {
 	number new_number;
@@ -16,29 +21,33 @@ void flying_number_indicator_system::advance(const augs::delta dt) {
 	erase_if(
 		numbers,
 		[this](const number& n) {
-			return (global_time_seconds - n.time_of_occurence_seconds) > n.in.maximum_duration_seconds;
+			const auto passed_time_seconds = global_time_seconds - n.time_of_occurence_seconds;
+			return passed_time_seconds > n.in.maximum_duration_seconds;
 		}
 	);
 }
 
 void flying_number_indicator_system::draw_numbers(
-	augs::vertex_triangle_buffer& triangles,
+	const augs::baked_font& font,
+	const augs::drawer output,
 	const camera_cone camera
 ) const {
 	for (const auto& r : numbers) {
 		const auto passed = global_time_seconds - r.time_of_occurence_seconds;
 		const auto ratio = passed / r.in.maximum_duration_seconds;
 
-		if (!r.first_camera_space_pos) {
+		if (!r.first_camera_space_pos.has_value()) {
 			r.first_camera_space_pos = camera[r.in.pos];
 		}
 
-		auto text = r.in.text;
+		const auto text_pos = r.first_camera_space_pos.value() + vec2(r.in.impact_velocity).set_length(static_cast<float>(sqrt(passed)) * 50.f);
+		// text_pos = camera[r.in.pos - vec2(0, static_cast<float>(sqrt(passed)) * 120.f)];
 
-		text.pos = r.first_camera_space_pos.value() + vec2(r.in.impact_velocity).set_length(static_cast<float>(sqrt(passed)) * 50.f);
-		// text.pos = camera[r.in.pos - vec2(0, static_cast<float>(sqrt(passed)) * 120.f)];
-
-		text.draw_stroke(triangles);
-		text.draw(triangles);
+		augs::gui::text::print_stroked(
+			output,
+			text_pos,
+			{ r.in.text, { font, r.in.color } },
+			black
+		);
 	}
 }

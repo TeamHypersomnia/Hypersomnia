@@ -22,8 +22,6 @@
 
 struct wielding_result;
 
-struct character_gui_drawing_input;
-
 struct character_gui {
 	struct hotbar_selection_setup {
 		entity_handle::hand_selections_array hand_selections;
@@ -35,8 +33,6 @@ struct character_gui {
 		hotbar_selection_setup get_available_entities(const const_entity_handle h) const;
 	};
 	
-	character_gui(game_gui_rect_world& shared_world) : rect_world(shared_world) {}
-
 	std::array<hotbar_button, 10> hotbar_buttons;
 	std::array<action_button, 10> action_buttons;
 	std::array<value_bar, value_bar_count> value_bars;
@@ -50,19 +46,18 @@ struct character_gui {
 	bool preview_due_to_item_picking_request = false;
 	bool draw_space_available_inside_container_icons = true;
 
-	game_gui_rect_world& rect_world;
 	int dragged_charges = 0;
 
-	drag_and_drop_target_drop_item drop_item_icon = augs::gui::material(assets::game_image_id::DROP_HAND_ICON, red);
-
-	void set_screen_size(const vec2i);
-	vec2i get_screen_size() const;
-	vec2i get_gui_crosshair_position() const;
+	drag_and_drop_target_drop_item drop_item_icon;
 
 	static xywh get_rectangle_for_slot_function(const slot_function);
 
-	vec2i get_initial_position_for(const drag_and_drop_target_drop_item&) const;
-	vec2 initial_inventory_root_position() const;
+	vec2i get_initial_position_for(
+		const vec2i screen_size,
+		const drag_and_drop_target_drop_item&
+	) const;
+
+	vec2 initial_inventory_root_position(const vec2i screen_size) const;
 
 	void push_setup(const hotbar_selection_setup);
 
@@ -123,9 +118,6 @@ struct character_gui {
 		const vec2 world_cursor_position
 	);
 	
-	void draw(const character_gui_drawing_input) const;
-	void draw_cursor_with_information(const character_gui_drawing_input) const;
-
 	void draw_tooltip_from_hover_or_world_highlight(
 		const viewing_game_gui_context context,
 		const vec2i tooltip_pos

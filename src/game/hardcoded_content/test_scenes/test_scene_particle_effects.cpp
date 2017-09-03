@@ -1,12 +1,35 @@
-#include "game/hardcoded_content/all_hardcoded_content.h"
-#include "game/assets/assets_manager.h"
+#include "game/hardcoded_content/test_scenes/test_scenes_content.h"
+#include "game/assets/all_assets.h"
 #include "game/assets/particle_effect.h"
 #include "game/assets/particle_effect_id.h"
 #include "augs/graphics/shader.h"
 
 #include "game/detail/particle_types.h"
 
-void load_test_scene_particle_effects(assets_manager& manager) {
+/* 
+	This code is shit. 
+	It doesn't matter because it is just a fallback populator,
+	not meant to be used in production.
+*/
+
+void load_test_scene_particle_effects(all_viewable_defs& manager) {
+	auto set = [&manager](auto& target, auto id, auto col) {
+		target.set_image(id, manager.at(id).get_size(), col);
+	};
+
+	auto sets = [&manager](auto& target, auto id, auto sz, auto col) {
+		target.set_image(id, sz, col);
+	};
+
+	auto anim = animation();
+	anim.loop_mode = animation::loop_type::NONE;
+
+	anim.create_frames(
+		assets::game_image_id::CAST_BLINK_1,
+		assets::game_image_id::CAST_BLINK_19,
+		50.0f
+	);
+
 	{
 		auto& effect = manager[assets::particle_effect_id::WANDERING_SMOKE];
 
@@ -35,7 +58,7 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 
 			particle_definition.angular_damping = 0;
 			particle_definition.linear_damping = 10;
-			particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::SMOKE_1) + i), rgba(255, 255, 255, 30));
+			set(particle_definition, assets::game_image_id(int(assets::game_image_id::SMOKE_1) + i), rgba(255, 255, 255, 30));
 			particle_definition.unshrinking_time_ms = 2000.f;
 			particle_definition.shrink_when_ms_remaining = 1500.f;
 
@@ -78,7 +101,7 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 
 				particle_definition.angular_damping = 0;
 				particle_definition.linear_damping = 10;
-				particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::SMOKE_1) + i), rgba(255, 255, 255, 60));
+				set(particle_definition, assets::game_image_id(int(assets::game_image_id::SMOKE_1) + i), rgba(255, 255, 255, 60));
 				particle_definition.unshrinking_time_ms = 250.f;
 				particle_definition.shrink_when_ms_remaining = 1000.f;
 
@@ -115,10 +138,10 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 
 			particle_definition.angular_damping = 0;
 			//if (i == 5) {
-			//	particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::BLINK_1) + 3), rgba(255, 255, 255, 255));
+			//	set(particle_definition, assets::game_image_id(int(assets::game_image_id::CAST_BLINK_1) + 3), rgba(255, 255, 255, 255));
 			//}
 			//else {
-			particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::ROUND_TRACE)), rgba(255, 255, 255, 255));
+			set(particle_definition, assets::game_image_id(int(assets::game_image_id::ROUND_TRACE)), rgba(255, 255, 255, 255));
 			//}
 			//particle_definition.face.size_multiplier.set(1, 0.5);					
 			particle_definition.unshrinking_time_ms = 30.f;
@@ -164,7 +187,7 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 
 				particle_definition.angular_damping = 0;
 				particle_definition.linear_damping = 10;
-				particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::SMOKE_1) + i), rgba(255, 255, 255, 15));
+				set(particle_definition, assets::game_image_id(int(assets::game_image_id::SMOKE_1) + i), rgba(255, 255, 255, 15));
 				particle_definition.unshrinking_time_ms = 0.f;
 				particle_definition.shrink_when_ms_remaining = 100.f;
 
@@ -208,7 +231,7 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 
 				particle_definition.angular_damping = 0;
 				particle_definition.linear_damping = 400;
-				particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::SMOKE_1) + i), rgba(255, 255, 255, 15));
+				set(particle_definition, assets::game_image_id(int(assets::game_image_id::SMOKE_1) + i), rgba(255, 255, 255, 15));
 				particle_definition.unshrinking_time_ms = 100.f;
 				particle_definition.shrink_when_ms_remaining = 200.f;
 
@@ -257,7 +280,6 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 		em.starting_homing_force = std::make_pair(100.f, 100.f);
 		em.ending_homing_force = std::make_pair(10000.f, 10000.f);
 
-		const auto& anim = manager[assets::animation_id::CAST_BLINK_ANIMATION];
 		const auto frame_duration = anim.frames[0].duration_milliseconds / 4.f;
 
 		for (size_t i = 0; i < anim.frames.size() - 1; ++i)
@@ -278,7 +300,7 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 			homing_animated_particle particle_definition;
 
 			particle_definition.linear_damping = 0;
-			particle_definition.first_face = static_cast<assets::game_image_id>(static_cast<int>(assets::game_image_id::BLINK_1) + i);
+			particle_definition.first_face = static_cast<assets::game_image_id>(static_cast<int>(assets::game_image_id::CAST_BLINK_1) + i);
 			particle_definition.frame_count = 7 - i;
 			particle_definition.frame_duration_ms = frame_duration;
 			particle_definition.color = white;
@@ -291,7 +313,7 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 			homing_animated_particle particle_definition;
 
 			particle_definition.linear_damping = 0;
-			particle_definition.first_face = static_cast<assets::game_image_id>(static_cast<int>(assets::game_image_id::BLINK_1) + 2);
+			particle_definition.first_face = static_cast<assets::game_image_id>(static_cast<int>(assets::game_image_id::CAST_BLINK_1) + 2);
 			particle_definition.frame_count = 1;
 			particle_definition.frame_duration_ms = 700.f;
 			particle_definition.color = white;
@@ -353,7 +375,6 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 			em.particle_lifetime_ms = std::make_pair(100, 200);
 
 			{
-				const auto& anim = manager[assets::animation_id::CAST_BLINK_ANIMATION];
 				const auto frame_duration = anim.frames[0].duration_milliseconds / 2.f;
 
 				for (size_t i = 0; i < anim.frames.size() - 1; ++i)
@@ -371,7 +392,6 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 			}
 
 			{
-				const auto& anim = manager[assets::animation_id::BLINK_ANIMATION];
 				const auto frame_duration = anim.frames[0].duration_milliseconds / 2.f;
 
 				for (size_t i = 0; i < anim.frames.size() - 1; ++i)
@@ -425,7 +445,7 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 			particle_definition.angular_damping = 0;
 			particle_definition.linear_damping = 200;
 			particle_definition.acc.set(700, -700);
-			particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::SMOKE_1) + i), rgba(255, 255, 255, 30));
+			set(particle_definition, assets::game_image_id(int(assets::game_image_id::SMOKE_1) + i), rgba(255, 255, 255, 30));
 			particle_definition.unshrinking_time_ms = 100.f;
 			particle_definition.shrink_when_ms_remaining = 200.f;
 
@@ -469,7 +489,7 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 				particle_definition.angular_damping = 0;
 				particle_definition.linear_damping = 400;
 				particle_definition.acc.set(900, -900);
-				particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::SMOKE_1) + i), rgba(255, 255, 255, 30));
+				set(particle_definition, assets::game_image_id(int(assets::game_image_id::SMOKE_1) + i), rgba(255, 255, 255, 30));
 				particle_definition.unshrinking_time_ms = 100.f;
 				particle_definition.shrink_when_ms_remaining = 200.f;
 
@@ -504,7 +524,6 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 			em.rotation_speed = std::make_pair(0, 0);
 			em.particle_lifetime_ms = std::make_pair(200, 600);
 
-			const auto& anim = manager[assets::animation_id::CAST_BLINK_ANIMATION];
 			const auto frame_duration = anim.frames[0].duration_milliseconds / 2.f;
 
 			for (size_t i = 0; i < anim.frames.size() - 1; ++i)
@@ -526,7 +545,7 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 
 				particle_definition.angular_damping = 0;
 				particle_definition.linear_damping = 1000;
-				particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::BLINK_1) + 2), white);
+				set(particle_definition, assets::game_image_id(int(assets::game_image_id::CAST_BLINK_1) + 2), white);
 				particle_definition.acc.set(900, -900);
 				particle_definition.alpha_levels = 1;
 
@@ -538,7 +557,7 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 			//
 			//	particle_definition.angular_damping = 0;
 			//	particle_definition.linear_damping = 1000;
-			//	particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::BLINK_1) + 3), white);
+			//	set(particle_definition, assets::game_image_id(int(assets::game_image_id::CAST_BLINK_1) + 3), white);
 			//	particle_definition.acc.set(400, -400);
 			//	particle_definition.alpha_levels = 1;
 			//
@@ -552,7 +571,7 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 				particle_definition.linear_damping = 700;
 				particle_definition.acc.set(1200, -1200);
 				
-				particle_definition.set_image(
+				sets(particle_definition,
 					assets::game_image_id(int(assets::game_image_id::BLANK)), 
 					vec2(1, 1),
 					white
@@ -600,7 +619,7 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 				particle_definition.angular_damping = 0;
 				particle_definition.linear_damping = 400;
 				particle_definition.acc.set(900, -900);
-				particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::SMOKE_1) + i), rgba(255, 255, 255, 30));
+				set(particle_definition, assets::game_image_id(int(assets::game_image_id::SMOKE_1) + i), rgba(255, 255, 255, 30));
 				particle_definition.unshrinking_time_ms = 100.f;
 				particle_definition.shrink_when_ms_remaining = 200.f;
 
@@ -639,7 +658,6 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 			em.rotation_speed = std::make_pair(0, 0);
 			em.particle_lifetime_ms = std::make_pair(200, 600);
 
-			const auto& anim = manager[assets::animation_id::CAST_BLINK_ANIMATION];
 			const auto frame_duration = anim.frames[0].duration_milliseconds / 2.f;
 
 			for (size_t i = 0; i < anim.frames.size() - 1; ++i)
@@ -661,7 +679,7 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 
 				particle_definition.angular_damping = 0;
 				particle_definition.linear_damping = 1000;
-				particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::BLINK_1) + 2), white);
+				set(particle_definition, assets::game_image_id(int(assets::game_image_id::CAST_BLINK_1) + 2), white);
 				particle_definition.acc.set(900, -900);
 				particle_definition.alpha_levels = 1;
 
@@ -673,7 +691,7 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 			//
 			//	particle_definition.angular_damping = 0;
 			//	particle_definition.linear_damping = 1000;
-			//	particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::BLINK_1) + 3), white);
+			//	set(particle_definition, assets::game_image_id(int(assets::game_image_id::CAST_BLINK_1) + 3), white);
 			//	particle_definition.acc.set(400, -400);
 			//	particle_definition.alpha_levels = 1;
 			//
@@ -687,7 +705,7 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 				particle_definition.linear_damping = 700;
 				particle_definition.acc.set(1200, -1200);
 				
-				particle_definition.set_image(
+				sets(particle_definition,
 					assets::game_image_id(int(assets::game_image_id::BLANK)), 
 					vec2(1, 1),
 					white
@@ -738,7 +756,7 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 				particle_definition.angular_damping = 0;
 				particle_definition.linear_damping = 20;
 				particle_definition.acc.set(300, -300);
-				particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::SMOKE_1) + i), rgba(255, 255, 255, 15));
+				set(particle_definition, assets::game_image_id(int(assets::game_image_id::SMOKE_1) + i), rgba(255, 255, 255, 15));
 				particle_definition.unshrinking_time_ms = 100.f;
 				particle_definition.shrink_when_ms_remaining = 150.f;
 
@@ -765,7 +783,7 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 
 				particle_definition.angular_damping = 0;
 				particle_definition.linear_damping = 5000;
-				particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::PIXEL_THUNDER_1) + i), rgba(255, 255, 255, 255));
+				set(particle_definition, assets::game_image_id(int(assets::game_image_id::PIXEL_THUNDER_1) + i), rgba(255, 255, 255, 255));
 				particle_definition.alpha_levels = 1;
 
 				em.add_particle_definition(particle_definition);
@@ -794,8 +812,8 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 
 			particle_definition.angular_damping = 0;
 			particle_definition.linear_damping = 5000;
-			particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::PIXEL_THUNDER_1) + i), rgba(255, 255, 255, 255));
-			particle_definition.size.x *= 1.3;
+			set(particle_definition, assets::game_image_id(int(assets::game_image_id::PIXEL_THUNDER_1) + i), rgba(255, 255, 255, 255));
+			particle_definition.size.x *= 1.3f;
 			particle_definition.alpha_levels = 1;
 
 			em.add_particle_definition(particle_definition);
@@ -834,7 +852,7 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 				particle_definition.angular_damping = 0;
 				particle_definition.linear_damping = 20;
 				particle_definition.acc.set(600, -600);
-				particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::SMOKE_1) + i), rgba(255, 255, 255, 15));
+				set(particle_definition, assets::game_image_id(int(assets::game_image_id::SMOKE_1) + i), rgba(255, 255, 255, 15));
 				particle_definition.unshrinking_time_ms = 30.f;
 				particle_definition.shrink_when_ms_remaining = 50.f;
 
@@ -872,7 +890,7 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 			particle_definition.angular_damping = 0;
 			particle_definition.linear_damping = 0;
 			
-			particle_definition.set_image(
+			sets(particle_definition,
 				assets::game_image_id(assets::game_image_id::BLANK), 
 				vec2(2, 2), 
 				rgba(255, 255, 255, 255)
@@ -883,7 +901,6 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 			em.add_particle_definition(particle_definition);
 		}
 
-		const auto& anim = manager[assets::animation_id::CAST_BLINK_ANIMATION];
 		const auto frame_duration = anim.frames[0].duration_milliseconds / 3.f;
 
 		for (size_t i = 0; i < anim.frames.size() - 1; ++i) {
@@ -920,7 +937,7 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 			particle_definition.angular_damping = 0;
 			particle_definition.linear_damping = 1000;
 			
-			particle_definition.set_image(
+			sets(particle_definition,
 				assets::game_image_id(assets::game_image_id::BLANK), 
 				vec2(1, 1), 
 				rgba(255, 255, 255, 255)
@@ -959,7 +976,7 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 			particle_definition.angular_damping = 0;
 			particle_definition.linear_damping = 0;
 			
-			particle_definition.set_image(
+			sets(particle_definition,
 				assets::game_image_id(assets::game_image_id::BLANK), 
 				vec2(1, 1), 
 				rgba(255, 255, 255, 255)
@@ -1003,7 +1020,7 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 
 			particle_definition.angular_damping = 0;
 			particle_definition.linear_damping = 10;
-			particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::SMOKE_1) + i), rgba(255, 255, 255, 220));
+			set(particle_definition, assets::game_image_id(int(assets::game_image_id::SMOKE_1) + i), rgba(255, 255, 255, 220));
 			particle_definition.size *= 0.4;
 
 			em.add_particle_definition(particle_definition);
@@ -1030,7 +1047,7 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 			particle_definition.angular_damping = 0;
 			particle_definition.linear_damping = 50;
 			
-			particle_definition.set_image(
+			sets(particle_definition,
 				assets::game_image_id(assets::game_image_id::BLANK), 
 				vec2(1, 1),
 				rgba(255, 255, 255, 255)
@@ -1066,7 +1083,7 @@ void load_test_scene_particle_effects(assets_manager& manager) {
 
 			particle_definition.angular_damping = 0;
 			particle_definition.linear_damping = 10;
-			particle_definition.set_image(assets::game_image_id(int(assets::game_image_id::SMOKE_1) + i), rgba(255, 255, 255, 30));
+			set(particle_definition, assets::game_image_id(int(assets::game_image_id::SMOKE_1) + i), rgba(255, 255, 255, 30));
 			particle_definition.unshrinking_time_ms = 10;
 			particle_definition.shrink_when_ms_remaining = 50;
 

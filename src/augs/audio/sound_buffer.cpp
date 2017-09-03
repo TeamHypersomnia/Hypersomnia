@@ -1,19 +1,17 @@
-#include <array>
-
-
 #if BUILD_OPENAL
 #include <AL/al.h>
 #include <AL/alc.h>
 #endif
 
 #include "augs/ensure.h"
-#include "augs/al_log.h"
+#include "augs/audio/OpenAL_error.h"
 
 #include "augs/filesystem/file.h"
 
 #include "augs/audio/sound_data.h"
 #include "augs/audio/sound_buffer.h"
-#include "augs/audio/sound_samples_from_file.h"
+
+#include "augs/templates/container_templates.h"
 
 #define TRACE_CONSTRUCTORS_DESTRUCTORS 0
 
@@ -37,6 +35,10 @@ namespace augs {
 #else
 		return 0xdeadbeef;
 #endif
+	}
+
+	single_sound_buffer::single_sound_buffer(const sound_data& data) {
+		set_data(data);
 	}
 
 	single_sound_buffer::~single_sound_buffer() {
@@ -110,146 +112,74 @@ namespace augs {
 		AL_CHECK(alBufferData(id, passed_format, new_data.samples.data(), passed_bytesize, passed_frequency));
 	}
 
-	//sound_data single_sound_buffer::get_data() const {
-	//	return data;
-	//}
-
-	bool single_sound_buffer::is_set() const {
-		return initialized;
-	}
-
 	double single_sound_buffer::get_length_in_seconds() const {
 		return computed_length_in_seconds;
 	}
 
-	single_sound_buffer& sound_buffer::variation::request_original() {
-		if (original_channels == 1) {
-			return mono;
-		}
-		else if (original_channels == 2) {
-			return stereo;
-		}
-
-		const bool bad_format = true;
-		ensure(!bad_format);
-
-		return mono;
+	const single_sound_buffer& sound_buffer::variation::stereo_or_mono() const {
+		return stereo ? *stereo : *mono;
 	}
 
-	single_sound_buffer& sound_buffer::variation::request_mono() {
-		ensure(mono.is_set());
-		return mono;
+	const single_sound_buffer& sound_buffer::variation::mono_or_stereo() const {
+		return mono ? *mono : *stereo;
 	}
 
-	single_sound_buffer& sound_buffer::variation::request_stereo() {
-		if (!stereo.is_set()) {
-			return request_mono();
-		}
-
-		return stereo;
-	}
-
-	const single_sound_buffer& sound_buffer::variation::request_original() const {
-		if (original_channels == 1) {
-			return request_mono();
-		}
-		else if (original_channels == 2) {
-			return request_stereo();
-		}
-
-		const bool bad_format = true;
-		ensure(!bad_format);
-
-		return mono;
-	}
-
-	const single_sound_buffer& sound_buffer::variation::request_mono() const {
-		ensure(mono.is_set());
-		return mono;
-	}
-
-	const single_sound_buffer& sound_buffer::variation::request_stereo() const {
-		if (!stereo.is_set()) {
-			return request_mono();
-		}
-
-		return stereo;
-	}
-
-	void sound_buffer::variation::set_data(const sound_data& data, const bool generate_mono) {
-		original_channels = data.channels;
-
+	sound_buffer::variation::variation(const sound_data& data, const bool generate_mono) {
 		if (data.channels == 1) {
-			mono.set_data(data);
+			mono = data;
 		}
 		else if (data.channels == 2) {
-			stereo.set_data(data);
+			stereo = data;
 
 			if (generate_mono) {
-				mono.set_data(mix_stereo_to_mono(data));
+				mono = sound_data(data).to_mono();
 			}
-
 		}
 		else {
-			const bool bad_format = true;
-			ensure(!bad_format);
+			ensure(false && "Bad format");
 		}
 	}
 
-	ALuint sound_buffer::get_id() const {
-		return variations[0].request_original();
-	}
-
-	sound_buffer::operator ALuint() const {
-		return get_id();
-	}
-	
-	sound_buffer_logical_meta sound_buffer::get_logical_meta(const assets_manager& manager) const {
-		sound_buffer_logical_meta output;
-		output.num_of_variations = variations.size();
-
-		const auto len = [](const variation& v) {
-			return v.request_original().get_length_in_seconds();
+	sound_buffer_logical::sound_buffer_logical(const sound_buffer& buf) 
+		: num_of_variations(buf.variations.size())
+	{
+		const auto len = [](const sound_buffer::variation& v) {
+			return v.stereo_or_mono().get_length_in_seconds();
 		};
 
-		output.max_duration_in_seconds = static_cast<float>(len(*std::max_element(
-			variations.begin(),
-			variations.end(),
-			[len](const variation& a, const variation& b) {
+		max_duration_in_seconds = static_cast<float>(len(maximum_of(
+			buf.variations,
+			[len](const auto& a, const auto& b) {
 				return len(a) < len(b);
 			}
 		)));
-
-		return output;
 	}
 
-	void sound_buffer::from_file(const std::string& path, const bool generate_mono) {
-		for (size_t i = 1;;++i) {
-			const auto target_path = typesafe_sprintf(path, i);
+	sound_buffer::sound_buffer(const sound_buffer_loading_input input) {
+		from_file(input);
+	}
 
-			const bool no_change_in_path = target_path == path;
+	void sound_buffer::from_file(const sound_buffer_loading_input input) {
+		const auto& path = input.path_template;
 
-			if (!augs::file_exists(target_path) || (i > 1 && no_change_in_path)) {
-				break;
+		if (
+			const bool many_files = typesafe_sprintf(path.string(), 1) != path;
+			many_files
+		) {
+			for (size_t i = 1;; ++i) {
+				const auto target_path = augs::path_type(typesafe_sprintf(path.string(), i));
+
+				if (!augs::file_exists(target_path)) {
+					break;
+				}
+
+				variations.emplace_back(target_path, input.generate_mono);
 			}
 
-			variation new_variation;
-			new_variation.set_data(get_sound_samples_from_file(target_path), generate_mono);
-			variations.emplace_back(std::move(new_variation));
+			ensure(variations.size() > 0);
 		}
-
-		ensure(variations.size() > 0);
-	}
-
-	size_t sound_buffer::get_num_variations() const {
-		return variations.size();
-	}
-
-	sound_buffer::variation& sound_buffer::get_variation(const size_t i) {
-		return variations.at(i);
-	}
-
-	const sound_buffer::variation& sound_buffer::get_variation(const size_t i) const {
-		return variations.at(i);
+		else {
+			variations.emplace_back(path, input.generate_mono);
+		}
 	}
 }

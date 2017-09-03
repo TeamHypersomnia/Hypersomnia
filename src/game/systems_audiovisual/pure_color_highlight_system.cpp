@@ -1,6 +1,6 @@
 #include "pure_color_highlight_system.h"
 #include "augs/templates/container_templates.h"
-#include "game/detail/camera_cone.h"
+#include "augs/math/camera_cone.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/components/render_component.h"
@@ -36,10 +36,11 @@ void pure_color_highlight_system::advance(const augs::delta dt) {
 }
 
 void pure_color_highlight_system::draw_highlights(
-	augs::vertex_triangle_buffer& triangles,
+	const augs::drawer output,
 	const camera_cone camera,
 	const cosmos& cosmos,
-	const interpolation_system& interp
+	const interpolation_system& interp,
+	const game_images_in_atlas& game_images
 ) const {
 	for (const auto& r : highlights) {
 		const auto subject = cosmos[r.in.target];
@@ -59,12 +60,14 @@ void pure_color_highlight_system::draw_highlights(
 		col.a = static_cast<rgba_channel>(255.f * sqrt(sqrt(ratio)) * r.in.starting_alpha_ratio);
 
 		render_system().draw_renderable(
-			triangles,
-			global_time_seconds,
 			sprite,
 			subject.get_viewing_transform(interp, true),
 			subject.get<components::render>(),
+
+			output,
+			game_images,
 			camera,
+			global_time_seconds,
 			renderable_drawing_type::NORMAL
 		);
 

@@ -23,7 +23,7 @@ namespace augs {
 		std::map<unsigned, entropy_type> step_to_entropy_to_replay;
 		unsigned player_step_position = 0u;
 
-		std::string live_saving_filename;
+		path_type live_saving_path;
 
 	public:
 		void advance_player_and_biserialize(entropy_type& total_collected_entropy) {
@@ -46,7 +46,8 @@ namespace augs {
 			}
 			else if (is_recording()) {
 				if (total_collected_entropy.length() > 0) {
-					std::ofstream recording_file(live_saving_filename, std::ios::out | std::ios::binary | std::ios::app);
+					auto recording_file = with_exceptions<std::ofstream>();
+					recording_file.open(live_saving_path, std::ios::out | std::ios::binary | std::ios::app);
 
 					augs::write(recording_file, player_step_position);
 					augs::write(recording_file, total_collected_entropy);
@@ -56,11 +57,11 @@ namespace augs {
 			}
 		}
 
-		bool try_to_load_and_replay_recording(const std::string& filename) {
+		bool try_to_load_and_replay_recording(const path_type& path) {
 			player_step_position = 0;
 			step_to_entropy_to_replay.clear();
 
-			read_map_until_eof(filename, step_to_entropy_to_replay);
+			read_map_until_eof(path, step_to_entropy_to_replay);
 
 			if (step_to_entropy_to_replay.empty()) {
 				return false;
@@ -71,29 +72,30 @@ namespace augs {
 			}
 		}
 
-		void record_and_save_this_session(const std::string& folder, const std::string& filename) {
-			const auto target_folder = folder + augs::get_timestamp() + "/";
+		void record_and_save_this_session(const path_type& folder, const path_type& path) {
+			const auto target_folder = path_type(folder.string() + augs::get_timestamp() + "/");
 			augs::create_directories(target_folder);
 
-			live_saving_filename = target_folder + "/" + filename;
+			live_saving_path = target_folder.string() + "/" + path.string();
 			current_player_state = player_state::RECORDING;
 		}
 
-		bool try_to_load_or_save_new_session(const std::string& sessions_folder, const std::string& recording_filename) {
-			std::vector<std::string> filenames = { recording_filename };
+		bool try_to_load_or_save_new_session(const path_type& sessions_folder, const path_type& recording_path) {
+			std::vector<path_type> paths = { recording_path };
+			const auto recording_path_str = recording_path.string();
 
-			if (recording_filename.find(".inputs") != std::string::npos) {
-				filenames.push_back(recording_filename.substr(0, recording_filename.size() - std::string(".inputs").length()) + "_0.inputs");
-				filenames.push_back(recording_filename.substr(0, recording_filename.size() - std::string(".inputs").length()) + "_1.inputs");
+			if (recording_path_str.find(".inputs") != std::string::npos) {
+				paths.push_back(recording_path_str.substr(0, recording_path_str.size() - std::string(".inputs").length()) + "_0.inputs");
+				paths.push_back(recording_path_str.substr(0, recording_path_str.size() - std::string(".inputs").length()) + "_1.inputs");
 			}
 
-			for (const auto& filename : filenames) {
-				if (try_to_load_and_replay_recording(filename)) {
+			for (const auto& path : paths) {
+				if (try_to_load_and_replay_recording(path)) {
 					return true;
 				}
 			}
 
-			record_and_save_this_session(sessions_folder, recording_filename);
+			record_and_save_this_session(sessions_folder, recording_path);
 			return false;
 		}
 

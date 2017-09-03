@@ -4,27 +4,28 @@
 #include "augs/graphics/vertex.h"
 #include "augs/gui/dereferenced_location.h"
 #include "augs/gui/basic_gui_context.h"
+#include "augs/math/camera_cone.h"
 
+#include "game/hardcoded_content/requisite_collections.h"
 #include "game/enums/input_context_enums.h"
 #include "game/transcendental/entity_handle.h"
-#include "game/detail/camera_cone.h"
-#include "game/detail/gui/game_gui_element_location.h"
-#include "game/detail/gui/character_gui_drawing_input.h"
 
-#include "application/config_lua_table.h"
+#include "game/detail/gui/game_gui_context_dependencies.h"
+#include "game/detail/gui/game_gui_element_location.h"
+#include "game/detail/gui/viewing_game_gui_context_dependencies.h"
 
 class game_gui_root;
-struct character_gui;
-
+class game_gui_system;
 using game_gui_rect_tree = augs::gui::rect_tree<game_gui_element_location>;
 
+struct character_gui;
+
 template <bool is_const>
-class basic_game_gui_context 
-	: public augs::gui::basic_context<
-		game_gui_element_location, 
-		is_const, 
-		basic_game_gui_context<is_const>
-	> {
+class basic_game_gui_context : public augs::gui::basic_context<
+	game_gui_element_location, 
+	is_const, 
+	basic_game_gui_context<is_const>
+> {
 public:
 	using base = augs::gui::basic_context<game_gui_element_location, is_const, basic_game_gui_context<is_const>>;
 	using game_gui_system_ref = maybe_const_ref_t<is_const, game_gui_system>;
@@ -34,55 +35,81 @@ public:
 	using tree_ref = typename base::tree_ref;
 
 	basic_game_gui_context(
+		const base b,
+
 		game_gui_system_ref sys,
-		rect_world_ref rect_world,
+		const const_entity_handle handle,
 		character_gui_ref char_gui,
-		const_entity_handle handle,
-		tree_ref tree
+
+		const game_gui_context_dependencies dependencies
 	) : 
-		base(rect_world, tree),
+		base(b),
+
 		sys(sys),
 		handle(handle),
-		char_gui(char_gui)
+		char_gui(char_gui),
+
+		dependencies(dependencies)
 	{}
 
 	game_gui_system_ref sys;
-	const_entity_handle handle;
+	const const_entity_handle handle;
 	character_gui_ref char_gui;
+	
+	const game_gui_context_dependencies dependencies;
 
-	template<class other_context>
-	operator other_context() const {
-		return other_context(
-			get_game_gui_system(),
-			get_rect_world(), 
-			get_character_gui(), 
+	operator basic_game_gui_context<true>() const {
+		return {
+			*static_cast<const base*>(this),
+
+			sys,
 			handle,
-			tree
-		);
+			char_gui,
+
+			dependencies
+		};
+	}
+
+	/* Boilerplate getters, pay no heed */
+
+	auto& get_root() const {
+		return sys.root;
 	}
 
 	auto get_root_id() const {
 		return game_gui_root_in_context();
 	}
 
-	auto& get_root() const {
-		return sys.root;
+	game_gui_system_ref get_game_gui_system() const {
+		return sys;
 	}
 
 	const_entity_handle get_subject_entity() const {
 		return handle;
 	}
 
-	const cosmos& get_cosmos() const {
-		return handle.get_cosmos();
-	}
-
 	character_gui_ref get_character_gui() const {
 		return char_gui;
 	}
 
-	game_gui_system_ref get_game_gui_system() const {
-		return sys;
+	const cosmos& get_cosmos() const {
+		return handle.get_cosmos();
+	}
+
+	const auto& get_gui_font() const {
+		return dependencies.gui_font;
+	}
+
+	const auto& get_requisite_images() const {
+		return dependencies.requisite_images;
+	}
+
+	const auto& get_game_images() const {
+		return dependencies.game_images;
+	}
+
+	const auto& get_game_image_definitions() const {
+		return dependencies.game_image_defs;
 	}
 };
 
@@ -93,30 +120,23 @@ class viewing_game_gui_context : public const_game_gui_context {
 public:
 	using base = const_game_gui_context;
 
-	using rect_world_ref = typename base::rect_world_ref;
-	using tree_ref = typename base::tree_ref;
-	using character_gui_ref = typename base::character_gui_ref;
-	using game_gui_root_ref = typename base::game_gui_root_ref;
-	using game_gui_system_ref = typename base::game_gui_system_ref;
-
 	viewing_game_gui_context(
-		rect_world_ref rect_world,
-		character_gui_ref char_gui,
-		const_entity_handle handle,
-		tree_ref tree,
-		const character_gui_drawing_input in
+		const base b,
+		const viewing_game_gui_context_dependencies in
 	) :
-		base(in.gui, rect_world, char_gui, handle, tree),
+		base(b),
 		in(in)
 	{}
 
-	const character_gui_drawing_input in;
+	const viewing_game_gui_context_dependencies in;
 
-	augs::vertex_triangle_buffer& get_output_buffer() const {
+	/* Boilerplate getters, pay no heed */
+
+	const auto& get_output() const {
 		return in.output;
 	}
 
-	const aabb_highlighter& get_aabb_highlighter() const {
+	const aabb_highlighter& get_world_hover_highlighter() const {
 		return in.world_hover_highlighter;
 	}
 

@@ -6,6 +6,7 @@
 #include "augs/math/vec2.h"
 #include "augs/misc/basic_input_context.h"
 #include "augs/graphics/rgba.h"
+#include "augs/image/font.h"
 
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/enums/input_context_enums.h"
@@ -19,10 +20,10 @@
 #include "augs/audio/audio_settings.h"
 #include "game/transcendental/simulation_receiver_settings.h"
 #include "game/view/debug_drawing_settings.h"
-#include "game/view/viewing_session_settings.h"
 #include "game/detail/gui/hotbar_settings.h"
 #include "game/systems_audiovisual/interpolation_settings.h"
 #include "application/debug_settings.h"
+#include "application/session_settings.h"
 #include "application/content_regeneration/content_regeneration_settings.h"
 #include "application/setups/main_menu_settings.h"
 
@@ -46,12 +47,22 @@ enum class launch_type {
 	// END GEN INTROSPECTOR
 };
 
-class config_lua_table {
-public:
-	config_lua_table() = default;
-	config_lua_table(const std::string& config_lua_path);
+struct config_read_error : public std::runtime_error {
+	explicit config_read_error(
+		const augs::path_type& path,
+		const std::string& what
+	) 
+		: std::runtime_error(
+			std::string("There was a problem reading "  + path.string() + ".\n" + what)
+		)
+	{}
+};
 
-	// GEN INTROSPECTOR class config_lua_table
+struct config_lua_table {
+	config_lua_table() = default;
+	config_lua_table(const augs::path_type& config_lua_path);
+
+	// GEN INTROSPECTOR struct config_lua_table
 	launch_type launch_mode = launch_type::LOCAL;
 
 	unit_tests_settings unit_tests;
@@ -69,7 +80,8 @@ public:
 	input_context controls;
 	ImGuiStyle gui_style;
 	debug_settings debug;
-	viewing_session_settings session;
+	session_settings session;
+	augs::font_loading_input gui_font;
 
 #if TODO
 	std::string connect_address;
@@ -83,13 +95,13 @@ public:
 	bool debug_randomize_entropies_in_client_setup = 0;
 	unsigned debug_randomize_entropies_in_client_setup_once_every_steps = 0;
 
-	std::string db_path;
-	std::string survey_num_file_path;
-	std::string post_data_file_path;
+	augs::path_type db_path;
+	augs::path_type survey_num_file_path;
+	augs::path_type post_data_file_path;
 	std::string last_session_update_link;
 
-	std::string director_input_scene_entropy_path;
-	std::string choreographic_input_scenario_path;
+	augs::path_type director_input_scene_entropy_path;
+	augs::path_type choreographic_input_scenario_path;
 
 	bool server_launch_http_daemon = 0;
 	unsigned short server_http_daemon_port = 0;
@@ -101,5 +113,5 @@ public:
 	launch_type get_launch_mode() const;
 	input_recording_type get_input_recording_mode() const;
 
-	void save(const std::string& target_path) const;
+	void save(const augs::path_type& target_path) const;
 };

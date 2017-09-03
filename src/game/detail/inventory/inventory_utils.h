@@ -25,29 +25,14 @@ augs::constant_size_vector<item_slot_transfer_request, 4> swap_slots_for_items(
 	const const_entity_handle second 
 );
 
-template <class T>
 components::transform get_attachment_offset(
-	const T& manager,
 	const inventory_slot& slot,
 	const components::transform container_transform,
 	const const_entity_handle item
-) {
-	ensure(slot.makes_physical_connection());
-
-	components::transform total;
-
-	const auto sticking = slot.attachment_sticking_mode;
-
-	total = slot.attachment_offset;
-	total.pos += item.get_aabb(manager, components::transform()).get_size().get_sticking_offset(sticking);
-	total.pos.rotate(container_transform.rotation, vec2(0, 0));
-
-	return total;
-}
+);
 
 components::transform sum_attachment_offsets(
 	const cosmos&, 
-	const all_logical_metas_of_assets&, 
 	const inventory_item_address addr
 );
 

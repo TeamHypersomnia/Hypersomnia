@@ -1,25 +1,20 @@
 #pragma once
-#include <vector>
-#include "material.h"
-#include "gui_traversal_structs.h"
-#include "augs/window_framework/event.h"
 #include "augs/misc/delta.h"
 #include "augs/misc/enum_boolset.h"
-#include "game/assets/assets_manager.h"
-#include "gui_flags.h"
+
+#include "augs/gui/gui_traversal_structs.h"
+#include "augs/gui/gui_flags.h"
+
+#include "augs/window_framework/event.h"
 
 namespace augs {
 	namespace gui {
-		struct stylesheet;
-
 		struct rect_node_data {
 			augs::enum_boolset<flag> flags;
-			vec2i rc_pos_before_dragging;
 
 			ltrb rc; /* actual rectangle */
 
 			rect_node_data(const xywh& rc = xywh());
-			rect_node_data(const assets::game_image_id& id);
 
 			void set_default_flags();
 
@@ -140,7 +135,6 @@ namespace augs {
 									gr.rect_held_by_lmb = this_id;
 									gr.ldrag_relative_anchor = mouse_pos - this_id->rc.get_position();
 									gr.last_ldown_position = mouse_pos;
-									this_id->rc_pos_before_dragging = vec2i(this_id->rc.get_position());
 									gui_event_lambda(gui_event::ldown);
 								}
 								if (msg == message::mdown) {
@@ -251,77 +245,27 @@ namespace augs {
 			template <class C, class gui_element_id>
 			static void draw(
 				const C context, 
-				const gui_element_id this_id, 
-				draw_info in
+				const gui_element_id this_id
 			) {
 				if (!this_id->get_flag(flag::ENABLE_DRAWING)) {
 					return;
 				}
 
-				draw_children(context, this_id, in);
+				draw_children(context, this_id);
 			}
 
 			template <class C, class gui_element_id>
 			static void draw_children(
 				const C context, 
-				const gui_element_id this_id, 
-				draw_info in
+				const gui_element_id this_id
 			) {
 				if (!this_id->get_flag(flag::ENABLE_DRAWING_OF_CHILDREN)) {
 					return;
 				}
 
 				this_id->for_each_child(context, this_id, [&](const auto& child_id) {
-					child_id->draw(context, child_id, in);
+					child_id->draw(context, child_id);
 				});
-			}
-
-			template <class C, class gui_element_id>
-			static void draw_stretched_texture(
-				const C context, 
-				const gui_element_id& id, 
-				gui::draw_info in, 
-				const gui::material& mat = gui::material()
-			) {
-				const auto absolute = context.get_tree_entry(id).get_absolute_rect();
-				draw_clipped_rect(mat, absolute, context, context.get_tree_entry(id).get_parent(), in.v);
-			}
-
-			template <class C, class gui_element_id>
-			static void draw_centered_texture(
-				const C context, 
-				const gui_element_id& id, 
-				gui::draw_info in, 
-				const gui::material& mat = gui::material(), 
-				const vec2i offset = vec2i()
-			) {
-				const auto& manager = get_assets_manager();
-				const auto absolute = context.get_tree_entry(id).get_absolute_rect();
-				const auto tex_size = manager.at(mat.tex).get_size();
-				
-				auto tex_rc = ltrbi(vec2i(0, 0), tex_size).place_in_center_of(absolute);
-				tex_rc.set_position(tex_rc.get_position() + offset);
-
-				draw_clipped_rect(mat, tex_rc, context, context.get_tree_entry(id).get_parent(), in.v);
-			}
-
-			template <class C, class gui_element_id>
-			static void draw_rectangle_stylesheeted(
-				const C context, 
-				const gui_element_id& id, 
-				gui::draw_info in, 
-				const gui::stylesheet& styles
-			) {
-				const auto st = styles.get_style();
-				const auto& this_entry = context.get_tree_entry(id);
-
-				if (st.color.active || st.background_image.active) {
-					draw_stretched_texture(context, in, material(st));
-				}
-
-				if (st.border.active) {
-					st.border.value.draw(in.v, this_entry.get_absolute_rect(), context, context.get_tree_entry(this_entry.get_parent()).get_absolute_clipping_rect());
-				}
 			}
 
 			template <class C, class gui_element_id, class L>

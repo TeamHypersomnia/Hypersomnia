@@ -10,8 +10,9 @@
 
 #include "generated/introspectors.h"
 
-void cosmic_movie_director::save_recording_to_file(const std::string& filename) const {
-	std::ofstream f(filename, std::ios::out | std::ios::binary);
+void cosmic_movie_director::save_recording_to_file(const augs::path_type& path) const {
+	auto f = augs::with_exceptions<std::ofstream>();
+	f.open(path, std::ios::out | std::ios::binary);
 
 	for (const auto& it : step_to_entropy) {
 		augs::write(f, it.first);
@@ -33,11 +34,11 @@ bool cosmic_movie_director::is_recording_available() const {
 	return step_to_entropy.size() > 0;
 }
 
-bool cosmic_movie_director::load_recording_from_file(const std::string& filename) {
+bool cosmic_movie_director::load_recording_from_file(const augs::path_type& path) {
 	player_step_position = 0;
 	step_to_entropy.clear();
 
-	augs::read_map_until_eof(filename, step_to_entropy);
+	augs::read_map_until_eof(path, step_to_entropy);
 
 	return is_recording_available();
 }

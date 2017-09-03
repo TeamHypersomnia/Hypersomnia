@@ -1,8 +1,9 @@
-#include "game/hardcoded_content/all_hardcoded_content.h"
+#include "game/hardcoded_content/test_scenes/test_scenes_content.h"
 
-#include "game/transcendental/cosmos.h"
+#include "game/assets/animation_id.h"
+#include "game/assets/all_assets.h"
 
-void load_test_scene_animations(assets_manager& anims) {
+void load_test_scene_animations(all_logical_assets& anims) {
 	{
 		auto& anim = anims[assets::animation_id::CAST_BLINK_ANIMATION];
 		anim.loop_mode = animation::loop_type::NONE;

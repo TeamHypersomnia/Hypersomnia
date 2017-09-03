@@ -100,9 +100,9 @@ struct is_comparable : std::false_type {
 
 template <class A, class B>
 struct is_comparable<A, B, decltype(
-	std::declval<const A&>() == std::declval<const B&>(), 
+	std::declval<A>() == std::declval<B>(),
 	void()
-) > : std::true_type {
+) > : std::bool_constant<!(std::is_array_v<A> && std::is_array_v<B>)> {
 
 };
 

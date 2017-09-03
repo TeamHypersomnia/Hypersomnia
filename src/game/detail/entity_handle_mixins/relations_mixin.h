@@ -9,7 +9,7 @@
 #include "game/enums/child_entity_name.h"
 
 #include "game/build_settings.h"
-#include "augs/build_settings/setting_empty_bases.h"
+#include "augs/build_settings/platform_defines.h"
 
 #include "augs/templates/maybe_const.h"
 #include "augs/templates/template_logic.h"

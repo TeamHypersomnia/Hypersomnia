@@ -21,7 +21,7 @@
 
 #include "game/container_sizes.h"
 
-class assets_manager;
+class all_assets;
 
 struct particle_effect_modifier {
 	// GEN INTROSPECTOR struct particle_effect_modifier
@@ -33,17 +33,19 @@ struct particle_effect_modifier {
 };	
 
 struct particles_emission {
-	typedef augs::minmax<float> minmax;
+	using minmax = augs::minmax<float>;
 
 	template <class T>
 	using make_particle_definitions_vector = make_vector<T>;
 
-	typedef transform_types_in_list_t<
-		list_of_particle_types_t<
-			std::tuple
-		>,
-		make_particle_definitions_vector
-	> tuple_of_particle_definitions_vectors;
+	using tuple_of_particle_definitions_vectors = 
+		transform_types_in_list_t<
+			list_of_particle_types_t<
+				std::tuple
+			>,
+			make_particle_definitions_vector
+		>
+	;
 
 	// GEN INTROSPECTOR struct particles_emission
 	minmax spread_degrees = minmax(0.f, 0.f);
@@ -105,23 +107,16 @@ struct particles_emission {
 	void apply_modifier(const particle_effect_modifier m);
 };
 
-struct particle_effect_logical_meta {
-	// GEN INTROSPECTOR struct particle_effect_logical_meta
-	float max_duration_in_seconds = 0.0;
+struct particle_effect {
+	// GEN INTROSPECTOR struct particle_effect
+	augs::constant_size_vector<particles_emission, PARTICLE_EMISSIONS_IN_EFFECT_COUNT> emissions;
 	// END GEN INTROSPECTOR
 };
 
-struct particle_effect {
-	augs::constant_size_vector<particles_emission, PARTICLE_EMISSIONS_IN_EFFECT_COUNT> emissions;
+struct particle_effect_logical {
+	// GEN INTROSPECTOR struct particle_effect_logical
+	float max_duration_in_seconds;
+	// END GEN INTROSPECTOR
 
-	particle_effect_logical_meta get_logical_meta(const assets_manager& manager) const {
-		return {
-			maximum_of(
-				emissions,
-				[](const particles_emission& a, const particles_emission& b) {
-					return a.stream_lifetime_ms.second < b.stream_lifetime_ms.second;
-				}
-			).stream_lifetime_ms.second
-		};
-	}
+	particle_effect_logical(const particle_effect&);
 };

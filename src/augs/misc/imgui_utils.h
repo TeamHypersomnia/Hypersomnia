@@ -1,4 +1,6 @@
 #pragma once
+#include <imgui/imgui.h>
+
 #include "augs/math/vec2.h"
 #include "augs/misc/machine_entropy.h"
 #include "augs/misc/scope_guard.h"
@@ -6,10 +8,33 @@
 #include "augs/templates/string_templates.h"
 #include "augs/templates/maybe_const.h"
 #include "augs/templates/corresponding_field.h"
-#include <imgui/imgui.h>
 
 namespace augs {
+	class image;
+
+	namespace graphics {
+		class texture;
+	}
+
 	namespace imgui {
+		void init(
+			const char* const ini_filename,
+			const char* const log_filename
+		);
+
+		image create_atlas_image();
+		graphics::texture create_atlas();
+
+		void setup_input(
+			augs::local_entropy& window_inputs,
+			const decltype(ImGuiIO::DeltaTime) delta_seconds,
+			const vec2i screen_size
+		);
+
+		void neutralize_mouse();
+
+		void render(const ImGuiStyle&);
+
 		namespace detail {
 			template <class Target, class T, class F>
 			decltype(auto) direct_or_convert(T& into, F&& callback) {
@@ -101,11 +126,7 @@ namespace augs {
 			thread_local std::vector<char> combo_names;
 
 			if (combo_names.empty()) {
-				for_each_enum<T>([](const T e) {
-					if (e == T::COUNT) {
-						return;
-					}
-
+				for_each_enum_except_bounds<T>([](const T e) {
 					concatenate(
 						combo_names, 
 						format_enum(e)
@@ -156,26 +177,26 @@ namespace augs {
 		}
 	}
 
-	template <class game_image_id>
-	game_image_id get_imgui_cursor() {
-		auto gui_cursor = game_image_id::GUI_CURSOR;
+	template <class id_type>
+	id_type get_imgui_cursor() {
+		auto gui_cursor = id_type::GUI_CURSOR;
 
 		if (ImGui::IsAnyItemHoveredWithHandCursor()) {
-			gui_cursor = game_image_id::GUI_CURSOR_HOVER;
+			gui_cursor = id_type::GUI_CURSOR_HOVER;
 		}
 
 		if (ImGui::GetMouseCursor() == ImGuiMouseCursor_ResizeNWSE) {
-			gui_cursor = game_image_id::GUI_CURSOR_RESIZE_NWSE;
+			gui_cursor = id_type::GUI_CURSOR_RESIZE_NWSE;
 		}
 
 		if (ImGui::GetMouseCursor() == ImGuiMouseCursor_TextInput) {
-			gui_cursor = game_image_id::GUI_CURSOR_TEXT_INPUT;
+			gui_cursor = id_type::GUI_CURSOR_TEXT_INPUT;
 		}
 
 		return gui_cursor;
 	}
 
-	inline auto filter_inputs_for_imgui(augs::machine_entropy::local_type local) {
+	inline auto filter_inputs_for_imgui(augs::local_entropy local) {
 		const bool filter_mouse = ImGui::GetIO().WantCaptureMouse;
 		const bool filter_keyboard = ImGui::GetIO().WantTextInput;
 
@@ -197,7 +218,7 @@ namespace augs {
 	}
 
 	template <class C, class G>
-	void sync_with_imgui(C& context, G& output_entropies) {
+	void give_precedence_to_imgui(C& context, G& output_entropies) {
 		auto& world = context.get_rect_world();
 
 		if (ImGui::GetIO().WantCaptureMouse) {
@@ -206,14 +227,15 @@ namespace augs {
 	}
 
 	template <class C>
-	auto consume_inputs_with_imgui_sync(
+	auto consume_inputs_with_imgui_precedence(
 		C& context,
-		const augs::machine_entropy::local_type& local
+		const augs::local_entropy& local
 	) {
 		auto& world = context.get_rect_world();
-		std::decay_t<decltype(world)>::gui_entropy gui_entropies;
+		using world_type = std::decay_t<decltype(world)>;
+		typename world_type::gui_entropy gui_entropies;
 
-		sync_with_imgui(context, gui_entropies);
+		give_precedence_to_imgui(context, gui_entropies);
 
 		for (const auto& ch : local) {
 			world.consume_raw_input_and_generate_gui_events(context, ch, gui_entropies);

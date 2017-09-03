@@ -1,34 +1,35 @@
 #include "augs/graphics/OpenGL_includes.h"
-#include "texture.h"
+#include "augs/graphics/texture.h"
 
 namespace augs {
 	namespace graphics {
-		void texture::unbind() {
-			glBindTexture(GL_TEXTURE_2D, 0); glerr
+		void texture::bind() const {
+			GL_CHECK(glBindTexture(GL_TEXTURE_2D, id));
 		}
 
-		void texture::bind() const {
-			glBindTexture(GL_TEXTURE_2D, id); glerr
+		void texture::unbind() {
+			GL_CHECK(glBindTexture(GL_TEXTURE_2D, 0));
 		}
 
 		texture::texture(const vec2u size) {
 			create(size, nullptr);
 		}
 
-		texture::texture(const augs::image& source) {
+		texture::texture(const image& source) {
 			create(source.get_size(), source.get_data());
 		}
 
-		void texture::create(const vec2u size, const unsigned char* source) {
-			glGenTextures(1, &id); glerr;
+		void texture::create(const vec2u size, const unsigned char* const source) {
+			GL_CHECK(glGenTextures(1, &id));
+
 			bind();
 
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); glerr;
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); glerr;
-			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); glerr
-			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); glerr
+			GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
+			GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
+			GL_CHECK(glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
+			GL_CHECK(glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
 
-			glTexImage2D(
+			GL_CHECK(glTexImage2D(
 				GL_TEXTURE_2D,
 				0,
 				GL_RGBA,
@@ -38,8 +39,8 @@ namespace augs {
 				GL_RGBA,
 				GL_UNSIGNED_BYTE,
 				source
-			); glerr;
-			
+			));
+
 			unbind();
 			built = true;
 		}
@@ -48,13 +49,13 @@ namespace augs {
 			destroy();
 		}
 
-		texture::texture(texture&& b) : 
+		texture::texture(texture&& b) :
 			built(b.built),
 			id(b.id)
 		{
 			b.built = false;
 		}
-		
+
 		texture& texture::operator=(texture&& b) {
 			destroy();
 
@@ -68,11 +69,9 @@ namespace augs {
 
 		void texture::destroy() {
 			if (built) {
-				glDeleteTextures(1, &id); glerr;
+				GL_CHECK(glDeleteTextures(1, &id));
 				built = false;
 			}
 		}
 	}
 }
-
-// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP); glerr;

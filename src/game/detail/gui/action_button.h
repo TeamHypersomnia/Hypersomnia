@@ -8,7 +8,6 @@
 
 class action_button : public game_gui_rect_node {
 public:
-	typedef augs::gui::draw_info draw_info;
 	typedef game_gui_rect_node base;
 	typedef base::gui_entropy gui_entropy;
 
@@ -34,8 +33,7 @@ public:
 
 	static void draw(
 		const viewing_game_gui_context, 
-		const const_this_in_item this_id, 
-		draw_info
+		const const_this_in_item this_id
 	);
 
 	static void respond_to_events(

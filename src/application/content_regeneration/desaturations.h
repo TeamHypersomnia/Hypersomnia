@@ -12,7 +12,7 @@ struct desaturation_stamp {
 };
 
 void regenerate_desaturation(
-	const std::string& source_path,
-	const std::string& output_path,
+	const augs::path_type& source_path,
+	const augs::path_type& output_path,
 	const bool force_regenerate
 );

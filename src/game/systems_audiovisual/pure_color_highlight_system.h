@@ -1,13 +1,21 @@
 #pragma once
-#include "augs/misc/minmax.h"
-#include "game/components/transform_component.h"
-#include "augs/graphics/vertex.h"
-#include "augs/misc/delta.h"
-#include "game/transcendental/entity_id.h"
+#include "augs/math/camera_cone.h"
 
-struct camera_cone;
+#include "augs/misc/delta.h"
+#include "augs/misc/minmax.h"
+
+#include "augs/graphics/vertex.h"
+
+#include "game/assets/assets_declarations.h"
+#include "game/transcendental/entity_id.h"
+#include "game/components/transform_component.h"
+
 class cosmos;
 class interpolation_system;
+
+namespace augs {
+	struct drawer;
+}
 
 class pure_color_highlight_system {
 public:
@@ -32,10 +40,11 @@ public:
 	void advance(const augs::delta dt);
 	
 	void draw_highlights(
-		augs::vertex_triangle_buffer& triangles,
+		const augs::drawer output,
 		const camera_cone camera,
 		const cosmos& cosmos,
-		const interpolation_system& interp
+		const interpolation_system& interp,
+		const game_images_in_atlas& game_images
 	) const;
 
 	void reserve_caches_for_entities(const size_t) const {}

@@ -1,22 +1,26 @@
 #pragma once
+
 using real32 = float;
 using real64 = double;
 
-template <class type> struct vec2t;
-template <class type> struct ltrbt;
-template <class type> struct xywht;
+template <class type> struct basic_vec2;
+template <class type> struct basic_ltrb;
+template <class type> struct basic_xywh;
+template <class type> struct basic_transform;
 
-typedef vec2t<int> vec2i;
-typedef vec2t<unsigned> vec2u;
-typedef vec2t<real32> vec2;
-typedef vec2t<real64> vec2d;
+using vec2i = basic_vec2<int>;
+using vec2u = basic_vec2<unsigned>;
+using vec2 = basic_vec2<real32>;
+using vec2d = basic_vec2<real64>;
 
-typedef ltrbt<int> ltrbi;
-typedef ltrbt<unsigned> ltrbu;
-typedef ltrbt<float> ltrb;
-typedef ltrbt<double> ltrbd;
+using ltrbi = basic_ltrb<int>;
+using ltrbu = basic_ltrb<unsigned>;
+using ltrb = basic_ltrb<float>;
+using ltrbd = basic_ltrb<double>;
 
-typedef xywht<int> xywhi;
-typedef xywht<unsigned> xywhu;
-typedef xywht<real32> xywh;
-typedef xywht<real64> xywhd;
+using xywhi = basic_xywh<int>;
+using xywhu = basic_xywh<unsigned>;
+using xywh = basic_xywh<real32>;
+using xywhd = basic_xywh<real64>;
+
+using transform = basic_transform<real32>;

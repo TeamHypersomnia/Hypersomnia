@@ -3,7 +3,7 @@
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/transcendental/step_declaration.h"
 #include "game/transcendental/entity_id.h"
-#include "augs/build_settings/setting_empty_bases.h"
+#include "augs/build_settings/platform_defines.h"
 #include "game/detail/wielding_result.h"
 #include "game/enums/callback_result.h"
 
@@ -53,9 +53,8 @@ public:
 	wielding_result swap_wielded_items() const;
 
 private:
-	template <bool track_attachment_offsets, class T, class S, class I>
+	template <class S, class I>
 	callback_result for_each_contained_slot_and_item_recursive(
-		const T& manager,
 		S slot_callback, 
 		I item_callback, 
 		inventory_traversal& trav
@@ -88,17 +87,14 @@ private:
 						trav.current_address.directions.back() = this_slot_id.type;
 						trav.item_remains_physical = is_this_slot_physical;
 
-						if constexpr(track_attachment_offsets) {
-							if (trav.item_remains_physical) {
-								trav.attachment_offset =
-									this_item_attachment_offset + get_attachment_offset(
-										manager,
-										s.second,
-										this_item_attachment_offset,
-										child_item_handle
-									)
-								;
-							}
+						if (trav.item_remains_physical) {
+							trav.attachment_offset =
+								this_item_attachment_offset + get_attachment_offset(
+									s.second,
+									this_item_attachment_offset,
+									child_item_handle
+								)
+							;
 						}
 
 						const auto item_callback_result = item_callback(child_item_handle, static_cast<const inventory_traversal&>(trav));
@@ -110,8 +106,7 @@ private:
 							continue;
 						}
 						else if (item_callback_result == recursive_callback_result::CONTINUE_AND_RECURSE) {
-							if (child_item_handle.template for_each_contained_slot_and_item_recursive<track_attachment_offsets>(
-								manager,
+							if (child_item_handle.for_each_contained_slot_and_item_recursive(
 								slot_callback,
 								item_callback,
 								trav
@@ -135,56 +130,37 @@ private:
 
 public:
 
-	template <class T, class S, class I>
-	void for_each_contained_slot_and_item_recursive(
-		const T& manager,
-		S slot_callback, 
-		I item_callback
-	) const {
-		const auto this_item_handle = *static_cast<const entity_handle_type*>(this);
-
-		inventory_traversal trav;
-		trav.current_address.root_container = this_item_handle.get_id();
-		
-		for_each_contained_slot_and_item_recursive<true>(
-			manager,
-			slot_callback, 
-			item_callback, 
-			trav
-		);
-	}
-	
 	template <class S, class I>
 	void for_each_contained_slot_and_item_recursive(
-		S slot_callback, 
-		I item_callback
+		S&& slot_callback, 
+		I&& item_callback
 	) const {
 		const auto this_item_handle = *static_cast<const entity_handle_type*>(this);
 
 		inventory_traversal trav;
 		trav.current_address.root_container = this_item_handle.get_id();
 		
-		for_each_contained_slot_and_item_recursive<false>(
-			0xdeadbeef,
-			slot_callback, 
-			item_callback, 
+		for_each_contained_slot_and_item_recursive(
+			std::forward<S>(slot_callback),
+			std::forward<I>(item_callback),
 			trav
 		);
 	}
 
-	template <class T, class I>
-	void for_each_contained_item_recursive(
-		const T& manager, 
-		I item_callback
-	) const {
-		for_each_contained_slot_and_item_recursive(manager, [](auto) { return recursive_callback_result::CONTINUE_AND_RECURSE; }, item_callback);
+	template <class I>
+	void for_each_contained_item_recursive(I&& item_callback) const {
+		for_each_contained_slot_and_item_recursive(
+			[](auto) { return recursive_callback_result::CONTINUE_AND_RECURSE; }, 
+			std::forward<I>(item_callback)
+		);
 	}
 
 	template <class S>
-	void for_each_contained_slot_recursive(
-		S slot_callback
-	) const {
-		for_each_contained_slot_and_item_recursive(slot_callback, [](auto...) { return recursive_callback_result::CONTINUE_AND_RECURSE; });
+	void for_each_contained_slot_recursive(S&& slot_callback) const {
+		for_each_contained_slot_and_item_recursive(
+			std::forward<S>(slot_callback), 
+			[](auto...) { return recursive_callback_result::CONTINUE_AND_RECURSE; }
+		);
 	}
 };
 

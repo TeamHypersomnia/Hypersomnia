@@ -184,6 +184,24 @@ namespace augs {
 		}
 	}
 
+	template <class Archive>
+	void read_object(
+		Archive& ar,
+		path_type& storage
+	) {
+		std::string str;
+		read(ar, str);
+		storage = str;
+	}
+	
+	template <class Archive>
+	void write_object(
+		Archive& ar,
+		const path_type& storage
+	) {
+		write(ar, storage.string());
+	}
+
 	template <class Archive, class Container, class container_size_type = std::size_t>
 	void read_object(
 		Archive& ar, 

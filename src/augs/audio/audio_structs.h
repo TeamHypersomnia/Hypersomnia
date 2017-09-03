@@ -1,8 +1,9 @@
 #pragma once
+#include <string>
+#include "augs/filesystem/path.h"
+#include "augs/templates/exception_templates.h"
 #include "augs/templates/settable_as_current_mixin.h"
 #include "augs/audio/audio_settings.h"
-
-#include <string>
 
 /** Opaque device handle */
 typedef struct ALCdevice_struct ALCdevice;
@@ -10,11 +11,15 @@ typedef struct ALCdevice_struct ALCdevice;
 typedef struct ALCcontext_struct ALCcontext;
 
 namespace augs {
+	struct audio_error : error_with_typesafe_sprintf {
+		using error_with_typesafe_sprintf::error_with_typesafe_sprintf;
+	};
+
 	void generate_alsoft_ini(
 		const unsigned max_number_of_sound_sources
 	);
 	
-	void log_all_audio_devices(const std::string& output_path);
+	void log_all_audio_devices(const path_type& output_path);
 	
 	class audio_device {
 		friend class audio_context;
@@ -47,13 +52,13 @@ namespace augs {
 	
 	/* We enforce just one context per every device to avoid unnecessary drama. */
 
-	class audio_context : public settable_as_current_mixin<audio_context> {
+	class audio_context {
 		audio_device device;
 		ALCcontext* context = nullptr;
 		audio_settings current_settings;
 
 		void destroy();
-		bool set_as_current_impl();
+		bool set_as_current();
 
 		friend class settable_as_current_base;
 

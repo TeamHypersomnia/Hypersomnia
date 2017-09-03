@@ -1,22 +1,24 @@
-#include "buttons_with_corners.h"
 #include "augs/gui/button_corners.h"
 
 #include "augs/misc/streams.h"
+#include "augs/image/image.h"
 
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
 
+#include "application/content_regeneration/buttons_with_corners.h"
+
 #include "generated/introspectors.h"
 
 void regenerate_button_with_corners(
-	const std::string& output_path_template,
+	const augs::path_type& output_path_template,
 	const button_with_corners_input input,
 	const bool force_regenerate
 ) {
 	button_with_corners_stamp new_stamp = input;
 
-	const auto untemplatized_path = typesafe_sprintf(output_path_template, "");
-	const auto button_with_corners_stamp_path = augs::replace_extension(untemplatized_path, ".stamp");
+	const auto untemplatized_path = augs::path_type(typesafe_sprintf(output_path_template.string(), ""));
+	const auto button_with_corners_stamp_path = augs::path_type(untemplatized_path).replace_extension(".stamp");
 
 	augs::stream new_stamp_stream;
 	augs::write(new_stamp_stream, new_stamp);
@@ -26,14 +28,10 @@ void regenerate_button_with_corners(
 	for (size_t i = 0; i < static_cast<int>(button_corner_type::COUNT); ++i) {
 		const auto type = static_cast<button_corner_type>(i);
 
-		if (is_lb_complement(type) && !new_stamp.make_lb_complement) {
-			continue;
-		}
-
 		if (
 			!augs::file_exists(
 				typesafe_sprintf(
-					output_path_template,
+					output_path_template.string(),
 					get_filename_for(type)
 				)
 			)
@@ -75,7 +73,7 @@ void regenerate_button_with_corners(
 }
 
 void create_and_save_button_with_corners(
-	const std::string& path_template,
+	const augs::path_type& path_template,
 	const button_with_corners_input in
 ) {
 	ensure(in.upper_side > 0);
@@ -84,7 +82,7 @@ void create_and_save_button_with_corners(
 	using img = augs::image;
 
 	const auto save = [&](const button_corner_type t, const img& im) {
-		im.save(typesafe_sprintf(path_template, get_filename_for(t)));
+		im.save(typesafe_sprintf(path_template.string(), get_filename_for(t)));
 	};
 
 	{
@@ -141,9 +139,7 @@ void create_and_save_button_with_corners(
 		save(button_corner_type::RB, rb);
 		save(button_corner_type::LB, lb);
 
-		if (in.make_lb_complement) {
-			save(button_corner_type::LB_COMPLEMENT, lb_complement);
-		}
+		save(button_corner_type::LB_COMPLEMENT, lb_complement);
 	}
 
 	{
@@ -192,9 +188,7 @@ void create_and_save_button_with_corners(
 		save(button_corner_type::RB_BORDER, rb);
 		save(button_corner_type::LB_BORDER, lb);
 
-		if (in.make_lb_complement) {
-			save(button_corner_type::LB_COMPLEMENT_BORDER, lb_complement);
-		}
+		save(button_corner_type::LB_COMPLEMENT_BORDER, lb_complement);
 	}
 
 	{
@@ -227,30 +221,4 @@ void create_and_save_button_with_corners(
 		inside.fill(in.inside_color);
 		save(button_corner_type::INSIDE, inside);
 	}
-}
-
-void load_button_with_corners(
-	const button_with_corners_input in,
-	game_image_definitions& into,
-	const assets::game_image_id first,
-	const std::string& path_template,
-	const bool force_regenerate
-) {
-	regenerate_button_with_corners(path_template, in, force_regenerate);
-
-	augs::for_each_enum<button_corner_type>([&](const button_corner_type type) {
-		if (type == button_corner_type::COUNT) {
-			return;
-		}
-
-		if (!in.make_lb_complement && is_lb_complement(type)) {
-			return;
-		}
-
-		const auto fictional_definition_path = augs::replace_extension(
-			typesafe_sprintf(path_template, get_filename_for(type)), ".lua"
-		);
-
-		into[fictional_definition_path] = game_image_definition();
-	});
 }

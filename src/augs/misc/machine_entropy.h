@@ -5,6 +5,10 @@
 #include "augs/network/network_types.h"
 
 namespace augs {
+	using local_entropy = std::vector<event::change>;
+	using remote_entropy = std::vector<event::change>;
+
+#if 0
 	struct machine_entropy {
 		using local_type = std::vector<augs::event::change>;
 		using remote_type = std::vector<augs::network::message>;
@@ -17,8 +21,12 @@ namespace augs {
 		// here will be remote entropy as well
 
 		machine_entropy& operator+=(const machine_entropy&);
+		
+		void clear();
+
+		void apply_to(event::state&) const;
 		bool operator==(const machine_entropy&) const;
 		bool empty() const;
-		void clear();
 	};
+#endif
 }

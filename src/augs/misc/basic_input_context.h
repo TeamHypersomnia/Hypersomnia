@@ -9,8 +9,8 @@
 
 template <class intent_enum_type, class motion_enum_type>
 struct basic_input_context {
-	typedef augs::event::keys::key key_type;
-	typedef augs::event::message message_type;
+	using key_type = augs::event::keys::key;
+	using message_type = augs::event::message;
 
 	// GEN INTROSPECTOR struct basic_input_context class intent_enum_type class motion_enum_type
 	augs::enum_associative_array<key_type, intent_enum_type> key_to_intent;
@@ -36,7 +36,7 @@ struct basic_input_context {
 		std::vector<basic_game_motion<motion_enum_type>> motions;
 	};
 
-	auto translate(const augs::machine_entropy::local_type& local) const {
+	auto translate(const augs::local_entropy& local) const {
 		translated output;
 
 		for (const auto& raw : local) {

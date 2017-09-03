@@ -1,18 +1,17 @@
 #pragma once
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/components/transform_component.h"
-#include "augs/build_settings/setting_empty_bases.h"
+#include "augs/build_settings/platform_defines.h"
 
 #include "game/components/polygon_component.h"
 #include "game/components/sprite_component.h"
-#include "game/components/tile_layer_instance_component.h"
 #include "game/components/particles_existence_component.h"
 #include "game/components/wandering_pixels_component.h"
 
 class interpolation_system;
-struct all_logical_metas_of_assets;
+class all_logical_assets;
 
-template<bool is_const, class entity_handle_type>
+template <bool is_const, class entity_handle_type>
 class basic_spatial_properties_mixin {
 public:
 	bool has_logic_transform() const;
@@ -20,63 +19,45 @@ public:
 	components::transform get_viewing_transform(const interpolation_system& sys, const bool integerize = false) const;
 	vec2 get_effective_velocity() const;
 
-	template <class T>
-	ltrb get_aabb(const T& metas) const {
+	ltrb get_aabb() const {
 		const auto handle = *static_cast<const entity_handle_type*>(this);
-
-		return get_aabb(metas, handle.get_logic_transform());
+		return get_aabb(handle.get_logic_transform());
 	}
 
-	template <class T>
-	ltrb get_aabb(
-		const T& metas,
-		const interpolation_system& interp
-	) const {
+	ltrb get_aabb(const interpolation_system& interp) const {
 		const auto handle = *static_cast<const entity_handle_type*>(this);
 
-		return get_aabb(metas, handle.get_viewing_transform(interp, true));
+		return get_aabb(handle.get_viewing_transform(interp, true));
 	}
 
-	template <class T>
-	ltrb get_aabb(
-		const T& metas,
-		const components::transform transform
-	) const {
+	ltrb get_aabb(const components::transform transform) const {
 		const auto handle = *static_cast<const entity_handle_type*>(this);
 
-		const auto* const sprite = handle.find<components::sprite>();
-
-		if (sprite) {
-			return sprite->get_aabb(
-				metas, 
-				transform
-			);
+		if (
+			const auto* const sprite = handle.find<components::sprite>();
+			sprite != nullptr
+		) {
+			return sprite->get_aabb(transform);
 		}
 
-		const auto* const polygon = handle.find<components::polygon>();
-
-		if (polygon) {
+		if (
+			const auto* const polygon = handle.find<components::polygon>();
+			polygon != nullptr
+		) {
 			return polygon->get_aabb(transform);
 		}
 
-		const auto* const tile_layer_instance = handle.find<components::tile_layer_instance>();
-
-		if (tile_layer_instance) {
-			return tile_layer_instance->get_aabb(
-				metas,
-				transform
-			);
-		}
-
-		const auto* const wandering_pixels = handle.find<components::wandering_pixels>();
-
-		if (wandering_pixels) {
+		if (
+			const auto* const wandering_pixels = handle.find<components::wandering_pixels>();
+			wandering_pixels != nullptr
+		) {
 			return wandering_pixels->reach;
 		}
 
-		const auto* const particles_existence = handle.find<components::particles_existence>();
-
-		if (particles_existence) {
+		if (
+			const auto* const particles_existence = handle.find<components::particles_existence>();
+			particles_existence != nullptr
+		) {
 			ltrb aabb;
 			aabb.set_position(transform.pos);
 			aabb.set_size({ 2.f, 2.f });

@@ -1,8 +1,8 @@
-#include "game/hardcoded_content/all_hardcoded_content.h"
+#include "game/hardcoded_content/test_scenes/test_scenes_content.h"
 
 #include "game/assets/recoil_player.h"
 #include "game/assets/recoil_player_id.h"
-#include "game/assets/assets_manager.h"
+#include "game/assets/all_assets.h"
 
 #include <type_traits>
 #include <random>
@@ -28,7 +28,7 @@ namespace {
 	}
 } // anonymous namespace
 
-void load_test_scene_recoil_players(assets_manager& assets) {
+void load_test_scene_recoil_players(all_logical_assets& assets) {
 	{
 		auto& generic_recoil = assets[assets::recoil_player_id::GENERIC];
 

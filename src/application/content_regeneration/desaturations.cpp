@@ -10,14 +10,14 @@
 #include "augs/image/image.h"
 
 void regenerate_desaturation(
-	const std::string& source_path,
-	const std::string& output_path,
+	const augs::path_type& source_path,
+	const augs::path_type& output_path,
 	const bool force_regenerate
 ) {
 	desaturation_stamp new_stamp;
-	new_stamp.last_write_time_of_source = augs::last_write_time(source_path);
+	new_stamp.last_write_time_of_source = last_write_time(source_path);
 
-	const auto desaturation_stamp_path = augs::replace_extension(output_path, ".stamp");
+	const auto desaturation_stamp_path = augs::path_type(output_path).replace_extension(".stamp");
 
 	augs::stream new_stamp_stream;
 	augs::write(new_stamp_stream, new_stamp);

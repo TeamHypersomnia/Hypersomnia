@@ -1,11 +1,10 @@
 #include <iostream>
 #include <string>
-#include <fstream>
 #include <thread>
 #include <mutex>
 
-#include "augs/math/vec2.h"
 #include "augs/log.h"
+#include "augs/math/vec2.h"
 
 #include "augs/filesystem/file.h"
 #include "augs/templates/string_templates.h"
@@ -15,11 +14,14 @@
 
 std::mutex log_mutex;
 
-unsigned global_log::max_all_entries = 10000;
+program_log program_log::global_instance = 10000;
 
-std::vector<log_entry> global_log::all_entries;
+program_log::program_log(const unsigned max_all_entries) 
+	: max_all_entries(max_all_entries) 
+{
+}
 
-void global_log::push_entry(const log_entry& new_entry) {
+void program_log::push_entry(const log_entry& new_entry) {
 	all_entries.push_back(new_entry);
 
 	if (all_entries.size() > max_all_entries) {
@@ -27,14 +29,14 @@ void global_log::push_entry(const log_entry& new_entry) {
 	}
 }
 
-void global_log::save_complete_log(const std::string& filename) {
+void program_log::save_complete_to(const augs::path_type& path) {
 	std::string complete_log;
 
 	for (const auto& e : all_entries) {
 		complete_log += e.text + '\n';
 	}
 	
-	augs::create_text_file(filename, complete_log);
+	augs::create_text_file(path, complete_log);
 }
 
 template<>
@@ -42,7 +44,7 @@ void LOG(const std::string& f) {
 #if ENABLE_LOG 
 	std::unique_lock<std::mutex> lock(log_mutex);
 
-	global_log::push_entry({ console_color::WHITE, f });
+	program_log::get_current().push_entry({ console_color::WHITE, f });
 
 	std::cout << f << std::endl;
 #if LOG_TO_FILE

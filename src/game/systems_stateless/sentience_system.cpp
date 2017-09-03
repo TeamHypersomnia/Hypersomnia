@@ -104,7 +104,7 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 	const auto regeneration_frequency_in_steps = static_cast<unsigned>(1 / delta.in_seconds() * 3);
 	const auto consciousness_regeneration_frequency_in_steps = static_cast<unsigned>(1 / delta.in_seconds() * 2);
 	const auto pe_regeneration_frequency_in_steps = static_cast<unsigned>(1 / delta.in_seconds() * 3);
-	const auto& metas = step.input.metas_of_assets;
+	const auto& metas = step.input.logical_assets;
 
 	cosmos.for_each(
 		processing_subjects::WITH_SENTIENCE,
@@ -512,7 +512,7 @@ TEST_CASE("SentienceSystem", "SentienceMeters") {
 		messages::damage_message msg;
 		msg.amount = 40.f;
 
-		c1.advance_deterministic_schemata(
+		c1.advance(
 		{},
 			[](const logic_step step) {
 			//step.transient.messages.post

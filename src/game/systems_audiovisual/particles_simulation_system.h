@@ -1,20 +1,21 @@
 #pragma once
-#include <array>
 #include <unordered_map>
-#include "game/enums/render_layer.h"
-
-#include "game/components/particles_existence_component.h"
-#include "game/transcendental/entity_handle_declaration.h"
-
-#include "game/transcendental/step_declaration.h"
 
 #include "augs/misc/delta.h"
 #include "augs/misc/randomization.h"
+
+#include "game/enums/render_layer.h"
+
+#include "game/transcendental/entity_handle_declaration.h"
+#include "game/transcendental/step_declaration.h"
+
+#include "game/assets/assets_declarations.h"
+
+#include "game/components/particles_existence_component.h"
+
 #include "game/detail/particle_types_declaration.h"
 
 struct general_particle;
-
-class viewing_step;
 
 class interpolation_system;
 struct particles_emission;
@@ -128,16 +129,31 @@ public:
 	}
 
 	void advance_visible_streams_and_all_particles(
-		camera_cone, 
-		const cosmos&, 
-		const augs::delta dt, 
+		camera_cone,
+		const cosmos&,
+		const particle_effect_definitions&,
+		const augs::delta dt,
 		const interpolation_system&
 	);
 
-	void draw(
-		augs::vertex_triangle_buffer& output,
-		const render_layer,
-		const camera_cone,
-		const renderable_drawing_type = renderable_drawing_type::NORMAL
-	) const;
+	template <class M>
+	void draw_particles_as_sprites(
+		const M& manager,
+		const components::sprite::drawing_input basic_input,
+		const render_layer layer
+	) const {
+		for (const auto& it : general_particles[layer]) {
+			it.draw_as_sprite(manager, basic_input);
+		}
+
+		for (const auto& it : animated_particles[layer]) {
+			it.draw_as_sprite(manager, basic_input);
+		}
+
+		for (const auto& cluster : homing_animated_particles[layer]) {
+			for (const auto& it : cluster.second) {
+				it.draw_as_sprite(manager, basic_input);
+			}
+		}
+	}
 };

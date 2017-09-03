@@ -2,7 +2,8 @@
 #include "augs/math/si_scaling.h"
 #include "game/enums/callback_result.h"
 
-struct camera_cone;
+#include "augs/math/camera_cone.h"
+
 struct b2AABB;
 struct b2Filter;
 class b2Shape;

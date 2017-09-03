@@ -3,7 +3,7 @@
 #include "game/assets/game_image_id.h"
 #include "game/container_sizes.h"
 
-class assets_manager;
+class all_assets;
 
 struct animation_frame {
 	// GEN INTROSPECTOR struct animation_frame
@@ -25,7 +25,7 @@ struct animation {
 	loop_type loop_mode = loop_type::REPEAT;
 	// END GEN INTROSPECTOR
 
-	animation get_logical_meta(const assets_manager& manager) const {
+	animation get_logical(const all_assets& manager) const {
 		return *this;
 	}
 

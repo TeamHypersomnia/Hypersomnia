@@ -1,24 +1,21 @@
 #pragma once
-#include "game/transcendental/entity_handle_declaration.h"
-#include "game/detail/gui/hotbar_settings.h"
-#include "game/enums/input_context_enums.h"
-#include "game/detail/camera_cone.h"
-#include "augs/graphics/vertex.h"
 #include "augs/misc/basic_input_context.h"
 
-class game_gui_system;
+#include "augs/math/camera_cone.h"
+#include "augs/drawing/drawing.h"
+
+#include "game/enums/input_context_enums.h"
+#include "game/detail/gui/hotbar_settings.h"
+
 class interpolation_system;
 struct aabb_highlighter;
 
-struct character_gui_drawing_input {
-	const game_gui_system& gui;
+struct viewing_game_gui_context_dependencies {
 	const interpolation_system& interpolation;
-	const const_entity_handle viewed_character;
 	const aabb_highlighter& world_hover_highlighter;
 	const hotbar_settings hotbar;
 	const double interpolation_ratio = 0.0;
 	const input_context input_information;
 	const camera_cone camera;
-	
-	augs::vertex_triangle_buffer& output;
+	const augs::drawer_with_default output;
 };

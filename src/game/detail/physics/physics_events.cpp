@@ -96,15 +96,15 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 							}
 						}
 
-						auto& renderer = augs::renderer::get_current();
-
 						if (DEBUG_DRAWING.draw_friction_field_collisions_of_entering) {
-							renderer.persistent_lines.draw_yellow(
-								si.get_pixels(worldManifold.points[i]), 
+							auto& renderer = augs::renderer::get_current();
+
+							renderer.persistent_lines.emplace_back(yellow,
+								si.get_pixels(worldManifold.points[i]),
 								si.get_pixels(worldManifold.points[i]) + vec2(worldManifold.normal).set_length(150)
 							);
 
-							renderer.persistent_lines.draw_red(
+							renderer.persistent_lines.emplace_back(red, 
 								si.get_pixels(worldManifold.points[i]), 
 								si.get_pixels(worldManifold.points[i]) + velOtherPixels
 							);

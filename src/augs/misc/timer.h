@@ -1,30 +1,34 @@
 #pragma once
 #include <ratio>
 #include <chrono>
-#include <vector>
 
 namespace augs {
 	class timer {
 		std::chrono::high_resolution_clock::time_point ticks;
-
 		std::chrono::duration<std::chrono::system_clock::rep, std::chrono::system_clock::period> paused_difference;
-		bool is_paused;
+
+		bool is_paused = false;
+
 	public:
+		timer();
+		
+		void pause(const bool flag);
+		void reset();
 
 		/* returns time that has lasted since last call to "extract" (zeroes the ticks) */
-		template<class resolution>
+		template <class resolution>
 		double extract() {
 			using namespace std::chrono;
-			auto now = high_resolution_clock::now();
+
+			const auto now = high_resolution_clock::now();
 			double count = 0.0;
 
-			if (is_paused)
+			if (is_paused) {
 				count = duration_cast<duration<double, typename resolution::period>>(paused_difference).count();
-			else
-			{
-				auto diff = now - ticks;
-				diff += paused_difference;
-				count = duration_cast<duration<double, typename resolution::period>>(diff).count();
+			}
+			else {
+				const auto difference = now - ticks + paused_difference;
+				count = duration_cast<duration<double, typename resolution::period>>(difference).count();
 			}
 
 			/* reset using already calculated "now" point in time */
@@ -34,21 +38,16 @@ namespace augs {
 		}
 
 		/* returns time that has lasted since last call to "extract" */
-		template<class resolution>
+		template <class resolution>
 		double get() const {
 			using namespace std::chrono;
-			if (is_paused)
+			
+			if (is_paused) {
 				return duration_cast<duration<double, typename resolution::period>>(paused_difference).count();
+			}
 
-			auto diff = (high_resolution_clock::now() - ticks);
-			diff += paused_difference;
-			return duration_cast<duration<double, typename resolution::period>>(diff).count();
+			const auto difference = (high_resolution_clock::now() - ticks) + paused_difference;
+			return duration_cast<duration<double, typename resolution::period>>(difference).count();
 		}
-
-		void reset();
-		void pause(bool flag);
-		timer();
 	};
-
-
 }

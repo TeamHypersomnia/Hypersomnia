@@ -385,10 +385,10 @@ void visibility_system::respond_to_visibility_information_requests(
 
 		/* debug drawing of the visibility square */
 		if (DEBUG_DRAWING.draw_cast_rays || DEBUG_DRAWING.draw_triangle_edges) {
-			lines.draw(si.get_pixels(vec2(whole_vision[0]) + vec2(-moving_epsilon, 0.f)), si.get_pixels(vec2(whole_vision[1]) + vec2(moving_epsilon, 0.f)));
-			lines.draw(si.get_pixels(vec2(whole_vision[1]) + vec2(0.f, -moving_epsilon)), si.get_pixels(vec2(whole_vision[2]) + vec2(0.f, moving_epsilon)));
-			lines.draw(si.get_pixels(vec2(whole_vision[2]) + vec2(moving_epsilon, 0.f)),  si.get_pixels(vec2(whole_vision[3]) + vec2(-moving_epsilon, 0.f)));
-			lines.draw(si.get_pixels(vec2(whole_vision[3]) + vec2(0.f, moving_epsilon)),  si.get_pixels(vec2(whole_vision[0]) + vec2(0.f, -moving_epsilon)));
+			lines.emplace_back(white, si.get_pixels(vec2(whole_vision[0]) + vec2(-moving_epsilon, 0.f)), si.get_pixels(vec2(whole_vision[1]) + vec2(moving_epsilon, 0.f)));
+			lines.emplace_back(white, si.get_pixels(vec2(whole_vision[1]) + vec2(0.f, -moving_epsilon)), si.get_pixels(vec2(whole_vision[2]) + vec2(0.f, moving_epsilon)));
+			lines.emplace_back(white, si.get_pixels(vec2(whole_vision[2]) + vec2(moving_epsilon, 0.f)),  si.get_pixels(vec2(whole_vision[3]) + vec2(-moving_epsilon, 0.f)));
+			lines.emplace_back(white, si.get_pixels(vec2(whole_vision[3]) + vec2(0.f, moving_epsilon)),  si.get_pixels(vec2(whole_vision[0]) + vec2(0.f, -moving_epsilon)));
 		}
 
 		/* raycast through the bounds to add another vertices where the shapes go beyond visibility square */
@@ -420,7 +420,7 @@ void visibility_system::respond_to_visibility_information_requests(
 			}
 
 			if (DEBUG_DRAWING.draw_cast_rays) {
-				lines.draw(si.get_pixels(bound.m_vertex1), si.get_pixels(bound.m_vertex2), rgba(255, 0, 0, 255));
+				lines.emplace_back(si.get_pixels(bound.m_vertex1), si.get_pixels(bound.m_vertex2), rgba(255, 0, 0, 255));
 			}
 
 			for (const auto v : output) {
@@ -501,7 +501,7 @@ void visibility_system::respond_to_visibility_information_requests(
 
 		/* helper debugging lambda */
 		const auto draw_line = [&](const vec2 point, const rgba col) {
-			lines.draw(si.get_pixels(position_meters), si.get_pixels(point), col);
+			lines.emplace_back(si.get_pixels(position_meters), si.get_pixels(point), col);
 		};
 
 		all_ray_inputs.clear();
@@ -761,7 +761,7 @@ void visibility_system::respond_to_visibility_information_requests(
 			//if (DEBUG_DRAWING.draw_triangle_edges) {
 			//	draw_line(si.get_pixels(p1), request.color);
 			//	draw_line(si.get_pixels(p2), request.color);
-			//	lines.draw(p1, p2, request.color);
+			//	lines.emplace_back(p1, p2, request.color);
 			//}
 
 			response.edges.push_back(std::make_pair(p1, p2));
@@ -848,7 +848,7 @@ void visibility_system::respond_to_visibility_information_requests(
 					marked_holes.push_back(edge(closest_point, d.points.first));
 
 					if (DEBUG_DRAWING.draw_discontinuities)
-						lines.draw(closest_point, d.points.first);
+						lines.emplace_back(white, closest_point, d.points.first);
 
 					/* remove this discontinuity */
 					return true;
@@ -897,7 +897,7 @@ void visibility_system::respond_to_visibility_information_requests(
 
 		if (DEBUG_DRAWING.draw_discontinuities) {
 			for (const auto& disc : response.discontinuities) {
-				lines.draw(disc.points.first, disc.points.second, rgba(0, 127, 255, 255));
+				lines.emplace_back(disc.points.first, disc.points.second, rgba(0, 127, 255, 255));
 			}
 		}
 

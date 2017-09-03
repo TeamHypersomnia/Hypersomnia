@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 
-template<class T>
+template <class T>
 struct make_vector {
-	typedef std::vector<T> type;
+	using type = std::vector<T>;
 };

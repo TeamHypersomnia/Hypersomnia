@@ -11,35 +11,21 @@ return {
   },
   camera = {
     angled_look_length = 100,
-    averages_per_sec = 25,
-    enable_smoothing = true,
-    smooth_value_field_settings = {
-      averages_per_sec = 0,
-      smoothing_average_factor = 0.5
+      enable_smoothing = true,
+    smoothing = {
+      averages_per_sec = 25,
+      average_factor = 0.5
     },
-    smoothing_average_factor = 0.5
+    additional_position_smoothing = {
+      averages_per_sec = 0,
+      average_factor = 0.5
+    },
   },
   content_regeneration = {
     check_integrity_every_launch = true,
-    hotbar_button = {
-      border_color = "255 255 255 255",
-      inside_color = "255 255 255 255",
-      lower_side = 20,
-      upper_side = 8,
-      inside_border_padding = 4,
-      make_lb_complement = true
-    },
-    menu_button = {
-      border_color = "255 255 255 255",
-      inside_color = "255 255 255 255",
-      lower_side = 12,
-      upper_side = 8,
-      inside_border_padding = 4,
-      make_lb_complement = false
-    },
     packer_detail_max_atlas_size = 8192,
     regenerate_every_launch = false,
-    save_regenerated_atlases_as_binary = true
+    save_regenerated_atlases_as_binary = false
   },
   controls = {
     key_to_intent = {
@@ -59,7 +45,7 @@ return {
       C = "SPECIAL_ACTION_BUTTON_3",
       CapsLock = "DEBUG_SWITCH_CHARACTER",
       D = "MOVE_RIGHT",
-      Dash = "OPEN_DEVELOPER_CONSOLE",
+      Dash = "SWITCH_DEVELOPER_CONSOLE",
       E = "USE_BUTTON",
       F = "SWITCH_WEAPON_LASER",
       F2 = "SPECIAL_ACTION_BUTTON_8",
@@ -86,8 +72,10 @@ return {
     },
     map_mouse_motion_to = "MOVE_CROSSHAIR"
   },
+  session = {
+    create_minimal_test_scene = false
+  },
   debug = {
-    create_minimal_test_scene = false,
     determinism_test_cloned_cosmoi_count = 0,
     input_recording_mode = "DISABLED"
   },
@@ -251,5 +239,10 @@ return {
       x = 1280,
       y = 768
     }
+  },
+  gui_font = {
+    source_font_path = "content/requisite/fonts/ProggyClean.ttf",
+    charset_path = "content/requisite/fonts/charset.txt",
+    pt = 16
   }
 }

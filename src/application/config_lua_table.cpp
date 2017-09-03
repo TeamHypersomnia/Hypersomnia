@@ -1,27 +1,28 @@
-#include "generated/introspectors.h"
-
 #include "augs/log.h"
-#include "augs/misc/lua_readwrite.h"
 #include "augs/templates/introspect.h"
 #include "augs/templates/corresponding_field.h"
 
+#include "augs/filesystem/file.h"
+
+#include "augs/misc/lua_readwrite.h"
+#include "augs/misc/script_utils.h"
+
 #include "augs/window_framework/window.h"
+
 #include "application/config_lua_table.h"
 
-#include "game/transcendental/entity_handle.h"
-#include "game/transcendental/cosmos.h"
-#include "game/view/viewing_session.h"
-#include "game/detail/gui/character_gui.h"
+#include "generated/introspectors.h"
 
-#include "augs/misc/script_utils.h"
-#include "augs/filesystem/file.h"
-#include "augs/window_framework/platform_utils.h"
-
-config_lua_table::config_lua_table(const std::string& config_lua_path) {
-	augs::load_from_lua_table(*this, config_lua_path);
+config_lua_table::config_lua_table(const augs::path_type& config_lua_path) {
+	try {
+		augs::load_from_lua_table(*this, config_lua_path);
+	}
+	catch (const augs::lua_deserialization_error err) {
+		throw config_read_error(config_lua_path, err.what());
+	}
 }
 
-void config_lua_table::save(const std::string& target_path) const {
+void config_lua_table::save(const augs::path_type& target_path) const {
 	augs::save_as_lua_table(*this, target_path);
 }
 

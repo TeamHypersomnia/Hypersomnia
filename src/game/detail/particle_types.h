@@ -26,7 +26,42 @@ struct general_particle {
 	// END GEN INTROSPECTOR
 
 	void integrate(const float dt);
-	void draw(components::sprite::drawing_input basic_input) const;
+
+	template <class M>
+	void draw_as_sprite(
+		const M& manager,
+		components::sprite::drawing_input basic_input
+	) const {
+		float size_mult = 1.f;
+
+		if (shrink_when_ms_remaining > 0.f) {
+			const auto alivity_multiplier = std::min(1.f, (max_lifetime_ms - current_lifetime_ms) / shrink_when_ms_remaining);
+
+			size_mult *= sqrt(alivity_multiplier);
+
+			//const auto desired_alpha = static_cast<rgba_channel>(alivity_multiplier * static_cast<float>(temp_alpha));
+			//
+			//if (fade_on_disappearance) {
+			//	if (alpha_levels > 0) {
+			//		face.color.a = desired_alpha == 0 ? 0 : ((255 / alpha_levels) * (1 + (desired_alpha / (255 / alpha_levels))));
+			//	}
+			//	else {
+			//		face.color.a = desired_alpha;
+			//	}
+			//}
+		}
+
+		if (unshrinking_time_ms > 0.f) {
+			size_mult *= std::min(1.f, (current_lifetime_ms / unshrinking_time_ms)*(current_lifetime_ms / unshrinking_time_ms));
+		}
+
+		components::sprite f;
+		f.set(image_id, size_mult * size, color);
+
+		basic_input.renderable_transform = { pos, rotation };
+		f.draw(manager, basic_input);
+	}
+
 	bool is_dead() const;
 
 	void set_position(const vec2);
@@ -37,11 +72,6 @@ struct general_particle {
 	void set_rotation_speed(const float);
 	void set_max_lifetime_ms(const float);
 	void colorize(const rgba);
-
-	void set_image(
-		const assets::game_image_id,
-		const rgba
-	);
 
 	void set_image(
 		const assets::game_image_id,
@@ -66,7 +96,24 @@ struct animated_particle {
 	// END GEN INTROSPECTOR
 
 	void integrate(const float dt);
-	void draw(components::sprite::drawing_input basic_input) const;
+
+	template <class M>
+	void draw_as_sprite(
+		const M& manager,
+		components::sprite::drawing_input basic_input
+	) const {
+		thread_local components::sprite face;
+		const auto frame_num = std::min(static_cast<unsigned>(current_lifetime_ms / frame_duration_ms), frame_count - 1);
+
+		const auto target_id = static_cast<assets::game_image_id>(static_cast<int>(first_face) + frame_num);
+
+		face.set(target_id, manager.at(target_id).get_size(), white);
+
+		basic_input.renderable_transform = { pos, 0 };
+		face.color = color;
+		face.draw(manager, basic_input);
+	}
+
 	bool is_dead() const;
 
 	void set_position(const vec2);
@@ -101,7 +148,27 @@ struct homing_animated_particle {
 		const vec2 homing_target
 	);
 
-	void draw(components::sprite::drawing_input basic_input) const;
+	template <class M>
+	void draw_as_sprite(
+		const M& manager,
+		components::sprite::drawing_input basic_input
+	) const {
+		thread_local components::sprite face;
+		const auto frame_num = std::min(static_cast<unsigned>(current_lifetime_ms / frame_duration_ms), frame_count - 1);
+
+		//face.set(static_cast<assets::game_image_id>(static_cast<int>(first_face) + frame_count - frame_num - 1));
+		const auto target_id = static_cast<assets::game_image_id>(static_cast<int>(first_face) + frame_num);
+
+		face.set(
+			target_id,
+			manager.at(target_id).get_size()
+		);
+
+		basic_input.renderable_transform = { pos, 0 };
+		face.color = color;
+		face.draw(manager, basic_input);
+	}
+
 	bool is_dead() const;
 
 	void set_position(const vec2);
