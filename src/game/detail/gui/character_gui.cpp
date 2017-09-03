@@ -32,7 +32,7 @@
 
 #include "augs/drawing/drawing.h"
 #include "augs/templates/visit_gettable.h"
-#include "game/detail/wielding_result.h"
+#include "game/detail/inventory/wielding_result.h"
 #include "game/detail/spells/spell_structs.h"
 
 using namespace augs;

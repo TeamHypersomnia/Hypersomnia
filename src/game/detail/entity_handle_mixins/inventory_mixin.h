@@ -4,7 +4,7 @@
 #include "game/transcendental/step_declaration.h"
 #include "game/transcendental/entity_id.h"
 #include "augs/build_settings/platform_defines.h"
-#include "game/detail/wielding_result.h"
+#include "game/detail/inventory/wielding_result.h"
 #include "game/enums/callback_result.h"
 
 template<bool is_const, class entity_handle_type>
