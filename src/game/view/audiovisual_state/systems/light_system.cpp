@@ -13,13 +13,13 @@
 
 #include "game/messages/visibility_information.h"
 
-#include "game/systems_audiovisual/light_system.h"
+#include "game/view/audiovisual_state/systems/light_system.h"
 
 #include "game/systems_stateless/visibility_system.h"
 #include "game/systems_stateless/render_system.h"
 
-#include "game/systems_audiovisual/interpolation_system.h"
-#include "game/systems_audiovisual/particles_simulation_system.h"
+#include "game/view/audiovisual_state/systems/interpolation_system.h"
+#include "game/view/audiovisual_state/systems/particles_simulation_system.h"
 
 void light_system::reserve_caches_for_entities(const size_t n) {
 	per_entity_cache.resize(n);

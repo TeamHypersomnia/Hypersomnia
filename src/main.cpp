@@ -23,9 +23,9 @@
 
 #include "game/assets/loaded_sounds.h"
 
-#include "game/systems_audiovisual/game_gui_system.h"
+#include "game/view/audiovisual_state/systems/game_gui_system.h"
 
-#include "game/view/audiovisual_state.h"
+#include "game/view/audiovisual_state/audiovisual_state.h"
 #include "game/view/rendering_scripts/illuminated_rendering.h"
 
 #include "application/config_lua_table.h"

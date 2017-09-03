@@ -18,7 +18,7 @@
 #include "game/components/sound_existence_component.h"
 #include "game/components/particles_existence_component.h"
 
-//#include "game/systems_audiovisual/interpolation_system.h"
+//#include "game/view/audiovisual_state/systems/interpolation_system.h"
 
 #include "game/detail/physics/physics_scripts.h"
 #include "game/detail/inventory/inventory_slot_handle.h"

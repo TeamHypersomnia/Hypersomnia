@@ -12,7 +12,7 @@
 #include "game/components/item_component.h"
 #include "game/components/item_slot_transfers_component.h"
 
-#include "game/systems_audiovisual/game_gui_system.h"
+#include "game/view/audiovisual_state/systems/game_gui_system.h"
 
 #include "pixel_line_connector.h"
 #include "augs/templates/string_templates.h"

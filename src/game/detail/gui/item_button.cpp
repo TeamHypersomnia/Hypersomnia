@@ -22,7 +22,7 @@
 #include "game/components/item_component.h"
 #include "game/components/fixtures_component.h"
 #include "game/systems_stateless/input_system.h"
-#include "game/systems_audiovisual/game_gui_system.h"
+#include "game/view/audiovisual_state/systems/game_gui_system.h"
 #include "game/assets/all_assets.h"
 
 #include "game/detail/gui/slot_button.h"

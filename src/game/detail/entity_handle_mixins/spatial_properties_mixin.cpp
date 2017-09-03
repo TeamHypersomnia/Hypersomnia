@@ -13,7 +13,7 @@
 #include "game/components/all_inferred_state_component.h"
 
 #include "spatial_properties_mixin.h"
-#include "game/systems_audiovisual/interpolation_system.h"
+#include "game/view/audiovisual_state/systems/interpolation_system.h"
 #include "augs/drawing/drawing.h"
 
 template <bool C, class D>

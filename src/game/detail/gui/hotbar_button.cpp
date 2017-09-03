@@ -7,7 +7,7 @@
 #include "augs/gui/button_corners.h"
 #include "augs/gui/text/printer.h"
 #include "game/detail/gui/drag_and_drop.h"
-#include "game/systems_audiovisual/game_gui_system.h"
+#include "game/view/audiovisual_state/systems/game_gui_system.h"
 
 #include "game/detail/gui/hotbar_settings.h"
 

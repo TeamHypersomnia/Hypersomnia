@@ -3,8 +3,8 @@
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 
-#include "game/systems_audiovisual/interpolation_system.h"
-#include "game/systems_audiovisual/sound_system.h"
+#include "game/view/audiovisual_state/systems/interpolation_system.h"
+#include "game/view/audiovisual_state/systems/sound_system.h"
 
 #include "game/assets/all_assets.h"
 #include "game/assets/loaded_sounds.h"

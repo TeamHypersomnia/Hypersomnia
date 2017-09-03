@@ -12,7 +12,7 @@
 #include "augs/ensure.h"
 #include "augs/templates/string_templates.h"
 #include "game/detail/gui/game_gui_context.h"
-#include "game/systems_audiovisual/game_gui_system.h"
+#include "game/view/audiovisual_state/systems/game_gui_system.h"
 
 void drag_and_drop_callback(
 	game_gui_context context, 

@@ -1,5 +1,5 @@
 #include "interpolation_system.h"
-#include "game/systems_audiovisual/interpolation_settings.h"
+#include "game/view/audiovisual_state/systems/interpolation_settings.h"
 #include "game/components/interpolation_component.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"

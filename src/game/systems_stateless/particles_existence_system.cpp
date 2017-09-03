@@ -21,7 +21,7 @@
 #include "game/messages/exhausted_cast_message.h"
 #include "game/messages/exploding_ring_input.h"
 
-#include "game/systems_audiovisual/particles_simulation_system.h"
+#include "game/view/audiovisual_state/systems/particles_simulation_system.h"
 #include "game/detail/particle_types.h"
 
 bool components::particles_existence::is_activated(const const_entity_handle h) {

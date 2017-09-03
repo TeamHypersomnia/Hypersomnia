@@ -1,7 +1,7 @@
 #include "rendering_scripts.h"
 #include "game/transcendental/cosmos.h"
 #include "game/systems_inferred/tree_of_npo_system.h"
-#include "game/systems_audiovisual/interpolation_system.h"
+#include "game/view/audiovisual_state/systems/interpolation_system.h"
 #include "game/components/sentience_component.h"
 #include "game/components/container_component.h"
 #include "augs/templates/string_templates.h"

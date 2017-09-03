@@ -11,8 +11,8 @@
 
 #include "game/systems_inferred/physics_system.h"
 
-#include "game/systems_audiovisual/particles_simulation_system.h"
-#include "game/systems_audiovisual/thunder_system.h"
+#include "game/view/audiovisual_state/systems/particles_simulation_system.h"
+#include "game/view/audiovisual_state/systems/thunder_system.h"
 
 void thunder_system::thunder::create_root_branch() {
 	thread_local fast_randomization rng;

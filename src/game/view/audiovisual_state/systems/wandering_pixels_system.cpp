@@ -3,7 +3,7 @@
 
 #include "game/detail/visible_entities.h"
 
-#include "game/systems_audiovisual/wandering_pixels_system.h"
+#include "game/view/audiovisual_state/systems/wandering_pixels_system.h"
 
 void wandering_pixels_system::erase_caches_for_dead_entities(const cosmos& new_cosmos) {
 	std::vector<entity_id> to_erase;

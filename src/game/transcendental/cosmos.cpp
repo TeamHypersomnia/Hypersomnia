@@ -54,8 +54,8 @@ void cosmos::complete_reinference() {
 }
 
 void cosmos::destroy_inferred_state_completely() {
-	systems_inferred.~storage_for_all_systems_inferred();
-	new (&systems_inferred) storage_for_all_systems_inferred;
+	systems_inferred.~all_systems_inferred();
+	new (&systems_inferred) all_systems_inferred;
 
 	const auto n = significant.pool_for_aggregates.capacity();
 
@@ -156,7 +156,7 @@ void cosmos::complete_reinference(const const_entity_handle h) {
 
 void cosmos::reserve_storage_for_entities(const std::size_t n) {
 	get_aggregate_pool().reserve(n);
-	reserve_storage_for_all_components(n);
+	reserve_all_components(n);
 
 	systems_inferred.for_each([n](auto& sys) {
 		sys.reserve_caches_for_entities(n);

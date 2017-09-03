@@ -1,5 +1,5 @@
 #include "augs/templates/string_templates.h"
-
+#include "game/components/flags_component.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/logic_step.h"
 #include "game/transcendental/cosmos.h"
@@ -8,7 +8,7 @@
 #include "game/messages/item_picked_up_message.h"
 #include "game/messages/interpolation_correction_request.h"
 
-#include "game/view/audiovisual_state.h"
+#include "game/view/audiovisual_state/audiovisual_state.h"
 
 void audiovisual_state::reserve_caches_for_entities(const std::size_t n) {
 	systems.for_each([n](auto& sys) {
@@ -17,7 +17,7 @@ void audiovisual_state::reserve_caches_for_entities(const std::size_t n) {
 }
 
 void audiovisual_state::advance(const audiovisual_advance_input input) {
-	const auto& cosm = input.cosm;
+	const auto& cosm = input.cosmos_to_sample;
 	const auto& all_visible = input.all_visible;
 	const auto dt = augs::delta(static_cast<float>(timer.extract<std::chrono::milliseconds>() * input.speed_multiplier));
 
@@ -169,15 +169,15 @@ void audiovisual_state::standard_post_solve(const const_logic_step step) {
 					flying_numbers.add(vn);
 				}
 
-				const auto base_radius = destroyed ? 80.f : h.effective_amount * 1.5;
+				const auto base_radius = destroyed ? 80.f : h.effective_amount * 1.5f;
 				{
 					exploding_ring_input ring;
 
-					ring.outer_radius_start_value = base_radius / 1.5;
-					ring.outer_radius_end_value = base_radius / 3;
+					ring.outer_radius_start_value = base_radius / 1.5f;
+					ring.outer_radius_end_value = base_radius / 3.f;
 
-					ring.inner_radius_start_value = base_radius / 2.5;
-					ring.inner_radius_end_value = base_radius / 3;
+					ring.inner_radius_start_value = base_radius / 2.5f;
+					ring.inner_radius_end_value = base_radius / 3.f;
 
 					ring.emit_particles_on_ring = false;
 
@@ -192,7 +192,7 @@ void audiovisual_state::standard_post_solve(const const_logic_step step) {
 				{
 					exploding_ring_input ring;
 
-					ring.outer_radius_start_value = base_radius / 2;
+					ring.outer_radius_start_value = base_radius / 2.f;
 					ring.outer_radius_end_value = base_radius;
 
 					ring.inner_radius_start_value = 0.f;
@@ -244,11 +244,11 @@ void audiovisual_state::standard_post_solve(const const_logic_step step) {
 				{
 					exploding_ring_input ring;
 
-					ring.outer_radius_start_value = base_radius / 1.5;
-					ring.outer_radius_end_value = base_radius / 3;
+					ring.outer_radius_start_value = base_radius / 1.5f;
+					ring.outer_radius_end_value = base_radius / 3.f;
 
-					ring.inner_radius_start_value = base_radius / 2.5;
-					ring.inner_radius_end_value = base_radius / 3;
+					ring.inner_radius_start_value = base_radius / 2.5f;
+					ring.inner_radius_end_value = base_radius / 3.f;
 
 					ring.emit_particles_on_ring = false;
 
@@ -299,11 +299,11 @@ void audiovisual_state::standard_post_solve(const const_logic_step step) {
 				{
 					exploding_ring_input ring;
 
-					ring.outer_radius_start_value = base_radius / 1.5;
-					ring.outer_radius_end_value = base_radius / 3;
+					ring.outer_radius_start_value = base_radius / 1.5f;
+					ring.outer_radius_end_value = base_radius / 3.f;
 
-					ring.inner_radius_start_value = base_radius / 2.5;
-					ring.inner_radius_end_value = base_radius / 3;
+					ring.inner_radius_start_value = base_radius / 2.5f;
+					ring.inner_radius_end_value = base_radius / 3.f;
 
 					ring.emit_particles_on_ring = false;
 
@@ -318,7 +318,7 @@ void audiovisual_state::standard_post_solve(const const_logic_step step) {
 				{
 					exploding_ring_input ring;
 
-					ring.outer_radius_start_value = base_radius / 2;
+					ring.outer_radius_start_value = base_radius / 2.f;
 					ring.outer_radius_end_value = base_radius;
 
 					ring.inner_radius_start_value = 0.f;

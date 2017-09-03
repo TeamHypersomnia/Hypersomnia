@@ -18,11 +18,11 @@
 #include "game/components/item_component.h"
 #include "game/components/render_component.h"
 #include "game/systems_stateless/render_system.h"
-#include "game/systems_audiovisual/game_gui_system.h"
+#include "game/view/audiovisual_state/systems/game_gui_system.h"
 
 #include "game/detail/gui/viewing_game_gui_context_dependencies.h"
 #include "game/detail/gui/drag_and_drop.h"
-#include "game/detail/gui/aabb_highlighter.h"
+#include "game/view/audiovisual_state/aabb_highlighter.h"
 #include "augs/graphics/renderer.h"
 #include "game/enums/filters.h"
 

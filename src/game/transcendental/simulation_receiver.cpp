@@ -8,8 +8,8 @@
 #include "game/components/gun_component.h"
 #include "game/components/item_component.h"
 
-#include "game/systems_audiovisual/interpolation_system.h"
-#include "game/systems_audiovisual/past_infection_system.h"
+#include "game/view/audiovisual_state/systems/interpolation_system.h"
+#include "game/view/audiovisual_state/systems/past_infection_system.h"
 
 #include "game/transcendental/network_commands.h"
 #include "game/transcendental/cosmos.h"

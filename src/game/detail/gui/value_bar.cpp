@@ -13,7 +13,7 @@
 #include "game/detail/inventory/inventory_slot.h"
 #include "game/detail/inventory/inventory_slot_handle.h"
 
-#include "game/systems_audiovisual/game_gui_system.h"
+#include "game/view/audiovisual_state/systems/game_gui_system.h"
 
 using namespace augs::gui::text;
 

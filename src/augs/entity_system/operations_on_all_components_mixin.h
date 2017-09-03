@@ -25,7 +25,7 @@ namespace augs {
 
 		using aggregate_pool_type = pool<aggregate_type>;
 
-		void reserve_storage_for_all_components(const std::size_t n) {
+		void reserve_all_components(const std::size_t n) {
 			auto& self = *static_cast<derived*>(this);
 
 			auto reserver = [&self, n](auto c) {

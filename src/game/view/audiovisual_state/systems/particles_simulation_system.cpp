@@ -10,7 +10,7 @@
 
 #include "game/detail/particle_types.h"
 
-#include "game/systems_audiovisual/particles_simulation_system.h"
+#include "game/view/audiovisual_state/systems/particles_simulation_system.h"
 
 void particles_simulation_system::erase_caches_for_dead_entities(const cosmos& new_cosmos) {
 	std::vector<entity_id> to_erase;

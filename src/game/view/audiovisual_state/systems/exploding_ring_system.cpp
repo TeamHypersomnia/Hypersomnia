@@ -8,8 +8,8 @@
 #include "game/transcendental/cosmos.h"
 #include "game/detail/particle_types.h"
 
-#include "game/systems_audiovisual/exploding_ring_system.h"
-#include "game/systems_audiovisual/particles_simulation_system.h"
+#include "game/view/audiovisual_state/systems/exploding_ring_system.h"
+#include "game/view/audiovisual_state/systems/particles_simulation_system.h"
 
 void exploding_ring_system::acquire_new_rings(const std::vector<exploding_ring_input>& new_rings) {
 	rings.reserve(rings.size() + new_rings.size());

@@ -5,7 +5,7 @@
 
 #include "augs/gui/text/printer.h"
 
-#include "game/systems_audiovisual/flying_number_indicator_system.h"
+#include "game/view/audiovisual_state/systems/flying_number_indicator_system.h"
 
 void flying_number_indicator_system::add(const number::input new_in) {
 	number new_number;

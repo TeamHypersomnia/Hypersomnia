@@ -25,7 +25,7 @@
 #include "game/transcendental/profiling.h"
 #include "game/transcendental/types_specification/all_components_declaration.h"
 #include "game/transcendental/types_specification/all_messages_declaration.h"
-#include "game/transcendental/types_specification/all_systems_declaration.h"
+#include "game/transcendental/types_specification/all_inferred_systems.h"
 #include "game/transcendental/cosmos_structs.h"
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
@@ -37,12 +37,6 @@
 #include "game/detail/inventory/item_slot_transfer_request_declaration.h"
 #include "game/detail/inventory/item_slot_transfer_request.h"
 
-#include "game/systems_inferred/tree_of_npo_system.h"
-#include "game/systems_inferred/physics_system.h"
-#include "game/systems_inferred/processing_lists_system.h"
-#include "game/systems_inferred/relational_system.h"
-#include "game/systems_inferred/name_system.h"
-
 #include "game/assets/behaviour_tree.h"
 
 using rng_seed_type = unsigned;
@@ -52,7 +46,7 @@ class EMPTY_BASES cosmos :
 	public augs::subscript_operator_for_get_handle_mixin<cosmos>
 {
 public:
-	storage_for_all_systems_inferred systems_inferred;
+	all_systems_inferred systems_inferred;
 
 	mutable cosmic_profiler profiler;
 	augs::stream reserved_memory_for_serialization;

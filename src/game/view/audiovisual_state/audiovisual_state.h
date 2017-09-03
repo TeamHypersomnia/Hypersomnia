@@ -1,8 +1,6 @@
 #pragma once
 #include "augs/entity_system/storage_for_systems.h"
 
-#include "game/transcendental/types_specification/all_systems_audiovisual_includes.h"
-#include "game/transcendental/types_specification/all_systems_declaration.h"
 #include "game/transcendental/step_declaration.h"
 #include "game/transcendental/entity_id.h"
 
@@ -10,22 +8,23 @@
 
 #include "game/detail/particle_types.h"
 
-#include "game/detail/gui/aabb_highlighter.h"
+#include "game/view/audiovisual_state/aabb_highlighter.h"
 #include "game/detail/gui/character_gui.h"
 #include "game/detail/gui/item_button.h"
 #include "game/detail/gui/slot_button.h"
-#include "game/view/world_camera.h"
+#include "game/view/audiovisual_state/world_camera.h"
 
-#include "game/view/world_camera.h"
+#include "game/view/audiovisual_state/world_camera.h"
 #include "augs/audio/audio_settings.h"
-#include "game/systems_audiovisual/interpolation_settings.h"
-#include "game/transcendental/types_specification/all_component_includes.h"
+#include "game/view/audiovisual_state/systems/interpolation_settings.h"
+
+#include "game/view/audiovisual_state/all_audiovisual_systems.h"
 
 class cosmos;
 struct visible_entities;
 
 struct audiovisual_advance_input {
-	const cosmos& cosm;
+	const cosmos& cosmos_to_sample;
 	const entity_id viewed_character_id;
 	const visible_entities& all_visible;
 	const float speed_multiplier;
@@ -41,7 +40,7 @@ struct audiovisual_advance_input {
 struct audiovisual_state {
 	world_camera camera;
 	aabb_highlighter world_hover_highlighter;
-	storage_for_all_systems_audiovisual systems;
+	all_audiovisual_systems systems;
 
 	augs::timer timer;
 

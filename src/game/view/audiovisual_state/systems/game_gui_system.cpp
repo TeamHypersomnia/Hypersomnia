@@ -19,7 +19,7 @@
 #include "game/components/item_component.h"
 #include "game/messages/item_picked_up_message.h"
 
-#include "game/systems_audiovisual/game_gui_system.h"
+#include "game/view/audiovisual_state/systems/game_gui_system.h"
 
 static char intent_to_hotbar_index(const intent_type type) {
 	switch (type) {

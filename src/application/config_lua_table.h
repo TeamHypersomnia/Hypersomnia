@@ -11,7 +11,7 @@
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/enums/input_context_enums.h"
 #include "game/view/game_drawing_settings.h"
-#include "game/view/world_camera.h"
+#include "game/view/audiovisual_state/world_camera.h"
 
 // all settings structures stored by the config
 
@@ -21,7 +21,7 @@
 #include "game/transcendental/simulation_receiver_settings.h"
 #include "game/view/debug_drawing_settings.h"
 #include "game/detail/gui/hotbar_settings.h"
-#include "game/systems_audiovisual/interpolation_settings.h"
+#include "game/view/audiovisual_state/systems/interpolation_settings.h"
 #include "application/debug_settings.h"
 #include "application/session_settings.h"
 #include "application/content_regeneration/content_regeneration_settings.h"
