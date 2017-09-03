@@ -17,6 +17,7 @@
 #include "game/components/container_component.h"
 #include "game/components/item_slot_transfers_component.h"
 #include "game/components/item_component.h"
+#include "game/messages/item_picked_up_message.h"
 
 #include "game/systems_audiovisual/game_gui_system.h"
 
@@ -240,6 +241,10 @@ void game_gui_system::control_hotbar_and_action_button(
 	}
 }
 
+void game_gui_system::build_tree_data(const game_gui_context context) {
+	world.build_tree_data_into(context);
+}
+
 void game_gui_system::advance(
 	const game_gui_context context,
 	const augs::delta dt
@@ -259,8 +264,6 @@ void game_gui_system::control(
 	
 	augs::gui::gui_entropy<game_gui_element_location> gui_events;
 
-	world.build_tree_data_into(context);
-	
 	augs::give_precedence_to_imgui(context, gui_events);
 
 	if (active) {
@@ -323,7 +326,7 @@ void game_gui_system::rebuild_layouts(
 ) {
 	const auto root_entity = context.get_subject_entity();
 	const auto& cosmos = root_entity.get_cosmos();
-	const auto& requisites = context.get_requisite_images();
+	const auto& necessarys = context.get_necessary_images();
 	const auto& game_image_defs = context.get_game_image_definitions();
 	auto& element = context.get_character_gui();
 
@@ -339,7 +342,7 @@ void game_gui_system::rebuild_layouts(
 		for (size_t i = 0; i < element.hotbar_buttons.size(); ++i) {
 			const auto& hb = element.hotbar_buttons[i];
 
-			const auto bbox = hb.get_bbox(requisites, game_image_defs, root_entity);
+			const auto bbox = hb.get_bbox(necessarys, game_image_defs, root_entity);
 			max_hotbar_height = std::max(max_hotbar_height, bbox.y);
 
 			total_width += bbox.x;
@@ -351,7 +354,7 @@ void game_gui_system::rebuild_layouts(
 		int current_x = screen_size.x / 2 - total_width / 2 - left_rc_spacing;
 
 		const auto set_rc = [&](auto& hb) {
-			const auto bbox = hb.get_bbox(requisites, game_image_defs, root_entity);
+			const auto bbox = hb.get_bbox(necessarys, game_image_defs, root_entity);
 
 			hb.rc = xywh(xywhi(current_x, screen_size.y - max_hotbar_height - 50, bbox.x + left_rc_spacing + right_rc_spacing, max_hotbar_height));
 
@@ -364,7 +367,7 @@ void game_gui_system::rebuild_layouts(
 	}
 
 	{
-		const auto action_button_size = context.get_requisite_images().at(assets::requisite_image_id::ACTION_BUTTON_BORDER).get_size();
+		const auto action_button_size = context.get_necessary_images().at(assets::necessary_image_id::ACTION_BUTTON_BORDER).get_size();
 
 		int total_width = element.action_buttons.size() * action_button_size.x;
 
@@ -392,8 +395,17 @@ void game_gui_system::rebuild_layouts(
 	world.rebuild_layouts(context);
 }
 
-void game_gui_system::reposition_picked_up_and_transferred_items(const const_logic_step step) {
+void game_gui_system::standard_post_solve(const const_logic_step step) {
+	const auto& cosmos = step.cosm;
 
+	erase_caches_for_dead_entities(cosmos);
+
+	for (const auto& pickup : step.transient.messages.get_queue<messages::item_picked_up_message>()) {
+		get_character_gui(pickup.subject).assign_item_to_first_free_hotbar_button(
+			cosmos[pickup.subject],
+			cosmos[pickup.item]
+		);
+	}
 }
 
 void game_gui_system::erase_caches_for_dead_entities(const cosmos& new_cosmos) {

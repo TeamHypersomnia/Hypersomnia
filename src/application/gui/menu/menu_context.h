@@ -7,7 +7,7 @@
 #include "application/gui/menu/menu_element_location.h"
 #include "application/gui/menu/menu_root.h"
 
-#include "game/hardcoded_content/requisite_collections.h"
+#include "game/hardcoded_content/necessary_collections.h"
 
 template <bool is_const, class Enum>
 class menu_context : public augs::gui::basic_context<menu_element_location<Enum>, is_const, menu_context<is_const, Enum>> {
@@ -16,22 +16,22 @@ public:
 	using menu_root_ref = maybe_const_ref_t<is_const, root_type>;
 
 	menu_root_ref root;
-	const requisite_images_in_atlas& requisites;
+	const necessary_images_in_atlas& necessarys;
 	const augs::baked_font& gui_font;
-	const sound_buffer_collection& sounds;
+	const necessary_sound_buffers& sounds;
 	const augs::audio_volume_settings& audio_volume;
 	
 	menu_context(
 		const base b,
 		menu_root_ref root,
-		const requisite_images_in_atlas& requisites,
+		const necessary_images_in_atlas& necessarys,
 		const augs::baked_font& gui_font,
-		const sound_buffer_collection& sounds,
+		const necessary_sound_buffers& sounds,
 		const augs::audio_volume_settings& audio_volume
 	) : 
 		base(b),
 		root(root),
-		requisites(requisites),
+		necessarys(necessarys),
 		gui_font(gui_font),
 		sounds(sounds),
 		audio_volume(audio_volume)
@@ -42,7 +42,7 @@ public:
 		return { 
 			*static_cast<const base*>(this), 
 			root,
-			requisites,
+			necessarys,
 			gui_font,
 			sounds, 
 			audio_volume 
@@ -59,8 +59,8 @@ public:
 		return root;
 	}
 
-	auto& get_requisite_images() const {
-		return requisites;
+	auto& get_necessary_images() const {
+		return necessarys;
 	}
 
 	const auto& get_gui_font() const {

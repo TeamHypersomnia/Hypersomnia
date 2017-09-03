@@ -241,8 +241,8 @@ return {
     }
   },
   gui_font = {
-    source_font_path = "content/requisite/fonts/ProggyClean.ttf",
-    charset_path = "content/requisite/fonts/charset.txt",
+    source_font_path = "content/necessary/fonts/ProggyClean.ttf",
+    charset_path = "content/necessary/fonts/charset.txt",
     pt = 16
   }
 }

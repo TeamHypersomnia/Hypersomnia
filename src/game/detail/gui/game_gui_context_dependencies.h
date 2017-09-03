@@ -1,6 +1,6 @@
 #pragma once
 #include "game/assets/assets_declarations.h"
-#include "game/hardcoded_content/requisite_collections.h"
+#include "game/hardcoded_content/necessary_collections.h"
 
 namespace augs {
 	struct baked_font;
@@ -9,6 +9,6 @@ namespace augs {
 struct game_gui_context_dependencies {
 	const game_image_definitions& game_image_defs;
 	const game_images_in_atlas& game_images;
-	const requisite_images_in_atlas& requisite_images;
+	const necessary_images_in_atlas& necessary_images;
 	const augs::baked_font& gui_font;
 };

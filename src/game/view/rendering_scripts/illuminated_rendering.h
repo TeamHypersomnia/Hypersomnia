@@ -17,19 +17,19 @@ namespace augs {
 	class renderer;
 }
 
-struct shader_collection;
-struct fbo_collection;
+struct necessary_shaders;
+struct necessary_fbos;
 
 /* Require all */
 
-using illuminated_rendering_fbos = fbo_collection;
-using illuminated_rendering_shaders = shader_collection;
+using illuminated_rendering_fbos = necessary_fbos;
+using illuminated_rendering_shaders = necessary_shaders;
 
 struct illuminated_rendering_input {
 	const cosmos& cosm;
 	const audiovisual_state& audiovisuals;
 	const game_drawing_settings drawing;
-	const requisite_images_in_atlas& requisite_images;
+	const necessary_images_in_atlas& necessary_images;
 	const augs::baked_font& gui_font;
 	const game_images_in_atlas& game_images;
 	const vec2i screen_size;

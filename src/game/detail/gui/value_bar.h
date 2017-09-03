@@ -15,7 +15,7 @@ struct value_bar : game_gui_rect_node {
 	
 	struct effect_particle {
 		vec2i relative_pos;
-		assets::requisite_image_id tex;
+		assets::necessary_image_id tex;
 	};
 
 	int border_width = 1;

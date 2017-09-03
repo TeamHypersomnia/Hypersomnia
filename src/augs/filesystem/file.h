@@ -42,29 +42,6 @@ namespace augs {
 		}
 	}
 
-	/*
-	
-	
-	inline auto get_extension(const path_type& path) {
-		return path.extension().string();
-	}
-
-	inline auto replace_extension(const path_type& path, const path_type& new_ext) {
-		return path.replace_extension(new_ext).string();
-	}
-
-	inline auto replace_filename(const path_type& path, const path_type& new_fn) {
-		return path.replace_filename(new_fn).string();
-	}
-
-	inline auto get_filename(const path_type& path) {
-		return path.filename().string();
-	}
-
-	inline auto get_stem(const path_type& path) {
-		return path.stem().string();
-	}
-	*/
 	template <class C = char>
 	auto get_file_contents(const path_type& path, const C = C()) {
 		auto t = with_exceptions<std::basic_ifstream<C>>();

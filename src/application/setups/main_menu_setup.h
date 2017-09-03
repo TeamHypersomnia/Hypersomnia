@@ -117,7 +117,7 @@ public:
 
 	void draw_overlays(
 		const augs::drawer_with_default output,
-		const requisite_images_in_atlas& requisites,
+		const necessary_images_in_atlas& necessarys,
 		const augs::baked_font& gui_font,
 		const vec2i screen_size
 	) const;

@@ -6,20 +6,20 @@
 
 #include "game/view/game_drawing_settings.h"
 
-#include "game/hardcoded_content/requisite_collections.h"
+#include "game/hardcoded_content/necessary_collections.h"
 
 #include "application/content_regeneration/procedural_image.h"
 
 #include "generated/introspectors.h"
 
-fbo_collection::fbo_collection(
+necessary_fbos::necessary_fbos(
 	const vec2i screen_size,
 	const game_drawing_settings settings
 ) {
 	apply(screen_size, settings);
 }
 
-void fbo_collection::apply(
+void necessary_fbos::apply(
 	const vec2i screen_size,
 	const game_drawing_settings settings
 ) {
@@ -34,7 +34,7 @@ void fbo_collection::apply(
 	reset(light);
 }
 
-shader_collection::shader_collection(
+necessary_shaders::necessary_shaders(
 	const augs::path_type& canon_directory,
 	const augs::path_type& local_directory,
 	const game_drawing_settings settings
@@ -108,35 +108,35 @@ shader_collection::shader_collection(
 	}
 }
 
-sound_buffer_collection::sound_buffer_collection(
+necessary_sound_buffers::necessary_sound_buffers(
 	const augs::path_type& directory
 ) try :
 	button_click(augs::sound_data(typesafe_sprintf("%xbutton_click.wav", directory))),
 	button_hover(augs::sound_data(typesafe_sprintf("%xbutton_hover.wav", directory)))
 {}
 catch (const augs::sound_decoding_error err) {
-	throw requisite_resource_loading_error(err.what());
+	throw necessary_resource_loading_error(err.what());
 }
 
 augs::path_type get_procedural_image_path(const augs::path_type& from_source_path) {
 	return typesafe_sprintf("generated/%x", from_source_path);
 }
 
-requisite_image_collection::requisite_image_collection(
+necessary_image_definitions::necessary_image_definitions(
 	const augs::path_type& directory,
 	const bool force_regenerate
 ) {
-	using id_type = assets::requisite_image_id;
+	using id_type = assets::necessary_image_id;
 
 	/* 
 		This additional reference is only to mitigate MSVC bug 
 		whereby there is some(?) problem capturing "this" contents in lambdas.
 	*/
 
-	auto& requisites = all;
+	auto& necessarys = all;
 
 	augs::for_each_enum_except_bounds<id_type>([&](const id_type id) {
-		if (found_in(requisites, id)) {
+		if (found_in(necessarys, id)) {
 			return;
 		}
 
@@ -155,7 +155,7 @@ requisite_image_collection::requisite_image_collection(
 				);
 			}
 			catch (augs::lua_deserialization_error err) {
-				throw requisite_resource_loading_error(
+				throw necessary_resource_loading_error(
 					"Error while loading additional properties for %x (%x):", 
 					stem, 
 					additional_properties_path,
@@ -169,7 +169,7 @@ requisite_image_collection::requisite_image_collection(
 			augs::file_exists(source_image_path)
 		) {
 			definition_template.source_image_path = source_image_path;
-			requisites.emplace(id, definition_template);
+			necessarys.emplace(id, definition_template);
 		}
 		else if (
 			const auto procedural_definition_path = typesafe_sprintf("%xprocedural/%x.lua", directory, stem);
@@ -181,7 +181,7 @@ requisite_image_collection::requisite_image_collection(
 				augs::load_from_lua_table(def, procedural_definition_path);
 			}
 			catch (augs::lua_deserialization_error err) {
-				throw requisite_resource_loading_error(
+				throw necessary_resource_loading_error(
 					"Error while loading procedural image definition for %x (%x):",
 					stem,
 					procedural_definition_path,
@@ -194,7 +194,7 @@ requisite_image_collection::requisite_image_collection(
 				const bool exactly_one = def.button_with_corners.has_value() != def.scripted_image.has_value();
 				!exactly_one
 			) {
-				throw requisite_resource_loading_error(
+				throw necessary_resource_loading_error(
 					"Error while loading procedural image definition for %x (%x):\n%x",
 					stem,
 					procedural_definition_path,
@@ -216,7 +216,7 @@ requisite_image_collection::requisite_image_collection(
 				augs::for_each_enum_except_bounds<button_corner_type>([&](const button_corner_type type) {
 					definition_template.source_image_path = typesafe_sprintf(path_template.string(), get_filename_for(type));
 					
-					requisites.emplace(
+					necessarys.emplace(
 						static_cast<id_type>(
 							static_cast<int>(first) + static_cast<int>(type)
 						), 
@@ -236,13 +236,13 @@ requisite_image_collection::requisite_image_collection(
 				);
 		
 				definition_template.source_image_path = generated_image_path;
-				requisites.emplace(id, definition_template);
+				necessarys.emplace(id, definition_template);
 			}
 		}
 
 		if (const bool nothing_loaded = definition_template.source_image_path.empty()) {
-			throw requisite_resource_loading_error(
-				"Error while loading requisite image: %x.\n%x",
+			throw necessary_resource_loading_error(
+				"Error while loading necessary image: %x.\n%x",
 				stem,
 				"No source image exists, nor does a procedural definition."
 			);

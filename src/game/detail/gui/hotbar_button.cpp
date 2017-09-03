@@ -50,14 +50,14 @@ entity_handle hotbar_button::get_assigned_entity(const entity_handle owner_trans
 
 button_corners_info hotbar_button::get_button_corners_info() const {
 	button_corners_info corners;
-	corners.inside_texture = assets::requisite_image_id::HOTBAR_BUTTON;
+	corners.inside_texture = assets::necessary_image_id::HOTBAR_BUTTON;
 	corners.flip = { flip::HORIZONTALLY };
 
 	return corners;
 }
 
 vec2i hotbar_button::get_bbox(
-	const requisite_images_in_atlas& requisites,
+	const necessary_images_in_atlas& necessarys,
 	const game_image_definitions& defs,
 	const const_entity_handle owner_transfer_capability
 ) const {
@@ -68,7 +68,7 @@ vec2i hotbar_button::get_bbox(
 	}
 
 	return get_button_corners_info().internal_size_to_cornered_size(
-		requisites,
+		necessarys,
 		item_button::calculate_button_layout(ent, defs, true).aabb.get_size()
 	);
 }
@@ -86,7 +86,7 @@ void hotbar_button::draw(
 	const auto owner_transfer_capability = context.get_subject_entity();
 	const auto settings = context.get_hotbar_settings();
 	const auto& game_image_defs = context.get_game_image_definitions();
-	const auto& requisites = context.get_requisite_images();
+	const auto& necessarys = context.get_necessary_images();
 	const auto& gui_font = context.get_gui_font();
 	const auto output = context.get_output();
 
@@ -100,7 +100,7 @@ void hotbar_button::draw(
 
 	const auto corners = this_id->get_button_corners_info();
 	
-	const auto internal_rc = corners.cornered_rc_to_internal_rc(requisites, absolute_rc);
+	const auto internal_rc = corners.cornered_rc_to_internal_rc(necessarys, absolute_rc);
 	
 	const auto assigned_entity = this_id->get_assigned_entity(owner_transfer_capability);
 	const bool has_assigned_entity = assigned_entity.alive();
@@ -206,9 +206,9 @@ void hotbar_button::draw(
 	
 	{
 		corners.for_each_button_corner(
-			requisites,
+			necessarys,
 			internal_rc, 
-			[&](const button_corner_type type, const assets::requisite_image_id id, const ltrb drawn_rc) {
+			[&](const button_corner_type type, const assets::necessary_image_id id, const ltrb drawn_rc) {
 				auto col = is_button_border(type) ? border_col : inside_col;
 				
 				if (distinguished_border_function(type)) {
@@ -216,7 +216,7 @@ void hotbar_button::draw(
 				}
 
 				if (part_visibility_flag(type)) {
-					output.aabb(requisites.at(id), drawn_rc, col, corners.flip);
+					output.aabb(necessarys.at(id), drawn_rc, col, corners.flip);
 				}
 				
 				if (type == button_corner_type::LB_COMPLEMENT) {
@@ -252,9 +252,9 @@ void hotbar_button::draw(
 				hover_effect_rc.expand_from_center(vec2(distance, distance));
 		
 				corners.for_each_button_corner(
-					requisites,
+					necessarys,
 					hover_effect_rc, 
-					[&](const button_corner_type type, const assets::requisite_image_id id, const ltrb drawn_rc) {
+					[&](const button_corner_type type, const assets::necessary_image_id id, const ltrb drawn_rc) {
 						if (part_visibility_flag(type) && is_button_border(type)) {
 							auto col = colorize;
 
@@ -262,7 +262,7 @@ void hotbar_button::draw(
 								col = distinguished_border_color;
 							}
 
-							output.aabb(requisites.at(id), drawn_rc, col, corners.flip);
+							output.aabb(necessarys.at(id), drawn_rc, col, corners.flip);
 						}
 					}
 				);
@@ -280,9 +280,9 @@ void hotbar_button::draw(
 				hover_effect_rc.expand_from_center(vec2(distance, distance));
 		
 				corners.for_each_button_corner(
-					requisites, 
+					necessarys, 
 					hover_effect_rc,
-					[&](const button_corner_type type, const assets::requisite_image_id id, const ltrb drawn_rc) {
+					[&](const button_corner_type type, const assets::necessary_image_id id, const ltrb drawn_rc) {
 						if (part_visibility_flag(type) && is_button_border(type)) {
 							auto col = colorize;
 
@@ -290,7 +290,7 @@ void hotbar_button::draw(
 								col = distinguished_border_color;
 							}
 
-							output.aabb(requisites.at(id), drawn_rc, col, corners.flip);
+							output.aabb(necessarys.at(id), drawn_rc, col, corners.flip);
 						}
 					}
 				);
@@ -321,7 +321,7 @@ void hotbar_button::draw(
 		f.expand_size_to_grid = false;
 		f.always_full_item_alpha = true;
 
-		const auto height_excess = absolute_rc.h() - this_id->get_bbox(requisites, game_image_defs, owner_transfer_capability).y;
+		const auto height_excess = absolute_rc.h() - this_id->get_bbox(necessarys, game_image_defs, owner_transfer_capability).y;
 		
 		f.absolute_xy_offset = internal_rc.get_position() - context.get_tree_entry(location).get_absolute_pos();
 		f.absolute_xy_offset.y += height_excess / 2;

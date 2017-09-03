@@ -30,7 +30,7 @@ void drag_and_drop_target_drop_item::draw(const viewing_game_gui_context context
 	}
 
 	context.get_output().gui_box_center_tex(
-		context.get_requisite_images().at(assets::requisite_image_id::DROP_HAND_ICON),
+		context.get_necessary_images().at(assets::necessary_image_id::DROP_HAND_ICON),
 		context,
 		this_id,
 		col
@@ -47,7 +47,7 @@ void drag_and_drop_target_drop_item::rebuild_layouts(
 	const game_gui_context context, 
 	const this_pointer this_id
 ) {
-	const auto& requisites = context.get_requisite_images();
+	const auto& necessarys = context.get_necessary_images();
 
 	const auto& world = context.get_rect_world();
 	const_dereferenced_location<item_button_in_item> dragged_item = context.get_if<item_button_in_item>(world.rect_held_by_lmb);
@@ -64,5 +64,5 @@ void drag_and_drop_target_drop_item::rebuild_layouts(
 		- vec2(20, 20)
 	);
 
-	this_id->rc.set_size(requisites.at(assets::requisite_image_id::DROP_HAND_ICON).get_original_size() + vec2(40, 40));
+	this_id->rc.set_size(necessarys.at(assets::necessary_image_id::DROP_HAND_ICON).get_original_size() + vec2(40, 40));
 }

@@ -84,7 +84,7 @@ public:
 		const C context,
 		const gui_element_id this_id
 	) {
-		this_id->set_menu_buttons_positions(context.get_requisite_images(), context.get_gui_font(), context.get_screen_size());
+		this_id->set_menu_buttons_positions(context.get_necessary_images(), context.get_gui_font(), context.get_screen_size());
 
 		menu_rect_node<Enum>::rebuild_layouts(context, this_id);
 	}
@@ -110,7 +110,7 @@ public:
 		ltrb buttons_bg;
 		buttons_bg.set_position(buttons.front().rc.left_top());
 		buttons_bg.b = buttons.back().rc.b;
-		buttons_bg.w(static_cast<float>(get_max_menu_button_size(context.get_requisite_images(), context.get_gui_font()).x));
+		buttons_bg.w(static_cast<float>(get_max_menu_button_size(context.get_necessary_images(), context.get_gui_font()).x));
 
 		context.get_output().aabb_with_border(
 			buttons_bg.expand_from_center(expand),

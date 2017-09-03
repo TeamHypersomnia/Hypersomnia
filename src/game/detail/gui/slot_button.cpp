@@ -39,7 +39,7 @@ void slot_button::draw(
 	const auto hand_index = slot_id.get_hand_index();
 	const auto& detector = this_id->detector;
 	const auto output = context.get_output();
-	const auto& requisites = context.get_requisite_images();
+	const auto& necessarys = context.get_necessary_images();
 
 	rgba inside_col, border_col;
 	
@@ -59,8 +59,8 @@ void slot_button::draw(
 		border_col.a = 255;
 	}
 
-	const auto inside_tex = requisites.at(requisite_image_id::ATTACHMENT_CIRCLE_FILLED);
-	const auto border_tex = requisites.at(requisite_image_id::ATTACHMENT_CIRCLE_BORDER);
+	const auto inside_tex = necessarys.at(necessary_image_id::ATTACHMENT_CIRCLE_FILLED);
+	const auto border_tex = necessarys.at(necessary_image_id::ATTACHMENT_CIRCLE_BORDER);
 
 	if (slot_id->always_allow_exactly_one_item) {
 		output.gui_box_center_tex(inside_tex, context, this_id, inside_col);
@@ -68,36 +68,36 @@ void slot_button::draw(
 
 		const auto slot_type = slot_id.get_id().type;
 
-		auto draw_icon = [&](requisite_image_id id, const vec2i offset = vec2i(0, 0)) {
-			output.gui_box_center_tex(requisites.at(id), context, this_id, border_col, offset);
+		auto draw_icon = [&](necessary_image_id id, const vec2i offset = vec2i(0, 0)) {
+			output.gui_box_center_tex(necessarys.at(id), context, this_id, border_col, offset);
 		};
 
 		if (hand_index == 0) {
-			draw_icon(requisite_image_id::PRIMARY_HAND_ICON, vec2(1, 0));
+			draw_icon(necessary_image_id::PRIMARY_HAND_ICON, vec2(1, 0));
 		}
 
 		if (hand_index == 1) {
-			draw_icon(requisite_image_id::SECONDARY_HAND_ICON);
+			draw_icon(necessary_image_id::SECONDARY_HAND_ICON);
 		}
 
 		if (slot_type == slot_function::SHOULDER) {
-			draw_icon(requisite_image_id::SHOULDER_SLOT_ICON);
+			draw_icon(necessary_image_id::SHOULDER_SLOT_ICON);
 		}
 
 		if (slot_type == slot_function::TORSO_ARMOR) {
-			draw_icon(requisite_image_id::ARMOR_SLOT_ICON);
+			draw_icon(necessary_image_id::ARMOR_SLOT_ICON);
 		}
 
 		if (slot_type == slot_function::GUN_CHAMBER) {
-			draw_icon(requisite_image_id::CHAMBER_SLOT_ICON);
+			draw_icon(necessary_image_id::CHAMBER_SLOT_ICON);
 		}
 
 		if (slot_type == slot_function::GUN_MUZZLE) {
-			draw_icon(requisite_image_id::GUN_MUZZLE_SLOT_ICON);
+			draw_icon(necessary_image_id::GUN_MUZZLE_SLOT_ICON);
 		}
 
 		if (slot_type == slot_function::GUN_DETACHABLE_MAGAZINE) {
-			draw_icon(requisite_image_id::DETACHABLE_MAGAZINE_SLOT_ICON);
+			draw_icon(necessary_image_id::DETACHABLE_MAGAZINE_SLOT_ICON);
 		}
 	}
 

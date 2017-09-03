@@ -7,7 +7,7 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
 
-#include "game/hardcoded_content/requisite_collections.h"
+#include "game/hardcoded_content/necessary_collections.h"
 
 #include "game/systems_stateless/render_system.h"
 
@@ -43,9 +43,9 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	const auto& visible_per_layer = in.visible.per_layer;
 	const auto& shaders = in.shaders;
 	const auto& fbos = in.fbos;
-	const auto& requisites = in.requisite_images;
+	const auto& necessarys = in.necessary_images;
 	const auto& game_images = in.game_images;
-	const auto blank = requisites.at(assets::requisite_image_id::BLANK);
+	const auto blank = necessarys.at(assets::necessary_image_id::BLANK);
 	const auto& gui_font = in.gui_font;
 
 	const auto output = augs::drawer_with_default{ renderer.get_triangle_buffer(), blank };
@@ -90,10 +90,10 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	const auto& light = in.audiovisuals.get<light_system>();
 	
-	const auto laser_glow = requisites.at(assets::requisite_image_id::LASER_GLOW);
-	const auto laser_glow_edge = requisites.at(assets::requisite_image_id::LASER_GLOW_EDGE);
+	const auto laser_glow = necessarys.at(assets::necessary_image_id::LASER_GLOW);
+	const auto laser_glow_edge = necessarys.at(assets::necessary_image_id::LASER_GLOW_EDGE);
 
-	const auto cast_highlight = requisites.at(assets::requisite_image_id::CAST_HIGHLIGHT);
+	const auto cast_highlight = necessarys.at(assets::necessary_image_id::CAST_HIGHLIGHT);
 
 	light.render_all_lights({
 		renderer,
@@ -220,7 +220,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	draw_layer(render_layer::OVER_CROSSHAIR);
 	
 	if (settings.draw_weapon_laser && viewed_character.alive()) {
-		const auto laser = requisites.at(assets::requisite_image_id::LASER);
+		const auto laser = necessarys.at(assets::necessary_image_id::LASER);
 		
 		draw_crosshair_lasers({
 			[&](const vec2 from, const vec2 to, const rgba col) {
@@ -275,7 +275,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	augs::vertex_triangle_buffer textual_infos;
 
 	{
-		const auto tex = requisites.at(assets::requisite_image_id::CIRCULAR_BAR_MEDIUM);
+		const auto tex = necessarys.at(assets::necessary_image_id::CIRCULAR_BAR_MEDIUM);
 
 		set_center_uniform(tex);
 
@@ -296,7 +296,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	}
 	
 	{
-		const auto tex = requisites.at(assets::requisite_image_id::CIRCULAR_BAR_SMALL);
+		const auto tex = necessarys.at(assets::necessary_image_id::CIRCULAR_BAR_SMALL);
 
 		set_center_uniform(tex);
 

@@ -2,7 +2,7 @@
 #include "augs/misc/machine_entropy.h"
 #include "augs/gui/formatted_string.h"
 
-#include "game/hardcoded_content/requisite_collections.h"
+#include "game/hardcoded_content/necessary_collections.h"
 
 #include "application/gui/ingame_menu_button_type.h"
 #include "application/gui/menu/menu_context.h"
@@ -22,8 +22,8 @@ struct ingame_menu_gui {
 		const augs::drawer_with_default output;
 		const vec2i screen_size;
 		const augs::gui::text::style text_style;
-		const requisite_images_in_atlas& requisite_images;
-		const sound_buffer_collection& sounds;
+		const necessary_images_in_atlas& necessary_images;
+		const necessary_sound_buffers& sounds;
 		const augs::delta vdt;
 		const augs::audio_volume_settings& audio_volume;
 	};
@@ -48,13 +48,13 @@ struct ingame_menu_gui {
 		auto context = ingame_menu_context(
 			{ world, tree, in.screen_size },
 			root,
-			in.requisite_images,
+			in.necessary_images,
 			gui_font,
 			in.sounds,
 			in.audio_volume
 		);
 
-		root.set_menu_buttons_sizes(in.requisite_images, gui_font, { 1000, 1000 });
+		root.set_menu_buttons_sizes(in.necessary_images, gui_font, { 1000, 1000 });
 
 		world.build_tree_data_into(context);
 
@@ -90,10 +90,10 @@ struct ingame_menu_gui {
 			world.respond_to_events(context, gui_entropies);
 		}
 		
-		auto determined_cursor = assets::requisite_image_id::GUI_CURSOR;
+		auto determined_cursor = assets::necessary_image_id::GUI_CURSOR;
 
 		if (context.alive(world.rect_hovered)) {
-			determined_cursor = assets::requisite_image_id::GUI_CURSOR_HOVER;
+			determined_cursor = assets::necessary_image_id::GUI_CURSOR_HOVER;
 		}
 
 		return determined_cursor;

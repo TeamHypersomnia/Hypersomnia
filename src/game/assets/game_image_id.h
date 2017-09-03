@@ -3,8 +3,8 @@
 #include "game/container_sizes.h"
 
 namespace assets {
-	enum class requisite_image_id {
-		// GEN INTROSPECTOR enum class assets::requisite_image_id
+	enum class necessary_image_id {
+		// GEN INTROSPECTOR enum class assets::necessary_image_id
 		INVALID,
 
 		BLANK,
@@ -123,13 +123,13 @@ namespace assets {
 		// END GEN INTROSPECTOR
 	};
 
-	inline auto get_cursor_offset(const requisite_image_id id) {
+	inline auto get_cursor_offset(const necessary_image_id id) {
 		auto output = vec2i { 0, 0 };
 
 		switch (id) {
-		case requisite_image_id::GUI_CURSOR_HOVER: output = { -5, 0 }; break;
-		case requisite_image_id::GUI_CURSOR_RESIZE_NWSE: output = { -9, -9 }; break;
-		case requisite_image_id::GUI_CURSOR_TEXT_INPUT: output = { -4, -8 }; break;
+		case necessary_image_id::GUI_CURSOR_HOVER: output = { -5, 0 }; break;
+		case necessary_image_id::GUI_CURSOR_RESIZE_NWSE: output = { -9, -9 }; break;
+		case necessary_image_id::GUI_CURSOR_TEXT_INPUT: output = { -4, -8 }; break;
 		default: break;
 		}
 

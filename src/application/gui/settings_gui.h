@@ -21,22 +21,22 @@ namespace augs {
 	class audio_context;
 }
 
-struct fbo_collection;
-struct shader_collection;
+struct necessary_fbos;
+struct necessary_shaders;
 
-struct sound_buffer_collection;
-struct requisite_image_collection;
+struct necessary_sound_buffers;
+struct necessary_image_definitions;
 
 struct configuration_subscribers {
 	augs::window& window;
-	fbo_collection& fbos;
+	necessary_fbos& fbos;
 	augs::audio_context& audio_context;
 
 #if TODO
 	augs::renderer& renderer;
-	shader_collection& shaders;
-	const sound_buffer_collection& sounds;
-	const requisite_image_collection& images;
+	necessary_shaders& shaders;
+	const necessary_sound_buffers& sounds;
+	const necessary_image_definitions& images;
 #endif
 
 	void apply(const config_lua_table&) const;

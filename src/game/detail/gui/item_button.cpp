@@ -197,7 +197,7 @@ void item_button::draw_proc(
 	const auto& rect_world = context.get_rect_world();
 	const auto& element = context.get_character_gui();
 	const auto output = context.get_output();
-	const auto& requisites = context.get_requisite_images();
+	const auto& necessarys = context.get_necessary_images();
 	auto& this_tree_entry = context.get_tree_entry(this_id);
 
 	const auto former_absolute_pos = this_tree_entry.get_absolute_pos();
@@ -403,18 +403,18 @@ void item_button::draw_proc(
 
 	if (f.draw_container_opened_mark) {
 		if (item.find<components::container>()) {
-			assets::requisite_image_id container_icon;
+			assets::necessary_image_id container_icon;
 
 			if (this_id->is_container_open) {
-				container_icon = assets::requisite_image_id::CONTAINER_OPEN_ICON;
+				container_icon = assets::necessary_image_id::CONTAINER_OPEN_ICON;
 			}
 			else {
-				container_icon = assets::requisite_image_id::CONTAINER_CLOSED_ICON;
+				container_icon = assets::necessary_image_id::CONTAINER_CLOSED_ICON;
 			}
 
-			const auto size = requisites.at(container_icon).get_size();
+			const auto size = necessarys.at(container_icon).get_size();
 
-			output.aabb_lt(requisites.at(container_icon), vec2(this_absolute_rect.r - size.x + 2, this_absolute_rect.t + 1), border_col);
+			output.aabb_lt(necessarys.at(container_icon), vec2(this_absolute_rect.r - size.x + 2, this_absolute_rect.t + 1), border_col);
 		}
 	}
 

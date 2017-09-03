@@ -6,7 +6,7 @@
 #include "augs/gui/basic_gui_context.h"
 #include "augs/math/camera_cone.h"
 
-#include "game/hardcoded_content/requisite_collections.h"
+#include "game/hardcoded_content/necessary_collections.h"
 #include "game/enums/input_context_enums.h"
 #include "game/transcendental/entity_handle.h"
 
@@ -100,8 +100,8 @@ public:
 		return dependencies.gui_font;
 	}
 
-	const auto& get_requisite_images() const {
-		return dependencies.requisite_images;
+	const auto& get_necessary_images() const {
+		return dependencies.necessary_images;
 	}
 
 	const auto& get_game_images() const {

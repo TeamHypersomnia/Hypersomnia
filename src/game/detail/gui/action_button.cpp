@@ -24,7 +24,7 @@ void action_button::draw(
 	const auto now = cosmos.get_timestamp();
 	const auto dt = cosmos.get_fixed_delta();
 
-	const auto& requisites = context.get_requisite_images();
+	const auto& necessarys = context.get_necessary_images();
 	const auto& game_images = context.get_game_images();
 	const auto& gui_font = context.get_gui_font();
 
@@ -57,7 +57,7 @@ void action_button::draw(
 					}
 
 					assets::game_image_id inside_tex = assets::game_image_id::INVALID;
-					const assets::requisite_image_id border_tex = assets::requisite_image_id::SPELL_BORDER;
+					const assets::necessary_image_id border_tex = assets::necessary_image_id::SPELL_BORDER;
 
 					rgba border_col;
 
@@ -69,7 +69,7 @@ void action_button::draw(
 					}
 
 					if (inside_tex != assets::game_image_id::INVALID) {
-						ensure(border_tex != assets::requisite_image_id::INVALID);
+						ensure(border_tex != assets::necessary_image_id::INVALID);
 
 						const auto absolute_icon_rect = ltrb(vec2i(0, 0), game_images.at(inside_tex).get_size()).place_in_center_of(absolute_rect);
 						const bool draw_partial_colorful_rect = false;
@@ -133,7 +133,7 @@ void action_button::draw(
 						}
 
 						output.gui_box_center_tex(
-							requisites.at(border_tex),
+							necessarys.at(border_tex),
 							context,
 							this_id, 
 							border_col
@@ -168,11 +168,11 @@ void action_button::draw(
 				border_col.a = 255;
 			}
 
-			const auto inside_tex = assets::requisite_image_id::ACTION_BUTTON_FILLED;
-			const auto border_tex = assets::requisite_image_id::ACTION_BUTTON_BORDER;
+			const auto inside_tex = assets::necessary_image_id::ACTION_BUTTON_FILLED;
+			const auto border_tex = assets::necessary_image_id::ACTION_BUTTON_BORDER;
 
-			output.gui_box_center_tex(requisites.at(inside_tex), context, this_id, inside_col);
-			output.gui_box_center_tex(requisites.at(border_tex), context, this_id, border_col);
+			output.gui_box_center_tex(necessarys.at(inside_tex), context, this_id, inside_col);
+			output.gui_box_center_tex(necessarys.at(border_tex), context, this_id, border_col);
 
 			print_stroked(
 				output,

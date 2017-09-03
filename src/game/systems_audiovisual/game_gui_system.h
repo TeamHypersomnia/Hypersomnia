@@ -80,6 +80,8 @@ public:
 		const augs::delta dt
 	);
 
+	void build_tree_data(const game_gui_context);
+
 	void rebuild_layouts(
 		const game_gui_context context
 	);
@@ -91,6 +93,7 @@ public:
 
 	void reserve_caches_for_entities(const size_t) const {}
 
-	void reposition_picked_up_and_transferred_items(const const_logic_step);
+	void standard_post_solve(const const_logic_step);
+
 	void erase_caches_for_dead_entities(const cosmos&);
 };

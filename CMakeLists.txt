@@ -385,7 +385,7 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/game/detail/spells/echoes_of_the_higher_realms.cpp"
 	"src/augs/misc/script_utils.cpp"
 	"src/game/hardcoded_content/test_scenes/test_scenes_content.cpp"
-	"src/game/hardcoded_content/requisite_collections.cpp"
+	"src/game/hardcoded_content/necessary_collections.cpp"
 	"src/augs/misc/imgui_utils.cpp"
 	"src/application/gui/settings_gui.cpp"
 	"src/game/assets/recoil_player.cpp"

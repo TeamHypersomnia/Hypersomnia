@@ -70,13 +70,6 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 	world_hover_highlighter.update(dt.in_milliseconds());
 
 	if (viewed_character.alive()) {
-		auto& gui = get<game_gui_system>();
-
-		const auto context = gui.create_context(input.screen_size, viewed_character, input.gui_deps);
-
-		gui.advance(context, dt);
-		gui.rebuild_layouts(context);
-
 		auto listener_cone = camera.smoothed_camera;
 		listener_cone.transform = viewed_character.get_viewing_transform(interp);
 
@@ -372,19 +365,7 @@ void audiovisual_state::standard_post_solve(const const_logic_step step) {
 
 	exploding_rings.acquire_new_rings(new_rings);
 
-	auto& gui = get<game_gui_system>();
-
-	gui.reposition_picked_up_and_transferred_items(step);
-
-	gui.erase_caches_for_dead_entities(cosmos);
 	get<sound_system>().erase_caches_for_dead_entities(cosmos);
 	get<particles_simulation_system>().erase_caches_for_dead_entities(cosmos);
 	get<wandering_pixels_system>().erase_caches_for_dead_entities(cosmos);
-
-	for (const auto& pickup : step.transient.messages.get_queue<messages::item_picked_up_message>()) {
-		gui.get_character_gui(pickup.subject).assign_item_to_first_free_hotbar_button(
-			cosmos[pickup.subject],
-			cosmos[pickup.item]
-		);
-	}
 }

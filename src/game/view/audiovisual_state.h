@@ -33,7 +33,6 @@ struct audiovisual_advance_input {
 	const particle_effect_definitions& particle_effects;
 
 	const loaded_sounds& sounds;
-	const game_gui_context_dependencies gui_deps;
 	const augs::audio_volume_settings audio_volume;
 	const interpolation_settings interpolation;
 	const world_camera_settings camera;

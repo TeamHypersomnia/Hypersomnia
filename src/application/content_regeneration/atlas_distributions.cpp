@@ -6,7 +6,7 @@ void standard_atlas_distribution(const standard_atlas_distribution_input in) {
 
 	atlas_input.clear();
 
-	for (const auto& r : in.requisite_images.all) {
+	for (const auto& r : in.necessary_images.all) {
 		atlas_input.images.emplace_back(r.second.get_source_image_path());
 	}
 
@@ -41,8 +41,8 @@ void standard_atlas_distribution(const standard_atlas_distribution_input in) {
 	{
 		const auto& baked = atlas.baked_images;
 
-		for (const auto& r : in.requisite_images.all) {
-			in.output_requisite_images[r.first] = baked.at(r.second.get_source_image_path());
+		for (const auto& r : in.necessary_images.all) {
+			in.output_necessary_images[r.first] = baked.at(r.second.get_source_image_path());
 		}
 
 		for (const auto& d : in.game_image_defs) {

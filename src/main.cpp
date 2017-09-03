@@ -23,6 +23,8 @@
 
 #include "game/assets/loaded_sounds.h"
 
+#include "game/systems_audiovisual/game_gui_system.h"
+
 #include "game/view/audiovisual_state.h"
 #include "game/view/rendering_scripts/illuminated_rendering.h"
 
@@ -77,29 +79,29 @@ int main(const int argc, const char* const * const argv) try {
 	/* The logic will use it to push debug lines */
 	renderer.set_as_current();
 
-	fbo_collection fbos(
+	necessary_fbos fbos(
 		config.window.get_screen_size(),
 		config.drawing
 	);
 
-    shader_collection shaders(
-		"content/requisite/shaders/",
-		"content/requisite/shaders/",
+    necessary_shaders shaders(
+		"content/necessary/shaders/",
+		"content/necessary/shaders/",
 		config.drawing
 	);
 
-	sound_buffer_collection sounds(
-		"content/requisite/sfx/"
+	necessary_sound_buffers sounds(
+		"content/necessary/sfx/"
 	);
 
-	requisite_image_collection images(
-		"content/requisite/gfx/",
+	necessary_image_definitions images(
+		"content/necessary/gfx/",
 		config.content_regeneration.regenerate_every_launch
 	);
 	
 	audiovisual_state audiovisuals;
 
-	auto& game_gui = audiovisuals.get<game_gui_system>();
+	auto game_gui = game_gui_system();
 
 	bool should_quit = false;
 	bool show_settings = false;
@@ -146,8 +148,8 @@ int main(const int argc, const char* const * const argv) try {
 	
 	ingame_menu_gui ingame_menu;
 	loaded_sounds game_sounds;
-	game_images_in_atlas game_images;
-	requisite_images_in_atlas requisite_images;
+	game_images_in_atlas game_atlas_entries;
+	necessary_images_in_atlas necessary_atlas_entries;
 	augs::baked_font gui_font;
 
 	auto preload_viewables = [&](const auto& setup) {
@@ -173,8 +175,8 @@ int main(const int argc, const char* const * const argv) try {
 					settings.check_integrity_every_launch
 				},
 				game_world_atlas,
-				game_images,
-				requisite_images,
+				game_atlas_entries,
+				necessary_atlas_entries,
 				gui_font
 			});
 		}
@@ -221,8 +223,8 @@ int main(const int argc, const char* const * const argv) try {
 	auto create_game_gui_deps = [&]() {
 		return game_gui_context_dependencies{
 			get_viewable_defs().get_store_by<assets::game_image_id>(),
-			game_images,
-			requisite_images,
+			game_atlas_entries,
+			necessary_atlas_entries,
 			gui_font
 		};
 	};
@@ -417,7 +419,6 @@ int main(const int argc, const char* const * const argv) try {
 					screen_size,
 					get_viewable_defs().get_store_by<assets::particle_effect_id>(),
 					game_sounds,
-					create_game_gui_deps(),
 				
 					viewing_config.audio_volume,
 					viewing_config.interpolation,
@@ -427,18 +428,38 @@ int main(const int argc, const char* const * const argv) try {
 
 			setup.advance(
 				audiovisual_step,
-				audiovisuals.get_standard_post_solve()
+				[&](const const_logic_step step) {
+					game_gui.standard_post_solve(step);
+					audiovisuals.standard_post_solve(step);
+				}
 			);
 		});
+		
+		const auto viewed_character = get_viewed_character();
 
-		/* What follows is strictly view part. */
+		if (viewed_character.alive()) {
+			const auto context = game_gui.create_context(
+				screen_size,
+				get_viewed_character(),
+				create_game_gui_deps()
+			);
+
+			game_gui.advance(context, frame_dt_ms);
+			game_gui.rebuild_layouts(context);
+			game_gui.build_tree_data(context);
+		}
+
+		/* 
+			What follows is strictly view part,
+			without advancement of any sort.
+		*/
 
 		auto frame = measure_scope(profiler.frame);
 		
 		auto get_drawer = [&]() { 
 			return augs::drawer_with_default {
 				renderer.get_triangle_buffer(),
-				requisite_images[assets::requisite_image_id::BLANK]
+				necessary_atlas_entries[assets::necessary_image_id::BLANK]
 			};
 		};
 
@@ -446,8 +467,6 @@ int main(const int argc, const char* const * const argv) try {
 			return augs::gui::text::style { gui_font, cyan };
 		};
 
-		const auto viewed_character = get_viewed_character();
-		
 		const auto interpolation_ratio = visit_current_setup([](auto& setup) {
 			return setup.get_interpolation_ratio();
 		});
@@ -512,9 +531,9 @@ int main(const int argc, const char* const * const argv) try {
 				viewed_character.get_cosmos(),
 				audiovisuals,
 				viewing_config.drawing,
-				requisite_images,
+				necessary_atlas_entries,
 				gui_font,
-				game_images,
+				game_atlas_entries,
 				screen_size,
 				viewing_config.hotbar,
 				viewing_config.controls,
@@ -550,7 +569,7 @@ int main(const int argc, const char* const * const argv) try {
 			}
 		}
 
-		auto menu_chosen_cursor = assets::requisite_image_id::INVALID;
+		auto menu_chosen_cursor = assets::necessary_image_id::INVALID;
 
 		if (main_menu.has_value()) {
 			menu_chosen_cursor = main_menu.value().gui.perform(
@@ -559,7 +578,7 @@ int main(const int argc, const char* const * const argv) try {
 					get_drawer(),
 					window.get_screen_size(),
 					get_gui_text_style(),
-					requisite_images,
+					necessary_atlas_entries,
 					sounds,
 					frame_dt_ms,
 					viewing_config.audio_volume
@@ -591,7 +610,7 @@ int main(const int argc, const char* const * const argv) try {
 
 			main_menu.value().draw_overlays(
 				get_drawer(),
-				requisite_images,
+				necessary_atlas_entries,
 				gui_font,
 				screen_size
 			);
@@ -606,7 +625,7 @@ int main(const int argc, const char* const * const argv) try {
 						get_drawer(),
 						window.get_screen_size(),
 						get_gui_text_style(),
-						requisite_images,
+						necessary_atlas_entries,
 						sounds,
 						frame_dt_ms,
 						viewing_config.audio_volume
@@ -649,13 +668,13 @@ int main(const int argc, const char* const * const argv) try {
 		const vec2i cursor_drawing_pos = ImGui::GetIO().MousePos;
 
 		if (ImGui::GetIO().WantCaptureMouse) {
-			get_drawer().cursor(requisite_images, augs::get_imgui_cursor<assets::requisite_image_id>(), cursor_drawing_pos, white);
+			get_drawer().cursor(necessary_atlas_entries, augs::get_imgui_cursor<assets::necessary_image_id>(), cursor_drawing_pos, white);
 		}
 		else if (
 			const bool we_drew_some_menu =
-			menu_chosen_cursor != assets::requisite_image_id::INVALID
+			menu_chosen_cursor != assets::necessary_image_id::INVALID
 		) {
-			get_drawer().cursor(requisite_images, menu_chosen_cursor, cursor_drawing_pos, white);
+			get_drawer().cursor(necessary_atlas_entries, menu_chosen_cursor, cursor_drawing_pos, white);
 		}
 		else if (game_gui.active && config.drawing.draw_character_gui) {
 			const auto& character_gui = game_gui.get_character_gui(viewed_character);
@@ -696,7 +715,7 @@ catch (const augs::audio_error& err) {
 	press_any_key();
 	return 1;
 }
-catch (const requisite_resource_loading_error err) {
+catch (const necessary_resource_loading_error err) {
 	LOG("Failed to load a resource necessary for the game to function!\n%x", err.what());
 	press_any_key();
 	return 1;

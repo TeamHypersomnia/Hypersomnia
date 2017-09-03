@@ -181,11 +181,11 @@ main_menu_setup::main_menu_setup(const main_menu_settings settings) : menu_theme
 
 void main_menu_setup::draw_overlays(
 	const augs::drawer_with_default output,
-	const requisite_images_in_atlas& requisites,
+	const necessary_images_in_atlas& necessarys,
 	const augs::baked_font& gui_font,
 	const vec2i screen_size
 ) const {
-	const auto game_logo = requisites.at(assets::requisite_image_id::MENU_GAME_LOGO);
+	const auto game_logo = necessarys.at(assets::necessary_image_id::MENU_GAME_LOGO);
 	const auto game_logo_size = game_logo.get_size();
 
 	ltrb game_logo_rect;

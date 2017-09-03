@@ -5,7 +5,7 @@
 
 #include "game/detail/gui/game_gui_context.h"
 
-using button_corners_info = basic_button_corners_info<assets::requisite_image_id>;
+using button_corners_info = basic_button_corners_info<assets::necessary_image_id>;
 
 class hotbar_button : public game_gui_rect_node {
 public:
@@ -25,7 +25,7 @@ public:
 	float hover_highlight_duration_ms = 400.f;
 
 	vec2i get_bbox(
-		const requisite_images_in_atlas& requisites,
+		const necessary_images_in_atlas& necessarys,
 		const game_image_definitions& defs,
 		const const_entity_handle owner_transfer_capability
 	) const;

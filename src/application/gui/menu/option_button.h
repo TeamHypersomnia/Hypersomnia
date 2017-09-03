@@ -10,7 +10,7 @@
 
 #include "application/gui/menu/appearing_text.h"
 
-using button_corners_info = basic_button_corners_info<assets::requisite_image_id>;
+using button_corners_info = basic_button_corners_info<assets::necessary_image_id>;
 
 template <class Enum>
 class option_button : public menu_rect_node<Enum> {
@@ -24,7 +24,7 @@ public:
 	augs::sound_source click_sound;
 
 	appearing_text appearing_caption;
-	button_corners_info corners = { assets::requisite_image_id::MENU_BUTTON };
+	button_corners_info corners = { assets::necessary_image_id::MENU_BUTTON };
 	float elapsed_hover_time_ms = 0.f;
 
 	float hover_highlight_maximum_distance = 8.f;
@@ -105,7 +105,7 @@ public:
 
 		const auto& rect_world = context.get_rect_world();
 		const auto& this_tree_entry = context.get_tree_entry(this_id);
-		const auto& requisites = context.get_requisite_images();
+		const auto& necessarys = context.get_necessary_images();
 		const auto& gui_font = context.get_gui_font();
 		const auto output = context.get_output();
 		const auto color = this_id->colorize;
@@ -134,15 +134,15 @@ public:
 		border_col *= color;
 
 		const auto flip = this_id->corners.flip;
-		const auto internal_rc = this_id->corners.cornered_rc_to_internal_rc(requisites, this_tree_entry.get_absolute_rect());
+		const auto internal_rc = this_id->corners.cornered_rc_to_internal_rc(necessarys, this_tree_entry.get_absolute_rect());
 
 		{
 			this_id->corners.for_each_button_corner(
-				requisites,
+				necessarys,
 				internal_rc, 
-				[&](const button_corner_type type, const assets::requisite_image_id id, const ltrb drawn_rc)  {
+				[&](const button_corner_type type, const assets::necessary_image_id id, const ltrb drawn_rc)  {
 					const auto col = is_button_border(type) ? border_col : inside_col;
-					output.aabb(requisites.at(id), drawn_rc, col, flip);
+					output.aabb(necessarys.at(id), drawn_rc, col, flip);
 				}
 			);
 
@@ -154,11 +154,11 @@ public:
 					hover_effect_rc.expand_from_center(vec2(distance, distance));
 
 					this_id->corners.for_each_button_corner(
-						requisites,
+						necessarys,
 						hover_effect_rc,
-						[&](const button_corner_type type, const assets::requisite_image_id id, const ltrb drawn_rc) {
+						[&](const button_corner_type type, const assets::necessary_image_id id, const ltrb drawn_rc) {
 							if (is_button_border(type)) {
-								output.aabb(requisites.at(id), drawn_rc, color, flip);
+								output.aabb(necessarys.at(id), drawn_rc, color, flip);
 							}
 						}
 					);
@@ -171,11 +171,11 @@ public:
 					hover_effect_rc.expand_from_center(vec2(distance, distance));
 
 					this_id->corners.for_each_button_corner(
-						requisites,
+						necessarys,
 						hover_effect_rc, 
-						[&](const button_corner_type type, const assets::requisite_image_id id, const ltrb drawn_rc) {
+						[&](const button_corner_type type, const assets::necessary_image_id id, const ltrb drawn_rc) {
 							if (is_button_corner(type) && is_button_border(type)) {
-								output.aabb(requisites.at(id), drawn_rc, color, flip);
+								output.aabb(necessarys.at(id), drawn_rc, color, flip);
 							}
 						}
 					);

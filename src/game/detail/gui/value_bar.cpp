@@ -124,7 +124,7 @@ void value_bar::draw(
 	const auto& tree_entry = context.get_tree_entry(this_id);
 	const auto absolute = tree_entry.get_absolute_rect();
 
-	const auto& requisites = context.get_requisite_images();
+	const auto& necessarys = context.get_necessary_images();
 	const auto output = context.get_output();
 
 	output.aabb_lt(game_images.at(icon_tex).texture_maps[texture_map_type::DIFFUSE], absolute.get_position());
@@ -188,7 +188,7 @@ void value_bar::draw(
 				const auto particle_col = bar_col + rgba(30, 30, 30, 0);
 			
 				output.aabb_lt_clipped(
-					requisites.at(p.tex),
+					necessarys.at(p.tex),
 					value_bar_rect.get_position() - vec2(6, 6) + p.relative_pos,
 					current_value_bar_rect,
 					particle_col
@@ -395,10 +395,10 @@ void value_bar::rebuild_layouts(
 		const auto value_bar_size = get_value_bar_rect(context, this_id, this_id->rc).get_size();
 
 		for (size_t i = 0; i < 40; ++i) {
-			const assets::requisite_image_id mats[3] = {
-				assets::requisite_image_id::WANDERING_CROSS,
-				assets::requisite_image_id::BLINK_1,
-				static_cast<assets::requisite_image_id>(static_cast<int>(assets::requisite_image_id::BLINK_1) + 2),
+			const assets::necessary_image_id mats[3] = {
+				assets::necessary_image_id::WANDERING_CROSS,
+				assets::necessary_image_id::BLINK_1,
+				static_cast<assets::necessary_image_id>(static_cast<int>(assets::necessary_image_id::BLINK_1) + 2),
 			};
 
 			effect_particle new_part;
