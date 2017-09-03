@@ -23,7 +23,7 @@
 #include "game/container_sizes.h"
 
 class cosmos;
-struct cosmos_global_state;
+struct cosmos_common_state;
 
 struct rigid_body_cache {
 	b2Body* body = nullptr;
@@ -55,8 +55,8 @@ class EMPTY_BASES physics_system : public physics_queries<physics_system> {
 
 	void destroy_inferred_state_of(const const_entity_handle);
 
-	void create_additional_inferred_state(const cosmos_global_state&) {}
-	void destroy_additional_inferred_state(const cosmos_global_state&) {}
+	void create_additional_inferred_state(const cosmos_common_state&) {}
+	void destroy_additional_inferred_state(const cosmos_common_state&) {}
 
 	friend class cosmos;
 	friend class physics_queries<physics_system>;

@@ -306,25 +306,6 @@ public:
 	}
 };
 
-template <class id_type>
-bool is_valid_cache_id(const id_type id) {
-	return id.indirection_index >= 0;
-}
-
-std::size_t make_cache_id(const unversioned_entity_id id);
-std::size_t make_cache_id(const entity_id id);
-std::size_t make_cache_id(const const_entity_handle handle);
-
-inline std::size_t make_cache_id(const entity_id id) {
-	ensure(is_valid_cache_id(id));
-	return id.indirection_index;
-}
-
-inline std::size_t make_cache_id(const unversioned_entity_id id) {
-	ensure(is_valid_cache_id(id));
-	return id.indirection_index;
-}
-
-inline std::size_t make_cache_id(const const_entity_handle handle) {
-	return make_cache_id(handle.get_id());
+inline auto linear_cache_key(const const_entity_handle handle) {
+	return linear_cache_key(handle.get_id());
 }

@@ -6,7 +6,7 @@
 #include "game/detail/perks/all_perks.h"
 
 void load_test_scene_sentience_properties(
-	cosmos_global_state& state
+	cosmos_common_state& state
 ) {
 	auto& perks = state.perks;
 	auto& spells = state.spells;

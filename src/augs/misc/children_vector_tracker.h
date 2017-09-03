@@ -27,23 +27,19 @@ namespace augs {
 		std::vector<parent_state> parent_caches;
 
 	public:
-		children_vector_tracker() {
-			ensure(!is_valid_cache_id(id_type()));
-		}
-
 		void reserve(const std::size_t n) {
 			child_caches.resize(n);
 			parent_caches.resize(n);
 		}
 		
 		//bool has_any_children(const id_type id) const {
-		//	return parents[make_cache_id(id)].children.size() > 0;
+		//	return parents[linear_cache_key(id)].children.size() > 0;
 		//}
 
 		void handle_deletion_of(
 			const id_type this_id
 		) {
-			const auto& cache = parent_caches[make_cache_id(this_id)];
+			const auto& cache = parent_caches[linear_cache_key(this_id)];
 
 			/*
 				If it is a parent, clear all references to it
@@ -52,7 +48,7 @@ namespace augs {
 			for(const auto& children_vector : cache.children) {
 				for (const auto& c : children_vector) {
 					for (std::size_t p = 0; p < parent_count; ++p) {
-						auto& parent_reference = child_caches[make_cache_id(c)].parents.at(p);
+						auto& parent_reference = child_caches[linear_cache_key(c)].parents.at(p);
 
 						if (parent_reference == this_id) {
 							parent_reference = id_type();
@@ -66,10 +62,10 @@ namespace augs {
 			const id_type child_id,
 			const std::size_t parent_index
 		) {
-			auto& child_cache = child_caches[make_cache_id(child_id)];
+			auto& child_cache = child_caches[linear_cache_key(child_id)];
 			auto& parent_entry = child_cache.parents.at(parent_index);
 
-			return is_valid_cache_id(parent_entry);
+			return parent_entry.is_set();
 		}
 
 		template <class = std::enable_if_t<parent_count == 1>>
@@ -83,13 +79,11 @@ namespace augs {
 			const id_type child_id,
 			const std::size_t parent_index
 		) {
-			auto& child_cache = child_caches[make_cache_id(child_id)];
+			auto& child_cache = child_caches[linear_cache_key(child_id)];
 			auto& parent_entry = child_cache.parents.at(parent_index);
 
-			const bool is_parent_set = is_valid_cache_id(parent_entry);
-
-			if (is_parent_set) {
-				auto& parent_cache = parent_caches[make_cache_id(parent_entry)];
+			if (parent_entry.is_set()) {
+				auto& parent_cache = parent_caches[linear_cache_key(parent_entry)];
 
 				parent_entry = id_type();
 				erase_element(parent_cache.children.at(parent_index), child_id);
@@ -116,7 +110,7 @@ namespace augs {
 		) {
 			unset_parent_of(child_id, parent_index);
 
-			auto& child_cache = child_caches[make_cache_id(child_id)];
+			auto& child_cache = child_caches[linear_cache_key(child_id)];
 			child_cache.parents.at(parent_index) = parent_id;
 			
 			for (std::size_t p = 0; p < parent_count; ++p) {
@@ -129,7 +123,7 @@ namespace augs {
 				}
 			}
 
-			auto& parent_cache = parent_caches[make_cache_id(parent_id)];
+			auto& parent_cache = parent_caches[linear_cache_key(parent_id)];
 			parent_cache.children.at(parent_index).push_back(child_id);
 		}
 
@@ -145,14 +139,14 @@ namespace augs {
 		const auto& get_children_of(
 			const id_type parent
 		) const {
-			return parent_caches[make_cache_id(parent)].children.at(0);
+			return parent_caches[linear_cache_key(parent)].children.at(0);
 		}
 
 		const auto& get_children_of(
 			const id_type parent, 
 			const std::size_t parenthood_index
 		) const {
-			return parent_caches[make_cache_id(parent)].children.at(parenthood_index);
+			return parent_caches[linear_cache_key(parent)].children.at(parenthood_index);
 		}
 
 		auto get_all_children_of(

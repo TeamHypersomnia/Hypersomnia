@@ -5,7 +5,7 @@
 
 #include "augs/templates/container_templates.h"
 
-void name_system::create_additional_inferred_state(const cosmos_global_state& global) {
+void name_system::create_additional_inferred_state(const cosmos_common_state& global) {
 	const bool is_already_constructed = name_to_id_lookup.size() > 0;
 
 	ensure(!is_already_constructed);
@@ -15,7 +15,7 @@ void name_system::create_additional_inferred_state(const cosmos_global_state& gl
 	}
 }
 
-void name_system::destroy_additional_inferred_state(const cosmos_global_state& global) {
+void name_system::destroy_additional_inferred_state(const cosmos_common_state& global) {
 	name_to_id_lookup.clear();
 }
 

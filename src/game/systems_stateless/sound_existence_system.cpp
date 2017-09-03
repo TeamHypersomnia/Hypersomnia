@@ -212,11 +212,11 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 		}
 		else if (h.target == messages::health_event::target_type::PERSONAL_ELECTRICITY) {
 			if (h.effective_amount > 0.f) {
-				in.effect = cosmos.get_global_assets().ped_shield_impact_sound;
+				in.effect = cosmos.get_common_assets().ped_shield_impact_sound;
 				in.effect.modifier.pitch *= 1.2f + h.effective_amount / 100.f;
 
 				if (h.special_result == messages::health_event::result_type::PERSONAL_ELECTRICITY_DESTRUCTION) {
-					in.effect = cosmos.get_global_assets().ped_shield_destruction_sound;
+					in.effect = cosmos.get_common_assets().ped_shield_destruction_sound;
 					in.effect.modifier.pitch *= 1.5f;
 				}
 			}
@@ -270,7 +270,7 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 
 		sound_existence_input in;
 		in.direct_listener = e.subject;
-		in.effect = cosmos.get_global_assets().cast_unsuccessful_sound;
+		in.effect = cosmos.get_common_assets().cast_unsuccessful_sound;
 
 		in.create_sound_effect_entity(
 			step, 

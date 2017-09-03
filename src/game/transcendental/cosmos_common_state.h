@@ -2,10 +2,10 @@
 #include "augs/math/si_scaling.h"
 #include "augs/templates/type_in_list_id.h"
 
-#include "game/global_state/visibility_settings.h"
-#include "game/global_state/pathfinding_settings.h"
-#include "game/global_state/global_assets.h"
-#include "game/global_state/entity_name_metas.h"
+#include "game/common_state/visibility_settings.h"
+#include "game/common_state/pathfinding_settings.h"
+#include "game/common_state/common_assets.h"
+#include "game/common_state/entity_name_metas.h"
 
 #include "game/detail/spells/all_spells.h"
 
@@ -16,14 +16,14 @@ using perk_tuple = put_all_perks_into_t<std::tuple>;
 using spell_meta_id = type_in_list_id<spell_tuple>;
 using perk_meta_id = type_in_list_id<meter_tuple>;
 
-struct cosmos_global_state {
-	// GEN INTROSPECTOR struct cosmos_global_state
+struct cosmos_common_state {
+	// GEN INTROSPECTOR struct cosmos_common_state
 	visibility_settings visibility;
 	pathfinding_settings pathfinding;
 	si_scaling si;
 
 	entity_name_metas name_metas;
-	global_assets assets;
+	common_assets assets;
 
 	meter_tuple meters;
 	spell_tuple spells;
@@ -33,7 +33,7 @@ struct cosmos_global_state {
 
 namespace std {
 	template <class T>
-	auto& get(const cosmos_global_state& s) {
+	auto& get(const cosmos_common_state& s) {
 		if constexpr(is_one_of_list_v<T, decltype(s.meters)>) {
 			return std::get<T>(s.meters);
 		}
@@ -46,7 +46,7 @@ namespace std {
 	}
 
 	template <class T>
-	const auto& get(const cosmos_global_state& s) {
+	const auto& get(const cosmos_common_state& s) {
 		if constexpr(is_one_of_list_v<T, decltype(s.meters)>) {
 			return std::get<T>(s.meters);
 		}

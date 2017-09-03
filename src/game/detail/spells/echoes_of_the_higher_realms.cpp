@@ -11,7 +11,7 @@
 #include "game/messages/health_event.h"
 
 bool echoes_of_the_higher_realms_instance::are_additional_conditions_for_casting_fulfilled(const const_entity_handle subject) const {
-	const auto& spell_data = std::get<echoes_of_the_higher_realms>(subject.get_cosmos().get_global_state().spells);
+	const auto& spell_data = std::get<echoes_of_the_higher_realms>(subject.get_cosmos().get_common_state().spells);
 
 	auto& consciousness = subject.get<components::sentience>().get<consciousness_meter_instance>();
 	
@@ -23,7 +23,7 @@ bool echoes_of_the_higher_realms_instance::are_additional_conditions_for_casting
 }
 
 void echoes_of_the_higher_realms_instance::perform_logic(const spell_logic_input in) {
-	const auto& spell_data = std::get<echoes_of_the_higher_realms>(in.subject.get_cosmos().get_global_state().spells);
+	const auto& spell_data = std::get<echoes_of_the_higher_realms>(in.subject.get_cosmos().get_common_state().spells);
 	const auto caster_transform = in.subject.get_logic_transform();
 
 	ignite_cast_sparkles(spell_data, in.step, caster_transform, in.subject);

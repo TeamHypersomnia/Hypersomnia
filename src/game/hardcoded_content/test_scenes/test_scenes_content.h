@@ -6,7 +6,7 @@
 struct content_regeneration_settings;
 class all_logical_assets;
 class all_viewable_defs;
-struct cosmos_global_state;
+struct cosmos_common_state;
 
 // test scene content
 
@@ -27,4 +27,4 @@ void populate_test_scene_assets(
 	all_viewable_defs& output_sources
 );
 
-void load_test_scene_sentience_properties(cosmos_global_state&);
+void load_test_scene_sentience_properties(cosmos_common_state&);

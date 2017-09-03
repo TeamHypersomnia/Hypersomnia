@@ -27,7 +27,7 @@ typedef components::name N;
 
 template <bool C>
 maybe_const_ref_t<C, entity_name_meta> basic_name_synchronizer<C>::get_meta() const {
-	return handle.get_cosmos().get_global_state().name_metas.get_meta(get_name_id());
+	return handle.get_cosmos().get_common_state().name_metas.get_meta(get_name_id());
 }
 
 template <bool C>
@@ -40,7 +40,7 @@ const entity_name_type& basic_name_synchronizer<C>::get_name() const {
 	const auto& cosmos = handle.get_cosmos();
 
 	return cosmos.systems_inferred.get<name_system>().get_name(
-		cosmos.get_global_state().name_metas,
+		cosmos.get_common_state().name_metas,
 		get_raw_component()
 	);
 }
@@ -49,7 +49,7 @@ void component_synchronizer<false, N>::set_name(const entity_name_type& full_nam
 	auto& cosmos = handle.get_cosmos();
 
 	cosmos.systems_inferred.get<name_system>().set_name(
-		cosmos.get_global_state().name_metas,
+		cosmos.get_common_state().name_metas,
 		full_name,
 		get_raw_component(),
 		handle

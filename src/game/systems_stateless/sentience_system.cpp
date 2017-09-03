@@ -31,7 +31,7 @@
 
 void sentience_system::cast_spells(const logic_step step) const {
 	auto& cosmos = step.cosm;
-	const auto& spell_metas = step.cosm.get_global_state().spells;
+	const auto& spell_metas = step.cosm.get_common_state().spells;
 	const auto now = cosmos.get_timestamp();
 	const auto delta = cosmos.get_fixed_delta();
 
@@ -157,7 +157,7 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 					sentience.spells, 
 					sentience.currently_casted_spell,
 					[&](auto& spell){
-						const auto spell_meta = get_meta_of(spell, cosmos.get_global_state().spells);
+						const auto spell_meta = get_meta_of(spell, cosmos.get_common_state().spells);
 						const auto spell_logic_duration_ms = spell_meta.get_spell_logic_duration_ms();
 						
 						const auto when_casted = sentience.time_of_last_spell_cast;

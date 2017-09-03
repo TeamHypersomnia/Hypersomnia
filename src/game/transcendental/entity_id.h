@@ -10,7 +10,7 @@ namespace augs {
 }
 
 struct entity_guid {
-	typedef unsigned guid_value_type;
+	using guid_value_type = unsigned;
 	// GEN INTROSPECTOR struct entity_guid
 	guid_value_type value = 0u;
 	// END GEN INTROSPECTOR
@@ -28,7 +28,7 @@ struct entity_guid {
 };
 
 struct unversioned_entity_id : public augs::unversioned_id<put_all_components_into_t<augs::component_aggregate>> {
-	typedef augs::unversioned_id<typename put_all_components_into<augs::component_aggregate>::type> base;
+	using base = augs::unversioned_id<typename put_all_components_into<augs::component_aggregate>::type>;
 
 	unversioned_entity_id(const base b = base()) : base(b) {}
 };
@@ -38,7 +38,7 @@ struct entity_id : public augs::pooled_object_id<put_all_components_into_t<augs:
 	// INTROSPECT BASE augs::pooled_object_id<put_all_components_into_t<augs::component_aggregate>>
 	// END GEN INTROSPECTOR
 
-	typedef augs::pooled_object_id<put_all_components_into_t<augs::component_aggregate>> base;
+	using base = augs::pooled_object_id<put_all_components_into_t<augs::component_aggregate>>;
 
 	entity_id(const base b = base()) : base(b) {}
 
@@ -52,12 +52,22 @@ struct child_entity_id : entity_id {
 	// INTROSPECT BASE entity_id
 	// END GEN INTROSPECTOR
 
-	typedef entity_id base;
+	using base = entity_id;
 
 	child_entity_id(const base b = base()) : base(b) {}
 
 	using base::operator unversioned_entity_id;
 };
+
+inline auto linear_cache_key(const entity_id id) {
+	ensure(id.is_set());
+	return static_cast<std::size_t>(id.indirection_index);
+}
+
+inline auto linear_cache_key(const unversioned_entity_id id) {
+	ensure(id.is_set());
+	return static_cast<std::size_t>(id.indirection_index);
+}
 
 namespace std {
 	template <>

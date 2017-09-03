@@ -119,7 +119,7 @@ void thunder_system::advance(
 				const bool is_leaf = b.children.empty();
 
 				if (is_leaf) {
-					const auto* const remnants = found_or_nullptr(manager, cosmos.get_global_assets().thunder_remnants);
+					const auto* const remnants = found_or_nullptr(manager, cosmos.get_common_assets().thunder_remnants);
 
 					if (remnants != nullptr) {
 						const auto remnants_emission = remnants->emissions.at(0);

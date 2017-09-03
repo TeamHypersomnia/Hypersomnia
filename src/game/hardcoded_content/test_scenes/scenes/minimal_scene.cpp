@@ -107,15 +107,15 @@ namespace test_scenes {
 			world.significant.meta.global
 		);
 
-		auto& global_assets = world.get_global_assets();
-		global_assets.cast_unsuccessful_sound.id = assets::sound_buffer_id::CAST_UNSUCCESSFUL;
-		global_assets.ped_shield_impact_sound.id = assets::sound_buffer_id::EXPLOSION;
-		global_assets.ped_shield_destruction_sound.id = assets::sound_buffer_id::GREAT_EXPLOSION;
-		global_assets.exhausted_smoke_particles.id = assets::particle_effect_id::EXHAUSTED_SMOKE;
-		global_assets.exploding_ring_smoke = assets::particle_effect_id::EXPLODING_RING_SMOKE;
-		global_assets.exploding_ring_sparkles = assets::particle_effect_id::EXPLODING_RING_SPARKLES;
-		global_assets.thunder_remnants = assets::particle_effect_id::THUNDER_REMNANTS;
+		auto& common_assets = world.get_common_assets();
+		common_assets.cast_unsuccessful_sound.id = assets::sound_buffer_id::CAST_UNSUCCESSFUL;
+		common_assets.ped_shield_impact_sound.id = assets::sound_buffer_id::EXPLOSION;
+		common_assets.ped_shield_destruction_sound.id = assets::sound_buffer_id::GREAT_EXPLOSION;
+		common_assets.exhausted_smoke_particles.id = assets::particle_effect_id::EXHAUSTED_SMOKE;
+		common_assets.exploding_ring_smoke = assets::particle_effect_id::EXPLODING_RING_SMOKE;
+		common_assets.exploding_ring_sparkles = assets::particle_effect_id::EXPLODING_RING_SPARKLES;
+		common_assets.thunder_remnants = assets::particle_effect_id::THUNDER_REMNANTS;
 
-		std::get<electric_triad>(world.get_global_state().spells).missile_definition = prefabs::create_electric_missile_def(step, {});
+		std::get<electric_triad>(world.get_common_state().spells).missile_definition = prefabs::create_electric_missile_def(step, {});
 	}
 }

@@ -12,7 +12,7 @@ namespace components {
 }
 
 class entity_name_metas;
-struct cosmos_global_state;
+struct cosmos_common_state;
 
 template <bool, class>
 class component_synchronizer;
@@ -42,8 +42,8 @@ class name_system {
 	void create_inferred_state_for(const entity_id, const components::name&);
 	void destroy_inferred_state_of(const entity_id, const components::name&);
 
-	void create_additional_inferred_state(const cosmos_global_state&);
-	void destroy_additional_inferred_state(const cosmos_global_state&);
+	void create_additional_inferred_state(const cosmos_common_state&);
+	void destroy_additional_inferred_state(const cosmos_common_state&);
 	
 	
 	/* 

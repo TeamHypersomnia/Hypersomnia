@@ -39,7 +39,7 @@ void action_button::draw(
 				sentience.spells,
 				bound_spell,
 				[&](const auto& spell){
-					const auto spell_data = get_meta_of(spell, cosmos.get_global_state().spells);
+					const auto spell_data = get_meta_of(spell, cosmos.get_common_state().spells);
 
 					const auto& pe = sentience.get<personal_electricity_meter_instance>();
 					const bool has_enough_mana = pe.value >= spell_data.common.personal_electricity_required;

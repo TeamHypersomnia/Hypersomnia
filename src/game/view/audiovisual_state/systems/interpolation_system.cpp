@@ -15,15 +15,15 @@ void interpolation_system::set_interpolation_enabled(const bool flag) {
 }
 
 components::transform& interpolation_system::get_interpolated(const const_entity_handle id) {
-	return per_entity_cache[make_cache_id(id)].interpolated_transform;
+	return per_entity_cache[linear_cache_key(id)].interpolated_transform;
 }
 
 components::transform interpolation_system::get_interpolated(const const_entity_handle id) const {
-	return enabled ? per_entity_cache[make_cache_id(id)].interpolated_transform : id.get_logic_transform();
+	return enabled ? per_entity_cache[linear_cache_key(id)].interpolated_transform : id.get_logic_transform();
 }
 
 interpolation_system::cache& interpolation_system::get_cache_of(const entity_id id) {
-	return per_entity_cache[make_cache_id(id)];
+	return per_entity_cache[linear_cache_key(id)];
 }
 
 void interpolation_system::reserve_caches_for_entities(const size_t n) {
@@ -34,7 +34,7 @@ void interpolation_system::set_updated_interpolated_transform(
 	const const_entity_handle subject,
 	const components::transform updated_value
 ) {
-	auto& cache = per_entity_cache[make_cache_id(subject)];
+	auto& cache = per_entity_cache[linear_cache_key(subject)];
 	const auto& info = subject.get<components::interpolation>();
 	
 	cache.recorded_place_of_birth = info.place_of_birth;
@@ -63,7 +63,7 @@ void interpolation_system::integrate_interpolated_transforms(
 			const auto& actual = e.get_logic_transform();
 			const auto& info = e.get<components::interpolation>();
 			auto& integrated = get_interpolated(e);
-			auto& cache = per_entity_cache[make_cache_id(e)];
+			auto& cache = per_entity_cache[linear_cache_key(e)];
 
 			const float considered_positional_speed = settings.speed / (sqrt(cache.positional_slowdown_multiplier));
 			const float considered_rotational_speed = settings.speed / (sqrt(cache.rotational_slowdown_multiplier));

@@ -662,7 +662,7 @@ void perform_transfer(
 		sound_existence_input sound;
 		sound.delete_entity_after_effect_lifetime = true;
 		sound.direct_listener = previous_slot_container.get_owning_transfer_capability();
-		sound.effect = cosmos.get_global_assets().item_throw_sound;
+		sound.effect = cosmos.get_common_assets().item_throw_sound;
 
 		sound.create_sound_effect_entity(
 			step,

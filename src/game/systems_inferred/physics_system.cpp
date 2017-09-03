@@ -47,27 +47,27 @@ bool physics_system::is_inferred_state_created_for_joint(const const_entity_hand
 }
 
 rigid_body_cache& physics_system::get_rigid_body_cache(const entity_id id) {
-	return rigid_body_caches[make_cache_id(id)];
+	return rigid_body_caches[linear_cache_key(id)];
 }
 
 colliders_cache& physics_system::get_colliders_cache(const entity_id id) {
-	return colliders_caches[make_cache_id(id)];
+	return colliders_caches[linear_cache_key(id)];
 }
 
 joint_cache& physics_system::get_joint_cache(const entity_id id) {
-	return joint_caches[make_cache_id(id)];
+	return joint_caches[linear_cache_key(id)];
 }
 
 const rigid_body_cache& physics_system::get_rigid_body_cache(const entity_id id) const {
-	return rigid_body_caches[make_cache_id(id)];
+	return rigid_body_caches[linear_cache_key(id)];
 }
 
 const colliders_cache& physics_system::get_colliders_cache(const entity_id id) const {
-	return colliders_caches[make_cache_id(id)];
+	return colliders_caches[linear_cache_key(id)];
 }
 
 const joint_cache& physics_system::get_joint_cache(const entity_id id) const {
-	return joint_caches[make_cache_id(id)];
+	return joint_caches[linear_cache_key(id)];
 }
 
 void physics_system::destroy_inferred_state_of(const const_entity_handle handle) {
@@ -304,11 +304,11 @@ b2Fixture_index_in_component physics_system::get_index_in_component(
 	b2Fixture_index_in_component result;
 	result.convex_shape_index = static_cast<std::size_t>(f->index_in_component);
 
-	ensure_eq(f, colliders_caches[make_cache_id(handle)].all_fixtures_in_component[result.convex_shape_index]);
+	ensure_eq(f, colliders_caches[linear_cache_key(handle)].all_fixtures_in_component[result.convex_shape_index]);
 
 	return result;
 
-	//const auto this_cache_id = make_cache_id(handle);
+	//const auto this_cache_id = linear_cache_key(handle);
 	//const auto& cache = colliders_caches[this_cache_id];
 	//const auto& all = cache.all_fixtures_in_component;
 	//
@@ -621,7 +621,7 @@ physics_system& physics_system::operator=(const physics_system& b) {
 	migrate_pointer(migrated_b2World.m_bodyList);
 
 	for (b2Body* b = migrated_b2World.m_bodyList; b; b = b->m_next) {
-		//auto rigid_body_cache_id = make_cache_id(b->m_userData);
+		//auto rigid_body_cache_id = linear_cache_key(b->m_userData);
 		//rigid_body_caches[rigid_body_cache_id].body = b;
 
 		migrate_pointer(b->m_fixtureList);

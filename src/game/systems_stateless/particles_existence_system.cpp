@@ -231,7 +231,7 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 
 	for (const auto& e : exhausted_casts) {
 		particles_existence_input burst;
-		burst.effect = cosmos.get_global_assets().exhausted_smoke_particles;
+		burst.effect = cosmos.get_common_assets().exhausted_smoke_particles;
 
 		burst.create_particle_effect_entity(
 			step,

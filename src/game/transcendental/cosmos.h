@@ -242,11 +242,11 @@ public:
 	void set_fixed_delta(const augs::delta&);
 	void set_fixed_delta(const unsigned steps_per_second);
 
-	cosmos_global_state& get_global_state();
-	const cosmos_global_state& get_global_state() const;
+	cosmos_common_state& get_common_state();
+	const cosmos_common_state& get_common_state() const;
 
-	global_assets& get_global_assets();
-	const global_assets& get_global_assets() const;
+	common_assets& get_common_assets();
+	const common_assets& get_common_assets() const;
 
 	/* saving procedure is not const due to possible reinference of the universe */
 	void save_to_file(const augs::path_type&);
@@ -303,20 +303,20 @@ inline entity_guid cosmos::get_guid(const const_entity_handle handle) const {
 }
 #endif
 
-inline cosmos_global_state& cosmos::get_global_state() {
+inline cosmos_common_state& cosmos::get_common_state() {
 	return significant.meta.global;
 }
 
-inline const cosmos_global_state& cosmos::get_global_state() const {
+inline const cosmos_common_state& cosmos::get_common_state() const {
 	return significant.meta.global;
 }
 
-inline global_assets& cosmos::get_global_assets() {
-	return get_global_state().assets;
+inline common_assets& cosmos::get_common_assets() {
+	return get_common_state().assets;
 }
 
-inline const global_assets& cosmos::get_global_assets() const {
-	return get_global_state().assets;
+inline const common_assets& cosmos::get_common_assets() const {
+	return get_common_state().assets;
 }
 
 inline std::unordered_set<entity_id> cosmos::get_entities_by_name(const entity_name_type& name) const {

@@ -33,7 +33,7 @@ decltype(auto) visit_by_vertical_index(
 
 		return visit_gettable(sentience.meters, id, 
 			[&cosm, &meter_callback](const auto& meter){
-				return meter_callback(meter, get_meta_of(meter, cosm.get_global_state().meters));
+				return meter_callback(meter, get_meta_of(meter, cosm.get_common_state().meters));
 			}
 		);
 	}
@@ -44,7 +44,7 @@ decltype(auto) visit_by_vertical_index(
 
 		return visit_gettable(sentience.perks, id, 
 			[&cosm, &perk_callback](const auto& perk){
-				return perk_callback(perk, get_meta_of(perk, cosm.get_global_state().perks));
+				return perk_callback(perk, get_meta_of(perk, cosm.get_common_state().perks));
 			}
 		);
 	}
@@ -75,7 +75,7 @@ std::wstring value_bar::get_description_for_hover(
 	const const_this_pointer self
 ) {
 	const auto& cosmos = context.get_cosmos();
-	const auto& metas = cosmos.get_global_state();
+	const auto& metas = cosmos.get_common_state();
 	const auto& sentience = context.get_subject_entity().get<components::sentience>();
 
 	return visit_by_vertical_index(
@@ -293,7 +293,7 @@ assets::game_image_id value_bar::get_bar_icon(
 	const const_this_pointer this_id
 ) {
 	const auto& cosmos = context.get_cosmos();
-	const auto& metas = cosmos.get_global_state();
+	const auto& metas = cosmos.get_common_state();
 	const auto& sentience = context.get_subject_entity().get<components::sentience>();
 
 	return visit_by_vertical_index(
@@ -311,7 +311,7 @@ rgba value_bar::get_bar_col(
 	const const_this_pointer this_id
 ) {
 	const auto& cosmos = context.get_cosmos();
-	const auto& metas = cosmos.get_global_state();
+	const auto& metas = cosmos.get_common_state();
 	const auto& sentience = context.get_subject_entity().get<components::sentience>();
 
 	return 

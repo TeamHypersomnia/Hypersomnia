@@ -501,7 +501,7 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 							sentience.spells,
 							bound_spell,
 							[&](const auto& spell) {
-								const auto& spell_data = get_meta_of(spell, cosmos.get_global_state().spells);
+								const auto& spell_data = get_meta_of(spell, cosmos.get_common_state().spells);
 
 								return text::from_bbcode(
 									get_bbcoded_spell_description(

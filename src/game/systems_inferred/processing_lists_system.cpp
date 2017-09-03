@@ -13,7 +13,7 @@ processing_lists_system::processing_lists_system() {
 }
 
 void processing_lists_system::destroy_inferred_state_of(const const_entity_handle handle) {
-	const auto index = make_cache_id(handle);
+	const auto index = linear_cache_key(handle);
 
 	if (per_entity_cache[index].is_constructed) {
 		for (auto& list : lists) {
@@ -29,7 +29,7 @@ void processing_lists_system::create_inferred_state_for(const const_entity_handl
 		return;
 	}
 
-	const auto index = make_cache_id(handle);
+	const auto index = linear_cache_key(handle);
 	
 	ensure(!per_entity_cache[index].is_constructed);
 

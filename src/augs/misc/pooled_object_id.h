@@ -23,6 +23,10 @@ namespace augs {
 	struct unversioned_id {
 		int indirection_index = -1;
 
+		bool is_set() const {
+			return *this != unversioned_id();
+		}
+
 		template<class B>
 		bool operator==(const B& b) const {
 			return indirection_index == b.indirection_index;

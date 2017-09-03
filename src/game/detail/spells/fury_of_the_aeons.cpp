@@ -12,7 +12,7 @@ bool fury_of_the_aeons_instance::are_additional_conditions_for_casting_fulfilled
 }
 
 void fury_of_the_aeons_instance::perform_logic(const spell_logic_input in) {
-	const auto& spell_data = std::get<fury_of_the_aeons>(in.subject.get_cosmos().get_global_state().spells);
+	const auto& spell_data = std::get<fury_of_the_aeons>(in.subject.get_cosmos().get_common_state().spells);
 	const auto caster_transform = in.subject.get_logic_transform();
 
 	ignite_cast_sparkles(spell_data, in.step, caster_transform, in.subject);

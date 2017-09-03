@@ -2,7 +2,7 @@
 #include "augs/misc/stepped_timing.h"
 #include "augs/misc/trivially_copyable_tuple.h"
 
-#include "game/transcendental/cosmos_global_state.h"
+#include "game/transcendental/cosmos_common_state.h"
 
 namespace augs {
 	struct introspection_access;
@@ -20,7 +20,7 @@ class cosmos_metadata {
 	entity_guid next_entity_guid = 1;
 #endif
 public:
-	cosmos_global_state global;
+	cosmos_common_state global;
 	// END GEN INTROSPECTOR
 };
 
