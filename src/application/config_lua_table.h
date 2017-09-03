@@ -20,7 +20,7 @@
 #include "augs/audio/audio_settings.h"
 #include "game/transcendental/simulation_receiver_settings.h"
 #include "game/view/debug_drawing_settings.h"
-#include "game/detail/gui/hotbar_settings.h"
+#include "game/view/game_gui/elements/hotbar_settings.h"
 #include "game/view/audiovisual_state/systems/interpolation_settings.h"
 #include "application/debug_settings.h"
 #include "application/session_settings.h"

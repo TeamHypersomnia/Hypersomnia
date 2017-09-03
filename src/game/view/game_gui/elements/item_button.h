@@ -9,7 +9,7 @@
 #include "augs/pad_bytes.h"
 
 #include "game_gui_context.h"
-#include "game/detail/gui/game_gui_context.h"
+#include "game/view/game_gui/elements/game_gui_context.h"
 
 struct item_button : game_gui_rect_node {
 	using base = game_gui_rect_node;

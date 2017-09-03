@@ -2,17 +2,17 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
 
-#include "game/detail/gui/item_button.h"
+#include "game/view/game_gui/elements/item_button.h"
 
 #include "game/detail/inventory/inventory_slot.h"
 #include "game/detail/inventory/inventory_utils.h"
-#include "game/detail/gui/game_gui_root.h"
-#include "game/detail/gui/character_gui.h"
+#include "game/view/game_gui/elements/game_gui_root.h"
+#include "game/view/game_gui/elements/character_gui.h"
 
 #include "game/components/item_component.h"
 #include "game/components/item_slot_transfers_component.h"
 
-#include "game/view/audiovisual_state/systems/game_gui_system.h"
+#include "game/view/game_gui/game_gui_system.h"
 
 #include "pixel_line_connector.h"
 #include "augs/templates/string_templates.h"

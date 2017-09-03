@@ -1,10 +1,11 @@
 #pragma once
-#include "game/transcendental/entity_handle_declaration.h"
-#include "game/detail/gui/hotbar_settings.h"
-#include "game/enums/input_context_enums.h"
-#include "augs/math/camera_cone.h"
-#include "augs/graphics/vertex.h"
 #include "augs/misc/basic_input_context.h"
+
+#include "augs/math/camera_cone.h"
+#include "augs/drawing/drawing.h"
+
+#include "game/enums/input_context_enums.h"
+#include "game/view/game_gui/elements/hotbar_settings.h"
 
 class interpolation_system;
 struct aabb_highlighter;

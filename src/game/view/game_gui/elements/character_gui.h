@@ -14,10 +14,10 @@
 
 #include "game/container_sizes.h"
 #include "game/transcendental/entity_id.h"
-#include "game/detail/gui/drag_and_drop_target_drop_item.h"
-#include "game/detail/gui/hotbar_button.h"
-#include "game/detail/gui/action_button.h"
-#include "game/detail/gui/value_bar.h"
+#include "game/view/game_gui/elements/drag_and_drop_target_drop_item.h"
+#include "game/view/game_gui/elements/hotbar_button.h"
+#include "game/view/game_gui/elements/action_button.h"
+#include "game/view/game_gui/elements/value_bar.h"
 #include "augs/templates/container_templates.h"
 
 struct wielding_result;

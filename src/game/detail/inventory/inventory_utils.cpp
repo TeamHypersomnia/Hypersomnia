@@ -10,7 +10,7 @@
 #include "game/components/name_component.h"
 #include "game/components/motor_joint_component.h"
 #include "game/components/sound_existence_component.h"
-#include "game/detail/gui/character_gui.h"
+#include "game/view/game_gui/elements/character_gui.h"
 #include "game/detail/entity_scripts.h"
 #include "game/messages/queue_destruction.h"
 #include "game/messages/item_picked_up_message.h"
@@ -20,7 +20,7 @@
 #include "augs/ensure.h"
 #include "game/transcendental/logic_step.h"
 #include "augs/templates/string_templates.h"
-#include "game/detail/gui/gui_positioning.h"
+#include "game/view/game_gui/elements/gui_positioning.h"
 
 
 #include "game/transcendental/data_living_one_step.h"

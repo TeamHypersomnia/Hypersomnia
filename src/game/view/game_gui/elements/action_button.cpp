@@ -1,7 +1,7 @@
 #include "action_button.h"
-#include "game/detail/gui/game_gui_context.h"
+#include "game/view/game_gui/elements/game_gui_context.h"
 #include "game/transcendental/cosmos.h"
-#include "game/view/audiovisual_state/systems/game_gui_system.h"
+#include "game/view/game_gui/game_gui_system.h"
 #include "game/components/sentience_component.h"
 #include "game/assets/all_assets.h"
 

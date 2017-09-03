@@ -14,7 +14,7 @@
 #include "game/view/rendering_scripts/rendering_scripts.h"
 #include "game/view/rendering_scripts/illuminated_rendering.h"
 
-#include "game/detail/gui/character_gui.h"
+#include "game/view/game_gui/elements/character_gui.h"
 #include "game/components/item_slot_transfers_component.h"
 #include "game/components/render_component.h"
 #include "game/view/audiovisual_state/audiovisual_state.h"

@@ -22,7 +22,7 @@
 
 #include "game/detail/physics/physics_scripts.h"
 #include "game/detail/inventory/inventory_slot_handle.h"
-#include "game/detail/gui/gui_positioning.h"
+#include "game/view/game_gui/elements/gui_positioning.h"
 
 #include "game/enums/rigid_body_type.h"
 

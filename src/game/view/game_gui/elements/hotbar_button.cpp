@@ -1,15 +1,15 @@
 #include "hotbar_button.h"
 #include "augs/gui/button_corners.h"
 #include "game/transcendental/cosmos.h"
-#include "game/detail/gui/item_button.h"
+#include "game/view/game_gui/elements/item_button.h"
 #include "game/components/item_component.h"
-#include "game/detail/gui/character_gui.h"
+#include "game/view/game_gui/elements/character_gui.h"
 #include "augs/gui/button_corners.h"
 #include "augs/gui/text/printer.h"
-#include "game/detail/gui/drag_and_drop.h"
-#include "game/view/audiovisual_state/systems/game_gui_system.h"
+#include "game/view/game_gui/elements/drag_and_drop.h"
+#include "game/view/game_gui/game_gui_system.h"
 
-#include "game/detail/gui/hotbar_settings.h"
+#include "game/view/game_gui/elements/hotbar_settings.h"
 
 using namespace augs::gui::text;
 using namespace augs::gui;

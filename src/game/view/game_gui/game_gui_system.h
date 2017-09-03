@@ -3,11 +3,11 @@
 #include <map>
 #include <array>
 
-#include "game/detail/gui/game_gui_context.h"
+#include "game/view/game_gui/elements/game_gui_context.h"
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/transcendental/cosmic_entropy.h"
 #include "augs/graphics/renderer.h"
-#include "game/detail/gui/game_gui_root.h"
+#include "game/view/game_gui/elements/game_gui_root.h"
 
 struct character_gui;
 

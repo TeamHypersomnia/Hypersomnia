@@ -14,7 +14,7 @@
 #include "game/components/item_slot_transfers_component.h"
 #include "game/components/fixtures_component.h"
 #include "game/components/sentience_component.h"
-#include "game/detail/gui/character_gui.h"
+#include "game/view/game_gui/elements/character_gui.h"
 
 #include "game/detail/inventory/inventory_utils.h"
 #include "game/detail/inventory/inventory_slot.h"

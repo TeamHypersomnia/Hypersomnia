@@ -5,7 +5,7 @@
 #include "game/enums/input_context_enums.h"
 
 #include "game/detail/visible_entities.h"
-#include "game/detail/gui/hotbar_settings.h"
+#include "game/view/game_gui/elements/hotbar_settings.h"
 
 #include "game/transcendental/entity_id.h"
 #include "game/view/game_drawing_settings.h"

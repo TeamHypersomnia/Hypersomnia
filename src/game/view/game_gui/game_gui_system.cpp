@@ -6,10 +6,10 @@
 #include "game/detail/inventory/inventory_slot_handle.h"
 #include "game/detail/inventory/inventory_utils.h"
 
-#include "game/detail/gui/game_gui_element_location.h"
-#include "game/detail/gui/character_gui.h"
-#include "game/detail/gui/slot_button.h"
-#include "game/detail/gui/item_button.h"
+#include "game/view/game_gui/elements/game_gui_element_location.h"
+#include "game/view/game_gui/elements/character_gui.h"
+#include "game/view/game_gui/elements/slot_button.h"
+#include "game/view/game_gui/elements/item_button.h"
 
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
@@ -19,7 +19,7 @@
 #include "game/components/item_component.h"
 #include "game/messages/item_picked_up_message.h"
 
-#include "game/view/audiovisual_state/systems/game_gui_system.h"
+#include "game/view/game_gui/game_gui_system.h"
 
 static char intent_to_hotbar_index(const intent_type type) {
 	switch (type) {

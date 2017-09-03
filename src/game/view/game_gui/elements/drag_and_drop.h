@@ -5,7 +5,7 @@
 #include "augs/gui/dereferenced_location.h"
 #include "game/detail/inventory/item_transfer_result.h"
 #include "game/detail/inventory/item_slot_transfer_request.h"
-#include "game/detail/gui/item_button.h"
+#include "game/view/game_gui/elements/item_button.h"
 #include "game/detail/inventory/inventory_utils.h"
 
 struct unfinished_drag_of_item {

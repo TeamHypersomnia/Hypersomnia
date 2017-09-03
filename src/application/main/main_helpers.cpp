@@ -1,4 +1,4 @@
-#include "game/view/audiovisual_state/systems/game_gui_system.h"
+#include "game/view/game_gui/game_gui_system.h"
 #include "application/main/main_helpers.h"
 #include "application/main/release_flags.h"
 

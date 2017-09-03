@@ -10,9 +10,9 @@
 #include "game/enums/input_context_enums.h"
 #include "game/transcendental/entity_handle.h"
 
-#include "game/detail/gui/game_gui_context_dependencies.h"
-#include "game/detail/gui/game_gui_element_location.h"
-#include "game/detail/gui/viewing_game_gui_context_dependencies.h"
+#include "game/view/game_gui/elements/game_gui_context_dependencies.h"
+#include "game/view/game_gui/elements/game_gui_element_location.h"
+#include "game/view/game_gui/elements/viewing_game_gui_context_dependencies.h"
 
 class game_gui_root;
 class game_gui_system;

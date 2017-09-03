@@ -3,7 +3,7 @@
 #include "augs/gui/appearance_detector.h"
 #include "augs/gui/button_corners.h"
 
-#include "game/detail/gui/game_gui_context.h"
+#include "game/view/game_gui/elements/game_gui_context.h"
 
 using button_corners_info = basic_button_corners_info<assets::necessary_image_id>;
 

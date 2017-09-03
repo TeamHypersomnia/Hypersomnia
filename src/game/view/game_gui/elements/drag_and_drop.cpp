@@ -2,8 +2,8 @@
 #include "slot_button.h"
 #include "item_button.h"
 #include "game/detail/inventory/item_slot_transfer_request.h"
-#include "game/detail/gui/grid.h"
-#include "game/detail/gui/character_gui.h"
+#include "game/view/game_gui/elements/grid.h"
+#include "game/view/game_gui/elements/character_gui.h"
 #include "game/components/item_component.h"
 #include "game/detail/inventory/inventory_utils.h"
 #include "game/transcendental/cosmos.h"
@@ -11,8 +11,8 @@
 #include "game/transcendental/logic_step.h"
 #include "augs/ensure.h"
 #include "augs/templates/string_templates.h"
-#include "game/detail/gui/game_gui_context.h"
-#include "game/view/audiovisual_state/systems/game_gui_system.h"
+#include "game/view/game_gui/elements/game_gui_context.h"
+#include "game/view/game_gui/game_gui_system.h"
 
 void drag_and_drop_callback(
 	game_gui_context context, 

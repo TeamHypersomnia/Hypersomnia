@@ -9,9 +9,9 @@
 #include "game/detail/particle_types.h"
 
 #include "game/view/audiovisual_state/aabb_highlighter.h"
-#include "game/detail/gui/character_gui.h"
-#include "game/detail/gui/item_button.h"
-#include "game/detail/gui/slot_button.h"
+#include "game/view/game_gui/elements/character_gui.h"
+#include "game/view/game_gui/elements/item_button.h"
+#include "game/view/game_gui/elements/slot_button.h"
 #include "game/view/audiovisual_state/world_camera.h"
 
 #include "game/view/audiovisual_state/world_camera.h"
