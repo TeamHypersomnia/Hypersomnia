@@ -2,8 +2,8 @@
 
 #include "game/enums/party_category.h"
 
-#include "game/hardcoded_content/test_scenes/ingredients/ingredients.h"
-#include "game/hardcoded_content/test_scenes/test_scenes_content.h"
+#include "test_scenes/ingredients/ingredients.h"
+#include "test_scenes/test_scenes_content.h"
 
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/types_specification/all_component_includes.h"
@@ -15,7 +15,6 @@
 namespace test_scenes {
 	void minimal_scene::populate(const logic_step step) {
 		auto& world = step.cosm;
-		world.set_fixed_delta(60);
 
 		//prefabs::create_force_grenade(step, { 254, 611 });
 		//prefabs::create_force_grenade(step, { 254, 711 });

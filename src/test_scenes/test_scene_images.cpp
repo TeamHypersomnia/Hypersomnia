@@ -1,5 +1,5 @@
 #include "game/assets/all_assets.h"
-#include "game/hardcoded_content/test_scenes/test_scenes_content.h"
+#include "test_scenes/test_scenes_content.h"
 
 #include "augs/filesystem/file.h"
 #include "augs/audio/sound_data.h"

@@ -1,4 +1,4 @@
-#include "game/hardcoded_content/test_scenes/test_scenes_content.h"
+#include "test_scenes/test_scenes_content.h"
 
 #include "game/assets/recoil_player.h"
 #include "game/assets/recoil_player_id.h"

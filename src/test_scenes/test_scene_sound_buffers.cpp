@@ -1,6 +1,6 @@
 #include "augs/filesystem/file.h"
 
-#include "game/hardcoded_content/test_scenes/test_scenes_content.h"
+#include "test_scenes/test_scenes_content.h"
 #include "game/assets/all_assets.h"
 
 #include "generated/introspectors.h"

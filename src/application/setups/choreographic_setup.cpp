@@ -6,8 +6,8 @@
 
 #include "game/assets/assets_manager.h"
 
-#include "game/hardcoded_content/test_scenes/scenes/testbed.h"
-#include "game/hardcoded_content/test_scenes/scenes/minimal_scene.h"
+#include "test_scenes/scenes/testbed.h"
+#include "test_scenes/scenes/minimal_scene.h"
 
 #include "game/transcendental/types_specification/all_component_includes.h"
 #include "game/view/viewing_session.h"

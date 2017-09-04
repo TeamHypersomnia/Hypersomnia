@@ -4,10 +4,10 @@
 
 #include "game/detail/visible_entities.h"
 
-#include "game/hardcoded_content/test_scenes/test_scenes_content.h"
+#include "test_scenes/test_scenes_content.h"
 
-#include "game/hardcoded_content/test_scenes/scenes/testbed.h"
-#include "game/hardcoded_content/test_scenes/scenes/minimal_scene.h"
+#include "test_scenes/scenes/testbed.h"
+#include "test_scenes/scenes/minimal_scene.h"
 
 #include "game/transcendental/logic_step.h"
 #include "game/transcendental/types_specification/all_messages_includes.h"
@@ -22,6 +22,7 @@ local_setup::local_setup(
 	const bool make_minimal_test_scene,
 	const input_recording_type recording_type
 ) {
+	hypersomnia.set_fixed_delta(60);
 #if BUILD_TEST_SCENES
 	hypersomnia.reserve_storage_for_entities(3000u);
 
@@ -89,10 +90,14 @@ void local_setup::control(
 	auto translated = context.translate(new_entropy);
 	characters.control_character_selection(translated.intents);
 
-	total_collected_entropy += cosmic_entropy(
-		get_viewed_character(),
-		translated
-	);
+	const auto viewed_character = get_viewed_character();
+
+	if (viewed_character.alive()) {
+		total_collected_entropy += cosmic_entropy(
+			viewed_character,
+			translated
+		);
+	}
 }
 
 void local_setup::accept_game_gui_events(const cosmic_entropy& events) {

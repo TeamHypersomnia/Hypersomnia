@@ -1,9 +1,9 @@
 #include "game/assets/game_image_id.h"
 #include "game/assets/all_assets.h"
 
-#include "game/hardcoded_content/test_scenes/scenes/testbed.h"
-#include "game/hardcoded_content/test_scenes/ingredients/ingredients.h"
-#include "game/hardcoded_content/test_scenes/test_scenes_content.h"
+#include "test_scenes/scenes/testbed.h"
+#include "test_scenes/ingredients/ingredients.h"
+#include "test_scenes/test_scenes_content.h"
 
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/types_specification/all_component_includes.h"
@@ -27,7 +27,6 @@
 namespace test_scenes {
 	void testbed::populate(const logic_step step) {
 		auto& world = step.cosm;
-		world.set_fixed_delta(60);
 		const auto& metas = step.input.logical_assets;
 		
 		//const auto crate = prefabs::create_crate(step, vec2(200, 200 + 300), vec2i(100, 100) / 3);

@@ -24,9 +24,9 @@
 
 #include "game/detail/visible_entities.h"
 
-#include "game/hardcoded_content/test_scenes/test_scenes_content.h"
-#include "game/hardcoded_content/test_scenes/scenes/testbed.h"
-#include "game/hardcoded_content/test_scenes/scenes/minimal_scene.h"
+#include "test_scenes/test_scenes_content.h"
+#include "test_scenes/scenes/testbed.h"
+#include "test_scenes/scenes/minimal_scene.h"
 
 #include "application/config_lua_table.h"
 
@@ -126,6 +126,7 @@ main_menu_setup::main_menu_setup(const main_menu_settings settings) : menu_theme
 	const bool is_intro_scene_available = settings.menu_intro_scene_cosmos_path.string().size() > 0;
 
 	if (is_intro_scene_available) {
+		intro_scene.set_fixed_delta(60);
 #if BUILD_TEST_SCENES
 		intro_scene.reserve_storage_for_entities(3000u);
 

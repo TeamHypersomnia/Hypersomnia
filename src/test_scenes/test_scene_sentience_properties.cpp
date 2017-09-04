@@ -1,4 +1,4 @@
-#include "game/hardcoded_content/test_scenes/test_scenes_content.h"
+#include "test_scenes/test_scenes_content.h"
 #include "game/detail/spells/spell_structs.h"
 #include "game/transcendental/cosmos.h"
 
