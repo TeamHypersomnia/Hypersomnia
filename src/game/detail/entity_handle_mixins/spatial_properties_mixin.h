@@ -1,14 +1,14 @@
 #pragma once
-#include "game/transcendental/entity_handle_declaration.h"
-#include "game/components/transform_component.h"
 #include "augs/build_settings/platform_defines.h"
 
+#include "game/transcendental/entity_handle_declaration.h"
+
+#include "game/components/transform_component.h"
 #include "game/components/polygon_component.h"
 #include "game/components/sprite_component.h"
 #include "game/components/particles_existence_component.h"
 #include "game/components/wandering_pixels_component.h"
 
-class interpolation_system;
 class all_logical_assets;
 
 template <bool is_const, class entity_handle_type>
@@ -16,7 +16,29 @@ class basic_spatial_properties_mixin {
 public:
 	bool has_logic_transform() const;
 	components::transform get_logic_transform() const;
-	components::transform get_viewing_transform(const interpolation_system& sys, const bool integerize = false) const;
+
+	template <class interpolation_system_type>
+	components::transform get_viewing_transform(const interpolation_system_type& sys, const bool integerize = false) const {
+		const auto handle = *static_cast<const entity_handle_type*>(this);
+
+		const auto& owner = handle.get_owner_body();
+
+		if (owner.alive() && owner.has<components::interpolation>() && owner != handle) {
+			auto in = sys.get_interpolated(owner);
+
+			if (integerize) {
+				in.pos.discard_fract();
+			}
+
+			return components::fixtures::transform_around_body(handle, in);
+		}
+		else if (handle.has<components::interpolation>()) {
+			return sys.get_interpolated(handle);
+		}
+
+		return handle.get_logic_transform();
+	}
+	
 	vec2 get_effective_velocity() const;
 
 	ltrb get_aabb() const {
@@ -24,7 +46,8 @@ public:
 		return get_aabb(handle.get_logic_transform());
 	}
 
-	ltrb get_aabb(const interpolation_system& interp) const {
+	template <class interpolation_system_type>
+	ltrb get_aabb(const interpolation_system_type& interp) const {
 		const auto handle = *static_cast<const entity_handle_type*>(this);
 
 		return get_aabb(handle.get_viewing_transform(interp, true));

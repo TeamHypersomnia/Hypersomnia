@@ -1,9 +1,12 @@
-#include "world_camera.h"
+#include "game/view/audiovisual_state/world_camera.h"
+#include "augs/misc/delta.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
 #include "game/components/rigid_body_component.h"
 #include "game/components/crosshair_component.h"
-#include "augs/misc/delta.h"
+#include "game/components/interpolation_component.h"
+#include "game/components/fixtures_component.h"
+#include "game/view/audiovisual_state/systems/interpolation_system.h"
 
 void world_camera::tick(
 	const vec2i screen_size,

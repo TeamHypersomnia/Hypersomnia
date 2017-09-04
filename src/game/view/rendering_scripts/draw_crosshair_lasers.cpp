@@ -9,6 +9,10 @@
 #include "game/enums/filters.h"
 #include "game/detail/entity_scripts.h"
 
+#include "game/components/interpolation_component.h"
+#include "game/components/fixtures_component.h"
+#include "game/view/audiovisual_state/systems/interpolation_system.h"
+
 void draw_crosshair_lasers(const draw_crosshair_lasers_input in) {
 	if (in.crosshair.alive()) {
 		const auto& cosmos = in.crosshair.get_cosmos();

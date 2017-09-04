@@ -1,6 +1,5 @@
 #include "processing_lists_system.h"
 #include "game/components/force_joint_component.h"
-#include "game/view/game_gui/elements/character_gui.h"
 
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"

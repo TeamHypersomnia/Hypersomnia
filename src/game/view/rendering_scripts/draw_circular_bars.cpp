@@ -10,6 +10,10 @@
 #include "augs/gui/text/printer.h"
 #include "augs/image/font.h"
 
+#include "game/components/interpolation_component.h"
+#include "game/components/fixtures_component.h"
+#include "game/view/audiovisual_state/systems/interpolation_system.h"
+
 using namespace augs::gui::text;
 
 augs::vertex_triangle_buffer draw_circular_bars_and_get_textual_info(const draw_circular_bars_input in) {

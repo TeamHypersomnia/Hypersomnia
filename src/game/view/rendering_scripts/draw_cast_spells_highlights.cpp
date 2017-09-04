@@ -3,6 +3,9 @@
 #include "augs/templates/visit_gettable.h"
 #include "game/transcendental/cosmos.h"
 #include "game/components/sprite_component.h"
+#include "game/components/interpolation_component.h"
+#include "game/components/fixtures_component.h"
+#include "game/view/audiovisual_state/systems/interpolation_system.h"
 
 void draw_cast_spells_highlights(const draw_cast_spells_highlights_input in) {
 	const auto& cosm = in.cosm;

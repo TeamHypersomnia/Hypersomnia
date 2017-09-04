@@ -1,11 +1,13 @@
 #pragma once
-#include "augs/misc/pooled_object_id.h"
-#include "game/transcendental/entity_id.h"
-#include "game/transcendental/entity_handle_declaration.h"
 #include <vector>
 
-#include "game/components/transform_component.h"
 #include "augs/misc/delta.h"
+#include "augs/misc/pooled_object_id.h"
+
+#include "game/transcendental/entity_id.h"
+#include "game/transcendental/entity_handle_declaration.h"
+
+#include "game/components/transform_component.h"
 
 struct interpolation_settings;
 

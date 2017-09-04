@@ -5,6 +5,9 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/components/render_component.h"
 #include "game/systems_stateless/render_system.h"
+#include "game/components/interpolation_component.h"
+#include "game/components/fixtures_component.h"
+#include "game/view/audiovisual_state/systems/interpolation_system.h"
 
 void pure_color_highlight_system::add(const highlight::input new_in) {
 	bool found = false;

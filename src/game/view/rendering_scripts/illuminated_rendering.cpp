@@ -20,6 +20,10 @@
 #include "game/view/audiovisual_state/audiovisual_state.h"
 #include "game/debug_drawing_settings.h"
 
+#include "game/components/interpolation_component.h"
+#include "game/components/fixtures_component.h"
+#include "game/view/audiovisual_state/systems/interpolation_system.h"
+
 #include "augs/drawing/drawing.h"
 #include "augs/graphics/shader.h"
 

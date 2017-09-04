@@ -18,6 +18,8 @@
 #include "game/systems_stateless/visibility_system.h"
 #include "game/systems_stateless/render_system.h"
 
+#include "game/components/interpolation_component.h"
+#include "game/components/fixtures_component.h"
 #include "game/view/audiovisual_state/systems/interpolation_system.h"
 #include "game/view/audiovisual_state/systems/particles_simulation_system.h"
 

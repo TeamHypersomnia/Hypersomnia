@@ -13,7 +13,6 @@
 #include "game/components/all_inferred_state_component.h"
 
 #include "spatial_properties_mixin.h"
-#include "game/view/audiovisual_state/systems/interpolation_system.h"
 #include "augs/drawing/drawing.h"
 
 template <bool C, class D>
@@ -95,28 +94,6 @@ vec2 basic_spatial_properties_mixin<C, D>::get_effective_velocity() const {
 	}
 	
 	return{};
-}
-
-template <bool C, class D>
-components::transform basic_spatial_properties_mixin<C, D>::get_viewing_transform(const interpolation_system& sys, const bool integerize) const {
-	const auto handle = *static_cast<const D*>(this);
-
-	const auto& owner = handle.get_owner_body();
-
-	if (owner.alive() && owner.has<components::interpolation>() && owner != handle) {
-		auto in = sys.get_interpolated(owner);
-
-		if (integerize) {
-			in.pos.discard_fract();
-		}
-
-		return components::fixtures::transform_around_body(handle, in);
-	}
-	else if (handle.has<components::interpolation>()) {
-		return sys.get_interpolated(handle);
-	}
-
-	return handle.get_logic_transform();
 }
 
 template <class D>

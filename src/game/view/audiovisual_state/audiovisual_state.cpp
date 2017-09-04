@@ -1,5 +1,7 @@
 #include "augs/templates/string_templates.h"
+#include "game/components/interpolation_component.h"
 #include "game/components/flags_component.h"
+#include "game/components/fixtures_component.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/logic_step.h"
 #include "game/transcendental/cosmos.h"
@@ -9,6 +11,7 @@
 #include "game/messages/interpolation_correction_request.h"
 
 #include "game/view/audiovisual_state/audiovisual_state.h"
+#include "game/view/audiovisual_state/systems/interpolation_system.h"
 
 void audiovisual_state::reserve_caches_for_entities(const std::size_t n) {
 	systems.for_each([n](auto& sys) {
