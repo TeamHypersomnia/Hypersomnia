@@ -15,7 +15,7 @@
 #include "game/assets/all_assets.h"
 
 #include "game/transcendental/types_specification/all_component_includes.h"
-#include "game/transcendental/step_packaged_for_network.h"
+#include "game/view/network/step_packaged_for_network.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/logic_step.h"
 #include "game/transcendental/cosmic_movie_director.h"

@@ -8,7 +8,7 @@
 #include "game/transcendental/types_specification/all_component_includes.h"
 #include "game/view/viewing_session.h"
 
-#include "game/transcendental/network_commands.h"
+#include "game/view/network/network_commands.h"
 #include "game/transcendental/cosmic_delta.h"
 #include "game/transcendental/logic_step.h"
 #include "game/transcendental/data_living_one_step.h"

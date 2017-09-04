@@ -7,7 +7,7 @@
 #include "augs/network/network_server.h"
 #include "augs/misc/jitter_buffer.h"
 
-#include "game/transcendental/step_packaged_for_network.h"
+#include "game/view/network/step_packaged_for_network.h"
 #include "game/transcendental/cosmos.h"
 
 #include "setup_base.h"

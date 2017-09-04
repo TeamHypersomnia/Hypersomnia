@@ -1,9 +1,12 @@
 #pragma once
-#include "step_packaged_for_network.h"
-#include "augs/misc/jitter_buffer.h"
-#include "game/components/transform_component.h"
 #include <unordered_set>
-#include "game/transcendental/simulation_receiver_settings.h"
+
+#include "augs/misc/jitter_buffer.h"
+
+#include "game/view/network/step_packaged_for_network.h"
+#include "game/view/network/simulation_receiver_settings.h"
+
+#include "game/components/transform_component.h"
 
 namespace augs {
 	namespace network {

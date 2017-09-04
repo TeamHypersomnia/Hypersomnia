@@ -10,7 +10,7 @@
 
 #include "game/transcendental/types_specification/all_component_includes.h"
 #include "game/view/viewing_session.h"
-#include "game/transcendental/simulation_broadcast.h"
+#include "game/view/network/simulation_broadcast.h"
 #include "game/transcendental/cosmic_delta.h"
 
 #include "augs/misc/debug_entropy_player.h"
@@ -18,7 +18,7 @@
 #include "augs/filesystem/file.h"
 
 #include "server_setup.h"
-#include "game/transcendental/network_commands.h"
+#include "game/view/network/network_commands.h"
 
 #include "augs/network/reliable_channel.h"
 

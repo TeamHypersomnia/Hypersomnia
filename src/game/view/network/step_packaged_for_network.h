@@ -1,6 +1,6 @@
 #pragma once
 #include "augs/misc/streams.h"
-#include "cosmic_entropy.h"
+#include "game/transcendental/cosmic_entropy.h"
 
 struct step_packaged_for_network {
 	enum class type : unsigned char {

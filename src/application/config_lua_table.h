@@ -18,7 +18,7 @@
 #include "augs/misc/basic_input_context.h"
 #include "augs/window_framework/window_settings.h"
 #include "augs/audio/audio_settings.h"
-#include "game/transcendental/simulation_receiver_settings.h"
+#include "game/view/network/simulation_receiver_settings.h"
 #include "game/debug_drawing_settings.h"
 #include "game/view/game_gui/elements/hotbar_settings.h"
 #include "game/view/audiovisual_state/systems/interpolation_settings.h"

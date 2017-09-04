@@ -11,7 +11,7 @@
 #include "game/view/audiovisual_state/systems/interpolation_system.h"
 #include "game/view/audiovisual_state/systems/past_infection_system.h"
 
-#include "game/transcendental/network_commands.h"
+#include "game/view/network/network_commands.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 
