@@ -4,7 +4,7 @@
 #include "augs/window_framework/platform_utils.h"
 #include "augs/window_framework/window.h"
 
-#include "game/view/necessary_resources.h"
+#include "view/necessary_resources.h"
 
 #include "application/config_lua_table.h"
 #include "application/gui/settings_gui.h"

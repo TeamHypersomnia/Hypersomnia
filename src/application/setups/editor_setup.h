@@ -3,7 +3,7 @@
 
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
-#include "game/view/debug_character_selection.h"
+#include "view/debug_character_selection.h"
 #include "augs/misc/debug_entropy_player.h"
 #include "game/assets/all_assets.h"
 #include "augs/misc/fixed_delta_timer.h"

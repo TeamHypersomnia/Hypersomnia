@@ -9,8 +9,8 @@
 #include "game/hardcoded_content/all_hardcoded_content.h"
 
 #include "game/organization/all_component_includes.h"
-#include "game/view/viewing_session.h"
-#include "game/view/network/simulation_broadcast.h"
+#include "view/viewing_session.h"
+#include "view/network/simulation_broadcast.h"
 #include "game/transcendental/cosmic_delta.h"
 
 #include "augs/misc/debug_entropy_player.h"
@@ -18,7 +18,7 @@
 #include "augs/filesystem/file.h"
 
 #include "server_setup.h"
-#include "game/view/network/network_commands.h"
+#include "view/network/network_commands.h"
 
 #include "augs/network/reliable_channel.h"
 

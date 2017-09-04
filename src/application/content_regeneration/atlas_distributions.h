@@ -1,7 +1,7 @@
 #pragma once
 #include "augs/texture_atlas/texture_atlas.h"
 #include "game/assets/assets_declarations.h"
-#include "game/view/necessary_resources.h"
+#include "view/necessary_resources.h"
 
 struct standard_atlas_distribution_input {
 	const game_image_definitions& game_image_defs;

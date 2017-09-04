@@ -3,7 +3,7 @@
 #include "augs/misc/debug_entropy_player.h"
 
 #include "game/assets/all_assets.h"
-#include "game/view/debug_character_selection.h"
+#include "view/debug_character_selection.h"
 
 #include "game/organization/all_component_includes.h"
 #include "game/transcendental/cosmos.h"

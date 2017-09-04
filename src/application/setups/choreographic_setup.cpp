@@ -10,8 +10,8 @@
 #include "test_scenes/scenes/minimal_scene.h"
 
 #include "game/organization/all_component_includes.h"
-#include "game/view/viewing_session.h"
-#include "game/view/network/step_packaged_for_network.h"
+#include "view/viewing_session.h"
+#include "view/network/step_packaged_for_network.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/logic_step.h"
 #include "game/transcendental/cosmic_movie_director.h"

@@ -3,7 +3,7 @@
 
 #include "game/transcendental/cosmos.h"
 
-#include "game/view/network/simulation_receiver.h"
+#include "view/network/simulation_receiver.h"
 
 #include "augs/misc/debug_entropy_player.h"
 #include "augs/network/network_client.h"

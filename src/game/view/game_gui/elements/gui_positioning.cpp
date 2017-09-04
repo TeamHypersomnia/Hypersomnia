@@ -1,8 +1,0 @@
-#include "gui_positioning.h"
-#include "item_button.h"
-#include "slot_button.h"
-#include "game/detail/inventory/inventory_slot_handle.h"
-#include "game/view/game_gui/elements/character_gui.h"
-#include "game/components/item_component.h"
-#include "game/components/container_component.h"
-#include "game/transcendental/cosmos.h"

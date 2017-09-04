@@ -1,4 +1,4 @@
-#include "game/view/game_gui/game_gui_system.h"
+#include "view/game_gui/game_gui_system.h"
 #include "application/main/main_helpers.h"
 #include "application/main/release_flags.h"
 

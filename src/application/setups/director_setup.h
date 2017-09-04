@@ -1,7 +1,7 @@
 #pragma once
 #include "setup_base.h"
 
-#include "game/view/debug_character_selection.h"
+#include "view/debug_character_selection.h"
 
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/cosmic_movie_director.h"

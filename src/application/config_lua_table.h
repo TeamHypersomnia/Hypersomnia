@@ -10,18 +10,18 @@
 
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/enums/input_context_enums.h"
-#include "game/view/game_drawing_settings.h"
-#include "game/view/audiovisual_state/world_camera.h"
+#include "view/game_drawing_settings.h"
+#include "view/audiovisual_state/world_camera.h"
 
 // all settings structures stored by the config
 
 #include "augs/misc/basic_input_context.h"
 #include "augs/window_framework/window_settings.h"
 #include "augs/audio/audio_settings.h"
-#include "game/view/network/simulation_receiver_settings.h"
+#include "view/network/simulation_receiver_settings.h"
 #include "game/debug_drawing_settings.h"
-#include "game/view/game_gui/elements/hotbar_settings.h"
-#include "game/view/audiovisual_state/systems/interpolation_settings.h"
+#include "view/game_gui/elements/hotbar_settings.h"
+#include "view/audiovisual_state/systems/interpolation_settings.h"
 #include "application/debug_settings.h"
 #include "application/session_settings.h"
 #include "application/content_regeneration/content_regeneration_settings.h"
