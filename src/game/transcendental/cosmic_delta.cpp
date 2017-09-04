@@ -8,7 +8,7 @@
 #include "augs/misc/pooled_object_id.h"
 
 #include "game/transcendental/cosmos.h"
-#include "game/transcendental/types_specification/all_component_includes.h"
+#include "game/organization/all_component_includes.h"
 
 #include "generated/introspectors.h"
 

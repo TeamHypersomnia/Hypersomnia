@@ -43,4 +43,4 @@
 #include "game/components/hand_fuse_component.h"
 #include "game/components/sender_component.h"
 
-#include "game/transcendental/types_specification/all_fundamental_component_includes.h"
+#include "game/organization/all_fundamental_component_includes.h"

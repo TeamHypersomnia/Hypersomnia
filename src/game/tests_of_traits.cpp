@@ -1,5 +1,5 @@
 #include "game/transcendental/cosmos.h"
-#include "game/transcendental/types_specification/all_component_includes.h"
+#include "game/organization/all_component_includes.h"
 
 #include "augs/templates/predicate_templates.h"
 #include "augs/templates/get_index_type_for_size_of.h"

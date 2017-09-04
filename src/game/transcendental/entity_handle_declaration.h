@@ -1,5 +1,5 @@
 #pragma once
-#include "game/transcendental/types_specification/all_components_declaration.h"
+#include "game/organization/all_components_declaration.h"
 
 namespace augs {
 	template <bool, class>

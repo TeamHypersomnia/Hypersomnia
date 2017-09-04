@@ -8,7 +8,7 @@
 
 #include "game/hardcoded_content/all_hardcoded_content.h"
 
-#include "game/transcendental/types_specification/all_component_includes.h"
+#include "game/organization/all_component_includes.h"
 #include "game/view/viewing_session.h"
 #include "game/view/network/simulation_broadcast.h"
 #include "game/transcendental/cosmic_delta.h"

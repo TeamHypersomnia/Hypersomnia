@@ -13,7 +13,7 @@
 #include "augs/entity_system/component_allocators_mixin.h"
 #include "augs/misc/pool_handle.h"
 #include "game/transcendental/entity_id.h"
-#include "game/transcendental/types_specification/all_components_declaration.h"
+#include "game/organization/all_components_declaration.h"
 
 #include "game/detail/entity_handle_mixins/inventory_mixin.h"
 #include "game/detail/entity_handle_mixins/physics_mixin.h"

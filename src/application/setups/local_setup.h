@@ -5,7 +5,7 @@
 #include "game/assets/all_assets.h"
 #include "game/view/debug_character_selection.h"
 
-#include "game/transcendental/types_specification/all_component_includes.h"
+#include "game/organization/all_component_includes.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 

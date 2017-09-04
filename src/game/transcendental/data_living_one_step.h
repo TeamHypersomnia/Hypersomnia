@@ -1,7 +1,7 @@
 #pragma once
 #include <unordered_map>
 
-#include "game/transcendental/types_specification/all_messages_declaration.h"
+#include "game/organization/all_messages_declaration.h"
 #include "game/messages/visibility_information.h"
 #include "augs/entity_system/storage_for_message_queues.h"
 

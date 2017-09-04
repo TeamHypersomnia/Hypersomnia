@@ -6,8 +6,8 @@
 #include "test_scenes/test_scenes_content.h"
 
 #include "game/transcendental/cosmos.h"
-#include "game/transcendental/types_specification/all_component_includes.h"
-#include "game/transcendental/types_specification/all_messages_includes.h"
+#include "game/organization/all_component_includes.h"
+#include "game/organization/all_messages_includes.h"
 
 #include "game/systems_stateless/input_system.h"
 #include "game/systems_stateless/render_system.h"

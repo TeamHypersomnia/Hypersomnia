@@ -10,7 +10,7 @@
 #include "test_scenes/scenes/minimal_scene.h"
 
 #include "game/transcendental/logic_step.h"
-#include "game/transcendental/types_specification/all_messages_includes.h"
+#include "game/organization/all_messages_includes.h"
 
 #include "application/setups/local_setup.h"
 

@@ -1,7 +1,7 @@
 #include "two_clients_and_server_setup.h"
 #include "server_setup.h"
 #include "client_setup.h"
-#include "game/transcendental/types_specification/all_component_includes.h"
+#include "game/organization/all_component_includes.h"
 
 #include "augs/window_framework/window.h"
 

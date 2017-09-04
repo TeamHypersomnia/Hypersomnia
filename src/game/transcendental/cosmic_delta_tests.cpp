@@ -5,7 +5,7 @@
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/cosmic_delta.h"
 #include "augs/templates/introspection_utils/describe_fields.h"
-#include "game/transcendental/types_specification/all_component_includes.h"
+#include "game/organization/all_component_includes.h"
 #include "augs/misc/delta_compression.h"
 #include "augs/misc/templated_readwrite.h"
 #include "generated/introspectors.h"

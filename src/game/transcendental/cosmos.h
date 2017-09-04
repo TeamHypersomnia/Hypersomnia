@@ -18,14 +18,14 @@
 #include "game/assets/behaviour_tree_id.h"
 #include "game/assets/behaviour_tree.h"
 
-#include "game/transcendental/types_specification/all_fundamental_component_includes.h"
+#include "game/organization/all_fundamental_component_includes.h"
 #include "augs/entity_system/component_aggregate.h"
 
 #include "game/transcendental/cosmic_entropy.h"
 #include "game/transcendental/profiling.h"
-#include "game/transcendental/types_specification/all_components_declaration.h"
-#include "game/transcendental/types_specification/all_messages_declaration.h"
-#include "game/transcendental/types_specification/all_inferred_systems.h"
+#include "game/organization/all_components_declaration.h"
+#include "game/organization/all_messages_declaration.h"
+#include "game/organization/all_inferred_systems.h"
 #include "game/transcendental/cosmos_structs.h"
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"

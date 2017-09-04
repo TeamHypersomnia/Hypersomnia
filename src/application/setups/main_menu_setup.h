@@ -13,7 +13,7 @@
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmic_movie_director.h"
-#include "game/transcendental/types_specification/all_component_includes.h"
+#include "game/organization/all_component_includes.h"
 
 #include "application/gui/menu/creators_screen.h"
 #include "application/gui/main_menu_gui.h"

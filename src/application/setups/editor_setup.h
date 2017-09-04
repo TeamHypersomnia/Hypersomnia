@@ -7,7 +7,7 @@
 #include "augs/misc/debug_entropy_player.h"
 #include "game/assets/all_assets.h"
 #include "augs/misc/fixed_delta_timer.h"
-#include "game/transcendental/types_specification/all_component_includes.h"
+#include "game/organization/all_component_includes.h"
 
 class editor_setup {
 public:

@@ -2,7 +2,7 @@
 
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
-#include "game/transcendental/types_specification/all_component_includes.h"
+#include "game/organization/all_component_includes.h"
 
 #include "game/view/audiovisual_state/systems/interpolation_system.h"
 #include "game/view/audiovisual_state/aabb_highlighter.h"

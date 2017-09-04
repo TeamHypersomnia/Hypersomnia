@@ -3,7 +3,7 @@
 #include "game/detail/inventory/inventory_slot_handle.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
-#include "game/transcendental/types_specification/all_component_includes.h"
+#include "game/organization/all_component_includes.h"
 #include "game/components/all_inferred_state_component.h"
 #include "game/components/guid_component.h"
 #include "game/components/child_component.h"
