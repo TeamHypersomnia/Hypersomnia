@@ -15,7 +15,7 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/detail/physics/physics_scripts.h"
 #include "game/messages/visibility_information.h"
-#include "game/view/debug_drawing_settings.h"
+#include "game/debug_drawing_settings.h"
 
 void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 	auto& cosmos = step.cosm;

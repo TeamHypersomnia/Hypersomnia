@@ -11,7 +11,7 @@
 #include "augs/math/vec2.h"
 #include "game/systems_inferred/physics_system.h"
 #include "augs/ensure.h"
-#include "game/view/debug_drawing_settings.h"
+#include "game/debug_drawing_settings.h"
 
 using P = components::rigid_body;
 

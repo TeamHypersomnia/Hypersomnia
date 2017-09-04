@@ -400,6 +400,7 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/application/main/release_flags.cpp"
 	"src/game/components/shape_polygon_component.cpp"
 	"src/game/components/shape_circle_component.cpp"
+	"src/game/debug_drawing_settings.cpp"
 )
 
 # natvis files for easier debugging in Visual Studio.

@@ -3,11 +3,11 @@
 /* Why it's global:
 	1. Debug drawing is performed in many places in the logic, even in some very modular ones (force application). 
 	If we stored it somehow in logic_step, we would need to pass step information to these modular functionalities as well,
-	even though only debug drawing settings are needed there, and possibly not at all needed.
-	This would be ugly.
+	so that they may access the settings.
+	This would be unnecessary headache.
 
 	2. Access to a global variable is faster which is important in the logic,
-	especially given that might not want to use the debug drawing at all.
+	especially given that we might not want to use the debug drawing at all.
 
 	3. We 'could' store it in augs::renderer, to which anyway global access is possible,
 	but then we couple very game-specific flags with a structure that is just meant to be pushed triangles and lines into.

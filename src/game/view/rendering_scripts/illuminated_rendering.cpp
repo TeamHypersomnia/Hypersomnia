@@ -18,7 +18,7 @@
 #include "game/components/item_slot_transfers_component.h"
 #include "game/components/render_component.h"
 #include "game/view/audiovisual_state/audiovisual_state.h"
-#include "game/view/debug_drawing_settings.h"
+#include "game/debug_drawing_settings.h"
 
 #include "augs/drawing/drawing.h"
 #include "augs/graphics/shader.h"

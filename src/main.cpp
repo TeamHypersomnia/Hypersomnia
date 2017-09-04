@@ -720,5 +720,3 @@ catch (const necessary_resource_loading_error err) {
 	press_any_key();
 	return 1;
 }
-
-debug_drawing_settings DEBUG_DRAWING;

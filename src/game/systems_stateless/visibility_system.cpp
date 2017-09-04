@@ -26,7 +26,7 @@
 #include "augs/graphics/renderer.h"
 
 #include "game/transcendental/logic_step.h"
-#include "game/view/debug_drawing_settings.h"
+#include "game/debug_drawing_settings.h"
 
 using namespace augs;
 using namespace messages;

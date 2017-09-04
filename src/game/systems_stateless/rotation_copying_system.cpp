@@ -22,7 +22,7 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/logic_step.h"
 #include "game/transcendental/cosmos.h"
-#include "game/view/debug_drawing_settings.h"
+#include "game/debug_drawing_settings.h"
 
 using namespace augs;
 

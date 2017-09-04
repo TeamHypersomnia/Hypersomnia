@@ -12,7 +12,7 @@
 #include "game/components/sentience_component.h"
 #include "game/transcendental/logic_step.h"
 #include "game/transcendental/data_living_one_step.h"
-#include "game/view/debug_drawing_settings.h"
+#include "game/debug_drawing_settings.h"
 #include "game/messages/thunder_input.h"
 
 void standard_explosion_input::instantiate(

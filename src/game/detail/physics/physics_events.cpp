@@ -14,7 +14,7 @@
 #include "augs/graphics/renderer.h"
 #include "augs/templates/container_templates.h"
 #include "augs/templates/to_array.h"
-#include "game/view/debug_drawing_settings.h"
+#include "game/debug_drawing_settings.h"
 
 #define FRICTION_FIELDS_COLLIDE 0
 
