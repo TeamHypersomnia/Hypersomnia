@@ -22,7 +22,7 @@
 #include "augs/entity_system/component_aggregate.h"
 
 #include "game/transcendental/cosmic_entropy.h"
-#include "game/transcendental/profiling.h"
+#include "game/transcendental/cosmic_profiler.h"
 #include "game/organization/all_components_declaration.h"
 #include "game/organization/all_messages_declaration.h"
 #include "game/organization/all_inferred_systems.h"

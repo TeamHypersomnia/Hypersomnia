@@ -390,7 +390,7 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/game/assets/recoil_player.cpp"
 	"src/augs/gui/bbcode.cpp"
 	"src/augs/unit_tests.cpp"
-	"src/game/transcendental/profiling.cpp"
+	"src/game/transcendental/cosmic_profiler.cpp"
 	"src/view/audiovisual_state/audiovisual_state.cpp"
 	"src/game/assets/loaded_sounds.cpp"
 	"src/application/content_regeneration/atlas_distributions.cpp"
@@ -401,6 +401,7 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/game/components/shape_polygon_component.cpp"
 	"src/game/components/shape_circle_component.cpp"
 	"src/game/debug_drawing_settings.cpp"
+	"src/application/session_profiler.cpp"
 )
 
 # natvis files for easier debugging in Visual Studio.

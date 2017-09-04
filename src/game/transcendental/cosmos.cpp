@@ -29,7 +29,6 @@
 #include "game/enums/render_layer.h"
 
 #include "game/transcendental/logic_step.h"
-#include "game/transcendental/profiling.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/detail/inventory/inventory_slot_handle.h"
 #include "game/detail/inventory/item_slot_transfer_request.h"

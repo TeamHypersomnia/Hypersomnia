@@ -15,10 +15,10 @@ namespace augs {
 
 		std::size_t measurement_index = 0;
 
-		T last_average = 1;
-		T last_minimum = 1;
-		T last_maximum = 1;
-		T last_measurement = 1;
+		T last_average = static_cast<T>(1);
+		T last_minimum = static_cast<T>(1);
+		T last_maximum = static_cast<T>(1);
+		T last_measurement = static_cast<T>(1);
 
 		bool measured = false;
 
@@ -27,10 +27,6 @@ namespace augs {
 		std::vector<T> tracked;
 
 		measurements(const std::size_t tracked_count = 20u) {
-			last_average = 1.0;
-			last_maximum = 1.0;
-			last_minimum = 1.0;
-			last_measurement = 1.0;
 			tracked.resize(tracked_count, 0);
 		}
 

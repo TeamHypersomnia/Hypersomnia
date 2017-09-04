@@ -3,6 +3,7 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
 
+#include "application/session_profiler.h"
 #include "application/main/draw_debug_details.h"
 
 #include "generated/introspectors.h"
