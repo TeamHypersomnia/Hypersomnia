@@ -1,13 +1,9 @@
-#include "recoil_player.h"
-
-#include <cstddef>
-#include <random>
-#include <algorithm>
-
-#include "augs/misc/randomization.h"
 #include "augs/log.h"
+#include "augs/misc/randomization.h"
 
-float recoil_player_instance::shoot_and_get_impulse(const recoil_player& meta) {
+#include "game/assets/recoil_player.h"
+
+real32 recoil_player_instance::shoot_and_get_impulse(const recoil_player& meta) {
 	const auto heat = current_heat;
 	current_heat += heat_per_shot;
 
@@ -21,7 +17,7 @@ float recoil_player_instance::shoot_and_get_impulse(const recoil_player& meta) {
 	return meta.offsets[index];
 }
 
-void recoil_player_instance::cooldown(const float amount_ms) {
+void recoil_player_instance::cooldown(const real32 amount_ms) {
 #if 0
 	if (current_heat > 0) {
 		DEBUG_LOG("%x", current_heat);

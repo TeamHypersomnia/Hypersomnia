@@ -3,8 +3,6 @@
 #include "game/assets/game_image_id.h"
 #include "game/container_sizes.h"
 
-class all_assets;
-
 struct animation_frame {
 	// GEN INTROSPECTOR struct animation_frame
 	assets::game_image_id image_id = assets::game_image_id::INVALID;
@@ -24,10 +22,6 @@ struct animation {
 
 	loop_type loop_mode = loop_type::REPEAT;
 	// END GEN INTROSPECTOR
-
-	animation get_logical(const all_assets& manager) const {
-		return *this;
-	}
 
 	void create_frames(
 		const assets::game_image_id first_frame,

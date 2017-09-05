@@ -21,8 +21,6 @@
 
 #include "game/container_sizes.h"
 
-class all_assets;
-
 struct particle_effect_modifier {
 	// GEN INTROSPECTOR struct particle_effect_modifier
 	rgba colorize;

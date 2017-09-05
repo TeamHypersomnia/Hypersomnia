@@ -62,6 +62,10 @@ namespace augs {
 			return get_average_units() < b.get_average_units();
 		}
 
+		bool operator>(const measurements& b) const {
+			return get_average_units() > b.get_average_units();
+		}
+
 		T get_average_units() const {
 			return last_average;
 		}

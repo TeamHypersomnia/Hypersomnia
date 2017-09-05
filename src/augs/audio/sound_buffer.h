@@ -1,13 +1,11 @@
 #pragma once
-#include <optional>
 #include <vector>
+#include <optional>
 
 #include "augs/filesystem/path.h"
 
 typedef unsigned int ALuint;
 typedef int ALenum;
-
-class all_assets;
 
 namespace augs {
 	struct sound_data;

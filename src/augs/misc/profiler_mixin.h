@@ -38,8 +38,11 @@ namespace augs {
 				self
 			);
 	
-			reverse_container(
-				sort_container(all_with_time, [](const auto& a, const auto& b) { return a.get() < b.get(); })
+			sort_container(
+				all_with_time, 
+				[](const auto& a, const auto& b) { 
+					return a.get() > b.get(); 
+				}
 			);
 	
 			for (const auto& t : all_with_time) {
