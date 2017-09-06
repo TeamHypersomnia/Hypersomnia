@@ -18,6 +18,22 @@ option(BUILD_HTTP_REQUESTS "Build simple http requests, e.g. for latest news bar
 option(BUILD_TEST_SCENES "Build unscripted test scenes hardcoded in C++." ON)
 option(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE "Add command to archive builds in Release." ON)
 
+option(HYPERSOMNIA_BARE "Build the minimal possible Hypersomnia runtime. For testing or quick iteration." OFF)
+
+if (HYPERSOMNIA_BARE)
+	set(BUILD_SOUND_FORMAT_DECODERS FALSE CACHE BOOL "" FORCE)
+	set(BUILD_OPENAL FALSE CACHE BOOL "" FORCE)
+	set(BUILD_OPENGL FALSE CACHE BOOL "" FORCE)
+	set(BUILD_UNIT_TESTS FALSE CACHE BOOL "" FORCE)
+	set(BUILD_VERSION_FILE_GENERATOR FALSE CACHE BOOL "" FORCE)
+	set(BUILD_ENET FALSE CACHE BOOL "" FORCE)
+	set(BUILD_HTTP_REQUESTS FALSE CACHE BOOL "" FORCE)
+	set(BUILD_TEST_SCENES FALSE CACHE BOOL "" FORCE)
+	set(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE FALSE CACHE BOOL "" FORCE)
+
+	message("Building Hypersomnia without... anything")
+endif()
+
 if (NOT HYPERSOMNIA_RUNTIME_ARCHIVE_DIR)
 	# By default, we set output directory for archives to completely outside of the source tree,
 	# because it might be useful to preserve some older builds even if the repository is deleted.
@@ -519,8 +535,11 @@ if(BUILD_OPENAL)
 endif()
 
 if(MSVC)
+#	if (BUILD_WINDOW_FRAMEWORK)
+		add_definitions(-DPLATFORM_WINDOWS)
+#	endif()
+
 	add_definitions(
-		-DPLATFORM_WINDOWS
 		-D_WINSOCK_DEPRECATED_NO_WARNINGS
 		-D_CRT_SECURE_NO_WARNINGS
 		-D_SCL_SECURE_NO_WARNINGS
