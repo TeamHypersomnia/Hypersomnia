@@ -68,6 +68,11 @@ int main(const int argc, const char* const * const argv) try {
 	augs::run_unit_tests(argc, argv, config.unit_tests);
 	augs::generate_alsoft_ini(config.audio.max_number_of_sound_sources);
 
+	/* 
+		All resources that are initialized once,
+		and persist for the duration of the program. 
+	*/
+
 	const augs::global_libraries libraries;
 	
 	augs::window window(config.window);
@@ -99,35 +104,50 @@ int main(const int argc, const char* const * const argv) try {
 		config.content_regeneration.regenerate_every_launch
 	);
 	
-	audiovisual_state audiovisuals;
+	auto imgui_atlas = augs::imgui::create_atlas();
 
+	const auto configurables = configuration_subscribers {
+		window,
+		fbos,
+		audio
+	};
+	
+	audiovisual_state audiovisuals;
 	auto game_gui = game_gui_system();
 
-	bool should_quit = false;
-	bool show_settings = false;
-
-	session_profiler profiler;
-	
-	augs::timer gui_timer;
-	augs::timer imgui_timer;
-	augs::timer frame_timer;
-
-	auto imgui_atlas = augs::imgui::create_atlas();
 	augs::graphics::texture game_world_atlas = augs::image {};
 
-	using setup_variant = std::variant<
-		test_scene_setup
-	>;
 
 	/* 
 		Main menu setup state may be preserved, 
 		therefore it resides in a separate optional.
 	*/
 
+	using setup_variant = std::variant<
+		test_scene_setup
+	>;
+
 	static std::optional<main_menu_setup> main_menu;
 	static std::optional<setup_variant> current_setup;
 
 	settings_gui_state settings_gui;
+	ingame_menu_gui ingame_menu;
+
+	/*
+		Resources that are loaded dynamically,
+		in accordance with the definitions provided by the current setup,
+		and in accordance with its chosen viewables_loading_type.
+		(May be for example streamed)
+	*/
+
+	loaded_sounds game_sounds;
+	game_images_in_atlas_map game_atlas_entries;
+	necessary_images_in_atlas necessary_atlas_entries;
+	augs::baked_font gui_font;
+
+	/*
+		The lambdas that aid to make the main loop code more concise.
+	*/	
 
 	auto visit_current_setup = [&](auto&& callback) -> decltype(auto) {
 		if (current_setup.has_value()) {
@@ -139,18 +159,6 @@ int main(const int argc, const char* const * const argv) try {
 			return callback(main_menu.value());
 		}
 	};
-
-	const auto configurables = configuration_subscribers {
-		window,
-		fbos,
-		audio
-	};
-	
-	ingame_menu_gui ingame_menu;
-	loaded_sounds game_sounds;
-	game_images_in_atlas_map game_atlas_entries;
-	necessary_images_in_atlas necessary_atlas_entries;
-	augs::baked_font gui_font;
 
 	auto preload_viewables = [&](const auto& setup) {
 		using T = std::decay_t<decltype(setup)>;
@@ -247,10 +255,21 @@ int main(const int argc, const char* const * const argv) try {
 
 	launch(config.get_launch_mode());
 	
+	/* 
+		The main loop variables.
+	*/
+
 	visible_entities all_visible;
 
+	session_profiler profiler;
+	
+	augs::timer imgui_timer;
+	augs::timer frame_timer;
+	
 	augs::local_entropy new_entropy;
 	augs::event::state state_for_releases;
+
+	bool should_quit = false;
 
 	while (!should_quit) {
 		auto scope = measure_scope(profiler.fps);
@@ -272,6 +291,12 @@ int main(const int argc, const char* const * const argv) try {
 		}
 
 		handle_exit_events(new_entropy, should_quit);
+
+		/*
+			Some circumstances may require that we simulate a release of all
+			currently held keys, for example if an alt+tab occured,
+			or if we've just entered the ingame menu overlay.
+		*/
 
 		bool release_occured_this_frame = false;
 
@@ -315,7 +340,7 @@ int main(const int argc, const char* const * const argv) try {
 
 		/* 
 			Enforce mouse position for all GUIs from one source: IMGUI 
-			this is to avoid hopping when one GUI takes precedence over another
+			this is to avoid hopping when one GUI takes precedence over another.
 		*/
 
 		{
@@ -356,7 +381,9 @@ int main(const int argc, const char* const * const argv) try {
 
 		auto viewing_config = config;
 
-		/* For example, the main menu might want to disable HUD or tune down the sound effects. */
+		/* 
+			For example, the main menu might want to disable HUD or tune down the sound effects. 
+		*/
 
 		visit_current_setup([&viewing_config](auto& setup) {
 			setup.customize_for_viewing(viewing_config);
@@ -392,7 +419,10 @@ int main(const int argc, const char* const * const argv) try {
 			}
 		}
 
-		/* Advance the setup logic. */
+		/* 
+			Advance the current setup's logic,
+			and let the audiovisual_state sample the game world that it chooses.
+		 */
 
 		visit_current_setup([&](auto& setup) {
 			const auto& viewed_cosmos = setup.get_viewed_cosmos();
@@ -451,7 +481,7 @@ int main(const int argc, const char* const * const argv) try {
 
 		/* 
 			What follows is strictly view part,
-			without advancement of any sort.
+			without advancement of any kind.
 		*/
 
 		auto frame = measure_scope(profiler.frame);
@@ -471,7 +501,7 @@ int main(const int argc, const char* const * const argv) try {
 			return setup.get_interpolation_ratio();
 		});
 
-		/* Prepare game GUI structures */
+		/* Prepare game GUI structures. */
 
 		const auto context = viewing_game_gui_context {
 			game_gui.create_context(
@@ -497,13 +527,14 @@ int main(const int argc, const char* const * const argv) try {
 			1.  Draw the cosmos in the vicinity of the viewed character.
 				Both the cosmos and the character are specified by the current setup (main menu is a setup, too).
 			
-			2.	Draw the debug lines over the game world, if so is required.
+			2.	Draw the debug lines over the game world, if so is appropriate.
 			
 			3.	Draw the game GUI, if so is appropriate.
-				Game GUI involves things like inventory UI and health bars.
+				Game GUI involves things like inventory buttons, hotbar and health bars.
 
 			4.	Draw either the main menu buttons, or the in-game menu overlay accessed by ESC.
-				These two are almost identical, except the first may also be influenced by a playing intro.
+				These two are almost identical, except the layouts of the first (e.g. tweened buttons) 
+				may also be influenced by a playing intro.
 
 			5.	Draw IMGUI, which is the highest priority GUI. 
 				This involves settings window, developer console and the like.
@@ -557,7 +588,7 @@ int main(const int argc, const char* const * const argv) try {
 				renderer.call_and_clear_lines();
 			}
 
-			/* Draw the game GUI if so is appropriate */
+			/* Draw the game GUI if so is appropriate. */
 
 			if (
 				viewing_config.drawing.draw_character_gui 
@@ -589,7 +620,7 @@ int main(const int argc, const char* const * const argv) try {
 							break;
 
 						case main_menu_button_type::SETTINGS:
-							show_settings = true;
+							settings_gui.show = true;
 							ImGui::SetWindowFocus("Settings");
 							break;
 
@@ -641,7 +672,7 @@ int main(const int argc, const char* const * const argv) try {
 								break;
 
 							case ingame_menu_button_type::SETTINGS:
-								show_settings = true;
+								settings_gui.show = true;
 								ImGui::SetWindowFocus("Settings");
 								break;
 
@@ -709,7 +740,7 @@ catch (const config_read_error err) {
 	return 1;
 }
 catch (const augs::audio_error& err) {
-	LOG("Failed to estabilish the audio context:\n%x", err.what());
+	LOG("Failed to establish the audio context:\n%x", err.what());
 	press_any_key();
 	return 1;
 }

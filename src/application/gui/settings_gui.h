@@ -4,10 +4,11 @@
 struct config_lua_table;
 
 class settings_gui_state {
-	bool show = false;
 	int active_pane = 0;
 
 public:
+	bool show = false;
+	
 	void perform(
 		const augs::path_type& path_for_saving,
 		config_lua_table& into,
