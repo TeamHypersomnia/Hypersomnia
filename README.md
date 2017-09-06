@@ -46,7 +46,7 @@ digraph G {
 }
 ```
 **Exceptions:**
-- Modified Box2D files (from ```3rdparty```) include ```game/transcendental/entity_id.h``` in order to conveniently define a userdata type that contains the id of the entity to whom a ```b2Fixture``` or ```b2Body``` belonds. Separating that dependency would otherwise involve a lot of alterations to Box2D in terms of code templatization, or unsafe reinterpret casts between ```void*``` and my types. 
+- Modified Box2D files (from ```3rdparty```) include ```game/transcendental/entity_id.h``` in order to conveniently define a userdata type that contains the id of the entity to whom a ```b2Fixture``` or a ```b2Body``` belongs. Separating that dependency would otherwise involve a lot of alterations to Box2D in terms of code templatization, or unsafe reinterpret casts between ```void*``` and my types. 
 
 # Hypersomnia
 Community-centered shooter/MMORPG released as free software.
