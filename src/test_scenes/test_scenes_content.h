@@ -5,7 +5,7 @@
 #include "view/viewables/all_viewables_declarations.h"
 
 struct all_logical_assets;
-struct all_viewables;
+struct all_viewables_defs;
 struct cosmos_common_state;
 
 // test scene content
@@ -30,7 +30,7 @@ void load_test_scene_recoil_players(all_logical_assets&);
 
 void populate_test_scene_assets(
 	all_logical_assets& output_logicals,
-	all_viewables& output_sources
+	all_viewables_defs& output_sources
 );
 
 void load_test_scene_sentience_properties(cosmos_common_state&);

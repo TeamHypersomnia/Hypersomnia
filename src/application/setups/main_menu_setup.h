@@ -29,7 +29,7 @@ class main_menu_setup {
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 	cosmic_entropy total_collected_entropy;
 	all_logical_assets logical_assets;
-	all_viewables viewable_defs;
+	all_viewables_defs viewable_defs;
 
 	entity_id viewed_character_id;
 	sol::table menu_config_patch;

@@ -5,7 +5,7 @@
 #include "game/assets/all_logical_assets.h"
 #include "view/viewables/all_viewables.h"
 
-void all_viewables::update_into(all_logical_assets& output) {
+void all_viewables_defs::update_into(all_logical_assets& output) {
 	const auto sound_duration = [](const augs::sound_buffer::variation& v) {
 		return v.stereo_or_mono().get_length_in_seconds();
 	};

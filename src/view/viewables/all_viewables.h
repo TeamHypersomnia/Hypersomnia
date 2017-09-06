@@ -24,7 +24,7 @@
 
 struct all_logical_assets;
 
-struct all_viewables {
+struct all_viewables_defs {
 	sound_buffer_inputs_map sounds;
 	particle_effects_map particle_effects;
 	game_image_loadables_map game_image_loadables;

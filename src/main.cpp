@@ -215,8 +215,8 @@ int main(const int argc, const char* const * const argv) try {
 		}
 	};
 
-	auto get_viewable_defs = [&]() -> const all_viewables& {
-		return visit_current_setup([](auto& setup) -> const all_viewables& {
+	auto get_viewable_defs = [&]() -> const all_viewables_defs& {
+		return visit_current_setup([](auto& setup) -> const all_viewables_defs& {
 			return setup.get_viewable_defs();
 		});
 	};

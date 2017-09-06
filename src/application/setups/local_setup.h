@@ -23,7 +23,7 @@ class local_setup {
 	debug_character_selection characters;
 
 	all_logical_assets logical_assets;
-	all_viewables viewable_defs;
+	all_viewables_defs viewable_defs;
 
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::ALWAYS_HAVE_ALL_LOADED;

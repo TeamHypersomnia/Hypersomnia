@@ -4,7 +4,7 @@
 
 void populate_test_scene_assets(
 	all_logical_assets& output_logicals,
-	all_viewables& output_sources
+	all_viewables_defs& output_sources
 ) {
 #if BUILD_TEST_SCENES
 	try {
