@@ -7,14 +7,14 @@
 #include "augs/templates/string_templates.h"
 #include "augs/filesystem/file.h"
 #include "augs/window_framework/log_color.h"
-#include "local_setup.h"
+#include "test_scene_setup.h"
 #include "game/detail/visible_entities.h"
 
 #include "generated/introspectors.h"
 
 using namespace augs::event::keys;
 
-void local_setup::control(
+void test_scene_setup::control(
 	augs::local_entropy& new_entropy,
 	const input_context& context
 ) {
@@ -55,7 +55,7 @@ void local_setup::control(
 	));
 }
 
-void local_setup::control(
+void test_scene_setup::control(
 	const cosmic_entropy& entropy
 ) {
 	total_collected_entropy += entropy;

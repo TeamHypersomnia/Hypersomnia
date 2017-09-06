@@ -15,7 +15,7 @@
 
 struct config_lua_table;
 
-class local_setup {
+class test_scene_setup {
 	cosmos hypersomnia;
 	cosmic_entropy total_collected_entropy;
 	augs::debug_entropy_player<cosmic_entropy> player;
@@ -29,7 +29,7 @@ public:
 	static constexpr auto loading_strategy = viewables_loading_type::ALWAYS_HAVE_ALL_LOADED;
 	static constexpr bool can_viewables_change = false;
 
-	local_setup(
+	test_scene_setup(
 		const bool make_minimal_test_scene,
 		const input_recording_type recording_type
 	);

@@ -22,6 +22,7 @@
 
 #include "view/viewables/all_viewables.h"
 #include "view/viewables/loaded_sounds.h"
+#include "view/viewables/atlas_distributions.h"
 
 #include "view/game_gui/game_gui_system.h"
 
@@ -35,10 +36,8 @@
 #include "application/gui/ingame_menu_gui.h"
 
 #include "application/setups/main_menu_setup.h"
-#include "application/setups/local_setup.h"
+#include "application/setups/test_scene_setup.h"
 #include "application/setups/editor_setup.h"
-
-#include "view/viewables/atlas_distributions.h"
 
 #include "application/main/main_helpers.h"
 #include "application/main/imgui_pass.h"
@@ -117,7 +116,7 @@ int main(const int argc, const char* const * const argv) try {
 	augs::graphics::texture game_world_atlas = augs::image {};
 
 	using setup_variant = std::variant<
-		local_setup
+		test_scene_setup
 	>;
 
 	/* 
@@ -198,8 +197,8 @@ int main(const int argc, const char* const * const argv) try {
 #endif
 				break;
 
-			case launch_type::LOCAL:
-				current_setup.emplace(std::in_place_type_t<local_setup>(),
+			case launch_type::TEST_SCENE:
+				current_setup.emplace(std::in_place_type_t<test_scene_setup>(),
 					config.session.create_minimal_test_scene,
 					config.get_input_recording_mode()
 				);
@@ -586,7 +585,7 @@ int main(const int argc, const char* const * const argv) try {
 				[&](const main_menu_button_type t) {
 					switch (t) {
 						case main_menu_button_type::LOCAL_UNIVERSE:
-							launch(launch_type::LOCAL);
+							launch(launch_type::TEST_SCENE);
 							break;
 
 						case main_menu_button_type::SETTINGS:

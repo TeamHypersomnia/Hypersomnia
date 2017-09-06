@@ -31,7 +31,7 @@ enum class launch_type {
 	// GEN INTROSPECTOR enum class launch_type
 	MAIN_MENU,
 
-	LOCAL,
+	TEST_SCENE,
 	LOCAL_DETERMINISM_TEST,
 
 	DIRECTOR,
@@ -63,7 +63,7 @@ struct config_lua_table {
 	config_lua_table(const augs::path_type& config_lua_path);
 
 	// GEN INTROSPECTOR struct config_lua_table
-	launch_type launch_mode = launch_type::LOCAL;
+	launch_type launch_mode = launch_type::TEST_SCENE;
 
 	unit_tests_settings unit_tests;
 	augs::window_settings window;

@@ -14,13 +14,13 @@
 
 #include "view/viewables/viewables_loading_type.h"
 
-#include "application/setups/local_setup.h"
+#include "application/setups/test_scene_setup.h"
 
 #include "generated/introspectors.h"
 
 using namespace augs::event::keys;
 
-local_setup::local_setup(
+test_scene_setup::test_scene_setup(
 	const bool make_minimal_test_scene,
 	const input_recording_type recording_type
 ) {
@@ -57,7 +57,7 @@ local_setup::local_setup(
 	timer.reset_timer();
 }
 
-void local_setup::control(
+void test_scene_setup::control(
 	augs::local_entropy& new_entropy,
 	const input_context& context
 ) {
@@ -102,6 +102,6 @@ void local_setup::control(
 	}
 }
 
-void local_setup::accept_game_gui_events(const cosmic_entropy& events) {
+void test_scene_setup::accept_game_gui_events(const cosmic_entropy& events) {
 	total_collected_entropy += events;
 }
