@@ -99,7 +99,7 @@ int main(const int argc, const char* const * const argv) try {
 		"content/necessary/sfx/"
 	);
 
-	necessary_image_definitions images(
+	necessary_image_loadables_map images(
 		"content/necessary/gfx/",
 		config.content_regeneration.regenerate_every_launch
 	);

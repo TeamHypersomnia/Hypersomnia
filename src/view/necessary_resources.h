@@ -78,10 +78,10 @@ struct necessary_sound_buffers {
 	necessary_sound_buffers(const augs::path_type& directory);
 };
 
-struct necessary_image_definitions {
-	augs::enum_associative_array<assets::necessary_image_id, game_image_loadables> all;
-
-	necessary_image_definitions(
+struct necessary_image_loadables_map :
+	public augs::enum_associative_array<assets::necessary_image_id, game_image_loadables>
+{
+	necessary_image_loadables_map(
 		const augs::path_type& directory,
 		const bool force_regenerate
 	);

@@ -123,7 +123,7 @@ augs::path_type get_procedural_image_path(const augs::path_type& from_source_pat
 	return typesafe_sprintf("generated/%x", from_source_path);
 }
 
-necessary_image_definitions::necessary_image_definitions(
+necessary_image_loadables_map::necessary_image_loadables_map(
 	const augs::path_type& directory,
 	const bool force_regenerate
 ) {
@@ -134,10 +134,8 @@ necessary_image_definitions::necessary_image_definitions(
 		whereby there is some(?) problem capturing "this" contents in lambdas.
 	*/
 
-	auto& necessarys = all;
-
 	augs::for_each_enum_except_bounds<id_type>([&](const id_type id) {
-		if (found_in(necessarys, id)) {
+		if (found_in(*this, id)) {
 			return;
 		}
 
@@ -170,7 +168,7 @@ necessary_image_definitions::necessary_image_definitions(
 			augs::file_exists(source_image_path)
 		) {
 			definition_template.source_image_path = source_image_path;
-			necessarys.emplace(id, definition_template);
+			emplace(id, definition_template);
 		}
 		else if (
 			const auto procedural_definition_path = typesafe_sprintf("%xprocedural/%x.lua", directory, stem);
@@ -217,7 +215,7 @@ necessary_image_definitions::necessary_image_definitions(
 				augs::for_each_enum_except_bounds<button_corner_type>([&](const button_corner_type type) {
 					definition_template.source_image_path = typesafe_sprintf(path_template.string(), get_filename_for(type));
 					
-					necessarys.emplace(
+					emplace(
 						static_cast<id_type>(
 							static_cast<int>(first) + static_cast<int>(type)
 						), 
@@ -237,7 +235,7 @@ necessary_image_definitions::necessary_image_definitions(
 				);
 		
 				definition_template.source_image_path = generated_image_path;
-				necessarys.emplace(id, definition_template);
+				emplace(id, definition_template);
 			}
 		}
 
