@@ -8,14 +8,10 @@
 #include "augs/window_framework/window.h"
 #include "augs/window_framework/platform_utils.h"
 
-#ifdef PLATFORM_WINDOWS
+#if PLATFORM_WINDOWS
 #include "augs/window_framework/translate_windows_enums.h"
 
 namespace augs {
-	vec2i window_settings::get_screen_size() const {
-		return fullscreen ? augs::get_display().get_size() : size;
-	}
-	
 	LRESULT CALLBACK wndproc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 		if (umsg == WM_GETMINMAXINFO || umsg == WM_INPUT) {
 			return DefWindowProc(hwnd, umsg, wParam, lParam);
@@ -288,8 +284,151 @@ namespace augs {
 		last_mouse_pos = settings.get_screen_size() / 2;
 	}
 
-	window_settings window::get_current_settings() const {
-		return current_settings;
+	void window::set_window_border_enabled(const bool f) {
+		const auto menu = f ? WS_CAPTION | WS_SYSMENU : 0;
+
+		style = menu ? (WS_OVERLAPPED | menu) | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_THICKFRAME | WS_SYSMENU | WS_MAXIMIZEBOX | WS_MINIMIZEBOX : WS_POPUP;
+		exstyle = menu ? WS_EX_WINDOWEDGE : WS_EX_APPWINDOW;
+
+		SetWindowLongPtr(hwnd, GWL_EXSTYLE, exstyle);
+		SetWindowLongPtr(hwnd, GWL_STYLE, style);
+
+		SetWindowPos(hwnd, NULL, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOZORDER | SWP_NOOWNERZORDER);
+		set_window_rect(get_window_rect());
+		show();
+	}
+
+	bool window::swap_buffers() {
+		return SwapBuffers(hdc) != FALSE;
+	}
+
+	void window::show() {
+		ShowWindow(hwnd, SW_SHOW);
+	}
+	
+	void window::set_mouse_position_frozen(const bool flag) {
+		frozen = flag;
+	}
+
+	bool window::set_as_current_impl() {
+#if BUILD_OPENGL
+		return wglMakeCurrent(hdc, hglrc);
+#else
+		return true;
+#endif
+	}
+
+	void window::set_current_to_none_impl() {
+#if BUILD_OPENGL
+		wglMakeCurrent(NULL, NULL);
+#endif
+	}
+
+	void window::collect_entropy(local_entropy& output) {
+		ensure(is_current());
+
+		while (PeekMessageW(&wmsg, hwnd, 0, 0, PM_REMOVE)) {
+			const auto new_change = handle_event(
+				wmsg.message, 
+				wmsg.wParam, 
+				wmsg.lParam
+			);
+
+			TranslateMessage(&wmsg);
+
+			if (new_change.has_value() && !new_change->repeated) {
+				output.push_back(*new_change);
+			}
+		}
+
+		if (current_settings.enable_cursor_clipping && GetFocus() == hwnd) {
+			enable_cursor_clipping(get_window_rect());
+		}
+		else {
+			disable_cursor_clipping();
+		}
+
+		if (!current_settings.fullscreen) {
+			current_settings.size = get_window_rect().get_size();
+			current_settings.position = get_window_rect().get_position();
+		}
+	}
+
+	void window::set_window_rect(const xywhi r) {
+		static RECT wr = { 0 };
+		ensure(SetRect(&wr, r.x, r.y, r.r(), r.b()));
+		ensure(AdjustWindowRectEx(&wr, style, FALSE, exstyle));
+		ensure(MoveWindow(hwnd, wr.left, wr.top, wr.right - wr.left, wr.bottom - wr.top, TRUE));
+	}
+
+	xywhi window::get_window_rect() const {
+		static RECT r;
+		GetClientRect(hwnd, &r);
+		ClientToScreen(hwnd, (POINT*)&r);
+		ClientToScreen(hwnd, (POINT*)&r + 1);
+		return ltrbi(r.left, r.top, r.right, r.bottom);
+	}
+
+	bool window::is_active() const {
+		return active;
+	}
+
+	void window::destroy() {
+		if (hwnd) {
+			unset_if_current();
+
+#if BUILD_OPENGL
+			wglDeleteContext(hglrc);
+#endif
+			ReleaseDC(hwnd, hdc);
+			DestroyWindow(hwnd);
+
+			hwnd = nullptr;
+		}
+	}
+}
+
+bool augs::window::window_class_registered = false;
+
+#else
+namespace augs {
+	window::window(const window_settings& settings) {
+		apply(settings, true);
+	}
+
+	void window::set_window_name(const std::string& name) {}
+	void window::set_window_border_enabled(const bool) {}
+
+	bool window::swap_buffers() { return true; }
+
+	void window::show() {}
+	void window::set_mouse_position_frozen(const bool) {}
+
+	void window::collect_entropy(local_entropy& into) {}
+
+	void window::set_window_rect(const xywhi) {}
+	xywhi window::get_window_rect() const { return {}; }
+
+	bool window::is_active() const { return false; }
+	void window::destroy() {}
+}
+#endif
+
+/* Common interface */
+
+namespace augs {
+	vec2i window_settings::get_screen_size() const {
+		return fullscreen ? augs::get_display().get_size() : size;
+	}
+	
+	local_entropy window::collect_entropy() {
+		local_entropy output;
+		collect_entropy(output);
+		return output;
+	}
+
+	vec2i window::get_screen_size() const {
+		return get_window_rect().get_size();
 	}
 
 	void window::apply(const window_settings& settings, const bool force) {
@@ -345,125 +484,11 @@ namespace augs {
 		current_settings = settings;
 	}
 
-	void window::set_window_border_enabled(const bool f) {
-		const auto menu = f ? WS_CAPTION | WS_SYSMENU : 0;
-
-		style = menu ? (WS_OVERLAPPED | menu) | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_THICKFRAME | WS_SYSMENU | WS_MAXIMIZEBOX | WS_MINIMIZEBOX : WS_POPUP;
-		exstyle = menu ? WS_EX_WINDOWEDGE : WS_EX_APPWINDOW;
-
-		SetWindowLongPtr(hwnd, GWL_EXSTYLE, exstyle);
-		SetWindowLongPtr(hwnd, GWL_STYLE, style);
-
-		SetWindowPos(hwnd, NULL, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOZORDER | SWP_NOOWNERZORDER);
-		set_window_rect(get_window_rect());
-		show();
-	}
-
-	bool window::swap_buffers() {
-		return SwapBuffers(hdc) != FALSE;
-	}
-
-	void window::show() {
-		ShowWindow(hwnd, SW_SHOW);
-	}
-	
-	void window::set_mouse_position_frozen(const bool flag) {
-		frozen = flag;
-	}
-
-	bool window::set_as_current_impl() {
-#if BUILD_OPENGL
-		return wglMakeCurrent(hdc, hglrc);
-#else
-		return true;
-#endif
-	}
-
-	void window::set_current_to_none_impl() {
-#if BUILD_OPENGL
-		wglMakeCurrent(NULL, NULL);
-#endif
-	}
-
-	local_entropy window::collect_entropy() {
-		local_entropy output;
-		collect_entropy(output);
-		return output;
-	}
-
-	void window::collect_entropy(local_entropy& output) {
-		ensure(is_current());
-
-		while (PeekMessageW(&wmsg, hwnd, 0, 0, PM_REMOVE)) {
-			const auto new_change = handle_event(
-				wmsg.message, 
-				wmsg.wParam, 
-				wmsg.lParam
-			);
-
-			TranslateMessage(&wmsg);
-
-			if (new_change.has_value() && !new_change->repeated) {
-				output.push_back(*new_change);
-			}
-		}
-
-		if (current_settings.enable_cursor_clipping && GetFocus() == hwnd) {
-			enable_cursor_clipping(get_window_rect());
-		}
-		else {
-			disable_cursor_clipping();
-		}
-
-		if (!current_settings.fullscreen) {
-			current_settings.size = get_window_rect().get_size();
-			current_settings.position = get_window_rect().get_position();
-		}
-	}
-
-	void window::set_window_rect(const xywhi r) {
-		static RECT wr = { 0 };
-		ensure(SetRect(&wr, r.x, r.y, r.r(), r.b()));
-		ensure(AdjustWindowRectEx(&wr, style, FALSE, exstyle));
-		ensure(MoveWindow(hwnd, wr.left, wr.top, wr.right - wr.left, wr.bottom - wr.top, TRUE));
-	}
-
-	vec2i window::get_screen_size() const {
-		return get_window_rect().get_size();
-	}
-
-	xywhi window::get_window_rect() const {
-		static RECT r;
-		GetClientRect(hwnd, &r);
-		ClientToScreen(hwnd, (POINT*)&r);
-		ClientToScreen(hwnd, (POINT*)&r + 1);
-		return ltrbi(r.left, r.top, r.right, r.bottom);
-	}
-
-	bool window::is_active() const {
-		return active;
-	}
-
-	void window::destroy() {
-		if (hwnd) {
-			unset_if_current();
-
-#if BUILD_OPENGL
-			wglDeleteContext(hglrc);
-#endif
-			ReleaseDC(hwnd, hdc);
-			DestroyWindow(hwnd);
-
-			hwnd = nullptr;
-		}
+	window_settings window::get_current_settings() const {
+		return current_settings;
 	}
 
 	window::~window() {
 		destroy();
 	}
 }
-
-bool augs::window::window_class_registered = false;
-
-#elif PLATFORM_LINUX
-#endif

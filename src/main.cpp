@@ -271,6 +271,8 @@ int main(const int argc, const char* const * const argv) try {
 
 	bool should_quit = false;
 
+	LOG("Entered the main loop.");
+
 	while (!should_quit) {
 		auto scope = measure_scope(profiler.fps);
 		

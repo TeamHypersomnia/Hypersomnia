@@ -16,7 +16,7 @@ void cleanup_proc() {
 	
 	program_log::get_current().save_complete_to("generated/logs/ensure_failed_debug_log.txt");
 
-#ifdef PLATFORM_WINDOWS
+#if PLATFORM_WINDOWS
 	__debugbreak();
 #endif
 }

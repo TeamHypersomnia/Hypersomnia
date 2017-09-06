@@ -1,3 +1,4 @@
+#if PLATFORM_WINDOWS
 #include <Windows.h>
 #include "translate_windows_enums.h"
 
@@ -206,3 +207,4 @@ key translate_key_with_lparam(const UINT lParam, UINT m) {
 
 	return translate_virtual_key(m);
 }
+#endif

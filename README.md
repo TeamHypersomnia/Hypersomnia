@@ -103,7 +103,7 @@ Alternatively, if you want to build the minimal possible Hypersomnia runtime, if
 ```
 cmake -DHYPERSOMNIA_BARE=ON ..
 ```
-This will disable all third parties, and build an executable reliant exclusively on the standard C++.
+This will disable all third party code and build Hypersomnia executable reliant exclusively on the standard C++. Refer to ```CMakeLists.txt``` to see which other options are available.
 
 If you are on Windows, resultant ```.sln``` and ```.vcxproj``` files should appear in the ```build/``` directory.
 Open ```Hypersomnia.sln``` file, select **Release** configuration and hit **F7** to build the game.

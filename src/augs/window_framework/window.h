@@ -21,7 +21,7 @@
 namespace augs {
 	// extern LRESULT CALLBACK wndproc(HWND, UINT, WPARAM, LPARAM);
 	class window : public augs::settable_as_current_mixin<window> {
-#ifdef PLATFORM_WINDOWS
+#if PLATFORM_WINDOWS
 		friend int WINAPI::WinMain(HINSTANCE, HINSTANCE, LPSTR, int);
 		friend LRESULT CALLBACK wndproc(HWND, UINT, WPARAM, LPARAM);
 
@@ -32,8 +32,6 @@ namespace augs {
 		HGLRC hglrc = nullptr;
 		MSG wmsg;
 		
-		window_settings current_settings;
-
 		vec2i last_mouse_pos;
 
 		vec2i min_window_size;
@@ -64,6 +62,8 @@ namespace augs {
 #elif PLATFORM_LINUX
 
 #endif
+		window_settings current_settings;
+		
 		void destroy();
 	public:
 		window(const window_settings&);

@@ -16,6 +16,7 @@ option(BUILD_VERSION_FILE_GENERATOR "Build version file generator to generate co
 option(BUILD_ENET "Build ENet networking library." ON)
 option(BUILD_HTTP_REQUESTS "Build simple http requests, e.g. for latest news bar in the main menu." ON)
 option(BUILD_TEST_SCENES "Build unscripted test scenes hardcoded in C++." ON)
+option(BUILD_PLATFORM_CODE "Build code specific to a given platfom, e.g. window management done by WinAPI." ON)
 option(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE "Add command to archive builds in Release." ON)
 
 option(HYPERSOMNIA_BARE "Build the minimal possible Hypersomnia runtime. For testing or quick iteration." OFF)
@@ -29,6 +30,7 @@ if (HYPERSOMNIA_BARE)
 	set(BUILD_ENET FALSE CACHE BOOL "" FORCE)
 	set(BUILD_HTTP_REQUESTS FALSE CACHE BOOL "" FORCE)
 	set(BUILD_TEST_SCENES FALSE CACHE BOOL "" FORCE)
+	set(BUILD_PLATFORM_CODE FALSE CACHE BOOL "" FORCE)
 	set(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE FALSE CACHE BOOL "" FORCE)
 
 	message("Building Hypersomnia without... anything")
@@ -535,9 +537,9 @@ if(BUILD_OPENAL)
 endif()
 
 if(MSVC)
-#	if (BUILD_WINDOW_FRAMEWORK)
-		add_definitions(-DPLATFORM_WINDOWS)
-#	endif()
+	if (BUILD_PLATFORM_CODE)
+		add_definitions(-DPLATFORM_WINDOWS=1)
+	endif()
 
 	add_definitions(
 		-D_WINSOCK_DEPRECATED_NO_WARNINGS

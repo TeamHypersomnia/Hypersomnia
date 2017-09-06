@@ -1,23 +1,21 @@
-#ifdef PLATFORM_WINDOWS
-#include <Windows.h>
-#elif PLATFORM_LINUX
-#endif
-#include "colored_print.h"
 #include <cstdio>
+#include "augs/window_framework/colored_print.h"
 
-#ifdef PLATFORM_WINDOWS
-WORD GetColorAttribute(int color) {
+#if PLATFORM_WINDOWS
+#include <Windows.h>
+
+WORD GetColorAttribute(const int color) {
 	switch (color) {
-	case 0:    return FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;
-	case 1:    return FOREGROUND_RED;
-	case 2:  return FOREGROUND_GREEN;
-	case 3: return FOREGROUND_RED | FOREGROUND_GREEN;
-	default:           return 0;
+	case 0:    	return FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;
+	case 1:    	return FOREGROUND_RED;
+	case 2: 	return FOREGROUND_GREEN;
+	case 3: 	return FOREGROUND_RED | FOREGROUND_GREEN;
+	default:	return 0;
 	}
 }
 
 namespace augs {
-	void colored_print(console_color color, const char* text) {
+	void colored_print(const console_color color, const char* const  text) {
 		const HANDLE stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
 
 		// Gets the current text color.
@@ -38,6 +36,11 @@ namespace augs {
 		SetConsoleTextAttribute(stdout_handle, old_color_attrs);
 	}
 }
-#elif PLATFORM_LINUX
+#else
+namespace augs {
+	void colored_print(const console_color color, const char* const text) {
+	
+	}
+}
 #endif
 
