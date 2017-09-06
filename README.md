@@ -8,9 +8,10 @@
   - ```src/3rdparty``` - 3rd party libraries, upon which the rest of ```src/``` depends.
   - ```src/augs/``` - abstraction of i/o; template code, utility functions, window management.
   - ```src/game/``` - Hypersomnia-specific code that implements the game world. Strictly, the **model** is present here, and nothing else.
-  - ```src/view/``` - Code that is concerned with viewing the game world. Examples: state of particle systems, interpolation, playing of sounds, or rendering scripts that take the game world reference and speak directly to OpenGL.
+  - ```src/view/``` - Code that is concerned with viewing the game world. Examples: viewables (as opposed to logical assets,  meant for viewing only), state of particle systems, interpolation, playing of sounds, or rendering scripts that take the game world reference and speak directly to OpenGL.
   - ```src/test_scenes/``` - Code generating some simple test scenes, with their needed resources. It exists only in order to conveniently test new game features without relying on the editor. Can be excluded from compilation via BUILD_TEST_SCENES CMake flag.
   - ```src/application/``` - highest level abstraction. Examples: setups implementation (test scene, client, server), the main menu/ingame menu gui, the main loop helpers, but also collateral things like http server code.
+    - ```src/application/setups``` - setups are objects that manage high-level functionality like a client, a server, an editor or a local test scene. They expose functions like ```get_viewed_cosmos()``` or ```get_viewed_character_id()``` that are in turn used by main.cpp to know what world to render, and with which entity as the viewer.
   - ```main.cpp``` - that, which straps all of the above together. Initializes libraries, contextes, necessary resources, handles input, selects the setup to work with, keeps track of the single audiovisual_state.
 - ```todo/``` - a personal to-do list of the founder. At the moment, not meant to be understood by the public.
 
@@ -20,7 +21,7 @@ An arrow from node A to node B denotes that A includes files from B. An arrow to
 
 ![enter image description here][2]
 
-**Dot language code:**
+**Graph source (DOT language):**
 
 ```
 digraph G {
@@ -96,6 +97,13 @@ Then, use your favorite shell to go into the newly created ```build/``` folder a
 ```
 cmake ..
 ```
+
+Alternatively, if you want to build the minimal possible Hypersomnia runtime, if you're for example trying to build for a different platform, run:
+
+```
+cmake -DHYPERSOMNIA_BARE=ON ..
+```
+This will disable all third parties, and build an executable reliant exclusively on the standard C++.
 
 If you are on Windows, resultant ```.sln``` and ```.vcxproj``` files should appear in the ```build/``` directory.
 Open ```Hypersomnia.sln``` file, select **Release** configuration and hit **F7** to build the game.
