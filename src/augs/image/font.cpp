@@ -1,14 +1,17 @@
 #include <map>
 #include "augs/image/font.h"
 
+#if BUILD_FREETYPE
 #include <ft2build.h> 
 #include FT_FREETYPE_H
+#endif
 
 #include "augs/global_libraries.h"
 #include "augs/filesystem/file.h"
 #include "augs/misc/scope_guard.h"
 
 namespace augs {
+#if BUILD_FREETYPE
 	font_glyph_metadata::font_glyph_metadata(
 		const FT_Glyph_Metrics& m
 	) :
@@ -18,8 +21,10 @@ namespace augs {
 		size(m.width >> 6, m.height >> 6)
 	{
 	}
+#endif
 
 	font::font(const font_loading_input& in) {
+#if BUILD_FREETYPE
 		auto throw_error = [&in](auto&&... args) {
 			throw font_loading_error(
 				typesafe_sprintf("Failed to load font file %x:\n", in.source_font_path.string())
@@ -75,7 +80,7 @@ namespace augs {
 						throw_error("FT_Render_Glyph returned %x", result);
 					}
 
-					meta.glyphs.push_back(font_glyph_metadata(face->glyph->metrics));
+					meta.glyphs.emplace_back(face->glyph->metrics);
 					glyph_bitmaps.push_back(augs::image());
 
 					auto& g = *meta.glyphs.rbegin();
@@ -119,5 +124,6 @@ namespace augs {
 		catch (const augs::ifstream_error& err) {
 			throw_error("Couldn't load charset file: %x\n%x", in.charset_path, err.what());
 		}
+#endif
 	}
 }

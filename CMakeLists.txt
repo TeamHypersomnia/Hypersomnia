@@ -14,6 +14,7 @@ option(BUILD_OPENGL "Build OpenGL-related code." ON)
 option(BUILD_UNIT_TESTS "Build unit tests that are run on game startup." ON)
 option(BUILD_VERSION_FILE_GENERATOR "Build version file generator to generate commit information." ON)
 option(BUILD_ENET "Build ENet networking library." ON)
+option(BUILD_FREETYPE "Build FreeType library responsible for loading fonts." ON)
 option(BUILD_HTTP_REQUESTS "Build simple http requests, e.g. for latest news bar in the main menu." ON)
 option(BUILD_TEST_SCENES "Build unscripted test scenes hardcoded in C++." ON)
 option(BUILD_PLATFORM_CODE "Build code specific to a given platfom, e.g. window management done by WinAPI." ON)
@@ -28,6 +29,7 @@ if (HYPERSOMNIA_BARE)
 	set(BUILD_UNIT_TESTS FALSE CACHE BOOL "" FORCE)
 	set(BUILD_VERSION_FILE_GENERATOR FALSE CACHE BOOL "" FORCE)
 	set(BUILD_ENET FALSE CACHE BOOL "" FORCE)
+	set(BUILD_FREETYPE FALSE CACHE BOOL "" FORCE)
 	set(BUILD_HTTP_REQUESTS FALSE CACHE BOOL "" FORCE)
 	set(BUILD_TEST_SCENES FALSE CACHE BOOL "" FORCE)
 	set(BUILD_PLATFORM_CODE FALSE CACHE BOOL "" FORCE)
@@ -634,7 +636,9 @@ if(BUILD_ENET)
 	add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/enet")
 endif()
 
-add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/freetype")
+if(BUILD_FREETYPE)
+	add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/freetype")
+endif()
 
 if(BUILD_OPENGL)
 	add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/glad")
@@ -649,7 +653,9 @@ if(BUILD_ENET)
 	add_include_dirs_of("enet")
 endif()
 
-add_include_dirs_of("freetype")
+if(BUILD_FREETYPE)
+	add_include_dirs_of("freetype")
+endif()
 
 if(BUILD_SOUND_FORMAT_DECODERS)
 	add_include_dirs_of("ogg")
@@ -807,10 +813,7 @@ endif()
 
 # We define libraries upon which Hypersomnia depends.
 
-set(HYPERSOMNIA_LIBS
-	freetype
-	lua
-)
+set(HYPERSOMNIA_LIBS lua)
 
 if(BUILD_OPENGL)
 	list(APPEND HYPERSOMNIA_LIBS
@@ -825,6 +828,10 @@ endif()
 
 if(BUILD_ENET)
 	list(APPEND HYPERSOMNIA_LIBS enet)
+endif()
+
+if(BUILD_FREETYPE)
+	list(APPEND HYPERSOMNIA_LIBS freetype)
 endif()
 
 if(BUILD_SOUND_FORMAT_DECODERS)

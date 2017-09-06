@@ -735,6 +735,7 @@ int main(const int argc, const char* const * const argv) try {
 	}
 
 	program_log::get_current().save_complete_to("generated/logs/successful_exit_debug_log.txt");
+	return 0;
 }
 catch (const config_read_error err) {
 	LOG("Failed to read the initial config for the game!\n%x", err.what());

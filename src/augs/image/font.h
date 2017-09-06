@@ -7,8 +7,10 @@
 #include "augs/image/image.h"
 #include "augs/texture_atlas/texture_atlas_entry.h"
 
+#if BUILD_FREETYPE
 struct FT_Glyph_Metrics_;
 typedef FT_Glyph_Metrics_ FT_Glyph_Metrics;
+#endif
 
 namespace augs {
 	struct font_loading_error : error_with_typesafe_sprintf {
@@ -29,7 +31,9 @@ namespace augs {
 		// END GEN INTROSPECTOR
 
 		font_glyph_metadata() = default;
+#if BUILD_FREETYPE
 		font_glyph_metadata(const FT_Glyph_Metrics&);
+#endif
 	};
 
 	struct font_metadata_from_file {

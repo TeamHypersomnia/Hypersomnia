@@ -73,7 +73,8 @@ return {
     map_mouse_motion_to = "MOVE_CROSSHAIR"
   },
   session = {
-    create_minimal_test_scene = false
+    create_minimal_test_scene = false,
+    show_developer_console = true
   },
   debug = {
     determinism_test_cloned_cosmoi_count = 0,
@@ -95,8 +96,7 @@ return {
   drawing = {
     draw_character_gui = true,
     draw_crosshairs = true,
-    draw_weapon_laser = true,
-    show_profile_details = true
+    draw_weapon_laser = true
   },
   gui_style = {
     Alpha = 1,
