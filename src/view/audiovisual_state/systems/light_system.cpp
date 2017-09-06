@@ -10,16 +10,17 @@
 
 #include "game/components/light_component.h"
 #include "game/components/render_component.h"
+#include "game/components/interpolation_component.h"
+#include "game/components/fixtures_component.h"
 
 #include "game/messages/visibility_information.h"
 
-#include "view/audiovisual_state/systems/light_system.h"
-
 #include "game/systems_stateless/visibility_system.h"
-#include "game/systems_stateless/render_system.h"
 
-#include "game/components/interpolation_component.h"
-#include "game/components/fixtures_component.h"
+#include "view/viewables/game_image.h"
+#include "view/rendering_scripts/draw_entity.h"
+
+#include "view/audiovisual_state/systems/light_system.h"
 #include "view/audiovisual_state/systems/interpolation_system.h"
 #include "view/audiovisual_state/systems/particles_simulation_system.h"
 
@@ -95,7 +96,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 	light_shader.set_projection(projection_matrix);
 
 	auto draw_layer = [&](const render_layer r, const renderable_drawing_type type = renderable_drawing_type::NEON_MAPS) {
-		render_system().draw_entities(visible_per_layer[r], cosmos, output, in.game_images, in.camera, global_time_seconds, in.interpolation, type);
+		draw_entities(visible_per_layer[r], cosmos, output, in.game_images, in.camera, global_time_seconds, in.interpolation, type);
 	};
 
 	cosmos.for_each(

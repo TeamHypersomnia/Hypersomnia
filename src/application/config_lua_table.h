@@ -24,7 +24,7 @@
 #include "view/audiovisual_state/systems/interpolation_settings.h"
 #include "application/debug_settings.h"
 #include "application/session_settings.h"
-#include "application/content_regeneration/content_regeneration_settings.h"
+#include "view/viewables/regeneration/content_regeneration_settings.h"
 #include "application/setups/main_menu_settings.h"
 
 enum class launch_type {

@@ -3,10 +3,12 @@
 #include "game/assets/sound_buffer_id.h"
 
 #include "augs/pad_bytes.h"
+
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/transcendental/step_declaration.h"
-#include "augs/audio/sound_effect_modifier.h"
+
+#include "game/detail/view_input/sound_effect_input.h"
 
 struct sound_existence_input {
 	// GEN INTROSPECTOR struct sound_existence_input

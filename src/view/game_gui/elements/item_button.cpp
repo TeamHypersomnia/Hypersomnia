@@ -4,27 +4,28 @@
 #include "augs/gui/text/printer.h"
 #include "augs/graphics/renderer.h"
 
-#include "view/game_gui/elements/item_button.h"
-#include "view/game_gui/elements/pixel_line_connector.h"
-#include "view/game_gui/elements/grid.h"
-#include "view/game_gui/elements/game_gui_context.h"
-#include "view/game_gui/elements/drag_and_drop.h"
-#include "view/game_gui/elements/game_gui_root.h"
-
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 
 #include "game/enums/item_category.h"
 #include "game/detail/inventory/inventory_slot.h"
 #include "game/detail/inventory/inventory_utils.h"
-#include "view/game_gui/elements/character_gui.h"
 #include "game/components/sprite_component.h"
 #include "game/components/item_component.h"
 #include "game/components/fixtures_component.h"
 #include "game/systems_stateless/input_system.h"
-#include "view/game_gui/game_gui_system.h"
-#include "game/assets/all_assets.h"
 
+#include "view/viewables/all_viewables_declarations.h"
+#include "view/viewables/game_image.h"
+
+#include "view/game_gui/game_gui_context.h"
+#include "view/game_gui/game_gui_system.h"
+#include "view/game_gui/elements/item_button.h"
+#include "view/game_gui/elements/pixel_line_connector.h"
+#include "view/game_gui/elements/grid.h"
+#include "view/game_gui/elements/drag_and_drop.h"
+#include "view/game_gui/elements/game_gui_root.h"
+#include "view/game_gui/elements/character_gui.h"
 #include "view/game_gui/elements/slot_button.h"
 
 using namespace augs::gui::text;
@@ -124,7 +125,7 @@ void item_button::draw_complete_dragged_ghost(
 
 item_button::layout_with_attachments item_button::calculate_button_layout(
 	const const_entity_handle component_owner,
-	const game_image_definitions& defs,
+	const game_image_metas_map& defs,
 	const bool include_attachments
 ) {
 	const auto& cosmos = component_owner.get_cosmos();
@@ -150,7 +151,7 @@ item_button::layout_with_attachments item_button::calculate_button_layout(
 		b += -origin;
 	}
 
-	const auto flip = defs.at(component_owner.get<components::sprite>().tex).gui_usage.flip;
+	const auto flip = defs.at(component_owner.get<components::sprite>().tex).usage_as_button.flip;
 
 	if (flip.horizontally()) {
 		for (auto& b : output.boxes) {
@@ -245,9 +246,9 @@ void item_button::draw_proc(
 		{
 			const bool draw_attachments = !this_id->is_container_open || f.draw_attachments_even_if_open;
 			auto item_sprite = item.get<components::sprite>();
-			const auto gui_def = context.get_game_image_definitions().at(item_sprite.tex).gui_usage;
+			const auto gui_def = context.get_game_image_metas().at(item_sprite.tex).usage_as_button;
 
-			const auto layout = calculate_button_layout(item, context.get_game_image_definitions(), draw_attachments);
+			const auto layout = calculate_button_layout(item, context.get_game_image_metas(), draw_attachments);
 			
 			vec2 expansion_offset;
 
@@ -448,11 +449,11 @@ void item_button::rebuild_layouts(const game_gui_context context, const this_in_
 
 	const auto* const sprite = item.find<components::sprite>();
 
-	const auto& manager = context.get_game_image_definitions();
+	const auto& manager = context.get_game_image_metas();
 
 	if (sprite) {
 		vec2i rounded_size = calculate_button_layout(item, manager, !this_id->is_container_open).aabb.get_size();
-		rounded_size = griddify_size(rounded_size, manager.at(item.get<components::sprite>().tex).gui_usage.bbox_expander);
+		rounded_size = griddify_size(rounded_size, manager.at(item.get<components::sprite>().tex).usage_as_button.bbox_expander);
 		this_id->rc.set_size(rounded_size);
 	}
 

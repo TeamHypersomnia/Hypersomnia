@@ -1,5 +1,9 @@
+#include "augs/log.h"
+
 #include "describers.h"
+
 #include "game/transcendental/entity_handle.h"
+
 #include "game/detail/inventory/inventory_slot_handle.h"
 #include "game/components/name_component.h"
 #include "game/components/melee_component.h"
@@ -13,9 +17,6 @@
 #include "game/detail/inventory/inventory_slot.h"
 #include "game/detail/inventory/inventory_slot_id.h"
 #include "game/transcendental/cosmos.h"
-#include "augs/log.h"
-#include "game/assets/all_assets.h"
-#include <iomanip>
 
 entity_name_type get_bbcoded_entity_name(const const_entity_handle maybe_overridden_by_nickname) {
 	return maybe_overridden_by_nickname.get_name();

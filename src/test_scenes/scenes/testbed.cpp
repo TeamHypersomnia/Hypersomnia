@@ -1,5 +1,5 @@
 #include "game/assets/game_image_id.h"
-#include "game/assets/all_assets.h"
+#include "game/assets/all_logical_assets.h"
 
 #include "test_scenes/scenes/testbed.h"
 #include "test_scenes/ingredients/ingredients.h"
@@ -10,7 +10,6 @@
 #include "game/organization/all_messages_includes.h"
 
 #include "game/systems_stateless/input_system.h"
-#include "game/systems_stateless/render_system.h"
 #include "game/systems_stateless/particles_existence_system.h"
 #include "game/systems_stateless/car_system.h"
 #include "game/systems_stateless/driver_system.h"

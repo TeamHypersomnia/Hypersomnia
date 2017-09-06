@@ -5,7 +5,7 @@
 #include "game/assets/sound_buffer_id.h"
 
 struct physical_material {
-	using collision_sound_matrix_type = asset_map<
+	using collision_sound_matrix_type = augs::enum_associative_array<
 		assets::physical_material_id, 
 		assets::sound_buffer_id
 	>;

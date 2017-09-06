@@ -2,7 +2,7 @@
 #include "augs/gui/rect.h"
 #include "augs/gui/appearance_detector.h"
 
-#include "view/game_gui/elements/game_gui_context.h"
+#include "view/game_gui/game_gui_context.h"
 
 struct drag_and_drop_target_drop_item : game_gui_rect_node {
 	typedef dereferenced_location<drag_and_drop_target_drop_item_in_character_gui> this_pointer;

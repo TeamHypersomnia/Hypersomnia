@@ -1,6 +1,6 @@
 #include "trace_system.h"
 
-#include "game/assets/all_assets.h"
+#include "game/assets/all_logical_assets.h"
 
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"

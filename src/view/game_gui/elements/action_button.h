@@ -1,10 +1,11 @@
 #pragma once
 #include "augs/math/vec2.h"
-#include "game_gui_context.h"
 #include "augs/gui/appearance_detector.h"
+#include "augs/audio/sound_source.h"
 
 #include "game/detail/spells/all_spells.h"
-#include "augs/audio/sound_source.h"
+
+#include "view/game_gui/game_gui_context.h"
 
 class action_button : public game_gui_rect_node {
 public:

@@ -1,16 +1,20 @@
 #pragma once
 #include <vector>
-#include "augs/math/vec2.h"
-#include "game/assets/particle_effect.h"
-#include "transform_component.h"
-
-#include "augs/misc/stepped_timing.h"
 
 #include "augs/pad_bytes.h"
 
+#include "augs/math/vec2.h"
+#include "augs/misc/stepped_timing.h"
+#include "augs/misc/minmax.h"
+
+#include "game/assets/particle_effect_id.h"
+
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/transcendental/step_declaration.h"
-#include "game/assets/particle_effect_id.h"
+
+#include "game/components/transform_component.h"
+
+#include "game/detail/view_input/particle_effect_input.h"
 
 struct particles_existence_input {
 	// GEN INTROSPECTOR struct particles_existence_input

@@ -6,7 +6,7 @@
 
 #include "game/messages/thunder_input.h"
 #include "game/components/transform_component.h"
-#include "game/assets/assets_declarations.h"
+#include "view/viewables/all_viewables_declarations.h"
 
 class particles_simulation_system;
 class cosmos;
@@ -46,7 +46,7 @@ public:
 
 	void advance(
 		const cosmos&,
-		const particle_effect_definitions&,
+		const particle_effects_map&,
 		const augs::delta dt,
 		particles_simulation_system& particles_output_for_effects
 	);

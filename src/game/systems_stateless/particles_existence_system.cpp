@@ -1,10 +1,5 @@
-#include "particles_existence_system.h"
 #include "game/transcendental/logic_step.h"
 #include "game/transcendental/cosmos.h"
-#include "game/components/particles_existence_component.h"
-#include "game/messages/queue_destruction.h"
-
-#include "game/assets/particle_effect.h"
 
 #include "game/components/missile_component.h"
 #include "game/components/render_component.h"
@@ -21,10 +16,12 @@
 #include "game/messages/exhausted_cast_message.h"
 #include "game/messages/exploding_ring_input.h"
 
-#include "game/detail/particle_types.h"
+#include "game/systems_stateless/particles_existence_system.h"
 
 bool components::particles_existence::is_activated(const const_entity_handle h) {
-	return h.get<components::tree_of_npo_node>().is_activated() && h.get<components::processing>().is_in(processing_subjects::WITH_PARTICLES_EXISTENCE);
+	return h.get<components::tree_of_npo_node>().is_activated() 
+		&& h.get<components::processing>().is_in(processing_subjects::WITH_PARTICLES_EXISTENCE)
+	;
 }
 
 void components::particles_existence::activate(const entity_handle h) {

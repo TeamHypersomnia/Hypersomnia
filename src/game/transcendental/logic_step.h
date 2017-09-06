@@ -3,7 +3,7 @@
 #include "game/transcendental/cosmic_entropy.h"
 
 struct data_living_one_step;
-class all_logical_assets;
+struct all_logical_assets;
 
 struct logic_step_input {
 	const cosmic_entropy& entropy;

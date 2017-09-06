@@ -3,7 +3,7 @@
 #include <map>
 #include <array>
 
-#include "view/game_gui/elements/game_gui_context.h"
+#include "view/game_gui/game_gui_context.h"
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/transcendental/cosmic_entropy.h"
 #include "augs/graphics/renderer.h"

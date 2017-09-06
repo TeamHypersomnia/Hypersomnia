@@ -452,20 +452,34 @@ struct basic_vec2 {
 		return *this;
 	}
 
+	template <class = std::enable_if_t<std::is_floating_point_v<type>>>
 	bool x_non_zero(const real eps = AUGS_EPSILON<real>) const {
 		return std::abs(x) > eps;
 	}
 
+	template <class = std::enable_if_t<std::is_floating_point_v<type>>>
 	bool y_non_zero(const real eps = AUGS_EPSILON<real>) const {
 		return std::abs(y) > eps;
 	}
 
+	template <class = std::enable_if_t<std::is_floating_point_v<type>>>
 	bool non_zero(const real eps = AUGS_EPSILON<real>) const {
 		return x_non_zero(eps) || y_non_zero(eps);
 	}
 
+	template <class = std::enable_if_t<std::is_floating_point_v<type>>>
 	bool is_zero(const real eps = AUGS_EPSILON<real>) const {
 		return !non_zero(eps);
+	}
+
+	template <class = std::enable_if_t<std::is_integral_v<type>>>
+	bool non_zero() const {
+		return x != 0 || y != 0;
+	}
+
+	template <class = std::enable_if_t<std::is_integral_v<type>>>
+	bool is_zero() const {
+		return x == 0 && y == 0;
 	}
 
 	basic_vec2 operator-() const { return basic_vec2(x * -1, y * -1); }

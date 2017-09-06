@@ -1,5 +1,5 @@
 return {
-scripted_image = {
+image_from_commands = {
 	commands = {
 		{
 			command = "circle_filled",

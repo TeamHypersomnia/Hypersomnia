@@ -5,7 +5,7 @@
 #include "augs/templates/get_index_type_for_size_of.h"
 
 #include "generated/introspectors.h"
-#include "game/assets/all_assets.h"
+#include "game/assets/all_logical_assets.h"
 
 #include "augs/misc/templated_readwrite.h"
 #include "augs/templates/container_traits.h"
@@ -23,6 +23,8 @@ namespace templates_detail {
 }
 
 struct tests_of_traits {
+	static_assert(b2_maxPolygonVertices == CONVEX_POLY_VERTEX_COUNT);
+
 	static_assert(
 		sizeof(entity_id) >= sizeof(entity_guid)
 		&& alignof(entity_id) >= alignof(entity_guid),

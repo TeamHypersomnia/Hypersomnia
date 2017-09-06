@@ -1,5 +1,5 @@
 #pragma once
-#include "view/game_gui/elements/game_gui_element_location.h"
+#include "view/game_gui/game_gui_element_location.h"
 
 class game_gui_root : public game_gui_rect_node {
 public:

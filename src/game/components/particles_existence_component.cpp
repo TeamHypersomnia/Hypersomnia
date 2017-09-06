@@ -4,7 +4,7 @@
 #include "game/transcendental/entity_handle.h"
 
 #include "game/components/position_copying_component.h"
-#include "game/assets/all_assets.h"
+#include "game/assets/all_logical_assets.h"
 
 entity_handle particles_existence_input::create_particle_effect_entity(
 	const logic_step step,

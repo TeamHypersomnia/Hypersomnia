@@ -6,12 +6,15 @@
 
 #include "game/components/sentience_component.h"
 
+#include "game/detail/inventory/inventory_slot.h"
+#include "game/detail/inventory/inventory_slot_handle.h"
+
+#include "view/viewables/game_image.h"
+
 #include "view/game_gui/elements/drag_and_drop_target_drop_item.h"
 #include "view/game_gui/elements/character_gui.h"
 #include "view/game_gui/elements/character_gui.h"
 #include "view/game_gui/elements/game_gui_root.h"
-#include "game/detail/inventory/inventory_slot.h"
-#include "game/detail/inventory/inventory_slot_handle.h"
 
 #include "view/game_gui/game_gui_system.h"
 
@@ -217,7 +220,7 @@ ltrb value_bar::get_bar_rect_with_borders(
 	auto icon_rect = absolute;
 
 	auto icon_tex = get_bar_icon(context, this_id);
-	icon_rect.set_size(context.get_game_image_definitions().at(icon_tex).get_size());
+	icon_rect.set_size(context.get_game_images().at(icon_tex).get_size());
 
 	const auto max_value_caption_size = get_text_bbox({ L"99999", context.get_gui_font() });
 

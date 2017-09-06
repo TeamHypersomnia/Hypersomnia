@@ -1,31 +1,30 @@
-#include "augs/graphics/renderer.h"
-
 #include "augs/math/matrix.h"
 
-#include "game/assets/all_assets.h"
+#include "augs/drawing/drawing.h"
+
+#include "augs/graphics/renderer.h"
+#include "augs/graphics/shader.h"
 
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
 
-#include "view/necessary_resources.h"
+#include "view/rendering_scripts/draw_entity.h"
 
-#include "game/systems_stateless/render_system.h"
-
-#include "view/rendering_scripts/rendering_scripts.h"
-#include "view/rendering_scripts/illuminated_rendering.h"
-
-#include "view/game_gui/elements/character_gui.h"
 #include "game/components/item_slot_transfers_component.h"
 #include "game/components/render_component.h"
-#include "view/audiovisual_state/audiovisual_state.h"
 #include "game/debug_drawing_settings.h"
 
 #include "game/components/interpolation_component.h"
 #include "game/components/fixtures_component.h"
-#include "view/audiovisual_state/systems/interpolation_system.h"
 
-#include "augs/drawing/drawing.h"
-#include "augs/graphics/shader.h"
+#include "view/rendering_scripts/rendering_scripts.h"
+#include "view/rendering_scripts/illuminated_rendering.h"
+
+#include "view/necessary_resources.h"
+#include "view/viewables/all_viewables_declarations.h"
+#include "view/viewables/game_image.h"
+
+#include "view/audiovisual_state/audiovisual_state.h"
 
 void illuminated_rendering(const illuminated_rendering_input in) {
 	auto& renderer = in.renderer;
@@ -169,7 +168,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		const render_layer r, 
 		const renderable_drawing_type type = renderable_drawing_type::NORMAL
 	) {
-		render_system().draw_entities(visible_per_layer[r], cosmos, output, game_images, camera, global_time_seconds, interp, type);
+		draw_entities(visible_per_layer[r], cosmos, output, game_images, camera, global_time_seconds, interp, type);
 	};
 
 	draw_layer(render_layer::UNDER_GROUND);

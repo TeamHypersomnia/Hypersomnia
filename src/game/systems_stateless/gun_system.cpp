@@ -5,7 +5,7 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/logic_step.h"
 
-#include "game/assets/all_assets.h"
+#include "game/assets/all_logical_assets.h"
 #include "game/messages/intent_message.h"
 #include "game/messages/damage_message.h"
 #include "game/messages/queue_destruction.h"

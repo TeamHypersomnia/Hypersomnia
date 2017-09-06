@@ -1,6 +1,5 @@
 #pragma once
 #include "game/container_sizes.h"
-#include "augs/audio/sound_effect_modifier.h"
 
 namespace assets {
 	enum class sound_buffer_id {
@@ -52,10 +51,3 @@ namespace assets {
 		// END GEN INTROSPECTOR
 	};
 }
-
-struct sound_effect_input {
-	// GEN INTROSPECTOR struct sound_effect_input
-	assets::sound_buffer_id id = assets::sound_buffer_id::INVALID;
-	augs::sound_effect_modifier modifier;
-	// END GEN INTROSPECTOR
-};

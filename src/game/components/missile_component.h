@@ -1,5 +1,11 @@
 #pragma once
-#include "augs/math/vec2.h"
+#include "augs/pad_bytes.h"
+
+#include "augs/misc/timer.h"
+#include "augs/misc/value_meter.h"
+#include "augs/misc/stepped_timing.h"
+
+#include "augs/graphics/rgba.h"
 
 #include "game/assets/sound_buffer_id.h"
 #include "game/assets/particle_effect_id.h"
@@ -7,12 +13,8 @@
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
 
-#include "augs/misc/timer.h"
-#include "augs/misc/stepped_timing.h"
-#include "augs/graphics/rgba.h"
-#include "augs/pad_bytes.h"
-
-#include "augs/misc/value_meter.h"
+#include "game/detail/view_input/sound_effect_input.h"
+#include "game/detail/view_input/particle_effect_input.h"
 
 namespace components {
 	struct missile {

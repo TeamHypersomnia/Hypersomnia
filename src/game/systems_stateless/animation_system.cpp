@@ -11,7 +11,7 @@
 
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/logic_step.h"
-#include "game/assets/all_assets.h"
+#include "game/assets/all_logical_assets.h"
 
 using namespace augs;
 

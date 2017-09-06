@@ -63,13 +63,4 @@ namespace augs {
 
 		std::vector<variation> variations;
 	};
-
-	struct sound_buffer_logical {
-		sound_buffer_logical(const sound_buffer&);
-
-		// GEN INTROSPECTOR struct augs::sound_buffer_logical
-		float max_duration_in_seconds = 0.f;
-		unsigned num_of_variations = 0xdeadbeef;
-		// END GEN INTROSPECTOR
-	};
 }

@@ -4,7 +4,7 @@
 #include "game/messages/queue_destruction.h"
 
 #include "game/detail/entity_scripts.h"
-#include "game/assets/all_assets.h"
+#include "game/assets/all_logical_assets.h"
 
 #include "game/components/missile_component.h"
 #include "game/components/render_component.h"

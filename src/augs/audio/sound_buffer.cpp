@@ -140,21 +140,6 @@ namespace augs {
 		}
 	}
 
-	sound_buffer_logical::sound_buffer_logical(const sound_buffer& buf) 
-		: num_of_variations(buf.variations.size())
-	{
-		const auto len = [](const sound_buffer::variation& v) {
-			return v.stereo_or_mono().get_length_in_seconds();
-		};
-
-		max_duration_in_seconds = static_cast<float>(len(maximum_of(
-			buf.variations,
-			[len](const auto& a, const auto& b) {
-				return len(a) < len(b);
-			}
-		)));
-	}
-
 	sound_buffer::sound_buffer(const sound_buffer_loading_input input) {
 		from_file(input);
 	}

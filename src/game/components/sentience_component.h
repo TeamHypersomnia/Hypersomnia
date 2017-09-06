@@ -3,11 +3,15 @@
 
 #include "augs/misc/stepped_timing.h"
 #include "augs/misc/enum_associative_array.h"
+#include "augs/misc/value_meter.h"
 
-#include "game/transcendental/entity_id.h"
+#include "augs/templates/type_list.h"
+#include "augs/templates/constexpr_arithmetic.h"
 
 #include "game/assets/sound_buffer_id.h"
 #include "game/assets/particle_effect_id.h"
+
+#include "game/transcendental/entity_id.h"
 
 #include "game/components/transform_component.h"
 
@@ -15,10 +19,8 @@
 #include "game/detail/spells/all_spells.h"
 #include "game/detail/perks/all_perks.h"
 
-#include "augs/misc/value_meter.h"
-
-#include "augs/templates/type_list.h"
-#include "augs/templates/constexpr_arithmetic.h"
+#include "game/detail/view_input/sound_effect_input.h"
+#include "game/detail/view_input/particle_effect_input.h"
 
 using learned_spells_array_type = std::array<
 	zeroed_pod<bool>,

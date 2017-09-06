@@ -6,7 +6,7 @@
 #include "game/detail/inventory/inventory_slot_handle.h"
 #include "game/detail/inventory/inventory_utils.h"
 
-#include "view/game_gui/elements/game_gui_element_location.h"
+#include "view/game_gui/game_gui_element_location.h"
 #include "view/game_gui/elements/character_gui.h"
 #include "view/game_gui/elements/slot_button.h"
 #include "view/game_gui/elements/item_button.h"
@@ -327,7 +327,7 @@ void game_gui_system::rebuild_layouts(
 	const auto root_entity = context.get_subject_entity();
 	const auto& cosmos = root_entity.get_cosmos();
 	const auto& necessarys = context.get_necessary_images();
-	const auto& game_image_defs = context.get_game_image_definitions();
+	const auto& game_image_defs = context.get_game_image_metas();
 	auto& element = context.get_character_gui();
 
 	ensure(root_entity.has<components::item_slot_transfers>());

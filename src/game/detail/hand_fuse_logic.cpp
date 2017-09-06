@@ -16,7 +16,7 @@
 #include "game/components/all_inferred_state_component.h"
 
 #include "game/systems_stateless/sound_existence_system.h"
-#include "game/assets/all_assets.h"
+#include "game/assets/all_logical_assets.h"
 
 void release_or_throw_fused_object(
 	const logic_step step,

@@ -1,13 +1,41 @@
-#include "visible_entities.h"
+#include "game/detail/visible_entities.h"
 
 #include "game/transcendental/cosmos.h"
 #include "game/components/render_component.h"
 
+#include "game/enums/filters.h"
+#include "game/detail/physics/physics_scripts.h"
+
 #include "game/systems_inferred/tree_of_npo_system.h"
 #include "game/systems_inferred/physics_system.h"
-#include "game/systems_stateless/render_system.h"
 
-#include "game/enums/filters.h"
+static void get_visible_per_layer(
+	const cosmos& cosmos,
+	const visible_entities::all_type& entities,
+	visible_entities::per_layer_type& output_layers
+) {
+	if (entities.empty()) {
+		return;
+	}
+
+	for (const auto it_id : entities) {
+		const auto it = cosmos[it_id];
+		const auto layer = it.get<components::render>().layer;
+		ensure(layer < static_cast<render_layer>(output_layers.size()));
+		output_layers[layer].push_back(it);
+	}
+
+	auto& car_interior_layer = output_layers[render_layer::CAR_INTERIOR];
+
+	if (car_interior_layer.size() > 1) {
+		sort_container(
+			car_interior_layer, 
+			[&cosmos](const auto b, const auto a) {
+				return are_connected_by_friction(cosmos[a], cosmos[b]);
+			}
+		);
+	}
+}
 
 visible_entities::visible_entities(const visible_entities_query input) {
 	reacquire(input);
@@ -44,10 +72,5 @@ void visible_entities::reacquire(const visible_entities_query input) {
 	);
 
 	concatenate(all, unique_from_physics);
-
-	render_system().get_visible_per_layer(
-		cosmos,
-		all,
-		per_layer
-	);
+	get_visible_per_layer(cosmos, all, per_layer);
 }

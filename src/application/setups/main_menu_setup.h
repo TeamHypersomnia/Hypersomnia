@@ -8,12 +8,15 @@
 #include "augs/misc/action_list.h"
 #include "augs/misc/fixed_delta_timer.h"
 
-#include "game/assets/all_assets.h"
+#include "game/assets/all_logical_assets.h"
 
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmic_movie_director.h"
 #include "game/organization/all_component_includes.h"
+
+#include "view/viewables/viewables_loading_type.h"
+#include "view/viewables/all_viewables.h"
 
 #include "application/gui/menu/creators_screen.h"
 #include "application/gui/main_menu_gui.h"
@@ -26,7 +29,7 @@ class main_menu_setup {
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 	cosmic_entropy total_collected_entropy;
 	all_logical_assets logical_assets;
-	all_viewable_defs viewable_defs;
+	all_viewables viewable_defs;
 
 	entity_id viewed_character_id;
 	sol::table menu_config_patch;

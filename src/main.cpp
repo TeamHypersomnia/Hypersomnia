@@ -20,7 +20,8 @@
 #include "game/transcendental/data_living_one_step.h"
 #include "game/transcendental/cosmos.h"
 
-#include "game/assets/loaded_sounds.h"
+#include "view/viewables/all_viewables.h"
+#include "view/viewables/loaded_sounds.h"
 
 #include "view/game_gui/game_gui_system.h"
 
@@ -37,7 +38,7 @@
 #include "application/setups/local_setup.h"
 #include "application/setups/editor_setup.h"
 
-#include "application/content_regeneration/atlas_distributions.h"
+#include "view/viewables/atlas_distributions.h"
 
 #include "application/main/main_helpers.h"
 #include "application/main/imgui_pass.h"
@@ -148,7 +149,7 @@ int main(const int argc, const char* const * const argv) try {
 	
 	ingame_menu_gui ingame_menu;
 	loaded_sounds game_sounds;
-	game_images_in_atlas game_atlas_entries;
+	game_images_in_atlas_map game_atlas_entries;
 	necessary_images_in_atlas necessary_atlas_entries;
 	augs::baked_font gui_font;
 
@@ -159,12 +160,12 @@ int main(const int argc, const char* const * const argv) try {
 		if constexpr(T::loading_strategy == viewables_loading_type::ALWAYS_HAVE_ALL_LOADED) {
 			const auto& defs = setup.get_viewable_defs();
 
-			game_sounds = defs.get_store_by<assets::sound_buffer_id>();
+			game_sounds = defs.sounds;
 
 			const auto settings = config.content_regeneration;
 
 			standard_atlas_distribution({
-				defs.get_store_by<assets::game_image_id>(),
+				defs.game_image_loadables,
 				images,
 				config.gui_font,
 				{
@@ -214,15 +215,15 @@ int main(const int argc, const char* const * const argv) try {
 		}
 	};
 
-	auto get_viewable_defs = [&]() -> const all_viewable_defs& {
-		return visit_current_setup([](auto& setup) -> const all_viewable_defs& {
+	auto get_viewable_defs = [&]() -> const all_viewables& {
+		return visit_current_setup([](auto& setup) -> const all_viewables& {
 			return setup.get_viewable_defs();
 		});
 	};
 
 	auto create_game_gui_deps = [&]() {
 		return game_gui_context_dependencies{
-			get_viewable_defs().get_store_by<assets::game_image_id>(),
+			get_viewable_defs().game_image_metas,
 			game_atlas_entries,
 			necessary_atlas_entries,
 			gui_font
@@ -417,7 +418,7 @@ int main(const int argc, const char* const * const argv) try {
 					static_cast<float>(setup.get_audiovisual_speed()),
 					
 					screen_size,
-					get_viewable_defs().get_store_by<assets::particle_effect_id>(),
+					get_viewable_defs().particle_effects,
 					game_sounds,
 				
 					viewing_config.audio_volume,
@@ -470,8 +471,6 @@ int main(const int argc, const char* const * const argv) try {
 		const auto interpolation_ratio = visit_current_setup([](auto& setup) {
 			return setup.get_interpolation_ratio();
 		});
-
-		const auto& game_image_defs = get_viewable_defs().get_store_by<assets::game_image_id>();
 
 		/* Prepare game GUI structures */
 

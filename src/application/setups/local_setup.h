@@ -2,12 +2,14 @@
 #include "augs/misc/fixed_delta_timer.h"
 #include "augs/misc/debug_entropy_player.h"
 
-#include "game/assets/all_assets.h"
-#include "view/debug_character_selection.h"
+#include "game/assets/all_logical_assets.h"
 
 #include "game/organization/all_component_includes.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
+
+#include "view/debug_character_selection.h"
+#include "view/viewables/all_viewables.h"
 
 #include "application/debug_settings.h"
 
@@ -21,7 +23,7 @@ class local_setup {
 	debug_character_selection characters;
 
 	all_logical_assets logical_assets;
-	all_viewable_defs viewable_defs;
+	all_viewables viewable_defs;
 
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::ALWAYS_HAVE_ALL_LOADED;

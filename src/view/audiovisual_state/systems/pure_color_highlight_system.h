@@ -6,7 +6,7 @@
 
 #include "augs/graphics/vertex.h"
 
-#include "game/assets/assets_declarations.h"
+#include "view/viewables/all_viewables_declarations.h"
 #include "game/transcendental/entity_id.h"
 #include "game/components/transform_component.h"
 
@@ -44,7 +44,7 @@ public:
 		const camera_cone camera,
 		const cosmos& cosmos,
 		const interpolation_system& interp,
-		const game_images_in_atlas& game_images
+		const game_images_in_atlas_map& game_images
 	) const;
 
 	void reserve_caches_for_entities(const size_t) const {}

@@ -5,7 +5,7 @@
 #include "game/transcendental/entity_handle.h"
 #include "view/debug_character_selection.h"
 #include "augs/misc/debug_entropy_player.h"
-#include "game/assets/all_assets.h"
+#include "game/assets/all_logical_assets.h"
 #include "augs/misc/fixed_delta_timer.h"
 #include "game/organization/all_component_includes.h"
 
@@ -16,7 +16,6 @@ public:
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 	entity_id viewed_entity_id;
 	all_logical_assets logical_assets;
-	game_image_definitions image_definitions;
 
 	editor_setup(const std::string& directory);
 

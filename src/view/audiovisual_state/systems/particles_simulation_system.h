@@ -4,21 +4,17 @@
 #include "augs/misc/delta.h"
 #include "augs/misc/randomization.h"
 
-#include "game/enums/render_layer.h"
-
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/transcendental/step_declaration.h"
 
-#include "game/assets/assets_declarations.h"
-
+#include "game/enums/render_layer.h"
 #include "game/components/particles_existence_component.h"
 
-#include "game/detail/particle_types_declaration.h"
-
-struct general_particle;
+#include "view/viewables/all_viewables_declarations.h"
+#include "view/viewables/particle_types_declaration.h"
+#include "view/viewables/particle_effect.h"
 
 class interpolation_system;
-struct particles_emission;
 
 class particles_simulation_system {
 public:
@@ -131,7 +127,7 @@ public:
 	void advance_visible_streams_and_all_particles(
 		camera_cone,
 		const cosmos&,
-		const particle_effect_definitions&,
+		const particle_effects_map&,
 		const augs::delta dt,
 		const interpolation_system&
 	);

@@ -1,10 +1,13 @@
 #pragma once
 #include <string>
-#include "game/assets/game_image_id.h"
 #include "augs/graphics/rgba.h"
 
+#include "game/assets/game_image_id.h"
 #include "game/assets/particle_effect_id.h"
 #include "game/assets/sound_buffer_id.h"
+
+#include "game/detail/view_input/sound_effect_input.h"
+#include "game/detail/view_input/particle_effect_input.h"
 
 struct spell_common_data {
 	// GEN INTROSPECTOR struct spell_common_data

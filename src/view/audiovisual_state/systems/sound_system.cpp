@@ -8,8 +8,7 @@
 #include "view/audiovisual_state/systems/interpolation_system.h"
 #include "view/audiovisual_state/systems/sound_system.h"
 
-#include "game/assets/all_assets.h"
-#include "game/assets/loaded_sounds.h"
+#include "view/viewables/loaded_sounds.h"
 
 #include "augs/audio/audio_settings.h"
 

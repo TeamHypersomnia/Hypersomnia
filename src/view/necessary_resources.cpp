@@ -8,7 +8,8 @@
 
 #include "view/necessary_resources.h"
 
-#include "application/content_regeneration/procedural_image.h"
+#include "view/viewables/regeneration/images_from_commands.h"
+#include "view/viewables/regeneration/procedural_image_definition.h"
 
 #include "generated/introspectors.h"
 
@@ -142,7 +143,7 @@ necessary_image_definitions::necessary_image_definitions(
 
 		const auto stem = to_lowercase(augs::enum_to_string(id));
 
-		game_image_definition definition_template;
+		game_image_loadables definition_template;
 
 		if (
 			const auto additional_properties_path = typesafe_sprintf("%x%x.lua", directory, stem);
@@ -191,7 +192,7 @@ necessary_image_definitions::necessary_image_definitions(
 
 			
 			if (
-				const bool exactly_one = def.button_with_corners.has_value() != def.scripted_image.has_value();
+				const bool exactly_one = def.button_with_corners.has_value() != def.image_from_commands.has_value();
 				!exactly_one
 			) {
 				throw necessary_resource_loading_error(
@@ -224,14 +225,14 @@ necessary_image_definitions::necessary_image_definitions(
 					);
 				});
 			}
-			else if (def.scripted_image) {
+			else if (def.image_from_commands) {
 				const auto generated_image_path = get_procedural_image_path(
 					typesafe_sprintf("%xprocedural/%x.png", directory, stem)
 				);
 		
-				regenerate_scripted_image(
+				regenerate_image_from_commands(
 					generated_image_path,
-					def.scripted_image.value(),
+					def.image_from_commands.value(),
 					force_regenerate
 				);
 		

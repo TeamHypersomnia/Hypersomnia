@@ -9,7 +9,7 @@
 #include "game/components/particles_existence_component.h"
 #include "game/components/wandering_pixels_component.h"
 
-class all_logical_assets;
+struct all_logical_assets;
 
 template <bool is_const, class entity_handle_type>
 class basic_spatial_properties_mixin {

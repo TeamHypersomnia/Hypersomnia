@@ -2,7 +2,7 @@
 #include "game/transcendental/entity_handle.h"
 
 #include "physics_mixin.h"
-#include "game/assets/all_assets.h"
+#include "game/assets/all_logical_assets.h"
 
 #include "game/components/rigid_body_component.h"
 #include "game/components/special_physics_component.h"

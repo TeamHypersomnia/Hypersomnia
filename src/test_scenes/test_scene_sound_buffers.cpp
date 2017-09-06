@@ -1,15 +1,17 @@
+#include "augs/misc/enum_associative_array.h"
+#include "augs/templates/enum_introspect.h"
 #include "augs/filesystem/file.h"
+#include "augs/audio/sound_buffer.h"
+
+#include "game/assets/sound_buffer_id.h"
 
 #include "test_scenes/test_scenes_content.h"
-#include "game/assets/all_assets.h"
 
 #include "generated/introspectors.h"
 
-void load_test_scene_sound_buffers(all_viewable_defs& manager) {
+void load_test_scene_sound_buffers(sound_buffer_inputs_map& sounds) {
 	using id_type = assets::sound_buffer_id;
 	const auto directory = "content/official/sfx/";
-
-	auto& sounds = manager.get_store_by(id_type());
 
 	augs::for_each_enum_except_bounds<id_type>([&](const id_type id) {
 		const auto stem = to_lowercase(augs::enum_to_string(id));

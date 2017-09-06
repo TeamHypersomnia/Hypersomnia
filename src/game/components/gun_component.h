@@ -2,19 +2,22 @@
 #include <cstddef>
 #include "augs/pad_bytes.h"
 
-#include "augs/audio/sound_effect_modifier.h"
-
 #include "augs/misc/timer.h"
 #include "augs/misc/stepped_timing.h"
 #include "augs/misc/minmax.h"
 
 #include "game/enums/gun_action_type.h"
+
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/step_declaration.h"
-#include "game/assets/sound_buffer_id.h"
+
 #include "game/components/render_component.h"
-#include "game/assets/recoil_player.h"
+
 #include "game/assets/recoil_player_id.h"
+#include "game/assets/sound_buffer_id.h"
+#include "game/assets/recoil_player.h"
+
+#include "game/detail/view_input/sound_effect_input.h"
 
 namespace augs {
 	struct introspection_access;

@@ -1,5 +1,4 @@
 #include "ingredients.h"
-#include "game/systems_stateless/render_system.h"
 
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"

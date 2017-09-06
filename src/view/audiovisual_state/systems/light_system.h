@@ -7,7 +7,7 @@
 
 #include "augs/math/camera_cone.h"
 
-#include "game/assets/assets_declarations.h"
+#include "view/viewables/all_viewables_declarations.h"
 #include "game/detail/visible_entities.h"
 
 class interpolation_system;
@@ -34,7 +34,7 @@ struct light_system_input {
 	const interpolation_system& interpolation;
 	const particles_simulation_system& particles;
 	const visible_entities::per_layer_type& visible_per_layer;
-	const game_images_in_atlas& game_images;
+	const game_images_in_atlas_map& game_images;
 };
 
 class light_system {

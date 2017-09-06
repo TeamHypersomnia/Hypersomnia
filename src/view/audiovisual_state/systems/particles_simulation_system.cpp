@@ -1,19 +1,18 @@
 #include "augs/templates/container_templates.h"
 #include "augs/misc/randomization.h"
 
-#include "game/assets/all_assets.h"
-
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 
 #include "game/components/position_copying_component.h"
-
-#include "game/detail/particle_types.h"
-
-#include "view/audiovisual_state/systems/particles_simulation_system.h"
-
 #include "game/components/interpolation_component.h"
 #include "game/components/fixtures_component.h"
+
+#include "view/viewables/all_viewables_declarations.h"
+#include "view/viewables/particle_effect.h"
+#include "view/viewables/particle_types.h"
+
+#include "view/audiovisual_state/systems/particles_simulation_system.h"
 #include "view/audiovisual_state/systems/interpolation_system.h"
 
 void particles_simulation_system::erase_caches_for_dead_entities(const cosmos& new_cosmos) {
@@ -49,7 +48,7 @@ void particles_simulation_system::add_particle(const render_layer l, const entit
 void particles_simulation_system::advance_visible_streams_and_all_particles(
 	camera_cone cone, 
 	const cosmos& cosmos, 
-	const particle_effect_definitions& manager,
+	const particle_effects_map& manager,
 	const augs::delta delta,
 	const interpolation_system& interp
 ) {

@@ -1,5 +1,5 @@
 #include "ingredients.h"
-#include "game/assets/all_assets.h"
+#include "game/assets/all_logical_assets.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
 

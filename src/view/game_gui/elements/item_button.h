@@ -1,15 +1,14 @@
 #pragma once
+#include "augs/pad_bytes.h"
+
 #include "augs/gui/rect.h"
 #include "augs/gui/appearance_detector.h"
 
-#include "game/detail/inventory/inventory_slot_id.h"
 #include "game/transcendental/entity_handle.h"
-#include "game/assets/assets_declarations.h"
+#include "game/detail/inventory/inventory_slot_id.h"
 
-#include "augs/pad_bytes.h"
-
-#include "game_gui_context.h"
-#include "view/game_gui/elements/game_gui_context.h"
+#include "view/viewables/all_viewables_declarations.h"
+#include "view/game_gui/game_gui_context.h"
 
 struct item_button : game_gui_rect_node {
 	using base = game_gui_rect_node;
@@ -42,7 +41,7 @@ struct item_button : game_gui_rect_node {
 
 	static layout_with_attachments calculate_button_layout(
 		const const_entity_handle component_owner,
-		const game_image_definitions&,
+		const game_image_metas_map&,
 		const bool include_attachments = true
 	);
 

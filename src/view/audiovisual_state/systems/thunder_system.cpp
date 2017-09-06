@@ -3,13 +3,15 @@
 #include "augs/math/camera_cone.h"
 #include "augs/drawing/drawing.h"
 
-#include "game/assets/all_assets.h"
 #include "game/enums/filters.h"
 
 #include "game/transcendental/cosmos.h"
-#include "game/detail/particle_types.h"
 
 #include "game/systems_inferred/physics_system.h"
+
+#include "view/viewables/all_viewables_declarations.h"
+#include "view/viewables/particle_effect.h"
+#include "view/viewables/particle_types.h"
 
 #include "view/audiovisual_state/systems/particles_simulation_system.h"
 #include "view/audiovisual_state/systems/thunder_system.h"
@@ -45,7 +47,7 @@ void thunder_system::add(const thunder_input in) {
 
 void thunder_system::advance(
 	const cosmos& cosmos,
-	const particle_effect_definitions& manager,
+	const particle_effects_map& manager,
 	const augs::delta dt,
 	particles_simulation_system& particles_output_for_effects
 ) {

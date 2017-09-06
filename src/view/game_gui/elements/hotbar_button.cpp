@@ -58,7 +58,7 @@ button_corners_info hotbar_button::get_button_corners_info() const {
 
 vec2i hotbar_button::get_bbox(
 	const necessary_images_in_atlas& necessarys,
-	const game_image_definitions& defs,
+	const game_image_metas_map& defs,
 	const const_entity_handle owner_transfer_capability
 ) const {
 	const auto ent = get_assigned_entity(owner_transfer_capability);
@@ -85,7 +85,7 @@ void hotbar_button::draw(
 	const auto& this_tree_entry = context.get_tree_entry(this_id);
 	const auto owner_transfer_capability = context.get_subject_entity();
 	const auto settings = context.get_hotbar_settings();
-	const auto& game_image_defs = context.get_game_image_definitions();
+	const auto& game_image_defs = context.get_game_image_metas();
 	const auto& necessarys = context.get_necessary_images();
 	const auto& gui_font = context.get_gui_font();
 	const auto output = context.get_output();

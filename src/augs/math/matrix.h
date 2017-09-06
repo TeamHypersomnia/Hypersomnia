@@ -1,5 +1,6 @@
 #pragma once
 #include <array>
+#include "augs/math/vec2.h"
 
 #undef near
 #undef far

@@ -4,7 +4,7 @@
 #include "augs/gui/rect.h"
 #include "augs/gui/appearance_detector.h"
 
-#include "view/game_gui/elements/game_gui_context.h"
+#include "view/game_gui/game_gui_context.h"
 
 struct value_bar : game_gui_rect_node {
 	typedef dereferenced_location<value_bar_in_character_gui> this_pointer;

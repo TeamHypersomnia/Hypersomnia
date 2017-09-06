@@ -12,7 +12,7 @@
 
 #include "game/components/sound_existence_component.h"
 
-#include "game/assets/assets_declarations.h"
+#include "view/viewables/all_viewables_declarations.h"
 
 class interpolation_system;
 class cosmos;

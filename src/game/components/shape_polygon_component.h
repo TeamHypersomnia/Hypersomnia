@@ -5,8 +5,7 @@
 #include "augs/misc/enum_array.h"
 #include "augs/misc/convex_partitioned_shape.h"
 
-#include "game/assets/assets_declarations.h"
-
+#include "game/assets/all_logical_assets_declarations.h"
 #include "game/transcendental/component_synchronizer.h"
 
 #include "game/components/all_inferred_state_component.h"

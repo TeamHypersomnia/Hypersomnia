@@ -1,13 +1,16 @@
-#include "action_button.h"
-#include "view/game_gui/elements/game_gui_context.h"
 #include "game/transcendental/cosmos.h"
-#include "view/game_gui/game_gui_system.h"
 #include "game/components/sentience_component.h"
-#include "game/assets/all_assets.h"
 
 #include "augs/drawing/drawing.h"
 #include "augs/gui/text/printer.h"
 #include "augs/templates/visit_gettable.h"
+
+#include "view/game_gui/elements/action_button.h"
+#include "view/game_gui/game_gui_context.h"
+#include "view/game_gui/game_gui_system.h"
+
+#include "view/viewables/all_viewables_declarations.h"
+#include "view/viewables/game_image.h"
 
 using namespace augs::gui::text;
 

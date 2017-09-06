@@ -1,8 +1,6 @@
 #pragma once
-#include "game/transcendental/entity_id.h"
-#include "game/enums/adverse_element_type.h"
-#include "game/assets/game_image_id.h"
-#include "game/detail/explosions.h"
+#include "augs/misc/stepped_timing.h"
+#include "game/detail/view_input/sound_effect_input.h"
 
 namespace components {
 	struct hand_fuse {

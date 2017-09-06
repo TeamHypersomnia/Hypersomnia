@@ -4,7 +4,6 @@
 #include "game/systems_stateless/visibility_system.h"
 #include "game/systems_stateless/pathfinding_system.h"
 #include "game/systems_stateless/animation_system.h"
-#include "game/systems_stateless/render_system.h"
 #include "game/systems_stateless/input_system.h"
 #include "game/systems_stateless/gun_system.h"
 #include "game/systems_stateless/crosshair_system.h"

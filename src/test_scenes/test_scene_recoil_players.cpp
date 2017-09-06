@@ -2,7 +2,7 @@
 
 #include "game/assets/recoil_player.h"
 #include "game/assets/recoil_player_id.h"
-#include "game/assets/all_assets.h"
+#include "game/assets/all_logical_assets.h"
 
 #include <type_traits>
 #include <random>

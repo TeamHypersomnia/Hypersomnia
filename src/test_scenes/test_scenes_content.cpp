@@ -1,15 +1,24 @@
+#include "game/assets/all_logical_assets.h"
+#include "view/viewables/all_viewables.h"
 #include "test_scenes/test_scenes_content.h"
-#include "game/assets/all_assets.h"
 
 void populate_test_scene_assets(
 	all_logical_assets& output_logicals,
-	all_viewable_defs& output_sources
+	all_viewables& output_sources
 ) {
 #if BUILD_TEST_SCENES
 	try {
-		load_test_scene_images(output_sources);
-		load_test_scene_particle_effects(output_sources);
-		load_test_scene_sound_buffers(output_sources);
+		load_test_scene_images(
+			output_sources.game_image_loadables,
+			output_sources.game_image_metas
+		);
+
+		load_test_scene_particle_effects(
+			output_sources.game_image_loadables, 
+			output_sources.particle_effects
+		);
+
+		load_test_scene_sound_buffers(output_sources.sounds);
 
 		load_test_scene_animations(output_logicals);
 		load_test_scene_physical_materials(output_logicals);
@@ -21,5 +30,5 @@ void populate_test_scene_assets(
 	}
 #endif
 
-	output_logicals.update_from(output_sources);
+	output_sources.update_into(output_logicals);
 }

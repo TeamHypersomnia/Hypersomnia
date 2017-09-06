@@ -11,7 +11,7 @@
 #include "game/transcendental/logic_step.h"
 #include "augs/ensure.h"
 #include "augs/templates/string_templates.h"
-#include "view/game_gui/elements/game_gui_context.h"
+#include "view/game_gui/game_gui_context.h"
 #include "view/game_gui/game_gui_system.h"
 
 void drag_and_drop_callback(

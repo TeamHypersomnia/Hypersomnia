@@ -1,10 +1,14 @@
-#include "test_scenes/test_scenes_content.h"
-#include "game/assets/all_assets.h"
-#include "game/assets/particle_effect.h"
-#include "game/assets/particle_effect_id.h"
-#include "augs/graphics/shader.h"
+#include "augs/misc/enum_associative_array.h"
 
-#include "game/detail/particle_types.h"
+#include "game/assets/particle_effect_id.h"
+#include "game/assets/animation.h"
+
+#include "view/viewables/regeneration/game_image_loadables.h"
+#include "view/viewables/particle_types.h"
+#include "view/viewables/particle_effect.h"
+
+#include "test_scenes/test_scenes_content.h"
+
 
 /* 
 	This code is shit. 
@@ -12,9 +16,12 @@
 	not meant to be used in production.
 */
 
-void load_test_scene_particle_effects(all_viewable_defs& manager) {
-	auto set = [&manager](auto& target, auto id, auto col) {
-		target.set_image(id, manager.at(id).get_size(), col);
+void load_test_scene_particle_effects(
+	const game_image_loadables_map& images,
+	particle_effects_map& manager
+) {
+	auto set = [&images](auto& target, auto id, auto col) {
+		target.set_image(id, images.at(id).get_size(), col);
 	};
 
 	auto sets = [&manager](auto& target, auto id, auto sz, auto col) {

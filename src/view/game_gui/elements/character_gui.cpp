@@ -1,5 +1,5 @@
 #include <tuple>
-#include "view/game_gui/elements/game_gui_element_location.h"
+#include "view/game_gui/game_gui_element_location.h"
 #include "character_gui.h"
 
 #include "augs/gui/text/printer.h"
@@ -17,10 +17,10 @@
 #include "game/components/name_component.h"
 #include "game/components/item_component.h"
 #include "game/components/render_component.h"
-#include "game/systems_stateless/render_system.h"
+#include "view/rendering_scripts/draw_entity.h"
 #include "view/game_gui/game_gui_system.h"
 
-#include "view/game_gui/elements/viewing_game_gui_context_dependencies.h"
+#include "view/game_gui/viewing_game_gui_context_dependencies.h"
 #include "view/game_gui/elements/drag_and_drop.h"
 #include "view/audiovisual_state/aabb_highlighter.h"
 #include "augs/graphics/renderer.h"
@@ -591,7 +591,7 @@ entity_id character_gui::get_hovered_world_entity(const cosmos& cosm, const vec2
 
 	if (hovered_entities.size() > 0) {
 		sort_container(hovered_entities, [&](const auto a, const auto b) {
-			return render_system::render_order_compare(cosm[a], cosm[b]);
+			return render_order_compare(cosm[a], cosm[b]);
 		});
 
 		for (const auto h : hovered_entities) {

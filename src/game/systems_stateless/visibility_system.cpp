@@ -1,32 +1,32 @@
-#include <Box2D\Box2D.h>
-#include "visibility_system.h"
-
-#include "game/transcendental/cosmos.h"
-#include "game/transcendental/entity_id.h"
-
-#include "game/systems_inferred/physics_system.h"
-#include "render_system.h"
-
-#include "game/detail/entity_scripts.h"
-
 #include <limits>
 #include <set>
 
+#include <Box2D\Box2D.h>
+
+#include "augs/graphics/renderer.h"
+
+#include "game/debug_drawing_settings.h"
+
+#include "game/transcendental/cosmos.h"
+#include "game/transcendental/entity_id.h"
+#include "game/transcendental/entity_handle.h"
+#include "game/transcendental/logic_step.h"
+
+#include "game/systems_stateless/visibility_system.h"
+#include "game/systems_inferred/physics_system.h"
+
+#include "game/enums/processing_subjects.h"
+
 #include "game/components/rigid_body_component.h"
-#include "game/messages/visibility_information.h"
 #include "game/components/transform_component.h"
 #include "game/components/item_component.h"
 #include "game/components/sentience_component.h"
 #include "game/components/attitude_component.h"
 
-#include "game/enums/processing_subjects.h"
-#include "game/transcendental/entity_handle.h"
+#include "game/messages/visibility_information.h"
+
+#include "game/detail/entity_scripts.h"
 #include "game/detail/physics/physics_scripts.h"
-
-#include "augs/graphics/renderer.h"
-
-#include "game/transcendental/logic_step.h"
-#include "game/debug_drawing_settings.h"
 
 using namespace augs;
 using namespace messages;

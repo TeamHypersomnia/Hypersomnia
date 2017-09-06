@@ -1,7 +1,6 @@
 #include <algorithm>
-#include "ui.h"
+#include "augs/gui/text/ui.h"
 #include "augs/window_framework/window.h"
-#include "game/assets/all_assets.h"
 
 #undef min
 #undef max

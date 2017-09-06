@@ -27,7 +27,7 @@ public:
 
 	void advance(
 		const cosmos& cosmos,
-		const particle_effect_definitions&,
+		const particle_effects_map&,
 		const augs::delta dt,
 		particles_simulation_system& particles_output_for_effects
 	);

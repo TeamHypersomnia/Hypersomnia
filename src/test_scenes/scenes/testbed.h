@@ -3,7 +3,7 @@
 #include "game/transcendental/step_declaration.h"
 
 class cosmos;
-class all_logical_assets;
+struct all_logical_assets;
 
 namespace test_scenes {
 	class testbed {

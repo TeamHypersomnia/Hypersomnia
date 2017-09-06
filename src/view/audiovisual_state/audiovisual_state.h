@@ -4,9 +4,9 @@
 #include "game/transcendental/step_declaration.h"
 #include "game/transcendental/entity_id.h"
 
-#include "game/assets/assets_declarations.h"
+#include "view/viewables/all_viewables_declarations.h"
 
-#include "game/detail/particle_types.h"
+#include "view/viewables/particle_types.h"
 
 #include "view/audiovisual_state/aabb_highlighter.h"
 #include "view/game_gui/elements/character_gui.h"
@@ -29,7 +29,7 @@ struct audiovisual_advance_input {
 	const visible_entities& all_visible;
 	const float speed_multiplier;
 	const vec2i screen_size;
-	const particle_effect_definitions& particle_effects;
+	const particle_effects_map& particle_effects;
 
 	const loaded_sounds& sounds;
 	const augs::audio_volume_settings audio_volume;

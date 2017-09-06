@@ -1,6 +1,5 @@
 #pragma once
 #include "game/container_sizes.h"
-#include "game/assets/particle_effect.h"
 
 namespace assets {
 	enum class particle_effect_id {
@@ -29,10 +28,3 @@ namespace assets {
 		COUNT = MAX_PARTICLE_EFFECT_COUNT + 1
 	};
 }
-
-struct particle_effect_input {
-	// GEN INTROSPECTOR struct particle_effect_input
-	assets::particle_effect_id id = assets::particle_effect_id::INVALID;
-	particle_effect_modifier modifier;
-	// END GEN INTROSPECTOR
-};

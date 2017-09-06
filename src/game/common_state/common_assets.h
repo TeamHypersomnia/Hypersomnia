@@ -3,6 +3,9 @@
 #include "game/assets/sound_buffer_id.h"
 #include "game/assets/game_image_id.h"
 
+#include "game/detail/view_input/sound_effect_input.h"
+#include "game/detail/view_input/particle_effect_input.h"
+
 struct common_assets {
 	// GEN INTROSPECTOR struct common_assets
 	sound_effect_input ped_shield_impact_sound;

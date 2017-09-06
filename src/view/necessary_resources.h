@@ -9,7 +9,7 @@
 
 #include "augs/templates/exception_templates.h"
 
-#include "game/assets/game_image.h"
+#include "view/viewables/regeneration/game_image_loadables.h"
 #include "view/necessary_image_id.h"
 
 /*
@@ -79,7 +79,7 @@ struct necessary_sound_buffers {
 };
 
 struct necessary_image_definitions {
-	augs::enum_associative_array<assets::necessary_image_id, game_image_definition> all;
+	augs::enum_associative_array<assets::necessary_image_id, game_image_loadables> all;
 
 	necessary_image_definitions(
 		const augs::path_type& directory,

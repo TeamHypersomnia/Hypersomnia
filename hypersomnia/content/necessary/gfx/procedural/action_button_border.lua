@@ -1,4 +1,4 @@
-return 	{	scripted_image = {
+return 	{	image_from_commands = {
 		commands = {
 			{
 				command = "circle_midpoint",

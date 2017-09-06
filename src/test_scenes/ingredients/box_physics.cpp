@@ -1,5 +1,5 @@
 #include "game/transcendental/cosmos.h"
-#include "game/assets/all_assets.h"
+#include "game/assets/all_logical_assets.h"
 #include "game/components/rigid_body_component.h"
 #include "game/components/fixtures_component.h"
 #include "game/components/shape_polygon_component.h"

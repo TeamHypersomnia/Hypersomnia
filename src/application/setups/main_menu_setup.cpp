@@ -12,7 +12,7 @@
 #include "augs/gui/text/caret.h"
 #include "augs/drawing/drawing.h"
 
-#include "game/assets/all_assets.h"
+#include "game/assets/all_logical_assets.h"
 
 #include "game/organization/all_component_includes.h"
 #include "view/network/step_packaged_for_network.h"

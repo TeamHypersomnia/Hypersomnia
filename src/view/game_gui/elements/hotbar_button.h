@@ -3,7 +3,7 @@
 #include "augs/gui/appearance_detector.h"
 #include "augs/gui/button_corners.h"
 
-#include "view/game_gui/elements/game_gui_context.h"
+#include "view/game_gui/game_gui_context.h"
 
 using button_corners_info = basic_button_corners_info<assets::necessary_image_id>;
 
@@ -26,7 +26,7 @@ public:
 
 	vec2i get_bbox(
 		const necessary_images_in_atlas& necessarys,
-		const game_image_definitions& defs,
+		const game_image_metas_map& defs,
 		const const_entity_handle owner_transfer_capability
 	) const;
 

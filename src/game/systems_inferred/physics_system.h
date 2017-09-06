@@ -4,6 +4,11 @@
 
 #include "3rdparty/Box2D/Box2D.h"
 
+#include "augs/build_settings/platform_defines.h"
+#include "augs/misc/convex_partitioned_shape.h"
+
+#include "game/assets/all_logical_assets_declarations.h"
+
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/transcendental/step_declaration.h"
@@ -14,13 +19,7 @@
 
 #include "game/messages/collision_message.h"
 
-#include "augs/misc/convex_partitioned_shape.h"
 #include "game/detail/physics/physics_queries.h"
-
-#include "augs/build_settings/platform_defines.h"
-
-#include "game/assets/game_image.h"
-#include "game/container_sizes.h"
 
 class cosmos;
 struct cosmos_common_state;

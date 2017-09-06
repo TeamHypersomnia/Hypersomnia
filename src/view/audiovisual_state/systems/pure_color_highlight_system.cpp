@@ -1,12 +1,18 @@
-#include "pure_color_highlight_system.h"
 #include "augs/templates/container_templates.h"
 #include "augs/math/camera_cone.h"
+
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
+
 #include "game/components/render_component.h"
-#include "game/systems_stateless/render_system.h"
 #include "game/components/interpolation_component.h"
 #include "game/components/fixtures_component.h"
+
+#include "view/viewables/game_image.h"
+
+#include "view/rendering_scripts/draw_entity.h"
+
+#include "view/audiovisual_state/systems/pure_color_highlight_system.h"
 #include "view/audiovisual_state/systems/interpolation_system.h"
 
 void pure_color_highlight_system::add(const highlight::input new_in) {
@@ -43,7 +49,7 @@ void pure_color_highlight_system::draw_highlights(
 	const camera_cone camera,
 	const cosmos& cosmos,
 	const interpolation_system& interp,
-	const game_images_in_atlas& game_images
+	const game_images_in_atlas_map& game_images
 ) const {
 	for (const auto& r : highlights) {
 		const auto subject = cosmos[r.in.target];
@@ -62,7 +68,7 @@ void pure_color_highlight_system::draw_highlights(
 
 		col.a = static_cast<rgba_channel>(255.f * sqrt(sqrt(ratio)) * r.in.starting_alpha_ratio);
 
-		render_system().draw_renderable(
+		draw_renderable(
 			sprite,
 			subject.get_viewing_transform(interp, true),
 			subject.get<components::render>(),

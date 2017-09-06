@@ -1,6 +1,6 @@
 #include "ingredients.h"
 
-#include "game/assets/all_assets.h"
+#include "game/assets/all_logical_assets.h"
 
 #include "game/components/sprite_component.h"
 #include "game/components/render_component.h"
