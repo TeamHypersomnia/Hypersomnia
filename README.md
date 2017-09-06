@@ -1,13 +1,52 @@
-Tree structure:
+# For developers
 
-- ```cmake/``` - CMake scripts and source code generators.
+**Tree structure:**
+
+- ```cmake/``` - CMake scripts and source code generators. (e.g. generated introspectors or a source file with the commit number)
 - ```hypersomnia/``` - all files needed by the Hypersomnia executable to run properly.
 - ```src/``` - complete source code of Hypersomnia, along with 3rd party libraries.
   - ```src/3rdparty``` - 3rd party libraries, upon which the rest of ```src/``` depends.
   - ```src/augs/``` - abstraction of i/o; template code, utility functions, window management.
-  - ```src/game/``` - Hypersomnia-specific code that implements the actual game mechanics.
-  - ```src/application/``` - functionality specific to Hypersomnia, but not involving the game world itself. Examples: content generation, http server code, the main menu.
+  - ```src/game/``` - Hypersomnia-specific code that implements the game world. Strictly, the **model** is present here, and nothing else.
+  - ```src/view/``` - Code that is concerned with viewing the game world. Examples: state of particle systems, interpolation, playing of sounds, or rendering scripts that take the game world reference and speak directly to OpenGL.
+  - ```src/test_scenes/``` - Code generating some simple test scenes, with their needed resources. It exists only in order to conveniently test new game features without relying on the editor. Can be excluded from compilation via BUILD_TEST_SCENES CMake flag.
+  - ```src/application/``` - highest level abstraction. Examples: setups implementation (test scene, client, server), the main menu/ingame menu gui, the main loop helpers, but also collateral things like http server code.
+  - ```main.cpp``` - that, which straps all of the above together. Initializes libraries, contextes, necessary resources, handles input, selects the setup to work with, keeps track of the single audiovisual_state.
 - ```todo/``` - a personal to-do list of the founder. At the moment, not meant to be understood by the public.
+
+**Dependency graph of ```src/```:**
+
+An arrow from node A to node B denotes that A includes files from B. An arrow to a cluster means that the folder may include from all nodes of the cluster.
+
+![enter image description here][2]
+
+**Dot language code:**
+
+```
+digraph G {
+  compound=true;
+
+  subgraph cluster0 {
+    subgraph cluster1 {
+      subgraph cluster2 {
+        subgraph cluster3 {
+          augs->"3rdparty"
+          augs->std
+          "3rdparty"->std[constraint=false];
+        }
+        game->augs[lhead=cluster3];
+      }
+      view->game[lhead=cluster2];
+      test_scenes->game[lhead=cluster2];
+      test_scenes->view[constraint=false];
+    }
+    application->test_scenes[lhead=cluster1];
+  }
+  "main.cpp"->application[lhead=cluster0];
+}
+```
+**Exceptions:**
+- Modified Box2D files (from ```3rdparty```) include ```game/transcendental/entity_id.h``` in order to conveniently define a userdata type that contains the id of the entity to whom a ```b2Fixture``` or ```b2Body``` belonds. Separating that dependency would otherwise involve a lot of alterations to Box2D in terms of code templatization, or unsafe reinterpret casts between ```void*``` and my types. 
 
 # Hypersomnia
 Community-centered shooter/MMORPG released as free software.
@@ -37,6 +76,7 @@ Watch gameplays on YouTube:
   [8]: https://gifyu.com/images/16.main_menu_reup.png
   [3]: http://gifyu.com/images/23.light.png
   [4]: http://gifyu.com/images/30.smoke.png
+  [2]: https://i.imgur.com/SzYA3BA.png
 
 # How to build
 To build Hypersomnia, you will need **CMake 3.8** or newer.
