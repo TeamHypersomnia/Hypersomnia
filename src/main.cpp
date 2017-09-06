@@ -117,7 +117,6 @@ int main(const int argc, const char* const * const argv) try {
 
 	augs::graphics::texture game_world_atlas = augs::image {};
 
-
 	/* 
 		Main menu setup state may be preserved, 
 		therefore it resides in a separate optional.
@@ -319,6 +318,12 @@ int main(const int argc, const char* const * const argv) try {
 			}
 		}
 		
+		/* 
+			Time to do all IMGUI logic.
+			The editor setup might want to use IMGUI to create entity/resource views,
+			thus we ask the current setup for its custom IMGUI logic.
+		*/
+
 		perform_imgui_pass(
 			new_entropy,
 			configurables,

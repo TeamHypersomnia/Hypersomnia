@@ -5,7 +5,7 @@ project(Hypersomnia)
 # Various feature switches.
 # If it is your first time building Hypersomnia and you get some errors,
 # try turning all of these off to build the minimal possible working Hypersomnia runtime. Then, try to work from there.
-# The game should still work, even not having these features.
+# The game should still run, even not having these features, although obviously, you won't see/hear anything.
 # In the future, the switches will also differ depending on whether the target application is a client or a server.
 
 option(BUILD_SOUND_FORMAT_DECODERS "Build ogg and vorbis. If this is off, there is also no point in enabling OpenAL." ON)
@@ -38,16 +38,20 @@ if (HYPERSOMNIA_BARE)
 	message("Building Hypersomnia without... anything")
 endif()
 
-if (NOT HYPERSOMNIA_RUNTIME_ARCHIVE_DIR)
-	# By default, we set output directory for archives to completely outside of the source tree,
-	# because it might be useful to preserve some older builds even if the repository is deleted.
-
-	set(HYPERSOMNIA_RUNTIME_ARCHIVE_DIR
-		"${PROJECT_SOURCE_DIR}/../build_database"
-	)
-
-	file(MAKE_DIRECTORY ${HYPERSOMNIA_RUNTIME_ARCHIVE_DIR})
+if(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE)
+	if (NOT HYPERSOMNIA_RUNTIME_ARCHIVE_DIR)
+		# By default, we set output directory for archives to completely outside of the source tree,
+		# because it might be useful to preserve some older builds even if the repository is deleted.
+	
+		set(HYPERSOMNIA_RUNTIME_ARCHIVE_DIR
+			"${PROJECT_SOURCE_DIR}/../build_database"
+		)
+	
+		file(MAKE_DIRECTORY ${HYPERSOMNIA_RUNTIME_ARCHIVE_DIR})
+	endif()
 endif()
+
+# Used by archiver and to set the working directory under VS.
 
 set(RESOURCES_FOLDER_NAME "hypersomnia")
 set(HYPERSOMNIA_EXE_RESOURCES_DIR "${PROJECT_SOURCE_DIR}/${RESOURCES_FOLDER_NAME}")
@@ -696,6 +700,10 @@ endif()
 
 if(BUILD_ENET) 
 	add_definitions(-DBUILD_ENET=1)
+endif()
+
+if(BUILD_FREETYPE) 
+	add_definitions(-DBUILD_FREETYPE=1)
 endif()
 
 if(BUILD_UNIT_TESTS) 
