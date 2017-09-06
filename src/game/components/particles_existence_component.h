@@ -7,7 +7,7 @@
 #include "augs/misc/stepped_timing.h"
 #include "augs/misc/minmax.h"
 
-#include "game/assets/particle_effect_id.h"
+#include "game/assets/ids/particle_effect_id.h"
 
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/transcendental/step_declaration.h"

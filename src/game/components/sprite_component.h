@@ -10,7 +10,7 @@
 #include "augs/drawing/drawing.h"
 #include "augs/drawing/sprite.h"
 
-#include "game/assets/game_image_id.h"
+#include "game/assets/ids/game_image_id.h"
 
 namespace components {
 	using sprite = augs::sprite<assets::game_image_id>;

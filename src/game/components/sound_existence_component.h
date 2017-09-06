@@ -1,6 +1,6 @@
 #pragma once
 #include "augs/misc/stepped_timing.h"
-#include "game/assets/sound_buffer_id.h"
+#include "game/assets/ids/sound_buffer_id.h"
 
 #include "augs/pad_bytes.h"
 

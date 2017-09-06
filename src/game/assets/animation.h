@@ -1,6 +1,6 @@
 #pragma once
 #include "augs/misc/constant_size_vector.h"
-#include "game/assets/game_image_id.h"
+#include "game/assets/ids/game_image_id.h"
 #include "game/container_sizes.h"
 
 struct animation_frame {

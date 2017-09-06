@@ -3,7 +3,7 @@
 #include "augs/filesystem/file.h"
 #include "augs/audio/sound_buffer.h"
 
-#include "game/assets/sound_buffer_id.h"
+#include "game/assets/ids/sound_buffer_id.h"
 
 #include "test_scenes/test_scenes_content.h"
 

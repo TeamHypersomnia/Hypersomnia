@@ -1,5 +1,5 @@
 #pragma once
-#include "game/assets/animation_id.h"
+#include "game/assets/ids/animation_id.h"
 
 namespace components {
 	struct animation {

@@ -1,6 +1,6 @@
 #include "augs/misc/enum_associative_array.h"
 
-#include "game/assets/particle_effect_id.h"
+#include "game/assets/ids/particle_effect_id.h"
 #include "game/assets/animation.h"
 
 #include "view/viewables/regeneration/game_image_loadables.h"

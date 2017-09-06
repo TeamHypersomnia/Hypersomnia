@@ -10,7 +10,7 @@
 
 #include "augs/graphics/rgba.h"
 
-#include "game/assets/game_image_id.h"
+#include "game/assets/ids/game_image_id.h"
 
 struct sentience_meter_appearance {
 	// GEN INTROSPECTOR struct sentience_meter_appearance

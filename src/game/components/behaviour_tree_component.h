@@ -1,6 +1,6 @@
 #pragma once
 #include "game/assets/behaviour_tree.h"
-#include "game/assets/behaviour_tree_id.h"
+#include "game/assets/ids/behaviour_tree_id.h"
 
 #include "game/container_sizes.h"
 #include "augs/misc/constant_size_vector.h"

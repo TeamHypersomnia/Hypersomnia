@@ -1,6 +1,6 @@
 #include "test_scenes/test_scenes_content.h"
 
-#include "game/assets/animation_id.h"
+#include "game/assets/ids/animation_id.h"
 #include "game/assets/all_logical_assets.h"
 
 void load_test_scene_animations(all_logical_assets& anims) {

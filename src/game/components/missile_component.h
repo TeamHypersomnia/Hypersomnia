@@ -7,8 +7,8 @@
 
 #include "augs/graphics/rgba.h"
 
-#include "game/assets/sound_buffer_id.h"
-#include "game/assets/particle_effect_id.h"
+#include "game/assets/ids/sound_buffer_id.h"
+#include "game/assets/ids/particle_effect_id.h"
 
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"

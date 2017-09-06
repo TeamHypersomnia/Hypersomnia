@@ -2,7 +2,7 @@
 #include "augs/graphics/rgba.h"
 
 #include "game/transcendental/entity_id.h"
-#include "game/assets/particle_effect_id.h"
+#include "game/assets/ids/particle_effect_id.h"
 
 struct particle_effect_modifier {
 	// GEN INTROSPECTOR struct particle_effect_modifier

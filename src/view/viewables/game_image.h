@@ -4,7 +4,7 @@
 #include "augs/misc/enum_array.h"
 #include "augs/drawing/flip.h"
 #include "augs/texture_atlas/texture_atlas_entry.h"
-#include "game/assets/game_image_id.h"
+#include "game/assets/ids/game_image_id.h"
 
 enum class texture_map_type {
 	// GEN INTROSPECTOR enum class texture_map_type

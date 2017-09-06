@@ -5,7 +5,7 @@
 #include "augs/graphics/rgba.h"
 
 
-#include "game/assets/game_image_id.h"
+#include "game/assets/ids/game_image_id.h"
 
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/step_declaration.h"

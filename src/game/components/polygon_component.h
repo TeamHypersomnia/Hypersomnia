@@ -1,6 +1,6 @@
 #pragma once
 #include "game/container_sizes.h"
-#include "game/assets/game_image_id.h"
+#include "game/assets/ids/game_image_id.h"
 #include "augs/drawing/polygon.h"
 
 namespace components {

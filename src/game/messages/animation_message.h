@@ -1,6 +1,6 @@
 #pragma once
 #include "message.h"
-#include "game/assets/animation_id.h"
+#include "game/assets/ids/animation_id.h"
 
 namespace messages {
 	struct animation_message : message {

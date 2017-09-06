@@ -1,5 +1,5 @@
 #include "explosions.h"
-#include "game/assets/sound_buffer_id.h"
+#include "game/assets/ids/sound_buffer_id.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 #include "augs/graphics/rgba.h"

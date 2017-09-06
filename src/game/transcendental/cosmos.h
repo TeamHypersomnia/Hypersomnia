@@ -15,7 +15,7 @@
 #include "augs/entity_system/storage_for_systems.h"
 
 #include "game/build_settings.h"
-#include "game/assets/behaviour_tree_id.h"
+#include "game/assets/ids/behaviour_tree_id.h"
 #include "game/assets/behaviour_tree.h"
 
 #include "game/organization/all_fundamental_component_includes.h"

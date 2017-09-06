@@ -5,4 +5,4 @@
 #include "game/transcendental/entity_id.h"
 #include "game/components/transform_component.h"
 #include "game/components/particles_existence_component.h"
-#include "game/assets/particle_effect_id.h"
+#include "game/assets/ids/particle_effect_id.h"

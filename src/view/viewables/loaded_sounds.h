@@ -3,7 +3,7 @@
 
 #include "view/viewables/all_viewables_declarations.h"
 
-#include "game/assets/sound_buffer_id.h"
+#include "game/assets/ids/sound_buffer_id.h"
 #include "augs/audio/sound_buffer.h"
 
 struct loaded_sounds : public asset_map<

@@ -1,6 +1,6 @@
 #pragma once
 #include "game/transcendental/entity_id.h"
-#include "game/assets/particle_effect_id.h"
+#include "game/assets/ids/particle_effect_id.h"
 
 namespace components {
 	struct catridge {

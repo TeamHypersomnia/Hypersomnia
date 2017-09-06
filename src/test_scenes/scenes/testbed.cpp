@@ -1,4 +1,4 @@
-#include "game/assets/game_image_id.h"
+#include "game/assets/ids/game_image_id.h"
 #include "game/assets/all_logical_assets.h"
 
 #include "test_scenes/scenes/testbed.h"
