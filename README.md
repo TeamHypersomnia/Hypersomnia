@@ -3,12 +3,12 @@
 **Tree structure:**
 
 - ```cmake/``` - CMake scripts and source code generators. (e.g. generated introspectors or a source file with the commit number)
-- ```hypersomnia/``` - all files needed by the Hypersomnia executable to run properly.
+- ```hypersomnia/``` - all content needed by the Hypersomnia executable to run properly. Images, sounds, shaders, configs and so on. 
 - ```src/``` - complete source code of Hypersomnia, along with 3rd party libraries.
   - ```src/3rdparty``` - 3rd party libraries, upon which the rest of ```src/``` depends.
   - ```src/augs/``` - abstraction of i/o; template code, utility functions, window management.
   - ```src/game/``` - Hypersomnia-specific code that implements the game world. Strictly, the **model** is present here, and nothing else.
-  - ```src/view/``` - Code that is concerned with viewing the game world. Examples: viewables (as opposed to logical assets,  meant for viewing only), state of particle systems, interpolation, playing of sounds, or rendering scripts that take the game world reference and speak directly to OpenGL.
+  - ```src/view/``` - Code that is concerned with viewing the game world. Examples: viewables (meant for viewing only, as opposed to logical assets used by the model), state of particle systems, interpolation, playing of sounds, or rendering scripts that take the game world reference and speak directly to OpenGL.
   - ```src/test_scenes/``` - Code generating some simple test scenes, with their needed resources. It exists only in order to conveniently test new game features without relying on the editor. Can be excluded from compilation via BUILD_TEST_SCENES CMake flag.
   - ```src/application/``` - highest level abstraction. Examples: _setups_ implementation, the main menu/ingame menu gui, the main loop helpers, but also collateral things like http server code.
     - ```src/application/setups``` - _setups_ are objects that manage high-level functionality like a client, a server, an editor or a local test scene. They expose functions like ```get_viewed_cosmos()``` or ```get_viewed_character_id()``` that are in turn used by main.cpp to know what world to render, and with which entity as the viewer.
