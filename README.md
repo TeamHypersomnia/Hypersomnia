@@ -17,7 +17,7 @@
 
 **Dependency graph of ```src/```:**
 
-An arrow from node A to node B denotes that A includes files from B. An arrow to a cluster means that the folder may include from all nodes of the cluster.
+An arrow from node A to node B denotes that A includes files from B. An arrow to a cluster means that the node may include from all nodes in the cluster.
 
 ![enter image description here][2]
 
