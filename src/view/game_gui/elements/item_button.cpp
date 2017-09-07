@@ -199,13 +199,14 @@ void item_button::draw_proc(
 	const auto& element = context.get_character_gui();
 	const auto output = context.get_output();
 	const auto& necessarys = context.get_necessary_images();
-	auto& this_tree_entry = context.get_tree_entry(this_id);
-
-	const auto former_absolute_pos = this_tree_entry.get_absolute_pos();
-#if TODO
-	this_tree_entry.set_absolute_pos(former_absolute_pos + f.absolute_xy_offset);
-#endif
-	const auto this_absolute_rect = context.get_tree_entry(this_id).get_absolute_rect();
+	auto this_tree_entry = context.get_tree_entry(this_id);
+	
+	this_tree_entry.set_absolute_pos(
+		this_tree_entry.get_absolute_pos() 
+		+ f.absolute_xy_offset
+	);
+	
+	const auto this_absolute_rect = this_tree_entry.get_absolute_rect();
 
 	auto parent_slot = cosmos[item.get<components::item>().current_slot];
 
@@ -239,7 +240,7 @@ void item_button::draw_proc(
 	}
 
 	if (f.draw_background) {
-		output.gui_box_stretch_tex(context, this_id, inside_col);
+		output.aabb(this_absolute_rect, inside_col);
 	}
 
 	if (f.draw_item) {
@@ -382,7 +383,7 @@ void item_button::draw_proc(
 
 				print_stroked(
 					output,
-					context.get_tree_entry(this_id).get_absolute_rect().right_bottom() - label_bbox,
+					this_tree_entry.get_absolute_rect().right_bottom() - label_bbox,
 					label_text
 				);
 			}
@@ -418,10 +419,6 @@ void item_button::draw_proc(
 			output.aabb_lt(necessarys.at(container_icon), vec2(this_absolute_rect.r - size.x + 2, this_absolute_rect.t + 1), border_col);
 		}
 	}
-
-#if TODO
-	this_tree_entry.set_absolute_pos(former_absolute_pos);
-#endif
 }
 
 bool item_button::is_inventory_root(const const_game_gui_context context, const const_this_in_item this_id) {

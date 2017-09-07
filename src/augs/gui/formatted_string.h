@@ -60,7 +60,7 @@ namespace augs {
 				operator std::wstring() const;
 			};
 
-			formatted_string format_recent_global_log(
+			formatted_string format_recent_program_log(
 				const baked_font&,
 				unsigned max_lines = 40
 			);
