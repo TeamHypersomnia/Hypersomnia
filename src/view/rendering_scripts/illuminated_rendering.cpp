@@ -309,7 +309,8 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 			interp,
 			camera,
 			cosmos,
-			global_time_seconds
+			global_time_seconds,
+			tex
 		});
 
 		renderer.call_and_clear_triangles();
