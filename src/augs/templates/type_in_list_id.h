@@ -25,7 +25,14 @@ class type_in_list_id {
 	static void assert_correct_type() {
 		static_assert(is_one_of_list_v<T, List>, "The type list does not contain the specified type!");
 	}
+
 public:
+	type_in_list_id(
+		const index_type index = dead_value
+	) : index(index) 
+	{
+	}
+
 	bool is_set() const {
 		return index < num_types_in_list_v<List>;
 	}

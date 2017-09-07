@@ -166,27 +166,23 @@ void value_bar::draw(
 		output.aabb(current_value_bar_rect, bar_col);
 		output.border(value_bar_rect, bar_col, this_id->border);
 
-		meter_id id;
+		/* Draw the value label if it is a meter, draw nothing if perk */
 
-		if (is_sentience_meter(this_id)) {
-			id.set_index(vertical_index);
+		visit_by_vertical_index(sentience, cosmos, vertical_index,
+			[&](const auto& meter, auto) {
+				const auto value = meter.get_value();
 
-			const auto value = visit_gettable(
-				sentience.meters,
-				id,
-				[](const auto& meter) {
-					return meter.get_value();
-				}
-			);
+				print_stroked(
+					output,
+					vec2{ full_bar_rect_bordered.r + total_spacing * 2, full_bar_rect_bordered.t - total_spacing },
+					{ typesafe_sprintf(L"%x", static_cast<int>(value)),{ context.get_gui_font(), white } }
+				);
+			},
 
-			print_stroked(
-				output,
-				vec2 { full_bar_rect_bordered.r + total_spacing * 2, full_bar_rect_bordered.t - total_spacing },
-				{ typesafe_sprintf(L"%x", static_cast<int>(value)),{ context.get_gui_font(), white } }
-			);
-		}
+			[](auto...) { return; }
+		);
 
-		if (bar_width >= 1) {
+		if (const bool should_draw_particles = bar_width >= 1) {
 			for (const auto& p : this_id->particles) {
 				const auto particle_col = bar_col + rgba(30, 30, 30, 0);
 			
@@ -199,15 +195,15 @@ void value_bar::draw(
 			}
 		}
 
-		if (id.is<consciousness_meter_instance>()) {
-			auto one_tenth_mark = ltrb();
+		if (const bool should_draw_one_tenth_mark = meter_id(vertical_index).is<consciousness_meter_instance>()) {
+			auto r = ltrb();
 
-			one_tenth_mark.l = value_bar_rect.l + value_bar_rect.w() / 10;
-			one_tenth_mark.t = full_bar_rect_bordered.t;
-			one_tenth_mark.b = full_bar_rect_bordered.b;
-			one_tenth_mark.r = one_tenth_mark.l + 1;
+			r.l = value_bar_rect.l + value_bar_rect.w() / 10;
+			r.t = full_bar_rect_bordered.t;
+			r.b = full_bar_rect_bordered.b;
+			r.r = r.l + 1;
 
-			output.aabb(one_tenth_mark);
+			output.aabb(r);
 		}
 	}
 }
