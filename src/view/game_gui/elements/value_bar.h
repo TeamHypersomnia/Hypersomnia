@@ -18,14 +18,9 @@ struct value_bar : game_gui_rect_node {
 		assets::necessary_image_id tex;
 	};
 
-	int border_width = 1;
-	int border_spacing = 1;
+	border_input border;
 	
 	float seconds_accumulated = 0.f;
-
-	int get_total_border_expansion() const {
-		return border_width + border_spacing;
-	}
 
 	std::vector<effect_particle> particles;
 

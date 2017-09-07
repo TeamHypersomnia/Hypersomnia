@@ -7,6 +7,7 @@
 
 #include "augs/texture_atlas/texture_atlas_entry.h"
 #include "augs/drawing/flip.h"
+#include "augs/drawing/border.h"
 
 namespace augs {
 	std::array<vec2, 4> make_sprite_points(
@@ -112,14 +113,15 @@ namespace augs {
 			const texture_atlas_entry,
 			ltrb origin,
 			const rgba color,
-			const unsigned width = 1
+			const border_input = border_input()
 		) const;
 
 		self aabb_with_border(
 			const texture_atlas_entry,
 			const ltrb origin,
 			const rgba inside_color,
-			const rgba border_color
+			const rgba border_color,
+			const border_input = border_input()
 		) const;
 
 		self rect(

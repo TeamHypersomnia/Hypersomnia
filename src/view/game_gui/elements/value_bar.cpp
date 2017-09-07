@@ -132,7 +132,7 @@ void value_bar::draw(
 
 	output.aabb_lt(game_images.at(icon_tex).texture_maps[texture_map_type::DIFFUSE], absolute.get_position());
 
-	const auto total_spacing = this_id->get_total_border_expansion();
+	const auto total_spacing = this_id->border.get_total_expansion();
 
 	{
 		const auto full_bar_rect_bordered = get_bar_rect_with_borders(context, this_id, absolute);
@@ -164,7 +164,7 @@ void value_bar::draw(
 		current_value_bar_rect.w(static_cast<float>(bar_width));
 
 		output.aabb(current_value_bar_rect, bar_col);
-		output.border(value_bar_rect, bar_col, this_id->border_width);
+		output.border(value_bar_rect, bar_col, this_id->border);
 
 		meter_id id;
 
@@ -225,7 +225,7 @@ ltrb value_bar::get_bar_rect_with_borders(
 	const auto max_value_caption_size = get_text_bbox({ L"99999", context.get_gui_font() });
 
 	auto value_bar_rect = icon_rect;
-	value_bar_rect.set_position(icon_rect.get_position() + vec2(this_id->get_total_border_expansion() + icon_rect.get_size().x, 0));
+	value_bar_rect.set_position(icon_rect.get_position() + vec2(this_id->border.get_total_expansion() + icon_rect.get_size().x, 0));
 	value_bar_rect.r = absolute.r - max_value_caption_size.x;
 
 	return value_bar_rect;
@@ -236,7 +236,7 @@ ltrb value_bar::get_value_bar_rect(
 	const const_this_pointer this_id,
 	const ltrb absolute
 ) {
-	const auto border_expansion = this_id->get_total_border_expansion();
+	const auto border_expansion = this_id->border.get_total_expansion();
 	return get_bar_rect_with_borders(context, this_id, absolute).expand_from_center({ static_cast<float>(-border_expansion), static_cast<float>(-border_expansion) });
 }
 
@@ -389,15 +389,18 @@ void value_bar::rebuild_layouts(
 
 	const auto lt = vec2i(screen_size.x - 220, 20 + drawing_vertical_index * (icon_size.y + 4));
 
-	this_id->rc.set_position(lt);
-	this_id->rc.set_size(with_bar_size);
+	auto& rc = this_id->rc;
+	rc.set_position(lt);
+	rc.set_size(with_bar_size);
 
 	if (this_id->particles.empty()) {
-		randomization rng(this_id.get_location().vertical_index);
+		fast_randomization rng(this_id.get_location().vertical_index);
 
-		const auto value_bar_size = get_value_bar_rect(context, this_id, this_id->rc).get_size();
+		const auto value_bar_size = get_value_bar_rect(context, this_id, rc).get_size();
 
-		for (size_t i = 0; i < 40; ++i) {
+		constexpr auto num_particles_to_spawn = 40u;
+
+		for (size_t i = 0; i < num_particles_to_spawn; ++i) {
 			const assets::necessary_image_id mats[3] = {
 				assets::necessary_image_id::WANDERING_CROSS,
 				assets::necessary_image_id::BLINK_1,

@@ -240,8 +240,10 @@ namespace augs {
 
 			template <class C>
 			void build_tree_data_into(const C context) const {
+				context.tree.clear();
+
 				context(context.get_root_id(), [&](const auto& r) { 
-					r->build_tree_data(context, r); 
+					r->build_tree_data(context, r, gui_element_variant_id());
 				});
 			}
 

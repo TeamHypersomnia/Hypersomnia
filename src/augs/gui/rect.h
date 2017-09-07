@@ -36,24 +36,24 @@ namespace augs {
 			template <class C, class gui_element_id>
 			static void build_tree_data(
 				const C context, 
-				const gui_element_id this_id
+				const gui_element_id this_id,
+				const gui_element_variant_id parent_id
 			) {
-				auto& tree_entry = context.make_tree_entry(this_id);
-				const auto parent = tree_entry.get_parent();
-				
-				auto absolute_clipped_rect = this_id->rc;
-				auto absolute_pos = vec2i(this_id->rc.get_position());
+				const auto rc = this_id->rc;
+
+				auto absolute_clipped_rect = rc;
+				auto absolute_pos = vec2i(rc.get_position());
 				auto absolute_clipping_rect = ltrb(0.f, 0.f, std::numeric_limits<int>::max() / 2.f, std::numeric_limits<int>::max() / 2.f);
 
 				/* if we have parent */
-				if (context.alive(parent)) {
-					context(parent, [&](const auto& parent_rect) {
-						auto& p = context.get_tree_entry(parent);
+				if (context.alive(parent_id)) {
+					context(parent_id, [&](const auto& parent_rect) {
+						auto& p = context.get_tree_entry(parent_id);
 						const auto scroll = parent_rect->get_scroll();
 
 						/* we have to save our global coordinates in absolute_xy */
-						absolute_pos = p.get_absolute_pos() + this_id->rc.get_position() - scroll;
-						absolute_clipped_rect = xywh(static_cast<float>(absolute_pos.x), static_cast<float>(absolute_pos.y), this_id->rc.w(), this_id->rc.h());
+						absolute_pos = p.get_absolute_pos() + rc.get_position() - scroll;
+						absolute_clipped_rect = xywh(static_cast<float>(absolute_pos.x), static_cast<float>(absolute_pos.y), rc.w(), rc.h());
 
 						/* and we have to clip by first clipping parent's rc_clipped */
 						//auto* clipping = get_clipping_parent(); 
@@ -75,13 +75,17 @@ namespace augs {
 				//	});
 				//}
 
-				tree_entry.set_absolute_clipped_rect(absolute_clipped_rect);
-				tree_entry.set_absolute_pos(absolute_pos);
-				tree_entry.set_absolute_clipping_rect(absolute_clipping_rect);
+				const auto it = context.tree.try_emplace(this_id, rc, parent_id);
+				ensure(it.second && "GUI graph is not DAG...");
+
+				auto& this_tree_entry = (*it.first).second;
+
+				this_tree_entry.set_absolute_clipped_rect(absolute_clipped_rect);
+				this_tree_entry.set_absolute_pos(absolute_pos);
+				this_tree_entry.set_absolute_clipping_rect(absolute_clipping_rect);
 
 				this_id->for_each_child(context, this_id, [&](const auto& child_id) {
-					context.make_tree_entry(child_id).set_parent(this_id);
-					child_id->build_tree_data(context, child_id);
+					child_id->build_tree_data(context, child_id, this_id);
 				});
 			}
 

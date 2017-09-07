@@ -55,15 +55,6 @@ namespace augs {
 				return screen_size;
 			}
 
-			template <class id_type, class = std::enable_if_t<!is_const_ref_v<rect_tree_entry_ref>>>
-			rect_tree_entry_ref make_tree_entry(const id_type& id) const {
-				//ensure(tree.find(id) == tree.end()) 
-				
-				return (*tree.emplace(id, operator()(id, [](const auto resolved_ref) {
-					return resolved_ref->rc;
-				})).first).second;
-			}
-
 			bool alive(const gui_element_variant_id& id) const {
 				return 
 					!(id == gui_element_variant_id()) 

@@ -10,15 +10,18 @@ namespace augs {
 		class rect_tree_entry {
 			ltrb rc;
 			gui_element_variant_id parent;
+
 			vec2 absolute_position;
 			ltrb absolute_clipped_rect;
 			ltrb absolute_clipping_rect;
 		public:
-			rect_tree_entry(const ltrb& rc) : rc(rc) {}
-
-			void set_parent(const gui_element_variant_id& id) {
-				parent = id;
-			}
+			rect_tree_entry(
+				const ltrb& rc,
+				const gui_element_variant_id& parent
+			) : 
+				rc(rc), 
+				parent(parent) 
+			{}
 
 			void set_absolute_clipping_rect(const ltrb& r) {
 				absolute_clipping_rect = r;

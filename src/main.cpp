@@ -12,8 +12,6 @@
 #include "augs/window_framework/window.h"
 #include "augs/audio/audio_structs.h"
 
-#include "augs/texture_atlas/texture_atlas.h"
-
 #include "game/organization/all_component_includes.h"
 #include "game/organization/all_messages_includes.h"
 
@@ -120,6 +118,8 @@ int main(const int argc, const char* const * const argv) try {
 	/* 
 		Main menu setup state may be preserved, 
 		therefore it resides in a separate optional.
+
+		Static is used to avoid potential stack overflow.
 	*/
 
 	using setup_variant = std::variant<
@@ -317,12 +317,6 @@ int main(const int argc, const char* const * const argv) try {
 				release_occured_this_frame = true;
 			}
 		}
-		
-		/* 
-			Time to do all IMGUI logic.
-			The editor setup might want to use IMGUI to create entity/resource views,
-			thus we ask the current setup for its custom IMGUI logic.
-		*/
 
 		perform_imgui_pass(
 			new_entropy,
@@ -333,12 +327,17 @@ int main(const int argc, const char* const * const argv) try {
 			local_config_path,
 			settings_gui,
 			[&]() {
+				/*
+					The editor setup might want to use IMGUI to create views of entities or resources,
+					thus we ask the current setup for its custom IMGUI logic.
+				*/
+
 				visit_current_setup([](auto& setup) {
 					setup.perform_custom_imgui();
 				});
 			},
 
-			/* Behaviour flags */
+			/* Flags controlling IMGUI behaviour */
 
 			ingame_menu.show,
 			game_gui.active,

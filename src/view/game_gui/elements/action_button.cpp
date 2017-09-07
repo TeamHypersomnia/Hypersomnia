@@ -176,14 +176,18 @@ void action_button::draw(
 
 			output.gui_box_center_tex(necessarys.at(inside_tex), context, this_id, inside_col);
 			output.gui_box_center_tex(necessarys.at(border_tex), context, this_id, border_col);
+			
+			const auto label_text = formatted_string{
+				key_to_wstring(bound_key),
+				{ context.get_gui_font(), border_col }
+			};
+
+			const auto label_bbox = get_text_bbox(label_text);
 
 			print_stroked(
 				output,
-				absolute_rect.get_center() + vec2(0, 2),
-				{
-					key_to_wstring(bound_key),
-					{ context.get_gui_font(), border_col }
-				}
+				absolute_rect.get_center() - label_bbox / 2 + vec2(0, 2),
+				label_text
 			);
 		}
 	}

@@ -261,10 +261,19 @@ namespace augs {
 		const texture_atlas_entry tex,
 		ltrb bordered,
 		const rgba color,
-		const unsigned width
+		const border_input in
 	) const {
-		bordered.r += 1;
-		bordered.b += 1;
+		const auto total = in.get_total_expansion();
+
+		bordered.l -= total;
+		bordered.t -= total;
+		bordered.r += total;
+		bordered.b += total;
+
+		if (in.spacing == 0) {
+			bordered.l++;
+			bordered.t++;
+		}
 
 		ltrb lines[4] = {
 			bordered,
@@ -273,10 +282,10 @@ namespace augs {
 			bordered
 		};
 
-		lines[0].r = bordered.l + width;
-		lines[1].b = bordered.t + width;
-		lines[2].l = bordered.r - width;
-		lines[3].t = bordered.b - width;
+		lines[0].r = bordered.l + in.width;
+		lines[1].b = bordered.t + in.width;
+		lines[2].l = bordered.r - in.width;
+		lines[3].t = bordered.b - in.width;
 
 		aabb(tex, lines[0], color);
 		aabb(tex, lines[1], color);
@@ -290,10 +299,11 @@ namespace augs {
 		const texture_atlas_entry tex,
 		const ltrb origin,
 		const rgba inside_color,
-		const rgba border_color
+		const rgba border_color,
+		const border_input in
 	) const {
 		aabb(tex, origin, inside_color);
-		border(tex, origin, border_color);
+		border(tex, origin, border_color, in);
 
 		return *this;
 	}
