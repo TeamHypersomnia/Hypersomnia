@@ -57,7 +57,7 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 	/* we'll need a reference to physics system for raycasting */
 	physics_system& physics = cosmos.systems_inferred.get<physics_system>();
 
-	auto& lines = DEBUG_LOGIC_LINES;
+	auto& lines = DEBUG_LOGIC_STEP_LINES;
 
 	cosmos.for_each(
 		processing_subjects::WITH_PATHFINDING,

@@ -9,6 +9,8 @@
 #include "augs/misc/lua_readwrite.h"
 #include "augs/misc/machine_entropy.h"
 
+#include "augs/graphics/renderer.h"
+
 #include "augs/window_framework/window.h"
 #include "augs/audio/audio_structs.h"
 
@@ -675,8 +677,8 @@ int main(const int argc, const char* const * const argv) try {
 			setup.advance(
 				audiovisual_step,
 				[&renderer](auto...) {
-					renderer.save_debug_logic_lines_for_interpolation(DEBUG_LOGIC_LINES);
-					DEBUG_LOGIC_LINES.clear();
+					renderer.save_debug_logic_step_lines_for_interpolation(DEBUG_LOGIC_STEP_LINES);
+					DEBUG_LOGIC_STEP_LINES.clear();
 				},
 				[&](const const_logic_step step) {
 					game_gui.standard_post_solve(step);
@@ -805,7 +807,7 @@ int main(const int argc, const char* const * const argv) try {
 			if (DEBUG_DRAWING.enabled) {
 				/* #2 */
 				renderer.draw_debug_lines(
-					DEBUG_LOGIC_LINES,
+					DEBUG_LOGIC_STEP_LINES,
 					DEBUG_PERSISTENT_LINES,
 
 					get_camera(), 

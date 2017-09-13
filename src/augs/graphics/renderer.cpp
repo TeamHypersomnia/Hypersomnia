@@ -176,8 +176,8 @@ namespace augs {
 		return specials;
 	}
 	
-	void renderer::save_debug_logic_lines_for_interpolation(const decltype(prev_logic_lines)& lines) {
-		prev_logic_lines = lines;
+	void renderer::save_debug_logic_step_lines_for_interpolation(const decltype(prev_logic_step_lines)& lines) {
+		prev_logic_step_lines = lines;
 	}
 
 	void renderer::fullscreen_quad() {
@@ -264,7 +264,7 @@ namespace augs {
 	}
 
 	void renderer::draw_debug_lines(
-		const debug_lines& logic_lines,
+		const debug_lines& logic_step_lines,
 		const debug_lines& persistent_lines,
 
 		const camera_cone camera,
@@ -277,21 +277,21 @@ namespace augs {
 			output.line(camera[line.a], camera[line.b], line.col);
 		};
 
-		if (interpolate_debug_logic_lines && logic_lines.size() == prev_logic_lines.size()) {
-			std::vector<debug_line> interpolated_logic_lines;
+		if (interpolate_debug_logic_step_lines && logic_step_lines.size() == prev_logic_step_lines.size()) {
+			std::vector<debug_line> interpolated_logic_step_lines;
 
-			interpolated_logic_lines.resize(logic_lines.size());
+			interpolated_logic_step_lines.resize(logic_step_lines.size());
 
-			for (size_t i = 0; i < logic_lines.size(); ++i) {
-				interpolated_logic_lines[i].a = prev_logic_lines[i].a.lerp(logic_lines[i].a, interpolation_ratio);
-				interpolated_logic_lines[i].b = prev_logic_lines[i].b.lerp(logic_lines[i].b, interpolation_ratio);
-				interpolated_logic_lines[i].col = logic_lines[i].col;
+			for (size_t i = 0; i < logic_step_lines.size(); ++i) {
+				interpolated_logic_step_lines[i].a = prev_logic_step_lines[i].a.lerp(logic_step_lines[i].a, interpolation_ratio);
+				interpolated_logic_step_lines[i].b = prev_logic_step_lines[i].b.lerp(logic_step_lines[i].b, interpolation_ratio);
+				interpolated_logic_step_lines[i].col = logic_step_lines[i].col;
 			}
 
-			for_each_in(interpolated_logic_lines, line_lambda);
+			for_each_in(interpolated_logic_step_lines, line_lambda);
 		}
 		else {
-			for_each_in(logic_lines, line_lambda);
+			for_each_in(logic_step_lines, line_lambda);
 		}
 
 		for_each_in(frame_lines, line_lambda);

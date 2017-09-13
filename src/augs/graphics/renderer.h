@@ -16,7 +16,7 @@ namespace augs {
 
 	struct renderer {
 		debug_lines frame_lines;
-		debug_lines prev_logic_lines;
+		debug_lines prev_logic_step_lines;
 		
 		timer line_timer;
 
@@ -33,7 +33,7 @@ namespace augs {
 
 		std::size_t triangles_drawn_total = 0;
 
-		bool interpolate_debug_logic_lines = true;
+		bool interpolate_debug_logic_step_lines = true;
 
 		renderer();
 
@@ -47,7 +47,7 @@ namespace augs {
 
 		void fullscreen_quad();
 		
-		void save_debug_logic_lines_for_interpolation(const debug_lines&);
+		void save_debug_logic_step_lines_for_interpolation(const debug_lines&);
 
 		void draw_call_imgui(
 			const graphics::texture& imgui_atlas,
@@ -55,7 +55,7 @@ namespace augs {
 		);
 
 		void draw_debug_lines(
-			const debug_lines& logic_lines,
+			const debug_lines& logic_step_lines,
 			const debug_lines& persistent_lines,
 
 			const camera_cone,

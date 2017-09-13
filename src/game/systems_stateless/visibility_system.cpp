@@ -173,7 +173,7 @@ void visibility_system::respond_to_visibility_information_requests(
 	ensure(settings.epsilon_ray_distance_variation > 0.f);
 	ensure(settings.epsilon_threshold_obstacle_hit > 0.f);
 
-	auto& lines = DEBUG_LOGIC_LINES;
+	auto& lines = DEBUG_LOGIC_STEP_LINES;
 
 	/* prepare epsilons to be used later, just to make the notation more clear */
 	const auto epsilon_distance_vertex_hit_sq =

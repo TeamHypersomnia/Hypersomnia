@@ -38,5 +38,5 @@ struct debug_drawing_settings {
 };
 
 extern debug_drawing_settings DEBUG_DRAWING;
-extern std::vector<debug_line> DEBUG_LOGIC_LINES;
+extern std::vector<debug_line> DEBUG_LOGIC_STEP_LINES;
 extern std::vector<debug_line> DEBUG_PERSISTENT_LINES;

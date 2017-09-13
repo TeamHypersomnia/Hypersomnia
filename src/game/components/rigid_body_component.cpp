@@ -144,7 +144,7 @@ void component_synchronizer<false, P>::apply_force(
 	data.velocity = body->GetLinearVelocity();
 
 	if (DEBUG_DRAWING.draw_forces && force.non_zero()) {
-		auto& lines = DEBUG_LOGIC_LINES;
+		auto& lines = DEBUG_LOGIC_STEP_LINES;
 		lines.emplace_back(green, to_pixels(location) + to_pixels(force), to_pixels(location));
 	}
 }
