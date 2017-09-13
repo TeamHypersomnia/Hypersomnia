@@ -1,15 +1,11 @@
 #pragma once
-#include <vector>
-#include <optional>
-
 #include "augs/math/vec2.h"
-
-#include "augs/templates/settable_as_current_mixin.h"
 #include "augs/misc/timer.h"
 
 #include "augs/graphics/rgba.h"
 #include "augs/graphics/vertex.h"
 #include "augs/graphics/texture.h"
+#include "augs/graphics/debug_line.h"
 
 #include "augs/math/camera_cone.h"
 
@@ -18,36 +14,18 @@ namespace augs {
 		class texture;
 	}
 
-	class renderer : public settable_as_current_mixin<renderer> {
-		friend class settable_as_current_base;
-
-		bool set_as_current_impl() { return true; }
-		void set_current_to_none_impl() {}
-	public:
-		struct debug_line {
-			debug_line() = default;
-			debug_line(const rgba col, const vec2 a, const vec2 b) : col(col), a(a), b(b) {}
-			debug_line(const vec2 a, const vec2 b, const rgba col) : col(col), a(a), b(b) {}
-
-			vec2 a;
-			vec2 b;
-			rgba col;
-		};
-
-		std::vector<debug_line> logic_lines;
-		std::vector<debug_line> prev_logic_lines;
-		std::vector<debug_line> frame_lines;
-		std::vector<debug_line> persistent_lines;
+	struct renderer {
+		debug_lines frame_lines;
+		debug_lines prev_logic_lines;
 		
 		timer line_timer;
 
-		unsigned int position_buffer_id = 0xdeadbeef;
-		unsigned int texcoord_buffer_id = 0xdeadbeef;
-		unsigned int color_buffer_id = 0xdeadbeef;
-		unsigned int triangle_buffer_id = 0xdeadbeef;
-		unsigned int special_buffer_id = 0xdeadbeef;
-
-		unsigned int imgui_elements_id = 0xdeadbeef;
+		GLuint position_buffer_id = 0xdeadbeef;
+		GLuint texcoord_buffer_id = 0xdeadbeef;
+		GLuint color_buffer_id = 0xdeadbeef;
+		GLuint triangle_buffer_id = 0xdeadbeef;
+		GLuint special_buffer_id = 0xdeadbeef;
+		GLuint imgui_elements_id = 0xdeadbeef;
 
 		vertex_triangle_buffer triangles;
 		vertex_line_buffer lines;
@@ -55,7 +33,7 @@ namespace augs {
 
 		std::size_t triangles_drawn_total = 0;
 
-		bool should_interpolate_debug_lines = false;
+		bool interpolate_debug_logic_lines = true;
 
 		renderer();
 
@@ -69,15 +47,17 @@ namespace augs {
 
 		void fullscreen_quad();
 		
-		void clear_logic_lines();
-		void clear_frame_lines();
-		
+		void save_debug_logic_lines_for_interpolation(const debug_lines&);
+
 		void draw_call_imgui(
 			const graphics::texture& imgui_atlas,
 			const graphics::texture& game_world_atlas
 		);
 
 		void draw_debug_lines(
+			const debug_lines& logic_lines,
+			const debug_lines& persistent_lines,
+
 			const camera_cone,
 			const augs::texture_atlas_entry line_texture, 
 			const float interpolation_ratio

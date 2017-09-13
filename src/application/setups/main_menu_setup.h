@@ -93,10 +93,11 @@ public:
 	void customize_for_viewing(config_lua_table& config);
 	void apply(const config_lua_table& config);
 
-	template <class F, class G>
+	template <class F, class Pre, class Post>
 	void advance(
 		F&& advance_audiovisuals,
-		G&& step_post_solve
+		Pre&& step_pre_solve,
+		Post&& step_post_solve
 	) {
 		auto steps = timer.count_logic_steps_to_perform(intro_scene.get_fixed_delta());
 
@@ -105,12 +106,10 @@ public:
 		}
 
 		while (steps--) {
-			augs::renderer::get_current().clear_logic_lines();
-
 			intro_scene.advance(
 				{ total_collected_entropy, logical_assets },
-				[](auto) {},
-				std::forward<G>(step_post_solve)
+				std::forward<Pre>(step_pre_solve),
+				std::forward<Post>(step_post_solve)
 			);
 
 			total_collected_entropy.clear();

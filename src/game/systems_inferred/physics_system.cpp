@@ -19,7 +19,6 @@
 #include "game/transcendental/logic_step.h"
 #include "game/transcendental/entity_handle.h"
 
-#include "augs/graphics/renderer.h"
 #include "augs/templates/container_templates.h"
 #include "augs/templates/dynamic_cast_dispatch.h"
 #include "augs/build_settings/setting_debug_physics_system_copy.h"

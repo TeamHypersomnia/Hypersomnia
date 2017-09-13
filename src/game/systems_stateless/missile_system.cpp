@@ -5,7 +5,6 @@
 #include "game/messages/collision_message.h"
 #include "game/messages/queue_destruction.h"
 #include "game/messages/damage_message.h"
-#include "augs/graphics/renderer.h"
 
 #include "game/detail/inventory/inventory_utils.h"
 #include "game/detail/entity_scripts.h"

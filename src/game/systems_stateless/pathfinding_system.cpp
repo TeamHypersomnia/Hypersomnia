@@ -10,7 +10,6 @@
 #include "game/components/fixtures_component.h"
 #include "game/messages/visibility_information.h"
 
-#include "augs/graphics/renderer.h"
 #include "game/enums/processing_subjects.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/detail/physics/physics_scripts.h"
@@ -58,8 +57,7 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 	/* we'll need a reference to physics system for raycasting */
 	physics_system& physics = cosmos.systems_inferred.get<physics_system>();
 
-	auto& renderer = augs::renderer::get_current();
-	auto& lines = augs::renderer::get_current().logic_lines;
+	auto& lines = DEBUG_LOGIC_LINES;
 
 	cosmos.for_each(
 		processing_subjects::WITH_PATHFINDING,

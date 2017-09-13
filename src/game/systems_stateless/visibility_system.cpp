@@ -3,8 +3,6 @@
 
 #include <Box2D\Box2D.h>
 
-#include "augs/graphics/renderer.h"
-
 #include "game/debug_drawing_settings.h"
 
 #include "game/transcendental/cosmos.h"
@@ -175,8 +173,7 @@ void visibility_system::respond_to_visibility_information_requests(
 	ensure(settings.epsilon_ray_distance_variation > 0.f);
 	ensure(settings.epsilon_threshold_obstacle_hit > 0.f);
 
-	auto& renderer = augs::renderer::get_current();
-	auto& lines = renderer.logic_lines;
+	auto& lines = DEBUG_LOGIC_LINES;
 
 	/* prepare epsilons to be used later, just to make the notation more clear */
 	const auto epsilon_distance_vertex_hit_sq =

@@ -18,7 +18,6 @@ public:
 
 namespace augs {
 	class window;
-	class renderer;
 	class audio_context;
 }
 

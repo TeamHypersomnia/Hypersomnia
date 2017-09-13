@@ -14,7 +14,7 @@ class cosmos;
 struct audiovisual_state;
 
 namespace augs {
-	class renderer;
+	struct renderer;
 }
 
 struct necessary_shaders;

@@ -2,7 +2,6 @@
 #include <Box2D\Dynamics\b2Body.h>
 
 #include "game/transcendental/entity_id.h"
-#include "augs/graphics/renderer.h"
 
 #include "game/components/rigid_body_component.h"
 #include "game/components/special_physics_component.h"
@@ -59,7 +58,7 @@ float colinearize_AB_with_C(
 	const auto final_angle = 2 * (CG.degrees() - AG.degrees());
 	
 	if (DEBUG_DRAWING.draw_colinearization) {
-		auto& ln = augs::renderer::get_current().logic_lines;
+		auto& ln = DEBUG_LOGIC_LINES;
 
 		ln.emplace_back(cyan, O_center_of_rotation, C_crosshair);
 		ln.emplace_back(red, O_center_of_rotation, A_barrel_center);

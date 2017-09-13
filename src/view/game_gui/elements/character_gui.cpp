@@ -23,7 +23,6 @@
 #include "view/game_gui/viewing_game_gui_context_dependencies.h"
 #include "view/game_gui/elements/drag_and_drop.h"
 #include "view/audiovisual_state/aabb_highlighter.h"
-#include "augs/graphics/renderer.h"
 #include "game/enums/filters.h"
 
 #include "game/detail/describers.h"

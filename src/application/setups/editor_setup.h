@@ -52,8 +52,6 @@ public:
 		while (steps--) {
 			player.advance_player_and_biserialize(total_collected_entropy);
 
-			augs::renderer::get_current().clear_logic_lines();
-
 			hypersomnia.advance(
 				{ total_collected_entropy, logical_assets },
 				[](auto){},

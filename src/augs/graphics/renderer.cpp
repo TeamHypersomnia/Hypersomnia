@@ -175,6 +175,10 @@ namespace augs {
 	special_buffer& renderer::get_special_buffer() {
 		return specials;
 	}
+	
+	void renderer::save_debug_logic_lines_for_interpolation(const decltype(prev_logic_lines)& lines) {
+		prev_logic_lines = lines;
+	}
 
 	void renderer::fullscreen_quad() {
 		static constexpr float vertices[] = {
@@ -210,15 +214,6 @@ namespace augs {
 		//glVertexAttrib2f(0u, 0.f, 0.f);
 		//glVertexAttrib2f(0u, 0.f, 1.f);
 		//glEnd();
-	}
-
-	void renderer::clear_logic_lines() {
-		prev_logic_lines = logic_lines;
-		logic_lines.clear();
-	}
-
-	void renderer::clear_frame_lines() {
-		frame_lines.clear();
 	}
 
 	void renderer::draw_call_imgui(
@@ -269,6 +264,9 @@ namespace augs {
 	}
 
 	void renderer::draw_debug_lines(
+		const debug_lines& logic_lines,
+		const debug_lines& persistent_lines,
+
 		const camera_cone camera,
 		const augs::texture_atlas_entry tex,
 		const float interpolation_ratio
@@ -279,7 +277,7 @@ namespace augs {
 			output.line(camera[line.a], camera[line.b], line.col);
 		};
 
-		if (should_interpolate_debug_lines && logic_lines.size() == prev_logic_lines.size()) {
+		if (interpolate_debug_logic_lines && logic_lines.size() == prev_logic_lines.size()) {
 			std::vector<debug_line> interpolated_logic_lines;
 
 			interpolated_logic_lines.resize(logic_lines.size());
@@ -306,8 +304,6 @@ namespace augs {
 			//persistent_lines.erase(persistent_lines.begin());
 			line_timer.reset();
 		}
-
-		clear_frame_lines();
 	}
 
 	std::size_t renderer::get_max_texture_size() const {

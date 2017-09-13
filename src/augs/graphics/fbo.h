@@ -6,8 +6,6 @@
 using GLuint = unsigned int;
 
 namespace augs {
-	class renderer;
-
 	namespace graphics {
 		class fbo : public settable_as_current_mixin<const fbo> {
 			bool created = false;

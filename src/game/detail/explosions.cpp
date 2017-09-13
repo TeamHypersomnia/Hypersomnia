@@ -8,7 +8,6 @@
 #include "game/systems_stateless/visibility_system.h"
 #include "game/systems_stateless/sound_existence_system.h"
 #include "game/enums/filters.h"
-#include "augs/graphics/renderer.h"
 #include "game/components/sentience_component.h"
 #include "game/transcendental/logic_step.h"
 #include "game/transcendental/data_living_one_step.h"
@@ -142,9 +141,7 @@ void standard_explosion_input::instantiate(
 								);
 
 								if (DEBUG_DRAWING.draw_explosion_forces) {
-									auto& r = augs::renderer::get_current();
-
-									r.persistent_lines.emplace_back(cyan,
+									DEBUG_PERSISTENT_LINES.emplace_back(cyan,
 										affected_physics.get_mass_position() + center_offset,
 										affected_physics.get_mass_position() + center_offset + impact
 									);

@@ -5,7 +5,6 @@
 
 #include <Box2D\Box2D.h>
 
-#include "augs/graphics/renderer.h"
 #include "fixtures_component.h"
 
 #include "augs/math/vec2.h"
@@ -145,7 +144,7 @@ void component_synchronizer<false, P>::apply_force(
 	data.velocity = body->GetLinearVelocity();
 
 	if (DEBUG_DRAWING.draw_forces && force.non_zero()) {
-		auto& lines = augs::renderer::get_current().logic_lines;
+		auto& lines = DEBUG_LOGIC_LINES;
 		lines.emplace_back(green, to_pixels(location) + to_pixels(force), to_pixels(location));
 	}
 }
@@ -176,8 +175,7 @@ void component_synchronizer<false, P>::apply_impulse(
 	data.velocity = body->GetLinearVelocity();
 
 	if (DEBUG_DRAWING.draw_forces && force.non_zero()) {
-		auto& lines = augs::renderer::get_current().persistent_lines;
-		lines.emplace_back(green, to_pixels(location) + to_pixels(force), to_pixels(location));
+		DEBUG_PERSISTENT_LINES.emplace_back(green, to_pixels(location) + to_pixels(force), to_pixels(location));
 	}
 }
 

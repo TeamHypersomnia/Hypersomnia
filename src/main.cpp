@@ -77,9 +77,6 @@ int main(const int argc, const char* const * const argv) try {
 
 	augs::renderer renderer;
 
-	/* The logic will use renderer::get_current() to push debug lines */
-	renderer.set_as_current();
-
 	necessary_fbos fbos(
 		config.window.get_screen_size(),
 		config.drawing
@@ -287,7 +284,7 @@ int main(const int argc, const char* const * const argv) try {
 
 		switch (intent) {
 			case T::CLEAR_DEBUG_LINES:
-				renderer.persistent_lines.clear();
+				DEBUG_PERSISTENT_LINES.clear();
 				break;
 
 			case T::SWITCH_WEAPON_LASER: {
@@ -677,6 +674,10 @@ int main(const int argc, const char* const * const argv) try {
 
 			setup.advance(
 				audiovisual_step,
+				[&renderer](auto...) {
+					renderer.save_debug_logic_lines_for_interpolation(DEBUG_LOGIC_LINES);
+					DEBUG_LOGIC_LINES.clear();
+				},
 				[&](const const_logic_step step) {
 					game_gui.standard_post_solve(step);
 					audiovisuals.standard_post_solve(step);
@@ -803,8 +804,18 @@ int main(const int argc, const char* const * const argv) try {
 
 			if (DEBUG_DRAWING.enabled) {
 				/* #2 */
-				renderer.draw_debug_lines(get_camera(), get_drawer().default_texture, static_cast<float>(interpolation_ratio));
+				renderer.draw_debug_lines(
+					DEBUG_LOGIC_LINES,
+					DEBUG_PERSISTENT_LINES,
+
+					get_camera(), 
+					get_drawer().default_texture, 
+					static_cast<float>(interpolation_ratio)
+				);
+
 				renderer.call_and_clear_lines();
+
+				renderer.frame_lines.clear();
 			}
 
 			if (

@@ -216,7 +216,7 @@ return {
     enabled = true,
     speed = 525
   },
-  launch_mode = "MAIN_MENU",
+  launch_mode = "TEST_SCENE",
   main_menu = {
     latest_news_url = "http://hypersomnia.pl/latest_post/",
     menu_intro_scene_cosmos_path = "abc",

@@ -70,10 +70,11 @@ public:
 		return;
 	}
 
-	template <class F, class G>
+	template <class F, class Pre, class Post>
 	void advance(
 		F&& advance_audiovisuals, 
-		G&& step_post_solve
+		Pre&& step_pre_solve,
+		Post&& step_post_solve
 	) {
 		auto steps = timer.count_logic_steps_to_perform(hypersomnia.get_fixed_delta());
 
@@ -84,12 +85,10 @@ public:
 		while (steps--) {
 			player.advance_player_and_biserialize(total_collected_entropy);
 
-			augs::renderer::get_current().clear_logic_lines();
-
 			hypersomnia.advance(
 				{ total_collected_entropy, logical_assets },
-				[](auto){},
-				std::forward<G>(step_post_solve)
+				std::forward<Pre>(step_pre_solve),
+				std::forward<Post>(step_post_solve)
 			);
 
 			total_collected_entropy.clear();

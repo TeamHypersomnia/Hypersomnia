@@ -11,7 +11,6 @@
 
 #include "physics_scripts.h"
 
-#include "augs/graphics/renderer.h"
 #include "augs/templates/container_templates.h"
 #include "augs/templates/to_array.h"
 #include "game/debug_drawing_settings.h"
@@ -97,14 +96,12 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 						}
 
 						if (DEBUG_DRAWING.draw_friction_field_collisions_of_entering) {
-							auto& renderer = augs::renderer::get_current();
-
-							renderer.persistent_lines.emplace_back(yellow,
+							DEBUG_PERSISTENT_LINES.emplace_back(yellow,
 								si.get_pixels(worldManifold.points[i]),
 								si.get_pixels(worldManifold.points[i]) + vec2(worldManifold.normal).set_length(150)
 							);
 
-							renderer.persistent_lines.emplace_back(red, 
+							DEBUG_PERSISTENT_LINES.emplace_back(red,
 								si.get_pixels(worldManifold.points[i]), 
 								si.get_pixels(worldManifold.points[i]) + velOtherPixels
 							);

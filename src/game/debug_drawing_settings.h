@@ -1,4 +1,6 @@
 #pragma once
+#include <vector>
+#include "augs/graphics/debug_line.h"
 
 /* Why it's global:
 	1. Debug drawing is performed in many places in the logic, even in some very modular ones (force application). 
@@ -36,3 +38,5 @@ struct debug_drawing_settings {
 };
 
 extern debug_drawing_settings DEBUG_DRAWING;
+extern std::vector<debug_line> DEBUG_LOGIC_LINES;
+extern std::vector<debug_line> DEBUG_PERSISTENT_LINES;
