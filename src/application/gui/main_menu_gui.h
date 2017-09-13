@@ -65,6 +65,11 @@ struct main_menu_gui {
 		root.set_menu_buttons_colors(cyan);
 		root.set_menu_buttons_sizes(context.get_necessary_images(), gui_font, { 1000, 1000 });
 
+		for (std::size_t i = 0; i < root.buttons.size(); ++i) {
+			const auto e = static_cast<main_menu_button_type>(i);
+			root.buttons[i].set_complete_caption(to_wstring(format_enum(e)));
+		}
+
 		world.advance_elements(context, vdt);
 		world.rebuild_layouts(context);
 		world.build_tree_data_into(context);

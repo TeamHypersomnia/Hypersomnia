@@ -1,8 +1,9 @@
-#include "fixed_delta_timer.h"
 #include <algorithm>
+
 #include "augs/ensure.h"
-#include <cmath>
-#undef min
+#include "augs/math/vec2.h"
+#include "augs/misc/fixed_delta_timer.h"
+
 /* credits goes to http://www.unagames.com/blog/daniele/2010/06/fixed-time-step-implementation-box2d */
 
 namespace augs {
@@ -13,6 +14,8 @@ namespace augs {
 	}
 
 	unsigned fixed_delta_timer::count_logic_steps_to_perform(const delta basic_delta) {
+		ensure(basic_delta.in_milliseconds() > AUGS_EPSILON<real32>);
+
 		accumulator += ticks.extract<std::chrono::milliseconds>() * time_multiplier;
 
 		const unsigned steps = static_cast<unsigned>(std::floor(accumulator / basic_delta.in_milliseconds()));
@@ -29,7 +32,7 @@ namespace augs {
 	}
 
 	float fixed_delta_timer::fraction_of_step_until_next_step(const delta basic_delta) const {
-		if (basic_delta.in_milliseconds() == 0.f) {
+		if (basic_delta.in_milliseconds() <= AUGS_EPSILON<real32>) {
 			return 0.f;
 		}
 

@@ -72,6 +72,10 @@ void main_menu_setup::launch_creators_screen() {
 main_menu_setup::main_menu_setup(const main_menu_settings settings) : menu_theme(settings.menu_theme_path) {
 	auto& lua = augs::get_thread_local_lua_state();
 	
+	if (settings.skip_credits) {
+		gui.show = true;
+	}
+
 	const auto menu_config_patch_path = "content/menu/config.lua";
 
 	try {

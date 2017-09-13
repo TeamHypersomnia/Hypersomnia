@@ -120,6 +120,7 @@ namespace augs {
 
 				{
 					gui_entropy entropies;
+
 					if (context.alive(rect_hovered)) {
 						context(rect_hovered, [&](const auto& r) {
 							event::change ch;

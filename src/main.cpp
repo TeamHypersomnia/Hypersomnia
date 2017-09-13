@@ -44,8 +44,8 @@
 #include "generated/introspectors.h"
 
 int main(const int argc, const char* const * const argv) try {
-	const augs::path_type canon_config_path = "config.lua";
-	const augs::path_type local_config_path = "config.local.lua";
+	const auto canon_config_path = augs::path_type("config.lua");
+	const auto local_config_path = augs::path_type("config.local.lua");
 	
 	augs::create_directories("generated/logs/");
 
@@ -192,17 +192,16 @@ int main(const int argc, const char* const * const argv) try {
 
 	auto launch = [&](const launch_type mode) {
 		LOG("Launch mode: %x", augs::enum_to_string(mode));
+		
+		current_setup = std::nullopt;
+		ingame_menu.show = false;
 
 		switch (mode) {
 			case launch_type::MAIN_MENU:
-#if TODO
-				main_menu.emplace(test_scene_populate);
-	
-				// play intro if not skipped
-				if (config.main_menu.skip_credits) {
-					make_menu_gui_complete();
+				if (!main_menu.has_value()) {
+					main_menu.emplace(config.main_menu);
 				}
-#endif
+
 				break;
 
 			case launch_type::TEST_SCENE:
@@ -211,15 +210,16 @@ int main(const int argc, const char* const * const argv) try {
 					config.get_input_recording_mode()
 				);
 
-				visit_current_setup([&](auto& setup) {
-					preload_viewables(setup);
-				});
 				break;
 
 			default:
 				ensure(false && "The launch mode you have chosen is currently out of service.");
 				break;
 		}
+
+		visit_current_setup([&](auto& setup) {
+			preload_viewables(setup);
+		});
 	};
 
 	auto get_viewable_defs = [&]() -> const all_viewables_defs& {
@@ -346,8 +346,7 @@ int main(const int argc, const char* const * const argv) try {
 				break;
 
 			case T::LEAVE_THIS_UNIVERSE:
-				ingame_menu.show = false;
-				current_setup.reset();
+				launch(launch_type::MAIN_MENU);
 				break;
 
 			case T::SETTINGS:
@@ -512,9 +511,7 @@ int main(const int argc, const char* const * const argv) try {
 					main_menu->gui.world.unhover_and_undrag(create_menu_context(main_menu->gui));
 				}
 
-				if (ingame_menu.show) {
-					ingame_menu.world.unhover_and_undrag(create_menu_context(ingame_menu));
-				}
+				ingame_menu.world.unhover_and_undrag(create_menu_context(ingame_menu));
 			}
 			/* Maybe the game GUI was deactivated while the button was still hovered */
 			else if (!game_gui.active && current_setup.has_value()) {
@@ -612,7 +609,7 @@ int main(const int argc, const char* const * const argv) try {
 						}
 					}
 
-					if (main_menu.has_value()) {
+					if (main_menu.has_value() && !current_setup.has_value()) {
 						if (main_menu->gui.show || e.was_any_key_released()) {
 							main_menu->gui.control(create_menu_context(main_menu->gui), e, do_main_menu_option);
 						}
@@ -821,9 +818,16 @@ int main(const int argc, const char* const * const argv) try {
 
 		auto menu_chosen_cursor = assets::necessary_image_id::INVALID;
 
-		if (main_menu.has_value()) {
+		if (current_setup.has_value()) {
+			if (ingame_menu.show) {
+				const auto context = create_menu_context(ingame_menu);
+				ingame_menu.advance(context, frame_dt_ms);
+				menu_chosen_cursor = ingame_menu.draw({ context, get_drawer() });
+			}
+		}
+		else {
 			const auto context = create_menu_context(main_menu->gui);
-			
+
 			main_menu->gui.advance(context, frame_dt_ms);
 
 			menu_chosen_cursor = main_menu->gui.draw({ context, get_drawer() });
@@ -834,15 +838,6 @@ int main(const int argc, const char* const * const argv) try {
 				gui_font,
 				screen_size
 			);
-		}
-		else {
-			ensure(current_setup.has_value());
-
-			if (ingame_menu.show) {
-				const auto context = create_menu_context(ingame_menu);
-				ingame_menu.advance(context, frame_dt_ms);
-				menu_chosen_cursor = ingame_menu.draw({context, get_drawer()});
-			}
 		}
 		
 		renderer.call_and_clear_triangles();

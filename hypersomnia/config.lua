@@ -25,7 +25,7 @@ return {
     check_integrity_every_launch = true,
     packer_detail_max_atlas_size = 8192,
     regenerate_every_launch = false,
-    save_regenerated_atlases_as_binary = false
+    save_regenerated_atlases_as_binary = true
   },
 
   app_controls = {
@@ -216,11 +216,11 @@ return {
     enabled = true,
     speed = 525
   },
-  launch_mode = "TEST_SCENE",
+  launch_mode = "MAIN_MENU",
   main_menu = {
     latest_news_url = "http://hypersomnia.pl/latest_post/",
-    menu_intro_scene_cosmos_path = "",
-    menu_intro_scene_entropy_path = "",
+    menu_intro_scene_cosmos_path = "abc",
+    menu_intro_scene_entropy_path = "abc",
     menu_theme_path = "",
     rewind_intro_scene_by_secs = 3.5,
     skip_credits = true,
