@@ -41,14 +41,6 @@ namespace augs {
 			return current_instance != nullptr;
 		}
 
-		template <class = std::enable_if_t<!is_const>>
-		void unset_if_current() {
-			if (is_current()) {
-				set_current_to_none();
-			}
-		}
-
-		template <class = std::enable_if_t<is_const>>
 		void unset_if_current() const {
 			if (is_current()) {
 				set_current_to_none();
