@@ -1,5 +1,5 @@
 #include "augs/misc/imgui_utils.h"
-#include "augs/audio/audio_structs.h"
+#include "augs/audio/audio_context.h"
 
 #include "augs/window_framework/platform_utils.h"
 #include "augs/window_framework/window.h"

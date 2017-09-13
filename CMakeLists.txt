@@ -188,7 +188,7 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/view/viewables/regeneration/neon_maps.cpp"
 	"src/augs/graphics/texture.cpp"
 	"src/augs/gui/button_corners.cpp"
-	"src/augs/audio/audio_structs.cpp"
+	"src/augs/audio/audio_context.cpp"
 	"src/augs/audio/sound_buffer.cpp"
 	"src/augs/audio/sound_source.cpp"
 	"src/augs/ensure.cpp"

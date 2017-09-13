@@ -1,4 +1,4 @@
-#include "audio_structs.h"
+#include "audio_context.h"
 
 #include "augs/audio/OpenAL_error.h"
 

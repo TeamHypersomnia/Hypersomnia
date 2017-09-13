@@ -12,7 +12,7 @@
 #include "augs/graphics/renderer.h"
 
 #include "augs/window_framework/window.h"
-#include "augs/audio/audio_structs.h"
+#include "augs/audio/audio_context.h"
 
 #include "game/organization/all_component_includes.h"
 #include "game/organization/all_messages_includes.h"
