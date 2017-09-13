@@ -230,33 +230,6 @@ namespace augs {
 
 		return local;
 	}
-
-	template <class C, class G>
-	void give_precedence_to_imgui(C& context, G& output_entropies) {
-		auto& world = context.get_rect_world();
-
-		if (ImGui::GetIO().WantCaptureMouse) {
-			world.unhover_and_undrag(context, output_entropies);
-		}
-	}
-
-	template <class C>
-	auto consume_inputs_with_imgui_precedence(
-		C& context,
-		const augs::local_entropy& local
-	) {
-		auto& world = context.get_rect_world();
-		using world_type = std::decay_t<decltype(world)>;
-		typename world_type::gui_entropy gui_entropies;
-
-		give_precedence_to_imgui(context, gui_entropies);
-
-		for (const auto& ch : local) {
-			world.consume_raw_input_and_generate_gui_events(context, ch, gui_entropies);
-		}
-
-		return gui_entropies;
-	}
 }
 
 namespace ImGui {

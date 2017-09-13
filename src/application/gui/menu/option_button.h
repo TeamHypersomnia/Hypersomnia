@@ -140,7 +140,8 @@ public:
 			this_id->corners.for_each_button_corner(
 				necessarys,
 				internal_rc, 
-				[&](const button_corner_type type, const assets::necessary_image_id id, const ltrb drawn_rc)  {
+				[&](const button_corner_type type, const assets::necessary_image_id id, const ltrb drawn_rc) {
+					if (is_lb_complement(type)) { return; }
 					const auto col = is_button_border(type) ? border_col : inside_col;
 					output.aabb(necessarys.at(id), drawn_rc, col, flip);
 				}
@@ -157,6 +158,7 @@ public:
 						necessarys,
 						hover_effect_rc,
 						[&](const button_corner_type type, const assets::necessary_image_id id, const ltrb drawn_rc) {
+							if (is_lb_complement(type)) { return; }
 							if (is_button_border(type)) {
 								output.aabb(necessarys.at(id), drawn_rc, color, flip);
 							}
@@ -174,6 +176,7 @@ public:
 						necessarys,
 						hover_effect_rc, 
 						[&](const button_corner_type type, const assets::necessary_image_id id, const ltrb drawn_rc) {
+							if (is_lb_complement(type)) { return; }
 							if (is_button_corner(type) && is_button_border(type)) {
 								output.aabb(necessarys.at(id), drawn_rc, color, flip);
 							}

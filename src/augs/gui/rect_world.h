@@ -86,7 +86,9 @@ namespace augs {
 			}
 
 			template <class C>
-			void unhover_and_undrag(const C context, gui_entropy& entropies) {
+			void unhover_and_undrag(const C context) {
+				gui_entropy entropies;
+
 				if (context.alive(rect_hovered)) {
 					context(rect_hovered, [&](const auto& r) {
 						event::change ch;
@@ -116,6 +118,8 @@ namespace augs {
 					current_drag_amount.set(0, 0);
 					rect_held_by_rmb = gui_element_variant_id();
 				}
+
+				respond_to_events(context, entropies);
 			}
 
 			template <class C>
@@ -236,7 +240,7 @@ namespace augs {
 				}
 
 				if (new_state.msg == event::message::clipboard_change) {
-					global_clipboard.change_clipboard();
+					//global_clipboard.change_clipboard();
 					pass = false;
 				}
 

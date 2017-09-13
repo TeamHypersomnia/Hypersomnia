@@ -122,7 +122,7 @@ namespace augs {
 						const bool hovering = absolute_clipped_rect.good() && absolute_clipped_rect.hover(mouse_pos);
 
 						if (context.dead(gr.rect_hovered)) {
-							if (hovering) {
+							if (hovering && (msg == message::mousemotion || (inf.change.uses_mouse() && inf.change.was_any_key_pressed()))) {
 								gui_event_lambda(gui_event::hover);
 								gr.rect_hovered = this_id;
 								inf.was_hovered_rect_visited = true;
@@ -184,7 +184,7 @@ namespace augs {
 							}
 							else {
 								// ensure(msg == message::mousemotion);
-								gui_event_lambda(gui_event::hout);
+								gui_event_lambda(gui_event::hoverlost);
 								unhover(context, this_id, inf, entropies);
 							}
 

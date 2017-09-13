@@ -479,6 +479,32 @@ int main(const int argc, const char* const * const argv) try {
 
 			releases.set_due_to_imgui(ImGui::GetIO());
 
+			/* 
+				Since ImGUI has quite a different philosophy about input,
+				we will need some ugly inter-op with our GUIs.
+			*/
+
+			if (ImGui::GetIO().WantCaptureMouse) {
+				/* 
+					If mouse enters IMGUI element, sync back its position. 
+					Mousemotions are eaten from the vector already,
+					so the common_input_state would otherwise not get updated.
+				*/
+
+				common_input_state.mouse.pos = ImGui::GetIO().MousePos;
+
+				/* Neutralize hovers on all GUIs whose focus may have just been stolen. */
+
+				game_gui.world.unhover_and_undrag(create_game_gui_context());
+				
+				if (main_menu.has_value()) {
+					main_menu->gui.world.unhover_and_undrag(create_menu_context(main_menu->gui));
+				}
+
+				if (ingame_menu.show) {
+					ingame_menu.world.unhover_and_undrag(create_menu_context(ingame_menu));
+				}
+			}
 
 			/* 
 				Distribution of all the remaining input happens here.
@@ -526,11 +552,8 @@ int main(const int argc, const char* const * const argv) try {
 					const bool pass_to_gameplay =
 						viewed_character.alive()
 						&& (
-							(key_change.has_value() && *key_change == intent_change::RELEASED) // Always pass releases
-							|| (
-								current_setup.has_value()
-								&& !ingame_menu.show
-							)
+							current_setup.has_value()
+							&& !ingame_menu.show
 						)
 					;
 
@@ -554,7 +577,12 @@ int main(const int argc, const char* const * const argv) try {
 									game_gui.control_hotbar_and_action_button(viewed_character, { *it, *key_change });
 								}
 								else if (const auto it = mapped_or_nullptr(config.game_controls, key)) {
-									game_intents.push_back({ *it, *key_change });
+									if (
+										const bool leave_it_for_game_gui = e.uses_mouse() && game_gui.active;
+										!leave_it_for_game_gui
+									) {
+										game_intents.push_back({ *it, *key_change });
+									}
 								}
 							}
 						}
@@ -569,22 +597,18 @@ int main(const int argc, const char* const * const argv) try {
 						}
 					}
 
-					if (pass_to_gameplay) {
-						game_gui.control_gui_world(create_game_gui_context(), e);
+					if (main_menu.has_value()) {
+						if (main_menu->gui.show || e.was_any_key_released()) {
+							main_menu->gui.control(create_menu_context(main_menu->gui), e, do_main_menu_option);
+						}
 					}
-					else {
-						if (main_menu.has_value()) {
-							if (main_menu->gui.show) {
-								main_menu->gui.control(create_menu_context(main_menu->gui), e, do_main_menu_option);
-							}
-						}
-						else {
-							ensure(current_setup.has_value());
-
-							if (ingame_menu.show) {
-								ingame_menu.control(create_menu_context(ingame_menu), e, do_ingame_menu_option);
-							}
-						}
+					
+					if (ingame_menu.show || e.was_any_key_released()) {
+						ingame_menu.control(create_menu_context(ingame_menu), e, do_ingame_menu_option);
+					}
+					
+					if (pass_to_gameplay || e.was_any_key_released()) {
+						game_gui.control_gui_world(create_game_gui_context(), e);
 					}
 				}
 			}
