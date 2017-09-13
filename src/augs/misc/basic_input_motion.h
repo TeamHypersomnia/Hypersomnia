@@ -4,7 +4,7 @@
 using controller_motion = basic_vec2<short>;
 
 template <class motion_type_enum>
-struct basic_game_motion {
+struct basic_input_motion {
 	motion_type_enum motion = motion_type_enum::INVALID;
 	controller_motion offset;
 
@@ -20,14 +20,14 @@ struct basic_game_motion {
 		return motion != motion_type_enum::INVALID;
 	}
 
-	bool operator==(const basic_game_motion& b) const {
+	bool operator==(const basic_input_motion& b) const {
 		return
 			motion == b.motion
 			&& offset == b.offset
 		;
 	}
 
-	bool operator!=(const basic_game_motion& b) const {
+	bool operator!=(const basic_input_motion& b) const {
 		return !operator==(b);
 	}
 };

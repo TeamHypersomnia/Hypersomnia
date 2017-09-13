@@ -58,7 +58,8 @@ namespace augs {
 
 			vec2i get_text_bbox(
 				const formatted_string& str, 
-				const unsigned wrapping_width = 0
+				const unsigned wrapping_width = 0,
+				const bool use_kerning = false
 			);
 
 			vec2i print(
@@ -66,7 +67,8 @@ namespace augs {
 				const vec2i pos,
 				const formatted_string& str,
 				const unsigned wrapping_width = 0,
-				const ltrbi clipper = ltrbi()
+				const ltrbi clipper = ltrbi(),
+				const bool use_kerning = false
 			);
 
 			vec2i print_stroked(
@@ -75,7 +77,8 @@ namespace augs {
 				const formatted_string& str,
 				const rgba stroke_color = black,
 				const unsigned wrapping_width = 0,
-				const ltrbi clipper = ltrbi()
+				const ltrbi clipper = ltrbi(),
+				const bool use_kerning = false
 			);
 
 			vec2i print(
@@ -84,7 +87,8 @@ namespace augs {
 				const formatted_string& str,
 				const caret_info caret,
 				const unsigned wrapping_width = 0,
-				const ltrbi clipper = ltrbi()
+				const ltrbi clipper = ltrbi(),
+				const bool use_kerning = false
 			);
 
 			vec2i print_stroked(
@@ -94,7 +98,8 @@ namespace augs {
 				const caret_info caret,
 				const rgba stroke_color = black,
 				const unsigned wrapping_width = 0,
-				const ltrbi clipper = ltrbi()
+				const ltrbi clipper = ltrbi(),
+				const bool use_kerning = false
 			);
 		}
 	}

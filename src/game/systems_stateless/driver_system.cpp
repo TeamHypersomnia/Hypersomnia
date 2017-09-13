@@ -76,10 +76,10 @@ void driver_system::release_drivers_due_to_requests(const logic_step step) {
 	const auto& intents = step.transient.messages.get_queue<messages::intent_message>();
 
 	for (const auto& e : intents) {
-		if (e.intent == intent_type::RELEASE_CAR && e.is_pressed) {
+		if (e.intent == game_intent_type::RELEASE_CAR && e.was_pressed()) {
 			release_car_ownership(cosmos[e.subject]);
 		}
-		else if (e.intent == intent_type::TAKE_HOLD_OF_WHEEL) {
+		else if (e.intent == game_intent_type::TAKE_HOLD_OF_WHEEL) {
 			const auto subject = cosmos[e.subject];
 
 			const auto* const sentience = subject.find<components::sentience>();
@@ -91,7 +91,7 @@ void driver_system::release_drivers_due_to_requests(const logic_step step) {
 			auto* const maybe_driver = subject.find<components::driver>();
 
 			if (maybe_driver != nullptr) {
-				maybe_driver->take_hold_of_wheel_when_touched = e.is_pressed;
+				maybe_driver->take_hold_of_wheel_when_touched = e.was_pressed();
 			}
 		}
 	}

@@ -97,12 +97,12 @@ namespace augs {
 				gui_entropy& entropies
 			) {
 				using namespace augs::event;
+
 				auto& gr = context.get_rect_world();
-				const auto& tree_entry = context.get_tree_entry(this_id);
-				const auto& state = gr.last_state;
-				const auto& m = state.mouse;
-				const auto& msg = inf.change.msg;
-				const auto& mouse_pos = m.pos;
+				
+				const auto state = context.get_input_state();
+				const auto mouse_pos = state.mouse.pos;
+				const auto msg = inf.change.msg;
 
 				auto gui_event_lambda = [&](const gui_event ev, const int scroll_amount = 0) {
 					entropies.post_event(this_id, { ev, scroll_amount });
@@ -118,20 +118,20 @@ namespace augs {
 					}
 
 					if (!this_id->get_flag(flag::DISABLE_HOVERING)) {
-						const auto absolute_clipped_rect = tree_entry.get_absolute_clipped_rect();
-						const bool hover = absolute_clipped_rect.good() && absolute_clipped_rect.hover(mouse_pos);
+						const auto absolute_clipped_rect = context.get_tree_entry(this_id).get_absolute_clipped_rect();
+						const bool hovering = absolute_clipped_rect.good() && absolute_clipped_rect.hover(mouse_pos);
 
 						if (context.dead(gr.rect_hovered)) {
-							if (hover) {
+							if (hovering) {
 								gui_event_lambda(gui_event::hover);
 								gr.rect_hovered = this_id;
 								inf.was_hovered_rect_visited = true;
 							}
 						}
 						else if (gr.rect_hovered == gui_element_variant_id(this_id)) {
-							const bool still_hover = hover;
+							const bool still_hovering = hovering;
 
-							if (still_hover) {
+							if (still_hovering) {
 								if (msg == message::lup) {
 									gui_event_lambda(gui_event::lup);
 								}
@@ -172,11 +172,14 @@ namespace augs {
 									gui_event_lambda(gui_event::wheel, inf.change.scroll.amount);
 								}
 
-								if (gr.rect_held_by_lmb == gui_element_variant_id(this_id) && msg == message::mousemotion && state.get_mouse_key(0) && absolute_clipped_rect.hover(m.ldrag)) {
-									gui_event_lambda(gui_event::lpressed);
-								}
-								if (gr.rect_held_by_rmb == gui_element_variant_id(this_id) && msg == message::mousemotion && state.get_mouse_key(1) && absolute_clipped_rect.hover(m.rdrag)) {
-									gui_event_lambda(gui_event::rpressed);
+								if (msg == message::mousemotion) {
+									if (gr.rect_held_by_lmb == gui_element_variant_id(this_id) && state.get_mouse_key(0) && absolute_clipped_rect.hover(state.mouse.ldrag)) {
+										gui_event_lambda(gui_event::lpressed);
+									}
+
+									if (gr.rect_held_by_rmb == gui_element_variant_id(this_id) && state.get_mouse_key(1) && absolute_clipped_rect.hover(state.mouse.rdrag)) {
+										gui_event_lambda(gui_event::rpressed);
+									}
 								}
 							}
 							else {
@@ -190,11 +193,17 @@ namespace augs {
 					}
 
 					if (gr.rect_held_by_lmb == gui_element_variant_id(this_id) && msg == message::mousemotion && mouse_pos != gr.last_ldown_position) {
-						bool has_only_started = !gr.held_rect_is_dragged;
+						const bool has_only_started = !gr.held_rect_is_dragged;
 						
 						gr.held_rect_is_dragged = true;
 						gr.current_drag_amount = mouse_pos - gr.last_ldown_position;
-						gui_event_lambda(has_only_started ? gui_event::lstarteddrag : gui_event::ldrag);
+
+						if (has_only_started) {
+							gui_event_lambda(gui_event::lstarteddrag);
+						}
+						else {
+							gui_event_lambda(gui_event::ldrag);
+						}
 					}
 				}
 			}

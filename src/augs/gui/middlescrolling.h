@@ -17,7 +17,7 @@ namespace augs {
 			void advance_elements(const C context, const delta& dt) {
 				if (context.alive(subject)) {
 					context(subject, [&](auto& r) {
-						r->set_scroll(r->get_scroll() + static_cast<vec2>(context.get_rect_world().last_state.mouse.pos - middlescroll_icon_position) * float(speed_mult*dt.in_milliseconds()));
+						r->set_scroll(r->get_scroll() + static_cast<vec2>(context.get_input_state().mouse.pos - middlescroll_icon_position) * float(speed_mult*dt.in_milliseconds()));
 					});
 				}
 			}

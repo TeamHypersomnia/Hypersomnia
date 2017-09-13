@@ -26,7 +26,13 @@ namespace augs {
 		graphics::texture create_atlas();
 
 		void setup_input(
-			augs::local_entropy& window_inputs,
+			local_entropy& window_inputs,
+			const decltype(ImGuiIO::DeltaTime) delta_seconds,
+			const vec2i screen_size
+		);
+
+		void setup_input(
+			event::state& state,
 			const decltype(ImGuiIO::DeltaTime) delta_seconds,
 			const vec2i screen_size
 		);
@@ -203,12 +209,20 @@ namespace augs {
 		erase_if(local, [filter_mouse, filter_keyboard](const augs::event::change ch) {
 			bool should_filter = false;
 
-			if (filter_mouse && ch.uses_mouse()) {
+			if (filter_mouse && ch.msg == augs::event::message::mousemotion) {
 				should_filter = true;
 			}
 
-			if (filter_keyboard && ch.uses_keyboard()) {
-				should_filter = true;
+			/* We always let release events propagate */
+
+			if (ch.was_any_key_pressed()) {
+				if (filter_mouse && ch.uses_mouse()) {
+					should_filter = true;
+				}
+
+				if (filter_keyboard && ch.uses_keyboard()) {
+					should_filter = true;
+				}
 			}
 
 			return should_filter;

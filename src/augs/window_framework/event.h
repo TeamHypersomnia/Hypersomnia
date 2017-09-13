@@ -237,6 +237,8 @@ namespace augs {
 				bool was_any_key_released() const;
 				bool was_key_pressed(const keys::key) const;
 				bool was_key_released(const keys::key) const;
+
+				bool is_exit_message() const;
 			};
 
 			struct state {
@@ -249,7 +251,17 @@ namespace augs {
 				} mouse;
 
 				void unset_keys();
-				void apply(const change&);
+				state& apply(const change&);
+				
+				template <class C>
+				state& apply(const C& changes) {
+					for (const auto& e : changes) {
+						apply(e);
+					}
+
+					return *this;
+				}
+
 				bool get_mouse_key(const unsigned) const;
 				bool is_set(const keys::key) const;
 

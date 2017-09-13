@@ -18,25 +18,31 @@ void action_button::draw(
 	const viewing_game_gui_context context,
 	const const_this_in_item this_id
 ) {
-	const auto intent_for_this = static_cast<intent_type>(static_cast<int>(intent_type::SPECIAL_ACTION_BUTTON_1) + this_id.get_location().index);
-	const auto bound_key = context.get_input_information().get_bound_key_if_any(intent_for_this);
+	const auto intent_for_this_button = static_cast<game_gui_intent_type>(
+		static_cast<int>(game_gui_intent_type::SPECIAL_ACTION_BUTTON_1) + this_id.get_location().index
+	);
 
-	const auto& cosmos = context.get_cosmos();
-	
-	const auto output = context.get_output();
-	const auto now = cosmos.get_timestamp();
-	const auto dt = cosmos.get_fixed_delta();
-
-	const auto& necessarys = context.get_necessary_images();
-	const auto& game_images = context.get_game_images();
-	const auto& gui_font = context.get_gui_font();
-
-	const auto absolute_rect = context.get_tree_entry(this_id).get_absolute_rect();
-
-	if (bound_key != augs::event::keys::key::INVALID) {
+	if (
+		const auto bound_key = key_or_default(
+			context.get_input_information(),
+			intent_for_this_button
+		);
+		bound_key != augs::event::keys::key::INVALID
+	) {
 		const auto& sentience = context.get_subject_entity().get<components::sentience>();
 		const auto bound_spell = get_bound_spell(context, this_id);
 
+		const auto& cosmos = context.get_cosmos();
+
+		const auto output = context.get_output();
+		const auto now = cosmos.get_timestamp();
+		const auto dt = cosmos.get_fixed_delta();
+
+		const auto& necessarys = context.get_necessary_images();
+		const auto& game_images = context.get_game_images();
+		const auto& gui_font = context.get_gui_font();
+
+		const auto absolute_rect = context.get_tree_entry(this_id).get_absolute_rect();
 		if (bound_spell.is_set()) {
 			visit_gettable(
 				sentience.spells,

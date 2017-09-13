@@ -54,15 +54,11 @@ struct debug_character_selection {
 		);
 	}
 
-	void control_character_selection(game_intent_vector& intents) {
-		for (const auto& intent : intents) {
-			if (intent.is_pressed && intent.intent == intent_type::DEBUG_SWITCH_CHARACTER) {
-				++current_character_index;
-				current_character_index %= characters.size();
+	void switch_character() {
+		++current_character_index;
+		current_character_index %= characters.size();
 
-				select_character(characters[current_character_index]);
-			}
-		}
+		select_character(characters[current_character_index]);
 	}
 
 	entity_id get_selected_character() const {

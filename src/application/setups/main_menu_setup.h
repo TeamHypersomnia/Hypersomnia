@@ -125,10 +125,7 @@ public:
 		const vec2i screen_size
 	) const;
 
-	void control(
-		augs::local_entropy& entropy,
-		const input_context&
-	) {
+	void control(const cosmic_entropy&) {
 		return;
 	}
 

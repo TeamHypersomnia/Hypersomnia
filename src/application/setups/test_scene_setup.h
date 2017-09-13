@@ -8,7 +8,7 @@
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 
-#include "view/debug_character_selection.h"
+#include "application/debug_character_selection.h"
 #include "view/viewables/all_viewables.h"
 
 #include "application/debug_settings.h"
@@ -97,10 +97,6 @@ public:
 		}
 	}
 
-	void control(
-		augs::local_entropy& entropy,
-		const input_context&
-	);
-
+	void control(const cosmic_entropy&);
 	void accept_game_gui_events(const cosmic_entropy&);
 };

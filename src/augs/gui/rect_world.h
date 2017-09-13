@@ -28,8 +28,6 @@ namespace augs {
 		public:
 			using gui_entropy = augs::gui::gui_entropy<gui_element_variant_id>;
 
-			event::state last_state;
-
 			middlescrolling<gui_element_variant_id> middlescroll;
 			
 			bool held_rect_is_dragged = false;
@@ -48,7 +46,7 @@ namespace augs {
 			template <class C, class gui_element_id>
 			bool is_hovered(const C context, const gui_element_id& id) {
 				return context(id, [&](const auto& p) {
-					return context.get_tree_entry(id).get_absolute_clipped_rect().hover(last_state.mouse.pos);
+					return context.get_tree_entry(id).get_absolute_clipped_rect().hover(context.get_input_state().mouse.pos);
 				});
 			}
 
@@ -121,11 +119,27 @@ namespace augs {
 			}
 
 			template <class C>
-			void consume_raw_input_and_generate_gui_events(const C context, const event::change new_state, gui_entropy& entropies) {
+			auto consume_raw_input_and_generate_gui_events(
+				const C context,
+				const event::change new_state
+			) {
+				gui_entropy entropy;
+				consume_raw_input_and_generate_gui_events(context, new_state, entropy);
+				return entropy;
+			}
+
+			template <class C>
+			void consume_raw_input_and_generate_gui_events(
+				const C context, 
+				const event::change new_state, 
+				gui_entropy& entropies
+			) {
+				if (context.tree.empty()) {
+					return;
+				}
+
 				using namespace augs;
 				const auto root = context.get_root_id();
-
-				last_state.apply(new_state);
 
 				raw_input_traversal in(new_state);
 				bool pass = true;
@@ -171,10 +185,11 @@ namespace augs {
 					}
 				}
 
-				if (context.alive(rect_in_focus) 
+				if (
+					new_state.msg == event::message::wheel
+					&& context.alive(rect_in_focus)
 					&& context(rect_in_focus, [](const auto& r) { return r->get_flag(flag::FETCH_WHEEL); } ) 
-					&& new_state.msg == event::message::wheel) {
-
+				) {
 					if (context(rect_in_focus, [](const auto& r) { return r->get_flag(flag::ENABLE_DRAWING); })) {
 						context(rect_in_focus, [&](const auto& r) {
 							r->consume_raw_input_and_generate_gui_events(context, r, in, entropies);
@@ -230,7 +245,7 @@ namespace augs {
 						r->consume_raw_input_and_generate_gui_events(context, r, in, entropies);
 					});
 
-					if (!in.was_hovered_rect_visited && context.alive(rect_hovered)) {
+					if (const bool hovered_but_unvisited = context.alive(rect_hovered) && !in.was_hovered_rect_visited) {
 						context(rect_hovered, [&](const auto& r) { 
 							r->unhover(context, r, in, entropies);
 						});
@@ -284,7 +299,7 @@ namespace augs {
 			void call_idle_mousemotion_updater(const C context, gui_entropy& entropy) {
 				event::change fabricated_state;
 				fabricated_state.msg = event::message::mousemotion;
-				fabricated_state.mouse.pos = last_state.pos;
+				fabricated_state.mouse.pos = context.get_input_state().mouse.pos;
 
 				raw_input_traversal mousemotion_updater(fabricated_state);
 
@@ -292,7 +307,7 @@ namespace augs {
 					r->consume_raw_input_and_generate_gui_events(context, r, mousemotion_updater, entropy);
 				});
 
-				if (!mousemotion_updater.was_hovered_rect_visited && context.alive(rect_hovered)) {
+				if (const bool hovered_but_unvisited = !mousemotion_updater.was_hovered_rect_visited && context.alive(rect_hovered)) {
 					context(rect_hovered, [&](const auto& r) { r->unhover(context, r, mousemotion_updater, entropy); });
 				}
 			}

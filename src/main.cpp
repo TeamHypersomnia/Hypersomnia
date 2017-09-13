@@ -37,7 +37,6 @@
 #include "application/setups/test_scene_setup.h"
 #include "application/setups/editor_setup.h"
 
-#include "application/main/main_helpers.h"
 #include "application/main/imgui_pass.h"
 #include "application/main/draw_debug_details.h"
 #include "application/main/release_flags.h"
@@ -142,7 +141,7 @@ int main(const int argc, const char* const * const argv) try {
 	loaded_sounds game_sounds;
 	game_images_in_atlas_map game_atlas_entries;
 	necessary_images_in_atlas necessary_atlas_entries;
-	augs::baked_font gui_font;
+	static augs::baked_font gui_font;
 
 	/*
 		The lambdas that aid to make the main loop code more concise.
@@ -236,6 +235,15 @@ int main(const int argc, const char* const * const argv) try {
 		};
 	};
 
+	auto create_menu_context_deps = [&](const auto& viewing_config) {
+		return menu_context_dependencies{
+			necessary_atlas_entries,
+			gui_font,
+			sounds,
+			viewing_config.audio_volume
+		};
+	};
+
 	auto get_viewed_character = [&]() -> const_entity_handle {
 		const auto& viewed_cosmos = visit_current_setup([](auto& setup) -> const cosmos& {
 			return setup.get_viewed_cosmos();
@@ -252,6 +260,107 @@ int main(const int argc, const char* const * const argv) try {
 		return audiovisuals.get_viewing_camera();
 	};
 
+	auto handle_app_intent = [
+		&config
+	](const app_intent_type intent) {
+		using T = decltype(intent);
+
+		switch (intent) {
+			case T::SWITCH_DEVELOPER_CONSOLE: {
+				bool& f = config.session.show_developer_console;
+				f = !f;
+				break;
+			}
+
+			default: break;
+		}
+	};
+	
+	auto handle_app_ingame_intent = [
+		&game_gui,
+		&renderer,
+		&config
+	](const app_ingame_intent_type intent) {
+		using T = decltype(intent);
+
+		switch (intent) {
+			case T::CLEAR_DEBUG_LINES:
+				renderer.persistent_lines.clear();
+				break;
+
+			case T::SWITCH_WEAPON_LASER: {
+				bool& f = config.drawing.draw_weapon_laser;
+				f = !f;
+				break;
+			}
+
+			case T::SWITCH_GAME_GUI_ACTIVE: {
+				bool& f = game_gui.active;
+				f = !f;
+				break;
+			}
+			
+			case T::SWITCH_CHARACTER: {
+
+			}
+
+			default: break;
+		}
+	};
+
+	bool should_quit = false;
+
+	auto do_main_menu_option = [&](const main_menu_button_type t) {
+		using T = decltype(t);
+
+		switch (t) {
+			case T::LOCAL_UNIVERSE:
+				launch(launch_type::TEST_SCENE);
+				break;
+
+			case T::SETTINGS:
+				settings_gui.show = true;
+				ImGui::SetWindowFocus("Settings");
+				break;
+
+			case T::CREATORS:
+				main_menu.value().launch_creators_screen();
+				break;
+
+			case T::QUIT:
+				should_quit = true;
+				break;
+
+			default: break;
+		}
+	};
+
+	auto do_ingame_menu_option = [&](const ingame_menu_button_type t) {
+		using T = decltype(t);
+
+		switch (t) {
+			case T::RESUME:
+				ingame_menu.show = false;
+				break;
+
+			case T::LEAVE_THIS_UNIVERSE:
+				ingame_menu.show = false;
+				current_setup.reset();
+				break;
+
+			case T::SETTINGS:
+				settings_gui.show = true;
+				ImGui::SetWindowFocus("Settings");
+				break;
+
+			case T::QUIT:
+				should_quit = true;
+				break;
+
+			default: break;
+		}
+	};
+
 	launch(config.get_launch_mode());
 	
 	/* 
@@ -265,10 +374,9 @@ int main(const int argc, const char* const * const argv) try {
 	augs::timer imgui_timer;
 	augs::timer frame_timer;
 	
-	augs::local_entropy new_entropy;
-	augs::event::state state_for_releases;
+	augs::event::state common_input_state;
 
-	bool should_quit = false;
+	release_flags releases;
 
 	LOG("Entered the main loop.");
 
@@ -279,161 +387,230 @@ int main(const int argc, const char* const * const argv) try {
 			frame_timer.extract<std::chrono::milliseconds>()
 		);
 
-		new_entropy.clear();
-
-		{
-			auto scope = measure_scope(profiler.local_entropy);
-			window.collect_entropy(new_entropy);
-		}
-
-
-		for (const auto& e : new_entropy) {
-			state_for_releases.apply(e);
-		}
-
-		handle_exit_events(new_entropy, should_quit);
-
-		/*
-			Some circumstances may require that we simulate a release of all
-			currently held keys, for example if an alt+tab occured,
-			or if we've just entered the ingame menu overlay.
-		*/
-
-		bool release_occured_this_frame = false;
-
-		{
-			release_flags releases;
-
-			releases.set_due_to_window_deactivation(new_entropy);
-			
-			if (const bool will_esc_switch_ingame_menu = current_setup.has_value()) {
-				releases.set_due_to_esc(new_entropy);
-			}
-
-			releases.set_due_to_imgui(ImGui::GetIO());
-			releases.apply_into(new_entropy, state_for_releases);
-
-			if (releases.any()) {
-				release_occured_this_frame = true;
-			}
-		}
-
-		perform_imgui_pass(
-			new_entropy,
-			configurables,
-			static_cast<float>(imgui_timer.extract<std::chrono::seconds>()),
-			config,
-			last_saved_config,
-			local_config_path,
-			settings_gui,
-			[&]() {
-				/*
-					The editor setup might want to use IMGUI to create views of entities or resources,
-					thus we ask the current setup for its custom IMGUI logic.
-				*/
-
-				visit_current_setup([](auto& setup) {
-					setup.perform_custom_imgui();
-				});
-			},
-
-			/* Flags controlling IMGUI behaviour */
-
-			ingame_menu.show,
-			game_gui.active,
-			current_setup.has_value()
-		);
-
-		/* 
-			Enforce mouse position for all GUIs from one source: IMGUI 
-			this is to avoid hopping when one GUI takes precedence over another.
-		*/
-
-		{
-			ingame_menu.world.last_state.mouse.pos = ImGui::GetIO().MousePos;
-
-			if (main_menu.has_value()) {
-				main_menu.value().gui.world.last_state.mouse.pos = ImGui::GetIO().MousePos;
-			}
-
-			game_gui.world.last_state.mouse.pos = ImGui::GetIO().MousePos;
-		}
-
-		// TODO: change it to generate actual UI intents
-		auto ui_intents = config.controls.translate(new_entropy).intents;
-
-		{
-			release_flags releases;
-
-			switch_between_game_gui_and_back(
-				ui_intents,
-				game_gui,
-				releases
-			);
-
-			releases.apply_into(new_entropy, state_for_releases);
-
-			if (releases.any()) {
-				release_occured_this_frame = true;
-			}
-		}
-
-		switch_developer_console(ui_intents, config.session.show_developer_console);
-
-		if (current_setup.has_value() && !ingame_menu.show) {
-			switch_weapon_laser(ui_intents, config.drawing.draw_weapon_laser);
-			clear_debug_lines(ui_intents, renderer.persistent_lines);
-		}
-
-		auto viewing_config = config;
-
 		/* 
 			For example, the main menu might want to disable HUD or tune down the sound effects. 
 		*/
 
-		visit_current_setup([&viewing_config](auto& setup) {
-			setup.customize_for_viewing(viewing_config);
-			setup.apply(viewing_config);
+		const auto viewing_config = visit_current_setup([config](auto& setup) mutable {
+			setup.customize_for_viewing(config);
+			setup.apply(config);
+
+			return config;
 		});
 
 		const auto screen_size = viewing_config.window.get_screen_size();
 
 		/*
-			Control the game GUI,
-			if the viewed character exists.
+			Additional lambda helpers.
 		*/
 
-		{
-			const auto viewed_character = get_viewed_character();
+		auto create_menu_context = [&](auto& gui) {
+			return gui.create_context(
+				screen_size,
+				common_input_state,
+				create_menu_context_deps(viewing_config)
+			);
+		};
 
-			if (
-				viewed_character.alive() 
-				&& !ingame_menu.show
-			) {
-				const auto context = game_gui.create_context(
-					screen_size,
-					viewed_character,
-					create_game_gui_deps()
-				);
+		auto create_game_gui_context = [&]() {
+			return game_gui.create_context(
+				screen_size,
+				common_input_state,
+				get_viewed_character(),
+				create_game_gui_deps()
+			);
+		};
 
-				game_gui.control(context, new_entropy);
+		/* The centralized transformation of all window inputs. */
 
-				game_gui.control_hotbar_and_action_button(
-					viewed_character,
-					config.controls.translate(new_entropy).intents
-				);
+		const auto new_game_entropy = [&]() {
+			static game_intents game_intents;
+			static game_motions game_motions;
+
+			game_intents.clear();
+			game_motions.clear();
+
+			static augs::local_entropy new_window_entropy;
+
+			new_window_entropy.clear();
+
+			/*
+				Generate release events if the previous frame so requested.
+			*/
+
+			releases.append_releases(new_window_entropy, common_input_state);
+			releases = {};
+
+			{
+				auto scope = measure_scope(profiler.local_entropy);
+				window.collect_entropy(new_window_entropy);
 			}
-		}
+
+			/* 
+				IMGUI is our top GUI whose priority precedes everything else. 
+				It will eat from the window input vector that is later passed to the game and other GUIs.	
+			*/
+
+			perform_imgui_pass(
+				new_window_entropy,
+				configurables,
+				static_cast<float>(imgui_timer.extract<std::chrono::seconds>()),
+				config,
+				last_saved_config,
+				local_config_path,
+				settings_gui,
+				[&]() {
+					/*
+						The editor setup might want to use IMGUI to create views of entities or resources,
+						thus we ask the current setup for its custom IMGUI logic.
+					*/
+
+					visit_current_setup([](auto& setup) {
+						setup.perform_custom_imgui();
+					});
+				},
+
+				/* Flags controlling IMGUI behaviour */
+
+				ingame_menu.show,
+				game_gui.active,
+				current_setup.has_value()
+			);
+
+			releases.set_due_to_imgui(ImGui::GetIO());
+
+
+			/* 
+				Distribution of all the remaining input happens here.
+			*/
+
+			for (const auto e : new_window_entropy) {
+				using namespace augs::event;
+				using namespace keys;
+				
+				/*
+					Now is the time to actually track the input state
+					and use the mouse position for GUI contexts or the key states
+					for key combinations.
+				*/
+
+				common_input_state.apply(e);
+
+				if (e.is_exit_message()) {
+					should_quit = true;
+				}
+				else if (e.msg == message::activate) {
+					releases.set_all();
+				}
+				else if (
+					current_setup.has_value()
+					&& e.was_key_pressed(key::ESC)
+				) {
+					bool& f = ingame_menu.show;
+					f = !f;
+					releases.set_all();
+				}
+				else {
+					std::optional<intent_change> key_change;
+
+					if (e.was_any_key_pressed()) {
+						key_change = intent_change::PRESSED;
+					}
+
+					if (e.was_any_key_released()) {
+						key_change = intent_change::RELEASED;
+					}
+
+					const auto viewed_character = get_viewed_character();
+
+					const bool pass_to_gameplay =
+						viewed_character.alive()
+						&& (
+							(key_change.has_value() && *key_change == intent_change::RELEASED) // Always pass releases
+							|| (
+								current_setup.has_value()
+								&& !ingame_menu.show
+							)
+						)
+					;
+
+					if (key_change.has_value()) {
+						const auto key = e.key.key;
+						const bool was_pressed = *key_change == intent_change::PRESSED;
+
+						if (const auto it = mapped_or_nullptr(config.app_controls, key)) {
+							if (was_pressed) {
+								handle_app_intent(*it);
+							}
+						}
+						else {
+							if (pass_to_gameplay) {
+								if (const auto it = mapped_or_nullptr(config.app_ingame_controls, key)) {
+									if (was_pressed) {
+										handle_app_ingame_intent(*it);
+									}
+								}
+								else if (const auto it = mapped_or_nullptr(config.game_gui_controls, key)) {
+									game_gui.control_hotbar_and_action_button(viewed_character, { *it, *key_change });
+								}
+								else if (const auto it = mapped_or_nullptr(config.game_controls, key)) {
+									game_intents.push_back({ *it, *key_change });
+								}
+							}
+						}
+					}
+					else {
+						if (
+							e.msg == message::mousemotion
+							&& pass_to_gameplay
+							&& !game_gui.active
+						) {
+							game_motions.push_back({ game_motion_type::MOVE_CROSSHAIR, e.mouse.rel });
+						}
+					}
+
+					if (pass_to_gameplay) {
+						game_gui.control_gui_world(create_game_gui_context(), e);
+					}
+					else {
+						if (main_menu.has_value()) {
+							if (main_menu->gui.show) {
+								main_menu->gui.control(create_menu_context(main_menu->gui), e, do_main_menu_option);
+							}
+						}
+						else {
+							ensure(current_setup.has_value());
+
+							if (ingame_menu.show) {
+								ingame_menu.control(create_menu_context(ingame_menu), e, do_ingame_menu_option);
+							}
+						}
+					}
+				}
+			}
+
+			/* 
+				Notice that window inputs do not propagate
+				beyond the closing of this scope.
+			*/
+
+			return cosmic_entropy(
+				get_viewed_character(), 
+				game_intents, 
+				game_motions
+			);
+		}();
 
 		/* 
 			Advance the current setup's logic,
-			and let the audiovisual_state sample the game world that it chooses.
-		 */
+			and let the audiovisual_state sample the game world 
+			that it chooses via get_viewed_cosmos.
+		*/
 
 		visit_current_setup([&](auto& setup) {
 			const auto& viewed_cosmos = setup.get_viewed_cosmos();
 
-			setup.control(new_entropy, config.controls);
+			setup.control(new_game_entropy);
 			setup.accept_game_gui_events(game_gui.get_and_clear_pending_events());
 
 			auto audiovisual_step = [&](){
@@ -471,14 +648,16 @@ int main(const int argc, const char* const * const argv) try {
 			);
 		});
 		
+		/*
+			Game GUI might have been altered by the step's post-solve,
+			therefore we need to rebuild its layouts (and from them, the tree data)
+			for immediate visual response.
+		*/
+
 		const auto viewed_character = get_viewed_character();
 
 		if (viewed_character.alive()) {
-			const auto context = game_gui.create_context(
-				screen_size,
-				get_viewed_character(),
-				create_game_gui_deps()
-			);
+			const auto context = create_game_gui_context();
 
 			game_gui.advance(context, frame_dt_ms);
 			game_gui.rebuild_layouts(context);
@@ -488,6 +667,9 @@ int main(const int argc, const char* const * const argv) try {
 		/* 
 			What follows is strictly view part,
 			without advancement of any kind.
+			
+			No state is altered beyond this point,
+			except for usage of graphical resources and profilers.
 		*/
 
 		auto frame = measure_scope(profiler.frame);
@@ -510,18 +692,14 @@ int main(const int argc, const char* const * const argv) try {
 		/* Prepare game GUI structures. */
 
 		const auto context = viewing_game_gui_context {
-			game_gui.create_context(
-				screen_size,
-				viewed_character,
-				create_game_gui_deps()
-			),
+			create_game_gui_context(),
 
 			{
 				audiovisuals.get<interpolation_system>(),
 				audiovisuals.world_hover_highlighter,
 				viewing_config.hotbar,
 				interpolation_ratio,
-				viewing_config.controls,
+				viewing_config.game_gui_controls,
 				get_camera(),
 				get_drawer()
 			}
@@ -551,8 +729,6 @@ int main(const int argc, const char* const * const argv) try {
 					- Or, the cursor of the game gui, with maybe tooltip, with maybe dragged item's ghost, if we're in-game in GUI mode.
 		*/
 
-		/* Main view of the game world */
-
 		renderer.set_viewport({ vec2i{0, 0}, screen_size });
 		
 		if (augs::graphics::fbo::current_exists()) {
@@ -562,6 +738,8 @@ int main(const int argc, const char* const * const argv) try {
 		renderer.clear_current_fbo();
 
 		if (const bool has_something_to_view = viewed_character.alive()) {
+			/* #1 */
+
 			illuminated_rendering({
 				viewed_character.get_cosmos(),
 				audiovisuals,
@@ -570,8 +748,6 @@ int main(const int argc, const char* const * const argv) try {
 				gui_font,
 				game_atlas_entries,
 				screen_size,
-				viewing_config.hotbar,
-				viewing_config.controls,
 				interpolation_ratio,
 				renderer,
 				game_world_atlas,
@@ -590,16 +766,16 @@ int main(const int argc, const char* const * const argv) try {
 			*/
 
 			if (DEBUG_DRAWING.enabled) {
+				/* #2 */
 				renderer.draw_debug_lines(get_camera(), get_drawer().default_texture, static_cast<float>(interpolation_ratio));
 				renderer.call_and_clear_lines();
 			}
-
-			/* Draw the game GUI if so is appropriate. */
 
 			if (
 				viewing_config.drawing.draw_character_gui 
 				&& viewed_character.has<components::item_slot_transfers>()
 			) {
+				/* #3 */
 				game_gui.world.draw(context);
 			}
 		}
@@ -607,41 +783,11 @@ int main(const int argc, const char* const * const argv) try {
 		auto menu_chosen_cursor = assets::necessary_image_id::INVALID;
 
 		if (main_menu.has_value()) {
-			menu_chosen_cursor = main_menu.value().gui.perform(
-				{
-					new_entropy,
-					get_drawer(),
-					window.get_screen_size(),
-					get_gui_text_style(),
-					necessary_atlas_entries,
-					sounds,
-					frame_dt_ms,
-					viewing_config.audio_volume
-				},
+			const auto context = create_menu_context(main_menu->gui);
+			
+			main_menu->gui.advance(context, frame_dt_ms);
 
-				[&](const main_menu_button_type t) {
-					switch (t) {
-						case main_menu_button_type::LOCAL_UNIVERSE:
-							launch(launch_type::TEST_SCENE);
-							break;
-
-						case main_menu_button_type::SETTINGS:
-							settings_gui.show = true;
-							ImGui::SetWindowFocus("Settings");
-							break;
-
-						case main_menu_button_type::CREATORS:
-							main_menu.value().launch_creators_screen();
-							break;
-
-						case main_menu_button_type::QUIT:
-							should_quit = true;
-							break;
-
-						default: break;
-					}
-				}
-			);
+			menu_chosen_cursor = main_menu->gui.draw({ context, get_drawer() });
 
 			main_menu.value().draw_overlays(
 				get_drawer(),
@@ -654,42 +800,9 @@ int main(const int argc, const char* const * const argv) try {
 			ensure(current_setup.has_value());
 
 			if (ingame_menu.show) {
-				menu_chosen_cursor = ingame_menu.perform(
-					{
-						new_entropy,
-						get_drawer(),
-						window.get_screen_size(),
-						get_gui_text_style(),
-						necessary_atlas_entries,
-						sounds,
-						frame_dt_ms,
-						viewing_config.audio_volume
-					},
-
-					[&](const ingame_menu_button_type t) {
-						switch (t) {
-							case ingame_menu_button_type::RESUME:
-								ingame_menu.show = false;
-								break;
-
-							case ingame_menu_button_type::LEAVE_THIS_UNIVERSE:
-								ingame_menu.show = false;
-								current_setup.reset();
-								break;
-
-							case ingame_menu_button_type::SETTINGS:
-								settings_gui.show = true;
-								ImGui::SetWindowFocus("Settings");
-								break;
-
-							case ingame_menu_button_type::QUIT:
-								should_quit = true;
-								break;
-
-							default: break;
-						}
-					}
-				);
+				const auto context = create_menu_context(ingame_menu);
+				ingame_menu.advance(context, frame_dt_ms);
+				menu_chosen_cursor = ingame_menu.draw({context, get_drawer()});
 			}
 		}
 		
@@ -700,7 +813,7 @@ int main(const int argc, const char* const * const argv) try {
 			game_world_atlas
 		);
 
-		const vec2i cursor_drawing_pos = ImGui::GetIO().MousePos;
+		const vec2i cursor_drawing_pos = common_input_state.mouse.pos;
 
 		if (ImGui::GetIO().WantCaptureMouse) {
 			get_drawer().cursor(necessary_atlas_entries, augs::get_imgui_cursor<assets::necessary_image_id>(), cursor_drawing_pos, white);

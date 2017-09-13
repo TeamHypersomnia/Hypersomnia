@@ -1,8 +1,7 @@
 #pragma once
-#include "augs/misc/basic_input_context.h"
 #include "augs/math/camera_cone.h"
 
-#include "game/enums/input_context_enums.h"
+#include "game/enums/game_intent_type.h"
 #include "game/transcendental/entity_id.h"
 #include "game/detail/visible_entities.h"
 
@@ -34,8 +33,6 @@ struct illuminated_rendering_input {
 	const augs::baked_font& gui_font;
 	const game_images_in_atlas_map& game_images;
 	const vec2i screen_size;
-	const hotbar_settings hotbar;
-	const input_context& input_information;
 	const double interpolation_ratio = 0.0;
 	augs::renderer& renderer;
 	const augs::graphics::texture& game_world_atlas;

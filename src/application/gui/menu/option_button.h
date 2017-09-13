@@ -61,8 +61,8 @@ public:
 
 	template <class C, class D>
 	static void advance_elements(const C context, const D this_id, const augs::delta dt) {
-		this_id->click_sound.set_gain(context.audio_volume.gui);
-		this_id->hover_sound.set_gain(context.audio_volume.gui);
+		this_id->click_sound.set_gain(context.get_audio_volume().gui);
+		this_id->hover_sound.set_gain(context.get_audio_volume().gui);
 
 		if (this_id->detector.is_hovered) {
 			this_id->elapsed_hover_time_ms += dt.in_milliseconds();
@@ -75,7 +75,7 @@ public:
 
 	template <class C, class D>
 	static void respond_to_events(const C context, const D this_id, const gui_entropy& entropies) {
-		const auto& sounds = context.sounds;
+		const auto& sounds = context.get_sounds();
 
 		for (const auto& info : entropies.get_events_for(this_id)) {
 			this_id->detector.update_appearance(info);

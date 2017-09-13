@@ -18,12 +18,12 @@ public:
 
 	template <class T>
 	decltype(auto) find(const T id) {
-		return found_or_nullptr(get_store_by(id), id);
+		return mapped_or_nullptr(get_store_by(id), id);
 	}
 
 	template <class T>
 	decltype(auto) find(const T id) const {
-		return found_or_nullptr(get_store_by(id), id);
+		return mapped_or_nullptr(get_store_by(id), id);
 	}
 
 	template <class T>

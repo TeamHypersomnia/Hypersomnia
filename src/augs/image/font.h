@@ -22,12 +22,9 @@ namespace augs {
 		int adv = 0;
 		int bear_x = 0;
 		int bear_y = 0;
-		unsigned int index = 0;
-		unsigned int unicode = 0;
+		unsigned index = 0xdeadbeef;
 
-		vec2i size = vec2i(0, 0);
-
-		std::vector<augs::trivially_copyable_pair<unsigned, int>> kerning;
+		std::vector<augs::trivially_copyable_pair<wchar_t, short>> kerning;
 		// END GEN INTROSPECTOR
 
 		font_glyph_metadata() = default;
@@ -36,47 +33,86 @@ namespace augs {
 #endif
 	};
 
-	struct font_metadata_from_file {
-		// GEN INTROSPECTOR struct augs::font_metadata_from_file
+	/* For future opts */
+	struct font_settings {
+		// GEN INTROSPECTOR struct augs::font_settings
+		// END GEN INTROSPECTOR
+	};
+
+	struct font_metrics {
+		// GEN INTROSPECTOR struct augs::font_metrics
 		int ascender = 0;
 		int descender = 0;
 
 		unsigned pt = 0;
-
-		std::vector<font_glyph_metadata> glyphs;
-		std::unordered_map<unsigned, unsigned> unicode_to_glyph_index;
 		// END GEN INTROSPECTOR
 
 		unsigned get_height() const {
 			return ascender - descender;
 		}
-
-		const font_glyph_metadata* get_glyph(const unsigned unicode_id) const {
-			auto it = unicode_to_glyph_index.find(unicode_id);
-			if (it == unicode_to_glyph_index.end()) return nullptr;
-			else return &glyphs[(*it).second];
-		}
-
-		unsigned get_glyph_index(const unsigned unicode) const {
-			const auto it = unicode_to_glyph_index.find(unicode);
-
-			if (it == unicode_to_glyph_index.end()) {
-				return 0xdeadbeef;
-			}
-
-			return (*it).second;
-		}
 	};
 
-	struct baked_font {
-		// GEN INTROSPECTOR struct augs::baked_font
-		font_metadata_from_file meta_from_file;
+	struct stored_font_metadata {
+		// GEN INTROSPECTOR struct augs::stored_font_metadata
+		font_metrics metrics;
+		font_settings settings;
+		std::unordered_map<wchar_t, font_glyph_metadata> glyphs_by_unicode;
+		// END GEN INTROSPECTOR
+	};
+
+	struct stored_baked_font {
+		// GEN INTROSPECTOR struct augs::stored_baked_font
+		stored_font_metadata meta;
 		std::vector<augs::texture_atlas_entry> glyphs_in_atlas;
 		// END GEN INTROSPECTOR
 	};
 
+	struct baked_font {
+		struct internal_glyph {
+			font_glyph_metadata meta;
+			augs::texture_atlas_entry in_atlas;
+		};
+
+		font_metrics metrics;
+		font_settings settings;
+
+		std::array<internal_glyph, std::numeric_limits<wchar_t>::max() + 1> glyphs;
+
+		/* 
+			Enforce mindful lifetime management. 
+			Copies could cause stack overflow.
+		*/
+
+		baked_font() = default;
+		baked_font(const baked_font&) = delete;
+		baked_font& operator=(const baked_font&) = delete;
+
+		void unpack(const stored_baked_font& store) {
+			metrics = store.meta.metrics;
+			settings = store.meta.settings;
+
+			for (const auto& g : store.meta.glyphs_by_unicode) {
+				auto& out_g = glyphs[g.first];
+
+				out_g.meta = g.second;
+				out_g.in_atlas = store.glyphs_in_atlas[g.second.index];
+			}
+		}
+
+		const internal_glyph* get_glyph(const wchar_t unicode_id) const {
+			auto& g = glyphs[unicode_id];
+
+			if (g.meta.index == 0xdeadbeef) {
+				return nullptr;
+			}
+
+			return &g;
+		}
+	};
+
 	struct font_loading_input {
 		// GEN INTROSPECTOR struct augs::font_loading_input
+		font_settings settings;
 		path_type source_font_path;
 		path_type charset_path;
 		unsigned pt = 0u;
@@ -92,7 +128,7 @@ namespace augs {
 	};
 
 	struct font {
-		font_metadata_from_file meta;
+		stored_font_metadata meta;
 		std::vector<augs::image> glyph_bitmaps;
 
 		font(const font_loading_input&);

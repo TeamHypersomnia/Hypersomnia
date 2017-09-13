@@ -47,12 +47,12 @@ void simulation_receiver::predict_intents_of_remote_entities(
 						game_intent release_intent;
 
 						if (hand_index == 0) {
-							release_intent.is_pressed = false;
-							release_intent.intent = intent_type::CROSSHAIR_PRIMARY_ACTION;
+							release_intent.change = intent_change::RELEASED;
+							release_intent.intent = game_intent_type::CROSSHAIR_PRIMARY_ACTION;
 						}
 						else if (hand_index == 1) {
-							release_intent.is_pressed = false;
-							release_intent.intent = intent_type::CROSSHAIR_PRIMARY_ACTION;
+							release_intent.change = intent_change::RELEASED;
+							release_intent.intent = game_intent_type::CROSSHAIR_PRIMARY_ACTION;
 						}
 						else {
 							ensure(false && "bad hand index");

@@ -17,8 +17,7 @@ namespace augs {
 	) :
 		adv(m.horiAdvance >> 6),
 		bear_x(m.horiBearingX >> 6),
-		bear_y(m.horiBearingY >> 6),
-		size(m.width >> 6, m.height >> 6)
+		bear_y(m.horiBearingY >> 6)
 	{
 	}
 #endif
@@ -57,21 +56,25 @@ namespace augs {
 			throw_error("FT_Select_Charmap returned %x", result);
 		}
 
-		meta.ascender = face->size->metrics.ascender >> 6;
-		meta.descender = face->size->metrics.descender >> 6;
+		meta.metrics.ascender = face->size->metrics.ascender >> 6;
+		meta.metrics.descender = face->size->metrics.descender >> 6;
 
 		FT_UInt g_index;
 
+		thread_local std::vector<FT_UInt> ft_indices;
+		ft_indices.clear();
+
 		try {
-			const auto& chars = augs::get_file_contents(in.charset_path, wchar_t());
+			const auto& unicodes = augs::get_file_contents(in.charset_path, wchar_t());
 
-			meta.glyphs.reserve(chars.size());
-			glyph_bitmaps.reserve(chars.size());
+			glyph_bitmaps.reserve(unicodes.size());
 
-			for (const auto j : chars) {
+			for (const auto j : unicodes) {
 				g_index = FT_Get_Char_Index(face, j);
 
 				if (g_index) {
+					ft_indices.push_back(g_index);
+
 					if (const auto result = FT_Load_Glyph(face, g_index, FT_LOAD_DEFAULT | FT_LOAD_IGNORE_TRANSFORM | FT_LOAD_NO_AUTOHINT)) {
 						throw_error("FT_Load_Glyph returned %x", result);
 					}
@@ -80,13 +83,11 @@ namespace augs {
 						throw_error("FT_Render_Glyph returned %x", result);
 					}
 
-					meta.glyphs.emplace_back(face->glyph->metrics);
+					auto& g = meta.glyphs_by_unicode[j];
+					g = face->glyph->metrics;
+					g.index = glyph_bitmaps.size();
+
 					glyph_bitmaps.push_back(augs::image());
-
-					auto& g = *meta.glyphs.rbegin();
-
-					g.index = g_index;
-					g.unicode = j;
 
 					if (face->glyph->bitmap.width) {
 						auto& g_img = *glyph_bitmaps.rbegin();
@@ -101,23 +102,23 @@ namespace augs {
 							)
 						);
 					}
-
-					meta.unicode_to_glyph_index[j] = static_cast<unsigned>(meta.glyphs.size() - 1u);
 				}
 			}
 
 			FT_Vector delta;
 			if (FT_HAS_KERNING(face)) {
-				for (unsigned i = 0; i < meta.glyphs.size(); ++i) {
-					for (unsigned j = 0; j < meta.glyphs.size(); ++j) {
-						FT_Get_Kerning(face, meta.glyphs[j].index, meta.glyphs[i].index, FT_KERNING_DEFAULT, &delta);
+				for (unsigned i = 0; i < ft_indices.size(); ++i) {
+					auto& subject = meta.glyphs_by_unicode[unicodes[i]];
+
+					for (unsigned j = 0; j < ft_indices.size(); ++j) {
+						FT_Get_Kerning(face, ft_indices[j], ft_indices[i], FT_KERNING_DEFAULT, &delta);
 						
 						if (delta.x) {
-							meta.glyphs[i].kerning.push_back({ meta.glyphs[j].unicode, delta.x >> 6 });
+							subject.kerning.push_back({ unicodes[j], static_cast<short>(delta.x >> 6) });
 						}
 					}
 
-					meta.glyphs[i].kerning.shrink_to_fit();
+					subject.kerning.shrink_to_fit();
 				}
 			}
 		}

@@ -101,8 +101,8 @@ regenerated_atlas::regenerated_atlas(
 			
 			const auto& fnt = (*it.first).second;
 			
-			auto& out_fnt = baked_fonts[input_fnt_id];
-			out_fnt.meta_from_file = fnt.meta;
+			auto& out_fnt = stored_baked_fonts[input_fnt_id];
+			out_fnt.meta = fnt.meta;
 
 			for (const auto& g : fnt.glyph_bitmaps) {
 				out_fnt.glyphs_in_atlas.push_back({});
@@ -190,7 +190,7 @@ regenerated_atlas::regenerated_atlas(
 		}
 
 		for (auto& input_font_id : in.fonts) {
-			auto& output_font = baked_fonts[input_font_id];
+			auto& output_font = stored_baked_fonts[input_font_id];
 
 			for (size_t glyph_index = 0; glyph_index < output_font.glyphs_in_atlas.size(); ++glyph_index) {
 				const auto& packed_rect = rects_for_packing_algorithm[current_rect];

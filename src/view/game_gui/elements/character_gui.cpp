@@ -287,8 +287,8 @@ void character_gui::draw_cursor_with_information(const viewing_game_gui_context 
 	auto gui_cursor = assets::necessary_image_id::GUI_CURSOR;
 	auto gui_cursor_color = white;
 
-	auto get_gui_crosshair_position = [&rect_world]() {
-		return rect_world.last_state.mouse.pos;
+	auto get_gui_crosshair_position = [&context]() {
+		return context.get_input_state().mouse.pos;
 	};
 
 	auto gui_cursor_position = get_gui_crosshair_position();
@@ -528,7 +528,7 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 	}
 	else {
 		const auto camera = context.get_camera_cone();
-		const auto world_cursor_pos = camera.transform.pos + rect_world.last_state.mouse.pos - camera.visible_world_area / 2;
+		const auto world_cursor_pos = camera.transform.pos + context.get_input_state().mouse.pos - camera.visible_world_area / 2;
 		const auto hovered = cosmos[get_hovered_world_entity(cosmos, world_cursor_pos)];
 
 		if (hovered.alive()) {

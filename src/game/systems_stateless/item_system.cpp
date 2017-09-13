@@ -41,13 +41,13 @@ void item_system::start_picking_up_items(const logic_step step) {
 	auto& cosm = step.cosm;
 
 	for (const auto& i : intents) {
-		if (i.intent == intent_type::START_PICKING_UP_ITEMS) {
+		if (i.intent == game_intent_type::START_PICKING_UP_ITEMS) {
 			const auto it = cosm[i.subject];
 
 			const auto maybe_transfers = it.find<components::item_slot_transfers>();
 
 			if (maybe_transfers != nullptr) {
-				maybe_transfers->picking_up_touching_items_enabled = i.is_pressed;
+				maybe_transfers->picking_up_touching_items_enabled = i.was_pressed();
 			}
 		}
 	}
@@ -122,27 +122,27 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 	const auto& requests = step.transient.messages.get_queue<messages::intent_message>();
 
 	for (auto r : requests) {
-		if (r.is_pressed) {
+		if (r.was_pressed()) {
 			int hand_index = -1;
 
-			if (r.intent == intent_type::THROW) {
+			if (r.intent == game_intent_type::THROW) {
 				const auto subject = cosmos[r.subject];
 
 				if (subject.get_if_any_item_in_hand_no(0).alive()) {
-					r.intent = intent_type::THROW_PRIMARY_ITEM;
+					r.intent = game_intent_type::THROW_PRIMARY_ITEM;
 				}
 				else if (
 					subject.get_if_any_item_in_hand_no(0).dead()
 					&& subject.get_if_any_item_in_hand_no(1).alive()
 				) {
-					r.intent = intent_type::THROW_SECONDARY_ITEM;
+					r.intent = game_intent_type::THROW_SECONDARY_ITEM;
 				}
 			}
 
-			if (r.intent == intent_type::THROW_PRIMARY_ITEM) {
+			if (r.intent == game_intent_type::THROW_PRIMARY_ITEM) {
 				hand_index = 0;
 			}
-			else if (r.intent == intent_type::THROW_SECONDARY_ITEM) {
+			else if (r.intent == game_intent_type::THROW_SECONDARY_ITEM) {
 				hand_index = 1;
 			}
 

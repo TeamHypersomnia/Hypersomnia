@@ -207,7 +207,7 @@ struct basic_button_corners_info {
 	void for_each_button_corner(const M& manager, const ltrb origin, L callback) const {
 		for (auto i = button_corner_type::INSIDE; i < button_corner_type::COUNT; i = static_cast<button_corner_type>(static_cast<int>(i) + 1)) {
 			const auto tex_id = get_tex_for_type(i);
-			const auto tex_ptr = found_or_nullptr(manager, tex_id);
+			const auto tex_ptr = mapped_or_nullptr(manager, tex_id);
 
 			if (tex_ptr == nullptr) {
 				continue;

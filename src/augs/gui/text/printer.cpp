@@ -33,7 +33,7 @@ namespace augs {
 				auto& sectors = d.sectors;
 				const bool clip = clipper.good();
 
-				auto getf = [&](auto& f) {
+				auto getf = [&](auto& f) -> decltype(auto) {
 					return *f;
 				};
 
@@ -47,7 +47,7 @@ namespace augs {
 							clip ? d.get_bbox().x + clipper.w() : d.get_bbox().x,
 							/* snap to default style's height */
 							highlighted.empty() ? 
-								getf(caret.default_style.font).meta_from_file.get_height()
+								getf(caret.default_style.font).metrics.get_height()
 								: highlighted.height()
 						) + pos, 
 						clipper,
@@ -121,7 +121,7 @@ namespace augs {
 							auto& g = *d.cached[i];
 
 							/* if it's not a whitespace */
-							if (d.cached_atlas_entries[i]->exists()) {
+							if (g.in_atlas.exists()) {
 								rgba charcolor = style(colors[i]).color;
 
 								/* if a character is between selection bounds, we change its color to the one specified in selected_text_color
@@ -133,8 +133,8 @@ namespace augs {
 
 								/* add the resulting character taking bearings into account */
 								out.aabb_clipped(
-									*d.cached_atlas_entries[i],
-									ltrb(xywhi(sectors[i] + g.bear_x, lines[l].top + lines[l].asc - g.bear_y, g.size.x, g.size.y) + pos),
+									g.in_atlas,
+									ltrb(xywhi({ sectors[i] + g.meta.bear_x, lines[l].top + lines[l].asc - g.meta.bear_y }, g.in_atlas.get_size()) + pos),
 									ltrb(clipper),
 									charcolor
 								);
@@ -153,21 +153,21 @@ namespace augs {
 								
 								caret_rect = xywhi(
 									sectors[caret.pos], 
-									lines[caret_line].top + lines[caret_line].asc - glyph_font.meta_from_file.ascender,
+									lines[caret_line].top + lines[caret_line].asc - glyph_font.metrics.ascender,
 									caret_width, 
-									glyph_font.meta_from_file.get_height()
+									glyph_font.metrics.get_height()
 								);
 							}
 						}
 						/* otherwise set caret's height to default style's height to avoid strange situations */
 						else {
-							caret_rect = xywhi(0, d.lines[caret_line].top, caret_width, getf(caret.default_style.font).meta_from_file.get_height());
+							caret_rect = xywhi(0, d.lines[caret_line].top, caret_width, getf(caret.default_style.font).metrics.get_height());
 						}
 					}
 				}
 				/* there is nothing to draw, but we are still active so we want to draw caret anyway */
 				else if (active) {
-					caret_rect = xywhi(0, 0, caret_width, getf(caret.default_style.font).meta_from_file.get_height());
+					caret_rect = xywhi(0, 0, caret_width, getf(caret.default_style.font).metrics.get_height());
 				}
 
 				if (blink.caret_visible) {
@@ -185,10 +185,6 @@ namespace augs {
 				auto& lines = d.lines;
 				auto& sectors = d.sectors;
 				const bool clip = clipper.good();
-
-				auto getf = [&](auto& f) {
-					return *f;
-				};
 
 				auto caret_rect = xywhi(0, 0, 0, 0);
 
@@ -218,12 +214,12 @@ namespace augs {
 							auto& g = *d.cached[i];
 
 							/* if it's not a whitespace */
-							if (d.cached_atlas_entries[i]->exists()) {
+							if (g.in_atlas.exists()) {
 								rgba charcolor = style(colors[i]).color;
 
 								out.aabb_clipped(
-									*d.cached_atlas_entries[i],
-									xywhi(sectors[i] + g.bear_x, lines[l].top + lines[l].asc - g.bear_y, g.size.x, g.size.y) + pos,
+									g.in_atlas,
+									xywhi({ sectors[i] + g.meta.bear_x, lines[l].top + lines[l].asc - g.meta.bear_y }, g.in_atlas.get_size()) + pos,
 									clipper,
 									charcolor
 								);
@@ -233,8 +229,13 @@ namespace augs {
 				}
 			}
 
-			vec2i get_text_bbox(const formatted_string& str, const unsigned wrapping_width) {
-				drafter dr;
+			vec2i get_text_bbox(
+				const formatted_string& str, 
+				const unsigned wrapping_width,
+				const bool use_kerning
+			) {
+				thread_local drafter dr;
+				dr.kerning = use_kerning;
 				dr.wrap_width = wrapping_width;
 				dr.draw(str);
 				return dr.get_bbox();
@@ -245,12 +246,14 @@ namespace augs {
 				const vec2i pos,
 				const formatted_string& str,
 				const unsigned wrapping_width,
-				const ltrbi clipper
+				const ltrbi clipper,
+				const bool use_kerning
 			) {
-				drafter draft;
-				printer print;
+				thread_local drafter draft;
+				thread_local printer print;
 				
 				draft.wrap_width = wrapping_width;
+				draft.kerning = use_kerning;
 
 				draft.draw(str);
 				print.draw_text(out, pos, draft, str, clipper);
@@ -264,12 +267,14 @@ namespace augs {
 				const formatted_string& str,
 				const rgba stroke_color,
 				const unsigned wrapping_width,
-				const ltrbi clipper
+				const ltrbi clipper,
+				const bool use_kerning
 			) {
-				drafter draft;
-				printer print;
+				thread_local drafter draft;
+				thread_local printer print;
 
 				draft.wrap_width = wrapping_width;
+				draft.kerning = use_kerning;
 
 				draft.draw(str);
 
@@ -295,12 +300,14 @@ namespace augs {
 				const formatted_string& str,
 				const caret_info caret,
 				const unsigned wrapping_width,
-				const ltrbi clipper
+				const ltrbi clipper,
+				const bool use_kerning
 			) {
-				drafter draft;
-				printer print;
+				thread_local drafter draft;
+				thread_local printer print;
 
 				draft.wrap_width = wrapping_width;
+				draft.kerning = use_kerning;
 
 				draft.draw(str);
 				print.draw_text(out, pos, draft, str, caret, clipper);
@@ -315,12 +322,14 @@ namespace augs {
 				const caret_info caret,
 				const rgba stroke_color,
 				const unsigned wrapping_width,
-				const ltrbi clipper
+				const ltrbi clipper,
+				const bool use_kerning
 			) {
-				drafter draft;
-				printer print;
+				thread_local drafter draft;
+				thread_local printer print;
 
 				draft.wrap_width = wrapping_width;
+				draft.kerning = use_kerning;
 
 				draft.draw(str);
 

@@ -73,7 +73,7 @@ void crosshair_system::generate_crosshair_intents(const logic_step step) {
 
 		auto& crosshair = subject.get<components::crosshair>();
 
-		if (it.intent == intent_type::SWITCH_LOOK && it.is_pressed) {
+		if (it.intent == game_intent_type::SWITCH_LOOK && it.was_pressed()) {
 			auto& mode = crosshair.orbit_mode;
 
 			if (mode == components::crosshair::LOOK) {

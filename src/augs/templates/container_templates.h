@@ -3,14 +3,14 @@
 #include <type_traits>
 #include "augs/templates/container_traits.h"
 
-template <class Container, class T>
-void erase_if(Container& v, const T& l) {
+template <class Container, class F>
+void erase_if(Container& v, F f) {
 	if constexpr(can_access_data_v<Container>) {
-		v.erase(std::remove_if(v.begin(), v.end(), l), v.end());
+		v.erase(std::remove_if(v.begin(), v.end(), f), v.end());
 	}
 	else {
 		for (auto it = v.begin(); it != v.end(); ) {
-			if (l(*it)) {
+			if (f(*it)) {
 				it = v.erase(it);
 			}
 			else {
@@ -76,26 +76,6 @@ A& concatenate(A& a, const B& b) {
 	return a;
 }
 
-template<class Container, class T>
-bool found_in(Container& v, const T& l) {
-	if constexpr(can_access_data_v<Container>) {
-		return std::find(v.begin(), v.end(), l) != v.end();
-	}
-	else {
-		return v.find(l) != v.end();
-	}
-}
-
-template<class Container, class T>
-auto find_in(Container& v, const T& l) {
-	if constexpr(can_access_data_v<Container>) {
-		return std::find(v.begin(), v.end(), l);
-	}
-	else {
-		return v.find(l);
-	}
-}
-
 template <class Container, class T>
 decltype(auto) minimum_of(const Container& v, T&& pred) {
 	return *std::min_element(v.begin(), v.end(), std::forward<T>(pred));
@@ -121,36 +101,94 @@ void copy_container(const Container1& from, Container2& into) {
 	std::copy(from.begin(), from.end(), into.begin());
 } 
 
-template <class Container, class Key, class... Args>
-auto found_or(Container&& container, Key&& key, Args&&... default_args) {
-	const auto it = find_in(std::forward<Container>(container), std::forward<Key>(key));
+template<class Container, class T>
+auto find_in(Container& v, const T& key) {
+	if constexpr(can_access_data_v<Container>) {
+		return std::find(v.begin(), v.end(), key);
+	}
+	else {
+		return v.find(key);
+	}
+}
 
-	const bool found = it != container.end();
-	using type = std::decay_t<decltype((*it).second)>;
+template<class Container, class T>
+bool found_in(Container& v, const T& l) {
+	return find_in(v, l) != v.end();
+}
 
-	if (found) {
-		return (*it).second; 		
+template <class T>
+auto default_or_invalid_enum() {
+	if constexpr(std::is_enum_v<T>) {
+		return T::INVALID;
+	}
+	else {
+		static_assert(
+			!std::is_arithmetic_v<T>,
+			"Default value for arithmetic types is not well-defined."
+			);
+
+		return T{};
+	}
+}
+
+template <class Container, class Key>
+auto value_or_nullptr(
+	Container& container, 
+	const Key& key
+) -> decltype(std::addressof(*container.begin())) {
+	if (const auto it = find_in(container, key);
+		it != container.end()) 
+	{
+		return std::addressof(*it);
 	}
 
-	return type(std::forward<Args>(default_args)...);
+	return nullptr;
 }
 
 template <class Container, class Key>
-auto found_or_default(Container&& container, Key&& key) {
-	return found_or(std::forward<Container>(container), std::forward<Key>(key));
+auto mapped_or_default(
+	const Container& container, 
+	const Key& key
+) {
+	using M = typename std::decay_t<Container>::mapped_type;
+
+	if (const auto it = container.find(key);
+		it != container.end()
+	) {
+		return (*it).second;
+	}
+
+	return default_or_invalid_enum<M>();
 }
 
 template <class Container, class Key>
-auto* found_or_nullptr(Container&& container, Key&& key) {
-	const auto it = find_in(std::forward<Container>(container), std::forward<Key>(key));
-
-	using ptr_type = decltype(std::addressof((*it).second));
-
-	if (const bool found = it != container.end()) {
+auto mapped_or_nullptr(
+	Container& container,
+	const Key& key
+) -> decltype(std::addressof((*container.begin()).second)) {
+	if (const auto it = container.find(key);
+		it != container.end()
+	) {
 		return std::addressof((*it).second);
 	}
 
-	return reinterpret_cast<ptr_type>(nullptr);
+	return nullptr;
+}
+
+template <class Container, class Value>
+auto key_or_default(
+	const Container& container, 
+	const Value& value
+) {
+	using K = typename std::decay_t<Container>::key_type;
+
+	for (const auto& it : container) {
+		if (it.second == value) {
+			return it.first;
+		}
+	}
+
+	return default_or_invalid_enum<K>();
 }
 
 template <class Container, class T>

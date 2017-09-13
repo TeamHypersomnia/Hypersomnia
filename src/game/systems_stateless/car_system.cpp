@@ -33,20 +33,20 @@ void car_system::set_steering_flags_from_intents(const logic_step step) {
 		auto& car = *maybe_car;
 
 		switch (it.intent) {
-		case intent_type::MOVE_FORWARD:
-			car.accelerating = it.is_pressed;
+		case game_intent_type::MOVE_FORWARD:
+			car.accelerating = it.was_pressed();
 			break;
-		case intent_type::MOVE_BACKWARD:
-			car.decelerating = it.is_pressed;
+		case game_intent_type::MOVE_BACKWARD:
+			car.decelerating = it.was_pressed();
 			break;
-		case intent_type::MOVE_LEFT:
-			car.turning_left = it.is_pressed;
+		case game_intent_type::MOVE_LEFT:
+			car.turning_left = it.was_pressed();
 			break;
-		case intent_type::MOVE_RIGHT:
-			car.turning_right = it.is_pressed;
+		case game_intent_type::MOVE_RIGHT:
+			car.turning_right = it.was_pressed();
 			break;
-		case intent_type::HAND_BRAKE:
-			car.hand_brake = it.is_pressed;
+		case game_intent_type::HAND_BRAKE:
+			car.hand_brake = it.was_pressed();
 			break;
 		default: break;
 		}

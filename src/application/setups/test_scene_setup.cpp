@@ -57,49 +57,8 @@ test_scene_setup::test_scene_setup(
 	timer.reset_timer();
 }
 
-void test_scene_setup::control(
-	augs::local_entropy& new_entropy,
-	const input_context& context
-) {
-	const bool debug_control_timing = true;// player.is_replaying();
-
-	if (debug_control_timing) {
-		for (const auto& raw_input : new_entropy) {
-			if (raw_input.was_any_key_pressed()) {
-				if (raw_input.key == key::_4) {
-					timer.set_stepping_speed_multiplier(0.1f);
-				}
-				if (raw_input.key == key::_5) {
-					timer.set_stepping_speed_multiplier(1.f);
-				}
-				if (raw_input.key == key::_6) {
-					timer.set_stepping_speed_multiplier(6.f);
-				}
-			}
-		}
-	}
-
-	for (const auto& raw_input : new_entropy) {
-		if (raw_input.was_any_key_pressed()) {
-			if (raw_input.key == key::F2) {
-				LOG_COLOR(console_color::YELLOW, "Separator");
-			}
-		}
-	}
-
-	characters.control_character_selection_numeric(new_entropy);
-
-	auto translated = context.translate(new_entropy);
-	characters.control_character_selection(translated.intents);
-
-	const auto viewed_character = get_viewed_character();
-
-	if (viewed_character.alive()) {
-		total_collected_entropy += cosmic_entropy(
-			viewed_character,
-			translated
-		);
-	}
+void test_scene_setup::control(const cosmic_entropy& events) {
+	total_collected_entropy += events;
 }
 
 void test_scene_setup::accept_game_gui_events(const cosmic_entropy& events) {

@@ -96,11 +96,11 @@ void gun_system::consume_gun_intents(const logic_step step) {
 
 		auto& gun = *maybe_gun;
 
-		if (gun_entity.intent == intent_type::PRESS_GUN_TRIGGER) {
-			gun.is_trigger_pressed = gun_entity.is_pressed;
+		if (gun_entity.intent == game_intent_type::PRESS_GUN_TRIGGER) {
+			gun.is_trigger_pressed = gun_entity.was_pressed();
 		}
 
-		if (gun_entity.intent == intent_type::RELOAD && gun_entity.is_pressed) {
+		if (gun_entity.intent == game_intent_type::RELOAD && gun_entity.was_pressed()) {
 			
 		}
 	}

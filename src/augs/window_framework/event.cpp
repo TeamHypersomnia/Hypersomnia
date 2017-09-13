@@ -34,13 +34,22 @@ namespace augs {
 		}
 
 		bool change::uses_mouse() const {
-			return
-				msg == message::mousemotion
-				|| (get_key_change() != key_change::NO_CHANGE
-					&& msg != message::keydown
-					&& msg != message::keyup
-				)
-			;
+			switch (msg) {
+			case message::mousemotion: return true;
+			case message::ltripleclick: return true;
+			case message::ldoubleclick:  return true;
+			case message::mdoubleclick: return true;
+			case message::rdoubleclick: return true;
+			case message::ldown: return true;
+			case message::lup: return true;
+			case message::mdown: return true;
+			case message::mup: return true;
+			case message::xdown: return true;
+			case message::xup: return true;
+			case message::rdown: return true;
+			case message::rup: return true;
+			default: return false; break;
+			}
 		}
 		
 		bool change::uses_keyboard() const {
@@ -71,7 +80,14 @@ namespace augs {
 			return was_any_key_released() && key.key == k;
 		}
 
-		void state::apply(const change& dt) {
+		bool change::is_exit_message() const {
+			return msg == message::close
+				|| msg == message::quit
+				|| (msg == message::syskeydown && key.key == keys::key::F4)
+			;
+		}
+
+		state& state::apply(const change& dt) {
 			const auto ch = dt.get_key_change();
 
 			if (ch == key_change::PRESSED) {
@@ -93,6 +109,8 @@ namespace augs {
 					mouse.rdrag.y = mouse.pos.y;
 				}
 			}
+
+			return *this;
 		}
 
 		bool state::get_mouse_key(const unsigned n) const {

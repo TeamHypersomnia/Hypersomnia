@@ -4,18 +4,15 @@
 
 #include "augs/pad_bytes.h"
 #include "augs/math/vec2.h"
-#include "augs/misc/basic_input_context.h"
 #include "augs/graphics/rgba.h"
 #include "augs/image/font.h"
 
 #include "game/transcendental/entity_handle_declaration.h"
-#include "game/enums/input_context_enums.h"
+#include "game/enums/game_intent_type.h"
 #include "view/game_drawing_settings.h"
 #include "view/audiovisual_state/world_camera.h"
 
 // all settings structures stored by the config
-
-#include "augs/misc/basic_input_context.h"
 #include "augs/window_framework/window_settings.h"
 #include "augs/audio/audio_settings.h"
 #include "view/network/simulation_receiver_settings.h"
@@ -26,6 +23,8 @@
 #include "application/session_settings.h"
 #include "view/viewables/regeneration/content_regeneration_settings.h"
 #include "application/setups/main_menu_settings.h"
+#include "application/app_intent_type.h"
+#include "view/game_gui/game_gui_intent_type.h"
 
 enum class launch_type {
 	// GEN INTROSPECTOR enum class launch_type
@@ -58,6 +57,9 @@ struct config_read_error : public std::runtime_error {
 	{}
 };
 
+using app_intent_map = augs::enum_associative_array<augs::event::keys::key, app_intent_type>;
+using game_gui_intent_map = augs::enum_associative_array<augs::event::keys::key, game_gui_intent_type>;
+
 struct config_lua_table {
 	config_lua_table() = default;
 	config_lua_table(const augs::path_type& config_lua_path);
@@ -77,7 +79,12 @@ struct config_lua_table {
 	simulation_receiver_settings simulation_receiver;
 	content_regeneration_settings content_regeneration;
 	main_menu_settings main_menu;
-	input_context controls;
+
+	game_intent_map game_controls;
+	game_gui_intent_map game_gui_controls;
+	app_intent_map app_controls;
+	app_ingame_intent_map app_ingame_controls;
+	
 	ImGuiStyle gui_style;
 	debug_settings debug;
 	session_settings session;

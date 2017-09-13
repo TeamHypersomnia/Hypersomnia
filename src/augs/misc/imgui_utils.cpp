@@ -43,14 +43,14 @@ namespace augs {
 		}
 
 		void setup_input(
-			augs::local_entropy& window_inputs,
+			local_entropy& window_inputs,
 			const decltype(ImGuiIO::DeltaTime) delta_seconds,
 			const vec2i screen_size
 		) {
-			auto& io = ImGui::GetIO();
-
 			using namespace event;
 			using namespace event::keys;
+
+			auto& io = ImGui::GetIO();
 
 			io.MouseDrawCursor = false;
 
@@ -99,6 +99,62 @@ namespace augs {
 			io.DisplaySize = vec2(screen_size);
 		}
 
+#if 0
+		void setup_input(
+			event::state& state,
+			const decltype(ImGuiIO::DeltaTime) delta_seconds,
+			const vec2i screen_size
+		) {
+			using namespace event;
+			using namespace event::keys;
+
+			auto& io = ImGui::GetIO();
+
+			io.MouseDrawCursor = false;
+			io.MousePos = vec2(state.mouse.pos);
+			io.MouseDown[0] = state.keys[key::LMOUSE];
+			io.MouseDown[1] = state.keys[key::RMOUSE];
+				else if (
+					in.msg == message::ldown
+					|| in.msg == message::ldoubleclick
+					|| in.msg == message::ltripleclick
+					) {
+					io.MouseDown[0] = true;
+				}
+				else if (in.msg == message::lup) {
+					io.MouseDown[0] = false;
+				}
+				else if (
+					in.msg == message::rdown
+					|| in.msg == message::rdoubleclick
+					) {
+					io.MouseDown[1] = true;
+				}
+				else if (in.msg == message::rup) {
+					io.MouseDown[1] = false;
+				}
+				else if (in.msg == message::wheel) {
+					io.MouseWheel = static_cast<float>(in.scroll.amount);
+				}
+				else if (in.msg == message::keydown) {
+					io.KeysDown[static_cast<int>(in.key.key)] = true;
+				}
+				else if (in.msg == message::keyup) {
+					io.KeysDown[static_cast<int>(in.key.key)] = false;
+				}
+				else if (in.msg == message::character) {
+					io.AddInputCharacter(in.character.utf16);
+				}
+			}
+
+			io.KeyCtrl = io.KeysDown[static_cast<int>(keys::key::LCTRL)] || io.KeysDown[static_cast<int>(keys::key::RCTRL)];
+			io.KeyShift = io.KeysDown[static_cast<int>(keys::key::LSHIFT)] || io.KeysDown[static_cast<int>(keys::key::RSHIFT)];
+			io.KeyAlt = io.KeysDown[static_cast<int>(keys::key::LALT)] || io.KeysDown[static_cast<int>(keys::key::RALT)];
+
+			io.DeltaTime = delta_seconds;
+			io.DisplaySize = vec2(screen_size);
+		}
+#endif
 		void render(const ImGuiStyle& style) {
 			ImGui::GetStyle() = style;
 			ImGui::Render();

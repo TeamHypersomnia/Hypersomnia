@@ -79,16 +79,16 @@ namespace augs {
 	public:
 		template <bool is_const>
 		class basic_iterator {
-			using ptr_type = maybe_const_ptr_t<is_const, enum_associative_array_base>;
-			using ref_type = std::pair<const key_type, maybe_const_ref_t<is_const, mapped_type>>;
+			using owner_ptr_type = maybe_const_ptr_t<is_const, enum_associative_array_base>;
+			using pair_type = std::pair<const key_type, maybe_const_ref_t<is_const, mapped_type>>;
 			
-			ptr_type ptr = nullptr;
+			owner_ptr_type ptr = nullptr;
 			size_type idx = 0;
 
 			friend class enum_associative_array_base<Enum, T>;
 
 		public:
-			basic_iterator(const ptr_type ptr, const size_type idx) : ptr(ptr), idx(idx) {}
+			basic_iterator(const owner_ptr_type ptr, const size_type idx) : ptr(ptr), idx(idx) {}
 
 			basic_iterator& operator++() {
 				idx = ptr->find_first_set_index(idx + 1);
@@ -109,7 +109,7 @@ namespace augs {
 				return idx != b.idx;
 			}
 
-			ref_type operator*() const {
+			pair_type operator*() const {
 				ensure(idx < ptr->capacity());
 				return { static_cast<key_type>(idx), ptr->nth(idx) };
 			}
@@ -287,7 +287,7 @@ namespace augs {
 		const enum_associative_array<Enum, T>& right
 	) {
 		for (const auto& it : left) {
-			const auto ptr = found_or_nullptr(right, it.first);
+			const auto ptr = mapped_or_nullptr(right, it.first);
 
 			if (ptr == nullptr) {
 				return false;

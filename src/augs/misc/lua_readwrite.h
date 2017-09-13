@@ -80,7 +80,7 @@ namespace augs {
 				const auto stringized_enum = object.as<std::string>();
 
 				if (
-					const auto* enumized = found_or_nullptr(
+					const auto* enumized = mapped_or_nullptr(
 						get_string_to_enum_map<T>(), 
 						stringized_enum
 					)

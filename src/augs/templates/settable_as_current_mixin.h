@@ -11,13 +11,13 @@ namespace augs {
 
 		settable_as_current_mixin() = default;
 
-		settable_as_current_mixin(settable_as_current_mixin&& b) {
+		settable_as_current_mixin(settable_as_current_mixin&& b) noexcept {
 			if (b.is_current()) {
 				current_instance = static_cast<derived*>(this);
 			}
 		}
 
-		settable_as_current_mixin& operator=(settable_as_current_mixin&& b) {
+		settable_as_current_mixin& operator=(settable_as_current_mixin&& b) noexcept {
 			unset_if_current();
 
 			if (b.is_current()) {

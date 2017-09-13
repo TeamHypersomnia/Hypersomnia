@@ -40,7 +40,7 @@ struct regenerated_atlas {
 	vec2u atlas_image_size;
 
 	std::unordered_map<source_image_identifier, augs::texture_atlas_entry> baked_images;
-	std::unordered_map<source_font_identifier, augs::baked_font> baked_fonts;
+	std::unordered_map<source_font_identifier, augs::stored_baked_font> stored_baked_fonts;
 	// END GEN INTROSPECTOR
 
 	regenerated_atlas(

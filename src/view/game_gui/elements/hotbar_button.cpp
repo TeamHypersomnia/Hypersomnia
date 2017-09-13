@@ -220,10 +220,21 @@ void hotbar_button::draw(
 				}
 				
 				if (type == button_corner_type::LB_COMPLEMENT) {
-					const auto intent_for_this = static_cast<intent_type>(static_cast<int>(intent_type::HOTBAR_BUTTON_0) + this_id.get_location().index);
-					const auto bound_key = context.get_input_information().get_bound_key_if_any(intent_for_this);
+					const auto intent_for_this_button = 
+						static_cast<game_gui_intent_type>(
+							static_cast<int>(
+								game_gui_intent_type::HOTBAR_BUTTON_0
+							) + this_id.get_location().index
+						)
+					;
 
-					if (bound_key != augs::event::keys::key::INVALID) {
+					if (
+						const auto bound_key = key_or_default(
+							context.get_input_information(),
+							intent_for_this_button
+						);
+						bound_key != augs::event::keys::key::INVALID
+					) {
 						const auto label_text = formatted_string{
 							key_to_wstring(bound_key).substr(0, 1),
 							label_style

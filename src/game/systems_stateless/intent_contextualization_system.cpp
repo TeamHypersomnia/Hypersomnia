@@ -29,7 +29,7 @@ void intent_contextualization_system::contextualize_use_button_intents(const log
 	for (auto& e : intents) {
 		const auto subject = cosmos[e.subject];
 
-		if (e.intent == intent_type::USE_BUTTON) {
+		if (e.intent == game_intent_type::USE_BUTTON) {
 			auto* const maybe_driver = subject.find<components::driver>();
 
 			if (maybe_driver) {
@@ -42,10 +42,10 @@ void intent_contextualization_system::contextualize_use_button_intents(const log
 				;
 
 				if (is_now_driving) {
-					e.intent = intent_type::RELEASE_CAR;
+					e.intent = game_intent_type::RELEASE_CAR;
 				}
 				else {
-					e.intent = intent_type::TAKE_HOLD_OF_WHEEL;
+					e.intent = game_intent_type::TAKE_HOLD_OF_WHEEL;
 				}
 			}
 		}
@@ -64,7 +64,7 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(con
 
 			const auto maybe_crosshair = subject[child_entity_name::CHARACTER_CROSSHAIR];
 
-			if (it.get_motion_type() == motion_type::MOVE_CROSSHAIR && maybe_crosshair.alive()) {
+			if (it.get_motion_type() == game_motion_type::MOVE_CROSSHAIR && maybe_crosshair.alive()) {
 				it.subject = maybe_crosshair;
 				continue;
 			}
@@ -81,10 +81,10 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(con
 		if (subject.has<components::container>()) {
 			int hand_index = -1;
 
-			if (it.intent == intent_type::CROSSHAIR_PRIMARY_ACTION) {
+			if (it.intent == game_intent_type::CROSSHAIR_PRIMARY_ACTION) {
 				hand_index = 0;
 			}
-			else if (it.intent == intent_type::CROSSHAIR_SECONDARY_ACTION) {
+			else if (it.intent == game_intent_type::CROSSHAIR_SECONDARY_ACTION) {
 				hand_index = 1;
 			}
 
@@ -97,16 +97,16 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(con
 
 		if (callee_handle.alive()) {
 			if (callee_handle.has<components::gun>()) {
-				it.intent = intent_type::PRESS_GUN_TRIGGER;
+				it.intent = game_intent_type::PRESS_GUN_TRIGGER;
 				it.subject = callee;
 				continue;
 			}
 			else if (callee_handle.has<components::melee>()) {
-				if (it.intent == intent_type::CROSSHAIR_PRIMARY_ACTION) {
-					it.intent = intent_type::MELEE_PRIMARY_MOVE;
+				if (it.intent == game_intent_type::CROSSHAIR_PRIMARY_ACTION) {
+					it.intent = game_intent_type::MELEE_PRIMARY_MOVE;
 				}
-				else if (it.intent == intent_type::CROSSHAIR_SECONDARY_ACTION) {
-					it.intent = intent_type::MELEE_SECONDARY_MOVE;
+				else if (it.intent == game_intent_type::CROSSHAIR_SECONDARY_ACTION) {
+					it.intent = game_intent_type::MELEE_SECONDARY_MOVE;
 				}
 
 				it.subject = callee;
@@ -117,7 +117,7 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(con
 					step,
 					cosmos[callee],
 					subject,
-					it.is_pressed
+					it.was_pressed()
 				);
 			}
 		}
@@ -139,30 +139,30 @@ void intent_contextualization_system::contextualize_movement_intents(const logic
 		const auto* const maybe_container = subject.find<components::container>();
 
 		if (maybe_driver && cosmos[maybe_driver->owned_vehicle].alive()) {
-			if (e.intent == intent_type::MOVE_FORWARD
-				|| e.intent == intent_type::MOVE_BACKWARD
-				|| e.intent == intent_type::MOVE_LEFT
-				|| e.intent == intent_type::MOVE_RIGHT
-				|| e.intent == intent_type::WALK
-				|| e.intent == intent_type::SPRINT
+			if (e.intent == game_intent_type::MOVE_FORWARD
+				|| e.intent == game_intent_type::MOVE_BACKWARD
+				|| e.intent == game_intent_type::MOVE_LEFT
+				|| e.intent == game_intent_type::MOVE_RIGHT
+				|| e.intent == game_intent_type::WALK
+				|| e.intent == game_intent_type::SPRINT
 			) {
 				callee = maybe_driver->owned_vehicle;
 				callee_resolved = true;
 			}
-			else if (e.intent == intent_type::SPACE_BUTTON) {
+			else if (e.intent == game_intent_type::SPACE_BUTTON) {
 				callee = maybe_driver->owned_vehicle;
 				callee_resolved = true;
-				e.intent = intent_type::HAND_BRAKE;
+				e.intent = game_intent_type::HAND_BRAKE;
 			}
 		}
 		
 		if (!callee_resolved) {
 			if (maybe_container) {
-				if (e.intent == intent_type::SPACE_BUTTON) {
+				if (e.intent == game_intent_type::SPACE_BUTTON) {
 					const auto hand = subject.get_primary_hand();
 
 					if (hand.alive() && hand->items_inside.size() > 0) {
-						e.intent = intent_type::MELEE_TERTIARY_MOVE;
+						e.intent = game_intent_type::MELEE_TERTIARY_MOVE;
 						callee = hand.get_items_inside()[0];
 						callee_resolved = true;
 					}

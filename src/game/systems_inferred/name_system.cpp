@@ -77,18 +77,14 @@ void name_system::set_name(
 }
 
 std::unordered_set<entity_id> name_system::get_entities_by_name_id(const entity_name_id id) const {
-	return found_or_default(entities_by_name_id, id);
+	return mapped_or_default(entities_by_name_id, id);
 }
 
 std::unordered_set<entity_id> name_system::get_entities_by_name(const entity_name_type& full_name) const {
-	const auto maybe_existent_id = name_to_id_lookup.find(full_name);
-
-	if (maybe_existent_id != name_to_id_lookup.end()) {
-		const auto id = (*maybe_existent_id).second;
-
-		return get_entities_by_name_id(id);
+	if (const auto* const id = mapped_or_nullptr(name_to_id_lookup, full_name)) {
+		return get_entities_by_name_id(*id);
 	}
-
+	
 	return {};
 }
 

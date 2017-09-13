@@ -4,43 +4,41 @@
 
 #include "application/main/release_flags.h"
 
-void release_flags::set_all() {
+release_flags& release_flags::set_all() {
 	keys = mouse = true;
+	return *this;
 }
 
-void release_flags::set_due_to_imgui(const ImGuiIO& io) {
+release_flags& release_flags::set_due_to_imgui(const ImGuiIO& io) {
 	thread_local bool released_due_to_text_input = false;
 
 	if (io.WantTextInput) {
 		if (!released_due_to_text_input) {
-			keys = mouse = true;
+			set_all();
 			released_due_to_text_input = true;
 		}
 	}
 	else {
 		released_due_to_text_input = false;
 	}
+
+	return *this;
 }
 
-void release_flags::set_due_to_window_deactivation(const augs::local_entropy& entropy) {
-	for (const auto& n : entropy) {
-		if (n.msg == augs::event::message::activate) {
-			set_all();
-		}
+void release_flags::append_releases(
+	augs::local_entropy& into_entropy,
+	const augs::event::state& from_state
+) const {
+	if (keys) {
+		concatenate(into_entropy, from_state.generate_key_releasing_changes());
+	}
+
+	if (mouse) {
+		concatenate(into_entropy, from_state.generate_mouse_releasing_changes());
 	}
 }
 
-void release_flags::set_due_to_esc(const augs::local_entropy& entropy) {
-	for (const auto& n : entropy) {
-		if (
-			n.msg == augs::event::message::keydown
-			&& n.key.key == augs::event::keys::key::ESC
-		) {
-			set_all();
-		}
-	}
-}
-
+#if 0
 void release_flags::apply_into(
 	augs::local_entropy& into_entropy,
 	augs::event::state& into_state
@@ -61,6 +59,20 @@ void release_flags::apply_into(
 		apply_releases(into_state.generate_mouse_releasing_changes());
 	}
 }
+
+void release_flags::apply_into(
+	augs::local_entropy& into_entropy,
+	const augs::event::state& into_state
+) const {
+	if (keys) {
+		concatenate(into_entropy, into_state.generate_key_releasing_changes());
+	}
+
+	if (mouse) {
+		concatenate(into_entropy, into_state.generate_mouse_releasing_changes());
+	}
+}
+#endif
 
 bool release_flags::any() const {
 	return keys || mouse;

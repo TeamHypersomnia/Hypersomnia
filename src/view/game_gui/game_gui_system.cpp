@@ -21,36 +21,36 @@
 
 #include "view/game_gui/game_gui_system.h"
 
-static char intent_to_hotbar_index(const intent_type type) {
+static char to_hotbar_index(const game_gui_intent_type type) {
 	switch (type) {
-	case intent_type::HOTBAR_BUTTON_0: return 0;
-	case intent_type::HOTBAR_BUTTON_1: return 1;
-	case intent_type::HOTBAR_BUTTON_2: return 2;
-	case intent_type::HOTBAR_BUTTON_3: return 3;
-	case intent_type::HOTBAR_BUTTON_4: return 4;
-	case intent_type::HOTBAR_BUTTON_5: return 5;
-	case intent_type::HOTBAR_BUTTON_6: return 6;
-	case intent_type::HOTBAR_BUTTON_7: return 7;
-	case intent_type::HOTBAR_BUTTON_8: return 8;
-	case intent_type::HOTBAR_BUTTON_9: return 9;
+	case game_gui_intent_type::HOTBAR_BUTTON_0: return 0;
+	case game_gui_intent_type::HOTBAR_BUTTON_1: return 1;
+	case game_gui_intent_type::HOTBAR_BUTTON_2: return 2;
+	case game_gui_intent_type::HOTBAR_BUTTON_3: return 3;
+	case game_gui_intent_type::HOTBAR_BUTTON_4: return 4;
+	case game_gui_intent_type::HOTBAR_BUTTON_5: return 5;
+	case game_gui_intent_type::HOTBAR_BUTTON_6: return 6;
+	case game_gui_intent_type::HOTBAR_BUTTON_7: return 7;
+	case game_gui_intent_type::HOTBAR_BUTTON_8: return 8;
+	case game_gui_intent_type::HOTBAR_BUTTON_9: return 9;
 	default: return -1;
 	}
 }
 
-static char intent_to_special_action_index(const intent_type type) {
+static char to_special_action_index(const game_gui_intent_type type) {
 	switch (type) {
-	case intent_type::SPECIAL_ACTION_BUTTON_1: return 0;
-	case intent_type::SPECIAL_ACTION_BUTTON_2: return 1;
-	case intent_type::SPECIAL_ACTION_BUTTON_3: return 2;
-	case intent_type::SPECIAL_ACTION_BUTTON_4: return 3;
-	case intent_type::SPECIAL_ACTION_BUTTON_5: return 4;
-	case intent_type::SPECIAL_ACTION_BUTTON_6: return 5;
-	case intent_type::SPECIAL_ACTION_BUTTON_7: return 6;
-	case intent_type::SPECIAL_ACTION_BUTTON_8: return 7;
-	case intent_type::SPECIAL_ACTION_BUTTON_9: return 8;
-	case intent_type::SPECIAL_ACTION_BUTTON_10: return 9;
-	case intent_type::SPECIAL_ACTION_BUTTON_11: return 10;
-	case intent_type::SPECIAL_ACTION_BUTTON_12: return 11;
+	case game_gui_intent_type::SPECIAL_ACTION_BUTTON_1: return 0;
+	case game_gui_intent_type::SPECIAL_ACTION_BUTTON_2: return 1;
+	case game_gui_intent_type::SPECIAL_ACTION_BUTTON_3: return 2;
+	case game_gui_intent_type::SPECIAL_ACTION_BUTTON_4: return 3;
+	case game_gui_intent_type::SPECIAL_ACTION_BUTTON_5: return 4;
+	case game_gui_intent_type::SPECIAL_ACTION_BUTTON_6: return 5;
+	case game_gui_intent_type::SPECIAL_ACTION_BUTTON_7: return 6;
+	case game_gui_intent_type::SPECIAL_ACTION_BUTTON_8: return 7;
+	case game_gui_intent_type::SPECIAL_ACTION_BUTTON_9: return 8;
+	case game_gui_intent_type::SPECIAL_ACTION_BUTTON_10: return 9;
+	case game_gui_intent_type::SPECIAL_ACTION_BUTTON_11: return 10;
+	case game_gui_intent_type::SPECIAL_ACTION_BUTTON_12: return 11;
 	default: return -1;
 	}
 }
@@ -123,34 +123,96 @@ void game_gui_system::queue_transfers(const wielding_result res) {
 		concatenate(pending_transfers, res.transfers);
 	}
 }
+	
+void game_gui_system::control_gui_world(
+	const game_gui_context context,
+	const augs::event::change change
+) {
+	const auto root_entity = context.get_subject_entity();
+	const auto& cosmos = root_entity.get_cosmos();
+	const auto state = context.get_input_state();
+	auto& element = context.get_character_gui();
+
+	ensure(root_entity.has<components::item_slot_transfers>());
+	
+	if (active) {
+		bool fetched = false;
+
+		const auto held_rect = context.get_if<item_button_in_item>(world.rect_held_by_lmb);
+
+		if (held_rect != nullptr) {
+			const auto& item_entity = cosmos[held_rect.get_location().item_id];
+			auto& dragged_charges = element.dragged_charges;
+
+			if (
+				change.msg == augs::event::message::rdown
+				|| change.msg == augs::event::message::rdoubleclick
+			) {
+				if (world.held_rect_is_dragged) {
+					pending_transfers.push_back(item_slot_transfer_request { item_entity, cosmos[inventory_slot_id()], dragged_charges });
+					fetched = true;
+				}
+			}
+
+			if (change.msg == augs::event::message::wheel) {
+				const auto& item = item_entity.get<components::item>();
+
+				const auto delta = change.scroll.amount;
+
+				dragged_charges += delta;
+
+				if (dragged_charges <= 0) {
+					dragged_charges = item.charges + dragged_charges;
+				}
+				if (dragged_charges > item.charges) {
+					dragged_charges = dragged_charges - item.charges;
+				}
+			}
+		}
+
+		if (!fetched) {
+			const auto gui_events = world.consume_raw_input_and_generate_gui_events(
+				context,
+				change
+			);
+
+			world.respond_to_events(
+				context,
+				gui_events
+			);
+		}
+	}
+}
 
 void game_gui_system::control_hotbar_and_action_button(
 	const const_entity_handle gui_entity,
-	const game_intent_vector& intents
+	const game_gui_intent intent
 ) {
 	const auto& cosmos = gui_entity.get_cosmos();
 	auto& gui = get_character_gui(gui_entity);
 
-	for (auto r : intents) {
-		if (r.is_pressed) {
+	{
+		auto r = intent;
+
+		if (r.was_pressed()) {
 			int hand_index = -1;
 
-			if (r.intent == intent_type::HOLSTER) {
+			if (r.intent == game_gui_intent_type::HOLSTER) {
 				if (gui_entity.get_if_any_item_in_hand_no(0).alive()) {
-					r.intent = intent_type::HOLSTER_PRIMARY_ITEM;
+					r.intent = game_gui_intent_type::HOLSTER_PRIMARY_ITEM;
 				}
 				else if (
 					gui_entity.get_if_any_item_in_hand_no(0).dead()
 					&& gui_entity.get_if_any_item_in_hand_no(1).alive()
 				) {
-					r.intent = intent_type::HOLSTER_SECONDARY_ITEM;
+					r.intent = game_gui_intent_type::HOLSTER_SECONDARY_ITEM;
 				}
 			}
 
-			if (r.intent == intent_type::HOLSTER_PRIMARY_ITEM) {
+			if (r.intent == game_gui_intent_type::HOLSTER_PRIMARY_ITEM) {
 				hand_index = 0;
 			}
-			else if (r.intent == intent_type::HOLSTER_SECONDARY_ITEM) {
+			else if (r.intent == game_gui_intent_type::HOLSTER_SECONDARY_ITEM) {
 				hand_index = 1;
 			}
 
@@ -162,9 +224,11 @@ void game_gui_system::control_hotbar_and_action_button(
 		}
 	}
 
-	for (const auto& i : intents) {
-		const auto hotbar_button_index = intent_to_hotbar_index(i.intent);
-		const auto special_action_index = intent_to_special_action_index(i.intent);
+	{
+		const auto& i = intent;
+
+		const auto hotbar_button_index = to_hotbar_index(i.intent);
+		const auto special_action_index = to_special_action_index(i.intent);
 
 		if (hotbar_button_index >= 0 && static_cast<std::size_t>(hotbar_button_index) < gui.hotbar_buttons.size()) {
 			auto& currently_held_index = gui.currently_held_hotbar_button_index;
@@ -180,7 +244,7 @@ void game_gui_system::control_hotbar_and_action_button(
 			const bool is_anything_assigned_to_that_button = gui.hotbar_buttons[hotbar_button_index].get_assigned_entity(gui_entity).alive();
 
 			if (is_anything_assigned_to_that_button) {
-				if (i.is_pressed) {
+				if (i.was_pressed()) {
 					const bool should_dual_wield = currently_held_index > -1;
 
 					if (should_dual_wield) {
@@ -221,9 +285,9 @@ void game_gui_system::control_hotbar_and_action_button(
 		}
 		else if (special_action_index >= 0 && static_cast<std::size_t>(special_action_index) < gui.action_buttons.size()) {
 			auto& action_b = gui.action_buttons[special_action_index];
-			action_b.detector.update_appearance(i.is_pressed ? gui_event::ldown : gui_event::lup);
+			action_b.detector.update_appearance(i.was_pressed() ? gui_event::ldown : gui_event::lup);
 
-			if (i.is_pressed) {
+			if (i.was_pressed()) {
 				const auto bound_spell = action_b.bound_spell;
 
 				if (bound_spell.is_set() && gui_entity.get<components::sentience>().is_learned(bound_spell)) {
@@ -231,7 +295,7 @@ void game_gui_system::control_hotbar_and_action_button(
 				}
 			}
 		}
-		else if (i.intent == intent_type::PREVIOUS_HOTBAR_SELECTION_SETUP && i.is_pressed) {
+		else if (i.intent == game_gui_intent_type::PREVIOUS_HOTBAR_SELECTION_SETUP && i.was_pressed()) {
 			const auto wielding = gui.make_wielding_transfers_for_previous_hotbar_selection_setup(gui_entity);
 
 			if (wielding.successful()) {
@@ -250,75 +314,6 @@ void game_gui_system::advance(
 	const augs::delta dt
 ) {
 	world.advance_elements(context, dt);
-}
-	
-void game_gui_system::control(
-	const game_gui_context context,
-	std::vector<augs::event::change>& events
-) {
-	const auto root_entity = context.get_subject_entity();
-	const auto& cosmos = root_entity.get_cosmos();
-	auto& element = context.get_character_gui();
-
-	ensure(root_entity.has<components::item_slot_transfers>());
-	
-	augs::gui::gui_entropy<game_gui_element_location> gui_events;
-
-	augs::give_precedence_to_imgui(context, gui_events);
-
-	if (active) {
-		erase_if(events, [&](const augs::event::change change) {
-			bool fetched = false;
-
-			const auto held_rect = context.get_if<item_button_in_item>(world.rect_held_by_lmb);
-
-			if (held_rect != nullptr) {
-				const auto& item_entity = cosmos[held_rect.get_location().item_id];
-				auto& dragged_charges = element.dragged_charges;
-
-				if (
-					change.msg == augs::event::message::rdown
-					|| change.msg == augs::event::message::rdoubleclick
-				) {
-					if (world.held_rect_is_dragged) {
-						pending_transfers.push_back(item_slot_transfer_request { item_entity, cosmos[inventory_slot_id()], dragged_charges });
-						fetched = true;
-					}
-				}
-
-				if (change.msg == augs::event::message::wheel) {
-					const auto& item = item_entity.get<components::item>();
-
-					const auto delta = change.scroll.amount;
-
-					dragged_charges += delta;
-
-					if (dragged_charges <= 0) {
-						dragged_charges = item.charges + dragged_charges;
-					}
-					if (dragged_charges > item.charges) {
-						dragged_charges = dragged_charges - item.charges;
-					}
-				}
-			}
-
-			if (!fetched) {
-				world.consume_raw_input_and_generate_gui_events(
-					context,
-					change,
-					gui_events
-				);
-			}
-
-			return change.uses_mouse();
-		});
-	}
-
-	// world.call_idle_mousemotion_updater(context, entropy);
-	world.respond_to_events(
-		context, 
-		gui_events
-	);
 }
 
 void game_gui_system::rebuild_layouts(

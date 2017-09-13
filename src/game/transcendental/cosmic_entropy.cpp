@@ -2,7 +2,6 @@
 #include "game/transcendental/cosmos.h"
 
 #include "augs/misc/machine_entropy.h"
-#include "augs/misc/basic_input_context.h"
 
 #include "game/detail/inventory/inventory_utils.h"
 #include "generated/introspectors.h"
@@ -136,10 +135,11 @@ cosmic_entropy::cosmic_entropy(
 
 cosmic_entropy::cosmic_entropy(
 	const const_entity_handle controlled_entity,
-	const input_context::translated& translated
+	const game_intents& intents,
+	const game_motions& motions
 ) {
-	intents_per_entity[controlled_entity] = translated.intents;
-	motions_per_entity[controlled_entity] = translated.motions;
+	intents_per_entity[controlled_entity] = intents;
+	motions_per_entity[controlled_entity] = motions;
 }
 
 template struct basic_cosmic_entropy<entity_id>;

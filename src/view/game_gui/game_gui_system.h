@@ -8,6 +8,7 @@
 #include "game/transcendental/cosmic_entropy.h"
 #include "augs/graphics/renderer.h"
 #include "view/game_gui/elements/game_gui_root.h"
+#include "view/game_gui/game_gui_intent_type.h"
 
 struct character_gui;
 
@@ -29,11 +30,12 @@ public:
 
 	game_gui_context create_context(
 		const vec2i screen_size,
+		const augs::event::state input_state,
 		const const_entity_handle gui_entity,
 		const game_gui_context_dependencies deps
 	) {
 		return {
-			{ world, tree, screen_size },
+			{ world, tree, screen_size, input_state },
 			*this,
 			gui_entity,
 			get_character_gui(gui_entity),
@@ -43,11 +45,12 @@ public:
 
 	const_game_gui_context create_context(
 		const vec2i screen_size,
+		const augs::event::state input_state,
 		const const_entity_handle gui_entity,
 		const game_gui_context_dependencies deps
 	) const {
 		return {
-			{ world, tree, screen_size },
+			{ world, tree, screen_size, input_state },
 			*this,
 			gui_entity,
 			get_character_gui(gui_entity),
@@ -70,9 +73,14 @@ public:
 	item_button& get_item_button(const entity_id);
 	const item_button& get_item_button(const entity_id) const;
 
-	void control(
+	void control_gui_world(
 		const game_gui_context context,
-		std::vector<augs::event::change>& events
+		const augs::event::change change
+	);
+
+	void control_hotbar_and_action_button(
+		const const_entity_handle root_entity,
+		const game_gui_intent intent
 	);
 
 	void advance(
@@ -84,11 +92,6 @@ public:
 
 	void rebuild_layouts(
 		const game_gui_context context
-	);
-
-	void control_hotbar_and_action_button(
-		const const_entity_handle root_entity,
-		const game_intent_vector& intents
 	);
 
 	void reserve_caches_for_entities(const size_t) const {}

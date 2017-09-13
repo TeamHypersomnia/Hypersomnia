@@ -1,18 +1,17 @@
 #pragma once
-#include <unordered_map>
 #include <vector>
+#include <unordered_map>
 
 #include "augs/templates/container_templates.h"
 
 #include "augs/misc/streams.h"
 #include "augs/misc/machine_entropy.h"
 #include "augs/misc/container_with_small_size.h"
-#include "augs/misc/basic_input_context.h"
 
 #include "augs/window_framework/event.h"
 
 #include "game/transcendental/entity_id.h"
-#include "game/enums/input_context_enums.h"
+#include "game/enums/game_intent_type.h"
 #include "game/messages/intent_message.h"
 #include "game/detail/inventory/item_slot_transfer_request.h"
 #include "game/components/sentience_component.h"
@@ -21,12 +20,10 @@ class cosmos;
 
 template <class key>
 struct basic_cosmic_entropy {
-	typedef key key_type;
-
 	// GEN INTROSPECTOR struct basic_cosmic_entropy class key
 	augs::container_with_small_size<std::unordered_map<key, spell_id>, unsigned char> cast_spells_per_entity;
-	augs::container_with_small_size<std::unordered_map<key, decltype(input_context::translated::intents)>, unsigned char> intents_per_entity;
-	augs::container_with_small_size<std::unordered_map<key, decltype(input_context::translated::motions)>, unsigned char> motions_per_entity;
+	augs::container_with_small_size<std::unordered_map<key, game_intents>, unsigned char> intents_per_entity;
+	augs::container_with_small_size<std::unordered_map<key, game_motions>, unsigned char> motions_per_entity;
 	augs::container_with_small_size<std::vector<basic_item_slot_transfer_request<key>>, unsigned short> transfer_requests;
 	// END GEN INTROSPECTOR
 
@@ -45,7 +42,7 @@ struct basic_cosmic_entropy {
 struct cosmic_entropy;
 
 struct guid_mapped_entropy : basic_cosmic_entropy<entity_guid> {
-	typedef basic_cosmic_entropy<entity_guid> base;
+	using base = basic_cosmic_entropy<entity_guid>;
 	
 	// GEN INTROSPECTOR struct guid_mapped_entropy
 	// INTROSPECT BASE basic_cosmic_entropy<entity_guid>
@@ -63,7 +60,7 @@ struct guid_mapped_entropy : basic_cosmic_entropy<entity_guid> {
 };
 
 struct cosmic_entropy : basic_cosmic_entropy<entity_id> {
-	typedef basic_cosmic_entropy<entity_id> base;
+	using base = basic_cosmic_entropy<entity_id>;
 
 	// GEN INTROSPECTOR struct cosmic_entropy
 	// INTROSPECT BASE basic_cosmic_entropy<entity_id>
@@ -78,7 +75,8 @@ struct cosmic_entropy : basic_cosmic_entropy<entity_id> {
 	
 	explicit cosmic_entropy(
 		const const_entity_handle controlled_entity, 
-		const input_context::translated&
+		const game_intents&,
+		const game_motions&
 	);
 
 	cosmic_entropy& operator+=(const cosmic_entropy& b) {

@@ -10,10 +10,7 @@ namespace augs {
 	namespace gui {
 		struct raw_input_traversal {
 			const augs::event::change change;
-			
 			bool was_hovered_rect_visited = false;
-			bool mouse_fetched = false;
-			bool scroll_fetched = false;
 
 			raw_input_traversal(const augs::event::change);
 		};

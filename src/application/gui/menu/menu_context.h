@@ -4,10 +4,17 @@
 #include "augs/templates/maybe_const.h"
 #include "augs/audio/audio_settings.h"
 
+#include "view/necessary_resources.h"
+
 #include "application/gui/menu/menu_element_location.h"
 #include "application/gui/menu/menu_root.h"
 
-#include "view/necessary_resources.h"
+struct menu_context_dependencies {
+	const necessary_images_in_atlas& necessarys;
+	const augs::baked_font& gui_font;
+	const necessary_sound_buffers& sounds;
+	const augs::audio_volume_settings& audio_volume;
+};
 
 template <bool is_const, class Enum>
 class menu_context : public augs::gui::basic_context<menu_element_location<Enum>, is_const, menu_context<is_const, Enum>> {
@@ -16,25 +23,16 @@ public:
 	using menu_root_ref = maybe_const_ref_t<is_const, root_type>;
 
 	menu_root_ref root;
-	const necessary_images_in_atlas& necessarys;
-	const augs::baked_font& gui_font;
-	const necessary_sound_buffers& sounds;
-	const augs::audio_volume_settings& audio_volume;
-	
+	const menu_context_dependencies deps;
+
 	menu_context(
 		const base b,
 		menu_root_ref root,
-		const necessary_images_in_atlas& necessarys,
-		const augs::baked_font& gui_font,
-		const necessary_sound_buffers& sounds,
-		const augs::audio_volume_settings& audio_volume
+		const menu_context_dependencies deps
 	) : 
 		base(b),
 		root(root),
-		necessarys(necessarys),
-		gui_font(gui_font),
-		sounds(sounds),
-		audio_volume(audio_volume)
+		deps(deps)
 	{}
 	
 	template <class other_context>
@@ -42,10 +40,7 @@ public:
 		return { 
 			*static_cast<const base*>(this), 
 			root,
-			necessarys,
-			gui_font,
-			sounds, 
-			audio_volume 
+			deps
 		};
 	}
 
@@ -60,11 +55,19 @@ public:
 	}
 
 	auto& get_necessary_images() const {
-		return necessarys;
+		return deps.necessarys;
 	}
 
 	const auto& get_gui_font() const {
-		return gui_font;
+		return deps.gui_font;
+	}
+
+	const auto& get_audio_volume() const {
+		return deps.audio_volume;
+	}
+
+	const auto& get_sounds() const {
+		return deps.sounds;
 	}
 };
 

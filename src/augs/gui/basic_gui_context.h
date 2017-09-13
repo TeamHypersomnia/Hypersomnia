@@ -27,20 +27,27 @@ namespace augs {
 			rect_world_ref world;
 			tree_ref tree;
 			const vec2i screen_size;
-
+			const event::state input_state;
+			
 			basic_context(
 				rect_world_ref world, 
 				tree_ref tree,
-				const vec2i screen_size
+				const vec2i screen_size,
+				const event::state input_state
 			) : 
 				world(world), 
 				tree(tree),
-				screen_size(screen_size)
+				screen_size(screen_size),
+				input_state(input_state)
 			{}
 
 			template <class other_derived>
 			operator basic_context<gui_element_variant_id, true, other_derived>() const {
-				return { world, tree, screen_size };
+				return { world, tree, screen_size, input_state };
+			};
+
+			auto get_input_state() const {
+				return input_state;
 			};
 
 			rect_world_ref get_rect_world() const {

@@ -51,8 +51,8 @@ void exploding_ring_system::advance(
 				const unsigned max_particles_to_spawn = 160;
 				const auto& common_assets = cosmos.get_common_assets();
 
-				const auto* const ring_smoke = found_or_nullptr(manager, common_assets.exploding_ring_smoke);
-				const auto* const ring_sparkles = found_or_nullptr(manager, common_assets.exploding_ring_sparkles);
+				const auto* const ring_smoke = mapped_or_nullptr(manager, common_assets.exploding_ring_smoke);
+				const auto* const ring_sparkles = mapped_or_nullptr(manager, common_assets.exploding_ring_sparkles);
 
 				if (ring_smoke != nullptr && ring_sparkles != nullptr) {
 					auto smokes_emission = ring_smoke->emissions.at(0);

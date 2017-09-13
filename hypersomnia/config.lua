@@ -27,8 +27,19 @@ return {
     regenerate_every_launch = false,
     save_regenerated_atlases_as_binary = false
   },
-  controls = {
-    key_to_intent = {
+
+  app_controls = {
+      Dash = "SWITCH_DEVELOPER_CONSOLE",
+  },
+
+  app_ingame_controls = {
+      Backspace = "CLEAR_DEBUG_LINES",
+      F = "SWITCH_WEAPON_LASER",
+      MouseButton4 = "SWITCH_GAME_GUI_ACTIVE",
+      CapsLock = "SWITCH_CHARACTER"
+  },
+
+  game_gui_controls = {
       ["0"] = "HOTBAR_BUTTON_9",
       ["1"] = "HOTBAR_BUTTON_0",
       ["2"] = "HOTBAR_BUTTON_1",
@@ -39,38 +50,37 @@ return {
       ["7"] = "HOTBAR_BUTTON_6",
       ["8"] = "HOTBAR_BUTTON_7",
       ["9"] = "HOTBAR_BUTTON_8",
-      A = "MOVE_LEFT",
-      B = "SPECIAL_ACTION_BUTTON_5",
-      Backspace = "CLEAR_DEBUG_LINES",
-      C = "SPECIAL_ACTION_BUTTON_3",
-      CapsLock = "DEBUG_SWITCH_CHARACTER",
-      D = "MOVE_RIGHT",
-      Dash = "SWITCH_DEVELOPER_CONSOLE",
-      E = "USE_BUTTON",
-      F = "SWITCH_WEAPON_LASER",
+
+      Q = "PREVIOUS_HOTBAR_SELECTION_SETUP",
+
       F2 = "SPECIAL_ACTION_BUTTON_8",
       F3 = "SPECIAL_ACTION_BUTTON_9",
       F4 = "SPECIAL_ACTION_BUTTON_10",
       F5 = "SPECIAL_ACTION_BUTTON_11",
       F6 = "SPECIAL_ACTION_BUTTON_12",
-      G = "THROW",
-      H = "HOLSTER",
-      LeftControl = "START_PICKING_UP_ITEMS",
-      LeftMouseButton = "CROSSHAIR_PRIMARY_ACTION",
-      LeftShift = "SPRINT",
       M = "SPECIAL_ACTION_BUTTON_7",
-      MouseButton4 = "SWITCH_TO_GUI",
       N = "SPECIAL_ACTION_BUTTON_6",
-      Q = "PREVIOUS_HOTBAR_SELECTION_SETUP",
-      RightMouseButton = "CROSSHAIR_SECONDARY_ACTION",
-      S = "MOVE_BACKWARD",
-      Space = "SPACE_BUTTON",
+      B = "SPECIAL_ACTION_BUTTON_5",
+      C = "SPECIAL_ACTION_BUTTON_3",
       V = "SPECIAL_ACTION_BUTTON_4",
-      W = "MOVE_FORWARD",
       X = "SPECIAL_ACTION_BUTTON_2",
-      Z = "SPECIAL_ACTION_BUTTON_1"
-    },
-    map_mouse_motion_to = "MOVE_CROSSHAIR"
+      Z = "SPECIAL_ACTION_BUTTON_1",
+
+      H = "HOLSTER"
+  },
+
+  game_controls = {
+    A = "MOVE_LEFT",
+    D = "MOVE_RIGHT",
+    E = "USE_BUTTON",
+    G = "THROW",
+    LeftControl = "START_PICKING_UP_ITEMS",
+    LeftMouseButton = "CROSSHAIR_PRIMARY_ACTION",
+    LeftShift = "SPRINT",
+    RightMouseButton = "CROSSHAIR_SECONDARY_ACTION",
+    S = "MOVE_BACKWARD",
+    Space = "SPACE_BUTTON",
+    W = "MOVE_FORWARD",
   },
   session = {
     create_minimal_test_scene = false,

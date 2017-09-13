@@ -119,9 +119,9 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 					friction_connection connection(new_owner);
 					connection.fixtures_connected = 1;
 
-					const auto found = find_in(grounds, new_owner);
-
-					if (found != grounds.end()) {
+					if (const auto found = find_in(grounds, new_owner);
+						found != grounds.end()
+					) {
 						LOG("Incr: %x", new_owner);
 
 						connection.fixtures_connected = (*found).fixtures_connected + 1;

@@ -66,13 +66,13 @@ struct tests_of_traits {
 	static_assert(is_constexpr_size_container_v<std::array<vec2, 3>>, "Trait has failed");
 	static_assert(is_constexpr_size_container_v<decltype(pad_bytes<3>::pad)>, "Trait has failed");
 	static_assert(!is_variable_size_container_v<decltype(pad_bytes<3>::pad)>, "Trait has failed");
-	static_assert(is_variable_size_container_v<augs::enum_associative_array<intent_type, vec2>>, "Trait has failed");
+	static_assert(is_variable_size_container_v<augs::enum_associative_array<game_intent_type, vec2>>, "Trait has failed");
 
 	
 	static_assert(is_unary_container_v<augs::constant_size_vector<vec2, 20>>, "Trait has failed");
 	static_assert(is_variable_size_container_v<augs::constant_size_vector<vec2, 20>>, "Trait has failed");
 	static_assert(augs::has_io_overloads_v<augs::stream, augs::constant_size_vector<vec2, 20>>, "Trait has failed");
-	static_assert(augs::has_io_overloads_v<augs::stream, augs::enum_associative_array<intent_type, vec2>>, "Trait has failed");
+	static_assert(augs::has_io_overloads_v<augs::stream, augs::enum_associative_array<game_intent_type, vec2>>, "Trait has failed");
 	static_assert(augs::has_io_overloads_v<augs::stream, std::vector<int>>, "Trait has failed");
 	static_assert(augs::has_io_overloads_v<augs::stream, std::vector<vec2>>, "Trait has failed");
 	static_assert(augs::has_io_overloads_v<augs::stream, std::vector<cosmos>>, "Trait has failed");
@@ -184,7 +184,6 @@ struct tests_of_traits {
 	static_assert(has_enum_to_string_v<launch_type>);
 	static_assert(has_for_each_enum_v<launch_type>);
 	static_assert(has_for_each_enum_v<input_recording_type>);
-	static_assert(is_container_v<decltype(input_context::key_to_intent)>);
 
 	static_assert(augs::has_custom_to_lua_value_v<rgba>);
 	static_assert(augs::has_custom_to_lua_value_v<ImVec4>);

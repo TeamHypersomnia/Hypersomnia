@@ -9,39 +9,38 @@ namespace augs {
 		namespace text {
 			struct drafter {
 				struct line {
-					unsigned hover(int x, const std::vector<int>& sectors) const;  /* return sector that is the closest x  */
-					xywhi get_rect() const; /* actual line rect */
+					int top = 0;
+					int right = 0;
+					int asc = 0; 
+					int desc = 0;
+					unsigned begin = 0;
+					unsigned end = 0;
+					bool wrapped = false;
 
-					int top, right, height() const, bottom() const, /* coordinates */
-						asc, desc;
-					unsigned begin, end;
-					bool wrapped;
-					line();
 					void set(int y, int asc, int desc);
-					void adjust(const augs::font_metadata_from_file&);
+					void adjust(const augs::font_metrics&);
+					
 					bool empty() const;
+					int height() const;
+					int bottom() const;
+					xywhi get_rect() const; /* actual line rect */
+					unsigned hover(int x, const std::vector<int>& sectors) const;  /* return sector that is the closest x */
 				};
 
-				std::vector<const augs::font_glyph_metadata*> cached;
-				std::vector<const augs::texture_atlas_entry*> cached_atlas_entries;
+				std::vector<const augs::baked_font::internal_glyph*> cached;
 				std::vector<line> lines;
 				std::vector<int> sectors;
 
 				word_separator word_wrapper_separator;
 
-				unsigned wrap_width;
+				unsigned wrap_width = 0;
 
-				/* WARNING! Setting kerning flag to true may reuslt in performance hit if rendering huge amounts of text */
-				bool kerning, password_mode;
+				bool kerning = true;
+				bool password_mode = false;
 
-				/* L'*' on init */
-				wchar_t password_character;
+				wchar_t password_character = L'*';
 
-				/* default glyph placed instead null characters */
-				augs::font_glyph_metadata default_info;
 				augs::font_glyph_metadata default_glyph;
-
-				drafter();
 
 				/* returns offset that clipper must be moved to show whole caret */
 				vec2i view_caret(unsigned caret_pos, const ltrbi& clipper) const;
@@ -55,6 +54,8 @@ namespace augs {
 				vec2i get_bbox() const;
 
 				void draw(const formatted_string&);
+
+				void clear();
 
 				/*
 				clipper is in local drafter's space: (0, 0) = left top corner

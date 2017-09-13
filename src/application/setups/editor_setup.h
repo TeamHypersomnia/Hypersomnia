@@ -3,7 +3,7 @@
 
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
-#include "view/debug_character_selection.h"
+#include "application/debug_character_selection.h"
 #include "augs/misc/debug_entropy_player.h"
 #include "game/assets/all_logical_assets.h"
 #include "augs/misc/fixed_delta_timer.h"
@@ -64,11 +64,6 @@ public:
 			advance_audiovisuals();
 		}
 	}
-
-	void control(
-		augs::local_entropy& entropy,
-		const input_context&
-	);
 
 	void control(
 		const cosmic_entropy&
