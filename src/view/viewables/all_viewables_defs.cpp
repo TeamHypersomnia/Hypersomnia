@@ -3,7 +3,7 @@
 #include "augs/templates/introspect.h"
 
 #include "game/assets/all_logical_assets.h"
-#include "view/viewables/all_viewables.h"
+#include "view/viewables/all_viewables_defs.h"
 
 void all_viewables_defs::update_into(all_logical_assets& output) {
 	const auto sound_duration = [](const augs::sound_buffer::variation& v) {

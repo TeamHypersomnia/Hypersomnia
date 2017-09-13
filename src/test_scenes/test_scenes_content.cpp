@@ -1,5 +1,5 @@
 #include "game/assets/all_logical_assets.h"
-#include "view/viewables/all_viewables.h"
+#include "view/viewables/all_viewables_defs.h"
 #include "test_scenes/test_scenes_content.h"
 
 void populate_test_scene_assets(

@@ -422,7 +422,7 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/game/components/shape_circle_component.cpp"
 	"src/game/debug_drawing_settings.cpp"
 	"src/application/session_profiler.cpp"
-	"src/view/viewables/all_viewables.cpp"
+	"src/view/viewables/all_viewables_defs.cpp"
 )
 
 # natvis files for easier debugging in Visual Studio.

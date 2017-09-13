@@ -16,7 +16,7 @@
 #include "game/organization/all_component_includes.h"
 
 #include "view/viewables/viewables_loading_type.h"
-#include "view/viewables/all_viewables.h"
+#include "view/viewables/all_viewables_defs.h"
 
 #include "application/gui/menu/creators_screen.h"
 #include "application/gui/main_menu_gui.h"

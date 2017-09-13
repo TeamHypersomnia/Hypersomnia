@@ -18,7 +18,6 @@
 #include "game/transcendental/data_living_one_step.h"
 #include "game/transcendental/cosmos.h"
 
-#include "view/viewables/all_viewables.h"
 #include "view/viewables/loaded_sounds.h"
 #include "view/viewables/atlas_distributions.h"
 
