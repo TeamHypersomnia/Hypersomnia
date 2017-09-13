@@ -19,7 +19,11 @@ components::transform& interpolation_system::get_interpolated(const const_entity
 }
 
 components::transform interpolation_system::get_interpolated(const const_entity_handle id) const {
-	return enabled ? per_entity_cache[linear_cache_key(id)].interpolated_transform : id.get_logic_transform();
+	if (enabled) {
+		return per_entity_cache[linear_cache_key(id)].interpolated_transform;
+	}
+	
+	return id.get_logic_transform();
 }
 
 interpolation_system::cache& interpolation_system::get_cache_of(const entity_id id) {
@@ -93,7 +97,7 @@ void interpolation_system::integrate_interpolated_transforms(
 			const auto& ver = e.get_id().version;
 
 			if (recorded_pob == pob && recorded_ver == ver) {
-				integrated = actual.interp_separate(integrated, positional_averaging_constant, rotational_averaging_constant);
+				integrated = integrated.interp_separate(actual, positional_averaging_constant, rotational_averaging_constant);
 			}
 			else {
 				integrated = actual;

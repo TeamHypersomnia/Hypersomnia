@@ -77,7 +77,7 @@ int main(const int argc, const char* const * const argv) try {
 
 	augs::renderer renderer;
 
-	/* The logic will use it to push debug lines */
+	/* The logic will use renderer::get_current() to push debug lines */
 	renderer.set_as_current();
 
 	necessary_fbos fbos(
@@ -134,7 +134,7 @@ int main(const int argc, const char* const * const argv) try {
 		Resources that are loaded dynamically,
 		in accordance with the definitions provided by the current setup,
 		and in accordance with its chosen viewables_loading_type.
-		(May be for example streamed)
+		(May be for example loaded all at once or streamed)
 	*/
 
 	loaded_sounds game_sounds;
@@ -148,9 +148,12 @@ int main(const int argc, const char* const * const argv) try {
 
 	auto visit_current_setup = [&](auto&& callback) -> decltype(auto) {
 		if (current_setup.has_value()) {
-			return std::visit([&](auto& setup) -> decltype(auto) {
-				return callback(setup);
-			}, current_setup.value());
+			return std::visit(
+				[&](auto& setup) -> decltype(auto) {
+					return callback(setup);
+				}, 
+				current_setup.value()
+			);
 		}
 		else {
 			return callback(main_menu.value());
@@ -420,7 +423,18 @@ int main(const int argc, const char* const * const argv) try {
 			);
 		};
 
-		/* The centralized transformation of all window inputs. */
+		/* 
+			The centralized transformation of all window inputs.
+			No window inputs will be acquired and/or used beyond the scope of this lambda
+			(except remote packets, received by the client/server setups).
+			
+			This is necessary because we need some complicated interactions between multiple GUI contexts,
+			primarily in deciding what events should be propagated further, down to the gameplay itself.
+			It is the easiest if every possibility is considered in one place. 
+			We have decided that some stronger decoupling here would benefit nobody.
+
+			The result, which is the collection of new game commands, will be passed further down the loop. 
+		*/
 
 		const auto new_game_entropy = [&]() {
 			static game_intents game_intents;
@@ -433,9 +447,7 @@ int main(const int argc, const char* const * const argv) try {
 
 			new_window_entropy.clear();
 
-			/*
-				Generate release events if the previous frame so requested.
-			*/
+			/* Generate release events if the previous frame so requested. */
 
 			releases.append_releases(new_window_entropy, common_input_state);
 			releases = {};
@@ -503,6 +515,10 @@ int main(const int argc, const char* const * const argv) try {
 				if (ingame_menu.show) {
 					ingame_menu.world.unhover_and_undrag(create_menu_context(ingame_menu));
 				}
+			}
+			/* Maybe the game GUI was deactivated while the button was still hovered */
+			else if (!game_gui.active && current_setup.has_value()) {
+				game_gui.world.unhover_and_undrag(create_game_gui_context());
 			}
 
 			/* 

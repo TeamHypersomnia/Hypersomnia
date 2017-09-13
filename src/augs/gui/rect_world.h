@@ -87,39 +87,52 @@ namespace augs {
 
 			template <class C>
 			void unhover_and_undrag(const C context) {
-				gui_entropy entropies;
+				{
+					gui_entropy entropies;
 
-				if (context.alive(rect_hovered)) {
-					context(rect_hovered, [&](const auto& r) {
-						event::change ch;
-						raw_input_traversal dummy(ch);
+					if (context.alive(rect_held_by_lmb)) {
+						generate_gui_event(entropies, rect_held_by_lmb, gui_event::loutup);
 
-						r->unhover(context, r, dummy, entropies);
-					});
+						if (held_rect_is_dragged) {
+							generate_gui_event(entropies, rect_held_by_lmb, { gui_event::lfinisheddrag, 0, current_drag_amount });
+							held_rect_is_dragged = false;
+						}
 
-					rect_hovered = gui_element_variant_id();
-				}
-
-				if (context.alive(rect_held_by_lmb)) {
-					generate_gui_event(entropies, rect_held_by_lmb, gui_event::loutup);
-
-					if (held_rect_is_dragged) {
-						generate_gui_event(entropies, rect_held_by_lmb, { gui_event::lfinisheddrag, 0, current_drag_amount });
-						held_rect_is_dragged = false;
+						current_drag_amount.set(0, 0);
+						rect_held_by_lmb = gui_element_variant_id();
 					}
 
-					current_drag_amount.set(0, 0);
-					rect_held_by_lmb = gui_element_variant_id();
+					respond_to_events(context, entropies);
 				}
 
-				if (context.alive(rect_held_by_rmb)) {
-					generate_gui_event(entropies, rect_held_by_rmb, gui_event::routup);
+				{
+					gui_entropy entropies;
 
-					current_drag_amount.set(0, 0);
-					rect_held_by_rmb = gui_element_variant_id();
+					if (context.alive(rect_held_by_rmb)) {
+						generate_gui_event(entropies, rect_held_by_rmb, gui_event::routup);
+
+						current_drag_amount.set(0, 0);
+						rect_held_by_rmb = gui_element_variant_id();
+					}
+
+					respond_to_events(context, entropies);
 				}
 
-				respond_to_events(context, entropies);
+				{
+					gui_entropy entropies;
+					if (context.alive(rect_hovered)) {
+						context(rect_hovered, [&](const auto& r) {
+							event::change ch;
+							raw_input_traversal dummy(ch);
+
+							r->unhover(context, r, dummy, entropies);
+						});
+
+						rect_hovered = gui_element_variant_id();
+					}
+
+					respond_to_events(context, entropies);
+				}
 			}
 
 			template <class C>
@@ -283,6 +296,10 @@ namespace augs {
 				const C context, 
 				const gui_entropy& entropies
 			) {
+				if (entropies.entries.empty()) {
+					return;
+				}
+
 				context(context.get_root_id(), [&](const auto& r) {
 					r->respond_to_events(
 						context, 
