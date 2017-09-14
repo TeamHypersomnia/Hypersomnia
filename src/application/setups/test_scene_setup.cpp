@@ -21,6 +21,7 @@
 using namespace augs::event::keys;
 
 test_scene_setup::test_scene_setup(
+	sol::state& lua,
 	const bool make_minimal_test_scene,
 	const input_recording_type recording_type
 ) {
@@ -28,7 +29,7 @@ test_scene_setup::test_scene_setup(
 #if BUILD_TEST_SCENES
 	hypersomnia.reserve_storage_for_entities(3000u);
 
-	populate_test_scene_assets(logical_assets, viewable_defs);
+	populate_test_scene_assets(lua, logical_assets, viewable_defs);
 
 	if (make_minimal_test_scene) {
 		test_scenes::minimal_scene().populate_world_with_entities(

@@ -15,6 +15,10 @@
 
 struct config_lua_table;
 
+namespace sol {
+	class state;
+}
+
 class test_scene_setup {
 	cosmos hypersomnia;
 	cosmic_entropy total_collected_entropy;
@@ -30,6 +34,7 @@ public:
 	static constexpr bool can_viewables_change = false;
 
 	test_scene_setup(
+		sol::state& lua,
 		const bool make_minimal_test_scene,
 		const input_recording_type recording_type
 	);

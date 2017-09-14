@@ -6,5 +6,4 @@
 
 namespace augs {
 	sol::state create_lua_state();
-	sol::state& get_thread_local_lua_state();
 }

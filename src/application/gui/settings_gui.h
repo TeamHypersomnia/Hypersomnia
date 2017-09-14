@@ -10,6 +10,7 @@ public:
 	bool show = false;
 	
 	void perform(
+		sol::state& lua,
 		const augs::path_type& path_for_saving,
 		config_lua_table& into,
 		config_lua_table& last_saved

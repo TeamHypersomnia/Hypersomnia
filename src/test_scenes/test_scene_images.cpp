@@ -9,6 +9,7 @@
 #include "generated/introspectors.h"
 
 void load_test_scene_images(
+	sol::state& lua,
 	game_image_loadables_map& all_loadables,
 	game_image_metas_map& all_metas
 ) {
@@ -38,14 +39,14 @@ void load_test_scene_images(
 				const auto extra_loadables_path = augs::path_type(directory) += stem + ".extras.lua";
 				augs::file_exists(extra_loadables_path)
 			) {
-				augs::load_from_lua_table(loadables.extras, extra_loadables_path);
+				augs::load_from_lua_table(lua, loadables.extras, extra_loadables_path);
 			}
 
 			if (
 				const auto meta_path = augs::path_type(directory) += stem + ".meta.lua";
 				augs::file_exists(meta_path)
 			) {
-				augs::load_from_lua_table(meta, meta_path);
+				augs::load_from_lua_table(lua, meta, meta_path);
 			}
 		}
 		catch (augs::lua_deserialization_error err) {

@@ -388,12 +388,11 @@ namespace augs {
 
 	template <class T, class... SaverArgs>
 	void save_as_lua_table(
+		sol::state& lua,
 		T&& object, 
 		const path_type& target_path, 
 		SaverArgs&&... args
 	) {
-		auto& lua = augs::get_thread_local_lua_state();
-
 		auto output_table = lua.create_named_table("my_table");
 		augs::write(output_table, std::forward<T>(object));
 
@@ -408,11 +407,12 @@ namespace augs {
 
 	template <class T>
 	void load_from_lua_table(
+		sol::state& lua,
 		T& object,
 		const path_type& source_path
 	) {
 		try {
-			auto pfr = get_thread_local_lua_state().do_string(
+			auto pfr = lua.do_string(
 				augs::get_file_contents(source_path)
 			);
 
@@ -437,9 +437,9 @@ namespace augs {
 	}
 
 	template <class T>
-	T load_from_lua_table(const path_type& source_path) {
+	T load_from_lua_table(sol::state& lua, const path_type& source_path) {
 		T object;
-		load_from_lua_table<T>(object, source_path);
+		load_from_lua_table<T>(lua, object, source_path);
 		return object;
 	}
 }

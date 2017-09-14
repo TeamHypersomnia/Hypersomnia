@@ -44,6 +44,7 @@ void configuration_subscribers::apply(const config_lua_table& new_config) const 
 #define CONFIG_NVP(x) format_field_name(std::string(#x)) + "##" + std::to_string(field_id++), config.x
 
 void settings_gui_state::perform(
+	sol::state& lua,
 	const augs::path_type& config_path_for_saving,
 	config_lua_table& config,
 	config_lua_table& last_saved_config
@@ -61,7 +62,7 @@ void settings_gui_state::perform(
 	using namespace augs::imgui;
 	const auto disp = augs::get_display();
 
-	thread_local std::vector<const char*> tabs = { 
+	static std::array<const char*, 7> tabs = { 
 		"Window", "Graphics", "Audio", "Controls", "Gameplay", "GUI styles", "Debug" 
 	};
 
@@ -241,7 +242,7 @@ void settings_gui_state::perform(
 			if (ImGui::Button("Save settings")) {
 				augs::timer save_timer;
 				last_saved_config = config;
-				config.save(config_path_for_saving);
+				config.save(lua, config_path_for_saving);
 				LOG("Saved new config in: %x ms", save_timer.get<std::chrono::milliseconds>());
 			}
 

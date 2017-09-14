@@ -124,6 +124,7 @@ augs::path_type get_procedural_image_path(const augs::path_type& from_source_pat
 }
 
 necessary_image_loadables_map::necessary_image_loadables_map(
+	sol::state& lua,
 	const augs::path_type& directory,
 	const bool force_regenerate
 ) {
@@ -149,6 +150,7 @@ necessary_image_loadables_map::necessary_image_loadables_map(
 		) {
 			try {
 				augs::load_from_lua_table(
+					lua,
 					definition_template,
 					additional_properties_path
 				);
@@ -177,7 +179,7 @@ necessary_image_loadables_map::necessary_image_loadables_map(
 			procedural_image_definition def;
 
 			try {
-				augs::load_from_lua_table(def, procedural_definition_path);
+				augs::load_from_lua_table(lua, def, procedural_definition_path);
 			}
 			catch (augs::lua_deserialization_error err) {
 				throw necessary_resource_loading_error(

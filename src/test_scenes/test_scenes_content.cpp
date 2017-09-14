@@ -3,12 +3,14 @@
 #include "test_scenes/test_scenes_content.h"
 
 void populate_test_scene_assets(
+	sol::state& lua,
 	all_logical_assets& output_logicals,
 	all_viewables_defs& output_sources
 ) {
 #if BUILD_TEST_SCENES
 	try {
 		load_test_scene_images(
+			lua,
 			output_sources.game_image_loadables,
 			output_sources.game_image_metas
 		);

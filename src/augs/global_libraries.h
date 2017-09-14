@@ -24,8 +24,16 @@ namespace augs {
 #endif
 
 		global_libraries(const library_flagset = { library::FREETYPE, library::ENET });
+		
+		global_libraries(const global_libraries&) = delete;
+		global_libraries& operator=(const global_libraries&) = delete;
+
+		global_libraries(global_libraries&&) = delete;
+		global_libraries& operator=(global_libraries&&) = delete;
+		
+		~global_libraries();
+
 		void init		(const library_flagset = { library::FREETYPE, library::ENET });
 		void deinit		(const library_flagset = { library::FREETYPE, library::ENET });
-		~global_libraries();
 	};
 };

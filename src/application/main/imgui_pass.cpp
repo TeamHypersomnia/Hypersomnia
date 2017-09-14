@@ -13,6 +13,7 @@ void perform_imgui_pass(
 	config_lua_table& last_saved_config,
 	const augs::path_type& path_for_saving_config,
 	settings_gui_state& settings_gui,
+	sol::state& lua,
 	std::function<void()> custom_imgui_logic,
 
 	const bool ingame_menu_active,
@@ -63,6 +64,7 @@ void perform_imgui_pass(
 		!should_hide_settings
 	) {
 		settings_gui.perform(
+			lua,
 			path_for_saving_config,
 			config,
 			last_saved_config

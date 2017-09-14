@@ -60,9 +60,13 @@ struct config_read_error : public std::runtime_error {
 using app_intent_map = augs::enum_associative_array<augs::event::keys::key, app_intent_type>;
 using game_gui_intent_map = augs::enum_associative_array<augs::event::keys::key, game_gui_intent_type>;
 
+namespace sol {
+	class state;
+}
+
 struct config_lua_table {
 	config_lua_table() = default;
-	config_lua_table(const augs::path_type& config_lua_path);
+	config_lua_table(sol::state&, const augs::path_type& config_lua_path);
 
 	// GEN INTROSPECTOR struct config_lua_table
 	launch_type launch_mode = launch_type::TEST_SCENE;
@@ -120,5 +124,5 @@ struct config_lua_table {
 	launch_type get_launch_mode() const;
 	input_recording_type get_input_recording_mode() const;
 
-	void save(const augs::path_type& target_path) const;
+	void save(sol::state&, const augs::path_type& target_path) const;
 };

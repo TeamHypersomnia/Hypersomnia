@@ -56,7 +56,9 @@ int main(const int argc, const char* const * const argv) try {
 		"generated/imgui_log.txt"
 	);
 
-	auto config = config_lua_table(augs::switch_path(
+	static auto lua = augs::create_lua_state();
+
+	auto config = config_lua_table(lua, augs::switch_path(
 		canon_config_path,
 		local_config_path
 	));
@@ -95,11 +97,12 @@ int main(const int argc, const char* const * const argv) try {
 	);
 
 	necessary_image_loadables_map images(
+		lua,
 		"content/necessary/gfx/",
 		config.content_regeneration.regenerate_every_launch
 	);
 	
-	auto imgui_atlas = augs::imgui::create_atlas();
+	const auto imgui_atlas = augs::imgui::create_atlas();
 
 	const auto configurables = configuration_subscribers {
 		window,
@@ -198,13 +201,14 @@ int main(const int argc, const char* const * const argv) try {
 		switch (mode) {
 			case launch_type::MAIN_MENU:
 				if (!main_menu.has_value()) {
-					main_menu.emplace(config.main_menu);
+					main_menu.emplace(lua, config.main_menu);
 				}
 
 				break;
 
 			case launch_type::TEST_SCENE:
 				current_setup.emplace(std::in_place_type_t<test_scene_setup>(),
+					lua,
 					config.session.create_minimal_test_scene,
 					config.get_input_recording_mode()
 				);
@@ -468,6 +472,7 @@ int main(const int argc, const char* const * const argv) try {
 				last_saved_config,
 				local_config_path,
 				settings_gui,
+				lua,
 				[&]() {
 					/*
 						The editor setup might want to use IMGUI to create views of entities or resources,

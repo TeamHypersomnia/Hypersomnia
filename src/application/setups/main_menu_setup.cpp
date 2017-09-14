@@ -69,9 +69,10 @@ void main_menu_setup::launch_creators_screen() {
 #endif
 }
 
-main_menu_setup::main_menu_setup(const main_menu_settings settings) : menu_theme(settings.menu_theme_path) {
-	auto& lua = augs::get_thread_local_lua_state();
-	
+main_menu_setup::main_menu_setup(
+	sol::state& lua,
+	const main_menu_settings settings
+) : menu_theme(settings.menu_theme_path) {
 	if (settings.skip_credits) {
 		gui.show = true;
 	}
@@ -126,6 +127,8 @@ main_menu_setup::main_menu_setup(const main_menu_settings settings) : menu_theme
 		}
 	});
 
+	latest_news_query.join();
+
 	// TODO: actually load a cosmos with its resources from a file/folder
 	const bool is_intro_scene_available = settings.menu_intro_scene_cosmos_path.string().size() > 0;
 
@@ -134,7 +137,7 @@ main_menu_setup::main_menu_setup(const main_menu_settings settings) : menu_theme
 #if BUILD_TEST_SCENES
 		intro_scene.reserve_storage_for_entities(3000u);
 
-		populate_test_scene_assets(logical_assets, viewable_defs);
+		populate_test_scene_assets(lua, logical_assets, viewable_defs);
 
 		test_scenes::testbed().populate_world_with_entities(
 			intro_scene,

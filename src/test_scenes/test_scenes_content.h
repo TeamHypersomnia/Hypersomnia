@@ -19,7 +19,13 @@ void load_test_scene_particle_effects(
 	const game_image_loadables_map&,
 	particle_effects_map&
 );
+
+namespace sol {
+	class state;
+}
+
 void load_test_scene_images(
+	sol::state& lua,
 	game_image_loadables_map&,
 	game_image_metas_map&
 );
@@ -29,6 +35,7 @@ void load_test_scene_physical_materials(all_logical_assets&);
 void load_test_scene_recoil_players(all_logical_assets&);
 
 void populate_test_scene_assets(
+	sol::state& lua,
 	all_logical_assets& output_logicals,
 	all_viewables_defs& output_sources
 );

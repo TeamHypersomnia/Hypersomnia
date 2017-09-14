@@ -24,6 +24,10 @@
 
 struct config_lua_table;
 
+namespace sol {
+	class state;
+}
+
 class main_menu_setup {
 	cosmos intro_scene;
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
@@ -58,7 +62,7 @@ public:
 
 	main_menu_gui gui;
 
-	main_menu_setup(const main_menu_settings);
+	main_menu_setup(sol::state&, const main_menu_settings);
 
 	auto get_audiovisual_speed() const {
 		return timer.get_stepping_speed_multiplier();
