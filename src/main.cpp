@@ -45,6 +45,15 @@
 #include "hypersomnia_version.h"
 #include "generated/introspectors.h"
 
+/*
+	Static is used for variables because some are huge, especially setups.
+	On the other hand, to preserve the destruction in the order of definition,
+	we must make all variables static, otherwise huge resources would get destructed last,
+	possibly causing bugs.
+
+	Main will also be called only once.
+*/
+
 int main(const int argc, const char* const * const argv) try {
 	static const auto canon_config_path = augs::path_type("config.lua");
 	static const auto local_config_path = augs::path_type("config.local.lua");
@@ -193,6 +202,8 @@ int main(const int argc, const char* const * const argv) try {
 	static auto launch = [](const launch_type mode) {
 		LOG("Launch mode: %x", augs::enum_to_string(mode));
 		
+		audiovisuals.get<sound_system>().clear_all();
+
 		current_setup = std::nullopt;
 		ingame_menu.show = false;
 

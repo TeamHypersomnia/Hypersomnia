@@ -12,6 +12,11 @@
 
 #include "augs/audio/audio_settings.h"
 
+void sound_system::clear_all() {
+	per_entity_cache.clear();
+	fading_sources.clear();
+}
+
 void sound_system::erase_caches_for_dead_entities(const cosmos& new_cosmos) {
 	std::vector<entity_id> to_erase;
 
