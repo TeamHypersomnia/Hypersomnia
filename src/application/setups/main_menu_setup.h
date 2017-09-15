@@ -1,9 +1,12 @@
 #pragma once
 #include <thread>
 #include <mutex>
+#include <future>
 #include <string>
 
 #include <sol2/sol.hpp>
+
+#include "augs/templates/thread_templates.h"
 
 #include "augs/misc/action_list.h"
 #include "augs/misc/fixed_delta_timer.h"
@@ -29,6 +32,8 @@ namespace sol {
 }
 
 class main_menu_setup {
+	std::shared_future<std::wstring> latest_news;
+
 	cosmos intro_scene;
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 	cosmic_entropy total_collected_entropy;
@@ -40,11 +45,6 @@ class main_menu_setup {
 
 	augs::sound_source menu_theme_source;
 	augs::single_sound_buffer menu_theme;
-
-	std::thread latest_news_query;
-
-	std::mutex news_mut;
-	std::wstring downloaded_news_text;
 
 	bool draw_menu_gui = false;
 	bool roll_news = false;
@@ -63,6 +63,8 @@ public:
 	main_menu_gui gui;
 
 	main_menu_setup(sol::state&, const main_menu_settings);
+
+	void query_latest_news(const std::string& url);
 
 	auto get_audiovisual_speed() const {
 		return timer.get_stepping_speed_multiplier();

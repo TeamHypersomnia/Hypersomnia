@@ -10,6 +10,7 @@
 #include "augs/audio/sound_source.h"
 
 #include "augs/gui/text/caret.h"
+#include "augs/gui/text/printer.h"
 #include "augs/drawing/drawing.h"
 
 #include "game/assets/all_logical_assets.h"
@@ -69,10 +70,35 @@ void main_menu_setup::launch_creators_screen() {
 #endif
 }
 
+void main_menu_setup::query_latest_news(const std::string& url) {
+	latest_news = std::async(std::launch::async, []() noexcept {
+		auto html = augs::http_get_request("http://hypersomnia.pl/latest_post/");
+		const auto delimiter = std::string("newsbegin");
+
+		const auto it = html.find(delimiter);
+
+		if (it != std::string::npos) {
+			html = html.substr(it + delimiter.length());
+
+			str_ops(html)
+				.multi_replace_all({ "\r", "\n" }, "")
+			;
+
+			if (html.size() > 0) {
+				return to_wstring(html);
+			}
+		}
+
+		return std::wstring(L"Couldn't download and/or parse the latest news.");
+	});
+}
+
 main_menu_setup::main_menu_setup(
 	sol::state& lua,
 	const main_menu_settings settings
 ) : menu_theme(settings.menu_theme_path) {
+	query_latest_news(settings.latest_news_url);
+
 	if (settings.skip_credits) {
 		gui.show = true;
 	}
@@ -102,32 +128,6 @@ main_menu_setup::main_menu_setup(
 		menu_theme_source.set_gain(0.f);
 		menu_theme_source.play();
 	}
-
-	latest_news_query = std::thread([&]() {
-		auto result = augs::http_get_request(settings.latest_news_url);
-		const std::string delim = "newsbegin";
-
-		const auto it = result.find(delim);
-
-		if (it == std::string::npos) {
-			return;
-		}
-
-		result = result.substr(it + delim.length());
-
-		str_ops(result)
-			.multi_replace_all({ "\r", "\n" }, "")
-		;
-
-		if (result.size() > 0) {
-			const auto wresult = to_wstring(result);
-
-			std::unique_lock<std::mutex> lck(news_mut);
-			downloaded_news_text = wresult;
-		}
-	});
-
-	latest_news_query.join();
 
 	// TODO: actually load a cosmos with its resources from a file/folder
 	const bool is_intro_scene_available = settings.menu_intro_scene_cosmos_path.string().size() > 0;
@@ -201,4 +201,12 @@ void main_menu_setup::draw_overlays(
 	game_logo_rect.set_size(game_logo_size);
 
 	output.aabb(game_logo, game_logo_rect);
+
+	if (is_ready(latest_news)) {
+		augs::gui::text::print_stroked(
+			output,
+			{ 0, 0 },
+			{ latest_news.get(), { gui_font, cyan } }
+		);
+	};
 }

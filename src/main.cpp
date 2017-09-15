@@ -46,12 +46,12 @@
 #include "generated/introspectors.h"
 
 /*
-	Static is used for variables because some are huge, especially setups.
+	static is used for variables because some are huge, especially setups.
 	On the other hand, to preserve the destruction in the order of definition,
-	we must make all variables static, otherwise huge resources would get destructed last,
-	possibly causing bugs.
+	we must make all variables static, otherwise the huge resources marked static
+	would get destructed last, possibly causing bugs.
 
-	Main will also be called only once.
+	main will also be called only once.
 */
 
 int main(const int argc, const char* const * const argv) try {
@@ -76,11 +76,6 @@ int main(const int argc, const char* const * const argv) try {
 
 	augs::run_unit_tests(argc, argv, config.unit_tests);
 	augs::generate_alsoft_ini(config.audio.max_number_of_sound_sources);
-
-	/* 
-		All resources that are initialized once,
-		and persist for the duration of the program. 
-	*/
 
 	static const augs::global_libraries libraries;
 	
