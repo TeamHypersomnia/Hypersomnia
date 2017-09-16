@@ -232,15 +232,14 @@ public:
 	std::size_t get_maximum_entities() const;
 	std::wstring summary() const;
 
-	double get_total_time_passed_in_seconds(const double view_interpolation_ratio) const;
-	double get_total_time_passed_in_seconds() const;
+	double get_total_seconds_passed(const double view_interpolation_ratio) const;
+	double get_total_seconds_passed() const;
 	decltype(augs::stepped_timestamp::step) get_total_steps_passed() const;
 
 	augs::stepped_timestamp get_timestamp() const;
 
 	const augs::delta& get_fixed_delta() const;
-	void set_fixed_delta(const augs::delta&);
-	void set_fixed_delta(const unsigned steps_per_second);
+	void set_steps_per_second(const unsigned steps_per_second);
 
 	cosmos_common_state& get_common_state();
 	const cosmos_common_state& get_common_state() const;

@@ -25,7 +25,7 @@ test_scene_setup::test_scene_setup(
 	const bool make_minimal_test_scene,
 	const input_recording_type recording_type
 ) {
-	hypersomnia.set_fixed_delta(60);
+	hypersomnia.set_steps_per_second(60);
 #if BUILD_TEST_SCENES
 	hypersomnia.reserve_storage_for_entities(3000u);
 
@@ -51,11 +51,9 @@ test_scene_setup::test_scene_setup(
 
 	if (recording_type != input_recording_type::DISABLED) {
 		if (player.try_to_load_or_save_new_session("generated/sessions/", "recorded.inputs")) {
-			timer.set_stepping_speed_multiplier(1.f);
+
 		}
 	}
-
-	timer.reset_timer();
 }
 
 void test_scene_setup::control(const cosmic_entropy& events) {

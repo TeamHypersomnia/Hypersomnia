@@ -23,7 +23,7 @@ public:
 	void load(const std::string& directory);
 
 	auto get_audiovisual_speed() const {
-		return timer.get_stepping_speed_multiplier();
+		return 1.0;
 	}
 
 	auto get_interpolation_ratio() const {
@@ -43,7 +43,7 @@ public:
 		F&& advance_audiovisuals, 
 		G&& step_post_solve
 	) {
-		auto steps = timer.count_logic_steps_to_perform(subject_cosmos.get_fixed_delta());
+		auto steps = timer.extract_num_of_logic_steps(subject_cosmos.get_fixed_delta());
 
 		if (!steps) {
 			advance_audiovisuals();

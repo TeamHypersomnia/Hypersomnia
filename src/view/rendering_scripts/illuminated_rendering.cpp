@@ -40,7 +40,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	const auto& flying_numbers = in.audiovisuals.get<flying_number_indicator_system>();
 	const auto& highlights = in.audiovisuals.get<pure_color_highlight_system>();
 	const auto& thunders = in.audiovisuals.get<thunder_system>();
-	const auto global_time_seconds = cosmos.get_total_time_passed_in_seconds(in.interpolation_ratio);
+	const auto global_time_seconds = cosmos.get_total_seconds_passed(in.interpolation_ratio);
 	const auto settings = in.drawing;
 	const auto matrix = augs::orthographic_projection(camera.visible_world_area);
 	const auto& visible_per_layer = in.visible.per_layer;

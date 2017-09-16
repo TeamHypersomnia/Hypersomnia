@@ -33,6 +33,7 @@ namespace sol {
 
 class main_menu_setup {
 	std::shared_future<std::wstring> latest_news;
+	vec2 latest_news_pos = { 0.f, 0.f };
 
 	cosmos intro_scene;
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
@@ -67,7 +68,7 @@ public:
 	void query_latest_news(const std::string& url);
 
 	auto get_audiovisual_speed() const {
-		return timer.get_stepping_speed_multiplier();
+		return 1.0;
 	}
 
 	auto get_interpolation_ratio() const {
@@ -101,11 +102,16 @@ public:
 
 	template <class F, class Pre, class Post>
 	void advance(
+		const augs::delta frame_delta,
 		F&& advance_audiovisuals,
 		Pre&& step_pre_solve,
 		Post&& step_post_solve
 	) {
-		auto steps = timer.count_logic_steps_to_perform(intro_scene.get_fixed_delta());
+		latest_news_pos.x += frame_delta.per_second(50.f);
+
+		timer.advance(frame_delta);
+
+		auto steps = timer.extract_num_of_logic_steps(intro_scene.get_fixed_delta());
 
 		if (!steps) {
 			advance_audiovisuals();

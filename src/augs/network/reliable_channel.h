@@ -51,7 +51,7 @@ namespace augs {
 			reliable_receiver receiver;
 			reliable_sender sender;
 
-			augs::timer last_received_packet;
+			timer last_received_packet;
 
 			bool timed_out(const size_t max_unacknowledged_sequences = 120) const;
 

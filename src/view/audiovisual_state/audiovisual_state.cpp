@@ -22,7 +22,7 @@ void audiovisual_state::reserve_caches_for_entities(const std::size_t n) {
 void audiovisual_state::advance(const audiovisual_advance_input input) {
 	const auto& cosm = input.cosmos_to_sample;
 	const auto& all_visible = input.all_visible;
-	const auto dt = augs::delta(static_cast<float>(timer.extract<std::chrono::milliseconds>() * input.speed_multiplier));
+	const auto dt = timer.extract_delta() *= input.speed_multiplier;
 
 	reserve_caches_for_entities(cosm.get_aggregate_pool().capacity());
 

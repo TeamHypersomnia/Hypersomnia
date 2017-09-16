@@ -1,6 +1,6 @@
 #pragma once
 #include "augs/math/vec2.h"
-#include "augs/misc/timer.h"
+#include "augs/misc/delta.h"
 
 namespace augs {
 	template <class T>
@@ -16,6 +16,6 @@ namespace augs {
 		vec2 value;
 		vec2 target_value;
 
-		void tick(const double delta_seconds, const smoothing_settings<double>);
+		void tick(const delta dt, const smoothing_settings<double>);
 	};
 }

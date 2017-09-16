@@ -16,8 +16,6 @@
 #include "game/components/rotation_copying_component.h"
 #include "game/components/transform_component.h"
 
-#include "augs/misc/timer.h"
-
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/logic_step.h"
 #include "game/transcendental/cosmos.h"
@@ -86,8 +84,9 @@ float rotation_copying_system::resolve_rotation_copying_value(const const_entity
 	auto& cosmos = it.get_cosmos();
 	const auto target = cosmos[rotation_copying.target];
 
-	if (target.dead())
+	if (target.dead()) {
 		return 0.f;
+	}
 
 	float new_angle = 0.f;
 

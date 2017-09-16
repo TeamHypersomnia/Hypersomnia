@@ -40,7 +40,7 @@ public:
 	);
 
 	auto get_audiovisual_speed() const {
-		return timer.get_stepping_speed_multiplier();
+		return 1.0;
 	}
 
 	auto get_interpolation_ratio() const {
@@ -77,11 +77,13 @@ public:
 
 	template <class F, class Pre, class Post>
 	void advance(
+		const augs::delta frame_delta,
 		F&& advance_audiovisuals, 
 		Pre&& step_pre_solve,
 		Post&& step_post_solve
 	) {
-		auto steps = timer.count_logic_steps_to_perform(hypersomnia.get_fixed_delta());
+		timer.advance(frame_delta);
+		auto steps = timer.extract_num_of_logic_steps(hypersomnia.get_fixed_delta());
 
 		if (!steps) {
 			advance_audiovisuals();

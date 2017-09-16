@@ -11,10 +11,14 @@ namespace sol {
 	class state;
 }
 
+namespace augs {
+	class delta;
+}
+
 void perform_imgui_pass(
 	augs::local_entropy& window_inputs,
 	const configuration_subscribers dependencies,
-	const float delta_seconds,
+	const augs::delta delta,
 	config_lua_table& config,
 	config_lua_table& last_saved_config,
 	const augs::path_type& path_for_saving_config,

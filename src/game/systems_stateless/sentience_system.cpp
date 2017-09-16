@@ -460,7 +460,7 @@ void sentience_system::cooldown_aimpunches(const logic_step step) const {
 }
 
 void sentience_system::set_borders(const logic_step step) const {
-	const auto timestamp_ms = static_cast<int>(step.cosm.get_total_time_passed_in_seconds() * 1000.0);
+	const auto timestamp_ms = static_cast<int>(step.cosm.get_total_seconds_passed() * 1000.0);
 	
 	step.cosm.for_each(
 		processing_subjects::WITH_SENTIENCE,

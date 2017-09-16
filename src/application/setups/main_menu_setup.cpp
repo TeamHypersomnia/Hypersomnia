@@ -71,6 +71,10 @@ void main_menu_setup::launch_creators_screen() {
 }
 
 void main_menu_setup::query_latest_news(const std::string& url) {
+	if (latest_news.valid()) {
+		latest_news.wait();
+	}
+
 	latest_news = std::async(std::launch::async, []() noexcept {
 		auto html = augs::http_get_request("http://hypersomnia.pl/latest_post/");
 		const auto delimiter = std::string("newsbegin");
@@ -133,7 +137,7 @@ main_menu_setup::main_menu_setup(
 	const bool is_intro_scene_available = settings.menu_intro_scene_cosmos_path.string().size() > 0;
 
 	if (is_intro_scene_available) {
-		intro_scene.set_fixed_delta(60);
+		intro_scene.set_steps_per_second(60);
 #if BUILD_TEST_SCENES
 		intro_scene.reserve_storage_for_entities(3000u);
 
@@ -157,8 +161,6 @@ main_menu_setup::main_menu_setup(
 	const bool is_recording_available = is_intro_scene_available && director.is_recording_available();
 	initial_step_number = intro_scene.get_total_steps_passed();
 
-	timer.reset_timer();
-
 	for (auto& m : gui.root.buttons) {
 		m.hover_highlight_maximum_distance = 10.f;
 		m.hover_highlight_duration_ms = 300.f;
@@ -175,7 +177,7 @@ main_menu_setup::main_menu_setup(
 	gui.root.buttons[main_menu_button_type::QUIT].set_appearing_caption(L"Quit");
 
 	if (is_recording_available) {
-		while (intro_scene.get_total_time_passed_in_seconds() < settings.rewind_intro_scene_by_secs) {
+		while (intro_scene.get_total_seconds_passed() < settings.rewind_intro_scene_by_secs) {
 			const auto entropy = cosmic_entropy(director.get_entropy_for_step(intro_scene.get_total_steps_passed() - initial_step_number), intro_scene);
 
 			intro_scene.advance(
@@ -203,10 +205,10 @@ void main_menu_setup::draw_overlays(
 	output.aabb(game_logo, game_logo_rect);
 
 	if (is_ready(latest_news)) {
-		augs::gui::text::print_stroked(
+		print_stroked(
 			output,
-			{ 0, 0 },
-			{ latest_news.get(), { gui_font, cyan } }
+			latest_news_pos,
+			from_bbcode ( latest_news.get(), { gui_font, cyan } )
 		);
 	};
 }

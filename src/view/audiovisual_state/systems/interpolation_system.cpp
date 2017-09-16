@@ -69,8 +69,8 @@ void interpolation_system::integrate_interpolated_transforms(
 			auto& integrated = get_interpolated(e);
 			auto& cache = per_entity_cache[linear_cache_key(e)];
 
-			const float considered_positional_speed = settings.speed / (sqrt(cache.positional_slowdown_multiplier));
-			const float considered_rotational_speed = settings.speed / (sqrt(cache.rotational_slowdown_multiplier));
+			const auto considered_positional_speed = settings.speed / (sqrt(cache.positional_slowdown_multiplier));
+			const auto considered_rotational_speed = settings.speed / (sqrt(cache.rotational_slowdown_multiplier));
 
 			if (cache.positional_slowdown_multiplier > 1.f) {
 				cache.positional_slowdown_multiplier -= slowdown_multipliers_decrease / 4;
@@ -88,8 +88,8 @@ void interpolation_system::integrate_interpolated_transforms(
 				}
 			}
 
-			const float positional_averaging_constant = 1.0f - static_cast<float>(pow(info.base_exponent, considered_positional_speed * seconds));
-			const float rotational_averaging_constant = 1.0f - static_cast<float>(pow(info.base_exponent, considered_rotational_speed * seconds));
+			const auto positional_averaging_constant = 1.0f - static_cast<float>(pow(info.base_exponent, considered_positional_speed * seconds));
+			const auto rotational_averaging_constant = 1.0f - static_cast<float>(pow(info.base_exponent, considered_rotational_speed * seconds));
 
 			auto& recorded_pob = cache.recorded_place_of_birth;
 			auto& recorded_ver = cache.recorded_version;

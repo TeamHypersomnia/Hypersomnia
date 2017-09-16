@@ -175,14 +175,12 @@ rng_seed_type cosmos::get_rng_seed_for(const entity_id id) const {
 	return get_handle(id).get_guid() + transform_hash;
 }
 
-double cosmos::get_total_time_passed_in_seconds(const double view_interpolation_ratio) const {
-	const auto double_dt = static_cast<double>(significant.meta.delta.in_seconds());
-
-	return get_total_time_passed_in_seconds() + double_dt * view_interpolation_ratio;
+double cosmos::get_total_seconds_passed(const double view_interpolation_ratio) const {
+	return get_total_seconds_passed() + get_fixed_delta().per_second(view_interpolation_ratio);
 }
 
-double cosmos::get_total_time_passed_in_seconds() const {
-	return significant.meta.now.step * static_cast<double>(significant.meta.delta.in_seconds());
+double cosmos::get_total_seconds_passed() const {
+	return significant.meta.now.step * get_fixed_delta().in_seconds<double>();
 }
 
 decltype(augs::stepped_timestamp::step) cosmos::get_total_steps_passed() const {
@@ -197,12 +195,8 @@ const augs::delta& cosmos::get_fixed_delta() const {
 	return significant.meta.delta;
 }
 
-void cosmos::set_fixed_delta(const augs::delta& dt) {
-	significant.meta.delta = dt;
-}
-
-void cosmos::set_fixed_delta(const unsigned steps_per_second) {
-	significant.meta.delta = static_cast<float>(1000.f / steps_per_second);
+void cosmos::set_steps_per_second(const unsigned steps_per_second) {
+	significant.meta.delta = augs::delta(steps_per_second);
 }
 
 entity_handle cosmos::allocate_new_entity() {

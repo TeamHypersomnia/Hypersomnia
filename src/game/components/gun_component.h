@@ -2,7 +2,6 @@
 #include <cstddef>
 #include "augs/pad_bytes.h"
 
-#include "augs/misc/timer.h"
 #include "augs/misc/stepped_timing.h"
 #include "augs/misc/minmax.h"
 

@@ -1,5 +1,4 @@
 #include "dragger.h"
-#include "augs/misc/timer.h"
 
 namespace augs {
 	namespace gui {

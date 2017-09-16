@@ -1,6 +1,5 @@
 #pragma once
 #include "augs/math/vec2.h"
-#include "augs/misc/timer.h"
 
 #include "augs/graphics/rgba.h"
 #include "augs/graphics/vertex.h"
@@ -18,8 +17,6 @@ namespace augs {
 		debug_lines frame_lines;
 		debug_lines prev_logic_step_lines;
 		
-		timer line_timer;
-
 		GLuint position_buffer_id = 0xdeadbeef;
 		GLuint texcoord_buffer_id = 0xdeadbeef;
 		GLuint color_buffer_id = 0xdeadbeef;

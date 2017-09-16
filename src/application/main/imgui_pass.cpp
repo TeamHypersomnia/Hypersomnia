@@ -1,4 +1,5 @@
 #include "augs/misc/imgui_utils.h"
+#include "augs/misc/delta.h"
 #include "augs/window_framework/window.h"
 
 #include "application/config_lua_table.h"
@@ -8,7 +9,7 @@
 void perform_imgui_pass(
 	augs::local_entropy& window_inputs,
 	const configuration_subscribers dependencies,
-	const float delta_seconds,
+	const augs::delta delta,
 	config_lua_table& config,
 	config_lua_table& last_saved_config,
 	const augs::path_type& path_for_saving_config,
@@ -29,7 +30,7 @@ void perform_imgui_pass(
 
 	augs::imgui::setup_input(
 		window_inputs,
-		delta_seconds,
+		delta.in_seconds<double>(),
 		dependencies.window.get_screen_size()
 	);
 	

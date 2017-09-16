@@ -244,7 +244,7 @@ void value_bar::advance_elements(
 	this_id->seconds_accumulated += dt.in_seconds();
 
 	if (this_id->particles.size() > 0) {
-		randomization rng(static_cast<std::size_t>(this_id.get_location().vertical_index + context.get_cosmos().get_total_time_passed_in_seconds() * 1000));
+		randomization rng(static_cast<std::size_t>(this_id.get_location().vertical_index + context.get_cosmos().get_total_seconds_passed() * 1000));
 
 		const auto value_bar_size = get_value_bar_rect(context, this_id, this_id->rc).get_size();
 

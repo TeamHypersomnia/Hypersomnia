@@ -81,7 +81,7 @@ TEST_CASE("CosmicDelta2 PaddingTest") {
 		);
 	};
 
-	auto padding_checker = [&](auto c) {
+	auto padding_checker = [&](auto c, auto... args) {
 		using checked_type = decltype(c);
 		static_assert(std::is_same_v<std::decay_t<checked_type>, checked_type>, "Something's wrong with the types");
 
@@ -102,8 +102,8 @@ TEST_CASE("CosmicDelta2 PaddingTest") {
 			// it looks like the placement new may zero-out the memory before allocation.
 			// we will leave this test as it is useful anyway.
 
-			new (buf1) checked_type();
-			new (buf2) checked_type();
+			new (buf1) checked_type(args...);
+			new (buf2) checked_type(args...);
 
 			int iter = 0;
 			bool same = true;
@@ -132,8 +132,8 @@ TEST_CASE("CosmicDelta2 PaddingTest") {
 
 			// test by delta
 			{
-				checked_type a;
-				checked_type b;
+				checked_type a(args...);
+				checked_type b(args...);
 
 				const auto dt = augs::object_delta<checked_type>(a, b);
 
@@ -154,11 +154,11 @@ TEST_CASE("CosmicDelta2 PaddingTest") {
 			}
 
 			// prove by introspection that all members are directly next to each other in memory
-			const auto breaks = determine_breaks_in_fields_continuity_by_introspection(checked_type());
+			const auto breaks = determine_breaks_in_fields_continuity_by_introspection(checked_type(args...));
 
 			if (breaks.size() > 0) {
 				LOG(breaks);
-				LOG(describe_fields(checked_type()));
+				LOG(describe_fields(checked_type(args...)));
 
 				FAIL(typesafe_sprintf(
 					"Padding is wrong, or a variable is uninitialized in %x\nsizeof: %x\n", 
@@ -183,7 +183,10 @@ TEST_CASE("CosmicDelta2 PaddingTest") {
 		augs::recursive([&](auto&& self, auto, auto m) {
 			using T = std::decay_t<decltype(m)>;
 
-			if constexpr(augs::is_byte_io_safe_v<augs::stream, T> && !is_introspective_leaf_v<T>) {
+			if constexpr(std::is_same_v<T, augs::delta>) {
+				padding_checker(m, 0u);
+			}
+			else if constexpr(augs::is_byte_io_safe_v<augs::stream, T> && !is_introspective_leaf_v<T>) {
 				padding_checker(m);
 			}
 			else if constexpr(has_introspect_v<T>){

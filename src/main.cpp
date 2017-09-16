@@ -376,6 +376,11 @@ int main(const int argc, const char* const * const argv) try {
 	static session_profiler profiler;
 	static visible_entities all_visible;
 
+	/* 
+		The audiovisual_step, advance_setup and advance_current_setup lambdas
+		are separated only because MSVC outputs ICEs if they become nested.
+	*/
+
 	static auto audiovisual_step = [](
 		auto& setup,
 		const config_lua_table& viewing_config
@@ -408,16 +413,19 @@ int main(const int argc, const char* const * const argv) try {
 	};
 
 	static auto advance_setup = [](
+		const augs::delta frame_delta,
 		auto& setup,
 		const cosmic_entropy& new_game_entropy,
 		const config_lua_table& viewing_config
 	) {
+		/* MVSC's ICE fix */
 		auto& _audiovisual_step = audiovisual_step;
 
 		setup.control(new_game_entropy);
 		setup.accept_game_gui_events(game_gui.get_and_clear_pending_events());
 		
 		setup.advance(
+			frame_delta,
 			[&]() {
 				_audiovisual_step(setup, viewing_config);
 			}, 
@@ -427,12 +435,13 @@ int main(const int argc, const char* const * const argv) try {
 	};
 
 	static auto advance_current_setup = [](
+		const augs::delta frame_delta,
 		const cosmic_entropy& new_game_entropy,
 		const config_lua_table& viewing_config
 	) { 
 		visit_current_setup(
 			[&](auto& setup) {
-				advance_setup(setup, new_game_entropy, viewing_config);
+				advance_setup(frame_delta, setup, new_game_entropy, viewing_config);
 			}
 		);
 	};
@@ -443,7 +452,6 @@ int main(const int argc, const char* const * const argv) try {
 		The main loop variables.
 	*/
 
-	static augs::timer imgui_timer;
 	static augs::timer frame_timer;
 	
 	static augs::event::state common_input_state;
@@ -454,10 +462,8 @@ int main(const int argc, const char* const * const argv) try {
 
 	while (!should_quit) {
 		auto scope = measure_scope(profiler.fps);
-		
-		const auto frame_dt_ms = static_cast<float>(
-			frame_timer.extract<std::chrono::milliseconds>()
-		);
+
+		const auto frame_delta = frame_timer.extract_delta();
 
 		/* 
 			For example, the main menu might want to disable HUD or tune down the sound effects. 
@@ -536,7 +542,7 @@ int main(const int argc, const char* const * const argv) try {
 			perform_imgui_pass(
 				new_window_entropy,
 				configurables,
-				static_cast<float>(imgui_timer.extract<std::chrono::seconds>()),
+				frame_delta,
 				config,
 				last_saved_config,
 				local_config_path,
@@ -716,7 +722,7 @@ int main(const int argc, const char* const * const argv) try {
 			that it chooses via get_viewed_cosmos.
 		*/
 
-		advance_current_setup(new_game_entropy, viewing_config);
+		advance_current_setup(frame_delta, new_game_entropy, viewing_config);
 		
 		/*
 			Game GUI might have been altered by the step's post-solve,
@@ -729,7 +735,7 @@ int main(const int argc, const char* const * const argv) try {
 		if (viewed_character.alive()) {
 			const auto context = create_game_gui_context();
 
-			game_gui.advance(context, frame_dt_ms);
+			game_gui.advance(context, frame_delta);
 			game_gui.rebuild_layouts(context);
 			game_gui.build_tree_data(context);
 		}
@@ -843,7 +849,7 @@ int main(const int argc, const char* const * const argv) try {
 
 					get_camera(), 
 					get_drawer().default_texture, 
-					static_cast<float>(interpolation_ratio)
+					interpolation_ratio
 				);
 
 				renderer.call_and_clear_lines();
@@ -865,14 +871,14 @@ int main(const int argc, const char* const * const argv) try {
 		if (current_setup.has_value()) {
 			if (ingame_menu.show) {
 				const auto context = create_menu_context(ingame_menu);
-				ingame_menu.advance(context, frame_dt_ms);
+				ingame_menu.advance(context, frame_delta);
 				menu_chosen_cursor = ingame_menu.draw({ context, get_drawer() });
 			}
 		}
 		else {
 			const auto context = create_menu_context(main_menu->gui);
 
-			main_menu->gui.advance(context, frame_dt_ms);
+			main_menu->gui.advance(context, frame_delta);
 
 			menu_chosen_cursor = main_menu->gui.draw({ context, get_drawer() });
 

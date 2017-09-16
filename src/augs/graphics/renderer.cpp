@@ -296,14 +296,6 @@ namespace augs {
 
 		for_each_in(frame_lines, line_lambda);
 		for_each_in(persistent_lines, line_lambda);
-
-		if (persistent_lines.empty()) {
-			line_timer.reset();
-		}
-		else if (line_timer.get<std::chrono::seconds>() > 0.4) {
-			//persistent_lines.erase(persistent_lines.begin());
-			line_timer.reset();
-		}
 	}
 
 	std::size_t renderer::get_max_texture_size() const {

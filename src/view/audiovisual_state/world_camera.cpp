@@ -120,7 +120,7 @@ void world_camera::tick(
 		//}
 
 		additional_position_smoothing.target_value = target_value * (-1);
-		additional_position_smoothing.tick(dt.in_seconds(), settings.additional_position_smoothing);
+		additional_position_smoothing.tick(dt, settings.additional_position_smoothing);
 	}
 
 	if (enable_smoothing) {
@@ -141,8 +141,9 @@ vec2i world_camera::get_camera_offset_due_to_character_crosshair(
 ) const {
 	vec2 camera_crosshair_offset;
 
-	if (entity_to_chase.dead())
+	if (entity_to_chase.dead()) {
 		return vec2i(0, 0);
+	}
 
 	auto crosshair_entity = entity_to_chase[child_entity_name::CHARACTER_CROSSHAIR];
 
