@@ -53,6 +53,14 @@ void settings_gui_state::perform(
 		return;
 	}
 
+	{
+		const auto screen_size = vec2(config.window.get_screen_size());
+		const auto initial_settings_size = screen_size / 2;
+
+		ImGui::SetNextWindowPos(screen_size / 2 - initial_settings_size / 2, ImGuiSetCond_FirstUseEver);
+		ImGui::SetNextWindowSize(initial_settings_size, ImGuiSetCond_FirstUseEver);
+	}
+
 	ImGui::Begin("Settings", &show);
 
 	ImGui::BeginChild("settings view", ImVec2(0, -(ImGui::GetItemsLineHeightWithSpacing() + 4)));
