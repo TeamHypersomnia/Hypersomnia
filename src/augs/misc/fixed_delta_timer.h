@@ -2,11 +2,21 @@
 #include "augs/misc/delta.h"
 
 namespace augs {
+	enum class lag_spike_handling_type {
+		DISCARD,
+		CATCH_UP
+	};
+
 	class fixed_delta_timer {
 		double accumulator_secs = 0.0;
-		unsigned max_steps_to_perform;
+		
+		const unsigned max_steps_to_perform_at_once;
+		const lag_spike_handling_type mode;
 	public:
-		fixed_delta_timer(const unsigned max_steps_to_perform);
+		fixed_delta_timer(
+			const unsigned max_steps_to_perform,
+			const lag_spike_handling_type mode
+		);
 
 		void advance(const delta frame_delta);
 

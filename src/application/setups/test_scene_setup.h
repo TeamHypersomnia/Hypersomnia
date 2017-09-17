@@ -23,7 +23,7 @@ class test_scene_setup {
 	cosmos hypersomnia;
 	cosmic_entropy total_collected_entropy;
 	augs::debug_entropy_player<cosmic_entropy> player;
-	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
+	augs::fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
 	debug_character_selection characters;
 
 	all_logical_assets logical_assets;

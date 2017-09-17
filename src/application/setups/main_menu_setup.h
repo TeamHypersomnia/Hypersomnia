@@ -36,7 +36,7 @@ class main_menu_setup {
 	vec2 latest_news_pos = { 0.f, 0.f };
 
 	cosmos intro_scene;
-	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
+	augs::fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
 	cosmic_entropy total_collected_entropy;
 	all_logical_assets logical_assets;
 	all_viewables_defs viewable_defs;

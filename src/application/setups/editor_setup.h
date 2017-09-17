@@ -13,7 +13,7 @@ class editor_setup {
 public:
 	cosmos subject_cosmos;
 	cosmic_entropy total_collected_entropy;
-	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
+	augs::fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
 	entity_id viewed_entity_id;
 	all_logical_assets logical_assets;
 
