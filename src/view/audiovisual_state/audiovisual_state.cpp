@@ -9,6 +9,7 @@
 #include "game/messages/health_event.h"
 #include "game/messages/item_picked_up_message.h"
 #include "game/messages/interpolation_correction_request.h"
+#include "game/messages/will_soon_be_deleted.h"
 
 #include "view/audiovisual_state/audiovisual_state.h"
 #include "view/audiovisual_state/systems/interpolation_system.h"
@@ -396,8 +397,14 @@ void audiovisual_state::standard_post_solve(const const_logic_step step) {
 void audiovisual_state::standard_post_cleanup(const const_logic_step step) {
 	auto scope = measure_scope(profiler.post_cleanup);
 
-	const auto& cosmos = step.cosm;
+	if (const bool any_deletion_occured =
+		step.transient.messages.get_queue<messages::will_soon_be_deleted>().size() > 0
+	) {
+		clear_dead_entities(step.cosm);
+	}
+}
 
+void audiovisual_state::clear_dead_entities(const cosmos& cosmos) {
 	all_visible.clear_dead(cosmos);
 
 	get<sound_system>().erase_caches_for_dead_entities(cosmos);

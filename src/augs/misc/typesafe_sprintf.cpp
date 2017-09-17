@@ -14,6 +14,7 @@ TEST_CASE("Type-safe sprintf", "Several tests") {
 	vec2 test(123, 412);
 
 	REQUIRE("Vector is equal to: (123;412)" == typesafe_sprintf("Vector is equal to: %x", test));
+	REQUIRE("Vector is equal to: (123.00;412.00)" == typesafe_sprintf("Vector is equal to: (%f2;%f2)", test.x, test.y));
 
 	int errid = 1282;
 	std::string location = "augs::create";

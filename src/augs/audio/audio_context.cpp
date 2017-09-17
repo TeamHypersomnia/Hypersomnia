@@ -28,7 +28,7 @@ static std::string list_audio_devices(const ALCchar * const devices) {
 	devices_list += "Devices list:\n";
 
 	while (device && *device != '\0' && next && *next != '\0') {
-		devices_list += typesafe_sprintf("%s\n", device);
+		devices_list += typesafe_sprintf("%x\n", device);
 		len = strlen(device);
 		device += (len + 1);
 		next += (len + 2);

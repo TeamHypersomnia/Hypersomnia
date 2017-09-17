@@ -75,4 +75,6 @@ struct audiovisual_state {
 	void spread_past_infection(const const_logic_step);
 
 	void reserve_caches_for_entities(const std::size_t);
+
+	void clear_dead_entities(const cosmos&);
 };
