@@ -47,9 +47,40 @@ class tree_of_npo_system {
 	cache& get_cache(const unversioned_entity_id);
 
 public:
-	void determine_visible_entities_from_camera(
-		std::vector<unversioned_entity_id>& into,
-		const camera_cone,
-		tree_of_npo_type = tree_of_npo_type::RENDERABLES
-	) const;
+	template <class F>
+	void for_each_visible_in_camera(
+		F callback,
+		const camera_cone camera,
+		const tree_of_npo_type type
+	) const {
+		const auto& tree = trees[type];
+
+		for (const auto e : tree.always_visible) {
+			callback(e);
+		}
+
+		struct render_listener {
+			const b2DynamicTree* tree;
+			F callback;
+
+			bool QueryCallback(int32 node) {
+				unversioned_entity_id id;
+				id.indirection_index = reinterpret_cast<int>(tree->GetUserData(node));
+				static_assert(std::is_same_v<decltype(id.indirection_index), int>, "Userdata types incompatible");
+
+				callback(id);
+				return true;
+			}
+		};
+
+		auto aabb_listener = render_listener{ &tree.nodes, callback };
+
+		const auto visible_aabb = camera.get_transformed_visible_world_area_aabb().expand_from_center({ 50, 50 });
+
+		b2AABB input;
+		input.lowerBound = visible_aabb.left_top();
+		input.upperBound = visible_aabb.right_bottom();
+
+		tree.nodes.Query(&aabb_listener, input);
+	}
 };

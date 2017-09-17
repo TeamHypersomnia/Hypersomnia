@@ -195,8 +195,8 @@ const augs::delta& cosmos::get_fixed_delta() const {
 	return significant.meta.delta;
 }
 
-void cosmos::set_steps_per_second(const unsigned steps_per_second) {
-	significant.meta.delta = augs::delta(steps_per_second);
+void cosmos::set_steps_per_second(const unsigned steps) {
+	significant.meta.delta = augs::delta::steps_per_second(steps);
 }
 
 entity_handle cosmos::allocate_new_entity() {

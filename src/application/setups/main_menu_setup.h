@@ -100,12 +100,10 @@ public:
 	void customize_for_viewing(config_lua_table& config);
 	void apply(const config_lua_table& config);
 
-	template <class F, class Pre, class Post>
+	template <class... Callbacks>
 	void advance(
 		const augs::delta frame_delta,
-		F&& advance_audiovisuals,
-		Pre&& step_pre_solve,
-		Post&& step_post_solve
+		Callbacks&&... callbacks
 	) {
 		latest_news_pos.x += frame_delta.per_second(50.f);
 
@@ -113,19 +111,13 @@ public:
 
 		auto steps = timer.extract_num_of_logic_steps(intro_scene.get_fixed_delta());
 
-		if (!steps) {
-			advance_audiovisuals();
-		}
-
 		while (steps--) {
 			intro_scene.advance(
 				{ total_collected_entropy, logical_assets },
-				std::forward<Pre>(step_pre_solve),
-				std::forward<Post>(step_post_solve)
+				std::forward<Callbacks>(callbacks)...
 			);
 
 			total_collected_entropy.clear();
-			advance_audiovisuals();
 		}
 	}
 

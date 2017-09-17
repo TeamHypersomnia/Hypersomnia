@@ -203,7 +203,7 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 									sensor_polygon, 
 									pathfinding.filter, 
 									([&](const auto fix, auto, auto) {
-										if (cosmos[get_id_of_entity_of_body(fix)] != it) {
+										if (cosmos[get_body_entity_that_owns(fix)] != it) {
 											was_hit = true;
 											return callback_result::ABORT;
 										}

@@ -10,8 +10,10 @@ struct visible_entities_query {
 };
 
 struct visible_entities {
-	using per_layer_type = per_render_layer_t<std::vector<unversioned_entity_id>>;
-	using all_type = std::vector<unversioned_entity_id>;
+	using id_type = entity_id;
+	
+	using per_layer_type = per_render_layer_t<std::vector<id_type>>;
+	using all_type = std::vector<id_type>;
 
 	all_type all;
 	per_layer_type per_layer;
@@ -26,4 +28,5 @@ struct visible_entities {
 		in order to take advantage of the reserved space in containers.
 	*/
 	void reacquire(const visible_entities_query);
+	void clear_dead(const cosmos&);
 };

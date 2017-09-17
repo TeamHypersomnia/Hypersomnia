@@ -93,7 +93,7 @@ void standard_explosion_input::instantiate(
 				const vec2 point_a,
 				const vec2 point_b
 			) {
-				const auto body_entity_id = get_id_of_entity_of_body(fix);
+				const auto body_entity_id = get_body_entity_that_owns(fix);
 				const bool is_self = 
 					subject_alive
 					&& (

@@ -8,6 +8,7 @@
 
 #include "view/viewables/particle_types.h"
 
+#include "view/audiovisual_state/audiovisual_profiler.h"
 #include "view/audiovisual_state/aabb_highlighter.h"
 #include "view/game_gui/elements/character_gui.h"
 #include "view/game_gui/elements/item_button.h"
@@ -22,12 +23,12 @@
 
 class cosmos;
 struct visible_entities;
+class session_profiler;
 
 struct audiovisual_advance_input {
+	const augs::delta delta;
 	const cosmos& cosmos_to_sample;
 	const entity_id viewed_character_id;
-	const visible_entities& all_visible;
-	const float speed_multiplier;
 	const vec2i screen_size;
 	const particle_effects_map& particle_effects;
 
@@ -39,10 +40,12 @@ struct audiovisual_advance_input {
 
 struct audiovisual_state {
 	world_camera camera;
+	visible_entities all_visible;
+	
 	aabb_highlighter world_hover_highlighter;
 	all_audiovisual_systems systems;
 
-	augs::timer timer;
+	audiovisual_profiler profiler;
 
 	template <class T>
 	auto& get() {
@@ -67,6 +70,8 @@ struct audiovisual_state {
 	void advance(const audiovisual_advance_input);
 
 	void standard_post_solve(const const_logic_step);
+	void standard_post_cleanup(const const_logic_step);
+
 	void spread_past_infection(const const_logic_step);
 
 	void reserve_caches_for_entities(const std::size_t);

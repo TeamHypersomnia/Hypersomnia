@@ -368,39 +368,22 @@ int main(const int argc, const char* const * const argv) try {
 		DEBUG_LOGIC_STEP_LINES.clear();
 	};
 
-	static auto setup_post_solve = [](const const_logic_step step) {
-		game_gui.standard_post_solve(step);
-		audiovisuals.standard_post_solve(step);
-	};
-
-	static session_profiler profiler;
-	static visible_entities all_visible;
-
 	/* 
 		The audiovisual_step, advance_setup and advance_current_setup lambdas
 		are separated only because MSVC outputs ICEs if they become nested.
 	*/
 
 	static auto audiovisual_step = [](
+		const augs::delta delta,
 		auto& setup,
 		const config_lua_table& viewing_config
 	) {
 		const auto& viewed_cosmos = setup.get_viewed_cosmos();
 
-		{
-			auto scope = measure_scope(profiler.camera_visibility_query);
-			all_visible.reacquire({ viewed_cosmos, get_camera() });
-
-			profiler.visible_entities.measure(all_visible.all.size());
-		}
-
-		auto scope = measure_scope(profiler.audiovisuals_advance);
-
 		audiovisuals.advance({
+			delta,
 			viewed_cosmos,
 			setup.get_viewed_character_id(),
-			all_visible,
-			static_cast<float>(setup.get_audiovisual_speed()),
 
 			viewing_config.window.get_screen_size(),
 			get_viewable_defs().particle_effects,
@@ -412,6 +395,15 @@ int main(const int argc, const char* const * const argv) try {
 		});
 	};
 
+	static auto setup_post_solve = [](const const_logic_step step) {
+		game_gui.standard_post_solve(step);
+		audiovisuals.standard_post_solve(step);
+	};
+
+	static auto setup_post_cleanup = [](const const_logic_step step) {
+		audiovisuals.standard_post_cleanup(step);
+	};
+
 	static auto advance_setup = [](
 		const augs::delta frame_delta,
 		auto& setup,
@@ -420,17 +412,21 @@ int main(const int argc, const char* const * const argv) try {
 	) {
 		/* MVSC's ICE fix */
 		auto& _audiovisual_step = audiovisual_step;
+		auto& _setup_post_solve = setup_post_solve;
 
 		setup.control(new_game_entropy);
 		setup.accept_game_gui_events(game_gui.get_and_clear_pending_events());
 		
+		audiovisual_step(augs::delta(frame_delta) *= setup.get_audiovisual_speed(), setup, viewing_config);
+
 		setup.advance(
 			frame_delta,
-			[&]() {
-				_audiovisual_step(setup, viewing_config);
-			}, 
-			setup_pre_solve, 
-			setup_post_solve
+			setup_pre_solve,
+			[&](const const_logic_step step) {
+				_setup_post_solve(step);
+				_audiovisual_step(augs::delta::zero, setup, viewing_config);
+			},
+			setup_post_cleanup
 		);
 	};
 
@@ -452,6 +448,7 @@ int main(const int argc, const char* const * const argv) try {
 		The main loop variables.
 	*/
 
+	static session_profiler profiler;
 	static augs::timer frame_timer;
 	
 	static augs::event::state common_input_state;
@@ -815,7 +812,6 @@ int main(const int argc, const char* const * const argv) try {
 
 		if (const bool has_something_to_view = viewed_character.alive()) {
 			/* #1 */
-
 			illuminated_rendering({
 				viewed_character.get_cosmos(),
 				audiovisuals,
@@ -830,8 +826,7 @@ int main(const int argc, const char* const * const argv) try {
 				fbos,
 				shaders,
 				get_camera(),
-				viewed_character.get_id(),
-				all_visible
+				viewed_character.get_id()
 			});
 			
 			/* 
@@ -921,6 +916,7 @@ int main(const int argc, const char* const * const argv) try {
 				screen_size,
 				viewed_character,
 				profiler,
+				audiovisuals.profiler,
 				viewed_character.alive() ? viewed_character.get_cosmos().profiler : cosmic_profiler{}
 			);
 		}

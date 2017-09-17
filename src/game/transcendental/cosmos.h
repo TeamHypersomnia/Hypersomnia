@@ -87,11 +87,12 @@ public:
 	bool operator==(const cosmos&) const;
 	bool operator!=(const cosmos&) const;
 
-	template <class Pre, class Post>
+	template <class Pre, class Post, class PostCleanup>
 	void advance(
 		const logic_step_input input,
 		Pre pre_solve,
-		Post post_solve
+		Post post_solve,
+		PostCleanup post_cleanup
 	) {
 		thread_local data_living_one_step queues;
 		logic_step step(*this, input, queues);
@@ -99,8 +100,9 @@ public:
 		pre_solve(step);
 		advance_and_queue_destructions(step);
 		post_solve(const_logic_step(step));
-		
 		perform_deletions(step);
+		post_cleanup(const_logic_step(step));
+
 		queues.clear_all();
 	}
 
@@ -143,6 +145,8 @@ public:
 	const_entity_handle get_handle(const unversioned_entity_id) const;
 	inventory_slot_handle get_handle(const inventory_slot_id);
 	const_inventory_slot_handle get_handle(const inventory_slot_id) const;
+
+	entity_id make_versioned(const unversioned_entity_id) const;
 
 #if COSMOS_TRACKS_GUIDS
 	template <template <class> class Guidized, class source_id_type>
@@ -359,11 +363,11 @@ inline const_entity_handle cosmos::get_handle(const entity_id id) const {
 }
 
 inline entity_handle cosmos::get_handle(const unversioned_entity_id id) {
-	return { *this, get_aggregate_pool().make_versioned(id) };
+	return { *this, make_versioned(id) };
 }
 
 inline const_entity_handle cosmos::get_handle(const unversioned_entity_id id) const {
-	return { *this, get_aggregate_pool().make_versioned(id) };
+	return { *this, make_versioned(id) };
 }
 
 inline inventory_slot_handle cosmos::get_handle(const inventory_slot_id id) {
@@ -372,6 +376,10 @@ inline inventory_slot_handle cosmos::get_handle(const inventory_slot_id id) {
 
 inline const_inventory_slot_handle cosmos::get_handle(const inventory_slot_id id) const {
 	return { *this, id };
+}
+
+inline entity_id cosmos::make_versioned(const unversioned_entity_id id) const {
+	return get_aggregate_pool().make_versioned(id);
 }
 
 inline randomization cosmos::get_rng_for(const entity_id id) const {

@@ -22,7 +22,6 @@ namespace augs {
 }
 
 class sound_system {
-public:
 	struct cache {
 		components::sound_existence recorded_component;
 		bool constructed = false;
@@ -30,23 +29,28 @@ public:
 	};
 
 	std::unordered_map<entity_id, cache> per_entity_cache;
+	std::vector<augs::sound_source> fading_sources;
 
 	cache& get_cache(const const_entity_handle);
 	const cache& get_cache(const const_entity_handle) const;
 
-	std::vector<augs::sound_source> fading_sources;
+	void update_listener(
+		const const_entity_handle subject,
+		const interpolation_system& sys
+	);
 
+public:
 	void reserve_caches_for_entities(const std::size_t) const {}
 
-	void play_nearby_sound_existences(
+	void track_new_sound_existences_near_camera(
 		const augs::audio_volume_settings&,
 		const loaded_sounds&,
 		const camera_cone,
-		const entity_id listening_character,
-		const cosmos&, 
-		const interpolation_system& sys,
-		const augs::delta dt
+		const const_entity_handle listener,
+		const interpolation_system& sys
 	);
+
+	void fade_sources(const augs::delta dt);
 
 	void clear_all();
 	void erase_caches_for_dead_entities(const cosmos&);

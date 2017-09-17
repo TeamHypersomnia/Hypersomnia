@@ -20,8 +20,8 @@ namespace augs {
 		default_t secsf = 0.f;
 		default_t msf = 0.f;
 		// END GEN INTROSPECTOR
-
-		delta(const double secs) :
+		
+		explicit delta(const double secs) :
 			secs(secs),
 			ms(secs * 1000),
 			secsf(static_cast<default_t>(secs)),
@@ -29,9 +29,11 @@ namespace augs {
 		{}
 
 	public:
-		explicit delta(const unsigned steps_per_second) : 
-			delta(1.0 / steps_per_second) 
-		{}
+		static delta zero;
+
+		static delta steps_per_second(const unsigned steps) {
+			return delta{ steps ? 1.0 / steps : 0.0 };
+		}
 
 		bool operator==(const delta& b) const {
 			return secs == b.secs;

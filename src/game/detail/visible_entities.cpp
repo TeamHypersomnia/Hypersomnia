@@ -54,23 +54,38 @@ void visible_entities::reacquire(const visible_entities_query input) {
 		layer.clear();
 	}
 
-	tree_of_npo.determine_visible_entities_from_camera(
-		all, 
-		camera
+	tree_of_npo.for_each_visible_in_camera(
+		[this, &cosmos](const unversioned_entity_id id) {
+			all.push_back(cosmos.make_versioned(id));
+		},
+		camera,
+		tree_of_npo_type::RENDERABLES
 	);
 
-	thread_local std::unordered_set<unversioned_entity_id> unique_from_physics;
+	thread_local std::unordered_set<entity_id> unique_from_physics;
 	unique_from_physics.clear();
 
 	physics.for_each_in_camera(
 		cosmos.get_si(),
 		camera,
-		[&](const auto fix) {
-			unique_from_physics.insert(get_id_of_entity_of_fixture(fix));
+		[&](const b2Fixture* const fix) {
+			unique_from_physics.insert(cosmos.make_versioned(get_entity_that_owns(fix)));
 			return callback_result::CONTINUE;
 		}
 	);
 
 	concatenate(all, unique_from_physics);
 	get_visible_per_layer(cosmos, all, per_layer);
+}
+
+void visible_entities::clear_dead(const cosmos& cosm) {
+	auto dead_deleter = [&cosm](const entity_id e) {
+		return cosm[e].dead();
+	};
+
+	erase_if(all, dead_deleter);
+
+	for (auto& layer : per_layer) {
+		erase_if(layer, dead_deleter);
+	}
 }

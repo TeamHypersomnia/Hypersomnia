@@ -207,7 +207,7 @@ void visibility_system::respond_to_visibility_information_requests(
 			transform.pos + vec2(d, d), 
 			request.candidate_filter, 
 			[&](const auto fix) {
-				const auto candidate = cosmos[get_id_of_entity_of_fixture(fix)];
+				const auto candidate = cosmos[get_entity_that_owns(fix)];
 				
 				if (candidate.get_owner_body() == it) {
 					return callback_result::CONTINUE;
@@ -339,7 +339,7 @@ void visibility_system::respond_to_visibility_information_requests(
 			aabb, 
 			request.filter,
 			[&](const b2Fixture* const f) {
-				if (get_id_of_entity_of_body(f) == ignored_entity) {
+				if (get_body_entity_that_owns(f) == ignored_entity) {
 					return callback_result::CONTINUE;
 				}
 

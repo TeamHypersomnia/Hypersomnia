@@ -3,6 +3,8 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
 
+#include "view/audiovisual_state/audiovisual_profiler.h"
+
 #include "application/session_profiler.h"
 #include "application/main/draw_debug_details.h"
 
@@ -15,6 +17,7 @@ void draw_debug_details(
 	const vec2i screen_size,
 	const const_entity_handle viewed_character,
 	const session_profiler& session_performance,
+	const audiovisual_profiler& audiovisual_performance,
 	const cosmic_profiler& cosmos_performance
 ) {
 	using namespace augs::gui::text;
@@ -26,14 +29,20 @@ void draw_debug_details(
 		300
 	);
 
-	auto total_details = formatted_string();
+	thread_local auto total_details = formatted_string();
+	total_details.clear();
 
-	const auto text_style = style(
+	static const auto text_style = style(
 		gui_font,
 		rgba(255, 255, 255, 150)
 	);
 
-	const auto version = hypersomnia_version();
+	static const auto category_style = style(
+		gui_font,
+		rgba(yellow.rgb(), 150)
+	);
+
+	static const auto version = hypersomnia_version();
 
 	total_details += {
 		to_wstring(typesafe_sprintf(
@@ -67,10 +76,12 @@ void draw_debug_details(
 		};
 	}
 
-	total_details += {
-		session_performance.summary() + cosmos_performance.summary(),
-		text_style
-	};
+	total_details += { L"Session\n", category_style };
+	total_details += { session_performance.summary(), text_style };
+	total_details += { L"Audiovisual\n", category_style };
+	total_details += { audiovisual_performance.summary(), text_style };
+	total_details += { L"Cosmos\n", category_style };
+	total_details += { cosmos_performance.summary(), text_style };
 
 	print(output, { 0, 0 }, total_details);
 }

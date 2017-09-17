@@ -43,7 +43,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	const auto global_time_seconds = cosmos.get_total_seconds_passed(in.interpolation_ratio);
 	const auto settings = in.drawing;
 	const auto matrix = augs::orthographic_projection(camera.visible_world_area);
-	const auto& visible_per_layer = in.visible.per_layer;
+	const auto& visible = in.audiovisuals.all_visible;
 	const auto& shaders = in.shaders;
 	const auto& fbos = in.fbos;
 	const auto& necessarys = in.necessary_images;
@@ -157,7 +157,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		camera,
 		interp,
 		particles,
-		in.visible.per_layer,
+		visible.per_layer,
 		game_images
 	});
 
@@ -168,7 +168,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		const render_layer r, 
 		const renderable_drawing_type type = renderable_drawing_type::NORMAL
 	) {
-		draw_entities(visible_per_layer[r], cosmos, output, game_images, camera, global_time_seconds, interp, type);
+		draw_entities(visible.per_layer[r], cosmos, output, game_images, camera, global_time_seconds, interp, type);
 	};
 
 	draw_layer(render_layer::UNDER_GROUND);
@@ -258,7 +258,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	draw_particles(render_layer::ILLUMINATING_PARTICLES);
 
-	for (const auto e : visible_per_layer[render_layer::WANDERING_PIXELS_EFFECTS]) {
+	for (const auto e : visible.per_layer[render_layer::WANDERING_PIXELS_EFFECTS]) {
 		wandering_pixels.draw_wandering_pixels_as_sprites(cosmos[e], game_images, basic_sprite_input);
 	}
 
@@ -283,7 +283,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		set_center_uniform(tex);
 
 		textual_infos = draw_circular_bars_and_get_textual_info({
-			in.visible.all,
+			visible.all,
 			output,
 			renderer.get_special_buffer(),
 			cosmos,

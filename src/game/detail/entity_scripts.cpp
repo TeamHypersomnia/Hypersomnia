@@ -196,7 +196,7 @@ entity_id get_closest_hostile(
 			transform.pos + vec2(radius, radius),
 			filter,
 			[&](const auto fix) {
-				const auto s = cosmos[get_id_of_entity_of_body(fix)];
+				const auto s = cosmos[get_body_entity_that_owns(fix)];
 
 				if (s != subject && s.has<components::attitude>()) {
 					const auto calculated_attitude = calculate_attitude(s, subject_attitude);
@@ -261,7 +261,7 @@ std::vector<entity_id> get_closest_hostiles(
 			transform.pos + vec2(radius, radius),
 			filter,
 			[&](const auto fix) {
-				const auto s = cosmos[get_id_of_entity_of_body(fix)];
+				const auto s = cosmos[get_body_entity_that_owns(fix)];
 
 				if (s != subject && s.has<components::attitude>()) {
 					const auto calculated_attitude = calculate_attitude(s, subject_attitude);

@@ -120,7 +120,7 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 					in.delete_entity_after_effect_lifetime = true;
 					in.effect.modifier.pitch = std::min(1.5f, 0.85f + pitch_mult);
 					
-					LOG_NVPS(in.effect.modifier.pitch);
+					// LOG_NVPS(in.effect.modifier.pitch);
 
 					in.effect.modifier.gain = gain_mult;
 					in.effect.id = sound_id;

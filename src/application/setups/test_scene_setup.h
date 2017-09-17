@@ -75,31 +75,23 @@ public:
 		return;
 	}
 
-	template <class F, class Pre, class Post>
+	template <class... Callbacks>
 	void advance(
 		const augs::delta frame_delta,
-		F&& advance_audiovisuals, 
-		Pre&& step_pre_solve,
-		Post&& step_post_solve
+		Callbacks&&... callbacks
 	) {
 		timer.advance(frame_delta);
 		auto steps = timer.extract_num_of_logic_steps(hypersomnia.get_fixed_delta());
-
-		if (!steps) {
-			advance_audiovisuals();
-		}
 
 		while (steps--) {
 			player.advance_player_and_biserialize(total_collected_entropy);
 
 			hypersomnia.advance(
 				{ total_collected_entropy, logical_assets },
-				std::forward<Pre>(step_pre_solve),
-				std::forward<Post>(step_post_solve)
+				std::forward<Callbacks>(callbacks)...
 			);
 
 			total_collected_entropy.clear();
-			advance_audiovisuals();
 		}
 	}
 

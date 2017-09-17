@@ -47,29 +47,35 @@ const sound_system::cache& sound_system::get_cache(const const_entity_handle id)
 	return per_entity_cache.at(id.get_id());
 }
 
-void sound_system::play_nearby_sound_existences(
+void sound_system::update_listener(
+	const const_entity_handle listener,
+	const interpolation_system& sys
+) {
+	const auto si = listener.get_cosmos().get_si();
+	const auto listener_pos = listener.get_viewing_transform(sys).pos;
+
+	augs::set_listener_position(si, listener_pos);
+	augs::set_listener_velocity(si, listener.get_effective_velocity());
+	augs::set_listener_orientation({ 0.f, -1.f, 0.f, 0.f, 0.f, -1.f });
+}
+
+void sound_system::track_new_sound_existences_near_camera(
 	const augs::audio_volume_settings& settings,
 	const loaded_sounds& manager,
 	const camera_cone cone,
-	const entity_id listening_character, 
-	const cosmos& cosmos, 
-	const interpolation_system& sys,
-	const augs::delta dt
+	const const_entity_handle listening_character,
+	const interpolation_system& sys
 ) {
+#if 0
 	auto queried_size = cone.visible_world_area;
 	queried_size.set(10000.f, 10000.f);
+#endif
 
-		//cosmos[cosmos.systems_inferred.get<tree_of_npo_system>()
-		//.determine_visible_entities_from_camera(cone, tree_of_npo_type::SOUND_EXISTENCES)];
+	update_listener(listening_character, sys);
 
-	const auto subject = cosmos[listening_character];
+	const auto& cosmos = listening_character.get_cosmos();
+	const auto listener_pos = listening_character.get_viewing_transform(sys).pos;
 	const auto si = cosmos.get_si();
-
-	const auto listener_pos = subject.get_viewing_transform(sys).pos;
-
-	augs::set_listener_position(si, listener_pos);
-	augs::set_listener_velocity(si, subject.get_effective_velocity());
-	augs::set_listener_orientation({ 0.f, -1.f, 0.f, 0.f, 0.f, -1.f });
 
 	cosmos.for_each(
 		processing_subjects::WITH_SOUND_EXISTENCE, 
@@ -125,7 +131,9 @@ void sound_system::play_nearby_sound_existences(
 			source.set_velocity(si, it.get_effective_velocity());
 		}
 	);
+}
 
+void sound_system::fade_sources(const augs::delta dt) {
 	erase_if(fading_sources, [dt](augs::sound_source& source) {
 		const auto new_gain = source.get_gain() - dt.in_seconds()*3.f;
 		const auto new_pitch = source.get_pitch() - dt.in_seconds()/3.f;
@@ -144,6 +152,4 @@ void sound_system::play_nearby_sound_existences(
 
 		return true;
 	});
-
-	fading_sources.shrink_to_fit();
 }

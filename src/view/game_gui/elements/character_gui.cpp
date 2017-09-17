@@ -578,7 +578,7 @@ entity_id character_gui::get_hovered_world_entity(const cosmos& cosm, const vec2
 		cursor_pointing_at + vec2(1, 1), 
 		filters::renderable_query(),
 		[&](const auto fix) {
-			const auto id = get_id_of_entity_of_fixture(fix);
+			const auto id = get_entity_that_owns(fix);
 
 			if (aabb_highlighter::is_hoverable(cosm[id])) {
 				hovered_entities.push_back(id);

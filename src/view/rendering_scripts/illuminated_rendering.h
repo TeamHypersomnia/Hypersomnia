@@ -40,7 +40,6 @@ struct illuminated_rendering_input {
 	const illuminated_rendering_shaders& shaders;
 	const camera_cone camera;
 	const entity_id viewed_character;
-	const visible_entities& visible;
 };
 
 void illuminated_rendering(const illuminated_rendering_input);

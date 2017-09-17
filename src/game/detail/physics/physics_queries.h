@@ -199,10 +199,10 @@ public:
 	}
 };
 
-inline auto get_id_of_entity_of_body(const b2Fixture* const f) {
+inline auto get_body_entity_that_owns(const b2Fixture* const f) {
 	return f->GetBody()->GetUserData();
 }
 
-inline auto get_id_of_entity_of_fixture(const b2Fixture* const f) {
+inline auto get_entity_that_owns(const b2Fixture* const f) {
 	return f->GetUserData();
 }

@@ -20,9 +20,10 @@ void audiovisual_state::reserve_caches_for_entities(const std::size_t n) {
 }
 
 void audiovisual_state::advance(const audiovisual_advance_input input) {
+	auto scope = measure_scope(profiler.advance);
+
 	const auto& cosm = input.cosmos_to_sample;
-	const auto& all_visible = input.all_visible;
-	const auto dt = timer.extract_delta() *= input.speed_multiplier;
+	const auto dt = input.delta;
 
 	reserve_caches_for_entities(cosm.get_aggregate_pool().capacity());
 
@@ -41,20 +42,10 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 	highlights.advance(dt);
 
 	{
-		auto scope = measure_scope(cosm.profiler.interpolation);
+		auto scope = measure_scope(profiler.interpolation);
 		interp.integrate_interpolated_transforms(input.interpolation, cosm, dt, cosm.get_fixed_delta());
 	}
-
-	particles.advance_visible_streams_and_all_particles(
-		camera.smoothed_camera,
-		cosm,
-		input.particle_effects,
-		dt,
-		interp
-	);
-
-	get<light_system>().advance_attenuation_variations(cosm, dt);
-
+	
 	camera.tick(
 		input.screen_size,
 		interp,
@@ -63,28 +54,58 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 		viewed_character
 	);
 
-	get<wandering_pixels_system>().advance_for(
-		all_visible,
-		cosm,
-		dt
-	);
+	{
+		{
+			auto scope = measure_scope(profiler.camera_visibility_query);
+			
+			all_visible.reacquire({ cosm, get_viewing_camera() });
+
+			profiler.visible_entities.measure(all_visible.all.size());
+		}
+
+		auto scope = measure_scope(profiler.particle_logic);
+
+		particles.advance_visible_streams_and_all_particles(
+			camera.smoothed_camera,
+			cosm,
+			input.particle_effects,
+			dt,
+			interp
+		);
+	}
+
+	get<light_system>().advance_attenuation_variations(cosm, dt);
+
+	{
+		auto scope = measure_scope(profiler.wandering_pixels);
+
+		get<wandering_pixels_system>().advance_for(
+			all_visible,
+			cosm,
+			dt
+		);
+	}
 
 	world_hover_highlighter.cycle_duration_ms = 400;
 	world_hover_highlighter.update(dt.in_milliseconds());
 
 	if (viewed_character.alive()) {
+		auto scope = measure_scope(profiler.sound_logic);
+
 		auto listener_cone = camera.smoothed_camera;
 		listener_cone.transform = viewed_character.get_viewing_transform(interp);
+		
+		auto& sounds = get<sound_system>();
 
-		get<sound_system>().play_nearby_sound_existences(
+		sounds.track_new_sound_existences_near_camera(
 			input.audio_volume,
 			input.sounds,
 			listener_cone,
 			viewed_character,
-			cosm,
-			interp,
-			dt
+			interp
 		);
+
+		sounds.fade_sources(dt);
 	}
 }
 
@@ -106,6 +127,8 @@ void audiovisual_state::spread_past_infection(const const_logic_step step) {
 }
 
 void audiovisual_state::standard_post_solve(const const_logic_step step) {
+	auto scope = measure_scope(profiler.post_solve);
+
 	const auto& cosmos = step.cosm;
 	reserve_caches_for_entities(cosmos.get_aggregate_pool().capacity());
 
@@ -367,6 +390,15 @@ void audiovisual_state::standard_post_solve(const const_logic_step step) {
 	}
 
 	exploding_rings.acquire_new_rings(new_rings);
+
+}
+
+void audiovisual_state::standard_post_cleanup(const const_logic_step step) {
+	auto scope = measure_scope(profiler.post_cleanup);
+
+	const auto& cosmos = step.cosm;
+
+	all_visible.clear_dead(cosmos);
 
 	get<sound_system>().erase_caches_for_dead_entities(cosmos);
 	get<particles_simulation_system>().erase_caches_for_dead_entities(cosmos);

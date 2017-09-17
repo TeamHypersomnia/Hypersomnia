@@ -145,8 +145,7 @@ main_menu_setup::main_menu_setup(
 
 		test_scenes::testbed().populate_world_with_entities(
 			intro_scene,
-			logical_assets,
-			[](auto...) {}
+			logical_assets
 		);
 #endif
 	}
@@ -182,6 +181,7 @@ main_menu_setup::main_menu_setup(
 
 			intro_scene.advance(
 				{ entropy, logical_assets },
+				[](auto) {},
 				[](auto) {},
 				[](auto) {}
 			);

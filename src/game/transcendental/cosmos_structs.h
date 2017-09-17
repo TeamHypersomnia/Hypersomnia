@@ -13,7 +13,7 @@ class cosmos_metadata {
 	friend class cosmos;
 	friend struct augs::introspection_access;
 
-	augs::delta delta = augs::delta { 0u };
+	augs::delta delta = augs::delta::zero;
 	augs::stepped_timestamp now = 0;
 
 #if COSMOS_TRACKS_GUIDS

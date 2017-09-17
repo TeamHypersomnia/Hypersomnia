@@ -34,15 +34,13 @@ test_scene_setup::test_scene_setup(
 	if (make_minimal_test_scene) {
 		test_scenes::minimal_scene().populate_world_with_entities(
 			hypersomnia,
-			logical_assets,
-			[](auto...){}
+			logical_assets
 		);
 	}
 	else {
 		test_scenes::testbed().populate_world_with_entities(
 			hypersomnia,
-			logical_assets,
-			[](auto...) {}
+			logical_assets
 		);
 	}
 

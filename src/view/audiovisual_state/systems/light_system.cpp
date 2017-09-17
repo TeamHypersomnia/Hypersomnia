@@ -96,6 +96,10 @@ void light_system::render_all_lights(const light_system_input in) const {
 	light_shader.set_projection(projection_matrix);
 
 	auto draw_layer = [&](const render_layer r, const renderable_drawing_type type = renderable_drawing_type::NEON_MAPS) {
+		for (const auto a : visible_per_layer[r]) {
+			ensure(cosmos[a].alive());
+		}
+
 		draw_entities(visible_per_layer[r], cosmos, output, in.game_images, in.camera, global_time_seconds, in.interpolation, type);
 	};
 

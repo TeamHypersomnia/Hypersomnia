@@ -184,7 +184,7 @@ TEST_CASE("CosmicDelta2 PaddingTest") {
 			using T = std::decay_t<decltype(m)>;
 
 			if constexpr(std::is_same_v<T, augs::delta>) {
-				padding_checker(m, 0u);
+				padding_checker(m, augs::delta::zero);
 			}
 			else if constexpr(augs::is_byte_io_safe_v<augs::stream, T> && !is_introspective_leaf_v<T>) {
 				padding_checker(m);
