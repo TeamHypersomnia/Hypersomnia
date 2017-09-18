@@ -148,8 +148,7 @@ void settings_gui_state::perform(
 		ImGuiStyle& style = config.gui_style;
 		const ImGuiStyle& last_saved_style = last_saved_config.gui_style;
 
-		if (ImGui::TreeNode("Rendering"))
-		{
+		if (ImGui::TreeNode("Rendering")) {
 			ImGui::Checkbox("Anti-aliased lines", &style.AntiAliasedLines); revert(style.AntiAliasedLines);
 			ImGui::Checkbox("Anti-aliased shapes", &style.AntiAliasedShapes); revert(style.AntiAliasedShapes);
 			ImGui::PushItemWidth(100);
@@ -163,8 +162,7 @@ void settings_gui_state::perform(
 			ImGui::TreePop();
 		}
 
-		if (ImGui::TreeNode("Settings"))
-		{
+		if (ImGui::TreeNode("Settings")) {
 			ImGui::SliderFloat2("WindowPadding", (float*)&style.WindowPadding, 0.0f, 20.0f, "%.0f"); revert(style.WindowPadding);
 			ImGui::SliderFloat("WindowRounding", &style.WindowRounding, 0.0f, 16.0f, "%.0f"); revert(style.WindowRounding);
 			ImGui::SliderFloat("ChildWindowRounding", &style.ChildWindowRounding, 0.0f, 16.0f, "%.0f"); revert(style.ChildWindowRounding);
@@ -184,11 +182,7 @@ void settings_gui_state::perform(
 			ImGui::TreePop();
 		}
 
-		if (ImGui::TreeNode("Colors"))
-		{
-			static int output_dest = 0;
-			static bool output_only_modified = false;
-
+		if (ImGui::TreeNode("Colors")) {
 			static ImGuiColorEditMode edit_mode = ImGuiColorEditMode_RGB;
 			ImGui::RadioButton("RGB", &edit_mode, ImGuiColorEditMode_RGB);
 			ImGui::SameLine();
@@ -203,8 +197,8 @@ void settings_gui_state::perform(
 			ImGui::BeginChild("#colors", ImVec2(0, 300), true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
 			ImGui::PushItemWidth(-250);
 			ImGui::ColorEditMode(edit_mode);
-			for (int i = 0; i < ImGuiCol_COUNT; i++)
-			{
+
+			for (int i = 0; i < ImGuiCol_COUNT; i++) {
 				const char* name = ImGui::GetStyleColName(i);
 				
 				if (!filter.PassFilter(name)) {
@@ -212,7 +206,7 @@ void settings_gui_state::perform(
 				}
 				
 				ImGui::PushID(i);
-				ImGui::ColorEdit4(name, (float*)&style.Colors[i], true);
+				ImGui::ColorEdit4(name, reinterpret_cast<float*>(&style.Colors[i]), true);
 
 				if (std::memcmp(&style.Colors[i], &last_saved_style.Colors[i], sizeof(ImVec4)) != 0) {
 					ImGui::SameLine(); if (ImGui::Button("Revert")) style.Colors[i] = last_saved_style.Colors[i];
@@ -236,7 +230,7 @@ void settings_gui_state::perform(
 
 	{
 		const bool has_config_changed =
-			!augs::introspective_compare(
+			!augs::equal_by_introspection(
 				config,
 				last_saved_config
 			)

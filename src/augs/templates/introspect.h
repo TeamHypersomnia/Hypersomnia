@@ -63,14 +63,14 @@ namespace augs {
 	}
 
 	template <class A, class B>
-	bool introspective_compare(
+	bool equal_by_introspection(
 		const A& a,
 		const B& b
 	) {
-		bool are_same = true;
+		bool are_equal = true;
 
 		augs::introspect(
-			augs::recursive([&are_same](
+			augs::recursive([&are_equal](
 				auto&& self,
 				const auto label,
 				const auto& aa, 
@@ -80,7 +80,7 @@ namespace augs {
 				using B = std::decay_t<decltype(bb)>;
 
 				if constexpr(is_comparable_v<A, B>) {
-					are_same = are_same && aa == bb;
+					are_equal = are_equal && aa == bb;
 				}
 				else {
 					augs::introspect(augs::recursive(self), aa, bb);
@@ -90,6 +90,6 @@ namespace augs {
 			b
 		);
 		
-		return are_same;
+		return are_equal;
 	}
 }
