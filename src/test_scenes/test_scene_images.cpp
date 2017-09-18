@@ -22,7 +22,7 @@ void load_test_scene_images(
 
 	const auto directory = augs::path_type("content/official/gfx/");
 
-	augs::for_each_enum_except_bounds<id_type>([&](const id_type id) {
+	augs::for_each_enum_except_bounds([&](const id_type id) {
 		if (found_in(all_loadables, id) || found_in(all_metas, id)) {
 			return;
 		}

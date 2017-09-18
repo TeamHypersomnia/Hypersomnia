@@ -13,7 +13,7 @@ void load_test_scene_sound_buffers(sound_buffer_inputs_map& sounds) {
 	using id_type = assets::sound_buffer_id;
 	const auto directory = "content/official/sfx/";
 
-	augs::for_each_enum_except_bounds<id_type>([&](const id_type id) {
+	augs::for_each_enum_except_bounds([&](const id_type id) {
 		const auto stem = to_lowercase(augs::enum_to_string(id));
 		using path = augs::path_type;
 

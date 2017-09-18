@@ -81,7 +81,7 @@ void settings_gui_state::perform(
 			static augs::enum_array<std::string, settings_pane> label_strs;
 			augs::enum_array<const char*, settings_pane> c_strs;
 
-			augs::for_each_enum_except_bounds<settings_pane>([&c_strs](const settings_pane s) {
+			augs::for_each_enum_except_bounds([&c_strs](const settings_pane s) {
 				label_strs[s] = format_enum(s);
 				c_strs[s] = label_strs[s].c_str();
 			});

@@ -1,8 +1,8 @@
 #pragma once
+#include <limits>
+
 #include "augs/templates/type_matching_and_indexing.h"
 #include "augs/templates/type_list.h"
-
-#include <limits>
 
 template <class SizedType, class IndexType>
 struct is_size_sufficient : std::bool_constant<std::numeric_limits<IndexType>::max() >= sizeof(SizedType) - 1> {

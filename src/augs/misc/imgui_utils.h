@@ -132,7 +132,7 @@ namespace augs {
 			thread_local std::vector<char> combo_names;
 
 			if (combo_names.empty()) {
-				for_each_enum_except_bounds<T>([](const T e) {
+				for_each_enum_except_bounds([](const T e) {
 					concatenate(
 						combo_names, 
 						format_enum(e)

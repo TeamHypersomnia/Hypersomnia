@@ -48,7 +48,7 @@ struct ingame_menu_gui {
 
 		world.respond_to_events(context, gui_entropies);
 
-		augs::for_each_enum_except_bounds<ingame_menu_button_type>([&](const ingame_menu_button_type t) {
+		augs::for_each_enum_except_bounds([&](const ingame_menu_button_type t) {
 			if (root.buttons[t].click_callback_required) {
 				root.buttons[t].click_callback_required = false;
 

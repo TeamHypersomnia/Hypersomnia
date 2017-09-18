@@ -135,7 +135,7 @@ necessary_image_loadables_map::necessary_image_loadables_map(
 		whereby there is some(?) problem capturing "this" contents in lambdas.
 	*/
 
-	augs::for_each_enum_except_bounds<id_type>([&](const id_type id) {
+	augs::for_each_enum_except_bounds([&](const id_type id) {
 		if (found_in(*this, id)) {
 			return;
 		}
@@ -214,7 +214,7 @@ necessary_image_loadables_map::necessary_image_loadables_map(
 		
 				const auto first = id;
 
-				augs::for_each_enum_except_bounds<button_corner_type>([&](const button_corner_type type) {
+				augs::for_each_enum_except_bounds([&](const button_corner_type type) {
 					definition_template.source_image_path = typesafe_sprintf(path_template.string(), get_filename_for(type));
 					
 					emplace(
