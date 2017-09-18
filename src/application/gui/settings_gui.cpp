@@ -77,23 +77,18 @@ void settings_gui_state::perform(
 	}
 	
 	{
-		struct tabs {
-			augs::enum_array<const char*, settings_pane> labels;
-			augs::enum_array<std::string, settings_pane> label_strs;
+		static auto labels = []() {
+			static augs::enum_array<std::string, settings_pane> label_strs;
+			augs::enum_array<const char*, settings_pane> c_strs;
 
-			tabs() {
-				augs::for_each_enum_except_bounds<settings_pane>([this](const settings_pane s) {
-					label_strs[s] = format_enum(s);
-					labels[s] = label_strs[s].c_str();
-				});
+			augs::for_each_enum_except_bounds<settings_pane>([&c_strs](const settings_pane s) {
+				label_strs[s] = format_enum(s);
+				c_strs[s] = label_strs[s].c_str();
+			});
 
-				labels[settings_pane::GUI_STYLES] = "GUI styles";
-			}
-		};
+			return c_strs;
+		}();
 
-		static tabs tabs;
-
-		auto& labels = tabs.labels;
 		auto index = static_cast<int>(active_pane);
 		ImGui::TabLabels(labels.data(), labels.size(), index, nullptr);
 		active_pane = static_cast<settings_pane>(index);
