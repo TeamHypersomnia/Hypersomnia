@@ -6,11 +6,6 @@
 #include "game/detail/inventory/inventory_slot_handle.h"
 #include "game/detail/inventory/inventory_utils.h"
 
-#include "view/game_gui/game_gui_element_location.h"
-#include "view/game_gui/elements/character_gui.h"
-#include "view/game_gui/elements/slot_button.h"
-#include "view/game_gui/elements/item_button.h"
-
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
 
@@ -18,8 +13,13 @@
 #include "game/components/item_slot_transfers_component.h"
 #include "game/components/item_component.h"
 #include "game/messages/item_picked_up_message.h"
+#include "game/messages/will_soon_be_deleted.h"
 
 #include "view/game_gui/game_gui_system.h"
+#include "view/game_gui/game_gui_element_location.h"
+#include "view/game_gui/elements/character_gui.h"
+#include "view/game_gui/elements/slot_button.h"
+#include "view/game_gui/elements/item_button.h"
 
 static char to_hotbar_index(const game_gui_intent_type type) {
 	switch (type) {
@@ -393,13 +393,19 @@ void game_gui_system::rebuild_layouts(
 void game_gui_system::standard_post_solve(const const_logic_step step) {
 	const auto& cosmos = step.cosm;
 
-	erase_caches_for_dead_entities(cosmos);
-
 	for (const auto& pickup : step.transient.messages.get_queue<messages::item_picked_up_message>()) {
 		get_character_gui(pickup.subject).assign_item_to_first_free_hotbar_button(
 			cosmos[pickup.subject],
 			cosmos[pickup.item]
 		);
+	}
+}
+
+void game_gui_system::standard_post_cleanup(const const_logic_step step) {
+	if (const bool any_deletion_occured =
+		step.transient.messages.get_queue<messages::will_soon_be_deleted>().size() > 0
+	) {
+		erase_caches_for_dead_entities(step.cosm);
 	}
 }
 

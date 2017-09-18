@@ -396,12 +396,13 @@ int main(const int argc, const char* const * const argv) try {
 	};
 
 	static auto setup_post_solve = [](const const_logic_step step) {
-		game_gui.standard_post_solve(step);
 		audiovisuals.standard_post_solve(step);
+		game_gui.standard_post_solve(step);
 	};
 
 	static auto setup_post_cleanup = [](const const_logic_step step) {
 		audiovisuals.standard_post_cleanup(step);
+		game_gui.standard_post_cleanup(step);
 	};
 
 	static auto advance_setup = [](
@@ -867,6 +868,8 @@ int main(const int argc, const char* const * const argv) try {
 			if (ingame_menu.show) {
 				const auto context = create_menu_context(ingame_menu);
 				ingame_menu.advance(context, frame_delta);
+
+				/* #4 */
 				menu_chosen_cursor = ingame_menu.draw({ context, get_drawer() });
 			}
 		}
@@ -875,6 +878,7 @@ int main(const int argc, const char* const * const argv) try {
 
 			main_menu->gui.advance(context, frame_delta);
 
+			/* #4 */
 			menu_chosen_cursor = main_menu->gui.draw({ context, get_drawer() });
 
 			main_menu.value().draw_overlays(
@@ -887,12 +891,14 @@ int main(const int argc, const char* const * const argv) try {
 		
 		renderer.call_and_clear_triangles();
 
+		/* #5 */
 		renderer.draw_call_imgui(
 			imgui_atlas,
 			game_world_atlas
 		);
 
-		const vec2i cursor_drawing_pos = common_input_state.mouse.pos;
+		/* #6 */
+		const auto cursor_drawing_pos = common_input_state.mouse.pos;
 
 		if (ImGui::GetIO().WantCaptureMouse) {
 			get_drawer().cursor(necessary_atlas_entries, augs::get_imgui_cursor<assets::necessary_image_id>(), cursor_drawing_pos, white);
