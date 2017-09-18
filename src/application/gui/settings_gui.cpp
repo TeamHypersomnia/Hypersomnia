@@ -68,17 +68,37 @@ void settings_gui_state::perform(
 
 	int field_id = 0;
 	using namespace augs::imgui;
-	const auto disp = augs::get_display();
 
-	static std::array<const char*, 7> tabs = { 
-		"Window", "Graphics", "Audio", "Controls", "Gameplay", "GUI styles", "Debug" 
-	};
+	{
+		auto tab_padding = ImGui::GetStyle().FramePadding;
+		tab_padding.x *= 4;
 
-	auto tab_padding = ImGui::GetStyle().FramePadding;
-	tab_padding.x *= 4;
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, tab_padding);
+	}
+	
+	{
+		struct tabs {
+			augs::enum_array<const char*, settings_pane> labels;
+			augs::enum_array<std::string, settings_pane> label_strs;
 
-	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, tab_padding);
-	ImGui::TabLabels(tabs.data(), tabs.size(), active_pane, nullptr);
+			tabs() {
+				augs::for_each_enum_except_bounds<settings_pane>([this](const settings_pane s) {
+					label_strs[s] = format_enum(s);
+					labels[s] = label_strs[s].c_str();
+				});
+
+				labels[settings_pane::GUI_STYLES] = "GUI styles";
+			}
+		};
+
+		static tabs tabs;
+
+		auto& labels = tabs.labels;
+		auto index = static_cast<int>(active_pane);
+		ImGui::TabLabels(labels.data(), labels.size(), index, nullptr);
+		active_pane = static_cast<settings_pane>(index);
+	}
+
 	ImGui::PopStyleVar();
 
 	ImGui::PushStyleColor(ImGuiCol_Border, ImGui::GetStyle().Colors[ImGuiCol_Button]);
@@ -87,142 +107,158 @@ void settings_gui_state::perform(
 
 	auto revert = make_revert_button_lambda(config, last_saved_config);
 
-	int pane = 0;
+	switch (active_pane) {
+		case settings_pane::WINDOW: {
+			enum_combo("Launch on game's startup", config.launch_mode);
 
-	if (active_pane == pane++) {
-		enum_combo("Launch on game's startup", config.launch_mode);
-
-		checkbox("Fullscreen", config.window.fullscreen); revert(config.window.fullscreen);
-		if (!config.window.fullscreen) {
-			auto indent = scoped_indent();
-
-			{
-				vec2i lower;
-				vec2i upper = disp.get_size();
-				ImGui::DragIntN("Window position", &config.window.position.x, 2, 0.3f, &lower.x, &upper.x, "%.0f");
-				revert(config.window.position);
-			}
-
-			{
-				vec2i lower;
-				vec2i upper = disp.get_size();
-				ImGui::DragIntN("Windowed size", &config.window.size.x, 2, 0.3f, &lower.x, &upper.x, "%.0f");
-				revert(config.window.size);
-			}
-
-			checkbox(CONFIG_NVP(window.border)); revert(config.window.border);
-			checkbox("Enable cursor clipping", config.window.enable_cursor_clipping); revert(config.window.enable_cursor_clipping);
-		}
-
-		input_text<100>(CONFIG_NVP(window.name)); revert(config.window.name);
-		checkbox("Automatically hide settings in-game", config.session.automatically_hide_settings_ingame); revert(config.session.automatically_hide_settings_ingame);
-	}
-	else if (active_pane == pane++) {
-
-	}
-	else if (active_pane == pane++) {
-		slider("Music volume", config.audio_volume.music, 0.f, 1.f); revert(config.audio_volume.music);
-		slider("Sound effects volume", config.audio_volume.sound_effects, 0.f, 1.f); revert(config.audio_volume.sound_effects);
-		slider("GUI volume", config.audio_volume.gui, 0.f, 1.f); revert(config.audio_volume.gui);
-
-		checkbox("Enable HRTF", config.audio.enable_hrtf); revert(config.audio.enable_hrtf);
-	}
-	else if (active_pane == pane++) {
-
-	}
-	else if (active_pane == pane++) {
-		checkbox(CONFIG_NVP(camera.enable_smoothing)); revert(config.camera.enable_smoothing);
-		
-		if (config.camera.enable_smoothing) {
-			auto indent = scoped_indent();
-
-			slider(CONFIG_NVP(camera.smoothing.averages_per_sec), 0.f, 100.f); revert(config.camera.smoothing.averages_per_sec);
-			slider(CONFIG_NVP(camera.smoothing.average_factor), 0.01f, 0.95f); revert(config.camera.smoothing.average_factor);
-		}
-
-		checkbox("Draw weapon laser", config.drawing.draw_weapon_laser); revert(config.drawing.draw_weapon_laser);
-		checkbox("Draw crosshairs", config.drawing.draw_crosshairs); revert(config.drawing.draw_crosshairs);
-		// checkbox("Draw gameplay GUI", config.drawing.draw_character_gui); revert(config.drawing.draw_character_gui);
-	}
-	else if (active_pane == pane++) {
-		ImGuiStyle& style = config.gui_style;
-		const ImGuiStyle& last_saved_style = last_saved_config.gui_style;
-
-		if (ImGui::TreeNode("Rendering")) {
-			ImGui::Checkbox("Anti-aliased lines", &style.AntiAliasedLines); revert(style.AntiAliasedLines);
-			ImGui::Checkbox("Anti-aliased shapes", &style.AntiAliasedShapes); revert(style.AntiAliasedShapes);
-			ImGui::PushItemWidth(100);
-
-			ImGui::DragFloat("Curve Tessellation Tolerance", &style.CurveTessellationTol, 0.02f, 0.10f, FLT_MAX, NULL, 2.0f);
-			if (style.CurveTessellationTol < 0.0f) style.CurveTessellationTol = 0.10f;
-			revert(style.CurveTessellationTol);
-
-			ImGui::SliderFloat("Global Alpha", &style.Alpha, 0.20f, 1.0f, "%.2f"); revert(style.Alpha);// Not exposing zero here so user doesn't "lose" the UI (zero alpha clips all widgets). But application code could have a toggle to switch between zero and non-zero.
-			ImGui::PopItemWidth();
-			ImGui::TreePop();
-		}
-
-		if (ImGui::TreeNode("Settings")) {
-			ImGui::SliderFloat2("WindowPadding", (float*)&style.WindowPadding, 0.0f, 20.0f, "%.0f"); revert(style.WindowPadding);
-			ImGui::SliderFloat("WindowRounding", &style.WindowRounding, 0.0f, 16.0f, "%.0f"); revert(style.WindowRounding);
-			ImGui::SliderFloat("ChildWindowRounding", &style.ChildWindowRounding, 0.0f, 16.0f, "%.0f"); revert(style.ChildWindowRounding);
-			ImGui::SliderFloat2("FramePadding", (float*)&style.FramePadding, 0.0f, 20.0f, "%.0f"); revert(style.FramePadding);
-			ImGui::SliderFloat("FrameRounding", &style.FrameRounding, 0.0f, 16.0f, "%.0f"); revert(style.FrameRounding);
-			ImGui::SliderFloat2("ItemSpacing", (float*)&style.ItemSpacing, 0.0f, 20.0f, "%.0f"); revert(style.ItemSpacing);
-			ImGui::SliderFloat2("ItemInnerSpacing", (float*)&style.ItemInnerSpacing, 0.0f, 20.0f, "%.0f"); revert(style.ItemInnerSpacing);
-			ImGui::SliderFloat2("TouchExtraPadding", (float*)&style.TouchExtraPadding, 0.0f, 10.0f, "%.0f"); revert(style.TouchExtraPadding);
-			ImGui::SliderFloat("IndentSpacing", &style.IndentSpacing, 0.0f, 30.0f, "%.0f"); revert(style.IndentSpacing);
-			ImGui::SliderFloat("ScrollbarSize", &style.ScrollbarSize, 1.0f, 20.0f, "%.0f"); revert(style.ScrollbarSize);
-			ImGui::SliderFloat("ScrollbarRounding", &style.ScrollbarRounding, 0.0f, 16.0f, "%.0f"); revert(style.ScrollbarRounding);
-			ImGui::SliderFloat("GrabMinSize", &style.GrabMinSize, 1.0f, 20.0f, "%.0f"); revert(style.GrabMinSize);
-			ImGui::SliderFloat("GrabRounding", &style.GrabRounding, 0.0f, 16.0f, "%.0f"); revert(style.GrabRounding);
-			ImGui::Text("Alignment");
-			ImGui::SliderFloat2("WindowTitleAlign", (float*)&style.WindowTitleAlign, 0.0f, 1.0f, "%.2f"); revert(style.WindowTitleAlign);
-			ImGui::SliderFloat2("ButtonTextAlign", (float*)&style.ButtonTextAlign, 0.0f, 1.0f, "%.2f"); ImGui::SameLine(); ShowHelpMarker("Alignment applies when a button is larger than its text content."); revert(style.ButtonTextAlign);
-			ImGui::TreePop();
-		}
-
-		if (ImGui::TreeNode("Colors")) {
-			static ImGuiColorEditMode edit_mode = ImGuiColorEditMode_RGB;
-			ImGui::RadioButton("RGB", &edit_mode, ImGuiColorEditMode_RGB);
-			ImGui::SameLine();
-			ImGui::RadioButton("HSV", &edit_mode, ImGuiColorEditMode_HSV);
-			ImGui::SameLine();
-			ImGui::RadioButton("HEX", &edit_mode, ImGuiColorEditMode_HEX);
-			//ImGui::Text("Tip: Click on colored square to change edit mode.");
-
-			static ImGuiTextFilter filter;
-			filter.Draw("Filter colors", 200);
-
-			ImGui::BeginChild("#colors", ImVec2(0, 300), true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
-			ImGui::PushItemWidth(-250);
-			ImGui::ColorEditMode(edit_mode);
-
-			for (int i = 0; i < ImGuiCol_COUNT; i++) {
-				const char* name = ImGui::GetStyleColName(i);
+			checkbox("Fullscreen", config.window.fullscreen); revert(config.window.fullscreen);
+			if (!config.window.fullscreen) {
+				auto indent = scoped_indent();
 				
-				if (!filter.PassFilter(name)) {
-					continue;
-				}
-				
-				ImGui::PushID(i);
-				ImGui::ColorEdit4(name, reinterpret_cast<float*>(&style.Colors[i]), true);
+				const auto disp = augs::get_display();
 
-				if (std::memcmp(&style.Colors[i], &last_saved_style.Colors[i], sizeof(ImVec4)) != 0) {
-					ImGui::SameLine(); if (ImGui::Button("Revert")) style.Colors[i] = last_saved_style.Colors[i];
+				{
+					vec2i lower;
+					vec2i upper = disp.get_size();
+					ImGui::DragIntN("Window position", &config.window.position.x, 2, 0.3f, &lower.x, &upper.x, "%.0f");
+					revert(config.window.position);
 				}
 
-				ImGui::PopID();
+				{
+					vec2i lower;
+					vec2i upper = disp.get_size();
+					ImGui::DragIntN("Windowed size", &config.window.size.x, 2, 0.3f, &lower.x, &upper.x, "%.0f");
+					revert(config.window.size);
+				}
+
+				checkbox(CONFIG_NVP(window.border)); revert(config.window.border);
+				checkbox("Enable cursor clipping", config.window.enable_cursor_clipping); revert(config.window.enable_cursor_clipping);
 			}
-			ImGui::EndChild();
 
-			ImGui::TreePop();
+			input_text<100>(CONFIG_NVP(window.name)); revert(config.window.name);
+			checkbox("Automatically hide settings in-game", config.session.automatically_hide_settings_ingame); revert(config.session.automatically_hide_settings_ingame);
+
+			break;
 		}
+		case settings_pane::GRAPHICS: {
 
-		ImGui::GetStyle() = style;
-	}
-	else if (active_pane == pane++) {
-		checkbox("Show developer console", config.session.show_developer_console); revert(config.session.show_developer_console);
+			break;
+		}
+		case settings_pane::AUDIO: {
+			slider("Music volume", config.audio_volume.music, 0.f, 1.f); revert(config.audio_volume.music);
+			slider("Sound effects volume", config.audio_volume.sound_effects, 0.f, 1.f); revert(config.audio_volume.sound_effects);
+			slider("GUI volume", config.audio_volume.gui, 0.f, 1.f); revert(config.audio_volume.gui);
+
+			checkbox("Enable HRTF", config.audio.enable_hrtf); revert(config.audio.enable_hrtf);
+
+			break;
+		}
+		case settings_pane::CONTROLS: {
+
+			break;
+		}
+		case settings_pane::GAMEPLAY: {
+			checkbox(CONFIG_NVP(camera.enable_smoothing)); revert(config.camera.enable_smoothing);
+
+			if (config.camera.enable_smoothing) {
+				auto indent = scoped_indent();
+
+				slider(CONFIG_NVP(camera.smoothing.averages_per_sec), 0.f, 100.f); revert(config.camera.smoothing.averages_per_sec);
+				slider(CONFIG_NVP(camera.smoothing.average_factor), 0.01f, 0.95f); revert(config.camera.smoothing.average_factor);
+			}
+
+			checkbox("Draw weapon laser", config.drawing.draw_weapon_laser); revert(config.drawing.draw_weapon_laser);
+			checkbox("Draw crosshairs", config.drawing.draw_crosshairs); revert(config.drawing.draw_crosshairs);
+			// checkbox("Draw gameplay GUI", config.drawing.draw_character_gui); revert(config.drawing.draw_character_gui);
+			break;
+		}
+		case settings_pane::GUI_STYLES: {
+			ImGuiStyle& style = config.gui_style;
+			const ImGuiStyle& last_saved_style = last_saved_config.gui_style;
+
+			if (ImGui::TreeNode("Rendering")) {
+				ImGui::Checkbox("Anti-aliased lines", &style.AntiAliasedLines); revert(style.AntiAliasedLines);
+				ImGui::Checkbox("Anti-aliased shapes", &style.AntiAliasedShapes); revert(style.AntiAliasedShapes);
+				ImGui::PushItemWidth(100);
+
+				ImGui::DragFloat("Curve Tessellation Tolerance", &style.CurveTessellationTol, 0.02f, 0.10f, FLT_MAX, NULL, 2.0f);
+				if (style.CurveTessellationTol < 0.0f) style.CurveTessellationTol = 0.10f;
+				revert(style.CurveTessellationTol);
+
+				ImGui::SliderFloat("Global Alpha", &style.Alpha, 0.20f, 1.0f, "%.2f"); revert(style.Alpha);// Not exposing zero here so user doesn't "lose" the UI (zero alpha clips all widgets). But application	code could have a toggle to switch between zero and non-zero.
+				ImGui::PopItemWidth();
+				ImGui::TreePop();
+			}
+
+			if (ImGui::TreeNode("Settings")) {
+				ImGui::SliderFloat2("WindowPadding", (float*)&style.WindowPadding, 0.0f, 20.0f, "%.0f"); revert(style.WindowPadding);
+				ImGui::SliderFloat("WindowRounding", &style.WindowRounding, 0.0f, 16.0f, "%.0f"); revert(style.WindowRounding);
+				ImGui::SliderFloat("ChildWindowRounding", &style.ChildWindowRounding, 0.0f, 16.0f, "%.0f"); revert(style.ChildWindowRounding);
+				ImGui::SliderFloat2("FramePadding", (float*)&style.FramePadding, 0.0f, 20.0f, "%.0f"); revert(style.FramePadding);
+				ImGui::SliderFloat("FrameRounding", &style.FrameRounding, 0.0f, 16.0f, "%.0f"); revert(style.FrameRounding);
+				ImGui::SliderFloat2("ItemSpacing", (float*)&style.ItemSpacing, 0.0f, 20.0f, "%.0f"); revert(style.ItemSpacing);
+				ImGui::SliderFloat2("ItemInnerSpacing", (float*)&style.ItemInnerSpacing, 0.0f, 20.0f, "%.0f"); revert(style.ItemInnerSpacing);
+				ImGui::SliderFloat2("TouchExtraPadding", (float*)&style.TouchExtraPadding, 0.0f, 10.0f, "%.0f"); revert(style.TouchExtraPadding);
+				ImGui::SliderFloat("IndentSpacing", &style.IndentSpacing, 0.0f, 30.0f, "%.0f"); revert(style.IndentSpacing);
+				ImGui::SliderFloat("ScrollbarSize", &style.ScrollbarSize, 1.0f, 20.0f, "%.0f"); revert(style.ScrollbarSize);
+				ImGui::SliderFloat("ScrollbarRounding", &style.ScrollbarRounding, 0.0f, 16.0f, "%.0f"); revert(style.ScrollbarRounding);
+				ImGui::SliderFloat("GrabMinSize", &style.GrabMinSize, 1.0f, 20.0f, "%.0f"); revert(style.GrabMinSize);
+				ImGui::SliderFloat("GrabRounding", &style.GrabRounding, 0.0f, 16.0f, "%.0f"); revert(style.GrabRounding);
+				ImGui::Text("Alignment");
+				ImGui::SliderFloat2("WindowTitleAlign", (float*)&style.WindowTitleAlign, 0.0f, 1.0f, "%.2f"); revert(style.WindowTitleAlign);
+				ImGui::SliderFloat2("ButtonTextAlign", (float*)&style.ButtonTextAlign, 0.0f, 1.0f, "%.2f"); ImGui::SameLine(); ShowHelpMarker("Alignment applies when a button is larger than its text content.");	revert(style.ButtonTextAlign);
+				ImGui::TreePop();
+			}
+
+			if (ImGui::TreeNode("Colors")) {
+				static ImGuiColorEditMode edit_mode = ImGuiColorEditMode_RGB;
+				ImGui::RadioButton("RGB", &edit_mode, ImGuiColorEditMode_RGB);
+				ImGui::SameLine();
+				ImGui::RadioButton("HSV", &edit_mode, ImGuiColorEditMode_HSV);
+				ImGui::SameLine();
+				ImGui::RadioButton("HEX", &edit_mode, ImGuiColorEditMode_HEX);
+				//ImGui::Text("Tip: Click on colored square to change edit mode.");
+
+				static ImGuiTextFilter filter;
+				filter.Draw("Filter colors", 200);
+
+				ImGui::BeginChild("#colors", ImVec2(0, 300), true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+				ImGui::PushItemWidth(-250);
+				ImGui::ColorEditMode(edit_mode);
+
+				for (int i = 0; i < ImGuiCol_COUNT; i++) {
+					const char* name = ImGui::GetStyleColName(i);
+
+					if (!filter.PassFilter(name)) {
+						continue;
+					}
+
+					ImGui::PushID(i);
+					ImGui::ColorEdit4(name, reinterpret_cast<float*>(&style.Colors[i]), true);
+
+					if (std::memcmp(&style.Colors[i], &last_saved_style.Colors[i], sizeof(ImVec4)) != 0) {
+						ImGui::SameLine(); if (ImGui::Button("Revert")) style.Colors[i] = last_saved_style.Colors[i];
+					}
+
+					ImGui::PopID();
+				}
+				ImGui::EndChild();
+
+				ImGui::TreePop();
+			}
+
+			ImGui::GetStyle() = style;
+
+			break;
+		}
+		case settings_pane::DEBUG: {
+			checkbox("Show developer console", config.session.show_developer_console); revert(config.session.show_developer_console);
+			break;
+		}
+		default: {
+			ensure(false && "Unknown settings pane type");
+			break;
+		}
 	}
 
 	ImGui::PopItemWidth();

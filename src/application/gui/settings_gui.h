@@ -3,8 +3,22 @@
 
 struct config_lua_table;
 
+enum class settings_pane {
+	// GEN INTROSPECTOR enum class settings_pane
+	WINDOW,
+	GRAPHICS,
+	AUDIO,
+	CONTROLS,
+	GAMEPLAY,
+	GUI_STYLES,
+	DEBUG,
+
+	COUNT
+	// END GEN INTROSPECTOR
+};
+
 class settings_gui_state {
-	int active_pane = 0;
+	settings_pane active_pane = settings_pane::WINDOW;
 
 public:
 	bool show = false;
