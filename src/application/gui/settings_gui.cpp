@@ -86,6 +86,8 @@ void settings_gui_state::perform(
 				c_strs[s] = label_strs[s].c_str();
 			});
 
+			c_strs[settings_pane::GUI_STYLES] = "GUI styles";
+
 			return c_strs;
 		}();
 
@@ -206,37 +208,31 @@ void settings_gui_state::perform(
 			}
 
 			if (ImGui::TreeNode("Colors")) {
-				static ImGuiColorEditMode edit_mode = ImGuiColorEditMode_RGB;
-				ImGui::RadioButton("RGB", &edit_mode, ImGuiColorEditMode_RGB);
-				ImGui::SameLine();
-				ImGui::RadioButton("HSV", &edit_mode, ImGuiColorEditMode_HSV);
-				ImGui::SameLine();
-				ImGui::RadioButton("HEX", &edit_mode, ImGuiColorEditMode_HEX);
-				//ImGui::Text("Tip: Click on colored square to change edit mode.");
+				ImGui::Text("Tip: Left-click on colored square to open color picker,\nRight-click to open edit options menu.");
 
 				static ImGuiTextFilter filter;
 				filter.Draw("Filter colors", 200);
 
+				static ImGuiColorEditFlags alpha_flags = 0;
+				ImGui::RadioButton("Opaque", &alpha_flags, 0); ImGui::SameLine();
+				ImGui::RadioButton("Alpha", &alpha_flags, ImGuiColorEditFlags_AlphaPreview); ImGui::SameLine();
+				ImGui::RadioButton("Both", &alpha_flags, ImGuiColorEditFlags_AlphaPreviewHalf);
+
 				ImGui::BeginChild("#colors", ImVec2(0, 300), true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
-				ImGui::PushItemWidth(-250);
-				ImGui::ColorEditMode(edit_mode);
-
-				for (int i = 0; i < ImGuiCol_COUNT; i++) {
-					const char* name = ImGui::GetStyleColName(i);
-
-					if (!filter.PassFilter(name)) {
+				ImGui::PushItemWidth(-160);
+				for (int i = 0; i < ImGuiCol_COUNT; i++)
+				{
+					const char* name = ImGui::GetStyleColorName(i);
+					if (!filter.PassFilter(name))
 						continue;
-					}
-
 					ImGui::PushID(i);
-					ImGui::ColorEdit4(name, reinterpret_cast<float*>(&style.Colors[i]), true);
-
+					ImGui::ColorEdit4(name, (float*)&style.Colors[i], ImGuiColorEditFlags_AlphaBar | alpha_flags);
 					if (std::memcmp(&style.Colors[i], &last_saved_style.Colors[i], sizeof(ImVec4)) != 0) {
 						ImGui::SameLine(); if (ImGui::Button("Revert")) style.Colors[i] = last_saved_style.Colors[i];
 					}
-
 					ImGui::PopID();
 				}
+				ImGui::PopItemWidth();
 				ImGui::EndChild();
 
 				ImGui::TreePop();
