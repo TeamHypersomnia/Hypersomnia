@@ -61,12 +61,12 @@ struct child_entity_id : entity_id {
 
 inline auto linear_cache_key(const entity_id id) {
 	ensure(id.is_set());
-	return static_cast<std::size_t>(id.indirection_index);
+	return id.indirection_index;
 }
 
 inline auto linear_cache_key(const unversioned_entity_id id) {
 	ensure(id.is_set());
-	return static_cast<std::size_t>(id.indirection_index);
+	return id.indirection_index;
 }
 
 namespace std {

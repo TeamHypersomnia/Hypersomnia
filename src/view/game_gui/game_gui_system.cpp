@@ -129,6 +129,11 @@ void game_gui_system::control_gui_world(
 	const augs::event::change change
 ) {
 	const auto root_entity = context.get_subject_entity();
+
+	if (root_entity.dead()) {
+		return;
+	}
+
 	const auto& cosmos = root_entity.get_cosmos();
 	const auto state = context.get_input_state();
 	auto& element = context.get_character_gui();
@@ -188,6 +193,10 @@ void game_gui_system::control_hotbar_and_action_button(
 	const const_entity_handle gui_entity,
 	const game_gui_intent intent
 ) {
+	if (gui_entity.dead()) {
+		return;
+	}
+
 	const auto& cosmos = gui_entity.get_cosmos();
 	auto& gui = get_character_gui(gui_entity);
 

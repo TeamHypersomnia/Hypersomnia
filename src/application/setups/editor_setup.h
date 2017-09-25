@@ -1,69 +1,95 @@
 #pragma once
-#include "application/debug_settings.h"
+#include "augs/misc/fixed_delta_timer.h"
+#include "augs/misc/debug_entropy_player.h"
 
+#include "game/assets/all_logical_assets.h"
+
+#include "game/organization/all_component_includes.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
+
+#include "view/viewables/all_viewables_defs.h"
+#include "view/viewables/viewables_loading_type.h"
+
 #include "application/debug_character_selection.h"
-#include "augs/misc/debug_entropy_player.h"
-#include "game/assets/all_logical_assets.h"
-#include "augs/misc/fixed_delta_timer.h"
-#include "game/organization/all_component_includes.h"
+#include "application/debug_settings.h"
+#include "application/setups/editor_settings.h"
+
+struct config_lua_table;
+
+namespace sol {
+	class state;
+}
 
 class editor_setup {
-public:
-	cosmos subject_cosmos;
+	cosmos edited_world;
 	cosmic_entropy total_collected_entropy;
 	augs::fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
-	entity_id viewed_entity_id;
+	entity_id viewed_character_id;
+
 	all_logical_assets logical_assets;
+	all_viewables_defs viewable_defs;
 
-	editor_setup(const std::string& directory);
+public:
+	static constexpr auto loading_strategy = viewables_loading_type::ALWAYS_HAVE_ALL_LOADED;
+	static constexpr bool can_viewables_change = false;
 
-	void save(const std::string& directory);
-	void load(const std::string& directory);
+	editor_setup(const editor_settings settings);
 
 	auto get_audiovisual_speed() const {
 		return 1.0;
 	}
 
 	auto get_interpolation_ratio() const {
-		return timer.fraction_of_step_until_next_step(subject_cosmos.get_fixed_delta());
+		return timer.fraction_of_step_until_next_step(edited_world.get_fixed_delta());
 	}
 
-	entity_handle get_viewed_character() {
-		return subject_cosmos[viewed_entity_id];
+	auto get_viewed_character_id() const {
+		return viewed_character_id;
 	}
 
-	const auto& get_viewing_cosmos() const {
-		return subject_cosmos;
+	const auto& get_viewed_cosmos() const {
+		return edited_world;
 	}
 
-	template <class F, class G>
+	auto get_viewed_character() const {
+		return get_viewed_cosmos()[get_viewed_character_id()];
+	}
+
+	const auto& get_viewable_defs() const {
+		return viewable_defs;
+	}
+
+	void perform_custom_imgui() {
+		return;
+	}
+
+	void customize_for_viewing(config_lua_table&) {
+		return;
+	}
+
+	void apply(const config_lua_table&) {
+		return;
+	}
+
+	template <class... Callbacks>
 	void advance(
-		F&& advance_audiovisuals, 
-		G&& step_post_solve
+		const augs::delta frame_delta,
+		Callbacks&&... callbacks
 	) {
-		auto steps = timer.extract_num_of_logic_steps(subject_cosmos.get_fixed_delta());
-
-		if (!steps) {
-			advance_audiovisuals();
-		}
+		timer.advance(frame_delta);
+		auto steps = timer.extract_num_of_logic_steps(edited_world.get_fixed_delta());
 
 		while (steps--) {
-			player.advance_player_and_biserialize(total_collected_entropy);
-
-			hypersomnia.advance(
-				{ total_collected_entropy, logical_assets },
-				[](auto){},
-				std::forward<G>(step_post_solve)
+			edited_world.advance(
+			{ total_collected_entropy, logical_assets },
+				std::forward<Callbacks>(callbacks)...
 			);
 
 			total_collected_entropy.clear();
-			advance_audiovisuals();
 		}
 	}
 
-	void control(
-		const cosmic_entropy&
-	);
+	void control(const cosmic_entropy&);
+	void accept_game_gui_events(const cosmic_entropy&);
 };

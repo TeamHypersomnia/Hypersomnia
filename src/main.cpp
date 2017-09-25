@@ -125,7 +125,8 @@ int main(const int argc, const char* const * const argv) try {
 	*/
 
 	using setup_variant = std::variant<
-		test_scene_setup
+		test_scene_setup,
+		editor_setup
 	>;
 
 	static std::optional<main_menu_setup> main_menu;
@@ -207,6 +208,13 @@ int main(const int argc, const char* const * const argv) try {
 				if (!main_menu.has_value()) {
 					main_menu.emplace(lua, config.main_menu);
 				}
+
+				break;
+
+			case launch_type::EDITOR:
+				current_setup.emplace(std::in_place_type_t<editor_setup>(),
+					config.editor
+				);
 
 				break;
 
@@ -319,6 +327,10 @@ int main(const int argc, const char* const * const argv) try {
 		switch (t) {
 			case T::LOCAL_UNIVERSE:
 				launch(launch_type::TEST_SCENE);
+				break;
+
+			case T::EDITOR:
+				launch(launch_type::EDITOR);
 				break;
 
 			case T::SETTINGS:

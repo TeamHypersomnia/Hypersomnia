@@ -1,18 +1,11 @@
-#include "augs/templates/string_templates.h"
-#include "augs/filesystem/file.h"
-#include "augs/window_framework/log_color.h"
-
-#include "game/detail/visible_entities.h"
-
-#include "test_scenes/test_scenes_content.h"
-
-#include "test_scenes/scenes/testbed.h"
-#include "test_scenes/scenes/minimal_scene.h"
-
 #include "game/transcendental/logic_step.h"
 #include "game/organization/all_messages_includes.h"
 
 #include "view/viewables/viewables_loading_type.h"
+
+#include "test_scenes/test_scenes_content.h"
+#include "test_scenes/scenes/testbed.h"
+#include "test_scenes/scenes/minimal_scene.h"
 
 #include "application/setups/test_scene_setup.h"
 

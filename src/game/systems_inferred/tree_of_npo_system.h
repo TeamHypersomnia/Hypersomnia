@@ -65,8 +65,8 @@ public:
 
 			bool QueryCallback(int32 node) {
 				unversioned_entity_id id;
-				id.indirection_index = reinterpret_cast<int>(tree->GetUserData(node));
-				static_assert(std::is_same_v<decltype(id.indirection_index), int>, "Userdata types incompatible");
+				id.indirection_index = { reinterpret_cast<unsigned>(tree->GetUserData(node)) };
+				static_assert(std::is_same_v<decltype(id.indirection_index), unsigned>, "Userdata types incompatible");
 
 				callback(id);
 				return true;

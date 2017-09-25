@@ -7,7 +7,7 @@ namespace augs {
 	public:
 		// GEN INTROSPECTOR class augs::pooled_object_raw_id
 		unsigned version = 0;
-		int indirection_index = -1;
+		unsigned indirection_index = -1;
 		// END GEN INTROSPECTOR
 
 		void unset();
@@ -21,7 +21,7 @@ namespace augs {
 
 	template<class T>
 	struct unversioned_id {
-		int indirection_index = -1;
+		unsigned indirection_index = -1;
 
 		bool is_set() const {
 			return *this != unversioned_id();

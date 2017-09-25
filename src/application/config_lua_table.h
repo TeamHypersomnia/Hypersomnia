@@ -15,22 +15,27 @@
 // all settings structures stored by the config
 #include "augs/window_framework/window_settings.h"
 #include "augs/audio/audio_settings.h"
-#include "view/network/simulation_receiver_settings.h"
 #include "game/debug_drawing_settings.h"
+
+#include "view/game_gui/game_gui_intent_type.h"
 #include "view/game_gui/elements/hotbar_settings.h"
+#include "view/viewables/regeneration/content_regeneration_settings.h"
 #include "view/audiovisual_state/systems/interpolation_settings.h"
+#include "view/network/simulation_receiver_settings.h"
+
 #include "application/debug_settings.h"
 #include "application/session_settings.h"
-#include "view/viewables/regeneration/content_regeneration_settings.h"
 #include "application/setups/main_menu_settings.h"
+#include "application/setups/editor_settings.h"
 #include "application/app_intent_type.h"
-#include "view/game_gui/game_gui_intent_type.h"
 
 enum class launch_type {
 	// GEN INTROSPECTOR enum class launch_type
 	MAIN_MENU,
 
 	TEST_SCENE,
+	EDITOR,
+
 	LOCAL_DETERMINISM_TEST,
 
 	DIRECTOR,
@@ -92,6 +97,7 @@ struct config_lua_table {
 	ImGuiStyle gui_style;
 	debug_settings debug;
 	session_settings session;
+	editor_settings editor;
 	augs::font_loading_input gui_font;
 
 #if TODO

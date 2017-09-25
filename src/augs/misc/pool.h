@@ -234,7 +234,10 @@ namespace augs {
 		}
 
 		bool alive(const id_type object) const {
-			return object.indirection_index >= 0 && indirectors[object.indirection_index].version == object.version;
+			return 
+				object.indirection_index < indirectors.size() 
+				&& indirectors[object.indirection_index].version == object.version
+			;
 		}
 
 		const auto& get_pooled() const {

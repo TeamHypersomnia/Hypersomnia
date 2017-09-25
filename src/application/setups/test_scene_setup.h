@@ -8,9 +8,10 @@
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 
-#include "application/debug_character_selection.h"
 #include "view/viewables/all_viewables_defs.h"
+#include "view/viewables/viewables_loading_type.h"
 
+#include "application/debug_character_selection.h"
 #include "application/debug_settings.h"
 
 struct config_lua_table;
