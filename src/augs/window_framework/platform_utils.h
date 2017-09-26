@@ -15,4 +15,6 @@ namespace augs {
 	void disable_cursor_clipping();
 
 	bool is_character_newline(unsigned i);
+	
+	std::string get_open_file_name();
 }
