@@ -30,6 +30,18 @@ class editor_setup {
 	all_logical_assets logical_assets;
 	all_viewables_defs viewable_defs;
 
+	struct popup {
+		std::string title;
+		std::string message;
+		std::string details;
+
+		bool details_expanded = false;
+	};
+
+	std::optional<popup> current_popup;
+
+	void set_popup(const popup);
+
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::ALWAYS_HAVE_ALL_LOADED;
 	static constexpr bool can_viewables_change = false;

@@ -7,6 +7,10 @@
 
 #include "generated/introspectors.h"
 
+void editor_setup::set_popup(const popup p) {
+	current_popup = p;
+}
+
 editor_setup::editor_setup(const editor_settings settings) {
 	bool success = false;
 	
@@ -15,7 +19,11 @@ editor_setup::editor_setup(const editor_settings settings) {
 		success = true;
 	}
 	catch (cosmos_loading_error err) {
-		LOG("ERROR: Editor failed to load a cosmos to work with: %x", err.what());
+		set_popup ({
+			"Error",
+			"Failed to load the editor workspace.\nA blank default was opened instead.",
+			err.what()
+		});
 	}
 
 	if (const bool load_default = !success) {
@@ -36,6 +44,8 @@ void editor_setup::control(
 }
 
 void editor_setup::perform_custom_imgui() {
+	using namespace augs::imgui;
+
 	ImGui::Begin("Summary");
 	ImGui::BeginChild("Cosmos");
 	ImGui::Text(typesafe_sprintf("Tick rate: %x/s", edited_world.get_steps_per_second()).c_str());
@@ -47,6 +57,37 @@ void editor_setup::perform_custom_imgui() {
 
 	ImGui::EndChild();
 	ImGui::End();
+
+	if (current_popup) {
+		auto& p = *current_popup;
+
+		if (!ImGui::IsPopupOpen(p.title.c_str())) {
+			ImGui::OpenPopup(p.title.c_str());
+		}
+
+		if (ImGui::BeginPopupModal(p.title.c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+			ImGui::Text(p.message.c_str());
+
+			{
+				auto& f = p.details_expanded;
+
+				if (ImGui::Button(f ? "Hide details" : "Show details")) {
+					f = !f;
+				}
+
+				if (f) {
+					ImGui::Text(p.details.c_str());
+				}
+			}
+
+			if (ImGui::Button("OK", ImVec2(120, 0))) { 
+				ImGui::CloseCurrentPopup();
+				current_popup = std::nullopt;
+			}
+
+			ImGui::EndPopup();
+		}
+	}
 }
 
 void editor_setup::accept_game_gui_events(
