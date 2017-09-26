@@ -244,6 +244,7 @@ public:
 
 	const augs::delta& get_fixed_delta() const;
 	void set_steps_per_second(const unsigned steps_per_second);
+	unsigned get_steps_per_second() const;
 
 	cosmos_common_state& get_common_state();
 	const cosmos_common_state& get_common_state() const;

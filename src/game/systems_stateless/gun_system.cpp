@@ -307,15 +307,22 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 				if (total_recoil_scale != 0.f) {
 					if (const auto* recoil_player = step.input.logical_assets.find(gun.recoil.id)) {
-						const auto recoil_body = owning_sentience
-							[child_entity_name::CHARACTER_CROSSHAIR]
-							[child_entity_name::CROSSHAIR_RECOIL_BODY]
-						.get<components::rigid_body>();
+						if (const auto recoil_entity = owning_sentience
+								[child_entity_name::CHARACTER_CROSSHAIR]
+								[child_entity_name::CROSSHAIR_RECOIL_BODY]
+							;
+							recoil_entity.alive()
+						) {
+							if (const auto recoil_body = recoil_entity.find<components::rigid_body>();
+								recoil_body != nullptr
+							) {
+								const auto recoil_value = gun.recoil.shoot_and_get_impulse(*recoil_player);
 
-						const auto recoil_value = gun.recoil.shoot_and_get_impulse(*recoil_player);
-						recoil_body.apply_angular_impulse(
-							total_recoil_scale * recoil_value * recoil_body.get_inertia()
-						);
+								recoil_body.apply_angular_impulse(
+									total_recoil_scale * recoil_value * recoil_body.get_inertia()
+								);
+							}
+						}
 					}
 
 					gun.current_heat = std::min(gun.maximum_heat, gun.current_heat + gun.gunshot_adds_heat);

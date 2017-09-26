@@ -309,46 +309,57 @@ rgba value_bar::get_bar_col(
 	const const_game_gui_context context, 
 	const const_this_pointer this_id
 ) {
-	const auto& cosmos = context.get_cosmos();
-	const auto& metas = cosmos.get_common_state();
-	const auto& sentience = context.get_subject_entity().get<components::sentience>();
+	rgba result;
 
-	return 
-		visit_by_vertical_index(
-			sentience,
-			cosmos,
-			this_id.get_location().vertical_index,
-			[](auto, const auto& meta){
-				return meta.appearance.get_bar_color();
-			}
-		)
-	;
+	if (const auto sentience = context.get_subject_entity().find<components::sentience>()) {
+		const auto& cosmos = context.get_cosmos();
+		const auto& metas = cosmos.get_common_state();
+
+		result = 
+			visit_by_vertical_index(
+				*sentience,
+				cosmos,
+				this_id.get_location().vertical_index,
+				[](auto, const auto& meta){
+					return meta.appearance.get_bar_color();
+				}
+			)
+		;
+	}
+
+	return result;
 }
 
 bool value_bar::is_enabled(
 	const const_game_gui_context context, 
 	const unsigned vertical_index
 ) {
-	const auto& cosm = context.get_cosmos();
+	bool result = false;
 
-	const auto dt = cosm.get_fixed_delta();
-	const auto now = cosm.get_timestamp();
+	if (const auto sentience = context.get_subject_entity().find<components::sentience>()) {
+		const auto& cosm = context.get_cosmos();
 
-	return 		
-		visit_by_vertical_index(
-			context.get_subject_entity().get<components::sentience>(),
-			cosm,
-			vertical_index,
+		const auto dt = cosm.get_fixed_delta();
+		const auto now = cosm.get_timestamp();
 
-			[](const auto& meter, auto){
-				return meter.is_enabled();
-			},
+		result =
+			visit_by_vertical_index(
+				context.get_subject_entity().get<components::sentience>(),
+				cosm,
+				vertical_index,
 
-			[now, dt](const auto& perk, auto){
-				return perk.timing.is_enabled(now, dt);
-			}
-		)
-	;
+				[](const auto& meter, auto){
+					return meter.is_enabled();
+				},
+
+				[now, dt](const auto& perk, auto){
+					return perk.timing.is_enabled(now, dt);
+				}
+			)
+		;
+	}
+
+	return result;
 }
 
 void value_bar::rebuild_layouts(
@@ -356,7 +367,6 @@ void value_bar::rebuild_layouts(
 	const this_pointer this_id
 ) {
 	const auto vertical_index = this_id.get_location().vertical_index;
-	const auto& sentience = context.get_subject_entity().get<components::sentience>();
 
 	const auto& cosmos = context.get_cosmos();
 

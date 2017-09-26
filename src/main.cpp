@@ -218,6 +218,8 @@ int main(const int argc, const char* const * const argv) try {
 					config.editor
 				);
 
+				game_gui.active = true;
+
 				break;
 
 			case launch_type::TEST_SCENE:

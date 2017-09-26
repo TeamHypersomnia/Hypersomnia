@@ -199,6 +199,10 @@ void cosmos::set_steps_per_second(const unsigned steps) {
 	significant.meta.delta = augs::delta::steps_per_second(steps);
 }
 
+unsigned cosmos::get_steps_per_second() const {
+	return get_fixed_delta().in_steps_per_second();
+}
+
 entity_handle cosmos::allocate_new_entity() {
 	if (get_aggregate_pool().full()) {
 		throw std::runtime_error("Entities should be controllably reserved to avoid invalidation of entity_handles.");

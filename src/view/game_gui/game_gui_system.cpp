@@ -138,39 +138,37 @@ void game_gui_system::control_gui_world(
 	const auto state = context.get_input_state();
 	auto& element = context.get_character_gui();
 
-	ensure(root_entity.has<components::item_slot_transfers>());
-	
 	if (active) {
 		bool fetched = false;
+		
+		if (root_entity.has<components::item_slot_transfers>()) {
+			if (const auto held_rect = context.get_if<item_button_in_item>(world.rect_held_by_lmb)) {
+				const auto& item_entity = cosmos[held_rect.get_location().item_id];
+				auto& dragged_charges = element.dragged_charges;
 
-		const auto held_rect = context.get_if<item_button_in_item>(world.rect_held_by_lmb);
-
-		if (held_rect != nullptr) {
-			const auto& item_entity = cosmos[held_rect.get_location().item_id];
-			auto& dragged_charges = element.dragged_charges;
-
-			if (
-				change.msg == augs::event::message::rdown
-				|| change.msg == augs::event::message::rdoubleclick
-			) {
-				if (world.held_rect_is_dragged) {
-					pending_transfers.push_back(item_slot_transfer_request { item_entity, cosmos[inventory_slot_id()], dragged_charges });
-					fetched = true;
+				if (
+					change.msg == augs::event::message::rdown
+					|| change.msg == augs::event::message::rdoubleclick
+				) {
+					if (world.held_rect_is_dragged) {
+						pending_transfers.push_back(item_slot_transfer_request { item_entity, cosmos[inventory_slot_id()], dragged_charges });
+						fetched = true;
+					}
 				}
-			}
 
-			if (change.msg == augs::event::message::wheel) {
-				const auto& item = item_entity.get<components::item>();
+				if (change.msg == augs::event::message::wheel) {
+					const auto& item = item_entity.get<components::item>();
 
-				const auto delta = change.scroll.amount;
+					const auto delta = change.scroll.amount;
 
-				dragged_charges += delta;
+					dragged_charges += delta;
 
-				if (dragged_charges <= 0) {
-					dragged_charges = item.charges + dragged_charges;
-				}
-				if (dragged_charges > item.charges) {
-					dragged_charges = dragged_charges - item.charges;
+					if (dragged_charges <= 0) {
+						dragged_charges = item.charges + dragged_charges;
+					}
+					if (dragged_charges > item.charges) {
+						dragged_charges = dragged_charges - item.charges;
+					}
 				}
 			}
 		}
@@ -334,65 +332,65 @@ void game_gui_system::rebuild_layouts(
 	const auto& game_image_defs = context.get_game_image_metas();
 	auto& element = context.get_character_gui();
 
-	ensure(root_entity.has<components::item_slot_transfers>());
+	if (root_entity.has<components::item_slot_transfers>()) {
+		const auto screen_size = context.get_screen_size();
 
-	const auto screen_size = context.get_screen_size();
+		int max_hotbar_height = 0;
 
-	int max_hotbar_height = 0;
+		{
+			int total_width = 0;
 
-	{
-		int total_width = 0;
+			for (size_t i = 0; i < element.hotbar_buttons.size(); ++i) {
+				const auto& hb = element.hotbar_buttons[i];
 
-		for (size_t i = 0; i < element.hotbar_buttons.size(); ++i) {
-			const auto& hb = element.hotbar_buttons[i];
+				const auto bbox = hb.get_bbox(necessarys, game_image_defs, root_entity);
+				max_hotbar_height = std::max(max_hotbar_height, bbox.y);
 
-			const auto bbox = hb.get_bbox(necessarys, game_image_defs, root_entity);
-			max_hotbar_height = std::max(max_hotbar_height, bbox.y);
+				total_width += bbox.x;
+			}
 
-			total_width += bbox.x;
+			const int left_rc_spacing = 2;
+			const int right_rc_spacing = 1;
+
+			int current_x = screen_size.x / 2 - total_width / 2 - left_rc_spacing;
+
+			const auto set_rc = [&](auto& hb) {
+				const auto bbox = hb.get_bbox(necessarys, game_image_defs, root_entity);
+
+				hb.rc = xywh(xywhi(current_x, screen_size.y - max_hotbar_height - 50, bbox.x + left_rc_spacing + right_rc_spacing, max_hotbar_height));
+
+				current_x += bbox.x + left_rc_spacing + right_rc_spacing;
+			};
+
+			for (size_t i = 0; i < element.hotbar_buttons.size(); ++i) {
+				set_rc(element.hotbar_buttons[i]);
+			}
 		}
 
-		const int left_rc_spacing = 2;
-		const int right_rc_spacing = 1;
+		{
+			const auto action_button_size = context.get_necessary_images().at(assets::necessary_image_id::ACTION_BUTTON_BORDER).get_size();
 
-		int current_x = screen_size.x / 2 - total_width / 2 - left_rc_spacing;
+			int total_width = element.action_buttons.size() * action_button_size.x;
 
-		const auto set_rc = [&](auto& hb) {
-			const auto bbox = hb.get_bbox(necessarys, game_image_defs, root_entity);
+			const int left_rc_spacing = 4;
+			const int right_rc_spacing = 3;
 
-			hb.rc = xywh(xywhi(current_x, screen_size.y - max_hotbar_height - 50, bbox.x + left_rc_spacing + right_rc_spacing, max_hotbar_height));
+			int current_x = screen_size.x / 2 - total_width / 2 - left_rc_spacing;
 
-			current_x += bbox.x + left_rc_spacing + right_rc_spacing;
-		};
+			const auto set_rc = [&](auto& hb) {
+				const auto bbox = action_button_size;
 
-		for (size_t i = 0; i < element.hotbar_buttons.size(); ++i) {
-			set_rc(element.hotbar_buttons[i]);
-		}
-	}
+				hb.rc = xywh(xywhi(
+					current_x, screen_size.y - action_button_size.y - 9 - max_hotbar_height - 50, 
+					bbox.x + left_rc_spacing + right_rc_spacing, 
+					action_button_size.y));
 
-	{
-		const auto action_button_size = context.get_necessary_images().at(assets::necessary_image_id::ACTION_BUTTON_BORDER).get_size();
+				current_x += bbox.x + left_rc_spacing + right_rc_spacing;
+			};
 
-		int total_width = element.action_buttons.size() * action_button_size.x;
-
-		const int left_rc_spacing = 4;
-		const int right_rc_spacing = 3;
-
-		int current_x = screen_size.x / 2 - total_width / 2 - left_rc_spacing;
-
-		const auto set_rc = [&](auto& hb) {
-			const auto bbox = action_button_size;
-
-			hb.rc = xywh(xywhi(
-				current_x, screen_size.y - action_button_size.y - 9 - max_hotbar_height - 50, 
-				bbox.x + left_rc_spacing + right_rc_spacing, 
-				action_button_size.y));
-
-			current_x += bbox.x + left_rc_spacing + right_rc_spacing;
-		};
-
-		for (size_t i = 0; i < element.action_buttons.size(); ++i) {
-			set_rc(element.action_buttons[i]);
+			for (size_t i = 0; i < element.action_buttons.size(); ++i) {
+				set_rc(element.action_buttons[i]);
+			}
 		}
 	}
 

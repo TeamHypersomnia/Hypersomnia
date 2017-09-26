@@ -62,10 +62,13 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(con
 		for (auto& it : events) {
 			const auto subject = cosmos[it.subject];
 
-			const auto maybe_crosshair = subject[child_entity_name::CHARACTER_CROSSHAIR];
+			if (it.get_motion_type() == game_motion_type::MOVE_CROSSHAIR) {
+				if (const auto maybe_crosshair = subject[child_entity_name::CHARACTER_CROSSHAIR];
+					maybe_crosshair.alive()
+				) {
+					it.subject = maybe_crosshair;
+				}
 
-			if (it.get_motion_type() == game_motion_type::MOVE_CROSSHAIR && maybe_crosshair.alive()) {
-				it.subject = maybe_crosshair;
 				continue;
 			}
 		}

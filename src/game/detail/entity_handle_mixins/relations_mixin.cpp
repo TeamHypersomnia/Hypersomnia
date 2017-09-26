@@ -65,7 +65,9 @@ void relations_mixin<false, D>::map_child_entity(
 	const child_entity_name n, 
 	const entity_id p
 ) const {
-	get_id(n) = p;
+	if (const auto maybe_id = get_id_ptr(n)) {
+		*maybe_id = p;
+	}
 }
 
 template <class D>
@@ -75,27 +77,45 @@ void relations_mixin<false, D>::set_owner_body(const entity_id parent_id) const 
 }
 
 template <bool C, class D>
-maybe_const_ref_t<C, child_entity_id> typename basic_relations_mixin<C, D>::get_id(const child_entity_name n) const {
+maybe_const_ptr_t<C, child_entity_id> typename basic_relations_mixin<C, D>::get_id_ptr(const child_entity_name n) const {
 	const auto& self = *static_cast<const D*>(this);
 
-	switch (n) {
-	case child_entity_name::CROSSHAIR_RECOIL_BODY:
-		return self.get<components::crosshair>().recoil_entity;
+	auto result = maybe_const_ptr_t<C, child_entity_id>(nullptr);
 
-	case child_entity_name::CHARACTER_CROSSHAIR:
-		return self.get<components::sentience>().character_crosshair;
+	if (self.alive()) {
+		switch (n) {
+		case child_entity_name::CROSSHAIR_RECOIL_BODY:
+			if (const auto crosshair = self.find<components::crosshair>()) {
+				result = &crosshair->recoil_entity;
+			}
+			break;
 
-	case child_entity_name::CATRIDGE_BULLET:
-		return self.get<components::catridge>().round;
+		case child_entity_name::CHARACTER_CROSSHAIR:
+			if (const auto sentience = self.find<components::sentience>()) {
+				result = &sentience->character_crosshair;
+			}
+			break;
 
-	case child_entity_name::CATRIDGE_SHELL:
-		return self.get<components::catridge>().shell;
+		case child_entity_name::CATRIDGE_BULLET:
+			if (const auto catridge = self.find<components::catridge>()) {
+				result = &catridge->round;
+			}
+			break;
 
-	default:
-		LOG("Random access abstraction for this child_entity_name is not implemented!");
-		ensure(false);
-		return get_id(child_entity_name::INVALID);
+		case child_entity_name::CATRIDGE_SHELL:
+			if (const auto catridge = self.find<components::catridge>()) {
+				result = &catridge->shell;
+			}
+			break;
+
+		default:
+			LOG("Random access abstraction for this child_entity_name is not implemented!");
+			ensure(false);
+			break;
+		}
 	}
+
+	return result;
 }
 
 template <bool C, class D>
@@ -107,7 +127,14 @@ typename basic_relations_mixin<C, D>::inventory_slot_handle_type basic_relations
 template <bool C, class D>
 D basic_relations_mixin<C, D>::operator[](const child_entity_name child) const {
 	auto& self = *static_cast<const D*>(this);
-	return self.get_cosmos()[get_id(child)];
+
+	entity_id id;
+
+	if (const auto maybe_id = get_id_ptr(child)) {
+		id = *maybe_id;
+	}
+	
+	return self.get_cosmos()[id];
 }
 
 template <bool C, class D>

@@ -19,7 +19,9 @@ struct entity_relations;
 template<bool is_const, class entity_handle_type>
 class basic_relations_mixin {
 protected:
-	typedef basic_inventory_slot_handle<is_const> inventory_slot_handle_type;
+	using inventory_slot_handle_type = basic_inventory_slot_handle<is_const>;
+	maybe_const_ptr_t<is_const, child_entity_id> get_id_ptr(const child_entity_name) const;
+
 public:
 	entity_handle_type get_parent() const;
 	
@@ -40,8 +42,6 @@ public:
 #if COSMOS_TRACKS_GUIDS
 	entity_guid get_guid() const;
 #endif
-
-	maybe_const_ref_t<is_const, child_entity_id> get_id(const child_entity_name) const;
 
 	inventory_slot_handle_type operator[](const slot_function) const;
 	entity_handle_type operator[](const child_entity_name) const;

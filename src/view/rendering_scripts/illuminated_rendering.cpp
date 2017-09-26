@@ -32,7 +32,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	const auto& cosmos = in.cosm;
 	const auto camera = in.camera;
 	const auto viewed_character = cosmos[in.viewed_character];
-	const auto viewed_crosshair = viewed_character.alive() ? viewed_character[child_entity_name::CHARACTER_CROSSHAIR] : cosmos[entity_id()];
+	const auto viewed_crosshair = viewed_character[child_entity_name::CHARACTER_CROSSHAIR];
 	const auto& interp = in.audiovisuals.get<interpolation_system>();
 	const auto& particles = in.audiovisuals.get<particles_simulation_system>();
 	const auto& wandering_pixels = in.audiovisuals.get<wandering_pixels_system>();

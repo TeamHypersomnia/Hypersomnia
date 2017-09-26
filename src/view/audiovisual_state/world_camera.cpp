@@ -142,26 +142,27 @@ vec2i world_camera::get_camera_offset_due_to_character_crosshair(
 	vec2 camera_crosshair_offset;
 
 	if (entity_to_chase.dead()) {
-		return vec2i(0, 0);
+		return { 0, 0 };
 	}
 
-	auto crosshair_entity = entity_to_chase[child_entity_name::CHARACTER_CROSSHAIR];
+	if (const auto crosshair_entity = entity_to_chase[child_entity_name::CHARACTER_CROSSHAIR];
+		crosshair_entity.alive()
+	) {
+		if (const auto maybe_crosshair = crosshair_entity.find<components::crosshair>()) {
+			auto& crosshair = *maybe_crosshair;
 
-	/* if we set player and crosshair entity targets */
-	/* skip calculations if no orbit_mode is specified */
-	if (crosshair_entity.alive()) {
-		auto& crosshair = crosshair_entity.get<components::crosshair>();
-		if (crosshair.orbit_mode != components::crosshair::NONE) {
-			camera_crosshair_offset = components::crosshair::calculate_aiming_displacement(crosshair_entity, false);
+			if (crosshair.orbit_mode != components::crosshair::NONE) {
+				camera_crosshair_offset = components::crosshair::calculate_aiming_displacement(crosshair_entity, false);
 
-			if (crosshair.orbit_mode == crosshair.ANGLED) {
-				camera_crosshair_offset.set_length(settings.angled_look_length);
-			}
+				if (crosshair.orbit_mode == crosshair.ANGLED) {
+					camera_crosshair_offset.set_length(settings.angled_look_length);
+				}
 
-			if (crosshair.orbit_mode == crosshair.LOOK) {
-				/* simple proportion */
-				camera_crosshair_offset /= crosshair.bounds_for_base_offset;
-				camera_crosshair_offset *= crosshair.max_look_expand;
+				if (crosshair.orbit_mode == crosshair.LOOK) {
+					/* simple proportion */
+					camera_crosshair_offset /= crosshair.bounds_for_base_offset;
+					camera_crosshair_offset *= crosshair.max_look_expand;
+				}
 			}
 		}
 	}

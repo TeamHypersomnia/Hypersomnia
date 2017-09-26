@@ -4,7 +4,8 @@
 
 template <bool is_const, class component_type>
 class component_synchronizer_base {
-	typedef maybe_const_ptr_t<is_const, component_type> component_pointer;
+	using component_pointer = maybe_const_ptr_t<is_const, component_type>;
+
 protected:
 	/*
 		A value of nullptr means that the entity has no such component.
@@ -22,23 +23,22 @@ public:
 		return *component;
 	}
 
-	bool operator==(std::nullptr_t) const {
+	bool operator==(const std::nullptr_t) const {
 		return component == nullptr;
 	}
 
-	bool operator!=(std::nullptr_t) const {
+	bool operator!=(const std::nullptr_t) const {
 		return component != nullptr;
 	}
 
 	component_synchronizer_base(
-		component_pointer c, 
-		basic_entity_handle<is_const> h
+		const component_pointer c, 
+		const basic_entity_handle<is_const> h
 	) : 
 		component(c), 
-		handle(h) 
-	{
-	}
+		handle(h)
+	{}
 };
 
 template <bool is_const, class component_type>
-class component_synchronizer : public component_synchronizer_base<is_const, component_type> {};
+class component_synchronizer;

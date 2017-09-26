@@ -86,5 +86,9 @@ namespace augs {
 			*this = { secs / scalar };
 			return *this;
 		}
+
+		auto in_steps_per_second() const {
+			return static_cast<unsigned>(1.0 / secs);
+		}
 	};
 }

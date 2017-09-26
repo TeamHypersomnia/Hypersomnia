@@ -60,9 +60,7 @@ public:
 		return viewable_defs;
 	}
 
-	void perform_custom_imgui() {
-		return;
-	}
+	void perform_custom_imgui();
 
 	void customize_for_viewing(config_lua_table&) {
 		return;
