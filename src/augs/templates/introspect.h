@@ -92,4 +92,18 @@ namespace augs {
 		
 		return are_equal;
 	}
+
+	template <class T>
+	void recursive_clear(T& object) {
+		augs::introspect(augs::recursive([](auto&& self, auto, auto& field) {
+			using T = std::decay_t<decltype(field)>;
+
+			if constexpr(can_clear_v<T>) {
+				field.clear();
+			}
+			else {
+				augs::introspect_if_not_leaf(augs::recursive(self), field);
+			}
+		}), object);
+	}
 }

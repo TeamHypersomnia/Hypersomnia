@@ -38,6 +38,8 @@ public:
 	cosmos_metadata meta;
 	// END GEN INTROSPECTOR
 
+	void clear();
+
 	std::size_t get_first_mismatch_pos(const cosmos_significant_state&) const;
 
 	bool operator==(const cosmos_significant_state&) const;

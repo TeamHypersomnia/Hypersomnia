@@ -1,4 +1,6 @@
 #pragma once
+#include <future>
+
 #include "augs/misc/fixed_delta_timer.h"
 #include "augs/misc/debug_entropy_player.h"
 
@@ -39,14 +41,19 @@ class editor_setup {
 	};
 
 	std::optional<popup> current_popup;
+	augs::path_type current_cosmos_path;
+
+	std::future<std::string> open_file_dialog;
 
 	void set_popup(const popup);
+	void open_cosmos(const augs::path_type& cosmos_path);
+	void start_open_file_dialog();
 
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::ALWAYS_HAVE_ALL_LOADED;
 	static constexpr bool can_viewables_change = false;
 
-	editor_setup(const editor_settings settings);
+	editor_setup(const augs::path_type& cosmos_path);
 
 	auto get_audiovisual_speed() const {
 		return 1.0;
@@ -73,6 +80,10 @@ public:
 	}
 
 	void perform_custom_imgui();
+
+	bool during_popup() const {
+		return current_popup.has_value();
+	}
 
 	void customize_for_viewing(config_lua_table&) {
 		return;

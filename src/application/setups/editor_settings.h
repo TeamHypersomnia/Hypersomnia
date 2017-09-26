@@ -3,6 +3,6 @@
 
 struct editor_settings {
 	// GEN INTROSPECTOR struct editor_settings
-	augs::path_type last_workspace_dir;
+	augs::path_type initial_cosmos_path;
 	// END GEN INTROSPECTOR
 };

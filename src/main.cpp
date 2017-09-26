@@ -215,7 +215,7 @@ int main(const int argc, const char* const * const argv) try {
 
 			case launch_type::EDITOR:
 				current_setup.emplace(std::in_place_type_t<editor_setup>(),
-					config.editor
+					config.editor.initial_cosmos_path
 				);
 
 				game_gui.active = true;
@@ -362,7 +362,7 @@ int main(const int argc, const char* const * const argv) try {
 				ingame_menu.show = false;
 				break;
 
-			case T::LEAVE_THIS_UNIVERSE:
+			case T::QUIT_TO_MENU:
 				launch(launch_type::MAIN_MENU);
 				break;
 

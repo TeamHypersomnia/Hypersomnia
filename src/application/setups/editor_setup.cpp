@@ -1,7 +1,8 @@
 #include "augs/templates/string_templates.h"
 #include "augs/misc/imgui_utils.h"
 #include "augs/filesystem/file.h"
-#include "augs/window_framework/log_color.h"
+#include "augs/templates/thread_templates.h"
+#include "augs/window_framework/platform_utils.h"
 
 #include "application/setups/editor_setup.h"
 
@@ -11,15 +12,25 @@ void editor_setup::set_popup(const popup p) {
 	current_popup = p;
 }
 
-editor_setup::editor_setup(const editor_settings settings) {
+void editor_setup::start_open_file_dialog() {
+	open_file_dialog = std::async(
+		std::launch::async,
+		[](){
+			return augs::get_open_file_name();
+		}
+	);
+}
+
+void editor_setup::open_cosmos(const augs::path_type& cosmos_path) {
 	bool success = false;
-	
+
 	try {
-		edited_world.load_from_file(augs::path_type(settings.last_workspace_dir) += "cosmos.bin");
+		edited_world.load_from_file(cosmos_path);
+		current_cosmos_path = cosmos_path;
 		success = true;
 	}
 	catch (cosmos_loading_error err) {
-		set_popup ({
+		set_popup({
 			"Error",
 			"Failed to load the editor workspace.\nA blank default was opened instead.",
 			err.what()
@@ -37,6 +48,10 @@ editor_setup::editor_setup(const editor_settings settings) {
 	}
 }
 
+editor_setup::editor_setup(const augs::path_type& cosmos_path) {
+	open_cosmos(cosmos_path);
+}
+
 void editor_setup::control(
 	const cosmic_entropy& entropy
 ) {
@@ -45,6 +60,38 @@ void editor_setup::control(
 
 void editor_setup::perform_custom_imgui() {
 	using namespace augs::imgui;
+
+	if (ImGui::BeginMainMenuBar()) {
+		if (ImGui::BeginMenu("File")) {
+			if (ImGui::MenuItem("New", "CTRL+N")) {}
+			
+			if (ImGui::MenuItem("Open", "CTRL+O")) {
+				start_open_file_dialog();
+			}
+
+			ImGui::EndMenu();
+		}
+		if (ImGui::BeginMenu("Edit")) {
+			if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
+			if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {} 
+			ImGui::Separator();
+			if (ImGui::MenuItem("Cut", "CTRL+X")) {}
+			if (ImGui::MenuItem("Copy", "CTRL+C")) {}
+			if (ImGui::MenuItem("Paste", "CTRL+V")) {}
+			ImGui::Separator();
+			
+			if (ImGui::MenuItem("Fill with test scene", nullptr, false, BUILD_TEST_SCENES == 1)) {
+			
+			}
+
+			ImGui::EndMenu();
+		}
+		ImGui::EndMainMenuBar();
+	}
+
+	if (open_file_dialog.valid() && is_ready(open_file_dialog)) {
+		open_cosmos(open_file_dialog.get());
+	}
 
 	ImGui::Begin("Summary");
 	ImGui::BeginChild("Cosmos");

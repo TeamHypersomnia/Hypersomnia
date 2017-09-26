@@ -42,6 +42,11 @@ class entity_name_metas {
 	// END GEN INTROSPECTOR
 public:
 	entity_name_metas() {
+		clear();
+	}
+
+	void clear() {
+		metas.clear();
 		metas[0] = entity_name_meta(L"Unnamed");
 	}
 

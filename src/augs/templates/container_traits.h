@@ -36,6 +36,13 @@ template <class T>
 struct can_reserve<T, decltype(std::declval<T>().reserve(0u), void())> : std::true_type {};
 
 
+template <class T, class = void>
+struct can_clear : std::false_type {};
+
+template <class T>
+struct can_clear<T, decltype(std::declval<T>().clear(), void())> : std::true_type {};
+
+
 template<typename Trait>
 struct size_test_detail
 {
@@ -77,6 +84,9 @@ constexpr bool can_access_data_v = can_access_data<T>::value;
 
 template <class T>
 constexpr bool can_reserve_v = can_reserve<T>::value;
+
+template <class T>
+constexpr bool can_clear_v = can_clear<T>::value;
 
 template <class T>
 constexpr bool is_associative_container_v = has_key_type_v<T> && has_mapped_type_v<T>;

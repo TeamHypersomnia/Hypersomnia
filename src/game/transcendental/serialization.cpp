@@ -44,23 +44,30 @@ void cosmos::load_from_file(const augs::path_type& path) {
 		refresh_for_new_significant_state();
 	});
 
-	ensure(significant.pool_for_aggregates.empty());
+	significant.clear();
 
-	try {
-		auto& stream = reserved_memory_for_serialization;
+	const auto extension = path.extension();
 
-		{
-			auto scope = measure_scope(profiler.reading_savefile);
-			augs::get_file_contents_binary_into(path, stream);
+	if (extension == ".bin") {
+		try {
+			auto& stream = reserved_memory_for_serialization;
+
+			{
+				auto scope = measure_scope(profiler.reading_savefile);
+				augs::get_file_contents_binary_into(path, stream);
+			}
+
+			{
+				auto scope = measure_scope(profiler.deserialization_pass);
+				augs::read(stream, significant);
+			}
 		}
-
-		{
-			auto scope = measure_scope(profiler.deserialization_pass);
-			augs::read(stream, significant);
+		catch (augs::ifstream_error err) {
+			throw cosmos_loading_error("Failed to load cosmos binary file:\n%x\n%x", path, err.what());
 		}
 	}
-	catch (augs::ifstream_error err) {
-		throw cosmos_loading_error("Failed to load cosmos binary file %x:\n%x", path, err.what());
+	else {
+		throw cosmos_loading_error("Failed to load cosmos file:\n%x\n%x", path, "Unknown extension!");
 	}
 
 	//ensure(cosmos() == cosmos());
@@ -89,6 +96,10 @@ namespace augs {
 
 static_assert(augs::has_io_overloads_v<augs::stream, put_all_components_into_t<augs::component_aggregate>>);
 #endif
+
+void cosmos_significant_state::clear() {
+	*this = cosmos_significant_state();
+}
 
 std::size_t cosmos_significant_state::get_first_mismatch_pos(const cosmos_significant_state& second) const {
 	/*

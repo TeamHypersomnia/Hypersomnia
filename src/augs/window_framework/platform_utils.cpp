@@ -52,25 +52,26 @@ namespace augs {
 
 	std::string get_open_file_name() {
 		OPENFILENAME ofn;       // common dialog box structure
-		wchar_t szFile[320];       // buffer for file name
-								   // Initialize OPENFILENAME
+		std::array<wchar_t, 400> szFile;
+		fill_container(szFile, 0);
+
 		ZeroMemory(&ofn, sizeof(ofn));
 		ofn.lStructSize = sizeof(ofn);
-		ofn.lpstrFile = szFile;
+		ofn.lpstrFile = szFile.data();
 		ofn.hwndOwner = NULL;
 		ofn.lpstrFile[0] = '\0';
-		ofn.nMaxFile = sizeof(szFile);
+		ofn.nMaxFile = szFile.size();
 		ofn.lpstrFilter = L"All\0*.*\0Text\0*.TXT\0";
 		ofn.nFilterIndex = 1;
 		ofn.lpstrFileTitle = NULL;
 		ofn.nMaxFileTitle = 0;
 		ofn.lpstrInitialDir = NULL;
-		ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+		ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_EXPLORER;
 
 		// Display the Open dialog box. 
 
 		if (GetOpenFileName(&ofn) == TRUE) {
-			return to_string(ofn.lpstrFile);
+			return str_ops(to_string(ofn.lpstrFile)).replace_all("\\", "/");
 		}
 		else {
 			return "";
