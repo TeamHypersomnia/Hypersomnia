@@ -2,6 +2,7 @@
 #include <map>
 #include "augs/build_settings/platform_defines.h"
 
+#include "augs/templates/exception_templates.h"
 #include "augs/templates/introspection_utils/rewrite_members.h"
 
 #include "augs/misc/randomization.h"
@@ -40,6 +41,10 @@
 #include "game/assets/behaviour_tree.h"
 
 using rng_seed_type = unsigned;
+
+struct cosmos_loading_error : error_with_typesafe_sprintf {
+	using error_with_typesafe_sprintf::error_with_typesafe_sprintf;
+};
 
 class EMPTY_BASES cosmos : 
 	private cosmos_base,

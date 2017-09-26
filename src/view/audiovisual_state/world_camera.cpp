@@ -145,9 +145,7 @@ vec2i world_camera::get_camera_offset_due_to_character_crosshair(
 		return { 0, 0 };
 	}
 
-	if (const auto crosshair_entity = entity_to_chase[child_entity_name::CHARACTER_CROSSHAIR];
-		crosshair_entity.alive()
-	) {
+	if (const auto crosshair_entity = entity_to_chase[child_entity_name::CHARACTER_CROSSHAIR]) {
 		if (const auto maybe_crosshair = crosshair_entity.find<components::crosshair>()) {
 			auto& crosshair = *maybe_crosshair;
 

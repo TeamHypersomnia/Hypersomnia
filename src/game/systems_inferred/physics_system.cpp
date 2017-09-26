@@ -123,7 +123,7 @@ void physics_system::create_inferred_state_for(const const_entity_handle handle)
 
 	if (
 		const auto rigid_body = handle.find<components::rigid_body>();
-		rigid_body != nullptr && rigid_body.is_activated()
+		rigid_body && rigid_body.is_activated()
 	) {
 		const auto& physics_data = rigid_body.get_raw_component();
 		auto& cache = get_rigid_body_cache(handle);

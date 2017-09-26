@@ -8,13 +8,25 @@
 #include "generated/introspectors.h"
 
 editor_setup::editor_setup(const editor_settings settings) {
-	edited_world.set_steps_per_second(60);
-	edited_world.reserve_storage_for_entities(100);
+	bool success = false;
+	
+	try {
+		edited_world.load_from_file(augs::path_type(settings.last_workspace_dir) += "cosmos.bin");
+		success = true;
+	}
+	catch (cosmos_loading_error err) {
+		LOG("ERROR: Editor failed to load a cosmos to work with: %x", err.what());
+	}
 
-	auto origin = edited_world.create_entity("origin_entity");
-	origin += components::transform();
+	if (const bool load_default = !success) {
+		edited_world.set_steps_per_second(60);
+		edited_world.reserve_storage_for_entities(100);
 
-	viewed_character_id = origin;
+		auto origin = edited_world.create_entity("origin_entity");
+		origin += components::transform();
+
+		viewed_character_id = origin;
+	}
 }
 
 void editor_setup::control(

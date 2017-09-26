@@ -40,24 +40,31 @@ void cosmos::save_to_file(const augs::path_type& path) {
 void cosmos::load_from_file(const augs::path_type& path) {
 	auto scope = measure_scope(profiler.total_load);
 
+	auto refresh_when_done = augs::make_scope_guard([this]() {
+		refresh_for_new_significant_state();
+	});
+
 	ensure(significant.pool_for_aggregates.empty());
+
+	try {
+		auto& stream = reserved_memory_for_serialization;
+
+		{
+			auto scope = measure_scope(profiler.reading_savefile);
+			augs::get_file_contents_binary_into(path, stream);
+		}
+
+		{
+			auto scope = measure_scope(profiler.deserialization_pass);
+			augs::read(stream, significant);
+		}
+	}
+	catch (augs::ifstream_error err) {
+		throw cosmos_loading_error("Failed to load cosmos binary file %x:\n%x", path, err.what());
+	}
 
 	//ensure(cosmos() == cosmos());
 	//ensure(main_cosmos == cosmos());
-
-	auto& stream = reserved_memory_for_serialization;
-
-	{
-		auto scope = measure_scope(profiler.reading_savefile);
-		augs::get_file_contents_binary_into(path, stream);
-	}
-	
-	{
-		auto scope = measure_scope(profiler.deserialization_pass);
-		augs::read(stream, significant);
-	}
-
-	refresh_for_new_significant_state();
 }
 
 #if ENTITY_TRACKS_NAME_FOR_DEBUG

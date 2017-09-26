@@ -68,9 +68,7 @@ void resolve_density_of_associated_fixtures(const entity_handle id) {
 	auto& cosmos = id.get_cosmos();
 
 	{
-		const auto rigid_body = id.find<components::rigid_body>();
-
-		if (rigid_body != nullptr) {
+		if (const auto rigid_body = id.find<components::rigid_body>()) {
 			const auto entities = rigid_body.get_fixture_entities();
 
 			for (const auto f : entities) {

@@ -31,6 +31,10 @@ public:
 		return component != nullptr;
 	}
 
+	operator bool() const {
+		return component != nullptr;
+	}
+
 	component_synchronizer_base(
 		const component_pointer c, 
 		const basic_entity_handle<is_const> h

@@ -159,6 +159,10 @@ public:
 		return raw_id;
 	}
 
+	operator bool() const {
+		return alive();
+	}
+
 	using allocator::has;
 
 	template <class T>

@@ -115,9 +115,7 @@ void spatial_properties_mixin<false, D>::set_logic_transform(
 
 	ensure(!this_entity_does_not_have_its_own_transform);
 	
-	const auto rigid_body = handle.find<components::rigid_body>();
-
-	if (rigid_body != nullptr) {
+	if (const auto rigid_body = handle.find<components::rigid_body>()) {
 		ensure(!handle.has<components::transform>());
 		rigid_body.set_transform(t);
 	}

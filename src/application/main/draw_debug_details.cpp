@@ -57,23 +57,37 @@ void draw_debug_details(
 	};
 
 	if (viewed_character.alive()) {
-		const auto coords = viewed_character.get_logic_transform().pos;
-		const auto rot = viewed_character.get_logic_transform().rotation;
-		const auto vel = viewed_character.get<components::rigid_body>().velocity();
+		{
+			const auto coords = viewed_character.get_logic_transform().pos;
+			const auto rot = viewed_character.get_logic_transform().rotation;
 
-		total_details += {
-			typesafe_sprintf(
-				L"Entities: %x\nX: %f2\nY: %f2\nRot: %f2\nVelX: %x\nVelY: %x\n",
-				viewed_character.get_cosmos().get_entities_count(),
-				coords.x,
-				coords.y,
-				rot,
-				vel.x,
-				vel.y
-			),
+			total_details += {
+				typesafe_sprintf(
+					L"Entities: %x\nX: %f2\nY: %f2\nRot: %f2\n",
+					viewed_character.get_cosmos().get_entities_count(),
+					coords.x,
+					coords.y,
+					rot
+				),
 
-			text_style
-		};
+				text_style
+			};
+		}
+
+		if (const auto maybe_body = viewed_character.find<components::rigid_body>()) {
+			const auto vel = maybe_body.velocity();
+
+			total_details += {
+				typesafe_sprintf(
+					L"VelX: %x\nVelY : %x\n",
+					vel.x,
+					vel.y
+				),
+				
+				text_style
+			};
+		}
+
 	}
 
 	total_details += { L"Session\n", category_style };

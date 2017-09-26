@@ -145,12 +145,7 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 			const auto shake_mult = (sentience.shake_for_ms - (now - sentience.time_of_last_shake).in_milliseconds(delta)) / 400.f;
 
 			if (shake_mult > 0.f) {
-				if (const auto owning_crosshair_recoil = subject
-						[child_entity_name::CHARACTER_CROSSHAIR]
-						[child_entity_name::CROSSHAIR_RECOIL_BODY]
-					;
-					owning_crosshair_recoil.alive()
-				) {
+				if (const auto owning_crosshair_recoil = subject[child_entity_name::CHARACTER_CROSSHAIR][child_entity_name::CROSSHAIR_RECOIL_BODY]) {
 					auto rng = cosmos.get_rng_for(subject);
 
 					owning_crosshair_recoil.get<components::rigid_body>().apply_impulse(
@@ -240,12 +235,7 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 	case messages::health_event::target_type::AIM:
 		const auto punched = subject;
 
-		if (const auto owning_crosshair_recoil = punched
-				[child_entity_name::CHARACTER_CROSSHAIR]
-				[child_entity_name::CROSSHAIR_RECOIL_BODY]
-			;
-			owning_crosshair_recoil.alive()
-		) {
+		if (const auto owning_crosshair_recoil = punched[child_entity_name::CHARACTER_CROSSHAIR][child_entity_name::CROSSHAIR_RECOIL_BODY]) {
 			auto& recoil_physics = owning_crosshair_recoil.get<components::rigid_body>();
 
 			recoil_physics.apply_angular_impulse((h.point_of_impact - punched.get_logic_transform().pos).cross(h.impact_velocity) / 10000000.f * 3.f / 25.f);
