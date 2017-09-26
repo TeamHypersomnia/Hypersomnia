@@ -5,6 +5,8 @@
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
 
+#include "augs/math/matrix.h"
+
 #include "augs/misc/imgui_utils.h"
 #include "augs/misc/lua_readwrite.h"
 #include "augs/misc/machine_entropy.h"
@@ -871,6 +873,15 @@ int main(const int argc, const char* const * const argv) try {
 			) {
 				/* #3 */
 				game_gui.world.draw(context);
+			}
+		}
+		else {
+			game_world_atlas.bind();
+			shaders.standard->set_as_current();
+
+			{
+				const auto matrix = augs::orthographic_projection(get_camera().visible_world_area);
+				shaders.standard->set_projection(matrix);
 			}
 		}
 

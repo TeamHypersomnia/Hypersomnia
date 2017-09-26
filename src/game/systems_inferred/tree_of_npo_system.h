@@ -63,7 +63,7 @@ public:
 			const b2DynamicTree* tree;
 			F callback;
 
-			bool QueryCallback(int32 node) {
+			bool QueryCallback(const int32 node) const {
 				unversioned_entity_id id;
 				id.indirection_index = { reinterpret_cast<unsigned>(tree->GetUserData(node)) };
 				static_assert(std::is_same_v<decltype(id.indirection_index), unsigned>, "Userdata types incompatible");
@@ -73,8 +73,7 @@ public:
 			}
 		};
 
-		auto aabb_listener = render_listener{ &tree.nodes, callback };
-
+		const auto aabb_listener = render_listener{ &tree.nodes, callback };
 		const auto visible_aabb = camera.get_transformed_visible_world_area_aabb().expand_from_center({ 50, 50 });
 
 		b2AABB input;
