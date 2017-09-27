@@ -50,7 +50,7 @@ namespace augs {
 		}
 	}
 
-	std::string get_open_file_name() {
+	std::string get_open_file_name(const std::wstring filter) {
 		OPENFILENAME ofn;       // common dialog box structure
 		std::array<wchar_t, 400> szFile;
 		fill_container(szFile, 0);
@@ -61,7 +61,7 @@ namespace augs {
 		ofn.hwndOwner = NULL;
 		ofn.lpstrFile[0] = '\0';
 		ofn.nMaxFile = szFile.size();
-		ofn.lpstrFilter = L"All\0*.*\0Text\0*.TXT\0";
+		ofn.lpstrFilter = filter.c_str();
 		ofn.nFilterIndex = 1;
 		ofn.lpstrFileTitle = NULL;
 		ofn.nMaxFileTitle = 0;
@@ -101,7 +101,7 @@ namespace augs {
 
 	}
 
-	std::string get_open_file_name() {
+	std::string get_open_file_name(const std::wstring) {
 		return {};
 	}
 }

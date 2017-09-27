@@ -16,7 +16,7 @@ void editor_setup::start_open_file_dialog() {
 	open_file_dialog = std::async(
 		std::launch::async,
 		[](){
-			return augs::get_open_file_name();
+			return augs::get_open_file_name(L"Cosmos binary file (*.bin)\0*.bin\0");
 		}
 	);
 }

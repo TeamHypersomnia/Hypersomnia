@@ -16,5 +16,5 @@ namespace augs {
 
 	bool is_character_newline(unsigned i);
 	
-	std::string get_open_file_name();
+	std::string get_open_file_name(const std::wstring);
 }
