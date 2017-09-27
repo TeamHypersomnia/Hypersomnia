@@ -129,8 +129,11 @@ void settings_gui_state::perform(
 				}
 
 				checkbox(CONFIG_NVP(window.border)); revert(config.window.border);
-				checkbox("Enable cursor clipping", config.window.enable_cursor_clipping); revert(config.window.enable_cursor_clipping);
+				checkbox("Show system cursor", config.window.show_system_cursor); revert(config.window.show_system_cursor);
+				checkbox("Clip system cursor", config.window.clip_system_cursor); revert(config.window.clip_system_cursor);
 			}
+			
+			checkbox("Raw mouse input", config.window.raw_mouse_input); revert(config.window.fullscreen);
 
 			input_text<100>(CONFIG_NVP(window.name)); revert(config.window.name);
 			checkbox("Automatically hide settings in-game", config.session.automatically_hide_settings_ingame); revert(config.session.automatically_hide_settings_ingame);
@@ -155,6 +158,8 @@ void settings_gui_state::perform(
 			break;
 		}
 		case settings_pane::GAMEPLAY: {
+			slider(CONFIG_NVP(camera.look_bound_expand), 0.2f, 2.f); revert(config.camera.look_bound_expand);
+			
 			checkbox(CONFIG_NVP(camera.enable_smoothing)); revert(config.camera.enable_smoothing);
 
 			if (config.camera.enable_smoothing) {

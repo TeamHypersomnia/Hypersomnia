@@ -239,7 +239,8 @@ return {
   window = {
     border = true,
     bpp = 24,
-    enable_cursor_clipping = true,
+    clip_system_cursor = true,
+    show_system_cursor = false,
     fullscreen = false,
     name = "Hypersomnia",
     position = {

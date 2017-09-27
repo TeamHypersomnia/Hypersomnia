@@ -127,7 +127,7 @@ namespace augs {
 			change.key.key = key::MMOUSE;
 			break;
 		case WM_MOUSEMOVE:
-			if (!raw_mouse_input) {
+			if (!current_settings.raw_mouse_input) {
 				basic_vec2<short> new_pos;
 
 				{
@@ -142,6 +142,9 @@ namespace augs {
 				}
 
 				last_mouse_pos = new_pos;
+
+				change.mouse.pos = basic_vec2<short>(last_mouse_pos);
+				change.msg = translate_enum(WM_MOUSEMOVE);
 			}
 			else {
 				return std::nullopt;
@@ -150,7 +153,7 @@ namespace augs {
 			break;
 
 		case WM_INPUT:
-			if (raw_mouse_input) {
+			if (current_settings.raw_mouse_input) {
 				GetRawInputData(
 					reinterpret_cast<HRAWINPUT>(lParam), 
 					RID_INPUT,
@@ -167,7 +170,7 @@ namespace augs {
 						static_cast<short>(raw->data.mouse.lLastY)
 					};
 
-					if (!frozen) {
+					if (!mouse_position_frozen) {
 						last_mouse_pos += change.mouse.rel;
 					}
 
@@ -185,6 +188,10 @@ namespace augs {
 
 		case WM_ACTIVATE:
 			active = LOWORD(wParam) == WA_ACTIVE;
+
+			if (!active) {
+				augs::set_cursor_pos(current_settings.position + last_mouse_pos);
+			}
 			break;
 
 		case WM_GETMINMAXINFO:
@@ -307,7 +314,7 @@ namespace augs {
 	}
 	
 	void window::set_mouse_position_frozen(const bool flag) {
-		frozen = flag;
+		mouse_position_frozen = flag;
 	}
 
 	bool window::set_as_current_impl() {
@@ -341,8 +348,12 @@ namespace augs {
 			}
 		}
 
-		if (current_settings.enable_cursor_clipping && GetFocus() == hwnd) {
-			enable_cursor_clipping(get_window_rect());
+		if (
+			!current_settings.fullscreen 
+			&& current_settings.clip_system_cursor 
+			&& GetFocus() == hwnd
+		) {
+			clip_system_cursor(get_window_rect());
 		}
 		else {
 			disable_cursor_clipping();
@@ -446,8 +457,8 @@ namespace augs {
 			set_window_rect(r);
 		}
 
-		if (force || changed(settings.enable_cursor_clipping)) {
-			set_cursor_visible(!settings.fullscreen && !settings.enable_cursor_clipping);
+		if (force || changed(settings.show_system_cursor)) {
+			set_cursor_visible(!settings.fullscreen && settings.show_system_cursor);
 		}
 
 		if (force || changed(settings.border)) {
@@ -463,7 +474,7 @@ namespace augs {
 			}
 			else {
 				set_window_border_enabled(settings.border);
-				set_cursor_visible(!settings.enable_cursor_clipping);
+				set_cursor_visible(settings.show_system_cursor);
 			}
 		}
 

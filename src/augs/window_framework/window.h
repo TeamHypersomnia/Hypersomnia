@@ -31,8 +31,6 @@ namespace augs {
 		HDC hdc = nullptr;
 		HGLRC hglrc = nullptr;
 		MSG wmsg;
-		
-		vec2i last_mouse_pos;
 
 		vec2i min_window_size;
 		vec2i max_window_size;
@@ -43,9 +41,9 @@ namespace augs {
 		bool active = false;
 		bool double_click_occured = false;
 		bool clear_window_inputs_once = true;
-		bool raw_mouse_input = true;
 
-		bool frozen = false;
+		bool mouse_position_frozen = false;
+		vec2i last_mouse_pos;
 
 		timer triple_click_timer;
 		unsigned triple_click_delay = 0xdeadbeef; /* maximum delay time for the next click (after doubleclick) to be considered tripleclick (in milliseconds) */

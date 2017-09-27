@@ -11,7 +11,7 @@ namespace augs {
 #include <Windows.h>
 
 namespace augs {
-	void enable_cursor_clipping(const ltrbi lt) {
+	void clip_system_cursor(const ltrbi lt) {
 		thread_local RECT r;
 		r.bottom = lt.b;
 		r.left = lt.l;
@@ -50,6 +50,10 @@ namespace augs {
 		}
 	}
 
+	void set_cursor_pos(const vec2i pos) {
+		SetCursorPos(pos.x, pos.y);
+	}
+
 	std::string get_open_file_name(const std::wstring filter) {
 		OPENFILENAME ofn;       // common dialog box structure
 		std::array<wchar_t, 400> szFile;
@@ -81,7 +85,7 @@ namespace augs {
 #else
 
 namespace augs {
-	void enable_cursor_clipping(const ltrbi lt) {
+	void clip_system_cursor(const ltrbi lt) {
 		
 	}
 
