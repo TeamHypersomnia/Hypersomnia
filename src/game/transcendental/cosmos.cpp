@@ -52,12 +52,12 @@ void cosmos::complete_reinference() {
 }
 
 void cosmos::destroy_inferred_state_completely() {
-	inferential_systems.~all_inferential_systems();
-	new (&inferential_systems) all_inferential_systems;
+	inferential.~all_inferential_systems();
+	new (&inferential) all_inferential_systems;
 
 	const auto n = significant.pool_for_aggregates.capacity();
 
-	inferential_systems.for_each([n](auto& sys) {
+	inferential.for_each([n](auto& sys) {
 		sys.reserve_caches_for_entities(n);
 	});
 }
@@ -67,7 +67,7 @@ void cosmos::create_inferred_state_completely() {
 		create_inferred_state_for(get_handle(ordered_pair.second));
 	}
 
-	inferential_systems.for_each([this](auto& sys) {
+	inferential.for_each([this](auto& sys) {
 		sys.create_additional_inferred_state(significant.meta.global);
 	});
 
@@ -81,7 +81,7 @@ void cosmos::destroy_inferred_state_of(const const_entity_handle h) {
 		sys.destroy_inferred_state_of(h);
 	};
 
-	inferential_systems.for_each(destructor);
+	inferential.for_each(destructor);
 }
 
 void cosmos::create_inferred_state_for(const const_entity_handle h) {
@@ -90,7 +90,7 @@ void cosmos::create_inferred_state_for(const const_entity_handle h) {
 			sys.create_inferred_state_for(h);
 		};
 
-		inferential_systems.for_each(constructor);
+		inferential.for_each(constructor);
 	}
 }
 
@@ -156,7 +156,7 @@ void cosmos::reserve_storage_for_entities(const std::size_t n) {
 	get_aggregate_pool().reserve(n);
 	reserve_all_components(n);
 
-	inferential_systems.for_each([n](auto& sys) {
+	inferential.for_each([n](auto& sys) {
 		sys.reserve_caches_for_entities(n);
 	});
 }
@@ -191,7 +191,7 @@ augs::stepped_timestamp cosmos::get_timestamp() const {
 	return significant.meta.now;
 }
 
-const augs::delta& cosmos::get_fixed_delta() const {
+augs::delta cosmos::get_fixed_delta() const {
 	return significant.meta.delta;
 }
 
@@ -352,7 +352,7 @@ void cosmos::delete_entity(const entity_id e) {
 		Unregister that id as a parent from the relational system
 	*/
 
-	inferential_systems.get<relational_system>().handle_deletion_of_potential_parent(e);
+	inferential.get<relational_system>().handle_deletion_of_potential_parent(e);
 }
 
 void cosmos::advance(const logic_step_input input) {
@@ -404,7 +404,7 @@ void cosmos::advance_and_queue_destructions(const logic_step step) {
 		auto scope = measure_scope(performance.physics);
 
 		listener.during_step = true;
-		inferential_systems.get<physics_system>().step_and_set_new_transforms(step);
+		inferential.get<physics_system>().step_and_set_new_transforms(step);
 		listener.during_step = false;
 	}
 
@@ -429,7 +429,7 @@ void cosmos::advance_and_queue_destructions(const logic_step step) {
 	
 	sentience_system().regenerate_values_and_advance_spell_logic(step);
 	sentience_system().apply_damage_and_generate_health_events(step);
-	inferential_systems.get<physics_system>().post_and_clear_accumulated_collision_messages(step);
+	inferential.get<physics_system>().post_and_clear_accumulated_collision_messages(step);
 	sentience_system().cooldown_aimpunches(step);
 	sentience_system().set_borders(step);
 
@@ -483,7 +483,7 @@ void cosmos::advance_and_queue_destructions(const logic_step step) {
 	//position_copying_system().update_transforms(step);
 	//rotation_copying_system().update_rotations(step.cosm);
 
-	profiler.raycasts.measure(inferential_systems.get<physics_system>().ray_casts_since_last_step);
+	profiler.raycasts.measure(inferential.get<physics_system>().ray_casts_since_last_step);
 
 	++significant.meta.now.step;
 

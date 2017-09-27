@@ -113,7 +113,7 @@ void physics_system::destroy_inferred_state_of(const const_entity_handle handle)
 
 void physics_system::create_inferred_state_for(const const_entity_handle handle) {
 	const auto& cosmos = handle.get_cosmos();
-	const auto& relational = cosmos.inferential_systems.get<relational_system>();
+	const auto& relational = cosmos.inferential.get<relational_system>();
 
 	if (const bool is_already_constructed = is_inferred_state_created_for_rigid_body(handle)) {
 		return;
@@ -337,7 +337,7 @@ void physics_system::post_and_clear_accumulated_collision_messages(const logic_s
 }
 
 physics_system& physics_system::contact_listener::get_sys() const {
-	return cosm.inferential_systems.get<physics_system>();
+	return cosm.inferential.get<physics_system>();
 }
 
 physics_system::contact_listener::contact_listener(cosmos& cosm) : cosm(cosm) {

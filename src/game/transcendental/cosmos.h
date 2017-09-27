@@ -50,47 +50,35 @@ class EMPTY_BASES cosmos :
 	private cosmos_base,
 	public augs::subscript_operator_for_get_handle_mixin<cosmos>
 {
-public:
-	all_inferential_systems inferential_systems;
-
-	mutable cosmic_profiler profiler;
-	augs::stream reserved_memory_for_serialization;
-
-	cosmos_significant_state significant;
-private:
+	/* State of the cosmos begins here ***************************/
 #if COSMOS_TRACKS_GUIDS
 	std::map<entity_guid, entity_id> guid_to_id;
-
-	friend class cosmic_delta;
-
-	template <class T>
-	friend void transform_component_guids_to_ids_in_place(T&, const cosmos&);
-
-	void assign_next_guid(const entity_handle);
-	void clear_guid(const entity_handle);
-	entity_guid get_guid(const const_entity_handle) const;
-public:
-	void remap_guids();
-private:
-	entity_handle create_entity_with_specific_guid(
-		const entity_guid specific_guid
-	);
 #endif
 
-	void advance_and_queue_destructions(const logic_step step_state);
-	void perform_deletions(const logic_step);
-
-	void destroy_inferred_state_completely();
-	void create_inferred_state_completely();
-
-	entity_handle allocate_new_entity();
-
 public:
+	cosmos_significant_state significant;
+	all_inferential_systems inferential;
+
+	augs::stream reserved_memory_for_serialization;
+	mutable cosmic_profiler profiler;
+	
+	/* State of the cosmos ends here *****************************/
+
 	cosmos(const std::size_t reserved_entities = 0u);
 	cosmos& operator=(const cosmos_significant_state&);
 
-	bool operator==(const cosmos&) const;
-	bool operator!=(const cosmos&) const;
+	/* saving procedure is not const due to possible reinference of the universe */
+	void save_to_file(const augs::path_type&);
+	void load_from_file(const augs::path_type&);
+
+	void reserve_storage_for_entities(const std::size_t);
+
+	entity_handle create_entity(const std::wstring& name);
+	entity_handle create_entity(const std::string& name);
+	entity_handle clone_entity(const entity_id);
+	void delete_entity(const entity_id);
+
+	void advance(const logic_step_input input);
 
 	template <class Pre, class Post, class PostCleanup>
 	void advance(
@@ -111,25 +99,57 @@ public:
 		queues.clear_all();
 	}
 
-	void advance(const logic_step_input input);
+	template <class F>
+	void for_each(
+		const processing_subjects list_type, 
+		F callback,
+		augs::enum_boolset<subjects_iteration_flag> flags = {}
+	) {
+		if (flags.test(subjects_iteration_flag::POSSIBLE_ITERATOR_INVALIDATION)) {
+			const auto targets = inferential.get<processing_lists_system>().get(list_type);
 
-	void reserve_storage_for_entities(const std::size_t);
+			for (const auto& subject : targets) {
+				operator()(subject, callback);
+			}
+		}
+		else {
+			for (const auto& subject : inferential.get<processing_lists_system>().get(list_type)) {
+				operator()(subject, callback);
+			}
+		}
+	}
 
-	entity_handle create_entity(const std::wstring& name);
-	entity_handle create_entity(const std::string& name);
-	entity_handle clone_entity(const entity_id);
-	void delete_entity(const entity_id);
+	template <class F>
+	void for_each(const processing_subjects list_type, F callback) const {
+		for (const auto& subject : inferential.get<processing_lists_system>().get(list_type)) {
+			operator()(subject, callback);
+		}
+	}
 
-	void refresh_for_new_significant_state();
+	template <class D>
+	void for_each_entity_id(D pred) {
+		get_aggregate_pool().for_each_id(pred);
+	}
+
+	template <class D>
+	void for_each_entity_id(D pred) const {
+		get_aggregate_pool().for_each_id(pred);
+	}
 
 	void complete_reinference();
 	void complete_reinference(const const_entity_handle);
-	void destroy_inferred_state_of(const const_entity_handle);
+
 	void create_inferred_state_for(const const_entity_handle);
+	void destroy_inferred_state_of(const const_entity_handle);
 	
+	void refresh_for_new_significant_state();
+#if COSMOS_TRACKS_GUIDS
+	void remap_guids();
+#endif
+
 	template <class System>
 	void partial_reinference(const entity_handle handle) {
-		auto& sys = inferential_systems.get<System>();
+		auto& sys = inferential.get<System>();
 
 		sys.destroy_inferred_state_of(handle);
 
@@ -138,11 +158,7 @@ public:
 		}
 	}
 
-#if COSMOS_TRACKS_GUIDS
-	entity_handle get_handle(const entity_guid);
-	const_entity_handle get_handle(const entity_guid) const;
-	bool entity_exists_with_guid(const entity_guid) const;
-#endif
+	entity_id make_versioned(const unversioned_entity_id) const;
 
 	entity_handle get_handle(const entity_id);
 	const_entity_handle get_handle(const entity_id) const;
@@ -151,9 +167,11 @@ public:
 	inventory_slot_handle get_handle(const inventory_slot_id);
 	const_inventory_slot_handle get_handle(const inventory_slot_id) const;
 
-	entity_id make_versioned(const unversioned_entity_id) const;
-
 #if COSMOS_TRACKS_GUIDS
+	entity_handle get_handle(const entity_guid);
+	const_entity_handle get_handle(const entity_guid) const;
+	bool entity_exists_with_guid(const entity_guid) const;
+
 	template <template <class> class Guidized, class source_id_type>
 	Guidized<entity_guid> guidize(const Guidized<source_id_type>& id_source) const {
 		return rewrite_members_and_transform_templated_type_into<entity_guid>(
@@ -189,48 +207,10 @@ public:
 	randomization get_rng_for(const entity_id) const;
 	rng_seed_type get_rng_seed_for(const entity_id) const;
 
-	template <class F>
-	decltype(auto) operator()(const entity_id subject, F callback) {
-		callback(get_handle(subject));
-	}
-
-	template <class F>
-	decltype(auto) operator()(const entity_id subject, F callback) const {
-		callback(get_handle(subject));
-	}
-
 	std::size_t get_count_of(const processing_subjects list_type) const {
-		return inferential_systems.get<processing_lists_system>().get(list_type).size();
-	}
-
-	template <class F>
-	void for_each(
-		const processing_subjects list_type, 
-		F callback,
-		augs::enum_boolset<subjects_iteration_flag> flags = {}
-	) {
-		if (flags.test(subjects_iteration_flag::POSSIBLE_ITERATOR_INVALIDATION)) {
-			const auto targets = inferential_systems.get<processing_lists_system>().get(list_type);
-
-			for (const auto& subject : targets) {
-				operator()(subject, callback);
-			}
-		}
-		else {
-			for (const auto& subject : inferential_systems.get<processing_lists_system>().get(list_type)) {
-				operator()(subject, callback);
-			}
-		}
-	}
-
-	template <class F>
-	void for_each(const processing_subjects list_type, F callback) const {
-		for (const auto& subject : inferential_systems.get<processing_lists_system>().get(list_type)) {
-			operator()(subject, callback);
-		}
+		return inferential.get<processing_lists_system>().get(list_type).size();
 	}
 	
-	// shortcuts
 	std::unordered_set<entity_id> get_entities_by_name(const entity_name_type&) const;
 	std::unordered_set<entity_id> get_entities_by_name_id(const entity_name_id&) const;
 	
@@ -247,7 +227,7 @@ public:
 
 	augs::stepped_timestamp get_timestamp() const;
 
-	const augs::delta& get_fixed_delta() const;
+	augs::delta get_fixed_delta() const;
 	void set_steps_per_second(const unsigned steps_per_second);
 	unsigned get_steps_per_second() const;
 
@@ -256,20 +236,6 @@ public:
 
 	common_assets& get_common_assets();
 	const common_assets& get_common_assets() const;
-
-	/* saving procedure is not const due to possible reinference of the universe */
-	void save_to_file(const augs::path_type&);
-	void load_from_file(const augs::path_type&);
-
-	template <class D>
-	void for_each_entity_id(D pred) {
-		get_aggregate_pool().for_each_id(pred);
-	}
-
-	template <class D>
-	void for_each_entity_id(D pred) const {
-		get_aggregate_pool().for_each_id(pred);
-	}
 
 	auto& get_aggregate_pool() {
 		return significant.pool_for_aggregates;
@@ -288,6 +254,43 @@ public:
 	const auto& get_component_pool() const {
 		return std::get<augs::pool<T>>(significant.pools_for_components);
 	}
+
+	bool operator==(const cosmos&) const;
+	bool operator!=(const cosmos&) const;
+
+	template <class F>
+	decltype(auto) operator()(const entity_id subject, F callback) {
+		callback(get_handle(subject));
+	}
+
+	template <class F>
+	decltype(auto) operator()(const entity_id subject, F callback) const {
+		callback(get_handle(subject));
+	}
+
+private:
+#if COSMOS_TRACKS_GUIDS
+	friend class cosmic_delta;
+
+	template <class T>
+	friend void transform_component_guids_to_ids_in_place(T&, const cosmos&);
+
+	void assign_next_guid(const entity_handle);
+	void clear_guid(const entity_handle);
+	entity_guid get_guid(const const_entity_handle) const;
+
+	entity_handle create_entity_with_specific_guid(
+		const entity_guid specific_guid
+	);
+#endif
+
+	void advance_and_queue_destructions(const logic_step step_state);
+	void perform_deletions(const logic_step);
+
+	void destroy_inferred_state_completely();
+	void create_inferred_state_completely();
+
+	entity_handle allocate_new_entity();
 };
 
 inline si_scaling cosmos::get_si() const {
@@ -329,11 +332,11 @@ inline const common_assets& cosmos::get_common_assets() const {
 }
 
 inline std::unordered_set<entity_id> cosmos::get_entities_by_name(const entity_name_type& name) const {
-	return inferential_systems.get<name_system>().get_entities_by_name(name);
+	return inferential.get<name_system>().get_entities_by_name(name);
 }
 
 inline std::unordered_set<entity_id> cosmos::get_entities_by_name_id(const entity_name_id& id) const {
-	return inferential_systems.get<name_system>().get_entities_by_name_id(id);
+	return inferential.get<name_system>().get_entities_by_name_id(id);
 }
 
 inline entity_handle cosmos::get_entity_by_name(const entity_name_type& name) {

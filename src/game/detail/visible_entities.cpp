@@ -45,8 +45,8 @@ void visible_entities::reacquire(const visible_entities_query input) {
 	const auto& cosmos = input.cosm;
 	const auto camera = input.cone;
 
-	const auto& tree_of_npo = cosmos.inferential_systems.get<tree_of_npo_system>();
-	const auto& physics = cosmos.inferential_systems.get<physics_system>();
+	const auto& tree_of_npo = cosmos.inferential.get<tree_of_npo_system>();
+	const auto& physics = cosmos.inferential.get<physics_system>();
 
 	all.clear();
 

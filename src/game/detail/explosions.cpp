@@ -75,7 +75,7 @@ void standard_explosion_input::instantiate(
 		{ request }
 	);
 
-	const auto& physics = cosmos.inferential_systems.get<physics_system>();
+	const auto& physics = cosmos.inferential.get<physics_system>();
 
 	std::unordered_set<unversioned_entity_id> affected_entities_of_bodies;
 

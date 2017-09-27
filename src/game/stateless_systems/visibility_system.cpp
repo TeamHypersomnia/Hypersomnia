@@ -184,7 +184,7 @@ void visibility_system::respond_to_visibility_information_requests(
 	const auto epsilon_threshold_obstacle_hit_meters = si.get_meters(settings.epsilon_threshold_obstacle_hit);
 
 	/* we'll need a reference to physics system for raycasting */
-	const physics_system& physics = cosmos.inferential_systems.get<physics_system>();
+	const physics_system& physics = cosmos.inferential.get<physics_system>();
 
 	struct ray_input {
 		vec2 targets[2];
