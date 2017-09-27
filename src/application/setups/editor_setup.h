@@ -43,7 +43,7 @@ class editor_setup {
 	std::optional<popup> current_popup;
 	augs::path_type current_cosmos_path;
 
-	std::future<std::string> open_file_dialog;
+	std::future<std::optional<std::string>> open_file_dialog;
 
 	void set_popup(const popup);
 	void open_cosmos(const augs::path_type& cosmos_path);
@@ -52,6 +52,7 @@ class editor_setup {
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::ALWAYS_HAVE_ALL_LOADED;
 	static constexpr bool can_viewables_change = false;
+	static constexpr bool accepts_shortcuts = true;
 
 	editor_setup(const augs::path_type& cosmos_path);
 
@@ -113,4 +114,15 @@ public:
 
 	void control(const cosmic_entropy&);
 	void accept_game_gui_events(const cosmic_entropy&);
+
+	void handle_open_shortcut();
+	void handle_save_shortcut();
+	void handle_save_as_shortcut();
+	void handle_undo_shortcut();
+	void handle_redo_shortcut();
+
+	void handle_copy_shortcut();
+	void handle_cut_shortcut();
+	void handle_paste_shortcut();
+
 };

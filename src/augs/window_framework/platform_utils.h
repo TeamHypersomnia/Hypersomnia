@@ -1,4 +1,6 @@
 #pragma once
+#include <optional>
+
 #include "augs/math/rects.h"
 #include "augs/math/vec2.h"
 
@@ -18,5 +20,5 @@ namespace augs {
 
 	bool is_character_newline(unsigned i);
 	
-	std::string get_open_file_name(const std::wstring);
+	std::optional<std::string> get_open_file_name(const std::wstring);
 }

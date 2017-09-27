@@ -73,7 +73,7 @@ void editor_setup::perform_custom_imgui() {
 		}
 		if (ImGui::BeginMenu("Edit")) {
 			if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
-			if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {} 
+			if (ImGui::MenuItem("Redo", "CTRL+SHIFT+Z", false, false)) {} 
 			ImGui::Separator();
 			if (ImGui::MenuItem("Cut", "CTRL+X")) {}
 			if (ImGui::MenuItem("Copy", "CTRL+C")) {}
@@ -90,7 +90,11 @@ void editor_setup::perform_custom_imgui() {
 	}
 
 	if (open_file_dialog.valid() && is_ready(open_file_dialog)) {
-		open_cosmos(open_file_dialog.get());
+		const auto result_path = open_file_dialog.get();
+		
+		if (result_path) {
+			open_cosmos(*result_path);
+		}
 	}
 
 	ImGui::Begin("Summary");
@@ -140,5 +144,37 @@ void editor_setup::perform_custom_imgui() {
 void editor_setup::accept_game_gui_events(
 	const cosmic_entropy& entropy
 ) {
+
+}
+
+void editor_setup::handle_open_shortcut() {
+	start_open_file_dialog();
+}
+
+void editor_setup::handle_save_shortcut() {
+
+}
+
+void editor_setup::handle_save_as_shortcut() {
+
+}
+
+void editor_setup::handle_undo_shortcut() {
+
+}
+
+void editor_setup::handle_redo_shortcut() {
+
+}
+
+void editor_setup::handle_copy_shortcut() {
+
+}
+
+void editor_setup::handle_cut_shortcut() {
+
+}
+
+void editor_setup::handle_paste_shortcut() {
 
 }

@@ -635,85 +635,126 @@ int main(const int argc, const char* const * const argv) try {
 				}
 				else if (
 					current_setup.has_value()
-					&& e.was_key_pressed(key::ESC)
+					&& e.was_pressed(key::ESC)
 				) {
 					bool& f = ingame_menu.show;
 					f = !f;
 					releases.set_all();
 				}
 				else {
-					std::optional<intent_change> key_change;
+					bool was_shortcut_hit = false;
+					
+					/* MSVC ICE fix */
+					auto& _common_input_state = common_input_state;
+					
+					visit_current_setup([&](auto& setup) {
+						using T = std::decay_t<decltype(setup)>;
 
-					if (e.was_any_key_pressed()) {
-						key_change = intent_change::PRESSED;
-					}
+						if constexpr(T::accepts_shortcuts) {
+							if (e.was_any_key_pressed()) {
+								const auto k = e.key.key;
 
-					if (e.was_any_key_released()) {
-						key_change = intent_change::RELEASED;
-					}
+								const auto has_ctrl = _common_input_state.is_set(key::LCTRL);
+								const auto has_shift = _common_input_state.is_set(key::LSHIFT);
 
-					const auto viewed_character = get_viewed_character();
+								if (has_ctrl) {
+									if (has_shift) {
+										switch (k) {
+											case key::S: setup.handle_save_as_shortcut(); was_shortcut_hit = true; break;
+											case key::Z: setup.handle_redo_shortcut(); was_shortcut_hit = true; break;
+											default: break;
+										}
+									}
+									else {
+										switch (k) {
+											case key::S: setup.handle_save_shortcut(); was_shortcut_hit = true; break;
+											case key::Z: setup.handle_undo_shortcut(); was_shortcut_hit = true; break;
+											case key::O: setup.handle_open_shortcut(); was_shortcut_hit = true; break;
+											case key::C: setup.handle_copy_shortcut(); was_shortcut_hit = true; break;
+											case key::X: setup.handle_cut_shortcut(); was_shortcut_hit = true; break;
+											case key::Y: setup.handle_paste_shortcut(); was_shortcut_hit = true; break;
+											default: break;
+										}
+									}
+								}
+							}
+						}
+					});
 
-					const bool pass_to_gameplay =
-						viewed_character.alive()
-						&& (
-							current_setup.has_value()
-							&& !ingame_menu.show
-						)
-					;
+					if (!was_shortcut_hit) {
+						std::optional<intent_change> key_change;
 
-					if (key_change.has_value()) {
-						const auto key = e.key.key;
-						const bool was_pressed = *key_change == intent_change::PRESSED;
+						if (e.was_any_key_pressed()) {
+							key_change = intent_change::PRESSED;
+						}
 
-						if (const auto it = mapped_or_nullptr(config.app_controls, key)) {
-							if (was_pressed) {
-								handle_app_intent(*it);
+						if (e.was_any_key_released()) {
+							key_change = intent_change::RELEASED;
+						}
+
+						const auto viewed_character = get_viewed_character();
+
+						const bool pass_to_gameplay =
+							viewed_character.alive()
+							&& (
+								current_setup.has_value()
+								&& !ingame_menu.show
+							)
+						;
+
+						if (key_change.has_value()) {
+							const auto key = e.key.key;
+							const bool was_pressed = *key_change == intent_change::PRESSED;
+
+							if (const auto it = mapped_or_nullptr(config.app_controls, key)) {
+								if (was_pressed) {
+									handle_app_intent(*it);
+								}
+							}
+							else {
+								if (pass_to_gameplay) {
+									if (const auto it = mapped_or_nullptr(config.app_ingame_controls, key)) {
+										if (was_pressed) {
+											handle_app_ingame_intent(*it);
+										}
+									}
+									else if (const auto it = mapped_or_nullptr(config.game_gui_controls, key)) {
+										game_gui.control_hotbar_and_action_button(viewed_character, { *it, *key_change });
+									}
+									else if (const auto it = mapped_or_nullptr(config.game_controls, key)) {
+										if (
+											const bool leave_it_for_game_gui = e.uses_mouse() && game_gui.active;
+											!leave_it_for_game_gui
+										) {
+											game_intents.push_back({ *it, *key_change });
+										}
+									}
+								}
 							}
 						}
 						else {
-							if (pass_to_gameplay) {
-								if (const auto it = mapped_or_nullptr(config.app_ingame_controls, key)) {
-									if (was_pressed) {
-										handle_app_ingame_intent(*it);
-									}
-								}
-								else if (const auto it = mapped_or_nullptr(config.game_gui_controls, key)) {
-									game_gui.control_hotbar_and_action_button(viewed_character, { *it, *key_change });
-								}
-								else if (const auto it = mapped_or_nullptr(config.game_controls, key)) {
-									if (
-										const bool leave_it_for_game_gui = e.uses_mouse() && game_gui.active;
-										!leave_it_for_game_gui
-									) {
-										game_intents.push_back({ *it, *key_change });
-									}
-								}
+							if (
+								e.msg == message::mousemotion
+								&& pass_to_gameplay
+								&& !game_gui.active
+							) {
+								game_motions.push_back({ game_motion_type::MOVE_CROSSHAIR, e.mouse.rel });
 							}
 						}
-					}
-					else {
-						if (
-							e.msg == message::mousemotion
-							&& pass_to_gameplay
-							&& !game_gui.active
-						) {
-							game_motions.push_back({ game_motion_type::MOVE_CROSSHAIR, e.mouse.rel });
-						}
-					}
 
-					if (main_menu.has_value() && !current_setup.has_value()) {
-						if (main_menu->gui.show || e.was_any_key_released()) {
-							main_menu->gui.control(create_menu_context(main_menu->gui), e, do_main_menu_option);
+						if (main_menu.has_value() && !current_setup.has_value()) {
+							if (main_menu->gui.show || e.was_any_key_released()) {
+								main_menu->gui.control(create_menu_context(main_menu->gui), e, do_main_menu_option);
+							}
 						}
-					}
-					
-					if (ingame_menu.show || e.was_any_key_released()) {
-						ingame_menu.control(create_menu_context(ingame_menu), e, do_ingame_menu_option);
-					}
-					
-					if (pass_to_gameplay || e.was_any_key_released()) {
-						game_gui.control_gui_world(create_game_gui_context(), e);
+						
+						if (ingame_menu.show || e.was_any_key_released()) {
+							ingame_menu.control(create_menu_context(ingame_menu), e, do_ingame_menu_option);
+						}
+						
+						if (pass_to_gameplay || e.was_any_key_released()) {
+							game_gui.control_gui_world(create_game_gui_context(), e);
+						}
 					}
 				}
 			}

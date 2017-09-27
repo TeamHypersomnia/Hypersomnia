@@ -72,7 +72,7 @@ namespace augs {
 			return get_key_change() == key_change::RELEASED;
 		}
 
-		bool change::was_key_pressed(const keys::key k) const {
+		bool change::was_pressed(const keys::key k) const {
 			return was_any_key_pressed() && key.key == k;
 		}
 

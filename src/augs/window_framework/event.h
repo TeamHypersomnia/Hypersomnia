@@ -235,7 +235,7 @@ namespace augs {
 				bool uses_keyboard() const;
 				bool was_any_key_pressed() const;
 				bool was_any_key_released() const;
-				bool was_key_pressed(const keys::key) const;
+				bool was_pressed(const keys::key) const;
 				bool was_key_released(const keys::key) const;
 
 				bool is_exit_message() const;

@@ -54,7 +54,7 @@ namespace augs {
 		SetCursorPos(pos.x, pos.y);
 	}
 
-	std::string get_open_file_name(const std::wstring filter) {
+	std::optional<std::string> get_open_file_name(const std::wstring filter) {
 		OPENFILENAME ofn;       // common dialog box structure
 		std::array<wchar_t, 400> szFile;
 		fill_container(szFile, 0);
@@ -78,7 +78,7 @@ namespace augs {
 			return str_ops(to_string(ofn.lpstrFile)).replace_all("\\", "/");
 		}
 		else {
-			return "";
+			return std::nullopt;
 		}
 	}
 }
@@ -105,8 +105,8 @@ namespace augs {
 
 	}
 
-	std::string get_open_file_name(const std::wstring) {
-		return {};
+	std::optional<std::string> get_open_file_name(const std::wstring filter) {
+		return std::nullopt;
 	}
 }
 
