@@ -265,7 +265,7 @@ void particles_simulation_system::advance_visible_streams_and_all_particles(
 		}
 	};
 
-	cosmos.systems_inferred.get<tree_of_npo_system>().for_each_visible_in_camera(
+	cosmos.inferential_systems.get<tree_of_npo_system>().for_each_visible_in_camera(
 		update_target,
 		cone,
 		tree_of_npo_type::PARTICLE_EXISTENCES

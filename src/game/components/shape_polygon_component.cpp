@@ -3,7 +3,7 @@
 
 #include "game/detail/physics/b2Fixture_index_in_component.h"
 #include "game/components/shape_polygon_component.h"
-#include "game/systems_inferred/physics_system.h"
+#include "game/inferential_systems/physics_system.h"
 
 template <bool C>
 bool basic_shape_polygon_synchronizer<C>::is_activated() const {

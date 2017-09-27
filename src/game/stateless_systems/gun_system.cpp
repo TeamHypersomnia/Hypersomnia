@@ -29,8 +29,8 @@
 #include "game/components/transform_component.h"
 #include "game/components/gun_component.h"
 
-#include "game/systems_stateless/gun_system.h"
-#include "game/systems_inferred/physics_system.h"
+#include "game/stateless_systems/gun_system.h"
+#include "game/inferential_systems/physics_system.h"
 
 using namespace augs;
 
@@ -118,7 +118,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
 
-	auto& physics_sys = cosmos.systems_inferred.get<physics_system>();
+	auto& physics_sys = cosmos.inferential_systems.get<physics_system>();
 
 	cosmos.for_each(
 		processing_subjects::WITH_GUN,

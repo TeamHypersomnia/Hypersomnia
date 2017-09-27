@@ -51,7 +51,7 @@ class EMPTY_BASES cosmos :
 	public augs::subscript_operator_for_get_handle_mixin<cosmos>
 {
 public:
-	all_systems_inferred systems_inferred;
+	all_inferential_systems inferential_systems;
 
 	mutable cosmic_profiler profiler;
 	augs::stream reserved_memory_for_serialization;
@@ -129,7 +129,7 @@ public:
 	
 	template <class System>
 	void partial_reinference(const entity_handle handle) {
-		auto& sys = systems_inferred.get<System>();
+		auto& sys = inferential_systems.get<System>();
 
 		sys.destroy_inferred_state_of(handle);
 
@@ -200,7 +200,7 @@ public:
 	}
 
 	std::size_t get_count_of(const processing_subjects list_type) const {
-		return systems_inferred.get<processing_lists_system>().get(list_type).size();
+		return inferential_systems.get<processing_lists_system>().get(list_type).size();
 	}
 
 	template <class F>
@@ -210,14 +210,14 @@ public:
 		augs::enum_boolset<subjects_iteration_flag> flags = {}
 	) {
 		if (flags.test(subjects_iteration_flag::POSSIBLE_ITERATOR_INVALIDATION)) {
-			const auto targets = systems_inferred.get<processing_lists_system>().get(list_type);
+			const auto targets = inferential_systems.get<processing_lists_system>().get(list_type);
 
 			for (const auto& subject : targets) {
 				operator()(subject, callback);
 			}
 		}
 		else {
-			for (const auto& subject : systems_inferred.get<processing_lists_system>().get(list_type)) {
+			for (const auto& subject : inferential_systems.get<processing_lists_system>().get(list_type)) {
 				operator()(subject, callback);
 			}
 		}
@@ -225,7 +225,7 @@ public:
 
 	template <class F>
 	void for_each(const processing_subjects list_type, F callback) const {
-		for (const auto& subject : systems_inferred.get<processing_lists_system>().get(list_type)) {
+		for (const auto& subject : inferential_systems.get<processing_lists_system>().get(list_type)) {
 			operator()(subject, callback);
 		}
 	}
@@ -329,11 +329,11 @@ inline const common_assets& cosmos::get_common_assets() const {
 }
 
 inline std::unordered_set<entity_id> cosmos::get_entities_by_name(const entity_name_type& name) const {
-	return systems_inferred.get<name_system>().get_entities_by_name(name);
+	return inferential_systems.get<name_system>().get_entities_by_name(name);
 }
 
 inline std::unordered_set<entity_id> cosmos::get_entities_by_name_id(const entity_name_id& id) const {
-	return systems_inferred.get<name_system>().get_entities_by_name_id(id);
+	return inferential_systems.get<name_system>().get_entities_by_name_id(id);
 }
 
 inline entity_handle cosmos::get_entity_by_name(const entity_name_type& name) {

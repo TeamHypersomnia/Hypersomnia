@@ -22,7 +22,7 @@
 #include "augs/templates/container_templates.h"
 #include "augs/templates/dynamic_cast_dispatch.h"
 #include "augs/build_settings/setting_debug_physics_system_copy.h"
-#include "game/systems_inferred/relational_system.h"
+#include "game/inferential_systems/relational_system.h"
 
 bool physics_system::is_inferred_state_created_for_rigid_body(const const_entity_handle handle) const {
 	return 
@@ -113,7 +113,7 @@ void physics_system::destroy_inferred_state_of(const const_entity_handle handle)
 
 void physics_system::create_inferred_state_for(const const_entity_handle handle) {
 	const auto& cosmos = handle.get_cosmos();
-	const auto& relational = cosmos.systems_inferred.get<relational_system>();
+	const auto& relational = cosmos.inferential_systems.get<relational_system>();
 
 	if (const bool is_already_constructed = is_inferred_state_created_for_rigid_body(handle)) {
 		return;
@@ -337,7 +337,7 @@ void physics_system::post_and_clear_accumulated_collision_messages(const logic_s
 }
 
 physics_system& physics_system::contact_listener::get_sys() const {
-	return cosm.systems_inferred.get<physics_system>();
+	return cosm.inferential_systems.get<physics_system>();
 }
 
 physics_system::contact_listener::contact_listener(cosmos& cosm) : cosm(cosm) {

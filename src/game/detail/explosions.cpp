@@ -5,8 +5,8 @@
 #include "augs/graphics/rgba.h"
 #include "game/messages/exploding_ring_input.h"
 #include "game/messages/damage_message.h"
-#include "game/systems_stateless/visibility_system.h"
-#include "game/systems_stateless/sound_existence_system.h"
+#include "game/stateless_systems/visibility_system.h"
+#include "game/stateless_systems/sound_existence_system.h"
 #include "game/enums/filters.h"
 #include "game/components/sentience_component.h"
 #include "game/transcendental/logic_step.h"
@@ -75,7 +75,7 @@ void standard_explosion_input::instantiate(
 		{ request }
 	);
 
-	const auto& physics = cosmos.systems_inferred.get<physics_system>();
+	const auto& physics = cosmos.inferential_systems.get<physics_system>();
 
 	std::unordered_set<unversioned_entity_id> affected_entities_of_bodies;
 

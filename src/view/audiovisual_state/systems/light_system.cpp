@@ -15,7 +15,7 @@
 
 #include "game/messages/visibility_information.h"
 
-#include "game/systems_stateless/visibility_system.h"
+#include "game/stateless_systems/visibility_system.h"
 
 #include "view/viewables/game_image.h"
 #include "view/rendering_scripts/draw_entity.h"

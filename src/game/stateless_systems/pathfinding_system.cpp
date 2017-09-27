@@ -3,7 +3,7 @@
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/logic_step.h"
 
-#include "game/systems_inferred/physics_system.h"
+#include "game/inferential_systems/physics_system.h"
 
 #include "game/components/pathfinding_component.h"
 #include "game/components/shape_polygon_component.h"
@@ -55,7 +55,7 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 	const float epsilon_distance_visible_point_sq = settings.epsilon_distance_visible_point * settings.epsilon_distance_visible_point;
 	
 	/* we'll need a reference to physics system for raycasting */
-	physics_system& physics = cosmos.systems_inferred.get<physics_system>();
+	physics_system& physics = cosmos.inferential_systems.get<physics_system>();
 
 	auto& lines = DEBUG_LOGIC_STEP_LINES;
 

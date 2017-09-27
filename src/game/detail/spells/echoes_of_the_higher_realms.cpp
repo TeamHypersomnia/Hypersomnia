@@ -6,7 +6,7 @@
 #include "game/components/sound_existence_component.h"
 #include "game/detail/spells/spell_logic_input.h"
 #include "game/detail/spells/spell_utils.h"
-#include "game/systems_stateless/sentience_system.h"
+#include "game/stateless_systems/sentience_system.h"
 
 #include "game/messages/health_event.h"
 

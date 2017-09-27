@@ -6,7 +6,7 @@
 #include "game/components/all_inferred_state_component.h"
 #include "game/components/name_component.h"
 
-#include "game/systems_inferred/name_system.h"
+#include "game/inferential_systems/name_system.h"
 
 entity_id get_first_named_ancestor(const const_entity_handle p) {
 	entity_id iterator = p;
@@ -39,7 +39,7 @@ template <bool C>
 const entity_name_type& basic_name_synchronizer<C>::get_name() const {
 	const auto& cosmos = handle.get_cosmos();
 
-	return cosmos.systems_inferred.get<name_system>().get_name(
+	return cosmos.inferential_systems.get<name_system>().get_name(
 		cosmos.get_common_state().name_metas,
 		get_raw_component()
 	);
@@ -48,7 +48,7 @@ const entity_name_type& basic_name_synchronizer<C>::get_name() const {
 void component_synchronizer<false, N>::set_name(const entity_name_type& full_name) const {
 	auto& cosmos = handle.get_cosmos();
 
-	cosmos.systems_inferred.get<name_system>().set_name(
+	cosmos.inferential_systems.get<name_system>().set_name(
 		cosmos.get_common_state().name_metas,
 		full_name,
 		get_raw_component(),
@@ -63,7 +63,7 @@ void component_synchronizer<false, N>::set_name(const entity_name_type& full_nam
 }
 
 void component_synchronizer<false, N>::set_name_id(const entity_name_id id) const {
-	handle.get_cosmos().systems_inferred.get<name_system>().set_name_id(
+	handle.get_cosmos().inferential_systems.get<name_system>().set_name_id(
 		id,
 		get_raw_component(),
 		handle

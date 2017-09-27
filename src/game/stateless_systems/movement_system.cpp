@@ -14,7 +14,7 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/logic_step.h"
 
-#include "game/systems_stateless/sentience_system.h"
+#include "game/stateless_systems/sentience_system.h"
 
 #include "game/detail/physics/physics_scripts.h"
 
@@ -62,7 +62,7 @@ void movement_system::set_movement_flags_from_input(const logic_step step) {
 }
 
 void movement_system::apply_movement_forces(cosmos& cosmos) {
-	auto& physics_sys = cosmos.systems_inferred.get<physics_system>();
+	auto& physics_sys = cosmos.inferential_systems.get<physics_system>();
 	const auto& delta = cosmos.get_fixed_delta();
 
 	cosmos.for_each(

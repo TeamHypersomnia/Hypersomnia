@@ -11,7 +11,7 @@
 #include "game/components/sentience_component.h"
 
 #include "game/transcendental/cosmos.h"
-#include "game/systems_inferred/physics_system.h"
+#include "game/inferential_systems/physics_system.h"
 
 #include "game/components/driver_component.h"
 #include "game/components/rigid_body_component.h"
@@ -52,7 +52,7 @@ void driver_system::release_drivers_due_to_ending_contact_with_wheel(const logic
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
 	const auto& contacts = step.transient.messages.get_queue<messages::collision_message>();
-	const auto& physics = cosmos.systems_inferred.get<physics_system>();
+	const auto& physics = cosmos.inferential_systems.get<physics_system>();
 
 	for (const auto& c : contacts) {
 		if (c.type == messages::collision_message::event_type::END_CONTACT) {
@@ -112,7 +112,7 @@ bool driver_system::change_car_ownership(
 ) {
 	auto& driver = driver_entity.get<components::driver>();
 	auto& cosmos = driver_entity.get_cosmos();
-	const auto& physics = cosmos.systems_inferred.get<physics_system>();
+	const auto& physics = cosmos.inferential_systems.get<physics_system>();
 
 	auto* const maybe_rotation_copying = driver_entity.find<components::rotation_copying>();
 	const auto maybe_rigid_body = driver_entity.find<components::rigid_body>();

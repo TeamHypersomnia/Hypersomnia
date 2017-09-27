@@ -8,7 +8,7 @@
 #include "fixtures_component.h"
 
 #include "augs/math/vec2.h"
-#include "game/systems_inferred/physics_system.h"
+#include "game/inferential_systems/physics_system.h"
 #include "augs/ensure.h"
 #include "game/debug_drawing_settings.h"
 
@@ -30,12 +30,12 @@ void components::rigid_body::set_transform(
 
 template<bool C>
 bool basic_physics_synchronizer<C>::is_constructed() const {
-	return handle.get_cosmos().systems_inferred.get<physics_system>().is_inferred_state_created_for_rigid_body(handle);
+	return handle.get_cosmos().inferential_systems.get<physics_system>().is_inferred_state_created_for_rigid_body(handle);
 }
 
 template<bool C>
 maybe_const_ref_t<C, rigid_body_cache>& basic_physics_synchronizer<C>::get_cache() const {
-	return handle.get_cosmos().systems_inferred.get<physics_system>().get_rigid_body_cache(handle);
+	return handle.get_cosmos().inferential_systems.get<physics_system>().get_rigid_body_cache(handle);
 }
 
 void component_synchronizer<false, P>::reinference() const {

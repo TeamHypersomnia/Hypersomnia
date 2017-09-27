@@ -5,7 +5,7 @@
 #include "game/components/explosive_component.h"
 #include "augs/drawing/drawing.h"
 
-#include "game/systems_inferred/physics_system.h"
+#include "game/inferential_systems/physics_system.h"
 #include "game/enums/filters.h"
 #include "game/detail/entity_scripts.h"
 
@@ -16,7 +16,7 @@
 void draw_crosshair_lasers(const draw_crosshair_lasers_input in) {
 	if (in.crosshair.alive()) {
 		const auto& cosmos = in.crosshair.get_cosmos();
-		const auto& physics = cosmos.systems_inferred.get<physics_system>();
+		const auto& physics = cosmos.inferential_systems.get<physics_system>();
 
 		const auto crosshair_pos = in.crosshair.get_viewing_transform(in.interpolation).pos;
 

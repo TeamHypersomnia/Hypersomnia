@@ -22,7 +22,7 @@
 #include "game/components/tree_of_npo_node_component.h"
 #include "game/components/flags_component.h"
 #include "game/components/shape_polygon_component.h"
-#include "game/systems_stateless/particles_existence_system.h"
+#include "game/stateless_systems/particles_existence_system.h"
 
 #include "game/enums/filters.h"
 #include "game/enums/party_category.h"

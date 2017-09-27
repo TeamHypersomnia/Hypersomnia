@@ -1,29 +1,29 @@
 #include "cosmos.h"
 
-#include "game/systems_stateless/movement_system.h"
-#include "game/systems_stateless/visibility_system.h"
-#include "game/systems_stateless/pathfinding_system.h"
-#include "game/systems_stateless/animation_system.h"
-#include "game/systems_stateless/input_system.h"
-#include "game/systems_stateless/gun_system.h"
-#include "game/systems_stateless/crosshair_system.h"
-#include "game/systems_stateless/rotation_copying_system.h"
-#include "game/systems_stateless/position_copying_system.h"
-#include "game/systems_stateless/missile_system.h"
-#include "game/systems_stateless/destroy_system.h"
-#include "game/systems_stateless/particles_existence_system.h"
-#include "game/systems_stateless/behaviour_tree_system.h"
-#include "game/systems_stateless/car_system.h"
-#include "game/systems_stateless/driver_system.h"
-#include "game/systems_stateless/item_system.h"
-#include "game/systems_stateless/force_joint_system.h"
-#include "game/systems_stateless/intent_contextualization_system.h"
-#include "game/systems_stateless/trace_system.h"
-#include "game/systems_stateless/melee_system.h"
-#include "game/systems_stateless/sentience_system.h"
-#include "game/systems_stateless/destruction_system.h"
-#include "game/systems_stateless/sound_existence_system.h"
-#include "game/systems_stateless/hand_fuse_system.h"
+#include "game/stateless_systems/movement_system.h"
+#include "game/stateless_systems/visibility_system.h"
+#include "game/stateless_systems/pathfinding_system.h"
+#include "game/stateless_systems/animation_system.h"
+#include "game/stateless_systems/input_system.h"
+#include "game/stateless_systems/gun_system.h"
+#include "game/stateless_systems/crosshair_system.h"
+#include "game/stateless_systems/rotation_copying_system.h"
+#include "game/stateless_systems/position_copying_system.h"
+#include "game/stateless_systems/missile_system.h"
+#include "game/stateless_systems/destroy_system.h"
+#include "game/stateless_systems/particles_existence_system.h"
+#include "game/stateless_systems/behaviour_tree_system.h"
+#include "game/stateless_systems/car_system.h"
+#include "game/stateless_systems/driver_system.h"
+#include "game/stateless_systems/item_system.h"
+#include "game/stateless_systems/force_joint_system.h"
+#include "game/stateless_systems/intent_contextualization_system.h"
+#include "game/stateless_systems/trace_system.h"
+#include "game/stateless_systems/melee_system.h"
+#include "game/stateless_systems/sentience_system.h"
+#include "game/stateless_systems/destruction_system.h"
+#include "game/stateless_systems/sound_existence_system.h"
+#include "game/stateless_systems/hand_fuse_system.h"
 
 #include "game/enums/render_layer.h"
 
@@ -52,12 +52,12 @@ void cosmos::complete_reinference() {
 }
 
 void cosmos::destroy_inferred_state_completely() {
-	systems_inferred.~all_systems_inferred();
-	new (&systems_inferred) all_systems_inferred;
+	inferential_systems.~all_inferential_systems();
+	new (&inferential_systems) all_inferential_systems;
 
 	const auto n = significant.pool_for_aggregates.capacity();
 
-	systems_inferred.for_each([n](auto& sys) {
+	inferential_systems.for_each([n](auto& sys) {
 		sys.reserve_caches_for_entities(n);
 	});
 }
@@ -67,7 +67,7 @@ void cosmos::create_inferred_state_completely() {
 		create_inferred_state_for(get_handle(ordered_pair.second));
 	}
 
-	systems_inferred.for_each([this](auto& sys) {
+	inferential_systems.for_each([this](auto& sys) {
 		sys.create_additional_inferred_state(significant.meta.global);
 	});
 
@@ -81,7 +81,7 @@ void cosmos::destroy_inferred_state_of(const const_entity_handle h) {
 		sys.destroy_inferred_state_of(h);
 	};
 
-	systems_inferred.for_each(destructor);
+	inferential_systems.for_each(destructor);
 }
 
 void cosmos::create_inferred_state_for(const const_entity_handle h) {
@@ -90,7 +90,7 @@ void cosmos::create_inferred_state_for(const const_entity_handle h) {
 			sys.create_inferred_state_for(h);
 		};
 
-		systems_inferred.for_each(constructor);
+		inferential_systems.for_each(constructor);
 	}
 }
 
@@ -156,7 +156,7 @@ void cosmos::reserve_storage_for_entities(const std::size_t n) {
 	get_aggregate_pool().reserve(n);
 	reserve_all_components(n);
 
-	systems_inferred.for_each([n](auto& sys) {
+	inferential_systems.for_each([n](auto& sys) {
 		sys.reserve_caches_for_entities(n);
 	});
 }
@@ -352,7 +352,7 @@ void cosmos::delete_entity(const entity_id e) {
 		Unregister that id as a parent from the relational system
 	*/
 
-	systems_inferred.get<relational_system>().handle_deletion_of_potential_parent(e);
+	inferential_systems.get<relational_system>().handle_deletion_of_potential_parent(e);
 }
 
 void cosmos::advance(const logic_step_input input) {
@@ -404,7 +404,7 @@ void cosmos::advance_and_queue_destructions(const logic_step step) {
 		auto scope = measure_scope(performance.physics);
 
 		listener.during_step = true;
-		systems_inferred.get<physics_system>().step_and_set_new_transforms(step);
+		inferential_systems.get<physics_system>().step_and_set_new_transforms(step);
 		listener.during_step = false;
 	}
 
@@ -429,7 +429,7 @@ void cosmos::advance_and_queue_destructions(const logic_step step) {
 	
 	sentience_system().regenerate_values_and_advance_spell_logic(step);
 	sentience_system().apply_damage_and_generate_health_events(step);
-	systems_inferred.get<physics_system>().post_and_clear_accumulated_collision_messages(step);
+	inferential_systems.get<physics_system>().post_and_clear_accumulated_collision_messages(step);
 	sentience_system().cooldown_aimpunches(step);
 	sentience_system().set_borders(step);
 
@@ -483,7 +483,7 @@ void cosmos::advance_and_queue_destructions(const logic_step step) {
 	//position_copying_system().update_transforms(step);
 	//rotation_copying_system().update_rotations(step.cosm);
 
-	profiler.raycasts.measure(systems_inferred.get<physics_system>().ray_casts_since_last_step);
+	profiler.raycasts.measure(inferential_systems.get<physics_system>().ray_casts_since_last_step);
 
 	++significant.meta.now.step;
 

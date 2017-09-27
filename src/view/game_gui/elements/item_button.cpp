@@ -12,7 +12,7 @@
 #include "game/components/sprite_component.h"
 #include "game/components/item_component.h"
 #include "game/components/fixtures_component.h"
-#include "game/systems_stateless/input_system.h"
+#include "game/stateless_systems/input_system.h"
 
 #include "view/viewables/all_viewables_declarations.h"
 #include "view/viewables/game_image.h"

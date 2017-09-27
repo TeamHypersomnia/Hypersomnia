@@ -9,10 +9,10 @@
 #include "game/organization/all_component_includes.h"
 #include "game/organization/all_messages_includes.h"
 
-#include "game/systems_stateless/input_system.h"
-#include "game/systems_stateless/particles_existence_system.h"
-#include "game/systems_stateless/car_system.h"
-#include "game/systems_stateless/driver_system.h"
+#include "game/stateless_systems/input_system.h"
+#include "game/stateless_systems/particles_existence_system.h"
+#include "game/stateless_systems/car_system.h"
+#include "game/stateless_systems/driver_system.h"
 
 #include "game/enums/party_category.h"
 #include "game/detail/describers.h"

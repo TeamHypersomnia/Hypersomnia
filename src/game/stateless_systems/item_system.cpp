@@ -20,7 +20,7 @@
 #include "game/detail/inventory/inventory_slot_handle.h"
 #include "game/detail/entity_scripts.h"
 
-#include "game/systems_inferred/physics_system.h"
+#include "game/inferential_systems/physics_system.h"
 #include "game/transcendental/entity_handle.h"
 
 #include "augs/ensure.h"

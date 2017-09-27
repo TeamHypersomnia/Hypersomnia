@@ -16,7 +16,7 @@
 #include "game/components/particles_existence_component.h"
 #include "game/components/sound_existence_component.h"
 
-#include "game/systems_stateless/car_system.h"
+#include "game/stateless_systems/car_system.h"
 
 void car_system::set_steering_flags_from_intents(const logic_step step) {
 	auto& cosmos = step.cosm;

@@ -1,7 +1,7 @@
 #include "ingredients.h"
 #include "game/transcendental/cosmos.h"
-#include "game/systems_stateless/particles_existence_system.h"
-#include "game/systems_stateless/sound_existence_system.h"
+#include "game/stateless_systems/particles_existence_system.h"
+#include "game/stateless_systems/sound_existence_system.h"
 #include "game/components/position_copying_component.h"
 
 #include "game/components/crosshair_component.h"

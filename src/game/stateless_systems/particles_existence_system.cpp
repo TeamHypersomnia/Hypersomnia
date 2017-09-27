@@ -16,7 +16,7 @@
 #include "game/messages/exhausted_cast_message.h"
 #include "game/messages/exploding_ring_input.h"
 
-#include "game/systems_stateless/particles_existence_system.h"
+#include "game/stateless_systems/particles_existence_system.h"
 
 bool components::particles_existence::is_activated(const const_entity_handle h) {
 	return h.get<components::tree_of_npo_node>().is_activated() 
