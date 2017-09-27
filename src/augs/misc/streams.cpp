@@ -6,16 +6,18 @@ namespace augs {
 		ar.write(storage);
 	}
 
-	void stream::read(std::byte* data, const size_t bytes) {
-		if (!has_read_failed && read_pos + bytes <= size()) {
-			std::memcpy(data, buf.data() + read_pos, bytes);
-			read_pos += bytes;
+	void stream::read(std::byte* data, const std::size_t bytes) {
+		if (read_pos + bytes > size()) {
+			throw stream_read_error(
+				"Failed to read bytes: %x-%x (size: %x)", 
+				read_pos, 
+				read_pos + bytes, 
+				size()
+			);
 		}
-		else {
-			has_read_failed = true;
-		}
-
-		ensure(!has_read_failed);
+		
+		std::memcpy(data, buf.data() + read_pos, bytes);
+		read_pos += bytes;
 	}
 	
 	std::string stream::format_as_uchars() const {

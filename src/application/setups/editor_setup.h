@@ -47,12 +47,14 @@ class editor_setup {
 
 	void set_popup(const popup);
 	void open_cosmos(const augs::path_type& cosmos_path);
+	void open_blank_cosmos();
 	void start_open_file_dialog();
 
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::ALWAYS_HAVE_ALL_LOADED;
 	static constexpr bool can_viewables_change = false;
 	static constexpr bool accepts_shortcuts = true;
+	static constexpr bool has_modal_popups = true;
 
 	editor_setup(const augs::path_type& cosmos_path);
 
@@ -115,6 +117,9 @@ public:
 	void control(const cosmic_entropy&);
 	void accept_game_gui_events(const cosmic_entropy&);
 
+	bool escape_modal_popup();
+	bool confirm_modal_popup();
+
 	void handle_open_shortcut();
 	void handle_save_shortcut();
 	void handle_save_as_shortcut();
@@ -124,5 +129,4 @@ public:
 	void handle_copy_shortcut();
 	void handle_cut_shortcut();
 	void handle_paste_shortcut();
-
 };

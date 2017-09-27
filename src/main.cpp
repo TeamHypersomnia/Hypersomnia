@@ -637,51 +637,74 @@ int main(const int argc, const char* const * const argv) try {
 					current_setup.has_value()
 					&& e.was_pressed(key::ESC)
 				) {
-					bool& f = ingame_menu.show;
-					f = !f;
-					releases.set_all();
+					if (const auto fetched = visit_current_setup([&](auto& setup) {
+							using T = std::decay_t<decltype(setup)>;
+
+							if constexpr(T::has_modal_popups) {
+								return setup.escape_modal_popup();
+							}
+							else {
+								return false;
+							}
+						});
+						!fetched
+					) {
+						bool& f = ingame_menu.show;
+						f = !f;
+						releases.set_all();
+					}
 				}
 				else {
-					bool was_shortcut_hit = false;
+					bool fetched = false;
 					
-					/* MSVC ICE fix */
-					auto& _common_input_state = common_input_state;
-					
-					visit_current_setup([&](auto& setup) {
-						using T = std::decay_t<decltype(setup)>;
+					if (!ingame_menu.show) {
+						/* MSVC ICE fix */
+						auto& _common_input_state = common_input_state;
+						
+						visit_current_setup([&](auto& setup) {
+							using T = std::decay_t<decltype(setup)>;
 
-						if constexpr(T::accepts_shortcuts) {
-							if (e.was_any_key_pressed()) {
-								const auto k = e.key.key;
+							if constexpr(T::accepts_shortcuts) {
+								if (e.was_any_key_pressed()) {
+									const auto k = e.key.key;
 
-								const auto has_ctrl = _common_input_state.is_set(key::LCTRL);
-								const auto has_shift = _common_input_state.is_set(key::LSHIFT);
+									const auto has_ctrl = _common_input_state.is_set(key::LCTRL);
+									const auto has_shift = _common_input_state.is_set(key::LSHIFT);
 
-								if (has_ctrl) {
-									if (has_shift) {
-										switch (k) {
-											case key::S: setup.handle_save_as_shortcut(); was_shortcut_hit = true; break;
-											case key::Z: setup.handle_redo_shortcut(); was_shortcut_hit = true; break;
-											default: break;
+									if (has_ctrl) {
+										if (has_shift) {
+											switch (k) {
+												case key::S: setup.handle_save_as_shortcut(); fetched = true; break;
+												case key::Z: setup.handle_redo_shortcut(); fetched = true; break;
+												default: break;
+											}
 										}
-									}
-									else {
-										switch (k) {
-											case key::S: setup.handle_save_shortcut(); was_shortcut_hit = true; break;
-											case key::Z: setup.handle_undo_shortcut(); was_shortcut_hit = true; break;
-											case key::O: setup.handle_open_shortcut(); was_shortcut_hit = true; break;
-											case key::C: setup.handle_copy_shortcut(); was_shortcut_hit = true; break;
-											case key::X: setup.handle_cut_shortcut(); was_shortcut_hit = true; break;
-											case key::Y: setup.handle_paste_shortcut(); was_shortcut_hit = true; break;
-											default: break;
+										else {
+											switch (k) {
+												case key::S: setup.handle_save_shortcut(); fetched = true; break;
+												case key::Z: setup.handle_undo_shortcut(); fetched = true; break;
+												case key::O: setup.handle_open_shortcut(); fetched = true; break;
+												case key::C: setup.handle_copy_shortcut(); fetched = true; break;
+												case key::X: setup.handle_cut_shortcut(); fetched = true; break;
+												case key::Y: setup.handle_paste_shortcut(); fetched = true; break;
+												default: break;
+											}
 										}
 									}
 								}
 							}
-						}
-					});
 
-					if (!was_shortcut_hit) {
+							if constexpr(T::has_modal_popups) {
+								if (e.was_pressed(key::ENTER)) {
+									if (setup.confirm_modal_popup()) {
+										fetched = true;
+									}
+								}
+							}
+						});
+					}
+
+					if (!fetched) {
 						std::optional<intent_change> key_change;
 
 						if (e.was_any_key_pressed()) {

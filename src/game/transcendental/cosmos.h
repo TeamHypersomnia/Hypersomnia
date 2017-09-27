@@ -64,6 +64,8 @@ public:
 	
 	/* State of the cosmos ends here *****************************/
 
+	static cosmos empty;
+
 	cosmos(const std::size_t reserved_entities = 0u);
 	cosmos& operator=(const cosmos_significant_state&);
 
@@ -146,6 +148,7 @@ public:
 #if COSMOS_TRACKS_GUIDS
 	void remap_guids();
 #endif
+	void clear();
 
 	template <class System>
 	void partial_reinference(const entity_handle handle) {

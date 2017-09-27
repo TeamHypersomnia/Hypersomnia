@@ -1,9 +1,14 @@
 #pragma once
 #include <vector>
 #include "augs/ensure.h"
+#include "augs/templates/exception_templates.h"
 
 namespace augs {
 	class output_stream_reserver;
+
+	struct stream_read_error : error_with_typesafe_sprintf {
+		using error_with_typesafe_sprintf::error_with_typesafe_sprintf;
+	};
 
 	class stream_position {
 	protected:
@@ -48,12 +53,6 @@ namespace augs {
 	class stream : public stream_position {
 		std::vector<std::byte> buf;
 	public:
-		bool has_read_failed = false;
-
-		bool failed() const {
-			return has_read_failed;
-		}
-
 		std::size_t mismatch(const stream&) const;
 
 		bool operator==(const stream&) const;

@@ -268,10 +268,6 @@ void cosmic_delta::decode(
 
 	augs::read(in, has_anything_changed);
 
-	if (in.failed()) {
-		return;
-	}
-
 	if (!has_anything_changed) {
 		return;
 	}
@@ -297,10 +293,6 @@ void cosmic_delta::decode(
 
 		augs::read(in, new_guid);
 		
-		if (in.failed()) {
-			return;
-		}
-
 		new_entities_ids.emplace_back(deco.create_entity_with_specific_guid(new_guid));
 #else
 		// otherwise new entity_id assignment needs be deterministic
@@ -341,10 +333,6 @@ void cosmic_delta::decode(
 		
 		augs::read(in, guid_of_changed);
 		
-		if (in.failed()) {
-			return;
-		}
-
 		const auto changed_entity = deco.get_handle(guid_of_changed);
 
 		std::array<bool, COMPONENTS_COUNT> overridden_components;
@@ -392,10 +380,6 @@ void cosmic_delta::decode(
 
 		augs::read(in, guid_of_destroyed);
 		
-		if(in.failed()) {
-			return;
-		}
-
 		deco.delete_entity(deco.get_handle(guid_of_destroyed));
 #else
 		static_assert(false, "Unimplemented");

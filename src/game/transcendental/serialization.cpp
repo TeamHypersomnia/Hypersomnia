@@ -63,7 +63,12 @@ void cosmos::load_from_file(const augs::path_type& path) {
 			}
 		}
 		catch (augs::ifstream_error err) {
+			clear();
 			throw cosmos_loading_error("Failed to load cosmos binary file:\n%x\n%x", path, err.what());
+		}
+		catch (augs::stream_read_error err) {
+			clear();
+			throw cosmos_loading_error("The cosmos binary file appears corrupt:\n%x\n%x", path, err.what());
 		}
 	}
 	else {

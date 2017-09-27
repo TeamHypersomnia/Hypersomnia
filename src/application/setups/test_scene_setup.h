@@ -34,6 +34,7 @@ public:
 	static constexpr auto loading_strategy = viewables_loading_type::ALWAYS_HAVE_ALL_LOADED;
 	static constexpr bool can_viewables_change = false;
 	static constexpr bool accepts_shortcuts = false;
+	static constexpr bool has_modal_popups = false;
 
 	test_scene_setup(
 		sol::state& lua,

@@ -74,7 +74,9 @@ void perform_imgui_pass(
 
 	dependencies.apply(config);
 
-	custom_imgui_logic();
+	if (!ingame_menu_active) {
+		custom_imgui_logic();
+	}
 
 	augs::imgui::render(config.gui_style);
 

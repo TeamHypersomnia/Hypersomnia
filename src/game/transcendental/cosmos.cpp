@@ -44,6 +44,12 @@
 
 #include "game/components/fixtures_component.h"
 
+cosmos cosmos::empty;
+
+void cosmos::clear() {
+	*this = cosmos::empty;
+}
+
 void cosmos::complete_reinference() {
 	auto scope = measure_scope(profiler.complete_reinference);
 	

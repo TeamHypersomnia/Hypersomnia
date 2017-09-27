@@ -16,18 +16,32 @@ void editor_setup::start_open_file_dialog() {
 	open_file_dialog = std::async(
 		std::launch::async,
 		[](){
-			return augs::get_open_file_name(L"Cosmos binary file (*.bin)\0*.bin\0");
+			return augs::get_open_file_name(L"Cosmos binary file (*.bin)\0*.BIN\0");
 		}
 	);
 }
 
 void editor_setup::open_cosmos(const augs::path_type& cosmos_path) {
-	bool success = false;
+	edited_world.load_from_file(cosmos_path);
+	current_cosmos_path = cosmos_path;
+}
 
+void editor_setup::open_blank_cosmos() {
+	edited_world = cosmos::empty;
+	edited_world.set_steps_per_second(60);
+	edited_world.reserve_storage_for_entities(100);
+
+	auto origin = edited_world.create_entity("origin_entity");
+	origin += components::transform();
+
+	viewed_character_id = origin;
+
+	current_cosmos_path = "untitled_cosmos.bin";
+}
+
+editor_setup::editor_setup(const augs::path_type& cosmos_path) {
 	try {
-		edited_world.load_from_file(cosmos_path);
-		current_cosmos_path = cosmos_path;
-		success = true;
+		open_cosmos(cosmos_path);
 	}
 	catch (cosmos_loading_error err) {
 		set_popup({
@@ -35,21 +49,9 @@ void editor_setup::open_cosmos(const augs::path_type& cosmos_path) {
 			"Failed to load the editor workspace.\nA blank default was opened instead.",
 			err.what()
 		});
+
+		open_blank_cosmos();
 	}
-
-	if (const bool load_default = !success) {
-		edited_world.set_steps_per_second(60);
-		edited_world.reserve_storage_for_entities(100);
-
-		auto origin = edited_world.create_entity("origin_entity");
-		origin += components::transform();
-
-		viewed_character_id = origin;
-	}
-}
-
-editor_setup::editor_setup(const augs::path_type& cosmos_path) {
-	open_cosmos(cosmos_path);
 }
 
 void editor_setup::control(
@@ -93,7 +95,18 @@ void editor_setup::perform_custom_imgui() {
 		const auto result_path = open_file_dialog.get();
 		
 		if (result_path) {
-			open_cosmos(*result_path);
+			try {
+				open_cosmos(*result_path);
+			}
+			catch (cosmos_loading_error err) {
+				set_popup({
+					"Error",
+					"Failed to load the file specified.\nA blank default was opened instead.",
+					err.what()
+				});
+
+				open_blank_cosmos();
+			}
 		}
 	}
 
@@ -145,6 +158,24 @@ void editor_setup::accept_game_gui_events(
 	const cosmic_entropy& entropy
 ) {
 
+}
+
+bool editor_setup::escape_modal_popup() {
+	if (current_popup) {
+		current_popup = std::nullopt;
+		return true;
+	}
+
+	return false;
+}
+
+bool editor_setup::confirm_modal_popup() {
+	if (current_popup) {
+		current_popup = std::nullopt;
+		return true;
+	}
+
+	return false;
 }
 
 void editor_setup::handle_open_shortcut() {
