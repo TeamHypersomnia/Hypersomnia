@@ -158,8 +158,8 @@ vec2i world_camera::get_camera_offset_due_to_character_crosshair(
 
 				if (crosshair.orbit_mode == crosshair.LOOK) {
 					/* simple proportion */
-					camera_crosshair_offset /= crosshair.bounds_for_base_offset;
-					camera_crosshair_offset *= crosshair.max_look_expand;
+					camera_crosshair_offset /= crosshair.base_offset_bound;
+					camera_crosshair_offset *= camera.visible_world_area * settings.look_bound_expand;
 				}
 			}
 		}

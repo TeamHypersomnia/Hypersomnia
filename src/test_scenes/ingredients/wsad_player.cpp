@@ -207,8 +207,7 @@ namespace prefabs {
 
 			crosshair.base_offset.set(-20, 0);
 			crosshair.sensitivity.set(3, 3);
-			crosshair.visible_world_area.set(1920, 1080);
-			crosshair.update_bounds();
+			crosshair.base_offset_bound.set(1920, 1080);
 
 			ingredients::make_always_visible(root);
 		}

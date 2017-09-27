@@ -14,16 +14,15 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/logic_step.h"
 
-void components::crosshair::update_bounds() {
-	max_look_expand = visible_world_area / 2;
-
+vec2 components::crosshair::get_bounds_in_this_look() const {
 	if (orbit_mode == ANGLED) {
-		bounds_for_base_offset = visible_world_area / 2.f;
+		return base_offset_bound / 2.f;
+	}
+	else if (orbit_mode == LOOK) {
+		return base_offset_bound;
 	}
 
-	else if (orbit_mode == LOOK) {
-		bounds_for_base_offset = max_look_expand + visible_world_area / 2;
-	}
+	return {};
 }
 
 void crosshair_system::generate_crosshair_intents(const logic_step step) {
@@ -49,7 +48,7 @@ void crosshair_system::generate_crosshair_intents(const logic_step step) {
 			const vec2 old_pos = subject.get_logic_transform().pos;
 
 			base_offset += delta;
-			base_offset.clamp_rotated(crosshair.bounds_for_base_offset, crosshair.rotation_offset);
+			base_offset.clamp_rotated(crosshair.get_bounds_in_this_look(), crosshair.rotation_offset);
 
 			messages::crosshair_motion_message crosshair_motion;
 
@@ -82,8 +81,6 @@ void crosshair_system::generate_crosshair_intents(const logic_step step) {
 			else {
 				mode = components::crosshair::LOOK;
 			}
-
-			crosshair.update_bounds();
 		}
 	}
 }

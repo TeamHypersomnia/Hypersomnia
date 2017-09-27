@@ -21,16 +21,14 @@ namespace components {
 		child_entity_id recoil_entity;
 
 		entity_id character_entity_to_chase;
+		
 		vec2 base_offset;
-		vec2 bounds_for_base_offset;
-
-		vec2 visible_world_area;
-		vec2 max_look_expand;
+		vec2 base_offset_bound;
 
 		float rotation_offset = 0.f;
 		vec2 sensitivity = vec2(1.0f, 1.0f);
 		// END GEN INTROSPECTOR
 
-		void update_bounds();
+		vec2 get_bounds_in_this_look() const;
 	};
 }

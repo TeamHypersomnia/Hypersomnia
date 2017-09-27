@@ -17,6 +17,7 @@ struct world_camera_settings {
 	augs::smoothing_settings<float> smoothing;
 
 	float angled_look_length = 100.f;
+	float look_bound_expand = 0.5f;
 	bool enable_smoothing = true;
 	// END GEN INTROSPECTOR
 };

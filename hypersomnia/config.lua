@@ -10,6 +10,7 @@ return {
     sound_effects = 1
   },
   camera = {
+    look_bound_expand = 0.5,
     angled_look_length = 100,
       enable_smoothing = true,
     smoothing = {
