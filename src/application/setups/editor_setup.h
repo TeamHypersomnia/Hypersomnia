@@ -24,6 +24,17 @@ namespace sol {
 }
 
 class editor_setup {
+	struct popup {
+		std::string title;
+		std::string message;
+		std::string details;
+
+		bool details_expanded = false;
+	};
+	
+	std::optional<popup> current_popup;
+	bool show_summary = true;
+
 	cosmos edited_world;
 	cosmic_entropy total_collected_entropy;
 	augs::fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
@@ -32,15 +43,6 @@ class editor_setup {
 	all_logical_assets logical_assets;
 	all_viewables_defs viewable_defs;
 
-	struct popup {
-		std::string title;
-		std::string message;
-		std::string details;
-
-		bool details_expanded = false;
-	};
-
-	std::optional<popup> current_popup;
 	augs::path_type current_cosmos_path;
 
 	std::future<std::optional<std::string>> open_file_dialog;

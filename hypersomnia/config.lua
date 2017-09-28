@@ -155,7 +155,7 @@ return {
     ImGuiCol_Header = "102 102 229 114",
     ImGuiCol_HeaderActive = "135 135 221 204",
     ImGuiCol_HeaderHovered = "114 114 229 204",
-    ImGuiCol_MenuBarBg = "102 102 140 204",
+    ImGuiCol_MenuBarBg = "0 81 165 221",
     ImGuiCol_ModalWindowDarkening = "51 51 51 89",
     ImGuiCol_PlotHistogram = "229 178 0 255",
     ImGuiCol_PlotHistogramHovered = "255 153 0 255",

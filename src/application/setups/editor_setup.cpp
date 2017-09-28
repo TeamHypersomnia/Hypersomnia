@@ -81,15 +81,22 @@ void editor_setup::perform_custom_imgui() {
 		}
 		if (ImGui::BeginMenu("Edit")) {
 			if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
-			if (ImGui::MenuItem("Redo", "CTRL+SHIFT+Z", false, false)) {} 
+			if (ImGui::MenuItem("Redo", "CTRL+SHIFT+Z", false, false)) {}
 			ImGui::Separator();
 			if (ImGui::MenuItem("Cut", "CTRL+X")) {}
 			if (ImGui::MenuItem("Copy", "CTRL+C")) {}
 			if (ImGui::MenuItem("Paste", "CTRL+V")) {}
 			ImGui::Separator();
-			
+
 			if (ImGui::MenuItem("Fill with test scene", nullptr, false, BUILD_TEST_SCENES == 1)) {
-			
+
+			}
+
+			ImGui::EndMenu();
+		}
+		if (ImGui::BeginMenu("View")) {
+			if (ImGui::MenuItem("Summary")) {
+				show_summary = true;
 			}
 
 			ImGui::EndMenu();
@@ -116,17 +123,19 @@ void editor_setup::perform_custom_imgui() {
 		}
 	}
 
-	ImGui::Begin("Summary");
-	ImGui::BeginChild("Cosmos");
-	ImGui::Text(typesafe_sprintf("Tick rate: %x/s", edited_world.get_steps_per_second()).c_str());
-	
-	ImGui::Text(typesafe_sprintf("Total entities: %x/%x", 
-		edited_world.get_entities_count(),
-		edited_world.get_maximum_entities()
-	).c_str());
+	if (show_summary) {
+		ImGui::Begin("Summary", &show_summary);
+		ImGui::BeginChild("Cosmos");
+		ImGui::Text(typesafe_sprintf("Tick rate: %x/s", edited_world.get_steps_per_second()).c_str());
+		
+		ImGui::Text(typesafe_sprintf("Total entities: %x/%x", 
+			edited_world.get_entities_count(),
+			edited_world.get_maximum_entities()
+		).c_str());
 
-	ImGui::EndChild();
-	ImGui::End();
+		ImGui::EndChild();
+		ImGui::End();
+	}
 
 	if (current_popup) {
 		auto& p = *current_popup;
@@ -157,6 +166,10 @@ void editor_setup::perform_custom_imgui() {
 
 			ImGui::EndPopup();
 		}
+	}
+
+	if (open_file_dialog.valid() && !is_ready(open_file_dialog)) {
+
 	}
 }
 
