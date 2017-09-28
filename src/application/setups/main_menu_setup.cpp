@@ -44,7 +44,7 @@ using namespace augs::event::keys;
 using namespace augs::gui::text;
 using namespace augs::gui;
 
-void main_menu_setup::customize_for_viewing(config_lua_table& config) {
+void main_menu_setup::customize_for_viewing(config_lua_table& config) const {
 	const auto previous_sfx_volume = config.audio_volume.sound_effects;
 	augs::read(menu_config_patch, config);
 	

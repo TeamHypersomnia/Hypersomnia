@@ -70,9 +70,7 @@ public:
 		return;
 	}
 
-	void customize_for_viewing(config_lua_table&) {
-		return;
-	}
+	void customize_for_viewing(config_lua_table&) const;
 
 	void apply(const config_lua_table&) {
 		return;

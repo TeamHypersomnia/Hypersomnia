@@ -7,6 +7,7 @@
 #include "test_scenes/scenes/testbed.h"
 #include "test_scenes/scenes/minimal_scene.h"
 
+#include "application/config_lua_table.h"
 #include "application/setups/test_scene_setup.h"
 
 #include "generated/introspectors.h"
@@ -45,6 +46,11 @@ test_scene_setup::test_scene_setup(
 
 		}
 	}
+}
+
+void test_scene_setup::customize_for_viewing(config_lua_table& config) const {
+	config.window.name = "Hypersmnia test scene";
+	return;
 }
 
 void test_scene_setup::control(const cosmic_entropy& events) {

@@ -99,7 +99,7 @@ public:
 
 	void launch_creators_screen();
 
-	void customize_for_viewing(config_lua_table& config);
+	void customize_for_viewing(config_lua_table& config) const;
 	void apply(const config_lua_table& config);
 
 	template <class... Callbacks>

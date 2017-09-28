@@ -61,8 +61,8 @@ void editor_setup::control(
 
 }
 
-void editor_setup::customize_for_viewing(config_lua_table& config) {
-	config.window.name = current_cosmos_path.string();
+void editor_setup::customize_for_viewing(config_lua_table& config) const {
+	config.window.name = "Editor - " + current_cosmos_path.string();
 	return;
 }
 
