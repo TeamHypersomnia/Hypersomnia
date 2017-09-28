@@ -1,6 +1,5 @@
 #include "augs/misc/imgui_utils.h"
 #include "augs/misc/delta.h"
-#include "augs/window_framework/window.h"
 
 #include "application/config_lua_table.h"
 #include "application/gui/settings_gui.h"
@@ -8,7 +7,7 @@
 
 void perform_imgui_pass(
 	augs::local_entropy& window_inputs,
-	const configuration_subscribers dependencies,
+	const vec2i screen_size,
 	const augs::delta delta,
 	config_lua_table& config,
 	config_lua_table& last_saved_config,
@@ -18,34 +17,18 @@ void perform_imgui_pass(
 	std::function<void()> custom_imgui_logic,
 
 	const bool ingame_menu_active,
-	const bool game_gui_active,
-	const bool has_gameplay_setup
+	const bool has_gameplay_setup,
+
+	const bool should_freeze_cursor
 ) {
-	/*
-		Neutralize the mouse if we are within proper gameplay,
-		so with when all GUIs (incl. gameplay gui) are off
-	*/
-
-	dependencies.sync_back_into(config);
-
 	augs::imgui::setup_input(
 		window_inputs,
-		delta.in_seconds<double>(),
-		dependencies.window.get_screen_size()
+		delta.in_seconds(),
+		screen_size
 	);
-	
-	{
-		const bool in_game_without_mouse =
-			!game_gui_active
-			&& has_gameplay_setup
-			&& !ingame_menu_active
-		;
 
-		if (in_game_without_mouse) {
-			augs::imgui::neutralize_mouse();
-		}
-		
-		dependencies.window.set_mouse_position_frozen(in_game_without_mouse);
+	if (should_freeze_cursor) {
+		augs::imgui::neutralize_mouse();
 	}
 
 	ImGui::NewFrame();
@@ -71,8 +54,6 @@ void perform_imgui_pass(
 			last_saved_config
 		);
 	}
-
-	dependencies.apply(config);
 
 	if (!ingame_menu_active) {
 		custom_imgui_logic();

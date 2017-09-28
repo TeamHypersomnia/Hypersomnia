@@ -25,12 +25,9 @@ namespace augs {
 		friend int WINAPI::WinMain(HINSTANCE, HINSTANCE, LPSTR, int);
 		friend LRESULT CALLBACK wndproc(HWND, UINT, WPARAM, LPARAM);
 
-		static bool window_class_registered;
-
 		HWND hwnd = nullptr;
 		HDC hdc = nullptr;
 		HGLRC hglrc = nullptr;
-		MSG wmsg;
 
 		vec2i min_window_size;
 		vec2i max_window_size;
@@ -47,6 +44,10 @@ namespace augs {
 
 		timer triple_click_timer;
 		unsigned triple_click_delay = 0xdeadbeef; /* maximum delay time for the next click (after doubleclick) to be considered tripleclick (in milliseconds) */
+
+		void set_window_name(const std::string& name);
+		void set_window_border_enabled(const bool);
+		void set_window_rect(const xywhi);
 
 		std::optional<event::change> handle_event(
 			const UINT, 
@@ -73,21 +74,18 @@ namespace augs {
 		window(const window&) = delete;
 		window& operator=(const window&) = delete;
 
-		void set_window_name(const std::string& name);
-		void set_window_border_enabled(const bool);
-
 		bool swap_buffers();
 
 		void show();
 		void set_mouse_position_frozen(const bool);
 
 		void apply(const window_settings&, const bool force = false);
+		void sync_back_into(window_settings&);
 		window_settings get_current_settings() const;
 
 		local_entropy collect_entropy();
 		void collect_entropy(local_entropy& into);
 
-		void set_window_rect(const xywhi);
 		vec2i get_screen_size() const;
 		xywhi get_window_rect() const;
 

@@ -88,9 +88,7 @@ public:
 		return current_popup.has_value();
 	}
 
-	void customize_for_viewing(config_lua_table&) {
-		return;
-	}
+	void customize_for_viewing(config_lua_table& cfg);
 
 	void apply(const config_lua_table&) {
 		return;

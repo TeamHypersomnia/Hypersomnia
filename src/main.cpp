@@ -478,24 +478,13 @@ int main(const int argc, const char* const * const argv) try {
 		auto scope = measure_scope(profiler.fps);
 
 		const auto frame_delta = frame_timer.extract_delta();
-
-		/* 
-			For example, the main menu might want to disable HUD or tune down the sound effects. 
-		*/
-
-		const auto viewing_config = visit_current_setup([](auto& setup) {
-			auto config_copy = config;
-			setup.customize_for_viewing(config_copy);
-			setup.apply(config_copy);
-
-			return config_copy;
-		});
-
-		const auto screen_size = viewing_config.window.get_screen_size();
+		const auto screen_size = window.get_screen_size();
 
 		/*
 			Additional lambda helpers.
 		*/
+		
+		auto viewing_config = config_lua_table();
 
 		auto create_menu_context = [&](auto& gui) {
 			return gui.create_context(
@@ -553,9 +542,19 @@ int main(const int argc, const char* const * const argv) try {
 				It will eat from the window input vector that is later passed to the game and other GUIs.	
 			*/
 
+			configurables.sync_back_into(config);
+
+			const bool should_freeze_cursor =
+				!game_gui.active
+				&& current_setup.has_value()
+				&& !ingame_menu.show
+			;
+
+			window.set_mouse_position_frozen(should_freeze_cursor);
+
 			perform_imgui_pass(
 				new_window_entropy,
-				configurables,
+				screen_size,
 				frame_delta,
 				config,
 				last_saved_config,
@@ -576,9 +575,30 @@ int main(const int argc, const char* const * const argv) try {
 				/* Flags controlling IMGUI behaviour */
 
 				ingame_menu.show,
-				game_gui.active,
-				current_setup.has_value()
+				current_setup.has_value(),
+
+				should_freeze_cursor
 			);
+			
+			/* MSVC ICE fix */
+
+			const auto& _config = config;
+
+			viewing_config = visit_current_setup([&_config](auto& setup) {
+				auto config_copy = _config;
+
+				/*
+					For example, the main menu might want to disable HUD or tune down the sound effects.
+					Editor might want to change the window name to the current file.
+				*/
+
+				setup.customize_for_viewing(config_copy);
+				setup.apply(config_copy);
+
+				return config_copy;
+			});
+
+			configurables.apply(viewing_config);
 
 			releases.set_due_to_imgui(ImGui::GetIO());
 
@@ -729,22 +749,22 @@ int main(const int argc, const char* const * const argv) try {
 							const auto key = e.key.key;
 							const bool was_pressed = *key_change == intent_change::PRESSED;
 
-							if (const auto it = mapped_or_nullptr(config.app_controls, key)) {
+							if (const auto it = mapped_or_nullptr(viewing_config.app_controls, key)) {
 								if (was_pressed) {
 									handle_app_intent(*it);
 								}
 							}
 							else {
 								if (pass_to_gameplay) {
-									if (const auto it = mapped_or_nullptr(config.app_ingame_controls, key)) {
+									if (const auto it = mapped_or_nullptr(viewing_config.app_ingame_controls, key)) {
 										if (was_pressed) {
 											handle_app_ingame_intent(*it);
 										}
 									}
-									else if (const auto it = mapped_or_nullptr(config.game_gui_controls, key)) {
+									else if (const auto it = mapped_or_nullptr(viewing_config.game_gui_controls, key)) {
 										game_gui.control_hotbar_and_action_button(viewed_character, { *it, *key_change });
 									}
-									else if (const auto it = mapped_or_nullptr(config.game_controls, key)) {
+									else if (const auto it = mapped_or_nullptr(viewing_config.game_controls, key)) {
 										if (
 											const bool leave_it_for_game_gui = e.uses_mouse() && game_gui.active;
 											!leave_it_for_game_gui
@@ -998,7 +1018,7 @@ int main(const int argc, const char* const * const argv) try {
 		) {
 			get_drawer().cursor(necessary_atlas_entries, menu_chosen_cursor, cursor_drawing_pos, white);
 		}
-		else if (game_gui.active && config.drawing.draw_character_gui) {
+		else if (game_gui.active && viewing_config.drawing.draw_character_gui) {
 			const auto& character_gui = game_gui.get_character_gui(viewed_character);
 
 			character_gui.draw_cursor_with_information(context);

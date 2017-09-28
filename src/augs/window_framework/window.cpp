@@ -221,10 +221,7 @@ namespace augs {
 		const window_settings& settings
 	) {
 		// TODO: throw an exception instead of ensuring
-
-		triple_click_delay = GetDoubleClickTime();
-
-		if (!window_class_registered) {
+		static bool register_once = [](){
 			WNDCLASSEX wcl = { 0 };
 			wcl.cbSize = sizeof(wcl);
 			wcl.style = CS_OWNDC | CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
@@ -239,9 +236,13 @@ namespace augs {
 			wcl.lpszClassName = L"AugmentedWindow";
 			wcl.hIconSm = 0;
 
-			ensure(RegisterClassEx(&wcl) != 0 && "class registering");
-			window_class_registered = true;
-		}
+			const auto register_success = RegisterClassEx(&wcl) != 0;
+
+			ensure(register_success && "class registering");
+			return register_success;
+		}();
+
+		triple_click_delay = GetDoubleClickTime();
 
 		ensure((hwnd = CreateWindowEx(0, L"AugmentedWindow", L"invalid_name", 0, 0, 0, 0, 0, 0, 0, GetModuleHandle(NULL), this)));
 
@@ -334,17 +335,21 @@ namespace augs {
 	void window::collect_entropy(local_entropy& output) {
 		ensure(is_current());
 
-		while (PeekMessageW(&wmsg, hwnd, 0, 0, PM_REMOVE)) {
-			const auto new_change = handle_event(
-				wmsg.message, 
-				wmsg.wParam, 
-				wmsg.lParam
-			);
+		{
+			MSG wmsg;
 
-			TranslateMessage(&wmsg);
+			while (PeekMessageW(&wmsg, hwnd, 0, 0, PM_REMOVE)) {
+				const auto new_change = handle_event(
+					wmsg.message, 
+					wmsg.wParam, 
+					wmsg.lParam
+				);
 
-			if (new_change.has_value() && !new_change->repeated) {
-				output.push_back(*new_change);
+				TranslateMessage(&wmsg);
+
+				if (new_change.has_value() && !new_change->repeated) {
+					output.push_back(*new_change);
+				}
 			}
 		}
 
@@ -358,10 +363,12 @@ namespace augs {
 		else {
 			disable_cursor_clipping();
 		}
+	}
 
+	void window::sync_back_into(window_settings& into) {
 		if (!current_settings.fullscreen) {
-			current_settings.size = get_window_rect().get_size();
-			current_settings.position = get_window_rect().get_position();
+			into.size = get_window_rect().get_size();
+			into.position = get_window_rect().get_position();
 		}
 	}
 
@@ -398,8 +405,6 @@ namespace augs {
 		}
 	}
 }
-
-bool augs::window::window_class_registered = false;
 
 #else
 namespace augs {

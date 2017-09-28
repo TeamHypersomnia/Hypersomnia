@@ -4,6 +4,7 @@
 #include "augs/templates/thread_templates.h"
 #include "augs/window_framework/platform_utils.h"
 
+#include "application/config_lua_table.h"
 #include "application/setups/editor_setup.h"
 
 #include "generated/introspectors.h"
@@ -58,6 +59,11 @@ void editor_setup::control(
 	const cosmic_entropy& entropy
 ) {
 
+}
+
+void editor_setup::customize_for_viewing(config_lua_table& config) {
+	config.window.name = current_cosmos_path.string();
+	return;
 }
 
 void editor_setup::perform_custom_imgui() {

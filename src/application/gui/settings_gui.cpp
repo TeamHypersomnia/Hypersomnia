@@ -28,7 +28,7 @@ static bool operator==(const ImVec2 a, const ImVec2 b) {
 };
 
 void configuration_subscribers::sync_back_into(config_lua_table& into) const {
-	into.window = window.get_current_settings();
+	window.sync_back_into(into.window);
 }
 
 void configuration_subscribers::apply(const config_lua_table& new_config) const {
