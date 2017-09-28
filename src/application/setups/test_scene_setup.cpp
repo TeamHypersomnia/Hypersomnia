@@ -3,10 +3,6 @@
 
 #include "view/viewables/viewables_loading_type.h"
 
-#include "test_scenes/test_scenes_content.h"
-#include "test_scenes/scenes/testbed.h"
-#include "test_scenes/scenes/minimal_scene.h"
-
 #include "application/config_lua_table.h"
 #include "application/setups/test_scene_setup.h"
 
@@ -19,26 +15,9 @@ test_scene_setup::test_scene_setup(
 	const bool make_minimal_test_scene,
 	const input_recording_type recording_type
 ) {
-	hypersomnia.set_steps_per_second(60);
 #if BUILD_TEST_SCENES
-	hypersomnia.reserve_storage_for_entities(3000u);
-
-	populate_test_scene_assets(lua, logical_assets, viewable_defs);
-
-	if (make_minimal_test_scene) {
-		test_scenes::minimal_scene().populate_world_with_entities(
-			hypersomnia,
-			logical_assets
-		);
-	}
-	else {
-		test_scenes::testbed().populate_world_with_entities(
-			hypersomnia,
-			logical_assets
-		);
-	}
-
-	characters.acquire_available_characters(hypersomnia);
+	scene.make_test_scene(lua, make_minimal_test_scene);
+	characters.acquire_available_characters(scene.world);
 #endif
 
 	if (recording_type != input_recording_type::DISABLED) {

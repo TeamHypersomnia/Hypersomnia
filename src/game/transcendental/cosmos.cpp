@@ -1,5 +1,8 @@
 #include "cosmos.h"
 
+#include "augs/misc/templated_readwrite.h"
+#include "augs/misc/streams.h"
+
 #include "game/stateless_systems/movement_system.h"
 #include "game/stateless_systems/visibility_system.h"
 #include "game/stateless_systems/pathfinding_system.h"
@@ -43,6 +46,8 @@
 #include "game/detail/inventory/inventory_utils.h"
 
 #include "game/components/fixtures_component.h"
+
+#include "generated/introspectors.h"
 
 cosmos cosmos::empty;
 
@@ -500,4 +505,40 @@ void cosmos::advance_and_queue_destructions(const logic_step step) {
 
 void cosmos::perform_deletions(const logic_step step) {
 	destroy_system().perform_deletions(step);
+}
+
+namespace augs {
+	void write_object(augs::stream& into, const cosmos& cosm) {
+		auto& profiler = cosm.profiler;
+
+		{
+			augs::output_stream_reserver reserver;
+
+			{
+				auto scope = measure_scope(profiler.size_calculation_pass);
+				augs::write(reserver, cosm.significant);
+			}
+
+			auto scope = measure_scope(profiler.memory_allocation_pass);
+			into.reserve(into.get_write_pos() + reserver.size());
+		}
+
+		{
+			auto scope = measure_scope(profiler.serialization_pass);
+			augs::write(into, cosm.significant);
+		}
+	}
+
+	void read_object(augs::stream& from, cosmos& cosm) {
+		auto& profiler = cosm.profiler;
+
+		auto refresh_when_done = augs::make_scope_guard([&cosm]() {
+			cosm.refresh_for_new_significant_state();
+		});
+
+		cosm.significant.clear();
+
+		auto scope = measure_scope(profiler.deserialization_pass);
+		augs::read(from, cosm.significant);
+	}
 }

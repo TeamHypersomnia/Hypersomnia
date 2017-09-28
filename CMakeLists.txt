@@ -327,7 +327,7 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/game/detail/describers.cpp"
 	"src/game/detail/names_and_descriptions.cpp"
 	"src/game/transcendental/logic_step.cpp"
-	"src/game/transcendental/serialization.cpp"
+	"src/game/transcendental/cosmos_significant_state.cpp"
 	"src/view/network/simulation_broadcast.cpp"
 	"src/view/network/simulation_receiver.cpp"
 	"src/game/stateless_systems/animation_system.cpp"
@@ -424,6 +424,7 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/application/session_profiler.cpp"
 	"src/view/viewables/all_viewables_defs.cpp"
 	"src/view/audiovisual_state/audiovisual_profiler.cpp"
+	"src/application/workspace.cpp"
 )
 
 # natvis files for easier debugging in Visual Studio.

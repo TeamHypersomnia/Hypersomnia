@@ -21,6 +21,8 @@
 #include "view/viewables/viewables_loading_type.h"
 #include "view/viewables/all_viewables_defs.h"
 
+#include "application/workspace.h"
+
 #include "application/gui/menu/creators_screen.h"
 #include "application/gui/main_menu_gui.h"
 #include "application/setups/main_menu_settings.h"
@@ -35,11 +37,10 @@ class main_menu_setup {
 	std::shared_future<std::wstring> latest_news;
 	vec2 latest_news_pos = { 0.f, 0.f };
 
-	cosmos intro_scene;
+	workspace intro;
+
 	augs::fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
 	cosmic_entropy total_collected_entropy;
-	all_logical_assets logical_assets;
-	all_viewables_defs viewable_defs;
 
 	entity_id viewed_character_id;
 	sol::table menu_config_patch;
@@ -73,16 +74,16 @@ public:
 		return 1.0;
 	}
 
+	const auto& get_viewed_cosmos() const {
+		return intro.world;
+	}
+
 	auto get_interpolation_ratio() const {
-		return timer.fraction_of_step_until_next_step(intro_scene.get_fixed_delta());
+		return timer.fraction_of_step_until_next_step(get_viewed_cosmos().get_fixed_delta());
 	}
 
 	auto get_viewed_character_id() const {
 		return viewed_character_id;
-	}
-
-	const auto& get_viewed_cosmos() const {
-		return intro_scene;
 	}
 
 	auto get_viewed_character() const {
@@ -90,7 +91,7 @@ public:
 	}
 
 	const auto& get_viewable_defs() const {
-		return viewable_defs;
+		return intro.viewables;
 	}
 
 	void perform_custom_imgui() {
@@ -111,11 +112,11 @@ public:
 
 		timer.advance(frame_delta);
 
-		auto steps = timer.extract_num_of_logic_steps(intro_scene.get_fixed_delta());
+		auto steps = timer.extract_num_of_logic_steps(get_viewed_cosmos().get_fixed_delta());
 
 		while (steps--) {
-			intro_scene.advance(
-				{ total_collected_entropy, logical_assets },
+			intro.advance(
+				{ total_collected_entropy },
 				std::forward<Callbacks>(callbacks)...
 			);
 

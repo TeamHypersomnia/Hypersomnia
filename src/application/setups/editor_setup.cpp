@@ -22,27 +22,25 @@ void editor_setup::start_open_file_dialog() {
 	);
 }
 
-void editor_setup::open_cosmos(const augs::path_type& cosmos_path) {
-	edited_world.load_from_file(cosmos_path);
-	current_cosmos_path = cosmos_path;
+void editor_setup::open_workspace(const augs::path_type& workspace_path) {
+	current_workspace_path = workspace_path;
 }
 
-void editor_setup::open_blank_cosmos() {
-	edited_world = cosmos::empty;
-	edited_world.set_steps_per_second(60);
-	edited_world.reserve_storage_for_entities(100);
+void editor_setup::open_blank_workspace() {
+	work.world = cosmos::empty;
+	work.world.reserve_storage_for_entities(100);
 
-	auto origin = edited_world.create_entity("origin_entity");
+	auto origin = work.world.create_entity("origin_entity");
 	origin += components::transform();
 
 	viewed_character_id = origin;
 
-	current_cosmos_path = "untitled_cosmos.bin";
+	current_workspace_path = "untitled_cosmos.bin";
 }
 
-editor_setup::editor_setup(const augs::path_type& cosmos_path) {
+editor_setup::editor_setup(const augs::path_type& workspace_path) {
 	try {
-		open_cosmos(cosmos_path);
+		open_workspace(workspace_path);
 	}
 	catch (cosmos_loading_error err) {
 		set_popup({
@@ -51,7 +49,7 @@ editor_setup::editor_setup(const augs::path_type& cosmos_path) {
 			err.what()
 		});
 
-		open_blank_cosmos();
+		open_blank_workspace();
 	}
 }
 
@@ -62,11 +60,13 @@ void editor_setup::control(
 }
 
 void editor_setup::customize_for_viewing(config_lua_table& config) const {
-	config.window.name = "Editor - " + current_cosmos_path.string();
+	config.window.name = "Editor - " + current_workspace_path.string();
 	return;
 }
 
-void editor_setup::perform_custom_imgui() {
+void editor_setup::perform_custom_imgui(
+	sol::state& lua
+) {
 	using namespace augs::imgui;
 
 	if (ImGui::BeginMainMenuBar()) {
@@ -89,7 +89,12 @@ void editor_setup::perform_custom_imgui() {
 			ImGui::Separator();
 
 			if (ImGui::MenuItem("Fill with test scene", nullptr, false, BUILD_TEST_SCENES == 1)) {
-
+#if BUILD_TEST_SCENES
+#if TODO
+				work.make_test_scene(lua, false);
+				viewed_character_id = work.world.get_entity_by_name(L"player0");
+#endif
+#endif
 			}
 
 			ImGui::EndMenu();
@@ -109,7 +114,7 @@ void editor_setup::perform_custom_imgui() {
 		
 		if (result_path) {
 			try {
-				open_cosmos(*result_path);
+				open_workspace(*result_path);
 			}
 			catch (cosmos_loading_error err) {
 				set_popup({
@@ -118,7 +123,7 @@ void editor_setup::perform_custom_imgui() {
 					err.what()
 				});
 
-				open_blank_cosmos();
+				open_blank_workspace();
 			}
 		}
 	}
@@ -126,11 +131,11 @@ void editor_setup::perform_custom_imgui() {
 	if (show_summary) {
 		ImGui::Begin("Summary", &show_summary);
 		ImGui::BeginChild("Cosmos");
-		ImGui::Text(typesafe_sprintf("Tick rate: %x/s", edited_world.get_steps_per_second()).c_str());
+		ImGui::Text(typesafe_sprintf("Tick rate: %x/s", get_viewed_cosmos().get_steps_per_second()).c_str());
 		
 		ImGui::Text(typesafe_sprintf("Total entities: %x/%x", 
-			edited_world.get_entities_count(),
-			edited_world.get_maximum_entities()
+			get_viewed_cosmos().get_entities_count(),
+			get_viewed_cosmos().get_maximum_entities()
 		).c_str());
 
 		ImGui::EndChild();

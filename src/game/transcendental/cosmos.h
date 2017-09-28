@@ -27,7 +27,7 @@
 #include "game/organization/all_components_declaration.h"
 #include "game/organization/all_messages_declaration.h"
 #include "game/organization/all_inferred_systems.h"
-#include "game/transcendental/cosmos_structs.h"
+#include "game/transcendental/cosmos_significant_state.h"
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/transcendental/data_living_one_step.h"
@@ -41,6 +41,15 @@
 #include "game/assets/behaviour_tree.h"
 
 using rng_seed_type = unsigned;
+
+class cosmic_delta;
+struct data_living_one_step;
+
+enum class subjects_iteration_flag {
+	POSSIBLE_ITERATOR_INVALIDATION,
+
+	COUNT
+};
 
 struct cosmos_loading_error : error_with_typesafe_sprintf {
 	using error_with_typesafe_sprintf::error_with_typesafe_sprintf;
@@ -68,10 +77,6 @@ public:
 
 	cosmos(const std::size_t reserved_entities = 0u);
 	cosmos& operator=(const cosmos_significant_state&);
-
-	/* saving procedure is not const due to possible reinference of the universe */
-	void save_to_file(const augs::path_type&);
-	void load_from_file(const augs::path_type&);
 
 	void reserve_storage_for_entities(const std::size_t);
 
@@ -404,4 +409,9 @@ inline std::size_t cosmos::get_entities_count() const {
 
 inline std::size_t cosmos::get_maximum_entities() const {
 	return significant.pool_for_aggregates.capacity();
+}
+
+namespace augs {
+	void write_object(augs::stream& ar, const cosmos& cosm);
+	void read_object(augs::stream& ar, cosmos& cosm);
 }

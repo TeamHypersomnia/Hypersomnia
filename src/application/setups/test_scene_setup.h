@@ -11,6 +11,8 @@
 #include "view/viewables/all_viewables_defs.h"
 #include "view/viewables/viewables_loading_type.h"
 
+#include "application/workspace.h"
+
 #include "application/debug_character_selection.h"
 #include "application/debug_settings.h"
 
@@ -21,14 +23,11 @@ namespace sol {
 }
 
 class test_scene_setup {
-	cosmos hypersomnia;
+	workspace scene;
 	cosmic_entropy total_collected_entropy;
 	augs::debug_entropy_player<cosmic_entropy> player;
 	augs::fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
 	debug_character_selection characters;
-
-	all_logical_assets logical_assets;
-	all_viewables_defs viewable_defs;
 
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::ALWAYS_HAVE_ALL_LOADED;
@@ -46,16 +45,16 @@ public:
 		return 1.0;
 	}
 
+	const auto& get_viewed_cosmos() const {
+		return scene.world;
+	}
+
 	auto get_interpolation_ratio() const {
-		return timer.fraction_of_step_until_next_step(hypersomnia.get_fixed_delta());
+		return timer.fraction_of_step_until_next_step(get_viewed_cosmos().get_fixed_delta());
 	}
 
 	auto get_viewed_character_id() const {
 		return characters.get_selected_character();
-	}
-
-	const auto& get_viewed_cosmos() const {
-		return hypersomnia;
 	}
 
 	auto get_viewed_character() const {
@@ -63,7 +62,7 @@ public:
 	}
 
 	const auto& get_viewable_defs() const {
-		return viewable_defs;
+		return scene.viewables;
 	}
 
 	void perform_custom_imgui() {
@@ -82,13 +81,13 @@ public:
 		Callbacks&&... callbacks
 	) {
 		timer.advance(frame_delta);
-		auto steps = timer.extract_num_of_logic_steps(hypersomnia.get_fixed_delta());
+		auto steps = timer.extract_num_of_logic_steps(get_viewed_cosmos().get_fixed_delta());
 
 		while (steps--) {
 			player.advance_player_and_biserialize(total_collected_entropy);
 
-			hypersomnia.advance(
-				{ total_collected_entropy, logical_assets },
+			scene.advance(
+				{ total_collected_entropy },
 				std::forward<Callbacks>(callbacks)...
 			);
 

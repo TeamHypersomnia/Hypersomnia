@@ -1,83 +1,12 @@
+#include "augs/filesystem/file.h"
+
 #include "augs/misc/templated_readwrite.h"
 #include "augs/misc/streams.h"
 
-#include "cosmos.h"
 #include "game/organization/all_component_includes.h"
-#include "augs/filesystem/file.h"
+#include "game/transcendental/cosmos.h"
+
 #include "generated/introspectors.h"
-
-void cosmos::save_to_file(const augs::path_type& path) {
-	auto scope = measure_scope(profiler.total_save);
-	
-	auto& reserved_memory = reserved_memory_for_serialization;
-
-	// memory reservation stage
-	{
-		augs::output_stream_reserver reserver;
-		
-		{
-			auto scope = measure_scope(profiler.size_calculation_pass);
-			augs::write(reserver, significant);
-		}
-		
-		auto scope = measure_scope(profiler.memory_allocation_pass);
-		reserved_memory.reserve(static_cast<size_t>(reserver.size() * 1.2));
-	}
-
-	// writing stage
-
-	{
-		auto scope = measure_scope(profiler.serialization_pass);
-		augs::write(reserved_memory, significant);
-	}
-	
-	{
-		auto scope = measure_scope(profiler.writing_savefile);
-		augs::create_binary_file(path, reserved_memory);
-	}
-}
-
-void cosmos::load_from_file(const augs::path_type& path) {
-	auto scope = measure_scope(profiler.total_load);
-
-	auto refresh_when_done = augs::make_scope_guard([this]() {
-		refresh_for_new_significant_state();
-	});
-
-	significant.clear();
-
-	const auto extension = path.extension();
-
-	if (extension == ".bin") {
-		try {
-			auto& stream = reserved_memory_for_serialization;
-
-			{
-				auto scope = measure_scope(profiler.reading_savefile);
-				augs::get_file_contents_binary_into(path, stream);
-			}
-
-			{
-				auto scope = measure_scope(profiler.deserialization_pass);
-				augs::read(stream, significant);
-			}
-		}
-		catch (augs::ifstream_error err) {
-			clear();
-			throw cosmos_loading_error("Failed to load cosmos binary file:\n%x\n%x", path, err.what());
-		}
-		catch (augs::stream_read_error err) {
-			clear();
-			throw cosmos_loading_error("The cosmos binary file appears corrupt:\n%x\n%x", path, err.what());
-		}
-	}
-	else {
-		throw cosmos_loading_error("Failed to load cosmos file:\n%x\n%x", path, "Unknown extension!");
-	}
-
-	//ensure(cosmos() == cosmos());
-	//ensure(main_cosmos == cosmos());
-}
 
 #if ENTITY_TRACKS_NAME_FOR_DEBUG
 /*

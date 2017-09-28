@@ -4,7 +4,7 @@
 struct main_menu_settings {
 	// GEN INTROSPECTOR struct main_menu_settings
 	augs::path_type menu_intro_scene_entropy_path;
-	augs::path_type menu_intro_scene_cosmos_path;
+	augs::path_type menu_intro_scene_workspace_path;
 	
 	augs::path_type menu_theme_path;
 

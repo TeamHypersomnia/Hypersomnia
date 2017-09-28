@@ -13,6 +13,8 @@
 #include "view/viewables/all_viewables_defs.h"
 #include "view/viewables/viewables_loading_type.h"
 
+#include "application/workspace.h"
+
 #include "application/debug_character_selection.h"
 #include "application/debug_settings.h"
 #include "application/setups/editor_settings.h"
@@ -35,21 +37,19 @@ class editor_setup {
 	std::optional<popup> current_popup;
 	bool show_summary = true;
 
-	cosmos edited_world;
+	workspace work;
+
 	cosmic_entropy total_collected_entropy;
 	augs::fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
 	entity_id viewed_character_id;
 
-	all_logical_assets logical_assets;
-	all_viewables_defs viewable_defs;
-
-	augs::path_type current_cosmos_path;
+	augs::path_type current_workspace_path;
 
 	std::future<std::optional<std::string>> open_file_dialog;
 
 	void set_popup(const popup);
-	void open_cosmos(const augs::path_type& cosmos_path);
-	void open_blank_cosmos();
+	void open_workspace(const augs::path_type& workspace_path);
+	void open_blank_workspace();
 	void start_open_file_dialog();
 
 public:
@@ -58,22 +58,22 @@ public:
 	static constexpr bool accepts_shortcuts = true;
 	static constexpr bool has_modal_popups = true;
 
-	editor_setup(const augs::path_type& cosmos_path);
+	editor_setup(const augs::path_type& workspace_path);
 
 	auto get_audiovisual_speed() const {
 		return 1.0;
 	}
 
+	const auto& get_viewed_cosmos() const {
+		return work.world;
+	}
+
 	auto get_interpolation_ratio() const {
-		return timer.fraction_of_step_until_next_step(edited_world.get_fixed_delta());
+		return timer.fraction_of_step_until_next_step(get_viewed_cosmos().get_fixed_delta());
 	}
 
 	auto get_viewed_character_id() const {
 		return viewed_character_id;
-	}
-
-	const auto& get_viewed_cosmos() const {
-		return edited_world;
 	}
 
 	auto get_viewed_character() const {
@@ -81,10 +81,12 @@ public:
 	}
 
 	const auto& get_viewable_defs() const {
-		return viewable_defs;
+		return work.viewables;
 	}
 
-	void perform_custom_imgui();
+	void perform_custom_imgui(
+		sol::state& lua
+	);
 
 	bool during_popup() const {
 		return current_popup.has_value();
@@ -102,11 +104,11 @@ public:
 		Callbacks&&... callbacks
 	) {
 		timer.advance(frame_delta);
-		auto steps = timer.extract_num_of_logic_steps(edited_world.get_fixed_delta());
+		auto steps = timer.extract_num_of_logic_steps(get_viewed_cosmos().get_fixed_delta());
 
 		while (steps--) {
-			edited_world.advance(
-			{ total_collected_entropy, logical_assets },
+			work.advance(
+				{ total_collected_entropy },
 				std::forward<Callbacks>(callbacks)...
 			);
 

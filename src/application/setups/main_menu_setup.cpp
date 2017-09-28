@@ -25,7 +25,6 @@
 
 #include "game/detail/visible_entities.h"
 
-#include "test_scenes/test_scenes_content.h"
 #include "test_scenes/scenes/testbed.h"
 #include "test_scenes/scenes/minimal_scene.h"
 
@@ -134,31 +133,23 @@ main_menu_setup::main_menu_setup(
 	}
 
 	// TODO: actually load a cosmos with its resources from a file/folder
-	const bool is_intro_scene_available = settings.menu_intro_scene_cosmos_path.string().size() > 0;
+	const bool is_intro_scene_available = settings.menu_intro_scene_workspace_path.string().size() > 0;
 
 	if (is_intro_scene_available) {
-		intro_scene.set_steps_per_second(60);
 #if BUILD_TEST_SCENES
-		intro_scene.reserve_storage_for_entities(3000u);
-
-		populate_test_scene_assets(lua, logical_assets, viewable_defs);
-
-		test_scenes::testbed().populate_world_with_entities(
-			intro_scene,
-			logical_assets
-		);
+		intro.make_test_scene(lua, false);
 #endif
 	}
 
 	viewed_character_id = is_intro_scene_available ?
-		intro_scene.get_entity_by_name(L"player0")
+		intro.world.get_entity_by_name(L"player0")
 		: entity_id()
 	;
 
 	// director.load_recording_from_file(settings.menu_intro_scene_entropy_path);
 
 	const bool is_recording_available = is_intro_scene_available && director.is_recording_available();
-	initial_step_number = intro_scene.get_total_steps_passed();
+	initial_step_number = intro.world.get_total_steps_passed();
 
 	for (auto& m : gui.root.buttons) {
 		m.hover_highlight_maximum_distance = 10.f;
@@ -176,11 +167,11 @@ main_menu_setup::main_menu_setup(
 	gui.root.buttons[main_menu_button_type::QUIT].set_appearing_caption(L"Quit");
 
 	if (is_recording_available) {
-		while (intro_scene.get_total_seconds_passed() < settings.rewind_intro_scene_by_secs) {
-			const auto entropy = cosmic_entropy(director.get_entropy_for_step(intro_scene.get_total_steps_passed() - initial_step_number), intro_scene);
+		while (intro.world.get_total_seconds_passed() < settings.rewind_intro_scene_by_secs) {
+			const auto entropy = cosmic_entropy(director.get_entropy_for_step(intro.world.get_total_steps_passed() - initial_step_number), intro.world);
 
-			intro_scene.advance(
-				{ entropy, logical_assets },
+			intro.world.advance(
+				{ entropy, intro.logicals },
 				[](auto) {},
 				[](auto) {},
 				[](auto) {}

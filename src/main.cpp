@@ -215,7 +215,7 @@ int main(const int argc, const char* const * const argv) try {
 
 			case launch_type::EDITOR:
 				current_setup.emplace(std::in_place_type_t<editor_setup>(),
-					config.editor.initial_cosmos_path
+					config.editor.initial_workspace_path
 				);
 
 				game_gui.active = true;
@@ -567,8 +567,20 @@ int main(const int argc, const char* const * const argv) try {
 						thus we ask the current setup for its custom IMGUI logic.
 					*/
 
-					visit_current_setup([](auto& setup) {
-						setup.perform_custom_imgui();
+
+					/* MSVC ICE fix */
+					auto& _lua = lua;
+
+					visit_current_setup([&](auto& setup) {
+						using T = std::decay_t<decltype(setup)>;
+
+						if constexpr(std::is_same_v<T, editor_setup>) {
+							/* Editor needs more goods */
+							setup.perform_custom_imgui(_lua);
+						}
+						else {
+							setup.perform_custom_imgui();
+						}
 					});
 				},
 

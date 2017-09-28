@@ -1,28 +1,5 @@
 #pragma once
-#include "augs/misc/stepped_timing.h"
-#include "augs/misc/trivially_copyable_tuple.h"
-
-#include "game/transcendental/cosmos_common_state.h"
-
-namespace augs {
-	struct introspection_access;
-}
-
-class cosmos_metadata {
-	// GEN INTROSPECTOR class cosmos_metadata
-	friend class cosmos;
-	friend struct augs::introspection_access;
-
-	augs::delta delta = augs::delta::zero;
-	augs::stepped_timestamp now = 0;
-
-#if COSMOS_TRACKS_GUIDS
-	entity_guid next_entity_guid = 1;
-#endif
-public:
-	cosmos_common_state global;
-	// END GEN INTROSPECTOR
-};
+#include "game/transcendental/cosmos_metadata.h"
 
 using cosmos_base = put_all_components_into_t<augs::operations_on_all_components_mixin, cosmos>;
 
@@ -45,12 +22,3 @@ public:
 	bool operator==(const cosmos_significant_state&) const;
 	bool operator!=(const cosmos_significant_state&) const;
 };
-
-enum class subjects_iteration_flag {
-	POSSIBLE_ITERATOR_INVALIDATION,
-
-	COUNT
-};
-
-class cosmic_delta;
-struct data_living_one_step;
