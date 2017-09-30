@@ -8,7 +8,7 @@
 
 #include "augs/misc/templated_readwrite.h"
 #include "augs/misc/custom_lua_representations.h"
-#include "augs/misc/script_utils.h"
+#include "augs/misc/lua_utils.h"
 
 #include "augs/filesystem/file.h"
 

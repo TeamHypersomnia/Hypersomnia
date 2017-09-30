@@ -5,7 +5,7 @@
 #include "augs/filesystem/file.h"
 
 #include "augs/misc/lua_readwrite.h"
-#include "augs/misc/script_utils.h"
+#include "augs/misc/lua_utils.h"
 
 #include "augs/window_framework/window.h"
 

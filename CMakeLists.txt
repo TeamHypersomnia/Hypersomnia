@@ -403,7 +403,7 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/game/detail/spells/ultimate_wrath_of_the_aeons.cpp"
 	"src/game/detail/spells/exaltation.cpp"
 	"src/game/detail/spells/echoes_of_the_higher_realms.cpp"
-	"src/augs/misc/script_utils.cpp"
+	"src/augs/misc/lua_utils.cpp"
 	"src/test_scenes/test_scenes_content.cpp"
 	"src/view/necessary_resources.cpp"
 	"src/augs/misc/imgui_utils.cpp"

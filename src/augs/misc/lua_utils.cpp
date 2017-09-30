@@ -1,4 +1,4 @@
-#include "script_utils.h"
+#include "lua_utils.h"
 
 namespace augs {
 	sol::state create_lua_state() {
