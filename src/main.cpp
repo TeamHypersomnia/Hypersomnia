@@ -1086,3 +1086,8 @@ catch (const necessary_resource_loading_error err) {
 	press_any_key();
 	return 1;
 }
+catch (const augs::lua_state_creation_error err) {
+	LOG("Failed to create a lua state for the game!\n%x", err.what());
+	press_any_key();
+	return 1;
+}

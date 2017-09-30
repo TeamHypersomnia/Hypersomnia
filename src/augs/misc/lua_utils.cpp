@@ -1,4 +1,7 @@
-#include "lua_utils.h"
+#include "augs/log.h"
+#include "augs/ensure.h"
+
+#include "augs/misc/lua_utils.h"
 
 namespace augs {
 	sol::state create_lua_state() {
@@ -31,14 +34,13 @@ namespace augs {
 			} 
 		};
 
-		const auto utils_path = "scripts/utils.lua";
-		
-		auto pfr = lua.do_file(utils_path);
-
-		if (!pfr.valid()) {
-			LOG("Fatal error: there was a problem building %x:\n%x", utils_path);
-			press_any_key();
-			cleanup_proc();
+		if (
+			const auto utils_path = "scripts/utils.lua";
+			!lua.do_file(utils_path).valid()
+		) {
+			throw lua_state_creation_error(
+				"Failed to build %x", utils_path
+			);
 		}
 
 		return lua;
