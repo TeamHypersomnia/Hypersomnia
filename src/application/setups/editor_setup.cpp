@@ -137,6 +137,14 @@ void editor_setup::perform_custom_imgui(
 	}
 
 	if (show_summary) {
+		{
+			const auto screen_size = vec2(ImGui::GetIO().DisplaySize);
+			const auto initial_settings_size = screen_size / 2;
+
+			ImGui::SetNextWindowPos(screen_size / 2 - initial_settings_size / 2, ImGuiSetCond_FirstUseEver);
+			ImGui::SetNextWindowSize(initial_settings_size, ImGuiSetCond_FirstUseEver);
+		}
+
 		ImGui::Begin("Summary", &show_summary);
 		ImGui::BeginChild("Cosmos");
 		ImGui::Text(typesafe_sprintf("Tick rate: %x/s", get_viewed_cosmos().get_steps_per_second()).c_str());
