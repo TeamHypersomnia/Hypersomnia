@@ -19,6 +19,7 @@ option(BUILD_HTTP_REQUESTS "Build simple http requests, e.g. for latest news bar
 option(BUILD_TEST_SCENES "Build unscripted test scenes hardcoded in C++." ON)
 option(BUILD_PLATFORM_CODE "Build code specific to a given platfom, e.g. window management done by WinAPI." ON)
 option(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE "Add command to archive builds in Release." ON)
+option(ADD_APPLICATION_ICON "Add application icon." ON)
 
 option(HYPERSOMNIA_BARE "Build the minimal possible Hypersomnia runtime. For testing or quick iteration." OFF)
 
@@ -34,6 +35,7 @@ if (HYPERSOMNIA_BARE)
 	set(BUILD_TEST_SCENES FALSE CACHE BOOL "" FORCE)
 	set(BUILD_PLATFORM_CODE FALSE CACHE BOOL "" FORCE)
 	set(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE FALSE CACHE BOOL "" FORCE)
+	set(ADD_APPLICATION_ICON FALSE CACHE BOOL "" FORCE)
 
 	message("Building Hypersomnia without... anything")
 endif()
@@ -468,10 +470,21 @@ set(HYPERSOMNIA_TRIVIAL_3RDPARTY_SRCS
 	"src/3rdparty/imgui/imgui_demo.cpp"
 )
 
+# Project resource files, e.g. an icon.
+
+if(ADD_APPLICATION_ICON)
+	if(MSVC)
+		set(HYPESROMNIA_PROJECT_RC_FILES
+			"${CMAKE_MODULE_PATH}/Hypersomnia.rc"
+		)
+	endif()
+endif()
+
 set(HYPERSOMNIA_SRCS
 	${HYPERSOMNIA_TRIVIAL_3RDPARTY_SRCS}
 	${HYPERSOMNIA_BOX2D_SRCS}
 	${HYPERSOMNIA_CODEBASE_SRCS}
+	${HYPESROMNIA_PROJECT_RC_FILES}
 
 	"src/main.cpp"
 )
@@ -744,8 +757,8 @@ set_source_files_properties(${HYPERSOMNIA_VERSION_FILE_PATH} PROPERTIES GENERATE
 # We build the main Hypersomnia executable.
 
 add_executable(Hypersomnia 
-	${HYPERSOMNIA_VERSION_FILE_PATH} 
-	${HYPERSOMNIA_SRCS} 
+	${HYPERSOMNIA_VERSION_FILE_PATH}
+	${HYPERSOMNIA_SRCS}
 	${HYPERSOMNIA_HEADERS}
 )
 
