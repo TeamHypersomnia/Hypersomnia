@@ -365,13 +365,6 @@ namespace augs {
 		}
 	}
 
-	void window::sync_back_into(window_settings& into) {
-		if (!current_settings.fullscreen) {
-			into.size = get_window_rect().get_size();
-			into.position = get_window_rect().get_position();
-		}
-	}
-
 	void window::set_window_rect(const xywhi r) {
 		static RECT wr = { 0 };
 		ensure(SetRect(&wr, r.x, r.y, r.r(), r.b()));
@@ -445,6 +438,13 @@ namespace augs {
 
 	vec2i window::get_screen_size() const {
 		return get_window_rect().get_size();
+	}
+
+	void window::sync_back_into(window_settings& into) {
+		if (!current_settings.fullscreen) {
+			into.size = get_window_rect().get_size();
+			into.position = get_window_rect().get_position();
+		}
 	}
 
 	void window::apply(const window_settings& settings, const bool force) {

@@ -96,12 +96,14 @@ void editor_setup::perform_custom_imgui(
 			if (ImGui::MenuItem("Paste", "CTRL+V")) {}
 			ImGui::Separator();
 
-			if (ImGui::MenuItem("Fill with test scene", nullptr, false, BUILD_TEST_SCENES == 1)) {
 #if BUILD_TEST_SCENES
+			if (ImGui::MenuItem("Fill with test scene")) {
 				work.make_test_scene(lua, false);
 				viewed_character_id = work.world.get_entity_by_name(L"player0");
-#endif
 			}
+#else
+			if (ImGui::MenuItem("Fill with test scene", nullptr, false, false)) {}
+#endif
 
 			ImGui::EndMenu();
 		}

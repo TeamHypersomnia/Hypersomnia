@@ -105,7 +105,7 @@ namespace augs {
 
 	}
 
-	std::optional<std::string> get_open_file_name(const std::wstring filter) {
+	std::optional<std::string> get_open_file_name(const wchar_t* const filter) {
 		return std::nullopt;
 	}
 }

@@ -45,10 +45,6 @@ namespace augs {
 		timer triple_click_timer;
 		unsigned triple_click_delay = 0xdeadbeef; /* maximum delay time for the next click (after doubleclick) to be considered tripleclick (in milliseconds) */
 
-		void set_window_name(const std::string& name);
-		void set_window_border_enabled(const bool);
-		void set_window_rect(const xywhi);
-
 		std::optional<event::change> handle_event(
 			const UINT, 
 			const WPARAM, 
@@ -62,7 +58,11 @@ namespace augs {
 
 #endif
 		window_settings current_settings;
-		
+
+		void set_window_name(const std::string& name);
+		void set_window_border_enabled(const bool);
+		void set_window_rect(const xywhi);
+
 		void destroy();
 	public:
 		window(const window_settings&);
