@@ -44,6 +44,8 @@
 #include "application/main/draw_debug_details.h"
 #include "application/main/release_flags.h"
 
+#include "cmd_line_params.h"
+
 #include "hypersomnia_version.h"
 #include "generated/introspectors.h"
 
@@ -75,6 +77,8 @@ int main(const int argc, const char* const * const argv) {
 */
 
 int work(const int argc, const char* const * const argv) try {
+	static const auto params = cmd_line_params(argc, argv);
+
 	static const auto canon_config_path = augs::path_type("config.lua");
 	static const auto local_config_path = augs::path_type("config.local.lua");
 	
@@ -215,37 +219,58 @@ int work(const int argc, const char* const * const argv) try {
 		}
 	};
 
-	static auto launch = [](const launch_type mode) {
-		LOG("Launch mode: %x", augs::enum_to_string(mode));
-		
+	static auto launch_setup = [](auto&& setup_init_callback) {
 		audiovisuals.get<sound_system>().clear_all();
 
 		current_setup = std::nullopt;
 		ingame_menu.show = false;
 
+		setup_init_callback();
+		
+		/* MSVC ICE workaround */
+		auto& _preload_viewables = preload_viewables;
+
+		visit_current_setup([&](auto& setup) {
+			_preload_viewables(setup);
+		});
+	};
+
+	static auto launch_editor = [](const augs::path_type workspace_path) {
+		launch_setup([&]() {
+			current_setup.emplace(std::in_place_type_t<editor_setup>(),
+				workspace_path
+			);
+
+			game_gui.active = true;
+		});
+	};
+
+	static auto launch = [](const launch_type mode) {
+		LOG("Launch mode: %x", augs::enum_to_string(mode));
+		
 		switch (mode) {
 			case launch_type::MAIN_MENU:
-				if (!main_menu.has_value()) {
-					main_menu.emplace(lua, config.main_menu);
-				}
+				launch_setup([]() {
+					if (!main_menu.has_value()) {
+						main_menu.emplace(lua, config.main_menu);
+					}
+				});
 
 				break;
 
 			case launch_type::EDITOR:
-				current_setup.emplace(std::in_place_type_t<editor_setup>(),
-					config.editor.initial_workspace_path
-				);
-
-				game_gui.active = true;
+				launch_editor(config.editor.initial_workspace_path);
 
 				break;
 
 			case launch_type::TEST_SCENE:
-				current_setup.emplace(std::in_place_type_t<test_scene_setup>(),
-					lua,
-					config.session.create_minimal_test_scene,
-					config.get_input_recording_mode()
-				);
+				launch_setup([]() {
+					current_setup.emplace(std::in_place_type_t<test_scene_setup>(),
+						lua,
+						config.session.create_minimal_test_scene,
+						config.get_input_recording_mode()
+					);
+				});
 
 				break;
 
@@ -253,10 +278,6 @@ int work(const int argc, const char* const * const argv) try {
 				ensure(false && "The launch mode you have chosen is currently out of service.");
 				break;
 		}
-
-		visit_current_setup([](auto& setup) {
-			preload_viewables(setup);
-		});
 	};
 
 	static auto get_viewable_defs = []() -> const all_viewables_defs& {
@@ -445,7 +466,7 @@ int work(const int argc, const char* const * const argv) try {
 		const cosmic_entropy& new_game_entropy,
 		const config_lua_table& viewing_config
 	) {
-		/* MVSC's ICE fix */
+		/* MSVC ICE workaround */
 		auto& _audiovisual_step = audiovisual_step;
 		auto& _setup_post_solve = setup_post_solve;
 
@@ -477,7 +498,12 @@ int work(const int argc, const char* const * const argv) try {
 		);
 	};
 
-	launch(config.get_launch_mode());
+	if (!params.editor_target.empty()) {
+		launch_editor(params.editor_target);
+	}
+	else {
+		launch(config.get_launch_mode());
+	}
 	
 	/* 
 		The main loop variables.
@@ -586,7 +612,7 @@ int work(const int argc, const char* const * const argv) try {
 					*/
 
 
-					/* MSVC ICE fix */
+					/* MSVC ICE workaround */
 					auto& _lua = lua;
 
 					visit_current_setup([&](auto& setup) {
@@ -610,7 +636,7 @@ int work(const int argc, const char* const * const argv) try {
 				should_freeze_cursor
 			);
 			
-			/* MSVC ICE fix */
+			/* MSVC ICE workaround */
 
 			const auto& _config = config;
 
@@ -708,7 +734,7 @@ int work(const int argc, const char* const * const argv) try {
 					bool fetched = false;
 					
 					if (!ingame_menu.show) {
-						/* MSVC ICE fix */
+						/* MSVC ICE workaround */
 						auto& _common_input_state = common_input_state;
 						
 						if (visit_current_setup([&](auto& setup) {

@@ -91,7 +91,7 @@ bool typesafe_scanf_detail(
 				detail_typesafe_scanf_value(read_chunk, val);
 			}
 
-			if (sizeof...(A) == 0) {
+			if constexpr(sizeof...(A) == 0) {
 				return true;
 			}
 			else {

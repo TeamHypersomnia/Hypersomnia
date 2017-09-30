@@ -215,7 +215,7 @@ void particles_simulation_system::advance_visible_streams_and_all_particles(
 						);
 					}
 
-					/* MSVC ICE fix */
+					/* MSVC ICE workaround */
 					auto& _rng = rng;
 
 					const auto spawner = [&](auto dummy) {
