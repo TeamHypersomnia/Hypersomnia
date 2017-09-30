@@ -217,7 +217,7 @@ return {
     enabled = true,
     speed = 525
   },
-  launch_mode = "TEST_SCENE",
+  launch_mode = "EDITOR",
   main_menu = {
     latest_news_url = "http://hypersomnia.pl/latest_post/",
     menu_intro_scene_workspace_path = "abc",
@@ -245,7 +245,7 @@ return {
     name = "Hypersomnia",
     position = {
       x = 100,
-      y = 10
+      y = 30
     },
     size = {
       x = 1280,

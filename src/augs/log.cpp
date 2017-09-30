@@ -1,4 +1,3 @@
-#include <iostream>
 #include <string>
 #include <thread>
 #include <mutex>
@@ -29,14 +28,18 @@ void program_log::push_entry(const log_entry& new_entry) {
 	}
 }
 
-void program_log::save_complete_to(const augs::path_type& path) const {
-	auto complete_log = std::string();
+std::string program_log::get_complete() const {
+	auto logs = std::string();
 
 	for (const auto& e : all_entries) {
-		complete_log += e.text + '\n';
+		logs += e.text + '\n';
 	}
-	
-	augs::create_text_file(path, complete_log);
+
+	return logs;
+}
+
+void program_log::save_complete_to(const augs::path_type& path) const {
+	augs::create_text_file(path, get_complete());
 }
 
 template<>
@@ -46,7 +49,6 @@ void LOG(const std::string& f) {
 
 	program_log::get_current().push_entry({ console_color::WHITE, f });
 
-	std::cout << f << std::endl;
 #if LOG_TO_FILE
 	std::ofstream recording_file("generated/logs/live_debug.txt", std::ios::out | std::ios::app);
 	recording_file << f << std::endl;

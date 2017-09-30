@@ -1,4 +1,6 @@
 #pragma once
+#include <iostream>
+
 #include "augs/unit_tests.h"
 #include "augs/global_libraries.h"
 
@@ -51,15 +53,26 @@
 
 int work(const int argc, const char* const * const argv);
 
+#if PLATFORM_WINDOWS
+int __stdcall WinMain(HINSTANCE, HINSTANCE, char*, int) {
+	const auto argc = __argc;
+	const auto argv = __argv;
+
+#else
 int main(const int argc, const char* const * const argv) {
+#endif
 	const auto exit_code = work(argc, argv);
 
 	{
-		const auto& logs = program_log::get_current(); 
+		const auto logs = program_log::get_current().get_complete(); 
 
 		switch (exit_code) {
-			case EXIT_SUCCESS: logs.save_complete_to("generated/logs/exit_success_debug_log.txt"); break;
-			case EXIT_FAILURE: logs.save_complete_to("generated/logs/exit_failure_debug_log.txt"); break;
+			case EXIT_SUCCESS: 
+				augs::create_text_file("generated/logs/exit_success_debug_log.txt", logs); 
+				break;
+			case EXIT_FAILURE: 
+				augs::create_text_file("generated/logs/exit_failure_debug_log.txt", logs);
+				break;
 			default: break;
 		}
 	}
@@ -1116,25 +1129,21 @@ int work(const int argc, const char* const * const argv) try {
 }
 catch (const config_read_error err) {
 	LOG("Failed to read the initial config for the game!\n%x", err.what());
-	press_any_key();
-
 	return EXIT_FAILURE;
 }
 catch (const augs::audio_error& err) {
 	LOG("Failed to establish the audio context:\n%x", err.what());
-	press_any_key();
-
 	return EXIT_FAILURE;
 }
 catch (const necessary_resource_loading_error err) {
 	LOG("Failed to load a resource necessary for the game to function!\n%x", err.what());
-	press_any_key();
-
 	return EXIT_FAILURE;
 }
 catch (const augs::lua_state_creation_error err) {
 	LOG("Failed to create a lua state for the game!\n%x", err.what());
-	press_any_key();
-
+	return EXIT_FAILURE;
+}
+catch (...) {
+	LOG("Unknown exception.");
 	return EXIT_FAILURE;
 }

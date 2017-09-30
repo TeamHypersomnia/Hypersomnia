@@ -756,11 +756,17 @@ set_source_files_properties(${HYPERSOMNIA_VERSION_FILE_PATH} PROPERTIES GENERATE
 
 # We build the main Hypersomnia executable.
 
-add_executable(Hypersomnia 
+set(HYPERSOMNIA_EXECUTABLE_ARGUMENT
 	${HYPERSOMNIA_VERSION_FILE_PATH}
 	${HYPERSOMNIA_SRCS}
 	${HYPERSOMNIA_HEADERS}
 )
+
+if(MSVC)
+	add_executable(Hypersomnia WIN32 ${HYPERSOMNIA_EXECUTABLE_ARGUMENT})
+else()
+	add_executable(Hypersomnia ${HYPERSOMNIA_EXECUTABLE_ARGUMENT})
+endif()
 
 # Here, we define pre-build events calling the source code generators.
 
@@ -876,6 +882,12 @@ set_target_properties(Hypersomnia PROPERTIES DEBUG_POSTFIX "-Debug")
 
 if(MSVC)
 	set_target_properties(Hypersomnia PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${HYPERSOMNIA_EXE_RESOURCES_DIR}")
+	
+#	set_target_properties(Hypersomnia PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG "${HYPERSOMNIA_EXE_RESOURCES_DIR}")
+#	set_target_properties(Hypersomnia PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE "${HYPERSOMNIA_EXE_RESOURCES_DIR}")
+#	set_target_properties(Hypersomnia PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${HYPERSOMNIA_EXE_RESOURCES_DIR}")
+#	set_target_properties(Hypersomnia PROPERTIES RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${HYPERSOMNIA_EXE_RESOURCES_DIR}")
+	
 	set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Hypersomnia)
 endif()
 
