@@ -29,8 +29,8 @@ void program_log::push_entry(const log_entry& new_entry) {
 	}
 }
 
-void program_log::save_complete_to(const augs::path_type& path) {
-	std::string complete_log;
+void program_log::save_complete_to(const augs::path_type& path) const {
+	auto complete_log = std::string();
 
 	for (const auto& e : all_entries) {
 		complete_log += e.text + '\n';

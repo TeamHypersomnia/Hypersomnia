@@ -25,7 +25,7 @@ public:
 	std::vector<log_entry> all_entries;
 
 	void push_entry(const log_entry&);
-	void save_complete_to(const augs::path_type& path);
+	void save_complete_to(const augs::path_type& path) const;
 };
 
 template <typename... A>

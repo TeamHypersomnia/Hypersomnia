@@ -47,6 +47,24 @@
 #include "hypersomnia_version.h"
 #include "generated/introspectors.h"
 
+int work(const int argc, const char* const * const argv);
+
+int main(const int argc, const char* const * const argv) {
+	const auto exit_code = work(argc, argv);
+
+	{
+		const auto& logs = program_log::get_current(); 
+
+		switch (exit_code) {
+			case EXIT_SUCCESS: logs.save_complete_to("generated/logs/exit_success_debug_log.txt"); break;
+			case EXIT_FAILURE: logs.save_complete_to("generated/logs/exit_failure_debug_log.txt"); break;
+			default: break;
+		}
+	}
+
+	return exit_code;
+}
+
 /*
 	static is used for variables because some are huge, especially setups.
 	On the other hand, to preserve the destruction in the order of definition,
@@ -56,7 +74,7 @@
 	main will also be called only once.
 */
 
-int main(const int argc, const char* const * const argv) try {
+int work(const int argc, const char* const * const argv) try {
 	static const auto canon_config_path = augs::path_type("config.lua");
 	static const auto local_config_path = augs::path_type("config.local.lua");
 	
@@ -1068,26 +1086,29 @@ int main(const int argc, const char* const * const argv) try {
 		window.swap_buffers();
 	}
 
-	program_log::get_current().save_complete_to("generated/logs/successful_exit_debug_log.txt");
-	return 0;
+	return EXIT_SUCCESS;
 }
 catch (const config_read_error err) {
 	LOG("Failed to read the initial config for the game!\n%x", err.what());
 	press_any_key();
-	return 1;
+
+	return EXIT_FAILURE;
 }
 catch (const augs::audio_error& err) {
 	LOG("Failed to establish the audio context:\n%x", err.what());
 	press_any_key();
-	return 1;
+
+	return EXIT_FAILURE;
 }
 catch (const necessary_resource_loading_error err) {
 	LOG("Failed to load a resource necessary for the game to function!\n%x", err.what());
 	press_any_key();
-	return 1;
+
+	return EXIT_FAILURE;
 }
 catch (const augs::lua_state_creation_error err) {
 	LOG("Failed to create a lua state for the game!\n%x", err.what());
 	press_any_key();
-	return 1;
+
+	return EXIT_FAILURE;
 }
