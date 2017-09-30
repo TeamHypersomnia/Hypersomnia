@@ -72,9 +72,17 @@ void editor_setup::perform_custom_imgui(
 	if (ImGui::BeginMainMenuBar()) {
 		if (ImGui::BeginMenu("File")) {
 			if (ImGui::MenuItem("New", "CTRL+N")) {}
-			
+
 			if (ImGui::MenuItem("Open", "CTRL+O")) {
 				start_open_file_dialog();
+			}
+
+			if (ImGui::MenuItem("Save", "CTRL+S")) {
+
+			}
+
+			if (ImGui::MenuItem("Save as", "F12")) {
+
 			}
 
 			ImGui::EndMenu();
@@ -90,10 +98,8 @@ void editor_setup::perform_custom_imgui(
 
 			if (ImGui::MenuItem("Fill with test scene", nullptr, false, BUILD_TEST_SCENES == 1)) {
 #if BUILD_TEST_SCENES
-#if TODO
 				work.make_test_scene(lua, false);
 				viewed_character_id = work.world.get_entity_by_name(L"player0");
-#endif
 #endif
 			}
 
