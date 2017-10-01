@@ -10,10 +10,7 @@
 
 #if PLATFORM_WINDOWS
 #include "augs/window_framework/translate_windows_enums.h"
-#if ADD_APPLICATION_ICON
-#include <dwmapi.h>
-#define IDI_ICON1 1
-#endif
+
 namespace augs {
 	LRESULT CALLBACK wndproc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 		if (umsg == WM_GETMINMAXINFO || umsg == WM_INPUT) {
@@ -233,8 +230,8 @@ namespace augs {
 			wcl.cbWndExtra = 0;
 			wcl.hInstance = GetModuleHandle(NULL);
 #if ADD_APPLICATION_ICON
-			wcl.hIcon = LoadIcon(0, MAKEINTRESOURCE(IDI_ICON1));
-			wcl.hIconSm = LoadIcon(0, MAKEINTRESOURCE(IDI_ICON1));
+			wcl.hIcon = 0;
+			wcl.hIconSm = 0;
 #else
 			wcl.hIcon = LoadIcon(0, IDI_APPLICATION);
 			wcl.hIconSm = 0;
@@ -242,7 +239,7 @@ namespace augs {
 			wcl.hCursor = LoadCursor(0, IDC_ARROW);
 			wcl.hbrBackground = 0;
 			wcl.lpszMenuName = 0;
-			wcl.lpszClassName = L"AugmentedWindow";
+			wcl.lpszClassName = L"augwin";
 
 			const auto register_success = RegisterClassEx(&wcl) != 0;
 
@@ -252,7 +249,7 @@ namespace augs {
 
 		triple_click_delay = GetDoubleClickTime();
 
-		ensure((hwnd = CreateWindowEx(0, L"AugmentedWindow", L"invalid_name", 0, 0, 0, 0, 0, 0, 0, GetModuleHandle(NULL), this)));
+		ensure((hwnd = CreateWindowEx(0, L"augwin", L"invalid_name", 0, 0, 0, 0, 0, 0, 0, GetModuleHandle(NULL), this)));
 
 		PIXELFORMATDESCRIPTOR p;
 		ZeroMemory(&p, sizeof(p));
@@ -298,13 +295,34 @@ namespace augs {
 
 		apply(settings, true);
 		last_mouse_pos = settings.get_screen_size() / 2;
+
+		const auto app_icon_path = settings.app_icon_path.wstring();
+		
+		if (const bool icon_was_specified = !app_icon_path.empty()) {
+			const auto app_icon = (HICON)LoadImage(NULL,
+				app_icon_path.c_str(),
+				IMAGE_ICON,       
+				0,                
+				0,                
+				LR_LOADFROMFILE |  
+				LR_DEFAULTSIZE |   
+				LR_SHARED         
+			);
+
+			SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)app_icon);
+			SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)app_icon);
+		}
 	}
 
-	void window::set_window_border_enabled(const bool f) {
-		const auto menu = f ? WS_CAPTION | WS_SYSMENU : 0;
-
-		style = menu ? (WS_OVERLAPPED | menu) | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_THICKFRAME | WS_SYSMENU | WS_MAXIMIZEBOX | WS_MINIMIZEBOX : WS_POPUP;
-		exstyle = menu ? WS_EX_WINDOWEDGE : WS_EX_APPWINDOW;
+	void window::set_window_border_enabled(const bool enabled) {
+		if (enabled) {
+			style = WS_OVERLAPPEDWINDOW;
+			exstyle = WS_EX_WINDOWEDGE;
+		}
+		else {
+			style = WS_POPUP;
+			exstyle = WS_EX_APPWINDOW;
+		}
 
 		SetWindowLongPtr(hwnd, GWL_EXSTYLE, exstyle);
 		SetWindowLongPtr(hwnd, GWL_STYLE, style);

@@ -237,6 +237,7 @@ return {
     run = true
   },
   window = {
+    app_icon_path = "content/necessary/gfx/app.ico",
     border = true,
     bpp = 24,
     clip_system_cursor = true,
