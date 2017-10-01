@@ -1,22 +1,31 @@
+#include <iostream>
+
 #include "augs/ensure.h"
+#include "augs/filesystem/file.h"
 #include "augs/window_framework/platform_utils.h"
+#include "augs/window_framework/shell.h"
 
-void press_any_key() {
-	LOG("Press any key...");
-	getchar();
-}
-
-void press_any_key_and_exit() {
-	press_any_key();
-	std::terminate();
-}
-
-void cleanup_proc() {
+void save_log_and_terminate() {
 	augs::disable_cursor_clipping();
 	
-	program_log::get_current().save_complete_to("generated/logs/ensure_failed_debug_log.txt");
+	const auto logs = program_log::get_current().get_complete();
+	const auto failure_log_path = augs::path_type("generated/logs/ensure_failed_debug_log.txt");
 
-#if PLATFORM_WINDOWS
+	augs::create_text_file(failure_log_path, logs);
+
+	{
+		const auto s = failure_log_path.string();
+		/* Open text editor */
+		augs::shell(s.c_str());
+	}
+
+	std::cerr << logs;
+
+#if IS_PRODUCTION_BUILD
+	std::terminate();
+#else
+	#if PLATFORM_WINDOWS
 	__debugbreak();
+	#endif
 #endif
 }

@@ -202,6 +202,7 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/augs/image/font.cpp"
 	"src/augs/image/image.cpp"
 	"src/augs/window_framework/log_color.cpp"
+	"src/augs/window_framework/shell.cpp"
 	"src/augs/misc/action_list.cpp"
 	"src/augs/misc/enum_bitset.cpp"
 	"src/augs/misc/http_requests.cpp"

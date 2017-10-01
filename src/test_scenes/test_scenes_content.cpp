@@ -28,7 +28,6 @@ void populate_test_scene_assets(
 	}
 	catch (const test_scene_asset_loading_error err) {
 		LOG(err.what());
-		press_any_key_and_exit();
 	}
 #endif
 

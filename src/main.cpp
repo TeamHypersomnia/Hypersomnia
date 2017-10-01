@@ -15,6 +15,7 @@
 
 #include "augs/graphics/renderer.h"
 
+#include "augs/window_framework/shell.h"
 #include "augs/window_framework/window.h"
 #include "augs/audio/audio_context.h"
 
@@ -65,6 +66,7 @@ int main(const int argc, const char* const * const argv) {
 
 	{
 		const auto logs = program_log::get_current().get_complete(); 
+		std::cerr << logs;
 
 		switch (exit_code) {
 			case EXIT_SUCCESS: 
@@ -74,9 +76,13 @@ int main(const int argc, const char* const * const argv) {
 				{
 					const auto failure_log_path = augs::path_type("generated/logs/exit_failure_debug_log.txt");
 					augs::create_text_file(failure_log_path, logs);
-#if PLATFORM_WINDOWS || PLATFORM_LINUX
-					system(failure_log_path.string().c_str());
-#endif
+					
+					{
+						const auto s = failure_log_path.string();
+
+						/* Open text editor */
+						augs::shell(s.c_str());
+					}
 				}
 
 				break;
