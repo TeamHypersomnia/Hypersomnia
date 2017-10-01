@@ -71,7 +71,14 @@ int main(const int argc, const char* const * const argv) {
 				augs::create_text_file("generated/logs/exit_success_debug_log.txt", logs); 
 				break;
 			case EXIT_FAILURE: 
-				augs::create_text_file("generated/logs/exit_failure_debug_log.txt", logs);
+				{
+					const auto failure_log_path = augs::path_type("generated/logs/exit_failure_debug_log.txt");
+					augs::create_text_file(failure_log_path, logs);
+#if PLATFORM_WINDOWS || PLATFORM_LINUX
+					system(failure_log_path.string().c_str());
+#endif
+				}
+
 				break;
 			default: break;
 		}
