@@ -735,6 +735,10 @@ if(BUILD_VERSION_FILE_GENERATOR)
 	add_definitions(-DWAS_VERSION_GENERATOR_BUILT=1)
 endif()
 
+if(ADD_APPLICATION_ICON)
+	add_definitions(-DADD_APPLICATION_ICON)
+endif()
+
 # We build the generator of type information required for introspection.
 
 add_subdirectory("${CMAKE_MODULE_PATH}/Introspector-generator")

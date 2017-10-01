@@ -10,7 +10,10 @@
 
 #if PLATFORM_WINDOWS
 #include "augs/window_framework/translate_windows_enums.h"
-
+#if ADD_APPLICATION_ICON
+#include <dwmapi.h>
+#define IDI_ICON1 1
+#endif
 namespace augs {
 	LRESULT CALLBACK wndproc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 		if (umsg == WM_GETMINMAXINFO || umsg == WM_INPUT) {
@@ -229,12 +232,17 @@ namespace augs {
 			wcl.cbClsExtra = 0;
 			wcl.cbWndExtra = 0;
 			wcl.hInstance = GetModuleHandle(NULL);
+#if ADD_APPLICATION_ICON
+			wcl.hIcon = LoadIcon(0, MAKEINTRESOURCE(IDI_ICON1));
+			wcl.hIconSm = LoadIcon(0, MAKEINTRESOURCE(IDI_ICON1));
+#else
 			wcl.hIcon = LoadIcon(0, IDI_APPLICATION);
+			wcl.hIconSm = 0;
+#endif
 			wcl.hCursor = LoadCursor(0, IDC_ARROW);
 			wcl.hbrBackground = 0;
 			wcl.lpszMenuName = 0;
 			wcl.lpszClassName = L"AugmentedWindow";
-			wcl.hIconSm = 0;
 
 			const auto register_success = RegisterClassEx(&wcl) != 0;
 
