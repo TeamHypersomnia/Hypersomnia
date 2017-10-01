@@ -17,6 +17,7 @@
 
 #include "augs/window_framework/shell.h"
 #include "augs/window_framework/window.h"
+#include "augs/window_framework/platform_utils.h"
 #include "augs/audio/audio_context.h"
 
 #include "game/organization/all_component_includes.h"
@@ -586,6 +587,8 @@ int work(const int argc, const char* const * const argv) try {
 			The result, which is the collection of new game commands, will be passed further down the loop. 
 		*/
 
+		bool was_system_cursor_kidnapped = false;
+
 		const auto new_game_entropy = [&]() {
 			static game_intents game_intents;
 			static game_motions game_motions;
@@ -602,6 +605,12 @@ int work(const int argc, const char* const * const argv) try {
 			releases.append_releases(new_window_entropy, common_input_state);
 			releases = {};
 
+			const bool in_direct_gameplay =
+				!game_gui.active
+				&& current_setup.has_value()
+				&& !ingame_menu.show
+			;
+
 			{
 				auto scope = measure_scope(profiler.local_entropy);
 				window.collect_entropy(new_window_entropy);
@@ -614,13 +623,7 @@ int work(const int argc, const char* const * const argv) try {
 
 			configurables.sync_back_into(config);
 
-			const bool should_freeze_cursor =
-				!game_gui.active
-				&& current_setup.has_value()
-				&& !ingame_menu.show
-			;
-
-			window.set_mouse_position_frozen(should_freeze_cursor);
+			window.set_mouse_position_frozen(in_direct_gameplay);
 
 			perform_imgui_pass(
 				new_window_entropy,
@@ -659,7 +662,7 @@ int work(const int argc, const char* const * const argv) try {
 				ingame_menu.show,
 				current_setup.has_value(),
 
-				should_freeze_cursor
+				in_direct_gameplay
 			);
 			
 			/* MSVC ICE workaround */
@@ -681,6 +684,31 @@ int work(const int argc, const char* const * const argv) try {
 			});
 
 			configurables.apply(viewing_config);
+
+			if (window.is_active()) {
+				if (in_direct_gameplay && window.is_active()) {
+					was_system_cursor_kidnapped = true;
+				}
+				else {
+					if (
+						viewing_config.window.raw_mouse_input
+#if TODO
+						&& !viewing_config.session.use_system_cursor_for_gui
+#endif
+					) {
+						was_system_cursor_kidnapped = true;
+					}
+				}
+			}
+
+			if (was_system_cursor_kidnapped) {
+				augs::clip_system_cursor(window.get_window_rect());
+				augs::set_cursor_visible(false);
+			}
+			else {
+				augs::disable_cursor_clipping();
+				augs::set_cursor_visible(true);
+			}
 
 			releases.set_due_to_imgui(ImGui::GetIO());
 
@@ -1099,21 +1127,29 @@ int work(const int argc, const char* const * const argv) try {
 		);
 
 		/* #6 */
-		const auto cursor_drawing_pos = common_input_state.mouse.pos;
+		const bool should_draw_our_cursor = was_system_cursor_kidnapped;
 
-		if (ImGui::GetIO().WantCaptureMouse) {
-			get_drawer().cursor(necessary_atlas_entries, augs::get_imgui_cursor<assets::necessary_image_id>(), cursor_drawing_pos, white);
-		}
-		else if (
-			const bool we_drew_some_menu =
-			menu_chosen_cursor != assets::necessary_image_id::INVALID
-		) {
-			get_drawer().cursor(necessary_atlas_entries, menu_chosen_cursor, cursor_drawing_pos, white);
-		}
-		else if (game_gui.active && viewing_config.drawing.draw_character_gui) {
-			const auto& character_gui = game_gui.get_character_gui(viewed_character);
+		{
+			const auto cursor_drawing_pos = common_input_state.mouse.pos;
 
-			character_gui.draw_cursor_with_information(context);
+			if (ImGui::GetIO().WantCaptureMouse) {
+				if (should_draw_our_cursor) {
+					get_drawer().cursor(necessary_atlas_entries, augs::get_imgui_cursor<assets::necessary_image_id>(), cursor_drawing_pos, white);
+				}
+			}
+			else if (
+				const bool we_drew_some_menu =
+				menu_chosen_cursor != assets::necessary_image_id::INVALID
+			) {
+				if (should_draw_our_cursor) {
+					get_drawer().cursor(necessary_atlas_entries, menu_chosen_cursor, cursor_drawing_pos, white);
+				}
+			}
+			else if (game_gui.active && viewing_config.drawing.draw_character_gui) {
+				const auto& character_gui = game_gui.get_character_gui(viewed_character);
+
+				character_gui.draw_cursor_with_information(context, should_draw_our_cursor);
+			}
 		}
 
 		if (viewing_config.session.show_developer_console) {
@@ -1132,8 +1168,6 @@ int work(const int argc, const char* const * const argv) try {
 
 		profiler.triangles.measure(renderer.triangles_drawn_total);
 		renderer.triangles_drawn_total = 0u;
-		
-		renderer.call_and_clear_triangles();
 
 		window.swap_buffers();
 	}

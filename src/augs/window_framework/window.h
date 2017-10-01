@@ -45,6 +45,9 @@ namespace augs {
 		timer triple_click_timer;
 		unsigned triple_click_delay = 0xdeadbeef; /* maximum delay time for the next click (after doubleclick) to be considered tripleclick (in milliseconds) */
 
+		bool cursor_in_client_area = false;
+		bool is_cursor_in_client_area() const;
+
 		std::optional<event::change> handle_event(
 			const UINT, 
 			const WPARAM, 

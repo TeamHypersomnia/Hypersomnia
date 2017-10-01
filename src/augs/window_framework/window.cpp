@@ -47,6 +47,10 @@ namespace augs {
 		event::change change;
 		change.msg = translate_enum(m);
 
+		auto default_proc = [&]() {
+			DefWindowProc(hwnd, m, wParam, lParam);
+		};
+
 		switch (m) {
 		case WM_CHAR:
 			change.character.utf16 = wchar_t(wParam);
@@ -126,6 +130,14 @@ namespace augs {
 		case WM_MBUTTONUP:
 			change.key.key = key::MMOUSE;
 			break;
+		case WM_MOUSEHOVER:
+			cursor_in_client_area = true;
+			default_proc();
+			break;
+		case WM_MOUSELEAVE:
+			cursor_in_client_area = false;
+			default_proc();
+			break;
 		case WM_MOUSEMOVE:
 			if (!current_settings.raw_mouse_input) {
 				basic_vec2<short> new_pos;
@@ -189,7 +201,7 @@ namespace augs {
 		case WM_ACTIVATE:
 			active = LOWORD(wParam) == WA_ACTIVE;
 
-			if (!active) {
+			if (!active && current_settings.raw_mouse_input) {
 				augs::set_cursor_pos(current_settings.position + last_mouse_pos);
 			}
 			break;
@@ -203,11 +215,11 @@ namespace augs {
 			break;
 
 		case WM_SYSCOMMAND:
-			DefWindowProc(hwnd, m, wParam, lParam);
+			default_proc();
 			change.msg = translate_enum(wParam);
 			break;
 
-		default: DefWindowProc(hwnd, m, wParam, lParam); break;
+		default: default_proc(); break;
 		}
 
 		return change;
@@ -378,17 +390,6 @@ namespace augs {
 				}
 			}
 		}
-
-		if (
-			!current_settings.fullscreen 
-			&& current_settings.clip_system_cursor 
-			&& GetFocus() == hwnd
-		) {
-			clip_system_cursor(get_window_rect());
-		}
-		else {
-			disable_cursor_clipping();
-		}
 	}
 
 	void window::set_window_rect(const xywhi r) {
@@ -408,6 +409,10 @@ namespace augs {
 
 	bool window::is_active() const {
 		return active;
+	}
+	
+	bool window::is_cursor_in_client_area() const {
+		return cursor_in_client_area; 
 	}
 
 	void window::destroy() {
@@ -446,6 +451,7 @@ namespace augs {
 
 	bool window::is_active() const { return false; }
 	void window::destroy() {}
+	bool is_cursor_in_client_area() const { return false; }
 }
 #endif
 
@@ -488,24 +494,17 @@ namespace augs {
 			set_window_rect(r);
 		}
 
-		if (force || changed(settings.show_system_cursor)) {
-			set_cursor_visible(!settings.fullscreen && settings.show_system_cursor);
-		}
-
 		if (force || changed(settings.border)) {
 			set_window_border_enabled(!settings.fullscreen && settings.border);
 		}
 
 		if (force || changed(settings.fullscreen)) {
 			if (settings.fullscreen) {
-				set_window_border_enabled(false);
-				set_cursor_visible(false);
-
 				set_display(settings.get_screen_size(), settings.bpp);
+				set_window_border_enabled(false);
 			}
 			else {
 				set_window_border_enabled(settings.border);
-				set_cursor_visible(settings.show_system_cursor);
 			}
 		}
 

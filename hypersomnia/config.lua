@@ -85,7 +85,8 @@ return {
   },
   session = {
     create_minimal_test_scene = false,
-    show_developer_console = true
+    show_developer_console = true,
+    use_system_cursor_for_gui = false
   },
   debug = {
     determinism_test_cloned_cosmoi_count = 0,
@@ -240,8 +241,6 @@ return {
     app_icon_path = "content/necessary/gfx/app.ico",
     border = true,
     bpp = 24,
-    clip_system_cursor = true,
-    show_system_cursor = false,
     fullscreen = false,
     name = "Hypersomnia",
     position = {

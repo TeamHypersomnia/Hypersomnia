@@ -129,11 +129,26 @@ void settings_gui_state::perform(
 				}
 
 				checkbox(CONFIG_NVP(window.border)); revert(config.window.border);
-				checkbox("Show system cursor", config.window.show_system_cursor); revert(config.window.show_system_cursor);
-				checkbox("Clip system cursor", config.window.clip_system_cursor); revert(config.window.clip_system_cursor);
 			}
 			
-			checkbox("Raw mouse input", config.window.raw_mouse_input); revert(config.window.fullscreen);
+
+			{
+				ImGui::Text("Mouse input source");
+
+				auto indent = scoped_indent();
+
+				int e = config.window.raw_mouse_input ? 1 : 0;
+				ImGui::RadioButton("Raw", &e, 1);
+#if TODO
+				if (config.window.raw_mouse_input) {
+					auto indent = scoped_indent();
+
+					checkbox("But use system cursor for GUI", config.session.use_system_cursor_for_gui);
+				}
+#endif
+				ImGui::RadioButton("System cursor", &e, 0);
+				config.window.raw_mouse_input = e != 0;
+			}
 
 			input_text<100>(CONFIG_NVP(window.name)); revert(config.window.name);
 			checkbox("Automatically hide settings in-game", config.session.automatically_hide_settings_ingame); revert(config.session.automatically_hide_settings_ingame);

@@ -277,7 +277,10 @@ character_gui::hotbar_selection_setup character_gui::get_actual_selection_setup(
 	return output;
 }
 
-void character_gui::draw_cursor_with_information(const viewing_game_gui_context context) const {
+void character_gui::draw_cursor_with_information(
+	const viewing_game_gui_context context,
+	const bool draw_cursor
+) const {
 	const auto drag_amount = context.get_rect_world().current_drag_amount;
 	const auto& manager = context.get_necessary_images();
 
@@ -442,7 +445,9 @@ void character_gui::draw_cursor_with_information(const viewing_game_gui_context 
 		}
 	}
 
-	output.aabb_lt(manager.at(gui_cursor), vec2(gui_cursor_position), gui_cursor_color);
+	if (draw_cursor) {
+		output.aabb_lt(manager.at(gui_cursor), vec2(gui_cursor_position), gui_cursor_color);
+	}
 }
 
 void character_gui::draw_tooltip_from_hover_or_world_highlight(

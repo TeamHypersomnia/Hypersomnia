@@ -6,8 +6,6 @@ namespace augs {
 		// GEN INTROSPECTOR struct augs::window_settings
 		std::string name = "example";
 		augs::path_type app_icon_path = "content/necessary/gfx/app.ico";
-		bool clip_system_cursor = false;
-		bool show_system_cursor = false;
 		bool fullscreen = false;
 		bool border = true;
 		vec2i position = vec2i(100, 10);

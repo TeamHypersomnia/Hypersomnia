@@ -124,6 +124,7 @@ struct character_gui {
 	) const;
 
 	void draw_cursor_with_information(
-		const viewing_game_gui_context
+		const viewing_game_gui_context,
+		const bool draw_cursor
 	) const;
 };
