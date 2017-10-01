@@ -139,6 +139,12 @@ void settings_gui_state::perform(
 
 				int e = config.window.raw_mouse_input ? 1 : 0;
 				ImGui::RadioButton("Raw", &e, 1);
+				
+				if (ImGui::IsItemHovered()) {
+					ImGui::BeginTooltip();
+					ImGui::Text("Game draws its own cursor.\nWhen in GUI mode,\nforces the cursor inside the window.");
+					ImGui::EndTooltip();
+				}
 #if TODO
 				if (config.window.raw_mouse_input) {
 					auto indent = scoped_indent();
@@ -147,6 +153,13 @@ void settings_gui_state::perform(
 				}
 #endif
 				ImGui::RadioButton("System cursor", &e, 0);
+
+				if (ImGui::IsItemHovered()) {
+					ImGui::BeginTooltip();
+					ImGui::Text("When in GUI mode,\nlets the cursor go outside the window.");
+					ImGui::EndTooltip();
+				}
+
 				config.window.raw_mouse_input = e != 0;
 			}
 
