@@ -17,7 +17,7 @@ void editor_setup::start_open_file_dialog() {
 	open_file_dialog = std::async(
 		std::launch::async,
 		[](){
-			return augs::get_open_file_name(L"Cosmos binary file (*.bin)\0*.BIN\0");
+			return augs::get_open_file_name(L"Hypersomnia workspace file (*.wp)\0*.WP\0");
 		}
 	);
 }

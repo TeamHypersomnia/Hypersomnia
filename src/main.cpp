@@ -685,25 +685,21 @@ int work(const int argc, const char* const * const argv) try {
 
 			configurables.apply(viewing_config);
 
-			if (window.is_active()) {
-				if (in_direct_gameplay && window.is_active()) {
-					was_system_cursor_kidnapped = true;
-				}
-				else {
-					if (
+			if (window.is_active()
+				&& (
+					in_direct_gameplay
+					|| (
 						viewing_config.window.raw_mouse_input
 #if TODO
 						&& !viewing_config.session.use_system_cursor_for_gui
 #endif
-					) {
-						was_system_cursor_kidnapped = true;
-					}
-				}
-			}
-
-			if (was_system_cursor_kidnapped) {
+					)
+				)
+			) {
 				augs::clip_system_cursor(window.get_window_rect());
 				augs::set_cursor_visible(false);
+
+				was_system_cursor_kidnapped = true;
 			}
 			else {
 				augs::disable_cursor_clipping();
