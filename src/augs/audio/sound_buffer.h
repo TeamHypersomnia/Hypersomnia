@@ -4,8 +4,8 @@
 
 #include "augs/filesystem/path.h"
 
-typedef unsigned int ALuint;
-typedef int ALenum;
+using ALuint = unsigned int;
+using ALenum = int;
 
 namespace augs {
 	struct sound_data;
@@ -19,6 +19,7 @@ namespace augs {
 		
 		void set_data(const sound_data&);
 		void destroy();
+
 	public:
 		single_sound_buffer(const sound_data&);
 		~single_sound_buffer();

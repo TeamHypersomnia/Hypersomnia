@@ -59,8 +59,7 @@ class main_menu_setup {
 	augs::action_list intro_actions;
 	augs::action_list credits_actions;
 public:
-	static constexpr auto loading_strategy = viewables_loading_type::ALWAYS_HAVE_ALL_LOADED;
-	static constexpr bool can_viewables_change = false;
+	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL_ONLY_ONCE;
 	static constexpr bool accepts_shortcuts = false;
 	static constexpr bool has_modal_popups = false;
 

@@ -53,8 +53,7 @@ class editor_setup {
 	void start_open_file_dialog();
 
 public:
-	static constexpr auto loading_strategy = viewables_loading_type::ALWAYS_HAVE_ALL_LOADED;
-	static constexpr bool can_viewables_change = false;
+	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
 	static constexpr bool accepts_shortcuts = true;
 	static constexpr bool has_modal_popups = true;
 

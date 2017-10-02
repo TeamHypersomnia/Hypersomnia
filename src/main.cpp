@@ -186,11 +186,13 @@ int work(const int argc, const char* const * const argv) try {
 	static settings_gui_state settings_gui;
 	static ingame_menu_gui ingame_menu;
 
+	static all_viewables_defs currently_loaded_defs;
+
 	/*
-		Resources that are loaded dynamically,
-		in accordance with the definitions provided by the current setup,
-		and in accordance with its chosen viewables_loading_type.
-		(May be for example loaded all at once or streamed)
+		Runtime representations of viewables,
+		loaded from the definitions provided by the current setup.
+		The setup's chosen viewables_loading_type decides if they are 
+		loaded just once or if they are for example continuously streamed.
 	*/
 
 	static loaded_sounds game_sounds;
@@ -216,34 +218,92 @@ int work(const int argc, const char* const * const argv) try {
 		}
 	};
 
-	static auto preload_viewables = [](const auto& setup) {
-		using T = std::decay_t<decltype(setup)>;
+	static session_profiler profiler;
 
-		// && !T::can_viewables_change
-		if constexpr(T::loading_strategy == viewables_loading_type::ALWAYS_HAVE_ALL_LOADED) {
-			const auto& defs = setup.get_viewable_defs();
+	static auto load_all = [](const all_viewables_defs& new_defs) {
+		auto scope = measure_scope(profiler.reloading_viewables);
 
-			game_sounds = defs.sounds;
+		auto equal = [](const auto& a, const auto& b) {
+			return augs::equal_by_introspection(a, b);
+		};
+		
+		/* Atlas pass */
 
-			const auto settings = config.content_regeneration;
+		{
+			bool new_atlas_required = false;
 
-			standard_atlas_distribution({
-				defs.game_image_loadables,
-				images,
-				config.gui_font,
-				{
-					renderer.get_max_texture_size(),
-					augs::path_type("generated/atlases/game_world_atlas") 
-						+= (settings.save_regenerated_atlases_as_binary ? ".bin" : ".png"),
-					settings.regenerate_every_launch,
-					settings.check_integrity_every_launch
-				},
-				game_world_atlas,
-				game_atlas_entries,
-				necessary_atlas_entries,
-				gui_font
-			});
+			/* Check for unloaded and changed resources */
+			for (auto& old : currently_loaded_defs.game_image_loadables) {
+				if (const auto found = mapped_or_nullptr(new_defs.game_image_loadables, old.first)) {
+					if (const bool reload = !equal(*found, old.second)) {
+						/* Changed, reload */
+						new_atlas_required = true;
+					}
+				}
+				else {
+					/* Missing, unload */
+					new_atlas_required = true;
+				}
+			}
+			
+			/* Check for new resources */
+			for (auto& fresh : new_defs.game_image_loadables) {
+				if (nullptr == mapped_or_nullptr(currently_loaded_defs.game_image_loadables, fresh.first)) {
+					new_atlas_required = true;
+				}
+				/* Otherwise it's already taken care of */
+			}
+
+			if (new_atlas_required) {
+				const auto settings = config.content_regeneration;
+
+				standard_atlas_distribution({
+					new_defs.game_image_loadables,
+					images,
+					config.gui_font,
+					{
+						renderer.get_max_texture_size(),
+						augs::path_type("generated/atlases/game_world_atlas") 
+							+= (settings.save_regenerated_atlases_as_binary ? ".bin" : ".png"),
+						settings.regenerate_every_launch,
+						settings.check_integrity_every_launch
+					},
+					game_world_atlas,
+					game_atlas_entries,
+					necessary_atlas_entries,
+					gui_font
+				});
+			}
 		}
+
+		/* Sounds pass */
+
+		{
+			/* Check for unloaded and changed resources */
+			for (auto& old : currently_loaded_defs.sounds) {
+				if (const auto found = mapped_or_nullptr(new_defs.sounds, old.first)) {
+					if (const bool reload = !equal(*found, old.second)) {
+						/* Changed, reload */
+						game_sounds.at(old.first) = *found;
+					}
+				}
+				else {
+					/* Missing, unload */
+					game_sounds.erase(old.first);
+				}
+			}
+
+			/* Check for new resources */
+			for (auto& fresh : new_defs.sounds) {
+				if (nullptr == mapped_or_nullptr(currently_loaded_defs.sounds, fresh.first)) {
+					game_sounds.try_emplace(fresh.first, fresh.second);
+				}
+				/* Otherwise it's already taken care of */
+			}
+		}
+
+		/* Done, overwrite */
+		currently_loaded_defs = new_defs;
 	};
 
 	static auto launch_setup = [](auto&& setup_init_callback) {
@@ -255,10 +315,14 @@ int work(const int argc, const char* const * const argv) try {
 		setup_init_callback();
 		
 		/* MSVC ICE workaround */
-		auto& _preload_viewables = preload_viewables;
+		auto& _load_all = load_all;
 
-		visit_current_setup([&](auto& setup) {
-			_preload_viewables(setup);
+		visit_current_setup([&](const auto& setup) {
+			using T = std::decay_t<decltype(setup)>;
+			
+			if constexpr(T::loading_strategy == viewables_loading_type::LOAD_ALL_ONLY_ONCE) {
+				_load_all(setup.get_viewable_defs());
+			}
 		});
 	};
 
@@ -536,7 +600,6 @@ int work(const int argc, const char* const * const argv) try {
 		The main loop variables.
 	*/
 
-	static session_profiler profiler;
 	static augs::timer frame_timer;
 	
 	static augs::event::state common_input_state;
@@ -929,6 +992,35 @@ int work(const int argc, const char* const * const argv) try {
 				game_motions
 			);
 		}();
+
+		/* 
+			Viewables reloading pass.
+		*/
+
+		/* MSVC ICE workaround */
+		auto& _load_all = load_all;
+
+		visit_current_setup(
+			[&](const auto& setup) {
+				using T = std::decay_t<decltype(setup)>;
+				using S = viewables_loading_type;
+
+				constexpr auto s = T::loading_strategy;
+
+				if constexpr(s == S::LOAD_ALL) {
+					_load_all(setup.get_viewable_defs());
+				}
+				else if constexpr(s == S::LOAD_ONLY_NEAR_CAMERA){
+					static_assert(false, "Unimplemented");
+				}
+				else if constexpr (T::loading_strategy == S::LOAD_ALL_ONLY_ONCE) {
+					/* Do nothing */
+				}
+				else {
+					static_assert(false, "Unknown viewables loading strategy.");
+				}
+			}
+		);
 
 		/* 
 			Advance the current setup's logic,

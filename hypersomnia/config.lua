@@ -218,7 +218,7 @@ return {
     enabled = true,
     speed = 525
   },
-  launch_mode = "EDITOR",
+  launch_mode = "TEST_SCENE",
   main_menu = {
     latest_news_url = "http://hypersomnia.pl/latest_post/",
     menu_intro_scene_workspace_path = "abc",
@@ -232,7 +232,7 @@ return {
     misprediction_smoothing_multiplier = 1.2
   },
   unit_tests = {
-    break_on_failure = true,
+    break_on_failure = false,
     log_successful = false,
     output_log_path = "generated/logs/unit_tests.txt",
     run = true
