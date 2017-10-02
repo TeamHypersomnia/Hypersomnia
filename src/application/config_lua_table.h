@@ -62,9 +62,6 @@ struct config_read_error : public std::runtime_error {
 	{}
 };
 
-using app_intent_map = augs::enum_associative_array<augs::event::keys::key, app_intent_type>;
-using game_gui_intent_map = augs::enum_associative_array<augs::event::keys::key, game_gui_intent_type>;
-
 namespace sol {
 	class state;
 }
