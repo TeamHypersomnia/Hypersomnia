@@ -3,7 +3,7 @@
 
 #include "view/viewables/regeneration/game_image_loadables.h"
 
-void standard_atlas_distribution(const standard_atlas_distribution_input in) {
+augs::graphics::texture standard_atlas_distribution(const standard_atlas_distribution_input in) {
 	thread_local auto atlas_input = atlas_regeneration_input();
 
 	atlas_input.clear();
@@ -66,5 +66,5 @@ void standard_atlas_distribution(const standard_atlas_distribution_input in) {
 		}
 	}
 
-	in.output_game_world_atlas = atlas_image;
+	return atlas_image;
 }

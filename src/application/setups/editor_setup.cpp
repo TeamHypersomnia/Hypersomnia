@@ -2,6 +2,7 @@
 #include "augs/misc/imgui_utils.h"
 #include "augs/filesystem/file.h"
 #include "augs/templates/thread_templates.h"
+#include "augs/templates/chrono_templates.h"
 #include "augs/window_framework/platform_utils.h"
 
 #include "application/config_lua_table.h"
@@ -153,6 +154,13 @@ void editor_setup::perform_custom_imgui(
 			get_viewed_cosmos().get_entities_count(),
 			get_viewed_cosmos().get_maximum_entities()
 		).c_str());
+
+		ImGui::Text(
+			typesafe_sprintf("World time: %x (%x steps)",
+				standard_format_seconds(get_viewed_cosmos().get_total_seconds_passed()),
+				get_viewed_cosmos().get_total_steps_passed()
+			).c_str()
+		);
 
 		ImGui::EndChild();
 		ImGui::End();

@@ -168,7 +168,7 @@ int work(const int argc, const char* const * const argv) try {
 	static audiovisual_state audiovisuals;
 	static auto game_gui = game_gui_system();
 
-	static augs::graphics::texture game_world_atlas = augs::image {};
+	static std::optional<augs::graphics::texture> game_world_atlas;
 
 	/* 
 		Main menu setup state may be preserved, 
@@ -231,6 +231,10 @@ int work(const int argc, const char* const * const argv) try {
 
 		{
 			bool new_atlas_required = false;
+			
+			if (!game_world_atlas.has_value()) {
+				new_atlas_required = true;
+			}
 
 			/* Check for unloaded and changed resources */
 			for (auto& old : currently_loaded_defs.game_image_loadables) {
@@ -257,7 +261,7 @@ int work(const int argc, const char* const * const argv) try {
 			if (new_atlas_required) {
 				const auto settings = config.content_regeneration;
 
-				standard_atlas_distribution({
+				game_world_atlas.emplace(standard_atlas_distribution({
 					new_defs.game_image_loadables,
 					images,
 					config.gui_font,
@@ -268,11 +272,10 @@ int work(const int argc, const char* const * const argv) try {
 						settings.regenerate_every_launch,
 						settings.check_integrity_every_launch
 					},
-					game_world_atlas,
 					game_atlas_entries,
 					necessary_atlas_entries,
 					gui_font
-				});
+				}));
 			}
 		}
 
@@ -1131,7 +1134,7 @@ int work(const int argc, const char* const * const argv) try {
 				screen_size,
 				interpolation_ratio,
 				renderer,
-				game_world_atlas,
+				*game_world_atlas,
 				fbos,
 				shaders,
 				get_camera(),
@@ -1170,7 +1173,7 @@ int work(const int argc, const char* const * const argv) try {
 			}
 		}
 		else {
-			game_world_atlas.bind();
+			game_world_atlas->bind();
 			shaders.standard->set_as_current();
 
 			{
@@ -1211,7 +1214,7 @@ int work(const int argc, const char* const * const argv) try {
 		/* #5 */
 		renderer.draw_call_imgui(
 			imgui_atlas,
-			game_world_atlas
+			*game_world_atlas
 		);
 
 		/* #6 */
