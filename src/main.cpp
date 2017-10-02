@@ -59,7 +59,6 @@ int work(const int argc, const char* const * const argv);
 int __stdcall WinMain(HINSTANCE, HINSTANCE, char*, int) {
 	const auto argc = __argc;
 	const auto argv = __argv;
-
 #else
 int main(const int argc, const char* const * const argv) {
 #endif
@@ -100,7 +99,7 @@ int main(const int argc, const char* const * const argv) {
 	we must make all variables static, otherwise the huge resources marked static
 	would get destructed last, possibly causing bugs.
 
-	main will also be called only once.
+	this function will also be called only once.
 */
 
 int work(const int argc, const char* const * const argv) try {
@@ -1074,8 +1073,6 @@ int work(const int argc, const char* const * const argv) try {
 			return setup.get_interpolation_ratio();
 		});
 
-		/* Prepare game GUI structures. */
-
 		const auto context = viewing_game_gui_context {
 			create_game_gui_context(),
 
@@ -1182,32 +1179,36 @@ int work(const int argc, const char* const * const argv) try {
 			}
 		}
 
-		auto menu_chosen_cursor = assets::necessary_image_id::INVALID;
+		const auto menu_chosen_cursor = [&](){
+			if (current_setup.has_value()) {
+				if (ingame_menu.show) {
+					const auto context = create_menu_context(ingame_menu);
+					ingame_menu.advance(context, frame_delta);
 
-		if (current_setup.has_value()) {
-			if (ingame_menu.show) {
-				const auto context = create_menu_context(ingame_menu);
-				ingame_menu.advance(context, frame_delta);
+					/* #4 */
+					return ingame_menu.draw({ context, get_drawer() });
+				}
+
+				return assets::necessary_image_id::INVALID;
+			}
+			else {
+				const auto context = create_menu_context(main_menu->gui);
+
+				main_menu->gui.advance(context, frame_delta);
 
 				/* #4 */
-				menu_chosen_cursor = ingame_menu.draw({ context, get_drawer() });
+				const auto cursor = main_menu->gui.draw({ context, get_drawer() });
+
+				main_menu.value().draw_overlays(
+					get_drawer(),
+					necessary_atlas_entries,
+					gui_font,
+					screen_size
+				);
+
+				return cursor;
 			}
-		}
-		else {
-			const auto context = create_menu_context(main_menu->gui);
-
-			main_menu->gui.advance(context, frame_delta);
-
-			/* #4 */
-			menu_chosen_cursor = main_menu->gui.draw({ context, get_drawer() });
-
-			main_menu.value().draw_overlays(
-				get_drawer(),
-				necessary_atlas_entries,
-				gui_font,
-				screen_size
-			);
-		}
+		}();
 		
 		renderer.call_and_clear_triangles();
 
