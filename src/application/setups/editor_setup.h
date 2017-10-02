@@ -36,6 +36,10 @@ class editor_setup {
 	
 	std::optional<popup> current_popup;
 	bool show_summary = true;
+	bool show_player = true;
+
+	double player_speed = 1.0;
+	bool player_paused = true;
 
 	workspace work;
 
@@ -60,7 +64,7 @@ public:
 	editor_setup(const augs::path_type& workspace_path);
 
 	auto get_audiovisual_speed() const {
-		return 1.0;
+		return player_paused ? 0.0 : player_speed;
 	}
 
 	const auto& get_viewed_cosmos() const {
@@ -99,10 +103,13 @@ public:
 
 	template <class... Callbacks>
 	void advance(
-		const augs::delta frame_delta,
+		augs::delta frame_delta,
 		Callbacks&&... callbacks
 	) {
-		timer.advance(frame_delta);
+		if (!player_paused) {
+			timer.advance(frame_delta *= player_speed);
+		}
+
 		auto steps = timer.extract_num_of_logic_steps(get_viewed_cosmos().get_fixed_delta());
 
 		while (steps--) {

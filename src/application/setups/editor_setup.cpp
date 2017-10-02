@@ -112,6 +112,9 @@ void editor_setup::perform_custom_imgui(
 			if (ImGui::MenuItem("Summary")) {
 				show_summary = true;
 			}
+			if (ImGui::MenuItem("Player")) {
+				show_player = true;
+			}
 
 			ImGui::EndMenu();
 		}
@@ -137,12 +140,31 @@ void editor_setup::perform_custom_imgui(
 		}
 	}
 
+	if (show_player) {
+		ImGui::Begin("Player", &show_player, ImGuiWindowFlags_AlwaysAutoResize);
+
+		if (ImGui::Button("Play")) {
+			player_paused = false;
+		}
+		ImGui::SameLine();
+		
+		if (ImGui::Button("Pause")) {
+			player_paused = true;
+		}
+		ImGui::SameLine();
+		
+		if (ImGui::Button("Stop")) {
+			player_paused = true;
+		}
+		ImGui::End();
+	}
+
 	if (show_summary) {
 		{
 			const auto screen_size = vec2(ImGui::GetIO().DisplaySize);
 			const auto initial_settings_size = screen_size / 2;
 
-			ImGui::SetNextWindowPos(screen_size / 2 - initial_settings_size / 2, ImGuiSetCond_FirstUseEver);
+			ImGui::SetNextWindowPos({ 100, 100 }, ImGuiSetCond_FirstUseEver);
 			ImGui::SetNextWindowSize(initial_settings_size, ImGuiSetCond_FirstUseEver);
 		}
 
