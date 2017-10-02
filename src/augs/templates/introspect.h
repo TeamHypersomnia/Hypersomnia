@@ -4,6 +4,7 @@
 #include "augs/templates/introspection_traits.h"
 #include "augs/templates/enum_introspect.h"
 #include "augs/templates/recursive.h"
+#include "augs/templates/is_optional.h"
 
 namespace augs {
 	struct introspection_access;
@@ -67,6 +68,8 @@ namespace augs {
 		const A& a,
 		const B& b
 	) {
+		static_assert(has_introspect_v<A> && has_introspect_v<B>, "Comparison requested on type(s) without introspectors!");
+
 		bool are_equal = true;
 
 		augs::introspect(
@@ -79,7 +82,20 @@ namespace augs {
 				using A = std::decay_t<decltype(aa)>;
 				using B = std::decay_t<decltype(bb)>;
 
-				if constexpr(is_comparable_v<A, B>) {
+				if constexpr(is_optional_v<A>) {
+					static_assert(is_optional_v<B>);
+
+					if (!aa && !bb) {
+						are_equal = are_equal && true;
+					}
+					else if (aa && bb) {
+						self(self, "", *aa, *bb);
+					}
+					else {
+						are_equal = are_equal && false;
+					}
+				}
+				else if constexpr(is_comparable_v<A, B>) {
 					are_equal = are_equal && aa == bb;
 				}
 				else {
