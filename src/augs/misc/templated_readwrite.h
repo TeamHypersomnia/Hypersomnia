@@ -42,11 +42,17 @@ namespace augs {
 		Serialized,
 		decltype(
 			read_object(
-				std::declval<Archive>(),
+				std::declval<
+					/* If the queried archive is augs::output_stream_reserver, map to augs::stream */
+					std::conditional_t<std::is_same_v<Archive, augs::output_stream_reserver>, augs::stream, Archive>
+				>(),
 				std::declval<Serialized>()
 			),
 			write_object(
-				std::declval<Archive>(),
+				std::declval<
+				/* If the queried archive is augs::output_stream_reserver, map to augs::stream */
+					std::conditional_t<std::is_same_v<Archive, augs::output_stream_reserver>, augs::stream, Archive>
+				>(),
 				std::declval<const Serialized>()
 			),
 			void()
