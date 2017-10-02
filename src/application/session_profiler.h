@@ -9,6 +9,8 @@ public:
 	augs::time_measurements fps;
 	augs::time_measurements frame;
 	augs::time_measurements local_entropy;
+	augs::time_measurements reloading_viewables;
+	augs::time_measurements determining_viewables_to_preload;
 	augs::amount_measurements<std::size_t> triangles;
 	// END GEN INTROSPECTOR
 };
