@@ -148,6 +148,17 @@ namespace augs {
 			return end();
 		}
 
+		void erase(const key_type k) {
+			const auto i = static_cast<size_type>(k);
+			
+			ensure(i < capacity());
+			
+			if (is_set(i)) {
+				is_value_set.set(k, false);
+				nth(i).~mapped_type();
+			}
+		}
+
 		template <class... T>
 		trivially_copyable_pair<iterator, bool> try_emplace(const key_type k, T&&... t) {
 			if (is_set(static_cast<size_type>(k))) {
