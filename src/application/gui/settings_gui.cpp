@@ -16,11 +16,11 @@ static void ShowHelpMarker(const char* const desc) {
 	ImGui::TextDisabled("(?)");
 
 	if (ImGui::IsItemHovered()) {
-		ImGui::BeginTooltip();
+		auto tooltip = augs::imgui::scoped_tooltip();
+
 		ImGui::PushTextWrapPos(450.0f);
 		ImGui::TextUnformatted(desc);
 		ImGui::PopTextWrapPos();
-		ImGui::EndTooltip();
 	}
 }
 
@@ -53,6 +53,8 @@ void settings_gui_state::perform(
 	if (!show) {
 		return;
 	}
+	
+	using namespace augs::imgui;
 
 	{
 		const auto screen_size = vec2(config.window.get_screen_size());
@@ -63,224 +65,222 @@ void settings_gui_state::perform(
 	}
 
 	ImGui::Begin("Settings", &show);
-
-	ImGui::BeginChild("settings view", ImVec2(0, -(ImGui::GetItemsLineHeightWithSpacing() + 4)));
-	ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.35f);
-
-	int field_id = 0;
-	using namespace augs::imgui;
-
-	{
-		auto style = scoped_style_var(ImGuiStyleVar_FramePadding, []() { auto padding = ImGui::GetStyle().FramePadding; padding.x *= 4; return padding; }());
-
-		{
-			static auto labels = []() {
-				static augs::enum_array<std::string, settings_pane> label_strs;
-				augs::enum_array<const char*, settings_pane> c_strs;
-
-				augs::for_each_enum_except_bounds([&c_strs](const settings_pane s) {
-					label_strs[s] = format_enum(s);
-					c_strs[s] = label_strs[s].c_str();
-				});
-
-				c_strs[settings_pane::GUI_STYLES] = "GUI styles";
-
-				return c_strs;
-			}();
-
-			auto index = static_cast<int>(active_pane);
-			ImGui::TabLabels(labels.data(), labels.size(), index, nullptr);
-			active_pane = static_cast<settings_pane>(index);
-		}
-	}
 	
 	{
-		auto scope = scoped_style_color(ImGuiCol_Border, ImGui::GetStyle().Colors[ImGuiCol_Button]);
-		ImGui::Separator();
-	}
+		auto child = scoped_child("settings view", ImVec2(0, -(ImGui::GetItemsLineHeightWithSpacing() + 4)));
+		auto width = scoped_item_width(ImGui::GetWindowWidth() * 0.35f);
 
-	auto revert = make_revert_button_lambda(config, last_saved_config);
+		int field_id = 0;
 
-	auto revertable_checkbox = [&](auto l, auto& f, auto&&... args) {
-		checkbox(l, f, std::forward<decltype(args)>(args)...);
-		revert(f);
-	};
-
-	auto revertable_slider = [&](auto l, auto& f, auto&&... args) {
-		slider(l, f, std::forward<decltype(args)>(args)...);
-		revert(f);
-	};
-
-	auto revertable_drag_rect_bounded_vec2 = [&](auto l, auto& f, auto&&... args) {
-		drag_rect_bounded_vec2(l, f, std::forward<decltype(args)>(args)...);
-		revert(f);
-	};
-
-	switch (active_pane) {
-		case settings_pane::WINDOW: {
-			enum_combo("Launch on game's startup", config.launch_mode);
-
-			revertable_checkbox("Fullscreen", config.window.fullscreen);
-			if (!config.window.fullscreen) {
-				auto indent = scoped_indent();
-				
-				{
-					const auto disp = augs::get_display();
-
-					revertable_drag_rect_bounded_vec2("Window position", config.window.position, 0.3f, vec2i{ 0, 0 }, disp.get_size(), "%.0f");
-					revertable_drag_rect_bounded_vec2("Windowed size", config.window.size, 0.3f, vec2i{ 0, 0 }, disp.get_size(), "%.0f");
-				}
-
-				revertable_checkbox(CONFIG_NVP(window.border));
-			}
+		{
+			auto style = scoped_style_var(ImGuiStyleVar_FramePadding, []() { auto padding = ImGui::GetStyle().FramePadding; padding.x *= 4; return padding; }());
 
 			{
-				text("Mouse input source");
+				static auto labels = []() {
+					static augs::enum_array<std::string, settings_pane> label_strs;
+					augs::enum_array<const char*, settings_pane> c_strs;
 
-				auto indent = scoped_indent();
+					augs::for_each_enum_except_bounds([&c_strs](const settings_pane s) {
+						label_strs[s] = format_enum(s);
+						c_strs[s] = label_strs[s].c_str();
+					});
 
-				int e = config.window.raw_mouse_input ? 1 : 0;
-				ImGui::RadioButton("Raw", &e, 1);
-				
-				if (ImGui::IsItemHovered()) {
-					text_tooltip("Game draws its own cursor.\nWhen in GUI mode,\nforces the cursor inside the window.");
+					c_strs[settings_pane::GUI_STYLES] = "GUI styles";
+
+					return c_strs;
+				}();
+
+				auto index = static_cast<int>(active_pane);
+				ImGui::TabLabels(labels.data(), labels.size(), index, nullptr);
+				active_pane = static_cast<settings_pane>(index);
+			}
+		}
+		
+		{
+			auto scope = scoped_style_color(ImGuiCol_Border, ImGui::GetStyle().Colors[ImGuiCol_Button]);
+			ImGui::Separator();
+		}
+
+		auto revert = make_revert_button_lambda(config, last_saved_config);
+
+		auto revertable_checkbox = [&](auto l, auto& f, auto&&... args) {
+			checkbox(l, f, std::forward<decltype(args)>(args)...);
+			revert(f);
+		};
+
+		auto revertable_slider = [&](auto l, auto& f, auto&&... args) {
+			slider(l, f, std::forward<decltype(args)>(args)...);
+			revert(f);
+		};
+
+		auto revertable_drag_rect_bounded_vec2 = [&](auto l, auto& f, auto&&... args) {
+			drag_rect_bounded_vec2(l, f, std::forward<decltype(args)>(args)...);
+			revert(f);
+		};
+
+		switch (active_pane) {
+			case settings_pane::WINDOW: {
+				enum_combo("Launch on game's startup", config.launch_mode);
+
+				revertable_checkbox("Fullscreen", config.window.fullscreen);
+				if (!config.window.fullscreen) {
+					auto indent = scoped_indent();
+					
+					{
+						const auto disp = augs::get_display();
+
+						revertable_drag_rect_bounded_vec2("Window position", config.window.position, 0.3f, vec2i{ 0, 0 }, disp.get_size(), "%.0f");
+						revertable_drag_rect_bounded_vec2("Windowed size", config.window.size, 0.3f, vec2i{ 0, 0 }, disp.get_size(), "%.0f");
+					}
+
+					revertable_checkbox(CONFIG_NVP(window.border));
 				}
-#if TODO
-				if (config.window.raw_mouse_input) {
+
+				{
+					text("Mouse input source");
+
 					auto indent = scoped_indent();
 
-					checkbox("But use system cursor for GUI", config.session.use_system_cursor_for_gui);
-				}
+					int e = config.window.raw_mouse_input ? 1 : 0;
+					ImGui::RadioButton("Raw", &e, 1);
+					
+					if (ImGui::IsItemHovered()) {
+						text_tooltip("Game draws its own cursor.\nWhen in GUI mode,\nforces the cursor inside the window.");
+					}
+#if TODO
+					if (config.window.raw_mouse_input) {
+						auto indent = scoped_indent();
+
+						checkbox("But use system cursor for GUI", config.session.use_system_cursor_for_gui);
+					}
 #endif
-				ImGui::RadioButton("System cursor", &e, 0);
+					ImGui::RadioButton("System cursor", &e, 0);
 
-				if (ImGui::IsItemHovered()) {
-					text_tooltip("When in GUI mode,\nlets the cursor go outside the window.");
+					if (ImGui::IsItemHovered()) {
+						text_tooltip("When in GUI mode,\nlets the cursor go outside the window.");
+					}
+
+					config.window.raw_mouse_input = e != 0;
 				}
 
-				config.window.raw_mouse_input = e != 0;
+				input_text<100>(CONFIG_NVP(window.name)); revert(config.window.name);
+				revertable_checkbox("Automatically hide settings in-game", config.session.automatically_hide_settings_ingame);
+
+				break;
 			}
+			case settings_pane::GRAPHICS: {
 
-			input_text<100>(CONFIG_NVP(window.name)); revert(config.window.name);
-			revertable_checkbox("Automatically hide settings in-game", config.session.automatically_hide_settings_ingame);
-
-			break;
-		}
-		case settings_pane::GRAPHICS: {
-
-			break;
-		}
-		case settings_pane::AUDIO: {
-			revertable_slider("Music volume", config.audio_volume.music, 0.f, 1.f);
-			revertable_slider("Sound effects volume", config.audio_volume.sound_effects, 0.f, 1.f);
-			revertable_slider("GUI volume", config.audio_volume.gui, 0.f, 1.f);
-
-			revertable_checkbox("Enable HRTF", config.audio.enable_hrtf);
-
-			break;
-		}
-		case settings_pane::CONTROLS: {
-
-			break;
-		}
-		case settings_pane::GAMEPLAY: {
-			revertable_slider(CONFIG_NVP(camera.look_bound_expand), 0.2f, 2.f);
-			
-			revertable_checkbox(CONFIG_NVP(camera.enable_smoothing));
-
-			if (config.camera.enable_smoothing) {
-				auto indent = scoped_indent();
-
-				revertable_slider(CONFIG_NVP(camera.smoothing.averages_per_sec), 0.f, 100.f); 
-				revertable_slider(CONFIG_NVP(camera.smoothing.average_factor), 0.01f, 0.95f); 
+				break;
 			}
+			case settings_pane::AUDIO: {
+				revertable_slider("Music volume", config.audio_volume.music, 0.f, 1.f);
+				revertable_slider("Sound effects volume", config.audio_volume.sound_effects, 0.f, 1.f);
+				revertable_slider("GUI volume", config.audio_volume.gui, 0.f, 1.f);
 
-			revertable_checkbox("Draw weapon laser", config.drawing.draw_weapon_laser);
-			revertable_checkbox("Draw crosshairs", config.drawing.draw_crosshairs);
-			// checkbox("Draw gameplay GUI", config.drawing.draw_character_gui); revert(config.drawing.draw_character_gui);
-			break;
-		}
-		case settings_pane::GUI_STYLES: {
-			ImGuiStyle& style = config.gui_style;
-			const ImGuiStyle& last_saved_style = last_saved_config.gui_style;
+				revertable_checkbox("Enable HRTF", config.audio.enable_hrtf);
 
-			if (auto node = scoped_tree_node("Rendering")) {
-				revertable_checkbox("Anti-aliased lines", style.AntiAliasedLines);
-				revertable_checkbox("Anti-aliased shapes", style.AntiAliasedShapes);
-
-				auto width = scoped_item_width(100);
-
-				ImGui::DragFloat("Curve Tessellation Tolerance", &style.CurveTessellationTol, 0.02f, 0.10f, FLT_MAX, NULL, 2.0f);
-				if (style.CurveTessellationTol < 0.0f) style.CurveTessellationTol = 0.10f;
-				revert(style.CurveTessellationTol);
-
-				revertable_slider("Global Alpha", style.Alpha, 0.20f, 1.0f, "%.2f"); // Not exposing zero here so user doesn't "lose" the UI (zero alpha clips all widgets). But application	code could have a toggle to switch between zero and non-zero.
+				break;
 			}
+			case settings_pane::CONTROLS: {
 
-			if (auto node = scoped_tree_node("Settings")) {
-				revertable_slider("WindowPadding", style.WindowPadding, 0.0f, 20.0f, "%.0f"); 
-				revertable_slider("WindowRounding", style.WindowRounding, 0.0f, 16.0f, "%.0f"); 
-				revertable_slider("ChildWindowRounding", style.ChildWindowRounding, 0.0f, 16.0f, "%.0f");
-				revertable_slider("FramePadding", style.FramePadding, 0.0f, 20.0f, "%.0f");
-				revertable_slider("FrameRounding", style.FrameRounding, 0.0f, 16.0f, "%.0f"); 
-				revertable_slider("ItemSpacing", style.ItemSpacing, 0.0f, 20.0f, "%.0f"); 
-				revertable_slider("ItemInnerSpacing", style.ItemInnerSpacing, 0.0f, 20.0f, "%.0f"); 
-				revertable_slider("TouchExtraPadding", style.TouchExtraPadding, 0.0f, 10.0f, "%.0f");
-				revertable_slider("IndentSpacing", style.IndentSpacing, 0.0f, 30.0f, "%.0f");
-				revertable_slider("ScrollbarSize", style.ScrollbarSize, 1.0f, 20.0f, "%.0f");
-				revertable_slider("ScrollbarRounding", style.ScrollbarRounding, 0.0f, 16.0f, "%.0f"); 
-				revertable_slider("GrabMinSize", style.GrabMinSize, 1.0f, 20.0f, "%.0f"); 
-				revertable_slider("GrabRounding", style.GrabRounding, 0.0f, 16.0f, "%.0f"); 
-				text("Alignment");
-				revertable_slider("WindowTitleAlign", style.WindowTitleAlign, 0.0f, 1.0f, "%.2f");
-				revertable_slider("ButtonTextAlign", style.ButtonTextAlign, 0.0f, 1.0f, "%.2f"); ImGui::SameLine(); ShowHelpMarker("Alignment applies when a button is larger than its text content.");
+				break;
 			}
+			case settings_pane::GAMEPLAY: {
+				revertable_slider(CONFIG_NVP(camera.look_bound_expand), 0.2f, 2.f);
+				
+				revertable_checkbox(CONFIG_NVP(camera.enable_smoothing));
 
-			if (auto node = scoped_tree_node("Colors")) {
-				text("Tip: Left-click on colored square to open color picker,\nRight-click to open edit options menu.");
+				if (config.camera.enable_smoothing) {
+					auto indent = scoped_indent();
 
-				static ImGuiTextFilter filter;
-				filter.Draw("Filter colors", 200);
+					revertable_slider(CONFIG_NVP(camera.smoothing.averages_per_sec), 0.f, 100.f); 
+					revertable_slider(CONFIG_NVP(camera.smoothing.average_factor), 0.01f, 0.95f); 
+				}
 
-				static ImGuiColorEditFlags alpha_flags = 0;
-				ImGui::RadioButton("Opaque", &alpha_flags, 0); ImGui::SameLine();
-				ImGui::RadioButton("Alpha", &alpha_flags, ImGuiColorEditFlags_AlphaPreview); ImGui::SameLine();
-				ImGui::RadioButton("Both", &alpha_flags, ImGuiColorEditFlags_AlphaPreviewHalf);
+				revertable_checkbox("Draw weapon laser", config.drawing.draw_weapon_laser);
+				revertable_checkbox("Draw crosshairs", config.drawing.draw_crosshairs);
+				// checkbox("Draw gameplay GUI", config.drawing.draw_character_gui); revert(config.drawing.draw_character_gui);
+				break;
+			}
+			case settings_pane::GUI_STYLES: {
+				ImGuiStyle& style = config.gui_style;
+				const ImGuiStyle& last_saved_style = last_saved_config.gui_style;
 
-				auto child = scoped_child("#colors", ImVec2(0, 300), true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
-				auto width = scoped_item_width(-160);
+				if (auto node = scoped_tree_node("Rendering")) {
+					revertable_checkbox("Anti-aliased lines", style.AntiAliasedLines);
+					revertable_checkbox("Anti-aliased shapes", style.AntiAliasedShapes);
 
-				for (int i = 0; i < ImGuiCol_COUNT; i++) {
-					const char* name = ImGui::GetStyleColorName(i);
-					if (!filter.PassFilter(name))
-						continue;
+					auto width = scoped_item_width(100);
 
-					auto id = scoped_id(i);
+					ImGui::DragFloat("Curve Tessellation Tolerance", &style.CurveTessellationTol, 0.02f, 0.10f, FLT_MAX, NULL, 2.0f);
+					if (style.CurveTessellationTol < 0.0f) style.CurveTessellationTol = 0.10f;
+					revert(style.CurveTessellationTol);
 
-					ImGui::ColorEdit4(name, (float*)&style.Colors[i], ImGuiColorEditFlags_AlphaBar | alpha_flags);
+					revertable_slider("Global Alpha", style.Alpha, 0.20f, 1.0f, "%.2f"); // Not exposing zero here so user doesn't "lose" the UI (zero alpha clips all widgets). But application	code could have a toggle to switch between zero and non-zero.
+				}
 
-					if (std::memcmp(&style.Colors[i], &last_saved_style.Colors[i], sizeof(ImVec4)) != 0) {
-						ImGui::SameLine(); if (ImGui::Button("Revert")) style.Colors[i] = last_saved_style.Colors[i];
+				if (auto node = scoped_tree_node("Settings")) {
+					revertable_slider("WindowPadding", style.WindowPadding, 0.0f, 20.0f, "%.0f"); 
+					revertable_slider("WindowRounding", style.WindowRounding, 0.0f, 16.0f, "%.0f"); 
+					revertable_slider("ChildWindowRounding", style.ChildWindowRounding, 0.0f, 16.0f, "%.0f");
+					revertable_slider("FramePadding", style.FramePadding, 0.0f, 20.0f, "%.0f");
+					revertable_slider("FrameRounding", style.FrameRounding, 0.0f, 16.0f, "%.0f"); 
+					revertable_slider("ItemSpacing", style.ItemSpacing, 0.0f, 20.0f, "%.0f"); 
+					revertable_slider("ItemInnerSpacing", style.ItemInnerSpacing, 0.0f, 20.0f, "%.0f"); 
+					revertable_slider("TouchExtraPadding", style.TouchExtraPadding, 0.0f, 10.0f, "%.0f");
+					revertable_slider("IndentSpacing", style.IndentSpacing, 0.0f, 30.0f, "%.0f");
+					revertable_slider("ScrollbarSize", style.ScrollbarSize, 1.0f, 20.0f, "%.0f");
+					revertable_slider("ScrollbarRounding", style.ScrollbarRounding, 0.0f, 16.0f, "%.0f"); 
+					revertable_slider("GrabMinSize", style.GrabMinSize, 1.0f, 20.0f, "%.0f"); 
+					revertable_slider("GrabRounding", style.GrabRounding, 0.0f, 16.0f, "%.0f"); 
+					text("Alignment");
+					revertable_slider("WindowTitleAlign", style.WindowTitleAlign, 0.0f, 1.0f, "%.2f");
+					revertable_slider("ButtonTextAlign", style.ButtonTextAlign, 0.0f, 1.0f, "%.2f"); ImGui::SameLine(); ShowHelpMarker("Alignment applies when a button is larger than its text content.");
+				}
+
+				if (auto node = scoped_tree_node("Colors")) {
+					text("Tip: Left-click on colored square to open color picker,\nRight-click to open edit options menu.");
+
+					static ImGuiTextFilter filter;
+					filter.Draw("Filter colors", 200);
+
+					static ImGuiColorEditFlags alpha_flags = 0;
+					ImGui::RadioButton("Opaque", &alpha_flags, 0); ImGui::SameLine();
+					ImGui::RadioButton("Alpha", &alpha_flags, ImGuiColorEditFlags_AlphaPreview); ImGui::SameLine();
+					ImGui::RadioButton("Both", &alpha_flags, ImGuiColorEditFlags_AlphaPreviewHalf);
+
+					auto child = scoped_child("#colors", ImVec2(0, 300), true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+					auto width = scoped_item_width(-160);
+
+					for (int i = 0; i < ImGuiCol_COUNT; i++) {
+						const char* name = ImGui::GetStyleColorName(i);
+						if (!filter.PassFilter(name))
+							continue;
+
+						auto id = scoped_id(i);
+
+						ImGui::ColorEdit4(name, (float*)&style.Colors[i], ImGuiColorEditFlags_AlphaBar | alpha_flags);
+
+						if (std::memcmp(&style.Colors[i], &last_saved_style.Colors[i], sizeof(ImVec4)) != 0) {
+							ImGui::SameLine(); if (ImGui::Button("Revert")) style.Colors[i] = last_saved_style.Colors[i];
+						}
 					}
 				}
+
+				ImGui::GetStyle() = style;
+
+				break;
 			}
-
-			ImGui::GetStyle() = style;
-
-			break;
-		}
-		case settings_pane::DEBUG: {
-			revertable_checkbox("Show developer console", config.session.show_developer_console); 
-			break;
-		}
-		default: {
-			ensure(false && "Unknown settings pane type");
-			break;
+			case settings_pane::DEBUG: {
+				revertable_checkbox("Show developer console", config.session.show_developer_console); 
+				break;
+			}
+			default: {
+				ensure(false && "Unknown settings pane type");
+				break;
+			}
 		}
 	}
-
-	ImGui::PopItemWidth();
-	ImGui::EndChild();
 
 	{
 		const bool has_config_changed =
