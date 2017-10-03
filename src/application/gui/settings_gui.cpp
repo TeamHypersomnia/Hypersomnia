@@ -71,37 +71,33 @@ void settings_gui_state::perform(
 	using namespace augs::imgui;
 
 	{
-		auto tab_padding = ImGui::GetStyle().FramePadding;
-		tab_padding.x *= 4;
+		auto style = scoped_style_var(ImGuiStyleVar_FramePadding, []() { auto padding = ImGui::GetStyle().FramePadding; padding.x *= 4; return padding; }());
 
-		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, tab_padding);
+		{
+			static auto labels = []() {
+				static augs::enum_array<std::string, settings_pane> label_strs;
+				augs::enum_array<const char*, settings_pane> c_strs;
+
+				augs::for_each_enum_except_bounds([&c_strs](const settings_pane s) {
+					label_strs[s] = format_enum(s);
+					c_strs[s] = label_strs[s].c_str();
+				});
+
+				c_strs[settings_pane::GUI_STYLES] = "GUI styles";
+
+				return c_strs;
+			}();
+
+			auto index = static_cast<int>(active_pane);
+			ImGui::TabLabels(labels.data(), labels.size(), index, nullptr);
+			active_pane = static_cast<settings_pane>(index);
+		}
 	}
 	
 	{
-		static auto labels = []() {
-			static augs::enum_array<std::string, settings_pane> label_strs;
-			augs::enum_array<const char*, settings_pane> c_strs;
-
-			augs::for_each_enum_except_bounds([&c_strs](const settings_pane s) {
-				label_strs[s] = format_enum(s);
-				c_strs[s] = label_strs[s].c_str();
-			});
-
-			c_strs[settings_pane::GUI_STYLES] = "GUI styles";
-
-			return c_strs;
-		}();
-
-		auto index = static_cast<int>(active_pane);
-		ImGui::TabLabels(labels.data(), labels.size(), index, nullptr);
-		active_pane = static_cast<settings_pane>(index);
+		auto scope = scoped_style_color(ImGuiCol_Border, ImGui::GetStyle().Colors[ImGuiCol_Button]);
+		ImGui::Separator();
 	}
-
-	ImGui::PopStyleVar();
-
-	ImGui::PushStyleColor(ImGuiCol_Border, ImGui::GetStyle().Colors[ImGuiCol_Button]);
-	ImGui::Separator();
-	ImGui::PopStyleColor();
 
 	auto revert = make_revert_button_lambda(config, last_saved_config);
 

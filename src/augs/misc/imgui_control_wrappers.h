@@ -238,6 +238,20 @@ namespace augs {
 
 			return make_scope_guard([]() { ImGui::End(); });
 		}
+
+		template <class... T>
+		auto scoped_style_color(T&&... args) {
+			ImGui::PushStyleColor(std::forward<T>(args)...);
+
+			return make_scope_guard([]() { ImGui::PopStyleColor(); });
+		}
+
+		template <class... T>
+		auto scoped_style_var(T&&... args) {
+			ImGui::PushStyleVar(std::forward<T>(args)...);
+
+			return make_scope_guard([]() { ImGui::PopStyleVar(); });
+		}
 	}
 }
 
