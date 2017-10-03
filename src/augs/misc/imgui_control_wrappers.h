@@ -106,12 +106,12 @@ namespace augs {
 			ImGui::EndTooltip();
 		}
 
-		template <class T, class... Args>
+		template <class T, class B, class... Args>
 		bool slider(
 			const std::string& label, 
 			T& into, 
-			const T lower_bound,
-			const T upper_bound,
+			const B lower_bound,
+			const B upper_bound,
 			Args&&... args
 		) {
 			using namespace detail;
@@ -124,6 +124,11 @@ namespace augs {
 			else if constexpr(std::is_floating_point_v<T>) {
 				return direct_or_convert(into, [&](float& input) {
 					return ImGui::SliderFloat(label.c_str(), &input, lower_bound, upper_bound, std::forward<Args>(args)...);
+				});
+			}
+			else if constexpr(std::is_same_v<T, ImVec2>) {
+				return direct_or_convert(into, [&](ImVec2& input) {
+					return ImGui::SliderFloat2(label.c_str(), &input.x, lower_bound, upper_bound, std::forward<Args>(args)...);
 				});
 			}
 			else if constexpr(std::is_same_v<T, vec2> || std::is_same_v<T, vec2d>) {

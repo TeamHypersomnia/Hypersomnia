@@ -217,28 +217,28 @@ void settings_gui_state::perform(
 				if (style.CurveTessellationTol < 0.0f) style.CurveTessellationTol = 0.10f;
 				revert(style.CurveTessellationTol);
 
-				ImGui::SliderFloat("Global Alpha", &style.Alpha, 0.20f, 1.0f, "%.2f"); revert(style.Alpha);// Not exposing zero here so user doesn't "lose" the UI (zero alpha clips all widgets). But application	code could have a toggle to switch between zero and non-zero.
+				revertable_slider("Global Alpha", style.Alpha, 0.20f, 1.0f, "%.2f"); // Not exposing zero here so user doesn't "lose" the UI (zero alpha clips all widgets). But application	code could have a toggle to switch between zero and non-zero.
 				ImGui::PopItemWidth();
 				ImGui::TreePop();
 			}
 
 			if (ImGui::TreeNode("Settings")) {
-				ImGui::SliderFloat2("WindowPadding", (float*)&style.WindowPadding, 0.0f, 20.0f, "%.0f"); revert(style.WindowPadding);
-				ImGui::SliderFloat("WindowRounding", &style.WindowRounding, 0.0f, 16.0f, "%.0f"); revert(style.WindowRounding);
-				ImGui::SliderFloat("ChildWindowRounding", &style.ChildWindowRounding, 0.0f, 16.0f, "%.0f"); revert(style.ChildWindowRounding);
-				ImGui::SliderFloat2("FramePadding", (float*)&style.FramePadding, 0.0f, 20.0f, "%.0f"); revert(style.FramePadding);
-				ImGui::SliderFloat("FrameRounding", &style.FrameRounding, 0.0f, 16.0f, "%.0f"); revert(style.FrameRounding);
-				ImGui::SliderFloat2("ItemSpacing", (float*)&style.ItemSpacing, 0.0f, 20.0f, "%.0f"); revert(style.ItemSpacing);
-				ImGui::SliderFloat2("ItemInnerSpacing", (float*)&style.ItemInnerSpacing, 0.0f, 20.0f, "%.0f"); revert(style.ItemInnerSpacing);
-				ImGui::SliderFloat2("TouchExtraPadding", (float*)&style.TouchExtraPadding, 0.0f, 10.0f, "%.0f"); revert(style.TouchExtraPadding);
-				ImGui::SliderFloat("IndentSpacing", &style.IndentSpacing, 0.0f, 30.0f, "%.0f"); revert(style.IndentSpacing);
-				ImGui::SliderFloat("ScrollbarSize", &style.ScrollbarSize, 1.0f, 20.0f, "%.0f"); revert(style.ScrollbarSize);
-				ImGui::SliderFloat("ScrollbarRounding", &style.ScrollbarRounding, 0.0f, 16.0f, "%.0f"); revert(style.ScrollbarRounding);
-				ImGui::SliderFloat("GrabMinSize", &style.GrabMinSize, 1.0f, 20.0f, "%.0f"); revert(style.GrabMinSize);
-				ImGui::SliderFloat("GrabRounding", &style.GrabRounding, 0.0f, 16.0f, "%.0f"); revert(style.GrabRounding);
+				revertable_slider("WindowPadding", style.WindowPadding, 0.0f, 20.0f, "%.0f"); 
+				revertable_slider("WindowRounding", style.WindowRounding, 0.0f, 16.0f, "%.0f"); 
+				revertable_slider("ChildWindowRounding", style.ChildWindowRounding, 0.0f, 16.0f, "%.0f");
+				revertable_slider("FramePadding", style.FramePadding, 0.0f, 20.0f, "%.0f");
+				revertable_slider("FrameRounding", style.FrameRounding, 0.0f, 16.0f, "%.0f"); 
+				revertable_slider("ItemSpacing", style.ItemSpacing, 0.0f, 20.0f, "%.0f"); 
+				revertable_slider("ItemInnerSpacing", style.ItemInnerSpacing, 0.0f, 20.0f, "%.0f"); 
+				revertable_slider("TouchExtraPadding", style.TouchExtraPadding, 0.0f, 10.0f, "%.0f");
+				revertable_slider("IndentSpacing", style.IndentSpacing, 0.0f, 30.0f, "%.0f");
+				revertable_slider("ScrollbarSize", style.ScrollbarSize, 1.0f, 20.0f, "%.0f");
+				revertable_slider("ScrollbarRounding", style.ScrollbarRounding, 0.0f, 16.0f, "%.0f"); 
+				revertable_slider("GrabMinSize", style.GrabMinSize, 1.0f, 20.0f, "%.0f"); 
+				revertable_slider("GrabRounding", style.GrabRounding, 0.0f, 16.0f, "%.0f"); 
 				text("Alignment");
-				ImGui::SliderFloat2("WindowTitleAlign", (float*)&style.WindowTitleAlign, 0.0f, 1.0f, "%.2f"); revert(style.WindowTitleAlign);
-				ImGui::SliderFloat2("ButtonTextAlign", (float*)&style.ButtonTextAlign, 0.0f, 1.0f, "%.2f"); ImGui::SameLine(); ShowHelpMarker("Alignment applies when a button is larger than its text content.");	revert(style.ButtonTextAlign);
+				revertable_slider("WindowTitleAlign", style.WindowTitleAlign, 0.0f, 1.0f, "%.2f");
+				revertable_slider("ButtonTextAlign", style.ButtonTextAlign, 0.0f, 1.0f, "%.2f"); ImGui::SameLine(); ShowHelpMarker("Alignment applies when a button is larger than its text content.");
 				ImGui::TreePop();
 			}
 
@@ -255,8 +255,8 @@ void settings_gui_state::perform(
 
 				ImGui::BeginChild("#colors", ImVec2(0, 300), true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
 				ImGui::PushItemWidth(-160);
-				for (int i = 0; i < ImGuiCol_COUNT; i++)
-				{
+
+				for (int i = 0; i < ImGuiCol_COUNT; i++) {
 					const char* name = ImGui::GetStyleColorName(i);
 					if (!filter.PassFilter(name))
 						continue;
