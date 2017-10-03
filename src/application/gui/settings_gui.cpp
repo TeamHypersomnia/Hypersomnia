@@ -64,7 +64,7 @@ void settings_gui_state::perform(
 		ImGui::SetNextWindowSize(initial_settings_size, ImGuiSetCond_FirstUseEver);
 	}
 
-	ImGui::Begin("Settings", &show);
+	auto settings = scoped_window("Settings", &show);
 	
 	{
 		auto child = scoped_child("settings view", ImVec2(0, -(ImGui::GetItemsLineHeightWithSpacing() + 4)));
@@ -290,7 +290,7 @@ void settings_gui_state::perform(
 			)
 		;
 
-		ImGui::BeginChild("save revert");
+		auto scope = scoped_child("save revert");
 
 		ImGui::Separator();
 
@@ -309,11 +309,7 @@ void settings_gui_state::perform(
 				ImGui::GetStyle() = config.gui_style;
 			}
 		}
-
-		ImGui::EndChild();
 	}
-
-	ImGui::End();
 }
 
 #undef CONFIG_NVP
