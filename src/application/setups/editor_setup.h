@@ -35,8 +35,10 @@ class editor_setup {
 	};
 	
 	std::optional<popup> current_popup;
+
 	bool show_summary = true;
 	bool show_player = true;
+	bool show_common_state = false;
 
 	double player_speed = 1.0;
 	bool player_paused = true;

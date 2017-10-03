@@ -116,6 +116,17 @@ void editor_setup::perform_custom_imgui(
 				show_player = true;
 			}
 
+			ImGui::Separator();
+			ImGui::MenuItem("(State)", NULL, false, false);
+
+			if (ImGui::MenuItem("Common")) {
+				show_common_state = true;
+			}
+
+			if (ImGui::MenuItem("Entities")) {
+
+			}
+
 			ImGui::EndMenu();
 		}
 		ImGui::EndMainMenuBar();
@@ -185,6 +196,13 @@ void editor_setup::perform_custom_imgui(
 		);
 
 		ImGui::EndChild();
+		ImGui::End();
+	}
+
+	if (show_common_state) {
+		ImGui::Begin("Common", &show_common_state);
+
+
 		ImGui::End();
 	}
 

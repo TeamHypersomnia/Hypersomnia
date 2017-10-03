@@ -151,7 +151,7 @@ set(HYPERSOMNIA_BOX2D_SRCS
 	"src/3rdparty/Box2D/Rope/b2Rope.cpp"
 )
 
-# Test scene sources that whose inclusion is conditional on the value of BUILD_TEST_SCENES.
+# Test scene sources whose inclusion is conditional on the value of BUILD_TEST_SCENES.
 
 set(HYPERSOMNIA_TEST_SCENES_SRCS
 	"src/test_scenes/ingredients/artificial_life.cpp"

@@ -104,6 +104,11 @@ void settings_gui_state::perform(
 
 	auto revert = make_revert_button_lambda(config, last_saved_config);
 
+	auto revertable = [&revert](auto& what, auto callback) {
+		callback(what);
+		revert(what);
+	};
+
 	switch (active_pane) {
 		case settings_pane::WINDOW: {
 			enum_combo("Launch on game's startup", config.launch_mode);
@@ -112,20 +117,11 @@ void settings_gui_state::perform(
 			if (!config.window.fullscreen) {
 				auto indent = scoped_indent();
 				
-				const auto disp = augs::get_display();
-
 				{
-					vec2i lower;
-					vec2i upper = disp.get_size();
-					ImGui::DragIntN("Window position", &config.window.position.x, 2, 0.3f, &lower.x, &upper.x, "%.0f");
-					revert(config.window.position);
-				}
+					const auto disp = augs::get_display();
 
-				{
-					vec2i lower;
-					vec2i upper = disp.get_size();
-					ImGui::DragIntN("Windowed size", &config.window.size.x, 2, 0.3f, &lower.x, &upper.x, "%.0f");
-					revert(config.window.size);
+					drag_rect_bounded_vec2(revert, "Window position", config.window.position, 0.3f, { 0, 0 }, disp.get_size(), "%.0f");
+					drag_rect_bounded_vec2(revert, "Windowed size", config.window.size, 0.3f, { 0, 0 }, disp.get_size(), "%.0f");
 				}
 
 				checkbox(CONFIG_NVP(window.border)); revert(config.window.border);

@@ -101,6 +101,32 @@ namespace augs {
 			}
 		}
 
+		template <class B>
+		bool drag_rect_bounded_vec2(
+			B after_behaviour,
+			const std::string& label, 
+			vec2i& into, 
+			const float speed, 
+			vec2i lower_bound, 
+			vec2i upper_bound, 
+			const std::string& display_format
+		) {
+			const bool output = { 
+				ImGui::DragIntN(
+					label.c_str(), 
+					&into.x, 
+					2, 
+					speed, 
+					&lower_bound.x,
+					&upper_bound.x,
+					"%.0f"
+				) 
+			};
+
+			after_behaviour(into);
+			return output;
+		}
+
 		template <class T, class... Args>
 		decltype(auto) slider(const std::string& label, T& into, Args&&... args) {
 			using namespace detail;
