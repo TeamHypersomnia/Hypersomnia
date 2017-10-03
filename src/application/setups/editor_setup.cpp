@@ -71,8 +71,8 @@ void editor_setup::perform_custom_imgui(
 ) {
 	using namespace augs::imgui;
 
-	if (ImGui::BeginMainMenuBar()) {
-		if (ImGui::BeginMenu("File")) {
+	if (auto main_menu = scoped_main_menu_bar()) {
+		if (auto menu = scoped_menu("File")) {
 			if (ImGui::MenuItem("New", "CTRL+N")) {}
 
 			if (ImGui::MenuItem("Open", "CTRL+O")) {
@@ -86,10 +86,8 @@ void editor_setup::perform_custom_imgui(
 			if (ImGui::MenuItem("Save as", "F12")) {
 
 			}
-
-			ImGui::EndMenu();
 		}
-		if (ImGui::BeginMenu("Edit")) {
+		if (auto menu = scoped_menu("Edit")) {
 			if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
 			if (ImGui::MenuItem("Redo", "CTRL+SHIFT+Z", false, false)) {}
 			ImGui::Separator();
@@ -106,10 +104,8 @@ void editor_setup::perform_custom_imgui(
 #else
 			if (ImGui::MenuItem("Fill with test scene", nullptr, false, false)) {}
 #endif
-
-			ImGui::EndMenu();
 		}
-		if (ImGui::BeginMenu("View")) {
+		if (auto menu = scoped_menu("View")) {
 			if (ImGui::MenuItem("Summary")) {
 				show_summary = true;
 			}
@@ -127,10 +123,7 @@ void editor_setup::perform_custom_imgui(
 			if (ImGui::MenuItem("Entities")) {
 
 			}
-
-			ImGui::EndMenu();
 		}
-		ImGui::EndMainMenuBar();
 	}
 
 	if (open_file_dialog.valid() && is_ready(open_file_dialog)) {
@@ -153,7 +146,7 @@ void editor_setup::perform_custom_imgui(
 	}
 
 	if (show_player) {
-		ImGui::Begin("Player", &show_player, ImGuiWindowFlags_AlwaysAutoResize);
+		auto player = scoped_window("Player", &show_player, ImGuiWindowFlags_AlwaysAutoResize);
 
 		if (ImGui::Button("Play")) {
 			player_paused = false;
@@ -168,7 +161,6 @@ void editor_setup::perform_custom_imgui(
 		if (ImGui::Button("Stop")) {
 			player_paused = true;
 		}
-		ImGui::End();
 	}
 
 	if (show_summary) {
@@ -180,31 +172,28 @@ void editor_setup::perform_custom_imgui(
 			ImGui::SetNextWindowSize(initial_settings_size, ImGuiSetCond_FirstUseEver);
 		}
 
-		ImGui::Begin("Summary", &show_summary);
-		ImGui::BeginChild("Cosmos");
-		ImGui::Text(typesafe_sprintf("Tick rate: %x/s", get_viewed_cosmos().get_steps_per_second()).c_str());
+		auto summary = scoped_window("Summary", &show_summary);
+		auto child = scoped_child("Cosmos");
+
+		text(typesafe_sprintf("Tick rate: %x/s", get_viewed_cosmos().get_steps_per_second()));
 		
-		ImGui::Text(typesafe_sprintf("Total entities: %x/%x", 
+		text(typesafe_sprintf("Total entities: %x/%x", 
 			get_viewed_cosmos().get_entities_count(),
 			get_viewed_cosmos().get_maximum_entities()
-		).c_str());
+		));
 
-		ImGui::Text(
+		text(
 			typesafe_sprintf("World time: %x (%x steps)",
 				standard_format_seconds(get_viewed_cosmos().get_total_seconds_passed()),
 				get_viewed_cosmos().get_total_steps_passed()
-			).c_str()
+			)
 		);
-
-		ImGui::EndChild();
-		ImGui::End();
 	}
 
 	if (show_common_state) {
-		ImGui::Begin("Common", &show_common_state);
+		auto common = scoped_window("Common", &show_common_state);
 
 
-		ImGui::End();
 	}
 
 	if (current_popup) {
@@ -215,7 +204,7 @@ void editor_setup::perform_custom_imgui(
 		}
 
 		if (ImGui::BeginPopupModal(p.title.c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
-			ImGui::Text(p.message.c_str());
+			text(p.message);
 
 			{
 				auto& f = p.details_expanded;
@@ -225,7 +214,7 @@ void editor_setup::perform_custom_imgui(
 				}
 
 				if (f) {
-					ImGui::Text(p.details.c_str());
+					text(p.details);
 				}
 			}
 

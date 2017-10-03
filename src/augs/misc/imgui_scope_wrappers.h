@@ -1,4 +1,5 @@
 #pragma once
+#include <optional>
 #include <imgui/imgui.h>
 
 #include "augs/misc/scope_guard.h"
@@ -40,7 +41,31 @@ namespace augs {
 		
 			return opt;
 		}
-		
+
+		auto scoped_menu(const char* label) {
+			const auto result = ImGui::BeginMenu(label);
+
+			auto opt = std::make_optional(make_scope_guard([result]() { if (result) { ImGui::EndMenu(); }}));
+
+			if (!result) {
+				opt = std::nullopt;
+			}
+
+			return opt;
+		}
+
+		auto scoped_main_menu_bar() {
+			const auto result = ImGui::BeginMainMenuBar();
+
+			auto opt = std::make_optional(make_scope_guard([result]() { if (result) { ImGui::EndMainMenuBar(); }}));
+
+			if (!result) {
+				opt = std::nullopt;
+			}
+
+			return opt;
+		}
+
 		template <class... T>
 		auto scoped_child(T&&... args) {
 			ImGui::BeginChild(std::forward<T>(args)...);

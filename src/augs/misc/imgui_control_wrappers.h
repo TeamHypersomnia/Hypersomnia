@@ -1,5 +1,4 @@
 #pragma once
-#include <optional>
 #include <imgui/imgui.h>
 
 #include "augs/templates/function_traits.h"
