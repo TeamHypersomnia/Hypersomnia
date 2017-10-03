@@ -145,6 +145,24 @@ void editor_setup::perform_custom_imgui(
 		}
 	}
 
+	if (show_summary) {
+		auto summary = scoped_window("Summary", &show_summary, ImGuiWindowFlags_AlwaysAutoResize);
+
+		text(typesafe_sprintf("Tick rate: %x/s", get_viewed_cosmos().get_steps_per_second()));
+
+		text(typesafe_sprintf("Total entities: %x/%x",
+			get_viewed_cosmos().get_entities_count(),
+			get_viewed_cosmos().get_maximum_entities()
+		));
+
+		text(
+			typesafe_sprintf("World time: %x (%x steps)",
+				standard_format_seconds(get_viewed_cosmos().get_total_seconds_passed()),
+				get_viewed_cosmos().get_total_steps_passed()
+			)
+		);
+	}
+
 	if (show_player) {
 		auto player = scoped_window("Player", &show_player, ImGuiWindowFlags_AlwaysAutoResize);
 
@@ -163,32 +181,6 @@ void editor_setup::perform_custom_imgui(
 		}
 	}
 
-	if (show_summary) {
-		{
-			const auto screen_size = vec2(ImGui::GetIO().DisplaySize);
-			const auto initial_settings_size = screen_size / 2;
-
-			ImGui::SetNextWindowPos({ 100, 100 }, ImGuiSetCond_FirstUseEver);
-			ImGui::SetNextWindowSize(initial_settings_size, ImGuiSetCond_FirstUseEver);
-		}
-
-		auto summary = scoped_window("Summary", &show_summary);
-		auto child = scoped_child("Cosmos");
-
-		text(typesafe_sprintf("Tick rate: %x/s", get_viewed_cosmos().get_steps_per_second()));
-		
-		text(typesafe_sprintf("Total entities: %x/%x", 
-			get_viewed_cosmos().get_entities_count(),
-			get_viewed_cosmos().get_maximum_entities()
-		));
-
-		text(
-			typesafe_sprintf("World time: %x (%x steps)",
-				standard_format_seconds(get_viewed_cosmos().get_total_seconds_passed()),
-				get_viewed_cosmos().get_total_steps_passed()
-			)
-		);
-	}
 
 	if (show_common_state) {
 		auto common = scoped_window("Common", &show_common_state);
