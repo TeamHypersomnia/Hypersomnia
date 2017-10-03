@@ -61,5 +61,5 @@ void perform_imgui_pass(
 
 	augs::imgui::render(config.gui_style);
 
-	window_inputs = augs::filter_inputs_for_imgui(window_inputs);
+	window_inputs = augs::imgui::filter_inputs(window_inputs);
 }

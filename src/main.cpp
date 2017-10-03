@@ -1226,7 +1226,7 @@ int work(const int argc, const char* const * const argv) try {
 
 			if (ImGui::GetIO().WantCaptureMouse) {
 				if (should_draw_our_cursor) {
-					get_drawer().cursor(necessary_atlas_entries, augs::get_imgui_cursor<assets::necessary_image_id>(), cursor_drawing_pos, white);
+					get_drawer().cursor(necessary_atlas_entries, augs::imgui::get_cursor<assets::necessary_image_id>(), cursor_drawing_pos, white);
 				}
 			}
 			else if (

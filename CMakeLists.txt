@@ -410,6 +410,7 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/test_scenes/test_scenes_content.cpp"
 	"src/view/necessary_resources.cpp"
 	"src/augs/misc/imgui_utils.cpp"
+	"src/augs/misc/imgui_control_wrappers.cpp"
 	"src/application/gui/settings_gui.cpp"
 	"src/game/assets/recoil_player.cpp"
 	"src/augs/gui/bbcode.cpp"
