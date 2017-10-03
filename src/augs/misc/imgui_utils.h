@@ -9,6 +9,8 @@
 #include "augs/templates/maybe_const.h"
 #include "augs/templates/corresponding_field.h"
 
+#include "augs/templates/function_traits.h"
+
 namespace augs {
 	class image;
 
@@ -42,8 +44,10 @@ namespace augs {
 		void render(const ImGuiStyle&);
 
 		namespace detail {
-			template <class Target, class T, class F>
-			decltype(auto) direct_or_convert(T& into, F&& callback) {
+			template <class T, class F>
+			decltype(auto) direct_or_convert(T& into, F callback) {
+				using Target = std::decay_t<argument_of_t<F, 0>>;
+
 				if constexpr(std::is_same_v<T, Target>) {
 					return callback(into);
 				}
@@ -57,7 +61,7 @@ namespace augs {
 		}
 
 		template <std::size_t buffer_size = 1000, class... Args>
-		decltype(auto) input_text(const std::string& label, std::string& value, Args&&... args) {
+		bool input_text(const std::string& label, std::string& value, Args&&... args) {
 			std::array<char, buffer_size> buf;
 
 			std::copy(value.data(), value.data() + value.size() + 1, buf.data());
@@ -70,9 +74,8 @@ namespace augs {
 			return false;
 		}
 
-		template <class... Args>
-		decltype(auto) checkbox(const std::string& label, bool& into, Args&&... args) {
-			ImGui::Checkbox(label.c_str(), &into, std::forward<Args>(args)...);
+		inline bool checkbox(const std::string& label, bool& into) {
+			return { ImGui::Checkbox(label.c_str(), &into) };
 		}
 
 		template <class T, class... Args>
@@ -80,30 +83,28 @@ namespace augs {
 			using namespace detail;
 
 			if constexpr(std::is_integral_v<T>) {
-				return direct_or_convert<int>(into, [&](int& input) {
+				return direct_or_convert(into, [&](int& input) {
 					return ImGui::DragInt(label.c_str(), &input, std::forward<Args>(args)...);
 				});
 			}
 			else if constexpr(std::is_floating_point_v<T>) {
-				return direct_or_convert<float>(into, [&](float& input) {
+				return direct_or_convert(into, [&](float& input) {
 					return ImGui::DragFloat(label.c_str(), &input, std::forward<Args>(args)...);
 				});
 			}
 			else if constexpr(std::is_same_v<T, vec2> || std::is_same_v<T, vec2d>) {
-				return direct_or_convert<vec2>(into, [&](vec2& input) {
+				return direct_or_convert(into, [&](vec2& input) {
 					return ImGui::DragFloat2(label.c_str(), &input.x, std::forward<Args>(args)...);
 				});
 			}
 			else if constexpr(std::is_same_v<T, vec2i> || std::is_same_v<T, vec2u>) {
-				return direct_or_convert<vec2i>(into, [&](vec2i& input) {
+				return direct_or_convert(into, [&](vec2i& input) {
 					return ImGui::DragInt2(label.c_str(), &input.x, std::forward<Args>(args)...);
 				});
 			}
 		}
 
-		template <class B>
-		bool drag_rect_bounded_vec2(
-			B after_behaviour,
+		inline bool drag_rect_bounded_vec2(
 			const std::string& label, 
 			vec2i& into, 
 			const float speed, 
@@ -111,7 +112,7 @@ namespace augs {
 			vec2i upper_bound, 
 			const std::string& display_format
 		) {
-			const bool output = { 
+			return { 
 				ImGui::DragIntN(
 					label.c_str(), 
 					&into.x, 
@@ -119,56 +120,75 @@ namespace augs {
 					speed, 
 					&lower_bound.x,
 					&upper_bound.x,
-					"%.0f"
+					display_format.c_str()
 				) 
 			};
+		}
 
-			after_behaviour(into);
-			return output;
+		inline void text(const std::string& t) {
+			ImGui::Text(t.c_str());
+		}
+
+		inline void text(const char* const t) {
+			ImGui::Text(t);
+		}
+
+		inline void text_tooltip(const std::string& t) {
+			ImGui::BeginTooltip();
+			text(t);
+			ImGui::EndTooltip();
 		}
 
 		template <class T, class... Args>
-		decltype(auto) slider(const std::string& label, T& into, Args&&... args) {
+		bool slider(
+			const std::string& label, 
+			T& into, 
+			const T lower_bound,
+			const T upper_bound,
+			Args&&... args
+		) {
 			using namespace detail;
 
 			if constexpr(std::is_integral_v<T>) {
-				return direct_or_convert<int>(into, [&](int& input) {
-					return ImGui::SliderInt(label.c_str(), &input, std::forward<Args>(args)...);
+				return direct_or_convert(into, [&](int& input) {
+					return ImGui::SliderInt(label.c_str(), &input, lower_bound, upper_bound, std::forward<Args>(args)...);
 				});
 			}
 			else if constexpr(std::is_floating_point_v<T>) {
-				return direct_or_convert<float>(into, [&](float& input) {
-					return ImGui::SliderFloat(label.c_str(), &input, std::forward<Args>(args)...);
+				return direct_or_convert(into, [&](float& input) {
+					return ImGui::SliderFloat(label.c_str(), &input, lower_bound, upper_bound, std::forward<Args>(args)...);
 				});
 			}
 			else if constexpr(std::is_same_v<T, vec2> || std::is_same_v<T, vec2d>) {
-				return direct_or_convert<vec2>(into, [&](vec2& input) {
-					return ImGui::SliderFloat2(label.c_str(), &input.x, std::forward<Args>(args)...);
+				return direct_or_convert(into, [&](vec2& input) {
+					return ImGui::SliderFloat2(label.c_str(), &input.x, lower_bound, upper_bound, std::forward<Args>(args)...);
 				});
 			}
 			else if constexpr(std::is_same_v<T, vec2i> || std::is_same_v<T, vec2u>) {
-				return direct_or_convert<vec2i>(into, [&](vec2i& input) {
-					return ImGui::SliderInt2(label.c_str(), &input.x, std::forward<Args>(args)...);
+				return direct_or_convert(into, [&](vec2i& input) {
+					return ImGui::SliderInt2(label.c_str(), &input.x, lower_bound, upper_bound, std::forward<Args>(args)...);
 				});
 			}
 		}
 
 		template <class T, class... Args>
 		auto enum_combo(const std::string& label, T& into, Args&&... args) {
-			thread_local std::vector<char> combo_names;
+			thread_local const auto combo_names = []() {
+				std::vector<char> names;
 
-			if (combo_names.empty()) {
-				for_each_enum_except_bounds([](const T e) {
+				for_each_enum_except_bounds([&names](const T e) {
 					concatenate(
-						combo_names, 
+						names,
 						format_enum(e)
 					);
 
-					combo_names.push_back('\0');
+					names.push_back('\0');
 				});
 				
-				combo_names.push_back('\0');
-			}
+				names.push_back('\0');
+
+				return names;
+			}();
 
 			auto current = static_cast<int>(into);
 			const auto result = ImGui::Combo(label.c_str(), &current, combo_names.data());
@@ -211,21 +231,19 @@ namespace augs {
 
 	template <class id_type>
 	id_type get_imgui_cursor() {
-		auto gui_cursor = id_type::GUI_CURSOR;
-
-		if (ImGui::IsAnyItemHoveredWithHandCursor()) {
-			gui_cursor = id_type::GUI_CURSOR_HOVER;
+		if (ImGui::GetMouseCursor() == ImGuiMouseCursor_TextInput) {
+			return id_type::GUI_CURSOR_TEXT_INPUT;
 		}
 
 		if (ImGui::GetMouseCursor() == ImGuiMouseCursor_ResizeNWSE) {
-			gui_cursor = id_type::GUI_CURSOR_RESIZE_NWSE;
+			return id_type::GUI_CURSOR_RESIZE_NWSE;
 		}
 
-		if (ImGui::GetMouseCursor() == ImGuiMouseCursor_TextInput) {
-			gui_cursor = id_type::GUI_CURSOR_TEXT_INPUT;
+		if (ImGui::IsAnyItemHoveredWithHandCursor()) {
+			return id_type::GUI_CURSOR_HOVER;
 		}
 
-		return gui_cursor;
+		return id_type::GUI_CURSOR;
 	}
 
 	inline auto filter_inputs_for_imgui(augs::local_entropy local) {
@@ -233,25 +251,23 @@ namespace augs {
 		const bool filter_keyboard = ImGui::GetIO().WantTextInput;
 
 		erase_if(local, [filter_mouse, filter_keyboard](const augs::event::change ch) {
-			bool should_filter = false;
-
 			if (filter_mouse && ch.msg == augs::event::message::mousemotion) {
-				should_filter = true;
+				return true;
 			}
 
 			/* We always let release events propagate */
 
 			if (ch.was_any_key_pressed()) {
 				if (filter_mouse && ch.uses_mouse()) {
-					should_filter = true;
+					return true;
 				}
 
 				if (filter_keyboard && ch.uses_keyboard()) {
-					should_filter = true;
+					return true;
 				}
 			}
 
-			return should_filter;
+			return false;
 		});
 
 		return local;
