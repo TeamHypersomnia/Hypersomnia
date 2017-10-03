@@ -1,4 +1,5 @@
 #pragma once
+#include <optional>
 #include <imgui/imgui.h>
 
 #include "augs/templates/function_traits.h"
@@ -197,7 +198,45 @@ namespace augs {
 		auto scoped_indent() {
 			ImGui::Indent();
 
-			return augs::make_scope_guard([]() { ImGui::Unindent(); });
+			return make_scope_guard([]() { ImGui::Unindent(); });
+		}
+
+		auto scoped_item_width(const float v) {
+			ImGui::PushItemWidth(v);
+
+			return make_scope_guard([]() { ImGui::PopItemWidth(); });
+		}
+
+		auto scoped_id(const int v) {
+			ImGui::PushID(v);
+
+			return make_scope_guard([]() { ImGui::PopID(); });
+		}
+
+		auto scoped_tree_node(const char* label) {
+			const auto result = ImGui::TreeNode(label);
+
+			auto opt = std::make_optional(make_scope_guard([result]() { if (result) { ImGui::TreePop(); }}));
+			
+			if (!result) {
+				opt = std::nullopt;
+			}
+
+			return opt;
+		}
+
+		template <class... T>
+		auto scoped_child(T&&... args) {
+			ImGui::BeginChild(std::forward<T>(args)...);
+
+			return make_scope_guard([]() { ImGui::EndChild(); });
+		}
+
+		template <class... T>
+		auto scoped_window(T&&... args) {
+			ImGui::Begin(std::forward<T>(args)...);
+
+			return make_scope_guard([]() { ImGui::End(); });
 		}
 	}
 }
