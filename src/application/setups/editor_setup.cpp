@@ -5,6 +5,7 @@
 #include "augs/templates/thread_templates.h"
 #include "augs/templates/chrono_templates.h"
 #include "augs/window_framework/platform_utils.h"
+#include "augs/window_framework/shell.h"
 
 #include "application/config_lua_table.h"
 #include "application/setups/editor_setup.h"
@@ -61,31 +62,6 @@ void editor_setup::control(
 
 }
 
-void editor_setup::play() {
-	player_paused = false;
-}
-
-void editor_setup::pause() {
-	player_paused = true;
-}
-
-void editor_setup::play_pause() {
-	auto& f = player_paused;
-	f = !f;
-}
-
-void editor_setup::stop() {
-	player_paused = true;
-}
-
-void editor_setup::prev() {
-	player_paused = true;
-}
-
-void editor_setup::next() {
-	player_paused = true;
-}
-
 void editor_setup::customize_for_viewing(config_lua_table& config) const {
 	config.window.name = "Editor - " + current_workspace_path.string();
 	return;
@@ -106,11 +82,25 @@ void editor_setup::perform_custom_imgui(
 					start_open_file_dialog();
 				}
 
+				if (ImGui::MenuItem("Recent files")) {
+
+				}
+
+				ImGui::Separator();
+
 				if (ImGui::MenuItem("Save", "CTRL+S")) {
 
 				}
 
 				if (ImGui::MenuItem("Save as", "F12")) {
+
+				}
+
+				if (ImGui::MenuItem("Export", "CTRL+E")) {
+
+				}
+
+				if (ImGui::MenuItem("Export as")) {
 
 				}
 			}
@@ -148,7 +138,7 @@ void editor_setup::perform_custom_imgui(
 				}
 
 				if (ImGui::MenuItem("Entities")) {
-
+					go_to_all();
 				}
 			}
 		}
@@ -216,7 +206,11 @@ void editor_setup::perform_custom_imgui(
 	}
 
 	if (show_common_state) {
-		auto common = scoped_window("Common", &show_common_state);
+		auto common = scoped_window("Common", &show_common_state, ImGuiWindowFlags_AlwaysAutoResize);
+	}
+
+	if (show_entities) {
+		auto entities = scoped_window("Entities", &show_entities, ImGuiWindowFlags_AlwaysAutoResize);
 	}
 
 	if (current_popup) {
@@ -279,50 +273,71 @@ bool editor_setup::confirm_modal_popup() {
 	return false;
 }
 
-void editor_setup::handle_open_shortcut() {
+void editor_setup::open() {
 	start_open_file_dialog();
 }
 
-void editor_setup::handle_save_shortcut() {
+void editor_setup::save() {
 
 }
 
-void editor_setup::handle_save_as_shortcut() {
+void editor_setup::save_as() {
 
 }
 
-void editor_setup::handle_undo_shortcut() {
+void editor_setup::undo() {
 
 }
 
-void editor_setup::handle_redo_shortcut() {
+void editor_setup::redo() {
 
 }
 
-void editor_setup::handle_copy_shortcut() {
+void editor_setup::copy() {
 
 }
 
-void editor_setup::handle_cut_shortcut() {
+void editor_setup::cut() {
 
 }
 
-void editor_setup::handle_paste_shortcut() {
+void editor_setup::paste() {
 
 }
 
-void editor_setup::handle_play_pause_key() {
-	play_pause();
+void editor_setup::go_to_all() {
+	show_entities = true;
 }
 
-void editor_setup::handle_next_key() {
-	next();
+void editor_setup::open_containing_folder() {
+	if (const auto path_str = augs::path_type(current_workspace_path).replace_filename("").string();
+		path_str.size() > 0
+	) {
+		augs::shell(path_str);
+	}
 }
 
-void editor_setup::handle_prev_key() {
-	prev();
+void editor_setup::play() {
+	player_paused = false;
 }
 
-void editor_setup::handle_stop_key() {
-	stop();
+void editor_setup::pause() {
+	player_paused = true;
+}
+
+void editor_setup::play_pause() {
+	auto& f = player_paused;
+	f = !f;
+}
+
+void editor_setup::stop() {
+	player_paused = true;
+}
+
+void editor_setup::prev() {
+	player_paused = true;
+}
+
+void editor_setup::next() {
+	player_paused = true;
 }

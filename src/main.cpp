@@ -868,10 +868,10 @@ int work(const int argc, const char* const * const argv) try {
 									const auto k = e.key.key;
 
 									switch (k) {
-										case key::PLAY_PAUSE_TRACK: setup.handle_play_pause_key(); return true;
-										case key::PREV_TRACK: setup.handle_prev_key(); return true;
-										case key::NEXT_TRACK: setup.handle_next_key(); return true;
-										case key::STOP_TRACK: setup.handle_stop_key(); return true;
+										case key::PLAY_PAUSE_TRACK: setup.play_pause(); return true;
+										case key::PREV_TRACK: setup.prev(); return true;
+										case key::NEXT_TRACK: setup.next(); return true;
+										case key::STOP_TRACK: setup.stop(); return true;
 										default: break;
 									}
 								}
@@ -882,7 +882,7 @@ int work(const int argc, const char* const * const argv) try {
 									const auto k = e.key.key;
 
 									switch (k) {
-										case key::F12: setup.handle_save_as_shortcut(); return true;
+										case key::F12: setup.save_as(); return true;
 										default: break;
 									}
 
@@ -894,18 +894,20 @@ int work(const int argc, const char* const * const argv) try {
 											has_shift
 										) {
 											switch (k) {
-												case key::Z: setup.handle_redo_shortcut(); return true;
+												case key::Z: setup.redo(); return true;
+												case key::E: setup.open_containing_folder(); return true;
 												default: break;
 											}
 										}
 										else {
 											switch (k) {
-												case key::S: setup.handle_save_shortcut(); return true;
-												case key::Z: setup.handle_undo_shortcut(); return true;
-												case key::O: setup.handle_open_shortcut(); return true;
-												case key::C: setup.handle_copy_shortcut(); return true;
-												case key::X: setup.handle_cut_shortcut(); return true;
-												case key::Y: setup.handle_paste_shortcut(); return true;
+												case key::S: setup.save(); return true;
+												case key::Z: setup.undo(); return true;
+												case key::O: setup.open(); return true;
+												case key::C: setup.copy(); return true;
+												case key::X: setup.cut(); return true;
+												case key::Y: setup.paste(); return true;
+												case key::P: setup.go_to_all(); return true;
 												default: break;
 											}
 										}

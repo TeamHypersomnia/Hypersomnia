@@ -39,16 +39,13 @@ class editor_setup {
 	bool show_summary = true;
 	bool show_player = true;
 	bool show_common_state = false;
+	bool show_entities = false;
 
 	double player_speed = 1.0;
 	bool player_paused = true;
 
 	void play();
 	void pause();
-	void play_pause();
-	void stop();
-	void prev();
-	void next();
 
 	workspace work;
 
@@ -139,18 +136,21 @@ public:
 	bool escape_modal_popup();
 	bool confirm_modal_popup();
 
-	void handle_open_shortcut();
-	void handle_save_shortcut();
-	void handle_save_as_shortcut();
-	void handle_undo_shortcut();
-	void handle_redo_shortcut();
+	void open();
+	void save();
+	void save_as();
+	void undo();
+	void redo();
 
-	void handle_copy_shortcut();
-	void handle_cut_shortcut();
-	void handle_paste_shortcut();
+	void copy();
+	void cut();
+	void paste();
 
-	void handle_play_pause_key();
-	void handle_stop_key();
-	void handle_prev_key();
-	void handle_next_key();
+	void play_pause();
+	void stop();
+	void prev();
+	void next();
+
+	void go_to_all();
+	void open_containing_folder();
 };
