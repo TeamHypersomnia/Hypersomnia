@@ -18,7 +18,7 @@ struct value_bar : game_gui_rect_node {
 		assets::necessary_image_id tex;
 	};
 
-	border_input border;
+	border_input border = { 1, 1 };
 	
 	float seconds_accumulated = 0.f;
 

@@ -261,18 +261,15 @@ namespace augs {
 		const texture_atlas_entry tex,
 		ltrb bordered,
 		const rgba color,
-		const border_input in
+		border_input in
 	) const {
-		const auto total = in.get_total_expansion();
+		{
+			const auto total = in.get_total_expansion();
 
-		bordered.l -= total;
-		bordered.t -= total;
-		bordered.r += total;
-		bordered.b += total;
-
-		if (in.spacing == 0) {
-			bordered.l++;
-			bordered.t++;
+			bordered.l -= total;
+			bordered.t -= total;
+			bordered.r += total;
+			bordered.b += total;
 		}
 
 		ltrb lines[4] = {
@@ -282,10 +279,26 @@ namespace augs {
 			bordered
 		};
 
+		/*
+			Side borders reach the corners,
+			the bottom and the top borders are in-between them.
+		*/
+
+		/* Left border */
 		lines[0].r = bordered.l + in.width;
+
+		/* Top border */
 		lines[1].b = bordered.t + in.width;
+		lines[1].r -= in.width;
+		lines[1].l += in.width;
+
+		/* Right border */
 		lines[2].l = bordered.r - in.width;
+		
+		/* Bottom border */
 		lines[3].t = bordered.b - in.width;
+		lines[3].r -= in.width;
+		lines[3].l += in.width;
 
 		aabb(tex, lines[0], color);
 		aabb(tex, lines[1], color);
