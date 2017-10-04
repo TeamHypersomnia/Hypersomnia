@@ -98,7 +98,8 @@ public:
 	}
 
 	void perform_custom_imgui(
-		sol::state& lua
+		sol::state& lua,
+		const bool game_gui_active
 	);
 
 	bool during_popup() const {

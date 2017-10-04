@@ -710,13 +710,14 @@ int work(const int argc, const char* const * const argv) try {
 
 					/* MSVC ICE workaround */
 					auto& _lua = lua;
+					auto& _game_gui = game_gui;
 
 					visit_current_setup([&](auto& setup) {
 						using T = std::decay_t<decltype(setup)>;
 
 						if constexpr(std::is_same_v<T, editor_setup>) {
 							/* Editor needs more goods */
-							setup.perform_custom_imgui(_lua);
+							setup.perform_custom_imgui(_lua, _game_gui.active);
 						}
 						else {
 							setup.perform_custom_imgui();
@@ -939,7 +940,7 @@ int work(const int argc, const char* const * const argv) try {
 
 						const auto viewed_character = get_viewed_character();
 
-						const bool pass_to_gameplay =
+						const bool direct_gameplay_or_game_gui =
 							viewed_character.alive()
 							&& (
 								current_setup.has_value()
@@ -957,7 +958,7 @@ int work(const int argc, const char* const * const argv) try {
 								}
 							}
 							else {
-								if (pass_to_gameplay) {
+								if (direct_gameplay_or_game_gui) {
 									if (const auto it = mapped_or_nullptr(viewing_config.app_ingame_controls, key)) {
 										if (was_pressed) {
 											handle_app_ingame_intent(*it);
@@ -980,7 +981,7 @@ int work(const int argc, const char* const * const argv) try {
 						else {
 							if (
 								e.msg == message::mousemotion
-								&& pass_to_gameplay
+								&& direct_gameplay_or_game_gui
 								&& !game_gui.active
 							) {
 								game_motions.push_back({ game_motion_type::MOVE_CROSSHAIR, e.mouse.rel });
@@ -997,7 +998,7 @@ int work(const int argc, const char* const * const argv) try {
 							ingame_menu.control(create_menu_context(ingame_menu), e, do_ingame_menu_option);
 						}
 						
-						if (pass_to_gameplay || e.was_any_key_released()) {
+						if (direct_gameplay_or_game_gui || e.was_any_key_released()) {
 							game_gui.control_gui_world(create_game_gui_context(), e);
 						}
 					}

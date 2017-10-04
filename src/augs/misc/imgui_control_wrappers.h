@@ -97,6 +97,10 @@ namespace augs {
 			ImGui::Text(t.c_str());
 		}
 
+		inline void text(const std::wstring& t) {
+			text(to_string(t));
+		}
+
 		inline void text(const char* const t) {
 			ImGui::Text(t);
 		}

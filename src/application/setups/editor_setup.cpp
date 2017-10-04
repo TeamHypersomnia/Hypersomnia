@@ -92,61 +92,64 @@ void editor_setup::customize_for_viewing(config_lua_table& config) const {
 }
 
 void editor_setup::perform_custom_imgui(
-	sol::state& lua
+	sol::state& lua,
+	const bool game_gui_active
 ) {
 	using namespace augs::imgui;
 
-	if (auto main_menu = scoped_main_menu_bar()) {
-		if (auto menu = scoped_menu("File")) {
-			if (ImGui::MenuItem("New", "CTRL+N")) {}
+	if (game_gui_active) {
+		if (auto main_menu = scoped_main_menu_bar()) {
+			if (auto menu = scoped_menu("File")) {
+				if (ImGui::MenuItem("New", "CTRL+N")) {}
 
-			if (ImGui::MenuItem("Open", "CTRL+O")) {
-				start_open_file_dialog();
+				if (ImGui::MenuItem("Open", "CTRL+O")) {
+					start_open_file_dialog();
+				}
+
+				if (ImGui::MenuItem("Save", "CTRL+S")) {
+
+				}
+
+				if (ImGui::MenuItem("Save as", "F12")) {
+
+				}
 			}
+			if (auto menu = scoped_menu("Edit")) {
+				if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
+				if (ImGui::MenuItem("Redo", "CTRL+SHIFT+Z", false, false)) {}
+				ImGui::Separator();
+				if (ImGui::MenuItem("Cut", "CTRL+X")) {}
+				if (ImGui::MenuItem("Copy", "CTRL+C")) {}
+				if (ImGui::MenuItem("Paste", "CTRL+V")) {}
+				ImGui::Separator();
 
-			if (ImGui::MenuItem("Save", "CTRL+S")) {
-
-			}
-
-			if (ImGui::MenuItem("Save as", "F12")) {
-
-			}
-		}
-		if (auto menu = scoped_menu("Edit")) {
-			if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
-			if (ImGui::MenuItem("Redo", "CTRL+SHIFT+Z", false, false)) {}
-			ImGui::Separator();
-			if (ImGui::MenuItem("Cut", "CTRL+X")) {}
-			if (ImGui::MenuItem("Copy", "CTRL+C")) {}
-			if (ImGui::MenuItem("Paste", "CTRL+V")) {}
-			ImGui::Separator();
-
-#if BUILD_TEST_SCENES
-			if (ImGui::MenuItem("Fill with test scene")) {
-				work.make_test_scene(lua, false);
-				viewed_character_id = work.world.get_entity_by_name(L"player0");
-			}
+#if	BUILD_TEST_SCENES
+				if (ImGui::MenuItem("Fill with test scene")) {
+					work.make_test_scene(lua, false);
+					viewed_character_id = work.world.get_entity_by_name(L"player0");
+				}
 #else
-			if (ImGui::MenuItem("Fill with test scene", nullptr, false, false)) {}
+				if (ImGui::MenuItem("Fill with test scene", nullptr, false, false)) {}
 #endif
-		}
-		if (auto menu = scoped_menu("View")) {
-			if (ImGui::MenuItem("Summary")) {
-				show_summary = true;
 			}
-			if (ImGui::MenuItem("Player")) {
-				show_player = true;
-			}
+			if (auto menu = scoped_menu("View")) {
+				if (ImGui::MenuItem("Summary")) {
+					show_summary = true;
+				}
+				if (ImGui::MenuItem("Player")) {
+					show_player = true;
+				}
 
-			ImGui::Separator();
-			ImGui::MenuItem("(State)", NULL, false, false);
+				ImGui::Separator();
+				ImGui::MenuItem("(State)", NULL, false, false);
 
-			if (ImGui::MenuItem("Common")) {
-				show_common_state = true;
-			}
+				if (ImGui::MenuItem("Common")) {
+					show_common_state = true;
+				}
 
-			if (ImGui::MenuItem("Entities")) {
+				if (ImGui::MenuItem("Entities")) {
 
+				}
 			}
 		}
 	}
@@ -184,6 +187,12 @@ void editor_setup::perform_custom_imgui(
 			typesafe_sprintf("World time: %x (%x steps)",
 				standard_format_seconds(get_viewed_cosmos().get_total_seconds_passed()),
 				get_viewed_cosmos().get_total_steps_passed()
+			)
+		);
+
+		text(
+			typesafe_sprintf(L"Currently viewing: %x",
+				get_viewed_character().alive() ? get_viewed_character().get_name() : L"no entity"
 			)
 		);
 	}
