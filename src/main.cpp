@@ -608,7 +608,7 @@ int work(const int argc, const char* const * const argv) try {
 
 	static release_flags releases;
 
-	/* MSVC ICE FIX */
+	/* MSVC ICE workaround */
 	auto& _common_input_state = common_input_state;
 
 	static auto make_create_game_gui_context = [&](const config_lua_table& cfg) {
@@ -652,11 +652,11 @@ int work(const int argc, const char* const * const argv) try {
 			The result, which is the collection of new game commands, will be passed further down the loop. 
 		*/
 
-		struct control_result {
-			const cosmic_entropy new_game_entropy;
-			const bool was_system_cursor_kidnapped;
-			const config_lua_table viewing_config;
-		} const result = [frame_delta]() -> control_result {
+		const auto [
+			new_game_entropy, 
+			was_system_cursor_kidnapped, 
+			viewing_config
+		] = [frame_delta]() {
 			static game_intents game_intents;
 			static game_motions game_motions;
 
@@ -997,7 +997,7 @@ int work(const int argc, const char* const * const argv) try {
 				beyond the closing of this scope.
 			*/
 
-			return {
+			return std::make_tuple(
 				cosmic_entropy(
 					get_viewed_character(),
 					game_intents,
@@ -1005,7 +1005,7 @@ int work(const int argc, const char* const * const argv) try {
 				),
 				was_system_cursor_kidnapped,
 				viewing_config
-			};
+			);
 		}();
 
 		/* 
@@ -1037,7 +1037,6 @@ int work(const int argc, const char* const * const argv) try {
 			}
 		);
 
-		const auto& viewing_config = result.viewing_config;
 		const auto screen_size = viewing_config.window.get_screen_size();
 
 		auto create_menu_context = make_create_menu_context(viewing_config);
@@ -1049,7 +1048,7 @@ int work(const int argc, const char* const * const argv) try {
 			that it chooses via get_viewed_cosmos.
 		*/
 
-		advance_current_setup(frame_delta, result.new_game_entropy, viewing_config);
+		advance_current_setup(frame_delta, new_game_entropy, viewing_config);
 		
 		/*
 			Game GUI might have been altered by the step's post-solve,
@@ -1238,7 +1237,7 @@ int work(const int argc, const char* const * const argv) try {
 		);
 
 		/* #6 */
-		const bool should_draw_our_cursor = result.was_system_cursor_kidnapped;
+		const bool should_draw_our_cursor = was_system_cursor_kidnapped;
 
 		{
 			const auto cursor_drawing_pos = common_input_state.mouse.pos;
