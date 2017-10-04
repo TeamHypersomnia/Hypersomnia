@@ -22,7 +22,7 @@ namespace augs {
 
 			using rect_world_ref = maybe_const_ref_t<is_const, rect_world_type>;
 			using tree_ref = maybe_const_ref_t<is_const, tree_type>;
-			using rect_tree_entry_ref = maybe_const_ref_t<is_const, rect_tree_entry<gui_element_variant_id>>;
+			using rect_tree_entry_type = rect_tree_entry<gui_element_variant_id>;
 
 			rect_world_ref world;
 			tree_ref tree;
@@ -54,8 +54,10 @@ namespace augs {
 				return world;
 			}
 
-			rect_tree_entry_ref get_tree_entry(const gui_element_variant_id& id) const {
-				return tree.at(id);
+			rect_tree_entry_type get_tree_entry(const gui_element_variant_id& id) const {
+				const auto& self = *static_cast<const derived*>(this);
+
+				return mapped_or_default(tree, id, ltrb {}, self.get_root_id());
 			}
 
 			auto get_screen_size() const {

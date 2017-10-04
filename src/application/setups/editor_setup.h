@@ -40,6 +40,7 @@ class editor_setup {
 	bool show_player = true;
 	bool show_common_state = false;
 	bool show_entities = false;
+	bool show_go_to_all = false;
 
 	double player_speed = 1.0;
 	bool player_paused = true;

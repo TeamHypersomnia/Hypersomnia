@@ -13,9 +13,9 @@ public:
 	) {
 		const auto handle = context.get_subject_entity();
 
-		// we do not dereference the gui element's entity location because it is possibly not an item;
-		// however it is assumed to be a container so we call the callback on the element's children
-		// i.e. the player has a gui element component and container component but not an item component.
+		if (!handle.has<components::item_slot_transfers>()) {
+			return;
+		}
 
 		item_button::for_each_child(context, item_button_in_item{ handle.get_id() }, generic_call);
 

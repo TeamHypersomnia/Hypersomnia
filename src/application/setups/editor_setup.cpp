@@ -138,7 +138,7 @@ void editor_setup::perform_custom_imgui(
 				}
 
 				if (ImGui::MenuItem("Entities")) {
-					go_to_all();
+					show_entities = true;
 				}
 			}
 		}
@@ -210,7 +210,26 @@ void editor_setup::perform_custom_imgui(
 	}
 
 	if (show_entities) {
-		auto entities = scoped_window("Entities", &show_entities, ImGuiWindowFlags_AlwaysAutoResize);
+		auto entities = scoped_window("Entities", &show_entities);
+
+		static ImGuiTextFilter filter;
+		filter.Draw();
+
+		work.world.for_each_entity_id([&](const entity_id id) {
+			const auto handle = work.world[id];
+			const auto name = to_string(handle.get_name());
+
+			if (filter.PassFilter(name.c_str())) {
+				auto scope = scoped_id(id.indirection_index);
+
+				if (auto node = scoped_tree_node(name.c_str())) {
+					if (ImGui::Button("Control")) {
+						viewed_character_id = id;
+					}
+				}
+			}
+
+		});
 	}
 
 	if (current_popup) {
@@ -306,7 +325,7 @@ void editor_setup::paste() {
 }
 
 void editor_setup::go_to_all() {
-	show_entities = true;
+	show_go_to_all = true;
 }
 
 void editor_setup::open_containing_folder() {

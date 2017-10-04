@@ -116,8 +116,8 @@ bool found_in(Container& v, const T& l) {
 	return find_in(v, l) != v.end();
 }
 
-template <class T>
-auto default_or_invalid_enum() {
+template <class T, class... Args>
+auto default_or_invalid_enum(Args&&... args) {
 	if constexpr(std::is_enum_v<T>) {
 		return T::INVALID;
 	}
@@ -127,7 +127,7 @@ auto default_or_invalid_enum() {
 			"Default value for arithmetic types is not well-defined."
 		);
 
-		return T{};
+		return T { std::forward<Args>(args)... };
 	}
 }
 
@@ -145,10 +145,11 @@ auto value_or_nullptr(
 	return nullptr;
 }
 
-template <class Container, class Key>
+template <class Container, class Key, class... Args>
 auto mapped_or_default(
 	const Container& container, 
-	const Key& key
+	const Key& key,
+	Args&&... args
 ) {
 	using M = typename std::decay_t<Container>::mapped_type;
 
@@ -158,7 +159,7 @@ auto mapped_or_default(
 		return (*it).second;
 	}
 
-	return default_or_invalid_enum<M>();
+	return default_or_invalid_enum<M>(std::forward<Args>(args)...);
 }
 
 template <class Container, class Key>
