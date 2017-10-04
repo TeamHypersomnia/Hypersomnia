@@ -23,10 +23,16 @@ namespace augs {
 		
 			return make_scope_guard([]() { ImGui::PopItemWidth(); });
 		}
-		
+
 		auto scoped_id(const int v) {
 			ImGui::PushID(v);
-		
+
+			return make_scope_guard([]() { ImGui::PopID(); });
+		}
+
+		auto scoped_id(void* const v) {
+			ImGui::PushID(v);
+
 			return make_scope_guard([]() { ImGui::PopID(); });
 		}
 		

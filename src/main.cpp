@@ -597,7 +597,7 @@ int work(const int argc, const char* const * const argv) try {
 	else {
 		launch(config.get_launch_mode());
 	}
-	
+
 	/* 
 		The main loop variables.
 	*/
@@ -608,36 +608,36 @@ int work(const int argc, const char* const * const argv) try {
 
 	static release_flags releases;
 
+	/* MSVC ICE FIX */
+	auto& _common_input_state = common_input_state;
+
+	static auto make_create_game_gui_context = [&](const config_lua_table& cfg) {
+		return [&]() {
+			return game_gui.create_context(
+				cfg.window.get_screen_size(),
+				_common_input_state,
+				get_viewed_character(),
+				create_game_gui_deps()
+			);
+		};
+	};
+
+	static auto make_create_menu_context = [&](const config_lua_table& cfg) {
+		return [&](auto& gui) {
+			return gui.create_context(
+				cfg.window.get_screen_size(),
+				_common_input_state,
+				create_menu_context_deps(cfg)
+			);
+		};
+	};
+
 	LOG("Entered the main loop.");
 
 	while (!should_quit) {
 		auto scope = measure_scope(profiler.fps);
 
 		const auto frame_delta = frame_timer.extract_delta();
-		const auto screen_size = window.get_screen_size();
-
-		/*
-			Additional lambda helpers.
-		*/
-		
-		auto viewing_config = config_lua_table();
-
-		auto create_menu_context = [&](auto& gui) {
-			return gui.create_context(
-				screen_size,
-				common_input_state,
-				create_menu_context_deps(viewing_config)
-			);
-		};
-
-		auto create_game_gui_context = [&]() {
-			return game_gui.create_context(
-				screen_size,
-				common_input_state,
-				get_viewed_character(),
-				create_game_gui_deps()
-			);
-		};
 
 		/* 
 			The centralized transformation of all window inputs.
@@ -652,9 +652,11 @@ int work(const int argc, const char* const * const argv) try {
 			The result, which is the collection of new game commands, will be passed further down the loop. 
 		*/
 
-		bool was_system_cursor_kidnapped = false;
-
-		const auto new_game_entropy = [&]() {
+		struct control_result {
+			const cosmic_entropy new_game_entropy;
+			const bool was_system_cursor_kidnapped;
+			const config_lua_table viewing_config;
+		} const result = [frame_delta]() -> control_result {
 			static game_intents game_intents;
 			static game_motions game_motions;
 
@@ -692,7 +694,7 @@ int work(const int argc, const char* const * const argv) try {
 
 			perform_imgui_pass(
 				new_window_entropy,
-				screen_size,
+				window.get_screen_size(),
 				frame_delta,
 				config,
 				last_saved_config,
@@ -734,7 +736,7 @@ int work(const int argc, const char* const * const argv) try {
 
 			const auto& _config = config;
 
-			viewing_config = visit_current_setup([&_config](auto& setup) {
+			const auto viewing_config = visit_current_setup([&_config](auto& setup) {
 				auto config_copy = _config;
 
 				/*
@@ -750,6 +752,8 @@ int work(const int argc, const char* const * const argv) try {
 
 			configurables.apply(viewing_config);
 
+			bool was_system_cursor_kidnapped = false;
+			
 			if (window.is_active()
 				&& (
 					in_direct_gameplay
@@ -773,7 +777,10 @@ int work(const int argc, const char* const * const argv) try {
 
 			releases.set_due_to_imgui(ImGui::GetIO());
 
-			/* 
+			auto create_menu_context = make_create_menu_context(viewing_config);
+			auto create_game_gui_context = make_create_game_gui_context(viewing_config);
+
+			/*
 				Since ImGUI has quite a different philosophy about input,
 				we will need some ugly inter-op with our GUIs.
 			*/
@@ -797,7 +804,9 @@ int work(const int argc, const char* const * const argv) try {
 
 				ingame_menu.world.unhover_and_undrag(create_menu_context(ingame_menu));
 			}
+
 			/* Maybe the game GUI was deactivated while the button was still hovered */
+
 			else if (!game_gui.active && current_setup.has_value()) {
 				game_gui.world.unhover_and_undrag(create_game_gui_context());
 			}
@@ -988,11 +997,15 @@ int work(const int argc, const char* const * const argv) try {
 				beyond the closing of this scope.
 			*/
 
-			return cosmic_entropy(
-				get_viewed_character(), 
-				game_intents, 
-				game_motions
-			);
+			return {
+				cosmic_entropy(
+					get_viewed_character(),
+					game_intents,
+					game_motions
+				),
+				was_system_cursor_kidnapped,
+				viewing_config
+			};
 		}();
 
 		/* 
@@ -1024,13 +1037,19 @@ int work(const int argc, const char* const * const argv) try {
 			}
 		);
 
+		const auto& viewing_config = result.viewing_config;
+		const auto screen_size = viewing_config.window.get_screen_size();
+
+		auto create_menu_context = make_create_menu_context(viewing_config);
+		auto create_game_gui_context = make_create_game_gui_context(viewing_config);
+
 		/* 
 			Advance the current setup's logic,
 			and let the audiovisual_state sample the game world 
 			that it chooses via get_viewed_cosmos.
 		*/
 
-		advance_current_setup(frame_delta, new_game_entropy, viewing_config);
+		advance_current_setup(frame_delta, result.new_game_entropy, viewing_config);
 		
 		/*
 			Game GUI might have been altered by the step's post-solve,
@@ -1219,7 +1238,7 @@ int work(const int argc, const char* const * const argv) try {
 		);
 
 		/* #6 */
-		const bool should_draw_our_cursor = was_system_cursor_kidnapped;
+		const bool should_draw_our_cursor = result.was_system_cursor_kidnapped;
 
 		{
 			const auto cursor_drawing_pos = common_input_state.mouse.pos;

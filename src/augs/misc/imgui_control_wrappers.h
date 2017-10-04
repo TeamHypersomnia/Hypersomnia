@@ -179,15 +179,13 @@ namespace augs {
 				bool changed = false;
 
 				if (!(field == corresponding_last_saved_field)) {
-					ImGui::PushID(reinterpret_cast<void*>(&field)); 
+					auto id = scoped_id(reinterpret_cast<void*>(&field)); 
 					ImGui::SameLine(); 
 
 					if (ImGui::Button("Revert")) { 
 						field = corresponding_last_saved_field;
 						changed = true;
 					} 
-					
-					ImGui::PopID(); 
 				}
 				
 				return changed;
