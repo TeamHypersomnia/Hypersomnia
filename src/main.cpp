@@ -837,18 +837,16 @@ int work(const int argc, const char* const * const argv) try {
 					current_setup.has_value()
 					&& e.was_pressed(key::ESC)
 				) {
-					if (const auto fetched = visit_current_setup([&](auto& setup) {
-							using T = std::decay_t<decltype(setup)>;
+					if (const auto not_fetched = !visit_current_setup([&](auto& setup) {
+						using T = std::decay_t<decltype(setup)>;
 
-							if constexpr(T::has_modal_popups) {
-								return setup.escape_modal_popup();
-							}
-							else {
-								return false;
-							}
-						});
-						!fetched
-					) {
+						if constexpr(T::has_modal_popups) {
+							return setup.escape_modal_popup();
+						}
+						else {
+							return false;
+						}
+					})) {
 						bool& f = ingame_menu.show;
 						f = !f;
 						releases.set_all();
@@ -863,6 +861,20 @@ int work(const int argc, const char* const * const argv) try {
 						
 						if (visit_current_setup([&](auto& setup) {
 							using T = std::decay_t<decltype(setup)>;
+
+							if constexpr(T::accepts_media_keys) {
+								if (e.was_any_key_pressed()) {
+									const auto k = e.key.key;
+
+									switch (k) {
+										case key::PLAY_PAUSE_TRACK: setup.handle_play_pause_key(); return true;
+										case key::PREV_TRACK: setup.handle_prev_key(); return true;
+										case key::NEXT_TRACK: setup.handle_next_key(); return true;
+										case key::STOP_TRACK: setup.handle_stop_key(); return true;
+										default: break;
+									}
+								}
+							}
 
 							if constexpr(T::accepts_shortcuts) {
 								if (e.was_any_key_pressed()) {

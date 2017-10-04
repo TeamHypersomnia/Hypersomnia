@@ -125,7 +125,7 @@ auto default_or_invalid_enum() {
 		static_assert(
 			!std::is_arithmetic_v<T>,
 			"Default value for arithmetic types is not well-defined."
-			);
+		);
 
 		return T{};
 	}
@@ -137,8 +137,8 @@ auto value_or_nullptr(
 	const Key& key
 ) -> decltype(std::addressof(*container.begin())) {
 	if (const auto it = find_in(container, key);
-		it != container.end()) 
-	{
+		it != container.end()
+	) {
 		return std::addressof(*it);
 	}
 
@@ -178,13 +178,13 @@ auto mapped_or_nullptr(
 template <class Container, class Value>
 auto key_or_default(
 	const Container& container, 
-	const Value& value
+	const Value& searched_value
 ) {
 	using K = typename std::decay_t<Container>::key_type;
 
-	for (const auto& it : container) {
-		if (it.second == value) {
-			return it.first;
+	for (const auto& [key, tested_value] : container) {
+		if (tested_value == searched_value) {
+			return key;
 		}
 	}
 

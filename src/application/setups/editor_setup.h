@@ -43,6 +43,13 @@ class editor_setup {
 	double player_speed = 1.0;
 	bool player_paused = true;
 
+	void play();
+	void pause();
+	void play_pause();
+	void stop();
+	void prev();
+	void next();
+
 	workspace work;
 
 	cosmic_entropy total_collected_entropy;
@@ -60,6 +67,7 @@ class editor_setup {
 
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
+	static constexpr bool accepts_media_keys = true;
 	static constexpr bool accepts_shortcuts = true;
 	static constexpr bool has_modal_popups = true;
 
@@ -139,4 +147,9 @@ public:
 	void handle_copy_shortcut();
 	void handle_cut_shortcut();
 	void handle_paste_shortcut();
+
+	void handle_play_pause_key();
+	void handle_stop_key();
+	void handle_prev_key();
+	void handle_next_key();
 };

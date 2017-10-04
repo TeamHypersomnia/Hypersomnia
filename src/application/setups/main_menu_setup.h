@@ -61,6 +61,7 @@ class main_menu_setup {
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL_ONLY_ONCE;
 	static constexpr bool accepts_shortcuts = false;
+	static constexpr bool accepts_media_keys = false;
 	static constexpr bool has_modal_popups = false;
 
 	main_menu_gui gui;

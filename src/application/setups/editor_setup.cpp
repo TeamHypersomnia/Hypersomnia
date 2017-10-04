@@ -61,6 +61,31 @@ void editor_setup::control(
 
 }
 
+void editor_setup::play() {
+	player_paused = false;
+}
+
+void editor_setup::pause() {
+	player_paused = true;
+}
+
+void editor_setup::play_pause() {
+	auto& f = player_paused;
+	f = !f;
+}
+
+void editor_setup::stop() {
+	player_paused = true;
+}
+
+void editor_setup::prev() {
+	player_paused = true;
+}
+
+void editor_setup::next() {
+	player_paused = true;
+}
+
 void editor_setup::customize_for_viewing(config_lua_table& config) const {
 	config.window.name = "Editor - " + current_workspace_path.string();
 	return;
@@ -167,25 +192,22 @@ void editor_setup::perform_custom_imgui(
 		auto player = scoped_window("Player", &show_player, ImGuiWindowFlags_AlwaysAutoResize);
 
 		if (ImGui::Button("Play")) {
-			player_paused = false;
+			play();
 		}
 		ImGui::SameLine();
 		
 		if (ImGui::Button("Pause")) {
-			player_paused = true;
+			pause();
 		}
 		ImGui::SameLine();
 		
 		if (ImGui::Button("Stop")) {
-			player_paused = true;
+			stop();
 		}
 	}
 
-
 	if (show_common_state) {
 		auto common = scoped_window("Common", &show_common_state);
-
-
 	}
 
 	if (current_popup) {
@@ -278,4 +300,20 @@ void editor_setup::handle_cut_shortcut() {
 
 void editor_setup::handle_paste_shortcut() {
 
+}
+
+void editor_setup::handle_play_pause_key() {
+	play_pause();
+}
+
+void editor_setup::handle_next_key() {
+	next();
+}
+
+void editor_setup::handle_prev_key() {
+	prev();
+}
+
+void editor_setup::handle_stop_key() {
+	stop();
 }
