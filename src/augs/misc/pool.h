@@ -216,21 +216,45 @@ namespace augs {
 		}
 
 		T& get(const id_type object) {
-			ensure(alive(object));
-			return pooled[get_real_index(object)];
+			ensure(object.indirection_index < indirectors.size());
+			const auto& indirector = indirectors[object.indirection_index];
+			ensure(indirector.version == object.version);
+			return pooled[indirector.real_index];
 		}
 
 		const T& get(const id_type object) const {
-			ensure(alive(object));
-			return pooled[get_real_index(object)];
+			ensure(object.indirection_index < indirectors.size());
+			const auto& indirector = indirectors[object.indirection_index];
+			ensure(indirector.version == object.version);
+			return pooled[indirector.real_index];
 		}
 
 		T* find(const id_type object) {
-			return alive(object) ? &get(object) : nullptr; 
+			if (object.indirection_index >= indirectors.size()) {
+				return nullptr;
+			}
+			
+			const auto& indirector = indirectors[object.indirection_index];
+
+			if (indirector.version != object.version) {
+				return nullptr;
+			}
+
+			return &pooled[indirector.real_index];
 		}
 
 		const T* find(const id_type object) const {
-			return alive(object) ? &get(object) : nullptr; 
+			if (object.indirection_index >= indirectors.size()) {
+				return nullptr;
+			}
+
+			const auto& indirector = indirectors[object.indirection_index];
+
+			if (indirector.version != object.version) {
+				return nullptr;
+			}
+
+			return &pooled[indirector.real_index];
 		}
 
 		bool alive(const id_type object) const {
