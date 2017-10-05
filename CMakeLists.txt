@@ -23,6 +23,18 @@ option(ADD_APPLICATION_ICON "Add application icon." ON)
 
 option(HYPERSOMNIA_BARE "Build the minimal possible Hypersomnia runtime. For testing or quick iteration." OFF)
 
+# Other variables.
+
+# If this variable is positive, the cosmos class will use a statically allocated number
+# of entities, possibly improving performance. Might be very useful for a sever application.
+# Pros: 
+# 	+ Dereferencing entities with speed of light
+# Cons:
+#	- Compilation might be longer due to component includes needed everywhere
+#	- Can't tweak maximum number of entities at runtime
+#	- For every game world, there's always maximum of possible memory allocated 
+set(STATICALLY_ALLOCATE_ENTITIES_NUM 5000)
+
 if (HYPERSOMNIA_BARE)
 	set(BUILD_SOUND_FORMAT_DECODERS FALSE CACHE BOOL "" FORCE)
 	set(BUILD_OPENAL FALSE CACHE BOOL "" FORCE)
@@ -739,6 +751,11 @@ endif()
 
 if(ADD_APPLICATION_ICON)
 	add_definitions(-DADD_APPLICATION_ICON)
+endif()
+
+# We configure additional user options for building the game.
+if(STATICALLY_ALLOCATE_ENTITIES_NUM)
+	add_definitions(-DSTATICALLY_ALLOCATE_ENTITIES_NUM=${STATICALLY_ALLOCATE_ENTITIES_NUM})
 endif()
 
 # We build the generator of type information required for introspection.

@@ -4,6 +4,7 @@
 
 #include "augs/build_settings/platform_defines.h"
 
+#include "augs/templates/container_templates.h"
 #include "augs/misc/pool_handle.h"
 #include "augs/misc/subscript_operator_for_get_handle_mixin.h"
 
@@ -29,25 +30,29 @@ namespace augs {
 		// END GEN INTROSPECTOR
 	};
 
-	template <class T>
-	class EMPTY_BASES pool : public subscript_operator_for_get_handle_mixin<pool<T>> {
+	template <class T, template <class> class make_container = make_vector>
+	class EMPTY_BASES pool : public subscript_operator_for_get_handle_mixin<pool<T, make_container>> {
 	public:
+		using this_pool_type = pool<T, make_container>;
 		using id_type = pooled_object_id<T>;
 		using key_type = id_type;
 		using unversioned_id_type = unversioned_id<T>;
-		using handle_type = handle_for_pool_container<false, pool<T>, T>;
-		using const_handle_type = handle_for_pool_container<true, pool<T>, T>;
+		using handle_type = handle_for_pool_container<false, this_pool_type, T>;
+		using const_handle_type = handle_for_pool_container<true, this_pool_type, T>;
 
 		using element_type = T;
+
+		template <class Element>
+		using pool_container = typename make_container<Element>::type;
 	
 	protected:
 		friend struct introspection_access;
 
-		// GEN INTROSPECTOR class augs::pool class T
-		std::vector<T> pooled;
-		std::vector<pool_metadata> slots;
-		std::vector<pool_indirector> indirectors;
-		std::vector<std::size_t> free_indirectors;
+		// GEN INTROSPECTOR class augs::pool class T template<class>class C
+		pool_container<T> pooled;
+		pool_container<pool_metadata> slots;
+		pool_container<pool_indirector> indirectors;
+		pool_container<std::size_t> free_indirectors;
 		// END GEN INTROSPECTOR
 
 	public:
@@ -309,18 +314,18 @@ namespace augs {
 		}
 	};
 
-	template <class T>
-	struct make_pool { using type = pool<T>; };
+	template <class T, template <class> class C>
+	struct make_pool { using type = pool<T, C>; };
 }
 
 namespace augs {
-	template<class A, class T, class...>
-	void read_object(A& ar, pool<T>& storage) {
+	template<class A, class T, template <class> class C>
+	void read_object(A& ar, pool<T, C>& storage) {
 		storage.read_object(ar);
 	}
 	
-	template<class A, class T, class...>
-	void write_object(A& ar, const pool<T>& storage) {
+	template<class A, class T, template <class> class C>
+	void write_object(A& ar, const pool<T, C>& storage) {
 		storage.write_object(ar);
 	}
 }

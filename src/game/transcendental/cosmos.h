@@ -24,7 +24,13 @@
 
 #include "game/transcendental/cosmic_entropy.h"
 #include "game/transcendental/cosmic_profiler.h"
+
+#if STATICALLY_ALLOCATE_ENTITIES_NUM
+#include "game/organization/all_component_includes.h"
+#else
 #include "game/organization/all_components_declaration.h"
+#endif
+
 #include "game/organization/all_messages_declaration.h"
 #include "game/organization/all_inferred_systems.h"
 #include "game/transcendental/cosmos_significant_state.h"
@@ -255,16 +261,19 @@ public:
 
 	template<class T>
 	auto& get_component_pool() {
-		return std::get<augs::pool<T>>(significant.pools_for_components);
+		return std::get<cosmic_object_pool<T>>(significant.pools_for_components);
 	}
 
 	template<class T>
 	const auto& get_component_pool() const {
-		return std::get<augs::pool<T>>(significant.pools_for_components);
+		return std::get<cosmic_object_pool<T>>(significant.pools_for_components);
 	}
 
+	/* TODO: Make comparisons somehow work with debug name pointers */
+#if !(ENTITY_TRACKS_NAME_FOR_DEBUG && STATICALLY_ALLOCATE_ENTITIES_NUM)
 	bool operator==(const cosmos&) const;
 	bool operator!=(const cosmos&) const;
+#endif
 
 	template <class F>
 	decltype(auto) operator()(const entity_id subject, F callback) {

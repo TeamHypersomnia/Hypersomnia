@@ -177,7 +177,7 @@ struct tests_of_traits {
 	static_assert(std::is_same_v<unsigned short, get_index_type_for_size_of_t<E>>, "Trait has failed");
 	static_assert(std::is_same_v<unsigned int, get_index_type_for_size_of_t<F>>, "Trait has failed");
 
-	static_assert(sizeof(cosmos) < 1000000, "Possible stack overflow due to cosmos on the stack");
+	//static_assert(sizeof(cosmos) < 1000000, "Possible stack overflow due to cosmos on the stack");
 
 	static_assert(is_introspective_leaf_v<launch_type>);
 	static_assert(has_enum_to_string_v<launch_type>);

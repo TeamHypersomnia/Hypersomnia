@@ -110,6 +110,8 @@ cosmos::cosmos(const std::size_t reserved_entities) {
 	significant.meta.global.si.set_pixels_per_meter(100.f);
 }
 
+/* TODO: Make comparisons somehow work with debug name pointers */
+#if !(ENTITY_TRACKS_NAME_FOR_DEBUG && STATICALLY_ALLOCATE_ENTITIES_NUM)
 bool cosmos::operator==(const cosmos& b) const {
 	return significant == b.significant;
 }
@@ -117,6 +119,7 @@ bool cosmos::operator==(const cosmos& b) const {
 bool cosmos::operator!=(const cosmos& b) const {
 	return !operator==(b);
 }
+#endif
 
 cosmos& cosmos::operator=(const cosmos_significant_state& b) {
 	{

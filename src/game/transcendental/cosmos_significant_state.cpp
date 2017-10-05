@@ -12,6 +12,7 @@ void cosmos_significant_state::clear() {
 	*this = cosmos_significant_state();
 }
 
+#if !(ENTITY_TRACKS_NAME_FOR_DEBUG && STATICALLY_ALLOCATE_ENTITIES_NUM)
 std::size_t cosmos_significant_state::get_first_mismatch_pos(const cosmos_significant_state& second) const {
 	/*
 		Notice that the comparison is performed by byte-wise serialization.
@@ -98,3 +99,4 @@ bool cosmos_significant_state::operator==(const cosmos_significant_state& second
 bool cosmos_significant_state::operator!=(const cosmos_significant_state& second) const {
 	return !operator==(second);
 }
+#endif

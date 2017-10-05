@@ -3,7 +3,6 @@
 #include "augs/templates/type_matching_and_indexing.h"
 #include "augs/entity_system/component_aggregate.h"
 
-#include "augs/misc/pool.h"
 #include "augs/misc/pooled_object_id.h"
 
 namespace augs {
@@ -12,18 +11,6 @@ namespace augs {
 	public:
 		using aggregate_type = component_aggregate<components...>;
 		using aggregate_id = pooled_object_id<aggregate_type>;
-
-		using dynamic_component_pools_type = 
-			replace_list_type_t<
-				transform_types_in_list_t<
-					typename aggregate_type::dynamic_components_list,
-					augs::make_pool
-				>, 
-				std::tuple
-			>
-		;
-
-		using aggregate_pool_type = pool<aggregate_type>;
 
 		void reserve_all_components(const std::size_t n) {
 			auto& self = *static_cast<derived*>(this);

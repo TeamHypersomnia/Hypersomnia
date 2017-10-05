@@ -197,6 +197,9 @@ TEST_CASE("CosmicDelta2 PaddingTest") {
 	);
 }
 
+#if !STATICALLY_ALLOCATE_ENTITIES_NUM
+/* Too much space would be wasted. */
+
 TEST_CASE("CosmicDelta3 GuidizeTests") {
 	cosmos c1(2);
 
@@ -599,5 +602,6 @@ TEST_CASE("CosmicDelta6 ThreeEntitiesWithReferencesAndDestroyedChild") {
 	const bool pc3_intact = ent3.get<components::position_copying>().target == ent1.get_id();
 	REQUIRE(pc3_intact);
 }
+#endif
 
 #endif

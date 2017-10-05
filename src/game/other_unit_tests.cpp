@@ -4,6 +4,8 @@
 #include "game/transcendental/cosmos.h"
 #include "augs/misc/trivially_copyable_tuple.h"
 
+#if !STATICALLY_ALLOCATE_ENTITIES_NUM
+
 TEST_CASE("Ca TriviallyCopyableTuple") {
 	struct a {
 		int mem = 1;
@@ -80,8 +82,8 @@ TEST_CASE("Ca TriviallyCopyableTuple") {
 	}
 
 	{
-		static_assert(alignof(cosmos_base::aggregate_pool_type) == 4, "Trait failed");
-		cosmos_base::aggregate_pool_type pool(2);
+		static_assert(alignof(aggregate_pool_type) == 4, "Trait failed");
+		aggregate_pool_type pool(2);
 		REQUIRE(pool.size() == 0);
 		pool.allocate();
 		REQUIRE(pool.size() == 1);
@@ -92,4 +94,6 @@ TEST_CASE("Ca TriviallyCopyableTuple") {
 	{
 	}
 }
+#endif
+
 #endif

@@ -325,6 +325,8 @@ namespace augs  {
 		constant_size_vector& operator=(const constant_size_vector& b) {
 			clear();
 			insert(begin(), b.begin(), b.end());
+
+			return *this;
 		}
 
 		constant_size_vector(constant_size_vector&& b) {
@@ -361,10 +363,10 @@ namespace augs  {
 	using constant_size_wstring = constant_size_vector<zeroed_pod<wchar_t>, const_count>;
 }
 
-template <size_t I>
+template <std::size_t I>
 struct of_size {
 	template <class T>
 	struct make_constant_vector {
-		typedef augs::constant_size_vector<T, I> type;
+		using type = augs::constant_size_vector<T, I>;
 	};
 };
