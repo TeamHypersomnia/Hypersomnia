@@ -19,7 +19,7 @@ namespace augs {
 		friend std::ostream& operator<<(std::ostream& out, const pooled_object_raw_id &x);
 	};
 
-	template<class T>
+	template <class T>
 	struct unversioned_id {
 		unsigned indirection_index = -1;
 
@@ -45,7 +45,7 @@ namespace augs {
 		// INTROSPECT BASE augs::pooled_object_raw_id
 		// END GEN INTROSPECTOR
 
-		typedef T element_type;
+		using element_type = T;
 
 		operator unversioned_id<T>() const {
 			unversioned_id<T> un;
@@ -58,7 +58,7 @@ namespace augs {
 		using pooled_object_raw_id::operator!=;
 	};
 
-	template<class T>
+	template <class T>
 	struct make_pooled_object_id { 
 		typedef pooled_object_id<T> type; 
 	};

@@ -6,13 +6,19 @@ namespace augs {
 	template<bool is_const, class pool_container, class value_type>
 	class handle_for_pool_container {
 	public:
-		typedef maybe_const_ref_t<is_const, pool_container> owner_reference;
-		typedef pooled_object_id<value_type> id_type;
+		using owner_reference = maybe_const_ref_t<is_const, pool_container>;
+		using id_type = pooled_object_id<value_type>;
 
 		owner_reference owner;
 		id_type raw_id;
 		
-		handle_for_pool_container(owner_reference owner, const id_type raw_id) : raw_id(raw_id), owner(owner) {}
+		handle_for_pool_container(
+			owner_reference owner, 
+			const id_type raw_id
+		) : 
+			raw_id(raw_id), 
+			owner(owner) 
+		{}
 
 		decltype(auto) get() const {
 			return owner.get(raw_id);

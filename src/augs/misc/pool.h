@@ -1,10 +1,11 @@
 #pragma once
-#include <vector>
 #include "augs/ensure.h"
 
 #include "augs/build_settings/platform_defines.h"
 
 #include "augs/templates/container_templates.h"
+#include "augs/templates/type_mod_templates.h"
+
 #include "augs/misc/pool_handle.h"
 #include "augs/misc/subscript_operator_for_get_handle_mixin.h"
 

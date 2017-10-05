@@ -33,7 +33,7 @@ option(HYPERSOMNIA_BARE "Build the minimal possible Hypersomnia runtime. For tes
 #	- Compilation might be longer due to component includes needed everywhere
 #	- Can't tweak maximum number of entities at runtime
 #	- For every game world, there's always maximum of possible memory allocated 
-set(STATICALLY_ALLOCATE_ENTITIES_NUM 5000)
+set(STATICALLY_ALLOCATE_ENTITIES_NUM "5000" CACHE STRING "Statically allocate entities in cosmos class")
 
 if (HYPERSOMNIA_BARE)
 	set(BUILD_SOUND_FORMAT_DECODERS FALSE CACHE BOOL "" FORCE)

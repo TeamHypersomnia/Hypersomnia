@@ -232,7 +232,7 @@ namespace augs  {
 		}
 
 		constexpr size_type max_size() const {
-			return data.max_size();
+			return const_count;
 		}
 
 		bool empty() const {
@@ -243,7 +243,8 @@ namespace augs  {
 			return const_count;
 		}
 
-		void reserve(const size_type) {
+		void reserve(const size_type s) {
+			ensure(s <= max_size());
 			// no-op
 		}
 
