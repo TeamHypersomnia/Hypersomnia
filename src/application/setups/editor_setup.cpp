@@ -26,6 +26,10 @@ void editor_setup::start_open_file_dialog() {
 }
 
 void editor_setup::open_workspace(const augs::path_type& workspace_path) {
+	if (!workspace_path.empty()) {
+
+	}
+
 	current_workspace_path = workspace_path;
 }
 
@@ -63,7 +67,9 @@ void editor_setup::control(
 }
 
 void editor_setup::customize_for_viewing(config_lua_table& config) const {
-	config.window.name = "Editor - " + current_workspace_path.string();
+	const auto filename = current_workspace_path.filename().string();
+
+	config.window.name = "Editor - " + (filename.empty() ? std::string("Untitled") : filename);
 	return;
 }
 
