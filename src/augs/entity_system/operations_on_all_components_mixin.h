@@ -6,7 +6,8 @@ namespace augs {
 	template <class derived, class... components>
 	class operations_on_all_components_mixin {
 	public:
-		void reserve_all_components(const std::size_t n) {
+		template <class size_type>
+		void reserve_all_components(const size_type n) {
 			auto& self = *static_cast<derived*>(this);
 
 			auto reserver = [&self, n](auto c) {

@@ -16,7 +16,7 @@ using dynamic_component_pools_type =
 	>
 ;
 
-using aggregate_pool_type = cosmic_object_pool<cosmic_entity>;
+using entity_pool_type = cosmic_object_pool<cosmic_entity>;
 
 class cosmos_significant_state {
 	// GEN INTROSPECTOR class cosmos_significant_state
@@ -24,8 +24,8 @@ class cosmos_significant_state {
 	friend class cosmic_delta;
 	friend struct augs::introspection_access;
 
-	aggregate_pool_type pool_for_aggregates;
-	dynamic_component_pools_type pools_for_components;
+	entity_pool_type entity_pool;
+	dynamic_component_pools_type component_pools;
 public:
 	cosmos_metadata meta;
 	// END GEN INTROSPECTOR

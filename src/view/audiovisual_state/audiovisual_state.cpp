@@ -26,7 +26,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 	const auto& cosm = input.cosmos_to_sample;
 	const auto dt = input.delta;
 
-	reserve_caches_for_entities(cosm.get_aggregate_pool().capacity());
+	reserve_caches_for_entities(cosm.get_entity_pool().capacity());
 
 	auto& thunders = get<thunder_system>();
 	auto& exploding_rings = get<exploding_ring_system>();
@@ -131,7 +131,7 @@ void audiovisual_state::standard_post_solve(const const_logic_step step) {
 	auto scope = measure_scope(profiler.post_solve);
 
 	const auto& cosmos = step.cosm;
-	reserve_caches_for_entities(cosmos.get_aggregate_pool().capacity());
+	reserve_caches_for_entities(cosmos.get_entity_pool().capacity());
 
 	const auto& healths = step.transient.messages.get_queue<messages::health_event>();
 	const auto& new_thunders = step.transient.messages.get_queue<thunder_input>();

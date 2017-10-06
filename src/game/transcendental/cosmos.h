@@ -141,12 +141,12 @@ public:
 
 	template <class D>
 	void for_each_entity_id(D pred) {
-		get_aggregate_pool().for_each_id(pred);
+		get_entity_pool().for_each_id(pred);
 	}
 
 	template <class D>
 	void for_each_entity_id(D pred) const {
-		get_aggregate_pool().for_each_id(pred);
+		get_entity_pool().for_each_id(pred);
 	}
 
 	void complete_reinference();
@@ -251,22 +251,22 @@ public:
 	common_assets& get_common_assets();
 	const common_assets& get_common_assets() const;
 
-	auto& get_aggregate_pool() {
-		return significant.pool_for_aggregates;
+	auto& get_entity_pool() {
+		return significant.entity_pool;
 	}
 
-	const auto& get_aggregate_pool() const {
-		return significant.pool_for_aggregates;
+	const auto& get_entity_pool() const {
+		return significant.entity_pool;
 	}
 
 	template<class T>
 	auto& get_component_pool() {
-		return std::get<cosmic_object_pool<T>>(significant.pools_for_components);
+		return std::get<cosmic_object_pool<T>>(significant.component_pools);
 	}
 
 	template<class T>
 	const auto& get_component_pool() const {
-		return std::get<cosmic_object_pool<T>>(significant.pools_for_components);
+		return std::get<cosmic_object_pool<T>>(significant.component_pools);
 	}
 
 	/* TODO: Make comparisons somehow work with debug name pointers */
@@ -405,7 +405,7 @@ inline const_inventory_slot_handle cosmos::get_handle(const inventory_slot_id id
 }
 
 inline entity_id cosmos::make_versioned(const unversioned_entity_id id) const {
-	return get_aggregate_pool().make_versioned(id);
+	return get_entity_pool().make_versioned(id);
 }
 
 inline randomization cosmos::get_rng_for(const entity_id id) const {
@@ -413,11 +413,11 @@ inline randomization cosmos::get_rng_for(const entity_id id) const {
 }
 
 inline std::size_t cosmos::get_entities_count() const {
-	return significant.pool_for_aggregates.size();
+	return significant.entity_pool.size();
 }
 
 inline std::size_t cosmos::get_maximum_entities() const {
-	return significant.pool_for_aggregates.capacity();
+	return significant.entity_pool.capacity();
 }
 
 namespace augs {

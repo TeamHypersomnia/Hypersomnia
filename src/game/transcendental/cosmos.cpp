@@ -66,7 +66,7 @@ void cosmos::destroy_inferred_state_completely() {
 	inferential.~all_inferential_systems();
 	new (&inferential) all_inferential_systems;
 
-	const auto n = significant.pool_for_aggregates.capacity();
+	const auto n = significant.entity_pool.capacity();
 
 	inferential.for_each([n](auto& sys) {
 		sys.reserve_caches_for_entities(n);
@@ -167,7 +167,7 @@ void cosmos::complete_reinference(const const_entity_handle h) {
 }
 
 void cosmos::reserve_storage_for_entities(const cosmic_pool_size_type n) {
-	get_aggregate_pool().reserve(n);
+	get_entity_pool().reserve(n);
 	reserve_all_components(n);
 
 	inferential.for_each([n](auto& sys) {
@@ -218,11 +218,11 @@ unsigned cosmos::get_steps_per_second() const {
 }
 
 entity_handle cosmos::allocate_new_entity() {
-	if (get_aggregate_pool().full()) {
+	if (get_entity_pool().full()) {
 		throw std::runtime_error("Entities should be controllably reserved to avoid invalidation of entity_handles.");
 	}
 
-	return { *this, get_aggregate_pool().allocate() };
+	return { *this, get_entity_pool().allocate() };
 }
 
 entity_handle cosmos::create_entity(const std::string& name) {
@@ -360,7 +360,7 @@ void cosmos::delete_entity(const entity_id e) {
 	}
 
 	free_all_components(get_handle(e));
-	get_aggregate_pool().free(e);
+	get_entity_pool().free(e);
 
 	/*
 		Unregister that id as a parent from the relational system

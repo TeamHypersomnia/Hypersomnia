@@ -73,11 +73,11 @@ private:
 	friend class component_synchronizer<false, components::name>;
 
 	using owner_reference = maybe_const_ref_t<is_const, cosmos>;
-	using aggregate_ptr = maybe_const_ptr_t<is_const, cosmic_entity>;
+	using entity_ptr = maybe_const_ptr_t<is_const, cosmic_entity>;
 
 	owner_reference owner;
 	entity_id raw_id;
-	aggregate_ptr ptr;
+	entity_ptr ptr;
 
 	typedef augs::component_allocators_mixin<is_const, basic_entity_handle<is_const>> allocator;
 
@@ -93,7 +93,7 @@ private:
 	basic_entity_handle(
 		owner_reference owner,
 		const entity_id raw_id,
-		const aggregate_ptr ptr
+		const entity_ptr ptr
 	) :
 		raw_id(raw_id),
 		owner(owner),
@@ -107,7 +107,7 @@ public:
 	) : basic_entity_handle(
 		owner, 
 		raw_id, 
-		owner.get_aggregate_pool().find(raw_id)
+		owner.get_entity_pool().find(raw_id)
 	) {
 	}
 

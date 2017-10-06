@@ -33,11 +33,11 @@ std::size_t cosmos_significant_state::get_first_mismatch_pos(const cosmos_signif
 
 	{
 		/* null-out the pointers so that we don't get a false negative */
-		for (auto& agg : a.pool_for_aggregates) {
+		for (auto& agg : a.entity_pool) {
 			agg.debug_name = nullptr;
 		}		
 		
-		for (auto& agg : b.pool_for_aggregates) {
+		for (auto& agg : b.entity_pool) {
 			agg.debug_name = nullptr;
 		}
 	}
