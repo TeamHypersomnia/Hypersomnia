@@ -194,7 +194,7 @@ struct tests_of_traits {
 	static_assert(augs::representable_as_lua_value_v<std::wstring>);
 	static_assert(augs::representable_as_lua_value_v<const std::wstring*>);
 	
-	static_assert(!augs::has_io_overloads_v<augs::stream, put_all_components_into_t<augs::component_aggregate>>);
+	static_assert(!augs::has_io_overloads_v<augs::stream, component_list_t<augs::component_aggregate>>);
 
 	static_assert(aligned_num_of_bytes_v<0, 4> == 0, "Trait is wrong");
 	static_assert(aligned_num_of_bytes_v<1, 4> == 4, "Trait is wrong");

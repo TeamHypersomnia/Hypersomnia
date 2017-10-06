@@ -25,12 +25,12 @@
 #include "game/components/name_component_declaration.h"
 
 template <class T>
-constexpr std::size_t component_index_v = index_in_list_v<T, put_all_components_into_t<type_list>>;
+constexpr std::size_t component_index_v = index_in_list_v<T, component_list_t<type_list>>;
 
 template<class F>
 void for_each_component_type(F&& callback) {
 	for_each_through_std_get(
-		put_all_components_into_t<std::tuple>(), 
+		component_list_t<std::tuple>(), 
 		std::forward<F>(callback)
 	);
 }
@@ -58,7 +58,7 @@ class EMPTY_BASES basic_entity_handle :
 {
 	template <typename T>
 	static void check_component_type() {
-		static_assert(is_one_of_list_v<T, put_all_components_into_t<type_list>>, "Unknown component type!");
+		static_assert(is_one_of_list_v<T, component_list_t<type_list>>, "Unknown component type!");
 	}
 
 public:
@@ -73,7 +73,7 @@ private:
 	friend class component_synchronizer<false, components::name>;
 
 	using owner_reference = maybe_const_ref_t<is_const, cosmos>;
-	using aggregate_ptr = maybe_const_ptr_t<is_const, put_all_components_into_t<augs::component_aggregate>>;
+	using aggregate_ptr = maybe_const_ptr_t<is_const, component_list_t<augs::component_aggregate>>;
 
 	owner_reference owner;
 	entity_id raw_id;

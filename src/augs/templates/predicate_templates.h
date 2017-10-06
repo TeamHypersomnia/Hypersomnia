@@ -49,21 +49,3 @@ template <
 	class... BoundTypes
 >
 using bind_types_right_t = typename bind_types_right<TypePredicate, BoundTypes...>::type;
-
-template <
-	template <class...> class LogicalOp,
-	template <class...> class UnaryPredicate
->
-struct make_variadic_predicate {
-	template <class... TypeArguments>
-	struct type
-		: LogicalOp<UnaryPredicate<TypeArguments>...>
-	{
-	};
-};
-
-template <
-	template <class...> class LogicalOp,
-	template <class...> class UnaryPredicate
->
-using make_variadic_predicate_t = typename make_variadic_predicate<LogicalOp, UnaryPredicate>::type;

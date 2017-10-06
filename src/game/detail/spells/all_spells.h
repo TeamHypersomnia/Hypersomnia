@@ -12,7 +12,7 @@
 #include "game/detail/spells/echoes_of_the_higher_realms.h"
 
 template <template <class...> class List>
-using put_all_spells_into_t = List<
+using spell_list_t = List<
 	haste,
 	fury_of_the_aeons,
 	ultimate_wrath_of_the_aeons,
@@ -23,10 +23,10 @@ using put_all_spells_into_t = List<
 >;
 
 template <template <class...> class List>
-using put_all_spell_instances_into_t = transform_types_in_list_t<
-	put_all_spells_into_t<List>,
+using spell_instance_list_t = transform_types_in_list_t<
+	spell_list_t<List>,
 	instance_of
 >;
 
-using spell_instance_tuple = put_all_spell_instances_into_t<augs::trivially_copyable_tuple>;
+using spell_instance_tuple = spell_instance_list_t<augs::trivially_copyable_tuple>;
 using spell_id = type_in_list_id<spell_instance_tuple>;

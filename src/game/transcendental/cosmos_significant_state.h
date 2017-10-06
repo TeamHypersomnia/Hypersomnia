@@ -4,7 +4,7 @@
 #include "augs/templates/type_mod_templates.h"
 #include "game/transcendental/cosmos_metadata.h"
 
-using cosmos_base = put_all_components_into_t<augs::operations_on_all_components_mixin, cosmos>;
+using cosmos_base = component_list_t<augs::operations_on_all_components_mixin, cosmos>;
 
 #if STATICALLY_ALLOCATE_ENTITIES_NUM
 template <class T>

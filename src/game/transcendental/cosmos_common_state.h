@@ -9,9 +9,9 @@
 
 #include "game/detail/spells/all_spells.h"
 
-using meter_tuple = put_all_meters_into_t<std::tuple>;
-using spell_tuple = put_all_spells_into_t<std::tuple>;
-using perk_tuple = put_all_perks_into_t<std::tuple>;
+using meter_tuple = meter_list_t<std::tuple>;
+using spell_tuple = spell_list_t<std::tuple>;
+using perk_tuple = perk_list_t<std::tuple>;
 
 using spell_meta_id = type_in_list_id<spell_tuple>;
 using perk_meta_id = type_in_list_id<meter_tuple>;

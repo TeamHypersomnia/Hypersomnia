@@ -72,17 +72,17 @@ struct consciousness_meter {
 };
 
 template <template <class...> class List>
-using put_all_meters_into_t = List<
+using meter_list_t = List<
 	health_meter,
 	personal_electricity_meter,
 	consciousness_meter
 >;
 
 template <template <class...> class List>
-using put_all_meter_instances_into_t = transform_types_in_list_t<
-	put_all_meters_into_t<List>,
+using meter_instance_list_t = transform_types_in_list_t<
+	meter_list_t<List>,
 	instance_of
 >;
 
-using meter_instance_tuple = put_all_meter_instances_into_t<augs::trivially_copyable_tuple>;
+using meter_instance_tuple = meter_instance_list_t<augs::trivially_copyable_tuple>;
 using meter_id = type_in_list_id<meter_instance_tuple>;

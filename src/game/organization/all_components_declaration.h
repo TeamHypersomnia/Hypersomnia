@@ -58,63 +58,57 @@ namespace components {
 	struct all_inferred_state;
 }
 
-template<template<typename...> class List, class... prepend>
-struct put_all_components_into {
-	using type = List<prepend...,
-		components::tree_of_npo_node,
-		components::special_physics,
-		components::animation,
-		components::behaviour_tree,
-		components::position_copying,
-		components::crosshair,
-		components::missile,
-		components::flags,
-		components::gun,
-		components::rotation_copying,
-		components::movement,
-		components::particles_existence,
-		components::pathfinding,
-		components::rigid_body,
-		components::render,
-		components::transform,
-		components::sprite,
-		components::polygon,
-		components::car,
-		components::driver,
-		components::fixtures,
-		components::container,
-		components::item,
-		components::force_joint,
-		components::item_slot_transfers,
-		components::name,
-		components::trace,
-		components::melee,
-		components::sentience,
-		components::attitude,
-		components::processing,
-		components::guid,
-		components::child,
-		components::interpolation,
-		components::light,
-		components::wandering_pixels,
-		components::sound_existence,
-		components::explosive,
-		components::catridge,
-		components::shape_polygon,
-		components::shape_circle,
-		components::motor_joint,
-		components::hand_fuse,
-		components::sender,
+template <template <class...> class List, class... prepend>
+using component_list_t = List<prepend...,
+	components::tree_of_npo_node,
+	components::special_physics,
+	components::animation,
+	components::behaviour_tree,
+	components::position_copying,
+	components::crosshair,
+	components::missile,
+	components::flags,
+	components::gun,
+	components::rotation_copying,
+	components::movement,
+	components::particles_existence,
+	components::pathfinding,
+	components::rigid_body,
+	components::render,
+	components::transform,
+	components::sprite,
+	components::polygon,
+	components::car,
+	components::driver,
+	components::fixtures,
+	components::container,
+	components::item,
+	components::force_joint,
+	components::item_slot_transfers,
+	components::name,
+	components::trace,
+	components::melee,
+	components::sentience,
+	components::attitude,
+	components::processing,
+	components::guid,
+	components::child,
+	components::interpolation,
+	components::light,
+	components::wandering_pixels,
+	components::sound_existence,
+	components::explosive,
+	components::catridge,
+	components::shape_polygon,
+	components::shape_circle,
+	components::motor_joint,
+	components::hand_fuse,
+	components::sender,
 
-		components::all_inferred_state
+	components::all_inferred_state
+>;
 
-	>;
-};
-
-template<template<typename...> class List, class... prepend>
-using put_all_components_into_t = typename put_all_components_into<List, prepend...>::type;
-
-template<class... Types>
+template <class... Types>
 struct type_count {
 	static const unsigned value = sizeof...(Types);
 };
@@ -126,4 +120,4 @@ namespace augs {
 	class operations_on_all_components_mixin;
 }
 
-constexpr unsigned COMPONENTS_COUNT = put_all_components_into_t<type_count>::value;
+constexpr unsigned COMPONENTS_COUNT = component_list_t<type_count>::value;
