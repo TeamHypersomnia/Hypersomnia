@@ -1,6 +1,7 @@
 #pragma once
 #include "augs/misc/constant_size_vector.h"
 #include "augs/misc/pool.h"
+#include "augs/templates/type_mod_templates.h"
 #include "game/transcendental/cosmos_metadata.h"
 
 using cosmos_base = put_all_components_into_t<augs::operations_on_all_components_mixin, cosmos>;
@@ -10,7 +11,7 @@ template <class T>
 using cosmic_object_pool = augs::pool<T, of_size<5000>::template make_constant_vector>;
 #else
 template <class T>
-using cosmic_object_pool = augs::pool<T>;
+using cosmic_object_pool = augs::pool<T, make_vector>;
 #endif
 
 template <class T>

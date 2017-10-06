@@ -3,9 +3,9 @@
 #include "augs/templates/hash_templates.h"
 
 namespace augs {
-	class pooled_object_raw_id {
+	class pooled_object_id_base {
 	public:
-		// GEN INTROSPECTOR class augs::pooled_object_raw_id
+		// GEN INTROSPECTOR class augs::pooled_object_id_base
 		unsigned version = 0;
 		unsigned indirection_index = -1;
 		// END GEN INTROSPECTOR
@@ -13,39 +13,36 @@ namespace augs {
 		void unset();
 		bool is_set() const;
 
-		bool operator==(const pooled_object_raw_id& b) const;
-		bool operator!=(const pooled_object_raw_id& b) const;
+		bool operator==(const pooled_object_id_base& b) const;
+		bool operator!=(const pooled_object_id_base& b) const;
 
-		friend std::ostream& operator<<(std::ostream& out, const pooled_object_raw_id &x);
+		friend std::ostream& operator<<(std::ostream& out, const pooled_object_id_base &x);
 	};
 
-	template <class T>
-	struct unversioned_id {
+	struct unversioned_id_base {
 		unsigned indirection_index = -1;
+		
+		bool is_set() const;
 
-		bool is_set() const {
-			return *this != unversioned_id();
-		}
-
-		template<class B>
-		bool operator==(const B& b) const {
-			return indirection_index == b.indirection_index;
-		}
-
-		template<class B>
-		bool operator!=(const B& b) const {
-			return indirection_index != b.indirection_index;
-		}
+		bool operator==(const unversioned_id_base& b) const;
+		bool operator!=(const unversioned_id_base& b) const;
 	};
 
 	template <class T>
-	class pooled_object_id : public pooled_object_raw_id {
+	struct unversioned_id : unversioned_id_base {
+		using unversioned_id_base::unversioned_id_base;
+		using unversioned_id_base::operator==;
+		using unversioned_id_base::operator!=;
+	};
+
+	template <class T>
+	class pooled_object_id : public pooled_object_id_base {
 	public:
 		// GEN INTROSPECTOR class augs::pooled_object_id class T
-		// INTROSPECT BASE augs::pooled_object_raw_id
+		// INTROSPECT BASE augs::pooled_object_id_base
 		// END GEN INTROSPECTOR
 
-		using element_type = T;
+		using mapped_type = T;
 
 		operator unversioned_id<T>() const {
 			unversioned_id<T> un;
@@ -53,14 +50,14 @@ namespace augs {
 			return un;
 		}
 
-		using pooled_object_raw_id::pooled_object_raw_id;
-		using pooled_object_raw_id::operator==;
-		using pooled_object_raw_id::operator!=;
+		using pooled_object_id_base::pooled_object_id_base;
+		using pooled_object_id_base::operator==;
+		using pooled_object_id_base::operator!=;
 	};
 
 	template <class T>
 	struct make_pooled_object_id { 
-		typedef pooled_object_id<T> type; 
+		using type = pooled_object_id<T>; 
 	};
 }
 

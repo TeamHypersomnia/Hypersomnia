@@ -5,25 +5,37 @@
 #include "augs/misc/pooled_object_id.h"
 
 namespace augs {
-	std::ostream& operator<<(std::ostream& out, const augs::pooled_object_raw_id &x) {
+	bool unversioned_id_base::operator==(const unversioned_id_base& b) const {
+		return indirection_index == b.indirection_index;
+	}
+
+	bool unversioned_id_base::operator!=(const unversioned_id_base& b) const {
+		return !operator==(b);
+	}
+
+	bool unversioned_id_base::is_set() const {
+		return *this != unversioned_id_base();
+	}
+
+	std::ostream& operator<<(std::ostream& out, const augs::pooled_object_id_base &x) {
 		out << "(" << x.indirection_index << ";" << x.version;
 		out << ")";
 		return out;
 	}
 
-	void pooled_object_raw_id::unset() {
-		*this = pooled_object_raw_id();
+	void pooled_object_id_base::unset() {
+		*this = pooled_object_id_base();
 	}
 
-	bool pooled_object_raw_id::is_set() const {
-		return *this != pooled_object_raw_id();
+	bool pooled_object_id_base::is_set() const {
+		return *this != pooled_object_id_base();
 	}
 
-	bool pooled_object_raw_id::operator==(const pooled_object_raw_id& b) const {
+	bool pooled_object_id_base::operator==(const pooled_object_id_base& b) const {
 		return version == b.version && indirection_index == b.indirection_index;
 	}
 
-	bool pooled_object_raw_id::operator!=(const pooled_object_raw_id& b) const {
+	bool pooled_object_id_base::operator!=(const pooled_object_id_base& b) const {
 		return !operator==(b);
 	}
 }

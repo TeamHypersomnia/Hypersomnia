@@ -25,7 +25,9 @@ struct particles_emission {
 	using minmax = augs::minmax<float>;
 
 	template <class T>
-	using make_particle_definitions_vector = make_vector<T>;
+	struct make_particle_definitions_vector {
+		using type = std::vector<T>;
+	};
 
 	using tuple_of_particle_definitions_vectors = 
 		transform_types_in_list_t<

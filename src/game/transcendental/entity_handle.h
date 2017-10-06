@@ -11,7 +11,6 @@
 #include "game/transcendental/entity_handle_declaration.h"
 #include "augs/entity_system/component_setters_mixin.h"
 #include "augs/entity_system/component_allocators_mixin.h"
-#include "augs/misc/pool_handle.h"
 #include "game/transcendental/entity_id.h"
 #include "game/organization/all_components_declaration.h"
 
@@ -282,11 +281,10 @@ public:
 		for_each_through_std_get(
 			ids,
 			[&](const auto& id) {
-				using component_type = typename std::decay_t<decltype(id)>::element_type;
-				const auto component_handle = cosm.get_component_pool<component_type>().get_handle(id);
+				using component_type = typename std::decay_t<decltype(id)>::mapped_type;
 
-				if (component_handle.alive()) {
-					callback(component_handle.get());
+				if (const auto maybe_component = cosm.get_component_pool<component_type>().find(id)) {
+					callback(*maybe_component);
 				}
 			}
 		);
