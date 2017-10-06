@@ -37,7 +37,7 @@ template <
 	class... Args
 >
 struct transform_types_in_list<List<Args...>, Mod> {
-	typedef List<typename Mod<Args>::type...> type;
+	using type = List<Mod<Args>...>;
 };
 
 template <

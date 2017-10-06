@@ -54,11 +54,6 @@ namespace augs {
 		using pooled_object_id_base::operator==;
 		using pooled_object_id_base::operator!=;
 	};
-
-	template <class T>
-	struct make_pooled_object_id { 
-		using type = pooled_object_id<T>; 
-	};
 }
 
 namespace std {

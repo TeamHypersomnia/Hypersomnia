@@ -14,16 +14,11 @@ template <class T>
 using cosmic_object_pool = augs::pool<T, make_vector>;
 #endif
 
-template <class T>
-struct make_cosmic_object_pool {
-	using type = cosmic_object_pool<T>;
-};
-
 using dynamic_component_pools_type = 
 	replace_list_type_t<
 		transform_types_in_list_t<
 			typename cosmos_base::aggregate_type::dynamic_components_list,
-			make_cosmic_object_pool
+			cosmic_object_pool
 		>, 
 		std::tuple
 	>

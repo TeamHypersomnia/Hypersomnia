@@ -18,7 +18,7 @@ namespace augs {
 			replace_list_type_t<
 				transform_types_in_list_t<
 					dynamic_components_list, 
-					make_pooled_object_id
+					pooled_object_id
 				>, 
 				trivially_copyable_tuple
 			>

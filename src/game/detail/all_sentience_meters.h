@@ -71,22 +71,17 @@ struct consciousness_meter {
 	// END GEN INTROSPECTOR
 };
 
-template<template <typename...> class List>
-struct put_all_meters_into {
-	using type = List<
-		health_meter,
-		personal_electricity_meter,
-		consciousness_meter
-	>;
-};
+template <template <class...> class List>
+using put_all_meters_into_t = List<
+	health_meter,
+	personal_electricity_meter,
+	consciousness_meter
+>;
 
-template <template <typename...> class List>
-using put_all_meters_into_t = typename put_all_meters_into<List>::type;
-
-template <template <typename...> class List>
+template <template <class...> class List>
 using put_all_meter_instances_into_t = transform_types_in_list_t<
 	put_all_meters_into_t<List>,
-	make_instance
+	instance_of
 >;
 
 using meter_instance_tuple = put_all_meter_instances_into_t<augs::trivially_copyable_tuple>;

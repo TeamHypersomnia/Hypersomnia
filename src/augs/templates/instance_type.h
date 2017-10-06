@@ -3,9 +3,7 @@
 #include "augs/templates/type_matching_and_indexing.h"
 
 template <class T>
-struct make_instance {
-	using type = typename T::instance;
-};
+using instance_of = typename T::instance;
 
 template <class SearchedInstance, class MetaCandidate, class = void>
 struct instance_type_matches {

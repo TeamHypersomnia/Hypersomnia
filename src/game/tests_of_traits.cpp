@@ -20,6 +20,9 @@ namespace templates_detail {
 	struct identity {
 		using type = T;
 	};
+
+	template <class T>
+	using identity_t = typename identity<T>::type;
 }
 
 struct tests_of_traits {
@@ -132,17 +135,17 @@ struct tests_of_traits {
 	);
 
 	static_assert(
-		std::is_same_v<type_list<int&, double&, float&>, transform_types_in_list_t<type_list<int, double, float>, std::add_lvalue_reference>>,
+		std::is_same_v<type_list<int&, double&, float&>, transform_types_in_list_t<type_list<int, double, float>, std::add_lvalue_reference_t>>,
 		"Trait has failed."
 	);
 	
 	static_assert(
-		std::is_same_v<type_list<int, double, float>, transform_types_in_list_t<type_list<const int&, double&&, float&>, std::decay>>,
+		std::is_same_v<type_list<int, double, float>, transform_types_in_list_t<type_list<const int&, double&&, float&>, std::decay_t>>,
 		"Trait has failed."
 	);
 	
 	static_assert(
-		std::is_same_v<type_list<const int&, double&&, float&>, transform_types_in_list_t<type_list<const int&, double&&, float&>, templates_detail::identity>>,
+		std::is_same_v<type_list<const int&, double&&, float&>, transform_types_in_list_t<type_list<const int&, double&&, float&>, templates_detail::identity_t>>,
 		"Trait has failed."
 	);
 
