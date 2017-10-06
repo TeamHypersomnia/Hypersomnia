@@ -367,7 +367,5 @@ namespace augs  {
 template <std::size_t I>
 struct of_size {
 	template <class T>
-	struct make_constant_vector {
-		using type = augs::constant_size_vector<T, I>;
-	};
+	using make_constant_vector = augs::constant_size_vector<T, I>;
 };

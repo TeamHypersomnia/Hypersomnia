@@ -8,7 +8,7 @@ using cosmos_base = put_all_components_into_t<augs::operations_on_all_components
 
 #if STATICALLY_ALLOCATE_ENTITIES_NUM
 template <class T>
-using cosmic_object_pool = augs::pool<T, of_size<5000>::template make_constant_vector>;
+using cosmic_object_pool = augs::pool<T, of_size<5000>::make_constant_vector>;
 #else
 template <class T>
 using cosmic_object_pool = augs::pool<T, make_vector>;
