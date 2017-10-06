@@ -41,9 +41,9 @@ TEST_CASE("Ca TriviallyCopyableTuple") {
 
 	{
 		using aggr = augs::trivially_copyable_tuple<
-			augs::pooled_object_id<components::transform>,
-			augs::pooled_object_id<components::rigid_body>, 
-			augs::pooled_object_id<components::render>
+			cosmic_object_pool_id<components::transform>,
+			cosmic_object_pool_id<components::rigid_body>, 
+			cosmic_object_pool_id<components::render>
 		>;
 
 		std::vector<aggr> pool;
@@ -56,7 +56,7 @@ TEST_CASE("Ca TriviallyCopyableTuple") {
 
 	{
 
-		using aggr2 = decltype(cosmos_base::aggregate_type::component_ids);
+		using aggr2 = decltype(cosmic_entity::component_ids);
 
 		std::vector<aggr2> pool;
 		REQUIRE(pool.size() == 0);

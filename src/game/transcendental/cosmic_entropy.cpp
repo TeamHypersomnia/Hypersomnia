@@ -117,15 +117,15 @@ cosmic_entropy::cosmic_entropy(
 	const cosmos& mapper
 ) {
 	for (const auto& entry : b.intents_per_entity) {
-		intents_per_entity[mapper.get_handle(entry.first).get_id()] = entry.second;
+		intents_per_entity[mapper[entry.first].get_id()] = entry.second;
 	}
 
 	for (const auto& entry : b.motions_per_entity) {
-		motions_per_entity[mapper.get_handle(entry.first).get_id()] = entry.second;
+		motions_per_entity[mapper[entry.first].get_id()] = entry.second;
 	}
 
 	for (const auto& entry : b.cast_spells_per_entity) {
-		cast_spells_per_entity[mapper.get_handle(entry.first).get_id()] = entry.second;
+		cast_spells_per_entity[mapper[entry.first].get_id()] = entry.second;
 	}
 
 	for (const auto& entry : b.transfer_requests) {

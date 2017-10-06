@@ -82,7 +82,7 @@ float basic_inventory_slot_handle<C>::calculate_density_multiplier_due_to_being_
 	const auto* const maybe_item = get_container().find<components::item>();
 	
 	if (maybe_item) {
-		const auto slot = owner.get_handle(maybe_item->current_slot);
+		const auto slot = owner[maybe_item->current_slot];
 
 		if (slot.alive()) {
 			return density_multiplier * slot.calculate_density_multiplier_due_to_being_attached();

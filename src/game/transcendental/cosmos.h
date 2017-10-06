@@ -9,7 +9,7 @@
 #include "augs/misc/streams.h"
 #include "augs/misc/delta.h"
 #include "augs/misc/enum_boolset.h"
-#include "augs/misc/subscript_operator_for_get_handle_mixin.h"
+#include "augs/misc/subscript_handle_getters_mixin.h"
 #include "augs/misc/enum_associative_array.h"
 
 #include "augs/entity_system/operations_on_all_components_mixin.h"
@@ -38,12 +38,6 @@
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/transcendental/data_living_one_step.h"
 
-#include "game/detail/inventory/inventory_slot_id.h"
-#include "game/detail/inventory/inventory_slot_handle_declaration.h"
-#include "game/detail/inventory/inventory_slot_handle.h"
-#include "game/detail/inventory/item_slot_transfer_request_declaration.h"
-#include "game/detail/inventory/item_slot_transfer_request.h"
-
 #include "game/assets/behaviour_tree.h"
 
 using rng_seed_type = unsigned;
@@ -61,9 +55,8 @@ struct cosmos_loading_error : error_with_typesafe_sprintf {
 	using error_with_typesafe_sprintf::error_with_typesafe_sprintf;
 };
 
-class EMPTY_BASES cosmos : 
-	private cosmos_base,
-	public augs::subscript_operator_for_get_handle_mixin<cosmos>
+class EMPTY_BASES cosmos : private cosmos_base,
+	public augs::subscript_handle_getters_mixin<cosmos>
 {
 	/* State of the cosmos begins here ***************************/
 #if COSMOS_TRACKS_GUIDS
@@ -174,27 +167,19 @@ public:
 
 	entity_id make_versioned(const unversioned_entity_id) const;
 
-	entity_handle get_handle(const entity_id);
-	const_entity_handle get_handle(const entity_id) const;
-	entity_handle get_handle(const unversioned_entity_id);
-	const_entity_handle get_handle(const unversioned_entity_id) const;
-	inventory_slot_handle get_handle(const inventory_slot_id);
-	const_inventory_slot_handle get_handle(const inventory_slot_id) const;
-
 #if COSMOS_TRACKS_GUIDS
-	entity_handle get_handle(const entity_guid);
-	const_entity_handle get_handle(const entity_guid) const;
-	bool entity_exists_with_guid(const entity_guid) const;
+	entity_id get_entity_id_by(const entity_guid) const;
+	bool entity_exists_by(const entity_guid) const;
 
 	template <template <class> class Guidized, class source_id_type>
 	Guidized<entity_guid> guidize(const Guidized<source_id_type>& id_source) const {
 		return rewrite_members_and_transform_templated_type_into<entity_guid>(
 			id_source,
 			[this](auto& guid_member, const auto& id_member) {
-				const auto handle = get_handle(id_member);
+				const auto handle = operator[](id_member);
 			
 				if (handle.alive()) {
-					guid_member = get_handle(id_member).get_guid();
+					guid_member = operator[](id_member).get_guid();
 				}
 				else {
 					guid_member = entity_guid();
@@ -277,12 +262,12 @@ public:
 
 	template <class F>
 	decltype(auto) operator()(const entity_id subject, F callback) {
-		callback(get_handle(subject));
+		callback(operator[](subject));
 	}
 
 	template <class F>
 	decltype(auto) operator()(const entity_id subject, F callback) const {
-		callback(get_handle(subject));
+		callback(operator[](subject));
 	}
 
 private:
@@ -314,16 +299,27 @@ inline si_scaling cosmos::get_si() const {
 	return significant.meta.global.si;
 }
 
+template <class C>
+auto subscript_handle_getter(C& cosm, const entity_id id) {
+	return basic_entity_handle<std::is_const_v<C>>{ cosm, id };
+}
+
+template <class C>
+auto subscript_handle_getter(C& cosm, const unversioned_entity_id id) {
+	return basic_entity_handle<std::is_const_v<C>>{ cosm, cosm.make_versioned(id) };
+}
+
 #if COSMOS_TRACKS_GUIDS
-inline entity_handle cosmos::get_handle(const entity_guid guid) {
-	return get_handle(guid_to_id.at(guid));
+template <class C>
+auto subscript_handle_getter(C& cosm, const entity_guid guid) {
+	return subscript_handle_getter(cosm, cosm.get_entity_id_by(guid));
 }
 
-inline const_entity_handle cosmos::get_handle(const entity_guid guid) const {
-	return get_handle(guid_to_id.at(guid));
+inline entity_id cosmos::get_entity_id_by(const entity_guid guid) const {
+	return guid_to_id.at(guid);
 }
 
-inline bool cosmos::entity_exists_with_guid(const entity_guid guid) const {
+inline bool cosmos::entity_exists_by(const entity_guid guid) const {
 	return guid_to_id.find(guid) != guid_to_id.end();
 }
 
@@ -361,10 +357,10 @@ inline entity_handle cosmos::get_entity_by_name(const entity_name_type& name) {
 	ensure(entities.size() <= 1);
 
 	if (entities.empty()) {
-		return get_handle(entity_id());		
+		return operator[](entity_id());		
 	}
 	else {
-		return get_handle(*entities.begin());		
+		return operator[](*entities.begin());
 	}
 }
 
@@ -373,35 +369,11 @@ inline const_entity_handle cosmos::get_entity_by_name(const entity_name_type& na
 	ensure(entities.size() <= 1);
 
 	if (entities.empty()) {
-		return get_handle(entity_id());		
+		return operator[](entity_id());
 	}
 	else {
-		return get_handle(*entities.begin());		
+		return operator[](*entities.begin());
 	}
-}
-
-inline entity_handle cosmos::get_handle(const entity_id id) {
-	return { *this, id };
-}
-
-inline const_entity_handle cosmos::get_handle(const entity_id id) const {
-	return { *this, id };
-}
-
-inline entity_handle cosmos::get_handle(const unversioned_entity_id id) {
-	return { *this, make_versioned(id) };
-}
-
-inline const_entity_handle cosmos::get_handle(const unversioned_entity_id id) const {
-	return { *this, make_versioned(id) };
-}
-
-inline inventory_slot_handle cosmos::get_handle(const inventory_slot_id id) {
-	return { *this, id };
-}
-
-inline const_inventory_slot_handle cosmos::get_handle(const inventory_slot_id id) const {
-	return { *this, id };
 }
 
 inline entity_id cosmos::make_versioned(const unversioned_entity_id id) const {

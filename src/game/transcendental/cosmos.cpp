@@ -28,14 +28,8 @@
 #include "game/stateless_systems/sound_existence_system.h"
 #include "game/stateless_systems/hand_fuse_system.h"
 
-#include "game/enums/render_layer.h"
-
 #include "game/transcendental/logic_step.h"
 #include "game/transcendental/entity_handle.h"
-#include "game/detail/inventory/inventory_slot_handle.h"
-#include "game/detail/inventory/item_slot_transfer_request.h"
-
-#include "game/messages/health_event.h"
 
 #include "game/organization/all_messages_includes.h"
 #include "game/organization/all_component_includes.h"
@@ -44,8 +38,6 @@
 #include "game/transcendental/data_living_one_step.h"
 
 #include "game/detail/inventory/inventory_utils.h"
-
-#include "game/components/fixtures_component.h"
 
 #include "generated/introspectors.h"
 
@@ -75,16 +67,12 @@ void cosmos::destroy_inferred_state_completely() {
 
 void cosmos::create_inferred_state_completely() {
 	for (const auto& ordered_pair : guid_to_id) {
-		create_inferred_state_for(get_handle(ordered_pair.second));
+		create_inferred_state_for(operator[](ordered_pair.second));
 	}
 
 	inferential.for_each([this](auto& sys) {
 		sys.create_additional_inferred_state(significant.meta.global);
 	});
-
-	//for (auto it = guid_to_id.rbegin(); it != guid_to_id.rend(); ++it) {
-	//	create_inferred_state_for(get_handle((*it).second));
-	//}
 }
 
 void cosmos::destroy_inferred_state_of(const const_entity_handle h) {
@@ -148,7 +136,7 @@ void cosmos::remap_guids() {
 	guid_to_id.clear();
 
 	for_each_entity_id([this](const entity_id id) {
-		guid_to_id[get_guid(get_handle(id))] = id;
+		guid_to_id[get_guid(operator[](id))] = id;
 	});
 }
 
@@ -181,12 +169,12 @@ std::wstring cosmos::summary() const {
 
 rng_seed_type cosmos::get_rng_seed_for(const entity_id id) const {
 	rng_seed_type transform_hash = 0;
-	const auto tr = get_handle(id).get_logic_transform();
+	const auto tr = operator[](id).get_logic_transform();
 	transform_hash = static_cast<rng_seed_type>(std::abs(tr.pos.x)*100.0);
 	transform_hash += static_cast<rng_seed_type>(std::abs(tr.pos.y)*100.0);
 	transform_hash += static_cast<rng_seed_type>(std::abs(tr.rotation)*100.0);
 
-	return get_handle(id).get_guid() + transform_hash;
+	return operator[](id).get_guid() + transform_hash;
 }
 
 double cosmos::get_total_seconds_passed(const double view_interpolation_ratio) const {
@@ -250,10 +238,10 @@ entity_handle cosmos::create_entity_with_specific_guid(const entity_guid specifi
 #endif
 
 entity_handle cosmos::clone_entity(const entity_id source_entity_id) {
-	entity_handle source_entity = get_handle(source_entity_id);
+	entity_handle source_entity = operator[](source_entity_id);
 
 	if (source_entity.dead()) {
-		return get_handle(entity_id());
+		return operator[](entity_id());
 	}
 
 	ensure(
@@ -330,7 +318,7 @@ entity_handle cosmos::clone_entity(const entity_id source_entity_id) {
 }
 
 void cosmos::delete_entity(const entity_id e) {
-	const auto handle = get_handle(e);
+	const auto handle = operator[](e);
 	
 	ensure(handle.alive());
 
@@ -359,7 +347,7 @@ void cosmos::delete_entity(const entity_id e) {
 		}
 	}
 
-	free_all_components(get_handle(e));
+	free_all_components(operator[](e));
 	get_entity_pool().free(e);
 
 	/*

@@ -103,7 +103,7 @@ bool cosmic_delta::encode(
 	delted_stream_of_entities dt;
 
 	enco.significant.entity_pool.for_each_id([&](const entity_id id) {
-		const const_entity_handle enco_entity = enco.get_handle(id);
+		const const_entity_handle enco_entity = enco[id];
 #if COSMOS_TRACKS_GUIDS
 		const auto stream_written_id = enco_entity.get_guid();
 		const auto maybe_base_entity = base.guid_to_id.find(stream_written_id);
@@ -113,7 +113,7 @@ bool cosmic_delta::encode(
 
 		const const_entity_handle base_entity = base[base_entity_id];
 #else
-		const const_entity_handle base_entity = base.get_handle(id);
+		const const_entity_handle base_entity = base[id];
 		const bool is_new = base_entity.dead();
 		const auto stream_written_id = id;
 #endif
@@ -198,14 +198,14 @@ bool cosmic_delta::encode(
 	});
 
 	base.significant.entity_pool.for_each_id([&base, &enco, &out, &dt](const entity_id id) {
-		const const_entity_handle base_entity = base.get_handle(id);
+		const const_entity_handle base_entity = base[id];
 #if COSMOS_TRACKS_GUIDS
 		const auto stream_written_id = base_entity.get_guid();
 		const auto maybe_enco_entity = enco.guid_to_id.find(stream_written_id);
 		const bool is_dead = maybe_enco_entity == enco.guid_to_id.end();
 #else
 		const auto stream_written_id = id;
-		const const_entity_handle enco_entity = enco.get_handle(stream_written_id);
+		const const_entity_handle enco_entity = enco[stream_written_id];
 		const bool is_dead = enco_entity.dead();
 #endif
 
@@ -333,7 +333,7 @@ void cosmic_delta::decode(
 		
 		augs::read(in, guid_of_changed);
 		
-		const auto changed_entity = deco.get_handle(guid_of_changed);
+		const auto changed_entity = deco[guid_of_changed];
 
 		std::array<bool, COMPONENTS_COUNT> overridden_components;
 		std::array<bool, COMPONENTS_COUNT> removed_components;
@@ -380,7 +380,7 @@ void cosmic_delta::decode(
 
 		augs::read(in, guid_of_destroyed);
 		
-		deco.delete_entity(deco.get_handle(guid_of_destroyed));
+		deco.delete_entity(deco[guid_of_destroyed]);
 #else
 		static_assert(false, "Unimplemented");
 #endif

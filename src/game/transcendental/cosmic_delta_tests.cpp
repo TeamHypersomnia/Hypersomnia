@@ -304,8 +304,8 @@ TEST_CASE("CosmicDelta4 EmptyAndTwoNew") {
 		REQUIRE(c1 == c2);
 	}
 
-	const auto ent1 = c1.get_handle(first_guid);
-	const auto ent2 = c1.get_handle(second_guid);
+	const auto ent1 = c1[first_guid];
+	const auto ent2 = c1[second_guid];
 
 	// check if components are intact after encode/decode cycle
 
@@ -425,9 +425,9 @@ TEST_CASE("CosmicDelta5 EmptyAndCreatedThreeEntitiesWithReferences") {
 	REQUIRE(3 == c1.get_entities_count());
 	REQUIRE(3 == c2.get_entities_count());
 
-	const auto deco_ent1 = c1.get_handle(first_guid);
-	const auto deco_ent2 = c1.get_handle(second_guid);
-	const auto deco_ent3 = c1.get_handle(third_guid);
+	const auto deco_ent1 = c1[first_guid];
+	const auto deco_ent2 = c1[second_guid];
+	const auto deco_ent3 = c1[third_guid];
 
 	REQUIRE(deco_ent1.has<components::sentience>());
 	REQUIRE(deco_ent1.has<components::position_copying>());
@@ -527,7 +527,7 @@ TEST_CASE("CosmicDelta6 ThreeEntitiesWithReferencesAndDestroyedChild") {
 		REQUIRE(1 == comparatory.size());
 	}
 
-	c2.delete_entity(c2.get_handle(c2_second_guid));
+	c2.delete_entity(c2[c2_second_guid]);
 	REQUIRE(2 == c2.get_entities_count());
 
 	{
@@ -579,9 +579,9 @@ TEST_CASE("CosmicDelta6 ThreeEntitiesWithReferencesAndDestroyedChild") {
 		// for example pointer types that are set to null every time that the object pointed to is deleted.
 		// In such case, this should become REQUIRE(c1 == c2).
 		REQUIRE(c1 != c2);
-		c2.get_handle(c2_first_guid).get<components::position_copying>().target = entity_id();
+		c2[c2_first_guid].get<components::position_copying>().target = entity_id();
 		// note: we were also setting this child to ent2, so we need to nullify it too before ensuring equality
-		c2.get_handle(c2_first_guid).map_child_entity(child_entity_name::CHARACTER_CROSSHAIR, entity_id());
+		c2[c2_first_guid].map_child_entity(child_entity_name::CHARACTER_CROSSHAIR, entity_id());
 		
 		// Only now shall the two cosmoi be equal. (the following expression is  equivalent to c1 == c2)
 		REQUIRE(c1.significant.get_first_mismatch_pos(c2.significant) == -1);
@@ -589,9 +589,9 @@ TEST_CASE("CosmicDelta6 ThreeEntitiesWithReferencesAndDestroyedChild") {
 		REQUIRE(1 == comparatory.size());
 	}
 
-	const auto ent1 = c1.get_handle(c1_first_guid);
-	REQUIRE(!c1.entity_exists_with_guid(c1_second_guid));
-	const auto ent3 = c1.get_handle(c1_third_guid);
+	const auto ent1 = c1[c1_first_guid];
+	REQUIRE(!c1.entity_exists_by(c1_second_guid));
+	const auto ent3 = c1[c1_third_guid];
 
 	REQUIRE(ent1.has<components::position_copying>());
 	const bool pc1_dead = c1[ent1.get<components::position_copying>().target].dead();

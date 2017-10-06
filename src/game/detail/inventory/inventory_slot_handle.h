@@ -1,11 +1,14 @@
 #pragma once
-#include "inventory_slot_handle_declaration.h"
+#include "augs/templates/maybe_const.h"
+
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/transcendental/entity_id.h"
 #include "game/enums/slot_function.h"
+
+#include "game/detail/inventory/inventory_slot_handle_declaration.h"
 #include "game/detail/inventory/inventory_slot_id.h"
+
 #include "game/components/transform_component.h"
-#include "augs/templates/maybe_const.h"
 
 struct inventory_slot;
 
@@ -124,4 +127,9 @@ inline basic_inventory_slot_handle<C>::operator inventory_slot_id() const {
 template <bool C>
 inline basic_inventory_slot_handle<C>::operator basic_inventory_slot_handle<true>() const {
 	return basic_inventory_slot_handle<true>(owner, raw_id);
+}
+
+template <class C>
+auto subscript_handle_getter(C& cosm, const inventory_slot_id id) {
+	return basic_inventory_slot_handle<std::is_const_v<C>>{ cosm, id };
 }
