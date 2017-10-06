@@ -3,56 +3,59 @@
 #include "augs/templates/hash_templates.h"
 
 namespace augs {
-	class pooled_object_id_base {
-	public:
-		// GEN INTROSPECTOR class augs::pooled_object_id_base
-		unsigned version = 0;
-		unsigned indirection_index = -1;
-		// END GEN INTROSPECTOR
+	template <class T, class size_type>
+	struct unversioned_id {
+		using mapped_type = T;
 
-		void unset();
-		bool is_set() const;
+		size_type indirection_index = -1;
 
-		bool operator==(const pooled_object_id_base& b) const;
-		bool operator!=(const pooled_object_id_base& b) const;
+		bool operator==(const unversioned_id& b) const {
+			return indirection_index == b.indirection_index;
+		}
 
-		friend std::ostream& operator<<(std::ostream& out, const pooled_object_id_base &x);
+		bool operator!=(const unversioned_id& b) const {
+			return !operator==(b);
+		}
+
+		bool is_set() const {
+			return *this != unversioned_id();
+		}
 	};
 
-	struct unversioned_id_base {
-		unsigned indirection_index = -1;
-		
-		bool is_set() const;
-
-		bool operator==(const unversioned_id_base& b) const;
-		bool operator!=(const unversioned_id_base& b) const;
-	};
-
-	template <class T>
-	struct unversioned_id : unversioned_id_base {
-		using unversioned_id_base::unversioned_id_base;
-		using unversioned_id_base::operator==;
-		using unversioned_id_base::operator!=;
-	};
-
-	template <class T>
-	class pooled_object_id : public pooled_object_id_base {
-	public:
-		// GEN INTROSPECTOR class augs::pooled_object_id class T
-		// INTROSPECT BASE augs::pooled_object_id_base
+	template <class T, class size_type>
+	struct pooled_object_id {
+		// GEN INTROSPECTOR struct augs::pooled_object_id class T class size_type
+		size_type version = 0;
+		size_type indirection_index = -1;
 		// END GEN INTROSPECTOR
 
 		using mapped_type = T;
 
-		operator unversioned_id<T>() const {
-			unversioned_id<T> un;
+		friend std::ostream& operator<<(std::ostream& out, const pooled_object_id& x) {
+			return out << "(" << x.indirection_index << ";" << x.version << ")";
+		}
+
+		void unset() {
+			*this = pooled_object_id();
+		}
+
+		bool is_set() const {
+			return *this != pooled_object_id();
+		}
+
+		bool operator==(const pooled_object_id& b) const {
+			return version == b.version && indirection_index == b.indirection_index;
+		}
+
+		bool operator!=(const pooled_object_id& b) const {
+			return !operator==(b);
+		}
+
+		operator unversioned_id<T, size_type>() const {
+			unversioned_id<T, size_type> un;
 			un.indirection_index = indirection_index;
 			return un;
 		}
-
-		using pooled_object_id_base::pooled_object_id_base;
-		using pooled_object_id_base::operator==;
-		using pooled_object_id_base::operator!=;
 	};
 }
 
@@ -60,16 +63,16 @@ namespace std {
 	template <class T>
 	struct hash;
 
-	template <class T>
-	struct hash<augs::pooled_object_id<T>> {
-		std::size_t operator()(const augs::pooled_object_id<T>& k) const {
+	template <class T, class S>
+	struct hash<augs::pooled_object_id<T, S>> {
+		std::size_t operator()(const augs::pooled_object_id<T, S>& k) const {
 			return augs::simple_two_hash(k.indirection_index, k.version);
 		}
 	};
 
-	template <class T>
-	struct hash<augs::unversioned_id<T>> {
-		std::size_t operator()(const augs::unversioned_id<T> k) const {
+	template <class T, class S>
+	struct hash<augs::unversioned_id<T, S>> {
+		std::size_t operator()(const augs::unversioned_id<T, S> k) const {
 			return std::hash<int>()(k.indirection_index);
 		}
 	};

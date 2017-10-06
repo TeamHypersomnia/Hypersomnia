@@ -29,8 +29,7 @@ struct tests_of_traits {
 	static_assert(b2_maxPolygonVertices == CONVEX_POLY_VERTEX_COUNT);
 
 	static_assert(
-		sizeof(entity_id) >= sizeof(entity_guid)
-		&& alignof(entity_id) >= alignof(entity_guid),
+		sizeof(entity_id) >= sizeof(entity_guid),
 		"With given memory layouts, entity_id<->entity_guid substitution will not be possible in delta encoding"
 	);
 
@@ -194,7 +193,7 @@ struct tests_of_traits {
 	static_assert(augs::representable_as_lua_value_v<std::wstring>);
 	static_assert(augs::representable_as_lua_value_v<const std::wstring*>);
 	
-	static_assert(!augs::has_io_overloads_v<augs::stream, component_list_t<augs::component_aggregate>>);
+	static_assert(!augs::has_io_overloads_v<augs::stream, cosmic_entity>);
 
 	static_assert(aligned_num_of_bytes_v<0, 4> == 0, "Trait is wrong");
 	static_assert(aligned_num_of_bytes_v<1, 4> == 4, "Trait is wrong");

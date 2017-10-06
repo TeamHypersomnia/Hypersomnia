@@ -81,10 +81,10 @@ public:
 
 	static cosmos empty;
 
-	cosmos(const std::size_t reserved_entities = 0u);
+	cosmos(const cosmic_pool_size_type reserved_entities = 0u);
 	cosmos& operator=(const cosmos_significant_state&);
 
-	void reserve_storage_for_entities(const std::size_t);
+	void reserve_storage_for_entities(const cosmic_pool_size_type);
 
 	entity_handle create_entity(const std::wstring& name);
 	entity_handle create_entity(const std::string& name);

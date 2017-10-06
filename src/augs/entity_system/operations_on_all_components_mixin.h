@@ -1,17 +1,11 @@
 #pragma once
 #include "augs/templates/for_each_in_types.h"
 #include "augs/templates/type_matching_and_indexing.h"
-#include "augs/entity_system/component_aggregate.h"
-
-#include "augs/misc/pooled_object_id.h"
 
 namespace augs {
 	template <class derived, class... components>
 	class operations_on_all_components_mixin {
 	public:
-		using aggregate_type = component_aggregate<components...>;
-		using aggregate_id = pooled_object_id<aggregate_type>;
-
 		void reserve_all_components(const std::size_t n) {
 			auto& self = *static_cast<derived*>(this);
 

@@ -73,7 +73,7 @@ private:
 	friend class component_synchronizer<false, components::name>;
 
 	using owner_reference = maybe_const_ref_t<is_const, cosmos>;
-	using aggregate_ptr = maybe_const_ptr_t<is_const, component_list_t<augs::component_aggregate>>;
+	using aggregate_ptr = maybe_const_ptr_t<is_const, cosmic_entity>;
 
 	owner_reference owner;
 	entity_id raw_id;

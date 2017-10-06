@@ -219,7 +219,6 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/augs/misc/enum_bitset.cpp"
 	"src/augs/misc/http_requests.cpp"
 	"src/augs/misc/machine_entropy.cpp"
-	"src/augs/misc/pooled_object_id.cpp"
 	"src/augs/misc/readable_bytesize.cpp"
 	"src/augs/misc/standard_actions.cpp"
 	"src/augs/misc/streams.cpp"

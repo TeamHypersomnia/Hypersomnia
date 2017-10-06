@@ -73,7 +73,7 @@ namespace prefabs {
 			components::fixtures group;
 
 			group.filter = filters::dynamic_object();
-			group.density = 0.6;
+			group.density = 0.6f;
 			group.material = assets::physical_material_id::METAL;
 
 			front += group;
@@ -103,7 +103,7 @@ namespace prefabs {
 			components::fixtures group;
 
 			group.filter = filters::friction_ground();
-			group.density = 0.6;
+			group.density = 0.6f;
 			group.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET].pos = offset;
 			group.is_friction_ground = true;
 			group.material = assets::physical_material_id::METAL;
@@ -132,7 +132,7 @@ namespace prefabs {
 			components::fixtures group;
 
 			group.filter = filters::trigger();
-			group.density = 0.6;
+			group.density = 0.6f;
 			group.disable_standard_collision_resolution = true;
 			group.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET].pos = offset;
 			group.material = assets::physical_material_id::METAL;

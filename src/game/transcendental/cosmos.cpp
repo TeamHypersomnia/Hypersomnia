@@ -105,7 +105,7 @@ void cosmos::create_inferred_state_for(const const_entity_handle h) {
 	}
 }
 
-cosmos::cosmos(const std::size_t reserved_entities) {
+cosmos::cosmos(const cosmic_pool_size_type reserved_entities) {
 	reserve_storage_for_entities(reserved_entities);
 	significant.meta.global.si.set_pixels_per_meter(100.f);
 }
@@ -166,7 +166,7 @@ void cosmos::complete_reinference(const const_entity_handle h) {
 	create_inferred_state_for(h);
 }
 
-void cosmos::reserve_storage_for_entities(const std::size_t n) {
+void cosmos::reserve_storage_for_entities(const cosmic_pool_size_type n) {
 	get_aggregate_pool().reserve(n);
 	reserve_all_components(n);
 

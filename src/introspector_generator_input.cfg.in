@@ -52,6 +52,7 @@ generated-file-format:
 #include "augs/templates/string_templates.h"
 
 #include "game/transcendental/entity_id_declaration.h"
+#include "game/transcendental/cosmic_types.h"
 
 #define FIELD(x) f(#x, _t_.x...)
 

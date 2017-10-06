@@ -1,30 +1,22 @@
 #pragma once
 #include "augs/misc/constant_size_vector.h"
 #include "augs/misc/pool.h"
-#include "augs/templates/type_mod_templates.h"
 #include "game/transcendental/cosmos_metadata.h"
+#include "game/transcendental/cosmic_types.h"
 
 using cosmos_base = component_list_t<augs::operations_on_all_components_mixin, cosmos>;
-
-#if STATICALLY_ALLOCATE_ENTITIES_NUM
-template <class T>
-using cosmic_object_pool = augs::pool<T, of_size<5000>::make_constant_vector>;
-#else
-template <class T>
-using cosmic_object_pool = augs::pool<T, make_vector>;
-#endif
 
 using dynamic_component_pools_type = 
 	replace_list_type_t<
 		transform_types_in_list_t<
-			typename cosmos_base::aggregate_type::dynamic_components_list,
+			cosmic_entity::dynamic_components_list,
 			cosmic_object_pool
 		>, 
 		std::tuple
 	>
 ;
 
-using aggregate_pool_type = cosmic_object_pool<cosmos_base::aggregate_type>;
+using aggregate_pool_type = cosmic_object_pool<cosmic_entity>;
 
 class cosmos_significant_state {
 	// GEN INTROSPECTOR class cosmos_significant_state

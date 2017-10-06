@@ -11,31 +11,34 @@ namespace augs {
 		if some debugging is necessary.
 	*/
 
+	template <class size_type>
 	struct pool_slot {
-		// GEN INTROSPECTOR struct augs::pool_slot
-		unsigned pointing_indirector = -1;
+		// GEN INTROSPECTOR struct augs::pool_slot class size_type
+		size_type pointing_indirector = -1;
 		// END GEN INTROSPECTOR
 	};
 
+	template <class size_type>
 	struct pool_indirector {
-		// GEN INTROSPECTOR struct augs::pool_indirector
-		unsigned real_index = 0;
-		unsigned version = 1;
+		// GEN INTROSPECTOR struct augs::pool_indirector class size_type
+		size_type real_index = 0;
+		size_type version = 1;
 		// END GEN INTROSPECTOR
 	};
 
-	template <class mapped_type, template <class> class make_container_type>
+	template <class mapped_type, template <class> class make_container_type, class size_type>
 	class pool {
 	public:
-		using key_type = pooled_object_id<mapped_type>;
-		using unversioned_id_type = unversioned_id<mapped_type>;
+		using key_type = pooled_object_id<mapped_type, size_type>;
+		using unversioned_id_type = unversioned_id<mapped_type, size_type>;
 
 	protected:
-		using size_type = unsigned;
+		using pool_slot = pool_slot<size_type>;
+		using pool_indirector = pool_indirector<size_type>;
 
 		friend struct introspection_access;
 
-		// GEN INTROSPECTOR class augs::pool class mapped_type template<class>class C
+		// GEN INTROSPECTOR class augs::pool class mapped_type template<class>class C class size_type
 		make_container_type<pool_slot> slots;
 		make_container_type<mapped_type> objects;
 		make_container_type<pool_indirector> indirectors;
@@ -51,7 +54,10 @@ namespace augs {
 		}
 
 		bool correct_range(const key_type key) const {
-			return key.indirection_index < indirectors.size();
+			return 
+				key.indirection_index != -1 // Quickly eliminate fresh ids without fetching indirectors.size()
+				&& key.indirection_index < indirectors.size()
+			;
 		}
 
 		bool versions_match(const pool_indirector& indirector, const key_type key) const {
@@ -82,13 +88,19 @@ namespace augs {
 		}
 
 		template <
-			size_type expansion_mult = 2, 
-			size_type expansion_add = 1, 
+			unsigned expansion_mult = 2, 
+			unsigned expansion_add = 1, 
 			class... Args
 		>
 		key_type allocate(Args&&... args) {
 			if (full()) {
-				reserve(size() * expansion_mult + expansion_add);
+				const auto old_size = size();
+				const auto new_size = old_size * expansion_mult + expansion_add;
+
+				// Check for overflow
+				ensure(new_size > old_size);
+
+				reserve(new_size);
 			}
 
 			const auto next_free_indirector = free_indirectors.back();
@@ -219,11 +231,11 @@ namespace augs {
 		}
 
 		auto size() const {
-			return slots.size();
+			return static_cast<size_type>(slots.size());
 		}
 
 		auto capacity() const {
-			return indirectors.size();
+			return static_cast<size_type>(indirectors.size());
 		}
 
 		bool empty() const {
@@ -302,6 +314,10 @@ namespace augs {
 			return objects.end();
 		}
 
+		auto max_size() {
+			return std::min(objects.max_size(), std::numeric_limits<size_type>::max());
+		}
+
 		template <class Archive>
 		void write_object(Archive& ar) const {
 			augs::write_with_capacity(ar, objects);
@@ -321,13 +337,13 @@ namespace augs {
 }
 
 namespace augs {
-	template <class A, class mapped_type, template <class> class C>
-	void read_object(A& ar, pool<mapped_type, C>& storage) {
+	template <class A, class mapped_type, template <class> class C, class S>
+	void read_object(A& ar, pool<mapped_type, C, S>& storage) {
 		storage.read_object(ar);
 	}
 	
-	template <class A, class mapped_type, template <class> class C>
-	void write_object(A& ar, const pool<mapped_type, C>& storage) {
+	template <class A, class mapped_type, template <class> class C, class S>
+	void write_object(A& ar, const pool<mapped_type, C, S>& storage) {
 		storage.write_object(ar);
 	}
 }

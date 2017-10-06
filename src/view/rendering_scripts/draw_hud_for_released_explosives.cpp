@@ -22,10 +22,10 @@ void draw_hud_for_released_explosives(const draw_hud_for_released_explosives_inp
 			}
 
 			if (hand_fuse.when_detonates.was_set()) {
-				const auto highlight_amount = 1.f - (
+				const auto highlight_amount = static_cast<float>(1 - (
 					(in.global_time_seconds - hand_fuse.when_released.in_seconds(dt))
 					/ (hand_fuse.when_detonates.in_seconds(dt) - hand_fuse.when_released.in_seconds(dt))
-				);
+				));
 
 				if (highlight_amount > 0.f) {
 					const auto highlight_color = augs::interp(white, red_violet, (1 - highlight_amount)* (1 - highlight_amount));

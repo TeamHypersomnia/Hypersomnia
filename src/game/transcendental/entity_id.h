@@ -1,13 +1,12 @@
 #pragma once
 #include <type_traits>
 #include "augs/misc/pooled_object_id.h"
+
 #include "game/organization/all_components_declaration.h"
 #include "game/transcendental/entity_id_declaration.h"
+#include "game/transcendental/cosmic_types.h"
 
-namespace augs {
-	template <class...>
-	class component_aggregate;
-}
+using cosmic_entity = component_list_t<cosmic_aggregate>;
 
 struct entity_guid {
 	using guid_value_type = unsigned;
@@ -27,18 +26,17 @@ struct entity_guid {
 	}
 };
 
-struct unversioned_entity_id : public augs::unversioned_id<component_list_t<augs::component_aggregate>> {
-	using base = augs::unversioned_id<component_list_t<augs::component_aggregate>>;
+struct unversioned_entity_id : public cosmic_object_unversioned_id<cosmic_entity> {
+	using base = cosmic_object_unversioned_id<cosmic_entity>;
 
 	unversioned_entity_id(const base b = base()) : base(b) {}
 };
 
-struct entity_id : public augs::pooled_object_id<component_list_t<augs::component_aggregate>> {
+struct entity_id : public cosmic_object_pool_id<cosmic_entity> {
+	using base = cosmic_object_pool_id<cosmic_entity>;
 	// GEN INTROSPECTOR struct entity_id
-	// INTROSPECT BASE augs::pooled_object_id<component_list_t<augs::component_aggregate>>
+	// INTROSPECT BASE cosmic_object_pool_id<cosmic_entity>
 	// END GEN INTROSPECTOR
-
-	using base = augs::pooled_object_id<component_list_t<augs::component_aggregate>>;
 
 	entity_id(const base b = base()) : base(b) {}
 

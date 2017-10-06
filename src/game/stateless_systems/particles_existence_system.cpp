@@ -157,15 +157,15 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 			).add_standard_components(step);
 
 			{
-				const auto max_radius = d.amount * 1.5;
+				const auto max_radius = d.amount * 1.5f;
 
 				exploding_ring_input ring;
 
 				ring.outer_radius_start_value = max_radius;
-				ring.outer_radius_end_value = max_radius / 1.2;
+				ring.outer_radius_end_value = max_radius / 1.2f;
 
-				ring.inner_radius_start_value = max_radius / 1.4;
-				ring.inner_radius_end_value = max_radius / 1.2;
+				ring.inner_radius_start_value = max_radius / 1.4f;
+				ring.inner_radius_end_value = max_radius / 1.2f;
 
 				ring.emit_particles_on_ring = false;
 
