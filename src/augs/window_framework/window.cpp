@@ -507,13 +507,26 @@ namespace augs {
 
 	bool window::is_active() const { return false; }
 	void window::destroy() {}
-	bool is_cursor_in_client_area() const { return false; }
 
-	std::optional<std::string> window::get_open_file_name(const wchar_t* const filter) {
+	bool window::set_as_current_impl() {
+#if BUILD_OPENGL
+		return true;
+#else
+		return true;
+#endif
+	}
+
+	void window::set_current_to_none_impl() {
+#if BUILD_OPENGL
+
+#endif
+	}
+
+	std::optional<std::string> window::get_open_file_name(const wchar_t* const filter) const {
 		return std::nullopt;
 	}
 
-	std::optional<std::string> window::get_save_file_name(const wchar_t* const filter) {
+	std::optional<std::string> window::get_save_file_name(const wchar_t* const filter) const {
 		return std::nullopt;
 	}
 }

@@ -23,8 +23,6 @@ namespace augs {
 	class window : public augs::settable_as_current_mixin<window> {
 #if PLATFORM_WINDOWS
 		friend LRESULT CALLBACK wndproc(HWND, UINT, WPARAM, LPARAM);
-		friend std::optional<std::string> get_open_file_name(window&, const wchar_t* const filter);
-		friend std::optional<std::string> get_save_file_name(window&, const wchar_t* const filter);
 
 		HWND hwnd = nullptr;
 		HDC hdc = nullptr;
@@ -55,12 +53,14 @@ namespace augs {
 			const LPARAM
 		);
 
-		friend class settable_as_current_base;
-		bool set_as_current_impl();
-		static void set_current_to_none_impl();
 #elif PLATFORM_LINUX
 
 #endif
+		friend class settable_as_current_base;
+
+		bool set_as_current_impl();
+		static void set_current_to_none_impl();
+
 		window_settings current_settings;
 
 		void set_window_name(const std::string& name);
