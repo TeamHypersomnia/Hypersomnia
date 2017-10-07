@@ -14,7 +14,6 @@
 #include "augs/misc/timer.h"
 #include "augs/misc/machine_entropy.h"
 
-#include "augs/window_framework/colored_print.h"
 #include "augs/window_framework/event.h"
 #include "augs/window_framework/window_settings.h"
 

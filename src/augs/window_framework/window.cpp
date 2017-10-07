@@ -454,7 +454,7 @@ namespace augs {
 		}
 		else {
 			return std::nullopt;
-	}
+		}
 	}
 
 	std::optional<std::string> window::get_save_file_name(const wchar_t* const filter) const {
@@ -546,7 +546,7 @@ namespace augs {
 	}
 
 	vec2i window::get_screen_size() const {
-		return get_window_rect().get_size();
+		return get_window_rect().get_size();	
 	}
 
 	void window::sync_back_into(window_settings& into) {
