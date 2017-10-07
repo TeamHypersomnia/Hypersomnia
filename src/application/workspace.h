@@ -15,11 +15,15 @@ struct workspace {
 	cosmos world;
 	all_logical_assets logicals;
 	all_viewables_defs viewables;
+	
+	entity_id locally_viewed;
 	// END GEN INTROSPECTOR
 
 #if BUILD_TEST_SCENES
 	void make_test_scene(sol::state&, const bool minimal);
 #endif
+
+	void make_blank();
 
 	template <class... Callbacks>
 	void advance(

@@ -1,7 +1,6 @@
 #pragma once
 #include "augs/graphics/rgba.h"
-#include "augs/misc/templated_readwrite.h"
-#include "augs/pad_bytes.h"
+#include "augs/filesystem/path.h"
 
 struct button_with_corners_input {
 	// GEN INTROSPECTOR struct button_with_corners_input

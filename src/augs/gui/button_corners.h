@@ -2,7 +2,7 @@
 #include <array>
 #include "augs/ensure.h"
 #include "augs/math/rects.h"
-
+#include "augs/filesystem/path.h"
 #include "augs/gui/button_corner_type.h"
 #include "augs/drawing/flip.h"
 

@@ -4,7 +4,6 @@
 
 #include "augs/misc/typesafe_sprintf.h"
 #include "augs/build_settings/setting_enable_debug_log.h"
-#include "augs/filesystem/path.h"
 
 struct log_entry {
 	console_color color;
@@ -27,7 +26,6 @@ public:
 	void push_entry(const log_entry&);
 
 	std::string get_complete() const;
-	void save_complete_to(const augs::path_type& path) const;
 };
 
 template <typename... A>
@@ -67,8 +65,6 @@ std::ostream& write_nvps(
 		std::forward<T>(rest)...
 	);
 }
-
-void CALL_SHELL(const std::string&);
 
 #if ENABLE_DEBUG_LOG
 #define DEBUG_LOG LOG

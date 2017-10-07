@@ -76,7 +76,7 @@ namespace augs {
 	}
 
 	template <class Serialized>
-	void verify_has_introspect(Serialized) {
+	void verify_has_introspect(const Serialized&) {
 		static_assert(has_introspect_v<Serialized>, "Attempt to serialize a type in a non-bytesafe context without i/o overloads and without introspectors!");
 	}
 	
@@ -190,22 +190,33 @@ namespace augs {
 		}
 	}
 
-	template <class Archive>
+	template <class Archive, class T>
 	void read_object(
 		Archive& ar,
-		path_type& storage
+		std::optional<T>& storage,
+		std::enable_if_t<!is_byte_io_safe_v<Archive, std::optional<T>>>* dummy = nullptr
 	) {
-		std::string str;
-		read(ar, str);
-		storage = str;
+		bool has_value = false;
+		read(ar, has_value);
+
+		if (has_value) {
+			T t;
+			read(ar, t);
+			storage.emplace(std::move(t));
+		}
 	}
-	
-	template <class Archive>
+
+	template <class Archive, class T>
 	void write_object(
 		Archive& ar,
-		const path_type& storage
+		const std::optional<T>& storage,
+		std::enable_if_t<!is_byte_io_safe_v<Archive, std::optional<T>>>* dummy = nullptr
 	) {
-		write(ar, storage.string());
+		write(ar, storage.has_value());
+		
+		if (storage) {
+			write(ar, *storage);
+		}
 	}
 
 	template <class Archive, class Container, class container_size_type = std::size_t>
@@ -326,26 +337,5 @@ namespace augs {
 		}
 
 		write(ar, compressed_storage);
-	}
-
-	// due to be deleted as we will introduce reading from lua tables
-
-	template<class Archive, class Serialized>
-	void read_from_stream(
-		Archive& ar,
-		Serialized& storage
-	) {
-		augs::introspect(augs::recursive([&](auto&& self, auto, auto& member) {
-			using T = std::decay_t<decltype(member)>;
-
-			if constexpr(!is_padding_field_v<T>) {
-				if constexpr(can_stream_right_v<Archive, T>) {
-					ar >> member;
-				}
-				else {
-					augs::introspect(augs::recursive(self), member);
-				}
-			}
-		}), storage);
 	}
 }

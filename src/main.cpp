@@ -1320,5 +1320,9 @@ catch (const augs::lua_state_creation_error err) {
 }
 catch (...) {
 	LOG("Unknown exception.");
+#if IS_PRODUCTION_BUILD
 	return EXIT_FAILURE;
+#else
+	throw;
+#endif
 }

@@ -42,7 +42,6 @@ class main_menu_setup {
 	augs::fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
 	cosmic_entropy total_collected_entropy;
 
-	entity_id viewed_character_id;
 	sol::table menu_config_patch;
 
 	augs::sound_source menu_theme_source;
@@ -83,7 +82,7 @@ public:
 	}
 
 	auto get_viewed_character_id() const {
-		return viewed_character_id;
+		return intro.locally_viewed;
 	}
 
 	auto get_viewed_character() const {

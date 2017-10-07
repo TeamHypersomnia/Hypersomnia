@@ -94,7 +94,12 @@ namespace augs {
 
 		bool is_active() const;
 
-		std::optional<std::string> get_open_file_name(const wchar_t* const filter) const;
-		std::optional<std::string> get_save_file_name(const wchar_t* const filter) const;
+		struct file_dialog_filter {
+			std::string description;
+			std::string extension;
+		};
+
+		std::optional<std::string> open_file_dialog(const std::vector<file_dialog_filter>& filters) const;
+		std::optional<std::string> save_file_dialog(const std::vector<file_dialog_filter>& filters) const;
 	};
 }

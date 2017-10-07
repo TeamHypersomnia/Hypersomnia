@@ -1,7 +1,6 @@
 #pragma once
 #include "augs/graphics/rgba.h"
-#include "augs/misc/templated_readwrite.h"
-#include "augs/pad_bytes.h"
+#include "augs/filesystem/path.h"
 #include "augs/image/image.h"
 
 struct image_from_commands_input {

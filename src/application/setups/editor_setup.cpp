@@ -18,37 +18,44 @@ void editor_setup::set_popup(const popup p) {
 }
 
 void editor_setup::open_workspace(const augs::path_type& workspace_path) {
-	if (!workspace_path.empty()) {
-
+	if (workspace_path.empty()) {
+		return;
 	}
 
-	current_workspace_path = workspace_path;
-}
-
-void editor_setup::open_blank_workspace() {
-	work.world = cosmos::empty;
-	work.world.reserve_storage_for_entities(100);
-
-	auto origin = work.world.create_entity("origin_entity");
-	origin += components::transform();
-
-	viewed_character_id = origin;
-
-	current_workspace_path = "untitled_cosmos.bin";
-}
-
-editor_setup::editor_setup(const augs::path_type& workspace_path) {
 	try {
-		open_workspace(workspace_path);
+		augs::load(work, workspace_path);
+		current_workspace_path = workspace_path;
 	}
 	catch (cosmos_loading_error err) {
 		set_popup({
 			"Error",
-			"Failed to load the editor workspace.\nA blank default was opened instead.",
+			"Failed to load the editor workspace. File(s) might be corrupt.",
 			err.what()
 		});
+	}
+	catch (augs::stream_read_error err) {
+		set_popup({
+			"Error",
+			"Failed to load the editor workspace. File(s) might be corrupt.",
+			err.what()
+		});
+	}
+}
 
-		open_blank_workspace();
+void editor_setup::save_workspace(const augs::path_type& workspace_path) {
+	augs::save(work, workspace_path);
+}
+
+void editor_setup::open_untitled_workspace() {
+	work.make_blank();
+	current_workspace_path = {};
+}
+
+editor_setup::editor_setup(const augs::path_type& workspace_path) {
+	open_workspace(workspace_path);
+
+	if (current_workspace_path.empty()) {
+		open_untitled_workspace();
 	}
 }
 
@@ -115,7 +122,6 @@ void editor_setup::perform_custom_imgui(
 #if	BUILD_TEST_SCENES
 				if (ImGui::MenuItem("Fill with test scene")) {
 					work.make_test_scene(lua, false);
-					viewed_character_id = work.world.get_entity_by_name(L"player0");
 				}
 #else
 				if (ImGui::MenuItem("Fill with test scene", nullptr, false, false)) {}
@@ -147,26 +153,16 @@ void editor_setup::perform_custom_imgui(
 		const auto result_path = open_file_dialog.get();
 		
 		if (result_path) {
-			try {
-				open_workspace(*result_path);
-			}
-			catch (cosmos_loading_error err) {
-				set_popup({
-					"Error",
-					"Failed to load the file specified.\nA blank default was opened instead.",
-					err.what()
-				});
-
-				open_blank_workspace();
-			}
+			open_workspace(*result_path);
 		}
 	}
 
 	if (save_file_dialog.valid() && is_ready(save_file_dialog)) {
-		const auto result_path = open_file_dialog.get();
+		const auto result_path = save_file_dialog.get();
 
 		if (result_path) {
-
+			save_workspace(*result_path);
+			current_workspace_path = *result_path;
 		}
 	}
 
@@ -231,7 +227,7 @@ void editor_setup::perform_custom_imgui(
 
 				if (auto node = scoped_tree_node(name.c_str())) {
 					if (ImGui::Button("Control")) {
-						viewed_character_id = id;
+						work.locally_viewed = id;
 					}
 				}
 			}
@@ -299,24 +295,36 @@ bool editor_setup::confirm_modal_popup() {
 	return false;
 }
 
+static auto get_filters() {
+	return std::vector<augs::window::file_dialog_filter> {
+		{ "Hypersomnia workspace file (*.wp)", ".wp" },
+		{ "All files", ".*" }
+	};
+}
+
 void editor_setup::open(const augs::window& owner) {
 	open_file_dialog = std::async(
 		std::launch::async,
 		[&](){
-			return owner.get_open_file_name(L"Hypersomnia workspace file (*.wp)\0*.WP\0");
+			return owner.open_file_dialog(get_filters());
 		}
 	);
 }
 
 void editor_setup::save(const augs::window& owner) {
-
+	if (current_workspace_path.empty()) {
+		save_as(owner);
+	}
+	else {
+		save_workspace(current_workspace_path);
+	}
 }
 
 void editor_setup::save_as(const augs::window& owner) {
 	save_file_dialog = std::async(
 		std::launch::async,
 		[&](){
-			return owner.get_save_file_name(L"Hypersomnia workspace file (*.wp)\0*.WP\0");
+			return owner.save_file_dialog(get_filters());
 		}
 	);
 }

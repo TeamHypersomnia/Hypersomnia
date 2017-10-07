@@ -429,7 +429,36 @@ namespace augs {
 		}
 	}
 
-	std::optional<std::string> window::get_open_file_name(const wchar_t* const filter) const {
+	static auto get_filter(const std::vector<window::file_dialog_filter>& filters) {
+		std::wstring filter;
+
+		auto to_reserve = std::size_t{ 0 };
+
+		for (const auto& f : filters) {
+			to_reserve += f.description.length();
+			to_reserve += f.extension.length() + 1;
+			to_reserve += 2;
+		}
+
+		filter.reserve(to_reserve);
+
+		for (const auto& f : filters) {
+			const auto description = to_wstring(f.description);
+			const auto extension = to_wstring(f.extension);
+
+			filter += to_wstring(f.description);
+			filter.push_back(L'\0');
+			filter += L'*';
+			filter += to_wstring(f.extension);
+			filter.push_back(L'\0');
+		}
+
+		return filter;
+	}
+
+	std::optional<std::string> window::open_file_dialog(const std::vector<file_dialog_filter>& filters) const {
+		auto filter = get_filter(filters);
+		
 		OPENFILENAME ofn;       // common dialog box structure
 		std::array<wchar_t, 400> szFile;
 		fill_container(szFile, 0);
@@ -440,7 +469,7 @@ namespace augs {
 		ofn.hwndOwner = hwnd;
 		ofn.lpstrFile[0] = '\0';
 		ofn.nMaxFile = szFile.size();
-		ofn.lpstrFilter = filter;
+		ofn.lpstrFilter = filter.data();
 		ofn.nFilterIndex = 1;
 		ofn.lpstrFileTitle = NULL;
 		ofn.nMaxFileTitle = 0;
@@ -457,7 +486,9 @@ namespace augs {
 		}
 	}
 
-	std::optional<std::string> window::get_save_file_name(const wchar_t* const filter) const {
+	std::optional<std::string> window::save_file_dialog(const std::vector<file_dialog_filter>& filters) const {
+		auto filter = get_filter(filters);
+
 		OPENFILENAME ofn;       // common dialog box structure
 		std::array<wchar_t, 400> szFile;
 		fill_container(szFile, 0);
@@ -468,7 +499,7 @@ namespace augs {
 		ofn.hwndOwner = hwnd;
 		ofn.lpstrFile[0] = '\0';
 		ofn.nMaxFile = szFile.size();
-		ofn.lpstrFilter = filter;
+		ofn.lpstrFilter = filter.data();
 		ofn.nFilterIndex = 1;
 		ofn.lpstrFileTitle = NULL;
 		ofn.nMaxFileTitle = 0;
@@ -478,7 +509,14 @@ namespace augs {
 		// Display the Open dialog box. 
 
 		if (GetSaveFileName(&ofn) == TRUE) {
-			return str_ops(to_string(ofn.lpstrFile)).replace_all("\\", "/");
+			auto result = augs::path_type(ofn.lpstrFile);
+			const auto supposed_extension = filters[ofn.nFilterIndex - 1].extension;
+
+			if (supposed_extension != ".*") {
+				result.replace_extension(filters[ofn.nFilterIndex - 1].extension);
+			}
+
+			return str_ops(result.string()).replace_all("\\", "/");
 		}
 		else {
 			return std::nullopt;
@@ -522,11 +560,11 @@ namespace augs {
 #endif
 	}
 
-	std::optional<std::string> window::get_open_file_name(const wchar_t* const filter) const {
+	std::optional<std::string> window::open_file_dialog(const wchar_t* const filter) const {
 		return std::nullopt;
 	}
 
-	std::optional<std::string> window::get_save_file_name(const wchar_t* const filter) const {
+	std::optional<std::string> window::save_file_dialog(const wchar_t* const filter) const {
 		return std::nullopt;
 	}
 }
@@ -566,11 +604,11 @@ namespace augs {
 #endif
 	}
 
-	std::optional<std::string> window::get_open_file_name(const wchar_t* const filter) const {
+	std::optional<std::string> window::open_file_dialog(const wchar_t* const filter) const {
 		return std::nullopt;
 	}
 
-	std::optional<std::string> window::get_save_file_name(const wchar_t* const filter) const {
+	std::optional<std::string> window::save_file_dialog(const wchar_t* const filter) const {
 		return std::nullopt;
 	}
 }

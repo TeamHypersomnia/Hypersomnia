@@ -56,7 +56,6 @@ class editor_setup {
 
 	cosmic_entropy total_collected_entropy;
 	augs::fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
-	entity_id viewed_character_id;
 
 	augs::path_type current_workspace_path;
 
@@ -65,7 +64,8 @@ class editor_setup {
 
 	void set_popup(const popup);
 	void open_workspace(const augs::path_type& workspace_path);
-	void open_blank_workspace();
+	void save_workspace(const augs::path_type& workspace_path);
+	void open_untitled_workspace();
 
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
@@ -88,7 +88,7 @@ public:
 	}
 
 	auto get_viewed_character_id() const {
-		return viewed_character_id;
+		return work.locally_viewed;
 	}
 
 	auto get_viewed_character() const {

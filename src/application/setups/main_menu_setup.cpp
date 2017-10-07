@@ -141,11 +141,6 @@ main_menu_setup::main_menu_setup(
 #endif
 	}
 
-	viewed_character_id = is_intro_scene_available ?
-		intro.world.get_entity_by_name(L"player0")
-		: entity_id()
-	;
-
 	// director.load_recording_from_file(settings.menu_intro_scene_entropy_path);
 
 	const bool is_recording_available = is_intro_scene_available && director.is_recording_available();

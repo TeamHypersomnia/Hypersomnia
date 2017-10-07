@@ -38,10 +38,6 @@ std::string program_log::get_complete() const {
 	return logs;
 }
 
-void program_log::save_complete_to(const augs::path_type& path) const {
-	augs::create_text_file(path, get_complete());
-}
-
 template<>
 void LOG(const std::string& f) {
 #if ENABLE_LOG 
@@ -54,10 +50,4 @@ void LOG(const std::string& f) {
 	recording_file << f << std::endl;
 #endif
 #endif
-}
-
-void CALL_SHELL(const std::string& s) {
-	std::unique_lock<std::mutex> lock(log_mutex);
-
-	system(s.c_str());
 }

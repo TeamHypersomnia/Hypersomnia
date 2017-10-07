@@ -3,7 +3,7 @@
 #include <chrono>
 
 #include "augs/graphics/rgba.h"
-#include "augs/misc/templated_readwrite.h"
+#include "augs/filesystem/path.h"
 
 struct desaturation_stamp {
 	// GEN INTROSPECTOR struct desaturation_stamp

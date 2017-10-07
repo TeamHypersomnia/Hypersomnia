@@ -3,8 +3,7 @@
 #include <chrono>
 
 #include "augs/graphics/rgba.h"
-#include "augs/misc/templated_readwrite.h"
-#include "augs/templates/maybe_const.h"
+#include "augs/filesystem/path.h"
 
 struct neon_map_input {
 	// GEN INTROSPECTOR struct neon_map_input
