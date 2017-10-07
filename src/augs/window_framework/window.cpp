@@ -36,6 +36,23 @@ namespace augs {
 		return DefWindowProc(hwnd, umsg, wParam, lParam);
 	}
 
+	event::change window::do_raw_motion(const basic_vec2<short> motion) {
+		event::change change;
+		
+		change.mouse.rel = motion;
+
+		if (!mouse_position_frozen) {
+			last_mouse_pos += change.mouse.rel;
+		}
+
+		const auto screen_size = current_settings.get_screen_size() - vec2i(1, 1);
+		last_mouse_pos.clamp_from_zero_to(screen_size);
+		change.mouse.pos = basic_vec2<short>(last_mouse_pos);
+		change.msg = translate_enum(WM_MOUSEMOVE);
+
+		return change;
+	}
+
 	std::optional<event::change> window::handle_event(const UINT m, const WPARAM wParam, const LPARAM lParam) {
 		using namespace event::keys;
 
@@ -165,7 +182,7 @@ namespace augs {
 			break;
 
 		case WM_INPUT:
-			if (current_settings.raw_mouse_input) {
+			if (active && current_settings.raw_mouse_input) {
 				GetRawInputData(
 					reinterpret_cast<HRAWINPUT>(lParam), 
 					RID_INPUT,
@@ -177,19 +194,10 @@ namespace augs {
 				raw = reinterpret_cast<RAWINPUT*>(lpb);
 
 				if (raw->header.dwType == RIM_TYPEMOUSE) {
-					change.mouse.rel = {
+					change = do_raw_motion({
 						static_cast<short>(raw->data.mouse.lLastX),
 						static_cast<short>(raw->data.mouse.lLastY)
-					};
-
-					if (!mouse_position_frozen) {
-						last_mouse_pos += change.mouse.rel;
-					}
-
-					const auto screen_size = current_settings.get_screen_size() - vec2i(1, 1);
-					last_mouse_pos.clamp_from_zero_to(screen_size);
-					change.mouse.pos = basic_vec2<short>(last_mouse_pos);
-					change.msg = translate_enum(WM_MOUSEMOVE);
+					});
 				}
 			}
 			else {
@@ -199,11 +207,23 @@ namespace augs {
 			break;
 
 		case WM_ACTIVATE:
-			active = LOWORD(wParam) != WA_INACTIVE;
+			{
+				const auto type = LOWORD(wParam);
 
-			if (!active && current_settings.raw_mouse_input) {
-				augs::set_cursor_pos(current_settings.position + last_mouse_pos);
+				active = type != WA_INACTIVE;
+
+				switch (type) {
+				case WA_INACTIVE: change.msg = event::message::deactivate; break;
+				case WA_ACTIVE: change.msg = event::message::activate; break;
+				case WA_CLICKACTIVE: change.msg = event::message::click_activate; break;
+				default: change.msg = event::message::unknown; break;
+				}
+
+				if (!active && current_settings.raw_mouse_input) {
+					augs::set_cursor_pos(current_settings.position + last_mouse_pos);
+				}
 			}
+
 			break;
 
 		case WM_GETMINMAXINFO:
@@ -386,6 +406,20 @@ namespace augs {
 				TranslateMessage(&wmsg);
 
 				if (new_change.has_value() && !new_change->repeated) {
+					if (const bool should_sync_mouse = new_change->msg == event::message::click_activate
+						&& get_current_settings().raw_mouse_input
+					) {
+						POINT screen_space;
+
+						if (GetCursorPos(&screen_space)) {
+							const auto window_pos = get_window_rect().get_position();
+							const auto rel_v = (vec2i(screen_space.x, screen_space.y) - window_pos) - last_mouse_pos;
+							const auto m = do_raw_motion(rel_v);
+							
+							output.push_back(m);
+						}
+					}
+
 					output.push_back(*new_change);
 				}
 			}

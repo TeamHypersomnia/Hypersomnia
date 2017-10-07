@@ -833,7 +833,7 @@ int work(const int argc, const char* const * const argv) try {
 				if (e.is_exit_message()) {
 					should_quit = true;
 				}
-				else if (e.msg == message::activate) {
+				else if (e.msg == message::deactivate) {
 					releases.set_all();
 				}
 				else if (
@@ -1255,7 +1255,7 @@ int work(const int argc, const char* const * const argv) try {
 		);
 
 		/* #6 */
-		const bool should_draw_our_cursor = was_system_cursor_kidnapped;
+		const bool should_draw_our_cursor = viewing_config.window.raw_mouse_input;
 
 		{
 			const auto cursor_drawing_pos = common_input_state.mouse.pos;

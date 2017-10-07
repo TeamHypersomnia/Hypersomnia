@@ -8,6 +8,7 @@
 #include <optional>
 
 #include "augs/math/rects.h"
+#include "augs/math/vec2.h"
 
 #include "augs/templates/settable_as_current_mixin.h"
 
@@ -45,6 +46,8 @@ namespace augs {
 
 		bool cursor_in_client_area = false;
 		bool is_cursor_in_client_area() const;
+
+		event::change do_raw_motion(const basic_vec2<short>);
 
 		std::optional<event::change> handle_event(
 			const UINT, 

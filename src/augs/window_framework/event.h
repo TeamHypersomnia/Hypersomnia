@@ -15,6 +15,8 @@ namespace augs {
 				quit,
 				move,
 				activate,
+				deactivate,
+				click_activate,
 				minimize,
 				maximize,
 				restore,
