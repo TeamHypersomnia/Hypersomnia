@@ -199,7 +199,7 @@ namespace augs {
 			break;
 
 		case WM_ACTIVATE:
-			active = LOWORD(wParam) == WA_ACTIVE;
+			active = LOWORD(wParam) != WA_INACTIVE;
 
 			if (!active && current_settings.raw_mouse_input) {
 				augs::set_cursor_pos(current_settings.position + last_mouse_pos);
