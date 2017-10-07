@@ -53,62 +53,6 @@ namespace augs {
 	void set_cursor_pos(const vec2i pos) {
 		SetCursorPos(pos.x, pos.y);
 	}
-
-	std::optional<std::string> get_open_file_name(const wchar_t* const filter) {
-		OPENFILENAME ofn;       // common dialog box structure
-		std::array<wchar_t, 400> szFile;
-		fill_container(szFile, 0);
-
-		ZeroMemory(&ofn, sizeof(ofn));
-		ofn.lStructSize = sizeof(ofn);
-		ofn.lpstrFile = szFile.data();
-		ofn.hwndOwner = NULL;
-		ofn.lpstrFile[0] = '\0';
-		ofn.nMaxFile = szFile.size();
-		ofn.lpstrFilter = filter;
-		ofn.nFilterIndex = 1;
-		ofn.lpstrFileTitle = NULL;
-		ofn.nMaxFileTitle = 0;
-		ofn.lpstrInitialDir = NULL;
-		ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_EXPLORER | OFN_NOCHANGEDIR;
-
-		// Display the Open dialog box. 
-
-		if (GetOpenFileName(&ofn) == TRUE) {
-			return str_ops(to_string(ofn.lpstrFile)).replace_all("\\", "/");
-		}
-		else {
-			return std::nullopt;
-		}
-	}
-
-	std::optional<std::string> get_save_file_name(const wchar_t* const filter) {
-		OPENFILENAME ofn;       // common dialog box structure
-		std::array<wchar_t, 400> szFile;
-		fill_container(szFile, 0);
-
-		ZeroMemory(&ofn, sizeof(ofn));
-		ofn.lStructSize = sizeof(ofn);
-		ofn.lpstrFile = szFile.data();
-		ofn.hwndOwner = NULL;
-		ofn.lpstrFile[0] = '\0';
-		ofn.nMaxFile = szFile.size();
-		ofn.lpstrFilter = filter;
-		ofn.nFilterIndex = 1;
-		ofn.lpstrFileTitle = NULL;
-		ofn.nMaxFileTitle = 0;
-		ofn.lpstrInitialDir = NULL;
-		ofn.Flags = OFN_PATHMUSTEXIST | OFN_EXPLORER | OFN_NOCHANGEDIR | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
-
-		// Display the Open dialog box. 
-
-		if (GetSaveFileName(&ofn) == TRUE) {
-			return str_ops(to_string(ofn.lpstrFile)).replace_all("\\", "/");
-		}
-		else {
-			return std::nullopt;
-		}
-	}
 }
 #else
 
@@ -131,14 +75,6 @@ namespace augs {
 
 	void set_cursor_visible(const bool flag) {
 
-	}
-
-	std::optional<std::string> get_open_file_name(const wchar_t* const filter) {
-		return std::nullopt;
-	}
-
-	std::optional<std::string> get_save_file_name(const wchar_t* const filter) {
-		return std::nullopt;
 	}
 }
 

@@ -1,6 +1,4 @@
 #pragma once
-#include <optional>
-
 #include "augs/math/rects.h"
 #include "augs/math/vec2.h"
 
@@ -19,7 +17,4 @@ namespace augs {
 	void disable_cursor_clipping();
 
 	bool is_character_newline(unsigned i);
-	
-	std::optional<std::string> get_open_file_name(const wchar_t* const filter);
-	std::optional<std::string> get_save_file_name(const wchar_t* const filter);
 }

@@ -25,6 +25,10 @@ namespace sol {
 	class state;
 }
 
+namespace augs {
+	class window;
+}
+
 class editor_setup {
 	struct popup {
 		std::string title;
@@ -97,6 +101,7 @@ public:
 
 	void perform_custom_imgui(
 		sol::state& lua,
+		augs::window& owner,
 		const bool game_gui_active
 	);
 
@@ -137,11 +142,11 @@ public:
 	bool escape_modal_popup();
 	bool confirm_modal_popup();
 
-	void open();
-	void save();
-	void save_as();
-	void export_();
-	void export_as();
+	void open(const augs::window& owner);
+	void save(const augs::window& owner);
+	void save_as(const augs::window& owner);
+	void export_(const augs::window& owner);
+	void export_as(const augs::window& owner);
 	void undo();
 	void redo();
 

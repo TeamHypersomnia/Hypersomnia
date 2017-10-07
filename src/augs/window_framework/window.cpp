@@ -428,6 +428,62 @@ namespace augs {
 			hwnd = nullptr;
 		}
 	}
+
+	std::optional<std::string> window::get_open_file_name(const wchar_t* const filter) const {
+		OPENFILENAME ofn;       // common dialog box structure
+		std::array<wchar_t, 400> szFile;
+		fill_container(szFile, 0);
+
+		ZeroMemory(&ofn, sizeof(ofn));
+		ofn.lStructSize = sizeof(ofn);
+		ofn.lpstrFile = szFile.data();
+		ofn.hwndOwner = hwnd;
+		ofn.lpstrFile[0] = '\0';
+		ofn.nMaxFile = szFile.size();
+		ofn.lpstrFilter = filter;
+		ofn.nFilterIndex = 1;
+		ofn.lpstrFileTitle = NULL;
+		ofn.nMaxFileTitle = 0;
+		ofn.lpstrInitialDir = NULL;
+		ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_EXPLORER | OFN_NOCHANGEDIR;
+
+		// Display the Open dialog box. 
+
+		if (GetOpenFileName(&ofn) == TRUE) {
+			return str_ops(to_string(ofn.lpstrFile)).replace_all("\\", "/");
+		}
+		else {
+			return std::nullopt;
+	}
+	}
+
+	std::optional<std::string> window::get_save_file_name(const wchar_t* const filter) const {
+		OPENFILENAME ofn;       // common dialog box structure
+		std::array<wchar_t, 400> szFile;
+		fill_container(szFile, 0);
+
+		ZeroMemory(&ofn, sizeof(ofn));
+		ofn.lStructSize = sizeof(ofn);
+		ofn.lpstrFile = szFile.data();
+		ofn.hwndOwner = hwnd;
+		ofn.lpstrFile[0] = '\0';
+		ofn.nMaxFile = szFile.size();
+		ofn.lpstrFilter = filter;
+		ofn.nFilterIndex = 1;
+		ofn.lpstrFileTitle = NULL;
+		ofn.nMaxFileTitle = 0;
+		ofn.lpstrInitialDir = NULL;
+		ofn.Flags = OFN_PATHMUSTEXIST | OFN_EXPLORER | OFN_NOCHANGEDIR | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
+
+		// Display the Open dialog box. 
+
+		if (GetSaveFileName(&ofn) == TRUE) {
+			return str_ops(to_string(ofn.lpstrFile)).replace_all("\\", "/");
+		}
+		else {
+			return std::nullopt;
+		}
+	}
 }
 
 #else
@@ -452,6 +508,14 @@ namespace augs {
 	bool window::is_active() const { return false; }
 	void window::destroy() {}
 	bool is_cursor_in_client_area() const { return false; }
+
+	std::optional<std::string> window::get_open_file_name(const wchar_t* const filter) {
+		return std::nullopt;
+	}
+
+	std::optional<std::string> window::get_save_file_name(const wchar_t* const filter) {
+		return std::nullopt;
+	}
 }
 #endif
 

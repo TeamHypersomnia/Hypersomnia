@@ -22,8 +22,9 @@ namespace augs {
 	// extern LRESULT CALLBACK wndproc(HWND, UINT, WPARAM, LPARAM);
 	class window : public augs::settable_as_current_mixin<window> {
 #if PLATFORM_WINDOWS
-		friend int WINAPI::WinMain(HINSTANCE, HINSTANCE, LPSTR, int);
 		friend LRESULT CALLBACK wndproc(HWND, UINT, WPARAM, LPARAM);
+		friend std::optional<std::string> get_open_file_name(window&, const wchar_t* const filter);
+		friend std::optional<std::string> get_save_file_name(window&, const wchar_t* const filter);
 
 		HWND hwnd = nullptr;
 		HDC hdc = nullptr;
@@ -93,5 +94,8 @@ namespace augs {
 		xywhi get_window_rect() const;
 
 		bool is_active() const;
+
+		std::optional<std::string> get_open_file_name(const wchar_t* const filter) const;
+		std::optional<std::string> get_save_file_name(const wchar_t* const filter) const;
 	};
 }

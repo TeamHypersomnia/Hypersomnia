@@ -4,6 +4,7 @@
 #include "augs/filesystem/file.h"
 #include "augs/templates/thread_templates.h"
 #include "augs/templates/chrono_templates.h"
+#include "augs/window_framework/window.h"
 #include "augs/window_framework/platform_utils.h"
 #include "augs/window_framework/shell.h"
 
@@ -66,6 +67,7 @@ void editor_setup::customize_for_viewing(config_lua_table& config) const {
 
 void editor_setup::perform_custom_imgui(
 	sol::state& lua,
+	augs::window& owner,
 	const bool game_gui_active
 ) {
 	using namespace augs::imgui;
@@ -76,7 +78,7 @@ void editor_setup::perform_custom_imgui(
 				if (ImGui::MenuItem("New", "CTRL+N")) {}
 
 				if (ImGui::MenuItem("Open", "CTRL+O")) {
-					open();
+					open(owner);
 				}
 
 				if (ImGui::MenuItem("Recent files")) {
@@ -86,19 +88,19 @@ void editor_setup::perform_custom_imgui(
 				ImGui::Separator();
 
 				if (ImGui::MenuItem("Save", "CTRL+S")) {
-					save();
+					save(owner);
 				}
 
 				if (ImGui::MenuItem("Save as", "F12")) {
-					save_as();
+					save_as(owner);
 				}
 
 				if (ImGui::MenuItem("Export", "CTRL+E")) {
-					export_();
+					export_(owner);
 				}
 
 				if (ImGui::MenuItem("Export as")) {
-					export_as();
+					export_as(owner);
 				}
 			}
 			if (auto menu = scoped_menu("Edit")) {
@@ -157,6 +159,14 @@ void editor_setup::perform_custom_imgui(
 
 				open_blank_workspace();
 			}
+		}
+	}
+
+	if (save_file_dialog.valid() && is_ready(save_file_dialog)) {
+		const auto result_path = open_file_dialog.get();
+
+		if (result_path) {
+
 		}
 	}
 
@@ -289,33 +299,33 @@ bool editor_setup::confirm_modal_popup() {
 	return false;
 }
 
-void editor_setup::open() {	
+void editor_setup::open(const augs::window& owner) {
 	open_file_dialog = std::async(
 		std::launch::async,
-		[](){
-			return augs::get_open_file_name(L"Hypersomnia workspace file (*.wp)\0*.WP\0");
+		[&](){
+			return owner.get_open_file_name(L"Hypersomnia workspace file (*.wp)\0*.WP\0");
 		}
 	);
 }
 
-void editor_setup::save() {
+void editor_setup::save(const augs::window& owner) {
 
 }
 
-void editor_setup::save_as() {
+void editor_setup::save_as(const augs::window& owner) {
 	save_file_dialog = std::async(
 		std::launch::async,
-		[](){
-			return augs::get_save_file_name(L"Hypersomnia workspace file (*.wp)\0*.WP\0");
+		[&](){
+			return owner.get_save_file_name(L"Hypersomnia workspace file (*.wp)\0*.WP\0");
 		}
 	);
 }
 
-void editor_setup::export_() {
+void editor_setup::export_(const augs::window& owner) {
 
 }
 
-void editor_setup::export_as() {
+void editor_setup::export_as(const augs::window& owner) {
 
 }
 

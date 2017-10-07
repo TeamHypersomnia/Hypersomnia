@@ -710,6 +710,7 @@ int work(const int argc, const char* const * const argv) try {
 
 					/* MSVC ICE workaround */
 					auto& _lua = lua;
+					auto& _window = window;
 					auto& _game_gui = game_gui;
 
 					visit_current_setup([&](auto& setup) {
@@ -717,7 +718,7 @@ int work(const int argc, const char* const * const argv) try {
 
 						if constexpr(std::is_same_v<T, editor_setup>) {
 							/* Editor needs more goods */
-							setup.perform_custom_imgui(_lua, _game_gui.active);
+							setup.perform_custom_imgui(_lua, _window, _game_gui.active);
 						}
 						else {
 							setup.perform_custom_imgui();
@@ -736,6 +737,7 @@ int work(const int argc, const char* const * const argv) try {
 			/* MSVC ICE workaround */
 
 			const auto& _config = config;
+			auto& _window = window;
 
 			const auto viewing_config = visit_current_setup([&_config](auto& setup) {
 				auto config_copy = _config;
@@ -882,7 +884,7 @@ int work(const int argc, const char* const * const argv) try {
 									const auto k = e.key.key;
 
 									switch (k) {
-										case key::F12: setup.save_as(); return true;
+										case key::F12: setup.save_as(_window); return true;
 										default: break;
 									}
 
@@ -901,9 +903,10 @@ int work(const int argc, const char* const * const argv) try {
 										}
 										else {
 											switch (k) {
-												case key::S: setup.save(); return true;
+												case key::S: setup.save(_window); return true;
+												case key::E: setup.export_(_window); return true;
 												case key::Z: setup.undo(); return true;
-												case key::O: setup.open(); return true;
+												case key::O: setup.open(_window); return true;
 												case key::C: setup.copy(); return true;
 												case key::X: setup.cut(); return true;
 												case key::Y: setup.paste(); return true;
