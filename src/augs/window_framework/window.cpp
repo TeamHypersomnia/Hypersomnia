@@ -490,8 +490,12 @@ namespace augs {
 		return filter;
 	}
 
-	std::optional<std::string> window::open_file_dialog(const std::vector<file_dialog_filter>& filters) const {
-		auto filter = get_filter(filters);
+	std::optional<std::string> window::open_file_dialog(
+		const std::vector<file_dialog_filter>& filters,
+		std::string custom_title
+	) const {
+		const auto filter = get_filter(filters);
+		const auto title = to_wstring(custom_title);
 		
 		OPENFILENAME ofn;       // common dialog box structure
 		std::array<wchar_t, 400> szFile;
@@ -504,6 +508,7 @@ namespace augs {
 		ofn.lpstrFile[0] = '\0';
 		ofn.nMaxFile = szFile.size();
 		ofn.lpstrFilter = filter.data();
+		ofn.lpstrTitle = title.data();
 		ofn.nFilterIndex = 1;
 		ofn.lpstrFileTitle = NULL;
 		ofn.nMaxFileTitle = 0;
@@ -520,8 +525,12 @@ namespace augs {
 		}
 	}
 
-	std::optional<std::string> window::save_file_dialog(const std::vector<file_dialog_filter>& filters) const {
-		auto filter = get_filter(filters);
+	std::optional<std::string> window::save_file_dialog(
+		const std::vector<file_dialog_filter>& filters,
+		std::string custom_title
+	) const {
+		const auto filter = get_filter(filters);
+		const auto title = to_wstring(custom_title);
 
 		OPENFILENAME ofn;       // common dialog box structure
 		std::array<wchar_t, 400> szFile;
@@ -534,6 +543,7 @@ namespace augs {
 		ofn.lpstrFile[0] = '\0';
 		ofn.nMaxFile = szFile.size();
 		ofn.lpstrFilter = filter.data();
+		ofn.lpstrTitle = title.data();
 		ofn.nFilterIndex = 1;
 		ofn.lpstrFileTitle = NULL;
 		ofn.nMaxFileTitle = 0;
@@ -594,11 +604,17 @@ namespace augs {
 #endif
 	}
 
-	std::optional<std::string> window::open_file_dialog(const wchar_t* const filter) const {
+	std::optional<std::string> window::open_file_dialog(
+		const std::vector<file_dialog_filter>& filters,
+		std::string custom_title
+	) const {
 		return std::nullopt;
 	}
 
-	std::optional<std::string> window::save_file_dialog(const wchar_t* const filter) const {
+	std::optional<std::string> window::save_file_dialog(
+		const std::vector<file_dialog_filter>& filters,
+		std::string custom_title
+	) const {
 		return std::nullopt;
 	}
 }
@@ -638,11 +654,17 @@ namespace augs {
 #endif
 	}
 
-	std::optional<std::string> window::open_file_dialog(const wchar_t* const filter) const {
+	std::optional<std::string> window::open_file_dialog(
+		const std::vector<file_dialog_filter>& filters,
+		std::string custom_title
+	) const {
 		return std::nullopt;
 	}
 
-	std::optional<std::string> window::save_file_dialog(const wchar_t* const filter) const {
+	std::optional<std::string> window::save_file_dialog(
+		const std::vector<file_dialog_filter>& filters,
+		std::string custom_title
+	) const {
 		return std::nullopt;
 	}
 }

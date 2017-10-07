@@ -306,7 +306,7 @@ void editor_setup::open(const augs::window& owner) {
 	open_file_dialog = std::async(
 		std::launch::async,
 		[&](){
-			return owner.open_file_dialog(get_filters());
+			return owner.open_file_dialog(get_filters(), "Open workspace");
 		}
 	);
 }

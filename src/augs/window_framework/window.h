@@ -102,7 +102,14 @@ namespace augs {
 			std::string extension;
 		};
 
-		std::optional<std::string> open_file_dialog(const std::vector<file_dialog_filter>& filters) const;
-		std::optional<std::string> save_file_dialog(const std::vector<file_dialog_filter>& filters) const;
+		std::optional<std::string> open_file_dialog(
+			const std::vector<file_dialog_filter>& filters,
+			std::string custom_title = std::string()
+		) const;
+
+		std::optional<std::string> save_file_dialog(
+			const std::vector<file_dialog_filter>& filters,
+			std::string custom_title = std::string()
+		) const;
 	};
 }
