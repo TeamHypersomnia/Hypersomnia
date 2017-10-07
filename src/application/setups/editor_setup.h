@@ -57,11 +57,11 @@ class editor_setup {
 	augs::path_type current_workspace_path;
 
 	std::future<std::optional<std::string>> open_file_dialog;
+	std::future<std::optional<std::string>> save_file_dialog;
 
 	void set_popup(const popup);
 	void open_workspace(const augs::path_type& workspace_path);
 	void open_blank_workspace();
-	void start_open_file_dialog();
 
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
@@ -140,6 +140,8 @@ public:
 	void open();
 	void save();
 	void save_as();
+	void export_();
+	void export_as();
 	void undo();
 	void redo();
 

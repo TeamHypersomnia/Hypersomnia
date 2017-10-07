@@ -81,6 +81,34 @@ namespace augs {
 			return std::nullopt;
 		}
 	}
+
+	std::optional<std::string> get_save_file_name(const wchar_t* const filter) {
+		OPENFILENAME ofn;       // common dialog box structure
+		std::array<wchar_t, 400> szFile;
+		fill_container(szFile, 0);
+
+		ZeroMemory(&ofn, sizeof(ofn));
+		ofn.lStructSize = sizeof(ofn);
+		ofn.lpstrFile = szFile.data();
+		ofn.hwndOwner = NULL;
+		ofn.lpstrFile[0] = '\0';
+		ofn.nMaxFile = szFile.size();
+		ofn.lpstrFilter = filter;
+		ofn.nFilterIndex = 1;
+		ofn.lpstrFileTitle = NULL;
+		ofn.nMaxFileTitle = 0;
+		ofn.lpstrInitialDir = NULL;
+		ofn.Flags = OFN_PATHMUSTEXIST | OFN_EXPLORER | OFN_NOCHANGEDIR | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
+
+		// Display the Open dialog box. 
+
+		if (GetSaveFileName(&ofn) == TRUE) {
+			return str_ops(to_string(ofn.lpstrFile)).replace_all("\\", "/");
+		}
+		else {
+			return std::nullopt;
+		}
+	}
 }
 #else
 
@@ -106,6 +134,10 @@ namespace augs {
 	}
 
 	std::optional<std::string> get_open_file_name(const wchar_t* const filter) {
+		return std::nullopt;
+	}
+
+	std::optional<std::string> get_save_file_name(const wchar_t* const filter) {
 		return std::nullopt;
 	}
 }

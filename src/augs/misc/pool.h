@@ -26,9 +26,10 @@ namespace augs {
 		// END GEN INTROSPECTOR
 	};
 
-	template <class mapped_type, template <class> class make_container_type, class size_type>
+	template <class T, template <class> class make_container_type, class size_type>
 	class pool {
 	public:
+		using mapped_type = T;
 		using key_type = pooled_object_id<mapped_type, size_type>;
 		using unversioned_id_type = unversioned_id<mapped_type, size_type>;
 
@@ -95,12 +96,11 @@ namespace augs {
 		key_type allocate(Args&&... args) {
 			if (full()) {
 				const auto old_size = size();
-				const auto new_size = old_size * expansion_mult + expansion_add;
+				const auto new_size = std::size_t(old_size) * expansion_mult + expansion_add;
 
-				// Check for overflow
-				ensure(new_size > old_size);
+				ensure(new_size <= std::numeric_limits<size_type>::max());
 
-				reserve(new_size);
+				reserve(static_cast<size_type>(new_size));
 			}
 
 			const auto next_free_indirector = free_indirectors.back();
@@ -312,10 +312,6 @@ namespace augs {
 
 		auto end() const {
 			return objects.end();
-		}
-
-		auto max_size() {
-			return std::min(objects.max_size(), std::numeric_limits<size_type>::max());
 		}
 
 		template <class Archive>

@@ -16,15 +16,6 @@ void editor_setup::set_popup(const popup p) {
 	current_popup = p;
 }
 
-void editor_setup::start_open_file_dialog() {
-	open_file_dialog = std::async(
-		std::launch::async,
-		[](){
-			return augs::get_open_file_name(L"Hypersomnia workspace file (*.wp)\0*.WP\0");
-		}
-	);
-}
-
 void editor_setup::open_workspace(const augs::path_type& workspace_path) {
 	if (!workspace_path.empty()) {
 
@@ -85,7 +76,7 @@ void editor_setup::perform_custom_imgui(
 				if (ImGui::MenuItem("New", "CTRL+N")) {}
 
 				if (ImGui::MenuItem("Open", "CTRL+O")) {
-					start_open_file_dialog();
+					open();
 				}
 
 				if (ImGui::MenuItem("Recent files")) {
@@ -95,19 +86,19 @@ void editor_setup::perform_custom_imgui(
 				ImGui::Separator();
 
 				if (ImGui::MenuItem("Save", "CTRL+S")) {
-
+					save();
 				}
 
 				if (ImGui::MenuItem("Save as", "F12")) {
-
+					save_as();
 				}
 
 				if (ImGui::MenuItem("Export", "CTRL+E")) {
-
+					export_();
 				}
 
 				if (ImGui::MenuItem("Export as")) {
-
+					export_as();
 				}
 			}
 			if (auto menu = scoped_menu("Edit")) {
@@ -298,8 +289,13 @@ bool editor_setup::confirm_modal_popup() {
 	return false;
 }
 
-void editor_setup::open() {
-	start_open_file_dialog();
+void editor_setup::open() {	
+	open_file_dialog = std::async(
+		std::launch::async,
+		[](){
+			return augs::get_open_file_name(L"Hypersomnia workspace file (*.wp)\0*.WP\0");
+		}
+	);
 }
 
 void editor_setup::save() {
@@ -307,6 +303,19 @@ void editor_setup::save() {
 }
 
 void editor_setup::save_as() {
+	save_file_dialog = std::async(
+		std::launch::async,
+		[](){
+			return augs::get_save_file_name(L"Hypersomnia workspace file (*.wp)\0*.WP\0");
+		}
+	);
+}
+
+void editor_setup::export_() {
+
+}
+
+void editor_setup::export_as() {
 
 }
 
