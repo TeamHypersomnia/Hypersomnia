@@ -654,7 +654,6 @@ int work(const int argc, const char* const * const argv) try {
 
 		const auto [
 			new_game_entropy, 
-			was_system_cursor_kidnapped, 
 			viewing_config
 		] = [frame_delta]() {
 			static game_intents game_intents;
@@ -755,8 +754,6 @@ int work(const int argc, const char* const * const argv) try {
 
 			configurables.apply(viewing_config);
 
-			bool was_system_cursor_kidnapped = false;
-			
 			if (window.is_active()
 				&& (
 					in_direct_gameplay
@@ -770,8 +767,6 @@ int work(const int argc, const char* const * const argv) try {
 			) {
 				augs::clip_system_cursor(window.get_window_rect());
 				augs::set_cursor_visible(false);
-
-				was_system_cursor_kidnapped = true;
 			}
 			else {
 				augs::disable_cursor_clipping();
@@ -956,6 +951,7 @@ int work(const int argc, const char* const * const argv) try {
 						if (key_change.has_value()) {
 							const auto key = e.key.key;
 							const bool was_pressed = *key_change == intent_change::PRESSED;
+							const bool was_released = *key_change == intent_change::RELEASED;
 
 							if (const auto it = mapped_or_nullptr(viewing_config.app_controls, key)) {
 								if (was_pressed) {
@@ -963,7 +959,7 @@ int work(const int argc, const char* const * const argv) try {
 								}
 							}
 							else {
-								if (direct_gameplay_or_game_gui) {
+								if (direct_gameplay_or_game_gui || was_released) {
 									if (const auto it = mapped_or_nullptr(viewing_config.app_ingame_controls, key)) {
 										if (was_pressed) {
 											handle_app_ingame_intent(*it);
@@ -1021,7 +1017,6 @@ int work(const int argc, const char* const * const argv) try {
 					game_intents,
 					game_motions
 				),
-				was_system_cursor_kidnapped,
 				viewing_config
 			);
 		}();
