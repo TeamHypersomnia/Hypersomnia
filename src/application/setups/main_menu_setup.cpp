@@ -119,7 +119,7 @@ main_menu_setup::main_menu_setup(
 		}
 	}
 	catch (const augs::ifstream_error& err) {
-		LOG("Error loading file %x:\n%x\nMenu will apply no patch to config.", menu_config_patch_path, err.what());
+		LOG("Failed to load %x:\n%x\nMenu will apply no patch to config.", menu_config_patch_path, err.what());
 	}
 
 	float gain_fade_multiplier = 0.f;

@@ -28,6 +28,8 @@ void editor_setup::open_workspace(sol::state& lua, const augs::path_type& worksp
 		return;
 	}
 
+	const auto display_path = augs::to_display_path(workspace_path);
+
 	try {
 		if (workspace_path.extension() == ".wp") {
 			augs::load(work, workspace_path);
@@ -41,24 +43,31 @@ void editor_setup::open_workspace(sol::state& lua, const augs::path_type& worksp
 
 		set_workspace_path(lua, workspace_path);
 	}
-	catch (cosmos_loading_error err) {
+	catch (const cosmos_loading_error err) {
 		set_popup({
 			"Error",
-			"Failed to load the editor workspace. File(s) might be corrupt.",
+			typesafe_sprintf("Failed to load %x.\nFile(s) might be corrupt.", display_path),
 			err.what()
 		});
 	}
-	catch (augs::stream_read_error err) {
+	catch (const augs::stream_read_error err) {
 		set_popup({
 			"Error",
-			"Failed to load the editor workspace. File(s) might be corrupt.",
+			typesafe_sprintf("Failed to load %x.\nFile(s) might be corrupt.", display_path),
 			err.what()
 		});
 	}
-	catch (augs::ifstream_error err) {
+	catch (const augs::lua_deserialization_error err) {
 		set_popup({
 			"Error",
-			"Failed to load the editor workspace. File(s) might be corrupt.",
+			typesafe_sprintf("Failed to load %x.\nNot a valid lua table.", display_path),
+			err.what()
+		});
+	}
+	catch (const augs::ifstream_error err) {
+		set_popup({
+			"Error",
+			typesafe_sprintf("Failed to load %x.\nFile(s) might be missing.", display_path),
 			err.what()
 		});
 	}
@@ -88,10 +97,10 @@ editor_recent_paths::editor_recent_paths(sol::state& lua) {
 	try {
 		augs::load_from_lua_table(lua, *this, get_recent_paths_path());
 	}
-	catch (augs::ifstream_error) {
+	catch (const augs::ifstream_error) {
 
 	}
-	catch (augs::lua_deserialization_error) {
+	catch (const augs::lua_deserialization_error) {
 
 	}
 }
@@ -151,12 +160,7 @@ void editor_setup::perform_custom_imgui(
 					const auto recent_paths = recent.paths;
 
 					for (const auto& target_path : recent_paths) {
-						auto display_path = target_path.filename();
-						display_path += " (";
-						display_path += augs::path_type(target_path).replace_filename("");
-						display_path += ")";
-
-						const auto str = display_path.string();
+						const auto str = augs::to_display_path(target_path).string();
 
 						if (ImGui::MenuItem(str.c_str())) {
 							open_workspace(lua, target_path);
@@ -423,6 +427,9 @@ void editor_setup::open_containing_folder() {
 		path_str.size() > 0
 	) {
 		augs::shell(path_str);
+	}
+	else {
+		augs::shell(std::experimental::filesystem::current_path().replace_filename("").string());
 	}
 }
 

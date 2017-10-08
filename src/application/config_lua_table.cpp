@@ -20,6 +20,9 @@ config_lua_table::config_lua_table(sol::state& lua, const augs::path_type& confi
 	catch (const augs::lua_deserialization_error err) {
 		throw config_read_error(config_lua_path, err.what());
 	}
+	catch (const augs::ifstream_error err) {
+		throw config_read_error(config_lua_path, err.what());
+	}
 }
 
 void config_lua_table::save(sol::state& lua, const augs::path_type& target_path) const {

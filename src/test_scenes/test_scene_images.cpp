@@ -51,7 +51,14 @@ void load_test_scene_images(
 		}
 		catch (augs::lua_deserialization_error err) {
 			throw test_scene_asset_loading_error(
-				"Error while loading additional properties for %x: %x",
+				"Failed to load additional properties for %x:\nNot a valid lua table.\n%x",
+				stem,
+				err.what()
+			);
+		}
+		catch (augs::ifstream_error err) {
+			throw test_scene_asset_loading_error(
+				"Failed to load additional properties for %x:\nFile might be corrupt.\n%x",
 				stem,
 				err.what()
 			);

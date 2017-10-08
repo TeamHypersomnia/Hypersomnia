@@ -41,7 +41,7 @@ void load_test_scene_sound_buffers(sound_buffer_inputs_map& sounds) {
 		}
 		else {
 			throw test_scene_asset_loading_error(
-				"Error loading %x: sound file was not found at %x.", 
+				"Failed to load %x: sound file was not found at %x.", 
 				stem, 
 				without_ext
 			);

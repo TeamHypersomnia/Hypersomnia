@@ -423,29 +423,20 @@ namespace augs {
 		T& object,
 		const path_type& source_path
 	) {
-		try {
-			auto pfr = lua.do_string(
-				get_file_contents(source_path)
-			);
+		auto pfr = lua.do_string(
+			get_file_contents(source_path)
+		);
 
-			if (!pfr.valid()) {
-				throw lua_deserialization_error(
-					"Failed to obtain table from %x:\n%x",
-					source_path,
-					pfr.operator std::string()
-				);
-			}
-
-			sol::table input_table = pfr;
-			read(input_table, object);
-		}
-		catch (const ifstream_error& err) {
+		if (!pfr.valid()) {
 			throw lua_deserialization_error(
-				"Failed to open file for reading the lua table: %x\n%x",
+				"Failed to obtain table from %x:\n%x",
 				source_path,
-				err.what()
+				pfr.operator std::string()
 			);
 		}
+
+		sol::table input_table = pfr;
+		read(input_table, object);
 	}
 
 	template <class T>

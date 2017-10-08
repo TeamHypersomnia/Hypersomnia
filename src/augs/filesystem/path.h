@@ -24,6 +24,14 @@ namespace augs {
 	}
 
 	static_assert(has_readwrite_overloads_v<stream, path_type>);
+
+	inline auto to_display_path(path_type target_path) {
+		auto display_path = target_path.filename();
+		display_path += " (";
+		display_path += target_path.replace_filename("");
+		display_path += ")";
+		return display_path;
+	}
 }
 
 namespace std {

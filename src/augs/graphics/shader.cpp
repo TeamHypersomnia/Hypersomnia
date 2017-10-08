@@ -67,7 +67,7 @@ namespace augs {
 		}
 		catch (const augs::ifstream_error& err) {
 			throw shader_error(
-				"Error while loading shader file %x:\n%x", path, err.what()
+				"Failed to load shader file %x:\n%x", path, err.what()
 			);
 		}
 

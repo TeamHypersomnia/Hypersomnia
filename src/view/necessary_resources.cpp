@@ -157,8 +157,16 @@ necessary_image_loadables_map::necessary_image_loadables_map(
 			}
 			catch (augs::lua_deserialization_error err) {
 				throw necessary_resource_loading_error(
-					"Error while loading additional properties for %x (%x):", 
+					"Failed to load additional properties for %x (%x).\nNot a valid lua table.\n%x",
 					stem, 
+					additional_properties_path,
+					err.what()
+				);
+			}
+			catch (augs::ifstream_error err) {
+				throw necessary_resource_loading_error(
+					"Failed to load additional properties for %x (%x).\nFile might be corrupt.\n%x",
+					stem,
 					additional_properties_path,
 					err.what()
 				);
@@ -183,20 +191,27 @@ necessary_image_loadables_map::necessary_image_loadables_map(
 			}
 			catch (augs::lua_deserialization_error err) {
 				throw necessary_resource_loading_error(
-					"Error while loading procedural image definition for %x (%x):",
+					"Failed to load procedural image definition for %x (%x).\nNot a valid lua table.\n%x",
 					stem,
 					procedural_definition_path,
 					err.what()
 				);
 			}
-
+			catch (augs::ifstream_error err) {
+				throw necessary_resource_loading_error(
+					"Failed to load procedural image definition for %x (%x).\nFile might be corrupt.\n%x",
+					stem,
+					procedural_definition_path,
+					err.what()
+				);
+			}
 			
 			if (
 				const bool exactly_one = def.button_with_corners.has_value() != def.image_from_commands.has_value();
 				!exactly_one
 			) {
 				throw necessary_resource_loading_error(
-					"Error while loading procedural image definition for %x (%x):\n%x",
+					"Failed to load procedural image definition for %x (%x):\n%x",
 					stem,
 					procedural_definition_path,
 					"Either none or more than one type of procedural image have been specified."
@@ -243,7 +258,7 @@ necessary_image_loadables_map::necessary_image_loadables_map(
 
 		if (const bool nothing_loaded = definition_template.source_image_path.empty()) {
 			throw necessary_resource_loading_error(
-				"Error while loading necessary image: %x.\n%x",
+				"Failed to load necessary image: %x.\n%x",
 				stem,
 				"No source image exists, nor does a procedural definition."
 			);
