@@ -53,6 +53,16 @@ namespace augs {
 	void set_cursor_pos(const vec2i pos) {
 		SetCursorPos(pos.x, pos.y);
 	}
+
+	std::optional<vec2i> get_cursor_pos() {
+		POINT p;
+
+		if (GetCursorPos(&p)) {
+			return vec2i { p.x, p.y };
+		}
+
+		return std::nullopt;
+	}
 }
 #else
 
@@ -75,6 +85,14 @@ namespace augs {
 
 	void set_cursor_visible(const bool flag) {
 
+	}
+
+	void set_cursor_pos(const vec2i pos) {
+	
+	}
+
+	std::optional<vec2i> get_cursor_pos() {
+		return std::nullopt;
 	}
 }
 

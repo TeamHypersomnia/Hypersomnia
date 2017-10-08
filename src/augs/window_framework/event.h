@@ -8,7 +8,7 @@
 
 namespace augs {
 		namespace event {
-			enum class message : unsigned char {
+			enum class message {
 				unknown,
 				ltripleclick,
 				close,
@@ -202,8 +202,6 @@ namespace augs {
 
 			struct change {
 				message msg = message::unknown;
-				bool repeated = false;
-				pad_bytes<2> pad;
 				
 				union {
 					struct mouse_data {

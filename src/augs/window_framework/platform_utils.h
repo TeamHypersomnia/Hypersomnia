@@ -1,4 +1,6 @@
 #pragma once
+#include <optional>
+
 #include "augs/math/rects.h"
 #include "augs/math/vec2.h"
 
@@ -8,6 +10,7 @@ namespace augs {
 
 	void set_cursor_visible(const bool flag);
 	void set_cursor_pos(vec2i);
+	std::optional<vec2i> get_cursor_pos();
 
 	void set_clipboard_data(std::string);
 	std::string get_data_from_clipboard();

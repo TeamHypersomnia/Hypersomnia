@@ -7,6 +7,7 @@ namespace augs {
 	namespace event {
 		change::change() {
 			std::memset(this, 0, sizeof(change));
+			msg = message::unknown;
 		}
 
 		key_change change::get_key_change() const {

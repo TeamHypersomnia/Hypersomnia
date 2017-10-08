@@ -48,9 +48,23 @@ namespace augs {
 		const auto screen_size = current_settings.get_screen_size() - vec2i(1, 1);
 		last_mouse_pos.clamp_from_zero_to(screen_size);
 		change.mouse.pos = basic_vec2<short>(last_mouse_pos);
-		change.msg = translate_enum(WM_MOUSEMOVE);
+		change.msg = event::message::mousemotion;
 
 		return change;
+	}
+	
+	std::optional<event::change> window::sync_mouse_on_click_activate(const event::change& new_change) {
+		if (const bool should_sync_mouse = new_change.msg == event::message::click_activate
+			&& get_current_settings().raw_mouse_input
+		) {
+			if (const auto screen_space = get_cursor_pos()) {
+				const auto window_pos = get_window_rect().get_position();
+				const auto rel_v = (*screen_space - window_pos) - last_mouse_pos;
+				return do_raw_motion(rel_v);
+			}
+		}
+
+		return std::nullopt;
 	}
 
 	std::optional<event::change> window::handle_event(const UINT m, const WPARAM wParam, const LPARAM lParam) {
@@ -75,7 +89,10 @@ namespace augs {
 				break;
 			}
 			//change.utf32 = unsigned(wParam);
-			change.repeated = ((lParam & (1 << 30)) != 0);
+			if (const bool repeated = ((lParam & (1 << 30)) != 0)) {
+				return std::nullopt;
+			}
+
 			break;
 		case WM_UNICHAR:
 			//change.utf32 = unsigned(wParam);
@@ -90,7 +107,11 @@ namespace augs {
 			break;
 		case WM_KEYDOWN:
 			change.key.key = translate_key_with_lparam(lParam, wParam);
-			change.repeated = ((lParam & (1 << 30)) != 0);
+
+			if (const bool repeated = ((lParam & (1 << 30)) != 0)) {
+				return std::nullopt;
+			}
+
 			break;
 
 		case WM_SYSKEYUP:
@@ -98,7 +119,11 @@ namespace augs {
 			break;
 		case WM_SYSKEYDOWN:
 			change.key.key = translate_key_with_lparam(lParam, wParam);
-			change.repeated = ((lParam & (1 << 30)) != 0);
+
+			if (const bool repeated = ((lParam & (1 << 30)) != 0)) {
+				return std::nullopt;
+			}
+
 			break;
 
 		case WM_MOUSEWHEEL:
@@ -173,7 +198,7 @@ namespace augs {
 				last_mouse_pos = new_pos;
 
 				change.mouse.pos = basic_vec2<short>(last_mouse_pos);
-				change.msg = translate_enum(WM_MOUSEMOVE);
+				change.msg = event::message::mousemotion;
 			}
 			else {
 				return std::nullopt;
@@ -405,19 +430,9 @@ namespace augs {
 
 				TranslateMessage(&wmsg);
 
-				if (new_change.has_value() && !new_change->repeated) {
-					if (const bool should_sync_mouse = new_change->msg == event::message::click_activate
-						&& get_current_settings().raw_mouse_input
-					) {
-						POINT screen_space;
-
-						if (GetCursorPos(&screen_space)) {
-							const auto window_pos = get_window_rect().get_position();
-							const auto rel_v = (vec2i(screen_space.x, screen_space.y) - window_pos) - last_mouse_pos;
-							const auto m = do_raw_motion(rel_v);
-							
-							output.push_back(m);
-						}
+				if (new_change.has_value()) {
+					if (const auto mouse_change = sync_mouse_on_click_activate(*new_change)) {
+						output.push_back(*mouse_change);
 					}
 
 					output.push_back(*new_change);

@@ -48,6 +48,7 @@ namespace augs {
 		bool is_cursor_in_client_area() const;
 
 		event::change do_raw_motion(const basic_vec2<short>);
+		std::optional<event::change> sync_mouse_on_click_activate(const event::change&);
 
 		std::optional<event::change> handle_event(
 			const UINT, 
@@ -63,11 +64,11 @@ namespace augs {
 		bool set_as_current_impl();
 		static void set_current_to_none_impl();
 
-		window_settings current_settings;
-
 		void set_window_name(const std::string& name);
 		void set_window_border_enabled(const bool);
 		void set_window_rect(const xywhi);
+
+		window_settings current_settings;
 
 		void destroy();
 	public:
