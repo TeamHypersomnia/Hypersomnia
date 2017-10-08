@@ -1,5 +1,5 @@
 #pragma once
-#include <xtr1common>
+#include <type_traits>
 #include <cstddef>
 
 template <class...>

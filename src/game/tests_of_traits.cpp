@@ -7,13 +7,13 @@
 #include "generated/introspectors.h"
 #include "game/assets/all_logical_assets.h"
 
-#include "augs/misc/templated_readwrite.h"
+#include "augs/readwrite/byte_readwrite.h"
 #include "augs/templates/container_traits.h"
 #include "game/components/pathfinding_component.h"
 
 #include "augs/pad_bytes.h"
 #include "augs/misc/custom_lua_representations.h"
-#include "augs/misc/lua_readwrite.h"
+#include "augs/readwrite/lua_readwrite.h"
 
 namespace templates_detail {
 	template <class T>

@@ -7,7 +7,7 @@
 #include "augs/templates/introspection_utils/describe_fields.h"
 #include "game/organization/all_component_includes.h"
 #include "augs/misc/delta_compression.h"
-#include "augs/misc/templated_readwrite.h"
+#include "augs/readwrite/byte_readwrite.h"
 #include "generated/introspectors.h"
 
 TEST_CASE("CosmicDelta0 PaddingSanityCheck1") {
@@ -222,7 +222,7 @@ TEST_CASE("CosmicDelta3 GuidizeTests") {
 	// sanity check
 	REQUIRE(dead == dt.target_slot.container_entity);
 }
-#include "augs/misc/lua_readwrite.h"
+#include "augs/readwrite/lua_readwrite.h"
 
 TEST_CASE("Cosmos ComparisonTest") {
 	cosmos c1(2);

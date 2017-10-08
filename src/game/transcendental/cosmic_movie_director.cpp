@@ -4,7 +4,7 @@
 
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
-#include "augs/misc/templated_readwrite.h"
+#include "augs/readwrite/byte_readwrite.h"
 
 #include "augs/templates/string_templates.h"
 

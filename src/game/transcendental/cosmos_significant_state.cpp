@@ -1,6 +1,6 @@
 #include "augs/filesystem/file.h"
 
-#include "augs/misc/templated_readwrite.h"
+#include "augs/readwrite/byte_readwrite.h"
 #include "augs/misc/streams.h"
 
 #include "game/organization/all_component_includes.h"

@@ -19,7 +19,7 @@
 
 #include "augs/network/network_client.h"
 
-#include "augs/misc/templated_readwrite.h"
+#include "augs/readwrite/byte_readwrite.h"
 #include "client_setup.h"
 #include "game/detail/visible_entities.h"
 

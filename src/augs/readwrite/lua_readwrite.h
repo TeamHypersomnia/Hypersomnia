@@ -5,9 +5,8 @@
 #include "augs/templates/is_variant.h"
 #include "augs/templates/is_optional.h"
 #include "augs/templates/exception_templates.h"
-#include "augs/templates/readwrite_traits.h"
+#include "augs/readwrite/readwrite_traits.h"
 
-#include "augs/misc/templated_readwrite.h"
 #include "augs/misc/custom_lua_representations.h"
 #include "augs/misc/lua_utils.h"
 

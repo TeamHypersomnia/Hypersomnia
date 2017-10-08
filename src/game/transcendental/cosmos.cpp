@@ -2,8 +2,8 @@
 
 #include "cosmos.h"
 
-#include "augs/misc/lua_readwrite.h"
-#include "augs/misc/templated_readwrite.h"
+#include "augs/readwrite/lua_readwrite.h"
+#include "augs/readwrite/byte_readwrite.h"
 #include "augs/misc/streams.h"
 
 #include "game/stateless_systems/movement_system.h"

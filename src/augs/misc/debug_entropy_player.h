@@ -4,7 +4,7 @@
 #include <map>
 
 #include "augs/misc/time_utils.h"
-#include "augs/misc/templated_readwrite.h"
+#include "augs/readwrite/byte_readwrite.h"
 
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"

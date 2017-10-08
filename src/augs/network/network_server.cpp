@@ -5,7 +5,7 @@
 #endif
 
 #include "network_server.h"
-#include "augs/misc/templated_readwrite.h"
+#include "augs/readwrite/byte_readwrite.h"
 
 namespace augs {
 	namespace network {

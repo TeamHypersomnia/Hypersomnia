@@ -3,7 +3,7 @@
 #include "augs/templates/type_matching_and_indexing.h"
 #include "augs/templates/for_each_in_types.h"
 
-#include "augs/misc/templated_readwrite.h"
+#include "augs/readwrite/byte_readwrite.h"
 #include "augs/misc/delta_compression.h"
 #include "augs/misc/pooled_object_id.h"
 

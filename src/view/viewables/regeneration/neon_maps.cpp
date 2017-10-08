@@ -8,7 +8,7 @@
 #include "augs/misc/streams.h"
 
 #include "augs/image/image.h"
-#include "augs/misc/lua_readwrite.h"
+#include "augs/readwrite/lua_readwrite.h"
 #include "generated/introspectors.h"
 
 #define PIXEL_NONE rgba(0,0,0,0)

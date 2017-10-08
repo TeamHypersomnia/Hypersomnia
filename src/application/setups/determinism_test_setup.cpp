@@ -19,7 +19,7 @@
 #include "augs/filesystem/file.h"
 #include "determinism_test_setup.h"
 
-#include "augs/misc/templated_readwrite.h"
+#include "augs/readwrite/byte_readwrite.h"
 #include "game/detail/visible_entities.h"
 
 #include "generated/introspectors.h"

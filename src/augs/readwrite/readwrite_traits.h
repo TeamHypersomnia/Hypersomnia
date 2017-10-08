@@ -3,6 +3,7 @@
 
 namespace augs {
 	class output_stream_reserver;
+	class stream;
 	
 	template <class Archive, class Serialized, class = void>
 	struct has_read_overload : std::false_type 

@@ -3,7 +3,7 @@
 #include "augs/filesystem/directory.h"
 #include "augs/misc/streams.h"
 #include "augs/templates/for_each_in_types.h"
-#include "augs/misc/templated_readwrite.h"
+#include "augs/readwrite/byte_readwrite.h"
 
 #include "view/viewables/regeneration/images_from_commands.h"
 

@@ -3,7 +3,7 @@
 #include "augs/ensure.h"
 #include "augs/filesystem/directory.h"
 #include "augs/filesystem/file.h"
-#include "augs/misc/templated_readwrite.h"
+#include "augs/readwrite/byte_readwrite.h"
 
 template<class C>
 static void Line(

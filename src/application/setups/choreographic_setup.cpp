@@ -18,7 +18,7 @@
 #include "game/organization/all_messages_includes.h"
 #include "game/transcendental/data_living_one_step.h"
 
-#include "augs/misc/templated_readwrite.h"
+#include "augs/readwrite/byte_readwrite.h"
 
 #include "augs/templates/string_templates.h"
 #include "augs/filesystem/file.h"
