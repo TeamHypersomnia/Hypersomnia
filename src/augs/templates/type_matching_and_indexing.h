@@ -166,7 +166,7 @@ template <class S, class... Types>
 using find_convertible_type_in_t = find_convertible_type_in_list_t<S, std::tuple<Types...>>;
 
 template <size_t I, class... Types>
-using nth_type_in_t = typename std::tuple_element<I, std::tuple<Types...>>::type;
+using nth_type_in_t = std::tuple_element_t<I, std::tuple<Types...>>;
 
 template <class T, class Candidate>
 struct is_key_type_equal_to : std::bool_constant<std::is_same_v<T, typename Candidate::key_type>> {
@@ -193,7 +193,7 @@ decltype(auto) get_container_with_key_type(ContainerList&& containers) {
 
 
 template<class T>
-struct always_false : std::false_type {};
+struct always_false : std::false_type{};
 
 template<class T>
-constexpr auto always_false_v = always_false<T>;
+constexpr auto always_false_v = always_false<T>::value;

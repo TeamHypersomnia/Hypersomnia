@@ -5,7 +5,6 @@
 #include "augs/templates/component_traits.h"
 #include "augs/templates/type_matching_and_indexing.h"
 #include "augs/templates/for_each_in_types.h"
-#include "augs/templates/list_ops.h"
 
 #include "game/detail/inventory/inventory_slot_handle_declaration.h"
 #include "game/transcendental/entity_handle_declaration.h"
