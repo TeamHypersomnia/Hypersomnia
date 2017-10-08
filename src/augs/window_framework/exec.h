@@ -5,7 +5,7 @@
 #include <string>
 #include <array>
 
-#if(PLATFORM_UNIX)
+#if PLATFORM_UNIX
 #define _popen popen
 #define _pclose pclose
 #endif

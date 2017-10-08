@@ -8,7 +8,7 @@
 #include <GL/GL.h>
 #undef min
 #undef max
-#elif PLATFORM_LINUX
+#elif PLATFORM_UNIX
 #include <GL/gl.h>
 #endif
 #endif

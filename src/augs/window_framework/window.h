@@ -56,7 +56,7 @@ namespace augs {
 			const LPARAM
 		);
 
-#elif PLATFORM_LINUX
+#elif PLATFORM_UNIX
 
 #endif
 		friend class settable_as_current_base;

@@ -11,7 +11,7 @@ namespace augs {
 		ShellExecute(NULL, NULL, wide.c_str(), NULL, NULL, SW_SHOW);
 	}
 }
-#elif PLATFORM_LINUX
+#elif PLATFORM_UNIX
 #include <stdlib.h>
 
 namespace augs {

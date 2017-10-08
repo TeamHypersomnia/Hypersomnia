@@ -585,7 +585,7 @@ namespace augs {
 	}
 }
 
-#elif PLATFORM_LINUX
+#elif PLATFORM_UNIX
 namespace augs {
 	window::window(const window_settings& settings) {
 		apply(settings, true);

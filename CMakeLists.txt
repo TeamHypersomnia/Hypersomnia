@@ -534,20 +534,19 @@ endif()
 # We configure additional flags for the compiler.
 
 if(MSVC)
-  set(HYPERSOMNIA_CXX_FLAGS "/MP /Gm- /fp:strict /bigobj")
-  set(HYPERSOMNIA_CXX_DEBUG_FLAGS " ")
-  set(HYPERSOMNIA_CXX_RELEASE_FLAGS "/Ob2 /GL /Oi")
-  set(HYPERSOMNIA_CXX_RELWITHDEBINFO_FLAGS "/Ob2 /GL /Oi")
+	# Latest features of C++17 will be enabled.
+	set(HYPERSOMNIA_CXX_FLAGS "/std:c++latest /MP /Gm- /fp:strict /bigobj")
+	set(HYPERSOMNIA_CXX_DEBUG_FLAGS " ")
+	set(HYPERSOMNIA_CXX_RELEASE_FLAGS "/Ob2 /GL /Oi")
+	set(HYPERSOMNIA_CXX_RELWITHDEBINFO_FLAGS "/Ob2 /GL /Oi")
 elseif(UNIX)
-
+	# Latest features of C++17 and the filesystem library will be enabled.
+	set(HYPERSOMNIA_CXX_FLAGS "-std=gnu++1z -lstdc++fs -fpermissive")
 endif()
 
 # We configure additional flags for linker.
 
 if(MSVC)
-	# Enable latest features of C++17
-	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} /std:c++latest")
-
 	set(HYPERSOMNIA_LINKER_RELEASE_FLAGS "/LTCG /INCREMENTAL:NO /OPT:REF")
 
 	# We enable incremental LTCG for at least one release configuration,
@@ -556,8 +555,6 @@ if(MSVC)
 	set(HYPERSOMNIA_LINKER_RELWITHDEBINFO_FLAGS "/LTCG:incremental /INCREMENTAL:NO")
 elseif(UNIX)
 
-  # We would like to enable C++1z and filesystem features.
-  set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -std=gnu++1z -lstdc++fs -fpermissive")
 endif()
 
 # We configure some preprocessor defines.
