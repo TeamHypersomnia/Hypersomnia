@@ -14,7 +14,7 @@
 #include "game/transcendental/cosmos.h"
 #include "augs/templates/container_templates.h"
 
-#include <Box2D\Dynamics\b2WorldCallbacks.h>
+#include <Box2D/Dynamics/b2WorldCallbacks.h>
 
 void unset_input_flags_of_orphaned_entity(entity_handle e) {
 	auto* const gun = e.find<components::gun>();

@@ -1,7 +1,7 @@
 #include <limits>
 #include <set>
 
-#include <Box2D\Box2D.h>
+#include <Box2D/Box2D.h>
 
 #include "game/debug_drawing_settings.h"
 

@@ -3,7 +3,7 @@
 #include "rigid_body_component.h"
 #include "all_inferred_state_component.h"
 
-#include <Box2D\Box2D.h>
+#include <Box2D/Box2D.h>
 
 #include "fixtures_component.h"
 

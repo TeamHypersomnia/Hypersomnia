@@ -7,7 +7,7 @@
 #include <optional>
 
 #include <fstream>
-#include <experimental\filesystem>
+#include <experimental/filesystem>
 
 #include "augs/filesystem/path.h"
 #include "augs/ensure.h"

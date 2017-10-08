@@ -1,5 +1,5 @@
 #include "rotation_copying_system.h"
-#include <Box2D\Dynamics\b2Body.h>
+#include <Box2D/Dynamics/b2Body.h>
 
 #include "game/transcendental/entity_id.h"
 

@@ -1,5 +1,5 @@
 #pragma once
-#include <Box2D\Dynamics\b2Fixture.h>
+#include <Box2D/Dynamics/b2Fixture.h>
 
 namespace filters {
 	enum categories {
