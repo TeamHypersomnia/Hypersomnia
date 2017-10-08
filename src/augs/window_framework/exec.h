@@ -5,6 +5,11 @@
 #include <string>
 #include <array>
 
+#if(PLATFORM_UNIX)
+#define _popen popen
+#define _pclose pclose
+#endif
+
 namespace augs {
 	std::string exec(const std::string cmd) {
 		std::array<char, 128> buffer;

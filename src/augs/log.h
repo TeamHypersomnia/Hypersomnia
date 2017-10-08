@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <cstring>
 #include "augs/console_color.h"
 
 #include "augs/misc/typesafe_sprintf.h"

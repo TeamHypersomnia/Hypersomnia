@@ -533,10 +533,14 @@ endif()
 
 # We configure additional flags for the compiler.
 
-set(HYPERSOMNIA_CXX_FLAGS "/MP /Gm- /fp:strict /bigobj")
-set(HYPERSOMNIA_CXX_DEBUG_FLAGS " ")
-set(HYPERSOMNIA_CXX_RELEASE_FLAGS "/Ob2 /GL /Oi")
-set(HYPERSOMNIA_CXX_RELWITHDEBINFO_FLAGS "/Ob2 /GL /Oi")
+if(MSVC)
+  set(HYPERSOMNIA_CXX_FLAGS "/MP /Gm- /fp:strict /bigobj")
+  set(HYPERSOMNIA_CXX_DEBUG_FLAGS " ")
+  set(HYPERSOMNIA_CXX_RELEASE_FLAGS "/Ob2 /GL /Oi")
+  set(HYPERSOMNIA_CXX_RELWITHDEBINFO_FLAGS "/Ob2 /GL /Oi")
+elseif(UNIX)
+
+endif()
 
 # We configure additional flags for linker.
 
@@ -550,8 +554,10 @@ if(MSVC)
 	# because LTCG takes very long even with just a single source file modified.
 
 	set(HYPERSOMNIA_LINKER_RELWITHDEBINFO_FLAGS "/LTCG:incremental /INCREMENTAL:NO")
-else()
+elseif(UNIX)
 
+  # We would like to enable C++1z and filesystem features.
+  set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -std=gnu++1z -lstdc++fs -fpermissive")
 endif()
 
 # We configure some preprocessor defines.
@@ -576,7 +582,9 @@ if(MSVC)
 		-D_CRT_SECURE_NO_WARNINGS
 		-D_SCL_SECURE_NO_WARNINGS
 		-DUNICODE
-	)
+	  )
+elseif(UNIX)
+    add_definitions(-DPLATFORM_UNIX=1)
 endif()
 
 # Additionally, we mark Release as the production build.
