@@ -2,7 +2,7 @@
 
 #include <ctime>
 #include <sstream>
-
+#include "augs/filesystem/path.h"
 template<class T>
 static std::string leading_zero(const T component) {
 	std::stringstream out;

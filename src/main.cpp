@@ -1,4 +1,3 @@
-#pragma once
 #include <iostream>
 
 #include "augs/unit_tests.h"
