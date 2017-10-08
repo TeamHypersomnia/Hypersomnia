@@ -167,7 +167,7 @@ pip-log.txt
 /ReleaseExe
 /RelDeb
 /hypersomnia/saves
-/hypersomnia/hypersomnia/music
+/hypersomnia/content/music
 /hypersomnia/generated
 /hypersomnia/choreographic/voices
 
@@ -202,4 +202,3 @@ alsoft.ini
 *.db-wal
 build
 dev/
-imgui.ini

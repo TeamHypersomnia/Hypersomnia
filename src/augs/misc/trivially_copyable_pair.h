@@ -1,13 +1,12 @@
 #pragma once
 #include <utility>
-#include "augs/templates/memcpy_safety.h"
 
 namespace augs {
 	template<class A, class B>
 	class trivially_copyable_pair {
 	public:
-		static_assert(is_memcpy_safe_v<A>, "First type is not trivially copyable!");
-		static_assert(is_memcpy_safe_v<B>, "Second type is not trivially copyable!");
+		static_assert(std::is_trivially_copyable_v<A>, "First type is not trivially copyable!");
+		static_assert(std::is_trivially_copyable_v<B>, "Second type is not trivially copyable!");
 
 		typedef std::pair<A, B> pair;
 		

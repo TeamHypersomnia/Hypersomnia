@@ -1,6 +1,7 @@
 #include "augs/templates/string_templates.h"
 #include "augs/misc/imgui_utils.h"
 #include "augs/misc/imgui_control_wrappers.h"
+#include "augs/misc/lua_readwrite.h"
 #include "augs/filesystem/file.h"
 #include "augs/templates/thread_templates.h"
 #include "augs/templates/chrono_templates.h"
@@ -17,14 +18,28 @@ void editor_setup::set_popup(const popup p) {
 	current_popup = p;
 }
 
-void editor_setup::open_workspace(const augs::path_type& workspace_path) {
+void editor_setup::set_workspace_path(sol::state& lua, const augs::path_type& path) {
+	current_workspace_path = path;
+	recent.add(lua, path);
+}
+
+void editor_setup::open_workspace(sol::state& lua, const augs::path_type& workspace_path) {
 	if (workspace_path.empty()) {
 		return;
 	}
 
 	try {
-		augs::load(work, workspace_path);
-		current_workspace_path = workspace_path;
+		if (workspace_path.extension() == ".wp") {
+			augs::load(work, workspace_path);
+		}
+		else if (workspace_path.extension() == ".lua") {
+			augs::load_from_lua_table(lua, work, workspace_path);
+		}
+		else {
+			return;
+		}
+
+		set_workspace_path(lua, workspace_path);
 	}
 	catch (cosmos_loading_error err) {
 		set_popup({
@@ -40,10 +55,24 @@ void editor_setup::open_workspace(const augs::path_type& workspace_path) {
 			err.what()
 		});
 	}
+	catch (augs::ifstream_error err) {
+		set_popup({
+			"Error",
+			"Failed to load the editor workspace. File(s) might be corrupt.",
+			err.what()
+		});
+	}
 }
 
-void editor_setup::save_workspace(const augs::path_type& workspace_path) {
-	augs::save(work, workspace_path);
+void editor_setup::save_workspace(sol::state& lua, const augs::path_type& workspace_path) {
+	if (workspace_path.extension() == ".wp") {
+		augs::save(work, workspace_path);
+	}
+	else if (workspace_path.extension() == ".lua") {
+		augs::save_as_lua_table(lua, work, workspace_path);
+	}
+
+	set_workspace_path(lua, workspace_path);
 }
 
 void editor_setup::open_untitled_workspace() {
@@ -51,8 +80,33 @@ void editor_setup::open_untitled_workspace() {
 	current_workspace_path = {};
 }
 
-editor_setup::editor_setup(const augs::path_type& workspace_path) {
-	open_workspace(workspace_path);
+static auto get_recent_paths_path() {
+	return "generated/editor_recent_paths.lua";
+}
+
+editor_recent_paths::editor_recent_paths(sol::state& lua) {
+	try {
+		augs::load_from_lua_table(lua, *this, get_recent_paths_path());
+	}
+	catch (augs::ifstream_error) {
+
+	}
+	catch (augs::lua_deserialization_error) {
+
+	}
+}
+
+void editor_recent_paths::add(sol::state& lua, const augs::path_type& path) {
+	erase_element(paths, path);
+	paths.insert(paths.begin(), path);
+	augs::save_as_lua_table(lua, *this, get_recent_paths_path());
+}
+
+editor_setup::editor_setup(sol::state& lua) : recent(lua) {
+}
+
+editor_setup::editor_setup(sol::state& lua, const augs::path_type& workspace_path) : recent(lua) {
+	open_workspace(lua, workspace_path);
 
 	if (current_workspace_path.empty()) {
 		open_untitled_workspace();
@@ -88,26 +142,36 @@ void editor_setup::perform_custom_imgui(
 					open(owner);
 				}
 
-				if (ImGui::MenuItem("Recent files")) {
+				if (auto menu = scoped_menu("Recent files")) {
+					/*	
+						IMPORTANT! recent.paths can be altered in the loop by loading a workspace,
+						thus we need to copy its contents.
+					*/
 
+					const auto recent_paths = recent.paths;
+
+					for (const auto& target_path : recent_paths) {
+						auto display_path = target_path.filename();
+						display_path += " (";
+						display_path += augs::path_type(target_path).replace_filename("");
+						display_path += ")";
+
+						const auto str = display_path.string();
+
+						if (ImGui::MenuItem(str.c_str())) {
+							open_workspace(lua, target_path);
+						}
+					}
 				}
 
 				ImGui::Separator();
 
 				if (ImGui::MenuItem("Save", "CTRL+S")) {
-					save(owner);
+					save(lua, owner);
 				}
 
 				if (ImGui::MenuItem("Save as", "F12")) {
 					save_as(owner);
-				}
-
-				if (ImGui::MenuItem("Export", "CTRL+E")) {
-					export_(owner);
-				}
-
-				if (ImGui::MenuItem("Export as")) {
-					export_as(owner);
 				}
 			}
 			if (auto menu = scoped_menu("Edit")) {
@@ -153,7 +217,7 @@ void editor_setup::perform_custom_imgui(
 		const auto result_path = open_file_dialog.get();
 		
 		if (result_path) {
-			open_workspace(*result_path);
+			open_workspace(lua, *result_path);
 		}
 	}
 
@@ -161,7 +225,7 @@ void editor_setup::perform_custom_imgui(
 		const auto result_path = save_file_dialog.get();
 
 		if (result_path) {
-			save_workspace(*result_path);
+			save_workspace(lua, *result_path);
 			current_workspace_path = *result_path;
 		}
 	}
@@ -298,6 +362,7 @@ bool editor_setup::confirm_modal_popup() {
 static auto get_filters() {
 	return std::vector<augs::window::file_dialog_filter> {
 		{ "Hypersomnia workspace file (*.wp)", ".wp" },
+		{ "Hypersomnia compatibile workspace file (*.lua)", ".lua" },
 		{ "All files", ".*" }
 	};
 }
@@ -311,12 +376,12 @@ void editor_setup::open(const augs::window& owner) {
 	);
 }
 
-void editor_setup::save(const augs::window& owner) {
+void editor_setup::save(sol::state& lua, const augs::window& owner) {
 	if (current_workspace_path.empty()) {
 		save_as(owner);
 	}
 	else {
-		save_workspace(current_workspace_path);
+		save_workspace(lua, current_workspace_path);
 	}
 }
 
@@ -327,14 +392,6 @@ void editor_setup::save_as(const augs::window& owner) {
 			return owner.save_file_dialog(get_filters());
 		}
 	);
-}
-
-void editor_setup::export_(const augs::window& owner) {
-
-}
-
-void editor_setup::export_as(const augs::window& owner) {
-
 }
 
 void editor_setup::undo() {

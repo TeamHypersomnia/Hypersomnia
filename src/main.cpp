@@ -328,10 +328,10 @@ int work(const int argc, const char* const * const argv) try {
 		});
 	};
 
-	static auto launch_editor = [](const augs::path_type workspace_path) {
+	static auto launch_editor = [](auto&&... args) {
 		launch_setup([&]() {
 			current_setup.emplace(std::in_place_type_t<editor_setup>(),
-				workspace_path
+				std::forward<decltype(args)>(args)...
 			);
 
 			game_gui.active = true;
@@ -352,7 +352,7 @@ int work(const int argc, const char* const * const argv) try {
 				break;
 
 			case launch_type::EDITOR:
-				launch_editor(config.editor.initial_workspace_path);
+				launch_editor(lua);
 
 				break;
 
@@ -592,7 +592,7 @@ int work(const int argc, const char* const * const argv) try {
 	};
 
 	if (!params.editor_target.empty()) {
-		launch_editor(params.editor_target);
+		launch_editor(lua, params.editor_target);
 	}
 	else {
 		launch(config.get_launch_mode());
@@ -856,7 +856,8 @@ int work(const int argc, const char* const * const argv) try {
 					if (!ingame_menu.show) {
 						/* MSVC ICE workaround */
 						auto& _common_input_state = common_input_state;
-						
+						auto& _lua = lua;
+
 						if (visit_current_setup([&](auto& setup) {
 							using T = std::decay_t<decltype(setup)>;
 
@@ -898,8 +899,7 @@ int work(const int argc, const char* const * const argv) try {
 										}
 										else {
 											switch (k) {
-												case key::S: setup.save(_window); return true;
-												case key::E: setup.export_(_window); return true;
+												case key::S: setup.save(_lua, _window); return true;
 												case key::Z: setup.undo(); return true;
 												case key::O: setup.open(_window); return true;
 												case key::C: setup.copy(); return true;

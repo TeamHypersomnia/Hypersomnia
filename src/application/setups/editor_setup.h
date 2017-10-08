@@ -29,6 +29,15 @@ namespace augs {
 	class window;
 }
 
+struct editor_recent_paths {
+	// GEN INTROSPECTOR struct editor_recent_paths
+	std::vector<augs::path_type> paths;
+	// END GEN INTROSPECTOR
+
+	editor_recent_paths(sol::state& lua);
+	void add(sol::state&, const augs::path_type& path);
+};
+
 class editor_setup {
 	struct popup {
 		std::string title;
@@ -53,6 +62,7 @@ class editor_setup {
 	void pause();
 
 	workspace work;
+	editor_recent_paths recent;
 
 	cosmic_entropy total_collected_entropy;
 	augs::fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
@@ -63,8 +73,9 @@ class editor_setup {
 	std::future<std::optional<std::string>> save_file_dialog;
 
 	void set_popup(const popup);
-	void open_workspace(const augs::path_type& workspace_path);
-	void save_workspace(const augs::path_type& workspace_path);
+	void open_workspace(sol::state&, const augs::path_type& workspace_path);
+	void save_workspace(sol::state&, const augs::path_type& workspace_path);
+	void set_workspace_path(sol::state&, const augs::path_type&);
 	void open_untitled_workspace();
 
 public:
@@ -73,7 +84,8 @@ public:
 	static constexpr bool accepts_shortcuts = true;
 	static constexpr bool has_modal_popups = true;
 
-	editor_setup(const augs::path_type& workspace_path);
+	editor_setup(sol::state& lua); // Loads the most recent work
+	editor_setup(sol::state& lua, const augs::path_type& workspace_path);
 
 	auto get_audiovisual_speed() const {
 		return player_paused ? 0.0 : player_speed;
@@ -143,10 +155,8 @@ public:
 	bool confirm_modal_popup();
 
 	void open(const augs::window& owner);
-	void save(const augs::window& owner);
+	void save(sol::state& lua, const augs::window& owner);
 	void save_as(const augs::window& owner);
-	void export_(const augs::window& owner);
-	void export_as(const augs::window& owner);
 	void undo();
 	void redo();
 

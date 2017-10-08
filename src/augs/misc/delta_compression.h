@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "augs/templates/memcpy_safety.h"
+#include "augs/templates/triviality_traits.h"
 #include "augs/templates/get_index_type_for_size_of.h"
 
 #include "augs/ensure.h"
@@ -53,7 +53,7 @@ namespace augs {
 	class object_delta;
 
 	template <class T>
-	class object_delta<T, std::enable_if_t<is_memcpy_safe_v<T>>> {
+	class object_delta<T, std::enable_if_t<std::is_trivially_copyable_v<T>>> {
 		using offset_type = get_index_type_for_size_of_t<T>;
 		static constexpr std::size_t length_bytes = sizeof T;
 		static_assert(0 == length_bytes % sizeof delta_unit, "Type size must be divisble by the size of delta unit");
@@ -89,8 +89,8 @@ namespace augs {
 			}
 
 			if (changed) {
-				augs::write_object(out, changed_bytes, offset_type());
-				augs::write_object(out, changed_offsets, offset_type());
+				augs::write_container(out, changed_bytes, offset_type());
+				augs::write_container(out, changed_offsets, offset_type());
 			}
 
 			return changed;
@@ -107,8 +107,8 @@ namespace augs {
 			}
 
 			if (changed) {
-				augs::read_object(in, changed_bytes, offset_type());
-				augs::read_object(in, changed_offsets, offset_type());
+				augs::read_variable_size_container(in, changed_bytes, offset_type());
+				augs::read_variable_size_container(in, changed_offsets, offset_type());
 			}
 		}
 
@@ -159,7 +159,7 @@ namespace augs {
 
 
 	template <class T>
-	class object_delta<T, std::enable_if_t<!is_memcpy_safe_v<T>>> {
+	class object_delta<T, std::enable_if_t<!std::is_trivially_copyable_v<T>>> {
 		augs::stream new_content;
 	public:
 		std::size_t get_first_divergence_pos() const {

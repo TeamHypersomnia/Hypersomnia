@@ -3,7 +3,7 @@
 #include "game/detail/inventory/inventory_slot_handle.h"
 #include "augs/pad_bytes.h"
 #include "augs/templates/maybe_const.h"
-#include "augs/templates/memcpy_safety.h"
+#include "augs/templates/triviality_traits.h"
 
 template <class id_type>
 struct basic_item_slot_transfer_request {

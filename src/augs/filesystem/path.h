@@ -22,7 +22,8 @@ namespace augs {
 	) {
 		write(ar, storage.string());
 	}
-	static_assert(has_io_overloads_v<stream, path_type>);
+
+	static_assert(has_readwrite_overloads_v<stream, path_type>);
 }
 
 namespace std {

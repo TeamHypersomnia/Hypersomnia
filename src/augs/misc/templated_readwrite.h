@@ -3,76 +3,37 @@
 #include "augs/ensure.h"
 #include "augs/pad_bytes.h"
 
-#include "augs/templates/memcpy_safety.h"
+#include "augs/templates/triviality_traits.h"
 #include "augs/templates/type_matching_and_indexing.h"
 #include "augs/templates/introspect.h"
 #include "augs/templates/container_traits.h"
 #include "augs/templates/recursive.h"
 #include "augs/templates/byte_type_for.h"
+#include "augs/templates/readwrite_traits.h"
 
 namespace augs {
 	class output_stream_reserver;
 	class stream;
 
 	template <class Archive>
-	struct is_native_binary_stream 
-		: std::bool_constant<
-			is_one_of_v<
-				std::decay_t<Archive>,
-				augs::stream, 
-				augs::output_stream_reserver, 
-				std::ifstream, 
-				std::ofstream
-			>
-		>
-	{
-		static_assert(!std::is_const_v<std::remove_reference_t<Archive>>, "Non-modifiable archives are ill-formed.");
-	};
-
-	template <class Archive>
-	constexpr bool is_native_binary_stream_v = is_native_binary_stream<Archive>::value;
-
-	template <class Archive, class Serialized, class = void>
-	struct has_io_overloads : std::false_type 
-	{};
+	constexpr bool is_byte_stream_v = is_one_of_v<
+		std::decay_t<Archive>,
+		stream,
+		output_stream_reserver,
+		std::ifstream,
+		std::ofstream
+	>;
 
 	template <class Archive, class Serialized>
-	struct has_io_overloads <
-		Archive,
-		Serialized,
-		decltype(
-			read_object(
-				std::declval<
-					/* If the queried archive is augs::output_stream_reserver, map to augs::stream */
-					std::conditional_t<std::is_same_v<Archive, augs::output_stream_reserver>, augs::stream, Archive>
-				>(),
-				std::declval<Serialized>()
-			),
-			write_object(
-				std::declval<
-				/* If the queried archive is augs::output_stream_reserver, map to augs::stream */
-					std::conditional_t<std::is_same_v<Archive, augs::output_stream_reserver>, augs::stream, Archive>
-				>(),
-				std::declval<const Serialized>()
-			),
-			void()
-		)
-	> : std::true_type 
-	{};
+	constexpr bool is_byte_readwrite_safe_v = is_byte_stream_v<Archive> && std::is_trivially_copyable_v<Serialized>;
 
 	template <class Archive, class Serialized>
-	constexpr bool has_io_overloads_v = has_io_overloads<Archive, Serialized>::value;
+	constexpr bool is_byte_readwrite_appropriate_v = is_byte_readwrite_safe_v<Archive, Serialized> && !has_readwrite_overloads_v<Archive, Serialized>;
 
 	template <class Archive, class Serialized>
-	constexpr bool is_byte_io_safe_v = is_native_binary_stream_v<Archive> && is_memcpy_safe_v<Serialized>;
-
-	template <class Archive, class Serialized>
-	constexpr bool is_byte_io_appropriate_v = is_byte_io_safe_v<Archive, Serialized> && !has_io_overloads_v<Archive, Serialized>;
-
-	template <class Archive, class Serialized>
-	void verify_byte_io_safety() {
-		static_assert(is_memcpy_safe_v<Serialized>, "Attempt to serialize a non-trivially copyable type");
-		static_assert(is_native_binary_stream_v<Archive>, "Byte serialization of trivial structs allowed only on native binary archives");
+	void verify_byte_readwrite_safety() {
+		static_assert(std::is_trivially_copyable_v<Serialized>, "Attempt to serialize a non-trivially copyable type");
+		static_assert(is_byte_stream_v<Archive>, "Byte serialization of trivial structs allowed only on native binary archives");
 	}
 
 	template <class Serialized>
@@ -80,45 +41,59 @@ namespace augs {
 		static_assert(has_introspect_v<Serialized>, "Attempt to serialize a type in a non-bytesafe context without i/o overloads and without introspectors!");
 	}
 	
-	template<class Archive, class Serialized>
+	template <class Archive, class Serialized>
 	void read_bytes(
 		Archive& ar, 
 		Serialized* const location, 
 		const std::size_t object_count
 	) {
-		verify_byte_io_safety<Archive, Serialized>();
+		verify_byte_readwrite_safety<Archive, Serialized>();
 
 		const auto byte_count = object_count * sizeof(Serialized);
 		ar.read(reinterpret_cast<byte_type_for_t<Archive>*>(location), byte_count);
 	}
 
-	template<class Archive, class Serialized>
+	template <class Archive, class Serialized>
 	void write_bytes(
 		Archive& ar, 
 		const Serialized* const location, 
 		const std::size_t object_count
 	) {
-		verify_byte_io_safety<Archive, Serialized>();
+		verify_byte_readwrite_safety<Archive, Serialized>();
 		
 		const auto byte_count = object_count * sizeof(Serialized);
 		ar.write(reinterpret_cast<const byte_type_for_t<Archive>*>(location), byte_count);
 	}
 
-	template<class Archive, class Serialized>
+	template <class Archive, class Serialized>
 	void read(
 		Archive& ar,
-		Serialized& storage
+		Serialized& storage,
+		std::enable_if_t<is_byte_stream_v<Archive>>* dummy = nullptr
 	) {
-		if constexpr(has_io_overloads_v<Archive, Serialized>) {
+		if constexpr(has_readwrite_overloads_v<Archive, Serialized>) {
 			read_object(ar, storage);
 		}
-		else if constexpr(is_byte_io_appropriate_v<Archive, Serialized>) {
+		else if constexpr(is_byte_readwrite_appropriate_v<Archive, Serialized>) {
 			read_bytes(ar, &storage, 1);
+		}
+		else if constexpr(is_optional_v<Serialized>) {
+			bool has_value = false;
+			read(ar, has_value);
+
+			if (has_value) {
+				typename Serialized::value_type value;
+				read(ar, value);
+				storage.emplace(std::move(value));
+			}
+		}
+		else if constexpr(is_variable_size_container_v<Serialized>) {
+			read_variable_size_container(ar, storage);
 		}
 		else {
 			verify_has_introspect(storage);
 
-			augs::introspect(
+			introspect(
 				[&](auto, auto& member) {
 					using T = std::decay_t<decltype(member)>;
 					
@@ -131,21 +106,32 @@ namespace augs {
 		}
 	}
 
-	template<class Archive, class Serialized>
+	template <class Archive, class Serialized>
 	void write(
 		Archive& ar,
-		const Serialized& storage
+		const Serialized& storage,
+		std::enable_if_t<is_byte_stream_v<Archive>>* dummy = nullptr
 	) {
-		if constexpr(has_io_overloads_v<Archive, Serialized>) {
+		if constexpr(has_readwrite_overloads_v<Archive, Serialized>) {
 			write_object(ar, storage);
 		}
-		else if constexpr(is_byte_io_appropriate_v<Archive, Serialized>) {
+		else if constexpr(is_byte_readwrite_appropriate_v<Archive, Serialized>) {
 			write_bytes(ar, &storage, 1);
+		}
+		else if constexpr(is_optional_v<Serialized>) {
+			write(ar, storage.has_value());
+
+			if (storage) {
+				write(ar, *storage);
+			}
+		}
+		else if constexpr(is_container_v<Serialized>) {
+			write_container(ar, storage);
 		}
 		else {
 			verify_has_introspect(storage);
 
-			augs::introspect(
+			introspect(
 				[&](auto, const auto& member) {
 					using T = std::decay_t<decltype(member)>;
 
@@ -157,6 +143,10 @@ namespace augs {
 			);
 		}
 	}
+	
+	/*
+		Utility functions
+	*/
 
 	template <class Archive, class Serialized>
 	void read_n(
@@ -164,7 +154,7 @@ namespace augs {
 		Serialized* const storage,
 		const std::size_t n
 	) {
-		if constexpr(is_byte_io_appropriate_v<Archive, Serialized>) {
+		if constexpr(is_byte_readwrite_appropriate_v<Archive, Serialized>) {
 			read_bytes(ar, storage, n);
 		}
 		else {
@@ -180,7 +170,7 @@ namespace augs {
 		const Serialized* const storage,
 		const std::size_t n
 	) {
-		if constexpr(is_byte_io_appropriate_v<Archive, Serialized>) {
+		if constexpr(is_byte_readwrite_appropriate_v<Archive, Serialized>) {
 			write_bytes(ar, storage, n);
 		}
 		else {
@@ -190,41 +180,11 @@ namespace augs {
 		}
 	}
 
-	template <class Archive, class T>
-	void read_object(
-		Archive& ar,
-		std::optional<T>& storage,
-		std::enable_if_t<!is_byte_io_safe_v<Archive, std::optional<T>>>* dummy = nullptr
-	) {
-		bool has_value = false;
-		read(ar, has_value);
-
-		if (has_value) {
-			T t;
-			read(ar, t);
-			storage.emplace(std::move(t));
-		}
-	}
-
-	template <class Archive, class T>
-	void write_object(
-		Archive& ar,
-		const std::optional<T>& storage,
-		std::enable_if_t<!is_byte_io_safe_v<Archive, std::optional<T>>>* dummy = nullptr
-	) {
-		write(ar, storage.has_value());
-		
-		if (storage) {
-			write(ar, *storage);
-		}
-	}
-
 	template <class Archive, class Container, class container_size_type = std::size_t>
-	void read_object(
+	void read_variable_size_container(
 		Archive& ar, 
 		Container& storage, 
-		container_size_type = container_size_type(),
-		std::enable_if_t<is_variable_size_container_v<Container>>* dummy = nullptr
+		container_size_type = container_size_type()
 	) {
 		container_size_type s;
 		read(ar, s);
@@ -266,14 +226,14 @@ namespace augs {
 	}
 
 	template <class Archive, class Container, class container_size_type = std::size_t>
-	void write_object(
+	void write_container(
 		Archive& ar, 
 		const Container& storage, 
-		container_size_type = container_size_type(),
-		std::enable_if_t<is_container_v<Container>>* dummy = nullptr
+		container_size_type = {}
 	) {
-		ensure(storage.size() <= std::numeric_limits<container_size_type>::max());
-		write(ar, static_cast<container_size_type>(storage.size()));
+		const auto s = storage.size();
+		ensure(s <= std::numeric_limits<container_size_type>::max());
+		write(ar, static_cast<container_size_type>(s));
 
 		if constexpr(can_access_data_v<Container>) {
 			write_n(ar, storage.data(), storage.size());
@@ -285,30 +245,22 @@ namespace augs {
 		}
 	}
 
-	/*
-		Utility functions
-	*/
-
-	template<class Archive, class Container, class...>
-	void read_with_capacity(Archive& ar, Container& storage) {
-		std::size_t c;
-		std::size_t s;
-
+	template <class Archive, class Container, class container_size_type = std::size_t>
+	void read_capacity(
+		Archive& ar, 
+		Container& storage,
+		container_size_type = {}
+	) {
+		container_size_type c;
 		read(ar, c);
-		read(ar, s);
-
 		storage.reserve(c);
-		storage.resize(s);
-
-		read_n(ar, storage.data(), storage.size());
 	}
 
-	template<class Archive, class Container>
-	void write_with_capacity(Archive& ar, const Container& storage) {
-		write(ar, storage.capacity());
-		write(ar, storage.size());
-
-		write_n(ar, storage.data(), storage.size());
+	template<class Archive, class Container, class container_size_type = std::size_t>
+	void write_capacity(Archive& ar, const Container& storage) {
+		const auto c = static_cast<container_size_type>(storage.capacity());
+		ensure(c <= std::numeric_limits<container_size_type>::max());
+		write(ar, c);
 	}
 
 	template<class Archive, std::size_t count>

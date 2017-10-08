@@ -1,5 +1,8 @@
+#include <sol2/sol.hpp>
+
 #include "cosmos.h"
 
+#include "augs/misc/lua_readwrite.h"
 #include "augs/misc/templated_readwrite.h"
 #include "augs/misc/streams.h"
 
@@ -507,7 +510,7 @@ namespace augs {
 
 			{
 				auto scope = measure_scope(profiler.size_calculation_pass);
-				augs::write(reserver, cosm.significant);
+				write(reserver, cosm.significant);
 			}
 
 			auto scope = measure_scope(profiler.memory_allocation_pass);
@@ -516,7 +519,7 @@ namespace augs {
 
 		{
 			auto scope = measure_scope(profiler.serialization_pass);
-			augs::write(into, cosm.significant);
+			write(into, cosm.significant);
 		}
 	}
 
@@ -527,9 +530,27 @@ namespace augs {
 			cosm.refresh_for_new_significant_state();
 		});
 
-		cosm.significant.clear();
-
 		auto scope = measure_scope(profiler.deserialization_pass);
-		augs::read(from, cosm.significant);
+		read(from, cosm.significant);
+	}
+
+	void write_object(sol::table ar, const cosmos& cosm) {
+#if TODO
+		write(ar, cosm.significant.meta);
+		
+		for (const auto& ent : cosm.get_entity_pool()) {
+
+			for_each_component_type(
+				[&](auto c) {
+				using component_type = decltype(c);
+
+
+			});
+		}
+#endif
+	}
+
+	void read_object(sol::table ar, cosmos& cosm) {
+
 	}
 }

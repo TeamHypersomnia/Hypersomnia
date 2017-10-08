@@ -5,6 +5,7 @@
 #include "augs/templates/is_variant.h"
 #include "augs/templates/is_optional.h"
 #include "augs/templates/exception_templates.h"
+#include "augs/templates/readwrite_traits.h"
 
 #include "augs/misc/templated_readwrite.h"
 #include "augs/misc/custom_lua_representations.h"
@@ -128,7 +129,13 @@ namespace augs {
 			"std::optional can only be serialized as a member object."
 		);
 
-		if constexpr(is_variant_v<Serialized>) {
+		if constexpr(has_read_overload_v<sol::table, Serialized>) {
+			static_assert(has_write_overload_v<sol::table, Serialized>, "Asymmetric overloads provided for a serialized type");
+			
+			sol::table input_table = input_object;
+			read_object(input_table, into);
+		}
+		else if constexpr(is_variant_v<Serialized>) {
 			sol::table input_table = input_object;
 			ensure(input_table.is<sol::table>());
 
@@ -227,7 +234,7 @@ namespace augs {
 				}
 			}
 			else {
-				augs::introspect(
+				introspect(
 					[input_table](const auto label, auto& field) {
 						using T = std::decay_t<decltype(field)>;
 
@@ -267,7 +274,7 @@ namespace augs {
 		else if constexpr(std::is_same_v<T, std::string> || std::is_arithmetic_v<T>) {
 			return field;
 		}
-		else if constexpr(std::is_same_v<T, augs::path_type>) {
+		else if constexpr(std::is_same_v<T, path_type>) {
 			return field.string();
 		}
 		else if constexpr(std::is_enum_v<T>) {
@@ -307,7 +314,12 @@ namespace augs {
 			"std::optional can only be serialized as a member object."
 		);
 
-		if constexpr(is_variant_v<Serialized>) {
+		if constexpr(has_write_overload_v<sol::table, Serialized>) {
+			static_assert(has_read_overload_v<sol::table, Serialized>, "Asymmetric overloads provided for a serialized type");
+
+			write_object(output_table, from);
+		}
+		else if constexpr(is_variant_v<Serialized>) {
 			std::visit(
 				[output_table](const auto& resolved){
 					using T = std::decay_t<decltype(resolved)>;
@@ -368,7 +380,7 @@ namespace augs {
 			}
 		}
 		else {
-			augs::introspect(
+			introspect(
 				[output_table](const auto label, const auto& field) {
 					using T = std::decay_t<decltype(field)>;
 
@@ -394,15 +406,15 @@ namespace augs {
 		SaverArgs&&... args
 	) {
 		auto output_table = lua.create_named_table("my_table");
-		augs::write(output_table, std::forward<T>(object));
+		write(output_table, std::forward<T>(object));
 
 		const std::string serialized_table = lua["table_to_string"](
 			output_table,
 			std::forward<SaverArgs>(args)...
 		);
 
-		const std::string file_contents = std::string("return ") + serialized_table;
-		augs::create_text_file(target_path, file_contents);
+		const auto file_contents = std::string("return ") + serialized_table;
+		create_text_file(target_path, file_contents);
 	}
 
 	template <class T>
@@ -413,7 +425,7 @@ namespace augs {
 	) {
 		try {
 			auto pfr = lua.do_string(
-				augs::get_file_contents(source_path)
+				get_file_contents(source_path)
 			);
 
 			if (!pfr.valid()) {
@@ -425,7 +437,7 @@ namespace augs {
 			}
 
 			sol::table input_table = pfr;
-			augs::read(input_table, object);
+			read(input_table, object);
 		}
 		catch (const ifstream_error& err) {
 			throw lua_deserialization_error(

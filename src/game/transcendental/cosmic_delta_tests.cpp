@@ -76,7 +76,7 @@ TEST_CASE("CosmicDelta2 PaddingTest") {
 		using checked_type = decltype(c);
 		
 		static_assert(
-			augs::is_byte_io_safe_v<augs::stream, checked_type> || allows_nontriviality_v<checked_type>,
+			augs::is_byte_readwrite_safe_v<augs::stream, checked_type> || allows_nontriviality_v<checked_type>,
 			"Non-trivially copyable component detected! If you need a non-trivial component, explicitly define static constexpr bool allow_nontriviality = true; within the class"
 		);
 	};
@@ -186,7 +186,7 @@ TEST_CASE("CosmicDelta2 PaddingTest") {
 			if constexpr(std::is_same_v<T, augs::delta>) {
 				padding_checker(m, augs::delta::zero);
 			}
-			else if constexpr(augs::is_byte_io_safe_v<augs::stream, T> && !is_introspective_leaf_v<T>) {
+			else if constexpr(augs::is_byte_readwrite_safe_v<augs::stream, T> && !is_introspective_leaf_v<T>) {
 				padding_checker(m);
 			}
 			else if constexpr(has_introspect_v<T>){

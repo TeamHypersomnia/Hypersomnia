@@ -316,18 +316,28 @@ namespace augs {
 
 		template <class Archive>
 		void write_object(Archive& ar) const {
-			augs::write_with_capacity(ar, objects);
-			augs::write_with_capacity(ar, slots);
-			augs::write_with_capacity(ar, indirectors);
-			augs::write_with_capacity(ar, free_indirectors);
+			auto w = [&ar](const auto& object) {
+				augs::write_capacity(ar, object);
+				augs::write_container(ar, object);
+			};
+
+			w(objects);
+			w(slots);
+			w(indirectors);
+			w(free_indirectors);
 		}
 
 		template <class Archive>
 		void read_object(Archive& ar) {
-			augs::read_with_capacity(ar, objects);
-			augs::read_with_capacity(ar, slots);
-			augs::read_with_capacity(ar, indirectors);
-			augs::read_with_capacity(ar, free_indirectors);
+			auto r = [&ar](auto& object) {
+				augs::read_capacity(ar, object);
+				augs::read_variable_size_container(ar, object);
+			};
+
+			r(objects);
+			r(slots);
+			r(indirectors);
+			r(free_indirectors);
 		}
 	};
 }

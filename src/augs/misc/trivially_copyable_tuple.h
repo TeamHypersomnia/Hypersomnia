@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/templates/memcpy_safety.h"
+#include "augs/templates/triviality_traits.h"
 #include "augs/templates/type_list.h"
 #include "augs/templates/for_each_in_types.h"
 #include "augs/templates/constexpr_arithmetic.h"
@@ -9,7 +9,7 @@ namespace augs {
 	class trivially_copyable_tuple {
 		alignas(constexpr_max_v<std::size_t, alignof(Types)...>) char buf[sum_sizes_of_types_in_list_v<type_list<Types...>>];
 	public:
-		static_assert(are_types_memcpy_safe_v<Types...>, "One of the tuple types is not trivially copyable!");
+		static_assert(std::conjunction_v<std::is_trivially_copyable<Types>...>, "One of the tuple types is not trivially copyable!");
 
 		trivially_copyable_tuple() {
 			for_each_through_std_get(

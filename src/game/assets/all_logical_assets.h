@@ -1,5 +1,4 @@
 #pragma once
-#include "augs/templates/tuple_of_containers.h"
 #include "augs/misc/convex_partitioned_shape.h"
 #include "augs/misc/trivially_copyable_tuple.h"
 
@@ -17,7 +16,7 @@
 #include "game/assets/physical_material.h"
 
 struct sound_buffer_logical {
-	// GEN INTROSPECTOR struct augs::sound_buffer_logical
+	// GEN INTROSPECTOR struct sound_buffer_logical
 	float max_duration_in_seconds = 0.f;
 	unsigned num_of_variations = 0xdeadbeef;
 	// END GEN INTROSPECTOR
@@ -53,6 +52,43 @@ using tuple_of_logical_assets = augs::trivially_copyable_tuple<
 	asset_map<assets::physical_material_id, physical_material>
 >;
 
-struct all_logical_assets 
-	: public tuple_of_containers<tuple_of_logical_assets>
-{};
+struct all_logical_assets {
+	// GEN INTROSPECTOR struct all_logical_assets
+	tuple_of_logical_assets all;
+	// END GEN INTROSPECTOR
+
+	template <class T>
+	auto& get_store_by(const T = T()) {
+		return get_container_with_key_type<T>(all);
+	}
+
+	template <class T>
+	const auto& get_store_by(const T = T()) const {
+		return get_container_with_key_type<T>(all);
+	}
+
+	template <class T>
+	decltype(auto) find(const T id) {
+		return mapped_or_nullptr(get_store_by(id), id);
+	}
+
+	template <class T>
+	decltype(auto) find(const T id) const {
+		return mapped_or_nullptr(get_store_by(id), id);
+	}
+
+	template <class T>
+	decltype(auto) operator[](const T id) {
+		return get_store_by(id)[id];
+	}
+
+	template <class T>
+	decltype(auto) at(const T id) {
+		return get_store_by(id).at(id);
+	}
+
+	template <class T>
+	decltype(auto) at(const T id) const {
+		return get_store_by(id).at(id);
+	}
+};

@@ -73,12 +73,12 @@ struct tests_of_traits {
 	
 	static_assert(is_unary_container_v<augs::constant_size_vector<vec2, 20>>, "Trait has failed");
 	static_assert(is_variable_size_container_v<augs::constant_size_vector<vec2, 20>>, "Trait has failed");
-	static_assert(augs::has_io_overloads_v<augs::stream, augs::constant_size_vector<vec2, 20>>, "Trait has failed");
-	static_assert(augs::has_io_overloads_v<augs::stream, augs::enum_associative_array<game_intent_type, vec2>>, "Trait has failed");
-	static_assert(augs::has_io_overloads_v<augs::stream, std::vector<int>>, "Trait has failed");
-	static_assert(augs::has_io_overloads_v<augs::stream, std::vector<vec2>>, "Trait has failed");
-	static_assert(augs::has_io_overloads_v<augs::stream, std::vector<cosmos>>, "Trait has failed");
-	static_assert(augs::has_io_overloads_v<augs::stream, std::vector<pathfinding_session>>, "Trait has failed");
+	static_assert(augs::is_byte_readwrite_appropriate_v<augs::stream, augs::constant_size_vector<vec2, 20>>, "Trait has failed");
+	static_assert(augs::is_byte_readwrite_appropriate_v<augs::stream, augs::enum_associative_array<game_intent_type, vec2>>, "Trait has failed");
+	static_assert(is_variable_size_container_v<std::vector<int>>, "Trait has failed");
+	static_assert(is_variable_size_container_v<std::vector<vec2>>, "Trait has failed");
+	static_assert(is_variable_size_container_v<std::vector<cosmos>>, "Trait has failed");
+	static_assert(is_variable_size_container_v<std::vector<pathfinding_session>>, "Trait has failed");
 
 	static_assert(can_access_data_v<std::string>, "Trait has failed");
 	static_assert(can_access_data_v<std::vector<int>>, "Trait has failed");
@@ -193,7 +193,7 @@ struct tests_of_traits {
 	static_assert(augs::representable_as_lua_value_v<std::wstring>);
 	static_assert(augs::representable_as_lua_value_v<const std::wstring*>);
 	
-	static_assert(!augs::has_io_overloads_v<augs::stream, cosmic_entity>);
+	static_assert(!augs::has_readwrite_overloads_v<augs::stream, cosmic_entity>);
 
 	static_assert(aligned_num_of_bytes_v<0, 4> == 0, "Trait is wrong");
 	static_assert(aligned_num_of_bytes_v<1, 4> == 4, "Trait is wrong");

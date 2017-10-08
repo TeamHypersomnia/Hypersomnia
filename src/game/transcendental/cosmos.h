@@ -1,5 +1,6 @@
 #pragma once
 #include <map>
+#include <sol2/sol/forward.hpp>
 #include "augs/build_settings/platform_defines.h"
 
 #include "augs/templates/exception_templates.h"
@@ -395,4 +396,7 @@ inline std::size_t cosmos::get_maximum_entities() const {
 namespace augs {
 	void write_object(augs::stream& ar, const cosmos& cosm);
 	void read_object(augs::stream& ar, cosmos& cosm);
+
+	void write_object(sol::table ar, const cosmos& cosm);
+	void read_object(sol::table ar, cosmos& cosm);
 }

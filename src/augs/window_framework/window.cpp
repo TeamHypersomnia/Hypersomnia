@@ -292,7 +292,7 @@ namespace augs {
 		p.iPixelType = PFD_TYPE_RGBA;
 		p.cColorBits = settings.bpp;
 		p.cAlphaBits = 8;
-		p.cDepthBits = 16;
+		p.cDepthBits = 0;
 		p.iLayerType = PFD_MAIN_PLANE;
 		ensure(hdc = GetDC(hwnd));
 
@@ -557,7 +557,9 @@ namespace augs {
 			const auto supposed_extension = filters[ofn.nFilterIndex - 1].extension;
 
 			if (supposed_extension != ".*") {
-				result.replace_extension(filters[ofn.nFilterIndex - 1].extension);
+				if (result.extension() != supposed_extension) {
+					result += filters[ofn.nFilterIndex - 1].extension;
+				}
 			}
 
 			return str_ops(result.string()).replace_all("\\", "/");
