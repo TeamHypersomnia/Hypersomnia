@@ -1,3 +1,5 @@
+#include "augs/templates/introspect.h"
+
 #include "augs/misc/imgui_control_wrappers.h"
 #include "augs/misc/imgui_utils.h"
 #include "augs/audio/audio_context.h"

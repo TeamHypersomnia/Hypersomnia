@@ -1,13 +1,16 @@
 #include <sstream>
 
-#include "desaturations.h"
 #include "augs/filesystem/directory.h"
 #include "augs/filesystem/file.h"
+
+#include "augs/readwrite/byte_readwrite.h"
 
 #include "augs/ensure.h"
 #include "augs/misc/streams.h"
 
 #include "augs/image/image.h"
+
+#include "view/viewables/regeneration/desaturations.h"
 
 void regenerate_desaturation(
 	const augs::path_type& source_path,

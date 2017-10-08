@@ -1,6 +1,6 @@
 #pragma once
 #include <experimental/filesystem>
-#include "augs/readwrite/byte_readwrite.h"
+#include "augs/readwrite/readwrite_traits.h"
 
 namespace augs {
 	using path_type = std::experimental::filesystem::path;

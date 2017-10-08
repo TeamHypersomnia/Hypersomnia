@@ -2,6 +2,7 @@
 
 #include "augs/misc/streams.h"
 #include "augs/image/image.h"
+#include "augs/readwrite/byte_readwrite.h"
 
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
