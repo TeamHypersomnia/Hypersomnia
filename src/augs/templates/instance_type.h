@@ -22,7 +22,7 @@ template <class T, class MetaTuple>
 decltype(auto) get_meta_of(T&&, MetaTuple&& t) {
 	return std::get<
 		find_matching_type_in_list<
-			bind_types_t<instance_type_matches, std::decay_t<T>>, std::decay_t<MetaTuple>
+			bind_types<instance_type_matches, std::decay_t<T>>::template type, std::decay_t<MetaTuple>
 		>
 	>(std::forward<MetaTuple>(t));
 }

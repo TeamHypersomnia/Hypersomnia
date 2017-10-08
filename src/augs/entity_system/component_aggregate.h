@@ -10,7 +10,7 @@ namespace augs {
 	template <template <class T> class make_pool_id, class... components>
 	class component_aggregate {
 	public:
-		using dynamic_components_list = filter_types<apply_negation_t<is_component_fundamental>, components...>;
+		using dynamic_components_list = filter_types<apply_negation<is_component_fundamental>::template type, components...>;
 		using fundamental_components_list = filter_types<is_component_fundamental, components...>;
 		
 		using dynamic_component_id_tuple = 

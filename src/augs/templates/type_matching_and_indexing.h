@@ -142,25 +142,25 @@ template <
 using find_matching_type_in_list = typename filter_types_in_list<Criterion, List>::template get_type<0>::type;
 
 template <class S, class List>
-constexpr bool is_one_of_list_v = filter_types_in_list<bind_types_t<std::is_same, S>, List>::found;
+constexpr bool is_one_of_list_v = filter_types_in_list<bind_types<std::is_same, S>::template type, List>::found;
 
 template <class S, class... Types>
 constexpr bool is_one_of_v = is_one_of_list_v<S, type_list<Types...>>;
 
 template <class S, class List>
-constexpr size_t index_in_list_v = sequence_element_v<0, typename filter_types_in_list<bind_types_t<std::is_same, S>, List>::indices>;
+constexpr size_t index_in_list_v = sequence_element_v<0, typename filter_types_in_list<bind_types<std::is_same, S>::template type, List>::indices>;
 
 template <class S, class... Types>
 constexpr size_t index_in_v = index_in_list_v<S, type_list<Types...>>;
 
 template <class S, class List>
-constexpr size_t count_occurences_in_list_v = typename filter_types_in_list<bind_types_t<std::is_same, S>, List>::indices::size();
+constexpr size_t count_occurences_in_list_v = typename filter_types_in_list<bind_types<std::is_same, S>::template type, List>::indices::size();
 
 template <class S, class... Types>
 constexpr size_t count_occurences_in_v = count_occurences_in_list_v<S, type_list<Types...>>;
 
 template <class S, class List>
-using find_convertible_type_in_list_t = find_matching_type_in_list<bind_types_t<std::is_convertible, S>, List>;
+using find_convertible_type_in_list_t = find_matching_type_in_list<bind_types<std::is_convertible, S>::template type, List>;
 
 template <class S, class... Types>
 using find_convertible_type_in_t = find_convertible_type_in_list_t<S, std::tuple<Types...>>;
@@ -174,7 +174,7 @@ struct is_key_type_equal_to : std::bool_constant<std::is_same_v<T, typename Cand
 };
 
 template <class SearchedKeyType, class List>
-using find_type_with_key_type_in_list_t = find_matching_type_in_list<bind_types_t<is_key_type_equal_to, SearchedKeyType>, List>;
+using find_type_with_key_type_in_list_t = find_matching_type_in_list<bind_types<is_key_type_equal_to, SearchedKeyType>::template type, List>;
 
 template <class SearchedKeyType, class... Types>
 using find_type_with_key_type_t = find_type_with_key_type_in_list_t<SearchedKeyType, type_list<Types...>>;

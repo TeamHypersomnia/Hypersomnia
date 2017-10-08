@@ -9,6 +9,6 @@ using is_size_sufficient = std::bool_constant<std::numeric_limits<IndexType>::ma
 
 template <class T>
 using get_index_type_for_size_of_t = find_matching_type_in_list<
-	bind_types_t<is_size_sufficient, T>,
+	bind_types<is_size_sufficient, T>::template type,
 	type_list<unsigned char, unsigned short, unsigned int>
 >;
