@@ -43,7 +43,7 @@ void LOG(const std::string& f) {
 #if ENABLE_LOG 
 	std::unique_lock<std::mutex> lock(log_mutex);
 
-	program_log::get_current().push_entry({ console_color::WHITE, f });
+	program_log::get_current().push_entry({ f });
 
 #if LOG_TO_FILE
 	std::ofstream recording_file("generated/logs/live_debug.txt", std::ios::out | std::ios::app);

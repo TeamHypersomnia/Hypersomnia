@@ -1,6 +1,5 @@
 #pragma once
 #include <iosfwd>
-#include "augs/console_color.h"
 
 struct ImVec4;
 struct hsv;
@@ -36,8 +35,6 @@ struct rgba {
 	rgba_channel b;
 	rgba_channel a;
 	// END GEN INTROSPECTOR
-
-	explicit rgba(const console_color);
 
 	rgba(const vec4&);
 	rgba(const ImVec4&);

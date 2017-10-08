@@ -1,9 +1,8 @@
 #include <limits>
+#include <array>
 #include <algorithm>
 #include <imgui/imgui.h>
-#include "augs/ensure.h"
 #include "augs/graphics/rgba.h"
-#include <array>
 
 namespace {
 	typedef struct {
@@ -178,16 +177,6 @@ rgba::operator ImVec4() const {
 		to_0_1(b),
 		to_0_1(a)
 	};
-}
-
-rgba::rgba(const console_color c) {
-	switch (c) {
-	case console_color::WHITE: set(white); break;
-	case console_color::RED: set(red); break;
-	case console_color::YELLOW: set(yellow); break;
-	case console_color::GREEN: set(green); break;
-	default: ensure(false); break;
-	}
 }
 
 rgba::rgba(

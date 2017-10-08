@@ -1,13 +1,11 @@
 #pragma once
 #include <vector>
 #include <cstring>
-#include "augs/console_color.h"
 
 #include "augs/misc/typesafe_sprintf.h"
 #include "augs/build_settings/setting_enable_debug_log.h"
 
 struct log_entry {
-	console_color color;
 	std::string text;
 };
 

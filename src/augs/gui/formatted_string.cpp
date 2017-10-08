@@ -24,7 +24,7 @@ namespace augs {
 
 				for (auto it = entries.end() - lines_remaining; it != entries.end(); ++it) {
 					auto wstr = to_wstring((*it).text + "\n");
-					concatenate(result, formatted_string{ wstr, { f, rgba((*it).color) } });
+					concatenate(result, formatted_string{ wstr, { f, white /* rgba((*it).color) */ } });
 
 					--lines_remaining;
 				}
@@ -33,7 +33,7 @@ namespace augs {
 			}
 
 			formatted_string::operator std::wstring() const {
-				const std::size_t l = size();
+				const auto l = size();
 				
 				std::wstring out;
 				out.reserve(l);
