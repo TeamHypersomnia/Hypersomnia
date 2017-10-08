@@ -92,8 +92,6 @@ struct tests_of_traits {
 
 	static_assert(bind_types<std::is_same, const int>::type<const int>::value, "Trait has failed");
 
-	static_assert(!bind_types_right<is_one_of, int, double, unsigned, signed>::type<float>::value, "Trait has failed");
-
 	static_assert(std::is_same_v<filter_types_in_list<std::is_integral, type_list<double, int, float>>::indices, std::index_sequence<1>>, "Trait has failed");
 	static_assert(std::is_same_v<filter_types_in_list<std::is_integral, type_list<double, int, float>>::type, std::tuple<int>>, "Trait has failed");
 	static_assert(std::is_same_v<filter_types_in_list<std::is_integral, type_list<double, int, float>>::get_type<0>::type, int>, "Trait has failed");

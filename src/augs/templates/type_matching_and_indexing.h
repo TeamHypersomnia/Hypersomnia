@@ -148,12 +148,6 @@ template <class S, class... Types>
 constexpr bool is_one_of_v = is_one_of_list_v<S, type_list<Types...>>;
 
 template <class S, class List>
-using is_one_of_list = std::bool_constant<is_one_of_list_v<S, List>>;
-
-template <class S, class... Types>
-using is_one_of = is_one_of_list<S, type_list<Types...>>;
-
-template <class S, class List>
 constexpr size_t index_in_list_v = sequence_element_v<0, typename filter_types_in_list<bind_types_t<std::is_same, S>, List>::indices>;
 
 template <class S, class... Types>
