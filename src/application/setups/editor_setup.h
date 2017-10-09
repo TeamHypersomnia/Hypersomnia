@@ -85,6 +85,16 @@ class editor_setup {
 	editor_tab_container tabs;
 	editor_tab* current_tab = nullptr;
 
+	void set_current_tab(editor_tab& t) {
+		current_tab = std::addressof(t);
+		pause();
+	}
+
+	void unset_current_tab() {
+		current_tab = nullptr;
+		pause();
+	}
+
 	auto& tab() {
 		return *current_tab;
 	}
@@ -107,7 +117,7 @@ class editor_setup {
 		auto& new_tab = (*tabs.try_emplace(new_id, new_horizontal_index).first).second;
 		
 		if (f(new_tab)) {
-			current_tab = std::addressof(new_tab);
+			set_current_tab(new_tab);
 
 			for (auto& it : tabs) {
 				if (current_tab != std::addressof(it.second) 

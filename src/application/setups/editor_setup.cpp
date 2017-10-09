@@ -522,7 +522,7 @@ void editor_setup::set_tab_by_index(const std::size_t next_index) {
 		}
 	);
 
-	current_tab = std::addressof((*found).second);
+	set_current_tab((*found).second);
 }
 
 void editor_setup::next_tab() {
@@ -560,6 +560,6 @@ void editor_setup::close_tab() {
 		set_tab_by_index(std::min(current_index, tabs.size() - 1));
 	}
 	else {
-		current_tab = nullptr;
+		unset_current_tab();
 	}
 }
