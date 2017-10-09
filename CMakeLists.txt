@@ -34,7 +34,6 @@ option(HYPERSOMNIA_BARE "Build the minimal possible Hypersomnia runtime. For tes
 #	- Can't tweak maximum number of entities at runtime
 #	- For every game world, there's always maximum of possible memory allocated 
 set(STATICALLY_ALLOCATE_ENTITIES_NUM "5000" CACHE STRING "Statically allocate entities in cosmos class")
-set(STATICALLY_ALLOCATE_EDITOR_TABS_NUM "4" CACHE STRING "Statically allocate tabs in editor")
 
 if (HYPERSOMNIA_BARE)
 	set(BUILD_SOUND_FORMAT_DECODERS FALSE CACHE BOOL "" FORCE)

@@ -44,8 +44,9 @@
 
 #include "generated/introspectors.h"
 
+const cosmos cosmos::empty;
+
 void cosmos::clear() {
-	static cosmos empty;
 	*this = empty;
 }
 

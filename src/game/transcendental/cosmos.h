@@ -65,6 +65,8 @@ class EMPTY_BASES cosmos : private cosmos_base,
 #endif
 
 public:
+	static const cosmos empty;
+
 	cosmos_significant_state significant;
 	all_inferential_systems inferential;
 

@@ -903,6 +903,7 @@ int work(const int argc, const char* const * const argv) try {
 												case key::X: setup.cut(); return true;
 												case key::Y: setup.paste(); return true;
 												case key::P: setup.go_to_all(); return true;
+												case key::N: setup.new_tab(); return true;
 												case key::W: setup.close_tab(); return true;
 												case key::TAB: setup.next_tab(); return true;
 												default: break;
@@ -1205,6 +1206,13 @@ int work(const int argc, const char* const * const argv) try {
 			{
 				const auto matrix = augs::orthographic_projection(get_camera().visible_world_area);
 				shaders.standard->set_projection(matrix);
+			}
+
+			if (
+				std::addressof(viewed_character.get_cosmos()) ==
+				std::addressof(cosmos::empty)
+			) {
+				get_drawer().color_overlay(screen_size, darkgray);
 			}
 		}
 

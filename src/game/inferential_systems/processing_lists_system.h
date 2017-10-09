@@ -1,6 +1,7 @@
 #pragma once
-#include <unordered_map>
 #include <vector>
+
+#include "augs/misc/enum_array.h"
 
 #include "game/enums/processing_subjects.h"
 #include "game/transcendental/entity_id.h"
@@ -19,7 +20,7 @@ class processing_lists_system {
 		bool is_constructed = false;
 	};
 	
-	std::unordered_map<processing_subjects, std::vector<entity_id>> lists;
+	augs::enum_array<std::vector<entity_id>, processing_subjects> lists;
 	std::vector<cache> per_entity_cache;
 	
 	void destroy_inferred_state_of(const const_entity_handle);
@@ -31,8 +32,7 @@ class processing_lists_system {
 	void reserve_caches_for_entities(const size_t n);
 
 	friend class cosmos;
-public:
-	processing_lists_system();
 
+public:
 	const std::vector<entity_id>& get(const processing_subjects) const;
 };

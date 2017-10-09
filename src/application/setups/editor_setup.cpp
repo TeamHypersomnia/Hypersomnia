@@ -23,6 +23,8 @@ void editor_tab::set_workspace_path(const path_operation op) {
 	op.recent.add(op.lua, op.path);
 }
 
+editor_tab::editor_tab(std::size_t horizontal_index) : horizontal_index(horizontal_index) {}
+
 std::optional<editor_popup> editor_tab::open_workspace(const path_operation op) {
 	if (op.path.empty()) {
 		return std::nullopt;
@@ -113,9 +115,7 @@ void editor_recent_paths::add(sol::state& lua, const augs::path_type& path) {
 	augs::save_as_lua_table(lua, *this, get_recent_paths_path());
 }
 
-editor_setup::editor_setup(sol::state& lua) : recent(lua) {
-	tabs.emplace_back();
-}
+editor_setup::editor_setup(sol::state& lua) : recent(lua) {}
 
 editor_setup::editor_setup(sol::state& lua, const augs::path_type& workspace_path) : recent(lua) {
 	if (tab().open_workspace({ lua, recent, workspace_path })) {
@@ -187,7 +187,7 @@ void editor_setup::perform_custom_imgui(
 		if (auto main_menu = scoped_main_menu_bar()) {
 			if (auto menu = scoped_menu("File")) {
 				if (ImGui::MenuItem("New", "CTRL+N")) {
-					try_new_tab([&](editor_tab& t) { return true; });
+					new_tab();
 				}
 
 				if (ImGui::MenuItem("Open", "CTRL+O")) {
@@ -413,6 +413,10 @@ static auto get_filters() {
 }
 
 void editor_setup::open(const augs::window& owner) {
+	if (current_popup) {
+		return;
+	}
+
 	open_file_dialog = std::async(
 		std::launch::async,
 		[&](){
@@ -422,6 +426,10 @@ void editor_setup::open(const augs::window& owner) {
 }
 
 void editor_setup::save(sol::state& lua, const augs::window& owner) {
+	if (!has_tabs()) {
+		return;
+	}
+
 	if (tab().current_path.empty()) {
 		save_as(owner);
 	}
@@ -431,6 +439,10 @@ void editor_setup::save(sol::state& lua, const augs::window& owner) {
 }
 
 void editor_setup::save_as(const augs::window& owner) {
+	if (!has_tabs() || current_popup) {
+		return;
+	}
+
 	save_file_dialog = std::async(
 		std::launch::async,
 		[&](){
@@ -499,14 +511,55 @@ void editor_setup::next() {
 	player_paused = true;
 }
 
-void editor_setup::next_tab() {
+void editor_setup::new_tab() {
+	try_new_tab([&](editor_tab& t) { return true; });
+}
 
+void editor_setup::set_tab_by_index(const std::size_t next_index) {
+	const auto found = find_if_in(tabs,
+		[next_index](const auto& it) {
+			return it.second.horizontal_index == next_index;
+		}
+	);
+
+	current_tab = std::addressof((*found).second);
+}
+
+void editor_setup::next_tab() {
+	if (has_tabs()) {
+		set_tab_by_index((current_tab->horizontal_index + 1) % tabs.size());
+	}
 }
 
 void editor_setup::prev_tab() {
+	if (has_tabs()) {
+		set_tab_by_index([this]() {
+			const auto current_index = current_tab->horizontal_index;
 
+			if (current_index == 0) {
+				return tabs.size() - 1;
+			}
+			else {
+				return current_index - 1;
+			}
+		}());
+	}
 }
 
 void editor_setup::close_tab() {
+	const auto current_index = current_tab->horizontal_index;
+	erase_if(tabs, [this](const auto& it) { return std::addressof(it.second) == current_tab; });
 
+	for (auto& it : tabs) {
+		if (it.second.horizontal_index > current_index) {
+			--it.second.horizontal_index;
+		}
+	}
+
+	if (has_tabs()) {
+		set_tab_by_index(std::min(current_index, tabs.size() - 1));
+	}
+	else {
+		current_tab = nullptr;
+	}
 }

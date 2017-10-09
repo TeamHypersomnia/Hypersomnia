@@ -24,6 +24,8 @@
 struct all_logical_assets;
 
 struct all_viewables_defs {
+	static const all_viewables_defs empty;
+
 	// GEN INTROSPECTOR struct all_viewables_defs
 	sound_buffer_inputs_map sounds;
 	particle_effects_map particle_effects;

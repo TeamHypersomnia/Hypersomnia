@@ -1,5 +1,6 @@
 #pragma once
 #include <future>
+#include <map>
 
 #include "augs/misc/fixed_delta_timer.h"
 #include "augs/misc/debug_entropy_player.h"
@@ -49,12 +50,15 @@ struct editor_popup {
 struct editor_tab {
 	workspace work;
 	augs::path_type current_path;
-	
+	std::size_t horizontal_index;
+
 	struct path_operation {
 		sol::state& lua;
 		editor_recent_paths& recent;
 		const augs::path_type& path;
 	};
+
+	editor_tab(std::size_t horizontal_index);
 
 	std::optional<editor_popup> open_workspace(path_operation);
 	
@@ -62,18 +66,7 @@ struct editor_tab {
 	void set_workspace_path(path_operation);
 };
 
-
-#if STATICALLY_ALLOCATE_EDITOR_TABS_NUM
-	using editor_tab_container = augs::constant_size_vector<editor_tab, STATICALLY_ALLOCATE_EDITOR_TABS_NUM>;
-#else
-	#include <deque>
-
-	using editor_tab_container = std::conditional_t<
-		std::is_nothrow_move_constructible_v<editor_tab>, 
-		std::vector<editor_tab>, 
-		std::deque<editor_tab>
-	>;
-#endif
+using editor_tab_container = std::map<std::size_t, editor_tab>;
 
 class editor_setup {
 	std::optional<editor_popup> current_popup;
@@ -90,40 +83,42 @@ class editor_setup {
 	editor_recent_paths recent;
 
 	editor_tab_container tabs;
-	std::size_t current_tab = std::size_t(-1);
+	editor_tab* current_tab = nullptr;
 
 	auto& tab() {
-		return tabs[current_tab];
+		return *current_tab;
 	}
 
 	const auto& tab() const {
-		return tabs[current_tab];
+		return *current_tab;
 	}
 
 	bool has_tabs() const {
-		return current_tab != -1;
+		return !tabs.empty();
 	}
+
+	void set_tab_by_index(const std::size_t);
 
 	template <class F>
 	void try_new_tab(F&& f) {
-		if (!has_tabs()) {
-			if (f(tabs[0])) {
-				current_tab = 0;
+		const auto new_id = first_free_key(tabs);
+		const auto new_horizontal_index = current_tab ? current_tab->horizontal_index + 1 : 0;
+
+		auto& new_tab = (*tabs.try_emplace(new_id, new_horizontal_index).first).second;
+		
+		if (f(new_tab)) {
+			current_tab = std::addressof(new_tab);
+
+			for (auto& it : tabs) {
+				if (current_tab != std::addressof(it.second) 
+					&& it.second.horizontal_index >= new_horizontal_index
+				) {
+					++it.second.horizontal_index;
+				}
 			}
 		}
 		else {
-			if constexpr(can_reserve_v<editor_tab_container>) {
-				tabs.reserve(tabs.size() + 1); /* Prevent exponential expansion */
-			}
-
-			tabs.emplace_back();
-			
-			if (f(tabs.back())) {
-				current_tab = tabs.size();
-			}
-			else {
-				tabs.pop_back();
-			}
+			tabs.erase(new_id);
 		}
 	}
 
@@ -165,7 +160,7 @@ public:
 			return tab().work.world;
 		}
 		
-		return tabs[0].work.world; /* 0 is always default initialized */
+		return cosmos::empty; 
 	}
 
 	auto get_interpolation_ratio() const {
@@ -185,7 +180,7 @@ public:
 			return tab().work.viewables;
 		}
 
-		return tabs[0].work.viewables; /* 0 is always default initialized */
+		return all_viewables_defs::empty;
 	}
 
 	void perform_custom_imgui(
@@ -246,6 +241,7 @@ public:
 	void prev();
 	void next();
 
+	void new_tab();
 	void next_tab();
 	void prev_tab();
 	void close_tab();

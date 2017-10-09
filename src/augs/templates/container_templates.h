@@ -101,6 +101,11 @@ void copy_container(const Container1& from, Container2& into) {
 	std::copy(from.begin(), from.end(), into.begin());
 } 
 
+template <class Container, class F>
+auto find_if_in(Container& v, F&& f) {
+	return std::find_if(v.begin(), v.end(), std::forward<F>(f));
+}
+
 template<class Container, class T>
 auto find_in(Container& v, const T& key) {
 	if constexpr(can_access_data_v<Container>) {
@@ -200,7 +205,7 @@ void fill_container(Container& c, T&& val) {
 template <class Container>
 auto first_free_key(const Container& in) {
 	for (std::size_t candidate = 0;;++candidate) {
-		const auto key = static_cast<Container::key_type>(key);
+		const auto key = static_cast<typename Container::key_type>(candidate);
 		const auto it = in.find(key);
 
 		if (it == in.end()) {
