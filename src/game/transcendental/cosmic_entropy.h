@@ -74,7 +74,7 @@ struct cosmic_entropy : basic_cosmic_entropy<entity_id> {
 	);
 	
 	explicit cosmic_entropy(
-		const const_entity_handle controlled_entity, 
+		const entity_id controlled_entity,
 		const game_intents&,
 		const game_motions&
 	);
