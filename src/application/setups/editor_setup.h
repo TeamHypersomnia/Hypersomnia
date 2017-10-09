@@ -62,6 +62,14 @@ struct editor_tab {
 	void set_workspace_path(path_operation);
 };
 
+using editor_tab_container =
+#if STATICALLY_ALLOCATE_EDITOR_TABS_NUM
+	augs::constant_size_vector<editor_tab, STATICALLY_ALLOCATE_EDITOR_TABS_NUM>
+#else
+	std::vector<editor_tab>
+#endif
+;
+
 class editor_setup {
 	std::optional<editor_popup> current_popup;
 
@@ -76,16 +84,38 @@ class editor_setup {
 
 	editor_recent_paths recent;
 
-	editor_tab stack_tab;
+	editor_tab_container tabs;
+	std::size_t current_tab = std::size_t(-1);
 
 	auto& tab() {
-		return stack_tab;
-		//tabs[current_tab];
+		return tabs[current_tab];
 	}
 
 	const auto& tab() const {
-		return stack_tab;
-		//tabs[current_tab];
+		return tabs[current_tab];
+	}
+
+	bool has_tabs() const {
+		return current_tab != -1;
+	}
+
+	template <class F>
+	void try_new_tab(F&& f) {
+		if (!has_tabs()) {
+			if (f(tabs[0])) {
+				current_tab = 0;
+			}
+		}
+		else {
+			tabs.emplace_back();
+			
+			if (f(tabs.back())) {
+				current_tab = tabs.size();
+			}
+			else {
+				tabs.pop_back();
+			}
+		}
 	}
 
 	void play();
@@ -122,7 +152,11 @@ public:
 	}
 
 	const auto& get_viewed_cosmos() const {
-		return tab().work.world;
+		if (has_tabs()) {
+			return tab().work.world;
+		}
+		
+		return tabs[0].work.world; /* 0 is always default initialized */
 	}
 
 	auto get_interpolation_ratio() const {
@@ -130,7 +164,7 @@ public:
 	}
 
 	auto get_viewed_character_id() const {
-		return tab().work.locally_viewed;
+		return has_tabs() ? tab().work.locally_viewed : entity_id();
 	}
 
 	auto get_viewed_character() const {
@@ -138,7 +172,11 @@ public:
 	}
 
 	const auto& get_viewable_defs() const {
-		return tab().work.viewables;
+		if (has_tabs()) {
+			return tab().work.viewables;
+		}
+
+		return tabs[0].work.viewables; /* 0 is always default initialized */
 	}
 
 	void perform_custom_imgui(

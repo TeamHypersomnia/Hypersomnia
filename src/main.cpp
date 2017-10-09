@@ -525,12 +525,9 @@ int work(const int argc, const char* const * const argv) try {
 		auto& setup,
 		const config_lua_table& viewing_config
 	) {
-		const auto& viewed_cosmos = setup.get_viewed_cosmos();
-
 		audiovisuals.advance({
 			delta,
-			viewed_cosmos,
-			setup.get_viewed_character_id(),
+			get_viewed_character(),
 
 			viewing_config.window.get_screen_size(),
 			get_viewable_defs().particle_effects,
@@ -1155,7 +1152,7 @@ int work(const int argc, const char* const * const argv) try {
 		if (const bool has_something_to_view = viewed_character.alive()) {
 			/* #1 */
 			illuminated_rendering({
-				viewed_character.get_cosmos(),
+				viewed_character,
 				audiovisuals,
 				viewing_config.drawing,
 				necessary_atlas_entries,
@@ -1167,8 +1164,7 @@ int work(const int argc, const char* const * const argv) try {
 				*game_world_atlas,
 				fbos,
 				shaders,
-				get_camera(),
-				viewed_character.get_id()
+				get_camera()
 			});
 			
 			/* 
@@ -1270,7 +1266,7 @@ int work(const int argc, const char* const * const argv) try {
 					get_drawer().cursor(necessary_atlas_entries, menu_chosen_cursor, cursor_drawing_pos, white);
 				}
 			}
-			else if (game_gui.active && viewing_config.drawing.draw_character_gui) {
+			else if (viewed_character.alive() && game_gui.active && viewing_config.drawing.draw_character_gui) {
 				const auto& character_gui = game_gui.get_character_gui(viewed_character);
 
 				character_gui.draw_cursor_with_information(context, should_draw_our_cursor);
@@ -1284,8 +1280,7 @@ int work(const int argc, const char* const * const argv) try {
 				screen_size,
 				viewed_character,
 				profiler,
-				audiovisuals.profiler,
-				viewed_character.alive() ? viewed_character.get_cosmos().profiler : cosmic_profiler{}
+				audiovisuals.profiler
 			);
 		}
 

@@ -23,7 +23,7 @@ void audiovisual_state::reserve_caches_for_entities(const std::size_t n) {
 void audiovisual_state::advance(const audiovisual_advance_input input) {
 	auto scope = measure_scope(profiler.advance);
 
-	const auto& cosm = input.cosmos_to_sample;
+	const auto& cosm = input.viewed_character.get_cosmos();
 	const auto dt = input.delta;
 
 	reserve_caches_for_entities(cosm.get_entity_pool().capacity());
@@ -35,7 +35,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 	auto& interp = get<interpolation_system>();
 	auto& particles = get<particles_simulation_system>();
 
-	const auto viewed_character = cosm[input.viewed_character_id];
+	const auto viewed_character = input.viewed_character;
 
 	thunders.advance(cosm, input.particle_effects, dt, particles);
 	exploding_rings.advance(cosm, input.particle_effects, dt, particles);

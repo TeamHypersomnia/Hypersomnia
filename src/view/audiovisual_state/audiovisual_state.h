@@ -27,8 +27,7 @@ class session_profiler;
 
 struct audiovisual_advance_input {
 	const augs::delta delta;
-	const cosmos& cosmos_to_sample;
-	const entity_id viewed_character_id;
+	const const_entity_handle viewed_character;
 	const vec2i screen_size;
 	const particle_effects_map& particle_effects;
 

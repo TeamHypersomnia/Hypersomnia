@@ -2,7 +2,7 @@
 #include "augs/math/camera_cone.h"
 
 #include "game/enums/game_intent_type.h"
-#include "game/transcendental/entity_id.h"
+#include "game/transcendental/entity_handle_declaration.h"
 #include "game/detail/visible_entities.h"
 
 #include "view/game_drawing_settings.h"
@@ -26,7 +26,7 @@ using illuminated_rendering_fbos = necessary_fbos;
 using illuminated_rendering_shaders = necessary_shaders;
 
 struct illuminated_rendering_input {
-	const cosmos& cosm;
+	const const_entity_handle& viewed_character;
 	const audiovisual_state& audiovisuals;
 	const game_drawing_settings drawing;
 	const necessary_images_in_atlas& necessary_images;
@@ -39,7 +39,6 @@ struct illuminated_rendering_input {
 	const illuminated_rendering_fbos& fbos;
 	const illuminated_rendering_shaders& shaders;
 	const camera_cone camera;
-	const entity_id viewed_character;
 };
 
 void illuminated_rendering(const illuminated_rendering_input);

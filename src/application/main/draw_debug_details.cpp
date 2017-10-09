@@ -17,8 +17,7 @@ void draw_debug_details(
 	const vec2i screen_size,
 	const const_entity_handle viewed_character,
 	const session_profiler& session_performance,
-	const audiovisual_profiler& audiovisual_performance,
-	const cosmic_profiler& cosmos_performance
+	const audiovisual_profiler& audiovisual_performance
 ) {
 	using namespace augs::gui::text;
 
@@ -95,7 +94,10 @@ void draw_debug_details(
 	total_details += { L"Audiovisual\n", category_style };
 	total_details += { audiovisual_performance.summary(), text_style };
 	total_details += { L"Cosmos\n", category_style };
-	total_details += { cosmos_performance.summary(), text_style };
+
+	if (viewed_character.alive()) {
+		total_details += { viewed_character.get_cosmos().profiler.summary(), text_style };
+	}
 
 	print(output, { 0, 0 }, total_details);
 }
