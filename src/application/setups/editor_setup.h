@@ -38,16 +38,32 @@ struct editor_recent_paths {
 	void add(sol::state&, const augs::path_type& path);
 };
 
-class editor_setup {
-	struct popup {
-		std::string title;
-		std::string message;
-		std::string details;
+struct editor_popup {
+	std::string title;
+	std::string message;
+	std::string details;
 
-		bool details_expanded = false;
-	};
+	bool details_expanded = false;
+};
+
+struct editor_tab {
+	workspace work;
+	augs::path_type current_path;
 	
-	std::optional<popup> current_popup;
+	struct path_operation {
+		sol::state& lua;
+		editor_recent_paths& recent;
+		const augs::path_type& path;
+	};
+
+	std::optional<editor_popup> open_workspace(path_operation);
+	
+	void save_workspace(path_operation);
+	void set_workspace_path(path_operation);
+};
+
+class editor_setup {
+	std::optional<editor_popup> current_popup;
 
 	bool show_summary = true;
 	bool show_player = true;
@@ -58,25 +74,39 @@ class editor_setup {
 	double player_speed = 1.0;
 	bool player_paused = true;
 
+	editor_recent_paths recent;
+
+	editor_tab stack_tab;
+
+	auto& tab() {
+		return stack_tab;
+		//tabs[current_tab];
+	}
+
+	const auto& tab() const {
+		return stack_tab;
+		//tabs[current_tab];
+	}
+
 	void play();
 	void pause();
-
-	workspace work;
-	editor_recent_paths recent;
 
 	cosmic_entropy total_collected_entropy;
 	augs::fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
 
-	augs::path_type current_workspace_path;
-
 	std::future<std::optional<std::string>> open_file_dialog;
 	std::future<std::optional<std::string>> save_file_dialog;
 
-	void set_popup(const popup);
-	void open_workspace(sol::state&, const augs::path_type& workspace_path);
-	void save_workspace(sol::state&, const augs::path_type& workspace_path);
-	void set_workspace_path(sol::state&, const augs::path_type&);
+	void set_popup(const editor_popup);
 	void open_untitled_workspace();
+	
+	struct path_operation {
+		sol::state& lua;
+		const augs::path_type path;
+	};
+
+	void open_workspace(path_operation);
+	void save_workspace(path_operation);
 
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
@@ -92,7 +122,7 @@ public:
 	}
 
 	const auto& get_viewed_cosmos() const {
-		return work.world;
+		return tab().work.world;
 	}
 
 	auto get_interpolation_ratio() const {
@@ -100,7 +130,7 @@ public:
 	}
 
 	auto get_viewed_character_id() const {
-		return work.locally_viewed;
+		return tab().work.locally_viewed;
 	}
 
 	auto get_viewed_character() const {
@@ -108,7 +138,7 @@ public:
 	}
 
 	const auto& get_viewable_defs() const {
-		return work.viewables;
+		return tab().work.viewables;
 	}
 
 	void perform_custom_imgui(
@@ -139,7 +169,7 @@ public:
 		auto steps = timer.extract_num_of_logic_steps(get_viewed_cosmos().get_fixed_delta());
 
 		while (steps--) {
-			work.advance(
+			tab().work.advance(
 				{ total_collected_entropy },
 				std::forward<Callbacks>(callbacks)...
 			);
@@ -168,6 +198,10 @@ public:
 	void stop();
 	void prev();
 	void next();
+
+	void next_tab();
+	void prev_tab();
+	void close_tab();
 
 	void go_to_all();
 	void open_containing_folder();

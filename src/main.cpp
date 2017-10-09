@@ -893,6 +893,7 @@ int work(const int argc, const char* const * const argv) try {
 											switch (k) {
 												case key::Z: setup.redo(); return true;
 												case key::E: setup.open_containing_folder(); return true;
+												case key::TAB: setup.prev_tab(); return true;
 												default: break;
 											}
 										}
@@ -905,6 +906,8 @@ int work(const int argc, const char* const * const argv) try {
 												case key::X: setup.cut(); return true;
 												case key::Y: setup.paste(); return true;
 												case key::P: setup.go_to_all(); return true;
+												case key::W: setup.close_tab(); return true;
+												case key::TAB: setup.next_tab(); return true;
 												default: break;
 											}
 										}

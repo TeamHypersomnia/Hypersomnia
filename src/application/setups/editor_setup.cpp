@@ -14,79 +14,81 @@
 
 #include "generated/introspectors.h"
 
-void editor_setup::set_popup(const popup p) {
+void editor_setup::set_popup(const editor_popup p) {
 	current_popup = p;
 }
 
-void editor_setup::set_workspace_path(sol::state& lua, const augs::path_type& path) {
-	current_workspace_path = path;
-	recent.add(lua, path);
+void editor_tab::set_workspace_path(const path_operation op) {
+	current_path = op.path;
+	op.recent.add(op.lua, op.path);
 }
 
-void editor_setup::open_workspace(sol::state& lua, const augs::path_type& workspace_path) {
-	if (workspace_path.empty()) {
-		return;
+std::optional<editor_popup> editor_tab::open_workspace(const path_operation op) {
+	if (op.path.empty()) {
+		return std::nullopt;
 	}
 
-	const auto display_path = augs::to_display_path(workspace_path);
+	const auto display_path = augs::to_display_path(op.path);
 
 	try {
-		if (workspace_path.extension() == ".wp") {
-			augs::load(work, workspace_path);
+		if (op.path.extension() == ".wp") {
+			augs::load(work, op.path);
 		}
-		else if (workspace_path.extension() == ".lua") {
-			augs::load_from_lua_table(lua, work, workspace_path);
+		else if (op.path.extension() == ".lua") {
+			augs::load_from_lua_table(op.lua, work, op.path);
 		}
 		else {
-			return;
+			return std::nullopt;
 		}
 
-		set_workspace_path(lua, workspace_path);
+		set_workspace_path(op);
 	}
 	catch (const cosmos_loading_error err) {
-		set_popup({
+		return { {
 			"Error",
 			typesafe_sprintf("Failed to load %x.\nFile(s) might be corrupt.", display_path),
 			err.what()
-		});
+		} };
 	}
 	catch (const augs::stream_read_error err) {
-		set_popup({
+		return { {
 			"Error",
 			typesafe_sprintf("Failed to load %x.\nFile(s) might be corrupt.", display_path),
 			err.what()
-		});
+		} };
 	}
 	catch (const augs::lua_deserialization_error err) {
-		set_popup({
+		return { {
 			"Error",
 			typesafe_sprintf("Failed to load %x.\nNot a valid lua table.", display_path),
 			err.what()
-		});
+		} };
 	}
 	catch (const augs::ifstream_error err) {
-		set_popup({
+		return { {
 			"Error",
 			typesafe_sprintf("Failed to load %x.\nFile(s) might be missing.", display_path),
 			err.what()
-		});
+		} };
 	}
+
+	return std::nullopt;
 }
 
-void editor_setup::save_workspace(sol::state& lua, const augs::path_type& workspace_path) {
-	if (workspace_path.extension() == ".wp") {
-		augs::save(work, workspace_path);
+void editor_tab::save_workspace(const path_operation op) {
+	if (op.path.extension() == ".wp") {
+		augs::save(work, op.path);
 	}
-	else if (workspace_path.extension() == ".lua") {
-		augs::save_as_lua_table(lua, work, workspace_path);
+	else if (op.path.extension() == ".lua") {
+		augs::save_as_lua_table(op.lua, work, op.path);
 	}
 
-	set_workspace_path(lua, workspace_path);
+	set_workspace_path(op);
 }
 
 void editor_setup::open_untitled_workspace() {
-	work.make_blank();
-	current_workspace_path = {};
+	tab().work.make_blank();
+	tab().current_path = {};
 }
 
 static auto get_recent_paths_path() {
@@ -115,9 +117,11 @@ editor_setup::editor_setup(sol::state& lua) : recent(lua) {
 }
 
 editor_setup::editor_setup(sol::state& lua, const augs::path_type& workspace_path) : recent(lua) {
-	open_workspace(lua, workspace_path);
+	if (tab().open_workspace({ lua, recent, workspace_path })) {
 
-	if (current_workspace_path.empty()) {
+	}
+
+	if (tab().current_path.empty()) {
 		open_untitled_workspace();
 	}
 }
@@ -129,10 +133,20 @@ void editor_setup::control(
 }
 
 void editor_setup::customize_for_viewing(config_lua_table& config) const {
-	const auto filename = current_workspace_path.filename().string();
+	const auto filename = tab().current_path.filename().string();
 
 	config.window.name = "Editor - " + (filename.empty() ? std::string("Untitled") : filename);
 	return;
+}
+
+void editor_setup::open_workspace(const path_operation op) {
+	if (const auto popup = tab().open_workspace({ op.lua, recent, op.path })) {
+		set_popup(*popup);
+	}
+}
+
+void editor_setup::save_workspace(const path_operation op) {
+	tab().save_workspace({ op.lua, recent, op.path });
 }
 
 void editor_setup::perform_custom_imgui(
@@ -141,6 +155,10 @@ void editor_setup::perform_custom_imgui(
 	const bool game_gui_active
 ) {
 	using namespace augs::imgui;
+
+	auto in_path = [&](const auto& path) {
+		return path_operation{ lua, path };
+	};
 
 	if (game_gui_active) {
 		if (auto main_menu = scoped_main_menu_bar()) {
@@ -163,7 +181,7 @@ void editor_setup::perform_custom_imgui(
 						const auto str = augs::to_display_path(target_path).string();
 
 						if (ImGui::MenuItem(str.c_str())) {
-							open_workspace(lua, target_path);
+							open_workspace(in_path(target_path));
 						}
 					}
 				}
@@ -189,7 +207,7 @@ void editor_setup::perform_custom_imgui(
 
 #if	BUILD_TEST_SCENES
 				if (ImGui::MenuItem("Fill with test scene")) {
-					work.make_test_scene(lua, false);
+					tab().work.make_test_scene(lua, false);
 				}
 #else
 				if (ImGui::MenuItem("Fill with test scene", nullptr, false, false)) {}
@@ -221,7 +239,7 @@ void editor_setup::perform_custom_imgui(
 		const auto result_path = open_file_dialog.get();
 		
 		if (result_path) {
-			open_workspace(lua, *result_path);
+			open_workspace(in_path(*result_path));
 		}
 	}
 
@@ -229,8 +247,7 @@ void editor_setup::perform_custom_imgui(
 		const auto result_path = save_file_dialog.get();
 
 		if (result_path) {
-			save_workspace(lua, *result_path);
-			current_workspace_path = *result_path;
+			save_workspace(in_path(*result_path));
 		}
 	}
 
@@ -286,8 +303,8 @@ void editor_setup::perform_custom_imgui(
 		static ImGuiTextFilter filter;
 		filter.Draw();
 
-		work.world.for_each_entity_id([&](const entity_id id) {
-			const auto handle = work.world[id];
+		tab().work.world.for_each_entity_id([&](const entity_id id) {
+			const auto handle = tab().work.world[id];
 			const auto name = to_string(handle.get_name());
 
 			if (filter.PassFilter(name.c_str())) {
@@ -295,7 +312,7 @@ void editor_setup::perform_custom_imgui(
 
 				if (auto node = scoped_tree_node(name.c_str())) {
 					if (ImGui::Button("Control")) {
-						work.locally_viewed = id;
+						tab().work.locally_viewed = id;
 					}
 				}
 			}
@@ -381,11 +398,11 @@ void editor_setup::open(const augs::window& owner) {
 }
 
 void editor_setup::save(sol::state& lua, const augs::window& owner) {
-	if (current_workspace_path.empty()) {
+	if (tab().current_path.empty()) {
 		save_as(owner);
 	}
 	else {
-		save_workspace(lua, current_workspace_path);
+		save_workspace({ lua, tab().current_path });
 	}
 }
 
@@ -423,7 +440,7 @@ void editor_setup::go_to_all() {
 }
 
 void editor_setup::open_containing_folder() {
-	if (const auto path_str = augs::path_type(current_workspace_path).replace_filename("").string();
+	if (const auto path_str = augs::path_type(tab().current_path).replace_filename("").string();
 		path_str.size() > 0
 	) {
 		augs::shell(path_str);
@@ -456,4 +473,16 @@ void editor_setup::prev() {
 
 void editor_setup::next() {
 	player_paused = true;
+}
+
+void editor_setup::next_tab() {
+
+}
+
+void editor_setup::prev_tab() {
+
+}
+
+void editor_setup::close_tab() {
+
 }
