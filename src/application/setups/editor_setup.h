@@ -62,13 +62,18 @@ struct editor_tab {
 	void set_workspace_path(path_operation);
 };
 
-using editor_tab_container =
+
 #if STATICALLY_ALLOCATE_EDITOR_TABS_NUM
-	augs::constant_size_vector<editor_tab, STATICALLY_ALLOCATE_EDITOR_TABS_NUM>
+	using editor_tab_container = augs::constant_size_vector<editor_tab, STATICALLY_ALLOCATE_EDITOR_TABS_NUM>;
 #else
-	std::vector<editor_tab>
+	#include <deque>
+
+	using editor_tab_container = std::conditional_t<
+		std::is_nothrow_move_constructible_v<editor_tab>, 
+		std::vector<editor_tab>, 
+		std::deque<editor_tab>
+	>;
 #endif
-;
 
 class editor_setup {
 	std::optional<editor_popup> current_popup;
@@ -107,6 +112,10 @@ class editor_setup {
 			}
 		}
 		else {
+			if constexpr(can_reserve_v<editor_tab_container>) {
+				tabs.reserve(tabs.size() + 1); /* Prevent exponential expansion */
+			}
+
 			tabs.emplace_back();
 			
 			if (f(tabs.back())) {
