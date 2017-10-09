@@ -73,8 +73,6 @@ public:
 	
 	/* State of the cosmos ends here *****************************/
 
-	static cosmos empty;
-
 	cosmos(const cosmic_pool_size_type reserved_entities = 0u);
 	cosmos& operator=(const cosmos_significant_state&);
 

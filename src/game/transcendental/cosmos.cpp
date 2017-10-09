@@ -44,10 +44,9 @@
 
 #include "generated/introspectors.h"
 
-cosmos cosmos::empty;
-
 void cosmos::clear() {
-	*this = cosmos::empty;
+	static cosmos empty;
+	*this = empty;
 }
 
 void cosmos::complete_reinference() {

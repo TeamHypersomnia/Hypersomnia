@@ -10,7 +10,7 @@
 
 #if BUILD_TEST_SCENES
 void workspace::make_test_scene(sol::state& lua, const bool minimal) {
-	world = cosmos::empty;
+	world.clear();
 	logicals = {};
 	viewables = {};
 	world.reserve_storage_for_entities(3000u);
@@ -29,7 +29,7 @@ void workspace::make_test_scene(sol::state& lua, const bool minimal) {
 #endif
 
 void workspace::make_blank() {
-	world = cosmos::empty;
+	world.clear();
 	world.reserve_storage_for_entities(100);
 
 	auto origin = world.create_entity("origin_entity");
