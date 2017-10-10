@@ -37,6 +37,8 @@ struct editor_recent_paths {
 
 	editor_recent_paths(sol::state& lua);
 	void add(sol::state&, const augs::path_type& path);
+	void clear(sol::state&);
+	bool empty() const;
 };
 
 struct editor_popup {

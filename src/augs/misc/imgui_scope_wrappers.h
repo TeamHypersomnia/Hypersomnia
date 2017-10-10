@@ -48,8 +48,8 @@ namespace augs {
 			return opt;
 		}
 
-		auto scoped_menu(const char* label) {
-			const auto result = ImGui::BeginMenu(label);
+		auto scoped_menu(const char* label, const bool enabled = true) {
+			const auto result = ImGui::BeginMenu(label, enabled);
 
 			auto opt = std::make_optional(make_scope_guard([result]() { if (result) { ImGui::EndMenu(); }}));
 

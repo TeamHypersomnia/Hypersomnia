@@ -115,6 +115,15 @@ void editor_recent_paths::add(sol::state& lua, const augs::path_type& path) {
 	augs::save_as_lua_table(lua, *this, get_recent_paths_path());
 }
 
+void editor_recent_paths::clear(sol::state& lua) {
+	paths.clear();
+	augs::save_as_lua_table(lua, *this, get_recent_paths_path());
+}
+
+bool editor_recent_paths::empty() const {
+	return paths.empty();
+}
+
 editor_setup::editor_setup(sol::state& lua) : recent(lua) {}
 
 editor_setup::editor_setup(sol::state& lua, const augs::path_type& workspace_path) : recent(lua) {
@@ -194,7 +203,7 @@ void editor_setup::perform_custom_imgui(
 					open(owner);
 				}
 
-				if (auto menu = scoped_menu("Recent files")) {
+				if (auto menu = scoped_menu("Recent files", !recent.empty())) {
 					/*	
 						IMPORTANT! recent.paths can be altered in the loop by loading a workspace,
 						thus we need to copy its contents.
@@ -209,6 +218,12 @@ void editor_setup::perform_custom_imgui(
 							open_workspace(in_path(target_path));
 						}
 					}
+
+					ImGui::Separator();
+
+					if (ImGui::MenuItem("Clear Recent Items")) {
+						recent.clear(lua);
+					}
 				}
 
 				ImGui::Separator();
@@ -220,7 +235,30 @@ void editor_setup::perform_custom_imgui(
 				if (item_if_tabs("Save as", "F12")) {
 					save_as(owner);
 				}
+
+				ImGui::Separator();
+
+				const auto close_str = [&]() -> std::string {
+					if (has_tabs()) {
+						const auto filename = tab().current_path.filename().string();
+
+						return std::string("Close ") + (filename.empty() ? std::string("Untitled") : filename);
+					}
+
+					return "Close";
+				}();
+
+				if (item_if_tabs(close_str.c_str(), "CTRL+W")) {
+					close_tab();
+				}
+
+				if (item_if_tabs("Close all")) {
+					while (has_tabs()) {
+						close_tab();
+					}
+				}
 			}
+
 			if (auto menu = scoped_menu("Edit")) {
 				if (item_if_tabs("Undo", "CTRL+Z")) {}
 				if (item_if_tabs("Redo", "CTRL+SHIFT+Z")) {}
