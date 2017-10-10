@@ -842,6 +842,10 @@ int work(const int argc, const char* const * const argv) try {
 				else if (e.msg == message::deactivate) {
 					releases.set_all();
 				}
+				else if (e.was_pressed(key::F11)) {
+					bool& f = config.window.fullscreen;
+					f = !f;
+				}
 				else if (
 					current_setup.has_value()
 					&& e.was_pressed(key::ESC)
