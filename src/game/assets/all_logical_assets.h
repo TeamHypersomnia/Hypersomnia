@@ -35,7 +35,7 @@ struct game_image_logical {
 
 struct particle_effect_logical {
 	// GEN INTROSPECTOR struct particle_effect_logical
-	float max_duration_in_seconds;
+	float max_duration_ms;
 	// END GEN INTROSPECTOR
 };
 

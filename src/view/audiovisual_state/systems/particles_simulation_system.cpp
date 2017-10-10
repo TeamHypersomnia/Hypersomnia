@@ -87,7 +87,7 @@ void particles_simulation_system::advance_visible_streams_and_all_particles(
 
 				dead_particles_remover(cluster.second);
 
-				return false;
+				return cluster.second.empty();
 			}
 			
 			return true;

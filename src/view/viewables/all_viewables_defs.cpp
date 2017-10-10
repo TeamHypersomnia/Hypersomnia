@@ -31,7 +31,7 @@ void all_viewables_defs::update_into(all_logical_assets& output) {
 		const auto& source = s.second;
 		auto& logical = output[s.first];
 
-		logical.max_duration_in_seconds = maximum_of(
+		logical.max_duration_ms = maximum_of(
 			source.emissions,
 			[](const particles_emission& a, const particles_emission& b) {
 				return a.stream_lifetime_ms.second < b.stream_lifetime_ms.second;
