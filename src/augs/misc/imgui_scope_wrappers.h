@@ -71,6 +71,19 @@ namespace augs {
 
 			return opt;
 		}
+		
+		template <class... T>
+		auto scoped_modal_popup(T&&... args) {
+			const auto result = ImGui::BeginPopupModal(std::forward<T>(args)...);
+
+			auto opt = std::make_optional(make_scope_guard([result]() { if (result) { ImGui::EndPopup(); }}));
+
+			if (!result) {
+				opt = std::nullopt;
+			}
+
+			return opt;
+		}
 
 		template <class... T>
 		auto scoped_child(T&&... args) {

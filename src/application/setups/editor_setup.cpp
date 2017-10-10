@@ -355,7 +355,7 @@ void editor_setup::perform_custom_imgui(
 			ImGui::OpenPopup(p.title.c_str());
 		}
 
-		if (ImGui::BeginPopupModal(p.title.c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+		if (auto popup = scoped_modal_popup(p.title.c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
 			text(p.message);
 
 			{
@@ -374,8 +374,6 @@ void editor_setup::perform_custom_imgui(
 				ImGui::CloseCurrentPopup();
 				current_popup = std::nullopt;
 			}
-
-			ImGui::EndPopup();
 		}
 	}
 }
