@@ -90,14 +90,14 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 	world_hover_highlighter.cycle_duration_ms = 400;
 	world_hover_highlighter.update(dt.in_milliseconds());
 
+	auto& sounds = get<sound_system>();
+
 	if (viewed_character.alive()) {
 		auto scope = measure_scope(profiler.sound_logic);
 
 		auto listener_cone = camera.smoothed_camera;
 		listener_cone.transform = viewed_character.get_viewing_transform(interp);
 		
-		auto& sounds = get<sound_system>();
-
 		sounds.track_new_sound_existences_near_camera(
 			input.audio_volume,
 			input.sounds,
@@ -105,9 +105,9 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 			viewed_character,
 			interp
 		);
-
-		sounds.fade_sources(dt);
 	}
+
+	sounds.fade_sources(sound_fading_timer.extract_delta());
 }
 
 void audiovisual_state::spread_past_infection(const const_logic_step step) {
@@ -407,7 +407,7 @@ void audiovisual_state::standard_post_cleanup(const const_logic_step step) {
 void audiovisual_state::clear_dead_entities(const cosmos& cosmos) {
 	all_visible.clear_dead(cosmos);
 
-	get<sound_system>().erase_caches_for_dead_entities(cosmos);
-	get<particles_simulation_system>().erase_caches_for_dead_entities(cosmos);
-	get<wandering_pixels_system>().erase_caches_for_dead_entities(cosmos);
+	get<sound_system>().clear_dead_entities(cosmos);
+	get<particles_simulation_system>().clear_dead_entities(cosmos);
+	get<wandering_pixels_system>().clear_dead_entities(cosmos);
 }

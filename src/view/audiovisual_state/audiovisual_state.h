@@ -45,7 +45,7 @@ struct audiovisual_state {
 	all_audiovisual_systems systems;
 
 	audiovisual_profiler profiler;
-
+	
 	template <class T>
 	auto& get() {
 		return systems.get<T>();
@@ -76,4 +76,7 @@ struct audiovisual_state {
 	void reserve_caches_for_entities(const std::size_t);
 
 	void clear_dead_entities(const cosmos&);
+
+private:
+	augs::timer sound_fading_timer;
 };

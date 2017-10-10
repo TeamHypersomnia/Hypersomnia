@@ -17,7 +17,7 @@ void sound_system::clear_all() {
 	fading_sources.clear();
 }
 
-void sound_system::erase_caches_for_dead_entities(const cosmos& new_cosmos) {
+void sound_system::clear_dead_entities(const cosmos& new_cosmos) {
 	std::vector<entity_id> to_erase;
 
 	for (const auto& it : per_entity_cache) {
@@ -147,9 +147,7 @@ void sound_system::fade_sources(const augs::delta dt) {
 			return false;
 		}
 		else {
-			source.set_gain(1.f);
+			return true;
 		}
-
-		return true;
 	});
 }

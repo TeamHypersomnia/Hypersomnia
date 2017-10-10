@@ -53,5 +53,5 @@ public:
 	void fade_sources(const augs::delta dt);
 
 	void clear_all();
-	void erase_caches_for_dead_entities(const cosmos&);
+	void clear_dead_entities(const cosmos&);
 };

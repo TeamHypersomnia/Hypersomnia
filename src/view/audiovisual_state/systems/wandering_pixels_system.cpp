@@ -5,7 +5,7 @@
 
 #include "view/audiovisual_state/systems/wandering_pixels_system.h"
 
-void wandering_pixels_system::erase_caches_for_dead_entities(const cosmos& new_cosmos) {
+void wandering_pixels_system::clear_dead_entities(const cosmos& new_cosmos) {
 	std::vector<entity_id> to_erase;
 
 	for (const auto it : per_entity_cache) {

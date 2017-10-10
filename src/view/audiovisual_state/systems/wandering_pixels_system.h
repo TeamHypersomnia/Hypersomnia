@@ -73,5 +73,5 @@ public:
 
 	void reserve_caches_for_entities(const size_t) const {}
 
-	void erase_caches_for_dead_entities(const cosmos&);
+	void clear_dead_entities(const cosmos&);
 };

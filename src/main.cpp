@@ -555,14 +555,20 @@ int work(const int argc, const char* const * const argv) try {
 		const cosmic_entropy& new_game_entropy,
 		const config_lua_table& viewing_config
 	) {
-		/* MSVC ICE workaround */
-		auto& _audiovisual_step = audiovisual_step;
-		auto& _setup_post_solve = setup_post_solve;
+		static auto get_sampled_cosmos = [](auto& setup) {
+			return std::addressof(setup.get_viewed_cosmos());
+		};
+
+		static auto last_sampled_cosmos = get_sampled_cosmos(setup);
 
 		setup.control(new_game_entropy);
 		setup.accept_game_gui_events(game_gui.get_and_clear_pending_events());
 		
 		audiovisual_step(augs::delta(frame_delta) *= setup.get_audiovisual_speed(), setup, viewing_config);
+
+		/* MSVC ICE workaround */
+		auto& _audiovisual_step = audiovisual_step;
+		auto& _setup_post_solve = setup_post_solve;
 
 		setup.advance(
 			frame_delta,
@@ -573,6 +579,15 @@ int work(const int argc, const char* const * const argv) try {
 			},
 			setup_post_cleanup
 		);
+
+		if (const auto now_sampled = get_sampled_cosmos(setup);
+			now_sampled != last_sampled_cosmos
+		) {
+			audiovisuals.clear_dead_entities(*now_sampled);
+			game_gui.clear_dead_entities(*now_sampled);
+
+			last_sampled_cosmos = now_sampled;
+		}
 	};
 
 	static auto advance_current_setup = [](

@@ -411,11 +411,11 @@ void game_gui_system::standard_post_cleanup(const const_logic_step step) {
 	if (const bool any_deletion_occured =
 		step.transient.messages.get_queue<messages::will_soon_be_deleted>().size() > 0
 	) {
-		erase_caches_for_dead_entities(step.cosm);
+		clear_dead_entities(step.cosm);
 	}
 }
 
-void game_gui_system::erase_caches_for_dead_entities(const cosmos& new_cosmos) {
+void game_gui_system::clear_dead_entities(const cosmos& new_cosmos) {
 	const auto eraser = [&](auto& caches) {
 		erase_if(caches, [&](const auto& it) {
 			return new_cosmos[it.first].dead();

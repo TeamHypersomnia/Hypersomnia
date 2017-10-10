@@ -75,7 +75,7 @@ public:
 	std::unordered_map<entity_id, cache> per_entity_cache;
 
 	void reserve_caches_for_entities(const size_t) {}
-	void erase_caches_for_dead_entities(const cosmos&);
+	void clear_dead_entities(const cosmos&);
 
 	cache& get_cache(const const_entity_handle);
 
