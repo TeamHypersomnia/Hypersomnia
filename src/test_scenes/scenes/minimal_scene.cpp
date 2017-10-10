@@ -84,6 +84,10 @@ namespace test_scenes {
 		//prefabs::create_force_rocket(step, { 100, 100 });
 		//prefabs::create_force_rocket(step, { 200, 100 });
 
+		prefabs::create_force_grenade(step, { 100, 100 });
+		prefabs::create_force_grenade(step, { 200, 100 });
+		prefabs::create_force_grenade(step, { 300, 100});
+
 		//prefabs::create_sample_rifle(step, vec2(300, -500 + 50));
 		//
 		//prefabs::create_sample_rifle(step, vec2(100, -500),

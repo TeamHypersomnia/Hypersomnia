@@ -12,7 +12,6 @@
 #include "physics_scripts.h"
 
 #include "augs/templates/container_templates.h"
-#include "augs/templates/to_array.h"
 #include "game/debug_drawing_settings.h"
 
 #define FRICTION_FIELDS_COLLIDE 0
@@ -397,9 +396,14 @@ void physics_system::contact_listener::PostSolve(b2Contact* contact, const b2Con
 
 		msg.subject_impact_velocity = body_a->GetLinearVelocityFromWorldPoint(manifold.points[0]);
 		msg.collider_impact_velocity = body_b->GetLinearVelocityFromWorldPoint(manifold.points[0]);
+		
+		const auto count = impulse->count;
 
-		msg.normal_impulse = si.get_pixels(maximum_of(std::to_array(impulse->normalImpulses)));
-		msg.tangent_impulse = si.get_pixels(maximum_of(std::to_array(impulse->tangentImpulses)));
+		const auto* const normals = impulse->normalImpulses;
+		const auto* const tangents = impulse->normalImpulses;
+
+		msg.normal_impulse = si.get_pixels(*std::max_element(normals, normals + count));
+		msg.tangent_impulse = si.get_pixels(*std::max_element(tangents, tangents + count));
 	}
 
 	sys.accumulated_messages.push_back(msgs[0]);

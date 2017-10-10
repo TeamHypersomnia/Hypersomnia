@@ -112,6 +112,8 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 
 				const auto impulse = (c.normal_impulse) * subject_coll.collision_sound_gain_mult * collider_coll.collision_sound_gain_mult;
 
+				// LOG("Cnorm/scgain/ccgain:\n%f4,%f4,%f4", c.normal_impulse, subject_coll.collision_sound_gain_mult, collider_coll.collision_sound_gain_mult);
+
 				const auto gain_mult = (impulse / 15.f) * (impulse / 15.f);
 				const auto pitch_mult = impulse / 185.f;
 
@@ -120,10 +122,10 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 					in.delete_entity_after_effect_lifetime = true;
 					in.effect.modifier.pitch = std::min(1.5f, 0.85f + pitch_mult);
 					
-					// LOG_NVPS(in.effect.modifier.pitch);
-
 					in.effect.modifier.gain = gain_mult;
 					in.effect.id = sound_id;
+
+					// LOG("Coll. gain/pitch: %f3/%f3", in.effect.modifier.gain, in.effect.modifier.pitch);
 
 					in.create_sound_effect_entity(step, c.point, entity_id()).add_standard_components(step);
 				}
