@@ -160,7 +160,7 @@ public:
 	static constexpr bool accepts_shortcuts = true;
 	static constexpr bool has_modal_popups = true;
 
-	editor_setup(sol::state& lua); // Loads the most recent work
+	editor_setup(sol::state& lua);
 	editor_setup(sol::state& lua, const augs::path_type& workspace_path);
 
 	auto get_audiovisual_speed() const {

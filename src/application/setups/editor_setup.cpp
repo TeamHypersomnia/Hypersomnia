@@ -127,13 +127,7 @@ bool editor_recent_paths::empty() const {
 editor_setup::editor_setup(sol::state& lua) : recent(lua) {}
 
 editor_setup::editor_setup(sol::state& lua, const augs::path_type& workspace_path) : recent(lua) {
-	if (tab().open_workspace({ lua, recent, workspace_path })) {
-
-	}
-
-	if (tab().current_path.empty()) {
-		open_untitled_workspace();
-	}
+	open_workspace({ lua, workspace_path });
 }
 
 void editor_setup::control(
