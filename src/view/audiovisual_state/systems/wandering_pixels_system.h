@@ -2,7 +2,7 @@
 #include <array>
 #include <unordered_map>
 
-#include "augs/misc/delta.h"
+#include "augs/misc/timing/delta.h"
 #include "augs/misc/randomization.h"
 
 #include "game/enums/render_layer.h"

@@ -2,7 +2,7 @@
 #include <cstddef>
 #include "augs/pad_bytes.h"
 
-#include "augs/misc/stepped_timing.h"
+#include "augs/misc/timing/stepped_timing.h"
 #include "augs/misc/minmax.h"
 
 #include "game/enums/gun_action_type.h"

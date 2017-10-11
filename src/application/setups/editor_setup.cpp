@@ -1,6 +1,6 @@
 #include "augs/templates/string_templates.h"
-#include "augs/misc/imgui_utils.h"
-#include "augs/misc/imgui_control_wrappers.h"
+#include "augs/misc/imgui/imgui_utils.h"
+#include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/readwrite/lua_readwrite.h"
 #include "augs/filesystem/file.h"
 #include "augs/templates/thread_templates.h"

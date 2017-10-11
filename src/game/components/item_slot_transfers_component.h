@@ -6,7 +6,7 @@
 #include "game/detail/inventory/inventory_slot_id.h"
 
 #include "game/transcendental/entity_handle_declaration.h"
-#include "augs/misc/stepped_timing.h"
+#include "augs/misc/timing/stepped_timing.h"
 #include "augs/pad_bytes.h"
 
 struct item_slot_mounting_operation {

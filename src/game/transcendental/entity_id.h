@@ -1,6 +1,6 @@
 #pragma once
 #include <type_traits>
-#include "augs/misc/pooled_object_id.h"
+#include "augs/misc/pool/pooled_object_id.h"
 
 #include "game/organization/all_components_declaration.h"
 #include "game/transcendental/entity_id_declaration.h"

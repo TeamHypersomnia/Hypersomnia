@@ -6,7 +6,7 @@
 #include "augs/math/vec2.h"
 #include "augs/math/rects.h"
 
-#include "augs/misc/enum_array.h"
+#include "augs/misc/enum/enum_array.h"
 
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/component_synchronizer.h"

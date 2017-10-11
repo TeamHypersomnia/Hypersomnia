@@ -6,7 +6,7 @@
 #include "augs/readwrite/byte_readwrite.h"
 
 #include "augs/ensure.h"
-#include "augs/misc/streams.h"
+#include "augs/readwrite/streams.h"
 
 #include "augs/image/image.h"
 

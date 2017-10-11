@@ -2,7 +2,7 @@
 #include "game/enums/slot_function.h"
 #include "game/detail/inventory/inventory_slot.h"
 
-#include "augs/misc/enum_associative_array.h"
+#include "augs/misc/enum/enum_associative_array.h"
 
 namespace components {
 	struct container {

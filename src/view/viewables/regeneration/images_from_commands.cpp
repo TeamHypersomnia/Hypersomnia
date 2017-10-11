@@ -1,7 +1,7 @@
 #include "augs/gui/button_corners.h"
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
-#include "augs/misc/streams.h"
+#include "augs/readwrite/streams.h"
 #include "augs/templates/for_each_in_types.h"
 #include "augs/readwrite/byte_readwrite.h"
 

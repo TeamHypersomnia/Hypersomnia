@@ -8,8 +8,8 @@
 
 #include "augs/templates/thread_templates.h"
 
-#include "augs/misc/action_list.h"
-#include "augs/misc/fixed_delta_timer.h"
+#include "augs/misc/action_list/action_list.h"
+#include "augs/misc/timing/fixed_delta_timer.h"
 
 #include "game/assets/all_logical_assets.h"
 

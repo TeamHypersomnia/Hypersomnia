@@ -2,7 +2,7 @@
 
 #include "augs/ensure.h"
 #include "augs/math/vec2.h"
-#include "augs/misc/fixed_delta_timer.h"
+#include "augs/misc/timing/fixed_delta_timer.h"
 
 namespace augs {
 	fixed_delta_timer::fixed_delta_timer(

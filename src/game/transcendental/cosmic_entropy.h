@@ -4,7 +4,7 @@
 
 #include "augs/templates/container_templates.h"
 
-#include "augs/misc/streams.h"
+#include "augs/readwrite/streams.h"
 #include "augs/misc/machine_entropy.h"
 #include "augs/misc/container_with_small_size.h"
 

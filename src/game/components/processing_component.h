@@ -3,7 +3,7 @@
 #include "game/transcendental/component_synchronizer.h"
 
 #include "augs/pad_bytes.h"
-#include "augs/misc/enum_boolset.h"
+#include "augs/misc/enum/enum_boolset.h"
 
 namespace components {
 	struct processing {

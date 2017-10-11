@@ -12,7 +12,7 @@
 
 #include "augs/templates/settable_as_current_mixin.h"
 
-#include "augs/misc/timer.h"
+#include "augs/misc/timing/timer.h"
 #include "augs/misc/machine_entropy.h"
 
 #include "augs/window_framework/event.h"

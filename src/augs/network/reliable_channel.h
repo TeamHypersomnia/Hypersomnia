@@ -4,8 +4,8 @@
 #include <memory>
 #include <map>
 
-#include "augs/misc/streams.h"
-#include "augs/misc/timer.h"
+#include "augs/readwrite/streams.h"
+#include "augs/misc/timing/timer.h"
 
 #include "network_types.h"
 

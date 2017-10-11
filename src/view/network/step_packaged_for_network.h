@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/misc/streams.h"
+#include "augs/readwrite/streams.h"
 #include "game/transcendental/cosmic_entropy.h"
 
 struct step_packaged_for_network {

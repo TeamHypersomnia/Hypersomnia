@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/misc/enum_boolset.h"
+#include "augs/misc/enum/enum_boolset.h"
 
 enum class flip {
 	HORIZONTALLY,

@@ -1,7 +1,7 @@
 #pragma once
 #include <optional>
 
-#include "augs/misc/timer.h"
+#include "augs/misc/timing/timer.h"
 #include "augs/drawing/drawing.h"
 #include "augs/gui/formatted_string.h"
 

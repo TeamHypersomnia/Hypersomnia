@@ -1,5 +1,5 @@
 #include "view/audiovisual_state/world_camera.h"
-#include "augs/misc/delta.h"
+#include "augs/misc/timing/delta.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
 #include "game/components/rigid_body_component.h"

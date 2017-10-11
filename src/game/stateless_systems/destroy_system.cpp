@@ -39,6 +39,10 @@ void destroy_system::perform_deletions(const logic_step step) {
 	for (auto it = deletions.rbegin(); it != deletions.rend(); ++it) {
 		const auto subject = cosmos[(*it).subject];
 		
+		if (subject.dead()) {
+			continue;
+		}
+
 		const auto current_slot = subject.get_current_slot();
 		const bool should_release_item_ownership = current_slot.alive();
 		

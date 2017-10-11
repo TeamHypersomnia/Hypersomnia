@@ -7,7 +7,7 @@
 
 #include "augs/math/vec2.h"
 
-#include "augs/misc/imgui_scope_wrappers.h"
+#include "augs/misc/imgui/imgui_scope_wrappers.h"
 
 namespace augs {
 	namespace imgui {

@@ -1,7 +1,7 @@
 #pragma once
 #include "augs/math/camera_cone.h"
 
-#include "augs/misc/delta.h"
+#include "augs/misc/timing/delta.h"
 #include "augs/misc/minmax.h"
 
 #include "augs/graphics/vertex.h"

@@ -2,7 +2,7 @@
 #include <ratio>
 #include <chrono>
 
-#include "augs/misc/delta.h"
+#include "augs/misc/timing/delta.h"
 
 namespace augs {
 	class timer {

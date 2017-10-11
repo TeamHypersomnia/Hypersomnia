@@ -7,13 +7,13 @@
 #include "augs/image/font.h"
 #include "rect.h"
 
-#include "augs/misc/pool.h"
-#include "augs/misc/subscript_handle_getters_mixin.h"
+#include "augs/misc/pool/pool.h"
+#include "augs/templates/subscript_handle_getters_mixin.h"
 
 #include "clipboard.h"
 #include "middlescrolling.h"
 
-#include "augs/misc/delta.h"
+#include "augs/misc/timing/delta.h"
 #include "gui_event.h"
 #include "gui_traversal_structs.h"
 #include "augs/pad_bytes.h"

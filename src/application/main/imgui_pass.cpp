@@ -1,5 +1,5 @@
-#include "augs/misc/imgui_utils.h"
-#include "augs/misc/delta.h"
+#include "augs/misc/imgui/imgui_utils.h"
+#include "augs/misc/timing/delta.h"
 
 #include "application/config_lua_table.h"
 #include "application/gui/settings_gui.h"

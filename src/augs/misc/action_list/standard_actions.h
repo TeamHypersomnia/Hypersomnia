@@ -3,10 +3,10 @@
 
 #include "augs/math/vec2.h"
 
-#include "augs/misc/action.h"
-#include "augs/misc/delta.h"
+#include "augs/misc/action_list/action.h"
+#include "augs/misc/timing/delta.h"
 #include "augs/misc/randomization.h"
-#include "augs/misc/action_list.h"
+#include "augs/misc/action_list/action_list.h"
 
 namespace augs {
 	template <class T>

@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "augs/misc/enum_associative_array.h"
+#include "augs/misc/enum/enum_associative_array.h"
 
 #include "augs/misc/basic_input_intent.h"
 #include "augs/misc/basic_input_motion.h"

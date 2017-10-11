@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/misc/fixed_delta_timer.h"
+#include "augs/misc/timing/fixed_delta_timer.h"
 #include "augs/misc/debug_entropy_player.h"
 
 #include "game/assets/all_logical_assets.h"

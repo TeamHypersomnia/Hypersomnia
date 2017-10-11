@@ -6,7 +6,7 @@
 #include "game/transcendental/cosmic_delta.h"
 #include "augs/templates/introspection_utils/describe_fields.h"
 #include "game/organization/all_component_includes.h"
-#include "augs/misc/delta_compression.h"
+#include "augs/readwrite/delta_compression.h"
 #include "augs/readwrite/byte_readwrite.h"
 #include "generated/introspectors.h"
 

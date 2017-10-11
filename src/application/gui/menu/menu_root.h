@@ -2,7 +2,7 @@
 #include "application/gui/menu/menu_element_location.h"
 #include "application/gui/menu/option_button.h"
 #include "augs/gui/dereferenced_location.h"
-#include "augs/misc/enum_array.h"
+#include "augs/misc/enum/enum_array.h"
 
 template <class Enum>
 class menu_root : public menu_rect_node<Enum> {

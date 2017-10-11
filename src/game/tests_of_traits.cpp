@@ -12,7 +12,7 @@
 #include "game/components/pathfinding_component.h"
 
 #include "augs/pad_bytes.h"
-#include "augs/misc/custom_lua_representations.h"
+#include "augs/readwrite/custom_lua_representations.h"
 #include "augs/readwrite/lua_readwrite.h"
 
 namespace templates_detail {

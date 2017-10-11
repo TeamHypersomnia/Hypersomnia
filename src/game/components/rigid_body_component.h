@@ -1,7 +1,7 @@
 #pragma once
 #include "3rdparty/Box2D/Common/b2Math.h"
 
-#include "augs/misc/stepped_timing.h"
+#include "augs/misc/timing/stepped_timing.h"
 
 #include "game/transcendental/component_synchronizer.h"
 #include "game/transcendental/entity_handle_declaration.h"

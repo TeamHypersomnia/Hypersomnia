@@ -1,7 +1,7 @@
 #include "augs/log.h"
 #include "augs/ensure.h"
 
-#include "augs/misc/lua_utils.h"
+#include "augs/misc/lua/lua_utils.h"
 
 namespace augs {
 	sol::state create_lua_state() {

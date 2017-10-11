@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/misc/streams.h"
+#include "augs/readwrite/streams.h"
 #include "augs/templates/hash_templates.h"
 
 struct _ENetAddress;

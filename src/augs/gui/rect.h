@@ -1,6 +1,6 @@
 #pragma once
-#include "augs/misc/delta.h"
-#include "augs/misc/enum_boolset.h"
+#include "augs/misc/timing/delta.h"
+#include "augs/misc/enum/enum_boolset.h"
 
 #include "augs/gui/gui_traversal_structs.h"
 #include "augs/gui/gui_flags.h"

@@ -1,6 +1,6 @@
 #pragma once
-#include "augs/misc/stepped_timing.h"
-#include "augs/misc/delta.h"
+#include "augs/misc/timing/stepped_timing.h"
+#include "augs/misc/timing/delta.h"
 
 struct perk_timing {
 	// GEN INTROSPECTOR struct perk_timing

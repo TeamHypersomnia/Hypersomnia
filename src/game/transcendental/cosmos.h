@@ -7,11 +7,11 @@
 #include "augs/templates/introspection_utils/rewrite_members.h"
 
 #include "augs/misc/randomization.h"
-#include "augs/misc/streams.h"
-#include "augs/misc/delta.h"
-#include "augs/misc/enum_boolset.h"
-#include "augs/misc/subscript_handle_getters_mixin.h"
-#include "augs/misc/enum_associative_array.h"
+#include "augs/readwrite/streams.h"
+#include "augs/misc/timing/delta.h"
+#include "augs/misc/enum/enum_boolset.h"
+#include "augs/templates/subscript_handle_getters_mixin.h"
+#include "augs/misc/enum/enum_associative_array.h"
 
 #include "augs/entity_system/operations_on_all_components_mixin.h"
 #include "augs/entity_system/storage_for_systems.h"

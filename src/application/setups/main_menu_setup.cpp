@@ -1,6 +1,6 @@
 #include "augs/readwrite/lua_readwrite.h"
-#include "augs/misc/http_requests.h"
-#include "augs/misc/standard_actions.h"
+#include "augs/misc/http/http_requests.h"
+#include "augs/misc/action_list/standard_actions.h"
 
 #include "augs/filesystem/file.h"
 #include "augs/templates/string_templates.h"

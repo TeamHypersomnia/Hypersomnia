@@ -1,8 +1,8 @@
 #pragma once
 #include "augs/graphics/rgba.h"
 
-#include "augs/misc/stepped_timing.h"
-#include "augs/misc/enum_associative_array.h"
+#include "augs/misc/timing/stepped_timing.h"
+#include "augs/misc/enum/enum_associative_array.h"
 #include "augs/misc/value_meter.h"
 
 #include "augs/templates/type_list.h"

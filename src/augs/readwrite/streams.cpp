@@ -1,5 +1,5 @@
-#include "streams.h"
-#include "enum_associative_array.h"
+#include <algorithm>
+#include "augs/readwrite/streams.h"
 
 namespace augs {
 	void write_object(augs::stream& ar, const augs::stream& storage) {

@@ -1,8 +1,8 @@
 #pragma once
 #include <vector>
 
-#include "augs/misc/delta.h"
-#include "augs/misc/pooled_object_id.h"
+#include "augs/misc/timing/delta.h"
+#include "augs/misc/pool/pooled_object_id.h"
 
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"

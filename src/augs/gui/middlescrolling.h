@@ -1,7 +1,7 @@
 #pragma once
 #include "augs/math/rects.h"
 #include "rect.h"
-#include "augs/misc/delta.h"
+#include "augs/misc/timing/delta.h"
 #include "augs/window_framework/event.h"
 
 namespace augs {

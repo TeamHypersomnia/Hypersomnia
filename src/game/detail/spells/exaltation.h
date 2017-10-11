@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/misc/stepped_timing.h"
+#include "augs/misc/timing/stepped_timing.h"
 #include "game/detail/spells/spell_structs.h"
 #include "game/transcendental/entity_handle_declaration.h"
 #include "augs/misc/value_meter.h"

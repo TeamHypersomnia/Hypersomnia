@@ -2,7 +2,7 @@
 #include "augs/pad_bytes.h"
 
 #include "augs/misc/value_meter.h"
-#include "augs/misc/stepped_timing.h"
+#include "augs/misc/timing/stepped_timing.h"
 
 #include "augs/graphics/rgba.h"
 

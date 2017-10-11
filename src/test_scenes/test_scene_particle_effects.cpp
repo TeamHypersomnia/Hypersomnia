@@ -1,4 +1,4 @@
-#include "augs/misc/enum_associative_array.h"
+#include "augs/misc/enum/enum_associative_array.h"
 
 #include "game/assets/ids/particle_effect_id.h"
 #include "game/assets/animation.h"

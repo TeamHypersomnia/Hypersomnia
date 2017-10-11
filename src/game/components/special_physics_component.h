@@ -3,7 +3,7 @@
 #include "augs/misc/constant_size_vector.h"
 
 #include "game/transcendental/entity_id.h"
-#include "augs/misc/stepped_timing.h"
+#include "augs/misc/timing/stepped_timing.h"
 
 struct friction_connection {
 	// GEN INTROSPECTOR struct friction_connection

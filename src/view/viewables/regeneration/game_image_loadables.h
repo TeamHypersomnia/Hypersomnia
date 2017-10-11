@@ -1,8 +1,8 @@
 #pragma once
 #include <optional>
 
-#include "augs/misc/enum_array.h"
-#include "augs/misc/enum_associative_array.h"
+#include "augs/misc/enum/enum_array.h"
+#include "augs/misc/enum/enum_associative_array.h"
 #include "augs/filesystem/path.h"
 
 #include "augs/drawing/flip.h"

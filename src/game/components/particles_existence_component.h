@@ -4,7 +4,7 @@
 #include "augs/pad_bytes.h"
 
 #include "augs/math/vec2.h"
-#include "augs/misc/stepped_timing.h"
+#include "augs/misc/timing/stepped_timing.h"
 #include "augs/misc/minmax.h"
 
 #include "game/assets/ids/particle_effect_id.h"

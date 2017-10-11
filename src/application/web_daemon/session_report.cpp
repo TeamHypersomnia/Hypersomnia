@@ -4,7 +4,7 @@
 #if BUILD_HTTP_DAEMON
 
 #include "3rdparty/http/microhttpd.h"
-#include "augs/misc/http_requests.h"
+#include "augs/misc/http/http_requests.h"
 #include <cstdio>
 #include <string>
 #include <chrono>

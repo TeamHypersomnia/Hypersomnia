@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/misc/enum_array.h"
+#include "augs/misc/enum/enum_array.h"
 
 enum class render_layer : unsigned char {
 	INVALID,

@@ -3,7 +3,7 @@
 #include <array>
 
 #include "augs/ensure.h"
-#include "augs/misc/enum_array.h"
+#include "augs/misc/enum/enum_array.h"
 #include "augs/misc/constant_size_vector.h"
 
 #include "augs/gui/rect.h"

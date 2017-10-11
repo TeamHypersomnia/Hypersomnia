@@ -4,7 +4,7 @@
 
 #include "augs/readwrite/lua_readwrite.h"
 #include "augs/readwrite/byte_readwrite.h"
-#include "augs/misc/streams.h"
+#include "augs/readwrite/streams.h"
 
 #include "game/stateless_systems/movement_system.h"
 #include "game/stateless_systems/visibility_system.h"
@@ -323,7 +323,9 @@ entity_handle cosmos::clone_entity(const entity_id source_entity_id) {
 void cosmos::delete_entity(const entity_id e) {
 	const auto handle = operator[](e);
 	
-	ensure(handle.alive());
+	if (handle.dead()) {
+		return;
+	}
 
 	const bool should_deactivate_inferred_state_to_avoid_repeated_reinference 
 		= handle.is_inferred_state_activated()

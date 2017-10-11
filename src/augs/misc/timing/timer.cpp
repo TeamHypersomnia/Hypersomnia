@@ -1,4 +1,4 @@
-#include "augs/misc/timer.h"
+#include "augs/misc/timing/timer.h"
 
 namespace augs {
 	timer::timer() {

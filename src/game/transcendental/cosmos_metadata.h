@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/misc/stepped_timing.h"
+#include "augs/misc/timing/stepped_timing.h"
 
 #include "game/transcendental/cosmos_common_state.h"
 

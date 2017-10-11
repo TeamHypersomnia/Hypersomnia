@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/misc/enum_associative_array.h"
+#include "augs/misc/enum/enum_associative_array.h"
 
 #include "view/viewables/all_viewables_declarations.h"
 

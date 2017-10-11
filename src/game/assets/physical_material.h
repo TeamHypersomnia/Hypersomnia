@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/misc/enum_associative_array.h"
+#include "augs/misc/enum/enum_associative_array.h"
 
 #include "game/assets/ids/physical_material_id.h"
 #include "game/assets/ids/sound_buffer_id.h"

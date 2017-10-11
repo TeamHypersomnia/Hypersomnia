@@ -1,7 +1,7 @@
 #pragma once
 #include <unordered_map>
 
-#include "augs/misc/delta.h"
+#include "augs/misc/timing/delta.h"
 #include "augs/misc/randomization.h"
 
 #include "game/transcendental/entity_handle_declaration.h"

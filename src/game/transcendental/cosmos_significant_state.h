@@ -1,6 +1,6 @@
 #pragma once
 #include "augs/misc/constant_size_vector.h"
-#include "augs/misc/pool.h"
+#include "augs/misc/pool/pool.h"
 #include "game/transcendental/cosmos_metadata.h"
 #include "game/transcendental/cosmic_types.h"
 

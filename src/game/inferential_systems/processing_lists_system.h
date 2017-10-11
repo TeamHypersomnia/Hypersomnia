@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 
-#include "augs/misc/enum_array.h"
+#include "augs/misc/enum/enum_array.h"
 
 #include "game/enums/processing_subjects.h"
 #include "game/transcendental/entity_id.h"

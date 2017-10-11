@@ -2,7 +2,7 @@
 #include <optional>
 
 #include "augs/math/vec2.h"
-#include "augs/misc/delta.h"
+#include "augs/misc/timing/delta.h"
 
 #include "augs/graphics/rgba.h"
 #include "augs/math/camera_cone.h"

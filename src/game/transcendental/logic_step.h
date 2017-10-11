@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/misc/delta.h"
+#include "augs/misc/timing/delta.h"
 #include "game/transcendental/cosmic_entropy.h"
 
 struct data_living_one_step;

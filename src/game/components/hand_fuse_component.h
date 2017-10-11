@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/misc/stepped_timing.h"
+#include "augs/misc/timing/stepped_timing.h"
 #include "game/detail/view_input/sound_effect_input.h"
 
 namespace components {

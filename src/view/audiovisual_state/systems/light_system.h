@@ -3,7 +3,7 @@
 #include <functional>
 
 #include "augs/misc/randomization.h"
-#include "augs/misc/delta.h"
+#include "augs/misc/timing/delta.h"
 
 #include "augs/math/camera_cone.h"
 

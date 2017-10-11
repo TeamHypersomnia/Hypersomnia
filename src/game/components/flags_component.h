@@ -1,6 +1,6 @@
 #pragma once
 #include "game/enums/entity_flag.h"
-#include "augs/misc/enum_boolset.h"
+#include "augs/misc/enum/enum_boolset.h"
 
 namespace components {
 	struct flags {

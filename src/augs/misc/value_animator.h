@@ -2,7 +2,7 @@
 #include <functional>
 #include <vector>
 
-#include "augs/misc/timer.h"
+#include "augs/misc/timing/timer.h"
 
 namespace augs {
 	class value_animator {

@@ -2,7 +2,7 @@
 #include <vector>
 #include <Box2D/Collision/b2DynamicTree.h>
 
-#include "augs/misc/enum_array.h"
+#include "augs/misc/enum/enum_array.h"
 
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"

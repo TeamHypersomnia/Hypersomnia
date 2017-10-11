@@ -1,7 +1,7 @@
 #pragma once
 #include <unordered_map>
 
-#include "augs/misc/delta.h"
+#include "augs/misc/timing/delta.h"
 
 #include "augs/audio/sound_source.h"
 #include "augs/math/camera_cone.h"

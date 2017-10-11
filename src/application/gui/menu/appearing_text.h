@@ -2,8 +2,8 @@
 #include "augs/gui/formatted_string.h"
 #include "augs/gui/text/caret.h"
 #include "augs/gui/text/printer.h"
-#include "augs/misc/action_list.h"
-#include "augs/misc/standard_actions.h"
+#include "augs/misc/action_list/action_list.h"
+#include "augs/misc/action_list/standard_actions.h"
 
 namespace augs {
 	class action;

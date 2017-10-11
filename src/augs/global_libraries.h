@@ -1,6 +1,6 @@
 #pragma once
 #include <memory>
-#include "augs/misc/enum_boolset.h"
+#include "augs/misc/enum/enum_boolset.h"
 
 #if BUILD_FREETYPE
 struct FT_LibraryRec_;

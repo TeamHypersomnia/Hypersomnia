@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/misc/delta.h"
+#include "augs/misc/timing/delta.h"
 
 namespace augs {
 	enum class lag_spike_handling_type {

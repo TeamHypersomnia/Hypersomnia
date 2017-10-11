@@ -3,7 +3,7 @@
 #include <bitset>
 
 #include "augs/math/vec2.h"
-#include "augs/misc/enum_bitset.h"
+#include "augs/misc/enum/enum_bitset.h"
 #include "augs/pad_bytes.h"
 
 namespace augs {

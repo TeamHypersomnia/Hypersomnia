@@ -1,7 +1,7 @@
 
 #if BUILD_UNIT_TESTS
-#include "augs/misc/enum_boolset.h"
-#include "augs/misc/enum_bitset.h"
+#include "augs/misc/enum/enum_boolset.h"
+#include "augs/misc/enum/enum_bitset.h"
 #include <catch.hpp>
 
 TEST_CASE("CustomContainers EnumBoolsetTest") {

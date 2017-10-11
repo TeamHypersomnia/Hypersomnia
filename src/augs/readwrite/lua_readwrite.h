@@ -7,8 +7,8 @@
 #include "augs/templates/exception_templates.h"
 #include "augs/readwrite/readwrite_traits.h"
 
-#include "augs/misc/custom_lua_representations.h"
-#include "augs/misc/lua_utils.h"
+#include "augs/readwrite/custom_lua_representations.h"
+#include "augs/misc/lua/lua_utils.h"
 
 #include "augs/filesystem/file.h"
 

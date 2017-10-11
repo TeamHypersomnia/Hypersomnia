@@ -1,6 +1,6 @@
 #pragma once
 #include "augs/math/vec2.h"
-#include "augs/misc/delta.h"
+#include "augs/misc/timing/delta.h"
 
 namespace augs {
 	template <class T>
