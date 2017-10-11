@@ -114,6 +114,7 @@ class editor_setup {
 		return !tabs.empty();
 	}
 
+	void set_tab_by_index(const std::size_t);
 	void set_tab_by_horizontal_index(const std::size_t);
 
 	template <class F>

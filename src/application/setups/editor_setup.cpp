@@ -337,18 +337,21 @@ void editor_setup::perform_custom_imgui(
 
 				tab_names.reserve(tabs.size());
 				tab_names_cstrs.reserve(tabs.size());
-				ordering.reserve(tabs.size());
+				ordering.resize(tabs.size());
 
 				int selected_index = -1;
 
 				for (const auto& it : tabs) {
 					auto& t = it.second;
 
+					const auto this_index = tab_names.size();
+
 					if (&t == current_tab) {
-						selected_index = static_cast<int>(tab_names.size());
+						selected_index = static_cast<int>(this_index);
 					}
 
-					ordering.push_back(t.horizontal_index);
+					ordering[t.horizontal_index] = this_index;
+					
 					tab_names.push_back(t.get_display_path());
 				}
 
@@ -356,15 +359,13 @@ void editor_setup::perform_custom_imgui(
 					tab_names_cstrs.push_back(s.c_str());
 				}
 
+				int closed_tab_index = -1;
+
+				auto passed_index = selected_index;
+
 				{
 					auto style = scoped_style_var(ImGuiStyleVar_FramePadding, []() { auto padding = ImGui::GetStyle().FramePadding; padding.x *= 2; return padding; }());
-
-					auto passed_index = selected_index;
-					ImGui::TabLabels(tabs.size(), tab_names_cstrs.data(), passed_index, nullptr, false, nullptr, ordering.data(), true, true, nullptr, nullptr);
-
-					if (passed_index != -1 && passed_index != selected_index) {
-						set_tab_by_horizontal_index(static_cast<std::size_t>(ordering[passed_index]));
-					}
+					ImGui::TabLabels(tabs.size(), tab_names_cstrs.data(), passed_index, nullptr, false, nullptr, ordering.data(), true, true, &closed_tab_index, nullptr);
 				}
 
 				/* Read back */
@@ -372,23 +373,32 @@ void editor_setup::perform_custom_imgui(
 				{
 					std::size_t i = 0;
 
-					std::vector<editor_tab*> closed_tabs;
+					if (closed_tab_index != -1) {
+						for (auto& it : tabs) {
+							auto& t = it.second;
 
-					for (auto& it : tabs) {
-						auto& t = it.second;
-						
-						const auto o = ordering[i++];
-						
-						if (o == -1) {
-							closed_tabs.push_back(std::addressof(t));
-						}
-						else {
-							t.horizontal_index = static_cast<std::size_t>(o);
+							if (i++ == closed_tab_index) {
+								close_tab(t);
+								break;
+							}
 						}
 					}
+					else {
+						for (auto& it : tabs) {
+							auto& t = it.second;
 
-					for (auto* const t : closed_tabs) {
-						close_tab(*t);
+							for (auto h = 0u; h < ordering.size(); ++h) {
+								if (ordering[h] == i) {
+									t.horizontal_index = static_cast<std::size_t>(h);
+								}
+							}
+
+							++i;
+						}
+
+						if (passed_index != -1 && passed_index != selected_index) {
+							set_tab_by_index(static_cast<std::size_t>(passed_index));
+						}
 					}
 				}
 			}
@@ -651,6 +661,16 @@ void editor_setup::new_tab() {
 	});
 }
 
+void editor_setup::set_tab_by_index(const std::size_t next_index) {
+	std::size_t i = 0;
+
+	for (auto& t : tabs) {
+		if (i++ == next_index) {
+			set_current_tab(t.second);
+		}
+	}
+}
+
 void editor_setup::set_tab_by_horizontal_index(const std::size_t next_index) {
 	const auto found = find_if_in(tabs,
 		[next_index](const auto& it) {
@@ -683,17 +703,18 @@ void editor_setup::prev_tab() {
 }
 
 void editor_setup::close_tab(editor_tab& tab_to_close) {
-	const auto current_index = tab_to_close.horizontal_index;
+	const auto current_horizontal_index = current_tab->horizontal_index;
+	const auto closed_horizontal_index = tab_to_close.horizontal_index;
 	erase_if(tabs, [&](const auto& it) { return std::addressof(it.second) == std::addressof(tab_to_close); });
 
 	for (auto& it : tabs) {
-		if (it.second.horizontal_index > current_index) {
+		if (it.second.horizontal_index > closed_horizontal_index) {
 			--it.second.horizontal_index;
 		}
 	}
 
 	if (has_tabs()) {
-		set_tab_by_horizontal_index(std::min(current_index, tabs.size() - 1));
+		set_tab_by_horizontal_index(std::min(current_horizontal_index, tabs.size() - 1));
 	}
 	else {
 		unset_current_tab();

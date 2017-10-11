@@ -682,6 +682,10 @@ int work(const int argc, const char* const * const argv) try {
 			releases.append_releases(new_window_entropy, common_input_state);
 			releases = {};
 
+			if (get_viewed_character().dead()) {
+				game_gui.active = true;
+			}
+
 			const bool in_direct_gameplay =
 				!game_gui.active
 				&& current_setup.has_value()
@@ -1294,7 +1298,7 @@ int work(const int argc, const char* const * const argv) try {
 					get_drawer().cursor(necessary_atlas_entries, menu_chosen_cursor, cursor_drawing_pos, white);
 				}
 			}
-			else if (viewed_character.alive() && game_gui.active && viewing_config.drawing.draw_character_gui) {
+			else if (game_gui.active && viewing_config.drawing.draw_character_gui) {
 				const auto& character_gui = game_gui.get_character_gui(viewed_character);
 
 				character_gui.draw_cursor_with_information(context, should_draw_our_cursor);
