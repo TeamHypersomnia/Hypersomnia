@@ -748,7 +748,7 @@ static bool TabButton(const char *label, bool selected, bool *pCloseButtonPresse
 
     // Render
 
-    const ImU32 col = (hovered && !btnHovered && held) ? tabStyle.colors[selected ? TabLabelStyle::Col_TabLabelSelectedActive : TabLabelStyle::Col_TabLabelActive] : (hovered && !btnHovered) ? tabStyle.colors[selected ? TabLabelStyle::Col_TabLabelSelectedHovered : TabLabelStyle::Col_TabLabelHovered] : tabStyle.colors[selected ? TabLabelStyle::Col_TabLabelSelected : TabLabelStyle::Col_TabLabel];
+    const ImU32 col = (hovered && !btnHovered && held) ? tabStyle.colors[selected ? TabLabelStyle::Col_TabLabelSelectedActive : TabLabelStyle::Col_TabLabelActive] : (hovered) ? tabStyle.colors[selected ? TabLabelStyle::Col_TabLabelSelectedHovered : TabLabelStyle::Col_TabLabelHovered] : tabStyle.colors[selected ? TabLabelStyle::Col_TabLabelSelected : TabLabelStyle::Col_TabLabel];
     const ImU32 colText = tabStyle.colors[selected ? TabLabelStyle::Col_TabLabelSelectedText : TabLabelStyle::Col_TabLabelText];
 
     if (!drawListOverride) drawListOverride = window->DrawList;
@@ -768,7 +768,7 @@ static bool TabButton(const char *label, bool selected, bool *pCloseButtonPresse
 
 
     //fprintf(stderr,"bb.Min=%d,%d bb.Max=%d,%d label_size=%d,%d extraWidthForBtn=%d\n",(int)bb.Min.x,(int)bb.Min.y,(int)bb.Max.x,(int)bb.Max.y,(int)label_size.x,(int)label_size.y,(int)extraWidthForBtn);
-    if (hasCloseButton) {
+    if (hasCloseButton && (hovered || selected)) {
     const ImU32 col = (held && btnHovered) ? tabStyle.colors[TabLabelStyle::Col_TabLabelCloseButtonActive] : btnHovered ? tabStyle.colors[TabLabelStyle::Col_TabLabelCloseButtonHovered] : 0;
     if (btnHovered) DrawListHelper::ImDrawListAddRect(drawListOverride,startBtn, endBtn, col,tabStyle.colors[TabLabelStyle::Col_TabLabelCloseButtonBorder],tabStyle.closeButtonRounding,0x0F,tabStyle.closeButtonBorderWidth,tabStyle.antialiasing);
 
@@ -2496,7 +2496,7 @@ bool TabLabels(int numTabs, const char** tabLabels, int& selectedIndex, const ch
     const TabLabelStyle& tabStyle = TabLabelStyle::GetMergedWithWindowAlpha();
 
     const ImVec2 itemSpacing =  style.ItemSpacing;
-    style.ItemSpacing.x =       1;
+    style.ItemSpacing.x =       0;
     style.ItemSpacing.y =       1;
 
     if (numTabs>0 && (selectedIndex<0 || selectedIndex>=numTabs)) {
@@ -2599,7 +2599,7 @@ bool TabLabels(int numTabs, const char** tabLabels, int& selectedIndex, const ch
     ImVec2 groupSize = ImGui::GetItemRectSize();
 
     // Draw tab label while mouse drags it
-    if (draggingTabIndex>=0 && draggingTabIndex<numTabs) {
+    if (draggingTabIndex>=0 && draggingTabIndex<numTabs && pOptionalItemOrdering[draggingTabIndex] != -1) {
         const ImVec2 wp = ImGui::GetWindowPos();
         startGroupCursorPos.x+=wp.x;
         startGroupCursorPos.y+=wp.y;
@@ -2608,9 +2608,9 @@ bool TabLabels(int numTabs, const char** tabLabels, int& selectedIndex, const ch
         const float deltaY = ImGui::GetTextLineHeightWithSpacing()*2.5f;
         startGroupCursorPos.y-=deltaY;
         groupSize.y+=2.f*deltaY;
-        if (ImGui::IsMouseHoveringRect(startGroupCursorPos,startGroupCursorPos+groupSize))  {
+        //if (ImGui::IsMouseHoveringRect(startGroupCursorPos,startGroupCursorPos+groupSize))  {
             const ImVec2& mp = ImGui::GetIO().MousePos;
-            ImVec2 start(wp.x+mp.x-draggingTabOffset.x-draggingTabSize.x*0.5f,wp.y+mp.y-draggingTabOffset.y-draggingTabSize.y*0.5f);
+            ImVec2 start(wp.x+mp.x-draggingTabOffset.x-draggingTabSize.x*0.5f,mp.y);
             //const ImVec2 end(start.x+draggingTabSize.x,start.y+draggingTabSize.y);
             ImDrawList* drawList = //ImGui::GetWindowDrawList();
                     &GImGui->OverlayDrawList;
@@ -2632,11 +2632,11 @@ bool TabLabels(int numTabs, const char** tabLabels, int& selectedIndex, const ch
                     drawList->AddImage(TabWindow::DockPanelIconTextureID,start,end,ImVec2(0.5f,0.75f),ImVec2(0.75f,1.f),ImGui::ColorConvertFloat4ToU32(color));
                 }
             }
-        }
-        else {
-            draggingTabIndex = -1;draggingTabTargetIndex=-1;
-            draggingLocked = true;// consume one mouse release
-        }
+       // }
+        //else {
+        //    draggingTabIndex = -1;draggingTabTargetIndex=-1;
+        //    draggingLocked = true;// consume one mouse release
+        //}
     }
 
     // Drop tab label
