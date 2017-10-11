@@ -1,7 +1,7 @@
 #pragma once
 #include <unordered_set>
 
-#include "augs/misc/jitter_buffer.h"
+#include "augs/network/jitter_buffer.h"
 
 #include "view/network/step_packaged_for_network.h"
 #include "view/network/simulation_receiver_settings.h"

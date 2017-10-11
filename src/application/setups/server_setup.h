@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "augs/network/network_server.h"
-#include "augs/misc/jitter_buffer.h"
+#include "augs/network/jitter_buffer.h"
 
 #include "view/network/step_packaged_for_network.h"
 #include "game/transcendental/cosmos.h"
