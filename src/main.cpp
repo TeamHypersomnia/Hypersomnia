@@ -728,7 +728,8 @@ int work(const int argc, const char* const * const argv) try {
 
 						if constexpr(std::is_same_v<T, editor_setup>) {
 							/* Editor needs more goods */
-							setup.perform_custom_imgui(_lua, _window, _game_gui.active);
+							const bool in_direct_gameplay = !_game_gui.active;
+							setup.perform_custom_imgui(_lua, _window, in_direct_gameplay);
 						}
 						else {
 							setup.perform_custom_imgui();

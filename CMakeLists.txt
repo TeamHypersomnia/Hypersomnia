@@ -438,6 +438,8 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/view/viewables/all_viewables_defs.cpp"
 	"src/view/audiovisual_state/audiovisual_profiler.cpp"
 	"src/application/workspace.cpp"
+	"src/augs/misc/imgui/addons/imguitabwindow/imguitabwindow.cpp"
+	"src/augs/misc/imgui/imgui_controls.cpp"
 )
 
 # natvis files for easier debugging in Visual Studio.
@@ -523,6 +525,7 @@ set(HYPERSOMNIA_INCLUDE_DIRS
 	"${PROJECT_SOURCE_DIR}/src/3rdparty"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/lua"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/sol2/single/sol"
+	"${PROJECT_SOURCE_DIR}/src/3rdparty/imgui"
 )
 
 if(BUILD_UNIT_TESTS)

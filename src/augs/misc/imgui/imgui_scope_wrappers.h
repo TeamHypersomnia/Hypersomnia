@@ -71,6 +71,18 @@ namespace augs {
 
 			return opt;
 		}
+
+		auto scoped_tab_menu_bar(const float y) {
+			const auto result = ImGui::BeginTabMenuBar(y);
+
+			auto opt = std::make_optional(make_scope_guard([result]() { if (result) { ImGui::EndTabMenuBar(); }}));
+
+			if (!result) {
+				opt = std::nullopt;
+			}
+
+			return opt;
+		}
 		
 		template <class... T>
 		auto scoped_modal_popup(T&&... args) {

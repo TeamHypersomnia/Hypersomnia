@@ -7,6 +7,7 @@
 
 #include "augs/math/vec2.h"
 
+#include "augs/misc/imgui/imgui_controls.h"
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
 
 namespace augs {
@@ -196,8 +197,4 @@ namespace augs {
 			};
 		}
 	}
-}
-
-namespace ImGui {
-	IMGUI_API bool TabLabels(const char **tabLabels, int tabSize, int &tabIndex, int *tabOrder = NULL);
 }

@@ -53,6 +53,7 @@ struct editor_tab {
 	workspace work;
 	augs::path_type current_path;
 	std::size_t horizontal_index;
+	std::optional<std::size_t> untitled_index;
 
 	struct path_operation {
 		sol::state& lua;
@@ -66,11 +67,15 @@ struct editor_tab {
 	
 	void save_workspace(path_operation);
 	void set_workspace_path(path_operation);
+
+	std::string get_display_path() const;
 };
 
 using editor_tab_container = std::map<std::size_t, editor_tab>;
 
 class editor_setup {
+	std::size_t untitled_index = 1;
+
 	std::optional<editor_popup> current_popup;
 
 	bool show_summary = true;
@@ -109,7 +114,7 @@ class editor_setup {
 		return !tabs.empty();
 	}
 
-	void set_tab_by_index(const std::size_t);
+	void set_tab_by_horizontal_index(const std::size_t);
 
 	template <class F>
 	void try_new_tab(F&& f) {
@@ -198,7 +203,7 @@ public:
 	void perform_custom_imgui(
 		sol::state& lua,
 		augs::window& owner,
-		const bool game_gui_active
+		const bool in_direct_gameplay
 	);
 
 	bool during_popup() const {
@@ -257,6 +262,7 @@ public:
 	void next_tab();
 	void prev_tab();
 	void close_tab();
+	void close_tab(editor_tab&);
 
 	void go_to_all();
 	void open_containing_folder();

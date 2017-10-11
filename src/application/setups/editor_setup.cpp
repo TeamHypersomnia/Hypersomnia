@@ -1,6 +1,7 @@
 #include "augs/templates/string_templates.h"
 #include "augs/misc/imgui/imgui_utils.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
+#include "augs/misc/imgui/addons/imguitabwindow/imguitabwindow.h"
 #include "augs/readwrite/lua_readwrite.h"
 #include "augs/filesystem/file.h"
 #include "augs/templates/thread_templates.h"
@@ -12,13 +13,25 @@
 #include "application/config_lua_table.h"
 #include "application/setups/editor_setup.h"
 
+#include <imgui/imgui_internal.h>
+
 #include "generated/introspectors.h"
+
+std::string editor_tab::get_display_path()  const {
+	if (untitled_index) {
+		return typesafe_sprintf("Workspace-%x.wp", *untitled_index);
+	}
+	
+	return current_path.filename().string();
+}
 
 void editor_setup::set_popup(const editor_popup p) {
 	current_popup = p;
 }
 
 void editor_tab::set_workspace_path(const path_operation op) {
+	untitled_index = std::nullopt;
+
 	current_path = op.path;
 	op.recent.add(op.lua, op.path);
 }
@@ -138,9 +151,7 @@ void editor_setup::control(
 
 void editor_setup::customize_for_viewing(config_lua_table& config) const {
 	if (has_tabs()) {
-		const auto filename = tab().current_path.filename().string();
-
-		config.window.name = "Editor - " + (filename.empty() ? std::string("Untitled") : filename);
+		config.window.name = "Editor - " + tab().get_display_path();
 	}
 	else {
 		config.window.name = "Editor";
@@ -174,7 +185,7 @@ void editor_setup::save_workspace(const path_operation op) {
 void editor_setup::perform_custom_imgui(
 	sol::state& lua,
 	augs::window& owner,
-	const bool game_gui_active
+	const bool in_direct_gameplay
 ) {
 	using namespace augs::imgui;
 
@@ -186,7 +197,8 @@ void editor_setup::perform_custom_imgui(
 		return ImGui::MenuItem(label, shortcut, nullptr, has_tabs());
 	};
 
-	if (game_gui_active) {
+
+	if (!in_direct_gameplay) {
 		if (auto main_menu = scoped_main_menu_bar()) {
 			if (auto menu = scoped_menu("File")) {
 				if (ImGui::MenuItem("New", "CTRL+N")) {
@@ -287,6 +299,97 @@ void editor_setup::perform_custom_imgui(
 
 				if (item_if_tabs("Entities")) {
 					show_entities = true;
+				}
+			}
+		}
+
+		if (has_tabs()) {
+			const auto& g = *ImGui::GetCurrentContext();
+			const auto bar_size = ImVec2(g.IO.DisplaySize.x, g.FontBaseSize + g.Style.FramePadding.y * 2.0f);
+
+			if (const auto tab_menu = scoped_tab_menu_bar(bar_size.y)) {
+				{
+					using namespace ImGui;
+					
+					const auto& in_style = GetStyle();
+					auto& out_style = TabLabelStyle::style;
+
+					using col = TabLabelStyle::Colors;
+
+					out_style.rounding = 0;
+					out_style.closeButtonRounding = 0;
+					out_style.closeButtonBorderWidth = 0;
+					out_style.colors[col::Col_TabLabel] = 0;
+					out_style.colors[col::Col_TabLabelHovered] = GetColorU32(in_style.Colors[ImGuiCol_ButtonHovered]);
+					out_style.colors[col::Col_TabLabelActive] = GetColorU32(in_style.Colors[ImGuiCol_ButtonActive]);
+					out_style.colors[col::Col_TabLabelText] = GetColorU32(in_style.Colors[ImGuiCol_Text]);
+					out_style.colors[col::Col_TabLabelSelected] = GetColorU32(in_style.Colors[ImGuiCol_Button]);
+					out_style.colors[col::Col_TabLabelSelectedHovered] = GetColorU32(in_style.Colors[ImGuiCol_Button]);
+					out_style.colors[col::Col_TabLabelSelectedActive] = GetColorU32(in_style.Colors[ImGuiCol_Button]);
+					out_style.colors[col::Col_TabLabelSelectedText] = GetColorU32(in_style.Colors[ImGuiCol_Text]);
+					out_style.colors[col::Col_TabLabelCloseButtonHovered] = GetColorU32(in_style.Colors[ImGuiCol_ButtonActive]);
+					out_style.colors[col::Col_TabLabelCloseButtonActive] = GetColorU32(rgba{ 210, 0, 0, 255 });
+				}
+
+				std::vector<std::string> tab_names;
+				std::vector<const char*> tab_names_cstrs;
+				std::vector<int> ordering;
+
+				tab_names.reserve(tabs.size());
+				tab_names_cstrs.reserve(tabs.size());
+				ordering.reserve(tabs.size());
+
+				int selected_index = -1;
+
+				for (const auto& it : tabs) {
+					auto& t = it.second;
+
+					if (&t == current_tab) {
+						selected_index = static_cast<int>(tab_names.size());
+					}
+
+					ordering.push_back(t.horizontal_index);
+					tab_names.push_back(t.get_display_path());
+				}
+
+				for (const auto& s : tab_names) {
+					tab_names_cstrs.push_back(s.c_str());
+				}
+
+				{
+					auto style = scoped_style_var(ImGuiStyleVar_FramePadding, []() { auto padding = ImGui::GetStyle().FramePadding; padding.x *= 2; return padding; }());
+
+					auto passed_index = selected_index;
+					ImGui::TabLabels(tabs.size(), tab_names_cstrs.data(), passed_index, nullptr, false, nullptr, ordering.data(), true, true, nullptr, nullptr);
+
+					if (passed_index != -1 && passed_index != selected_index) {
+						set_tab_by_horizontal_index(static_cast<std::size_t>(ordering[passed_index]));
+					}
+				}
+
+				/* Read back */
+
+				{
+					std::size_t i = 0;
+
+					std::vector<editor_tab*> closed_tabs;
+
+					for (auto& it : tabs) {
+						auto& t = it.second;
+						
+						const auto o = ordering[i++];
+						
+						if (o == -1) {
+							closed_tabs.push_back(std::addressof(t));
+						}
+						else {
+							t.horizontal_index = static_cast<std::size_t>(o);
+						}
+					}
+
+					for (auto* const t : closed_tabs) {
+						close_tab(*t);
+					}
 				}
 			}
 		}
@@ -542,10 +645,13 @@ void editor_setup::next() {
 }
 
 void editor_setup::new_tab() {
-	try_new_tab([&](editor_tab& t) { return true; });
+	try_new_tab([&](editor_tab& t) { 
+		t.untitled_index = untitled_index++; 
+		return true; 
+	});
 }
 
-void editor_setup::set_tab_by_index(const std::size_t next_index) {
+void editor_setup::set_tab_by_horizontal_index(const std::size_t next_index) {
 	const auto found = find_if_in(tabs,
 		[next_index](const auto& it) {
 			return it.second.horizontal_index == next_index;
@@ -557,13 +663,13 @@ void editor_setup::set_tab_by_index(const std::size_t next_index) {
 
 void editor_setup::next_tab() {
 	if (has_tabs()) {
-		set_tab_by_index((current_tab->horizontal_index + 1) % tabs.size());
+		set_tab_by_horizontal_index((current_tab->horizontal_index + 1) % tabs.size());
 	}
 }
 
 void editor_setup::prev_tab() {
 	if (has_tabs()) {
-		set_tab_by_index([this]() {
+		set_tab_by_horizontal_index([this]() {
 			const auto current_index = current_tab->horizontal_index;
 
 			if (current_index == 0) {
@@ -576,9 +682,9 @@ void editor_setup::prev_tab() {
 	}
 }
 
-void editor_setup::close_tab() {
-	const auto current_index = current_tab->horizontal_index;
-	erase_if(tabs, [this](const auto& it) { return std::addressof(it.second) == current_tab; });
+void editor_setup::close_tab(editor_tab& tab_to_close) {
+	const auto current_index = tab_to_close.horizontal_index;
+	erase_if(tabs, [&](const auto& it) { return std::addressof(it.second) == std::addressof(tab_to_close); });
 
 	for (auto& it : tabs) {
 		if (it.second.horizontal_index > current_index) {
@@ -587,9 +693,15 @@ void editor_setup::close_tab() {
 	}
 
 	if (has_tabs()) {
-		set_tab_by_index(std::min(current_index, tabs.size() - 1));
+		set_tab_by_horizontal_index(std::min(current_index, tabs.size() - 1));
 	}
 	else {
 		unset_current_tab();
+	}
+}
+
+void editor_setup::close_tab() {
+	if (current_tab) {
+		close_tab(*current_tab);
 	}
 }
