@@ -34,14 +34,14 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 		const auto* fix_a = contact->GetFixtureA();
 		const auto* fix_b = contact->GetFixtureB();
 
-		int numPoints = contact->GetManifold()->pointCount;
+		const auto num_points = contact->GetManifold()->pointCount;
 		b2WorldManifold worldManifold;
 		contact->GetWorldManifold(&worldManifold);
 
 		if (i == 1) {
 			std::swap(fix_a, fix_b);
 
-			if (numPoints > 1) {
+			if (num_points > 1) {
 				std::swap(worldManifold.points[0], worldManifold.points[1]);
 				std::swap(worldManifold.separations[0], worldManifold.separations[1]);
 			}
