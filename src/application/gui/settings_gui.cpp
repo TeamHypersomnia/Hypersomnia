@@ -99,7 +99,7 @@ void settings_gui_state::perform(
 		}
 		
 		{
-			auto scope = scoped_style_color(ImGuiCol_Border, ImGui::GetStyle().Colors[ImGuiCol_Button]);
+			auto scope = scoped_style_color(ImGuiCol_Separator, ImGui::GetStyle().Colors[ImGuiCol_Button]);
 			ImGui::Separator();
 		}
 
