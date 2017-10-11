@@ -181,7 +181,7 @@ namespace augs {
 			default_proc();
 			break;
 		case WM_MOUSEMOVE:
-			if (!current_settings.raw_mouse_input) {
+			if (!current_settings.raw_mouse_input && !mouse_position_frozen) {
 				basic_vec2<short> new_pos;
 
 				{
@@ -207,7 +207,7 @@ namespace augs {
 			break;
 
 		case WM_INPUT:
-			if (active && current_settings.raw_mouse_input) {
+			if (active && (current_settings.raw_mouse_input || mouse_position_frozen)) {
 				GetRawInputData(
 					reinterpret_cast<HRAWINPUT>(lParam), 
 					RID_INPUT,
@@ -398,6 +398,10 @@ namespace augs {
 	}
 	
 	void window::set_mouse_position_frozen(const bool flag) {
+		if (mouse_position_frozen && !flag) {
+			augs::set_cursor_pos(current_settings.position + last_mouse_pos);
+		}
+
 		mouse_position_frozen = flag;
 	}
 
