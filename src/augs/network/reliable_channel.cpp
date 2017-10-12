@@ -1,6 +1,5 @@
 #include "augs/readwrite/byte_readwrite.h"
-#include "reliable_channel.h"
-#include <numeric>
+#include "augs/network/reliable_channel.h"
 
 namespace augs {
 	namespace network {
@@ -173,7 +172,13 @@ namespace augs {
 		}
 
 		unsigned reliable_channel::get_pending_reliable_bytes_num() const {
-			return std::accumulate(sender.reliable_buf.begin(), sender.reliable_buf.end(), 0u, [](const size_t& s, const auto& buf) { return s + buf.size(); });
+			auto output = 0u;
+
+			for (const auto& r : sender.reliable_buf) {
+				output += r.size();
+			}
+
+			return output;
 		}
 
 		reliable_receiver::result_data reliable_channel::handle_incoming_packet(augs::stream& in) {

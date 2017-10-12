@@ -246,9 +246,7 @@ void editor_setup::perform_custom_imgui(
 
 				const auto close_str = [&]() -> std::string {
 					if (has_tabs()) {
-						const auto filename = tab().current_path.filename().string();
-
-						return std::string("Close ") + (filename.empty() ? std::string("Untitled") : filename);
+						return std::string("Close ") + tab().get_display_path();
 					}
 
 					return "Close";

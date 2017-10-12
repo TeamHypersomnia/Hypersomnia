@@ -1,5 +1,3 @@
-#include <numeric>
-
 #include <3rdparty/Box2D/Dynamics/b2Fixture.h>
 #include <3rdparty/Box2D/Box2D.h>
 
@@ -14,7 +12,7 @@
 
 #include "game/detail/physics/b2Fixture_index_in_component.h"
 
-typedef components::fixtures F;
+using F = components::fixtures;
 
 template<bool C>
 maybe_const_ref_t<C, colliders_cache>& basic_fixtures_synchronizer<C>::get_cache() const {
@@ -217,13 +215,13 @@ components::transform basic_fixtures_synchronizer<C>::get_offset(const colliders
 
 template<bool C>
 components::transform basic_fixtures_synchronizer<C>::get_total_offset() const {
-	const auto& offsets = get_raw_component().offsets_for_created_shapes;
+	components::transform total;
 
-	return std::accumulate(
-		offsets.begin(), 
-		offsets.end(), 
-		components::transform()
-	);
+	for (const auto& o : get_raw_component().offsets_for_created_shapes) {
+		total += o;
+	}
+
+	return total;
 }
 
 components::transform components::fixtures::transform_around_body(
