@@ -20,6 +20,8 @@ namespace components {
 		// GEN INTROSPECTOR struct components::missile
 		meter_value_type damage_amount = 12;
 
+		float muzzle_velocity_mult = 1.f;
+
 		float impulse_upon_hit = 100.f;
 		float impulse_multiplier_against_sentience = 1.f;
 

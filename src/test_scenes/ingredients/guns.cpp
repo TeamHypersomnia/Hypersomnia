@@ -161,6 +161,85 @@ namespace prefabs {
 		return sample_suppressor;
 	}
 
+	entity_handle create_damped_cyan_charge(const logic_step step, vec2 pos, int charges) {
+		auto& cosmos = step.cosm;
+		const auto cyan_charge = cosmos.create_entity("Cyan charge");
+		const auto round_definition = cosmos.create_entity("round_definition");
+		const auto shell_definition = cosmos.create_entity("shell_definition");
+
+		const auto& metas = step.input.logical_assets;
+
+		{
+			ingredients::add_sprite(metas, cyan_charge, assets::game_image_id::CYAN_CHARGE, white, render_layer::SMALL_DYNAMIC_BODY);
+			ingredients::add_see_through_dynamic_body(step, cyan_charge, pos);
+
+			auto& item = ingredients::make_item(cyan_charge);
+			item.space_occupied_per_charge = to_space_units("0.01");
+			item.categories_for_slot_compatibility.set(item_category::SHOT_CHARGE);
+			item.charges = charges;
+			item.stackable = true;
+
+			auto& cat = cyan_charge += components::catridge();
+
+			cat.shell_trace_particles.id = assets::particle_effect_id::CONCENTRATED_WANDERING_PIXELS;
+			cat.shell_trace_particles.modifier.colorize = cyan;
+		}
+
+		{
+			auto& s = ingredients::add_sprite(metas, round_definition, assets::game_image_id::ROUND_TRACE, cyan, render_layer::FLYING_BULLETS);
+			ingredients::add_bullet_round_physics(step, round_definition, pos);
+
+			auto& body = round_definition.get<components::rigid_body>();
+			body.set_linear_damping(3.8f);
+
+			auto& sender = round_definition += components::sender();
+			auto& missile = round_definition += components::missile();
+
+			missile.max_lifetime_ms = 400.f;
+			missile.muzzle_velocity_mult = 2.7f;
+
+			missile.destruction_particles.id = assets::particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION;
+			missile.destruction_particles.modifier.colorize = cyan;
+
+			missile.trace_particles.id = assets::particle_effect_id::WANDERING_PIXELS_DIRECTED;
+			missile.trace_particles.modifier.colorize = cyan;
+
+			missile.muzzle_leave_particles.id = assets::particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION;
+			missile.muzzle_leave_particles.modifier.colorize = cyan;
+			missile.pass_through_held_item_sound.id = assets::sound_buffer_id::BULLET_PASSES_THROUGH_HELD_ITEM;
+
+			auto& trace_modifier = missile.trace_sound.modifier;
+
+			trace_modifier.max_distance = 1020.f;
+			trace_modifier.reference_distance = 100.f;
+			trace_modifier.gain = 1.3f;
+			trace_modifier.repetitions = -1;
+			trace_modifier.fade_on_exit = false;
+
+			missile.trace_sound.id = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;
+			missile.destruction_sound.id = assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION;
+
+			auto& trace = round_definition += components::trace();
+			trace.max_multiplier_x = std::make_pair(0.0f, 1.2f);
+			trace.max_multiplier_y = std::make_pair(0.f, 0.f);
+			trace.lengthening_duration_ms = std::make_pair(200.f, 250.f);
+			trace.additional_multiplier = vec2(1.f, 1.f);
+		}
+
+		{
+			ingredients::add_sprite(metas, shell_definition, assets::game_image_id::CYAN_SHELL, white, render_layer::SMALL_DYNAMIC_BODY);
+			ingredients::add_shell_dynamic_body(step, shell_definition, pos);
+		}
+
+		cyan_charge.map_child_entity(child_entity_name::CATRIDGE_BULLET, round_definition);
+		cyan_charge.map_child_entity(child_entity_name::CATRIDGE_SHELL, shell_definition);
+
+		cyan_charge.add_standard_components(step);
+		cyan_charge.get_meta_of_name().stackable = true;
+
+		return cyan_charge;
+	}
+
 	entity_handle create_cyan_charge(const logic_step step, vec2 pos, int charges) {
 		auto& cosmos = step.cosm;
 		const auto cyan_charge = cosmos.create_entity("Cyan charge");

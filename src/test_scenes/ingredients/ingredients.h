@@ -81,6 +81,7 @@ namespace prefabs {
 		const vec2 pos 
 	);
 
+	entity_handle create_damped_cyan_charge(const logic_step, vec2 pos, int charges = 30);
 	entity_handle create_cyan_charge(const logic_step, vec2 pos, int charges = 30);
 
 	entity_handle create_sample_backpack(const logic_step, vec2 pos);
