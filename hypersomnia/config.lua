@@ -232,9 +232,8 @@ return {
     misprediction_smoothing_multiplier = 1.2
   },
   unit_tests = {
-    break_on_failure = false,
+    break_on_failure = true,
     log_successful = false,
-    output_log_path = "generated/logs/unit_tests.txt",
     run = true
   },
   window = {

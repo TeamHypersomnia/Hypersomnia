@@ -1342,6 +1342,13 @@ catch (const augs::lua_state_creation_error err) {
 	LOG("Failed to create a lua state for the game!\n%x", err.what());
 	return EXIT_FAILURE;
 }
+catch (const augs::unit_test_session_error err) {
+	LOG("Unit test session failure:\n%x\ncout:%x\ncerr:%x\nclog:%x\n", 
+		err.what(), err.cout_content, err.cerr_content, err.clog_content
+	);
+
+	return EXIT_FAILURE;
+}
 catch (...) {
 	LOG("Unknown exception.");
 #if IS_PRODUCTION_BUILD
