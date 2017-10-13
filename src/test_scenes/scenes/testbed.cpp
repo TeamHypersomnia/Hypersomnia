@@ -260,6 +260,27 @@ namespace test_scenes {
 		}
 
 		// street wandering pixels
+		auto wandering_pixels_frames = decltype(components::wandering_pixels::frames){};
+		wandering_pixels_frames.resize(5);
+
+		wandering_pixels_frames[0] = { assets::game_image_id::BLANK, vec2(1, 1), cyan };
+		wandering_pixels_frames[1] = { assets::game_image_id::BLANK, vec2(2, 2), cyan };
+		wandering_pixels_frames[2] = { assets::game_image_id(int(assets::game_image_id::CAST_BLINK_1) + 1), metas, cyan };
+		wandering_pixels_frames[3] = { assets::game_image_id(int(assets::game_image_id::CAST_BLINK_1) + 2), metas, cyan };
+		wandering_pixels_frames[4] = { assets::game_image_id::BLANK, vec2(2, 2), cyan };
+
+		auto get_frames_col = [&](rgba col) {
+			auto f = wandering_pixels_frames;
+
+			for (auto& o : f) {
+				o.color = col;
+			}
+
+			return f;
+		};
+
+		const auto duration_ms = 200.f;
+
 		{
 			const auto reach = xywh(0, 0, 1500, 32000);
 
@@ -270,8 +291,9 @@ namespace test_scenes {
 
 				r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
-				w.face.set(assets::game_image_id(int(assets::game_image_id::BLANK)), vec2(1, 1), cyan);
-				w.count = 200;
+				w.frames = get_frames_col(cyan);
+				w.frame_duration_ms = duration_ms;
+				w.particles_count = 200;
 				w.reach = reach;
 				e.add_standard_components(step);
 			}
@@ -283,9 +305,10 @@ namespace test_scenes {
 
 				r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
-				w.face.set(assets::game_image_id(int(assets::game_image_id::CAST_BLINK_1) + 2), metas, cyan);
+				w.frames = get_frames_col(cyan);
+				w.frame_duration_ms = duration_ms;
 				//w.face.size.set(1, 1);
-				w.count = 80;
+				w.particles_count = 80;
 				w.reach = reach;
 				e.add_standard_components(step);
 			}
@@ -297,9 +320,10 @@ namespace test_scenes {
 
 				r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
-				w.face.set(assets::game_image_id(int(assets::game_image_id::CAST_BLINK_1) + 2), metas, cyan);
+				w.frames = get_frames_col(cyan);
+				w.frame_duration_ms = duration_ms;
 				//w.face.size.set(1, 1);
-				w.count = 80;
+				w.particles_count = 80;
 				w.reach = reach;
 				e.add_standard_components(step);
 			}
@@ -351,8 +375,9 @@ namespace test_scenes {
 
 					r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
-					w.face.set(assets::game_image_id(int(assets::game_image_id::BLANK)), vec2(1, 1), light_cyan);
-					w.count = 50;
+					w.frames = get_frames_col(light_cyan);
+					w.frame_duration_ms = duration_ms;
+					w.particles_count = 50;
 					w.reach = xywh(light_pos.x- 250, light_pos.y-250, 500, 500);
 					e.add_standard_components(step);
 				}
@@ -364,8 +389,9 @@ namespace test_scenes {
 
 					r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
-					w.face.set(assets::game_image_id(int(assets::game_image_id::CAST_BLINK_1) + 2), metas, light_cyan);
-					w.count = 20;
+					w.frames = get_frames_col(light_cyan);
+					w.frame_duration_ms = duration_ms;
+					w.particles_count = 20;
 					w.reach = xywh(light_pos.x - 150, light_pos.y - 150, 300, 300);
 					e.add_standard_components(step);
 				}
@@ -377,8 +403,9 @@ namespace test_scenes {
 
 					r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
-					w.face.set(assets::game_image_id(int(assets::game_image_id::CAST_BLINK_1) + 2), metas, light_cyan);
-					w.count = 20;
+					w.frames = get_frames_col(light_cyan);
+					w.frame_duration_ms = duration_ms;
+					w.particles_count = 20;
 					w.reach = xywh(light_pos.x - 25, light_pos.y - 25, 50, 50);
 					e.add_standard_components(step);
 				}
@@ -386,27 +413,6 @@ namespace test_scenes {
 		}
 
 		{
-			//{
-			//	const auto l = world.create_entity("l");
-			//	l += components::transform(0, 300);
-			//	auto& light = l += components::light();
-			//	light.color = red;
-			//	l.add_standard_components(step);
-			//}
-			//{
-			//	const auto l = world.create_entity("l");
-			//	l += components::transform(300, 300);
-			//	auto& light = l += components::light();
-			//	light.color = green;
-			//	l.add_standard_components(step);
-			//}
-			//{
-			//	const auto l = world.create_entity("l");
-			//	l += components::transform(600, 300);
-			//	auto& light = l += components::light();
-			//	light.color = blue;
-			//	l.add_standard_components(step);
-			//}
 			{
 				const auto l = world.create_entity("l");
 				l += components::transform(164.f - 8.f + 90.f, 220);
@@ -436,8 +442,9 @@ namespace test_scenes {
 
 					r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
-					w.face.set(assets::game_image_id(int(assets::game_image_id::CAST_BLINK_1) + 2), metas, cyan);
-					w.count = 20;
+					w.frames = get_frames_col(cyan);
+					w.frame_duration_ms = duration_ms;
+					w.particles_count = 20;
 					w.reach = left_reach;
 					e.add_standard_components(step);
 				}
@@ -449,8 +456,9 @@ namespace test_scenes {
 
 					r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
-					w.face.set(assets::game_image_id(int(assets::game_image_id::CAST_BLINK_1) + 2), metas, orange);
-					w.count = 20;
+					w.frames = get_frames_col(orange);
+					w.frame_duration_ms = duration_ms;
+					w.particles_count = 20;
 					w.reach = right_reach;
 					e.add_standard_components(step);
 				}
@@ -462,8 +470,9 @@ namespace test_scenes {
 
 					r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
-					w.face.set(assets::game_image_id(int(assets::game_image_id::BLANK)), vec2(1, 1), cyan);
-					w.count = 50;
+					w.frames = get_frames_col(cyan);
+					w.frame_duration_ms = duration_ms;
+					w.particles_count = 50;
 					w.reach = left_reach;
 					e.add_standard_components(step);
 				}
@@ -475,8 +484,9 @@ namespace test_scenes {
 
 					r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
-					w.face.set(assets::game_image_id(int(assets::game_image_id::BLANK)), vec2(1, 1), orange);
-					w.count = 50;
+					w.frames = get_frames_col(orange);
+					w.frame_duration_ms = duration_ms;
+					w.particles_count = 50;
 					w.reach = right_reach;
 					e.add_standard_components(step);
 				}
@@ -488,8 +498,9 @@ namespace test_scenes {
 
 					r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
-					w.face.set(assets::game_image_id(int(assets::game_image_id::BLANK)), vec2(2, 2), cyan);
-					w.count = 30;
+					w.frames = get_frames_col(cyan);
+					w.frame_duration_ms = duration_ms;
+					w.particles_count = 30;
 					w.reach = left_reach;
 					e.add_standard_components(step);
 				}
@@ -501,50 +512,14 @@ namespace test_scenes {
 
 					r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
-					w.face.set(assets::game_image_id(int(assets::game_image_id::BLANK)), vec2(2, 2), orange);
-					w.count = 30;
+					w.frames = get_frames_col(orange);
+					w.frame_duration_ms = duration_ms;
+					w.particles_count = 30;
 					w.reach = right_reach;
 					e.add_standard_components(step);
 				}
-
-				//{
-				//	const auto e = world.create_entity("wandering_pixels");
-				//	auto& w = e += components::wandering_pixels();
-				//	auto& r = e += components::render();
-				//
-				//	r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
-				//
-				//	w.face.set(assets::game_image_id(int(assets::game_image_id::WANDERING_CROSS)), cyan);
-				//	w.count = 15;
-				//	w.reach = xywh(164.f - 8.f + 90.f - 100, 220 - 100, 200, 200);
-				//	e.add_standard_components(step);
-				//}
-				//
-				//{
-				//	const auto e = world.create_entity("wandering_pixels");
-				//	auto& w = e += components::wandering_pixels();
-				//	auto& r = e += components::render();
-				//
-				//	r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
-				//
-				//	w.face.set(assets::game_image_id(int(assets::game_image_id::WANDERING_CROSS)), orange);
-				//	w.count = 15;
-				//	w.reach = xywh(1164.f - 8.f + 90.f - 100, 220 - 100, 200, 200);
-				//	e.add_standard_components(step);
-				//}
 			}
 
-			{
-				//const auto l = world.create_entity("l");
-				//l += components::transform(164.f - 8.f, -700);
-				//auto& light = l += components::light();
-				//light.color = cyan;
-				////light.linear.base_value = 0.000005f;
-				////light.quadratic.base_value = 0.000025f;
-				//light.max_distance.base_value = 4500.f;
-				//light.wall_max_distance.base_value = 4000.f;
-				//l.add_standard_components(step);
-			}
 			{
 				const auto l = world.create_entity("l");
 				l += components::transform(664.f + 24.f, -1100);

@@ -43,23 +43,32 @@ void wandering_pixels_system::advance_for(
 	const const_entity_handle it, 
 	const augs::delta dt
 ) {
+	const auto dt_secs = dt.in_seconds();
+	const auto dt_ms = dt.in_milliseconds();
+
 	const auto& cosmos = it.get_cosmos();
 	auto& cache = get_cache(it);
 	const auto& wandering = it.get<components::wandering_pixels>();
 
-	if (cache.recorded_component.count != wandering.count) {
-		cache.particles.resize(wandering.count);
-		cache.recorded_component.count = wandering.count;
+	if (const bool refresh_cache = 
+		cache.recorded_component.particles_count != wandering.particles_count
+	) {
+		cache.particles.resize(wandering.particles_count);
+		cache.recorded_component.particles_count = wandering.particles_count;
 	}
 
-	if (!(cache.recorded_component.reach == wandering.reach)) {
-		cache.rng = fast_randomization(static_cast<std::size_t>(cosmos.get_rng_seed_for(it)));
+	if (const bool refresh_cache = 
+		!(cache.recorded_component.reach == wandering.reach)
+	) {
+		cache.rng = { static_cast<std::size_t>(cosmos.get_rng_seed_for(it)) };
 
 		for (auto& p : cache.particles) {
 			p.pos.set(
 				wandering.reach.x + cache.rng.randval(0u, static_cast<unsigned>(wandering.reach.w)), 
 				wandering.reach.y + cache.rng.randval(0u, static_cast<unsigned>(wandering.reach.h))
 			);
+
+			p.current_lifetime_ms = cache.rng.randval(0.f, wandering.frame_duration_ms);
 		}
 
 		cache.recorded_component.reach = wandering.reach;
@@ -69,6 +78,8 @@ void wandering_pixels_system::advance_for(
 	constexpr float interp_time = 700.f;
 
 	for (auto& p : cache.particles) {
+		p.current_lifetime_ms += dt_ms + dt_ms * (p.direction_ms_left / max_direction_time) + dt_ms * p.current_direction.radians();
+
 		if (p.direction_ms_left <= 0.f) {
 			p.direction_ms_left = static_cast<float>(cache.rng.randval(max_direction_time, max_direction_time + 800u));
 
@@ -107,7 +118,7 @@ void wandering_pixels_system::advance_for(
 			}
 		}
 		else {
-			p.direction_ms_left -= dt.in_milliseconds();
+			p.direction_ms_left -= dt_ms;
 		}
 
 		vec2 considered_direction;
@@ -124,24 +135,24 @@ void wandering_pixels_system::advance_for(
 
 		const auto vel = p.current_velocity;
 
-		p.pos += considered_direction * vel * dt.in_seconds();
+		p.pos += considered_direction * vel * dt_secs;
 
 		const auto sin_secs = static_cast<float>(sin(global_time_seconds));
 		const auto cos_secs = static_cast<float>(cos(global_time_seconds));
 
 		if (considered_direction.x > 0) {
-			p.pos.y += considered_direction.x * sin_secs * vel * dt.in_seconds() * 1.2f;
+			p.pos.y += considered_direction.x * sin_secs * vel * dt_secs * 1.2f;
 		}
 		else if (considered_direction.x < 0) {
-			p.pos.y -= -considered_direction.x * sin_secs * vel * dt.in_seconds() * 1.2f;
+			p.pos.y -= -considered_direction.x * sin_secs * vel * dt_secs * 1.2f;
 		}
 		if (considered_direction.y > 0) {
-			p.pos.x += considered_direction.y * cos_secs * vel * dt.in_seconds() * 1.2f;
+			p.pos.x += considered_direction.y * cos_secs * vel * dt_secs * 1.2f;
 		}
 		else if (considered_direction.y < 0) {
-			p.pos.x -= -considered_direction.y * cos_secs * vel * dt.in_seconds() * 1.2f;
+			p.pos.x -= -considered_direction.y * cos_secs * vel * dt_secs * 1.2f;
 		}
 
-		//p.pos.x += cos(global_time_seconds) * 20 * dt.in_seconds() * 1.2;
+		//p.pos.x += cos(global_time_seconds) * 20 * dt_secs * 1.2;
 	}
 }

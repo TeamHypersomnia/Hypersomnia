@@ -40,6 +40,24 @@ namespace augs {
 		{}
 
 		template <class M>
+		sprite(
+			const id_type tex,
+			const M& manager,
+			const rgba color = rgba()
+		) {
+			set(tex, manager, color);
+		}
+
+		template <class T>
+		sprite(
+			const id_type tex,
+			const basic_vec2<T> size,
+			const rgba color = rgba()
+		) {
+			set(tex, size, color);
+		}
+
+		template <class M>
 		void set(
 			const id_type tex,
 			const M& manager,

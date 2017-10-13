@@ -81,5 +81,5 @@ struct basic_randomization {
 	}
 };
 
-typedef basic_randomization<std::mt19937> randomization;
-typedef basic_randomization<std::minstd_rand0> fast_randomization;
+using randomization = basic_randomization<std::mt19937>;
+using fast_randomization = basic_randomization<std::minstd_rand0>;

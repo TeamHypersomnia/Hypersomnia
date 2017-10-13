@@ -26,6 +26,7 @@ public:
 		vec2 current_direction = vec2(1, 0);
 		float current_velocity = 20.f;
 		float direction_ms_left = 0.f;
+		float current_lifetime_ms = 0.f;
 	};
 
 	struct cache {
@@ -67,7 +68,7 @@ public:
 		for (const auto& p : cache.particles) {
 			basic_input.renderable_transform = p.pos;
 
-			wandering.face.draw(manager, basic_input);
+			wandering.get_face_after(p.current_lifetime_ms).draw(manager, basic_input);
 		}
 	}
 

@@ -194,6 +194,13 @@ void game_gui_system::control_hotbar_and_action_button(
 		return;
 	}
 
+	if (const bool not_applicable = 
+		!gui_entity.has<components::item_slot_transfers>()
+		|| !gui_entity.has<components::sentience>()
+	) {
+		return;
+	}
+
 	const auto& cosmos = gui_entity.get_cosmos();
 	auto& gui = get_character_gui(gui_entity);
 
