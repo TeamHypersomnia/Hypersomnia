@@ -279,7 +279,7 @@ namespace test_scenes {
 			return f;
 		};
 
-		const auto duration_ms = 200.f;
+		const auto duration_ms = 6000.f;
 
 		{
 			const auto reach = xywh(0, 0, 1500, 32000);

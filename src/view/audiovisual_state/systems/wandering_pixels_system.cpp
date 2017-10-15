@@ -45,7 +45,6 @@ void wandering_pixels_system::advance_for(
 ) {
 	const auto dt_secs = dt.in_seconds();
 	const auto dt_ms = dt.in_milliseconds();
-
 	const auto& cosmos = it.get_cosmos();
 	auto& cache = get_cache(it);
 	const auto& wandering = it.get<components::wandering_pixels>();
@@ -137,8 +136,8 @@ void wandering_pixels_system::advance_for(
 
 		p.pos += considered_direction * vel * dt_secs;
 
-		const auto sin_secs = static_cast<float>(sin(global_time_seconds));
-		const auto cos_secs = static_cast<float>(cos(global_time_seconds));
+		const auto sin_secs = static_cast<float>(sin(p.current_lifetime_ms / 1000));
+		const auto cos_secs = static_cast<float>(cos(p.current_lifetime_ms / 1000));
 
 		if (considered_direction.x > 0) {
 			p.pos.y += considered_direction.x * sin_secs * vel * dt_secs * 1.2f;
