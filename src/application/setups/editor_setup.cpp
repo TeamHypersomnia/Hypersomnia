@@ -527,7 +527,7 @@ void editor_setup::accept_game_gui_events(
 
 }
 
-bool editor_setup::escape_modal_popup() {
+bool editor_setup::escape() {
 	if (current_popup) {
 		current_popup = std::nullopt;
 		return true;
@@ -723,4 +723,59 @@ void editor_setup::close_tab() {
 	if (current_tab) {
 		close_tab(*current_tab);
 	}
+}
+
+bool editor_setup::handle_window_input(
+	const augs::event::state& common_input_state,
+	const augs::event::change e,
+
+	augs::window& window,
+	sol::state& lua
+) {
+	using namespace augs::event::keys;
+
+	if (e.was_any_key_pressed()) {
+		const auto k = e.key.key;
+		const auto has_ctrl = common_input_state.is_set(key::LCTRL);
+
+		if (has_ctrl) {
+			if (
+				const auto has_shift = common_input_state.is_set(key::LSHIFT);
+				has_shift
+			) {
+				switch (k) {
+					case key::Z: redo(); return true;
+					case key::E: open_containing_folder(); return true;
+					case key::TAB: prev_tab(); return true;
+					default: break;
+				}
+			}
+
+			switch (k) {
+				case key::S: save(lua, window); return true;
+				case key::Z: undo(); return true;
+				case key::O: open(window); return true;
+				case key::C: copy(); return true;
+				case key::X: cut(); return true;
+				case key::V: paste(); return true;
+				case key::P: go_to_all(); return true;
+				case key::N: new_tab(); return true;
+				case key::W: close_tab(); return true;
+				case key::TAB: next_tab(); return true;
+				default: break;
+			}
+		}
+
+		switch (k) {
+			case key::PLAY_PAUSE_TRACK: play_pause(); return true;
+			case key::PREV_TRACK: prev(); return true;
+			case key::NEXT_TRACK: next(); return true;
+			case key::STOP_TRACK: stop(); return true;
+			case key::F12: save_as(window); return true;
+			case key::ENTER: confirm_modal_popup(); return true;
+			default: break;
+		}
+	}
+
+	return false;
 }

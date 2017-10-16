@@ -28,6 +28,11 @@ namespace sol {
 
 namespace augs {
 	class window;
+
+	namespace event {
+		class change;
+		class state;
+	}
 }
 
 struct editor_recent_paths {
@@ -162,9 +167,8 @@ class editor_setup {
 
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
-	static constexpr bool accepts_media_keys = true;
-	static constexpr bool accepts_shortcuts = true;
-	static constexpr bool has_modal_popups = true;
+	static constexpr bool handles_window_input = true;
+	static constexpr bool handles_escape = true;
 
 	editor_setup(sol::state& lua);
 	editor_setup(sol::state& lua, const augs::path_type& workspace_path);
@@ -241,7 +245,15 @@ public:
 	void control(const cosmic_entropy&);
 	void accept_game_gui_events(const cosmic_entropy&);
 
-	bool escape_modal_popup();
+	bool handle_window_input(
+		const augs::event::state& common_input_state,
+		const augs::event::change change,
+
+		augs::window& window,
+		sol::state& lua
+	);
+
+	bool escape();
 	bool confirm_modal_popup();
 
 	void open(const augs::window& owner);

@@ -858,8 +858,8 @@ int work(const int argc, const char* const * const argv) try {
 					if (const auto not_fetched = !visit_current_setup([&](auto& setup) {
 						using T = std::decay_t<decltype(setup)>;
 
-						if constexpr(T::has_modal_popups) {
-							return setup.escape_modal_popup();
+						if constexpr(T::handles_escape) {
+							return setup.escape();
 						}
 						else {
 							return false;
@@ -877,76 +877,17 @@ int work(const int argc, const char* const * const argv) try {
 						/* MSVC ICE workaround */
 						auto& _common_input_state = common_input_state;
 						auto& _lua = lua;
+						auto& _window = window;
 
 						if (visit_current_setup([&](auto& setup) {
 							using T = std::decay_t<decltype(setup)>;
 
-							if constexpr(T::accepts_media_keys) {
-								if (e.was_any_key_pressed()) {
-									const auto k = e.key.key;
-
-									switch (k) {
-										case key::PLAY_PAUSE_TRACK: setup.play_pause(); return true;
-										case key::PREV_TRACK: setup.prev(); return true;
-										case key::NEXT_TRACK: setup.next(); return true;
-										case key::STOP_TRACK: setup.stop(); return true;
-										default: break;
-									}
-								}
-							}
-
-							if constexpr(T::accepts_shortcuts) {
-								if (e.was_any_key_pressed()) {
-									const auto k = e.key.key;
-
-									switch (k) {
-										case key::F12: setup.save_as(_window); return true;
-										default: break;
-									}
-
-									const auto has_ctrl = _common_input_state.is_set(key::LCTRL);
-
-									if (has_ctrl) {
-										if (
-											const auto has_shift = _common_input_state.is_set(key::LSHIFT);
-											has_shift
-										) {
-											switch (k) {
-												case key::Z: setup.redo(); return true;
-												case key::E: setup.open_containing_folder(); return true;
-												case key::TAB: setup.prev_tab(); return true;
-												default: break;
-											}
-										}
-										else {
-											switch (k) {
-												case key::S: setup.save(_lua, _window); return true;
-												case key::Z: setup.undo(); return true;
-												case key::O: setup.open(_window); return true;
-												case key::C: setup.copy(); return true;
-												case key::X: setup.cut(); return true;
-												case key::Y: setup.paste(); return true;
-												case key::P: setup.go_to_all(); return true;
-												case key::N: setup.new_tab(); return true;
-												case key::W: setup.close_tab(); return true;
-												case key::TAB: setup.next_tab(); return true;
-												default: break;
-											}
-										}
-									}
-								}
-							}
-
-							if constexpr(T::has_modal_popups) {
-								if (e.was_pressed(key::ENTER)) {
-									if (setup.confirm_modal_popup()) {
-										return true;
-									}
-								}
+							if constexpr(T::handles_window_input) {
+								return setup.handle_window_input(_common_input_state, e, _window, _lua);
 							}
 
 							return false;
-						})){ 
+						})) { 
 							fetched = true;
 						}
 					}
