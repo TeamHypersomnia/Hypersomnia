@@ -160,16 +160,21 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		particles,
 		visible.per_layer,
 		game_images
-	});
+		});
 
 	shaders.illuminated->set_as_current();
 	shaders.illuminated->set_projection(matrix);
 
-	auto draw_layer = [&](
-		const render_layer r, 
-		const renderable_drawing_type type = renderable_drawing_type::NORMAL
-	) {
-		draw_entities(visible.per_layer[r], cosmos, output, game_images, camera, global_time_seconds, interp, type);
+	auto draw_layer = [&](const render_layer r) {
+		for (const auto e : visible.per_layer[r]) {
+			draw_entity(cosmos[e], { output, game_images, camera, global_time_seconds }, interp);
+		}
+	};
+
+	auto draw_borders = [&](const render_layer r, auto provider) {
+		for (const auto e : visible.per_layer[r]) {
+			draw_border(cosmos[e], { output, game_images, camera, global_time_seconds }, interp, provider);
+		}
 	};
 
 	draw_layer(render_layer::UNDER_GROUND);
@@ -192,8 +197,19 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	shaders.pure_color_highlight->set_as_current();
 	shaders.pure_color_highlight->set_projection(matrix);
-	
-	draw_layer(render_layer::SMALL_DYNAMIC_BODY, renderable_drawing_type::BORDER_HIGHLIGHTS);
+
+	const auto timestamp_ms = static_cast<unsigned>(global_time_seconds * 1000);
+
+	draw_borders(
+		render_layer::SMALL_DYNAMIC_BODY,
+		[timestamp_ms](const const_entity_handle sentience) -> std::optional<rgba> {
+			if (const auto s = sentience.find<components::sentience>()) {
+				return s->get_low_health_border(timestamp_ms);
+			}
+
+			return std::nullopt;
+		}
+	);
 	
 	renderer.call_and_clear_triangles();
 	

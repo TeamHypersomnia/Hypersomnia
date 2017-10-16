@@ -70,14 +70,15 @@ void pure_color_highlight_system::draw_highlights(
 
 		draw_renderable(
 			sprite,
-			subject.get_viewing_transform(interp, true),
-			subject.get<components::render>(),
 
-			output,
-			game_images,
-			camera,
-			global_time_seconds,
-			renderable_drawing_type::NORMAL
+			{
+				output,
+				game_images,
+				camera,
+				global_time_seconds
+			},
+			
+			subject.get_viewing_transform(interp, true)
 		);
 
 		col = prevcol;

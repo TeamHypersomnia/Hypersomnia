@@ -1,4 +1,6 @@
 #pragma once
+#include <optional>
+
 #include "augs/graphics/rgba.h"
 
 #include "augs/misc/timing/stepped_timing.h"
@@ -77,7 +79,9 @@ namespace components {
 			return currently_casted_spell.is_set();
 		}
 
-		rgba calculate_health_color(float time_pulse_multiplier) const;
+		rgba calculate_health_color(const float time_pulse_multiplier) const;
+		std::optional<rgba> get_low_health_border(const unsigned timestamp_ms) const;
+
 		bool is_conscious() const;
 
 		template <class T>

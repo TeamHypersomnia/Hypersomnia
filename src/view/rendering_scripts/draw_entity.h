@@ -20,12 +20,6 @@
 
 class interpolation_system;
 
-enum class renderable_drawing_type {
-	NORMAL,
-	BORDER_HIGHLIGHTS,
-	NEON_MAPS
-};
-
 FORCE_INLINE bool render_order_compare(
 	const const_entity_handle a, 
 	const const_entity_handle b
@@ -36,88 +30,121 @@ FORCE_INLINE bool render_order_compare(
 	return (layer_a == layer_b && layer_a == render_layer::CAR_INTERIOR) ? are_connected_by_friction(a, b) : layer_a < layer_b;
 }
 
-template <class Container>
-void draw_entities(
-	const Container& entities,
-	const cosmos& cosmos,
+struct draw_renderable_input {
+	const augs::drawer drawer;
+	const game_images_in_atlas_map& manager;
+	const camera_cone camera;
+	const double global_time_seconds;
+};
 
-	const augs::drawer output,
-	const game_images_in_atlas_map& manager,
-
-	const camera_cone in_camera,
-
-	const double global_time_seconds,
-	const interpolation_system& interp,
-
-	const renderable_drawing_type renderable_drawing_mode
+template <class renderable_type>
+FORCE_INLINE void draw_renderable(
+	const renderable_type& renderable,
+	const draw_renderable_input input,
+	const components::transform renderable_transform
 ) {
-	for (const auto e_id : entities) {
-		const auto e = cosmos[e_id];
+	using input_type = typename renderable_type::drawing_input;
 
-		for_each_type<components::polygon, components::sprite>([&](auto T) {
-			using renderable_type = decltype(T);
+	auto in = input_type(input.drawer);
 
-			if (e.has<renderable_type>()) {
-				const auto& render = e.get<components::render>();
-				const auto& renderable_transform = e.get_viewing_transform(interp, true);
-				const auto& renderable = e.get<renderable_type>();
+	in.camera = input.camera;
 
-				draw_renderable(
-					renderable,
-					renderable_transform,
-					render,
+	in.renderable_transform = renderable_transform;
+	in.set_global_time_seconds(input.global_time_seconds);
 
-					output,
-					manager,
-
-					in_camera,
-					global_time_seconds,
-					renderable_drawing_mode
-				);
-			}
-		});
-	}
+	renderable.draw(input.manager, in);
 }
 
 template <class renderable_type>
-void draw_renderable(
+FORCE_INLINE void draw_neon_map(
 	const renderable_type& renderable,
-	const components::transform& renderable_transform,
-	const components::render& render,
-
-	const augs::drawer output,
-	const game_images_in_atlas_map& manager,
-
-	const camera_cone camera,
-	const double global_time_seconds,
-
-	const renderable_drawing_type renderable_drawing_mode
+	const draw_renderable_input input,
+	const components::transform renderable_transform
 ) {
 	using input_type = typename renderable_type::drawing_input;
-	
-	auto in = input_type(output);
 
-	in.camera = camera;
+	auto in = input_type(input.drawer);
+
+	in.camera = input.camera;
+	in.use_neon_map = true;
 
 	in.renderable_transform = renderable_transform;
-	in.set_global_time_seconds(global_time_seconds);
-	in.use_neon_map = renderable_drawing_mode == renderable_drawing_type::NEON_MAPS;
+	in.set_global_time_seconds(input.global_time_seconds);
 
-	if (renderable_drawing_mode == renderable_drawing_type::BORDER_HIGHLIGHTS) {
-		if (render.draw_border) {
-			static const vec2i offsets[4] = {
-				vec2i(-1, 0), vec2i(1, 0), vec2i(0, 1), vec2i(0, -1)
-			};
+	renderable.draw(input.manager, in);
+}
 
-			in.colorize = render.border_color;
+template <class renderable_type>
+FORCE_INLINE void draw_border(
+	const renderable_type& renderable,
+	const draw_renderable_input input,
+	const components::transform renderable_transform,
+	const rgba border_color
+) {
+	using input_type = typename renderable_type::drawing_input;
 
-			for (const auto o : offsets) {
-				in.renderable_transform.pos = renderable_transform.pos + o;
-				renderable.draw(manager, in);
-			}
-		}
+	auto in = input_type(input.drawer);
+
+	in.camera = input.camera;
+
+	in.renderable_transform = renderable_transform;
+	in.set_global_time_seconds(input.global_time_seconds);
+
+	static const vec2i offsets[4] = {
+		vec2i(-1, 0), vec2i(1, 0), vec2i(0, 1), vec2i(0, -1)
+	};
+	
+	in.colorize = border_color;
+
+	for (const auto o : offsets) {
+		in.renderable_transform.pos = renderable_transform.pos + o;
+		renderable.draw(input.manager, in);
 	}
-	else {
-		renderable.draw(manager, in);
+}
+
+template <class F>
+FORCE_INLINE void for_each_renderable_component(const const_entity_handle h, F callback) {
+	if (const auto renderable = h.find<components::sprite>()) {
+		callback(*renderable);
+	}
+
+	if (const auto renderable = h.find<components::polygon>()) {
+		callback(*renderable);
+	}
+}
+
+FORCE_INLINE void draw_entity(
+	const const_entity_handle e,
+	const draw_renderable_input in,
+	const interpolation_system& interp
+) {
+	for_each_renderable_component(e, [&](const auto& r) {
+		draw_renderable(r, in, e.get_viewing_transform(interp, true));
+	});
+}
+
+FORCE_INLINE void draw_neon_map(
+	const const_entity_handle e,
+	const draw_renderable_input in,
+	const interpolation_system& interp
+) {
+	for_each_renderable_component(e, [&](const auto& r) {
+		draw_neon_map(r, in, e.get_viewing_transform(interp, true));
+	});
+}
+
+template <class border_provider>
+FORCE_INLINE void draw_border(
+	const const_entity_handle e,
+	const draw_renderable_input in,
+	const interpolation_system& interp,
+	const border_provider& borders
+) {
+	const auto border_info = borders(e);
+
+	if (border_info) {
+		for_each_renderable_component(e, [&](const auto& r) {
+			draw_border(r, in, e.get_viewing_transform(interp, true), *border_info);
+		});
 	}
 }

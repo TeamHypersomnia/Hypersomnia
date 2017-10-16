@@ -25,4 +25,25 @@ namespace components {
 
 		return augs::interp(health_col, pulse_target, pulse_redness_multiplier);
 	}
+	
+	std::optional<rgba> sentience::get_low_health_border(const unsigned timestamp_ms) const {
+		if (is_conscious()) {
+			const auto& health = get<health_meter_instance>();
+			auto hr = health.get_ratio();
+			const auto one_less_hr = 1.f - hr;
+
+			const auto pulse_duration = static_cast<int>(1250 - 1000 * (1 - hr));
+			const auto time_pulse_ratio = (timestamp_ms % pulse_duration) / static_cast<float>(pulse_duration);
+
+			hr *= 1.f - (0.2f * time_pulse_ratio);
+
+			if (hr < 1.f) {
+				const auto alpha_multiplier = one_less_hr * one_less_hr * one_less_hr * one_less_hr * time_pulse_ratio;
+
+				return { { 255, 0, 0, static_cast<rgba_channel>(255 * alpha_multiplier) } };
+			}
+		}
+
+		return std::nullopt;
+	}
 }

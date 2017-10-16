@@ -11,10 +11,6 @@ namespace components {
 	struct render {
 		// GEN INTROSPECTOR struct components::render
 		render_layer layer = render_layer::INVALID;
-		bool draw_border = false;
-		pad_bytes<2> pad;
-
-		rgba border_color;
 		// END GEN INTROSPECTOR
 	};
 }

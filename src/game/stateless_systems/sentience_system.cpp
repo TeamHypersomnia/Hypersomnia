@@ -460,45 +460,6 @@ void sentience_system::cooldown_aimpunches(const logic_step step) const {
 	);
 }
 
-void sentience_system::set_borders(const logic_step step) const {
-	const auto timestamp_ms = static_cast<int>(step.cosm.get_total_seconds_passed() * 1000.0);
-	
-	step.cosm.for_each(
-		processing_subjects::WITH_SENTIENCE,
-		[&](const auto t) {
-			const auto& sentience = t.get<components::sentience>();
-
-			auto* const render = t.find<components::render>();
-
-			if (render != nullptr) {
-				if (sentience.is_conscious()) {
-					const auto& health = sentience.get<health_meter_instance>();
-					auto hr = health.get_ratio();
-					const auto one_less_hr = 1.f - hr;
-
-					const auto pulse_duration = static_cast<int>(1250 - 1000 * (1 - hr));
-					const auto time_pulse_ratio = (timestamp_ms % pulse_duration) / static_cast<float>(pulse_duration);
-
-					hr *= 1.f - (0.2f * time_pulse_ratio);
-
-					if (hr < 1.f) {
-						render->draw_border = true;
-
-						const auto alpha_multiplier = one_less_hr * one_less_hr * one_less_hr * one_less_hr * time_pulse_ratio;
-
-						render->border_color = rgba(255, 0, 0, static_cast<rgba_channel>(255 * alpha_multiplier));
-					}
-					else {
-						render->draw_border = false;
-					}
-				}
-				else {
-					render->draw_border = false;
-				}
-			}
-		}
-	);
-}
 /*
 
 #include <catch.hpp>

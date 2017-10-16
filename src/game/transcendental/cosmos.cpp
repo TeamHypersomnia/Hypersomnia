@@ -438,7 +438,6 @@ void cosmos::advance_and_queue_destructions(const logic_step step) {
 	sentience_system().apply_damage_and_generate_health_events(step);
 	inferential.get<physics_system>().post_and_clear_accumulated_collision_messages(step);
 	sentience_system().cooldown_aimpunches(step);
-	sentience_system().set_borders(step);
 
 	driver_system().release_drivers_due_to_requests(step);
 	driver_system().assign_drivers_who_touch_wheels(step);

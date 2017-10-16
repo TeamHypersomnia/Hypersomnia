@@ -95,12 +95,16 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 	light_shader.set_projection(projection_matrix);
 
-	auto draw_layer = [&](const render_layer r, const renderable_drawing_type type = renderable_drawing_type::NEON_MAPS) {
-		for (const auto a : visible_per_layer[r]) {
-			ensure(cosmos[a].alive());
+	auto draw_layer = [&](const render_layer r) {
+		for (const auto e : visible_per_layer[r]) {
+			draw_entity(cosmos[e], { output, in.game_images, in.camera, global_time_seconds }, in.interpolation);
 		}
-
-		draw_entities(visible_per_layer[r], cosmos, output, in.game_images, in.camera, global_time_seconds, in.interpolation, type);
+	};
+	
+	auto draw_neons = [&](const render_layer r) {
+		for (const auto e : visible_per_layer[r]) {
+			draw_neon_map(cosmos[e], { output, in.game_images, in.camera, global_time_seconds }, in.interpolation);
+		}
 	};
 
 	cosmos.for_each(
@@ -225,7 +229,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 			light.color.rgb()
 		);
 		
-		draw_layer(render_layer::DYNAMIC_BODY, renderable_drawing_type::NORMAL);
+		draw_layer(render_layer::DYNAMIC_BODY);
 
 		renderer.call_triangles();
 		renderer.clear_triangles();
@@ -238,13 +242,13 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 	standard_shader.set_as_current();
 
-	draw_layer(render_layer::DYNAMIC_BODY);
-	draw_layer(render_layer::SMALL_DYNAMIC_BODY);
-	draw_layer(render_layer::FLYING_BULLETS);
-	draw_layer(render_layer::CAR_INTERIOR);
-	draw_layer(render_layer::CAR_WHEEL);
-	draw_layer(render_layer::NEON_CAPTIONS);
-	draw_layer(render_layer::ON_GROUND);
+	draw_neons(render_layer::DYNAMIC_BODY);
+	draw_neons(render_layer::SMALL_DYNAMIC_BODY);
+	draw_neons(render_layer::FLYING_BULLETS);
+	draw_neons(render_layer::CAR_INTERIOR);
+	draw_neons(render_layer::CAR_WHEEL);
+	draw_neons(render_layer::NEON_CAPTIONS);
+	draw_neons(render_layer::ON_GROUND);
 
 	{
 		components::sprite::drawing_input basic(output);

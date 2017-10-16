@@ -39,6 +39,8 @@ struct illuminated_rendering_input {
 	const illuminated_rendering_fbos& fbos;
 	const illuminated_rendering_shaders& shaders;
 	const camera_cone camera;
+
+	const std::unordered_map<entity_id, rgba>& additional_borders;
 };
 
 void illuminated_rendering(const illuminated_rendering_input);
