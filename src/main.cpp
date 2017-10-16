@@ -1349,11 +1349,10 @@ catch (const augs::unit_test_session_error err) {
 
 	return EXIT_FAILURE;
 }
+/* We want the debugger to break if it is not in production */
+#if IS_PRODUCTION_BUILD
 catch (...) {
 	LOG("Unknown exception.");
-#if IS_PRODUCTION_BUILD
 	return EXIT_FAILURE;
-#else
-	throw;
-#endif
 }
+#endif

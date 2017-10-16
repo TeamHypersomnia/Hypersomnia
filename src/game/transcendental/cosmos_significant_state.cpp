@@ -12,7 +12,7 @@ void cosmos_significant_state::clear() {
 	*this = cosmos_significant_state();
 }
 
-#if !(ENTITY_TRACKS_NAME_FOR_DEBUG && STATICALLY_ALLOCATE_ENTITIES_NUM)
+#if !(DEBUG_TRACK_ENTITY_NAME && STATICALLY_ALLOCATE_ENTITIES_NUM)
 std::size_t cosmos_significant_state::get_first_mismatch_pos(const cosmos_significant_state& second) const {
 	/*
 		Notice that the comparison is performed by byte-wise serialization.
@@ -27,7 +27,7 @@ std::size_t cosmos_significant_state::get_first_mismatch_pos(const cosmos_signif
 		despite pointing to the same entities logically.
 	*/
 
-#if ENTITY_TRACKS_NAME_FOR_DEBUG
+#if DEBUG_TRACK_ENTITY_NAME
 	auto a = *this;
 	auto b = second;
 

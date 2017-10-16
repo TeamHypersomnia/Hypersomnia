@@ -1,4 +1,4 @@
-#include "augs/build_settings/setting_entity_tracks_name_for_debug.h"
+#include "augs/build_settings/setting_debug_track_entity_name.h"
 
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
@@ -55,7 +55,7 @@ void component_synchronizer<false, N>::set_name(const entity_name_type& full_nam
 		handle
 	);
 
-#if ENTITY_TRACKS_NAME_FOR_DEBUG
+#if DEBUG_TRACK_ENTITY_NAME
 	const auto* new_name = &get_name();
 	auto& debug_name = handle.get().debug_name;
 	debug_name = new_name;
@@ -69,7 +69,7 @@ void component_synchronizer<false, N>::set_name_id(const entity_name_id id) cons
 		handle
 	);
 
-#if ENTITY_TRACKS_NAME_FOR_DEBUG
+#if DEBUG_TRACK_ENTITY_NAME
 	const auto* new_name = &get_name();
 	auto& debug_name = handle.get().debug_name;
 	debug_name = new_name;

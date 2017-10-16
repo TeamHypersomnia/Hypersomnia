@@ -256,7 +256,7 @@ public:
 	}
 
 	/* TODO: Make comparisons somehow work with debug name pointers */
-#if !(ENTITY_TRACKS_NAME_FOR_DEBUG && STATICALLY_ALLOCATE_ENTITIES_NUM)
+#if !(DEBUG_TRACK_ENTITY_NAME && STATICALLY_ALLOCATE_ENTITIES_NUM)
 	bool operator==(const cosmos&) const;
 	bool operator!=(const cosmos&) const;
 #endif

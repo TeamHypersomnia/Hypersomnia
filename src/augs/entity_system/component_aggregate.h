@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/build_settings/setting_entity_tracks_name_for_debug.h"
+#include "augs/build_settings/setting_debug_track_entity_name.h"
 #include "augs/misc/trivially_copyable_tuple.h"
 #include "augs/templates/type_matching_and_indexing.h"
 #include "augs/templates/transform_types.h"
@@ -33,7 +33,7 @@ namespace augs {
 		// GEN INTROSPECTOR class augs::component_aggregate template<class>class make_pool_id class... components
 		fundamental_components_tuple fundamentals;
 		dynamic_component_id_tuple component_ids;
-#if ENTITY_TRACKS_NAME_FOR_DEBUG
+#if DEBUG_TRACK_ENTITY_NAME
 		const std::wstring* debug_name = nullptr;
 #else
 		pad_bytes<sizeof(const std::wstring*)> for_release_debug_compatibility;

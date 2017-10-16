@@ -5,7 +5,7 @@ class cosmos;
 #include "game/transcendental/step_declaration.h"
 
 class driver_system {
-	bool change_car_ownership(entity_handle driver, entity_handle car, bool lost);
+	bool change_car_ownership(entity_handle driver, entity_handle car);
 public:
 	bool release_car_ownership(entity_handle driver);
 	bool assign_car_ownership(entity_handle driver, entity_handle car);

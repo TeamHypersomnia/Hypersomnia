@@ -98,17 +98,16 @@ void driver_system::release_drivers_due_to_requests(const logic_step step) {
 }
 
 bool driver_system::release_car_ownership(const entity_handle driver) {
-	return change_car_ownership(driver, driver.get_cosmos()[entity_id()], true);
+	return change_car_ownership(driver, driver.get_cosmos()[entity_id()]);
 }
 
 bool driver_system::assign_car_ownership(const entity_handle driver, const entity_handle car) {
-	return change_car_ownership(driver, car, false);
+	return change_car_ownership(driver, car);
 }
 
 bool driver_system::change_car_ownership(
 	const entity_handle driver_entity, 
-	const entity_handle car_entity, 
-	const bool lost_ownership
+	const entity_handle car_entity
 ) {
 	auto& driver = driver_entity.get<components::driver>();
 	auto& cosmos = driver_entity.get_cosmos();
@@ -120,19 +119,19 @@ bool driver_system::change_car_ownership(
 	auto* const maybe_movement = driver_entity.find<components::movement>();
 	auto force_joint = driver_entity.get<components::motor_joint>().get_raw_component();
 
-	if (!lost_ownership) {
+	if (const bool new_ownership = car_entity.alive()) {
 		auto& car = car_entity.get<components::car>();
-		
+
 		if (cosmos[car.current_driver].alive()) {
 			return false;
 		}
 
 		// reset the input flag so it is necessary to press the key again
 		driver.take_hold_of_wheel_when_touched = false;
-		
+
 		driver.owned_vehicle = car_entity;
 		car.current_driver = driver_entity;
-		
+
 		car.last_turned_on = cosmos.get_timestamp();
 
 		force_joint.target_bodies[0] = driver_entity;
@@ -158,8 +157,11 @@ bool driver_system::change_car_ownership(
 			resolve_density_of_associated_fixtures(driver_entity);
 		}
 	}
-	else {
-		auto& car = cosmos[driver.owned_vehicle].get<components::car>();
+	else if (
+		const auto owned_vehicle = cosmos[driver.owned_vehicle];
+		owned_vehicle.alive()
+	) {
+		auto& car = owned_vehicle.get<components::car>();
 
 		car.last_turned_off = cosmos.get_timestamp();
 

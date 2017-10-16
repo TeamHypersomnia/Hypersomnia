@@ -102,7 +102,7 @@ cosmos::cosmos(const cosmic_pool_size_type reserved_entities) {
 }
 
 /* TODO: Make comparisons somehow work with debug name pointers */
-#if !(ENTITY_TRACKS_NAME_FOR_DEBUG && STATICALLY_ALLOCATE_ENTITIES_NUM)
+#if !(DEBUG_TRACK_ENTITY_NAME && STATICALLY_ALLOCATE_ENTITIES_NUM)
 bool cosmos::operator==(const cosmos& b) const {
 	return significant == b.significant;
 }
