@@ -135,6 +135,8 @@ struct basic_vec2 {
 	type y;
 	// END GEN INTROSPECTOR
 
+	static basic_vec2 zero;
+
 	template <class B> friend std::ostream& operator<<(std::ostream& out, const basic_vec2<B>& x);
 	template <class B> friend std::istream& operator>>(std::istream& out, basic_vec2<B>& x);
 
@@ -452,6 +454,16 @@ struct basic_vec2 {
 		return *this;
 	}
 
+	basic_vec2& negate_x() {
+		x = -x;
+		return *this;
+	}
+
+	basic_vec2& negate_y() {
+		y = -y;
+		return *this;
+	}
+
 	template <class = std::enable_if_t<std::is_floating_point_v<type>>>
 	bool x_non_zero(const real eps = AUGS_EPSILON<real>) const {
 		return std::abs(x) > eps;
@@ -576,6 +588,9 @@ template <class type> inline basic_vec2<type> operator+(const unsigned d, const 
 template <class type> inline basic_vec2<type> operator*(const unsigned d, const basic_vec2<type> t) { return { t.x * static_cast<type>(d), t.y * static_cast<type>(d) }; }
 template <class type> inline basic_vec2<type> operator/(const unsigned d, const basic_vec2<type> t) { return { t.x / static_cast<type>(d), t.y / static_cast<type>(d) }; }
 
+template <class type>
+basic_vec2<type> basic_vec2<type>::zero = { static_cast<type>(0), static_cast<type>(0) };
+
 namespace std {
 	template <class T>
 	struct hash<basic_vec2<T>> {
@@ -584,7 +599,6 @@ namespace std {
 		}
 	};
 }
-
 
 namespace augs {
 	template<class T>
