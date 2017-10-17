@@ -33,13 +33,13 @@ namespace augs {
 				ensure(false); 
 			} 
 		};
+		
+		const auto utils_path = "scripts/utils.lua";
+		const auto pfr = lua.do_file(utils_path);
 
-		if (
-			const auto utils_path = "scripts/utils.lua";
-			!lua.do_file(utils_path).valid()
-		) {
+		if (!pfr.valid()) {
 			throw lua_state_creation_error(
-				"Failed to build %x", utils_path
+				"Failed to build %x:\n%x", utils_path, pfr.operator std::string()
 			);
 		}
 

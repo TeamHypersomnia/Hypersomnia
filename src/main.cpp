@@ -195,6 +195,8 @@ int work(const int argc, const char* const * const argv) try {
 	static std::optional<augs::graphics::texture> game_world_atlas;
 
 	static audiovisual_state audiovisuals;
+
+	/* TODO: We need to have one game gui per cosmos. */
 	static auto game_gui = game_gui_system();
 
 	/*
@@ -589,15 +591,12 @@ int work(const int argc, const char* const * const argv) try {
 			audiovisuals.clear_dead_entities(*now_sampled);
 #endif
 			audiovisuals.clear();
+
+			/* TODO: We need to have one game gui per cosmos. */
 			game_gui.clear_dead_entities(*now_sampled);
 
 			last_sampled_cosmos = now_sampled;
-			_audiovisual_step(augs::delta::zero, 0.0, viewing_config);
-
-			//const auto n = now_sampled->get_maximum_entities();
-			//
-			//audiovisuals.reserve_caches_for_entities(n);
-			//game_gui.reserve_caches_for_entities(n);
+			audiovisual_step(augs::delta::zero, 0.0, viewing_config);
 		}
 	};
 
