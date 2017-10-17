@@ -15,30 +15,36 @@ void world_camera::tick(
 	world_camera_settings settings,
 	const const_entity_handle entity_to_chase
 ) {
-	camera.visible_world_area = screen_size;
-
 	const auto& cosm = entity_to_chase.get_cosmos();
 
 	const auto enable_smoothing = settings.enable_smoothing;
 	const auto angled_look_length = settings.angled_look_length;
 	const auto average_factor = settings.smoothing.average_factor;
 	const auto averages_per_sec = settings.smoothing.averages_per_sec;
+	
+	const auto target_cone = [&]() {
+		auto cone = camera_cone();
 
-	/* we obtain transform as a copy because we'll be now offsetting it by crosshair position */
-	if (entity_to_chase.alive()) {
-		camera.transform = entity_to_chase.get_viewing_transform(interp);
-		camera.transform.rotation = 0;
-	}
+		cone.visible_world_area = screen_size;
 
-	camera.transform.pos = vec2i(camera.transform.pos);
+		/* we obtain transform as a copy because we'll be now offsetting it by crosshair position */
+		if (entity_to_chase.alive()) {
+			cone.transform = entity_to_chase.get_viewing_transform(interp);
+			cone.transform.rotation = 0;
+		}
+
+		cone.transform.pos = vec2i(cone.transform.pos);
+
+		return cone;
+	}();
 
 	const vec2i camera_crosshair_offset = get_camera_offset_due_to_character_crosshair(entity_to_chase, settings);
 
-	smoothed_camera = camera;
-	smoothed_camera.transform.pos += camera_crosshair_offset;
+	current_cone = target_cone;
+	current_cone.transform.pos += camera_crosshair_offset;
 
 	if (enable_smoothing) {
-		/* variable time step camera smoothing by averaging last position with the current */
+		/* variable time step target_cone smoothing by averaging last position with the current */
 		float averaging_constant = 1.0f - static_cast<float>(pow(average_factor, averages_per_sec * dt.in_seconds()));
 
 		if (dont_smooth_once)
@@ -47,18 +53,18 @@ void world_camera::tick(
 		//if ((transform.pos - last_interpolant).length() < 2.0) last_interpolant = transform.pos;
 		//else
 
-		const vec2i target = camera.transform.pos + camera_crosshair_offset;
+		const vec2i target_pos = target_cone.transform.pos + camera_crosshair_offset;
 		const vec2i smoothed_part = camera_crosshair_offset;
 
 		last_interpolant.pos = augs::interp(vec2d(last_interpolant.pos), vec2d(smoothed_part), averaging_constant);
-		last_interpolant.rotation = augs::interp(last_interpolant.rotation, camera.transform.rotation, averaging_constant);
+		last_interpolant.rotation = augs::interp(last_interpolant.rotation, target_cone.transform.rotation, averaging_constant);
 
-		last_ortho_interpolant.x = camera.visible_world_area.x; //augs::interp(last_ortho_interpolant.x, visible_world_area.x, averaging_constant);
-		last_ortho_interpolant.y = camera.visible_world_area.y; //augs::interp(last_ortho_interpolant.y, visible_world_area.y, averaging_constant);
+		last_ortho_interpolant.x = target_cone.visible_world_area.x; //augs::interp(last_ortho_interpolant.x, visible_world_area.x, averaging_constant);
+		last_ortho_interpolant.y = target_cone.visible_world_area.y; //augs::interp(last_ortho_interpolant.y, visible_world_area.y, averaging_constant);
 
 																	   /* save smoothing result */
 																	   //if ((smoothed_camera_transform.pos - last_interpolant.pos).length() > 5)
-		const vec2 calculated_smoothed_pos = static_cast<vec2>(target - smoothed_part) + last_interpolant.pos;
+		const vec2 calculated_smoothed_pos = static_cast<vec2>(target_pos - smoothed_part) + last_interpolant.pos;
 		const int calculated_smoothed_rotation = static_cast<int>(last_interpolant.rotation);
 
 		//if (vec2i(calculated_smoothed_pos) == vec2i(smoothed_camera_transform.pos))
@@ -66,19 +72,19 @@ void world_camera::tick(
 		//if (int(calculated_smoothed_rotation) == int(smoothed_camera_transform.rotation))
 		//	last_interpolant.rotation = smoothed_camera_transform.rotation;
 
-		if (calculated_smoothed_pos.compare_abs(smoothed_camera.transform.pos, 1.f)) {
+		if (calculated_smoothed_pos.compare_abs(current_cone.transform.pos, 1.f)) {
 			last_interpolant.pos = smoothed_part;
 		}
-		if (std::abs(calculated_smoothed_rotation - smoothed_camera.transform.rotation) < 1.f) {
-			last_interpolant.rotation = smoothed_camera.transform.rotation;
+		if (std::abs(calculated_smoothed_rotation - current_cone.transform.rotation) < 1.f) {
+			last_interpolant.rotation = current_cone.transform.rotation;
 		}
 
-		smoothed_camera.transform.pos = calculated_smoothed_pos;
-		smoothed_camera.transform.rotation = static_cast<float>(calculated_smoothed_rotation);
+		current_cone.transform.pos = calculated_smoothed_pos;
+		current_cone.transform.rotation = static_cast<float>(calculated_smoothed_rotation);
 
 		//additional_position_smoothing
 
-		smoothed_camera.visible_world_area = last_ortho_interpolant;
+		current_cone.visible_world_area = last_ortho_interpolant;
 	}
 
 	if (entity_to_chase.alive()) {
@@ -124,13 +130,13 @@ void world_camera::tick(
 	}
 
 	if (enable_smoothing) {
-		smoothed_camera.transform.pos = vec2i(smoothed_camera.transform.pos + additional_position_smoothing.value);
+		current_cone.transform.pos = vec2i(current_cone.transform.pos + additional_position_smoothing.value);
 	}
 	else {
-		smoothed_camera.transform.pos = vec2i(smoothed_camera.transform.pos);
+		current_cone.transform.pos = vec2i(current_cone.transform.pos);
 	}
 
-	smoothed_camera.visible_world_area = vec2i(smoothed_camera.visible_world_area);
+	current_cone.visible_world_area = vec2i(current_cone.visible_world_area);
 
 	dont_smooth_once = false;
 }
@@ -159,7 +165,7 @@ vec2i world_camera::get_camera_offset_due_to_character_crosshair(
 				if (crosshair.orbit_mode == crosshair.LOOK) {
 					/* simple proportion */
 					camera_crosshair_offset /= crosshair.base_offset_bound;
-					camera_crosshair_offset *= camera.visible_world_area * settings.look_bound_expand;
+					camera_crosshair_offset *= current_cone.visible_world_area * settings.look_bound_expand;
 				}
 			}
 		}

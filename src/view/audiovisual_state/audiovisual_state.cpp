@@ -73,7 +73,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 		auto scope = measure_scope(profiler.particle_logic);
 
 		particles.advance_visible_streams_and_all_particles(
-			camera.smoothed_camera,
+			camera.get_current_cone(),
 			cosm,
 			input.particle_effects,
 			dt,
@@ -101,7 +101,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 	if (viewed_character.alive()) {
 		auto scope = measure_scope(profiler.sound_logic);
 
-		auto listener_cone = camera.smoothed_camera;
+		auto listener_cone = camera.get_current_cone();
 		listener_cone.transform = viewed_character.get_viewing_transform(interp);
 		
 		sounds.track_new_sound_existences_near_camera(

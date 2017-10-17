@@ -410,7 +410,13 @@ int work(const int argc, const char* const * const argv) try {
 		return viewed_cosmos[viewed_character_id];
 	};
 
-	static auto get_camera = []() {
+	static auto get_camera = []() {		
+		audiovisuals.camera.panning = visit_current_setup(
+			[](const auto& setup) { 
+				return setup.get_camera_panning(); 
+			}
+		);
+		
 		return audiovisuals.get_viewing_camera();
 	};
 

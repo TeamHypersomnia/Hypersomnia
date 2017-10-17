@@ -17,6 +17,10 @@
 
 #include "generated/introspectors.h"
 
+editor_tab::editor_tab(std::size_t horizontal_index) 
+	: horizontal_index(horizontal_index) 
+{}
+
 std::string editor_tab::get_display_path()  const {
 	if (untitled_index) {
 		return typesafe_sprintf("Workspace-%x.wp", *untitled_index);
@@ -36,7 +40,10 @@ void editor_tab::set_workspace_path(const path_operation op) {
 	op.recent.add(op.lua, op.path);
 }
 
-editor_tab::editor_tab(std::size_t horizontal_index) : horizontal_index(horizontal_index) {}
+void editor_tab::set_locally_viewed(const entity_id id) {
+	work.locally_viewed = id;
+	panning = {};
+}
 
 std::optional<editor_popup> editor_tab::open_workspace(const path_operation op) {
 	if (op.path.empty()) {
@@ -479,7 +486,7 @@ void editor_setup::perform_custom_imgui(
 
 					if (auto node = scoped_tree_node(name.c_str())) {
 						if (ImGui::Button("Control")) {
-							tab().work.locally_viewed = id;
+							tab().set_locally_viewed(id);
 						}
 					}
 				}
@@ -806,11 +813,17 @@ bool editor_setup::handle_unfetched_window_input(
 	using namespace augs::event;
 	using namespace augs::event::keys;
 
-	if (e.msg == message::mousemotion) {
-		return true;
-	}
-
 	if (player_paused) {
+		if (e.msg == message::mousemotion) {
+			if (common_input_state.is_set(key::RMOUSE)) {
+				if (has_tabs()) {
+					tab().panning -= e.mouse.rel;
+
+					return true;
+				}
+			}
+		}
+
 		if (e.was_any_key_pressed()) {
 			const auto k = e.key.key;
 

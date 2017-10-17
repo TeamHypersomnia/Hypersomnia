@@ -59,6 +59,10 @@ struct editor_tab {
 	augs::path_type current_path;
 	std::size_t horizontal_index;
 	std::optional<std::size_t> untitled_index;
+	
+	vec2 panning;
+
+	void set_locally_viewed(const entity_id);
 
 	struct path_operation {
 		sol::state& lua;
@@ -291,4 +295,8 @@ public:
 
 	void go_to_all();
 	void open_containing_folder();
+
+	auto get_camera_panning() const {
+		return has_tabs() ? tab().panning : vec2::zero;
+	}
 };

@@ -23,18 +23,24 @@ struct world_camera_settings {
 };
 
 struct world_camera {
-	camera_cone camera;
-	camera_cone smoothed_camera;
+	vec2 panning;
 
 	bool dont_smooth_once = false;
 
 	components::transform last_interpolant;
+
 	vec2 last_ortho_interpolant;
 
 	vec2 player_position_previously_seen;
 	vec2 player_position_at_previous_step;
 
 	augs::smooth_value_field additional_position_smoothing;
+
+	auto get_current_cone() const {
+		auto cone = current_cone;
+		cone.transform.pos += panning;
+		return cone;
+	}
 
 	void tick(
 		const vec2i screen_size,
@@ -48,4 +54,7 @@ struct world_camera {
 		const const_entity_handle,
 		const world_camera_settings
 	) const;
+
+private:
+	camera_cone current_cone;
 };

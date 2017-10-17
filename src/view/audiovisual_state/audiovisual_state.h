@@ -65,7 +65,7 @@ struct audiovisual_state {
 	}
 
 	auto get_viewing_camera() const {
-		return camera.smoothed_camera;
+		return camera.get_current_cone();
 	}
 
 	void advance(const audiovisual_advance_input);

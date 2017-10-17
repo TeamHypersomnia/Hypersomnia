@@ -99,4 +99,8 @@ public:
 
 	void control(const cosmic_entropy&);
 	void accept_game_gui_events(const cosmic_entropy&);
+
+	auto get_camera_panning() const {
+		return vec2::zero;
+	}
 };
