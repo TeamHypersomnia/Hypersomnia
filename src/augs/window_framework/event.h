@@ -240,6 +240,8 @@ namespace augs {
 				bool was_pressed(const keys::key) const;
 				bool was_released(const keys::key) const;
 
+				bool is_shortcut_key() const;
+
 				bool is_exit_message() const;
 
 				friend std::ostream& operator<<(std::ostream& out, const change& x);

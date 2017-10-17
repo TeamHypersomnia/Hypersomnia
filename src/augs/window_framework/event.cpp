@@ -103,7 +103,27 @@ namespace augs {
 				|| (msg == message::syskeydown && key.key == keys::key::F4)
 			;
 		}
-		
+
+		bool change::is_shortcut_key() const {
+			if (get_key_change() != key_change::NO_CHANGE) {
+				/* Let shortcut keys propagate */
+				switch (key.key) {
+					case keys::key::LCTRL: return true;
+					case keys::key::LALT: return true;
+					case keys::key::LSHIFT: return true;
+					case keys::key::RCTRL: return true;
+					case keys::key::RALT: return true;
+					case keys::key::RSHIFT: return true;
+					case keys::key::CTRL: return true;
+					case keys::key::ALT: return true;
+					case keys::key::SHIFT: return true;
+					default: return false;
+				}
+			}
+
+			return false;
+		}
+
 		state& state::apply(const change& dt) {
 			const auto ch = dt.get_key_change();
 
