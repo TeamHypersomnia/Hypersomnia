@@ -165,6 +165,8 @@ class editor_setup {
 	void open_workspace(path_operation);
 	void save_workspace(path_operation);
 
+	void fill_with_test_scene(sol::state& lua);
+
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
 	static constexpr bool handles_window_input = true;

@@ -188,6 +188,14 @@ void editor_setup::save_workspace(const path_operation op) {
 	tab().save_workspace({ op.lua, recent, op.path });
 }
 
+void editor_setup::fill_with_test_scene(sol::state& lua) {
+#if BUILD_TEST_SCENES
+	if (has_tabs()) {
+		tab().work.make_test_scene(lua, false);
+	}
+#endif
+}
+
 void editor_setup::perform_custom_imgui(
 	sol::state& lua,
 	augs::window& owner,
@@ -198,11 +206,14 @@ void editor_setup::perform_custom_imgui(
 	auto in_path = [&](const auto& path) {
 		return path_operation{ lua, path };
 	};
-	
-	auto item_if_tabs = [this](const char* label, const char* shortcut = nullptr) {
-		return ImGui::MenuItem(label, shortcut, nullptr, has_tabs());
+
+	auto item_if_tabs_and = [this](const bool condition, const char* label, const char* shortcut = nullptr) {
+		return ImGui::MenuItem(label, shortcut, nullptr, condition && has_tabs());
 	};
 
+	auto item_if_tabs = [&](const char* label, const char* shortcut = nullptr) {
+		return item_if_tabs_and(true, label, shortcut);
+	};
 
 	if (!in_direct_gameplay) {
 		if (auto main_menu = scoped_main_menu_bar()) {
@@ -278,13 +289,9 @@ void editor_setup::perform_custom_imgui(
 				if (item_if_tabs("Paste", "CTRL+V")) {}
 				ImGui::Separator();
 
-#if	BUILD_TEST_SCENES
-				if (item_if_tabs("Fill with test scene")) {
-					tab().work.make_test_scene(lua, false);
+				if (item_if_tabs_and(BUILD_TEST_SCENES, "Fill with test scene", "SHIFT+F5")) {
+					fill_with_test_scene(lua);
 				}
-#else
-				if (ImGui::MenuItem("Fill with test scene", nullptr, false, false)) {}
-#endif
 			}
 			if (auto menu = scoped_menu("View")) {
 				if (item_if_tabs("Summary")) {
@@ -748,13 +755,11 @@ bool editor_setup::handle_window_input(
 		}
 
 		if (player_paused) {
-			const auto has_ctrl = common_input_state.is_set(key::LCTRL);
+			const bool has_ctrl{ common_input_state.is_set(key::LCTRL) };
+			const bool has_shift{ common_input_state.is_set(key::LSHIFT) };
 
 			if (has_ctrl) {
-				if (
-					const auto has_shift = common_input_state.is_set(key::LSHIFT);
-					has_shift
-				) {
+				if (has_shift) {
 					switch (k) {
 						case key::Z: redo(); return true;
 						case key::E: open_containing_folder(); return true;
@@ -775,6 +780,12 @@ bool editor_setup::handle_window_input(
 					case key::W: close_tab(); return true;
 					case key::TAB: next_tab(); return true;
 					default: break;
+				}
+			}
+
+			if (has_shift) {
+				switch (k) {
+					case key::F5: fill_with_test_scene(lua); return true;
 				}
 			}
 
