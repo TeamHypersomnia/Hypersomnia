@@ -36,6 +36,7 @@ struct basic_cosmic_entropy {
 
 	basic_cosmic_entropy& operator+=(const basic_cosmic_entropy& b);
 
+	void clear_dead_entities(const cosmos&);
 	void clear();
 };
 
