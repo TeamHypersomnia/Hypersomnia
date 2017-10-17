@@ -138,10 +138,10 @@ namespace augs {
 			template <class C>
 			auto consume_raw_input_and_generate_gui_events(
 				const C context,
-				const event::change new_state
+				const event::change event
 			) {
 				gui_entropy entropy;
-				consume_raw_input_and_generate_gui_events(context, new_state, entropy);
+				consume_raw_input_and_generate_gui_events(context, event, entropy);
 				return entropy;
 			}
 
@@ -296,7 +296,7 @@ namespace augs {
 				const C context, 
 				const gui_entropy& entropies
 			) {
-				if (entropies.entries.empty()) {
+				if (entropies.empty()) {
 					return;
 				}
 

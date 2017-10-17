@@ -31,10 +31,12 @@ void release_flags::append_releases(
 ) const {
 	if (keys) {
 		concatenate(into_entropy, from_state.generate_key_releasing_changes());
+		LOG("Released all keys");
 	}
 
 	if (mouse) {
 		concatenate(into_entropy, from_state.generate_mouse_releasing_changes());
+		LOG("Released mouse");
 	}
 }
 

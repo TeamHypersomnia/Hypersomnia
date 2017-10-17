@@ -45,6 +45,10 @@ namespace augs {
 			void post_event(const id_type& id, const event_info& ev) {
 				entries[id].push_back(ev);
 			}
+
+			bool empty() const {
+				return entries.empty();
+			}
 		};
 	}
 }
