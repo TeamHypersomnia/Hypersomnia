@@ -636,7 +636,7 @@ void editor_setup::pause() {
 }
 
 void editor_setup::play_pause() {
-	auto& f = player_paused;
+	bool& f = player_paused;
 	f = !f;
 }
 
@@ -736,44 +736,53 @@ bool editor_setup::handle_window_input(
 
 	if (e.was_any_key_pressed()) {
 		const auto k = e.key.key;
-		const auto has_ctrl = common_input_state.is_set(key::LCTRL);
-
-		if (has_ctrl) {
-			if (
-				const auto has_shift = common_input_state.is_set(key::LSHIFT);
-				has_shift
-			) {
-				switch (k) {
-					case key::Z: redo(); return true;
-					case key::E: open_containing_folder(); return true;
-					case key::TAB: prev_tab(); return true;
-					default: break;
-				}
-			}
-
-			switch (k) {
-				case key::S: save(lua, window); return true;
-				case key::Z: undo(); return true;
-				case key::O: open(window); return true;
-				case key::C: copy(); return true;
-				case key::X: cut(); return true;
-				case key::V: paste(); return true;
-				case key::P: go_to_all(); return true;
-				case key::N: new_tab(); return true;
-				case key::W: close_tab(); return true;
-				case key::TAB: next_tab(); return true;
-				default: break;
-			}
-		}
+		
+		/* Media buttons work regardless of pause */
 
 		switch (k) {
 			case key::PLAY_PAUSE_TRACK: play_pause(); return true;
 			case key::PREV_TRACK: prev(); return true;
 			case key::NEXT_TRACK: next(); return true;
 			case key::STOP_TRACK: stop(); return true;
-			case key::F12: save_as(window); return true;
-			case key::ENTER: confirm_modal_popup(); return true;
 			default: break;
+		}
+
+		if (player_paused) {
+			const auto has_ctrl = common_input_state.is_set(key::LCTRL);
+
+			if (has_ctrl) {
+				if (
+					const auto has_shift = common_input_state.is_set(key::LSHIFT);
+					has_shift
+				) {
+					switch (k) {
+						case key::Z: redo(); return true;
+						case key::E: open_containing_folder(); return true;
+						case key::TAB: prev_tab(); return true;
+						default: break;
+					}
+				}
+
+				switch (k) {
+					case key::S: save(lua, window); return true;
+					case key::Z: undo(); return true;
+					case key::O: open(window); return true;
+					case key::C: copy(); return true;
+					case key::X: cut(); return true;
+					case key::V: paste(); return true;
+					case key::P: go_to_all(); return true;
+					case key::N: new_tab(); return true;
+					case key::W: close_tab(); return true;
+					case key::TAB: next_tab(); return true;
+					default: break;
+				}
+			}
+
+			switch (k) {
+				case key::F12: save_as(window); return true;
+				case key::ENTER: confirm_modal_popup(); return true;
+				default: break;
+			}
 		}
 	}
 
