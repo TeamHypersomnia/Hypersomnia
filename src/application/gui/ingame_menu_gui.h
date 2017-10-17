@@ -55,6 +55,12 @@ struct ingame_menu_gui {
 				button_callback(t);
 			}
 		});
+
+		if (!gui_entropies.empty()) {
+			return true;
+		}
+
+		return false;
 	}
 
 	void advance(

@@ -56,8 +56,11 @@ namespace augs {
 			const bool filter_mouse = ImGui::GetIO().WantCaptureMouse;
 			const bool filter_keyboard = ImGui::GetIO().WantTextInput;
 
-			erase_if(local, [filter_mouse, filter_keyboard](const augs::event::change ch) {
-				if (filter_mouse && ch.msg == augs::event::message::mousemotion) {
+			using namespace augs::event;
+			using namespace keys;
+
+			erase_if(local, [filter_mouse, filter_keyboard](const change ch) {
+				if (filter_mouse && ch.msg == message::mousemotion) {
 					return true;
 				}
 
@@ -69,6 +72,10 @@ namespace augs {
 					}
 
 					if (filter_keyboard && ch.uses_keyboard()) {
+						if (ch.is_shortcut_key()) {
+							return false;
+						}
+
 						return true;
 					}
 				}

@@ -123,14 +123,14 @@ void game_gui_system::queue_transfers(const wielding_result res) {
 	}
 }
 	
-void game_gui_system::control_gui_world(
+bool game_gui_system::control_gui_world(
 	const game_gui_context context,
 	const augs::event::change change
 ) {
 	const auto root_entity = context.get_subject_entity();
 
 	if (root_entity.dead()) {
-		return;
+		return false;
 	}
 
 	const auto& cosmos = root_entity.get_cosmos();
@@ -138,8 +138,6 @@ void game_gui_system::control_gui_world(
 	auto& element = context.get_character_gui();
 
 	if (active) {
-		bool fetched = false;
-		
 		if (root_entity.has<components::item_slot_transfers>()) {
 			if (const auto held_rect = context.get_if<item_button_in_item>(world.rect_held_by_lmb)) {
 				const auto& item_entity = cosmos[held_rect.get_location().item_id];
@@ -151,7 +149,7 @@ void game_gui_system::control_gui_world(
 				) {
 					if (world.held_rect_is_dragged) {
 						pending_transfers.push_back(item_slot_transfer_request { item_entity, cosmos[inventory_slot_id()], dragged_charges });
-						fetched = true;
+						return true;
 					}
 				}
 
@@ -172,18 +170,22 @@ void game_gui_system::control_gui_world(
 			}
 		}
 
-		if (!fetched) {
-			const auto gui_events = world.consume_raw_input_and_generate_gui_events(
-				context,
-				change
-			);
+		const auto gui_events = world.consume_raw_input_and_generate_gui_events(
+			context,
+			change
+		);
 
-			world.respond_to_events(
-				context,
-				gui_events
-			);
+		world.respond_to_events(
+			context,
+			gui_events
+		);
+
+		if (!gui_events.empty()) {
+			return true;
 		}
 	}
+
+	return false;
 }
 
 void game_gui_system::control_hotbar_and_action_button(

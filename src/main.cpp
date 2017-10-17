@@ -707,6 +707,58 @@ int work(const int argc, const char* const * const argv) try {
 				window.collect_entropy(new_window_entropy);
 			}
 
+			/*
+				Top-level events, higher than IMGUI.
+			*/
+			
+			{
+				auto simulated_state = common_input_state;
+
+				erase_if(new_window_entropy, [&](const augs::event::change e) {
+					using namespace augs::event;
+					using namespace augs::event::keys;
+
+					simulated_state.apply(e);
+
+					if (e.is_exit_message()) {
+						should_quit = true;
+						return true;
+					}
+					
+					if (e.msg == message::deactivate) {
+						releases.set_all();
+						return true;
+					}
+					
+					if (e.was_pressed(key::F11)) {
+						bool& f = config.window.fullscreen;
+						f = !f;
+						return true;
+					}
+
+					if (ingame_menu.show) {
+						return false;
+					}
+					
+					/* MSVC ICE workaround */
+					auto& _simulated_state = simulated_state;
+					auto& _lua = lua;
+					auto& _window = window;
+
+					return visit_current_setup([&](auto& setup) {
+						using T = std::decay_t<decltype(setup)>;
+
+						if constexpr(T::handles_window_input) {
+							return setup.handle_top_level_window_input(
+								_simulated_state, e, _window, _lua
+							);
+						}
+
+						return false;
+					});
+				});
+			}
+
 			/* 
 				IMGUI is our top GUI whose priority precedes everything else. 
 				It will eat from the window input vector that is later passed to the game and other GUIs.	
@@ -851,132 +903,160 @@ int work(const int argc, const char* const * const argv) try {
 
 				common_input_state.apply(e);
 
-				if (e.is_exit_message()) {
-					should_quit = true;
-				}
-				else if (e.msg == message::deactivate) {
-					releases.set_all();
-				}
-				else if (e.was_pressed(key::F11)) {
-					bool& f = config.window.fullscreen;
-					f = !f;
-				}
-				else if (
+				if (
 					current_setup.has_value()
 					&& e.was_pressed(key::ESC)
 				) {
-					if (const auto not_fetched = !visit_current_setup([&](auto& setup) {
+					if (visit_current_setup([&](auto& setup) {
 						using T = std::decay_t<decltype(setup)>;
 
 						if constexpr(T::handles_escape) {
 							return setup.escape();
 						}
-						else {
-							return false;
-						}
+						
+						return false;
 					})) {
-						bool& f = ingame_menu.show;
-						f = !f;
-						releases.set_all();
+						continue;
 					}
-				}
-				else {
-					bool fetched = false;
+
+					bool& f = ingame_menu.show;
+					f = !f;
+					releases.set_all();
 					
-					if (!ingame_menu.show) {
-						/* MSVC ICE workaround */
-						auto& _common_input_state = common_input_state;
-						auto& _lua = lua;
-						auto& _window = window;
+					continue;
+				}
 
-						if (visit_current_setup([&](auto& setup) {
-							using T = std::decay_t<decltype(setup)>;
+				std::optional<intent_change> key_change;
 
-							if constexpr(T::handles_window_input) {
-								return setup.handle_window_input(_common_input_state, e, _window, _lua);
-							}
+				if (e.was_any_key_pressed()) {
+					key_change = intent_change::PRESSED;
+				}
 
-							return false;
-						})) { 
-							fetched = true;
-						}
-					}
+				if (e.was_any_key_released()) {
+					key_change = intent_change::RELEASED;
+				}
 
-					if (!fetched) {
-						std::optional<intent_change> key_change;
+				const bool was_pressed = key_change && *key_change == intent_change::PRESSED;
+				const bool was_released = key_change && *key_change == intent_change::RELEASED;
 
-						if (e.was_any_key_pressed()) {
-							key_change = intent_change::PRESSED;
-						}
-
-						if (e.was_any_key_released()) {
-							key_change = intent_change::RELEASED;
-						}
-
-						const auto viewed_character = get_viewed_character();
-
-						const bool direct_gameplay_or_game_gui =
-							viewed_character.alive()
-							&& (
-								current_setup.has_value()
-								&& !ingame_menu.show
-							)
-						;
-
-						if (key_change.has_value()) {
-							const auto key = e.key.key;
-							const bool was_pressed = *key_change == intent_change::PRESSED;
-							const bool was_released = *key_change == intent_change::RELEASED;
-
-							if (const auto it = mapped_or_nullptr(viewing_config.app_controls, key)) {
-								if (was_pressed) {
-									handle_app_intent(*it);
-								}
-							}
-							else {
-								if (direct_gameplay_or_game_gui || was_released) {
-									if (const auto it = mapped_or_nullptr(viewing_config.app_ingame_controls, key)) {
-										if (was_pressed) {
-											handle_app_ingame_intent(*it);
-										}
-									}
-									else if (const auto it = mapped_or_nullptr(viewing_config.game_gui_controls, key)) {
-										game_gui.control_hotbar_and_action_button(viewed_character, { *it, *key_change });
-									}
-									else if (const auto it = mapped_or_nullptr(viewing_config.game_controls, key)) {
-										if (
-											const bool leave_it_for_game_gui = e.uses_mouse() && game_gui.active;
-											!leave_it_for_game_gui
-										) {
-											game_intents.push_back({ *it, *key_change });
-										}
-									}
-								}
-							}
-						}
-						else {
-							if (
-								e.msg == message::mousemotion
-								&& direct_gameplay_or_game_gui
-								&& !game_gui.active
-							) {
-								game_motions.push_back({ game_motion_type::MOVE_CROSSHAIR, e.mouse.rel });
-							}
-						}
-
+				{
+					auto control_main_menu = [&]() {
 						if (main_menu.has_value() && !current_setup.has_value()) {
-							if (main_menu->gui.show || e.was_any_key_released()) {
+							if (main_menu->gui.show) {
 								main_menu->gui.control(create_menu_context(main_menu->gui), e, do_main_menu_option);
 							}
+
+							return true;
 						}
-						
-						if (ingame_menu.show || e.was_any_key_released()) {
-							ingame_menu.control(create_menu_context(ingame_menu), e, do_ingame_menu_option);
+
+						return false;
+					};
+
+					auto control_ingame_menu = [&]() {
+						if (ingame_menu.show || was_released) {
+							return ingame_menu.control(create_menu_context(ingame_menu), e, do_ingame_menu_option);
 						}
-						
-						if (direct_gameplay_or_game_gui || e.was_any_key_released()) {
-							game_gui.control_gui_world(create_game_gui_context(), e);
+
+						return false;
+					};
+					
+					if (was_released) {
+						control_main_menu();
+						control_ingame_menu();
+					}
+					else {
+						if (control_main_menu()) {
+							continue;
 						}
+
+						if (control_ingame_menu()) {
+							continue;
+						}
+					}
+				}
+
+				const auto viewed_character = get_viewed_character();
+
+				const bool direct_gameplay_or_game_gui =
+					viewed_character.alive()
+					&& (
+						current_setup.has_value()
+						&& !ingame_menu.show
+					)
+				;
+
+				if (was_pressed || was_released) {
+					const auto key = e.key.key;
+
+					if (const auto it = mapped_or_nullptr(viewing_config.app_controls, key)) {
+						if (was_pressed) {
+							handle_app_intent(*it);
+							continue;
+						}
+					}
+
+					if (direct_gameplay_or_game_gui || was_released) {
+						if (const auto it = mapped_or_nullptr(viewing_config.app_ingame_controls, key)) {
+							if (was_pressed) {
+								handle_app_ingame_intent(*it);
+								continue;
+							}
+						}
+						if (const auto it = mapped_or_nullptr(viewing_config.game_gui_controls, key)) {
+							game_gui.control_hotbar_and_action_button(viewed_character, { *it, *key_change });
+							
+							if (was_pressed) {
+								continue;
+							}
+						}
+						if (const auto it = mapped_or_nullptr(viewing_config.game_controls, key)) {
+							if (
+								const bool leave_it_for_game_gui = e.uses_mouse() && game_gui.active;
+								!leave_it_for_game_gui
+							) {
+								game_intents.push_back({ *it, *key_change });
+
+								if (was_pressed) {
+									continue;
+								}
+							}
+						}
+					}
+				}
+
+				if (
+					e.msg == message::mousemotion
+					&& direct_gameplay_or_game_gui
+					&& !game_gui.active
+				) {
+					game_motions.push_back({ game_motion_type::MOVE_CROSSHAIR, e.mouse.rel });
+					continue;
+				}
+
+				if (direct_gameplay_or_game_gui || was_released) {
+					if (game_gui.control_gui_world(create_game_gui_context(), e)) {
+						continue;
+					}
+				}
+
+				{
+					/* MSVC ICE workaround */
+					auto& _common_input_state = common_input_state;
+					auto& _lua = lua;
+					auto& _window = window;
+
+					if (visit_current_setup([&](auto& setup) {
+						using T = std::decay_t<decltype(setup)>;
+
+						if constexpr(T::handles_window_input) {
+							return setup.handle_unfetched_window_input(
+								_common_input_state, e, _window, _lua
+							);
+						}
+
+						return false;
+					})) {
+						continue;
 					}
 				}
 			}

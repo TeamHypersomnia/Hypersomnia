@@ -71,7 +71,7 @@ public:
 	item_button& get_item_button(const entity_id);
 	const item_button& get_item_button(const entity_id) const;
 
-	void control_gui_world(
+	bool control_gui_world(
 		const game_gui_context context,
 		const augs::event::change change
 	);

@@ -732,7 +732,7 @@ void editor_setup::close_tab() {
 	}
 }
 
-bool editor_setup::handle_window_input(
+bool editor_setup::handle_top_level_window_input(
 	const augs::event::state& common_input_state,
 	const augs::event::change e,
 
@@ -761,7 +761,6 @@ bool editor_setup::handle_window_input(
 			if (has_ctrl) {
 				if (has_shift) {
 					switch (k) {
-						case key::Z: redo(); return true;
 						case key::E: open_containing_folder(); return true;
 						case key::TAB: prev_tab(); return true;
 						default: break;
@@ -770,11 +769,7 @@ bool editor_setup::handle_window_input(
 
 				switch (k) {
 					case key::S: save(lua, window); return true;
-					case key::Z: undo(); return true;
 					case key::O: open(window); return true;
-					case key::C: copy(); return true;
-					case key::X: cut(); return true;
-					case key::V: paste(); return true;
 					case key::P: go_to_all(); return true;
 					case key::N: new_tab(); return true;
 					case key::W: close_tab(); return true;
@@ -793,6 +788,50 @@ bool editor_setup::handle_window_input(
 				case key::F12: save_as(window); return true;
 				case key::ENTER: confirm_modal_popup(); return true;
 				default: break;
+			}
+		}
+	}
+
+	return false;
+}
+
+
+bool editor_setup::handle_unfetched_window_input(
+	const augs::event::state& common_input_state,
+	const augs::event::change e,
+
+	augs::window& window,
+	sol::state& lua
+) {
+	using namespace augs::event;
+	using namespace augs::event::keys;
+
+	if (e.msg == message::mousemotion) {
+		return true;
+	}
+
+	if (player_paused) {
+		if (e.was_any_key_pressed()) {
+			const auto k = e.key.key;
+
+			const bool has_ctrl{ common_input_state.is_set(key::LCTRL) };
+			const bool has_shift{ common_input_state.is_set(key::LSHIFT) };
+
+			if (has_ctrl) {
+				if (has_shift) {
+					switch (k) {
+						case key::Z: redo(); return true;
+						default: break;
+					}
+				}
+
+				switch (k) {
+					case key::Z: undo(); return true;
+					case key::C: copy(); return true;
+					case key::X: cut(); return true;
+					case key::V: paste(); return true;
+					default: break;
+				}
 			}
 		}
 	}
