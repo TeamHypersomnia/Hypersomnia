@@ -24,8 +24,12 @@
 #include "view/audiovisual_state/systems/interpolation_system.h"
 #include "view/audiovisual_state/systems/particles_simulation_system.h"
 
-void light_system::reserve_caches_for_entities(const size_t n) {
+void light_system::reserve_caches_for_entities(const std::size_t n) {
 	per_entity_cache.resize(n);
+}
+
+void light_system::clear() {
+	per_entity_cache.clear();
 }
 
 light_system::cache::cache() {

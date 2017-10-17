@@ -16,6 +16,10 @@
 #include "view/audiovisual_state/systems/particles_simulation_system.h"
 #include "view/audiovisual_state/systems/thunder_system.h"
 
+void thunder_system::clear() {
+	thunders.clear();
+}
+
 void thunder_system::thunder::create_root_branch() {
 	thread_local fast_randomization rng;
 

@@ -57,7 +57,7 @@ public:
 
 	void fade_sources(const augs::delta dt);
 
+	void clear();
 	void clear_sources_playing(const assets::sound_buffer_id);
-	void clear_all();
 	void clear_dead_entities(const cosmos&);
 };

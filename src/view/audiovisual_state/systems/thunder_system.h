@@ -57,4 +57,5 @@ public:
 	) const;
 
 	void reserve_caches_for_entities(const std::size_t) const {}
+	void clear();
 };

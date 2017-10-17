@@ -51,6 +51,7 @@ public:
 	randomization rng;
 
 	void reserve_caches_for_entities(const size_t);
+	void clear();
 
 	void advance_attenuation_variations(
 		const cosmos& cosmos,

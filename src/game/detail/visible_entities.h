@@ -28,5 +28,6 @@ struct visible_entities {
 		in order to take advantage of the reserved space in containers.
 	*/
 	void reacquire(const visible_entities_query);
-	void clear_dead(const cosmos&);
+	void clear_dead_entities(const cosmos&);
+	void clear();
 };

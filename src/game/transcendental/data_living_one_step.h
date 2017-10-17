@@ -13,5 +13,5 @@ struct data_living_one_step {
 	calculated_visibility_map calculated_visibility;
 	calculated_line_of_sight_map calculated_line_of_sight;
 
-	void clear_all();
+	void clear();
 };

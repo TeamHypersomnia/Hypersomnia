@@ -12,7 +12,7 @@
 
 #include "augs/audio/audio_settings.h"
 
-void sound_system::clear_all() {
+void sound_system::clear() {
 	per_entity_cache.clear();
 	fading_sources.clear();
 }

@@ -15,6 +15,10 @@
 #include "view/audiovisual_state/systems/pure_color_highlight_system.h"
 #include "view/audiovisual_state/systems/interpolation_system.h"
 
+void pure_color_highlight_system::clear() {
+	highlights.clear();
+}
+
 void pure_color_highlight_system::add(const highlight::input new_in) {
 	bool found = false;
 

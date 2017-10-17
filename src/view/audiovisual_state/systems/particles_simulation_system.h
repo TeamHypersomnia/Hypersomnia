@@ -71,10 +71,10 @@ public:
 	per_render_layer_t<std::vector<animated_particle>> animated_particles;
 	per_render_layer_t<std::unordered_map<entity_id, std::vector<homing_animated_particle>>> homing_animated_particles;
 
-	//std::vector<cache> per_entity_cache;
 	std::unordered_map<entity_id, cache> per_entity_cache;
 
 	void reserve_caches_for_entities(const size_t) {}
+	void clear();
 	void clear_dead_entities(const cosmos&);
 
 	cache& get_cache(const const_entity_handle);

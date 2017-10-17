@@ -4,6 +4,10 @@
 #include "game/components/flags_component.h"
 #include "augs/templates/container_templates.h"
 
+void past_infection_system::clear() {
+	infected_entities.clear();
+}
+
 void past_infection_system::infect(const const_entity_handle id) {
 	if (!is_infected(id)) {
 		infected_entities.insert(id);

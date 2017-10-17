@@ -14,6 +14,12 @@
 #include "view/audiovisual_state/audiovisual_state.h"
 #include "view/audiovisual_state/systems/interpolation_system.h"
 
+void audiovisual_state::clear() {
+	systems.for_each([](auto& sys) {
+		sys.clear();
+	});
+}
+
 void audiovisual_state::reserve_caches_for_entities(const std::size_t n) {
 	systems.for_each([n](auto& sys) {
 		sys.reserve_caches_for_entities(n);
@@ -405,7 +411,7 @@ void audiovisual_state::standard_post_cleanup(const const_logic_step step) {
 }
 
 void audiovisual_state::clear_dead_entities(const cosmos& cosmos) {
-	all_visible.clear_dead(cosmos);
+	all_visible.clear_dead_entities(cosmos);
 
 	get<sound_system>().clear_dead_entities(cosmos);
 	get<particles_simulation_system>().clear_dead_entities(cosmos);

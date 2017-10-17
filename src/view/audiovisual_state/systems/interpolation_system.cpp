@@ -34,6 +34,10 @@ void interpolation_system::reserve_caches_for_entities(const size_t n) {
 	per_entity_cache.resize(n);
 }
 
+void interpolation_system::clear() {
+	per_entity_cache.clear();
+}
+
 void interpolation_system::set_updated_interpolated_transform(
 	const const_entity_handle subject,
 	const components::transform updated_value

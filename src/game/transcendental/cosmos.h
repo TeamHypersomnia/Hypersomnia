@@ -101,7 +101,7 @@ public:
 		perform_deletions(step);
 		post_cleanup(const_logic_step(step));
 
-		queues.clear_all();
+		queues.clear();
 	}
 
 	template <class F>

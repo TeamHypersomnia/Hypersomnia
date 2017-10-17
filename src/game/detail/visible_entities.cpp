@@ -41,18 +41,22 @@ visible_entities::visible_entities(const visible_entities_query input) {
 	reacquire(input);
 }
 
+void visible_entities::clear() {
+	all.clear();
+
+	for (auto& layer : per_layer) {
+		layer.clear();
+	}
+}
+
 void visible_entities::reacquire(const visible_entities_query input) {
 	const auto& cosmos = input.cosm;
 	const auto camera = input.cone;
 
 	const auto& tree_of_npo = cosmos.inferential.get<tree_of_npo_system>();
 	const auto& physics = cosmos.inferential.get<physics_system>();
-
-	all.clear();
-
-	for (auto& layer : per_layer) {
-		layer.clear();
-	}
+	
+	clear();
 
 	tree_of_npo.for_each_visible_in_camera(
 		[this, &cosmos](const unversioned_entity_id id) {
@@ -78,7 +82,7 @@ void visible_entities::reacquire(const visible_entities_query input) {
 	get_visible_per_layer(cosmos, all, per_layer);
 }
 
-void visible_entities::clear_dead(const cosmos& cosm) {
+void visible_entities::clear_dead_entities(const cosmos& cosm) {
 	auto dead_deleter = [&cosm](const entity_id e) {
 		return cosm[e].dead();
 	};

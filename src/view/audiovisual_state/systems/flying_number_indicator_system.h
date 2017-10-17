@@ -36,6 +36,7 @@ public:
 	std::vector<number> numbers;
 
 	void reserve_caches_for_entities(const size_t) const {}
+	void clear();
 
 	void add(const number::input);
 	void advance(const augs::delta dt);

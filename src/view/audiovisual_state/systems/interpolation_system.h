@@ -37,6 +37,7 @@ public:
 	components::transform& get_interpolated(const const_entity_handle);
 
 	void reserve_caches_for_entities(const size_t);
+	void clear();
 
 	cache& get_cache_of(const entity_id);
 

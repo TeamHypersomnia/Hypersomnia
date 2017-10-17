@@ -308,7 +308,7 @@ int work(const int argc, const char* const * const argv) try {
 	};
 
 	static auto launch_setup = [](auto&& setup_init_callback) {
-		audiovisuals.get<sound_system>().clear_all();
+		audiovisuals.get<sound_system>().clear();
 
 		current_setup = std::nullopt;
 		ingame_menu.show = false;
@@ -522,8 +522,7 @@ int work(const int argc, const char* const * const argv) try {
 
 	static auto audiovisual_step = [](
 		const augs::delta frame_delta,
-		const auto speed_multiplier,
-		auto& setup,
+		const double speed_multiplier,
 		const config_lua_table& viewing_config
 	) {
 		audiovisuals.advance({
@@ -567,7 +566,7 @@ int work(const int argc, const char* const * const argv) try {
 		setup.control(new_game_entropy);
 		setup.accept_game_gui_events(game_gui.get_and_clear_pending_events());
 		
-		audiovisual_step(frame_delta, setup.get_audiovisual_speed(), setup, viewing_config);
+		audiovisual_step(frame_delta, setup.get_audiovisual_speed(), viewing_config);
 
 		/* MSVC ICE workaround */
 		auto& _audiovisual_step = audiovisual_step;
@@ -578,7 +577,7 @@ int work(const int argc, const char* const * const argv) try {
 			setup_pre_solve,
 			[&](const const_logic_step step) {
 				_setup_post_solve(step);
-				_audiovisual_step(augs::delta::zero, 0.0, setup, viewing_config);
+				_audiovisual_step(augs::delta::zero, 0.0, viewing_config);
 			},
 			setup_post_cleanup
 		);
@@ -586,10 +585,19 @@ int work(const int argc, const char* const * const argv) try {
 		if (const auto now_sampled = get_sampled_cosmos(setup);
 			now_sampled != last_sampled_cosmos
 		) {
+#if 0
 			audiovisuals.clear_dead_entities(*now_sampled);
+#endif
+			audiovisuals.clear();
 			game_gui.clear_dead_entities(*now_sampled);
 
 			last_sampled_cosmos = now_sampled;
+			_audiovisual_step(augs::delta::zero, 0.0, viewing_config);
+
+			//const auto n = now_sampled->get_maximum_entities();
+			//
+			//audiovisuals.reserve_caches_for_entities(n);
+			//game_gui.reserve_caches_for_entities(n);
 		}
 	};
 

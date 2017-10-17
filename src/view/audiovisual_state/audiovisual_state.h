@@ -77,5 +77,6 @@ struct audiovisual_state {
 
 	void reserve_caches_for_entities(const std::size_t);
 
+	void clear();
 	void clear_dead_entities(const cosmos&);
 };

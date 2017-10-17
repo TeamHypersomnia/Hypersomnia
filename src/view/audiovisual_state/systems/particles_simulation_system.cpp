@@ -15,6 +15,10 @@
 #include "view/audiovisual_state/systems/particles_simulation_system.h"
 #include "view/audiovisual_state/systems/interpolation_system.h"
 
+void particles_simulation_system::clear() {
+	per_entity_cache.clear();
+}
+
 void particles_simulation_system::clear_dead_entities(const cosmos& new_cosmos) {
 	std::vector<entity_id> to_erase;
 

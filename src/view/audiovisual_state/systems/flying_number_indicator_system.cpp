@@ -7,6 +7,10 @@
 
 #include "view/audiovisual_state/systems/flying_number_indicator_system.h"
 
+void flying_number_indicator_system::clear() {
+	numbers.clear();
+}
+
 void flying_number_indicator_system::add(const number::input new_in) {
 	number new_number;
 	new_number.in = new_in;
