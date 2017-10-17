@@ -146,7 +146,13 @@ editor_setup::editor_setup(sol::state& lua, const augs::path_type& workspace_pat
 void editor_setup::control(
 	const cosmic_entropy& entropy
 ) {
+	total_collected_entropy += entropy;
+}
 
+void editor_setup::accept_game_gui_events(
+	const cosmic_entropy& entropy
+) {
+	control(entropy);
 }
 
 void editor_setup::customize_for_viewing(config_lua_table& config) const {
@@ -519,12 +525,6 @@ void editor_setup::perform_custom_imgui(
 			}
 		}
 	}
-}
-
-void editor_setup::accept_game_gui_events(
-	const cosmic_entropy& entropy
-) {
-
 }
 
 bool editor_setup::escape() {

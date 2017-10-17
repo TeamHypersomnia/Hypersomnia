@@ -362,14 +362,6 @@ void cosmos::delete_entity(const entity_id e) {
 	inferential.get<relational_system>().handle_deletion_of_potential_parent(e);
 }
 
-void cosmos::advance(const logic_step_input input) {
-	data_living_one_step transient;
-	logic_step step(*this, input, transient);
-
-	advance_and_queue_destructions(step);
-	perform_deletions(step);
-}
-
 void cosmos::advance_and_queue_destructions(const logic_step step) {
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();

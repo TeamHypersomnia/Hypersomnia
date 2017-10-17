@@ -1130,7 +1130,8 @@ int work(const int argc, const char* const * const argv) try {
 				*game_world_atlas,
 				fbos,
 				shaders,
-				get_camera()
+				get_camera(),
+				{}
 			});
 			
 			/* 

@@ -30,8 +30,8 @@ namespace augs {
 	class window;
 
 	namespace event {
-		class change;
-		class state;
+		struct change;
+		struct state;
 	}
 }
 
@@ -233,6 +233,8 @@ public:
 		auto steps = timer.extract_num_of_logic_steps(get_viewed_cosmos().get_fixed_delta());
 
 		while (steps--) {
+			total_collected_entropy.clear_dead_entities(tab().work.world);
+
 			tab().work.advance(
 				{ total_collected_entropy },
 				std::forward<Callbacks>(callbacks)...

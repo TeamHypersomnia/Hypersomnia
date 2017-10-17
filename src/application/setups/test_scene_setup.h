@@ -84,6 +84,8 @@ public:
 		auto steps = timer.extract_num_of_logic_steps(get_viewed_cosmos().get_fixed_delta());
 
 		while (steps--) {
+			total_collected_entropy.clear_dead_entities(scene.world);
+			
 			player.advance_player_and_biserialize(total_collected_entropy);
 
 			scene.advance(

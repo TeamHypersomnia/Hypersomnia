@@ -113,6 +113,8 @@ public:
 		auto steps = timer.extract_num_of_logic_steps(get_viewed_cosmos().get_fixed_delta());
 
 		while (steps--) {
+			total_collected_entropy.clear_dead_entities(intro.world);
+
 			intro.advance(
 				{ total_collected_entropy },
 				std::forward<Callbacks>(callbacks)...

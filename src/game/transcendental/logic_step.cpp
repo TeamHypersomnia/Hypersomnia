@@ -24,7 +24,7 @@ typename basic_logic_step<C>::cosmos_ref basic_logic_step<C>::get_cosmos() const
 }
 
 template<bool C>
-basic_logic_step<C>::operator basic_logic_step<true>() const {
+basic_logic_step<C>::operator const_logic_step() const {
 	return { cosm, input, transient };
 }
 

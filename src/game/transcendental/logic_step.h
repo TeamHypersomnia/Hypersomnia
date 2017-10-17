@@ -1,6 +1,7 @@
 #pragma once
 #include "augs/misc/timing/delta.h"
 #include "game/transcendental/cosmic_entropy.h"
+#include "game/transcendental/step_declaration.h"
 
 struct data_living_one_step;
 struct all_logical_assets;
@@ -29,8 +30,5 @@ struct basic_logic_step {
 
 	augs::delta get_delta() const;
 
-	operator basic_logic_step<true>() const;
+	operator const_logic_step() const;
 };
-
-typedef basic_logic_step<false> logic_step;
-typedef basic_logic_step<true> const_logic_step;

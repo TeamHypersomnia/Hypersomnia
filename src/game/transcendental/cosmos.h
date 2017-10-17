@@ -85,8 +85,6 @@ public:
 	entity_handle clone_entity(const entity_id);
 	void delete_entity(const entity_id);
 
-	void advance(const logic_step_input input);
-
 	template <class Pre, class Post, class PostCleanup>
 	void advance(
 		const logic_step_input input,

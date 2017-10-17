@@ -199,10 +199,15 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	shaders.pure_color_highlight->set_projection(matrix);
 
 	const auto timestamp_ms = static_cast<unsigned>(global_time_seconds * 1000);
+	const bool has_additional_borders = !in.additional_borders.empty();
 
 	draw_borders(
 		render_layer::SMALL_DYNAMIC_BODY,
-		[timestamp_ms](const const_entity_handle sentience) -> std::optional<rgba> {
+		[timestamp_ms, has_additional_borders, &in](const const_entity_handle sentience) -> std::optional<rgba> {
+			if (has_additional_borders) {
+
+			}
+
 			if (const auto s = sentience.find<components::sentience>()) {
 				return s->get_low_health_border(timestamp_ms);
 			}
