@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <bitset>
+#include <iosfwd>
 
 #include "augs/math/vec2.h"
 #include "augs/misc/enum/enum_bitset.h"
@@ -190,6 +191,7 @@ namespace augs {
 				};
 
 				bool is_numpad_key(const key);
+				std::string key_to_string(const key);
 				std::wstring key_to_wstring(const key);
 				key wstring_to_key(const std::wstring&);
 			}
@@ -239,6 +241,8 @@ namespace augs {
 				bool was_released(const keys::key) const;
 
 				bool is_exit_message() const;
+
+				friend std::ostream& operator<<(std::ostream& out, const change& x);
 			};
 
 			struct state {

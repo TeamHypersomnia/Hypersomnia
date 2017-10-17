@@ -5,6 +5,22 @@
 
 namespace augs {
 	namespace event {
+		std::ostream& operator<<(std::ostream& out, const augs::event::change& x) {
+			if (x.was_any_key_pressed()) {
+				return out << "Pressed: " << augs::event::keys::key_to_string(x.key.key);
+			}
+
+			if (x.was_any_key_released()) {
+				return out << "Released: " << augs::event::keys::key_to_string(x.key.key);
+			}
+
+			if (x.msg == message::mousemotion) {
+				return out << "Mouse moved to: " << x.mouse.pos << ", Rel: " << x.mouse.rel;
+			}
+
+			return out;
+		}
+
 		change::change() {
 			std::memset(this, 0, sizeof(change));
 			msg = message::unknown;
@@ -87,7 +103,7 @@ namespace augs {
 				|| (msg == message::syskeydown && key.key == keys::key::F4)
 			;
 		}
-
+		
 		state& state::apply(const change& dt) {
 			const auto ch = dt.get_key_change();
 
@@ -210,6 +226,10 @@ namespace augs {
 			bool is_numpad_key(const key k) {
 				if (static_cast<int>(k) >= static_cast<int>(key::NUMPAD0) && static_cast<int>(k) <= static_cast<int>(key::NUMPAD9)) return true;
 				return false;
+			}
+
+			std::string key_to_string(const key k) {
+				return to_string(key_to_wstring(k));
 			}
 
 			std::wstring key_to_wstring(const key k) {

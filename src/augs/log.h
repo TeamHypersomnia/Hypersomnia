@@ -27,9 +27,14 @@ public:
 	std::string get_complete() const;
 };
 
-template <typename... A>
+template <class... A>
 void LOG(const std::string& f, A&&... a) {
 	LOG(typesafe_sprintf(f, std::forward<A>(a)...));
+}
+
+template <class A>
+void LOG(const A& f) {
+	LOG(typesafe_sprintf("%x", f));
 }
 
 template <>
