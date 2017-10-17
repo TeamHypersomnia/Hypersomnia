@@ -28,8 +28,13 @@ class sound_system {
 		augs::sound_source source;
 	};
 
+	struct fading_source {
+		assets::sound_buffer_id id;
+		augs::sound_source source;
+	};
+
 	std::unordered_map<entity_id, cache> per_entity_cache;
-	std::vector<augs::sound_source> fading_sources;
+	std::vector<fading_source> fading_sources;
 
 	cache& get_cache(const const_entity_handle);
 	const cache& get_cache(const const_entity_handle) const;
@@ -52,6 +57,7 @@ public:
 
 	void fade_sources(const augs::delta dt);
 
+	void clear_sources_playing(const assets::sound_buffer_id);
 	void clear_all();
 	void clear_dead_entities(const cosmos&);
 };

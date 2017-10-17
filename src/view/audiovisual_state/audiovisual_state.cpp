@@ -24,7 +24,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 	auto scope = measure_scope(profiler.advance);
 
 	const auto& cosm = input.viewed_character.get_cosmos();
-	const auto dt = input.delta;
+	const auto dt = augs::delta(input.frame_delta) *= input.speed_multiplier;
 
 	reserve_caches_for_entities(cosm.get_entity_pool().capacity());
 
@@ -50,7 +50,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 	camera.tick(
 		input.screen_size,
 		interp,
-		dt,
+		input.frame_delta,
 		input.camera,
 		viewed_character
 	);
@@ -107,7 +107,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 		);
 	}
 
-	sounds.fade_sources(sound_fading_timer.extract_delta());
+	sounds.fade_sources(input.frame_delta);
 }
 
 void audiovisual_state::spread_past_infection(const const_logic_step step) {

@@ -26,7 +26,9 @@ struct visible_entities;
 class session_profiler;
 
 struct audiovisual_advance_input {
-	const augs::delta delta;
+	const augs::delta frame_delta;
+	const double speed_multiplier;
+
 	const const_entity_handle viewed_character;
 	const vec2i screen_size;
 	const particle_effects_map& particle_effects;
@@ -76,7 +78,4 @@ struct audiovisual_state {
 	void reserve_caches_for_entities(const std::size_t);
 
 	void clear_dead_entities(const cosmos&);
-
-private:
-	augs::timer sound_fading_timer;
 };

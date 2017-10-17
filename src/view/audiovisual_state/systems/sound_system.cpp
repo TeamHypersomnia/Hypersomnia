@@ -17,6 +17,16 @@ void sound_system::clear_all() {
 	fading_sources.clear();
 }
 
+void sound_system::clear_sources_playing(const assets::sound_buffer_id id) {
+	erase_if(fading_sources, [id](fading_source& source) {
+		return id == source.id;
+	});
+	
+	erase_if(per_entity_cache, [id](auto& it) {
+		return id == it.second.recorded_component.input.effect.id;
+	});
+}
+
 void sound_system::clear_dead_entities(const cosmos& new_cosmos) {
 	std::vector<entity_id> to_erase;
 
@@ -31,8 +41,11 @@ void sound_system::clear_dead_entities(const cosmos& new_cosmos) {
 	}
 
 	for (const auto it : to_erase) {
-		if (per_entity_cache[it].recorded_component.input.effect.modifier.fade_on_exit) {
-			fading_sources.emplace_back(std::move(per_entity_cache[it].source));
+		const auto& effect = per_entity_cache[it].recorded_component.input.effect;
+
+		if (effect.modifier.fade_on_exit) {
+			const auto buffer_id = effect.id;
+			fading_sources.push_back({ buffer_id, std::move(per_entity_cache[it].source) });
 		}
 
 		per_entity_cache.erase(it);
@@ -84,7 +97,8 @@ void sound_system::track_new_sound_existences_near_camera(
 			const auto& existence = it.get<components::sound_existence>();
 			auto& source = cache.source;
 
-			const auto& buffer = manager.at(existence.input.effect.id).variations[existence.input.variation_number];
+			const auto buffer_id = existence.input.effect.id;
+			const auto& buffer = manager.at(buffer_id).variations[existence.input.variation_number];
 
 			const auto& requested_buf = 
 				existence.input.direct_listener == listening_character ? 
@@ -92,13 +106,13 @@ void sound_system::track_new_sound_existences_near_camera(
 				buffer.mono_or_stereo()
 			;
 
-			if (
+			if (const bool refresh_cache =
 				cache.recorded_component.time_of_birth != existence.time_of_birth
 				|| cache.recorded_component.input.effect.id != existence.input.effect.id
 				|| &requested_buf != source.get_bound_buffer()
 			) {
 				if (source.is_playing() && cache.recorded_component.input.effect.modifier.fade_on_exit) {
-					fading_sources.emplace_back(std::move(source));
+					fading_sources.push_back({ buffer_id, std::move(source) });
 
 					source = augs::sound_source();
 				}
@@ -134,7 +148,9 @@ void sound_system::track_new_sound_existences_near_camera(
 }
 
 void sound_system::fade_sources(const augs::delta dt) {
-	erase_if(fading_sources, [dt](augs::sound_source& source) {
+	erase_if(fading_sources, [dt](fading_source& f) {
+		auto& source = f.source;
+
 		const auto new_gain = source.get_gain() - dt.in_seconds()*3.f;
 		const auto new_pitch = source.get_pitch() - dt.in_seconds()/3.f;
 

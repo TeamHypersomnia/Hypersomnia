@@ -13,6 +13,8 @@
 #include "game/detail/inventory/inventory_slot_handle.h"
 #include "view/game_gui/elements/drag_and_drop.h"
 #include "game/components/container_component.h"
+#include "game/components/fixtures_component.h"
+#include "game/components/interpolation_component.h"
 #include "game/components/item_slot_transfers_component.h"
 #include "game/components/name_component.h"
 #include "game/components/item_component.h"

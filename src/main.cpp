@@ -290,6 +290,7 @@ int work(const int argc, const char* const * const argv) try {
 				}
 				else {
 					/* Missing, unload */
+					audiovisuals.get<sound_system>().clear_sources_playing(old.first);
 					game_sounds.erase(old.first);
 				}
 			}
@@ -521,12 +522,15 @@ int work(const int argc, const char* const * const argv) try {
 	*/
 
 	static auto audiovisual_step = [](
-		const augs::delta delta,
+		const augs::delta frame_delta,
+		const auto speed_multiplier,
 		auto& setup,
 		const config_lua_table& viewing_config
 	) {
 		audiovisuals.advance({
-			delta,
+			frame_delta,
+			{ speed_multiplier },
+
 			get_viewed_character(),
 
 			viewing_config.window.get_screen_size(),
@@ -564,7 +568,7 @@ int work(const int argc, const char* const * const argv) try {
 		setup.control(new_game_entropy);
 		setup.accept_game_gui_events(game_gui.get_and_clear_pending_events());
 		
-		audiovisual_step(augs::delta(frame_delta) *= setup.get_audiovisual_speed(), setup, viewing_config);
+		audiovisual_step(frame_delta, setup.get_audiovisual_speed(), setup, viewing_config);
 
 		/* MSVC ICE workaround */
 		auto& _audiovisual_step = audiovisual_step;
@@ -575,7 +579,7 @@ int work(const int argc, const char* const * const argv) try {
 			setup_pre_solve,
 			[&](const const_logic_step step) {
 				_setup_post_solve(step);
-				_audiovisual_step(augs::delta::zero, setup, viewing_config);
+				_audiovisual_step(augs::delta::zero, 0.0, setup, viewing_config);
 			},
 			setup_post_cleanup
 		);

@@ -1,7 +1,6 @@
-#include "sound_source.h"
-#include "sound_buffer.h"
-
-#include "augs/audio/OpenAL_error.h"
+#define TRACE_PARAMETERS 0
+#define TRACE_CONSTRUCTORS_DESTRUCTORS 0
+#define Y_IS_Z 1
 
 #if BUILD_OPENAL
 #include <AL/al.h>
@@ -13,9 +12,10 @@
 #include "augs/math/vec2.h"
 #include "augs/math/si_scaling.h"
 
-#define TRACE_PARAMETERS 0
-#define TRACE_CONSTRUCTORS_DESTRUCTORS 0
-#define Y_IS_Z 1
+#include "augs/audio/sound_source.h"
+#include "augs/audio/sound_buffer.h"
+
+#include "augs/audio/OpenAL_error.h"
 
 #if TRACE_CONSTRUCTORS_DESTRUCTORS
 int g_num_sources = 0;
