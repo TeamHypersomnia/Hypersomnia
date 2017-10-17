@@ -162,11 +162,6 @@ int work(const int argc, const char* const * const argv) try {
 		fbos,
 		audio
 	};
-	
-	static audiovisual_state audiovisuals;
-	static auto game_gui = game_gui_system();
-
-	static std::optional<augs::graphics::texture> game_world_atlas;
 
 	/* 
 		Main menu setup state may be preserved, 
@@ -197,6 +192,10 @@ int work(const int argc, const char* const * const argv) try {
 	static game_images_in_atlas_map game_atlas_entries;
 	static necessary_images_in_atlas necessary_atlas_entries;
 	static augs::baked_font gui_font;
+	static std::optional<augs::graphics::texture> game_world_atlas;
+
+	static audiovisual_state audiovisuals;
+	static auto game_gui = game_gui_system();
 
 	/*
 		The lambdas that aid to make the main loop code more concise.
