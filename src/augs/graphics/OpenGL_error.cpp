@@ -13,9 +13,12 @@ static const char * get_OpenGL_error_string(int errID) {
 }
 
 void check_OpenGL_error(const char* stmt, const char* fname, int line) {
-	GLenum err = glGetError();
+	const GLenum err { glGetError() };
 
 	if (err != GL_NO_ERROR) {
 		LOG("OpenAL error %x, (%x) at %x:%x - for %x", err, get_OpenGL_error_string(err), fname, line, stmt);
+#if !IS_PRODUCTION_BUILD
+		ensure(false && "OpenGL error.");
+#endif
 	}
 }

@@ -15,9 +15,12 @@ static const char * get_OpenAL_error_string(int errID) {
 }
 
 void check_OpenAL_error(const char* stmt, const char* fname, int line) {
-	ALenum err = alGetError();
+	const ALenum err { alGetError() };
 
 	if (err != AL_NO_ERROR) {
 		LOG("OpenAL error %x, (%x) at %x:%x - for %x", err, get_OpenAL_error_string(err), fname, line, stmt);
+#if !IS_PRODUCTION_BUILD
+		ensure(false && "OpenAL error.");
+#endif
 	}
 };
