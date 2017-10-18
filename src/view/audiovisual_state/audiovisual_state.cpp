@@ -94,7 +94,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 	}
 
 	world_hover_highlighter.cycle_duration_ms = 400;
-	world_hover_highlighter.update(dt.in_milliseconds());
+	world_hover_highlighter.update(input.frame_delta);
 
 	auto& sounds = get<sound_system>();
 

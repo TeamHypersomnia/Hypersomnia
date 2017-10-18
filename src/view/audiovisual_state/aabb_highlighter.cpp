@@ -9,8 +9,8 @@
 
 #include "generated/introspectors.h"
 
-void aabb_highlighter::update(const float delta_ms) {
-	timer += delta_ms;
+void aabb_highlighter::update(const augs::delta dt) {
+	timer += dt.in_milliseconds();
 	timer = fmod(timer, cycle_duration_ms);
 }
 

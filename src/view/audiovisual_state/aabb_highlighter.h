@@ -25,6 +25,6 @@ struct aabb_highlighter {
 
 	static bool is_hoverable(const const_entity_handle);
 
-	void update(const float delta_ms);
+	void update(const augs::delta);
 	void draw(const aabb_highlighter_drawing_input) const;
 };
