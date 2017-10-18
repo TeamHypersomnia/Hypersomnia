@@ -66,7 +66,7 @@ void determinism_test_setup::process(
 	}
 
 	if (session.config.get_input_recording_mode() != input_recording_type::DISABLED) {
-		if (player.try_to_load_or_save_new_session("generated/sessions/", "recorded.inputs")) {
+		if (player.try_to_load_or_save_new_session(LOCAL_FILES_DIR "sessions/", "recorded.inputs")) {
 			timer.set_stepping_speed_multiplier(1.f);
 		}
 	}

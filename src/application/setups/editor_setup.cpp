@@ -114,7 +114,7 @@ void editor_setup::open_untitled_workspace() {
 }
 
 static auto get_recent_paths_path() {
-	return "generated/editor_recent_paths.lua";
+	return LOCAL_FILES_DIR "editor_recent_paths.lua";
 }
 
 editor_recent_paths::editor_recent_paths(sol::state& lua) {

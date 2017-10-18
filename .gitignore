@@ -168,7 +168,7 @@ pip-log.txt
 /RelDeb
 /hypersomnia/saves
 /hypersomnia/content/music
-/hypersomnia/generated
+/hypersomnia/cache
 /hypersomnia/choreographic/voices
 
 *.log

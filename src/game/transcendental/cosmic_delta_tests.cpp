@@ -123,8 +123,8 @@ TEST_CASE("CosmicDelta2 PaddingTest") {
 					iter
 				);
 
-				augs::create_text_file("generated/logs/object1.txt", describe_fields(*(checked_type*)buf1));
-				augs::create_text_file("generated/logs/object2.txt", describe_fields(*(checked_type*)buf2));
+				augs::create_text_file(LOG_FILES_DIR "object1.txt", describe_fields(*(checked_type*)buf1));
+				augs::create_text_file(LOG_FILES_DIR "object2.txt", describe_fields(*(checked_type*)buf2));
 
 				LOG(log_contents);
 				FAIL(log_contents);
@@ -145,8 +145,8 @@ TEST_CASE("CosmicDelta2 PaddingTest") {
 						static_cast<int>(dt.get_first_divergence_pos())
 					);
 
-					augs::create_text_file("generated/logs/object1.txt", describe_fields(a));
-					augs::create_text_file("generated/logs/object2.txt", describe_fields(b));
+					augs::create_text_file(LOG_FILES_DIR "object1.txt", describe_fields(a));
+					augs::create_text_file(LOG_FILES_DIR "object2.txt", describe_fields(b));
 
 					LOG(log_contents);
 					FAIL(log_contents);
@@ -173,7 +173,7 @@ TEST_CASE("CosmicDelta2 PaddingTest") {
 	for_each_through_std_get(component_list_t<std::tuple>(), padding_checker);
 
 	component_size_information += typesafe_sprintf("Total size in bytes: %x", total_components_size);
-	augs::create_text_file("generated/logs/components.txt", component_size_information);
+	augs::create_text_file(LOG_FILES_DIR "components.txt", component_size_information);
 
 	/* Validate cosmos_metadata. It will also be written and compared. */
 

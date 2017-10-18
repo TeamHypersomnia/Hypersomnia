@@ -25,6 +25,21 @@ option(HYPERSOMNIA_BARE "Build the minimal possible Hypersomnia runtime. For tes
 
 # Other variables.
 
+# Where the game will save logs.
+# Deleting this folder will have no effect on the game.
+
+set(HYPERSOMNIA_LOG_FILES_DIR "cache/log/")
+
+# Where the game will save neon maps and other regenerable content.
+# Deleting this folder will have no effect on the game, except that some resources might take time to generate again.
+
+set(HYPERSOMNIA_GENERATED_FILES_DIR "cache/gen/")
+
+# Where the game will save editor autosaves, gui layouts, user config etc.
+# Deleting this folder might reset some user settings.
+
+set(HYPERSOMNIA_LOCAL_FILES_DIR "cache/usr/")
+
 # If this variable is positive, the cosmos class will use a statically allocated number
 # of entities, possibly improving performance. Might be very useful for a sever application.
 # Pros: 
@@ -767,6 +782,10 @@ endif()
 if(STATICALLY_ALLOCATE_EDITOR_TABS_NUM)
 	add_definitions(-DSTATICALLY_ALLOCATE_EDITOR_TABS_NUM=${STATICALLY_ALLOCATE_EDITOR_TABS_NUM})
 endif()
+
+add_definitions(-DGENERATED_FILES_DIR="${HYPERSOMNIA_GENERATED_FILES_DIR}")
+add_definitions(-DLOCAL_FILES_DIR="${HYPERSOMNIA_LOCAL_FILES_DIR}")
+add_definitions(-DLOG_FILES_DIR="${HYPERSOMNIA_LOG_FILES_DIR}")
 
 # We build the generator of type information required for introspection.
 

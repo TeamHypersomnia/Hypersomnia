@@ -46,7 +46,7 @@ void LOG(const std::string& f) {
 	program_log::get_current().push_entry({ f });
 
 #if LOG_TO_FILE
-	std::ofstream recording_file("generated/logs/live_debug.txt", std::ios::out | std::ios::app);
+	std::ofstream recording_file(LOG_FILES_DIR "live_debug.txt", std::ios::out | std::ios::app);
 	recording_file << f << std::endl;
 #endif
 #endif

@@ -9,7 +9,7 @@ void save_log_and_terminate() {
 	augs::disable_cursor_clipping();
 	
 	const auto logs = program_log::get_current().get_complete();
-	const auto failure_log_path = augs::path_type("generated/logs/ensure_failed_debug_log.txt");
+	const auto failure_log_path = augs::path_type(LOG_FILES_DIR "ensure_failed_debug_log.txt");
 
 	augs::create_text_file(failure_log_path, logs);
 
