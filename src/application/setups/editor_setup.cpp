@@ -762,8 +762,8 @@ bool editor_setup::handle_top_level_window_input(
 		}
 
 		if (player_paused) {
-			const bool has_ctrl{ common_input_state.is_set(key::LCTRL) };
-			const bool has_shift{ common_input_state.is_set(key::LSHIFT) };
+			const bool has_ctrl{ common_input_state[key::LCTRL] };
+			const bool has_shift{ common_input_state[key::LSHIFT] };
 
 			if (has_ctrl) {
 				if (has_shift) {
@@ -815,7 +815,7 @@ bool editor_setup::handle_unfetched_window_input(
 
 	if (player_paused) {
 		if (e.msg == message::mousemotion) {
-			if (common_input_state.is_set(key::RMOUSE)) {
+			if (common_input_state[key::RMOUSE]) {
 				if (has_tabs()) {
 					tab().panning -= e.mouse.rel;
 
@@ -824,11 +824,19 @@ bool editor_setup::handle_unfetched_window_input(
 			}
 		}
 
+		if (e.was_pressed(key::HOME)) {
+			if (has_tabs()) {
+				tab().panning = {};
+
+				return true;
+			}
+		}
+
 		if (e.was_any_key_pressed()) {
 			const auto k = e.key.key;
 
-			const bool has_ctrl{ common_input_state.is_set(key::LCTRL) };
-			const bool has_shift{ common_input_state.is_set(key::LSHIFT) };
+			const bool has_ctrl{ common_input_state[key::LCTRL] };
+			const bool has_shift{ common_input_state[key::LSHIFT] };
 
 			if (has_ctrl) {
 				if (has_shift) {

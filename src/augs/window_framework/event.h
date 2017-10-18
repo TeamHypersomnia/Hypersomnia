@@ -1,10 +1,9 @@
 #pragma once
 #include <string>
-#include <bitset>
 #include <iosfwd>
 
 #include "augs/math/vec2.h"
-#include "augs/misc/enum/enum_bitset.h"
+#include "augs/misc/enum/enum_boolset.h"
 #include "augs/pad_bytes.h"
 
 namespace augs {
@@ -248,7 +247,7 @@ namespace augs {
 			};
 
 			struct state {
-				augs::enum_bitset<keys::key> keys;
+				enum_boolset<keys::key> keys;
 
 				struct mouse_info {
 					vec2i pos;
@@ -256,7 +255,7 @@ namespace augs {
 					vec2i rdrag;
 				} mouse;
 
-				void unset_keys();
+				void reset_keys();
 				state& apply(const change&);
 				
 				template <class C>
@@ -269,11 +268,14 @@ namespace augs {
 				}
 
 				bool get_mouse_key(const unsigned) const;
-				bool is_set(const keys::key) const;
 
 				std::vector<change> generate_all_releasing_changes() const;
 				std::vector<change> generate_key_releasing_changes() const;
 				std::vector<change> generate_mouse_releasing_changes() const;
+
+				bool operator[](const keys::key k) const {
+					return keys.test(k);
+				}
 			};
 	}
 }

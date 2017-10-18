@@ -234,11 +234,7 @@ namespace augs {
 			return output;
 		}
 
-		bool state::is_set(const keys::key k) const {
-			return keys.test(k);
-		}
-
-		void state::unset_keys() {
+		void state::reset_keys() {
 			keys.reset();
 		}
 
