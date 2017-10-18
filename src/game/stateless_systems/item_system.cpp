@@ -44,10 +44,8 @@ void item_system::start_picking_up_items(const logic_step step) {
 		if (i.intent == game_intent_type::START_PICKING_UP_ITEMS) {
 			const auto it = cosm[i.subject];
 
-			const auto maybe_transfers = it.find<components::item_slot_transfers>();
-
-			if (maybe_transfers != nullptr) {
-				maybe_transfers->picking_up_touching_items_enabled = i.was_pressed();
+			if (const auto transfers = it.find<components::item_slot_transfers>()) {
+				transfers->picking_up_touching_items_enabled = i.was_pressed();
 			}
 		}
 	}
@@ -66,44 +64,39 @@ void item_system::pick_up_touching_items(const logic_step step) {
 		entity_id picker_id = c.subject;
 
 		const auto picker = cosmos[picker_id];
-		const auto item = cosmos[c.collider];
+		const auto item_entity = cosmos[c.collider];
 
-		const auto* const maybe_item = item.find<components::item>();
-
-		if (maybe_item != nullptr && item.get_owning_transfer_capability().dead()) {
-			auto* maybe_transfers = picker.find<components::item_slot_transfers>();
-
-			if (
-				maybe_transfers != nullptr
-				&& maybe_transfers->picking_up_touching_items_enabled	
+		if (const auto* const item = item_entity.find<components::item>();
+			item && item_entity.get_owning_transfer_capability().dead()
+		) {
+			if (auto* const transfers = picker.find<components::item_slot_transfers>();
+				transfers && transfers->picking_up_touching_items_enabled	
 			) {
 				const auto actual_picker = cosmos[picker_id];
 
-				if (actual_picker.has<components::sentience>()) {
-					if (!actual_picker.get<components::sentience>().is_conscious()) {
-						continue;
-					}
+				if (const auto* sentience = actual_picker.find<components::sentience>();
+					sentience && !sentience->is_conscious()
+				) {
+					continue;
 				}
 
-				entity_id item_to_pick = item;
+				entity_id item_to_pick = item_entity;
 
-				if (item.get_current_slot().alive()) {
-					item_to_pick = item.get_current_slot().get_root_container();
+				if (item_entity.get_current_slot().alive()) {
+					item_to_pick = item_entity.get_current_slot().get_root_container();
 				}
 
-				const auto& pick_list = maybe_transfers->only_pick_these_items;
+				const auto& pick_list = transfers->only_pick_these_items;
 				const bool found_on_subscription_list = found_in(pick_list, item_to_pick);
 
-				const bool item_subscribed = 
-					(pick_list.empty() && maybe_transfers->pick_all_touched_items_if_list_to_pick_empty)
+				if (const bool item_subscribed =
+					(pick_list.empty() && transfers->pick_all_touched_items_if_list_to_pick_empty)
 					|| found_on_subscription_list
-				;
-
-				if (item_subscribed) {
+				) {
 					const auto pickup_slot = actual_picker.determine_pickup_target_slot_for(cosmos[item_to_pick]);
 
 					if (pickup_slot.alive()) {
-						const bool can_pick_already = maybe_transfers->pickup_timeout.try_to_fire_and_reset(cosmos.get_timestamp(), delta);
+						const bool can_pick_already = transfers->pickup_timeout.try_to_fire_and_reset(cosmos.get_timestamp(), delta);
 
 						if (can_pick_already) {
 							const item_slot_transfer_request request{ item_to_pick, pickup_slot };
