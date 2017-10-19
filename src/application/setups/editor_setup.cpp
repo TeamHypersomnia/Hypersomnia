@@ -266,6 +266,13 @@ void editor_setup::customize_for_viewing(config_lua_table& config) const {
 }
 
 bool editor_setup::open_workspace_in_new_tab(const path_operation op) {
+	for (std::size_t i = 0; i < tabs.size(); ++i) {
+		if (tabs[i].current_path == op.path) {
+			set_current_tab(i);
+			return true;
+		}
+	}
+
 	return try_to_open_new_tab(
 		[this, op](editor_tab& t, workspace& work) {
 			if (const auto popup = open_workspace(work, op)) {
