@@ -84,6 +84,9 @@ class editor_setup {
 
 	const autosave_input destructor_autosave_input;
 
+	augs::timer autosave_timer;
+	editor_settings settings;
+
 	std::optional<editor_popup> current_popup;
 
 	bool show_summary = true;
@@ -235,7 +238,13 @@ public:
 
 	void customize_for_viewing(config_lua_table& cfg) const;
 
-	void apply(const config_lua_table&) {
+	void apply(const config_lua_table& cfg) {
+		if (cfg.editor.autosave != settings.autosave) {
+			autosave_timer = {};
+		}
+			
+		settings = cfg.editor;
+
 		return;
 	}
 

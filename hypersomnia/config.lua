@@ -110,6 +110,16 @@ return {
     draw_crosshairs = true,
     draw_weapon_laser = true
   },
+  editor = {
+    autosave = {
+      enabled = true,
+      once_every_min = 1
+    },
+    camera_panning_speed = {
+      x = 1,
+      y = 1
+    }
+  },
   gui_style = {
     Alpha = 1,
     AntiAliasedLines = false,

@@ -120,6 +120,11 @@ void settings_gui_state::perform(
 			revert(f);
 		};
 
+		auto revertable_drag = [&](auto l, auto& f, auto&&... args) {
+			drag(l, f, std::forward<decltype(args)>(args)...);
+			revert(f);
+		};
+
 		switch (active_pane) {
 			case settings_pane::WINDOW: {
 				enum_combo("Launch on game's startup", config.launch_mode);
@@ -202,6 +207,20 @@ void settings_gui_state::perform(
 				revertable_checkbox("Draw weapon laser", config.drawing.draw_weapon_laser);
 				revertable_checkbox("Draw crosshairs", config.drawing.draw_crosshairs);
 				// checkbox("Draw gameplay GUI", config.drawing.draw_character_gui); revert(config.drawing.draw_character_gui);
+				break;
+			}
+			case settings_pane::EDITOR: {
+				revertable_checkbox("Enable autosave", config.editor.autosave.enabled);
+
+				if (config.editor.autosave.enabled) {
+					auto scope = scoped_indent();
+					text("Once per");
+					ImGui::SameLine();
+					revertable_drag("minutes", config.editor.autosave.once_every_min, 0.002f, 0.05f, 2000.f);
+				}
+				
+				revertable_drag("Camera panning speed", config.editor.camera_panning_speed, 0.001f, -10.f, 10.f);
+
 				break;
 			}
 			case settings_pane::GUI_STYLES: {

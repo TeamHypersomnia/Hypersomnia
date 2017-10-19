@@ -46,9 +46,8 @@ static auto get_unsaved_path(augs::path_type path) {
 }
 
 static bool is_untitled_path(augs::path_type path) {
-	const auto untitled_dir = std::string(get_untitled_dir());
-	auto checked_path = path.string();
-	str_ops(checked_path).replace_all("\\", "/");
+	const auto untitled_dir = augs::path_type(get_untitled_dir()).make_preferred().string();
+	const auto checked_path = path.make_preferred().string();
 
 	return untitled_dir == checked_path.substr(0, untitled_dir.length());
 }
@@ -306,6 +305,14 @@ void editor_setup::perform_custom_imgui(
 	const bool in_direct_gameplay
 ) {
 	using namespace augs::imgui;
+
+	if (
+		settings.autosave.enabled 
+		&& settings.autosave.once_every_min <= autosave_timer.get<std::chrono::minutes>()
+	) {
+		autosave({ lua });
+		autosave_timer.reset();
+	}
 
 	auto in_path = [&](const auto& path) {
 		return path_operation{ lua, path };
@@ -909,7 +916,7 @@ bool editor_setup::handle_unfetched_window_input(
 		if (e.msg == message::mousemotion) {
 			if (common_input_state[key::RMOUSE]) {
 				if (has_current_tab()) {
-					tab().panning -= e.mouse.rel;
+					tab().panning -= e.mouse.rel * settings.camera_panning_speed;
 
 					return true;
 				}
