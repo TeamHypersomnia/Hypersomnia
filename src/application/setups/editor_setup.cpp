@@ -17,15 +17,43 @@
 
 #include "generated/introspectors.h"
 
-editor_tab::editor_tab(std::size_t horizontal_index) 
-	: horizontal_index(horizontal_index) 
-{}
+#define EDITOR_DIR LOCAL_FILES_DIR "editor/"
 
-std::string editor_tab::get_display_path()  const {
-	if (untitled_index) {
-		return typesafe_sprintf("Workspace-%x.wp", *untitled_index);
-	}
-	
+static auto get_editor_tabs_path() {
+	return EDITOR_DIR "editor_tabs.lua";
+}
+
+static auto get_recent_paths_path() {
+	return EDITOR_DIR "editor_recent_paths.lua";
+}
+
+static auto get_untitled_dir() {
+	return EDITOR_DIR "untitled/";
+}
+
+template <class T>
+static auto get_path_in_untitled(const T& p) {
+	return augs::path_type(get_untitled_dir()) += p;
+}
+
+template <class T>
+static auto get_first_free_untitled_path(const T& path_template) {
+	return augs::first_free_path(get_path_in_untitled(path_template));
+}
+
+static auto get_unsaved_path(augs::path_type path) {
+	return path.replace_extension(path.extension() += ".unsaved");
+}
+
+static bool is_untitled_path(augs::path_type path) {
+	const auto untitled_dir = std::string(get_untitled_dir());
+	auto checked_path = path.string();
+	str_ops(checked_path).replace_all("\\", "/");
+
+	return untitled_dir == checked_path.substr(0, untitled_dir.length());
+}
+
+std::string editor_tab::get_display_path() const {
 	return current_path.filename().string();
 }
 
@@ -33,106 +61,58 @@ void editor_setup::set_popup(const editor_popup p) {
 	current_popup = p;
 }
 
-void editor_tab::set_workspace_path(const path_operation op) {
-	untitled_index = std::nullopt;
-
+void editor_tab::set_workspace_path(const workspace_path_op op, editor_recent_paths& recent) {
 	current_path = op.path;
-	op.recent.add(op.lua, op.path);
+	recent.add(op);
 }
 
-void editor_tab::set_locally_viewed(const entity_id id) {
-	work.locally_viewed = id;
-	panning = {};
+void editor_setup::set_locally_viewed(const entity_id id) {
+	work().locally_viewed = id;
+	tab().panning = {};
 }
 
-std::optional<editor_popup> editor_tab::open_workspace(const path_operation op) {
+std::optional<editor_popup> open_workspace(workspace& work, const workspace_path_op op) {
 	if (op.path.empty()) {
 		return std::nullopt;
 	}
 
-	const auto display_path = augs::to_display_path(op.path);
-
 	try {
-		if (op.path.extension() == ".wp") {
-			augs::load(work, op.path);
-		}
-		else if (op.path.extension() == ".lua") {
-			augs::load_from_lua_table(op.lua, work, op.path);
-		}
-		else {
-			return std::nullopt;
-		}
+		work.open(op);
+	}
+	catch (const workspace_loading_error err) {
+		editor_popup p;
 
-		set_workspace_path(op);
-	}
-	catch (const cosmos_loading_error err) {
-		return { {
-			"Error",
-			typesafe_sprintf("Failed to load %x.\nFile(s) might be corrupt.", display_path),
-			err.what()
-		} };
-	}
-	catch (const augs::stream_read_error err) {
-		return { {
-			"Error",
-			typesafe_sprintf("Failed to load %x.\nFile(s) might be corrupt.", display_path),
-			err.what()
-		} };
-	}
-	catch (const augs::lua_deserialization_error err) {
-		return { {
-			"Error",
-			typesafe_sprintf("Failed to load %x.\nNot a valid lua table.", display_path),
-			err.what()
-		} };
-	}
-	catch (const augs::ifstream_error err) {
-		return { {
-			"Error",
-			typesafe_sprintf("Failed to load %x.\nFile(s) might be missing.", display_path),
-			err.what()
-		} };
+		p.title = err.title;
+		p.details = err.details;
+		p.message = err.message;
+
+		return p;
 	}
 
 	return std::nullopt;
 }
 
-void editor_tab::save_workspace(const path_operation op) {
-	if (op.path.extension() == ".wp") {
-		augs::save(work, op.path);
-	}
-	else if (op.path.extension() == ".lua") {
-		augs::save_as_lua_table(op.lua, work, op.path);
-	}
-
-	set_workspace_path(op);
+bool editor_tab::has_unsaved_changes() const {
+	return true;
 }
 
-void editor_setup::open_untitled_workspace() {
-	tab().work.make_blank();
-	tab().current_path = {};
-}
-
-static auto get_recent_paths_path() {
-	return LOCAL_FILES_DIR "editor_recent_paths.lua";
+bool editor_tab::is_untitled() const {
+	return is_untitled_path(current_path);
 }
 
 editor_recent_paths::editor_recent_paths(sol::state& lua) {
 	try {
 		augs::load_from_lua_table(lua, *this, get_recent_paths_path());
 	}
-	catch (const augs::ifstream_error) {
-
-	}
-	catch (const augs::lua_deserialization_error) {
+	catch (...) {
 
 	}
 }
 
-void editor_recent_paths::add(sol::state& lua, const augs::path_type& path) {
-	erase_element(paths, path);
-	paths.insert(paths.begin(), path);
-	augs::save_as_lua_table(lua, *this, get_recent_paths_path());
+void editor_recent_paths::add(const workspace_path_op op) {
+	erase_element(paths, op.path);
+	paths.insert(paths.begin(), op.path);
+	augs::save_as_lua_table(op.lua, *this, get_recent_paths_path());
 }
 
 void editor_recent_paths::clear(sol::state& lua) {
@@ -144,10 +124,122 @@ bool editor_recent_paths::empty() const {
 	return paths.empty();
 }
 
-editor_setup::editor_setup(sol::state& lua) : recent(lua) {}
+editor_setup::editor_setup(
+	sol::state& lua
+) : 
+	destructor_autosave_input{ lua },
+	recent(lua) 
+{
+	augs::create_directories(get_untitled_dir());
 
-editor_setup::editor_setup(sol::state& lua, const augs::path_type& workspace_path) : recent(lua) {
-	open_workspace({ lua, workspace_path });
+	open_last_tabs(lua);
+}
+
+editor_setup::editor_setup(
+	sol::state& lua, 
+	const augs::path_type& workspace_path
+) : 
+	destructor_autosave_input{ lua },
+	recent(lua) 
+{
+	augs::create_directories(get_untitled_dir());
+
+	open_last_tabs(lua);
+	open_workspace_in_new_tab({ lua, workspace_path });
+}
+
+editor_setup::~editor_setup() {
+	autosave(destructor_autosave_input);
+}
+
+/* Thanks to https://stackoverflow.com/a/28139075/503776 */
+
+template <typename T>
+struct reversion_wrapper { T& iterable; };
+
+template <typename T>
+auto begin(reversion_wrapper<T> w) { return rbegin(w.iterable); }
+
+template <typename T>
+auto end(reversion_wrapper<T> w) { return rend(w.iterable); }
+
+template <typename T>
+reversion_wrapper<T> reverse(T&& iterable) { return { iterable }; }
+
+void editor_setup::open_last_tabs(sol::state& lua) {
+	ensure(tabs.empty());
+	ensure(works.empty());
+
+	try {
+		const auto opened_tabs = augs::load_from_lua_table<editor_saved_tabs>(lua, get_editor_tabs_path());
+		tabs = opened_tabs.tabs;
+
+		if (!tabs.empty()) {
+			/* Reload workspaces */
+
+			std::vector<std::size_t> tabs_to_close;
+
+			for (std::size_t i = 0; i < tabs.size(); ++i) {
+				works.emplace_back(std::make_unique<workspace>());
+				
+				if (const bool try_loading_unsaved = !tabs[i].is_untitled()) {
+					const auto unsaved_path = get_unsaved_path(tabs[i].current_path);
+
+					if (const auto popup = open_workspace(*works.back(), { lua, unsaved_path })) {
+						if (const auto popup = open_workspace(*works.back(), { lua, tabs[i].current_path })) {
+							set_popup(*popup);
+							tabs_to_close.push_back(i);
+						}
+					}
+				}
+				else {
+					if (const auto popup = open_workspace(*works.back(), { lua, tabs[i].current_path })) {
+						set_popup(*popup);
+						tabs_to_close.push_back(i);
+					}
+				}
+			}
+			
+			set_current_tab(opened_tabs.current_tab_index);
+
+			sort_container(tabs_to_close);
+
+			for (const auto i : reverse(tabs_to_close)) {
+				close_tab(i);
+			}
+		}
+	}
+	catch (...) {
+
+	}
+}
+
+void editor_setup::autosave(const autosave_input in) const {
+	editor_saved_tabs saved_tabs;
+
+	auto& lua = in.lua;
+
+	if (has_current_tab()) {
+		saved_tabs.tabs = tabs;
+		saved_tabs.current_tab_index = current_index;
+
+		for (std::size_t i = 0; i < tabs.size(); ++i) {
+			const auto& t = tabs[i];
+			const auto& w = *works[i];
+
+			if (const bool resave_untitled_work = t.is_untitled()) {
+				const auto saving_path = t.current_path;
+				w.save({ lua, saving_path });
+			}
+			else if (const bool cache_changes_of_named_work = t.has_unsaved_changes()) {
+				auto extension = t.current_path.extension();
+				const auto saving_path = augs::path_type(t.current_path).replace_extension(extension += ".unsaved");
+				w.save({ lua, saving_path });
+			}
+		}
+	}
+
+	augs::save_as_lua_table(lua, saved_tabs, get_editor_tabs_path());
 }
 
 void editor_setup::control(
@@ -163,7 +255,7 @@ void editor_setup::accept_game_gui_events(
 }
 
 void editor_setup::customize_for_viewing(config_lua_table& config) const {
-	if (has_tabs()) {
+	if (has_current_tab()) {
 		config.window.name = "Editor - " + tab().get_display_path();
 	}
 	else {
@@ -173,32 +265,30 @@ void editor_setup::customize_for_viewing(config_lua_table& config) const {
 	return;
 }
 
-void editor_setup::open_workspace(const path_operation op) {
-	if (0 && "MSVC strange error workaround") {
-		editor_tab* e = nullptr;
-		auto ppp = e->open_workspace({ op.lua, recent, op.path });
-	}
-	
-	try_new_tab(
-		[this, op](editor_tab& t) {
-			if (const auto popup = t.open_workspace({ op.lua, recent, op.path })) {
+bool editor_setup::open_workspace_in_new_tab(const path_operation op) {
+	return try_to_open_new_tab(
+		[this, op](editor_tab& t, workspace& work) {
+			if (const auto popup = open_workspace(work, op)) {
 				set_popup(*popup);
 				return false;
 			}
 			
+			t.set_workspace_path(op, recent);
+
 			return true;
 		}
 	);
 }
 
-void editor_setup::save_workspace(const path_operation op) {
-	tab().save_workspace({ op.lua, recent, op.path });
+void editor_setup::save_current_tab_to(const path_operation op) {
+	work().save(op);
+	tab().set_workspace_path(op, recent);
 }
 
 void editor_setup::fill_with_test_scene(sol::state& lua) {
 #if BUILD_TEST_SCENES
-	if (has_tabs()) {
-		tab().work.make_test_scene(lua, false);
+	if (has_current_tab()) {
+		work().make_test_scene(lua, false);
 	}
 #endif
 }
@@ -215,7 +305,7 @@ void editor_setup::perform_custom_imgui(
 	};
 
 	auto item_if_tabs_and = [this](const bool condition, const char* label, const char* shortcut = nullptr) {
-		return ImGui::MenuItem(label, shortcut, nullptr, condition && has_tabs());
+		return ImGui::MenuItem(label, shortcut, nullptr, condition && has_current_tab());
 	};
 
 	auto item_if_tabs = [&](const char* label, const char* shortcut = nullptr) {
@@ -245,7 +335,7 @@ void editor_setup::perform_custom_imgui(
 						const auto str = augs::to_display_path(target_path).string();
 
 						if (ImGui::MenuItem(str.c_str())) {
-							open_workspace(in_path(target_path));
+							open_workspace_in_new_tab(in_path(target_path));
 						}
 					}
 
@@ -269,7 +359,7 @@ void editor_setup::perform_custom_imgui(
 				ImGui::Separator();
 
 				const auto close_str = [&]() -> std::string {
-					if (has_tabs()) {
+					if (has_current_tab()) {
 						return std::string("Close ") + tab().get_display_path();
 					}
 
@@ -281,7 +371,7 @@ void editor_setup::perform_custom_imgui(
 				}
 
 				if (item_if_tabs("Close all")) {
-					while (has_tabs()) {
+					while (has_current_tab()) {
 						close_tab();
 					}
 				}
@@ -321,7 +411,7 @@ void editor_setup::perform_custom_imgui(
 			}
 		}
 
-		if (has_tabs()) {
+		if (has_current_tab()) {
 			const auto& g = *ImGui::GetCurrentContext();
 			const auto bar_size = ImVec2(g.IO.DisplaySize.x, g.FontBaseSize + g.Style.FramePadding.y * 2.0f);
 
@@ -349,41 +439,47 @@ void editor_setup::perform_custom_imgui(
 					out_style.colors[col::Col_TabLabelCloseButtonActive] = GetColorU32(rgba{ 210, 0, 0, 255 });
 				}
 
-				std::vector<std::string> tab_names;
-				std::vector<const char*> tab_names_cstrs;
-				std::vector<int> ordering;
+				// Tab algorithm i/o
 
-				tab_names.reserve(tabs.size());
-				tab_names_cstrs.reserve(tabs.size());
-				ordering.resize(tabs.size());
+				auto selected_index = static_cast<int>(current_index);
+				int closed_tab_index{ -1 };
 
-				int selected_index = -1;
+				auto ordering = [&]() {
+					std::vector<int> out;
+					out.reserve(tabs.size());
 
-				for (const auto& it : tabs) {
-					auto& t = it.second;
-
-					const auto this_index = tab_names.size();
-
-					if (&t == current_tab) {
-						selected_index = static_cast<int>(this_index);
+					for (const auto& it : tabs) {
+						out.push_back(out.size());
 					}
 
-					ordering[t.horizontal_index] = this_index;
-					
-					tab_names.push_back(t.get_display_path());
-				}
-
-				for (const auto& s : tab_names) {
-					tab_names_cstrs.push_back(s.c_str());
-				}
-
-				int closed_tab_index = -1;
-
-				auto passed_index = selected_index;
+					return out;
+				}();
 
 				{
+					const auto tab_names = [&]() {
+						std::vector<std::string> out;
+						out.reserve(tabs.size());
+
+						for (const auto& it : tabs) {
+							out.push_back(it.get_display_path());
+						}
+
+						return out;
+					}();
+
+					auto tab_names_cstrs = [&]() {
+						std::vector<const char*> out;
+						out.reserve(tabs.size());
+
+						for (const auto& it : tab_names) {
+							out.push_back(it.c_str());
+						}
+
+						return out;
+					}();
+
 					auto style = scoped_style_var(ImGuiStyleVar_FramePadding, []() { auto padding = ImGui::GetStyle().FramePadding; padding.x *= 2; return padding; }());
-					ImGui::TabLabels(tabs.size(), tab_names_cstrs.data(), passed_index, nullptr, false, nullptr, ordering.data(), true, true, &closed_tab_index, nullptr);
+					ImGui::TabLabels(tabs.size(), tab_names_cstrs.data(), selected_index, nullptr, false, nullptr, ordering.data(), true, true, &closed_tab_index, nullptr);
 				}
 
 				/* Read back */
@@ -392,42 +488,52 @@ void editor_setup::perform_custom_imgui(
 					std::size_t i = 0;
 
 					if (closed_tab_index != -1) {
-						for (auto& it : tabs) {
-							auto& t = it.second;
+						close_tab(static_cast<std::size_t>(closed_tab_index));
+					}
+					else {
+						bool changed_order = false;
 
-							if (i++ == closed_tab_index) {
-								close_tab(t);
+						for (std::size_t i = 0; i < ordering.size(); ++i) {
+							if (ordering[i] != i) {
+								changed_order = true;
 								break;
 							}
 						}
-					}
-					else {
-						for (auto& it : tabs) {
-							auto& t = it.second;
 
-							for (auto h = 0u; h < ordering.size(); ++h) {
-								if (ordering[h] == i) {
-									t.horizontal_index = static_cast<std::size_t>(h);
+						auto index_to_set = static_cast<std::size_t>(selected_index);
+
+						if (changed_order) {
+							decltype(tabs) new_tabs;
+							decltype(works) new_works;
+
+							new_tabs.reserve(tabs.size());
+							new_works.reserve(works.size());
+
+							for (const auto o : ordering) {
+								if (o == selected_index) {
+									index_to_set = new_tabs.size();
 								}
+
+								new_tabs.push_back(tabs[o]);
+								new_works.push_back(std::move(works[o]));
 							}
 
-							++i;
+							tabs = new_tabs;
+							works = std::move(new_works);
 						}
 
-						if (passed_index != -1 && passed_index != selected_index) {
-							set_tab_by_index(static_cast<std::size_t>(passed_index));
-						}
+						set_current_tab(index_to_set);
 					}
 				}
 			}
 		}
 	}
 
-	if (has_tabs()) {
+	if (has_current_tab()) {
 		if (show_summary) {
 			auto summary = scoped_window("Summary", &show_summary, ImGuiWindowFlags_AlwaysAutoResize);
 
-			if (has_tabs()) {
+			if (has_current_tab()) {
 				text(typesafe_sprintf("Tick rate: %x/s", get_viewed_cosmos().get_steps_per_second()));
 				text(typesafe_sprintf("Total entities: %x/%x",
 					get_viewed_cosmos().get_entities_count(),
@@ -477,8 +583,8 @@ void editor_setup::perform_custom_imgui(
 			static ImGuiTextFilter filter;
 			filter.Draw();
 			
-			tab().work.world.for_each_entity_id([&](const entity_id id) {
-				const auto handle = tab().work.world[id];
+			work().world.for_each_entity_id([&](const entity_id id) {
+				const auto handle = work().world[id];
 				const auto name = to_string(handle.get_name());
 
 				if (filter.PassFilter(name.c_str())) {
@@ -486,7 +592,7 @@ void editor_setup::perform_custom_imgui(
 
 					if (auto node = scoped_tree_node(name.c_str())) {
 						if (ImGui::Button("Control")) {
-							tab().set_locally_viewed(id);
+							set_locally_viewed(id);
 						}
 					}
 				}
@@ -499,7 +605,7 @@ void editor_setup::perform_custom_imgui(
 		const auto result_path = open_file_dialog.get();
 
 		if (result_path) {
-			open_workspace(in_path(*result_path));
+			open_workspace_in_new_tab(in_path(*result_path));
 		}
 	}
 
@@ -507,7 +613,7 @@ void editor_setup::perform_custom_imgui(
 		const auto result_path = save_file_dialog.get();
 
 		if (result_path) {
-			save_workspace(in_path(*result_path));
+			save_current_tab_to(in_path(*result_path));
 		}
 	}
 
@@ -581,20 +687,20 @@ void editor_setup::open(const augs::window& owner) {
 }
 
 void editor_setup::save(sol::state& lua, const augs::window& owner) {
-	if (!has_tabs()) {
+	if (!has_current_tab()) {
 		return;
 	}
 
-	if (tab().current_path.empty()) {
+	if (tab().is_untitled()) {
 		save_as(owner);
 	}
 	else {
-		save_workspace({ lua, tab().current_path });
+		save_current_tab_to({ lua, tab().current_path });
 	}
 }
 
 void editor_setup::save_as(const augs::window& owner) {
-	if (!has_tabs() || current_popup) {
+	if (!has_current_tab() || current_popup) {
 		return;
 	}
 
@@ -667,75 +773,54 @@ void editor_setup::next() {
 }
 
 void editor_setup::new_tab() {
-	try_new_tab([&](editor_tab& t) { 
-		t.untitled_index = untitled_index++; 
+	try_to_open_new_tab([&](editor_tab& t, workspace& w) {
+		const auto path = get_first_free_untitled_path("Workspace%x.wp");
+		augs::create_text_file(path, "empty");
+
+		t.current_path = path;
 		return true; 
 	});
 }
 
-void editor_setup::set_tab_by_index(const std::size_t next_index) {
-	std::size_t i = 0;
-
-	for (auto& t : tabs) {
-		if (i++ == next_index) {
-			set_current_tab(t.second);
-		}
-	}
-}
-
-void editor_setup::set_tab_by_horizontal_index(const std::size_t next_index) {
-	const auto found = find_if_in(tabs,
-		[next_index](const auto& it) {
-			return it.second.horizontal_index == next_index;
-		}
-	);
-
-	set_current_tab((*found).second);
-}
-
 void editor_setup::next_tab() {
-	if (has_tabs()) {
-		set_tab_by_horizontal_index((current_tab->horizontal_index + 1) % tabs.size());
+	if (has_current_tab()) {
+		set_current_tab((current_index + 1) % tabs.size());
 	}
 }
 
 void editor_setup::prev_tab() {
-	if (has_tabs()) {
-		set_tab_by_horizontal_index([this]() {
-			const auto current_index = current_tab->horizontal_index;
-
-			if (current_index == 0) {
-				return tabs.size() - 1;
-			}
-			else {
-				return current_index - 1;
-			}
-		}());
+	if (has_current_tab()) {
+		set_current_tab(current_index == 0 ? tabs.size() - 1 : current_index - 1);
 	}
 }
 
-void editor_setup::close_tab(editor_tab& tab_to_close) {
-	const auto current_horizontal_index = current_tab->horizontal_index;
-	const auto closed_horizontal_index = tab_to_close.horizontal_index;
-	erase_if(tabs, [&](const auto& it) { return std::addressof(it.second) == std::addressof(tab_to_close); });
+void editor_setup::close_tab(const std::size_t i) {
+	auto& tab_to_close = tabs[i];
 
-	for (auto& it : tabs) {
-		if (it.second.horizontal_index > closed_horizontal_index) {
-			--it.second.horizontal_index;
-		}
+	if (tab_to_close.has_unsaved_changes()) {
+		set_popup({ "Nie", "Nie", "Nie" });
+		return;
+	}
+		
+	if (tab_to_close.is_untitled()) {
+		augs::remove_file(tab_to_close.current_path);
 	}
 
-	if (has_tabs()) {
-		set_tab_by_horizontal_index(std::min(current_horizontal_index, tabs.size() - 1));
+	tabs.erase(tabs.begin() + i);
+	works.erase(works.begin() + i);
+
+	if (!tabs.empty()) {
+		set_current_tab(std::min(current_index, tabs.size() - 1));
 	}
 	else {
 		unset_current_tab();
+		pause();
 	}
 }
 
 void editor_setup::close_tab() {
-	if (current_tab) {
-		close_tab(*current_tab);
+	if (has_current_tab()) {
+		close_tab(current_index);
 	}
 }
 
@@ -816,7 +901,7 @@ bool editor_setup::handle_unfetched_window_input(
 	if (player_paused) {
 		if (e.msg == message::mousemotion) {
 			if (common_input_state[key::RMOUSE]) {
-				if (has_tabs()) {
+				if (has_current_tab()) {
 					tab().panning -= e.mouse.rel;
 
 					return true;
@@ -825,7 +910,7 @@ bool editor_setup::handle_unfetched_window_input(
 		}
 
 		if (e.was_pressed(key::HOME)) {
-			if (has_tabs()) {
+			if (has_current_tab()) {
 				tab().panning = {};
 
 				return true;

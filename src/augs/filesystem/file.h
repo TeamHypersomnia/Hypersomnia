@@ -30,6 +30,23 @@ namespace augs {
 		return std::ifstream(path).good();
 	}
 
+	inline void remove_file(const path_type& path) {
+		std::experimental::filesystem::remove(path);
+	}
+
+	inline path_type first_free_path(const path_type path_template) {
+		for (std::size_t candidate = 0;; ++candidate) {
+			const auto candidate_path = candidate ? 
+				typesafe_sprintf(path_template.string(), typesafe_sprintf("-%x", candidate))
+				: typesafe_sprintf(path_template.string(), "")
+			;
+
+			if (!file_exists(candidate_path)) {
+				return candidate_path;
+			}
+		}
+	}
+
 	inline path_type switch_path(
 		const path_type canon_path,
 		const path_type local_path

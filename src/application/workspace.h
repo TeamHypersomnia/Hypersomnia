@@ -10,6 +10,17 @@ namespace sol {
 	class state;
 }
 
+struct workspace_loading_error {
+	std::string title;
+	std::string message;
+	std::string details;
+};
+
+struct workspace_path_op {
+	sol::state& lua;
+	augs::path_type path;
+};
+
 struct workspace {
 	// GEN INTROSPECTOR struct workspace
 	cosmos world;
@@ -24,6 +35,9 @@ struct workspace {
 #endif
 
 	void make_blank();
+
+	void open(const workspace_path_op);
+	void save(const workspace_path_op) const;
 
 	template <class... Callbacks>
 	void advance(

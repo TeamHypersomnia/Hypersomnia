@@ -1,7 +1,8 @@
 #pragma once
 #include "augs/misc/enum/enum_array.h"
 
-enum class render_layer : unsigned char {
+enum class render_layer {
+	// GEN INTROSPECTOR enum class render_layer
 	INVALID,
 	OVER_CROSSHAIR,
 	CROSSHAIR,
@@ -20,12 +21,8 @@ enum class render_layer : unsigned char {
 	UNDER_GROUND,
 
 	COUNT
+	// END GEN INTROSPECTOR
 };
 
 template <class T>
-struct per_render_layer {
-	typedef typename augs::enum_array<T, render_layer> type;
-};
-
-template<class T>
-using per_render_layer_t = typename per_render_layer<T>::type;
+using per_render_layer_t = augs::enum_array<T, render_layer>;
