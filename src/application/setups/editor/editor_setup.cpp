@@ -12,57 +12,14 @@
 
 #include "application/config_lua_table.h"
 #include "application/setups/editor/editor_setup.h"
+#include "application/setups/editor/editor_paths.h"
 
 #include <imgui/imgui_internal.h>
 
 #include "generated/introspectors.h"
 
-#define EDITOR_DIR LOCAL_FILES_DIR "editor/"
-
-static auto get_editor_tabs_path() {
-	return EDITOR_DIR "editor_tabs.lua";
-}
-
-static auto get_recent_paths_path() {
-	return EDITOR_DIR "editor_recent_paths.lua";
-}
-
-static auto get_untitled_dir() {
-	return EDITOR_DIR "untitled/";
-}
-
-template <class T>
-static auto get_path_in_untitled(const T& p) {
-	return augs::path_type(get_untitled_dir()) += p;
-}
-
-template <class T>
-static auto get_first_free_untitled_path(const T& path_template) {
-	return augs::first_free_path(get_path_in_untitled(path_template));
-}
-
-static auto get_unsaved_path(augs::path_type path) {
-	return path.replace_extension(path.extension() += ".unsaved");
-}
-
-static bool is_untitled_path(augs::path_type path) {
-	const auto untitled_dir = augs::path_type(get_untitled_dir()).make_preferred().string();
-	const auto checked_path = path.make_preferred().string();
-
-	return untitled_dir == checked_path.substr(0, untitled_dir.length());
-}
-
-std::string editor_tab::get_display_path() const {
-	return current_path.filename().string();
-}
-
 void editor_setup::set_popup(const editor_popup p) {
 	current_popup = p;
-}
-
-void editor_tab::set_workspace_path(const workspace_path_op op, editor_recent_paths& recent) {
-	current_path = op.path;
-	recent.add(op);
 }
 
 void editor_setup::set_locally_viewed(const entity_id id) {
@@ -91,37 +48,6 @@ std::optional<editor_popup> open_workspace(workspace& work, const workspace_path
 	return std::nullopt;
 }
 
-bool editor_tab::has_unsaved_changes() const {
-	return true;
-}
-
-bool editor_tab::is_untitled() const {
-	return is_untitled_path(current_path);
-}
-
-editor_recent_paths::editor_recent_paths(sol::state& lua) {
-	try {
-		augs::load_from_lua_table(lua, *this, get_recent_paths_path());
-	}
-	catch (...) {
-
-	}
-}
-
-void editor_recent_paths::add(const workspace_path_op op) {
-	erase_element(paths, op.path);
-	paths.insert(paths.begin(), op.path);
-	augs::save_as_lua_table(op.lua, *this, get_recent_paths_path());
-}
-
-void editor_recent_paths::clear(sol::state& lua) {
-	paths.clear();
-	augs::save_as_lua_table(lua, *this, get_recent_paths_path());
-}
-
-bool editor_recent_paths::empty() const {
-	return paths.empty();
-}
 
 editor_setup::editor_setup(
 	sol::state& lua
@@ -250,6 +176,16 @@ void editor_setup::customize_for_viewing(config_lua_table& config) const {
 	return;
 }
 
+void editor_setup::apply(const config_lua_table& cfg) {
+	if (cfg.editor.autosave != settings.autosave) {
+		autosave_timer = {};
+	}
+		
+	settings = cfg.editor;
+
+	return;
+}
+
 bool editor_setup::open_workspace_in_new_tab(const path_operation op) {
 	for (std::size_t i = 0; i < tabs.size(); ++i) {
 		if (tabs[i].current_path == op.path) {
@@ -265,7 +201,7 @@ bool editor_setup::open_workspace_in_new_tab(const path_operation op) {
 				return false;
 			}
 			
-			t.set_workspace_path(op, recent);
+			t.set_workspace_path(op.lua, op.path, recent);
 
 			return true;
 		}
@@ -274,7 +210,7 @@ bool editor_setup::open_workspace_in_new_tab(const path_operation op) {
 
 void editor_setup::save_current_tab_to(const path_operation op) {
 	work().save(op);
-	tab().set_workspace_path(op, recent);
+	tab().set_workspace_path(op.lua, op.path, recent);
 }
 
 void editor_setup::fill_with_test_scene(sol::state& lua) {

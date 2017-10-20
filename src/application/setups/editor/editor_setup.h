@@ -1,7 +1,6 @@
 #pragma once
 #include <future>
 #include <map>
-#include <unordered_map>
 
 #include "augs/misc/timing/fixed_delta_timer.h"
 #include "augs/misc/debug_entropy_player.h"
@@ -19,13 +18,13 @@
 
 #include "application/debug_character_selection.h"
 #include "application/debug_settings.h"
+
 #include "application/setups/editor/editor_settings.h"
+#include "application/setups/editor/editor_tab.h"
+#include "application/setups/editor/editor_recent_paths.h"
+#include "application/setups/editor/current_tab_access_cache.h"
 
 struct config_lua_table;
-
-namespace sol {
-	class state;
-}
 
 namespace augs {
 	class window;
@@ -36,17 +35,6 @@ namespace augs {
 	}
 }
 
-struct editor_recent_paths {
-	// GEN INTROSPECTOR struct editor_recent_paths
-	std::vector<augs::path_type> paths;
-	// END GEN INTROSPECTOR
-
-	editor_recent_paths(sol::state& lua);
-	void add(const workspace_path_op);
-	void clear(sol::state&);
-	bool empty() const;
-};
-
 struct editor_popup {
 	std::string title;
 	std::string message;
@@ -55,36 +43,16 @@ struct editor_popup {
 	bool details_expanded = false;
 };
 
-struct editor_tab {
-	// GEN INTROSPECTOR struct editor_tab
-	augs::path_type current_path;
-	std::unordered_map<entity_id, rgba> selected_entities;
-	vec2 panning;
-	// END GEN INTROSPECTOR
+class editor_setup : private current_tab_access_cache<editor_setup> {
+	friend class current_tab_access_cache<editor_setup>;
 
-	void set_workspace_path(const workspace_path_op, editor_recent_paths&);
-	
-	bool has_unsaved_changes() const;
-	bool is_untitled() const;
-
-	std::string get_display_path() const;
-};
-
-struct editor_saved_tabs {
-	// GEN INTROSPECTOR struct editor_saved_tabs
-	std::size_t current_tab_index = -1;
-	std::vector<editor_tab> tabs;
-	// END GEN INTROSPECTOR
-};
-
-class editor_setup {
 	struct autosave_input {
 		sol::state& lua;
 	};
 
 	const autosave_input destructor_autosave_input;
-
 	augs::timer autosave_timer;
+
 	editor_settings settings;
 
 	std::optional<editor_popup> current_popup;
@@ -102,51 +70,6 @@ class editor_setup {
 	
 	std::vector<editor_tab> tabs;
 	std::vector<std::unique_ptr<workspace>> works;
-
-	std::size_t current_index = -1;
-	
-	/* Cache for fast access */
-	editor_tab* current_tab = nullptr;
-	workspace* current_work = nullptr;
-
-	void set_current_tab(const std::size_t i) {
-		current_index = i;
-
-		current_tab = &tabs[i];
-		current_work = works[i].get();
-	}
-
-	void unset_current_tab() {
-		current_index = -1;
-
-		current_tab = nullptr;
-		current_work = nullptr;
-	};
-
-	void set_current_tab(editor_tab& t) {
-		current_tab = std::addressof(t);
-		pause();
-	}
-
-	bool has_current_tab() const {
-		return current_tab != nullptr;
-	}
-
-	auto& tab() {
-		return *current_tab;
-	}
-
-	const auto& tab() const {
-		return *current_tab;
-	}
-
-	auto& work() {
-		return *current_work;
-	}
-
-	const auto& work() const {
-		return *current_work;
-	}
 
 	void set_locally_viewed(const entity_id);
 
@@ -202,27 +125,27 @@ public:
 	
 	~editor_setup();
 
-	auto get_audiovisual_speed() const {
+	FORCE_INLINE auto get_audiovisual_speed() const {
 		return player_paused ? 0.0 : player_speed;
 	}
 
-	const auto& get_viewed_cosmos() const {
+	FORCE_INLINE const auto& get_viewed_cosmos() const {
 		return has_current_tab() ? work().world : cosmos::empty; 
 	}
 
-	auto get_interpolation_ratio() const {
+	FORCE_INLINE auto get_interpolation_ratio() const {
 		return timer.fraction_of_step_until_next_step(get_viewed_cosmos().get_fixed_delta());
 	}
 
-	auto get_viewed_character_id() const {
+	FORCE_INLINE auto get_viewed_character_id() const {
 		return has_current_tab() ? work().locally_viewed : entity_id();
 	}
 
-	auto get_viewed_character() const {
+	FORCE_INLINE auto get_viewed_character() const {
 		return get_viewed_cosmos()[get_viewed_character_id()];
 	}
 
-	const auto& get_viewable_defs() const {
+	FORCE_INLINE const auto& get_viewable_defs() const {
 		return has_current_tab() ? work().viewables : all_viewables_defs::empty;
 	}
 
@@ -237,16 +160,7 @@ public:
 	}
 
 	void customize_for_viewing(config_lua_table& cfg) const;
-
-	void apply(const config_lua_table& cfg) {
-		if (cfg.editor.autosave != settings.autosave) {
-			autosave_timer = {};
-		}
-			
-		settings = cfg.editor;
-
-		return;
-	}
+	void apply(const config_lua_table& cfg);
 
 	template <class... Callbacks>
 	void advance(
@@ -317,7 +231,7 @@ public:
 	void go_to_all();
 	void open_containing_folder();
 
-	auto get_camera_panning() const {
+	FORCE_INLINE auto get_camera_panning() const {
 		return has_current_tab() ? tab().panning : vec2::zero;
 	}
 };

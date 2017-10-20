@@ -387,6 +387,8 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 #	"src/application/setups/two_clients_and_server_setup.cpp" #
 	"src/application/setups/test_scene_setup.cpp"
 	"src/application/setups/editor/editor_setup.cpp"
+	"src/application/setups/editor/editor_tab.cpp"
+	"src/application/setups/editor/editor_recent_paths.cpp"
 #	"src/application/setups/choreographic_setup.cpp" #
 #	"src/application/setups/director_setup.cpp" #
 	"src/application/setups/main_menu_setup.cpp"

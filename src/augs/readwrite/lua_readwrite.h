@@ -1,6 +1,8 @@
 #pragma once
 #include <sol2/sol.hpp>
 
+#include "augs/pad_bytes.h"
+
 #include "augs/templates/string_to_enum.h"
 #include "augs/templates/is_variant.h"
 #include "augs/templates/is_optional.h"
