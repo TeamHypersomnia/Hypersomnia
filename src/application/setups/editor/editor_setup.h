@@ -19,7 +19,7 @@
 
 #include "application/debug_character_selection.h"
 #include "application/debug_settings.h"
-#include "application/setups/editor_settings.h"
+#include "application/setups/editor/editor_settings.h"
 
 struct config_lua_table;
 

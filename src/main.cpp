@@ -41,7 +41,7 @@
 
 #include "application/setups/main_menu_setup.h"
 #include "application/setups/test_scene_setup.h"
-#include "application/setups/editor_setup.h"
+#include "application/setups/editor/editor_setup.h"
 
 #include "application/main/imgui_pass.h"
 #include "application/main/draw_debug_details.h"

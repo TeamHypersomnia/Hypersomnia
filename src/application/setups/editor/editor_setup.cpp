@@ -11,7 +11,7 @@
 #include "augs/window_framework/shell.h"
 
 #include "application/config_lua_table.h"
-#include "application/setups/editor_setup.h"
+#include "application/setups/editor/editor_setup.h"
 
 #include <imgui/imgui_internal.h>
 

@@ -26,7 +26,7 @@
 #include "application/debug_settings.h"
 #include "application/session_settings.h"
 #include "application/setups/main_menu_settings.h"
-#include "application/setups/editor_settings.h"
+#include "application/setups/editor/editor_settings.h"
 #include "application/app_intent_type.h"
 
 enum class launch_type {
