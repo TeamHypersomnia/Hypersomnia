@@ -43,9 +43,6 @@
 
 using rng_seed_type = unsigned;
 
-class cosmic_delta;
-struct data_living_one_step;
-
 enum class subjects_iteration_flag {
 	POSSIBLE_ITERATOR_INVALIDATION,
 
