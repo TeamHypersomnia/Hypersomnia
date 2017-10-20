@@ -15,6 +15,6 @@ struct editor_autosave_settings {
 struct editor_settings {
 	// GEN INTROSPECTOR struct editor_settings
 	editor_autosave_settings autosave;
-	vec2 camera_panning_speed = { 1.f, 1.f };
+	float camera_panning_speed = 1.f;
 	// END GEN INTROSPECTOR
 };

@@ -151,20 +151,6 @@ editor_setup::~editor_setup() {
 	autosave(destructor_autosave_input);
 }
 
-/* Thanks to https://stackoverflow.com/a/28139075/503776 */
-
-template <typename T>
-struct reversion_wrapper { T& iterable; };
-
-template <typename T>
-auto begin(reversion_wrapper<T> w) { return rbegin(w.iterable); }
-
-template <typename T>
-auto end(reversion_wrapper<T> w) { return rend(w.iterable); }
-
-template <typename T>
-reversion_wrapper<T> reverse(T&& iterable) { return { iterable }; }
-
 void editor_setup::open_last_tabs(sol::state& lua) {
 	ensure(tabs.empty());
 	ensure(works.empty());
@@ -294,7 +280,7 @@ void editor_setup::save_current_tab_to(const path_operation op) {
 void editor_setup::fill_with_test_scene(sol::state& lua) {
 #if BUILD_TEST_SCENES
 	if (has_current_tab()) {
-		work().make_test_scene(lua, false);
+		work().make_test_scene(lua, true);
 	}
 #endif
 }

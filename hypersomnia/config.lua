@@ -115,10 +115,7 @@ return {
       enabled = true,
       once_every_min = 1
     },
-    camera_panning_speed = {
-      x = 1,
-      y = 1
-    }
+    camera_panning_speed = 1
   },
   gui_style = {
     Alpha = 1,

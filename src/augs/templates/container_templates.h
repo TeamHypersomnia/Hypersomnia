@@ -225,3 +225,17 @@ template <class C1, class C2>
 auto compare_containers(const C1& c1, const C2& c2) {
 	return std::equal(std::begin(c1), std::end(c1), std::begin(c2));
 }
+
+/* Thanks to https://stackoverflow.com/a/28139075/503776 */
+
+template <typename T>
+struct reversion_wrapper { T& iterable; };
+
+template <typename T>
+auto begin(reversion_wrapper<T> w) { return rbegin(w.iterable); }
+
+template <typename T>
+auto end(reversion_wrapper<T> w) { return rend(w.iterable); }
+
+template <typename T>
+reversion_wrapper<T> reverse(T&& iterable) { return { iterable }; }
