@@ -151,12 +151,9 @@ public:
 	void perform_custom_imgui(
 		sol::state& lua,
 		augs::window& owner,
-		const bool in_direct_gameplay
+		const bool in_direct_gameplay,
+		const camera_cone current_cone
 	);
-
-	bool during_popup() const {
-		return current_popup.has_value();
-	}
 
 	void customize_for_viewing(config_lua_table& cfg) const;
 	void apply(const config_lua_table& cfg);
@@ -200,7 +197,9 @@ public:
 		const augs::event::change change,
 
 		augs::window& window,
-		sol::state& lua
+		sol::state& lua,
+
+		const camera_cone current_cone
 	);
 
 	bool escape();

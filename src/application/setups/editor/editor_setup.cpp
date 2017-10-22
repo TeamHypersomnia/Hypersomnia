@@ -225,7 +225,9 @@ void editor_setup::fill_with_test_scene(sol::state& lua) {
 void editor_setup::perform_custom_imgui(
 	sol::state& lua,
 	augs::window& owner,
-	const bool in_direct_gameplay
+	const bool in_direct_gameplay,
+
+	const camera_cone current_cone
 ) {
 	using namespace augs::imgui;
 
@@ -471,7 +473,12 @@ void editor_setup::perform_custom_imgui(
 			auto summary = scoped_window("Summary", &show_summary, ImGuiWindowFlags_AlwaysAutoResize);
 
 			if (has_current_tab()) {
-				text(typesafe_sprintf("Tick rate: %x/s", get_viewed_cosmos().get_steps_per_second()));
+				const auto mouse_pos = vec2(ImGui::GetIO().MousePos);
+				const auto screen_size = vec2(ImGui::GetIO().DisplaySize);
+				const auto world_cursor_pos = current_cone.transform.pos + mouse_pos - screen_size / 2;
+				
+				//text(typesafe_sprintf("Tick rate: %x/s", get_viewed_cosmos().get_steps_per_second()));
+				text(typesafe_sprintf("Cursor: %x", world_cursor_pos));
 				text(typesafe_sprintf("Total entities: %x/%x",
 					get_viewed_cosmos().get_entities_count(),
 					get_viewed_cosmos().get_maximum_entities()
@@ -830,7 +837,9 @@ bool editor_setup::handle_unfetched_window_input(
 	const augs::event::change e,
 
 	augs::window& window,
-	sol::state& lua
+	sol::state& lua,
+	
+	const camera_cone current_cone
 ) {
 	using namespace augs::event;
 	using namespace augs::event::keys;
