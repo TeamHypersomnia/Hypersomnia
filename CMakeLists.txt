@@ -583,6 +583,11 @@ endif()
 
 add_definitions(-DSOL_USING_CXX_LUA)
 
+# We must wait till SOL will fixes these warnings.
+
+add_definitions(-D_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING)
+add_definitions(-D_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING)
+
 # To avoid linker errors, we also need to tell OpenAL Soft we will be using it statically.
 
 if(BUILD_OPENAL)
