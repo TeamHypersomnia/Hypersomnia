@@ -15,6 +15,10 @@ void world_camera::tick(
 	world_camera_settings settings,
 	const const_entity_handle entity_to_chase
 ) {
+	if (const bool minimized = screen_size.is_zero()) {
+		return;
+	}
+
 	const auto& cosm = entity_to_chase.get_cosmos();
 
 	const auto enable_smoothing = settings.enable_smoothing;

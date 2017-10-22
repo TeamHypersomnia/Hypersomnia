@@ -1147,7 +1147,7 @@ int work(const int argc, const char* const * const argv) try {
 			except for usage of graphical resources and profilers.
 		*/
 
-		if (!window.should_render()) {
+		if (const bool minimized = screen_size.is_zero()) {
 			continue;
 		}
 

@@ -24,6 +24,10 @@ void necessary_fbos::apply(
 	const vec2i screen_size,
 	const game_drawing_settings settings
 ) {
+	if (const bool just_minimized = screen_size.is_zero()) {
+		return;
+	}
+
 	auto reset = [screen_size](auto& fbo) {
 		if (!fbo || fbo->get_size() != screen_size) {
 			fbo.emplace(screen_size);
