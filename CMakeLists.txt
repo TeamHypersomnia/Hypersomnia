@@ -588,6 +588,10 @@ add_definitions(-DSOL_USING_CXX_LUA)
 add_definitions(-D_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING)
 add_definitions(-D_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING)
 
+# We must wait till Catch fixes this warning.
+
+add_definitions(-D_SILENCE_CXX17_UNCAUGHT_EXCEPTION_DEPRECATION_WARNING)
+
 # To avoid linker errors, we also need to tell OpenAL Soft we will be using it statically.
 
 if(BUILD_OPENAL)
