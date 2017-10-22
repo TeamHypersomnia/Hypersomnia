@@ -32,13 +32,6 @@ void tree_of_npo_system::destroy_inferred_state_of(const const_entity_handle han
 	}
 }
 
-struct dsadsa {
-	int a;
-	pad_bytes<0> pad;
-};
-
-auto b= sizeof(dsadsa);
-
 void tree_of_npo_system::create_inferred_state_for(const const_entity_handle handle) {
 	auto& cache = get_cache(handle.get_id());
 

@@ -463,7 +463,11 @@ namespace augs {
 	bool window::is_active() const {
 		return active;
 	}
-	
+
+	bool window::should_render() const {
+		return !IsIconic(hwnd);
+	}
+
 	bool window::is_cursor_in_client_area() const {
 		return cursor_in_client_area; 
 	}
@@ -609,6 +613,7 @@ namespace augs {
 	xywhi window::get_window_rect() const { return {}; }
 
 	bool window::is_active() const { return false; }
+	bool window::should_render() const { return false; }
 	void window::destroy() {}
 
 	bool window::set_as_current_impl() {
@@ -659,6 +664,7 @@ namespace augs {
 	xywhi window::get_window_rect() const { return {}; }
 
 	bool window::is_active() const { return false; }
+	bool window::should_render() const { return false; }
 	void window::destroy() {}
 
 	bool window::set_as_current_impl() {

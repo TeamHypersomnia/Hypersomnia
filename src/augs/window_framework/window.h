@@ -97,6 +97,7 @@ namespace augs {
 		xywhi get_window_rect() const;
 
 		bool is_active() const;
+		bool should_render() const;
 
 		struct file_dialog_filter {
 			std::string description;

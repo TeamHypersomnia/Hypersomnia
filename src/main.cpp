@@ -1147,6 +1147,10 @@ int work(const int argc, const char* const * const argv) try {
 			except for usage of graphical resources and profilers.
 		*/
 
+		if (!window.should_render()) {
+			continue;
+		}
+
 		auto frame = measure_scope(profiler.frame);
 		
 		auto get_drawer = [&]() { 
