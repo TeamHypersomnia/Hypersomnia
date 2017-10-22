@@ -14,6 +14,18 @@ struct cosmos_common_state;
 
 /* NPO stands for "non-physical objects" */
 
+union tree_of_npo_node {
+	using payload_type = unversioned_entity_id;
+	static_assert(sizeof(payload_type) <= sizeof(void*));
+
+	payload_type payload;
+	void* bytes;
+
+	tree_of_npo_node() {
+		bytes = nullptr;
+	}
+};
+
 class tree_of_npo_system {
 	friend class cosmos;
 	
@@ -63,11 +75,11 @@ public:
 			const b2DynamicTree* tree;
 			F callback;
 
-			bool QueryCallback(const int32 node) const {
-				unversioned_entity_id id;
-				id.indirection_index = reinterpret_cast<decltype(id.indirection_index)>(tree->GetUserData(node));
-
-				callback(id);
+			bool QueryCallback(const int32 node_id) const {
+				tree_of_npo_node node;
+				node.bytes = tree->GetUserData(node_id);
+				
+				callback(node.payload);
 				return true;
 			}
 		};

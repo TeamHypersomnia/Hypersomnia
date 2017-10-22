@@ -68,8 +68,8 @@ augs::vertex_triangle_buffer draw_circular_bars_and_get_textual_info(const draw_
 			) {
 				augs::special s;
 
-				s.v1.set(augs::normalize_degrees(lower_outside), augs::normalize_degrees(upper_outside + 0.001)) /= 180;
-				s.v2.set(augs::normalize_degrees(lower_inside), augs::normalize_degrees(upper_inside + 0.001)) /= 180;
+				s.v1.set(augs::normalize_degrees(lower_outside), augs::normalize_degrees(upper_outside + 0.001f)) /= 180;
+				s.v2.set(augs::normalize_degrees(lower_inside), augs::normalize_degrees(upper_inside + 0.001f)) /= 180;
 
 				specials.push_back(s);
 				specials.push_back(s);

@@ -1,3 +1,8 @@
+/*
+	Disable float/int warnings, this is just a content script
+*/
+#pragma warning(disable : 4244)
+
 #include "augs/misc/enum/enum_associative_array.h"
 
 #include "game/assets/ids/particle_effect_id.h"
@@ -8,7 +13,6 @@
 #include "view/viewables/particle_effect.h"
 
 #include "test_scenes/test_scenes_content.h"
-
 
 /* 
 	This code is shit. 

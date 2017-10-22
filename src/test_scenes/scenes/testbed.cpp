@@ -1,3 +1,8 @@
+/*
+	Disable float/int warnings, this is just a content script
+*/
+#pragma warning(disable : 4244)
+
 #include "game/assets/ids/game_image_id.h"
 #include "game/assets/all_logical_assets.h"
 

@@ -32,15 +32,22 @@ void tree_of_npo_system::destroy_inferred_state_of(const const_entity_handle han
 	}
 }
 
+struct dsadsa {
+	int a;
+	pad_bytes<0> pad;
+};
+
+auto b= sizeof(dsadsa);
+
 void tree_of_npo_system::create_inferred_state_for(const const_entity_handle handle) {
 	auto& cache = get_cache(handle.get_id());
 
 	ensure(!cache.is_constructed());
 
-	const auto tree_of_npo_node = handle.find<components::tree_of_npo_node>();
+	const auto node = handle.find<components::tree_of_npo_node>();
 
-	if (tree_of_npo_node != nullptr && tree_of_npo_node.is_activated()) {
-		const auto data = tree_of_npo_node.get_raw_component();
+	if (node != nullptr && node.is_activated()) {
+		const auto data = node.get_raw_component();
 
 		cache.type = data.type;
 
@@ -52,10 +59,10 @@ void tree_of_npo_system::create_inferred_state_for(const const_entity_handle han
 			input.lowerBound = data.aabb.left_top();
 			input.upperBound = data.aabb.right_bottom();
 			
-			auto node_userdata = handle.get_id().operator unversioned_entity_id();
-			static_assert(sizeof(node_userdata) <= sizeof(void*), "Userdata must be less than size of void*");
+			tree_of_npo_node data;
+			data.payload = handle.get_id().operator unversioned_entity_id();
 
-			cache.tree_proxy_id = get_tree(cache).nodes.CreateProxy(input, reinterpret_cast<void*>(node_userdata.indirection_index));
+			cache.tree_proxy_id = get_tree(cache).nodes.CreateProxy(input, data.bytes);
 		}
 		
 		cache.constructed = true;
