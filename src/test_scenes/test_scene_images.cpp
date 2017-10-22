@@ -1,11 +1,11 @@
 #include "augs/filesystem/file.h"
-#include "augs/readwrite/lua_readwrite.h"
 
 #include "view/viewables/game_image.h"
 #include "view/viewables/regeneration/game_image_loadables.h"
 
 #include "test_scenes/test_scenes_content.h"
 
+#include "augs/readwrite/lua_readwrite.h"
 #include "generated/introspectors.h"
 
 void load_test_scene_images(

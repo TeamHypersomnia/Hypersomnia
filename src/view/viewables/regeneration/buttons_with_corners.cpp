@@ -2,13 +2,13 @@
 
 #include "augs/readwrite/streams.h"
 #include "augs/image/image.h"
-#include "augs/readwrite/byte_readwrite.h"
 
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
 
 #include "view/viewables/regeneration/buttons_with_corners.h"
 
+#include "augs/readwrite/byte_readwrite.h"
 #include "generated/introspectors.h"
 
 void regenerate_button_with_corners(

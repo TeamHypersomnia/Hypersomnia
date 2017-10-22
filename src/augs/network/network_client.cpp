@@ -5,10 +5,10 @@
 #undef max
 #endif
 
-#include "augs/readwrite/byte_readwrite.h"
 #include "network_client.h"
 
 #include "augs/misc/readable_bytesize.h"
+#include "augs/readwrite/byte_readwrite.h"
 
 namespace augs {
 	namespace network {

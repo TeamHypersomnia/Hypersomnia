@@ -5,7 +5,6 @@
 
 #include "view/network/simulation_receiver.h"
 
-#include "augs/misc/debug_entropy_player.h"
 #include "augs/network/network_client.h"
 
 class client_setup : public setup_base {

@@ -1,8 +1,5 @@
 #include "workspace.h"
 
-#include "augs/readwrite/lua_readwrite.h"
-#include "augs/readwrite/byte_readwrite.h"
-
 #include "game/organization/all_messages_includes.h"
 #include "game/organization/all_component_includes.h"
 
@@ -11,6 +8,8 @@
 #include "test_scenes/scenes/testbed.h"
 #include "test_scenes/scenes/minimal_scene.h"
 
+#include "augs/readwrite/lua_readwrite.h"
+#include "augs/readwrite/byte_readwrite.h"
 #include "generated/introspectors.h"
 
 #if BUILD_TEST_SCENES

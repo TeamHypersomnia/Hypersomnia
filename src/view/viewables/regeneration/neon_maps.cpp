@@ -3,8 +3,6 @@
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
 
-#include "augs/readwrite/byte_readwrite.h"
-
 #include "augs/ensure.h"
 #include "augs/readwrite/streams.h"
 
@@ -12,6 +10,7 @@
 
 #include "view/viewables/regeneration/neon_maps.h"
 
+#include "augs/readwrite/byte_readwrite.h"
 #include "generated/introspectors.h"
 
 #define PIXEL_NONE rgba(0,0,0,0)

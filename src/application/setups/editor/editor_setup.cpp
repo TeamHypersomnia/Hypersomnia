@@ -2,8 +2,8 @@
 #include "augs/misc/imgui/imgui_utils.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/misc/imgui/addons/imguitabwindow/imguitabwindow.h"
-#include "augs/readwrite/lua_readwrite.h"
 #include "augs/filesystem/file.h"
+#include "augs/filesystem/directory.h"
 #include "augs/templates/thread_templates.h"
 #include "augs/templates/chrono_templates.h"
 #include "augs/window_framework/window.h"
@@ -16,6 +16,7 @@
 
 #include <imgui/imgui_internal.h>
 
+#include "augs/readwrite/lua_readwrite.h"
 #include "generated/introspectors.h"
 
 void editor_setup::set_popup(const editor_popup p) {

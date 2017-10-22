@@ -1,6 +1,5 @@
 #pragma once
 #include "augs/misc/timing/fixed_delta_timer.h"
-#include "augs/misc/debug_entropy_player.h"
 
 #include "game/assets/all_logical_assets.h"
 
@@ -25,7 +24,6 @@ namespace sol {
 class test_scene_setup {
 	workspace scene;
 	cosmic_entropy total_collected_entropy;
-	augs::debug_entropy_player<cosmic_entropy> player;
 	augs::fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
 	debug_character_selection characters;
 
@@ -85,7 +83,7 @@ public:
 		while (steps--) {
 			total_collected_entropy.clear_dead_entities(scene.world);
 			
-			player.advance_player_and_biserialize(total_collected_entropy);
+			// player.advance_player_and_biserialize(total_collected_entropy);
 
 			scene.advance(
 				{ total_collected_entropy },

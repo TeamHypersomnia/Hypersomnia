@@ -1,7 +1,6 @@
 #include "augs/templates/introspect.h"
 #include "augs/filesystem/file.h"
 #include "augs/audio/sound_data.h"
-#include "augs/readwrite/lua_readwrite.h"
 #include "augs/gui/button_corners.h"
 
 #include "view/game_drawing_settings.h"
@@ -11,6 +10,7 @@
 #include "view/viewables/regeneration/images_from_commands.h"
 #include "view/viewables/regeneration/procedural_image_definition.h"
 
+#include "augs/readwrite/lua_readwrite.h"
 #include "generated/introspectors.h"
 
 necessary_fbos::necessary_fbos(

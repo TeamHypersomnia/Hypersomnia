@@ -9,8 +9,8 @@
 #include "augs/math/matrix.h"
 
 #include "augs/misc/imgui/imgui_utils.h"
-#include "augs/readwrite/lua_readwrite.h"
 #include "augs/misc/machine_entropy.h"
+#include "augs/misc/lua/lua_utils.h"
 
 #include "augs/graphics/renderer.h"
 
@@ -48,9 +48,6 @@
 #include "application/main/release_flags.h"
 
 #include "cmd_line_params.h"
-
-#include "hypersomnia_version.h"
-#include "generated/introspectors.h"
 
 int work(const int argc, const char* const * const argv);
 

@@ -106,6 +106,10 @@ namespace augs {
 	};
 }
 
+#if READWRITE_TRAITS_INCLUDED
+#error "I/O traits were included BEFORE I/O overloads, which may cause them to be omitted under some compilers."
+#endif
+
 namespace augs {
 	template <class...>
 	void read_object(augs::stream& ar, augs::stream& storage) {

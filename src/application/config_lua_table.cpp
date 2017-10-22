@@ -4,13 +4,13 @@
 
 #include "augs/filesystem/file.h"
 
-#include "augs/readwrite/lua_readwrite.h"
 #include "augs/misc/lua/lua_utils.h"
 
 #include "augs/window_framework/window.h"
 
 #include "application/config_lua_table.h"
 
+#include "augs/readwrite/lua_readwrite.h"
 #include "generated/introspectors.h"
 
 config_lua_table::config_lua_table(sol::state& lua, const augs::path_type& config_lua_path) {

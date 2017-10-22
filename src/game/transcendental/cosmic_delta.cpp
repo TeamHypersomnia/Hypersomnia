@@ -3,13 +3,13 @@
 #include "augs/templates/type_matching_and_indexing.h"
 #include "augs/templates/for_each_in_types.h"
 
-#include "augs/readwrite/byte_readwrite.h"
 #include "augs/readwrite/delta_compression.h"
 #include "augs/misc/pool/pooled_object_id.h"
 
 #include "game/transcendental/cosmos.h"
 #include "game/organization/all_component_includes.h"
 
+#include "augs/readwrite/byte_readwrite.h"
 #include "generated/introspectors.h"
 
 /* Several assumptions regarding delta encoding */

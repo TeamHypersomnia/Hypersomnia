@@ -2,8 +2,6 @@
 
 #include "cosmos.h"
 
-#include "augs/readwrite/lua_readwrite.h"
-#include "augs/readwrite/byte_readwrite.h"
 #include "augs/readwrite/streams.h"
 
 #include "game/stateless_systems/movement_system.h"
@@ -42,6 +40,8 @@
 
 #include "game/detail/inventory/inventory_utils.h"
 
+#include "augs/readwrite/lua_readwrite.h"
+#include "augs/readwrite/byte_readwrite.h"
 #include "generated/introspectors.h"
 
 const cosmos cosmos::empty;

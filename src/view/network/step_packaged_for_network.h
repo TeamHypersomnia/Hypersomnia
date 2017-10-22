@@ -15,6 +15,10 @@ struct step_packaged_for_network {
 	guid_mapped_entropy entropy;
 };
 
+#if READWRITE_TRAITS_INCLUDED
+#error "I/O traits were included BEFORE I/O overloads, which may cause them to be omitted under some compilers."
+#endif
+
 namespace augs {
 	template<class A>
 	void read_object(A& ar, step_packaged_for_network& storage) {

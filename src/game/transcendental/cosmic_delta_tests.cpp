@@ -1,13 +1,17 @@
-
 #if BUILD_UNIT_TESTS
 #include <tuple>
 #include <catch.hpp>
+
+#include "augs/filesystem/file.h"
+#include "augs/templates/introspection_utils/describe_fields.h"
+#include "augs/readwrite/delta_compression.h"
+
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/cosmic_delta.h"
-#include "augs/templates/introspection_utils/describe_fields.h"
 #include "game/organization/all_component_includes.h"
-#include "augs/readwrite/delta_compression.h"
+
 #include "augs/readwrite/byte_readwrite.h"
+#include "augs/readwrite/lua_readwrite.h"
 #include "generated/introspectors.h"
 
 TEST_CASE("CosmicDelta0 PaddingSanityCheck1") {
@@ -66,7 +70,6 @@ TEST_CASE("CosmicDelta1 PaddingSanityCheck2") {
 	REQUIRE(are_different);
 }
 
-#include "augs/filesystem/file.h"
 
 TEST_CASE("CosmicDelta2 PaddingTest") {
 	std::string component_size_information;
@@ -222,7 +225,6 @@ TEST_CASE("CosmicDelta3 GuidizeTests") {
 	// sanity check
 	REQUIRE(dead == dt.target_slot.container_entity);
 }
-#include "augs/readwrite/lua_readwrite.h"
 
 TEST_CASE("Cosmos ComparisonTest") {
 	cosmos c1(2);

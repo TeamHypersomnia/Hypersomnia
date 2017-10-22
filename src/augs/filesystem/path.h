@@ -1,9 +1,12 @@
 #pragma once
 #include <experimental/filesystem>
-#include "augs/readwrite/readwrite_traits.h"
 
 namespace augs {
 	using path_type = std::experimental::filesystem::path;
+
+#if READWRITE_TRAITS_INCLUDED
+#error "I/O traits were included BEFORE I/O overloads, which may cause them to be omitted under some compilers."
+#endif
 
 	template <class Archive>
 	void read_object(
@@ -22,8 +25,6 @@ namespace augs {
 	) {
 		write(ar, storage.string());
 	}
-
-	static_assert(has_readwrite_overloads_v<stream, path_type>);
 
 	inline auto to_display_path(path_type target_path) {
 		auto display_path = target_path.filename();

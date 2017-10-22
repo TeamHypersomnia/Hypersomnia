@@ -1,5 +1,5 @@
-#include "augs/readwrite/byte_readwrite.h"
 #include "augs/network/reliable_channel.h"
+#include "augs/readwrite/byte_readwrite.h"
 
 namespace augs {
 	namespace network {

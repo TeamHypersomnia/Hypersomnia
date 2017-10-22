@@ -1,6 +1,6 @@
-#include "augs/readwrite/lua_readwrite.h"
 #include "application/setups/editor/editor_recent_paths.h"
 #include "application/setups/editor/editor_paths.h"
+#include "augs/readwrite/lua_readwrite.h"
 #include "generated/introspectors.h"
 
 editor_recent_paths::editor_recent_paths(sol::state& lua) {
