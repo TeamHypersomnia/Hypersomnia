@@ -11,6 +11,7 @@
 #include "game/build_settings.h"
 #include "augs/build_settings/platform_defines.h"
 
+#include "augs/templates/introspect.h"
 #include "augs/templates/maybe_const.h"
 
 struct entity_relations;

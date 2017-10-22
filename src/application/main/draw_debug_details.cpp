@@ -1,4 +1,7 @@
+#include "generated/introspectors.h"
+
 #include "augs/gui/text/printer.h"
+#include "augs/templates/introspect.h"
 
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
@@ -8,7 +11,6 @@
 #include "application/session_profiler.h"
 #include "application/main/draw_debug_details.h"
 
-#include "generated/introspectors.h"
 #include "hypersomnia_version.h"
 
 void draw_debug_details(

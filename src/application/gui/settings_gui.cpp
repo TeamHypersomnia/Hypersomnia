@@ -1,4 +1,5 @@
 #include "augs/templates/introspect.h"
+#include "augs/templates/enum_introspect.h"
 
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/misc/imgui/imgui_utils.h"

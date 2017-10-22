@@ -4,6 +4,7 @@
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 #include "augs/templates/container_templates.h"
+#include "augs/templates/enum_introspect.h"
 
 #include "generated/introspectors.h"
 

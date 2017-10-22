@@ -1,8 +1,7 @@
-#include "augs/templates/introspect.h"
-
-#include "view/viewables/loaded_sounds.h"
-
 #include "generated/introspectors.h"
+
+#include "augs/templates/enum_introspect.h"
+#include "view/viewables/loaded_sounds.h"
 
 loaded_sounds::loaded_sounds(const sound_buffer_inputs_map& definitions) {
 	using id_type = assets::sound_buffer_id;

@@ -2,6 +2,7 @@
 #include "game/transcendental/cosmos.h"
 
 #include "augs/misc/machine_entropy.h"
+#include "augs/templates/introspection_utils/rewrite_members.h"
 
 #include "game/detail/inventory/inventory_utils.h"
 #include "generated/introspectors.h"

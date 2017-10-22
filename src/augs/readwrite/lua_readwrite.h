@@ -13,6 +13,7 @@
 
 #include "augs/filesystem/file.h"
 #include "augs/readwrite/readwrite_traits.h"
+#include "augs/templates/introspect.h"
 
 namespace augs {
 	struct lua_deserialization_error : error_with_typesafe_sprintf {

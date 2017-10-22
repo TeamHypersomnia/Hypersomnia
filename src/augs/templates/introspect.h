@@ -2,7 +2,6 @@
 #include <type_traits>
 #include "augs/templates/container_templates.h"
 #include "augs/templates/introspection_traits.h"
-#include "augs/templates/enum_introspect.h"
 #include "augs/templates/recursive.h"
 #include "augs/templates/is_optional.h"
 

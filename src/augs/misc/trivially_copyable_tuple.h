@@ -1,4 +1,6 @@
 #pragma once
+#include "augs/ensure.h"
+
 #include "augs/templates/triviality_traits.h"
 #include "augs/templates/type_list.h"
 #include "augs/templates/for_each_in_types.h"

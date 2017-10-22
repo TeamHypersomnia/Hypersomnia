@@ -4,7 +4,6 @@
 #include "augs/build_settings/platform_defines.h"
 
 #include "augs/templates/exception_templates.h"
-#include "augs/templates/introspection_utils/rewrite_members.h"
 
 #include "augs/misc/randomization.h"
 #include "augs/readwrite/streams.h"

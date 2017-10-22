@@ -1,6 +1,6 @@
 #pragma once
 #include <unordered_map>
-#include "augs/templates/introspect.h"
+#include "augs/templates/enum_introspect.h"
 
 namespace augs {
 	template <class Enum>
