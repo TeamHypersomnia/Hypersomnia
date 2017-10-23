@@ -19,5 +19,6 @@ struct editor_settings {
 
 	rgba controlled_entity_color = { 255, 255, 0, 150 };
 	rgba selected_entity_color = { 255, 255, 255, 150 };
+	rgba hovered_entity_color = { 255, 255, 255, 80 };
 	// END GEN INTROSPECTOR
 };

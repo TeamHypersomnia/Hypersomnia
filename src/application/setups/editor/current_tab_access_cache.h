@@ -16,6 +16,10 @@ protected:
 	void set_current_tab(const std::size_t i) {
 		auto& self = *static_cast<derived*>(this);
 
+		if (current_index != i) {
+			self.on_tab_changed();
+		}
+
 		current_index = i;
 
 		current_tab = &self.tabs[i];

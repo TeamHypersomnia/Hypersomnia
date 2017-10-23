@@ -20,16 +20,6 @@
 
 class interpolation_system;
 
-FORCE_INLINE bool render_order_compare(
-	const const_entity_handle a, 
-	const const_entity_handle b
-) {
-	const auto layer_a = a.get<components::render>().layer;
-	const auto layer_b = b.get<components::render>().layer;
-
-	return (layer_a == layer_b && layer_a == render_layer::CAR_INTERIOR) ? are_connected_by_friction(a, b) : layer_a < layer_b;
-}
-
 struct draw_renderable_input {
 	const augs::drawer drawer;
 	const game_images_in_atlas_map& manager;
@@ -129,16 +119,15 @@ FORCE_INLINE void draw_color_highlight(
 	const draw_renderable_input in,
 	const interpolation_system& interp
 ) {
-	if (const auto sprite = h.find<components::sprite>()) {
-		auto sprite_copy = *sprite;
-		sprite_copy.color = color;
+	for_each_renderable_component(h, [&](auto copy) {
+		copy.set_color(color);
 
 		draw_renderable(
-			sprite_copy,
+			copy,
 			in,
 			h.get_viewing_transform(interp, true)
 		);
-	}
+	});
 }
 
 FORCE_INLINE void draw_neon_map(

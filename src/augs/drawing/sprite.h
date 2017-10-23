@@ -78,6 +78,10 @@ namespace augs {
 			this->size = static_cast<vec2>(size);
 			this->color = color;
 		}
+		
+		void set_color(const rgba col) {
+			color = col;
+		}
 
 		// GEN INTROSPECTOR struct augs::sprite class id_type
 		id_type tex = id_type::INVALID;

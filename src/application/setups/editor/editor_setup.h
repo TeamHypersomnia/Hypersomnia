@@ -68,10 +68,13 @@ class editor_setup : private current_tab_access_cache<editor_setup> {
 	bool player_paused = true;
 
 	editor_recent_paths recent;
-	
+
 	std::vector<editor_tab> tabs;
 	std::vector<std::unique_ptr<workspace>> works;
+	
+	entity_id hovered_entity;
 
+	void on_tab_changed();
 	void set_locally_viewed(const entity_id);
 
 	template <class F>
@@ -111,6 +114,7 @@ class editor_setup : private current_tab_access_cache<editor_setup> {
 	bool open_workspace_in_new_tab(path_operation);
 	void save_current_tab_to(path_operation);
 
+	void fill_with_minimal_scene(sol::state& lua);
 	void fill_with_test_scene(sol::state& lua);
 
 	void autosave(const autosave_input) const;
@@ -236,7 +240,7 @@ public:
 
 	template <class F>
 	void for_each_additional_highlight(F callback) const {
-		if (has_current_tab()) {
+		if (has_current_tab() && player_paused) {
 			if (get_viewed_character().alive()) {
 				auto color = settings.controlled_entity_color;
 				color.a += static_cast<rgba_channel>(augs::zigzag(global_time_seconds, 1.0 / 2) * 25);
@@ -246,6 +250,10 @@ public:
 
 			for (const auto& e : tab().selected_entities) {
 				callback(e, settings.selected_entity_color);
+			}
+
+			if (work().world[hovered_entity].alive()) {
+				callback(hovered_entity, settings.hovered_entity_color);
 			}
 		}
 	}

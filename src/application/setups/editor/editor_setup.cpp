@@ -10,6 +10,8 @@
 #include "augs/window_framework/platform_utils.h"
 #include "augs/window_framework/shell.h"
 
+#include "game/detail/visible_entities.h"
+
 #include "application/config_lua_table.h"
 #include "application/setups/editor/editor_setup.h"
 #include "application/setups/editor/editor_paths.h"
@@ -18,6 +20,11 @@
 
 #include "augs/readwrite/lua_readwrite.h"
 #include "generated/introspectors.h"
+
+void editor_setup::on_tab_changed() {
+	hovered_entity = {};
+	player_paused = true;
+}
 
 void editor_setup::set_popup(const editor_popup p) {
 	current_popup = p;
@@ -214,10 +221,18 @@ void editor_setup::save_current_tab_to(const path_operation op) {
 	tab().set_workspace_path(op.lua, op.path, recent);
 }
 
-void editor_setup::fill_with_test_scene(sol::state& lua) {
+void editor_setup::fill_with_minimal_scene(sol::state& lua) {
 #if BUILD_TEST_SCENES
 	if (has_current_tab()) {
 		work().make_test_scene(lua, true);
+	}
+#endif
+}
+
+void editor_setup::fill_with_test_scene(sol::state& lua) {
+#if BUILD_TEST_SCENES
+	if (has_current_tab()) {
+		work().make_test_scene(lua, false);
 	}
 #endif
 }
@@ -250,6 +265,10 @@ void editor_setup::perform_custom_imgui(
 	auto item_if_tabs = [&](const char* label, const char* shortcut = nullptr) {
 		return item_if_tabs_and(true, label, shortcut);
 	};
+
+	const auto mouse_pos = vec2(ImGui::GetIO().MousePos);
+	const auto screen_size = vec2(ImGui::GetIO().DisplaySize);
+	const auto world_cursor_pos = current_cone.transform.pos + mouse_pos - screen_size / 2;
 
 	if (!in_direct_gameplay) {
 		if (auto main_menu = scoped_main_menu_bar()) {
@@ -325,7 +344,11 @@ void editor_setup::perform_custom_imgui(
 				if (item_if_tabs("Paste", "CTRL+V")) {}
 				ImGui::Separator();
 
-				if (item_if_tabs_and(BUILD_TEST_SCENES, "Fill with test scene", "SHIFT+F5")) {
+				if (item_if_tabs_and(BUILD_TEST_SCENES, "Fill with minimal scene", "SHIFT+F5")) {
+					fill_with_minimal_scene(lua);
+				}
+
+				if (item_if_tabs_and(BUILD_TEST_SCENES, "Fill with test scene")) {
 					fill_with_test_scene(lua);
 				}
 			}
@@ -473,10 +496,6 @@ void editor_setup::perform_custom_imgui(
 			auto summary = scoped_window("Summary", &show_summary, ImGuiWindowFlags_AlwaysAutoResize);
 
 			if (has_current_tab()) {
-				const auto mouse_pos = vec2(ImGui::GetIO().MousePos);
-				const auto screen_size = vec2(ImGui::GetIO().DisplaySize);
-				const auto world_cursor_pos = current_cone.transform.pos + mouse_pos - screen_size / 2;
-				
 				//text(typesafe_sprintf("Tick rate: %x/s", get_viewed_cosmos().get_steps_per_second()));
 				text(typesafe_sprintf("Cursor: %x", world_cursor_pos));
 				text(typesafe_sprintf("Total entities: %x/%x",
@@ -588,6 +607,27 @@ void editor_setup::perform_custom_imgui(
 				current_popup = std::nullopt;
 			}
 		}
+	}
+
+	if (has_current_tab()) {
+		hovered_entity = get_hovered_world_entity(
+			work().world, 
+			world_cursor_pos, 
+			[&](const entity_id id) { 
+				if (work().world[id].has<components::wandering_pixels>()) {
+					return false;
+				}
+
+				return true; 
+			}
+		);
+
+		if (work().world[hovered_entity].alive()) {
+			LOG(to_string(work().world[hovered_entity].get_name()));
+		}
+	}
+	else {
+		hovered_entity = {};
 	}
 }
 
@@ -816,7 +856,7 @@ bool editor_setup::handle_top_level_window_input(
 
 			if (has_shift) {
 				switch (k) {
-					case key::F5: fill_with_test_scene(lua); return true;
+					case key::F5: fill_with_minimal_scene(lua); return true;
 				}
 			}
 
@@ -852,6 +892,22 @@ bool editor_setup::handle_unfetched_window_input(
 
 					return true;
 				}
+			}
+		}
+
+		if (e.msg == message::ldown) {
+			if (has_current_tab()) {
+				const bool has_ctrl{ common_input_state[key::LCTRL] };
+
+				if (has_ctrl) {
+
+				}
+
+				tab().selected_entities = {};
+
+				tab().panning -= e.mouse.rel * settings.camera_panning_speed;
+
+				return true;
 			}
 		}
 
