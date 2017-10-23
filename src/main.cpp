@@ -1216,22 +1216,28 @@ int work(const int argc, const char* const * const argv) try {
 
 		if (const bool has_something_to_view = viewed_character.alive()) {
 			/* #1 */
-			illuminated_rendering({
-				viewed_character,
-				audiovisuals,
-				viewing_config.drawing,
-				necessary_atlas_entries,
-				gui_font,
-				game_atlas_entries,
-				screen_size,
-				interpolation_ratio,
-				renderer,
-				*game_world_atlas,
-				fbos,
-				shaders,
-				get_camera(),
-				{}
-			});
+			illuminated_rendering(
+				{
+					viewed_character,
+					audiovisuals,
+					viewing_config.drawing,
+					necessary_atlas_entries,
+					gui_font,
+					game_atlas_entries,
+					screen_size,
+					interpolation_ratio,
+					renderer,
+					*game_world_atlas,
+					fbos,
+					shaders,
+					get_camera()
+				},
+				false,
+				[](const const_entity_handle handle) -> std::optional<rgba> { return std::nullopt; },
+				[&](auto callback) {
+
+				}
+			);
 			
 			/* 
 				Illuminated rendering leaves the renderer in a state 

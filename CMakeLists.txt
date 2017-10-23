@@ -380,7 +380,6 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/view/rendering_scripts/draw_cast_spells_highlights.cpp"
 	"src/view/rendering_scripts/draw_crosshair_lasers.cpp"
 	"src/view/rendering_scripts/draw_hud_for_released_explosives.cpp"
-	"src/view/rendering_scripts/illuminated_rendering.cpp"
 	"src/view/audiovisual_state/world_camera.cpp"
 #	"src/application/setups/server_setup.cpp" #
 #	"src/application/setups/setup_base.cpp" #
