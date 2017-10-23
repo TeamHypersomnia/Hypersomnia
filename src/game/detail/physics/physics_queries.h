@@ -113,7 +113,7 @@ public:
 		const camera_cone camera,
 		F callback
 	) const {
-		const auto visible_aabb = camera.get_transformed_visible_world_area_aabb().expand_from_center({ 100, 100 });
+		const auto visible_aabb = camera.get_transformed_visible_world_area_aabb();
 
 		for_each_in_aabb(
 			si,

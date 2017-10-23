@@ -38,7 +38,7 @@ static void get_visible_per_layer(
 }
 
 visible_entities::visible_entities(const visible_entities_query input) {
-	reacquire(input);
+	reacquire_all_and_sort(input);
 }
 
 void visible_entities::clear() {
@@ -49,22 +49,18 @@ void visible_entities::clear() {
 	}
 }
 
-void visible_entities::reacquire(const visible_entities_query input) {
+void visible_entities::reacquire_all_and_sort(const visible_entities_query input) {
+	clear();
+	acquire_non_physical(input);
+	acquire_physical(input);
+	sort_per_layer(input.cosm);
+}
+
+void visible_entities::acquire_physical(const visible_entities_query input) {
 	const auto& cosmos = input.cosm;
 	const auto camera = input.cone;
 
-	const auto& tree_of_npo = cosmos.inferential.get<tree_of_npo_system>();
 	const auto& physics = cosmos.inferential.get<physics_system>();
-	
-	clear();
-
-	tree_of_npo.for_each_visible_in_camera(
-		[this, &cosmos](const unversioned_entity_id id) {
-			all.push_back(cosmos.make_versioned(id));
-		},
-		camera,
-		tree_of_npo_type::RENDERABLES
-	);
 
 	thread_local std::unordered_set<entity_id> unique_from_physics;
 	unique_from_physics.clear();
@@ -79,7 +75,21 @@ void visible_entities::reacquire(const visible_entities_query input) {
 	);
 
 	concatenate(all, unique_from_physics);
-	get_visible_per_layer(cosmos, all, per_layer);
+}
+
+void visible_entities::acquire_non_physical(const visible_entities_query input) {
+	const auto& cosmos = input.cosm;
+	const auto camera = input.cone;
+
+	const auto& tree_of_npo = cosmos.inferential.get<tree_of_npo_system>();
+	
+	tree_of_npo.for_each_visible_in_camera(
+		[this, &cosmos](const unversioned_entity_id id) {
+			all.push_back(cosmos.make_versioned(id));
+		},
+		camera,
+		tree_of_npo_type::RENDERABLES
+	);
 }
 
 void visible_entities::clear_dead_entities(const cosmos& cosm) {
@@ -92,4 +102,8 @@ void visible_entities::clear_dead_entities(const cosmos& cosm) {
 	for (auto& layer : per_layer) {
 		erase_if(layer, dead_deleter);
 	}
+}
+
+void visible_entities::sort_per_layer(const cosmos& cosm) {
+	get_visible_per_layer(cosm, all, per_layer);
 }

@@ -11,6 +11,7 @@
 #include "view/game_gui/elements/item_button.h"
 #include "view/game_gui/elements/slot_button.h"
 #include "game/detail/inventory/inventory_slot_handle.h"
+#include "game/detail/visible_entities.h"
 #include "view/game_gui/elements/drag_and_drop.h"
 #include "game/components/container_component.h"
 #include "game/components/fixtures_component.h"
@@ -575,42 +576,19 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 }
 
 entity_id character_gui::get_hovered_world_entity(const cosmos& cosm, const vec2 world_cursor_position) {
-	const auto& physics = cosm.inferential.get<physics_system>();
-	const auto cursor_pointing_at = world_cursor_position;
-	const auto si = cosm.get_si();
+	return ::get_hovered_world_entity(
+		cosm,
+		world_cursor_position,
+		[&](const entity_id id) {
+			const auto handle = cosm[id];
 
-	std::vector<unversioned_entity_id> hovered_entities;
-
-	physics.for_each_in_aabb(
-		si,
-		cursor_pointing_at,
-		cursor_pointing_at + vec2(1, 1), 
-		filters::renderable_query(),
-		[&](const auto fix) {
-			const auto id = get_entity_that_owns(fix);
-
-			if (aabb_highlighter::is_hoverable(cosm[id])) {
-				hovered_entities.push_back(id);
+			if (aabb_highlighter::is_hoverable(handle)) {
+				if (cosm[get_first_named_ancestor(handle)].alive()) {
+					return true;
+				}
 			}
 
-			return callback_result::CONTINUE;
+			return false;
 		}
 	);
-
-	if (hovered_entities.size() > 0) {
-		sort_container(hovered_entities, [&](const auto a, const auto b) {
-			return render_order_compare(cosm[a], cosm[b]);
-		});
-
-		for (const auto h : hovered_entities) {
-			const auto hovered = cosm[h];
-			const auto named = cosm[get_first_named_ancestor(hovered)];
-
-			if (named.alive()) {
-				return named;
-			}
-		}
-	}
-
-	return entity_id();
 }

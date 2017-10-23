@@ -27,7 +27,37 @@ struct visible_entities {
 		This function will be used instead of copy-assignment operator,
 		in order to take advantage of the reserved space in containers.
 	*/
-	void reacquire(const visible_entities_query);
+
+	void reacquire_all_and_sort(const visible_entities_query);
+	
+	void acquire_physical(const visible_entities_query);
+	void acquire_non_physical(const visible_entities_query);
+	void sort_per_layer(const cosmos&);
+
 	void clear_dead_entities(const cosmos&);
 	void clear();
 };
+
+template <class F>
+entity_id get_hovered_world_entity(
+	const cosmos& cosm,
+	const vec2 world_cursor_position,
+	F hoverable
+) {
+	thread_local visible_entities entities;
+
+	entities.reacquire_all_and_sort({
+		cosm,
+		{ world_cursor_position, vec2(1, 1) }
+	});
+
+	for (const auto& layer : entities.per_layer) {
+		for (const auto candidate : layer) {
+			if (hoverable(candidate)) {
+				return candidate;
+			}
+		}
+	}
+
+	return {};
+}

@@ -19,17 +19,19 @@ bool aabb_highlighter::is_hoverable(const const_entity_handle e) {
 		return false;
 	}
 
-	const auto maybe_render = e.find<components::render>();
-
-	if (maybe_render && maybe_render->layer < render_layer::SMALL_DYNAMIC_BODY) {
+	if (const auto maybe_render = e.find<components::render>()) {
+		switch (maybe_render->layer) {
+			case render_layer::SMALL_DYNAMIC_BODY: return true;
+			case render_layer::DYNAMIC_BODY: return true;
+			case render_layer::CAR_INTERIOR: return true;
+			case render_layer::CAR_WHEEL: return true;
+			default: return false;
+		}
+	
 		return false;
 	}
 
-	if (e.has<components::particles_existence>()) {
-		return false;
-	}
-
-	return true;
+	return false;
 }
 
 void aabb_highlighter::draw(const aabb_highlighter_drawing_input in) const {
