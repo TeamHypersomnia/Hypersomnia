@@ -208,8 +208,6 @@ namespace prefabs {
 			crosshair.base_offset.set(-20, 0);
 			crosshair.sensitivity.set(3, 3);
 			crosshair.base_offset_bound.set(1920, 1080);
-
-			//ingredients::make_always_visible(root);
 		}
 
 		{
@@ -224,7 +222,6 @@ namespace prefabs {
 
 			auto& render = recoil += components::render();
 			render.layer = render_layer::OVER_CROSSHAIR;
-			//ingredients::make_always_visible(recoil);
 
 			body.linear_damping = 5;
 			body.angular_damping = 5;

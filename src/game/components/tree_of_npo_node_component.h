@@ -12,11 +12,10 @@ namespace components {
 		static constexpr bool is_synchronized = true;
 
 		// GEN INTROSPECTOR struct components::tree_of_npo_node
-		bool always_visible = false;
 		bool activated = true;
 		tree_of_npo_type type = tree_of_npo_type::RENDERABLES;
 
-		pad_bytes<1> pad;
+		pad_bytes<2> pad;
 
 		ltrb aabb;
 		// END GEN INTROSPECTOR

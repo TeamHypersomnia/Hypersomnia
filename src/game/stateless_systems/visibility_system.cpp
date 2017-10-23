@@ -3,6 +3,7 @@
 
 #include <Box2D/Box2D.h>
 
+#include "game/detail/physics/physics_queries.h"
 #include "game/debug_drawing_settings.h"
 
 #include "game/transcendental/cosmos.h"

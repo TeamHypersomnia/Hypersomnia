@@ -4,7 +4,6 @@
 
 #include "3rdparty/Box2D/Box2D.h"
 
-#include "augs/build_settings/platform_defines.h"
 #include "augs/misc/convex_partitioned_shape.h"
 
 #include "game/assets/all_logical_assets_declarations.h"
@@ -18,8 +17,6 @@
 #include "game/components/motor_joint_component.h"
 
 #include "game/messages/collision_message.h"
-
-#include "game/detail/physics/physics_queries.h"
 
 class cosmos;
 struct cosmos_common_state;
@@ -36,7 +33,7 @@ struct joint_cache {
 	b2Joint* joint = nullptr;
 };
 
-class EMPTY_BASES physics_system : public physics_queries<physics_system> {
+class physics_system {
 	std::vector<rigid_body_cache> rigid_body_caches;
 	std::vector<colliders_cache> colliders_caches;
 	std::vector<joint_cache> joint_caches;
@@ -58,7 +55,6 @@ class EMPTY_BASES physics_system : public physics_queries<physics_system> {
 	void destroy_additional_inferred_state(const cosmos_common_state&) {}
 
 	friend class cosmos;
-	friend class physics_queries<physics_system>;
 	friend class component_synchronizer<false, components::rigid_body>;
 	friend class component_synchronizer<true, components::rigid_body>;
 	friend class component_synchronizer<false, components::motor_joint>;
@@ -129,6 +125,38 @@ public:
 		const b2Filter filter, 
 		const entity_id ignore_entity = entity_id()
 	) const;
+
+	/* Interface for physics queries */
+
+	template <class... Args>
+	void for_each_in_aabb_meters(Args&&... args) const {
+		::for_each_in_aabb_meters(get_b2world(), std::forward<Args>(args)...);
+	}
+
+	template <class... Args>
+	void for_each_intersection_with_shape_meters(Args&&... args) const {
+		::for_each_intersection_with_shape_meters(get_b2world(), std::forward<Args>(args)...);
+	}
+
+	template <class... Args>
+	void for_each_in_aabb(Args&&... args) const {
+		::for_each_in_aabb(get_b2world(), std::forward<Args>(args)...);
+	}
+
+	template <class... Args>
+	void for_each_in_camera(Args&&... args) const {
+		::for_each_in_camera(get_b2world(), std::forward<Args>(args)...);
+	}
+
+	template <class... Args>
+	void for_each_intersection_with_triangle(Args&&... args) const {
+		::for_each_intersection_with_triangle(get_b2world(), std::forward<Args>(args)...);
+	}
+
+	template <class... Args>
+	void for_each_intersection_with_polygon(Args&&... args) const {
+		::for_each_intersection_with_polygon(get_b2world(), std::forward<Args>(args)...);
+	}
 
 	void step_and_set_new_transforms(const logic_step);
 	void post_and_clear_accumulated_collision_messages(const logic_step);

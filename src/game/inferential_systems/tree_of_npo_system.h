@@ -32,7 +32,6 @@ class tree_of_npo_system {
 	friend class component_synchronizer<false, components::tree_of_npo_node>;
 
 	struct tree {
-		std::vector<unversioned_entity_id> always_visible;
 		b2DynamicTree nodes;
 	};
 
@@ -60,19 +59,15 @@ class tree_of_npo_system {
 
 public:
 	template <class F>
-	void for_each_visible_in_camera(
+	void for_each_in_camera(
 		F callback,
 		const camera_cone camera,
 		const tree_of_npo_type type
 	) const {
 		const auto& tree = trees[type];
 
-		for (const auto e : tree.always_visible) {
-			callback(e);
-		}
-
 		struct render_listener {
-			const b2DynamicTree* tree;
+			const b2DynamicTree* const tree;
 			F callback;
 
 			bool QueryCallback(const int32 node_id) const {
@@ -85,7 +80,7 @@ public:
 		};
 
 		const auto aabb_listener = render_listener{ &tree.nodes, callback };
-		const auto visible_aabb = camera.get_transformed_visible_world_area_aabb().expand_from_center({ 50, 50 });
+		const auto visible_aabb = camera.get_transformed_visible_world_area_aabb();
 
 		b2AABB input;
 		input.lowerBound = visible_aabb.left_top();

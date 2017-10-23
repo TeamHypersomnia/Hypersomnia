@@ -50,7 +50,7 @@ void component_synchronizer<false, D>::update_proxy(const logic_step step) const
 	auto& sys = handle.get_cosmos().inferential.get<tree_of_npo_system>();
 	auto& cache = sys.get_cache(handle.get_id());
 	
-	if (cache.is_constructed() && !data.always_visible) {
+	if (cache.is_constructed()) {
 		b2AABB aabb;
 		aabb.lowerBound = data.aabb.left_top();
 		aabb.upperBound = data.aabb.right_bottom();

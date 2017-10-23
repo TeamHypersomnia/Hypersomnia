@@ -22,8 +22,6 @@ void tree_of_npo_system::destroy_inferred_state_of(const const_entity_handle han
 	auto& cache = get_cache(handle.get_id());
 
 	if (cache.is_constructed()) {
-		erase_element(get_tree(cache).always_visible, handle.get_id());
-
 		if (cache.tree_proxy_id != -1) {
 			get_tree(cache).nodes.DestroyProxy(cache.tree_proxy_id);
 		}
@@ -37,26 +35,21 @@ void tree_of_npo_system::create_inferred_state_for(const const_entity_handle han
 
 	ensure(!cache.is_constructed());
 
-	const auto node = handle.find<components::tree_of_npo_node>();
+	const auto tree_node = handle.find<components::tree_of_npo_node>();
 
-	if (node != nullptr && node.is_activated()) {
-		const auto data = node.get_raw_component();
+	if (tree_node != nullptr && tree_node.is_activated()) {
+		const auto data = tree_node.get_raw_component();
 
 		cache.type = data.type;
 
-		if (data.always_visible) {
-			get_tree(cache).always_visible.push_back(handle.get_id());
-		}
-		else {
-			b2AABB input;
-			input.lowerBound = data.aabb.left_top();
-			input.upperBound = data.aabb.right_bottom();
-			
-			tree_of_npo_node data;
-			data.payload = handle.get_id().operator unversioned_entity_id();
+		b2AABB input;
+		input.lowerBound = data.aabb.left_top();
+		input.upperBound = data.aabb.right_bottom();
+		
+		tree_of_npo_node node;
+		node.payload = handle.get_id().operator unversioned_entity_id();
 
-			cache.tree_proxy_id = get_tree(cache).nodes.CreateProxy(input, data.bytes);
-		}
+		cache.tree_proxy_id = get_tree(cache).nodes.CreateProxy(input, node.bytes);
 		
 		cache.constructed = true;
 	}

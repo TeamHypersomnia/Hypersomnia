@@ -1,3 +1,4 @@
+#include "game/detail/physics/physics_queries.h"
 #include "game/detail/visible_entities.h"
 
 #include "game/transcendental/cosmos.h"
@@ -65,14 +66,30 @@ void visible_entities::acquire_physical(const visible_entities_query input) {
 	thread_local std::unordered_set<entity_id> unique_from_physics;
 	unique_from_physics.clear();
 
-	physics.for_each_in_camera(
-		cosmos.get_si(),
-		camera,
-		[&](const b2Fixture* const fix) {
-			unique_from_physics.insert(cosmos.make_versioned(get_entity_that_owns(fix)));
-			return callback_result::CONTINUE;
-		}
-	);
+	if (input.exact) {
+		const auto camera_aabb = camera.get_transformed_visible_world_area_aabb();
+		
+		physics.for_each_intersection_with_polygon(
+			cosmos.get_si(),
+			camera_aabb.get_vertices<real32>(),
+			filters::renderable_query(),
+			[&](const b2Fixture* const fix, auto, auto) {
+				unique_from_physics.insert(cosmos.make_versioned(get_entity_that_owns(fix)));
+				LOG(to_string(cosmos[cosmos.make_versioned(get_entity_that_owns(fix))].get_name()));
+				return callback_result::CONTINUE;
+			}
+		);
+	}
+	else {
+		physics.for_each_in_camera(
+			cosmos.get_si(),
+			camera,
+			[&](const b2Fixture* const fix) {
+				unique_from_physics.insert(cosmos.make_versioned(get_entity_that_owns(fix)));
+				return callback_result::CONTINUE;
+			}
+		);
+	}
 
 	concatenate(all, unique_from_physics);
 }
@@ -80,11 +97,20 @@ void visible_entities::acquire_physical(const visible_entities_query input) {
 void visible_entities::acquire_non_physical(const visible_entities_query input) {
 	const auto& cosmos = input.cosm;
 	const auto camera = input.cone;
+	const auto camera_aabb = camera.get_transformed_visible_world_area_aabb();
 
 	const auto& tree_of_npo = cosmos.inferential.get<tree_of_npo_system>();
 	
-	tree_of_npo.for_each_visible_in_camera(
-		[this, &cosmos](const unversioned_entity_id id) {
+	tree_of_npo.for_each_in_camera(
+		[&](const unversioned_entity_id id) {
+			const auto versioned_id = cosmos.make_versioned(id);
+			
+			if (input.exact) {
+				if (!camera_aabb.hover(cosmos[versioned_id].get<components::tree_of_npo_node>().get_raw_component().aabb)) {
+					return;
+				}
+			}
+
 			all.push_back(cosmos.make_versioned(id));
 		},
 		camera,

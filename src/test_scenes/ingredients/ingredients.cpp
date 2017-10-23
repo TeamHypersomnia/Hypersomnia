@@ -22,10 +22,4 @@ namespace ingredients {
 		
 		return item;
 	}
-
-	void make_always_visible(entity_handle e) {
-		components::tree_of_npo_node node;
-		node.always_visible = true;
-		e += node;
-	}
 }

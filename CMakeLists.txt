@@ -285,7 +285,7 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 	"src/view/viewables/particle_types.cpp"
 	"src/game/detail/physics/physics_events.cpp"
 	"src/game/detail/physics/physics_friction_fields.cpp"
-	"src/game/detail/physics/physics_queries.cpp"
+	"src/game/detail/physics/ray_casts.cpp"
 	"src/game/detail/physics/physics_scripts.cpp"
 	"src/augs/misc/value_meter.cpp"
 	"src/game/detail/visible_entities.cpp"

@@ -658,6 +658,12 @@ int work(const int argc, const char* const * const argv) try {
 		};
 	};
 
+	/* 
+		MousePos is initially set to negative infinity.
+	*/
+
+	ImGui::GetIO().MousePos = { 0, 0 };
+
 	LOG("Entered the main loop.");
 
 	while (!should_quit) {

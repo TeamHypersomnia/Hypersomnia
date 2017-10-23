@@ -1,4 +1,5 @@
 #include "pathfinding_system.h"
+#include "game/detail/physics/physics_queries.h"
 
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/logic_step.h"

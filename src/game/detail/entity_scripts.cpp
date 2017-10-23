@@ -1,4 +1,5 @@
-#include "entity_scripts.h"
+#include "game/detail/physics/physics_queries.h"
+#include "game/detail/entity_scripts.h"
 #include "game/components/movement_component.h"
 #include "game/components/gun_component.h"
 #include "game/components/melee_component.h"

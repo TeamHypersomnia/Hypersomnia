@@ -68,7 +68,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 			auto queried_camera = get_viewing_camera();
 			queried_camera.visible_world_area += { 100, 100 };
 
-			all_visible.reacquire_all_and_sort({ cosm, get_viewing_camera() });
+			all_visible.reacquire_all_and_sort({ cosm, queried_camera, false });
 
 			profiler.visible_entities.measure(all_visible.all.size());
 		}
