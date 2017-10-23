@@ -202,7 +202,7 @@ int work(const int argc, const char* const * const argv) try {
 		The lambdas that aid to make the main loop code more concise.
 	*/	
 
-	static auto visit_current_setup = [](auto&& callback) -> decltype(auto) {
+	static auto visit_current_setup = [](auto callback) -> decltype(auto) {
 		if (current_setup.has_value()) {
 			return std::visit(
 				[&](auto& setup) -> decltype(auto) {
@@ -213,6 +213,23 @@ int work(const int argc, const char* const * const argv) try {
 		}
 		else {
 			return callback(main_menu.value());
+		}
+	};
+
+	static auto on_specific_setup = [](auto callback) -> decltype(auto) {
+		using T = std::decay_t<argument_of_t<decltype(callback), 0>>;
+
+		if constexpr(std::is_same_v<T, main_menu_setup>) {
+			if (main_menu.has_value()) {
+				callback(*main_menu);
+			}
+		}
+		else {
+			if (current_setup.has_value()) {
+				if (auto* setup = std::get_if<T>(&*current_setup)) {
+					callback(*setup);
+				}
+			}
 		}
 	};
 
@@ -891,11 +908,9 @@ int work(const int argc, const char* const * const argv) try {
 
 				ingame_menu.world.unhover_and_undrag(create_menu_context(ingame_menu));
 
-				if (current_setup) {
-					if (auto* editor = std::get_if<editor_setup>(&*current_setup)) {
-						editor->unhover();
-					}
-				}
+				on_specific_setup([](editor_setup& setup) {
+					setup.unhover();
+				});
 			}
 
 			/*
@@ -1271,9 +1286,9 @@ int work(const int argc, const char* const * const argv) try {
 			);
 			
 			if (current_setup) {
-				if (const auto* editor = std::get_if<editor_setup>(&*current_setup)) {
-					
-				}
+				on_specific_setup([&](editor_setup&) {
+
+				});
 			}
 
 			/* 
