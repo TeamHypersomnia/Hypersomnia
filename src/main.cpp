@@ -890,6 +890,25 @@ int work(const int argc, const char* const * const argv) try {
 				}
 
 				ingame_menu.world.unhover_and_undrag(create_menu_context(ingame_menu));
+
+				if (current_setup) {
+					if (auto* editor = std::get_if<editor_setup>(&*current_setup)) {
+						editor->unhover();
+					}
+				}
+			}
+
+			/*
+				We also need inter-op between our own GUIs, 
+				because we have quite a lot of them.
+			*/
+
+			if (game_gui.world.wants_to_capture_mouse(create_game_gui_context())) {
+				if (current_setup) {
+					if (auto* editor = std::get_if<editor_setup>(&*current_setup)) {
+						editor->unhover();
+					}
+				}
 			}
 
 			/* Maybe the game GUI was deactivated while the button was still hovered */

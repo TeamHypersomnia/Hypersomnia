@@ -66,7 +66,7 @@ return {
     },
     camera_panning_speed = 1,
     controlled_entity_color = "255 255 0 120",
-    selected_entity_color = "255 255 255 120"
+    selected_entity_color = "65 131 196 180"
   },
   game_controls = {
     A = "MOVE_LEFT",

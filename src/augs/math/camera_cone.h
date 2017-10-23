@@ -25,6 +25,13 @@ struct basic_camera_cone {
 	ltrb get_transformed_visible_world_area_aabb() const {
 		return augs::get_aabb_rotated(visible_world_area, transform.rotation) + transform.pos - visible_world_area / 2;
 	}
+
+	vec2 get_world_cursor_pos(
+		const vec2i cursor_pos,
+		const vec2i screen_size
+	) const {
+		return transform.pos + cursor_pos - screen_size / 2;
+	}
 };
 
 using camera_cone = basic_camera_cone<float>;

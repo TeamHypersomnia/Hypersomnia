@@ -272,7 +272,7 @@ void editor_setup::perform_custom_imgui(
 
 	const auto mouse_pos = vec2(ImGui::GetIO().MousePos);
 	const auto screen_size = vec2(ImGui::GetIO().DisplaySize);
-	const auto world_cursor_pos = current_cone.transform.pos + mouse_pos - screen_size / 2;
+	const auto world_cursor_pos = current_cone.get_world_cursor_pos(mouse_pos, screen_size);
 
 	if (!in_direct_gameplay) {
 		if (auto main_menu = scoped_main_menu_bar()) {
@@ -612,27 +612,6 @@ void editor_setup::perform_custom_imgui(
 			}
 		}
 	}
-
-	if (has_current_tab()) {
-		hovered_entity = get_hovered_world_entity(
-			work().world, 
-			world_cursor_pos, 
-			[&](const entity_id id) { 
-				if (work().world[id].has<components::wandering_pixels>()) {
-					return false;
-				}
-
-				return true; 
-			}
-		);
-
-		if (work().world[hovered_entity].alive()) {
-			LOG(to_string(work().world[hovered_entity].get_name()));
-		}
-	}
-	else {
-		hovered_entity = {};
-	}
 }
 
 bool editor_setup::escape() {
@@ -718,6 +697,16 @@ void editor_setup::cut() {
 
 void editor_setup::paste() {
 
+}
+
+void editor_setup::del() {
+	if (has_current_tab()) {
+		for (const auto e : tab().selected_entities) {
+			work().world.delete_entity(e);
+		}
+
+		tab().selected_entities.clear();
+	}
 }
 
 void editor_setup::go_to_all() {
@@ -897,17 +886,45 @@ bool editor_setup::handle_unfetched_window_input(
 					return true;
 				}
 			}
+			else {
+				const auto mouse_pos = vec2(ImGui::GetIO().MousePos);
+				const auto screen_size = vec2(ImGui::GetIO().DisplaySize);
+				const auto world_cursor_pos = current_cone.get_world_cursor_pos(mouse_pos, screen_size);
+
+				hovered_entity = {};
+
+				if (has_current_tab()) {
+					hovered_entity = get_hovered_world_entity(
+						work().world, 
+						world_cursor_pos, 
+						[&](const entity_id id) { 
+							if (work().world[id].has<components::wandering_pixels>()) {
+								return false;
+							}
+
+							return true; 
+						}
+					);
+				}
+			}
 		}
 
 		if (e.msg == message::ldown) {
 			if (has_current_tab()) {
 				const bool has_ctrl{ common_input_state[key::LCTRL] };
 
-				if (has_ctrl) {
+				const auto world_cursor_pos = current_cone.get_world_cursor_pos(
+					common_input_state.mouse.pos,
+					window.get_screen_size()
+				);
 
+				if (!has_ctrl) {
+					tab().selected_entities.clear();
 				}
 
-				tab().selected_entities = {};
+				if (work().world[hovered_entity].alive()) {
+					tab().selected_entities.emplace(hovered_entity);
+				}
 
 				tab().panning -= e.mouse.rel * settings.camera_panning_speed;
 
@@ -944,6 +961,11 @@ bool editor_setup::handle_unfetched_window_input(
 					case key::V: paste(); return true;
 					default: break;
 				}
+			}
+
+			switch (k) {
+			case key::DEL: del(); return true;
+			default: break;
 			}
 		}
 	}

@@ -224,6 +224,8 @@ public:
 	void cut();
 	void paste();
 
+	void del();
+
 	void play_pause();
 	void stop();
 	void prev();
@@ -237,6 +239,10 @@ public:
 
 	void go_to_all();
 	void open_containing_folder();
+
+	void unhover() {
+		hovered_entity = {};
+	}
 
 	template <class F>
 	void for_each_highlight(F callback) const {

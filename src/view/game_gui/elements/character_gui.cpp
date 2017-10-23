@@ -537,7 +537,8 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 	}
 	else {
 		const auto camera = context.get_camera_cone();
-		const auto world_cursor_pos = camera.transform.pos + context.get_input_state().mouse.pos - camera.visible_world_area / 2;
+		const auto world_cursor_pos = camera.get_world_cursor_pos(context.get_input_state().mouse.pos, screen_size);
+
 		const auto hovered = cosmos[get_hovered_world_entity(cosmos, world_cursor_pos)];
 
 		if (hovered.alive()) {
