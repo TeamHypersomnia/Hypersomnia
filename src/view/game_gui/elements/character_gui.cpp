@@ -541,12 +541,14 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 		const auto hovered = cosmos[get_hovered_world_entity(cosmos, world_cursor_pos)];
 
 		if (hovered.alive()) {
-			context.get_world_hover_highlighter().draw({
-				output, 
-				hovered, 
-				context.get_interpolation_system(), 
-				context.get_camera_cone()
-			});
+			if (context.dependencies.settings.draw_aabb_highlighter) {
+				context.get_world_hover_highlighter().draw({
+					output, 
+					hovered, 
+					context.get_interpolation_system(), 
+					context.get_camera_cone()
+				});
+			}
 
 			tooltip_text = from_bbcode(
 				get_bbcoded_entity_details(hovered), 

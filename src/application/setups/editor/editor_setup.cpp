@@ -181,6 +181,10 @@ void editor_setup::customize_for_viewing(config_lua_table& config) const {
 		config.window.name = "Editor";
 	}
 
+	if (player_paused) {
+		config.drawing.draw_aabb_highlighter = false;
+	}
+
 	return;
 }
 

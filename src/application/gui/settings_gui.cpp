@@ -177,6 +177,7 @@ void settings_gui_state::perform(
 				break;
 			}
 			case settings_pane::GRAPHICS: {
+				checkbox("Highlight hovered world items", config.drawing.draw_aabb_highlighter);
 
 				break;
 			}

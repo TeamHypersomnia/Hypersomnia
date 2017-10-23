@@ -122,37 +122,37 @@ public:
 
 	viewing_game_gui_context(
 		const base b,
-		const viewing_game_gui_context_dependencies in
+		const viewing_game_gui_context_dependencies dependencies
 	) :
 		base(b),
-		in(in)
+		dependencies(dependencies)
 	{}
 
-	const viewing_game_gui_context_dependencies in;
+	const viewing_game_gui_context_dependencies dependencies;
 
 	/* Boilerplate getters, pay no heed */
 
 	const auto& get_output() const {
-		return in.output;
+		return dependencies.output;
 	}
 
 	const aabb_highlighter& get_world_hover_highlighter() const {
-		return in.world_hover_highlighter;
+		return dependencies.world_hover_highlighter;
 	}
 
 	const interpolation_system& get_interpolation_system() const {
-		return in.interpolation;
+		return dependencies.interpolation;
 	}
 
 	camera_cone get_camera_cone() const {
-		return in.camera;
+		return dependencies.camera;
 	}
 
 	auto get_hotbar_settings() const {
-		return in.hotbar;
+		return dependencies.hotbar;
 	}
 
 	auto get_input_information() const {
-		return in.input_information;
+		return dependencies.input_information;
 	}
 };

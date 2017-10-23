@@ -6,6 +6,6 @@ struct game_drawing_settings {
 	bool draw_character_gui = true;
 	bool draw_crosshairs = true;
 	bool draw_weapon_laser = true;
-	pad_bytes<1> pad;
+	bool draw_aabb_highlighter = true;
 	// END GEN INTROSPECTOR
 };

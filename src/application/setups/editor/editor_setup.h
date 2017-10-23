@@ -239,7 +239,7 @@ public:
 	void open_containing_folder();
 
 	template <class F>
-	void for_each_additional_highlight(F callback) const {
+	void for_each_highlight(F callback) const {
 		if (has_current_tab() && player_paused) {
 			if (get_viewed_character().alive()) {
 				auto color = settings.controlled_entity_color;
@@ -256,6 +256,11 @@ public:
 				callback(hovered_entity, settings.hovered_entity_color);
 			}
 		}
+	}
+
+	template <class F>
+	void for_each_line(F callback) const {
+	
 	}
 
 	FORCE_INLINE auto get_camera_panning() const {

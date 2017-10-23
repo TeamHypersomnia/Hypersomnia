@@ -1181,7 +1181,7 @@ int work(const int argc, const char* const * const argv) try {
 				audiovisuals.get<interpolation_system>(),
 				audiovisuals.world_hover_highlighter,
 				viewing_config.hotbar,
-				interpolation_ratio,
+				viewing_config.drawing,
 				viewing_config.game_gui_controls,
 				get_camera(),
 				get_drawer()
@@ -1245,12 +1245,18 @@ int work(const int argc, const char* const * const argv) try {
 						using T = std::decay_t<decltype(setup)>;
 
 						if constexpr(T::has_additional_highlights) {
-							setup.for_each_additional_highlight(callback);
+							setup.for_each_highlight(callback);
 						}
 					});
 				}
 			);
 			
+			if (current_setup) {
+				if (const auto* editor = std::get_if<editor_setup>(&*current_setup)) {
+					
+				}
+			}
+
 			/* 
 				Illuminated rendering leaves the renderer in a state 
 				where the default shader is being used and the game world atlas is still bound.

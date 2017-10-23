@@ -93,12 +93,11 @@ FORCE_INLINE void draw_border(
 }
 
 template <class F>
-FORCE_INLINE void for_each_renderable_component(const const_entity_handle h, F callback) {
+FORCE_INLINE void on_renderable_component(const const_entity_handle h, F callback) {
 	if (const auto renderable = h.find<components::sprite>()) {
 		callback(*renderable);
 	}
-
-	if (const auto renderable = h.find<components::polygon>()) {
+	else if (const auto renderable = h.find<components::polygon>()) {
 		callback(*renderable);
 	}
 }
@@ -108,7 +107,7 @@ FORCE_INLINE void draw_entity(
 	const draw_renderable_input in,
 	const interpolation_system& interp
 ) {
-	for_each_renderable_component(e, [&](const auto& r) {
+	on_renderable_component(e, [&](const auto& r) {
 		draw_renderable(r, in, e.get_viewing_transform(interp, true));
 	});
 }
@@ -119,7 +118,7 @@ FORCE_INLINE void draw_color_highlight(
 	const draw_renderable_input in,
 	const interpolation_system& interp
 ) {
-	for_each_renderable_component(h, [&](auto copy) {
+	on_renderable_component(h, [&](auto copy) {
 		copy.set_color(color);
 
 		draw_renderable(
@@ -135,7 +134,7 @@ FORCE_INLINE void draw_neon_map(
 	const draw_renderable_input in,
 	const interpolation_system& interp
 ) {
-	for_each_renderable_component(e, [&](const auto& r) {
+	on_renderable_component(e, [&](const auto& r) {
 		draw_neon_map(r, in, e.get_viewing_transform(interp, true));
 	});
 }
@@ -150,7 +149,7 @@ FORCE_INLINE void draw_border(
 	const auto border_info = borders(e);
 
 	if (border_info) {
-		for_each_renderable_component(e, [&](const auto& r) {
+		on_renderable_component(e, [&](const auto& r) {
 			draw_border(r, in, e.get_viewing_transform(interp, true), *border_info);
 		});
 	}
