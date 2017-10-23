@@ -502,6 +502,11 @@ void editor_setup::perform_custom_imgui(
 			if (has_current_tab()) {
 				//text(typesafe_sprintf("Tick rate: %x/s", get_viewed_cosmos().get_steps_per_second()));
 				text(typesafe_sprintf("Cursor: %x", world_cursor_pos));
+				
+				if (get_camera_panning().non_zero()) {
+					text(typesafe_sprintf("Panning: %x", get_camera_panning()));
+				}
+
 				text(typesafe_sprintf("Total entities: %x/%x",
 					get_viewed_cosmos().get_entities_count(),
 					get_viewed_cosmos().get_maximum_entities()
@@ -925,8 +930,6 @@ bool editor_setup::handle_unfetched_window_input(
 				if (work().world[hovered_entity].alive()) {
 					tab().selected_entities.emplace(hovered_entity);
 				}
-
-				tab().panning -= e.mouse.rel * settings.camera_panning_speed;
 
 				return true;
 			}

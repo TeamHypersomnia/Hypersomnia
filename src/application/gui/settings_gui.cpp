@@ -126,6 +126,11 @@ void settings_gui_state::perform(
 			revert(f);
 		};
 
+		auto revertable_color_edit = [&](auto l, auto& f, auto&&... args) {
+			color_edit(l, f, std::forward<decltype(args)>(args)...);
+			revert(f);
+		};
+
 		switch (active_pane) {
 			case settings_pane::WINDOW: {
 				enum_combo("Launch on game's startup", config.launch_mode);
@@ -159,7 +164,7 @@ void settings_gui_state::perform(
 					if (config.window.raw_mouse_input) {
 						auto indent = scoped_indent();
 
-						checkbox("But use system cursor for GUI", config.session.use_system_cursor_for_gui);
+						revertable_checkbox("But use system cursor for GUI", config.session.use_system_cursor_for_gui);
 					}
 #endif
 					ImGui::RadioButton("System cursor", &e, 0);
@@ -177,7 +182,7 @@ void settings_gui_state::perform(
 				break;
 			}
 			case settings_pane::GRAPHICS: {
-				checkbox("Highlight hovered world items", config.drawing.draw_aabb_highlighter);
+				revertable_checkbox("Highlight hovered world items", config.drawing.draw_aabb_highlighter);
 
 				break;
 			}
@@ -208,7 +213,7 @@ void settings_gui_state::perform(
 
 				revertable_checkbox("Draw weapon laser", config.drawing.draw_weapon_laser);
 				revertable_checkbox("Draw crosshairs", config.drawing.draw_crosshairs);
-				// checkbox("Draw gameplay GUI", config.drawing.draw_character_gui); revert(config.drawing.draw_character_gui);
+				// revertable_checkbox("Draw gameplay GUI", config.drawing.draw_character_gui); revert(config.drawing.draw_character_gui);
 				break;
 			}
 			case settings_pane::EDITOR: {
@@ -223,8 +228,9 @@ void settings_gui_state::perform(
 				
 				revertable_drag("Camera panning speed", config.editor.camera_panning_speed, 0.001f, -10.f, 10.f);
 
-				color_edit("Controlled entity color", config.editor.controlled_entity_color);
-				color_edit("Selected entity color", config.editor.selected_entity_color);
+				revertable_color_edit("Controlled entity color", config.editor.controlled_entity_color);
+				revertable_color_edit("Hovered entity color", config.editor.hovered_entity_color);
+				revertable_color_edit("Selected entity color", config.editor.selected_entity_color);
 
 				break;
 			}

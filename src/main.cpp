@@ -558,18 +558,18 @@ int work(const int argc, const char* const * const argv) try {
 		game_gui.standard_post_cleanup(step);
 	};
 
+	static auto get_sampled_cosmos = [](auto& setup) {
+		return std::addressof(setup.get_viewed_cosmos());
+	};
+
+	static const cosmos* last_sampled_cosmos = nullptr;
+
 	static auto advance_setup = [](
 		const augs::delta frame_delta,
 		auto& setup,
 		const cosmic_entropy& new_game_entropy,
 		const config_lua_table& viewing_config
 	) {
-		static auto get_sampled_cosmos = [](auto& setup) {
-			return std::addressof(setup.get_viewed_cosmos());
-		};
-
-		static auto last_sampled_cosmos = get_sampled_cosmos(setup);
-
 		setup.control(new_game_entropy);
 		setup.accept_game_gui_events(game_gui.get_and_clear_pending_events());
 		

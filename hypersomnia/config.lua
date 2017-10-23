@@ -66,7 +66,8 @@ return {
     },
     camera_panning_speed = 1,
     controlled_entity_color = "255 255 0 120",
-    selected_entity_color = "65 131 196 180"
+    hovered_entity_color = "255 255 255 20",
+    selected_entity_color = "65 131 196 80"
   },
   game_controls = {
     A = "MOVE_LEFT",
@@ -115,8 +116,8 @@ return {
   },
   gui_style = {
     Alpha = 1,
-    AntiAliasedLines = false,
-    AntiAliasedShapes = false,
+    AntiAliasedLines = true,
+    AntiAliasedShapes = true,
     ButtonTextAlign = {
       x = 0.5,
       y = 0.5
