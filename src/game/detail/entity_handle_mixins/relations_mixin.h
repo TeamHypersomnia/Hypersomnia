@@ -75,7 +75,6 @@ class relations_mixin;
 
 template<class entity_handle_type>
 class EMPTY_BASES relations_mixin<false, entity_handle_type> : public basic_relations_mixin<false, entity_handle_type> {
-protected:
 public:
 	void make_as_child_of(const entity_id) const;
 

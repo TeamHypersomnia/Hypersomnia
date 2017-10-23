@@ -58,35 +58,28 @@ void pure_color_highlight_system::draw_highlights(
 	for (const auto& r : highlights) {
 		const auto subject = cosmos[r.in.target];
 
-		if (subject.dead() || !subject.has<components::sprite>()) {
+		if (subject.dead()) {
 			continue;
 		}
 
-		auto sprite = subject.get<components::sprite>();
-		auto& col = sprite.color;
-		auto prevcol = col;
-		col = r.in.color;
+		const auto passed = global_time_seconds - r.time_of_occurence_seconds;
+		const auto ratio = std::max(0.f, 1.f - static_cast<float>(passed / r.in.maximum_duration_seconds));
+		
+		const auto target_color = rgba { 
+			r.in.color.rgb(),
+			static_cast<rgba_channel>(255.f * sqrt(sqrt(ratio)) * r.in.starting_alpha_ratio)
+		};
 
-		auto passed = global_time_seconds - r.time_of_occurence_seconds;
-		auto ratio = std::max(0.f, 1.f - static_cast<float>(passed / r.in.maximum_duration_seconds));
-
-		col.a = static_cast<rgba_channel>(255.f * sqrt(sqrt(ratio)) * r.in.starting_alpha_ratio);
-
-		draw_renderable(
-			sprite,
-
+		draw_color_highlight(
+			subject,
+			target_color,
 			{
 				output,
 				game_images,
 				camera,
 				global_time_seconds
 			},
-			
-			subject.get_viewing_transform(interp, true)
+			interp
 		);
-
-		col = prevcol;
 	}
-
-	//step.state.output->triangles.insert(step.state.output->triangles.begin(), pure_color_highlights.begin(), pure_color_highlights.end());
 }

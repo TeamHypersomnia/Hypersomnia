@@ -123,6 +123,24 @@ FORCE_INLINE void draw_entity(
 	});
 }
 
+FORCE_INLINE void draw_color_highlight(
+	const const_entity_handle h,
+	const rgba color,
+	const draw_renderable_input in,
+	const interpolation_system& interp
+) {
+	if (const auto sprite = h.find<components::sprite>()) {
+		auto sprite_copy = *sprite;
+		sprite_copy.color = color;
+
+		draw_renderable(
+			sprite_copy,
+			in,
+			h.get_viewing_transform(interp, true)
+		);
+	}
+}
+
 FORCE_INLINE void draw_neon_map(
 	const const_entity_handle e,
 	const draw_renderable_input in,
