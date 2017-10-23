@@ -23,6 +23,14 @@ template <class T>
 constexpr T PI = static_cast<T>(3.1415926535897932384626433832795);
 
 namespace augs {
+	template <class T>
+	auto zigzag(const T current_time, const T cycle) {
+		const auto m = current_time / cycle;
+		const auto i = int(m);
+
+		return i % 2 ? (1 - (m - i)) : (m - i);
+	}
+
 	template <typename T> 
 	int sgn(const T val) {
 		return (T(0) < val) - (val < T(0));

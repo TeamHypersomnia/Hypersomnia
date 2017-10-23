@@ -239,7 +239,7 @@ public:
 		if (has_current_tab()) {
 			if (get_viewed_character().alive()) {
 				auto color = settings.controlled_entity_color;
-				color.a += static_cast<rgba_channel>(sin(global_time_seconds * 8) * 10);
+				color.a += static_cast<rgba_channel>(augs::zigzag(global_time_seconds, 1.0 / 2) * 25);
 
 				callback(work().locally_viewed, color);
 			}
