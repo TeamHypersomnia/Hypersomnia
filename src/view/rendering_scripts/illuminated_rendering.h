@@ -93,8 +93,12 @@ void illuminated_rendering(
 
 	in.game_world_atlas.bind();
 
-	shaders.standard->set_as_current();
-	shaders.standard->set_projection(matrix);
+	auto set_shader_with_matrix = [&](auto& shader) {
+		shader->set_as_current();
+		shader->set_projection(matrix);
+	};
+
+	set_shader_with_matrix(shaders.standard);
 
 	fbos.smoke->set_as_current();
 
@@ -198,8 +202,7 @@ void illuminated_rendering(
 		game_images
 		});
 
-	shaders.illuminated->set_as_current();
-	shaders.illuminated->set_projection(matrix);
+	set_shader_with_matrix(shaders.illuminated);
 
 	auto draw_layer = [&](const render_layer r) {
 		for (const auto e : visible.per_layer[r]) {
@@ -219,8 +222,7 @@ void illuminated_rendering(
 
 	renderer.call_and_clear_triangles();
 
-	shaders.specular_highlights->set_as_current();
-	shaders.specular_highlights->set_projection(matrix);
+	set_shader_with_matrix(shaders.specular_highlights);
 
 	renderer.call_and_clear_triangles();
 
@@ -231,8 +233,7 @@ void illuminated_rendering(
 
 	renderer.call_and_clear_triangles();
 
-	shaders.pure_color_highlight->set_as_current();
-	shaders.pure_color_highlight->set_projection(matrix);
+	set_shader_with_matrix(shaders.pure_color_highlight);
 
 	const auto timestamp_ms = static_cast<unsigned>(global_time_seconds * 1000);
 	
@@ -330,8 +331,7 @@ void illuminated_rendering(
 
 	renderer.call_and_clear_triangles();
 
-	shaders.circular_bars->set_as_current();
-	shaders.circular_bars->set_projection(matrix);
+	set_shader_with_matrix(shaders.circular_bars);
 
 	const auto set_center_uniform = [&](const auto& tex) {
 		const auto upper = tex.get_atlas_space_uv({ 0.0f, 0.0f });
@@ -386,8 +386,7 @@ void illuminated_rendering(
 
 	renderer.call_triangles(textual_infos);
 
-	shaders.exploding_rings->set_as_current();
-	shaders.exploding_rings->set_projection(matrix);
+	set_shader_with_matrix(shaders.exploding_rings);
 
 	exploding_rings.draw_rings(
 		output,
