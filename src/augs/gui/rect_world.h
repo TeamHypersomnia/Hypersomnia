@@ -58,6 +58,16 @@ namespace augs {
 				return held_rect_is_dragged;
 			}
 
+			template <class C>
+			bool wants_to_capture_mouse(const C context) const {
+				if (context.alive(rect_hovered)) {
+					return true;
+				}
+				else {
+					return is_currently_dragging();
+				}
+			}
+
 			gui_element_variant_id get_rect_in_focus() const {
 				return rect_in_focus;
 			}

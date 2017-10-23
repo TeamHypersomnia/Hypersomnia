@@ -25,6 +25,7 @@ enum class gui_event {
 	loutup,
 	routup,
 	hover,
+	hovermovement,
 	hoverlost,
 	lstarteddrag,
 	ldrag,

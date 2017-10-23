@@ -176,9 +176,11 @@ namespace augs {
 									if (gr.rect_held_by_lmb == gui_element_variant_id(this_id) && state.get_mouse_key(0) && absolute_clipped_rect.hover(state.mouse.ldrag)) {
 										gui_event_lambda(gui_event::lpressed);
 									}
-
-									if (gr.rect_held_by_rmb == gui_element_variant_id(this_id) && state.get_mouse_key(1) && absolute_clipped_rect.hover(state.mouse.rdrag)) {
+									else if (gr.rect_held_by_rmb == gui_element_variant_id(this_id) && state.get_mouse_key(1) && absolute_clipped_rect.hover(state.mouse.rdrag)) {
 										gui_event_lambda(gui_event::rpressed);
+									}
+									else {
+										gui_event_lambda(gui_event::hovermovement);
 									}
 								}
 							}
