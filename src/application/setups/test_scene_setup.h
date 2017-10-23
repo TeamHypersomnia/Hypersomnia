@@ -8,9 +8,10 @@
 #include "game/transcendental/entity_handle.h"
 
 #include "view/viewables/all_viewables_defs.h"
-#include "view/viewables/viewables_loading_type.h"
 
 #include "application/workspace.h"
+
+#include "application/setups/default_setup_settings.h"
 
 #include "application/debug_character_selection.h"
 #include "application/debug_settings.h"
@@ -21,17 +22,13 @@ namespace sol {
 	class state;
 }
 
-class test_scene_setup {
+class test_scene_setup : public default_setup_settings {
 	workspace scene;
 	cosmic_entropy total_collected_entropy;
 	augs::fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
 	debug_character_selection characters;
 
 public:
-	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL_ONLY_ONCE;
-	static constexpr bool handles_window_input = false;
-	static constexpr bool handles_escape = false;
-
 	test_scene_setup(
 		sol::state& lua,
 		const bool make_minimal_test_scene,

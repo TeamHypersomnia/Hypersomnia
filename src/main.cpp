@@ -1235,7 +1235,13 @@ int work(const int argc, const char* const * const argv) try {
 				false,
 				[](const const_entity_handle handle) -> std::optional<rgba> { return std::nullopt; },
 				[&](auto callback) {
+					visit_current_setup([&](auto& setup) {
+						using T = std::decay_t<decltype(setup)>;
 
+						if constexpr(T::has_additional_highlights) {
+							setup.for_each_additional_highlight(callback);
+						}
+					});
 				}
 			);
 			

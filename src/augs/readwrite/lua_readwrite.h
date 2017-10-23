@@ -44,7 +44,6 @@ namespace augs {
 	template <class T>
 	constexpr bool representable_as_lua_value_v =
 		std::is_same_v<T, std::string>
-		|| std::is_same_v<T, path_type>
 		|| std::is_arithmetic_v<T>
 		|| std::is_enum_v<T>
 		|| has_custom_to_lua_value_v<T>
@@ -74,9 +73,6 @@ namespace augs {
 		}
 		else if constexpr(std::is_same_v<T, std::string> || std::is_arithmetic_v<T>) {
 			into = object.as<T>();
-		}
-		else if constexpr(std::is_same_v<T, path_type>) {
-			into = object.as<std::string>();
 		}
 		else if constexpr(std::is_enum_v<T>) {
 			if constexpr(has_enum_to_string_v<T>) {
@@ -185,7 +181,7 @@ namespace augs {
 					}
 				*/
 
-				if constexpr(key_representable_as_lua_value_v<Container>) {
+				if constexpr(is_associative_v<Container> && key_representable_as_lua_value_v<Container>) {
 					for (auto key_value_pair : input_table) {
 						typename Container::key_type key;
 						typename Container::mapped_type mapped;
@@ -203,7 +199,7 @@ namespace augs {
 						sol::object maybe_element = input_table[counter];
 
 						if (maybe_element.valid()) {
-							if constexpr(is_associative_container_v<Container>) {
+							if constexpr(is_associative_v<Container>) {
 								typename Container::key_type key;
 								typename Container::mapped_type mapped;
 
@@ -224,7 +220,12 @@ namespace augs {
 
 								read(input_table[counter], val);
 
-								into.emplace_back(std::move(val));
+								if constexpr(can_emplace_back_v<Container>) {
+									into.emplace_back(std::move(val));
+								}
+								else {
+									into.emplace(std::move(val));
+								}
 							}
 						}
 						else {
@@ -275,9 +276,6 @@ namespace augs {
 		}
 		else if constexpr(std::is_same_v<T, std::string> || std::is_arithmetic_v<T>) {
 			return field;
-		}
-		else if constexpr(std::is_same_v<T, path_type>) {
-			return field.string();
 		}
 		else if constexpr(std::is_enum_v<T>) {
 			if constexpr(has_enum_to_string_v<T>) {
@@ -356,7 +354,7 @@ namespace augs {
 				}
 			*/
 
-			if constexpr(key_representable_as_lua_value_v<Container>) {
+			if constexpr(is_associative_v<Container> && key_representable_as_lua_value_v<Container>) {
 				for (const auto& element : from) {
 					write_table_or_field(output_table, element.second, general_to_lua_value(element.first));
 				}
@@ -365,7 +363,7 @@ namespace augs {
 				int counter = 1;
 
 				for (const auto& element : from) {
-					if constexpr(is_associative_container_v<Container>) {
+					if constexpr(is_associative_v<Container>) {
 						auto key_value_pair_table = output_table.create();
 
 						write_table_or_field(key_value_pair_table, element.first, 1);

@@ -45,6 +45,8 @@ struct editor_popup {
 class editor_setup : private current_tab_access_cache<editor_setup> {
 	friend class current_tab_access_cache<editor_setup>;
 
+	double global_time_seconds = 0.0;
+
 	struct autosave_input {
 		sol::state& lua;
 	};
@@ -118,6 +120,7 @@ public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
 	static constexpr bool handles_window_input = true;
 	static constexpr bool handles_escape = true;
+	static constexpr bool has_additional_highlights = true;
 
 	editor_setup(sol::state& lua);
 	editor_setup(sol::state& lua, const augs::path_type& workspace_path);
@@ -163,6 +166,8 @@ public:
 		augs::delta frame_delta,
 		Callbacks&&... callbacks
 	) {
+		global_time_seconds += frame_delta.in_seconds();
+
 		if (!player_paused) {
 			timer.advance(frame_delta *= player_speed);
 		}
@@ -228,6 +233,22 @@ public:
 
 	void go_to_all();
 	void open_containing_folder();
+
+	template <class F>
+	void for_each_additional_highlight(F callback) const {
+		if (has_current_tab()) {
+			if (get_viewed_character().alive()) {
+				auto color = settings.controlled_entity_color;
+				color.a += static_cast<rgba_channel>(sin(global_time_seconds * 8) * 10);
+
+				callback(work().locally_viewed, color);
+			}
+
+			for (const auto& e : tab().selected_entities) {
+				callback(e, settings.selected_entity_color);
+			}
+		}
+	}
 
 	FORCE_INLINE auto get_camera_panning() const {
 		return has_current_tab() ? tab().panning : vec2::zero;

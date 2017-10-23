@@ -2,6 +2,7 @@
 #include <string>
 #include "augs/graphics/rgba.h"
 #include "augs/templates/string_templates.h"
+#include "augs/filesystem/path.h"
 
 namespace augs {
 	inline auto to_lua_value(const rgba r) {
@@ -11,6 +12,25 @@ namespace augs {
 	template <class I>
 	void from_lua_value(I& in, rgba& r) {
 		r.from_stream(std::istringstream(in.as<std::string>()));
+	}
+
+	inline auto to_lua_value(const path_type r) {
+		auto nice_representation = r.string();
+
+		for (auto& s : nice_representation) {
+			/* Double backslash is ugly */
+
+			if (s == '\\') {
+				s = '/';
+			}
+		}
+
+		return nice_representation;
+	}
+
+	template <class I>
+	void from_lua_value(I& in, path_type& r) {
+		r = in.as<std::string>();
 	}
 
 	inline auto to_lua_value(const ImVec4& r) {

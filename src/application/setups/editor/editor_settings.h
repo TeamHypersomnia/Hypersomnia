@@ -16,5 +16,8 @@ struct editor_settings {
 	// GEN INTROSPECTOR struct editor_settings
 	editor_autosave_settings autosave;
 	float camera_panning_speed = 1.f;
+
+	rgba controlled_entity_color = { 255, 255, 0, 150 };
+	rgba selected_entity_color = { 255, 255, 255, 150 };
 	// END GEN INTROSPECTOR
 };

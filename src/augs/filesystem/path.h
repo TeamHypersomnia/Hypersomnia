@@ -23,7 +23,17 @@ namespace augs {
 		Archive& ar,
 		const path_type& storage
 	) {
-		write(ar, storage.string());
+		auto nice_representation = storage.string();
+		
+		for (auto& s : nice_representation) {
+			/* Double backslash is ugly */
+			
+			if (s == '\\') {
+				s = '/';
+			}
+		}
+
+		write(ar, nice_representation);
 	}
 
 	inline auto to_display_path(path_type target_path) {

@@ -18,10 +18,11 @@
 #include "game/transcendental/cosmic_movie_director.h"
 #include "game/organization/all_component_includes.h"
 
-#include "view/viewables/viewables_loading_type.h"
 #include "view/viewables/all_viewables_defs.h"
 
 #include "application/workspace.h"
+
+#include "application/setups/default_setup_settings.h"
 
 #include "application/gui/menu/creators_screen.h"
 #include "application/gui/main_menu_gui.h"
@@ -33,7 +34,7 @@ namespace sol {
 	class state;
 }
 
-class main_menu_setup {
+class main_menu_setup : public default_setup_settings {
 	std::shared_future<std::wstring> latest_news;
 	vec2 latest_news_pos = { 0.f, 0.f };
 
@@ -58,10 +59,6 @@ class main_menu_setup {
 	augs::action_list intro_actions;
 	augs::action_list credits_actions;
 public:
-	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL_ONLY_ONCE;
-	static constexpr bool handles_window_input = false;
-	static constexpr bool handles_escape = false;
-
 	main_menu_gui gui;
 
 	main_menu_setup(sol::state&, const main_menu_settings);

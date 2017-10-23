@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include "augs/filesystem/path.h"
@@ -16,7 +16,7 @@ struct editor_recent_paths;
 struct editor_tab {
 	// GEN INTROSPECTOR struct editor_tab
 	augs::path_type current_path;
-	std::unordered_map<entity_id, rgba> selected_entities;
+	std::unordered_set<entity_id> selected_entities;
 	vec2 panning;
 	// END GEN INTROSPECTOR
 

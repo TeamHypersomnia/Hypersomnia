@@ -202,7 +202,7 @@ namespace augs {
 				storage.reserve(s);
 			}
 
-			if constexpr(is_associative_container_v<Container>) {
+			if constexpr(is_associative_v<Container>) {
 				while (s--) {
 					typename Container::key_type key;
 					typename Container::mapped_type mapped;
