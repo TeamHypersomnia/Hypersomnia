@@ -222,6 +222,9 @@ void settings_gui_state::perform(
 				
 				revertable_drag("Camera panning speed", config.editor.camera_panning_speed, 0.001f, -10.f, 10.f);
 
+				color_edit("Controlled entity color", config.editor.controlled_entity_color);
+				color_edit("Selected entity color", config.editor.selected_entity_color);
+
 				break;
 			}
 			case settings_pane::GUI_STYLES: {

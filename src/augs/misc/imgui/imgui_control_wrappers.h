@@ -6,6 +6,7 @@
 #include "augs/templates/string_templates.h"
 
 #include "augs/math/vec2.h"
+#include "augs/graphics/rgba.h"
 
 #include "augs/misc/imgui/imgui_controls.h"
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
@@ -92,6 +93,17 @@ namespace augs {
 					display_format.c_str()
 				) 
 			};
+		}
+
+		inline bool color_edit(
+			const std::string& label,
+			rgba& into,
+			const ImGuiColorEditFlags flags = 0
+		) {
+			ImVec4 input = into;
+			const bool result = { ImGui::ColorEdit4(label.c_str(), reinterpret_cast<float*>(&input), flags) };
+			into = input;
+			return result;
 		}
 
 		inline void text(const std::string& t) {
