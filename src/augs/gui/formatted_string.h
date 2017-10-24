@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <vector>
 
 #include "augs/graphics/rgba.h"
 #include "augs/image/font.h"

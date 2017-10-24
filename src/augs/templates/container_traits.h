@@ -12,21 +12,21 @@ template <class T, class = void>
 struct can_access_data : std::false_type {};
 
 template <class T>
-struct can_access_data<T, decltype(std::declval<T>().data(), void())> : std::true_type {};
+struct can_access_data<T, decltype(std::declval<T&>().data(), void())> : std::true_type {};
 
 
 template <class T, class = void>
 struct can_reserve : std::false_type {};
 
 template <class T>
-struct can_reserve<T, decltype(std::declval<T>().reserve(0u), void())> : std::true_type {};
+struct can_reserve<T, decltype(std::declval<T&>().reserve(0u), void())> : std::true_type {};
 
 
 template <class T, class = void>
 struct can_clear : std::false_type {};
 
 template <class T>
-struct can_clear<T, decltype(std::declval<T>().clear(), void())> : std::true_type {};
+struct can_clear<T, decltype(std::declval<T&>().clear(), void())> : std::true_type {};
 
 
 template <class T, class = void>
@@ -40,7 +40,7 @@ template <class T, class = void>
 struct has_begin_and_end : std::false_type {};
 
 template <class T>
-struct has_begin_and_end<T, decltype(std::declval<T>().begin(), std::declval<T>().end(), void())> : std::true_type {};
+struct has_begin_and_end<T, decltype(std::declval<T&>().begin(), std::declval<T&>().end(), void())> : std::true_type {};
 
 
 template<typename Trait>

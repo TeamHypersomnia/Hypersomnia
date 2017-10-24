@@ -1,5 +1,5 @@
 #pragma once
-#include "3rdparty/polypartition/src/polypartition.h"
+#include "augs/drawing/polygon.h"
 
 #include "augs/math/vec2.h"
 #include "augs/math/transform.h"

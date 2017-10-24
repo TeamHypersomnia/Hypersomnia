@@ -18,7 +18,7 @@ struct basic_transform {
 	T rotation;
 	// END GEN INTROSPECTOR
 
-	transform(
+	basic_transform(
 		const T x = static_cast<T>(0),
 		const T y = static_cast<T>(0),
 		const T rotation = static_cast<T>(0)
@@ -27,7 +27,7 @@ struct basic_transform {
 		rotation(rotation)
 	{}
 
-	transform(
+	basic_transform(
 		const vec2 pos,
 		const T rotation = static_cast<T>(0)
 	) :

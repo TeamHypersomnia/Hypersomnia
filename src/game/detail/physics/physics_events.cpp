@@ -127,7 +127,7 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 						LOG("Reg: %x", new_owner);
 					}
 					
-					add_element(grounds, connection);
+					grounds.emplace_back(connection);
 
 					sys.rechoose_owner_friction_body(collider.get_owner_body());
 				}

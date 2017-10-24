@@ -1,18 +1,20 @@
 #pragma once
 #include <vector>
-#include "game/detail/inventory/inventory_slot_handle_declaration.h"
-#include "game/transcendental/entity_handle_declaration.h"
 
-#include "game/transcendental/entity_id.h"
-
-#include "game/enums/slot_function.h"
-#include "game/enums/child_entity_name.h"
-
-#include "game/build_settings.h"
 #include "augs/build_settings/platform_defines.h"
 
 #include "augs/templates/introspect.h"
 #include "augs/templates/maybe_const.h"
+
+#include "game/build_settings.h"
+
+#include "game/detail/inventory/inventory_slot_handle_declaration.h"
+
+#include "game/transcendental/entity_handle_declaration.h"
+#include "game/transcendental/entity_id.h"
+
+#include "game/enums/slot_function.h"
+#include "game/enums/child_entity_name.h"
 
 struct entity_relations;
 

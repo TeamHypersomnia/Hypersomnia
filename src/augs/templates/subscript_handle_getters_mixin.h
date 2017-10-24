@@ -7,13 +7,13 @@ namespace augs {
 		template <class id_type>
 		decltype(auto) operator[](const id_type id) {
 			auto& self = *static_cast<derived*>(this);
-			return ::subscript_handle_getter(self, id);
+			return subscript_handle_getter(self, id);
 		}
 
 		template <class id_type>
 		decltype(auto) operator[](const id_type id) const {
 			const auto& self = *static_cast<const derived*>(this);
-			return ::subscript_handle_getter(self, id);
+			return subscript_handle_getter(self, id);
 		}
 	};
 }

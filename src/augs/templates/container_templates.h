@@ -31,15 +31,11 @@ void erase_element(Container& v, const T& l) {
 	}
 }
 
-template <class Container, class... T>
-void add_element(Container& v, T&&... l) {
-	if constexpr(can_access_data_v<Container>) {
-		v.emplace_back(std::forward<T>(l)...);
-	}
-	else {
-		v.emplace(std::forward<T>(l)...);
-	}
-}
+template <class T, class = void>
+struct asdasd : std::false_type {};
+
+template <class T>
+struct asdasd<T, decltype(std::declval<T>().emplace_back(), void())> : std::true_type {};
 
 template<class Container, class T>
 auto& sort_container(Container& v, const T l) {

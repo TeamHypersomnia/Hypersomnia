@@ -1,3 +1,5 @@
+#include "generated/introspectors.h"
+
 #include "workspace.h"
 
 #include "game/organization/all_messages_includes.h"
@@ -10,7 +12,6 @@
 
 #include "augs/readwrite/lua_readwrite.h"
 #include "augs/readwrite/byte_readwrite.h"
-#include "generated/introspectors.h"
 
 #if BUILD_TEST_SCENES
 void workspace::make_test_scene(sol::state& lua, const bool minimal) {

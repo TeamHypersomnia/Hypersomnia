@@ -160,7 +160,7 @@ struct basic_vec2 {
 	}
 
 	basic_vec2 get_sticking_offset(const rectangle_sticking mode) {
-		vec2 res;
+		basic_vec2 res;
 		switch (mode) {
 		case ::rectangle_sticking::LEFT: res = vec2(-x / 2, 0);	break;
 		case ::rectangle_sticking::RIGHT: res = vec2(x / 2, 0);	break;

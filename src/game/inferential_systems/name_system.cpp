@@ -20,8 +20,7 @@ void name_system::destroy_additional_inferred_state(const cosmos_common_state& g
 }
 
 void name_system::create_inferred_state_for(const entity_id id, const components::name& name) {
-	auto& entities_with_this_name_id = entities_by_name_id[name.name_id];
-	add_element(entities_with_this_name_id, id);
+	entities_by_name_id[name.name_id].emplace(id);
 }
 
 void name_system::destroy_inferred_state_of(const entity_id id, const components::name& name) {

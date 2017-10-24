@@ -1,15 +1,18 @@
 #pragma once
 #include <iosfwd>
 
+#include "augs/build_settings/platform_defines.h"
+
 #include "augs/templates/maybe_const.h"
 #include "augs/templates/component_traits.h"
 #include "augs/templates/type_matching_and_indexing.h"
 #include "augs/templates/for_each_in_types.h"
 
-#include "game/detail/inventory/inventory_slot_handle_declaration.h"
-#include "game/transcendental/entity_handle_declaration.h"
 #include "augs/entity_system/component_setters_mixin.h"
 #include "augs/entity_system/component_allocators_mixin.h"
+
+#include "game/detail/inventory/inventory_slot_handle_declaration.h"
+#include "game/transcendental/entity_handle_declaration.h"
 #include "game/transcendental/entity_id.h"
 #include "game/organization/all_components_declaration.h"
 
@@ -19,9 +22,9 @@
 #include "game/detail/entity_handle_mixins/spatial_properties_mixin.h"
 
 #include "game/enums/entity_flag.h"
-#include "augs/build_settings/platform_defines.h"
 #include "game/transcendental/step_declaration.h"
 #include "game/components/name_component_declaration.h"
+#include "game/components/flags_component.h"
 
 template <class T>
 constexpr std::size_t component_index_v = index_in_list_v<T, component_list_t<type_list>>;
@@ -282,7 +285,7 @@ public:
 			[&](const auto& id) {
 				using component_type = typename std::decay_t<decltype(id)>::mapped_type;
 
-				if (const auto maybe_component = cosm.get_component_pool<component_type>().find(id)) {
+				if (const auto maybe_component = cosm.template get_component_pool<component_type>().find(id)) {
 					callback(*maybe_component);
 				}
 			}

@@ -37,7 +37,6 @@ void LOG(const A& f) {
 	LOG(typesafe_sprintf("%x", f));
 }
 
-template <>
 void LOG(const std::string& f);
 
 #define LOG_NVPS(...) { \

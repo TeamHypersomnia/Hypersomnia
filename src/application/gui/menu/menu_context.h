@@ -19,6 +19,8 @@ struct menu_context_dependencies {
 template <bool is_const, class Enum>
 class menu_context : public augs::gui::basic_context<menu_element_location<Enum>, is_const, menu_context<is_const, Enum>> {
 public:
+	using base = augs::gui::basic_context<menu_element_location<Enum>, is_const, menu_context<is_const, Enum>>;
+
 	using root_type = menu_root<Enum>;
 	using menu_root_ref = maybe_const_ref_t<is_const, root_type>;
 

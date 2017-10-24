@@ -20,17 +20,15 @@ namespace augs {
 	>
 	void introspect(
 		F&& callback,
-		Instance&& t,
-		Instances&&... tn
+		Instance& t,
+		Instances&... tn
 	) {
 		using T = std::remove_reference_t<Instance>;
 		static_assert(has_introspect_v<T>, "Recursion requested on type(s) without introspectors!");
 
 		augs::introspection_access::introspect_body(
 			static_cast<std::decay_t<Instance>*>(nullptr), 
-			std::forward<F>(callback),
-			std::forward<Instance>(t), 
-			std::forward<Instances>(tn)...
+			std::forward<F>(callback), t, tn...
 		);
 	}
 	/*
@@ -47,17 +45,15 @@ namespace augs {
 	>
 	void introspect_if_not_leaf(
 		F&& callback,
-		Instance&& t,
-		Instances&&... tn
+		Instance& t,
+		Instances&... tn
 	) {
 		using T = std::remove_reference_t<Instance>;
 
 		if constexpr(!is_introspective_leaf_v<T>) {
 			augs::introspection_access::introspect_body(
 				static_cast<std::decay_t<Instance>*>(nullptr),
-				std::forward<F>(callback),
-				std::forward<Instance>(t),
-				std::forward<Instances>(tn)...
+				std::forward<F>(callback), t, tn...
 			);
 		}
 	}

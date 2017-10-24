@@ -7,61 +7,20 @@
 #include "augs/templates/is_variant.h"
 #include "augs/templates/is_optional.h"
 #include "augs/templates/exception_templates.h"
+#include "augs/templates/introspect.h"
 
 #include "augs/readwrite/custom_lua_representations.h"
 #include "augs/misc/lua/lua_utils.h"
 
 #include "augs/filesystem/file.h"
+
 #include "augs/readwrite/readwrite_traits.h"
-#include "augs/templates/introspect.h"
+#include "augs/readwrite/lua_traits.h"
 
 namespace augs {
 	struct lua_deserialization_error : error_with_typesafe_sprintf {
 		using error_with_typesafe_sprintf::error_with_typesafe_sprintf;
 	};
-
-	template <class T, class = void>
-	struct has_custom_to_lua_value : std::false_type {};
-
-	template <class T>
-	struct has_custom_to_lua_value<
-		T, 
-		decltype(
-			to_lua_value(
-				std::declval<const T>()
-			),
-			from_lua_value(
-				std::declval<sol::object>(),
-				std::declval<T>()
-			),
-			void()
-		)
-	> : std::true_type {};
-
-	template <class T>
-	constexpr bool has_custom_to_lua_value_v = has_custom_to_lua_value<T>::value;
-
-	template <class T>
-	constexpr bool representable_as_lua_value_v =
-		std::is_same_v<T, std::string>
-		|| std::is_arithmetic_v<T>
-		|| std::is_enum_v<T>
-		|| has_custom_to_lua_value_v<T>
-	;
-	
-	template <class T>
-	constexpr bool representable_as_lua_value_v<T*> = representable_as_lua_value_v<std::remove_const_t<T>>;
-
-	template <class T, class = void>
-	struct key_representable_as_lua_value : std::false_type {};
-
-	template <class T>
-	struct key_representable_as_lua_value<T, decltype(typename T::key_type(), void())> 
-		: std::bool_constant<representable_as_lua_value_v<typename T::key_type>> {
-	};
-
-	template <class T>
-	static constexpr bool key_representable_as_lua_value_v = key_representable_as_lua_value<T>::value;
 
 	template <class T>
 	void general_from_lua_value(sol::object object, T& into) {
@@ -101,23 +60,6 @@ namespace augs {
 		else {
 			static_assert(always_false_v<T>, "Non-exhaustive general_from_lua_value");
 		}
-	}
-
-
-	/*
-		For correct overload resolution.
-		This prevents the compiler from choosing the templated, byte-wise read
-		when the archive type is sol::table - obviously.
-	*/
-
-	template <class Serialized>
-	void read(sol::table input_table, Serialized& into) {
-		read(sol::object(input_table), into);
-	}
-
-	template <class A, class B, class Serialized>
-	void read(sol::proxy<A, B> input_proxy, Serialized& into) {
-		read(sol::object(input_proxy), into);
 	}
 
 	template <class Serialized>
@@ -266,6 +208,22 @@ namespace augs {
 		}
 	}
 
+	/*
+		For correct overload resolution.
+		This prevents the compiler from choosing the templated, byte-wise read
+		when the archive type is sol::table - obviously.
+	*/
+
+	template <class Serialized>
+	void read(sol::table input_table, Serialized& into) {
+		read(sol::object(input_table), into);
+	}
+
+	template <class A, class B, class Serialized>
+	void read(sol::proxy<A, B> input_proxy, Serialized& into) {
+		read(sol::object(input_proxy), into);
+	}
+
 	template <class T>
 	decltype(auto) general_to_lua_value(const T& field) {
 		if constexpr(std::is_pointer_v<T>) {
@@ -324,9 +282,9 @@ namespace augs {
 				[output_table](const auto& resolved){
 					using T = std::decay_t<decltype(resolved)>;
 					
-					const auto variant_type_label = get_variant_type_label(std::declval<Serialized>());
-					const auto variant_content_label = get_variant_content_label(std::declval<Serialized>());
-					const auto this_type_name = get_custom_type_name(std::declval<T>());
+					const auto variant_type_label = get_variant_type_label(std::declval<Serialized&>());
+					const auto variant_content_label = get_variant_content_label(std::declval<Serialized&>());
+					const auto this_type_name = get_custom_type_name(std::declval<T&>());
 
 					output_table[variant_type_label] = this_type_name;
 					write_table_or_field(output_table, resolved, variant_content_label);

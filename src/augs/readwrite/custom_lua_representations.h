@@ -4,14 +4,20 @@
 #include "augs/templates/string_templates.h"
 #include "augs/filesystem/path.h"
 
+#if LUA_TRAITS_INCLUDED
+#error "I/O traits were included BEFORE I/O overloads, which may cause them to be omitted under some compilers."
+#endif
+
 namespace augs {
 	inline auto to_lua_value(const rgba r) {
-		return r.stream_to(std::ostringstream()).str();
+		auto s = std::ostringstream();
+		r.stream_to(s);
+		return s.str();
 	}
 
 	template <class I>
 	void from_lua_value(I& in, rgba& r) {
-		r.from_stream(std::istringstream(in.as<std::string>()));
+		r.from_stream(std::istringstream(in.template as<std::string>()));
 	}
 
 	inline auto to_lua_value(const path_type r) {
@@ -30,7 +36,7 @@ namespace augs {
 
 	template <class I>
 	void from_lua_value(I& in, path_type& r) {
-		r = in.as<std::string>();
+		r = in.template as<std::string>();
 	}
 
 	inline auto to_lua_value(const ImVec4& r) {
@@ -40,7 +46,7 @@ namespace augs {
 	template <class I>
 	void from_lua_value(I& in, ImVec4& v) {
 		rgba r;
-		r.from_stream(std::istringstream(in.as<std::string>()));
+		r.from_stream(std::istringstream(in.template as<std::string>()));
 		v = r;
 	}
 
@@ -50,6 +56,6 @@ namespace augs {
 
 	template <class I>
 	void from_lua_value(I& in, std::wstring& r) {
-		r = to_wstring(in.as<std::string>());
+		r = to_wstring(in.template as<std::string>());
 	}
 }

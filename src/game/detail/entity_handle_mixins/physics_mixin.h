@@ -31,7 +31,8 @@ public:
 			const auto image_size = metas.at(sprite.tex).get_size();
 			vec2 scale = sprite.get_size() / image_size;
 
-			components::shape_polygon shape_polygon;
+			/* trick to make this type dependent */
+			std::decay_t<decltype(handle.get<components::shape_polygon>().get_raw_component())> shape_polygon;
 			shape_polygon.shape = metas.at(sprite.tex).shape;
 			shape_polygon.shape.scale(scale);
 			
@@ -48,7 +49,8 @@ public:
 				input.push_back(v.pos);
 			}
 
-			components::shape_polygon shape_polygon;
+			/* trick to make this type dependent */
+			std::decay_t<decltype(handle.get<components::shape_polygon>().get_raw_component())> shape_polygon;
 			shape_polygon.shape.add_concave_polygon(input);
 
 			callback_for_created_component(shape_polygon);
@@ -62,10 +64,12 @@ class physics_mixin;
 template <class entity_handle_type>
 class EMPTY_BASES physics_mixin<false, entity_handle_type> : public basic_physics_mixin<false, entity_handle_type> {
 public:
+	using base = basic_physics_mixin<false, entity_handle_type>;
+
 	void add_shape_component_from_renderable(
 		const const_logic_step step
 	) const {
-		create_shape_component_from_renderable(
+		base::create_shape_component_from_renderable(
 			step, 
 			[this](const auto& component){
 				const auto& handle = *static_cast<const entity_handle_type*>(this);

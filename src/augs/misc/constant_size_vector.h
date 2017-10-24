@@ -286,7 +286,8 @@ namespace augs  {
 		using string_type = std::basic_string<underlying_char_type>;
 
 	public:
-		using constant_size_vector_base::constant_size_vector_base;
+		using base = constant_size_vector_base<T, N>;
+		using base::constant_size_vector_base;
 
 		constant_size_vector() = default;
 
@@ -315,7 +316,8 @@ namespace augs  {
 	class constant_size_vector<T, N, std::enable_if_t<!std::is_trivially_copyable_v<T>>>
 		: public constant_size_vector_base<T, N> {
 	public:
-		using constant_size_vector_base::constant_size_vector_base;
+		using base = constant_size_vector_base<T, N>;
+		using base::constant_size_vector_base;
 		
 		constant_size_vector() = default;
 

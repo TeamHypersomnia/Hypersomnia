@@ -1,7 +1,3 @@
-#include <algorithm>
-#include <cstring>
-#include <vector>
-
 #include "augs/log.h"
 
 #include "augs/templates/string_templates.h"
@@ -77,7 +73,7 @@ namespace augs {
 				reserve(str.size());
 
 				for (const auto c : str) {
-					add_element(*this, s, c);
+					emplace_back(s, c);
 				}
 			}
 

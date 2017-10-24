@@ -17,7 +17,7 @@ namespace augs {
 			}
 			else {
 				const auto component_id = aggregate.template get_id<component>();
-				auto& component_pool = self.owner.get_component_pool<component>();
+				auto& component_pool = self.owner.template get_component_pool<component>();
 
 				if (component_id.is_set() && component_pool.alive(component_id)) {
 					return &component_pool.get(component_id);
@@ -71,7 +71,7 @@ namespace augs {
 
 			auto& self = *static_cast<const derived_entity_handle*>(this);
 			auto& aggregate = self.get();
-			const auto id_of_deleted = aggregate.get_id<component>();
+			const auto id_of_deleted = aggregate.template get_id<component>();
 
 			self.get_cosmos().template get_component_pool<component>().free(id_of_deleted);
 			aggregate.set_id(decltype(id_of_deleted)());

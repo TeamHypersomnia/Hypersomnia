@@ -11,8 +11,6 @@ namespace augs {
 	template <class derived, class T = double>
 	class measurements {
 	protected:
-		using base = measurements<derived, T>;
-
 		std::size_t measurement_index = 0;
 
 		T last_average = static_cast<T>(1);
@@ -89,10 +87,11 @@ namespace augs {
 
 	template <class T>
 	class amount_measurements : public measurements<amount_measurements<T>, T> {
+		using base = measurements<amount_measurements<T>, T>;
 		friend class base;
 
 		auto summary_impl() const {
-			return typesafe_sprintf(L"%x: %f2\n", title, get_average_units());
+			return typesafe_sprintf(L"%x: %f2\n", base::title, base::get_average_units());
 		}
 
 	public:
@@ -103,6 +102,7 @@ namespace augs {
 	class time_measurements : public measurements<time_measurements, double> {
 		timer tm;
 
+		using base = measurements<time_measurements, double>;
 		friend class base;
 
 		auto summary_impl() const {

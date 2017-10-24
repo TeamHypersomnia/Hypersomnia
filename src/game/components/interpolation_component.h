@@ -1,5 +1,5 @@
 #pragma once
-#include "game/transcendental/component_synchronizer.h"
+#include "game/components/transform_component.h"
 
 namespace components {
 	struct interpolation {

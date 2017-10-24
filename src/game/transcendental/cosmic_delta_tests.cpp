@@ -138,8 +138,8 @@ TEST_CASE("CosmicDelta2 PaddingTest") {
 
 			// test by delta
 			{
-				checked_type a(args...);
-				checked_type b(args...);
+				auto a = checked_type(args...);
+				auto b = checked_type(args...);
 
 				const auto dt = augs::object_delta<checked_type>(a, b);
 

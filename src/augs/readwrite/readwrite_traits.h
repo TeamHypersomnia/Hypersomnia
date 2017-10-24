@@ -19,9 +19,9 @@ namespace augs {
 			read_object(
 				std::declval<
 					/* If the queried archive is output_stream_reserver, map to stream */
-					std::conditional_t<std::is_same_v<Archive, output_stream_reserver>, stream, Archive>
+					std::conditional_t<std::is_same_v<Archive, output_stream_reserver>, stream&, Archive&>
 				>(),
-				std::declval<Serialized>()
+				std::declval<Serialized&>()
 			),
 			void()
 		)
@@ -40,9 +40,9 @@ namespace augs {
 			write_object(
 				std::declval<
 					/* If the queried archive is output_stream_reserver, map to stream */
-					std::conditional_t<std::is_same_v<Archive, output_stream_reserver>, stream, Archive>
+					std::conditional_t<std::is_same_v<Archive, output_stream_reserver>, stream&, Archive&>
 				>(),
-				std::declval<const Serialized>()
+				std::declval<const Serialized&>()
 			),
 			void()
 		)

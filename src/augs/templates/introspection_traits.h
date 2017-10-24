@@ -23,7 +23,7 @@ struct has_introspect<
 		augs::introspection_access::introspect_body(
 			static_cast<T*>(nullptr),
 			true_returner(),
-			std::declval<T>()
+			std::declval<T&>()
 		),
 		void()
 	)

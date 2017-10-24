@@ -1,4 +1,6 @@
 #pragma once
+#include "3rdparty/polypartition/src/polypartition.h"
+
 #include "augs/zeroed_pod.h"
 
 #include "augs/math/vec2.h"
@@ -242,7 +244,9 @@ namespace augs {
 		id_type texture_map_id = id_type::INVALID;
 		// END GEN INTROSPECTOR
 
-		using polygon<vertex_count, index_count>::draw;
+		using base = polygon<vertex_count, index_count>;
+		using base::draw;
+		using base::drawing_input;
 
 		template <class M>
 		void draw(

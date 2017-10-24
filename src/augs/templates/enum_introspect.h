@@ -25,7 +25,7 @@ namespace augs {
 	void for_each_enum(F callback) {
 		using Enum = argument_of_t<F, 0>;
 
-		augs::enum_to_args_impl(
+		enum_to_args_impl(
 			Enum(),
 			[callback](const auto... all_enums) {
 				for (const auto _enum : { all_enums... }) {
@@ -39,7 +39,7 @@ namespace augs {
 	void for_each_enum_except_bounds(F callback) {
 		using Enum = argument_of_t<F, 0>;
 
-		augs::enum_to_args_impl(
+		enum_to_args_impl(
 			Enum(),
 			[callback](const auto... all_enums) {
 				for (const auto _enum : { all_enums... }) {

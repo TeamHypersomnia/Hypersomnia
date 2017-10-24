@@ -1,17 +1,22 @@
+#include "generated/introspectors.h"
+#include "augs/filesystem/path.h"
+
+#include "augs/readwrite/custom_lua_representations.h"
+
+#include "augs/readwrite/streams.h"
+
 #include "game/transcendental/cosmos.h"
 #include "game/organization/all_component_includes.h"
 
 #include "augs/templates/predicate_templates.h"
 #include "augs/templates/get_index_type_for_size_of.h"
 
-#include "generated/introspectors.h"
 #include "game/assets/all_logical_assets.h"
 
 #include "augs/templates/container_traits.h"
 #include "game/components/pathfinding_component.h"
 
 #include "augs/pad_bytes.h"
-#include "augs/readwrite/custom_lua_representations.h"
 
 #include "augs/readwrite/lua_readwrite.h"
 #include "augs/readwrite/byte_readwrite.h"
@@ -28,6 +33,7 @@ namespace templates_detail {
 
 struct tests_of_traits {
 	static_assert(augs::has_readwrite_overloads_v<augs::stream, augs::path_type>);
+	static_assert(augs::has_readwrite_overloads_v<augs::stream, cosmos>);
 
 	static_assert(b2_maxPolygonVertices == CONVEX_POLY_VERTEX_COUNT);
 

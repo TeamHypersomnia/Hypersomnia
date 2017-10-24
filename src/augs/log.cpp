@@ -38,7 +38,6 @@ std::string program_log::get_complete() const {
 	return logs;
 }
 
-template<>
 void LOG(const std::string& f) {
 #if ENABLE_LOG 
 	std::unique_lock<std::mutex> lock(log_mutex);

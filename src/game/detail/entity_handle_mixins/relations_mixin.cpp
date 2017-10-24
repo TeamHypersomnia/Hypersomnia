@@ -1,3 +1,5 @@
+#include "generated/introspectors.h"
+
 #include "relations_mixin.h"
 #include "game/detail/inventory/inventory_slot_id.h"
 #include "game/detail/inventory/inventory_slot_handle.h"
@@ -10,8 +12,6 @@
 #include "game/components/crosshair_component.h"
 #include "augs/templates/container_templates.h"
 #include "augs/templates/type_matching_and_indexing.h"
-
-#include "generated/introspectors.h"
 
 template <class D>
 void relations_mixin<false, D>::make_as_child_of(const entity_id parent_id) const {

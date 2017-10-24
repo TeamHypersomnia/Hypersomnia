@@ -1,4 +1,5 @@
 #include "ingredients.h"
+#include "augs/drawing/polygon.h"
 #include "game/transcendental/cosmos.h"
 #include "game/stateless_systems/particles_existence_system.h"
 #include "game/stateless_systems/sound_existence_system.h"

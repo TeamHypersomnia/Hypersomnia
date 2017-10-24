@@ -18,7 +18,7 @@ introspector-body-format:
 		static void introspect_body(
 			%x,
 			F f,
-			Instances&&... _t_
+			Instances&... _t_
 		) {
 %x		}
 
@@ -88,7 +88,7 @@ struct ImVec4;
 		static void introspect_body(
 			const std::array<ElemType, count>* const,
 			F f,
-			Instances&&... t
+			Instances&... t
 		) {
 			for (size_t i = 0; i < count; ++i) {
 				f(std::to_string(i), t[i]...);
@@ -99,7 +99,7 @@ struct ImVec4;
 		static void introspect_body(
 			const std::pair<First, Second>* const,
 			F f,
-			Instances&&... _t_
+			Instances&... _t_
 		) {
 			FIELD(first);
 			FIELD(second);
@@ -109,14 +109,14 @@ struct ImVec4;
 		static void introspect_body(
 			const std::tuple<Types...>* const,
 			F f,
-			Instances&&... t
+			Instances&... t
 		) {
 			templates_detail::for_each_through_std_get(
-				[f](auto num, auto&&... args) {
-					f(std::to_string(num), std::forward<decltype(args)>(args)...);
+				[f](auto num, auto&... args) {
+					f(std::to_string(num), args...);
 				},
 				std::index_sequence_for<Types...>{},
-				std::forward<Instances>(t)...
+				t...
 			);
 		}
 
@@ -124,14 +124,14 @@ struct ImVec4;
 		static void introspect_body(
 			const augs::trivially_copyable_tuple<Types...>* const,
 			F f,
-			Instances&&... t
+			Instances&... t
 		) {
 			templates_detail::for_each_through_std_get(
-				[f](auto num, auto&&... args) {
-					f(std::to_string(num), std::forward<decltype(args)>(args)...);
+				[f](auto num, auto&... args) {
+					f(std::to_string(num), args...);
 				},
 				std::index_sequence_for<Types...>{},
-				std::forward<Instances>(t)...
+				t...
 			);
 		}
 
@@ -139,7 +139,7 @@ struct ImVec4;
 		static void introspect_body(
 			const ImVec2* const,
 			F f,
-			Instances&&... _t_
+			Instances&... _t_
 		) {
 			FIELD(x);
 			FIELD(y);
@@ -149,7 +149,7 @@ struct ImVec4;
 		static void introspect_body(
 			const ImVec4* const,
 			F f,
-			Instances&&... _t_
+			Instances&... _t_
 		) {
 			FIELD(x);
 			FIELD(y);
@@ -161,7 +161,7 @@ struct ImVec4;
 		static void introspect_body(
 			const ImGuiStyle* const,
 			F f,
-			Instances&&... _t_
+			Instances&... _t_
 		) {
 #define imcol(x) f(#x, _t_.Colors[x]...)
 			FIELD(Alpha);                      

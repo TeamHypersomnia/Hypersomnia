@@ -18,7 +18,6 @@ namespace augs {
 		public:
 			using tree_type = rect_tree<gui_element_variant_id>;
 			using rect_world_type = rect_world<gui_element_variant_id>;
-			using base = basic_context;
 
 			using rect_world_ref = maybe_const_ref_t<is_const, rect_world_type>;
 			using tree_ref = maybe_const_ref_t<is_const, tree_type>;
@@ -130,8 +129,6 @@ namespace augs {
 		template <class gui_element_variant_id, class derived>
 		class basic_viewing_context : public basic_context<gui_element_variant_id, true, derived> {
 		public:
-			using base = basic_context<gui_element_variant_id, true, derived>;
-
 			basic_viewing_context(
 				const base b,
 				const augs::drawer_with_default output
