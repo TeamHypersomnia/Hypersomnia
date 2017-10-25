@@ -983,6 +983,17 @@ int work(const int argc, const char* const * const argv) try {
 
 				const bool was_pressed = key_change && *key_change == intent_change::PRESSED;
 				const bool was_released = key_change && *key_change == intent_change::RELEASED;
+				
+				if (was_pressed || was_released) {
+					const auto key = e.key.key;
+
+					if (const auto it = mapped_or_nullptr(viewing_config.app_controls, key)) {
+						if (was_pressed) {
+							handle_app_intent(*it);
+							continue;
+						}
+					}
+				}
 
 				{
 					auto control_main_menu = [&]() {
@@ -1032,13 +1043,6 @@ int work(const int argc, const char* const * const argv) try {
 
 				if (was_pressed || was_released) {
 					const auto key = e.key.key;
-
-					if (const auto it = mapped_or_nullptr(viewing_config.app_controls, key)) {
-						if (was_pressed) {
-							handle_app_intent(*it);
-							continue;
-						}
-					}
 
 					if (direct_gameplay_or_game_gui || was_released) {
 						if (const auto it = mapped_or_nullptr(viewing_config.app_ingame_controls, key)) {
