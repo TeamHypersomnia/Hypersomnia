@@ -786,7 +786,9 @@ void b2DynamicTree::ShiftOrigin(const b2Vec2& newOrigin)
 }
 
 #if DEBUG_PHYSICS_SYSTEM_COPY
+#if PLATFORM_WINDOWS
 #include <malloc.h>
+#endif
 #endif
 
 b2DynamicTree& b2DynamicTree::operator=(const b2DynamicTree& b) 
@@ -795,7 +797,11 @@ b2DynamicTree& b2DynamicTree::operator=(const b2DynamicTree& b)
 
 	const auto bytes = b.m_nodeCapacity * sizeof(b2TreeNode);
 #if DEBUG_PHYSICS_SYSTEM_COPY
+#if PLATFORM_WINDOWS
 	ensure_eq(_msize(b.m_nodes), bytes);
+#else
+
+#endif
 #endif
 
 	m_nodes = (b2TreeNode*)b2Alloc(bytes);
