@@ -7,6 +7,11 @@
 template <class Enum>
 class menu_root : public menu_rect_node<Enum> {
 public:
+	using base = menu_rect_node<Enum>;
+	using base::set_flag;
+	using base::unset_flag;
+	using base::rc;
+
 	augs::enum_array<
 		option_button<Enum>,
 		Enum

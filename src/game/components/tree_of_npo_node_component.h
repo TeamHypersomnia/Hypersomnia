@@ -26,9 +26,11 @@ namespace components {
 
 template<bool is_const>
 class basic_tree_of_npo_node_synchronizer : public component_synchronizer_base<is_const, components::tree_of_npo_node> {
-protected:
+	using base = component_synchronizer_base<is_const, components::tree_of_npo_node>;
 public:
-	using component_synchronizer_base<is_const, components::tree_of_npo_node>::component_synchronizer_base;
+	using base::get_raw_component;
+	using base::handle;
+	using base::component_synchronizer_base;
 
 	bool is_activated() const;
 };

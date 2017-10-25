@@ -62,12 +62,12 @@ private:
 		const auto this_item_handle = *static_cast<const entity_handle_type*>(this);
 		auto& cosm = this_item_handle.get_cosmos();
 
-		if (this_item_handle.has<components::container>()) {
+		if (this_item_handle.template has<components::container>()) {
 			trav.current_address.directions.push_back(slot_function());
 			const auto this_item_attachment_offset = trav.attachment_offset;
 			const bool does_this_item_remain_physical = trav.item_remains_physical;
 
-			for (const auto& s : this_item_handle.get<components::container>().slots) {
+			for (const auto& s : this_item_handle.template get<components::container>().slots) {
 				const auto this_slot_id = inventory_slot_id(s.first, this_item_handle.get_id());
 				
 				const auto slot_callback_result = slot_callback(cosm[this_slot_id]);

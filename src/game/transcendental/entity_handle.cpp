@@ -61,7 +61,7 @@ basic_entity_handle<C> basic_entity_handle<C>::add_standard_components(const log
 		)
 	) {
 		add(components::interpolation());
-		get<components::interpolation>().place_of_birth = get_logic_transform();
+		get<components::interpolation>().place_of_birth = this->get_logic_transform();
 	}
 
 	if ((

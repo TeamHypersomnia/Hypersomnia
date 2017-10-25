@@ -17,7 +17,8 @@ namespace augs {
 
 	template <class I>
 	void from_lua_value(I& in, rgba& r) {
-		r.from_stream(std::istringstream(in.template as<std::string>()));
+		auto s = std::istringstream(in.template as<std::string>());
+		r.from_stream(s);
 	}
 
 	inline auto to_lua_value(const path_type r) {
@@ -46,7 +47,8 @@ namespace augs {
 	template <class I>
 	void from_lua_value(I& in, ImVec4& v) {
 		rgba r;
-		r.from_stream(std::istringstream(in.template as<std::string>()));
+		auto s = std::istringstream(in.template as<std::string>());
+		r.from_stream(s);
 		v = r;
 	}
 

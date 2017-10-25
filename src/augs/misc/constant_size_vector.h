@@ -288,6 +288,10 @@ namespace augs  {
 	public:
 		using base = constant_size_vector_base<T, N>;
 		using base::constant_size_vector_base;
+		using base::insert;
+		using base::assign;
+		using base::begin;
+		using base::end;
 
 		constant_size_vector() = default;
 
@@ -318,7 +322,11 @@ namespace augs  {
 	public:
 		using base = constant_size_vector_base<T, N>;
 		using base::constant_size_vector_base;
-		
+		using base::insert;
+		using base::clear;
+		using base::begin;
+		using base::end;
+
 		constant_size_vector() = default;
 
 		constant_size_vector(const constant_size_vector& b) {

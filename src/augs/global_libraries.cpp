@@ -8,6 +8,9 @@
 #include FT_FREETYPE_H
 #endif
 
+#undef min
+#undef max
+
 #include "augs/log.h"
 #include "augs/ensure.h"
 #include "augs/global_libraries.h"

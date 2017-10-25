@@ -29,7 +29,7 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 	) {
 		std::vector<b2Vec2> output;
 
-		auto& b = subject.get<components::rigid_body>();
+		const auto b = subject.get<components::rigid_body>();
 
 		const auto& verts = subject.get<components::shape_polygon>().get_raw_component().shape.convex_polys[fixture_num];
 
@@ -66,7 +66,7 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 		/* get necessary components */
 			auto& pathfinding = it.get<components::pathfinding>();
 			const auto& transform = it.get_logic_transform() + pathfinding.eye_offset;
-			auto& body = it.get<components::rigid_body>();
+			const auto body = it.get<components::rigid_body>();
 
 			if (!body.is_constructed()) {
 				return;
@@ -284,7 +284,7 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 				/* now for the actual pathfinding routine */
 
 				/* helpful lambda */
-				auto& is_point_visible = [&](vec2 from, vec2 point, b2Filter& filter){
+				auto is_point_visible = [&](vec2 from, vec2 point, b2Filter& filter){
 					bool visibility_condition_fulfilled = true;
 					
 					//if (pathfinding.target_visibility_condition)
@@ -480,7 +480,7 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 
 					bool rays_hit = false;
 					/* extract all transformed vertices of the subject's original model, false means we want pixels */
-					auto& subject_verts = get_world_vertices(it, false);
+					auto subject_verts = get_world_vertices(it, false);
 					subject_verts.clear();
 					subject_verts.push_back(transform.pos);
 

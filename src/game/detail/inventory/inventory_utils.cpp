@@ -573,7 +573,7 @@ void perform_transfer(
 
 		descendant.get<components::fixtures>() = def;
 		
-		auto& rigid_body = descendant.get<components::rigid_body>();
+		const auto rigid_body = descendant.get<components::rigid_body>();
 		rigid_body.set_activated(should_body_persist);
 
 		if (should_body_persist) {
@@ -637,7 +637,7 @@ void perform_transfer(
 	if (is_drop_request) {
 		ensure(previous_slot_container.alive());
 
-		auto& rigid_body = grabbed_item_part_handle.get<components::rigid_body>();
+		const auto rigid_body = grabbed_item_part_handle.get<components::rigid_body>();
 		
 		// LOG_NVPS(rigid_body.velocity());
 		// ensure(rigid_body.velocity().is_epsilon());

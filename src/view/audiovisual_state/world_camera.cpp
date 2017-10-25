@@ -95,7 +95,7 @@ void world_camera::tick(
 		vec2 target_value;
 
 		if (entity_to_chase.has<components::rigid_body>()) {
-			auto& rigid_body = entity_to_chase.get<components::rigid_body>();
+			const auto rigid_body = entity_to_chase.get<components::rigid_body>();
 
 			vec2 player_pos;
 

@@ -81,7 +81,7 @@ void exploding_ring_system::advance(
 
 							{
 								const auto spawner = [&](auto dummy) {
-									auto& new_p = particles.spawn_particle<decltype(dummy)>(
+									auto new_p = particles.spawn_particle<decltype(dummy)>(
 										rng,
 										0.f,
 										{ 200.f, 220.f },

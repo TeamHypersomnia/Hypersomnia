@@ -9,6 +9,8 @@ namespace augs {
 
 #if PLATFORM_WINDOWS
 #include <Windows.h>
+#undef min
+#undef max
 
 namespace augs {
 	void clip_system_cursor(const ltrbi lt) {

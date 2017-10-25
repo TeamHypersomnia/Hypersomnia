@@ -252,7 +252,7 @@ int work(const int argc, const char* const * const argv) try {
 			}
 
 			/* Check for unloaded and changed resources */
-			for (auto& old : currently_loaded_defs.game_image_loadables) {
+			for (const auto& old : currently_loaded_defs.game_image_loadables) {
 				if (const auto found = mapped_or_nullptr(new_defs.game_image_loadables, old.first)) {
 					if (const bool reload = !equal(*found, old.second)) {
 						/* Changed, reload */
@@ -266,7 +266,7 @@ int work(const int argc, const char* const * const argv) try {
 			}
 			
 			/* Check for new resources */
-			for (auto& fresh : new_defs.game_image_loadables) {
+			for (const auto& fresh : new_defs.game_image_loadables) {
 				if (nullptr == mapped_or_nullptr(currently_loaded_defs.game_image_loadables, fresh.first)) {
 					new_atlas_required = true;
 				}
@@ -298,7 +298,7 @@ int work(const int argc, const char* const * const argv) try {
 
 		{
 			/* Check for unloaded and changed resources */
-			for (auto& old : currently_loaded_defs.sounds) {
+			for (const auto& old : currently_loaded_defs.sounds) {
 				if (const auto found = mapped_or_nullptr(new_defs.sounds, old.first)) {
 					if (const bool reload = !equal(*found, old.second)) {
 						/* Changed, reload */
@@ -313,7 +313,7 @@ int work(const int argc, const char* const * const argv) try {
 			}
 
 			/* Check for new resources */
-			for (auto& fresh : new_defs.sounds) {
+			for (const auto& fresh : new_defs.sounds) {
 				if (nullptr == mapped_or_nullptr(currently_loaded_defs.sounds, fresh.first)) {
 					game_sounds.try_emplace(fresh.first, fresh.second);
 				}

@@ -226,7 +226,7 @@ namespace augs {
 
 		void clear() {
 			if constexpr(!is_trivially_copyable) {
-				for (auto& v : *this) {
+				for (auto&& v : *this) {
 					v.second.~mapped_type();
 				}
 			}
@@ -243,12 +243,25 @@ namespace augs {
 	class enum_associative_array<Enum, T, std::enable_if_t<std::is_trivially_copyable_v<T>>>
 		: public enum_associative_array_base<Enum, T> {
 	public:
+		using base = enum_associative_array_base<Enum, T>;
+		using base::key_type;
+		using base::mapped_type;
 	};
 
 	template <class Enum, class T>
 	class enum_associative_array<Enum, T, std::enable_if_t<!std::is_trivially_copyable_v<T>>>
 		: public enum_associative_array_base<Enum, T> {
 	public:
+		using base = enum_associative_array_base<Enum, T>;
+		using base::key_type;
+		using base::mapped_type;
+		using base::flagset_type;
+		using base::clear;
+		using base::emplace;
+		using base::is_value_set;
+		using base::begin;
+		using base::end;
+
 		enum_associative_array() = default;
 		
 		enum_associative_array(const enum_associative_array& b) {
@@ -260,7 +273,7 @@ namespace augs {
 		enum_associative_array& operator=(const enum_associative_array& b) {
 			clear();
 
-			for (auto& v : b) {
+			for (const auto& v : b) {
 				emplace(v.first, v.second);
 			}
 
@@ -268,7 +281,7 @@ namespace augs {
 		}
 
 		enum_associative_array(enum_associative_array&& b) {
-			for (auto& v : b) {
+			for (auto&& v : b) {
 				emplace(v.first, std::move(v.second));
 			}
 
@@ -278,7 +291,7 @@ namespace augs {
 		enum_associative_array& operator=(enum_associative_array&& b) {
 			clear();
 
-			for (auto& v : b) {
+			for (auto&& v : b) {
 				emplace(v.first, std::move(v.second));
 			}
 

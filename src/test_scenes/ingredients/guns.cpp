@@ -189,7 +189,7 @@ namespace prefabs {
 			auto& s = ingredients::add_sprite(metas, round_definition, assets::game_image_id::ROUND_TRACE, cyan, render_layer::FLYING_BULLETS);
 			ingredients::add_bullet_round_physics(step, round_definition, pos);
 
-			auto& body = round_definition.get<components::rigid_body>();
+			const auto body = round_definition.get<components::rigid_body>();
 			body.set_linear_damping(3.8f);
 
 			auto& sender = round_definition += components::sender();

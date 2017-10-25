@@ -101,7 +101,7 @@ void spatial_properties_mixin<false, D>::set_logic_transform(
 	const logic_step step,
 	const components::transform t
 ) const {
-	if (get_logic_transform() == t) {
+	if (this->get_logic_transform() == t) {
 		return;
 	}
 	

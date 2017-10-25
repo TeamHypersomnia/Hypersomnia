@@ -81,7 +81,7 @@ private:
 	entity_id raw_id;
 	entity_ptr ptr;
 
-	typedef augs::component_allocators_mixin<is_const, basic_entity_handle<is_const>> allocator;
+	using allocator = augs::component_allocators_mixin<is_const, basic_entity_handle<is_const>>;
 
 	friend class augs::component_allocators_mixin<is_const, basic_entity_handle<is_const>>;
 	friend class cosmic_delta;

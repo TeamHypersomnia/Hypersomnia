@@ -204,8 +204,8 @@ namespace augs {
 
 			if constexpr(is_associative_v<Container>) {
 				while (s--) {
-					typename Container::key_type key;
-					typename Container::mapped_type mapped;
+					typename Container::key_type key{};
+					typename Container::mapped_type mapped{};
 
 					read(ar, key);
 					read(ar, mapped);

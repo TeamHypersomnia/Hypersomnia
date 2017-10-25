@@ -55,7 +55,7 @@ void destruction_system::apply_damages_and_split_fixtures(const logic_step step)
 		auto shape_polygon = subject.find<components::shape_polygon>();
 
 		if (fixtures != nullptr && shape_polygon != nullptr) {
-			auto& fixtures = subject.get<components::fixtures>();
+			const auto fixtures = subject.get<components::fixtures>();
 			
 			const auto& data_indices = d.subject_b2Fixture_index;
 

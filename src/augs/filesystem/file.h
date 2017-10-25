@@ -178,8 +178,8 @@ namespace augs {
 		source.open(path, std::ios::binary | std::ios::in);
 
 		while (source.peek() != EOF) {
-			typename ContainerType::key_type key;
-			typename ContainerType::mapped_type value;
+			typename ContainerType::key_type key{};
+			typename ContainerType::mapped_type value{};
 
 			augs::read(source, key);
 			augs::read(source, value);

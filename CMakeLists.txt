@@ -554,7 +554,7 @@ endif()
 
 if(MSVC)
 	# Latest features of C++17 will be enabled.
-	set(HYPERSOMNIA_CXX_FLAGS "/std:c++latest /MP /Gm- /fp:strict /bigobj")
+	set(HYPERSOMNIA_CXX_FLAGS "/std:c++latest /MP /Gm- /fp:strict /bigobj /permissive-")
 	set(HYPERSOMNIA_CXX_DEBUG_FLAGS " ")
 	set(HYPERSOMNIA_CXX_RELEASE_FLAGS "/Ob2 /GL /Oi")
 	set(HYPERSOMNIA_CXX_RELWITHDEBINFO_FLAGS "/Ob2 /GL /Oi")

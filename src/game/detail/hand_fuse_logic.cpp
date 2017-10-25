@@ -70,7 +70,7 @@ void release_or_throw_fused_object(
 				explosive.released_image_id, metas
 			);
 
-			auto& rigid_body = fused_entity.get<components::rigid_body>();
+			const auto rigid_body = fused_entity.get<components::rigid_body>();
 			
 			//ensure(rigid_body.velocity().is_epsilon());
 
@@ -81,7 +81,7 @@ void release_or_throw_fused_object(
 			rigid_body.set_bullet_body(true);
 			rigid_body.set_linear_damping(3.0f);
 
-			auto& fixtures = fused_entity.get<components::fixtures>();
+			const auto fixtures = fused_entity.get<components::fixtures>();
 			
 			auto new_def = fixtures.get_raw_component();
 			new_def.restitution = 0.6f;

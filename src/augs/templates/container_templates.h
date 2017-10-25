@@ -31,12 +31,6 @@ void erase_element(Container& v, const T& l) {
 	}
 }
 
-template <class T, class = void>
-struct asdasd : std::false_type {};
-
-template <class T>
-struct asdasd<T, decltype(std::declval<T>().emplace_back(), void())> : std::true_type {};
-
 template<class Container, class T>
 auto& sort_container(Container& v, const T l) {
 	std::sort(v.begin(), v.end(), l);
@@ -102,19 +96,21 @@ auto find_if_in(Container& v, F&& f) {
 	return std::find_if(v.begin(), v.end(), std::forward<F>(f));
 }
 
-template<class Container, class T>
-auto find_in(Container& v, const T& key) {
-	if constexpr(can_access_data_v<Container>) {
-		return std::find(v.begin(), v.end(), key);
-	}
-	else {
-		return v.find(key);
-	}
+template<class Container, class K>
+auto find_in(Container& v, const K& key) {
+	static_assert(!has_member_find_v<Container, K>, "Use mapped_or_nullptr instead of find_in.");
+	
+	return std::find(v.begin(), v.end(), key);
 }
 
-template<class Container, class T>
-bool found_in(Container& v, const T& l) {
-	return find_in(v, l) != v.end();
+template<class Container, class K>
+bool found_in(Container& v, const K& l) {
+	if constexpr(has_member_find_v<Container, K>) {
+		return v.find(l) != v.end();
+	}
+	else {
+		return find_in(v, l) != v.end();
+	}
 }
 
 template <class T, class... Args>

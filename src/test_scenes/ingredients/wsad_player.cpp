@@ -91,7 +91,7 @@ namespace ingredients {
 		e += components::position_copying(); // used when it is an astral body
 		
 		auto& attitude = e += components::attitude();
-		auto& processing = e += components::processing();
+		const auto processing = e += components::processing();
 		e.set_flag(entity_flag::IS_PAST_CONTAGIOUS);
 
 		attitude.parties = party_category::METROPOLIS_CITIZEN;
@@ -199,7 +199,7 @@ namespace prefabs {
 			auto& render = root += components::render();
 			auto& transform = root += components::transform();
 			auto& crosshair = root += components::crosshair();
-			auto& processing = root += components::processing();
+			const auto processing = root += components::processing();
 			
 			sprite.set(assets::game_image_id::TEST_CROSSHAIR, metas, rgba(255, 255, 255, 255));
 

@@ -3,6 +3,8 @@
 
 #if PLATFORM_WINDOWS
 #include <Windows.h>
+#undef min
+#undef max
 
 namespace augs {
 	void shell(const std::string& s) {

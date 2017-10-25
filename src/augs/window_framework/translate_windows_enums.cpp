@@ -1,5 +1,7 @@
 #if PLATFORM_WINDOWS
 #include <Windows.h>
+#undef min
+#undef max
 #include "translate_windows_enums.h"
 
 using namespace augs::event;

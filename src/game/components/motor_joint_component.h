@@ -41,8 +41,11 @@ class basic_motor_joint_synchronizer : public component_synchronizer_base<is_con
 protected:
 	friend class ::physics_system;
 
+	using base = component_synchronizer_base<is_const, components::motor_joint>;
+	using base::handle;
 public:
-	using component_synchronizer_base<is_const, components::motor_joint>::component_synchronizer_base;
+	using base::get_raw_component;
+	using base::component_synchronizer_base;
 
 	bool is_activated() const;
 	decltype(components::motor_joint::target_bodies) get_target_bodies() const;

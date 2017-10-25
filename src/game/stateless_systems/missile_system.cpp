@@ -72,7 +72,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 			;
 
 			if (should_send_damage) {
-				auto& subject_of_impact = subject_handle.get_owner_body().get<components::rigid_body>();
+				const auto subject_of_impact = subject_handle.get_owner_body().get<components::rigid_body>();
 
 				vec2 impact_velocity = missile.custom_impact_velocity;
 

@@ -14,7 +14,7 @@ void resolve_dampings_of_body(
 	const bool is_sprint_effective
 ) {
 	auto& cosmos = it.get_cosmos();
-	auto& rigid_body = it.get<components::rigid_body>();
+	const auto rigid_body = it.get<components::rigid_body>();
 
 	auto considered_damping = 0.f;
 
@@ -79,7 +79,7 @@ void resolve_density_of_associated_fixtures(const entity_handle id) {
 		}
 	}
 
-	auto& fixtures = id.get<components::fixtures>();
+	const auto fixtures = id.get<components::fixtures>();
 
 	float density_multiplier = 1.f;
 

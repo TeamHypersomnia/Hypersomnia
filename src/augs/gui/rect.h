@@ -48,7 +48,7 @@ namespace augs {
 				/* if we have parent */
 				if (context.alive(parent_id)) {
 					context(parent_id, [&](const auto& parent_rect) {
-						auto& p = context.get_tree_entry(parent_id);
+						auto p = context.get_tree_entry(parent_id);
 						const auto scroll = parent_rect->get_scroll();
 
 						/* we have to save our global coordinates in absolute_xy */

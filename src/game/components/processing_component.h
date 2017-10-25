@@ -25,8 +25,12 @@ namespace components {
 
 template<bool is_const>
 class basic_processing_synchronizer : public component_synchronizer_base<is_const, components::processing> {
+protected:
+	using base = component_synchronizer_base<is_const, components::processing>;
+	using base::handle;
 public:
-	using component_synchronizer_base<is_const, components::processing>::component_synchronizer_base;
+	using base::component_synchronizer_base;
+	using base::get_raw_component;
 
 	bool is_activated() const;
 	bool is_in(const processing_subjects) const;

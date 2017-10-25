@@ -784,7 +784,7 @@ void visibility_system::respond_to_visibility_information_requests(
 			const int edges_num = response.edges.size();
 
 			/* prepare helpful lambda */
-			auto& wrap = [edges_num](int ix) {
+			auto wrap = [edges_num](const int ix) {
 				if (ix < 0) return edges_num + ix;
 				return ix % edges_num;
 			};

@@ -17,7 +17,10 @@ namespace components {
 template<bool is_const>
 class basic_all_inferred_state_synchronizer : public component_synchronizer_base<is_const, components::all_inferred_state> {
 public:
-	using component_synchronizer_base<is_const, components::all_inferred_state>::component_synchronizer_base;
+	using base = component_synchronizer_base<is_const, components::all_inferred_state>;
+	using base::component_synchronizer_base;
+	using base::get_raw_component;
+	using base::handle;
 
 	bool is_activated() const;
 };

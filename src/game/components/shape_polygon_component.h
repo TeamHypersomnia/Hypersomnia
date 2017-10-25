@@ -40,8 +40,12 @@ namespace components {
 
 template<bool is_const>
 class basic_shape_polygon_synchronizer : public component_synchronizer_base<is_const, components::shape_polygon> {
+protected:
+	using base = component_synchronizer_base<is_const, components::shape_polygon>;
+	using base::handle;
 public:
-	using component_synchronizer_base<is_const, components::shape_polygon>::component_synchronizer_base;
+	using base::component_synchronizer_base;
+	using base::get_raw_component;
 
 	bool is_activated() const;
 };

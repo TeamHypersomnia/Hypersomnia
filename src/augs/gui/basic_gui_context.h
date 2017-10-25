@@ -91,7 +91,7 @@ namespace augs {
 
 			template <class L>
 			decltype(auto) operator()(const gui_element_variant_id& id, L generic_call) const {
-				return std::visit([&](const auto specific_loc) {
+				return std::visit([&](const auto specific_loc) -> decltype(auto) {
 					return generic_call(dereference_location(specific_loc));
 				}, id);
 			}
@@ -116,7 +116,7 @@ namespace augs {
 
 			template <class T = float>
 			auto get_drawing_rects(const gui_element_variant_id& id) const {
-				auto& entry = get_tree_entry(id);
+				const auto entry = get_tree_entry(id);
 
 				return drawing_rects<T>{
 					entry.get_absolute_rect(),

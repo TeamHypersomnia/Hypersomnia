@@ -61,7 +61,7 @@ void car_system::apply_movement_forces(const logic_step step) {
 		processing_subjects::WITH_CAR, 
 		[&](const auto& it) {
 			auto& car = it.get<components::car>();
-			auto& rigid_body = it.get<components::rigid_body>();
+			const auto rigid_body = it.get<components::rigid_body>();
 
 			const auto body_angle = rigid_body.get_angle();
 			const vec2 forward_dir = vec2().set_from_degrees(body_angle);

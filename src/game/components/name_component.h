@@ -28,8 +28,12 @@ namespace components {
 template <bool is_const>
 class basic_name_synchronizer : public component_synchronizer_base<is_const, components::name> {
 	friend class name_system;
+protected:
+	using base = component_synchronizer_base<is_const, components::name>;
+	using base::handle;
 public:
-	using component_synchronizer_base<is_const, components::name>::component_synchronizer_base;
+	using base::get_raw_component;
+	using base::component_synchronizer_base;
 	
 	maybe_const_ref_t<is_const, entity_name_meta> get_meta() const;
 

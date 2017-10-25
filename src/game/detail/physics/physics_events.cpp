@@ -61,8 +61,8 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 		msg.subject = subject;
 		msg.collider = collider;
 
-		auto& subject_fixtures = subject.get<components::fixtures>();
-		auto& collider_fixtures = collider.get<components::fixtures>();
+		const auto subject_fixtures = subject.get<components::fixtures>();
+		const auto collider_fixtures = collider.get<components::fixtures>();
 
 		if (subject_fixtures.is_friction_ground()) {
 #if FRICTION_FIELDS_COLLIDE
@@ -190,8 +190,8 @@ void physics_system::contact_listener::EndContact(b2Contact* contact) {
 		msg.subject = subject;
 		msg.collider = collider;
 
-		auto& subject_fixtures = subject.get<components::fixtures>();
-		auto& collider_fixtures = collider.get<components::fixtures>();
+		const auto subject_fixtures = subject.get<components::fixtures>();
+		const auto collider_fixtures = collider.get<components::fixtures>();
 
 		auto& collider_physics = collider.get_owner_body().get<components::special_physics>();
 
@@ -264,8 +264,8 @@ void physics_system::contact_listener::PreSolve(b2Contact* contact, const b2Mani
 		msg.subject = subject;
 		msg.collider = collider;
 
-		auto& subject_fixtures = subject.get<components::fixtures>();
-		auto& collider_fixtures = subject.get<components::fixtures>();
+		const auto subject_fixtures = subject.get<components::fixtures>();
+		const auto collider_fixtures = subject.get<components::fixtures>();
 
 		const const_entity_handle subject_owner_body = subject.get_owner_body();
 		const const_entity_handle subject_capability = subject.get_owning_transfer_capability();

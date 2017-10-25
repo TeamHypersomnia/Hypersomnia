@@ -73,8 +73,11 @@ protected:
 		return handle.get_cosmos().get_si().get_meters(pixels);
 	}
 
+	using base = component_synchronizer_base<is_const, components::rigid_body>;
+	using base::handle;
 public:
-	using component_synchronizer_base<is_const, components::rigid_body>::component_synchronizer_base;
+	using base::component_synchronizer_base;
+	using base::get_raw_component;
 
 	bool is_activated() const;
 	bool is_constructed() const;

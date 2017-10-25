@@ -236,7 +236,7 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 		const auto punched = subject;
 
 		if (const auto owning_crosshair_recoil = punched[child_entity_name::CHARACTER_CROSSHAIR][child_entity_name::CROSSHAIR_RECOIL_BODY]) {
-			auto& recoil_physics = owning_crosshair_recoil.get<components::rigid_body>();
+			const auto recoil_physics = owning_crosshair_recoil.get<components::rigid_body>();
 
 			recoil_physics.apply_angular_impulse((h.point_of_impact - punched.get_logic_transform().pos).cross(h.impact_velocity) / 10000000.f * 3.f / 25.f);
 		}

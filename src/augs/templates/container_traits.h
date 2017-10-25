@@ -8,6 +8,13 @@ template <class T>
 struct is_associative<T, decltype(typename T::key_type(), typename T::mapped_type(), void())> : std::true_type {};
 
 
+template <class T, class K, class = void>
+struct has_member_find : std::false_type {};
+
+template <class T, class K>
+struct has_member_find<T, K, decltype(std::declval<T&>().find(std::declval<const K&>()), void())> : std::true_type {};
+
+
 template <class T, class = void>
 struct can_access_data : std::false_type {};
 
@@ -72,6 +79,9 @@ constexpr bool is_std_array_v = is_std_array<T>::value;
 
 template <class T>
 constexpr bool can_access_data_v = can_access_data<T>::value;
+
+template <class T, class K>
+constexpr bool has_member_find_v = has_member_find<T, K>::value;
 
 template <class T>
 constexpr bool can_reserve_v = can_reserve<T>::value;

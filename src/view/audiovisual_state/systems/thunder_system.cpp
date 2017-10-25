@@ -132,7 +132,7 @@ void thunder_system::advance(
 
 						{
 							const auto spawner = [&](auto dummy) {
-								auto& new_p = particles_output_for_effects.spawn_particle<decltype(dummy)>(
+								auto new_p = particles_output_for_effects.spawn_particle<decltype(dummy)>(
 									rng,
 									0.f,
 									{ 20.f, 100.f },

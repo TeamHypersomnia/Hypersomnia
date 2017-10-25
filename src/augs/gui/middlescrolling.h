@@ -16,7 +16,7 @@ namespace augs {
 			template<class C>
 			void advance_elements(const C context, const delta& dt) {
 				if (context.alive(subject)) {
-					context(subject, [&](auto& r) {
+					context(subject, [&](const auto& r) {
 						r->set_scroll(r->get_scroll() + static_cast<vec2>(context.get_input_state().mouse.pos - middlescroll_icon_position) * float(speed_mult*dt.in_milliseconds()));
 					});
 				}

@@ -4,6 +4,8 @@
 
 #include <winsock2.h>
 #include <windows.h>
+#undef min
+#undef max
 using namespace std;
 
 void mParseUrl(string url, string &serverName, string &filepath, string &filename)

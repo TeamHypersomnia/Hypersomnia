@@ -19,8 +19,12 @@ namespace components {
 
 template<bool is_const>
 class basic_shape_circle_synchronizer : public component_synchronizer_base<is_const, components::shape_circle> {
+protected:
+	using base = component_synchronizer_base<is_const, components::shape_circle>;
+	using base::handle;
 public:
-	using component_synchronizer_base<is_const, components::shape_circle>::component_synchronizer_base;
+	using base::component_synchronizer_base;
+	using base::get_raw_component;
 
 	real32 get_radius() const;
 	bool is_activated() const;

@@ -39,9 +39,9 @@ void physics_system::rechoose_owner_friction_body(const entity_handle entity) {
 
 		// make the new owner first in order in case it is later compared to the same ancestor-level parents
 
-		for (auto& it = special_physics.owner_friction_grounds.begin(); it != special_physics.owner_friction_grounds.end(); ++it) {
-			if (*it == special_physics.owner_friction_ground) {
-				std::swap(special_physics.owner_friction_grounds[0], *it);
+		for (auto& it : special_physics.owner_friction_grounds) {
+			if (it == special_physics.owner_friction_ground) {
+				std::swap(special_physics.owner_friction_grounds[0], it);
 			}
 		}
 

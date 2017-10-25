@@ -38,7 +38,7 @@ void transform_component_ids_to_guids_in_place(
 		}
 		else {
 			if constexpr(is_variable_size_container_v<T>) {
-				for (auto& e : id) {
+				for (auto&& e : id) {
 					augs::introspect_if_not_leaf(augs::recursive(self), e);
 				}
 			}
@@ -68,7 +68,7 @@ void transform_component_guids_to_ids_in_place(
 		}
 		else {
 			if constexpr(is_variable_size_container_v<T>) {
-				for (auto& e : id) {
+				for (auto&& e : id) {
 					augs::introspect_if_not_leaf(augs::recursive(self), e);
 				}
 			}

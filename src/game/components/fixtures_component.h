@@ -60,10 +60,13 @@ template <bool is_const>
 class basic_fixtures_synchronizer : public component_synchronizer_base<is_const, components::fixtures> {
 protected:
 	friend class ::physics_system;
+	using base = component_synchronizer_base<is_const, components::fixtures>;
+	using base::handle;
 
 	maybe_const_ref_t<is_const, colliders_cache>& get_cache() const;
 public:
-	using component_synchronizer_base<is_const, components::fixtures>::component_synchronizer_base;
+	using base::get_raw_component;
+	using base::component_synchronizer_base;
 
 	components::transform get_offset(const colliders_offset_type) const;
 	components::transform get_total_offset() const;
