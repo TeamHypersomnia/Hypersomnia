@@ -357,7 +357,7 @@ struct basic_xywh {
 		this->h = bottom - y;
 	}
 
-	basic_xywh& expand_from_center(const vec2 amount) {
+	basic_xywh& expand_from_center(const basic_vec2<T> amount) {
 		x -= amount.x;
 		y -= amount.y;
 		w += amount.x;
