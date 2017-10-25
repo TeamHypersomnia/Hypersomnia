@@ -78,22 +78,22 @@ void aabb_highlighter::draw(const aabb_highlighter_drawing_input in) const {
 	
 	aabb.expand_from_center(gap);
 
-	const vec2i as = aabb.get_size();
-	const vec2i ap = in.camera[aabb.get_position()];
+	const auto as = vec2i(aabb.get_size());
+	const auto ap = vec2(in.camera[aabb.get_position()]);
 
 	if (aabb.good()) {
 		in.output
-			.aabb(ltrb(ap, vec2i { current_length, 1 }), cyan)
-			.aabb(ltrb(ap, vec2i { 1, current_length }), cyan)
+			.aabb(ltrb(ap, vec2(vec2i { current_length, 1 })), cyan)
+			.aabb(ltrb(ap, vec2(vec2i { 1, current_length })), cyan)
 
-			.aabb(ltrb(ap + vec2i(as.x - current_length, 0), vec2i { current_length, 1 }), cyan)
-			.aabb(ltrb(ap + vec2i(as.x - 1, 0), vec2i { 1, current_length }), cyan)
+			.aabb(ltrb(ap + vec2(vec2i(as.x - current_length, 0)), vec2(vec2i { current_length, 1 })), cyan)
+			.aabb(ltrb(ap + vec2(vec2i(as.x - 1, 0)), vec2(vec2i { 1, current_length })), cyan)
 
-			.aabb(ltrb(ap + vec2i(0, as.y - current_length), vec2i { 1, current_length }), cyan)
-			.aabb(ltrb(ap + vec2i(0, as.y - 1), vec2i { current_length, 1 }), cyan)
+			.aabb(ltrb(ap + vec2(vec2i(0, as.y - current_length)), vec2(vec2i { 1, current_length })), cyan)
+			.aabb(ltrb(ap + vec2(vec2i(0, as.y - 1)), vec2(vec2i { current_length, 1 })), cyan)
 
-			.aabb(ltrb(ap + vec2i(as.x - current_length, as.y - 1), vec2i { current_length, 1 }), cyan)
-			.aabb(ltrb(ap + vec2i(as.x - 1, as.y - current_length), vec2i { 1, current_length }), cyan)
+			.aabb(ltrb(ap + vec2(vec2i(as.x - current_length, as.y - 1)), vec2(vec2i { current_length, 1 })), cyan)
+			.aabb(ltrb(ap + vec2(vec2i(as.x - 1, as.y - current_length)), vec2(vec2i { 1, current_length })), cyan)
 		;
 	}
 }

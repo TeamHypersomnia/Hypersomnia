@@ -111,7 +111,7 @@ struct basic_ltrb {
 		return true;
 	}
 
-	basic_ltrb& expand_from_center(const vec2 amount) {
+	basic_ltrb& expand_from_center(const basic_vec2<T> amount) {
 		l -= amount.x;
 		t -= amount.y;
 		r += amount.x;

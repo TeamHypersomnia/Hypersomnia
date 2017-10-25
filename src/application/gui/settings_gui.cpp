@@ -1,5 +1,6 @@
 #include "augs/templates/introspect.h"
 #include "augs/templates/enum_introspect.h"
+#include "augs/templates/format_enum.h"
 
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/misc/imgui/imgui_utils.h"
@@ -12,8 +13,6 @@
 
 #include "application/config_lua_table.h"
 #include "application/gui/settings_gui.h"
-
-
 
 static void ShowHelpMarker(const char* const desc) {
 	ImGui::TextDisabled("(?)");
@@ -63,8 +62,8 @@ void settings_gui_state::perform(
 		const auto screen_size = vec2(config.window.get_screen_size());
 		const auto initial_settings_size = screen_size / 1.5;
 
-		ImGui::SetNextWindowPos(screen_size / 2 - initial_settings_size / 2, ImGuiSetCond_FirstUseEver);
-		ImGui::SetNextWindowSize(initial_settings_size, ImGuiSetCond_FirstUseEver);
+		ImGui::SetNextWindowPos(ImVec2(screen_size / 2 - initial_settings_size / 2), ImGuiSetCond_FirstUseEver);
+		ImGui::SetNextWindowSize(ImVec2(initial_settings_size), ImGuiSetCond_FirstUseEver);
 	}
 
 	auto settings = scoped_window("Settings", &show);

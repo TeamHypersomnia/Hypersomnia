@@ -52,10 +52,10 @@ void component_synchronizer<false, D>::update_proxy(const logic_step step) const
 	
 	if (cache.is_constructed()) {
 		b2AABB aabb;
-		aabb.lowerBound = data.aabb.left_top();
-		aabb.upperBound = data.aabb.right_bottom();
+		aabb.lowerBound = b2Vec2(data.aabb.left_top());
+		aabb.upperBound = b2Vec2(data.aabb.right_bottom());
 
-		sys.get_tree(cache).nodes.MoveProxy(cache.tree_proxy_id, aabb, displacement);
+		sys.get_tree(cache).nodes.MoveProxy(cache.tree_proxy_id, aabb, b2Vec2(displacement));
 	}
 }
 

@@ -78,7 +78,7 @@ struct basic_transform {
 		b2Transform& m_xf,
 		b2Sweep& m_sweep
 	) const {
-		m_xf.p = pos;
+		m_xf.p = b2Vec2(pos);
 		m_xf.q.Set(rotation);
 
 		m_sweep.localCenter.SetZero();

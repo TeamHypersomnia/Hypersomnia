@@ -46,7 +46,7 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 				out_vert = si.get_meters(out_vert);
 			}
 
-			output.push_back(out_vert);
+			output.push_back(b2Vec2(out_vert));
 		}
 
 		return output;
@@ -265,7 +265,7 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 					if (pathfinding.mark_touched_as_discovered) {
 						/* prepare edge shape for sensor to test for overlaps */
 						b2EdgeShape sensor_edge;
-						sensor_edge.Set(si.get_meters(nav.location), si.get_meters(nav.sensor));
+						sensor_edge.Set(si.get_meters(b2Vec2(nav.location)), si.get_meters(b2Vec2(nav.sensor)));
 
 						/* prepare null transform, both bodies are already in the same frame of reference */
 						b2Transform null_transform(b2Vec2(0.f, 0.f), b2Rot(0.f));
@@ -482,7 +482,7 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 					/* extract all transformed vertices of the subject's original model, false means we want pixels */
 					auto subject_verts = get_world_vertices(it, false);
 					subject_verts.clear();
-					subject_verts.push_back(transform.pos);
+					subject_verts.push_back(b2Vec2(transform.pos));
 
 					for (auto& subject_vert : subject_verts) {
 						if (
@@ -503,10 +503,10 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 							for (auto& marked : vision.marked_holes) {
 								/* prepare raycast subject */
 								b2EdgeShape marked_hole;
-								marked_hole.Set(marked.first, marked.second);
+								marked_hole.Set(b2Vec2(marked.first), b2Vec2(marked.second));
 
 								input.p1 = subject_vert;
-								input.p2 = current_target.location;
+								input.p2 = b2Vec2(current_target.location);
 
 								/* we don't need to transform edge or ray since they are in the same space
 								but we have to prepare dummy b2Transform as argument for b2EdgeShape::RayCast
@@ -518,7 +518,7 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 									break;
 								}
 
-								input.p2 = current_target.sensor;
+								input.p2 = b2Vec2(current_target.sensor);
 
 								if (marked_hole.RayCast(&output, input, null_transform, 0)) {
 									rays_hit = false;

@@ -56,7 +56,7 @@ namespace augs {
 
 			for (const auto& in : window_inputs) {
 				if (in.msg == message::mousemotion) {
-					io.MousePos = vec2(in.mouse.pos);
+					io.MousePos = ImVec2(in.mouse.pos);
 				}
 				else if (
 					in.msg == message::ldown 
@@ -96,7 +96,7 @@ namespace augs {
 			}
 
 			io.DeltaTime = delta_seconds;
-			io.DisplaySize = vec2(screen_size);
+			io.DisplaySize = ImVec2(screen_size);
 		}
 
 #if 0

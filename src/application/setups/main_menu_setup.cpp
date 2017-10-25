@@ -193,7 +193,7 @@ void main_menu_setup::draw_overlays(
 	if (is_ready(latest_news)) {
 		print_stroked(
 			output,
-			latest_news_pos,
+			vec2i(latest_news_pos),
 			from_bbcode ( latest_news.get(), { gui_font, cyan } )
 		);
 	};

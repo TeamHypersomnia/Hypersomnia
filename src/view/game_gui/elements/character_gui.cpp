@@ -559,9 +559,9 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 	}
 
 	if (tooltip_text.size() > 0) {
-		const auto tooltip_rect = ltrbi(
+		const auto tooltip_rect = ltrb(
 			tooltip_pos, 
-			get_text_bbox(tooltip_text) + vec2i(10, 8)).snap_to_bounds(ltrb(vec2(0, 0), screen_size - vec2i(1, 1))
+			get_text_bbox(tooltip_text) + vec2(10.f, 8.f)).snap_to_bounds(ltrb(vec2(0, 0), screen_size - vec2(1, 1))
 		);
 
 		output.aabb_with_border(

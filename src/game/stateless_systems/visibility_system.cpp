@@ -303,8 +303,8 @@ void visibility_system::respond_to_visibility_information_requests(
 
 		/* prepare maximum visibility square */
 		b2AABB aabb;
-		aabb.lowerBound = position_meters - vision_side_meters / 2;
-		aabb.upperBound = position_meters + vision_side_meters / 2;
+		aabb.lowerBound = b2Vec2(position_meters - vision_side_meters / 2);
+		aabb.upperBound = b2Vec2(position_meters + vision_side_meters / 2);
 
 		ltrb ltrb(aabb.lowerBound.x, aabb.lowerBound.y, aabb.upperBound.x, aabb.upperBound.y);
 
@@ -366,9 +366,9 @@ void visibility_system::respond_to_visibility_information_requests(
 		/* extract the actual vertices from visibility AABB to cast rays to */
 		const b2Vec2 whole_vision[] = {
 			aabb.lowerBound,
-			aabb.lowerBound + vec2(vision_side_meters, 0),
+			aabb.lowerBound + b2Vec2(vision_side_meters, 0),
 			aabb.upperBound,
-			aabb.upperBound - vec2(vision_side_meters, 0)
+			aabb.upperBound - b2Vec2(vision_side_meters, 0)
 		};
 
 		/* prepare edge shapes given above vertices to cast rays against when no obstacle was hit
@@ -376,10 +376,10 @@ void visibility_system::respond_to_visibility_information_requests(
 		*/
 		b2EdgeShape bounds[4];
 		const auto moving_epsilon = si.get_meters(1.f);
-		bounds[0].Set(vec2(whole_vision[0]) + vec2(-moving_epsilon, 0.f), vec2(whole_vision[1]) + vec2(moving_epsilon, 0.f));
-		bounds[1].Set(vec2(whole_vision[1]) + vec2(0.f, -moving_epsilon), vec2(whole_vision[2]) + vec2(0.f, moving_epsilon));
-		bounds[2].Set(vec2(whole_vision[2]) + vec2(moving_epsilon, 0.f), vec2(whole_vision[3]) + vec2(-moving_epsilon, 0.f));
-		bounds[3].Set(vec2(whole_vision[3]) + vec2(0.f, moving_epsilon), vec2(whole_vision[0]) + vec2(0.f, -moving_epsilon));
+		bounds[0].Set(b2Vec2(whole_vision[0]) + b2Vec2(-moving_epsilon, 0.f), b2Vec2(whole_vision[1]) + b2Vec2(moving_epsilon, 0.f));
+		bounds[1].Set(b2Vec2(whole_vision[1]) + b2Vec2(0.f, -moving_epsilon), b2Vec2(whole_vision[2]) + b2Vec2(0.f, moving_epsilon));
+		bounds[2].Set(b2Vec2(whole_vision[2]) + b2Vec2(moving_epsilon, 0.f), b2Vec2(whole_vision[3]) + b2Vec2(-moving_epsilon, 0.f));
+		bounds[3].Set(b2Vec2(whole_vision[3]) + b2Vec2(0.f, moving_epsilon), b2Vec2(whole_vision[0]) + b2Vec2(0.f, -moving_epsilon));
 
 		/* debug drawing of the visibility square */
 		if (DEBUG_DRAWING.draw_cast_rays || DEBUG_DRAWING.draw_triangle_edges) {
@@ -870,13 +870,13 @@ void visibility_system::respond_to_visibility_information_requests(
 			for (const auto& marked : marked_holes) {
 				/* prepare raycast subject */
 				b2EdgeShape marked_hole;
-				marked_hole.Set(marked.first, marked.second);
+				marked_hole.Set(b2Vec2(marked.first), b2Vec2(marked.second));
 
 				/* remove every discontinuity raycast with which gives positive result */
 				discs_copy.erase(std::remove_if(discs_copy.begin(), discs_copy.end(),
 					[&marked_hole, &output, &input, &transform](const discontinuity& d) {
-					input.p1 = transform.pos;
-					input.p2 = d.points.first;
+					input.p1 = b2Vec2(transform.pos);
+					input.p2 = b2Vec2(d.points.first);
 
 					/* we don't need to transform edge or ray since they are in the same space
 					but we have to prepare dummy b2Transform as argument for b2EdgeShape::RayCast

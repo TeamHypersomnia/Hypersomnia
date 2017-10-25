@@ -2,13 +2,12 @@
 #include "augs/misc/machine_entropy.h"
 #include "augs/gui/formatted_string.h"
 #include "augs/templates/enum_introspect.h"
+#include "augs/templates/format_enum.h"
 
 #include "view/necessary_resources.h"
 
 #include "application/gui/ingame_menu_button_type.h"
 #include "application/gui/menu/menu_context.h"
-
-
 
 using ingame_menu_context = menu_context<false, ingame_menu_button_type>;
 using const_ingame_menu_context = menu_context<true, ingame_menu_button_type>;

@@ -12,13 +12,13 @@ intersection_output circle_ray_intersection(
 ) {
 	b2CircleShape cs;
 
-	cs.m_p = circle_center;
+	cs.m_p = b2Vec2(circle_center);
 	cs.m_radius = circle_radius;
 
 	b2RayCastInput in;
 	in.maxFraction = 1.f;
-	in.p1 = b + (b-a).set_length(4000.f);
-	in.p2 = a;
+	in.p1 = b2Vec2(b + (b-a).set_length(4000.f));
+	in.p2 = b2Vec2(a);
 
 	b2RayCastOutput out;
 	b2Transform id;
@@ -28,7 +28,7 @@ intersection_output circle_ray_intersection(
 		intersection_output result;
 		
 		result.hit = true;
-		result.intersection = in.p1 + vec2(in.p2 - in.p1) * (out.fraction);
+		result.intersection = vec2(in.p1) + vec2(in.p2 - in.p1) * (out.fraction);
 		
 		return result;
 	}
@@ -48,8 +48,8 @@ intersection_output rectangle_ray_intersection(
 
 	b2RayCastInput in;
 	in.maxFraction = 1.f;
-	in.p1 = a - center;
-	in.p2 = b - center;
+	in.p1 = b2Vec2(a - center);
+	in.p2 = b2Vec2(b - center);
 
 	b2RayCastOutput out;
 	b2Transform id;
@@ -59,7 +59,7 @@ intersection_output rectangle_ray_intersection(
 		intersection_output result;
 		
 		result.hit = true;
-		result.intersection = center + vec2(in.p1 + vec2(in.p2 - in.p1) * (out.fraction));
+		result.intersection = center + vec2(vec2(in.p1) + vec2(in.p2 - in.p1) * (out.fraction));
 		
 		return result;
 	}
@@ -95,8 +95,8 @@ intersection_output segment_segment_intersection(
 	b2RayCastInput input;
 	output.fraction = 0.f;
 	input.maxFraction = 1.0;
-	input.p1 = a1;
-	input.p2 = a2;
+	input.p1 = b2Vec2(a1);
+	input.p2 = b2Vec2(a2);
 
 	/* we don't need to transform edge or ray since they are in the same space
 	but we have to prepare dummy b2Transform as argument for b2EdgeShape::RayCast

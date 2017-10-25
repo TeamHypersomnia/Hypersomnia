@@ -10,6 +10,15 @@
 #include "augs/misc/typesafe_sprintf.h"
 #include "augs/misc/typesafe_sscanf.h"
 
+template <class T, class = void>
+struct has_x_and_y : std::false_type {};
+
+template <class T>
+struct has_x_and_y<T, decltype(std::declval<T&>().x, std::declval<T&>().y, void())> : std::true_type {};
+
+template <class T>
+constexpr bool has_x_and_y_v = has_x_and_y<T>::value;
+
 template <class T>
 constexpr T AUGS_EPSILON = static_cast<T>(0.0001);
 
@@ -133,9 +142,6 @@ namespace augs {
 	}
 }
 
-struct b2Vec2;
-struct ImVec2;
-
 template <class type>
 struct basic_vec2 {
 	// GEN INTROSPECTOR struct basic_vec2 class type
@@ -184,48 +190,15 @@ struct basic_vec2 {
 			&&
 			smaller_p1.distance_from_segment_sq(bigger_p1, bigger_p2) < maximum_offset*maximum_offset
 			&&
-			smaller_p2.distance_from_segment_sq(bigger_p1, bigger_p2) < maximum_offset*maximum_offset;
+			smaller_p2.distance_from_segment_sq(bigger_p1, bigger_p2) < maximum_offset*maximum_offset
+		;
 	}
 
-	template <class t>
-	basic_vec2(
-		const basic_vec2<t>& v
-	) : 
+	template <class V>
+	basic_vec2(const V& v, std::enable_if_t<has_x_and_y_v<V>>* = nullptr) : 
 		x(static_cast<type>(v.x)), 
 		y(static_cast<type>(v.y)) 
 	{}
-
-	basic_vec2(
-		const b2Vec2& v
-	) :
-		x(static_cast<type>(v.x)),
-		y(static_cast<type>(v.y))
-	{}
-
-	basic_vec2(
-		const ImVec2& v
-	) :
-		x(static_cast<type>(v.x)),
-		y(static_cast<type>(v.y))
-	{}
-
-	template <
-		class T,
-		class = std::enable_if_t<
-			std::is_same_v<T, b2Vec2>
-		|| std::is_same_v<T, ImVec2>
-		>
-	>
-	operator T() const {
-		return { x, y };
-	}
-
-	template <class t>
-	basic_vec2& operator=(const basic_vec2<t>& v) {
-		x = static_cast<type>(v.x);
-		y = static_cast<type>(v.y);
-		return *this;
-	}
 
 	basic_vec2(
 		const type x = static_cast<type>(0), 
@@ -234,6 +207,21 @@ struct basic_vec2 {
 		x(x), 
 		y(y) 
 	{}
+
+	template <class t>
+	basic_vec2& operator=(const basic_vec2<t>& v) {
+		x = static_cast<type>(v.x);
+		y = static_cast<type>(v.y);
+		return *this;
+	}
+
+	template <class V, class = std::enable_if_t<has_x_and_y_v<V>>>
+	explicit operator V() const {
+		return { 
+			static_cast<decltype(V::x)>(x), 
+			static_cast<decltype(V::y)>(y) 
+		};
+	}
 
 	/* from http://stackoverflow.com/a/1501725 */
 	real distance_from_segment_sq(const basic_vec2 v, const basic_vec2 w) const {

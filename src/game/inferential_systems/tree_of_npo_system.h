@@ -83,8 +83,8 @@ public:
 		const auto visible_aabb = camera.get_transformed_visible_world_area_aabb();
 
 		b2AABB input;
-		input.lowerBound = visible_aabb.left_top();
-		input.upperBound = visible_aabb.right_bottom();
+		input.lowerBound = b2Vec2(visible_aabb.left_top());
+		input.upperBound = b2Vec2(visible_aabb.right_bottom());
 
 		tree.nodes.Query(&aabb_listener, input);
 	}

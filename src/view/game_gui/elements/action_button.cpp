@@ -80,7 +80,7 @@ void action_button::draw(
 					if (inside_tex != assets::game_image_id::INVALID) {
 						ensure(border_tex != assets::necessary_image_id::INVALID);
 
-						const auto absolute_icon_rect = ltrb(vec2i(0, 0), game_images.at(inside_tex).get_size()).place_in_center_of(absolute_rect);
+						const auto absolute_icon_rect = ltrb(vec2(0, 0), vec2(game_images.at(inside_tex).get_size())).place_in_center_of(absolute_rect);
 						const bool draw_partial_colorful_rect = false;
 
 						if (has_enough_mana) {
@@ -156,7 +156,7 @@ void action_button::draw(
 
 						print_stroked(
 							output,
-							absolute_rect.right_bottom() - label_bbox - vec2(4, 0),
+							absolute_rect.right_bottom() - vec2(label_bbox) - vec2(4, 0),
 							label_text
 						);
 					}

@@ -42,7 +42,7 @@ namespace augs {
 		change.mouse.rel = motion;
 
 		if (!mouse_position_frozen) {
-			last_mouse_pos += change.mouse.rel;
+			last_mouse_pos += vec2i(change.mouse.rel);
 		}
 
 		const auto screen_size = current_settings.get_screen_size() - vec2i(1, 1);
@@ -59,7 +59,7 @@ namespace augs {
 		) {
 			if (const auto screen_space = get_cursor_pos()) {
 				const auto window_pos = get_window_rect().get_position();
-				const auto rel_v = (*screen_space - window_pos) - last_mouse_pos;
+				const auto rel_v = basic_vec2<short>((*screen_space - window_pos) - last_mouse_pos);
 				return do_raw_motion(rel_v);
 			}
 		}
@@ -189,7 +189,7 @@ namespace augs {
 					new_pos = { p.x, p.y };
 				}
 
-				change.mouse.rel = new_pos - last_mouse_pos;
+				change.mouse.rel = new_pos - basic_vec2<short>(last_mouse_pos);
 				
 				if (change.mouse.rel.non_zero()) {
 					double_click_occured = false;

@@ -95,8 +95,8 @@ namespace prefabs {
 		const int create_arm_count = 2
 	);
 
-	entity_handle create_crate(const logic_step, const components::transform pos, vec2i size = vec2());
-	entity_handle create_brick_wall(const logic_step, const components::transform pos, vec2i size = vec2());
+	entity_handle create_crate(const logic_step, const components::transform pos, vec2i size = {});
+	entity_handle create_brick_wall(const logic_step, const components::transform pos, vec2i size = {});
 
 	entity_handle create_cyan_urban_machete(const logic_step, const vec2 pos);
 

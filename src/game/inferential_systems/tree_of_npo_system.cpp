@@ -43,8 +43,8 @@ void tree_of_npo_system::create_inferred_state_for(const const_entity_handle han
 		cache.type = data.type;
 
 		b2AABB input;
-		input.lowerBound = data.aabb.left_top();
-		input.upperBound = data.aabb.right_bottom();
+		input.lowerBound = b2Vec2(data.aabb.left_top());
+		input.upperBound = b2Vec2(data.aabb.right_bottom());
 		
 		tree_of_npo_node node;
 		node.payload = handle.get_id().operator unversioned_entity_id();

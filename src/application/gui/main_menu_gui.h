@@ -1,13 +1,12 @@
 #pragma once
 #include "augs/misc/machine_entropy.h"
 #include "augs/gui/formatted_string.h"
+#include "augs/templates/format_enum.h"
 
 #include "view/necessary_resources.h"
 
 #include "application/gui/main_menu_button_type.h"
 #include "application/gui/menu/menu_context.h"
-
-
 
 using main_menu_context = menu_context<false, main_menu_button_type>;
 using const_main_menu_context = menu_context<true, main_menu_button_type>;

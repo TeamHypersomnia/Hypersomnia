@@ -69,7 +69,7 @@ struct appearing_text {
 
 	void draw(
 		const augs::drawer_with_default output,
-		vec2 target_pos,
+		const vec2i target_pos,
 		augs::gui::text::style style
 	) const {
 		using namespace augs::gui::text;

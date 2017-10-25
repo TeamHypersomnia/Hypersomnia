@@ -96,7 +96,7 @@ namespace augs {
 							face->glyph->bitmap.buffer, 
 							1, 
 							face->glyph->bitmap.pitch, 
-							vec2i(
+							vec2u(
 								face->glyph->bitmap.width, 
 								face->glyph->bitmap.rows
 							)

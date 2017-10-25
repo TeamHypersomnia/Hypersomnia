@@ -270,8 +270,8 @@ void editor_setup::perform_custom_imgui(
 		return item_if_tabs_and(true, label, shortcut);
 	};
 
-	const auto mouse_pos = vec2(ImGui::GetIO().MousePos);
-	const auto screen_size = vec2(ImGui::GetIO().DisplaySize);
+	const auto mouse_pos = vec2i(ImGui::GetIO().MousePos);
+	const auto screen_size = vec2i(ImGui::GetIO().DisplaySize);
 	const auto world_cursor_pos = current_cone.get_world_cursor_pos(mouse_pos, screen_size);
 
 	if (!in_direct_gameplay) {
@@ -892,8 +892,8 @@ bool editor_setup::handle_unfetched_window_input(
 				}
 			}
 			else {
-				const auto mouse_pos = vec2(ImGui::GetIO().MousePos);
-				const auto screen_size = vec2(ImGui::GetIO().DisplaySize);
+				const auto mouse_pos = vec2i(ImGui::GetIO().MousePos);
+				const auto screen_size = vec2i(ImGui::GetIO().DisplaySize);
 				const auto world_cursor_pos = current_cone.get_world_cursor_pos(mouse_pos, screen_size);
 
 				hovered_entity = {};

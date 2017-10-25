@@ -147,7 +147,7 @@ void physics_system::create_inferred_state_for(const const_entity_handle handle)
 		def.allowSleep = physics_data.allow_sleep;
 		def.gravityScale = physics_data.gravity_scale;
 		def.active = true;
-		def.linearVelocity = physics_data.velocity;
+		def.linearVelocity = b2Vec2(physics_data.velocity);
 		def.angularVelocity = physics_data.angular_velocity;
 
 		cache.body = b2world->CreateBody(&def);
@@ -278,7 +278,7 @@ void physics_system::create_inferred_state_for_joint(const const_entity_handle h
 		def.bodyA = get_rigid_body_cache(cosmos[joint_data.target_bodies[0]]).body;
 		def.bodyB = get_rigid_body_cache(cosmos[joint_data.target_bodies[1]]).body;
 		def.collideConnected = joint_data.collide_connected;
-		def.linearOffset = si.get_meters(joint_data.linear_offset);
+		def.linearOffset = b2Vec2(si.get_meters(joint_data.linear_offset));
 		def.angularOffset = DEG_TO_RAD<float> * joint_data.angular_offset;
 		def.maxForce = si.get_meters(joint_data.max_force);
 		def.maxTorque = joint_data.max_torque;

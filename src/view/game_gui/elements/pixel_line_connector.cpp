@@ -1,7 +1,7 @@
 #include "pixel_line_connector.h"
 #include "augs/drawing/drawing.h"
 
-augs::constant_size_vector<std::array<vec2i, 2>, 2> get_connecting_pixel_lines(
+augs::constant_size_vector<std::array<vec2, 2>, 2> get_connecting_pixel_lines(
 	const ltrb& a,
 	const ltrb& b
 ) {

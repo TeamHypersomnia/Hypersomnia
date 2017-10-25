@@ -51,7 +51,7 @@ std::vector<physics_system::raycast_output> physics_system::ray_cast_all_interse
 		LOG("Ray casting error: X: %x %x", p1_meters, p2_meters);
 	}
 
-	b2world->RayCast(&callback, p1_meters, p2_meters);
+	b2world->RayCast(&callback, b2Vec2(p1_meters), b2Vec2(p2_meters));
 	return callback.outputs;
 }
 
@@ -135,7 +135,7 @@ physics_system::raycast_output physics_system::ray_cast(const vec2 p1_meters, co
 		return callback.output;
 	}
 
-	b2world->RayCast(&callback, p1_meters, p2_meters);
+	b2world->RayCast(&callback, b2Vec2(p1_meters), b2Vec2(p2_meters));
 	return callback.output;
 }
 

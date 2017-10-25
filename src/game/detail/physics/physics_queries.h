@@ -106,8 +106,8 @@ void for_each_in_aabb(
 	F callback
 ) {
 	b2AABB aabb;
-	aabb.lowerBound = si.get_meters(p1);
-	aabb.upperBound = si.get_meters(p2);
+	aabb.lowerBound = b2Vec2(si.get_meters(p1));
+	aabb.upperBound = b2Vec2(si.get_meters(p2));
 
 	for_each_in_aabb_meters(b2world, aabb, filter, callback);
 }
@@ -144,9 +144,9 @@ void for_each_intersection_with_triangle(
 
 	std::array<b2Vec2, 3> verts;
 
-	verts[0] = si.get_meters(vertices[0]);
-	verts[1] = si.get_meters(vertices[1]);
-	verts[2] = si.get_meters(vertices[2]);
+	verts[0] = b2Vec2(si.get_meters(vertices[0]));
+	verts[1] = b2Vec2(si.get_meters(vertices[1]));
+	verts[2] = b2Vec2(si.get_meters(vertices[2]));
 
 	poly_shape.Set(verts.data(), verts.size());
 

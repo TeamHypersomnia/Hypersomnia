@@ -187,7 +187,7 @@ namespace augs {
 
 			const auto angle = vec2i(x_center, y_center);// .degrees();
 
-			if (!in.constrain_angle || (angle_start.cross(angle) >= 0.f && angle_end.cross(angle) <= 0.f)) {
+			if (!in.constrain_angle || (angle_start.cross(vec2(angle)) >= 0.f && angle_end.cross(vec2(angle)) <= 0.f)) {
 				const auto col = in.filling;
 				//if (scale_alpha)
 				//	col.a = (angle - angle_start) / (angle_end - angle_start) * 255;

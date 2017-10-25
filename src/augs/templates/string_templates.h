@@ -138,13 +138,7 @@ auto format_field_name(S s) {
 	return str_ops(s).multi_replace_all({ "_", "." }, " ").subject;
 }
 
-template <class Enum>
-auto format_enum(const Enum e) {
-	return format_field_name(to_lowercase(augs::enum_to_string(e)));
-}
-
-inline bool ends_with(const std::string& value, const std::string& ending)
-{
+inline bool ends_with(const std::string& value, const std::string& ending) {
     if (ending.size() > value.size()) {
     	return false;
     }

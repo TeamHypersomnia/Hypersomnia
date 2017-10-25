@@ -73,7 +73,7 @@ void component_synchronizer<false, P>::set_velocity(const vec2 pixels) const {
 	if (!is_constructed())
 		return;
 
-	get_cache().body->SetLinearVelocity(get_raw_component().velocity);
+	get_cache().body->SetLinearVelocity(b2Vec2(get_raw_component().velocity));
 }
 
 void component_synchronizer<false, P>::set_angular_velocity(const float degrees) const {
@@ -82,7 +82,7 @@ void component_synchronizer<false, P>::set_angular_velocity(const float degrees)
 	if (!is_constructed())
 		return;
 
-	get_cache().body->SetLinearVelocity(get_raw_component().velocity);
+	get_cache().body->SetLinearVelocity(b2Vec2(get_raw_component().velocity));
 }
 
 void component_synchronizer<false, P>::set_linear_damping(const float damping) const {
@@ -110,7 +110,7 @@ void component_synchronizer<false, P>::set_linear_damping_vec(const vec2 damping
 	if (!is_constructed())
 		return;
 
-	get_cache().body->SetLinearDampingVec(damping);
+	get_cache().body->SetLinearDampingVec(b2Vec2(damping));
 }
 
 void component_synchronizer<false, P>::apply_force(const vec2 pixels) const {
@@ -132,11 +132,11 @@ void component_synchronizer<false, P>::apply_force(
 	auto& data = get_raw_component();
 
 	const auto force = handle.get_cosmos().get_fixed_delta().in_seconds() * to_meters(pixels);
-	const auto location = vec2(body->GetWorldCenter() + to_meters(center_offset));
+	const auto location = vec2(body->GetWorldCenter() + b2Vec2(to_meters(center_offset)));
 
 	body->ApplyLinearImpulse(
-		force, 
-		location, 
+		b2Vec2(force), 
+		b2Vec2(location), 
 		wake
 	);
 
@@ -168,9 +168,9 @@ void component_synchronizer<false, P>::apply_impulse(
 	auto& data = get_raw_component();
 
 	const vec2 force = to_meters(pixels);
-	const vec2 location = body->GetWorldCenter() + to_meters(center_offset);
+	const vec2 location = vec2(body->GetWorldCenter()) + to_meters(center_offset);
 
-	body->ApplyLinearImpulse(force, location, true);
+	body->ApplyLinearImpulse(b2Vec2(force), b2Vec2(location), true);
 	data.angular_velocity = body->GetAngularVelocity();
 	data.velocity = body->GetLinearVelocity();
 
@@ -266,7 +266,7 @@ void component_synchronizer<false, P>::set_transform(const components::transform
 template<bool C>
 bool basic_physics_synchronizer<C>::test_point(const vec2 v) const {
 	ensure(is_constructed());
-	return get_cache().body->TestPoint(to_meters(v));
+	return get_cache().body->TestPoint(b2Vec2(to_meters(v)));
 }
 
 template class basic_physics_synchronizer<false>;

@@ -96,13 +96,13 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 
 						if (DEBUG_DRAWING.draw_friction_field_collisions_of_entering) {
 							DEBUG_PERSISTENT_LINES.emplace_back(yellow,
-								si.get_pixels(worldManifold.points[i]),
-								si.get_pixels(worldManifold.points[i]) + vec2(worldManifold.normal).set_length(150)
+								vec2(si.get_pixels(worldManifold.points[i])),
+								vec2(si.get_pixels(worldManifold.points[i])) + vec2(worldManifold.normal).set_length(150)
 							);
 
 							DEBUG_PERSISTENT_LINES.emplace_back(red,
-								si.get_pixels(worldManifold.points[i]), 
-								si.get_pixels(worldManifold.points[i]) + velOtherPixels
+								vec2(si.get_pixels(worldManifold.points[i])), 
+								vec2(si.get_pixels(worldManifold.points[i])) + velOtherPixels
 							);
 						}
 					}

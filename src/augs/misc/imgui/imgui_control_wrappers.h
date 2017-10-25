@@ -4,6 +4,7 @@
 #include "augs/templates/function_traits.h"
 #include "augs/templates/corresponding_field.h"
 #include "augs/templates/string_templates.h"
+#include "augs/templates/format_enum.h"
 
 #include "augs/math/vec2.h"
 #include "augs/graphics/rgba.h"

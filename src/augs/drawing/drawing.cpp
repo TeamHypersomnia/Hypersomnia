@@ -172,7 +172,7 @@ namespace augs {
 		const vec2 center,
 		const rgba color
 	) const {
-		return aabb_centered(tex, center, tex.get_original_size(), color);
+		return aabb_centered(tex, center, vec2(tex.get_original_size()), color);
 	}
 
 	const drawer& drawer::aabb_lt_clipped(
@@ -182,7 +182,7 @@ namespace augs {
 		const rgba color,
 		const flip_flags flip
 	) const {
-		return aabb_clipped(tex, { left_top, tex.get_original_size() }, clipper, color, flip);
+		return aabb_clipped(tex, { left_top, vec2(tex.get_original_size()) }, clipper, color, flip);
 	}
 
 	const drawer& drawer::aabb_clipped(
