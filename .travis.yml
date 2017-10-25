@@ -17,7 +17,6 @@ script:
   - gcc -v && g++ -v && cmake --version
   # Run your build commands next
   - cmake -DUNIX=ON -DHYPERSOMNIA_BARE=ON -D CMAKE_C_COMPILER=gcc-6 -D CMAKE_CXX_COMPILER=g++-6 CMakeLists.txt
-  - make --dry-run
   - make VERBOSE=1
   - ./Hypersomnia
   
