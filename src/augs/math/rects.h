@@ -1,4 +1,5 @@
 #pragma once
+#include <array>
 #include <vector>
 #include <iosfwd>
 #include <algorithm>
