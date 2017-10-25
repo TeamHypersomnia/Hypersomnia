@@ -19,7 +19,7 @@
 #include <imgui/imgui_internal.h>
 
 #include "augs/readwrite/lua_readwrite.h"
-#include "generated/introspectors.h"
+
 
 void editor_setup::on_tab_changed() {
 	hovered_entity = {};

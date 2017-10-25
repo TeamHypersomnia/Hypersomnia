@@ -22,7 +22,7 @@
 #include "augs/readwrite/byte_readwrite.h"
 #include "game/detail/visible_entities.h"
 
-#include "generated/introspectors.h"
+
 #include "view/debug_character_selection.h"
 #include "application/config_lua_table.h"
 

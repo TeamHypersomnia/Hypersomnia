@@ -31,7 +31,7 @@
 
 #include "augs/templates/container_templates.h"
 
-#include "generated/introspectors.h"
+
 #include "application/config_lua_table.h"
 
 

@@ -37,7 +37,7 @@
 #include "application/gui/menu/creators_screen.h"
 
 #include "augs/readwrite/lua_readwrite.h"
-#include "generated/introspectors.h"
+
 
 using namespace augs::event::keys;
 using namespace augs::gui::text;

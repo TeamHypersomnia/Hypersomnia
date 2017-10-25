@@ -8,7 +8,7 @@
 #include "application/gui/ingame_menu_button_type.h"
 #include "application/gui/menu/menu_context.h"
 
-#include "generated/introspectors.h"
+
 
 using ingame_menu_context = menu_context<false, ingame_menu_button_type>;
 using const_ingame_menu_context = menu_context<true, ingame_menu_button_type>;

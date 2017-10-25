@@ -1,6 +1,6 @@
 #include "augs/templates/introspect.h"
 #include "application/session_profiler.h"
-#include "generated/introspectors.h"
+
 
 /* So that we don't have to include generated/introspectors with the header */
 

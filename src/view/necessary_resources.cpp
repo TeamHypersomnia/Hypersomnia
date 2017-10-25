@@ -11,7 +11,7 @@
 #include "view/viewables/regeneration/procedural_image_definition.h"
 
 #include "augs/readwrite/lua_readwrite.h"
-#include "generated/introspectors.h"
+
 
 necessary_fbos::necessary_fbos(
 	const vec2i screen_size,

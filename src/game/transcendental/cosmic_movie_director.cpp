@@ -8,7 +8,7 @@
 #include "augs/templates/string_templates.h"
 
 #include "augs/readwrite/byte_readwrite.h"
-#include "generated/introspectors.h"
+
 
 void cosmic_movie_director::save_recording_to_file(const augs::path_type& path) const {
 	auto f = augs::with_exceptions<std::ofstream>();

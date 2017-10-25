@@ -5,7 +5,7 @@
 #include "augs/templates/introspection_utils/rewrite_members.h"
 
 #include "game/detail/inventory/inventory_utils.h"
-#include "generated/introspectors.h"
+
 
 template <class key>
 void basic_cosmic_entropy<key>::override_transfers_leaving_other_entities(

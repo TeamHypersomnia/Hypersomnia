@@ -2,7 +2,7 @@
 #include <tuple>
 #include <catch.hpp>
 
-#include "generated/introspectors.h"
+
 
 #include "augs/filesystem/file.h"
 #include "augs/templates/introspection_utils/describe_fields.h"

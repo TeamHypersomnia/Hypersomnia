@@ -6,7 +6,7 @@
 #include "application/config_lua_table.h"
 #include "application/setups/test_scene_setup.h"
 
-#include "generated/introspectors.h"
+
 
 using namespace augs::event::keys;
 

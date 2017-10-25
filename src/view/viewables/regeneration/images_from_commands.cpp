@@ -7,7 +7,7 @@
 #include "view/viewables/regeneration/images_from_commands.h"
 
 #include "augs/readwrite/byte_readwrite.h"
-#include "generated/introspectors.h"
+
 
 void regenerate_image_from_commands(
 	const augs::path_type& output_image_path,

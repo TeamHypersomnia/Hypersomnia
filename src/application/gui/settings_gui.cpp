@@ -13,7 +13,7 @@
 #include "application/config_lua_table.h"
 #include "application/gui/settings_gui.h"
 
-#include "generated/introspectors.h"
+
 
 static void ShowHelpMarker(const char* const desc) {
 	ImGui::TextDisabled("(?)");

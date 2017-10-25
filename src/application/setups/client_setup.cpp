@@ -23,7 +23,7 @@
 #include "client_setup.h"
 #include "game/detail/visible_entities.h"
 
-#include "generated/introspectors.h"
+
 #include "application/config_lua_table.h"
 
 

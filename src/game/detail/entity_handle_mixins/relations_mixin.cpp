@@ -1,4 +1,4 @@
-#include "generated/introspectors.h"
+
 
 #include "relations_mixin.h"
 #include "game/detail/inventory/inventory_slot_id.h"

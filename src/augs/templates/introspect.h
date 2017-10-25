@@ -1,13 +1,14 @@
 #pragma once
 #include <type_traits>
+
+#include "generated/introspectors.h"
+
 #include "augs/templates/container_templates.h"
 #include "augs/templates/introspection_traits.h"
 #include "augs/templates/recursive.h"
 #include "augs/templates/is_optional.h"
 
 namespace augs {
-	struct introspection_access;
-
 	/*
 		Simple introspection with just one level of depth.
 		Will invoke a callback upon every top-level field of a struct.
@@ -26,7 +27,7 @@ namespace augs {
 		using T = std::remove_reference_t<Instance>;
 		static_assert(has_introspect_v<T>, "Recursion requested on type(s) without introspectors!");
 
-		augs::introspection_access::introspect_body(
+		introspection_access::introspect_body(
 			static_cast<std::decay_t<Instance>*>(nullptr), 
 			std::forward<F>(callback), t, tn...
 		);
@@ -51,7 +52,7 @@ namespace augs {
 		using T = std::remove_reference_t<Instance>;
 
 		if constexpr(!is_introspective_leaf_v<T>) {
-			augs::introspection_access::introspect_body(
+			introspection_access::introspect_body(
 				static_cast<std::decay_t<Instance>*>(nullptr),
 				std::forward<F>(callback), t, tn...
 			);
@@ -67,8 +68,8 @@ namespace augs {
 
 		bool are_equal = true;
 
-		augs::introspect(
-			augs::recursive([&are_equal](
+		introspect(
+			recursive([&are_equal](
 				auto&& self,
 				const auto label,
 				const auto& aa, 
@@ -94,7 +95,7 @@ namespace augs {
 					are_equal = are_equal && aa == bb;
 				}
 				else {
-					augs::introspect(augs::recursive(self), aa, bb);
+					introspect(recursive(self), aa, bb);
 				}
 			}),
 			a,
@@ -106,14 +107,14 @@ namespace augs {
 
 	template <class T>
 	void recursive_clear(T& object) {
-		augs::introspect(augs::recursive([](auto&& self, auto, auto& field) {
+		introspect(recursive([](auto&& self, auto, auto& field) {
 			using T = std::decay_t<decltype(field)>;
 
 			if constexpr(can_clear_v<T>) {
 				field.clear();
 			}
 			else {
-				augs::introspect_if_not_leaf(augs::recursive(self), field);
+				introspect_if_not_leaf(recursive(self), field);
 			}
 		}), object);
 	}

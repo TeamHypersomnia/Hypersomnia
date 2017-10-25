@@ -28,7 +28,7 @@
 
 #include "application/setups/director_setup.h"
 
-#include "generated/introspectors.h"
+
 #include "augs/misc/parsing_utils.h"
 #include "augs/audio/sound_samples_from_file.h"
 

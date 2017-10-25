@@ -6,7 +6,7 @@
 #include "game/transcendental/cosmos.h"
 
 #include "augs/readwrite/byte_readwrite.h"
-#include "generated/introspectors.h"
+
 
 void cosmos_significant_state::clear() {
 	*this = cosmos_significant_state();

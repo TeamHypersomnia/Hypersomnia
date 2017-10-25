@@ -1,6 +1,7 @@
-#include "button_corners.h"
-#include "generated/introspectors.h"
+#include "augs/templates/introspect.h"
 #include "augs/templates/string_templates.h"
+
+#include "augs/gui/button_corners.h"
 
 augs::path_type get_filename_for(const button_corner_type t) {
 	return to_lowercase(augs::enum_to_string(t));

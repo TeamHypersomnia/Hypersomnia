@@ -12,7 +12,7 @@
 #include "augs/texture_atlas/texture_atlas.h"
 
 #include "augs/readwrite/byte_readwrite.h"
-#include "generated/introspectors.h"
+
 
 regenerated_atlas::regenerated_atlas(
 	const atlas_regeneration_input& in,

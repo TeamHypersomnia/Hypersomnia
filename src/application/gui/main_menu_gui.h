@@ -7,7 +7,7 @@
 #include "application/gui/main_menu_button_type.h"
 #include "application/gui/menu/menu_context.h"
 
-#include "generated/introspectors.h"
+
 
 using main_menu_context = menu_context<false, main_menu_button_type>;
 using const_main_menu_context = menu_context<true, main_menu_button_type>;

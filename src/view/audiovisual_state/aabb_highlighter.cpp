@@ -7,7 +7,7 @@
 #include "view/audiovisual_state/systems/interpolation_system.h"
 #include "view/audiovisual_state/aabb_highlighter.h"
 
-#include "generated/introspectors.h"
+
 
 void aabb_highlighter::update(const augs::delta dt) {
 	timer += dt.in_milliseconds();

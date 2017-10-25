@@ -10,7 +10,7 @@
 #include "game/organization/all_component_includes.h"
 
 #include "augs/readwrite/byte_readwrite.h"
-#include "generated/introspectors.h"
+
 
 /* Several assumptions regarding delta encoding */
 

@@ -42,7 +42,7 @@
 
 #include "augs/readwrite/lua_readwrite.h"
 #include "augs/readwrite/byte_readwrite.h"
-#include "generated/introspectors.h"
+
 
 const cosmos cosmos::empty;
 
