@@ -1,6 +1,14 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.2)
 
 project(Hypersomnia)
+
+if(UNIX)
+	message("Building for UNIX systems.")
+elseif(MSVC)
+	message("Building for Windows systems.")
+else()
+	message("Unknown system.")
+endif()
 
 # Various feature switches.
 # If it is your first time building Hypersomnia and you get some errors,
@@ -552,28 +560,28 @@ endif()
 
 # We configure additional flags for the compiler.
 
-if(MSVC)
+if(UNIX)
+	# Latest features of C++17 and the filesystem library will be enabled.
+	set(HYPERSOMNIA_CXX_FLAGS "-std=gnu++1z -fpermissive")
+elseif(MSVC)
 	# Latest features of C++17 will be enabled.
 	set(HYPERSOMNIA_CXX_FLAGS "/std:c++latest /MP /Gm- /fp:strict /bigobj /permissive-")
 	set(HYPERSOMNIA_CXX_DEBUG_FLAGS " ")
 	set(HYPERSOMNIA_CXX_RELEASE_FLAGS "/Ob2 /GL /Oi")
 	set(HYPERSOMNIA_CXX_RELWITHDEBINFO_FLAGS "/Ob2 /GL /Oi")
-elseif(UNIX)
-	# Latest features of C++17 and the filesystem library will be enabled.
-	set(HYPERSOMNIA_CXX_FLAGS "-std=gnu++1z -lstdc++fs -fpermissive")
 endif()
 
 # We configure additional flags for linker.
 
-if(MSVC)
+if(UNIX)
+
+elseif(MSVC)
 	set(HYPERSOMNIA_LINKER_RELEASE_FLAGS "/LTCG /INCREMENTAL:NO /OPT:REF")
 
 	# We enable incremental LTCG for at least one release configuration,
 	# because LTCG takes very long even with just a single source file modified.
 
 	set(HYPERSOMNIA_LINKER_RELWITHDEBINFO_FLAGS "/LTCG:incremental /INCREMENTAL:NO")
-elseif(UNIX)
-
 endif()
 
 # We configure some preprocessor defines.
@@ -597,7 +605,9 @@ if(BUILD_OPENAL)
 	add_definitions(-DAL_LIBTYPE_STATIC)
 endif()
 
-if(MSVC)
+if(UNIX)
+    add_definitions(-DPLATFORM_UNIX=1)
+elseif(MSVC)
 	if (BUILD_PLATFORM_CODE)
 		add_definitions(-DPLATFORM_WINDOWS=1)
 	endif()
@@ -608,8 +618,6 @@ if(MSVC)
 		-D_SCL_SECURE_NO_WARNINGS
 		-DUNICODE
 	  )
-elseif(UNIX)
-    add_definitions(-DPLATFORM_UNIX=1)
 endif()
 
 # Additionally, we mark Release as the production build.
@@ -936,6 +944,10 @@ if(MSVC)
 			"winmm.lib"  		# for ENet
 		)
 	endif()
+endif()
+
+if(UNIX)
+	list(APPEND HYPERSOMNIA_LIBS stdc++fs)
 endif()
 
 target_link_libraries(Hypersomnia ${HYPERSOMNIA_LIBS})

@@ -1,0 +1,25 @@
+dist: trusty
+sudo: required
+language:
+  - cpp
+compiler:
+  - gcc
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - gcc-6
+      - g++-6
+      - cmake
+script:
+  # Check versions of gcc, g++ and cmake
+  - gcc -v && g++ -v && cmake --version
+  # Run your build commands next
+  - cmake -DUNIX=ON -DHYPERSOMNIA_BARE=ON -D CMAKE_C_COMPILER=gcc-6 -D CMAKE_CXX_COMPILER=g++-6 CMakeLists.txt
+  - make --dry-run
+  - make VERBOSE=1
+  - ./Hypersomnia
+  
+notfications:
+  email: false
