@@ -97,7 +97,7 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # We will be building Lua manually as there is no up-to-date CMakeLists for Lua.
 
-set(LUA_SRCS
+set(LUA_CPPS
 	"src/3rdparty/lua/lapi.c"
 	"src/3rdparty/lua/lauxlib.c"
 	"src/3rdparty/lua/lbaselib.c"
@@ -133,11 +133,11 @@ set(LUA_SRCS
 	"src/3rdparty/lua/lzio.c"
 )
 
-set_source_files_properties(${LUA_SRCS} PROPERTIES LANGUAGE CXX)
+set_source_files_properties(${LUA_CPPS} PROPERTIES LANGUAGE CXX)
 
 # We will be building Box2D manually, as it is hacked to the utmost.
 
-set(HYPERSOMNIA_BOX2D_SRCS
+set(HYPERSOMNIA_BOX2D_CPPS
 	"src/3rdparty/Box2D/Collision/b2BroadPhase.cpp"
 	"src/3rdparty/Box2D/Collision/b2CollideCircle.cpp"
 	"src/3rdparty/Box2D/Collision/b2CollideEdge.cpp"
@@ -188,7 +188,7 @@ set(HYPERSOMNIA_BOX2D_SRCS
 
 # Test scene sources whose inclusion is conditional on the value of BUILD_TEST_SCENES.
 
-set(HYPERSOMNIA_TEST_SCENES_SRCS
+set(HYPERSOMNIA_TEST_SCENES_CPPS
 	"src/test_scenes/ingredients/artificial_life.cpp"
 	"src/test_scenes/ingredients/backpack.cpp"
 	"src/test_scenes/ingredients/box_physics.cpp"
@@ -217,7 +217,7 @@ set(HYPERSOMNIA_TEST_SCENES_SRCS
 
 # We don't care about alphabetical order. Put new files to the very bottom.
 
-set(HYPERSOMNIA_CODEBASE_SRCS
+set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/application/config_lua_table.cpp"
 	"src/view/viewables/regeneration/desaturations.cpp"
 	"src/view/viewables/regeneration/buttons_with_corners.cpp"
@@ -469,7 +469,7 @@ set(HYPERSOMNIA_CODEBASE_SRCS
 # natvis files for easier debugging in Visual Studio.
 
 if(MSVC)
-	list(APPEND HYPERSOMNIA_CODEBASE_SRCS
+	set(HYPERSOMNIA_NATVIS_FILES
 		"src/game/transcendental/entity_handle.natvis"
 		"src/game/detail/inventory/inventory_slot_handle.natvis"
 		"src/augs/misc/pool/pooled_object_id.natvis"
@@ -477,20 +477,20 @@ if(MSVC)
 endif()
 
 if(BUILD_OPENGL)
-	list(APPEND HYPERSOMNIA_CODEBASE_SRCS
+	list(APPEND HYPERSOMNIA_CODEBASE_CPPS
 		"src/augs/graphics/OpenGL_error.cpp"
 	)
 endif()
 
 if(BUILD_OPENAL)
-	list(APPEND HYPERSOMNIA_CODEBASE_SRCS
+	list(APPEND HYPERSOMNIA_CODEBASE_CPPS
 		"src/augs/audio/OpenAL_error.cpp"
 	)
 endif()
 
 if(BUILD_TEST_SCENES)
-	list(APPEND HYPERSOMNIA_CODEBASE_SRCS
-		${HYPERSOMNIA_TEST_SCENES_SRCS}
+	list(APPEND HYPERSOMNIA_CODEBASE_CPPS
+		${HYPERSOMNIA_TEST_SCENES_CPPS}
 	)
 
 	message("Building of test scenes is enabled.")
@@ -498,7 +498,7 @@ endif()
 
 # The rest of 3rdparty libraries with minimal amount of source files.
 
-set(HYPERSOMNIA_TRIVIAL_3RDPARTY_SRCS
+set(HYPERSOMNIA_TRIVIAL_3RDPARTY_CPPS
 	"src/3rdparty/lodepng/lodepng.cpp"
 	"src/3rdparty/polypartition/src/polypartition.cpp"
 	"src/3rdparty/rectpack2D/src/pack.cpp"
@@ -511,20 +511,11 @@ set(HYPERSOMNIA_TRIVIAL_3RDPARTY_SRCS
 
 if(ADD_APPLICATION_ICON)
 	if(MSVC)
-		set(HYPESROMNIA_PROJECT_RC_FILES
+		set(HYPESROMNIA_RC_FILES
 			"${CMAKE_MODULE_PATH}/Hypersomnia.rc"
 		)
 	endif()
 endif()
-
-set(HYPERSOMNIA_SRCS
-	${HYPERSOMNIA_TRIVIAL_3RDPARTY_SRCS}
-	${HYPERSOMNIA_BOX2D_SRCS}
-	${HYPERSOMNIA_CODEBASE_SRCS}
-	${HYPESROMNIA_PROJECT_RC_FILES}
-
-	"src/main.cpp"
-)
 
 # We add headers to aid IntelliSense.
 
@@ -561,7 +552,7 @@ endif()
 # We configure additional flags for the compiler.
 
 if(UNIX)
-	# Latest features of C++17 and the filesystem library will be enabled.
+	# Latest features of C++17 will be enabled.
 	set(HYPERSOMNIA_CXX_FLAGS "-std=gnu++1z -fpermissive")
 elseif(MSVC)
 	# Latest features of C++17 will be enabled.
@@ -672,7 +663,7 @@ configure_msvc_runtime()
 
 # We build Lua manually as there is no up-to-date CMakeLists for Lua.
 
-add_library(lua ${LUA_SRCS})
+add_library(lua ${LUA_CPPS})
 
 if(BUILD_OPENAL)
 	# We build OpenAL Soft. We need to set some variables beforehand.
@@ -818,24 +809,35 @@ if(BUILD_VERSION_FILE_GENERATOR)
 	)
 endif()
 
-set(HYPERSOMNIA_VERSION_FILE_PATH
+set(HYPERSOMNIA_VERSION_FILE_CPP
 	"${GENERATED_SOURCES_PATH}/hypersomnia_version.cpp"
 )
 
-set_source_files_properties(${HYPERSOMNIA_VERSION_FILE_PATH} PROPERTIES GENERATED TRUE)
+set_source_files_properties(${HYPERSOMNIA_VERSION_FILE_CPP} PROPERTIES GENERATED TRUE)
 
 # We build the main Hypersomnia executable.
 
-set(HYPERSOMNIA_EXECUTABLE_ARGUMENT
-	${HYPERSOMNIA_VERSION_FILE_PATH}
-	${HYPERSOMNIA_SRCS}
+
+set(HYPERSOMNIA_CPPS
+	${HYPERSOMNIA_TRIVIAL_3RDPARTY_CPPS}
+	${HYPERSOMNIA_BOX2D_CPPS}
+	${HYPERSOMNIA_CODEBASE_CPPS}
+	${HYPERSOMNIA_VERSION_FILE_CPP}
+
+	"src/main.cpp"
+)
+
+set(HYPERSOMNIA_SRCS
+	${HYPERSOMNIA_CPPS}
+	${HYPESROMNIA_RC_FILES}
+	${HYPESROMNIA_NATVIS_FILES}
 	${HYPERSOMNIA_HEADERS}
 )
 
 if(MSVC AND BUILD_PLATFORM_CODE)
-	add_executable(Hypersomnia WIN32 ${HYPERSOMNIA_EXECUTABLE_ARGUMENT})
+	add_executable(Hypersomnia WIN32 ${HYPERSOMNIA_SRCS})
 else()
-	add_executable(Hypersomnia ${HYPERSOMNIA_EXECUTABLE_ARGUMENT})
+	add_executable(Hypersomnia ${HYPERSOMNIA_SRCS})
 endif()
 
 # Here, we define pre-build events calling the source code generators.
@@ -851,14 +853,14 @@ if(BUILD_VERSION_FILE_GENERATOR)
 	add_custom_command(
 		PRE_BUILD
 		TARGET Hypersomnia
-		COMMAND version_file_generator ${GIT_EXECUTABLE} ${HYPERSOMNIA_VERSION_FILE_IN_PATH} ${HYPERSOMNIA_VERSION_FILE_PATH}
+		COMMAND version_file_generator ${GIT_EXECUTABLE} ${HYPERSOMNIA_VERSION_FILE_IN_PATH} ${HYPERSOMNIA_VERSION_FILE_CPP}
 		COMMENT "Generating version files..."
 	)
 	
 	add_dependencies(Hypersomnia version_file_generator)
 else()
-	message("Version file generator will not be built. Copying ${HYPERSOMNIA_VERSION_FILE_IN_PATH} into ${HYPERSOMNIA_VERSION_FILE_PATH}")
-	execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${HYPERSOMNIA_VERSION_FILE_IN_PATH} ${HYPERSOMNIA_VERSION_FILE_PATH})
+	message("Version file generator will not be built. Copying ${HYPERSOMNIA_VERSION_FILE_IN_PATH} into ${HYPERSOMNIA_VERSION_FILE_CPP}")
+	execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${HYPERSOMNIA_VERSION_FILE_IN_PATH} ${HYPERSOMNIA_VERSION_FILE_CPP})
 endif()
 
 # Before Hypersomnia builds,

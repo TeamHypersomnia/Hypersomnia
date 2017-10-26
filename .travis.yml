@@ -14,10 +14,10 @@ addons:
       - cmake
 script:
   # Check versions of gcc, g++ and cmake
-  - gcc -v && g++ -v && cmake --version
+  - gcc -v && g++ -v && cmake --version && make --version
   # Run your build commands next
   - cmake -DUNIX=ON -DHYPERSOMNIA_BARE=ON -D CMAKE_C_COMPILER=gcc-7 -D CMAKE_CXX_COMPILER=g++-7 CMakeLists.txt
-  - make VERBOSE=1
+  - make VERBOSE=1 --keep-going
   - ./Hypersomnia
   
 notfications:
