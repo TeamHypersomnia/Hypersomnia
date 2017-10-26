@@ -37,6 +37,9 @@ struct add_to_sequence<I, std::index_sequence<Is...>> {
 };
 
 template <size_t I, class T>
+using add_to_sequence_t = typename add_to_sequence<I, T>::type;
+
+template <size_t I, class T>
 struct sequence_element;
 
 template <size_t I, class T, T Head, T... Tail>
@@ -68,7 +71,7 @@ struct filter_types_detail<
 	Criterion,
 	List<>
 > { 
-	using type = std::tuple<>; 
+	using types = std::tuple<>; 
 	using indices = std::index_sequence<>;
 };
 
@@ -84,35 +87,28 @@ struct filter_types_detail<
 	Criterion,
 	List<Head, Tail...>
 > {
-	using type = std::conditional_t<
+	using types = std::conditional_t<
 		Criterion<Head>::value,
 		prepend_to_list_t<
 			Head,
-			typename filter_types_detail<Index + 1, Criterion, List<Tail...>>::type
+			typename filter_types_detail<Index + 1, Criterion, List<Tail...>>::types
 		>,
-		typename filter_types_detail<Index + 1, Criterion, List<Tail...>>::type
+		typename filter_types_detail<Index + 1, Criterion, List<Tail...>>::types
 	>;
 
 	using indices = std::conditional_t<
 		Criterion<Head>::value,
-		typename add_to_sequence<
+		add_to_sequence_t<
 			Index,
 			typename filter_types_detail<Index + 1, Criterion, List<Tail...>>::indices
-		>::type,
+		>,
 		typename filter_types_detail<Index + 1, Criterion, List<Tail...>>::indices
 	>;
 
 	static constexpr bool found = indices().size() > 0;
 
-	template <size_t I, class = void>
-	struct get_type {
-
-	};
-
 	template <size_t I>
-	struct get_type<I, std::enable_if_t<I < std::tuple_size_v<type>>> {
-		using type = std::tuple_element_t<I, type>;
-	};
+	using get_type = std::tuple_element_t<I, types>;
 };
 
 template <
@@ -125,7 +121,7 @@ template <
 	template <class...> class Criterion,
 	class List
 >
-using filter_types_in_list_t = typename filter_types_detail<0, Criterion, List>::type;
+using filter_types_in_list_t = typename filter_types_detail<0, Criterion, List>::types;
 
 template <
 	template <class...> class Criterion,
@@ -137,7 +133,7 @@ template <
 	template <class...> class Criterion,
 	class List
 >
-using find_matching_type_in_list = typename filter_types_in_list<Criterion, List>::template get_type<0>::type;
+using find_matching_type_in_list = typename filter_types_in_list<Criterion, List>::template get_type<0>;
 
 template <class S, class List>
 constexpr bool is_one_of_list_v = filter_types_in_list<bind_types<std::is_same, S>::template type, List>::found;

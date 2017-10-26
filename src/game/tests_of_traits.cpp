@@ -100,8 +100,8 @@ struct tests_of_traits {
 	static_assert(bind_types<std::is_same, const int>::type<const int>::value, "Trait has failed");
 
 	static_assert(std::is_same_v<filter_types_in_list<std::is_integral, type_list<double, int, float>>::indices, std::index_sequence<1>>, "Trait has failed");
-	static_assert(std::is_same_v<filter_types_in_list<std::is_integral, type_list<double, int, float>>::type, std::tuple<int>>, "Trait has failed");
-	static_assert(std::is_same_v<filter_types_in_list<std::is_integral, type_list<double, int, float>>::get_type<0>::type, int>, "Trait has failed");
+	static_assert(std::is_same_v<filter_types_in_list<std::is_integral, type_list<double, int, float>>::types, std::tuple<int>>, "Trait has failed");
+	static_assert(std::is_same_v<filter_types_in_list<std::is_integral, type_list<double, int, float>>::get_type<0>, int>, "Trait has failed");
 	
 	static_assert(is_one_of_list_v<unsigned, std::tuple<float, float, double, unsigned>>, "Trait has failed");
 	static_assert(!is_one_of_v<int, float, double>, "Trait has failed");
@@ -116,7 +116,7 @@ struct tests_of_traits {
 	
 	static_assert(
 		std::is_same_v<
-			filter_types_in_list<std::is_integral, type_list<int, double, float, unsigned>>::type, 
+			filter_types_in_list<std::is_integral, type_list<int, double, float, unsigned>>::types, 
 			std::tuple<int, unsigned>
 		>, 
 		"Trait has failed"
@@ -132,7 +132,7 @@ struct tests_of_traits {
 	
 	static_assert(
 		!std::is_same_v<
-		filter_types_in_list<std::is_floating_point, type_list<int, double, float, unsigned>>::type,
+		filter_types_in_list<std::is_floating_point, type_list<int, double, float, unsigned>>::types,
 			std::tuple<int, unsigned>
 		>, 
 		"Trait has failed"
