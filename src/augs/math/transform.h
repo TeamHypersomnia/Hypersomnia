@@ -1,12 +1,8 @@
 #pragma once
 #include <type_traits>
 
-#include "augs/math/rects.h"
 #include "augs/math/vec2.h"
 #include "augs/math/si_scaling.h"
-
-struct b2Sweep;
-struct b2Transform;
 
 template <class T>
 struct basic_transform {
@@ -73,12 +69,18 @@ struct basic_transform {
 		return pos == b.pos && rotation == b.rotation;
 	}
 
-	template <class = std::enable_if_t<std::is_same_v<T, real32>>>
+	template <
+		class b2_transform_type, 
+		class b2_sweep_type, 
+		class K = T,
+		class = std::enable_if_t<std::is_same_v<K, real32>>
+	>
 	void to_box2d_transforms(
-		b2Transform& m_xf,
-		b2Sweep& m_sweep
+		b2_transform_type& m_xf,
+		b2_sweep_type& m_sweep
 	) const {
-		m_xf.p = b2Vec2(pos);
+		m_xf.p.x = pos.x;
+		m_xf.p.y = pos.y;
 		m_xf.q.Set(rotation);
 
 		m_sweep.localCenter.SetZero();

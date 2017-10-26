@@ -123,11 +123,6 @@ namespace augs {
 		a = get_clamped(a, min_a, max_a);
 	}
 
-	template <class vec, class d>
-	vec& rotate(vec& v, const vec& origin, const d angle) {
-		return rotate_radians(v, origin, angle * DEG_TO_RAD<d>);
-	}
-
 	template <class T, class d>
 	basic_vec2<T>& rotate_radians(basic_vec2<T>& v, const basic_vec2<T>& origin, const d angle) {
 		const auto s = static_cast<typename basic_vec2<T>::real>(sin(angle));
@@ -140,6 +135,11 @@ namespace augs {
 		rotated.y = static_cast<T>(v.x * s + v.y * c);
 
 		return v = (rotated + origin);
+	}
+
+	template <class vec, class d>
+	vec& rotate(vec& v, const vec& origin, const d angle) {
+		return rotate_radians(v, origin, angle * DEG_TO_RAD<d>);
 	}
 }
 

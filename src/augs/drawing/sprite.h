@@ -1,11 +1,14 @@
 #pragma once
-
-#include "augs/drawing/drawing_input_base.h"
+#include "augs/pad_bytes.h"
 
 #include "augs/ensure.h"
+
 #include "augs/math/vec2.h"
+#include "augs/math/rects.h"
 
 #include "augs/graphics/vertex.h"
+
+#include "augs/drawing/drawing_input_base.h"
 #include "augs/drawing/drawing.h"
 
 #include "augs/texture_atlas/texture_atlas_entry.h"

@@ -4,13 +4,9 @@
 
 #include "augs/templates/type_list.h"
 
-/*
-	These includes only contain using declarations
-*/
-
-#include "game/components/transform_component.h"
-#include "game/components/sprite_component.h"
-#include "game/components/polygon_component.h"
+#include "game/components/transform_component_declaration.h"
+#include "game/components/sprite_component_declaration.h"
+#include "game/components/polygon_component_declaration.h"
 
 namespace components {
 	struct tree_of_npo_node;

@@ -4,6 +4,8 @@
 #include "augs/misc/value_meter.h"
 #include "augs/misc/timing/stepped_timing.h"
 
+#include "augs/math/vec2.h"
+
 #include "augs/graphics/rgba.h"
 
 #include "game/assets/ids/sound_buffer_id.h"
