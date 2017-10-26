@@ -15,7 +15,7 @@ struct step_packaged_for_network {
 	guid_mapped_entropy entropy;
 };
 
-#if READWRITE_TRAITS_INCLUDED
+#if READWRITE_OVERLOAD_TRAITS_INCLUDED
 #error "I/O traits were included BEFORE I/O overloads, which may cause them to be omitted under some compilers."
 #endif
 
@@ -42,19 +42,19 @@ namespace augs {
 
 	template<class A>
 	void write_object(A& ar, const step_packaged_for_network& written) {
-		augs::write(ar, written.step_type);
+		write(ar, written.step_type);
 
 		if (written.step_type == step_packaged_for_network::type::NEW_ENTROPY) {
-			augs::write(ar, written.shall_reinfer);
-			augs::write(ar, written.next_client_commands_accepted);
-			augs::write(ar, written.entropy);
+			write(ar, written.shall_reinfer);
+			write(ar, written.next_client_commands_accepted);
+			write(ar, written.entropy);
 
 		}
 		else if (written.step_type == step_packaged_for_network::type::NEW_ENTROPY_WITH_HEARTBEAT) {
-			augs::write(ar, written.next_client_commands_accepted);
-			augs::write(ar, written.entropy);
+			write(ar, written.next_client_commands_accepted);
+			write(ar, written.entropy);
 
-			augs::write_stream_with_size(ar, written.delta);
+			write_stream_with_size(ar, written.delta);
 		}
 		else {
 			ensure(false);

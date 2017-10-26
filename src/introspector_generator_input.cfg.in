@@ -53,10 +53,12 @@ generated-file-format:
 #include <tuple>
 #include <array>
 
+#include "augs/drawing/flip.h"
 #include "augs/misc/trivially_copyable_tuple.h"
 #include "augs/misc/imgui/imguicol_helper.h"
 #include "augs/templates/for_each_std_get.h"
 #include "augs/templates/container_templates.h"
+#include "game/transcendental/cosmic_types.h"
 
 #define FIELD(x) f(#x, _t_.x...)
 

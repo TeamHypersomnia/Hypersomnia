@@ -9,7 +9,7 @@
 #include "augs/templates/container_traits.h"
 #include "augs/templates/recursive.h"
 #include "augs/templates/byte_type_for.h"
-#include "augs/readwrite/readwrite_traits.h"
+#include "augs/readwrite/readwrite_overload_traits.h"
 
 namespace augs {
 	class output_stream_reserver;

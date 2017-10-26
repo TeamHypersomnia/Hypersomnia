@@ -1,7 +1,7 @@
 #pragma once
 #include <type_traits>
 
-#define READWRITE_TRAITS_INCLUDED 1
+#define READWRITE_OVERLOAD_TRAITS_INCLUDED 1
 
 namespace augs {
 	class output_stream_reserver;

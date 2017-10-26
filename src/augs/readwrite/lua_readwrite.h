@@ -15,7 +15,7 @@
 
 #include "augs/filesystem/file.h"
 
-#include "augs/readwrite/readwrite_traits.h"
+#include "augs/readwrite/readwrite_overload_traits.h"
 #include "augs/readwrite/lua_traits.h"
 
 namespace augs {
