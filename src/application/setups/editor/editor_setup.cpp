@@ -348,13 +348,18 @@ void editor_setup::perform_custom_imgui(
 				if (item_if_tabs("Paste", "CTRL+V")) {}
 				ImGui::Separator();
 
-				if (item_if_tabs_and(BUILD_TEST_SCENES, "Fill with minimal scene", "SHIFT+F5")) {
+#if BUILD_TEST_SCENES
+				if (item_if_tabs("Fill with minimal scene", "SHIFT+F5")) {
 					fill_with_minimal_scene(lua);
 				}
 
-				if (item_if_tabs_and(BUILD_TEST_SCENES, "Fill with test scene")) {
+				if (item_if_tabs("Fill with test scene")) {
 					fill_with_test_scene(lua);
 				}
+#else
+				if (item_if_tabs_and(false, "Fill with minimal scene", "SHIFT+F5")) {}
+				if (item_if_tabs(false, "Fill with test scene")) {}
+#endif
 			}
 			if (auto menu = scoped_menu("View")) {
 				if (item_if_tabs("Summary")) {
