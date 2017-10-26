@@ -12,7 +12,6 @@
 
 #include "augs/readwrite/lua_readwrite.h"
 
-
 config_lua_table::config_lua_table(sol::state& lua, const augs::path_type& config_lua_path) {
 	try {
 		augs::load_from_lua_table(lua, *this, config_lua_path);

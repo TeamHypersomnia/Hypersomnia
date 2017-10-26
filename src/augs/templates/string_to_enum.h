@@ -1,8 +1,8 @@
 #pragma once
 #include <string>
 #include <unordered_map>
+
 #include "augs/templates/enum_introspect.h"
-#include "augs/templates/introspection_traits.h"
 
 namespace augs {
 	template <class Enum>

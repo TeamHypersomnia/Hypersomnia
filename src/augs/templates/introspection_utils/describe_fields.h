@@ -1,9 +1,19 @@
 #pragma once
-#include "augs/templates/conditional_to_string.h"
 #include "augs/templates/string_templates.h"
 #include "augs/templates/introspect.h"
 #include "augs/templates/recursive.h"
 #include "augs/misc/typesafe_sprintf.h"
+
+template <class T>
+std::string conditional_to_string(const T& t) {
+	if constexpr(can_stream_left_v<std::ostringstream, T>) {
+		std::ostringstream out;
+		out << t;
+		return out.str();
+	}
+
+	return {};
+}
 
 template <class T>
 auto describe_fields(const T& object) {

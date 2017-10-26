@@ -1,11 +1,10 @@
 #include "processing_lists_system.h"
+#include "augs/templates/enum_introspect.h"
 #include "game/components/force_joint_component.h"
 
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 #include "augs/templates/container_templates.h"
-#include "augs/templates/enum_introspect.h"
-
 
 
 void processing_lists_system::destroy_inferred_state_of(const const_entity_handle handle) {

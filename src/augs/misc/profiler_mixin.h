@@ -1,4 +1,5 @@
 #pragma once
+#include "augs/templates/introspect_declaration.h"
 #include "augs/misc/measurements.h"
 #include "augs/misc/scope_guard.h"
 

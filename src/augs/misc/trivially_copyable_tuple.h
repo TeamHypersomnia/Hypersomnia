@@ -1,7 +1,6 @@
 #pragma once
 #include "augs/ensure.h"
 
-#include "augs/templates/triviality_traits.h"
 #include "augs/templates/type_list.h"
 #include "augs/templates/for_each_std_get.h"
 #include "augs/templates/constexpr_arithmetic.h"
@@ -18,7 +17,9 @@ namespace augs {
 			for_each_through_std_get(
 				*this,
 				[this](auto& field){
-					ensure((char*)&field >= (char*)buf && (char*)&field + sizeof(std::decay_t<decltype(field)>) <= buf + sum_sizes_of_types_in_list_v<type_list<Types...>>)
+					ensure(reinterpret_cast<char*>(&field) >= (char*)buf);
+					ensure(reinterpret_cast<char*>(&field) + sizeof(std::decay_t<decltype(field)>) <= buf + sum_sizes_of_types_in_list_v<type_list<Types...>>);
+
 					new (&field) std::decay_t<decltype(field)>;
 				}
 			);
@@ -34,16 +35,11 @@ namespace augs {
 	};
 }
 
-#include "augs/templates/static_assert_helpers.h"
-
 namespace std {
 	template <std::size_t I, class... Types>
 	auto& get(augs::trivially_copyable_tuple<Types...>& t) {
 		static constexpr std::size_t offset = sum_sizes_until_nth_v<I, type_list<Types...>>;
 		using type = nth_type_in_t<I, Types...>;
-
-		static_assert_print<offset < sizeof(t), _types<type>, _vals<std::size_t, I, offset, sizeof(t)>>();
-		static_assert_print<offset + sizeof(type) <= sizeof(t), _types<type>, _vals<std::size_t, I, offset + sizeof(type), sizeof(t)>>();
 
 		return *reinterpret_cast<type*>(t.data() + offset);
 	}
@@ -53,23 +49,16 @@ namespace std {
 		static constexpr std::size_t offset = sum_sizes_until_nth_v<I, type_list<Types...>>;
 		using type = nth_type_in_t<I, Types...>;
 
-		static_assert_print<offset < sizeof(t), _types<type>, _vals<std::size_t, I, offset, sizeof(t)>>();
-		static_assert_print<offset + sizeof(type) <= sizeof(t), _types<type>, _vals<std::size_t, I, offset + sizeof(type), sizeof(t)>>();
-
 		return *reinterpret_cast<const type*>(t.data() + offset);
 	}
 	
 	template<class T, class... Types>
 	auto& get(augs::trivially_copyable_tuple<Types...>& t) {
-		static_assert(count_occurences_in_v<T, Types...> != 0, "Type not found in the tuple!");
-		static_assert(count_occurences_in_v<T, Types...> == 1, "The type occurs in the tuple more than once!");
 		return get<index_in_v<T, Types...>>(t);
 	}
 	
 	template<class T, class... Types>
 	const auto& get(const augs::trivially_copyable_tuple<Types...>& t) {
-		static_assert(count_occurences_in_v<T, Types...> != 0, "Type not found in the tuple!");
-		static_assert(count_occurences_in_v<T, Types...> == 1, "The type occurs in the tuple more than once!");
 		return get<index_in_v<T, Types...>>(t);
 	}
 }

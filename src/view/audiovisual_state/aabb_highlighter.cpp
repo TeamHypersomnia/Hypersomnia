@@ -1,4 +1,5 @@
 #include "augs/drawing/drawing.h"
+#include "augs/templates/introspect.h"
 
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
@@ -6,7 +7,6 @@
 
 #include "view/audiovisual_state/systems/interpolation_system.h"
 #include "view/audiovisual_state/aabb_highlighter.h"
-
 
 
 void aabb_highlighter::update(const augs::delta dt) {

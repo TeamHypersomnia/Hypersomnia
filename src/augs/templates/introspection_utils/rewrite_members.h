@@ -1,6 +1,5 @@
 #pragma once
-#include "augs/templates/introspect.h"
-#include "augs/templates/recursive.h"
+#include "augs/templates/introspect_declaration.h"
 
 template <
 	class destination_type,

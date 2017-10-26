@@ -10,6 +10,7 @@
 #include "augs/misc/timing/delta.h"
 #include "augs/misc/enum/enum_boolset.h"
 #include "augs/templates/subscript_handle_getters_mixin.h"
+#include "augs/templates/introspection_utils/rewrite_members.h"
 #include "augs/misc/enum/enum_associative_array.h"
 
 #include "augs/entity_system/operations_on_all_components_mixin.h"

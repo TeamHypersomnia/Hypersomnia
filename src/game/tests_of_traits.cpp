@@ -21,6 +21,8 @@
 #include "augs/readwrite/lua_readwrite.h"
 #include "augs/readwrite/byte_readwrite.h"
 
+#include "3rdparty/imgui/imgui.h"
+
 namespace templates_detail {
 	template <class T>
 	struct identity {
@@ -32,6 +34,8 @@ namespace templates_detail {
 }
 
 struct tests_of_traits {
+	static_assert(static_cast<int>(imguicol_helper::ImGuiCol_COUNT) == static_cast<int>(ImGuiCol_COUNT));
+
 	static_assert(augs::has_readwrite_overloads_v<augs::stream, augs::path_type>);
 	static_assert(augs::has_readwrite_overloads_v<augs::stream, cosmos>);
 

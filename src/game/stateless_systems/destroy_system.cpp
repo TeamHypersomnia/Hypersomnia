@@ -1,3 +1,4 @@
+#include "augs/templates/introspect.h"
 #include "destroy_system.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_id.h"
@@ -9,7 +10,6 @@
 #include "game/transcendental/logic_step.h"
 
 #include "augs/ensure.h"
-
 
 #include "game/organization/all_component_includes.h"
 

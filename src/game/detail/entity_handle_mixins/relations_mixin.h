@@ -3,7 +3,7 @@
 
 #include "augs/build_settings/platform_defines.h"
 
-#include "augs/templates/introspect.h"
+#include "augs/templates/introspect_declaration.h"
 #include "augs/templates/maybe_const.h"
 
 #include "game/build_settings.h"

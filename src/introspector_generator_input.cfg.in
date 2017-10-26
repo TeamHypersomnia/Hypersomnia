@@ -23,20 +23,26 @@ introspector-body-format:
 %x		}
 
 enum-field-format:
-		case %x::%x: return "%x";
+		case T::%x: return "%x";
 enum-introspector-body-format:
-	template <class... T>
-	const char* enum_to_string(const %x e, T...) {
+	template <class... A>
+	const char* enum_to_string(const %x e, A...) {
+		/* Make dependent */
+		using T = std::conditional_t<sizeof...(A) == 0, decltype(e), int>;
+
 		switch(e) {
 %x		default: return "Invalid";
 		}
 	}
 
 enum-arg-format:
-			%x::%x
+			T::%x
 enum-to-args-body-format:
 	template <class F>
-	void enum_to_args_impl(const %x, F f) {
+	void enum_to_args_impl(const %x e, F f) {
+		/* Make dependent */
+		using T = std::conditional_t<std::is_same_v<F, int>, int, decltype(e)>;
+
 		f(
 %x		);
 	}
@@ -48,11 +54,9 @@ generated-file-format:
 #include <array>
 
 #include "augs/misc/trivially_copyable_tuple.h"
+#include "augs/misc/imgui/imguicol_helper.h"
 #include "augs/templates/for_each_std_get.h"
-#include "augs/templates/string_templates.h"
-
-#include "game/transcendental/entity_id_declaration.h"
-#include "game/transcendental/cosmic_types.h"
+#include "augs/templates/container_templates.h"
 
 #define FIELD(x) f(#x, _t_.x...)
 
@@ -62,7 +66,7 @@ namespace augs {
 	namespace event {
 		namespace keys {
 			enum class key;
-			std::wstring key_to_wstring(const key);
+			std::string key_to_string(const key);
 		}
 	}
 }
@@ -76,9 +80,9 @@ struct ImVec4;
 
 	template <class... T>
 	std::string enum_to_string(const event::keys::key k, T...) {
-		auto wstr = event::keys::key_to_wstring(k);
-		str_ops(wstr).replace_all(L" ", L"");
-		return std::string(wstr.begin(), wstr.end());
+		auto str = event::keys::key_to_string(k);
+		erase_if(str, [](const auto ch) { return ch == ' '; });
+		return str;
 	}
 
 	/* Generated introspectors begin here */
@@ -164,7 +168,7 @@ struct ImVec4;
 			F f,
 			Instances&... _t_
 		) {
-#define imcol(x) f(#x, _t_.Colors[x]...)
+#define imcol(x) f(#x, _t_.Colors[static_cast<std::size_t>(imguicol_helper::x)]...)
 			FIELD(Alpha);                      
 			FIELD(WindowPadding);              
 			FIELD(WindowMinSize);              
