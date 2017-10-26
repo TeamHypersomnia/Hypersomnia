@@ -128,10 +128,10 @@ TEST_CASE("NetChannelWrapper FlagForDeletionAndAck") {
 
 	b.handle_incoming_packet(sender_packets[0]);
 	int table[4];
-	augs::read(sender_packets[0], table[0]);
-	augs::read(sender_packets[0], table[1]);
-	augs::read(sender_packets[0], table[2]);
-	augs::read(sender_packets[0], table[3]);
+	augs::read_bytes(sender_packets[0], table[0]);
+	augs::read_bytes(sender_packets[0], table[1]);
+	augs::read_bytes(sender_packets[0], table[2]);
+	augs::read_bytes(sender_packets[0], table[3]);
 
 	//REQUIRE(0 == table[0]);
 	//REQUIRE(1 == table[1]);

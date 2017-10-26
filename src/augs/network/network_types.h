@@ -55,10 +55,10 @@ namespace augs {
 
 	template<class A>
 	void read_object_bytes(A& ar, network::message& s) {
-		read(ar, s.message_type);
-		read(ar, s.address);
-		read_stream_with_properties(ar, s.payload);
-		read(ar, s.messages_to_skip);
+		augs::read_bytes(ar, s.message_type);
+		augs::read_bytes(ar, s.address);
+		augs::read_stream_with_properties(ar, s.payload);
+		augs::read_bytes(ar, s.messages_to_skip);
 	}
 
 	template<class A>

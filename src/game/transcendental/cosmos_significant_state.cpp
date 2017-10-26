@@ -75,7 +75,7 @@ std::size_t cosmos_significant_state::get_first_mismatch_pos(const cosmos_signif
 	//}
 	
 	//cosmos_significant_state resultant;
-	//augs::read(second_serialized, resultant);
+	//augs::read_bytes(second_serialized, resultant);
 
 	//if(found_mismatch)
 	//	LOG("C1: %x\nC2: %x, mismatch: %x", this_serialized.to_string(), second_serialized.to_string(), mismatch_byte);

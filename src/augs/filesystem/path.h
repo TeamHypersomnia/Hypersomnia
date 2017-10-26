@@ -15,7 +15,7 @@ namespace augs {
 		path_type& storage
 	) {
 		std::string str;
-		read(ar, str);
+		augs::read_bytes(ar, str);
 		storage = str;
 	}
 

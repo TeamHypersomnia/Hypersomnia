@@ -1,4 +1,5 @@
 #pragma once
+#include <algorithm>
 #include <type_traits>
 
 #include "augs/ensure.h"
@@ -38,7 +39,7 @@ namespace augs {
 	}
 
 	template <class Archive, class Serialized>
-	void read(
+	void read_bytes(
 		Archive& ar,
 		Serialized& storage,
 		std::enable_if_t<is_byte_stream_v<Archive>>* dummy = nullptr
@@ -53,11 +54,11 @@ namespace augs {
 		}
 		else if constexpr(is_optional_v<Serialized>) {
 			bool has_value = false;
-			read(ar, has_value);
+			read_bytes(ar, has_value);
 
 			if (has_value) {
 				typename Serialized::value_type value;
-				read(ar, value);
+				read_bytes(ar, value);
 				storage.emplace(std::move(value));
 			}
 		}
@@ -72,7 +73,7 @@ namespace augs {
 					using T = std::decay_t<decltype(member)>;
 					
 					if constexpr (!is_padding_field_v<T>) {
-						read(ar, member);
+						read_bytes(ar, member);
 					}
 				},
 				storage
@@ -135,7 +136,7 @@ namespace augs {
 		}
 		else {
 			for (std::size_t i = 0; i < n; ++i) {
-				read(ar, storage[i]);
+				read_bytes(ar, storage[i]);
 			}
 		}
 	}
@@ -163,7 +164,7 @@ namespace augs {
 		container_size_type = container_size_type()
 	) {
 		container_size_type s;
-		read(ar, s);
+		read_bytes(ar, s);
 
 		if (s == 0) {
 			return;
@@ -183,8 +184,8 @@ namespace augs {
 					typename Container::key_type key{};
 					typename Container::mapped_type mapped{};
 
-					read(ar, key);
-					read(ar, mapped);
+					read_bytes(ar, key);
+					read_bytes(ar, mapped);
 
 					storage.emplace(std::move(key), std::move(mapped));
 				}
@@ -193,7 +194,7 @@ namespace augs {
 				while (s--) {
 					typename Container::value_type val;
 
-					read(ar, val);
+					read_bytes(ar, val);
 
 					storage.emplace(std::move(val));
 				}
@@ -228,7 +229,7 @@ namespace augs {
 		container_size_type = {}
 	) {
 		container_size_type c;
-		read(ar, c);
+		read_bytes(ar, c);
 		storage.reserve(c);
 	}
 
@@ -241,10 +242,10 @@ namespace augs {
 
 	template<class Archive, std::size_t count>
 	void read_flags(Archive& ar, std::array<bool, count>& storage) {
-		static_assert(count > 0, "Can't read a null array");
+		static_assert(count > 0, "Can't read_bytes a null array");
 
 		std::array<std::byte, (count - 1) / 8 + 1> compressed_storage;
-		read(ar, compressed_storage);
+		read_bytes(ar, compressed_storage);
 
 		for (std::size_t bit = 0; bit < count; ++bit) {
 			storage[bit] = std::to_integer<int>((compressed_storage[bit / 8] >> (bit % 8)) & static_cast<std::byte>(1)) != 0;

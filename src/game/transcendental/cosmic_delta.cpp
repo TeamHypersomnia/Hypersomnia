@@ -269,7 +269,7 @@ void cosmic_delta::decode(
 
 	bool has_anything_changed = false;
 
-	augs::read(in, has_anything_changed);
+	augs::read_bytes(in, has_anything_changed);
 
 	if (!has_anything_changed) {
 		return;
@@ -283,9 +283,9 @@ void cosmic_delta::decode(
 
 	delted_stream_of_entities dt;
 
-	augs::read(in, dt.new_entities);
-	augs::read(in, dt.changed_entities);
-	augs::read(in, dt.deleted_entities);
+	augs::read_bytes(in, dt.new_entities);
+	augs::read_bytes(in, dt.changed_entities);
+	augs::read_bytes(in, dt.deleted_entities);
 
 	size_t new_guids = dt.new_entities;
 	std::vector<entity_id> new_entities_ids;
@@ -294,7 +294,7 @@ void cosmic_delta::decode(
 #if COSMOS_TRACKS_GUIDS
 		entity_guid new_guid;
 
-		augs::read(in, new_guid);
+		augs::read_bytes(in, new_guid);
 		
 		new_entities_ids.emplace_back(deco.create_entity_with_specific_guid(new_guid));
 #else
@@ -334,7 +334,7 @@ void cosmic_delta::decode(
 	while (dt.changed_entities--) {
 		entity_guid guid_of_changed;
 		
-		augs::read(in, guid_of_changed);
+		augs::read_bytes(in, guid_of_changed);
 		
 		const auto changed_entity = deco[guid_of_changed];
 
@@ -381,7 +381,7 @@ void cosmic_delta::decode(
 #if COSMOS_TRACKS_GUIDS
 		entity_guid guid_of_destroyed;
 
-		augs::read(in, guid_of_destroyed);
+		augs::read_bytes(in, guid_of_destroyed);
 		
 		deco.delete_entity(deco[guid_of_destroyed]);
 #else

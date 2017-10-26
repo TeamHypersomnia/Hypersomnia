@@ -23,18 +23,18 @@ struct step_packaged_for_network {
 namespace augs {
 	template<class A>
 	void read_object_bytes(A& ar, step_packaged_for_network& storage) {
-		read(ar, storage.step_type);
+		augs::read_bytes(ar, storage.step_type);
 
 		if (storage.step_type == step_packaged_for_network::type::NEW_ENTROPY) {
-			read(ar, storage.shall_reinfer);
-			read(ar, storage.next_client_commands_accepted);
-			read(ar, storage.entropy);
+			augs::read_bytes(ar, storage.shall_reinfer);
+			augs::read_bytes(ar, storage.next_client_commands_accepted);
+			augs::read_bytes(ar, storage.entropy);
 		}
 		else if (storage.step_type == step_packaged_for_network::type::NEW_ENTROPY_WITH_HEARTBEAT) {
-			read(ar, storage.next_client_commands_accepted);
-			read(ar, storage.entropy);
+			augs::read_bytes(ar, storage.next_client_commands_accepted);
+			augs::read_bytes(ar, storage.entropy);
 
-			read_stream_with_size(ar, storage.delta);
+			augs::read_stream_with_size(ar, storage.delta);
 		}
 		else {
 			ensure(false);

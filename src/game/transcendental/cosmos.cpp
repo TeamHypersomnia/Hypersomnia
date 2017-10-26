@@ -523,7 +523,7 @@ namespace augs {
 		});
 
 		auto scope = measure_scope(profiler.deserialization_pass);
-		read(from, cosm.significant);
+		augs::read_bytes(from, cosm.significant);
 	}
 
 	void write_object_lua(sol::table ar, const cosmos& cosm) {

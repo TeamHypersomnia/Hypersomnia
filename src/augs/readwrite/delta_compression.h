@@ -103,7 +103,7 @@ namespace augs {
 			bool changed = true;
 
 			if (read_changed_bit) {
-				augs::read(in, changed);
+				augs::read_bytes(in, changed);
 			}
 
 			if (changed) {
@@ -195,7 +195,7 @@ namespace augs {
 			bool changed = true;
 
 			if (read_changed_bit) {
-				augs::read(in, changed);
+				augs::read_bytes(in, changed);
 			}
 
 			if (changed) {
@@ -221,7 +221,7 @@ namespace augs {
 			new_content.set_read_pos(0u);
 
 			if (new_content.size() > 0) {
-				augs::read(new_content, decoded);
+				augs::read_bytes(new_content, decoded);
 			}
 		}
 	};

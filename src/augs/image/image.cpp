@@ -125,8 +125,8 @@ namespace augs {
 		auto in = with_exceptions<std::ifstream>();
 		in.open(path, std::ios::in | std::ios::binary);
 
-		augs::read(in, size);
-		augs::read(in, v);
+		augs::read_bytes(in, size);
+		augs::read_bytes(in, v);
 	}
 	catch (const augs::ifstream_error& err) {
 		throw image_loading_error(

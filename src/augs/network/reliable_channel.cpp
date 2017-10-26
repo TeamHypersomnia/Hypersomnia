@@ -82,7 +82,7 @@ namespace augs {
 
 			input;//name_property("reliable_ack");
 			
-			augs::read(input, reliable_ack);
+			augs::read_bytes(input, reliable_ack);
 			
 			if (sequence_more_recent(reliable_ack, most_recent_acked_sequence)) {
 				auto last_message_of_acked_sequence = sequence_to_reliable_range.find(reliable_ack);
@@ -123,19 +123,19 @@ namespace augs {
 			result_data res;
 
 			input;//name_property("has_reliable");
-			augs::read(input, has_reliable);
+			augs::read_bytes(input, has_reliable);
 
 			/* reliable + maybe unreliable */
 			if (has_reliable) {
 				input;//name_property("sequence");
-				augs::read(input, received_sequence);
+				augs::read_bytes(input, received_sequence);
 				input;//name_property("most_recent_acked_sequence");
-				augs::read(input, update_from_sequence);
+				augs::read_bytes(input, update_from_sequence);
 
 				input;//name_property("first_message");
-				augs::read(input, received_first_message);
+				augs::read_bytes(input, received_first_message);
 				input;//name_property("last_message");
-				augs::read(input, received_message_count);
+				augs::read_bytes(input, received_message_count);
 
 				if (!sequence_more_recent(received_sequence, last_received_sequence)) {
 					return res;

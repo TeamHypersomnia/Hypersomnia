@@ -146,7 +146,7 @@ namespace augs {
 		augs::stream content;
 		get_file_contents_binary_into(path, content);
 
-		read(content, object);
+		augs::read_bytes(content, object);
 	}
 
 	template <class O>
@@ -155,7 +155,7 @@ namespace augs {
 		get_file_contents_binary_into(path, content);
 
 		O object;
-		read(content, object);
+		augs::read_bytes(content, object);
 		return object;
 	}
 
@@ -181,8 +181,8 @@ namespace augs {
 			typename ContainerType::key_type key{};
 			typename ContainerType::mapped_type value{};
 
-			augs::read(source, key);
-			augs::read(source, value);
+			augs::read_bytes(source, key);
+			augs::read_bytes(source, value);
 
 			into.emplace(std::move(key), std::move(value));
 		}

@@ -86,10 +86,10 @@ namespace augs {
 
 		template <class Archive>
 		void read_with_properties(Archive& ar) {
-			augs::read(ar, buf);
-			augs::read(ar, has_read_failed);
-			augs::read(ar, write_pos);
-			augs::read(ar, read_pos);
+			augs::read_bytes(ar, buf);
+			augs::read_bytes(ar, has_read_failed);
+			augs::read_bytes(ar, write_pos);
+			augs::read_bytes(ar, read_pos);
 		}
 
 		void read(std::byte* const data, const std::size_t bytes);
@@ -140,7 +140,7 @@ namespace augs {
 	void read_stream_with_size(A& ar, augs::stream& storage) {
 		std::size_t s;
 
-		read(ar, s);
+		augs::read_bytes(ar, s);
 		
 		storage.reserve(s);
 		storage.set_write_pos(s);
