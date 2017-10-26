@@ -526,7 +526,7 @@ namespace augs {
 		read(from, cosm.significant);
 	}
 
-	void write_object(sol::table ar, const cosmos& cosm) {
+	void write_object_lua(sol::table ar, const cosmos& cosm) {
 #if TODO
 		write(ar, cosm.significant.meta);
 		
@@ -542,7 +542,7 @@ namespace augs {
 #endif
 	}
 
-	void read_object(sol::table ar, cosmos& cosm) {
+	void read_object_lua(sol::table ar, cosmos& cosm) {
 
 	}
 }

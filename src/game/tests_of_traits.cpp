@@ -1,4 +1,3 @@
-
 #include "augs/filesystem/path.h"
 
 #include "augs/readwrite/custom_lua_representations.h"
@@ -38,6 +37,7 @@ struct tests_of_traits {
 
 	static_assert(augs::has_readwrite_overloads_v<augs::stream, augs::path_type>);
 	static_assert(augs::has_readwrite_overloads_v<augs::stream, cosmos>);
+	static_assert(augs::has_lua_readwrite_overloads_v<cosmos>);
 
 	static_assert(b2_maxPolygonVertices == CONVEX_POLY_VERTEX_COUNT);
 

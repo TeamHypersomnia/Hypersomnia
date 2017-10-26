@@ -42,7 +42,7 @@ namespace augs {
 		std::enable_if_t<is_byte_stream_v<Archive>>* dummy = nullptr
 	) {
 		if constexpr(has_read_overload_v<Archive, Serialized>) {
-			static_assert(has_write_overload_v<Archive, Serialized>, "Has read overload, but no write overload.");
+			static_assert(has_write_overload_v<Archive, Serialized>, "Has read_object_binary overload, but no write_object_binary overload.");
 
 			read_object(ar, storage);
 		}
@@ -85,7 +85,7 @@ namespace augs {
 		std::enable_if_t<is_byte_stream_v<Archive>>* dummy = nullptr
 	) {
 		if constexpr(has_write_overload_v<Archive, Serialized>) {
-			static_assert(has_read_overload_v<Archive, std::decay_t<Serialized>&>, "Has write overload, but no read overload.");
+			static_assert(has_read_overload_v<Archive, std::decay_t<Serialized>&>, "Has write_object_binary overload, but no read_object_binary overload.");
 
 			write_object(ar, storage);
 		}

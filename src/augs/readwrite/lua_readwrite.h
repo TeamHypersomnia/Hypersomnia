@@ -15,7 +15,7 @@
 
 #include "augs/filesystem/file.h"
 
-#include "augs/readwrite/readwrite_overload_traits.h"
+#include "augs/readwrite/lua_readwrite_overload_traits.h"
 #include "augs/readwrite/lua_traits.h"
 
 namespace augs {
@@ -70,11 +70,11 @@ namespace augs {
 			"std::optional can only be serialized as a member object."
 		);
 
-		if constexpr(has_read_overload_v<sol::table, Serialized>) {
-			static_assert(has_write_overload_v<sol::table, Serialized>, "Asymmetric overloads provided for a serialized type");
+		if constexpr(has_lua_read_overload_v<Serialized>) {
+			static_assert(has_lua_write_overload_v<Serialized>, "Has read_object_lua overload, but no write_object_lua overload.");
 			
 			sol::table input_table = input_object;
-			read_object(input_table, into);
+			read_object_lua(input_table, into);
 		}
 		else if constexpr(is_variant_v<Serialized>) {
 			sol::table input_table = input_object;
@@ -273,10 +273,10 @@ namespace augs {
 			"std::optional can only be serialized as a member object."
 		);
 
-		if constexpr(has_write_overload_v<sol::table, Serialized>) {
-			static_assert(has_read_overload_v<sol::table, Serialized>, "Asymmetric overloads provided for a serialized type");
+		if constexpr(has_lua_write_overload_v<Serialized>) {
+			static_assert(has_lua_read_overload_v<Serialized>, "Has write_object_lua overload, but no read_object_lua overload.");
 
-			write_object(output_table, from);
+			write_object_lua(output_table, from);
 		}
 		else if constexpr(is_variant_v<Serialized>) {
 			std::visit(

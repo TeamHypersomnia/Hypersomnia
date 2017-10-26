@@ -389,7 +389,7 @@ inline std::size_t cosmos::get_maximum_entities() const {
 	return significant.entity_pool.capacity();
 }
 
-#if READWRITE_OVERLOAD_TRAITS_INCLUDED
+#if READWRITE_OVERLOAD_TRAITS_INCLUDED || LUA_READWRITE_OVERLOAD_TRAITS_INCLUDED
 #error "I/O traits were included BEFORE I/O overloads, which may cause them to be omitted under some compilers."
 #endif
 
@@ -397,6 +397,6 @@ namespace augs {
 	void write_object(augs::stream& ar, const cosmos& cosm);
 	void read_object(augs::stream& ar, cosmos& cosm);
 
-	void write_object(sol::table ar, const cosmos& cosm);
-	void read_object(sol::table ar, cosmos& cosm);
+	void write_object_lua(sol::table ar, const cosmos& cosm);
+	void read_object_lua(sol::table ar, cosmos& cosm);
 }
