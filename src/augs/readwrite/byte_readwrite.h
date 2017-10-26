@@ -11,28 +11,30 @@
 #include "augs/readwrite/byte_readwrite_traits.h"
 
 namespace augs {
-	template <class Archive, class Serialized>
-	void read_bytes(
-		Archive& ar, 
-		Serialized* const location, 
-		const std::size_t object_count
-	) {
-		verify_byte_readwrite_safety<Archive, Serialized>();
+	namespace detail {	
+		template <class Archive, class Serialized>
+		void read_bytes(
+			Archive& ar, 
+			Serialized* const location, 
+			const std::size_t object_count
+		) {
+			verify_byte_readwrite_safety<Archive, Serialized>();
 
-		const auto byte_count = object_count * sizeof(Serialized);
-		ar.read(reinterpret_cast<byte_type_for_t<Archive>*>(location), byte_count);
-	}
+			const auto byte_count = object_count * sizeof(Serialized);
+			ar.read(reinterpret_cast<byte_type_for_t<Archive>*>(location), byte_count);
+		}
 
-	template <class Archive, class Serialized>
-	void write_bytes(
-		Archive& ar, 
-		const Serialized* const location, 
-		const std::size_t object_count
-	) {
-		verify_byte_readwrite_safety<Archive, Serialized>();
-		
-		const auto byte_count = object_count * sizeof(Serialized);
-		ar.write(reinterpret_cast<const byte_type_for_t<Archive>*>(location), byte_count);
+		template <class Archive, class Serialized>
+		void write_bytes(
+			Archive& ar, 
+			const Serialized* const location, 
+			const std::size_t object_count
+		) {
+			verify_byte_readwrite_safety<Archive, Serialized>();
+			
+			const auto byte_count = object_count * sizeof(Serialized);
+			ar.write(reinterpret_cast<const byte_type_for_t<Archive>*>(location), byte_count);
+		}
 	}
 
 	template <class Archive, class Serialized>
@@ -47,7 +49,7 @@ namespace augs {
 			read_object_bytes(ar, storage);
 		}
 		else if constexpr(is_byte_readwrite_appropriate_v<Archive, Serialized>) {
-			read_bytes(ar, &storage, 1);
+			detail::read_bytes(ar, &storage, 1);
 		}
 		else if constexpr(is_optional_v<Serialized>) {
 			bool has_value = false;
@@ -90,7 +92,7 @@ namespace augs {
 			write_object_bytes(ar, storage);
 		}
 		else if constexpr(is_byte_readwrite_appropriate_v<Archive, Serialized>) {
-			write_bytes(ar, &storage, 1);
+			detail::write_bytes(ar, &storage, 1);
 		}
 		else if constexpr(is_optional_v<Serialized>) {
 			write(ar, storage.has_value());
@@ -129,7 +131,7 @@ namespace augs {
 		const std::size_t n
 	) {
 		if constexpr(is_byte_readwrite_appropriate_v<Archive, Serialized>) {
-			read_bytes(ar, storage, n);
+			detail::read_bytes(ar, storage, n);
 		}
 		else {
 			for (std::size_t i = 0; i < n; ++i) {
@@ -145,7 +147,7 @@ namespace augs {
 		const std::size_t n
 	) {
 		if constexpr(is_byte_readwrite_appropriate_v<Archive, Serialized>) {
-			write_bytes(ar, storage, n);
+			detail::write_bytes(ar, storage, n);
 		}
 		else {
 			for (std::size_t i = 0; i < n; ++i) {
