@@ -1,14 +1,11 @@
-
 #if BUILD_ENET
 #include <enet/enet.h>
 #undef min
 #undef max
 #endif
 
-#include "network_client.h"
-
 #include "augs/misc/readable_bytesize.h"
-#include "augs/readwrite/byte_readwrite.h"
+#include "augs/network/network_client.h"
 
 namespace augs {
 	namespace network {
@@ -182,7 +179,7 @@ namespace augs {
 				case ENET_EVENT_TYPE_RECEIVE:
 					new_event.payload.reserve(event.packet->dataLength);
 					recv_size.measure(event.packet->dataLength);
-					augs::write_bytes(new_event.payload, event.packet->data, event.packet->dataLength);
+					new_event.payload.write(reinterpret_cast<const std::byte*>(event.packet->data), event.packet->dataLength);
 					new_event.message_type = message::type::RECEIVE;
 					new_event.address = event.peer->address;
 

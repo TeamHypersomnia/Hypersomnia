@@ -105,7 +105,7 @@ namespace augs {
 					break;
 				case ENET_EVENT_TYPE_RECEIVE:
 					new_event.payload.reserve(event.packet->dataLength);
-					augs::write_bytes(new_event.payload, event.packet->data, event.packet->dataLength);
+					new_event.payload.write(reinterpret_cast<const std::byte*>(event.packet->data), event.packet->dataLength);
 					new_event.message_type = message::type::RECEIVE;
 					new_event.address = event.peer->address;
 

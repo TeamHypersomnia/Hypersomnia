@@ -1,9 +1,9 @@
 #pragma once
-#include "network_types.h"
-#include "enet_raii.h"
-#include "reliable_channel.h"
-
 #include "augs/misc/measurements.h"
+
+#include "augs/network/network_types.h"
+#include "augs/network/enet_raii.h"
+#include "augs/network/reliable_channel.h"
 
 struct _ENetPeer;
 typedef struct _ENetPeer ENetPeer;
