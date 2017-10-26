@@ -131,7 +131,7 @@ public:
 		return raw_id != id;
 	}
 
-	template <class = std::enable_if_t<!is_const>>
+	template <bool C = is_const, class = std::enable_if_t<!C>>
 	operator const_entity_handle() const {
 		return const_entity_handle(owner, raw_id, ptr);
 	}
@@ -168,7 +168,7 @@ public:
 		}
 	}
 
-	template <class T, class = std::enable_if_t<!is_const>>
+	template <class T, bool C = is_const, class = std::enable_if_t<!is_const>>
 	void add(const T& c) const {
 		check_component_type<T>();
 		ensure(alive());
@@ -182,7 +182,7 @@ public:
 		}
 	}
 
-	template <class T, class = std::enable_if_t<!is_const>>
+	template <class T, bool C = is_const, class = std::enable_if_t<!is_const>>
 	void add(const component_synchronizer<is_const, T>& c) const {
 		add(c.get_raw_component());
 	}
@@ -201,7 +201,7 @@ public:
 		}
 	}
 
-	template<class T, class = std::enable_if_t<!is_const>>
+	template<class T, bool C = is_const, class = std::enable_if_t<!is_const>>
 	void remove() const {
 		check_component_type<T>();
 
@@ -216,13 +216,13 @@ public:
 		}
 	}
 
-	template <class = std::enable_if_t<!is_const>>
+	template <bool C = is_const, class = std::enable_if_t<!is_const>>
 	basic_entity_handle<is_const> add_standard_components(const logic_step step, const bool activate_inferred) const;
 
-	template <class = std::enable_if_t<!is_const>>
+	template <bool C = is_const, class = std::enable_if_t<!is_const>>
 	basic_entity_handle<is_const> add_standard_components(const logic_step step) const;
 
-	template <class = std::enable_if_t<!is_const>>
+	template <bool C = is_const, class = std::enable_if_t<!is_const>>
 	void recalculate_basic_processing_categories() const;
 
 	bool get_flag(const entity_flag f) const {
@@ -236,7 +236,7 @@ public:
 		return from.values.test(f);
 	}
 
-	template <class = std::enable_if_t<!is_const>>
+	template <bool C = is_const, class = std::enable_if_t<!is_const>>
 	void set_flag(const entity_flag f) const {
 		ensure(alive());
 		if (!has<components::flags>()) {
@@ -246,7 +246,7 @@ public:
 		get<components::flags>().values.set(f, true);
 	}
 
-	template<class = std::enable_if_t<!is_const>>
+	template <bool C = is_const, class = std::enable_if_t<!is_const>>
 	void unset_flag(const entity_flag f) const {
 		ensure(alive());
 		if (!has<components::flags>()) {
@@ -288,7 +288,7 @@ public:
 		return get<components::name>().get_name();
 	}
 
-	template <class = std::enable_if_t<!is_const>>
+	template <bool C = is_const, class = std::enable_if_t<!is_const>>
 	void set_name(const entity_name_type& new_name) const;
 
 	bool is_inferred_state_activated() const {

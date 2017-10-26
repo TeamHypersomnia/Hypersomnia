@@ -16,12 +16,11 @@ class cosmos;
 
 template <bool is_const>
 class basic_inventory_slot_handle {
-	typedef basic_entity_handle<is_const> entity_handle_type;
-	
-	typedef maybe_const_ref_t<is_const, cosmos> owner_reference;
-	typedef maybe_const_ref_t<is_const, inventory_slot> slot_reference;
-	typedef maybe_const_ptr_t<is_const, inventory_slot> slot_pointer;
+	using owner_reference = maybe_const_ref_t<is_const, cosmos>;
+	using slot_reference = maybe_const_ref_t<is_const, inventory_slot>;
+	using slot_pointer = maybe_const_ptr_t<is_const, inventory_slot>;
 
+	using entity_handle_type = basic_entity_handle<is_const>;
 public:
 	static constexpr bool is_const_value = is_const;
 	

@@ -1,8 +1,5 @@
-#include "behaviour_tree.h"
-
 #include "augs/ensure.h"
-
-#include "game/transcendental/entity_handle.h"
+#include "game/assets/behaviour_tree.h"
 
 behaviour_tree::state_of_traversal::state_of_traversal(
 	const logic_step step,
