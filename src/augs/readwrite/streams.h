@@ -78,10 +78,10 @@ namespace augs {
 
 		template <class Archive>
 		void write_with_properties(Archive& ar) const {
-			augs::write(ar, buf);
-			augs::write(ar, has_read_failed);
-			augs::write(ar, write_pos);
-			augs::write(ar, read_pos);
+			augs::write_bytes(ar, buf);
+			augs::write_bytes(ar, has_read_failed);
+			augs::write_bytes(ar, write_pos);
+			augs::write_bytes(ar, read_pos);
 		}
 
 		template <class Archive>
@@ -132,8 +132,8 @@ namespace augs {
 	template <class A>
 	void write_stream_with_size(A& ar, const augs::stream& storage) {
 		ensure(storage.get_read_pos() == 0);
-		write(ar, storage.size());
-		write_n(ar, storage.data(), storage.size());
+		augs::write_bytes(ar, storage.size());
+		detail::write_bytes_n(ar, storage.data(), storage.size());
 	}
 
 	template <class A>
@@ -145,6 +145,6 @@ namespace augs {
 		storage.reserve(s);
 		storage.set_write_pos(s);
 		
-		read_n(ar, storage.data(), storage.size());
+		detail::read_bytes_n(ar, storage.data(), storage.size());
 	}
 }

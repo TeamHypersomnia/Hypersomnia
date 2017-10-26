@@ -50,7 +50,7 @@ void regenerate_neon_map(
 	const auto neon_map_stamp_path = augs::path_type(neon_map_path).replace_extension(".stamp");
 
 	augs::stream new_stamp_stream;
-	augs::write(new_stamp_stream, new_stamp);
+	augs::write_bytes(new_stamp_stream, new_stamp);
 
 	bool should_regenerate = force_regenerate;
 

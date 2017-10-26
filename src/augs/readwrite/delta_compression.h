@@ -85,7 +85,7 @@ namespace augs {
 			const bool changed = has_changed();
 
 			if (write_changed_bit) {
-				augs::write(out, changed);
+				augs::write_bytes(out, changed);
 			}
 
 			if (changed) {
@@ -178,7 +178,7 @@ namespace augs {
 			const bool changed = has_changed();
 
 			if (write_changed_bit) {
-				augs::write(out, changed);
+				augs::write_bytes(out, changed);
 			}
 
 			if (changed) {
@@ -209,8 +209,8 @@ namespace augs {
 		) {
 			augs::stream base_content;
 
-			augs::write(base_content, base_object);
-			augs::write(new_content, encoded_object);
+			augs::write_bytes(base_content, base_object);
+			augs::write_bytes(new_content, encoded_object);
 
 			if (new_content == base_content) {
 				new_content.set_write_pos(0u);

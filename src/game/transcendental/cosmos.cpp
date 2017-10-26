@@ -502,7 +502,7 @@ namespace augs {
 
 			{
 				auto scope = measure_scope(profiler.size_calculation_pass);
-				write(reserver, cosm.significant);
+				augs::write_bytes(reserver, cosm.significant);
 			}
 
 			auto scope = measure_scope(profiler.memory_allocation_pass);
@@ -511,7 +511,7 @@ namespace augs {
 
 		{
 			auto scope = measure_scope(profiler.serialization_pass);
-			write(into, cosm.significant);
+			augs::write_bytes(into, cosm.significant);
 		}
 	}
 

@@ -15,8 +15,8 @@ void cosmic_movie_director::save_recording_to_file(const augs::path_type& path) 
 	f.open(path, std::ios::out | std::ios::binary);
 
 	for (const auto& it : step_to_entropy) {
-		augs::write(f, it.first);
-		augs::write(f, it.second);
+		augs::write_bytes(f, it.first);
+		augs::write_bytes(f, it.second);
 	}
 }
 

@@ -331,8 +331,8 @@ namespace augs {
 		augs::create_directories(path);
 
 		std::ofstream out(path, std::ios::out | std::ios::binary);
-		augs::write(out, size);
-		augs::write(out, v);
+		augs::write_bytes(out, size);
+		augs::write_bytes(out, v);
 	}
 
 	void image::fill(const rgba col) {

@@ -136,7 +136,7 @@ namespace augs {
 	template <class O>
 	void save(const O& object, const path_type& path) {
 		augs::stream content;
-		write(content, object);
+		augs::write_bytes(content, object);
 
 		create_binary_file(path, content);
 	}

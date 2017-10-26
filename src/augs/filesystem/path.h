@@ -34,7 +34,7 @@ namespace augs {
 			}
 		}
 
-		write(ar, nice_representation);
+		augs::write_bytes(ar, nice_representation);
 	}
 
 	template <class Archive>

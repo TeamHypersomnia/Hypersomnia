@@ -63,10 +63,10 @@ namespace augs {
 
 	template<class A>
 	void write_object_bytes(A& ar, const network::message& s) {
-		write(ar, s.message_type);
-		write(ar, s.address);
+		augs::write_bytes(ar, s.message_type);
+		augs::write_bytes(ar, s.address);
 		write_stream_with_properties(ar, s.payload);
-		write(ar, s.messages_to_skip);
+		augs::write_bytes(ar, s.messages_to_skip);
 	}
 }
 

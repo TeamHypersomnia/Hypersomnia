@@ -48,8 +48,8 @@ namespace augs {
 					auto recording_file = with_exceptions<std::ofstream>();
 					recording_file.open(live_saving_path, std::ios::out | std::ios::binary | std::ios::app);
 
-					augs::write(recording_file, player_step_position);
-					augs::write(recording_file, total_collected_entropy);
+					augs::write_bytes(recording_file, player_step_position);
+					augs::write_bytes(recording_file, total_collected_entropy);
 				}
 
 				++player_step_position;

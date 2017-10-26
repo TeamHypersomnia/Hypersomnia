@@ -179,22 +179,22 @@ bool cosmic_delta::encode(
 
 		if (is_new) {
 #if COSMOS_TRACKS_GUIDS
-			augs::write(dt.stream_of_new_guids, stream_written_id);
+			augs::write_bytes(dt.stream_of_new_guids, stream_written_id);
 #else
 			// otherwise new entity_id assignment needs be deterministic
 #endif
 
 			augs::write_flags(dt.stream_for_new, overridden_components);
-			augs::write(dt.stream_for_new, new_content);
+			augs::write_bytes(dt.stream_for_new, new_content);
 
 			++dt.new_entities;
 		}
 		else if (has_entity_changed) {
-			augs::write(dt.stream_for_changed, stream_written_id);
+			augs::write_bytes(dt.stream_for_changed, stream_written_id);
 
 			augs::write_flags(dt.stream_for_changed, overridden_components);
 			augs::write_flags(dt.stream_for_changed, removed_components);
-			augs::write(dt.stream_for_changed, new_content);
+			augs::write_bytes(dt.stream_for_changed, new_content);
 
 			++dt.changed_entities;
 		}
@@ -214,7 +214,7 @@ bool cosmic_delta::encode(
 
 		if (is_dead) {
 			++dt.deleted_entities;
-			augs::write(dt.stream_for_deleted, stream_written_id);
+			augs::write_bytes(dt.stream_for_deleted, stream_written_id);
 		}
 	});
 
@@ -235,21 +235,21 @@ bool cosmic_delta::encode(
 	;
 
 	if (has_anything_changed) {
-		augs::write(out, true);
+		augs::write_bytes(out, true);
 
-		augs::write(out, new_meta_content);
+		augs::write_bytes(out, new_meta_content);
 
-		augs::write(out, dt.new_entities);
-		augs::write(out, dt.changed_entities);
-		augs::write(out, dt.deleted_entities);
+		augs::write_bytes(out, dt.new_entities);
+		augs::write_bytes(out, dt.changed_entities);
+		augs::write_bytes(out, dt.deleted_entities);
 
-		augs::write(out, dt.stream_of_new_guids);
-		augs::write(out, dt.stream_for_new);
-		augs::write(out, dt.stream_for_changed);
-		augs::write(out, dt.stream_for_deleted);
+		augs::write_bytes(out, dt.stream_of_new_guids);
+		augs::write_bytes(out, dt.stream_for_new);
+		augs::write_bytes(out, dt.stream_for_changed);
+		augs::write_bytes(out, dt.stream_for_deleted);
 	}
 	else {
-		augs::write(out, false);
+		augs::write_bytes(out, false);
 	}
 
 	enco.profiler.delta_bytes.measure(out.size());

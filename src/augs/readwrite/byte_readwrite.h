@@ -39,11 +39,9 @@ namespace augs {
 	}
 
 	template <class Archive, class Serialized>
-	void read_bytes(
-		Archive& ar,
-		Serialized& storage,
-		std::enable_if_t<is_byte_stream_v<Archive>>* dummy = nullptr
-	) {
+	void read_bytes(Archive& ar, Serialized& storage) {
+		static_assert(is_byte_stream_v<Archive>, "Trying to read from a non-byte stream.");
+
 		if constexpr(has_byte_read_overload_v<Archive, Serialized>) {
 			static_assert(has_byte_write_overload_v<Archive, Serialized>, "Has read_object_bytes overload, but no write_object_bytes overload.");
 
@@ -82,11 +80,9 @@ namespace augs {
 	}
 
 	template <class Archive, class Serialized>
-	void write(
-		Archive& ar,
-		const Serialized& storage,
-		std::enable_if_t<is_byte_stream_v<Archive>>* dummy = nullptr
-	) {
+	void write_bytes(Archive& ar, const Serialized& storage) {
+		static_assert(is_byte_stream_v<Archive>, "Trying to write to a non-byte stream.");
+
 		if constexpr(has_byte_write_overload_v<Archive, Serialized>) {
 			static_assert(has_byte_read_overload_v<Archive, std::decay_t<Serialized>&>, "Has write_object_bytes overload, but no read_object_bytes overload.");
 
@@ -96,10 +92,10 @@ namespace augs {
 			detail::write_bytes(ar, &storage, 1);
 		}
 		else if constexpr(is_optional_v<Serialized>) {
-			write(ar, storage.has_value());
+			write_bytes(ar, storage.has_value());
 
 			if (storage) {
-				write(ar, *storage);
+				write_bytes(ar, *storage);
 			}
 		}
 		else if constexpr(is_container_v<Serialized>) {
@@ -113,7 +109,7 @@ namespace augs {
 					using T = std::decay_t<decltype(member)>;
 
 					if constexpr (!is_padding_field_v<T>) {
-						write(ar, member);
+						write_bytes(ar, member);
 					}
 				},
 				storage
@@ -121,38 +117,36 @@ namespace augs {
 		}
 	}
 	
-	/*
-		Utility functions
-	*/
-
-	template <class Archive, class Serialized>
-	void read_n(
-		Archive& ar,
-		Serialized* const storage,
-		const std::size_t n
-	) {
-		if constexpr(is_byte_readwrite_appropriate_v<Archive, Serialized>) {
-			detail::read_bytes(ar, storage, n);
-		}
-		else {
-			for (std::size_t i = 0; i < n; ++i) {
-				read_bytes(ar, storage[i]);
+	namespace detail {
+		template <class Archive, class Serialized>
+		void read_bytes_n(
+			Archive& ar,
+			Serialized* const storage,
+			const std::size_t n
+		) {
+			if constexpr(is_byte_readwrite_appropriate_v<Archive, Serialized>) {
+				detail::read_bytes(ar, storage, n);
+			}
+			else {
+				for (std::size_t i = 0; i < n; ++i) {
+					augs::read_bytes(ar, storage[i]);
+				}
 			}
 		}
-	}
 
-	template <class Archive, class Serialized>
-	void write_n(
-		Archive& ar,
-		const Serialized* const storage,
-		const std::size_t n
-	) {
-		if constexpr(is_byte_readwrite_appropriate_v<Archive, Serialized>) {
-			detail::write_bytes(ar, storage, n);
-		}
-		else {
-			for (std::size_t i = 0; i < n; ++i) {
-				write(ar, storage[i]);
+		template <class Archive, class Serialized>
+		void write_bytes_n(
+			Archive& ar,
+			const Serialized* const storage,
+			const std::size_t n
+		) {
+			if constexpr(is_byte_readwrite_appropriate_v<Archive, Serialized>) {
+				detail::write_bytes(ar, storage, n);
+			}
+			else {
+				for (std::size_t i = 0; i < n; ++i) {
+					augs::write_bytes(ar, storage[i]);
+				}
 			}
 		}
 	}
@@ -172,7 +166,7 @@ namespace augs {
 
 		if constexpr(can_access_data_v<Container>) {
 			storage.resize(s);
-			read_n(ar, storage.data(), storage.size());
+			detail::read_bytes_n(ar, storage.data(), storage.size());
 		}
 		else {
 			if constexpr(can_reserve_v<Container>) {
@@ -210,14 +204,14 @@ namespace augs {
 	) {
 		const auto s = storage.size();
 		ensure(s <= std::numeric_limits<container_size_type>::max());
-		write(ar, static_cast<container_size_type>(s));
+		write_bytes(ar, static_cast<container_size_type>(s));
 
 		if constexpr(can_access_data_v<Container>) {
-			write_n(ar, storage.data(), storage.size());
+			detail::write_bytes_n(ar, storage.data(), storage.size());
 		}
 		else {
 			for (const auto& obj : storage) {
-				write(ar, obj);
+				write_bytes(ar, obj);
 			}
 		}
 	}
@@ -237,7 +231,7 @@ namespace augs {
 	void write_capacity(Archive& ar, const Container& storage) {
 		const auto c = static_cast<container_size_type>(storage.capacity());
 		ensure(c <= std::numeric_limits<container_size_type>::max());
-		write(ar, c);
+		write_bytes(ar, c);
 	}
 
 	template<class Archive, std::size_t count>
@@ -254,7 +248,7 @@ namespace augs {
 
 	template<class Archive, std::size_t count>
 	void write_flags(Archive& ar, const std::array<bool, count>& storage) {
-		static_assert(count > 0, "Can't write a null array");
+		static_assert(count > 0, "Can't write_bytes a null array");
 
 		std::array<std::byte, (count - 1) / 8 + 1> compressed_storage;
 		std::fill(compressed_storage.begin(), compressed_storage.end(), static_cast<std::byte>(0));
@@ -265,6 +259,6 @@ namespace augs {
 			}
 		}
 
-		write(ar, compressed_storage);
+		write_bytes(ar, compressed_storage);
 	}
 }

@@ -5,7 +5,7 @@ TEST_CASE("NetChannelWrapper SingleTransmissionDeleteAllPending") {
 	augs::stream msg[15];
 
 	for (int i = 0; i < 15; ++i) {
-		augs::write(msg[i], int(i));
+		augs::write_bytes(msg[i], int(i));
 		
 	}
 
@@ -46,7 +46,7 @@ TEST_CASE("NetChannelWrapper PastAcknowledgementDeletesSeveralPending") {
 	augs::stream msg[15];
 
 	for (int i = 0; i < 15; ++i) {
-		augs::write(msg[i], int(i));
+		augs::write_bytes(msg[i], int(i));
 		
 	}
 
@@ -91,7 +91,7 @@ TEST_CASE("NetChannelWrapper FlagForDeletionAndAck") {
 	augs::stream msg[15];
 
 	for (int i = 0; i < 15; ++i) {
-		augs::write(msg[i], int(i));
+		augs::write_bytes(msg[i], int(i));
 		
 	}
 

@@ -17,7 +17,7 @@ void regenerate_image_from_commands(
 	const auto output_image_stamp_path = augs::path_type(output_image_path).replace_extension(".stamp");
 
 	augs::stream new_stamp_stream;
-	augs::write(new_stamp_stream, input);
+	augs::write_bytes(new_stamp_stream, input);
 
 	bool should_regenerate = force_regenerate;
 

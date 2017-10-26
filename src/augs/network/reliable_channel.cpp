@@ -43,19 +43,19 @@ namespace augs {
 
 			for (auto& msg : reliable_buf) {
 				reliable_bs;//name_property("reliable message");
-				augs::write(reliable_bs, msg);
+				augs::write_bytes(reliable_bs, msg);
 			}
 
 			if (reliable_bs.size() > 0) {
 				output;//name_property("has_reliable");
-				augs::write(output, bool(1));
+				augs::write_bytes(output, bool(1));
 				output;//name_property("sequence");
-				augs::write(output, ++sequence);
+				augs::write_bytes(output, ++sequence);
 				output;//name_property("most_recent_acked_sequence");
-				augs::write(output, most_recent_acked_sequence);
+				augs::write_bytes(output, most_recent_acked_sequence);
 
 				output;//name_property("first_message");
-				augs::write(output, first_message);
+				augs::write_bytes(output, first_message);
 				output;//name_property("last_message");
 				
 				//if (last_message - first_message > std::numeric_limits<unsigned char>::max()) {
@@ -64,17 +64,17 @@ namespace augs {
 				//}
 
 				unsigned short msg_count = last_message - first_message;
-				augs::write(output, msg_count);
+				augs::write_bytes(output, msg_count);
 
 				sequence_to_reliable_range[sequence] = last_message;
 			}
 			else {
 				output;//name_property("has_reliable");
-				augs::write(output, bool(0));
+				augs::write_bytes(output, bool(0));
 			}
 
 			output;//name_property("reliable_buffer");
-			augs::write(output, reliable_bs);
+			augs::write_bytes(output, reliable_bs);
 		}
 
 		bool reliable_sender::read_ack(augs::stream& input) {
@@ -155,7 +155,7 @@ namespace augs {
 
 		void reliable_receiver::write_ack(augs::stream& output) {
 			output;//name_property("reliable_ack");
-			augs::write(output, last_received_sequence);
+			augs::write_bytes(output, last_received_sequence);
 		}
 
 		bool reliable_channel::timed_out(const size_t max_unacknowledged_sequences) const {
@@ -200,7 +200,7 @@ namespace augs {
 
 				if (output_bs.size() > 0) {
 					out;//name_property("sender channel");
-					augs::write(out, output_bs);
+					augs::write_bytes(out, output_bs);
 				}
 			//}
 		}
@@ -244,7 +244,7 @@ TEST_CASE("NetChannel SingleTransmissionDeleteAllPending") {
 	augs::stream msg[15];
 
 	for (int i = 0; i < 15; ++i) {
-		augs::write(msg[i], int(i));
+		augs::write_bytes(msg[i], int(i));
 		
 	}
 
@@ -281,7 +281,7 @@ TEST_CASE("NetChannel PastAcknowledgementDeletesSeveralPending") {
 	augs::stream msg[15];
 
 	for (int i = 0; i < 15; ++i) {
-		augs::write(msg[i], int(i));
+		augs::write_bytes(msg[i], int(i));
 		
 	}
 
@@ -327,7 +327,7 @@ TEST_CASE("NetChannel FlagForDeletionAndAck") {
 	augs::stream msg[15];
 
 	for (int i = 0; i < 15; ++i) {
-		augs::write(msg[i], int(i));
+		augs::write_bytes(msg[i], int(i));
 		
 	}
 
@@ -404,7 +404,7 @@ TEST_CASE("NetChannel SequenceNumberOverflowMultipleTries") {
 		augs::stream msg[15];
 
 		for (int i = 0; i < 15; ++i) {
-			augs::write(msg[i], int(i));
+			augs::write_bytes(msg[i], int(i));
 			
 		}
 
@@ -485,7 +485,7 @@ TEST_CASE("NetChannel OutOfDatePackets") {
 		augs::stream msg[15];
 
 		for (int i = 0; i < 15; ++i) {
-			augs::write(msg[i], int(i));
+			augs::write_bytes(msg[i], int(i));
 			
 		}
 

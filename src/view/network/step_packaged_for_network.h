@@ -43,19 +43,19 @@ namespace augs {
 
 	template<class A>
 	void write_object_bytes(A& ar, const step_packaged_for_network& written) {
-		write(ar, written.step_type);
+		augs::write_bytes(ar, written.step_type);
 
 		if (written.step_type == step_packaged_for_network::type::NEW_ENTROPY) {
-			write(ar, written.shall_reinfer);
-			write(ar, written.next_client_commands_accepted);
-			write(ar, written.entropy);
+			augs::write_bytes(ar, written.shall_reinfer);
+			augs::write_bytes(ar, written.next_client_commands_accepted);
+			augs::write_bytes(ar, written.entropy);
 
 		}
 		else if (written.step_type == step_packaged_for_network::type::NEW_ENTROPY_WITH_HEARTBEAT) {
-			write(ar, written.next_client_commands_accepted);
-			write(ar, written.entropy);
+			augs::write_bytes(ar, written.next_client_commands_accepted);
+			augs::write_bytes(ar, written.entropy);
 
-			write_stream_with_size(ar, written.delta);
+			augs::write_stream_with_size(ar, written.delta);
 		}
 		else {
 			ensure(false);
