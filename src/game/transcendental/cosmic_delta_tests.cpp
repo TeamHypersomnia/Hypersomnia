@@ -176,6 +176,8 @@ TEST_CASE("CosmicDelta2 PaddingTest") {
 	for_each_through_std_get(component_list_t<std::tuple>(), assert_component_trivial);
 	for_each_through_std_get(component_list_t<std::tuple>(), padding_checker);
 
+	padding_checker(item_slot_transfer_request());
+
 	component_size_information += typesafe_sprintf("Total size in bytes: %x", total_components_size);
 	augs::create_text_file(LOG_FILES_DIR "components.txt", component_size_information);
 
