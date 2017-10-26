@@ -22,7 +22,7 @@ struct step_packaged_for_network {
 
 namespace augs {
 	template<class A>
-	void read_object(A& ar, step_packaged_for_network& storage) {
+	void read_object_bytes(A& ar, step_packaged_for_network& storage) {
 		read(ar, storage.step_type);
 
 		if (storage.step_type == step_packaged_for_network::type::NEW_ENTROPY) {
@@ -42,7 +42,7 @@ namespace augs {
 	}
 
 	template<class A>
-	void write_object(A& ar, const step_packaged_for_network& written) {
+	void write_object_bytes(A& ar, const step_packaged_for_network& written) {
 		write(ar, written.step_type);
 
 		if (written.step_type == step_packaged_for_network::type::NEW_ENTROPY) {

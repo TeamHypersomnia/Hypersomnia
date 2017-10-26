@@ -316,7 +316,7 @@ namespace augs {
 		}
 
 		template <class Archive>
-		void write_object(Archive& ar) const {
+		void write_object_bytes(Archive& ar) const {
 			auto w = [&ar](const auto& object) {
 				augs::write_capacity(ar, object);
 				augs::write_container(ar, object);
@@ -329,7 +329,7 @@ namespace augs {
 		}
 
 		template <class Archive>
-		void read_object(Archive& ar) {
+		void read_object_bytes(Archive& ar) {
 			auto r = [&ar](auto& object) {
 				augs::read_capacity(ar, object);
 				augs::read_variable_size_container(ar, object);
@@ -349,12 +349,12 @@ namespace augs {
 
 namespace augs {
 	template <class A, class mapped_type, template <class> class C, class S>
-	void read_object(A& ar, pool<mapped_type, C, S>& storage) {
-		storage.read_object(ar);
+	void read_object_bytes(A& ar, pool<mapped_type, C, S>& storage) {
+		storage.read_object_bytes(ar);
 	}
 	
 	template <class A, class mapped_type, template <class> class C, class S>
-	void write_object(A& ar, const pool<mapped_type, C, S>& storage) {
-		storage.write_object(ar);
+	void write_object_bytes(A& ar, const pool<mapped_type, C, S>& storage) {
+		storage.write_object_bytes(ar);
 	}
 }

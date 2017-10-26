@@ -2,7 +2,7 @@
 #include "augs/readwrite/streams.h"
 
 namespace augs {
-	void write_object(augs::stream& ar, const augs::stream& storage) {
+	void write_object_bytes(augs::stream& ar, const augs::stream& storage) {
 		ar.write(storage);
 	}
 

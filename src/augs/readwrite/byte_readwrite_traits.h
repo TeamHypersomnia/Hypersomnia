@@ -22,7 +22,7 @@ namespace augs {
 	constexpr bool is_byte_readwrite_safe_v = is_byte_stream_v<Archive> && std::is_trivially_copyable_v<Serialized>;
 
 	template <class Archive, class Serialized>
-	constexpr bool is_byte_readwrite_appropriate_v = is_byte_readwrite_safe_v<Archive, Serialized> && !has_readwrite_overloads_v<Archive, Serialized>;
+	constexpr bool is_byte_readwrite_appropriate_v = is_byte_readwrite_safe_v<Archive, Serialized> && !has_byte_readwrite_overloads_v<Archive, Serialized>;
 
 	template <class Archive, class Serialized>
 	void verify_byte_readwrite_safety() {

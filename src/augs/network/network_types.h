@@ -54,7 +54,7 @@ namespace augs {
 #endif
 
 	template<class A>
-	void read_object(A& ar, network::message& s) {
+	void read_object_bytes(A& ar, network::message& s) {
 		read(ar, s.message_type);
 		read(ar, s.address);
 		read_stream_with_properties(ar, s.payload);
@@ -62,7 +62,7 @@ namespace augs {
 	}
 
 	template<class A>
-	void write_object(A& ar, const network::message& s) {
+	void write_object_bytes(A& ar, const network::message& s) {
 		write(ar, s.message_type);
 		write(ar, s.address);
 		write_stream_with_properties(ar, s.payload);

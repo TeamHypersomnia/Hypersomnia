@@ -10,7 +10,7 @@ namespace augs {
 #endif
 
 	template <class Archive>
-	void read_object(
+	void read_object_bytes(
 		Archive& ar,
 		path_type& storage
 	) {
@@ -20,7 +20,7 @@ namespace augs {
 	}
 
 	template <class Archive>
-	void write_object(
+	void write_object_bytes(
 		Archive& ar,
 		const path_type& storage
 	) {
@@ -38,16 +38,16 @@ namespace augs {
 	}
 
 	template <class Archive>
-	void write_object(Archive& ar, const std::string& storage) = delete;
+	void write_object_bytes(Archive& ar, const std::string& storage) = delete;
 
 	template <class Archive>
-	void read_object(Archive& ar, std::string& storage) = delete;
+	void read_object_bytes(Archive& ar, std::string& storage) = delete;
 
 	template <class Archive>
-	void write_object(Archive& ar, const std::wstring& storage) = delete;
+	void write_object_bytes(Archive& ar, const std::wstring& storage) = delete;
 
 	template <class Archive>
-	void read_object(Archive& ar, std::wstring& storage) = delete;
+	void read_object_bytes(Archive& ar, std::wstring& storage) = delete;
 
 	inline auto to_display_path(path_type target_path) {
 		auto display_path = target_path.filename();

@@ -119,7 +119,7 @@ namespace augs {
 #endif
 
 	template<class A, class T, class size_type>
-	void read_object(
+	void read_object_bytes(
 		A& ar,
 		container_with_small_size<T, size_type>& storage
 	) {
@@ -127,7 +127,7 @@ namespace augs {
 	}
 
 	template<class A, class T, class size_type>
-	void write_object(
+	void write_object_bytes(
 		A& ar,
 		const container_with_small_size<T, size_type>& storage
 	) {

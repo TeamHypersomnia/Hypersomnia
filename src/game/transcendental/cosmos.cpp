@@ -494,7 +494,7 @@ void cosmos::perform_deletions(const logic_step step) {
 }
 
 namespace augs {
-	void write_object(augs::stream& into, const cosmos& cosm) {
+	void write_object_bytes(augs::stream& into, const cosmos& cosm) {
 		auto& profiler = cosm.profiler;
 
 		{
@@ -515,7 +515,7 @@ namespace augs {
 		}
 	}
 
-	void read_object(augs::stream& from, cosmos& cosm) {
+	void read_object_bytes(augs::stream& from, cosmos& cosm) {
 		auto& profiler = cosm.profiler;
 
 		auto refresh_when_done = augs::make_scope_guard([&cosm]() {

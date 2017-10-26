@@ -7,7 +7,7 @@
 #include "augs/templates/container_traits.h"
 #include "augs/templates/byte_type_for.h"
 
-#include "augs/readwrite/readwrite_overload_traits.h"
+#include "augs/readwrite/byte_readwrite_overload_traits.h"
 #include "augs/readwrite/byte_readwrite_traits.h"
 
 namespace augs {
@@ -41,10 +41,10 @@ namespace augs {
 		Serialized& storage,
 		std::enable_if_t<is_byte_stream_v<Archive>>* dummy = nullptr
 	) {
-		if constexpr(has_read_overload_v<Archive, Serialized>) {
-			static_assert(has_write_overload_v<Archive, Serialized>, "Has read_object_binary overload, but no write_object_binary overload.");
+		if constexpr(has_byte_read_overload_v<Archive, Serialized>) {
+			static_assert(has_byte_write_overload_v<Archive, Serialized>, "Has read_object_bytes overload, but no write_object_bytes overload.");
 
-			read_object(ar, storage);
+			read_object_bytes(ar, storage);
 		}
 		else if constexpr(is_byte_readwrite_appropriate_v<Archive, Serialized>) {
 			read_bytes(ar, &storage, 1);
@@ -84,10 +84,10 @@ namespace augs {
 		const Serialized& storage,
 		std::enable_if_t<is_byte_stream_v<Archive>>* dummy = nullptr
 	) {
-		if constexpr(has_write_overload_v<Archive, Serialized>) {
-			static_assert(has_read_overload_v<Archive, std::decay_t<Serialized>&>, "Has write_object_binary overload, but no read_object_binary overload.");
+		if constexpr(has_byte_write_overload_v<Archive, Serialized>) {
+			static_assert(has_byte_read_overload_v<Archive, std::decay_t<Serialized>&>, "Has write_object_bytes overload, but no read_object_bytes overload.");
 
-			write_object(ar, storage);
+			write_object_bytes(ar, storage);
 		}
 		else if constexpr(is_byte_readwrite_appropriate_v<Archive, Serialized>) {
 			write_bytes(ar, &storage, 1);

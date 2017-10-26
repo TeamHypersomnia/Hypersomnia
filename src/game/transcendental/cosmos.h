@@ -394,8 +394,8 @@ inline std::size_t cosmos::get_maximum_entities() const {
 #endif
 
 namespace augs {
-	void write_object(augs::stream& ar, const cosmos& cosm);
-	void read_object(augs::stream& ar, cosmos& cosm);
+	void write_object_bytes(augs::stream& ar, const cosmos& cosm);
+	void read_object_bytes(augs::stream& ar, cosmos& cosm);
 
 	void write_object_lua(sol::table ar, const cosmos& cosm);
 	void read_object_lua(sol::table ar, cosmos& cosm);
