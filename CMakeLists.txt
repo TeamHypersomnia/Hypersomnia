@@ -517,9 +517,39 @@ if(ADD_APPLICATION_ICON)
 	endif()
 endif()
 
-# We add headers to aid IntelliSense.
+# We arrange the generated sources paths.
+
+set(GENERATORS_OUTPUT_PATH "${PROJECT_BINARY_DIR}/generators_output")
+set(GENERATED_SOURCES_PATH "${GENERATORS_OUTPUT_PATH}/generated")
+
+file(MAKE_DIRECTORY ${GENERATED_SOURCES_PATH})
+
+include_directories(${GENERATORS_OUTPUT_PATH})
+
+set(GENERATED_INTROSPECTORS_HEADER "${GENERATED_SOURCES_PATH}/introspectors.h")
+
+# Before Hypersomnia builds,
+# Introspector-generator must first generate the type information.
+
+# We build the generator of type information required for introspection.
+
+add_subdirectory("${CMAKE_MODULE_PATH}/Introspector-generator")
+
+# We prepare a correct input configuration file for Introspector-generator.
+
+# CMake separates elements of lists with a semicolon, but the Introspector-generator accepts lists separated by newlines.
+# We must correct that.
+
+set(INTROSPECTOR_GENERATOR_INPUT_CONFIG_PATH_TEMPLATE
+	"src/introspector_generator_input.cfg.in"
+)
+
+set(INTROSPECTOR_GENERATOR_INPUT_CONFIG_PATH
+	"${PROJECT_BINARY_DIR}/introspector_generator_input.cfg"
+)
 
 file(GLOB_RECURSE HYPERSOMNIA_HEADERS_WITH_INTROSPECTED_CLASSES
+    "src/hypersomnia_version.h"
 	"src/augs/*.h"
 	"src/game/*.h"
 	"src/view/*.h"
@@ -528,9 +558,34 @@ file(GLOB_RECURSE HYPERSOMNIA_HEADERS_WITH_INTROSPECTED_CLASSES
 	"src/3rdparty/Box2D/Dynamics/*.h"
 )
 
-file(GLOB_RECURSE HYPERSOMNIA_HEADERS
-    "src/hypersomnia_version.h"
-    ${HYPERSOMNIA_HEADERS_WITH_INTROSPECTED_CLASSES}
+# The correct input configuration file shall contain paths to all headers for whom the generator should create introspectors,
+# and should also contain the correct output file path.
+# Thus, that call should substitute:
+# HYPERSOMNIA_HEADERS_WITH_INTROSPECTED_CLASSES_NEWLINE_SEPARATED 
+# and GENERATED_SOURCES_PATH for the output file path.
+
+string (REPLACE ";" "\n" 
+	HYPERSOMNIA_HEADERS_WITH_INTROSPECTED_CLASSES_NEWLINE_SEPARATED 
+	"${HYPERSOMNIA_HEADERS_WITH_INTROSPECTED_CLASSES}"
+)
+
+configure_file(
+	${INTROSPECTOR_GENERATOR_INPUT_CONFIG_PATH_TEMPLATE}
+	${INTROSPECTOR_GENERATOR_INPUT_CONFIG_PATH}
+	@ONLY
+)
+
+add_custom_command(
+	OUTPUT ${GENERATED_INTROSPECTORS_HEADER}
+	COMMAND Introspector-generator ${INTROSPECTOR_GENERATOR_INPUT_CONFIG_PATH}
+	COMMENT "Generating type information for introspection..."
+)
+
+# We add headers to aid IntelliSense.
+
+set(HYPERSOMNIA_HEADERS
+	${HYPERSOMNIA_HEADERS_WITH_INTROSPECTED_CLASSES}
+	${GENERATED_INTROSPECTORS_HEADER}
 )
 
 # We configure include directories for Hypersomnia codebase.
@@ -730,15 +785,6 @@ include_directories(${HYPERSOMNIA_INCLUDE_DIRS})
 
 # We build the source code generators.
 
-# We arrange the output directory for the generated source files.
-
-set(GENERATED_SOURCES_PATH
-	"${PROJECT_BINARY_DIR}/generators_output/generated"
-)
-
-file(MAKE_DIRECTORY ${GENERATED_SOURCES_PATH})
-
-include_directories("${PROJECT_BINARY_DIR}/generators_output")
 
 # We configure the C++ defines in accordance with the currently set options.
 
@@ -795,10 +841,6 @@ endif()
 add_definitions(-DGENERATED_FILES_DIR="${HYPERSOMNIA_GENERATED_FILES_DIR}")
 add_definitions(-DLOCAL_FILES_DIR="${HYPERSOMNIA_LOCAL_FILES_DIR}")
 add_definitions(-DLOG_FILES_DIR="${HYPERSOMNIA_LOG_FILES_DIR}")
-
-# We build the generator of type information required for introspection.
-
-add_subdirectory("${CMAKE_MODULE_PATH}/Introspector-generator")
 
 # We build the generator of commit information.
 
@@ -862,46 +904,6 @@ else()
 	message("Version file generator will not be built. Copying ${HYPERSOMNIA_VERSION_FILE_IN_PATH} into ${HYPERSOMNIA_VERSION_FILE_CPP}")
 	execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${HYPERSOMNIA_VERSION_FILE_IN_PATH} ${HYPERSOMNIA_VERSION_FILE_CPP})
 endif()
-
-# Before Hypersomnia builds,
-# Introspector-generator must first generate the type information.
-
-# We prepare a correct input configuration file for Introspector-generator.
-
-# CMake separates elements of lists with a semicolon, but the Introspector-generator accepts lists separated by newlines.
-# We must correct that.
-
-string (REPLACE ";" "\n" 
-	HYPERSOMNIA_HEADERS_WITH_INTROSPECTED_CLASSES_NEWLINE_SEPARATED 
-	"${HYPERSOMNIA_HEADERS_WITH_INTROSPECTED_CLASSES}"
-)
-
-set(INTROSPECTOR_GENERATOR_ACTUAL_INPUT_PATH
-	"${PROJECT_BINARY_DIR}/introspector_generator_input.cfg"
-)
-
-# The correct input configuration file shall contain paths to all headers for whom the generator should create introspectors,
-# and should also contain the correct output file path.
-# Thus, that call should substitute:
-# HYPERSOMNIA_HEADERS_WITH_INTROSPECTED_CLASSES_NEWLINE_SEPARATED 
-# and GENERATED_SOURCES_PATH for the output file path.
-
-configure_file(
-	"src/introspector_generator_input.cfg.in"
-	${INTROSPECTOR_GENERATOR_ACTUAL_INPUT_PATH}
-	@ONLY
-)
-
-# Now to define the actual pre-build event.
-
-add_custom_command(
-	PRE_BUILD
-	TARGET Hypersomnia
-	COMMAND Introspector-generator ${INTROSPECTOR_GENERATOR_ACTUAL_INPUT_PATH}
-	COMMENT "Generating type information for introspection..."
-)
-
-add_dependencies(Hypersomnia Introspector-generator)
 
 if(BUILD_OPENGL)
 	# Before Hypersomnia builds,
