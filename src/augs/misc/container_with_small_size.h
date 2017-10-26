@@ -1,12 +1,26 @@
 #pragma once
 #include <limits>
+#include <type_traits>
+
 #include "augs/ensure.h"
+#include "augs/readwrite/byte_readwrite_declaration.h"
 
 namespace augs {
 	template <class T, class size_type>
 	class container_with_small_size {
 		T container;
 	public:
+		void overflow_check() {
+			if (overflowed()) {
+				LOG("Warning! %x has overflowed - clearing the container.", typeid(T).name());
+				clear();
+			}
+		}
+
+		bool overflowed() const {
+			return container.size() > std::numeric_limits<size_type>::max();
+		}
+
 		template <class... Args>
 		container_with_small_size(Args&&... args) : container(std::forward<Args>(args)...) {
 			overflow_check();
@@ -24,19 +38,8 @@ namespace augs {
 			return &container;
 		}
 
-		bool overflowed() const {
-			return container.size() > std::numeric_limits<size_type>::max();
-		}
-
 		bool is_full() const {
 			return container.size() >= std::numeric_limits<size_type>::max();
-		}
-
-		void overflow_check() {
-			if (overflowed()) {
-				LOG("Warning! %x has overflowed - clearing the container.", typeid(T).name());
-				clear();
-			}
 		}
 
 		const T* operator->() const {

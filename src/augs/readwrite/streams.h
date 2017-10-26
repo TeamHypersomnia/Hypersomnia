@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include "augs/ensure.h"
+#include "augs/readwrite/byte_readwrite_declaration.h"
 #include "augs/templates/exception_templates.h"
 
 namespace augs {

@@ -1,6 +1,7 @@
 #pragma once
 #include "augs/readwrite/streams.h"
 #include "augs/templates/hash_templates.h"
+#include "augs/readwrite/byte_readwrite_declaration.h"
 
 struct _ENetAddress;
 typedef struct _ENetAddress ENetAddress;

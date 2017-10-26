@@ -1,6 +1,7 @@
 #pragma once
 #include "augs/ensure.h"
 #include "augs/misc/pool/pooled_object_id.h"
+#include "augs/readwrite/byte_readwrite_declaration.h"
 
 namespace augs {
 	struct introspection_access;

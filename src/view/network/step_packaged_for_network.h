@@ -1,6 +1,7 @@
 #pragma once
 #include "augs/readwrite/streams.h"
 #include "game/transcendental/cosmic_entropy.h"
+#include "augs/readwrite/byte_readwrite_declaration.h"
 
 struct step_packaged_for_network {
 	enum class type : unsigned char {
