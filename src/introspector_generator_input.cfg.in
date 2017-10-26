@@ -48,7 +48,7 @@ generated-file-format:
 #include <array>
 
 #include "augs/misc/trivially_copyable_tuple.h"
-#include "augs/templates/for_each_in_types.h"
+#include "augs/templates/for_each_std_get.h"
 #include "augs/templates/string_templates.h"
 
 #include "game/transcendental/entity_id_declaration.h"
@@ -62,6 +62,7 @@ namespace augs {
 	namespace event {
 		namespace keys {
 			enum class key;
+			std::wstring key_to_wstring(const key);
 		}
 	}
 }

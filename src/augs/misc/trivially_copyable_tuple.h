@@ -3,8 +3,9 @@
 
 #include "augs/templates/triviality_traits.h"
 #include "augs/templates/type_list.h"
-#include "augs/templates/for_each_in_types.h"
+#include "augs/templates/for_each_std_get.h"
 #include "augs/templates/constexpr_arithmetic.h"
+#include "augs/templates/type_matching_and_indexing.h"
 
 namespace augs {
 	template <class... Types>

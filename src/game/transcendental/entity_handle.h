@@ -6,7 +6,7 @@
 #include "augs/templates/maybe_const.h"
 #include "augs/templates/component_traits.h"
 #include "augs/templates/type_matching_and_indexing.h"
-#include "augs/templates/for_each_in_types.h"
+#include "augs/templates/for_each_std_get.h"
 
 #include "augs/entity_system/component_setters_mixin.h"
 #include "augs/entity_system/component_allocators_mixin.h"

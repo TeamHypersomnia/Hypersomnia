@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/templates/for_each_in_types.h"
+#include "augs/templates/for_each_type.h"
 #include "augs/templates/type_matching_and_indexing.h"
 #include "augs/templates/component_traits.h"
 

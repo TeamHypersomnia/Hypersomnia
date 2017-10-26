@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/templates/for_each_in_types.h"
+#include "augs/templates/for_each_std_get.h"
 
 namespace augs {
 	template<class... Systems>
