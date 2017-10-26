@@ -44,6 +44,9 @@
 #include "augs/readwrite/lua_readwrite.h"
 #include "augs/readwrite/byte_readwrite.h"
 
+cosmos::cosmos(const cosmic_pool_size_type reserved_entities) {
+	reserve_storage_for_entities(reserved_entities);
+}
 
 const cosmos cosmos::empty;
 
@@ -95,11 +98,6 @@ void cosmos::create_inferred_state_for(const const_entity_handle h) {
 
 		inferential.for_each(constructor);
 	}
-}
-
-cosmos::cosmos(const cosmic_pool_size_type reserved_entities) {
-	reserve_storage_for_entities(reserved_entities);
-	significant.meta.global.si.set_pixels_per_meter(100.f);
 }
 
 /* TODO: Make comparisons somehow work with debug name pointers */

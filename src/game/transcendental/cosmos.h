@@ -72,7 +72,8 @@ public:
 	
 	/* State of the cosmos ends here *****************************/
 
-	cosmos(const cosmic_pool_size_type reserved_entities = 0u);
+	cosmos() = default;
+	explicit cosmos(const cosmic_pool_size_type reserved_entities);
 	cosmos& operator=(const cosmos_significant_state&);
 
 	void reserve_storage_for_entities(const cosmic_pool_size_type);

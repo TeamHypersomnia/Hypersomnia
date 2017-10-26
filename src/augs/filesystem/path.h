@@ -36,6 +36,18 @@ namespace augs {
 		write(ar, nice_representation);
 	}
 
+	template <class Archive>
+	void write_object(Archive& ar, const std::string& storage) = delete;
+
+	template <class Archive>
+	void read_object(Archive& ar, std::string& storage) = delete;
+
+	template <class Archive>
+	void write_object(Archive& ar, const std::wstring& storage) = delete;
+
+	template <class Archive>
+	void read_object(Archive& ar, std::wstring& storage) = delete;
+
 	inline auto to_display_path(path_type target_path) {
 		auto display_path = target_path.filename();
 		display_path += " (";
