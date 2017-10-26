@@ -6,7 +6,6 @@
 #include "augs/templates/maybe_const.h"
 #include "augs/templates/component_traits.h"
 #include "augs/templates/type_matching_and_indexing.h"
-#include "augs/templates/for_each_std_get.h"
 
 #include "augs/entity_system/component_setters_mixin.h"
 #include "augs/entity_system/component_allocators_mixin.h"
@@ -25,17 +24,6 @@
 #include "game/transcendental/step_declaration.h"
 #include "game/components/name_component_declaration.h"
 #include "game/components/flags_component.h"
-
-template <class T>
-constexpr std::size_t component_index_v = index_in_list_v<T, component_list_t<type_list>>;
-
-template<class F>
-void for_each_component_type(F&& callback) {
-	for_each_through_std_get(
-		component_list_t<std::tuple>(), 
-		std::forward<F>(callback)
-	);
-}
 
 class cosmos;
 class cosmic_delta;

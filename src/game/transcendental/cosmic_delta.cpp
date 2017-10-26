@@ -8,9 +8,12 @@
 
 #include "game/transcendental/cosmos.h"
 #include "game/organization/all_component_includes.h"
+#include "game/organization/for_each_component_type.h"
 
 #include "augs/readwrite/byte_readwrite.h"
 
+template <class T>
+constexpr std::size_t component_index_v = index_in_list_v<T, component_list_t<type_list>>;
 
 /* Several assumptions regarding delta encoding */
 

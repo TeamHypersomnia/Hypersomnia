@@ -34,6 +34,7 @@
 
 #include "game/organization/all_messages_includes.h"
 #include "game/organization/all_component_includes.h"
+#include "game/organization/for_each_component_type.h"
 
 #include "game/transcendental/cosmic_delta.h"
 #include "game/transcendental/data_living_one_step.h"
