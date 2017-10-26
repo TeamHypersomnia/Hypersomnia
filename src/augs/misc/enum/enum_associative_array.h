@@ -244,8 +244,8 @@ namespace augs {
 		: public enum_associative_array_base<Enum, T> {
 	public:
 		using base = enum_associative_array_base<Enum, T>;
-		using base::key_type;
-		using base::mapped_type;
+		using typename base::key_type;
+		using typename base::mapped_type;
 	};
 
 	template <class Enum, class T>
@@ -253,9 +253,9 @@ namespace augs {
 		: public enum_associative_array_base<Enum, T> {
 	public:
 		using base = enum_associative_array_base<Enum, T>;
-		using base::key_type;
-		using base::mapped_type;
-		using base::flagset_type;
+		using typename base::key_type;
+		using typename base::mapped_type;
+		using typename base::flagset_type;
 		using base::clear;
 		using base::emplace;
 		using base::is_value_set;

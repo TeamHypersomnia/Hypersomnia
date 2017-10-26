@@ -246,7 +246,7 @@ namespace augs {
 
 		using base = polygon<vertex_count, index_count>;
 		using base::draw;
-		using base::drawing_input;
+		using typename base::drawing_input;
 
 		template <class M>
 		void draw(

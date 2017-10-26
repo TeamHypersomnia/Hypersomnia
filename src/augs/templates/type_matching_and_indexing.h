@@ -115,13 +115,11 @@ struct filter_types_detail<
 	};
 };
 
-
 template <
 	template <class...> class Criterion,
 	class List
 >
 using filter_types_in_list = filter_types_detail<0, Criterion, List>;
-
 
 template <
 	template <class...> class Criterion,
@@ -158,12 +156,6 @@ constexpr size_t count_occurences_in_list_v = typename filter_types_in_list<bind
 
 template <class S, class... Types>
 constexpr size_t count_occurences_in_v = count_occurences_in_list_v<S, type_list<Types...>>;
-
-template <class S, class List>
-using find_convertible_type_in_list_t = find_matching_type_in_list<bind_types<std::is_convertible, S>::template type, List>;
-
-template <class S, class... Types>
-using find_convertible_type_in_t = find_convertible_type_in_list_t<S, std::tuple<Types...>>;
 
 template <size_t I, class... Types>
 using nth_type_in_t = std::tuple_element_t<I, std::tuple<Types...>>;
