@@ -53,7 +53,7 @@ namespace augs {
 			return current_instance == std::addressof(self);
 		}
 
-		template <class = std::enable_if_t<!is_const>>
+		template <bool C = is_const, class = std::enable_if_t<!C>>
 		bool set_as_current() {
 			auto& self = static_cast<derived&>(*this);
 
@@ -65,7 +65,7 @@ namespace augs {
 			return true;
 		}
 
-		template <class = std::enable_if_t<is_const>>
+		template <bool C = is_const, class = std::enable_if_t<C>>
 		bool set_as_current() const {
 			const auto& self = static_cast<derived&>(*this);
 
