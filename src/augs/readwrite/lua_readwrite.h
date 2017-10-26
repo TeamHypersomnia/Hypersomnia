@@ -64,7 +64,7 @@ namespace augs {
 	}
 
 	template <class Serialized>
-	void read(sol::object input_object, Serialized& into) {
+	void read_lua(sol::object input_object, Serialized& into) {
 		static_assert(
 			!is_optional_v<Serialized>,
 			"std::optional can only be serialized as a member object."
@@ -91,7 +91,7 @@ namespace augs {
 					const auto this_type_name = get_custom_type_name(specific_object);
 
 					if (this_type_name == variant_type) {
-						read(variant_content, specific_object);
+						read_lua(variant_content, specific_object);
 						into = specific_object;
 					}
 				}
@@ -130,7 +130,7 @@ namespace augs {
 						typename Container::mapped_type mapped{};
 
 						general_from_lua_value(key_value_pair.first, key);
-						read(key_value_pair.second, mapped);
+						read_lua(key_value_pair.second, mapped);
 
 						into.emplace(std::move(key), std::move(mapped));
 					}
@@ -153,15 +153,15 @@ namespace augs {
 								ensure(key_value_table[1].valid());
 								ensure(key_value_table[2].valid());
 
-								read(key_value_table[1], key);
-								read(key_value_table[2], mapped);
+								read_lua(key_value_table[1], key);
+								read_lua(key_value_table[2], mapped);
 
 								into.emplace(std::move(key), std::move(mapped));
 							}
 							else {
 								typename Container::value_type val;
 
-								read(input_table[counter], val);
+								read_lua(input_table[counter], val);
 
 								if constexpr(can_emplace_back_v<Container>) {
 									into.emplace_back(std::move(val));
@@ -189,7 +189,7 @@ namespace augs {
 							
 							if (maybe_field.valid()) {
 								typename T::value_type value;
-								read(input_table[label], value);
+								read_lua(input_table[label], value);
 								field.emplace(std::move(value));
 							}
 						}
@@ -199,7 +199,7 @@ namespace augs {
 							const bool field_specified = maybe_field.valid();
 							
 							if (field_specified) {
-								read(maybe_field, field);
+								read_lua(maybe_field, field);
 							}
 						}
 					},
@@ -216,13 +216,13 @@ namespace augs {
 	*/
 
 	template <class Serialized>
-	void read(sol::table input_table, Serialized& into) {
-		read(sol::object(input_table), into);
+	void read_lua(sol::table input_table, Serialized& into) {
+		read_lua(sol::object(input_table), into);
 	}
 
 	template <class A, class B, class Serialized>
-	void read(sol::proxy<A, B> input_proxy, Serialized& into) {
-		read(sol::object(input_proxy), into);
+	void read_lua(sol::proxy<A, B> input_proxy, Serialized& into) {
+		read_lua(sol::object(input_proxy), into);
 	}
 
 	template <class T>
@@ -257,12 +257,12 @@ namespace augs {
 		else {
 			auto new_table = output_table.create();
 			output_table[std::forward<K>(key)] = new_table;
-			write(new_table, from);
+			write_lua(new_table, from);
 		}
 	}
 
 	template <class Serialized>
-	void write(sol::table output_table, const Serialized& from) {
+	void write_lua(sol::table output_table, const Serialized& from) {
 		static_assert(
 			!representable_as_lua_value_v<Serialized>, 
 			"Directly representable, but no key (label) provided! Use write_representable_field to directly serialize this object."
@@ -365,7 +365,7 @@ namespace augs {
 		SaverArgs&&... args
 	) {
 		auto output_table = lua.create_named_table("my_table");
-		write(output_table, std::forward<T>(object));
+		write_lua(output_table, std::forward<T>(object));
 
 		const std::string serialized_table = lua["table_to_string"](
 			output_table,
@@ -395,7 +395,7 @@ namespace augs {
 		}
 
 		sol::table input_table = pfr;
-		read(input_table, object);
+		read_lua(input_table, object);
 	}
 
 	template <class T>

@@ -45,7 +45,7 @@ using namespace augs::gui;
 
 void main_menu_setup::customize_for_viewing(config_lua_table& config) const {
 	const auto previous_sfx_volume = config.audio_volume.sound_effects;
-	augs::read(menu_config_patch, config);
+	augs::read_lua(menu_config_patch, config);
 	
 	/* Treat new volume as a multiplier */
 

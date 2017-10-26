@@ -528,7 +528,7 @@ namespace augs {
 
 	void write_object_lua(sol::table ar, const cosmos& cosm) {
 #if TODO
-		write(ar, cosm.significant.meta);
+		write_lua(ar, cosm.significant.meta);
 		
 		for (const auto& ent : cosm.get_entity_pool()) {
 
