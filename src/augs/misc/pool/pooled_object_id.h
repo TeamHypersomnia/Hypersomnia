@@ -1,5 +1,5 @@
 #pragma once
-#include <iosfwd>
+#include <sstream>
 #include "augs/templates/hash_templates.h"
 
 namespace augs {

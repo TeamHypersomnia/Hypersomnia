@@ -49,20 +49,20 @@ augs::graphics::texture standard_atlas_distribution(const standard_atlas_distrib
 
 		for (const auto& d : in.game_image_loadables) {
 			auto& output_viewable = in.output_game_images[d.first];
-			auto& maps = output_viewable.texture_maps;
+			auto& maps = output_viewable;
 			
 			const auto& def = d.second;
 
-			maps[texture_map_type::DIFFUSE] = baked.at(def.get_source_image_path());
+			maps.diffuse = baked.at(def.get_source_image_path());
 
-			auto set_if_exists = [&](const texture_map_type t, const auto path) {
+			auto set_if_exists = [&](auto& m, const auto path) {
 				if (path.has_value()) {
-					maps[t] = baked.at(path.value());
+					m = baked.at(path.value());
 				}
 			};
 
-			set_if_exists(texture_map_type::NEON, def.get_neon_map_path());
-			set_if_exists(texture_map_type::DESATURATED, def.get_desaturation_path());
+			set_if_exists(maps.neon_map, def.get_neon_map_path());
+			set_if_exists(maps.desaturated, def.get_desaturation_path());
 		}
 	}
 

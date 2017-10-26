@@ -1,9 +1,10 @@
 #pragma once
 #include <array>
+
 #include "augs/math/vec2.h"
+#include "augs/math/si_scaling.h"
 
 typedef unsigned int ALuint;
-struct si_scaling;
 
 namespace augs {
 	class single_sound_buffer;

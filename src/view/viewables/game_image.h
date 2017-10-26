@@ -6,16 +6,6 @@
 #include "augs/texture_atlas/texture_atlas_entry.h"
 #include "game/assets/ids/game_image_id.h"
 
-enum class texture_map_type {
-	// GEN INTROSPECTOR enum class texture_map_type
-	DIFFUSE,
-	NEON,
-	DESATURATED,
-
-	COUNT
-	// END GEN INTROSPECTOR
-};
-
 struct game_image_usage_as_button {
 	// GEN INTROSPECTOR struct game_image_usage_as_button
 	flip_flags flip;
@@ -31,13 +21,15 @@ struct game_image_meta {
 };
 
 struct game_image_in_atlas {
-	augs::enum_array<augs::texture_atlas_entry, texture_map_type> texture_maps;
+	augs::texture_atlas_entry diffuse;
+	augs::texture_atlas_entry neon_map;
+	augs::texture_atlas_entry desaturated;
 
 	operator augs::texture_atlas_entry() const {
-		return texture_maps[texture_map_type::DIFFUSE];
+		return diffuse;
 	}
 
 	vec2u get_size() const {
-		return texture_maps[texture_map_type::DIFFUSE].get_original_size();
+		return diffuse.get_original_size();
 	}
 };

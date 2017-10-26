@@ -17,7 +17,7 @@ namespace augs {
 			for_each_through_std_get(
 				*this,
 				[this](auto& field){
-					ensure((char*)&field >= (char*)buf && (char*)&field + sizeof (std::decay_t<decltype(field)>) <= buf + sum_sizes_of_types_in_list_v<type_list<Types...>>)
+					ensure((char*)&field >= (char*)buf && (char*)&field + sizeof(std::decay_t<decltype(field)>) <= buf + sum_sizes_of_types_in_list_v<type_list<Types...>>)
 					new (&field) std::decay_t<decltype(field)>;
 				}
 			);
@@ -42,7 +42,7 @@ namespace std {
 		using type = nth_type_in_t<I, Types...>;
 
 		static_assert_print<offset < sizeof(t), _types<type>, _vals<std::size_t, I, offset, sizeof(t)>>();
-		static_assert_print<offset + sizeof type <= sizeof(t), _types<type>, _vals<std::size_t, I, offset + sizeof type, sizeof(t)>>();
+		static_assert_print<offset + sizeof(type) <= sizeof(t), _types<type>, _vals<std::size_t, I, offset + sizeof(type), sizeof(t)>>();
 
 		return *reinterpret_cast<type*>(t.data() + offset);
 	}
@@ -53,7 +53,7 @@ namespace std {
 		using type = nth_type_in_t<I, Types...>;
 
 		static_assert_print<offset < sizeof(t), _types<type>, _vals<std::size_t, I, offset, sizeof(t)>>();
-		static_assert_print<offset + sizeof type <= sizeof(t), _types<type>, _vals<std::size_t, I, offset + sizeof type, sizeof(t)>>();
+		static_assert_print<offset + sizeof(type) <= sizeof(t), _types<type>, _vals<std::size_t, I, offset + sizeof(type), sizeof(t)>>();
 
 		return *reinterpret_cast<const type*>(t.data() + offset);
 	}

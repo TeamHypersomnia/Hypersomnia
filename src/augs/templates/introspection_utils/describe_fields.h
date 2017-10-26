@@ -29,8 +29,8 @@ auto describe_fields(const T& object) {
 
 			result += typesafe_sprintf("%x - %x (%x) (%x) %x",
 				this_offset,
-				this_offset + sizeof field,
-				sizeof field,
+				this_offset + sizeof(field),
+				sizeof(field),
 				// print type name without the leading "struct ", "class " or "enum "
 				type_name,
 				make_full_field_name() + label
@@ -87,8 +87,8 @@ auto determine_breaks_in_fields_continuity_by_introspection(const T& object) {
 							next_expected_offset,
 							this_offset,
 							this_offset,
-							this_offset + sizeof field,
-							sizeof field,
+							this_offset + sizeof(field),
+							sizeof(field),
 							type_name,
 							make_full_field_name() + label
 						);
@@ -102,8 +102,8 @@ auto determine_breaks_in_fields_continuity_by_introspection(const T& object) {
 						result += "\n\n";
 					}
 
-					next_expected_offset = this_offset + sizeof field;
-					total_size_of_leaves += sizeof field;
+					next_expected_offset = this_offset + sizeof(field);
+					total_size_of_leaves += sizeof(field);
 				}
 				else {
 					fields.push_back(label);
@@ -115,11 +115,11 @@ auto determine_breaks_in_fields_continuity_by_introspection(const T& object) {
 		object
 	);
 
-	if (total_size_of_leaves != sizeof T) {
+	if (total_size_of_leaves != sizeof(T)) {
 		result += typesafe_sprintf(
 			"sizeofs of leaf fields do not sum up to sizeof %x!\nExpected: %x\nActual:%x",
 			typeid(T).name(),
-			sizeof T,
+			sizeof(T),
 			total_size_of_leaves
 		);
 	}

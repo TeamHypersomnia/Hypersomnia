@@ -39,7 +39,7 @@ struct sum_sizes_until_nth {
 
 template <std::size_t I, std::size_t Current, template <class...> class List, class T, class... Args>
 struct sum_sizes_until_nth<I, Current, List<T, Args...>, std::enable_if_t<Current < I>>  {
-	static constexpr std::size_t value = sizeof T + sum_sizes_until_nth<I, Current + 1, List<Args...>>::value;
+	static constexpr std::size_t value = sizeof(T) + sum_sizes_until_nth<I, Current + 1, List<Args...>>::value;
 };
 
 

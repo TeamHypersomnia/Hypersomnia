@@ -85,14 +85,14 @@ void action_button::draw(
 
 						if (has_enough_mana) {
 							output.aabb(
-								game_images.at(inside_tex).texture_maps[texture_map_type::DIFFUSE],
+								game_images.at(inside_tex).diffuse,
 								absolute_icon_rect,
 								inside_col
 							);
 						}
 						else {
 							output.aabb(
-								game_images.at(inside_tex).texture_maps[texture_map_type::DESATURATED],
+								game_images.at(inside_tex).desaturated,
 								absolute_icon_rect,
 								inside_col
 							);
@@ -104,7 +104,7 @@ void action_button::draw(
 								colorful_rect.b = colorful_rect.t + colorful_height;
 
 								output.aabb_clipped(
-									game_images.at(inside_tex).texture_maps[texture_map_type::DIFFUSE],
+									game_images.at(inside_tex).diffuse,
 									ltrb(absolute_icon_rect),
 									ltrb(colorful_rect),
 									inside_col

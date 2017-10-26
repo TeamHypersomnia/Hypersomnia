@@ -1,5 +1,6 @@
 #pragma once
 #include <algorithm>
+#include <sstream>
 
 #include "augs/math/rects.h"
 #include "augs/math/declare_math.h"

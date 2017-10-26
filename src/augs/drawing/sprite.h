@@ -128,7 +128,7 @@ namespace augs {
 			}
 
 			if (in.use_neon_map) {
-				const auto& maybe_neon_map = manager.at(tex).texture_maps[texture_map_type::NEON];
+				const auto& maybe_neon_map = manager.at(tex).neon_map;
 
 				if (maybe_neon_map.exists()) {
 					draw(
@@ -144,7 +144,7 @@ namespace augs {
 			else {
 				draw(
 					in,
-					manager.at(tex).texture_maps[texture_map_type::DIFFUSE],
+					manager.at(tex).diffuse,
 					screen_space_pos,
 					final_rotation,
 					drawn_size

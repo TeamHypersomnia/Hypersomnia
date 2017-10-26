@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include <iosfwd>
+#include <sstream>
 
 #include "augs/math/vec2.h"
 #include "augs/misc/enum/enum_boolset.h"

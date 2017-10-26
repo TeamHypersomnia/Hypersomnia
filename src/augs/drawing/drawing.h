@@ -148,19 +148,6 @@ namespace augs {
 			return aabb_lt(manager.at(id), origin + get_cursor_offset(id), color);
 		}
 
-		template <class M, class C>
-		self imgui_cursor_or_contextual(
-			const M& manager,
-			const C& context,
-			const rgba color = white
-		) const {
-			using I = typename M::key_type;
-			const auto gui_cursor = get_imgui_cursor_or_contextual<I>(context);
-
-			const vec2i cursor_drawing_pos = ImGui::GetIO().MousePos;
-			return cursor(manager, gui_cursor, cursor_drawing_pos, color);
-		}
-
 		self line(
 			const texture_atlas_entry,
 			const vec2 from,

@@ -91,8 +91,8 @@ TEST_CASE("CosmicDelta2 PaddingTest") {
 		using checked_type = decltype(c);
 		static_assert(std::is_same_v<std::decay_t<checked_type>, checked_type>, "Something's wrong with the types");
 
-		total_components_size += sizeof checked_type;
-		component_size_information += typesafe_sprintf("%x == sizeof %x\n", sizeof checked_type, typeid(checked_type).name());
+		total_components_size += sizeof(checked_type);
+		component_size_information += typesafe_sprintf("%x == sizeof %x\n", sizeof(checked_type), typeid(checked_type).name());
 
 		if constexpr(!allows_nontriviality_v<checked_type>) {
 			constexpr size_t type_size = sizeof(checked_type);

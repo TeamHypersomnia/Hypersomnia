@@ -130,7 +130,7 @@ void value_bar::draw(
 	const auto& necessarys = context.get_necessary_images();
 	const auto output = context.get_output();
 
-	output.aabb_lt(game_images.at(icon_tex).texture_maps[texture_map_type::DIFFUSE], absolute.get_position());
+	output.aabb_lt(game_images.at(icon_tex).diffuse, absolute.get_position());
 
 	const auto total_spacing = this_id->border.get_total_expansion();
 

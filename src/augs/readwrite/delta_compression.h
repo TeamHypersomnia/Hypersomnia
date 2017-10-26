@@ -55,8 +55,8 @@ namespace augs {
 	template <class T>
 	class object_delta<T, std::enable_if_t<std::is_trivially_copyable_v<T>>> {
 		using offset_type = get_index_type_for_size_of_t<T>;
-		static constexpr std::size_t length_bytes = sizeof T;
-		static_assert(0 == length_bytes % sizeof delta_unit, "Type size must be divisble by the size of delta unit");
+		static constexpr std::size_t length_bytes = sizeof(T);
+		static_assert(0 == length_bytes % sizeof(delta_unit), "Type size must be divisble by the size of delta unit");
 
 		std::vector<delta_unit> changed_bytes;
 		std::vector<offset_type> changed_offsets;

@@ -3,10 +3,10 @@
 
 #include "augs/math/rects.h"
 #include "augs/math/vec2.h"
+#include "augs/math/si_scaling.h"
 
 struct b2Sweep;
 struct b2Transform;
-struct si_scaling;
 
 template <class T>
 struct basic_transform {
