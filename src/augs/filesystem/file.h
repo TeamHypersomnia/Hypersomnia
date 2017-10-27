@@ -141,6 +141,19 @@ namespace augs {
 		create_binary_file(path, content);
 	}
 
+	template <class S>
+	void get_file_contents_binary_into(const path_type& path, S& target) {
+		auto file = with_exceptions<std::ifstream>();
+		file.open(path, std::ios::binary | std::ios::ate);
+
+		const std::streamsize size = file.tellg();
+		file.seekg(0, std::ios::beg);
+
+		target.reserve(static_cast<unsigned>(size));
+		file.read(reinterpret_cast<byte_type_for_t<std::ifstream>*>(target.data()), size);
+		target.set_write_pos(static_cast<size_t>(size));
+	}
+
 	template <class O>
 	void load(O& object, const path_type& path) {
 		augs::stream content;
@@ -157,19 +170,6 @@ namespace augs {
 		O object;
 		augs::read_bytes(content, object);
 		return object;
-	}
-
-	template <class S>
-	void get_file_contents_binary_into(const path_type& path, S& target) {
-		auto file = with_exceptions<std::ifstream>();
-		file.open(path, std::ios::binary | std::ios::ate);
-
-		const std::streamsize size = file.tellg();
-		file.seekg(0, std::ios::beg);
-
-		target.reserve(static_cast<unsigned>(size));
-		file.read(reinterpret_cast<byte_type_for_t<std::ifstream>*>(target.data()), size);
-		target.set_write_pos(static_cast<size_t>(size));
 	}
 
 	template <class ContainerType>

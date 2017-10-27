@@ -76,7 +76,7 @@ namespace augs {
 		font_metrics metrics;
 		font_settings settings;
 
-		std::array<internal_glyph, std::numeric_limits<wchar_t>::max() + 1> glyphs;
+		std::array<internal_glyph, std::size_t(std::numeric_limits<wchar_t>::max()) + 1> glyphs;
 
 		/* 
 			Enforce mindful lifetime management. 
