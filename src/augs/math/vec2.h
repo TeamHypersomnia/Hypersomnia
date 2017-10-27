@@ -1,6 +1,7 @@
 #pragma once
 #include <algorithm>
 #include <sstream>
+#include <cmath>
 
 #include "augs/math/rects.h"
 #include "augs/math/declare_math.h"
@@ -306,7 +307,7 @@ struct basic_vec2 {
 			dotted = -1;
 		}
 
-		auto result = acos(dotted);
+		auto result = std::acos(dotted);
 
 		return static_cast<real>(result);
 	}
@@ -386,8 +387,8 @@ struct basic_vec2 {
 	
 	template <class A = type, class = std::enable_if_t<std::is_floating_point_v<A>>>
 	basic_vec2& discard_fract() {
-		x = std::trunc(x);
-		y = std::trunc(y);
+		x = static_cast<type>(static_cast<int>(x));
+		y = static_cast<type>(static_cast<int>(y));
 		return *this;
 	}
 

@@ -20,4 +20,4 @@ struct is_padding_field<pad_bytes<I>> : std::true_type {
 };
 
 template <class T>
-static constexpr auto is_padding_field_v = is_padding_field<T>::value;
+constexpr bool is_padding_field_v = is_padding_field<T>::value;

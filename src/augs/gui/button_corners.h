@@ -214,7 +214,7 @@ struct basic_button_corners_info {
 				continue;
 			}
 
-			const augs::texture_atlas_entry tex = *tex_ptr;
+			const auto tex = *tex_ptr;
 
 			if (!tex.exists()) {
 				continue;
