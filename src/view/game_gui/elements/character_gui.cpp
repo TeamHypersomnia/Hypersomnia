@@ -36,7 +36,7 @@
 #include "augs/templates/string_templates.h"
 
 #include "augs/drawing/drawing.h"
-#include "augs/templates/visit_gettable.h"
+#include "augs/templates/get_by_dynamic_id.h"
 #include "game/detail/inventory/wielding_result.h"
 #include "game/detail/spells/spell_structs.h"
 
@@ -507,7 +507,7 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 					if (bound_spell.is_set()) {
 						const auto& sentience = gui_entity.get<components::sentience>();
 
-						tooltip_text = visit_gettable(
+						tooltip_text = get_by_dynamic_id(
 							sentience.spells,
 							bound_spell,
 							[&](const auto& spell) {

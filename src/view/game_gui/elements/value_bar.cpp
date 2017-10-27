@@ -1,4 +1,4 @@
-#include "augs/templates/visit_gettable.h"
+#include "augs/templates/get_by_dynamic_id.h"
 #include "augs/gui/text/printer.h"
 
 #include "game/transcendental/entity_handle.h"
@@ -34,7 +34,7 @@ decltype(auto) visit_by_vertical_index(
 		meter_id id;
 		id.set_index(index);
 
-		return visit_gettable(sentience.meters, id, 
+		return get_by_dynamic_id(sentience.meters, id, 
 			[&cosm, &meter_callback](const auto& meter){
 				return meter_callback(meter, get_meta_of(meter, cosm.get_common_state().meters));
 			}
@@ -45,7 +45,7 @@ decltype(auto) visit_by_vertical_index(
 		perk_id id;
 		id.set_index(index - num_sentience_meters);
 
-		return visit_gettable(sentience.perks, id, 
+		return get_by_dynamic_id(sentience.perks, id, 
 			[&cosm, &perk_callback](const auto& perk){
 				return perk_callback(perk, get_meta_of(perk, cosm.get_common_state().perks));
 			}

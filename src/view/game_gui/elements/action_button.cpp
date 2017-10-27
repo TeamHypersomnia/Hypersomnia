@@ -3,7 +3,7 @@
 
 #include "augs/drawing/drawing.h"
 #include "augs/gui/text/printer.h"
-#include "augs/templates/visit_gettable.h"
+#include "augs/templates/get_by_dynamic_id.h"
 
 #include "view/game_gui/elements/action_button.h"
 #include "view/game_gui/game_gui_context.h"
@@ -44,7 +44,7 @@ void action_button::draw(
 
 		const auto absolute_rect = context.get_tree_entry(this_id).get_absolute_rect();
 		if (bound_spell.is_set()) {
-			visit_gettable(
+			get_by_dynamic_id(
 				sentience.spells,
 				bound_spell,
 				[&](const auto& spell){

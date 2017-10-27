@@ -8,7 +8,7 @@ template <
 	class T,
 	class F
 >
-decltype(auto) visit_gettable(
+decltype(auto) get_by_dynamic_id(
 	T&& index_gettable_object,
 	const type_in_list_id<std::decay_t<T>> dynamic_type_index,
 	F&& generic_call,
@@ -24,7 +24,7 @@ template <
 	class T,
 	class F
 >
-decltype(auto) visit_gettable(
+decltype(auto) get_by_dynamic_id(
 	T&& index_gettable_object,
 	const type_in_list_id<std::decay_t<T>> dynamic_type_index,
 	F&& generic_call,
@@ -34,7 +34,7 @@ decltype(auto) visit_gettable(
 		return generic_call(std::get<current_candidate>(std::forward<T>(index_gettable_object)));
 	}
 
-	return visit_gettable<current_candidate + 1, T, F>(
+	return get_by_dynamic_id<current_candidate + 1, T, F>(
 		index_gettable_object,
 		dynamic_type_index,
 		std::forward<F>(generic_call)

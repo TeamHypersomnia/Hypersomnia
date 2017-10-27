@@ -1,6 +1,6 @@
 #include "sentience_system.h"
 
-#include "augs/templates/visit_gettable.h"
+#include "augs/templates/get_by_dynamic_id.h"
 #include "game/messages/damage_message.h"
 #include "game/messages/health_event.h"
 #include "game/messages/health_event.h"
@@ -45,7 +45,7 @@ void sentience_system::cast_spells(const logic_step step) const {
 
 		ensure(spell.is_set());
 
-		visit_gettable(
+		get_by_dynamic_id(
 			sentience.spells,
 			spell,
 			[&](auto& spell_instance_data){
@@ -155,7 +155,7 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 			}
 
 			if (sentience.is_spell_being_cast()) {
-				visit_gettable(
+				get_by_dynamic_id(
 					sentience.spells, 
 					sentience.currently_casted_spell,
 					[&](auto& spell){

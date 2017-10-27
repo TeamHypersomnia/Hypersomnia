@@ -1,6 +1,6 @@
 #include "rendering_scripts.h"
 #include "augs/drawing/drawing.h"
-#include "augs/templates/visit_gettable.h"
+#include "augs/templates/get_by_dynamic_id.h"
 #include "game/transcendental/cosmos.h"
 #include "game/components/sprite_component.h"
 #include "game/components/interpolation_component.h"
@@ -18,7 +18,7 @@ void draw_cast_spells_highlights(const draw_cast_spells_highlights_input in) {
 			const auto casted_spell = sentience.currently_casted_spell;
 
 			if (casted_spell.is_set()) {
-				visit_gettable(
+				get_by_dynamic_id(
 					sentience.spells,
 					casted_spell,
 					[&](const auto& spell){
