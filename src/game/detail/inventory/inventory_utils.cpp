@@ -325,7 +325,7 @@ std::wstring format_space_units(const unsigned u) {
 		return L"0";
 	}
 
-	return to_wstring(u / long double(SPACE_ATOMS_PER_UNIT), 2);
+	return to_wstring(u / double(SPACE_ATOMS_PER_UNIT), 2);
 }
 
 void drop_from_all_slots(const entity_handle c, const logic_step step) {

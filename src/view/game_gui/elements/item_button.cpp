@@ -321,7 +321,7 @@ void item_button::draw_proc(
 				considered_charges = item_data.charges - element.dragged_charges;
 			}
 
-			long double bottom_number_val = -1.f;
+			double bottom_number_val = -1.0;
 			bool printing_charge_count = false;
 			bool trim_zero = false;
 
@@ -342,7 +342,7 @@ void item_button::draw_proc(
 					bottom_number_val = count_charges_in_deposit(item);
 				}
 				else {
-					bottom_number_val = item[slot_function::ITEM_DEPOSIT].calculate_real_space_available() / long double(SPACE_ATOMS_PER_UNIT);
+					bottom_number_val = item[slot_function::ITEM_DEPOSIT].calculate_real_space_available() / double(SPACE_ATOMS_PER_UNIT);
 
 					if (bottom_number_val < 1.0 && bottom_number_val > 0.0) {
 						trim_zero = true;
