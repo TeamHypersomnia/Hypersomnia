@@ -63,7 +63,7 @@ namespace augs {
 
 			formatted_string format_recent_program_log(
 				const baked_font&,
-				unsigned max_lines = 40
+				std::size_t max_lines = 40
 			);
 
 			formatted_string from_bbcode(const std::string&, const style default_style);

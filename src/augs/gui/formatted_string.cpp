@@ -10,7 +10,7 @@ namespace augs {
 		namespace text {
 			formatted_string format_recent_program_log(
 				const baked_font& f,
-				unsigned lines_remaining
+				std::size_t lines_remaining
 			) {
 				formatted_string result;
 
