@@ -53,6 +53,29 @@ using tuple_of_logical_assets = augs::trivially_copyable_tuple<
 	asset_map<assets::physical_material_id, physical_material>
 >;
 
+template <class T, class Candidate>
+struct is_key_type_equal_to : std::bool_constant<std::is_same_v<T, typename Candidate::key_type>> {
+
+};
+
+template <class SearchedKeyType, class List>
+using find_type_with_key_type_in_list_t = find_matching_type_in_list<bind_types<is_key_type_equal_to, SearchedKeyType>::template type, List>;
+
+template <class SearchedKeyType, class... Types>
+using find_type_with_key_type_t = find_type_with_key_type_in_list_t<SearchedKeyType, type_list<Types...>>;
+
+template <class T, class ContainerList>
+decltype(auto) get_container_with_key_type(ContainerList&& containers) {
+	return std::get<
+		find_type_with_key_type_in_list_t<
+			T, 
+			std::decay_t<ContainerList>
+		>
+	> (
+		std::forward<ContainerList>(containers)
+	);
+}
+
 struct all_logical_assets {
 	// GEN INTROSPECTOR struct all_logical_assets
 	tuple_of_logical_assets all;

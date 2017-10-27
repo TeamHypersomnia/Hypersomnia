@@ -10,6 +10,7 @@
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/cosmic_delta.h"
 #include "game/organization/all_component_includes.h"
+#include "game/organization/for_each_component_type.h"
 
 #include "augs/templates/introspection_utils/rewrite_members.h"
 
@@ -174,8 +175,8 @@ TEST_CASE("CosmicDelta2 PaddingTest") {
 		}
 	};
 
-	for_each_through_std_get(component_list_t<std::tuple>(), assert_component_trivial);
-	for_each_through_std_get(component_list_t<std::tuple>(), padding_checker);
+	for_each_component_type(assert_component_trivial);
+	for_each_component_type(padding_checker);
 
 	padding_checker(item_slot_transfer_request());
 

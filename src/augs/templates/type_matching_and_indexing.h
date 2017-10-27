@@ -155,27 +155,3 @@ constexpr size_t count_occurences_in_v = count_occurences_in_list_v<S, type_list
 
 template <size_t I, class... Types>
 using nth_type_in_t = std::tuple_element_t<I, std::tuple<Types...>>;
-
-template <class T, class Candidate>
-struct is_key_type_equal_to : std::bool_constant<std::is_same_v<T, typename Candidate::key_type>> {
-
-};
-
-template <class SearchedKeyType, class List>
-using find_type_with_key_type_in_list_t = find_matching_type_in_list<bind_types<is_key_type_equal_to, SearchedKeyType>::template type, List>;
-
-template <class SearchedKeyType, class... Types>
-using find_type_with_key_type_t = find_type_with_key_type_in_list_t<SearchedKeyType, type_list<Types...>>;
-
-template <class T, class ContainerList>
-decltype(auto) get_container_with_key_type(ContainerList&& containers) {
-	return std::get<
-		find_type_with_key_type_in_list_t<
-			T, 
-			std::decay_t<ContainerList>
-		>
-	> (
-		std::forward<ContainerList>(containers)
-	);
-}
-

@@ -1,4 +1,8 @@
 #pragma once
+#include <tuple>
+#include <variant>
+#include "augs/misc/trivially_copyable_tuple.h"
+
 #include "augs/ensure.h"
 #include "augs/templates/type_in_list_id.h"
 #include "augs/templates/type_list.h"

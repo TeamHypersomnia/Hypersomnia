@@ -2,6 +2,7 @@
 #include "augs/ensure.h"
 #include "augs/templates/maybe_const.h"
 #include "augs/templates/component_traits.h"
+#include "augs/misc/trivially_copyable_tuple.h"
 
 namespace augs {
 	template <bool is_const, class derived_entity_handle>

@@ -1,6 +1,8 @@
 #pragma once
 #include <type_traits>
 #include <tuple>
+#include <variant>
+#include "augs/misc/trivially_copyable_tuple.h"
 
 namespace templates_detail {
 	template <class F, class... Instances>

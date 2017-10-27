@@ -1,11 +1,9 @@
 #pragma once
 #include "game/organization/all_components_declaration.h"
-#include "augs/templates/for_each_std_get.h"
+#include "augs/templates/for_each_type.h"
+#include "augs/templates/type_list.h"
 
 template <class F>
 void for_each_component_type(F&& callback) {
-	for_each_through_std_get(
-		component_list_t<std::tuple>(),
-		std::forward<F>(callback)
-	);
+	for_each_type_in_list<component_list_t<type_list>>(std::forward<F>(callback));
 }

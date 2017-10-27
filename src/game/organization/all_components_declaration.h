@@ -2,8 +2,6 @@
 // disables the warning due to type name length exceeded
 #pragma warning(disable : 4503)
 
-#include "augs/templates/type_list.h"
-
 #include "game/components/transform_component_declaration.h"
 #include "game/components/sprite_component_declaration.h"
 #include "game/components/polygon_component_declaration.h"
