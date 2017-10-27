@@ -175,7 +175,7 @@ float rotation_copying_system::resolve_rotation_copying_value(const const_entity
 void rotation_copying_system::update_rotations(cosmos& cosmos) const {
 	cosmos.for_each(
 		processing_subjects::WITH_ROTATION_COPYING,
-		[&](const auto it) {
+		[&](const entity_handle it) {
 			const auto& rotation_copying = it.get<components::rotation_copying>();
 
 			if (rotation_copying.update_value) {

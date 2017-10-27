@@ -61,7 +61,7 @@ void sound_existence_system::destroy_dead_sounds(const logic_step step) const {
 
 	cosmos.for_each(
 		processing_subjects::WITH_SOUND_EXISTENCE,
-		[&](const auto it) {
+		[&](const entity_handle it) {
 			auto& existence = it.get<components::sound_existence>();
 
 			const auto repetitions = existence.input.effect.modifier.repetitions;

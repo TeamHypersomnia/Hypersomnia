@@ -49,7 +49,7 @@ void position_copying_system::update_transforms(const logic_step step) {
 
 	cosmos.for_each(
 		processing_subjects::WITH_POSITION_COPYING,
-		[&](const auto it) {
+		[&](const entity_handle it) {
 			components::transform transform = it.get_logic_transform();
 			auto& position_copying = it.get<components::position_copying>();
 

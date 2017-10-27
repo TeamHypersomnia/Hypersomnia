@@ -108,7 +108,7 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 
 	cosmos.for_each(
 		processing_subjects::WITH_SENTIENCE,
-		[&](const auto subject) {
+		[&](const entity_handle subject) {
 			auto& sentience = subject.get<components::sentience>();
 			auto& health = sentience.get<health_meter_instance>();
 			auto& consciousness = sentience.get<consciousness_meter_instance>();

@@ -44,7 +44,7 @@ void light_system::advance_attenuation_variations(
 
 	cosmos.for_each(
 		processing_subjects::WITH_LIGHT,
-		[&](const auto it) {
+		[&](const const_entity_handle it) {
 			const auto& light = it.get<components::light>();
 			auto& cache = per_entity_cache[linear_cache_key(it)];
 
@@ -113,7 +113,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 	cosmos.for_each(
 		processing_subjects::WITH_LIGHT,
-		[&](const auto light_entity) {
+		[&](const const_entity_handle light_entity) {
 			const auto& cache = per_entity_cache[linear_cache_key(light_entity)];
 			const auto light_displacement = vec2(cache.all_variation_values[6], cache.all_variation_values[7]);
 

@@ -39,7 +39,7 @@ template <bool C>
 const entity_name_type& basic_name_synchronizer<C>::get_name() const {
 	const auto& cosmos = handle.get_cosmos();
 
-	return cosmos.inferential.get<name_system>().get_name(
+	return cosmos.inferential.template get<name_system>().get_name(
 		cosmos.get_common_state().name_metas,
 		get_raw_component()
 	);

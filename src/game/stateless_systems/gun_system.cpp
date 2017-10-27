@@ -122,7 +122,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 	cosmos.for_each(
 		processing_subjects::WITH_GUN,
-		[&](const auto gun_entity) {
+		[&](const entity_handle gun_entity) {
 			const auto gun_transform = gun_entity.get_logic_transform();
 			const auto owning_capability = gun_entity.get_owning_transfer_capability();
 			

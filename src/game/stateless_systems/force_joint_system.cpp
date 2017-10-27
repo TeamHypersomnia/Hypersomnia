@@ -19,7 +19,7 @@ void force_joint_system::apply_forces_towards_target_entities(const logic_step s
 
 	cosmos.for_each(
 		processing_subjects::WITH_FORCE_JOINT,
-		[&](const auto it) {
+		[&](const entity_handle it) {
 			if (!it.has<components::rigid_body>()) {
 				return;
 			}

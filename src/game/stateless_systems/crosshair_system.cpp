@@ -100,7 +100,7 @@ void crosshair_system::apply_base_offsets_to_crosshair_transforms(const logic_st
 	
 	cosmos.for_each(
 		processing_subjects::WITH_CROSSHAIR,
-		[&](const auto it) {
+		[&](const entity_handle it) {
 			const auto player = cosmos[it.get<components::crosshair>().character_entity_to_chase];
 
 			if (player.alive()) {

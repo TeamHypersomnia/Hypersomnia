@@ -50,7 +50,7 @@ void particles_existence_system::displace_streams_and_destroy_dead_streams(const
 
 	cosmos.for_each(
 		processing_subjects::WITH_PARTICLES_EXISTENCE,
-		[&](const auto it) {
+		[&](const entity_handle it) {
 			auto& existence = it.get<components::particles_existence>();
 			auto& input = existence.input;
 

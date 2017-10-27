@@ -92,7 +92,7 @@ void sound_system::track_new_sound_existences_near_camera(
 
 	cosmos.for_each(
 		processing_subjects::WITH_SOUND_EXISTENCE, 
-		[&](const auto it) {
+		[&](const const_entity_handle it) {
 			auto& cache = get_cache(it);
 			const auto& existence = it.get<components::sound_existence>();
 			auto& source = cache.source;

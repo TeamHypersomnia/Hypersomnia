@@ -141,7 +141,7 @@ void missile_system::detonate_expired_missiles(const logic_step step) {
 
 	cosmos.for_each(
 		processing_subjects::WITH_DAMAGE,
-		[&](const auto it) {
+		[&](const entity_handle it) {
 			auto& missile = it.get<components::missile>();
 		
 			const bool already_detonated_in_this_step = 

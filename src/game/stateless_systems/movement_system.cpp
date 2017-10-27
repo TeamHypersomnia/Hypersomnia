@@ -67,7 +67,7 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 
 	cosmos.for_each(
 		processing_subjects::WITH_MOVEMENT,
-		[&](const auto it) {
+		[&](const entity_handle it) {
 			auto& movement = it.get<components::movement>();
 
 			const auto& rigid_body = it.get<components::rigid_body>();
@@ -171,7 +171,7 @@ void movement_system::generate_movement_events(const logic_step step) {
 
 	cosmos.for_each(
 		processing_subjects::WITH_MOVEMENT,
-		[&](const auto it) {
+		[&](const entity_handle it) {
 			const auto& movement = it.get<components::movement>();
 
 			float32 speed = 0.0f;

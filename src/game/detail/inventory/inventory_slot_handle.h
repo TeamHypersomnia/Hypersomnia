@@ -84,7 +84,7 @@ inline typename basic_inventory_slot_handle<C>::owner_reference basic_inventory_
 
 template <bool C>
 inline typename basic_inventory_slot_handle<C>::slot_pointer basic_inventory_slot_handle<C>::operator->() const {
-	return &get_container().get<components::container>().slots.at(raw_id.type);
+	return &get_container().template get<components::container>().slots.at(raw_id.type);
 }
 
 template <bool C>
@@ -103,7 +103,7 @@ inline bool basic_inventory_slot_handle<C>::alive() const {
 		return false;
 	}
 
-	const auto* const container = get_container().find<components::container>();
+	const auto* const container = get_container().template find<components::container>();
 
 	return container && container->slots.find(raw_id.type) != container->slots.end();
 }

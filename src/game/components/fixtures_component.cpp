@@ -17,7 +17,7 @@ using F = components::fixtures;
 template<bool C>
 maybe_const_ref_t<C, colliders_cache>& basic_fixtures_synchronizer<C>::get_cache() const {
 	auto& cosmos = handle.get_cosmos();
-	return cosmos.inferential.get<physics_system>().get_colliders_cache(handle);
+	return cosmos.inferential.template get<physics_system>().get_colliders_cache(handle);
 }
 
 template<bool C>
@@ -205,7 +205,7 @@ bool basic_fixtures_synchronizer<C>::is_activated() const {
 
 template<bool C>
 bool basic_fixtures_synchronizer<C>::is_constructed() const {
-	return handle.get_cosmos().inferential.get<physics_system>().is_inferred_state_created_for_colliders(handle);
+	return handle.get_cosmos().inferential.template get<physics_system>().is_inferred_state_created_for_colliders(handle);
 }
 
 template<bool C>

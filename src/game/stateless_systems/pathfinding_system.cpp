@@ -62,7 +62,7 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 
 	cosmos.for_each(
 		processing_subjects::WITH_PATHFINDING,
-		[&](const auto it) {
+		[&](const entity_handle it) {
 		/* get necessary components */
 			auto& pathfinding = it.get<components::pathfinding>();
 			const auto& transform = it.get_logic_transform() + pathfinding.eye_offset;

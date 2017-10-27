@@ -59,7 +59,7 @@ void car_system::apply_movement_forces(const logic_step step) {
 
 	cosmos.for_each(
 		processing_subjects::WITH_CAR, 
-		[&](const auto& it) {
+		[&](const entity_handle it) {
 			auto& car = it.get<components::car>();
 			const auto rigid_body = it.get<components::rigid_body>();
 

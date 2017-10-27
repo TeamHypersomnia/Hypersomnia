@@ -21,7 +21,7 @@ void hand_fuse_system::detonate_fuses(const logic_step step) {
 
 	cosmos.for_each(
 		processing_subjects::WITH_HAND_FUSE,
-		[&](const auto it) {
+		[&](const entity_handle it) {
 			auto& fuse = it.get<components::hand_fuse>();
 
 			if (fuse.when_detonates.was_set() && now >= fuse.when_detonates) {
