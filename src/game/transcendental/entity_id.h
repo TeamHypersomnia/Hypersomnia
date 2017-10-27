@@ -2,6 +2,7 @@
 #include <type_traits>
 #include "augs/ensure.h"
 #include "augs/misc/pool/pooled_object_id.h"
+#include "augs/build_settings/platform_defines.h"
 
 #include "game/organization/all_components_declaration.h"
 #include "game/transcendental/entity_id_declaration.h"
@@ -33,12 +34,15 @@ struct unversioned_entity_id : public cosmic_object_unversioned_id<cosmic_entity
 	unversioned_entity_id(const base b = base()) : base(b) {}
 };
 
+struct child_entity_id;
+
 struct entity_id : public cosmic_object_pool_id<cosmic_entity> {
 	using base = cosmic_object_pool_id<cosmic_entity>;
 	// GEN INTROSPECTOR struct entity_id
 	// INTROSPECT BASE cosmic_object_pool_id<cosmic_entity>
 	// END GEN INTROSPECTOR
 
+	entity_id(const child_entity_id c);
 	entity_id(const base b = base()) : base(b) {}
 
 	operator unversioned_entity_id() const {
@@ -55,12 +59,10 @@ struct child_entity_id : entity_id {
 
 	child_entity_id(const base b = base()) : base(b) {}
 
-	operator entity_id() const {
-		return *static_cast<const entity_id*>(this);
-	}
-
 	using base::operator unversioned_entity_id;
 };
+
+FORCE_INLINE entity_id::entity_id(const child_entity_id c) : entity_id(*static_cast<const entity_id*>(&c)) {}
 
 inline auto linear_cache_key(const entity_id id) {
 	ensure(id.is_set());

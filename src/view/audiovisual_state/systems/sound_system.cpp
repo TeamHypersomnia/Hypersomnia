@@ -137,7 +137,7 @@ void sound_system::track_new_sound_existences_near_camera(
 
 			const auto source_pos = it.get_viewing_transform(sys).pos;
 			const auto dist_from_listener = (listener_pos - source_pos).length();
-			const float absorption = std::min(10.f, pow(std::max(0.f, dist_from_listener - 2220.f)/520.f, 2));
+			const float absorption = std::min(10.f, static_cast<float>(pow(std::max(0.f, dist_from_listener - 2220.f)/520.f, 2)));
 
 			source.set_air_absorption_factor(absorption);
 			source.set_pitch(existence.input.effect.modifier.pitch);

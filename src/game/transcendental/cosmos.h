@@ -60,7 +60,7 @@ auto subscript_handle_getter(C& cosm, const entity_id id) {
 
 template <class C>
 auto subscript_handle_getter(C& cosm, const child_entity_id id) {
-	return subscript_handle_getter(cosm, id.operator entity_id());
+	return subscript_handle_getter(cosm, entity_id(id));
 }
 
 template <class C>

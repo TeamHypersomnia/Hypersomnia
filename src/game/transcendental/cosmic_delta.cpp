@@ -296,7 +296,7 @@ void cosmic_delta::decode(
 
 		augs::read_bytes(in, new_guid);
 		
-		new_entities_ids.emplace_back(deco.create_entity_with_specific_guid(new_guid));
+		new_entities_ids.push_back(deco.create_entity_with_specific_guid(new_guid).get_id());
 #else
 		// otherwise new entity_id assignment needs be deterministic
 #endif

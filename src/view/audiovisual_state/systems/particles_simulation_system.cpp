@@ -227,7 +227,7 @@ void particles_simulation_system::advance_visible_streams_and_all_particles(
 					const auto spawner = [&](auto dummy) {
 						using spawned_particle_type = decltype(dummy);
 
-						return spawn_particle<spawned_particle_type>(
+						return this->spawn_particle<spawned_particle_type>(
 							_rng,
 							instance.angular_offset,
 							instance.particle_speed,

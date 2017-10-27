@@ -16,7 +16,7 @@ namespace augs {
 				bool caret_visible = true;
 				unsigned interval_ms = 250;
 
-				timer timer;
+				timer timing;
 
 				void update();
 				void reset();

@@ -10,14 +10,14 @@ namespace augs {
 	namespace gui {
 		namespace text {
 			void caret_blinker::update() {
-				if (static_cast<unsigned>(timer.get<std::chrono::milliseconds>()) > interval_ms) {
+				if (static_cast<unsigned>(timing.get<std::chrono::milliseconds>()) > interval_ms) {
 					caret_visible = !caret_visible;
-					timer.reset();
+					timing.reset();
 				}
 			}
 
 			void caret_blinker::reset() {
-				timer.reset();
+				timing.reset();
 				caret_visible = true;
 			}
 

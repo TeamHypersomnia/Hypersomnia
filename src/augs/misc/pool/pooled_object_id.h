@@ -31,7 +31,7 @@ namespace augs {
 
 		using mapped_type = T;
 
-		friend std::ostream& operator<<(std::ostream& out, const pooled_object_id& x) {
+		friend std::ostream& operator<<(std::ostream& out, const pooled_object_id x) {
 			return out << "(" << x.indirection_index << ";" << x.version << ")";
 		}
 
@@ -65,7 +65,7 @@ namespace std {
 
 	template <class T, class S>
 	struct hash<augs::pooled_object_id<T, S>> {
-		std::size_t operator()(const augs::pooled_object_id<T, S>& k) const {
+		std::size_t operator()(const augs::pooled_object_id<T, S> k) const {
 			return augs::simple_two_hash(k.indirection_index, k.version);
 		}
 	};
