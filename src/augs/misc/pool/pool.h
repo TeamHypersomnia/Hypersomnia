@@ -35,15 +35,15 @@ namespace augs {
 		using unversioned_id_type = unversioned_id<mapped_type, size_type>;
 
 	protected:
-		using pool_slot = pool_slot<size_type>;
-		using pool_indirector = pool_indirector<size_type>;
+		using pool_slot_type = pool_slot<size_type>;
+		using pool_indirector_type = pool_indirector<size_type>;
 
 		friend struct introspection_access;
 
 		// GEN INTROSPECTOR class augs::pool class mapped_type template<class>class C class size_type
-		make_container_type<pool_slot> slots;
+		make_container_type<pool_slot_type> slots;
 		make_container_type<mapped_type> objects;
-		make_container_type<pool_indirector> indirectors;
+		make_container_type<pool_indirector_type> indirectors;
 		make_container_type<size_type> free_indirectors;
 		// END GEN INTROSPECTOR
 
@@ -62,7 +62,7 @@ namespace augs {
 			;
 		}
 
-		bool versions_match(const pool_indirector& indirector, const key_type key) const {
+		bool versions_match(const pool_indirector_type& indirector, const key_type key) const {
 			return indirector.version == key.version;
 		}
 
@@ -109,14 +109,14 @@ namespace augs {
 			
 			const auto new_slot_index = size();
 
-			pool_indirector& allocated_indirector = indirectors[next_free_indirector];
+			pool_indirector_type& allocated_indirector = indirectors[next_free_indirector];
 			allocated_indirector.real_index = new_slot_index;
 
 			key_type allocated_id;
 			allocated_id.version = allocated_indirector.version;
 			allocated_id.indirection_index = next_free_indirector;
 
-			pool_slot allocated_slot;
+			pool_slot_type allocated_slot;
 			allocated_slot.pointing_indirector = next_free_indirector;
 
 			slots.push_back(allocated_slot);
