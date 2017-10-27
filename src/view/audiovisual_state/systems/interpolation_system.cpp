@@ -52,7 +52,7 @@ void interpolation_system::set_updated_interpolated_transform(
 
 void interpolation_system::integrate_interpolated_transforms(
 	const interpolation_settings& settings,
-	const cosmos& cosm,
+	const cosmos& cosmos,
 	const augs::delta delta,
 	const augs::delta fixed_delta_for_slowdowns
 ) {
@@ -65,9 +65,9 @@ void interpolation_system::integrate_interpolated_transforms(
 	const auto seconds = delta.in_seconds();
 	const float slowdown_multipliers_decrease = seconds / fixed_delta_for_slowdowns.in_seconds();
 
-	cosm.for_each(
+	cosmos.for_each(
 		processing_subjects::WITH_INTERPOLATION, 
-		[&](const auto e) {
+		[&](const const_entity_handle e) {
 			const auto& actual = e.get_logic_transform();
 			const auto& info = e.get<components::interpolation>();
 			auto& integrated = get_interpolated(e);

@@ -12,9 +12,11 @@
 void draw_hud_for_released_explosives(const draw_hud_for_released_explosives_input in) {
 	const auto dt = in.cosm.get_fixed_delta();
 
-	in.cosm.for_each(
+	const auto& cosmos = in.cosm;
+
+	cosmos.for_each(
 		processing_subjects::WITH_HAND_FUSE,
-		[&](const auto it) {
+		[&](const const_entity_handle it) {
 			const components::hand_fuse& hand_fuse = it.get<components::hand_fuse>();
 
 			if (!it.get<components::fixtures>().is_activated()) {

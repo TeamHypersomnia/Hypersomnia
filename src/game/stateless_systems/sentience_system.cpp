@@ -452,9 +452,11 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 }
 
 void sentience_system::cooldown_aimpunches(const logic_step step) const {
-	step.cosm.for_each(
+	const auto& cosmos = step.cosm;
+
+	cosmos.for_each(
 		processing_subjects::WITH_SENTIENCE,
-		[&](const auto t) {
+		[&](const const_entity_handle t) {
 
 		}
 	);
