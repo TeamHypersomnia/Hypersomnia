@@ -16,6 +16,7 @@
 
 #include "augs/filesystem/file.h"
 
+#include "augs/readwrite/lua_readwrite_declaration.h"
 #include "augs/readwrite/lua_readwrite_overload_traits.h"
 #include "augs/readwrite/lua_traits.h"
 
