@@ -76,23 +76,6 @@ namespace augs {
 				entropies.post_event(id, in);
 			}
 
-			template <class C, class gui_element_id>
-			void set_focus(const C context, const gui_element_id& new_to_focus) {
-				if (new_to_focus == rect_in_focus) {
-					return;
-				}
-
-				if (context.alive(rect_in_focus)) {
-					generate_gui_event(entropies, rect_in_focus, gui_event::blur);
-				}
-
-				rect_in_focus = new_to_focus;
-
-				if (context.alive(new_to_focus)) {
-					generate_gui_event(entropies, new_to_focus, gui_event::focus);
-				}
-			}
-
 			template <class C>
 			void unhover_and_undrag(const C context) {
 				{
@@ -224,14 +207,7 @@ namespace augs {
 
 					pass = false;
 				}
-				/*
-				if(new_state.msg == down && new_state.key == event::keys::key::TAB) {
-				gui_element_id f;
-				if(f = seek_focusable(focus ? focus : &root, new_state.keys[event::keys::key::LSHIFT]))
-				set_focus(f);
-
-				pass = false;
-				}*/
+				
 				if (context.alive(rect_in_focus)) {
 					const bool rect_in_focus_drawing_enabled = context(rect_in_focus, [](const auto& r) { return r->get_flag(flag::ENABLE_DRAWING); });
 
@@ -325,23 +301,6 @@ namespace augs {
 				});
 			}
 			
-			template <class C>
-			void call_idle_mousemotion_updater(const C context, gui_entropy& entropy) {
-				event::change fabricated_state;
-				fabricated_state.msg = event::message::mousemotion;
-				fabricated_state.mouse.pos = context.get_input_state().mouse.pos;
-
-				raw_input_traversal mousemotion_updater(fabricated_state);
-
-				context(context.get_root_id(), [&](const auto& r) {
-					r->consume_raw_input_and_generate_gui_events(context, r, mousemotion_updater, entropy);
-				});
-
-				if (const bool hovered_but_unvisited = !mousemotion_updater.was_hovered_rect_visited && context.alive(rect_hovered)) {
-					context(rect_hovered, [&](const auto& r) { r->unhover(context, r, mousemotion_updater, entropy); });
-				}
-			}
-
 			template <class C>
 			void draw(const C context) const {
 				context(context.get_root_id(), [&](const auto& r) {

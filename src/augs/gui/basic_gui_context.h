@@ -97,8 +97,8 @@ namespace augs {
 				}, id);
 			}
 
-			template <bool is_const, class T, class L>
-			decltype(auto) operator()(const basic_dereferenced_location<is_const, T>& loc, L generic_call) const {
+			template <bool _is_const, class T, class L>
+			decltype(auto) operator()(const basic_dereferenced_location<_is_const, T>& loc, L generic_call) const {
 				return generic_call(loc);
 			}
 
