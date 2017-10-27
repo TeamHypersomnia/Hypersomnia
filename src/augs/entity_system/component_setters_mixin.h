@@ -26,7 +26,7 @@ namespace augs {
 		decltype(auto) operator+=(const component& c) const {
 			auto& self = *static_cast<const derived_entity_handle*>(this);
 			self.add(c);
-			return self.get<component>();
+			return self.template get<component>();
 		}
 
 		template<
