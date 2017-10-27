@@ -7,8 +7,6 @@ namespace augs {
 		static constexpr bool is_const = std::is_const_v<derived>;
 
 	protected:
-		using settable_as_current_base = settable_as_current_mixin<derived>;
-
 		settable_as_current_mixin() = default;
 
 		settable_as_current_mixin(settable_as_current_mixin&& b) noexcept {

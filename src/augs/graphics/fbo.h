@@ -13,7 +13,8 @@ namespace augs {
 			GLuint id = 0xdeadbeef;
 			vec2u size;
 
-			friend class settable_as_current_base;
+			using settable_as_current_base = settable_as_current_mixin<const fbo>;
+			friend settable_as_current_base;
 
 			bool set_as_current_impl() const;
 			static void set_current_to_none_impl();

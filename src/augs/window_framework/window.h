@@ -20,7 +20,7 @@
 
 namespace augs {
 	// extern LRESULT CALLBACK wndproc(HWND, UINT, WPARAM, LPARAM);
-	class window : public augs::settable_as_current_mixin<window> {
+	class window : public settable_as_current_mixin<window> {
 #if PLATFORM_WINDOWS
 		friend LRESULT CALLBACK wndproc(HWND, UINT, WPARAM, LPARAM);
 
@@ -59,7 +59,8 @@ namespace augs {
 #elif PLATFORM_UNIX
 
 #endif
-		friend class settable_as_current_base;
+		using settable_as_current_base = settable_as_current_mixin<window>;
+		friend settable_as_current_base;
 
 		bool set_as_current_impl();
 		static void set_current_to_none_impl();

@@ -59,7 +59,8 @@ namespace augs {
 			shader fragment;
 #endif
 
-			friend class settable_as_current_base;
+			using settable_as_current_base = settable_as_current_mixin<const shader_program>;
+			friend settable_as_current_base;
 
 			bool set_as_current_impl() const;
 			static void set_current_to_none_impl();

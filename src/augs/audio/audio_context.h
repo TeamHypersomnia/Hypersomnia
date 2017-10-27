@@ -2,7 +2,6 @@
 #include <string>
 #include "augs/filesystem/path.h"
 #include "augs/templates/exception_templates.h"
-#include "augs/templates/settable_as_current_mixin.h"
 #include "augs/audio/audio_settings.h"
 
 /** Opaque device handle */
@@ -59,8 +58,6 @@ namespace augs {
 
 		void destroy();
 		bool set_as_current();
-
-		friend class settable_as_current_base;
 
 	public:
 		audio_context(const audio_settings& device_name);
