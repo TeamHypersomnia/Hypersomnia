@@ -55,7 +55,7 @@ components::transform basic_spatial_properties_mixin<C, D>::get_logic_transform(
 	const auto owner = handle.get_owner_body();
 
 	if (owner.alive()) {
-		ensure(!handle.has<components::transform>());
+		ensure(!handle.template has<components::transform>());
 
 		const auto& phys = owner.template get<components::rigid_body>();
 

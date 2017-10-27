@@ -13,8 +13,8 @@ void perform_transfer(
 	const logic_step step
 );
 
-template<class C>
-void perform_transfers(const C requests, const logic_step step) {
+template <class C, class step_type>
+void perform_transfers(const C requests, const step_type step) {
 	for (const auto r : requests) {
 		perform_transfer(r, step);
 	}

@@ -1,14 +1,21 @@
 #pragma once
 #include <unordered_map>
 
+#include "augs/misc/timing/delta.h"
+
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/transcendental/cosmic_entropy.h"
+
+#include "game/detail/inventory/item_slot_transfer_request.h"
+#include "game/detail/spells/all_spells.h"
 
 #include "view/game_gui/game_gui_context.h"
 #include "view/game_gui/elements/game_gui_root.h"
 #include "view/game_gui/game_gui_intent_type.h"
 
-struct character_gui;
+#include "view/game_gui/elements/character_gui.h"
+#include "view/game_gui/elements/slot_button.h"
+#include "view/game_gui/elements/item_button.h"
 
 class game_gui_system {
 public:

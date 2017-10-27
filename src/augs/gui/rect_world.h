@@ -8,7 +8,6 @@
 #include "rect.h"
 
 #include "augs/misc/pool/pool.h"
-#include "augs/templates/subscript_handle_getters_mixin.h"
 
 #include "clipboard.h"
 #include "middlescrolling.h"

@@ -10,7 +10,7 @@ template <class List>
 class type_in_list_id {
 	using index_type = unsigned;
 	friend struct augs::introspection_access;
-	static constexpr std::size_t dead_value = -1;
+	static constexpr unsigned dead_value = static_cast<unsigned>(-1);
 	// GEN INTROSPECTOR class type_in_list_id class List
 	index_type index = dead_value;
 	// END GEN INTROSPECTOR

@@ -66,8 +66,8 @@ struct item_button : game_gui_rect_node {
 	static void for_each_child(const C context, const gui_element_id this_id, L generic_call) {
 		const auto container = context.get_cosmos()[this_id.get_location().item_id];
 
-		if (container.has<components::container>()) {
-			for (const auto& s : container.get<components::container>().slots) {
+		if (container.template has<components::container>()) {
+			for (const auto& s : container.template get<components::container>().slots) {
 				{
 					slot_button_in_container child_slot_location;
 					child_slot_location.slot_id.type = s.first;

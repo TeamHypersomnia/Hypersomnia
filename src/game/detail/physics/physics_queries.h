@@ -1,16 +1,15 @@
 #pragma once
+#include <Box2D/Common/b2Math.h>
 #include <Box2D/Dynamics/b2WorldCallbacks.h>
 #include <Box2D/Dynamics/b2Fixture.h>
 #include <Box2D/Dynamics/b2Body.h>
+#include <Box2D/Dynamics/b2World.h>
+#include <Box2D/Collision/Shapes/b2PolygonShape.h>
+#include <Box2D/Collision/b2Collision.h>
 
 #include "game/enums/callback_result.h"
 
 #include "game/detail/physics/physics_queries_declaration.h"
-
-struct b2AABB;
-struct b2Filter;
-class b2Shape;
-class b2World;
 
 template <class F>
 void for_each_in_aabb_meters(

@@ -175,7 +175,7 @@ std::optional<drag_and_drop_result> prepare_drag_and_drop_result(
 			else if (target_item != nullptr && target_item != dragged_item) {
 				const auto target_item_handle = cosmos[target_item.get_location().item_id];
 
-				if (target_item_handle.has<components::container>()) {
+				if (target_item_handle.template has<components::container>()) {
 					const auto compatible_slot = get_slot_with_compatible_category(dragged_item_handle, target_item_handle);
 
 					if (compatible_slot != slot_function::INVALID) {
@@ -183,7 +183,7 @@ std::optional<drag_and_drop_result> prepare_drag_and_drop_result(
 					}
 				}
 				else if (can_stack_entities(target_item_handle, dragged_item_handle)) {
-					simulated_transfer.target_slot = target_item_handle.get<components::item>().current_slot;
+					simulated_transfer.target_slot = target_item_handle.template get<components::item>().current_slot;
 					was_pointing_to_a_stack_target = true;
 				}
 			}
@@ -212,7 +212,7 @@ std::optional<drag_and_drop_result> prepare_drag_and_drop_result(
 					// 	drop.hint_text += L"Unmount & ";
 
 					std::wstring charges_text;
-					const auto item_charges = dragged_item_handle.get<components::item>().charges;
+					const auto item_charges = dragged_item_handle.template get<components::item>().charges;
 
 					if (item_charges > 1) {
 						if (simulated_transfer.specified_quantity == drop.result.transferred_charges) {

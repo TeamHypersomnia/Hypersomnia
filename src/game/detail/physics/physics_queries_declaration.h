@@ -2,7 +2,6 @@
 #include <array>
 
 #include "augs/math/si_scaling.h"
-
 #include "augs/math/camera_cone.h"
 
 struct b2AABB;

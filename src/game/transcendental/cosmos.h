@@ -53,6 +53,23 @@ struct cosmos_loading_error : error_with_typesafe_sprintf {
 	using error_with_typesafe_sprintf::error_with_typesafe_sprintf;
 };
 
+template <class C>
+auto subscript_handle_getter(C& cosm, const entity_id id) {
+	return basic_entity_handle<std::is_const_v<C>>{ cosm, id };
+}
+
+template <class C>
+auto subscript_handle_getter(C& cosm, const unversioned_entity_id id) {
+	return basic_entity_handle<std::is_const_v<C>>{ cosm, cosm.make_versioned(id) };
+}
+
+#if COSMOS_TRACKS_GUIDS
+template <class C>
+auto subscript_handle_getter(C& cosm, const entity_guid guid) {
+	return subscript_handle_getter(cosm, cosm.get_entity_id_by(guid));
+}
+#endif
+
 class EMPTY_BASES cosmos : private cosmos_base,
 	public augs::subscript_handle_getters_mixin<cosmos>
 {
@@ -296,22 +313,7 @@ inline si_scaling cosmos::get_si() const {
 	return significant.meta.global.si;
 }
 
-template <class C>
-auto subscript_handle_getter(C& cosm, const entity_id id) {
-	return basic_entity_handle<std::is_const_v<C>>{ cosm, id };
-}
-
-template <class C>
-auto subscript_handle_getter(C& cosm, const unversioned_entity_id id) {
-	return basic_entity_handle<std::is_const_v<C>>{ cosm, cosm.make_versioned(id) };
-}
-
 #if COSMOS_TRACKS_GUIDS
-template <class C>
-auto subscript_handle_getter(C& cosm, const entity_guid guid) {
-	return subscript_handle_getter(cosm, cosm.get_entity_id_by(guid));
-}
-
 inline entity_id cosmos::get_entity_id_by(const entity_guid guid) const {
 	return guid_to_id.at(guid);
 }

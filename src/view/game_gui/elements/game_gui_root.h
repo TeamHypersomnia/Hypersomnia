@@ -1,5 +1,6 @@
 #pragma once
 #include "view/game_gui/game_gui_element_location.h"
+#include "view/game_gui/elements/item_button.h"
 
 class game_gui_root : public game_gui_rect_node {
 public:
@@ -13,7 +14,7 @@ public:
 	) {
 		const auto handle = context.get_subject_entity();
 
-		if (!handle.has<components::item_slot_transfers>()) {
+		if (!handle.template has<components::item_slot_transfers>()) {
 			return;
 		}
 
