@@ -179,9 +179,3 @@ decltype(auto) get_container_with_key_type(ContainerList&& containers) {
 	);
 }
 
-
-template<class T>
-struct always_false : std::false_type{};
-
-template<class T>
-constexpr auto always_false_v = always_false<T>::value;

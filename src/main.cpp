@@ -3,6 +3,8 @@
 #include "augs/unit_tests.h"
 #include "augs/global_libraries.h"
 
+#include "augs/templates/always_false.h"
+
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
 
@@ -1143,13 +1145,13 @@ int work(const int argc, const char* const * const argv) try {
 					_load_all(setup.get_viewable_defs());
 				}
 				else if constexpr(s == S::LOAD_ONLY_NEAR_CAMERA){
-					static_assert(false, "Unimplemented");
+					static_assert(always_false_v<T>, "Unimplemented");
 				}
-				else if constexpr (T::loading_strategy == S::LOAD_ALL_ONLY_ONCE) {
+				else if constexpr(T::loading_strategy == S::LOAD_ALL_ONLY_ONCE) {
 					/* Do nothing */
 				}
 				else {
-					static_assert(false, "Unknown viewables loading strategy.");
+					static_assert(always_false_v<T>, "Unknown viewables loading strategy.");
 				}
 			}
 		);

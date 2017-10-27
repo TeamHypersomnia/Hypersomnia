@@ -9,6 +9,7 @@
 #include "augs/templates/exception_templates.h"
 #include "augs/templates/introspect.h"
 #include "augs/templates/for_each_type.h"
+#include "augs/templates/always_false.h"
 
 #include "augs/readwrite/custom_lua_representations.h"
 #include "augs/misc/lua/lua_utils.h"

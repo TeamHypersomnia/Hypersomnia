@@ -1,6 +1,7 @@
 #pragma once
 #include "augs/math/si_scaling.h"
 #include "augs/templates/type_in_list_id.h"
+#include "augs/templates/always_false.h"
 
 #include "game/common_state/visibility_settings.h"
 #include "game/common_state/pathfinding_settings.h"

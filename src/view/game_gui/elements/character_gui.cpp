@@ -3,6 +3,7 @@
 #include "character_gui.h"
 
 #include "augs/gui/text/printer.h"
+#include "augs/templates/always_false.h"
 
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"

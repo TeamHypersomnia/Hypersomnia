@@ -1,5 +1,6 @@
 #pragma once
 #include "augs/math/declare_math.h"
+#include "augs/templates/always_false.h"
 
 namespace augs {
 	struct introspection_access;
@@ -40,31 +41,31 @@ namespace augs {
 		}
 
 		template <class T = default_t>
-		T in_seconds() const;
-		
+		T in_seconds() const {
+			if constexpr(std::is_same_v<T, default_t>) {
+				return { secsf };
+			}
+			else if constexpr(std::is_same_v<T, double>) {
+				return { secs };
+			}
+			else {
+				static_assert(always_false_v<T>, "Can't call in_seconds with this type.");
+			}
+		}
+
 		template <class T = default_t>
-		T in_milliseconds() const;
-
-		template <>
-		default_t in_milliseconds<default_t>() const {
-			return { msf };
+		T in_milliseconds() const {
+			if constexpr(std::is_same_v<T, default_t>) {
+				return { msf };
+			}
+			else if constexpr(std::is_same_v<T, double>) {
+				return { ms };
+			}
+			else {
+				static_assert(always_false_v<T>, "Can't call in_milliseconds with this type.");
+			}
 		}
-
-		template <>
-		default_t in_seconds<default_t>() const {
-			return { secsf };
-		}
-
-		template <>
-		double in_milliseconds<double>() const {
-			return { ms };
-		}
-
-		template <>
-		double in_seconds<double>() const {
-			return { secs };
-		}
-
+		
 		template <class T>
 		auto per_second(const T t) const {
 			return t * in_seconds<T>();
