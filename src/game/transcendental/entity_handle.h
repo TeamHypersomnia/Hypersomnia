@@ -101,8 +101,6 @@ public:
 	) {
 	}
 
-	friend std::ostream& operator<<(std::ostream& out, const basic_entity_handle &x);
-
 	entity_id get_id() const {
 		return raw_id;
 	}
@@ -297,6 +295,9 @@ public:
 		return inferred != nullptr && inferred.is_activated();
 	}
 };
+
+std::ostream& operator<<(std::ostream& out, const entity_handle&x);
+std::ostream& operator<<(std::ostream& out, const const_entity_handle &x);
 
 inline auto linear_cache_key(const const_entity_handle handle) {
 	return linear_cache_key(handle.get_id());
