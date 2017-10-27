@@ -224,18 +224,6 @@ components::transform basic_fixtures_synchronizer<C>::get_total_offset() const {
 	return total;
 }
 
-components::transform components::fixtures::transform_around_body(
-	const const_entity_handle fe, 
-	const components::transform body_transform
-) {
-	const auto total_offset = fe.get<components::fixtures>().get_total_offset();
-	
-	components::transform displaced = body_transform + total_offset;
-	displaced.pos.rotate(body_transform.rotation, body_transform.pos);
-
-	return displaced;
-}
-
 template<bool C>
 entity_id basic_fixtures_synchronizer<C>::get_owner_body() const {
 	return get_raw_component().owner_body;

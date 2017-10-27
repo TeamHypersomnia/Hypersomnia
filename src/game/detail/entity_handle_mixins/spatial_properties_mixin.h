@@ -11,6 +11,11 @@
 
 struct all_logical_assets;
 
+components::transform transform_around_body(
+	const const_entity_handle fe,
+	const components::transform body_transform
+);
+
 template <bool is_const, class entity_handle_type>
 class basic_spatial_properties_mixin {
 public:
@@ -30,7 +35,7 @@ public:
 				in.pos.discard_fract();
 			}
 
-			return components::fixtures::transform_around_body(handle, in);
+			return transform_around_body(handle, in);
 		}
 		else if (handle.template has<components::interpolation>()) {
 			return sys.get_interpolated(handle);

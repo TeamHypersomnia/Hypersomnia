@@ -15,6 +15,18 @@
 #include "spatial_properties_mixin.h"
 #include "augs/drawing/drawing.h"
 
+components::transform transform_around_body(
+	const const_entity_handle fe,
+	const components::transform body_transform
+) {
+	const auto total_offset = fe.get<components::fixtures>().get_total_offset();
+
+	components::transform displaced = body_transform + total_offset;
+	displaced.pos.rotate(body_transform.rotation, body_transform.pos);
+
+	return displaced;
+}
+
 template <bool C, class D>
 bool basic_spatial_properties_mixin<C, D>::has_logic_transform() const {
 	const auto handle = *static_cast<const D*>(this);
@@ -51,7 +63,7 @@ components::transform basic_spatial_properties_mixin<C, D>::get_logic_transform(
 			const auto& fixtures = handle.template get<components::fixtures>();
 
 			if (fixtures.is_activated() && phys.is_activated()) {
-				return components::fixtures::transform_around_body(handle, owner.get_logic_transform());
+				return transform_around_body(handle, owner.get_logic_transform());
 			}
 			else {
 				ensure(handle.template has<components::item>());

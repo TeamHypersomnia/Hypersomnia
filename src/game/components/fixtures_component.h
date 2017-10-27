@@ -43,13 +43,7 @@ namespace components {
 		augs::enum_array<components::transform, colliders_offset_type> offsets_for_created_shapes;
 
 		entity_id owner_body;
-
 		// END GEN INTROSPECTOR
-
-		static components::transform transform_around_body(
-			const const_entity_handle fixtures_entity, 
-			const components::transform body_transform
-		);
 	};
 }
 
