@@ -1,7 +1,9 @@
 #pragma once
 #include <string>
 #include <sstream>
+#include <algorithm>
 #include <iomanip>
+#include <cctype>
 
 #include "augs/ensure.h"
 
@@ -84,7 +86,7 @@ struct str_ops_impl {
 			subject.begin(),
 			subject.end(),
 			subject.begin(),
-			::tolower
+			std::tolower
 		);
 
 		return *this;
@@ -95,7 +97,7 @@ struct str_ops_impl {
 			subject.begin(),
 			subject.end(),
 			subject.begin(),
-			::toupper
+			std::toupper
 		);
 		
 		return *this;
