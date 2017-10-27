@@ -79,7 +79,6 @@ namespace augs {
 		template <class Archive>
 		void write_with_properties(Archive& ar) const {
 			augs::write_bytes(ar, buf);
-			augs::write_bytes(ar, has_read_failed);
 			augs::write_bytes(ar, write_pos);
 			augs::write_bytes(ar, read_pos);
 		}
@@ -87,7 +86,6 @@ namespace augs {
 		template <class Archive>
 		void read_with_properties(Archive& ar) {
 			augs::read_bytes(ar, buf);
-			augs::read_bytes(ar, has_read_failed);
 			augs::read_bytes(ar, write_pos);
 			augs::read_bytes(ar, read_pos);
 		}

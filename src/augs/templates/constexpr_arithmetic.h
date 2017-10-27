@@ -1,5 +1,6 @@
 #pragma once
 #include <cstddef>
+#include "augs/templates/type_list.h"
 
 template <std::size_t num_bytes, std::size_t alignment>
 struct aligned_num_of_bytes {
