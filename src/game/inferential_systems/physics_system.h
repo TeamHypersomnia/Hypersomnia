@@ -17,6 +17,7 @@
 #include "game/components/motor_joint_component.h"
 
 #include "game/messages/collision_message.h"
+#include "game/detail/physics/physics_queries_declaration.h"
 
 class cosmos;
 struct cosmos_common_state;

@@ -3,10 +3,9 @@
 #include <Box2D/Dynamics/b2Fixture.h>
 #include <Box2D/Dynamics/b2Body.h>
 
-#include "augs/math/si_scaling.h"
 #include "game/enums/callback_result.h"
 
-#include "augs/math/camera_cone.h"
+#include "game/detail/physics/physics_queries_declaration.h"
 
 struct b2AABB;
 struct b2Filter;
