@@ -1,5 +1,4 @@
 #pragma once
-#include "augs/templates/for_each_type.h"
 #include "augs/templates/type_matching_and_indexing.h"
 #include "augs/templates/component_traits.h"
 
@@ -20,7 +19,7 @@ namespace augs {
 				}
 			};
 
-			for_each_type<components...>(reserver);
+			(reserver(components()), ...);
 		}
 
 		template <class... excluded_components, class handle_type>
@@ -28,7 +27,7 @@ namespace augs {
 			const handle_type into,
 			const handle_type from 
 		) {
-			for_each_type<components...>([&from, &into](auto c) {
+			auto cloner = [&from, &into](auto c) {
 				using component = decltype(c);
 				using allocator_base = typename handle_type::allocator;
 
@@ -47,14 +46,16 @@ namespace augs {
 						}
 					}
 				}
-			});
+			};
+			
+			(cloner(components()), ...);
 		}
 
 		template <class handle_type>
 		void free_all_components(const handle_type handle) {
 			auto& self = *static_cast<derived*>(this);
 
-			for_each_type<components...>([&](auto c) {
+			auto freer = [&](auto c) {
 				using component = decltype(c);
 				using allocator_base = typename handle_type::allocator;
 
@@ -63,7 +64,9 @@ namespace augs {
 						handle.allocator_base::template remove<component>();
 					}
 				}
-			});
+			};
+
+			(freer(components()), ...);
 		}
 	};
 }
