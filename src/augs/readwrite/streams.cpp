@@ -21,22 +21,6 @@ namespace augs {
 		read_pos += bytes;
 	}
 	
-	std::string stream::format_as_uchars() const {
-		const auto first = reinterpret_cast<const unsigned char*>(data());
-
-		std::string output;
-
-		for (size_t i = 0; i < size(); ++i) {
-			output += std::to_string(static_cast<int>(first[i])) + " ";
-		}
-
-		if (output.size() > 0) {
-			output.erase(output.end() - 1);
-		}
-
-		return output;
-	}
-
 	std::size_t stream::mismatch(const stream& b) const {
 		return std::mismatch(data(), data() + size(), b.data()).first - data();
 	}
@@ -65,10 +49,6 @@ namespace augs {
 		return data()[idx];
 	}
 	
-	std::string stream::to_string() const {
-		return std::string(data(), data() + size());
-	}
-
 	size_t stream::capacity() const {
 		return buf.size();
 	}

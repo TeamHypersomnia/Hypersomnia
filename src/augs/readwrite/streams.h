@@ -65,16 +65,12 @@ namespace augs {
 		std::byte& operator[](const std::size_t);
 		const std::byte& operator[](const std::size_t) const;
 
-		std::string to_string() const;
-
 		std::size_t capacity() const;
 
 		template<class T>
 		T peek() const {
 			return *reinterpret_cast<const T*>(buf.data() + read_pos);
 		}
-
-		std::string format_as_uchars() const;
 
 		template <class Archive>
 		void write_with_properties(Archive& ar) const {
