@@ -332,7 +332,7 @@ namespace augs {
 		void read_object_bytes(Archive& ar) {
 			auto r = [&ar](auto& object) {
 				augs::read_capacity(ar, object);
-				augs::read_variable_size_container(ar, object);
+				augs::read_container(ar, object);
 			};
 
 			r(objects);

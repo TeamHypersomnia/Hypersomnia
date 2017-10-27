@@ -107,8 +107,8 @@ namespace augs {
 			}
 
 			if (changed) {
-				augs::read_variable_size_container(in, changed_bytes, offset_type());
-				augs::read_variable_size_container(in, changed_offsets, offset_type());
+				augs::read_container(in, changed_bytes, offset_type());
+				augs::read_container(in, changed_offsets, offset_type());
 			}
 		}
 

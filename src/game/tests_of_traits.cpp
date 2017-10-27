@@ -22,6 +22,21 @@
 
 #include "3rdparty/imgui/imgui.h"
 
+template <typename Trait>
+struct size_test_detail {
+	static Trait ttt;
+
+	template<int Value = ttt.size()>
+	static std::true_type do_call(int) { return std::true_type(); }
+
+	static std::false_type do_call(...) { return std::false_type(); }
+
+	static auto call() { return do_call(0); }
+};
+
+template <class T>
+constexpr bool is_constexpr_size_v = size_test<T>::value;
+
 namespace templates_detail {
 	template <class T>
 	struct identity {
@@ -80,16 +95,16 @@ struct tests_of_traits {
 	static_assert(is_constexpr_size_v<std::array<int, 3>>, "Trait has failed");
 	static_assert(is_constexpr_size_v<std::array<vec2, 3>>, "Trait has failed");
 	static_assert(is_constexpr_size_v<decltype(pad_bytes<3>::pad)>, "Trait has failed");
-	static_assert(!is_variable_size_container_v<decltype(pad_bytes<3>::pad)>, "Trait has failed");
-	static_assert(is_variable_size_container_v<augs::enum_associative_array<game_intent_type, vec2>>, "Trait has failed");
+	static_assert(!is_container_v<decltype(pad_bytes<3>::pad)>, "Trait has failed");
+	static_assert(is_container_v<augs::enum_associative_array<game_intent_type, vec2>>, "Trait has failed");
 
-	static_assert(is_variable_size_container_v<augs::constant_size_vector<vec2, 20>>, "Trait has failed");
+	static_assert(is_container_v<augs::constant_size_vector<vec2, 20>>, "Trait has failed");
 	static_assert(augs::is_byte_readwrite_appropriate_v<augs::stream, augs::constant_size_vector<vec2, 20>>, "Trait has failed");
 	static_assert(augs::is_byte_readwrite_appropriate_v<augs::stream, augs::enum_associative_array<game_intent_type, vec2>>, "Trait has failed");
-	static_assert(is_variable_size_container_v<std::vector<int>>, "Trait has failed");
-	static_assert(is_variable_size_container_v<std::vector<vec2>>, "Trait has failed");
-	static_assert(is_variable_size_container_v<std::vector<cosmos>>, "Trait has failed");
-	static_assert(is_variable_size_container_v<std::vector<pathfinding_session>>, "Trait has failed");
+	static_assert(is_container_v<std::vector<int>>, "Trait has failed");
+	static_assert(is_container_v<std::vector<vec2>>, "Trait has failed");
+	static_assert(is_container_v<std::vector<cosmos>>, "Trait has failed");
+	static_assert(is_container_v<std::vector<pathfinding_session>>, "Trait has failed");
 
 	static_assert(can_access_data_v<std::string>, "Trait has failed");
 	static_assert(can_access_data_v<std::vector<int>>, "Trait has failed");

@@ -50,29 +50,15 @@ template <class T>
 struct has_begin_and_end<T, decltype(std::declval<T&>().begin(), std::declval<T&>().end(), void())> : std::true_type {};
 
 
-template<typename Trait>
-struct size_test_detail
-{
-	static Trait ttt;
-
-	template<int Value = ttt.size()>
-	static std::true_type do_call(int){ return std::true_type(); }
-
-	static std::false_type do_call(...){ return std::false_type(); }
-
-	static auto call(){ return do_call(0); }
-};
-
-template<typename Trait>
-struct size_test : decltype(size_test_detail<Trait>::call()) {
-
-};
+template <typename Trait>
+struct size_test : decltype(size_test_detail<Trait>::call()) {};
 
 template <class T>
 struct is_std_array : std::false_type {};
 
 template <class T, std::size_t I>
 struct is_std_array<std::array<T, I>> : std::true_type {};
+
 
 template <class T>
 constexpr bool is_std_array_v = is_std_array<T>::value;
@@ -96,10 +82,4 @@ template <class T>
 constexpr bool is_associative_v = is_associative<T>::value;
 
 template <class T>
-constexpr bool is_constexpr_size_v = size_test<T>::value;
-
-template <class T>
 constexpr bool is_container_v = has_begin_and_end<T>::value && !is_std_array_v<T>;
-
-template <class T>
-constexpr bool is_variable_size_container_v = is_container_v<T> && !is_constexpr_size_v<T>;

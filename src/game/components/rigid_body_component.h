@@ -2,6 +2,7 @@
 #include "3rdparty/Box2D/Common/b2Math.h"
 
 #include "augs/misc/timing/stepped_timing.h"
+#include "augs/templates/maybe_const.h"
 
 #include "game/transcendental/component_synchronizer.h"
 #include "game/transcendental/entity_handle_declaration.h"
@@ -10,6 +11,8 @@
 #include "game/enums/rigid_body_type.h"
 
 #include "game/components/transform_component.h"
+
+class relational_system;
 
 namespace components {
 	struct rigid_body {

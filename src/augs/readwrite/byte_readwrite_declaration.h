@@ -17,7 +17,7 @@ namespace augs {
 	void write_bytes(Archive&, const Serialized&);
 
 	template <class Archive, class Container, class container_size_type = std::size_t>
-	void read_variable_size_container(
+	void read_container(
 		Archive& ar,
 		Container& storage,
 		container_size_type = container_size_type()

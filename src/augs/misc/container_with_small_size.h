@@ -123,7 +123,7 @@ namespace augs {
 		A& ar,
 		container_with_small_size<T, size_type>& storage
 	) {
-		read_variable_size_container(ar, *storage, size_type());
+		read_container(ar, *storage, size_type());
 	}
 
 	template<class A, class T, class size_type>

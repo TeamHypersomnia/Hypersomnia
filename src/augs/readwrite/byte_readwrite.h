@@ -84,8 +84,8 @@ namespace augs {
 				storage = {};
 			}
 		}
-		else if constexpr(is_variable_size_container_v<Serialized>) {
-			read_variable_size_container(ar, storage);
+		else if constexpr(is_container_v<Serialized>) {
+			read_container(ar, storage);
 		}
 		else {
 			verify_has_introspect(storage);
@@ -193,7 +193,7 @@ namespace augs {
 	}
 
 	template <class Archive, class Container, class container_size_type>
-	void read_variable_size_container(
+	void read_container(
 		Archive& ar, 
 		Container& storage, 
 		container_size_type
