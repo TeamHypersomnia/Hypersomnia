@@ -59,6 +59,11 @@ auto subscript_handle_getter(C& cosm, const entity_id id) {
 }
 
 template <class C>
+auto subscript_handle_getter(C& cosm, const child_entity_id id) {
+	return subscript_handle_getter(cosm, id.operator entity_id());
+}
+
+template <class C>
 auto subscript_handle_getter(C& cosm, const unversioned_entity_id id) {
 	return basic_entity_handle<std::is_const_v<C>>{ cosm, cosm.make_versioned(id) };
 }

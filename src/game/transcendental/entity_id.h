@@ -55,6 +55,10 @@ struct child_entity_id : entity_id {
 
 	child_entity_id(const base b = base()) : base(b) {}
 
+	operator entity_id() const {
+		return *static_cast<const entity_id*>(this);
+	}
+
 	using base::operator unversioned_entity_id;
 };
 

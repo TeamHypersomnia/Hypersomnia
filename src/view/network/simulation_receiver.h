@@ -7,6 +7,7 @@
 #include "view/network/simulation_receiver_settings.h"
 
 #include "game/components/transform_component.h"
+#include "game/transcendental/cosmos.h"
 
 namespace augs {
 	namespace network {

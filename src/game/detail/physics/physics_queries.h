@@ -1,4 +1,6 @@
 #pragma once
+#include <type_traits>
+
 #include <Box2D/Common/b2Math.h>
 #include <Box2D/Dynamics/b2WorldCallbacks.h>
 #include <Box2D/Dynamics/b2Fixture.h>
@@ -7,6 +9,7 @@
 #include <Box2D/Collision/Shapes/b2PolygonShape.h>
 #include <Box2D/Collision/b2Collision.h>
 
+#include "game/enums/filters.h"
 #include "game/enums/callback_result.h"
 
 #include "game/detail/physics/physics_queries_declaration.h"

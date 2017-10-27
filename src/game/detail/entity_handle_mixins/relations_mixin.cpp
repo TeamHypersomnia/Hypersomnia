@@ -79,7 +79,7 @@ void relations_mixin<false, D>::set_owner_body(const entity_id parent_id) const 
 }
 
 template <bool C, class D>
-maybe_const_ptr_t<C, child_entity_id> typename basic_relations_mixin<C, D>::get_id_ptr(const child_entity_name n) const {
+maybe_const_ptr_t<C, child_entity_id> basic_relations_mixin<C, D>::get_id_ptr(const child_entity_name n) const {
 	const auto& self = *static_cast<const D*>(this);
 
 	auto result = maybe_const_ptr_t<C, child_entity_id>(nullptr);
