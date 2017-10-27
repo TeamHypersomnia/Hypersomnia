@@ -10,8 +10,7 @@ template <class List>
 class type_in_list_id {
 	using index_type = unsigned;
 	friend struct augs::introspection_access;
-	static constexpr std::size_t dead_value = 0xdeadbeef;
-	static_assert(num_types_in_list_v<List> < dead_value, "Take it easy, man.");
+	static constexpr std::size_t dead_value = -1;
 	// GEN INTROSPECTOR class type_in_list_id class List
 	index_type index = dead_value;
 	// END GEN INTROSPECTOR

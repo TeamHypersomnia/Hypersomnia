@@ -8,6 +8,7 @@
 #include "augs/templates/container_traits.h"
 #include "augs/templates/byte_type_for.h"
 #include "augs/templates/is_variant.h"
+#include "augs/templates/for_each_type.h"
 
 #include "augs/readwrite/byte_readwrite_overload_traits.h"
 #include "augs/readwrite/byte_readwrite_traits.h"
@@ -61,6 +62,27 @@ namespace augs {
 				storage.emplace(std::move(value));
 			}
 		}
+		else if constexpr(is_variant_v<Serialized>) {
+			auto type_id = static_cast<unsigned>(-1);
+			read_bytes(ar, type_id);
+
+			if (type_id != static_cast<unsigned>(-1)) {
+				for_each_type_in_list<Serialized>(
+					[&](const auto& dummy) {
+						using T = std::decay_t<decltype(dummy)>;
+
+						if (type_id == index_in_list_v<T, Serialized>) {
+							T object;
+							read_bytes(ar, object);
+							storage.emplace<T>(std::move(object));
+						}
+					}
+				);
+			}
+			else {
+				storage = {};
+			}
+		}
 		else if constexpr(is_variable_size_container_v<Serialized>) {
 			read_variable_size_container(ar, storage);
 		}
@@ -97,6 +119,23 @@ namespace augs {
 
 			if (storage) {
 				write_bytes(ar, *storage);
+			}
+		}
+		else if constexpr(is_variant_v<Serialized>) {
+			const auto index = storage.index();
+
+			if (index == std::variant_npos) {
+				write_bytes(ar, static_cast<unsigned>(-1));
+			}
+			else {
+				write_bytes(ar, static_cast<unsigned>(index));
+
+				std::visit(
+					[&](const auto& object) {
+						write_bytes(ar, object);
+					}, 
+					storage
+				);
 			}
 		}
 		else if constexpr(is_container_v<Serialized>) {

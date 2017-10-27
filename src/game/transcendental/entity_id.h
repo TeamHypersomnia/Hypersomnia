@@ -1,5 +1,6 @@
 #pragma once
 #include <type_traits>
+#include "augs/ensure.h"
 #include "augs/misc/pool/pooled_object_id.h"
 
 #include "game/organization/all_components_declaration.h"

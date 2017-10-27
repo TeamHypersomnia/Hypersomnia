@@ -89,12 +89,14 @@ namespace augs {
 			sol::object variant_content = input_table[variant_content_label];
 
 			for_each_type_in_list<Serialized>(
-				[variant_content, variant_type, &into](auto specific_object){
+				[variant_content, variant_type, &into](const auto& specific_object){
 					const auto this_type_name = get_custom_type_name(specific_object);
 
 					if (this_type_name == variant_type) {
-						read_lua(variant_content, specific_object);
-						into = specific_object;
+						using T = std::decay_t<decltype(specific_object)>;
+						T object;
+						read_lua(variant_content, object);
+						into.emplace<T>(std::move(object));
 					}
 				}
 			);

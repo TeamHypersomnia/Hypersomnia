@@ -7,6 +7,7 @@
 #include "augs/misc/enum/enum_associative_array.h"
 #include "augs/misc/value_meter.h"
 
+#include "augs/zeroed_pod.h"
 #include "augs/templates/type_list.h"
 #include "augs/templates/constexpr_arithmetic.h"
 #include "augs/templates/always_false.h"

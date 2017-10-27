@@ -1,6 +1,4 @@
 #pragma once
-#include "augs/zeroed_pod.h"
-
 #include "augs/templates/type_mod_templates.h"
 #include "augs/templates/transform_types.h"
 

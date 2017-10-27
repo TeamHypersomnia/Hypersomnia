@@ -1,6 +1,4 @@
-
 #if BUILD_UNIT_TESTS
-
 #include <catch.hpp>
 
 #include "augs/math/vec2.h"

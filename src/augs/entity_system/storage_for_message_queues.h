@@ -4,6 +4,7 @@
 #include "augs/templates/for_each_std_get.h"
 #include "augs/templates/container_templates.h"
 #include "augs/templates/type_mod_templates.h"
+#include "augs/templates/type_matching_and_indexing.h"
 #include "augs/ensure.h"
 
 namespace augs {

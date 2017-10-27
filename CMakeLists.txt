@@ -464,6 +464,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/application/workspace.cpp"
 	"src/augs/misc/imgui/addons/imguitabwindow/imguitabwindow.cpp"
 	"src/augs/misc/imgui/imgui_controls.cpp"
+	"src/augs/readwrite/readwrite_tests.cpp"
 )
 
 # natvis files for easier debugging in Visual Studio.

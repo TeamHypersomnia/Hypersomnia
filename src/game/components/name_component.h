@@ -1,5 +1,4 @@
 #pragma once
-#include "augs/zeroed_pod.h"
 #include "game/transcendental/component_synchronizer.h"
 
 #include "game/transcendental/entity_id.h"
