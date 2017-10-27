@@ -47,8 +47,9 @@ namespace augs {
 		}
 
 		template <
-			class component, 
-			class = std::enable_if<!is_const>
+			class component,
+			bool C = !is_const,
+			class = std::enable_if<C>
 		>
 		void add(const component& c) const {
 			if constexpr(is_component_fundamental_v<component>) {
@@ -64,7 +65,8 @@ namespace augs {
 
 		template <
 			class component, 
-			class = std::enable_if<!is_const && !is_component_fundamental_v<component>>
+			bool C = !is_const && !is_component_fundamental_v<component>,
+			class = std::enable_if<C>
 		>
 		void remove() const {
 			ensure(has<component>());

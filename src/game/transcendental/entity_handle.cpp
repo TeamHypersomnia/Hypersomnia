@@ -33,13 +33,13 @@ std::ostream& operator<<(std::ostream& out, const const_entity_handle &x) {
 
 template <bool C>
 template <bool, class>
-basic_entity_handle<C> basic_entity_handle<C>::add_standard_components(const logic_step step) const {
-	return add_standard_components(step, true);
+entity_handle basic_entity_handle<C>::add_standard_components(const logic_step step) const {
+	return add_standard_components<true, void>(step, true);
 }
 
 template <bool C>
 template <bool, class>
-basic_entity_handle<C> basic_entity_handle<C>::add_standard_components(const logic_step step, const bool activate_inferred) const {
+entity_handle basic_entity_handle<C>::add_standard_components(const logic_step step, const bool activate_inferred) const {
 	if (dead()) {
 		return *this;
 	}
@@ -90,7 +90,7 @@ basic_entity_handle<C> basic_entity_handle<C>::add_standard_components(const log
 		ensure(has<components::sender>());
 	}
 
-	recalculate_basic_processing_categories();
+	recalculate_basic_processing_categories<true, void>();
 	
 	if (activate_inferred) {
 		get<components::all_inferred_state>().set_activated(true);
@@ -120,7 +120,7 @@ void basic_entity_handle<C>::recalculate_basic_processing_categories() const {
 }
 
 // explicit instantiation
-template basic_entity_handle<false> basic_entity_handle<false>::add_standard_components<false, void>(const logic_step, const bool) const;
-template basic_entity_handle<false> basic_entity_handle<false>::add_standard_components<false, void>(const logic_step) const;
-template void basic_entity_handle<false>::set_name<false, void>(const entity_name_type&) const;
-template void basic_entity_handle<false>::recalculate_basic_processing_categories<false, void>() const;
+template entity_handle basic_entity_handle<false>::add_standard_components<true, void>(const logic_step, const bool) const;
+template entity_handle basic_entity_handle<false>::add_standard_components<true, void>(const logic_step) const;
+template void basic_entity_handle<false>::set_name<true, void>(const entity_name_type&) const;
+template void basic_entity_handle<false>::recalculate_basic_processing_categories<true, void>() const;

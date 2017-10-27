@@ -4,6 +4,7 @@
 
 #include "augs/ensure.h"
 #include "augs/readwrite/byte_readwrite_declaration.h"
+#include "augs/templates/container_traits.h"
 
 namespace augs {
 	template <class T, class size_type>
@@ -99,12 +100,12 @@ namespace augs {
 			return container.size();
 		}
 
-		template <class = std::enable_if_t<can_access_data_v<T>>>
+		template <bool C = can_access_data_v<T>, class = std::enable_if_t<C>>
 		decltype(auto) data() {
 			return container.data();
 		}
 
-		template <class = std::enable_if_t<can_access_data_v<T>>>
+		template <bool C = can_access_data_v<T>, class = std::enable_if_t<C>>
 		decltype(auto) data() const {
 			return container.data();
 		}

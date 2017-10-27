@@ -67,7 +67,7 @@ namespace augs {
 			return parent_entry.is_set();
 		}
 
-		template <class = std::enable_if_t<parent_count == 1>>
+		template <bool C = parent_count == 1, class = std::enable_if_t<C>>
 		bool is_parent_set(
 			const id_type child_id
 		) {
@@ -89,7 +89,7 @@ namespace augs {
 			}
 		}
 
-		template <class = std::enable_if_t<parent_count == 1>>
+		template <bool C = parent_count == 1, class = std::enable_if_t<C>>
 		void unset_parent_of(
 			const id_type child_id
 		) {
@@ -126,7 +126,7 @@ namespace augs {
 			parent_cache.children.at(parent_index).push_back(child_id);
 		}
 
-		template <class = std::enable_if_t<parent_count == 1>>
+		template <bool C = parent_count == 1, class = std::enable_if_t<C>>
 		void set_parent(
 			const id_type child_id, 
 			const id_type parent_id
@@ -134,7 +134,7 @@ namespace augs {
 			set_parent(child_id, parent_id, 0u);
 		}
 
-		template <class = std::enable_if_t<parent_count == 1>>
+		template <bool C = parent_count == 1, class = std::enable_if_t<C>>
 		const auto& get_children_of(
 			const id_type parent
 		) const {

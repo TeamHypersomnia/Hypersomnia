@@ -295,22 +295,22 @@ namespace augs  {
 
 		constant_size_vector() = default;
 
-		template <class = std::enable_if_t<should_act_like_string>>
+		template <bool C = should_act_like_string, class = std::enable_if_t<C>>
 		constant_size_vector(const string_type& s) : constant_size_vector(s.begin(), s.end()) {}
 
-		template <class = std::enable_if_t<should_act_like_string>>
+		template <bool C = should_act_like_string, class = std::enable_if_t<C>>
 		constant_size_vector& operator=(const string_type& s) {
 			assign(s.begin(), s.end());
 			return *this;
 		}
 
-		template <class = std::enable_if_t<should_act_like_string>>
+		template <bool C = should_act_like_string, class = std::enable_if_t<C>>
 		constant_size_vector& operator+=(const string_type& s) {
 			insert(end(), s.begin(), s.end());
 			return *this;
 		}
 
-		template <class = std::enable_if_t<should_act_like_string>>
+		template <bool C = should_act_like_string, class = std::enable_if_t<C>>
 		operator string_type() const {
 			return{ begin(), end() };
 		}

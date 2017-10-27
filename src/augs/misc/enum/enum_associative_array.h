@@ -201,7 +201,7 @@ namespace augs {
 			return nth(i);
 		}
 
-		template <class = std::enable_if_t<std::is_default_constructible_v<mapped_type>>>
+		template <bool C = std::is_default_constructible_v<mapped_type>, class = std::enable_if_t<C>>
 		mapped_type& operator[](const key_type enum_idx) {
 			const auto i = static_cast<size_type>(enum_idx);
 			ensure(i < capacity());
