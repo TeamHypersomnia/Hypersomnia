@@ -987,7 +987,7 @@ int work(const int argc, const char* const * const argv) try {
 				const bool was_released = key_change && *key_change == intent_change::RELEASED;
 				
 				if (was_pressed || was_released) {
-					const auto key = e.key.key;
+					const auto key = e.data.key.key;
 
 					if (const auto it = mapped_or_nullptr(viewing_config.app_controls, key)) {
 						if (was_pressed) {
@@ -1044,7 +1044,7 @@ int work(const int argc, const char* const * const argv) try {
 				;
 
 				if (was_pressed || was_released) {
-					const auto key = e.key.key;
+					const auto key = e.data.key.key;
 
 					if (direct_gameplay_or_game_gui || was_released) {
 						if (const auto it = mapped_or_nullptr(viewing_config.app_ingame_controls, key)) {
@@ -1080,7 +1080,7 @@ int work(const int argc, const char* const * const argv) try {
 					&& direct_gameplay_or_game_gui
 					&& !game_gui.active
 				) {
-					game_motions.push_back({ game_motion_type::MOVE_CROSSHAIR, e.mouse.rel });
+					game_motions.push_back({ game_motion_type::MOVE_CROSSHAIR, e.data.mouse.rel });
 					continue;
 				}
 

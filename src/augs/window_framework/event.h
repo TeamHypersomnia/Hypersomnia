@@ -202,30 +202,34 @@ namespace augs {
 			};
 
 			struct change {
-				message msg = message::unknown;
-				
-				union {
-					struct mouse_data {
-						basic_vec2<short> rel;
-						basic_vec2<short> pos;
-					} mouse;
-
-					struct scroll_data {
-						int amount;
-					} scroll;
-
-					struct key_data {
-						keys::key key;
-
-						operator keys::key() const {
-							return key;
-						}
-					} key;
-
-					struct character_data {
-						wchar_t utf16;
-					} character;
+				struct mouse_data {
+					basic_vec2<short> rel;
+					basic_vec2<short> pos;
 				};
+
+				struct scroll_data {
+					int amount;
+				};
+
+				struct key_data {
+					keys::key key;
+				};
+
+				struct character_data {
+					wchar_t utf16;
+				};
+
+				union data_type {
+					mouse_data mouse;
+					scroll_data scroll;
+					key_data key;
+					character_data character;
+					
+					data_type() {}
+				};
+
+				message msg = message::unknown;
+				data_type data;
 
 				change();
 

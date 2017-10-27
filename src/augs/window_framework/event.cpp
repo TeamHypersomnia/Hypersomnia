@@ -7,15 +7,15 @@ namespace augs {
 	namespace event {
 		std::ostream& operator<<(std::ostream& out, const augs::event::change& x) {
 			if (x.was_any_key_pressed()) {
-				return out << "Pressed: " << augs::event::keys::key_to_string(x.key.key);
+				return out << "Pressed: " << augs::event::keys::key_to_string(x.data.key.key);
 			}
 
 			if (x.was_any_key_released()) {
-				return out << "Released: " << augs::event::keys::key_to_string(x.key.key);
+				return out << "Released: " << augs::event::keys::key_to_string(x.data.key.key);
 			}
 
 			if (x.msg == message::mousemotion) {
-				return out << "Mouse moved to: " << x.mouse.pos << ", Rel: " << x.mouse.rel;
+				return out << "Mouse moved to: " << x.data.mouse.pos << ", Rel: " << x.data.mouse.rel;
 			}
 
 			return out;
@@ -90,24 +90,24 @@ namespace augs {
 		}
 
 		bool change::was_pressed(const keys::key k) const {
-			return was_any_key_pressed() && key.key == k;
+			return was_any_key_pressed() && data.key.key == k;
 		}
 
 		bool change::was_released(const keys::key k) const {
-			return was_any_key_released() && key.key == k;
+			return was_any_key_released() && data.key.key == k;
 		}
 
 		bool change::is_exit_message() const {
 			return msg == message::close
 				|| msg == message::quit
-				|| (msg == message::syskeydown && key.key == keys::key::F4)
+				|| (msg == message::syskeydown && data.key.key == keys::key::F4)
 			;
 		}
 
 		bool change::is_shortcut_key() const {
 			if (get_key_change() != key_change::NO_CHANGE) {
 				/* Let shortcut keys propagate */
-				switch (key.key) {
+				switch (data.key.key) {
 					case keys::key::LCTRL: return true;
 					case keys::key::LALT: return true;
 					case keys::key::LSHIFT: return true;
@@ -128,13 +128,13 @@ namespace augs {
 			const auto ch = dt.get_key_change();
 
 			if (ch == key_change::PRESSED) {
-				keys.set(dt.key.key, true);
+				keys.set(dt.data.key.key, true);
 			}
 			else if (ch == key_change::RELEASED) {
-				keys.set(dt.key.key, false);
+				keys.set(dt.data.key.key, false);
 			}
 			else if (dt.msg == message::mousemotion) {
-				mouse.pos = dt.mouse.pos;
+				mouse.pos = dt.data.mouse.pos;
 				
 				if (!get_mouse_key(0)) {
 					mouse.ldrag.x = mouse.pos.x;
@@ -177,7 +177,7 @@ namespace augs {
 
 				if (keys[k]) {
 					change c;
-					c.key.key = k;
+					c.data.key.key = k;
 					c.msg = message::keyup;
 					output.push_back(c);
 				}
@@ -198,7 +198,7 @@ namespace augs {
 				{
 					change c;
 					c.msg = message::keyup;
-					c.key.key = k;
+					c.data.key.key = k;
 					output.push_back(c);
 				}
 			}
@@ -212,7 +212,7 @@ namespace augs {
 				{
 					change c;
 					c.msg = message::keyup;
-					c.key.key = k;
+					c.data.key.key = k;
 					output.push_back(c);
 				}
 			}
@@ -226,7 +226,7 @@ namespace augs {
 				{
 					change c;
 					c.msg = message::keyup;
-					c.key.key = k;
+					c.data.key.key = k;
 					output.push_back(c);
 				}
 			}

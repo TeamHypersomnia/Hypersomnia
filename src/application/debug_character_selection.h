@@ -41,8 +41,8 @@ struct debug_character_selection {
 			[this](const auto& c) {
 				state.apply(c);
 
-				if (state[key::LCTRL] && c.was_any_key_pressed() && int(c.key.key) > int(key::_0) && int(c.key.key) <= int(key::_9)) {
-					current_character_index = int(c.key.key) - int(key::_0);
+				if (state[key::LCTRL] && c.was_any_key_pressed() && int(c.data.key.key) > int(key::_0) && int(c.data.key.key) <= int(key::_9)) {
+					current_character_index = int(c.data.key.key) - int(key::_0);
 
 					select_character(characters[current_character_index]);
 

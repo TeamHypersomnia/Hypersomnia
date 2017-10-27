@@ -169,7 +169,7 @@ namespace augs {
 								}
 
 								if (msg == message::wheel) {
-									gui_event_lambda(gui_event::wheel, inf.change.scroll.amount);
+									gui_event_lambda(gui_event::wheel, inf.change.data.scroll.amount);
 								}
 
 								if (msg == message::mousemotion) {

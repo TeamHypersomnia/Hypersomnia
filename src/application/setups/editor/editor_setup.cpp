@@ -821,7 +821,7 @@ bool editor_setup::handle_top_level_window_input(
 	using namespace augs::event::keys;
 
 	if (e.was_any_key_pressed()) {
-		const auto k = e.key.key;
+		const auto k = e.data.key.key;
 		
 		/* Media buttons work regardless of pause */
 
@@ -891,7 +891,7 @@ bool editor_setup::handle_unfetched_window_input(
 		if (e.msg == message::mousemotion) {
 			if (common_input_state[key::RMOUSE]) {
 				if (has_current_tab()) {
-					tab().panning -= e.mouse.rel * settings.camera_panning_speed;
+					tab().panning -= e.data.mouse.rel * settings.camera_panning_speed;
 
 					return true;
 				}
@@ -949,7 +949,7 @@ bool editor_setup::handle_unfetched_window_input(
 		}
 
 		if (e.was_any_key_pressed()) {
-			const auto k = e.key.key;
+			const auto k = e.data.key.key;
 
 			const bool has_ctrl{ common_input_state[key::LCTRL] };
 			const bool has_shift{ common_input_state[key::LSHIFT] };

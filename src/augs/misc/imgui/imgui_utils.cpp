@@ -56,7 +56,7 @@ namespace augs {
 
 			for (const auto& in : window_inputs) {
 				if (in.msg == message::mousemotion) {
-					io.MousePos = ImVec2(in.mouse.pos);
+					io.MousePos = ImVec2(in.data.mouse.pos);
 				}
 				else if (
 					in.msg == message::ldown 
@@ -78,16 +78,16 @@ namespace augs {
 					io.MouseDown[1] = false;
 				}
 				else if (in.msg == message::wheel) {
-					io.MouseWheel = static_cast<float>(in.scroll.amount);
+					io.MouseWheel = static_cast<float>(in.data.scroll.amount);
 				}
 				else if (in.msg == message::keydown) {
-					io.KeysDown[static_cast<int>(in.key.key)] = true;
+					io.KeysDown[static_cast<int>(in.data.key.key)] = true;
 				}
 				else if (in.msg == message::keyup) {
-					io.KeysDown[static_cast<int>(in.key.key)] = false;
+					io.KeysDown[static_cast<int>(in.data.key.key)] = false;
 				}
 				else if (in.msg == message::character) {
-					io.AddInputCharacter(in.character.utf16);
+					io.AddInputCharacter(in.data.character.utf16);
 				}
 
 				io.KeyCtrl = io.KeysDown[static_cast<int>(keys::key::LCTRL)] || io.KeysDown[static_cast<int>(keys::key::RCTRL)];
@@ -134,16 +134,16 @@ namespace augs {
 					io.MouseDown[1] = false;
 				}
 				else if (in.msg == message::wheel) {
-					io.MouseWheel = static_cast<float>(in.scroll.amount);
+					io.MouseWheel = static_cast<float>(in.data.scroll.amount);
 				}
 				else if (in.msg == message::keydown) {
-					io.KeysDown[static_cast<int>(in.key.key)] = true;
+					io.KeysDown[static_cast<int>(in.data.key.key)] = true;
 				}
 				else if (in.msg == message::keyup) {
-					io.KeysDown[static_cast<int>(in.key.key)] = false;
+					io.KeysDown[static_cast<int>(in.data.key.key)] = false;
 				}
 				else if (in.msg == message::character) {
-					io.AddInputCharacter(in.character.utf16);
+					io.AddInputCharacter(in.data.character.utf16);
 				}
 			}
 

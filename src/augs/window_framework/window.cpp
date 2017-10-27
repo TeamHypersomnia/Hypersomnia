@@ -39,15 +39,15 @@ namespace augs {
 	event::change window::do_raw_motion(const basic_vec2<short> motion) {
 		event::change change;
 		
-		change.mouse.rel = motion;
+		change.data.mouse.rel = motion;
 
 		if (!mouse_position_frozen) {
-			last_mouse_pos += vec2i(change.mouse.rel);
+			last_mouse_pos += vec2i(change.data.mouse.rel);
 		}
 
 		const auto screen_size = current_settings.get_screen_size() - vec2i(1, 1);
 		last_mouse_pos.clamp_from_zero_to(screen_size);
-		change.mouse.pos = basic_vec2<short>(last_mouse_pos);
+		change.data.mouse.pos = basic_vec2<short>(last_mouse_pos);
 		change.msg = event::message::mousemotion;
 
 		return change;
@@ -84,8 +84,8 @@ namespace augs {
 
 		switch (m) {
 		case WM_CHAR:
-			change.character.utf16 = wchar_t(wParam);
-			if (change.character.utf16 > 255) {
+			change.data.character.utf16 = wchar_t(wParam);
+			if (change.data.character.utf16 > 255) {
 				break;
 			}
 			//change.utf32 = unsigned(wParam);
@@ -103,10 +103,10 @@ namespace augs {
 			break;
 
 		case WM_KEYUP:
-			change.key.key = translate_key_with_lparam(lParam, wParam);
+			change.data.key.key = translate_key_with_lparam(lParam, wParam);
 			break;
 		case WM_KEYDOWN:
-			change.key.key = translate_key_with_lparam(lParam, wParam);
+			change.data.key.key = translate_key_with_lparam(lParam, wParam);
 
 			if (const bool repeated = ((lParam & (1 << 30)) != 0)) {
 				return std::nullopt;
@@ -115,10 +115,10 @@ namespace augs {
 			break;
 
 		case WM_SYSKEYUP:
-			change.key.key = translate_key_with_lparam(lParam, wParam);
+			change.data.key.key = translate_key_with_lparam(lParam, wParam);
 			break;
 		case WM_SYSKEYDOWN:
-			change.key.key = translate_key_with_lparam(lParam, wParam);
+			change.data.key.key = translate_key_with_lparam(lParam, wParam);
 
 			if (const bool repeated = ((lParam & (1 << 30)) != 0)) {
 				return std::nullopt;
@@ -127,11 +127,11 @@ namespace augs {
 			break;
 
 		case WM_MOUSEWHEEL:
-			change.scroll.amount = GET_WHEEL_DELTA_WPARAM(wParam) / WHEEL_DELTA;
+			change.data.scroll.amount = GET_WHEEL_DELTA_WPARAM(wParam) / WHEEL_DELTA;
 			break;
 		case WM_LBUTTONDBLCLK:
 		case WM_LBUTTONDOWN:
-			change.key.key = key::LMOUSE;
+			change.data.key.key = key::LMOUSE;
 			SetCapture(hwnd);
 
 			if (m == WM_LBUTTONDOWN) {
@@ -148,29 +148,29 @@ namespace augs {
 			break;
 		case WM_RBUTTONDBLCLK:
 		case WM_RBUTTONDOWN:
-			change.key.key = key::RMOUSE;
+			change.data.key.key = key::RMOUSE;
 			break;
 		case WM_MBUTTONDBLCLK:
 		case WM_MBUTTONDOWN:
-			change.key.key = key::MMOUSE;
+			change.data.key.key = key::MMOUSE;
 			break;
 		case WM_XBUTTONDBLCLK:
 		case WM_XBUTTONDOWN:
-			change.key.key = key::MOUSE4;
+			change.data.key.key = key::MOUSE4;
 			change.msg = event::message::keydown;
 			break;
 		case WM_XBUTTONUP:
-			change.key.key = key::MOUSE4;
+			change.data.key.key = key::MOUSE4;
 			change.msg = event::message::keyup;
 			break;
 		case WM_LBUTTONUP:
-			change.key.key = key::LMOUSE;
+			change.data.key.key = key::LMOUSE;
 			if (GetCapture() == hwnd) ReleaseCapture(); break;
 		case WM_RBUTTONUP:
-			change.key.key = key::RMOUSE;
+			change.data.key.key = key::RMOUSE;
 			break;
 		case WM_MBUTTONUP:
-			change.key.key = key::MMOUSE;
+			change.data.key.key = key::MMOUSE;
 			break;
 		case WM_MOUSEHOVER:
 			cursor_in_client_area = true;
@@ -189,15 +189,15 @@ namespace augs {
 					new_pos = { p.x, p.y };
 				}
 
-				change.mouse.rel = new_pos - basic_vec2<short>(last_mouse_pos);
+				change.data.mouse.rel = new_pos - basic_vec2<short>(last_mouse_pos);
 				
-				if (change.mouse.rel.non_zero()) {
+				if (change.data.mouse.rel.non_zero()) {
 					double_click_occured = false;
 				}
 
 				last_mouse_pos = new_pos;
 
-				change.mouse.pos = basic_vec2<short>(last_mouse_pos);
+				change.data.mouse.pos = basic_vec2<short>(last_mouse_pos);
 				change.msg = event::message::mousemotion;
 			}
 			else {
