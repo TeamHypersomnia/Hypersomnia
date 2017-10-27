@@ -1,8 +1,6 @@
 #pragma once
 #include <type_traits>
 
-#include "augs/templates/maybe_const.h"
-
 template <class T>
 struct zeroed_pod {
 	// GEN INTROSPECTOR struct zeroed_pod class T
