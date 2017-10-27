@@ -1,9 +1,7 @@
 #pragma once
-#include "game/transcendental/entity_handle_declaration.h"
+#include "augs/math/vec2.h"
 #include "augs/build_settings/platform_defines.h"
-#include "game/transcendental/step_declaration.h"
-
-struct fixture_group_data;
+#include "game/organization/all_components_declaration.h"
 
 template <bool is_const, class entity_handle_type>
 class basic_physics_mixin {
@@ -12,12 +10,12 @@ public:
 	
 	bool is_physical() const {
 		const auto& handle = *static_cast<const entity_handle_type*>(this);
-		return handle.has<components::fixtures>() || handle.has<components::rigid_body>();
+		return handle.template has<components::fixtures>() || handle.template has<components::rigid_body>();
 	}
 
-	template <class F>
+	template <class step_type, class F>
 	void create_shape_component_from_renderable(
-		const const_logic_step step,
+		const step_type step,
 		F callback_for_created_component
 	) const {
 		const auto& handle = *static_cast<const entity_handle_type*>(this);
@@ -66,8 +64,9 @@ class EMPTY_BASES physics_mixin<false, entity_handle_type> : public basic_physic
 public:
 	using base = basic_physics_mixin<false, entity_handle_type>;
 
+	template <class step_type>
 	void add_shape_component_from_renderable(
-		const const_logic_step step
+		const step_type step
 	) const {
 		base::create_shape_component_from_renderable(
 			step, 
