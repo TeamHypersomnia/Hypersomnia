@@ -10,6 +10,7 @@
 #include "augs/templates/is_variant.h"
 #include "augs/templates/for_each_type.h"
 
+#include "augs/readwrite/byte_readwrite_declaration.h"
 #include "augs/readwrite/byte_readwrite_overload_traits.h"
 #include "augs/readwrite/byte_readwrite_traits.h"
 
@@ -191,11 +192,11 @@ namespace augs {
 		}
 	}
 
-	template <class Archive, class Container, class container_size_type = std::size_t>
+	template <class Archive, class Container, class container_size_type>
 	void read_variable_size_container(
 		Archive& ar, 
 		Container& storage, 
-		container_size_type = container_size_type()
+		container_size_type
 	) {
 		container_size_type s;
 		read_bytes(ar, s);
@@ -236,11 +237,11 @@ namespace augs {
 		}
 	}
 
-	template <class Archive, class Container, class container_size_type = std::size_t>
+	template <class Archive, class Container, class container_size_type>
 	void write_container(
 		Archive& ar, 
 		const Container& storage, 
-		container_size_type = {}
+		container_size_type
 	) {
 		const auto s = storage.size();
 		ensure(s <= std::numeric_limits<container_size_type>::max());
@@ -256,18 +257,18 @@ namespace augs {
 		}
 	}
 
-	template <class Archive, class Container, class container_size_type = std::size_t>
+	template <class Archive, class Container, class container_size_type>
 	void read_capacity(
 		Archive& ar, 
 		Container& storage,
-		container_size_type = {}
+		container_size_type
 	) {
 		container_size_type c;
 		read_bytes(ar, c);
 		storage.reserve(c);
 	}
 
-	template<class Archive, class Container, class container_size_type = std::size_t>
+	template<class Archive, class Container, class container_size_type>
 	void write_capacity(Archive& ar, const Container& storage) {
 		const auto c = static_cast<container_size_type>(storage.capacity());
 		ensure(c <= std::numeric_limits<container_size_type>::max());
