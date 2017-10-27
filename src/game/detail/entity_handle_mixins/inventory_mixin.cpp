@@ -20,11 +20,11 @@ D basic_inventory_mixin<C, D>::get_owning_transfer_capability() const {
 		return cosmos[entity_id()];
 	}
 
-	if (self.has<components::item_slot_transfers>()) {
+	if (self.template has<components::item_slot_transfers>()) {
 		return self;
 	}
 
-	const auto* const maybe_item = self.find<components::item>();
+	const auto* const maybe_item = self.template find<components::item>();
 
 	if (!maybe_item || cosmos[maybe_item->current_slot].dead()) {
 		return cosmos[entity_id()];
@@ -47,7 +47,7 @@ template <bool C, class D>
 typename basic_inventory_mixin<C, D>::inventory_slot_handle_type basic_inventory_mixin<C, D>::get_primary_hand() const {
 	const auto& self = *static_cast<const D*>(this);
 	auto& cosmos = self.get_cosmos();
-	ensure(self.has<components::sentience>());
+	ensure(self.template has<components::sentience>());
 
 	return self[slot_function::PRIMARY_HAND];
 }
@@ -56,7 +56,7 @@ template <bool C, class D>
 typename basic_inventory_mixin<C, D>::inventory_slot_handle_type basic_inventory_mixin<C, D>::get_secondary_hand() const {
 	const auto& self = *static_cast<const D*>(this);
 	auto& cosmos = self.get_cosmos();
-	ensure(self.has<components::sentience>());
+	ensure(self.template has<components::sentience>());
 
 	return self[slot_function::SECONDARY_HAND];
 }
@@ -117,7 +117,7 @@ template <bool C, class D>
 typename basic_inventory_mixin<C, D>::inventory_slot_handle_type basic_inventory_mixin<C, D>::get_current_slot() const {
 	const auto& self = *static_cast<const D*>(this);
 	
-	const auto* const maybe_item = self.find<components::item>();
+	const auto* const maybe_item = self.template find<components::item>();
 
 	if (maybe_item == nullptr) {
 		return self.get_cosmos()[inventory_slot_id()];
@@ -220,7 +220,7 @@ augs::constant_size_vector<entity_id, 2> basic_inventory_mixin<C, D>::get_wielde
 	erase_if(
 		result, 
 		[&](const auto item) {
-			return !self.get_cosmos()[item].has<components::gun>();
+			return !self.get_cosmos()[item].template has<components::gun>();
 		}
 	);
 

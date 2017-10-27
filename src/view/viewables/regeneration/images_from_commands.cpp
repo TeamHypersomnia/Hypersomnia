@@ -8,6 +8,10 @@
 
 #include "augs/readwrite/byte_readwrite.h"
 
+static_assert(
+	augs::is_byte_readwrite_appropriate_v<augs::stream, augs::paint_command_variant>,
+	"That was unexpected."
+);
 
 void regenerate_image_from_commands(
 	const augs::path_type& output_image_path,

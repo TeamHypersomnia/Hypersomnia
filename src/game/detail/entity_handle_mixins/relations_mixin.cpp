@@ -31,7 +31,7 @@ void relations_mixin<false, D>::make_cloned_child_entities_recursive(const entit
 	for_each_component_type([&](auto c) {
 		using component_type = decltype(c);
 		
-		if (self.has<component_type>()) {
+		if (self.template has<component_type>()) {
 			using allocator_base = typename D::allocator;
 
 			auto& cloned_to_component = self.allocator_base::template get<component_type>();
@@ -75,7 +75,7 @@ void relations_mixin<false, D>::map_child_entity(
 template <class D>
 void relations_mixin<false, D>::set_owner_body(const entity_id parent_id) const {
 	auto& self = *static_cast<const D*>(this);
-	self.get<components::fixtures>().set_owner_body(parent_id);
+	self.template get<components::fixtures>().set_owner_body(parent_id);
 }
 
 template <bool C, class D>
@@ -87,25 +87,25 @@ maybe_const_ptr_t<C, child_entity_id> typename basic_relations_mixin<C, D>::get_
 	if (self.alive()) {
 		switch (n) {
 		case child_entity_name::CROSSHAIR_RECOIL_BODY:
-			if (const auto crosshair = self.find<components::crosshair>()) {
+			if (const auto crosshair = self.template find<components::crosshair>()) {
 				result = &crosshair->recoil_entity;
 			}
 			break;
 
 		case child_entity_name::CHARACTER_CROSSHAIR:
-			if (const auto sentience = self.find<components::sentience>()) {
+			if (const auto sentience = self.template find<components::sentience>()) {
 				result = &sentience->character_crosshair;
 			}
 			break;
 
 		case child_entity_name::CATRIDGE_BULLET:
-			if (const auto catridge = self.find<components::catridge>()) {
+			if (const auto catridge = self.template find<components::catridge>()) {
 				result = &catridge->round;
 			}
 			break;
 
 		case child_entity_name::CATRIDGE_SHELL:
-			if (const auto catridge = self.find<components::catridge>()) {
+			if (const auto catridge = self.template find<components::catridge>()) {
 				result = &catridge->shell;
 			}
 			break;
@@ -142,7 +142,7 @@ D basic_relations_mixin<C, D>::operator[](const child_entity_name child) const {
 template <bool C, class D>
 D basic_relations_mixin<C, D>::get_owner_body() const {
 	auto& self = *static_cast<const D*>(this);
-	const auto fixtures = self.find<components::fixtures>();
+	const auto fixtures = self.template find<components::fixtures>();
 	return fixtures != nullptr ? self.get_cosmos()[fixtures.get_owner_body()] : self.get_cosmos()[entity_id()];
 }
 
@@ -150,7 +150,7 @@ D basic_relations_mixin<C, D>::get_owner_body() const {
 template <bool C, class D>
 entity_guid basic_relations_mixin<C, D>::get_guid() const {
 	auto& self = *static_cast<const D*>(this);
-	return self.get<components::guid>().get_value();
+	return self.template get<components::guid>().get_value();
 }
 #endif
 
@@ -158,8 +158,8 @@ template <bool C, class D>
 D basic_relations_mixin<C, D>::get_parent() const {
 	auto& self = *static_cast<const D*>(this);
 
-	if (self.has<components::child>()) {
-		return self.get_cosmos()[self.get<components::child>().parent];
+	if (self.template has<components::child>()) {
+		return self.get_cosmos()[self.template get<components::child>().parent];
 	}
 	else {
 		return self.get_cosmos()[entity_id()];

@@ -23,7 +23,7 @@ public:
 
 		const auto& owner = handle.get_owner_body();
 
-		if (owner.alive() && owner.has<components::interpolation>() && owner != handle) {
+		if (owner.alive() && owner.template has<components::interpolation>() && owner != handle) {
 			auto in = sys.get_interpolated(owner);
 
 			if (integerize) {
@@ -32,7 +32,7 @@ public:
 
 			return components::fixtures::transform_around_body(handle, in);
 		}
-		else if (handle.has<components::interpolation>()) {
+		else if (handle.template has<components::interpolation>()) {
 			return sys.get_interpolated(handle);
 		}
 
@@ -57,28 +57,28 @@ public:
 		const auto handle = *static_cast<const entity_handle_type*>(this);
 
 		if (
-			const auto* const sprite = handle.find<components::sprite>();
+			const auto* const sprite = handle.template find<components::sprite>();
 			sprite != nullptr
 		) {
 			return sprite->get_aabb(transform);
 		}
 
 		if (
-			const auto* const polygon = handle.find<components::polygon>();
+			const auto* const polygon = handle.template find<components::polygon>();
 			polygon != nullptr
 		) {
 			return polygon->get_aabb(transform);
 		}
 
 		if (
-			const auto* const wandering_pixels = handle.find<components::wandering_pixels>();
+			const auto* const wandering_pixels = handle.template find<components::wandering_pixels>();
 			wandering_pixels != nullptr
 		) {
 			return wandering_pixels->reach;
 		}
 
 		if (
-			const auto* const particles_existence = handle.find<components::particles_existence>();
+			const auto* const particles_existence = handle.template find<components::particles_existence>();
 			particles_existence != nullptr
 		) {
 			ltrb aabb;
@@ -109,8 +109,8 @@ public:
 		//ensure(false);
 
 		/* TODO: Implement get_aabb for physical entities */
-		ensure(!handle.has<components::rigid_body>());
-		ensure(!handle.has<components::fixtures>());
+		ensure(!handle.template has<components::rigid_body>());
+		ensure(!handle.template has<components::fixtures>());
 
 		return{};
 	}

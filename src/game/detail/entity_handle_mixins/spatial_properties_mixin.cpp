@@ -23,13 +23,13 @@ bool basic_spatial_properties_mixin<C, D>::has_logic_transform() const {
 	if (owner.alive() && owner != handle) {
 		return true;
 	}
-	else if (handle.has<components::rigid_body>()) {
+	else if (handle.template has<components::rigid_body>()) {
 		return true;
 	}
-	else if (handle.has<components::transform>()) {
+	else if (handle.template has<components::transform>()) {
 		return true;
 	}
-	else if (handle.has<components::wandering_pixels>()) {
+	else if (handle.template has<components::wandering_pixels>()) {
 		return true;
 	}
 
@@ -45,16 +45,16 @@ components::transform basic_spatial_properties_mixin<C, D>::get_logic_transform(
 	if (owner.alive()) {
 		ensure(!handle.has<components::transform>());
 
-		const auto& phys = owner.get<components::rigid_body>();
+		const auto& phys = owner.template get<components::rigid_body>();
 
 		if (owner != handle) {
-			const auto& fixtures = handle.get<components::fixtures>();
+			const auto& fixtures = handle.template get<components::fixtures>();
 
 			if (fixtures.is_activated() && phys.is_activated()) {
 				return components::fixtures::transform_around_body(handle, owner.get_logic_transform());
 			}
 			else {
-				ensure(handle.has<components::item>());
+				ensure(handle.template has<components::item>());
 
 				return handle.get_current_slot().get_container().get_logic_transform();
 			}
@@ -64,17 +64,17 @@ components::transform basic_spatial_properties_mixin<C, D>::get_logic_transform(
 				return{ phys.get_position(), phys.get_angle() };
 			}
 			else {
-				ensure(handle.has<components::item>());
+				ensure(handle.template has<components::item>());
 
 				return handle.get_current_slot().get_container().get_logic_transform();
 			}
 		}
 	}
-	else if (handle.has<components::wandering_pixels>()) {
-		return handle.get<components::wandering_pixels>().reach.center();
+	else if (handle.template has<components::wandering_pixels>()) {
+		return handle.template get<components::wandering_pixels>().reach.center();
 	}
 	else {
-		return handle.get<components::transform>();
+		return handle.template get<components::transform>();
 	}	
 }
 
@@ -84,12 +84,12 @@ vec2 basic_spatial_properties_mixin<C, D>::get_effective_velocity() const {
 	const auto owner = handle.get_owner_body();
 
 	if (owner.alive()) {
-		return owner.get<components::rigid_body>().velocity();
+		return owner.template get<components::rigid_body>().velocity();
 	}
-	else if (handle.has<components::position_copying>()) {
-		ensure(handle.has<components::transform>());
+	else if (handle.template has<components::position_copying>()) {
+		ensure(handle.template has<components::transform>());
 		return 
-			(handle.get<components::transform>().pos - handle.get<components::position_copying>().get_previous_transform().pos)
+			(handle.template get<components::transform>().pos - handle.template get<components::position_copying>().get_previous_transform().pos)
 			/ static_cast<float>(handle.get_cosmos().get_fixed_delta().in_seconds());
 	}
 	
@@ -115,15 +115,15 @@ void spatial_properties_mixin<false, D>::set_logic_transform(
 
 	ensure(!this_entity_does_not_have_its_own_transform);
 	
-	if (const auto rigid_body = handle.find<components::rigid_body>()) {
-		ensure(!handle.has<components::transform>());
+	if (const auto rigid_body = handle.template find<components::rigid_body>()) {
+		ensure(!handle.template has<components::transform>());
 		rigid_body.set_transform(t);
 	}
 	else {
-		handle.get<components::transform>() = t;
+		handle.template get<components::transform>() = t;
 
-		if (handle.has<components::tree_of_npo_node>()) {
-			handle.get<components::tree_of_npo_node>().update_proxy(step);
+		if (handle.template has<components::tree_of_npo_node>()) {
+			handle.template get<components::tree_of_npo_node>().update_proxy(step);
 		}
 	}
 }

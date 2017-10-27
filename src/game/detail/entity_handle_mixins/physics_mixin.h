@@ -24,24 +24,24 @@ public:
 		const auto& cosmos = step.cosm;
 		const auto& metas = step.input.logical_assets;
 
-		if (handle.has<components::sprite>()) {
+		if (handle.template has<components::sprite>()) {
 			const auto& cosm = handle.get_cosmos();
-			const auto sprite = handle.get<components::sprite>();
+			const auto sprite = handle.template get<components::sprite>();
 
 			const auto image_size = metas.at(sprite.tex).get_size();
 			vec2 scale = sprite.get_size() / image_size;
 
 			/* trick to make this type dependent */
-			std::decay_t<decltype(handle.get<components::shape_polygon>().get_raw_component())> shape_polygon;
+			std::decay_t<decltype(handle.template get<components::shape_polygon>().get_raw_component())> shape_polygon;
 			shape_polygon.shape = metas.at(sprite.tex).shape;
 			shape_polygon.shape.scale(scale);
 			
 			callback_for_created_component(shape_polygon);
 		}
-		if (handle.has<components::polygon>()) {
+		if (handle.template has<components::polygon>()) {
 			std::vector<vec2> input;
 
-			const auto& poly = handle.get<components::polygon>();
+			const auto& poly = handle.template get<components::polygon>();
 
 			input.reserve(poly.vertices.size());
 
@@ -50,7 +50,7 @@ public:
 			}
 
 			/* trick to make this type dependent */
-			std::decay_t<decltype(handle.get<components::shape_polygon>().get_raw_component())> shape_polygon;
+			std::decay_t<decltype(handle.template get<components::shape_polygon>().get_raw_component())> shape_polygon;
 			shape_polygon.shape.add_concave_polygon(input);
 
 			callback_for_created_component(shape_polygon);
