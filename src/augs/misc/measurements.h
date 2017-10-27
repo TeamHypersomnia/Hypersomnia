@@ -88,7 +88,7 @@ namespace augs {
 	template <class T>
 	class amount_measurements : public measurements<amount_measurements<T>, T> {
 		using base = measurements<amount_measurements<T>, T>;
-		friend class base;
+		friend base;
 
 		auto summary_impl() const {
 			return typesafe_sprintf(L"%x: %f2\n", base::title, base::get_average_units());
@@ -103,7 +103,7 @@ namespace augs {
 		timer tm;
 
 		using base = measurements<time_measurements, double>;
-		friend class base;
+		friend base;
 
 		auto summary_impl() const {
 			const auto avg_secs = get_average_units();
