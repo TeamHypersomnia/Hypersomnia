@@ -110,9 +110,9 @@ namespace augs {
 #endif
 
 namespace augs {
-	template <class...>
+	template <class... Args>
 	void read_object_bytes(augs::stream& ar, augs::stream& storage) {
-		static_assert(false, "Reading a stream from a stream is ill-formed.");
+		static_assert(sizeof...(Args) > 0xdeadbeef, "Reading a stream from a stream is ill-formed.");
 	}
 
 	void write_object_bytes(augs::stream& ar, const augs::stream& storage);
@@ -131,7 +131,8 @@ namespace augs {
 	void write_stream_with_size(A& ar, const augs::stream& storage) {
 		ensure(storage.get_read_pos() == 0);
 		augs::write_bytes(ar, storage.size());
-		detail::write_bytes_n(ar, storage.data(), storage.size());
+		
+		detail::write_raw_bytes(ar, storage.data(), storage.size());
 	}
 
 	template <class A>
@@ -143,6 +144,6 @@ namespace augs {
 		storage.reserve(s);
 		storage.set_write_pos(s);
 		
-		detail::read_bytes_n(ar, storage.data(), storage.size());
+		detail::read_raw_bytes(ar, storage.data(), storage.size());
 	}
 }

@@ -75,11 +75,11 @@ namespace augs {
 				const auto& aa, 
 				const auto& bb
 			) {
-				using A = std::decay_t<decltype(aa)>;
-				using B = std::decay_t<decltype(bb)>;
+				using AA = std::decay_t<decltype(aa)>;
+				using BB = std::decay_t<decltype(bb)>;
 
-				if constexpr(is_optional_v<A>) {
-					static_assert(is_optional_v<B>);
+				if constexpr(is_optional_v<AA>) {
+					static_assert(is_optional_v<BB>);
 
 					if (!aa && !bb) {
 						are_equal = are_equal && true;
@@ -91,7 +91,7 @@ namespace augs {
 						are_equal = are_equal && false;
 					}
 				}
-				else if constexpr(is_comparable_v<A, B>) {
+				else if constexpr(is_comparable_v<AA, BB>) {
 					are_equal = are_equal && aa == bb;
 				}
 				else {
@@ -108,9 +108,9 @@ namespace augs {
 	template <class T>
 	void recursive_clear(T& object) {
 		introspect(recursive([](auto&& self, auto, auto& field) {
-			using T = std::decay_t<decltype(field)>;
+			using Field = std::decay_t<decltype(field)>;
 
-			if constexpr(can_clear_v<T>) {
+			if constexpr(can_clear_v<Field>) {
 				field.clear();
 			}
 			else {
