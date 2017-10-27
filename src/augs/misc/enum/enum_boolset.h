@@ -79,7 +79,7 @@ namespace augs {
 		template <class... Args>
 		enum_boolset(Args... setters) {
 			reset();
-			[](auto...) {}(set(std::forward<Args>(setters))...);
+			(set(setters), ...);
 		}
 	};
 }

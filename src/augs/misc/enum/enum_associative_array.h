@@ -159,20 +159,20 @@ namespace augs {
 			}
 		}
 
-		template <class... T>
-		trivially_copyable_pair<iterator, bool> try_emplace(const key_type k, T&&... t) {
+		template <class... Args>
+		trivially_copyable_pair<iterator, bool> try_emplace(const key_type k, Args&&... args) {
 			if (is_set(static_cast<size_type>(k))) {
 				return { find(k), false };
 			}
 			else {
-				set(static_cast<size_type>(k), std::forward<T>(t)...);
+				set(static_cast<size_type>(k), std::forward<Args>(args)...);
 				return { find(k), true };
 			}
 		}
 
-		template <class T>
-		auto emplace(const key_type k, T&& t) {
-			return try_emplace(k, std::forward<T>(t));
+		template <class... Args>
+		auto emplace(const key_type k, Args&&... args) {
+			return try_emplace(k, std::forward<Args>(args)...);
 		}
 
 		const_iterator find(const key_type enum_idx) const {
