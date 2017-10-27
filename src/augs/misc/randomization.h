@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "augs/misc/minmax.h"
-#include "augs/math/declare_math.h"
+#include "augs/math/vec2.h"
 
 template <class generator_type>
 struct basic_randomization {
