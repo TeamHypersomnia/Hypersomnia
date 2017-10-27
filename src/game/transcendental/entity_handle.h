@@ -150,7 +150,10 @@ public:
 		return alive();
 	}
 
-	using allocator::has;
+	template <class component>
+	bool has() const {
+		return allocator::template has<component>();
+	}
 
 	template <class T>
 	decltype(auto) get() const {

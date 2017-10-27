@@ -27,7 +27,7 @@ namespace augs {
 			}
 		}
 
-		template<class component>
+		template <class component>
 		bool has() const {
 			if constexpr(is_component_fundamental_v<component>) {
 				return true;
