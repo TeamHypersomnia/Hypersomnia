@@ -86,7 +86,7 @@ struct str_ops_impl {
 			subject.begin(),
 			subject.end(),
 			subject.begin(),
-			std::tolower
+			[](unsigned char c) { return std::tolower(c); }
 		);
 
 		return *this;
@@ -97,7 +97,7 @@ struct str_ops_impl {
 			subject.begin(),
 			subject.end(),
 			subject.begin(),
-			std::toupper
+			[](unsigned char c) { return std::toupper(c); }
 		);
 		
 		return *this;
