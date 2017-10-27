@@ -1,6 +1,9 @@
-#include "augs/image/image.h"
+#include <cstring>
+
 #include "3rdparty/lodepng/lodepng.h"
 #include "augs/ensure.h"
+
+#include "augs/image/image.h"
 #include "augs/filesystem/directory.h"
 #include "augs/filesystem/file.h"
 #include "augs/readwrite/byte_readwrite.h"

@@ -1,3 +1,4 @@
+#include <cstring>
 #include "physics_system.h"
 
 #include "game/transcendental/entity_id.h"
@@ -442,7 +443,7 @@ physics_system& physics_system::operator=(const physics_system& b) {
 			const size_t bytes_count = sizeof(type) * count;
 
 			void* const migrated_pointer = migrated_allocator.Allocate(bytes_count);
-			memcpy(migrated_pointer, void_ptr, bytes_count);
+			std::memcpy(migrated_pointer, void_ptr, bytes_count);
 			
 			/* Bookmark position in memory of each and every element */
 

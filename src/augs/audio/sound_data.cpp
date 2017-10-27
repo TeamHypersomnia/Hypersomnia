@@ -1,3 +1,5 @@
+#include <cstring>
+
 #if BUILD_SOUND_FORMAT_DECODERS
 #include <ogg/ogg.h>
 #include <vorbis/vorbisfile.h>

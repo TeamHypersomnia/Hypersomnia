@@ -1,5 +1,6 @@
 #pragma once
 #include <type_traits>
+#include <cstring>
 
 template <class A>
 bool trivial_compare(const A& a, const A& b) {

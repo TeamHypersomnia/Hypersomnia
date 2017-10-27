@@ -1,5 +1,6 @@
 #pragma once
 #include <array>
+#include <algorithm>
 #include "augs/templates/constexpr_arithmetic.h"
 #include "augs/templates/container_templates.h"
 
@@ -20,7 +21,11 @@ namespace augs {
 		// END GEN INTROSPECTOR
 	public:
 		bool operator==(const enum_boolset& b) const {
-			return !std::memcmp(flags.data(), b.flags.data(), flag_count);
+			return std::equal(
+				flags.begin(), 
+				b.flags.begin(), 
+				flags.begin() + flag_count
+			);
 		}
 	
 		bool operator!=(const enum_boolset& b) const {

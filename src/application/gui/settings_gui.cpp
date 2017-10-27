@@ -1,3 +1,5 @@
+#include <cstring>
+
 #include "augs/templates/introspect.h"
 #include "augs/templates/enum_introspect.h"
 #include "augs/templates/format_enum.h"

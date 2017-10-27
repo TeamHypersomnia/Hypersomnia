@@ -74,7 +74,7 @@ namespace augs {
 						if (type_id == index_in_list_v<T, Serialized>) {
 							T object;
 							read_bytes(ar, object);
-							storage.emplace<T>(std::move(object));
+							storage.template emplace<T>(std::move(object));
 						}
 					}
 				);

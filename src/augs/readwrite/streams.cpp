@@ -1,3 +1,4 @@
+#include <cstring>
 #include <algorithm>
 #include "augs/readwrite/streams.h"
 

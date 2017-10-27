@@ -96,7 +96,7 @@ namespace augs {
 						using T = std::decay_t<decltype(specific_object)>;
 						T object;
 						read_lua(variant_content, object);
-						into.emplace<T>(std::move(object));
+						into.template emplace<T>(std::move(object));
 					}
 				}
 			);
