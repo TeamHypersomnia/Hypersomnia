@@ -30,18 +30,19 @@ namespace augs {
 		) {
 			for_each_type<components...>([&from, &into](auto c) {
 				using component = decltype(c);
+				using allocator_base = typename handle_type::allocator;
 
 				if constexpr(!is_one_of_v<component, excluded_components...>) {
 					if constexpr(is_component_fundamental_v<component>) {
-						into.allocator::template get<component>() = from.allocator::template get<component>();
+						into.allocator_base::template get<component>() = from.allocator_base::template get<component>();
 					}
 					else {
-						if (from.allocator::template has<component>()) {
-							if (into.allocator::template has<component>()) {
-								into.allocator::template get<component>() = from.allocator::template get<component>();
+						if (from.allocator_base::template has<component>()) {
+							if (into.allocator_base::template has<component>()) {
+								into.allocator_base::template get<component>() = from.allocator_base::template get<component>();
 							}
 							else {
-								into.allocator::template add<component>(from.allocator::template get<component>());
+								into.allocator_base::template add<component>(from.allocator_base::template get<component>());
 							}
 						}
 					}
@@ -55,10 +56,11 @@ namespace augs {
 
 			for_each_type<components...>([&](auto c) {
 				using component = decltype(c);
+				using allocator_base = typename handle_type::allocator;
 
 				if constexpr(!is_component_fundamental_v<component>) {
-					if (handle.allocator::template has<component>()) {
-						handle.allocator::template remove<component>();
+					if (handle.allocator_base::template has<component>()) {
+						handle.allocator_base::template remove<component>();
 					}
 				}
 			});

@@ -32,7 +32,9 @@ void relations_mixin<false, D>::make_cloned_child_entities_recursive(const entit
 		using component_type = decltype(c);
 		
 		if (self.has<component_type>()) {
-			auto& cloned_to_component = self.allocator::template get<component_type>();
+			using allocator_base = typename D::allocator;
+
+			auto& cloned_to_component = self.allocator_base::template get<component_type>();
 			const auto& cloned_from_component = from.allocator::template get<component_type>();
 
 			if constexpr(allows_nontriviality_v<component_type>) {
