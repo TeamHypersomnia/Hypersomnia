@@ -1,3 +1,5 @@
+#include "augs/templates/algorithm_templates.h"
+#include "augs/templates/container_templates.h"
 #include "game/detail/physics/physics_queries.h"
 #include "game/detail/visible_entities.h"
 
@@ -29,7 +31,7 @@ static void get_visible_per_layer(
 	auto& car_interior_layer = output_layers[render_layer::CAR_INTERIOR];
 
 	if (car_interior_layer.size() > 1) {
-		sort_container(
+		sort_range(
 			car_interior_layer, 
 			[&cosmos](const auto b, const auto a) {
 				return are_connected_by_friction(cosmos[a], cosmos[b]);

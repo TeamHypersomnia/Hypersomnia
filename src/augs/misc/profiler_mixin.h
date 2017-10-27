@@ -1,5 +1,6 @@
 #pragma once
 #include "augs/templates/introspect_declaration.h"
+#include "augs/templates/algorithm_templates.h"
 #include "augs/misc/measurements.h"
 #include "augs/misc/scope_guard.h"
 
@@ -39,7 +40,7 @@ namespace augs {
 				self
 			);
 	
-			sort_container(
+			sort_range(
 				all_with_time, 
 				[](const auto& a, const auto& b) { 
 					return a.get() > b.get(); 

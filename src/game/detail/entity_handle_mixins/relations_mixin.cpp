@@ -10,7 +10,7 @@
 #include "game/components/guid_component.h"
 #include "game/components/child_component.h"
 #include "game/components/crosshair_component.h"
-#include "augs/templates/container_templates.h"
+
 #include "augs/templates/type_matching_and_indexing.h"
 
 template <class D>

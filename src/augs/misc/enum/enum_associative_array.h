@@ -1,6 +1,7 @@
 #pragma once
 #include "augs/ensure.h"
 #include "augs/templates/maybe_const.h"
+#include "augs/templates/container_templates.h"
 #include "augs/misc/enum/enum_boolset.h"
 #include "augs/misc/trivially_copyable_pair.h"
 

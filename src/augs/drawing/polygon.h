@@ -2,7 +2,7 @@
 #include "3rdparty/polypartition/src/polypartition.h"
 
 #include "augs/zeroed_pod.h"
-
+#include "augs/templates/algorithm_templates.h"
 #include "augs/math/vec2.h"
 #include "augs/misc/constant_size_vector.h"
 

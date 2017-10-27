@@ -34,6 +34,9 @@ struct size_test_detail {
 	static auto call() { return do_call(0); }
 };
 
+template <typename Trait>
+struct size_test : decltype(size_test_detail<Trait>::call()) {};
+
 template <class T>
 constexpr bool is_constexpr_size_v = size_test<T>::value;
 

@@ -4,6 +4,7 @@
 #include "augs/gui/rect_world.h"
 #include "augs/gui/gui_traversal_structs.h"
 #include "augs/templates/maybe_const.h"
+#include "augs/templates/container_templates.h"
 
 namespace augs {
 	namespace gui {

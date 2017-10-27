@@ -1,3 +1,4 @@
+#include "augs/templates/container_templates.h"
 #include "augs/templates/introspect.h"
 #include "augs/filesystem/file.h"
 #include "augs/audio/sound_data.h"

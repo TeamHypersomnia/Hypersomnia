@@ -1,7 +1,6 @@
 #include <imgui/imgui.h>
 
 #include "augs/templates/container_templates.h"
-
 #include "application/main/release_flags.h"
 
 release_flags& release_flags::set_all() {

@@ -1,10 +1,9 @@
 #pragma once
-
 #include <array>
 #include <vector>
 
-#include "augs/ensure.h"
 #include "augs/templates/container_templates.h"
+#include "augs/ensure.h"
 
 namespace augs {
 	template <class id_type, std::size_t parent_count>

@@ -5,7 +5,6 @@
 
 #include "augs/ensure.h"
 
-#include "augs/templates/container_templates.h"
 #include "augs/templates/maybe_const.h"
 #include "augs/templates/get_underlying_char_type.h"
 

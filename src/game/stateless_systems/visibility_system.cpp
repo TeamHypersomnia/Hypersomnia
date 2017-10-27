@@ -3,6 +3,8 @@
 
 #include <Box2D/Box2D.h>
 
+#include "augs/templates/container_templates.h"
+#include "augs/templates/algorithm_templates.h"
 #include "game/detail/physics/physics_queries.h"
 #include "game/debug_drawing_settings.h"
 
@@ -432,7 +434,7 @@ void visibility_system::respond_to_visibility_information_requests(
 		}
 
 		/* SORT ALL VERTICES BY ANGLE */
-		sort_container(all_vertices_transformed);
+		sort_range(all_vertices_transformed);
 		remove_duplicates_from_sorted(all_vertices_transformed);
 
 		/* by now we have ensured that all_vertices_transformed is non-empty

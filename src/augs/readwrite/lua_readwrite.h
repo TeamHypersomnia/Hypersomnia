@@ -7,6 +7,7 @@
 #include "augs/templates/is_variant.h"
 #include "augs/templates/is_optional.h"
 #include "augs/templates/exception_templates.h"
+#include "augs/templates/container_templates.h"
 #include "augs/templates/introspect.h"
 #include "augs/templates/for_each_type.h"
 #include "augs/templates/always_false.h"

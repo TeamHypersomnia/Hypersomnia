@@ -1,3 +1,4 @@
+#include "augs/templates/container_templates.h"
 #include "augs/templates/introspect.h"
 #include "cosmic_entropy.h"
 #include "game/transcendental/cosmos.h"

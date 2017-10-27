@@ -1,5 +1,7 @@
 #include "minimal_scene.h"
 
+#include "augs/templates/algorithm_templates.h"
+
 #include "game/enums/party_category.h"
 
 #include "test_scenes/ingredients/ingredients.h"
@@ -60,7 +62,7 @@ namespace test_scenes {
 			auto& sentience = new_character.get<components::sentience>();
 
 
-			fill_container(sentience.learned_spells, true);
+			fill_range(sentience.learned_spells, true);
 			//for_each_through_std_get(
 			//	sentience.spells,
 			//	[](auto& spell) {

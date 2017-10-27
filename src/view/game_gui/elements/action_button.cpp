@@ -3,6 +3,7 @@
 
 #include "augs/drawing/drawing.h"
 #include "augs/gui/text/printer.h"
+#include "augs/templates/container_templates.h"
 #include "augs/templates/get_by_dynamic_id.h"
 
 #include "view/game_gui/elements/action_button.h"

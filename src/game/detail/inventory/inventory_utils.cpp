@@ -1,3 +1,4 @@
+#include "augs/templates/container_templates.h"
 #include "inventory_utils.h"
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/cosmos.h"

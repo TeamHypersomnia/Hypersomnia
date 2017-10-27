@@ -1,8 +1,7 @@
 #pragma once
 #include <array>
-#include <algorithm>
 #include "augs/templates/constexpr_arithmetic.h"
-#include "augs/templates/container_templates.h"
+#include "augs/templates/algorithm_templates.h"
 
 namespace augs {
 	struct introspection_access;
@@ -21,11 +20,7 @@ namespace augs {
 		// END GEN INTROSPECTOR
 	public:
 		bool operator==(const enum_boolset& b) const {
-			return std::equal(
-				flags.begin(), 
-				b.flags.begin(), 
-				flags.begin() + flag_count
-			);
+			return ranges_equal(flags, b.flags, flag_count);
 		}
 	
 		bool operator!=(const enum_boolset& b) const {
@@ -78,7 +73,7 @@ namespace augs {
 		}
 	
 		void reset() {
-			fill_container(flags, false);
+			fill_range(flags, false);
 		}
 	
 		template <class... Args>

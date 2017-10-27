@@ -18,7 +18,6 @@
 #include "view/game_gui/elements/hotbar_button.h"
 #include "view/game_gui/elements/action_button.h"
 #include "view/game_gui/elements/value_bar.h"
-#include "augs/templates/container_templates.h"
 
 struct wielding_result;
 

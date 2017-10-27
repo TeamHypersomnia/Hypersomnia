@@ -1,6 +1,7 @@
 #pragma once
 #include <imgui/imgui.h>
 
+#include "augs/templates/container_templates.h"
 #include "augs/misc/machine_entropy.h"
 
 namespace augs {

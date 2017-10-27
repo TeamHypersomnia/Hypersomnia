@@ -1,6 +1,5 @@
 #pragma once
 #include <algorithm>
-#include <type_traits>
 #include "augs/templates/container_traits.h"
 
 template <class Container, class F>
@@ -23,30 +22,13 @@ void erase_if(Container& v, F f) {
 template <class Container, class T>
 void erase_element(Container& v, const T& l) {
 	static_assert(!std::is_same_v<decltype(v.begin()), T>, "erase_element serves to erase keys or values, not iterators!");
+
 	if constexpr(can_access_data_v<Container>) {
 		v.erase(std::remove(v.begin(), v.end(), l), v.end());
 	}
 	else {
 		v.erase(l);
 	}
-}
-
-template<class Container, class T>
-auto& sort_container(Container& v, const T l) {
-	std::sort(v.begin(), v.end(), l);
-	return v;
-}
-
-template<class Container>
-auto& sort_container(Container& v) {
-	std::sort(v.begin(), v.end());
-	return v;
-}
-
-template<class Container>
-auto& reverse_container(Container& v) {
-	std::reverse(v.begin(), v.end());
-	return v;
 }
 
 template<class Container>
@@ -64,36 +46,6 @@ A& concatenate(A& a, const B& b) {
 	}
 
 	return a;
-}
-
-template <class Container, class T>
-decltype(auto) minimum_of(const Container& v, T&& pred) {
-	return *std::min_element(v.begin(), v.end(), std::forward<T>(pred));
-}
-
-template <class Container, class T>
-decltype(auto) maximum_of(const Container& v, T&& pred) {
-	return *std::max_element(v.begin(), v.end(), std::forward<T>(pred));
-}
-
-template <class Container>
-decltype(auto) minimum_of(const Container& v) {
-	return *std::min_element(v.begin(), v.end());
-}
-
-template <class Container>
-decltype(auto) maximum_of(const Container& v) {
-	return *std::max_element(v.begin(), v.end());
-}
-
-template <class Container1, class Container2>
-void copy_container(const Container1& from, Container2& into) {
-	std::copy(from.begin(), from.end(), into.begin());
-} 
-
-template <class Container, class F>
-auto find_if_in(Container& v, F&& f) {
-	return std::find_if(v.begin(), v.end(), std::forward<F>(f));
 }
 
 template<class Container, class K>
@@ -126,20 +78,6 @@ auto default_or_invalid_enum(Args&&... args) {
 
 		return T { std::forward<Args>(args)... };
 	}
-}
-
-template <class Container, class Key>
-auto value_or_nullptr(
-	Container& container, 
-	const Key& key
-) -> decltype(std::addressof(*container.begin())) {
-	if (const auto it = find_in(container, key);
-		it != container.end()
-	) {
-		return std::addressof(*it);
-	}
-
-	return nullptr;
 }
 
 template <class Container, class Key, class... Args>
@@ -189,10 +127,6 @@ auto key_or_default(
 	return default_or_invalid_enum<K>();
 }
 
-template <class Container, class T>
-void fill_container(Container& c, T&& val) {
-	std::fill(c.begin(), c.end(), std::forward<T>(val));
-}
 
 template <class Container>
 auto first_free_key(const Container& in) {
@@ -211,11 +145,6 @@ void for_each_in(const Container& in, F callback) {
 	for (auto& element : in) {
 		callback(element);
 	}
-}
-
-template <class C1, class C2>
-auto compare_containers(const C1& c1, const C2& c2) {
-	return std::equal(std::begin(c1), std::end(c1), std::begin(c2));
 }
 
 /* Thanks to https://stackoverflow.com/a/28139075/503776 */

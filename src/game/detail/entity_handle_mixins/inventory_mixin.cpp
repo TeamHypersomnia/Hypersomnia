@@ -1,3 +1,4 @@
+#include "augs/templates/container_templates.h"
 #include "inventory_mixin.h"
 
 #include "game/transcendental/entity_handle.h"

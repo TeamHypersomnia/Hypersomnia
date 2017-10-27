@@ -1,5 +1,4 @@
 #include "augs/templates/container_templates.h"
-
 #include "augs/drawing/drawing.h"
 #include "augs/math/camera_cone.h"
 

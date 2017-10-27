@@ -1,6 +1,7 @@
 #pragma once
 #include <imgui/imgui.h>
 
+#include "augs/templates/container_templates.h"
 #include "augs/templates/function_traits.h"
 #include "augs/templates/corresponding_field.h"
 #include "augs/templates/string_templates.h"

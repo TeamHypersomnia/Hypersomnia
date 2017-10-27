@@ -1,3 +1,4 @@
+#include "augs/templates/container_templates.h"
 #include "augs/audio/sound_buffer.h"
 
 #include "game/transcendental/cosmos.h"

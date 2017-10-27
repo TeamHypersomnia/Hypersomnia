@@ -1,3 +1,6 @@
+#include <Box2D/Dynamics/b2WorldCallbacks.h>
+#include "augs/templates/container_templates.h"
+#include "augs/templates/algorithm_templates.h"
 #include "game/detail/physics/physics_queries.h"
 #include "game/detail/entity_scripts.h"
 #include "game/components/movement_component.h"
@@ -13,9 +16,7 @@
 #include "game/detail/inventory/inventory_slot.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
-#include "augs/templates/container_templates.h"
 
-#include <Box2D/Dynamics/b2WorldCallbacks.h>
 
 void unset_input_flags_of_orphaned_entity(entity_handle e) {
 	auto* const gun = e.find<components::gun>();
@@ -283,7 +284,7 @@ std::vector<entity_id> get_closest_hostiles(
 		);
 	}
 
-	sort_container(hostiles);
+	sort_range(hostiles);
 	remove_duplicates_from_sorted(hostiles);
 
 	return { hostiles.begin(), hostiles.end() };

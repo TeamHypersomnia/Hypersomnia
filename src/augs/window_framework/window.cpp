@@ -4,6 +4,7 @@
 
 #include "augs/templates/string_templates.h"
 #include "augs/templates/corresponding_field.h"
+#include "augs/templates/algorithm_templates.h"
 
 #include "augs/window_framework/window.h"
 #include "augs/window_framework/platform_utils.h"
@@ -518,7 +519,7 @@ namespace augs {
 		
 		OPENFILENAME ofn;       // common dialog box structure
 		std::array<wchar_t, 400> szFile;
-		fill_container(szFile, 0);
+		fill_range(szFile, 0);
 
 		ZeroMemory(&ofn, sizeof(ofn));
 		ofn.lStructSize = sizeof(ofn);
@@ -553,7 +554,7 @@ namespace augs {
 
 		OPENFILENAME ofn;       // common dialog box structure
 		std::array<wchar_t, 400> szFile;
-		fill_container(szFile, 0);
+		fill_range(szFile, 0);
 
 		ZeroMemory(&ofn, sizeof(ofn));
 		ofn.lStructSize = sizeof(ofn);

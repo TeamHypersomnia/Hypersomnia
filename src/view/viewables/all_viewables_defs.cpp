@@ -1,5 +1,6 @@
 #include <Box2D/Box2D.h>
 
+#include "augs/templates/algorithm_templates.h"
 #include "game/assets/all_logical_assets.h"
 #include "view/viewables/all_viewables_defs.h"
 
@@ -70,7 +71,7 @@ void all_viewables_defs::update_into(all_logical_assets& output) {
 			shape.scale(vec2(1, -1));
 
 			for (auto& c : shape.convex_polys) {
-				reverse_container(c);
+				reverse_range(c);
 			}
 		}
 		else {

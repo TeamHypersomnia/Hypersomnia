@@ -1,5 +1,5 @@
-#include "augs/templates/container_templates.h"
 #include "augs/misc/machine_entropy.h"
+#include "augs/templates/container_templates.h"
 
 namespace augs {
 #if 0

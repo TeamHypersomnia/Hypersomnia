@@ -1,3 +1,4 @@
+#include "augs/templates/container_templates.h"
 #include "item_system.h"
 
 #include "game/messages/intent_message.h"
@@ -34,7 +35,7 @@
 #include "game/enums/item_transfer_result_type.h"
 
 #include "game/detail/physics/physics_scripts.h"
-#include "augs/templates/container_templates.h"
+
 
 void item_system::start_picking_up_items(const logic_step step) {
 	const auto& intents = step.transient.messages.get_queue<messages::intent_message>();

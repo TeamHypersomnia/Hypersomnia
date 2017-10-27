@@ -1,5 +1,4 @@
 #include "augs/templates/container_templates.h"
-
 #include "augs/math/camera_cone.h"
 
 #include "game/transcendental/cosmos.h"

@@ -1,9 +1,8 @@
+#include "augs/templates/container_templates.h"
 #include "name_system.h"
 #include "game/components/name_component.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
-
-#include "augs/templates/container_templates.h"
 
 void name_system::create_additional_inferred_state(const cosmos_common_state& global) {
 	const bool is_already_constructed = name_to_id_lookup.size() > 0;

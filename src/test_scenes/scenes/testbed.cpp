@@ -2,7 +2,7 @@
 	Disable float/int warnings, this is just a content script
 */
 #pragma warning(disable : 4244)
-
+#include "augs/templates/algorithm_templates.h"
 #include "game/assets/ids/game_image_id.h"
 #include "game/assets/all_logical_assets.h"
 
@@ -252,7 +252,7 @@ namespace test_scenes {
 				sentience.get<personal_electricity_meter_instance>().set_value(800);
 			}
 
-			fill_container(sentience.learned_spells, true);
+			fill_range(sentience.learned_spells, true);
 
 			// for_each_through_std_get(
 			// 	sentience.spells,

@@ -1,4 +1,5 @@
 #include "augs/templates/string_templates.h"
+#include "augs/templates/algorithm_templates.h"
 #include "augs/misc/imgui/imgui_utils.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/misc/imgui/addons/imguitabwindow/imguitabwindow.h"
@@ -121,7 +122,7 @@ void editor_setup::open_last_tabs(sol::state& lua) {
 			
 			set_current_tab(opened_tabs.current_tab_index);
 
-			sort_container(tabs_to_close);
+			sort_range(tabs_to_close);
 
 			for (const auto i : reverse(tabs_to_close)) {
 				close_tab(i);

@@ -1,5 +1,8 @@
 #pragma once
 #include <array>
+#include <type_traits>
+#include <cstddef>
+#include <utility>
 
 template <class T, class = void>
 struct is_associative : std::false_type {};
@@ -49,9 +52,6 @@ struct has_begin_and_end : std::false_type {};
 template <class T>
 struct has_begin_and_end<T, decltype(std::declval<T&>().begin(), std::declval<T&>().end(), void())> : std::true_type {};
 
-
-template <typename Trait>
-struct size_test : decltype(size_test_detail<Trait>::call()) {};
 
 template <class T>
 struct is_std_array : std::false_type {};

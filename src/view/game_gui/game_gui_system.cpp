@@ -1,3 +1,4 @@
+#include "augs/templates/container_templates.h"
 #include "augs/gui/button_corners.h"
 
 #include "game/enums/slot_function.h"

@@ -6,8 +6,8 @@
 #include "augs/math/rects.h"
 #include "augs/math/declare_math.h"
 
+#include "augs/templates/algorithm_templates.h"
 #include "augs/templates/hash_templates.h"
-#include "augs/templates/container_templates.h"
 
 #include "augs/misc/typesafe_sprintf.h"
 #include "augs/misc/typesafe_sscanf.h"

@@ -1,3 +1,4 @@
+#include "augs/templates/container_templates.h"
 #include "game/inferential_systems/physics_system.h"
 #include "game/components/fixtures_component.h"
 #include "game/messages/collision_message.h"
@@ -11,7 +12,6 @@
 
 #include "physics_scripts.h"
 
-#include "augs/templates/container_templates.h"
 #include "game/debug_drawing_settings.h"
 
 #define FRICTION_FIELDS_COLLIDE 0

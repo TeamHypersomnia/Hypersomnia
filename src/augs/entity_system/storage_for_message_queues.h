@@ -1,16 +1,16 @@
 #pragma once
 #include <tuple>
 #include <vector>
-#include "augs/templates/for_each_std_get.h"
-#include "augs/templates/container_templates.h"
-#include "augs/templates/type_mod_templates.h"
-#include "augs/templates/type_matching_and_indexing.h"
+
 #include "augs/ensure.h"
+#include "augs/templates/for_each_std_get.h"
+#include "augs/templates/type_matching_and_indexing.h"
+#include "augs/templates/container_templates.h"
 
 namespace augs {
 	template<class... Queues>
 	class storage_for_message_queues {
-		typedef std::tuple<std::vector<Queues>...> tuple_type;
+		using tuple_type = std::tuple<std::vector<Queues>...>;
 		tuple_type queues;
 
 		template <typename T>

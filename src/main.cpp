@@ -4,6 +4,7 @@
 #include "augs/global_libraries.h"
 
 #include "augs/templates/always_false.h"
+#include "augs/templates/container_templates.h"
 
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"

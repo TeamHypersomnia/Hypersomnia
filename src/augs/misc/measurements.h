@@ -4,7 +4,8 @@
 
 #include "augs/log.h"
 #include "augs/math/vec2.h"
-#include "augs/templates/container_templates.h"
+
+#include "augs/templates/algorithm_templates.h"
 #include "augs/misc/timing/timer.h"
 
 namespace augs {

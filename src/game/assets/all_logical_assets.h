@@ -1,4 +1,5 @@
 #pragma once
+#include "augs/templates/container_templates.h"
 #include "augs/misc/convex_partitioned_shape.h"
 #include "augs/misc/trivially_copyable_tuple.h"
 

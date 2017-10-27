@@ -1,7 +1,6 @@
 #include <imgui/imgui.h>
 
 #include "augs/templates/container_templates.h"
-
 #include "augs/graphics/OpenGL_includes.h"
 #include "augs/graphics/renderer.h"
 #include "augs/graphics/fbo.h"

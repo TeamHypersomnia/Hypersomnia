@@ -1,6 +1,5 @@
-#include "randomization.h"
-#include "augs/templates/container_templates.h"
-#include <algorithm>
+#include "augs/misc/randomization.h"
+#include "augs/templates/algorithm_templates.h"
 
 template <class T>
 basic_randomization<T>::basic_randomization(const size_t seed) {
@@ -82,7 +81,7 @@ std::vector<float> basic_randomization<T>::make_random_intervals(
 		result[i] = std::max(0.f, result[i]);
 	}
 
-	sort_container(result);
+	sort_range(result);
 
 	return result;
 }

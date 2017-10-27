@@ -1,10 +1,10 @@
+#include "augs/templates/container_templates.h"
 #include "game/inferential_systems/physics_system.h"
 #include "game/components/fixtures_component.h"
 #include "game/components/special_physics_component.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/logic_step.h"
 #include "physics_scripts.h"
-#include "augs/templates/container_templates.h"
 
 void physics_system::rechoose_owner_friction_body(const entity_handle entity) {
 	ensure(entity.get<components::rigid_body>().is_constructed());

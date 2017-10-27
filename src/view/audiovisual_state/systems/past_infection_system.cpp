@@ -1,8 +1,8 @@
+#include "augs/templates/container_templates.h"
 #include "past_infection_system.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
 #include "game/components/flags_component.h"
-#include "augs/templates/container_templates.h"
 
 void past_infection_system::clear() {
 	infected_entities.clear();
