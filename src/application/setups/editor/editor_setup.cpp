@@ -21,7 +21,6 @@
 
 #include "augs/readwrite/lua_readwrite.h"
 
-
 void editor_setup::on_tab_changed() {
 	hovered_entity = {};
 	player_paused = true;
@@ -920,7 +919,7 @@ bool editor_setup::handle_unfetched_window_input(
 			}
 		}
 
-		if (e.msg == message::ldown) {
+		if (e.was_pressed(key::LMOUSE)) {
 			if (has_current_tab()) {
 				const bool has_ctrl{ common_input_state[key::LCTRL] };
 
@@ -929,12 +928,20 @@ bool editor_setup::handle_unfetched_window_input(
 					window.get_screen_size()
 				);
 
-				if (!has_ctrl) {
-					tab().selected_entities.clear();
+				auto& selections = tab().selected_entities;
+				const auto hovered = work().world[hovered_entity];
+
+				if (const bool new_selection = !has_ctrl) {
+					selections.clear();
 				}
 
-				if (work().world[hovered_entity].alive()) {
-					tab().selected_entities.emplace(hovered_entity);
+				if (hovered.alive()) {
+					if (has_ctrl && found_in(selections, hovered)) {
+						selections.erase(hovered);
+					}
+					else {
+						selections.emplace(hovered_entity);
+					}
 				}
 
 				return true;
