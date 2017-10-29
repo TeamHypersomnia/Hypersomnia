@@ -44,9 +44,9 @@ std::wstring get_bbcoded_slot_function_description(const slot_function);
 std::wstring get_bbcoded_slot_details(const const_inventory_slot_handle);
 std::wstring get_bbcoded_entity_details(const const_entity_handle);
 
-template <class T>
+template <class entity_handle_type, class T>
 std::wstring get_bbcoded_spell_description(
-	const const_entity_handle subject,
+	const entity_handle_type subject,
 	const T& spell
 ) {
 	const auto properties = typesafe_sprintf(

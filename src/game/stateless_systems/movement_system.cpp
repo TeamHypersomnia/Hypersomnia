@@ -29,7 +29,7 @@ void movement_system::set_movement_flags_from_input(const logic_step step) {
 		cosmos(
 			it.subject,
 			[&](const auto subject) {
-				auto* const movement = subject.find<components::movement>();
+				auto* const movement = subject.template find<components::movement>();
 
 				if (movement == nullptr) {
 					return;

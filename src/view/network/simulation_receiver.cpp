@@ -8,10 +8,6 @@
 #include "game/components/gun_component.h"
 #include "game/components/item_component.h"
 
-#include "view/audiovisual_state/systems/interpolation_system.h"
-#include "view/audiovisual_state/systems/past_infection_system.h"
-
-#include "view/network/network_commands.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 
@@ -36,7 +32,7 @@ void simulation_receiver::predict_intents_of_remote_entities(
 			}
 
 			for (const auto g_id : e.get_wielded_guns()) {
-				const auto g = predicted_cosmos[g_id];
+				const auto g = const_entity_handle(predicted_cosmos[g_id]);
 
 				if (g.get<components::gun>().is_trigger_pressed) {
 					const auto current_slot = g.get_current_slot();

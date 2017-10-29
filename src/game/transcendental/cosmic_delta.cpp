@@ -23,9 +23,9 @@ void transform_component_ids_to_guids_in_place(
 	const cosmos& cosm
 ) {
 	augs::introspect(augs::recursive([&](auto&& self, auto, auto& id) {
-		using T = std::decay_t<decltype(id)>;
+		using id_type = std::decay_t<decltype(id)>;
 
-		if constexpr(std::is_base_of_v<entity_id, T>) {
+		if constexpr(std::is_base_of_v<entity_id, id_type>) {
 			const auto handle = cosm[id];
 
 			id.unset();
@@ -40,7 +40,7 @@ void transform_component_ids_to_guids_in_place(
 			}
 		}
 		else {
-			if constexpr(is_container_v<T>) {
+			if constexpr(is_container_v<id_type>) {
 				for (auto&& e : id) {
 					augs::introspect_if_not_leaf(augs::recursive(self), e);
 				}
@@ -58,9 +58,9 @@ void transform_component_guids_to_ids_in_place(
 	const cosmos& cosm
 ) {
 	augs::introspect(augs::recursive([&](auto&& self, auto, auto& id) {
-		using T = std::decay_t<decltype(id)>;
+		using id_type = std::decay_t<decltype(id)>;
 
-		if constexpr(std::is_base_of_v<entity_id, T>) {
+		if constexpr(std::is_base_of_v<entity_id, id_type>) {
 			const auto guid_inside = reinterpret_cast<const entity_guid&>(id);
 
 			id.unset();
@@ -70,7 +70,7 @@ void transform_component_guids_to_ids_in_place(
 			}
 		}
 		else {
-			if constexpr(is_container_v<T>) {
+			if constexpr(is_container_v<id_type>) {
 				for (auto&& e : id) {
 					augs::introspect_if_not_leaf(augs::recursive(self), e);
 				}

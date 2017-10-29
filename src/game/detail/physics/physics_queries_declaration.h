@@ -8,6 +8,7 @@ struct b2AABB;
 struct b2Filter;
 class b2Shape;
 class b2World;
+struct b2Transform;
 
 template <class F>
 void for_each_in_aabb_meters(

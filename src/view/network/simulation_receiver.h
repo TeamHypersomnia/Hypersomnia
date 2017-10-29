@@ -3,11 +3,15 @@
 
 #include "augs/network/jitter_buffer.h"
 
+#include "game/components/transform_component.h"
+#include "game/transcendental/cosmos.h"
+
+#include "view/network/network_commands.h"
 #include "view/network/step_packaged_for_network.h"
 #include "view/network/simulation_receiver_settings.h"
 
-#include "game/components/transform_component.h"
-#include "game/transcendental/cosmos.h"
+#include "view/audiovisual_state/systems/interpolation_system.h"
+#include "view/audiovisual_state/systems/past_infection_system.h"
 
 namespace augs {
 	namespace network {
