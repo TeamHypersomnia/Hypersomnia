@@ -1,10 +1,12 @@
 #pragma once
 #include <type_traits>
 #include <utility>
-#include <tuple>
 
 #include "augs/templates/predicate_templates.h"
-#include "augs/templates/type_list.h"
+#include "augs/templates/nth_type_in.h"
+
+template <class...>
+struct type_list;
 
 template <class, class>
 struct prepend_to_list;
@@ -72,7 +74,7 @@ struct filter_types_detail<
 	Criterion,
 	List<>
 > { 
-	using types = std::tuple<>; 
+	using types = List<>; 
 	using indices = std::index_sequence<>;
 };
 
@@ -109,7 +111,7 @@ struct filter_types_detail<
 	static constexpr bool found = indices().size() > 0;
 
 	template <size_t I>
-	using get_type = std::tuple_element_t<I, types>;
+	using get_type = nth_type_in_list_t<I, types>;
 };
 
 template <
@@ -153,6 +155,3 @@ constexpr size_t count_occurences_in_list_v = filter_types_in_list<bind_types<st
 
 template <class S, class... Types>
 constexpr size_t count_occurences_in_v = count_occurences_in_list_v<S, type_list<Types...>>;
-
-template <size_t I, class... Types>
-using nth_type_in_t = std::tuple_element_t<I, std::tuple<Types...>>;

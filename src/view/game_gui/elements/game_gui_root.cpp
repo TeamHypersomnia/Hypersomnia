@@ -1,4 +1,3 @@
-#include <tuple>
 #include "game_gui_root.h"
 
 game_gui_root::game_gui_root() {

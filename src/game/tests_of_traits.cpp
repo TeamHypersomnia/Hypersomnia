@@ -122,7 +122,7 @@ struct tests_of_traits {
 	static_assert(bind_types<std::is_same, const int>::type<const int>::value, "Trait has failed");
 
 	static_assert(std::is_same_v<filter_types_in_list<std::is_integral, type_list<double, int, float>>::indices, std::index_sequence<1>>, "Trait has failed");
-	static_assert(std::is_same_v<filter_types_in_list<std::is_integral, type_list<double, int, float>>::types, std::tuple<int>>, "Trait has failed");
+	static_assert(std::is_same_v<filter_types_in_list<std::is_integral, type_list<double, int, float>>::types, type_list<int>>, "Trait has failed");
 	static_assert(std::is_same_v<filter_types_in_list<std::is_integral, type_list<double, int, float>>::get_type<0>, int>, "Trait has failed");
 	
 	static_assert(is_one_of_list_v<unsigned, std::tuple<float, float, double, unsigned>>, "Trait has failed");
@@ -134,12 +134,14 @@ struct tests_of_traits {
 	static_assert(index_in_v<unsigned, float, float, double, unsigned> == 3, "Trait has failed");
 	
 	static_assert(std::is_same_v<unsigned, nth_type_in_t<0, unsigned, float, float>>, "Trait has failed");
+	static_assert(std::is_same_v<float, nth_type_in_t<1, unsigned, float, float>>, "Trait has failed");
+	static_assert(std::is_same_v<float, nth_type_in_t<2, unsigned, float, float>>, "Trait has failed");
 	static_assert(std::is_same_v<double, nth_type_in_t<3, unsigned, float, float, double, unsigned>>, "Trait has failed");
 	
 	static_assert(
 		std::is_same_v<
 			filter_types_in_list<std::is_integral, type_list<int, double, float, unsigned>>::types, 
-			std::tuple<int, unsigned>
+			type_list<int, unsigned>
 		>, 
 		"Trait has failed"
 	);

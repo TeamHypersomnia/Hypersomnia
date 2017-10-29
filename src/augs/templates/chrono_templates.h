@@ -1,7 +1,8 @@
 #pragma once
 #include <chrono>
 #include <string>
-#include <tuple>
+
+#include "augs/misc/trivially_copyable_tuple.h"
 
 template <class S>
 auto lead_zeroes(const S& s, std::size_t count) {
@@ -14,7 +15,8 @@ auto lead_zeroes(const S& s, std::size_t count) {
 
 template <class...Durations, class DurationIn>
 auto break_down_durations(DurationIn d) {
-	std::tuple<Durations...> retval;
+	augs::trivially_copyable_tuple<Durations...> retval;
+
 	using discard = int[];
 	(void)discard {
 		0, (void((

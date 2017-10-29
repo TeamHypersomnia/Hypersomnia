@@ -1,5 +1,4 @@
 #include "inventory_slot_id.h"
-#include <tuple>
 
 template <class T>
 basic_inventory_slot_id<T>::basic_inventory_slot_id() : type(slot_function::INVALID) {

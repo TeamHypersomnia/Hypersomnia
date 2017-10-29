@@ -1,4 +1,3 @@
-#include <tuple>
 #include "view/game_gui/game_gui_element_location.h"
 #include "character_gui.h"
 

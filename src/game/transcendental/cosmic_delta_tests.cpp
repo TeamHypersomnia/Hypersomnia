@@ -1,5 +1,4 @@
 #if BUILD_UNIT_TESTS
-#include <tuple>
 #include <catch.hpp>
 #include <cstring>
 
