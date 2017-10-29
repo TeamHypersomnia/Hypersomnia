@@ -358,7 +358,7 @@ void editor_setup::perform_custom_imgui(
 				}
 #else
 				if (item_if_tabs_and(false, "Fill with minimal scene", "SHIFT+F5")) {}
-				if (item_if_tabs(false, "Fill with test scene")) {}
+				if (item_if_tabs_and(false, "Fill with test scene")) {}
 #endif
 			}
 			if (auto menu = scoped_menu("View")) {

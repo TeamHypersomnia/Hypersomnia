@@ -1,5 +1,6 @@
 #pragma once
 #include "augs/filesystem/path.h"
+#include "augs/filesystem/file.h"
 
 #define EDITOR_DIR LOCAL_FILES_DIR "editor/"
 

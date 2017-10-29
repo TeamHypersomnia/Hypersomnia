@@ -4,7 +4,7 @@
 #include "game/assets/all_logical_assets.h"
 #include "view/viewables/all_viewables_defs.h"
 
-const all_viewables_defs all_viewables_defs::empty;
+const all_viewables_defs all_viewables_defs::empty {};
 
 void all_viewables_defs::update_into(all_logical_assets& output) {
 	const auto sound_duration = [](const augs::sound_buffer::variation& v) {
