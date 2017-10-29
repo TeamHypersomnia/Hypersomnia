@@ -209,7 +209,7 @@ namespace augs {
 
 	void sound_source::unbind_buffer() {
 		attached_buffer = nullptr;
-		AL_CHECK(alSourcei(id, AL_BUFFER, NULL));
+		AL_CHECK(alSourcei(id, AL_BUFFER, 0));
 	}
 	
 	const single_sound_buffer* sound_source::get_bound_buffer() const {

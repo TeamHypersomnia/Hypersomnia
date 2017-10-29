@@ -72,7 +72,7 @@ namespace augs {
 						using T = std::decay_t<decltype(dummy)>;
 
 						if (type_id == index_in_list_v<T, Serialized>) {
-							T object;
+							T object {};
 							read_bytes(ar, object);
 							storage.template emplace<T>(std::move(object));
 						}

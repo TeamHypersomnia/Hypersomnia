@@ -575,6 +575,46 @@ add_custom_command(
 	COMMENT "Generating type information for introspection..."
 )
 
+# Before Hypersomnia builds,
+# version_file_generator must first query git for information about the most recent commit.
+
+set(HYPERSOMNIA_VERSION_FILE_INPUT_PATH
+	"${PROJECT_SOURCE_DIR}/src/hypersomnia_version.cpp.in"
+)
+
+set(HYPERSOMNIA_VERSION_FILE_CPP
+	"${GENERATED_SOURCES_PATH}/hypersomnia_version.cpp"
+)
+
+# So from now on, we will be using Git to obtain some information about commits.
+
+find_package(Git)
+
+message("Git path: ${GIT_EXECUTABLE}")
+
+if(NOT (GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git"))
+	set(BUILD_VERSION_FILE_GENERATOR FALSE)
+	set(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE FALSE)
+	message("Git not found. Some functionality will be disabled.")
+endif()
+
+if(BUILD_VERSION_FILE_GENERATOR)
+	add_executable(version_file_generator 
+		"${CMAKE_MODULE_PATH}/version_file_generator.cpp"
+		"src/augs/misc/time_utils.cpp"
+	)
+
+	add_custom_command(
+		OUTPUT ${HYPERSOMNIA_VERSION_FILE_CPP}
+		COMMAND version_file_generator ${GIT_EXECUTABLE} ${HYPERSOMNIA_VERSION_FILE_INPUT_PATH} ${HYPERSOMNIA_VERSION_FILE_CPP}
+		COMMENT "Generating version files..."
+	)
+else()
+	message("Version file generator will not be built. Copying ${HYPERSOMNIA_VERSION_FILE_INPUT_PATH} into ${HYPERSOMNIA_VERSION_FILE_CPP}")
+	execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${HYPERSOMNIA_VERSION_FILE_INPUT_PATH} ${HYPERSOMNIA_VERSION_FILE_CPP})
+endif()
+
+
 # We add headers to aid IntelliSense.
 
 set(HYPERSOMNIA_HEADERS
@@ -689,17 +729,6 @@ set(CMAKE_CXX_FLAGS_RELEASE
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO 
  "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} ${HYPERSOMNIA_CXX_RELWITHDEBINFO_FLAGS}"
 )
-
-# From now on, we will be using Git to obtain some information about commits.
-find_package(Git)
-
-message("Git path: ${GIT_EXECUTABLE}")
-
-if(NOT (GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git"))
-	set(BUILD_VERSION_FILE_GENERATOR FALSE)
-	set(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE FALSE)
-	message("Git not found. Some functionality will be disabled.")
-endif()
 
 # We configure MSVC to use static runtime libraries ("/MT" switch),
 # instead of DLL ones.
@@ -826,21 +855,6 @@ add_definitions(-DGENERATED_FILES_DIR="${HYPERSOMNIA_GENERATED_FILES_DIR}")
 add_definitions(-DLOCAL_FILES_DIR="${HYPERSOMNIA_LOCAL_FILES_DIR}")
 add_definitions(-DLOG_FILES_DIR="${HYPERSOMNIA_LOG_FILES_DIR}")
 
-# We build the generator of commit information.
-
-if(BUILD_VERSION_FILE_GENERATOR)
-	add_executable(version_file_generator 
-		"${CMAKE_MODULE_PATH}/version_file_generator.cpp"
-		"src/augs/misc/time_utils.cpp"
-	)
-endif()
-
-set(HYPERSOMNIA_VERSION_FILE_CPP
-	"${GENERATED_SOURCES_PATH}/hypersomnia_version.cpp"
-)
-
-set_source_files_properties(${HYPERSOMNIA_VERSION_FILE_CPP} PROPERTIES GENERATED TRUE)
-
 # We build the main Hypersomnia executable.
 
 
@@ -864,29 +878,6 @@ if(MSVC)
 	add_executable(Hypersomnia WIN32 ${HYPERSOMNIA_SRCS})
 else()
 	add_executable(Hypersomnia ${HYPERSOMNIA_SRCS})
-endif()
-
-# Here, we define pre-build events calling the source code generators.
-
-# Before Hypersomnia builds,
-# version_file_generator must first query git for information about the most recent commit.
-
-set(HYPERSOMNIA_VERSION_FILE_IN_PATH
-	"${PROJECT_SOURCE_DIR}/src/hypersomnia_version.cpp.in"
-)
-
-if(BUILD_VERSION_FILE_GENERATOR)
-	add_custom_command(
-		PRE_BUILD
-		TARGET Hypersomnia
-		COMMAND version_file_generator ${GIT_EXECUTABLE} ${HYPERSOMNIA_VERSION_FILE_IN_PATH} ${HYPERSOMNIA_VERSION_FILE_CPP}
-		COMMENT "Generating version files..."
-	)
-	
-	add_dependencies(Hypersomnia version_file_generator)
-else()
-	message("Version file generator will not be built. Copying ${HYPERSOMNIA_VERSION_FILE_IN_PATH} into ${HYPERSOMNIA_VERSION_FILE_CPP}")
-	execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${HYPERSOMNIA_VERSION_FILE_IN_PATH} ${HYPERSOMNIA_VERSION_FILE_CPP})
 endif()
 
 if(BUILD_OPENGL)

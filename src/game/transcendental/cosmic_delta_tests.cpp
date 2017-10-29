@@ -1,6 +1,7 @@
 #if BUILD_UNIT_TESTS
 #include <catch.hpp>
 #include <cstring>
+#include <array>
 
 #include "augs/filesystem/file.h"
 #include "augs/templates/introspection_utils/describe_fields.h"
@@ -30,10 +31,10 @@ TEST_CASE("CosmicDelta0 PaddingSanityCheck1") {
 	typedef ok checked_type;
 	constexpr size_t type_size = sizeof(checked_type);
 
-	std::array<char, type_size> buf1;
-	std::array<char, type_size> buf2;
+	std::array<char, type_size> buf1{};
+	std::array<char, type_size> buf2{};
 
-	for (int i = 0; i < type_size; ++i) {
+	for (std::size_t i = 0; i < type_size; ++i) {
 		buf1[i] = 3;
 		buf2[i] = 4;
 	}
@@ -56,10 +57,10 @@ TEST_CASE("CosmicDelta1 PaddingSanityCheck2") {
 	typedef ok checked_type;
 	constexpr size_t type_size = sizeof(checked_type);
 
-	std::array<char, type_size> buf1;
-	std::array<char, type_size> buf2;
+	std::array<char, type_size> buf1{};
+	std::array<char, type_size> buf2{};
 
-	for (int i = 0; i < type_size; ++i) {
+	for (std::size_t i = 0; i < type_size; ++i) {
 		buf1[i] = 3;
 		buf2[i] = 4;
 	}
@@ -96,10 +97,10 @@ TEST_CASE("CosmicDelta2 PaddingTest") {
 		if constexpr(!allows_nontriviality_v<checked_type>) {
 			constexpr size_t type_size = sizeof(checked_type);
 
-			std::array<char, type_size> buf1;
-			std::array<char, type_size> buf2;
+			std::array<char, type_size> buf1 {};
+			std::array<char, type_size> buf2 {};
 
-			for (int i = 0; i < type_size; ++i) {
+			for (std::size_t i = 0; i < type_size; ++i) {
 				buf1[i] = 3;
 				buf2[i] = 4;
 			}

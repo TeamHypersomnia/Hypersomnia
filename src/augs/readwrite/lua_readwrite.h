@@ -95,7 +95,7 @@ namespace augs {
 
 					if (this_type_name == variant_type) {
 						using T = std::decay_t<decltype(specific_object)>;
-						T object;
+						T object{};
 						read_lua(variant_content, object);
 						into.template emplace<T>(std::move(object));
 					}
@@ -405,7 +405,7 @@ namespace augs {
 
 	template <class T>
 	T load_from_lua_table(sol::state& lua, const path_type& source_path) {
-		T object;
+		T object{};
 		load_from_lua_table<T>(lua, object, source_path);
 		return object;
 	}
