@@ -43,7 +43,7 @@ namespace augs {
 		//>;
 
 		using flagset_type = augs::enum_boolset<Enum>;
-		friend struct augs::introspection_access;
+		friend augs::introspection_access;
 
 		/* Introspection will fail if the storage type involves an aligned storage */
 		// GEN INTROSPECTOR class augs::enum_associative_array_base class key_type class mapped_type

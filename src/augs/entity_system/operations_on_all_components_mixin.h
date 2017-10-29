@@ -10,7 +10,7 @@ namespace augs {
 		void reserve_all_components(const size_type n) {
 			auto& self = *static_cast<derived*>(this);
 
-			auto reserver = [&self, n](auto c) {
+			auto reserver = [&](auto c) {
 				using component = decltype(c);
 
 				if constexpr(!is_component_fundamental_v<component>) {
@@ -27,7 +27,7 @@ namespace augs {
 			const handle_type into,
 			const handle_type from 
 		) {
-			auto cloner = [&from, &into](auto c) {
+			auto cloner = [&](auto c) {
 				using component = decltype(c);
 				using allocator_base = typename handle_type::allocator;
 

@@ -169,7 +169,7 @@ void for_each_intersection_with_polygon(
 	const b2Filter filter,
 	F callback
 ) {
-	const auto count = vertices.size();
+	const auto count = static_cast<unsigned>(vertices.size());
 	b2Assert(3 <= count && count <= b2_maxPolygonVertices);
 	
 	b2PolygonShape poly_shape;

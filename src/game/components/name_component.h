@@ -17,7 +17,7 @@ namespace components {
 		static constexpr bool is_fundamental = true;
 		static constexpr bool is_synchronized = true;
 
-		friend struct augs::introspection_access;
+		friend augs::introspection_access;
 		// GEN INTROSPECTOR struct components::name
 		entity_name_id name_id = 0u;
 		// END GEN INTROSPECTOR

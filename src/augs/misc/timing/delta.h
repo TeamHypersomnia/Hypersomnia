@@ -78,13 +78,13 @@ namespace augs {
 
 		template <class T>
 		auto& operator*=(const T scalar) {
-			*this = { secs * scalar };
+			*this = delta { secs * scalar };
 			return *this;
 		}
 
 		template <class T>
 		auto& operator/=(const T scalar) {
-			*this = { secs / scalar };
+			*this = delta { secs / scalar };
 			return *this;
 		}
 

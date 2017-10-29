@@ -19,7 +19,7 @@ ForwardIt binary_find(ForwardIt first, ForwardIt last, const T& value, Compare c
 	return first != last && !comp(value, *first) ? first : last;
 }
 
-namespace augs  {
+namespace augs {
 	struct introspection_access;
 
 	template <class T, std::size_t const_count>
@@ -52,7 +52,7 @@ namespace augs  {
 		storage_type raw;
 		// END GEN INTROSPECTOR
 
-		friend struct augs::introspection_access;
+		friend augs::introspection_access;
 
 		auto& as_value_array() {
 			return reinterpret_cast<value_array&>(raw);

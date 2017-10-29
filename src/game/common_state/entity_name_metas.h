@@ -11,7 +11,7 @@ namespace augs {
 
 class entity_name_meta {
 	// GEN INTROSPECTOR class entity_name_meta
-	friend struct augs::introspection_access;
+	friend augs::introspection_access;
 	friend class name_system;
 	
 	entity_name_type name;
@@ -32,7 +32,7 @@ public:
 };
 
 class entity_name_metas {
-	friend struct augs::introspection_access;
+	friend augs::introspection_access;
 	friend class name_system;
 
 	// GEN INTROSPECTOR class entity_name_metas

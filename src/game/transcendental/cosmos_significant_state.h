@@ -22,7 +22,7 @@ class cosmos_significant_state {
 	// GEN INTROSPECTOR class cosmos_significant_state
 	friend class cosmos;
 	friend class cosmic_delta;
-	friend struct augs::introspection_access;
+	friend augs::introspection_access;
 
 	entity_pool_type entity_pool;
 	dynamic_component_pools_type component_pools;

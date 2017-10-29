@@ -60,7 +60,7 @@ namespace components {
 		sound_effect_input low_ammo_cue_sound;
 
 	private:
-		friend struct augs::introspection_access;
+		friend augs::introspection_access;
 
 		bool is_cocking_handle_being_pulled = false;
 		pad_bytes<3> pad;

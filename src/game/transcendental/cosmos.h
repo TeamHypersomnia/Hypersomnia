@@ -78,6 +78,9 @@ auto subscript_handle_getter(C& cosm, const entity_guid guid) {
 class EMPTY_BASES cosmos : private cosmos_base,
 	public augs::subscript_handle_getters_mixin<cosmos>
 {
+	friend augs::subscript_handle_getters_mixin<cosmos>;
+	friend cosmos_base;
+
 	/* State of the cosmos begins here ***************************/
 #if COSMOS_TRACKS_GUIDS
 	std::map<entity_guid, entity_id> guid_to_id;

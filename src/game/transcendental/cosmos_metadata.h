@@ -10,7 +10,7 @@ namespace augs {
 class cosmos_metadata {
 	// GEN INTROSPECTOR class cosmos_metadata
 	friend class cosmos;
-	friend struct augs::introspection_access;
+	friend augs::introspection_access;
 
 	augs::delta delta = augs::delta::steps_per_second(60);
 	augs::stepped_timestamp now = 0;

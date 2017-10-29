@@ -71,7 +71,7 @@ struct basic_convex_partitioned_shape {
 
 			auto first_v = new_convex[0];
 
-			const unsigned max_vertices = CONVEX_POLY_VERTEX_COUNT;
+			const unsigned max_vertices = convex_poly_vertex_count;
 
 			if (new_convex.size() > max_vertices) {
 				unsigned first = 1;

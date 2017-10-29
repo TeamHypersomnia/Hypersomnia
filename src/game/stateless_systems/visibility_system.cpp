@@ -209,7 +209,7 @@ void visibility_system::respond_to_visibility_information_requests(
 			transform.pos - vec2(d, d), 
 			transform.pos + vec2(d, d), 
 			request.candidate_filter, 
-			[&](const auto fix) {
+			[&](const b2Fixture* const fix) {
 				const auto candidate = cosmos[get_entity_that_owns(fix)];
 				
 				if (candidate.get_owner_body() == it) {

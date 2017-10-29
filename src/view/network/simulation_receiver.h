@@ -1,6 +1,7 @@
 #pragma once
 #include <unordered_set>
 
+#include "augs/network/network_client.h"
 #include "augs/network/jitter_buffer.h"
 
 #include "game/components/transform_component.h"
@@ -12,15 +13,6 @@
 
 #include "view/audiovisual_state/systems/interpolation_system.h"
 #include "view/audiovisual_state/systems/past_infection_system.h"
-
-namespace augs {
-	namespace network {
-		class client;
-	}
-}
-
-class interpolation_system;
-class past_infection_system;
 
 struct misprediction_candidate_entry {
 	entity_id id;
