@@ -18,7 +18,7 @@ script:
   # Run your build commands next
   - mkdir dev
   - cd dev
-  - cmake -DUNIX=ON -DBUILD_OPENGL=OFF -DBUILD_VERSION_FILE_GENERATOR=OFF -DBUILD_HTTP_REQUESTS=OFF -DADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE=OFF -D CMAKE_C_COMPILER=gcc-7 -D CMAKE_CXX_COMPILER=g++-7 ..
+  - cmake -DUNIX=ON -DHYPERSOMNIA_BARE=ON -D CMAKE_C_COMPILER=gcc-7 -D CMAKE_CXX_COMPILER=g++-7 ..
   - make --keep-going
   - ./Hypersomnia --unit-tests-only
   

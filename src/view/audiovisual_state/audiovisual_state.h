@@ -36,6 +36,35 @@ struct audiovisual_advance_input {
 	const augs::audio_volume_settings audio_volume;
 	const interpolation_settings interpolation;
 	const world_camera_settings camera;
+
+	// for now just to know whats going on
+	audiovisual_advance_input(
+		const augs::delta frame_delta,
+		const double speed_multiplier,
+
+		const const_entity_handle viewed_character,
+		const vec2i screen_size,
+		const particle_effects_map& particle_effects,
+
+		const loaded_sounds& sounds,
+		const augs::audio_volume_settings audio_volume,
+		const interpolation_settings interpolation,
+		const world_camera_settings camera
+	) :
+		frame_delta(frame_delta),
+		speed_multiplier(speed_multiplier),
+
+		viewed_character(viewed_character),
+		screen_size(screen_size),
+		particle_effects(particle_effects),
+
+		sounds(sounds),
+		audio_volume(audio_volume),
+		interpolation(interpolation),
+		camera(camera)
+	{
+
+	}
 };
 
 struct audiovisual_state {
