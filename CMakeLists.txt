@@ -712,6 +712,26 @@ configure_msvc_runtime()
 
 add_library(lua ${LUA_CPPS})
 
+# As some libraries do not use the preferred target_include_directories,
+# we must manually acquire the directories that they add via include_directories.
+
+include(add_include_dirs_of)
+
+if(BUILD_SOUND_FORMAT_DECODERS)
+	# We build OGG.
+	
+	add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/ogg")
+	add_include_dirs_of("ogg")
+	
+	# We build Vorbis. It must know the paths for OGG that we have just built.
+	
+	set(OGG_ROOT "${PROJECT_SOURCE_DIR}/src/3rdparty/ogg")
+	set(OGG_LIBRARIES ogg)
+	
+	add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/vorbis")
+	add_include_dirs_of("vorbis")
+endif()
+
 if(BUILD_OPENAL)
 	# We build OpenAL Soft. We need to set some variables beforehand.
 	
@@ -722,55 +742,23 @@ if(BUILD_OPENAL)
 	set(ALSOFT_TESTS FALSE CACHE BOOL "Build and install test programs" FORCE)
 	
 	add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/openal-soft")
-endif()
-
-if(BUILD_SOUND_FORMAT_DECODERS)
-	# We build OGG.
-	
-	add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/ogg")
-	
-	# We build Vorbis. It must know the paths for OGG that we have just built.
-	
-	set(OGG_ROOT "${PROJECT_SOURCE_DIR}/src/3rdparty/ogg")
-	set(OGG_LIBRARIES ogg)
-	
-	add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/vorbis")
+	add_include_dirs_of("OpenAL")
 endif()
 
 # We build the remaining libraries.
 
 if(BUILD_ENET)
 	add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/enet")
-endif()
-
-if(BUILD_FREETYPE)
-	add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/freetype")
-endif()
-
-if(BUILD_OPENGL)
-	add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/glad")
-endif()
-
-# As the following libraries do not use the preferred target_include_directories,
-# we must manually acquire the directories that they add via include_directories.
-
-include(add_include_dirs_of)
-
-if(BUILD_ENET)
 	add_include_dirs_of("enet")
 endif()
 
 if(BUILD_FREETYPE)
+	add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/freetype")
 	add_include_dirs_of("freetype")
 endif()
 
-if(BUILD_SOUND_FORMAT_DECODERS)
-	add_include_dirs_of("ogg")
-	add_include_dirs_of("vorbis")
-endif()
-
-if(BUILD_OPENAL)
-	add_include_dirs_of("OpenAL")
+if(BUILD_OPENGL)
+	add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/glad")
 endif()
 
 include_directories(${HYPERSOMNIA_INCLUDE_DIRS})
