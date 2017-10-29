@@ -890,9 +890,18 @@ set(HYPERSOMNIA_LIBS lua)
 
 if(BUILD_OPENGL)
 	list(APPEND HYPERSOMNIA_LIBS
-		"OpenGL32.lib"
 		glad
 	)
+
+	if(UNIX)
+		list(APPEND HYPERSOMNIA_LIBS
+			GL
+		)
+	elseif(MSVC)
+		list(APPEND HYPERSOMNIA_LIBS
+			"OpenGL32.lib"
+		)
+	endif()
 endif()
 
 if(BUILD_OPENAL)
