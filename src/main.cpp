@@ -563,7 +563,7 @@ int work(const int argc, const char* const * const argv) try {
 		const double speed_multiplier,
 		const config_lua_table& viewing_config
 	) {
-		audiovisuals.advance({
+		const audiovisual_advance_input in {
 			frame_delta,
 			{ speed_multiplier },
 
@@ -576,7 +576,9 @@ int work(const int argc, const char* const * const argv) try {
 			viewing_config.audio_volume,
 			viewing_config.interpolation,
 			viewing_config.camera
-		});
+		};
+
+		audiovisuals.advance(in);
 	};
 
 	static auto setup_post_solve = [](const const_logic_step step) {
