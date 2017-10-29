@@ -7,18 +7,18 @@
 #undef max
 
 namespace augs {
-	void shell(const std::string& s) {
+	int shell(const std::string& s) {
 		const auto wide = to_wstring(s);
 
-		ShellExecute(NULL, NULL, wide.c_str(), NULL, NULL, SW_SHOW);
+		return reinterpret_cast<int>(ShellExecute(NULL, NULL, wide.c_str(), NULL, NULL, SW_SHOW));
 	}
 }
 #elif PLATFORM_UNIX
 #include <stdlib.h>
 
 namespace augs {
-	void shell(const std::string& s) {
-		system(s.c_str());
+	int shell(const std::string& s) {
+		return system(s.c_str());
 	}
 }
 #else
