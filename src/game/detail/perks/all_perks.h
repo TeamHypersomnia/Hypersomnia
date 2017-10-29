@@ -3,6 +3,8 @@
 #include "augs/templates/instance_type.h"
 #include "augs/templates/type_in_list_id.h"
 
+#include "augs/misc/trivially_copyable_tuple.h"
+
 #include "game/detail/perks/haste_perk.h"
 #include "game/detail/perks/electric_shield_perk.h"
 

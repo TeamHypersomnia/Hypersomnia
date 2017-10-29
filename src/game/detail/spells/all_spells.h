@@ -3,6 +3,8 @@
 #include "augs/templates/instance_type.h"
 #include "augs/templates/type_in_list_id.h"
 
+#include "augs/misc/trivially_copyable_tuple.h"
+
 #include "game/detail/spells/haste.h"
 #include "game/detail/spells/fury_of_the_aeons.h"
 #include "game/detail/spells/ultimate_wrath_of_the_aeons.h"

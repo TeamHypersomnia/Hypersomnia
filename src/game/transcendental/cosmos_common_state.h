@@ -11,6 +11,8 @@
 #include "game/common_state/entity_name_metas.h"
 
 #include "game/detail/spells/all_spells.h"
+#include "game/detail/perks/all_perks.h"
+#include "game/detail/all_sentience_meters.h"
 
 using meter_tuple = meter_list_t<std::tuple>;
 using spell_tuple = spell_list_t<std::tuple>;
