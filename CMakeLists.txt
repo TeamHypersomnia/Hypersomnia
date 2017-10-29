@@ -16,18 +16,26 @@ endif()
 # The game should still run, even not having these features, although obviously, you won't see/hear anything.
 # In the future, the switches will also differ depending on whether the target application is a client or a server.
 
-option(BUILD_SOUND_FORMAT_DECODERS "Build ogg and vorbis. If this is off, there is also no point in enabling OpenAL." ON)
-option(BUILD_OPENAL "Build OpenAL Soft." ON)
-option(BUILD_OPENGL "Build OpenGL-related code." ON)
-option(BUILD_UNIT_TESTS "Build unit tests that are run on game startup." ON)
-option(BUILD_VERSION_FILE_GENERATOR "Build version file generator to generate commit information." ON)
-option(BUILD_ENET "Build ENet networking library." ON)
-option(BUILD_FREETYPE "Build FreeType library responsible for loading fonts." ON)
-option(BUILD_HTTP_REQUESTS "Build simple http requests, e.g. for latest news bar in the main menu." ON)
-option(BUILD_TEST_SCENES "Build unscripted test scenes hardcoded in C++." ON)
-option(BUILD_WINDOW_FRAMEWORK "Build code specific to a given platfom, e.g. window management done by WinAPI." ON)
-option(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE "Add command to archive builds in Release." ON)
-option(ADD_APPLICATION_ICON "Add application icon." ON)
+if(HYPERSOMNIA_BARE)
+	message("Building Hypersomnia without... anything")
+	
+	set(DEFAULT_OPT, OFF)
+else()
+	set(DEFAULT_OPT, ON)
+endif()
+
+option(BUILD_SOUND_FORMAT_DECODERS "Build ogg and vorbis. If this is off, there is also no point in enabling OpenAL." ${DEFAULT_OPT})
+option(BUILD_OPENAL "Build OpenAL Soft." ${DEFAULT_OPT})
+option(BUILD_OPENGL "Build OpenGL-related code." ${DEFAULT_OPT})
+option(BUILD_UNIT_TESTS "Build unit tests that are run on game startup." ${DEFAULT_OPT})
+option(BUILD_VERSION_FILE_GENERATOR "Build version file generator to generate commit information." ${DEFAULT_OPT})
+option(BUILD_ENET "Build ENet networking library." ${DEFAULT_OPT})
+option(BUILD_FREETYPE "Build FreeType library responsible for loading fonts." ${DEFAULT_OPT})
+option(BUILD_HTTP_REQUESTS "Build simple http requests, e.g. for latest news bar in the main menu." ${DEFAULT_OPT})
+option(BUILD_TEST_SCENES "Build unscripted test scenes hardcoded in C++." ${DEFAULT_OPT})
+option(BUILD_WINDOW_FRAMEWORK "Build code specific to a given platfom, e.g. window management done by WinAPI." ${DEFAULT_OPT})
+option(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE "Add command to archive builds in Release." ${DEFAULT_OPT})
+option(ADD_APPLICATION_ICON "Add application icon." ${DEFAULT_OPT})
 
 option(HYPERSOMNIA_BARE "Build the minimal possible Hypersomnia runtime. For testing or quick iteration." OFF)
 
@@ -57,23 +65,6 @@ set(HYPERSOMNIA_LOCAL_FILES_DIR "cache/usr/")
 #	- Can't tweak maximum number of entities at runtime
 #	- For every game world, there's always maximum of possible memory allocated 
 set(STATICALLY_ALLOCATE_ENTITIES_NUM "5000" CACHE STRING "Statically allocate entities in cosmos class")
-
-if (HYPERSOMNIA_BARE)
-	set(BUILD_SOUND_FORMAT_DECODERS FALSE CACHE BOOL "" FORCE)
-	set(BUILD_OPENAL FALSE CACHE BOOL "" FORCE)
-	set(BUILD_OPENGL FALSE CACHE BOOL "" FORCE)
-	set(BUILD_UNIT_TESTS FALSE CACHE BOOL "" FORCE)
-	set(BUILD_VERSION_FILE_GENERATOR FALSE CACHE BOOL "" FORCE)
-	set(BUILD_ENET FALSE CACHE BOOL "" FORCE)
-	set(BUILD_FREETYPE FALSE CACHE BOOL "" FORCE)
-	set(BUILD_HTTP_REQUESTS FALSE CACHE BOOL "" FORCE)
-	set(BUILD_TEST_SCENES FALSE CACHE BOOL "" FORCE)
-	set(BUILD_WINDOW_FRAMEWORK FALSE CACHE BOOL "" FORCE)
-	set(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE FALSE CACHE BOOL "" FORCE)
-	set(ADD_APPLICATION_ICON FALSE CACHE BOOL "" FORCE)
-
-	message("Building Hypersomnia without... anything")
-endif()
 
 if(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE)
 	if (NOT HYPERSOMNIA_RUNTIME_ARCHIVE_DIR)
