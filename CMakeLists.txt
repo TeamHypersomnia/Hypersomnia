@@ -24,6 +24,9 @@ else()
 	set(DEFAULT_OPT ON)
 endif()
 
+message("Hypersomnia project source dir: ${PROJECT_SOURCE_DIR}")
+message("Hypersomnia project binary dir: ${PROJECT_BINARY_DIR}")
+
 option(BUILD_SOUND_FORMAT_DECODERS "Build ogg and vorbis. If this is off, there is also no point in enabling OpenAL." ${DEFAULT_OPT})
 option(BUILD_OPENAL "Build OpenAL Soft." ${DEFAULT_OPT})
 option(BUILD_OPENGL "Build OpenGL-related code." ${DEFAULT_OPT})
