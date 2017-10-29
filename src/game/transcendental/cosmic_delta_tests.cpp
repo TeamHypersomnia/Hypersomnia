@@ -30,18 +30,18 @@ TEST_CASE("CosmicDelta0 PaddingSanityCheck1") {
 	typedef ok checked_type;
 	constexpr size_t type_size = sizeof(checked_type);
 
-	char buf1[type_size];
-	char buf2[type_size];
+	std::array<char, type_size> buf1;
+	std::array<char, type_size> buf2;
 
 	for (int i = 0; i < type_size; ++i) {
 		buf1[i] = 3;
 		buf2[i] = 4;
 	}
 
-	new (buf1) checked_type;
-	new (buf2) checked_type;
+	new (&buf1) checked_type;
+	new (&buf2) checked_type;
 
-	const bool are_different = std::memcmp(buf1, buf2, type_size);
+	const bool are_different = std::memcmp(&buf1, &buf2, type_size);
 
 	REQUIRE(are_different);
 }
@@ -56,18 +56,18 @@ TEST_CASE("CosmicDelta1 PaddingSanityCheck2") {
 	typedef ok checked_type;
 	constexpr size_t type_size = sizeof(checked_type);
 
-	char buf1[type_size];
-	char buf2[type_size];
+	std::array<char, type_size> buf1;
+	std::array<char, type_size> buf2;
 
 	for (int i = 0; i < type_size; ++i) {
 		buf1[i] = 3;
 		buf2[i] = 4;
 	}
 
-	new (buf1) checked_type;
-	new (buf2) checked_type;
+	new (&buf1) checked_type;
+	new (&buf2) checked_type;
 
-	const bool are_different = std::memcmp(buf1, buf2, type_size);
+	const bool are_different = std::memcmp(&buf1, &buf2, type_size);
 
 	REQUIRE(are_different);
 }
@@ -96,8 +96,8 @@ TEST_CASE("CosmicDelta2 PaddingTest") {
 		if constexpr(!allows_nontriviality_v<checked_type>) {
 			constexpr size_t type_size = sizeof(checked_type);
 
-			char buf1[type_size];
-			char buf2[type_size];
+			std::array<char, type_size> buf1;
+			std::array<char, type_size> buf2;
 
 			for (int i = 0; i < type_size; ++i) {
 				buf1[i] = 3;
@@ -107,8 +107,8 @@ TEST_CASE("CosmicDelta2 PaddingTest") {
 			// it looks like the placement new may zero-out the memory before allocation.
 			// we will leave this test as it is useful anyway.
 
-			new (buf1) checked_type(args...);
-			new (buf2) checked_type(args...);
+			new (&buf1) checked_type(args...);
+			new (&buf2) checked_type(args...);
 
 			int iter = 0;
 			bool same = true;
@@ -128,8 +128,8 @@ TEST_CASE("CosmicDelta2 PaddingTest") {
 					iter
 				);
 
-				augs::create_text_file(LOG_FILES_DIR "object1.txt", describe_fields(*(checked_type*)buf1));
-				augs::create_text_file(LOG_FILES_DIR "object2.txt", describe_fields(*(checked_type*)buf2));
+				augs::create_text_file(LOG_FILES_DIR "object1.txt", describe_fields(*reinterpret_cast<checked_type*>(&buf1)));
+				augs::create_text_file(LOG_FILES_DIR "object2.txt", describe_fields(*reinterpret_cast<checked_type*>(&buf2)));
 
 				LOG(log_contents);
 				FAIL(log_contents);
