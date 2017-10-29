@@ -109,7 +109,7 @@ namespace augs {
 		}
 
 		inline void text(const std::string& t) {
-			ImGui::Text(t.c_str());
+			ImGui::TextUnformatted(t.c_str());
 		}
 
 		inline void text(const std::wstring& t) {
@@ -117,12 +117,22 @@ namespace augs {
 		}
 
 		inline void text(const char* const t) {
-			ImGui::Text(t);
+			ImGui::TextUnformatted(t);
 		}
 
 		inline void text_tooltip(const std::string& t) {
 			auto scope = scoped_tooltip();
 			text(t);
+		}
+
+		template <class... Args>
+		inline void text(const std::string& format, Args&&... args) {
+			text(typesafe_sprintf(format, std::forward<Args>(args)...));
+		}
+
+		template <class... Args>
+		inline void text(const std::wstring& format, Args&&... args) {
+			text(typesafe_sprintf(format, std::forward<Args>(args)...));
 		}
 
 		template <class T, class B, class... Args>

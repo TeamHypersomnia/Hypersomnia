@@ -505,29 +505,25 @@ void editor_setup::perform_custom_imgui(
 			auto summary = scoped_window("Summary", &show_summary, ImGuiWindowFlags_AlwaysAutoResize);
 
 			if (has_current_tab()) {
-				//text(typesafe_sprintf("Tick rate: %x/s", get_viewed_cosmos().get_steps_per_second()));
-				text(typesafe_sprintf("Cursor: %x", world_cursor_pos));
+				//text("Tick rate: %x/s", get_viewed_cosmos().get_steps_per_second()));
+				text("Cursor: %x", world_cursor_pos);
 				
 				if (get_camera_panning().non_zero()) {
-					text(typesafe_sprintf("Panning: %x", get_camera_panning()));
+					text("Panning: %x", get_camera_panning());
 				}
 
-				text(typesafe_sprintf("Total entities: %x/%x",
+				text("Total entities: %x/%x",
 					get_viewed_cosmos().get_entities_count(),
 					get_viewed_cosmos().get_maximum_entities()
-				));
-
-				text(
-					typesafe_sprintf("World time: %x (%x steps)",
-						standard_format_seconds(get_viewed_cosmos().get_total_seconds_passed()),
-						get_viewed_cosmos().get_total_steps_passed()
-					)
 				);
 
-				text(
-					typesafe_sprintf(L"Currently viewing: %x",
-						get_viewed_character().alive() ? get_viewed_character().get_name() : L"no entity"
-					)
+				text("World time: %x (%x steps)",
+					standard_format_seconds(get_viewed_cosmos().get_total_seconds_passed()),
+					get_viewed_cosmos().get_total_steps_passed()
+				);
+
+				text(L"Currently viewing: %x",
+					get_viewed_character().alive() ? get_viewed_character().get_name() : L"no entity"
 				);
 			}
 		}
