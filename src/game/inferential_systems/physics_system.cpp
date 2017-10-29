@@ -410,11 +410,11 @@ physics_system& physics_system::operator=(const physics_system& b) {
 
 #define my_offsetof(s,m) ((std::size_t)&reinterpret_cast<char const volatile&>((((s*)0)->m)))
 	
-	constexpr auto contact_edge_a_offset = my_offsetof(b2Contact, m_nodeA);
-	constexpr auto contact_edge_b_offset = my_offsetof(b2Contact, m_nodeB);
+	const auto contact_edge_a_offset = my_offsetof(b2Contact, m_nodeA);
+	const auto contact_edge_b_offset = my_offsetof(b2Contact, m_nodeB);
 
-	constexpr auto joint_edge_a_offset = my_offsetof(b2Joint, m_edgeA);
-	constexpr auto joint_edge_b_offset = my_offsetof(b2Joint, m_edgeB);
+	const auto joint_edge_a_offset = my_offsetof(b2Joint, m_edgeA);
+	const auto joint_edge_b_offset = my_offsetof(b2Joint, m_edgeB);
 
 #if DEBUG_PHYSICS_SYSTEM_COPY
 	std::unordered_set<void**> already_migrated_pointers;
@@ -553,11 +553,6 @@ physics_system& physics_system::operator=(const physics_system& b) {
 
 		const bool a_or_b_in_joint { joint_edge_a_or_b_in_joints.at(edge_ptr) };
 		const auto offset_to_edge_in_joint = std::size_t { !a_or_b_in_joint ? joint_edge_a_offset : joint_edge_b_offset };
-
-		ensure(
-			offset_to_edge_in_joint == offsetof(b2Joint, m_edgeA)
-			|| offset_to_edge_in_joint == offsetof(b2Joint, m_edgeB)
-		);
 
 		std::byte* const joint_that_owns_unmigrated_edge = reinterpret_cast<std::byte*>(edge_ptr) - offset_to_edge_in_joint;
 		// here "at" requires that the joints be already migrated
