@@ -599,10 +599,7 @@ if(NOT (GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git"))
 endif()
 
 if(BUILD_VERSION_FILE_GENERATOR)
-	add_executable(version_file_generator 
-		"${CMAKE_MODULE_PATH}/version_file_generator.cpp"
-		"src/augs/misc/time_utils.cpp"
-	)
+	add_subdirectory("${CMAKE_MODULE_PATH}/version_file_generator")
 
 	add_custom_command(
 		OUTPUT ${HYPERSOMNIA_VERSION_FILE_CPP}

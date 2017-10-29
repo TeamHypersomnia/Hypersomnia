@@ -30,7 +30,7 @@ struct editor_tab {
 
 struct editor_saved_tabs {
 	// GEN INTROSPECTOR struct editor_saved_tabs
-	std::size_t current_tab_index = -1;
+	std::size_t current_tab_index = static_cast<std::size_t>(-1);
 	std::vector<editor_tab> tabs;
 	// END GEN INTROSPECTOR
 };

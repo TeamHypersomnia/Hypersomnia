@@ -1,7 +1,11 @@
 #define FORCE_DISABLE_ENSURE 1
 
 #include <iostream>
+#include <chrono>
 
+using namespace std::chrono;
+
+#include "augs/misc/scope_guard.h"
 #include "augs/window_framework/exec.h"
 #include "augs/filesystem/file.h"
 #include "augs/misc/typesafe_sprintf.h"
@@ -9,18 +13,26 @@
 #include "augs/templates/string_templates.h"
 
 int main(int argc, char** argv) {
+	auto start = high_resolution_clock::now();
+
+	std::cout << "------------\nversion_file_generator run" << std::endl;
+
+	auto end_message = augs::make_scope_guard([&]() {
+		std::cout << "Run time: " << duration_cast<duration<double, milliseconds::period>>(high_resolution_clock::now() - start).count() << " ms" << std::endl << "------------\n";
+	});
+
 	if (argc < 2) {
-		std::cout << "Path to GIT executable was not specified!";
+		std::cout << "Path to GIT executable was not specified!\nFailure";
 		return 1;
 	}
 
 	if (argc < 3) {
-		std::cout << "Path to the input file was not specified!";
+		std::cout << "Path to the input file was not specified!\nFailure";
 		return 1;
 	}
 
 	if (argc < 4) {
-		std::cout << "Path to the output file was not specified!";
+		std::cout << "Path to the output file was not specified!\nFailure";
 		return 1;
 	}
 	
@@ -75,5 +87,6 @@ int main(int argc, char** argv) {
 		output_file_contents
 	);
 
+	std::cout << "Success" << std::endl;
 	return 0;
 }

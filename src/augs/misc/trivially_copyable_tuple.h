@@ -8,17 +8,18 @@
 namespace augs {
 	template <class... Types>
 	class trivially_copyable_tuple {
-		alignas(constexpr_max_v<std::size_t, alignof(Types)...>) char buf[sum_sizes_of_types_in_list_v<type_list<Types...>>];
+		std::aligned_storage_t<
+			sum_sizes_of_types_in_list_v<type_list<Types...>>,
+			constexpr_max_v<std::size_t, alignof(Types)...>
+		> buf;
 		
 		template <class type>
 		void init() {
 			static constexpr std::size_t offset = sum_sizes_until_nth_v<index_in_v<type, Types...>, type_list<Types...>>;
 			
-			auto* p = data() + offset;
-			auto* field = reinterpret_cast<const type*>(p);
+			auto* const p = data() + offset;
 
-			ensure(p >= reinterpret_cast<char*>(buf));
-			ensure(p + sizeof(type) <= buf + sum_sizes_of_types_in_list_v<type_list<Types...>>);
+			ensure(p + sizeof(type) <= data() + sum_sizes_of_types_in_list_v<type_list<Types...>>);
 
 			new (p) type;
 		}
@@ -32,11 +33,11 @@ namespace augs {
 		}
 
 		char* data() {
-			return buf;
+			return reinterpret_cast<char*>(&buf);
 		}
 
 		const char* data() const {
-			return buf;
+			return reinterpret_cast<const char*>(&buf);
 		}
 	};
 }

@@ -1,4 +1,5 @@
 #include "readable_bytesize.h"
+#include "augs/misc/typesafe_sprintf.h"
 
 std::string readable_bytesize(unsigned _size) {
 	double size = static_cast<double>(_size);
@@ -10,9 +11,5 @@ std::string readable_bytesize(unsigned _size) {
 		i++;
 	}
 
-	char buf[100];
-	std::fill(buf, buf + 100, 0);
-
-	sprintf(buf, "%.*f %s", i, size, units[i]);
-	return std::string(buf);
+	return typesafe_sprintf("%x.%x %x", i, size, units[i]);
 }
