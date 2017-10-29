@@ -297,7 +297,7 @@ namespace augs {
 		for_each_in(persistent_lines, line_lambda);
 	}
 
-	std::size_t renderer::get_max_texture_size() const {
+	int renderer::get_max_texture_size() const {
 #if BUILD_OPENGL
 		GLint tsize;
 		GL_CHECK(glGetIntegerv(GL_MAX_TEXTURE_SIZE, &tsize));

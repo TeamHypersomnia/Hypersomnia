@@ -89,7 +89,7 @@ namespace augs {
 		void call_and_clear_lines();
 		void call_and_clear_triangles();
 
-		size_t get_max_texture_size() const;
+		int get_max_texture_size() const;
 
 		int get_triangle_count() const;
 		vertex_triangle& get_triangle(const int i);

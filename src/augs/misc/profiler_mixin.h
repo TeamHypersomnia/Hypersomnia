@@ -20,7 +20,7 @@ namespace augs {
 		}
 	
 		auto summary() const {
-			std::vector<std::reference_wrapper<const time_measurements>> all_with_time;
+			std::vector<const time_measurements*> all_with_time;
 			std::wstring times_summary;
 			std::wstring amounts_summary;
 			
@@ -31,7 +31,7 @@ namespace augs {
 					using T = std::decay_t<decltype(m)>;
 					
 					if constexpr(std::is_same_v<T, time_measurements>) {
-						all_with_time.push_back(std::cref(m));
+						all_with_time.push_back(&m);
 					}
 					else {
 						amounts_summary += m.summary();
@@ -42,13 +42,13 @@ namespace augs {
 	
 			sort_range(
 				all_with_time, 
-				[](const auto& a, const auto& b) { 
-					return a.get() > b.get(); 
+				[](const auto* a, const auto* b) {
+					return *a > *b; 
 				}
 			);
 	
 			for (const auto& t : all_with_time) {
-				times_summary += t.get().summary();
+				times_summary += t->summary();
 			}
 	
 			return times_summary + amounts_summary;

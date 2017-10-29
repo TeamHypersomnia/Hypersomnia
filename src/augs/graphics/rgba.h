@@ -1,5 +1,5 @@
 #pragma once
-#include <iosfwd>
+#include <sstream>
 
 struct ImVec4;
 struct hsv;

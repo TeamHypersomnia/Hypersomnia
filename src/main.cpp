@@ -284,7 +284,7 @@ int work(const int argc, const char* const * const argv) try {
 					images,
 					config.gui_font,
 					{
-						renderer.get_max_texture_size(),
+						static_cast<unsigned>(renderer.get_max_texture_size()),
 						augs::path_type(GENERATED_FILES_DIR "atlases/game_world_atlas") 
 							+= (settings.save_regenerated_atlases_as_binary ? ".bin" : ".png"),
 						settings.regenerate_every_launch,
