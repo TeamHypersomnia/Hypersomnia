@@ -19,9 +19,9 @@ endif()
 if(HYPERSOMNIA_BARE)
 	message("Building Hypersomnia without... anything")
 	
-	set(DEFAULT_OPT, OFF)
+	set(DEFAULT_OPT OFF)
 else()
-	set(DEFAULT_OPT, ON)
+	set(DEFAULT_OPT ON)
 endif()
 
 option(BUILD_SOUND_FORMAT_DECODERS "Build ogg and vorbis. If this is off, there is also no point in enabling OpenAL." ${DEFAULT_OPT})
@@ -36,8 +36,6 @@ option(BUILD_TEST_SCENES "Build unscripted test scenes hardcoded in C++." ${DEFA
 option(BUILD_WINDOW_FRAMEWORK "Build code specific to a given platfom, e.g. window management done by WinAPI." ${DEFAULT_OPT})
 option(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE "Add command to archive builds in Release." ${DEFAULT_OPT})
 option(ADD_APPLICATION_ICON "Add application icon." ${DEFAULT_OPT})
-
-option(HYPERSOMNIA_BARE "Build the minimal possible Hypersomnia runtime. For testing or quick iteration." OFF)
 
 # Other variables.
 
