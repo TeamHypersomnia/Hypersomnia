@@ -1,5 +1,7 @@
 #define FORCE_DISABLE_ENSURE 1
 
+#include <iostream>
+
 #include "augs/window_framework/exec.h"
 #include "augs/filesystem/file.h"
 #include "augs/misc/typesafe_sprintf.h"
@@ -8,20 +10,23 @@
 
 int main(int argc, char** argv) {
 	if (argc < 2) {
-		throw std::runtime_error("Path to GIT executable was not specified!");
+		std::cout << "Path to GIT executable was not specified!";
+		return 1;
 	}
 
 	if (argc < 3) {
-		throw std::runtime_error("Path to the input file was not specified!");
+		std::cout << "Path to the input file was not specified!";
+		return 1;
 	}
 
 	if (argc < 4) {
-		throw std::runtime_error("Path to the output file was not specified!");
+		std::cout << "Path to the output file was not specified!";
+		return 1;
 	}
 	
-	const std::string git_executable_path = "\"" + std::string(argv[1]) + "\"";
-	const std::string input_file_path = argv[2];
-	const std::string output_file_path = argv[3];
+	const auto git_executable_path = augs::path_type("\"" + std::string(argv[1]) + "\"");
+	const auto input_file_path = augs::path_type(argv[2]);
+	const auto output_file_path = augs::path_type(argv[3]);
 
 	const auto input_file_contents = augs::get_file_contents(input_file_path);
 	
@@ -33,19 +38,19 @@ int main(int argc, char** argv) {
 
 	debug_argv_content += "\n";
 
-	const auto git_commit_number = augs::exec(git_executable_path + " rev-list --count master");
+	const auto git_commit_number = augs::exec(git_executable_path.string() + " rev-list --count master");
 	
-	auto git_commit_message = augs::exec(git_executable_path + " log -1 --format=%s");
+	auto git_commit_message = augs::exec(git_executable_path.string() + " log -1 --format=%s");
 	// We shall add the backslash both before \ and " to avoid compilation errors
 	str_ops(git_commit_message)
 		.replace_all("\\", "\\\\")
 		.replace_all("\"", "\\\"")
 	;
 
-	const auto git_commit_date = augs::exec(git_executable_path + " log -1 --format=%ad --date=local");
-	const auto git_commit_hash = augs::exec(git_executable_path + " rev-parse --verify HEAD");
+	const auto git_commit_date = augs::exec(git_executable_path.string() + " log -1 --format=%ad --date=local");
+	const auto git_commit_hash = augs::exec(git_executable_path.string() + " rev-parse --verify HEAD");
 
-	std::istringstream git_working_tree_changes (augs::exec(git_executable_path + " diff --name-only"));
+	std::istringstream git_working_tree_changes (augs::exec(git_executable_path.string() + " diff --name-only"));
 
 	std::string git_working_tree_changes_lines;
 
