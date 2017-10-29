@@ -134,14 +134,14 @@ public:
 		augs::enum_boolset<subjects_iteration_flag> flags = {}
 	) {
 		if (flags.test(subjects_iteration_flag::POSSIBLE_ITERATOR_INVALIDATION)) {
-			const auto targets = inferential.get<processing_lists_system>().get(list_type);
+			const auto targets = inferential.processing_lists.get(list_type);
 
 			for (const auto& subject : targets) {
 				operator()(subject, callback);
 			}
 		}
 		else {
-			for (const auto& subject : inferential.get<processing_lists_system>().get(list_type)) {
+			for (const auto& subject : inferential.processing_lists.get(list_type)) {
 				operator()(subject, callback);
 			}
 		}
@@ -149,7 +149,7 @@ public:
 
 	template <class F>
 	void for_each(const processing_subjects list_type, F callback) const {
-		for (const auto& subject : inferential.get<processing_lists_system>().get(list_type)) {
+		for (const auto& subject : inferential.processing_lists.get(list_type)) {
 			operator()(subject, callback);
 		}
 	}
@@ -178,13 +178,17 @@ public:
 
 	template <class System>
 	void partial_reinference(const entity_handle handle) {
-		auto& sys = inferential.get<System>();
+		inferential.for_each([&](auto& sys) {
+			using T = std::decay_t<decltype(sys)>;
 
-		sys.destroy_inferred_state_of(handle);
+			if constexpr(std::is_same_v<T, System>) {
+				sys.destroy_inferred_state_of(handle);
 
-		if (handle.is_inferred_state_activated()) {
-			sys.create_inferred_state_for(handle);
-		}
+				if (handle.is_inferred_state_activated()) {
+					sys.create_inferred_state_for(handle);
+				}
+			}
+		});
 	}
 
 	entity_id make_versioned(const unversioned_entity_id) const;
@@ -229,7 +233,7 @@ public:
 	rng_seed_type get_rng_seed_for(const entity_id) const;
 
 	std::size_t get_count_of(const processing_subjects list_type) const {
-		return inferential.get<processing_lists_system>().get(list_type).size();
+		return inferential.processing_lists.get(list_type).size();
 	}
 	
 	std::unordered_set<entity_id> get_entities_by_name(const entity_name_type&) const;
@@ -352,11 +356,11 @@ inline const common_assets& cosmos::get_common_assets() const {
 }
 
 inline std::unordered_set<entity_id> cosmos::get_entities_by_name(const entity_name_type& name) const {
-	return inferential.get<name_system>().get_entities_by_name(name);
+	return inferential.name.get_entities_by_name(name);
 }
 
 inline std::unordered_set<entity_id> cosmos::get_entities_by_name_id(const entity_name_id& id) const {
-	return inferential.get<name_system>().get_entities_by_name_id(id);
+	return inferential.name.get_entities_by_name_id(id);
 }
 
 inline entity_handle cosmos::get_entity_by_name(const entity_name_type& name) {

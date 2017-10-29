@@ -56,7 +56,7 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 	const float epsilon_distance_visible_point_sq = settings.epsilon_distance_visible_point * settings.epsilon_distance_visible_point;
 	
 	/* we'll need a reference to physics system for raycasting */
-	physics_system& physics = cosmos.inferential.get<physics_system>();
+	physics_system& physics = cosmos.inferential.physics;
 
 	auto& lines = DEBUG_LOGIC_STEP_LINES;
 

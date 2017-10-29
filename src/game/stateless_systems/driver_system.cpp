@@ -52,7 +52,7 @@ void driver_system::release_drivers_due_to_ending_contact_with_wheel(const logic
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
 	const auto& contacts = step.transient.messages.get_queue<messages::collision_message>();
-	const auto& physics = cosmos.inferential.get<physics_system>();
+	const auto& physics = cosmos.inferential.physics;
 
 	for (const auto& c : contacts) {
 		if (c.type == messages::collision_message::event_type::END_CONTACT) {
@@ -111,7 +111,7 @@ bool driver_system::change_car_ownership(
 ) {
 	auto& driver = driver_entity.get<components::driver>();
 	auto& cosmos = driver_entity.get_cosmos();
-	const auto& physics = cosmos.inferential.get<physics_system>();
+	const auto& physics = cosmos.inferential.physics;
 
 	auto* const maybe_rotation_copying = driver_entity.find<components::rotation_copying>();
 	const auto maybe_rigid_body = driver_entity.find<components::rigid_body>();

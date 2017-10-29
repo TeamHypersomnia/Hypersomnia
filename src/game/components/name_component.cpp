@@ -39,7 +39,7 @@ template <bool C>
 const entity_name_type& basic_name_synchronizer<C>::get_name() const {
 	const auto& cosmos = handle.get_cosmos();
 
-	return cosmos.inferential.template get<name_system>().get_name(
+	return cosmos.inferential.name.get_name(
 		cosmos.get_common_state().name_metas,
 		get_raw_component()
 	);
@@ -48,7 +48,7 @@ const entity_name_type& basic_name_synchronizer<C>::get_name() const {
 void component_synchronizer<false, N>::set_name(const entity_name_type& full_name) const {
 	auto& cosmos = handle.get_cosmos();
 
-	cosmos.inferential.get<name_system>().set_name(
+	cosmos.inferential.name.set_name(
 		cosmos.get_common_state().name_metas,
 		full_name,
 		get_raw_component(),
@@ -63,7 +63,7 @@ void component_synchronizer<false, N>::set_name(const entity_name_type& full_nam
 }
 
 void component_synchronizer<false, N>::set_name_id(const entity_name_id id) const {
-	handle.get_cosmos().inferential.get<name_system>().set_name_id(
+	handle.get_cosmos().inferential.name.set_name_id(
 		id,
 		get_raw_component(),
 		handle

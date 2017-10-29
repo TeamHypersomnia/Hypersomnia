@@ -15,7 +15,6 @@
 #include "view/game_gui/elements/slot_button.h"
 #include "view/audiovisual_state/world_camera.h"
 
-#include "view/audiovisual_state/world_camera.h"
 #include "augs/audio/audio_settings.h"
 #include "view/audiovisual_state/systems/interpolation_settings.h"
 

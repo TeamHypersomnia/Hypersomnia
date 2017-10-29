@@ -16,7 +16,7 @@
 void draw_crosshair_lasers(const draw_crosshair_lasers_input in) {
 	if (in.crosshair.alive()) {
 		const auto& cosmos = in.crosshair.get_cosmos();
-		const auto& physics = cosmos.inferential.get<physics_system>();
+		const auto& physics = cosmos.inferential.physics;
 
 		const auto crosshair_pos = in.crosshair.get_viewing_transform(in.interpolation).pos;
 

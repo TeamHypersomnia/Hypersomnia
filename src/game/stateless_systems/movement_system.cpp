@@ -62,7 +62,7 @@ void movement_system::set_movement_flags_from_input(const logic_step step) {
 }
 
 void movement_system::apply_movement_forces(cosmos& cosmos) {
-	auto& physics_sys = cosmos.inferential.get<physics_system>();
+	auto& physics_sys = cosmos.inferential.physics;
 	const auto& delta = cosmos.get_fixed_delta();
 
 	cosmos.for_each(

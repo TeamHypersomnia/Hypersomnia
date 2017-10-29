@@ -17,7 +17,7 @@ using F = components::fixtures;
 template<bool C>
 maybe_const_ref_t<C, colliders_cache>& basic_fixtures_synchronizer<C>::get_cache() const {
 	auto& cosmos = handle.get_cosmos();
-	return cosmos.inferential.template get<physics_system>().get_colliders_cache(handle);
+	return cosmos.inferential.physics.get_colliders_cache(handle);
 }
 
 template<bool C>
@@ -162,7 +162,7 @@ void component_synchronizer<false, F>::set_owner_body(const entity_id owner_id) 
 	const auto former_owner = cosmos[get_raw_component().owner_body];
 	get_raw_component().owner_body = new_owner;
 
-	auto& relational = cosmos.inferential.get<relational_system>().fixtures_of_bodies;
+	auto& relational = cosmos.inferential.relational.fixtures_of_bodies;
 	relational.set_parent(self, new_owner);
 
 	if (former_owner.alive()) {
@@ -205,7 +205,7 @@ bool basic_fixtures_synchronizer<C>::is_activated() const {
 
 template<bool C>
 bool basic_fixtures_synchronizer<C>::is_constructed() const {
-	return handle.get_cosmos().inferential.template get<physics_system>().is_inferred_state_created_for_colliders(handle);
+	return handle.get_cosmos().inferential.physics.is_inferred_state_created_for_colliders(handle);
 }
 
 template<bool C>

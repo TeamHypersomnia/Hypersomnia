@@ -7,21 +7,28 @@
 #include "game/inferential_systems/relational_system.h"
 #include "game/inferential_systems/name_system.h"
 
-namespace augs {
-	template <class...>
-	class storage_for_systems;
-}
+struct all_inferential_systems {
+	relational_system relational;
+	name_system name;
+	physics_system physics;
+	tree_of_npo_system tree_of_npo;
+	processing_lists_system processing_lists;
 
-using all_inferential_systems = augs::storage_for_systems<
-	/* 
-		It is critical that the relational system is the first on this list
-		so that it creates inferred state of relations before physics_system uses it for constructing
-		bodies, fixtures and joints.
-	*/
+	template <class F>
+	void for_each(F f) {
+		f(relational);
+		f(name);
+		f(physics);
+		f(tree_of_npo);
+		f(processing_lists);
+	}
 
-	relational_system,
-	name_system,
-	physics_system,
-	tree_of_npo_system,
-	processing_lists_system
->;
+	template <class F>
+	void for_each(F f) const {
+		f(relational);
+		f(name);
+		f(physics);
+		f(tree_of_npo);
+		f(processing_lists);
+	}
+};

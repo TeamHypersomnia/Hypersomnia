@@ -97,11 +97,11 @@ public:
 	rigid_body_type get_body_type() const;
 
 	auto get_fixture_entities() const {
-		return handle.get_cosmos().inferential.template get<relational_system>().fixtures_of_bodies.get_children_of(handle);
+		return handle.get_cosmos().inferential.relational.fixtures_of_bodies.get_children_of(handle);
 	}
 
 	auto get_attached_joints() const {
-		return handle.get_cosmos().inferential.template get<relational_system>().joints_of_bodies.get_all_children_of(handle);
+		return handle.get_cosmos().inferential.relational.joints_of_bodies.get_all_children_of(handle);
 	}
 
 	bool test_point(const vec2) const;

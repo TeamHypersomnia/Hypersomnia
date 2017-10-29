@@ -63,7 +63,7 @@ void visible_entities::acquire_physical(const visible_entities_query input) {
 	const auto& cosmos = input.cosm;
 	const auto camera = input.cone;
 
-	const auto& physics = cosmos.inferential.get<physics_system>();
+	const auto& physics = cosmos.inferential.physics;
 
 	thread_local std::unordered_set<entity_id> unique_from_physics;
 	unique_from_physics.clear();
@@ -101,7 +101,7 @@ void visible_entities::acquire_non_physical(const visible_entities_query input) 
 	const auto camera = input.cone;
 	const auto camera_aabb = camera.get_transformed_visible_world_area_aabb();
 
-	const auto& tree_of_npo = cosmos.inferential.get<tree_of_npo_system>();
+	const auto& tree_of_npo = cosmos.inferential.tree_of_npo;
 	
 	tree_of_npo.for_each_in_camera(
 		[&](const unversioned_entity_id id) {

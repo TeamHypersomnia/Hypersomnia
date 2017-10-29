@@ -358,7 +358,7 @@ void cosmos::delete_entity(const entity_id e) {
 		Unregister that id as a parent from the relational system
 	*/
 
-	inferential.get<relational_system>().handle_deletion_of_potential_parent(e);
+	inferential.relational.handle_deletion_of_potential_parent(e);
 }
 
 void cosmos::advance_and_queue_destructions(const logic_step step) {
@@ -402,7 +402,7 @@ void cosmos::advance_and_queue_destructions(const logic_step step) {
 		auto scope = measure_scope(performance.physics);
 
 		listener.during_step = true;
-		inferential.get<physics_system>().step_and_set_new_transforms(step);
+		inferential.physics.step_and_set_new_transforms(step);
 		listener.during_step = false;
 	}
 
@@ -427,7 +427,7 @@ void cosmos::advance_and_queue_destructions(const logic_step step) {
 	
 	sentience_system().regenerate_values_and_advance_spell_logic(step);
 	sentience_system().apply_damage_and_generate_health_events(step);
-	inferential.get<physics_system>().post_and_clear_accumulated_collision_messages(step);
+	inferential.physics.post_and_clear_accumulated_collision_messages(step);
 	sentience_system().cooldown_aimpunches(step);
 
 	driver_system().release_drivers_due_to_requests(step);
@@ -480,7 +480,7 @@ void cosmos::advance_and_queue_destructions(const logic_step step) {
 	//position_copying_system().update_transforms(step);
 	//rotation_copying_system().update_rotations(step.cosm);
 
-	profiler.raycasts.measure(inferential.get<physics_system>().ray_casts_since_last_step);
+	profiler.raycasts.measure(inferential.physics.ray_casts_since_last_step);
 
 	++significant.meta.now.step;
 

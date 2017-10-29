@@ -182,7 +182,7 @@ entity_id get_closest_hostile(
 	const auto& cosmos = subject.get_cosmos();
 	const auto si = cosmos.get_si();
 
-	const auto& physics = cosmos.inferential.get<physics_system>();
+	const auto& physics = cosmos.inferential.physics;
 	const auto transform = subject.get_logic_transform();
 
 	entity_id closest_hostile;
@@ -230,7 +230,7 @@ std::vector<entity_id> get_closest_hostiles(
 	const auto& cosmos = subject.get_cosmos();
 	const auto si = cosmos.get_si();
 
-	const auto& physics = cosmos.inferential.get<physics_system>();
+	const auto& physics = cosmos.inferential.physics;
 	const auto transform = subject.get_logic_transform();
 
 	struct hostile_entry {
