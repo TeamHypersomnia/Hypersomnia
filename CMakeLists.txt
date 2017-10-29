@@ -663,6 +663,10 @@ endif()
 
 # We configure some preprocessor defines.
 
+if(UNIX)
+	add_definitions(-DLUA_USE_POSIX)
+endif()
+
 # Lua is configured to compile as C++, of which sol2 library must necessarily know.
 
 add_definitions(-DSOL_USING_CXX_LUA)
@@ -889,10 +893,6 @@ endif()
 set(HYPERSOMNIA_LIBS lua)
 
 if(BUILD_OPENGL)
-	list(APPEND HYPERSOMNIA_LIBS
-		glad
-	)
-
 	if(UNIX)
 		list(APPEND HYPERSOMNIA_LIBS
 			GL
@@ -902,6 +902,10 @@ if(BUILD_OPENGL)
 			"OpenGL32.lib"
 		)
 	endif()
+	
+	list(APPEND HYPERSOMNIA_LIBS
+		glad
+	)
 endif()
 
 if(BUILD_OPENAL)
