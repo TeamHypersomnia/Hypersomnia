@@ -10,5 +10,7 @@
 #undef max
 #elif PLATFORM_UNIX
 #include <GL/gl.h>
+#else
+#error "Unsupported platform!"
 #endif
 #endif

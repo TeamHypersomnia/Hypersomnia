@@ -7,6 +7,8 @@ namespace augs {
 	}
 }
 
+#if BUILD_WINDOW_FRAMEWORK
+
 #if PLATFORM_WINDOWS
 #include <Windows.h>
 #undef min
@@ -66,7 +68,8 @@ namespace augs {
 		return std::nullopt;
 	}
 }
-#else
+
+#elif PLATFORM_UNIX
 
 namespace augs {
 	void clip_system_cursor(const ltrbi lt) {
@@ -91,6 +94,41 @@ namespace augs {
 
 	void set_cursor_pos(const vec2i pos) {
 	
+	}
+
+	std::optional<vec2i> get_cursor_pos() {
+		return std::nullopt;
+	}
+}
+
+#else
+#error "Unsupported platform!"
+#endif
+
+#else
+namespace augs {
+	void clip_system_cursor(const ltrbi lt) {
+
+	}
+
+	void disable_cursor_clipping() {
+
+	}
+
+	bool set_display(const vec2i v, const int bpp) {
+		return true;
+	}
+
+	xywhi get_display() {
+		return {};
+	}
+
+	void set_cursor_visible(const bool flag) {
+
+	}
+
+	void set_cursor_pos(const vec2i pos) {
+
 	}
 
 	std::optional<vec2i> get_cursor_pos() {

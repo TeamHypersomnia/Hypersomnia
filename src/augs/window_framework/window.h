@@ -58,6 +58,8 @@ namespace augs {
 
 #elif PLATFORM_UNIX
 
+#else
+#error "Unsupported platform!"
 #endif
 		using settable_as_current_base = settable_as_current_mixin<window>;
 		friend settable_as_current_base;

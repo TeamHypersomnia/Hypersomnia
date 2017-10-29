@@ -9,6 +9,7 @@
 #include "augs/window_framework/window.h"
 #include "augs/window_framework/platform_utils.h"
 
+#if BUILD_WINDOW_FRAMEWORK
 #if PLATFORM_WINDOWS
 #include "augs/window_framework/translate_windows_enums.h"
 
@@ -640,6 +641,9 @@ namespace augs {
 		return std::nullopt;
 	}
 }
+#else
+#error "Unsupported platform!"
+#endif
 #else
 namespace augs {
 	window::window(const window_settings& settings) {

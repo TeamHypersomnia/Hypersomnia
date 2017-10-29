@@ -25,7 +25,7 @@ option(BUILD_ENET "Build ENet networking library." ON)
 option(BUILD_FREETYPE "Build FreeType library responsible for loading fonts." ON)
 option(BUILD_HTTP_REQUESTS "Build simple http requests, e.g. for latest news bar in the main menu." ON)
 option(BUILD_TEST_SCENES "Build unscripted test scenes hardcoded in C++." ON)
-option(BUILD_PLATFORM_CODE "Build code specific to a given platfom, e.g. window management done by WinAPI." ON)
+option(BUILD_WINDOW_FRAMEWORK "Build code specific to a given platfom, e.g. window management done by WinAPI." ON)
 option(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE "Add command to archive builds in Release." ON)
 option(ADD_APPLICATION_ICON "Add application icon." ON)
 
@@ -68,7 +68,7 @@ if (HYPERSOMNIA_BARE)
 	set(BUILD_FREETYPE FALSE CACHE BOOL "" FORCE)
 	set(BUILD_HTTP_REQUESTS FALSE CACHE BOOL "" FORCE)
 	set(BUILD_TEST_SCENES FALSE CACHE BOOL "" FORCE)
-	set(BUILD_PLATFORM_CODE FALSE CACHE BOOL "" FORCE)
+	set(BUILD_WINDOW_FRAMEWORK FALSE CACHE BOOL "" FORCE)
 	set(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE FALSE CACHE BOOL "" FORCE)
 	set(ADD_APPLICATION_ICON FALSE CACHE BOOL "" FORCE)
 
@@ -655,9 +655,7 @@ endif()
 if(UNIX)
     add_definitions(-DPLATFORM_UNIX=1)
 elseif(MSVC)
-	if (BUILD_PLATFORM_CODE)
-		add_definitions(-DPLATFORM_WINDOWS=1)
-	endif()
+	add_definitions(-DPLATFORM_WINDOWS=1)
 
 	add_definitions(
 		-D_WINSOCK_DEPRECATED_NO_WARNINGS
@@ -817,6 +815,10 @@ if(BUILD_TEST_SCENES)
 	add_definitions(-DBUILD_TEST_SCENES=1)
 endif()
 
+if(BUILD_WINDOW_FRAMEWORK)
+	add_definitions(-DBUILD_WINDOW_FRAMEWORK=1)
+endif()
+
 if(BUILD_HTTP_REQUESTS) 
 	add_definitions(-DBUILD_HTTP_REQUESTS=1)
 endif()
@@ -877,7 +879,7 @@ set(HYPERSOMNIA_SRCS
 	${HYPERSOMNIA_HEADERS}
 )
 
-if(MSVC AND BUILD_PLATFORM_CODE)
+if(MSVC)
 	add_executable(Hypersomnia WIN32 ${HYPERSOMNIA_SRCS})
 else()
 	add_executable(Hypersomnia ${HYPERSOMNIA_SRCS})

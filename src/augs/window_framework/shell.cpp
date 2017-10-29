@@ -22,9 +22,5 @@ namespace augs {
 	}
 }
 #else
-namespace augs {
-	void shell(const std::string& s) {
-
-	}
-}
+#error "Unsupported platform!"
 #endif

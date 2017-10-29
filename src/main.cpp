@@ -58,8 +58,10 @@ int work(const int argc, const char* const * const argv);
 int __stdcall WinMain(HINSTANCE, HINSTANCE, char*, int) {
 	const auto argc = __argc;
 	const auto argv = __argv;
-#else
+#elif PLATFORM_UNIX
 int main(const int argc, const char* const * const argv) {
+#else
+#error "Unsupported platform!"
 #endif
 	const auto exit_code = work(argc, argv);
 
