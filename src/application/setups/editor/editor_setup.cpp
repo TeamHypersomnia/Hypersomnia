@@ -21,6 +21,8 @@
 
 #include "augs/readwrite/lua_readwrite.h"
 
+auto sss = sizeof(cosmos);
+
 void editor_setup::on_tab_changed() {
 	hovered_entity = {};
 	player_paused = true;
