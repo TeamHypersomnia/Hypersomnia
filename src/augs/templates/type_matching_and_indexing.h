@@ -1,5 +1,6 @@
 #pragma once
 #include <type_traits>
+#include <utility>
 #include <tuple>
 
 #include "augs/templates/predicate_templates.h"
@@ -148,7 +149,7 @@ template <class S, class... Types>
 constexpr size_t index_in_v = index_in_list_v<S, type_list<Types...>>;
 
 template <class S, class List>
-constexpr size_t count_occurences_in_list_v = typename filter_types_in_list<bind_types<std::is_same, S>::template type, List>::indices::size();
+constexpr size_t count_occurences_in_list_v = filter_types_in_list<bind_types<std::is_same, S>::template type, List>::indices::size();
 
 template <class S, class... Types>
 constexpr size_t count_occurences_in_v = count_occurences_in_list_v<S, type_list<Types...>>;
