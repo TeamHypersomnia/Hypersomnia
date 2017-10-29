@@ -403,10 +403,18 @@ physics_system& physics_system::operator=(const physics_system& b) {
 	migrated_b2World.m_contactManager.m_allocator = &migrated_b2World.m_blockAllocator;
 
 	std::unordered_map<void*, void*> pointer_migrations;
-	std::unordered_map<void*, std::size_t> contact_edge_offsets_in_contacts;
-	std::unordered_map<void*, std::size_t> joint_edge_offsets_in_joints;
+	std::unordered_map<void*, bool> contact_edge_a_or_b_in_contacts;
+	std::unordered_map<void*, bool> joint_edge_a_or_b_in_joints;
 
 	b2BlockAllocator& migrated_allocator = migrated_b2World.m_blockAllocator;
+
+#define my_offsetof(s,m) ((std::size_t)&reinterpret_cast<char const volatile&>((((s*)0)->m)))
+	
+	constexpr auto contact_edge_a_offset = my_offsetof(b2Contact, m_nodeA);
+	constexpr auto contact_edge_b_offset = my_offsetof(b2Contact, m_nodeB);
+
+	constexpr auto joint_edge_a_offset = my_offsetof(b2Joint, m_edgeA);
+	constexpr auto joint_edge_b_offset = my_offsetof(b2Joint, m_edgeB);
 
 #if DEBUG_PHYSICS_SYSTEM_COPY
 	std::unordered_set<void**> already_migrated_pointers;
@@ -440,7 +448,7 @@ physics_system& physics_system::operator=(const physics_system& b) {
 			auto maybe_already_migrated = pointer_migrations.find(void_ptr);
 			maybe_already_migrated == pointer_migrations.end()
 		) {
-			const size_t bytes_count = sizeof(type) * count;
+			const auto bytes_count = std::size_t{ sizeof(type) * count };
 
 			void* const migrated_pointer = migrated_allocator.Allocate(bytes_count);
 			std::memcpy(migrated_pointer, void_ptr, bytes_count);
@@ -466,7 +474,9 @@ physics_system& physics_system::operator=(const physics_system& b) {
 		&already_migrated_pointers,
 #endif
 		&pointer_migrations, 
-		&contact_edge_offsets_in_contacts
+		&contact_edge_a_or_b_in_contacts,
+		contact_edge_a_offset,
+		contact_edge_b_offset
 	](b2ContactEdge*& edge_ptr) {
 #if DEBUG_PHYSICS_SYSTEM_COPY
 		ensure(already_migrated_pointers.find((void**)&edge_ptr) == already_migrated_pointers.end());
@@ -476,12 +486,8 @@ physics_system& physics_system::operator=(const physics_system& b) {
 			return;
 		}
 
-		const size_t offset_to_edge_in_contact = contact_edge_offsets_in_contacts.at(edge_ptr);
-
-		ensure(
-			offset_to_edge_in_contact == offsetof(b2Contact, m_nodeA) 
-			|| offset_to_edge_in_contact == offsetof(b2Contact, m_nodeB)
-		);
+		const bool a_or_b_in_contact { contact_edge_a_or_b_in_contacts.at(edge_ptr) };
+		const auto offset_to_edge_in_contact = std::size_t{ !a_or_b_in_contact ? contact_edge_a_offset : contact_edge_b_offset };
 
 		std::byte* const contact_that_owns_unmigrated_edge = reinterpret_cast<std::byte*>(edge_ptr) - offset_to_edge_in_contact;
 		// here "at" requires that the contacts be already migrated
@@ -494,8 +500,8 @@ physics_system& physics_system::operator=(const physics_system& b) {
 	// make a map of pointers to b2ContactEdges to their respective offsets in
 	// the b2Contacts that own them
 	for (b2Contact* c = migrated_b2World.m_contactManager.m_contactList; c; c = c->m_next) {
-		contact_edge_offsets_in_contacts.insert(std::make_pair(&c->m_nodeA, offsetof(b2Contact, m_nodeA)));
-		contact_edge_offsets_in_contacts.insert(std::make_pair(&c->m_nodeB, offsetof(b2Contact, m_nodeB)));
+		contact_edge_a_or_b_in_contacts.insert(std::make_pair(&c->m_nodeA, false));
+		contact_edge_a_or_b_in_contacts.insert(std::make_pair(&c->m_nodeB, true));
 	}
 
 	// migrate contact pointers
@@ -533,7 +539,9 @@ physics_system& physics_system::operator=(const physics_system& b) {
 		&already_migrated_pointers,
 #endif
 		&pointer_migrations,
-		&joint_edge_offsets_in_joints
+		&joint_edge_a_or_b_in_joints,
+		joint_edge_a_offset,
+		joint_edge_b_offset
 	](b2JointEdge*& edge_ptr) {
 #if DEBUG_PHYSICS_SYSTEM_COPY
 		ensure(already_migrated_pointers.find((void**)&edge_ptr) == already_migrated_pointers.end());
@@ -543,7 +551,8 @@ physics_system& physics_system::operator=(const physics_system& b) {
 			return;
 		}
 
-		const size_t offset_to_edge_in_joint = joint_edge_offsets_in_joints.at(edge_ptr);
+		const bool a_or_b_in_joint { joint_edge_a_or_b_in_joints.at(edge_ptr) };
+		const auto offset_to_edge_in_joint = std::size_t { !a_or_b_in_joint ? joint_edge_a_offset : joint_edge_b_offset };
 
 		ensure(
 			offset_to_edge_in_joint == offsetof(b2Joint, m_edgeA)
@@ -586,8 +595,8 @@ physics_system& physics_system::operator=(const physics_system& b) {
 	// make a map of pointers to b2JointEdges to their respective offsets in
 	// the b2Joints that own them
 	for (b2Joint* j = migrated_b2World.m_jointList; j; j = j->m_next) {
-		joint_edge_offsets_in_joints.insert(std::make_pair(&j->m_edgeA, offsetof(b2Joint, m_edgeA)));
-		joint_edge_offsets_in_joints.insert(std::make_pair(&j->m_edgeB, offsetof(b2Joint, m_edgeB)));
+		joint_edge_a_or_b_in_joints.insert(std::make_pair(&j->m_edgeA, false));
+		joint_edge_a_or_b_in_joints.insert(std::make_pair(&j->m_edgeB, true));
 	}
 
 	// migrate joint pointers
