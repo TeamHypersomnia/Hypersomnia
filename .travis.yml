@@ -16,9 +16,9 @@ script:
   # Check versions of gcc, g++ and cmake
   - gcc -v && g++ -v && cmake --version && make --version
   # Run your build commands next
-  - cmake -DUNIX=ON -DHYPERSOMNIA_BARE=ON -D CMAKE_C_COMPILER=gcc-7 -D CMAKE_CXX_COMPILER=g++-7 CMakeLists.txt
+  - cmake -DUNIX=ON -DHYPERSOMNIA_BARE=ON -DBUILD_UNIT_TESTS=ON -DBUILD_FREETYPE=ON -D CMAKE_C_COMPILER=gcc-7 -D CMAKE_CXX_COMPILER=g++-7 CMakeLists.txt
   - make --keep-going
-  - ./Hypersomnia
+  - ./Hypersomnia --unit-tests-only
   
 notfications:
   email: false

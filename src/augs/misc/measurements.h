@@ -1,6 +1,5 @@
 #pragma once
 #include <string>
-#include <algorithm>
 
 #include "augs/log.h"
 #include "augs/math/vec2.h"

@@ -1,5 +1,4 @@
 #pragma once
-#include <algorithm>
 #include <type_traits>
 
 #include "augs/ensure.h"
@@ -292,7 +291,10 @@ namespace augs {
 		static_assert(count > 0, "Can't write_bytes a null array");
 
 		std::array<std::byte, (count - 1) / 8 + 1> compressed_storage;
-		std::fill(compressed_storage.begin(), compressed_storage.end(), static_cast<std::byte>(0));
+		
+		for (auto& c : compressed_storage) {
+			c = static_cast<std::byte>(0);
+		}
 
 		for (std::size_t bit = 0; bit < count; ++bit) {
 			if (storage[bit]) {
