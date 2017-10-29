@@ -1,8 +1,7 @@
 #include <sol2/sol.hpp>
 
-#include "cosmos.h"
-
 #include "augs/readwrite/streams.h"
+#include "augs/misc/randomization.h"
 
 #include "game/stateless_systems/movement_system.h"
 #include "game/stateless_systems/visibility_system.h"
@@ -29,6 +28,7 @@
 #include "game/stateless_systems/sound_existence_system.h"
 #include "game/stateless_systems/hand_fuse_system.h"
 
+#include "game/transcendental/cosmos.h"
 #include "game/transcendental/logic_step.h"
 #include "game/transcendental/entity_handle.h"
 
@@ -491,6 +491,10 @@ void cosmos::advance_and_queue_destructions(const logic_step step) {
 
 void cosmos::perform_deletions(const logic_step step) {
 	destroy_system().perform_deletions(step);
+}
+
+randomization cosmos::get_rng_for(const entity_id id) const {
+	return{ static_cast<std::size_t>(get_rng_seed_for(id)) };
 }
 
 namespace augs {

@@ -2,7 +2,6 @@
 #include <array>
 #include <functional>
 
-#include "augs/misc/randomization.h"
 #include "augs/misc/timing/delta.h"
 
 #include "augs/math/camera_cone.h"
@@ -47,8 +46,6 @@ public:
 	};
 
 	std::vector<cache> per_entity_cache;
-
-	randomization rng;
 
 	void reserve_caches_for_entities(const size_t);
 	void clear();

@@ -1,3 +1,4 @@
+#include "augs/misc/randomization.h"
 #include "game/detail/physics/physics_queries.h"
 #include "game/detail/explosions.h"
 #include "game/assets/ids/sound_buffer_id.h"

@@ -1,3 +1,5 @@
+#include "augs/misc/randomization.h"
+
 #include "augs/graphics/vertex.h"
 #include "augs/graphics/renderer.h"
 #include "augs/graphics/shader.h"
@@ -23,6 +25,8 @@
 #include "view/audiovisual_state/systems/light_system.h"
 #include "view/audiovisual_state/systems/interpolation_system.h"
 #include "view/audiovisual_state/systems/particles_simulation_system.h"
+
+thread_local randomization rng;
 
 void light_system::reserve_caches_for_entities(const std::size_t n) {
 	per_entity_cache.resize(n);

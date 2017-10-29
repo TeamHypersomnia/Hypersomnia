@@ -81,5 +81,10 @@ struct basic_randomization {
 	}
 };
 
-using randomization = basic_randomization<std::mt19937>;
-using fast_randomization = basic_randomization<std::minstd_rand0>;
+struct randomization : basic_randomization<std::mt19937> {
+	using basic_randomization<std::mt19937>::basic_randomization;
+};
+
+struct fast_randomization : basic_randomization<std::minstd_rand0> {
+	using basic_randomization<std::minstd_rand0>::basic_randomization;
+};

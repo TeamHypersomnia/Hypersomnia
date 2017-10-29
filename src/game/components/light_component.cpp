@@ -1,5 +1,5 @@
-#include "light_component.h"
 #include "augs/misc/randomization.h"
+#include "game/components/light_component.h"
 
 namespace components {
 	light::light() {

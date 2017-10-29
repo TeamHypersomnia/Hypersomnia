@@ -2,7 +2,7 @@
 #include <array>
 #include "augs/graphics/rgba.h"
 
-#include "augs/misc/randomization.h"
+struct randomization;
 
 struct light_value_variation {
 	// GEN INTROSPECTOR struct light_value_variation

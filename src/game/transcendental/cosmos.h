@@ -5,7 +5,6 @@
 
 #include "augs/templates/exception_templates.h"
 
-#include "augs/misc/randomization.h"
 #include "augs/readwrite/streams.h"
 #include "augs/misc/timing/delta.h"
 #include "augs/misc/enum/enum_boolset.h"
@@ -42,6 +41,7 @@
 #include "game/assets/behaviour_tree.h"
 
 using rng_seed_type = unsigned;
+struct randomization;
 
 enum class subjects_iteration_flag {
 	POSSIBLE_ITERATOR_INVALIDATION,
@@ -389,10 +389,6 @@ inline const_entity_handle cosmos::get_entity_by_name(const entity_name_type& na
 
 inline entity_id cosmos::make_versioned(const unversioned_entity_id id) const {
 	return get_entity_pool().make_versioned(id);
-}
-
-inline randomization cosmos::get_rng_for(const entity_id id) const {
-	return{ static_cast<std::size_t>(get_rng_seed_for(id)) };
 }
 
 inline std::size_t cosmos::get_entities_count() const {

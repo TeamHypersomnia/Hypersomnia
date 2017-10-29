@@ -455,6 +455,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/augs/misc/imgui/addons/imguitabwindow/imguitabwindow.cpp"
 	"src/augs/misc/imgui/imgui_controls.cpp"
 	"src/augs/readwrite/readwrite_tests.cpp"
+	"src/game/components/trace_component.cpp"
 )
 
 # natvis files for easier debugging in Visual Studio.

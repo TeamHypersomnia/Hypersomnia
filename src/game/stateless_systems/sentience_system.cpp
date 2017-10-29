@@ -1,6 +1,7 @@
 #include "sentience_system.h"
 
 #include "augs/templates/get_by_dynamic_id.h"
+#include "augs/misc/randomization.h"
 #include "game/messages/damage_message.h"
 #include "game/messages/health_event.h"
 #include "game/messages/health_event.h"
