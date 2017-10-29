@@ -82,7 +82,6 @@ TEST_CASE("Ca TriviallyCopyableTuple") {
 	}
 
 	{
-		static_assert(alignof(entity_pool_type) == 4, "Trait failed");
 		entity_pool_type pool(2);
 		REQUIRE(pool.size() == 0);
 		pool.allocate();
