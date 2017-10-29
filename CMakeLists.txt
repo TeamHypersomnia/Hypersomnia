@@ -639,7 +639,7 @@ endif()
 
 if(UNIX)
 	# Latest features of C++17 will be enabled.
-	set(HYPERSOMNIA_CXX_FLAGS "-std=gnu++1z")
+	set(HYPERSOMNIA_CXX_FLAGS "-std=gnu++1z -mcmodel=large")
 elseif(MSVC)
 	# Latest features of C++17 will be enabled.
 	set(HYPERSOMNIA_CXX_FLAGS "/std:c++latest /MP /Gm- /fp:strict /bigobj /permissive-")
