@@ -412,7 +412,6 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/augs/misc/randomization.cpp"
 	"src/augs/misc/smooth_value_field.cpp"
 	"src/augs/misc/timing/timer.cpp"
-	"src/augs/misc/value_animator.cpp"
 	"src/augs/log.cpp"
 	"src/augs/window_framework/event.cpp"
 	"src/augs/window_framework/window.cpp"

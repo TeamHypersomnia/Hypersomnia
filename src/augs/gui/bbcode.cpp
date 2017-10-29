@@ -5,7 +5,6 @@
 #include <vector>
 #include <iterator>
 #include <cwctype>
-#include <functional>
 #include <tuple>
 #include <type_traits>
 #include <optional>

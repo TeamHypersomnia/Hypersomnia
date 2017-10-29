@@ -28,17 +28,5 @@ namespace augs {
 			self.add(c);
 			return self.template get<component>();
 		}
-
-		template<
-			class... added_components,
-			bool C = !is_const, class = std::enable_if_t<C>
-		>
-		void set(added_components... args) const {
-			auto components_tuple = std::make_tuple(args...);
-
-			for_each_through_std_get(components_tuple, [this](auto& c) {
-				set(c);
-			});
-		}
 	};
 }
