@@ -43,15 +43,15 @@ namespace augs {
 					INVALID = COUNT,
 				};
 
-				struct tag {
+				struct tag_data {
 					tag_type type = tag_type::INVALID;
 					tag_position position = tag_position::INVALID;
 				};
 
 				using input_iterator_t = std::wstring::const_iterator;
 
-				std::tuple<tag, input_iterator_t> parse_tag(const input_iterator_t first, const input_iterator_t last) {
-					tag result;
+				std::tuple<tag_data, input_iterator_t> parse_tag(const input_iterator_t first, const input_iterator_t last) {
+					tag_data result;
 
 					auto current_token = first;
 
@@ -89,7 +89,7 @@ namespace augs {
 						}
 					}
 
-					return std::make_tuple(tag{}, first);
+					return std::make_tuple(tag_data{}, first);
 				}
 
 				std::tuple<rgba_channel, input_iterator_t> parse_color_component(const input_iterator_t first, const input_iterator_t last) {
@@ -265,7 +265,7 @@ namespace augs {
 				auto current_style = default_style;
 
 				struct tag_entry {
-					tag tag;
+					tag_data tag;
 					format_alteration alteration;
 				};
 
@@ -303,7 +303,7 @@ namespace augs {
 					++current_token; // skip L'['
 
 					// parse openning/closing tag name
-					tag current_tag;
+					tag_data current_tag;
 					{
 						decltype(current_token) tag_name_token_end;
 						std::tie(current_tag, tag_name_token_end) = parse_tag(current_token, input_end);
