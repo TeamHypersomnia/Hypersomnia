@@ -76,7 +76,12 @@ namespace augs {
 					channels = wav_header.NumOfChan;
 					frequency = wav_header.SamplesPerSec;
 					samples.resize(wav_header.Subchunk2Size / sizeof(sound_sample_type));
-					fread(samples.data(), sizeof(char), wav_header.Subchunk2Size, wav_file.get());
+					
+					if (const auto bytes_read = fread(samples.data(), sizeof(char), wav_header.Subchunk2Size, wav_file.get());
+						bytes_read != wav_header.Subchunk2Size
+					) {
+						throw sound_decoding_error("Failed to decode %x as WAV file.", path);
+					}
 				}
 				else {
 					throw sound_decoding_error(
