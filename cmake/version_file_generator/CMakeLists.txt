@@ -19,6 +19,19 @@ endif()
 
 include_directories("../../src/")
 
+if(UNIX)
+    add_definitions(-DPLATFORM_UNIX=1)
+elseif(MSVC)
+	add_definitions(-DPLATFORM_WINDOWS=1)
+
+	add_definitions(
+		-D_WINSOCK_DEPRECATED_NO_WARNINGS
+		-D_CRT_SECURE_NO_WARNINGS
+		-D_SCL_SECURE_NO_WARNINGS
+		-DUNICODE
+	  )
+endif()
+
 add_executable(version_file_generator 
 	"version_file_generator.cpp"
 	"../../src/augs/misc/time_utils.cpp"
