@@ -127,7 +127,16 @@ int work(const int argc, const char* const * const argv) try {
 
 	static auto last_saved_config = config;
 
-	augs::run_unit_tests(argc, argv, config.unit_tests);
+	if (config.unit_tests.run) {
+		augs::run_unit_tests(argc, argv, config.unit_tests);
+
+		LOG("All unit tests have passed.");
+
+		if (params.unit_tests_only) {
+			return EXIT_SUCCESS;
+		}
+	}
+
 	augs::generate_alsoft_ini(config.audio.max_number_of_sound_sources);
 
 	static const augs::global_libraries libraries;
