@@ -887,7 +887,7 @@ bool editor_setup::handle_unfetched_window_input(
 		if (e.msg == message::mousemotion) {
 			if (common_input_state[key::RMOUSE]) {
 				if (has_current_tab()) {
-					tab().panning -= e.data.mouse.rel * settings.camera_panning_speed;
+					tab().panning -= vec2i(e.data.mouse.rel) * settings.camera_panning_speed;
 
 					return true;
 				}
