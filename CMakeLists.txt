@@ -663,6 +663,10 @@ if(ADD_MCMODEL_LARGE_FLAG)
 	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -mcmodel=large")
 endif()
 
+if(UNIX)
+	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -static -s")
+endif()
+
 # We configure additional flags for linker.
 
 if(UNIX)
