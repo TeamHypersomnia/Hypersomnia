@@ -81,6 +81,12 @@ if(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE)
 	endif()
 endif()
 
+if(UNIX)
+	set(ADD_MCMODEL_LARGE_FLAG ON CACHE STRING "Needed to suppress some crazy linker errors")
+else()
+	set(ADD_MCMODEL_LARGE_FLAG OFF CACHE STRING "Needed to suppress some crazy linker errors")
+endif()
+
 # Used by archiver and to set the working directory under VS.
 
 set(RESOURCES_FOLDER_NAME "hypersomnia")
@@ -639,13 +645,18 @@ endif()
 
 if(UNIX)
 	# Latest features of C++17 will be enabled.
-	set(HYPERSOMNIA_CXX_FLAGS "-std=gnu++1z -mcmodel=medium -fPIC")
+	set(HYPERSOMNIA_CXX_FLAGS "-std=gnu++1z")
 elseif(MSVC)
 	# Latest features of C++17 will be enabled.
 	set(HYPERSOMNIA_CXX_FLAGS "/std:c++latest /MP /Gm- /fp:strict /bigobj /permissive-")
 	set(HYPERSOMNIA_CXX_DEBUG_FLAGS " ")
 	set(HYPERSOMNIA_CXX_RELEASE_FLAGS "/Ob2 /GL /Oi")
 	set(HYPERSOMNIA_CXX_RELWITHDEBINFO_FLAGS "/Ob2 /GL /Oi")
+endif()
+
+if(ADD_MCMODEL_LARGE_FLAG)
+	message("-mcmodel=large flag will be specified.")
+	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -mcmodel=large")
 endif()
 
 # We configure additional flags for linker.
@@ -751,6 +762,11 @@ if(BUILD_SOUND_FORMAT_DECODERS)
 	# We build OGG.
 	
 	add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/ogg")
+	
+	if(ADD_MCMODEL_LARGE_FLAG)
+		target_compile_options(ogg PUBLIC -mcmodel=large)
+	endif()
+
 	add_include_dirs_of("ogg")
 	
 	# We build Vorbis. It must know the paths for OGG that we have just built.
@@ -759,6 +775,11 @@ if(BUILD_SOUND_FORMAT_DECODERS)
 	set(OGG_LIBRARIES ogg)
 	
 	add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/vorbis")
+	
+	if(ADD_MCMODEL_LARGE_FLAG)
+		target_compile_options(vorbis PUBLIC -mcmodel=large)
+	endif()
+
 	add_include_dirs_of("vorbis")
 endif()
 
@@ -772,6 +793,11 @@ if(BUILD_OPENAL)
 	set(ALSOFT_TESTS FALSE CACHE BOOL "Build and install test programs" FORCE)
 	
 	add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/openal-soft")
+
+	if(ADD_MCMODEL_LARGE_FLAG)
+		target_compile_options(OpenAL PUBLIC -mcmodel=large)
+	endif()
+
 	add_include_dirs_of("OpenAL")
 endif()
 
@@ -779,16 +805,30 @@ endif()
 
 if(BUILD_ENET)
 	add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/enet")
+
+	if(ADD_MCMODEL_LARGE_FLAG)
+		target_compile_options(enet PUBLIC -mcmodel=large)
+	endif()
+	
 	add_include_dirs_of("enet")
 endif()
 
 if(BUILD_FREETYPE)
 	add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/freetype")
+	
+	if(ADD_MCMODEL_LARGE_FLAG)
+		target_compile_options(freetype PUBLIC -mcmodel=large)
+	endif()
+
 	add_include_dirs_of("freetype")
 endif()
 
 if(BUILD_OPENGL)
 	add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/glad")
+
+	if(ADD_MCMODEL_LARGE_FLAG)
+		target_compile_options(glad PUBLIC -mcmodel=large)
+	endif()
 endif()
 
 include_directories(${HYPERSOMNIA_INCLUDE_DIRS})
