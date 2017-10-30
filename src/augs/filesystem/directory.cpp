@@ -16,19 +16,6 @@ namespace augs {
 		return fs::create_directories(path.remove_filename());
 	}
 
-	std::vector<path_type> get_all_files_in_directory(const path_type& dirpath) {
-		std::vector<path_type> result;
-
-		for_each_file_in_dir_recursive(
-			dirpath, 
-			[&result](const auto& path) {
-				result.push_back(path);
-			}
-		);
-
-		return result;
-	}
-
 	path_type get_executable_directory() {
 		return fs::current_path();
 	}
