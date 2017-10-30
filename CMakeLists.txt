@@ -659,8 +659,8 @@ elseif(MSVC)
 endif()
 
 if(ADD_MCMODEL_LARGE_FLAG)
-	message("-mcmodel=large flag will be specified.")
-	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -mcmodel=large")
+	message("-mcmodel=large -no-pie flag will be specified.")
+	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -mcmodel=large -no-pie")
 endif()
 
 if(UNIX)
@@ -772,7 +772,7 @@ if(BUILD_SOUND_FORMAT_DECODERS)
 	add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/ogg")
 	
 	if(ADD_MCMODEL_LARGE_FLAG)
-		target_compile_options(ogg PUBLIC -mcmodel=large)
+		target_compile_options(ogg PUBLIC -mcmodel=large -no-pie)
 	endif()
 
 	add_include_dirs_of("ogg")
@@ -785,7 +785,7 @@ if(BUILD_SOUND_FORMAT_DECODERS)
 	add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/vorbis")
 	
 	if(ADD_MCMODEL_LARGE_FLAG)
-		target_compile_options(vorbis PUBLIC -mcmodel=large)
+		target_compile_options(vorbis PUBLIC -mcmodel=large -no-pie)
 	endif()
 
 	add_include_dirs_of("vorbis")
@@ -803,7 +803,7 @@ if(BUILD_OPENAL)
 	add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/openal-soft")
 
 	if(ADD_MCMODEL_LARGE_FLAG)
-		target_compile_options(OpenAL PUBLIC -mcmodel=large)
+		target_compile_options(OpenAL PUBLIC -mcmodel=large -no-pie)
 	endif()
 
 	add_include_dirs_of("OpenAL")
@@ -815,7 +815,7 @@ if(BUILD_ENET)
 	add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/enet")
 
 	if(ADD_MCMODEL_LARGE_FLAG)
-		target_compile_options(enet PUBLIC -mcmodel=large)
+		target_compile_options(enet PUBLIC -mcmodel=large -no-pie)
 	endif()
 	
 	add_include_dirs_of("enet")
@@ -825,7 +825,7 @@ if(BUILD_FREETYPE)
 	add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/freetype")
 	
 	if(ADD_MCMODEL_LARGE_FLAG)
-		target_compile_options(freetype PUBLIC -mcmodel=large)
+		target_compile_options(freetype PUBLIC -mcmodel=large -no-pie)
 	endif()
 
 	add_include_dirs_of("freetype")
@@ -835,7 +835,7 @@ if(BUILD_OPENGL)
 	add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/glad")
 
 	if(ADD_MCMODEL_LARGE_FLAG)
-		target_compile_options(glad PUBLIC -mcmodel=large)
+		target_compile_options(glad PUBLIC -mcmodel=large -no-pie)
 	endif()
 endif()
 
