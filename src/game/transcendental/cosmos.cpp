@@ -494,7 +494,7 @@ void cosmos::perform_deletions(const logic_step step) {
 }
 
 randomization cosmos::get_rng_for(const entity_id id) const {
-	return{ static_cast<std::size_t>(get_rng_seed_for(id)) };
+	return{ get_rng_seed_for(id) };
 }
 
 namespace augs {

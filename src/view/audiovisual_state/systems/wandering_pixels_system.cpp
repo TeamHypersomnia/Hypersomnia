@@ -63,7 +63,7 @@ void wandering_pixels_system::advance_for(
 	if (const bool refresh_cache = 
 		!(cache.recorded_component.reach == wandering.reach)
 	) {
-		cache.rng = { static_cast<std::size_t>(cosmos.get_rng_seed_for(it)) };
+		cache.rng = { cosmos.get_rng_seed_for(it) };
 
 		for (auto& p : cache.particles) {
 			p.pos.set(

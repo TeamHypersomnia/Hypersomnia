@@ -7,10 +7,10 @@ real32 recoil_player_instance::shoot_and_get_impulse(const recoil_player& meta) 
 	const auto heat = current_heat;
 	current_heat += heat_per_shot;
 
-	const auto index = std::size_t(heat);
+	const auto index = static_cast<std::size_t>(heat);
 
-	if(index >= meta.offsets.size()) {
-		fast_randomization rng{std::size_t(heat * 100)};
+	if (index >= meta.offsets.size()) {
+		fast_randomization rng{static_cast<rng_seed_type>(heat * 100)};
 		return rng.randval(meta.fallback_random_magnitude);
 	}
 
