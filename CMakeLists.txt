@@ -68,6 +68,10 @@ set(HYPERSOMNIA_LOCAL_FILES_DIR "cache/usr/")
 #	- For every game world, there's always maximum of possible memory allocated 
 set(STATICALLY_ALLOCATE_ENTITIES_NUM "5000" CACHE STRING "Statically allocate entities in cosmos class")
 
+set(STATICALLY_ALLOCATE_ASSETS "1" CACHE STRING "Statically allocate assets using container_sizes.h")
+
+set(OUTPUT_LOG_TO_STDOUT OFF CACHE STRING "Output LOG arguments live to std::cout.")
+
 if(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE)
 	if (NOT HYPERSOMNIA_RUNTIME_ARCHIVE_DIR)
 		# By default, we set output directory for archives to completely outside of the source tree,
@@ -886,6 +890,14 @@ endif()
 
 if(STATICALLY_ALLOCATE_ENTITIES_NUM)
 	add_definitions(-DSTATICALLY_ALLOCATE_ENTITIES_NUM=${STATICALLY_ALLOCATE_ENTITIES_NUM})
+endif()
+
+if(STATICALLY_ALLOCATE_ASSETS)
+	add_definitions(-DSTATICALLY_ALLOCATE_ASSETS=${STATICALLY_ALLOCATE_ASSETS})
+endif()
+
+if(OUTPUT_LOG_TO_STDOUT)
+	add_definitions(-DOUTPUT_LOG_TO_STDOUT=${OUTPUT_LOG_TO_STDOUT})
 endif()
 
 if(STATICALLY_ALLOCATE_EDITOR_TABS_NUM)

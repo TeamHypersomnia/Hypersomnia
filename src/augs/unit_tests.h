@@ -22,9 +22,5 @@ namespace augs {
 		std::string clog_content;
 	};
 
-	void run_unit_tests(
-		const int argc,
-		const char* const * const argv,
-		const unit_tests_settings&
-	);
+	void run_unit_tests(const unit_tests_settings&);
 }

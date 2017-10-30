@@ -1,8 +1,8 @@
 #pragma once
 #include "augs/templates/container_templates.h"
 #include "augs/misc/convex_partitioned_shape.h"
-#include "augs/misc/trivially_copyable_tuple.h"
 
+#include "game/assets/asset_map.h"
 #include "game/assets/all_logical_assets_declarations.h"
 
 #include "game/assets/ids/game_image_id.h"
@@ -40,8 +40,8 @@ struct particle_effect_logical {
 	// END GEN INTROSPECTOR
 };
 
-template <class enum_key, class mapped>
-using asset_map = augs::enum_associative_array<enum_key, mapped>;
+#if STATICALLY_ALLOCATE_ASSETS
+#include "augs/misc/trivially_copyable_tuple.h"
 
 using tuple_of_logical_assets = augs::trivially_copyable_tuple<
 	asset_map<assets::game_image_id, game_image_logical>,
@@ -52,6 +52,18 @@ using tuple_of_logical_assets = augs::trivially_copyable_tuple<
 	asset_map<assets::recoil_player_id, recoil_player>,
 	asset_map<assets::physical_material_id, physical_material>
 >;
+#else
+#include <tuple>
+using tuple_of_logical_assets = std::tuple<
+	asset_map<assets::game_image_id, game_image_logical>,
+	asset_map<assets::particle_effect_id, particle_effect_logical>,
+	asset_map<assets::sound_buffer_id, sound_buffer_logical>,
+
+	asset_map<assets::animation_id, animation>,
+	asset_map<assets::recoil_player_id, recoil_player>,
+	asset_map<assets::physical_material_id, physical_material>
+>;
+#endif
 
 template <class T, class Candidate>
 struct is_key_type_equal_to : std::bool_constant<std::is_same_v<T, typename Candidate::key_type>> {

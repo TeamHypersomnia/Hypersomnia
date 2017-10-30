@@ -128,7 +128,7 @@ int work(const int argc, const char* const * const argv) try {
 	static auto last_saved_config = config;
 
 	if (config.unit_tests.run) {
-		augs::run_unit_tests(argc, argv, config.unit_tests);
+		augs::run_unit_tests(config.unit_tests);
 
 		LOG("All unit tests have passed.");
 

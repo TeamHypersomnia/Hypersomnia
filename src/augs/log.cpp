@@ -9,7 +9,10 @@
 #include "augs/templates/string_templates.h"
 
 #define ENABLE_LOG 1
-#define LOG_TO_FILE 0
+
+#if OUTPUT_LOG_TO_STDOUT
+#include <iostream>
+#endif
 
 std::mutex log_mutex;
 
@@ -44,7 +47,11 @@ void LOG(const std::string& f) {
 
 	program_log::get_current().push_entry({ f });
 
-#if LOG_TO_FILE
+#if OUTPUT_LOG_TO_STDOUT
+	std::cout << f << std::endl;
+#endif
+
+#if OUTPUT_LOG_TO_LIVE_FILE
 	std::ofstream recording_file(LOG_FILES_DIR "live_debug.txt", std::ios::out | std::ios::app);
 	recording_file << f << std::endl;
 #endif

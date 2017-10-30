@@ -2,14 +2,13 @@
 #include "augs/math/declare_math.h"
 #include "augs/misc/declare_containers.h"
 
+#include "game/assets/asset_map.h"
+
 namespace assets {
 	enum class game_image_id;
 	enum class sound_buffer_id;
 	enum class particle_effect_id;
 }
-
-template <class enum_key, class mapped>
-using asset_map = augs::enum_associative_array<enum_key, mapped>;
 
 namespace augs {
 	class sound_buffer;

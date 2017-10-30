@@ -28,11 +28,7 @@ namespace Catch {
 }
 
 namespace augs {
-	void run_unit_tests(
-		const int argc,
-		const char* const * const argv,
-		const unit_tests_settings& settings
-	) {
+	void run_unit_tests(const unit_tests_settings& settings) {
 #if BUILD_UNIT_TESTS
 		if (!settings.run) {
 			return;
@@ -59,7 +55,7 @@ namespace augs {
 			config.runOrder = Catch::RunTests::InWhatOrder::InDeclarationOrder;
 		}
 
-		if (const auto result = session.run(argc, argv);
+		if (const auto result = session.run();
 			result != 0
 		) {
 			auto e = unit_test_session_error(
