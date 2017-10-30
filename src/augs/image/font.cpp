@@ -85,7 +85,7 @@ namespace augs {
 
 					auto& g = meta.glyphs_by_unicode[j];
 					g = face->glyph->metrics;
-					g.index = glyph_bitmaps.size();
+					g.index = static_cast<unsigned>(glyph_bitmaps.size());
 
 					glyph_bitmaps.push_back(augs::image());
 

@@ -22,13 +22,13 @@ ForwardIt binary_find(ForwardIt first, ForwardIt last, const T& value, Compare c
 namespace augs {
 	struct introspection_access;
 
-	template <class T, std::size_t const_count>
+	template <class T, unsigned const_count>
 	class constant_size_vector_base {
 	public:
 		using value_type = T;
 
 	protected:
-		using size_type = std::size_t;
+		using size_type = unsigned;
 
 		static constexpr bool is_trivially_copyable = std::is_trivially_copyable_v<value_type>;
 
@@ -47,7 +47,7 @@ namespace augs {
 			"No support for a type that is trivially copyable but not default constructible."
 		);
 
-		// GEN INTROSPECTOR class augs::constant_size_vector_base class T std::size_t const_count
+		// GEN INTROSPECTOR class augs::constant_size_vector_base class T unsigned const_count
 		size_type count = 0;
 		storage_type raw;
 		// END GEN INTROSPECTOR
@@ -105,22 +105,22 @@ namespace augs {
 			construct_at(count++, std::forward<Args>(args)...);
 		}
 
-		value_type& operator[](const size_type i) {
-			return nth(i);
+		value_type& operator[](const std::size_t i) {
+			return nth(static_cast<size_type>(i));
 		}
 
-		const value_type& operator[](const size_type i) const {
-			return nth(i);
+		const value_type& operator[](const std::size_t i) const {
+			return nth(static_cast<size_type>(i));
 		}
 
-		value_type& at(const size_type i) {
-			ensure(i < count);
-			return nth(i);
+		value_type& at(const std::size_t i) {
+			ensure(static_cast<size_type>(i) < count);
+			return nth(static_cast<size_type>(i));
 		}
 
-		const value_type& at(const size_type i) const {
-			ensure(i < count);
-			return nth(i);
+		const value_type& at(const std::size_t i) const {
+			ensure(static_cast<size_type>(i) < count);
+			return nth(static_cast<size_type>(i));
 		}
 
 		value_type& front() {
@@ -160,14 +160,14 @@ namespace augs {
 			ensure(count + new_elements_count <= capacity());
 
 			std::move(where, end(), where + 1);
-			construct_at(where - begin(), obj);
+			construct_at(static_cast<size_type>(where - begin()), obj);
 
 			count += new_elements_count;
 		}
 
 		template <class Iter>
 		void insert(iterator where, Iter first, const Iter last) {
-			const auto new_elements_count = last - first;
+			const auto new_elements_count = static_cast<size_type>(last - first);
 			
 			ensure(where >= begin());
 			ensure(count + new_elements_count <= capacity());
@@ -175,7 +175,7 @@ namespace augs {
 			std::move(where, end(), where + (last - first));
 			
 			while (first != last) {
-				construct_at(where - begin(), *first);
+				construct_at(static_cast<size_type>(where - begin()), *first);
 
 				++first;
 				++where;
@@ -184,10 +184,10 @@ namespace augs {
 			count += new_elements_count;
 		}
 
-		void resize(const size_type s) {
+		void resize(const std::size_t s) {
 			ensure(s <= capacity());
-			int diff = s;
-			diff -= size();
+			auto diff = static_cast<int>(s);
+			diff -= static_cast<int>(size());
 
 			if (diff > 0) {
 				while (diff--) {
@@ -227,11 +227,11 @@ namespace augs {
 			return as_value_array().begin() + size();
 		}
 
-		size_type size() const {
-			return count;
+		std::size_t size() const {
+			return static_cast<std::size_t>(count);
 		}
 
-		constexpr size_type max_size() const {
+		constexpr std::size_t max_size() const {
 			return const_count;
 		}
 
@@ -239,11 +239,11 @@ namespace augs {
 			return size() == 0;
 		}
 
-		size_type capacity() const {
+		std::size_t capacity() const {
 			return const_count;
 		}
 
-		void reserve(const size_type s) {
+		void reserve(const std::size_t s) {
 			ensure(s <= max_size());
 			// no-op
 		}
@@ -270,11 +270,11 @@ namespace augs {
 		}
 	};
 
-	// GEN INTROSPECTOR class augs::constant_size_vector class T std::size_t const_count class dummy
+	// GEN INTROSPECTOR class augs::constant_size_vector class T unsigned const_count class dummy
 	// INTROSPECT BASE augs::constant_size_vector_base<T, const_count>
 	// END GEN INTROSPECTOR
 
-	template <class T, std::size_t N>
+	template <class T, unsigned N>
 	class constant_size_vector<T, N, std::enable_if_t<std::is_trivially_copyable_v<T>>>
 		: public constant_size_vector_base<T, N> {
 		using underlying_char_type = zeroed_pod_internal_type_t<T>;
@@ -316,7 +316,7 @@ namespace augs {
 		}
 	};
 
-	template <class T, std::size_t N>
+	template <class T, unsigned N>
 	class constant_size_vector<T, N, std::enable_if_t<!std::is_trivially_copyable_v<T>>>
 		: public constant_size_vector_base<T, N> {
 	public:
@@ -367,14 +367,14 @@ namespace augs {
 		}
 	};
 
-	template <std::size_t const_count>
+	template <unsigned const_count>
 	using constant_size_string = constant_size_vector<zeroed_pod<char>, const_count>;
 
-	template <std::size_t const_count>
+	template <unsigned const_count>
 	using constant_size_wstring = constant_size_vector<zeroed_pod<wchar_t>, const_count>;
 }
 
-template <std::size_t I>
+template <unsigned I>
 struct of_size {
 	template <class T>
 	using make_constant_vector = augs::constant_size_vector<T, I>;

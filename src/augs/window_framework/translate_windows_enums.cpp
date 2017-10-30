@@ -8,7 +8,7 @@
 using namespace augs::event;
 using namespace augs::event::keys;
 
-message translate_enum(UINT m) {
+message translate_enum(const UINT m) {
 	switch (m) {
 	case UINT(message::ltripleclick):	return message::ltripleclick;
 	case SC_CLOSE:						return message::close; break;
@@ -44,7 +44,7 @@ message translate_enum(UINT m) {
 	return augs::event::message::unknown;
 }
 
-key translate_virtual_key(const unsigned int m) {
+key translate_virtual_key(const UINT m) {
 	switch (m) {
 	case VK_LBUTTON:										return key::LMOUSE;
 	case VK_RBUTTON:										return key::RMOUSE;
@@ -189,7 +189,7 @@ key translate_virtual_key(const unsigned int m) {
 	}
 }
 
-key translate_key_with_lparam(const UINT lParam, UINT m) {
+key translate_key_with_lparam(const LPARAM lParam, WPARAM m) {
 	UINT scancode = (lParam & 0x00ff0000) >> 16;
 	int extended = (lParam & 0x01000000) != 0;
 
@@ -207,7 +207,7 @@ key translate_key_with_lparam(const UINT lParam, UINT m) {
 		break;
 	}
 
-	return translate_virtual_key(m);
+	return translate_virtual_key(static_cast<UINT>(m));
 }
 #endif
 #endif

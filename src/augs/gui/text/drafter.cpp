@@ -90,7 +90,7 @@ namespace augs {
 				if (end - begin <= 1)
 					return begin; /* obvious if we have no (or one) sectors */
 
-				unsigned iter = lower_bound(sectors.begin() + begin, sectors.begin() + end, x) - sectors.begin();
+				auto iter = static_cast<unsigned>(lower_bound(sectors.begin() + begin, sectors.begin() + end, x) - sectors.begin());
 
 				/* if iter is equal to begin there's no "previous" sector we can compare to */
 				if (iter == begin /*|| iter == sectors.size()-1*/) return iter;
@@ -117,11 +117,13 @@ namespace augs {
 				if (lines.empty()) return 0;
 				line l;
 				l.end = i;
-				const auto res = upper_bound(lines.begin(), lines.end(), l, [](const line& x, const line& y) {return x.end < y.end; }) - lines.begin();
+				const auto res = static_cast<unsigned>(upper_bound(lines.begin(), lines.end(), l, [](const line& x, const line& y) {return x.end < y.end; }) - lines.begin());
 
-				if (res == lines.size())
+				if (res == lines.size()) {
 					return res - 1;
-				else return res;
+				}
+				
+				return res;
 			}
 
 			vec2i drafter::view_caret(const unsigned caret_pos, const ltrbi& clipper) const {
@@ -156,7 +158,7 @@ namespace augs {
 				line l;
 				l.top = p.y;
 				l.desc = l.asc = 0;
-				int res = lower_bound(lines.begin(), lines.end(), l, [](const line& x, const line& y) {return x.bottom() < y.bottom(); }) - lines.begin();
+				auto res = static_cast<unsigned>(lower_bound(lines.begin(), lines.end(), l, [](const line& x, const line& y) {return x.bottom() < y.bottom(); }) - lines.begin());
 				if (res == lines.size()) --res;
 				return res;
 			}
@@ -275,7 +277,7 @@ namespace augs {
 				/* break the last line as it will never hit condition of wrapping nor newlining
 					same things happen here
 				*/
-				(*lines.rbegin()).end = cached.size();
+				(*lines.rbegin()).end = static_cast<unsigned>(cached.size());
 				(*lines.rbegin()).right = pen.x;
 				max_x = std::max(max_x, unsigned((*lines.rbegin()).right));
 

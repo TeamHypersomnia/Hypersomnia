@@ -12,7 +12,7 @@
 #include "augs/misc/randomization.h"
 
 namespace {
-	void populate_with_uniform_offsets(recoil_player& recoil_player, const std::size_t quantity, const std::size_t seed = 1236011) {
+	void populate_with_uniform_offsets(recoil_player& recoil_player, const std::size_t quantity, const rng_seed_type seed = 1236011) {
 		randomization rng{seed};
 		for(std::size_t i = 0; i != quantity; ++i) {
 			recoil_player.offsets.push_back(rng.randval(recoil_player.fallback_random_magnitude));

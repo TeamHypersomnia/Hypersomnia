@@ -94,7 +94,7 @@ namespace augs {
 		GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer_id));
 
 		GL_CHECK(glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_triangle) * buffer.size(), buffer.data(), GL_STREAM_DRAW));
-		GL_CHECK(glDrawArrays(GL_TRIANGLES, 0, buffer.size() * 3));
+		GL_CHECK(glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(buffer.size()) * 3));
 		triangles_drawn_total += buffer.size();
 	}
 
@@ -107,7 +107,7 @@ namespace augs {
 
 		GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer_id));
 		GL_CHECK(glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_line) * lines.size(), lines.data(), GL_STREAM_DRAW));
-		GL_CHECK(glDrawArrays(GL_LINES, 0, lines.size() * 2));
+		GL_CHECK(glDrawArrays(GL_LINES, 0, static_cast<GLsizei>(lines.size()) * 2));
 	}
 
 	void renderer::push_line(const vertex_line& line) {
@@ -155,7 +155,7 @@ namespace augs {
 		lines.clear();
 	}
 
-	int renderer::get_triangle_count() const {
+	std::size_t renderer::get_triangle_count() const {
 		return triangles.size();
 	}
 

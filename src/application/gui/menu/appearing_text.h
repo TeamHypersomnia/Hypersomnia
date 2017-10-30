@@ -4,6 +4,7 @@
 #include "augs/gui/text/printer.h"
 #include "augs/misc/action_list/action_list.h"
 #include "augs/misc/action_list/standard_actions.h"
+#include "augs/misc/randomization_declaration.h"
 
 namespace augs {
 	class action;
@@ -38,7 +39,7 @@ struct appearing_text {
 	}
 
 	void push_actions(augs::action_list& into) {
-		static size_t rng = 0;
+		static rng_seed_type rng = 0;
 
 		auto push = [&](act a) {
 			into.push_blocking(std::move(a));
@@ -81,7 +82,7 @@ struct appearing_text {
 		const auto formatted = formatted_string(text, style).set_alpha(alpha);
 
 		caret_info caret(style);
-		caret.pos = text.size();
+		caret.pos = static_cast<unsigned>(text.size());
 
 		print_stroked(
 			output,

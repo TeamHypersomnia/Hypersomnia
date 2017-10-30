@@ -109,7 +109,7 @@ namespace augs {
 		LOG("Passed format: %x\nPassed frequency: %x\nPassed bytesize: %x", passed_format, passed_frequency, passed_bytesize);
 #endif
 
-		AL_CHECK(alBufferData(id, passed_format, new_data.samples.data(), passed_bytesize, passed_frequency));
+		AL_CHECK(alBufferData(id, passed_format, new_data.samples.data(), static_cast<ALsizei>(passed_bytesize), static_cast<ALsizei>(passed_frequency)));
 	}
 
 	double single_sound_buffer::get_length_in_seconds() const {

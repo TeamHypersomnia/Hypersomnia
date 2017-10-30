@@ -149,7 +149,7 @@ void for_each_intersection_with_triangle(
 	verts[1] = b2Vec2(si.get_meters(vertices[1]));
 	verts[2] = b2Vec2(si.get_meters(vertices[2]));
 
-	poly_shape.Set(verts.data(), verts.size());
+	poly_shape.Set(verts.data(), static_cast<int32>(verts.size()));
 
 	for_each_intersection_with_shape_meters(
 		b2world,

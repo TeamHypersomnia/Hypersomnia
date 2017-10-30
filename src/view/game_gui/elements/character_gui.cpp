@@ -199,10 +199,10 @@ wielding_result character_gui::make_wielding_transfers_for_previous_hotbar_selec
 	;
 
 	if (previous_is_identical_so_wield_first_item_from_hotbar) {
-		const auto try_wielding_item_from_hotbar_button_no = [&](const size_t hotbar_button_index) {
+		const auto try_wielding_item_from_hotbar_button_no = [&](const std::size_t hotbar_button_index) {
 			wielding_result output;
 
-			const auto tried_setup = get_setup_from_button_indices(gui_entity, hotbar_button_index, -1);
+			const auto tried_setup = get_setup_from_button_indices(gui_entity, static_cast<int>(hotbar_button_index), -1);
 			const auto candidate_entity = cosm[tried_setup.hand_selections[0]];
 
 			if (candidate_entity.alive()) {
@@ -220,7 +220,7 @@ wielding_result character_gui::make_wielding_transfers_for_previous_hotbar_selec
 
 		wielding_result output_transfers;
 
-		for (size_t i = 0; i < hotbar_buttons.size(); ++i) {
+		for (std::size_t i = 0; i < hotbar_buttons.size(); ++i) {
 			output_transfers = try_wielding_item_from_hotbar_button_no(i);
 
 			if (output_transfers.successful()) {

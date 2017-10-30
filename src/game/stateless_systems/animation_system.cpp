@@ -91,7 +91,7 @@ void animation_system::handle_animation_messages(const logic_step step) {
 	}
 }
 
-void components::animation::set_current_frame(unsigned number) {
+void components::animation::set_current_frame(const unsigned number) {
 	frame_num = number;
 }
 
@@ -147,7 +147,7 @@ void animation_system::progress_animation_states(const logic_step step) {
 							}
 							else if (animation_state.state == components::animation::playing_state::DECREASING) {
 								if (animation_state.get_current_frame() > 0) animation_state.decrease_frame();
-								else animation_state.set_current_frame(animation.frames.size() - 1);
+								else animation_state.set_current_frame(static_cast<unsigned>(animation.frames.size()) - 1);
 							}
 						}
 

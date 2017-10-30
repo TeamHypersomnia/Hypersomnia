@@ -46,13 +46,13 @@ struct basic_convex_partitioned_shape {
 	void add_concave_polygon(const C& verts) {
 		std::list<TPPLPoly> inpolys, outpolys;
 		TPPLPoly subject_poly;
-		subject_poly.Init(verts.size());
+		subject_poly.Init(static_cast<long>(verts.size()));
 		subject_poly.SetHole(false);
 
-		for (size_t i = 0; i < verts.size(); ++i) {
+		for (std::size_t i = 0; i < verts.size(); ++i) {
 			vec2 p(verts[i]);
-			subject_poly[i].x = p.x;
-			subject_poly[i].y = -p.y;
+			subject_poly[static_cast<int>(i)].x = p.x;
+			subject_poly[static_cast<int>(i)].y = -p.y;
 		}
 
 		inpolys.push_back(subject_poly);

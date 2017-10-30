@@ -95,7 +95,7 @@ void settings_gui_state::perform(
 				}();
 
 				auto index = static_cast<int>(active_pane);
-				ImGui::TabLabels(labels.data(), labels.size(), index, nullptr);
+				ImGui::TabLabels(labels.data(), static_cast<int>(labels.size()), index, nullptr);
 				active_pane = static_cast<settings_pane>(index);
 			}
 		}

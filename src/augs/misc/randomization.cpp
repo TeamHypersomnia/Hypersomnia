@@ -2,7 +2,7 @@
 #include "augs/templates/algorithm_templates.h"
 
 template <class T>
-basic_randomization<T>::basic_randomization(const size_t seed) {
+basic_randomization<T>::basic_randomization(const rng_seed_type seed) {
 	generator.seed(seed);
 }
 

@@ -91,7 +91,7 @@ namespace augs {
 
 		int get_max_texture_size() const;
 
-		int get_triangle_count() const;
+		std::size_t get_triangle_count() const;
 		vertex_triangle& get_triangle(const int i);
 
 		vertex_triangle_buffer& get_triangle_buffer();

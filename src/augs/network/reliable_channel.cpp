@@ -158,21 +158,21 @@ namespace augs {
 			augs::write_bytes(output, last_received_sequence);
 		}
 
-		bool reliable_channel::timed_out(const size_t max_unacknowledged_sequences) const {
-			return get_unacknowledged_sequences_num() > max_unacknowledged_sequences;
+		bool reliable_channel::timed_out(const std::size_t max_unacknowledged_sequences) const {
+			return get_num_unacknowledged_sequences() > max_unacknowledged_sequences;
 		}
 
-		unsigned reliable_channel::get_unacknowledged_sequences_num() const {
+		std::size_t reliable_channel::get_num_unacknowledged_sequences() const {
 			//LOG("seq: %x last: %x dist: %x", sender.sequence, sender.most_recent_acked_sequence, sequence_distance(sender.sequence, sender.most_recent_acked_sequence));
 			return sequence_distance(sender.sequence, sender.most_recent_acked_sequence);
 		}
 
-		unsigned reliable_channel::get_pending_reliable_messages_num() const {
+		std::size_t reliable_channel::get_num_pending_reliable_messages() const {
 			return sender.reliable_buf.size();
 		}
 
-		unsigned reliable_channel::get_pending_reliable_bytes_num() const {
-			auto output = 0u;
+		std::size_t reliable_channel::get_num_pending_reliable_bytes() const {
+			std::size_t output{ 0 };
 
 			for (const auto& r : sender.reliable_buf) {
 				output += r.size();

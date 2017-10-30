@@ -245,7 +245,7 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 				/* prepare body polygon to test for overlaps */
 				b2PolygonShape body_poly;
 				auto verts = get_world_vertices(it);
-				body_poly.Set(verts.data(), verts.size());
+				body_poly.Set(verts.data(), static_cast<int32>(verts.size()));
 
 				/* for every undiscovered navigation point */
 				auto& undiscs = pathfinding.session().undiscovered_vertices;

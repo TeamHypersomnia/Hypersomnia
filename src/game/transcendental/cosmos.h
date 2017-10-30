@@ -11,6 +11,7 @@
 #include "augs/templates/subscript_handle_getters_mixin.h"
 #include "augs/templates/introspection_utils/rewrite_members.h"
 #include "augs/misc/enum/enum_associative_array.h"
+#include "augs/misc/randomization_declaration.h"
 
 #include "augs/entity_system/operations_on_all_components_mixin.h"
 #include "augs/entity_system/storage_for_systems.h"
@@ -39,9 +40,6 @@
 #include "game/transcendental/data_living_one_step.h"
 
 #include "game/assets/behaviour_tree.h"
-
-using rng_seed_type = unsigned;
-struct randomization;
 
 enum class subjects_iteration_flag {
 	POSSIBLE_ITERATOR_INVALIDATION,

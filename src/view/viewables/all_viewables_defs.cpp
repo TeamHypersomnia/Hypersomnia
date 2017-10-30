@@ -16,7 +16,7 @@ void all_viewables_defs::update_into(all_logical_assets& output) {
 		auto& logical = output[s.first];
 		const auto buffer = augs::sound_buffer(source);
 
-		logical.num_of_variations = buffer.variations.size();
+		logical.num_of_variations = static_cast<unsigned>(buffer.variations.size());
 
 		logical.max_duration_in_seconds = static_cast<float>(sound_duration(maximum_of(
 			buffer.variations,

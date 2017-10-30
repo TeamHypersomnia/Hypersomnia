@@ -63,7 +63,7 @@ namespace augs {
 
 					if (clip)
 						visible = d.get_line_visibility(clipper - pos);
-					else visible = std::make_pair(0, lines.size() - 1);
+					else visible = std::make_pair(0, static_cast<int>(lines.size() - 1));
 
 					/* if this happens:
 					- check if there is always an empty line
@@ -195,7 +195,7 @@ namespace augs {
 						visible = d.get_line_visibility(clipper - pos);
 					}
 					else {
-						visible = std::make_pair(0, lines.size() - 1);
+						visible = std::make_pair(0, static_cast<int>(lines.size()) - 1);
 					}
 
 					if (visible.first == -1) {

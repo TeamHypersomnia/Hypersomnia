@@ -804,7 +804,7 @@ b2DynamicTree& b2DynamicTree::operator=(const b2DynamicTree& b)
 #endif
 #endif
 
-	m_nodes = (b2TreeNode*)b2Alloc(bytes);
+	m_nodes = (b2TreeNode*)b2Alloc(static_cast<int32>(bytes));
 	memcpy(m_nodes, b.m_nodes, bytes);
 
 	m_root = b.m_root;

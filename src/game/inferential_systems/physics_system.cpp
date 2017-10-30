@@ -217,7 +217,7 @@ void physics_system::create_inferred_state_for_fixtures(const const_entity_handl
 				}
 
 				b2PolygonShape shape;
-				shape.Set(b2verts.data(), b2verts.size());
+				shape.Set(b2verts.data(), static_cast<int32>(b2verts.size()));
 
 				fixdef.shape = &shape;
 				b2Fixture* const new_fix = owner_b2Body->CreateFixture(&fixdef);
@@ -450,7 +450,7 @@ physics_system& physics_system::operator=(const physics_system& b) {
 		) {
 			const auto bytes_count = std::size_t{ sizeof(type) * count };
 
-			void* const migrated_pointer = migrated_allocator.Allocate(bytes_count);
+			void* const migrated_pointer = migrated_allocator.Allocate(static_cast<int32>(bytes_count));
 			std::memcpy(migrated_pointer, void_ptr, bytes_count);
 			
 			/* Bookmark position in memory of each and every element */

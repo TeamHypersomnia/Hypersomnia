@@ -49,7 +49,7 @@ namespace messages {
 		typedef std::array<vec2, 3> triangle;
 
 		struct discontinuity {
-			int edge_index;
+			unsigned edge_index;
 			bool is_boundary;
 			vec2 normal;
 

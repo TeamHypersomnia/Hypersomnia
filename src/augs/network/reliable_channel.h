@@ -55,9 +55,9 @@ namespace augs {
 
 			bool timed_out(const size_t max_unacknowledged_sequences = 120) const;
 
-			unsigned get_unacknowledged_sequences_num() const;
-			unsigned get_pending_reliable_messages_num() const;
-			unsigned get_pending_reliable_bytes_num() const;
+			std::size_t get_num_unacknowledged_sequences() const;
+			std::size_t get_num_pending_reliable_messages() const;
+			std::size_t get_num_pending_reliable_bytes() const;
 
 			void build_next_packet(augs::stream& out);
 			/* returns result enum */

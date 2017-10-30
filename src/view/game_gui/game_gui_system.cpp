@@ -379,7 +379,7 @@ void game_gui_system::rebuild_layouts(
 		{
 			const auto action_button_size = context.get_necessary_images().at(assets::necessary_image_id::ACTION_BUTTON_BORDER).get_size();
 
-			int total_width = element.action_buttons.size() * action_button_size.x;
+			auto total_width = static_cast<int>(element.action_buttons.size()) * action_button_size.x;
 
 			const int left_rc_spacing = 4;
 			const int right_rc_spacing = 3;

@@ -10,7 +10,7 @@ namespace augs {
 	int shell(const std::string& s) {
 		const auto wide = to_wstring(s);
 
-		return reinterpret_cast<int>(ShellExecute(NULL, NULL, wide.c_str(), NULL, NULL, SW_SHOW));
+		return static_cast<int>(reinterpret_cast<INT_PTR>(ShellExecute(NULL, NULL, wide.c_str(), NULL, NULL, SW_SHOW)));
 	}
 }
 #elif PLATFORM_UNIX

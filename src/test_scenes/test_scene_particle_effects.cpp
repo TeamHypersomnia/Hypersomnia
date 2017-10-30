@@ -2,6 +2,7 @@
 	Disable float/int warnings, this is just a content script
 */
 #pragma warning(disable : 4244)
+#pragma warning(disable : 4267)
 
 #include "augs/misc/enum/enum_associative_array.h"
 

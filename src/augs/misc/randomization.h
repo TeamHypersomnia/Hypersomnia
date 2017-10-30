@@ -3,6 +3,8 @@
 #include <utility>
 #include <vector>
 
+#include "augs/misc/randomization_declaration.h"
+
 #include "augs/misc/minmax.h"
 #include "augs/math/vec2.h"
 
@@ -10,7 +12,7 @@ template <class generator_type>
 struct basic_randomization {
 	generator_type generator;
 
-	basic_randomization(const size_t seed = 0);
+	basic_randomization(const rng_seed_type seed = 0);
 
 	int randval(
 		const int min, 
@@ -30,12 +32,12 @@ struct basic_randomization {
 	float randval(const float minmax);
 	
 	std::vector<float> make_random_intervals(
-		const size_t n, 
+		const std::size_t n, 
 		const float maximum
 	);
 
 	std::vector<float> make_random_intervals(
-		const size_t n, 
+		const std::size_t n,
 		const float maximum, 
 		const float variation_multiplier
 	);

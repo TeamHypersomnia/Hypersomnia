@@ -103,7 +103,7 @@ void thunder_system::advance(
 							child.to = raycast.intersection;
 						}
 
-						b.children.push_back(t.branches.size());
+						b.children.push_back(static_cast<int>(t.branches.size()));
 						t.branches.push_back(child);
 						++t.num_active_branches;
 						--t.in.max_all_spawned_branches;
@@ -147,7 +147,7 @@ void thunder_system::advance(
 								particles_output_for_effects.add_particle(remnants_emission.target_render_layer, new_p);
 							};
 
-							for (size_t i = 0; i < rng.randval(2u, 16u); ++i) {
+							for (std::size_t i = 0; i < rng.randval(2u, 16u); ++i) {
 								spawner(general_particle());
 							}
 						}

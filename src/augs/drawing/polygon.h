@@ -130,21 +130,22 @@ namespace augs {
 			std::list<TPPLPoly> out_tris;
 
 			TPPLPoly subject_poly;
-			inpoly.Init(polygon.size());
+			inpoly.Init(static_cast<long>(polygon.size()));
 			inpoly.SetHole(false);
 
 			vertices.reserve(vertices.size() + polygon.size());
 
-			int offset = vertices.size();
-			for (size_t i = 0; i < polygon.size(); ++i) {
+			const auto offset = vertices.size();
+			
+			for (std::size_t i = 0; i < polygon.size(); ++i) {
 				vertices.push_back(polygon[i]);
 				//original_polygon.push_back(polygon[i].pos);
 			}
 
-			for (size_t i = 0; i < polygon.size(); ++i) {
+			for (std::size_t i = 0; i < polygon.size(); ++i) {
 				vec2 p(polygon[i].pos);
-				inpoly[i].x = p.x;
-				inpoly[i].y = -p.y;
+				inpoly[static_cast<int>(i)].x = p.x;
+				inpoly[static_cast<int>(i)].y = -p.y;
 			}
 
 			TPPLPartition partition;
@@ -154,9 +155,9 @@ namespace augs {
 				for (int i = 0; i < 3; ++i) {
 					auto new_tri_point = out.GetPoint(i);
 
-					for (size_t j = offset; j < polygon.size(); ++j) {
+					for (std::size_t j = offset; j < polygon.size(); ++j) {
 						if (polygon[j].pos.compare(vec2(static_cast<float>(new_tri_point.x), static_cast<float>(-new_tri_point.y)), 1.f)) {
-							triangulation_indices.push_back(j);
+							triangulation_indices.push_back(static_cast<unsigned>(j));
 							break;
 						}
 					}

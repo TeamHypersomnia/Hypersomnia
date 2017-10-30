@@ -422,7 +422,7 @@ void editor_setup::perform_custom_imgui(
 					out.reserve(tabs.size());
 
 					for (const auto& it : tabs) {
-						out.push_back(out.size());
+						out.push_back(static_cast<int>(out.size()));
 					}
 
 					return out;
@@ -452,7 +452,7 @@ void editor_setup::perform_custom_imgui(
 					}();
 
 					auto style = scoped_style_var(ImGuiStyleVar_FramePadding, []() { auto padding = ImGui::GetStyle().FramePadding; padding.x *= 2; return padding; }());
-					ImGui::TabLabels(tabs.size(), tab_names_cstrs.data(), selected_index, nullptr, false, nullptr, ordering.data(), true, true, &closed_tab_index, nullptr);
+					ImGui::TabLabels(static_cast<int>(tabs.size()), tab_names_cstrs.data(), selected_index, nullptr, false, nullptr, ordering.data(), true, true, &closed_tab_index, nullptr);
 				}
 
 				/* Read back */

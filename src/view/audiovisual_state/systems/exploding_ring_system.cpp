@@ -35,7 +35,7 @@ void exploding_ring_system::advance(
 	auto& particles = particles_output_for_effects;
 
 	global_time_seconds += dt.in_seconds();
-	auto rng = fast_randomization(static_cast<size_t>(global_time_seconds * 10000));
+	auto rng = fast_randomization(static_cast<rng_seed_type>(global_time_seconds * 10000));
 
 	erase_if(rings, [&](ring& e) {
 		auto& r = e.in;

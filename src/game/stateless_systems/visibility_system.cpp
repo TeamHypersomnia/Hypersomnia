@@ -589,7 +589,7 @@ void visibility_system::respond_to_visibility_information_requests(
 			if (vertex.is_on_a_bound && (!ray_callbacks[0].hit || (ray_callbacks[0].intersection - vertex.pos).length_sq() < epsilon_distance_vertex_hit_sq)) {
 				/* if it is a vertex on the boundary, handle it accordingly - interpret it as a new discontinuity (e.g. for pathfinding) */
 				discontinuity new_discontinuity;
-				new_discontinuity.edge_index = double_rays.size();
+				new_discontinuity.edge_index = static_cast<unsigned>(double_rays.size());
 				new_discontinuity.points.first = vertex.pos;
 
 				vec2 actual_normal;// = (ray_callbacks[0].normal / 2;
@@ -639,7 +639,7 @@ void visibility_system::respond_to_visibility_information_requests(
 						for maximum accuracy, push the vertex coordinates instead of the actual intersections */
 
 						if (push_double_ray(double_ray(vertex.pos, vertex.pos, true, true))) {
-							response.vertex_hits.push_back(std::make_pair(double_rays.size() - 1, si.get_pixels(vertex.pos)));
+							response.vertex_hits.push_back(std::make_pair(static_cast<int>(double_rays.size()) - 1, si.get_pixels(vertex.pos)));
 							if (DEBUG_DRAWING.draw_cast_rays) draw_line(vertex.pos, rgba(255, 255, 0, 255));
 						}
 					}
@@ -671,7 +671,7 @@ void visibility_system::respond_to_visibility_information_requests(
 							new_discontinuity.points.first = vertex.pos;
 							new_discontinuity.points.second = ray_callbacks[1].intersection;
 							new_discontinuity.winding = discontinuity::RIGHT;
-							new_discontinuity.edge_index = double_rays.size() - 1;
+							new_discontinuity.edge_index = static_cast<unsigned>(double_rays.size() - 1);
 							if (DEBUG_DRAWING.draw_cast_rays) draw_line(ray_callbacks[1].intersection, rgba(255, 0, 255, 255));
 						}
 						/* otherwise the free area is to the left */
@@ -683,7 +683,7 @@ void visibility_system::respond_to_visibility_information_requests(
 							new_discontinuity.points.first = vertex.pos;
 							new_discontinuity.points.second = ray_callbacks[0].intersection;
 							new_discontinuity.winding = discontinuity::LEFT;
-							new_discontinuity.edge_index = double_rays.size();
+							new_discontinuity.edge_index = static_cast<unsigned>(double_rays.size());
 							if (DEBUG_DRAWING.draw_cast_rays) draw_line(ray_callbacks[0].intersection, rgba(255, 0, 255, 255));
 						}
 
@@ -724,13 +724,13 @@ void visibility_system::respond_to_visibility_information_requests(
 									/* if the left-handed ray intersected with boundary and thus the right-handed intersected with an obstacle */
 									if (k == 0) {
 										new_discontinuity.winding = discontinuity::LEFT;
-										new_discontinuity.edge_index = double_rays.size();
+										new_discontinuity.edge_index = static_cast<unsigned>(double_rays.size());
 										new_double_ray = double_ray(actual_intersection, vertex.pos, false, true);
 									}
 									/* if the right-handed ray intersected with boundary and thus the left-handed intersected with an obstacle */
 									else if (k == 1) {
 										new_discontinuity.winding = discontinuity::RIGHT;
-										new_discontinuity.edge_index = double_rays.size() - 1;
+										new_discontinuity.edge_index = static_cast<unsigned>(double_rays.size()) - 1;
 										new_double_ray = double_ray(vertex.pos, actual_intersection, true, false);
 									}
 
@@ -775,7 +775,7 @@ void visibility_system::respond_to_visibility_information_requests(
 
 			/* wrap the indices, some may be negative */
 			if (disc.edge_index < 0) {
-				disc.edge_index = double_rays.size() - 1;
+				disc.edge_index = static_cast<unsigned>(double_rays.size()) - 1;
 			}
 		}
 
@@ -783,7 +783,7 @@ void visibility_system::respond_to_visibility_information_requests(
 		additional processing: delete discontinuities navigation to which will result in collision
 		values less than zero indicate we don't want to perform this calculation */
 		if (request.ignore_discontinuities_shorter_than > 0.f) {
-			const int edges_num = response.edges.size();
+			const auto edges_num = static_cast<int>(response.edges.size());
 
 			/* prepare helpful lambda */
 			auto wrap = [edges_num](const int ix) {
@@ -807,7 +807,7 @@ void visibility_system::respond_to_visibility_information_requests(
 				const int cw = d.winding == d.RIGHT ? 1 : -1;
 
 				/* we check all vertices of edges */
-				for (int j = wrap(d.edge_index + cw), k = 0; k < edges_num - 1; j = wrap(j + cw), ++k) {
+				for (int j = wrap(static_cast<int>(d.edge_index) + cw), k = 0; k < edges_num - 1; j = wrap(j + cw), ++k) {
 					/* if any of the two points of the edge is to the CW/CCW side of discontinuity */
 					if (cw * (d.points.first - transform.pos).cross(response.edges[j].first - transform.pos) >= 0
 						||

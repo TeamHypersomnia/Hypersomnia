@@ -1,4 +1,6 @@
 #pragma once
+#include <cstddef>
+
 #include "augs/templates/string_templates.h"
 #include "augs/templates/introspect.h"
 #include "augs/templates/recursive.h"
@@ -32,7 +34,11 @@ auto describe_fields(const T& object) {
 				return name;
 			};
 
-			const auto this_offset = (char*)&field - (char*)&object;
+			const auto this_offset = static_cast<std::size_t>(
+				reinterpret_cast<const std::byte*>(&field) 
+				- reinterpret_cast<const std::byte*>(&object)
+			);
+
 			auto type_name = std::string(typeid(field).name());
 			// print type name without the leading "struct ", "class " or "enum "
 			str_ops(type_name).multi_replace_all({ "struct ", "class ", "enum " }, "");
@@ -69,8 +75,8 @@ auto determine_breaks_in_fields_continuity_by_introspection(const T& object) {
 	std::string result;
 	std::vector<std::string> fields;
 
-	long next_expected_offset = 0;
-	long total_size_of_leaves = 0;
+	std::size_t next_expected_offset = 0;
+	std::size_t total_size_of_leaves = 0;
 
 	augs::introspect(
 		augs::recursive(
@@ -86,7 +92,10 @@ auto determine_breaks_in_fields_continuity_by_introspection(const T& object) {
 						return name;
 					};
 
-					const auto this_offset = (char*)&field - (char*)&object;
+					const auto this_offset = static_cast<std::size_t>(
+						reinterpret_cast<const std::byte*>(&field)
+						- reinterpret_cast<const std::byte*>(&object)
+					);
 
 					if (this_offset != next_expected_offset) {
 						auto type_name = std::string(typeid(field).name());

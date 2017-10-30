@@ -93,7 +93,7 @@ namespace augs {
 		float duration_ms;
 		float elapsed_ms;
 		float variation_multiplier;
-		unsigned rng_seed;
+		rng_seed_type rng_seed;
 		size_t current_interval = 0;
 
 		std::vector<float> intervals;
@@ -101,7 +101,7 @@ namespace augs {
 		T from_container;
 		T& target_container;
 
-		populate_with_delays(T& target, const T from, const float duration_ms, const float variation_multiplier = 0.1f, const unsigned rng_seed = 0) :
+		populate_with_delays(T& target, const T from, const float duration_ms, const float variation_multiplier = 0.1f, const rng_seed_type rng_seed = 0) :
 			target_container(target), from_container(from), duration_ms(duration_ms), rng_seed(rng_seed), elapsed_ms(0.f), variation_multiplier(variation_multiplier) {
 		}
 

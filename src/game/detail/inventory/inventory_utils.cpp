@@ -278,14 +278,14 @@ unsigned to_space_units(const std::string& s) {
 	unsigned mult = SPACE_ATOMS_PER_UNIT;
 
 	if (s.find('.') == std::string::npos) {
-		int l = s.length() - 1;
+		auto l = static_cast<int>(s.length()) - 1;
 		
 		while (l--) {
 			mult *= 10;
 		}
 	}
 	else {
-		int l = s.find('.') - 1;
+		int l = static_cast<int>(s.find('.')) - 1;
 
 		while (l--) {
 			mult *= 10;

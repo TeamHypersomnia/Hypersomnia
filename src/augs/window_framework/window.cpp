@@ -72,11 +72,6 @@ namespace augs {
 	std::optional<event::change> window::handle_event(const UINT m, const WPARAM wParam, const LPARAM lParam) {
 		using namespace event::keys;
 
-		thread_local MINMAXINFO* mi;
-		thread_local BYTE lpb[40];
-		thread_local UINT dwSize = 40;
-		thread_local RAWINPUT* raw;
-
 		event::change change;
 		change.msg = translate_enum(m);
 
@@ -210,6 +205,9 @@ namespace augs {
 
 		case WM_INPUT:
 			if (active && (current_settings.raw_mouse_input || mouse_position_frozen)) {
+				thread_local BYTE lpb[sizeof(RAWINPUT)];
+				thread_local UINT dwSize = sizeof(RAWINPUT);
+
 				GetRawInputData(
 					reinterpret_cast<HRAWINPUT>(lParam), 
 					RID_INPUT,
@@ -218,7 +216,7 @@ namespace augs {
 					sizeof(RAWINPUTHEADER)
 				);
 
-				raw = reinterpret_cast<RAWINPUT*>(lpb);
+				const auto* const raw = reinterpret_cast<RAWINPUT*>(lpb);
 
 				if (raw->header.dwType == RIM_TYPEMOUSE) {
 					change = do_raw_motion({
@@ -254,16 +252,18 @@ namespace augs {
 			break;
 
 		case WM_GETMINMAXINFO:
-			mi = (MINMAXINFO*)lParam;
-			mi->ptMinTrackSize.x = min_window_size.x;
-			mi->ptMinTrackSize.y = min_window_size.y;
-			mi->ptMaxTrackSize.x = max_window_size.x;
-			mi->ptMaxTrackSize.y = max_window_size.y;
+			{
+				auto* const mi = reinterpret_cast<MINMAXINFO*>(lParam);
+				mi->ptMinTrackSize.x = min_window_size.x;
+				mi->ptMinTrackSize.y = min_window_size.y;
+				mi->ptMaxTrackSize.x = max_window_size.x;
+				mi->ptMaxTrackSize.y = max_window_size.y;
+			}
 			break;
 
 		case WM_SYSCOMMAND:
 			default_proc();
-			change.msg = translate_enum(wParam);
+			change.msg = translate_enum(static_cast<UINT>(wParam));
 			break;
 
 		default: default_proc(); break;
@@ -527,7 +527,7 @@ namespace augs {
 		ofn.lpstrFile = szFile.data();
 		ofn.hwndOwner = hwnd;
 		ofn.lpstrFile[0] = '\0';
-		ofn.nMaxFile = szFile.size();
+		ofn.nMaxFile = static_cast<DWORD>(szFile.size());
 		ofn.lpstrFilter = filter.data();
 		ofn.lpstrTitle = title.data();
 		ofn.nFilterIndex = 1;
@@ -562,7 +562,7 @@ namespace augs {
 		ofn.lpstrFile = szFile.data();
 		ofn.hwndOwner = hwnd;
 		ofn.lpstrFile[0] = '\0';
-		ofn.nMaxFile = szFile.size();
+		ofn.nMaxFile = static_cast<DWORD>(szFile.size());
 		ofn.lpstrFilter = filter.data();
 		ofn.lpstrTitle = title.data();
 		ofn.nFilterIndex = 1;

@@ -93,7 +93,7 @@ public:
 		const particles_emission& emission
 	) {
 		const auto& templates = emission.get_definitions<particle_type>();
-		auto new_particle = templates[rng.randval(0u, templates.size() - 1)];
+		auto new_particle = templates[rng.randval(0u, static_cast<unsigned>(templates.size()) - 1)];
 		
 		const auto velocity_degrees = basic_velocity_degrees + angular_offset + rng.randval(spread);
 		const auto new_velocity = vec2().set_from_degrees(velocity_degrees) * rng.randval(speed);
