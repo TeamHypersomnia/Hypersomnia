@@ -44,7 +44,7 @@ template <class F>
 entity_id get_hovered_world_entity(
 	const cosmos& cosm,
 	const vec2 world_cursor_position,
-	F hoverable
+	F is_hoverable
 ) {
 	thread_local visible_entities entities;
 
@@ -56,7 +56,7 @@ entity_id get_hovered_world_entity(
 
 	for (const auto& layer : entities.per_layer) {
 		for (const auto candidate : layer) {
-			if (hoverable(candidate)) {
+			if (is_hoverable(candidate)) {
 				return candidate;
 			}
 		}

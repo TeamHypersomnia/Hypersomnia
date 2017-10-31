@@ -335,11 +335,11 @@ namespace augs {
 				const auto twelve_o_clock = (origin.right_top() + origin.left_top()) / 2;
 
 				augs::constant_size_vector<vec2, 7> verts;
-				verts.push_back(origin.center());
+				verts.push_back(origin.get_center());
 
 				const auto intersection = rectangle_ray_intersection(
-					origin.center() + vec2().set_from_degrees(-90 + 360 * (1 - ratio)) * (origin.w() + origin.h()),
-					origin.center(),
+					origin.get_center() + vec2().set_from_degrees(-90 + 360 * (1 - ratio)) * (origin.w() + origin.h()),
+					origin.get_center(),
 					origin
 				);
 

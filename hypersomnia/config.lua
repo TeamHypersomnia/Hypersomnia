@@ -67,7 +67,9 @@ return {
     camera_panning_speed = 1,
     controlled_entity_color = "255 255 0 120",
     hovered_entity_color = "255 255 255 20",
-    selected_entity_color = "65 131 196 80"
+    selected_entity_color = "65 131 196 80",
+    rectangular_selection_color = "65 131 196 60",
+    rectangular_selection_border_color = "65 131 196 120"
   },
   game_controls = {
     A = "MOVE_LEFT",

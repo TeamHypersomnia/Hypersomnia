@@ -24,6 +24,7 @@
 void editor_setup::on_tab_changed() {
 	hovered_entity = {};
 	player_paused = true;
+	finish_rectangular_selection();
 }
 
 void editor_setup::set_popup(const editor_popup p) {
@@ -620,6 +621,30 @@ void editor_setup::perform_custom_imgui(
 	}
 }
 
+void editor_setup::finish_rectangular_selection() {
+	if (has_current_tab()) {
+		decltype(tab().selected_entities) new_selections;
+
+		for_each_selected_entity(
+			[&](const auto e) {
+				new_selections.emplace(e);
+			}
+		);
+
+		tab().selected_entities = new_selections;
+
+		rectangular_drag_origin = std::nullopt;
+		in_rectangular_selection.clear();
+	}
+}
+
+void editor_setup::clear_all_selections() {
+	if (has_current_tab()) {
+		tab().selected_entities.clear();
+		in_rectangular_selection.clear();
+	}
+}
+
 bool editor_setup::escape() {
 	if (current_popup) {
 		current_popup = std::nullopt;
@@ -707,11 +732,13 @@ void editor_setup::paste() {
 
 void editor_setup::del() {
 	if (has_current_tab()) {
-		for (const auto e : tab().selected_entities) {
-			work().world.delete_entity(e);
-		}
+		for_each_selected_entity(
+			[&](const auto e) {
+				work().world.delete_entity(e);
+			}
+		);
 
-		tab().selected_entities.clear();
+		clear_all_selections();
 	}
 }
 
@@ -900,17 +927,42 @@ bool editor_setup::handle_unfetched_window_input(
 				hovered_entity = {};
 
 				if (has_current_tab()) {
-					hovered_entity = get_hovered_world_entity(
-						work().world, 
-						world_cursor_pos, 
-						[&](const entity_id id) { 
-							if (work().world[id].has<components::wandering_pixels>()) {
-								return false;
-							}
-
-							return true; 
+					{
+						const auto drag_dead_area = 3.f;
+						const auto drag_offset = world_cursor_pos - last_ldown_position;
+						
+						if (common_input_state[key::LMOUSE] && !drag_offset.is_epsilon(drag_dead_area)) {
+							rectangular_drag_origin = last_ldown_position;
+							held_entity = {};
 						}
-					);
+					}
+
+					if (rectangular_drag_origin.has_value()) {
+						auto world_range = ltrb::from_points(*rectangular_drag_origin, world_cursor_pos);
+
+						in_rectangular_selection.clear();
+						
+						const auto query = visible_entities_query{
+							work().world,
+							{ world_range.get_center(), world_range.get_size() }
+						};
+
+						in_rectangular_selection.acquire_non_physical(query);
+						in_rectangular_selection.acquire_physical(query);
+					}
+					else {
+						hovered_entity = get_hovered_world_entity(
+							work().world, 
+							world_cursor_pos, 
+							[&](const entity_id id) { 
+								if (work().world[id].has<components::wandering_pixels>()) {
+									return false;
+								}
+
+								return true; 
+							}
+						);
+					}
 				}
 			}
 		}
@@ -924,24 +976,36 @@ bool editor_setup::handle_unfetched_window_input(
 					window.get_screen_size()
 				);
 
+				last_ldown_position = world_cursor_pos;
+				held_entity = hovered_entity;
+
 				auto& selections = tab().selected_entities;
-				const auto hovered = work().world[hovered_entity];
 
 				if (const bool new_selection = !has_ctrl) {
 					selections.clear();
 				}
 
-				if (hovered.alive()) {
-					if (has_ctrl && found_in(selections, hovered)) {
-						selections.erase(hovered);
-					}
-					else {
-						selections.emplace(hovered_entity);
-					}
-				}
-
 				return true;
 			}
+		}
+		else if (e.was_released(key::LMOUSE)) {
+			const auto held = work().world[held_entity];
+
+			if (held.alive()) {
+				const bool has_ctrl{ common_input_state[key::LCTRL] };
+				auto& selections = tab().selected_entities;
+
+				if (has_ctrl && found_in(selections, held)) {
+					selections.erase(held);
+				}
+				else {
+					selections.emplace(hovered_entity);
+				}
+			}
+
+			held_entity = {};
+
+			finish_rectangular_selection();
 		}
 
 		if (e.was_pressed(key::HOME)) {

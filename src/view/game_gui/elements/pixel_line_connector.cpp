@@ -7,8 +7,8 @@ augs::constant_size_vector<std::array<vec2, 2>, 2> get_connecting_pixel_lines(
 ) {
 	using namespace augs::gui;
 
-	const vec2 ac = a.center();
-	const vec2 bc = b.center();
+	const vec2 ac = a.get_center();
+	const vec2 bc = b.get_center();
 
 	const vec2 aw2(a.w() / 2, 0);
 	const vec2 ah2(0, a.h() / 2);

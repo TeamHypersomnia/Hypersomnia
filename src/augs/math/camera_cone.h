@@ -1,15 +1,21 @@
 #pragma once
 #include "augs/math/transform.h"
+#include "augs/math/rects.h"
 
 template <class T>
 struct basic_camera_cone {
 	using vec2 = basic_vec2<T>;
+	using ltrb = basic_ltrb<T>;
 
 	basic_transform<T> transform;
 	vec2 visible_world_area;
 
 	vec2 operator[](const vec2 pos) const {
 		return pos - transform.pos + visible_world_area / 2;
+	}
+
+	ltrb operator[](const ltrb r) const {
+		return { operator[](r.get_position()), r.get_size() };
 	}
 
 	vec2 get_screen_space_0_1(const vec2 pos) const {

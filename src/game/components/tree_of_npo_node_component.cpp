@@ -44,7 +44,7 @@ void component_synchronizer<false, D>::update_proxy(const logic_step step) const
 	const auto new_aabb = components::tree_of_npo_node::create_default_for(handle).aabb;
 	auto& data = get_raw_component();
 
-	const vec2 displacement = new_aabb.center() - data.aabb.center();
+	const vec2 displacement = new_aabb.get_center() - data.aabb.get_center();
 	data.aabb = new_aabb;
 
 	auto& sys = handle.get_cosmos().inferential.tree_of_npo;

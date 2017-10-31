@@ -44,7 +44,7 @@ intersection_output rectangle_ray_intersection(
 	b2PolygonShape ps;
 	ps.SetAsBox(rectangle.w()/2, rectangle.h()/2);
 
-	const auto center = rectangle.center();
+	const auto center = rectangle.get_center();
 
 	b2RayCastInput in;
 	in.maxFraction = 1.f;

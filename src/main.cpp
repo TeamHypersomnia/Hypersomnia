@@ -1309,8 +1309,26 @@ int work(const int argc, const char* const * const argv) try {
 			);
 			
 			if (current_setup) {
-				on_specific_setup([&](editor_setup&) {
+				on_specific_setup([&](editor_setup& editor) {
+					if (editor.rectangular_drag_origin.has_value()) {
+						const auto camera = get_camera();
 
+						const auto world_cursor_pos = camera.get_world_cursor_pos(
+							common_input_state.mouse.pos, 
+							screen_size
+						);
+
+						const auto world_rectangular_selection = ltrb::from_points(
+							world_cursor_pos, 
+							*editor.rectangular_drag_origin
+						);
+
+						get_drawer().aabb_with_border(
+							camera[world_rectangular_selection],
+							viewing_config.editor.rectangular_selection_color,
+							viewing_config.editor.rectangular_selection_border_color
+						);
+					}
 				});
 			}
 

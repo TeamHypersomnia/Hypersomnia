@@ -270,7 +270,7 @@ void item_button::draw_proc(
 			auto state = components::sprite::drawing_input{ augs::drawer (output) };
 
 			const auto rc_pos = this_absolute_rect.get_position();
-			state.renderable_transform.pos = layout.get_base_item_pos().center() + rc_pos + expansion_offset;
+			state.renderable_transform.pos = layout.get_base_item_pos().get_center() + rc_pos + expansion_offset;
 
 			if (draw_attachments) {
 				size_t attachment_index = 1;
@@ -287,7 +287,7 @@ void item_button::draw_proc(
 
 						auto attachment_state = components::sprite::drawing_input(output);
 
-						attachment_state.renderable_transform.pos = rc_pos + layout.boxes[attachment_index].center() + expansion_offset;
+						attachment_state.renderable_transform.pos = rc_pos + layout.boxes[attachment_index].get_center() + expansion_offset;
 						attachment_state.renderable_transform.rotation = trav.attachment_offset.rotation;
 
 						if (flip.horizontally()) {

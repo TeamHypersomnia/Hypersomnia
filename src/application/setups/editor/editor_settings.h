@@ -18,7 +18,11 @@ struct editor_settings {
 	float camera_panning_speed = 1.f;
 
 	rgba controlled_entity_color = { 255, 255, 0, 120 };
+	rgba held_entity_color = { 65, 131, 196, 160 };
 	rgba selected_entity_color = { 65, 131, 196, 120 };
 	rgba hovered_entity_color = { 255, 255, 255, 80 };
+
+	rgba rectangular_selection_color = { 65, 131, 196, 60 };
+	rgba rectangular_selection_border_color = { 65, 131, 196, 120 };
 	// END GEN INTROSPECTOR
 };

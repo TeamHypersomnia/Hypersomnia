@@ -73,9 +73,13 @@ class editor_setup : private current_tab_access_cache<editor_setup> {
 	std::vector<std::unique_ptr<workspace>> works;
 	
 	entity_id hovered_entity;
+	entity_id held_entity;
+	vec2 last_ldown_position;
+	visible_entities in_rectangular_selection;
 
 	void on_tab_changed();
 	void set_locally_viewed(const entity_id);
+	void finish_rectangular_selection();
 
 	template <class F>
 	bool try_to_open_new_tab(F&& new_workspace_provider) {
@@ -120,11 +124,32 @@ class editor_setup : private current_tab_access_cache<editor_setup> {
 	void autosave(const autosave_input) const;
 	void open_last_tabs(sol::state& lua);
 
+	template <class F>
+	void for_each_selected_entity(F callback) const {
+		if (has_current_tab()) {
+			for (const auto e : tab().selected_entities) {
+				if (!found_in(in_rectangular_selection.all, e)) {
+					callback(e);
+				}
+			}
+
+			for (const auto e : in_rectangular_selection.all) {
+				if (!found_in(tab().selected_entities, e)) {
+					callback(e);
+				}
+			}
+		}
+	}
+
+	void clear_all_selections();
+
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
 	static constexpr bool handles_window_input = true;
 	static constexpr bool handles_escape = true;
 	static constexpr bool has_additional_highlights = true;
+
+	std::optional<vec2> rectangular_drag_origin;
 
 	editor_setup(sol::state& lua);
 	editor_setup(sol::state& lua, const augs::path_type& workspace_path);
@@ -254,8 +279,14 @@ public:
 				callback(work().locally_viewed, color);
 			}
 
-			for (const auto& e : tab().selected_entities) {
-				callback(e, settings.selected_entity_color);
+			for_each_selected_entity(
+				[&](const auto e) {
+					callback(e, settings.selected_entity_color);
+				}
+			);
+
+			if (work().world[held_entity].alive()) {
+				callback(held_entity, settings.held_entity_color);
 			}
 
 			if (work().world[hovered_entity].alive()) {

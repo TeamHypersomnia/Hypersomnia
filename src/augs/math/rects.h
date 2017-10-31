@@ -35,6 +35,25 @@ struct basic_ltrb {
 	basic_ltrb(const T l, const T t, const T r, const T b) : l(l), t(t), r(r), b(b) {}
 	basic_ltrb(const basic_vec2<T> pos, const basic_vec2<T> size) : l(pos.x), t(pos.y), r(pos.x + size.x), b(pos.y + size.y) {}
 
+	static basic_ltrb<T> from_points(
+		const basic_vec2<T> a,
+		const basic_vec2<T> b
+	) {
+		const auto lt = vec2(
+			std::min(a.x, b.x),
+			std::min(a.y, b.y)
+		);
+
+		const auto rt = vec2(
+			std::max(a.x, b.x),
+			std::max(a.y, b.y)
+		);
+
+		const auto size = rt - lt;
+
+		return { lt, size };
+	}
+
 	void x(const T xx) {
 		*this += (basic_vec2<T>(xx - l, 0));
 	}
@@ -222,10 +241,6 @@ struct basic_ltrb {
 		}
 
 		return res;
-	}
-
-	basic_vec2<T> center() const {
-		return { l + w() / 2.f, t + h() / 2.f };
 	}
 
 	template <typename S>

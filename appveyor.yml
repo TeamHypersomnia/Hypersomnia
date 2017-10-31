@@ -18,6 +18,15 @@ test:
       - '**\*.Hypersomnia.exe'
       - '**\*.Hypersomnia-Debug.exe'
 
+notifications:
+  - provider: Email
+    to:
+      - some@email.com
+    on_build_success: false
+    on_build_failure: false
+    on_build_status_changed: false
+
+
 before_build:
   - mkdir dev
   - cd dev
