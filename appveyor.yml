@@ -1,0 +1,22 @@
+version: 1.0.{build}
+branches:
+  only:
+    - master
+
+image: Visual Studio 2017 Preview
+configuration: Release
+build:
+  parallel: true                  # enable MSBuild parallel builds
+  project: dev/Hypersomnia.sln      # path to Visual Studio solution or project
+  verbosity: normal
+
+test:
+  assemblies:
+    only:
+      - '**\*.Hypersomnia.exe'
+      - '**\*.Hypersomnia-Debug.exe'
+
+before_build:
+  - mkdir dev
+  - cd dev
+  - cmake -DOUTPUT_LOG_TO_STDOUT=1 ..
