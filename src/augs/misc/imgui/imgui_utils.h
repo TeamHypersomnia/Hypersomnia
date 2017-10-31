@@ -36,6 +36,8 @@ namespace augs {
 
 		void render(const ImGuiStyle&);
 	
+		bool is_hovered_with_hand_cursor();
+
 		template <class id_type>
 		id_type get_cursor() {
 			if (ImGui::GetMouseCursor() == ImGuiMouseCursor_TextInput) {
@@ -46,7 +48,7 @@ namespace augs {
 				return id_type::GUI_CURSOR_RESIZE_NWSE;
 			}
 
-			if (ImGui::IsAnyItemHoveredWithHandCursor()) {
+			if (is_hovered_with_hand_cursor()) {
 				return id_type::GUI_CURSOR_HOVER;
 			}
 

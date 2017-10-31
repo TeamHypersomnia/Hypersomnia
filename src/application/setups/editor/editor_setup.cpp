@@ -993,17 +993,19 @@ bool editor_setup::handle_unfetched_window_input(
 			}
 		}
 		else if (e.was_released(key::LMOUSE)) {
-			const auto held = work().world[held_entity];
+			if (has_current_tab()) {
+				const auto held = work().world[held_entity];
 
-			if (held.alive()) {
-				const bool has_ctrl{ common_input_state[key::LCTRL] };
-				auto& selections = tab().selected_entities;
+				if (held.alive()) {
+					const bool has_ctrl{ common_input_state[key::LCTRL] };
+					auto& selections = tab().selected_entities;
 
-				if (has_ctrl && found_in(selections, held)) {
-					selections.erase(held);
-				}
-				else {
-					selections.emplace(hovered_entity);
+					if (has_ctrl && found_in(selections, held)) {
+						selections.erase(held);
+					}
+					else {
+						selections.emplace(hovered_entity);
+					}
 				}
 			}
 

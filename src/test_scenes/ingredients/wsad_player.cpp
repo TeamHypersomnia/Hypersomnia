@@ -235,7 +235,7 @@ namespace prefabs {
 
 			components::fixtures group;
 
-			group.filter = filters::trigger();
+			group.filter = {};
 			//group.filter.categoryBits = 0;
 			group.density = 0.1f;
 			group.sensor = true;

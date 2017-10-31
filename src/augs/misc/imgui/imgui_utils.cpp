@@ -1,4 +1,7 @@
 #include "imgui_utils.h"
+
+#include <imgui/imgui_internal.h>
+
 #include "augs/image/image.h"
 #include "augs/graphics/texture.h"
 #include "augs/window_framework/window.h"
@@ -185,6 +188,10 @@ namespace augs {
 
 		graphics::texture create_atlas() {
 			return create_atlas_image();
+		}
+
+		bool is_hovered_with_hand_cursor() {
+			return ImGui::IsAnyItemHovered() && ImGui::GetCurrentContext()->HoveredIdHandCursor;
 		}
 	}
 }
