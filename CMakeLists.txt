@@ -825,6 +825,12 @@ if(BUILD_ENET)
 endif()
 
 if(BUILD_FREETYPE)
+	set(WITH_ZLIB OFF)
+	set(WITH_BZip2 OFF)
+	set(WITH_PNG OFF)
+	set(WITH_HarfBuzz OFF)
+	set(FREETYPE_NO_DIST ON)
+
 	add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/freetype")
 	
 	if(ADD_MCMODEL_LARGE_FLAG)
