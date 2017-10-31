@@ -68,6 +68,7 @@ return {
     controlled_entity_color = "255 255 0 120",
     hovered_entity_color = "255 255 255 20",
     selected_entity_color = "65 131 196 80",
+    held_entity_color = "65 131 196 120",
     rectangular_selection_color = "65 131 196 60",
     rectangular_selection_border_color = "65 131 196 120"
   },

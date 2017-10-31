@@ -196,14 +196,11 @@ namespace prefabs {
 
 		{
 			auto& sprite = root += components::sprite();
-			auto& render = root += components::render();
 			auto& transform = root += components::transform();
 			auto& crosshair = root += components::crosshair();
 			const auto processing = root += components::processing();
 			
 			sprite.set(assets::game_image_id::TEST_CROSSHAIR, metas, rgba(255, 255, 255, 255));
-
-			render.layer = render_layer::CROSSHAIR;
 
 			crosshair.base_offset.set(-20, 0);
 			crosshair.sensitivity.set(3, 3);
@@ -219,9 +216,6 @@ namespace prefabs {
 			auto& sprite = recoil += components::sprite();
 
 			sprite.set(assets::game_image_id::TEST_CROSSHAIR, metas, rgba(0, 255, 0, 0));
-
-			auto& render = recoil += components::render();
-			render.layer = render_layer::OVER_CROSSHAIR;
 
 			body.linear_damping = 5;
 			body.angular_damping = 5;

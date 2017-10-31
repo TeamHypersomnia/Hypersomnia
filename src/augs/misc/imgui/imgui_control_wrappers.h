@@ -141,7 +141,7 @@ namespace augs {
 			T& into, 
 			const B lower_bound,
 			const B upper_bound,
-			const char* display_format = "%.0f"
+			const char* display_format = "%.3f"
 		) {
 			using namespace detail;
 

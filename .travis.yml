@@ -24,7 +24,7 @@ script:
   # - We don't need to allocate entities statically for performance as this is just a test.
   # - We don't need to archive builds, either.
   - cmake -DUNIX=ON -DCMAKE_CXX_FLAGS="-m64" -DCMAKE_C_FLAGS="-m64" -DCMAKE_BUILD_TYPE=Release -DHYPERSOMNIA_BARE=ON -DSTATICALLY_ALLOCATE_ENTITIES_NUM=0 -DSTATICALLY_ALLOCATE_ASSETS=0 -DBUILD_IN_CONSOLE_MODE=1 -DBUILD_HTTP_REQUESTS=OFF -DADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE=OFF -D CMAKE_C_COMPILER=gcc-7 -D CMAKE_CXX_COMPILER=g++-7 ..
-  - make --keep-going VERBOSE=1
+  - make --keep-going
   - ./Hypersomnia --unit-tests-only
   
 notfications:

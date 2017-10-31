@@ -230,6 +230,8 @@ void editor_setup::fill_with_minimal_scene(sol::state& lua) {
 #if BUILD_TEST_SCENES
 	if (has_current_tab()) {
 		work().make_test_scene(lua, true);
+
+		clear_all_selections();
 	}
 #endif
 }
@@ -238,6 +240,8 @@ void editor_setup::fill_with_test_scene(sol::state& lua) {
 #if BUILD_TEST_SCENES
 	if (has_current_tab()) {
 		work().make_test_scene(lua, false);
+
+		clear_all_selections();
 	}
 #endif
 }

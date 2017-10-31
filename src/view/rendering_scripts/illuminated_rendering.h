@@ -284,10 +284,19 @@ void illuminated_rendering(
 	draw_layer(render_layer::NEON_CAPTIONS);
 	
 	if (settings.draw_crosshairs) {
-		draw_layer(render_layer::CROSSHAIR);
+		cosmos.for_each(
+			processing_subjects::WITH_CROSSHAIR,
+			[&](const const_entity_handle it) {
+				if (const auto s = it.find<components::sprite>()) {
+					draw_renderable(
+						*s, 
+						{ output, game_images, camera, global_time_seconds },
+						it.get<components::transform>()
+					);
+				}
+			}
+		);
 	}
-	
-	draw_layer(render_layer::OVER_CROSSHAIR);
 	
 	if (settings.draw_weapon_laser && viewed_character.alive()) {
 		const auto laser = necessarys.at(assets::necessary_image_id::LASER);

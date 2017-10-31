@@ -84,6 +84,7 @@ void crosshair_system::generate_crosshair_intents(const logic_step step) {
 		}
 	}
 }
+
 void crosshair_system::apply_crosshair_intents_to_base_offsets(const logic_step step) {
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
