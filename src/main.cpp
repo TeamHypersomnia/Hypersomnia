@@ -1468,6 +1468,11 @@ catch (const augs::unit_test_session_error err) {
 
 	return EXIT_FAILURE;
 }
+catch (const std::runtime_error err) {
+	LOG("Runtime error: %x", err.what());
+
+	return EXIT_FAILURE;
+}
 /* We want the debugger to break if it is not in production */
 #if IS_PRODUCTION_BUILD
 catch (...) {
