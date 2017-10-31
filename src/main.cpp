@@ -55,9 +55,13 @@
 int work(const int argc, const char* const * const argv);
 
 #if PLATFORM_WINDOWS
+#if BUILD_IN_CONSOLE_MODE
+int main(const int argc, const char* const * const argv) {
+#else
 int __stdcall WinMain(HINSTANCE, HINSTANCE, char*, int) {
 	const auto argc = __argc;
 	const auto argv = __argv;
+#endif
 #elif PLATFORM_UNIX
 int main(const int argc, const char* const * const argv) {
 #else
@@ -67,7 +71,6 @@ int main(const int argc, const char* const * const argv) {
 
 	{
 		const auto logs = program_log::get_current().get_complete(); 
-		std::cerr << logs;
 
 		switch (exit_code) {
 			case EXIT_SUCCESS: 

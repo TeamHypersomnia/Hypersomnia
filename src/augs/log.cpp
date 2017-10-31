@@ -10,7 +10,7 @@
 
 #define ENABLE_LOG 1
 
-#if OUTPUT_LOG_TO_STDOUT
+#if BUILD_IN_CONSOLE_MODE
 #include <iostream>
 #endif
 
@@ -47,7 +47,7 @@ void LOG(const std::string& f) {
 
 	program_log::get_current().push_entry({ f });
 
-#if OUTPUT_LOG_TO_STDOUT
+#if BUILD_IN_CONSOLE_MODE
 	std::cout << f << std::endl;
 #endif
 

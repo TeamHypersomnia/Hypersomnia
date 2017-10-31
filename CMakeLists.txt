@@ -70,7 +70,7 @@ set(STATICALLY_ALLOCATE_ENTITIES_NUM "5000" CACHE STRING "Statically allocate en
 
 set(STATICALLY_ALLOCATE_ASSETS "1" CACHE STRING "Statically allocate assets using container_sizes.h")
 
-set(OUTPUT_LOG_TO_STDOUT OFF CACHE STRING "Output LOG arguments live to std::cout.")
+set(BUILD_IN_CONSOLE_MODE OFF CACHE STRING "")
 
 if(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE)
 	if (NOT HYPERSOMNIA_RUNTIME_ARCHIVE_DIR)
@@ -909,8 +909,8 @@ if(STATICALLY_ALLOCATE_ASSETS)
 	add_definitions(-DSTATICALLY_ALLOCATE_ASSETS=${STATICALLY_ALLOCATE_ASSETS})
 endif()
 
-if(OUTPUT_LOG_TO_STDOUT)
-	add_definitions(-DOUTPUT_LOG_TO_STDOUT=${OUTPUT_LOG_TO_STDOUT})
+if(BUILD_IN_CONSOLE_MODE)
+	add_definitions(-DBUILD_IN_CONSOLE_MODE=${BUILD_IN_CONSOLE_MODE})
 endif()
 
 if(STATICALLY_ALLOCATE_EDITOR_TABS_NUM)
@@ -941,7 +941,11 @@ set(HYPERSOMNIA_SRCS
 )
 
 if(MSVC)
-	add_executable(Hypersomnia WIN32 ${HYPERSOMNIA_SRCS})
+	if(BUILD_IN_CONSOLE_MODE)
+		add_executable(Hypersomnia ${HYPERSOMNIA_SRCS})
+	else()
+		add_executable(Hypersomnia WIN32 ${HYPERSOMNIA_SRCS})
+	endif()
 else()
 	add_executable(Hypersomnia ${HYPERSOMNIA_SRCS})
 endif()

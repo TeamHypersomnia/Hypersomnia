@@ -8,7 +8,7 @@ configuration: Release
 build:
   parallel: true                  # enable MSBuild parallel builds
   project: dev/Hypersomnia.sln      # path to Visual Studio solution or project
-  verbosity: normal
+  verbosity: minimal
 install:
   - git submodule update --init --recursive
 
@@ -21,4 +21,8 @@ test:
 before_build:
   - mkdir dev
   - cd dev
-  - cmake -DOUTPUT_LOG_TO_STDOUT=1 ..
+  - cmake -DBUILD_IN_CONSOLE_MODE=1 ..
+
+test_script:
+  - cd hypersomnia
+  - call "../dev/$env:CONFIGURATION/Hypersomnia.exe" --unit-tests-only

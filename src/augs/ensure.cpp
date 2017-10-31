@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "augs/ensure.h"
 #include "augs/filesystem/file.h"
 #include "augs/window_framework/platform_utils.h"
@@ -18,8 +16,6 @@ void save_log_and_terminate() {
 		/* Open text editor */
 		augs::shell(s.c_str());
 	}
-
-	std::cerr << logs;
 
 #if IS_PRODUCTION_BUILD
 	std::terminate();
