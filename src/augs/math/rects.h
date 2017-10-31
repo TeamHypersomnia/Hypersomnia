@@ -39,12 +39,12 @@ struct basic_ltrb {
 		const basic_vec2<T> a,
 		const basic_vec2<T> b
 	) {
-		const auto lt = vec2(
+		const auto lt = basic_vec2<T>(
 			std::min(a.x, b.x),
 			std::min(a.y, b.y)
 		);
 
-		const auto rt = vec2(
+		const auto rt = basic_vec2<T>(
 			std::max(a.x, b.x),
 			std::max(a.y, b.y)
 		);
