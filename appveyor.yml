@@ -9,6 +9,8 @@ build:
   parallel: true                  # enable MSBuild parallel builds
   project: dev/Hypersomnia.sln      # path to Visual Studio solution or project
   verbosity: normal
+install:
+  - git submodule update --init --recursive
 
 test:
   assemblies:
