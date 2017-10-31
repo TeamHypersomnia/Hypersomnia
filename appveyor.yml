@@ -24,5 +24,6 @@ before_build:
   - cmake -DBUILD_IN_CONSOLE_MODE=1 ..
 
 test_script:
-  - cd hypersomnia
-  - call "../dev/$env:CONFIGURATION/Hypersomnia.exe" --unit-tests-only
+  - ps: 'cd ../hypersomnia'
+  - ps: '& "../dev/$env:CONFIGURATION/Hypersomnia.exe" --unit-tests-only'
+  - ps: 'if($LastExitCode -ne 0) { $host.SetShouldExit($LastExitCode ) }'
