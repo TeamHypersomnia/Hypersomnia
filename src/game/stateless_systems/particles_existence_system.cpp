@@ -61,7 +61,7 @@ void particles_existence_system::displace_streams_and_destroy_dead_streams(const
 					randomization rng(new_seed);
 
 					existence.time_of_last_displacement = timestamp;
-					existence.current_displacement.set_from_degrees(rng.randval(0.f, 360.f)).set_length(rng.randval(0.f, input.displace_source_position_within_radius));
+					existence.current_displacement = vec2::from_degrees(rng.randval(0.f, 360.f)) * rng.randval(0.f, input.displace_source_position_within_radius);
 					existence.current_displacement_duration_bound_ms = rng.randval(input.single_displacement_duration_ms);
 				}
 			}

@@ -27,7 +27,7 @@ void thunder_system::thunder::create_root_branch() {
 	b.current_lifetime_ms = 0.f;
 
 	b.from = in.first_branch_root.pos;
-	b.to = b.from + vec2().set_from_degrees(
+	b.to = b.from + vec2::from_degrees(
 		in.first_branch_root.rotation + rng.randval(in.branch_angle_spread)
 	) * rng.randval(in.branch_length);
 
@@ -85,7 +85,7 @@ void thunder_system::advance(
 						child.from = b.to;
 						child.to =
 							child.from 
-							+ vec2().set_from_degrees(rng.randval(t.in.branch_angle_spread) 
+							+ vec2::from_degrees(rng.randval(t.in.branch_angle_spread) 
 							+ (b.to - b.from).degrees()) * rng.randval(t.in.branch_length)
 						;
 

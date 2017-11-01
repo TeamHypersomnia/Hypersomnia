@@ -97,7 +97,7 @@ struct basic_transform {
 	) const {
 		return transform{
 			augs::interp(pos, next.pos, alpha),
-			augs::interp(vec2().set_from_degrees(rotation), vec2().set_from_degrees(next.rotation), alpha).degrees()
+			augs::interp(vec2::from_degrees(rotation), vec2::from_degrees(next.rotation), alpha).degrees()
 		};
 	}
 
@@ -108,7 +108,7 @@ struct basic_transform {
 	) const {
 		return transform{
 			augs::interp(pos, next.pos, positional_alpha),
-			augs::interp(vec2().set_from_degrees(rotation), vec2().set_from_degrees(next.rotation), rotational_alpha).degrees()
+			augs::interp(vec2::from_degrees(rotation), vec2::from_degrees(next.rotation), rotational_alpha).degrees()
 		};
 	}
 
@@ -158,7 +158,7 @@ struct basic_transform {
 	}
 
 	auto get_orientation() const {
-		return vec2().set_from_degrees(rotation);
+		return vec2::from_degrees(rotation);
 	}
 };
 

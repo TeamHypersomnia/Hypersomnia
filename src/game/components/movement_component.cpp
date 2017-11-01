@@ -5,14 +5,14 @@ namespace components {
 		moving_left = moving_right = moving_forward = moving_backward = false;
 
 		static const vec2 dirs[] = {
-			vec2().set_from_degrees(0),
-			vec2().set_from_degrees(45 * 1),
-			vec2().set_from_degrees(45 * 2),
-			vec2().set_from_degrees(45 * 3),
-			vec2().set_from_degrees(45 * 4),
-			vec2().set_from_degrees(45 * 5),
-			vec2().set_from_degrees(45 * 6),
-			vec2().set_from_degrees(45 * 7)
+			vec2::from_degrees(0),
+			vec2::from_degrees(45 * 1),
+			vec2::from_degrees(45 * 2),
+			vec2::from_degrees(45 * 3),
+			vec2::from_degrees(45 * 4),
+			vec2::from_degrees(45 * 5),
+			vec2::from_degrees(45 * 6),
+			vec2::from_degrees(45 * 7)
 		};
 
 		const auto dir_num = std::min_element(dirs, dirs + 8, [d](vec2 a, vec2 b) { return a.dot(d) > b.dot(d); }) - dirs;

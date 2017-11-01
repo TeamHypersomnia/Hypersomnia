@@ -338,7 +338,7 @@ namespace augs {
 				verts.push_back(origin.get_center());
 
 				const auto intersection = rectangle_ray_intersection(
-					origin.get_center() + vec2().set_from_degrees(-90 + 360 * (1 - ratio)) * (origin.w() + origin.h()),
+					origin.get_center() + vec2::from_degrees(-90 + 360 * (1 - ratio)) * (origin.w() + origin.h()),
 					origin.get_center(),
 					origin
 				);

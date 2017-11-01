@@ -96,7 +96,7 @@ public:
 		auto new_particle = templates[rng.randval(0u, static_cast<unsigned>(templates.size()) - 1)];
 		
 		const auto velocity_degrees = basic_velocity_degrees + angular_offset + rng.randval(spread);
-		const auto new_velocity = vec2().set_from_degrees(velocity_degrees) * rng.randval(speed);
+		const auto new_velocity = vec2::from_degrees(velocity_degrees) * rng.randval(speed);
 		
 		new_particle.set_velocity(new_velocity);
 		new_particle.set_position(position);
@@ -114,7 +114,7 @@ public:
 
 		if (emission.randomize_acceleration) {
 			new_particle.set_acceleration(
-				vec2().set_from_degrees(
+				vec2::from_degrees(
 					rng.randval(spread) + basic_velocity_degrees
 				) * rng.randval(emission.acceleration)
 			);

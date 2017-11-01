@@ -72,6 +72,10 @@ set(STATICALLY_ALLOCATE_ASSETS "1" CACHE STRING "Statically allocate assets usin
 
 set(BUILD_IN_CONSOLE_MODE OFF CACHE STRING "")
 
+if(NOT BUILD_WINDOW_FRAMEWORK)
+	set(BUILD_IN_CONSOLE_MODE 1)
+endif()
+
 if(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE)
 	if (NOT HYPERSOMNIA_RUNTIME_ARCHIVE_DIR)
 		# By default, we set output directory for archives to completely outside of the source tree,

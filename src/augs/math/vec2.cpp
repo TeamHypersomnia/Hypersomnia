@@ -78,7 +78,7 @@ std::vector<vec2> generate_circle_points(
 	const real32 step = (last_angle_in_degrees - starting_angle_in_degrees) / number_of_points;
 
 	for (real32 i = starting_angle_in_degrees; i < last_angle_in_degrees; i += step) {
-		result.push_back(vec2().set_from_degrees(i).set_length(circle_radius) );
+		result.push_back(vec2::from_degrees(i).set_length(circle_radius) );
 	}
 
 	return result;
@@ -130,7 +130,7 @@ vec2 position_rectangle_around_a_circle(
 		{ bottom_bounds[0], bottom_bounds[1] }
 	};
 
-	const vec2 angle_norm = vec2().set_from_degrees(position_at_degrees);
+	const vec2 angle_norm = vec2::from_degrees(position_at_degrees);
 	const vec2 angle = angle_norm * circle_radius;
 
 	static const vec2 quadrant_multipliers[4] = { vec2(-1, -1), vec2(1, -1), vec2(1, 1), vec2(-1, 1), };

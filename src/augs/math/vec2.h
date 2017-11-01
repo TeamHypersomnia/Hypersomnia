@@ -106,24 +106,6 @@ namespace augs {
 		}
 	}
 
-	template <typename T>
-	T get_clamped(const T a, const T min_a, const T max_a) {
-		if (a < min_a) {
-			return min_a;
-		}
-
-		if (a > max_a) {
-			return max_a;
-		}
-
-		return a;
-	}
-
-	template <typename T>
-	void clamp(T& a, const T min_a, const T max_a) {
-		a = get_clamped(a, min_a, max_a);
-	}
-
 	template <class T, class d>
 	basic_vec2<T>& rotate_radians(basic_vec2<T>& v, const basic_vec2<T>& origin, const d angle) {
 		const auto s = static_cast<typename basic_vec2<T>::real>(sin(angle));
@@ -223,6 +205,15 @@ struct basic_vec2 {
 			static_cast<decltype(V::x)>(x), 
 			static_cast<decltype(V::y)>(y) 
 		};
+	}
+
+	static basic_vec2<type> from_degrees(const real degrees) {
+		const auto radians = degrees * DEG_TO_RAD<real>;
+		return { cos(radians), sin(radians) };
+	}
+
+	static basic_vec2<type> from_radians(const real radians) {
+		return { cos(radians), sin(radians) };
 	}
 
 	/* from http://stackoverflow.com/a/1501725 */
@@ -326,17 +317,6 @@ struct basic_vec2 {
 	basic_vec2& set(const v& t) {
 		set(t.x, t.y);
 		return *this;
-	}
-
-	basic_vec2& set_from_degrees(const real degrees) {
-		const auto radians = degrees * DEG_TO_RAD<real>;
-		set(cos(radians), sin(radians));
-		normalize();
-		return *this;
-	}
-
-	basic_vec2& set_from_radians(const real radians) {
-		return set_from_degrees(radians * RAD_TO_DEG<real>);
 	}
 
 	template <typename v>
@@ -601,7 +581,7 @@ namespace std {
 namespace augs {
 	template<class T>
 	T normalize_degrees(const T degrees) {
-		return basic_vec2<T>().set_from_degrees(degrees).degrees();
+		return basic_vec2<T>::from_degrees(degrees).degrees();
 	}
 }
 

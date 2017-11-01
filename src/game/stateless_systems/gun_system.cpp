@@ -186,7 +186,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					{
 						auto rng = cosmos.get_rng_for(round_entity);
 
-						const auto missile_velocity = vec2().set_from_degrees(muzzle_transform.rotation)
+						const auto missile_velocity = vec2::from_degrees(muzzle_transform.rotation)
 							* missile.muzzle_velocity_mult
 							* rng.randval(gun.muzzle_velocity)
 						;
@@ -265,7 +265,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 							{
 								auto rng = cosmos.get_rng_for(round_entity);
 
-								const auto missile_velocity = vec2().set_from_degrees(muzzle_transform.rotation)
+								const auto missile_velocity = vec2::from_degrees(muzzle_transform.rotation)
 									* missile.muzzle_velocity_mult
 									* rng.randval(gun.muzzle_velocity)
 								;
@@ -300,7 +300,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 							shell_entity.set_logic_transform(step, shell_transform);
 
-							shell_entity.get<components::rigid_body>().set_velocity(vec2().set_from_degrees(muzzle_transform.rotation + spread_component).set_length(rng.randval(gun.shell_velocity)));
+							shell_entity.get<components::rigid_body>().set_velocity(vec2::from_degrees(muzzle_transform.rotation + spread_component).set_length(rng.randval(gun.shell_velocity)));
 							response.spawned_shell = shell_entity;
 
 							shell_entity.add_standard_components(step);

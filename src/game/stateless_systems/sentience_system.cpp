@@ -311,7 +311,7 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 
 		subject.get<components::rigid_body>().apply_impulse(
 			h.impact_velocity.set_length(850) 
-			//vec2().set_from_degrees(subject_transform.rotation) * 70
+			//vec2::from_degrees(subject_transform.rotation) * 70
 		);
 
 

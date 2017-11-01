@@ -178,8 +178,8 @@ namespace augs {
 		ensure(size.x >= side);
 		ensure(size.y >= side);
 
-		const auto angle_start = vec2().set_from_degrees(in.angle_start);
-		const auto angle_end = vec2().set_from_degrees(in.angle_end);
+		const auto angle_start = vec2::from_degrees(in.angle_start);
+		const auto angle_end = vec2::from_degrees(in.angle_end);
 
 		const auto pp = [&](
 			const unsigned x, 

@@ -52,7 +52,7 @@ struct basic_randomization {
 		const T min_radius,
 		const T max_radius
 	) {
-		return randval(min_radius, max_radius) * vec2().set_from_degrees(
+		return randval(min_radius, max_radius) * vec2::from_degrees(
 			randval(
 				static_cast<T>(0), 
 				static_cast<T>(360)

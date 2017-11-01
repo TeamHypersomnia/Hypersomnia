@@ -128,7 +128,7 @@ float rotation_copying_system::resolve_rotation_copying_value(const const_entity
 				}
 				else if (subject_item.has<components::hand_fuse>()) {
 					auto throwable_transform = subject_item.get_logic_transform();
-					auto throwable_target_vector = throwable_transform.pos + vec2().set_from_degrees(throwable_transform.rotation);
+					auto throwable_target_vector = throwable_transform.pos + vec2::from_degrees(throwable_transform.rotation);
 
 					const auto mc = subject_transform.pos;
 

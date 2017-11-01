@@ -163,7 +163,7 @@ augs::vertex_triangle_buffer draw_circular_bars_and_get_textual_info(const draw_
 				
 				const vec2i screen_space_circle_center = camera[transform.pos];
 				const auto text_pos = screen_space_circle_center + position_rectangle_around_a_circle(radius + 6.f, bbox, info.angle) - bbox / 2;
-				//health_points.pos = screen_space_circle_center + vec2().set_from_degrees(in.angle).set_length(circle_displacement_length);
+				//health_points.pos = screen_space_circle_center + vec2::from_degrees(in.angle).set_length(circle_displacement_length);
 
 				augs::gui::text::print_stroked(
 					augs::drawer { circular_bars_information },

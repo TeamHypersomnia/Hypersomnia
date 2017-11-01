@@ -30,7 +30,7 @@ void release_or_throw_fused_object(
 	const auto delta = step.get_delta();
 	const auto thrower = cosmos[thrower_id];
 	const auto thrower_transform = thrower.get_logic_transform();
-	//const auto thrower_orientation = vec2().set_from_degrees(thrower_transform.rotation);
+	//const auto thrower_orientation = vec2::from_degrees(thrower_transform.rotation);
 	
 	// LOG("throrot: %x", thrower_transform.rotation);
 	auto& fuse = fused_entity.get<components::hand_fuse>();
@@ -77,7 +77,7 @@ void release_or_throw_fused_object(
 			rigid_body.set_velocity({ 0.f, 0.f });
 			rigid_body.set_angular_velocity(0.f);
 			rigid_body.apply_angular_impulse(1.5f * rigid_body.get_mass());
-			rigid_body.apply_impulse(vec2().set_from_degrees(fused_entity.get_logic_transform().rotation) * 5000 * rigid_body.get_mass());
+			rigid_body.apply_impulse(vec2::from_degrees(fused_entity.get_logic_transform().rotation) * 5000 * rigid_body.get_mass());
 			rigid_body.set_bullet_body(true);
 			rigid_body.set_linear_damping(3.0f);
 

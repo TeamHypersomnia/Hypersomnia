@@ -184,17 +184,17 @@ void particles_simulation_system::advance_visible_streams_and_all_particles(
 				instance.swing_spread += rng.randval(-instance.swing_spread_change, instance.swing_spread_change);
 
 				if (instance.max_swing_spread > 0) {
-					augs::clamp(instance.swing_spread, instance.min_swing_spread, instance.max_swing_spread);
+					instance.swing_spread = std::clamp(instance.swing_spread, instance.min_swing_spread, instance.max_swing_spread);
 				}
 				if (instance.max_swings_per_sec > 0) {
-					augs::clamp(instance.swings_per_sec, instance.min_swings_per_sec, instance.max_swings_per_sec);
+					instance.swings_per_sec = std::clamp(instance.swings_per_sec, instance.min_swings_per_sec, instance.max_swings_per_sec);
 				}
 
 				const int to_spawn = static_cast<int>(std::floor(instance.stream_particles_to_spawn));
 
 				const auto segment_length = existence.distribute_within_segment_of_length;
-				const vec2 segment_A = transform.pos + vec2().set_from_degrees(transform.rotation + 90).set_length(segment_length / 2);
-				const vec2 segment_B = transform.pos - vec2().set_from_degrees(transform.rotation + 90).set_length(segment_length / 2);
+				const vec2 segment_A = transform.pos + vec2::from_degrees(transform.rotation + 90).set_length(segment_length / 2);
+				const vec2 segment_B = transform.pos - vec2::from_degrees(transform.rotation + 90).set_length(segment_length / 2);
 				
 				const auto homing_target_pos = cosmos[emission.homing_target].alive() ? cosmos[emission.homing_target].get_viewing_transform(interp).pos : vec2();
 

@@ -69,7 +69,7 @@ float physics_system::get_closest_wall_intersection(
 		const auto out = ray_cast_px(
 			si,
 			position, 
-			position + vec2().set_from_degrees((360.f / ray_amount) * i) * radius, 
+			position + vec2::from_degrees((360.f / ray_amount) * i) * radius, 
 			filter, 
 			ignore_entity
 		);
@@ -101,7 +101,7 @@ vec2 physics_system::push_away_from_walls(
 		const auto out = ray_cast_px(
 			si,
 			position, 
-			position + vec2().set_from_degrees((360.f / ray_amount) * i) * radius, 
+			position + vec2::from_degrees((360.f / ray_amount) * i) * radius, 
 			filter, 
 			ignore_entity
 		);

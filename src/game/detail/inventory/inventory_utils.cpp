@@ -647,7 +647,7 @@ void perform_transfer(
 		rigid_body.set_angular_velocity(0.f);
 
 		if (r.impulse_applied_on_drop > 0.f) {
-			const auto impulse = vec2().set_from_degrees(previous_container_transform.rotation) * r.impulse_applied_on_drop;
+			const auto impulse = vec2::from_degrees(previous_container_transform.rotation) * r.impulse_applied_on_drop;
 			rigid_body.apply_impulse(impulse * rigid_body.get_mass());
 		}
 
