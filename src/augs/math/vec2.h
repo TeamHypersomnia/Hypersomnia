@@ -209,11 +209,11 @@ struct basic_vec2 {
 
 	static basic_vec2<type> from_degrees(const real degrees) {
 		const auto radians = degrees * DEG_TO_RAD<real>;
-		return { cos(radians), sin(radians) };
+		return { static_cast<type>(cos(radians)), static_cast<type>(sin(radians)) };
 	}
 
 	static basic_vec2<type> from_radians(const real radians) {
-		return { cos(radians), sin(radians) };
+		return { static_cast<type>(cos(radians)), static_cast<type>(sin(radians)) };
 	}
 
 	/* from http://stackoverflow.com/a/1501725 */
