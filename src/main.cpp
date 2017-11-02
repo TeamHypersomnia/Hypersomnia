@@ -207,7 +207,21 @@ int work(const int argc, const char* const * const argv) try {
 	static loaded_sounds game_sounds;
 	static game_images_in_atlas_map game_atlas_entries;
 	static necessary_images_in_atlas necessary_atlas_entries;
+	
+#if STATICALLY_ALLOCATE_BAKED_FONTS
 	static augs::baked_font gui_font;
+
+	static auto get_gui_font = []() -> augs::baked_font& {
+		return gui_font;
+	};
+#else
+	static auto gui_font = std::make_unique<augs::baked_font>();
+
+	static auto get_gui_font = []() -> augs::baked_font& {
+		return *gui_font;
+	};
+#endif
+	
 	static std::optional<augs::graphics::texture> game_world_atlas;
 
 	static audiovisual_state audiovisuals;
@@ -306,7 +320,7 @@ int work(const int argc, const char* const * const argv) try {
 					},
 					game_atlas_entries,
 					necessary_atlas_entries,
-					gui_font
+					get_gui_font()
 				}));
 			}
 		}
@@ -418,14 +432,14 @@ int work(const int argc, const char* const * const argv) try {
 			get_viewable_defs().game_image_metas,
 			game_atlas_entries,
 			necessary_atlas_entries,
-			gui_font
+			get_gui_font()
 		};
 	};
 
 	static auto create_menu_context_deps = [](const auto& viewing_config) {
 		return menu_context_dependencies{
 			necessary_atlas_entries,
-			gui_font,
+			get_gui_font(),
 			sounds,
 			viewing_config.audio_volume
 		};
@@ -1224,7 +1238,7 @@ int work(const int argc, const char* const * const argv) try {
 		};
 
 		auto get_gui_text_style = [&]() {
-			return augs::gui::text::style { gui_font, cyan };
+			return augs::gui::text::style { get_gui_font(), cyan };
 		};
 
 		const auto interpolation_ratio = visit_current_setup([](auto& setup) {
@@ -1285,7 +1299,7 @@ int work(const int argc, const char* const * const argv) try {
 					audiovisuals,
 					viewing_config.drawing,
 					necessary_atlas_entries,
-					gui_font,
+					get_gui_font(),
 					game_atlas_entries,
 					screen_size,
 					interpolation_ratio,
@@ -1403,7 +1417,7 @@ int work(const int argc, const char* const * const argv) try {
 				main_menu.value().draw_overlays(
 					get_drawer(),
 					necessary_atlas_entries,
-					gui_font,
+					get_gui_font(),
 					screen_size
 				);
 
@@ -1448,7 +1462,7 @@ int work(const int argc, const char* const * const argv) try {
 		if (viewing_config.session.show_developer_console) {
 			draw_debug_details(
 				get_drawer(),
-				gui_font,
+				get_gui_font(),
 				screen_size,
 				viewed_character,
 				profiler,

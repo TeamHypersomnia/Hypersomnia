@@ -69,6 +69,7 @@ set(HYPERSOMNIA_LOCAL_FILES_DIR "cache/usr/")
 set(STATICALLY_ALLOCATE_ENTITIES_NUM "5000" CACHE STRING "Statically allocate entities in cosmos class")
 
 set(STATICALLY_ALLOCATE_ASSETS "1" CACHE STRING "Statically allocate assets using container_sizes.h")
+set(STATICALLY_ALLOCATE_BAKED_FONTS "1" CACHE STRING "Statically allocate fonts for faster rendering. One font weights 3 MB.")
 
 set(BUILD_IN_CONSOLE_MODE OFF CACHE STRING "")
 
@@ -911,6 +912,10 @@ endif()
 
 if(STATICALLY_ALLOCATE_ASSETS)
 	add_definitions(-DSTATICALLY_ALLOCATE_ASSETS=${STATICALLY_ALLOCATE_ASSETS})
+endif()
+
+if(STATICALLY_ALLOCATE_BAKED_FONTS)
+	add_definitions(-DSTATICALLY_ALLOCATE_BAKED_FONTS=${STATICALLY_ALLOCATE_BAKED_FONTS})
 endif()
 
 if(BUILD_IN_CONSOLE_MODE)
