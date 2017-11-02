@@ -30,7 +30,7 @@ notifications:
 before_build:
   - mkdir dev
   - cd dev
-  - cmake -DBUILD_IN_CONSOLE_MODE=1 ..
+  - cmake -G "Visual Studio 15 2017 Win64" -DBUILD_IN_CONSOLE_MODE=1 ..
 
 test_script:
   - ps: 'cd ../hypersomnia'
