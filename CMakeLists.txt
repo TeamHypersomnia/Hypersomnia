@@ -588,6 +588,7 @@ add_custom_command(
 	OUTPUT ${GENERATED_INTROSPECTORS_HEADER}
 	COMMAND Introspector-generator ${INTROSPECTOR_GENERATOR_INPUT_CONFIG_PATH}
 	COMMENT "Generating type information for introspection..."
+	DEPENDS ${HYPERSOMNIA_HEADERS_WITH_INTROSPECTED_CLASSES}
 )
 
 # Before Hypersomnia builds,
