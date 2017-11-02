@@ -471,6 +471,10 @@ int work(const int argc, const char* const * const argv) try {
 				}
 			});
 
+			on_specific_setup([&](main_menu_setup& setup) {
+				should = false;
+			});
+
 			if (!should) {
 				return false;
 			}

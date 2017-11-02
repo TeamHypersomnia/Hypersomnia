@@ -29,20 +29,24 @@ script:
   - cd dev
   # - We don't need to allocate entities statically for performance as this is just a test.
   # - We don't need to archive builds, either.
-  - cmake -DUNIX=ON -DCMAKE_CXX_FLAGS="-m64" -DCMAKE_C_FLAGS="-m64" -DCMAKE_BUILD_TYPE=Debug -DADD_MCMODEL_LARGE_FLAG=OFF -DHYPERSOMNIA_BARE=ON -DSTATICALLY_ALLOCATE_ENTITIES_NUM=0 -DSTATICALLY_ALLOCATE_ASSETS=0 -DSTATICALLY_ALLOCATE_BAKED_FONTS=0 -DBUILD_IN_CONSOLE_MODE=1 -DBUILD_HTTP_REQUESTS=OFF -DADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE=OFF -D CMAKE_C_COMPILER=gcc-7 -D CMAKE_CXX_COMPILER=g++-7 ..
-  - make --keep-going
+  - cmake -DUNIX=ON -DCMAKE_CXX_FLAGS="-m64" -DCMAKE_C_FLAGS="-m64" -DCMAKE_BUILD_TYPE=${config} -DADD_MCMODEL_LARGE_FLAG=OFF -DHYPERSOMNIA_BARE=ON -DSTATICALLY_ALLOCATE_ENTITIES_NUM=0 -DSTATICALLY_ALLOCATE_ASSETS=0 -DSTATICALLY_ALLOCATE_BAKED_FONTS=0 -DBUILD_IN_CONSOLE_MODE=1 -DBUILD_HTTP_REQUESTS=OFF -DADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE=OFF -D CMAKE_C_COMPILER=gcc-7 -D CMAKE_CXX_COMPILER=g++-7 ..
+  - make -j2 --keep-going
   - cd ../hypersomnia
   - |
     if [[ "${config}" == "Debug" ]]; then 
-      ../dev/Hypersomnia-Debug --unit-tests-only
+      EXECUTABLE_NAME = Hypersomnia-Debug
     else
-      ../dev/Hypersomnia --unit-tests-only
+      EXECUTABLE_NAME = Hypersomnia
     fi
+    
+    echo '/tmp/core_%e' | sudo tee /proc/sys/kernel/core_pattern
+    ../dev/${EXECUTABLE_NAME} --unit-tests-only
 
 after_failure:
+  - dir
   - cd ../
   - echo $PWD
-  - COREFILE=$(find . -maxdepth 1 -name "core*" | head -n 1) # find core file
+  - COREFILE='/tmp/core_${EXECUTABLE_NAME}'
   - |
     if [[ -f "$COREFILE" ]]; then 
       gdb -c "$COREFILE" example -ex "thread apply all bt" -ex "set pagination 0" -batch; 
