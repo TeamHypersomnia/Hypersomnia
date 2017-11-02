@@ -42,14 +42,16 @@ void load_test_scene_particle_effects(
 		50.0f
 	);
 
+	auto default_bounds = [](particles_emission& em) {
+		em.swings_per_sec_bound = { { 0.15f, 0.25f },{ 0.30f, 0.50f } };
+		em.swing_spread_bound = { { 0.5f, 1.0f },{ 5.0f, 6.0f } };
+	};
+
 	{
 		auto& effect = manager[assets::particle_effect_id::WANDERING_SMOKE];
 
 		particles_emission em;
-		em.min_swing_spread.set(0.5, 1);
-		em.min_swings_per_sec.set(0.3 / 2, 0.5 / 2);
-		em.max_swing_spread.set(10 / 2, 10 / 2);
-		em.max_swings_per_sec.set(0.3 / 2, 0.5 / 2);
+		default_bounds(em);
 
 		em.swing_spread.set(0, 0);
 		em.swings_per_sec.set(0.3 / 2, 0.5 / 2);
@@ -89,10 +91,7 @@ void load_test_scene_particle_effects(
 
 		{
 			particles_emission em;
-			em.min_swing_spread.set(0.5, 1);
-			em.min_swings_per_sec.set(0.3 / 2, 0.5 / 2);
-			em.max_swing_spread.set(10 / 2, 10 / 2);
-			em.max_swings_per_sec.set(0.3 / 2, 0.5 / 2);
+			default_bounds(em);
 
 			em.swing_spread.set(0, 0);
 			em.swings_per_sec.set(0.3 / 2, 0.5 / 2);
@@ -175,11 +174,8 @@ void load_test_scene_particle_effects(
 		auto& effect = manager[assets::particle_effect_id::MUZZLE_SMOKE];
 
 		{
-			particles_emission em;
-			em.min_swing_spread.set(2.3, 2.5);
-			em.min_swings_per_sec.set(3.3, 3.5);
-			em.max_swing_spread.set(10, 20);
-			em.max_swings_per_sec.set(1.3, 1.5);
+			particles_emission em; 
+			default_bounds(em);
 
 			em.swing_spread.set(10, 20);
 			em.swings_per_sec.set(1.3, 1.5);
@@ -219,10 +215,7 @@ void load_test_scene_particle_effects(
 
 		{
 			particles_emission em;
-			em.min_swing_spread.set(0.5, 1);
-			em.min_swings_per_sec.set(0.3 / 2, 0.5 / 2);
-			em.max_swing_spread.set(10 / 2, 10 / 2);
-			em.max_swings_per_sec.set(0.3 / 2, 0.5 / 2);
+			default_bounds(em);
 
 			em.swing_spread.set(0, 0);
 			em.swings_per_sec.set(0.3 / 2, 0.5 / 2);
@@ -263,10 +256,7 @@ void load_test_scene_particle_effects(
 		auto& effect = manager[assets::particle_effect_id::CAST_CHARGING];
 
 		particles_emission em;
-		em.min_swing_spread.set(0.5, 1);
-		em.min_swings_per_sec.set(0.3 / 2, 0.5 / 2);
-		em.max_swing_spread.set(10 / 2, 10 / 2);
-		em.max_swings_per_sec.set(0.3 / 2, 0.5 / 2);
+		default_bounds(em);
 
 		em.swing_spread.set(0, 0);
 		em.swings_per_sec.set(0.3 / 2, 0.5 / 2);
@@ -361,10 +351,7 @@ void load_test_scene_particle_effects(
 
 		{
 			particles_emission em;
-			em.min_swing_spread.set(0.5, 1);
-			em.min_swings_per_sec.set(0.3 / 2, 0.5 / 2);
-			em.max_swing_spread.set(10 / 2, 10 / 2);
-			em.max_swings_per_sec.set(0.3 / 2, 0.5 / 2);
+			default_bounds(em);
 
 			em.swing_spread.set(0, 0);
 			em.swings_per_sec.set(0.3 / 2, 0.5 / 2);
@@ -430,10 +417,7 @@ void load_test_scene_particle_effects(
 		}
 
 		particles_emission em;
-		em.min_swing_spread.set(0.5, 1);
-		em.min_swings_per_sec.set(0.3 / 2, 0.5 / 2);
-		em.max_swing_spread.set(10 / 2, 10 / 2);
-		em.max_swings_per_sec.set(0.3 / 2, 0.5 / 2);
+		default_bounds(em);
 
 		em.swing_spread.set(0, 0);
 		em.swings_per_sec.set(0.3 / 2, 0.5 / 2);
@@ -476,10 +460,7 @@ void load_test_scene_particle_effects(
 
 		{
 			particles_emission em;
-			em.min_swing_spread.set(0.5, 1);
-			em.min_swings_per_sec.set(0.3 / 2, 0.5 / 2);
-			em.max_swing_spread.set(10 / 2, 10 / 2);
-			em.max_swings_per_sec.set(0.3 / 2, 0.5 / 2);
+			default_bounds(em);
 
 			em.swing_spread.set(0, 0);
 			em.swings_per_sec.set(0.3 / 2, 0.5 / 2);
@@ -517,10 +498,7 @@ void load_test_scene_particle_effects(
 
 		{
 			particles_emission em;
-			em.min_swing_spread.set(0.5, 1);
-			em.min_swings_per_sec.set(0.3 / 2, 0.5 / 2);
-			em.max_swing_spread.set(10 / 2, 10 / 2);
-			em.max_swings_per_sec.set(0.3 / 2, 0.5 / 2);
+			default_bounds(em);
 
 			em.swing_spread.set(0, 0);
 			em.swings_per_sec.set(0.3 / 2, 0.5 / 2);
@@ -606,10 +584,7 @@ void load_test_scene_particle_effects(
 
 		{
 			particles_emission em;
-			em.min_swing_spread.set(0.5, 1);
-			em.min_swings_per_sec.set(0.3 / 2, 0.5 / 2);
-			em.max_swing_spread.set(10 / 2, 10 / 2);
-			em.max_swings_per_sec.set(0.3 / 2, 0.5 / 2);
+			default_bounds(em);
 
 			em.swing_spread.set(0, 0);
 			em.swings_per_sec.set(0.3 / 2, 0.5 / 2);
@@ -651,10 +626,7 @@ void load_test_scene_particle_effects(
 		
 		{
 			particles_emission em;
-			em.min_swing_spread.set(0.5, 1);
-			em.min_swings_per_sec.set(0.3 / 2, 0.5 / 2);
-			em.max_swing_spread.set(10 / 2, 10 / 2);
-			em.max_swings_per_sec.set(0.3 / 2, 0.5 / 2);
+			default_bounds(em);
 
 			em.swing_spread.set(0, 0);
 			em.swings_per_sec.set(0.3 / 2, 0.5 / 2);
@@ -740,10 +712,7 @@ void load_test_scene_particle_effects(
 
 		{
 			particles_emission em;
-			em.min_swing_spread.set(0.5, 1);
-			em.min_swings_per_sec.set(0.3 / 2, 0.5 / 2);
-			em.max_swing_spread.set(10 / 2, 10 / 2);
-			em.max_swings_per_sec.set(0.3 / 2, 0.5 / 2);
+			default_bounds(em);
 
 			em.swing_spread.set(0, 0);
 			em.swings_per_sec.set(0.3 / 2, 0.5 / 2);
@@ -839,10 +808,7 @@ void load_test_scene_particle_effects(
 
 		{
 			particles_emission em;
-			em.min_swing_spread.set(0.5, 1);
-			em.min_swings_per_sec.set(0.3 / 2, 0.5 / 2);
-			em.max_swing_spread.set(10 / 2, 10 / 2);
-			em.max_swings_per_sec.set(0.3 / 2, 0.5 / 2);
+			default_bounds(em);
 
 			em.swing_spread.set(0, 0);
 			em.swings_per_sec.set(0.3 / 2, 0.5 / 2);
@@ -1018,10 +984,7 @@ void load_test_scene_particle_effects(
 		em.rotation_speed = std::make_pair(1.8, 1.8);
 		em.particle_lifetime_ms = std::make_pair(4000, 4000);
 
-		em.min_swing_spread = std::make_pair(2, 5);
-		em.min_swings_per_sec = std::make_pair(0.5, 1);
-		em.max_swing_spread = std::make_pair(6, 12);
-		em.max_swings_per_sec = std::make_pair(1.5, 4);
+		default_bounds(em);
 		em.swing_spread = std::make_pair(5, 52);
 		em.swings_per_sec = std::make_pair(2, 8);
 		em.swing_spread_change_rate = std::make_pair(1, 4);

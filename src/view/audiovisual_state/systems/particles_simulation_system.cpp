@@ -134,10 +134,8 @@ void particles_simulation_system::advance_visible_streams_and_all_particles(
 				new_emission_instance.swing_spread = rng.randval(emission.swing_spread);
 				new_emission_instance.swings_per_sec = rng.randval(emission.swings_per_sec);
 
-				new_emission_instance.min_swing_spread = rng.randval(emission.min_swing_spread);
-				new_emission_instance.min_swings_per_sec = rng.randval(emission.min_swings_per_sec);
-				new_emission_instance.max_swing_spread = rng.randval(emission.max_swing_spread);
-				new_emission_instance.max_swings_per_sec = rng.randval(emission.max_swings_per_sec);
+				new_emission_instance.swing_spread_bound = rng.randval(emission.swing_spread_bound);
+				new_emission_instance.swings_per_sec_bound = rng.randval(emission.swings_per_sec_bound);
 
 				new_emission_instance.stream_max_lifetime_ms = rng.randval(emission.stream_lifetime_ms);
 				new_emission_instance.stream_particles_to_spawn = rng.randval(emission.num_of_particles_to_spawn_initially);
@@ -183,11 +181,15 @@ void particles_simulation_system::advance_visible_streams_and_all_particles(
 				instance.swings_per_sec += rng.randval(-instance.swing_speed_change, instance.swing_speed_change);
 				instance.swing_spread += rng.randval(-instance.swing_spread_change, instance.swing_spread_change);
 
-				if (instance.max_swing_spread > 0) {
-					instance.swing_spread = std::clamp(instance.swing_spread, instance.min_swing_spread, instance.max_swing_spread);
+				auto clamp = [](auto& val, const auto bound) {
+					val = std::clamp(val, bound.first, bound.second);
+				};
+
+				if (instance.swing_spread_bound.second > 0) {
+					clamp(instance.swing_spread, instance.swing_spread_bound);
 				}
-				if (instance.max_swings_per_sec > 0) {
-					instance.swings_per_sec = std::clamp(instance.swings_per_sec, instance.min_swings_per_sec, instance.max_swings_per_sec);
+				if (instance.swings_per_sec_bound.second > 0) {
+					clamp(instance.swings_per_sec, instance.swings_per_sec_bound);
 				}
 
 				const int to_spawn = static_cast<int>(std::floor(instance.stream_particles_to_spawn));

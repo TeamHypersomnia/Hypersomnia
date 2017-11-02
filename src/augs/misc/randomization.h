@@ -42,9 +42,19 @@ struct basic_randomization {
 		const float variation_multiplier
 	);
 
-	template<class A, class B>
+	template <class A, class B>
 	auto randval(const std::pair<A, B> p) {
 		return randval(p.first, p.second);
+	}
+
+	template <class A, class B>
+	auto randval(const augs::trivially_copyable_pair<A, B> p) {
+		return randval(p.first, p.second);
+	}
+
+	template<class T>
+	auto randval(const augs::random_bound<T> r) {
+		return augs::minmax<T>(randval(r.first), randval(r.second));
 	}
 
 	template<class T>
@@ -75,11 +85,6 @@ struct basic_randomization {
 			randval(min_a.x, max_a.x), 
 			randval(min_a.y, max_a.y) 
 		};
-	}
-
-	template<class T>
-	T randval(const augs::minmax<T> m) {
-		return randval(m.first, m.second);
 	}
 };
 

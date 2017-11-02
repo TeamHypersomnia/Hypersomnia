@@ -2,6 +2,7 @@
 #include <unordered_map>
 
 #include "augs/misc/timing/delta.h"
+#include "augs/misc/minmax.h"
 
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/transcendental/step_declaration.h"
@@ -18,6 +19,8 @@ class interpolation_system;
 class particles_simulation_system {
 public:
 	struct emission_instance {
+		using minmax = augs::minmax<float>;
+
 		bool enable_streaming = false;
 		pad_bytes<2> pad;
 
@@ -32,10 +35,8 @@ public:
 
 		float swing_spread = 0.f;
 		float swings_per_sec = 0.f;
-		float min_swing_spread = 0.f;
-		float max_swing_spread = 0.f;
-		float min_swings_per_sec = 0.f;
-		float max_swings_per_sec = 0.f;
+		minmax swing_spread_bound = {};
+		minmax swings_per_sec_bound = {};
 		float swing_spread_change = 0.f;
 		float swing_speed_change = 0.f;
 

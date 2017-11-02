@@ -22,6 +22,7 @@ struct particle_effect_modifier;
 
 struct particles_emission {
 	using minmax = augs::minmax<float>;
+	using random_bound = augs::random_bound<float>;
 
 	template <class T>
 	using particle_definitions_container = std::vector<T>;
@@ -48,10 +49,8 @@ struct particles_emission {
 	minmax angular_offset = minmax(0.f, 0.f);
 	minmax swing_spread = minmax(0.f, 0.f);
 	minmax swings_per_sec = minmax(0.f, 0.f);
-	minmax min_swing_spread = minmax(0.f, 0.f);
-	minmax max_swing_spread = minmax(0.f, 0.f);
-	minmax min_swings_per_sec = minmax(0.f, 0.f);
-	minmax max_swings_per_sec = minmax(0.f, 0.f);
+	random_bound swing_spread_bound = { { 0.f, 0.f }, { 0.f, 0.f } };
+	random_bound swings_per_sec_bound = { { 0.f, 0.f }, { 0.f, 0.f } };
 	minmax swing_spread_change_rate = minmax(0.f, 0.f);
 	minmax swing_speed_change_rate = minmax(0.f, 0.f);
 	minmax fade_when_ms_remaining = minmax(0.f, 0.f);
@@ -75,6 +74,7 @@ struct particles_emission {
 
 	tuple_of_particle_definitions_vectors particle_definitions;
 	render_layer target_render_layer = render_layer::INVALID;
+
 	// END GEN INTROSPECTOR
 
 	template <class T>

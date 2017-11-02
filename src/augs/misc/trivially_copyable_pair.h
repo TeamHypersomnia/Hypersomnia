@@ -8,14 +8,15 @@ namespace augs {
 		static_assert(std::is_trivially_copyable_v<A>, "First type is not trivially copyable!");
 		static_assert(std::is_trivially_copyable_v<B>, "Second type is not trivially copyable!");
 
-		typedef std::pair<A, B> pair;
+		using pair = std::pair<A, B>;
 		
 		// GEN INTROSPECTOR class augs::trivially_copyable_pair class A class B
 		A first;
 		B second;
 		// END GEN INTROSPECTOR
 
-		trivially_copyable_pair(const A& a = A(), const B& b = B()) : first(a), second(b) {}
+		trivially_copyable_pair() = default;
+		trivially_copyable_pair(const A& a, const B& b) : first(a), second(b) {}
 		trivially_copyable_pair(const pair& p) : first(p.first), second(p.second) {}
 
 		trivially_copyable_pair& operator=(const pair& p) {
