@@ -43,7 +43,12 @@ after_failure:
   - cd ../
   - echo $PWD
   - COREFILE=$(find . -maxdepth 1 -name "core*" | head -n 1) # find core file
-  - if [[ -f "$COREFILE" ]]; then gdb -c "$COREFILE" example -ex "thread apply all bt" -ex "set pagination 0" -batch; else echo "No core file found" fi
+  - |
+    if [[ -f "$COREFILE" ]]; then 
+      gdb -c "$COREFILE" example -ex "thread apply all bt" -ex "set pagination 0" -batch; 
+    else 
+      echo "No dumped core file found" 
+    fi
 
 notfications:
   email: false
