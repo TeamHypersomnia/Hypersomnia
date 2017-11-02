@@ -95,7 +95,7 @@ namespace augs {
 
 		GL_CHECK(glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_triangle) * buffer.size(), buffer.data(), GL_STREAM_DRAW));
 		GL_CHECK(glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(buffer.size()) * 3));
-		triangles_drawn_total += buffer.size();
+		num_total_triangles_drawn += buffer.size();
 	}
 
 	void renderer::push_triangle(const vertex_triangle& tri) {

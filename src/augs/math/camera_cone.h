@@ -7,8 +7,10 @@ struct basic_camera_cone {
 	using vec2 = basic_vec2<T>;
 	using ltrb = basic_ltrb<T>;
 
+	// GEN INTROSPECTOR struct basic_camera_cone class T
 	basic_transform<T> transform;
 	vec2 visible_world_area;
+	// END GEN INTROSPECTOR
 
 	vec2 operator[](const vec2 pos) const {
 		return pos - transform.pos + visible_world_area / 2;

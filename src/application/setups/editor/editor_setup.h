@@ -304,7 +304,13 @@ public:
 	
 	}
 
-	FORCE_INLINE auto get_camera_panning() const {
-		return (has_current_tab() && is_paused()) ? tab().panning : vec2::zero;
+	FORCE_INLINE std::optional<camera_cone> get_custom_camera() const {
+		if (has_current_tab() && is_paused()) {
+			if (tab().editor_mode_cam.has_value()) {
+				return tab().editor_mode_cam;
+			}
+		}
+
+		return std::nullopt;
 	}
 };

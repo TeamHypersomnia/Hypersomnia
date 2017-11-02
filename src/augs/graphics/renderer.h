@@ -28,7 +28,7 @@ namespace augs {
 		vertex_line_buffer lines;
 		special_buffer specials;
 
-		std::size_t triangles_drawn_total = 0;
+		std::size_t num_total_triangles_drawn = 0;
 
 		bool interpolate_debug_logic_step_lines = true;
 

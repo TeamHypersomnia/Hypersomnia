@@ -416,9 +416,7 @@ void game_gui_system::standard_post_solve(const const_logic_step step) {
 }
 
 void game_gui_system::standard_post_cleanup(const const_logic_step step) {
-	if (const bool any_deletion_occured =
-		step.transient.messages.get_queue<messages::will_soon_be_deleted>().size() > 0
-	) {
+	if (step.any_deletion_occured()) {
 		clear_dead_entities(step.cosm);
 	}
 }

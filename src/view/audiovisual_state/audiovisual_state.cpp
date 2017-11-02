@@ -4,6 +4,7 @@
 #include "game/components/fixtures_component.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/logic_step.h"
+#include "game/detail/visible_entities.h"
 #include "game/transcendental/cosmos.h"
 
 #include "game/messages/health_event.h"
@@ -32,8 +33,6 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 	const auto& cosm = input.viewed_character.get_cosmos();
 	const auto dt = augs::delta(input.frame_delta) *= input.speed_multiplier;
 
-	reserve_caches_for_entities(cosm.get_entity_pool().capacity());
-
 	auto& thunders = get<thunder_system>();
 	auto& exploding_rings = get<exploding_ring_system>();
 	auto& flying_numbers = get<flying_number_indicator_system>();
@@ -52,31 +51,12 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 		auto scope = measure_scope(profiler.interpolation);
 		interp.integrate_interpolated_transforms(input.interpolation, cosm, dt, cosm.get_fixed_delta());
 	}
-	
-	camera.tick(
-		input.screen_size,
-		interp,
-		input.frame_delta,
-		input.camera,
-		viewed_character
-	);
 
 	{
-		{
-			auto scope = measure_scope(profiler.camera_visibility_query);
-			
-			auto queried_camera = get_viewing_camera();
-			queried_camera.visible_world_area += { 100, 100 };
-
-			all_visible.reacquire_all_and_sort({ cosm, queried_camera, false });
-
-			profiler.visible_entities.measure(all_visible.all.size());
-		}
-
 		auto scope = measure_scope(profiler.particle_logic);
 
 		particles.advance_visible_streams_and_all_particles(
-			camera.get_current_cone(),
+			input.cone,
 			cosm,
 			input.particle_effects,
 			dt,
@@ -90,7 +70,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 		auto scope = measure_scope(profiler.wandering_pixels);
 
 		get<wandering_pixels_system>().advance_for(
-			all_visible,
+			input.all_visible,
 			cosm,
 			dt
 		);
@@ -104,7 +84,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 	if (viewed_character.alive()) {
 		auto scope = measure_scope(profiler.sound_logic);
 
-		auto listener_cone = camera.get_current_cone();
+		auto listener_cone = input.cone;
 		listener_cone.transform = viewed_character.get_viewing_transform(interp);
 		
 		sounds.track_new_sound_existences_near_camera(
@@ -406,16 +386,12 @@ void audiovisual_state::standard_post_solve(const const_logic_step step) {
 void audiovisual_state::standard_post_cleanup(const const_logic_step step) {
 	auto scope = measure_scope(profiler.post_cleanup);
 
-	if (const bool any_deletion_occured =
-		step.transient.messages.get_queue<messages::will_soon_be_deleted>().size() > 0
-	) {
+	if (step.any_deletion_occured()) {
 		clear_dead_entities(step.cosm);
 	}
 }
 
 void audiovisual_state::clear_dead_entities(const cosmos& cosmos) {
-	all_visible.clear_dead_entities(cosmos);
-
 	get<sound_system>().clear_dead_entities(cosmos);
 	get<particles_simulation_system>().clear_dead_entities(cosmos);
 	get<wandering_pixels_system>().clear_dead_entities(cosmos);

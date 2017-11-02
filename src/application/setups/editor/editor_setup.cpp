@@ -33,7 +33,7 @@ void editor_setup::set_popup(const editor_popup p) {
 
 void editor_setup::set_locally_viewed(const entity_id id) {
 	work().locally_viewed = id;
-	tab().panning = {};
+	tab().editor_mode_cam = std::nullopt;
 }
 
 std::optional<editor_popup> open_workspace(workspace& work, const workspace_path_op op) {
@@ -513,9 +513,8 @@ void editor_setup::perform_custom_imgui(
 				//text("Tick rate: %x/s", get_viewed_cosmos().get_steps_per_second()));
 				text("Cursor: %x", world_cursor_pos);
 				
-				if (get_camera_panning().non_zero()) {
-					text("Panning: %x", get_camera_panning());
-				}
+				const auto printed_camera = get_custom_camera() ? *get_custom_camera() : current_cone;
+				text("View center: %x", printed_camera.transform.pos);
 
 				text("Total entities: %x/%x",
 					get_viewed_cosmos().get_entities_count(),
@@ -915,10 +914,24 @@ bool editor_setup::handle_unfetched_window_input(
 	using namespace augs::event::keys;
 
 	if (player_paused) {
+		if (e.msg == message::wheel) {
+			if (has_current_tab()) {
+				if (!tab().editor_mode_cam.has_value()) {
+					tab().editor_mode_cam = current_cone;
+				}
+
+				tab().editor_mode_cam->visible_world_area -= e.data.scroll.amount * 100;
+			}
+		}
+
 		if (e.msg == message::mousemotion) {
 			if (common_input_state[key::RMOUSE]) {
 				if (has_current_tab()) {
-					tab().panning -= vec2i(e.data.mouse.rel) * settings.camera_panning_speed;
+					if (!tab().editor_mode_cam.has_value()) {
+						tab().editor_mode_cam = current_cone;
+					}
+
+					tab().editor_mode_cam->transform.pos -= vec2i(e.data.mouse.rel) * settings.camera_panning_speed;
 
 					return true;
 				}
@@ -1016,7 +1029,7 @@ bool editor_setup::handle_unfetched_window_input(
 
 		if (e.was_pressed(key::HOME)) {
 			if (has_current_tab()) {
-				tab().panning = {};
+				tab().editor_mode_cam = std::nullopt;
 
 				return true;
 			}

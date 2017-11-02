@@ -1,5 +1,6 @@
 #include "game/transcendental/logic_step.h"
 #include "game/transcendental/cosmos.h"
+#include "game/messages/will_soon_be_deleted.h"
 
 template<bool C>
 basic_logic_step<C>::basic_logic_step(
@@ -26,6 +27,11 @@ typename basic_logic_step<C>::cosmos_ref basic_logic_step<C>::get_cosmos() const
 template<bool C>
 basic_logic_step<C>::operator const_logic_step() const {
 	return { cosm, input, transient };
+}
+
+template<bool C>
+bool basic_logic_step<C>::any_deletion_occured() const {
+	return transient.messages.get_queue<messages::will_soon_be_deleted>().size() > 0;
 }
 
 template struct basic_logic_step<false>;

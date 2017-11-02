@@ -31,4 +31,5 @@ struct basic_logic_step {
 	augs::delta get_delta() const;
 
 	operator const_logic_step() const;
+	bool any_deletion_occured() const;
 };

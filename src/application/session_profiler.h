@@ -11,7 +11,9 @@ public:
 	augs::time_measurements local_entropy;
 	augs::time_measurements reloading_viewables;
 	augs::time_measurements determining_viewables_to_preload;
-	augs::amount_measurements<std::size_t> triangles;
+	augs::time_measurements camera_visibility_query;
+	augs::amount_measurements<std::size_t> num_visible_entities;
+	augs::amount_measurements<std::size_t> num_triangles;
 	// END GEN INTROSPECTOR
 };
 

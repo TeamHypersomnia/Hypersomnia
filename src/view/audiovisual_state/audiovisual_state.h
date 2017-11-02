@@ -1,5 +1,6 @@
 #pragma once
 #include "augs/entity_system/storage_for_systems.h"
+#include "augs/math/camera_cone.h"
 
 #include "game/transcendental/step_declaration.h"
 #include "game/transcendental/entity_id.h"
@@ -13,7 +14,6 @@
 #include "view/game_gui/elements/character_gui.h"
 #include "view/game_gui/elements/item_button.h"
 #include "view/game_gui/elements/slot_button.h"
-#include "view/audiovisual_state/world_camera.h"
 
 #include "augs/audio/audio_settings.h"
 #include "view/audiovisual_state/systems/interpolation_settings.h"
@@ -29,13 +29,14 @@ struct audiovisual_advance_input {
 	const double speed_multiplier;
 
 	const const_entity_handle viewed_character;
+	const camera_cone cone;
+	const visible_entities& all_visible;
 	const vec2i screen_size;
 	const particle_effects_map& particle_effects;
 
 	const loaded_sounds& sounds;
 	const augs::audio_volume_settings audio_volume;
 	const interpolation_settings interpolation;
-	const world_camera_settings camera;
 
 	// for now just to know whats going on
 	audiovisual_advance_input(
@@ -43,34 +44,34 @@ struct audiovisual_advance_input {
 		const double speed_multiplier,
 
 		const const_entity_handle viewed_character,
+		const camera_cone cone,
+		const visible_entities& all_visible,
+
 		const vec2i screen_size,
 		const particle_effects_map& particle_effects,
 
 		const loaded_sounds& sounds,
 		const augs::audio_volume_settings audio_volume,
-		const interpolation_settings interpolation,
-		const world_camera_settings camera
+		const interpolation_settings interpolation
 	) :
 		frame_delta(frame_delta),
 		speed_multiplier(speed_multiplier),
 
 		viewed_character(viewed_character),
+		cone(cone),
+		all_visible(all_visible),
 		screen_size(screen_size),
 		particle_effects(particle_effects),
 
 		sounds(sounds),
 		audio_volume(audio_volume),
-		interpolation(interpolation),
-		camera(camera)
+		interpolation(interpolation)
 	{
 
 	}
 };
 
 struct audiovisual_state {
-	world_camera camera;
-	visible_entities all_visible;
-	
 	aabb_highlighter world_hover_highlighter;
 	all_audiovisual_systems systems;
 
@@ -90,10 +91,6 @@ struct audiovisual_state {
 		return [this](const const_logic_step step) {
 			standard_post_solve(step);
 		};
-	}
-
-	auto get_viewing_camera() const {
-		return camera.get_current_cone();
 	}
 
 	void advance(const audiovisual_advance_input);

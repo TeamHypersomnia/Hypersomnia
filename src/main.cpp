@@ -33,6 +33,7 @@
 
 #include "view/game_gui/game_gui_system.h"
 
+#include "view/audiovisual_state/world_camera.h"
 #include "view/audiovisual_state/audiovisual_state.h"
 #include "view/rendering_scripts/illuminated_rendering.h"
 
@@ -227,6 +228,7 @@ int work(const int argc, const char* const * const argv) try {
 	
 	static std::optional<augs::graphics::texture> game_world_atlas;
 
+	static world_camera gameplay_camera;
 	static audiovisual_state audiovisuals;
 
 	/*
@@ -471,9 +473,9 @@ int work(const int argc, const char* const * const argv) try {
 				}
 			});
 
-			on_specific_setup([&](main_menu_setup& setup) {
+			if (main_menu.has_value() && !current_setup.has_value()) {
 				should = false;
-			});
+			}
 
 			if (!should) {
 				return false;
@@ -494,13 +496,15 @@ int work(const int argc, const char* const * const argv) try {
 	};
 
 	static auto get_camera = []() {		
-		audiovisuals.camera.panning = visit_current_setup(
+		if(const auto custom = visit_current_setup(
 			[](const auto& setup) { 
-				return setup.get_camera_panning(); 
+				return setup.get_custom_camera(); 
 			}
-		);
+		)) {
+			return *custom;
+		}
 		
-		return audiovisuals.get_viewing_camera();
+		return gameplay_camera.get_current_cone();
 	};
 
 	static auto handle_app_intent = [](const app_intent_type intent) {
@@ -611,25 +615,52 @@ int work(const int argc, const char* const * const argv) try {
 		are separated only because MSVC outputs ICEs if they become nested.
 	*/
 
+	static visible_entities all_visible;
+
 	static auto audiovisual_step = [](
 		const augs::delta frame_delta,
 		const double speed_multiplier,
 		const config_lua_table& viewing_config
 	) {
-		const audiovisual_advance_input in {
+		const auto screen_size = viewing_config.window.get_screen_size();
+		const auto viewed_character = get_viewed_character();
+		
+		audiovisuals.reserve_caches_for_entities(viewed_character.get_cosmos().get_entity_pool().capacity());
+
+		gameplay_camera.tick(
+			screen_size,
+			audiovisuals.systems.get<interpolation_system>(),
+			frame_delta,
+			viewing_config.camera,
+			viewed_character
+		);
+
+		{
+			auto scope = measure_scope(profiler.camera_visibility_query);
+
+			auto queried_camera = get_camera();
+			queried_camera.visible_world_area += { 100, 100 };
+
+			all_visible.reacquire_all_and_sort({ viewed_character.get_cosmos(), queried_camera, false });
+
+			profiler.num_visible_entities.measure(all_visible.all.size());
+		}
+
+		const audiovisual_advance_input in(
 			frame_delta,
 			{ speed_multiplier },
 
 			get_viewed_character(),
+			get_camera(),
+			all_visible,
 
 			viewing_config.window.get_screen_size(),
 			get_viewable_defs().particle_effects,
 			game_sounds,
 
 			viewing_config.audio_volume,
-			viewing_config.interpolation,
-			viewing_config.camera
-		};
+			viewing_config.interpolation
+		);
 
 		audiovisuals.advance(in);
 	};
@@ -642,6 +673,10 @@ int work(const int argc, const char* const * const argv) try {
 	static auto setup_post_cleanup = [](const const_logic_step step) {
 		audiovisuals.standard_post_cleanup(step);
 		game_gui.standard_post_cleanup(step);
+		
+		if (step.any_deletion_occured()) {
+			all_visible.clear_dead_entities(step.cosm);
+		}
 	};
 
 	static auto get_sampled_cosmos = [](auto& setup) {
@@ -682,6 +717,7 @@ int work(const int argc, const char* const * const argv) try {
 			audiovisuals.clear_dead_entities(*now_sampled);
 #endif
 			audiovisuals.clear();
+			all_visible.clear_dead_entities(*now_sampled);
 
 			/* TODO: We need to have one game gui per cosmos. */
 			game_gui.clear_dead_entities(*now_sampled);
@@ -1344,7 +1380,8 @@ int work(const int argc, const char* const * const argv) try {
 					*game_world_atlas,
 					fbos,
 					shaders,
-					get_camera()
+					get_camera(),
+					all_visible
 				},
 				false,
 				[](const const_entity_handle handle) -> std::optional<rgba> { return std::nullopt; },
@@ -1515,8 +1552,8 @@ int work(const int argc, const char* const * const argv) try {
 
 		renderer.call_and_clear_triangles();
 
-		profiler.triangles.measure(renderer.triangles_drawn_total);
-		renderer.triangles_drawn_total = 0u;
+		profiler.num_triangles.measure(renderer.num_total_triangles_drawn);
+		renderer.num_total_triangles_drawn = 0u;
 
 		window.swap_buffers();
 	}

@@ -14,6 +14,7 @@
 #include "game/components/item_slot_transfers_component.h"
 #include "game/components/render_component.h"
 #include "game/debug_drawing_settings.h"
+#include "game/detail/visible_entities.h"
 
 #include "game/components/interpolation_component.h"
 #include "game/components/fixtures_component.h"
@@ -54,6 +55,7 @@ struct illuminated_rendering_input {
 	const illuminated_rendering_fbos& fbos;
 	const illuminated_rendering_shaders& shaders;
 	const camera_cone camera;
+	const visible_entities& all_visible;
 };
 
 template <class B, class H>
@@ -80,7 +82,7 @@ void illuminated_rendering(
 	const auto global_time_seconds = cosmos.get_total_seconds_passed(in.interpolation_ratio);
 	const auto settings = in.drawing;
 	const auto matrix = augs::orthographic_projection(camera.visible_world_area);
-	const auto& visible = in.audiovisuals.all_visible;
+	const auto& visible = in.all_visible;
 	const auto& shaders = in.shaders;
 	const auto& fbos = in.fbos;
 	const auto& necessarys = in.necessary_images;

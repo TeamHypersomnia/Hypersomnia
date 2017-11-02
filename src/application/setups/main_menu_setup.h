@@ -3,6 +3,7 @@
 #include <mutex>
 #include <future>
 #include <string>
+#include <optional>
 
 #include <sol2/sol.hpp>
 
@@ -136,7 +137,7 @@ public:
 		return;
 	}
 
-	auto get_camera_panning() const {
-		return vec2::zero;
+	std::optional<camera_cone> get_custom_camera() const {
+		return std::nullopt;
 	}
 };
