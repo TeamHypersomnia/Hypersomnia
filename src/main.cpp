@@ -123,10 +123,13 @@ int work(const int argc, const char* const * const argv) try {
 
 	static auto lua = augs::create_lua_state();
 
-	static auto config = config_lua_table(lua, augs::switch_path(
-		canon_config_path,
-		local_config_path
-	));
+	static config_lua_table config { 
+		lua, 
+		augs::switch_path(
+			canon_config_path,
+			local_config_path
+		)
+	};
 
 	static auto last_saved_config = config;
 
@@ -173,7 +176,7 @@ int work(const int argc, const char* const * const argv) try {
 	
 	static const auto imgui_atlas = augs::imgui::create_atlas();
 
-	static const auto configurables = configuration_subscribers {
+	static const configuration_subscribers configurables {
 		window,
 		fbos,
 		audio
@@ -227,7 +230,7 @@ int work(const int argc, const char* const * const argv) try {
 	static audiovisual_state audiovisuals;
 
 	/* TODO: We need to have one game gui per cosmos. */
-	static auto game_gui = game_gui_system();
+	static game_gui_system game_gui;
 
 	/*
 		The lambdas that aid to make the main loop code more concise.
@@ -844,7 +847,6 @@ int work(const int argc, const char* const * const argv) try {
 						thus we ask the current setup for its custom IMGUI logic.
 					*/
 
-
 					/* MSVC ICE workaround */
 					auto& _lua = lua;
 					auto& _window = window;
@@ -1456,6 +1458,15 @@ int work(const int argc, const char* const * const argv) try {
 				const auto& character_gui = game_gui.get_character_gui(viewed_character);
 
 				character_gui.draw_cursor_with_information(context, should_draw_our_cursor);
+			}
+			else { 
+				if (should_draw_our_cursor) {
+					on_specific_setup([&](editor_setup& setup) {
+						if (setup.is_paused()) {
+							get_drawer().cursor(necessary_atlas_entries, assets::necessary_image_id::GUI_CURSOR, cursor_drawing_pos, white);
+						}
+					});
+				}
 			}
 		}
 

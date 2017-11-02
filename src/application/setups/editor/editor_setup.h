@@ -295,12 +295,16 @@ public:
 		}
 	}
 
+	bool is_paused() const {
+		return player_paused;
+	}
+
 	template <class F>
 	void for_each_line(F callback) const {
 	
 	}
 
 	FORCE_INLINE auto get_camera_panning() const {
-		return has_current_tab() ? tab().panning : vec2::zero;
+		return (has_current_tab() && is_paused()) ? tab().panning : vec2::zero;
 	}
 };
