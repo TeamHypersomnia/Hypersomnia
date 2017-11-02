@@ -31,7 +31,7 @@ basic_logic_step<C>::operator const_logic_step() const {
 
 template<bool C>
 bool basic_logic_step<C>::any_deletion_occured() const {
-	return transient.messages.get_queue<messages::will_soon_be_deleted>().size() > 0;
+	return transient.messages.template get_queue<messages::will_soon_be_deleted>().size() > 0;
 }
 
 template struct basic_logic_step<false>;
