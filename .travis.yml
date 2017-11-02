@@ -34,9 +34,9 @@ script:
   - cd ../hypersomnia
   - |
     if [[ "${config}" == "Debug" ]]; then 
-      EXECUTABLE_NAME = Hypersomnia-Debug
+      EXECUTABLE_NAME=Hypersomnia-Debug
     else
-      EXECUTABLE_NAME = Hypersomnia
+      EXECUTABLE_NAME=Hypersomnia
     fi
     
     echo '/tmp/core_%e' | sudo tee /proc/sys/kernel/core_pattern
