@@ -15,7 +15,7 @@ namespace augs {
 		B second;
 		// END GEN INTROSPECTOR
 
-		trivially_copyable_pair() = default;
+		trivially_copyable_pair() {};
 		trivially_copyable_pair(const A& a, const B& b) : first(a), second(b) {}
 		trivially_copyable_pair(const pair& p) : first(p.first), second(p.second) {}
 
