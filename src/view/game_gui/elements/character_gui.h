@@ -122,7 +122,7 @@ struct character_gui {
 		const vec2i tooltip_pos
 	) const;
 
-	void draw_cursor_with_information(
+	void draw_cursor_with_tooltip(
 		const viewing_game_gui_context,
 		const bool draw_cursor
 	) const;

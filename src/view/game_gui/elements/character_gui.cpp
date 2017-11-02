@@ -282,7 +282,7 @@ character_gui::hotbar_selection_setup character_gui::get_actual_selection_setup(
 	return output;
 }
 
-void character_gui::draw_cursor_with_information(
+void character_gui::draw_cursor_with_tooltip(
 	const viewing_game_gui_context context,
 	const bool draw_cursor
 ) const {

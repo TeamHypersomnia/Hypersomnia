@@ -138,52 +138,50 @@ bool game_gui_system::control_gui_world(
 	const auto state = context.get_input_state();
 	auto& element = context.get_character_gui();
 
-	if (active) {
-		if (root_entity.has<components::item_slot_transfers>()) {
-			if (const auto held_rect = context.get_if<item_button_in_item>(world.rect_held_by_lmb)) {
-				const auto& item_entity = cosmos[held_rect.get_location().item_id];
-				auto& dragged_charges = element.dragged_charges;
+	if (root_entity.has<components::item_slot_transfers>()) {
+		if (const auto held_rect = context.get_if<item_button_in_item>(world.rect_held_by_lmb)) {
+			const auto& item_entity = cosmos[held_rect.get_location().item_id];
+			auto& dragged_charges = element.dragged_charges;
 
-				if (
-					change.msg == augs::event::message::rdown
-					|| change.msg == augs::event::message::rdoubleclick
-				) {
-					if (world.held_rect_is_dragged) {
-						pending_transfers.push_back(item_slot_transfer_request { item_entity, cosmos[inventory_slot_id()], dragged_charges });
-						return true;
-					}
+			if (
+				change.msg == augs::event::message::rdown
+				|| change.msg == augs::event::message::rdoubleclick
+			) {
+				if (world.held_rect_is_dragged) {
+					pending_transfers.push_back(item_slot_transfer_request { item_entity, cosmos[inventory_slot_id()], dragged_charges });
+					return true;
 				}
+			}
 
-				if (change.msg == augs::event::message::wheel) {
-					const auto& item = item_entity.get<components::item>();
+			if (change.msg == augs::event::message::wheel) {
+				const auto& item = item_entity.get<components::item>();
 
-					const auto delta = change.data.scroll.amount;
+				const auto delta = change.data.scroll.amount;
 
-					dragged_charges += delta;
+				dragged_charges += delta;
 
-					if (dragged_charges <= 0) {
-						dragged_charges = item.charges + dragged_charges;
-					}
-					if (dragged_charges > item.charges) {
-						dragged_charges = dragged_charges - item.charges;
-					}
+				if (dragged_charges <= 0) {
+					dragged_charges = item.charges + dragged_charges;
+				}
+				if (dragged_charges > item.charges) {
+					dragged_charges = dragged_charges - item.charges;
 				}
 			}
 		}
+	}
 
-		const auto gui_events = world.consume_raw_input_and_generate_gui_events(
-			context,
-			change
-		);
+	const auto gui_events = world.consume_raw_input_and_generate_gui_events(
+		context,
+		change
+	);
 
-		world.respond_to_events(
-			context,
-			gui_events
-		);
+	world.respond_to_events(
+		context,
+		gui_events
+	);
 
-		if (!gui_events.empty()) {
-			return true;
-		}
+	if (!gui_events.empty()) {
+		return true;
 	}
 
 	return false;

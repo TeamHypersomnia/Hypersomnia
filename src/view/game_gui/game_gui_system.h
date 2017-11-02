@@ -31,8 +31,6 @@ public:
 	game_gui_rect_tree tree;
 	game_gui_root root;
 
-	bool active = false;
-
 	game_gui_context create_context(
 		const vec2i screen_size,
 		const augs::event::state input_state,

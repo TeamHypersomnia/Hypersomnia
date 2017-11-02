@@ -6,7 +6,7 @@ return {
     Backspace = "CLEAR_DEBUG_LINES",
     CapsLock = "SWITCH_CHARACTER",
     F = "SWITCH_WEAPON_LASER",
-    MouseButton4 = "SWITCH_GAME_GUI_ACTIVE"
+    MouseButton4 = "SWITCH_GAME_GUI_MODE"
   },
   audio = {
     enable_hrtf = false,

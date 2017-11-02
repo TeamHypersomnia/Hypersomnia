@@ -38,7 +38,7 @@ namespace augs {
 		bool double_click_occured = false;
 		bool clear_window_inputs_once = true;
 
-		bool mouse_position_frozen = false;
+		bool mouse_pos_frozen = false;
 		vec2i last_mouse_pos;
 
 		timer triple_click_timer;
@@ -87,7 +87,8 @@ namespace augs {
 		bool swap_buffers();
 
 		void show();
-		void set_mouse_position_frozen(const bool);
+		void set_mouse_pos_frozen(const bool);
+		bool is_mouse_pos_frozen() const;
 
 		void apply(const window_settings&, const bool force = false);
 		void sync_back_into(window_settings&);

@@ -229,9 +229,6 @@ int work(const int argc, const char* const * const argv) try {
 
 	static audiovisual_state audiovisuals;
 
-	/* TODO: We need to have one game gui per cosmos. */
-	static game_gui_system game_gui;
-
 	/*
 		The lambdas that aid to make the main loop code more concise.
 	*/	
@@ -266,6 +263,10 @@ int work(const int argc, const char* const * const argv) try {
 			}
 		}
 	};
+
+	/* TODO: We need to have one game gui per cosmos. */
+	static game_gui_system game_gui;
+	static bool game_gui_mode = false;
 
 	static session_profiler profiler;
 
@@ -385,7 +386,7 @@ int work(const int argc, const char* const * const argv) try {
 				std::forward<decltype(args)>(args)...
 			);
 
-			game_gui.active = true;
+			game_gui_mode = true;
 		});
 	};
 
@@ -459,6 +460,34 @@ int work(const int argc, const char* const * const argv) try {
 
 		return viewed_cosmos[viewed_character_id];
 	};
+		
+	static auto should_draw_game_gui = []() {
+		{
+			bool should = true;
+
+			on_specific_setup([&](editor_setup& setup) {
+				if (setup.is_paused()) {
+					should = false;
+				}
+			});
+
+			if (!should) {
+				return false;
+			}
+		}
+
+		const auto viewed = get_viewed_character();
+
+		if (!viewed.alive()) {
+			return false;
+		}
+
+		if (!get_viewed_character().has<components::item_slot_transfers>()) {
+			return false;
+		}
+
+		return true;
+	};
 
 	static auto get_camera = []() {		
 		audiovisuals.camera.panning = visit_current_setup(
@@ -498,8 +527,8 @@ int work(const int argc, const char* const * const argv) try {
 				break;
 			}
 
-			case T::SWITCH_GAME_GUI_ACTIVE: {
-				bool& f = game_gui.active;
+			case T::SWITCH_GAME_GUI_MODE: {
+				bool& f = game_gui_mode;
 				f = !f;
 				break;
 			}
@@ -757,11 +786,11 @@ int work(const int argc, const char* const * const argv) try {
 			releases = {};
 
 			if (get_viewed_character().dead()) {
-				game_gui.active = true;
+				game_gui_mode = true;
 			}
 
 			const bool in_direct_gameplay =
-				!game_gui.active
+				!game_gui_mode
 				&& current_setup.has_value()
 				&& !ingame_menu.show
 			;
@@ -830,7 +859,7 @@ int work(const int argc, const char* const * const argv) try {
 
 			configurables.sync_back_into(config);
 
-			window.set_mouse_position_frozen(in_direct_gameplay);
+			window.set_mouse_pos_frozen(in_direct_gameplay);
 
 			perform_imgui_pass(
 				new_window_entropy,
@@ -850,14 +879,14 @@ int work(const int argc, const char* const * const argv) try {
 					/* MSVC ICE workaround */
 					auto& _lua = lua;
 					auto& _window = window;
-					auto& _game_gui = game_gui;
+					
+					const bool in_direct_gameplay = !game_gui_mode;
 
 					visit_current_setup([&](auto& setup) {
 						using T = std::decay_t<decltype(setup)>;
 
 						if constexpr(std::is_same_v<T, editor_setup>) {
 							/* Editor needs more goods */
-							const bool in_direct_gameplay = !_game_gui.active;
 							setup.perform_custom_imgui(_lua, _window, in_direct_gameplay, get_camera());
 						}
 						else {
@@ -963,7 +992,7 @@ int work(const int argc, const char* const * const argv) try {
 
 			/* Maybe the game GUI was deactivated while the button was still hovered */
 
-			else if (!game_gui.active && current_setup.has_value()) {
+			else if (!game_gui_mode && current_setup.has_value()) {
 				game_gui.world.unhover_and_undrag(create_game_gui_context());
 			}
 
@@ -1087,15 +1116,17 @@ int work(const int argc, const char* const * const argv) try {
 							}
 						}
 						if (const auto it = mapped_or_nullptr(viewing_config.game_gui_controls, key)) {
-							game_gui.control_hotbar_and_action_button(viewed_character, { *it, *key_change });
-							
-							if (was_pressed) {
-								continue;
+							if (should_draw_game_gui()) {
+								game_gui.control_hotbar_and_action_button(viewed_character, { *it, *key_change });
+
+								if (was_pressed) {
+									continue;
+								}
 							}
 						}
 						if (const auto it = mapped_or_nullptr(viewing_config.game_controls, key)) {
 							if (
-								const bool leave_it_for_game_gui = e.uses_mouse() && game_gui.active;
+								const bool leave_it_for_game_gui = e.uses_mouse() && game_gui_mode;
 								!leave_it_for_game_gui
 							) {
 								game_intents.push_back({ *it, *key_change });
@@ -1111,13 +1142,13 @@ int work(const int argc, const char* const * const argv) try {
 				if (
 					e.msg == message::mousemotion
 					&& direct_gameplay_or_game_gui
-					&& !game_gui.active
+					&& !game_gui_mode
 				) {
 					game_motions.push_back({ game_motion_type::MOVE_CROSSHAIR, e.data.mouse.rel });
 					continue;
 				}
 
-				if (direct_gameplay_or_game_gui || was_released) {
+				if (should_draw_game_gui() && (direct_gameplay_or_game_gui || was_released)) {
 					if (game_gui.control_gui_world(create_game_gui_context(), e)) {
 						continue;
 					}
@@ -1210,7 +1241,7 @@ int work(const int argc, const char* const * const argv) try {
 
 		const auto viewed_character = get_viewed_character();
 
-		if (viewed_character.alive()) {
+		if (should_draw_game_gui()) {
 			const auto context = create_game_gui_context();
 
 			game_gui.advance(context, frame_delta);
@@ -1371,10 +1402,7 @@ int work(const int argc, const char* const * const argv) try {
 				renderer.frame_lines.clear();
 			}
 
-			if (
-				viewing_config.drawing.draw_character_gui 
-				&& viewed_character.has<components::item_slot_transfers>()
-			) {
+			if (should_draw_game_gui()) {
 				/* #3 */
 				game_gui.world.draw(context);
 			}
@@ -1436,7 +1464,7 @@ int work(const int argc, const char* const * const argv) try {
 		);
 
 		/* #6 */
-		const bool should_draw_our_cursor = viewing_config.window.raw_mouse_input;
+		const bool should_draw_our_cursor = viewing_config.window.raw_mouse_input && !window.is_mouse_pos_frozen();
 
 		{
 			const auto cursor_drawing_pos = common_input_state.mouse.pos;
@@ -1454,12 +1482,12 @@ int work(const int argc, const char* const * const argv) try {
 					get_drawer().cursor(necessary_atlas_entries, menu_chosen_cursor, cursor_drawing_pos, white);
 				}
 			}
-			else if (game_gui.active && viewing_config.drawing.draw_character_gui) {
+			else if (game_gui_mode && should_draw_game_gui()) {
 				const auto& character_gui = game_gui.get_character_gui(viewed_character);
 
-				character_gui.draw_cursor_with_information(context, should_draw_our_cursor);
+				character_gui.draw_cursor_with_tooltip(context, should_draw_our_cursor);
 			}
-			else { 
+			else {
 				if (should_draw_our_cursor) {
 					on_specific_setup([&](editor_setup& setup) {
 						if (setup.is_paused()) {

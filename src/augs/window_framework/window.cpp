@@ -43,7 +43,7 @@ namespace augs {
 		
 		change.data.mouse.rel = motion;
 
-		if (!mouse_position_frozen) {
+		if (!mouse_pos_frozen) {
 			last_mouse_pos += vec2i(change.data.mouse.rel);
 		}
 
@@ -178,7 +178,7 @@ namespace augs {
 			default_proc();
 			break;
 		case WM_MOUSEMOVE:
-			if (!current_settings.raw_mouse_input && !mouse_position_frozen) {
+			if (!current_settings.raw_mouse_input && !mouse_pos_frozen) {
 				basic_vec2<short> new_pos;
 
 				{
@@ -204,7 +204,7 @@ namespace augs {
 			break;
 
 		case WM_INPUT:
-			if (active && (current_settings.raw_mouse_input || mouse_position_frozen)) {
+			if (active && (current_settings.raw_mouse_input || mouse_pos_frozen)) {
 				thread_local BYTE lpb[sizeof(RAWINPUT)];
 				thread_local UINT dwSize = sizeof(RAWINPUT);
 
@@ -399,12 +399,16 @@ namespace augs {
 		ShowWindow(hwnd, SW_SHOW);
 	}
 	
-	void window::set_mouse_position_frozen(const bool flag) {
-		if (mouse_position_frozen && !flag) {
+	void window::set_mouse_pos_frozen(const bool flag) {
+		if (mouse_pos_frozen && !flag) {
 			augs::set_cursor_pos(current_settings.position + last_mouse_pos);
 		}
 
-		mouse_position_frozen = flag;
+		mouse_pos_frozen = flag;
+	}
+	
+	bool window::is_mouse_pos_frozen() const {
+		return mouse_pos_frozen;
 	}
 
 	bool window::set_as_current_impl() {
@@ -603,7 +607,11 @@ namespace augs {
 	bool window::swap_buffers() { return true; }
 
 	void window::show() {}
-	void window::set_mouse_position_frozen(const bool) {}
+	void window::set_mouse_pos_frozen(const bool) {}
+
+	bool window::is_mouse_pos_frozen() const {
+		return false;
+	}
 
 	void window::collect_entropy(local_entropy& into) {}
 
@@ -656,7 +664,11 @@ namespace augs {
 	bool window::swap_buffers() { return true; }
 
 	void window::show() {}
-	void window::set_mouse_position_frozen(const bool) {}
+	void window::set_mouse_pos_frozen(const bool) {}
+	
+	bool window::is_mouse_pos_frozen() const {
+		return false;
+	}
 
 	void window::collect_entropy(local_entropy& into) {}
 
