@@ -183,6 +183,14 @@ void settings_gui_state::perform(
 				break;
 			}
 			case settings_pane::GRAPHICS: {
+				revertable_checkbox("Interpolate frames", config.interpolation.enabled);
+				
+				if (config.interpolation.enabled) {
+					auto scope = scoped_indent();
+
+					revertable_slider("Speed", config.interpolation.speed, 50.f, 1000.f);
+				}
+
 				revertable_checkbox("Highlight hovered world items", config.drawing.draw_aabb_highlighter);
 
 				break;
