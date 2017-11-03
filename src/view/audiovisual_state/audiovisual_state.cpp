@@ -49,11 +49,6 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 	highlights.advance(dt);
 
 	{
-		auto scope = measure_scope(profiler.interpolation);
-		interp.integrate_interpolated_transforms(input.interpolation, cosm, dt, cosm.get_fixed_delta());
-	}
-
-	{
 		auto scope = measure_scope(profiler.particle_logic);
 
 		particles.advance_visible_streams_and_all_particles(

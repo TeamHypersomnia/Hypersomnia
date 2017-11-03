@@ -38,7 +38,6 @@ struct audiovisual_advance_input {
 
 	const loaded_sounds& sounds;
 	const augs::audio_volume_settings audio_volume;
-	const interpolation_settings interpolation;
 
 	// for now just to know whats going on
 	audiovisual_advance_input(
@@ -53,8 +52,7 @@ struct audiovisual_advance_input {
 		const particle_effects_map& particle_effects,
 
 		const loaded_sounds& sounds,
-		const augs::audio_volume_settings audio_volume,
-		const interpolation_settings interpolation
+		const augs::audio_volume_settings audio_volume
 	) :
 		frame_delta(frame_delta),
 		speed_multiplier(speed_multiplier),
@@ -66,8 +64,7 @@ struct audiovisual_advance_input {
 		particle_effects(particle_effects),
 
 		sounds(sounds),
-		audio_volume(audio_volume),
-		interpolation(interpolation)
+		audio_volume(audio_volume)
 	{
 
 	}

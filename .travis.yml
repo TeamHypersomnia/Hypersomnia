@@ -1,5 +1,5 @@
 sudo: true
-dist: trusty
+dist: precise
 language:
   - cpp
 compiler:
@@ -57,18 +57,6 @@ script:
   - sudo bash -c "echo '/tmp/logbt-coredumps/core.%p.%E' > /proc/sys/kernel/core_pattern"
   - RESULT=0
   - ./logbt ../dev/${EXECUTABLE_NAME} --unit-tests-only
-
-after_failure:
-  - cd ../
-  - dir dev
-  - echo $PWD
-  - COREFILE='/tmp/core_${EXECUTABLE_NAME}'
-  - |
-    if [[ -f "$COREFILE" ]]; then 
-      gdb -c "$COREFILE" example -ex "thread apply all bt" -ex "set pagination 0" -batch; 
-    else 
-      echo "No dumped core file found" 
-    fi
 
 notfications:
   email: false

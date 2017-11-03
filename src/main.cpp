@@ -624,12 +624,26 @@ int work(const int argc, const char* const * const argv) try {
 	) {
 		const auto screen_size = viewing_config.window.get_screen_size();
 		const auto viewed_character = get_viewed_character();
+		const auto& cosmos = viewed_character.get_cosmos();
 		
 		audiovisuals.reserve_caches_for_entities(viewed_character.get_cosmos().get_entity_pool().capacity());
+		
+		auto& interp = audiovisuals.get<interpolation_system>();
+
+		{
+			auto scope = measure_scope(audiovisuals.profiler.interpolation);
+
+			interp.integrate_interpolated_transforms(
+				viewing_config.interpolation, 
+				cosmos, 
+				augs::delta(frame_delta) *= speed_multiplier, 
+				cosmos.get_fixed_delta()
+			);
+		}
 
 		gameplay_camera.tick(
 			screen_size,
-			audiovisuals.systems.get<interpolation_system>(),
+			interp,
 			frame_delta,
 			viewing_config.camera,
 			viewed_character
@@ -658,8 +672,7 @@ int work(const int argc, const char* const * const argv) try {
 			get_viewable_defs().particle_effects,
 			game_sounds,
 
-			viewing_config.audio_volume,
-			viewing_config.interpolation
+			viewing_config.audio_volume
 		);
 
 		audiovisuals.advance(in);
