@@ -1,6 +1,7 @@
 #pragma once
 #include <array>
 #include "augs/math/vec2.h"
+#include "augs/math/rects.h"
 
 #undef near
 #undef far
@@ -23,6 +24,18 @@ namespace augs {
 			visible_area.x,
 			visible_area.y,
 			0.f,
+			0.f,
+			1.f
+			);
+	}
+
+	template <class T>
+	std::array<T, 16> orthographic_projection(const basic_ltrb<T> visible_area) {
+		return augs::orthographic_projection<T>(
+			visible_area.l,
+			visible_area.r,
+			visible_area.b,
+			visible_area.t,
 			0.f,
 			1.f
 		);
