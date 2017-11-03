@@ -11,9 +11,9 @@ TEST_CASE("Byte readwrite", "Several tests") {
 	T v;
 
 	auto test_cycle = [&]() {
-		augs::save(v, path);
+		augs::save_as_bytes(v, path);
 		T test;
-		augs::load(test, path);
+		augs::load_from_bytes(test, path);
 
 		REQUIRE(test == v);
 	};

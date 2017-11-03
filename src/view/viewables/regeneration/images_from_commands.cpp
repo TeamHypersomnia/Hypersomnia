@@ -48,6 +48,6 @@ void regenerate_image_from_commands(
 		resultant.save(output_image_path);
 
 		augs::create_directories(output_image_stamp_path);
-		augs::save(new_stamp_bytes, output_image_stamp_path);
+		augs::save_as_bytes(new_stamp_bytes, output_image_stamp_path);
 	}
 }

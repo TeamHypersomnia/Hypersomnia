@@ -55,7 +55,7 @@ namespace augs {
 
 		const auto alsoft_ini_path = augs::path_type(alstr_get_cstr(where_openal_expects_alsoft_ini));
 
-		augs::create_text_file(alsoft_ini_path, alsoft_ini_file);
+		augs::save_as_text(alsoft_ini_path, alsoft_ini_file);
 #endif
 	}
 
@@ -66,7 +66,7 @@ namespace augs {
 		LOG(all_audio_devices);
 		LOG("Default device: %x", alcGetString(nullptr, ALC_DEFAULT_DEVICE_SPECIFIER));
 
-		augs::create_text_file(
+		augs::save_as_text(
 			output_path,
 			all_audio_devices
 		);

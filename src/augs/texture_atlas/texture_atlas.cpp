@@ -46,7 +46,7 @@ regenerated_atlas::regenerated_atlas(
 				should_regenerate = true;
 			}
 			else {
-				const auto existent_stamp = augs::load<texture_atlas_stamp>(atlas_stamp_path);
+				const auto existent_stamp = augs::load_from_bytes<texture_atlas_stamp>(atlas_stamp_path);
 
 				if (
 					const bool stamps_match =
@@ -220,11 +220,11 @@ regenerated_atlas::regenerated_atlas(
 		}
 
 		output_image.save(atlas_image_path);
-		augs::save(new_stamp, atlas_stamp_path);
-		augs::save(*this, atlas_metadata_path);
+		augs::save_as_bytes(new_stamp, atlas_stamp_path);
+		augs::save_as_bytes(*this, atlas_metadata_path);
 	}
 	else {
 		output_image.from_file(atlas_image_path);
-		augs::load(*this, atlas_metadata_path);
+		augs::load_from_bytes(*this, atlas_metadata_path);
 	}
 }

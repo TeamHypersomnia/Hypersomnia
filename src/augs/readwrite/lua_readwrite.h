@@ -378,7 +378,7 @@ namespace augs {
 		);
 
 		const auto file_contents = std::string("return ") + serialized_table;
-		create_text_file(target_path, file_contents);
+		save_as_text(target_path, file_contents);
 	}
 
 	template <class T>

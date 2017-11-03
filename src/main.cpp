@@ -75,12 +75,12 @@ int main(const int argc, const char* const * const argv) {
 
 		switch (exit_code) {
 			case EXIT_SUCCESS: 
-				augs::create_text_file(LOG_FILES_DIR "exit_success_debug_log.txt", logs); 
+				augs::save_as_text(LOG_FILES_DIR "exit_success_debug_log.txt", logs); 
 				break;
 			case EXIT_FAILURE: 
 				{
 					const auto failure_log_path = augs::path_type(LOG_FILES_DIR "exit_failure_debug_log.txt");
-					augs::create_text_file(failure_log_path, logs);
+					augs::save_as_text(failure_log_path, logs);
 					
 					{
 						const auto s = failure_log_path.string();

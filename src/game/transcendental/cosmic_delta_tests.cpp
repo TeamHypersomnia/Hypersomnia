@@ -129,8 +129,8 @@ TEST_CASE("CosmicDelta2 PaddingTest") {
 					iter
 				);
 
-				augs::create_text_file(LOG_FILES_DIR "object1.txt", describe_fields(*reinterpret_cast<checked_type*>(&buf1)));
-				augs::create_text_file(LOG_FILES_DIR "object2.txt", describe_fields(*reinterpret_cast<checked_type*>(&buf2)));
+				augs::save_as_text(LOG_FILES_DIR "object1.txt", describe_fields(*reinterpret_cast<checked_type*>(&buf1)));
+				augs::save_as_text(LOG_FILES_DIR "object2.txt", describe_fields(*reinterpret_cast<checked_type*>(&buf2)));
 
 				LOG(log_contents);
 				FAIL(log_contents);
@@ -151,8 +151,8 @@ TEST_CASE("CosmicDelta2 PaddingTest") {
 						static_cast<int>(dt.get_first_divergence_pos())
 					);
 
-					augs::create_text_file(LOG_FILES_DIR "object1.txt", describe_fields(a));
-					augs::create_text_file(LOG_FILES_DIR "object2.txt", describe_fields(b));
+					augs::save_as_text(LOG_FILES_DIR "object1.txt", describe_fields(a));
+					augs::save_as_text(LOG_FILES_DIR "object2.txt", describe_fields(b));
 
 					LOG(log_contents);
 					FAIL(log_contents);
@@ -181,7 +181,7 @@ TEST_CASE("CosmicDelta2 PaddingTest") {
 	padding_checker(item_slot_transfer_request());
 
 	component_size_information += typesafe_sprintf("Total size in bytes: %x", total_components_size);
-	augs::create_text_file(LOG_FILES_DIR "components.txt", component_size_information);
+	augs::save_as_text(LOG_FILES_DIR "components.txt", component_size_information);
 
 	/* Validate cosmos_metadata. It will also be written and compared. */
 

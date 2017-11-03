@@ -49,7 +49,7 @@ void workspace::save(const workspace_path_op op) const {
 	}
 
 	if (target_extension == ".wp") {
-		augs::save(*this, op.path);
+		augs::save_as_bytes(*this, op.path);
 	}
 	else if (target_extension == ".lua") {
 		augs::save_as_lua_table(op.lua, *this, op.path);
@@ -67,7 +67,7 @@ void workspace::open(const workspace_path_op op) {
 		}
 
 		if (target_extension == ".wp") {
-			augs::load(*this, op.path);
+			augs::load_from_bytes(*this, op.path);
 		}
 		else if (target_extension == ".lua") {
 			augs::load_from_lua_table(op.lua, *this, op.path);

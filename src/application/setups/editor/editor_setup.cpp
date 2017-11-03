@@ -92,7 +92,7 @@ void editor_setup::open_last_tabs(sol::state& lua) {
 	ensure(works.empty());
 
 	try {
-		const auto opened_tabs = augs::load<editor_saved_tabs>(get_editor_tabs_path());
+		const auto opened_tabs = augs::load_from_bytes<editor_saved_tabs>(get_editor_tabs_path());
 		tabs = opened_tabs.tabs;
 
 		if (!tabs.empty()) {
@@ -160,7 +160,7 @@ void editor_setup::autosave(const autosave_input in) const {
 		}
 	}
 
-	augs::save(saved_tabs, get_editor_tabs_path());
+	augs::save_as_bytes(saved_tabs, get_editor_tabs_path());
 }
 
 void editor_setup::control(
@@ -787,7 +787,7 @@ void editor_setup::next() {
 void editor_setup::new_tab() {
 	try_to_open_new_tab([&](editor_tab& t, workspace& w) {
 		const auto path = get_first_free_untitled_path("Workspace%x.wp");
-		augs::create_text_file(path, "empty");
+		augs::save_as_text(path, "empty");
 
 		t.current_path = path;
 		return true; 

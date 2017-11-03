@@ -98,15 +98,28 @@ namespace augs {
 		return output;
 	}
 
+	template <class O>
+	void load_from_bytes(O& object, const path_type& path) {
+		auto file = open_binary_input_stream(path);
+		augs::read_bytes(file, object);
+	}
+
+	template <class O>
+	O load_from_bytes(const path_type& path) {
+		O object;
+		load_from_bytes(object, path);
+		return object;
+	}
+
 	template <class S>
-	void create_text_file(const path_type& path, const S& text) {
+	void save_as_text(const path_type& path, const S& text) {
 		auto out = with_exceptions<std::ofstream>();
 		out.open(path, std::ios::out);
 		out << text;
 	}
 
 	template <class S>
-	void create_text_file_if_different(const path_type& path, const S& text) {
+	void save_as_text_if_different(const path_type& path, const S& text) {
 		if (!file_exists(path) || text != file_to_string(path)) {
 			auto out = with_exceptions<std::ofstream>();
 			out.open(path, std::ios::out);
@@ -115,27 +128,14 @@ namespace augs {
 	}
 
 	template <class O>
-	void save(const O& object, const path_type& path) {
+	void save_as_bytes(const O& object, const path_type& path) {
 		auto out = open_binary_output_stream(path);
 		write_bytes(out, object);
 	}
 
-	inline void save(const std::vector<std::byte>& bytes, const path_type& path) {
+	inline void save_as_bytes(const std::vector<std::byte>& bytes, const path_type& path) {
 		auto out = open_binary_output_stream(path);
 		out.write(reinterpret_cast<const byte_type_for_t<decltype(out)>*>(bytes.data()), bytes.size());
-	}
-
-	template <class O>
-	void load(O& object, const path_type& path) {
-		auto file = open_binary_input_stream(path);
-		augs::read_bytes(file, object);
-	}
-
-	template <class O>
-	O load(const path_type& path) {
-		O object;
-		load(object, path);
-		return object;
 	}
 
 	template <class ContainerType>

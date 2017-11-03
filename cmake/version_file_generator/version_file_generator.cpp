@@ -82,7 +82,7 @@ int main(int argc, char** argv) {
 		git_working_tree_changes_lines
 	);
 
-	augs::create_text_file_if_different(
+	augs::save_as_text_if_different(
 		output_file_path,
 		output_file_contents
 	);
