@@ -185,7 +185,7 @@ bool cosmic_delta::encode(
 #endif
 
 			augs::write_flags(dt.stream_for_new, overridden_components);
-			augs::write_bytes(dt.stream_for_new, new_content);
+			dt.stream_for_new.write(new_content);
 
 			++dt.new_entities;
 		}
@@ -194,7 +194,7 @@ bool cosmic_delta::encode(
 
 			augs::write_flags(dt.stream_for_changed, overridden_components);
 			augs::write_flags(dt.stream_for_changed, removed_components);
-			augs::write_bytes(dt.stream_for_changed, new_content);
+			dt.stream_for_changed.write(new_content);
 
 			++dt.changed_entities;
 		}
@@ -237,16 +237,16 @@ bool cosmic_delta::encode(
 	if (has_anything_changed) {
 		augs::write_bytes(out, true);
 
-		augs::write_bytes(out, new_meta_content);
+		out.write(new_meta_content);
 
 		augs::write_bytes(out, dt.new_entities);
 		augs::write_bytes(out, dt.changed_entities);
 		augs::write_bytes(out, dt.deleted_entities);
 
-		augs::write_bytes(out, dt.stream_of_new_guids);
-		augs::write_bytes(out, dt.stream_for_new);
-		augs::write_bytes(out, dt.stream_for_changed);
-		augs::write_bytes(out, dt.stream_for_deleted);
+		out.write(dt.stream_of_new_guids);
+		out.write(dt.stream_for_new);
+		out.write(dt.stream_for_changed);
+		out.write(dt.stream_for_deleted);
 	}
 	else {
 		augs::write_bytes(out, false);

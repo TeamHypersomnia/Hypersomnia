@@ -43,7 +43,7 @@ namespace augs {
 
 			for (auto& msg : reliable_buf) {
 				reliable_bs;//name_property("reliable message");
-				augs::write_bytes(reliable_bs, msg);
+				reliable_bs.write(msg);
 			}
 
 			if (reliable_bs.size() > 0) {
@@ -74,7 +74,7 @@ namespace augs {
 			}
 
 			output;//name_property("reliable_buffer");
-			augs::write_bytes(output, reliable_bs);
+			output.write(reliable_bs);
 		}
 
 		bool reliable_sender::read_ack(augs::stream& input) {
@@ -200,7 +200,7 @@ namespace augs {
 
 				if (output_bs.size() > 0) {
 					out;//name_property("sender channel");
-					augs::write_bytes(out, output_bs);
+					out.write(output_bs);
 				}
 			//}
 		}

@@ -3,10 +3,6 @@
 #include "augs/readwrite/streams.h"
 
 namespace augs {
-	void write_object_bytes(augs::stream& ar, const augs::stream& storage) {
-		ar.write(storage);
-	}
-
 	void stream::read(std::byte* data, const std::size_t bytes) {
 		if (read_pos + bytes > size()) {
 			throw stream_read_error(

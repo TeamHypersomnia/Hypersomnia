@@ -106,13 +106,6 @@ namespace augs {
 #endif
 
 namespace augs {
-	template <class... Args>
-	void read_object_bytes(augs::stream& ar, augs::stream& storage) {
-		static_assert(sizeof...(Args) > 0xdeadbeef, "Reading a stream from a stream is ill-formed.");
-	}
-
-	void write_object_bytes(augs::stream& ar, const augs::stream& storage);
-
 	template<class A>
 	void write_stream_with_properties(A& ar, const augs::stream& storage) {
 		storage.write_with_properties(ar);
