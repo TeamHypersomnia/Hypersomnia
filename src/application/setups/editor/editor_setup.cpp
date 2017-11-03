@@ -937,6 +937,7 @@ bool editor_setup::handle_unfetched_window_input(
 				const auto zoom_change = new_zoom - old_zoom;
 				const auto zoom_point = world_cursor_pos;
 				
+				// TODO: FIX ZOOM PANNING
 				camera.transform.pos += (vec2(screen_size / 2 - mouse_pos) / old_zoom)  * zoom_change;
 			}
 		}

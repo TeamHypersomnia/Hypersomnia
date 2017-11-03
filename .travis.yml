@@ -1,4 +1,4 @@
-sudo: required
+sudo: true
 dist: trusty
 language:
   - cpp
@@ -16,12 +16,27 @@ env:
   - config=Debug
 python:
   - "3.6"
-install:
-  - sudo apt-get install -y gdb  # install gdb  
-before_script:
-  - ulimit -c unlimited -S       # enable core dumps
+before_install:
+ # What is the current file size max for core files?
+ # It is usually 0, which means no core file will be dumped if there is a crash 
+ - ulimit -c
+ - ulimit -a -S
+ - ulimit -a -H
+ - cat /proc/sys/kernel/core_pattern
+ - cat /etc/default/apport
+ - service --status-all || true
+ - initctl list || true
+
 script:
-  # Check versions
+  - mkdir ./mason/
+  - curl -sSfL https://github.com/mapbox/mason/archive/v0.2.0.tar.gz | tar --gunzip --extract --strip-components=1 --directory=./mason/
+  # install gdb via mason
+  - ./mason/mason install gdb 7.12
+  # put GDB on PATH
+  - export PATH=$(./mason/mason prefix gdb 7.12)/bin:${PATH}
+  # install logbt
+  - curl -sSfL https://github.com/mapbox/logbt/archive/v1.6.0.tar.gz | tar --gunzip --extract --strip-components=2 --exclude="*md" --exclude="test*" --directory=.
+
   - gcc -v && g++ -v && cmake --version && make --version
   - python --version
   # Run your build commands next
@@ -39,12 +54,13 @@ script:
       EXECUTABLE_NAME=Hypersomnia
     fi
     
-    echo '/tmp/core_%e' | sudo tee /proc/sys/kernel/core_pattern
-    ../dev/${EXECUTABLE_NAME} --unit-tests-only
+  - sudo bash -c "echo '/tmp/logbt-coredumps/core.%p.%E' > /proc/sys/kernel/core_pattern"
+  - RESULT=0
+  - ./logbt ../dev/${EXECUTABLE_NAME} --unit-tests-only
 
 after_failure:
-  - dir
   - cd ../
+  - dir dev
   - echo $PWD
   - COREFILE='/tmp/core_${EXECUTABLE_NAME}'
   - |
