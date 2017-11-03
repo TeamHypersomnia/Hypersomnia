@@ -933,12 +933,9 @@ bool editor_setup::handle_unfetched_window_input(
 				const auto zoom_offset = 0.09f * camera.zoom * e.data.scroll.amount;
 				camera.zoom = std::clamp(camera.zoom + zoom_offset, 0.01f, 10.f);
 				const auto new_zoom = camera.zoom;
-
-				const auto zoom_change = new_zoom - old_zoom;
 				const auto zoom_point = world_cursor_pos;
 				
-				// TODO: FIX ZOOM PANNING
-				camera.transform.pos += (vec2(screen_size / 2 - mouse_pos) / old_zoom)  * zoom_change;
+				camera.transform.pos += (1 - 1 / (new_zoom/old_zoom))*(zoom_point - camera.transform.pos);
 			}
 		}
 
