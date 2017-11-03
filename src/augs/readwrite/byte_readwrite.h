@@ -1,5 +1,6 @@
 #pragma once
 #include <type_traits>
+#include <vector>
 
 #include "augs/ensure.h"
 #include "augs/pad_bytes.h"
@@ -24,7 +25,9 @@ namespace augs {
 			verify_byte_readwrite_safety<Archive, Serialized>();
 
 			const auto byte_count = object_count * sizeof(Serialized);
-			ar.read(reinterpret_cast<byte_type_for_t<Archive>*>(location), byte_count);
+			auto* const byte_location = reinterpret_cast<byte_type_for_t<Archive>*>(location);
+			
+			ar.read(byte_location, byte_count);
 		}
 
 		template <class Archive, class Serialized>
@@ -36,7 +39,9 @@ namespace augs {
 			verify_byte_readwrite_safety<Archive, Serialized>();
 			
 			const auto byte_count = object_count * sizeof(Serialized);
-			ar.write(reinterpret_cast<const byte_type_for_t<Archive>*>(location), byte_count);
+			const auto* const byte_location = reinterpret_cast<const byte_type_for_t<Archive>*>(location);
+
+			ar.write(byte_location, byte_count);
 		}
 	}
 

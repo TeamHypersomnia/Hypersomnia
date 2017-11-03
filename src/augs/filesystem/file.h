@@ -9,10 +9,10 @@
 #include <fstream>
 #include <experimental/filesystem>
 
+#include "augs/ensure.h"
 #include "augs/templates/byte_type_for.h"
 #include "augs/filesystem/path.h"
-#include "augs/readwrite/streams.h"
-#include "augs/ensure.h"
+#include "augs/readwrite/byte_readwrite_declaration.h"
 
 namespace augs {
 	template <class T, class... Args>

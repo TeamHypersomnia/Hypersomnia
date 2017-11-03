@@ -90,7 +90,6 @@ public:
 	cosmos_significant_state significant;
 	all_inferential_systems inferential;
 
-	augs::stream reserved_memory_for_serialization;
 	mutable cosmic_profiler profiler;
 	
 	/* State of the cosmos ends here *****************************/

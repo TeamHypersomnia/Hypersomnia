@@ -5,9 +5,6 @@
 #define LUA_READWRITE_OVERLOAD_TRAITS_INCLUDED 1
 
 namespace augs {
-	class output_stream_reserver;
-	class stream;
-	
 	template <class Serialized, class = void>
 	struct has_lua_read_overload : std::false_type 
 	{};
