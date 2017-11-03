@@ -82,7 +82,7 @@ TEST_CASE("CosmicDelta2 PaddingTest") {
 		using checked_type = decltype(c);
 		
 		static_assert(
-			augs::is_byte_readwrite_safe_v<augs::stream, checked_type> || allows_nontriviality_v<checked_type>,
+			augs::is_byte_readwrite_safe_v<augs::memory_stream, checked_type> || allows_nontriviality_v<checked_type>,
 			"Non-trivially copyable component detected! If you need a non-trivial component, explicitly define static constexpr bool allow_nontriviality = true; within the class"
 		);
 	};
@@ -194,7 +194,7 @@ TEST_CASE("CosmicDelta2 PaddingTest") {
 			if constexpr(std::is_same_v<T, augs::delta>) {
 				padding_checker(m, augs::delta::zero);
 			}
-			else if constexpr(augs::is_byte_readwrite_safe_v<augs::stream, T> && !is_introspective_leaf_v<T>) {
+			else if constexpr(augs::is_byte_readwrite_safe_v<augs::memory_stream, T> && !is_introspective_leaf_v<T>) {
 				padding_checker(m);
 			}
 			else if constexpr(has_introspect_v<T>){
@@ -304,7 +304,7 @@ TEST_CASE("CosmicDelta4 EmptyAndTwoNew") {
 	new_ent2 += components::position_copying();
 
 	{
-		augs::stream s;
+		augs::memory_stream s;
 
 		cosmic_delta::encode(c1, c2, s);
 		cosmic_delta::decode(c1, s);
@@ -336,7 +336,7 @@ TEST_CASE("CosmicDelta4 EmptyAndTwoNew") {
 	REQUIRE(ent2.has<components::trace>());
 
 	{
-		augs::stream comparatory;
+		augs::memory_stream comparatory;
 
 		REQUIRE(!cosmic_delta::encode(c1, c2, comparatory));
 
@@ -350,7 +350,7 @@ TEST_CASE("CosmicDelta4 EmptyAndTwoNew") {
 	new_ent2.remove<components::position_copying>();
 
 	{
-		augs::stream s;
+		augs::memory_stream s;
 
 		cosmic_delta::encode(c1, c2, s);
 		cosmic_delta::decode(c1, s);
@@ -366,7 +366,7 @@ TEST_CASE("CosmicDelta4 EmptyAndTwoNew") {
 	ent1.remove<components::transform>();
 
 	{
-		augs::stream comparatory;
+		augs::memory_stream comparatory;
 
 		REQUIRE(!cosmic_delta::encode(c1, c2, comparatory));
 
@@ -421,7 +421,7 @@ TEST_CASE("CosmicDelta5 EmptyAndCreatedThreeEntitiesWithReferences") {
 	new_ent1.map_child_entity(child_entity_name::CHARACTER_CROSSHAIR, new_ent2);
 
 	{
-		augs::stream s;
+		augs::memory_stream s;
 
 		cosmic_delta::encode(c1, c2, s);
 		cosmic_delta::decode(c1, s);
@@ -454,7 +454,7 @@ TEST_CASE("CosmicDelta5 EmptyAndCreatedThreeEntitiesWithReferences") {
 	REQUIRE(pc3_intact);
 
 	{
-		augs::stream comparatory;
+		augs::memory_stream comparatory;
 
 		REQUIRE(!cosmic_delta::encode(c1, c2, comparatory));
 
@@ -527,7 +527,7 @@ TEST_CASE("CosmicDelta6 ThreeEntitiesWithReferencesAndDestroyedChild") {
 	REQUIRE(3 == c2.get_entities_count());
 
 	{
-		augs::stream comparatory;
+		augs::memory_stream comparatory;
 
 		REQUIRE(!cosmic_delta::encode(c1, c2, comparatory));
 
@@ -538,7 +538,7 @@ TEST_CASE("CosmicDelta6 ThreeEntitiesWithReferencesAndDestroyedChild") {
 	REQUIRE(2 == c2.get_entities_count());
 
 	{
-		augs::stream s;
+		augs::memory_stream s;
 
 		/*
 			Note: when components with entity_ids are delta compared,
@@ -563,7 +563,7 @@ TEST_CASE("CosmicDelta6 ThreeEntitiesWithReferencesAndDestroyedChild") {
 	REQUIRE(2 == c1.get_entities_count());
 
 	{
-		augs::stream comparatory;
+		augs::memory_stream comparatory;
 
 		REQUIRE(!cosmic_delta::encode(c1, c2, comparatory));
 		

@@ -12,7 +12,7 @@ struct step_packaged_for_network {
 
 	bool shall_reinfer = false;
 	bool next_client_commands_accepted = false;
-	augs::stream delta;
+	augs::memory_stream delta;
 	guid_mapped_entropy entropy;
 };
 

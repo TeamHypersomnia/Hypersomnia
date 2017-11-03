@@ -5,7 +5,7 @@
 namespace augs {
 	struct serialized_field {
 		unsigned field_index;
-		stream data;
+		memory_stream data;
 
 		template <class T>
 		serialized_field(const T& object, )

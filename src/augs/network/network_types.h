@@ -8,7 +8,7 @@ typedef struct _ENetAddress ENetAddress;
 
 namespace augs {
 	namespace network {
-		typedef augs::stream packet;
+		typedef augs::memory_stream packet;
 
 		class endpoint_address {
 			unsigned ip;

@@ -70,7 +70,7 @@ namespace augs {
 			if (peer == nullptr || host.get() == nullptr)
 				return false;
 
-			augs::stream payload;
+			augs::memory_stream payload;
 
 			redundancy.build_next_packet(payload);
 

@@ -5,7 +5,7 @@
 #include "augs/templates/exception_templates.h"
 
 namespace augs {
-	class output_stream_reserver;
+	class memory_stream_reserver;
 
 	struct stream_read_error : error_with_typesafe_sprintf {
 		using error_with_typesafe_sprintf::error_with_typesafe_sprintf;
@@ -43,25 +43,25 @@ namespace augs {
 		}
 	};
 
-	class stream : public stream_position {
+	class memory_stream : public stream_position {
 		std::vector<std::byte> buffer;
 
 	public:
-		stream() = default;
+		memory_stream() = default;
 		
-		stream(stream&&) = default;
-		stream(const stream&) = default;
+		memory_stream(memory_stream&&) = default;
+		memory_stream(const memory_stream&) = default;
 
-		stream& operator=(const stream&) = default;
-		stream& operator=(stream&&) = default;
+		memory_stream& operator=(const memory_stream&) = default;
+		memory_stream& operator=(memory_stream&&) = default;
 
-		stream(std::vector<std::byte>&& new_buffer);
-		stream& operator=(std::vector<std::byte>&& new_buffer);
+		memory_stream(std::vector<std::byte>&& new_buffer);
+		memory_stream& operator=(std::vector<std::byte>&& new_buffer);
 
-		std::size_t mismatch(const stream&) const;
+		std::size_t mismatch(const memory_stream&) const;
 
-		bool operator==(const stream&) const;
-		bool operator!=(const stream&) const;
+		bool operator==(const memory_stream&) const;
+		bool operator!=(const memory_stream&) const;
 
 		std::byte* data();
 		const std::byte* data() const;
@@ -92,25 +92,25 @@ namespace augs {
 
 		void read(std::byte* const data, const std::size_t bytes);
 		void write(const std::byte* const data, const std::size_t bytes);
-		void write(const augs::stream&);
+		void write(const augs::memory_stream&);
 		void reserve(const std::size_t);
-		void reserve(const output_stream_reserver&);
+		void reserve(const memory_stream_reserver&);
 
 		operator std::vector<std::byte>&&() && {
 			return std::move(buffer);
 		}
 	};
 
-	class output_stream_reserver : public stream_position {
+	class memory_stream_reserver : public stream_position {
 	public:
-		stream create_reserved_stream();
+		memory_stream create_reserved_stream();
 
 		void write(const std::byte* const data, const std::size_t bytes);
 	};
 
 	template <class T>
 	std::vector<std::byte> to_bytes(const T& object) {
-		stream s;
+		memory_stream s;
 		augs::write_bytes(s, object);
 		return std::move(s);
 	}
@@ -118,17 +118,17 @@ namespace augs {
 
 namespace augs {
 	template<class A>
-	void write_stream_with_properties(A& ar, const augs::stream& storage) {
+	void write_stream_with_properties(A& ar, const augs::memory_stream& storage) {
 		storage.write_with_properties(ar);
 	}
 
 	template <class A>
-	void read_stream_with_properties(A& ar, augs::stream& storage) {
+	void read_stream_with_properties(A& ar, augs::memory_stream& storage) {
 		storage.read_with_properties(ar);
 	}
 
 	template <class A>
-	void write_stream_with_size(A& ar, const augs::stream& storage) {
+	void write_stream_with_size(A& ar, const augs::memory_stream& storage) {
 		ensure(storage.get_read_pos() == 0);
 		augs::write_bytes(ar, storage.size());
 		
@@ -136,7 +136,7 @@ namespace augs {
 	}
 
 	template <class A>
-	void read_stream_with_size(A& ar, augs::stream& storage) {
+	void read_stream_with_size(A& ar, augs::memory_stream& storage) {
 		std::size_t s;
 
 		augs::read_bytes(ar, s);

@@ -2,7 +2,7 @@
 TEST_CASE("NetChannelWrapper SingleTransmissionDeleteAllPending") {
 	reliable_channel a, b;
 	
-	augs::stream msg[15];
+	augs::memory_stream msg[15];
 
 	for (int i = 0; i < 15; ++i) {
 		augs::write_bytes(msg[i], int(i));
@@ -15,8 +15,8 @@ TEST_CASE("NetChannelWrapper SingleTransmissionDeleteAllPending") {
 	a.sender.post_message(msg[2]);
 	a.sender.post_message(msg[3]);
 
-	augs::stream sender_bs;
-	augs::stream receiver_bs;
+	augs::memory_stream sender_bs;
+	augs::memory_stream receiver_bs;
 
 	REQUIRE(false == a.receiver.ack_requested);
 	a.build_next_packet(sender_bs);
@@ -43,15 +43,15 @@ TEST_CASE("NetChannelWrapper PastAcknowledgementDeletesSeveralPending") {
 	reliable_channel a, b;
 
 	
-	augs::stream msg[15];
+	augs::memory_stream msg[15];
 
 	for (int i = 0; i < 15; ++i) {
 		augs::write_bytes(msg[i], int(i));
 		
 	}
 
-	augs::stream sender_packets[15];
-	augs::stream receiver_packet;
+	augs::memory_stream sender_packets[15];
+	augs::memory_stream receiver_packet;
 
 	/* post four messages */
 	a.sender.post_message(msg[0]);
@@ -88,15 +88,15 @@ TEST_CASE("NetChannelWrapper FlagForDeletionAndAck") {
 	reliable_channel a, b;
 
 	
-	augs::stream msg[15];
+	augs::memory_stream msg[15];
 
 	for (int i = 0; i < 15; ++i) {
 		augs::write_bytes(msg[i], int(i));
 		
 	}
 
-	augs::stream sender_packets[15];
-	augs::stream receiver_packet;
+	augs::memory_stream sender_packets[15];
+	augs::memory_stream receiver_packet;
 
 	/* post four messages */
 	a.sender.post_message(msg[0]);

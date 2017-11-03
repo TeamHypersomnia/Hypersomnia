@@ -87,16 +87,16 @@ struct delted_stream_of_entities {
 	unsigned changed_entities = 0;
 	unsigned deleted_entities = 0;
 
-	augs::stream stream_of_new_guids;
-	augs::stream stream_for_new;
-	augs::stream stream_for_changed;
-	augs::stream stream_for_deleted;
+	augs::memory_stream stream_of_new_guids;
+	augs::memory_stream stream_for_new;
+	augs::memory_stream stream_for_changed;
+	augs::memory_stream stream_for_deleted;
 };
 
 bool cosmic_delta::encode(
 	const cosmos& base, 
 	const cosmos& enco, 
-	augs::stream& out
+	augs::memory_stream& out
 ) {
 	const auto used_bits = out.size();
 	//should_eq(0, used_bits);
@@ -128,7 +128,7 @@ bool cosmic_delta::encode(
 		std::fill(overridden_components.begin(), overridden_components.end(), false);
 		std::fill(removed_components.begin(), removed_components.end(), false);
 
-		augs::stream new_content;
+		augs::memory_stream new_content;
 		
 		for_each_component_type(
 			[&base, &enco, base_entity, is_new, enco_entity, &has_entity_changed, &new_content, &overridden_components, &removed_components](auto c) {
@@ -218,7 +218,7 @@ bool cosmic_delta::encode(
 		}
 	});
 
-	augs::stream new_meta_content;
+	augs::memory_stream new_meta_content;
 
 	const bool has_meta_changed = augs::write_delta(
 		base.significant.meta, 
@@ -260,7 +260,7 @@ bool cosmic_delta::encode(
 
 void cosmic_delta::decode(
 	cosmos& deco, 
-	augs::stream& in, 
+	augs::memory_stream& in, 
 	const bool reinfer_partially
 ) {
 	if (in.get_unread_bytes() == 0) {

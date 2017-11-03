@@ -6,14 +6,14 @@
 #include "augs/templates/type_matching_and_indexing.h"
 
 namespace augs {
-	class output_stream_reserver;
-	class stream;
+	class memory_stream_reserver;
+	class memory_stream;
 
 	template <class Archive>
 	constexpr bool is_byte_stream_v = is_one_of_v<
 		std::decay_t<Archive>,
-		stream,
-		output_stream_reserver,
+		memory_stream,
+		memory_stream_reserver,
 		std::ifstream,
 		std::ofstream
 	>;

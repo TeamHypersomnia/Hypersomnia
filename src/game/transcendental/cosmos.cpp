@@ -503,7 +503,7 @@ namespace augs {
 		auto& profiler = cosm.profiler;
 
 		if constexpr(can_reserve_v<Archive>) {
-			augs::output_stream_reserver reserver;
+			augs::memory_stream_reserver reserver;
 
 			{
 				auto scope = measure_scope(profiler.size_calculation_pass);
@@ -554,8 +554,8 @@ namespace augs {
 	}
 }
 
-template void augs::write_object_bytes(augs::stream&, const cosmos&);
-template void augs::read_object_bytes(augs::stream&, cosmos&);
+template void augs::write_object_bytes(augs::memory_stream&, const cosmos&);
+template void augs::read_object_bytes(augs::memory_stream&, cosmos&);
 
 template void augs::write_object_bytes(std::ofstream&, const cosmos&);
 template void augs::read_object_bytes(std::ifstream&, cosmos&);

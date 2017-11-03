@@ -68,7 +68,7 @@ public:
 	) {
 		guid_mapped_entropy guid_mapped(new_local_entropy, predicted_cosmos);
 
-		augs::stream client_commands;
+		augs::memory_stream client_commands;
 		augs::write_bytes(client_commands, network_command::CLIENT_REQUESTED_ENTROPY);
 		augs::write_bytes(client_commands, guid_mapped);
 

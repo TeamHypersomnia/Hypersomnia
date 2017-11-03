@@ -44,7 +44,7 @@ TEST_CASE("Byte readwrite", "Several tests") {
 
 			T test;
 			auto bytes = augs::file_to_bytes(path);
-			augs::stream ss = std::move(bytes);
+			augs::memory_stream ss = std::move(bytes);
 			augs::read_bytes(ss, test);
 
 			REQUIRE(test == v);

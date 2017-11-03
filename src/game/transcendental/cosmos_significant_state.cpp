@@ -47,8 +47,8 @@ std::size_t cosmos_significant_state::get_first_mismatch_pos(const cosmos_signif
 	const auto& b = second;
 #endif
 
-	augs::output_stream_reserver this_serialized_reserver;
-	augs::output_stream_reserver second_serialized_reserver;
+	augs::memory_stream_reserver this_serialized_reserver;
+	augs::memory_stream_reserver second_serialized_reserver;
 
 	auto& r1 = this_serialized_reserver;
 	auto& r2 = second_serialized_reserver;

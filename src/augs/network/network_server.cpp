@@ -45,7 +45,7 @@ namespace augs {
 			bool result = true;
 
 			for (auto& e : peer_map) {
-				augs::stream payload;
+				augs::memory_stream payload;
 				
 				e.second.redundancy.build_next_packet(payload);
 

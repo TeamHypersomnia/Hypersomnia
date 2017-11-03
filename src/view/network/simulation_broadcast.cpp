@@ -10,7 +10,7 @@ void simulation_broadcast::set_state_heartbeat_interval(const augs::delta& dt, f
 	state_heartbeat_interval_in_steps = static_cast<unsigned>(ms / dt.in_milliseconds());
 }
 
-//void simulation_broadcast::read_client_commands(augs::stream& in) {
+//void simulation_broadcast::read_client_commands(augs::memory_stream& in) {
 //
 //}
 

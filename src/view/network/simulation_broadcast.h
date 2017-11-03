@@ -7,13 +7,13 @@ class entropy_accepter {
 	augs::network::reliable_channel channel;
 public:
 
-	void read_entropy_for_next_step(augs::stream&);
+	void read_entropy_for_next_step(augs::memory_stream&);
 
 	cosmic_entropy unpack_entropy_for_next_step(const cosmos& guid_mapper);
 };
 
 class simulation_broadcast {
-	augs::stream delta;
+	augs::memory_stream delta;
 	std::thread delta_production;
 	unsigned steps_since_last_heartbeat = 0;
 

@@ -79,7 +79,7 @@ namespace augs {
 		}
 
 		bool write(
-			stream& out,
+			memory_stream& out,
 			const bool write_changed_bit = false
 		) const {
 			const bool changed = has_changed();
@@ -97,7 +97,7 @@ namespace augs {
 		}
 
 		object_delta(
-			stream& in,
+			memory_stream& in,
 			const bool read_changed_bit = false
 		) {
 			bool changed = true;
@@ -160,7 +160,7 @@ namespace augs {
 
 	template <class T>
 	class object_delta<T, std::enable_if_t<!std::is_trivially_copyable_v<T>>> {
-		augs::stream new_content;
+		augs::memory_stream new_content;
 	public:
 		std::size_t get_first_divergence_pos() const {
 			ensure(false && "not implemented");
@@ -172,7 +172,7 @@ namespace augs {
 		}
 
 		bool write(
-			stream& out,
+			memory_stream& out,
 			const bool write_changed_bit = false
 		) const {
 			const bool changed = has_changed();
@@ -189,7 +189,7 @@ namespace augs {
 		}
 
 		object_delta(
-			stream& in,
+			memory_stream& in,
 			const bool read_changed_bit = false
 		) {
 			bool changed = true;
@@ -207,7 +207,7 @@ namespace augs {
 			const T& base_object,
 			const T& encoded_object
 		) {
-			augs::stream base_content;
+			augs::memory_stream base_content;
 
 			augs::write_bytes(base_content, base_object);
 			augs::write_bytes(new_content, encoded_object);
@@ -232,7 +232,7 @@ namespace augs {
 	bool write_delta(
 		const T& base,
 		const T& enco,
-		stream& out,
+		memory_stream& out,
 		const bool write_changed_bit = false
 	) {
 		const auto dt = object_delta<T>(base, enco);
@@ -242,7 +242,7 @@ namespace augs {
 	template <class T>
 	void read_delta(
 		T& into,
-		stream& in,
+		memory_stream& in,
 		const bool read_changed_bit = false
 	) {
 		auto dt = object_delta<T>(in, read_changed_bit);

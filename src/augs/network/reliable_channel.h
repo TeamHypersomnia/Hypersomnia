@@ -12,7 +12,7 @@
 namespace augs {
 	namespace network {
 		struct reliable_sender {
-			std::vector<augs::stream> reliable_buf;
+			std::vector<memory_stream> reliable_buf;
 
 			std::map<unsigned, unsigned> sequence_to_reliable_range;
 
@@ -22,9 +22,9 @@ namespace augs {
 			unsigned first_message = 0u;
 			unsigned last_message = 0u;
 
-			bool post_message(augs::stream&);
-			void write_data(augs::stream& output);
-			bool read_ack(augs::stream& input);
+			bool post_message(memory_stream&);
+			void write_data(memory_stream& output);
+			bool read_ack(memory_stream& input);
 		};
 
 		struct reliable_receiver {
@@ -42,8 +42,8 @@ namespace augs {
 			};
 
 			/* returns how many messages to skip if message_indexing == true */
-			reliable_receiver::result_data read_sequence(augs::stream& input);
-			void write_ack(augs::stream& input);
+			reliable_receiver::result_data read_sequence(memory_stream& input);
+			void write_ack(memory_stream& input);
 		};
 
 
@@ -59,9 +59,9 @@ namespace augs {
 			std::size_t get_num_pending_reliable_messages() const;
 			std::size_t get_num_pending_reliable_bytes() const;
 
-			void build_next_packet(augs::stream& out);
+			void build_next_packet(memory_stream& out);
 			/* returns result enum */
-			reliable_receiver::result_data handle_incoming_packet(augs::stream& in);
+			reliable_receiver::result_data handle_incoming_packet(memory_stream& in);
 		};
 	}
 }

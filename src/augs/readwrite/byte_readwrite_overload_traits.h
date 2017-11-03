@@ -4,8 +4,8 @@
 #define READWRITE_OVERLOAD_TRAITS_INCLUDED 1
 
 namespace augs {
-	class output_stream_reserver;
-	class stream;
+	class memory_stream_reserver;
+	class memory_stream;
 	
 	template <class Archive, class Serialized, class = void>
 	struct has_byte_read_overload : std::false_type 
@@ -18,8 +18,8 @@ namespace augs {
 		decltype(
 			read_object_bytes(
 				std::declval<
-					/* If the queried archive is output_stream_reserver, map to stream */
-					std::conditional_t<std::is_same_v<Archive, output_stream_reserver>, stream&, Archive&>
+					/* If the queried archive is memory_stream_reserver, map to memory_stream */
+					std::conditional_t<std::is_same_v<Archive, memory_stream_reserver>, memory_stream&, Archive&>
 				>(),
 				std::declval<Serialized&>()
 			),
@@ -39,8 +39,8 @@ namespace augs {
 		decltype(
 			write_object_bytes(
 				std::declval<
-					/* If the queried archive is output_stream_reserver, map to stream */
-					std::conditional_t<std::is_same_v<Archive, output_stream_reserver>, stream&, Archive&>
+					/* If the queried archive is memory_stream_reserver, map to memory_stream */
+					std::conditional_t<std::is_same_v<Archive, memory_stream_reserver>, memory_stream&, Archive&>
 				>(),
 				std::declval<const Serialized&>()
 			),
