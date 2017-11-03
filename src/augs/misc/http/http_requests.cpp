@@ -88,7 +88,7 @@ namespace augs {
 		get_http += "\r\n\r\n";
 		get_http += post_data;
 		// send GET / HTTP
-		send(Socket, get_http.c_str(), strlen(get_http.c_str()), 0);
+		send(Socket, get_http.c_str(), static_cast<int>(get_http.length()), 0);
 
 		// recieve html
 		while ((nDataLength = recv(Socket, buffer, 10000, 0)) > 0) {
@@ -150,7 +150,7 @@ namespace augs {
 		get_http += "\r\nHost: " + serverName;
 		get_http += "\r\n\r\n";
 		// send GET / HTTP
-		send(Socket, get_http.c_str(), strlen(get_http.c_str()), 0);
+		send(Socket, get_http.c_str(), static_cast<int>(get_http.length()), 0);
 
 		// recieve html
 		while ((nDataLength = recv(Socket, buffer, 10000, 0)) > 0) {
