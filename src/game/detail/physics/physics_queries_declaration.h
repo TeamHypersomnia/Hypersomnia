@@ -43,6 +43,7 @@ void for_each_in_camera(
 	const b2World& b2world,
 	const si_scaling si,
 	const camera_cone camera,
+	const vec2 screen_size,
 	F callback
 );
 

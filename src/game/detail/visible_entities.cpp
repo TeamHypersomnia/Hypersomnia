@@ -69,7 +69,7 @@ void visible_entities::acquire_physical(const visible_entities_query input) {
 	unique_from_physics.clear();
 
 	if (input.exact) {
-		const auto camera_aabb = camera.get_transformed_visible_world_area_aabb();
+		const auto camera_aabb = camera.get_visible_world_rect_aabb(input.screen_size);
 		
 		physics.for_each_intersection_with_polygon(
 			cosmos.get_si(),
@@ -86,6 +86,7 @@ void visible_entities::acquire_physical(const visible_entities_query input) {
 		physics.for_each_in_camera(
 			cosmos.get_si(),
 			camera,
+			input.screen_size,
 			[&](const b2Fixture* const fix) {
 				unique_from_physics.insert(cosmos.make_versioned(get_entity_that_owns(fix)));
 				return callback_result::CONTINUE;
@@ -99,7 +100,7 @@ void visible_entities::acquire_physical(const visible_entities_query input) {
 void visible_entities::acquire_non_physical(const visible_entities_query input) {
 	const auto& cosmos = input.cosm;
 	const auto camera = input.cone;
-	const auto camera_aabb = camera.get_transformed_visible_world_area_aabb();
+	const auto camera_aabb = camera.get_visible_world_rect_aabb(input.screen_size);
 
 	const auto& tree_of_npo = cosmos.inferential.tree_of_npo;
 	
@@ -116,6 +117,7 @@ void visible_entities::acquire_non_physical(const visible_entities_query input) 
 			all.push_back(cosmos.make_versioned(id));
 		},
 		camera,
+		input.screen_size,
 		tree_of_npo_type::RENDERABLES
 	);
 }

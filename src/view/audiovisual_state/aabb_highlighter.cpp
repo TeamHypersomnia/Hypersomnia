@@ -79,7 +79,7 @@ void aabb_highlighter::draw(const aabb_highlighter_drawing_input in) const {
 	aabb.expand_from_center(gap);
 
 	const auto as = vec2i(aabb.get_size());
-	const auto ap = vec2(in.camera[aabb.get_position()]);
+	const auto ap = vec2(in.camera.to_screen_space(in.screen_size, aabb.get_position()));
 
 	if (aabb.good()) {
 		in.output

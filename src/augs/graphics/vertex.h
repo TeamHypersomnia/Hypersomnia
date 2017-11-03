@@ -23,7 +23,7 @@ namespace augs {
 	};
 
 	struct vertex_triangle {
-		vertex vertices[3];
+		std::array<vertex, 3> vertices;
 
 		vertex& get_vert(int i) { return vertices[i]; }
 	};

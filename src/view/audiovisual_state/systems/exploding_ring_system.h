@@ -1,13 +1,12 @@
 #pragma once
 #include "augs/misc/minmax.h"
 #include "augs/misc/timing/delta.h"
+#include "augs/math/camera_cone.h"
 
 #include "augs/drawing/drawing.h"
 
 #include "game/messages/exploding_ring_input.h"
 #include "game/components/transform_component.h"
-
-#include "augs/math/camera_cone.h"
 
 class cosmos;
 class particles_simulation_system;
@@ -35,15 +34,17 @@ public:
 	void draw_rings(
 		const augs::drawer_with_default output,
 		augs::special_buffer& specials,
-		const camera_cone camera,
-		const cosmos& cosmos
+		const cosmos& cosmos,
+		const camera_cone cone,
+		const vec2 screen_size
 	) const;
 
 	void draw_highlights_of_rings(
 		const augs::drawer output,
 		const augs::texture_atlas_entry highlight_tex,
-		const camera_cone camera,
-		const cosmos& cosmos
+		const cosmos& cosmos,
+		const camera_cone cone,
+		const vec2 screen_size
 	) const;
 
 	void reserve_caches_for_entities(const size_t) const {}

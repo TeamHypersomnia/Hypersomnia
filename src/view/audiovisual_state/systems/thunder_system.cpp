@@ -1,6 +1,5 @@
 #include "augs/misc/randomization.h"
 #include "augs/templates/container_templates.h"
-#include "augs/math/camera_cone.h"
 #include "augs/drawing/drawing.h"
 
 #include "game/enums/filters.h"
@@ -166,13 +165,12 @@ void thunder_system::advance(
 }
 
 void thunder_system::draw_thunders(
-	const augs::line_drawer_with_default output,
-	const camera_cone camera
+	const augs::line_drawer_with_default output
 ) const {
 	for (const auto& t : thunders) {
 		for (const auto& b : t.branches) {
 			if (b.activated) {
-				output.line(camera[b.from], camera[b.to], t.in.color);
+				output.line(b.from, b.to, t.in.color);
 			}
 		}
 	}

@@ -126,6 +126,7 @@ public:
 
 	void advance_visible_streams_and_all_particles(
 		camera_cone,
+		const vec2 screen_size,
 		const cosmos&,
 		const particle_effects_map&,
 		const augs::delta dt,

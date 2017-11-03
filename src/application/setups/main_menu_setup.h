@@ -7,6 +7,7 @@
 
 #include <sol2/sol.hpp>
 
+#include "augs/math/camera_cone.h"
 #include "augs/templates/thread_templates.h"
 
 #include "augs/misc/action_list/action_list.h"

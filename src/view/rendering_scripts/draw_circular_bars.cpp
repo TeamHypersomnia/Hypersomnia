@@ -20,7 +20,6 @@ augs::vertex_triangle_buffer draw_circular_bars_and_get_textual_info(const draw_
 	const auto& visible_entities = in.all;
 	const auto& cosmos = in.cosm;
 	const auto& interp = in.interpolation;
-	const auto camera = in.camera;
 	const auto output = in.output;
 	auto& specials = in.specials;
 
@@ -45,7 +44,7 @@ augs::vertex_triangle_buffer draw_circular_bars_and_get_textual_info(const draw_
 
 			const auto transform = v.get_viewing_transform(interp);
 
-			output.aabb_centered(in.circular_bar_tex, camera[transform.pos], health_col);
+			output.aabb_centered(in.circular_bar_tex, (transform.pos), health_col);
 
 			const auto watched_character_transform = watched_character.get_viewing_transform(interp);
 			float starting_health_angle = 0.f;
@@ -108,7 +107,7 @@ augs::vertex_triangle_buffer draw_circular_bars_and_get_textual_info(const draw_
 							auto ammo_color = augs::interp(white, red_violet, (1 - ammo_ratio)* (1 - ammo_ratio));
 							ammo_color.a = 200;
 
-							output.aabb_centered(in.circular_bar_tex, camera[transform.pos], ammo_color);
+							output.aabb_centered(in.circular_bar_tex, (transform.pos), ammo_color);
 
 							circle_info new_info;
 
@@ -161,7 +160,7 @@ augs::vertex_triangle_buffer draw_circular_bars_and_get_textual_info(const draw_
 				const auto text = formatted_string { info.text,{ in.gui_font, info.color } };
 				const auto bbox = get_text_bbox(text);
 				
-				const vec2i screen_space_circle_center = camera[transform.pos];
+				const vec2i screen_space_circle_center = transform.pos;
 				const auto text_pos = screen_space_circle_center + position_rectangle_around_a_circle(radius + 6.f, bbox, info.angle) - bbox / 2;
 				//health_points.pos = screen_space_circle_center + vec2::from_degrees(in.angle).set_length(circle_displacement_length);
 

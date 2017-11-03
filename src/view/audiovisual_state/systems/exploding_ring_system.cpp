@@ -1,6 +1,5 @@
 #include "augs/misc/randomization.h"
 #include "augs/templates/container_templates.h"
-#include "augs/math/camera_cone.h"
 
 #include "game/transcendental/cosmos.h"
 
@@ -142,8 +141,9 @@ void exploding_ring_system::advance(
 void exploding_ring_system::draw_rings(
 	const augs::drawer_with_default output,
 	augs::special_buffer& specials,
-	const camera_cone camera,
-	const cosmos& cosmos
+	const cosmos& cosmos,
+	const camera_cone cone,
+	const vec2 screen_size
 ) const {
 	for (const auto& e : rings) {
 		const auto& r = e.in;
@@ -151,17 +151,15 @@ void exploding_ring_system::draw_rings(
 		const auto passed = global_time_seconds - e.time_of_occurence_seconds;
 		auto ratio = passed / r.maximum_duration_seconds;
 
-		const auto inner_radius_now = augs::interp(r.inner_radius_start_value, r.inner_radius_end_value, ratio);
-		const auto outer_radius_now = augs::interp(r.outer_radius_start_value, r.outer_radius_end_value, ratio);
-
-		const auto screen_space_center = camera.get_screen_space_revert_y(r.center);
-
-		augs::special sp;
-		sp.v1 = screen_space_center;
-		sp.v2.x = inner_radius_now;
-		sp.v2.y = outer_radius_now;
+		const auto inner_radius_now = augs::interp(r.inner_radius_start_value, r.inner_radius_end_value, ratio) / cone.zoom;
+		const auto outer_radius_now = augs::interp(r.outer_radius_start_value, r.outer_radius_end_value, ratio) / cone.zoom;
 
 		const auto world_explosion_center = r.center;
+
+		augs::special sp;
+		sp.v1 = cone.to_screen_space(screen_size, world_explosion_center);
+		sp.v2.x = inner_radius_now;
+		sp.v2.y = outer_radius_now;
 
 		const auto& vis = r.visibility;
 
@@ -173,9 +171,9 @@ void exploding_ring_system::draw_rings(
 				const auto world_light_tri = vis.get_world_triangle(t, world_explosion_center);
 				augs::vertex_triangle renderable_tri;
 
-				renderable_tri.vertices[0].pos = camera[world_light_tri[0]];
-				renderable_tri.vertices[1].pos = camera[world_light_tri[1]];
-				renderable_tri.vertices[2].pos = camera[world_light_tri[2]];
+				renderable_tri.vertices[0].pos = world_light_tri[0];
+				renderable_tri.vertices[1].pos = world_light_tri[1];
+				renderable_tri.vertices[2].pos = world_light_tri[2];
 
 				renderable_tri.vertices[0].color = considered_color;
 				renderable_tri.vertices[1].color = considered_color;
@@ -190,7 +188,7 @@ void exploding_ring_system::draw_rings(
 		}
 		else {
 			output.aabb_centered(
-				camera[world_explosion_center], 
+				world_explosion_center, 
 				vec2(outer_radius_now * 2, outer_radius_now * 2),
 				considered_color
 			);
@@ -205,14 +203,15 @@ void exploding_ring_system::draw_rings(
 void exploding_ring_system::draw_highlights_of_rings(
 	const augs::drawer output,
 	const augs::texture_atlas_entry highlight_tex,
-	const camera_cone camera,
-	const cosmos& cosmos
+	const cosmos& cosmos,
+	const camera_cone cone,
+	const vec2 screen_size
 ) const {
 	for (const auto& r : rings) {
 		const auto passed = global_time_seconds - r.time_of_occurence_seconds;
 		auto ratio = passed / (r.in.maximum_duration_seconds * 1.2);
 
-		const auto radius = std::max(r.in.outer_radius_end_value, r.in.outer_radius_start_value);
+		const auto radius = std::max(r.in.outer_radius_end_value, r.in.outer_radius_start_value) / cone.zoom;
 		auto highlight_col = r.in.color;
 
 		const auto highlight_amount = 1.f - ratio;
@@ -222,7 +221,7 @@ void exploding_ring_system::draw_highlights_of_rings(
 
 			output.aabb_centered(
 				highlight_tex,
-				camera[r.in.center],
+				r.in.center,
 				vec2(radius, radius),
 				highlight_col
 			);

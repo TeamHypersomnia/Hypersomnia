@@ -12,6 +12,7 @@ struct aabb_highlighter_drawing_input {
 	const const_entity_handle subject;
 	const interpolation_system& interp;
 	const camera_cone camera;
+	const vec2 screen_size;
 };
 
 struct aabb_highlighter {

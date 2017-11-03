@@ -309,7 +309,8 @@ void settings_gui_state::perform(
 				break;
 			}
 			case settings_pane::DEBUG: {
-				revertable_checkbox("Show developer console", config.session.show_developer_console); 
+				revertable_checkbox("Show developer console", config.session.show_developer_console);
+				revertable_slider("Camera query expansion", config.session.camera_query_expansion, -4.f, 0.9f);
 				break;
 			}
 			default: {

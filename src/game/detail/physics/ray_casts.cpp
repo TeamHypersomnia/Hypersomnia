@@ -4,7 +4,6 @@
 
 #include "augs/ensure.h"
 #include "game/detail/physics/physics_scripts.h"
-#include "augs/math/camera_cone.h"
 #include "game/enums/filters.h"
 
 bool physics_system::raycast_input::ShouldRaycast(b2Fixture* const fixture) {

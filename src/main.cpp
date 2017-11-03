@@ -639,9 +639,9 @@ int work(const int argc, const char* const * const argv) try {
 			auto scope = measure_scope(profiler.camera_visibility_query);
 
 			auto queried_camera = get_camera();
-			queried_camera.visible_world_area += { 100, 100 };
+			queried_camera.zoom -= viewing_config.session.camera_query_expansion;
 
-			all_visible.reacquire_all_and_sort({ viewed_character.get_cosmos(), queried_camera, false });
+			all_visible.reacquire_all_and_sort({ viewed_character.get_cosmos(), queried_camera, screen_size, false });
 
 			profiler.num_visible_entities.measure(all_visible.all.size());
 		}
@@ -652,9 +652,9 @@ int work(const int argc, const char* const * const argv) try {
 
 			get_viewed_character(),
 			get_camera(),
+			vec2(screen_size),
 			all_visible,
 
-			viewing_config.window.get_screen_size(),
 			get_viewable_defs().particle_effects,
 			game_sounds,
 
@@ -1395,37 +1395,6 @@ int work(const int argc, const char* const * const argv) try {
 					});
 				}
 			);
-			
-			if (current_setup) {
-				on_specific_setup([&](editor_setup& editor) {
-					if (editor.rectangular_drag_origin.has_value()) {
-						const auto camera = get_camera();
-
-						const auto world_cursor_pos = camera.get_world_cursor_pos(
-							common_input_state.mouse.pos, 
-							screen_size
-						);
-
-						const auto world_rectangular_selection = ltrb::from_points(
-							world_cursor_pos, 
-							*editor.rectangular_drag_origin
-						);
-
-						get_drawer().aabb_with_border(
-							camera[world_rectangular_selection],
-							viewing_config.editor.rectangular_selection_color,
-							viewing_config.editor.rectangular_selection_border_color
-						);
-					}
-				});
-			}
-
-			/* 
-				Illuminated rendering leaves the renderer in a state 
-				where the default shader is being used and the game world atlas is still bound.
-				
-				It is the configuration required for further viewing of GUI.
-			*/
 
 			if (DEBUG_DRAWING.enabled) {
 				/* #2 */
@@ -1433,14 +1402,41 @@ int work(const int argc, const char* const * const argv) try {
 					DEBUG_LOGIC_STEP_LINES,
 					DEBUG_PERSISTENT_LINES,
 
-					get_camera(), 
-					get_drawer().default_texture, 
+					get_drawer().default_texture,
 					interpolation_ratio
 				);
 
 				renderer.call_and_clear_lines();
 
 				renderer.frame_lines.clear();
+			}
+
+			shaders.standard->set_projection(augs::orthographic_projection(vec2(screen_size)));
+
+			/*
+				Illuminated rendering leaves the renderer in a state
+				where the default shader is being used and the game world atlas is still bound.
+
+				It is the configuration required for further viewing of GUI.
+			*/
+
+			if (current_setup) {
+				on_specific_setup([&](editor_setup& editor) {
+					if (editor.rectangular_drag_origin.has_value()) {
+						const auto camera = get_camera();
+
+						const auto rectangular_selection = ltrb::from_points(
+							common_input_state.mouse.pos,
+							camera.to_screen_space(screen_size, *editor.rectangular_drag_origin)
+						);
+
+						get_drawer().aabb_with_border(
+							rectangular_selection,
+							viewing_config.editor.rectangular_selection_color,
+							viewing_config.editor.rectangular_selection_border_color
+						);
+					}
+				});
 			}
 
 			if (should_draw_game_gui()) {
@@ -1451,14 +1447,9 @@ int work(const int argc, const char* const * const argv) try {
 		else {
 			game_world_atlas->bind();
 			shaders.standard->set_as_current();
+			shaders.standard->set_projection(augs::orthographic_projection(vec2(screen_size)));
 
-			{
-				const auto matrix = augs::orthographic_projection(get_camera().visible_world_area);
-				shaders.standard->set_projection(matrix);
-			}
-
-			if (
-				std::addressof(viewed_character.get_cosmos()) ==
+			if (std::addressof(viewed_character.get_cosmos()) ==
 				std::addressof(cosmos::empty)
 			) {
 				get_drawer().color_overlay(screen_size, darkgray);

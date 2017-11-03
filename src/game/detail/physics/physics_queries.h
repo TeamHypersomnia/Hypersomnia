@@ -118,9 +118,10 @@ void for_each_in_camera(
 	const b2World& b2world,
 	const si_scaling si,
 	const camera_cone camera,
+	const vec2 screen_size,
 	F callback
 ) {
-	const auto visible_aabb = camera.get_transformed_visible_world_area_aabb();
+	const auto visible_aabb = camera.get_visible_world_rect_aabb(screen_size);
 
 	for_each_in_aabb(
 		b2world,

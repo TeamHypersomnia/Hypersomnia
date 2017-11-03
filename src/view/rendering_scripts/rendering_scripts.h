@@ -2,7 +2,6 @@
 #include <functional>
 
 #include "augs/graphics/vertex.h"
-#include "augs/math/camera_cone.h"
 #include "game/detail/visible_entities.h"
 #include "game/components/sentience_component.h"
 #include "game/transcendental/entity_handle.h"
@@ -23,7 +22,6 @@ struct draw_circular_bars_input {
 
 	const cosmos& cosm;
 	const entity_id viewed_character_id;
-	const camera_cone camera;
 	const interpolation_system& interpolation;
 	const double global_time_seconds;
 
@@ -34,7 +32,6 @@ struct draw_circular_bars_input {
 struct draw_cast_spells_highlights_input {
 	const augs::drawer output;
 	const interpolation_system& interpolation;
-	const camera_cone camera;
 	const cosmos& cosm;
 	const double global_time_seconds;
 	const augs::texture_atlas_entry cast_highlight_tex;
@@ -45,7 +42,6 @@ struct draw_hud_for_released_explosives_input {
 	augs::special_buffer& specials;
 
 	const interpolation_system& interpolation;
-	const camera_cone camera;
 	const cosmos& cosm;
 	const double global_time_seconds;
 	const augs::texture_atlas_entry circular_bar_tex;

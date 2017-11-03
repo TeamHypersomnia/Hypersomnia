@@ -1,6 +1,5 @@
 #pragma once
 #include "augs/ensure.h"
-#include "augs/math/camera_cone.h"
 #include "augs/drawing/drawing.h"
 #include "augs/build_settings/platform_defines.h"
 
@@ -23,7 +22,6 @@ class interpolation_system;
 struct draw_renderable_input {
 	const augs::drawer drawer;
 	const game_images_in_atlas_map& manager;
-	const camera_cone camera;
 	const double global_time_seconds;
 };
 
@@ -36,8 +34,6 @@ FORCE_INLINE void draw_renderable(
 	using input_type = typename renderable_type::drawing_input;
 
 	auto in = input_type(input.drawer);
-
-	in.camera = input.camera;
 
 	in.renderable_transform = renderable_transform;
 	in.set_global_time_seconds(input.global_time_seconds);
@@ -55,9 +51,7 @@ FORCE_INLINE void draw_neon_map(
 
 	auto in = input_type(input.drawer);
 
-	in.camera = input.camera;
 	in.use_neon_map = true;
-
 	in.renderable_transform = renderable_transform;
 	in.set_global_time_seconds(input.global_time_seconds);
 
@@ -74,8 +68,6 @@ FORCE_INLINE void draw_border(
 	using input_type = typename renderable_type::drawing_input;
 
 	auto in = input_type(input.drawer);
-
-	in.camera = input.camera;
 
 	in.renderable_transform = renderable_transform;
 	in.set_global_time_seconds(input.global_time_seconds);

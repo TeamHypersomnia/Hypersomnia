@@ -238,7 +238,8 @@ return {
   session = {
     automatically_hide_settings_ingame = false,
     create_minimal_test_scene = false,
-    show_developer_console = false
+    show_developer_console = false,
+    camera_query_expansion = 0.1
   },
   simulation_receiver = {
     misprediction_smoothing_multiplier = 1.2000000476837158

@@ -2,7 +2,6 @@
 #include "augs/misc/minmax.h"
 #include "augs/misc/timing/delta.h"
 #include "augs/graphics/rgba.h"
-#include "augs/math/camera_cone.h"
 
 #include "game/messages/thunder_input.h"
 #include "game/components/transform_component.h"
@@ -52,8 +51,7 @@ public:
 	);
 
 	void draw_thunders(
-		const augs::line_drawer_with_default output,
-		const camera_cone camera
+		const augs::line_drawer_with_default output
 	) const;
 
 	void reserve_caches_for_entities(const std::size_t) const {}

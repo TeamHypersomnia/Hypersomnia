@@ -34,7 +34,7 @@ void editor_setup::set_popup(const editor_popup p) {
 
 void editor_setup::set_locally_viewed(const entity_id id) {
 	work().locally_viewed = id;
-	tab().editor_mode_cam = std::nullopt;
+	tab().panned_camera = std::nullopt;
 }
 
 std::optional<editor_popup> open_workspace(workspace& work, const workspace_path_op op) {
@@ -116,7 +116,7 @@ void editor_setup::open_last_tabs(sol::state& lua) {
 				else {
 					if (const auto popup = open_workspace(*works.back(), { lua, tabs[i].current_path })) {
 						set_popup(*popup);
-						tabs_to_close.push_back(i);
+						tabs_to_close.push_back(static_cast<tab_index_type>(i));
 					}
 				}
 			}
@@ -278,7 +278,7 @@ void editor_setup::perform_custom_imgui(
 
 	const auto mouse_pos = vec2i(ImGui::GetIO().MousePos);
 	const auto screen_size = vec2i(ImGui::GetIO().DisplaySize);
-	const auto world_cursor_pos = current_cone.get_world_cursor_pos(mouse_pos, screen_size);
+	const auto world_cursor_pos = current_cone.to_world_space(screen_size, mouse_pos);
 
 	if (!in_direct_gameplay) {
 		if (auto main_menu = scoped_main_menu_bar()) {
@@ -486,7 +486,7 @@ void editor_setup::perform_custom_imgui(
 
 							for (const auto o : ordering) {
 								if (o == selected_index) {
-									index_to_set = new_tabs.size();
+									index_to_set = static_cast<tab_index_type>(new_tabs.size());
 								}
 
 								new_tabs.push_back(tabs[o]);
@@ -513,7 +513,10 @@ void editor_setup::perform_custom_imgui(
 				text("Cursor: %x", world_cursor_pos);
 				
 				const auto printed_camera = get_custom_camera() ? *get_custom_camera() : current_cone;
+				
 				text("View center: %x", printed_camera.transform.pos);
+
+				text(typesafe_sprintf("Zoom: %x", printed_camera.zoom * 100.f) + " %");
 
 				text("Total entities: %x/%x",
 					get_viewed_cosmos().get_entities_count(),
@@ -525,7 +528,7 @@ void editor_setup::perform_custom_imgui(
 					get_viewed_cosmos().get_total_steps_passed()
 				);
 
-				text(L"Currently viewing: %x",
+				text(L"Currently controlling: %x",
 					get_viewed_character().alive() ? get_viewed_character().get_name() : L"no entity"
 				);
 			}
@@ -802,7 +805,7 @@ void editor_setup::next_tab() {
 
 void editor_setup::prev_tab() {
 	if (has_current_tab()) {
-		set_current_tab(current_index == 0 ? tabs.size() - 1 : current_index - 1);
+		set_current_tab(current_index == 0 ? static_cast<tab_index_type>(tabs.size() - 1) : current_index - 1);
 	}
 }
 
@@ -912,34 +915,47 @@ bool editor_setup::handle_unfetched_window_input(
 	using namespace augs::event;
 	using namespace augs::event::keys;
 
+	const auto mouse_pos = vec2i(ImGui::GetIO().MousePos);
+	const auto screen_size = vec2i(ImGui::GetIO().DisplaySize);
+	const auto world_cursor_pos = current_cone.to_world_space(screen_size, mouse_pos);
+	const auto world_screen_center = current_cone.to_world_space(screen_size, screen_size/2);
+
 	if (player_paused) {
 		if (e.msg == message::wheel) {
 			if (has_current_tab()) {
-				if (!tab().editor_mode_cam.has_value()) {
-					tab().editor_mode_cam = current_cone;
+				if (!tab().panned_camera.has_value()) {
+					tab().panned_camera = current_cone;
 				}
 
-				tab().editor_mode_cam->visible_world_area -= e.data.scroll.amount * 100;
+				auto& camera = *tab().panned_camera;
+
+				const auto old_zoom = camera.zoom;
+				const auto zoom_offset = 0.09f * camera.zoom * e.data.scroll.amount;
+				camera.zoom = std::clamp(camera.zoom + zoom_offset, 0.01f, 10.f);
+				const auto new_zoom = camera.zoom;
+
+				const auto zoom_change = new_zoom - old_zoom;
+				const auto zoom_point = world_cursor_pos;
+				
+				camera.transform.pos += (vec2(screen_size / 2 - mouse_pos) / old_zoom)  * zoom_change;
 			}
 		}
 
 		if (e.msg == message::mousemotion) {
 			if (common_input_state[key::RMOUSE]) {
 				if (has_current_tab()) {
-					if (!tab().editor_mode_cam.has_value()) {
-						tab().editor_mode_cam = current_cone;
+					if (!tab().panned_camera.has_value()) {
+						tab().panned_camera = current_cone;
 					}
+					
+					auto& camera = *tab().panned_camera;
 
-					tab().editor_mode_cam->transform.pos -= vec2i(e.data.mouse.rel) * settings.camera_panning_speed;
+					camera.transform.pos -= vec2(e.data.mouse.rel) * (settings.camera_panning_speed / camera.zoom);
 
 					return true;
 				}
 			}
 			else {
-				const auto mouse_pos = vec2i(ImGui::GetIO().MousePos);
-				const auto screen_size = vec2i(ImGui::GetIO().DisplaySize);
-				const auto world_cursor_pos = current_cone.get_world_cursor_pos(mouse_pos, screen_size);
-
 				hovered_entity = {};
 
 				if (has_current_tab()) {
@@ -960,7 +976,8 @@ bool editor_setup::handle_unfetched_window_input(
 						
 						const auto query = visible_entities_query{
 							work().world,
-							{ world_range.get_center(), world_range.get_size() }
+							{ world_range.get_center(), 1.f },
+							world_range.get_size()
 						};
 
 						in_rectangular_selection.acquire_non_physical(query);
@@ -987,9 +1004,9 @@ bool editor_setup::handle_unfetched_window_input(
 			if (has_current_tab()) {
 				const bool has_ctrl{ common_input_state[key::LCTRL] };
 
-				const auto world_cursor_pos = current_cone.get_world_cursor_pos(
-					common_input_state.mouse.pos,
-					window.get_screen_size()
+				const auto world_cursor_pos = current_cone.to_world_space(
+					window.get_screen_size(),
+					common_input_state.mouse.pos
 				);
 
 				last_ldown_position = world_cursor_pos;
@@ -1028,7 +1045,7 @@ bool editor_setup::handle_unfetched_window_input(
 
 		if (e.was_pressed(key::HOME)) {
 			if (has_current_tab()) {
-				tab().editor_mode_cam = std::nullopt;
+				tab().panned_camera = std::nullopt;
 
 				return true;
 			}

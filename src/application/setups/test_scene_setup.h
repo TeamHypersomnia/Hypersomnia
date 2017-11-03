@@ -1,9 +1,9 @@
 #pragma once
 #include <optional>
 #include "augs/misc/timing/fixed_delta_timer.h"
+#include "augs/math/camera_cone.h"
 
 #include "game/assets/all_logical_assets.h"
-
 #include "game/organization/all_component_includes.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"

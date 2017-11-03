@@ -308,8 +308,8 @@ public:
 
 	FORCE_INLINE std::optional<camera_cone> get_custom_camera() const {
 		if (has_current_tab() && is_paused()) {
-			if (tab().editor_mode_cam.has_value()) {
-				return tab().editor_mode_cam;
+			if (tab().panned_camera) {
+				return tab().panned_camera;
 			}
 		}
 

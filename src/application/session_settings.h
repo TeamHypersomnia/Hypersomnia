@@ -8,5 +8,6 @@ struct session_settings {
 #if TODO
 	bool use_system_cursor_for_gui = false;
 #endif
+	float camera_query_expansion = 0.1f;
 	// END GEN INTROSPECTOR
 };

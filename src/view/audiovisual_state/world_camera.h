@@ -29,8 +29,6 @@ struct world_camera {
 
 	components::transform last_interpolant;
 
-	vec2 last_ortho_interpolant;
-
 	vec2 player_position_previously_seen;
 	vec2 player_position_at_previous_step;
 
@@ -52,7 +50,8 @@ struct world_camera {
 
 	vec2i get_camera_offset_due_to_character_crosshair(
 		const const_entity_handle,
-		const world_camera_settings
+		const world_camera_settings,
+		const vec2 screen_size
 	) const;
 
 private:

@@ -6,7 +6,6 @@
 #include "augs/graphics/fbo.h"
 
 #include "augs/drawing/drawing.h"
-#include "augs/math/camera_cone.h"
 
 #include "augs/texture_atlas/texture_atlas_entry.h"
 
@@ -266,14 +265,13 @@ namespace augs {
 		const debug_lines& logic_step_lines,
 		const debug_lines& persistent_lines,
 
-		const camera_cone camera,
 		const augs::texture_atlas_entry tex,
 		const float interpolation_ratio
 	) {
 		const auto output = augs::line_drawer_with_default({ get_line_buffer(), tex });
 
 		auto line_lambda = [&](const debug_line line) {
-			output.line(camera[line.a], camera[line.b], line.col);
+			output.line(line.a, line.b, line.col);
 		};
 
 		if (interpolate_debug_logic_step_lines && logic_step_lines.size() == prev_logic_step_lines.size()) {

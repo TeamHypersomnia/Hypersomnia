@@ -30,6 +30,7 @@ void audiovisual_state::reserve_caches_for_entities(const std::size_t n) {
 void audiovisual_state::advance(const audiovisual_advance_input input) {
 	auto scope = measure_scope(profiler.advance);
 
+	const auto screen_size = input.screen_size;
 	const auto& cosm = input.viewed_character.get_cosmos();
 	const auto dt = augs::delta(input.frame_delta) *= input.speed_multiplier;
 
@@ -57,6 +58,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 
 		particles.advance_visible_streams_and_all_particles(
 			input.cone,
+			screen_size,
 			cosm,
 			input.particle_effects,
 			dt,
@@ -91,6 +93,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 			input.audio_volume,
 			input.sounds,
 			listener_cone,
+			screen_size,
 			viewed_character,
 			interp
 		);

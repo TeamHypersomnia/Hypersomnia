@@ -1,5 +1,4 @@
 #include "augs/templates/container_templates.h"
-#include "augs/math/camera_cone.h"
 
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
@@ -50,7 +49,6 @@ void pure_color_highlight_system::advance(const augs::delta dt) {
 
 void pure_color_highlight_system::draw_highlights(
 	const augs::drawer output,
-	const camera_cone camera,
 	const cosmos& cosmos,
 	const interpolation_system& interp,
 	const game_images_in_atlas_map& game_images
@@ -76,7 +74,6 @@ void pure_color_highlight_system::draw_highlights(
 			{
 				output,
 				game_images,
-				camera,
 				global_time_seconds
 			},
 			interp

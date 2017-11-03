@@ -18,10 +18,10 @@ void main() {
 	output_vert.z = 0.0f;						
 	output_vert.w = 1.0f;
 
-	ring_center = vec2(special.x, special.y);
+	ring_center = special.xy;
 	inner_radius_sq = special.z*special.z;
 	outer_radius_sq = special.w*special.w;
 
-	gl_Position = projection_matrix*output_vert;
+	gl_Position = projection_matrix * output_vert;
 	theColor = color;
 }

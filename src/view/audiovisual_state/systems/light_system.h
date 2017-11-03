@@ -30,6 +30,7 @@ struct light_system_input {
 	const augs::graphics::shader_program& standard_shader;
 	std::function<void()> neon_callback;
 	const camera_cone camera;
+	const vec2 screen_size;
 	const interpolation_system& interpolation;
 	const particles_simulation_system& particles;
 	const visible_entities::per_layer_type& visible_per_layer;

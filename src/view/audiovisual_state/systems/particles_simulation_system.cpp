@@ -53,7 +53,8 @@ void particles_simulation_system::add_particle(const render_layer l, const entit
 
 void particles_simulation_system::advance_visible_streams_and_all_particles(
 	camera_cone cone, 
-	const cosmos& cosmos, 
+	const vec2 screen_size,
+	const cosmos& cosmos,
 	const particle_effects_map& manager,
 	const augs::delta delta,
 	const interpolation_system& interp
@@ -100,7 +101,7 @@ void particles_simulation_system::advance_visible_streams_and_all_particles(
 		});
 	}
 
-	cone.visible_world_area *= 2.5f;
+	cone.zoom /= 2.5f;
 
 	auto update_target = [&](const unversioned_entity_id it_id) {
 		const auto it = cosmos[it_id];
@@ -276,6 +277,7 @@ void particles_simulation_system::advance_visible_streams_and_all_particles(
 	cosmos.inferential.tree_of_npo.for_each_in_camera(
 		update_target,
 		cone,
+		screen_size,
 		tree_of_npo_type::PARTICLE_EXISTENCES
 	);
 }

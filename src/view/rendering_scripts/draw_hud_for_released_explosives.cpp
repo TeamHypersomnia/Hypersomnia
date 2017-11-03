@@ -32,7 +32,7 @@ void draw_hud_for_released_explosives(const draw_hud_for_released_explosives_inp
 				if (highlight_amount > 0.f) {
 					const auto highlight_color = augs::interp(white, red_violet, (1 - highlight_amount)* (1 - highlight_amount));
 					
-					in.output.aabb_centered(in.circular_bar_tex, in.camera[it.get_viewing_transform(in.interpolation).pos], highlight_color);
+					in.output.aabb_centered(in.circular_bar_tex, it.get_viewing_transform(in.interpolation).pos, highlight_color);
 
 					augs::special s;
 

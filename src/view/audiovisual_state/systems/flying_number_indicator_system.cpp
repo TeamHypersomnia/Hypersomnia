@@ -33,22 +33,23 @@ void flying_number_indicator_system::advance(const augs::delta dt) {
 void flying_number_indicator_system::draw_numbers(
 	const augs::baked_font& font,
 	const augs::drawer output,
-	const camera_cone camera
+	const camera_cone camera,
+	const vec2 screen_size
 ) const {
 	for (const auto& r : numbers) {
 		const auto passed = global_time_seconds - r.time_of_occurence_seconds;
 		const auto ratio = passed / r.in.maximum_duration_seconds;
 
 		if (!r.first_camera_space_pos.has_value()) {
-			r.first_camera_space_pos = camera[r.in.pos];
+			r.first_camera_space_pos = camera.to_screen_space(screen_size, r.in.pos);
 		}
 
 		const auto text_pos = r.first_camera_space_pos.value() + vec2(r.in.impact_velocity).set_length(static_cast<float>(sqrt(passed)) * 50.f);
-		// text_pos = camera[r.in.pos - vec2(0, static_cast<float>(sqrt(passed)) * 120.f)];
+		// text_pos = (r.in.pos - vec2(0, static_cast<float>(sqrt(passed)) * 120.f));
 
 		augs::gui::text::print_stroked(
 			output,
-			text_pos,
+			camera.to_world_space(screen_size, text_pos),
 			{ r.in.text, { font, r.in.color } },
 			black
 		);

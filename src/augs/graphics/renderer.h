@@ -6,8 +6,6 @@
 #include "augs/graphics/texture.h"
 #include "augs/graphics/debug_line.h"
 
-#include "augs/math/camera_cone.h"
-
 namespace augs {
 	namespace graphics {
 		class texture;
@@ -55,7 +53,6 @@ namespace augs {
 			const debug_lines& logic_step_lines,
 			const debug_lines& persistent_lines,
 
-			const camera_cone,
 			const augs::texture_atlas_entry line_texture, 
 			const float interpolation_ratio
 		);

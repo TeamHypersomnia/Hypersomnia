@@ -93,7 +93,7 @@ namespace augs {
 
 		std::vector<std::byte> output;
 
-		output.resize(size);
+		output.resize(static_cast<std::size_t>(size));
 		file.read(reinterpret_cast<byte_type_for_t<std::ifstream>*>(output.data()), size);
 		return output;
 	}

@@ -1,6 +1,4 @@
 #pragma once
-#include "augs/math/camera_cone.h"
-
 #include "augs/misc/timing/delta.h"
 #include "augs/misc/minmax.h"
 
@@ -41,7 +39,6 @@ public:
 	
 	void draw_highlights(
 		const augs::drawer output,
-		const camera_cone camera,
 		const cosmos& cosmos,
 		const interpolation_system& interp,
 		const game_images_in_atlas_map& game_images

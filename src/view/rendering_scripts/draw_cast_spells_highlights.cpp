@@ -32,7 +32,7 @@ void draw_cast_spells_highlights(const draw_cast_spells_highlights_input in) {
 
 							in.output.aabb_centered(
 								in.cast_highlight_tex,
-								in.camera[it.get_viewing_transform(in.interpolation).pos],
+								it.get_viewing_transform(in.interpolation).pos,
 								highlight_col
 							);
 						}

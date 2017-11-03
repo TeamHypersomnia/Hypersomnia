@@ -90,6 +90,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 	const auto light_pos_uniform = light_shader.get_uniform_location("light_pos");
 	const auto light_max_distance_uniform = light_shader.get_uniform_location("max_distance");
+	const auto light_distance_mult_uniform = light_shader.get_uniform_location("distance_mult");
 	const auto light_attenuation_uniform = light_shader.get_uniform_location("light_attenuation");
 	const auto light_multiply_color_uniform = light_shader.get_uniform_location("multiply_color");
 	const auto projection_matrix_uniform = light_shader.get_uniform_location("projection_matrix");
@@ -101,17 +102,18 @@ void light_system::render_all_lights(const light_system_input in) const {
 	std::vector<messages::visibility_information_request> requests;
 	std::vector<messages::visibility_information_response> responses;
 
-	light_shader.set_projection(projection_matrix);
+	light_shader.set_projection(in.camera.get_projection_matrix(in.screen_size));
+	light_shader.set_uniform(light_distance_mult_uniform, 1.f / in.camera.zoom);
 
 	auto draw_layer = [&](const render_layer r) {
 		for (const auto e : visible_per_layer[r]) {
-			draw_entity(cosmos[e], { output, in.game_images, in.camera, global_time_seconds }, in.interpolation);
+			draw_entity(cosmos[e], { output, in.game_images, global_time_seconds }, in.interpolation);
 		}
 	};
 	
 	auto draw_neons = [&](const render_layer r) {
 		for (const auto e : visible_per_layer[r]) {
-			draw_neon_map(cosmos[e], { output, in.game_images, in.camera, global_time_seconds }, in.interpolation);
+			draw_neon_map(cosmos[e], { output, in.game_images, global_time_seconds }, in.interpolation);
 		}
 	};
 
@@ -149,9 +151,9 @@ void light_system::render_all_lights(const light_system_input in) const {
 			const auto world_light_tri = r.get_world_triangle(t, world_light_pos);
 			augs::vertex_triangle renderable_light_tri;
 
-			renderable_light_tri.vertices[0].pos = in.camera[world_light_tri[0]];
-			renderable_light_tri.vertices[1].pos = in.camera[world_light_tri[1]];
-			renderable_light_tri.vertices[2].pos = in.camera[world_light_tri[2]];
+			renderable_light_tri.vertices[0].pos = world_light_tri[0];
+			renderable_light_tri.vertices[1].pos = world_light_tri[1];
+			renderable_light_tri.vertices[2].pos = world_light_tri[2];
 
 			auto considered_color = light.color;
 			
@@ -198,7 +200,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 		const auto& cache = per_entity_cache[linear_cache_key(light_entity)];
 
-		const auto light_frag_pos = in.camera.get_screen_space_revert_y(world_light_pos);
+		const auto light_frag_pos = in.camera.to_screen_space(in.screen_size, world_light_pos);
 
 		light_shader.set_uniform(light_pos_uniform, light_frag_pos);
 		light_shader.set_uniform(light_max_distance_uniform, light.max_distance.base_value);
@@ -260,7 +262,6 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 	{
 		components::sprite::drawing_input basic(output);
-		basic.camera = in.camera;
 		basic.use_neon_map = true;
 
 		particles.draw_particles_as_sprites(

@@ -29,9 +29,11 @@ struct audiovisual_advance_input {
 	const double speed_multiplier;
 
 	const const_entity_handle viewed_character;
+	
 	const camera_cone cone;
+	const vec2 screen_size;
+
 	const visible_entities& all_visible;
-	const vec2i screen_size;
 	const particle_effects_map& particle_effects;
 
 	const loaded_sounds& sounds;
@@ -45,9 +47,9 @@ struct audiovisual_advance_input {
 
 		const const_entity_handle viewed_character,
 		const camera_cone cone,
+		const vec2 screen_size,
 		const visible_entities& all_visible,
 
-		const vec2i screen_size,
 		const particle_effects_map& particle_effects,
 
 		const loaded_sounds& sounds,
@@ -59,8 +61,8 @@ struct audiovisual_advance_input {
 
 		viewed_character(viewed_character),
 		cone(cone),
-		all_visible(all_visible),
 		screen_size(screen_size),
+		all_visible(all_visible),
 		particle_effects(particle_effects),
 
 		sounds(sounds),

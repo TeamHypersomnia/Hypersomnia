@@ -1,4 +1,5 @@
 #pragma once
+#include "augs/math/camera_cone.h"
 #include "augs/math/matrix.h"
 
 #include "augs/drawing/drawing.h"
@@ -69,6 +70,7 @@ void illuminated_rendering(
 	
 	const auto viewed_character = in.viewed_character;
 
+	const auto screen_size = in.screen_size;
 	const auto& cosmos = viewed_character.get_cosmos();
 	const auto camera = in.camera;
 	const auto viewed_crosshair = viewed_character[child_entity_name::CHARACTER_CROSSHAIR];
@@ -81,7 +83,7 @@ void illuminated_rendering(
 	const auto& thunders = in.audiovisuals.get<thunder_system>();
 	const auto global_time_seconds = cosmos.get_total_seconds_passed(in.interpolation_ratio);
 	const auto settings = in.drawing;
-	const auto matrix = augs::orthographic_projection(camera.visible_world_area);
+	const auto matrix = camera.get_projection_matrix(screen_size);
 	const auto& visible = in.all_visible;
 	const auto& shaders = in.shaders;
 	const auto& fbos = in.fbos;
@@ -108,7 +110,6 @@ void illuminated_rendering(
 	renderer.set_additive_blending();
 	
 	auto basic_sprite_input = components::sprite::drawing_input(output);
-	basic_sprite_input.camera = camera;
 
 	auto draw_particles = [&](const render_layer layer) {
 		particles.draw_particles_as_sprites(
@@ -158,12 +159,12 @@ void illuminated_rendering(
 
 						const vec2 edge_size = static_cast<vec2>(laser_glow_edge.get_size());
 
-						output.line(laser_glow, camera[from], camera[to], edge_size.y / 3.f, col);
+						output.line(laser_glow, from, to, edge_size.y / 3.f, col);
 
 						const auto edge_offset = (to - from).set_length(edge_size.x);
 
-						output.line(laser_glow_edge, camera[to], camera[to + edge_offset], edge_size.y / 3.f, col);
-						output.line(laser_glow_edge, camera[from - edge_offset], camera[from], edge_size.y / 3.f, col, { flip::HORIZONTALLY });
+						output.line(laser_glow_edge, to, to + edge_offset, edge_size.y / 3.f, col);
+						output.line(laser_glow_edge, from - edge_offset, from, edge_size.y / 3.f, col, { flip::HORIZONTALLY });
 					},
 					[](const vec2, const vec2) {},
 					interp,
@@ -175,7 +176,6 @@ void illuminated_rendering(
 			draw_cast_spells_highlights({
 				output,
 				interp,
-				camera,
 				cosmos,
 				global_time_seconds
 			});
@@ -193,28 +193,30 @@ void illuminated_rendering(
 			exploding_rings.draw_highlights_of_rings(
 				output,
 				cast_highlight,
+				cosmos,
 				camera,
-				cosmos
+				screen_size
 			);
 		},
 		camera,
+		screen_size,
 		interp,
 		particles,
 		visible.per_layer,
 		game_images
-		});
+	});
 
 	set_shader_with_matrix(shaders.illuminated);
 
 	auto draw_layer = [&](const render_layer r) {
 		for (const auto e : visible.per_layer[r]) {
-			draw_entity(cosmos[e], { output, game_images, camera, global_time_seconds }, interp);
+			draw_entity(cosmos[e], { output, game_images, global_time_seconds }, interp);
 		}
 	};
 
 	auto draw_borders = [&](const render_layer r, auto provider) {
 		for (const auto e : visible.per_layer[r]) {
-			draw_border(cosmos[e], { output, game_images, camera, global_time_seconds }, interp, provider);
+			draw_border(cosmos[e], { output, game_images, global_time_seconds }, interp, provider);
 		}
 	};
 
@@ -292,7 +294,7 @@ void illuminated_rendering(
 				if (const auto s = it.find<components::sprite>()) {
 					draw_renderable(
 						*s, 
-						{ output, game_images, camera, global_time_seconds },
+						{ output, game_images, global_time_seconds },
 						it.get<components::transform>()
 					);
 				}
@@ -307,8 +309,8 @@ void illuminated_rendering(
 			[&](const vec2 from, const vec2 to, const rgba col) {
 				line_output.line(
 					laser,
-					camera[from],
-					camera[to], 
+					from,
+					to, 
 					col
 				);
 			},
@@ -316,8 +318,8 @@ void illuminated_rendering(
 			[&](const vec2 from, const vec2 to) {
 				line_output.dashed_line(
 					laser,
-					camera[from],
-					camera[to],
+					from,
+					to,
 					white,
 					10.f,
 					40.f, 
@@ -365,7 +367,6 @@ void illuminated_rendering(
 			renderer.get_special_buffer(),
 			cosmos,
 			viewed_character,
-			camera,
 			interp,
 			global_time_seconds,
 			gui_font,
@@ -384,7 +385,6 @@ void illuminated_rendering(
 			output,
 			renderer.get_special_buffer(),
 			interp,
-			camera,
 			cosmos,
 			global_time_seconds,
 			tex
@@ -402,8 +402,9 @@ void illuminated_rendering(
 	exploding_rings.draw_rings(
 		output,
 		renderer.specials,
+		cosmos,
 		camera,
-		cosmos
+		screen_size
 	);
 
 	renderer.call_and_clear_triangles();
@@ -412,7 +413,6 @@ void illuminated_rendering(
 
 	highlights.draw_highlights(
 		output,
-		camera,
 		cosmos,
 		interp,
 		game_images
@@ -428,7 +428,6 @@ void illuminated_rendering(
 			{
 				output,
 				game_images,
-				camera,
 				global_time_seconds
 			},
 			interp
@@ -436,8 +435,7 @@ void illuminated_rendering(
 	});
 
 	thunders.draw_thunders(
-		line_output,
-		camera
+		line_output
 	);
 
 	renderer.call_and_clear_triangles();
@@ -448,8 +446,12 @@ void illuminated_rendering(
 	flying_numbers.draw_numbers(
 		gui_font,
 		output, 
-		camera
+		camera,
+		screen_size
 	);
+
+	renderer.call_and_clear_triangles();
+	renderer.call_and_clear_lines();
 
 	in.game_world_atlas.bind();
 }

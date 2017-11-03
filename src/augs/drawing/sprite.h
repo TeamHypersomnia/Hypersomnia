@@ -123,11 +123,10 @@ namespace augs {
 			vec2i transform_pos = in.renderable_transform.pos;
 			const float final_rotation = in.renderable_transform.rotation + rotation_offset;
 
-			auto screen_space_pos = in.camera[transform_pos];
 			const auto drawn_size = get_size();
 
 			if (center_offset.non_zero()) {
-				screen_space_pos -= vec2(center_offset).rotate(final_rotation, vec2(0, 0));
+				transform_pos -= vec2(center_offset).rotate(final_rotation, vec2(0, 0));
 			}
 
 			if (in.use_neon_map) {
@@ -137,7 +136,7 @@ namespace augs {
 					draw(
 						in,
 						maybe_neon_map,
-						screen_space_pos,
+						transform_pos,
 						final_rotation,
 						vec2(maybe_neon_map.get_size())
 						/ manager.at(tex).get_size() * drawn_size
@@ -148,7 +147,7 @@ namespace augs {
 				draw(
 					in,
 					manager.at(tex).diffuse,
-					screen_space_pos,
+					transform_pos,
 					final_rotation,
 					drawn_size
 				);

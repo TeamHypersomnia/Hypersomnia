@@ -2,7 +2,6 @@
 #include "augs/math/transform.h"
 
 #include "augs/drawing/drawing.h"
-#include "augs/math/camera_cone.h"
 
 template <class T>
 struct basic_drawing_input_base {
@@ -13,8 +12,6 @@ struct basic_drawing_input_base {
 	{}
 
 	basic_transform<T> renderable_transform;
-	basic_camera_cone<T> camera;
-
 	rgba colorize = white;
 	bool use_neon_map = false;
 

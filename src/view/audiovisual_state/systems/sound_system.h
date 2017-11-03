@@ -51,6 +51,7 @@ public:
 		const augs::audio_volume_settings&,
 		const loaded_sounds&,
 		const camera_cone,
+		const vec2 screen_size,
 		const const_entity_handle listener,
 		const interpolation_system& sys
 	);

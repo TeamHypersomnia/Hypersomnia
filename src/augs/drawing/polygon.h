@@ -178,30 +178,18 @@ namespace augs {
 		void draw(
 			const augs::drawer output,
 			const texture_atlas_entry texture,
-			const transform target_transform,
-			const camera_cone camera = camera_cone()
+			const transform target_transform
 		) const {
 			vertex_triangle new_tri;
-			const auto camera_pos = camera.transform.pos;
 
 			auto model_transformed = vertices;
 
-			if (std::abs(target_transform.rotation) > 0.f) {
-				for (auto& v : model_transformed) {
+			for (auto& v : model_transformed) {
+				if (std::abs(target_transform.rotation) > 0.f) {
 					v.pos.rotate(target_transform.rotation, vec2(0, 0));
 				}
-			}
 
-			/* further rotation of the polygon to fit the camera transform */
-			for (auto& v : model_transformed) {
-				const auto center = camera.visible_world_area / 2;
-				
-				v.pos += target_transform.pos - camera_pos + center;
-
-				/* rotate around the center of the screen */
-				if (std::abs(camera.transform.rotation) > 0.f) {
-					v.pos.rotate(camera.transform.rotation, center);
-				}
+				v.pos += target_transform.pos;
 
 				v.pos.x = static_cast<float>(static_cast<int>(v.pos.x));
 				v.pos.y = static_cast<float>(static_cast<int>(v.pos.y));
@@ -262,7 +250,6 @@ namespace augs {
 				auto neon_in = typename sprite_type::drawing_input{ in.output };
 
 				neon_in.renderable_transform = in.renderable_transform;
-				neon_in.camera = in.camera;
 				neon_in.colorize = in.colorize;
 
 				neon_in.global_time_seconds = in.global_time_seconds;
@@ -279,8 +266,7 @@ namespace augs {
 			draw(
 				in.output,
 				texture,
-				in.renderable_transform,
-				in.camera
+				in.renderable_transform
 			);
 		}
 	};

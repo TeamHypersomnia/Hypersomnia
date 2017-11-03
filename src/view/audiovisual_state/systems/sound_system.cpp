@@ -77,6 +77,7 @@ void sound_system::track_new_sound_existences_near_camera(
 	const augs::audio_volume_settings& settings,
 	const loaded_sounds& manager,
 	const camera_cone cone,
+	const vec2 screen_size,
 	const const_entity_handle listening_character,
 	const interpolation_system& sys
 ) {

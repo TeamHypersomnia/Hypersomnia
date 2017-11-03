@@ -24,7 +24,7 @@ struct editor_tab {
 	// GEN INTROSPECTOR struct editor_tab
 	augs::path_type current_path;
 	std::unordered_set<entity_id> selected_entities;
-	std::optional<camera_cone> editor_mode_cam;
+	std::optional<camera_cone> panned_camera;
 	editor_history history;
 	// END GEN INTROSPECTOR
 
