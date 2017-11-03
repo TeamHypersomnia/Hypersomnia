@@ -38,25 +38,25 @@ namespace augs {
 			read_pos = new_pos;
 		}
 
-		void reset_write_pos() {
-			write_pos = 0;
-		}
-
-		void reset_read_pos() {
-			read_pos = 0;
-		}
-
 		std::size_t size() const {
 			return write_pos;
 		}
 	};
 
 	class stream : public stream_position {
-		std::vector<std::byte> buf;
+		std::vector<std::byte> buffer;
 
-		template <class T>
-		friend std::vector<std::byte> to_bytes(const T& object);
 	public:
+		stream() = default;
+		
+		stream(stream&&) = default;
+		stream(const stream&) = default;
+
+		stream& operator=(const stream&) = default;
+		stream& operator=(stream&&) = default;
+
+		stream(std::vector<std::byte>&& new_buffer);
+		stream& operator=(std::vector<std::byte>&& new_buffer);
 
 		std::size_t mismatch(const stream&) const;
 
@@ -73,19 +73,19 @@ namespace augs {
 
 		template<class T>
 		T peek() const {
-			return *reinterpret_cast<const T*>(buf.data() + read_pos);
+			return *reinterpret_cast<const T*>(buffer.data() + read_pos);
 		}
 
 		template <class Archive>
 		void write_with_properties(Archive& ar) const {
-			augs::write_bytes(ar, buf);
+			augs::write_bytes(ar, buffer);
 			augs::write_bytes(ar, write_pos);
 			augs::write_bytes(ar, read_pos);
 		}
 
 		template <class Archive>
 		void read_with_properties(Archive& ar) {
-			augs::read_bytes(ar, buf);
+			augs::read_bytes(ar, buffer);
 			augs::read_bytes(ar, write_pos);
 			augs::read_bytes(ar, read_pos);
 		}
@@ -95,11 +95,15 @@ namespace augs {
 		void write(const augs::stream&);
 		void reserve(const std::size_t);
 		void reserve(const output_stream_reserver&);
+
+		operator std::vector<std::byte>&&() && {
+			return std::move(buffer);
+		}
 	};
 
 	class output_stream_reserver : public stream_position {
 	public:
-		stream make_stream();
+		stream create_reserved_stream();
 
 		void write(const std::byte* const data, const std::size_t bytes);
 	};
@@ -108,13 +112,9 @@ namespace augs {
 	std::vector<std::byte> to_bytes(const T& object) {
 		stream s;
 		augs::write_bytes(s, object);
-		return std::move(s.buf);
+		return std::move(s);
 	}
 }
-
-#if READWRITE_OVERLOAD_TRAITS_INCLUDED
-#error "I/O traits were included BEFORE I/O overloads, which may cause them to be omitted under some compilers."
-#endif
 
 namespace augs {
 	template<class A>

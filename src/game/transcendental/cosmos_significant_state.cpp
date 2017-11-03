@@ -56,8 +56,8 @@ std::size_t cosmos_significant_state::get_first_mismatch_pos(const cosmos_signif
 	augs::write_bytes(r1, a);
 	augs::write_bytes(r2, b);
 	
-	auto this_serialized = r1.make_stream();
-	auto second_serialized = r2.make_stream();
+	auto this_serialized = r1.create_reserved_stream();
+	auto second_serialized = r2.create_reserved_stream();
 
 	augs::write_bytes(this_serialized, a);
 	augs::write_bytes(second_serialized, b);

@@ -2,6 +2,7 @@
 #include <catch.hpp>
 
 #include "augs/filesystem/file.h"
+#include "augs/readwrite/streams.h"
 #include "augs/readwrite/byte_readwrite.h"
 
 TEST_CASE("Byte readwrite", "Several tests") {
@@ -11,11 +12,43 @@ TEST_CASE("Byte readwrite", "Several tests") {
 	T v;
 
 	auto test_cycle = [&]() {
-		augs::save_as_bytes(v, path);
-		T test;
-		augs::load_from_bytes(test, path);
+		{
+			augs::save_as_bytes(v, path);
+			T test;
+			augs::load_from_bytes(test, path);
 
-		REQUIRE(test == v);
+			REQUIRE(test == v);
+		}
+
+		{
+			{
+				std::vector<std::byte> bytes;
+				bytes = augs::to_bytes(v);
+				
+				augs::save_as_bytes(bytes, path);
+			}
+
+			T test;
+			augs::load_from_bytes(test, path);
+
+			REQUIRE(test == v);
+		}
+
+		{
+			{
+				std::vector<std::byte> bytes;
+				bytes = augs::to_bytes(v);
+
+				augs::save_as_bytes(bytes, path);
+			}
+
+			T test;
+			auto bytes = augs::file_to_bytes(path);
+			augs::stream ss = std::move(bytes);
+			augs::read_bytes(ss, test);
+
+			REQUIRE(test == v);
+		}
 	};
 
 	{
