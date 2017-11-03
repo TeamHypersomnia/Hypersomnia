@@ -31,11 +31,9 @@ void world_camera::tick(
 
 		/* we obtain transform as a copy because we'll be now offsetting it by crosshair position */
 		if (entity_to_chase.alive()) {
-			cone.transform = entity_to_chase.get_viewing_transform(interp);
+			cone.transform = entity_to_chase.get_viewing_transform(interp, true);
 			cone.transform.rotation = 0;
 		}
-
-		cone.transform.pos = vec2i(cone.transform.pos);
 
 		return cone;
 	}();

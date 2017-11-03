@@ -127,6 +127,7 @@ namespace ingredients {
 		// driver.linear_damping_while_driving = 4.f;
 
 		e.map_child_entity(child_entity_name::CHARACTER_CROSSHAIR, crosshair_entity);
+		crosshair_entity.make_as_child_of(e);
 
 		sprite.set(assets::game_image_id::STANDARD_HEAD, metas);
 
@@ -182,7 +183,6 @@ namespace prefabs {
 		}
 
 		character.add_standard_components(step);
-
 		// LOG("Character mass: %x", character.get<components::rigid_body>().get_mass());
 		return character;
 	}

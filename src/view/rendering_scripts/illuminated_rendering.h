@@ -292,10 +292,19 @@ void illuminated_rendering(
 			processing_subjects::WITH_CROSSHAIR,
 			[&](const const_entity_handle it) {
 				if (const auto s = it.find<components::sprite>()) {
+					const auto p = it.get_parent();
+
+					if (p.dead()) {
+						return;
+					}
+
+					auto transform = p.get_viewing_transform(interp, true);
+					transform.pos += it.get<components::crosshair>().base_offset;
+
 					draw_renderable(
-						*s, 
+						*s,
 						{ output, game_images, global_time_seconds },
-						it.get<components::transform>()
+						transform
 					);
 				}
 			}
