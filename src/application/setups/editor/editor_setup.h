@@ -43,7 +43,8 @@ struct editor_popup {
 };
 
 class editor_setup : private current_tab_access_cache<editor_setup> {
-	friend class current_tab_access_cache<editor_setup>;
+	using base = current_tab_access_cache<editor_setup>;
+	friend base;
 
 	double global_time_seconds = 0.0;
 
@@ -90,6 +91,7 @@ class editor_setup : private current_tab_access_cache<editor_setup> {
 
 		tabs.emplace(tabs.begin() + new_index);
 		works.emplace(works.begin() + new_index, std::make_unique<workspace>());
+		base::refresh();
 
 		if (const bool successfully_opened = new_workspace_provider(tabs[new_index], *works[new_index])) {
 			set_current_tab(new_index);
@@ -260,7 +262,7 @@ public:
 	void next_tab();
 	void prev_tab();
 	void close_tab();
-	void close_tab(const std::size_t i);
+	void close_tab(const tab_index_type i);
 
 	void go_to_all();
 	void open_containing_folder();

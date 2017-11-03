@@ -19,6 +19,7 @@
 
 #include <imgui/imgui_internal.h>
 
+#include "augs/readwrite/byte_readwrite.h"
 #include "augs/readwrite/lua_readwrite.h"
 
 void editor_setup::on_tab_changed() {
@@ -91,13 +92,13 @@ void editor_setup::open_last_tabs(sol::state& lua) {
 	ensure(works.empty());
 
 	try {
-		const auto opened_tabs = augs::load_from_lua_table<editor_saved_tabs>(lua, get_editor_tabs_path());
+		const auto opened_tabs = augs::load<editor_saved_tabs>(get_editor_tabs_path());
 		tabs = opened_tabs.tabs;
 
 		if (!tabs.empty()) {
 			/* Reload workspaces */
 
-			std::vector<std::size_t> tabs_to_close;
+			std::vector<tab_index_type> tabs_to_close;
 
 			for (std::size_t i = 0; i < tabs.size(); ++i) {
 				works.emplace_back(std::make_unique<workspace>());
@@ -108,7 +109,7 @@ void editor_setup::open_last_tabs(sol::state& lua) {
 					if (const auto popup = open_workspace(*works.back(), { lua, unsaved_path })) {
 						if (const auto popup = open_workspace(*works.back(), { lua, tabs[i].current_path })) {
 							set_popup(*popup);
-							tabs_to_close.push_back(i);
+							tabs_to_close.push_back(static_cast<tab_index_type>(i));
 						}
 					}
 				}
@@ -159,7 +160,7 @@ void editor_setup::autosave(const autosave_input in) const {
 		}
 	}
 
-	augs::save_as_lua_table(lua, saved_tabs, get_editor_tabs_path());
+	augs::save(saved_tabs, get_editor_tabs_path());
 }
 
 void editor_setup::control(
@@ -202,7 +203,7 @@ void editor_setup::apply(const config_lua_table& cfg) {
 bool editor_setup::open_workspace_in_new_tab(const path_operation op) {
 	for (std::size_t i = 0; i < tabs.size(); ++i) {
 		if (tabs[i].current_path == op.path) {
-			set_current_tab(i);
+			set_current_tab(static_cast<tab_index_type>(i));
 			return true;
 		}
 	}
@@ -461,10 +462,8 @@ void editor_setup::perform_custom_imgui(
 				/* Read back */
 
 				{
-					std::size_t i = 0;
-
 					if (closed_tab_index != -1) {
-						close_tab(static_cast<std::size_t>(closed_tab_index));
+						close_tab(static_cast<tab_index_type>(closed_tab_index));
 					}
 					else {
 						bool changed_order = false;
@@ -476,7 +475,7 @@ void editor_setup::perform_custom_imgui(
 							}
 						}
 
-						auto index_to_set = static_cast<std::size_t>(selected_index);
+						auto index_to_set = static_cast<tab_index_type>(selected_index);
 
 						if (changed_order) {
 							decltype(tabs) new_tabs;
@@ -807,7 +806,7 @@ void editor_setup::prev_tab() {
 	}
 }
 
-void editor_setup::close_tab(const std::size_t i) {
+void editor_setup::close_tab(const tab_index_type i) {
 	auto& tab_to_close = tabs[i];
 
 	if (tab_to_close.has_unsaved_changes()) {
@@ -823,7 +822,7 @@ void editor_setup::close_tab(const std::size_t i) {
 	works.erase(works.begin() + i);
 
 	if (!tabs.empty()) {
-		set_current_tab(std::min(current_index, tabs.size() - 1));
+		set_current_tab(std::min(current_index, static_cast<tab_index_type>(tabs.size() - 1)));
 	}
 	else {
 		unset_current_tab();

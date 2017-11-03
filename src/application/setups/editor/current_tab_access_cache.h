@@ -4,6 +4,7 @@
 
 struct editor_tab;
 struct workspace;
+using tab_index_type = unsigned;
 
 template <class derived>
 class current_tab_access_cache {
@@ -11,9 +12,18 @@ class current_tab_access_cache {
 	workspace* current_work = nullptr;
 
 protected:
-	std::size_t current_index = -1;
+	tab_index_type current_index = static_cast<tab_index_type>(-1);
 
-	void set_current_tab(const std::size_t i) {
+	void refresh() {
+		auto& self = *static_cast<derived*>(this);
+
+		if (current_index != static_cast<tab_index_type>(-1)) {
+			current_tab = &self.tabs[current_index];
+			current_work = self.works[current_index].get();
+		}
+	}
+
+	void set_current_tab(const tab_index_type i) {
 		auto& self = *static_cast<derived*>(this);
 
 		if (current_index != i) {
@@ -21,13 +31,11 @@ protected:
 		}
 
 		current_index = i;
-
-		current_tab = &self.tabs[i];
-		current_work = self.works[i].get();
+		refresh();
 	}
 
 	void unset_current_tab() {
-		current_index = -1;
+		current_index = static_cast<tab_index_type>(-1);
 
 		current_tab = nullptr;
 		current_work = nullptr;
