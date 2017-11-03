@@ -49,8 +49,7 @@ void regenerate_neon_map(
 	const auto neon_map_path = output_image_path;
 	const auto neon_map_stamp_path = augs::path_type(neon_map_path).replace_extension(".stamp");
 
-	augs::stream new_stamp_stream;
-	augs::write_bytes(new_stamp_stream, new_stamp);
+	const auto new_stamp_bytes = augs::to_bytes(new_stamp);
 
 	bool should_regenerate = force_regenerate;
 
@@ -62,10 +61,8 @@ void regenerate_neon_map(
 			should_regenerate = true;
 		}
 		else {
-			augs::stream existent_stamp_stream;
-			augs::get_file_contents_binary_into(neon_map_stamp_path, existent_stamp_stream);
-
-			const bool are_stamps_identical = (new_stamp_stream == existent_stamp_stream);
+			const auto existent_stamp_bytes = augs::file_to_bytes(neon_map_stamp_path);
+			const bool are_stamps_identical = (new_stamp_bytes == existent_stamp_bytes);
 
 			if (!are_stamps_identical) {
 				should_regenerate = true;
@@ -82,7 +79,7 @@ void regenerate_neon_map(
 		source_image.save(neon_map_path);
 
 		augs::create_directories(neon_map_stamp_path);
-		augs::create_binary_file(neon_map_stamp_path, new_stamp_stream);
+		augs::save(new_stamp_bytes, neon_map_stamp_path);
 	}
 }
 

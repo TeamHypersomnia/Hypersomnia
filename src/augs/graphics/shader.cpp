@@ -63,7 +63,7 @@ namespace augs {
 			const type shader_type,
 			const path_type& path
 		) try {
-			create(shader_type, "// " + path.string() + "\n" + get_file_contents(path));
+			create(shader_type, "// " + path.string() + "\n" + file_to_string(path));
 		}
 		catch (const augs::ifstream_error& err) {
 			throw shader_error(

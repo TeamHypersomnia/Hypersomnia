@@ -498,10 +498,11 @@ randomization cosmos::get_rng_for(const entity_id id) const {
 }
 
 namespace augs {
-	void write_object_bytes(augs::stream& into, const cosmos& cosm) {
+	template <class Archive>
+	void write_object_bytes(Archive& into, const cosmos& cosm) {
 		auto& profiler = cosm.profiler;
 
-		{
+		if constexpr(can_reserve_v<Archive>) {
 			augs::output_stream_reserver reserver;
 
 			{
@@ -510,6 +511,7 @@ namespace augs {
 			}
 
 			auto scope = measure_scope(profiler.memory_allocation_pass);
+			
 			into.reserve(into.get_write_pos() + reserver.size());
 		}
 
@@ -519,7 +521,8 @@ namespace augs {
 		}
 	}
 
-	void read_object_bytes(augs::stream& from, cosmos& cosm) {
+	template <class Archive>
+	void read_object_bytes(Archive& from, cosmos& cosm) {
 		auto& profiler = cosm.profiler;
 
 		auto refresh_when_done = augs::make_scope_guard([&cosm]() {
@@ -550,3 +553,10 @@ namespace augs {
 
 	}
 }
+
+template void augs::write_object_bytes(augs::stream&, const cosmos&);
+template void augs::read_object_bytes(augs::stream&, cosmos&);
+
+template void augs::write_object_bytes(std::ofstream&, const cosmos&);
+template void augs::read_object_bytes(std::ifstream&, cosmos&);
+

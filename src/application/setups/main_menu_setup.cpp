@@ -109,7 +109,7 @@ main_menu_setup::main_menu_setup(
 	const auto menu_config_patch_path = "content/menu/config.lua";
 
 	try {
-		auto pfr = lua.do_string(augs::get_file_contents(menu_config_patch_path));
+		auto pfr = lua.do_string(augs::file_to_string(menu_config_patch_path));
 		
 		if (pfr.valid()) {
 			menu_config_patch = pfr;

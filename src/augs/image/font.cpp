@@ -65,7 +65,7 @@ namespace augs {
 		ft_indices.clear();
 
 		try {
-			const auto& unicodes = augs::get_file_contents(in.charset_path, wchar_t());
+			const auto unicodes = augs::file_to_string(in.charset_path, wchar_t());
 
 			glyph_bitmaps.reserve(unicodes.size());
 

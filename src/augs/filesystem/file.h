@@ -22,6 +22,18 @@ namespace augs {
 		return stream;
 	}
 
+	inline auto open_binary_output_stream(const augs::path_type& path) {
+		auto s = with_exceptions<std::ofstream>();
+		s.open(path, std::ios::out | std::ios::binary);
+		return s;
+	}
+
+	inline auto open_binary_input_stream(const augs::path_type& path) {
+		auto s = with_exceptions<std::ifstream>();
+		s.open(path, std::ios::in | std::ios::binary);
+		return s;
+	}
+
 	using ifstream_error = std::ifstream::failure;
 	
 	inline std::chrono::system_clock::time_point last_write_time(const path_type& path) {
@@ -62,7 +74,7 @@ namespace augs {
 	}
 
 	template <class C = char>
-	auto get_file_contents(const path_type& path, const C = C()) {
+	auto file_to_string(const path_type& path, const C = C()) {
 		auto t = with_exceptions<std::basic_ifstream<C>>();
 		t.open(path);
 
@@ -72,42 +84,18 @@ namespace augs {
 		return buffer.str();
 	}
 
-	inline std::vector<std::string> get_file_lines_without_blanks_and_comments(
-		const path_type& path,
-		const char comment_begin_character = '%'
-	) {
-		auto input = with_exceptions<std::ifstream>();
-		input.open(path);
-	
-		std::vector<std::string> out;
-	
-		for (std::string line; std::getline(input, line); ) {
-			const bool should_omit = 
-				std::all_of(line.begin(), line.end(), isspace) 
-				|| line[0] == comment_begin_character
-			;
-	
-			if(!should_omit) {
-				out.emplace_back(line);
-			}
-		}
-	
-		return out;
-	}
+	inline auto file_to_bytes(const path_type& path) {
+		auto file = with_exceptions<std::ifstream>();
+		file.open(path, std::ios::binary | std::ios::ate);
 
-	inline auto get_file_lines(const path_type& path) {
-		using string_type = std::string;
+		const std::streamsize size = file.tellg();
+		file.seekg(0, std::ios::beg);
 
-		auto input = with_exceptions<std::ifstream>();
-		input.open(path);
+		std::vector<std::byte> output;
 
-		std::vector<string_type> out;
-
-		for (string_type line; std::getline(input, line);) {
-			out.push_back(line);
-		}
-
-		return out;
+		output.resize(size);
+		file.read(reinterpret_cast<byte_type_for_t<std::ifstream>*>(output.data()), size);
+		return output;
 	}
 
 	template <class S>
@@ -119,63 +107,40 @@ namespace augs {
 
 	template <class S>
 	void create_text_file_if_different(const path_type& path, const S& text) {
-		if (!file_exists(path) || text != get_file_contents(path)) {
+		if (!file_exists(path) || text != file_to_string(path)) {
 			auto out = with_exceptions<std::ofstream>();
 			out.open(path, std::ios::out);
 			out << text;
 		}
 	}
 
-	template <class C>
-	void create_binary_file(const path_type& path, const C& content) {
-		auto out = with_exceptions<std::ofstream>();
-		out.open(path, std::ios::out | std::ios::binary);
-		out.write(reinterpret_cast<const byte_type_for_t<std::ofstream>*>(content.data()), content.size() * sizeof(content[0]));
-	}
-
 	template <class O>
 	void save(const O& object, const path_type& path) {
-		augs::stream content;
-		augs::write_bytes(content, object);
-
-		create_binary_file(path, content);
+		auto out = open_binary_output_stream(path);
+		write_bytes(out, object);
 	}
 
-	template <class S>
-	void get_file_contents_binary_into(const path_type& path, S& target) {
-		auto file = with_exceptions<std::ifstream>();
-		file.open(path, std::ios::binary | std::ios::ate);
-
-		const std::streamsize size = file.tellg();
-		file.seekg(0, std::ios::beg);
-
-		target.reserve(static_cast<unsigned>(size));
-		file.read(reinterpret_cast<byte_type_for_t<std::ifstream>*>(target.data()), size);
-		target.set_write_pos(static_cast<size_t>(size));
+	inline void save(const std::vector<std::byte>& bytes, const path_type& path) {
+		auto out = open_binary_output_stream(path);
+		out.write(reinterpret_cast<const byte_type_for_t<decltype(out)>*>(bytes.data()), bytes.size());
 	}
 
 	template <class O>
 	void load(O& object, const path_type& path) {
-		augs::stream content;
-		get_file_contents_binary_into(path, content);
-
-		augs::read_bytes(content, object);
+		auto file = open_binary_input_stream(path);
+		augs::read_bytes(file, object);
 	}
 
 	template <class O>
 	O load(const path_type& path) {
-		augs::stream content;
-		get_file_contents_binary_into(path, content);
-
 		O object;
-		augs::read_bytes(content, object);
+		load(object, path);
 		return object;
 	}
 
 	template <class ContainerType>
 	void read_map_until_eof(const path_type& path, ContainerType& into) {
-		auto source = with_exceptions<std::ifstream>();
-		source.open(path, std::ios::binary | std::ios::in);
+		auto source = open_binary_input_stream(path);
 
 		while (source.peek() != EOF) {
 			typename ContainerType::key_type key{};

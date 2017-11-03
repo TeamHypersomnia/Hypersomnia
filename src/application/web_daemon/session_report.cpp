@@ -76,7 +76,7 @@ ahc_echo(void *cls,
 }
 
 bool session_report::start_daemon(const config_lua_table& cfg) {
-	std::string contents = augs::get_file_contents(cfg.server_http_daemon_html_file_path);
+	std::string contents = augs::file_to_string(cfg.server_http_daemon_html_file_path);
 	
 	const std::string survey_num_token = "%survey_num%";
 	const std::string stats_token = "%stats%";
@@ -88,7 +88,7 @@ bool session_report::start_daemon(const config_lua_table& cfg) {
 	last_seen_updater = [&cfg, post_data_path]() {
 		while (true) {
 			using namespace std::literals::chrono_literals;
-			augs::http_post_request(cfg.last_session_update_link, "", augs::get_file_contents(post_data_path));
+			augs::http_post_request(cfg.last_session_update_link, "", augs::file_to_string(post_data_path));
 			std::this_thread::sleep_for(10000ms);
 		}
 	};

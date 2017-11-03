@@ -388,7 +388,7 @@ namespace augs {
 		const path_type& source_path
 	) {
 		auto pfr = lua.do_string(
-			get_file_contents(source_path)
+			file_to_string(source_path)
 		);
 
 		if (!pfr.valid()) {

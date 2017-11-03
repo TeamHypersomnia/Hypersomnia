@@ -40,7 +40,7 @@ int main(int argc, char** argv) {
 	const auto input_file_path = augs::path_type(argv[2]);
 	const auto output_file_path = augs::path_type(argv[3]);
 
-	const auto input_file_contents = augs::get_file_contents(input_file_path);
+	const auto input_file_contents = augs::file_to_string(input_file_path);
 	
 	std::string debug_argv_content;
 

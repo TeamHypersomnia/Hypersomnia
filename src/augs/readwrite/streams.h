@@ -53,7 +53,11 @@ namespace augs {
 
 	class stream : public stream_position {
 		std::vector<std::byte> buf;
+
+		template <class T>
+		friend std::vector<std::byte> to_bytes(const T& object);
 	public:
+
 		std::size_t mismatch(const stream&) const;
 
 		bool operator==(const stream&) const;
@@ -99,6 +103,13 @@ namespace augs {
 
 		void write(const std::byte* const data, const std::size_t bytes);
 	};
+
+	template <class T>
+	std::vector<std::byte> to_bytes(const T& object) {
+		stream s;
+		augs::write_bytes(s, object);
+		return std::move(s.buf);
+	}
 }
 
 #if READWRITE_OVERLOAD_TRAITS_INCLUDED

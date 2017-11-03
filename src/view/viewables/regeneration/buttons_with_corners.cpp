@@ -21,8 +21,7 @@ void regenerate_button_with_corners(
 	const auto untemplatized_path = augs::path_type(typesafe_sprintf(output_path_template.string(), ""));
 	const auto button_with_corners_stamp_path = augs::path_type(untemplatized_path).replace_extension(".stamp");
 
-	augs::stream new_stamp_stream;
-	augs::write_bytes(new_stamp_stream, new_stamp);
+	const auto new_stamp_bytes = augs::to_bytes(new_stamp);
 
 	bool should_regenerate = force_regenerate;
 
@@ -47,10 +46,8 @@ void regenerate_button_with_corners(
 			should_regenerate = true;
 		}
 		else {
-			augs::stream existent_stamp_stream;
-			augs::get_file_contents_binary_into(button_with_corners_stamp_path, existent_stamp_stream);
-
-			const bool are_stamps_identical = (new_stamp_stream == existent_stamp_stream);
+			const auto existent_stamp_bytes = augs::file_to_bytes(button_with_corners_stamp_path);
+			const bool are_stamps_identical = (new_stamp_bytes == existent_stamp_bytes);
 
 			if (!are_stamps_identical) {
 				should_regenerate = true;
@@ -69,7 +66,7 @@ void regenerate_button_with_corners(
 			new_stamp
 		);
 
-		augs::create_binary_file(button_with_corners_stamp_path, new_stamp_stream);
+		augs::save(new_stamp_bytes, button_with_corners_stamp_path);
 	}
 }
 
