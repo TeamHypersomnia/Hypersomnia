@@ -4,7 +4,7 @@
 #include "augs/templates/get_index_type_for_size_of.h"
 
 #include "augs/ensure.h"
-#include "augs/readwrite/streams.h"
+#include "augs/readwrite/memory_stream.h"
 
 namespace augs {
 	template <class offset_type>

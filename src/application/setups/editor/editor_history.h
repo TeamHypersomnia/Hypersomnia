@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include <variant>
-#include "augs/readwrite/streams.h"
+#include "augs/readwrite/memory_stream.h"
 #include "game/transcendental/entity_id.h"
 
 struct change_common_state_command {

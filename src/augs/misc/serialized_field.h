@@ -1,6 +1,6 @@
 #pragma
 #include "augs/misc/introspect_declaration.h"
-#include "augs/readwrite/streams.h"
+#include "augs/readwrite/memory_stream.h"
 
 namespace augs {
 	struct serialized_field {

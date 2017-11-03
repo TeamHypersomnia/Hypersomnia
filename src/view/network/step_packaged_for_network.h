@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/readwrite/streams.h"
+#include "augs/readwrite/memory_stream.h"
 #include "game/transcendental/cosmic_entropy.h"
 #include "augs/readwrite/byte_readwrite_declaration.h"
 

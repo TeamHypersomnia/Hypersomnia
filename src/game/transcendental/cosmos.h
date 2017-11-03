@@ -5,7 +5,7 @@
 
 #include "augs/templates/exception_templates.h"
 
-#include "augs/readwrite/streams.h"
+#include "augs/readwrite/memory_stream.h"
 #include "augs/misc/timing/delta.h"
 #include "augs/misc/enum/enum_boolset.h"
 #include "augs/templates/subscript_handle_getters_mixin.h"

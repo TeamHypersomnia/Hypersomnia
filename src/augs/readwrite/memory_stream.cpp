@@ -1,6 +1,6 @@
 #include <cstring>
 #include <algorithm>
-#include "augs/readwrite/streams.h"
+#include "augs/readwrite/memory_stream.h"
 
 namespace augs {
 	memory_stream::memory_stream(std::vector<std::byte>&& new_buffer)

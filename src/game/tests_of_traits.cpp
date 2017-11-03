@@ -2,7 +2,7 @@
 
 #include "augs/readwrite/custom_lua_representations.h"
 
-#include "augs/readwrite/streams.h"
+#include "augs/readwrite/memory_stream.h"
 
 #include "game/transcendental/cosmos.h"
 #include "game/organization/all_component_includes.h"

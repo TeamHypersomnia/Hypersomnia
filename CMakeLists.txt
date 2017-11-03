@@ -251,7 +251,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/augs/misc/machine_entropy.cpp"
 	"src/augs/misc/readable_bytesize.cpp"
 	"src/augs/misc/action_list/standard_actions.cpp"
-	"src/augs/readwrite/streams.cpp"
+	"src/augs/readwrite/memory_stream.cpp"
 	"src/augs/misc/time_utils.cpp"
 	"src/augs/misc/typesafe_sprintf.cpp"
 	"src/augs/misc/typesafe_sscanf.cpp"

@@ -4,7 +4,7 @@
 #include <memory>
 #include <map>
 
-#include "augs/readwrite/streams.h"
+#include "augs/readwrite/memory_stream.h"
 #include "augs/misc/timing/timer.h"
 
 #include "network_types.h"

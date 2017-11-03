@@ -2,7 +2,7 @@
 #include <catch.hpp>
 
 #include "augs/filesystem/file.h"
-#include "augs/readwrite/streams.h"
+#include "augs/readwrite/memory_stream.h"
 #include "augs/readwrite/byte_readwrite.h"
 
 TEST_CASE("Byte readwrite", "Several tests") {

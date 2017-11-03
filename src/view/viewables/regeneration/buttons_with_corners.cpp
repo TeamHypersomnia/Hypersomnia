@@ -1,6 +1,6 @@
 #include "augs/gui/button_corners.h"
 
-#include "augs/readwrite/streams.h"
+#include "augs/readwrite/memory_stream.h"
 #include "augs/image/image.h"
 
 #include "augs/filesystem/file.h"

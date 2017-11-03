@@ -2,7 +2,7 @@
 #include <vector>
 #include <unordered_map>
 
-#include "augs/readwrite/streams.h"
+#include "augs/readwrite/memory_stream.h"
 #include "augs/misc/machine_entropy.h"
 #include "augs/misc/container_with_small_size.h"
 

@@ -1,6 +1,6 @@
 #include <sol2/sol.hpp>
 
-#include "augs/readwrite/streams.h"
+#include "augs/readwrite/memory_stream.h"
 #include "augs/misc/randomization.h"
 
 #include "game/stateless_systems/movement_system.h"
