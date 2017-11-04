@@ -818,14 +818,12 @@ endif()
 if(BUILD_OPENAL)
 	# We build OpenAL Soft. We need to set some variables beforehand.
 	
-	if(MSVC)
-		set(LIBTYPE "STATIC")
-		set(FORCE_STATIC_VCRT TRUE CACHE BOOL "/MT for static VC runtimes" FORCE)
-		
-		# To avoid linker errors, we also need to tell OpenAL Soft we will be using it statically.
+	set(LIBTYPE "STATIC")
+	set(FORCE_STATIC_VCRT TRUE CACHE BOOL "/MT for static VC runtimes" FORCE)
+	
+	# To avoid linker errors, we also need to tell OpenAL Soft we will be using it statically.
 
-		add_definitions(-DAL_LIBTYPE_STATIC)
-	endif()
+	add_definitions(-DAL_LIBTYPE_STATIC)
 
 	set(ALSOFT_UTILS FALSE CACHE BOOL "Build and install utility programs" FORCE)
 	set(ALSOFT_EXAMPLES FALSE CACHE BOOL "Build and install example programs" FORCE)
