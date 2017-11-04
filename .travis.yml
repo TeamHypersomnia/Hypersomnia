@@ -46,7 +46,6 @@ script:
   - ulimit -c unlimited -S
   - ../dev/${EXECUTABLE_NAME} --unit-tests-only
   - ls -l
-  - if [[ ${RESULT} != 139 ]]; then echo "expected segfault and 139 exit but instead exited with ${RESULT}" && exit 1; fi;
   - for i in $(find ./ -maxdepth 1 -name 'core*' -print); do gdb $(pwd)/test core* -ex "thread apply all bt" -ex "set pagination 0" -batch; done;
 
 notfications:
