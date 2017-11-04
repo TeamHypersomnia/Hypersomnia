@@ -10,6 +10,10 @@ else()
 	message("Unknown system.")
 endif()
 
+# Important note:
+# UNIX build is currently hardcoded to be dynamically linked.
+# MSVC build is currently hardcoded to be statically linked.
+
 # Various feature switches.
 # If it is your first time building Hypersomnia and you get some errors,
 # try turning all of these off to build the minimal possible working Hypersomnia runtime. Then, try to work from there.
@@ -688,7 +692,7 @@ if(ADD_MCMODEL_LARGE_FLAG)
 endif()
 
 if(UNIX)
-	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -g -pthread -static")
+	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -g -pthread")
 endif()
 
 # We configure additional flags for linker.
@@ -707,7 +711,7 @@ endif()
 # We configure some preprocessor defines.
 
 if(UNIX)
-	add_definitions(-DLUA_USE_POSIX)
+	add_definitions(-DLUA_USE_LINUX)
 endif()
 
 # Lua is configured to compile as C++, of which sol2 library must necessarily know.
@@ -722,12 +726,6 @@ add_definitions(-D_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING)
 # We must wait till Catch fixes this warning.
 
 add_definitions(-D_SILENCE_CXX17_UNCAUGHT_EXCEPTION_DEPRECATION_WARNING)
-
-# To avoid linker errors, we also need to tell OpenAL Soft we will be using it statically.
-
-if(BUILD_OPENAL)
-	add_definitions(-DAL_LIBTYPE_STATIC)
-endif()
 
 if(UNIX)
     add_definitions(-DPLATFORM_UNIX=1)
@@ -818,8 +816,15 @@ endif()
 if(BUILD_OPENAL)
 	# We build OpenAL Soft. We need to set some variables beforehand.
 	
-	set(LIBTYPE "STATIC")
-	set(FORCE_STATIC_VCRT TRUE CACHE BOOL "/MT for static VC runtimes" FORCE)
+	if(MSVC)
+		set(LIBTYPE "STATIC")
+		set(FORCE_STATIC_VCRT TRUE CACHE BOOL "/MT for static VC runtimes" FORCE)
+		
+		# To avoid linker errors, we also need to tell OpenAL Soft we will be using it statically.
+
+		add_definitions(-DAL_LIBTYPE_STATIC)
+	endif()
+
 	set(ALSOFT_UTILS FALSE CACHE BOOL "Build and install utility programs" FORCE)
 	set(ALSOFT_EXAMPLES FALSE CACHE BOOL "Build and install example programs" FORCE)
 	set(ALSOFT_TESTS FALSE CACHE BOOL "Build and install test programs" FORCE)
