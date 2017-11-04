@@ -212,6 +212,10 @@ TEST_CASE("Byte readwrite Variants and optionals") {
 		mm[16445] = 4.0;
 		v = mm;
 
+		T by_assignment;
+		by_assignment = mm;
+
+		REQUIRE(by_assignment == v);
 
 		augs::save_as_bytes(v, path);
 		T test;
@@ -225,6 +229,8 @@ TEST_CASE("Byte readwrite Variants and optionals") {
 			std::get<map_type>(test) ==
 			std::get<map_type>(v)
 		);
+
+		REQUIRE(v == test);
 	}
 
 
