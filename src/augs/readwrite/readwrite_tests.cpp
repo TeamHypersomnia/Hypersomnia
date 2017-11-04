@@ -11,13 +11,27 @@
 static const auto path = GENERATED_FILES_DIR "test_byte_readwrite.bin";
 
 template <class T>
+static void report(const T& v, const T& reloaded) {
+	if constexpr(can_stream_left_v<std::ostringstream, T>) {
+		LOG("Original %x\nReloaded: %x", v, reloaded);
+	}
+}
+
+template <class T>
 static bool try_to_reload_with_file(const T& v) {
 	augs::save_as_bytes(v, path);
 	T test;
 	augs::load_from_bytes(test, path);
 
 	augs::remove_file(path);
-	return (test == v);
+
+	const auto success = test == v;
+
+	if (!success) {
+		report(v, test);
+	}
+
+	return success;
 }
 
 template <class T>
@@ -33,7 +47,14 @@ static bool try_to_reload_with_bytes(const T& v) {
 	augs::load_from_bytes(test, path);
 
 	augs::remove_file(path);
-	return (test == v);
+	
+	const auto success = test == v;
+
+	if (!success) {
+		report(v, test);
+	}
+
+	return success;
 }
 
 template <class T>
@@ -51,7 +72,14 @@ static bool try_to_reload_with_memory_stream(const T& v) {
 	augs::read_bytes(ss, test);
 
 	augs::remove_file(path);
-	return (test == v);
+
+	const auto success = test == v;
+
+	if (!success) {
+		report(v, test);
+	}
+
+	return success;
 }
 
 #define test_cycle(variable) \
@@ -59,6 +87,37 @@ REQUIRE(try_to_reload_with_file(variable)); \
 REQUIRE(try_to_reload_with_bytes(variable)); \
 REQUIRE(try_to_reload_with_memory_stream(variable));
 
+TEST_CASE("Byte readwrite Sanity check") {
+	using T = std::variant<double, std::string, std::unordered_map<int, double>, std::optional<std::string>>;
+
+	T a, b;
+	REQUIRE(a == b);
+
+	a = 2.0;
+	b = 2.0;
+
+	REQUIRE(a == b);
+	
+	REQUIRE(std::optional<std::string>() == std::optional<std::string>());
+
+	a = std::optional<std::string>();
+	b = std::optional<std::string>();
+
+	REQUIRE(a == b);
+	
+	REQUIRE((std::unordered_map<int, double>() == std::unordered_map<int, double>()));
+
+	std::unordered_map<int, double> ma;
+	ma[2] = 4587.0;
+	ma[3] = 458247.0;
+	ma[22] = 45187.0;
+	std::unordered_map<int, double> mb;
+	mb[2] = 4587.0;
+	mb[3] = 458247.0;
+	mb[22] = 45187.0;
+
+	REQUIRE(ma == mb);
+}
 
 TEST_CASE("Byte readwrite Trivial types") {
 	int a = 2;
