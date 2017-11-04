@@ -46,7 +46,7 @@ script:
   - ulimit -c unlimited -S
   - ../dev/${EXECUTABLE_NAME} --unit-tests-only
   - ls -l
-  - for i in $(find ./ -maxdepth 1 -name 'core*' -print); do gdb $(pwd)/test core* -ex "thread apply all bt" -ex "set pagination 0" -batch; done;
+  - for i in $(find ./ -maxdepth 1 -name 'core*' -print); do gdb $(pwd)/../dev/${EXECUTABLE_NAME} core* -ex "thread apply all bt" -ex "set pagination 0" -batch; done;
 
 notfications:
   email: false
