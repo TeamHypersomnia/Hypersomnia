@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <iomanip>
 #include <cctype>
+#include <cstddef>
 
 #include "augs/ensure.h"
 
