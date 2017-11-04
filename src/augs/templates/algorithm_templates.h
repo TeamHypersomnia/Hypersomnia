@@ -50,12 +50,12 @@ void fill_range(Container& c, T&& val) {
 	std::fill(c.begin(), c.end(), std::forward<T>(val));
 }
 
-template <class Container, class Container2>
-bool ranges_equal(const Container& c1, const Container& c2, const std::size_t count) {
+template <class Container, class Container2, class count_type>
+bool ranges_equal(const Container& c1, const Container2& c2, const count_type count) {
 	return std::equal(c1.begin(), c1.begin() + count, c2.begin());
 }
 
 template <class Container, class Container2>
-bool ranges_equal(const Container& c1, const Container& c2) {
+bool ranges_equal(const Container& c1, const Container2& c2) {
 	return std::equal(c1.begin(), c1.end(), c2.begin());
 }

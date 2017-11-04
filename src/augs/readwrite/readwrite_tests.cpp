@@ -163,6 +163,11 @@ TEST_CASE("Byte readwrite Containers") {
 	std::vector<int> abcd;
 	std::vector<std::vector<int>> abcde;
 	std::vector<std::unordered_map<int, std::vector<int>>> abcdef;
+	std::unordered_map<int, double> mm;
+	mm[4] = 2.0;
+	mm[4287] = 455.2;
+	mm[16445] = 4.0;
+
 	abc.resize(2);
 	abcd.resize(2);
 	abcde.resize(2);
@@ -170,6 +175,7 @@ TEST_CASE("Byte readwrite Containers") {
 	abcdef[0][412] = { 2, 3, 4 };
 	abcdef[1][420] = { 997, 1 };
 
+	test_cycle(mm);
 	test_cycle(abc);
 	test_cycle(abcd);
 	test_cycle(abcde);
@@ -225,10 +231,17 @@ TEST_CASE("Byte readwrite Variants and optionals") {
 
 		REQUIRE(test.index() == v.index());
 
-		REQUIRE(
-			std::get<map_type>(test) ==
-			std::get<map_type>(v)
-		);
+		{
+			const auto& m1 = std::get<map_type>(test);
+			const auto& m2 = std::get<map_type>(v);
+		
+			REQUIRE(m1.size() == m2.size());
+			REQUIRE(m1.at(4) == m2.at(4));
+			REQUIRE(m1.at(4287) == m2.at(4287));
+			REQUIRE(m1.at(16445) == m2.at(16445));
+		
+			REQUIRE(m1 == m2);
+		}
 
 		REQUIRE(v == test);
 	}

@@ -301,6 +301,8 @@ struct b2Mat33
 	b2Vec3 ex, ey, ez;
 };
 
+bool operator == (const b2Vec2& a, const b2Vec2& b);
+
 /// Rotation
 struct b2Rot
 {
@@ -352,6 +354,10 @@ struct b2Rot
 	float32 s;
 	float32 c;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const b2Rot& b) const {
+		return s == b.s && c == b.c;
+	}
 };
 
 /// A transform contains translation and rotation. It is used to represent
@@ -382,6 +388,10 @@ struct b2Transform
 	b2Vec2 p;
 	b2Rot q;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const b2Transform& b) const {
+		return p == b.p && q == b.q;
+	}
 };
 
 /// This describes the motion of a body/shape for TOI computation.
@@ -409,6 +419,17 @@ struct b2Sweep
 	float32 a;		
 	float32 alpha0;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const b2Sweep& b) const {
+		return localCenter == b.localCenter
+			&& c0 == b.c0
+			&& c == b.c
+			&&  a0 == b.a0
+			&&  a == b.a
+			&&  alpha0 == b.alpha0
+		;
+	}
+
 	/// Fraction of the current time step in the range [0,1]
 	/// c0 and a0 are the positions at alpha0.
 };

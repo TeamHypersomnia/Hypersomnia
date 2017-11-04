@@ -13,6 +13,14 @@ struct pad_bytes {
 			p = static_cast<std::byte>(0u);
 		}
 	}
+
+	bool operator==(const pad_bytes<count>& b) const {
+		return pad == b.pad;
+	}
+
+	bool operator!=(const pad_bytes<count>& b) const {
+		return pad != b.pad;
+	}
 };
 
 template <class T>

@@ -19,11 +19,11 @@ namespace augs {
 		alignas(alignment) std::array<bool, aligned_flag_count> flags;
 		// END GEN INTROSPECTOR
 	public:
-		bool operator==(const enum_boolset& b) const {
+		bool operator==(const enum_boolset<_enum, alignment>& b) const {
 			return ranges_equal(flags, b.flags, flag_count);
 		}
 	
-		bool operator!=(const enum_boolset& b) const {
+		bool operator!=(const enum_boolset<_enum, alignment>& b) const {
 			return !operator==(b);
 		}
 	

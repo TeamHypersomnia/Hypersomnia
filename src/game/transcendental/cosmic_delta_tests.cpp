@@ -280,6 +280,54 @@ TEST_CASE("Cosmos ComparisonTest") {
 	REQUIRE(c1 == c2);
 }
 
+static auto component_checker = [](auto e1, auto e2, auto c) {
+	using T = decltype(c);
+
+	const auto maybe_1 = e1.template find<T>();
+	REQUIRE(maybe_1 != nullptr);
+
+	if (maybe_1) {
+		const auto maybe_2 = e2.template find<T>();
+
+		REQUIRE(maybe_2 != nullptr);
+
+		if (maybe_2) {
+			augs::introspect(
+				[&](auto, const auto& a, const auto& b) {
+					REQUIRE(a == b);
+			},
+
+				*maybe_1,
+				*maybe_2
+				);
+		}
+	}
+};
+
+static auto synchronizer_component_checker = [](auto e1, auto e2, auto c) {
+	using T = decltype(c);
+
+	const auto maybe_1 = e1.template find<T>();
+	REQUIRE(maybe_1 != nullptr);
+
+	if (maybe_1) {
+		const auto maybe_2 = e2.template find<T>();
+
+		REQUIRE(maybe_2 != nullptr);
+
+		if (maybe_2) {
+			augs::introspect(
+				[](auto, const auto& a, const auto& b) {
+				REQUIRE(a == b);
+			},
+
+				maybe_1.get_raw_component(),
+				maybe_2.get_raw_component()
+				);
+		}
+	}
+};
+
 TEST_CASE("CosmicDelta4 EmptyAndTwoNew") {
 	cosmos c1(2);
 	cosmos c2(2);
@@ -308,32 +356,86 @@ TEST_CASE("CosmicDelta4 EmptyAndTwoNew") {
 
 		cosmic_delta::encode(c1, c2, s);
 		cosmic_delta::decode(c1, s);
+
+		{
+			const auto ent1 = c1[first_guid];
+			const auto ent2 = c1[second_guid];
+
+			// check if components are intact after encode/decode cycle
+
+			REQUIRE(2 == c1.get_entities_count());
+			REQUIRE(2 == c2.get_entities_count());
+			REQUIRE(ent1.has<components::transform>());
+			const bool transform_intact = ent1.get<components::transform>() == first_transform;
+			REQUIRE(transform_intact);
+			REQUIRE(ent1.has<components::rigid_body>());
+			REQUIRE(ent1.has<components::render>());
+			REQUIRE(ent1.has<components::sprite>());
+			REQUIRE(!ent1.has<components::trace>());
+
+			REQUIRE(ent2.has<components::transform>());
+			const bool default_transform_intact = ent2.get<components::transform>() == components::transform();
+			REQUIRE(default_transform_intact);
+			REQUIRE(!ent2.has<components::rigid_body>());
+			REQUIRE(!ent2.has<components::render>());
+			REQUIRE(!ent2.has<components::sprite>());
+			REQUIRE(ent2.has<components::trace>());
+		}
+
+		// general comparisons
+
+		auto dec_ent1 = c1[new_ent1.get_id()];
+		auto dec_ent2 = c1[new_ent2.get_id()];
+
+		REQUIRE(dec_ent1.alive());
+		REQUIRE(dec_ent2.alive());
+
+		REQUIRE(dec_ent1.get_guid() == new_ent1.get_guid());
+		REQUIRE(dec_ent2.get_guid() == new_ent2.get_guid());
+
+		REQUIRE(c1[first_guid].alive());
+		REQUIRE(c1[second_guid].alive());
+
+		{
+			component_checker(new_ent1, dec_ent1, components::guid());
+		
+			component_checker(new_ent1, dec_ent1, components::transform());
+			synchronizer_component_checker(new_ent1, dec_ent1, components::rigid_body());
+			component_checker(new_ent1, dec_ent1, components::render());
+			component_checker(new_ent1, dec_ent1, components::sprite());
+			
+			component_checker(new_ent2, dec_ent2, components::transform());
+			component_checker(new_ent2, dec_ent2, components::trace());
+			component_checker(new_ent2, dec_ent2, components::position_copying());
+		}
+		
+		// reverse order
+		{
+			component_checker(dec_ent1, new_ent1, components::guid());
+		
+			component_checker(dec_ent1, new_ent1, components::transform());
+			synchronizer_component_checker(dec_ent1, new_ent1, components::rigid_body());
+			component_checker(dec_ent1, new_ent1, components::render());
+			component_checker(dec_ent1, new_ent1, components::sprite());
+		
+			component_checker(dec_ent2, new_ent2, components::transform());
+			component_checker(dec_ent2, new_ent2, components::trace());
+			component_checker(dec_ent2, new_ent2, components::position_copying());
+		}
+		
+		auto check_fundamentals = [&](auto e1, auto e2) {
+			synchronizer_component_checker(e1, e2, components::name());
+			synchronizer_component_checker(e1, e2, components::all_inferred_state());
+		};
+		
+		check_fundamentals(new_ent1, dec_ent1);
+		check_fundamentals(new_ent2, dec_ent2);
+		
+		check_fundamentals(dec_ent1, new_ent1);
+		check_fundamentals(dec_ent2, new_ent2);
+
 		REQUIRE(c1 == c2);
 	}
-
-	const auto ent1 = c1[first_guid];
-	const auto ent2 = c1[second_guid];
-
-	// check if components are intact after encode/decode cycle
-
-
-	REQUIRE(2 == c1.get_entities_count());
-	REQUIRE(2 == c2.get_entities_count());
-	REQUIRE(ent1.has<components::transform>());
-	const bool transform_intact = ent1.get<components::transform>() == first_transform;
-	REQUIRE(transform_intact);
-	REQUIRE(ent1.has<components::rigid_body>());
-	REQUIRE(ent1.has<components::render>());
-	REQUIRE(ent1.has<components::sprite>());
-	REQUIRE(!ent1.has<components::trace>());
-
-	REQUIRE(ent2.has<components::transform>());
-	const bool default_transform_intact = ent2.get<components::transform>() == components::transform();
-	REQUIRE(default_transform_intact);
-	REQUIRE(!ent2.has<components::rigid_body>());
-	REQUIRE(!ent2.has<components::render>());
-	REQUIRE(!ent2.has<components::sprite>());
-	REQUIRE(ent2.has<components::trace>());
 
 	{
 		augs::memory_stream comparatory;
@@ -356,6 +458,9 @@ TEST_CASE("CosmicDelta4 EmptyAndTwoNew") {
 		cosmic_delta::decode(c1, s);
 		REQUIRE(c1 == c2);
 	}
+
+	const auto ent1 = c1[first_guid];
+	const auto ent2 = c1[second_guid];
 
 	REQUIRE(!ent1.has<components::rigid_body>());
 	REQUIRE(!ent2.has<components::trace>());
