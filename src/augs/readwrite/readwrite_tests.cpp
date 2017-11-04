@@ -11,17 +11,17 @@
 static const auto path = GENERATED_FILES_DIR "test_byte_readwrite.bin";
 
 template <class T>
-static void try_to_reload_with_file(const T& v) {
+static bool try_to_reload_with_file(const T& v) {
 	augs::save_as_bytes(v, path);
 	T test;
 	augs::load_from_bytes(test, path);
 
 	augs::remove_file(path);
-	REQUIRE(test == v);
+	return (test == v);
 }
 
 template <class T>
-static void try_to_reload_with_bytes(const T& v) {
+static bool try_to_reload_with_bytes(const T& v) {
 	{
 		std::vector<std::byte> bytes;
 		bytes = augs::to_bytes(v);
@@ -33,11 +33,11 @@ static void try_to_reload_with_bytes(const T& v) {
 	augs::load_from_bytes(test, path);
 
 	augs::remove_file(path);
-	REQUIRE(test == v);
+	return (test == v);
 }
 
 template <class T>
-static void try_to_reload_with_memory_stream(const T& v) {
+static bool try_to_reload_with_memory_stream(const T& v) {
 	{
 		std::vector<std::byte> bytes;
 		bytes = augs::to_bytes(v);
@@ -51,24 +51,23 @@ static void try_to_reload_with_memory_stream(const T& v) {
 	augs::read_bytes(ss, test);
 
 	augs::remove_file(path);
-	REQUIRE(test == v);
+	return (test == v);
 }
 
-template <class T>
-static void try_to_reload_with_all(const T& v) {
-	try_to_reload_with_file(v);
-	try_to_reload_with_bytes(v);
-	try_to_reload_with_memory_stream(v);
-}
+#define test_cycle(variable) \
+REQUIRE(try_to_reload_with_file(variable)); \
+REQUIRE(try_to_reload_with_bytes(variable)); \
+REQUIRE(try_to_reload_with_memory_stream(variable));
+
 
 TEST_CASE("Byte readwrite Trivial types") {
 	int a = 2;
 	double b = 512.0;
 	float C = 432.f;
-
-	try_to_reload_with_all(a);
-	try_to_reload_with_all(b);
-	try_to_reload_with_all(C);
+	
+	test_cycle(a);
+	test_cycle(b);
+	test_cycle(C);
 }
 
 TEST_CASE("Byte readwrite Classes") {
@@ -77,9 +76,9 @@ TEST_CASE("Byte readwrite Classes") {
 	std::vector<transform> v;
 	v.resize(3);
 
-	try_to_reload_with_all(ab);
-	try_to_reload_with_all(tr);
-	try_to_reload_with_all(v);
+	test_cycle(ab);
+	test_cycle(tr);
+	test_cycle(v);
 }
 
 TEST_CASE("Byte readwrite Arrays") {
@@ -87,9 +86,9 @@ TEST_CASE("Byte readwrite Arrays") {
 	std::array<std::array<float, 12>, 12> some_more;
 	std::array<std::array<std::array<std::array<std::array<float, 2>, 2>, 2>, 2>, 2> even_more;
 
-	try_to_reload_with_all(some);
-	try_to_reload_with_all(some_more);
-	try_to_reload_with_all(even_more);
+	test_cycle(some);
+	test_cycle(some_more);
+	test_cycle(even_more);
 }
 
 TEST_CASE("Byte readwrite Containers") {
@@ -104,10 +103,28 @@ TEST_CASE("Byte readwrite Containers") {
 	abcdef[0][412] = { 2, 3, 4 };
 	abcdef[1][420] = { 997, 1 };
 
-	try_to_reload_with_all(abc);
-	try_to_reload_with_all(abcd);
-	try_to_reload_with_all(abcde);
-	try_to_reload_with_all(abcdef);
+	test_cycle(abc);
+	test_cycle(abcd);
+	test_cycle(abcde);
+	test_cycle(abcdef);
+}
+
+TEST_CASE("Byte readwrite Optionals") {
+	std::optional<std::vector<float>> abc{ {} };
+	std::optional<std::vector<int>> abcd{ {} };
+	std::optional<std::vector<std::vector<int>>> abcde{ {} };
+	std::vector<std::unordered_map<int, std::optional<std::vector<int>>>> abcdef;
+	abc->resize(2);
+	abcd->resize(2);
+	abcde->resize(2);
+	abcdef.resize(2);
+	abcdef[0][412] = { { 2, 3, 4 } };
+	abcdef[1][420] = { { 997, 1 } };
+
+	test_cycle(abc);
+	test_cycle(abcd);
+	test_cycle(abcde);
+	test_cycle(abcdef);
 }
 
 TEST_CASE("Byte readwrite Variants and optionals") {
@@ -117,7 +134,7 @@ TEST_CASE("Byte readwrite Variants and optionals") {
 
 	{
 		v = 2.0;
-		try_to_reload_with_all(v);
+		test_cycle(v);
 	}
 
 	{
@@ -126,20 +143,20 @@ TEST_CASE("Byte readwrite Variants and optionals") {
 		mm[4287] = 455.2;
 		mm[16445] = 4.0;
 		v = mm;
-		try_to_reload_with_all(v);
+		test_cycle(v);
 	}
 
 
 	{
 		std::optional<std::string> mm = "Hello world!";
 		v = mm;
-		try_to_reload_with_all(v);
+		test_cycle(v);
 	}
 
 	{
 		std::string mm = "Hello world!";
 		v = mm;
-		try_to_reload_with_all(v);
+		test_cycle(v);
 	}
 }
 #endif
