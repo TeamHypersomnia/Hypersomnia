@@ -27,17 +27,18 @@ public:
 	std::string get_complete() const;
 };
 
+void write_log_entry(const std::string& f);
+void write_log_entry(const std::wstring& f);
+
 template <class... A>
 void LOG(const std::string& f, A&&... a) {
-	LOG(typesafe_sprintf(f, std::forward<A>(a)...));
+	write_log_entry(typesafe_sprintf(f, std::forward<A>(a)...));
 }
 
-template <class A>
-void LOG(const A& f) {
-	LOG(typesafe_sprintf("%x", f));
+template <class... A>
+void LOG(const std::wstring& f, A&&... a) {
+	write_log_entry(typesafe_sprintf(f, std::forward<A>(a)...));
 }
-
-void LOG(const std::string& f);
 
 #define LOG_NVPS(...) { \
 std::ostringstream sss;\

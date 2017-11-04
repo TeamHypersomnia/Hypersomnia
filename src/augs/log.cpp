@@ -41,7 +41,7 @@ std::string program_log::get_complete() const {
 	return logs;
 }
 
-void LOG(const std::string& f) {
+void write_log_entry(const std::string& f) {
 #if ENABLE_LOG 
 	std::unique_lock<std::mutex> lock(log_mutex);
 
@@ -55,5 +55,11 @@ void LOG(const std::string& f) {
 	std::ofstream recording_file(LOG_FILES_DIR "live_debug.txt", std::ios::out | std::ios::app);
 	recording_file << f << std::endl;
 #endif
+#endif
+}
+
+void write_log_entry(const std::wstring& f) {
+#if ENABLE_LOG 
+	write_log_entry(to_string(f));
 #endif
 }
