@@ -94,6 +94,8 @@ if(NOT BUILD_WINDOW_FRAMEWORK)
 	set(BUILD_IN_CONSOLE_MODE 1)
 endif()
 
+set(BUILD_GLAD ${BUILD_OPENGL})
+
 if(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE)
 	if (NOT HYPERSOMNIA_RUNTIME_ARCHIVE_DIR)
 		# By default, we set output directory for archives to completely outside of the source tree,
@@ -866,7 +868,7 @@ if(BUILD_FREETYPE)
 	add_include_dirs_of("freetype")
 endif()
 
-if(BUILD_OPENGL)
+if(BUILD_GLAD)
 	add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/glad")
 
 	if(ADD_MCMODEL_LARGE_FLAG)
@@ -980,7 +982,7 @@ else()
 	add_executable(Hypersomnia ${HYPERSOMNIA_SRCS})
 endif()
 
-if(BUILD_OPENGL)
+if(BUILD_GLAD)
 	# Before Hypersomnia builds,
 	# GLAD must first download and generate the source files.
 
@@ -992,16 +994,20 @@ endif()
 set(HYPERSOMNIA_LIBS lua)
 
 if(BUILD_OPENGL)
-	if(UNIX)
-		list(APPEND HYPERSOMNIA_LIBS
-			GL
-		)
-	elseif(MSVC)
-		list(APPEND HYPERSOMNIA_LIBS
-			"OpenGL32.lib"
-		)
-	endif()
-	
+	message("OPENGL_INCLUDE_DIRS before finding: ${OPENGL_INCLUDE_DIRS}")
+	message("OPENGL_LIBRARIES before finding: ${OPENGL_LIBRARIES}")
+	find_package(OpenGL REQUIRED)
+	message("OPENGL_INCLUDE_DIRS after finding: ${OPENGL_INCLUDE_DIRS}")
+	message("OPENGL_LIBRARIES after finding: ${OPENGL_LIBRARIES}")
+
+	include_directories(${OPENGL_INCLUDE_DIRS})
+
+	list(APPEND HYPERSOMNIA_LIBS
+		${OPENGL_LIBRARIES}
+	)
+endif()
+
+if(BUILD_GLAD)
 	list(APPEND HYPERSOMNIA_LIBS
 		glad
 	)
