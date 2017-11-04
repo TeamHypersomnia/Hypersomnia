@@ -26,5 +26,11 @@ TEST_CASE("Type-safe sprintf", "Several tests") {
 	std::string location = "augs::create";
 
 	REQUIRE("OpenGL error 1282 in augs::create" == typesafe_sprintf("OpenGL error %x in %x", errid, location));
+	
+	std::array<std::byte, 3> bb = { 
+		static_cast<std::byte>(1), static_cast<std::byte>(34), static_cast<std::byte>(255)
+	};
+
+	REQUIRE("[1 34 255]" == typesafe_sprintf("[%x]", format_as_bytes(bb)));
 }
 #endif

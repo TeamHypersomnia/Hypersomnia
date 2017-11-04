@@ -146,3 +146,22 @@ inline bool ends_with(const std::string& value, const std::string& ending) {
 
     return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
 }
+
+template <class T>
+auto format_as_bytes(const T& t) {
+	std::string output;
+	output.reserve(sizeof(T) * 4);
+
+	const auto bytes = reinterpret_cast<const std::byte*>(&t);
+
+	for (std::size_t i = 0; i < sizeof(T); ++i) {
+		output += std::to_string(static_cast<int>(bytes[i]));
+		output += ' ';
+	}
+
+	if (output.size() > 0) {
+		output.pop_back();
+	}
+
+	return output;
+}
