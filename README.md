@@ -5,15 +5,15 @@
 
 ## Tree structure
 
-- ```cmake/``` - CMake scripts and source code generators. (e.g. generated introspectors or a source file with the commit number)
-- ```hypersomnia/``` - all content needed by the Hypersomnia executable to run properly. Images, sounds, shaders, configs and so on. 
+- ```cmake/``` - CMake scripts and source code generators. (Introspector-generator, version_file_generator)
+- ```hypersomnia/``` -  directory for the executable. All content needed by Hypersomnia to run properly is present here: images, sounds, shaders, configs and so on. 
 - ```src/``` - complete source code of Hypersomnia, along with 3rd party libraries.
-  - ```src/3rdparty``` - 3rd party libraries, upon which the rest of ```src/``` depends.
+  - ```src/3rdparty/``` - 3rd party libraries, upon which the rest of ```src/``` depends.
   - ```src/augs/``` - abstraction of i/o; template code, utility functions, window management.
-  - ```src/game/``` - Hypersomnia-specific code that implements the game world. Strictly, the **model** is present here, and nothing else.
+  - ```src/game/``` - Hypersomnia-specific code that implements the game world. Strictly, just the **model** is present here.
   - ```src/view/``` - Code that is concerned with viewing the game world. Examples: viewables (meant for viewing only, as opposed to logical assets used by the model), state of particle systems, interpolation, playing of sounds, or rendering scripts that take the game world reference and speak directly to OpenGL.
   - ```src/test_scenes/``` - Code generating some simple test scenes, with their needed resources. It exists only in order to conveniently test new game features without relying on the editor. Can be excluded from compilation via BUILD_TEST_SCENES CMake flag.
-  - ```src/application/``` - highest level abstraction. Examples: _setups_ implementation, the main menu or the ingame menu overlay, the main loop helpers, but also collateral things like http server code.
+  - ```src/application/``` - highest level abstraction. Examples: _setups_ implementation, the main menu or the ingame menu overlay, workspace file format, but also collateral things like http server code.
     - ```src/application/setups``` - _setups_ are objects that manage high-level functionality like a client, a server, an editor or a local test scene. They expose functions like ```get_viewed_cosmos()``` or ```get_viewed_character_id()``` that are in turn used by main.cpp to know what world to render and with which entity as the viewer.
   - ```main.cpp``` - that, which straps all of the above together. Initializes libraries, contextes, necessary resources, handles input, selects the setup to work with, keeps track of the single ```audiovisual_state```.
 - ```todo/``` - a personal to-do list of the founder. At the moment, not meant to be understood by the public.
@@ -50,7 +50,7 @@ digraph G {
 }
 ```
 **Exceptions:**
-- Modified Box2D files (from ```3rdparty```) include ```game/transcendental/entity_id.h``` in order to conveniently define a userdata type that contains the id of the entity to whom a ```b2Fixture``` or a ```b2Body``` belongs. Separating that dependency would otherwise involve a lot of alterations to Box2D in terms of code templatization, or unsafe reinterpret casts between ```void*``` and my types. 
+- Modified Box2D files (from ```3rdparty```) include ```game/transcendental/entity_id.h``` in order to conveniently define a userdata type that contains the id of the entity to whom a ```b2Fixture``` or a ```b2Body``` belongs. Separating that dependency would otherwise involve a lot of alterations to Box2D in terms of code templatization, or unsafe reinterpret casts between ```void*``` and ```entity_id``` types. 
 
 # Hypersomnia
 Community-centered shooter/MMORPG released as free software.
