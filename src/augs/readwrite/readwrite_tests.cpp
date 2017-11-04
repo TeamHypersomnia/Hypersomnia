@@ -117,6 +117,9 @@ TEST_CASE("Byte readwrite Sanity check") {
 	mb[22] = 45187.0;
 
 	REQUIRE(ma == mb);
+
+	using arr = std::array<std::array<std::array<std::array<std::array<float, 2>, 2>, 2>, 2>, 2>;
+	REQUIRE(arr() == arr());
 }
 
 TEST_CASE("Byte readwrite Trivial types") {
@@ -141,9 +144,14 @@ TEST_CASE("Byte readwrite Classes") {
 }
 
 TEST_CASE("Byte readwrite Arrays") {
-	std::array<float, 48> some;
-	std::array<std::array<float, 12>, 12> some_more;
-	std::array<std::array<std::array<std::array<std::array<float, 2>, 2>, 2>, 2>, 2> even_more;
+	/* 
+		Due to default initialization,
+		arrays might have NANs, which would always return false upon comparison.
+	*/
+
+	std::array<float, 48> some{};
+	std::array<std::array<float, 12>, 12> some_more{};
+	std::array<std::array<std::array<std::array<std::array<float, 2>, 2>, 2>, 2>, 2> even_more{};
 
 	test_cycle(some);
 	test_cycle(some_more);
@@ -187,7 +195,8 @@ TEST_CASE("Byte readwrite Optionals") {
 }
 
 TEST_CASE("Byte readwrite Variants and optionals") {
-	using T = std::variant<double, std::string, std::unordered_map<int, double>, std::optional<std::string>>;
+	using map_type = std::unordered_map<int, double>;
+	using T = std::variant<double, std::string, map_type, std::optional<std::string>>;
 
 	T v;
 
@@ -197,12 +206,25 @@ TEST_CASE("Byte readwrite Variants and optionals") {
 	}
 
 	{
-		std::unordered_map<int, double> mm;
+		map_type mm;
 		mm[4] = 2.0;
 		mm[4287] = 455.2;
 		mm[16445] = 4.0;
 		v = mm;
-		test_cycle(v);
+
+
+		augs::save_as_bytes(v, path);
+		T test;
+		augs::load_from_bytes(test, path);
+
+		augs::remove_file(path);
+
+		REQUIRE(test.index() == v.index());
+
+		REQUIRE(
+			std::get<map_type>(test) ==
+			std::get<map_type>(v)
+		);
 	}
 
 
