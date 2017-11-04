@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/TeamHypersomnia/Hypersomnia.svg?branch=master)](https://travis-ci.org/TeamHypersomnia/Hypersomnia)
 [![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/5aatwxv8hceaop56?svg=true)](https://ci.appveyor.com/project/geneotech/Hypersomnia)
 
-**Tree structure:**
+## Tree structure
 
 - ```cmake/``` - CMake scripts and source code generators. (e.g. generated introspectors or a source file with the commit number)
 - ```hypersomnia/``` - all content needed by the Hypersomnia executable to run properly. Images, sounds, shaders, configs and so on. 
@@ -18,13 +18,13 @@
   - ```main.cpp``` - that, which straps all of the above together. Initializes libraries, contextes, necessary resources, handles input, selects the setup to work with, keeps track of the single ```audiovisual_state```.
 - ```todo/``` - a personal to-do list of the founder. At the moment, not meant to be understood by the public.
 
-**Dependency graph of ```src/```:**
+### Dependency graph of ```src/```
 
 An arrow from node A to node B denotes that A includes files from B. An arrow to a cluster means that the node may include from all nodes in the cluster.
 
 ![enter image description here][2]
 
-**Graph source (DOT language):**
+### Graph source (DOT language)
 
 ```
 digraph G {
@@ -83,11 +83,13 @@ Watch gameplays on YouTube:
   [2]: https://i.imgur.com/SzYA3BA.png
 
 # How to build
-To build Hypersomnia, you will need **CMake 3.8** or newer.
-You might also need **Python** installed on your system due to requirements of some CMake scripts.
-Optionally, you can also install **7-Zip** so that the **Release** configuration can automatically create a compressed archive with the executable and game resources. 
+To build Hypersomnia, you will need some dependencies installed on your system:
+ - **CMake 3.2** or newer.
+ - **Python 3.6** or newer.
+ - **git** to clone the respository and later generate version information.
+ - Optional: **7-Zip** so that the **Release** configuration can automatically create a compressed archive with the executable and game resources, ready to be sent to someone. 
 
-Go to the directory where you wish to have your Hypersomnia project downloaded,
+Once installed, go to the directory where you wish to have your Hypersomnia project downloaded,
 open git bash and paste:
 
 ```
@@ -97,7 +99,7 @@ git clone https://github.com/TeamHypersomnia/Hypersomnia.git --recursive
 The repository will start downloading. Once complete, create a ```build/``` folder next to ```CMakeLists.txt``` file. 
 Next steps depend on the platform you are on.
 
-**Windows**
+## Windows
 
 You will need **Visual Studio 2017 Preview** or newer.
 Use your favorite shell to go into the newly created ```build/``` folder and run:
@@ -112,7 +114,7 @@ Resultant ```.sln``` and ```.vcxproj``` files should appear in the ```build/``` 
 Open ```Hypersomnia.sln``` file, select **Release** configuration and hit **F7** to build the game.
 **F5** should launch it.
 
-**Linux**
+## Linux
 
 You will need **gcc 7.2** or newer.
 Use your favorite shell to go into the newly created ```build/``` folder and run these commands:
