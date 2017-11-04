@@ -220,9 +220,9 @@ namespace prefabs {
 			missile.destruction_sound.id = assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION;
 
 			auto& trace = round_definition += components::trace();
-			trace.max_multiplier_x = std::make_pair(0.0f, 1.2f);
-			trace.max_multiplier_y = std::make_pair(0.f, 0.f);
-			trace.lengthening_duration_ms = std::make_pair(200.f, 250.f);
+			trace.max_multiplier_x = {0.0f, 1.2f};
+			trace.max_multiplier_y = {0.f, 0.f};
+			trace.lengthening_duration_ms = {200.f, 250.f};
 			trace.additional_multiplier = vec2(1.f, 1.f);
 		}
 
@@ -293,9 +293,9 @@ namespace prefabs {
 			missile.destruction_sound.id = assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION;
 
 			auto& trace = round_definition += components::trace();
-			trace.max_multiplier_x = std::make_pair(0.0f, 1.2f);
-			trace.max_multiplier_y = std::make_pair(0.f, 0.f);
-			trace.lengthening_duration_ms = std::make_pair(200.f, 250.f);
+			trace.max_multiplier_x = {0.0f, 1.2f};
+			trace.max_multiplier_y = {0.f, 0.f};
+			trace.lengthening_duration_ms = {200.f, 250.f};
 			trace.additional_multiplier = vec2(1.f, 1.f);
 		}
 
@@ -329,7 +329,7 @@ namespace prefabs {
 		gun.muzzle_shot_sound.id = assets::sound_buffer_id::ASSAULT_RIFLE_MUZZLE;
 
 		gun.action_mode = gun_action_type::AUTOMATIC;
-		gun.muzzle_velocity = std::make_pair(4000.f, 4000.f);
+		gun.muzzle_velocity = {4000.f, 4000.f};
 		gun.shot_cooldown = augs::stepped_cooldown(100);
 		gun.bullet_spawn_offset.set(sprite.get_size(/*metas*/).x / 2, 0);
 		gun.camera_shake_radius = 5.f;
@@ -337,9 +337,9 @@ namespace prefabs {
 
 		gun.shell_spawn_offset.pos.set(0, 10);
 		gun.shell_spawn_offset.rotation = 45;
-		gun.shell_angular_velocity = std::make_pair(2.f, 14.f);
+		gun.shell_angular_velocity = {2.f, 14.f};
 		gun.shell_spread_degrees = 20.f;
-		gun.shell_velocity = std::make_pair(300.f, 1700.f);
+		gun.shell_velocity = {300.f, 1700.f};
 		gun.damage_multiplier = 2.2f;
 		gun.num_last_bullets_to_trigger_low_ammo_cue = 6;
 		gun.low_ammo_cue_sound.id = assets::sound_buffer_id::LOW_AMMO_CUE;
@@ -393,7 +393,7 @@ namespace prefabs {
 		gun.muzzle_shot_sound.id = assets::sound_buffer_id::SN69_MUZZLE;
 
 		gun.action_mode = gun_action_type::SEMI_AUTOMATIC;
-		gun.muzzle_velocity = std::make_pair(3000.f, 3000.f);
+		gun.muzzle_velocity = {3000.f, 3000.f};
 		gun.shot_cooldown = augs::stepped_cooldown(100);
 		gun.bullet_spawn_offset.set(sprite.get_size(/*metas*/).x / 2, -7);
 		gun.camera_shake_radius = 5.f;
@@ -401,9 +401,9 @@ namespace prefabs {
 
 		gun.shell_spawn_offset.pos.set(0, 10);
 		gun.shell_spawn_offset.rotation = 45;
-		gun.shell_angular_velocity = std::make_pair(2.f, 14.f);
+		gun.shell_angular_velocity = {2.f, 14.f};
 		gun.shell_spread_degrees = 20.f;
-		gun.shell_velocity = std::make_pair(300.f, 1700.f);
+		gun.shell_velocity = {300.f, 1700.f};
 		gun.damage_multiplier = 1.4f;
 		gun.num_last_bullets_to_trigger_low_ammo_cue = 6;
 		gun.low_ammo_cue_sound.id = assets::sound_buffer_id::LOW_AMMO_CUE;
@@ -454,7 +454,7 @@ namespace prefabs {
 		gun.muzzle_shot_sound.id = assets::sound_buffer_id::KEK9_MUZZLE;
 
 		gun.action_mode = gun_action_type::SEMI_AUTOMATIC;
-		gun.muzzle_velocity = std::make_pair(3000.f, 3000.f);
+		gun.muzzle_velocity = {3000.f, 3000.f};
 		gun.shot_cooldown = augs::stepped_cooldown(100);
 		gun.bullet_spawn_offset.set(sprite.get_size(/*metas*/).x / 2, -7);
 		gun.camera_shake_radius = 5.f;
@@ -462,9 +462,9 @@ namespace prefabs {
 
 		gun.shell_spawn_offset.pos.set(0, 10);
 		gun.shell_spawn_offset.rotation = 45;
-		gun.shell_angular_velocity = std::make_pair(2.f, 14.f);
+		gun.shell_angular_velocity = {2.f, 14.f};
 		gun.shell_spread_degrees = 20.f;
-		gun.shell_velocity = std::make_pair(300.f, 1700.f);
+		gun.shell_velocity = {300.f, 1700.f};
 		gun.damage_multiplier = 1.4f;
 		gun.num_last_bullets_to_trigger_low_ammo_cue = 6;
 		gun.low_ammo_cue_sound.id = assets::sound_buffer_id::LOW_AMMO_CUE;
@@ -520,7 +520,7 @@ namespace prefabs {
 		gun.muzzle_shot_sound.id = assets::sound_buffer_id::ASSAULT_RIFLE_MUZZLE;
 
 		gun.action_mode = gun_action_type::AUTOMATIC;
-		gun.muzzle_velocity = std::make_pair(2000.f, 2000.f);
+		gun.muzzle_velocity = {2000.f, 2000.f};
 		gun.shot_cooldown = augs::stepped_cooldown(500);
 		gun.bullet_spawn_offset.set(sprite.get_size(/*metas*/).x / 2, 0);
 		gun.camera_shake_radius = 5.f;
@@ -565,9 +565,9 @@ namespace prefabs {
 			missile.damage_amount = 42;
 
 			auto& trace = round_definition += components::trace();
-			trace.max_multiplier_x = std::make_pair(0.0f, 0.f);
-			trace.max_multiplier_y = std::make_pair(0.f, 0.f);
-			trace.lengthening_duration_ms = std::make_pair(200.f, 250.f);
+			trace.max_multiplier_x = {0.0f, 0.f};
+			trace.max_multiplier_y = {0.f, 0.f};
+			trace.lengthening_duration_ms = {200.f, 250.f};
 			trace.additional_multiplier = vec2(1.f, 1.f);
 
 			gun.magic_missile_definition = round_definition;

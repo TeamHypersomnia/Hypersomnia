@@ -21,6 +21,11 @@
 	not meant to be used in production.
 */
 
+template <class A, class B>
+auto float_minmax(const A a, const B b) {
+	return augs::minmax<float>(static_cast<float>(a), static_cast<float>(b));
+}
+
 void load_test_scene_particle_effects(
 	const game_image_loadables_map& images,
 	particle_effects_map& manager
@@ -62,10 +67,10 @@ void load_test_scene_particle_effects(
 		em.stream_lifetime_ms.set(3000000, 3000000);
 
 		em.base_speed.set(200, 300);
-		em.base_speed_variation = std::make_pair(5.f, 10.f);
+		em.base_speed_variation = float_minmax(5.f, 10.f);
 
-		em.rotation_speed = std::make_pair(1.5f*RAD_TO_DEG<float>, 2.3f*RAD_TO_DEG<float>);
-		em.particle_lifetime_ms = std::make_pair(5000, 5000);
+		em.rotation_speed = float_minmax(1.5f*RAD_TO_DEG<float>, 2.3f*RAD_TO_DEG<float>);
+		em.particle_lifetime_ms = float_minmax(5000, 5000);
 
 		for (int i = 0; i < 3; ++i) {
 			general_particle particle_definition;
@@ -97,15 +102,15 @@ void load_test_scene_particle_effects(
 			em.swings_per_sec.set(0.3 / 2, 0.5 / 2);
 			em.swing_spread_change_rate.set(0.3 / 2, 0.5 / 2);
 
-			em.spread_degrees = std::make_pair(7, 7);
+			em.spread_degrees = float_minmax(7, 7);
 			em.particles_per_sec.set(80 / 4.5, 80 / 4.5);
-			em.stream_lifetime_ms = std::make_pair(3000000, 3000000);
+			em.stream_lifetime_ms = float_minmax(3000000, 3000000);
 
-			em.base_speed = std::make_pair(100, 110);
-			em.base_speed_variation = std::make_pair(5.f, 10.f);
+			em.base_speed = float_minmax(100, 110);
+			em.base_speed_variation = float_minmax(5.f, 10.f);
 
-			em.rotation_speed = std::make_pair(2.5f*RAD_TO_DEG<float>, 2.8f*RAD_TO_DEG<float>);
-			em.particle_lifetime_ms = std::make_pair(2500 * 1.5, 2500 * 1.5);
+			em.rotation_speed = float_minmax(2.5f*RAD_TO_DEG<float>, 2.8f*RAD_TO_DEG<float>);
+			em.particle_lifetime_ms = float_minmax(2500 * 1.5, 2500 * 1.5);
 
 			for (int i = 0; i < 3; ++i) {
 				general_particle particle_definition;
@@ -119,7 +124,7 @@ void load_test_scene_particle_effects(
 				em.add_particle_definition(particle_definition);
 			}
 
-			em.size_multiplier = std::make_pair(1.0, 1.0);
+			em.size_multiplier = float_minmax(1.0, 1.0);
 			em.target_render_layer = render_layer::DIM_SMOKES;
 			em.initial_rotation_variation = 180;
 
@@ -137,12 +142,12 @@ void load_test_scene_particle_effects(
 			//em.swings_per_sec.set(0.3 / 2, 0.5 / 2);
 			//em.swing_spread_change_rate.set(0.3 / 2, 0.5 / 2);
 			//
-			//em.spread_degrees = std::make_pair(6, 6);
-			em.particles_per_sec = std::make_pair(500, 500);
-			em.stream_lifetime_ms = std::make_pair(3000000, 3000000);
-			em.base_speed = std::make_pair(10, 100);
-			em.rotation_speed = std::make_pair(0, 0);
-			em.particle_lifetime_ms = std::make_pair(40, 100);
+			//em.spread_degrees = float_minmax(6, 6);
+			em.particles_per_sec = float_minmax(500, 500);
+			em.stream_lifetime_ms = float_minmax(3000000, 3000000);
+			em.base_speed = float_minmax(10, 100);
+			em.rotation_speed = float_minmax(0, 0);
+			em.particle_lifetime_ms = float_minmax(40, 100);
 
 			//for (int i = 0; i < 6; ++i) {
 			general_particle particle_definition;
@@ -162,7 +167,7 @@ void load_test_scene_particle_effects(
 			em.add_particle_definition(particle_definition);
 			//}
 
-			em.size_multiplier = std::make_pair(1.0, 1.0);
+			em.size_multiplier = float_minmax(1.0, 1.0);
 			em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
 			em.initial_rotation_variation = 0;
 
@@ -181,14 +186,14 @@ void load_test_scene_particle_effects(
 			em.swings_per_sec.set(1.3, 1.5);
 			em.swing_spread_change_rate.set(0.8, 0.9);
 
-			em.spread_degrees = std::make_pair(7, 7);
+			em.spread_degrees = float_minmax(7, 7);
 			em.particles_per_sec.set(40, 40);
-			em.stream_lifetime_ms = std::make_pair(3000000, 3000000);
+			em.stream_lifetime_ms = float_minmax(3000000, 3000000);
 
-			em.base_speed = std::make_pair(50, 350);
+			em.base_speed = float_minmax(50, 350);
 
-			em.rotation_speed = std::make_pair(2.5f*RAD_TO_DEG<float>, 2.8f*RAD_TO_DEG<float>);
-			em.particle_lifetime_ms = std::make_pair(1500, 1500);
+			em.rotation_speed = float_minmax(2.5f*RAD_TO_DEG<float>, 2.8f*RAD_TO_DEG<float>);
+			em.particle_lifetime_ms = float_minmax(1500, 1500);
 
 			for (int i = 0; i < 3; ++i) {
 				general_particle particle_definition;
@@ -202,7 +207,7 @@ void load_test_scene_particle_effects(
 				em.add_particle_definition(particle_definition);
 			}
 
-			em.size_multiplier = std::make_pair(0.35, 0.65);
+			em.size_multiplier = float_minmax(0.35, 0.65);
 			em.target_render_layer = render_layer::DIM_SMOKES;
 			em.initial_rotation_variation = 180;
 
@@ -221,15 +226,15 @@ void load_test_scene_particle_effects(
 			em.swings_per_sec.set(0.3 / 2, 0.5 / 2);
 			em.swing_spread_change_rate.set(0.3 / 2, 0.5 / 2);
 
-			em.spread_degrees = std::make_pair(360, 360);
+			em.spread_degrees = float_minmax(360, 360);
 			em.num_of_particles_to_spawn_initially.set(150, 170);
-			em.stream_lifetime_ms = std::make_pair(0, 0);
+			em.stream_lifetime_ms = float_minmax(0, 0);
 
-			em.base_speed = std::make_pair(350, 400);
-			em.base_speed_variation = std::make_pair(100.f, 120.f);
+			em.base_speed = float_minmax(350, 400);
+			em.base_speed_variation = float_minmax(100.f, 120.f);
 
-			em.rotation_speed = std::make_pair(2.5f*RAD_TO_DEG<float>, 2.8f*RAD_TO_DEG<float>);
-			em.particle_lifetime_ms = std::make_pair(900, 900);
+			em.rotation_speed = float_minmax(2.5f*RAD_TO_DEG<float>, 2.8f*RAD_TO_DEG<float>);
+			em.particle_lifetime_ms = float_minmax(900, 900);
 
 			for (int i = 0; i < 3; ++i) {
 				general_particle particle_definition;
@@ -243,7 +248,7 @@ void load_test_scene_particle_effects(
 				em.add_particle_definition(particle_definition);
 			}
 
-			em.size_multiplier = std::make_pair(0.35, 0.35);
+			em.size_multiplier = float_minmax(0.35, 0.35);
 			em.target_render_layer = render_layer::DIM_SMOKES;
 			em.initial_rotation_variation = 180;
 
@@ -262,25 +267,25 @@ void load_test_scene_particle_effects(
 		em.swings_per_sec.set(0.3 / 2, 0.5 / 2);
 		em.swing_spread_change_rate.set(0.3 / 2, 0.5 / 2);
 
-		em.spread_degrees = std::make_pair(360, 360);
+		em.spread_degrees = float_minmax(360, 360);
 		em.num_of_particles_to_spawn_initially.set(0, 0);
-		em.particles_per_sec = std::make_pair(250, 250);
-		em.stream_lifetime_ms = std::make_pair(1000, 1000);
+		em.particles_per_sec = float_minmax(250, 250);
+		em.stream_lifetime_ms = float_minmax(1000, 1000);
 
-		em.base_speed = std::make_pair(20, 300);
-		em.base_speed_variation = std::make_pair(0.f, 0.f);
+		em.base_speed = float_minmax(20, 300);
+		em.base_speed_variation = float_minmax(0.f, 0.f);
 
-		em.rotation_speed = std::make_pair(0, 0);
-		em.particle_lifetime_ms = std::make_pair(1000, 1000);
+		em.rotation_speed = float_minmax(0, 0);
+		em.particle_lifetime_ms = float_minmax(1000, 1000);
 
-		em.randomize_spawn_point_within_circle_of_inner_radius = std::make_pair(200.f, 200.f);
-		em.randomize_spawn_point_within_circle_of_outer_radius = std::make_pair(250.f, 250.f);
+		em.randomize_spawn_point_within_circle_of_inner_radius = float_minmax(200.f, 200.f);
+		em.randomize_spawn_point_within_circle_of_outer_radius = float_minmax(250.f, 250.f);
 
-		em.starting_spawn_circle_size_multiplier = std::make_pair(1.f, 1.f);
-		em.ending_spawn_circle_size_multiplier = std::make_pair(0.35f, 0.35f);
+		em.starting_spawn_circle_size_multiplier = float_minmax(1.f, 1.f);
+		em.ending_spawn_circle_size_multiplier = float_minmax(0.35f, 0.35f);
 
-		em.starting_homing_force = std::make_pair(100.f, 100.f);
-		em.ending_homing_force = std::make_pair(10000.f, 10000.f);
+		em.starting_homing_force = float_minmax(100.f, 100.f);
+		em.ending_homing_force = float_minmax(10000.f, 10000.f);
 
 		const auto frame_duration = anim.frames[0].duration_milliseconds / 4.f;
 
@@ -337,7 +342,7 @@ void load_test_scene_particle_effects(
 		//	em.add_particle_definition(particle_definition);
 		//}
 
-		em.size_multiplier = std::make_pair(1, 1);
+		em.size_multiplier = float_minmax(1, 1);
 		em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
 		em.initial_rotation_variation = 0;
 		em.should_particles_look_towards_velocity = false;
@@ -357,38 +362,21 @@ void load_test_scene_particle_effects(
 			em.swings_per_sec.set(0.3 / 2, 0.5 / 2);
 			em.swing_spread_change_rate.set(0.3 / 2, 0.5 / 2);
 
-			em.spread_degrees = std::make_pair(45, 60);
-			em.stream_lifetime_ms = std::make_pair(150.f, 200.f);
-			em.particles_per_sec = std::make_pair(350.f, 400.f);
+			em.spread_degrees = float_minmax(45, 60);
+			em.stream_lifetime_ms = float_minmax(150.f, 200.f);
+			em.particles_per_sec = float_minmax(350.f, 400.f);
 
-			em.base_speed = std::make_pair(120, 300);
-			em.base_speed_variation = std::make_pair(10.f, 20.f);
+			em.base_speed = float_minmax(120, 300);
+			em.base_speed_variation = float_minmax(10.f, 20.f);
 
-			em.randomize_spawn_point_within_circle_of_inner_radius = std::make_pair(90.f, 90.f);
-			em.randomize_spawn_point_within_circle_of_outer_radius = std::make_pair(115.f, 115.f);
+			em.randomize_spawn_point_within_circle_of_inner_radius = float_minmax(90.f, 90.f);
+			em.randomize_spawn_point_within_circle_of_outer_radius = float_minmax(115.f, 115.f);
 
-			em.starting_homing_force = std::make_pair(20.f, 20.f);
-			em.ending_homing_force = std::make_pair(300.f, 300.f);
+			em.starting_homing_force = float_minmax(20.f, 20.f);
+			em.ending_homing_force = float_minmax(300.f, 300.f);
 
-			em.rotation_speed = std::make_pair(0, 0);
-			em.particle_lifetime_ms = std::make_pair(100, 200);
-
-			{
-				const auto frame_duration = anim.frames[0].duration_milliseconds / 2.f;
-
-				for (size_t i = 0; i < anim.frames.size() - 1; ++i)
-				{
-					homing_animated_particle particle_definition;
-
-					particle_definition.linear_damping = 300;
-					particle_definition.first_face = static_cast<assets::game_image_id>(static_cast<int>(anim.frames[0].image_id) + i);
-					particle_definition.frame_count = anim.frames.size() - i;
-					particle_definition.frame_duration_ms = frame_duration;
-					particle_definition.color = white;
-
-					em.add_particle_definition(particle_definition);
-				}
-			}
+			em.rotation_speed = float_minmax(0, 0);
+			em.particle_lifetime_ms = float_minmax(100, 200);
 
 			{
 				const auto frame_duration = anim.frames[0].duration_milliseconds / 2.f;
@@ -407,7 +395,24 @@ void load_test_scene_particle_effects(
 				}
 			}
 
-			em.size_multiplier = std::make_pair(1, 1);
+			{
+				const auto frame_duration = anim.frames[0].duration_milliseconds / 2.f;
+
+				for (size_t i = 0; i < anim.frames.size() - 1; ++i)
+				{
+					homing_animated_particle particle_definition;
+
+					particle_definition.linear_damping = 300;
+					particle_definition.first_face = static_cast<assets::game_image_id>(static_cast<int>(anim.frames[0].image_id) + i);
+					particle_definition.frame_count = anim.frames.size() - i;
+					particle_definition.frame_duration_ms = frame_duration;
+					particle_definition.color = white;
+
+					em.add_particle_definition(particle_definition);
+				}
+			}
+
+			em.size_multiplier = float_minmax(1, 1);
 			em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
 			em.initial_rotation_variation = 0;
 			em.should_particles_look_towards_velocity = false;
@@ -423,17 +428,17 @@ void load_test_scene_particle_effects(
 		em.swings_per_sec.set(0.3 / 2, 0.5 / 2);
 		em.swing_spread_change_rate.set(0.3 / 2, 0.5 / 2);
 
-		em.spread_degrees = std::make_pair(360, 360);
+		em.spread_degrees = float_minmax(360, 360);
 		em.num_of_particles_to_spawn_initially.set(150, 170);
-		em.stream_lifetime_ms = std::make_pair(0, 0);
+		em.stream_lifetime_ms = float_minmax(0, 0);
 
-		//em.randomize_spawn_point_within_circle_of_inner_radius = std::make_pair(90.f, 90.f);
-		//em.randomize_spawn_point_within_circle_of_outer_radius = std::make_pair(115.f, 115.f);
-		em.base_speed = std::make_pair(300, 360);
-		em.base_speed_variation = std::make_pair(10.f, 12.f);
+		//em.randomize_spawn_point_within_circle_of_inner_radius = float_minmax(90.f, 90.f);
+		//em.randomize_spawn_point_within_circle_of_outer_radius = float_minmax(115.f, 115.f);
+		em.base_speed = float_minmax(300, 360);
+		em.base_speed_variation = float_minmax(10.f, 12.f);
 
-		em.rotation_speed = std::make_pair(2.5f*RAD_TO_DEG<float>, 2.8f*RAD_TO_DEG<float>);
-		em.particle_lifetime_ms = std::make_pair(200, 350);
+		em.rotation_speed = float_minmax(2.5f*RAD_TO_DEG<float>, 2.8f*RAD_TO_DEG<float>);
+		em.particle_lifetime_ms = float_minmax(200, 350);
 
 		for (int i = 0; i < 3; ++i) {
 			general_particle particle_definition;
@@ -448,7 +453,7 @@ void load_test_scene_particle_effects(
 			em.add_particle_definition(particle_definition);
 		}
 
-		em.size_multiplier = std::make_pair(0.40, 0.40);
+		em.size_multiplier = float_minmax(0.40, 0.40);
 		em.target_render_layer = render_layer::ILLUMINATING_SMOKES;
 		em.initial_rotation_variation = 180;
 
@@ -466,15 +471,15 @@ void load_test_scene_particle_effects(
 			em.swings_per_sec.set(0.3 / 2, 0.5 / 2);
 			em.swing_spread_change_rate.set(0.3 / 2, 0.5 / 2);
 
-			em.spread_degrees = std::make_pair(360, 360);
+			em.spread_degrees = float_minmax(360, 360);
 			em.num_of_particles_to_spawn_initially.set(150, 170);
-			em.stream_lifetime_ms = std::make_pair(0, 0);
+			em.stream_lifetime_ms = float_minmax(0, 0);
 
-			em.base_speed = std::make_pair(350, 400);
-			em.base_speed_variation = std::make_pair(100.f, 120.f);
+			em.base_speed = float_minmax(350, 400);
+			em.base_speed_variation = float_minmax(100.f, 120.f);
 
-			em.rotation_speed = std::make_pair(2.5f*RAD_TO_DEG<float>, 2.8f*RAD_TO_DEG<float>);
-			em.particle_lifetime_ms = std::make_pair(900, 900);
+			em.rotation_speed = float_minmax(2.5f*RAD_TO_DEG<float>, 2.8f*RAD_TO_DEG<float>);
+			em.particle_lifetime_ms = float_minmax(900, 900);
 
 			for (int i = 0; i < 3; ++i) {
 				general_particle particle_definition;
@@ -489,7 +494,7 @@ void load_test_scene_particle_effects(
 				em.add_particle_definition(particle_definition);
 			}
 
-			em.size_multiplier = std::make_pair(0.40, 0.40);
+			em.size_multiplier = float_minmax(0.40, 0.40);
 			em.target_render_layer = render_layer::ILLUMINATING_SMOKES;
 			em.initial_rotation_variation = 180;
 
@@ -504,15 +509,15 @@ void load_test_scene_particle_effects(
 			em.swings_per_sec.set(0.3 / 2, 0.5 / 2);
 			em.swing_spread_change_rate.set(0.3 / 2, 0.5 / 2);
 
-			em.spread_degrees = std::make_pair(360, 360);
+			em.spread_degrees = float_minmax(360, 360);
 			em.num_of_particles_to_spawn_initially.set(300, 340);
-			em.stream_lifetime_ms = std::make_pair(0, 0);
+			em.stream_lifetime_ms = float_minmax(0, 0);
 
-			em.base_speed = std::make_pair(320, 600);
-			em.base_speed_variation = std::make_pair(10.f, 20.f);
+			em.base_speed = float_minmax(320, 600);
+			em.base_speed_variation = float_minmax(10.f, 20.f);
 
-			em.rotation_speed = std::make_pair(0, 0);
-			em.particle_lifetime_ms = std::make_pair(200, 600);
+			em.rotation_speed = float_minmax(0, 0);
+			em.particle_lifetime_ms = float_minmax(200, 600);
 
 			const auto frame_duration = anim.frames[0].duration_milliseconds / 2.f;
 
@@ -570,7 +575,7 @@ void load_test_scene_particle_effects(
 				em.add_particle_definition(particle_definition);
 			}
 
-			em.size_multiplier = std::make_pair(1, 1);
+			em.size_multiplier = float_minmax(1, 1);
 			em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
 			em.initial_rotation_variation = 0;
 			em.should_particles_look_towards_velocity = false;
@@ -590,15 +595,15 @@ void load_test_scene_particle_effects(
 			em.swings_per_sec.set(0.3 / 2, 0.5 / 2);
 			em.swing_spread_change_rate.set(0.3 / 2, 0.5 / 2);
 
-			em.spread_degrees = std::make_pair(360, 360);
+			em.spread_degrees = float_minmax(360, 360);
 			em.num_of_particles_to_spawn_initially.set(150, 170);
-			em.stream_lifetime_ms = std::make_pair(0, 0);
+			em.stream_lifetime_ms = float_minmax(0, 0);
 
-			em.base_speed = std::make_pair(350, 400);
-			em.base_speed_variation = std::make_pair(100.f, 120.f);
+			em.base_speed = float_minmax(350, 400);
+			em.base_speed_variation = float_minmax(100.f, 120.f);
 
-			em.rotation_speed = std::make_pair(2.5f*RAD_TO_DEG<float>, 2.8f*RAD_TO_DEG<float>);
-			em.particle_lifetime_ms = std::make_pair(900, 900);
+			em.rotation_speed = float_minmax(2.5f*RAD_TO_DEG<float>, 2.8f*RAD_TO_DEG<float>);
+			em.particle_lifetime_ms = float_minmax(900, 900);
 
 			for (int i = 0; i < 3; ++i) {
 				general_particle particle_definition;
@@ -613,7 +618,7 @@ void load_test_scene_particle_effects(
 				em.add_particle_definition(particle_definition);
 			}
 
-			em.size_multiplier = std::make_pair(0.40, 0.40);
+			em.size_multiplier = float_minmax(0.40, 0.40);
 			em.target_render_layer = render_layer::ILLUMINATING_SMOKES;
 			em.initial_rotation_variation = 180;
 
@@ -632,15 +637,15 @@ void load_test_scene_particle_effects(
 			em.swings_per_sec.set(0.3 / 2, 0.5 / 2);
 			em.swing_spread_change_rate.set(0.3 / 2, 0.5 / 2);
 
-			em.spread_degrees = std::make_pair(360, 360);
+			em.spread_degrees = float_minmax(360, 360);
 			em.num_of_particles_to_spawn_initially.set(300, 340);
-			em.stream_lifetime_ms = std::make_pair(0, 0);
+			em.stream_lifetime_ms = float_minmax(0, 0);
 
-			em.base_speed = std::make_pair(320, 600);
-			em.base_speed_variation = std::make_pair(10.f, 20.f);
+			em.base_speed = float_minmax(320, 600);
+			em.base_speed_variation = float_minmax(10.f, 20.f);
 
-			em.rotation_speed = std::make_pair(0, 0);
-			em.particle_lifetime_ms = std::make_pair(200, 600);
+			em.rotation_speed = float_minmax(0, 0);
+			em.particle_lifetime_ms = float_minmax(200, 600);
 
 			const auto frame_duration = anim.frames[0].duration_milliseconds / 2.f;
 
@@ -698,7 +703,7 @@ void load_test_scene_particle_effects(
 				em.add_particle_definition(particle_definition);
 			}
 
-			em.size_multiplier = std::make_pair(1, 1);
+			em.size_multiplier = float_minmax(1, 1);
 			em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
 			em.initial_rotation_variation = 0;
 			em.should_particles_look_towards_velocity = false;
@@ -718,18 +723,18 @@ void load_test_scene_particle_effects(
 			em.swings_per_sec.set(0.3 / 2, 0.5 / 2);
 			em.swing_spread_change_rate.set(0.3 / 2, 0.5 / 2);
 
-			em.spread_degrees = std::make_pair(360, 360);
+			em.spread_degrees = float_minmax(360, 360);
 			em.num_of_particles_to_spawn_initially.set(18, 20);
-			em.stream_lifetime_ms = std::make_pair(0, 0);
+			em.stream_lifetime_ms = float_minmax(0, 0);
 
-			em.base_speed = std::make_pair(100, 150);
-			em.base_speed_variation = std::make_pair(10.f, 12.f);
+			em.base_speed = float_minmax(100, 150);
+			em.base_speed_variation = float_minmax(10.f, 12.f);
 
-			em.rotation_speed = std::make_pair(2.5f*RAD_TO_DEG<float>, 2.8f*RAD_TO_DEG<float>);
-			em.particle_lifetime_ms = std::make_pair(400, 500);
+			em.rotation_speed = float_minmax(2.5f*RAD_TO_DEG<float>, 2.8f*RAD_TO_DEG<float>);
+			em.particle_lifetime_ms = float_minmax(400, 500);
 
-			em.randomize_spawn_point_within_circle_of_inner_radius = std::make_pair(20.f, 25.f);
-			em.randomize_spawn_point_within_circle_of_outer_radius = std::make_pair(40.f, 45.f);
+			em.randomize_spawn_point_within_circle_of_inner_radius = float_minmax(20.f, 25.f);
+			em.randomize_spawn_point_within_circle_of_outer_radius = float_minmax(40.f, 45.f);
 
 			for (int i = 0; i < 3; ++i) {
 				general_particle particle_definition;
@@ -744,7 +749,7 @@ void load_test_scene_particle_effects(
 				em.add_particle_definition(particle_definition);
 			}
 
-			em.size_multiplier = std::make_pair(0.40, 0.50);
+			em.size_multiplier = float_minmax(0.40, 0.50);
 			em.target_render_layer = render_layer::ILLUMINATING_SMOKES;
 			em.initial_rotation_variation = 180;
 
@@ -753,11 +758,11 @@ void load_test_scene_particle_effects(
 
 		{
 			particles_emission em;
-			em.spread_degrees = std::make_pair(100, 130);
-			em.num_of_particles_to_spawn_initially = std::make_pair(30, 120);
-			em.base_speed = std::make_pair(250 + 200, 800 + 200);
-			em.rotation_speed = std::make_pair(0, 0);
-			em.particle_lifetime_ms = std::make_pair(30, 50);
+			em.spread_degrees = float_minmax(100, 130);
+			em.num_of_particles_to_spawn_initially = float_minmax(30, 120);
+			em.base_speed = float_minmax(250 + 200, 800 + 200);
+			em.rotation_speed = float_minmax(0, 0);
+			em.particle_lifetime_ms = float_minmax(30, 50);
 
 			for (int i = 0; i < 5; ++i) {
 				general_particle particle_definition;
@@ -770,7 +775,7 @@ void load_test_scene_particle_effects(
 				em.add_particle_definition(particle_definition);
 			}
 
-			em.size_multiplier = std::make_pair(0.5, 1);
+			em.size_multiplier = float_minmax(0.5, 1);
 			em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
 			em.initial_rotation_variation = 0;
 
@@ -782,11 +787,11 @@ void load_test_scene_particle_effects(
 		auto& effect = manager[assets::particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION];
 
 		particles_emission em;
-		em.spread_degrees = std::make_pair(150, 360);
-		em.num_of_particles_to_spawn_initially = std::make_pair(40, 120);
-		em.base_speed = std::make_pair(500, 900);
-		em.rotation_speed = std::make_pair(0, 0);
-		em.particle_lifetime_ms = std::make_pair(32, 90);
+		em.spread_degrees = float_minmax(150, 360);
+		em.num_of_particles_to_spawn_initially = float_minmax(40, 120);
+		em.base_speed = float_minmax(500, 900);
+		em.rotation_speed = float_minmax(0, 0);
+		em.particle_lifetime_ms = float_minmax(32, 90);
 
 		for (int i = 0; i < 5; ++i) {
 			general_particle particle_definition;
@@ -800,7 +805,7 @@ void load_test_scene_particle_effects(
 			em.add_particle_definition(particle_definition);
 		}
 
-		em.size_multiplier = std::make_pair(1.0, 1.3);
+		em.size_multiplier = float_minmax(1.0, 1.3);
 		em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
 		em.initial_rotation_variation = 0;
 
@@ -814,15 +819,15 @@ void load_test_scene_particle_effects(
 			em.swings_per_sec.set(0.3 / 2, 0.5 / 2);
 			em.swing_spread_change_rate.set(0.3 / 2, 0.5 / 2);
 
-			em.spread_degrees = std::make_pair(360, 360);
+			em.spread_degrees = float_minmax(360, 360);
 			em.num_of_particles_to_spawn_initially.set(18, 20);
-			em.stream_lifetime_ms = std::make_pair(0, 0);
+			em.stream_lifetime_ms = float_minmax(0, 0);
 
-			em.base_speed = std::make_pair(250, 350);
-			em.base_speed_variation = std::make_pair(10.f, 12.f);
+			em.base_speed = float_minmax(250, 350);
+			em.base_speed_variation = float_minmax(10.f, 12.f);
 
-			em.rotation_speed = std::make_pair(2.5f*RAD_TO_DEG<float>, 2.8f*RAD_TO_DEG<float>);
-			em.particle_lifetime_ms = std::make_pair(700, 800);
+			em.rotation_speed = float_minmax(2.5f*RAD_TO_DEG<float>, 2.8f*RAD_TO_DEG<float>);
+			em.particle_lifetime_ms = float_minmax(700, 800);
 
 			for (int i = 0; i < 3; ++i) {
 				general_particle particle_definition;
@@ -837,7 +842,7 @@ void load_test_scene_particle_effects(
 				em.add_particle_definition(particle_definition);
 			}
 
-			em.size_multiplier = std::make_pair(0.40, 0.50);
+			em.size_multiplier = float_minmax(0.40, 0.50);
 			em.target_render_layer = render_layer::ILLUMINATING_SMOKES;
 			em.initial_rotation_variation = 180;
 
@@ -849,18 +854,18 @@ void load_test_scene_particle_effects(
 		auto& effect = manager[assets::particle_effect_id::WANDERING_PIXELS_DIRECTED];
 
 		particles_emission em;
-		em.spread_degrees = std::make_pair(0, 1);
-		em.particles_per_sec = std::make_pair(70, 80);
-		em.stream_lifetime_ms = std::make_pair(300, 500);
-		em.base_speed = std::make_pair(100, 300);
-		em.rotation_speed = std::make_pair(0, 0);
-		em.particle_lifetime_ms = std::make_pair(500, 700);
+		em.spread_degrees = float_minmax(0, 1);
+		em.particles_per_sec = float_minmax(70, 80);
+		em.stream_lifetime_ms = float_minmax(300, 500);
+		em.base_speed = float_minmax(100, 300);
+		em.rotation_speed = float_minmax(0, 0);
+		em.particle_lifetime_ms = float_minmax(500, 700);
 
-		em.randomize_spawn_point_within_circle_of_inner_radius = std::make_pair(9.f, 9.f);
-		em.randomize_spawn_point_within_circle_of_outer_radius = std::make_pair(15.f, 15.f);
+		em.randomize_spawn_point_within_circle_of_inner_radius = float_minmax(9.f, 9.f);
+		em.randomize_spawn_point_within_circle_of_outer_radius = float_minmax(15.f, 15.f);
 
-		em.starting_spawn_circle_size_multiplier = std::make_pair(1.f, 1.f);
-		em.ending_spawn_circle_size_multiplier = std::make_pair(2.f, 2.f);
+		em.starting_spawn_circle_size_multiplier = float_minmax(1.f, 1.f);
+		em.ending_spawn_circle_size_multiplier = float_minmax(2.f, 2.f);
 
 		for (int i = 0; i < 5; ++i) {
 			general_particle particle_definition;
@@ -903,11 +908,11 @@ void load_test_scene_particle_effects(
 		auto& effect = manager[assets::particle_effect_id::WANDERING_PIXELS_SPREAD];
 
 		particles_emission em;
-		em.spread_degrees = std::make_pair(0, 10);
-		em.num_of_particles_to_spawn_initially = std::make_pair(30, 40);
-		em.base_speed = std::make_pair(350, 550);
-		em.rotation_speed = std::make_pair(0, 0);
-		em.particle_lifetime_ms = std::make_pair(200, 400);
+		em.spread_degrees = float_minmax(0, 10);
+		em.num_of_particles_to_spawn_initially = float_minmax(30, 40);
+		em.base_speed = float_minmax(350, 550);
+		em.rotation_speed = float_minmax(0, 0);
+		em.particle_lifetime_ms = float_minmax(200, 400);
 
 		for (int i = 0; i < 5; ++i) {
 			general_particle particle_definition;
@@ -926,14 +931,14 @@ void load_test_scene_particle_effects(
 			em.add_particle_definition(particle_definition);
 		}
 
-		em.size_multiplier = std::make_pair(1, 1.5);
+		em.size_multiplier = float_minmax(1, 1.5);
 		em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
 		em.initial_rotation_variation = 0;
 
 		effect.emissions.push_back(em);
 		auto wandering = manager[assets::particle_effect_id::WANDERING_PIXELS_DIRECTED].emissions[0];
-		wandering.spread_degrees = std::make_pair(10, 30);
-		wandering.base_speed = std::make_pair(160, 330);
+		wandering.spread_degrees = float_minmax(10, 30);
+		wandering.base_speed = float_minmax(160, 330);
 		effect.emissions.push_back(wandering);
 	}
 
@@ -941,12 +946,12 @@ void load_test_scene_particle_effects(
 		auto& effect = manager[assets::particle_effect_id::CONCENTRATED_WANDERING_PIXELS];
 
 		particles_emission em;
-		em.spread_degrees = std::make_pair(0, 1);
-		em.particles_per_sec = std::make_pair(50, 60);
-		em.stream_lifetime_ms = std::make_pair(450, 800);
-		em.base_speed = std::make_pair(4, 30);
-		em.rotation_speed = std::make_pair(0, 0);
-		em.particle_lifetime_ms = std::make_pair(300, 400);
+		em.spread_degrees = float_minmax(0, 1);
+		em.particles_per_sec = float_minmax(50, 60);
+		em.stream_lifetime_ms = float_minmax(450, 800);
+		em.base_speed = float_minmax(4, 30);
+		em.rotation_speed = float_minmax(0, 0);
+		em.particle_lifetime_ms = float_minmax(300, 400);
 
 		for (int i = 0; i < 5; ++i) {
 			general_particle particle_definition;
@@ -965,7 +970,7 @@ void load_test_scene_particle_effects(
 			em.add_particle_definition(particle_definition);
 		}
 
-		em.size_multiplier = std::make_pair(1, 2.0);
+		em.size_multiplier = float_minmax(1, 2.0);
 		em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
 		em.initial_rotation_variation = 0;
 
@@ -976,19 +981,19 @@ void load_test_scene_particle_effects(
 		auto& effect = manager[assets::particle_effect_id::ROUND_ROTATING_BLOOD_STREAM];
 
 		particles_emission em;
-		em.spread_degrees = std::make_pair(180, 180);
-		em.particles_per_sec = std::make_pair(5, 5);
-		em.stream_lifetime_ms = std::make_pair(3000, 3000);
-		em.num_of_particles_to_spawn_initially = std::make_pair(55, 55);
-		em.base_speed = std::make_pair(30, 70);
-		em.rotation_speed = std::make_pair(1.8, 1.8);
-		em.particle_lifetime_ms = std::make_pair(4000, 4000);
+		em.spread_degrees = float_minmax(180, 180);
+		em.particles_per_sec = float_minmax(5, 5);
+		em.stream_lifetime_ms = float_minmax(3000, 3000);
+		em.num_of_particles_to_spawn_initially = float_minmax(55, 55);
+		em.base_speed = float_minmax(30, 70);
+		em.rotation_speed = float_minmax(1.8, 1.8);
+		em.particle_lifetime_ms = float_minmax(4000, 4000);
 
 		default_bounds(em);
-		em.swing_spread = std::make_pair(5, 52);
-		em.swings_per_sec = std::make_pair(2, 8);
-		em.swing_spread_change_rate = std::make_pair(1, 4);
-		em.angular_offset = std::make_pair(0, 0);
+		em.swing_spread = float_minmax(5, 52);
+		em.swings_per_sec = float_minmax(2, 8);
+		em.swing_spread_change_rate = float_minmax(1, 4);
+		em.angular_offset = float_minmax(0, 0);
 
 		for (int i = 0; i < 3; ++i) {
 			general_particle particle_definition;
@@ -1001,10 +1006,10 @@ void load_test_scene_particle_effects(
 			em.add_particle_definition(particle_definition);
 		}
 
-		em.size_multiplier = std::make_pair(0.2, 0.5);
+		em.size_multiplier = float_minmax(0.2, 0.5);
 		em.target_render_layer = render_layer::DIM_SMOKES;
 		em.initial_rotation_variation = 180;
-		//em.fade_when_ms_remaining = std::make_pair(10, 50);
+		//em.fade_when_ms_remaining = float_minmax(10, 50);
 
 		effect.emissions.push_back(em);
 	}
@@ -1013,8 +1018,8 @@ void load_test_scene_particle_effects(
 		auto& effect = manager[assets::particle_effect_id::THUNDER_REMNANTS];
 
 		particles_emission em;
-		em.rotation_speed = std::make_pair(0, 0);
-		em.particle_lifetime_ms = std::make_pair(100, 350);
+		em.rotation_speed = float_minmax(0, 0);
+		em.particle_lifetime_ms = float_minmax(100, 350);
 
 		for (int i = 0; i < 5; ++i) {
 			general_particle particle_definition;
@@ -1033,7 +1038,7 @@ void load_test_scene_particle_effects(
 			em.add_particle_definition(particle_definition);
 		}
 
-		em.size_multiplier = std::make_pair(1.f, 1.5f);
+		em.size_multiplier = float_minmax(1.f, 1.5f);
 		em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
 		em.initial_rotation_variation = 0;
 		em.randomize_acceleration = true;
@@ -1045,13 +1050,13 @@ void load_test_scene_particle_effects(
 		auto& effect = manager[assets::particle_effect_id::MISSILE_SMOKE_TRAIL];
 
 		particles_emission em;
-		em.spread_degrees = std::make_pair(7, 7);
-		em.particles_per_sec = std::make_pair(70, 80);
-		em.stream_lifetime_ms = std::make_pair(2000, 2000);
-		em.base_speed = std::make_pair(0, 0);
-		em.rotation_speed = std::make_pair(1.5f*RAD_TO_DEG<float>, 2.3f*RAD_TO_DEG<float>);
-		em.particle_lifetime_ms = std::make_pair(700, 700);
-		em.size_multiplier = std::make_pair(0.3f, 0.3f);
+		em.spread_degrees = float_minmax(7, 7);
+		em.particles_per_sec = float_minmax(70, 80);
+		em.stream_lifetime_ms = float_minmax(2000, 2000);
+		em.base_speed = float_minmax(0, 0);
+		em.rotation_speed = float_minmax(1.5f*RAD_TO_DEG<float>, 2.3f*RAD_TO_DEG<float>);
+		em.particle_lifetime_ms = float_minmax(700, 700);
+		em.size_multiplier = float_minmax(0.3f, 0.3f);
 
 		for (int i = 0; i < 3; ++i) {
 			general_particle particle_definition;

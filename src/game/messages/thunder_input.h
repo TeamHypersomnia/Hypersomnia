@@ -1,9 +1,11 @@
 #pragma once
-#include "game/components/transform_component.h"
+#include "augs/misc/minmax.h"
 #include "augs/graphics/rgba.h"
 
+#include "game/components/transform_component.h"
+
 struct thunder_input {
-	typedef augs::minmax<float> minmax;
+	using minmax = augs::minmax<float>;
 
 	minmax delay_between_branches_ms = minmax(0.f, 0.f);
 	minmax max_branch_lifetime_ms = minmax(0.f, 0.f);

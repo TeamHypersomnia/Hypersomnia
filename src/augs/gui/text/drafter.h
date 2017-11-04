@@ -1,6 +1,8 @@
 #pragma once
 #include "augs/image/font.h"
+#include "augs/misc/trivially_copyable_pair.h"
 #include "word_separator.h"
+
 // ui relates on draft object (result) only
 // if bugs viewing the caret, check the viewcaret where "car" variable was changed to caret_rect
 // neither drafter nor printer have their formatted_string declared as member fields because it is better to pass it around than rewrite each time we want to change string
@@ -60,7 +62,7 @@ namespace augs {
 				/*
 				clipper is in local drafter's space: (0, 0) = left top corner
 				if any in the pair is -1, there's no line visible */
-				std::pair<int, int> get_line_visibility(const ltrbi& clipper) const;
+				trivially_copyable_pair<int, int> get_line_visibility(const ltrbi& clipper) const;
 			private:
 				unsigned max_x;
 				void find_ascdesc(const formatted_string& source, const int i, const int j, int&, int&) const;

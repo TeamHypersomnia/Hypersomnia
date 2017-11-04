@@ -59,11 +59,11 @@ namespace augs {
 
 				if (!lines.empty() && !sectors.empty()) {
 					/* only these lines we want to process */
-					std::pair<int, int> visible;
+					trivially_copyable_pair<int, int> visible;
 
 					if (clip)
 						visible = d.get_line_visibility(clipper - pos);
-					else visible = std::make_pair(0, static_cast<int>(lines.size() - 1));
+					else visible = { 0, static_cast<int>(lines.size() - 1) };
 
 					/* if this happens:
 					- check if there is always an empty line
@@ -189,13 +189,13 @@ namespace augs {
 				auto caret_rect = xywhi(0, 0, 0, 0);
 
 				if (!lines.empty() && !sectors.empty()) {
-					std::pair<int, int> visible;
+					trivially_copyable_pair<int, int> visible;
 
 					if (clip) {
 						visible = d.get_line_visibility(clipper - pos);
 					}
 					else {
-						visible = std::make_pair(0, static_cast<int>(lines.size()) - 1);
+						visible = { 0, static_cast<int>(lines.size()) - 1 };
 					}
 
 					if (visible.first == -1) {

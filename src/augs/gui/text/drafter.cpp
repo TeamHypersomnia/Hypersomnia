@@ -4,7 +4,6 @@
 
 #include "augs/window_framework/window.h"
 #include "augs/window_framework/platform_utils.h"
-
 #undef min
 #undef max
 namespace augs {
@@ -314,12 +313,12 @@ namespace augs {
 				return { static_cast<int>(max_x) + 1, lines[lines.size() - 1].bottom() };
 			}
 
-			std::pair<int, int> drafter::get_line_visibility(const ltrbi& clipper) const {
+			trivially_copyable_pair<int, int> drafter::get_line_visibility(const ltrbi& clipper) const {
 				if (!clipper.good() || !clipper.hover(ltrbi(vec2i(0, 0), get_bbox())))
-					return std::make_pair(-1, -1);
+					return { -1, -1 };
 
 				/* we are now sure that both rectangles intersect */
-				return std::make_pair(map_to_line(vec2i(0, clipper.t)), map_to_line(vec2i(0, clipper.b)));
+				return { static_cast<int>(map_to_line(vec2i(0, clipper.t))), static_cast<int>(map_to_line(vec2i(0, clipper.b))) };
 			}
 		}
 	}

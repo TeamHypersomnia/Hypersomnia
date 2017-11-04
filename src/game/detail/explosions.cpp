@@ -25,9 +25,9 @@ void standard_explosion_input::instantiate(
 			static randomization rng;
 			thunder_input th;
 
-			th.delay_between_branches_ms = std::make_pair(10.f, 25.f);
-			th.max_branch_lifetime_ms = std::make_pair(40.f, 65.f);
-			th.branch_length = std::make_pair(10.f, 120.f);
+			th.delay_between_branches_ms = {10.f, 25.f};
+			th.max_branch_lifetime_ms = {40.f, 65.f};
+			th.branch_length = {10.f, 120.f};
 
 			th.max_all_spawned_branches = 40 + (t+1)*10;
 			th.max_branch_children = 2;

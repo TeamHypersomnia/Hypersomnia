@@ -2,6 +2,7 @@
 
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
+#include "augs/misc/trivially_copyable_pair.h"
 
 #include "augs/ensure.h"
 #include "augs/readwrite/memory_stream.h"
@@ -167,7 +168,7 @@ std::vector<std::vector<double>> generate_gauss_kernel(const neon_map_input& inp
 		radius_towards_y_axis = radius_towards_x_axis;
 	}
 
-	std::vector<std::vector<std::pair<int, int>>> index;
+	std::vector<std::vector<augs::trivially_copyable_pair<int, int>>> index;
 
 	auto max_index_x = radius_towards_x_axis / 2;
 	auto max_index_y = radius_towards_y_axis / 2;
@@ -180,7 +181,7 @@ std::vector<std::vector<double>> generate_gauss_kernel(const neon_map_input& inp
 
 	for (unsigned y = 0; y < index.size(); ++y) {
 		for (unsigned x = 0; x < index[y].size(); ++x) {
-			index[y][x] = std::make_pair(x - max_index_x, y - max_index_y);
+			index[y][x] = { static_cast<int>(x - max_index_x), static_cast<int>(y - max_index_y) };
 		}
 	}
 

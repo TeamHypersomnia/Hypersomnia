@@ -1,5 +1,5 @@
 #pragma once
-#include <utility>
+#include <type_traits>
 
 namespace augs {
 	template<class A, class B>
@@ -8,8 +8,6 @@ namespace augs {
 		static_assert(std::is_trivially_copyable_v<A>, "First type is not trivially copyable!");
 		static_assert(std::is_trivially_copyable_v<B>, "Second type is not trivially copyable!");
 
-		using pair = std::pair<A, B>;
-		
 		// GEN INTROSPECTOR class augs::trivially_copyable_pair class A class B
 		A first;
 		B second;
@@ -17,13 +15,6 @@ namespace augs {
 
 		trivially_copyable_pair() {};
 		trivially_copyable_pair(const A& a, const B& b) : first(a), second(b) {}
-		trivially_copyable_pair(const pair& p) : first(p.first), second(p.second) {}
-
-		trivially_copyable_pair& operator=(const pair& p) {
-			first = p.first;
-			second = p.second;
-			return *this;
-		}
 
 		template <class A1, class A2>
 		void set(const A1& a, const A2& b) {
@@ -31,16 +22,16 @@ namespace augs {
 			second = static_cast<B>(b);
 		}
 
-		operator pair() const {
-			return{ first, second };
-		}
-
 		bool operator<(const trivially_copyable_pair& b) const {
-			return pair(*this) < pair(b);
+			return (first < b.first || (!(b.first < first) && second < b.second));
 		}
 
 		bool operator==(const trivially_copyable_pair& b) const {
-			return pair(*this) == pair(b);
+			return first == b.first && second == b.second;
+		}
+
+		bool operator!=(const trivially_copyable_pair& b) const {
+			return first != b.first || second != b.second;
 		}
 	};
 }

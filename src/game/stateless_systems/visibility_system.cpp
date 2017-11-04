@@ -568,11 +568,11 @@ void visibility_system::respond_to_visibility_information_requests(
 
 		/* process all raycast inputs at once to improve cache coherency */
 		for (size_t j = 0; j < all_ray_inputs.size(); ++j) {
-			all_ray_outputs.push_back(std::make_pair(
+			all_ray_outputs.emplace_back(
 				physics.ray_cast(position_meters, all_ray_inputs[j].targets[0], request.filter, ignored_entity),
 				all_vertices_transformed[j].is_on_a_bound ?
 				physics_system::raycast_output() : physics.ray_cast(position_meters, all_ray_inputs[j].targets[1], request.filter, ignored_entity)
-			));
+			);
 		}
 
 		for (size_t i = 0; i < all_ray_outputs.size(); ++i) {
@@ -639,7 +639,11 @@ void visibility_system::respond_to_visibility_information_requests(
 						for maximum accuracy, push the vertex coordinates instead of the actual intersections */
 
 						if (push_double_ray(double_ray(vertex.pos, vertex.pos, true, true))) {
-							response.vertex_hits.push_back(std::make_pair(static_cast<int>(double_rays.size()) - 1, si.get_pixels(vertex.pos)));
+							response.vertex_hits.emplace_back(
+								static_cast<int>(double_rays.size()) - 1, 
+								si.get_pixels(vertex.pos)
+							);
+
 							if (DEBUG_DRAWING.draw_cast_rays) draw_line(vertex.pos, rgba(255, 255, 0, 255));
 						}
 					}
@@ -764,7 +768,7 @@ void visibility_system::respond_to_visibility_information_requests(
 			//	lines.emplace_back(p1, p2, request.color);
 			//}
 
-			response.edges.push_back(std::make_pair(p1, p2));
+			response.edges.emplace_back(p1, p2);
 		}
 
 		/* a little processing on discontinuities, we'll need them in a moment */

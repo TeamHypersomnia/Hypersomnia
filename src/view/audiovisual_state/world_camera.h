@@ -23,8 +23,6 @@ struct world_camera_settings {
 };
 
 struct world_camera {
-	vec2 panning;
-
 	bool dont_smooth_once = false;
 
 	components::transform last_interpolant;
@@ -35,9 +33,7 @@ struct world_camera {
 	augs::smooth_value_field additional_position_smoothing;
 
 	auto get_current_cone() const {
-		auto cone = current_cone;
-		cone.transform.pos += panning;
-		return cone;
+		return current_cone;
 	}
 
 	void tick(

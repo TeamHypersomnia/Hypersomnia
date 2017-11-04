@@ -225,9 +225,9 @@ void audiovisual_state::standard_post_solve(const const_logic_step step) {
 				{
 					thunder_input th;
 
-					th.delay_between_branches_ms = std::make_pair(5.f, 17.f);
-					th.max_branch_lifetime_ms = std::make_pair(30.f, 55.f);
-					th.branch_length = std::make_pair(10.f, 60.f);
+					th.delay_between_branches_ms = { 5.f, 17.f };
+					th.max_branch_lifetime_ms = { 30.f, 55.f };
+					th.branch_length = { 10.f, 60.f };
 
 					th.max_all_spawned_branches = static_cast<unsigned>(h.effective_amount);
 					++th.max_all_spawned_branches;
