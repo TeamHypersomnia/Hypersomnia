@@ -253,7 +253,7 @@ TEST_CASE("Byte readwrite Variants and optionals") {
 				LOG("original:");
 
 				for (const auto& it : m2) {
-					LOG("[%x] = %x", it.first, it.second, format_as_bytes(it.second));
+					LOG("[%x] = %x (%x)", it.first, it.second, format_as_bytes(it.second));
 				}
 			}
 

@@ -255,8 +255,16 @@ namespace augs {
 			detail::write_bytes_n(ar, storage.data(), storage.size());
 		}
 		else {
-			for (const auto& obj : storage) {
-				write_bytes(ar, obj);
+			if constexpr(is_associative_v<Container>) {
+				for (auto&& it : storage) {
+					write_bytes(ar, it.first);
+					write_bytes(ar, it.second);
+				}
+			}
+			else {
+				for (const auto& obj : storage) {
+					write_bytes(ar, obj);
+				}
 			}
 		}
 	}
