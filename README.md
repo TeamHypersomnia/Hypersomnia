@@ -95,27 +95,47 @@ git clone https://github.com/TeamHypersomnia/Hypersomnia.git --recursive
 ```
 
 The repository will start downloading. Once complete, create a ```build/``` folder next to ```CMakeLists.txt``` file. 
-Then, use your favorite shell to go into the newly created ```build/``` folder and run:
+Next steps depend on the platform you are on.
+
+**Windows**
+
+You will need **Visual Studio 2017 Preview** or newer.
+Use your favorite shell to go into the newly created ```build/``` folder and run:
 
 ```
 cmake ..
 ```
 
-Alternatively, if you want to build the minimal possible Hypersomnia runtime, if you're for example trying to build for a different platform, run:
+If you want to somehow customize your build, refer to the beginning of ```CMakeLists.txt``` to see which options you can pass to the ```cmake``` command.
 
-```
-cmake -DHYPERSOMNIA_BARE=ON ..
-```
-This will disable all third party code and build Hypersomnia executable reliant exclusively on the standard C++. Refer to ```CMakeLists.txt``` to see which other options are available.
-
-If you are on Windows, resultant ```.sln``` and ```.vcxproj``` files should appear in the ```build/``` directory.
+Resultant ```.sln``` and ```.vcxproj``` files should appear in the ```build/``` directory.
 Open ```Hypersomnia.sln``` file, select **Release** configuration and hit **F7** to build the game.
+**F5** should launch it.
 
-As it currently stands, the game is known to build successfully only with Visual Studio 2017 **Preview** under Windows systems. Compilers from Visual Studio 2015 do not support some of the C++ language features.
+**Linux**
+
+You will need **gcc 7.2** or newer.
+Use your favorite shell to go into the newly created ```build/``` folder and run these commands:
+
+```
+cmake -DUNIX=ON -DCMAKE_BUILD_TYPE=Release -D CMAKE_C_COMPILER=gcc-7 -D CMAKE_CXX_COMPILER=g++-7 ..
+make -j4
+```
+
+Then, to launch the built game:
+
+```
+cd ../hypersomnia
+../build/Hypersomnia
+```
+
+If the game fails to launch, it should automatically open a log file with the relevant message.
+
+If it complains about some missing file, double-check that the game's working directory is ```hypersomnia/``` (where ```config.lua``` resides)
 
 # Contributing
 
-We fondly welcome every pull request, should it even be a typo fix or a missing const guarantee.
+We consider every pull request, should it even be typo fixes, missing const guarantees or changes in nomenclature.
 
 If you however plan to add a completely new feature, please notice us in advance, because the project is continuously in a very, very active development and may undergo a revolution when it is the least expected.
 I also recommend that you be familiar with component-based entity architecture beforehand.
@@ -125,9 +145,3 @@ You will be added to our TeamHypersomnia organization once we accept at least on
 If you have questions or you fail to build Hypersomnia, ask via mail: patryk.czachurski@gmail.com
 
 Or if you just can't wait to utter some brilliant suggestions regarding the game, please do so, too!
-
-# Launching
-
-You might want to properly configure some variables before launching the game.
-- Clone the ```config.lua``` and name it ```config.local.lua``` so that it stays unversioned and unique to your filesystem, if for example you want to preserve your original window resolution and coordinates across further commits.
-- The game will try to read ```config.local.lua``` and if there is no such file, it shall try loading ```config.lua```.

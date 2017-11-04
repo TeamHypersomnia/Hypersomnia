@@ -73,6 +73,19 @@ set(STATICALLY_ALLOCATE_BAKED_FONTS "1" CACHE STRING "Statically allocate fonts 
 
 set(BUILD_IN_CONSOLE_MODE OFF CACHE STRING "")
 
+if(UNIX)
+	# Set different default options for UNIX:
+	# Disable those that are not yet supported
+
+	message("Changing unsupported UNIX defaults to off...")
+	
+	set(STATICALLY_ALLOCATE_ENTITIES_NUM "0")
+	set(STATICALLY_ALLOCATE_ASSETS "0")
+	set(STATICALLY_ALLOCATE_BAKED_FONTS "0")
+	set(BUILD_HTTP_REQUESTS OFF)
+	set(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE OFF)
+endif()
+
 if(NOT BUILD_WINDOW_FRAMEWORK)
 	set(BUILD_IN_CONSOLE_MODE 1)
 endif()
@@ -87,6 +100,8 @@ if(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE)
 		)
 	
 		file(MAKE_DIRECTORY ${HYPERSOMNIA_RUNTIME_ARCHIVE_DIR})
+
+		message("Built Hypersomnia archives will be copied to ${HYPERSOMNIA_RUNTIME_ARCHIVE_DIR}")
 	endif()
 endif()
 
