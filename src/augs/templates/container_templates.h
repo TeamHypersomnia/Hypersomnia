@@ -66,7 +66,7 @@ bool found_in(Container& v, const K& l) {
 }
 
 template <class T, class... Args>
-auto default_or_invalid_enum(Args&&... args) {
+T default_or_invalid_enum(Args&&... args) {
 	if constexpr(std::is_enum_v<T>) {
 		return T::INVALID;
 	}
@@ -76,7 +76,7 @@ auto default_or_invalid_enum(Args&&... args) {
 			"Default value for arithmetic types is not well-defined."
 		);
 
-		return T { std::forward<Args>(args)... };
+		return { std::forward<Args>(args)... };
 	}
 }
 
@@ -118,9 +118,9 @@ auto key_or_default(
 ) {
 	using K = typename std::decay_t<Container>::key_type;
 
-	for (const auto& [key, tested_value] : container) {
-		if (tested_value == searched_value) {
-			return key;
+	for (auto&& it : container) {
+		if (it.second == searched_value) {
+			return it.first;
 		}
 	}
 

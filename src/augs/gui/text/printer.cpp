@@ -59,7 +59,7 @@ namespace augs {
 
 				if (!lines.empty() && !sectors.empty()) {
 					/* only these lines we want to process */
-					trivially_copyable_pair<int, int> visible;
+					simple_pair<int, int> visible;
 
 					if (clip)
 						visible = d.get_line_visibility(clipper - pos);
@@ -189,7 +189,7 @@ namespace augs {
 				auto caret_rect = xywhi(0, 0, 0, 0);
 
 				if (!lines.empty() && !sectors.empty()) {
-					trivially_copyable_pair<int, int> visible;
+					simple_pair<int, int> visible;
 
 					if (clip) {
 						visible = d.get_line_visibility(clipper - pos);

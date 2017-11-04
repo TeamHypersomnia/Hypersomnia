@@ -3,7 +3,7 @@
 #include "augs/templates/maybe_const.h"
 #include "augs/templates/container_templates.h"
 #include "augs/misc/enum/enum_boolset.h"
-#include "augs/misc/trivially_copyable_pair.h"
+#include "augs/misc/simple_pair.h"
 
 #include "augs/misc/declare_containers.h"
 
@@ -81,7 +81,7 @@ namespace augs {
 		template <bool is_const>
 		class basic_iterator {
 			using owner_ptr_type = maybe_const_ptr_t<is_const, enum_associative_array_base>;
-			using pair_type = std::pair<const key_type, maybe_const_ref_t<is_const, mapped_type>>;
+			using pair_type = simple_pair<const key_type, maybe_const_ref_t<is_const, mapped_type>>;
 			
 			owner_ptr_type ptr = nullptr;
 			size_type idx = 0;
@@ -161,7 +161,7 @@ namespace augs {
 		}
 
 		template <class... Args>
-		trivially_copyable_pair<iterator, bool> try_emplace(const key_type k, Args&&... args) {
+		simple_pair<iterator, bool> try_emplace(const key_type k, Args&&... args) {
 			if (is_set(static_cast<size_type>(k))) {
 				return { find(k), false };
 			}

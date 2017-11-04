@@ -5,6 +5,7 @@
 
 #include "augs/templates/container_templates.h"
 #include "augs/templates/algorithm_templates.h"
+#include "augs/misc/simple_pair.h"
 #include "game/detail/physics/physics_queries.h"
 #include "game/debug_drawing_settings.h"
 
@@ -193,7 +194,12 @@ void visibility_system::respond_to_visibility_information_requests(
 		vec2 targets[2];
 	};
 
-	std::vector<std::pair<physics_system::raycast_output, physics_system::raycast_output>> all_ray_outputs;
+	std::vector<
+		augs::simple_pair<
+			physics_system::raycast_output, 
+			physics_system::raycast_output
+		>
+	> all_ray_outputs;
 	std::vector<ray_input> all_ray_inputs;
 
 	for (const auto& request : los_requests) {

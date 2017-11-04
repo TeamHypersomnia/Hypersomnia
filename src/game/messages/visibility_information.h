@@ -4,6 +4,7 @@
 #include <unordered_set>
 #include <vector>
 #include "augs/graphics/rgba.h"
+#include "augs/misc/simple_pair.h"
 #include "game/components/transform_component.h"
 #include "3rdparty/Box2D/Dynamics/b2Fixture.h"
 #include "augs/math/vec2.h"
@@ -45,8 +46,8 @@ namespace messages {
 	};
 
 	struct visibility_information_response {
-		typedef std::pair<vec2, vec2> edge;
-		typedef std::array<vec2, 3> triangle;
+		using edge = augs::simple_pair<vec2, vec2>;
+		using triangle = std::array<vec2, 3>;
 
 		struct discontinuity {
 			unsigned edge_index;
@@ -73,7 +74,7 @@ namespace messages {
 		std::vector<edge> edges;
 
 		/* first: edge index, second: location */
-		std::vector<std::pair<int, vec2>> vertex_hits;
+		std::vector<augs::simple_pair<int, vec2>> vertex_hits;
 		std::vector<discontinuity> discontinuities;
 
 		/* segments that denote narrow areas */

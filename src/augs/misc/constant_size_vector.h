@@ -3,7 +3,7 @@
 #include "augs/ensure.h"
 #include "augs/zeroed_pod.h"
 
-#include "augs/misc/trivially_copyable_pair.h"
+#include "augs/misc/simple_pair.h"
 #include "augs/templates/type_matching_and_indexing.h"
 
 #include "augs/misc/declare_containers.h"

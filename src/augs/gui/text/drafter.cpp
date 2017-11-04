@@ -313,7 +313,7 @@ namespace augs {
 				return { static_cast<int>(max_x) + 1, lines[lines.size() - 1].bottom() };
 			}
 
-			trivially_copyable_pair<int, int> drafter::get_line_visibility(const ltrbi& clipper) const {
+			simple_pair<int, int> drafter::get_line_visibility(const ltrbi& clipper) const {
 				if (!clipper.good() || !clipper.hover(ltrbi(vec2i(0, 0), get_bbox())))
 					return { -1, -1 };
 

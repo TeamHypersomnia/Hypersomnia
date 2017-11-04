@@ -50,7 +50,13 @@ namespace templates_detail {
 	using identity_t = typename identity<T>::type;
 }
 
+struct AAA {
+	int& czo;
+};
+
 struct tests_of_traits {
+	static_assert(std::is_trivially_copyable_v<game_intent_type>);
+
 	static_assert(static_cast<int>(imguicol_helper::ImGuiCol_COUNT) == static_cast<int>(ImGuiCol_COUNT));
 
 	static_assert(augs::has_byte_readwrite_overloads_v<augs::memory_stream, augs::path_type>);

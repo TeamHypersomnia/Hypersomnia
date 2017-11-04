@@ -2,7 +2,7 @@
 #include <unordered_map>
 #include "augs/math/vec2.h"
 #include "augs/templates/exception_templates.h"
-#include "augs/misc/trivially_copyable_pair.h"
+#include "augs/misc/simple_pair.h"
 #include "augs/filesystem/path.h"
 #include "augs/image/image.h"
 #include "augs/texture_atlas/texture_atlas_entry.h"
@@ -24,7 +24,7 @@ namespace augs {
 		int bear_y = 0;
 		unsigned index = 0xdeadbeef;
 
-		std::vector<augs::trivially_copyable_pair<wchar_t, short>> kerning;
+		std::vector<augs::simple_pair<wchar_t, short>> kerning;
 		// END GEN INTROSPECTOR
 
 		font_glyph_metadata() = default;

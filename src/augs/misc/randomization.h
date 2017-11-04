@@ -1,6 +1,5 @@
 #pragma once
 #include <random>
-#include <utility>
 #include <vector>
 
 #include "augs/misc/randomization_declaration.h"
@@ -43,12 +42,7 @@ struct basic_randomization {
 	);
 
 	template <class A, class B>
-	auto randval(const std::pair<A, B> p) {
-		return randval(p.first, p.second);
-	}
-
-	template <class A, class B>
-	auto randval(const augs::trivially_copyable_pair<A, B> p) {
+	auto randval(const augs::simple_pair<A, B> p) {
 		return randval(p.first, p.second);
 	}
 

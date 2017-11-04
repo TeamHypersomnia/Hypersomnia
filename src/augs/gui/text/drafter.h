@@ -1,6 +1,6 @@
 #pragma once
 #include "augs/image/font.h"
-#include "augs/misc/trivially_copyable_pair.h"
+#include "augs/misc/simple_pair.h"
 #include "word_separator.h"
 
 // ui relates on draft object (result) only
@@ -62,7 +62,7 @@ namespace augs {
 				/*
 				clipper is in local drafter's space: (0, 0) = left top corner
 				if any in the pair is -1, there's no line visible */
-				trivially_copyable_pair<int, int> get_line_visibility(const ltrbi& clipper) const;
+				simple_pair<int, int> get_line_visibility(const ltrbi& clipper) const;
 			private:
 				unsigned max_x;
 				void find_ascdesc(const formatted_string& source, const int i, const int j, int&, int&) const;
