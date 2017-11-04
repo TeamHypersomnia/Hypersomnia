@@ -169,9 +169,9 @@ TEST_CASE("Byte readwrite Containers") {
 }
 
 TEST_CASE("Byte readwrite Optionals") {
-	std::optional<std::vector<float>> abc{ {} };
-	std::optional<std::vector<int>> abcd{ {} };
-	std::optional<std::vector<std::vector<int>>> abcde{ {} };
+	std::optional<std::vector<float>> abc = std::vector<float>();
+	std::optional<std::vector<int>> abcd = std::vector<int>();
+	std::optional<std::vector<std::vector<int>>> abcde = std::vector<std::vector<int>>();
 	std::vector<std::unordered_map<int, std::optional<std::vector<int>>>> abcdef;
 	abc->resize(2);
 	abcd->resize(2);
