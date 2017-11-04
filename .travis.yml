@@ -1,24 +1,24 @@
-sudo: true
-dist: precise
-language:
-  - cpp
-compiler:
-  - gcc
+os: linux
+language: cpp
+sudo: required
+dist: trusty
 addons:
   apt:
+    packages:
+     - gdb
+     - apport
+     - gcc-7
+     - g++-7
+     - cmake
     sources:
       - ubuntu-toolchain-r-test
-    packages:
-      - gcc-7
-      - g++-7
-      - cmake
+compiler:
+ - gcc
 env:
   - config=Debug
 python:
   - "3.6"
 before_install:
- # What is the current file size max for core files?
- # It is usually 0, which means no core file will be dumped if there is a crash 
  - ulimit -c
  - ulimit -a -S
  - ulimit -a -H
@@ -28,18 +28,7 @@ before_install:
  - initctl list || true
 
 script:
-  - mkdir ./mason/
-  - curl -sSfL https://github.com/mapbox/mason/archive/v0.2.0.tar.gz | tar --gunzip --extract --strip-components=1 --directory=./mason/
-  # install gdb via mason
-  - ./mason/mason install gdb 7.12
-  # put GDB on PATH
-  - export PATH=$(./mason/mason prefix gdb 7.12)/bin:${PATH}
-  # install logbt
-  - curl -sSfL https://github.com/mapbox/logbt/archive/v1.6.0.tar.gz | tar --gunzip --extract --strip-components=2 --exclude="*md" --exclude="test*" --directory=.
-
-  - gcc -v && g++ -v && cmake --version && make --version
-  - python --version
-  # Run your build commands next
+  - gcc -v && g++ -v && cmake --version && make --version && python --version
   - mkdir dev
   - cd dev
   # - We don't need to allocate entities statically for performance as this is just a test.
@@ -54,9 +43,11 @@ script:
       EXECUTABLE_NAME=Hypersomnia
     fi
     
-  - sudo bash -c "echo '/tmp/logbt-coredumps/core.%p.%E' > /proc/sys/kernel/core_pattern"
-  - RESULT=0
-  - ./logbt ../dev/${EXECUTABLE_NAME} --unit-tests-only
+  - ulimit -c unlimited -S
+  - ../dev/${EXECUTABLE_NAME} --unit-tests-only
+  - ls -l
+  - if [[ ${RESULT} != 139 ]]; then echo "expected segfault and 139 exit but instead exited with ${RESULT}" && exit 1; fi;
+  - for i in $(find ./ -maxdepth 1 -name 'core*' -print); do gdb $(pwd)/test core* -ex "thread apply all bt" -ex "set pagination 0" -batch; done;
 
 notfications:
   email: false
