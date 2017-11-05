@@ -16,7 +16,6 @@
 #include "augs/entity_system/operations_on_all_components_mixin.h"
 #include "augs/entity_system/storage_for_systems.h"
 
-#include "game/build_settings.h"
 #include "game/assets/ids/behaviour_tree_id.h"
 #include "game/assets/behaviour_tree.h"
 
@@ -66,12 +65,10 @@ auto subscript_handle_getter(C& cosm, const unversioned_entity_id id) {
 	return basic_entity_handle<std::is_const_v<C>>{ cosm, cosm.make_versioned(id) };
 }
 
-#if COSMOS_TRACKS_GUIDS
 template <class C>
 auto subscript_handle_getter(C& cosm, const entity_guid guid) {
 	return subscript_handle_getter(cosm, cosm.get_entity_id_by(guid));
 }
-#endif
 
 class EMPTY_BASES cosmos : private cosmos_base,
 	public augs::subscript_handle_getters_mixin<cosmos>
@@ -80,9 +77,7 @@ class EMPTY_BASES cosmos : private cosmos_base,
 	friend cosmos_base;
 
 	/* State of the cosmos begins here ***************************/
-#if COSMOS_TRACKS_GUIDS
 	std::map<entity_guid, entity_id> guid_to_id;
-#endif
 
 public:
 	static const cosmos empty;
@@ -168,9 +163,7 @@ public:
 	void destroy_inferred_state_of(const const_entity_handle);
 	
 	void refresh_for_new_significant_state();
-#if COSMOS_TRACKS_GUIDS
 	void remap_guids();
-#endif
 	void clear();
 
 	template <class System>
@@ -190,7 +183,6 @@ public:
 
 	entity_id make_versioned(const unversioned_entity_id) const;
 
-#if COSMOS_TRACKS_GUIDS
 	entity_id get_entity_id_by(const entity_guid) const;
 	bool entity_exists_by(const entity_guid) const;
 
@@ -222,7 +214,6 @@ public:
 			}
 		);
 	}
-#endif
 
 	si_scaling get_si() const;
 
@@ -291,7 +282,6 @@ public:
 	}
 
 private:
-#if COSMOS_TRACKS_GUIDS
 	friend class cosmic_delta;
 
 	template <class T>
@@ -304,7 +294,6 @@ private:
 	entity_handle create_entity_with_specific_guid(
 		const entity_guid specific_guid
 	);
-#endif
 
 	void advance_and_queue_destructions(const logic_step step_state);
 	void perform_deletions(const logic_step);
@@ -319,7 +308,6 @@ inline si_scaling cosmos::get_si() const {
 	return significant.meta.global.si;
 }
 
-#if COSMOS_TRACKS_GUIDS
 inline entity_id cosmos::get_entity_id_by(const entity_guid guid) const {
 	return guid_to_id.at(guid);
 }
@@ -331,7 +319,6 @@ inline bool cosmos::entity_exists_by(const entity_guid guid) const {
 inline entity_guid cosmos::get_guid(const const_entity_handle handle) const {
 	return handle.get_guid();
 }
-#endif
 
 inline cosmos_common_state& cosmos::get_common_state() {
 	return significant.meta.global;

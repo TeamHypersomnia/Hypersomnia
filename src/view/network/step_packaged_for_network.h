@@ -1,5 +1,4 @@
 #pragma once
-#include "augs/readwrite/memory_stream.h"
 #include "game/transcendental/cosmic_entropy.h"
 #include "augs/readwrite/byte_readwrite_declaration.h"
 
@@ -12,7 +11,7 @@ struct step_packaged_for_network {
 
 	bool shall_reinfer = false;
 	bool next_client_commands_accepted = false;
-	augs::memory_stream delta;
+	std::vector<std::byte> delta;
 	guid_mapped_entropy entropy;
 };
 
@@ -34,7 +33,7 @@ namespace augs {
 			augs::read_bytes(ar, storage.next_client_commands_accepted);
 			augs::read_bytes(ar, storage.entropy);
 
-			augs::read_stream_with_size(ar, storage.delta);
+			augs::read_bytes(ar, storage.delta);
 		}
 		else {
 			ensure(false);
@@ -49,13 +48,12 @@ namespace augs {
 			augs::write_bytes(ar, written.shall_reinfer);
 			augs::write_bytes(ar, written.next_client_commands_accepted);
 			augs::write_bytes(ar, written.entropy);
-
 		}
 		else if (written.step_type == step_packaged_for_network::type::NEW_ENTROPY_WITH_HEARTBEAT) {
 			augs::write_bytes(ar, written.next_client_commands_accepted);
 			augs::write_bytes(ar, written.entropy);
 
-			augs::write_stream_with_size(ar, written.delta);
+			augs::write_bytes(ar, written.delta);
 		}
 		else {
 			ensure(false);

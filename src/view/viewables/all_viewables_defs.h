@@ -2,7 +2,6 @@
 #include "augs/misc/enum/enum_associative_array.h"
 #include "augs/audio/sound_buffer.h"
 
-#include "game/build_settings.h"
 #include "view/viewables/particle_types.h"
 
 #include "game/assets/ids/game_image_id.h"

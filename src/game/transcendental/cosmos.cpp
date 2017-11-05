@@ -188,8 +188,6 @@ cosmos& cosmos::operator=(const cosmos_significant_state& b) {
 	return *this;
 }
 
-#if COSMOS_TRACKS_GUIDS
-
 void cosmos::assign_next_guid(const entity_handle new_entity) {
 	const auto this_guid = significant.meta.next_entity_guid.value++;
 
@@ -209,12 +207,8 @@ void cosmos::remap_guids() {
 	});
 }
 
-#endif
-
 void cosmos::refresh_for_new_significant_state() {
-#if COSMOS_TRACKS_GUIDS
 	remap_guids();
-#endif
 	complete_reinference();
 }
 
@@ -290,13 +284,10 @@ entity_handle cosmos::create_entity(const std::wstring& name_str) {
 	auto new_entity = allocate_new_entity();
 	new_entity.set_name(name_str);
 
-#if COSMOS_TRACKS_GUIDS
 	assign_next_guid(new_entity);
-#endif
 	return new_entity;
 }
 
-#if COSMOS_TRACKS_GUIDS
 entity_handle cosmos::create_entity_with_specific_guid(const entity_guid specific_guid) {
 	const auto new_entity = allocate_new_entity();
 
@@ -304,7 +295,6 @@ entity_handle cosmos::create_entity_with_specific_guid(const entity_guid specifi
 	new_entity.get<components::guid>().value = specific_guid;
 	return new_entity;
 }
-#endif
 
 entity_handle cosmos::clone_entity(const entity_id source_entity_id) {
 	entity_handle source_entity = operator[](source_entity_id);
@@ -335,9 +325,7 @@ entity_handle cosmos::clone_entity(const entity_id source_entity_id) {
 		components::all_inferred_state
 	>(new_entity, source_entity);
 
-#if COSMOS_TRACKS_GUIDS
 	assign_next_guid(new_entity);
-#endif
 
 	if (new_entity.has<components::item>()) {
 		new_entity.get<components::item>().current_slot.unset();
@@ -401,9 +389,7 @@ void cosmos::delete_entity(const entity_id e) {
 		handle.get<components::all_inferred_state>().set_activated(false);
 	}
 
-#if COSMOS_TRACKS_GUIDS
 	clear_guid(handle);
-#endif
 	// now manipulation of an entity without all_inferred_state component won't trigger redundant reinference
 
 	const auto maybe_fixtures = handle.find<components::fixtures>();

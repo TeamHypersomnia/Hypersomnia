@@ -146,13 +146,11 @@ D basic_relations_mixin<C, D>::get_owner_body() const {
 	return fixtures != nullptr ? self.get_cosmos()[fixtures.get_owner_body()] : self.get_cosmos()[entity_id()];
 }
 
-#if COSMOS_TRACKS_GUIDS
 template <bool C, class D>
 entity_guid basic_relations_mixin<C, D>::get_guid() const {
 	auto& self = *static_cast<const D*>(this);
 	return self.template get<components::guid>().get_value();
 }
-#endif
 
 template <bool C, class D>
 D basic_relations_mixin<C, D>::get_parent() const {

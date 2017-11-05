@@ -104,7 +104,6 @@ bool cosmic_delta::encode(
 
 	enco.significant.entity_pool.for_each_id([&](const entity_id id) {
 		const const_entity_handle enco_entity = enco[id];
-#if COSMOS_TRACKS_GUIDS
 		const auto stream_written_id = enco_entity.get_guid();
 		const auto maybe_base_entity = base.guid_to_id.find(stream_written_id);
 
@@ -112,11 +111,6 @@ bool cosmic_delta::encode(
 		const entity_id base_entity_id = is_new ? entity_id() : (*maybe_base_entity).second;
 
 		const const_entity_handle base_entity = base[base_entity_id];
-#else
-		const const_entity_handle base_entity = base[id];
-		const bool is_new = base_entity.dead();
-		const auto stream_written_id = id;
-#endif
 
 		bool has_entity_changed = false;
 
@@ -175,11 +169,7 @@ bool cosmic_delta::encode(
 		);
 
 		if (is_new) {
-#if COSMOS_TRACKS_GUIDS
 			augs::write_bytes(dt.stream_of_new_guids, stream_written_id);
-#else
-			// otherwise new entity_id assignment needs be deterministic
-#endif
 
 			augs::write_flags(dt.stream_for_new, overridden_components);
 			dt.stream_for_new.write(new_content);
@@ -199,15 +189,9 @@ bool cosmic_delta::encode(
 
 	base.significant.entity_pool.for_each_id([&base, &enco, &dt](const entity_id id) {
 		const const_entity_handle base_entity = base[id];
-#if COSMOS_TRACKS_GUIDS
 		const auto stream_written_id = base_entity.get_guid();
 		const auto maybe_enco_entity = enco.guid_to_id.find(stream_written_id);
 		const bool is_dead = maybe_enco_entity == enco.guid_to_id.end();
-#else
-		const auto stream_written_id = id;
-		const const_entity_handle enco_entity = enco[stream_written_id];
-		const bool is_dead = enco_entity.dead();
-#endif
 
 		if (is_dead) {
 			++dt.deleted_entities;
@@ -288,15 +272,11 @@ void cosmic_delta::decode(
 	std::vector<entity_id> new_entities_ids;
 
 	while (dt.new_entities--) {
-#if COSMOS_TRACKS_GUIDS
 		entity_guid new_guid;
 
 		augs::read_bytes(in, new_guid);
 		
 		new_entities_ids.push_back(deco.create_entity_with_specific_guid(new_guid).get_id());
-#else
-		// otherwise new entity_id assignment needs be deterministic
-#endif
 	}
 
 	for(const auto new_entity_id : new_entities_ids) {
@@ -375,15 +355,11 @@ void cosmic_delta::decode(
 	}
 
 	while (dt.deleted_entities--) {
-#if COSMOS_TRACKS_GUIDS
 		entity_guid guid_of_destroyed;
 
 		augs::read_bytes(in, guid_of_destroyed);
 		
 		deco.delete_entity(deco[guid_of_destroyed]);
-#else
-		static_assert(false, "Unimplemented");
-#endif
 	}
 
 	const auto unread_bits = in.get_unread_bytes();

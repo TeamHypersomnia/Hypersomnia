@@ -6,8 +6,6 @@
 #include "augs/templates/introspect_declaration.h"
 #include "augs/templates/maybe_const.h"
 
-#include "game/build_settings.h"
-
 #include "game/detail/inventory/inventory_slot_handle_declaration.h"
 
 #include "game/transcendental/entity_handle_declaration.h"
@@ -41,9 +39,7 @@ public:
 		return self.template get<components::rigid_body>().get_attached_joints();
 	}
 
-#if COSMOS_TRACKS_GUIDS
 	entity_guid get_guid() const;
-#endif
 
 	inventory_slot_handle_type operator[](const slot_function) const;
 	entity_handle_type operator[](const child_entity_name) const;
