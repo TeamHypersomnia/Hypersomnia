@@ -23,4 +23,10 @@ namespace augs {
 		Instance& t,
 		Instances&... tn
 	);
+
+	template <class A, class B>
+	bool equal_by_introspection(
+		const A& a,
+		const B& b
+	);
 }

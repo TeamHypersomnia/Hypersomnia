@@ -2,6 +2,7 @@
 #include <vector>
 #include "augs/templates/triviality_traits.h"
 #include "augs/templates/get_index_type_for_size_of.h"
+#include "augs/templates/introspect_declaration.h"
 
 #include "augs/ensure.h"
 #include "augs/readwrite/memory_stream.h"
@@ -207,10 +208,8 @@ namespace augs {
 			const T& base_object,
 			const T& encoded_object
 		) {
-			new_content = to_bytes(encoded_object);
-
-			if (new_content == to_bytes(base_object)) {
-				new_content.clear();
+			if (!equal_by_introspection(base_object, encoded_object)) {
+				new_content = to_bytes(encoded_object);
 			}
 		}
 
