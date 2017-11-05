@@ -100,16 +100,83 @@ void cosmos::create_inferred_state_for(const const_entity_handle h) {
 	}
 }
 
-/* TODO: Make comparisons somehow work with debug name pointers */
-#if !(DEBUG_TRACK_ENTITY_NAME && STATICALLY_ALLOCATE_ENTITIES_NUM)
+template <class T>
+static bool components_equal_in_entities(
+	const const_entity_handle e1, 
+	const const_entity_handle e2
+) {
+	const auto maybe_1 = e1.find<T>();
+	const auto maybe_2 = e2.find<T>();
+
+	if (!maybe_1 && !maybe_2) {
+		return true;
+	}
+
+	if (maybe_1) {
+		if (maybe_2) {
+			bool difference_found = false;
+
+			if constexpr(is_component_synchronized_v<T>) {
+				if (!augs::equal_by_introspection(maybe_1.get_raw_component(), maybe_2.get_raw_component())) {
+					difference_found = true;
+				}
+			}
+			else {
+				if (!augs::equal_by_introspection(*maybe_1, *maybe_2)) {
+					difference_found = true;
+				}
+			}
+
+			if (!difference_found) {
+				return true;
+			}
+		}
+	}
+
+	return false;
+};
+
 bool cosmos::operator==(const cosmos& b) const {
-	return significant == b.significant;
+	ensure(guid_to_id.size() == get_entities_count());
+	ensure(b.guid_to_id.size() == b.get_entities_count());
+
+	if (get_entities_count() != b.get_entities_count()) {
+		return false;
+	}
+
+	if (!augs::equal_by_introspection(significant.meta, b.significant.meta)) {
+		return false;
+	}
+
+	for (const auto& it : guid_to_id) {
+		const auto guid = it.first;
+
+		const auto left = operator[](it.second);
+		const auto right = b[guid];
+
+		if (right.dead()) {
+			return false;
+		}
+
+		bool difference_found = false;
+
+		for_each_component_type([&](auto c) {
+			if (!components_equal_in_entities<decltype(c)>(left, right)) {
+				difference_found = true;
+			}
+		});
+
+		if (difference_found) {
+			return false;
+		}
+	}
+
+	return true;
 }
 
 bool cosmos::operator!=(const cosmos& b) const {
 	return !operator==(b);
 }
-#endif
 
 cosmos& cosmos::operator=(const cosmos_significant_state& b) {
 	{

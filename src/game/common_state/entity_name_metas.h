@@ -20,6 +20,10 @@ public:
 	entity_description_type description = L"No description";
 	// END GEN INTROSPECTOR
 
+	bool operator==(const entity_name_meta& b) const {
+		return name == b.name && stackable == b.stackable && description == b.description;
+	}
+
 	const auto& get_name() const {
 		return name;
 	}

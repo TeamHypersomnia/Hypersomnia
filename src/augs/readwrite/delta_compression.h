@@ -160,7 +160,7 @@ namespace augs {
 
 	template <class T>
 	class object_delta<T, std::enable_if_t<!std::is_trivially_copyable_v<T>>> {
-		augs::memory_stream new_content;
+		std::vector<std::byte> new_content;
 	public:
 		std::size_t get_first_divergence_pos() const {
 			ensure(false && "not implemented");
@@ -182,7 +182,7 @@ namespace augs {
 			}
 
 			if (changed) {
-				augs::write_stream_with_size(out, new_content);
+				augs::write_bytes(out, new_content);
 			}
 
 			return changed;
@@ -199,7 +199,7 @@ namespace augs {
 			}
 
 			if (changed) {
-				augs::read_stream_with_size(in, new_content);
+				augs::read_bytes(in, new_content);
 			}
 		}
 
@@ -207,21 +207,16 @@ namespace augs {
 			const T& base_object,
 			const T& encoded_object
 		) {
-			augs::memory_stream base_content;
+			new_content = to_bytes(encoded_object);
 
-			augs::write_bytes(base_content, base_object);
-			augs::write_bytes(new_content, encoded_object);
-
-			if (new_content == base_content) {
-				new_content.set_write_pos(0u);
+			if (new_content == to_bytes(base_object)) {
+				new_content.clear();
 			}
 		}
 
 		void decode_into(T& decoded) {
-			new_content.set_read_pos(0u);
-
 			if (new_content.size() > 0) {
-				augs::read_bytes(new_content, decoded);
+				from_bytes(std::move(new_content), decoded);
 			}
 		}
 	};

@@ -1,6 +1,7 @@
 #pragma once
 #include "augs/ensure.h"
 #include "augs/templates/maybe_const.h"
+#include "augs/templates/is_comparable.h"
 #include "augs/templates/container_templates.h"
 #include "augs/misc/enum/enum_boolset.h"
 #include "augs/misc/simple_pair.h"
@@ -306,7 +307,7 @@ namespace augs {
 		}
 	};
 
-	template <class Enum, class T>
+	template <class Enum, class T, class = std::enable_if_t<is_comparable_v<T, T>>>
 	bool operator==(
 		const enum_associative_array<Enum, T>& left, 
 		const enum_associative_array<Enum, T>& right

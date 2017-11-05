@@ -20,6 +20,10 @@ struct pathfinding_navigation_vertex {
 	vec2 location;
 	vec2 sensor;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const pathfinding_navigation_vertex& b) const {
+		return location == b.location && sensor == b.sensor;
+	}
 };
 
 struct pathfinding_session {
@@ -37,6 +41,8 @@ struct pathfinding_session {
 
 	float temporary_ignore_discontinuities_shorter_than = 0.f;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const pathfinding_session&) const;
 };
 
 namespace components {

@@ -314,7 +314,7 @@ struct basic_ltrb {
 		return *this;
 	}
 
-	bool operator==(const basic_ltrb& a) {
+	bool operator==(const basic_ltrb& a) const {
 		return l == a.l && r == a.r && t == a.t && b == a.b;
 	}
 };

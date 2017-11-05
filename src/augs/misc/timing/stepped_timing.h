@@ -39,6 +39,10 @@ namespace augs {
 		bool lasts(const stepped_timestamp, const delta t) const;
 		bool is_ready(const stepped_timestamp, const delta t) const;
 		bool try_to_fire_and_reset(const stepped_timestamp, const delta t);
+
+		bool operator==(const stepped_cooldown& b) const {
+			return when_last_fired == b.when_last_fired && cooldown_duration_ms == b.cooldown_duration_ms;
+		}
 	};
 
 }

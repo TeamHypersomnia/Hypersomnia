@@ -696,7 +696,8 @@ TEST_CASE("CosmicDelta6 ThreeEntitiesWithReferencesAndDestroyedChild") {
 		c2[c2_first_guid].map_child_entity(child_entity_name::CHARACTER_CROSSHAIR, entity_id());
 		
 		// Only now shall the two cosmoi be equal. (the following expression is  equivalent to c1 == c2)
-		REQUIRE(c1.significant.get_first_mismatch_pos(c2.significant) == -1);
+		// REQUIRE(c1.significant.get_first_mismatch_pos(c2.significant) == -1);
+		REQUIRE(c1 == c2);
 
 		REQUIRE(1 == comparatory.size());
 	}

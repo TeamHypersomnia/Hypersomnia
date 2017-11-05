@@ -114,6 +114,20 @@ namespace augs {
 		augs::write_bytes(s, object);
 		return std::move(s);
 	}
+
+	template <class T>
+	void from_bytes(std::vector<std::byte>&& bytes, T& object) {
+		memory_stream s(std::move(bytes));
+		augs::read_bytes(s, object);
+	}
+	
+	template <class T>
+	T from_bytes(std::vector<std::byte>&& bytes) {
+		T object;
+		memory_stream s(std::move(bytes));
+		augs::read_bytes(s, object);
+		return object;
+	}
 }
 
 namespace augs {

@@ -7,6 +7,8 @@
 #include "augs/templates/introspection_traits.h"
 #include "augs/templates/recursive.h"
 #include "augs/templates/is_optional.h"
+#include "augs/templates/is_comparable.h"
+#include "augs/templates/is_tuple.h"
 
 namespace augs {
 	/*
@@ -90,6 +92,12 @@ namespace augs {
 					else {
 						are_equal = are_equal && false;
 					}
+				}
+				else if constexpr(is_tuple_v<AA>) {
+					introspect(recursive(self), aa, bb);
+				}
+				else if constexpr(is_std_array_v<AA>) {
+					introspect(recursive(self), aa, bb);
 				}
 				else if constexpr(is_comparable_v<AA, BB>) {
 					are_equal = are_equal && aa == bb;

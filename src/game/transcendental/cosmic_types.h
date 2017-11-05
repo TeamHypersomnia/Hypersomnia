@@ -1,4 +1,6 @@
 #pragma once
+#include "game/build_settings.h"
+
 namespace augs {
 	template <template <class T> class, class... components>
 	class component_aggregate;

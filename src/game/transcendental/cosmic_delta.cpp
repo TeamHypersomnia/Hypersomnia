@@ -98,9 +98,6 @@ bool cosmic_delta::encode(
 	const cosmos& enco, 
 	augs::memory_stream& out
 ) {
-	const auto used_bits = out.size();
-	//should_eq(0, used_bits);
-
 	auto scope = measure_scope(enco.profiler.delta_encoding);
 	
 	delted_stream_of_entities dt;
@@ -200,7 +197,7 @@ bool cosmic_delta::encode(
 		}
 	});
 
-	base.significant.entity_pool.for_each_id([&base, &enco, &out, &dt](const entity_id id) {
+	base.significant.entity_pool.for_each_id([&base, &enco, &dt](const entity_id id) {
 		const const_entity_handle base_entity = base[id];
 #if COSMOS_TRACKS_GUIDS
 		const auto stream_written_id = base_entity.get_guid();

@@ -277,11 +277,8 @@ public:
 		return std::get<cosmic_object_pool<T>>(significant.component_pools);
 	}
 
-	/* TODO: Make comparisons somehow work with debug name pointers */
-#if !(DEBUG_TRACK_ENTITY_NAME && STATICALLY_ALLOCATE_ENTITIES_NUM)
 	bool operator==(const cosmos&) const;
 	bool operator!=(const cosmos&) const;
-#endif
 
 	template <class F>
 	decltype(auto) operator()(const entity_id subject, F callback) {

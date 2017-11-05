@@ -31,13 +31,4 @@ public:
 	// END GEN INTROSPECTOR
 
 	void clear();
-
-	/* TODO: Make comparisons somehow work with debug name pointers */
-	/* These would eat too much space due to cosmos copies for modification */
-#if !(DEBUG_TRACK_ENTITY_NAME && STATICALLY_ALLOCATE_ENTITIES_NUM)
-	std::size_t get_first_mismatch_pos(const cosmos_significant_state&) const;
-
-	bool operator==(const cosmos_significant_state&) const;
-	bool operator!=(const cosmos_significant_state&) const;
-#endif
 };
