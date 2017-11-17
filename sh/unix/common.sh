@@ -3,9 +3,10 @@ function build_dir() {
 }	
 
 function executable_name() {
-	if [[ "${config}" == "Debug" ]]; then
-		echo Hypersomnia-Debug
+	if [[ "${CONFIGURATION}" == "Debug" ]]
+   	then
+		echo "Hypersomnia-Debug"
+	else
+		echo "Hypersomnia"
 	fi
-
-	echo Hypersomnia
 }

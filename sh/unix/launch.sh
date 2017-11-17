@@ -1,7 +1,14 @@
 source sh/unix/common.sh
+source sh/unix/make.sh
 
 ulimit -c unlimited -S
 
 pushd hypersomnia
-$(build_dir)/$(executable_name) --unit-tests-only
+
+EXECUTABLE_PATH="$OLDPWD/$(build_dir)/$(executable_name)"
+
+echo "Executable path: $EXECUTABLE_PATH"
+echo "Executable working dir: $PWD"
+
+$EXECUTABLE_PATH --unit-tests-only
 popd

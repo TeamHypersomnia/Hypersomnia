@@ -51,7 +51,7 @@ namespace augs {
 		alsoft_ini_file += typesafe_sprintf("\nsources = %x", max_number_of_sound_sources);
 
 		auto where_openal_expects_alsoft_ini = GetProcPath();
-		alstr_append_cstr(&where_openal_expects_alsoft_ini, "\\alsoft.ini");
+		alstr_append_cstr(&where_openal_expects_alsoft_ini, "/alsoft.ini");
 
 		const auto alsoft_ini_path = augs::path_type(alstr_get_cstr(where_openal_expects_alsoft_ini));
 
