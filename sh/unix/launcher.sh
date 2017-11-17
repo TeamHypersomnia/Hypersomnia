@@ -1,16 +1,16 @@
-#!/bin/bash
+function launcher() {
+	source sh/unix/common.sh
+	sh/unix/make.sh
 
-source sh/unix/common.sh
-sh/unix/make.sh
+	ulimit -c unlimited -S
 
-ulimit -c unlimited -S
+	pushd hypersomnia
 
-pushd hypersomnia
+	EXECUTABLE_PATH="$OLDPWD/$(build_dir)/$(executable_name)"
 
-EXECUTABLE_PATH="$OLDPWD/$(build_dir)/$(executable_name)"
+	echo "Executable path: $EXECUTABLE_PATH"
+	echo "Executable working dir: $PWD"
 
-echo "Executable path: $EXECUTABLE_PATH"
-echo "Executable working dir: $PWD"
-
-$1 $EXECUTABLE_PATH 
-popd
+	$1 $EXECUTABLE_PATH 
+	popd
+}

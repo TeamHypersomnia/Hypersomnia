@@ -1,5 +1,7 @@
-function debug_launcher() {
+source sh/unix/launcher.sh 
+
+function standard_launcher() {
 	cgdb $1	
 }
 
-sh/unix/launcher.sh debug_launcher 
+launcher standard_launcher
