@@ -10,5 +10,5 @@ EXECUTABLE_PATH="$OLDPWD/$(build_dir)/$(executable_name)"
 echo "Executable path: $EXECUTABLE_PATH"
 echo "Executable working dir: $PWD"
 
-$EXECUTABLE_PATH --unit-tests-only
+$EXECUTABLE_PATH 
 popd
