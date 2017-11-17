@@ -211,7 +211,7 @@ namespace augs {
 	bool audio_context::set_as_current() {
 #if BUILD_OPENAL
 		auto result = alcMakeContextCurrent(context);
-		AL_CHECK(1);
+		AL_CHECK(result);
 		return result == ALC_TRUE;
 #else
 		return true;

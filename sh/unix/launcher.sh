@@ -1,6 +1,6 @@
 function launcher() {
 	source sh/unix/common.sh
-	sh/unix/make.sh
+	bash sh/unix/make.sh
 
 	ulimit -c unlimited -S
 

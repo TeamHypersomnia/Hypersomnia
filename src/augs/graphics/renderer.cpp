@@ -11,7 +11,11 @@
 
 namespace augs {
 	renderer::renderer() {
-		GL_CHECK(gladLoadGL());
+#if BUILD_OPENGL
+		if (!gladLoadGL()) {
+			throw renderer_error("Failed to initialize GLAD!"); 		
+		}
+#endif
 
 		GL_CHECK(glEnable(GL_TEXTURE_2D));
 		GL_CHECK(glEnable(GL_BLEND));

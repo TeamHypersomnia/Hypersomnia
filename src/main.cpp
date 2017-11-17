@@ -82,12 +82,24 @@ int main(const int argc, const char* const * const argv) {
 					const auto failure_log_path = augs::path_type(LOG_FILES_DIR "exit_failure_debug_log.txt");
 					augs::save_as_text(failure_log_path, logs);
 					
+#if !BUILD_IN_CONSOLE_MODE
 					{
 						const auto s = failure_log_path.string();
 
+						std::string command;
+
 						/* Open text editor */
-						augs::shell(s.c_str());
+
+#if PLATFORM_WINDOWS
+						command = s;
+#elif PLATFORM_UNIX
+						command = "$EDITOR " + s;
+#else
+#error "Unsupported platform!"
+#endif
+						augs::shell(command.c_str());
 					}
+#endif
 				}
 
 				break;
@@ -1570,6 +1582,10 @@ catch (const config_read_error err) {
 }
 catch (const augs::audio_error& err) {
 	LOG("Failed to establish the audio context:\n%x", err.what());
+	return EXIT_FAILURE;
+}
+catch (const augs::renderer_error& err) {
+	LOG("Failed to initialize the renderer: %x", err.what());
 	return EXIT_FAILURE;
 }
 catch (const necessary_resource_loading_error err) {

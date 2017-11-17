@@ -1,6 +1,8 @@
 #pragma once
 #include "augs/math/vec2.h"
 
+#include "augs/templates/exception_templates.h"
+
 #include "augs/graphics/rgba.h"
 #include "augs/graphics/vertex.h"
 #include "augs/graphics/texture.h"
@@ -10,6 +12,10 @@ namespace augs {
 	namespace graphics {
 		class texture;
 	}
+	
+	struct renderer_error : error_with_typesafe_sprintf {
+		using error_with_typesafe_sprintf::error_with_typesafe_sprintf; 
+	};
 
 	struct renderer {
 		debug_lines frame_lines;

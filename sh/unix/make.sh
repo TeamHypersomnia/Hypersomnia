@@ -1,5 +1,3 @@
-#!/bin/bash
-
 source sh/unix/common.sh
 
 pushd $(build_dir)
