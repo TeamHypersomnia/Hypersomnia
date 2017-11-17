@@ -496,6 +496,22 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/components/trace_component.cpp"
 )
 
+if(BUILD_WINDOW_FRAMEWORK)
+	if(MSVC)
+		list(APPEND HYPERSOMNIA_CODEBASE_CPPS
+			"src/augs/window_framework/window_windows.cpp"
+		)
+	elseif(UNIX)
+		list(APPEND HYPERSOMNIA_CODEBASE_CPPS
+			"src/augs/window_framework/window_unix.cpp"
+		)
+	endif()
+else()
+	list(APPEND HYPERSOMNIA_CODEBASE_CPPS
+		"src/augs/window_framework/window_stubs.cpp"
+	)
+endif()
+
 # natvis files for easier debugging in Visual Studio.
 
 if(MSVC)
