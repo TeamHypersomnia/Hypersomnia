@@ -2,11 +2,12 @@ source sh/unix/common.sh
 
 if [[ $ARCHITECTURE == "x64" ]] 
 then
+	echo "x64 build"
 	PASSED_CMAKE_CXX = "-m64"
 	PASSED_CMAKE_C = "-m64"
 elif [[ $ARCHITECTURE == "x86" ]]
 then
-	# Nothing needed
+	echo "x86 build"
 else
 	echo "Unknown/unsupported architecture: $ARCHITECTURE"
 	return 1
