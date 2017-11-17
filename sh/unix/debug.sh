@@ -1,14 +1,5 @@
-source sh/unix/common.sh
-source sh/unix/make.sh
+function debug_launcher() {
+	cgdb $1	
+}
 
-ulimit -c unlimited -S
-
-pushd hypersomnia
-
-EXECUTABLE_PATH="$OLDPWD/$(build_dir)/$(executable_name)"
-
-echo "Executable path: $EXECUTABLE_PATH"
-echo "Executable working dir: $PWD"
-
-gdb $EXECUTABLE_PATH 
-popd
+sh/unix/launcher.sh debug_launcher 
