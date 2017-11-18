@@ -1584,6 +1584,10 @@ catch (const augs::audio_error& err) {
 	LOG("Failed to establish the audio context:\n%x", err.what());
 	return EXIT_FAILURE;
 }
+catch (const augs::window_error& err) {
+	LOG("Failed to create an OpenGL window:\n%x", err.what());
+	return EXIT_FAILURE;
+}
 catch (const augs::renderer_error& err) {
 	LOG("Failed to initialize the renderer: %x", err.what());
 	return EXIT_FAILURE;

@@ -1044,6 +1044,24 @@ if(BUILD_OPENGL)
 	)
 endif()
 
+if(BUILD_WINDOW_FRAMEWORK)
+	if(UNIX)
+		find_package(X11 REQUIRED)
+		find_package(ECM REQUIRED NO_MODULE)
+		list(APPEND CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
+		find_package(XCB REQUIRED)
+		find_package(X11_XCB REQUIRED)
+
+		include_directories(${X11_INCLUDE_DIR})
+		include_directories(${XCB_INCLUDE_DIR})
+		include_directories(${X11_XCB_INCLUDE_DIR})
+
+		list(APPEND HYPERSOMNIA_LIBS ${X11_LIBRARIES})
+		list(APPEND HYPERSOMNIA_LIBS ${XCB_LIBRARIES})
+		list(APPEND HYPERSOMNIA_LIBS ${X11_XCB_LIBRARIES})
+	endif()
+endif()
+
 if(BUILD_GLAD)
 	list(APPEND HYPERSOMNIA_LIBS
 		glad

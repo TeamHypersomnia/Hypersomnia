@@ -3,6 +3,26 @@
 #include <Windows.h>
 #undef min
 #undef max
+#elif PLATFORM_UNIX
+/*
+	Hacky forward declarations to avoid the need for X includes.
+	There are errors anyway when the declarations are conflicting,
+	so we'll know when something's wrong.
+*/
+
+struct __GLXcontextRec;
+typedef struct __GLXcontextRec *GLXContext;
+
+typedef unsigned long XID;
+typedef XID GLXWindow;
+typedef XID GLXDrawable;
+
+typedef uint32_t xcb_window_t;
+
+struct _XDisplay;
+typedef struct _XDisplay Display;
+struct xcb_connection_t;
+
 #endif
 
 #include <optional>
@@ -11,6 +31,7 @@
 #include "augs/math/vec2.h"
 
 #include "augs/templates/settable_as_current_mixin.h"
+#include "augs/templates/exception_templates.h"
 
 #include "augs/misc/timing/timer.h"
 #include "augs/misc/machine_entropy.h"
@@ -19,6 +40,10 @@
 #include "augs/window_framework/window_settings.h"
 
 namespace augs {
+	struct window_error : error_with_typesafe_sprintf {
+		using error_with_typesafe_sprintf::error_with_typesafe_sprintf;
+	};
+
 	// extern LRESULT CALLBACK wndproc(HWND, UINT, WPARAM, LPARAM);
 	class window : public settable_as_current_mixin<window> {
 #if PLATFORM_WINDOWS
@@ -57,7 +82,12 @@ namespace augs {
 		);
 
 #elif PLATFORM_UNIX
-
+		GLXContext context = 0;
+		GLXWindow glxwindow = 0;
+		xcb_window_t window_id = 0;
+		GLXDrawable drawable = 0;
+		Display *display = nullptr;
+		xcb_connection_t *connection = nullptr;
 #else
 #error "Unsupported platform!"
 #endif
