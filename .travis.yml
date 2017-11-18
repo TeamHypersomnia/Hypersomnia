@@ -29,22 +29,10 @@ before_install:
 
 script:
   - gcc -v && g++ -v && cmake --version && make --version && python --version
-  - mkdir dev
-  - cd dev
-  # - We don't need to allocate entities statically for performance as this is just a test.
-  # - We don't need to archive builds, either.
-  - cmake -DUNIX=ON -DCMAKE_CXX_FLAGS="-m64" -DCMAKE_C_FLAGS="-m64" -DCMAKE_BUILD_TYPE=${config} -DBUILD_IN_CONSOLE_MODE=1 -D CMAKE_C_COMPILER=gcc-7 -D CMAKE_CXX_COMPILER=g++-7 ..
-  - make -j2 --keep-going
-  - cd ../hypersomnia
-  - |
-    if [[ "${config}" == "Debug" ]]; then 
-      EXECUTABLE_NAME=Hypersomnia-Debug
-    else
-      EXECUTABLE_NAME=Hypersomnia
-    fi
-    
+  - cmake/build.sh ${config} x64 "-DBUILD_IN_CONSOLE_MODE=1 -D CMAKE_C_COMPILER=gcc-7 -D CMAKE_CXX_COMPILER=g++-7"
   - ulimit -c unlimited -S
-  - ../dev/${EXECUTABLE_NAME} --unit-tests-only
+  - cd build/${config}-x64
+  - make tests -j2 --keep-going
   - ls -l
   - for i in $(find ./ -maxdepth 1 -name 'core*' -print); do gdb $(pwd)/../dev/${EXECUTABLE_NAME} core* -ex "thread apply all bt" -ex "set pagination 0" -batch; done;
 
