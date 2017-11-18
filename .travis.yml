@@ -29,7 +29,7 @@ before_install:
 
 script:
   - gcc -v && g++ -v && cmake --version && make --version && python --version
-  - cmake/build.sh ${config} x64 "-DBUILD_IN_CONSOLE_MODE=1 -D CMAKE_C_COMPILER=gcc-7 -D CMAKE_CXX_COMPILER=g++-7"
+  - cmake/build.sh ${config} x64 "-DBUILD_IN_CONSOLE_MODE=1 -DBUILD_WINDOW_FRAMEWORK=0 -D CMAKE_C_COMPILER=gcc-7 -D CMAKE_CXX_COMPILER=g++-7"
   - ulimit -c unlimited -S
   - cd build/${config}-x64
   - make tests -j2 --keep-going
