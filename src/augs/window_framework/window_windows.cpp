@@ -371,6 +371,20 @@ namespace augs {
 		}
 	}
 
+	void window::destroy() {
+		if (hwnd) {
+			unset_if_current();
+
+#if BUILD_OPENGL
+			wglDeleteContext(hglrc);
+#endif
+			ReleaseDC(hwnd, hdc);
+			DestroyWindow(hwnd);
+
+			hwnd = nullptr;
+		}
+	}
+
 	void window::set_window_border_enabled(const bool enabled) {
 		if (enabled) {
 			style = WS_OVERLAPPEDWINDOW;
@@ -470,20 +484,6 @@ namespace augs {
 	
 	bool window::is_cursor_in_client_area() const {
 		return cursor_in_client_area; 
-	}
-
-	void window::destroy() {
-		if (hwnd) {
-			unset_if_current();
-
-#if BUILD_OPENGL
-			wglDeleteContext(hglrc);
-#endif
-			ReleaseDC(hwnd, hdc);
-			DestroyWindow(hwnd);
-
-			hwnd = nullptr;
-		}
 	}
 
 	static auto get_filter(const std::vector<window::file_dialog_filter>& filters) {
