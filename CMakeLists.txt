@@ -4,10 +4,24 @@ project(Hypersomnia)
 
 if(UNIX)
 	message("Building for UNIX systems.")
+
+	if(NOT ARCHITECTURE)
+		message(FATAL_ERROR "Architecture type was not specified.")
+	endif()
+
+	if(${ARCHITECTURE} STREQUAL "x86")
+		message("Building for x86 architecture.")
+	elseif(${ARCHITECTURE} STREQUAL "x64")
+		message("Building for x64 architecture.")
+	else()
+		message(FATAL_ERROR "Unknown architecture: ${ARCHITECTURE}")
+	endif()
+
 elseif(MSVC)
 	message("Building for Windows systems.")
+	# Unlike makefiles, architecture is determined by the generator used.
 else()
-	message("Unknown system.")
+	message(FATAL_ERROR "Unknown system.")
 endif()
 
 # Important note:
@@ -693,6 +707,10 @@ endif()
 if(UNIX)
 	# Latest features of C++17 will be enabled.
 	set(HYPERSOMNIA_CXX_FLAGS "-std=gnu++1z")
+	if(ARCHITECTURE EQUAL x64)
+		set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -m64")
+		set(HYPERSOMNIA_C_FLAGS "${HYPERSOMNIA_C_FLAGS} -m64")
+	endif()
 elseif(MSVC)
 	# Latest features of C++17 will be enabled.
 	set(HYPERSOMNIA_CXX_FLAGS "/std:c++latest /MP /Gm- /fp:strict /bigobj /permissive-")
@@ -772,6 +790,10 @@ set(CMAKE_EXE_LINKER_FLAGS_RELEASE
 
 set(CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO 
  "${CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO} ${HYPERSOMNIA_LINKER_RELWITHDEBINFO_FLAGS}"
+)
+
+set(CMAKE_C_FLAGS 
+ "${CMAKE_C_FLAGS} ${HYPERSOMNIA_C_FLAGS}"
 )
 
 set(CMAKE_CXX_FLAGS 
@@ -1095,3 +1117,24 @@ if(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE)
 		VERBATIM
 	)
 endif()
+
+# Custom targets for Makefile
+if(UNIX)
+	add_custom_target(run
+		COMMAND Hypersomnia
+		DEPENDS Hypersomnia
+		WORKING_DIRECTORY ${HYPERSOMNIA_EXE_RESOURCES_DIR} 
+	)
+
+	add_custom_target(debug
+		COMMAND cgdb $<TARGET_FILE:Hypersomnia>
+		DEPENDS Hypersomnia
+		WORKING_DIRECTORY ${HYPERSOMNIA_EXE_RESOURCES_DIR} 
+	)
+
+	add_custom_target(tests
+		COMMAND Hypersomnia --unit-tests-only
+		DEPENDS Hypersomnia
+		WORKING_DIRECTORY ${HYPERSOMNIA_EXE_RESOURCES_DIR} 
+	)
+endif()	
