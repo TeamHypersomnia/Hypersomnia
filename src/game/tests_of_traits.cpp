@@ -56,6 +56,8 @@ struct AAA {
 
 struct tests_of_traits {
 	static_assert(std::is_trivially_copyable_v<game_intent_type>);
+	static_assert(has_string_v<augs::path_type>);
+	static_assert(has_wstring_v<augs::path_type>);
 
 	static_assert(static_cast<int>(imguicol_helper::ImGuiCol_COUNT) == static_cast<int>(ImGuiCol_COUNT));
 

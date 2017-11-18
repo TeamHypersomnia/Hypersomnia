@@ -3,8 +3,12 @@
 
 #include "augs/math/vec2.h"
 #include "augs/misc/typesafe_sprintf.h"
+#include "augs/filesystem/path.h"
 
 TEST_CASE("Type-safe sprintf", "Several tests") {
+	REQUIRE("content/necessary/shaders/nice.vsh" == typesafe_sprintf("%x/%x", augs::path_type("content/necessary/shaders"), "nice.vsh"));
+	REQUIRE(L"content/necessary/shaders/nice.vsh" == typesafe_sprintf(L"%x/%x", augs::path_type(L"content/necessary/shaders"), L"nice.vsh"));
+
 	// corner cases
 	REQUIRE("%x%x%%%%f%c%ddasdfs" == typesafe_sprintf("%x%x%%%%f%c%ddasdfs"));
 	REQUIRE(L"%x%x%%%%f%c%ddasdfs" == typesafe_sprintf(L"%x%x%%%%f%c%ddasdfs"));

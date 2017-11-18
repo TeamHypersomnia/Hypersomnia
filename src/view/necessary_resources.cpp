@@ -47,8 +47,8 @@ necessary_shaders::necessary_shaders(
 ) {
 	augs::introspect(
 		[&](const std::string label, auto& shader) {
-			const auto canon_vsh_path = typesafe_sprintf("%x%x.vsh", canon_directory, label);
-			const auto local_vsh_path = typesafe_sprintf("%x%x.vsh", local_directory, label);
+			const auto canon_vsh_path = typesafe_sprintf("%x/%x.vsh", canon_directory, label);
+			const auto local_vsh_path = typesafe_sprintf("%x/%x.vsh", local_directory, label);
 
 			const auto final_vsh_path = augs::switch_path(
 				canon_vsh_path,
@@ -117,8 +117,8 @@ necessary_shaders::necessary_shaders(
 necessary_sound_buffers::necessary_sound_buffers(
 	const augs::path_type& directory
 ) try :
-	button_click(augs::sound_data(typesafe_sprintf("%xbutton_click.wav", directory))),
-	button_hover(augs::sound_data(typesafe_sprintf("%xbutton_hover.wav", directory)))
+	button_click(augs::sound_data(typesafe_sprintf("%x/button_click.wav", directory))),
+	button_hover(augs::sound_data(typesafe_sprintf("%x/button_hover.wav", directory)))
 {}
 catch (const augs::sound_decoding_error err) {
 	throw necessary_resource_loading_error(err.what());
@@ -150,7 +150,7 @@ necessary_image_loadables_map::necessary_image_loadables_map(
 		game_image_loadables definition_template;
 
 		if (
-			const auto additional_properties_path = typesafe_sprintf("%x%x.lua", directory, stem);
+			const auto additional_properties_path = typesafe_sprintf("%x/%x.lua", directory, stem);
 			augs::file_exists(additional_properties_path)
 		) {
 			try {
@@ -179,14 +179,14 @@ necessary_image_loadables_map::necessary_image_loadables_map(
 		}
 
 		if (
-			const auto source_image_path = typesafe_sprintf("%x%x.png", directory, stem);
+			const auto source_image_path = typesafe_sprintf("%x/%x.png", directory, stem);
 			augs::file_exists(source_image_path)
 		) {
 			definition_template.source_image_path = source_image_path;
 			emplace(id, definition_template);
 		}
 		else if (
-			const auto procedural_definition_path = typesafe_sprintf("%xprocedural/%x.lua", directory, stem);
+			const auto procedural_definition_path = typesafe_sprintf("%x/procedural/%x.lua", directory, stem);
 			augs::file_exists(procedural_definition_path)
 		) {
 			procedural_image_definition def;
@@ -225,7 +225,7 @@ necessary_image_loadables_map::necessary_image_loadables_map(
 
 			if (def.button_with_corners) {
 				const auto path_template = get_procedural_image_path(
-					typesafe_sprintf("%xprocedural/%x_%x.png", directory, stem)
+					typesafe_sprintf("%x/procedural/%x_%x.png", directory, stem)
 				);
 				
 				const auto input = def.button_with_corners.value();
@@ -247,7 +247,7 @@ necessary_image_loadables_map::necessary_image_loadables_map(
 			}
 			else if (def.image_from_commands) {
 				const auto generated_image_path = get_procedural_image_path(
-					typesafe_sprintf("%xprocedural/%x.png", directory, stem)
+					typesafe_sprintf("%x/procedural/%x.png", directory, stem)
 				);
 		
 				regenerate_image_from_commands(

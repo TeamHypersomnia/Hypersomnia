@@ -172,18 +172,18 @@ int work(const int argc, const char* const * const argv) try {
 	);
 
 	static necessary_shaders shaders(
-		"content/necessary/shaders/",
-		"content/necessary/shaders/",
+		"content/necessary/shaders",
+		"content/necessary/shaders",
 		config.drawing
 	);
 
 	static necessary_sound_buffers sounds(
-		"content/necessary/sfx/"
+		"content/necessary/sfx"
 	);
 
 	static necessary_image_loadables_map images(
 		lua,
-		"content/necessary/gfx/",
+		"content/necessary/gfx",
 		config.content_regeneration.regenerate_every_launch
 	);
 	

@@ -7,6 +7,27 @@
 
 #include "augs/templates/get_underlying_char_type.h"
 
+template <class T, class = void>
+struct has_string : std::false_type {};
+
+template <class T>
+struct has_string<T, decltype(std::declval<T&>().string(), void())> : std::true_type {};
+
+
+template <class T, class = void>
+struct has_wstring : std::false_type {};
+
+template <class T>
+struct has_wstring<T, decltype(std::declval<T&>().wstring(), void())> : std::true_type {};
+
+
+template <class T>
+constexpr bool has_string_v = has_string<T>::value;
+
+template <class T>
+constexpr bool has_wstring_v = has_wstring<T>::value;
+
+
 template <typename CharType>
 void typesafe_sprintf_detail(size_t, std::basic_string<CharType>&) {
 
@@ -58,8 +79,16 @@ void typesafe_sprintf_detail(size_t starting_pos, std::basic_string<CharType>& t
 
 		if (num_special_letters > 0) {
 			const auto num_chars_to_replace = num_special_letters + 1;
-
-			replacement << val;
+			
+			if constexpr(std::is_same_v<char, CharType> && has_string_v<T>) {
+				replacement << val.string();
+			}	
+		    else if constexpr(std::is_same_v<wchar_t, CharType> && has_wstring_v<T>) {
+				replacement << val.wstring();
+			}	
+			else {
+				replacement << val;
+			}
 
 			target_str.replace(
 				starting_pos,
