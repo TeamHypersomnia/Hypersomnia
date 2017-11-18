@@ -18,6 +18,7 @@ namespace augs {
 
 #if BUILD_SOUND_FORMAT_DECODERS
 		const auto extension = path.extension();
+		const auto path_str = path.string();
 
 		if (extension == ".ogg") {
 			std::vector<char> buffer;
@@ -28,7 +29,7 @@ namespace augs {
 			long bytes = 0xdeadbeef;
 			char array[OGG_BUFFER_SIZE]; 
 
-			auto ogg_stdio_file = std::unique_ptr<FILE, decltype(&fclose)>(fopen(path.string().c_str(), "rb"), &fclose);
+			auto ogg_stdio_file = std::unique_ptr<FILE, decltype(&fclose)>(fopen(path_str.c_str(), "rb"), &fclose);
 
 			OggVorbis_File oggFile;
 			ov_open(ogg_stdio_file.get(), &oggFile, NULL, 0);
@@ -48,7 +49,7 @@ namespace augs {
 			ov_clear(&oggFile);
 		}
 		else if (extension == ".wav") {
-			auto wav_file = std::unique_ptr<FILE, decltype(&fclose)>(fopen(path.string().c_str(), "rb"), &fclose);
+			auto wav_file = std::unique_ptr<FILE, decltype(&fclose)>(fopen(path_str.c_str(), "rb"), &fclose);
 
 			typedef struct WAV_HEADER {
 				/* RIFF Chunk Descriptor */
