@@ -8,6 +8,7 @@
 
 #include "augs/global_libraries.h"
 #include "augs/filesystem/file.h"
+#include "augs/templates/string_templates.h"
 #include "augs/misc/scope_guard.h"
 
 namespace augs {
@@ -65,7 +66,7 @@ namespace augs {
 		ft_indices.clear();
 
 		try {
-			const auto unicodes = augs::file_to_string(in.charset_path, wchar_t());
+			const auto unicodes = to_wstring(augs::file_to_string(in.charset_path)); 
 
 			glyph_bitmaps.reserve(unicodes.size());
 
