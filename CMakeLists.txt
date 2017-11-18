@@ -707,7 +707,8 @@ endif()
 if(UNIX)
 	# Latest features of C++17 will be enabled.
 	set(HYPERSOMNIA_CXX_FLAGS "-std=gnu++1z")
-	if(ARCHITECTURE EQUAL x64)
+
+	if(${ARCHITECTURE} STREQUAL "x64")
 		set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -m64")
 		set(HYPERSOMNIA_C_FLAGS "${HYPERSOMNIA_C_FLAGS} -m64")
 	endif()
