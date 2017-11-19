@@ -9,6 +9,7 @@
 	There are errors anyway when the declarations are conflicting,
 	so we'll know when something's wrong.
 */
+#include <cstdint>
 
 struct __GLXcontextRec;
 typedef struct __GLXcontextRec *GLXContext;
