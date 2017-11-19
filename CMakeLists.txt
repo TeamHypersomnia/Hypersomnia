@@ -712,6 +712,12 @@ if(UNIX)
 		set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -m64")
 		set(HYPERSOMNIA_C_FLAGS "${HYPERSOMNIA_C_FLAGS} -m64")
 	endif()
+
+	if(CMAKE_COMPILER_IS_GNUCC)
+		message("-O0 will be specified for Debug build.")
+		set(HYPERSOMNIA_CXX_DEBUG_FLAGS "${HYPERSOMNIA_CXX_DEBUG_FLAGS} -O0")
+		set(HYPERSOMNIA_C_DEBUG_FLAGS "${HYPERSOMNIA_C_DEBUG_FLAGS} -O0")
+	endif()
 elseif(MSVC)
 	# Latest features of C++17 will be enabled.
 	set(HYPERSOMNIA_CXX_FLAGS "/std:c++latest /MP /Gm- /fp:strict /bigobj /permissive-")
@@ -797,6 +803,10 @@ set(CMAKE_C_FLAGS
  "${CMAKE_C_FLAGS} ${HYPERSOMNIA_C_FLAGS}"
 )
 
+set(CMAKE_C_FLAGS_DEBUG
+ "${CMAKE_C_FLAGS_DEBUG} ${HYPERSOMNIA_C_DEBUG_FLAGS}"
+)
+
 set(CMAKE_CXX_FLAGS 
  "${CMAKE_CXX_FLAGS} ${HYPERSOMNIA_CXX_FLAGS}"
 )
@@ -812,6 +822,10 @@ set(CMAKE_CXX_FLAGS_RELEASE
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO 
  "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} ${HYPERSOMNIA_CXX_RELWITHDEBINFO_FLAGS}"
 )
+
+message("All CXX flags: ${CMAKE_CXX_FLAGS}")
+message("Debug CXX flags: ${CMAKE_CXX_FLAGS_DEBUG}")
+message("Release CXX flags: ${CMAKE_CXX_FLAGS_RELEASE}")
 
 # We configure MSVC to use static runtime libraries ("/MT" switch),
 # instead of DLL ones.
