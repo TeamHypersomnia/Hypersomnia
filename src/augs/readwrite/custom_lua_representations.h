@@ -22,17 +22,7 @@ namespace augs {
 	}
 
 	inline auto to_lua_value(const path_type r) {
-		auto nice_representation = r.string();
-
-		for (auto& s : nice_representation) {
-			/* Double backslash is ugly */
-
-			if (s == '\\') {
-				s = '/';
-			}
-		}
-
-		return nice_representation;
+		return to_forward_slashes(r.string());
 	}
 
 	template <class I>

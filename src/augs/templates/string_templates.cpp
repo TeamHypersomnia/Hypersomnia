@@ -1,6 +1,26 @@
+#include "string_templates.h"
+
+std::string to_forward_slashes(std::string str) {
+	for (auto& s : str) {
+		if (s == '\\') {
+			s = '/';
+		}
+	}
+
+	return str;
+}
+
+std::wstring to_forward_slashes(std::wstring str) {
+	for (auto& s : str) {
+		if (s == '\\') {
+			s = '/';
+		}
+	}
+
+	return str;
+}
 
 #if BUILD_UNIT_TESTS
-#include "string_templates.h"
 #include <catch.hpp>
 
 TEST_CASE("Templates StringTemplates") {

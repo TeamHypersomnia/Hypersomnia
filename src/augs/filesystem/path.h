@@ -2,6 +2,8 @@
 #include <experimental/filesystem>
 #include "augs/readwrite/byte_readwrite_declaration.h"
 
+std::string to_forward_slashes(std::string);
+
 namespace augs {
 	using path_type = std::experimental::filesystem::path;
 
@@ -24,17 +26,7 @@ namespace augs {
 		Archive& ar,
 		const path_type& storage
 	) {
-		auto nice_representation = storage.string();
-		
-		for (auto& s : nice_representation) {
-			/* Double backslash is ugly */
-			
-			if (s == '\\') {
-				s = '/';
-			}
-		}
-
-		augs::write_bytes(ar, nice_representation);
+		augs::write_bytes(ar, to_forward_slashes(storage.string()));
 	}
 
 	template <class Archive>

@@ -166,3 +166,6 @@ auto format_as_bytes(const T& t) {
 
 	return output;
 }
+
+std::string to_forward_slashes(std::string);
+std::wstring to_forward_slashes(std::wstring);
