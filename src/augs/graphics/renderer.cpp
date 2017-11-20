@@ -9,6 +9,23 @@
 
 #include "augs/texture_atlas/texture_atlas_entry.h"
 
+#if PLATFORM_UNIX
+#define USE_BUFFER_SUB_DATA 1
+#endif
+
+void buffer_data(
+	GLenum target,
+  	GLsizeiptr size,
+  	const GLvoid * data,
+  	GLenum usage
+) {
+#if USE_BUFFER_SUB_DATA
+	GL_CHECK(glBufferSubData(target, 0, size, data));
+#else
+	GL_CHECK(glBufferData(target, size, data, usage));
+#endif
+}
+
 namespace augs {
 	renderer::renderer() {
 #if BUILD_OPENGL
@@ -44,6 +61,17 @@ namespace augs {
 		disable_special_vertex_attribute();
 
 		GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer_id));
+	
+#if USE_BUFFER_SUB_DATA
+		/* Preallocate necessary space */
+
+		GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer_id));
+		GL_CHECK(glBufferData(GL_ARRAY_BUFFER, sizeof(vertex) * 30000, nullptr, GL_STREAM_DRAW));
+		GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, special_buffer_id));
+		GL_CHECK(glBufferData(GL_ARRAY_BUFFER, sizeof(special) * 6000, nullptr, GL_STREAM_DRAW));
+		GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, imgui_elements_id));
+		GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned) * 12000, nullptr, GL_STREAM_DRAW));
+#endif
 	}
 
 	void renderer::enable_special_vertex_attribute() {
@@ -83,7 +111,7 @@ namespace augs {
 		if (!specials.empty()) {
 			enable_special_vertex_attribute();
 			GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, special_buffer_id));
-			GL_CHECK(glBufferData(GL_ARRAY_BUFFER, sizeof(special) * specials.size(), specials.data(), GL_STREAM_DRAW));
+			GL_CHECK(buffer_data(GL_ARRAY_BUFFER, sizeof(special) * specials.size(), specials.data(), GL_STREAM_DRAW));
 		}
 
 		call_triangles(triangles);
@@ -96,7 +124,7 @@ namespace augs {
 	void renderer::call_triangles(const vertex_triangle_buffer& buffer) {
 		GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer_id));
 
-		GL_CHECK(glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_triangle) * buffer.size(), buffer.data(), GL_STREAM_DRAW));
+		GL_CHECK(buffer_data(GL_ARRAY_BUFFER, sizeof(vertex_triangle) * buffer.size(), buffer.data(), GL_STREAM_DRAW));
 		GL_CHECK(glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(buffer.size()) * 3));
 		num_total_triangles_drawn += buffer.size();
 	}
@@ -109,7 +137,7 @@ namespace augs {
 		if (lines.empty()) return;
 
 		GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer_id));
-		GL_CHECK(glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_line) * lines.size(), lines.data(), GL_STREAM_DRAW));
+		GL_CHECK(buffer_data(GL_ARRAY_BUFFER, sizeof(vertex_line) * lines.size(), lines.data(), GL_STREAM_DRAW));
 		GL_CHECK(glDrawArrays(GL_LINES, 0, static_cast<GLsizei>(lines.size()) * 2));
 	}
 
@@ -236,10 +264,10 @@ namespace augs {
 				const ImDrawIdx* idx_buffer_offset = 0;
 
 				GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer_id));
-				GL_CHECK(glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr)cmd_list->VtxBuffer.Size * sizeof(ImDrawVert), (const GLvoid*)cmd_list->VtxBuffer.Data, GL_STREAM_DRAW));
+				GL_CHECK(buffer_data(GL_ARRAY_BUFFER, (GLsizeiptr)cmd_list->VtxBuffer.Size * sizeof(ImDrawVert), (const GLvoid*)cmd_list->VtxBuffer.Data, GL_STREAM_DRAW));
 
 				GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, imgui_elements_id));
-				GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, (GLsizeiptr)cmd_list->IdxBuffer.Size * sizeof(ImDrawIdx), (const GLvoid*)cmd_list->IdxBuffer.Data, GL_STREAM_DRAW));
+				GL_CHECK(buffer_data(GL_ELEMENT_ARRAY_BUFFER, (GLsizeiptr)cmd_list->IdxBuffer.Size * sizeof(ImDrawIdx), (const GLvoid*)cmd_list->IdxBuffer.Data, GL_STREAM_DRAW));
 
 				for (int cmd_i = 0; cmd_i < cmd_list->CmdBuffer.Size; ++cmd_i) {
 					const ImDrawCmd* const pcmd = &cmd_list->CmdBuffer[cmd_i];

@@ -10,8 +10,6 @@
 
 namespace augs {
 	window::window(const window_settings& settings) {
-		apply(settings, true);
-
 		int default_screen = 0xdeadbeef;
 
 		/* Open Xlib Display */ 
@@ -38,7 +36,7 @@ namespace augs {
 						--screen_num, xcb_screen_next(&screen_iter));
 		screen = screen_iter.data;
 
-		auto setup_and_run = [this](int default_screen, xcb_screen_t *screen) {
+		auto setup_and_run = [this, settings](int default_screen, xcb_screen_t *screen) {
 			int visualID = 0;
 
 			/* Query framebuffer configurations */
@@ -80,30 +78,24 @@ namespace augs {
 			uint32_t valuemask = XCB_CW_EVENT_MASK | XCB_CW_COLORMAP;
 
 			xcb_create_window(
-					connection,
-					XCB_COPY_FROM_PARENT,
-					window_id,
-					screen->root,
-					0, 0,
-					150, 150,
-					0,
-					XCB_WINDOW_CLASS_INPUT_OUTPUT,
-					visualID,
-					valuemask,
-					valuelist
-					);
+				connection,
+				XCB_COPY_FROM_PARENT,
+				window_id,
+				screen->root,
+				settings.position.x, settings.position.y,
+				settings.size.x, settings.size.y,
+				0,
+				XCB_WINDOW_CLASS_INPUT_OUTPUT,
+				visualID,
+				valuemask,
+				valuelist
+			);
 
 
 			// NOTE: window must be mapped before glXMakeContextCurrent
 			xcb_map_window(connection, window_id); 
 
-			glxwindow = 
-				glXCreateWindow(
-						display,
-						fb_config,
-						window_id,
-						0
-						);
+			glxwindow = glXCreateWindow(display, fb_config, window_id, 0);
 
 			if(!window_id) {
 				xcb_destroy_window(connection, window_id);
@@ -115,7 +107,7 @@ namespace augs {
 			drawable = glxwindow;
 
 			/* make OpenGL context current */
-			if(!glXMakeContextCurrent(display, drawable, drawable, context)) {
+			if (!set_as_current()) {
 				xcb_destroy_window(connection, window_id);
 				glXDestroyContext(display, context);
 
@@ -124,6 +116,7 @@ namespace augs {
 		};
 
 		setup_and_run(default_screen, screen);
+		apply(settings, true);
 	}
 
 	void window::destroy() {
@@ -146,7 +139,18 @@ namespace augs {
 		}	
 	}
 
-	void window::set_window_name(const std::string& name) {}
+	void window::set_window_name(const std::string& name) {
+		xcb_change_property (connection,
+				XCB_PROP_MODE_REPLACE,
+				window_id,
+				XCB_ATOM_WM_NAME,
+				XCB_ATOM_STRING,
+				8,
+				name.length(),
+				name.c_str()
+		);
+	}
+
 	void window::set_window_border_enabled(const bool) {}
 
 	bool window::swap_buffers() { 
@@ -161,17 +165,49 @@ namespace augs {
 		return false;
 	}
 
-	void window::collect_entropy(local_entropy& into) {}
+	void window::collect_entropy(local_entropy& into) {
+		/* Wait for event */
+		//return;
+	//	xcb_generic_event_t *event = xcb_poll_for_event(connection);
+		
+		// if (!event) {
+			// throw window_error("i/o error in xcb_wait_for_event");
+		// }
+		
+		xcb_generic_event_t* event = nullptr;
+		
+		while (event = xcb_poll_for_event(connection)) {
+			event::change ch;
+
+			switch (event->response_type & ~0x80) {
+				case XCB_KEY_PRESS:
+					break;
+				default:
+					break;
+			}
+
+			free(event);
+		}
+	}
 
 	void window::set_window_rect(const xywhi) {}
-	xywhi window::get_window_rect() const { return {}; }
+
+	xywhi window::get_window_rect() const { 
+		xcb_get_geometry_cookie_t  geomCookie = xcb_get_geometry (connection, window_id);
+		
+		std::unique_ptr<xcb_get_geometry_reply_t, decltype(free)*> geom { 
+			xcb_get_geometry_reply (connection, geomCookie, NULL), free
+		};
+
+		return { geom->x, geom->y, geom->width, geom->height }; 
+	}
 
 	bool window::is_active() const { return false; }
 
 
 	bool window::set_as_current_impl() {
 #if BUILD_OPENGL
-		return true;
+		return glXMakeContextCurrent(display, drawable, drawable, context);
 #else
 		return true;
 #endif
@@ -179,7 +215,8 @@ namespace augs {
 
 	void window::set_current_to_none_impl() {
 #if BUILD_OPENGL
-
+	// For now we only will have one window anyway
+	//	 glXMakeContextCurrent(display, None, None, nullptr);
 #endif
 	}
 
