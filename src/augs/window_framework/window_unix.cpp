@@ -73,7 +73,13 @@ namespace augs {
 			);
 
 			/* Create window */
-			uint32_t eventmask = XCB_EVENT_MASK_EXPOSURE | XCB_EVENT_MASK_KEY_PRESS;
+			uint32_t eventmask = 
+				XCB_EVENT_MASK_EXPOSURE 
+				| XCB_EVENT_MASK_KEY_PRESS 
+				| XCB_EVENT_MASK_BUTTON_PRESS
+				| XCB_EVENT_MASK_BUTTON_RELEASE
+			;
+
 			uint32_t valuelist[] = { eventmask, colormap, 0 };
 			uint32_t valuemask = XCB_CW_EVENT_MASK | XCB_CW_COLORMAP;
 
@@ -84,7 +90,7 @@ namespace augs {
 				screen->root,
 				settings.position.x, settings.position.y,
 				settings.size.x, settings.size.y,
-				0,
+				settings.border ? 1 : 0,
 				XCB_WINDOW_CLASS_INPUT_OUTPUT,
 				visualID,
 				valuemask,
@@ -141,17 +147,26 @@ namespace augs {
 
 	void window::set_window_name(const std::string& name) {
 		xcb_change_property (connection,
-				XCB_PROP_MODE_REPLACE,
-				window_id,
-				XCB_ATOM_WM_NAME,
-				XCB_ATOM_STRING,
-				8,
-				name.length(),
-				name.c_str()
+			XCB_PROP_MODE_REPLACE,
+			window_id,
+			XCB_ATOM_WM_NAME,
+			XCB_ATOM_STRING,
+			8,
+			name.length(),
+			name.c_str()
 		);
 	}
 
-	void window::set_window_border_enabled(const bool) {}
+	void window::set_window_border_enabled(const bool flag) {
+		uint32_t new_width = flag ? 0 : 1;
+
+		xcb_configure_window(
+			connection,
+			window_id,
+			XCB_CONFIG_WINDOW_BORDER_WIDTH,
+			&new_width
+		);
+	}
 
 	bool window::swap_buffers() { 
 		glXSwapBuffers(display, drawable);
@@ -166,17 +181,10 @@ namespace augs {
 	}
 
 	void window::collect_entropy(local_entropy& into) {
-		/* Wait for event */
-		//return;
-	//	xcb_generic_event_t *event = xcb_poll_for_event(connection);
-		
-		// if (!event) {
-			// throw window_error("i/o error in xcb_wait_for_event");
-		// }
-		
-		xcb_generic_event_t* event = nullptr;
-		
-		while (event = xcb_poll_for_event(connection)) {
+		while (
+			std::unique_ptr<xcb_generic_event_t, decltype(free)*> 
+			event { xcb_poll_for_event(connection), free }
+		) {
 			event::change ch;
 
 			switch (event->response_type & ~0x80) {
@@ -185,8 +193,6 @@ namespace augs {
 				default:
 					break;
 			}
-
-			free(event);
 		}
 	}
 
@@ -215,7 +221,7 @@ namespace augs {
 
 	void window::set_current_to_none_impl() {
 #if BUILD_OPENGL
-	// For now we only will have one window anyway
+	//	 For now we only will have one window anyway
 	//	 glXMakeContextCurrent(display, None, None, nullptr);
 #endif
 	}

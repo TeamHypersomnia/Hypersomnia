@@ -21,9 +21,6 @@ namespace augs {
 		debug_lines frame_lines;
 		debug_lines prev_logic_step_lines;
 		
-		GLuint position_buffer_id = 0xdeadbeef;
-		GLuint texcoord_buffer_id = 0xdeadbeef;
-		GLuint color_buffer_id = 0xdeadbeef;
 		GLuint triangle_buffer_id = 0xdeadbeef;
 		GLuint special_buffer_id = 0xdeadbeef;
 		GLuint imgui_elements_id = 0xdeadbeef;
