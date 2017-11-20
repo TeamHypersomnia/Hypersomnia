@@ -1,5 +1,9 @@
 #include <iostream>
 
+#if PLATFORM_UNIX
+#include <csignal>
+#endif
+
 #include "augs/unit_tests.h"
 #include "augs/global_libraries.h"
 
@@ -561,6 +565,16 @@ int work(const int argc, const char* const * const argv) try {
 		}
 	};
 
+#if PLATFORM_UNIX	
+	static volatile std::sig_atomic_t signal_status = 0;
+ 
+	static auto signal_handler = [](int signal) {
+   		signal_status = signal;
+	};
+
+	std::signal(SIGINT, signal_handler);
+#endif
+ 
 	static bool should_quit = false;
 
 	static auto do_main_menu_option = [](const main_menu_button_type t) {
@@ -815,6 +829,14 @@ int work(const int argc, const char* const * const argv) try {
 
 	while (!should_quit) {
 		auto scope = measure_scope(profiler.fps);
+		
+#if PLATFORM_UNIX
+		if (signal_status == SIGINT) {
+			should_quit = true;
+			LOG("SIGINT received. Gracefully shutting down.");
+			break;
+		}
+#endif
 
 		const auto frame_delta = frame_timer.extract_delta();
 
