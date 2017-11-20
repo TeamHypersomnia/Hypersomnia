@@ -566,6 +566,14 @@ set(HYPERSOMNIA_TRIVIAL_3RDPARTY_CPPS
 	"src/3rdparty/imgui/imgui_draw.cpp"
 	"src/3rdparty/imgui/imgui_demo.cpp"
 )
+# TODO: add prebuilt glad sources
+#if(UNIX)
+#	if(BUILD_OPENGL)
+#		list(APPEND HYPERSOMNIA_TRIVIAL_3RDPARTY_CPPS
+#			
+#		)
+#	endif()
+#endif()
 
 # Project resource files, e.g. an icon.
 
@@ -1161,6 +1169,12 @@ if(UNIX)
 
 	add_custom_target(debug
 		COMMAND cgdb $<TARGET_FILE:Hypersomnia>
+		DEPENDS Hypersomnia
+		WORKING_DIRECTORY ${HYPERSOMNIA_EXE_RESOURCES_DIR} 
+	)
+
+	add_custom_target(memdeb
+		COMMAND valgrind --log-file="memory_log.txt" --leak-check=yes $<TARGET_FILE:Hypersomnia>
 		DEPENDS Hypersomnia
 		WORKING_DIRECTORY ${HYPERSOMNIA_EXE_RESOURCES_DIR} 
 	)
