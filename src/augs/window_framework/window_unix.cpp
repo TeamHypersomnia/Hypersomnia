@@ -188,38 +188,45 @@ namespace augs {
 		return false;
 	}
 
+	std::optional<event::change> handle_event(const xcb_generic_event_t* event) {
+		using namespace event;
+
+		change ch;
+
+		switch (event->response_type & ~0x80) {
+			case XCB_KEY_PRESS:
+				break;
+			case XCB_MOTION_NOTIFY: {
+           		const auto* const motion = reinterpret_cast<const xcb_motion_notify_event_t*>(event);
+		
+				ch.data.mouse.pos = {
+					motion->event_x,
+					motion->event_y
+				};						
+
+				ch.msg = message::mousemotion;
+				return ch;
+			} 
+			case XCB_BUTTON_PRESS: {
+           		const auto* const press = reinterpret_cast<const xcb_button_press_event_t*>(event);
+				
+
+
+			}
+				return ch;
+			default:
+				return std::nullopt;
+		}
+	}
+
 	void window::collect_entropy(local_entropy& into) {
 		while (const auto event = freed_unique(xcb_poll_for_event(connection))) {
-			using namespace event;
-
-			change ch;
-
-			switch (event->response_type & ~0x80) {
-				case XCB_KEY_PRESS:
-					break;
-				case XCB_MOTION_NOTIFY: {
-            		const auto* const motion = reinterpret_cast<xcb_motion_notify_event_t*>(event.get());
-			
-					ch.data.mouse.pos = {
-						motion->event_x,
-						motion->event_y
-					};						
-
-					ch.msg = message::mousemotion;
-				} 
-				case XCB_BUTTON_PRESS: {
-            		const auto* const press = reinterpret_cast<xcb_button_press_event_t*>(event.get());
-				}
-					break;
-				default:
-					break;
-			}
-
-			if (ch.msg != message::unknown) {
-				into.push_back(ch);
+			if (const auto ch = handle_event(event.get())) {
+				into.push_back(*ch);
 			}
 		}
 	}
+
 
 	void window::set_window_rect(const xywhi) {}
 

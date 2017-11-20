@@ -23,7 +23,7 @@ namespace augs {
 
 		change::change() {
 			std::memset(this, 0, sizeof(change));
-			msg = message::unknown;
+			msg = message::INVALID;
 		}
 
 		key_change change::get_key_change() const {

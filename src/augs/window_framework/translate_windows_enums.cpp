@@ -41,7 +41,7 @@ message translate_enum(const UINT m) {
 	default: break;
 	}
 
-	return augs::event::message::unknown;
+	return augs::event::message::INVALID;
 }
 
 key translate_virtual_key(const UINT m) {

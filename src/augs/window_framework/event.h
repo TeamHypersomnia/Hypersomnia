@@ -9,7 +9,8 @@
 namespace augs {
 		namespace event {
 			enum class message {
-				unknown,
+				INVALID,
+
 				ltripleclick,
 				close,
 				quit,
@@ -41,12 +42,14 @@ namespace augs {
 				xup,
 				rdown,
 				rup,
+
 				COUNT
 			};
 
 			namespace keys {
 				enum class key {
 					INVALID,
+
 					LMOUSE,
 					RMOUSE,
 					MMOUSE,
@@ -186,6 +189,7 @@ namespace augs {
 					BACKSLASH,
 					CLOSE_SQUARE_BRACKET,
 					APOSTROPHE,
+
 					COUNT = 256,
 				};
 
@@ -228,7 +232,7 @@ namespace augs {
 					data_type() {}
 				};
 
-				message msg = message::unknown;
+				message msg = message::INVALID;
 				data_type data;
 
 				change();

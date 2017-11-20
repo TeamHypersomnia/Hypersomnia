@@ -239,7 +239,7 @@ namespace augs {
 				case WA_INACTIVE: change.msg = event::message::deactivate; break;
 				case WA_ACTIVE: change.msg = event::message::activate; break;
 				case WA_CLICKACTIVE: change.msg = event::message::click_activate; break;
-				default: change.msg = event::message::unknown; break;
+				default: return std::nullopt;
 				}
 
 				if (!active && current_settings.raw_mouse_input) {
