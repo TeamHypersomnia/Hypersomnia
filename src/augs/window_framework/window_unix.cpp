@@ -8,6 +8,12 @@
 
 #include "augs/window_framework/window.h"
 
+template <class T>
+auto freed_unique(T* const ptr) {
+	return std::unique_ptr<T, decltype(free)*>(ptr, free);
+}
+
+
 namespace augs {
 	window::window(const window_settings& settings) {
 		int default_screen = 0xdeadbeef;
@@ -76,6 +82,7 @@ namespace augs {
 			uint32_t eventmask = 
 				XCB_EVENT_MASK_EXPOSURE 
 				| XCB_EVENT_MASK_KEY_PRESS 
+				| XCB_EVENT_MASK_KEY_RELEASE
 				| XCB_EVENT_MASK_BUTTON_PRESS
 				| XCB_EVENT_MASK_BUTTON_RELEASE
 			;
@@ -181,14 +188,15 @@ namespace augs {
 	}
 
 	void window::collect_entropy(local_entropy& into) {
-		while (
-			std::unique_ptr<xcb_generic_event_t, decltype(free)*> 
-			event { xcb_poll_for_event(connection), free }
-		) {
+		while (const auto event = freed_unique(xcb_poll_for_event(connection))) {
 			event::change ch;
 
 			switch (event->response_type & ~0x80) {
 				case XCB_KEY_PRESS:
+					break;
+				case XCB_BUTTON_PRESS: {
+
+				}
 					break;
 				default:
 					break;
@@ -201,9 +209,9 @@ namespace augs {
 	xywhi window::get_window_rect() const { 
 		xcb_get_geometry_cookie_t  geomCookie = xcb_get_geometry (connection, window_id);
 		
-		std::unique_ptr<xcb_get_geometry_reply_t, decltype(free)*> geom { 
-			xcb_get_geometry_reply (connection, geomCookie, NULL), free
-		};
+		const auto geom = freed_unique(
+			xcb_get_geometry_reply (connection, geomCookie, NULL)
+		);
 
 		return { geom->x, geom->y, geom->width, geom->height }; 
 	}
