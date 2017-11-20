@@ -83,6 +83,7 @@ namespace augs {
 				XCB_EVENT_MASK_EXPOSURE 
 				| XCB_EVENT_MASK_KEY_PRESS 
 				| XCB_EVENT_MASK_KEY_RELEASE
+				| XCB_EVENT_MASK_POINTER_MOTION
 				| XCB_EVENT_MASK_BUTTON_PRESS
 				| XCB_EVENT_MASK_BUTTON_RELEASE
 			;
@@ -189,17 +190,33 @@ namespace augs {
 
 	void window::collect_entropy(local_entropy& into) {
 		while (const auto event = freed_unique(xcb_poll_for_event(connection))) {
-			event::change ch;
+			using namespace event;
+
+			change ch;
 
 			switch (event->response_type & ~0x80) {
 				case XCB_KEY_PRESS:
 					break;
-				case XCB_BUTTON_PRESS: {
+				case XCB_MOTION_NOTIFY: {
+            		const auto* const motion = reinterpret_cast<xcb_motion_notify_event_t*>(event.get());
+			
+					ch.data.mouse.pos = {
+						motion->event_x,
+						motion->event_y
+					};						
 
+					ch.msg = message::mousemotion;
+				} 
+				case XCB_BUTTON_PRESS: {
+            		const auto* const press = reinterpret_cast<xcb_button_press_event_t*>(event.get());
 				}
 					break;
 				default:
 					break;
+			}
+
+			if (ch.msg != message::unknown) {
+				into.push_back(ch);
 			}
 		}
 	}
