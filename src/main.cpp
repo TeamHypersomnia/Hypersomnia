@@ -573,6 +573,8 @@ int work(const int argc, const char* const * const argv) try {
 	};
 
 	std::signal(SIGINT, signal_handler);
+	std::signal(SIGTERM, signal_handler);
+	std::signal(SIGSTOP, signal_handler);
 #endif
  
 	static bool should_quit = false;
@@ -831,10 +833,21 @@ int work(const int argc, const char* const * const argv) try {
 		auto scope = measure_scope(profiler.fps);
 		
 #if PLATFORM_UNIX
-		if (signal_status == SIGINT) {
-			should_quit = true;
-			LOG("SIGINT received. Gracefully shutting down.");
-			break;
+		if (signal_status != 0) {
+			const auto sig = signal_status;
+
+			LOG("%x received.", strsignal(sig));
+
+			if(
+				sig == SIGINT
+				|| sig == SIGSTOP
+				|| sig == SIGTERM
+			) {
+				LOG("Gracefully shutting down.");
+				should_quit = true;
+				
+				break;
+			}
 		}
 #endif
 
