@@ -26,6 +26,22 @@ namespace augs {
 			msg = message::INVALID;
 		}
 
+		keys::key change::get_key() const {
+			using namespace keys;
+
+			switch (msg) {
+			case message::ltripleclick: return key::LMOUSE;
+			case message::syskeydown: return data.key.key;
+			case message::syskeyup: return data.key.key;
+			case message::keydown: return data.key.key;
+			case message::keyup: return data.key.key;
+			case message::ldoubleclick:  return key::LMOUSE;
+			case message::mdoubleclick: return key::MMOUSE;
+			case message::rdoubleclick: return key::RMOUSE;
+			default: return key::INVALID;
+			}
+		}
+
 		key_change change::get_key_change() const {
 			switch (msg) {
 			case message::ltripleclick: return key_change::PRESSED;
@@ -34,14 +50,6 @@ namespace augs {
 			case message::ldoubleclick:  return key_change::PRESSED;
 			case message::mdoubleclick: return key_change::PRESSED;
 			case message::rdoubleclick: return key_change::PRESSED;
-			case message::ldown: return key_change::PRESSED;
-			case message::lup: return key_change::RELEASED;
-			case message::mdown: return key_change::PRESSED;
-			case message::mup: return key_change::RELEASED;
-			case message::xdown: return key_change::PRESSED;
-			case message::xup: return key_change::RELEASED;
-			case message::rdown: return key_change::PRESSED;
-			case message::rup: return key_change::RELEASED;
 			default: return key_change::NO_CHANGE; break;
 			}
 		}
@@ -57,22 +65,16 @@ namespace augs {
 			case message::ldoubleclick:  return true;
 			case message::mdoubleclick: return true;
 			case message::rdoubleclick: return true;
-			case message::ldown: return true;
-			case message::lup: return true;
-			case message::mdown: return true;
-			case message::mup: return true;
-			case message::xdown: return true;
-			case message::xup: return true;
-			case message::rdown: return true;
-			case message::rup: return true;
+			case message::keydown: return is_mouse_key(get_key());
+			case message::keyup: return is_mouse_key(get_key());
 			default: return false; break;
 			}
 		}
 		
 		bool change::uses_keyboard() const {
 			switch (msg) {
-			case message::keydown: return true;
-			case message::keyup: return true;
+			case message::keydown: return !is_mouse_key(get_key());
+			case message::keyup: return !is_mouse_key(get_key());
 			case message::syskeydown: return true;
 			case message::syskeyup: return true;
 			case message::character: return true;
@@ -90,24 +92,24 @@ namespace augs {
 		}
 
 		bool change::was_pressed(const keys::key k) const {
-			return was_any_key_pressed() && data.key.key == k;
+			return was_any_key_pressed() && get_key() == k;
 		}
 
 		bool change::was_released(const keys::key k) const {
-			return was_any_key_released() && data.key.key == k;
+			return was_any_key_released() && get_key() == k;
 		}
 
 		bool change::is_exit_message() const {
 			return msg == message::close
 				|| msg == message::quit
-				|| (msg == message::syskeydown && data.key.key == keys::key::F4)
+				|| (msg == message::syskeydown && get_key() == keys::key::F4)
 			;
 		}
 
 		bool change::is_shortcut_key() const {
 			if (get_key_change() != key_change::NO_CHANGE) {
 				/* Let shortcut keys propagate */
-				switch (data.key.key) {
+				switch (get_key()) {
 					case keys::key::LCTRL: return true;
 					case keys::key::LALT: return true;
 					case keys::key::LSHIFT: return true;
@@ -128,10 +130,10 @@ namespace augs {
 			const auto ch = dt.get_key_change();
 
 			if (ch == key_change::PRESSED) {
-				keys.set(dt.data.key.key, true);
+				keys.set(dt.get_key(), true);
 			}
 			else if (ch == key_change::RELEASED) {
-				keys.set(dt.data.key.key, false);
+				keys.set(dt.get_key(), false);
 			}
 			else if (dt.msg == message::mousemotion) {
 				mouse.pos = dt.data.mouse.pos;
@@ -171,7 +173,7 @@ namespace augs {
 			for (std::size_t i = 0; i < keys.size(); ++i) {
 				const auto k = static_cast<keys::key>(i);
 
-				if (k == keys::key::LMOUSE || k == keys::key::RMOUSE || k == keys::key::MMOUSE) {
+				if (is_mouse_key(k)) {
 					continue;
 				}
 
@@ -189,44 +191,17 @@ namespace augs {
 		std::vector<change> state::generate_mouse_releasing_changes() const {
 			std::vector<change> output;
 
-			if (const auto k = keys::key::LMOUSE; keys[k]) {
-				{
-					change c;
-					c.msg = message::lup;
-					output.push_back(c);
-				}
-				{
-					change c;
-					c.msg = message::keyup;
-					c.data.key.key = k;
-					output.push_back(c);
-				}
-			}
+			for (std::size_t i = 0; i < keys.size(); ++i) {
+				const auto k = static_cast<keys::key>(i);
 
-			if (const auto k = keys::key::RMOUSE; keys[k]) {
-				{
-					change c;
-					c.msg = message::rup;
-					output.push_back(c);
+				if (!is_mouse_key(k)) {
+					continue;
 				}
-				{
-					change c;
-					c.msg = message::keyup;
-					c.data.key.key = k;
-					output.push_back(c);
-				}
-			}
 
-			if (const auto k = keys::key::MMOUSE; keys[k]) {
-				{
+				if (keys[k]) {
 					change c;
-					c.msg = message::mup;
-					output.push_back(c);
-				}
-				{
-					change c;
-					c.msg = message::keyup;
 					c.data.key.key = k;
+					c.msg = message::keyup;
 					output.push_back(c);
 				}
 			}
@@ -242,6 +217,17 @@ namespace augs {
 			bool is_numpad_key(const key k) {
 				if (static_cast<int>(k) >= static_cast<int>(key::NUMPAD0) && static_cast<int>(k) <= static_cast<int>(key::NUMPAD9)) return true;
 				return false;
+			}
+
+			bool is_mouse_key(const key k) {
+				switch(k) {
+					case key::LMOUSE: return true;
+					case key::RMOUSE: return true;
+					case key::MMOUSE: return true;
+					case key::MOUSE4: return true;
+					case key::MOUSE5: return true;
+					default: return false;
+				}
 			}
 
 			std::string key_to_string(const key k) {

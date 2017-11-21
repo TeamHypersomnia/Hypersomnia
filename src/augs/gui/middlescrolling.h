@@ -25,8 +25,9 @@ namespace augs {
 			template<class C>
 			bool handle_new_raw_state(const C context, const event::change& state) {
 				if (context.alive(subject)) {
-					if (state.msg == event::message::mdown || state.msg == event::message::mdoubleclick)
+					if (state.was_pressed(event::keys::key::MMOUSE)) {
 						subject = gui_element_variant_id();
+					}
 
 					return true;
 				}

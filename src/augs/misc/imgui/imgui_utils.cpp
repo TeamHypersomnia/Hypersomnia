@@ -61,23 +61,16 @@ namespace augs {
 				if (in.msg == message::mousemotion) {
 					io.MousePos = ImVec2(in.data.mouse.pos);
 				}
-				else if (
-					in.msg == message::ldown 
-					|| in.msg == message::ldoubleclick 
-					|| in.msg == message::ltripleclick
-				) {
+				else if (in.was_pressed(key::LMOUSE)) {
 					io.MouseDown[0] = true;
 				}
-				else if (in.msg == message::lup) {
+				else if (in.was_released(key::LMOUSE)) {
 					io.MouseDown[0] = false;
 				}
-				else if (
-					in.msg == message::rdown 
-					|| in.msg == message::rdoubleclick
-				) {
+				else if (in.was_pressed(key::RMOUSE)) {
 					io.MouseDown[1] = true;
 				}
-				else if (in.msg == message::rup) {
+				else if (in.was_released(key::RMOUSE)) {
 					io.MouseDown[1] = false;
 				}
 				else if (in.msg == message::wheel) {

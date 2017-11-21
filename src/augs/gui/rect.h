@@ -97,12 +97,14 @@ namespace augs {
 				gui_entropy& entropies
 			) {
 				using namespace augs::event;
+				using namespace keys;
 
 				auto& gr = context.get_rect_world();
 				
 				const auto state = context.get_input_state();
 				const auto mouse_pos = state.mouse.pos;
-				const auto msg = inf.change.msg;
+				const auto ch = inf.change;
+				const auto msg = ch.msg;
 
 				auto gui_event_lambda = [&](const gui_event ev, const int scroll_amount = 0) {
 					entropies.post_event(this_id, { ev, scroll_amount });
@@ -132,20 +134,17 @@ namespace augs {
 							const bool still_hovering = hovering;
 
 							if (still_hovering) {
-								if (msg == message::lup) {
+								if (ch.was_released(key::LMOUSE)) {
 									gui_event_lambda(gui_event::lup);
 								}
-								if (msg == message::ldown) {
+								if (ch.was_pressed(key::LMOUSE)) {
 									gr.rect_held_by_lmb = this_id;
 									gr.ldrag_relative_anchor = mouse_pos - this_id->rc.get_position();
 									gr.last_ldown_position = mouse_pos;
 									gui_event_lambda(gui_event::ldown);
 								}
-								if (msg == message::mdown) {
+								if (ch.was_pressed(key::MMOUSE)) {
 									gui_event_lambda(gui_event::mdown);
-								}
-								if (msg == message::mdoubleclick) {
-									gui_event_lambda(gui_event::mdoubleclick);
 								}
 								if (msg == message::ldoubleclick) {
 									gr.rect_held_by_lmb = this_id;
@@ -159,7 +158,7 @@ namespace augs {
 									gr.last_ldown_position = mouse_pos;
 									gui_event_lambda(gui_event::ltripleclick);
 								}
-								if (msg == message::rdown) {
+								if (ch.was_pressed(key::RMOUSE)) {
 									gr.rect_held_by_rmb = this_id;
 									gui_event_lambda(gui_event::rdown);
 								}

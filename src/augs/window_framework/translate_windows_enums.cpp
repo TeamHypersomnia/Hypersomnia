@@ -10,38 +10,39 @@ using namespace augs::event::keys;
 
 message translate_enum(const UINT m) {
 	switch (m) {
-	case UINT(message::ltripleclick):	return message::ltripleclick;
-	case SC_CLOSE:						return message::close; break;
-	case WM_MOVE:						return message::move; break;
-	case WM_QUIT:						return message::quit; break;
-	case SC_MINIMIZE:					return message::minimize; break;
-	case SC_MAXIMIZE:					return message::maximize; break;
-	case SC_RESTORE:					return message::restore;  break;
-	case WM_CLIPBOARDUPDATE:			return message::clipboard_change; break;
-	case WM_SYSKEYDOWN:					return message::syskeydown; break;
-	case WM_SYSKEYUP:					return message::syskeyup; break;
-	case WM_KEYDOWN:					return message::keydown; break;
-	case WM_KEYUP:						return message::keyup; break;
-	case WM_CHAR:						return message::character; break;
-	case WM_UNICHAR:					return message::unichar; break;
-	case WM_MOUSEMOVE:					return message::mousemotion; break;
-	case WM_MOUSEWHEEL:					return message::wheel; break;
-	case WM_LBUTTONDBLCLK:				return message::ldoubleclick; break;
-	case WM_MBUTTONDBLCLK:				return message::mdoubleclick; break;
-	case WM_XBUTTONDBLCLK:				return message::xdoubleclick; break;
-	case WM_RBUTTONDBLCLK:				return message::rdoubleclick; break;
-	case WM_LBUTTONDOWN:				return message::ldown; break;
-	case WM_LBUTTONUP:					return message::lup; break;
-	case WM_MBUTTONDOWN:				return message::mdown; break;
-	case WM_MBUTTONUP:					return message::mup; break;
-	case WM_XBUTTONDOWN:				return message::xdown; break;
-	case WM_XBUTTONUP:					return message::xup; break;
-	case WM_RBUTTONDOWN:				return message::rdown; break;
-	case WM_RBUTTONUP:					return message::rup; break;
-	default: break;
-	}
+	case SC_CLOSE:						return message::close; 
+	case WM_MOVE:						return message::move; 
+	case WM_QUIT:						return message::quit; 
+	case SC_MINIMIZE:					return message::minimize; 
+	case SC_MAXIMIZE:					return message::maximize; 
+	case SC_RESTORE:					return message::restore;  
+	case WM_CLIPBOARDUPDATE:			return message::clipboard_change; 
+	case WM_SYSKEYDOWN:					return message::syskeydown; 
+	case WM_SYSKEYUP:					return message::syskeyup; 
+	case WM_KEYDOWN:					return message::keydown; 
+	case WM_KEYUP:						return message::keyup; 
+	case WM_CHAR:						return message::character; 
+	case WM_UNICHAR:					return message::unichar; 
+	case WM_MOUSEMOVE:					return message::mousemotion; 
+	case WM_MOUSEWHEEL:					return message::wheel; 
 
-	return augs::event::message::INVALID;
+	case WM_LBUTTONDBLCLK:				return message::ldoubleclick; 
+	case WM_RBUTTONDBLCLK:				return message::rdoubleclick;
+	case WM_MBUTTONDBLCLK:				return message::mdoubleclick;
+
+	case WM_LBUTTONDOWN:				return message::keydown; 
+	case WM_LBUTTONUP:					return message::keyup; 
+	case WM_MBUTTONDOWN:				return message::keydown; 
+	case WM_MBUTTONUP:					return message::keyup; 
+	case WM_XBUTTONDOWN:				return message::keydown; 
+	case WM_XBUTTONUP:					return message::keyup; 
+										
+	case WM_MBUTTONDBLCLK:				return message::keydown;
+
+	case UINT(message::ltripleclick):	return message::ltripleclick;
+
+	default: return augs::event::message::INVALID;
+	}
 }
 
 key translate_virtual_key(const UINT m) {

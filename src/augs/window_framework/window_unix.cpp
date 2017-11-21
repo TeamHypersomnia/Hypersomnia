@@ -16,6 +16,8 @@ auto freed_unique(T* const ptr) {
 
 namespace augs {
 	window::window(const window_settings& settings) {
+		last_mouse_pos = settings.get_screen_size() / 2;
+
 		int default_screen = 0xdeadbeef;
 
 		/* Open Xlib Display */ 
@@ -182,15 +184,20 @@ namespace augs {
 	}
 
 	void window::show() {}
-	void window::set_mouse_pos_frozen(const bool) {}
 
-	bool window::is_mouse_pos_frozen() const {
-		return false;
-	}
-
-	std::optional<event::change> handle_event(const xcb_generic_event_t* event) {
+	template <class F>
+	std::optional<event::change> handle_event(
+		const xcb_generic_event_t* event,
+		xcb_timestamp_t& last_ldown_time_ms,
+		F mousemotion_handler
+	) {
 		using namespace event;
+		using namespace keys;
 
+		// TODO: handle WM_DELETE_WINDOW
+		// xcb_intern_atom_cookie_t cookie2 = xcb_intern_atom(c, 0, 16, "WM_DELETE_WINDOW");
+		// xcb_intern_atom_reply_t* reply2 = xcb_intern_atom_reply(c, cookie2, 0);
+	
 		change ch;
 
 		switch (event->response_type & ~0x80) {
@@ -198,22 +205,96 @@ namespace augs {
 				break;
 			case XCB_MOTION_NOTIFY: {
            		const auto* const motion = reinterpret_cast<const xcb_motion_notify_event_t*>(event);
-		
-				ch.data.mouse.pos = {
-					motion->event_x,
-					motion->event_y
-				};						
-
-				ch.msg = message::mousemotion;
-				return ch;
+				return mousemotion_handler({motion->event_x, motion->event_y});
 			} 
 			case XCB_BUTTON_PRESS: {
            		const auto* const press = reinterpret_cast<const xcb_button_press_event_t*>(event);
+
+				LOG("DOWN.Det: %x; time: %x; st: %x", static_cast<int>(press->detail), press->time, static_cast<int>(press->state));
+		
+				// TODO: support doubleclicks for left and middle
 				
+				switch (press->detail) {
+					case 1:
+					   	if(press->time - last_ldown_time_ms >= 500) {
+							ch.msg = message::ldoubleclick;
+						}
+						else {
+							ch.msg = message::keydown;
+							ch.data.key.key = key::LMOUSE;
+						}
 
+						last_ldown_time_ms = press->time;
 
+						return ch;
+
+					case 3:
+						ch.msg = message::keydown;
+						ch.data.key.key = key::RMOUSE;
+						return ch;
+
+					case 2:
+						ch.msg = message::keydown;
+						ch.data.key.key = key::MMOUSE;
+						return ch;
+						
+					case 8:
+						ch.msg = message::keydown;
+						ch.data.key.key = key::MOUSE4;
+						return ch;
+
+					case 9:
+						ch.msg = message::keydown;
+						ch.data.key.key = key::MOUSE5;
+						return ch;
+
+					default: return std::nullopt;
+				}
 			}
-				return ch;
+
+			case XCB_BUTTON_RELEASE: {
+           		const auto* const release = reinterpret_cast<const xcb_button_release_event_t*>(event);
+
+				LOG("UP.Det: %x; time: %x; st: %x", static_cast<int>(release->detail), release->time, static_cast<int>(release->state));
+			
+				switch (release->detail) {
+					case 1:
+						ch.msg = message::keyup;
+						ch.data.key.key = key::LMOUSE;
+						return ch;
+
+					case 3:
+						ch.msg = message::keyup;
+						ch.data.key.key = key::RMOUSE;
+						return ch;
+
+					case 2:
+						ch.msg = message::keyup;
+						ch.data.key.key = key::MMOUSE;
+						return ch;
+						
+					case 8:
+						ch.msg = message::keyup;
+						ch.data.key.key = key::MOUSE4;
+						return ch;
+
+					case 9:
+						ch.msg = message::keyup;
+						ch.data.key.key = key::MOUSE5;
+						return ch;
+
+					default: return std::nullopt;
+				}
+			}
+/*
+		    case XCB_CLIENT_MESSAGE: {
+										 if((*(xcb_client_message_event_t*)event).data.data32[0] == (*reply2).atom) {
+
+
+										 }
+									 }
+
+*/
 			default:
 				return std::nullopt;
 		}
@@ -221,7 +302,11 @@ namespace augs {
 
 	void window::collect_entropy(local_entropy& into) {
 		while (const auto event = freed_unique(xcb_poll_for_event(connection))) {
-			if (const auto ch = handle_event(event.get())) {
+			if (const auto ch = handle_event(
+				event.get(), 
+				last_ldown_time_ms,
+				[this](const basic_vec2<short> p) { return handle_mousemove(p); } 
+			)) {
 				into.push_back(*ch);
 			}
 		}

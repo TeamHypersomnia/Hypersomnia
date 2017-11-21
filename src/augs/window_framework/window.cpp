@@ -33,6 +33,24 @@ namespace augs {
 		}
 	}
 
+	std::optional<event::change> window::handle_mousemove(const basic_vec2<short> new_pos) {
+		event::change change;
+
+		if (!current_settings.raw_mouse_input && !mouse_pos_frozen) {
+			change.data.mouse.rel = new_pos - basic_vec2<short>(last_mouse_pos);
+			
+			last_mouse_pos = new_pos;
+
+			change.data.mouse.pos = basic_vec2<short>(last_mouse_pos);
+			change.msg = event::message::mousemotion;
+			
+			return change;
+		}
+		else {
+			return std::nullopt;
+		}
+	}
+
 	void window::apply(const window_settings& settings, const bool force) {
 		auto changed = [&](auto& field) {
 			return !(field == get_corresponding_field(field, settings, current_settings));
@@ -81,6 +99,18 @@ namespace augs {
 
 	window_settings window::get_current_settings() const {
 		return current_settings;
+	}
+
+	void window::set_mouse_pos_frozen(const bool flag) {
+		if (mouse_pos_frozen && !flag) {
+			augs::set_cursor_pos(current_settings.position + last_mouse_pos);
+		}
+
+		mouse_pos_frozen = flag;
+	}
+	
+	bool window::is_mouse_pos_frozen() const {
+		return mouse_pos_frozen;
 	}
 
 	window::~window() {

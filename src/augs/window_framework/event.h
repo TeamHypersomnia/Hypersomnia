@@ -11,7 +11,6 @@ namespace augs {
 			enum class message {
 				INVALID,
 
-				ltripleclick,
 				close,
 				quit,
 				move,
@@ -31,17 +30,9 @@ namespace augs {
 				mousemotion,
 				wheel,
 				ldoubleclick,
-				mdoubleclick,
-				xdoubleclick,
 				rdoubleclick,
-				ldown,
-				lup,
-				mdown,
-				mup,
-				xdown,
-				xup,
-				rdown,
-				rup,
+				mdoubleclick,
+				ltripleclick,
 
 				COUNT
 			};
@@ -193,6 +184,7 @@ namespace augs {
 					COUNT = 256,
 				};
 
+				bool is_mouse_key(const key);
 				bool is_numpad_key(const key);
 				std::string key_to_string(const key);
 				std::wstring key_to_wstring(const key);
@@ -239,6 +231,7 @@ namespace augs {
 
 				bool operator==(const change&) const;
 
+				keys::key get_key() const;
 				key_change get_key_change() const;
 				bool uses_mouse() const;
 				bool uses_keyboard() const;

@@ -157,7 +157,9 @@ namespace augs {
 					return;
 				}
 
-				if (new_state.msg == event::message::lup) {
+				using namespace event::keys;
+
+				if (new_state.was_released(key::LMOUSE)) {
 					if (context.alive(rect_held_by_lmb)) {
 						if (is_hovered(context, rect_held_by_lmb)) {
 							generate_gui_event(entropies, rect_held_by_lmb, gui_event::lup);
@@ -178,7 +180,7 @@ namespace augs {
 					}
 				}
 
-				if (new_state.msg == event::message::rup) {
+				if (new_state.was_released(key::RMOUSE)) {
 					if (context.alive(rect_held_by_rmb)) {
 						if (is_hovered(context, rect_held_by_rmb)) {
 							generate_gui_event(entropies, rect_held_by_rmb, gui_event::rup);

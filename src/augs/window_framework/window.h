@@ -23,7 +23,7 @@ typedef uint32_t xcb_window_t;
 struct _XDisplay;
 typedef struct _XDisplay Display;
 struct xcb_connection_t;
-
+typedef uint32_t xcb_timestamp_t;
 #endif
 
 #include <optional>
@@ -64,9 +64,6 @@ namespace augs {
 		bool double_click_occured = false;
 		bool clear_window_inputs_once = true;
 
-		bool mouse_pos_frozen = false;
-		vec2i last_mouse_pos;
-
 		timer triple_click_timer;
 		unsigned triple_click_delay = 0xdeadbeef; /* maximum delay time for the next click (after doubleclick) to be considered tripleclick (in milliseconds) */
 
@@ -89,9 +86,18 @@ namespace augs {
 		GLXDrawable drawable = 0;
 		Display *display = nullptr;
 		xcb_connection_t *connection = nullptr;
+		xcb_timestamp_t last_ldown_time_ms = 0;
 #else
 #error "Unsupported platform!"
 #endif
+
+		vec2i last_mouse_pos;
+		bool mouse_pos_frozen = false;
+
+		std::optional<event::change> handle_mousemove(
+			const basic_vec2<short> new_position
+		);
+
 		using settable_as_current_base = settable_as_current_mixin<window>;
 		friend settable_as_current_base;
 

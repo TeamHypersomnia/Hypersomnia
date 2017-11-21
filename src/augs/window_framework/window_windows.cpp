@@ -81,25 +81,25 @@ namespace augs {
 		case WM_CHAR:
 			change.data.character.utf16 = wchar_t(wParam);
 			if (change.data.character.utf16 > 255) {
-				break;
+				return change;
 			}
 			//change.utf32 = unsigned(wParam);
 			if (const bool repeated = ((lParam & (1 << 30)) != 0)) {
 				return std::nullopt;
 			}
 
-			break;
+			return change;
 		case WM_UNICHAR:
 			//change.utf32 = unsigned(wParam);
 			//change.repeated = ((lParam & (1 << 30)) != 0);
-			break;
+			return change;
 
 		case SC_CLOSE:
-			break;
+			return change;
 
 		case WM_KEYUP:
 			change.data.key.key = translate_key_with_lparam(lParam, wParam);
-			break;
+			return change;
 		case WM_KEYDOWN:
 			change.data.key.key = translate_key_with_lparam(lParam, wParam);
 
@@ -107,11 +107,11 @@ namespace augs {
 				return std::nullopt;
 			}
 
-			break;
+			return change;
 
 		case WM_SYSKEYUP:
 			change.data.key.key = translate_key_with_lparam(lParam, wParam);
-			break;
+			return change;
 		case WM_SYSKEYDOWN:
 			change.data.key.key = translate_key_with_lparam(lParam, wParam);
 
@@ -119,87 +119,111 @@ namespace augs {
 				return std::nullopt;
 			}
 
-			break;
+			return change;
 
 		case WM_MOUSEWHEEL:
 			change.data.scroll.amount = GET_WHEEL_DELTA_WPARAM(wParam) / WHEEL_DELTA;
-			break;
+			return change;
+		
+		// Doubleclicks
+		
 		case WM_LBUTTONDBLCLK:
+			SetCapture(hwnd);
+			
+			triple_click_timer.extract<std::chrono::microseconds>();
+			double_click_occured = true;
+
+			return change;
+
+		case WM_RBUTTONDBLCLK:
+		case WM_MBUTTONDBLCLK:
+			return change;
+
+		// Downs
+		
 		case WM_LBUTTONDOWN:
 			change.data.key.key = key::LMOUSE;
+
 			SetCapture(hwnd);
 
-			if (m == WM_LBUTTONDOWN) {
-				if (double_click_occured && triple_click_timer.extract<std::chrono::milliseconds>() < triple_click_delay) {
-					change.msg = event::message::ltripleclick;
-					double_click_occured = false;
-				}
-			}
-			else {
-				triple_click_timer.extract<std::chrono::microseconds>();
-				double_click_occured = true;
+			if (double_click_occured && triple_click_timer.extract<std::chrono::milliseconds>() < triple_click_delay) {
+				change.msg = event::message::ltripleclick;
+				double_click_occured = false;
 			}
 
-			break;
-		case WM_RBUTTONDBLCLK:
+			return change;
+
 		case WM_RBUTTONDOWN:
 			change.data.key.key = key::RMOUSE;
-			break;
-		case WM_MBUTTONDBLCLK:
+			return change;
 		case WM_MBUTTONDOWN:
 			change.data.key.key = key::MMOUSE;
-			break;
+			return change;
+
+		// dont support x double click already
 		case WM_XBUTTONDBLCLK:
 		case WM_XBUTTONDOWN:
-			change.data.key.key = key::MOUSE4;
-			change.msg = event::message::keydown;
-			break;
+			{
+				const auto fwButton = GET_XBUTTON_WPARAM(wParam);
+
+				if (fwButton == XBUTTON1) {
+					change.data.key.key = key::MOUSE4;
+				}
+				else if(fwButton == XBUTTON2) {
+					change.data.key.key = key::MOUSE5;
+				}
+				else {
+					throw window_error("Unknown fwButton: %x", fwButton);
+				}
+			}
+
+			return change;
+		
+		// Ups
+
 		case WM_XBUTTONUP:
-			change.data.key.key = key::MOUSE4;
-			change.msg = event::message::keyup;
-			break;
+			{
+				const auto fwButton = GET_XBUTTON_WPARAM(wParam);
+
+				if (fwButton == XBUTTON1) {
+					change.data.key.key = key::MOUSE4;
+				}
+				else if(fwButton == XBUTTON2) {
+					change.data.key.key = key::MOUSE5;
+				}
+				else {
+					throw window_error("Unknown fwButton: %x", fwButton);
+				}
+			}
+			return change;
 		case WM_LBUTTONUP:
 			change.data.key.key = key::LMOUSE;
-			if (GetCapture() == hwnd) ReleaseCapture(); break;
+			if (GetCapture() == hwnd) ReleaseCapture(); return change;
 		case WM_RBUTTONUP:
 			change.data.key.key = key::RMOUSE;
-			break;
+			return change;
 		case WM_MBUTTONUP:
 			change.data.key.key = key::MMOUSE;
-			break;
+			return change;
 		case WM_MOUSEHOVER:
 			cursor_in_client_area = true;
 			default_proc();
-			break;
+			return change;
 		case WM_MOUSELEAVE:
 			cursor_in_client_area = false;
 			default_proc();
-			break;
+			return change;
 		case WM_MOUSEMOVE:
-			if (!current_settings.raw_mouse_input && !mouse_pos_frozen) {
-				basic_vec2<short> new_pos;
+			{
+				const auto p = MAKEPOINTS(lParam);
+				const auto new_pos = basic_vec2<short>{ p.x, p.y };
 
-				{
-					const auto p = MAKEPOINTS(lParam);
-					new_pos = { p.x, p.y };
-				}
+				double_click_occured = false;
 
-				change.data.mouse.rel = new_pos - basic_vec2<short>(last_mouse_pos);
-				
-				if (change.data.mouse.rel.non_zero()) {
-					double_click_occured = false;
-				}
-
-				last_mouse_pos = new_pos;
-
-				change.data.mouse.pos = basic_vec2<short>(last_mouse_pos);
-				change.msg = event::message::mousemotion;
-			}
-			else {
-				return std::nullopt;
+				return handle_mousemove(new_pos);
 			}
 
-			break;
+			return change;
 
 		case WM_INPUT:
 			if (active && (current_settings.raw_mouse_input || mouse_pos_frozen)) {
@@ -227,7 +251,7 @@ namespace augs {
 				return std::nullopt;
 			}
 
-			break;
+			return change;
 
 		case WM_ACTIVATE:
 			{
@@ -236,9 +260,9 @@ namespace augs {
 				active = type != WA_INACTIVE;
 
 				switch (type) {
-				case WA_INACTIVE: change.msg = event::message::deactivate; break;
-				case WA_ACTIVE: change.msg = event::message::activate; break;
-				case WA_CLICKACTIVE: change.msg = event::message::click_activate; break;
+				case WA_INACTIVE: change.msg = event::message::deactivate; return change;
+				case WA_ACTIVE: change.msg = event::message::activate; return change;
+				case WA_CLICKACTIVE: change.msg = event::message::click_activate; return change;
 				default: return std::nullopt;
 				}
 
@@ -247,7 +271,7 @@ namespace augs {
 				}
 			}
 
-			break;
+			return change;
 
 		case WM_GETMINMAXINFO:
 			{
@@ -257,17 +281,15 @@ namespace augs {
 				mi->ptMaxTrackSize.x = max_window_size.x;
 				mi->ptMaxTrackSize.y = max_window_size.y;
 			}
-			break;
+			return change;
 
 		case WM_SYSCOMMAND:
 			default_proc();
 			change.msg = translate_enum(static_cast<UINT>(wParam));
-			break;
+			return change;
 
-		default: default_proc(); break;
+		default: default_proc(); return std::nullopt;
 		}
-
-		return change;
 	}
 
 	void window::set_window_name(const std::string& name) {
@@ -409,18 +431,6 @@ namespace augs {
 
 	void window::show() {
 		ShowWindow(hwnd, SW_SHOW);
-	}
-	
-	void window::set_mouse_pos_frozen(const bool flag) {
-		if (mouse_pos_frozen && !flag) {
-			augs::set_cursor_pos(current_settings.position + last_mouse_pos);
-		}
-
-		mouse_pos_frozen = flag;
-	}
-	
-	bool window::is_mouse_pos_frozen() const {
-		return mouse_pos_frozen;
 	}
 
 	bool window::set_as_current_impl() {

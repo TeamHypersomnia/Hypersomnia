@@ -143,10 +143,7 @@ bool game_gui_system::control_gui_world(
 			const auto& item_entity = cosmos[held_rect.get_location().item_id];
 			auto& dragged_charges = element.dragged_charges;
 
-			if (
-				change.msg == augs::event::message::rdown
-				|| change.msg == augs::event::message::rdoubleclick
-			) {
+			if (change.was_pressed(augs::event::keys::key::RMOUSE)) {
 				if (world.held_rect_is_dragged) {
 					pending_transfers.push_back(item_slot_transfer_request { item_entity, cosmos[inventory_slot_id()], dragged_charges });
 					return true;
