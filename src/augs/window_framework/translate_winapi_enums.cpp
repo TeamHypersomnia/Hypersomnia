@@ -2,7 +2,7 @@
 #include <Windows.h>
 #undef min
 #undef max
-#include "translate_windows_enums.h"
+#include "translate_winapi_enums.h"
 
 using namespace augs::event;
 using namespace augs::event::keys;
