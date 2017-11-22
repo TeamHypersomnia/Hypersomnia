@@ -36,8 +36,6 @@ message translate_enum(const UINT m) {
 	case WM_MBUTTONUP:					return message::keyup; 
 	case WM_XBUTTONDOWN:				return message::keydown; 
 	case WM_XBUTTONUP:					return message::keyup; 
-										
-	case WM_MBUTTONDBLCLK:				return message::keydown;
 
 	case UINT(message::ltripleclick):	return message::ltripleclick;
 

@@ -11,11 +11,6 @@ namespace augs {
 	bool window::swap_buffers() { return true; }
 
 	void window::show() {}
-	void window::set_mouse_pos_frozen(const bool) {}
-	
-	bool window::is_mouse_pos_frozen() const {
-		return false;
-	}
 
 	void window::collect_entropy(local_entropy& into) {}
 
