@@ -70,8 +70,7 @@ namespace augs {
 		timer triple_click_timer;
 		unsigned triple_click_delay = 0xdeadbeef; /* maximum delay time for the next click (after doubleclick) to be considered tripleclick (in milliseconds) */
 
-		bool cursor_in_client_area = false;
-		bool is_cursor_in_client_area() const;
+		void show();
 
 		event::change do_raw_motion(const basic_vec2<short>);
 		std::optional<event::change> sync_mouse_on_click_activate(const event::change&);
@@ -129,7 +128,6 @@ namespace augs {
 
 		bool swap_buffers();
 
-		void show();
 		void set_mouse_pos_frozen(const bool);
 		bool is_mouse_pos_frozen() const;
 

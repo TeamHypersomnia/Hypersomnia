@@ -205,14 +205,6 @@ namespace augs {
 		case WM_MBUTTONUP:
 			change.data.key.key = key::MMOUSE;
 			return change;
-		case WM_MOUSEHOVER:
-			cursor_in_client_area = true;
-			default_proc();
-			return change;
-		case WM_MOUSELEAVE:
-			cursor_in_client_area = false;
-			default_proc();
-			return change;
 		case WM_MOUSEMOVE:
 			{
 				const auto p = MAKEPOINTS(lParam);
@@ -492,10 +484,6 @@ namespace augs {
 		return active;
 	}
 	
-	bool window::is_cursor_in_client_area() const {
-		return cursor_in_client_area; 
-	}
-
 	static auto get_filter(const std::vector<window::file_dialog_filter>& filters) {
 		std::wstring filter;
 

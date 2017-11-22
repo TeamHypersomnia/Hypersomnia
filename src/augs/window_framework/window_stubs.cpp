@@ -10,8 +10,6 @@ namespace augs {
 
 	bool window::swap_buffers() { return true; }
 
-	void window::show() {}
-
 	void window::collect_entropy(local_entropy& into) {}
 
 	void window::set_window_rect(const xywhi) {}

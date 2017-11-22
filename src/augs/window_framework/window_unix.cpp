@@ -189,8 +189,6 @@ namespace augs {
 		return true;
 	}
 
-	void window::show() {}
-
 	template <class F, class G>
 	std::optional<event::change> handle_event(
 		const xcb_generic_event_t* event,
@@ -364,7 +362,6 @@ namespace augs {
 	}
 
 	bool window::is_active() const { return false; }
-
 
 	bool window::set_as_current_impl() {
 #if BUILD_OPENGL
