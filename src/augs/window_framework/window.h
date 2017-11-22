@@ -24,6 +24,9 @@ struct _XDisplay;
 typedef struct _XDisplay Display;
 struct xcb_connection_t;
 typedef uint32_t xcb_timestamp_t;
+
+struct _XCBKeySymbols;
+typedef struct _XCBKeySymbols xcb_key_symbols_t;
 #endif
 
 #include <optional>
@@ -80,13 +83,16 @@ namespace augs {
 		);
 
 #elif PLATFORM_UNIX
+		xcb_timestamp_t last_ldown_time_ms = 0;
+
 		GLXContext context = 0;
 		GLXWindow glxwindow = 0;
 		xcb_window_t window_id = 0;
 		GLXDrawable drawable = 0;
 		Display *display = nullptr;
 		xcb_connection_t *connection = nullptr;
-		xcb_timestamp_t last_ldown_time_ms = 0;
+
+		xcb_key_symbols_t* syms = nullptr;
 #else
 #error "Unsupported platform!"
 #endif

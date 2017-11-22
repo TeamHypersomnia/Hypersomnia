@@ -2,10 +2,12 @@
 #include <X11/Xlib-xcb.h>
 
 #include <xcb/xcb.h>
+#include <xcb/xcb_keysyms.h>
 
 #include <GL/glx.h>
 #include <GL/gl.h>
 
+#include "augs/window_framework/translate_x_enums.h"
 #include "augs/window_framework/window.h"
 
 template <class T>
@@ -32,6 +34,8 @@ namespace augs {
 			XCloseDisplay(display);
 			throw window_error("Can't get xcb connection from display");
 		}
+
+		syms = xcb_key_symbols_alloc(connection);
 
 		/* Acquire event queue ownership */
 		XSetEventQueueOwner(display, XCBOwnsEventQueue);
@@ -139,6 +143,8 @@ namespace augs {
 		if (display) {
 			unset_if_current();
 
+			xcb_key_symbols_free(syms);	
+
 			glXDestroyWindow(display, glxwindow);
 
 			xcb_destroy_window(connection, window_id);
@@ -185,11 +191,12 @@ namespace augs {
 
 	void window::show() {}
 
-	template <class F>
+	template <class F, class G>
 	std::optional<event::change> handle_event(
 		const xcb_generic_event_t* event,
 		xcb_timestamp_t& last_ldown_time_ms,
-		F mousemotion_handler
+		F mousemotion_handler,
+		G keysym_getter
 	) {
 		using namespace event;
 		using namespace keys;
@@ -201,8 +208,34 @@ namespace augs {
 		change ch;
 
 		switch (event->response_type & ~0x80) {
-			case XCB_KEY_PRESS:
-				break;
+            case XCB_KEY_PRESS: {
+				const auto* const press = reinterpret_cast<const xcb_key_press_event_t*>(event);
+			
+				const auto keycode = press->detail;	
+				const auto keysym = keysym_getter(keycode);
+#if 0
+				LOG("Keycode down: %x", static_cast<int>(keycode));
+				LOG("Keysym down: %x", static_cast<int>(keysym));
+#endif			
+				ch.msg = message::keydown;
+				ch.data.key.key = translate_keysym({ keysym });
+
+				return ch;
+            }
+            case XCB_KEY_RELEASE: {
+				const auto* const release = reinterpret_cast<const xcb_key_release_event_t*>(event);
+			
+				const auto keycode = release->detail;	
+				const auto keysym = keysym_getter(keycode);
+#if 0
+				LOG("Keycode up: %x", static_cast<int>(keycode));
+				LOG("Keysym up: %x", static_cast<int>(keysym));
+#endif			
+				ch.msg = message::keyup;
+				ch.data.key.key = translate_keysym({ keysym });
+
+				return ch;
+            }
 			case XCB_MOTION_NOTIFY: {
            		const auto* const motion = reinterpret_cast<const xcb_motion_notify_event_t*>(event);
 				return mousemotion_handler({motion->event_x, motion->event_y});
@@ -210,7 +243,7 @@ namespace augs {
 			case XCB_BUTTON_PRESS: {
            		const auto* const press = reinterpret_cast<const xcb_button_press_event_t*>(event);
 
-				LOG("DOWN.Det: %x; time: %x; st: %x", static_cast<int>(press->detail), press->time, static_cast<int>(press->state));
+				// LOG("DOWN.Det: %x; time: %x; st: %x", static_cast<int>(press->detail), press->time, static_cast<int>(press->state));
 		
 				// TODO: support doubleclicks for left and middle
 				
@@ -255,7 +288,7 @@ namespace augs {
 			case XCB_BUTTON_RELEASE: {
            		const auto* const release = reinterpret_cast<const xcb_button_release_event_t*>(event);
 
-				LOG("UP.Det: %x; time: %x; st: %x", static_cast<int>(release->detail), release->time, static_cast<int>(release->state));
+				// LOG("UP.Det: %x; time: %x; st: %x", static_cast<int>(release->detail), release->time, static_cast<int>(release->state));
 			
 				switch (release->detail) {
 					case 1:
@@ -301,11 +334,16 @@ namespace augs {
 	}
 
 	void window::collect_entropy(local_entropy& into) {
+		auto keysym_getter = [this](const xcb_keycode_t keycode){
+			return xcb_key_symbols_get_keysym(syms, keycode, 0);
+		};
+
 		while (const auto event = freed_unique(xcb_poll_for_event(connection))) {
 			if (const auto ch = handle_event(
 				event.get(), 
 				last_ldown_time_ms,
-				[this](const basic_vec2<short> p) { return handle_mousemove(p); } 
+				[this](const basic_vec2<short> p) { return handle_mousemove(p); },
+				keysym_getter
 			)) {
 				into.push_back(*ch);
 			}

@@ -9,7 +9,7 @@
 #include "augs/window_framework/window.h"
 #include "augs/window_framework/platform_utils.h"
 
-#include "augs/window_framework/translate_windows_enums.h"
+#include "augs/window_framework/translate_winapi_enums.h"
 
 namespace augs {
 	LRESULT CALLBACK wndproc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {

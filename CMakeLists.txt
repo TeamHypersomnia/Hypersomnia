@@ -297,7 +297,6 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/augs/network/reliable_channel.cpp"
 	"src/augs/texture_atlas/texture_atlas_entry.cpp"
 	"src/augs/texture_atlas/texture_atlas.cpp"
-	"src/augs/window_framework/translate_windows_enums.cpp"
 	"src/game/assets/animation.cpp"
 	"src/game/assets/behaviour_tree.cpp"
 	"src/view/viewables/regeneration/game_image_loadables.cpp"
@@ -514,10 +513,12 @@ if(BUILD_WINDOW_FRAMEWORK)
 	if(MSVC)
 		list(APPEND HYPERSOMNIA_CODEBASE_CPPS
 			"src/augs/window_framework/window_windows.cpp"
+			"src/augs/window_framework/translate_winapi_enums.cpp"
 		)
 	elseif(UNIX)
 		list(APPEND HYPERSOMNIA_CODEBASE_CPPS
 			"src/augs/window_framework/window_unix.cpp"
+			"src/augs/window_framework/translate_x_enums.cpp"
 		)
 	endif()
 else()

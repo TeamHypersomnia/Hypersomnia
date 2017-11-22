@@ -1,5 +1,4 @@
 #if BUILD_WINDOW_FRAMEWORK
-#if PLATFORM_WINDOWS
 #include <Windows.h>
 #undef min
 #undef max
@@ -208,5 +207,4 @@ key translate_key_with_lparam(const LPARAM lParam, WPARAM m) {
 
 	return translate_virtual_key(static_cast<UINT>(m));
 }
-#endif
 #endif
