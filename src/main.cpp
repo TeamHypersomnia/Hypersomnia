@@ -1149,7 +1149,7 @@ int work(const int argc, const char* const * const argv) try {
 				const bool was_released = key_change && *key_change == intent_change::RELEASED;
 				
 				if (was_pressed || was_released) {
-					const auto key = e.data.key.key;
+					const auto key = e.get_key();
 
 					if (const auto it = mapped_or_nullptr(viewing_config.app_controls, key)) {
 						if (was_pressed) {
@@ -1206,7 +1206,7 @@ int work(const int argc, const char* const * const argv) try {
 				;
 
 				if (was_pressed || was_released) {
-					const auto key = e.data.key.key;
+					const auto key = e.get_key();
 
 					if (direct_gameplay_or_game_gui || was_released) {
 						if (const auto it = mapped_or_nullptr(viewing_config.app_ingame_controls, key)) {

@@ -249,7 +249,7 @@ namespace augs {
 				
 				switch (press->detail) {
 					case 1:
-					   	if(press->time - last_ldown_time_ms >= 500) {
+					   	if(press->time - last_ldown_time_ms <= 500) {
 							ch.msg = message::ldoubleclick;
 						}
 						else {
