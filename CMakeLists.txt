@@ -1072,7 +1072,7 @@ if(BUILD_WINDOW_FRAMEWORK)
 		find_package(X11 REQUIRED)
 		find_package(ECM REQUIRED NO_MODULE)
 		list(APPEND CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
-		find_package(XCB REQUIRED)
+		find_package(XCB REQUIRED COMPONENTS XCB GLX KEYSYMS)
 		find_package(X11_XCB REQUIRED)
 
 		include_directories(${X11_INCLUDE_DIR})
