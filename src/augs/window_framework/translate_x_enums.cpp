@@ -137,7 +137,7 @@ key translate_keysym(const xcb_keysym_t m) {
 	case XK_minus:										return key::MINUS;
 	case XK_period:										return key::PERIOD;
 	case XK_slash:											return key::SLASH;
-	case XK_hyphen:											return key::DASH;
+	case XK_grave:											return key::TILDE;
 	case XK_bracketleft:											return key::OPEN_SQUARE_BRACKET;
 	case XK_backslash:											return key::BACKSLASH;
 	case XK_bracketright:											return key::CLOSE_SQUARE_BRACKET;

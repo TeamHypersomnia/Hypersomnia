@@ -1,6 +1,6 @@
 return {
   app_controls = {
-    Dash = "SWITCH_DEVELOPER_CONSOLE"
+    Tilde = "SWITCH_DEVELOPER_CONSOLE"
   },
   app_ingame_controls = {
     Backspace = "CLEAR_DEBUG_LINES",

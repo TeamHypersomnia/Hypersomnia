@@ -175,7 +175,7 @@ namespace augs {
 					MINUS,
 					PERIOD,
 					SLASH,
-					DASH,
+					TILDE,
 					OPEN_SQUARE_BRACKET,
 					BACKSLASH,
 					CLOSE_SQUARE_BRACKET,

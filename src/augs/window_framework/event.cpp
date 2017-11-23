@@ -357,7 +357,7 @@ namespace augs {
 				case key::RCTRL: return L"Right Control"; break;
 				case key::LALT: return L"Left Alt"; break;
 				case key::RALT: return L"Right Alt"; break;
-				case key::DASH: return L"Dash"; break;
+				case key::TILDE: return L"Tilde"; break;
 				case key::EQUAL: return L"Equal"; break;
 				case key::VOLUME_MUTE: return L"Volume Mute"; break;
 				case key::VOLUME_DOWN: return L"Volume Down"; break;

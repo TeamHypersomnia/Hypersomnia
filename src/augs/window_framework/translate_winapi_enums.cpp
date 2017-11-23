@@ -178,7 +178,7 @@ key translate_virtual_key(const UINT m) {
 	case VK_OEM_MINUS:										return key::MINUS;
 	case VK_OEM_PERIOD:										return key::PERIOD;
 	case VK_OEM_2:											return key::SLASH;
-	case VK_OEM_3:											return key::DASH;
+	case VK_OEM_3:											return key::TILDE;
 	case VK_OEM_4:											return key::OPEN_SQUARE_BRACKET;
 	case VK_OEM_5:											return key::BACKSLASH;
 	case VK_OEM_6:											return key::CLOSE_SQUARE_BRACKET;
