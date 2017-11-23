@@ -223,7 +223,7 @@ namespace augs {
 				}
 
 				if (change.msg == event::message::deactivate && current_settings.raw_mouse_input) {
-					augs::set_cursor_pos(current_settings.position + last_mouse_pos);
+					set_cursor_pos(last_mouse_pos);
 				}
 			}
 
