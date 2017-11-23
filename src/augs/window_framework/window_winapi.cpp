@@ -329,7 +329,7 @@ namespace augs {
 		RegisterRawInputDevices(Rid, 1, sizeof(Rid[0]));
 
 		apply(settings, true);
-		last_mouse_pos = settings.get_screen_size() / 2;
+		last_mouse_pos = get_screen_size() / 2;
 
 		const auto app_icon_path = settings.app_icon_path.wstring();
 		
