@@ -567,14 +567,12 @@ set(HYPERSOMNIA_TRIVIAL_3RDPARTY_CPPS
 	"src/3rdparty/imgui/imgui_draw.cpp"
 	"src/3rdparty/imgui/imgui_demo.cpp"
 )
-# TODO: add prebuilt glad sources
-#if(UNIX)
-#	if(BUILD_OPENGL)
-#		list(APPEND HYPERSOMNIA_TRIVIAL_3RDPARTY_CPPS
-#			
-#		)
-#	endif()
-#endif()
+
+if(BUILD_GLAD)
+	list(APPEND HYPERSOMNIA_TRIVIAL_3RDPARTY_CPPS
+		"src/3rdparty/glad/glad.c"
+	)
+endif()
 
 # Project resource files, e.g. an icon.
 
@@ -928,13 +926,6 @@ if(BUILD_FREETYPE)
 	add_include_dirs_of("freetype")
 endif()
 
-if(BUILD_GLAD)
-	add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/glad")
-
-	if(ADD_MCMODEL_LARGE_FLAG)
-		target_compile_options(glad PUBLIC -mcmodel=large -no-pie)
-	endif()
-endif()
 
 include_directories(${HYPERSOMNIA_INCLUDE_DIRS})
 
@@ -1042,13 +1033,6 @@ else()
 	add_executable(Hypersomnia ${HYPERSOMNIA_SRCS})
 endif()
 
-if(BUILD_GLAD)
-	# Before Hypersomnia builds,
-	# GLAD must first download and generate the source files.
-
-	add_dependencies(Hypersomnia glad)
-endif()
-
 # We define libraries upon which Hypersomnia depends.
 
 set(HYPERSOMNIA_LIBS lua)
@@ -1083,12 +1067,6 @@ if(BUILD_WINDOW_FRAMEWORK)
 		list(APPEND HYPERSOMNIA_LIBS ${XCB_LIBRARIES})
 		list(APPEND HYPERSOMNIA_LIBS ${X11_XCB_LIBRARIES})
 	endif()
-endif()
-
-if(BUILD_GLAD)
-	list(APPEND HYPERSOMNIA_LIBS
-		glad
-	)
 endif()
 
 if(BUILD_OPENAL)
