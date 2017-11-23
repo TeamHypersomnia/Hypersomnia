@@ -36,37 +36,6 @@ namespace augs {
 		return DefWindowProc(hwnd, umsg, wParam, lParam);
 	}
 
-	event::change window::do_raw_motion(const basic_vec2<short> motion) {
-		event::change change;
-		
-		change.data.mouse.rel = motion;
-
-		if (!mouse_pos_frozen) {
-			last_mouse_pos += vec2i(change.data.mouse.rel);
-		}
-
-		const auto screen_size = current_settings.get_screen_size() - vec2i(1, 1);
-		last_mouse_pos.clamp_from_zero_to(screen_size);
-		change.data.mouse.pos = basic_vec2<short>(last_mouse_pos);
-		change.msg = event::message::mousemotion;
-
-		return change;
-	}
-	
-	std::optional<event::change> window::sync_mouse_on_click_activate(const event::change& new_change) {
-		if (const bool should_sync_mouse = new_change.msg == event::message::click_activate
-			&& get_current_settings().raw_mouse_input
-		) {
-			if (const auto screen_space = get_cursor_pos()) {
-				const auto window_pos = get_window_rect().get_position();
-				const auto rel_v = basic_vec2<short>((*screen_space - window_pos) - last_mouse_pos);
-				return do_raw_motion(rel_v);
-			}
-		}
-
-		return std::nullopt;
-	}
-
 	std::optional<event::change> window::handle_event(const UINT m, const WPARAM wParam, const LPARAM lParam) {
 		using namespace event::keys;
 
@@ -218,7 +187,7 @@ namespace augs {
 			return change;
 
 		case WM_INPUT:
-			if (active && (current_settings.raw_mouse_input || mouse_pos_frozen)) {
+			if (is_active() && (current_settings.raw_mouse_input || mouse_pos_paused)) {
 				thread_local BYTE lpb[sizeof(RAWINPUT)];
 				thread_local UINT dwSize = sizeof(RAWINPUT);
 
@@ -233,23 +202,18 @@ namespace augs {
 				const auto* const raw = reinterpret_cast<RAWINPUT*>(lpb);
 
 				if (raw->header.dwType == RIM_TYPEMOUSE) {
-					change = do_raw_motion({
+					return do_raw_motion({
 						static_cast<short>(raw->data.mouse.lLastX),
 						static_cast<short>(raw->data.mouse.lLastY)
 					});
 				}
 			}
-			else {
-				return std::nullopt;
-			}
 
-			return change;
+			return std::nullopt;
 
 		case WM_ACTIVATE:
 			{
 				const auto type = LOWORD(wParam);
-
-				active = type != WA_INACTIVE;
 
 				switch (type) {
 				case WA_INACTIVE: change.msg = event::message::deactivate; return change;
@@ -258,7 +222,7 @@ namespace augs {
 				default: return std::nullopt;
 				}
 
-				if (!active && current_settings.raw_mouse_input) {
+				if (change.msg == event::message::deactivate && current_settings.raw_mouse_input) {
 					augs::set_cursor_pos(current_settings.position + last_mouse_pos);
 				}
 			}
@@ -455,10 +419,7 @@ namespace augs {
 				TranslateMessage(&wmsg);
 
 				if (new_change.has_value()) {
-					if (const auto mouse_change = sync_mouse_on_click_activate(*new_change)) {
-						output.push_back(*mouse_change);
-					}
-
+					common_event_handler(*new_change, output);
 					output.push_back(*new_change);
 				}
 			}
@@ -480,10 +441,6 @@ namespace augs {
 		return ltrbi(r.left, r.top, r.right, r.bottom);
 	}
 
-	bool window::is_active() const {
-		return active;
-	}
-	
 	static auto get_filter(const std::vector<window::file_dialog_filter>& filters) {
 		std::wstring filter;
 

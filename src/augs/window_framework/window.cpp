@@ -12,6 +12,55 @@
 /* Common interface */
 
 namespace augs {
+	event::change window::do_raw_motion(const basic_vec2<short> motion) {
+		event::change change;
+		
+		change.data.mouse.rel = motion;
+
+		if (!mouse_pos_paused) {
+			last_mouse_pos += vec2i(change.data.mouse.rel);
+		}
+
+		const auto screen_size = current_settings.get_screen_size() - vec2i(1, 1);
+		last_mouse_pos.clamp_from_zero_to(screen_size);
+		change.data.mouse.pos = basic_vec2<short>(last_mouse_pos);
+		change.msg = event::message::mousemotion;
+
+		return change;
+	}
+
+	std::optional<event::change> window::sync_mouse_on_click_activate(const event::change& new_change) {
+		if (const bool should_sync_mouse = new_change.msg == event::message::click_activate
+			&& get_current_settings().raw_mouse_input
+		) {
+			if (const auto screen_space = get_cursor_pos()) {
+				const auto window_pos = get_window_rect().get_position();
+				const auto rel_v = basic_vec2<short>((*screen_space - window_pos) - last_mouse_pos);
+				return do_raw_motion(rel_v);
+			}
+		}
+
+		return std::nullopt;
+	}
+
+	void window::common_event_handler(event::change ch, local_entropy& output) {
+		using namespace event;
+
+		if (ch.msg == message::activate
+			|| ch.msg == message::click_activate
+		) {
+			active = true;
+		}
+		
+		if (ch.msg == message::deactivate) {
+			active = false;
+		}
+
+		if (const auto mouse_change = sync_mouse_on_click_activate(ch)) {
+			output.push_back(ch);
+		}
+	}
+
 	vec2i window_settings::get_screen_size() const {
 		return fullscreen ? augs::get_display().get_size() : size;
 	}
@@ -36,7 +85,7 @@ namespace augs {
 	std::optional<event::change> window::handle_mousemove(const basic_vec2<short> new_pos) {
 		event::change change;
 
-		if (!current_settings.raw_mouse_input && !mouse_pos_frozen) {
+		if (!current_settings.raw_mouse_input && !mouse_pos_paused) {
 			change.data.mouse.rel = new_pos - basic_vec2<short>(last_mouse_pos);
 			
 			last_mouse_pos = new_pos;
@@ -101,16 +150,20 @@ namespace augs {
 		return current_settings;
 	}
 
-	void window::set_mouse_pos_frozen(const bool flag) {
-		if (mouse_pos_frozen && !flag) {
+	void window::set_mouse_pos_paused(const bool flag) {
+		if (const bool unpause = mouse_pos_paused && !flag) {
 			augs::set_cursor_pos(current_settings.position + last_mouse_pos);
 		}
 
-		mouse_pos_frozen = flag;
+		mouse_pos_paused = flag;
 	}
 	
-	bool window::is_mouse_pos_frozen() const {
-		return mouse_pos_frozen;
+	bool window::is_mouse_pos_paused() const {
+		return mouse_pos_paused;
+	}
+
+	bool window::is_active() const {
+		return active;
 	}
 
 	window::~window() {

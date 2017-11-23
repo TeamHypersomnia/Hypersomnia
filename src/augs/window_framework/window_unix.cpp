@@ -1,3 +1,6 @@
+#include <unistd.h>
+#include <fcntl.h>
+
 #include <X11/Xlib.h>
 #include <X11/Xlib-xcb.h>
 
@@ -19,6 +22,30 @@ auto freed_unique(T* const ptr) {
 namespace augs {
 	window::window(const window_settings& settings) {
 		last_mouse_pos = settings.get_screen_size() / 2;
+
+		// setup raw mouse input
+		{
+			const char* const pDevice = "/dev/input/mice";
+
+			// Open Mouse
+			auto& fd = raw_mouse_input_fd;
+
+			fd = open(pDevice, O_RDONLY);
+
+			if (fd == -1) {
+				throw window_error(
+					"Failed to open %x for reading raw mouse input.\n"
+					"This might be due to insufficient permissions.\n"
+					"If you want to keep using raw mouse input,\n"
+				    "you will need to add your user to the input group.\n"
+					"Refer to this tutorial:\n"
+					"https://puredata.info/docs/faq/how-can-i-set-permissions-so-hid-can-read-devices-in-gnu-linux"
+				, pDevice);
+			}
+
+			const int flags = fcntl(fd, F_GETFL, 0);
+			fcntl(fd, F_SETFL, flags | O_NONBLOCK);
+		}
 
 		int default_screen = 0xdeadbeef;
 
@@ -92,7 +119,8 @@ namespace augs {
 				| XCB_EVENT_MASK_POINTER_MOTION
 				| XCB_EVENT_MASK_BUTTON_PRESS
 				| XCB_EVENT_MASK_BUTTON_RELEASE
-			;
+				| XCB_EVENT_MASK_FOCUS_CHANGE
+		   	;
 
 			uint32_t valuelist[] = { eventmask, colormap, 0 };
 			uint32_t valuemask = XCB_CW_EVENT_MASK | XCB_CW_COLORMAP;
@@ -143,6 +171,8 @@ namespace augs {
 		if (display) {
 			unset_if_current();
 
+			close(raw_mouse_input_fd);
+
 			xcb_key_symbols_free(syms);	
 
 			glXDestroyWindow(display, glxwindow);
@@ -187,8 +217,7 @@ namespace augs {
 	bool window::swap_buffers() { 
 		glXSwapBuffers(display, drawable);
 		return true;
-	}
-
+	} 
 	template <class F, class G>
 	std::optional<event::change> handle_event(
 		const xcb_generic_event_t* event,
@@ -206,6 +235,14 @@ namespace augs {
 		change ch;
 
 		switch (event->response_type & ~0x80) {
+			case XCB_FOCUS_OUT:
+			   ch.msg = message::deactivate;
+		   	   return ch;
+
+			case XCB_FOCUS_IN:
+			   ch.msg = message::activate;
+		   	   return ch;
+
             case XCB_KEY_PRESS: {
 				const auto* const press = reinterpret_cast<const xcb_key_press_event_t*>(event);
 			
@@ -331,7 +368,23 @@ namespace augs {
 		}
 	}
 
-	void window::collect_entropy(local_entropy& into) {
+	void window::collect_entropy(local_entropy& output) {
+		if (is_active() && (current_settings.raw_mouse_input || mouse_pos_paused)) {
+			// handle raw mouse input separately
+    		
+			unsigned char data[3];
+			
+			while (read(raw_mouse_input_fd, data, sizeof(data)) > 0) {
+				const signed char x = data[1];
+				const signed char y = data[2];
+
+				output.push_back(do_raw_motion({
+					static_cast<short>(x),
+					static_cast<short>(y * (-1)) 
+				}));
+			}	
+		}
+
 		auto keysym_getter = [this](const xcb_keycode_t keycode){
 			return xcb_key_symbols_get_keysym(syms, keycode, 0);
 		};
@@ -343,7 +396,8 @@ namespace augs {
 				[this](const basic_vec2<short> p) { return handle_mousemove(p); },
 				keysym_getter
 			)) {
-				into.push_back(*ch);
+				common_event_handler(*ch, output);
+				output.push_back(*ch);
 			}
 		}
 	}
@@ -360,8 +414,6 @@ namespace augs {
 
 		return { geom->x, geom->y, geom->width, geom->height }; 
 	}
-
-	bool window::is_active() const { return false; }
 
 	bool window::set_as_current_impl() {
 #if BUILD_OPENGL

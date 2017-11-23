@@ -63,7 +63,6 @@ namespace augs {
 		int style = 0xdeadbeef;
 		int exstyle = 0xdeadbeef;
 
-		bool active = false;
 		bool double_click_occured = false;
 		bool clear_window_inputs_once = true;
 
@@ -71,9 +70,6 @@ namespace augs {
 		unsigned triple_click_delay = 0xdeadbeef; /* maximum delay time for the next click (after doubleclick) to be considered tripleclick (in milliseconds) */
 
 		void show();
-
-		event::change do_raw_motion(const basic_vec2<short>);
-		std::optional<event::change> sync_mouse_on_click_activate(const event::change&);
 
 		std::optional<event::change> handle_event(
 			const UINT, 
@@ -92,16 +88,24 @@ namespace augs {
 		xcb_connection_t *connection = nullptr;
 
 		xcb_key_symbols_t* syms = nullptr;
+		
+		int raw_mouse_input_fd = -1;
 #else
 #error "Unsupported platform!"
 #endif
 
+		bool active = false;
+
 		vec2i last_mouse_pos;
-		bool mouse_pos_frozen = false;
+		bool mouse_pos_paused = false;
 
 		std::optional<event::change> handle_mousemove(
 			const basic_vec2<short> new_position
 		);
+		
+		event::change do_raw_motion(const basic_vec2<short>);
+		std::optional<event::change> sync_mouse_on_click_activate(const event::change&);
+		void common_event_handler(event::change, local_entropy&);
 
 		using settable_as_current_base = settable_as_current_mixin<window>;
 		friend settable_as_current_base;
@@ -128,8 +132,8 @@ namespace augs {
 
 		bool swap_buffers();
 
-		void set_mouse_pos_frozen(const bool);
-		bool is_mouse_pos_frozen() const;
+		void set_mouse_pos_paused(const bool);
+		bool is_mouse_pos_paused() const;
 
 		void apply(const window_settings&, const bool force = false);
 		void sync_back_into(window_settings&);

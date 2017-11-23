@@ -959,7 +959,13 @@ int work(const int argc, const char* const * const argv) try {
 
 			configurables.sync_back_into(config);
 
-			window.set_mouse_pos_frozen(in_direct_gameplay);
+			/*
+				We "pause" the mouse cursor's position when we are in direct gameplay,
+				so that when switching to GUI, the cursor appears where it disappeared.
+				(it does not physically freeze the cursor, it just remembers the position)
+			*/
+
+			window.set_mouse_pos_paused(in_direct_gameplay);
 
 			perform_imgui_pass(
 				new_window_entropy,
@@ -1238,7 +1244,6 @@ int work(const int argc, const char* const * const argv) try {
 						}
 					}
 				}
-
 				if (
 					e.msg == message::mousemotion
 					&& direct_gameplay_or_game_gui
@@ -1556,7 +1561,7 @@ int work(const int argc, const char* const * const argv) try {
 		);
 
 		/* #6 */
-		const bool should_draw_our_cursor = viewing_config.window.raw_mouse_input && !window.is_mouse_pos_frozen();
+		const bool should_draw_our_cursor = viewing_config.window.raw_mouse_input && !window.is_mouse_pos_paused();
 
 		{
 			const auto cursor_drawing_pos = common_input_state.mouse.pos;
