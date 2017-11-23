@@ -22,9 +22,6 @@
 [submodule "3rdparty/Catch"]
 	path = src/3rdparty/Catch
 	url = https://github.com/philsquared/Catch.git
-[submodule "3rdparty/glad"]
-	path = src/3rdparty/glad
-	url = https://github.com/Dav1dde/glad.git
 [submodule "src/3rdparty/sol2"]
 	path = src/3rdparty/sol2
 	url = https://github.com/ThePhD/sol2.git
