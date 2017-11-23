@@ -6,11 +6,17 @@
 #define OGG_BUFFER_SIZE 4096
 #endif
 
+#include "augs/misc/scope_guard.h"
 #include "augs/audio/sound_data.h"
 #include "augs/ensure.h"
 #include "augs/filesystem/file.h"
 #include "augs/audio/sound_data.h"
 #include "augs/build_settings/setting_log_audio_files.h"
+
+template <class T>
+auto fclosed_unique(T* const ptr) {
+	return std::unique_ptr<T, decltype(fclose)*>(ptr, fclose);
+}
 
 namespace augs {
 	sound_data::sound_data(const path_type& path) {
@@ -29,10 +35,12 @@ namespace augs {
 			long bytes = 0xdeadbeef;
 			char array[OGG_BUFFER_SIZE]; 
 
-			auto ogg_stdio_file = std::unique_ptr<FILE, decltype(&fclose)>(fopen(path_str.c_str(), "rb"), &fclose);
-
 			OggVorbis_File oggFile;
-			ov_open(ogg_stdio_file.get(), &oggFile, NULL, 0);
+			ov_fopen(path_str.c_str(), &oggFile);
+			
+			auto scope = make_scope_guard([&oggFile](){
+				ov_clear(&oggFile);
+			});
 
 			const auto* pInfo = ov_info(&oggFile, -1);
 			channels = pInfo->channels;
@@ -45,11 +53,9 @@ namespace augs {
 
 			samples.resize(buffer.size() / sizeof(sound_sample_type));
 			std::memcpy(samples.data(), buffer.data(), buffer.size());
-
-			ov_clear(&oggFile);
 		}
 		else if (extension == ".wav") {
-			auto wav_file = std::unique_ptr<FILE, decltype(&fclose)>(fopen(path_str.c_str(), "rb"), &fclose);
+			auto wav_file = fclosed_unique(fopen(path_str.c_str(), "rb"));
 
 			typedef struct WAV_HEADER {
 				/* RIFF Chunk Descriptor */
