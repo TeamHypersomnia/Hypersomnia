@@ -481,6 +481,41 @@ xcb_ewmh_init_atoms_replies(&EWMH, EWMHCookie, NULL);
 		XUngrabPointer(display, CurrentTime);
 	}
 
+	void window::set_cursor_visible(const bool flag) {
+		if (!flag) {
+			static const auto sharedInvisibleCursor = [this](){
+				// Thanks to:
+				// https://stackoverflow.com/a/664528/503776
+
+				Cursor invisibleCursor;
+				Pixmap bitmapNoData;
+				XColor black;
+				static char noData[] = { 0,0,0,0,0,0,0,0 };
+				black.red = black.green = black.blue = 0;
+
+				bitmapNoData = XCreateBitmapFromData(display, window_id, noData, 8, 8);
+
+				invisibleCursor = XCreatePixmapCursor(
+					display,
+				   	bitmapNoData, 
+					bitmapNoData, 
+					&black, 
+					&black, 
+					0, 
+					0
+				);
+				
+				XFreePixmap(display, bitmapNoData);
+				return invisibleCursor;
+			}();
+
+			XDefineCursor(display,window_id, sharedInvisibleCursor);
+		}
+		else {
+			XUndefineCursor(display,window_id);
+		}
+	}
+
 	std::optional<std::string> window::open_file_dialog(
 		const std::vector<file_dialog_filter>& filters,
 		std::string custom_title

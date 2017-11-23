@@ -1042,11 +1042,11 @@ int work(const int argc, const char* const * const argv) try {
 				)
 			) {
 				window.clip_system_cursor();
-				augs::set_cursor_visible(false);
+				window.set_cursor_visible(false);
 			}
 			else {
 				window.disable_cursor_clipping();
-				augs::set_cursor_visible(true);
+				window.set_cursor_visible(true);
 			}
 
 			releases.set_due_to_imgui(ImGui::GetIO());

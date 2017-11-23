@@ -573,5 +573,14 @@ namespace augs {
 	void window::disable_cursor_clipping() {
 		ClipCursor(NULL);
 	}
+
+	void window::set_cursor_visible(const bool flag) {
+		if (!flag) {
+			while (ShowCursor(FALSE) >= 0);
+		}
+		else {
+			while (ShowCursor(TRUE) <= 0);
+		}
+	}
 }
 

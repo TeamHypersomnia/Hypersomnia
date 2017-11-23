@@ -32,15 +32,6 @@ namespace augs {
 		return xywhi(rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top);
 	}
 
-	void set_cursor_visible(const bool flag) {
-		if (!flag) {
-			while (ShowCursor(FALSE) >= 0);
-		}
-		else {
-			while (ShowCursor(TRUE) <= 0);
-		}
-	}
-
 	std::optional<vec2i> get_cursor_pos() {
 		POINT p;
 
@@ -63,14 +54,6 @@ namespace augs {
 		return {};
 	}
 
-	void set_cursor_visible(const bool flag) {
-
-	}
-
-	void set_cursor_pos(const vec2i pos) {
-	
-	}
-
 	std::optional<vec2i> get_cursor_pos() {
 		return std::nullopt;
 	}
@@ -88,14 +71,6 @@ namespace augs {
 
 	xywhi get_display() {
 		return {};
-	}
-
-	void set_cursor_visible(const bool flag) {
-
-	}
-
-	void set_cursor_pos(const vec2i pos) {
-
 	}
 
 	std::optional<vec2i> get_cursor_pos() {

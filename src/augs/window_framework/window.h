@@ -151,6 +151,7 @@ namespace augs {
 		void set_cursor_pos(vec2i);
 		void clip_system_cursor();
 		void disable_cursor_clipping();
+		void set_cursor_visible(bool flag); 
 
 		bool is_active() const;
 
