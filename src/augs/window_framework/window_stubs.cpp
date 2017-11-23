@@ -18,7 +18,6 @@ namespace augs {
 
 	xywhi window::get_window_rect() const { return {}; }
 
-	bool window::is_active() const { return false; }
 	void window::destroy() {}
 
 	bool window::set_as_current_impl() {
