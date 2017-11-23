@@ -15,19 +15,6 @@ namespace augs {
 #undef max
 
 namespace augs {
-	void clip_system_cursor(const ltrbi lt) {
-		thread_local RECT r;
-		r.bottom = lt.b;
-		r.left = lt.l;
-		r.right = lt.r;
-		r.top = lt.t;
-		ClipCursor(&r);
-	}
-
-	void disable_cursor_clipping() {
-		ClipCursor(NULL);
-	}
-
 	bool set_display(const vec2i v, const int bpp) {
 		static DEVMODE screen;
 		ZeroMemory(&screen, sizeof(screen));
@@ -72,14 +59,6 @@ namespace augs {
 #elif PLATFORM_UNIX
 
 namespace augs {
-	void clip_system_cursor(const ltrbi lt) {
-		
-	}
-
-	void disable_cursor_clipping() {
-
-	}
-
 	bool set_display(const vec2i v, const int bpp) {
 		return true;
 	}
@@ -107,14 +86,6 @@ namespace augs {
 
 #else
 namespace augs {
-	void clip_system_cursor(const ltrbi lt) {
-
-	}
-
-	void disable_cursor_clipping() {
-
-	}
-
 	bool set_display(const vec2i v, const int bpp) {
 		return true;
 	}

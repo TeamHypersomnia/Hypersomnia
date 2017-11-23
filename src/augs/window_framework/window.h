@@ -148,6 +148,9 @@ namespace augs {
 		vec2i get_screen_size() const;
 		xywhi get_window_rect() const;
 
+		void clip_system_cursor();
+		void disable_cursor_clipping();
+
 		bool is_active() const;
 
 		struct file_dialog_filter {

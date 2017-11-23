@@ -15,8 +15,5 @@ namespace augs {
 	std::string get_data_from_clipboard();
 	std::string get_executable_path();
 
-	void clip_system_cursor(ltrbi);
-	void disable_cursor_clipping();
-
 	bool is_character_newline(unsigned i);
 }

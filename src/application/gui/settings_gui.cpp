@@ -151,12 +151,12 @@ void settings_gui_state::perform(
 				}
 
 				{
-					text("Mouse input source");
+					text("GUI cursor input source");
 
 					auto indent = scoped_indent();
 
 					int e = config.window.raw_mouse_input ? 1 : 0;
-					ImGui::RadioButton("Raw", &e, 1);
+					ImGui::RadioButton("Raw (traps cursor inside the window)", &e, 1);
 					
 					if (ImGui::IsItemHovered()) {
 						text_tooltip("Game draws its own cursor.\nWhen in GUI mode,\nforces the cursor inside the window.");

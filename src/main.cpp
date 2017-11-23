@@ -1041,11 +1041,11 @@ int work(const int argc, const char* const * const argv) try {
 					)
 				)
 			) {
-				augs::clip_system_cursor(window.get_window_rect());
+				window.clip_system_cursor();
 				augs::set_cursor_visible(false);
 			}
 			else {
-				augs::disable_cursor_clipping();
+				window.disable_cursor_clipping();
 				augs::set_cursor_visible(true);
 			}
 

@@ -458,6 +458,24 @@ xcb_ewmh_init_atoms_replies(&EWMH, EWMHCookie, NULL);
 #endif
 	}
 
+	void window::clip_system_cursor() {
+		XGrabPointer(
+			display,
+		   	window_id,
+		   	True,
+		   	0,
+            GrabModeAsync, 
+			GrabModeAsync,
+            window_id,
+		   	None,
+		   	CurrentTime
+		);
+	}
+
+	void window::disable_cursor_clipping() {
+		XUngrabPointer(display, CurrentTime);
+	}
+
 	std::optional<std::string> window::open_file_dialog(
 		const std::vector<file_dialog_filter>& filters,
 		std::string custom_title

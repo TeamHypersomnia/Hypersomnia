@@ -550,5 +550,22 @@ namespace augs {
 			return std::nullopt;
 		}
 	}
+
+	void window::clip_system_cursor() {
+		thread_local RECT r;
+		
+		const ltrbi lt = get_window_rect();
+
+		r.bottom = lt.b;
+		r.left = lt.l;
+		r.right = lt.r;
+		r.top = lt.t;
+
+		ClipCursor(&r);
+	}
+
+	void window::disable_cursor_clipping() {
+		ClipCursor(NULL);
+	}
 }
 

@@ -1,10 +1,12 @@
 #include "augs/ensure.h"
 #include "augs/filesystem/file.h"
-#include "augs/window_framework/platform_utils.h"
+#include "augs/window_framework/window.h"
 #include "augs/window_framework/shell.h"
 
 void save_log_and_terminate() {
-	augs::disable_cursor_clipping();
+	if (augs::window::current_exists()) {
+		augs::window::get_current().disable_cursor_clipping();
+	}
 	
 	const auto logs = program_log::get_current().get_complete();
 	const auto failure_log_path = augs::path_type(LOG_FILES_DIR "ensure_failed_debug_log.txt");

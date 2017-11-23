@@ -26,13 +26,6 @@ namespace augs {
 	}
 
 	void global_libraries::init(const library_flagset to_initialize) {
-#if 0
-		signal(SIGSEGV, [](const int signal) {
-			augs::disable_cursor_clipping();
-			throw "Access violation!";
-		});
-#endif
-
 		if(to_initialize.test(library::FREETYPE)) {
 #if BUILD_FREETYPE
 			ensure(!FT_Init_FreeType(freetype_library.get()) && "freetype initialization");
