@@ -811,10 +811,13 @@ int work(const int argc, const char* const * const argv) try {
 		};
 	};
 
+	/* MSVC ICE workaround */
+	auto& _window = window;
+
 	static auto make_create_menu_context = [&](const config_lua_table& cfg) {
 		return [&](auto& gui) {
 			return gui.create_context(
-				window.get_screen_size(),
+				_window.get_screen_size(),
 				_common_input_state,
 				create_menu_context_deps(cfg)
 			);

@@ -19,7 +19,6 @@ auto freed_unique(T* const ptr) {
 	return std::unique_ptr<T, decltype(free)*>(ptr, free);
 }
 
-
 namespace augs {
 	window::window(const window_settings& settings) {
 		// setup raw mouse input
