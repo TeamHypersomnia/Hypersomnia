@@ -512,12 +512,12 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 if(BUILD_WINDOW_FRAMEWORK)
 	if(MSVC)
 		list(APPEND HYPERSOMNIA_CODEBASE_CPPS
-			"src/augs/window_framework/window_windows.cpp"
+			"src/augs/window_framework/window_winapi.cpp"
 			"src/augs/window_framework/translate_winapi_enums.cpp"
 		)
 	elseif(UNIX)
 		list(APPEND HYPERSOMNIA_CODEBASE_CPPS
-			"src/augs/window_framework/window_unix.cpp"
+			"src/augs/window_framework/window_x.cpp"
 			"src/augs/window_framework/translate_x_enums.cpp"
 		)
 	endif()
