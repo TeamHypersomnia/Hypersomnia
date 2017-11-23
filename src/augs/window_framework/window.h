@@ -117,6 +117,9 @@ namespace augs {
 		void set_window_border_enabled(const bool);
 		void set_window_rect(const xywhi);
 
+		void set_fullscreen_geometry(const bool);
+		void set_fullscreen_hint(const bool);
+
 		window_settings current_settings;
 
 		void destroy();

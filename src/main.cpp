@@ -171,7 +171,7 @@ int work(const int argc, const char* const * const argv) try {
 	static augs::renderer renderer;
 
 	static necessary_fbos fbos(
-		config.window.get_screen_size(),
+		window.get_screen_size(),
 		config.drawing
 	);
 
@@ -650,7 +650,7 @@ int work(const int argc, const char* const * const argv) try {
 		const double speed_multiplier,
 		const config_lua_table& viewing_config
 	) {
-		const auto screen_size = viewing_config.window.get_screen_size();
+		const auto screen_size = window.get_screen_size();
 		const auto viewed_character = get_viewed_character();
 		const auto& cosmos = viewed_character.get_cosmos();
 		
@@ -803,7 +803,7 @@ int work(const int argc, const char* const * const argv) try {
 	static auto make_create_game_gui_context = [&](const config_lua_table& cfg) {
 		return [&]() {
 			return game_gui.create_context(
-				cfg.window.get_screen_size(),
+				window.get_screen_size(),
 				_common_input_state,
 				get_viewed_character(),
 				create_game_gui_deps()
@@ -814,7 +814,7 @@ int work(const int argc, const char* const * const argv) try {
 	static auto make_create_menu_context = [&](const config_lua_table& cfg) {
 		return [&](auto& gui) {
 			return gui.create_context(
-				cfg.window.get_screen_size(),
+				window.get_screen_size(),
 				_common_input_state,
 				create_menu_context_deps(cfg)
 			);
@@ -1325,7 +1325,7 @@ int work(const int argc, const char* const * const argv) try {
 			}
 		);
 
-		const auto screen_size = viewing_config.window.get_screen_size();
+		const auto screen_size = window.get_screen_size();
 
 		auto create_menu_context = make_create_menu_context(viewing_config);
 		auto create_game_gui_context = make_create_game_gui_context(viewing_config);

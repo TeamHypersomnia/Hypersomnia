@@ -5,7 +5,6 @@
 #include "augs/math/vec2.h"
 
 namespace augs {
-	bool set_display(const vec2i, int bpp);
 	xywhi get_display();
 
 	void set_cursor_visible(const bool flag);

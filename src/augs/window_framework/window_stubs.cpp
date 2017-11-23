@@ -13,6 +13,9 @@ namespace augs {
 	void window::collect_entropy(local_entropy& into) {}
 
 	void window::set_window_rect(const xywhi) {}
+	
+	void window::set_fullscreen_hint(const bool flag) {}
+
 	xywhi window::get_window_rect() const { return {}; }
 
 	bool window::is_active() const { return false; }

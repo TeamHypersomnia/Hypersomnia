@@ -5,6 +5,7 @@
 #include <X11/Xlib-xcb.h>
 
 #include <xcb/xcb.h>
+#include <xcb/xcb_ewmh.h>
 #include <xcb/xcb_keysyms.h>
 
 #include <GL/glx.h>
@@ -21,8 +22,6 @@ auto freed_unique(T* const ptr) {
 
 namespace augs {
 	window::window(const window_settings& settings) {
-		last_mouse_pos = settings.get_screen_size() / 2;
-
 		// setup raw mouse input
 		{
 			const char* const pDevice = "/dev/input/mice";
@@ -165,6 +164,8 @@ namespace augs {
 
 		setup_and_run(default_screen, screen);
 		apply(settings, true);
+
+		last_mouse_pos = get_screen_size() / 2;
 	}
 
 	void window::destroy() {
@@ -204,7 +205,7 @@ namespace augs {
 	}
 
 	void window::set_window_border_enabled(const bool flag) {
-		uint32_t new_width = flag ? 0 : 1;
+		uint32_t new_width = flag ? 1 : 0;
 
 		xcb_configure_window(
 			connection,
@@ -284,7 +285,7 @@ namespace augs {
 				
 				switch (press->detail) {
 					case 1:
-					   	if(press->time - last_ldown_time_ms <= 500) {
+					   	if (press->time - last_ldown_time_ms <= 500) {
 							ch.msg = message::ldoubleclick;
 						}
 						else {
@@ -403,7 +404,34 @@ namespace augs {
 	}
 
 
-	void window::set_window_rect(const xywhi) {}
+	void window::set_window_rect(const xywhi r) {
+		uint32_t values[4] = {
+			static_cast<uint32_t>(r.x),
+			static_cast<uint32_t>(r.y),
+			static_cast<uint32_t>(r.w),
+			static_cast<uint32_t>(r.h)
+		};
+
+		xcb_configure_window(
+			connection,
+			window_id,
+			XCB_CONFIG_WINDOW_X 
+			| XCB_CONFIG_WINDOW_Y
+			| XCB_CONFIG_WINDOW_WIDTH
+			| XCB_CONFIG_WINDOW_HEIGHT
+			,	
+			values
+		);
+	}
+
+	void window::set_fullscreen_hint(const bool flag) {
+// TODO: actually implement fullscreen
+#if 0
+xcb_ewmh_connection_t EWMH;
+xcb_intern_atom_cookie_t *EWMHCookie = xcb_ewmh_init_atoms(connection, &EWMH);
+xcb_ewmh_init_atoms_replies(&EWMH, EWMHCookie, NULL);
+#endif
+	}
 
 	xywhi window::get_window_rect() const { 
 		xcb_get_geometry_cookie_t  geomCookie = xcb_get_geometry (connection, window_id);

@@ -39,7 +39,7 @@ void configuration_subscribers::sync_back_into(config_lua_table& into) const {
 void configuration_subscribers::apply(const config_lua_table& new_config) const {
 	DEBUG_DRAWING = new_config.debug_drawing;
 	
-	const auto screen_size = new_config.window.get_screen_size();
+	const auto screen_size = window.get_screen_size();
 
 	fbos.apply(screen_size, new_config.drawing);
 	window.apply(new_config.window);
@@ -61,7 +61,7 @@ void settings_gui_state::perform(
 	using namespace augs::imgui;
 
 	{
-		const auto screen_size = vec2(config.window.get_screen_size());
+		const auto screen_size = vec2(ImGui::GetIO().DisplaySize);
 		const auto initial_settings_size = screen_size / 1.5;
 
 		ImGui::SetNextWindowPos(ImVec2(screen_size / 2 - initial_settings_size / 2), ImGuiSetCond_FirstUseEver);

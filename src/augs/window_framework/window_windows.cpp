@@ -441,6 +441,10 @@ namespace augs {
 		return ltrbi(r.left, r.top, r.right, r.bottom);
 	}
 
+	void window::set_fullscreen_hint(const bool flag) {
+		
+	}
+
 	static auto get_filter(const std::vector<window::file_dialog_filter>& filters) {
 		std::wstring filter;
 

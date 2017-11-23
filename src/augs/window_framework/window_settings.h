@@ -1,5 +1,6 @@
 #pragma once
 #include "augs/filesystem/path.h"
+#include "augs/math/rects.h"
 
 namespace augs {
 	struct window_settings {
@@ -14,6 +15,8 @@ namespace augs {
 		bool raw_mouse_input = true;
 		// END GEN INTROSPECTOR
 
-		vec2i get_screen_size() const;
+		xywhi make_window_rect() const {
+			return { position, size };
+		}
 	};
 }

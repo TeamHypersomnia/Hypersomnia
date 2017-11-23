@@ -21,7 +21,7 @@ namespace augs {
 			last_mouse_pos += vec2i(change.data.mouse.rel);
 		}
 
-		const auto screen_size = current_settings.get_screen_size() - vec2i(1, 1);
+		const auto screen_size = get_screen_size() - vec2i(1, 1);
 		last_mouse_pos.clamp_from_zero_to(screen_size);
 		change.data.mouse.pos = basic_vec2<short>(last_mouse_pos);
 		change.msg = event::message::mousemotion;
@@ -61,10 +61,6 @@ namespace augs {
 		}
 	}
 
-	vec2i window_settings::get_screen_size() const {
-		return fullscreen ? augs::get_display().get_size() : size;
-	}
-	
 	local_entropy window::collect_entropy() {
 		local_entropy output;
 		collect_entropy(output);
@@ -73,6 +69,15 @@ namespace augs {
 
 	vec2i window::get_screen_size() const {
 		return get_window_rect().get_size();	
+	}
+
+	void window::set_fullscreen_geometry(const bool flag) {
+		if (flag) {
+ 			set_window_rect(get_display());
+		}
+		else {
+ 			set_window_rect(get_current_settings().make_window_rect());
+		}	
 	}
 
 	void window::sync_back_into(window_settings& into) {
@@ -109,38 +114,41 @@ namespace augs {
 			set_window_name(settings.name);
 		}
 
-		if (force || changed(settings.position)) {
-			auto r = get_window_rect();
-			r.set_position(settings.position);
-			set_window_rect(r);
-		}
-
 		if (force || changed(settings.border)) {
 			set_window_border_enabled(!settings.fullscreen && settings.border);
 		}
 
 		if (force || changed(settings.fullscreen)) {
 			if (settings.fullscreen) {
-				set_display(settings.get_screen_size(), settings.bpp);
 				set_window_border_enabled(false);
+				set_fullscreen_geometry(true);
+				set_fullscreen_hint(true);
 			}
 			else {
 				set_window_border_enabled(settings.border);
+				set_fullscreen_geometry(false);
+				set_fullscreen_hint(false);
 			}
 		}
 
-		if (force
-			|| settings.get_screen_size() != current_settings.get_screen_size()
-			|| changed(settings.border)
-		) {
-			xywhi screen_rect;
+		if (!settings.fullscreen) {
+			if (force
+				|| changed(settings.position)
+				|| changed(settings.border)
+			) {
+				xywhi screen_rect;
 
-			if (!settings.fullscreen) {
 				screen_rect.set_position(settings.position);
+				screen_rect.set_size(settings.size);
+	
+				set_window_rect(screen_rect);
 			}
-
-			screen_rect.set_size(settings.get_screen_size());
-			set_window_rect(screen_rect);
+	
+			if (force || changed(settings.position)) {
+				auto r = get_window_rect();
+				r.set_position(settings.position);
+				set_window_rect(r);
+			}
 		}
 
 		current_settings = settings;
