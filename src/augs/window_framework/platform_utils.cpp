@@ -41,10 +41,6 @@ namespace augs {
 		}
 	}
 
-	void set_cursor_pos(const vec2i pos) {
-		SetCursorPos(pos.x, pos.y);
-	}
-
 	std::optional<vec2i> get_cursor_pos() {
 		POINT p;
 

@@ -8,7 +8,6 @@ namespace augs {
 	xywhi get_display();
 
 	void set_cursor_visible(const bool flag);
-	void set_cursor_pos(vec2i);
 	std::optional<vec2i> get_cursor_pos();
 
 	void set_clipboard_data(std::string);

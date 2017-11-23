@@ -551,6 +551,12 @@ namespace augs {
 		}
 	}
 
+	void window::set_cursor_pos(vec2i pos) {
+		pos += get_window_rect().get_position();
+
+		SetCursorPos(pos.x, pos.y);
+	}
+
 	void window::clip_system_cursor() {
 		thread_local RECT r;
 		

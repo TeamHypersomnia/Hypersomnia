@@ -370,15 +370,15 @@ namespace augs {
 	}
 
 	void window::collect_entropy(local_entropy& output) {
-		if (is_active() && (current_settings.raw_mouse_input || mouse_pos_paused)) {
 			// handle raw mouse input separately
     		
-			unsigned char data[3];
-			
-			while (read(raw_mouse_input_fd, data, sizeof(data)) > 0) {
-				const signed char x = data[1];
-				const signed char y = data[2];
+		unsigned char data[3];
 
+		while (read(raw_mouse_input_fd, data, sizeof(data)) > 0) {
+			const signed char x = data[1];
+			const signed char y = data[2];
+
+			if (is_active() && (current_settings.raw_mouse_input || mouse_pos_paused)) {
 				output.push_back(do_raw_motion({
 					static_cast<short>(x),
 					static_cast<short>(y * (-1)) 
@@ -456,6 +456,11 @@ xcb_ewmh_init_atoms_replies(&EWMH, EWMHCookie, NULL);
 	//	 For now we only will have one window anyway
 	//	 glXMakeContextCurrent(display, None, None, nullptr);
 #endif
+	}
+
+	void window::set_cursor_pos(vec2i pos) {
+    	XWarpPointer(display, None, window_id, 0, 0, 0, 0, pos.x, pos.y);
+		XSync(display, False);
 	}
 
 	void window::clip_system_cursor() {
