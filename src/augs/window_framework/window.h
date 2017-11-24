@@ -90,6 +90,7 @@ namespace augs {
 		xcb_key_symbols_t* syms = nullptr;
 		
 		int raw_mouse_input_fd = -1;
+		uint32_t wm_delete_window_atom = static_cast<uint32_t>(-1);
 #else
 #error "Unsupported platform!"
 #endif

@@ -137,9 +137,21 @@ namespace augs {
 				valuelist
 			);
 
-
 			// NOTE: window must be mapped before glXMakeContextCurrent
-			xcb_map_window(connection, window_id); 
+			xcb_map_window(connection, window_id);
+
+			{
+				xcb_intern_atom_cookie_t cookie = xcb_intern_atom(connection, 1, 12,"WM_PROTOCOLS");
+				auto reply = freed_unique(xcb_intern_atom_reply(connection, cookie, 0));
+				xcb_intern_atom_cookie_t cookie2 = xcb_intern_atom(connection, 0, 16, "WM_DELETE_WINDOW");
+				auto reply2 = freed_unique(xcb_intern_atom_reply(connection, cookie2, 0));
+
+				xcb_change_property(connection, XCB_PROP_MODE_REPLACE, window_id, (*reply).atom, 4, 32, 1, &reply2->atom);
+
+				xcb_flush(connection);
+
+				wm_delete_window_atom = { reply2->atom };
+			}
 
 			glxwindow = glXCreateWindow(display, fb_config, window_id, 0);
 
@@ -223,18 +235,26 @@ namespace augs {
 		const xcb_generic_event_t* event,
 		xcb_timestamp_t& last_ldown_time_ms,
 		F mousemotion_handler,
-		G keysym_getter
+		G keysym_getter,
+		decltype(xcb_intern_atom_reply_t::atom) wm_delete_window_atom
 	) {
 		using namespace event;
 		using namespace keys;
 
-		// TODO: handle WM_DELETE_WINDOW
-		// xcb_intern_atom_cookie_t cookie2 = xcb_intern_atom(c, 0, 16, "WM_DELETE_WINDOW");
-		// xcb_intern_atom_reply_t* reply2 = xcb_intern_atom_reply(c, cookie2, 0);
-	
 		change ch;
 
 		switch (event->response_type & ~0x80) {
+			case XCB_CLIENT_MESSAGE:
+				{
+					if (wm_delete_window_atom == reinterpret_cast<const xcb_client_message_event_t*>(event)->data.data32[0]) {
+						LOG("WM_DELETE_WINDOW request received");
+						ch.msg = message::close;
+
+						return ch;
+					}	
+
+					return std::nullopt;
+				}
 			case XCB_FOCUS_OUT:
 			   ch.msg = message::deactivate;
 		   	   return ch;
@@ -394,7 +414,8 @@ namespace augs {
 				event.get(), 
 				last_ldown_time_ms,
 				[this](const basic_vec2<short> p) { return handle_mousemove(p); },
-				keysym_getter
+				keysym_getter,
+				wm_delete_window_atom
 			)) {
 				common_event_handler(*ch, output);
 				output.push_back(*ch);
