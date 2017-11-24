@@ -425,6 +425,10 @@ namespace augs {
 
 
 	void window::set_window_rect(const xywhi r) {
+		if (!can_control_window_geometry) {
+			return;
+		}
+
 		uint32_t values[4] = {
 			static_cast<uint32_t>(r.x),
 			static_cast<uint32_t>(r.y),
@@ -442,6 +446,10 @@ namespace augs {
 			,	
 			values
 		);
+
+		if (get_window_rect() != r) {
+			can_control_window_geometry = false;
+		}
 	}
 
 	void window::set_fullscreen_hint(const bool flag) {

@@ -317,6 +317,10 @@ struct basic_ltrb {
 	bool operator==(const basic_ltrb& a) const {
 		return l == a.l && r == a.r && t == a.t && b == a.b;
 	}
+
+	bool operator!=(const basic_ltrb& a) const {
+		return l != a.l || r != a.r || t != a.t || b != a.b;
+	}
 };
 
 template <class T>
@@ -431,6 +435,10 @@ struct basic_xywh {
 
 	bool operator==(const basic_xywh r) const {
 		return x == r.x && y == r.y && w == r.w && h == r.h;
+	}
+
+	bool operator!=(const basic_xywh r) const {
+		return x != r.x || y != r.y || w != r.w || h != r.h;
 	}
 
 	template <class P>

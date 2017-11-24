@@ -94,6 +94,13 @@ namespace augs {
 #else
 #error "Unsupported platform!"
 #endif
+		/*
+			Some window managers, like i3, do not allow us to set
+			the window geometry directly, which is otherwise useful
+			when last window pos/size is read from the configuration file.
+		*/
+
+		bool can_control_window_geometry = true;
 
 		bool active = false;
 
