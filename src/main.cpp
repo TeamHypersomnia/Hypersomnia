@@ -394,6 +394,10 @@ int work(const int argc, const char* const * const argv) try {
 	static auto launch = [](const launch_type mode) {
 		LOG("Launch mode: %x", augs::enum_to_string(mode));
 		
+		config.launch_mode = mode;
+		last_saved_config.launch_mode = mode;
+		last_saved_config.save(lua, local_config_path);
+
 		switch (mode) {
 			case launch_type::MAIN_MENU:
 				launch_setup([]() {
