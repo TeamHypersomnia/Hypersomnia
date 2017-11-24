@@ -24,3 +24,18 @@ namespace augs {
 #else
 #error "Unsupported platform!"
 #endif
+
+namespace augs {
+	void open_text_editor(const std::string& on_file) {
+		std::string command;
+
+#if PLATFORM_WINDOWS
+		command = on_file;
+#elif PLATFORM_UNIX
+		command = "$VISUAL " + on_file;
+#else
+#error "Unsupported platform!"
+#endif
+		shell(command.c_str());
+	}
+}

@@ -1,3 +1,5 @@
+#include <csignal>
+
 #include "augs/ensure.h"
 #include "augs/filesystem/file.h"
 #include "augs/window_framework/window.h"
@@ -13,17 +15,15 @@ void save_log_and_terminate() {
 
 	augs::save_as_text(failure_log_path, logs);
 
-	{
-		const auto s = failure_log_path.string();
-		/* Open text editor */
-		augs::shell(s.c_str());
-	}
+	augs::open_text_editor(failure_log_path.string());
 
-#if IS_PRODUCTION_BUILD
-	std::terminate();
-#else
+#if !IS_PRODUCTION_BUILD
 	#if PLATFORM_WINDOWS
 	__debugbreak();
+	#elif PLATFORM_UNIX
+	std::raise(SIGINT);	
 	#endif
+#else
+	std::terminate();
 #endif
 }

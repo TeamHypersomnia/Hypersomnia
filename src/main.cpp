@@ -86,24 +86,7 @@ int main(const int argc, const char* const * const argv) {
 					const auto failure_log_path = augs::path_type(LOG_FILES_DIR "exit_failure_debug_log.txt");
 					augs::save_as_text(failure_log_path, logs);
 					
-#if !BUILD_IN_CONSOLE_MODE
-					{
-						const auto s = failure_log_path.string();
-
-						std::string command;
-
-						/* Open text editor */
-
-#if PLATFORM_WINDOWS
-						command = s;
-#elif PLATFORM_UNIX
-						command = "$EDITOR " + s;
-#else
-#error "Unsupported platform!"
-#endif
-						augs::shell(command.c_str());
-					}
-#endif
+					augs::open_text_editor(failure_log_path.string());
 				}
 
 				break;
