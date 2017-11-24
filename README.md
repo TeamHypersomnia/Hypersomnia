@@ -85,9 +85,9 @@ Watch gameplays on YouTube:
 # How to build
 To build Hypersomnia, you will need some dependencies installed on your system:
  - **CMake 3.2** or newer.
- - **Python 3.6** or newer.
  - **git** to clone the respository and later generate version information.
  - Optional: **7-Zip** so that the **Release** configuration can automatically create a compressed archive with the executable and game resources, ready to be sent to someone. 
+ - Optional: **Python 3.6** or newer for the script that prepares an archive with the executable.
 
 Once installed, go to the directory where you wish to have your Hypersomnia project downloaded,
 open git bash and paste:
@@ -116,24 +116,47 @@ Open ```Hypersomnia.sln``` file, select **Release** configuration and hit **F7**
 
 ## Linux
 
+Hypersomnia has currently been tested on:
+- Arch Linux with i3 window manager 
+
 You will need **gcc 7.2** or newer.
-Use your favorite shell to go into the newly created ```build/``` folder and run these commands:
+Use your favorite shell to enter the repository's directory.
+Then run:
 
 ```
-cmake -DUNIX=ON -DCMAKE_BUILD_TYPE=Release -D CMAKE_C_COMPILER=gcc-7 -D CMAKE_CXX_COMPILER=g++-7 ..
-make -j4
+cmake/build.sh [Debug|Release|RelWithDebInfo|MinSizeRel] [x86|x64] ["ADDITIONAL CMAKE FLAGS"]
 ```
-
-Then, to launch the built game:
+For example:
 
 ```
-cd ../hypersomnia
-../build/Hypersomnia
+cmake/build.sh Debug x64
 ```
+After which, the resultant Makefile should appear in the build/Debug-x64 directory.
+There are several additional make targets defined:
 
-If the game fails to launch, it should automatically open a log file with the relevant message.
+```
+make run
+```
+Launches the game normally.
 
-If it complains about some missing file, double-check that the game's working directory is ```hypersomnia/``` (where ```config.lua``` resides)
+```
+make tests
+```
+Launches unit tests only and exits cleanly.
+
+```
+make debug
+```
+Launches the game through ```cgdb```.
+
+```
+make memdeb
+```
+Launches the game through ```valgrind```.
+
+All the above targets set the working directory automatically to ```${PROJECT_SOURCE_DIR}/hypersomnia```.
+
+If the game fails to launch, it should automatically open a log file with the relevant message using ```$VISUAL``` executable.
 
 # Contributing
 
