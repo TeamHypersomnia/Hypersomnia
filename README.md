@@ -114,6 +114,8 @@ Resultant ```.sln``` and ```.vcxproj``` files should appear in the ```build/``` 
 Open ```Hypersomnia.sln``` file, select **Release** configuration and hit **F7** to build the game.
 **F5** should launch it.
 
+If, for some reason, some step fails, refer to the latest working Appveyor build and the relevant ```appveyor.yml``` file.
+
 ## Linux
 
 Hypersomnia has currently been tested on:
@@ -155,6 +157,8 @@ make memdeb
 Launches the game through ```valgrind```.
 
 All the above targets set the working directory automatically to ```${PROJECT_SOURCE_DIR}/hypersomnia```.
+
+If, for some reason, some step fails, refer to the latest working Travis build and the relevant ```travis.yml``` file.
 
 If the game fails to launch, it should automatically open a log file with the relevant message using ```$VISUAL``` executable.
 
