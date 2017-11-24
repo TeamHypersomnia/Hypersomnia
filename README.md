@@ -121,7 +121,12 @@ If, for some reason, some step fails, refer to the latest working Appveyor build
 Hypersomnia has currently been tested on:
 - Arch Linux with i3 window manager 
 
-You will need **gcc 7.2** or newer.
+Additional dependencies:
+- gcc 7.2 or newer
+- libx11
+- libxcb
+- xcb-util-keysyms
+ 
 Use your favorite shell to enter the repository's directory.
 Then run:
 
