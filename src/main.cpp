@@ -133,6 +133,13 @@ int work(const int argc, const char* const * const argv) try {
 
 	static auto last_saved_config = config;
 
+	static auto change_with_save = [](auto setter) {
+		setter(config);
+		setter(last_saved_config);
+
+		last_saved_config.save(lua, local_config_path);
+	};
+
 	if (config.unit_tests.run) {
 		augs::run_unit_tests(config.unit_tests);
 
@@ -394,9 +401,9 @@ int work(const int argc, const char* const * const argv) try {
 	static auto launch = [](const launch_type mode) {
 		LOG("Launch mode: %x", augs::enum_to_string(mode));
 		
-		config.launch_mode = mode;
-		last_saved_config.launch_mode = mode;
-		last_saved_config.save(lua, local_config_path);
+		change_with_save([mode](config_lua_table& cfg) {
+			cfg.launch_mode = mode;
+		});
 
 		switch (mode) {
 			case launch_type::MAIN_MENU:
@@ -515,8 +522,11 @@ int work(const int argc, const char* const * const argv) try {
 
 		switch (intent) {
 			case T::SWITCH_DEVELOPER_CONSOLE: {
-				bool& f = config.session.show_developer_console;
-				f = !f;
+				change_with_save([](config_lua_table& cfg) {
+					bool& f = cfg.session.show_developer_console;
+					f = !f;
+				});
+
 				break;
 			}
 
