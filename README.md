@@ -126,6 +126,17 @@ Additional dependencies:
 - libx11
 - libxcb
 - xcb-util-keysyms
+
+One-shot launch:
+
+```
+git clone https://github.com/TeamHypersomnia/Hypersomnia --recursive
+cd Hypersomnia
+cmake/build.sh Release x64
+make run -j4 -C build/Release-x64
+```
+
+### Detailed instructions:
  
 Use your favorite shell to enter the repository's directory.
 Then run:
@@ -162,6 +173,7 @@ make memdeb
 Launches the game through ```valgrind```.
 
 All the above targets set the working directory automatically to ```${PROJECT_SOURCE_DIR}/hypersomnia```.
+Remember to pass ``-j4`` or so to speed up the build.
 
 If, for some reason, some step fails, refer to the latest working Travis build and the relevant ```travis.yml``` file.
 
