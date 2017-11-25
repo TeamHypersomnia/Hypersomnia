@@ -299,13 +299,16 @@ void illuminated_rendering(
 					}
 
 					auto transform = p.get_viewing_transform(interp, true);
-					transform.pos += it.get<components::crosshair>().base_offset;
 
-					draw_renderable(
-						*s,
-						{ output, game_images, global_time_seconds },
-						transform
-					);
+					if (const auto crosshair = it.find<components::crosshair>()) {
+						transform.pos += crosshair->calculate_aiming_displacement(it, false);
+					
+						draw_renderable(
+							*s,
+							{ output, game_images, global_time_seconds },
+							transform
+						);
+					}
 				}
 			}
 		);
