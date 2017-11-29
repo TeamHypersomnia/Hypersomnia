@@ -368,7 +368,7 @@ int work(const int argc, const char* const * const argv) try {
 		currently_loaded_defs = new_defs;
 	};
 
-	static auto launch_setup = [](auto&& setup_init_callback) {
+	static auto setup_launcher = [](auto&& setup_init_callback) {
 		audiovisuals.get<sound_system>().clear();
 
 		current_setup = std::nullopt;
@@ -389,7 +389,7 @@ int work(const int argc, const char* const * const argv) try {
 	};
 
 	static auto launch_editor = [](auto&&... args) {
-		launch_setup([&]() {
+		setup_launcher([&]() {
 			current_setup.emplace(std::in_place_type_t<editor_setup>(),
 				std::forward<decltype(args)>(args)...
 			);
@@ -398,8 +398,8 @@ int work(const int argc, const char* const * const argv) try {
 		});
 	};
 
-	static auto launch = [](const launch_type mode) {
-		LOG("Launch mode: %x", augs::enum_to_string(mode));
+	static auto launch_setup = [](const launch_type mode) {
+		LOG("Launched mode: %x", augs::enum_to_string(mode));
 		
 		change_with_save([mode](config_lua_table& cfg) {
 			cfg.launch_mode = mode;
@@ -407,7 +407,7 @@ int work(const int argc, const char* const * const argv) try {
 
 		switch (mode) {
 			case launch_type::MAIN_MENU:
-				launch_setup([]() {
+				setup_launcher([]() {
 					if (!main_menu.has_value()) {
 						main_menu.emplace(lua, config.main_menu);
 					}
@@ -421,7 +421,7 @@ int work(const int argc, const char* const * const argv) try {
 				break;
 
 			case launch_type::TEST_SCENE:
-				launch_setup([]() {
+				setup_launcher([]() {
 					current_setup.emplace(std::in_place_type_t<test_scene_setup>(),
 						lua,
 						config.session.create_minimal_test_scene,
@@ -432,7 +432,7 @@ int work(const int argc, const char* const * const argv) try {
 				break;
 
 			default:
-				ensure(false && "The launch mode you have chosen is currently out of service.");
+				ensure(false && "The launch_setup mode you have chosen is currently out of service.");
 				break;
 		}
 	};
@@ -581,11 +581,11 @@ int work(const int argc, const char* const * const argv) try {
 
 		switch (t) {
 			case T::LOCAL_UNIVERSE:
-				launch(launch_type::TEST_SCENE);
+				launch_setup(launch_type::TEST_SCENE);
 				break;
 
 			case T::EDITOR:
-				launch(launch_type::EDITOR);
+				launch_setup(launch_type::EDITOR);
 				break;
 
 			case T::SETTINGS:
@@ -614,7 +614,7 @@ int work(const int argc, const char* const * const argv) try {
 				break;
 
 			case T::QUIT_TO_MENU:
-				launch(launch_type::MAIN_MENU);
+				launch_setup(launch_type::MAIN_MENU);
 				break;
 
 			case T::SETTINGS:
@@ -781,7 +781,7 @@ int work(const int argc, const char* const * const argv) try {
 		launch_editor(lua, params.editor_target);
 	}
 	else {
-		launch(config.get_launch_mode());
+		launch_setup(config.get_launch_mode());
 	}
 
 	/* 
