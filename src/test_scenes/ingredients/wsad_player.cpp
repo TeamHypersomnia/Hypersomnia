@@ -211,7 +211,6 @@ namespace prefabs {
 			auto& force_joint = recoil += components::force_joint();
 			zero_target += components::transform();
 			components::rigid_body body;
-			components::fixtures colliders;
 
 			auto& sprite = recoil += components::sprite();
 
@@ -235,7 +234,7 @@ namespace prefabs {
 
 			components::fixtures group;
 
-			group.filter = {};
+			group.filter = filters::none();
 			//group.filter.categoryBits = 0;
 			group.density = 0.1f;
 			group.sensor = true;

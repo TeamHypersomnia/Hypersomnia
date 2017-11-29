@@ -18,6 +18,8 @@ namespace filters {
 		SIGHT_QUERY = 1 << 14,
 	};
 
+	b2Filter none();
+
 	b2Filter renderable_query();
 	b2Filter renderable();
 	b2Filter controlled_character();

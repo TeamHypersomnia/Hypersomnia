@@ -3,6 +3,14 @@
 auto all = std::numeric_limits<decltype(b2Filter::categoryBits)>::max() & (~filters::TRIGGER);
 
 namespace filters {
+	b2Filter none() {
+		b2Filter out;
+		out.categoryBits = 0;
+		out.maskBits = 0;
+		out.groupIndex = 0;
+		return out;
+	}
+
 	b2Filter renderable() {
 		b2Filter out;
 		out.categoryBits = RENDERABLE;
