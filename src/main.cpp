@@ -565,8 +565,8 @@ int work(const int argc, const char* const * const argv) try {
 #if PLATFORM_UNIX	
 	static volatile std::sig_atomic_t signal_status = 0;
  
-	static auto signal_handler = [](int signal) {
-   		signal_status = signal;
+	static auto signal_handler = [](const int signal_type) {
+   		signal_status = signal_type;
 	};
 
 	std::signal(SIGINT, signal_handler);

@@ -1,23 +1,23 @@
 #include "string_templates.h"
 
-std::string to_forward_slashes(std::string str) {
-	for (auto& s : str) {
+std::string to_forward_slashes(std::string in_str) {
+	for (auto& s : in_str) {
 		if (s == '\\') {
 			s = '/';
 		}
 	}
 
-	return str;
+	return in_str;
 }
 
-std::wstring to_forward_slashes(std::wstring str) {
-	for (auto& s : str) {
+std::wstring to_forward_slashes(std::wstring in_str) {
+	for (auto& s : in_str) {
 		if (s == '\\') {
 			s = '/';
 		}
 	}
 
-	return str;
+	return in_str;
 }
 
 #if BUILD_UNIT_TESTS

@@ -14,15 +14,19 @@
 std::string to_string(const std::wstring& val);
 
 template <class T>
-std::wstring to_wstring(T val, int precision = -1, bool fixed = false) {
+std::wstring to_wstring(
+	const T& val, 
+	const int decimal_precision = -1, 
+	bool fixed_precision = false
+) {
 	std::wostringstream ss;
 
-	if (precision > -1) {
-		if (fixed) {
+	if (decimal_precision > -1) {
+		if (fixed_precision) {
 			ss << std::fixed;
 		}
 
-		ss << std::setprecision(precision);
+		ss << std::setprecision(decimal_precision);
 	}
 
 	ss << val;
