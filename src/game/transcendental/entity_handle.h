@@ -37,7 +37,7 @@ namespace augs {
 }
 
 template <bool is_const>
-class EMPTY_BASES basic_entity_handle :
+class basic_entity_handle :
 	private augs::component_allocators_mixin<is_const, basic_entity_handle<is_const>>,
 	public augs::component_setters_mixin<is_const, basic_entity_handle<is_const>>,
 

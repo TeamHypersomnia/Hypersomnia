@@ -125,7 +125,7 @@ template<bool, class>
 class spatial_properties_mixin;
 
 template<class entity_handle_type>
-class EMPTY_BASES spatial_properties_mixin<false, entity_handle_type> : public basic_spatial_properties_mixin<false, entity_handle_type> {
+class spatial_properties_mixin<false, entity_handle_type> : public basic_spatial_properties_mixin<false, entity_handle_type> {
 public:
 	void set_logic_transform(
 		const logic_step step,
@@ -134,5 +134,5 @@ public:
 };
 
 template<class entity_handle_type>
-class EMPTY_BASES spatial_properties_mixin<true, entity_handle_type> : public basic_spatial_properties_mixin<true, entity_handle_type> {
+class spatial_properties_mixin<true, entity_handle_type> : public basic_spatial_properties_mixin<true, entity_handle_type> {
 };

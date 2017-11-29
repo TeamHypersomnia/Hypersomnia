@@ -60,7 +60,7 @@ template <bool, class>
 class physics_mixin;
 
 template <class entity_handle_type>
-class EMPTY_BASES physics_mixin<false, entity_handle_type> : public basic_physics_mixin<false, entity_handle_type> {
+class physics_mixin<false, entity_handle_type> : public basic_physics_mixin<false, entity_handle_type> {
 public:
 	using base = basic_physics_mixin<false, entity_handle_type>;
 
@@ -79,5 +79,5 @@ public:
 };
 
 template <class entity_handle_type>
-class EMPTY_BASES physics_mixin<true, entity_handle_type> : public basic_physics_mixin<true, entity_handle_type> {
+class physics_mixin<true, entity_handle_type> : public basic_physics_mixin<true, entity_handle_type> {
 };

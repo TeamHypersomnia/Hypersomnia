@@ -72,7 +72,7 @@ template<bool, class>
 class relations_mixin;
 
 template<class entity_handle_type>
-class EMPTY_BASES relations_mixin<false, entity_handle_type> : public basic_relations_mixin<false, entity_handle_type> {
+class relations_mixin<false, entity_handle_type> : public basic_relations_mixin<false, entity_handle_type> {
 	using base = basic_relations_mixin<false, entity_handle_type>;
 	using base::get_id_ptr;
 public:
@@ -85,6 +85,6 @@ public:
 };
 
 template<class entity_handle_type>
-class EMPTY_BASES relations_mixin<true, entity_handle_type> : public basic_relations_mixin<true, entity_handle_type> {
+class relations_mixin<true, entity_handle_type> : public basic_relations_mixin<true, entity_handle_type> {
 public:
 };

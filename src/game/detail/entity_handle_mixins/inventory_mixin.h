@@ -168,11 +168,11 @@ template<bool, class>
 class inventory_mixin;
 
 template<class entity_handle_type>
-class EMPTY_BASES inventory_mixin<false, entity_handle_type> : public basic_inventory_mixin<false, entity_handle_type> {
+class inventory_mixin<false, entity_handle_type> : public basic_inventory_mixin<false, entity_handle_type> {
 public:
 
 };
 
 template<class entity_handle_type>
-class EMPTY_BASES inventory_mixin<true, entity_handle_type> : public basic_inventory_mixin<true, entity_handle_type> {
+class inventory_mixin<true, entity_handle_type> : public basic_inventory_mixin<true, entity_handle_type> {
 };

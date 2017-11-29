@@ -70,7 +70,7 @@ auto subscript_handle_getter(C& cosm, const entity_guid guid) {
 	return subscript_handle_getter(cosm, cosm.get_entity_id_by(guid));
 }
 
-class EMPTY_BASES cosmos : private cosmos_base,
+class cosmos : private cosmos_base,
 	public augs::subscript_handle_getters_mixin<cosmos>
 {
 	friend augs::subscript_handle_getters_mixin<cosmos>;
