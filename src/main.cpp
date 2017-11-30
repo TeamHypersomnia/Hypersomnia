@@ -569,7 +569,9 @@ int work(const int argc, const char* const * const argv) try {
    		signal_status = signal_type;
 	};
 
+#if IS_PRODUCTION_BUILD // If debugging, we use SIGINT for simulating a debugger break
 	std::signal(SIGINT, signal_handler);
+#endif
 	std::signal(SIGTERM, signal_handler);
 	std::signal(SIGSTOP, signal_handler);
 #endif

@@ -4,16 +4,16 @@
 namespace augs {
 	namespace fs = std::experimental::filesystem;
 
-	bool create_directory(const path_type& path) {
-		return fs::create_directory(path);
+	bool create_directory(const path_type& input_path) {
+		return fs::create_directory(input_path);
 	}
 	
-	bool create_directories(path_type path) {
-		if (path.filename() == path) {
+	bool create_directories(path_type input_path) {
+		if (input_path.filename() == input_path) {
 			return true;
 		}
 
-		return fs::create_directories(path.remove_filename());
+		return fs::create_directories(input_path.remove_filename());
 	}
 
 	path_type get_executable_directory() {
