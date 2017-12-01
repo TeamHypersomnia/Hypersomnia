@@ -1,5 +1,3 @@
-
-
 #include "augs/gui/text/printer.h"
 #include "augs/templates/introspect.h"
 
@@ -47,13 +45,28 @@ void draw_debug_details(
 
 	total_details += {
 		to_wstring(typesafe_sprintf(
-			"Revision no.: %x %x\nDate: %x\nMessage:\n%x\n",
+			"Revision no.: %x %x\n"
+			"Date: %x\n"
+			"Message:\n%x\n",
 			version.commit_number ? std::to_string(version.commit_number) : "Unknown",
 			version.commit_number ? version.working_tree_changes.empty() ? "(clean)" : "(dirty)" : "",
 			version.commit_date,
 			version.commit_message.size() < 30 ? version.commit_message : version.commit_message.substr(0, 30) + "(...)"
 		)),
 		
+		text_style
+	};
+
+	total_details += {
+		to_wstring(typesafe_sprintf(
+			"STATICALLY_ALLOCATE_ENTITIES_NUM=%x\n"
+			"STATICALLY_ALLOCATE_ASSETS=%x\n"
+			"STATICALLY_ALLOCATE_BAKED_FONTS=%x\n",
+			STATICALLY_ALLOCATE_ENTITIES_NUM,
+			STATICALLY_ALLOCATE_ASSETS,
+			STATICALLY_ALLOCATE_BAKED_FONTS
+		)),
+
 		text_style
 	};
 
