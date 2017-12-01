@@ -1136,27 +1136,39 @@ endif()
 
 # Custom targets for Makefile
 if(UNIX)
+	set(HYPERSOMNIA_WORKING_DIR ${HYPERSOMNIA_EXE_RESOURCES_DIR})
+
 	add_custom_target(run
 		COMMAND Hypersomnia
 		DEPENDS Hypersomnia
-		WORKING_DIRECTORY ${HYPERSOMNIA_EXE_RESOURCES_DIR} 
+		WORKING_DIRECTORY ${HYPERSOMNIA_WORKING_DIR} 
 	)
 
 	add_custom_target(debug
 		COMMAND cgdb $<TARGET_FILE:Hypersomnia>
 		DEPENDS Hypersomnia
-		WORKING_DIRECTORY ${HYPERSOMNIA_EXE_RESOURCES_DIR} 
+		WORKING_DIRECTORY ${HYPERSOMNIA_WORKING_DIR} 
+	)
+
+	set(CONQUE_DEBUG_ARGS
+		"--remote-send" ":execute \\'ConqueGdbCommand run\\' \\<bar\\> ConqueGdb -cd ${HYPERSOMNIA_WORKING_DIR} -ex run --args $<TARGET_FILE:Hypersomnia>\\<CR\\> "	
+	)
+
+	add_custom_target(conque_debug
+		COMMAND vim ${CONQUE_DEBUG_ARGS}
+		DEPENDS Hypersomnia
+		WORKING_DIRECTORY ${HYPERSOMNIA_WORKING_DIR} 
 	)
 
 	add_custom_target(memdeb
 		COMMAND valgrind --log-file="memory_log.txt" --leak-check=yes $<TARGET_FILE:Hypersomnia>
 		DEPENDS Hypersomnia
-		WORKING_DIRECTORY ${HYPERSOMNIA_EXE_RESOURCES_DIR} 
+		WORKING_DIRECTORY ${HYPERSOMNIA_WORKING_DIR} 
 	)
 
 	add_custom_target(tests
 		COMMAND Hypersomnia --unit-tests-only
 		DEPENDS Hypersomnia
-		WORKING_DIRECTORY ${HYPERSOMNIA_EXE_RESOURCES_DIR} 
+		WORKING_DIRECTORY ${HYPERSOMNIA_WORKING_DIR} 
 	)
 endif()	
