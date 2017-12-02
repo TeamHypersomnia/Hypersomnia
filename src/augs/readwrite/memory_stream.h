@@ -5,7 +5,7 @@
 #include "augs/templates/exception_templates.h"
 
 namespace augs {
-	class memory_stream_reserver;
+	class byte_counter_stream;
 
 	struct stream_read_error : error_with_typesafe_sprintf {
 		using error_with_typesafe_sprintf::error_with_typesafe_sprintf;
@@ -94,14 +94,14 @@ namespace augs {
 		void write(const std::byte* const data, const std::size_t bytes);
 		void write(const augs::memory_stream&);
 		void reserve(const std::size_t);
-		void reserve(const memory_stream_reserver&);
+		void reserve(const byte_counter_stream&);
 
 		operator std::vector<std::byte>&&() && {
 			return std::move(buffer);
 		}
 	};
 
-	class memory_stream_reserver : public stream_position {
+	class byte_counter_stream : public stream_position {
 	public:
 		memory_stream create_reserved_stream();
 

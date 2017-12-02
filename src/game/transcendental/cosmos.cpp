@@ -556,16 +556,16 @@ namespace augs {
 		auto& profiler = cosm.profiler;
 
 		if constexpr(can_reserve_v<Archive>) {
-			augs::memory_stream_reserver reserver;
+			augs::byte_counter_stream counter_stream;
 
 			{
 				auto scope = measure_scope(profiler.size_calculation_pass);
-				augs::write_bytes(reserver, cosm.significant);
+				augs::write_bytes(counter_stream, cosm.significant);
 			}
 
 			auto scope = measure_scope(profiler.memory_allocation_pass);
 			
-			into.reserve(into.get_write_pos() + reserver.size());
+			into.reserve(into.get_write_pos() + counter_stream.size());
 		}
 
 		{

@@ -4,7 +4,7 @@
 #define READWRITE_OVERLOAD_TRAITS_INCLUDED 1
 
 namespace augs {
-	class memory_stream_reserver;
+	class byte_counter_stream;
 	class memory_stream;
 	
 	template <class Archive, class Serialized, class = void>
@@ -18,8 +18,8 @@ namespace augs {
 		decltype(
 			read_object_bytes(
 				std::declval<
-					/* If the queried archive is memory_stream_reserver, map to memory_stream */
-					std::conditional_t<std::is_same_v<Archive, memory_stream_reserver>, memory_stream&, Archive&>
+					/* If the queried archive is byte_counter_stream, map to memory_stream */
+					std::conditional_t<std::is_same_v<Archive, byte_counter_stream>, memory_stream&, Archive&>
 				>(),
 				std::declval<Serialized&>()
 			),
@@ -39,8 +39,8 @@ namespace augs {
 		decltype(
 			write_object_bytes(
 				std::declval<
-					/* If the queried archive is memory_stream_reserver, map to memory_stream */
-					std::conditional_t<std::is_same_v<Archive, memory_stream_reserver>, memory_stream&, Archive&>
+					/* If the queried archive is byte_counter_stream, map to memory_stream */
+					std::conditional_t<std::is_same_v<Archive, byte_counter_stream>, memory_stream&, Archive&>
 				>(),
 				std::declval<const Serialized&>()
 			),
