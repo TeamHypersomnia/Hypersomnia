@@ -126,7 +126,7 @@ Additional dependencies:
 - libxcb
 - xcb-util-keysyms
 
-One-shot launch:
+### One-shot launch
 
 ```
 git clone https://github.com/TeamHypersomnia/Hypersomnia --recursive
