@@ -1,9 +1,9 @@
-# For developers
+# Hypersomnia
 
 [![Build Status](https://travis-ci.org/TeamHypersomnia/Hypersomnia.svg?branch=master)](https://travis-ci.org/TeamHypersomnia/Hypersomnia)
 [![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/5aatwxv8hceaop56?svg=true)](https://ci.appveyor.com/project/geneotech/Hypersomnia)
 
-## Tree structure
+## Source tree structure
 
 - ```cmake/``` - CMake scripts and source code generators. (Introspector-generator, version_file_generator)
 - ```hypersomnia/``` -  directory for the executable. All content needed by Hypersomnia to run properly is present here: images, sounds, shaders, configs and so on. 
@@ -52,15 +52,14 @@ digraph G {
 **Exceptions:**
 - Modified Box2D files (from ```3rdparty```) include ```game/transcendental/entity_id.h``` in order to conveniently define a userdata type that contains the id of the entity to whom a ```b2Fixture``` or a ```b2Body``` belongs. Separating that dependency would otherwise involve a lot of alterations to Box2D in terms of code templatization, or unsafe reinterpret casts between ```void*``` and ```entity_id``` types. 
 
-# Hypersomnia
-Community-centered shooter/MMORPG released as free software.
+# About
+Hypersomnia is an upcoming community-centered shooter/MMORPG released as free software.
 
-from: http://hypersomnia.pl/summary/
+from http://hypersomnia.pl/summary/:
 
 Hypersomnia is an upcoming futuristic universe with elements of fast-paced shooter, stealth and role-playing game.
 Set in a hypothetical afterlife reality, it shall provide joy through altruistic behaviours and fulfillment of elaborate social roles,
 including, but not limited to, sowing panic as a traitor to benevolent ones.
-
 
 
 Decide upon your allegiance to one of the three warring factions whose apple of discord is a disparity between prevailing notions of moral excellence.
