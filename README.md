@@ -195,13 +195,13 @@ If the game fails to launch, it should automatically open a log file with the re
 
 # Contributing
 
-We consider every pull request, should it even be typo fixes, missing const guarantees or changes in nomenclature.
+Pull requests are welcomed, should they even be typo fixes, missing const guarantees or changes in nomenclature.
+If you however plan to add a completely new feature, create a relevant [issue](https://github.com/TeamHypersomnia/Hypersomnia/issues) so that everybody knows about it,
+because the project is continuously in a very, very active development and may undergo a revolution when it is the least expected.
 
-If you however plan to add a completely new feature, please notice us in advance, because the project is continuously in a very, very active development and may undergo a revolution when it is the least expected.
-I also recommend that you be familiar with component-based entity architecture beforehand.
+For documentation, please make sure to read the [wiki](https://github.com/TeamHypersomnia/Hypersomnia/wiki) to learn about the game and the codebase.
 
-You will be added to our TeamHypersomnia organization once we accept at least one of your pull requests.
+You will be added to [TeamHypersomnia](https://github.com/TeamHypersomnia) organization once at least one of your pull requests is accepted.
 
-If you have questions or you fail to build Hypersomnia, ask via mail: patryk.czachurski@gmail.com
-
-Or if you just can't wait to utter some brilliant suggestions regarding the game, please do so, too!
+If you have questions or you fail to build Hypersomnia, create an [issue](https://github.com/TeamHypersomnia/Hypersomnia/issues).
+Or if you just can't wait to utter some brilliant ideas with regard to the game, please do so, too!
