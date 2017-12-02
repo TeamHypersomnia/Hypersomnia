@@ -135,7 +135,7 @@ cmake/build.sh Release x64
 make run -j4 -C build/Release-x64
 ```
 
-### Detailed instructions:
+### Detailed instructions
  
 Use your favorite shell to enter the repository's directory.
 Then run:
