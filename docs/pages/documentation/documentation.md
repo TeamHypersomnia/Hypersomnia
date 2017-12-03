@@ -58,8 +58,16 @@ digraph G {
 
 ## Core principles
 
-Even though many concepts described here can be applied to just about any game,
+Many concepts described here could be readily applied to just about any kind of game.  
+That said, the main focus of this project **is not to create a general game engine**,  
+but to create a [fun](https://en.wiktionary.org/wiki/fun#Adjective), fast-paced top-down game,  
+customization of which will mostly be possible to C++ programmers only.  
+That is why, on one hand, you may find ```augs/``` to be a game-agnostic "framework", but on the other hand, you will find:
+- hardcoded enumerations of [render layers](render_layer) with well-defined behaviours;
+- natively coded [rendering routine](illuminated_rendering) in C++ that uses these layers and speaks directly to OpenGL without any kind of intermediary framework;
+- little to none scripting support, at least not until there is such a demand in the community.
 
+To reach out to the non-tech-savvy audience, a full-flegded [editor](editor) is developed. 
 
 ## Coding conventions
 
