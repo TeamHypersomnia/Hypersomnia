@@ -63,7 +63,7 @@ That said, the main focus of this project **is not to create a general game engi
 but to create a [fun](https://en.wiktionary.org/wiki/fun#Adjective), fast-paced top-down game,  
 customization of which will mostly be possible to C++ programmers only.  
 That is why, on one hand, you may find ```augs/``` to be a game-agnostic "framework", but on the other hand, you will find:
-- hardcoded enumerations of [render layers](render_layer) with well-defined behaviours;
+- hardcoded C++ enumerations of [render layers](render_layer) with well-defined roles;
 - natively coded [rendering routine](illuminated_rendering) in C++ that uses these layers and speaks directly to OpenGL without any kind of intermediary framework;
 - little to none scripting support, at least not until there is such a demand in the community.
 
@@ -124,6 +124,8 @@ The rules are:
 
 		}
         
+
+- The rest is left to your imagination.
 
 Additionally, all modifications to the code not original to the Hypersomnia repository (third party libraries or just any submodule) shall stay in accordance with their respective conventions.
 
