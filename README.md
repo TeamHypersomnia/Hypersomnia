@@ -22,13 +22,13 @@
 Hypersomnia is an upcoming community-centered shooter released as free software,
 with an aspiration to one day become an MMO with elements of RPG.
 
-Set in a hypothetical afterlife reality, it shall provide joy through altruistic behaviours and fulfillment of elaborate social roles,
-including, but not limited to, sowing panic as a traitor to benevolent ones.
+Set in a hypothetical afterlife reality, it shall provide joy through altruistic behaviours, fierce fights, exploration, fulfillment of elaborate social roles or sowing panic as a traitor to benevolent ones.
 
 Decide upon your allegiance to one of the three warring factions whose apple of discord is a disparity between prevailing notions of moral excellence.
 **Metropolis. Atlantis. Resistance.**
 
 See [gameplay](#showcase).
+See the game's [wiki](https://github.com/TeamHypersomnia/Hypersomnia/wiki) to get familiar with the universe.
 
 ## Source tree structure
 
