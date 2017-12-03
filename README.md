@@ -29,7 +29,7 @@ Decide upon your allegiance to one of the three warring factions whose apple of 
 
 See [gameplay](#showcase).
 
-See the game's [wiki](https://github.com/TeamHypersomnia/Hypersomnia/wiki) to get familiar with the universe.
+See the game's [wiki](http://wiki.hypersomnia.pl) to get familiar with the universe.
 
 ## Source tree structure
 
@@ -200,7 +200,7 @@ Pull requests are welcomed, should they even be typo fixes, missing const guaran
 If you however plan to add a completely new feature, create a relevant [issue](https://github.com/TeamHypersomnia/Hypersomnia/issues) so that everybody knows about it,
 because the project is continuously in a very, very active development and may undergo a revolution when it is the least expected.
 
-For documentation, please make sure to read the [wiki](https://github.com/TeamHypersomnia/Hypersomnia/wiki) to learn about the game and the codebase.
+For documentation, please make sure to read the [wiki](http://wiki.hypersomnia.pl) to learn about the game and the codebase.
 
 You will be added to [TeamHypersomnia](https://github.com/TeamHypersomnia) organization once at least one of your pull requests is accepted.
 
