@@ -28,6 +28,7 @@ Decide upon your allegiance to one of the three warring factions whose apple of 
 **Metropolis. Atlantis. Resistance.**
 
 See [gameplay](#showcase).
+
 See the game's [wiki](https://github.com/TeamHypersomnia/Hypersomnia/wiki) to get familiar with the universe.
 
 ## Source tree structure
