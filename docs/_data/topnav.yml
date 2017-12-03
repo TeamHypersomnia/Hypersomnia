@@ -7,14 +7,3 @@ topnav:
       external_url: https://github.com/TeamHypersomnia/Hypersomnia
     - title: News
       external_url: http://hypersomnia.pl
-
-#Topnav dropdowns
-topnav_dropdowns:
-- title: Topnav dropdowns
-  folders:
-    - title: Topics
-      folderitems:
-        - title: Codebase
-          url: /codebase_landing_page
-        - title: Universe
-          url: /universe_landing_page

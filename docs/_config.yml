@@ -75,7 +75,7 @@ defaults:
       layout: "page"
       comments: true
       search: true
-      sidebar: codebase_sidebar
+      sidebar: documentation_sidebar
       topnav: topnav
   -
     scope:
@@ -95,17 +95,17 @@ defaults:
       layout: "post"
       comments: true
       search: true
-      sidebar: codebase_sidebar
+      sidebar: documentation_sidebar
       topnav: topnav
 
 # these are defaults used for the frontmatter for these file types
 
 sidebars:
-- codebase_sidebar
+- documentation_sidebar
 - universe_sidebar
 
-description: "Documentation of the Hypersomnia Universe and its codebase."
+description: "Hypersomnia Wiki"
 # the description is used in the feed.xml file
 
 # needed for sitemap.xml file only
-url: http://idratherbewriting.com
+url: http://hypersomnia.pl

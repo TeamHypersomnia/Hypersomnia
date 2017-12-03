@@ -8,7 +8,7 @@ permalink: index.html
 
 From here you can go to:
 - Encyclopaedia of the [Hypersomnia universe](universe).
-- Documentation the [Hypersomnia source code](codebase).
+- Documentation of the [Hypersomnia source code](docs).
 
 Whether a player or developer, you probably want to launch Hypersomnia first.  
 Unfortunately, no binaries are available yet.  
