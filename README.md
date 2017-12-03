@@ -3,8 +3,6 @@
 [![Build Status](https://travis-ci.org/TeamHypersomnia/Hypersomnia.svg?branch=master)](https://travis-ci.org/TeamHypersomnia/Hypersomnia)
 [![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/5aatwxv8hceaop56?svg=true)](https://ci.appveyor.com/project/geneotech/Hypersomnia)
 
-## Table of Contents
-
 - [Hypersomnia](#hypersomnia)
 - [Gallery](#gallery)
 - [How to build](#how-to-build)
@@ -22,7 +20,7 @@ Set in a hypothetical afterlife reality, it shall provide joy through altruistic
 Decide upon your allegiance to one of the three warring factions whose apple of discord is a disparity between prevailing notions of moral excellence.
 **Metropolis. Atlantis. Resistance.**
 
-See the game's [wiki](http://wiki.hypersomnia.pl) to get familiar with the universe.
+See the game's [wiki](http://wiki.hypersomnia.pl) to get familiar with the universe.  
 To understand the repository's folder structure, make sure to read the [documentation](http://wiki.hypersomnia.pl/docs).
 
 ## Gallery
