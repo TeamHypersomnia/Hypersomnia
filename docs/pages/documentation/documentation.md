@@ -71,5 +71,59 @@ To reach out to the non-tech-savvy audience, a full-flegded [editor](editor) is 
 
 ## Coding conventions
 
-Hypersomnia codebase uses ```underscore_case``` everywhere.
-If a function call 
+Please notice that some of the following conventions are not necessarily what would have been decided had the project begun yesterday.
+These have been established too long ago, when the project wasn't thought of quite seriously, and the codebase has grown too huge for the style to be changed now.
+
+The rules are:
+
+- Use tabs for indentation.
+- Use uncapitalized ```underscore_case``` everywhere.
+    - But do literally what you want with template parameters.
+- [Linux kernel indentation style.](https://en.wikipedia.org/wiki/Indentation_style#K.26R).
+    - But ALWAYS use brackets after ``if``/``else``/``for`` and the like! Too much life has been wasted on the illusion that this line is really a single expression...
+    - Example:
+
+            if constexpr(std::is_same_v<T, int>) {
+            	// ...
+            }
+            else {
+            	// ...
+            }
+        
+- Put a single space after ``if``, ``while``, ``for``, etc. Like so:
+    - ```if (expression)``` 
+    - ```if constexpr(expression)```
+    - ```do { ... } while (expression);```
+- Prefer initialization with ``auto`` or ``const auto``.
+    - Except for [default initialization](http://en.cppreference.com/w/cpp/language/default_initialization) or non-movable types as move elision does not yet fully work in MSVC.
+- Put a single space between the operator and each operand, e.g. ``const auto abc = 2 + 2;``
+- Put ```const``` wherever possible even at the cost of readability. 
+    - In particular, ```const``` every possible function argument.
+    - But don't ```const``` in the function declarations, though this must still be corrected for much of the existing code.
+- There isn't really a fixed maximum for the line's length, but keep it around 125 characters. If you must break the function arguments, do it like so:
+
+        
+        function(
+        	a,
+        	b
+        	c
+        );
+        
+        func(other_func(hey_there(
+        	a,
+        	[](){
+        		return 1337;
+        	},
+        	c
+        )));
+
+        void something::foo(
+			const int bar,
+			const double other
+		) const {
+
+		}
+        
+
+Additionally, all modifications to the code not original to the Hypersomnia repository (third party libraries or just any submodule) shall stay in accordance with their respective conventions.
+
