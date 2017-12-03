@@ -44,7 +44,7 @@ See the game's [wiki](https://github.com/TeamHypersomnia/Hypersomnia/wiki) to ge
   - ```src/application/``` - highest level abstraction. Examples: _setups_ implementation, the main menu or the ingame menu overlay, workspace file format, but also collateral things like http server code.
     - ```src/application/setups``` - _setups_ are objects that manage high-level functionality like a client, a server, an editor or a local test scene. They expose functions like ```get_viewed_cosmos()``` or ```get_viewed_character_id()``` that are in turn used by main.cpp to know what world to render and with which entity as the viewer.
   - ```main.cpp``` - that, which straps all of the above together. Initializes libraries, contextes, necessary resources, handles input, selects the setup to work with, keeps track of the single ```audiovisual_state```.
-- ```todo/``` - a personal to-do list of the founder. At the moment, not meant to be understood by the public.
+- ```docs/``` - the project wiki hosted via GitHub Pages.
 
 ### Dependency graph of ```src/```
 
