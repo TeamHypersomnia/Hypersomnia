@@ -25,12 +25,24 @@ entries:
       url: inferential_system
       output: web
 
+    - title: Audiovisual system
+      url: audiovisual_system
+      output: web
+
     - title: Cosmos
       url: cosmos
       output: web
 
     - title: Workspace
       url: workspace
+      output: web
+
+    - title: Necessary resource
+      url: necessary
+      output: web
+
+    - title: Setup
+      url: setup
       output: web
 
     - title: The main.cpp file

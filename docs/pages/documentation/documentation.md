@@ -58,6 +58,8 @@ digraph G {
 
 ## Core principles
 
+### On extensibility 
+
 Much of the codebase described here could be readily applied to just about any kind of game.  
 You might find some topics like [entities](entity), [components](component) or [systems](stateless_system) defined in a rather general fashion, 
 not necessarily pertaining to any particular Hypersomnia mechanic, or even to any specific game genre.  
@@ -80,6 +82,25 @@ This is because:
 - C++ code is way, way more easier to reason about (and thus maintain) than some obscure plugin code written in a dynamically-typed script.
 - C++ is more performant than any scripting language.
 - Possible conflicts between community extensions might be resolved at the compilation stage, and thus very early.
+
+### Using external code
+
+Although a great part of the game is hand-written, this project **is not, in fact, about writing a game from scratch**.
+
+You can notice that there is [plenty of third-party code](https://github.com/TeamHypersomnia/Hypersomnia/tree/master/src/3rdparty) used in Hypersomnia.
+At that point, you might ask, why not choose a standalone game framework that has all of this functionality built-in?  
+
+We believe it is beneficial to manually pick the libraries that the game is proven to need at this exact moment:
+
+- If there is no particular reason to use other audio formats than ``wav`` or ``ogg`` in the game, why also waste time compiling some other obscure formats?
+- Game frameworks might not always be up-to-date with latest improvements to specific libraries, like ``OpenAL Soft`` or ``enet``.
+- You are in complete control of what to build, and what to not build. It is useful if you want to iterate faster - then you can, for example, [completely exclude networking or sound from the game](cmakelists#build-settings), resulting in faster builds.
+- You can learn something new! After all, you're not writing it from scratch, you're just putting a little more time to assemble your perfect toolset!
+
+Generally, if writing gameplay code, you should not need to introduce any other external library at this point, maybe to the exception of some crazy math.
+It is however entirely possible that such a need arises. In this case:
+- Make sure that the library is compatible with [AGPL-3.0](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/LICENSE.md).
+- Make sure that there is no library that too suits your need while having less dependencies.
 
 ## Coding conventions
 
