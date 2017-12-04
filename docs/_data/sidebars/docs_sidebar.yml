@@ -1,0 +1,40 @@
+# This is your sidebar TOC. The sidebar code loops through sections here and provides the appropriate formatting.
+
+entries:
+- title: Sidebar
+  levels: one
+  folders:
+
+  - title: Topics
+    output: web
+    folderitems:
+
+    - title: Entity
+      url: entity
+      output: web
+
+    - title: Component
+      url: component
+      output: web
+
+    - title: Stateless system
+      url: stateless_system
+      output: web
+
+    - title: Inferential system
+      url: inferential_system
+      output: web
+
+    - title: Cosmos
+      url: cosmos
+      output: web
+
+    - title: Workspace
+      url: workspace
+      output: web
+
+    - title: The main.cpp file
+      url: main
+      output: web
+
+

@@ -1,6 +1,6 @@
 ---
 title: Source code documentation
-sidebar: documnetation_sidebar
+sidebar: docs_sidebar
 permalink: docs
 ---
 
@@ -16,8 +16,8 @@ permalink: docs
   - ```src/view/``` - Code that is concerned with viewing the game world. Examples: viewables (meant for viewing only, as opposed to logical assets used by the model), state of particle systems, interpolation, playing of sounds, or rendering scripts that take the game world reference and speak directly to OpenGL.
   - ```src/test_scenes/``` - Code generating some simple test scenes, with their needed resources. It exists only in order to conveniently test new game features without relying on the editor. Can be excluded from compilation via BUILD_TEST_SCENES CMake flag.
   - ```src/application/``` - highest level abstraction. Examples: _setups_ implementation, the main menu or the ingame menu overlay, workspace file format, but also collateral things like http server code.
-    - ```src/application/setups``` - _setups_ are objects that manage high-level functionality like a client, a server, an editor or a local test scene. They expose functions like ```get_viewed_cosmos()``` or ```get_viewed_character_id()``` that are in turn used by main.cpp to know what world to render and with which entity as the viewer.
-  - ```main.cpp``` - that, which straps all of the above together. Initializes libraries, contextes, necessary resources, handles input, selects the setup to work with, keeps track of the single ```audiovisual_state```.
+    - ```src/application/setups``` - _setups_ are objects that manage high-level functionality like a client, a server, an editor or a local test scene. They expose functions like ```get_viewed_cosmos()``` or ```get_viewed_character_id()``` that are in turn used by  [```main.cpp```](main) to know what world to render and with which [entity](entity) as the viewer.
+  - [```main.cpp```](main) - that, which straps all of the above together. Initializes libraries, contextes, necessary resources, handles input, selects the setup to work with, keeps track of the single ```audiovisual_state```.
 
 ### Dependency graph of ```src/```
 
@@ -58,16 +58,28 @@ digraph G {
 
 ## Core principles
 
-Many concepts described here could be readily applied to just about any kind of game.  
-That said, the main focus of this project **is not to create a general game engine**,  
-but to create a [fun](https://en.wiktionary.org/wiki/fun#Adjective), fast-paced top-down game,  
-customization of which will mostly be possible to C++ programmers only.  
+Much of the codebase described here could be readily applied to just about any kind of game.  
+You might find some topics like [entities](entity), [components](component) or [systems](stateless_system) defined in a rather general fashion, 
+not necessarily pertaining to any particular Hypersomnia mechanic, or even to any specific game genre.  
+
+It should be remembered though, that the main focus of this project **is not to create a universal game engine**,  
+but to create a [fun](https://en.wiktionary.org/wiki/fun#Adjective), fast-paced top-down game,
+customization of which will be possible almost exclusively by direct interaction with the game's C++ source code.
 That is why, on one hand, you may find ```augs/``` to be a game-agnostic "framework", but on the other hand, you will find:
 - hardcoded C++ enumerations of [render layers](render_layer) with well-defined roles;
-- natively coded [rendering routine](illuminated_rendering) in C++ that uses these layers and speaks directly to OpenGL without any kind of intermediary framework;
-- little to none scripting support, at least not until there is such a demand in the community.
+- a very game-specific, natively coded [rendering routine](illuminated_rendering) in C++ that uses these render layers and speaks directly to OpenGL without any kind of general rendering framework;
+- little to none script support (except configuration files, e.g. [``config.lua``](config_lua)), at least not until there is such a demand in the community.
 
 To reach out to the non-tech-savvy audience, a full-flegded [editor](editor) is developed. 
+
+In particular, **no scripted plugin system** is planned to ever come about.
+We believe that the C++ codebase may be made so easily extendable that any fan of Hypersomnia, that is coincidentally a programming adept,
+could easily add their modifications, that would in turn be reviewed by the community in order to be finally merged into the official game.
+
+This is because:
+- C++ code is way, way more easier to reason about (and thus maintain) than some obscure plugin code written in a dynamically-typed script.
+- C++ is more performant than any scripting language.
+- Possible conflicts between community extensions might be resolved at the compilation stage, and thus very early.
 
 ## Coding conventions
 
@@ -75,6 +87,12 @@ Please notice that some of the following conventions are not necessarily what wo
 These have been established too long ago, when the project wasn't thought of quite seriously, and the codebase has grown too huge for the style to be changed now.
 
 The rules are:
+
+- Usage of modern C++ features is highly recommended, but make sure that they are supported by:
+    - The latest stable GCC release (at the time of this writing, 7.2).
+    - MSVC that ships with the latest Visual Studio Preview.
+
+    Worry not though, if you mess up with either, we will know thanks to AppVeyor and TravisCI integration.
 
 - Use tabs for indentation.
 - Use uncapitalized ```underscore_case``` everywhere.
@@ -95,7 +113,7 @@ The rules are:
     - ```if constexpr(expression)```
     - ```do { ... } while (expression);```
 - Prefer initialization with ``auto`` or ``const auto``.
-    - Except for [default initialization](http://en.cppreference.com/w/cpp/language/default_initialization) or non-movable types as move elision does not yet fully work in MSVC.
+    - Except if you need [default initialization](http://en.cppreference.com/w/cpp/language/default_initialization) or non-movable types as move elision does not yet fully work in MSVC.
 - Put a single space between the operator and each operand, e.g. ``const auto abc = 2 + 2;``
 - Put ```const``` wherever possible even at the cost of readability. 
     - In particular, ```const``` every possible function argument.
