@@ -33,6 +33,10 @@ entries:
       url: cosmos
       output: web
 
+    - title: Flyweight
+      url: flyweight
+      output: web
+
     - title: Workspace
       url: workspace
       output: web
@@ -49,4 +53,11 @@ entries:
       url: main
       output: web
 
+  - title: Classes
+    output: web
+    folderitems:
+
+    - title: Editor setup
+      url: editor_setup
+      output: web
 
