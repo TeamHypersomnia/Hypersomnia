@@ -1,0 +1,132 @@
+---
+title: Source code reference
+permalink: docs
+hide_sidebar: true
+folder: docs
+---
+<br/>
+<p style="text-align:center; font-size: 17pt">Welcome to the <b>official documentation</b> of the Hypersomnia source code, </p>
+<p style="text-align:center; font-size: 14pt">a comprehensive resource written and maintained by developers.</p>
+<br/>
+
+{% unless site.output == "pdf" %}
+<script src="js/jquery.shuffle.min.js"></script>
+<script src="js/jquery.ba-throttle-debounce.min.js"></script>
+{% endunless %}
+
+      <div class="filter-options">
+      <button class="btn btn-primary" data-group="gettind_started">Getting started</button>
+      <button class="btn btn-primary" data-group="topics">Topics</button>
+      <button class="btn btn-primary" data-group="ECS">ECS</button>
+      <button class="btn btn-primary" data-group="flyweights">Flyweights</button>
+      <button class="btn btn-primary" data-group="stateless_systems">Stateless systems</button>
+    </div>      
+
+<div id="grid" class="row">
+
+    <div class="col-xs-6 col-sm-4 col-md-4" data-groups='["getting_started"]'>
+
+               <div class="panel panel-default">
+               <div class="panel-heading">Getting started</div>
+               <div class="panel-body">
+				   If you're getting started with contributing to Hypersomnia, see the links in this section. It will take you from the beginning level to comfortable.
+                  <ul>
+                {% for page in site.pages %}
+                {% for tag in page.tags %}
+                {% if tag == "getting_started" %}
+                  <li><a href="{{page.url | remove: '/'}}">{{page.title}}</a></li>
+                {% endif %}
+                {% endfor %}
+                {% endfor %} 
+                  </ul>
+               </div>
+            </div>
+    
+    </div>
+
+    <div class="col-xs-6 col-sm-4 col-md-4" data-groups='["topics"]'>
+
+               <div class="panel panel-default">
+               <div class="panel-heading">Topics</div>
+               <div class="panel-body">
+				   All articles concerning the code's design in general.
+                  <ul>
+                {% for page in site.pages %}
+                {% for tag in page.tags %}
+                {% if tag == "topics" %}
+                  <li><a href="{{page.url | remove: '/'}}">{{page.title}}</a></li>
+                {% endif %}
+                {% endfor %}
+                {% endfor %} 
+                  </ul>
+               </div>
+            </div>
+    
+    </div>
+    <div class="col-xs-6 col-sm-4 col-md-4" data-groups='["flyweights"]'>
+
+               <div class="panel panel-default">
+               <div class="panel-heading">Flyweights</div>
+               <div class="panel-body">
+                  <ul>
+                {% for page in site.pages %}
+                {% for tag in page.tags %}
+                {% if tag == "flyweights" %}
+                  <li><a href="{{page.url | remove: '/'}}">{{page.title}}</a></li>
+                {% endif %}
+                {% endfor %}
+                {% endfor %} 
+                  </ul>
+               </div>
+            </div>
+    
+    </div>
+    <div class="col-xs-6 col-sm-4 col-md-4" data-groups='["ECS"]'>
+
+               <div class="panel panel-default">
+               <div class="panel-heading">ECS</div>
+               <div class="panel-body">
+				   Our flavour of Entity-component-system pattern.
+                  <ul>
+                {% for page in site.pages %}
+                {% for tag in page.tags %}
+                {% if tag == "ECS" %}
+                  <li><a href="{{page.url | remove: '/'}}">{{page.title}}</a></li>
+                {% endif %}
+                {% endfor %}
+                {% endfor %} 
+                  </ul>
+               </div>
+            </div>
+    
+    </div>
+    <div class="col-xs-6 col-sm-4 col-md-4" data-groups='["stateless_systems"]'>
+
+               <div class="panel panel-default">
+				   <div class="panel-heading"><a href="{{page.url | remove: '/'}}/stateless_system">Stateless systems</a></div>
+               <div class="panel-body">
+				   All of them.
+                  <ul>
+                {% for page in site.pages %}
+                {% for tag in page.tags %}
+                {% if tag == "stateless_systems" %}
+                  <li><a href="{{page.url | remove: '/'}}">{{page.title}}</a></li>
+                {% endif %}
+                {% endfor %}
+                {% endfor %} 
+                  </ul>
+               </div>
+            </div>
+    
+    </div>
+   
+
+          <!-- sizer -->
+      <div class="col-xs-6 col-sm-4 col-md-1 shuffle_sizer"></div>          
+
+
+    </div><!-- /#grid -->
+
+{% unless site.output == "pdf" %}
+{% include initialize_shuffle.html %}
+{% endunless %}

@@ -75,8 +75,8 @@ defaults:
       layout: "page"
       comments: true
       search: true
-      sidebar: documentation_sidebar
       topnav: topnav
+      hide_sidebar: true
   -
     scope:
       path: ""
@@ -86,6 +86,7 @@ defaults:
       comments: true
       search: true
       tooltip: true
+      hide_sidebar: true
 
   -
     scope:
@@ -95,7 +96,7 @@ defaults:
       layout: "post"
       comments: true
       search: true
-      sidebar: documentation_sidebar
+      hide_sidebar: true
       topnav: topnav
 
 # these are defaults used for the frontmatter for these file types

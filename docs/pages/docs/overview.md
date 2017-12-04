@@ -1,7 +1,7 @@
 ---
-title: Source code documentation
-sidebar: docs_sidebar
-permalink: docs
+title: Overview
+tags: [getting_started]
+permalink: overview
 ---
 
 ## Repository structure
@@ -118,7 +118,7 @@ The rules are:
 - Use tabs for indentation.
 - Use uncapitalized ```underscore_case``` everywhere.
     - But do literally what you want with template parameters.
-- [Linux kernel indentation style.](https://en.wikipedia.org/wiki/Indentation_style#K.26R).
+- [Linux kernel indentation style](https://en.wikipedia.org/wiki/Indentation_style#K.26R).
     - But ALWAYS use brackets after ``if``/``else``/``for`` and the like! Too much life has been wasted on the illusion that this line is really a single expression...
     - Example:
 
@@ -167,4 +167,5 @@ The rules are:
 - The rest is left to your imagination.
 
 Additionally, all modifications to the code not original to the Hypersomnia repository (third party libraries or just any submodule) shall stay in accordance with their respective conventions.
+
 

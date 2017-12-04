@@ -3,6 +3,10 @@
 topnav:
 - title: Topnav
   items:
+    - title: Universe
+      url: universe
+    - title: Docs
+      url: docs
     - title: GitHub
       external_url: https://github.com/TeamHypersomnia/Hypersomnia
     - title: News

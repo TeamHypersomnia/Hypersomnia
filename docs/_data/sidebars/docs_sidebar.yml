@@ -9,6 +9,10 @@ entries:
     output: web
     folderitems:
 
+    - title: Overview
+      url: docs
+      output: web
+
     - title: Entity
       url: entity
       output: web
