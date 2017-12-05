@@ -3,8 +3,13 @@ title: Stateless system
 tags: [topics, ECS] 
 hide_sidebar: true
 summary: |
-    A [system](system) is called *stateless* if its member functions d does not ww class with one or more [systematic functions](systematic_function) as members that taken together solve some high-level problem  made members of a class with a name grouped under a name that describes their behaviour. that solve a  whose existence does not   
+    A [system](system) is called *stateless* if the side effects of all of its [systematic functions](systematic_function) are limited to the fields of [logic step](logic_step) that each takes as input.
 permalink: stateless_system
 ---
 
-hahaha
+## Conventions
+
+A stateless system is usually an empty class without member fields, only member [systematic functions](systematic_function).  
+In this case these member functions could as well be free-standing functions in the global scope.  
+
+If a stateless system needed to initialize some heavy data to be used once by all of its member functions, having those functions as members allows us to do so transparently to the system's client; though to date, no stateless system needs that.

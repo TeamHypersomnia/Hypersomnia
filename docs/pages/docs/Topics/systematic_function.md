@@ -26,7 +26,7 @@ Usually, all systematic functions are called, directly or indirectly by another 
         ```cpp
         movement_system::set_movement_flags_from_input
         ````
-- Iterates through a message queue and generates events to another message queue.
+- Iterates through a message queue and generates messages to another queue.
     - For example, one that queries children entities of deleted entities into the deletion queue.
 
         ```cpp
