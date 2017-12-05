@@ -20,7 +20,7 @@ These have been established too long ago, when the project wasn't thought of qui
 
 ### Language
 
-- Usage of modern C++ features is highly recommended, but make sure that they are supported by:
+- Usage of modern C++ features is required where it is applicable. Make sure that the feature you use is supported by:
     - The latest stable GCC release (at the time of this writing, 7.2).
     - MSVC that ships with the latest Visual Studio Preview.
 
@@ -83,7 +83,7 @@ These have been established too long ago, when the project wasn't thought of qui
 
 - The rest is left to your imagination.
 
-### Using external code
+### Adding external code
 
 Generally, if writing gameplay code, you should not need to introduce any other external library at this point, maybe to the exception of some crazy math.
 It is however entirely possible that such a need arises. In this case:
@@ -96,3 +96,4 @@ It is however entirely possible that such a need arises. In this case:
 
 Additionally, all modifications to the code not original to the Hypersomnia repository (whether a new one or already added) shall stay in accordance with their respective conventions.
 
+If you paste snippets from sites like [stackoverflow.com](http://stackoverflow.com), make sure to attribute them by adding a commented link above the code.

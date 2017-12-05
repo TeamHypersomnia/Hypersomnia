@@ -8,13 +8,25 @@ permalink: core_principles
 
 ## Goals
 
-The primary goal is to have [fun](https://en.wiktionary.org/wiki/fun#Noun).
+- The primary goal is to have [fun](https://en.wiktionary.org/wiki/fun#Noun).
 
-The secondary goal is to create a [fun](https://en.wiktionary.org/wiki/fun#Adjective), fast-paced top-down game,
-and when that succeeds, to extend it into an MMO with an interesting set of social mechanics.
+- The secondary goal is to create a [fun](https://en.wiktionary.org/wiki/fun#Adjective), fast-paced top-down game,
+and when that succeeds, to extend it into an MMO, with an interesting set of social mechanics.
 
-The tertiary goal is to have the game be enriched by diverse improvements from its fans,  
+- The tertiary goal is to have the game be enriched by diverse improvements from its fans,  
 or, in other words, having an awesome and accessible community.
+
+## On commercial usage
+
+{% include important.html content="The official Hypersomnia is and will always remain, regardless of its stage of development, **free for everyone** to play without charge, tamper with and host custom servers with." %}
+
+Hypersomnia is licensed under [AGPL-3.0](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/LICENSE.md), which briefly means that you can do whatever you want with the code and other content, as long as:
+- The binaries you distribute provide their complete source code.
+- The custom servers you host also expose their complete source code, in one way or another.
+
+In particular, **you can charge whatever you want** for copies of your Hypersomnia, essentially making a business out of it, provided you meet those requirements, and thus letting the community thrive.
+
+{% include important.html content="There may come a time when, once the MMO stage is reached, an *official* kind of game server becomes a demanded feature. Needless to say, such a thing may cost lots of money. **We will make efforts to fund it from donations that do not create any privileges for the benefactors, keeping all players equal** (with maybe just a hall of fame on the homepage). If that does not succeed, the official server may introduce some harmless privileges that could be bought and would not break the game for everyone. Purchasable character skins is the most radical step we can take. If that still does not succeed, the official servers will just not exist and the game will continue to develop as usual. It will then be left to you, dear fan, if you ever decide it's worth it, to come up with a business scheme that sustains a persistent world; one that works and you consider moral." %}
 
 ## On extensibility 
 
