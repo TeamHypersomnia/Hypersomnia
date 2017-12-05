@@ -12,6 +12,10 @@ site_title: Hypersomnia Wiki
 company_name: TeamHypersomnia
 # this appears in the footer
 
+organization_path: https://github.com/TeamHypersomnia
+
+repo_path: https://github.com/TeamHypersomnia/Hypersomnia
+
 github_editme_path: TeamHypersomnia/Hypersomnia/blob/master/docs/
 # if you're using Github, provide the basepath to the branch you've created for reviews, following the sample here. if not, leave this value blank.
 

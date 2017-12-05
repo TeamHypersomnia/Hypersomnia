@@ -31,7 +31,7 @@ layout: default
 <div class="post-content">
 
    {% if page.summary %}
-    <div class="summary">{{page.summary}}</div>
+    <div class="summary">{{page.summary | markdownify }}</div>
    {% endif %}
 
     {% unless page.toc == false %}
