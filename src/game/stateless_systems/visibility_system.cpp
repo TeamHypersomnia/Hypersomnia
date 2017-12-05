@@ -196,8 +196,8 @@ void visibility_system::respond_to_visibility_information_requests(
 
 	std::vector<
 		augs::simple_pair<
-			physics_system::raycast_output, 
-			physics_system::raycast_output
+			physics_raycast_output, 
+			physics_raycast_output
 		>
 	> all_ray_outputs;
 	std::vector<ray_input> all_ray_inputs;
@@ -577,12 +577,12 @@ void visibility_system::respond_to_visibility_information_requests(
 			all_ray_outputs.emplace_back(
 				physics.ray_cast(position_meters, all_ray_inputs[j].targets[0], request.filter, ignored_entity),
 				all_vertices_transformed[j].is_on_a_bound ?
-				physics_system::raycast_output() : physics.ray_cast(position_meters, all_ray_inputs[j].targets[1], request.filter, ignored_entity)
+				physics_raycast_output() : physics.ray_cast(position_meters, all_ray_inputs[j].targets[1], request.filter, ignored_entity)
 			);
 		}
 
 		for (size_t i = 0; i < all_ray_outputs.size(); ++i) {
-			physics_system::raycast_output ray_callbacks[2] = { all_ray_outputs[i].first, all_ray_outputs[i].second };
+			physics_raycast_output ray_callbacks[2] = { all_ray_outputs[i].first, all_ray_outputs[i].second };
 			auto& vertex = all_vertices_transformed[i];
 
 			const b2Vec2* from_aabb = nullptr;

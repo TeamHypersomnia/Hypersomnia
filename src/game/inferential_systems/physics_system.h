@@ -34,6 +34,13 @@ struct joint_cache {
 	b2Joint* joint = nullptr;
 };
 
+struct physics_raycast_output {
+	bool hit = false;
+	vec2 intersection;
+	vec2 normal;
+	unversioned_entity_id what_entity;
+};
+
 class physics_system {
 	std::vector<rigid_body_cache> rigid_body_caches;
 	std::vector<colliders_cache> colliders_caches;
@@ -78,31 +85,25 @@ class physics_system {
 	const joint_cache& get_joint_cache(const entity_id) const;
 
 	std::vector<messages::collision_message> accumulated_messages;
-public:
-	struct raycast_output {
-		bool hit = false;
-		vec2 intersection;
-		vec2 normal;
-		unversioned_entity_id what_entity;
-	};
 
+public:
 	physics_system();
 
-	std::vector<raycast_output> ray_cast_all_intersections(
+	std::vector<physics_raycast_output> ray_cast_all_intersections(
 		const vec2 p1_meters,
 		const vec2 p2_meters, 
 		const b2Filter filter, 
 		const entity_id ignore_entity = entity_id()
 	) const;
 
-	raycast_output ray_cast(
+	physics_raycast_output ray_cast(
 		const vec2 p1_meters, 
 		const vec2 p2_meters, 
 		const b2Filter filter, 
 		const entity_id ignore_entity = entity_id()
 	) const;
 
-	raycast_output ray_cast_px(
+	physics_raycast_output ray_cast_px(
 		const si_scaling si,
 		const vec2 p1, 
 		const vec2 p2, 
@@ -187,8 +188,8 @@ private:
 		b2Filter subject_filter;
 
 		bool save_all = false;
-		raycast_output output;
-		std::vector<raycast_output> outputs;
+		physics_raycast_output output;
+		std::vector<physics_raycast_output> outputs;
 
 		bool ShouldRaycast(b2Fixture* fixture) override;
 		float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction) override;

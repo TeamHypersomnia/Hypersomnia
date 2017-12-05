@@ -33,7 +33,7 @@ float32 physics_system::raycast_input::ReportFixture(
 	return fraction;
 }
 
-std::vector<physics_system::raycast_output> physics_system::ray_cast_all_intersections(
+std::vector<physics_raycast_output> physics_system::ray_cast_all_intersections(
 	const vec2 p1_meters, 
 	const vec2 p2_meters, 
 	const b2Filter filter, 
@@ -122,7 +122,7 @@ vec2 physics_system::push_away_from_walls(
 	}
 }
 
-physics_system::raycast_output physics_system::ray_cast(const vec2 p1_meters, const vec2 p2_meters, const b2Filter filter, const entity_id ignore_entity) const {
+physics_raycast_output physics_system::ray_cast(const vec2 p1_meters, const vec2 p2_meters, const b2Filter filter, const entity_id ignore_entity) const {
 	++ray_casts_since_last_step;
 
 	raycast_input callback;
@@ -138,7 +138,7 @@ physics_system::raycast_output physics_system::ray_cast(const vec2 p1_meters, co
 	return callback.output;
 }
 
-physics_system::raycast_output physics_system::ray_cast_px(
+physics_raycast_output physics_system::ray_cast_px(
 	const si_scaling si,
 	const vec2 p1, 
 	const vec2 p2, 
