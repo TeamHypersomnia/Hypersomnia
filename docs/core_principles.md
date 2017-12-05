@@ -11,12 +11,12 @@ permalink: core_principles
 - The primary goal is to have [fun](https://en.wiktionary.org/wiki/fun#Noun).
 
 - The secondary goal is to create a [fun](https://en.wiktionary.org/wiki/fun#Adjective), fast-paced top-down game,
-and when that succeeds, to extend it into an MMO, with an interesting set of social mechanics.
+and when that succeeds, to extend it into an MMO with an interesting set of social mechanics.
 
 - The tertiary goal is to have the game be enriched by diverse improvements from its fans,  
 or, in other words, having an awesome and accessible community.
 
-## On commercial usage
+## Commercial usage
 
 {% include important.html content="The official Hypersomnia is and will always remain, regardless of its stage of development, **free for everyone** to play without charge, tamper with and host custom servers with." %}
 
@@ -26,15 +26,17 @@ Hypersomnia is licensed under [AGPL-3.0](https://github.com/TeamHypersomnia/Hype
 
 In particular, **you can charge whatever you want** for copies of your Hypersomnia, essentially making a business out of it, provided you meet those requirements, and thus letting the community thrive.
 
-{% include important.html content="There may come a time when, once the MMO stage is reached, an *official* kind of game server becomes a demanded feature. Needless to say, such a thing may cost lots of money. **We will make efforts to fund it from donations that do not create any privileges for the benefactors, keeping all players equal** (with maybe just a hall of fame on the homepage). If that does not succeed, the official server may introduce some harmless privileges that could be bought and would not break the game for everyone. Purchasable character skins is the most radical step we can take. If that still does not succeed, the official servers will just not exist and the game will continue to develop as usual. It will then be left to you, dear fan, if you ever decide it's worth it, to come up with a business scheme that sustains a persistent world; one that works and you consider moral." %}
+{% include important.html content="There may come a time when, once the MMO stage is reached, an *official* kind of game server becomes a demanded feature. Needless to say, such a thing may cost lots of money. **We will make efforts to fund it from donations that do not create any privileges for the benefactors, keeping all players equal** (with maybe just a hall of fame on the homepage). If that does not succeed, the official server may introduce some harmless privileges that could be bought and would not break the game for everyone. Purchasable character skins is the most radical step we are ready to take. If that still does not succeed, the official servers will just not exist and the game will continue to develop as usual. It will then be left to you, dear fan, if you ever decide it's worth it, to come up with a business scheme that sustains a persistent world; one that works and you consider moral." %}
 
-## On extensibility 
+{% include important.html content="There may come a time when Hypersomnia gets an official single-player campaign. In that case, the game may benefit from some licensed content, for example music. Needless to say, it might be impossible to distribute such content under the same rules as described in this section. The game will explicitly ask the user if they wish to download the licensed content in order to play the single-player campaign, and make it clear that the downloaded files are not to be used with freedoms that the rest of the game can. So that any fan does not use such content accidentally in their own copy, the licensed content will be downloaded to completely outside of the source tree, and obviously, will not be tracked by git at all. We will make efforts to ensure that **anything inside the repository itself is safe** to use under the rules described in this section." %}
+
+## Extensibility 
 
 Much of the codebase described here could be readily applied to just about any kind of game.  
 You might find some topics like [entities](entity), [components](component) or [systems](stateless_system) defined in a rather general fashion, 
 not necessarily pertaining to any particular Hypersomnia mechanic, or even to any specific game genre.  
 
-It should be remembered though, that the [main focus](#goal) of this project **is not to create a universal game engine**.  
+It should be remembered though, that the [main focus](#goals) of this project **is not to create a universal game engine**.  
 In particular, most of the tweaks will be possible almost exclusively by direct interaction with the game's C++ source code.
 That is why, on one hand, you may find ```augs/``` to be a game-agnostic "framework", but on the other hand, you will find:
 - hardcoded C++ enumerations of [render layers](render_layer) with well-defined roles;
