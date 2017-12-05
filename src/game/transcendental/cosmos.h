@@ -111,7 +111,7 @@ public:
 		logic_step step(*this, input, queues);
 
 		pre_solve(step);
-		advance_and_queue_destructions(step);
+		advance_systems(step);
 		post_solve(const_logic_step(step));
 		perform_deletions(step);
 		post_cleanup(const_logic_step(step));
@@ -295,7 +295,7 @@ private:
 		const entity_guid specific_guid
 	);
 
-	void advance_and_queue_destructions(const logic_step step_state);
+	void advance_systems(const logic_step step_state);
 	void perform_deletions(const logic_step);
 
 	void destroy_inferred_state_completely();

@@ -414,7 +414,7 @@ void cosmos::delete_entity(const entity_id e) {
 	inferential.relational.handle_deletion_of_potential_parent(e);
 }
 
-void cosmos::advance_and_queue_destructions(const logic_step step) {
+void cosmos::advance_systems(const logic_step step) {
 	auto& cosmos = step.cosm;
 	const auto& delta = step.get_delta();
 	auto& performance = profiler;
