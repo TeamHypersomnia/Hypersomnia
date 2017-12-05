@@ -53,13 +53,13 @@ namespace components {
 	};
 }
 
-class physics_system;
+class physics_world_cache;
 struct rigid_body_cache;
 
 template <bool is_const>
 class basic_physics_synchronizer : public component_synchronizer_base<is_const, components::rigid_body> {
 protected:
-	friend class ::physics_system;
+	friend class ::physics_world_cache;
 	friend class component_synchronizer<is_const, components::fixtures>;
 	template <bool> 
 	friend class basic_fixtures_synchronizer;

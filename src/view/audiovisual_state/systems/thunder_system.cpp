@@ -6,7 +6,7 @@
 
 #include "game/transcendental/cosmos.h"
 
-#include "game/inferential_systems/physics_system.h"
+#include "game/inferential_systems/physics_world_cache.h"
 
 #include "view/viewables/all_viewables_declarations.h"
 #include "view/viewables/particle_effect.h"

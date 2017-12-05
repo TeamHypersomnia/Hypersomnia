@@ -1,5 +1,5 @@
 #include <cstring>
-#include "physics_system.h"
+#include "physics_world_cache.h"
 
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/cosmos.h"
@@ -22,55 +22,55 @@
 
 
 #include "augs/templates/dynamic_cast_dispatch.h"
-#include "augs/build_settings/setting_debug_physics_system_copy.h"
+#include "augs/build_settings/setting_debug_physics_world_cache_copy.h"
 #include "game/inferential_systems/relational_system.h"
 
-bool physics_system::is_inferred_state_created_for_rigid_body(const const_entity_handle handle) const {
+bool physics_world_cache::is_inferred_state_created_for_rigid_body(const const_entity_handle handle) const {
 	return 
 		handle.alive() 
 		&& get_rigid_body_cache(handle).body != nullptr
 	;
 }
 
-bool physics_system::is_inferred_state_created_for_colliders(const const_entity_handle handle) const {
+bool physics_world_cache::is_inferred_state_created_for_colliders(const const_entity_handle handle) const {
 	return
 		handle.alive()
 		&& get_colliders_cache(handle).all_fixtures_in_component.size() > 0u
 	;
 }
 
-bool physics_system::is_inferred_state_created_for_joint(const const_entity_handle handle) const {
+bool physics_world_cache::is_inferred_state_created_for_joint(const const_entity_handle handle) const {
 	return 
 		handle.alive() 
 		&& get_joint_cache(handle).joint != nullptr
 	;
 }
 
-rigid_body_cache& physics_system::get_rigid_body_cache(const entity_id id) {
+rigid_body_cache& physics_world_cache::get_rigid_body_cache(const entity_id id) {
 	return rigid_body_caches[linear_cache_key(id)];
 }
 
-colliders_cache& physics_system::get_colliders_cache(const entity_id id) {
+colliders_cache& physics_world_cache::get_colliders_cache(const entity_id id) {
 	return colliders_caches[linear_cache_key(id)];
 }
 
-joint_cache& physics_system::get_joint_cache(const entity_id id) {
+joint_cache& physics_world_cache::get_joint_cache(const entity_id id) {
 	return joint_caches[linear_cache_key(id)];
 }
 
-const rigid_body_cache& physics_system::get_rigid_body_cache(const entity_id id) const {
+const rigid_body_cache& physics_world_cache::get_rigid_body_cache(const entity_id id) const {
 	return rigid_body_caches[linear_cache_key(id)];
 }
 
-const colliders_cache& physics_system::get_colliders_cache(const entity_id id) const {
+const colliders_cache& physics_world_cache::get_colliders_cache(const entity_id id) const {
 	return colliders_caches[linear_cache_key(id)];
 }
 
-const joint_cache& physics_system::get_joint_cache(const entity_id id) const {
+const joint_cache& physics_world_cache::get_joint_cache(const entity_id id) const {
 	return joint_caches[linear_cache_key(id)];
 }
 
-void physics_system::destroy_inferred_state_of(const const_entity_handle handle) {
+void physics_world_cache::destroy_inferred_state_of(const const_entity_handle handle) {
 	const auto& cosmos = handle.get_cosmos();
 
 	if (is_inferred_state_created_for_rigid_body(handle)) {
@@ -112,7 +112,7 @@ void physics_system::destroy_inferred_state_of(const const_entity_handle handle)
 	}
 }
 
-void physics_system::create_inferred_state_for(const const_entity_handle handle) {
+void physics_world_cache::create_inferred_state_for(const const_entity_handle handle) {
 	const auto& cosmos = handle.get_cosmos();
 	const auto& relational = cosmos.inferential.relational;
 
@@ -170,7 +170,7 @@ void physics_system::create_inferred_state_for(const const_entity_handle handle)
 	create_inferred_state_for_joint(handle);
 }
 
-void physics_system::create_inferred_state_for_fixtures(const const_entity_handle handle) {
+void physics_world_cache::create_inferred_state_for_fixtures(const const_entity_handle handle) {
 	if (const bool is_already_constructed = is_inferred_state_created_for_colliders(handle)) {
 		return;
 	}
@@ -252,7 +252,7 @@ void physics_system::create_inferred_state_for_fixtures(const const_entity_handl
 	}
 }
 
-void physics_system::create_inferred_state_for_joint(const const_entity_handle handle) {
+void physics_world_cache::create_inferred_state_for_joint(const const_entity_handle handle) {
 	if (const bool is_already_constructed = is_inferred_state_created_for_joint(handle)) {
 		return;
 	}
@@ -289,13 +289,13 @@ void physics_system::create_inferred_state_for_joint(const const_entity_handle h
 	}
 }
 
-void physics_system::reserve_caches_for_entities(const size_t n) {
+void physics_world_cache::reserve_caches_for_entities(const size_t n) {
 	rigid_body_caches.resize(n);
 	colliders_caches.resize(n);
 	joint_caches.resize(n);
 }
 
-b2Fixture_index_in_component physics_system::get_index_in_component(
+b2Fixture_index_in_component physics_world_cache::get_index_in_component(
 	const b2Fixture* const f, 
 	const const_entity_handle handle
 ) {
@@ -325,19 +325,19 @@ b2Fixture_index_in_component physics_system::get_index_in_component(
 	//return b2Fixture_index_in_component();
 }
 
-physics_system::physics_system() :
+physics_world_cache::physics_world_cache() :
 	b2world(new b2World(b2Vec2(0.f, 0.f))) 
 {
 	b2world->SetAllowSleeping(true);
 	b2world->SetAutoClearForces(false);
 }
 
-void physics_system::post_and_clear_accumulated_collision_messages(const logic_step step) {
+void physics_world_cache::post_and_clear_accumulated_collision_messages(const logic_step step) {
 	step.transient.messages.post(accumulated_messages);
 	accumulated_messages.clear();
 }
 
-void physics_system::step_and_set_new_transforms(const logic_step step) {
+void physics_world_cache::step_and_set_new_transforms(const logic_step step) {
 	auto& cosmos = step.cosm;
 	const auto delta = step.get_delta();
 
@@ -365,11 +365,11 @@ void physics_system::step_and_set_new_transforms(const logic_step step) {
 	}
 }
 
-physics_system::physics_system(const physics_system& b) {
+physics_world_cache::physics_world_cache(const physics_world_cache& b) {
 	*this = b;
 }
 
-physics_system& physics_system::operator=(const physics_system& b) {
+physics_world_cache& physics_world_cache::operator=(const physics_world_cache& b) {
 	ray_casts_since_last_step = b.ray_casts_since_last_step;
 	accumulated_messages = b.accumulated_messages;
 

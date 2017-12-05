@@ -9,7 +9,7 @@
 #include "game/components/tree_of_npo_node_component.h"
 #include "augs/math/camera_cone.h"
 
-class physics_system;
+class physics_world_cache;
 struct cosmos_common_state;
 
 /* NPO stands for "non-physical objects" */

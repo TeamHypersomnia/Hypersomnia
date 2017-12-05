@@ -1,12 +1,12 @@
 #include "augs/templates/container_templates.h"
-#include "game/inferential_systems/physics_system.h"
+#include "game/inferential_systems/physics_world_cache.h"
 #include "game/components/fixtures_component.h"
 #include "game/components/special_physics_component.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/logic_step.h"
 #include "physics_scripts.h"
 
-void physics_system::rechoose_owner_friction_body(const entity_handle entity) {
+void physics_world_cache::rechoose_owner_friction_body(const entity_handle entity) {
 	ensure(entity.get<components::rigid_body>().is_constructed());
 	
 	auto& special_physics = entity.get<components::special_physics>();
@@ -59,7 +59,7 @@ void physics_system::rechoose_owner_friction_body(const entity_handle entity) {
 	}
 }
 
-void physics_system::recurential_friction_handler(const logic_step step, b2Body* const body, b2Body* const friction_entity) {
+void physics_world_cache::recurential_friction_handler(const logic_step step, b2Body* const body, b2Body* const friction_entity) {
 	if (friction_entity == nullptr) return;
 
 	const float dt = static_cast<float>(step.get_delta().in_seconds());

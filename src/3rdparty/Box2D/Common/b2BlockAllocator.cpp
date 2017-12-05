@@ -22,7 +22,7 @@
 #include <cstring>
 #include <memory>
 
-#include "augs/build_settings/setting_debug_physics_system_copy.h"
+#include "augs/build_settings/setting_debug_physics_world_cache_copy.h"
 
 using namespace std;
 
@@ -60,7 +60,7 @@ struct b2Block
 b2BlockAllocator::b2BlockAllocator()
 {
 	b2Assert(b2_blockSizes < UCHAR_MAX);
-#if DEBUG_PHYSICS_SYSTEM_COPY
+#if DEBUG_PHYSICS_WORLD_CACHE_COPY
 	m_numAllocatedObjects = 0;
 #endif
 
@@ -109,7 +109,7 @@ void* b2BlockAllocator::Allocate(int32 size)
 
 	b2Assert(0 < size);
 
-#if DEBUG_PHYSICS_SYSTEM_COPY
+#if DEBUG_PHYSICS_WORLD_CACHE_COPY
 	++m_numAllocatedObjects;
 #endif
 
@@ -173,7 +173,7 @@ void b2BlockAllocator::Free(void* p, int32 size)
 
 	b2Assert(0 < size);
 	
-#if DEBUG_PHYSICS_SYSTEM_COPY
+#if DEBUG_PHYSICS_WORLD_CACHE_COPY
 	--m_numAllocatedObjects;
 #endif
 

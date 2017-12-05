@@ -352,7 +352,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/view/audiovisual_state/systems/thunder_system.cpp"
 	"src/view/audiovisual_state/systems/flying_number_indicator_system.cpp"
 	"src/view/audiovisual_state/systems/wandering_pixels_system.cpp"
-	"src/game/inferential_systems/physics_system.cpp"
+	"src/game/inferential_systems/physics_world_cache.cpp"
 	"src/game/inferential_systems/processing_lists_system.cpp"
 	"src/game/inferential_systems/tree_of_npo_system.cpp"
 	"src/game/stateless_systems/destruction_system.cpp"

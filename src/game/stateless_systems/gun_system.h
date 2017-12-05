@@ -1,6 +1,6 @@
 #pragma once
 
-class physics_system;
+class physics_world_cache;
 class cosmos;
 #include "game/transcendental/step_declaration.h"
 

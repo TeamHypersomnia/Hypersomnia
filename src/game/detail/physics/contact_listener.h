@@ -2,7 +2,7 @@ class b2Contact;
 class b2Manifold;
 class b2ContactImpulse;
 
-class physics_system;
+class physics_world_cache;
 class cosmos;
 
 struct contact_listener : public b2ContactListener {
@@ -14,7 +14,7 @@ struct contact_listener : public b2ContactListener {
 	bool during_step = false;
 
 	cosmos& cosm;
-	physics_system& get_sys() const;
+	physics_world_cache& get_sys() const;
 
 	contact_listener(const contact_listener&) = delete;
 	contact_listener(contact_listener&&) = delete;

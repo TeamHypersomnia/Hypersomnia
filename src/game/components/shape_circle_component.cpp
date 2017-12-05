@@ -3,7 +3,7 @@
 
 #include "game/detail/physics/b2Fixture_index_in_component.h"
 #include "game/components/shape_circle_component.h"
-#include "game/inferential_systems/physics_system.h"
+#include "game/inferential_systems/physics_world_cache.h"
 
 template <bool C>
 bool basic_shape_circle_synchronizer<C>::is_activated() const {
@@ -18,7 +18,7 @@ real32 basic_shape_circle_synchronizer<C>::get_radius() const {
 using S = components::shape_circle;
 
 void component_synchronizer<false, S>::reinference() const {
-	handle.get_cosmos().partial_reinference<physics_system>(handle);
+	handle.get_cosmos().partial_reinference<physics_world_cache>(handle);
 }
 
 void component_synchronizer<false, S>::set_activated(const bool flag) const {

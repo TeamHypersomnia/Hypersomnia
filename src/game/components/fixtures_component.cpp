@@ -74,7 +74,7 @@ const component_synchronizer<false, F>& component_synchronizer<false, F>::operat
 
 void component_synchronizer<false, F>::reinference() const {
 	handle.get_cosmos().partial_reinference<relational_system>(handle);
-	handle.get_cosmos().partial_reinference<physics_system>(handle);
+	handle.get_cosmos().partial_reinference<physics_world_cache>(handle);
 }
 
 void component_synchronizer<false, F>::rebuild_density() const {
@@ -166,11 +166,11 @@ void component_synchronizer<false, F>::set_owner_body(const entity_id owner_id) 
 	relational.set_parent(self, new_owner);
 
 	if (former_owner.alive()) {
-		cosmos.partial_reinference<physics_system>(former_owner);
+		cosmos.partial_reinference<physics_world_cache>(former_owner);
 	}
 
 	ensure(new_owner.alive());
-	cosmos.partial_reinference<physics_system>(new_owner);
+	cosmos.partial_reinference<physics_world_cache>(new_owner);
 }
 
 template<bool C>

@@ -156,7 +156,7 @@ protected:
 	friend class b2Body;
 	friend class b2Island;
 	friend class b2GearJoint;
-	friend class physics_system;
+	friend class physics_world_cache;
 
 	static b2Joint* Create(const b2JointDef* def, b2BlockAllocator* allocator);
 	static void Destroy(b2Joint* joint, b2BlockAllocator* allocator);

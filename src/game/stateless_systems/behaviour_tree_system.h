@@ -1,7 +1,7 @@
 #pragma once
 #include "game/transcendental/step_declaration.h"
 
-class physics_system;
+class physics_world_cache;
 class cosmos;
 
 class behaviour_tree_system {

@@ -14,7 +14,7 @@ class component_synchronizer;
 
 class relational_system {
 	friend class cosmos;
-	friend class physics_system;
+	friend class physics_world_cache;
 
 	friend class component_synchronizer<false, components::fixtures>;
 

@@ -47,13 +47,13 @@ namespace components {
 	};
 }
 
-class physics_system;
+class physics_world_cache;
 struct colliders_cache;
 
 template <bool is_const>
 class basic_fixtures_synchronizer : public component_synchronizer_base<is_const, components::fixtures> {
 protected:
-	friend class ::physics_system;
+	friend class ::physics_world_cache;
 	using base = component_synchronizer_base<is_const, components::fixtures>;
 	using base::handle;
 

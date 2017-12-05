@@ -12,7 +12,7 @@
 
 #include "game/components/transform_component.h"
 
-class physics_system;
+class physics_world_cache;
 struct motor_joint_cache;
 struct b2Fixture_index_in_component;
 
@@ -39,7 +39,7 @@ namespace components {
 template <bool is_const>
 class basic_motor_joint_synchronizer : public component_synchronizer_base<is_const, components::motor_joint> {
 protected:
-	friend class ::physics_system;
+	friend class ::physics_world_cache;
 
 	using base = component_synchronizer_base<is_const, components::motor_joint>;
 	using base::handle;

@@ -19,7 +19,7 @@
 #include <Box2D/Collision/b2DynamicTree.h>
 #include <memory.h>
 #include "augs/ensure.h"
-#include "augs/build_settings/setting_debug_physics_system_copy.h"
+#include "augs/build_settings/setting_debug_physics_world_cache_copy.h"
 
 b2DynamicTree::b2DynamicTree()
 {
@@ -35,7 +35,7 @@ b2DynamicTree::b2DynamicTree()
 	{
 		m_nodes[i].next = i + 1;
 		m_nodes[i].height = -1;
-#if DEBUG_PHYSICS_SYSTEM_COPY
+#if DEBUG_PHYSICS_WORLD_CACHE_COPY
 		m_nodes[i].userData = nullptr;
 #endif
 	}
@@ -100,7 +100,7 @@ void b2DynamicTree::FreeNode(int32 nodeId)
 	b2Assert(0 < m_nodeCount);
 	m_nodes[nodeId].next = m_freeList;
 	m_nodes[nodeId].height = -1;
-#if DEBUG_PHYSICS_SYSTEM_COPY
+#if DEBUG_PHYSICS_WORLD_CACHE_COPY
 	m_nodes[nodeId].userData = nullptr;
 #endif
 	m_freeList = nodeId;
@@ -785,7 +785,7 @@ void b2DynamicTree::ShiftOrigin(const b2Vec2& newOrigin)
 	}
 }
 
-#if DEBUG_PHYSICS_SYSTEM_COPY
+#if DEBUG_PHYSICS_WORLD_CACHE_COPY
 #if PLATFORM_WINDOWS
 #include <malloc.h>
 #endif
@@ -796,7 +796,7 @@ b2DynamicTree& b2DynamicTree::operator=(const b2DynamicTree& b)
 	this->~b2DynamicTree();
 
 	const auto bytes = b.m_nodeCapacity * sizeof(b2TreeNode);
-#if DEBUG_PHYSICS_SYSTEM_COPY
+#if DEBUG_PHYSICS_WORLD_CACHE_COPY
 #if PLATFORM_WINDOWS
 	ensure_eq(_msize(b.m_nodes), bytes);
 #else

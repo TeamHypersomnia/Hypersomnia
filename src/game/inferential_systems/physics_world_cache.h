@@ -41,7 +41,7 @@ struct physics_raycast_output {
 	unversioned_entity_id what_entity;
 };
 
-class physics_system {
+class physics_world_cache {
 	std::vector<rigid_body_cache> rigid_body_caches;
 	std::vector<colliders_cache> colliders_caches;
 	std::vector<joint_cache> joint_caches;
@@ -87,7 +87,7 @@ class physics_system {
 	std::vector<messages::collision_message> accumulated_messages;
 
 public:
-	physics_system();
+	physics_world_cache();
 
 	std::vector<physics_raycast_output> ray_cast_all_intersections(
 		const vec2 p1_meters,
@@ -177,11 +177,11 @@ public:
 	// b2World on stack causes a stack overflow due to a large stack allocator, therefore it must be dynamically allocated
 	std::unique_ptr<b2World> b2world;
 
-	physics_system(const physics_system&);
-	physics_system& operator=(const physics_system&);
+	physics_world_cache(const physics_world_cache&);
+	physics_world_cache& operator=(const physics_world_cache&);
 
-	physics_system& operator=(physics_system&&) = delete;
-	physics_system(physics_system&&) = delete;
+	physics_world_cache& operator=(physics_world_cache&&) = delete;
+	physics_world_cache(physics_world_cache&&) = delete;
 private:	
 	struct raycast_input : public b2RayCastCallback {
 		entity_id subject;

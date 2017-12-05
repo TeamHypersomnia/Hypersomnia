@@ -8,7 +8,7 @@
 #include "fixtures_component.h"
 
 #include "augs/math/vec2.h"
-#include "game/inferential_systems/physics_system.h"
+#include "game/inferential_systems/physics_world_cache.h"
 #include "augs/ensure.h"
 #include "game/debug_drawing_settings.h"
 
@@ -39,7 +39,7 @@ maybe_const_ref_t<C, rigid_body_cache>& basic_physics_synchronizer<C>::get_cache
 }
 
 void component_synchronizer<false, P>::reinference() const {
-	handle.get_cosmos().partial_reinference<physics_system>(handle);
+	handle.get_cosmos().partial_reinference<physics_world_cache>(handle);
 }
 
 void component_synchronizer<false, P>::set_body_type(const rigid_body_type t) const {

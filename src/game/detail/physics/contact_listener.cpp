@@ -16,11 +16,11 @@
 #include "game/detail/physics/physics_scripts.h"
 #include "game/detail/physics/contact_listener.h"
 
-#include "game/inferential_systems/physics_system.h"
+#include "game/inferential_systems/physics_world_cache.h"
 
 #define FRICTION_FIELDS_COLLIDE 0
 
-physics_system& contact_listener::get_sys() const {
+physics_world_cache& contact_listener::get_sys() const {
 	return cosm.inferential.physics;
 }
 

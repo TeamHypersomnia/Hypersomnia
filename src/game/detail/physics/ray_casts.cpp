@@ -1,4 +1,4 @@
-#include "game/inferential_systems/physics_system.h"
+#include "game/inferential_systems/physics_world_cache.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 
@@ -6,14 +6,14 @@
 #include "game/detail/physics/physics_scripts.h"
 #include "game/enums/filters.h"
 
-bool physics_system::raycast_input::ShouldRaycast(b2Fixture* const fixture) {
+bool physics_world_cache::raycast_input::ShouldRaycast(b2Fixture* const fixture) {
 	const auto fixture_entity = fixture->GetBody()->GetUserData();
 	return
 		(subject == entity_id() || fixture_entity != subject) &&
 		(b2ContactFilter::ShouldCollide(&subject_filter, &fixture->GetFilterData()));
 }
 
-float32 physics_system::raycast_input::ReportFixture(
+float32 physics_world_cache::raycast_input::ReportFixture(
 	b2Fixture* const fixture, 
 	const b2Vec2& point,
 	const b2Vec2& normal, 
@@ -33,7 +33,7 @@ float32 physics_system::raycast_input::ReportFixture(
 	return fraction;
 }
 
-std::vector<physics_raycast_output> physics_system::ray_cast_all_intersections(
+std::vector<physics_raycast_output> physics_world_cache::ray_cast_all_intersections(
 	const vec2 p1_meters, 
 	const vec2 p2_meters, 
 	const b2Filter filter, 
@@ -54,7 +54,7 @@ std::vector<physics_raycast_output> physics_system::ray_cast_all_intersections(
 	return callback.outputs;
 }
 
-float physics_system::get_closest_wall_intersection(
+float physics_world_cache::get_closest_wall_intersection(
 	const si_scaling si,
 	const vec2 position, 
 	const float radius, 
@@ -84,7 +84,7 @@ float physics_system::get_closest_wall_intersection(
 	return worst_distance;
 }
 
-vec2 physics_system::push_away_from_walls(
+vec2 physics_world_cache::push_away_from_walls(
 	const si_scaling si,
 	const vec2 position, 
 	const float radius, 
@@ -122,7 +122,7 @@ vec2 physics_system::push_away_from_walls(
 	}
 }
 
-physics_raycast_output physics_system::ray_cast(const vec2 p1_meters, const vec2 p2_meters, const b2Filter filter, const entity_id ignore_entity) const {
+physics_raycast_output physics_world_cache::ray_cast(const vec2 p1_meters, const vec2 p2_meters, const b2Filter filter, const entity_id ignore_entity) const {
 	++ray_casts_since_last_step;
 
 	raycast_input callback;
@@ -138,7 +138,7 @@ physics_raycast_output physics_system::ray_cast(const vec2 p1_meters, const vec2
 	return callback.output;
 }
 
-physics_raycast_output physics_system::ray_cast_px(
+physics_raycast_output physics_world_cache::ray_cast_px(
 	const si_scaling si,
 	const vec2 p1, 
 	const vec2 p2, 
