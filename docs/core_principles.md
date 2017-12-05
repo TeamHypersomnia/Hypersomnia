@@ -33,7 +33,7 @@ In particular, **you can charge whatever you want** for copies of your Hypersomn
 ## Extensibility 
 
 Much of the codebase described here could be readily applied to just about any kind of game.  
-You might find some topics like [entities](entity), [components](component) or [systems](stateless_system) defined in a rather general fashion, 
+You might find some topics like [entities](entity), [components](component) or [systems](system) defined in a rather general fashion, 
 not necessarily pertaining to any particular Hypersomnia mechanic, or even to any specific game genre.  
 
 It should be remembered though, that the [main focus](#goals) of this project **is not to create a universal game engine**.  
