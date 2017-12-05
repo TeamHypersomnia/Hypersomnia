@@ -29,6 +29,9 @@ layout: default
 {% endif %}
 
 <div class="post-content">
+   {% if page.note %}
+   {% include note.html content=page.note %}
+   {% endif %}
 
    {% if page.summary %}
     <div class="summary">{{page.summary | markdownify }}</div>

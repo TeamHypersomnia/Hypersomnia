@@ -1,8 +1,20 @@
 ---
 title: Core principles
 tags: [getting_started]
+summary: |
+    General rationales and ideology.
 permalink: core_principles
 ---
+
+## Goals
+
+The primary goal is to have [fun](https://en.wiktionary.org/wiki/fun#Noun).
+
+The secondary goal is to create a [fun](https://en.wiktionary.org/wiki/fun#Adjective), fast-paced top-down game,
+and when that succeeds, to extend it into an MMO with an interesting set of social mechanics.
+
+The tertiary goal is to have the game be enriched by diverse improvements from its fans,  
+or, in other words, having an awesome and accessible community.
 
 ## On extensibility 
 
@@ -10,9 +22,8 @@ Much of the codebase described here could be readily applied to just about any k
 You might find some topics like [entities](entity), [components](component) or [systems](stateless_system) defined in a rather general fashion, 
 not necessarily pertaining to any particular Hypersomnia mechanic, or even to any specific game genre.  
 
-It should be remembered though, that the main focus of this project **is not to create a universal game engine**,  
-but to create a [fun](https://en.wiktionary.org/wiki/fun#Adjective), fast-paced top-down game,
-customization of which will be possible almost exclusively by direct interaction with the game's C++ source code.
+It should be remembered though, that the [main focus](#goal) of this project **is not to create a universal game engine**.  
+In particular, most of the tweaks will be possible almost exclusively by direct interaction with the game's C++ source code.
 That is why, on one hand, you may find ```augs/``` to be a game-agnostic "framework", but on the other hand, you will find:
 - hardcoded C++ enumerations of [render layers](render_layer) with well-defined roles;
 - a very game-specific, natively coded [rendering routine](illuminated_rendering) in C++ that uses these render layers and speaks directly to OpenGL without any kind of general rendering framework;

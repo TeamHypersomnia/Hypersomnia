@@ -1,6 +1,10 @@
 ---
 title: Folder structure
 tags: [getting_started]
+summary: |
+    Care was taken to reasonably distribute the codebase across folders.  
+    It is plentifully important to put the new source files exactly where they belong in the hierarchy.  
+    Very often, you can reason about a file's dependencies by just seeing where it is located.
 permalink: folder_structure
 ---
 

@@ -2,9 +2,8 @@
 title: Contributing
 tags: [getting_started]
 summary: |
-    Great portion of time spent Hypersomnia was to make the codebase possible to be understood by newcomers.  
-    Our purpose is to establish a community project, wherein each fan can extend the game in any way imaginable,  
-    with reasonable amount of effort.  
+    Great portion of time spent developing Hypersomnia was to make the codebase possible to be understood by newcomers.  
+    Our purpose is to establish a community project, wherein each fan can improve the game with reasonable amount of effort.
 
     This article will run you through the basic procedure of making changes to the Hypersomnia source code. 
 permalink: contributing
