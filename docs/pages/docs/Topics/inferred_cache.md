@@ -1,8 +1,8 @@
 ---
-title: Inferential system
+title: Inferred cache
 tags: [topics, ECS] 
 hide_sidebar: true
-permalink: inferential_system
+permalink: inferred_cache
 ---
 
 hahaha
