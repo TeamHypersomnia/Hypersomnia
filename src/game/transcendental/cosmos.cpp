@@ -40,6 +40,7 @@
 #include "game/transcendental/data_living_one_step.h"
 
 #include "game/detail/inventory/inventory_utils.h"
+#include "game/detail/physics/contact_listener.h"
 
 #include "augs/readwrite/lua_readwrite.h"
 #include "augs/readwrite/byte_readwrite.h"
@@ -421,7 +422,7 @@ void cosmos::advance_systems(const logic_step step) {
 	
 	auto logic_scope = measure_scope(performance.logic);
 
-	physics_system::contact_listener listener(step.cosm);
+	contact_listener listener(step.cosm);
 	
 	perform_transfers(step.input.entropy.transfer_requests, step);
 	

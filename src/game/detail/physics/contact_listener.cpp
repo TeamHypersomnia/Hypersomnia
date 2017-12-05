@@ -1,22 +1,38 @@
 #include "augs/templates/container_templates.h"
-#include "game/inferential_systems/physics_system.h"
+
+#include "game/debug_drawing_settings.h"
+
 #include "game/components/fixtures_component.h"
-#include "game/messages/collision_message.h"
 #include "game/components/driver_component.h"
 #include "game/components/special_physics_component.h"
 #include "game/components/flags_component.h"
 #include "game/components/missile_component.h"
 
+#include "game/messages/collision_message.h"
+
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/logic_step.h"
 
-#include "physics_scripts.h"
+#include "game/detail/physics/physics_scripts.h"
+#include "game/detail/physics/contact_listener.h"
 
-#include "game/debug_drawing_settings.h"
+#include "game/inferential_systems/physics_system.h"
 
 #define FRICTION_FIELDS_COLLIDE 0
 
-void physics_system::contact_listener::BeginContact(b2Contact* contact) {
+physics_system& contact_listener::get_sys() const {
+	return cosm.inferential.physics;
+}
+
+contact_listener::contact_listener(cosmos& cosm) : cosm(cosm) {
+	get_sys().b2world->SetContactListener(this);
+}
+
+contact_listener::~contact_listener() {
+	get_sys().b2world->SetContactListener(nullptr);
+}
+
+void contact_listener::BeginContact(b2Contact* contact) {
 	auto& sys = get_sys();
 	auto& cosmos = cosm;
 	
@@ -165,7 +181,7 @@ void physics_system::contact_listener::BeginContact(b2Contact* contact) {
 	}
 }
 
-void physics_system::contact_listener::EndContact(b2Contact* contact) {
+void contact_listener::EndContact(b2Contact* contact) {
 	auto& sys = get_sys();
 	auto& cosmos = cosm;
 	const auto si = cosmos.get_si();
@@ -228,7 +244,7 @@ void physics_system::contact_listener::EndContact(b2Contact* contact) {
 	}
 }
 
-void physics_system::contact_listener::PreSolve(b2Contact* contact, const b2Manifold* oldManifold) {
+void contact_listener::PreSolve(b2Contact* contact, const b2Manifold* oldManifold) {
 	auto& sys = get_sys();
 	auto& cosmos = cosm;
 
@@ -357,7 +373,7 @@ void physics_system::contact_listener::PreSolve(b2Contact* contact, const b2Mani
 	}
 }
 
-void physics_system::contact_listener::PostSolve(b2Contact* contact, const b2ContactImpulse* impulse) {
+void contact_listener::PostSolve(b2Contact* contact, const b2ContactImpulse* impulse) {
 	auto& sys = get_sys();
 	auto& cosmos = cosm;
 	const auto si = cosmos.get_si();

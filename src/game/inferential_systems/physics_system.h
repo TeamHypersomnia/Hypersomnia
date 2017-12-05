@@ -56,6 +56,7 @@ class physics_system {
 	void destroy_additional_inferred_state(const cosmos_common_state&) {}
 
 	friend class cosmos;
+	friend class contact_listener;
 	friend class component_synchronizer<false, components::rigid_body>;
 	friend class component_synchronizer<true, components::rigid_body>;
 	friend class component_synchronizer<false, components::motor_joint>;
@@ -191,27 +192,6 @@ private:
 
 		bool ShouldRaycast(b2Fixture* fixture) override;
 		float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction) override;
-	};
-
-	struct contact_listener : public b2ContactListener {
-		void BeginContact(b2Contact* contact) override;
-		void EndContact(b2Contact* contact) override;
-		void PreSolve(b2Contact* contact, const b2Manifold* oldManifold) override;
-		void PostSolve(b2Contact* contact, const b2ContactImpulse* impulse) override;
-
-		bool during_step = false;
-
-		cosmos& cosm;
-		physics_system& get_sys() const;
-
-		contact_listener(const contact_listener&) = delete;
-		contact_listener(contact_listener&&) = delete;
-		
-		contact_listener(cosmos&);
-		~contact_listener();
-		
-		contact_listener& operator=(const contact_listener&) = delete;
-		contact_listener& operator=(contact_listener&&) = delete;
 	};
 
 	void rechoose_owner_friction_body(entity_handle);

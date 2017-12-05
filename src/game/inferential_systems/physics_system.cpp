@@ -337,18 +337,6 @@ void physics_system::post_and_clear_accumulated_collision_messages(const logic_s
 	accumulated_messages.clear();
 }
 
-physics_system& physics_system::contact_listener::get_sys() const {
-	return cosm.inferential.physics;
-}
-
-physics_system::contact_listener::contact_listener(cosmos& cosm) : cosm(cosm) {
-	get_sys().b2world->SetContactListener(this);
-}
-
-physics_system::contact_listener::~contact_listener() {
-	get_sys().b2world->SetContactListener(nullptr);
-}
-
 void physics_system::step_and_set_new_transforms(const logic_step step) {
 	auto& cosmos = step.cosm;
 	const auto delta = step.get_delta();

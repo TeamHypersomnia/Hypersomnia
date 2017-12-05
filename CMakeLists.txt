@@ -330,7 +330,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/detail/inventory/inventory_slot_id.cpp"
 	"src/game/detail/inventory/inventory_utils.cpp"
 	"src/view/viewables/particle_types.cpp"
-	"src/game/detail/physics/physics_events.cpp"
+	"src/game/detail/physics/contact_listener.cpp"
 	"src/game/detail/physics/physics_friction_fields.cpp"
 	"src/game/detail/physics/ray_casts.cpp"
 	"src/game/detail/physics/physics_scripts.cpp"
