@@ -1,5 +1,4 @@
 #pragma once
-
 #include "game/transcendental/step_declaration.h"
 
 class destroy_system {

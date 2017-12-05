@@ -63,6 +63,7 @@ class physics_world_cache {
 	void destroy_additional_inferred_state(const cosmos_common_state&) {}
 
 	friend class cosmos;
+	friend class physics_system;
 	friend class contact_listener;
 	friend class component_synchronizer<false, components::rigid_body>;
 	friend class component_synchronizer<true, components::rigid_body>;

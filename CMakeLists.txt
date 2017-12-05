@@ -504,6 +504,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/augs/misc/imgui/imgui_controls.cpp"
 	"src/augs/readwrite/readwrite_tests.cpp"
 	"src/game/components/trace_component.cpp"
+	"src/game/stateless_systems/physics_system.cpp"
 )
 
 if(BUILD_WINDOW_FRAMEWORK)

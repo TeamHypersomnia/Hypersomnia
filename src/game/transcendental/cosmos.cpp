@@ -27,6 +27,7 @@
 #include "game/stateless_systems/destruction_system.h"
 #include "game/stateless_systems/sound_existence_system.h"
 #include "game/stateless_systems/hand_fuse_system.h"
+#include "game/stateless_systems/physics_system.h"
 
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/logic_step.h"
@@ -456,7 +457,7 @@ void cosmos::advance_systems(const logic_step step) {
 		auto scope = measure_scope(performance.physics);
 
 		listener.during_step = true;
-		inferential.physics.step_and_set_new_transforms(step);
+		physics_system().step_and_set_new_transforms(step);
 		listener.during_step = false;
 	}
 
@@ -481,7 +482,7 @@ void cosmos::advance_systems(const logic_step step) {
 	
 	sentience_system().regenerate_values_and_advance_spell_logic(step);
 	sentience_system().apply_damage_and_generate_health_events(step);
-	inferential.physics.post_and_clear_accumulated_collision_messages(step);
+	physics_system().post_and_clear_accumulated_collision_messages(step);
 	sentience_system().cooldown_aimpunches(step);
 
 	driver_system().release_drivers_due_to_requests(step);

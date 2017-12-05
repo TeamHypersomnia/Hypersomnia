@@ -1,9 +1,6 @@
 #include <cstring>
 #include "physics_world_cache.h"
 
-#include "game/transcendental/entity_id.h"
-#include "game/transcendental/cosmos.h"
-
 #include "game/components/item_component.h"
 #include "game/components/driver_component.h"
 #include "game/components/fixtures_component.h"
@@ -19,7 +16,6 @@
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/logic_step.h"
 #include "game/transcendental/entity_handle.h"
-
 
 #include "augs/templates/dynamic_cast_dispatch.h"
 #include "augs/build_settings/setting_debug_physics_world_cache_copy.h"
@@ -330,39 +326,6 @@ physics_world_cache::physics_world_cache() :
 {
 	b2world->SetAllowSleeping(true);
 	b2world->SetAutoClearForces(false);
-}
-
-void physics_world_cache::post_and_clear_accumulated_collision_messages(const logic_step step) {
-	step.transient.messages.post(accumulated_messages);
-	accumulated_messages.clear();
-}
-
-void physics_world_cache::step_and_set_new_transforms(const logic_step step) {
-	auto& cosmos = step.cosm;
-	const auto delta = step.get_delta();
-
-	int32 velocityIterations = 8;
-	int32 positionIterations = 3;
-
-	ray_casts_since_last_step = 0;
-
-	b2world->Step(static_cast<float32>(delta.in_seconds()), velocityIterations, positionIterations);
-
-	post_and_clear_accumulated_collision_messages(step);
-
-	for (b2Body* b = b2world->GetBodyList(); b != nullptr; b = b->GetNext()) {
-		if (b->GetType() == b2_staticBody) continue;
-		entity_handle entity = cosmos[b->GetUserData()];
-
-		recurential_friction_handler(step, b, b->m_ownerFrictionGround);
-
-		auto& body = entity.get<components::rigid_body>().get_raw_component();
-		
-		body.transform = b->m_xf;
-		body.sweep = b->m_sweep;
-		body.velocity = vec2(b->GetLinearVelocity());
-		body.angular_velocity = b->GetAngularVelocity();
-	}
 }
 
 physics_world_cache::physics_world_cache(const physics_world_cache& b) {
