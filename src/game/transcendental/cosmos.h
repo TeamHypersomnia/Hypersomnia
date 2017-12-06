@@ -156,22 +156,15 @@ public:
 		get_entity_pool().for_each_id(pred);
 	}
 
-	void complete_reinference();
-	void complete_reinference(const const_entity_handle);
-
 	void infer_cache_for(const const_entity_handle);
 	void destroy_cache_of(const const_entity_handle);
 	
-	void refresh_for_new_significant_state();
-	void remap_guids();
-	void clear();
-
-	template <class System>
-	void partial_reinference(const entity_handle handle) {
+	template <class cache_type>
+	void regenerate_cache(const entity_handle handle) {
 		inferred.for_each([&](auto& sys) {
 			using T = std::decay_t<decltype(sys)>;
 
-			if constexpr(std::is_same_v<T, System>) {
+			if constexpr(std::is_same_v<T, cache_type>) {
 				sys.destroy_cache_of(handle);
 
 				if (handle.is_inferred_state_activated()) {
@@ -180,6 +173,13 @@ public:
 			}
 		});
 	}
+
+	void regenerate_all_caches_for();
+	void regenerate_all_caches_for(const const_entity_handle);
+
+	void refresh_for_new_significant_state();
+	void remap_guids();
+	void clear();
 
 	entity_id make_versioned(const unversioned_entity_id) const;
 

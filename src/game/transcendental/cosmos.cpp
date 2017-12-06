@@ -56,8 +56,8 @@ void cosmos::clear() {
 	*this = empty;
 }
 
-void cosmos::complete_reinference() {
-	auto scope = measure_scope(profiler.complete_reinference);
+void cosmos::regenerate_all_caches_for() {
+	auto scope = measure_scope(profiler.regenerate_all_caches_for);
 	
 	destroy_all_caches();
 	infer_all_caches();
@@ -211,10 +211,10 @@ void cosmos::remap_guids() {
 
 void cosmos::refresh_for_new_significant_state() {
 	remap_guids();
-	complete_reinference();
+	regenerate_all_caches_for();
 }
 
-void cosmos::complete_reinference(const const_entity_handle h) {
+void cosmos::regenerate_all_caches_for(const const_entity_handle h) {
 	destroy_cache_of(h);
 	infer_cache_for(h);
 }
@@ -322,7 +322,7 @@ entity_handle cosmos::clone_entity(const entity_id source_entity_id) {
 
 		/*
 			Let us keep the inferred state of the new entity disabled for a while,
-			to avoid unnecessary reinference.
+			to avoid unnecessary regeneration.
 		*/
 		components::all_inferred_state
 	>(new_entity, source_entity);
@@ -383,16 +383,16 @@ void cosmos::delete_entity(const entity_id e) {
 		return;
 	}
 
-	const bool should_deactivate_inferred_state_to_avoid_repeated_reinference 
+	const bool should_deactivate_inferred_state_to_avoid_repeated_regeneration 
 		= handle.is_inferred_state_activated()
 	;
 
-	if (should_deactivate_inferred_state_to_avoid_repeated_reinference) {
+	if (should_deactivate_inferred_state_to_avoid_repeated_regeneration) {
 		handle.get<components::all_inferred_state>().set_activated(false);
 	}
 
 	clear_guid(handle);
-	// now manipulation of an entity without all_inferred_state component won't trigger redundant reinference
+	// now manipulation of an entity without all_inferred_state component won't trigger redundant regeneration
 
 	const auto maybe_fixtures = handle.find<components::fixtures>();
 

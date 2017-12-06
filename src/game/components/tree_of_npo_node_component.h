@@ -37,7 +37,7 @@ public:
 
 template<>
 class component_synchronizer<false, components::tree_of_npo_node> : public basic_tree_of_npo_node_synchronizer<false> {
-	void reinference() const;
+	void regenerate_caches() const;
 public:
 	using basic_tree_of_npo_node_synchronizer<false>::basic_tree_of_npo_node_synchronizer;
 

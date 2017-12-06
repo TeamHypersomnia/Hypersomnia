@@ -27,7 +27,7 @@ public:
 
 template<>
 class component_synchronizer<false, components::all_inferred_state> : public basic_all_inferred_state_synchronizer<false> {
-	void reinference() const;
+	void regenerate_caches() const;
 public:
 	using basic_all_inferred_state_synchronizer<false>::basic_all_inferred_state_synchronizer;
 

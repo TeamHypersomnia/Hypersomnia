@@ -96,18 +96,18 @@ bool basic_processing_synchronizer<C>::is_in(const processing_subjects list) con
 	return get_raw_component().processing_subject_categories.test(list) && !get_raw_component().disabled_categories.test(list);
 }
 
-void component_synchronizer<false, P>::reinference() const {
-	handle.get_cosmos().partial_reinference<processing_lists_cache>(handle);
+void component_synchronizer<false, P>::regenerate_caches() const {
+	handle.get_cosmos().regenerate_cache<processing_lists_cache>(handle);
 }
 
 void component_synchronizer<false, P>::disable_in(const processing_subjects list) const {
 	get_raw_component().disabled_categories.set(list, true);
-	reinference();
+	regenerate_caches();
 }
 
 void component_synchronizer<false, P>::enable_in(const processing_subjects list) const {
 	get_raw_component().disabled_categories.set(list, false);
-	reinference();
+	regenerate_caches();
 }
 
 template<bool C>
@@ -122,12 +122,12 @@ P::flagset_type basic_processing_synchronizer<C>::get_basic_categories() const {
 
 void component_synchronizer<false, P>::set_disabled_categories(const P::flagset_type& categories) const {
 	get_raw_component().disabled_categories = categories;
-	reinference();
+	regenerate_caches();
 }
 
 void component_synchronizer<false, P>::set_basic_categories(const P::flagset_type& categories) const {
 	get_raw_component().processing_subject_categories = categories;
-	reinference();
+	regenerate_caches();
 }
 
 template class basic_processing_synchronizer<false>;

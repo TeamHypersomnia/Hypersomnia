@@ -357,7 +357,7 @@ void server_setup::process(const config_lua_table& cfg, game_window& window, con
 			
 			if (reinfer) {
 				LOG("Ser: resubs at step: %x", hypersomnia.get_total_steps_passed());
-				hypersomnia.complete_reinference();
+				hypersomnia.regenerate_all_caches_for();
 				reinfer = false;
 			}
 

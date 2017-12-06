@@ -12,8 +12,8 @@ bool basic_shape_polygon_synchronizer<C>::is_activated() const {
 
 using S = components::shape_polygon;
 
-void component_synchronizer<false, S>::reinference() const {
-	handle.get_cosmos().partial_reinference<physics_world_cache>(handle);
+void component_synchronizer<false, S>::regenerate_caches() const {
+	handle.get_cosmos().regenerate_cache<physics_world_cache>(handle);
 }
 
 convex_poly_destruction_data& component_synchronizer<false, S>::get_modifiable_destruction_data(
@@ -28,7 +28,7 @@ void component_synchronizer<false, S>::set_activated(const bool flag) const {
 	}
 
 	get_raw_component().activated = flag;
-	reinference();
+	regenerate_caches();
 }
 
 template class basic_shape_polygon_synchronizer<false>;

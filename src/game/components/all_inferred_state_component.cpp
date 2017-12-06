@@ -8,8 +8,8 @@ bool basic_all_inferred_state_synchronizer<C>::is_activated() const {
 
 using A = components::all_inferred_state;
 
-void component_synchronizer<false, A>::reinference() const {
-	handle.get_cosmos().complete_reinference(handle);
+void component_synchronizer<false, A>::regenerate_caches() const {
+	handle.get_cosmos().regenerate_all_caches_for(handle);
 }
 
 void component_synchronizer<false, A>::set_activated(const bool flag) const {
@@ -18,7 +18,7 @@ void component_synchronizer<false, A>::set_activated(const bool flag) const {
 	}
 
 	get_raw_component().activated = flag;
-	reinference();
+	regenerate_caches();
 }
 
 template class basic_all_inferred_state_synchronizer<false>;

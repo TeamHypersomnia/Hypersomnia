@@ -62,19 +62,19 @@ void component_synchronizer<false, F>::set_offset(
 	const components::transform off
 ) const {
 	get_raw_component().offsets_for_created_shapes[t] = off;
-	reinference();
+	regenerate_caches();
 }
 
 const component_synchronizer<false, F>& component_synchronizer<false, F>::operator=(const F& f) const {
 	set_owner_body(f.owner_body);
 	get_raw_component() = f;
-	reinference();
+	regenerate_caches();
 	return *this;
 }
 
-void component_synchronizer<false, F>::reinference() const {
-	handle.get_cosmos().partial_reinference<relational_cache>(handle);
-	handle.get_cosmos().partial_reinference<physics_world_cache>(handle);
+void component_synchronizer<false, F>::regenerate_caches() const {
+	handle.get_cosmos().regenerate_cache<relational_cache>(handle);
+	handle.get_cosmos().regenerate_cache<physics_world_cache>(handle);
 }
 
 void component_synchronizer<false, F>::rebuild_density() const {
@@ -115,7 +115,7 @@ void component_synchronizer<false, F>::set_activated(const bool flag) const {
 	}
 
 	get_raw_component().activated = flag;
-	reinference();
+	regenerate_caches();
 }
 
 void component_synchronizer<false, F>::set_friction(
@@ -166,11 +166,11 @@ void component_synchronizer<false, F>::set_owner_body(const entity_id owner_id) 
 	relational.set_parent(self, new_owner);
 
 	if (former_owner.alive()) {
-		cosmos.partial_reinference<physics_world_cache>(former_owner);
+		cosmos.regenerate_cache<physics_world_cache>(former_owner);
 	}
 
 	ensure(new_owner.alive());
-	cosmos.partial_reinference<physics_world_cache>(new_owner);
+	cosmos.regenerate_cache<physics_world_cache>(new_owner);
 }
 
 template<bool C>

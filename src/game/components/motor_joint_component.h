@@ -53,7 +53,7 @@ public:
 
 template<>
 class component_synchronizer<false, components::motor_joint> : public basic_motor_joint_synchronizer<false> {
-	void reinference() const;
+	void regenerate_caches() const;
 
 public:
 	using basic_motor_joint_synchronizer<false>::basic_motor_joint_synchronizer;
