@@ -174,7 +174,7 @@ public:
 		});
 	}
 
-	void regenerate_all_caches_for();
+	void regenerate_all_caches();
 	void regenerate_all_caches_for(const const_entity_handle);
 
 	void refresh_for_new_significant_state();
