@@ -105,10 +105,6 @@ defaults:
 
 # these are defaults used for the frontmatter for these file types
 
-sidebars:
-- documentation_sidebar
-- universe_sidebar
-
 description: "Hypersomnia Wiki"
 # the description is used in the feed.xml file
 
