@@ -32,7 +32,7 @@
 #endif
 
 #include "game/organization/all_messages_declaration.h"
-#include "game/organization/all_inferred_systems.h"
+#include "game/organization/all_inferred_caches.h"
 #include "game/transcendental/cosmos_significant_state.h"
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
