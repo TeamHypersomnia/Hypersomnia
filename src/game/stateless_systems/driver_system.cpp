@@ -11,7 +11,7 @@
 #include "game/components/sentience_component.h"
 
 #include "game/transcendental/cosmos.h"
-#include "game/inferential_systems/physics_world_cache.h"
+#include "game/inferred_caches/physics_world_cache.h"
 
 #include "game/components/driver_component.h"
 #include "game/components/rigid_body_component.h"

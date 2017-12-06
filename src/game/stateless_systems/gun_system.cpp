@@ -30,7 +30,7 @@
 #include "game/components/gun_component.h"
 
 #include "game/stateless_systems/gun_system.h"
-#include "game/inferential_systems/physics_world_cache.h"
+#include "game/inferred_caches/physics_world_cache.h"
 
 using namespace augs;
 

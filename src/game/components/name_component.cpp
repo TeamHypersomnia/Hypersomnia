@@ -6,7 +6,7 @@
 #include "game/components/all_inferred_state_component.h"
 #include "game/components/name_component.h"
 
-#include "game/inferential_systems/name_system.h"
+#include "game/inferred_caches/name_system.h"
 
 entity_id get_first_named_ancestor(const const_entity_handle p) {
 	entity_id iterator = p;

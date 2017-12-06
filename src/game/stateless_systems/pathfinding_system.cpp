@@ -4,7 +4,7 @@
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/logic_step.h"
 
-#include "game/inferential_systems/physics_world_cache.h"
+#include "game/inferred_caches/physics_world_cache.h"
 
 #include "game/components/pathfinding_component.h"
 #include "game/components/shape_polygon_component.h"

@@ -15,7 +15,7 @@
 #include "game/transcendental/logic_step.h"
 
 #include "game/stateless_systems/visibility_system.h"
-#include "game/inferential_systems/physics_world_cache.h"
+#include "game/inferred_caches/physics_world_cache.h"
 
 #include "game/enums/processing_subjects.h"
 

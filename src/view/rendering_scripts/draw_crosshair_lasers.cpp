@@ -5,7 +5,7 @@
 #include "game/components/explosive_component.h"
 #include "augs/drawing/drawing.h"
 
-#include "game/inferential_systems/physics_world_cache.h"
+#include "game/inferred_caches/physics_world_cache.h"
 #include "game/enums/filters.h"
 #include "game/detail/entity_scripts.h"
 

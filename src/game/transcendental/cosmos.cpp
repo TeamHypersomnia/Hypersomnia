@@ -64,8 +64,8 @@ void cosmos::complete_reinference() {
 }
 
 void cosmos::destroy_inferred_state_completely() {
-	inferential.~all_inferential_systems();
-	new (&inferential) all_inferential_systems;
+	inferential.~all_inferred_caches();
+	new (&inferential) all_inferred_caches;
 
 	const auto n = significant.entity_pool.capacity();
 

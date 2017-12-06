@@ -1,5 +1,5 @@
 #include "processing_component.h"
-#include "game/inferential_systems/processing_lists_system.h"
+#include "game/inferred_caches/processing_lists_system.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
 #include "game/organization/all_component_includes.h"

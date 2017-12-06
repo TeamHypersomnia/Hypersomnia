@@ -1,13 +1,13 @@
 #pragma warning(disable : 4503)
 #pragma once
 
-#include "game/inferential_systems/tree_of_npo_system.h"
-#include "game/inferential_systems/physics_world_cache.h"
-#include "game/inferential_systems/processing_lists_system.h"
-#include "game/inferential_systems/relational_system.h"
-#include "game/inferential_systems/name_system.h"
+#include "game/inferred_caches/tree_of_npo_system.h"
+#include "game/inferred_caches/physics_world_cache.h"
+#include "game/inferred_caches/processing_lists_system.h"
+#include "game/inferred_caches/relational_system.h"
+#include "game/inferred_caches/name_system.h"
 
-struct all_inferential_systems {
+struct all_inferred_caches {
 	relational_system relational;
 	name_system name;
 	physics_world_cache physics;

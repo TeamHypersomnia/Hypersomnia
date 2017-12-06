@@ -9,8 +9,8 @@
 #include "game/enums/filters.h"
 #include "game/detail/physics/physics_scripts.h"
 
-#include "game/inferential_systems/tree_of_npo_system.h"
-#include "game/inferential_systems/physics_world_cache.h"
+#include "game/inferred_caches/tree_of_npo_system.h"
+#include "game/inferred_caches/physics_world_cache.h"
 
 static void get_visible_per_layer(
 	const cosmos& cosmos,

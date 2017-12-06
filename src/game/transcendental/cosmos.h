@@ -83,7 +83,7 @@ public:
 	static const cosmos empty;
 
 	cosmos_significant_state significant;
-	all_inferential_systems inferential;
+	all_inferred_caches inferential;
 
 	mutable cosmic_profiler profiler;
 	

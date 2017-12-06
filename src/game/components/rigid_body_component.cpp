@@ -8,7 +8,7 @@
 #include "fixtures_component.h"
 
 #include "augs/math/vec2.h"
-#include "game/inferential_systems/physics_world_cache.h"
+#include "game/inferred_caches/physics_world_cache.h"
 #include "augs/ensure.h"
 #include "game/debug_drawing_settings.h"
 

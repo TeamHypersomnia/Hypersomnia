@@ -1,5 +1,5 @@
 #include "augs/templates/container_templates.h"
-#include "game/inferential_systems/physics_world_cache.h"
+#include "game/inferred_caches/physics_world_cache.h"
 #include "game/components/fixtures_component.h"
 #include "game/components/special_physics_component.h"
 #include "game/transcendental/cosmos.h"
