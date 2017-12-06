@@ -1,13 +1,10 @@
 ---
-title: Source code reference
-permalink: docs
-folder: docs
-extension: .html
+title: Welcome to the Hypersomnia Universe
+sidebar: universe_sidebar
+permalink: universe
 ---
-<br/>
-<p style="text-align:center; font-size: 17pt">Welcome to the <b>official documentation</b> of the Hypersomnia source code, </p>
-<p style="text-align:center; font-size: 14pt">a comprehensive resource written and maintained by developers.</p>
-<br/>
+
+Here you will learn about the lore, the game mechanics, places to explore, and more!
 
 {% unless site.output == "pdf" %}
 <script src="js/jquery.shuffle.min.js"></script>
@@ -15,14 +12,14 @@ extension: .html
 {% endunless %}
 
       <div class="filter-options">
-                {% for current_tag in site.data.docs_tags %}
+                {% for current_tag in site.data.universe_tags %}
 				<button class="btn btn-primary" data-group="{{ current_tag.name }}">{{ current_tag.title }}</button>
                 {% endfor %} 
     </div>      
 
 <div id="grid" class="row">
 
-                {% for current_tag in site.data.docs_tags %}
+                {% for current_tag in site.data.universe_tags %}
 				<div class="col-xs-6 col-sm-4 col-md-4" data-groups='["{{ current_tag.name }}"]'>
 
                <div class="panel panel-default">

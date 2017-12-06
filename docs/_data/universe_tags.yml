@@ -1,0 +1,11 @@
+# Note:
+# If you are using the createtag script, don't leave an blank line at the end of this file.
+# In other words, the last line must be the last tag in the allowed-tags list.
+- title: Organizations
+  name: organizations
+- title: Places
+  name: places
+  description: Your tour guide.
+- title: Characters
+  name: characters
+  description: Notable citizens.

@@ -1,0 +1,18 @@
+# Note:
+# If you are using the createtag script, don't leave an blank line at the end of this file.
+# In other words, the last line must be the last tag in the allowed-tags list.
+- title: Getting started
+  name: getting_started
+  description: If it is your first time fiddling with the inner workings of Hypersomnia, see the links in this section. It will take you from the beginning level to comfortable.
+- title: Topics
+  name: topics
+  description: All articles concerning the code's design in general.
+- title: Flyweights
+  name: flyweights
+- title: ECS
+  name: ECS
+  description: Our flavour of Entity-component-system pattern.
+- title: Stateless systems
+  title_link: stateless_system
+  name: stateless_systems
+  description: All of them.
