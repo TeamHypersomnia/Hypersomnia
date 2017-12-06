@@ -4,7 +4,7 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
 
-void name_cache::create_additional_inferred_state(const cosmos_common_state& global) {
+void name_cache::infer_additional_cache(const cosmos_common_state& global) {
 	const bool is_already_constructed = name_to_id_lookup.size() > 0;
 
 	ensure(!is_already_constructed);
@@ -14,15 +14,15 @@ void name_cache::create_additional_inferred_state(const cosmos_common_state& glo
 	}
 }
 
-void name_cache::destroy_additional_inferred_state(const cosmos_common_state& global) {
+void name_cache::destroy_additional_cache_of(const cosmos_common_state& global) {
 	name_to_id_lookup.clear();
 }
 
-void name_cache::create_inferred_state_for(const entity_id id, const components::name& name) {
+void name_cache::infer_cache_for(const entity_id id, const components::name& name) {
 	entities_by_name_id[name.name_id].emplace(id);
 }
 
-void name_cache::destroy_inferred_state_of(const entity_id id, const components::name& name) {
+void name_cache::destroy_cache_of(const entity_id id, const components::name& name) {
 	const auto this_name_id = name.name_id;
 	auto& entities_with_this_name_id = entities_by_name_id[this_name_id];
 
@@ -33,12 +33,12 @@ void name_cache::destroy_inferred_state_of(const entity_id id, const components:
 	}
 }
 
-void name_cache::create_inferred_state_for(const const_entity_handle h) {
-	create_inferred_state_for(h, h.get<components::name>().get_raw_component());
+void name_cache::infer_cache_for(const const_entity_handle h) {
+	infer_cache_for(h, h.get<components::name>().get_raw_component());
 }
 
-void name_cache::destroy_inferred_state_of(const const_entity_handle h) {
-	destroy_inferred_state_of(h, h.get<components::name>().get_raw_component());
+void name_cache::destroy_cache_of(const const_entity_handle h) {
+	destroy_cache_of(h, h.get<components::name>().get_raw_component());
 }
 
 void name_cache::set_name_id(
@@ -46,9 +46,9 @@ void name_cache::set_name_id(
 	components::name& name_of_subject, 
 	const entity_id subject
 ) {
-	destroy_inferred_state_of(subject, name_of_subject);
+	destroy_cache_of(subject, name_of_subject);
 	name_of_subject.name_id = new_name_id;
-	create_inferred_state_for(subject, name_of_subject);
+	infer_cache_for(subject, name_of_subject);
 }
 
 void name_cache::set_name(

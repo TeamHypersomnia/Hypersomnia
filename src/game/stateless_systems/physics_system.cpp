@@ -8,7 +8,7 @@
 
 void physics_system::post_and_clear_accumulated_collision_messages(const logic_step step) {
 	auto& cosmos = step.cosm;
-	auto& physics = cosmos.inferential.physics;
+	auto& physics = cosmos.inferred.physics;
 	
 	step.transient.messages.post(physics.accumulated_messages);
 	physics.accumulated_messages.clear();
@@ -16,7 +16,7 @@ void physics_system::post_and_clear_accumulated_collision_messages(const logic_s
 
 void physics_system::step_and_set_new_transforms(const logic_step step) {
 	auto& cosmos = step.cosm;
-	auto& physics = cosmos.inferential.physics;
+	auto& physics = cosmos.inferred.physics;
 
 	const auto delta = step.get_delta();
 

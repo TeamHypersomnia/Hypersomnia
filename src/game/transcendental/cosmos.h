@@ -83,7 +83,7 @@ public:
 	static const cosmos empty;
 
 	cosmos_significant_state significant;
-	all_inferred_caches inferential;
+	all_inferred_caches inferred;
 
 	mutable cosmic_profiler profiler;
 	
@@ -126,14 +126,14 @@ public:
 		augs::enum_boolset<subjects_iteration_flag> flags = {}
 	) {
 		if (flags.test(subjects_iteration_flag::POSSIBLE_ITERATOR_INVALIDATION)) {
-			const auto targets = inferential.processing_lists.get(list_type);
+			const auto targets = inferred.processing_lists.get(list_type);
 
 			for (const auto& subject : targets) {
 				operator()(subject, callback);
 			}
 		}
 		else {
-			for (const auto& subject : inferential.processing_lists.get(list_type)) {
+			for (const auto& subject : inferred.processing_lists.get(list_type)) {
 				operator()(subject, callback);
 			}
 		}
@@ -141,7 +141,7 @@ public:
 
 	template <class F>
 	void for_each(const processing_subjects list_type, F callback) const {
-		for (const auto& subject : inferential.processing_lists.get(list_type)) {
+		for (const auto& subject : inferred.processing_lists.get(list_type)) {
 			operator()(subject, callback);
 		}
 	}
@@ -159,8 +159,8 @@ public:
 	void complete_reinference();
 	void complete_reinference(const const_entity_handle);
 
-	void create_inferred_state_for(const const_entity_handle);
-	void destroy_inferred_state_of(const const_entity_handle);
+	void infer_cache_for(const const_entity_handle);
+	void destroy_cache_of(const const_entity_handle);
 	
 	void refresh_for_new_significant_state();
 	void remap_guids();
@@ -168,14 +168,14 @@ public:
 
 	template <class System>
 	void partial_reinference(const entity_handle handle) {
-		inferential.for_each([&](auto& sys) {
+		inferred.for_each([&](auto& sys) {
 			using T = std::decay_t<decltype(sys)>;
 
 			if constexpr(std::is_same_v<T, System>) {
-				sys.destroy_inferred_state_of(handle);
+				sys.destroy_cache_of(handle);
 
 				if (handle.is_inferred_state_activated()) {
-					sys.create_inferred_state_for(handle);
+					sys.infer_cache_for(handle);
 				}
 			}
 		});
@@ -221,7 +221,7 @@ public:
 	rng_seed_type get_rng_seed_for(const entity_id) const;
 
 	std::size_t get_count_of(const processing_subjects list_type) const {
-		return inferential.processing_lists.get(list_type).size();
+		return inferred.processing_lists.get(list_type).size();
 	}
 	
 	std::unordered_set<entity_id> get_entities_by_name(const entity_name_type&) const;
@@ -298,8 +298,8 @@ private:
 	void advance_systems(const logic_step step_state);
 	void perform_deletions(const logic_step);
 
-	void destroy_inferred_state_completely();
-	void create_inferred_state_completely();
+	void destroy_all_caches();
+	void infer_all_caches();
 
 	entity_handle allocate_new_entity();
 };
@@ -337,11 +337,11 @@ inline const common_assets& cosmos::get_common_assets() const {
 }
 
 inline std::unordered_set<entity_id> cosmos::get_entities_by_name(const entity_name_type& name) const {
-	return inferential.name.get_entities_by_name(name);
+	return inferred.name.get_entities_by_name(name);
 }
 
 inline std::unordered_set<entity_id> cosmos::get_entities_by_name_id(const entity_name_id& id) const {
-	return inferential.name.get_entities_by_name_id(id);
+	return inferred.name.get_entities_by_name_id(id);
 }
 
 inline entity_handle cosmos::get_entity_by_name(const entity_name_type& name) {

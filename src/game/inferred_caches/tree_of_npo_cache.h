@@ -48,11 +48,11 @@ class tree_of_npo_cache {
 	std::vector<cache> per_entity_cache;
 
 	void reserve_caches_for_entities(const size_t n);
-	void create_inferred_state_for(const const_entity_handle);
-	void destroy_inferred_state_of(const const_entity_handle);
+	void infer_cache_for(const const_entity_handle);
+	void destroy_cache_of(const const_entity_handle);
 
-	void create_additional_inferred_state(const cosmos_common_state&) {}
-	void destroy_additional_inferred_state(const cosmos_common_state&) {}
+	void infer_additional_cache(const cosmos_common_state&) {}
+	void destroy_additional_cache_of(const cosmos_common_state&) {}
 
 	tree& get_tree(const cache&);
 	cache& get_cache(const unversioned_entity_id);

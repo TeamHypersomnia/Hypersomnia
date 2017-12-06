@@ -258,7 +258,7 @@ void cosmic_delta::decode(
 	
 	deco.profiler.delta_decoding.start();
 
-	deco.destroy_inferred_state_completely();
+	deco.destroy_all_caches();
 
 	augs::read_delta(deco.significant.meta, in, true);
 
@@ -365,7 +365,7 @@ void cosmic_delta::decode(
 	const auto unread_bits = in.get_unread_bytes();
 	//should_eq(0, unread_bits);
 
-	deco.create_inferred_state_completely();
+	deco.infer_all_caches();
 
 	deco.profiler.delta_decoding.stop();
 }

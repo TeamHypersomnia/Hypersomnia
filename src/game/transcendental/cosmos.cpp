@@ -59,46 +59,46 @@ void cosmos::clear() {
 void cosmos::complete_reinference() {
 	auto scope = measure_scope(profiler.complete_reinference);
 	
-	destroy_inferred_state_completely();
-	create_inferred_state_completely();
+	destroy_all_caches();
+	infer_all_caches();
 }
 
-void cosmos::destroy_inferred_state_completely() {
-	inferential.~all_inferred_caches();
-	new (&inferential) all_inferred_caches;
+void cosmos::destroy_all_caches() {
+	inferred.~all_inferred_caches();
+	new (&inferred) all_inferred_caches;
 
 	const auto n = significant.entity_pool.capacity();
 
-	inferential.for_each([n](auto& sys) {
+	inferred.for_each([n](auto& sys) {
 		sys.reserve_caches_for_entities(n);
 	});
 }
 
-void cosmos::create_inferred_state_completely() {
+void cosmos::infer_all_caches() {
 	for (const auto& ordered_pair : guid_to_id) {
-		create_inferred_state_for(operator[](ordered_pair.second));
+		infer_cache_for(operator[](ordered_pair.second));
 	}
 
-	inferential.for_each([this](auto& sys) {
-		sys.create_additional_inferred_state(significant.meta.global);
+	inferred.for_each([this](auto& sys) {
+		sys.infer_additional_cache(significant.meta.global);
 	});
 }
 
-void cosmos::destroy_inferred_state_of(const const_entity_handle h) {
+void cosmos::destroy_cache_of(const const_entity_handle h) {
 	auto destructor = [h](auto& sys) {
-		sys.destroy_inferred_state_of(h);
+		sys.destroy_cache_of(h);
 	};
 
-	inferential.for_each(destructor);
+	inferred.for_each(destructor);
 }
 
-void cosmos::create_inferred_state_for(const const_entity_handle h) {
+void cosmos::infer_cache_for(const const_entity_handle h) {
 	if (h.is_inferred_state_activated()) {
 		auto constructor = [h](auto& sys) {
-			sys.create_inferred_state_for(h);
+			sys.infer_cache_for(h);
 		};
 
-		inferential.for_each(constructor);
+		inferred.for_each(constructor);
 	}
 }
 
@@ -215,15 +215,15 @@ void cosmos::refresh_for_new_significant_state() {
 }
 
 void cosmos::complete_reinference(const const_entity_handle h) {
-	destroy_inferred_state_of(h);
-	create_inferred_state_for(h);
+	destroy_cache_of(h);
+	infer_cache_for(h);
 }
 
 void cosmos::reserve_storage_for_entities(const cosmic_pool_size_type n) {
 	get_entity_pool().reserve(n);
 	reserve_all_components(n);
 
-	inferential.for_each([n](auto& sys) {
+	inferred.for_each([n](auto& sys) {
 		sys.reserve_caches_for_entities(n);
 	});
 }
@@ -413,7 +413,7 @@ void cosmos::delete_entity(const entity_id e) {
 		Unregister that id as a parent from the relational system
 	*/
 
-	inferential.relational.handle_deletion_of_potential_parent(e);
+	inferred.relational.handle_deletion_of_potential_parent(e);
 }
 
 void cosmos::advance_systems(const logic_step step) {
@@ -535,7 +535,7 @@ void cosmos::advance_systems(const logic_step step) {
 	//position_copying_system().update_transforms(step);
 	//rotation_copying_system().update_rotations(step.cosm);
 
-	profiler.raycasts.measure(inferential.physics.ray_casts_since_last_step);
+	profiler.raycasts.measure(inferred.physics.ray_casts_since_last_step);
 
 	++significant.meta.now.step;
 

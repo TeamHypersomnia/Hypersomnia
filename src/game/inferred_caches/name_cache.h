@@ -36,14 +36,14 @@ class name_cache {
 
 	void reserve_caches_for_entities(const std::size_t n) const {}
 
-	void create_inferred_state_for(const const_entity_handle);
-	void destroy_inferred_state_of(const const_entity_handle);
+	void infer_cache_for(const const_entity_handle);
+	void destroy_cache_of(const const_entity_handle);
 
-	void create_inferred_state_for(const entity_id, const components::name&);
-	void destroy_inferred_state_of(const entity_id, const components::name&);
+	void infer_cache_for(const entity_id, const components::name&);
+	void destroy_cache_of(const entity_id, const components::name&);
 
-	void create_additional_inferred_state(const cosmos_common_state&);
-	void destroy_additional_inferred_state(const cosmos_common_state&);
+	void infer_additional_cache(const cosmos_common_state&);
+	void destroy_additional_cache_of(const cosmos_common_state&);
 	
 	
 	/* 

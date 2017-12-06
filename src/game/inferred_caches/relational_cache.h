@@ -22,11 +22,11 @@ class relational_cache {
 	friend class basic_physics_synchronizer;
 
 	void reserve_caches_for_entities(const size_t n);
-	void create_inferred_state_for(const const_entity_handle);
-	void destroy_inferred_state_of(const const_entity_handle);
+	void infer_cache_for(const const_entity_handle);
+	void destroy_cache_of(const const_entity_handle);
 
-	void create_additional_inferred_state(const cosmos_common_state&) {}
-	void destroy_additional_inferred_state(const cosmos_common_state&) {}
+	void infer_additional_cache(const cosmos_common_state&) {}
+	void destroy_additional_cache_of(const cosmos_common_state&) {}
 
 	void handle_deletion_of_potential_parent(const entity_id);
 

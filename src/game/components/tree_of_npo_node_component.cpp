@@ -47,7 +47,7 @@ void component_synchronizer<false, D>::update_proxy(const logic_step step) const
 	const vec2 displacement = new_aabb.get_center() - data.aabb.get_center();
 	data.aabb = new_aabb;
 
-	auto& sys = handle.get_cosmos().inferential.tree_of_npo;
+	auto& sys = handle.get_cosmos().inferred.tree_of_npo;
 	auto& cache = sys.get_cache(handle.get_id());
 	
 	if (cache.is_constructed()) {

@@ -21,21 +21,21 @@
 #include "augs/build_settings/setting_debug_physics_world_cache_copy.h"
 #include "game/inferred_caches/relational_cache.h"
 
-bool physics_world_cache::is_inferred_state_created_for_rigid_body(const const_entity_handle handle) const {
+bool physics_world_cache::cache_exists_for_rigid_body(const const_entity_handle handle) const {
 	return 
 		handle.alive() 
 		&& get_rigid_body_cache(handle).body != nullptr
 	;
 }
 
-bool physics_world_cache::is_inferred_state_created_for_colliders(const const_entity_handle handle) const {
+bool physics_world_cache::cache_exists_for_colliders(const const_entity_handle handle) const {
 	return
 		handle.alive()
 		&& get_colliders_cache(handle).all_fixtures_in_component.size() > 0u
 	;
 }
 
-bool physics_world_cache::is_inferred_state_created_for_joint(const const_entity_handle handle) const {
+bool physics_world_cache::cache_exists_for_joint(const const_entity_handle handle) const {
 	return 
 		handle.alive() 
 		&& get_joint_cache(handle).joint != nullptr
@@ -66,10 +66,10 @@ const joint_cache& physics_world_cache::get_joint_cache(const entity_id id) cons
 	return joint_caches[linear_cache_key(id)];
 }
 
-void physics_world_cache::destroy_inferred_state_of(const const_entity_handle handle) {
+void physics_world_cache::destroy_cache_of(const const_entity_handle handle) {
 	const auto& cosmos = handle.get_cosmos();
 
-	if (is_inferred_state_created_for_rigid_body(handle)) {
+	if (cache_exists_for_rigid_body(handle)) {
 		auto& cache = get_rigid_body_cache(handle);
 		
 		for (const b2Fixture* f = cache.body->m_fixtureList; f != nullptr; f = f->m_next) {
@@ -88,7 +88,7 @@ void physics_world_cache::destroy_inferred_state_of(const const_entity_handle ha
 		cache = rigid_body_cache();
 	}
 	
-	if (is_inferred_state_created_for_colliders(handle)) {
+	if (cache_exists_for_colliders(handle)) {
 		auto& cache = get_colliders_cache(handle);
 		auto& owner_body_cache = get_rigid_body_cache(cosmos[cache.all_fixtures_in_component[0]->GetBody()->GetUserData()]);
 
@@ -99,7 +99,7 @@ void physics_world_cache::destroy_inferred_state_of(const const_entity_handle ha
 		cache = colliders_cache();
 	}
 
-	if (is_inferred_state_created_for_joint(handle)) {
+	if (cache_exists_for_joint(handle)) {
 		auto& cache = get_joint_cache(handle);
 
 		b2world->DestroyJoint(cache.joint);
@@ -108,15 +108,15 @@ void physics_world_cache::destroy_inferred_state_of(const const_entity_handle ha
 	}
 }
 
-void physics_world_cache::create_inferred_state_for(const const_entity_handle handle) {
+void physics_world_cache::infer_cache_for(const const_entity_handle handle) {
 	const auto& cosmos = handle.get_cosmos();
-	const auto& relational = cosmos.inferential.relational;
+	const auto& relational = cosmos.inferred.relational;
 
-	if (const bool is_already_constructed = is_inferred_state_created_for_rigid_body(handle)) {
+	if (const bool is_already_constructed = cache_exists_for_rigid_body(handle)) {
 		return;
 	}
 
-	create_inferred_state_for_fixtures(handle);
+	infer_cache_for_fixtures(handle);
 
 	if (
 		const auto rigid_body = handle.find<components::rigid_body>();
@@ -153,21 +153,21 @@ void physics_world_cache::create_inferred_state_for(const const_entity_handle ha
 		const auto fixture_entities = rigid_body.get_fixture_entities();
 
 		for (const auto f : fixture_entities) {
-			create_inferred_state_for_fixtures(cosmos[f]);
+			infer_cache_for_fixtures(cosmos[f]);
 		}
 
 		const auto joint_entities = rigid_body.get_attached_joints();
 		
 		for (const auto j : joint_entities) {
-			create_inferred_state_for_joint(cosmos[j]);
+			infer_cache_for_joint(cosmos[j]);
 		}
 	}
 
-	create_inferred_state_for_joint(handle);
+	infer_cache_for_joint(handle);
 }
 
-void physics_world_cache::create_inferred_state_for_fixtures(const const_entity_handle handle) {
-	if (const bool is_already_constructed = is_inferred_state_created_for_colliders(handle)) {
+void physics_world_cache::infer_cache_for_fixtures(const const_entity_handle handle) {
+	if (const bool is_already_constructed = cache_exists_for_colliders(handle)) {
 		return;
 	}
 	
@@ -176,7 +176,7 @@ void physics_world_cache::create_inferred_state_for_fixtures(const const_entity_
 
 		colliders != nullptr
 		&& colliders.is_activated()
-		&& is_inferred_state_created_for_rigid_body(handle.get_owner_body())
+		&& cache_exists_for_rigid_body(handle.get_owner_body())
 	) {
 		const auto si = handle.get_cosmos().get_si();
 		const auto owner_body_entity = handle.get_owner_body();
@@ -248,8 +248,8 @@ void physics_world_cache::create_inferred_state_for_fixtures(const const_entity_
 	}
 }
 
-void physics_world_cache::create_inferred_state_for_joint(const const_entity_handle handle) {
-	if (const bool is_already_constructed = is_inferred_state_created_for_joint(handle)) {
+void physics_world_cache::infer_cache_for_joint(const const_entity_handle handle) {
+	if (const bool is_already_constructed = cache_exists_for_joint(handle)) {
 		return;
 	}
 
@@ -260,8 +260,8 @@ void physics_world_cache::create_inferred_state_for_joint(const const_entity_han
 
 		motor_joint != nullptr
 		&& motor_joint.is_activated()
-		&& is_inferred_state_created_for_rigid_body(cosmos[motor_joint.get_target_bodies()[0]])
-		&& is_inferred_state_created_for_rigid_body(cosmos[motor_joint.get_target_bodies()[1]])
+		&& cache_exists_for_rigid_body(cosmos[motor_joint.get_target_bodies()[0]])
+		&& cache_exists_for_rigid_body(cosmos[motor_joint.get_target_bodies()[1]])
 	) {
 		const components::motor_joint joint_data = motor_joint.get_raw_component();
 

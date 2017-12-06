@@ -6,7 +6,7 @@
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 
-void processing_lists_cache::destroy_inferred_state_of(const const_entity_handle handle) {
+void processing_lists_cache::destroy_cache_of(const const_entity_handle handle) {
 	const auto index = linear_cache_key(handle);
 
 	if (per_entity_cache[index].is_constructed) {
@@ -18,7 +18,7 @@ void processing_lists_cache::destroy_inferred_state_of(const const_entity_handle
 	}
 }
 
-void processing_lists_cache::create_inferred_state_for(const const_entity_handle handle) {
+void processing_lists_cache::infer_cache_for(const const_entity_handle handle) {
 	if (!handle.has<components::processing>()) {
 		return;
 	}

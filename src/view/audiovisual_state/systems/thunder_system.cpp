@@ -90,7 +90,7 @@ void thunder_system::advance(
 
 						child.max_lifetime_ms = rng.randval(t.in.max_branch_lifetime_ms);
 
-						const auto raycast = cosmos.inferential.physics.ray_cast_px(
+						const auto raycast = cosmos.inferred.physics.ray_cast_px(
 							cosmos.get_si(),
 							child.from,
 							child.to,

@@ -17,7 +17,7 @@ tree_of_npo_cache::tree& tree_of_npo_cache::get_tree(const cache& c) {
 	return trees[static_cast<size_t>(c.type)];
 }
 
-void tree_of_npo_cache::destroy_inferred_state_of(const const_entity_handle handle) {
+void tree_of_npo_cache::destroy_cache_of(const const_entity_handle handle) {
 	auto& cache = get_cache(handle.get_id());
 
 	if (cache.is_constructed()) {
@@ -29,7 +29,7 @@ void tree_of_npo_cache::destroy_inferred_state_of(const const_entity_handle hand
 	}
 }
 
-void tree_of_npo_cache::create_inferred_state_for(const const_entity_handle handle) {
+void tree_of_npo_cache::infer_cache_for(const const_entity_handle handle) {
 	auto& cache = get_cache(handle.get_id());
 
 	ensure(!cache.is_constructed());

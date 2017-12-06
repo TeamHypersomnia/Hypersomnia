@@ -53,14 +53,14 @@ class physics_world_cache {
 	
 	void reserve_caches_for_entities(const size_t n);
 
-	void create_inferred_state_for(const const_entity_handle);
-	void create_inferred_state_for_fixtures(const const_entity_handle);
-	void create_inferred_state_for_joint(const const_entity_handle);
+	void infer_cache_for(const const_entity_handle);
+	void infer_cache_for_fixtures(const const_entity_handle);
+	void infer_cache_for_joint(const const_entity_handle);
 
-	void destroy_inferred_state_of(const const_entity_handle);
+	void destroy_cache_of(const const_entity_handle);
 
-	void create_additional_inferred_state(const cosmos_common_state&) {}
-	void destroy_additional_inferred_state(const cosmos_common_state&) {}
+	void infer_additional_cache(const cosmos_common_state&) {}
+	void destroy_additional_cache_of(const cosmos_common_state&) {}
 
 	friend class cosmos;
 	friend class physics_system;
@@ -74,9 +74,9 @@ class physics_world_cache {
 	template <bool> friend class basic_physics_synchronizer;
 	template <bool> friend class basic_fixtures_synchronizer;
 
-	bool is_inferred_state_created_for_rigid_body(const const_entity_handle) const;
-	bool is_inferred_state_created_for_colliders(const const_entity_handle) const;
-	bool is_inferred_state_created_for_joint(const const_entity_handle) const;
+	bool cache_exists_for_rigid_body(const const_entity_handle) const;
+	bool cache_exists_for_colliders(const const_entity_handle) const;
+	bool cache_exists_for_joint(const const_entity_handle) const;
 
 	rigid_body_cache& get_rigid_body_cache(const entity_id);
 	colliders_cache& get_colliders_cache(const entity_id);
