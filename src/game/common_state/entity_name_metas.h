@@ -12,7 +12,7 @@ namespace augs {
 class entity_name_meta {
 	// GEN INTROSPECTOR class entity_name_meta
 	friend augs::introspection_access;
-	friend class name_system;
+	friend class name_cache;
 	
 	entity_name_type name;
 public:
@@ -37,7 +37,7 @@ public:
 
 class entity_name_metas {
 	friend augs::introspection_access;
-	friend class name_system;
+	friend class name_cache;
 
 	// GEN INTROSPECTOR class entity_name_metas
 	entity_name_id next_name_id = 1;

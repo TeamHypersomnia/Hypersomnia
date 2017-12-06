@@ -12,7 +12,7 @@ struct cosmos_common_state;
 template <bool, class>
 class component_synchronizer;
 
-class relational_system {
+class relational_cache {
 	friend class cosmos;
 	friend class physics_world_cache;
 

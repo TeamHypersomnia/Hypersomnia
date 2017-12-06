@@ -1,10 +1,10 @@
 #include "augs/templates/container_templates.h"
-#include "name_system.h"
+#include "name_cache.h"
 #include "game/components/name_component.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
 
-void name_system::create_additional_inferred_state(const cosmos_common_state& global) {
+void name_cache::create_additional_inferred_state(const cosmos_common_state& global) {
 	const bool is_already_constructed = name_to_id_lookup.size() > 0;
 
 	ensure(!is_already_constructed);
@@ -14,15 +14,15 @@ void name_system::create_additional_inferred_state(const cosmos_common_state& gl
 	}
 }
 
-void name_system::destroy_additional_inferred_state(const cosmos_common_state& global) {
+void name_cache::destroy_additional_inferred_state(const cosmos_common_state& global) {
 	name_to_id_lookup.clear();
 }
 
-void name_system::create_inferred_state_for(const entity_id id, const components::name& name) {
+void name_cache::create_inferred_state_for(const entity_id id, const components::name& name) {
 	entities_by_name_id[name.name_id].emplace(id);
 }
 
-void name_system::destroy_inferred_state_of(const entity_id id, const components::name& name) {
+void name_cache::destroy_inferred_state_of(const entity_id id, const components::name& name) {
 	const auto this_name_id = name.name_id;
 	auto& entities_with_this_name_id = entities_by_name_id[this_name_id];
 
@@ -33,15 +33,15 @@ void name_system::destroy_inferred_state_of(const entity_id id, const components
 	}
 }
 
-void name_system::create_inferred_state_for(const const_entity_handle h) {
+void name_cache::create_inferred_state_for(const const_entity_handle h) {
 	create_inferred_state_for(h, h.get<components::name>().get_raw_component());
 }
 
-void name_system::destroy_inferred_state_of(const const_entity_handle h) {
+void name_cache::destroy_inferred_state_of(const const_entity_handle h) {
 	destroy_inferred_state_of(h, h.get<components::name>().get_raw_component());
 }
 
-void name_system::set_name_id(
+void name_cache::set_name_id(
 	const entity_name_id new_name_id, 
 	components::name& name_of_subject, 
 	const entity_id subject
@@ -51,7 +51,7 @@ void name_system::set_name_id(
 	create_inferred_state_for(subject, name_of_subject);
 }
 
-void name_system::set_name(
+void name_cache::set_name(
 	entity_name_metas& metas,
 	const entity_name_type& full_name,
 	components::name& name_of_subject, 
@@ -74,11 +74,11 @@ void name_system::set_name(
 	set_name_id(id, name_of_subject, subject);
 }
 
-std::unordered_set<entity_id> name_system::get_entities_by_name_id(const entity_name_id id) const {
+std::unordered_set<entity_id> name_cache::get_entities_by_name_id(const entity_name_id id) const {
 	return mapped_or_default(entities_by_name_id, id);
 }
 
-std::unordered_set<entity_id> name_system::get_entities_by_name(const entity_name_type& full_name) const {
+std::unordered_set<entity_id> name_cache::get_entities_by_name(const entity_name_type& full_name) const {
 	if (const auto* const id = mapped_or_nullptr(name_to_id_lookup, full_name)) {
 		return get_entities_by_name_id(*id);
 	}
@@ -86,7 +86,7 @@ std::unordered_set<entity_id> name_system::get_entities_by_name(const entity_nam
 	return {};
 }
 
-const entity_name_type& name_system::get_name(
+const entity_name_type& name_cache::get_name(
 	const entity_name_metas& metas,
 	const components::name& from
 ) const {

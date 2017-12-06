@@ -1,5 +1,5 @@
 #include "processing_component.h"
-#include "game/inferred_caches/processing_lists_system.h"
+#include "game/inferred_caches/processing_lists_cache.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
 #include "game/organization/all_component_includes.h"
@@ -97,7 +97,7 @@ bool basic_processing_synchronizer<C>::is_in(const processing_subjects list) con
 }
 
 void component_synchronizer<false, P>::reinference() const {
-	handle.get_cosmos().partial_reinference<processing_lists_system>(handle);
+	handle.get_cosmos().partial_reinference<processing_lists_cache>(handle);
 }
 
 void component_synchronizer<false, P>::disable_in(const processing_subjects list) const {

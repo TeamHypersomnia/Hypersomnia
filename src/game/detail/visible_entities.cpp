@@ -9,7 +9,7 @@
 #include "game/enums/filters.h"
 #include "game/detail/physics/physics_scripts.h"
 
-#include "game/inferred_caches/tree_of_npo_system.h"
+#include "game/inferred_caches/tree_of_npo_cache.h"
 #include "game/inferred_caches/physics_world_cache.h"
 
 static void get_visible_per_layer(

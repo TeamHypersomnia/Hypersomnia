@@ -73,7 +73,7 @@ const component_synchronizer<false, F>& component_synchronizer<false, F>::operat
 }
 
 void component_synchronizer<false, F>::reinference() const {
-	handle.get_cosmos().partial_reinference<relational_system>(handle);
+	handle.get_cosmos().partial_reinference<relational_cache>(handle);
 	handle.get_cosmos().partial_reinference<physics_world_cache>(handle);
 }
 

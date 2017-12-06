@@ -12,7 +12,7 @@
 class cosmos;
 struct cosmos_common_state;
 
-class processing_lists_system {
+class processing_lists_cache {
 	friend class component_synchronizer<false, components::processing>;
 	template<bool> friend class basic_processing_synchronizer;
 

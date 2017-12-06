@@ -37,7 +37,7 @@ bool basic_tree_of_npo_node_synchronizer<C>::is_activated() const {
 }
 
 void component_synchronizer<false, D>::reinference() const {
-	handle.get_cosmos().partial_reinference<tree_of_npo_system>(handle);
+	handle.get_cosmos().partial_reinference<tree_of_npo_cache>(handle);
 }
 
 void component_synchronizer<false, D>::update_proxy(const logic_step step) const {

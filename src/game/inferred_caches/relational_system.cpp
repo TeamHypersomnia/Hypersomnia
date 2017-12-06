@@ -1,11 +1,11 @@
-#include "relational_system.h"
+#include "relational_cache.h"
 #include "game/components/fixtures_component.h"
 #include "game/components/motor_joint_component.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
 
 
-void relational_system::reserve_caches_for_entities(const size_t n) {
+void relational_cache::reserve_caches_for_entities(const size_t n) {
 	for_each_tracker(
 		[n](auto& tracker){
 			tracker.reserve(n);
@@ -13,7 +13,7 @@ void relational_system::reserve_caches_for_entities(const size_t n) {
 	);
 }
 
-void relational_system::handle_deletion_of_potential_parent(const entity_id h) {
+void relational_cache::handle_deletion_of_potential_parent(const entity_id h) {
 	for_each_tracker(
 		[h](auto& tracker){
 			tracker.handle_deletion_of(h);
@@ -21,7 +21,7 @@ void relational_system::handle_deletion_of_potential_parent(const entity_id h) {
 	);
 }
 
-void relational_system::create_inferred_state_for(const const_entity_handle h) {
+void relational_cache::create_inferred_state_for(const const_entity_handle h) {
 	const auto fixtures = h.find<components::fixtures>();
 	const auto motor_joint = h.find<components::motor_joint>();
 	const auto& cosmos = h.get_cosmos();
@@ -54,7 +54,7 @@ void relational_system::create_inferred_state_for(const const_entity_handle h) {
 	}
 }
 
-void relational_system::destroy_inferred_state_of(const const_entity_handle h) {
+void relational_cache::destroy_inferred_state_of(const const_entity_handle h) {
 	for_each_tracker(
 		[h](auto& tracker){
 			tracker.unset_parents_of(h);

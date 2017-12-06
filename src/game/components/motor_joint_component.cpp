@@ -19,7 +19,7 @@ decltype(M::target_bodies) basic_motor_joint_synchronizer<C>::get_target_bodies(
 }
 
 void component_synchronizer<false, M>::reinference() const {
-	handle.get_cosmos().partial_reinference<relational_system>(handle);
+	handle.get_cosmos().partial_reinference<relational_cache>(handle);
 	handle.get_cosmos().partial_reinference<physics_world_cache>(handle);
 }
 

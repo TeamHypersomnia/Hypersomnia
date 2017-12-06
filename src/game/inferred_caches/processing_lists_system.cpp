@@ -1,12 +1,12 @@
 #include "augs/templates/container_templates.h"
-#include "processing_lists_system.h"
+#include "processing_lists_cache.h"
 #include "augs/templates/enum_introspect.h"
 #include "game/components/force_joint_component.h"
 
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 
-void processing_lists_system::destroy_inferred_state_of(const const_entity_handle handle) {
+void processing_lists_cache::destroy_inferred_state_of(const const_entity_handle handle) {
 	const auto index = linear_cache_key(handle);
 
 	if (per_entity_cache[index].is_constructed) {
@@ -18,7 +18,7 @@ void processing_lists_system::destroy_inferred_state_of(const const_entity_handl
 	}
 }
 
-void processing_lists_system::create_inferred_state_for(const const_entity_handle handle) {
+void processing_lists_cache::create_inferred_state_for(const const_entity_handle handle) {
 	if (!handle.has<components::processing>()) {
 		return;
 	}
@@ -40,10 +40,10 @@ void processing_lists_system::create_inferred_state_for(const const_entity_handl
 	}
 }
 
-void processing_lists_system::reserve_caches_for_entities(size_t n) {
+void processing_lists_cache::reserve_caches_for_entities(size_t n) {
 	per_entity_cache.resize(n);
 }
 
-const std::vector<entity_id>& processing_lists_system::get(const processing_subjects list) const {
+const std::vector<entity_id>& processing_lists_cache::get(const processing_subjects list) const {
 	return lists[list];
 }

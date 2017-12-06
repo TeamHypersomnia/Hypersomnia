@@ -1,6 +1,6 @@
 #include "rendering_scripts.h"
 #include "game/transcendental/cosmos.h"
-#include "game/inferred_caches/tree_of_npo_system.h"
+#include "game/inferred_caches/tree_of_npo_cache.h"
 #include "view/audiovisual_state/systems/interpolation_system.h"
 #include "game/components/sentience_component.h"
 #include "game/components/container_component.h"

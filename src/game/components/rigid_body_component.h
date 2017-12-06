@@ -12,7 +12,7 @@
 
 #include "game/components/transform_component.h"
 
-class relational_system;
+class relational_cache;
 
 namespace components {
 	struct rigid_body {

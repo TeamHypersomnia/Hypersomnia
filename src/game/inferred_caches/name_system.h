@@ -17,7 +17,7 @@ struct cosmos_common_state;
 template <bool, class>
 class component_synchronizer;
 
-class name_system {
+class name_cache {
 	std::unordered_map<
 		entity_name_id,
 		std::unordered_set<entity_id>

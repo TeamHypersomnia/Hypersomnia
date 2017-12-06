@@ -19,7 +19,7 @@
 
 #include "augs/templates/dynamic_cast_dispatch.h"
 #include "augs/build_settings/setting_debug_physics_world_cache_copy.h"
-#include "game/inferred_caches/relational_system.h"
+#include "game/inferred_caches/relational_cache.h"
 
 bool physics_world_cache::is_inferred_state_created_for_rigid_body(const const_entity_handle handle) const {
 	return 
