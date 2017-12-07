@@ -1006,6 +1006,7 @@ add_definitions(-DLOG_FILES_DIR="${HYPERSOMNIA_LOG_FILES_DIR}")
 
 set(HYPERSOMNIA_CPPS
 	"src/main.cpp"
+	"src/help_section.cpp"
 	
 	${HYPERSOMNIA_TRIVIAL_3RDPARTY_CPPS}
 	${HYPERSOMNIA_BOX2D_CPPS}

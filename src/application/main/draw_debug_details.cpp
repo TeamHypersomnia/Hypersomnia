@@ -41,18 +41,8 @@ void draw_debug_details(
 		rgba(yellow.rgb(), 150)
 	);
 
-	static const auto version = hypersomnia_version();
-
 	total_details += {
-		to_wstring(typesafe_sprintf(
-			"Revision no.: %x %x\n"
-			"Date: %x\n"
-			"Message:\n%x\n",
-			version.commit_number ? std::to_string(version.commit_number) : "Unknown",
-			version.commit_number ? version.working_tree_changes.empty() ? "(clean)" : "(dirty)" : "",
-			version.commit_date,
-			version.commit_message.size() < 30 ? version.commit_message : version.commit_message.substr(0, 30) + "(...)"
-		)),
+		to_wstring(hypersomnia_version().get_summary()),
 		
 		text_style
 	};

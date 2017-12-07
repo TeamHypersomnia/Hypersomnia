@@ -15,4 +15,6 @@ struct hypersomnia_version {
 	std::string commit_hash;
 	std::vector<std::string> working_tree_changes;
 	// END GEN INTROSPECTOR
+
+	std::string get_summary() const;
 };

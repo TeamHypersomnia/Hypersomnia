@@ -57,6 +57,8 @@
 
 #include "cmd_line_params.h"
 
+extern std::string help_contents;
+
 int work(const int argc, const char* const * const argv);
 
 #if PLATFORM_WINDOWS
@@ -72,6 +74,13 @@ int main(const int argc, const char* const * const argv) {
 #else
 #error "Unsupported platform!"
 #endif
+
+	if (cmd_line_params(argc, argv).help_only) {
+		std::cout << help_contents << std::endl;
+		
+		return EXIT_SUCCESS;
+	}
+
 	const auto exit_code = work(argc, argv);
 
 	{

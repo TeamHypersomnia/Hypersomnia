@@ -6,6 +6,7 @@
 #include "hypersomnia_version.h"
 
 #if WAS_VERSION_GENERATOR_BUILT
+#include "augs/misc/typesafe_sprintf.h"
 
 hypersomnia_version::hypersomnia_version() :
 	commit_number(%x),
@@ -17,6 +18,18 @@ hypersomnia_version::hypersomnia_version() :
 {
 }
 
+std::string hypersomnia_version::get_summary() const {
+	return typesafe_sprintf(
+		"Revision no.: %x %x\n"
+		"Build date: %x\n"
+		"Commit message:\n%x\n",
+		commit_number ? std::to_string(commit_number) : "Unknown",
+		commit_number ? working_tree_changes.empty() ? "(clean)" : "(dirty)" : "",
+		commit_date,
+		commit_message.size() < 30 ? commit_message : commit_message.substr(0, 30) + "(...)"
+	);
+}
+
 #else
 
 hypersomnia_version::hypersomnia_version() :
@@ -26,6 +39,10 @@ hypersomnia_version::hypersomnia_version() :
 	commit_hash("Unknown"),
 	working_tree_changes({})
 {
+}
+
+std::string hypersomnia_version::get_summary() const {
+	return "Unknown revision.\nVersion file generator was excluded from build.";
 }
 
 #endif
