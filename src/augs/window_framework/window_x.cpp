@@ -328,6 +328,16 @@ namespace augs {
 						ch.data.key.key = key::MMOUSE;
 						return ch;
 						
+					case 4:
+						ch.msg = message::wheel;
+						ch.data.scroll.amount = 1;
+						return ch;
+						
+					case 5:
+						ch.msg = message::wheel;
+						ch.data.scroll.amount = -1;
+						return ch;
+						
 					case 8:
 						ch.msg = message::keydown;
 						ch.data.key.key = key::MOUSE4;
