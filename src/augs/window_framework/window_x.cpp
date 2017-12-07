@@ -230,12 +230,13 @@ namespace augs {
 		glXSwapBuffers(display, drawable);
 		return true;
 	} 
-	template <class F, class G>
+	template <class F, class G, class H>
 	std::optional<event::change> handle_event(
 		const xcb_generic_event_t* event,
 		xcb_timestamp_t& last_ldown_time_ms,
 		F mousemotion_handler,
 		G keysym_getter,
+		H character_event_from,
 		decltype(xcb_intern_atom_reply_t::atom) wm_delete_window_atom
 	) {
 		using namespace event;
@@ -275,6 +276,7 @@ namespace augs {
 				ch.msg = message::keydown;
 				ch.data.key.key = translate_keysym({ keysym });
 
+				character_event_from(press);	
 				return ch;
             }
             case XCB_KEY_RELEASE: {
@@ -409,12 +411,35 @@ namespace augs {
 			return xcb_key_symbols_get_keysym(syms, keycode, 0);
 		};
 
+		auto character_event_emitter = [&](const xcb_key_press_event_t* const press){
+			using namespace event;
+			
+			change ch;
+			ch.msg = message::character;
+
+			XKeyEvent keyev;
+			keyev.display = display;
+			keyev.keycode = press->detail;
+			keyev.state = press->state;
+			
+			std::array<char, 16> buf {};
+
+			if (XLookupString(&keyev, buf.data(), buf.size(), nullptr, nullptr)) {
+#if 0
+				LOG("Ch press: %x", buf);
+#endif
+				ch.data.character.utf16 = buf[0];
+				output.push_back(ch);
+			}
+		};
+		
 		while (const auto event = freed_unique(xcb_poll_for_event(connection))) {
 			if (const auto ch = handle_event(
 				event.get(), 
 				last_ldown_time_ms,
 				[this](const basic_vec2<short> p) { return handle_mousemove(p); },
 				keysym_getter,
+				character_event_emitter,
 				wm_delete_window_atom
 			)) {
 				common_event_handler(*ch, output);

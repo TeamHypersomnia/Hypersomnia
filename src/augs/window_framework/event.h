@@ -212,7 +212,7 @@ namespace augs {
 				};
 
 				struct character_data {
-					wchar_t utf16;
+					long utf16;
 				};
 
 				union data_type {
