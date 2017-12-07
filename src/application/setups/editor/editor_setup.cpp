@@ -247,6 +247,13 @@ void editor_setup::fill_with_test_scene(sol::state& lua) {
 #endif
 }
 
+static auto get_filters() {
+	return std::vector<augs::window::file_dialog_filter> {
+		{ "Hypersomnia workspace file (*.wp)", ".wp" },
+		{ "Hypersomnia compatibile workspace file (*.lua)", ".lua" }
+	};
+}
+
 void editor_setup::perform_custom_imgui(
 	sol::state& lua,
 	augs::window& owner,
@@ -592,7 +599,22 @@ void editor_setup::perform_custom_imgui(
 		const auto result_path = save_file_dialog.get();
 
 		if (result_path) {
-			save_current_tab_to(in_path(*result_path));
+			const auto extension = augs::path_type(*result_path).extension();
+
+			const auto filters = get_filters();
+			bool found_extension = false;
+
+			for (const auto& f : filters) {
+				if (f.extension == extension) {
+					found_extension = true;
+					save_current_tab_to(in_path(*result_path));
+					break;
+				}
+			}
+
+			if (!found_extension) {
+				set_popup({ "Error", "Unrecognized extension: " + extension.string() });
+			}
 		}
 	}
 
@@ -666,14 +688,6 @@ bool editor_setup::confirm_modal_popup() {
 	}
 
 	return false;
-}
-
-static auto get_filters() {
-	return std::vector<augs::window::file_dialog_filter> {
-		{ "Hypersomnia workspace file (*.wp)", ".wp" },
-		{ "Hypersomnia compatibile workspace file (*.lua)", ".lua" },
-		{ "All files", ".*" }
-	};
 }
 
 void editor_setup::open(const augs::window& owner) {
