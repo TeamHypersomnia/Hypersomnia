@@ -11,7 +11,10 @@
 #include <GL/glx.h>
 #include <GL/gl.h>
 
+#include "augs/filesystem/file.h"
+
 #include "augs/window_framework/translate_x_enums.h"
+#include "augs/window_framework/shell.h"
 #include "augs/window_framework/window.h"
 
 template <class T>
@@ -579,10 +582,22 @@ xcb_ewmh_init_atoms_replies(&EWMH, EWMHCookie, NULL);
 		}
 	}
 
+	const auto temp_file_with_result_path = GENERATED_FILES_DIR "last_file_path.txt";
+
 	std::optional<std::string> window::open_file_dialog(
 		const std::vector<file_dialog_filter>& filters,
 		std::string custom_title
 	) const {
+		shell("scripts/unix_open_file.sh");
+
+		const auto result_path = temp_file_with_result_path;
+
+		if (file_exists(result_path)) {
+			const auto result = file_to_string(result_path);
+			remove_file(result_path);
+			return result;
+		}
+
 		return std::nullopt;
 	}
 
@@ -590,6 +605,16 @@ xcb_ewmh_init_atoms_replies(&EWMH, EWMHCookie, NULL);
 		const std::vector<file_dialog_filter>& filters,
 		std::string custom_title
 	) const {
+		shell("scripts/unix_open_file.sh");
+
+		const auto result_path = temp_file_with_result_path;
+
+		if (file_exists(result_path)) {
+			const auto result = file_to_string(result_path);
+			remove_file(result_path);
+			return result;
+		}
+
 		return std::nullopt;
 	}
 }
