@@ -13,7 +13,7 @@ namespace augs {
 	public:
 		void overflow_check() {
 			if (overflowed()) {
-				LOG("Warning! %x has overflowed - clearing the container.", typeid(T).name());
+				LOG("Warning! %x has overflowed - clearing the container.", get_type_name<T>());
 				clear();
 			}
 		}

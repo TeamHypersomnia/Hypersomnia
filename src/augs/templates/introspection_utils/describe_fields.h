@@ -39,9 +39,7 @@ auto describe_fields(const T& object) {
 				- reinterpret_cast<const std::byte*>(&object)
 			);
 
-			auto type_name = std::string(typeid(field).name());
-			// print type name without the leading "struct ", "class " or "enum "
-			str_ops(type_name).multi_replace_all({ "struct ", "class ", "enum " }, "");
+			const auto type_name = get_type_name<decltype(field)>();
 
 			result += typesafe_sprintf("%x - %x (%x) (%x) %x",
 				this_offset,
@@ -98,9 +96,7 @@ auto determine_breaks_in_fields_continuity_by_introspection(const T& object) {
 					);
 
 					if (this_offset != next_expected_offset) {
-						auto type_name = std::string(typeid(field).name());
-						// print type name without the leading "struct ", "class " or "enum "
-						str_ops(type_name).multi_replace_all({ "struct ", "class ", "enum " }, "");
+						const auto type_name = get_type_name<decltype(field)>();
 
 						result += typesafe_sprintf("Field breaks continuity!\nExpected offset: %x\nActual offset: %x\n%x - %x (%x) (%x) %x",
 							next_expected_offset,
@@ -137,7 +133,7 @@ auto determine_breaks_in_fields_continuity_by_introspection(const T& object) {
 	if (total_size_of_leaves != sizeof(T)) {
 		result += typesafe_sprintf(
 			"sizeofs of leaf fields do not sum up to sizeof %x!\nExpected: %x\nActual:%x",
-			typeid(T).name(),
+			get_type_name<T>(),
 			sizeof(T),
 			total_size_of_leaves
 		);

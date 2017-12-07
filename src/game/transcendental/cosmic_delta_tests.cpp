@@ -92,7 +92,7 @@ TEST_CASE("CosmicDelta2 PaddingTest") {
 		static_assert(std::is_same_v<std::decay_t<checked_type>, checked_type>, "Something's wrong with the types");
 
 		total_components_size += sizeof(checked_type);
-		component_size_information += typesafe_sprintf("%x == sizeof %x\n", sizeof(checked_type), typeid(checked_type).name());
+		component_size_information += typesafe_sprintf("%x == sizeof %x\n", sizeof(checked_type), get_type_name<checked_type>());
 
 		if constexpr(!allows_nontriviality_v<checked_type>) {
 			constexpr size_t type_size = sizeof(checked_type);
@@ -124,7 +124,7 @@ TEST_CASE("CosmicDelta2 PaddingTest") {
 			if(!same) {
 				const auto log_contents = typesafe_sprintf(
 					"Padding is wrong, or a variable is uninitialized in %x\nsizeof: %x\nDivergence position: %x",
-					typeid(checked_type).name(),
+					get_type_name<checked_type>(),
 					type_size,
 					iter
 				);
@@ -146,7 +146,7 @@ TEST_CASE("CosmicDelta2 PaddingTest") {
 				if (dt.has_changed()) {
 					const auto log_contents = typesafe_sprintf(
 						"Padding is wrong, or a variable is uninitialized in %x\nsizeof: %x\nDivergence position: %x",
-						typeid(checked_type).name(),
+						get_type_name<checked_type>(),
 						type_size,
 						static_cast<int>(dt.get_first_divergence_pos())
 					);
@@ -168,7 +168,7 @@ TEST_CASE("CosmicDelta2 PaddingTest") {
 
 				FAIL(typesafe_sprintf(
 					"Padding is wrong, or a variable is uninitialized in %x\nsizeof: %x\n", 
-					typeid(checked_type).name(),
+					get_type_name<checked_type>(),
 					type_size
 				));
 			}

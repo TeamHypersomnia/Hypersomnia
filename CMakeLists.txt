@@ -374,7 +374,6 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/augs/gui/appearance_detector.cpp"
 	"src/augs/misc/timing/delta.cpp"
 	"src/augs/misc/timing/stepped_timing.cpp"
-	"src/augs/templates/templates.cpp"
 	"src/augs/window_framework/platform_utils.cpp"
 	"src/game/components/animation_component.cpp"
 	"src/game/components/car_component.cpp"

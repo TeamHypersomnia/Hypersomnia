@@ -53,7 +53,7 @@ namespace augs {
 					throw lua_deserialization_error(
 						"Failed to read \"%x\" into %x enum. Check if such option exists, or if spelling is correct.",
 						stringized_enum,
-						typeid(T).name()
+						get_type_name<T>()
 					);
 				}
 			}

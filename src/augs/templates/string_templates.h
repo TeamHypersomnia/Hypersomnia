@@ -171,5 +171,32 @@ auto format_as_bytes(const T& t) {
 	return output;
 }
 
+std::string demangle(const char*);
+
+template <class T>
+std::string get_type_name() {
+	auto name = std::string(demangle(typeid(T).name()));
+	str_ops(name).multi_replace_all({ "struct ", "class ", "enum " }, "");
+	return name;
+}
+
+template <class T>
+std::string get_type_name(const T&) {
+	return get_type_name<T>();
+}
+
+template <class T>
+std::string get_type_name_strip_namespace() {
+	auto name = get_type_name<T>();
+
+	if (const auto it = name.rfind("::");
+		it != std::string::npos
+	) {
+		name = name.substr(it + 2);
+	}
+
+	return name;
+}
+
 std::string to_forward_slashes(std::string);
 std::wstring to_forward_slashes(std::wstring);
