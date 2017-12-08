@@ -43,14 +43,10 @@ class entity_name_metas {
 	entity_name_id next_name_id = 1;
 	std::unordered_map<entity_name_id, entity_name_meta> metas;
 	// END GEN INTROSPECTOR
-public:
-	entity_name_metas() {
-		clear();
-	}
 
+public:
 	void clear() {
 		metas.clear();
-		metas[0] = entity_name_meta(L"Unnamed");
 	}
 
 	entity_name_meta& get_meta(const entity_name_id id) {

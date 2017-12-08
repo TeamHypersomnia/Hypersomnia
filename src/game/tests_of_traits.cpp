@@ -108,6 +108,7 @@ struct tests_of_traits {
 	static_assert(is_constexpr_size_v<decltype(pad_bytes<3>::pad)>, "Trait has failed");
 	static_assert(!is_container_v<decltype(pad_bytes<3>::pad)>, "Trait has failed");
 	static_assert(is_container_v<augs::enum_associative_array<game_intent_type, vec2>>, "Trait has failed");
+	static_assert(!is_container_v<augs::enum_array<basic_transform<float>, colliders_offset_type>>, "Trait has failed");
 
 	static_assert(is_container_v<augs::constant_size_vector<vec2, 20>>, "Trait has failed");
 	static_assert(augs::is_byte_readwrite_appropriate_v<augs::memory_stream, augs::constant_size_vector<vec2, 20>>, "Trait has failed");

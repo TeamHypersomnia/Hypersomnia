@@ -39,6 +39,18 @@ namespace augs {
 			return c;
 		}
 	
+		auto none() const {
+			std::size_t c = 0;
+			
+			for (const auto f : flags) {
+				if (f) {
+					return false;
+				}
+			}
+
+			return true;
+		}
+
 		constexpr auto size() const {
 			return flag_count;
 		}

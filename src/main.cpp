@@ -1526,7 +1526,7 @@ int work(const int argc, const char* const * const argv) try {
 			shaders.standard->set_projection(augs::orthographic_projection(vec2(screen_size)));
 
 			if (std::addressof(viewed_character.get_cosmos()) ==
-				std::addressof(cosmos::empty)
+				std::addressof(cosmos::zero)
 			) {
 				get_drawer().color_overlay(screen_size, darkgray);
 			}

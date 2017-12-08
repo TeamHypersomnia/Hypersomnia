@@ -68,7 +68,9 @@ public:
 		for (const auto& p : cache.particles) {
 			basic_input.renderable_transform = p.pos;
 
-			wandering.get_face_after(p.current_lifetime_ms).draw(manager, basic_input);
+			if (wandering.frames.size() > 0) {
+				wandering.get_face_after(p.current_lifetime_ms).draw(manager, basic_input);
+			}
 		}
 	}
 

@@ -163,7 +163,7 @@ public:
 	}
 
 	FORCE_INLINE const auto& get_viewed_cosmos() const {
-		return has_current_tab() ? work().world : cosmos::empty; 
+		return has_current_tab() ? work().world : cosmos::zero; 
 	}
 
 	FORCE_INLINE auto get_interpolation_ratio() const {

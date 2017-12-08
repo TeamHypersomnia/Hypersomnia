@@ -67,7 +67,6 @@ void name_cache::set_name(
 	else {
 		id = metas.next_name_id++;
 		metas.metas[id].name = full_name;
-		ensure(metas.metas.size() > 1);
 		name_to_id_lookup[full_name] = id;
 	}
 

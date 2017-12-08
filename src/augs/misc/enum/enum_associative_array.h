@@ -226,6 +226,10 @@ namespace augs {
 			return is_value_set.count();
 		}
 
+		auto empty() const {
+			return is_value_set.none();
+		}
+
 		void clear() {
 			if constexpr(!is_trivially_copyable) {
 				for (auto&& v : *this) {

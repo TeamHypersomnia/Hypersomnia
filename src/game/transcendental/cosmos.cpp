@@ -50,10 +50,10 @@ cosmos::cosmos(const cosmic_pool_size_type reserved_entities) {
 	reserve_storage_for_entities(reserved_entities);
 }
 
-const cosmos cosmos::empty;
+const cosmos cosmos::zero;
 
 void cosmos::clear() {
-	*this = empty;
+	*this = zero;
 }
 
 void cosmos::regenerate_all_caches() {
@@ -552,6 +552,10 @@ randomization cosmos::get_rng_for(const entity_id id) const {
 	return{ get_rng_seed_for(id) };
 }
 
+bool cosmos::empty() const {
+	return get_entities_count() == 0 && guid_to_id.empty();
+}
+
 namespace augs {
 	template <class Archive>
 	void write_object_bytes(Archive& into, const cosmos& cosm) {
@@ -578,6 +582,8 @@ namespace augs {
 
 	template <class Archive>
 	void read_object_bytes(Archive& from, cosmos& cosm) {
+		ensure(cosm.empty());
+
 		auto& profiler = cosm.profiler;
 
 		auto refresh_when_done = augs::make_scope_guard([&cosm]() {
@@ -589,23 +595,109 @@ namespace augs {
 	}
 
 	void write_object_lua(sol::table ar, const cosmos& cosm) {
-#if TODO
-		write_lua(ar, cosm.significant.meta);
-		
-		for (const auto& ent : cosm.get_entity_pool()) {
+		{
+			auto common_table = ar.create();
+			ar["common"] = common_table;
 
+			write_lua(common_table, cosm.significant.meta);
+		}
+		
+		{
+			auto pool_meta_table = ar.create();
+			ar["pool_meta"] = pool_meta_table;
+			pool_meta_table["reserved_entities_count"] = static_cast<unsigned>(cosm.get_maximum_entities());
+		}
+
+		auto entities_table = ar.create();
+		ar["entities"] = entities_table;
+		
+		int entity_table_counter = 1;
+
+		for (const auto& ent : cosm.get_entity_pool()) {
+			auto this_entity_table = entities_table.create();
+	
 			for_each_component_type(
 				[&](auto c) {
-				using component_type = decltype(c);
+					using component_type = decltype(c);
 
+					auto create_component_table = [&](){
+						const auto this_component_name = get_type_name_strip_namespace<component_type>();
 
-			});
+						auto this_component_table = this_entity_table.create();
+						this_entity_table[this_component_name] = this_component_table;
+						
+						return this_component_table;
+					};
+					
+					if constexpr(is_component_fundamental_v<component_type>) {
+						write_lua(create_component_table(), std::get<component_type>(ent.fundamentals)); 
+					}
+					else {
+						const auto& pool = cosm.get_component_pool<component_type>();
+
+						if (const auto maybe_component = pool.find(ent.get_id<component_type>())) {
+							write_lua(create_component_table(), *maybe_component);
+						}
+					}
+				}
+			);
+
+			entities_table[entity_table_counter++] = this_entity_table;
 		}
-#endif
 	}
 
 	void read_object_lua(sol::table ar, cosmos& cosm) {
+		ensure(cosm.empty());
 
+		auto refresh_when_done = augs::make_scope_guard([&cosm]() {
+			cosm.refresh_for_new_significant_state();
+		});
+
+		{
+			sol::object reserved_count = ar["pool_meta"]["reserved_entities_count"];
+			cosm.reserve_storage_for_entities(reserved_count.as<unsigned>());
+		}
+
+		read_lua(ar["common"], cosm.significant.meta);
+
+		int entity_table_counter = 1;
+		auto entities_table = ar["entities"];
+
+		while (true) {
+			sol::table maybe_next_entity = entities_table[entity_table_counter];
+
+			if (maybe_next_entity.valid()) {
+				const auto new_entity = cosm.create_entity("");
+
+				/* guid entry must always exist */
+				//components::guid g;
+				//read_lua(maybe_next_entity["guid"], g);
+				//cosm.
+
+				for (auto key_value_pair : maybe_next_entity) {
+					const auto component_name = key_value_pair.first.as<std::string>();
+
+					for_each_component_type(
+						[&](auto c) {
+							using component_type = decltype(c);
+
+							const auto this_component_name = get_type_name_strip_namespace<component_type>();
+
+							if (this_component_name == component_name) {
+								component_type c;
+								read_lua(key_value_pair.second, c);
+								new_entity.allocator::template add<component_type>(c);
+							}
+						}
+					);
+				}
+			}
+			else {
+				break;
+			};
+
+			++entity_table_counter;
+		}
 	}
 }
 

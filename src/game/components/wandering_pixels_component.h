@@ -11,10 +11,6 @@ namespace components {
 		unsigned particles_count = 0u;
 		// END GEN INTROSPECTOR
 
-		wandering_pixels() {
-			frames.emplace_back();
-		}
-
 		const sprite& get_face_after(const float passed_lifetime_ms) const {
 			const auto frame_count = frames.size();
 			const auto frame_num = static_cast<unsigned>(passed_lifetime_ms / frame_duration_ms) % frame_count;

@@ -202,6 +202,8 @@ namespace augs {
 		Container& storage, 
 		container_size_type
 	) {
+		ensure(storage.empty());
+
 		container_size_type s;
 		read_bytes(ar, s);
 

@@ -1,6 +1,7 @@
 #pragma once
 #include <map>
-#include <sol2/sol/forward.hpp>
+#include "3rdparty/sol2/sol/forward.hpp"
+
 #include "augs/build_settings/platform_defines.h"
 
 #include "augs/templates/exception_templates.h"
@@ -80,7 +81,7 @@ class cosmos : private cosmos_base,
 	std::map<entity_guid, entity_id> guid_to_id;
 
 public:
-	static const cosmos empty;
+	static const cosmos zero;
 
 	cosmos_significant_state significant;
 	all_inferred_caches inferred;
@@ -280,6 +281,8 @@ public:
 	decltype(auto) operator()(const entity_id subject, F callback) const {
 		callback(operator[](subject));
 	}
+	
+	bool empty() const;
 
 private:
 	friend class cosmic_delta;

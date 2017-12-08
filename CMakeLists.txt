@@ -258,6 +258,9 @@ set(HYPERSOMNIA_TEST_SCENES_CPPS
 # We don't care about alphabetical order. Put new files to the very bottom.
 
 set(HYPERSOMNIA_CODEBASE_CPPS
+	# This should be the first one to build to catch errors early
+	"src/game/tests_of_traits.cpp"
+
 	"src/application/config_lua_table.cpp"
 	"src/view/viewables/regeneration/desaturations.cpp"
 	"src/view/viewables/regeneration/buttons_with_corners.cpp"
@@ -361,7 +364,6 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/stateless_systems/melee_system.cpp"
 	"src/game/stateless_systems/particles_existence_system.cpp"
 	"src/game/stateless_systems/sound_existence_system.cpp"
-	"src/game/tests_of_traits.cpp"
 	"src/game/other_unit_tests.cpp"
 	"src/game/transcendental/cosmic_delta.cpp"
 	"src/game/transcendental/cosmic_delta_tests.cpp"

@@ -1,5 +1,6 @@
 #pragma once
 #include <iosfwd>
+#include "3rdparty/sol2/sol/forward.hpp"
 
 #include "augs/build_settings/platform_defines.h"
 
@@ -34,6 +35,8 @@ class component_synchronizer;
 namespace augs {
 	template <class, class...>
 	class operations_on_all_components_mixin;
+	
+	void read_object_lua(sol::table ar, cosmos& cosm);
 }
 
 template <bool is_const>
@@ -74,6 +77,8 @@ private:
 	friend class augs::component_allocators_mixin<is_const, basic_entity_handle<is_const>>;
 	friend class cosmic_delta;
 	friend class cosmos;
+
+	friend void augs::read_object_lua(sol::table, cosmos&);
 
 	auto& get() const {
 		return *ptr;

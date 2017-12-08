@@ -111,7 +111,9 @@ namespace augs {
 			
 			if constexpr(is_container_v<Serialized>) {
 				using Container = Serialized;
-				
+			
+				ensure(into.empty());
+
 				/*
 					If container is associative and the keys are representable as lua values,
 					read container table as:
