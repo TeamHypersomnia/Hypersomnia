@@ -33,11 +33,6 @@ namespace augs {
 		// GEN INTROSPECTOR class augs::component_aggregate template<class>class make_pool_id class... components
 		fundamental_components_tuple fundamentals;
 		dynamic_component_id_tuple component_ids;
-#if DEBUG_TRACK_ENTITY_NAME
-		const std::wstring* debug_name = nullptr;
-#else
-		pad_bytes<sizeof(const std::wstring*)> for_release_debug_compatibility;
-#endif
 		// END GEN INTROSPECTOR
 
 		template <class component>

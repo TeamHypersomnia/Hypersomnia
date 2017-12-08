@@ -56,9 +56,7 @@ void component_synchronizer<false, N>::set_name(const entity_name_type& full_nam
 	);
 
 #if DEBUG_TRACK_ENTITY_NAME
-	const auto* new_name = &get_name();
-	auto& debug_name = handle.get().debug_name;
-	debug_name = new_name;
+	/* TODO: Come up with something so that we can check entity names while debugging */
 #endif
 }
 
@@ -70,9 +68,7 @@ void component_synchronizer<false, N>::set_name_id(const entity_name_id id) cons
 	);
 
 #if DEBUG_TRACK_ENTITY_NAME
-	const auto* new_name = &get_name();
-	auto& debug_name = handle.get().debug_name;
-	debug_name = new_name;
+	/* TODO: Come up with something so that we can check entity names while debugging */
 #endif
 }
 

@@ -17,7 +17,7 @@ class entity_name_meta {
 	entity_name_type name;
 public:
 	bool stackable = false;
-	entity_description_type description = L"No description";
+	entity_description_type description;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const entity_name_meta& b) const {
@@ -32,7 +32,7 @@ public:
 		return description != L"No description";
 	}
 
-	entity_name_meta(const entity_name_type& name = L"Invalid") : name(name) {}
+	entity_name_meta(const entity_name_type& name = {}) : name(name) {}
 };
 
 class entity_name_metas {
