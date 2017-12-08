@@ -180,9 +180,35 @@ TEST_CASE("CosmicDelta2 PaddingTest") {
 
 	padding_checker(item_slot_transfer_request());
 
+	padding_checker(augs::pool_indirector<unsigned short>());
+	padding_checker(augs::pool_slot<unsigned short>());
+
+	padding_checker(augs::pool_indirector<unsigned>());
+	padding_checker(augs::pool_slot<unsigned>());
+
 	component_size_information += typesafe_sprintf("Total size in bytes: %x", total_components_size);
 	augs::save_as_text(LOG_FILES_DIR "components.txt", component_size_information);
 
+	std::string other_types;
+
+	auto report_type = [&other_types](auto t) {
+		other_types += typesafe_sprintf("Type: %x\nsizeof: %x\nFields:\n", get_type_name<decltype(t)>(), sizeof(t));
+
+		other_types += describe_fields(t) + '\n';	
+	};
+	
+#if 0
+	report_type(augs::pool_indirector<unsigned short>());
+	report_type(augs::pool_slot<unsigned short>());
+
+	report_type(augs::pool_indirector<unsigned>());
+	report_type(augs::pool_slot<unsigned>());
+#endif
+
+	if (other_types.size() > 0) {
+		augs::save_as_text(LOG_FILES_DIR "other_types.txt", other_types);
+	}
+	
 	/* Validate cosmos_metadata. It will also be written and compared. */
 
 	cosmos_metadata meta;

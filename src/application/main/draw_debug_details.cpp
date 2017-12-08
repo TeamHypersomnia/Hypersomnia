@@ -47,19 +47,6 @@ void draw_debug_details(
 		text_style
 	};
 
-	total_details += {
-		to_wstring(typesafe_sprintf(
-			"STATICALLY_ALLOCATE_ENTITIES_NUM=%x\n"
-			"STATICALLY_ALLOCATE_ASSETS=%x\n"
-			"STATICALLY_ALLOCATE_BAKED_FONTS=%x\n",
-			STATICALLY_ALLOCATE_ENTITIES_NUM,
-			STATICALLY_ALLOCATE_ASSETS,
-			STATICALLY_ALLOCATE_BAKED_FONTS
-		)),
-
-		text_style
-	};
-
 	if (viewed_character.alive()) {
 		{
 			const auto coords = viewed_character.get_logic_transform().pos;
