@@ -204,3 +204,4 @@ build
 dev/
 dev_unix/
 tags
+*.local.sh

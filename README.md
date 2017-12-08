@@ -137,6 +137,24 @@ If, for some reason, some step fails, refer to the latest working Travis build a
 
 If the game fails to launch, it should automatically open a log file with the relevant message using ```$VISUAL``` executable.
 
+### Editor integration
+
+The Hypersomnia editor has options to save and open files. On Windows, they open a dialog through [GetOpenFileName](https://msdn.microsoft.com/en-us/library/windows/desktop/ms646927(v=vs.85).aspx).
+Needless to say, such a thing does not exist on Unix. Hypersomnia provides bash scripts for common file managers in ``hypersomnia/scripts/unix/managers``.
+Choose one for opening and one for saving, then ``cd`` to ``hypersomnia/scripts/unix`` and create symlinks as such: 
+
+- ``ln -s managers/save_file_ranger.sh save_file.local.sh``
+- ``ln -s managers/open_file_ranger.sh open_file.local.sh``
+
+(That assumes you want to use ``ranger`` as your file manager)
+The symlinks will not be tracked by git.
+
+Currently, the following file managers are supported:
+- [ranger](https://github.com/ranger/ranger) through ``--choosefile`` option
+
+The scripts use ``$TERMINAL`` variable for file managers that need a terminal to run on. Ensure your terminal supports ``-e`` flag that passes the commands to launch on startup. 
+If you want to implement your own script, the only thing it is required to do is to create a ``$PWD/cache/gen/last_file_path.txt`` file containg the path to the file to be opened or saved to by the editor.
+
 # Contributing
 
 Pull requests are welcomed, should they even be typo fixes, missing const guarantees or changes in nomenclature.
