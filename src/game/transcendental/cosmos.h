@@ -111,13 +111,15 @@ public:
 		thread_local data_living_one_step queues;
 		logic_step step(*this, input, queues);
 
+		auto scope = augs::make_scope_guard([](){
+			queues.clear();
+		});
+
 		pre_solve(step);
 		advance_systems(step);
 		post_solve(const_logic_step(step));
 		perform_deletions(step);
 		post_cleanup(const_logic_step(step));
-
-		queues.clear();
 	}
 
 	template <class F>

@@ -4,7 +4,7 @@ tags: [topics, ECS]
 hide_sidebar: true
 permalink: significant_state
 summary: |
-  In any programming context, we call state **significant** if it is read from disk, written to disk and synchronized through the network.  
-  In the context of this wiki, "**the** significant state" always refers to that part of the [cosmos](cosmos) that is **significant**.
+  In any programming context, we call state **significant** if it is at any point read from disk, written to disk and/or synchronized through the network.  
+  Additionally, in the context of this wiki, "**the** significant state" always refers to the field in the [cosmos](cosmos) named "significant" which, among all state of the cosmos, is the part that is **significant**.
 ---
 

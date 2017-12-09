@@ -3,14 +3,14 @@ title: Inferred cache
 tags: [topics, ECS] 
 hide_sidebar: true
 permalink: inferred_cache
-summary: An **inferred cache** is a portion of game [state](state) that only ever exists at [run time](https://en.wikipedia.org/wiki/Run_time_(program_lifecycle_phase)) and can always be completely regenerated from the [significant state](significant_state).
+summary: An **inferred cache** is a portion of state that only ever exists at [run time](https://en.wikipedia.org/wiki/Run_time_(program_lifecycle_phase)) and can always be completely regenerated from some [significant state](significant_state).
 ---
 
 ## Etymology
 
 The term is composed of two words, each of which describes an important property of the state that it refers to:
 - *inferred* means that it can always be recalculated based on the current contents of significant state;
-- *cache* means that its destruction does not imply loss of data in any way meaningful to the player; which, in some way, is already implied by the capability of being *inferred*.
+- *cache* means that its destruction does not imply loss of data in any way meaningful to the application user; which, in some way, is already implied by the capability of being *inferred*.
 
 ## Purpose
 
