@@ -7,6 +7,7 @@
 - title: Topics
   name: topics
   description: All articles concerning the code's design in general.
+  disable_on_homepage: on
 - title: Flyweights
   name: flyweights
 - title: ECS

@@ -15,13 +15,16 @@ extension: .html
 
       <div class="filter-options">
                 {% for current_tag in site.data.docs_tags %}
-				<button class="btn btn-primary" data-group="{{ current_tag.name }}">{{ current_tag.title }}</button>
+				{% unless current_tag.disable_on_homepage %}
+				<button class="btn btn-primary" data-group="{{ current_tag.name }}">{{ current_tag.title }}{{ current_tag.disable_on_homepage }}</button>
+				{% endunless %}
                 {% endfor %} 
     </div>      
 
 <div id="grid" class="row">
 
                 {% for current_tag in site.data.docs_tags %}
+				{% unless current_tag.disable_on_homepage %}
 				<div class="col-xs-6 col-sm-4 col-md-4" data-groups='["{{ current_tag.name }}"]'>
 
                <div class="panel panel-default">
@@ -48,6 +51,7 @@ extension: .html
             </div>
     
     </div>
+				{% endunless %}
                 {% endfor %} 
 
           <!-- sizer -->
