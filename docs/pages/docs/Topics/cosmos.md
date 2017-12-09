@@ -4,7 +4,7 @@ tags: [topics, ECS]
 hide_sidebar: true
 permalink: cosmos
 summary: |
-    The **cosmos** stores [entities](entities), [components](components), [common cosmos state](common_cosmos_state) and all [caches inferred](inferred_state) from the three. It is a fancy term for what is commonly understood as the "game world". Its methods allow to, for example, create entities, access and modify them via returned [handles](entity_handle), clone or delete them. The cosmos also provides an *advance* method that calls all [stateless systems](stateless_system) to effectively move the game forward in time.
+    The **cosmos** stores [entities](entities), [components](components), [common state](cosmos_common_state) and all [caches inferred](inferred_state) from the three. It is a fancy term for what is commonly understood as the "game world". Its methods allow to, for example, create entities, access and modify them via returned [handles](entity_handle), clone or delete them. The cosmos also provides an *advance* method that calls all [stateless systems](stateless_system) to effectively move the game forward in time.
 ---
 
 ## Overview

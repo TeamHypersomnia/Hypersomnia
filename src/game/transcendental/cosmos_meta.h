@@ -6,8 +6,8 @@ namespace augs {
 	struct introspection_access;
 }
 
-class cosmos_metadata {
-	// GEN INTROSPECTOR class cosmos_metadata
+class cosmos_meta {
+	// GEN INTROSPECTOR class cosmos_meta
 	friend class cosmos;
 	friend augs::introspection_access;
 

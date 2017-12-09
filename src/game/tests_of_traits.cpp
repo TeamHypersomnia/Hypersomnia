@@ -80,7 +80,7 @@ struct tests_of_traits {
 	static_assert(is_padding_field_v<pad_bytes<1>>);
 
 	static_assert(!has_introspect_v<cosmos>, "Trait has failed");
-	static_assert(has_introspect_v<cosmos_metadata>, "Trait has failed");
+	static_assert(has_introspect_v<cosmos_meta>, "Trait has failed");
 	static_assert(has_introspect_v<augs::constant_size_vector<int, 2>>, "Trait has failed");
 	static_assert(has_introspect_v<zeroed_pod<unsigned int>>, "Trait has failed");
 	static_assert(has_introspect_v<augs::delta>, "Trait has failed");
@@ -137,7 +137,7 @@ struct tests_of_traits {
 	static_assert(is_one_of_list_v<unsigned, std::tuple<float, float, double, unsigned>>, "Trait has failed");
 	static_assert(!is_one_of_v<int, float, double>, "Trait has failed");
 	static_assert(is_one_of_v<unsigned, float, float, double, unsigned>, "Trait has failed");
-	static_assert(is_one_of_v<cosmos, int, cosmos_metadata, cosmos>, "Trait has failed");
+	static_assert(is_one_of_v<cosmos, int, cosmos_meta, cosmos>, "Trait has failed");
 
 	static_assert(index_in_list_v<unsigned, std::tuple<float, float, double, unsigned>> == 3, "Trait has failed");
 	static_assert(index_in_v<unsigned, float, float, double, unsigned> == 3, "Trait has failed");
