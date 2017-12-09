@@ -4,7 +4,7 @@ tags: [topics, ECS]
 hide_sidebar: true
 permalink: cosmos
 summary: |
-    The **cosmos** stores [entities](entities), [components](components), [common state](cosmos_common_state) and all [caches inferred](inferred_state) from the three. It is a fancy term for what is commonly understood as the "game world". Its methods allow to, for example, create entities, access and modify them via returned [handles](entity_handle), clone or delete them. The cosmos also provides an *advance* method that calls all [stateless systems](stateless_system) to effectively move the game forward in time.
+    The **cosmos** stores [entities](entities), [components](components), [common state](cosmos_common_state) and all [caches inferred](inferred_state) from the three. It is a fancy term for what is commonly understood as the "game world". Its methods allow to, for example, create entities, access and modify them via returned [handles](entity_handle), clone or delete them. The cosmos also provides an *advance* method that calls all [stateless systems](stateless_system) to effectively move the game forward in time by a specified [delta time](cosmos_meta#fixed-delta).
 ---
 
 ## Overview
@@ -18,7 +18,7 @@ The reason that these two are coupled into a single object is because one is so 
 
 There are also many other helper methods for performing common tasks on the cosmos, e.g. getting a handle to an entity referenced by an [id](entity_id), [guid](entity_guid), getting a [processing list](processing_lists_cache) of a given kind, or getting all entities matching a given name. While, under the principle of separation of concerns, it would make sense to distribute such functions across multiple source files or even classes, there is currently no benefit seen in doing that.
 
-## The advance function
+## The advance method
 
 The *advance* function accepts [entropy](cosmic_entropy) along with a reference to all [logical assets](logical_asset) in order to perform a single simulation step.  
 It initializes all [message](message) queues on [TLS](https://en.wikipedia.org/wiki/Thread-local_storage) and clears them when the step finishes, to ensure no messages persist beyond duration of the step.  
