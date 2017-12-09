@@ -1,7 +1,7 @@
 #pragma once
 #include "augs/misc/constant_size_vector.h"
 #include "augs/misc/pool/pool.h"
-#include "game/transcendental/cosmos_metadata.h"
+#include "game/transcendental/cosmos_common_state.h"
 #include "game/transcendental/cosmic_types.h"
 
 using cosmos_base = component_list_t<augs::operations_on_all_components_mixin, cosmos>;
@@ -27,7 +27,7 @@ class cosmos_significant_state {
 	entity_pool_type entity_pool;
 	dynamic_component_pools_type component_pools;
 public:
-	cosmos_metadata meta;
+	cosmos_common_state common;
 	// END GEN INTROSPECTOR
 
 	void clear();

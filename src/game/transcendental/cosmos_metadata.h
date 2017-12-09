@@ -1,7 +1,6 @@
 #pragma once
 #include "augs/misc/timing/stepped_timing.h"
-
-#include "game/transcendental/cosmos_common_state.h"
+#include "game/transcendental/entity_id.h"
 
 namespace augs {
 	struct introspection_access;
@@ -16,7 +15,5 @@ class cosmos_metadata {
 	augs::stepped_timestamp now = 0;
 
 	entity_guid next_entity_guid = 1;
-public:
-	cosmos_common_state global;
 	// END GEN INTROSPECTOR
 };

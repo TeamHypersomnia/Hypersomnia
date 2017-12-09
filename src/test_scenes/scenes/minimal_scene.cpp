@@ -109,7 +109,7 @@ namespace test_scenes {
 
 		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
 		load_test_scene_sentience_properties(
-			world.significant.meta.global
+			world.significant.common
 		);
 
 		auto& common_assets = world.get_common_assets();

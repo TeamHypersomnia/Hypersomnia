@@ -20,7 +20,7 @@
 void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 	auto& cosmos = step.cosm;
 	const auto si = cosmos.get_si();
-	const auto& settings = cosmos.significant.meta.global.pathfinding;
+	const auto& settings = cosmos.significant.common.pathfinding;
 
 	const auto get_world_vertices = [&](
 		const const_entity_handle subject, 

@@ -64,7 +64,7 @@ What you are more likely to do is to introduce a helper map:
 std::unordered_map<std::string, std::vector<my_entity*>> entities_by_name;
 ````
 
-You would keep ``entities_by_name`` up to update each time an entity gets deleted, created, or if name of some entity changes.  
+**You would keep ``entities_by_name`` up to date** each time an entity gets deleted, created, or if name of some entity changes.  
 Then, the definition for ``get_entities_by_name`` would pretty much boil down to:
 
 ```cpp

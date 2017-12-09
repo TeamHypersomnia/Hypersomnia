@@ -784,7 +784,7 @@ namespace test_scenes {
 		common_assets.thunder_remnants = assets::particle_effect_id::THUNDER_REMNANTS;
 		
 		load_test_scene_sentience_properties(
-			world.significant.meta.global
+			world.significant.common
 		);
 
 		auto& spells = world.get_common_state().spells;

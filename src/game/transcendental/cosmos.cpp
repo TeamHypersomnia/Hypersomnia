@@ -80,7 +80,7 @@ void cosmos::infer_all_caches() {
 	}
 
 	inferred.for_each([this](auto& sys) {
-		sys.infer_additional_cache(significant.meta.global);
+		sys.infer_additional_cache(significant.common);
 	});
 }
 
@@ -146,7 +146,7 @@ bool cosmos::operator==(const cosmos& b) const {
 		return false;
 	}
 
-	if (!augs::equal_by_introspection(significant.meta, b.significant.meta)) {
+	if (!augs::equal_by_introspection(significant.common, b.significant.common)) {
 		return false;
 	}
 
@@ -191,7 +191,7 @@ cosmos& cosmos::operator=(const cosmos_significant_state& b) {
 }
 
 void cosmos::assign_next_guid(const entity_handle new_entity) {
-	const auto this_guid = significant.meta.next_entity_guid.value++;
+	const auto this_guid = significant.common.meta.next_entity_guid.value++;
 
 	guid_to_id[this_guid] = new_entity;
 	new_entity.get<components::guid>().value = this_guid;
@@ -247,23 +247,23 @@ double cosmos::get_total_seconds_passed(const double view_interpolation_ratio) c
 }
 
 double cosmos::get_total_seconds_passed() const {
-	return significant.meta.now.step * get_fixed_delta().in_seconds<double>();
+	return significant.common.meta.now.step * get_fixed_delta().in_seconds<double>();
 }
 
 decltype(augs::stepped_timestamp::step) cosmos::get_total_steps_passed() const {
-	return significant.meta.now.step;
+	return significant.common.meta.now.step;
 }
 
 augs::stepped_timestamp cosmos::get_timestamp() const {
-	return significant.meta.now;
+	return significant.common.meta.now;
 }
 
 augs::delta cosmos::get_fixed_delta() const {
-	return significant.meta.delta;
+	return significant.common.meta.delta;
 }
 
 void cosmos::set_steps_per_second(const unsigned steps) {
-	significant.meta.delta = augs::delta::steps_per_second(steps);
+	significant.common.meta.delta = augs::delta::steps_per_second(steps);
 }
 
 unsigned cosmos::get_steps_per_second() const {
@@ -537,7 +537,7 @@ void cosmos::advance_systems(const logic_step step) {
 
 	profiler.raycasts.measure(inferred.physics.ray_casts_since_last_step);
 
-	++significant.meta.now.step;
+	++significant.common.meta.now.step;
 
 	const size_t queued_at_end_num = step.transient.messages.get_queue<messages::queue_destruction>().size();
 
@@ -599,7 +599,7 @@ namespace augs {
 			auto common_table = ar.create();
 			ar["common"] = common_table;
 
-			write_lua(common_table, cosm.significant.meta);
+			write_lua(common_table, cosm.significant.common);
 		}
 		
 		{
@@ -658,7 +658,7 @@ namespace augs {
 			cosm.reserve_storage_for_entities(reserved_count.as<unsigned>());
 		}
 
-		read_lua(ar["common"], cosm.significant.meta);
+		read_lua(ar["common"], cosm.significant.common);
 
 		int entity_table_counter = 1;
 		auto entities_table = ar["entities"];

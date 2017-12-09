@@ -202,8 +202,8 @@ bool cosmic_delta::encode(
 	augs::memory_stream new_meta_content;
 
 	const bool has_meta_changed = augs::write_delta(
-		base.significant.meta, 
-		enco.significant.meta, 
+		base.significant.common, 
+		enco.significant.common, 
 		new_meta_content, 
 		true
 	);
@@ -260,7 +260,7 @@ void cosmic_delta::decode(
 
 	deco.destroy_all_caches();
 
-	augs::read_delta(deco.significant.meta, in, true);
+	augs::read_delta(deco.significant.common, in, true);
 
 	delted_stream_of_entities dt;
 

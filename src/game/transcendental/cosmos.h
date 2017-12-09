@@ -310,7 +310,7 @@ private:
 };
 
 inline si_scaling cosmos::get_si() const {
-	return significant.meta.global.si;
+	return significant.common.si;
 }
 
 inline entity_id cosmos::get_entity_id_by(const entity_guid guid) const {
@@ -326,11 +326,11 @@ inline entity_guid cosmos::get_guid(const const_entity_handle handle) const {
 }
 
 inline cosmos_common_state& cosmos::get_common_state() {
-	return significant.meta.global;
+	return significant.common;
 }
 
 inline const cosmos_common_state& cosmos::get_common_state() const {
-	return significant.meta.global;
+	return significant.common;
 }
 
 inline common_assets& cosmos::get_common_assets() {

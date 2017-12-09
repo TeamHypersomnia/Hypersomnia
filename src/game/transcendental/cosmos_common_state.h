@@ -5,6 +5,8 @@
 #include "augs/templates/type_in_list_id.h"
 #include "augs/templates/always_false.h"
 
+#include "game/transcendental/cosmos_metadata.h"
+
 #include "game/common_state/visibility_settings.h"
 #include "game/common_state/pathfinding_settings.h"
 #include "game/common_state/common_assets.h"
@@ -23,6 +25,8 @@ using perk_meta_id = type_in_list_id<meter_tuple>;
 
 struct cosmos_common_state {
 	// GEN INTROSPECTOR struct cosmos_common_state
+	cosmos_metadata meta;
+
 	visibility_settings visibility;
 	pathfinding_settings pathfinding;
 	si_scaling si;

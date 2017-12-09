@@ -251,7 +251,7 @@ void component_synchronizer<false, P>::set_transform(const components::transform
 	auto& data = get_raw_component();
 
 	data.set_transform(
-		handle.get_cosmos().significant.meta.global.si,
+		handle.get_cosmos().significant.common.si,
 		transform
 	);
 
