@@ -24,7 +24,7 @@ Say that the state for your game looks like this:
 
 ```cpp
 struct my_entity {
-	std::string my_cool_name;
+	std::string name;
 	int my_super_cool_health;
 };
 
