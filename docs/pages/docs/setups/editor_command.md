@@ -5,12 +5,10 @@ hide_sidebar: true
 permalink: editor_command
 summary: |
     An **``editor_command``** is an object representing a single, indivisible operation of the [author](author).  
+    It can be **undone** or **redone** (executed).
 ---
 
-## Overview
-
-An editor command is an object representing a single, indivisible operation of the user.  
-A command can be **undone** or **redone** (executed).  
+## Considerations
 
 As for determinism of the editor commands, it is debatable if it must be as strict as during networking.
  
@@ -25,6 +23,17 @@ Those approaches to command implementation have been considered so far:
         - Assuming that we always delete redoable history once a new change is made, this will not be noticeable. 
     - Unacceptable memory and processing performance.
 
+Additionally: 
+
+- There is currently little benefit seen in making history of changes be compatible with future releases.
+  - Required lifetime of a history of changes is rather short. 
+    - An artist probably won't care about the history after closing the editor.
+  <!--- - Managing changes in binary format will be significantly more performant and easier to code. -->
+  - In extreme case, we may export history of changes to lua.
+
+<!---
+If you are not a programmer and only intend to use the editor to author actual content, you can safely skip this section.
+-->-
 ## Commmand types
 
 ### Change of a value
@@ -48,16 +57,3 @@ The question is, do we care what happens with the [inferred state](cosmos#inferr
   - Probably yes.
 
 ### Delete one or more entities
-    
-    This might be unsafe if we 
-
-## Considerations
-- There is currently little benefit seen in making history of changes be compatible with future releases.
-  - Required lifetime of a history of changes is rather short. 
-    - An artist probably won't care about the history after closing the editor.
-  <!--- - Managing changes in binary format will be significantly more performant and easier to code. -->
-  - In extreme case, we may export history of changes to lua.
-
-<!---
-If you are not a programmer and only intend to use the editor to author actual content, you can safely skip this section.
--->-
