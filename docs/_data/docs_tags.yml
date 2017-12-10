@@ -8,12 +8,16 @@
   name: topics
   description: All articles concerning the code's design in general.
   disable_on_homepage: on
-- title: Flyweights
-  name: flyweights
 - title: ECS
   name: ECS
   description: Our flavour of Entity-component-system pattern.
+- title: Setups
+  title_link: setup
+  name: setups
+  description: Highest-level objects in the entire source code.
 - title: Stateless systems
   title_link: stateless_system
   name: stateless_systems
   description: All of them.
+- title: Flyweights
+  name: flyweights
