@@ -3,21 +3,18 @@ title: Systematic function
 tags: [topics, ECS] 
 hide_sidebar: true
 permalink: systematic_function
-note: This name does not appear anywhere in the source code itself and is only introduced for the sake of this wiki.
+note: This name, except as a part of another name, does not appear anywhere in the source code. It is only introduced for the sake of this wiki.
 summary: |
     A function is called *systematic* if it operates on a [message queue](message) or if it operates on all [entities](entity) in the [cosmos](cosmos) that match a certain criterion.
 ---
 
 ## Introduction
 
-Systematic functions are the highest-level building blocks of the game logic.  
-Every systematic function is required to be [deterministic](determinism).  
-A common pitfall is to define a static RNG within the body of a systematic function, later to only produce divergent results for two [cosmoi](cosmos) run with identical inputs.
+Systematic functions are high-level calls that solve an abstract problem.  
+Care should be taken to name them so that there is little to no doubt what kind of problem that is.  
 
-Ideally, a systematic function should only be concerned with iteration and offload the complex logic to somewhere like ``src/game/detail``,  
-where other systematic functions are free to reuse that logic. 
-
-Usually, all systematic functions are called, directly or indirectly by another systematic function, inside [```cosmos::advance_systems```](cosmos#advance-systems), every time the game performs a step. 
+Ideally, a systematic function should only be concerned with iteration and offload the more complex stuff to another source file, where other systematic functions are free to reuse that logic.  
+For example, a function that is concerned with detonatable entities - ``hand_fuse_system::detonate_fuses`` - ignites explosions using ``src/game/detail/explosions.h``, a header used in some other domains as well.
 
 ## Common types of systematic functions
 
@@ -44,3 +41,4 @@ Usually, all systematic functions are called, directly or indirectly by another 
 
 - ```gun_system::launch_shots_due_to_pressed_triggers```
 - ```sentience_system::apply_damage_and_generate_health_events```
+- ```sound_system::track_new_sound_existences_near_camera```

@@ -3,7 +3,7 @@ title: Audiovisual system
 tags: [topics, ECS] 
 hide_sidebar: true
 summary: |
-    A [system](system) is called *audiovisual* if all of its [systematic functions](systematic_function) take only immutable variants of [logic step](logic_step) or [cosmos](cosmos), (``const_logic_step`` or ``const cosmos&``) and hence, whose side effects are limited to internal fields of the system.
+    A [system](system) is called *audiovisual* if all of its [systematic functions](systematic_function) take only immutable variants of [logic step](logic_step) or [cosmos](cosmos), (``const_logic_step`` or ``const cosmos&``) and hence, whose side effects are limited to the private fields of the system.
 permalink: audiovisual_system
 ---
 

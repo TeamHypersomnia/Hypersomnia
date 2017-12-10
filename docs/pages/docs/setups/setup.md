@@ -5,14 +5,14 @@ hide_sidebar: true
 permalink: setup
 summary: |
     **Setups** are the highest-level objects in the entire source code. They are allocated and used directly by [``main.cpp``](main_cpp).  
-    Usually, each *setup* has a single dedicated button in the main menu.  
+    Usually, each *setup* has a single dedicated button in the game's main menu.  
 
-    An application may choose which setup to launch on startup, via a relevant [``config.lua``](config_lua) setting.
+    An application may choose which setup to launch on startup via a relevant [``config.lua``](config_lua) setting.
 ---
 
 ## Interface
 
-Each setup is required to expose several member functions that the ``main.cpp`` uses to construct a viable program session.
+Each setup is required to expose several **``public``** member functions that the ``main.cpp`` uses to run a viable program session.
 Examples:
 
 - ``const cosmos& get_viewed_cosmos() const`` - return a reference to the [cosmos](cosmos) to be viewed in this frame.
