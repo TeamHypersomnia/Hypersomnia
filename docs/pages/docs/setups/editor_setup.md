@@ -7,6 +7,8 @@ summary: |
     The **editor setup** is a [setup](setup) that allows one to work with [intercosm](intercosm) objects. It can read intercosms from files on the disk and perform various operations on them, like create new entities or record and replay simulations.
 ---
 
+A person who authors content with help of the **editor setup** is hereafter named an *author*.
+
 ## Writing and reading files
 
 Currently supported:
@@ -24,7 +26,20 @@ Currently supported:
 ## Editor command
 
 An editor command is an object representing a single, indivisible operation of the user.  
-A command can be **undone** or **redone** (executed).
+A command can be **undone** or **redone** (executed).  
+
+As for determinism of the editor commands, it is debatable if it must be as strict as during networking.
+ 
+Those approaches to command implementation have been considered so far:
+1. With each command, store a snapshot of both the cosmos's entire [significant](cosmos#significant) state and [inferred state](cosmos#inferred). Additionally, store only the new value for redoing, as undoing is already possible thanks to the snapshot. 
+    - Maximum determinism.
+    - Easiest to get right without bugs.
+    - Unacceptable memory and processing performance.
+1. With each command, store a snapshot the cosmos's entire [significant](cosmos#significant) state. Additionally, store only the new value for redoing, as undoing is already possible thanks to the snapshot. [Reinfer](reinference) on undo.
+    - Slightly less determinism.
+        - If the author has jumped once 10 commands back, their further actions and recordings might result in a different cosmos than if they would, for example, just repeat undo ten times.
+        - Assuming that we always delete redoable history once a new change is made, this will not be noticeable. 
+    - Unacceptable memory and processing performance.
 
 ### Change of a value
 

@@ -10,24 +10,28 @@ summary: |
 ## State
 
 The cosmos is arguably the most complex structure in the entire codebase.  
-There are exactly two fields in the class: **significant** and **inferred** (see below).  
-The reason that these two are coupled together into a single object is because one is so rarely (if ever) needed without the other that separating them would only accomplish so much as to introduce unnecessary noise, in the form of twice as many references passed across the entire game's logic.  
-
+There are exactly two fields in the class:
+- 
 ### Significant
 
-Represents the part of the cosmos that is [significant](significant_state). It holds:
+    Represents the part of the cosmos that is [significant](significant_state). It holds:
+    
+    - All [entities](entity).
+    - All [components](component).
+    - The state that is [common to them](cosmos_common_state).
+    
 
-- All [entities](entity).
-- All [components](component).
-- The state that is [common to them](cosmos_common_state).
-
+- 
 ### Inferred
 
-The storage of all [caches](inferred_cache) that are at any time regenerable from the contents of the [significant](cosmos#significant) field.
+    The storage of all [caches](inferred_cache) that are at any time regenerable from the contents of the [significant](cosmos#significant) field.
+
+<br/>
+The reason that these two are coupled together into a single object is because one is so rarely (if ever) needed without the other that separating them would only accomplish so much as to introduce unnecessary noise, in the form of twice as many references passed across the entire game's logic.  
 
 ## The advance method
 
-The *advance* function accepts [entropy](cosmic_entropy) along with a reference to all [logical assets](logical_asset) in order to perform a single simulation step.  
+The *advance* function accepts [entropy](cosmic_entropy) along with a reference to all [logical assets](logical_asset) referenced via ids in components, in order to perform a single simulation step.  
 It initializes all [message](message) queues on [TLS](https://en.wikipedia.org/wiki/Thread-local_storage) and clears them when the step finishes, to ensure no messages persist beyond duration of the step.  
 If some messages were to linger between two consecutive steps, one would need to save them to disk or even synchronize through the network to ensure [determinism](determinism), effectively making messages another case of [significant state](significant_state).  
 It makes much more sense to just design the *advance* function so that all posted messages are handled in the same simulation step.
