@@ -4,7 +4,7 @@ tags: [topics, ECS]
 hide_sidebar: true
 permalink: cosmos_common_state
 summary: |
-    The **``cosmos_common_state``** is an object holding [significant](significant_state) data that is not tied to any particular [entity](entity).  
+    The **``cosmos_common_state``** is a part of the [cosmos](cosmos)'s [significant state](significant_state) ([``cosmos::significant``](cosmos#overview)) that is not tied to any particular [entity](entity).  
     Notably, it also contains [cosmos meta](cosmos_meta).
 ---
 

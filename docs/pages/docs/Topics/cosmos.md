@@ -11,7 +11,10 @@ summary: |
 
 The cosmos is arguably the most complex structure in the entire codebase.
 There are exactly two fields in the class:
-- *significant*, representing the part of the cosmos that is [significant](significant_state);
+- *significant*, representing the part of the cosmos that is [significant](significant_state). It holds:
+  - All [entities](entity).
+  - All [components](component).
+  - The state that is [common to them](cosmos_common_state).
 - *inferred*, which is a storage of all [caches](inferred_cache) that are at any time regenerable from the contents of the *significant* field.
 
 The reason that these two are coupled into a single object is because one is so rarely (if ever) needed without the other that separating them would only accomplish so much as to introduce unnecessary noise, in the form of twice as many references passed across the entire game's logic.  
