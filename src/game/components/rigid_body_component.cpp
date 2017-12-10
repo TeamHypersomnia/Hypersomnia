@@ -38,13 +38,13 @@ maybe_const_ref_t<C, rigid_body_cache>& basic_physics_synchronizer<C>::get_cache
 	return handle.get_cosmos().inferred.physics.get_rigid_body_cache(handle);
 }
 
-void component_synchronizer<false, P>::regenerate_caches() const {
-	handle.get_cosmos().regenerate_cache<physics_world_cache>(handle);
+void component_synchronizer<false, P>::reinfer_caches() const {
+	handle.get_cosmos().reinfer_cache<physics_world_cache>(handle);
 }
 
 void component_synchronizer<false, P>::set_body_type(const rigid_body_type t) const {
 	get_raw_component().body_type = t;
-	regenerate_caches();
+	reinfer_caches();
 }
 
 void component_synchronizer<false, P>::set_activated(const bool flag) const {
@@ -59,12 +59,12 @@ void component_synchronizer<false, P>::set_activated(const bool flag) const {
 		get_raw_component().angular_velocity = 0.f;
 	}
 
-	regenerate_caches();
+	reinfer_caches();
 }
 
 void component_synchronizer<false, P>::set_bullet_body(const bool flag) const {
 	get_raw_component().bullet = flag;
-	regenerate_caches();
+	reinfer_caches();
 }
 
 void component_synchronizer<false, P>::set_velocity(const vec2 pixels) const {

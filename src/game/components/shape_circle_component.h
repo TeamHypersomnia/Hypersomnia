@@ -32,7 +32,7 @@ public:
 
 template<>
 class component_synchronizer<false, components::shape_circle> : public basic_shape_circle_synchronizer<false> {
-	void regenerate_caches() const;
+	void reinfer_caches() const;
 public:
 	using basic_shape_circle_synchronizer<false>::basic_shape_circle_synchronizer;
 

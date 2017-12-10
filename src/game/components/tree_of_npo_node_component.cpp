@@ -36,8 +36,8 @@ bool basic_tree_of_npo_node_synchronizer<C>::is_activated() const {
 	return get_raw_component().activated;
 }
 
-void component_synchronizer<false, D>::regenerate_caches() const {
-	handle.get_cosmos().regenerate_cache<tree_of_npo_cache>(handle);
+void component_synchronizer<false, D>::reinfer_caches() const {
+	handle.get_cosmos().reinfer_cache<tree_of_npo_cache>(handle);
 }
 
 void component_synchronizer<false, D>::update_proxy(const logic_step step) const {
@@ -67,7 +67,7 @@ void component_synchronizer<false, D>::set_activated(const bool flag) const {
 	}
 
 	data.activated = flag;
-	regenerate_caches();
+	reinfer_caches();
 }
 
 template class basic_tree_of_npo_node_synchronizer<false>;

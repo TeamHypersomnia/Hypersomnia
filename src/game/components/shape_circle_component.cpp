@@ -17,8 +17,8 @@ real32 basic_shape_circle_synchronizer<C>::get_radius() const {
 
 using S = components::shape_circle;
 
-void component_synchronizer<false, S>::regenerate_caches() const {
-	handle.get_cosmos().regenerate_cache<physics_world_cache>(handle);
+void component_synchronizer<false, S>::reinfer_caches() const {
+	handle.get_cosmos().reinfer_cache<physics_world_cache>(handle);
 }
 
 void component_synchronizer<false, S>::set_activated(const bool flag) const {
@@ -27,7 +27,7 @@ void component_synchronizer<false, S>::set_activated(const bool flag) const {
 	}
 
 	get_raw_component().activated = flag;
-	regenerate_caches();
+	reinfer_caches();
 }
 
 template class basic_shape_circle_synchronizer<false>;

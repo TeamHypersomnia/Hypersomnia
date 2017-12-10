@@ -88,7 +88,7 @@ template<>
 class component_synchronizer<false, components::fixtures> : public basic_fixtures_synchronizer<false> {
 	void rebuild_density() const;
 
-	void regenerate_caches() const;
+	void reinfer_caches() const;
 
 public:
 	using basic_fixtures_synchronizer<false>::basic_fixtures_synchronizer;

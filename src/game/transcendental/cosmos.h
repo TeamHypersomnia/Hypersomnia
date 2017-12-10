@@ -163,7 +163,7 @@ public:
 	void destroy_cache_of(const const_entity_handle);
 	
 	template <class cache_type>
-	void regenerate_cache(const entity_handle handle) {
+	void reinfer_cache(const entity_handle handle) {
 		inferred.for_each([&](auto& sys) {
 			using T = std::decay_t<decltype(sys)>;
 
@@ -177,8 +177,8 @@ public:
 		});
 	}
 
-	void regenerate_all_caches();
-	void regenerate_all_caches_for(const const_entity_handle);
+	void reinfer_all_caches();
+	void reinfer_all_caches_for(const const_entity_handle);
 
 	void refresh_for_new_significant_state();
 	void remap_guids();

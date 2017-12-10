@@ -52,7 +52,7 @@ public:
 
 template<>
 class component_synchronizer<false, components::shape_polygon> : public basic_shape_polygon_synchronizer<false> {
-	void regenerate_caches() const;
+	void reinfer_caches() const;
 public:
 	using basic_shape_polygon_synchronizer<false>::basic_shape_polygon_synchronizer;
 

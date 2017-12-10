@@ -56,8 +56,8 @@ void cosmos::clear() {
 	*this = zero;
 }
 
-void cosmos::regenerate_all_caches() {
-	auto scope = measure_scope(profiler.regenerate_all_caches_for);
+void cosmos::reinfer_all_caches() {
+	auto scope = measure_scope(profiler.reinfer_all_caches_for);
 	
 	destroy_all_caches();
 	infer_all_caches();
@@ -211,10 +211,10 @@ void cosmos::remap_guids() {
 
 void cosmos::refresh_for_new_significant_state() {
 	remap_guids();
-	regenerate_all_caches();
+	reinfer_all_caches();
 }
 
-void cosmos::regenerate_all_caches_for(const const_entity_handle h) {
+void cosmos::reinfer_all_caches_for(const const_entity_handle h) {
 	destroy_cache_of(h);
 	infer_cache_for(h);
 }

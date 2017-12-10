@@ -97,7 +97,7 @@ public:
 			
 			if (e.reinfer) {
 				LOG("Cli: %x resubs at step: %x", locally_controlled_entity, referential_cosmos.get_total_steps_passed());
-				referential_cosmos.regenerate_all_caches();
+				referential_cosmos.reinfer_all_caches();
 			}
 
 			advance(cosmic_entropy_for_this_step, referential_cosmos);

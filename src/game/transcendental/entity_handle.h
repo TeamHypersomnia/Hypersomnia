@@ -181,7 +181,7 @@ public:
 		
 		if constexpr(is_component_synchronized_v<T>) {
 			allocator::template add<T>(c);
-			owner.regenerate_all_caches_for(*this);
+			owner.reinfer_all_caches_for(*this);
 		}
 		else {
 			allocator::template add<T>(c);
@@ -215,7 +215,7 @@ public:
 
 		if constexpr(is_component_synchronized_v<T>) {
 			allocator::template remove<T>();
-			owner.regenerate_all_caches_for(*this);
+			owner.reinfer_all_caches_for(*this);
 		}
 		else {
 			allocator::template remove<T>();

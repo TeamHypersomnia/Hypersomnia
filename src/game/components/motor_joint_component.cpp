@@ -18,14 +18,14 @@ decltype(M::target_bodies) basic_motor_joint_synchronizer<C>::get_target_bodies(
 	return get_raw_component().target_bodies;
 }
 
-void component_synchronizer<false, M>::regenerate_caches() const {
-	handle.get_cosmos().regenerate_cache<relational_cache>(handle);
-	handle.get_cosmos().regenerate_cache<physics_world_cache>(handle);
+void component_synchronizer<false, M>::reinfer_caches() const {
+	handle.get_cosmos().reinfer_cache<relational_cache>(handle);
+	handle.get_cosmos().reinfer_cache<physics_world_cache>(handle);
 }
 
 const component_synchronizer<false, M>& component_synchronizer<false, M>::operator=(const M& m) const {
 	get_raw_component() = m;
-	regenerate_caches();
+	reinfer_caches();
 	return *this;
 }
 
