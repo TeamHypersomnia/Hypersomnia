@@ -4,7 +4,7 @@ tags: [topics, ECS]
 hide_sidebar: true
 permalink: intercosm
 summary: |
-    An **intercosm**, a short for an *interactive cosmos*, is an object that holds a [cosmos](cosmos), [logical assets](logical_asset), [viewables](viewable) and extra information like [id](entity_id) of the entity that is to be controlled during the game.  
+    An **intercosm**, a short for an *interactive cosmos*, is an object that holds a [cosmos](cosmos), [logical assets](logical_asset), [viewables](viewable) and extra information like [id](entity_id) of the [entity](entity) that is to be controlled during the game.  
 ---
 
 ## Overview

@@ -4,13 +4,50 @@ tags: [topics, setups]
 hide_sidebar: true
 permalink: editor_setup
 summary: |
-    The **editor setup** is a setup that allows one to work with [intercosm](intercosm) objects. It can read intercosms from files on the disk and perform various operations on them, like create new entities or record and replay simulations.
+    The **editor setup** is a [setup](setup) that allows one to work with [intercosm](intercosm) objects. It can read intercosms from files on the disk and perform various operations on them, like create new entities or record and replay simulations.
 ---
 
-## Features
+## Writing and reading files
 
-- Read saved intercosms in ``.int`` file format.
-- Import saved intercosms from ``.lua`` table files.
-- Save opened intercosms to ``.int`` file format.
-- Export opened intercosms to ``.lua`` table files.
-- Delete [entities](entity) from the [cosmos](cosmos).
+Currently supported:
+
+- Read intercosms in ``.int`` file format.
+- Import intercosms from ``.lua`` table files.
+- Save intercosms to ``.int`` file format.
+- Export intercosms to ``.lua`` table files.
+
+## Autosave behaviour
+
+## Multiple selection of entities
+
+
+## Editor command
+
+An editor command is an object representing a single, indivisible operation of the user.  
+A command can be **undone** or **redone** (executed).
+
+### Change of a value
+
+There are several classes defined for commands that change a value.
+Generally, they should follow this format:
+
+- The kind of object that has changed (the [cosmos common state](cosmos_common_state) or the [component](component) type).
+- Given the type, an introspective index of the changed field.
+- A vector of bytes representing the new value (for execution).
+- A vector of bytes representing the old value (for undoing).
+
+Writing chunks of bytes *to* and *from* the [significant state](cosmos#significant) should be entirely deterministic.  
+The question is, do we care what happens with the [inferred state](cosmos#inferred) when executing and undoing commands?
+
+### Delete one or more entities
+
+### Considerations
+- There is currently little benefit seen in making history of changes be compatible with future releases.
+  - Required lifetime of a history of changes is rather short. 
+    - An artist probably won't care about the history after closing the editor.
+  <!--- - Managing changes in binary format will be significantly more performant and easier to code. -->
+  - In extreme case, we may export history of changes to lua.
+
+<!---
+If you are not a programmer and only intend to use the editor to author actual content, you can safely skip this section.
+-->-
