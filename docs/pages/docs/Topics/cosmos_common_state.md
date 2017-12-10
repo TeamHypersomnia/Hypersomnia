@@ -11,8 +11,10 @@ summary: |
 ## Overview
 
 There are certain examples of state that is better held common for all game objects.  
-For example: if there exist 200 entities named "Road", it makes no sense to store a ``std::wstring`` containing a value of "Road" for each of the 200 pieces of the road.  
-Instead, for each such entity, we store a **name identifier** inside a [name component](name_component), which is a simple **integer**.  
+For example: if there exist 200 entities named "Road", it makes no sense to store 2 hundred ``std::wstring``s containing a value of "Road".  
+It would be better if those 200 entities could share a single ``std::wstring`` that they could refer to by a simple identifier.
+
+So, for each such entity, we store a **name identifier** inside a [name component](name_component), which is a simple **integer**.  
 Then, in an object of class ``entity_name_metas`` (that is a part of the cosmos common state) we store a map from the **name identifier** into the corresponding ``std::wstring``.  
 
 This has several advantages:  
