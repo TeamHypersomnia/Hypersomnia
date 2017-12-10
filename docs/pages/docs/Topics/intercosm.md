@@ -15,4 +15,3 @@ It serves a similar purpose to what is referred to as a "game map" in other game
 ## Inside editor
 
 An intercosm is the highest-level object that the [editor setup](editor_setup) works with.
-It has 
