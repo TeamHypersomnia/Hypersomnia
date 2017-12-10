@@ -22,7 +22,7 @@
 
 #include "view/viewables/all_viewables_defs.h"
 
-#include "application/workspace.h"
+#include "application/intercosm.h"
 
 #include "application/setups/default_setup_settings.h"
 
@@ -40,7 +40,7 @@ class main_menu_setup : public default_setup_settings {
 	std::shared_future<std::wstring> latest_news;
 	vec2 latest_news_pos = { 0.f, 0.f };
 
-	workspace intro;
+	intercosm intro;
 
 	augs::fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
 	cosmic_entropy total_collected_entropy;

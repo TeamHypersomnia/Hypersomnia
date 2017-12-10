@@ -37,7 +37,7 @@ void editor_setup::set_locally_viewed(const entity_id id) {
 	tab().panned_camera = std::nullopt;
 }
 
-std::optional<editor_popup> open_workspace(workspace& work, const workspace_path_op op) {
+std::optional<editor_popup> open_intercosm(intercosm& work, const intercosm_path_op op) {
 	if (op.path.empty()) {
 		return std::nullopt;
 	}
@@ -45,7 +45,7 @@ std::optional<editor_popup> open_workspace(workspace& work, const workspace_path
 	try {
 		work.open(op);
 	}
-	catch (const workspace_loading_error err) {
+	catch (const intercosm_loading_error err) {
 		editor_popup p;
 
 		p.title = err.title;
@@ -72,7 +72,7 @@ editor_setup::editor_setup(
 
 editor_setup::editor_setup(
 	sol::state& lua, 
-	const augs::path_type& workspace_path
+	const augs::path_type& intercosm_path
 ) : 
 	destructor_autosave_input{ lua },
 	recent(lua) 
@@ -80,7 +80,7 @@ editor_setup::editor_setup(
 	augs::create_directories(get_untitled_dir());
 
 	open_last_tabs(lua);
-	open_workspace_in_new_tab({ lua, workspace_path });
+	open_intercosm_in_new_tab({ lua, intercosm_path });
 }
 
 editor_setup::~editor_setup() {
@@ -96,25 +96,25 @@ void editor_setup::open_last_tabs(sol::state& lua) {
 		tabs = opened_tabs.tabs;
 
 		if (!tabs.empty()) {
-			/* Reload workspaces */
+			/* Reload intercosms */
 
 			std::vector<tab_index_type> tabs_to_close;
 
 			for (std::size_t i = 0; i < tabs.size(); ++i) {
-				works.emplace_back(std::make_unique<workspace>());
+				works.emplace_back(std::make_unique<intercosm>());
 				
 				if (const bool try_loading_unsaved = !tabs[i].is_untitled()) {
 					const auto unsaved_path = get_unsaved_path(tabs[i].current_path);
 
-					if (const auto popup = open_workspace(*works.back(), { lua, unsaved_path })) {
-						if (const auto popup = open_workspace(*works.back(), { lua, tabs[i].current_path })) {
+					if (const auto popup = open_intercosm(*works.back(), { lua, unsaved_path })) {
+						if (const auto popup = open_intercosm(*works.back(), { lua, tabs[i].current_path })) {
 							set_popup(*popup);
 							tabs_to_close.push_back(static_cast<tab_index_type>(i));
 						}
 					}
 				}
 				else {
-					if (const auto popup = open_workspace(*works.back(), { lua, tabs[i].current_path })) {
+					if (const auto popup = open_intercosm(*works.back(), { lua, tabs[i].current_path })) {
 						set_popup(*popup);
 						tabs_to_close.push_back(static_cast<tab_index_type>(i));
 					}
@@ -200,7 +200,7 @@ void editor_setup::apply(const config_lua_table& cfg) {
 	return;
 }
 
-bool editor_setup::open_workspace_in_new_tab(const path_operation op) {
+bool editor_setup::open_intercosm_in_new_tab(const path_operation op) {
 	for (std::size_t i = 0; i < tabs.size(); ++i) {
 		if (tabs[i].current_path == op.path) {
 			set_current_tab(static_cast<tab_index_type>(i));
@@ -209,13 +209,13 @@ bool editor_setup::open_workspace_in_new_tab(const path_operation op) {
 	}
 
 	return try_to_open_new_tab(
-		[this, op](editor_tab& t, workspace& work) {
-			if (const auto popup = open_workspace(work, op)) {
+		[this, op](editor_tab& t, intercosm& work) {
+			if (const auto popup = open_intercosm(work, op)) {
 				set_popup(*popup);
 				return false;
 			}
 			
-			t.set_workspace_path(op.lua, op.path, recent);
+			t.set_intercosm_path(op.lua, op.path, recent);
 
 			return true;
 		}
@@ -224,7 +224,7 @@ bool editor_setup::open_workspace_in_new_tab(const path_operation op) {
 
 void editor_setup::save_current_tab_to(const path_operation op) {
 	work().save(op);
-	tab().set_workspace_path(op.lua, op.path, recent);
+	tab().set_intercosm_path(op.lua, op.path, recent);
 }
 
 void editor_setup::fill_with_minimal_scene(sol::state& lua) {
@@ -249,8 +249,8 @@ void editor_setup::fill_with_test_scene(sol::state& lua) {
 
 static auto get_filters() {
 	return std::vector<augs::window::file_dialog_filter> {
-		{ "Hypersomnia workspace file (*.wp)", ".wp" },
-		{ "Hypersomnia compatibile workspace file (*.lua)", ".lua" }
+		{ "Hypersomnia intercosm file (*.int)", ".int" },
+		{ "Hypersomnia compatibile intercosm file (*.lua)", ".lua" }
 	};
 }
 
@@ -300,7 +300,7 @@ void editor_setup::perform_custom_imgui(
 
 				if (auto menu = scoped_menu("Recent files", !recent.empty())) {
 					/*	
-						IMPORTANT! recent.paths can be altered in the loop by loading a workspace,
+						IMPORTANT! recent.paths can be altered in the loop by loading a intercosm,
 						thus we need to copy its contents.
 					*/
 
@@ -310,7 +310,7 @@ void editor_setup::perform_custom_imgui(
 						const auto str = augs::to_display_path(target_path).string();
 
 						if (ImGui::MenuItem(str.c_str())) {
-							open_workspace_in_new_tab(in_path(target_path));
+							open_intercosm_in_new_tab(in_path(target_path));
 						}
 					}
 
@@ -591,7 +591,7 @@ void editor_setup::perform_custom_imgui(
 		const auto result_path = open_file_dialog.get();
 
 		if (result_path) {
-			open_workspace_in_new_tab(in_path(*result_path));
+			open_intercosm_in_new_tab(in_path(*result_path));
 		}
 	}
 
@@ -698,7 +698,7 @@ void editor_setup::open(const augs::window& owner) {
 	open_file_dialog = std::async(
 		std::launch::async,
 		[&](){
-			return owner.open_file_dialog(get_filters(), "Open workspace");
+			return owner.open_file_dialog(get_filters(), "Open intercosm");
 		}
 	);
 }
@@ -802,8 +802,8 @@ void editor_setup::next() {
 }
 
 void editor_setup::new_tab() {
-	try_to_open_new_tab([&](editor_tab& t, workspace& w) {
-		const auto path = get_first_free_untitled_path("Workspace%x.wp");
+	try_to_open_new_tab([&](editor_tab& t, intercosm& w) {
+		const auto path = get_first_free_untitled_path("Intercosm%x.int");
 		augs::save_as_text(path, "empty");
 
 		t.current_path = path;

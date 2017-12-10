@@ -2,7 +2,7 @@
 #include <vector>
 #include "augs/filesystem/path.h"
 
-struct workspace_path_op;
+struct intercosm_path_op;
 
 namespace sol {
 	class state;

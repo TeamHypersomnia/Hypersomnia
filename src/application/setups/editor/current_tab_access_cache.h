@@ -3,13 +3,13 @@
 #include "augs/build_settings/platform_defines.h"
 
 struct editor_tab;
-struct workspace;
+struct intercosm;
 using tab_index_type = unsigned;
 
 template <class derived>
 class current_tab_access_cache {
 	editor_tab* current_tab = nullptr;
-	workspace* current_work = nullptr;
+	intercosm* current_work = nullptr;
 
 protected:
 	tab_index_type current_index = static_cast<tab_index_type>(-1);

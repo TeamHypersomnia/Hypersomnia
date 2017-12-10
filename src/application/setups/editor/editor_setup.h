@@ -13,7 +13,7 @@
 #include "view/viewables/all_viewables_defs.h"
 #include "view/viewables/viewables_loading_type.h"
 
-#include "application/workspace.h"
+#include "application/intercosm.h"
 
 #include "application/debug_character_selection.h"
 #include "application/debug_settings.h"
@@ -71,7 +71,7 @@ class editor_setup : private current_tab_access_cache<editor_setup> {
 	editor_recent_paths recent;
 
 	std::vector<editor_tab> tabs;
-	std::vector<std::unique_ptr<workspace>> works;
+	std::vector<std::unique_ptr<intercosm>> works;
 	
 	entity_id hovered_entity;
 	entity_id held_entity;
@@ -83,17 +83,17 @@ class editor_setup : private current_tab_access_cache<editor_setup> {
 	void finish_rectangular_selection();
 
 	template <class F>
-	bool try_to_open_new_tab(F&& new_workspace_provider) {
+	bool try_to_open_new_tab(F&& new_intercosm_provider) {
 		const auto new_index = has_current_tab() ? current_index + 1 : 0;
 
 		works.reserve(works.size() + 1);
 		tabs.reserve(tabs.size() + 1);
 
 		tabs.emplace(tabs.begin() + new_index);
-		works.emplace(works.begin() + new_index, std::make_unique<workspace>());
+		works.emplace(works.begin() + new_index, std::make_unique<intercosm>());
 		base::refresh();
 
-		if (const bool successfully_opened = new_workspace_provider(tabs[new_index], *works[new_index])) {
+		if (const bool successfully_opened = new_intercosm_provider(tabs[new_index], *works[new_index])) {
 			set_current_tab(new_index);
 			return true;
 		}
@@ -115,9 +115,9 @@ class editor_setup : private current_tab_access_cache<editor_setup> {
 
 	void set_popup(const editor_popup);
 	
-	using path_operation = workspace_path_op;
+	using path_operation = intercosm_path_op;
 
-	bool open_workspace_in_new_tab(path_operation);
+	bool open_intercosm_in_new_tab(path_operation);
 	void save_current_tab_to(path_operation);
 
 	void fill_with_minimal_scene(sol::state& lua);
@@ -154,7 +154,7 @@ public:
 	std::optional<vec2> rectangular_drag_origin;
 
 	editor_setup(sol::state& lua);
-	editor_setup(sol::state& lua, const augs::path_type& workspace_path);
+	editor_setup(sol::state& lua, const augs::path_type& intercosm_path);
 	
 	~editor_setup();
 

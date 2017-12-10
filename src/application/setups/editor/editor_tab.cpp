@@ -6,7 +6,7 @@ std::string editor_tab::get_display_path() const {
 	return current_path.filename().string();
 }
 
-void editor_tab::set_workspace_path(
+void editor_tab::set_intercosm_path(
 	sol::state& lua, 
 	const augs::path_type& path, 
 	editor_recent_paths& recent

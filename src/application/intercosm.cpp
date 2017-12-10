@@ -1,4 +1,4 @@
-#include "workspace.h"
+#include "intercosm.h"
 
 #include "game/organization/all_messages_includes.h"
 #include "game/organization/all_component_includes.h"
@@ -12,7 +12,7 @@
 #include "augs/readwrite/byte_readwrite.h"
 
 #if BUILD_TEST_SCENES
-void workspace::make_test_scene(sol::state& lua, const bool minimal) {
+void intercosm::make_test_scene(sol::state& lua, const bool minimal) {
 	world.clear();
 	logicals = {};
 	viewables = {};
@@ -31,7 +31,7 @@ void workspace::make_test_scene(sol::state& lua, const bool minimal) {
 }
 #endif
 
-void workspace::make_blank() {
+void intercosm::make_blank() {
 	world.clear();
 	world.reserve_storage_for_entities(100);
 
@@ -41,7 +41,7 @@ void workspace::make_blank() {
 	locally_viewed = origin;
 }
 
-void workspace::save(const workspace_path_op op) const {
+void intercosm::save(const intercosm_path_op op) const {
 	auto target_extension = op.path.extension();
 
 	if (target_extension == ".unsaved") {
@@ -56,7 +56,7 @@ void workspace::save(const workspace_path_op op) const {
 	}
 }
 
-void workspace::open(const workspace_path_op op) {
+void intercosm::open(const intercosm_path_op op) {
 	const auto display_path = augs::to_display_path(op.path);
 
 	try {
@@ -74,28 +74,28 @@ void workspace::open(const workspace_path_op op) {
 		}
 	}
 	catch (const cosmos_loading_error err) {
-		throw workspace_loading_error {
+		throw intercosm_loading_error {
 			"Error",
 			typesafe_sprintf("Failed to load %x.\nFile(s) might be corrupt.", display_path),
 			err.what()
 		};
 	}
 	catch (const augs::stream_read_error err) {
-		throw workspace_loading_error{
+		throw intercosm_loading_error{
 			"Error",
 			typesafe_sprintf("Failed to load %x.\nFile(s) might be corrupt.", display_path),
 			err.what()
 		};
 	}
 	catch (const augs::lua_deserialization_error err) {
-		throw workspace_loading_error {
+		throw intercosm_loading_error {
 			"Error",
 			typesafe_sprintf("Failed to load %x.\nNot a valid lua table.", display_path),
 			err.what()
 		};
 	}
 	catch (const augs::ifstream_error err) {
-		throw workspace_loading_error {
+		throw intercosm_loading_error {
 			"Error",
 			typesafe_sprintf("Failed to load %x.\nFile(s) might be missing.", display_path),
 			err.what()

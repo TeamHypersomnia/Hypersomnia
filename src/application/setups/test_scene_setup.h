@@ -10,7 +10,7 @@
 
 #include "view/viewables/all_viewables_defs.h"
 
-#include "application/workspace.h"
+#include "application/intercosm.h"
 
 #include "application/setups/default_setup_settings.h"
 
@@ -24,7 +24,7 @@ namespace sol {
 }
 
 class test_scene_setup : public default_setup_settings {
-	workspace scene;
+	intercosm scene;
 	cosmic_entropy total_collected_entropy;
 	augs::fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
 	debug_character_selection characters;

@@ -133,7 +133,7 @@ main_menu_setup::main_menu_setup(
 	}
 
 	// TODO: actually load a cosmos with its resources from a file/folder
-	const bool is_intro_scene_available = settings.menu_intro_scene_workspace_path.string().size() > 0;
+	const bool is_intro_scene_available = settings.menu_intro_scene_intercosm_path.string().size() > 0;
 
 	if (is_intro_scene_available) {
 #if BUILD_TEST_SCENES

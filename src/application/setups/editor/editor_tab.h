@@ -28,7 +28,7 @@ struct editor_tab {
 	editor_history history;
 	// END GEN INTROSPECTOR
 
-	void set_workspace_path(sol::state&, const augs::path_type&, editor_recent_paths&);
+	void set_intercosm_path(sol::state&, const augs::path_type&, editor_recent_paths&);
 
 	bool has_unsaved_changes() const;
 	bool is_untitled() const;

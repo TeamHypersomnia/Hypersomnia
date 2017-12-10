@@ -16,6 +16,8 @@ GEM
     commonmarker (0.17.6)
       ruby-enum (~> 0.5)
     concurrent-ruby (1.0.5)
+    disqus-for-jekyll (1.0.0)
+      jekyll (~> 3.3)
     ethon (0.11.0)
       ffi (>= 1.3.0)
     execjs (2.7.0)
@@ -232,6 +234,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  disqus-for-jekyll
   github-pages
 
 BUNDLED WITH

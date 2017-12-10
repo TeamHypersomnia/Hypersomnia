@@ -500,7 +500,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/application/session_profiler.cpp"
 	"src/view/viewables/all_viewables_defs.cpp"
 	"src/view/audiovisual_state/audiovisual_profiler.cpp"
-	"src/application/workspace.cpp"
+	"src/application/intercosm.cpp"
 	"src/augs/misc/imgui/addons/imguitabwindow/imguitabwindow.cpp"
 	"src/augs/misc/imgui/imgui_controls.cpp"
 	"src/augs/readwrite/readwrite_tests.cpp"
