@@ -3,7 +3,7 @@ title: Inferred cache
 tags: [topics, ECS] 
 hide_sidebar: true
 permalink: inferred_cache
-summary: An **inferred cache** is a portion of state that only ever exists at [run time](https://en.wikipedia.org/wiki/Run_time_(program_lifecycle_phase)) and can always be completely regenerated from some [significant state](significant_state).
+summary: An **inferred cache** is a portion of state that only ever exists at [run time](https://en.wikipedia.org/wiki/Run_time_(program_lifecycle_phase)) and can always be completely generated from some [significant state](significant_state).
 ---
 
 ## Etymology
