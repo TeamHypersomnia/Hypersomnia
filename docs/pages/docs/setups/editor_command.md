@@ -17,7 +17,7 @@ Those approaches to command implementation have been considered so far:
     - Maximum determinism.
     - Easiest to get right without bugs.
     - Unacceptable memory and processing performance.
-1. With each command, store a snapshot of the cosmos's entire [significant](cosmos#significant) state. Additionally, store only the new value for redoing, as undoing is already possible thanks to the snapshot. [Reinfer](reinference) on undo.
+2. With each command, store a snapshot of the cosmos's entire [significant](cosmos#significant) state. Additionally, store only the new value for redoing, as undoing is already possible thanks to the snapshot. [Reinfer](reinference) on undo.
     - Slightly less determinism.
         - If the author has jumped once 10 commands back, their further actions and recordings might result in a different cosmos than if they would, for example, just repeat undo ten times.
         - Assuming that we always delete redoable history once a new change is made, this will not be noticeable. 

@@ -24,17 +24,17 @@ For example, a function that is concerned with detonatable entities - ``hand_fus
         movement_system::set_movement_flags_from_input
         ````
 - Iterates through a message queue and generates messages to another queue.
-    - For example, one that queries children entities of deleted entities into the deletion queue.
+    - For example, one that adds the children entities of deleted entities into the deletion queue.
 
         ```cpp
         destroy_system::mark_queued_entities_and_their_children_for_deletion
         ````
 
 - Iterates through a processing list and produces side effects.
-    - For example, one that iterates through all entities having a [sentience](sentience_component) and decreases their aimpunch offset, making the crosshair gradually return to its original position.
+    - For example, one that iterates through all entities having a [sentience](sentience_component) and regenerates their [health points](health_points), [PE](personal_electricity) and [CP](consciousness_points).
 
         ```cpp
-        sentience_system::cooldown_aimpunches
+        sentience_system::regenerate_values_and_advance_spell_logic
         ````
 
 ## Other examples
