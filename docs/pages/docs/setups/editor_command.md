@@ -20,14 +20,17 @@ Those approaches to command implementation have been considered so far:
 2. With each command, store a snapshot of the cosmos's entire [significant](cosmos#significant) state. Additionally, store only the bytes of the new value for redoing, as undoing is already possible thanks to the snapshot. [Reinfer](reinference) on undo.
     - Slightly less determinism.
         - If the author has done undo and then redo, their further actions and recordings might result in a different cosmos than if they would stay on the current change.
-        - Assuming that we always delete redoable history once a new change is made, this will not be noticeable. 
     - Unacceptable memory and processing performance.
-3. With each command, store the bytes of both the new and the old value. If part of sensitive common state, or if part of a synchronized component, [reinfer](reinference).
+3. (Chosen approach) **With each command, store the bytes of both the new and the old value. If part of sensitive common state, or if part of a synchronized component, [reinfer](reinference).**
     - Even less determinism, but the problem is solvable or tolerable equally well as in 2.
         - If the author has jumped once 10 commands back, their further actions and recordings might result in a different cosmos than if they would, for example, just repeat undo ten times.
         - Solved if both redos and undos are reinferred completely.
     - Memory and processing performance is ok. 
     - If we accidentally forget to reinfer something, some state might be corrupted and even result in a crash.
+
+Further: commands, whether they are redone or executed for the first time, should do so via the same method: redo.
+This wouldn't be acceptable only if the redo performance was for some reason unacceptable.
+This will greatly reduce code duplication.
 
 ### State consistency
 
@@ -41,13 +44,26 @@ Care must be taken so that whatever field is exposed to the user:
     - In particular, something must be done about processing lists which assume that a relevant component is always existent within an entity.
         - Theoretically, replacing ``get`` with ``find`` should not considerably impair performance.
         - On the other hand, buggy behaviour might be more hard to spot and debug if we can't make basic assumptions in the code.
-        - **It might then be advisable to, once a component is removed or added, make proper changes to the processing lists.**
+        - **It might then be advisable to, once a component is removed or added, make proper changes to state, e.g. the processing lists.**
 - There exists no value that, shortly after setting it and playing the cosmos, the game becomes unplayable, or the state becomes completely broken.
     - Efforts can be made, but this is virtually impossible to ensure. In any case, the author can always undo the problematic change.
 
 If there exists a value that fails to satisfy the above criteria, the following approaches can be taken:
 - On changing to a problematic value, alter some other state (but it should be state invisible to the author) such that the problem no longer exists.
 - The bounds for the value prevent the author from setting a problematic value in the first place.
+
+<!---
+Existing problems with state consistency:
+- processing::processing_subject_categories needs be hidden and updated when components are removed.
+-->
+
+
+### Multiplicity
+
+Commands that alter existing entities in any way may be applied to more than just one entity.
+Such command types will always be wrapped into an object that additionally specifies a vector of target entities.
+
+No other considerations are needed at this point.
 
 ### Summary:
 
@@ -79,6 +95,23 @@ If you are not a programmer and only intend to use the editor to author actual c
 -->-
 ## Commmand types
 
+### Create an entity
+
+- Stores the [entity guid](entity_guid) to be passed to create an entity with ``create_entity_with_specific_guid``.
+- On creation, name the entity as "unnamed" so that the name id is valid henceforth. It can be at any time changed, obviously. Maybe even let the focus switch to a textbox with the name.
+- Deletes the entity on undo.
+
+### Add a component
+
+- Stores the component index.
+- Removes the component on undo.
+    - This must obviously take proper measures to update processing lists and whatnot.
+
+### Remove a component
+
+- Stores the component index and the byte content.
+- Adds the component on undo with the previous byte content.
+
 ### Change of a value
 
 There are several classes defined for commands that change a value.
@@ -90,7 +123,18 @@ Generally, they should follow this format:
 - A vector of bytes representing the old value (for undoing).
 
 Writing chunks of bytes *to* and *from* the [significant state](cosmos#significant) should be entirely deterministic.  
-The question is, do we care what happens with the [inferred state](cosmos#inferred) when executing and undoing commands?
+What happens with the [inferred state](cosmos#inferred) on undos and redos is considered [above](#considerations). 
+
+#### Type granularity
+
+We shouldn't make a command type for a change of every component.
+Instead just store the type index. Later do constexprs in a generic lambda if necessary.
+
+Types will be separate for:
+- A change inside of a common state.
+- A change of a name meta (that container will be particularly large so we shouldn't always store whole container).
+- A change of a component.
+- A change of a viewable.
 
 #### Smooth GUI sliders
 
