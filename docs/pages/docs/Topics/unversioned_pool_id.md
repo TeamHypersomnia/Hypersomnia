@@ -11,7 +11,7 @@ summary: |
 
 Dereferencing an unversioned pool id stays predictable **only as long as the object it refers to is alive**.  
 In particular, if the object gets freed and the pool later allocates a new object, it may, by a quirk of fate, be assigned the same indirection index.  
-Then, the **unversioned pool id** may begin to point to a completely different object.  
+Then, the unversioned pool id may begin to point to a **completely different object**.  
 
 An unversioned pool id is useful if its user wants to save on memory and the id of an object is guaranteed to stop existing the moment that the object referred to is deleted.  
 

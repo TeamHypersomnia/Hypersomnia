@@ -17,13 +17,53 @@ Those approaches to command implementation have been considered so far:
     - Maximum determinism.
     - Easiest to get right without bugs.
     - Unacceptable memory and processing performance.
-2. With each command, store a snapshot of the cosmos's entire [significant](cosmos#significant) state. Additionally, store only the new value for redoing, as undoing is already possible thanks to the snapshot. [Reinfer](reinference) on undo.
+2. With each command, store a snapshot of the cosmos's entire [significant](cosmos#significant) state. Additionally, store only the bytes of the new value for redoing, as undoing is already possible thanks to the snapshot. [Reinfer](reinference) on undo.
     - Slightly less determinism.
-        - If the author has jumped once 10 commands back, their further actions and recordings might result in a different cosmos than if they would, for example, just repeat undo ten times.
+        - If the author has done undo and then redo, their further actions and recordings might result in a different cosmos than if they would stay on the current change.
         - Assuming that we always delete redoable history once a new change is made, this will not be noticeable. 
     - Unacceptable memory and processing performance.
+3. With each command, store the bytes of both the new and the old value. If part of sensitive common state, or if part of a synchronized component, [reinfer](reinference).
+    - Even less determinism, but the problem is solvable or tolerable equally well as in 2.
+        - If the author has jumped once 10 commands back, their further actions and recordings might result in a different cosmos than if they would, for example, just repeat undo ten times.
+        - Solved if both redos and undos are reinferred completely.
+    - Memory and processing performance is ok. 
+    - If we accidentally forget to reinfer something, some state might be corrupted and even result in a crash.
 
 ### State consistency
+
+For some components, it is easy to guarantee that any possible combination of member values results in a valid game behaviour,  
+or at least that it does not result in crashing the application.
+ 
+For some components, it is considerably harder.
+
+Care must be taken so that whatever field is exposed to the user: 
+- There exists no value that would crash the application.
+    - In particular, something must be done about processing lists which assume that a relevant component is always existent within an entity.
+        - Theoretically, replacing ``get`` with ``find`` should not considerably impair performance.
+        - On the other hand, buggy behaviour might be more hard to spot and debug if we can't make basic assumptions in the code.
+        - **It might then be advisable to, once a component is removed or added, make proper changes to the processing lists.**
+- There exists no value that, shortly after setting it and playing the cosmos, the game becomes unplayable, or the state becomes completely broken.
+    - Efforts can be made, but this is virtually impossible to ensure. In any case, the author can always undo the problematic change.
+
+If there exists a value that fails to satisfy the above criteria, the following approaches can be taken:
+- On changing to a problematic value, alter some other state (but it should be state invisible to the author) such that the problem no longer exists.
+- The bounds for the value prevent the author from setting a problematic value in the first place.
+
+### Summary:
+
+- What do we store?
+    - whole significant + inferred - maximum determinism, no bugs, unacceptable performance
+    - only whole significant...
+        - ...and incrementally reinfer redos - unacceptable performance, slightly less determinism, some bugs possible
+        - ...and completely reinfer redos - even more unacceptable performance, maximum determinism, some bugs possible
+        - undos have to be completely reinferred either way
+    - only the new value and the old value...
+        - ...and incrementally reinfer redos, incrementally reinfer undos - best performance, poor determinism, some bugs possible
+        - ...and completely reinfer redos, completely reinfer undos - slightly worse processing performance due to reinferences, maximum determinism, less bugs possible
+            - note that complete reinference can still be skipped for components that aren't synchronized
+        - we could make a flag out of this; both are pretty much acceptable.
+            - **we might begin with complete reinferences, as it will be easier.**
+        - perhaps mixing complete and incremental reinference makes no sense, as a "slightly worse" assumption about determinism means no assumption
 
 
 ### Notes
