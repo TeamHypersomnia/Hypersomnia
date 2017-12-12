@@ -86,7 +86,7 @@ Now, here is where our distinction comes in.
 
 Assume that an inferred cache is continually kept up to date with the current significant state, every time the latter changes even the slightest bit.  
 Say that you now completely [destroy the caches and infer](reinference) them again from the current significant state.  
-One would naturally expect the inferred cache to remain completely unchanged, maybe even identical to every single byte.  
+One would naturally expect the inferred cache to remain completely unchanged, maybe even identical down to every single byte.  
 Unfortunately, that is not always the case.  
 
 Assume the [previous example](#explanation).
@@ -95,7 +95,7 @@ Assume also, that, at some point in your code, you do this:
 ```cpp
 // Prints all existent names of entities
 for (const auto& e : entities_by_name) {
-	std::cout << e.name << std::endl;
+	std::cout << e.first.name << std::endl;
 }
 ````
 It may print something like:
@@ -116,7 +116,7 @@ Motorcycle
 Road
 ````
 
-Iterating two distinct ``std::unordered_map`` and expecting the order to be the same is only reasonable when the elements are identical and inserted in the same order (this, however, [*is not* enforced by the standard](https://stackoverflow.com/a/13623172/503776), but can be easily verified empirically).
+Iterating two distinct ``std::unordered_map``s and expecting the order to be the same is only reasonable when the elements are identical and inserted in the same order (this, however, [*is not* enforced by the standard](https://stackoverflow.com/a/13623172/503776), but can be easily verified empirically).
 However, once we reinfer the map, we pass it elements (entity names) in a possibly completely different order from when it was incrementally kept up to date - entity creations, deletions and renames might have happened arbitrarily. Which means that our inferred cache is not quite identical to the one before reinference, even though they were generated from the same significant state. 
 
 This is an important implication when dealing with simulation's [determinism](determinism).  

@@ -23,7 +23,10 @@ Those approaches to command implementation have been considered so far:
         - Assuming that we always delete redoable history once a new change is made, this will not be noticeable. 
     - Unacceptable memory and processing performance.
 
-Additionally: 
+### State consistency
+
+
+### Notes
 
 - There is currently little benefit seen in making history of changes be compatible with future releases.
   - Required lifetime of a history of changes is rather short. 
