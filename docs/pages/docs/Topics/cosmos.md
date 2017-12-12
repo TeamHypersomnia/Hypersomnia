@@ -36,6 +36,10 @@ It initializes all [message](message) queues on [TLS](https://en.wikipedia.org/w
 If some messages were to linger between two consecutive steps, one would need to save them to disk or even synchronize through the network to ensure [determinism](determinism), effectively making messages another case of [significant state](significant_state).  
 It makes much more sense to just design the *advance* function so that all posted messages are handled in the same simulation step.
 
+### Pre solve
+
+### Post solve
+
 ## Notes
 
 There are also many other helper methods for performing common tasks on the cosmos, e.g. getting a handle to an entity referenced by an [id](entity_id), [guid](entity_guid), getting a [processing list](processing_lists_cache) of a given kind, or getting all entities matching a given name. While, under the principle of separation of concerns, it would make sense to distribute such functions across multiple source files or even classes, there is currently no benefit seen in doing that.
