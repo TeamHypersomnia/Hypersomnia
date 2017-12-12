@@ -81,3 +81,44 @@ Now, here is where our distinction comes in.
 
 - ``my_entities`` is a part of *significant state*, because this is the state that you write to disk, read from disk and synchronize through the network. If you lost that data, it would have some rather *significant* consequences.
 - ``entities_by_name`` is an *inferred cache*. As its state can be *inferred* from the significant state, it only makes sense for that state to exist at runtime, and it makes no sense to serialize it or send through the network, as each client can infer it from the significant state that is assumed to have been already synchronized.
+
+## Reinference error
+
+Assume that an inferred cache is continually kept up to date with the current significant state, every time the latter changes even the slightest bit.  
+Say that you now completely [destroy the caches and infer](reinference) them again from the current significant state.  
+One would naturally expect the inferred cache to remain completely unchanged, maybe even identical to every single byte.  
+Unfortunately, that is not always the case.  
+
+Assume the [previous example](#explanation).
+Assume also, that, at some point in your code, you do this:
+
+```cpp
+// Prints all existent names of entities
+for (const auto& e : entities_by_name) {
+	std::cout << e.name << std::endl;
+}
+````
+It may print something like:
+
+```
+Road
+Tree
+BILMER2000
+Motorcycle
+````
+
+If, however, you now completely [reinfer](reinference) ``entities_by_name``, the same code may produce:
+
+```
+BILMER2000
+Tree
+Motorcycle
+Road
+````
+
+Iterating two distinct ``std::unordered_map`` and expecting the order to be the same is only reasonable when the elements are identical and inserted in the same order (this, however, [*is not* enforced by the standard](https://stackoverflow.com/a/13623172/503776), but can be easily verified empirically).
+However, once we reinfer the map, we pass it elements (entity names) in a possibly completely different order from when it was incrementally kept up to date - entity creations, deletions and renames might have happened arbitrarily. Which means that our inferred cache is not quite identical to the one before reinference, even though they were generated from the same significant state. 
+
+This is an important implication when dealing with simulation's [determinism](determinism).  
+For example, if one client needs to completely [reinfer](reinference) from their significant state, all others should do the same so that the simulation does not diverge across machines.  
+This is particularly important when dealing with [``physics_cache``](physics_cache), which also keeps all contact information in a ``b2World``.
