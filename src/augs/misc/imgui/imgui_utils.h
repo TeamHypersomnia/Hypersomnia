@@ -68,6 +68,10 @@ namespace augs {
 					return true;
 				}
 
+				if (filter_mouse && ch.msg == message::wheel) {
+					return true;
+				}
+				
 				/* We always let release events propagate */
 
 				if (ch.was_any_key_pressed()) {
