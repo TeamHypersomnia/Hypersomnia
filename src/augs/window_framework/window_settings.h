@@ -13,6 +13,7 @@ namespace augs {
 		unsigned bpp = 24;
 		vec2i size = vec2i(1280, 768);
 		bool raw_mouse_input = true;
+		bool log_keystrokes = false;
 		// END GEN INTROSPECTOR
 
 		xywhi make_window_rect() const {

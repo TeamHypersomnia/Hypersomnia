@@ -596,6 +596,8 @@ void editor_setup::perform_custom_imgui(
 		}
 
 		if (show_go_to_all) {
+			auto go_to_all = scoped_window("Go to all", &show_go_to_all);
+
 
 		}
 	}
@@ -904,7 +906,7 @@ bool editor_setup::handle_top_level_window_input(
 				switch (k) {
 					case key::S: save(lua, window); return true;
 					case key::O: open(window); return true;
-					case key::SEMICOLON: go_to_all(); return true;
+					case key::COMMA: go_to_all(); return true;
 					case key::N: new_tab(); return true;
 					case key::W: close_tab(); return true;
 					case key::TAB: next_tab(); return true;

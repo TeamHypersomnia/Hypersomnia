@@ -264,6 +264,7 @@ return {
       y = 208
     },
     raw_mouse_input = false,
+    log_keystrokes = false,
     size = {
       x = 1200,
       y = 700

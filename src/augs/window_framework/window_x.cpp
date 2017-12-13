@@ -240,7 +240,8 @@ namespace augs {
 		F mousemotion_handler,
 		G keysym_getter,
 		H character_event_from,
-		decltype(xcb_intern_atom_reply_t::atom) wm_delete_window_atom
+		decltype(xcb_intern_atom_reply_t::atom) wm_delete_window_atom,
+		const bool log_keystrokes
 	) {
 		using namespace event;
 		using namespace keys;
@@ -272,10 +273,12 @@ namespace augs {
 			
 				const auto keycode = press->detail;	
 				const auto keysym = keysym_getter(keycode);
-#if 0
-				LOG("Keycode down: %x", static_cast<int>(keycode));
-				LOG("Keysym down: %x", static_cast<int>(keysym));
-#endif			
+
+				if (log_keystrokes) {
+					LOG("Keycode down: %x", static_cast<int>(keycode));
+					LOG("Keysym down: %x", static_cast<int>(keysym));
+				}
+
 				ch.msg = message::keydown;
 				ch.data.key.key = translate_keysym({ keysym });
 
@@ -287,10 +290,12 @@ namespace augs {
 			
 				const auto keycode = release->detail;	
 				const auto keysym = keysym_getter(keycode);
-#if 0
-				LOG("Keycode up: %x", static_cast<int>(keycode));
-				LOG("Keysym up: %x", static_cast<int>(keysym));
-#endif			
+
+				if (log_keystrokes) {
+					LOG("Keycode up: %x", static_cast<int>(keycode));
+					LOG("Keysym up: %x", static_cast<int>(keysym));
+				}
+
 				ch.msg = message::keyup;
 				ch.data.key.key = translate_keysym({ keysym });
 
@@ -438,9 +443,10 @@ namespace augs {
 			std::array<char, 16> buf {};
 
 			if (XLookupString(&keyev, buf.data(), buf.size(), nullptr, nullptr)) {
-#if 0
-				LOG("Ch press: %x", buf);
-#endif
+				if (get_current_settings().log_keystrokes) {
+					LOG("Ch press: %x", buf.data());
+				}
+				
 				ch.data.character.utf16 = buf[0];
 				output.push_back(ch);
 			}
@@ -453,7 +459,8 @@ namespace augs {
 				[this](const basic_vec2<short> p) { return handle_mousemove(p); },
 				keysym_getter,
 				character_event_emitter,
-				wm_delete_window_atom
+				wm_delete_window_atom,
+				get_current_settings().log_keystrokes
 			)) {
 				common_event_handler(*ch, output);
 				output.push_back(*ch);
