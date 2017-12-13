@@ -226,24 +226,35 @@ void settings_gui_state::perform(
 				break;
 			}
 			case settings_pane::EDITOR: {
-				revertable_checkbox("Enable autosave", config.editor.autosave.enabled);
-
-				if (config.editor.autosave.enabled) {
-					auto scope = scoped_indent();
-					text("Once per");
+				if (auto node = scoped_tree_node("General")) {
+					revertable_checkbox("Enable autosave", config.editor.autosave.enabled);
+	
+					if (config.editor.autosave.enabled) {
+						auto scope = scoped_indent();
+						text("Once per");
+						ImGui::SameLine();
+						revertable_drag("minutes", config.editor.autosave.once_every_min, 0.002f, 0.05f, 2000.f);
+					}
+					
+					text("Remember last");
 					ImGui::SameLine();
-					revertable_drag("minutes", config.editor.autosave.once_every_min, 0.002f, 0.05f, 2000.f);
-				}
+
+					revertable_drag("commands for undoing", config.editor.remember_last_n_commands, 1, 10, 2000);
+				}	
 				
-				revertable_drag("Camera panning speed", config.editor.camera_panning_speed, 0.001f, -10.f, 10.f);
+				if (auto node = scoped_tree_node("Interface")) {
+					revertable_drag("Camera panning speed", config.editor.camera_panning_speed, 0.001f, -10.f, 10.f);
+				}
 
-				revertable_color_edit("Controlled entity color", config.editor.controlled_entity_color);
-				revertable_color_edit("Hovered entity color", config.editor.hovered_entity_color);
-				revertable_color_edit("Selected entity color", config.editor.selected_entity_color);
-				revertable_color_edit("Held entity color", config.editor.held_entity_color);
+				if (auto node = scoped_tree_node("Appearance")) {
+					revertable_color_edit("Controlled entity color", config.editor.controlled_entity_color);
+					revertable_color_edit("Hovered entity color", config.editor.hovered_entity_color);
+					revertable_color_edit("Selected entity color", config.editor.selected_entity_color);
+					revertable_color_edit("Held entity color", config.editor.held_entity_color);
 
-				revertable_color_edit("Rectangular selection color", config.editor.rectangular_selection_color);
-				revertable_color_edit("Rectangular selection border color", config.editor.rectangular_selection_border_color);
+					revertable_color_edit("Rectangular selection color", config.editor.rectangular_selection_color);
+					revertable_color_edit("Rectangular selection border color", config.editor.rectangular_selection_border_color);
+				}
 
 				break;
 			}

@@ -31,7 +31,7 @@ The reason that these two are coupled together into a single object is because o
 
 ## The advance method
 
-The *advance* function accepts [entropy](cosmic_entropy) along with a reference to all [logical assets](logical_asset) referenced via ids in components, in order to perform a single simulation step.  
+The *advance* function accepts [entropy](cosmic_entropy) along with a reference to all [logical assets](logical_asset) referenced via ids from inside [significant](#significant), in order to perform a single simulation step.  
 It initializes all [message](message) queues on [TLS](https://en.wikipedia.org/wiki/Thread-local_storage) and clears them when the step finishes, to ensure no messages persist beyond duration of the step.  
 If some messages were to linger between two consecutive steps, one would need to save them to disk or even synchronize through the network to ensure [determinism](determinism), effectively making messages another case of [significant state](significant_state).  
 It makes much more sense to just design the *advance* function so that all posted messages are handled in the same simulation step.

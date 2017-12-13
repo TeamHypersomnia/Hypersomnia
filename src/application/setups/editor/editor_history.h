@@ -37,8 +37,10 @@ struct duplicate_entity_command {
 
 };
 
-struct remove_entity_command {
-
+struct delete_entity_command {
+	// GEN INTROSPECTOR struct delete_entity_command
+	std::vector<std::byte> deleted_content;
+	// END GEN INTROSPECTOR
 };
 
 struct existing_entity_command {
@@ -48,7 +50,7 @@ struct existing_entity_command {
 		remove_component_command,
 
 		duplicate_entity_command,
-		remove_entity_command
+		delete_entity_command
 	>;
 
 	// GEN INTROSPECTOR struct existing_entity_command

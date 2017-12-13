@@ -19,11 +19,11 @@ Those approaches to command implementation have been considered so far:
     - Unacceptable memory and processing performance.
 2. With each command, store a snapshot of the cosmos's entire [significant](cosmos#significant) state. Additionally, store only the bytes of the new value for redoing, as undoing is already possible thanks to the snapshot. [Reinfer](reinference) on undo.
     - Slightly less determinism.
-        - If the author has done undo and then redo, their further actions and recordings might result in a different cosmos than if they would stay on the current change.
+        - If the author has done undo and then redo, their further actions and recordings might result in a different cosmos than if they would have stayed on the current change.
     - Unacceptable memory and processing performance.
 3. (Chosen approach) **With each command, store the bytes of both the new and the old value. If part of sensitive common state, or if part of a synchronized component, [reinfer](reinference).**
     - Even less determinism, but the problem is solvable or tolerable equally well as in 2.
-        - If the author has jumped once 10 commands back, their further actions and recordings might result in a different cosmos than if they would, for example, just repeat undo ten times.
+        - If the author has jumped once 10 commands back, their further actions and recordings might result in a different cosmos than if they would have just repeated undo ten times.
         - Solved if both redos and undos are reinferred completely.
     - Memory and processing performance is ok. 
     - If we accidentally forget to reinfer something, some state might be corrupted and even result in a crash.
@@ -37,7 +37,7 @@ This will greatly reduce code duplication.
 For some components, it is easy to guarantee that any possible combination of member values results in a valid game behaviour,  
 or at least that it does not result in crashing the application.
  
-For some components, it is considerably harder.
+For other components, it is considerably harder.
 
 Care must be taken so that whatever field is exposed to the user: 
 - There exists no value that would crash the application.
@@ -101,6 +101,14 @@ If you are not a programmer and only intend to use the editor to author actual c
 - On creation, name the entity as "unnamed" so that the name id is valid henceforth. It can be at any time changed, obviously. Maybe even let the focus switch to a textbox with the name.
 - Deletes the entity on undo.
 
+### Delete entity
+
+- Stores the previous byte content of all components.
+
+### Duplicate entity
+
+- Stores nothing?
+
 ### Add a component
 
 - Stores the component index.
@@ -143,4 +151,3 @@ Types will be separate for:
 - Will performance be acceptable if we perform the change logic every time the slider is moved?
   - Probably yes.
 
-### Delete one or more entities

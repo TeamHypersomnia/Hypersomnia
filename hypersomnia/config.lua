@@ -64,6 +64,9 @@ return {
       enabled = true,
       once_every_min = 1
     },
+
+	remember_last_n_commands = 200,
+
     camera_panning_speed = 1,
     controlled_entity_color = "255 255 0 120",
     hovered_entity_color = "255 255 255 20",
