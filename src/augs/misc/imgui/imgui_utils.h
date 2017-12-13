@@ -14,7 +14,8 @@ namespace augs {
 	namespace imgui {
 		void init(
 			const char* const ini_filename,
-			const char* const log_filename
+			const char* const log_filename,
+			const ImGuiStyle& initial_style
 		);
 
 		image create_atlas_image();
@@ -34,7 +35,7 @@ namespace augs {
 
 		void neutralize_mouse();
 
-		void render(const ImGuiStyle&);
+		void render();
 	
 		bool is_hovered_with_hand_cursor();
 

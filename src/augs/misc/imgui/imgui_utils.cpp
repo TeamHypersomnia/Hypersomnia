@@ -10,7 +10,8 @@ namespace augs {
 	namespace imgui {
 		void init(
 			const char* const ini_filename,
-			const char* const log_filename
+			const char* const log_filename,
+			const ImGuiStyle& initial_style
 		) {
 			auto& io = ImGui::GetIO();
 			
@@ -43,6 +44,7 @@ namespace augs {
 			io.IniFilename = ini_filename;
 			io.LogFilename = log_filename;
 			io.MouseDoubleClickMaxDist = 100.f;
+			ImGui::GetStyle() = initial_style;
 		}
 
 		void setup_input(
@@ -151,8 +153,7 @@ namespace augs {
 			io.DisplaySize = vec2(screen_size);
 		}
 #endif
-		void render(const ImGuiStyle& style) {
-			ImGui::GetStyle() = style;
+		void render() {
 			ImGui::Render();
 		}
 

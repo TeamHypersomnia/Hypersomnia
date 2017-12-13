@@ -6,6 +6,47 @@
 
 namespace augs {
 	namespace imgui {
+		template <class... T>
+		auto scoped_child(T&&... args) {
+			ImGui::BeginChild(std::forward<T>(args)...);
+		
+			return make_scope_guard([]() { ImGui::EndChild(); });
+		}
+		
+		template <class... T>
+		auto scoped_window(T&&... args) {
+			ImGui::Begin(std::forward<T>(args)...);
+		
+			return make_scope_guard([]() { ImGui::End(); });
+		}
+		
+		template <class... T>
+		auto scoped_style_color(T&&... args) {
+			ImGui::PushStyleColor(std::forward<T>(args)...);
+		
+			return make_scope_guard([]() { ImGui::PopStyleColor(); });
+		}
+		
+		template <class... T>
+		auto scoped_style_var(T&&... args) {
+			ImGui::PushStyleVar(std::forward<T>(args)...);
+		
+			return make_scope_guard([]() { ImGui::PopStyleVar(); });
+		}
+
+		template <class... T>
+		auto scoped_modal_popup(T&&... args) {
+			const auto result = ImGui::BeginPopupModal(std::forward<T>(args)...);
+
+			auto opt = std::make_optional(make_scope_guard([result]() { if (result) { ImGui::EndPopup(); }}));
+
+			if (!result) {
+				opt = std::nullopt;
+			}
+
+			return opt;
+		}
+
 		inline auto scoped_indent() {
 			ImGui::Indent();
 		
@@ -83,46 +124,6 @@ namespace augs {
 
 			return opt;
 		}
-		
-		template <class... T>
-		auto scoped_modal_popup(T&&... args) {
-			const auto result = ImGui::BeginPopupModal(std::forward<T>(args)...);
 
-			auto opt = std::make_optional(make_scope_guard([result]() { if (result) { ImGui::EndPopup(); }}));
-
-			if (!result) {
-				opt = std::nullopt;
-			}
-
-			return opt;
-		}
-
-		template <class... T>
-		auto scoped_child(T&&... args) {
-			ImGui::BeginChild(std::forward<T>(args)...);
-		
-			return make_scope_guard([]() { ImGui::EndChild(); });
-		}
-		
-		template <class... T>
-		auto scoped_window(T&&... args) {
-			ImGui::Begin(std::forward<T>(args)...);
-		
-			return make_scope_guard([]() { ImGui::End(); });
-		}
-		
-		template <class... T>
-		auto scoped_style_color(T&&... args) {
-			ImGui::PushStyleColor(std::forward<T>(args)...);
-		
-			return make_scope_guard([]() { ImGui::PopStyleColor(); });
-		}
-		
-		template <class... T>
-		auto scoped_style_var(T&&... args) {
-			ImGui::PushStyleVar(std::forward<T>(args)...);
-		
-			return make_scope_guard([]() { ImGui::PopStyleVar(); });
-		}
 	}
 }

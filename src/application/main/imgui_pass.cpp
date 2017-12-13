@@ -59,7 +59,7 @@ void perform_imgui_pass(
 		custom_imgui_logic();
 	}
 
-	augs::imgui::render(config.gui_style);
+	augs::imgui::render();
 
 	window_inputs = augs::imgui::filter_inputs(window_inputs);
 }

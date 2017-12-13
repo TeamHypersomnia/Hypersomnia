@@ -22,6 +22,9 @@
 #include "augs/readwrite/byte_readwrite.h"
 #include "augs/readwrite/lua_readwrite.h"
 
+namespace ImGui {
+	bool BeginMenuBarSeparator(const float y); 
+	};
 void editor_setup::on_tab_changed() {
 	hovered_entity = {};
 	player_paused = true;
@@ -288,109 +291,115 @@ void editor_setup::perform_custom_imgui(
 	const auto world_cursor_pos = current_cone.to_world_space(screen_size, mouse_pos);
 
 	if (!in_direct_gameplay) {
-		if (auto main_menu = scoped_main_menu_bar()) {
-			if (auto menu = scoped_menu("File")) {
-				if (ImGui::MenuItem("New", "CTRL+N")) {
-					new_tab();
-				}
+		{
+			/* We don't want ugly borders in our menu bar */
+			auto window_border_size = scoped_style_var(ImGuiStyleVar_WindowBorderSize, 0.0f);
+			auto frame_border_size = scoped_style_var(ImGuiStyleVar_FrameBorderSize, 0.0f);
 
-				if (ImGui::MenuItem("Open", "CTRL+O")) {
-					open(owner);
-				}
+			if (auto main_menu = scoped_main_menu_bar()) {
+				if (auto menu = scoped_menu("File")) {
+					if (ImGui::MenuItem("New", "CTRL+N")) {
+						new_tab();
+					}
 
-				if (auto menu = scoped_menu("Recent files", !recent.empty())) {
-					/*	
-						IMPORTANT! recent.paths can be altered in the loop by loading a intercosm,
-						thus we need to copy its contents.
-					*/
+					if (ImGui::MenuItem("Open", "CTRL+O")) {
+						open(owner);
+					}
 
-					const auto recent_paths = recent.paths;
+					if (auto menu = scoped_menu("Recent files", !recent.empty())) {
+						/*	
+							IMPORTANT! recent.paths can be altered in the loop by loading a intercosm,
+							thus we need to copy its contents.
+						*/
 
-					for (const auto& target_path : recent_paths) {
-						const auto str = augs::to_display_path(target_path).string();
+						const auto recent_paths = recent.paths;
 
-						if (ImGui::MenuItem(str.c_str())) {
-							open_intercosm_in_new_tab(in_path(target_path));
+						for (const auto& target_path : recent_paths) {
+							const auto str = augs::to_display_path(target_path).string();
+
+							if (ImGui::MenuItem(str.c_str())) {
+								open_intercosm_in_new_tab(in_path(target_path));
+							}
+						}
+
+						ImGui::Separator();
+
+						if (ImGui::MenuItem("Clear Recent Items")) {
+							recent.clear(lua);
 						}
 					}
 
 					ImGui::Separator();
 
-					if (ImGui::MenuItem("Clear Recent Items")) {
-						recent.clear(lua);
-					}
-				}
-
-				ImGui::Separator();
-
-				if (item_if_tabs("Save", "CTRL+S")) {
-					save(lua, owner);
-				}
-
-				if (item_if_tabs("Save as", "F12")) {
-					save_as(owner);
-				}
-
-				ImGui::Separator();
-
-				const auto close_str = [&]() -> std::string {
-					if (has_current_tab()) {
-						return std::string("Close ") + tab().get_display_path();
+					if (item_if_tabs("Save", "CTRL+S")) {
+						save(lua, owner);
 					}
 
-					return "Close";
-				}();
+					if (item_if_tabs("Save as", "F12")) {
+						save_as(owner);
+					}
 
-				if (item_if_tabs(close_str.c_str(), "CTRL+W")) {
-					close_tab();
-				}
+					ImGui::Separator();
 
-				if (item_if_tabs("Close all")) {
-					while (has_current_tab()) {
+					const auto close_str = [&]() -> std::string {
+						if (has_current_tab()) {
+							return std::string("Close ") + tab().get_display_path();
+						}
+
+						return "Close";
+					}();
+
+					if (item_if_tabs(close_str.c_str(), "CTRL+W")) {
 						close_tab();
 					}
-				}
-			}
 
-			if (auto menu = scoped_menu("Edit")) {
-				if (item_if_tabs("Undo", "CTRL+Z")) {}
-				if (item_if_tabs("Redo", "CTRL+SHIFT+Z")) {}
-				ImGui::Separator();
-				if (item_if_tabs("Cut", "CTRL+X")) {}
-				if (item_if_tabs("Copy", "CTRL+C")) {}
-				if (item_if_tabs("Paste", "CTRL+V")) {}
-				ImGui::Separator();
+					if (item_if_tabs("Close all")) {
+						while (has_current_tab()) {
+							close_tab();
+						}
+					}
+				}
+
+				if (auto menu = scoped_menu("Edit")) {
+					if (item_if_tabs("Undo", "CTRL+Z")) {}
+					if (item_if_tabs("Redo", "CTRL+SHIFT+Z")) {}
+					ImGui::Separator();
+					if (item_if_tabs("Cut", "CTRL+X")) {}
+					if (item_if_tabs("Copy", "CTRL+C")) {}
+					if (item_if_tabs("Paste", "CTRL+V")) {}
+					ImGui::Separator();
 
 #if BUILD_TEST_SCENES
-				if (item_if_tabs("Fill with minimal scene", "SHIFT+F5")) {
-					fill_with_minimal_scene(lua);
-				}
+					if (item_if_tabs("Fill with minimal scene", "SHIFT+F5")) {
+						fill_with_minimal_scene(lua);
+					}
 
-				if (item_if_tabs("Fill with test scene")) {
-					fill_with_test_scene(lua);
-				}
+					if (item_if_tabs("Fill with test scene")) {
+						fill_with_test_scene(lua);
+					}
 #else
-				if (item_if_tabs_and(false, "Fill with minimal scene", "SHIFT+F5")) {}
-				if (item_if_tabs_and(false, "Fill with test scene")) {}
+					if (item_if_tabs_and(false, "Fill with minimal scene", "SHIFT+F5")) {}
+					if (item_if_tabs_and(false, "Fill with test scene")) {}
 #endif
-			}
-			if (auto menu = scoped_menu("View")) {
-				if (item_if_tabs("Summary")) {
-					show_summary = true;
 				}
-				if (item_if_tabs("Player")) {
-					show_player = true;
-				}
+				if (auto menu = scoped_menu("View")) {
+					if (item_if_tabs("Summary")) {
+						show_summary = true;
+					}
+					if (item_if_tabs("Player")) {
+						show_player = true;
+					}
 
-				ImGui::Separator();
-				ImGui::MenuItem("(State)", NULL, false, false);
+					ImGui::Separator();
+					ImGui::MenuItem("(State)", NULL, false, false);
 
-				if (item_if_tabs("Common")) {
-					show_common_state = true;
-				}
+					if (item_if_tabs("Common")) {
+						show_common_state = true;
+					}
 
-				if (item_if_tabs("Entities")) {
-					show_entities = true;
+					if (item_if_tabs("Entities")) {
+						show_entities = true;
+					}
 				}
 			}
 		}
@@ -415,12 +424,12 @@ void editor_setup::perform_custom_imgui(
 					out_style.colors[col::Col_TabLabelHovered] = GetColorU32(in_style.Colors[ImGuiCol_ButtonHovered]);
 					out_style.colors[col::Col_TabLabelActive] = GetColorU32(in_style.Colors[ImGuiCol_ButtonActive]);
 					out_style.colors[col::Col_TabLabelText] = GetColorU32(in_style.Colors[ImGuiCol_Text]);
-					out_style.colors[col::Col_TabLabelSelected] = GetColorU32(in_style.Colors[ImGuiCol_Button]);
-					out_style.colors[col::Col_TabLabelSelectedHovered] = GetColorU32(in_style.Colors[ImGuiCol_Button]);
-					out_style.colors[col::Col_TabLabelSelectedActive] = GetColorU32(in_style.Colors[ImGuiCol_Button]);
+					out_style.colors[col::Col_TabLabelSelected] = GetColorU32(in_style.Colors[ImGuiCol_ButtonActive]);
+					out_style.colors[col::Col_TabLabelSelectedHovered] = GetColorU32(in_style.Colors[ImGuiCol_ButtonActive]);
+					out_style.colors[col::Col_TabLabelSelectedActive] = GetColorU32(in_style.Colors[ImGuiCol_ButtonActive]);
 					out_style.colors[col::Col_TabLabelSelectedText] = GetColorU32(in_style.Colors[ImGuiCol_Text]);
-					out_style.colors[col::Col_TabLabelCloseButtonHovered] = GetColorU32(in_style.Colors[ImGuiCol_ButtonActive]);
-					out_style.colors[col::Col_TabLabelCloseButtonActive] = GetColorU32(rgba{ 210, 0, 0, 255 });
+					out_style.colors[col::Col_TabLabelCloseButtonHovered] = GetColorU32(in_style.Colors[ImGuiCol_CloseButtonHovered]);
+					out_style.colors[col::Col_TabLabelCloseButtonActive] = GetColorU32(in_style.Colors[ImGuiCol_CloseButtonActive]);
 				}
 
 				// Tab algorithm i/o
@@ -584,6 +593,10 @@ void editor_setup::perform_custom_imgui(
 				}
 
 			});
+		}
+
+		if (show_go_to_all) {
+
 		}
 	}
 
@@ -891,7 +904,7 @@ bool editor_setup::handle_top_level_window_input(
 				switch (k) {
 					case key::S: save(lua, window); return true;
 					case key::O: open(window); return true;
-					case key::P: go_to_all(); return true;
+					case key::SEMICOLON: go_to_all(); return true;
 					case key::N: new_tab(); return true;
 					case key::W: close_tab(); return true;
 					case key::TAB: next_tab(); return true;

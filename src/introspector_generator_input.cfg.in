@@ -173,50 +173,54 @@ struct ImVec4;
 			F f,
 			Instances&... _t_
 		) {
-#define imcol(x) f(#x, _t_.Colors[static_cast<std::size_t>(imguicol_helper::x)]...)
-			FIELD(Alpha);                      
-			FIELD(WindowPadding);              
-			FIELD(WindowMinSize);              
-			FIELD(WindowRounding);             
-			FIELD(WindowTitleAlign);           
-			FIELD(ChildWindowRounding);        
-			FIELD(FramePadding);               
-			FIELD(FrameRounding);              
-			FIELD(ItemSpacing);                
-			FIELD(ItemInnerSpacing);           
-			FIELD(TouchExtraPadding);         
-			FIELD(IndentSpacing);              
-			FIELD(ColumnsMinSpacing);          
-			FIELD(ScrollbarSize);              
-			FIELD(ScrollbarRounding);          
-			FIELD(GrabMinSize);                
-			FIELD(GrabRounding);               
-			FIELD(ButtonTextAlign);            
-			FIELD(DisplayWindowPadding);       
-			FIELD(DisplaySafeAreaPadding);     
-			FIELD(AntiAliasedLines);           
-			FIELD(AntiAliasedShapes);          
+			FIELD(Alpha);
+			FIELD(WindowPadding);
+			FIELD(WindowRounding);
+			FIELD(WindowBorderSize);
+			FIELD(WindowMinSize);
+			FIELD(WindowTitleAlign);
+			FIELD(ChildRounding);
+			FIELD(ChildBorderSize);
+			FIELD(PopupRounding);
+			FIELD(PopupBorderSize);
+			FIELD(FramePadding);
+			FIELD(FrameRounding);
+			FIELD(FrameBorderSize);
+			FIELD(ItemSpacing);
+			FIELD(ItemInnerSpacing);
+			FIELD(TouchExtraPadding);
+			FIELD(IndentSpacing);
+			FIELD(ColumnsMinSpacing);
+			FIELD(ScrollbarSize);
+			FIELD(ScrollbarRounding);
+			FIELD(GrabMinSize);
+			FIELD(GrabRounding);
+			FIELD(ButtonTextAlign);
+			FIELD(DisplayWindowPadding);
+			FIELD(DisplaySafeAreaPadding);
+			FIELD(AntiAliasedLines);
+			FIELD(AntiAliasedShapes);
 			FIELD(CurveTessellationTol);
 			
+#define imcol(x) f(#x, _t_.Colors[static_cast<std::size_t>(imguicol_helper::x)]...)
 			imcol(ImGuiCol_Text);
 			imcol(ImGuiCol_TextDisabled);
-			imcol(ImGuiCol_WindowBg);              
-			imcol(ImGuiCol_ChildWindowBg);         
-			imcol(ImGuiCol_PopupBg);               
+			imcol(ImGuiCol_WindowBg);              // Background of normal windows
+			imcol(ImGuiCol_ChildBg);               // Background of child windows
+			imcol(ImGuiCol_PopupBg);               // Background of popups, menus, tooltips windows
 			imcol(ImGuiCol_Border);
 			imcol(ImGuiCol_BorderShadow);
-			imcol(ImGuiCol_FrameBg);               
+			imcol(ImGuiCol_FrameBg);               // Background of checkbox, radio button, plot, slider, text input
 			imcol(ImGuiCol_FrameBgHovered);
 			imcol(ImGuiCol_FrameBgActive);
 			imcol(ImGuiCol_TitleBg);
-			imcol(ImGuiCol_TitleBgCollapsed);
 			imcol(ImGuiCol_TitleBgActive);
+			imcol(ImGuiCol_TitleBgCollapsed);
 			imcol(ImGuiCol_MenuBarBg);
 			imcol(ImGuiCol_ScrollbarBg);
 			imcol(ImGuiCol_ScrollbarGrab);
 			imcol(ImGuiCol_ScrollbarGrabHovered);
 			imcol(ImGuiCol_ScrollbarGrabActive);
-			imcol(ImGuiCol_ComboBg);
 			imcol(ImGuiCol_CheckMark);
 			imcol(ImGuiCol_SliderGrab);
 			imcol(ImGuiCol_SliderGrabActive);
@@ -226,9 +230,9 @@ struct ImVec4;
 			imcol(ImGuiCol_Header);
 			imcol(ImGuiCol_HeaderHovered);
 			imcol(ImGuiCol_HeaderActive);
-			imcol(ImGuiCol_Column);
-			imcol(ImGuiCol_ColumnHovered);
-			imcol(ImGuiCol_ColumnActive);
+			imcol(ImGuiCol_Separator);
+			imcol(ImGuiCol_SeparatorHovered);
+			imcol(ImGuiCol_SeparatorActive);
 			imcol(ImGuiCol_ResizeGrip);
 			imcol(ImGuiCol_ResizeGripHovered);
 			imcol(ImGuiCol_ResizeGripActive);
@@ -240,7 +244,8 @@ struct ImVec4;
 			imcol(ImGuiCol_PlotHistogram);
 			imcol(ImGuiCol_PlotHistogramHovered);
 			imcol(ImGuiCol_TextSelectedBg);
-			imcol(ImGuiCol_ModalWindowDarkening);
+			imcol(ImGuiCol_ModalWindowDarkening);  // darken entire screen when a modal window is active
+			imcol(ImGuiCol_DragDropTarget);
 #undef imcol
 		}
 

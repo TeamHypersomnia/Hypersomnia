@@ -125,11 +125,6 @@ int work(const int argc, const char* const * const argv) try {
 	static const auto canon_config_path = augs::path_type("config.lua");
 	static const auto local_config_path = augs::path_type(LOCAL_FILES_DIR "config.local.lua");
 
-	augs::imgui::init(
-		LOCAL_FILES_DIR "imgui.ini",
-		LOG_FILES_DIR "imgui_log.txt"
-	);
-
 	static auto lua = augs::create_lua_state();
 
 	static config_lua_table config { 
@@ -139,6 +134,12 @@ int work(const int argc, const char* const * const argv) try {
 			local_config_path
 		)
 	};
+
+	augs::imgui::init(
+		LOCAL_FILES_DIR "imgui.ini",
+		LOG_FILES_DIR "imgui_log.txt",
+		config.gui_style
+	);
 
 	static auto last_saved_config = config;
 

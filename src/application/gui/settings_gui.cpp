@@ -71,7 +71,7 @@ void settings_gui_state::perform(
 	auto settings = scoped_window("Settings", &show);
 	
 	{
-		auto child = scoped_child("settings view", ImVec2(0, -(ImGui::GetItemsLineHeightWithSpacing() + 4)));
+		auto child = scoped_child("settings view", ImVec2(0, -(ImGui::GetFrameHeightWithSpacing() + 4)));
 		auto width = scoped_item_width(ImGui::GetWindowWidth() * 0.35f);
 
 		int field_id = 0;
@@ -259,71 +259,21 @@ void settings_gui_state::perform(
 				break;
 			}
 			case settings_pane::GUI_STYLES: {
+				text(
+					"Note: this is the original ImGui style tweaker.\n"
+					"It is used because imgui is being continuously improved,\n"
+					"so keeping it up to date by ourselves would be pretty hard.\n\n"
+					"To save your changes to the local configuration file,\n"
+					"You need to push Save Ref and only then Save settings at the bottom."
+				);
+				
+				ImGui::Separator();
+
 				ImGuiStyle& style = config.gui_style;
 				const ImGuiStyle& last_saved_style = last_saved_config.gui_style;
 
-				if (auto node = scoped_tree_node("Rendering")) {
-					revertable_checkbox("Anti-aliased lines", style.AntiAliasedLines);
-					revertable_checkbox("Anti-aliased shapes", style.AntiAliasedShapes);
-
-					auto width = scoped_item_width(100);
-
-					ImGui::DragFloat("Curve Tessellation Tolerance", &style.CurveTessellationTol, 0.02f, 0.10f, FLT_MAX, NULL, 2.0f);
-					if (style.CurveTessellationTol < 0.0f) style.CurveTessellationTol = 0.10f;
-					revert(style.CurveTessellationTol);
-
-					revertable_slider("Global Alpha", style.Alpha, 0.20f, 1.0f, "%.2f"); // Not exposing zero here so user doesn't "lose" the UI (zero alpha clips all widgets). But application	code could have a toggle to switch between zero and non-zero.
-				}
-
-				if (auto node = scoped_tree_node("Settings")) {
-					revertable_slider("WindowPadding", style.WindowPadding, 0.0f, 20.0f, "%.0f"); 
-					revertable_slider("WindowRounding", style.WindowRounding, 0.0f, 16.0f, "%.0f"); 
-					revertable_slider("ChildWindowRounding", style.ChildWindowRounding, 0.0f, 16.0f, "%.0f");
-					revertable_slider("FramePadding", style.FramePadding, 0.0f, 20.0f, "%.0f");
-					revertable_slider("FrameRounding", style.FrameRounding, 0.0f, 16.0f, "%.0f"); 
-					revertable_slider("ItemSpacing", style.ItemSpacing, 0.0f, 20.0f, "%.0f"); 
-					revertable_slider("ItemInnerSpacing", style.ItemInnerSpacing, 0.0f, 20.0f, "%.0f"); 
-					revertable_slider("TouchExtraPadding", style.TouchExtraPadding, 0.0f, 10.0f, "%.0f");
-					revertable_slider("IndentSpacing", style.IndentSpacing, 0.0f, 30.0f, "%.0f");
-					revertable_slider("ScrollbarSize", style.ScrollbarSize, 1.0f, 20.0f, "%.0f");
-					revertable_slider("ScrollbarRounding", style.ScrollbarRounding, 0.0f, 16.0f, "%.0f"); 
-					revertable_slider("GrabMinSize", style.GrabMinSize, 1.0f, 20.0f, "%.0f"); 
-					revertable_slider("GrabRounding", style.GrabRounding, 0.0f, 16.0f, "%.0f"); 
-					text("Alignment");
-					revertable_slider("WindowTitleAlign", style.WindowTitleAlign, 0.0f, 1.0f, "%.2f");
-					revertable_slider("ButtonTextAlign", style.ButtonTextAlign, 0.0f, 1.0f, "%.2f"); ImGui::SameLine(); ShowHelpMarker("Alignment applies when a button is larger than its text content.");
-				}
-
-				if (auto node = scoped_tree_node("Colors")) {
-					text("Tip: Left-click on colored square to open color picker,\nRight-click to open edit options menu.");
-
-					static ImGuiTextFilter filter;
-					filter.Draw("Filter colors", 200);
-
-					static ImGuiColorEditFlags alpha_flags = 0;
-					ImGui::RadioButton("Opaque", &alpha_flags, 0); ImGui::SameLine();
-					ImGui::RadioButton("Alpha", &alpha_flags, ImGuiColorEditFlags_AlphaPreview); ImGui::SameLine();
-					ImGui::RadioButton("Both", &alpha_flags, ImGuiColorEditFlags_AlphaPreviewHalf);
-
-					auto child = scoped_child("#colors", ImVec2(0, 300), true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
-					auto width = scoped_item_width(-160);
-
-					for (int i = 0; i < ImGuiCol_COUNT; i++) {
-						const char* name = ImGui::GetStyleColorName(i);
-						if (!filter.PassFilter(name))
-							continue;
-
-						auto id = scoped_id(i);
-
-						ImGui::ColorEdit4(name, (float*)&style.Colors[i], ImGuiColorEditFlags_AlphaBar | alpha_flags);
-
-						if (std::memcmp(&style.Colors[i], &last_saved_style.Colors[i], sizeof(ImVec4)) != 0) {
-							ImGui::SameLine(); if (ImGui::Button("Revert")) style.Colors[i] = last_saved_style.Colors[i];
-						}
-					}
-				}
-
-				ImGui::GetStyle() = style;
+				// TODO: debug behaviour of this
+				ImGui::ShowStyleEditor(&config.gui_style);
 
 				break;
 			}

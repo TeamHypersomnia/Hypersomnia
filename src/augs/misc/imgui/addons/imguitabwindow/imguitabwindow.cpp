@@ -1,7 +1,5 @@
 //- Common Code For All Addons needed just to ease inclusion as separate files in user code ----------------------
 #include <imgui.h>
-#undef IMGUI_DEFINE_PLACEMENT_NEW
-#define IMGUI_DEFINE_PLACEMENT_NEW
 #undef IMGUI_DEFINE_MATH_OPERATORS
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui_internal.h>
@@ -241,7 +239,7 @@ void ImDrawListAddRectWithVerticalGradient(ImDrawList *dl, const ImVec2 &a, cons
 
 namespace RevertUpstreamBeginChildCommit   {
 // That commit [2016/11/06 (1.50)] broke everything!
-static bool OldBeginChild(const char* str_id, const ImVec2& size_arg = ImVec2(0,0), bool border = false, ImGuiWindowFlags extra_flags = 0)    {
+static bool OldBeginChild(const char* str_id, const ImVec2& size_arg = ImVec2(0,0), ImGuiWindowFlags extra_flags = 0)    {
     ImGuiWindow* parent_window = ImGui::GetCurrentWindow();
     ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoSavedSettings|ImGuiWindowFlags_ChildWindow;
 
@@ -258,19 +256,18 @@ static bool OldBeginChild(const char* str_id, const ImVec2& size_arg = ImVec2(0,
         //if (size.y == 0.0f) flags |= ImGuiWindowFlags_ChildWindowAutoFitY;
         size.y = ImMax(content_avail.y, 4.0f) - fabsf(size.y);
     }
-    if (border)
-        flags |= ImGuiWindowFlags_ShowBorders;
     flags |= extra_flags;
 
     char title[256];
     ImFormatString(title, IM_ARRAYSIZE(title), "%s.%s", parent_window->Name, str_id);
 
-    bool ret = ImGui::Begin(title, NULL, size, -1.0f, flags);
+    //bool ret = ImGui::Begin(title, NULL, size, -1.0f, flags); // This triggers an asset now, but this is OK:
+    ImGui::SetNextWindowSize(size);
+    bool ret = ImGui::Begin(title, NULL, flags);
 
     ImGuiWindow* child_window = ImGui::GetCurrentWindow();
     child_window->AutoFitChildAxises = auto_fit_axises;
-    if (!(parent_window->Flags & ImGuiWindowFlags_ShowBorders))
-        child_window->Flags &= ~ImGuiWindowFlags_ShowBorders;
+    //if (!(parent_window->Flags & ImGuiWindowFlags_ShowBorders)) child_window->Flags &= ~ImGuiWindowFlags_ShowBorders;
 
     return ret;
 }
@@ -340,7 +337,7 @@ TabLabelStyle::TabLabelStyle()    {
     tabWindowLabelBackgroundColor        = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
     tabWindowLabelShowAreaSeparator      = false;
     tabWindowSplitterColor               = ImVec4(1,1,1,1);
-    tabWindowSplitterSize                = 8.f;
+    tabWindowSplitterSize                = 6.f;
 }
 void ChangeTabLabelStyleColors(TabLabelStyle& style,float satThresholdForInvertingLuminance,float shiftHue)  {
     if (satThresholdForInvertingLuminance>=1.f && shiftHue==0.f) return;
@@ -662,7 +659,7 @@ const TabLabelStyle& TabLabelStyle::GetMergedWithWindowAlpha()    {
     static int frameCnt=-1;    
     if (frameCnt!=ImGui::GetFrameCount())   {
         frameCnt=ImGui::GetFrameCount();
-    const float alpha = GImGui->Style.Alpha * GImGui->Style.Colors[ImGuiCol_WindowBg].w;
+    const float alpha = GImGui->Style.Alpha;
         S = TabLabelStyle::style;
     for (int i=0;i<Col_TabLabel_Count;i++) S.colors[i] = ColorMergeWithAlpha(style.colors[i],alpha);
 	S.tabWindowLabelBackgroundColor.w*=alpha;
@@ -1346,6 +1343,7 @@ struct MyTabWindowHelperStruct {
 
 
     ImVec2 itemSpacing;
+    float childBorderSize;
 
     ImVec4 splitterColor;
     ImVec4 splitterColorHovered;
@@ -1366,6 +1364,7 @@ struct MyTabWindowHelperStruct {
 
         ImGuiStyle& style = ImGui::GetStyle();
         itemSpacing =   style.ItemSpacing;
+        childBorderSize = style.ChildBorderSize;
 
         const TabLabelStyle& ts = TabLabelStyle::Get();
         splitterColor           = ts.tabWindowSplitterColor;  splitterColor.w *= 0.4f;
@@ -1378,7 +1377,7 @@ struct MyTabWindowHelperStruct {
 
         isWindowHovered = ImGui::IsRootWindowOrAnyChildFocused();
 
-	flags = TabWindow::ExtraWindowFlags | ((ImGui::GetCurrentWindow()->Flags&ImGuiWindowFlags_ShowBorders) ? ImGuiWindowFlags_ShowBorders : 0);
+        flags = TabWindow::ExtraWindowFlags;// | ((ImGui::GetCurrentWindow()->Flags&ImGuiWindowFlags_ShowBorders) ? ImGuiWindowFlags_ShowBorders : 0);
     }
     ~MyTabWindowHelperStruct() {
 	restoreStyleVars();
@@ -1387,8 +1386,16 @@ struct MyTabWindowHelperStruct {
 	    ImGui::OpenPopup(ImGui::TabWindow::GetTabLabelAskForDeletionModalWindowName());
     }*/
     }
-    inline void storeStyleVars() {ImGui::GetStyle().ItemSpacing = ImVec2(1,1);}
-    inline void restoreStyleVars() {ImGui::GetStyle().ItemSpacing = itemSpacing;}
+    inline void storeStyleVars() {
+        ImGuiStyle& style = ImGui::GetStyle();
+        style.ItemSpacing = ImVec2(1,1);
+        style.ChildBorderSize = 0.f;
+    }
+    inline void restoreStyleVars() {
+        ImGuiStyle& style = ImGui::GetStyle();
+        style.ItemSpacing = itemSpacing;
+        style.ChildBorderSize = childBorderSize;
+    }
 
     inline static void ResetTabsToClose() {
 	TabsToClose.clear();TabsToCloseParents.clear();
@@ -1444,7 +1451,7 @@ void TabWindowNode::render(const ImVec2 &windowSize, MyTabWindowHelperStruct *pt
         IM_ASSERT(tabs.size()==0);
         const float minSplitSize = 10;  // If size is smaller, the child won't be displayed
         style.Colors[ImGuiCol_ChildWindowBg] = colorTransparent;
-        if (ImGui::RevertUpstreamBeginChildCommit::OldBeginChild(name,windowSize,false,ImGuiWindowFlags_NoScrollbar))   {
+        if (ImGui::RevertUpstreamBeginChildCommit::OldBeginChild(name,windowSize,ImGuiWindowFlags_NoScrollbar))   {
             style.Colors[ImGuiCol_ChildWindowBg] = colorChildWindowBg;
             ImVec2 ws = windowSize;
             float splitterPercToPixels = 0.f,splitterDelta = 0.f;
@@ -1531,7 +1538,7 @@ void TabWindowNode::render(const ImVec2 &windowSize, MyTabWindowHelperStruct *pt
     //----------------------------------------------------------------
     {
         style.Colors[ImGuiCol_ChildWindowBg] = colorTransparent;
-        if (ImGui::RevertUpstreamBeginChildCommit::OldBeginChild(name,windowSize,false,ImGuiWindowFlags_NoScrollbar)) {
+        if (ImGui::RevertUpstreamBeginChildCommit::OldBeginChild(name,windowSize,ImGuiWindowFlags_NoScrollbar)) {
             if (tabStyle.tabWindowLabelBackgroundColor.w!=0)    {
                 ImGuiWindow* window = ImGui::GetCurrentWindow();
                 window->DrawList->AddRectFilled(window->Pos, window->Pos+ImVec2(windowSize.x,allTabsSize.y), GetColorU32(tabStyle.tabWindowLabelBackgroundColor), 0);
@@ -1675,8 +1682,9 @@ void TabWindowNode::render(const ImVec2 &windowSize, MyTabWindowHelperStruct *pt
             if (selection_changed) mhs.tabWindow->activeNode = this;
 
             if (tabStyle.tabWindowLabelShowAreaSeparator) {
-                ImGui::PushStyleColor(ImGuiCol_Border,ImGui::ColorConvertU32ToFloat4(tabStyle.colors[TabLabelStyle::Col_TabLabelText]));
-                ImGui::Separator();
+                const TabLabelStyle::Colors separatorColor = TabLabelStyle::Col_TabLabelText;//TabLabelStyle::Col_TabLabelSelectedBorder
+                ImGui::PushStyleColor(ImGuiCol_Separator,ImGui::ColorConvertU32ToFloat4(tabStyle.colors[separatorColor]));
+                ImGui::Separator(); // We'd need it higher than just one pixel...
                 ImGui::PopStyleColor();
             }
             ImGui::EndGroup();allTabsSize = ImGui::GetItemRectSize();
@@ -1699,11 +1707,11 @@ void TabWindowNode::render(const ImVec2 &windowSize, MyTabWindowHelperStruct *pt
             //----------------------------------------------------------------
             mhs.restoreStyleVars();     // needs matching
             const ImGuiWindowFlags childFlags = mhs.flags | (selectedTab ? selectedTab->wndFlags : 0);
-            if (ImGui::RevertUpstreamBeginChildCommit::OldBeginChild("user",ImVec2(0,0),false,(childFlags&(~ImGuiWindowFlags_ShowBorders))))    {
-                if (childFlags&ImGuiWindowFlags_ShowBorders) {
+            if (ImGui::RevertUpstreamBeginChildCommit::OldBeginChild("user",ImVec2(0,0),childFlags))    {
+                /*if (childFlags&ImGuiWindowFlags_ShowBorders) {
                     // This kind of handling the ImGuiWindowFlags_ShowBorders flag on its own is necessary to achieve what we want
                     GImGui->CurrentWindow->Flags|=childFlags;//Changed from ImGui::GetCurrentWindow()-> (faster)
-                }
+                }*/
                 if (/*selectedTab &&*/ TabWindow::WindowContentDrawerCb) {
                     TabWindow::WindowContentDrawerCb(selectedTab,*mhs.tabWindow,TabWindow::WindowContentDrawerUserPtr);
                 }
@@ -1897,8 +1905,6 @@ void TabWindow::render()
 
     MyTabWindowHelperStruct mhs(this);
     mainNode->render(windowSize,&mhs);
-
-
     static const ImGuiWindow* HoveredCorrectChildWindow = NULL;
 
     // Draw dragging stuff and Apply drag logic -------------------------------------------
@@ -2523,7 +2529,7 @@ bool TabLabels(int numTabs, const char** tabLabels, int& selectedIndex, const ch
     ImVec2 startGroupCursorPos = ImGui::GetCursorPos();
     ImGui::BeginGroup();
     ImVec2 tabButtonSz(0,0);bool mustCloseTab = false;bool canUseSizeOptimization = false;
-    const bool isWindowHovered = ImGui::IsWindowHovered();
+    const bool isWindowHovered = ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem);
     bool selection_changed = false;bool noButtonDrawn = true;
     for (int j = 0,i; j < numTabs; j++)
     {
@@ -2632,7 +2638,7 @@ bool TabLabels(int numTabs, const char** tabLabels, int& selectedIndex, const ch
                     drawList->AddImage(TabWindow::DockPanelIconTextureID,start,end,ImVec2(0.5f,0.75f),ImVec2(0.75f,1.f),ImGui::ColorConvertFloat4ToU32(color));
                 }
             }
-       // }
+        //}
         //else {
         //    draggingTabIndex = -1;draggingTabTargetIndex=-1;
         //    draggingLocked = true;// consume one mouse release
@@ -2955,7 +2961,7 @@ bool TabLabelsVertical(bool textIsRotatedCCW, int numTabs, const char** tabLabel
     ImGui::BeginGroup();
     //ImVec2 tabButtonSz(0,0);
     bool mustCloseTab = false;bool canUseSizeOptimization = false;
-    const bool isWindowHovered = ImGui::IsWindowHovered();
+    const bool isWindowHovered = ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem);
     bool selection_changed = false;bool noButtonDrawn = true;
     for (int j = 0,i; j < numTabs; j++)
     {
