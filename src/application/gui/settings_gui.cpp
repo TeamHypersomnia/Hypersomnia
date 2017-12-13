@@ -66,7 +66,6 @@ void settings_gui_state::perform(
 
 		ImGui::SetNextWindowPos(ImVec2(screen_size / 2 - initial_settings_size / 2), ImGuiSetCond_FirstUseEver);
 		ImGui::SetNextWindowSize(ImVec2(initial_settings_size), ImGuiSetCond_FirstUseEver);
-		ImGui::SetNextWindowSizeConstraints(ImVec2(initial_settings_size * 0.3), ImVec2(initial_settings_size * 2.0));
 	}
 
 	auto settings = scoped_window("Settings", &show);
