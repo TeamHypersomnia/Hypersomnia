@@ -599,7 +599,7 @@ void editor_setup::perform_custom_imgui(
 			{
 				const auto size = vec2 {
 					static_cast<float>(settings.go_to_dialog_width),
-					(settings.lines_in_go_to_dialogs + 2) * ImGui::GetTextLineHeightWithSpacing()
+					(matching_go_to_entities.size() + 2) * ImGui::GetTextLineHeightWithSpacing()
 				};
 
 				set_next_window_rect(
