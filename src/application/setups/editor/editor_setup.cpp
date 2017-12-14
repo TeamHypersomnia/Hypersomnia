@@ -3,7 +3,6 @@
 #include "augs/misc/imgui/imgui_utils.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/misc/imgui/addons/imguitabwindow/imguitabwindow.h"
-#include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
 #include "augs/templates/thread_templates.h"
 #include "augs/templates/chrono_templates.h"
@@ -19,12 +18,9 @@
 
 #include <imgui/imgui_internal.h>
 
-#include "augs/readwrite/byte_readwrite.h"
-#include "augs/readwrite/lua_readwrite.h"
+#include "augs/readwrite/byte_file.h"
+#include "augs/readwrite/lua_file.h"
 
-namespace ImGui {
-	bool BeginMenuBarSeparator(const float y); 
-	};
 void editor_setup::on_tab_changed() {
 	hovered_entity = {};
 	player_paused = true;
@@ -95,7 +91,7 @@ void editor_setup::open_last_tabs(sol::state& lua) {
 	ensure(works.empty());
 
 	try {
-		const auto opened_tabs = augs::load_from_bytes<editor_saved_tabs>(get_editor_tabs_path());
+		const auto opened_tabs = augs::load_from_lua_table<editor_saved_tabs>(lua, get_editor_tabs_path());
 		tabs = opened_tabs.tabs;
 
 		if (!tabs.empty()) {
@@ -163,7 +159,7 @@ void editor_setup::autosave(const autosave_input in) const {
 		}
 	}
 
-	augs::save_as_bytes(saved_tabs, get_editor_tabs_path());
+	augs::save_as_lua_table(lua, saved_tabs, get_editor_tabs_path());
 }
 
 void editor_setup::control(
@@ -597,8 +593,61 @@ void editor_setup::perform_custom_imgui(
 
 		if (show_go_to_all) {
 			auto go_to_all = scoped_window("Go to all", &show_go_to_all);
+		}
 
+		if (show_go_to_entity) {
+			center_next_window(0.30f);
 
+			auto go_to_entity = scoped_window(
+				"Go to entity", 
+				&show_go_to_entity,
+			   	ImGuiWindowFlags_NoTitleBar 
+				| ImGuiWindowFlags_NoResize 
+				| ImGuiWindowFlags_NoMove 
+				| ImGuiWindowFlags_NoSavedSettings
+			);
+
+			static std::array<char, 512> buf {};
+
+			static auto arrow_callback = [](ImGuiTextEditCallbackData* data){
+				LOG_NVPS(data->EventFlag);
+				LOG_NVPS(data->EventKey);
+				switch (data->EventFlag) {
+					case ImGuiInputTextFlags_CallbackCompletion: {
+
+						if (data->EventKey == ImGuiKey_UpArrow) {
+							LOG("UP arrow");
+						}
+						else if (data->EventKey == ImGuiKey_DownArrow) {
+							LOG("Down arrow");
+						}
+					}
+
+					break;
+
+					default: break;
+				}
+
+				return 0;
+			};
+
+			text("Go to entity");
+			ImGui::SameLine();
+
+        	if (ImGui::InputText(
+					"", 
+					buf.data(), 
+					buf.size(), 
+					ImGuiInputTextFlags_CallbackCompletion | ImGuiInputTextFlags_EnterReturnsTrue, 
+					arrow_callback,
+					nullptr
+			)) {
+				const auto selected_name = to_wstring(std::string(buf.data()));
+
+				LOG(selected_name);
+
+				tab().selected_entities = { *work().world.get_entities_by_name(selected_name).begin() };
+			}
 		}
 	}
 
@@ -780,6 +829,10 @@ void editor_setup::go_to_all() {
 	show_go_to_all = true;
 }
 
+void editor_setup::go_to_entity() {
+	show_go_to_entity = true;
+}
+
 void editor_setup::open_containing_folder() {
 	if (const auto path_str = augs::path_type(tab().current_path).replace_filename("").string();
 		path_str.size() > 0
@@ -922,7 +975,8 @@ bool editor_setup::handle_top_level_window_input(
 
 			switch (k) {
 				case key::F12: save_as(window); return true;
-				case key::ENTER: confirm_modal_popup(); return true;
+				case key::SLASH: go_to_entity(); return true;
+				case key::ENTER: return confirm_modal_popup();
 				default: break;
 			}
 		}

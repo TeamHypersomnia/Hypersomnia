@@ -33,6 +33,17 @@ The editor keeps a history of changes, thanks to which an author can **undo** or
 
 ## Dialogs
 
+### Go to all
+
+Default shortcut: ``ctrl + ,``.
+- Goes to any entity
+- Goes to any field in the cosmos common state
+- Goes to any viewable
+
+### Go to entity
+
+Default shortcut: ``/``.
+
 ### Context help
 
 Serves as a tutorial for first-time users. It has unique content every time:

@@ -8,8 +8,7 @@
 
 #include "view/viewables/regeneration/buttons_with_corners.h"
 
-#include "augs/readwrite/byte_readwrite.h"
-
+#include "augs/readwrite/byte_file.h"
 
 void regenerate_button_with_corners(
 	const augs::path_type& output_path_template,

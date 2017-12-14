@@ -4,15 +4,13 @@
 #include "3rdparty/rectpack2D/src/pack.h"
 
 #include "augs/ensure.h"
-#include "augs/filesystem/file.h"
 
 #include "augs/readwrite/memory_stream.h"
 
 #include "augs/image/image.h"
 #include "augs/texture_atlas/texture_atlas.h"
 
-#include "augs/readwrite/byte_readwrite.h"
-
+#include "augs/readwrite/byte_file.h"
 
 regenerated_atlas::regenerated_atlas(
 	const atlas_regeneration_input& in,

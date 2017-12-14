@@ -6,6 +6,8 @@
 #include "augs/graphics/texture.h"
 #include "augs/window_framework/window.h"
 
+using namespace ImGui;
+
 namespace augs {
 	namespace imgui {
 		void init(
@@ -13,7 +15,7 @@ namespace augs {
 			const char* const log_filename,
 			const ImGuiStyle& initial_style
 		) {
-			auto& io = ImGui::GetIO();
+			auto& io = GetIO();
 			
 			using namespace augs::event::keys;
 
@@ -44,7 +46,7 @@ namespace augs {
 			io.IniFilename = ini_filename;
 			io.LogFilename = log_filename;
 			io.MouseDoubleClickMaxDist = 100.f;
-			ImGui::GetStyle() = initial_style;
+			GetStyle() = initial_style;
 		}
 
 		void setup_input(
@@ -55,7 +57,7 @@ namespace augs {
 			using namespace event;
 			using namespace event::keys;
 
-			auto& io = ImGui::GetIO();
+			auto& io = GetIO();
 
 			io.MouseDrawCursor = false;
 
@@ -106,7 +108,7 @@ namespace augs {
 			using namespace event;
 			using namespace event::keys;
 
-			auto& io = ImGui::GetIO();
+			auto& io = GetIO();
 
 			io.MouseDrawCursor = false;
 			io.MousePos = vec2(state.mouse.pos);
@@ -154,11 +156,11 @@ namespace augs {
 		}
 #endif
 		void render() {
-			ImGui::Render();
+			Render();
 		}
 
 		void neutralize_mouse() {
-			auto& io = ImGui::GetIO();
+			auto& io = GetIO();
 
 			io.MousePos = { -1, -1 };
 
@@ -168,7 +170,7 @@ namespace augs {
 		}
 		
 		image create_atlas_image() {
-			auto& io = ImGui::GetIO();
+			auto& io = GetIO();
 
 			unsigned char* pixels = nullptr;
 			int width = 0;
@@ -185,7 +187,15 @@ namespace augs {
 		}
 
 		bool is_hovered_with_hand_cursor() {
-			return ImGui::IsAnyItemHovered() && ImGui::GetCurrentContext()->HoveredIdHandCursor;
+			return IsAnyItemHovered() && GetCurrentContext()->HoveredIdHandCursor;
+		}
+
+		void center_next_window(const float size_multiplier) {
+			const auto screen_size = vec2(GetIO().DisplaySize);
+			const auto initial_settings_size = screen_size * size_multiplier;
+
+			SetNextWindowPos(ImVec2(screen_size / 2 - initial_settings_size / 2), ImGuiSetCond_FirstUseEver);
+			SetNextWindowSize(ImVec2(initial_settings_size), ImGuiSetCond_FirstUseEver);
 		}
 	}
 }

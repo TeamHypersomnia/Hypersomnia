@@ -5,8 +5,7 @@
 
 #include "test_scenes/test_scenes_content.h"
 
-#include "augs/readwrite/lua_readwrite.h"
-
+#include "augs/readwrite/lua_file.h"
 
 void load_test_scene_images(
 	sol::state& lua,

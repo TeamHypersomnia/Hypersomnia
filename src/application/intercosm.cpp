@@ -8,8 +8,8 @@
 #include "test_scenes/scenes/testbed.h"
 #include "test_scenes/scenes/minimal_scene.h"
 
-#include "augs/readwrite/lua_readwrite.h"
-#include "augs/readwrite/byte_readwrite.h"
+#include "augs/readwrite/lua_file.h"
+#include "augs/readwrite/byte_file.h"
 
 #if BUILD_TEST_SCENES
 void intercosm::make_test_scene(sol::state& lua, const bool minimal) {
@@ -48,7 +48,7 @@ void intercosm::save(const intercosm_path_op op) const {
 		target_extension = augs::path_type(op.path).replace_extension("").extension();
 	}
 
-	if (target_extension == ".wp") {
+	if (target_extension == ".int") {
 		augs::save_as_bytes(*this, op.path);
 	}
 	else if (target_extension == ".lua") {
@@ -63,10 +63,11 @@ void intercosm::open(const intercosm_path_op op) {
 		auto target_extension = op.path.extension();
 
 		if (target_extension == ".unsaved") {
+			/* Get the extension before ".unsaved" */
 			target_extension = augs::path_type(op.path).replace_extension("").extension();
 		}
 
-		if (target_extension == ".wp") {
+		if (target_extension == ".int") {
 			augs::load_from_bytes(*this, op.path);
 		}
 		else if (target_extension == ".lua") {

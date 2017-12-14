@@ -1,7 +1,7 @@
 #include "augs/templates/container_templates.h"
 #include "application/setups/editor/editor_recent_paths.h"
 #include "application/setups/editor/editor_paths.h"
-#include "augs/readwrite/lua_readwrite.h"
+#include "augs/readwrite/lua_file.h"
 
 editor_recent_paths::editor_recent_paths(sol::state& lua) {
 	try {

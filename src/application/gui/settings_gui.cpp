@@ -60,13 +60,7 @@ void settings_gui_state::perform(
 	
 	using namespace augs::imgui;
 
-	{
-		const auto screen_size = vec2(ImGui::GetIO().DisplaySize);
-		const auto initial_settings_size = screen_size / 1.5;
-
-		ImGui::SetNextWindowPos(ImVec2(screen_size / 2 - initial_settings_size / 2), ImGuiSetCond_FirstUseEver);
-		ImGui::SetNextWindowSize(ImVec2(initial_settings_size), ImGuiSetCond_FirstUseEver);
-	}
+	center_next_window();
 
 	auto settings = scoped_window("Settings", &show);
 	

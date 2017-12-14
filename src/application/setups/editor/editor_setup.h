@@ -64,6 +64,7 @@ class editor_setup : private current_tab_access_cache<editor_setup> {
 	bool show_common_state = false;
 	bool show_entities = false;
 	bool show_go_to_all = false;
+	bool show_go_to_entity = false;
 
 	double player_speed = 1.0;
 	bool player_paused = true;
@@ -265,6 +266,7 @@ public:
 	void close_tab(const tab_index_type i);
 
 	void go_to_all();
+	void go_to_entity();
 	void open_containing_folder();
 
 	void unhover() {

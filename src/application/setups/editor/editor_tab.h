@@ -25,8 +25,9 @@ struct editor_tab {
 	augs::path_type current_path;
 	std::unordered_set<entity_id> selected_entities;
 	std::optional<camera_cone> panned_camera;
-	editor_history history;
 	// END GEN INTROSPECTOR
+
+	editor_history history;
 
 	void set_intercosm_path(sol::state&, const augs::path_type&, editor_recent_paths&);
 

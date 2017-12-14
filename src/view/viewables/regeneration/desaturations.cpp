@@ -9,7 +9,7 @@
 #include "augs/image/image.h"
 
 #include "view/viewables/regeneration/desaturations.h"
-#include "augs/readwrite/byte_readwrite.h"
+#include "augs/readwrite/byte_file.h"
 
 void regenerate_desaturation(
 	const augs::path_type& source_path,
