@@ -5,7 +5,7 @@
 #include "game/transcendental/entity_id.h"
 #include "augs/build_settings/platform_defines.h"
 #include "game/detail/inventory/wielding_result.h"
-#include "game/enums/callback_result.h"
+#include "augs/callback_result.h"
 
 template<bool is_const, class entity_handle_type>
 class basic_inventory_mixin {
