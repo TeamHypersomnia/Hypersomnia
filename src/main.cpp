@@ -1210,6 +1210,11 @@ int work(const int argc, const char* const * const argv) try {
 						if (control_ingame_menu()) {
 							continue;
 						}
+
+						/* Prevent e.g. panning in editor when the ingame menu is on */
+						if (ingame_menu.show) {
+							continue;
+						}
 					}
 				}
 
