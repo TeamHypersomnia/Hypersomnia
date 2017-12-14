@@ -617,6 +617,7 @@ void editor_setup::perform_custom_imgui(
 			   	ImGuiWindowFlags_NoTitleBar 
 				| ImGuiWindowFlags_NoResize 
 				| ImGuiWindowFlags_NoScrollbar 
+				| ImGuiWindowFlags_NoScrollWithMouse
 				| ImGuiWindowFlags_NoMove 
 				| ImGuiWindowFlags_NoSavedSettings
 			);
@@ -983,6 +984,7 @@ void editor_setup::go_to_entity() {
 	go_to_entity_query.clear();
 	matching_go_to_entities.clear();
 	last_go_to_entities_input.clear();
+	go_to_entities_selected_index = 0;
 	ImGui::SetWindowFocus("Go to entity");
 }
 
@@ -1128,7 +1130,6 @@ bool editor_setup::handle_top_level_window_input(
 
 			switch (k) {
 				case key::F12: save_as(window); return true;
-				case key::SLASH: go_to_entity(); return true;
 				case key::ENTER: return confirm_modal_popup();
 				default: break;
 			}
@@ -1234,7 +1235,13 @@ bool editor_setup::handle_unfetched_window_input(
 			}
 		}
 
-		if (e.was_pressed(key::LMOUSE)) {
+		if (e.was_pressed(key::SLASH)) {
+			if (has_current_tab()) {
+		  		go_to_entity();
+				return true;
+			}
+		}
+		else if (e.was_pressed(key::LMOUSE)) {
 			if (has_current_tab()) {
 				const bool has_ctrl{ common_input_state[key::LCTRL] };
 

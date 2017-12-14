@@ -954,6 +954,11 @@ int work(const int argc, const char* const * const argv) try {
 						using T = std::decay_t<decltype(setup)>;
 
 						if constexpr(T::handles_window_input) {
+							/* 
+								Let's a setup fetch an input before IMGUI does,
+								For example when IMGUI wants to capture keyboard input.	
+							*/
+
 							return setup.handle_top_level_window_input(
 								_simulated_state, e, _window, _lua
 							);
