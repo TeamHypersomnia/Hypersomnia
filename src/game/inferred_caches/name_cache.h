@@ -28,6 +28,8 @@ class name_cache {
 		entity_name_id
 	> name_to_id_lookup;
 
+	std::set<std::pair<entity_name_type, entity_guid>> lexicographic_names;
+
 	friend class cosmos;
 	friend class component_synchronizer<false, components::name>;
 
@@ -71,6 +73,10 @@ class name_cache {
 public:
 	std::unordered_set<entity_id> get_entities_by_name_id(const entity_name_id) const;
 	std::unordered_set<entity_id> get_entities_by_name(const entity_name_type& full_name) const;
+
+	const auto& get_lexicographic_names() const {
+		return lexicographic_names;
+	}
 
 	const entity_name_type& get_name(
 		const entity_name_metas& metas,

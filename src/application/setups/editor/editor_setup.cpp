@@ -599,7 +599,7 @@ void editor_setup::perform_custom_imgui(
 			{
 				const auto size = vec2 {
 					static_cast<float>(settings.go_to_dialog_width),
-					(settings.lines_in_go_to_dialogs + 2) * ImGui::GetTextLineHeight()
+					(settings.lines_in_go_to_dialogs + 2) * ImGui::GetTextLineHeightWithSpacing()
 				};
 
 				set_next_window_rect(
@@ -616,23 +616,85 @@ void editor_setup::perform_custom_imgui(
 				&show_go_to_entity,
 			   	ImGuiWindowFlags_NoTitleBar 
 				| ImGuiWindowFlags_NoResize 
+				| ImGuiWindowFlags_NoScrollbar 
 				| ImGuiWindowFlags_NoMove 
 				| ImGuiWindowFlags_NoSavedSettings
 			);
 
 			static auto arrow_callback = [](ImGuiTextEditCallbackData* data) {
+#if 0
+				LOG_NVPS(data->EventFlag);
+				LOG_NVPS(data->Buf);			
+#endif
+				auto& self = *reinterpret_cast<editor_setup*>(data->UserData);
+
 				switch (data->EventFlag) {
 					case ImGuiInputTextFlags_CallbackHistory: {
-						if (data->EventKey == ImGuiKey_UpArrow) {
+						const auto max_index = self.matching_go_to_entities.size();
 
+						if (max_index == 0) {
+							break;
+						}
+						
+						if (data->EventKey == ImGuiKey_UpArrow) {
+							if (self.go_to_entities_selected_index == 0) {
+								self.go_to_entities_selected_index = max_index - 1;
+							}
+							else {
+								--self.go_to_entities_selected_index; 	
+							}
 						}
 						else if (data->EventKey == ImGuiKey_DownArrow) {
-
+							++self.go_to_entities_selected_index; 	
+							self.go_to_entities_selected_index %= max_index;
 						}
 					}
 
 					break;
 
+					case ImGuiInputTextFlags_CallbackAlways: {
+						const auto current_input_text = std::string(data->Buf, data->BufTextLen);
+			
+						const bool should_rebuild = 
+							current_input_text != self.last_go_to_entities_input
+							|| (current_input_text.empty() && self.matching_go_to_entities.empty())
+						;
+			
+						if (!should_rebuild) {
+							break;
+						}
+			
+						self.last_go_to_entities_input = current_input_text;
+			
+						self.matching_go_to_entities.clear();
+						const auto query = to_wstring(current_input_text);
+			
+						unsigned hits = 0;
+							
+						for (const auto& lex : self.work().world.inferred.name.get_lexicographic_names()) {
+							const auto& name = lex.first;
+			
+							if (query.empty() || to_lowercase(name).find(query) != std::wstring::npos) {
+								++hits;
+			
+								self.matching_go_to_entities.push_back(lex.second);
+			
+								if (hits >= self.settings.lines_in_go_to_dialogs) {
+									break;
+								}
+							}
+						}	
+
+						if (self.matching_go_to_entities.size() > 0) {
+							self.go_to_entities_selected_index %= self.matching_go_to_entities.size();
+						}
+						else {
+							self.go_to_entities_selected_index = 0;
+						}
+					}
+
+					break;
+					
 					default: break;
 				}
 
@@ -650,19 +712,67 @@ void editor_setup::perform_custom_imgui(
 			}
 			
         	if (input_text<256>(
-					"##GoToEntityInput", 
-					go_to_entity_query,
-					ImGuiInputTextFlags_CallbackHistory | ImGuiInputTextFlags_EnterReturnsTrue, 
-					arrow_callback,
-					nullptr
+				"##GoToEntityInput", 
+				go_to_entity_query,
+				ImGuiInputTextFlags_CallbackHistory | ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackAlways, 
+				arrow_callback,
+				reinterpret_cast<void*>(this)
 			)) {
 				const auto selected_name = to_wstring(go_to_entity_query);
 
-				LOG(selected_name);
+				// LOG(selected_name);
+				if (const auto match = get_matched_entity();
+					match.alive()
+				) {	
+					tab().selected_entities = { match };
 
-				tab().selected_entities = { *work().world.get_entities_by_name(selected_name).begin() };
+					if (!tab().panned_camera.has_value()) {
+						tab().panned_camera = current_cone;
+					}
+
+					tab().panned_camera->transform.pos = match.get_logic_transform().pos;
+				}
 			}
-			
+	
+			{
+				const auto last_input = to_wstring(last_go_to_entities_input);
+
+				unsigned current_index = 0;
+
+				for (const auto& m : matching_go_to_entities) {
+					if (current_index == go_to_entities_selected_index) {
+						bool s = true;
+						ImGui::PushID(reinterpret_cast<void*>(current_index));
+						ImGui::Selectable("##gotoentity", &s);
+						ImGui::PopID();
+						ImGui::SameLine(0.f, 0.f);
+					}
+
+					const auto name = work().world[m].get_name();
+					const auto matched_name = to_lowercase(name);
+
+					const auto unmatched_left = matched_name.find(last_input);
+					const auto unmatched_right = unmatched_left + last_input.length();
+
+					text(name.substr(0, unmatched_left));
+					ImGui::SameLine(0.f, 0.f);
+
+					{
+						auto scope = scoped_style_color(ImGuiCol_Text, ImVec4(0.f, 1.f, 0.f, 1.f));
+						text(name.substr(unmatched_left, unmatched_right - unmatched_left));
+						ImGui::SameLine(0.f, 0.f);
+					}
+
+					text(name.substr(unmatched_right));
+
+					ImGui::SameLine(settings.go_to_dialog_width * 0.7);
+
+					text("(guid: %x)", m);
+
+					++current_index;
+				}
+			}
+
 			if (!was_acquired && ImGui::GetCurrentWindow()->GetID("##GoToEntityInput") != GImGui->ActiveId) {
 				show_go_to_entity = false;
 			}
@@ -850,6 +960,8 @@ void editor_setup::go_to_all() {
 void editor_setup::go_to_entity() {
 	show_go_to_entity = true;
 	go_to_entity_query.clear();
+	matching_go_to_entities.clear();
+	last_go_to_entities_input.clear();
 	ImGui::SetWindowFocus("Go to entity");
 }
 

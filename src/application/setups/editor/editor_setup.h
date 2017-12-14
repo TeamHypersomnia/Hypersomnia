@@ -67,6 +67,18 @@ class editor_setup : private current_tab_access_cache<editor_setup> {
 	bool show_go_to_entity = false;
 	std::string go_to_entity_query;
 
+	std::string last_go_to_entities_input;
+	unsigned go_to_entities_selected_index = 0;
+	std::vector<entity_guid> matching_go_to_entities;
+
+	auto get_matched_entity() const {
+		if (show_go_to_entity && matching_go_to_entities.size() > 0) {
+			return work().world[matching_go_to_entities[go_to_entities_selected_index]];
+		}
+		
+		return work().world[entity_id()];
+	}
+
 	double player_speed = 1.0;
 	bool player_paused = true;
 
@@ -297,6 +309,15 @@ public:
 			if (work().world[hovered_entity].alive()) {
 				callback(hovered_entity, settings.hovered_entity_color);
 			}
+			
+			if (const auto match = get_matched_entity(); 
+				match.alive()
+			) {
+				auto color = green;
+				color.a += static_cast<rgba_channel>(augs::zigzag(global_time_seconds, 1.0 / 2) * 25);
+				
+				callback(match.get_id(), settings.matched_entity_color);
+			}
 		}
 	}
 
@@ -310,12 +331,31 @@ public:
 	}
 
 	FORCE_INLINE std::optional<camera_cone> get_custom_camera() const {
+		auto normal_panning = [this]() -> std::optional<camera_cone> { 
+			if (has_current_tab() && is_paused()) {
+				if (tab().panned_camera) {
+					return tab().panned_camera;
+				}
+			}
+
+			return std::nullopt;
+		};
+
 		if (has_current_tab() && is_paused()) {
-			if (tab().panned_camera) {
-				return tab().panned_camera;
+			if (const auto match = get_matched_entity(); 
+				match.alive()
+			) {
+				auto panning = normal_panning();
+
+				if (!panning) {
+					panning = camera_cone();
+				}
+
+				panning->transform.pos = match.get_logic_transform().pos;
+				return panning;
 			}
 		}
 
-		return std::nullopt;
+		return normal_panning();
 	}
 };

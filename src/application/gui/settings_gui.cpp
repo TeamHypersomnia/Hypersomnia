@@ -252,6 +252,8 @@ void settings_gui_state::perform(
 					revertable_color_edit("Selected entity color", config.editor.selected_entity_color);
 					revertable_color_edit("Held entity color", config.editor.held_entity_color);
 
+					revertable_color_edit("Matched (go to dialogs) entity color", config.editor.matched_entity_color);
+
 					revertable_color_edit("Rectangular selection color", config.editor.rectangular_selection_color);
 					revertable_color_edit("Rectangular selection border color", config.editor.rectangular_selection_border_color);
 				}

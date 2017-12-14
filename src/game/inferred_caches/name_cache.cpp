@@ -35,9 +35,11 @@ void name_cache::destroy_cache_of(const entity_id id, const components::name& na
 
 void name_cache::infer_cache_for(const const_entity_handle h) {
 	infer_cache_for(h, h.get<components::name>().get_raw_component());
+	lexicographic_names.insert({ h.get_name(), h.get_guid() });
 }
 
 void name_cache::destroy_cache_of(const const_entity_handle h) {
+	lexicographic_names.erase({ h.get_name(), h.get_guid() });
 	destroy_cache_of(h, h.get<components::name>().get_raw_component());
 }
 
@@ -61,6 +63,7 @@ void name_cache::set_name(
 
 	entity_name_id id = 0u;
 
+	/* Incremental reinference for entity_name_metas */
 	if (maybe_existent_id != name_to_id_lookup.end()) {
 		id = (*maybe_existent_id).second;
 	}
@@ -70,6 +73,7 @@ void name_cache::set_name(
 		name_to_id_lookup[full_name] = id;
 	}
 
+	/* Actual reinference for the entity */
 	set_name_id(id, name_of_subject, subject);
 }
 
