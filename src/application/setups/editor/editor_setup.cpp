@@ -622,10 +622,9 @@ void editor_setup::perform_custom_imgui(
 			);
 
 			static auto arrow_callback = [](ImGuiTextEditCallbackData* data) {
-#if 0
 				LOG_NVPS(data->EventFlag);
 				LOG_NVPS(data->Buf);			
-#endif
+
 				auto& self = *reinterpret_cast<editor_setup*>(data->UserData);
 
 				switch (data->EventFlag) {
@@ -695,6 +694,24 @@ void editor_setup::perform_custom_imgui(
 
 					break;
 					
+					case ImGuiInputTextFlags_CallbackCompletion: {
+						if (const auto match = self.get_matched_entity();
+							match.alive()
+						) {
+							const auto name = to_string(match.get_name());
+
+							if (name.length() < data->BufSize) {
+								std::copy(name.c_str(), name.c_str() + name.length() + 1, data->Buf);
+
+								data->BufTextLen = name.length();
+								data->CursorPos = name.length();
+								data->BufDirty = true;
+							}
+						}
+
+						break;
+					}
+
 					default: break;
 				}
 
@@ -714,7 +731,11 @@ void editor_setup::perform_custom_imgui(
         	if (input_text<256>(
 				"##GoToEntityInput", 
 				go_to_entity_query,
-				ImGuiInputTextFlags_CallbackHistory | ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackAlways, 
+					ImGuiInputTextFlags_CallbackHistory 
+					| ImGuiInputTextFlags_EnterReturnsTrue 
+					| ImGuiInputTextFlags_CallbackAlways
+					| ImGuiInputTextFlags_CallbackCompletion
+				, 
 				arrow_callback,
 				reinterpret_cast<void*>(this)
 			)) {
