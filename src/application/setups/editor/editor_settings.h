@@ -19,6 +19,9 @@ struct editor_settings {
 	
 	unsigned remember_last_n_commands = 200;
 
+	unsigned  go_to_dialog_width = 400;
+	unsigned lines_in_go_to_dialogs = 15;
+	
 	rgba controlled_entity_color = { 255, 255, 0, 120 };
 	rgba held_entity_color = { 65, 131, 196, 160 };
 	rgba selected_entity_color = { 65, 131, 196, 120 };

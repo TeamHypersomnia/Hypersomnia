@@ -190,12 +190,22 @@ namespace augs {
 			return IsAnyItemHovered() && GetCurrentContext()->HoveredIdHandCursor;
 		}
 
-		void center_next_window(const float size_multiplier) {
+		void center_next_window(const float size_multiplier, const ImGuiCond cond) {
 			const auto screen_size = vec2(GetIO().DisplaySize);
 			const auto initial_settings_size = screen_size * size_multiplier;
 
-			SetNextWindowPos(ImVec2(screen_size / 2 - initial_settings_size / 2), ImGuiSetCond_FirstUseEver);
-			SetNextWindowSize(ImVec2(initial_settings_size), ImGuiSetCond_FirstUseEver);
+			set_next_window_rect(
+				{
+					{ screen_size / 2 - initial_settings_size / 2 },
+					initial_settings_size,
+				},
+				cond
+			);
+		}
+
+		void set_next_window_rect(const xywh r, const ImGuiCond cond) {
+			SetNextWindowPos(ImVec2(r.get_position()), cond);
+			SetNextWindowSize(ImVec2(r.get_size()), cond);
 		}
 	}
 }

@@ -52,7 +52,8 @@ void settings_gui_state::perform(
 	sol::state& lua,
 	const augs::path_type& config_path_for_saving,
 	config_lua_table& config,
-	config_lua_table& last_saved_config
+	config_lua_table& last_saved_config,
+	vec2i screen_size
 ) {
 	if (!show) {
 		return;
@@ -238,6 +239,11 @@ void settings_gui_state::perform(
 				
 				if (auto node = scoped_tree_node("Interface")) {
 					revertable_drag("Camera panning speed", config.editor.camera_panning_speed, 0.001f, -10.f, 10.f);
+
+					if (auto node = scoped_tree_node("\"Go to\" dialogs")) {
+						revertable_slider("Width", config.editor.go_to_dialog_width, 30, screen_size.x);
+						revertable_slider("Number of lines to show", config.editor.lines_in_go_to_dialogs, 1, 300);
+					}
 				}
 
 				if (auto node = scoped_tree_node("Appearance")) {

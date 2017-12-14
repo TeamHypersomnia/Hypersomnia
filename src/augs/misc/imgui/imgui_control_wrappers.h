@@ -141,33 +141,33 @@ namespace augs {
 			T& into, 
 			const B lower_bound,
 			const B upper_bound,
-			const char* display_format = "%.3f"
+			Args&&... args
 		) {
 			using namespace detail;
 
 			if constexpr(std::is_integral_v<T>) {
 				return direct_or_convert(into, [&](int& input) {
-					return ImGui::SliderInt(label.c_str(), &input, lower_bound, upper_bound, display_format);
+					return ImGui::SliderInt(label.c_str(), &input, lower_bound, upper_bound, std::forward<Args>(args)...);
 				});
 			}
 			else if constexpr(std::is_floating_point_v<T>) {
 				return direct_or_convert(into, [&](float& input) {
-					return ImGui::SliderFloat(label.c_str(), &input, lower_bound, upper_bound, display_format);
+					return ImGui::SliderFloat(label.c_str(), &input, lower_bound, upper_bound, std::forward<Args>(args)...);
 				});
 			}
 			else if constexpr(std::is_same_v<T, ImVec2>) {
 				return direct_or_convert(into, [&](ImVec2& input) {
-					return ImGui::SliderFloat2(label.c_str(), &input.x, lower_bound, upper_bound, display_format);
+					return ImGui::SliderFloat2(label.c_str(), &input.x, lower_bound, upper_bound, std::forward<Args>(args)...);
 				});
 			}
 			else if constexpr(std::is_same_v<T, vec2> || std::is_same_v<T, vec2d>) {
 				return direct_or_convert(into, [&](vec2& input) {
-					return ImGui::SliderFloat2(label.c_str(), &input.x, lower_bound, upper_bound, display_format);
+					return ImGui::SliderFloat2(label.c_str(), &input.x, lower_bound, upper_bound, std::forward<Args>(args)...);
 				});
 			}
 			else if constexpr(std::is_same_v<T, vec2i> || std::is_same_v<T, vec2u>) {
 				return direct_or_convert(into, [&](vec2i& input) {
-					return ImGui::SliderInt2(label.c_str(), &input.x, lower_bound, upper_bound, display_format);
+					return ImGui::SliderInt2(label.c_str(), &input.x, lower_bound, upper_bound, std::forward<Args>(args)...);
 				});
 			}
 		}

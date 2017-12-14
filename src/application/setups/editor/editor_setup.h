@@ -65,6 +65,7 @@ class editor_setup : private current_tab_access_cache<editor_setup> {
 	bool show_entities = false;
 	bool show_go_to_all = false;
 	bool show_go_to_entity = false;
+	std::string go_to_entity_query;
 
 	double player_speed = 1.0;
 	bool player_paused = true;

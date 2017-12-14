@@ -51,7 +51,8 @@ void perform_imgui_pass(
 			lua,
 			path_for_saving_config,
 			config,
-			last_saved_config
+			last_saved_config,
+			screen_size
 		);
 	}
 

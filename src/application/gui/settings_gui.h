@@ -28,7 +28,8 @@ public:
 		sol::state& lua,
 		const augs::path_type& path_for_saving,
 		config_lua_table& into,
-		config_lua_table& last_saved
+		config_lua_table& last_saved,
+		vec2i screen_size
 	);
 };
 

@@ -94,6 +94,7 @@ namespace augs {
 			return local;
 		}
 
-		void center_next_window(const float size_multiplier = 0.6f);
+		void center_next_window(float size_multiplier = 0.6f, ImGuiCond = ImGuiCond_FirstUseEver);
+		void set_next_window_rect(xywh, ImGuiCond = ImGuiCond_FirstUseEver);
 	}
 }

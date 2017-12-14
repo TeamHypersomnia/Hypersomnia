@@ -286,6 +286,9 @@ void editor_setup::perform_custom_imgui(
 	const auto screen_size = vec2i(ImGui::GetIO().DisplaySize);
 	const auto world_cursor_pos = current_cone.to_world_space(screen_size, mouse_pos);
 
+	const auto& g = *ImGui::GetCurrentContext();
+	const auto menu_bar_size = ImVec2(g.IO.DisplaySize.x, g.FontBaseSize + g.Style.FramePadding.y * 2.0f);
+
 	if (!in_direct_gameplay) {
 		{
 			/* We don't want ugly borders in our menu bar */
@@ -401,10 +404,7 @@ void editor_setup::perform_custom_imgui(
 		}
 
 		if (has_current_tab()) {
-			const auto& g = *ImGui::GetCurrentContext();
-			const auto bar_size = ImVec2(g.IO.DisplaySize.x, g.FontBaseSize + g.Style.FramePadding.y * 2.0f);
-
-			if (const auto tab_menu = scoped_tab_menu_bar(bar_size.y)) {
+			if (const auto tab_menu = scoped_tab_menu_bar(menu_bar_size.y)) {
 				{
 					using namespace ImGui;
 					
@@ -596,7 +596,20 @@ void editor_setup::perform_custom_imgui(
 		}
 
 		if (show_go_to_entity) {
-			center_next_window(0.30f);
+			{
+				const auto size = vec2 {
+					static_cast<float>(settings.go_to_dialog_width),
+					(settings.lines_in_go_to_dialogs + 2) * ImGui::GetTextLineHeight()
+				};
+
+				set_next_window_rect(
+					{
+						{ screen_size.x / 2 - size.x / 2, menu_bar_size.y * 2 + 1 },
+						size	
+					},
+					ImGuiCond_Always
+				);
+			}
 
 			auto go_to_entity = scoped_window(
 				"Go to entity", 
@@ -606,8 +619,6 @@ void editor_setup::perform_custom_imgui(
 				| ImGuiWindowFlags_NoMove 
 				| ImGuiWindowFlags_NoSavedSettings
 			);
-
-			static std::array<char, 512> buf {};
 
 			static auto arrow_callback = [](ImGuiTextEditCallbackData* data) {
 				switch (data->EventFlag) {
@@ -638,15 +649,14 @@ void editor_setup::perform_custom_imgui(
 				was_acquired = true;
 			}
 			
-        	if (ImGui::InputText(
+        	if (input_text<256>(
 					"##GoToEntityInput", 
-					buf.data(), 
-					buf.size(), 
+					go_to_entity_query,
 					ImGuiInputTextFlags_CallbackHistory | ImGuiInputTextFlags_EnterReturnsTrue, 
 					arrow_callback,
 					nullptr
 			)) {
-				const auto selected_name = to_wstring(std::string(buf.data()));
+				const auto selected_name = to_wstring(go_to_entity_query);
 
 				LOG(selected_name);
 
@@ -655,7 +665,6 @@ void editor_setup::perform_custom_imgui(
 			
 			if (!was_acquired && ImGui::GetCurrentWindow()->GetID("##GoToEntityInput") != GImGui->ActiveId) {
 				show_go_to_entity = false;
-				buf = {};
 			}
 		}
 	}
@@ -840,6 +849,7 @@ void editor_setup::go_to_all() {
 
 void editor_setup::go_to_entity() {
 	show_go_to_entity = true;
+	go_to_entity_query.clear();
 	ImGui::SetWindowFocus("Go to entity");
 }
 
