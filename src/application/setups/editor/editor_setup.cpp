@@ -609,17 +609,14 @@ void editor_setup::perform_custom_imgui(
 
 			static std::array<char, 512> buf {};
 
-			static auto arrow_callback = [](ImGuiTextEditCallbackData* data){
-				LOG_NVPS(data->EventFlag);
-				LOG_NVPS(data->EventKey);
+			static auto arrow_callback = [](ImGuiTextEditCallbackData* data) {
 				switch (data->EventFlag) {
-					case ImGuiInputTextFlags_CallbackCompletion: {
-
+					case ImGuiInputTextFlags_CallbackHistory: {
 						if (data->EventKey == ImGuiKey_UpArrow) {
-							LOG("UP arrow");
+
 						}
 						else if (data->EventKey == ImGuiKey_DownArrow) {
-							LOG("Down arrow");
+
 						}
 					}
 
@@ -633,12 +630,19 @@ void editor_setup::perform_custom_imgui(
 
 			text("Go to entity");
 			ImGui::SameLine();
-
+			
+			bool was_acquired = false;
+			
+			if (ImGui::GetCurrentWindow()->GetID("##GoToEntityInput") != GImGui->ActiveId) {
+				ImGui::SetKeyboardFocusHere();
+				was_acquired = true;
+			}
+			
         	if (ImGui::InputText(
-					"", 
+					"##GoToEntityInput", 
 					buf.data(), 
 					buf.size(), 
-					ImGuiInputTextFlags_CallbackCompletion | ImGuiInputTextFlags_EnterReturnsTrue, 
+					ImGuiInputTextFlags_CallbackHistory | ImGuiInputTextFlags_EnterReturnsTrue, 
 					arrow_callback,
 					nullptr
 			)) {
@@ -647,6 +651,11 @@ void editor_setup::perform_custom_imgui(
 				LOG(selected_name);
 
 				tab().selected_entities = { *work().world.get_entities_by_name(selected_name).begin() };
+			}
+			
+			if (!was_acquired && ImGui::GetCurrentWindow()->GetID("##GoToEntityInput") != GImGui->ActiveId) {
+				show_go_to_entity = false;
+				buf = {};
 			}
 		}
 	}
@@ -831,6 +840,7 @@ void editor_setup::go_to_all() {
 
 void editor_setup::go_to_entity() {
 	show_go_to_entity = true;
+	ImGui::SetWindowFocus("Go to entity");
 }
 
 void editor_setup::open_containing_folder() {
