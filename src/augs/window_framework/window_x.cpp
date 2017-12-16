@@ -40,8 +40,9 @@ namespace augs {
 					"If you want to keep using raw mouse input,\n"
 				    "you will need to add your user to the input group.\n"
 					"Refer to this tutorial:\n"
-					"https://puredata.info/docs/faq/how-can-i-set-permissions-so-hid-can-read-devices-in-gnu-linux"
-				, pDevice);
+					"https://puredata.info/docs/faq/how-can-i-set-permissions-so-hid-can-read-devices-in-gnu-linux",
+					pDevice
+				);
 			}
 
 			const int flags = fcntl(fd, F_GETFL, 0);
