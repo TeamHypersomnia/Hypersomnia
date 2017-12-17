@@ -19,7 +19,7 @@ with an aspiration to one day become an MMO with elements of RPG.
 
 Set in a hypothetical afterlife reality, it shall provide joy through altruistic behaviours, fierce fights, exploration, fulfillment of elaborate social roles or sowing panic as a traitor to benevolent ones.
 
-Decide upon your allegiance to one of the three warring factions whose apple of discord is a disparity between prevailing notions of moral excellence.
+Declare allegiance to one of the three factions whose apple of discord is a disparity between prevailing notions of moral excellence.
 **Metropolis. Atlantis. Resistance.**
 
 See the game's [wiki](http://wiki.hypersomnia.pl) to get familiar with the universe.  

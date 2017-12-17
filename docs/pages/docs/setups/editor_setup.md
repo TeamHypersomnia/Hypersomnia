@@ -16,6 +16,10 @@ Currently supported:
 - Import intercosms from ``.lua`` table files.
 - Export intercosms to ``.lua`` table files.
 
+## Tokens
+
+An entity token is of the form
+
 ## Modes
 
 
