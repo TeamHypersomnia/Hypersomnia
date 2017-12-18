@@ -9,37 +9,61 @@ summary: |
   An [entity](entity) specifies its **type** via its [type component](type_component). 
 ---
 
-## Map of type identifiers
+## Overview
 
-Inside the [cosmos_common_state](cosmos_common_state), there is an object named ``types``.  
-It maps type identifiers found in the [type component](type_component) to the respective **entity type**.
 
-## Future work
+So that working with content is easier, and so that less memory is wasted, each entity is divided into two kinds of data:
+1. state that should never change and is supposed to be shared between entities,
+	- ``gun::muzzle_velocity``
+2. state whose instance is needed by each single entity, since it is constantly in flux.
+	- ``gun::trigger_pressed`` 
+  
 
-So that working with content is easier, and so that less memory is wasted, each component should specify fully a separate type information.
-This would serve to separate data that is more like "input" to the processing, and the ever-changing caches, like
-- ``gun::muzzle_velocity`` would become a part of ``type``, but
-- ``gun::recoil_player_instance`` would remain as part of the component. 
+The first is more like "input" to the processing, in which [authors](author) in particular are interested.  
+Most of the time, only the programmers are concerned with the second type of data.
 
-Type creation would be a separate stage that would usually never occur in logic.  
-In fact, logic step could simply provide only a const getter for the type information.
+- An *entity type* contains a tuple of [definitions](definition), along with a flag for each definition to signify whether it is *enabled*.
+	- An author may specify which definitions to enable.
+	- The flags will be held separate:``std::array<bool, DEFINITION_COUNT_V> enabled_definitions;``
+		- A lot better cache coherency from the more idiomatic ``std::optional``.
+	- An *enabled* definition may or may not imply that the entity needs a particular component for the definition to be properly used by the logic.  
+		- If it implies that need, it additionally stores an initial value for the component.
+- Types can be created, copied and then modified, or destroyed.  
+	- It is a separate stage that never occurs in logic itself.
+		- In fact, the [logic step](logic_step) simply provides only const getters for the type information.
+	- Should only be done by [authors](author).
+- There won't be many types, but access is **frequent** during the [advance](cosmos#the-advance-method). 
+	- We allocate all definitions **statically**, as memory won't suffer relatively to the speed gain.
+- On creating an entity, the chosen type's id is passed.  
+	- The [cosmos](cosmos) adds all components implied by the definitions are added automatically.
+- Some components do not need any definition data.
+	- examples: child, flags, **sender**
+	- They will have an empty definition struct that will not take up space and will define "implied_component" type.
+		- if a definition implies more than one component, perhaps they should be merged?
+		- That ensures that each component has a corresponding definition.
+		- missile will imply both missile and sender?
+			- we'll just add the sender component where necessary and where it wasn't yet added.
+			- the sender, child components will anyway be hidden from the author as they are detail.
 
-Types could be created, copied and then modified, or destroyed.
+- Some definitions do not need any instance data.
+	- Example: render component.
+		- That doesnt change anything at all, except for the way of getting that data.
+- Some definitions might be so heavily used that a copy in the entity itself would be beneficial.
+	- Example: render component.
+		- Perfectly viable; just declare it with a constexpr and make the field constant.
+- Some definitions and components serve exactly the same role but a component lets us avoid to create a new type.
+	- Example: shape polygon component.
+		- We then must disable storing of an initial value; or just never specify the implied component type in the first place.
 
-This could be incrementally introduced (not right away), but an entity could be created while being given the type right away. Then the cosmos could add all needed components automatically.  
-Or, we could leave things as they are and only implement this in editor as the default behaviour.
+We might be tempted to make some of the definitions fundamental, thus always defined as "enabled".
+However, there is no benefit seen in doing so. It is a wiser choice to have a flag for each definition and assume that the contents of a default-constructed definition are always in a valid state.
+Provide a "set" function?
 
-There won't be many types, but access will be frequent, thus we could allocate all component types there statically, without much of a memory hit.
-
-Some components exist only as types without instance counterpart or the opposite.
-- would it make sense to abstract away access to types and components, both as just components?
-	- note it will not reduce the amount of work needed to transform the code, except for components that fall just into one category. You will somehow need to differentiate for access of fields from different categories.
-	- would be safer not to, because of the constness of types.
-
+<!--
 ### Performance
 
 Some concern could be falsely raised to the fact that an entity's type id first need to be obtained, and only later the type information;  
-as, compared to just a single component lookup, this could potentially be slower
+as, compared to just a single component lookup, this could potentially be slower.
 
 However, at the time of having an entity handle, the type id is already available, possibly in cache.  
 The only thing left is to perform the lookup in the type information map.
@@ -47,20 +71,23 @@ Then, the only thing to compare performance-wise is a lookup in an ``unordered_m
 If the container was optimized for deterministic identificators, it could possibly be faster;
 Note that types won't be altered during logic, usually only during the creation of content.  
 So, they could be stored in a fixed-sized container. **There can even be a vast performance improvement**. 
+-->
 
 ### Polygon shape concern
 
-Deserves a separate topic because it is the biggest component currently, second only to the [container component](container_component). 
+Deserves a separate topic because it is the biggest component currently, second only to the [container component](container_component).  
 The decrease in memory usage will be *enormous*. Let's add to it the fact that we were always instancing a ``b2PolygonShape`` for each entity.  
 That was not at all efficient.
 
-#### physics assignment operator
+#### physics world cache copy-assignment operator
 
 There is further potential in reducing the amount of shape that the [physics world cache](physics_world_cache) keeps internally.
 Unless the shape was allocated for a custom polygon shape component, the ``physics_world_cache::operator=`` should disregard copying of shapes.
 This will additionally dramatically improve performance of copying the cosmoi along with their inferred states.
 
 Additionally, ``b2PolygonShape``s and others will need to be inferred from the vertex data. That is because the struct is virtual, so may prevent direct std::memcpy, and also because it will hold convex-partitioned information.
+
+**We should disregard tailoring the assignment operator until we get to networking, where we'll probably switch to another physics engine with the features we need.**
 
 ### Inferred state
 
@@ -118,11 +145,6 @@ However, the presence of components will be initially derived from the presence 
 It will thus be always required to define at least an empty type that specifies the correspondent component type,  
 event if the component type itself does not need any definition-like data.
 
-Per each definition, we hold a boolean value of whether the definition is set. 
-It would the most idiomatic to hold a tuple of ``std::optional`` definitions, but a lot better cache coherency will be achieved if the boolean values will be stored in a separate variable like so:
-
-``std::array<bool, DEFINITION_COUNT_V> enabled_definitions;``
-
 A concern could be raised because with this design, performance of serializing types could suffer.  
 That is because, if we serialize linearly without regard for which definitions are set, we serialize possibly a lot of unneeded data.  
 On the other hand, if we do serialize only that which was set, we may suffer from instruction cache misses as the code will not degrade to a simple memcpy anymore.
@@ -135,3 +157,6 @@ However, the type information:
 A custom readwrite overloads will be in order, both for lua and binary, which will take note of which initial component values are set, and serialize only the according definitions;  
 At that point, serialization performance pretty much does not matter at all, and disk space may or may not come in handy.
 
+## Storage
+Inside the [cosmos common state](cosmos_common_state), there is an object named ``types``.  
+It maps type identifiers found in the [type component](type_component) to the respective **entity type**.
