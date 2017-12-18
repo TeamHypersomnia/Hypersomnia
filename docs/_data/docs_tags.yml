@@ -21,3 +21,7 @@
   description: All of them.
 - title: Flyweights
   name: flyweights
+  title_link: flyweight
+- title: Inferred caches
+  name: inferred_caches
+  title_link: inferred_cache
