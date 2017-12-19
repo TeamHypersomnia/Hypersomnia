@@ -10,7 +10,7 @@
 namespace components {
 	struct render {
 		// GEN INTROSPECTOR struct components::render
-		render_layer layer = render_layer::INVALID;
+		render_layer layer = render_layer::UNDER_GROUND;
 		// END GEN INTROSPECTOR
 	};
 }

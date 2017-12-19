@@ -16,20 +16,18 @@ class entity_name_meta {
 	
 	entity_name_type name;
 public:
-	bool stackable = false;
 	entity_description_type description;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const entity_name_meta& b) const {
-		return name == b.name && stackable == b.stackable && description == b.description;
+		return 
+			name == b.name 
+			&& description == b.description
+		;
 	}
 
 	const auto& get_name() const {
 		return name;
-	}
-
-	bool has_description() const {
-		return description != L"No description";
 	}
 
 	entity_name_meta(const entity_name_type& name = {}) : name(name) {}

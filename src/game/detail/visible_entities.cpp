@@ -24,7 +24,7 @@ static void get_visible_per_layer(
 	for (const auto it_id : entities) {
 		const auto it = cosmos[it_id];
 		const auto layer = it.get<components::render>().layer;
-		ensure(layer < static_cast<render_layer>(output_layers.size()));
+		// ensure(layer < static_cast<render_layer>(output_layers.size()));
 		output_layers[layer].push_back(it);
 	}
 

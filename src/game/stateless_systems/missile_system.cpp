@@ -174,7 +174,8 @@ void missile_system::detonate_expired_missiles(const logic_step step) {
 				const auto particular_homing_target = cosmos[missile.particular_homing_target];
 				
 				const auto closest_hostile = 
-					particular_homing_target.alive() ? particular_homing_target : cosmos[get_closest_hostile(it, sender_attitude, 250, filters::bullet())];
+					particular_homing_target.alive() ? particular_homing_target : cosmos[get_closest_hostile(it, sender_attitude, 250, filters::bullet())]
+				;
 
 				const auto current_velocity = it.get<components::rigid_body>().velocity();
 

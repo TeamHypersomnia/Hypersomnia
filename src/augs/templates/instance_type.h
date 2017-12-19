@@ -2,6 +2,15 @@
 #include <type_traits>
 #include "augs/templates/type_matching_and_indexing.h"
 
+template <class T, class = void>
+struct has_instance : std::false_type {};
+
+template <class T>
+struct has_instance<T, decltype(typename T::instance(), void())> : std::true_type {};
+
+template <class T>
+constexpr bool has_instance_v = has_instance<T>::value;
+
 template <class T>
 using instance_of = typename T::instance;
 

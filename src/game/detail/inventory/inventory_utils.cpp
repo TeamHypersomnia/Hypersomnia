@@ -254,7 +254,7 @@ bool can_stack_entities(
 	
 	const auto name = a.get_name();
 
-	if (name == b.get_name() && a.get_meta_of_name().stackable) {
+	if (name == b.get_name() && a.get<components::item>().stackable) {
 		return true;
 	}
 

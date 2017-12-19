@@ -58,11 +58,9 @@ namespace prefabs {
 		
 		auto& meta = grenade_entity.get_meta_of_name();
 
-		if (!meta.has_description()) {
-			meta.description =
-				L"Throwable explosive with a three seconds delay.\nDeals damage to [color=red]Health[/color]."
-			;
-		}
+		meta.description =
+			L"Throwable explosive with a three seconds delay.\nDeals damage to [color=red]Health[/color]."
+		;
 
 		return grenade_entity;
 	}
@@ -107,11 +105,9 @@ namespace prefabs {
 
 		auto& meta = grenade_entity.get_meta_of_name();
 
-		if (!meta.has_description()) {
-			meta.description =
-				L"Throwable explosive with a three seconds delay.\nDrains [color=cyan]Personal Electricity[/color].\nIf the subject has [color=turquoise]Electric Shield[/color] enabled,\nthe effect is doubled."
-				;
-		}
+		meta.description =
+			L"Throwable explosive with a three seconds delay.\nDrains [color=cyan]Personal Electricity[/color].\nIf the subject has [color=turquoise]Electric Shield[/color] enabled,\nthe effect is doubled."
+		;
 
 		return grenade_entity;
 	}
@@ -156,11 +152,9 @@ namespace prefabs {
 
 		auto& meta = grenade_entity.get_meta_of_name();
 
-		if (!meta.has_description()) {
-			meta.description =
-				L"Throwable explosive with a three seconds delay.\nDeals damage to [color=orange]Consciousness[/color].\nCauses massive aimpunch."
-			;
-		}
+		meta.description =
+			L"Throwable explosive with a three seconds delay.\nDeals damage to [color=orange]Consciousness[/color].\nCauses massive aimpunch."
+		;
 
 		return grenade_entity;
 	}

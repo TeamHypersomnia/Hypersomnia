@@ -235,7 +235,6 @@ namespace prefabs {
 		cyan_charge.map_child_entity(child_entity_name::CATRIDGE_SHELL, shell_definition);
 
 		cyan_charge.add_standard_components(step);
-		cyan_charge.get_meta_of_name().stackable = true;
 
 		return cyan_charge;
 	}
@@ -308,7 +307,6 @@ namespace prefabs {
 		cyan_charge.map_child_entity(child_entity_name::CATRIDGE_SHELL, shell_definition);
 
 		cyan_charge.add_standard_components(step);
-		cyan_charge.get_meta_of_name().stackable = true;
 
 		return cyan_charge;
 	}

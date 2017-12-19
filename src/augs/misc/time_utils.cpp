@@ -23,7 +23,7 @@ std::string augs::get_timestamp() {
 	struct tm *local_time;
 	local_time = localtime(&current_time);
 
-	const auto result = 
+	return	
 		"[" 
 		+ leading_zero(local_time->tm_mday) + "." 
 		+ leading_zero(local_time->tm_mon + 1) + "." 
