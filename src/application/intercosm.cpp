@@ -67,12 +67,19 @@ void intercosm::open(const intercosm_path_op op) {
 			target_extension = augs::path_type(op.path).replace_extension("").extension();
 		}
 
+		augs::recursive_clear(version);
+		version.commit_number = 0;
+
 		if (target_extension == ".int") {
 			augs::load_from_bytes(*this, op.path);
 		}
 		else if (target_extension == ".lua") {
 			augs::load_from_lua_table(op.lua, *this, op.path);
 		}
+
+		/* TODO: Check version integrity */
+
+		version = hypersomnia_version();
 	}
 	catch (const cosmos_loading_error err) {
 		throw intercosm_loading_error {

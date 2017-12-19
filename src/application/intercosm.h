@@ -5,6 +5,7 @@
 #include "game/transcendental/cosmic_entropy.h"
 
 #include "view/viewables/all_viewables_defs.h"
+#include "hypersomnia_version.h"
 
 namespace sol {
 	class state;
@@ -23,7 +24,10 @@ struct intercosm_path_op {
 
 struct intercosm {
 	// GEN INTROSPECTOR struct intercosm
+	hypersomnia_version version;
+
 	cosmos world;
+	cosmos_common_state common;
 	all_logical_assets logicals;
 	all_viewables_defs viewables;
 	
