@@ -13,7 +13,7 @@ entity_id get_first_named_ancestor(const const_entity_handle p) {
 	const auto& cosmos = p.get_cosmos();
 
 	while (cosmos[iterator].alive()) {
-		if (cosmos[iterator].get<components::name>().get_name_id() != 0) {
+		if (cosmos[iterator].get<components::name>().get_type_id() != 0) {
 			return iterator;
 		}
 
@@ -26,13 +26,13 @@ entity_id get_first_named_ancestor(const const_entity_handle p) {
 typedef components::name N;
 
 template <bool C>
-maybe_const_ref_t<C, entity_name_meta> basic_name_synchronizer<C>::get_meta() const {
-	return handle.get_cosmos().get_common_state().name_metas.get_meta(get_name_id());
+maybe_const_ref_t<C, entity_type> basic_name_synchronizer<C>::get_type() const {
+	return handle.get_cosmos().get_common_state().all_entity_types.get_type(get_type_id());
 }
 
 template <bool C>
-entity_name_id basic_name_synchronizer<C>::get_name_id() const {
-	return get_raw_component().name_id;
+entity_type_id basic_name_synchronizer<C>::get_type_id() const {
+	return get_raw_component().type_id;
 }
 
 template <bool C>
@@ -40,7 +40,7 @@ const entity_name_type& basic_name_synchronizer<C>::get_name() const {
 	const auto& cosmos = handle.get_cosmos();
 
 	return cosmos.inferred.name.get_name(
-		cosmos.get_common_state().name_metas,
+		cosmos.get_common_state().all_entity_types,
 		get_raw_component()
 	);
 }
@@ -49,7 +49,7 @@ void component_synchronizer<false, N>::set_name(const entity_name_type& full_nam
 	auto& cosmos = handle.get_cosmos();
 
 	cosmos.inferred.name.set_name(
-		cosmos.get_common_state().name_metas,
+		cosmos.get_common_state().all_entity_types,
 		full_name,
 		get_raw_component(),
 		handle
@@ -60,8 +60,8 @@ void component_synchronizer<false, N>::set_name(const entity_name_type& full_nam
 #endif
 }
 
-void component_synchronizer<false, N>::set_name_id(const entity_name_id id) const {
-	handle.get_cosmos().inferred.name.set_name_id(
+void component_synchronizer<false, N>::set_type_id(const entity_type_id id) const {
+	handle.get_cosmos().inferred.name.set_type_id(
 		id,
 		get_raw_component(),
 		handle

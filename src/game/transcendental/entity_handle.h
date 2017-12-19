@@ -286,8 +286,8 @@ public:
 		);
 	}
 	
-	auto& get_meta_of_name() const {
-		return get<components::name>().get_meta();
+	auto& get_type() const {
+		return get<components::name>().get_type();
 	}
 
 	const auto& get_name() const {

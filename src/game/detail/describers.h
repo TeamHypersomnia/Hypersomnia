@@ -9,7 +9,7 @@
 #include "game/enums/item_category.h"
 
 #include "game/components/name_component_declaration.h"
-#include "game/common_state/entity_name_metas.h"
+#include "game/common_state/entity_types.h"
 
 /*
 	Example details:

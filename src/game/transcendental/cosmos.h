@@ -228,7 +228,7 @@ public:
 	}
 	
 	std::unordered_set<entity_id> get_entities_by_name(const entity_name_type&) const;
-	std::unordered_set<entity_id> get_entities_by_name_id(const entity_name_id&) const;
+	std::unordered_set<entity_id> get_entities_by_type_id(const entity_type_id&) const;
 	
 	entity_handle get_entity_by_name(const entity_name_type&);
 	const_entity_handle get_entity_by_name(const entity_name_type&) const;
@@ -345,8 +345,8 @@ inline std::unordered_set<entity_id> cosmos::get_entities_by_name(const entity_n
 	return inferred.name.get_entities_by_name(name);
 }
 
-inline std::unordered_set<entity_id> cosmos::get_entities_by_name_id(const entity_name_id& id) const {
-	return inferred.name.get_entities_by_name_id(id);
+inline std::unordered_set<entity_id> cosmos::get_entities_by_type_id(const entity_type_id& id) const {
+	return inferred.name.get_entities_by_type_id(id);
 }
 
 inline entity_handle cosmos::get_entity_by_name(const entity_name_type& name) {

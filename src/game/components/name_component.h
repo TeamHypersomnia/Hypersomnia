@@ -10,7 +10,7 @@ namespace augs {
 	struct introspection_access;
 }
 
-class entity_name_meta;
+class entity_type;
 
 namespace components {
 	struct name {
@@ -19,7 +19,7 @@ namespace components {
 
 		friend augs::introspection_access;
 		// GEN INTROSPECTOR struct components::name
-		entity_name_id name_id = 0u;
+		entity_type_id type_id = 0u;
 		// END GEN INTROSPECTOR
 	};
 }
@@ -34,10 +34,10 @@ public:
 	using base::get_raw_component;
 	using base::component_synchronizer_base;
 	
-	maybe_const_ref_t<is_const, entity_name_meta> get_meta() const;
+	maybe_const_ref_t<is_const, entity_type> get_type() const;
 
 	const entity_name_type& get_name() const;
-	entity_name_id get_name_id() const;
+	entity_type_id get_type_id() const;
 };
 
 template<>
@@ -48,7 +48,7 @@ public:
 	using basic_name_synchronizer<false>::basic_name_synchronizer;
 
 	void set_name(const entity_name_type&) const;
-	void set_name_id(const entity_name_id) const;
+	void set_type_id(const entity_type_id) const;
 };
 
 template<>

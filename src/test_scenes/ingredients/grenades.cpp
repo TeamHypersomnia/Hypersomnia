@@ -56,7 +56,7 @@ namespace prefabs {
 
 		grenade_entity.add_standard_components(step);
 		
-		auto& meta = grenade_entity.get_meta_of_name();
+		auto& meta = grenade_entity.get_type();
 
 		meta.description =
 			L"Throwable explosive with a three seconds delay.\nDeals damage to [color=red]Health[/color]."
@@ -103,7 +103,7 @@ namespace prefabs {
 
 		grenade_entity.add_standard_components(step);
 
-		auto& meta = grenade_entity.get_meta_of_name();
+		auto& meta = grenade_entity.get_type();
 
 		meta.description =
 			L"Throwable explosive with a three seconds delay.\nDrains [color=cyan]Personal Electricity[/color].\nIf the subject has [color=turquoise]Electric Shield[/color] enabled,\nthe effect is doubled."
@@ -150,7 +150,7 @@ namespace prefabs {
 
 		grenade_entity.add_standard_components(step);
 
-		auto& meta = grenade_entity.get_meta_of_name();
+		auto& meta = grenade_entity.get_type();
 
 		meta.description =
 			L"Throwable explosive with a three seconds delay.\nDeals damage to [color=orange]Consciousness[/color].\nCauses massive aimpunch."

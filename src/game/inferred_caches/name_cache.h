@@ -11,7 +11,7 @@ namespace components {
 	struct name;
 }
 
-class entity_name_metas;
+class entity_types;
 struct cosmos_common_state;
 
 template <bool, class>
@@ -19,13 +19,13 @@ class component_synchronizer;
 
 class name_cache {
 	std::unordered_map<
-		entity_name_id,
+		entity_type_id,
 		std::unordered_set<entity_id>
-	> entities_by_name_id;
+	> entities_by_type_id;
 
 	std::unordered_map<
 		entity_name_type, 
-		entity_name_id
+		entity_type_id
 	> name_to_id_lookup;
 
 	std::set<std::pair<entity_name_type, entity_guid>> lexicographic_names;
@@ -58,20 +58,20 @@ class name_cache {
 	*/
 
 	void set_name(
-		entity_name_metas& metas,
+		entity_types& metas,
 		const entity_name_type& full_name,
 		components::name& name_of_subject,
 		const entity_id subject
 	);
 
-	void set_name_id(
-		const entity_name_id name_id,
+	void set_type_id(
+		const entity_type_id type_id,
 		components::name& name_of_subject,
 		const entity_id subject
 	);
 
 public:
-	std::unordered_set<entity_id> get_entities_by_name_id(const entity_name_id) const;
+	std::unordered_set<entity_id> get_entities_by_type_id(const entity_type_id) const;
 	std::unordered_set<entity_id> get_entities_by_name(const entity_name_type& full_name) const;
 
 	const auto& get_lexicographic_names() const {
@@ -79,7 +79,7 @@ public:
 	}
 
 	const entity_name_type& get_name(
-		const entity_name_metas& metas,
+		const entity_types& metas,
 		const components::name& from
 	) const;
 };

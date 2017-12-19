@@ -26,11 +26,11 @@ void set_bbcoded_entity_description(
 	const entity_handle handle, 
 	const entity_description_type& new_details
 ) {
-	handle.get_meta_of_name().description = new_details;
+	handle.get_type().description = new_details;
 }
 
 const entity_description_type& get_bbcoded_entity_description(const const_entity_handle handle) {
-	return handle.get_meta_of_name().description;
+	return handle.get_type().description;
 }
 
 std::wstring get_bbcoded_entity_properties(const const_entity_handle id) {

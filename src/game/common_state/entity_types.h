@@ -9,8 +9,8 @@ namespace augs {
 	struct introspection_access;
 }
 
-class entity_name_meta {
-	// GEN INTROSPECTOR class entity_name_meta
+class entity_type {
+	// GEN INTROSPECTOR class entity_type
 	friend augs::introspection_access;
 	friend class name_cache;
 	
@@ -19,7 +19,7 @@ public:
 	entity_description_type description;
 	// END GEN INTROSPECTOR
 
-	bool operator==(const entity_name_meta& b) const {
+	bool operator==(const entity_type& b) const {
 		return 
 			name == b.name 
 			&& description == b.description
@@ -30,16 +30,16 @@ public:
 		return name;
 	}
 
-	entity_name_meta(const entity_name_type& name = {}) : name(name) {}
+	entity_type(const entity_name_type& name = {}) : name(name) {}
 };
 
-class entity_name_metas {
+class entity_types {
 	friend augs::introspection_access;
 	friend class name_cache;
 
-	// GEN INTROSPECTOR class entity_name_metas
-	entity_name_id next_name_id = 1;
-	std::unordered_map<entity_name_id, entity_name_meta> metas;
+	// GEN INTROSPECTOR class entity_types
+	entity_type_id next_type_id = 1;
+	std::unordered_map<entity_type_id, entity_type> metas;
 	// END GEN INTROSPECTOR
 
 public:
@@ -47,11 +47,11 @@ public:
 		metas.clear();
 	}
 
-	entity_name_meta& get_meta(const entity_name_id id) {
+	entity_type& get_type(const entity_type_id id) {
 		return metas.at(id);
 	}
 
-	const entity_name_meta& get_meta(const entity_name_id id) const {
+	const entity_type& get_type(const entity_type_id id) const {
 		return metas.at(id);
 	}
 };
