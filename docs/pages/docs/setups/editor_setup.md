@@ -48,6 +48,11 @@ Default shortcut: ``ctrl + ,``.
 
 Default shortcut: ``/``.
 
+#### Future work
+
+- ``Shift + arrows`` let one select multiple entities from that window
+- ``Ctrl + enter`` adds to the current selection instead of replacing it
+
 ### Context help
 
 Serves as a tutorial for first-time users. It has unique content every time:

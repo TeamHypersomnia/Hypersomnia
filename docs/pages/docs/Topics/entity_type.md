@@ -27,31 +27,41 @@ Most of the time, only the programmers are concerned with the second type of dat
 	- The flags will be held separate:``std::array<bool, DEFINITION_COUNT_V> enabled_definitions;``
 		- A lot better cache coherency from the more idiomatic ``std::optional``.
 	- An *enabled* definition may or may not imply that the entity needs a particular component for the definition to be properly used by the logic.  
-		- If it implies that need, it additionally stores an initial value for the component.
+		- If it implies that need, it additionally stores an **initial value** for the component.
 - Types can be created, copied and then modified, or destroyed.  
 	- It is a separate stage that never occurs in logic itself.
 		- In fact, the [logic step](logic_step) simply provides only const getters for the type information.
 	- Should only be done by [authors](author).
+	- In particular, the **initial value** for a component may change even though some entities already exist.
+		- This is not important. The field, in practice, serves two purposes:
+			- Used by the logic when it gets a type identifier to spawn (e.g. ``gun::magic_missile_definition``), so that it can set reasonable initial values. Thus, a change to initial value needs not updating here as the logic will naturally catch up, storing only the type identifier.
+			- Optionally as a helper for the author when they want to spawn some very specific entities. The author shouldn't worry that the initial value changes something for the existent entities.
 - There won't be many types, but access is **frequent** during the [advance](cosmos#the-advance-method). 
 	- We allocate all definitions **statically**, as memory won't suffer relatively to the speed gain.
 - On creating an entity, the chosen type's id is passed.  
 	- The [cosmos](cosmos) adds all components implied by the definitions are added automatically.
 - Some components do not need any definition data.
 	- examples: child, flags, **sender**
-	- They will have an empty definition struct that will not take up space and will define "implied_component" type.
+		- Looks like most of them should anyway be transparent to the author.
+		- Their existence is either fundamental or implied by a specific circumstance in the logic (as logic can add or remove components (rarely))
+	- ~~They will have an empty definition struct that will not take up space and will define "implied_component" type.~~
+		- We've decided that the author should not be concerned with such obscurities and existence of these components should not be implied by definitions, but by a circumstance.  
+
+<!--
 		- if a definition implies more than one component, perhaps they should be merged?
 		- That ensures that each component has a corresponding definition.
 		- missile will imply both missile and sender?
 			- we'll just add the sender component where necessary and where it wasn't yet added.
-			- the sender, child components will anyway be hidden from the author as they are detail.
-
+			- the sender, child components will anyway be hidden from the author as they are detail.~~
+-->
 - Some definitions do not need any instance data.
 	- Example: render component.
 		- That doesnt change anything at all, except for the way of getting that data.
-- Some definitions might be so heavily used that a copy in the entity itself would be beneficial.
+- Some definitions might be so heavily used that an immutable copy in the entity itself would be beneficial.
 	- Example: render component.
-		- Perfectly viable; just declare it with a constexpr and make the field constant.
-- Some definitions and components serve exactly the same role but a component lets us avoid to create a new type.
+		- Perfectly viable; just declare it with a ``static constexpr bool`` inside the definition and make the field constant.
+		- Care: if the type information changes, so must the copied definition. So let's save it for later.
+- Some definitions and components serve exactly the same role but the component counterpart lets us customize each instance without creating new type for each.
 	- Example: shape polygon component.
 		- We then must disable storing of an initial value; or just never specify the implied component type in the first place.
 
@@ -96,7 +106,7 @@ That state should most likely be held separate from the cosmos, because it will 
 It will most likely only ever change during the stage of content creation.
 Thus, in ordinary multiplayer gameplays, it should be inferred exactly once.
 
-
+<!--
 ### Frequent new types
 
 There are examples of data that, on one hand, will very frequently be shared identical,  
@@ -119,6 +129,7 @@ In that case, we may:
 		- although I would not advocate this.
 	- problem arises when we will need to copy the game world. Precisely, how do we determine if a shape is owned by the physics world cache? 
 		- we need to take proper measures so as to never copy the shapes that are indeed flyweights; as opposed to the custom shapes.
+-->
 
 ### Per-field overrides
 
@@ -131,8 +142,8 @@ Two approaches can be taken:
 
 We'll probably use scalars most of the time.
 
+<!--
 ### Components considerations
-
 An author should not be concerned with adding components to a new entity, that properly correspond to what they've already set in the definitions.  
 Regardless of the fact that the definitions are statically allocated (and thus always "present"), the author should be able to specify which definitions they are interested in.  
 
@@ -154,9 +165,15 @@ However, the type information:
 	- Will not at all be copied around frequently (pretty much never, just the cosmos) 
 	- Should have the topmost access performance, which would suffer from facilitating the structure for better serialization performance.
 
+-->
+## Storage
+
+Inside the [cosmos common state](cosmos_common_state), there is an object named ``types``.  
+It maps type identifiers found in the [type component](type_component) to the respective **entity type**.  
+Preferably, the container should be a constant size vector as the type ids will just be consecutive integers.  
+We will treat a type with blank name as not set.  
+
+Care must be taken that the storage is not treated like trivially copyable types during byte readwrite.
+
 A custom readwrite overloads will be in order, both for lua and binary, which will take note of which initial component values are set, and serialize only the according definitions;  
 At that point, serialization performance pretty much does not matter at all, and disk space may or may not come in handy.
-
-## Storage
-Inside the [cosmos common state](cosmos_common_state), there is an object named ``types``.  
-It maps type identifiers found in the [type component](type_component) to the respective **entity type**.
