@@ -29,17 +29,6 @@ There are exactly two fields in the class:
 <br/>
 The reason that these two are coupled together into a single object is because one is so rarely (if ever) needed without the other that separating them would only accomplish so much as to introduce unnecessary noise, in the form of twice as many references passed across the entire game's logic.  
 
-## The advance method
-
-The *advance* function accepts [entropy](cosmic_entropy) along with a reference to all [logical assets](logical_asset) referenced via ids from inside [significant](#significant), in order to perform a single simulation step.  
-It initializes all [message](message) queues on [TLS](https://en.wikipedia.org/wiki/Thread-local_storage) and clears them when the step finishes, to ensure no messages persist beyond duration of the step.  
-If some messages were to linger between two consecutive steps, one would need to save them to disk or even synchronize through the network to ensure [determinism](determinism), effectively making messages another case of [significant state](significant_state).  
-It makes much more sense to just design the *advance* function so that all posted messages are handled in the same simulation step.
-
-### Pre solve
-
-### Post solve
-
 ## Notes
 
 There are also many other helper methods for performing common tasks on the cosmos, e.g. getting a handle to an entity referenced by an [id](entity_id), [guid](entity_guid), getting a [processing list](processing_lists_cache) of a given kind, or getting all entities matching a given name. While, under the principle of separation of concerns, it would make sense to distribute such functions across multiple source files or even classes, there is currently no benefit seen in doing that.

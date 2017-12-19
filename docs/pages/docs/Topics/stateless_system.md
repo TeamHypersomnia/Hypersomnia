@@ -12,7 +12,7 @@ permalink: stateless_system
 As opposed to member functions of an [audiovisual system](audiovisual_system), the member functions of a **stateless system** are required to be **[deterministic](determinism)**.  
 A common pitfall here is to define a static RNG within the body of a systematic function, later to only produce divergent results for two [cosmoi](cosmos) run with identical inputs.
 
-Usually, the systematic functions of all stateless systems are called inside [```cosmos::advance_systems```](cosmos#the-advance-method), every time the game performs a step. 
+Usually, the systematic functions of all stateless systems are called inside [solve](solve#the-solve), so every time the game performs a step. 
 
 ## Conventions
 
