@@ -5,10 +5,10 @@
 #include "augs/misc/children_vector_tracker.h"
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
-#include "game/components/name_component.h"
+#include "game/components/type_component.h"
 
 namespace components {
-	struct name;
+	struct type;
 }
 
 class entity_types;
@@ -31,18 +31,18 @@ class name_cache {
 	std::set<std::pair<entity_name_type, entity_guid>> lexicographic_names;
 
 	friend class cosmos;
-	friend class component_synchronizer<false, components::name>;
+	friend class component_synchronizer<false, components::type>;
 
 	template <bool is_const>
-	friend class basic_name_synchronizer;
+	friend class basic_type_synchronizer;
 
 	void reserve_caches_for_entities(const std::size_t n) const {}
 
 	void infer_cache_for(const const_entity_handle);
 	void destroy_cache_of(const const_entity_handle);
 
-	void infer_cache_for(const entity_id, const components::name&);
-	void destroy_cache_of(const entity_id, const components::name&);
+	void infer_cache_for(const entity_id, const components::type&);
+	void destroy_cache_of(const entity_id, const components::type&);
 
 	void infer_additional_cache(const cosmos_common_state&);
 	void destroy_additional_cache_of(const cosmos_common_state&);
@@ -60,13 +60,13 @@ class name_cache {
 	void set_name(
 		entity_types& metas,
 		const entity_name_type& full_name,
-		components::name& name_of_subject,
+		components::type& name_of_subject,
 		const entity_id subject
 	);
 
 	void set_type_id(
 		const entity_type_id type_id,
-		components::name& name_of_subject,
+		components::type& name_of_subject,
 		const entity_id subject
 	);
 
@@ -80,6 +80,6 @@ public:
 
 	const entity_name_type& get_name(
 		const entity_types& metas,
-		const components::name& from
+		const components::type& from
 	) const;
 };

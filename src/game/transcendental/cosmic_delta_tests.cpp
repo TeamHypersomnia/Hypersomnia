@@ -450,7 +450,7 @@ TEST_CASE("CosmicDelta4 EmptyAndTwoNew") {
 		}
 		
 		auto check_fundamentals = [&](auto e1, auto e2) {
-			synchronizer_component_checker(e1, e2, components::name());
+			synchronizer_component_checker(e1, e2, components::type());
 			synchronizer_component_checker(e1, e2, components::all_inferred_state());
 		};
 		

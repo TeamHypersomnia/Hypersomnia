@@ -16,7 +16,7 @@
 #include "game/components/special_physics_component.h"
 #include "game/components/driver_component.h"
 #include "game/components/force_joint_component.h"
-#include "game/components/name_component.h"
+#include "game/components/type_component.h"
 #include "game/components/sentience_component.h"
 #include "game/components/attitude_component.h"
 #include "game/components/tree_of_npo_node_component.h"

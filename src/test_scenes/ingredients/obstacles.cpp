@@ -1,7 +1,7 @@
 #include "ingredients.h"
 #include "game/assets/all_logical_assets.h"
 #include "game/transcendental/cosmos.h"
-#include "game/components/name_component.h"
+#include "game/components/type_component.h"
 #include "game/components/fixtures_component.h"
 
 namespace prefabs {

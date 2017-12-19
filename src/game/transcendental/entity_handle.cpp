@@ -102,7 +102,7 @@ entity_handle basic_entity_handle<C>::add_standard_components(const logic_step s
 template <bool C>
 template <bool, class>
 void basic_entity_handle<C>::set_name(const entity_name_type& new_name) const {
-	get<components::name>().set_name(new_name);
+	get<components::type>().set_name(new_name);
 }
 
 template <bool C>

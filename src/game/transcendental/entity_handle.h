@@ -23,7 +23,7 @@
 
 #include "game/enums/entity_flag.h"
 #include "game/transcendental/step_declaration.h"
-#include "game/components/name_component_declaration.h"
+#include "game/components/type_component_declaration.h"
 #include "game/components/flags_component.h"
 
 class cosmos;
@@ -63,7 +63,7 @@ private:
 	template <bool, class> friend class basic_relations_mixin;
 	template <bool> friend class basic_entity_handle;
 	// for debug names
-	friend class component_synchronizer<false, components::name>;
+	friend class component_synchronizer<false, components::type>;
 
 	using owner_reference = maybe_const_ref_t<is_const, cosmos>;
 	using entity_ptr = maybe_const_ptr_t<is_const, cosmic_entity>;
@@ -287,11 +287,11 @@ public:
 	}
 	
 	auto& get_type() const {
-		return get<components::name>().get_type();
+		return get<components::type>().get_type();
 	}
 
 	const auto& get_name() const {
-		return get<components::name>().get_name();
+		return get<components::type>().get_name();
 	}
 
 	template <bool C = !is_const, class = std::enable_if_t<C>>

@@ -72,7 +72,7 @@ struct tests_of_traits {
 		"With given memory layouts, entity_id<->entity_guid substitution will not be possible in delta encoding"
 	);
 
-	static_assert(is_component_fundamental_v<components::name>);
+	static_assert(is_component_fundamental_v<components::type>);
 
 	static_assert(is_container_v<augs::path_type>);
 	static_assert(!is_padding_field_v<entity_id>);

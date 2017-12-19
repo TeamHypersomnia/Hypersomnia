@@ -3,7 +3,7 @@
 #include "game/components/item_component.h"
 #include "game/components/missile_component.h"
 #include "game/components/sprite_component.h"
-#include "game/components/name_component.h"
+#include "game/components/type_component.h"
 #include "game/components/trace_component.h"
 #include "game/components/sound_existence_component.h"
 #include "game/components/fixtures_component.h"

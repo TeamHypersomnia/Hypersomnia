@@ -16,7 +16,7 @@
 #include "game/components/special_physics_component.h"
 #include "game/components/animation_component.h"
 #include "game/components/car_component.h"
-#include "game/components/name_component.h"
+#include "game/components/type_component.h"
 #include "game/components/shape_polygon_component.h"
 
 #include "game/enums/filters.h"

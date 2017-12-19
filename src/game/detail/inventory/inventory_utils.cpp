@@ -8,7 +8,7 @@
 #include "game/components/rigid_body_component.h"
 #include "game/components/special_physics_component.h"
 #include "game/components/item_slot_transfers_component.h"
-#include "game/components/name_component.h"
+#include "game/components/type_component.h"
 #include "game/components/motor_joint_component.h"
 #include "game/components/sound_existence_component.h"
 #include "game/detail/entity_scripts.h"
