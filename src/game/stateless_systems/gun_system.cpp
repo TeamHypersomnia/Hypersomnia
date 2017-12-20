@@ -4,6 +4,7 @@
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/logic_step.h"
+#include "game/transcendental/data_living_one_step.h"
 
 #include "game/assets/all_logical_assets.h"
 #include "game/messages/intent_message.h"
@@ -49,8 +50,8 @@ void components::gun::load_next_round(
 	const entity_id subject,
 	const logic_step step
 ) {
-	auto& cosmos = step.cosm;
-	const auto gun_entity = step.cosm[subject];
+	auto& cosmos = step.get_cosmos();
+	const auto gun_entity = step.get_cosmos()[subject];
 
 	thread_local decltype(inventory_slot::items_inside) next_catridge_from;
 	next_catridge_from.clear();
@@ -83,7 +84,7 @@ void components::gun::load_next_round(
 }
 
 void gun_system::consume_gun_intents(const logic_step step) {
-	auto& cosmos = step.cosm;
+	auto& cosmos = step.get_cosmos();
 	const auto& delta = step.get_delta();
 	const auto& events = step.transient.messages.get_queue<messages::intent_message>();
 
@@ -115,7 +116,7 @@ vec2  components::gun::calculate_barrel_center(const components::transform gun_t
 }
 
 void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
-	auto& cosmos = step.cosm;
+	auto& cosmos = step.get_cosmos();
 	const auto& delta = step.get_delta();
 
 	auto& physics_sys = cosmos.inferred.physics;
@@ -203,13 +204,13 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					round_entity.set_flag(entity_flag::IS_IMMUNE_TO_PAST);
 					round_entity.add_standard_components(step);
 					
-					step.transient.messages.post(response);
+					step.post_message(response);
 
 					messages::interpolation_correction_request request;
 					request.subject = round_entity;
 					request.set_previous_transform_value = muzzle_transform;
 
-					step.transient.messages.post(request);
+					step.post_message(request);
 				}
 				else {
 					const auto chamber_slot = gun_entity[slot_function::GUN_CHAMBER];
@@ -230,7 +231,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 							we must additionally queue the catridge itself
 						*/
 
-						step.transient.messages.post(messages::queue_destruction(catridge_in_chamber));
+						step.post_message(messages::queue_destruction(catridge_in_chamber));
 					}
 					else {
 						bullet_stacks.push_back(catridge_in_chamber);
@@ -282,7 +283,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 							request.subject = round_entity;
 							request.set_previous_transform_value = muzzle_transform;
 
-							step.transient.messages.post(request);
+							step.post_message(request);
 						}
 
 						const auto shell_definition = single_bullet_or_pellet_stack[child_entity_name::CATRIDGE_SHELL];
@@ -306,10 +307,10 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 							shell_entity.add_standard_components(step);
 						}
 						
-						step.transient.messages.post(messages::queue_destruction(single_bullet_or_pellet_stack));
+						step.post_message(messages::queue_destruction(single_bullet_or_pellet_stack));
 					}
 
-					step.transient.messages.post(response);
+					step.post_message(response);
 					
 					/* 
 						by now every item inside the chamber is queued for destruction.
@@ -324,7 +325,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 				}
 
 				if (total_recoil_scale != 0.f) {
-					if (const auto* recoil_player = step.input.logical_assets.find(gun.recoil.id)) {
+					if (const auto* recoil_player = step.get_logical_assets().find(gun.recoil.id)) {
 						if (const auto recoil_entity = owning_sentience[child_entity_name::CHARACTER_CROSSHAIR][child_entity_name::CROSSHAIR_RECOIL_BODY]) {
 							if (const auto recoil_body = recoil_entity.find<components::rigid_body>()) {
 								const auto recoil_value = gun.recoil.shoot_and_get_impulse(*recoil_player);

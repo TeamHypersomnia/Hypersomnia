@@ -165,8 +165,8 @@ main_menu_setup::main_menu_setup(
 		while (intro.world.get_total_seconds_passed() < settings.rewind_intro_scene_by_secs) {
 			const auto entropy = cosmic_entropy(director.get_entropy_for_step(intro.world.get_total_steps_passed() - initial_step_number), intro.world);
 
-			intro.world.advance(
-				{ entropy, intro.logicals },
+			intro.advance(
+				entropy,
 				[](auto) {},
 				[](auto) {},
 				[](auto) {}

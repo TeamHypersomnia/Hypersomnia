@@ -6,6 +6,7 @@
 
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/logic_step.h"
+#include "game/transcendental/data_living_one_step.h"
 
 #include "game/detail/hand_fuse_logic.h"
 #include "game/detail/explosions.h"
@@ -15,7 +16,7 @@
 #include "game/messages/queue_destruction.h"
 
 void hand_fuse_system::detonate_fuses(const logic_step step) {
-	auto& cosmos = step.cosm;
+	auto& cosmos = step.get_cosmos();
 	const auto delta = step.get_delta();
 	const auto now = cosmos.get_timestamp();
 
@@ -30,7 +31,7 @@ void hand_fuse_system::detonate_fuses(const logic_step step) {
 				if (maybe_explosive != nullptr) {
 					const auto explosion_location = it.get_logic_transform();
 					maybe_explosive->explosion.instantiate(step, explosion_location, entity_id());
-					step.transient.messages.post(messages::queue_destruction(it));
+					step.post_message(messages::queue_destruction(it));
 				}
 			}
 		}

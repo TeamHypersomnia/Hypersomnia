@@ -18,11 +18,12 @@
 
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/logic_step.h"
+#include "game/transcendental/data_living_one_step.h"
 
 using namespace augs;
 
 void intent_contextualization_system::contextualize_use_button_intents(const logic_step step) {
-	auto& cosmos = step.cosm;
+	auto& cosmos = step.get_cosmos();
 	const auto delta = step.get_delta();
 	auto& intents = step.transient.messages.get_queue<messages::intent_message>();
 	
@@ -53,7 +54,7 @@ void intent_contextualization_system::contextualize_use_button_intents(const log
 }
 
 void intent_contextualization_system::contextualize_crosshair_action_intents(const logic_step step) {
-	auto& cosmos = step.cosm;
+	auto& cosmos = step.get_cosmos();
 	const auto& delta = step.get_delta();
 
 	{
@@ -128,7 +129,7 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(con
 }
 
 void intent_contextualization_system::contextualize_movement_intents(const logic_step step) {
-	auto& cosmos = step.cosm;
+	auto& cosmos = step.get_cosmos();
 	const auto& delta = step.get_delta();
 	auto& intents = step.transient.messages.get_queue<messages::intent_message>();
 

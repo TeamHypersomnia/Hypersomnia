@@ -1,6 +1,7 @@
 #include "sound_existence_system.h"
 #include "game/transcendental/logic_step.h"
 #include "game/transcendental/cosmos.h"
+#include "game/transcendental/data_living_one_step.h"
 #include "game/messages/queue_destruction.h"
 
 #include "game/detail/entity_scripts.h"
@@ -56,7 +57,7 @@ float components::sound_existence::calculate_max_audible_distance() const {
 }
 
 void sound_existence_system::destroy_dead_sounds(const logic_step step) const {
-	auto& cosmos = step.cosm;
+	auto& cosmos = step.get_cosmos();
 	const auto timestamp = cosmos.get_timestamp();
 
 	cosmos.for_each(
@@ -68,7 +69,7 @@ void sound_existence_system::destroy_dead_sounds(const logic_step step) const {
 
 			if (repetitions > -1 && (timestamp - existence.time_of_birth).step > existence.max_lifetime_in_steps * repetitions) {
 				if (existence.input.delete_entity_after_effect_lifetime) {
-					step.transient.messages.post(messages::queue_destruction(it));
+					step.post_message(messages::queue_destruction(it));
 				}
 				else {
 					components::sound_existence::deactivate(it);
@@ -86,7 +87,7 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 	const auto& swings = step.transient.messages.get_queue<messages::melee_swing_response>();
 	const auto& healths = step.transient.messages.get_queue<messages::health_event>();
 	const auto& exhausted_casts = step.transient.messages.get_queue<messages::exhausted_cast>();
-	auto& cosmos = step.cosm;
+	auto& cosmos = step.get_cosmos();
 
 	for (size_t i = 0; i < collisions.size(); ++i) {
 		const auto& c = collisions[i];
@@ -101,8 +102,8 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 			const auto subject_coll = subject_fix.get_raw_component();
 			const auto collider_coll = collider_fix.get_raw_component();
 			
-			const auto* const subject_coll_material = step.input.logical_assets.find(subject_coll.material);
-			const auto* const collider_coll_material = step.input.logical_assets.find(collider_coll.material);
+			const auto* const subject_coll_material = step.get_logical_assets().find(subject_coll.material);
+			const auto* const collider_coll_material = step.get_logical_assets().find(collider_coll.material);
 
 			if (
 				subject_coll_material != nullptr

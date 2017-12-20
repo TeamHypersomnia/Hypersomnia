@@ -13,6 +13,7 @@
 
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/logic_step.h"
+#include "game/transcendental/data_living_one_step.h"
 
 vec2 components::crosshair::get_bounds_in_this_look() const {
 	if (orbit_mode == ANGLED) {
@@ -26,7 +27,7 @@ vec2 components::crosshair::get_bounds_in_this_look() const {
 }
 
 void crosshair_system::generate_crosshair_intents(const logic_step step) {
-	auto& cosmos = step.cosm;
+	auto& cosmos = step.get_cosmos();
 	const auto delta = step.get_delta();
 
 	{
@@ -57,7 +58,7 @@ void crosshair_system::generate_crosshair_intents(const logic_step step) {
 			crosshair_motion.crosshair_base_offset = base_offset;
 			crosshair_motion.crosshair_world_pos = base_offset + cosmos[crosshair.character_entity_to_chase].get_logic_transform().pos;
 
-			step.transient.messages.post(crosshair_motion);
+			step.post_message(crosshair_motion);
 		}
 	}
 
@@ -86,7 +87,7 @@ void crosshair_system::generate_crosshair_intents(const logic_step step) {
 }
 
 void crosshair_system::apply_crosshair_intents_to_base_offsets(const logic_step step) {
-	auto& cosmos = step.cosm;
+	auto& cosmos = step.get_cosmos();
 	const auto& delta = step.get_delta();
 	const auto& events = step.transient.messages.get_queue<messages::crosshair_motion_message>();
 
@@ -96,7 +97,7 @@ void crosshair_system::apply_crosshair_intents_to_base_offsets(const logic_step 
 }
 
 void crosshair_system::apply_base_offsets_to_crosshair_transforms(const logic_step step) {
-	auto& cosmos = step.cosm;
+	auto& cosmos = step.get_cosmos();
 	const auto& delta = step.get_delta();
 	
 	cosmos.for_each(

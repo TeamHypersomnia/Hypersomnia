@@ -6,6 +6,7 @@
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/logic_step.h"
+#include "game/transcendental/data_living_one_step.h"
 
 #include "game/components/trace_component.h"
 #include "game/components/render_component.h"
@@ -21,9 +22,9 @@
 #include "game/messages/will_soon_be_deleted.h"
 
 void trace_system::lengthen_sprites_of_traces(const logic_step step) const {
-	auto& cosmos = step.cosm;
+	auto& cosmos = step.get_cosmos();
 	const auto delta = step.get_delta();
-	const auto& metas = step.input.logical_assets;
+	const auto& metas = step.get_logical_assets();
 
 	cosmos.for_each(
 		processing_subjects::WITH_TRACE,
@@ -57,7 +58,7 @@ void trace_system::lengthen_sprites_of_traces(const logic_step step) const {
 }
 
 void trace_system::destroy_outdated_traces(const logic_step step) const {
-	auto& cosmos = step.cosm;
+	auto& cosmos = step.get_cosmos();
 
 	cosmos.for_each(
 		processing_subjects::WITH_TRACE,
@@ -68,7 +69,7 @@ void trace_system::destroy_outdated_traces(const logic_step step) const {
 				trace.lengthening_time_passed_ms = trace.chosen_lengthening_duration_ms;
 
 				if (trace.is_it_a_finishing_trace) {
-					step.transient.messages.post(messages::queue_destruction(t));
+					step.post_message(messages::queue_destruction(t));
 				}
 			}
 		}
@@ -76,9 +77,9 @@ void trace_system::destroy_outdated_traces(const logic_step step) const {
 }
 
 void trace_system::spawn_finishing_traces_for_deleted_entities(const logic_step step) const {
-	auto& cosmos = step.cosm;
+	auto& cosmos = step.get_cosmos();
 	const auto& events = step.transient.messages.get_queue<messages::will_soon_be_deleted>();
-	const auto& metas = step.input.logical_assets;
+	const auto& metas = step.get_logical_assets();
 
 	for (const auto& it : events) {
 		const auto deleted_entity = cosmos[it.subject];
@@ -124,7 +125,7 @@ void trace_system::spawn_finishing_traces_for_deleted_entities(const logic_step 
 			request.subject = finishing_trace;
 			request.set_previous_transform_from = deleted_entity;
 
-			step.transient.messages.post(request);
+			step.post_message(request);
 		}
 	}
 }

@@ -14,7 +14,7 @@
 #include "game/transcendental/logic_step.h"
 
 void force_joint_system::apply_forces_towards_target_entities(const logic_step step) {
-	auto& cosmos = step.cosm;
+	auto& cosmos = step.get_cosmos();
 	const auto delta = step.get_delta();
 
 	cosmos.for_each(

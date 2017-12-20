@@ -6,10 +6,10 @@
 
 namespace prefabs {
 	entity_handle create_crate(const logic_step step, const components::transform pos, vec2i size) {
-		const auto crate = step.cosm.create_entity("crate");
+		const auto crate = step.get_cosmos().create_entity("crate");
 		
 		if (size.is_zero()) {
-			size = step.input.logical_assets.at(assets::game_image_id::CRATE).get_size();
+			size = step.get_logical_assets().at(assets::game_image_id::CRATE).get_size();
 		}
 
 		ingredients::add_sprite_scaled(crate, size, assets::game_image_id::CRATE, white, render_layer::DYNAMIC_BODY);
@@ -24,10 +24,10 @@ namespace prefabs {
 	}
 
 	entity_handle create_brick_wall(const logic_step step, const components::transform pos, vec2i size) {
-		const auto crate = step.cosm.create_entity("brick_wall");
+		const auto crate = step.get_cosmos().create_entity("brick_wall");
 		
 		if (size.is_zero()) {
-			size = step.input.logical_assets.at(assets::game_image_id::CRATE).get_size();
+			size = step.get_logical_assets().at(assets::game_image_id::CRATE).get_size();
 		}
 
 		ingredients::add_sprite_scaled(crate, size, assets::game_image_id::BRICK_WALL, white, render_layer::DYNAMIC_BODY);

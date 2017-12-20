@@ -19,8 +19,8 @@ public:
 		F callback_for_created_component
 	) const {
 		const auto& handle = *static_cast<const entity_handle_type*>(this);
-		const auto& cosmos = step.cosm;
-		const auto& metas = step.input.logical_assets;
+		const auto& cosmos = step.get_cosmos();
+		const auto& metas = step.get_logical_assets();
 
 		if (handle.template has<components::sprite>()) {
 			const auto& cosm = handle.get_cosmos();

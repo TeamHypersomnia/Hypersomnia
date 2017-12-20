@@ -12,7 +12,7 @@ bool ultimate_wrath_of_the_aeons_instance::are_additional_conditions_for_casting
 }
 
 void ultimate_wrath_of_the_aeons_instance::perform_logic(const spell_logic_input in) {
-	auto& cosmos = in.step.cosm;
+	auto& cosmos = in.step.get_cosmos();
 	const auto& spell_data = std::get<ultimate_wrath_of_the_aeons>(cosmos.get_common_state().spells);
 	const auto caster = in.subject;
 	const auto caster_transform = caster.get_logic_transform();

@@ -37,7 +37,6 @@
 #include "game/transcendental/cosmos_significant_state.h"
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
-#include "game/transcendental/data_living_one_step.h"
 
 #include "game/assets/behaviour_tree.h"
 
@@ -86,6 +85,7 @@ public:
 	cosmos_significant_state significant;
 	all_inferred_caches inferred;
 
+	/* A detail only for performance benchmarks */
 	mutable cosmic_profiler profiler;
 	
 	/* State of the cosmos ends here *****************************/
@@ -100,27 +100,6 @@ public:
 	entity_handle create_entity(const std::string& name);
 	entity_handle clone_entity(const entity_id);
 	void delete_entity(const entity_id);
-
-	template <class Pre, class Post, class PostCleanup>
-	void advance(
-		const logic_step_input input,
-		Pre pre_solve,
-		Post post_solve,
-		PostCleanup post_cleanup
-	) {
-		thread_local data_living_one_step queues;
-		logic_step step(*this, input, queues);
-
-		auto scope = augs::make_scope_guard([](){
-			queues.clear();
-		});
-
-		pre_solve(step);
-		advance_systems(step);
-		post_solve(const_logic_step(step));
-		perform_deletions(step);
-		post_cleanup(const_logic_step(step));
-	}
 
 	template <class F>
 	void for_each(
@@ -183,6 +162,8 @@ public:
 	void refresh_for_new_significant_state();
 	void remap_guids();
 	void clear();
+
+	void increment_step();
 
 	entity_id make_versioned(const unversioned_entity_id) const;
 

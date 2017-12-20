@@ -3,19 +3,20 @@
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/logic_step.h"
 #include "game/transcendental/entity_handle.h"
+#include "game/transcendental/data_living_one_step.h"
 
 #include "game/stateless_systems/physics_system.h"
 
 void physics_system::post_and_clear_accumulated_collision_messages(const logic_step step) {
-	auto& cosmos = step.cosm;
+	auto& cosmos = step.get_cosmos();
 	auto& physics = cosmos.inferred.physics;
 	
-	step.transient.messages.post(physics.accumulated_messages);
+	step.post_message(physics.accumulated_messages);
 	physics.accumulated_messages.clear();
 }
 
 void physics_system::step_and_set_new_transforms(const logic_step step) {
-	auto& cosmos = step.cosm;
+	auto& cosmos = step.get_cosmos();
 	auto& physics = cosmos.inferred.physics;
 
 	const auto delta = step.get_delta();

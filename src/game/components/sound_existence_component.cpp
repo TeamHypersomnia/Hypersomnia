@@ -11,7 +11,7 @@ entity_handle sound_existence_input::create_sound_effect_entity(
 	const components::transform place_of_birth,
 	const entity_id chased_subject_id
 ) const {
-	auto& cosmos = step.cosm;
+	auto& cosmos = step.get_cosmos();
 
 	const auto new_sound_entity = cosmos.create_entity("particle_stream");
 	new_sound_entity += place_of_birth;
@@ -20,7 +20,7 @@ entity_handle sound_existence_input::create_sound_effect_entity(
 	existence.input = *this;
 	existence.time_of_birth = cosmos.get_timestamp();
 
-	const auto* const info = step.input.logical_assets.find(effect.id);
+	const auto* const info = step.get_logical_assets().find(effect.id);
 
 	if (info == nullptr) {
 		return cosmos[entity_id()];

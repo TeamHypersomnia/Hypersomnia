@@ -10,6 +10,7 @@
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/logic_step.h"
 #include "game/transcendental/entity_id.h"
+#include "game/transcendental/data_living_one_step.h"
 
 #include "game/components/rigid_body_component.h"
 #include "game/components/container_component.h"
@@ -31,14 +32,14 @@
 #include "game/stateless_systems/driver_system.h"
 
 void sentience_system::cast_spells(const logic_step step) const {
-	auto& cosmos = step.cosm;
-	const auto& spell_metas = step.cosm.get_common_state().spells;
+	auto& cosmos = step.get_cosmos();
+	const auto& spell_metas = step.get_common().spells;
 	const auto now = cosmos.get_timestamp();
 	const auto delta = cosmos.get_fixed_delta();
 
 	constexpr float standard_cooldown_for_all_spells_ms = 2000.f;
 
-	for (const auto& cast : step.input.entropy.cast_spells_per_entity) {
+	for (const auto& cast : step.get_entropy().cast_spells_per_entity) {
 		const auto subject = cosmos[cast.first];
 		const auto spell = cast.second;
 
@@ -86,7 +87,7 @@ void sentience_system::cast_spells(const logic_step step) const {
 							msg.subject = subject;
 							msg.transform = subject.get_logic_transform();
 
-							step.transient.messages.post(msg);
+							step.post_message(msg);
 							
 							sentience.time_of_last_exhausted_cast = now;
 						}
@@ -98,14 +99,14 @@ void sentience_system::cast_spells(const logic_step step) const {
 }
 
 void sentience_system::regenerate_values_and_advance_spell_logic(const logic_step step) const {
-	const auto now = step.cosm.get_timestamp();
-	auto& cosmos = step.cosm;
+	const auto now = step.get_cosmos().get_timestamp();
+	auto& cosmos = step.get_cosmos();
 	const auto delta = cosmos.get_fixed_delta();
 
 	const auto regeneration_frequency_in_steps = static_cast<unsigned>(1 / delta.in_seconds() * 3);
 	const auto consciousness_regeneration_frequency_in_steps = static_cast<unsigned>(1 / delta.in_seconds() * 2);
 	const auto pe_regeneration_frequency_in_steps = static_cast<unsigned>(1 / delta.in_seconds() * 3);
-	const auto& metas = step.input.logical_assets;
+	const auto& metas = step.get_logical_assets();
 
 	cosmos.for_each(
 		processing_subjects::WITH_SENTIENCE,
@@ -184,7 +185,7 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 }
 
 void sentience_system::consume_health_event(messages::health_event h, const logic_step step) const {
-	auto& cosmos = step.cosm;
+	auto& cosmos = step.get_cosmos();
 	const auto subject = cosmos[h.subject];
 	const auto now = cosmos.get_timestamp();
 	auto& sentience = subject.get<components::sentience>();
@@ -320,12 +321,12 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 		);
 	}
 
-	step.transient.messages.post(h);
+	step.post_message(h);
 }
 
 void sentience_system::apply_damage_and_generate_health_events(const logic_step step) const {
 	const auto& damages = step.transient.messages.get_queue<messages::damage_message>();
-	auto& cosmos = step.cosm;
+	auto& cosmos = step.get_cosmos();
 	const auto now = cosmos.get_timestamp();
 	const auto delta = cosmos.get_fixed_delta();
 
@@ -453,7 +454,7 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 }
 
 void sentience_system::cooldown_aimpunches(const logic_step step) const {
-	const auto& cosmos = step.cosm;
+	const auto& cosmos = step.get_cosmos();
 
 	cosmos.for_each(
 		processing_subjects::WITH_SENTIENCE,
@@ -480,7 +481,7 @@ TEST_CASE("SentienceSystem", "SentienceMeters") {
 		c1.advance(
 		{},
 			[](const logic_step step) {
-			//step.transient.messages.post
+			//step.post_message
 		},
 			[](auto...) {
 

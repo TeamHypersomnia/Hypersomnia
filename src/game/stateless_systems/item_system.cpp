@@ -32,6 +32,7 @@
 
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/logic_step.h"
+#include "game/transcendental/data_living_one_step.h"
 #include "game/enums/item_transfer_result_type.h"
 
 #include "game/detail/physics/physics_scripts.h"
@@ -39,7 +40,7 @@
 
 void item_system::start_picking_up_items(const logic_step step) {
 	const auto& intents = step.transient.messages.get_queue<messages::intent_message>();
-	auto& cosm = step.cosm;
+	auto& cosm = step.get_cosmos();
 
 	for (const auto& i : intents) {
 		if (i.intent == game_intent_type::START_PICKING_UP_ITEMS) {
@@ -53,7 +54,7 @@ void item_system::start_picking_up_items(const logic_step step) {
 }
 
 void item_system::pick_up_touching_items(const logic_step step) {
-	auto& cosmos = step.cosm;
+	auto& cosmos = step.get_cosmos();
 	const auto& delta = step.get_delta();
 	const auto& collisions = step.transient.messages.get_queue<messages::collision_message>();
 
@@ -111,7 +112,7 @@ void item_system::pick_up_touching_items(const logic_step step) {
 }
 
 void item_system::handle_throw_item_intents(const logic_step step) {
-	auto& cosmos = step.cosm;
+	auto& cosmos = step.get_cosmos();
 	const auto& delta = step.get_delta();
 	const auto& requests = step.transient.messages.get_queue<messages::intent_message>();
 
@@ -163,7 +164,7 @@ void components::item_slot_transfers::interrupt_mounting() {
 void item_system::process_mounting_and_unmounting(const logic_step step) {
 	ensure(false);
 	
-	auto& cosmos = step.cosm;
+	auto& cosmos = step.get_cosmos();
 	const auto delta = step.get_delta();
 	
 	cosmos.for_each(

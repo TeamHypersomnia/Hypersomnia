@@ -401,7 +401,6 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/enums/filters.cpp"
 	"src/game/detail/describers.cpp"
 	"src/game/detail/names_and_descriptions.cpp"
-	"src/game/transcendental/logic_step.cpp"
 	"src/game/transcendental/cosmos_significant_state.cpp"
 	"src/view/network/simulation_broadcast.cpp"
 	"src/view/network/simulation_receiver.cpp"
@@ -506,6 +505,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/augs/readwrite/readwrite_tests.cpp"
 	"src/game/components/trace_component.cpp"
 	"src/game/stateless_systems/physics_system.cpp"
+	"src/game/transcendental/standard_solver.cpp"
 )
 
 if(BUILD_WINDOW_FRAMEWORK)

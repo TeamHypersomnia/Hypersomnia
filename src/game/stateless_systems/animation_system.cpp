@@ -11,6 +11,7 @@
 
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/logic_step.h"
+#include "game/transcendental/data_living_one_step.h"
 #include "game/assets/all_logical_assets.h"
 
 using namespace augs;
@@ -18,14 +19,14 @@ using namespace augs;
 using namespace messages;
 
 void animation_system::game_responses_to_animation_messages(const logic_step step) {
-	auto& cosmos = step.cosm;
+	auto& cosmos = step.get_cosmos();
 	const auto& delta = step.get_delta();
 	const auto& movements = step.transient.messages.get_queue<movement_event>();
 	const auto& gunshots = step.transient.messages.get_queue<gunshot_response>();
 }
 
 void animation_system::handle_animation_messages(const logic_step step) {
-	auto& cosmos = step.cosm;
+	auto& cosmos = step.get_cosmos();
 	const auto& delta = step.get_delta();
 	const auto& events = step.transient.messages.get_queue<animation_message>();
 
@@ -96,8 +97,8 @@ void components::animation::set_current_frame(const unsigned number) {
 }
 
 void animation_system::progress_animation_states(const logic_step step) {
-	auto& cosmos = step.cosm;
-	const auto& metas = step.input.logical_assets;
+	auto& cosmos = step.get_cosmos();
+	const auto& metas = step.get_logical_assets();
 	const auto& delta = step.get_delta();
 
 	cosmos.for_each(

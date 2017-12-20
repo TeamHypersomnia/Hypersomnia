@@ -11,11 +11,11 @@ entity_handle particles_existence_input::create_particle_effect_entity(
 	const components::transform place_of_birth,
 	const entity_id chased_subject
 ) const {
-	if (step.input.logical_assets.find(effect.id) == nullptr) {
-		return step.cosm[entity_id()];
+	if (step.get_logical_assets().find(effect.id) == nullptr) {
+		return step.get_cosmos()[entity_id()];
 	}
 
-	const entity_handle new_stream_entity = step.cosm.create_entity("particle_stream");
+	const entity_handle new_stream_entity = step.get_cosmos().create_entity("particle_stream");
 
 	create_particle_effect_components(
 		new_stream_entity += components::transform(),
@@ -37,7 +37,7 @@ void particles_existence_input::create_particle_effect_components(
 	const components::transform place_of_birth,
 	const entity_id chased_subject_id
 ) const {
-	auto& cosmos = step.cosm;
+	auto& cosmos = step.get_cosmos();
 	
 	out_transform = place_of_birth;
 
@@ -46,7 +46,7 @@ void particles_existence_input::create_particle_effect_components(
 	out_existence.time_of_last_displacement = cosmos.get_timestamp();
 	out_existence.current_displacement_duration_bound_ms = 0;
 
-	const auto duration_ms = step.input.logical_assets.at(effect.id).max_duration_ms;
+	const auto duration_ms = step.get_logical_assets().at(effect.id).max_duration_ms;
 	out_existence.max_lifetime_in_steps = static_cast<unsigned>(duration_ms / cosmos.get_fixed_delta().in_milliseconds()) + 1u;
 
 	const auto chased_subject = cosmos[chased_subject_id];

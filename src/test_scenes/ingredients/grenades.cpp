@@ -20,8 +20,8 @@
 
 namespace prefabs {
 	entity_handle create_force_grenade(const logic_step step, vec2 pos) {
-		auto& world = step.cosm;
-		const auto& metas = step.input.logical_assets;
+		auto& world = step.get_cosmos();
+		const auto& metas = step.get_logical_assets();
 		const auto grenade_entity = world.create_entity("Force grenade");
 
 		auto& sender = grenade_entity += components::sender();
@@ -66,8 +66,8 @@ namespace prefabs {
 	}
 
 	entity_handle create_ped_grenade(const logic_step step, vec2 pos) {
-		auto& world = step.cosm;
-		const auto& metas = step.input.logical_assets;
+		auto& world = step.get_cosmos();
+		const auto& metas = step.get_logical_assets();
 		const auto grenade_entity = world.create_entity("PED grenade");
 
 		auto& sender = grenade_entity += components::sender();
@@ -113,8 +113,8 @@ namespace prefabs {
 	}
 
 	entity_handle create_interference_grenade(const logic_step step, vec2 pos) {
-		auto& world = step.cosm;
-		const auto& metas = step.input.logical_assets;
+		auto& world = step.get_cosmos();
+		const auto& metas = step.get_logical_assets();
 		const auto grenade_entity = world.create_entity("Interference grenade");
 		
 		auto& sender = grenade_entity += components::sender();

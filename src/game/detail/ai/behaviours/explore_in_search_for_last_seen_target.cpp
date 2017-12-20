@@ -13,7 +13,7 @@ namespace behaviours {
 	tree::goal_availability explore_in_search_for_last_seen_target::goal_resolution(tree::state_of_traversal& t) const {
 		auto subject = t.subject;
 		auto& attitude = subject.get<components::attitude>();
-		auto currently_attacked_visible_entity = t.step.cosm[attitude.currently_attacked_visible_entity];
+		auto currently_attacked_visible_entity = t.step.get_cosmos()[attitude.currently_attacked_visible_entity];
 
 		if (currently_attacked_visible_entity.dead() && attitude.is_alert && attitude.last_seen_target_position_inspected) {
 			return tree::goal_availability::SHOULD_EXECUTE;

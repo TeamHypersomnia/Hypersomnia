@@ -24,8 +24,8 @@ void release_or_throw_fused_object(
 	const entity_id thrower_id,
 	bool is_pressed_flag
 ) {
-	auto& cosmos = step.cosm;
-	const auto& metas = step.input.logical_assets;
+	auto& cosmos = step.get_cosmos();
+	const auto& metas = step.get_logical_assets();
 	const auto now = cosmos.get_timestamp();
 	const auto delta = step.get_delta();
 	const auto thrower = cosmos[thrower_id];

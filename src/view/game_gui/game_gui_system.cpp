@@ -7,6 +7,7 @@
 #include "game/detail/inventory/inventory_utils.h"
 
 #include "game/transcendental/entity_handle.h"
+#include "game/transcendental/data_living_one_step.h"
 #include "game/transcendental/cosmos.h"
 
 #include "game/components/container_component.h"
@@ -402,7 +403,7 @@ void game_gui_system::rebuild_layouts(
 }
 
 void game_gui_system::standard_post_solve(const const_logic_step step) {
-	const auto& cosmos = step.cosm;
+	const auto& cosmos = step.get_cosmos();
 
 	for (const auto& pickup : step.transient.messages.get_queue<messages::item_picked_up_message>()) {
 		get_character_gui(pickup.subject).assign_item_to_first_free_hotbar_button(
@@ -414,7 +415,7 @@ void game_gui_system::standard_post_solve(const const_logic_step step) {
 
 void game_gui_system::standard_post_cleanup(const const_logic_step step) {
 	if (step.any_deletion_occured()) {
-		clear_dead_entities(step.cosm);
+		clear_dead_entities(step.get_cosmos());
 	}
 }
 

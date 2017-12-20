@@ -30,8 +30,8 @@
 
 namespace test_scenes {
 	void testbed::populate(const logic_step step) {
-		auto& world = step.cosm;
-		const auto& metas = step.input.logical_assets;
+		auto& world = step.get_cosmos();
+		const auto& metas = step.get_logical_assets();
 		
 		//const auto crate = prefabs::create_crate(step, vec2(200, 200 + 300), vec2i(100, 100) / 3);
 		//const auto crate2 = prefabs::create_crate(step, vec2(400, 200 + 400), vec2i(300, 300));

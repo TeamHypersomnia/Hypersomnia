@@ -49,7 +49,7 @@ namespace ingredients {
 		body.fixed_rotation = false;
 		body.angled_damping = true;
 		body.allow_sleep = false;
-		const auto si = step.cosm.get_si();
+		const auto si = step.get_cosmos().get_si();
 
 		body.set_transform(si, spawn_transform);
 
@@ -148,12 +148,12 @@ namespace prefabs {
 		const std::string name,
 		const int create_arm_count
 	) {
-		auto& world = step.cosm;
+		auto& world = step.get_cosmos();
 
 		const auto character = world.create_entity(name);
 
 		
-		const auto& metas = step.input.logical_assets;
+		const auto& metas = step.get_logical_assets();
 		const auto crosshair = create_character_crosshair(step);
 		crosshair.get<components::crosshair>().character_entity_to_chase = character;
 		crosshair.set_logic_transform(step, spawn_transform.pos);
@@ -188,11 +188,11 @@ namespace prefabs {
 	}
 
 	entity_handle create_character_crosshair(const logic_step step) {
-		auto& world = step.cosm;
+		auto& world = step.get_cosmos();
 		auto root = world.create_entity("crosshair");
 		auto recoil = world.create_entity("crosshair_recoil_body");
 		auto zero_target = world.create_entity("zero_target");
-		const auto& metas = step.input.logical_assets;
+		const auto& metas = step.get_logical_assets();
 
 		{
 			auto& sprite = root += components::sprite();

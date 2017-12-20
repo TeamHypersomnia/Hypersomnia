@@ -1,6 +1,7 @@
 #include "augs/misc/randomization.h"
 #include "game/transcendental/logic_step.h"
 #include "game/transcendental/cosmos.h"
+#include "game/transcendental/data_living_one_step.h"
 
 #include "game/components/missile_component.h"
 #include "game/components/render_component.h"
@@ -46,7 +47,7 @@ void components::particles_existence::deactivate(const entity_handle h) {
 }
 
 void particles_existence_system::displace_streams_and_destroy_dead_streams(const logic_step step) const {
-	auto& cosmos = step.cosm;
+	auto& cosmos = step.get_cosmos();
 	const auto timestamp = cosmos.get_timestamp();
 
 	cosmos.for_each(
@@ -68,7 +69,7 @@ void particles_existence_system::displace_streams_and_destroy_dead_streams(const
 
 			if ((timestamp - existence.time_of_birth).step > existence.max_lifetime_in_steps) {
 				if (existence.input.delete_entity_after_effect_lifetime) {
-					step.transient.messages.post(messages::queue_destruction(it));
+					step.post_message(messages::queue_destruction(it));
 				}
 				else {
 					components::particles_existence::deactivate(it);
@@ -85,7 +86,7 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 	const auto& swings = step.transient.messages.get_queue<messages::melee_swing_response>();
 	const auto& healths = step.transient.messages.get_queue<messages::health_event>();
 	const auto& exhausted_casts = step.transient.messages.get_queue<messages::exhausted_cast>();
-	auto& cosmos = step.cosm;
+	auto& cosmos = step.get_cosmos();
 
 	for (const auto& g : gunshots) {
 		for (auto& r : g.spawned_rounds) {
@@ -175,7 +176,7 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 				ring.color = burst.effect.modifier.colorize;
 				ring.center = place_of_birth.pos;
 
-				step.transient.messages.post(ring);
+				step.post_message(ring);
 			}
 		}
 	}

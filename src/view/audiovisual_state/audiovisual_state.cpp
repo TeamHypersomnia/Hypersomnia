@@ -4,6 +4,7 @@
 #include "game/components/fixtures_component.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/logic_step.h"
+#include "game/transcendental/data_living_one_step.h"
 #include "game/detail/visible_entities.h"
 #include "game/transcendental/cosmos.h"
 
@@ -98,7 +99,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 }
 
 void audiovisual_state::spread_past_infection(const const_logic_step step) {
-	const auto& cosm = step.cosm;
+	const auto& cosm = step.get_cosmos();
 
 	const auto& events = step.transient.messages.get_queue<messages::collision_message>();
 
@@ -117,7 +118,7 @@ void audiovisual_state::spread_past_infection(const const_logic_step step) {
 void audiovisual_state::standard_post_solve(const const_logic_step step) {
 	auto scope = measure_scope(profiler.post_solve);
 
-	const auto& cosmos = step.cosm;
+	const auto& cosmos = step.get_cosmos();
 	reserve_caches_for_entities(cosmos.get_entity_pool().capacity());
 
 	const auto& healths = step.transient.messages.get_queue<messages::health_event>();
@@ -385,7 +386,7 @@ void audiovisual_state::standard_post_cleanup(const const_logic_step step) {
 	auto scope = measure_scope(profiler.post_cleanup);
 
 	if (step.any_deletion_occured()) {
-		clear_dead_entities(step.cosm);
+		clear_dead_entities(step.get_cosmos());
 	}
 }
 

@@ -12,7 +12,7 @@
 using namespace augs;
 
 void behaviour_tree_system::evaluate_trees(const logic_step step) {
-	auto& cosmos = step.cosm;
+	auto& cosmos = step.get_cosmos();
 
 	cosmos.for_each(
 		processing_subjects::WITH_BEHAVIOUR_TREE, 

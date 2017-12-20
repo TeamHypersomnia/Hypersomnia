@@ -16,7 +16,7 @@
 
 namespace test_scenes {
 	void minimal_scene::populate(const logic_step step) {
-		auto& world = step.cosm;
+		auto& world = step.get_cosmos();
 
 		//prefabs::create_force_grenade(step, { 254, 611 });
 		//prefabs::create_force_grenade(step, { 254, 711 });

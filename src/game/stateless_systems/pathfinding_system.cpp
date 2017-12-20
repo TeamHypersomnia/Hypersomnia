@@ -3,6 +3,7 @@
 
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/logic_step.h"
+#include "game/transcendental/data_living_one_step.h"
 
 #include "game/inferred_caches/physics_world_cache.h"
 
@@ -18,7 +19,7 @@
 #include "game/debug_drawing_settings.h"
 
 void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
-	auto& cosmos = step.cosm;
+	auto& cosmos = step.get_cosmos();
 	const auto si = cosmos.get_si();
 	const auto& settings = cosmos.significant.common.pathfinding;
 

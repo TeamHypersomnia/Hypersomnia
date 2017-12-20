@@ -11,7 +11,7 @@
 namespace behaviours {
 	tree::goal_availability navigate_to_last_seen_position_of_target::goal_resolution(tree::state_of_traversal& t) const {
 		auto subject = t.subject;
-		auto& cosmos = t.step.cosm;
+		auto& cosmos = t.step.get_cosmos();
 		auto& attitude = subject.get<components::attitude>();
 		auto currently_attacked_visible_entity = cosmos[attitude.currently_attacked_visible_entity];
 

@@ -13,6 +13,7 @@
 
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/logic_step.h"
+#include "game/transcendental/data_living_one_step.h"
 
 #include "game/stateless_systems/sentience_system.h"
 
@@ -21,7 +22,7 @@
 using namespace augs;
 
 void movement_system::set_movement_flags_from_input(const logic_step step) {
-	auto& cosmos = step.cosm;
+	auto& cosmos = step.get_cosmos();
 	const auto& delta = step.get_delta();
 	const auto& events = step.transient.messages.get_queue<messages::intent_message>();
 
@@ -166,7 +167,7 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 }
 
 void movement_system::generate_movement_events(const logic_step step) {
-	auto& cosmos = step.cosm;
+	auto& cosmos = step.get_cosmos();
 	const auto& delta = step.get_delta();
 
 	cosmos.for_each(
@@ -191,7 +192,7 @@ void movement_system::generate_movement_events(const logic_step step) {
 				messages::movement_event copy(msg);
 				copy.stop_response_at_zero_speed = receiver.stop_response_at_zero_speed;
 				copy.subject = receiver.target;
-				step.transient.messages.post(copy);
+				step.post_message(copy);
 			}
 		}
 	);

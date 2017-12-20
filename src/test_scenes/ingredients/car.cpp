@@ -28,8 +28,8 @@
 
 namespace prefabs {
 	entity_handle create_car(const logic_step step, const components::transform& spawn_transform) {
-		auto& world = step.cosm;
-		const auto& metas = step.input.logical_assets;
+		auto& world = step.get_cosmos();
+		const auto& metas = step.get_logical_assets();
 
 		auto front = world.create_entity("front");
 		auto interior = world.create_entity("interior");

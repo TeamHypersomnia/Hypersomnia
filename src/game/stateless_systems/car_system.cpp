@@ -5,6 +5,7 @@
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/logic_step.h"
+#include "game/transcendental/data_living_one_step.h"
 
 #include "game/messages/intent_message.h"
 
@@ -19,7 +20,7 @@
 #include "game/stateless_systems/car_system.h"
 
 void car_system::set_steering_flags_from_intents(const logic_step step) {
-	auto& cosmos = step.cosm;
+	auto& cosmos = step.get_cosmos();
 	const auto delta = step.get_delta();
 	const auto& intents = step.transient.messages.get_queue<messages::intent_message>();
 
@@ -54,7 +55,7 @@ void car_system::set_steering_flags_from_intents(const logic_step step) {
 }
 
 void car_system::apply_movement_forces(const logic_step step) {
-	auto& cosmos = step.cosm;
+	auto& cosmos = step.get_cosmos();
 	const auto delta = step.get_delta();
 
 	cosmos.for_each(

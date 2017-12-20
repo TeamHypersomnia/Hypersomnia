@@ -13,6 +13,7 @@
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/logic_step.h"
+#include "game/transcendental/data_living_one_step.h"
 
 #include "game/stateless_systems/visibility_system.h"
 #include "game/inferred_caches/physics_world_cache.h"
@@ -129,7 +130,7 @@ void visibility_system::respond_to_visibility_information_requests(const logic_s
 	auto& los_responses = queues.get_queue<messages::line_of_sight_response>();
 	auto& vis_responses = queues.get_queue<messages::visibility_information_response>();
 
-	respond_to_visibility_information_requests(step.cosm,
+	respond_to_visibility_information_requests(step.get_cosmos(),
 		los_requests,
 		vis_requests,
 		los_responses,

@@ -12,6 +12,7 @@
 
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/logic_step.h"
+#include "game/transcendental/data_living_one_step.h"
 
 using namespace augs;
 
@@ -25,7 +26,7 @@ void components::melee::reset_weapon(const entity_handle e) {
 }
 
 void melee_system::consume_melee_intents(const logic_step step) {
-	auto& cosmos = step.cosm;
+	auto& cosmos = step.get_cosmos();
 	const auto& delta = step.get_delta();
 	const auto& events = step.transient.messages.get_queue<messages::intent_message>();
 
@@ -59,6 +60,6 @@ void melee_system::consume_melee_intents(const logic_step step) {
 }
 
 void melee_system::initiate_and_update_moves(const logic_step step) {
-	auto& cosmos = step.cosm;
+	auto& cosmos = step.get_cosmos();
 	const auto& delta = step.get_delta();
 }

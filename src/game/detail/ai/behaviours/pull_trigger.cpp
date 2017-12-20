@@ -12,7 +12,7 @@ namespace behaviours {
 	tree::goal_availability pull_trigger::goal_resolution(tree::state_of_traversal& t) const {
 		const auto subject = t.subject;
 		const auto& attitude = subject.get<components::attitude>();
-		const auto currently_attacked_visible_entity = t.step.cosm[attitude.currently_attacked_visible_entity];
+		const auto currently_attacked_visible_entity = t.step.get_cosmos()[attitude.currently_attacked_visible_entity];
 
 		if (currently_attacked_visible_entity.alive() && subject.get_wielded_guns().size() > 0) {
 			//if (crosshair_offset.degrees_between(orientation(subject)) < attitude.maximum_divergence_angle_before_shooting) {
@@ -26,7 +26,7 @@ namespace behaviours {
 	void pull_trigger::execute_leaf_goal_callback(const tree::execution_occurence o, tree::state_of_traversal& t) const {
 		const auto subject = t.subject;
 		const auto wielded = subject.get_wielded_guns();
-		auto& cosmos = t.step.cosm;
+		auto& cosmos = t.step.get_cosmos();
 
 		for (const auto w_id : wielded) {
 			const auto w = cosmos[w_id];

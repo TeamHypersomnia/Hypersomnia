@@ -3,6 +3,7 @@
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/logic_step.h"
+#include "game/transcendental/data_living_one_step.h"
 
 #include "game/messages/collision_message.h"
 #include "game/messages/damage_message.h"
@@ -12,7 +13,7 @@
 #include "game/components/shape_circle_component.h"
 
 void destruction_system::generate_damages_from_forceful_collisions(const logic_step step) const {
-	auto& cosmos = step.cosm;
+	auto& cosmos = step.get_cosmos();
 	const auto& events = step.transient.messages.get_queue<messages::collision_message>();
 
 	for (const auto& it : events) {
@@ -38,13 +39,13 @@ void destruction_system::generate_damages_from_forceful_collisions(const logic_s
 			damage_msg.impact_velocity = it.collider_impact_velocity;
 			damage_msg.point_of_impact = it.point;
 
-			step.transient.messages.post(damage_msg);
+			step.post_message(damage_msg);
 		}
 	}
 }
 
 void destruction_system::apply_damages_and_split_fixtures(const logic_step step) const {
-	auto& cosmos = step.cosm;
+	auto& cosmos = step.get_cosmos();
 	const auto delta = step.get_delta();
 	const auto& damages = step.transient.messages.get_queue<messages::damage_message>();
 

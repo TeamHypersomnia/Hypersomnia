@@ -21,9 +21,10 @@
 
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/logic_step.h"
+#include "game/transcendental/data_living_one_step.h"
 
 void driver_system::assign_drivers_who_touch_wheels(const logic_step step) {
-	auto& cosmos = step.cosm;
+	auto& cosmos = step.get_cosmos();
 	const auto& delta = step.get_delta();
 	const auto& contacts = step.transient.messages.get_queue<messages::collision_message>();
 
@@ -49,7 +50,7 @@ void driver_system::assign_drivers_who_touch_wheels(const logic_step step) {
 }
 
 void driver_system::release_drivers_due_to_ending_contact_with_wheel(const logic_step step) {
-	auto& cosmos = step.cosm;
+	auto& cosmos = step.get_cosmos();
 	const auto& delta = step.get_delta();
 	const auto& contacts = step.transient.messages.get_queue<messages::collision_message>();
 	const auto& physics = cosmos.inferred.physics;
@@ -71,7 +72,7 @@ void driver_system::release_drivers_due_to_ending_contact_with_wheel(const logic
 	}
 }
 void driver_system::release_drivers_due_to_requests(const logic_step step) {
-	auto& cosmos = step.cosm;
+	auto& cosmos = step.get_cosmos();
 	const auto& delta = step.get_delta();
 	const auto& intents = step.transient.messages.get_queue<messages::intent_message>();
 

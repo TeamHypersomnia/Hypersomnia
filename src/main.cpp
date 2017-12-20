@@ -725,7 +725,7 @@ int work(const int argc, const char* const * const argv) try {
 		game_gui.standard_post_cleanup(step);
 		
 		if (step.any_deletion_occured()) {
-			all_visible.clear_dead_entities(step.cosm);
+			all_visible.clear_dead_entities(step.get_cosmos());
 		}
 	};
 

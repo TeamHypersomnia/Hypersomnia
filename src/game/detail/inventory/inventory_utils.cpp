@@ -435,7 +435,7 @@ void perform_transfer(
 	const item_slot_transfer_request r, 
 	const logic_step step
 ) {
-	auto& cosmos = step.cosm;
+	auto& cosmos = step.get_cosmos();
 	const auto transferred_item = cosmos[r.item];
 	auto& item = transferred_item.get<components::item>();
 
@@ -498,7 +498,7 @@ void perform_transfer(
 
 	if (target_item_to_stack_with.alive()) {
 		if (whole_item_grabbed) {
-			step.transient.messages.post(messages::queue_destruction(transferred_item));
+			step.post_message(messages::queue_destruction(transferred_item));
 		}
 		else {
 			item.charges -= result.transferred_charges;
@@ -548,7 +548,7 @@ void perform_transfer(
 			if (should_fixtures_persist) {
 				const auto first_with_body = slot.get_first_ancestor_with_body_connection();
 
-				fixtures_offset = sum_attachment_offsets(step.cosm, descendant.get_address_from_root(first_with_body));
+				fixtures_offset = sum_attachment_offsets(step.get_cosmos(), descendant.get_address_from_root(first_with_body));
 				
 				if (slot->physical_behaviour == slot_physical_behaviour::CONNECT_AS_JOINTED_BODY) {
 					slot_requests_connection_of_bodies = true;
@@ -605,7 +605,7 @@ void perform_transfer(
 		messages::interpolation_correction_request request;
 		request.subject = descendant;
 		request.set_previous_transform_value = target_transform;
-		step.transient.messages.post(request);
+		step.post_message(request);
 
 		return recursive_callback_result::CONTINUE_AND_RECURSE;
 	};
@@ -620,7 +620,7 @@ void perform_transfer(
 		msg.subject = target_capability;
 		msg.item = grabbed_item_part_handle;
 
-		step.transient.messages.post(msg);
+		step.post_message(msg);
 	}
 	
 	auto& grabbed_item = grabbed_item_part_handle.get<components::item>();

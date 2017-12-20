@@ -22,7 +22,7 @@ namespace behaviours {
 		if (occ == tree::execution_occurence::LAST)
 			return;
 
-		auto& cosmos = t.step.cosm;
+		auto& cosmos = t.step.get_cosmos();
 		auto subject = t.subject;
 		const auto subject_transform = subject.get_logic_transform();
 		auto pos = subject_transform.pos;

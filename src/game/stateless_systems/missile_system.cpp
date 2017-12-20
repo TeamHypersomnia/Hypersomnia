@@ -22,6 +22,7 @@
 
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/logic_step.h"
+#include "game/transcendental/data_living_one_step.h"
 
 #include "game/detail/physics/physics_scripts.h"
 
@@ -46,7 +47,7 @@ static void detonate_missile(
 }
 
 void missile_system::detonate_colliding_missiles(const logic_step step) {
-	auto& cosmos = step.cosm;
+	auto& cosmos = step.get_cosmos();
 	const auto delta = step.get_delta();
 	const auto now = cosmos.get_timestamp();
 	const auto& events = step.transient.messages.get_queue<messages::collision_message>();
@@ -118,7 +119,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 
 					// delete only once
 					if (missile.damage_charges_before_destruction == 0) {
-						step.transient.messages.post(messages::queue_destruction(it.collider));
+						step.post_message(messages::queue_destruction(it.collider));
 						damage_msg.inflictor_destructed = true;
 					}
 				}
@@ -128,14 +129,14 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 				damage_msg.amount = missile.damage_amount;
 				damage_msg.impact_velocity = impact_velocity;
 				damage_msg.point_of_impact = it.point;
-				step.transient.messages.post(damage_msg);
+				step.post_message(damage_msg);
 			}
 		}
 	}
 }
 
 void missile_system::detonate_expired_missiles(const logic_step step) {
-	auto& cosmos = step.cosm;
+	auto& cosmos = step.get_cosmos();
 	const auto now = cosmos.get_timestamp();
 	const auto& delta = step.get_delta();
 
@@ -161,7 +162,7 @@ void missile_system::detonate_expired_missiles(const logic_step step) {
 
 					missile.saved_point_of_impact_before_death = current_pos;
 					detonate_missile(step, current_pos, it);
-					step.transient.messages.post(messages::queue_destruction(it));
+					step.post_message(messages::queue_destruction(it));
 				}
 			}
 

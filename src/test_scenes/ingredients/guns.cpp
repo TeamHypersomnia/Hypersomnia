@@ -107,10 +107,10 @@ namespace ingredients {
 
 namespace prefabs {
 	entity_handle create_sample_magazine(const logic_step step, components::transform pos, std::string space, entity_id charge_inside_id) {
-		auto& cosmos = step.cosm;
+		auto& cosmos = step.get_cosmos();
 		auto charge_inside = cosmos[charge_inside_id];
 
-		const auto& metas = step.input.logical_assets;
+		const auto& metas = step.get_logical_assets();
 
 		auto sample_magazine = cosmos.create_entity("sample_magazine");
 		
@@ -143,10 +143,10 @@ namespace prefabs {
 	}
 
 	entity_handle create_sample_suppressor(const logic_step step, vec2 pos) {
-		auto& cosmos = step.cosm;
+		auto& cosmos = step.get_cosmos();
 		auto sample_suppressor = cosmos.create_entity("sample_suppressor");
 		
-		const auto& metas = step.input.logical_assets;
+		const auto& metas = step.get_logical_assets();
 
 		ingredients::add_sprite(metas, sample_suppressor, assets::game_image_id::SAMPLE_SUPPRESSOR, white, render_layer::SMALL_DYNAMIC_BODY);
 		ingredients::add_see_through_dynamic_body(step, sample_suppressor, pos);
@@ -162,12 +162,12 @@ namespace prefabs {
 	}
 
 	entity_handle create_damped_cyan_charge(const logic_step step, vec2 pos, int charges) {
-		auto& cosmos = step.cosm;
+		auto& cosmos = step.get_cosmos();
 		const auto cyan_charge = cosmos.create_entity("Cyan charge");
 		const auto round_definition = cosmos.create_entity("round_definition");
 		const auto shell_definition = cosmos.create_entity("shell_definition");
 
-		const auto& metas = step.input.logical_assets;
+		const auto& metas = step.get_logical_assets();
 
 		{
 			ingredients::add_sprite(metas, cyan_charge, assets::game_image_id::CYAN_CHARGE, white, render_layer::SMALL_DYNAMIC_BODY);
@@ -240,12 +240,12 @@ namespace prefabs {
 	}
 
 	entity_handle create_cyan_charge(const logic_step step, vec2 pos, int charges) {
-		auto& cosmos = step.cosm;
+		auto& cosmos = step.get_cosmos();
 		const auto cyan_charge = cosmos.create_entity("Cyan charge");
 		const auto round_definition = cosmos.create_entity("round_definition");
 		const auto shell_definition = cosmos.create_entity("shell_definition");
 		
-		const auto& metas = step.input.logical_assets;
+		const auto& metas = step.get_logical_assets();
 
 		{
 			ingredients::add_sprite(metas, cyan_charge, assets::game_image_id::CYAN_CHARGE, white, render_layer::SMALL_DYNAMIC_BODY);
@@ -312,8 +312,8 @@ namespace prefabs {
 	}
 
 	entity_handle create_sample_rifle(const logic_step step, vec2 pos, entity_id load_mag_id) {
-		auto& metas = step.input.logical_assets;
-		auto& cosmos = step.cosm;
+		const auto& metas = step.get_logical_assets();
+		auto& cosmos = step.get_cosmos();
 		auto load_mag = cosmos[load_mag_id];
 
 		auto weapon = cosmos.create_entity("Sample rifle");
@@ -376,8 +376,8 @@ namespace prefabs {
 #define OTHER_WEAPONS 1
 #if OTHER_WEAPONS
 	entity_handle create_sn69(const logic_step step, vec2 pos, entity_id load_mag_id) {
-		auto& metas = step.input.logical_assets;
-		auto& cosmos = step.cosm;
+		const auto& metas = step.get_logical_assets();
+		auto& cosmos = step.get_cosmos();
 		auto load_mag = cosmos[load_mag_id];
 
 		auto weapon = cosmos.create_entity("SN Six-Nine");
@@ -437,8 +437,8 @@ namespace prefabs {
 		return weapon;
 	}
 	entity_handle create_kek9(const logic_step step, vec2 pos, entity_id load_mag_id) {
-		auto& metas = step.input.logical_assets;
-		auto& cosmos = step.cosm;
+		const auto& metas = step.get_logical_assets();
+		auto& cosmos = step.get_cosmos();
 		auto load_mag = cosmos[load_mag_id];
 
 		auto weapon = cosmos.create_entity("SN Six-Nine");
@@ -503,8 +503,8 @@ namespace prefabs {
 		const logic_step step,
 		vec2 pos
 	) {
-		auto& metas = step.input.logical_assets;
-		auto& cosmos = step.cosm;
+		const auto& metas = step.get_logical_assets();
+		auto& cosmos = step.get_cosmos();
 		auto weapon = cosmos.create_entity("Amplifier arm");
 
 		auto& sprite = ingredients::add_sprite(metas, weapon, assets::game_image_id::AMPLIFIER_ARM, white, render_layer::SMALL_DYNAMIC_BODY);
@@ -575,8 +575,8 @@ namespace prefabs {
 	}
 
 	entity_handle create_electric_missile_def(const logic_step step, const components::transform transform) {
-		const auto energy_ball = step.cosm.create_entity("electric_missile");
-		const auto& metas = step.input.logical_assets;
+		const auto energy_ball = step.get_cosmos().create_entity("electric_missile");
+		const auto& metas = step.get_logical_assets();
 
 		ingredients::add_sprite(metas, 
 			energy_ball, 

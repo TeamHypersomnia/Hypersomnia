@@ -14,6 +14,7 @@
 #include "game/transcendental/data_living_one_step.h"
 #include "game/debug_drawing_settings.h"
 #include "game/messages/thunder_input.h"
+#include "game/transcendental/data_living_one_step.h"
 
 void standard_explosion_input::instantiate(
 	const logic_step step,
@@ -39,11 +40,11 @@ void standard_explosion_input::instantiate(
 
 			th.color = t % 2 ? cyan : turquoise;
 
-			step.transient.messages.post(th);
+			step.post_message(th);
 		}
 	}
 
-	auto& cosmos = step.cosm;
+	auto& cosmos = step.get_cosmos();
 
 	sound_existence_input sound_in;
 	sound_in.delete_entity_after_effect_lifetime = true;
@@ -169,7 +170,7 @@ void standard_explosion_input::instantiate(
 							break;
 						}
 
-						step.transient.messages.post(damage_msg);
+						step.post_message(damage_msg);
 					}
 				}
 
@@ -195,7 +196,7 @@ void standard_explosion_input::instantiate(
 		ring.center = request.eye_transform.pos;
 		ring.visibility = std::move(response.vis[0]);
 
-		step.transient.messages.post(ring);
+		step.post_message(ring);
 	}
 
 	{
@@ -215,6 +216,6 @@ void standard_explosion_input::instantiate(
 		ring.center = request.eye_transform.pos;
 		ring.visibility = std::move(response.vis[0]);
 
-		step.transient.messages.post(ring);
+		step.post_message(ring);
 	}
 }
