@@ -51,7 +51,7 @@ void determinism_test_setup::process(
 	else {
 		for (size_t i = 0; i < cosmoi_count; ++i) {
 			hypersomnias[i].set_fixed_delta(session.config.default_tickrate);
-			test_scenes::testbed().populate_world_with_entities(
+			test_scenes::testbed().populate_with_entities(
 				hypersomnias[i], 
 				metas_of_assets,
 				session.get_standard_post_solve()

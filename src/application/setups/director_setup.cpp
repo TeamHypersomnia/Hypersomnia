@@ -44,14 +44,14 @@ void director_setup::init(
 		hypersomnia.set_fixed_delta(session.config.default_tickrate);
 
 		if (session.config.debug_minimal_test_scene) {
-			test_scenes::minimal_scene().populate_world_with_entities(
+			test_scenes::minimal_scene().populate_with_entities(
 				hypersomnia,
 				metas_of_assets,
 				session.get_standard_post_solve()
 			);
 		}
 		else {
-			test_scenes::testbed().populate_world_with_entities(
+			test_scenes::testbed().populate_with_entities(
 				hypersomnia,
 				metas_of_assets,
 				session.get_standard_post_solve()

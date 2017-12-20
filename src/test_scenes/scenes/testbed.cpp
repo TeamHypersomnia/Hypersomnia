@@ -29,7 +29,28 @@
 #include "game/transcendental/cosmic_delta.h"
 
 namespace test_scenes {
-	void testbed::populate(const logic_step step) {
+	void testbed::populate(cosmos_common_state& common) const {
+		auto& common_assets = common.assets;
+		common_assets.cast_unsuccessful_sound.id = assets::sound_buffer_id::CAST_UNSUCCESSFUL;
+		common_assets.ped_shield_impact_sound.id = assets::sound_buffer_id::EXPLOSION;
+		common_assets.ped_shield_destruction_sound.id = assets::sound_buffer_id::GREAT_EXPLOSION;
+		common_assets.item_throw_sound.id = assets::sound_buffer_id::ITEM_THROW;
+		common_assets.item_throw_sound.modifier.pitch = 1.15f;
+		common_assets.item_throw_sound.modifier.gain = 0.8f;
+
+		common_assets.exhausted_smoke_particles.id = assets::particle_effect_id::EXHAUSTED_SMOKE;
+		common_assets.exploding_ring_smoke = assets::particle_effect_id::EXPLODING_RING_SMOKE;
+		common_assets.exploding_ring_sparkles = assets::particle_effect_id::EXPLODING_RING_SPARKLES;
+		common_assets.thunder_remnants = assets::particle_effect_id::THUNDER_REMNANTS;
+
+		load_test_scene_sentience_properties(common);
+
+		auto& spells = common.spells;
+		//std::get<electric_triad>(spells).missile_definition = prefabs::create_electric_missile_def(step, {});
+		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
+	}
+
+	void testbed::populate(const logic_step step) const {
 		auto& world = step.get_cosmos();
 		const auto& metas = step.get_logical_assets();
 		
@@ -770,25 +791,5 @@ namespace test_scenes {
 			perform_transfer({ pis2, character(3).get_primary_hand() }, step);
 		}
 
-		auto& common_assets = world.get_common_assets();
-		common_assets.cast_unsuccessful_sound.id = assets::sound_buffer_id::CAST_UNSUCCESSFUL;
-		common_assets.ped_shield_impact_sound.id = assets::sound_buffer_id::EXPLOSION;
-		common_assets.ped_shield_destruction_sound.id = assets::sound_buffer_id::GREAT_EXPLOSION;
-		common_assets.item_throw_sound.id = assets::sound_buffer_id::ITEM_THROW;
-		common_assets.item_throw_sound.modifier.pitch = 1.15f;
-		common_assets.item_throw_sound.modifier.gain = 0.8f;
-
-		common_assets.exhausted_smoke_particles.id = assets::particle_effect_id::EXHAUSTED_SMOKE;
-		common_assets.exploding_ring_smoke = assets::particle_effect_id::EXPLODING_RING_SMOKE;
-		common_assets.exploding_ring_sparkles = assets::particle_effect_id::EXPLODING_RING_SPARKLES;
-		common_assets.thunder_remnants = assets::particle_effect_id::THUNDER_REMNANTS;
-		
-		load_test_scene_sentience_properties(
-			world.significant.common
-		);
-
-		auto& spells = world.get_common_state().spells;
-		std::get<electric_triad>(spells).missile_definition = prefabs::create_electric_missile_def(step, {});
-		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
 	}
 }

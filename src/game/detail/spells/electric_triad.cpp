@@ -35,6 +35,10 @@ void electric_triad_instance::perform_logic(const spell_logic_input in) {
 	const auto caster = in.subject;
 	auto& cosmos = caster.get_cosmos();
 
+	if (cosmos[spell_data.missile_definition].dead()) {
+		return;
+	}
+	
 	const auto hostiles = get_closest_hostiles(
 		caster,
 		caster,

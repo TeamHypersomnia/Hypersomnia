@@ -9,9 +9,11 @@ struct all_logical_assets;
 
 namespace test_scenes {
 	class testbed {
-		void populate(const logic_step);
+		void populate(const logic_step) const;
+
 	public:
-		void populate_world_with_entities(const logic_step_input input) {
+		void populate(cosmos_common_state&) const;
+		void populate_with_entities(const logic_step_input input) const {
 			standard_solver(
 				input,
 				[&](const logic_step step) { populate(step); }, 

@@ -15,7 +15,22 @@
 #include "game/detail/inventory/inventory_utils.h"
 
 namespace test_scenes {
-	void minimal_scene::populate(const logic_step step) {
+	void minimal_scene::populate(cosmos_common_state& common) const {
+		load_test_scene_sentience_properties(common);
+
+		auto& common_assets = common.assets;
+		common_assets.cast_unsuccessful_sound.id = assets::sound_buffer_id::CAST_UNSUCCESSFUL;
+		common_assets.ped_shield_impact_sound.id = assets::sound_buffer_id::EXPLOSION;
+		common_assets.ped_shield_destruction_sound.id = assets::sound_buffer_id::GREAT_EXPLOSION;
+		common_assets.exhausted_smoke_particles.id = assets::particle_effect_id::EXHAUSTED_SMOKE;
+		common_assets.exploding_ring_smoke = assets::particle_effect_id::EXPLODING_RING_SMOKE;
+		common_assets.exploding_ring_sparkles = assets::particle_effect_id::EXPLODING_RING_SPARKLES;
+		common_assets.thunder_remnants = assets::particle_effect_id::THUNDER_REMNANTS;
+
+		//std::get<electric_triad>(common.spells).missile_definition = prefabs::create_electric_missile_def(step, {});
+	}
+
+	void minimal_scene::populate(const logic_step step) const {
 		auto& world = step.get_cosmos();
 
 		//prefabs::create_force_grenade(step, { 254, 611 });
@@ -108,19 +123,5 @@ namespace test_scenes {
 		//		prefabs::create_cyan_charge(step, vec2(0, 0), true ? 1000 : 30)));
 
 		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
-		load_test_scene_sentience_properties(
-			world.significant.common
-		);
-
-		auto& common_assets = world.get_common_assets();
-		common_assets.cast_unsuccessful_sound.id = assets::sound_buffer_id::CAST_UNSUCCESSFUL;
-		common_assets.ped_shield_impact_sound.id = assets::sound_buffer_id::EXPLOSION;
-		common_assets.ped_shield_destruction_sound.id = assets::sound_buffer_id::GREAT_EXPLOSION;
-		common_assets.exhausted_smoke_particles.id = assets::particle_effect_id::EXHAUSTED_SMOKE;
-		common_assets.exploding_ring_smoke = assets::particle_effect_id::EXPLODING_RING_SMOKE;
-		common_assets.exploding_ring_sparkles = assets::particle_effect_id::EXPLODING_RING_SPARKLES;
-		common_assets.thunder_remnants = assets::particle_effect_id::THUNDER_REMNANTS;
-
-		std::get<electric_triad>(world.get_common_state().spells).missile_definition = prefabs::create_electric_missile_def(step, {});
 	}
 }

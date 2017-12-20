@@ -24,9 +24,6 @@
 
 #include "game/detail/visible_entities.h"
 
-#include "test_scenes/scenes/testbed.h"
-#include "test_scenes/scenes/minimal_scene.h"
-
 #include "application/config_lua_table.h"
 
 #include "application/setups/main_menu_setup.h"

@@ -16,15 +16,18 @@ void intercosm::make_test_scene(sol::state& lua, const bool minimal) {
 	world.clear();
 	logicals = {};
 	viewables = {};
+	common = {};
 	world.reserve_storage_for_entities(3000u);
 
 	populate_test_scene_assets(lua, logicals, viewables);
 
 	if (minimal) {
-		test_scenes::minimal_scene().populate_world_with_entities(make_logic_step_input({}));
+		test_scenes::minimal_scene().populate(world.significant.common);
+		test_scenes::minimal_scene().populate_with_entities(make_logic_step_input({}));
 	}
 	else {
-		test_scenes::testbed().populate_world_with_entities(make_logic_step_input({}));
+		test_scenes::testbed().populate(world.significant.common);
+		test_scenes::testbed().populate_with_entities(make_logic_step_input({}));
 	}
 
 	locally_viewed = world.get_entity_by_name(L"player0");
