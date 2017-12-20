@@ -11,8 +11,8 @@ summary: |
 ## Notes
 
 One may be tempted to think of logical assets as of another case of [inferred cache](inferred_cache).  
-That is not quite the case, because logical assets might be serialized to the disk so that a map is always ensured to be playable regardless if the viewables on disk change.  
-For example, someone may replace an image or a sound on the disk, effectively making it larger or longer, but, as we have saved the original value of logical assets,  
+That is not quite the case, because logical assets might be serialized to the disk so that an [intercosm](intercosm) is guaranteed to play correctly, regardless if some viewables change on the disk.  
+For example, someone may replace an image or a sound on the disk, effectively giving it different dimensions or duration, but, as we have saved the original value of logical assets,  
 we may still use them, keeping the behaviour of the simulation identical, despite the viewables now looking different.  
 Thus, logical assets are indeed **inferred**, but they are not **caches**.  
 

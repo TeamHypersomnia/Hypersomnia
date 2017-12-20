@@ -25,14 +25,15 @@ Most of the time, only the programmers are concerned with the second type of dat
 - An *entity type* contains a tuple of [definitions](definition), along with a flag for each definition to signify whether it is *enabled*.
 	- An author may specify which definitions to enable.
 	- The flags will be held separate:``std::array<bool, DEFINITION_COUNT_V> enabled_definitions;``
-		- A lot better cache coherency from the more idiomatic ``std::optional``.
-	- An *enabled* definition may or may not imply that the entity needs a particular component for the definition to be properly used by the logic.  
-		- If it implies that need, it additionally stores an **initial value** for the component.
+		- A lot better cache coherency than the more idiomatic ``std::optional``.
+	- An *enabled* definition implies that the entity needs a component of type ``definition_type::instance`` (if specified) for the definition to be ever used by the logic.  
+		- If instance type is specified, it additionally stores an **initial value** for the component.
 - Types can be created, copied and then modified, or destroyed.  
 	- It is a separate stage that never occurs in logic itself.
 		- In fact, the [logic step](logic_step) simply provides only const getters for the type information.
 	- Should only be done by [authors](author).
-	- In particular, the **initial value** for a component may change even though some entities already exist.
+	- In particular, the **enabled** flags for definitions may change even though some entities of this type already exist.
+	- In particular, the **initial value** for a component may change even though some entities of this type already exist.
 		- This is not important. The field, in practice, serves two purposes:
 			- Used by the logic when it gets a type identifier to spawn (e.g. ``gun::magic_missile_definition``), so that it can set reasonable initial values. Thus, a change to initial value needs not updating here as the logic will naturally catch up, storing only the type identifier.
 			- Optionally as a helper for the author when they want to spawn some very specific entities. The author shouldn't worry that the initial value changes something for the existent entities.
