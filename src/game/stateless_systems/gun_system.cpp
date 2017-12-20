@@ -86,7 +86,7 @@ void components::gun::load_next_round(
 void gun_system::consume_gun_intents(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
 	const auto& delta = step.get_delta();
-	const auto& events = step.transient.messages.get_queue<messages::intent_message>();
+	const auto& events = step.get_queue<messages::intent_message>();
 
 	for (const auto& gun_entity : events) {
 		auto* const maybe_gun = cosmos[gun_entity.subject].find<components::gun>();

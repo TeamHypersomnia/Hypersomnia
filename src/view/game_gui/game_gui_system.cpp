@@ -405,7 +405,7 @@ void game_gui_system::rebuild_layouts(
 void game_gui_system::standard_post_solve(const const_logic_step step) {
 	const auto& cosmos = step.get_cosmos();
 
-	for (const auto& pickup : step.transient.messages.get_queue<messages::item_picked_up_message>()) {
+	for (const auto& pickup : step.get_queue<messages::item_picked_up_message>()) {
 		get_character_gui(pickup.subject).assign_item_to_first_free_hotbar_button(
 			cosmos[pickup.subject],
 			cosmos[pickup.item]

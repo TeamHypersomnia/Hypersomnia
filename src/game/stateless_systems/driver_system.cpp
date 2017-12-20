@@ -26,7 +26,7 @@
 void driver_system::assign_drivers_who_touch_wheels(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
 	const auto& delta = step.get_delta();
-	const auto& contacts = step.transient.messages.get_queue<messages::collision_message>();
+	const auto& contacts = step.get_queue<messages::collision_message>();
 
 	for (const auto& e : contacts) {
 		if (!(e.type == messages::collision_message::event_type::PRE_SOLVE)) {
@@ -52,7 +52,7 @@ void driver_system::assign_drivers_who_touch_wheels(const logic_step step) {
 void driver_system::release_drivers_due_to_ending_contact_with_wheel(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
 	const auto& delta = step.get_delta();
-	const auto& contacts = step.transient.messages.get_queue<messages::collision_message>();
+	const auto& contacts = step.get_queue<messages::collision_message>();
 	const auto& physics = cosmos.inferred.physics;
 
 	for (const auto& c : contacts) {
@@ -74,7 +74,7 @@ void driver_system::release_drivers_due_to_ending_contact_with_wheel(const logic
 void driver_system::release_drivers_due_to_requests(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
 	const auto& delta = step.get_delta();
-	const auto& intents = step.transient.messages.get_queue<messages::intent_message>();
+	const auto& intents = step.get_queue<messages::intent_message>();
 
 	for (const auto& e : intents) {
 		if (e.intent == game_intent_type::RELEASE_CAR && e.was_pressed()) {

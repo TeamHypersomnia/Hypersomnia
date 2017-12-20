@@ -81,12 +81,12 @@ void sound_existence_system::destroy_dead_sounds(const logic_step step) const {
 }
 
 void sound_existence_system::create_sounds_from_game_events(const logic_step step) const {
-	const auto& collisions = step.transient.messages.get_queue<messages::collision_message>();
-	const auto& gunshots = step.transient.messages.get_queue<messages::gunshot_response>();
-	const auto& damages = step.transient.messages.get_queue<messages::damage_message>();
-	const auto& swings = step.transient.messages.get_queue<messages::melee_swing_response>();
-	const auto& healths = step.transient.messages.get_queue<messages::health_event>();
-	const auto& exhausted_casts = step.transient.messages.get_queue<messages::exhausted_cast>();
+	const auto& collisions = step.get_queue<messages::collision_message>();
+	const auto& gunshots = step.get_queue<messages::gunshot_response>();
+	const auto& damages = step.get_queue<messages::damage_message>();
+	const auto& swings = step.get_queue<messages::melee_swing_response>();
+	const auto& healths = step.get_queue<messages::health_event>();
+	const auto& exhausted_casts = step.get_queue<messages::exhausted_cast>();
 	auto& cosmos = step.get_cosmos();
 
 	for (size_t i = 0; i < collisions.size(); ++i) {

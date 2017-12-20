@@ -101,7 +101,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 void audiovisual_state::spread_past_infection(const const_logic_step step) {
 	const auto& cosm = step.get_cosmos();
 
-	const auto& events = step.transient.messages.get_queue<messages::collision_message>();
+	const auto& events = step.get_queue<messages::collision_message>();
 
 	for (const auto& it : events) {
 		const const_entity_handle subject_owner_body = cosm[it.subject].get_owner_body();
@@ -121,11 +121,11 @@ void audiovisual_state::standard_post_solve(const const_logic_step step) {
 	const auto& cosmos = step.get_cosmos();
 	reserve_caches_for_entities(cosmos.get_entity_pool().capacity());
 
-	const auto& healths = step.transient.messages.get_queue<messages::health_event>();
-	const auto& new_thunders = step.transient.messages.get_queue<thunder_input>();
-	auto new_rings = step.transient.messages.get_queue<exploding_ring_input>();
+	const auto& healths = step.get_queue<messages::health_event>();
+	const auto& new_thunders = step.get_queue<thunder_input>();
+	auto new_rings = step.get_queue<exploding_ring_input>();
 
-	const auto& new_interpolation_corrections = step.transient.messages.get_queue<messages::interpolation_correction_request>();
+	const auto& new_interpolation_corrections = step.get_queue<messages::interpolation_correction_request>();
 	auto& interp = get<interpolation_system>();
 
 	for (const auto& c : new_interpolation_corrections) {

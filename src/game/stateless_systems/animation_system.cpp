@@ -21,14 +21,14 @@ using namespace messages;
 void animation_system::game_responses_to_animation_messages(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
 	const auto& delta = step.get_delta();
-	const auto& movements = step.transient.messages.get_queue<movement_event>();
-	const auto& gunshots = step.transient.messages.get_queue<gunshot_response>();
+	const auto& movements = step.get_queue<movement_event>();
+	const auto& gunshots = step.get_queue<gunshot_response>();
 }
 
 void animation_system::handle_animation_messages(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
 	const auto& delta = step.get_delta();
-	const auto& events = step.transient.messages.get_queue<animation_message>();
+	const auto& events = step.get_queue<animation_message>();
 
 	for (auto it : events) {
 		auto ptr = cosmos[it.subject].find<components::animation>();

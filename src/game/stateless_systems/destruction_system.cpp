@@ -14,7 +14,7 @@
 
 void destruction_system::generate_damages_from_forceful_collisions(const logic_step step) const {
 	auto& cosmos = step.get_cosmos();
-	const auto& events = step.transient.messages.get_queue<messages::collision_message>();
+	const auto& events = step.get_queue<messages::collision_message>();
 
 	for (const auto& it : events) {
 		if (it.type != messages::collision_message::event_type::PRE_SOLVE || it.one_is_sensor) {
@@ -47,7 +47,7 @@ void destruction_system::generate_damages_from_forceful_collisions(const logic_s
 void destruction_system::apply_damages_and_split_fixtures(const logic_step step) const {
 	auto& cosmos = step.get_cosmos();
 	const auto delta = step.get_delta();
-	const auto& damages = step.transient.messages.get_queue<messages::damage_message>();
+	const auto& damages = step.get_queue<messages::damage_message>();
 
 	for (const auto& d : damages) {
 		const auto subject = cosmos[d.subject];

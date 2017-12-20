@@ -123,12 +123,10 @@ bool line_of_sight_response::sees(const entity_id id) const {
 }
 
 void visibility_system::respond_to_visibility_information_requests(const logic_step step) const {
-	auto& queues = step.transient.messages;
-
-	const auto& los_requests = queues.get_queue<messages::line_of_sight_request>();
-	const auto& vis_requests = queues.get_queue<messages::visibility_information_request>();
-	auto& los_responses = queues.get_queue<messages::line_of_sight_response>();
-	auto& vis_responses = queues.get_queue<messages::visibility_information_response>();
+	const auto& los_requests = step.get_queue<messages::line_of_sight_request>();
+	const auto& vis_requests = step.get_queue<messages::visibility_information_request>();
+	auto& los_responses = step.get_queue<messages::line_of_sight_response>();
+	auto& vis_responses = step.get_queue<messages::visibility_information_response>();
 
 	respond_to_visibility_information_requests(step.get_cosmos(),
 		los_requests,

@@ -24,7 +24,7 @@ using namespace augs;
 void movement_system::set_movement_flags_from_input(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
 	const auto& delta = step.get_delta();
-	const auto& events = step.transient.messages.get_queue<messages::intent_message>();
+	const auto& events = step.get_queue<messages::intent_message>();
 
 	for (const auto& it : events) {
 		cosmos(

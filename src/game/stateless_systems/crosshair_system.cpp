@@ -31,7 +31,7 @@ void crosshair_system::generate_crosshair_intents(const logic_step step) {
 	const auto delta = step.get_delta();
 
 	{
-		const auto& events = step.transient.messages.get_queue<messages::motion_message>();
+		const auto& events = step.get_queue<messages::motion_message>();
 		
 		for (const auto& it : events) {
 			const auto subject = cosmos[it.subject];
@@ -62,7 +62,7 @@ void crosshair_system::generate_crosshair_intents(const logic_step step) {
 		}
 	}
 
-	const auto& events = step.transient.messages.get_queue<messages::intent_message>();
+	const auto& events = step.get_queue<messages::intent_message>();
 
 	for (const auto& it : events) {
 		const auto subject = cosmos[it.subject];
@@ -89,7 +89,7 @@ void crosshair_system::generate_crosshair_intents(const logic_step step) {
 void crosshair_system::apply_crosshair_intents_to_base_offsets(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
 	const auto& delta = step.get_delta();
-	const auto& events = step.transient.messages.get_queue<messages::crosshair_motion_message>();
+	const auto& events = step.get_queue<messages::crosshair_motion_message>();
 
 	for (const auto& it : events) {
 		cosmos[it.subject].get<components::crosshair>().base_offset = it.crosshair_base_offset;

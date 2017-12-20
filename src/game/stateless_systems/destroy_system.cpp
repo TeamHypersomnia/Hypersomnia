@@ -18,8 +18,8 @@
 
 void destroy_system::mark_queued_entities_and_their_children_for_deletion(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
-	const auto& queued = step.transient.messages.get_queue<messages::queue_destruction>();
-	auto& deletions = step.transient.messages.get_queue<messages::will_soon_be_deleted>();
+	const auto& queued = step.get_queue<messages::queue_destruction>();
+	auto& deletions = step.get_queue<messages::will_soon_be_deleted>();
 
 	for (const auto& it : queued) {
 		auto deletion_adder = [&deletions](const child_entity_id descendant) {
@@ -34,7 +34,7 @@ void destroy_system::mark_queued_entities_and_their_children_for_deletion(const 
 
 void destroy_system::perform_deletions(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
-	const auto& deletions = step.transient.messages.get_queue<messages::will_soon_be_deleted>();
+	const auto& deletions = step.get_queue<messages::will_soon_be_deleted>();
 
 	// destroy in reverse order; children first
 	for (auto it = deletions.rbegin(); it != deletions.rend(); ++it) {

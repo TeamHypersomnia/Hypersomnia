@@ -81,11 +81,11 @@ void particles_existence_system::displace_streams_and_destroy_dead_streams(const
 }
 
 void particles_existence_system::game_responses_to_particle_effects(const logic_step step) const {
-	const auto& gunshots = step.transient.messages.get_queue<messages::gunshot_response>();
-	const auto& damages = step.transient.messages.get_queue<messages::damage_message>();
-	const auto& swings = step.transient.messages.get_queue<messages::melee_swing_response>();
-	const auto& healths = step.transient.messages.get_queue<messages::health_event>();
-	const auto& exhausted_casts = step.transient.messages.get_queue<messages::exhausted_cast>();
+	const auto& gunshots = step.get_queue<messages::gunshot_response>();
+	const auto& damages = step.get_queue<messages::damage_message>();
+	const auto& swings = step.get_queue<messages::melee_swing_response>();
+	const auto& healths = step.get_queue<messages::health_event>();
+	const auto& exhausted_casts = step.get_queue<messages::exhausted_cast>();
 	auto& cosmos = step.get_cosmos();
 
 	for (const auto& g : gunshots) {

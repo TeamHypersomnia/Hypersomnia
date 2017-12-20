@@ -39,7 +39,7 @@
 
 
 void item_system::start_picking_up_items(const logic_step step) {
-	const auto& intents = step.transient.messages.get_queue<messages::intent_message>();
+	const auto& intents = step.get_queue<messages::intent_message>();
 	auto& cosm = step.get_cosmos();
 
 	for (const auto& i : intents) {
@@ -56,7 +56,7 @@ void item_system::start_picking_up_items(const logic_step step) {
 void item_system::pick_up_touching_items(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
 	const auto& delta = step.get_delta();
-	const auto& collisions = step.transient.messages.get_queue<messages::collision_message>();
+	const auto& collisions = step.get_queue<messages::collision_message>();
 
 	for (const auto& c : collisions) {
 		if (c.type != messages::collision_message::event_type::PRE_SOLVE) {
@@ -114,7 +114,7 @@ void item_system::pick_up_touching_items(const logic_step step) {
 void item_system::handle_throw_item_intents(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
 	const auto& delta = step.get_delta();
-	const auto& requests = step.transient.messages.get_queue<messages::intent_message>();
+	const auto& requests = step.get_queue<messages::intent_message>();
 
 	for (auto r : requests) {
 		if (r.was_pressed()) {

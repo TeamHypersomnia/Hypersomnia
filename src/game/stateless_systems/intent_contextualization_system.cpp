@@ -25,7 +25,7 @@ using namespace augs;
 void intent_contextualization_system::contextualize_use_button_intents(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
 	const auto delta = step.get_delta();
-	auto& intents = step.transient.messages.get_queue<messages::intent_message>();
+	auto& intents = step.get_queue<messages::intent_message>();
 	
 	for (auto& e : intents) {
 		const auto subject = cosmos[e.subject];
@@ -58,7 +58,7 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(con
 	const auto& delta = step.get_delta();
 
 	{
-		auto& events = step.transient.messages.get_queue<messages::motion_message>();
+		auto& events = step.get_queue<messages::motion_message>();
 		
 		for (auto& it : events) {
 			const auto subject = cosmos[it.subject];
@@ -75,7 +75,7 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(con
 		}
 	}
 
-	auto& events = step.transient.messages.get_queue<messages::intent_message>();
+	auto& events = step.get_queue<messages::intent_message>();
 
 	for (auto& it : events) {
 		entity_id callee;
@@ -131,7 +131,7 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(con
 void intent_contextualization_system::contextualize_movement_intents(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
 	const auto& delta = step.get_delta();
-	auto& intents = step.transient.messages.get_queue<messages::intent_message>();
+	auto& intents = step.get_queue<messages::intent_message>();
 
 	for (auto& e : intents) {
 		entity_id callee;

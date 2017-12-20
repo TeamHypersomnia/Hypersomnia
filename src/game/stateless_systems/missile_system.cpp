@@ -50,7 +50,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
 	const auto delta = step.get_delta();
 	const auto now = cosmos.get_timestamp();
-	const auto& events = step.transient.messages.get_queue<messages::collision_message>();
+	const auto& events = step.get_queue<messages::collision_message>();
 
 	for (const auto& it : events) {
 		if (it.type != messages::collision_message::event_type::BEGIN_CONTACT || it.one_is_sensor) {
