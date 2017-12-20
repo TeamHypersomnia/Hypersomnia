@@ -23,7 +23,7 @@ void cosmos::clear() {
 }
 
 void cosmos::increment_step() {
-	++significant.common.meta.now.step;
+	++significant.meta.now.step;
 }
 
 void cosmos::reinfer_all_caches() {
@@ -161,7 +161,7 @@ cosmos& cosmos::operator=(const cosmos_significant_state& b) {
 }
 
 void cosmos::assign_next_guid(const entity_handle new_entity) {
-	const auto this_guid = significant.common.meta.next_entity_guid.value++;
+	const auto this_guid = significant.meta.next_entity_guid.value++;
 
 	guid_to_id[this_guid] = new_entity;
 	new_entity.get<components::guid>().value = this_guid;
@@ -217,23 +217,23 @@ double cosmos::get_total_seconds_passed(const double view_interpolation_ratio) c
 }
 
 double cosmos::get_total_seconds_passed() const {
-	return significant.common.meta.now.step * get_fixed_delta().in_seconds<double>();
+	return significant.meta.now.step * get_fixed_delta().in_seconds<double>();
 }
 
 decltype(augs::stepped_timestamp::step) cosmos::get_total_steps_passed() const {
-	return significant.common.meta.now.step;
+	return significant.meta.now.step;
 }
 
 augs::stepped_timestamp cosmos::get_timestamp() const {
-	return significant.common.meta.now;
+	return significant.meta.now;
 }
 
 augs::delta cosmos::get_fixed_delta() const {
-	return significant.common.meta.delta;
+	return significant.meta.delta;
 }
 
 void cosmos::set_steps_per_second(const unsigned steps) {
-	significant.common.meta.delta = augs::delta::steps_per_second(steps);
+	significant.meta.delta = augs::delta::steps_per_second(steps);
 }
 
 unsigned cosmos::get_steps_per_second() const {

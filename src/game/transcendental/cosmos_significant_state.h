@@ -28,6 +28,7 @@ class cosmos_significant_state {
 	dynamic_component_pools_type component_pools;
 public:
 	cosmos_common_state common;
+	cosmos_meta meta;
 	// END GEN INTROSPECTOR
 
 	void clear();

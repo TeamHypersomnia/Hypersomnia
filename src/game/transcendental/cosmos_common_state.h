@@ -25,8 +25,6 @@ using perk_meta_id = type_in_list_id<meter_tuple>;
 
 struct cosmos_common_state {
 	// GEN INTROSPECTOR struct cosmos_common_state
-	cosmos_meta meta;
-
 	visibility_settings visibility;
 	pathfinding_settings pathfinding;
 	si_scaling si;
