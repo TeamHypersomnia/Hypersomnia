@@ -4,13 +4,18 @@ tags: [topics, ECS]
 hide_sidebar: true
 permalink: cosmos
 summary: |
-    The **cosmos** stores [entities](entities), [components](components), [common state](cosmos_common_state) and all [caches inferred](inferred_state) from the three. It is a fancy term for what is commonly understood as the "game world". Its methods allow to, for example, create entities, access and modify them via returned [handles](entity_handle), clone or delete them. 
+    The **cosmos** stores [entities](entities), [components](components), the [cosmos meta](cosmos_meta) and all [caches inferred](inferred_state) from the three.  
+    It represents the part of the application model that continuously changes as the [time flows forward](solver).  
+    It could be thought of as the "game world".  
 ---
 
 ## State
 
 The cosmos is arguably the most complex structure in the entire codebase.  
-There are exactly two fields in the class:
+Its methods allow to, for example, create entities, access and modify them via returned [handles](entity_handle), clone or delete them.
+
+There are, however, exactly two *member fields* in the class:
+
 - 
 ### Significant
 
@@ -18,7 +23,7 @@ There are exactly two fields in the class:
     
     - All [entities](entity).
     - All [components](component).
-    - The state that is [common to them](cosmos_common_state).
+    - [cosmos meta](cosmos_meta).
     
 
 - 

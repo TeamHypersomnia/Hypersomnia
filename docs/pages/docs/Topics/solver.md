@@ -11,6 +11,8 @@ summary: |
 ## Overview
 
 The only currently available solver is called *the standard solver*.  
+Once we introduce more solvers, they will be put into a separate ``src/game/solvers`` folder.  
+This could also be a good place to start writing a game mod.
 
 It initializes all [message](message) queues on [TLS](https://en.wikipedia.org/wiki/Thread-local_storage) and clears them when the step finishes, to ensure no messages persist beyond duration of the step.  
 If some messages were to linger between two consecutive steps, one would need to save them to disk or even synchronize through the network to ensure [determinism](determinism), effectively making messages another case of [significant state](significant_state).  
