@@ -110,7 +110,7 @@ void physics_world_cache::destroy_cache_of(const const_entity_handle handle) {
 
 void physics_world_cache::infer_cache_for(const const_entity_handle handle) {
 	const auto& cosmos = handle.get_cosmos();
-	const auto& relational = cosmos.inferred.relational;
+	const auto& relational = cosmos.solvable.inferred.relational;
 
 	if (const bool is_already_constructed = cache_exists_for_rigid_body(handle)) {
 		return;

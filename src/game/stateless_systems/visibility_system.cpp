@@ -169,7 +169,7 @@ void visibility_system::respond_to_visibility_information_requests(
 	std::vector<messages::line_of_sight_response>& los_responses,
 	std::vector<messages::visibility_information_response>& vis_responses
 ) const {
-	const auto& settings = cosmos.significant.common.visibility;
+	const auto& settings = cosmos.common.visibility;
 	const auto si = cosmos.get_si();
 
 	ensure(settings.epsilon_distance_vertex_hit > 0.f);
@@ -187,7 +187,7 @@ void visibility_system::respond_to_visibility_information_requests(
 	const auto epsilon_threshold_obstacle_hit_meters = si.get_meters(settings.epsilon_threshold_obstacle_hit);
 
 	/* we'll need a reference to physics system for raycasting */
-	const physics_world_cache& physics = cosmos.inferred.physics;
+	const physics_world_cache& physics = cosmos.solvable.inferred.physics;
 
 	struct ray_input {
 		vec2 targets[2];

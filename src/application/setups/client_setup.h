@@ -13,11 +13,11 @@ public:
 
 	all_logical_assets logical_assets;
 
-	cosmos hypersomnia = cosmos(3000);
-	cosmos initial_hypersomnia = cosmos(3000);
+	cosmos cosm = cosmos(3000);
+	cosmos initial_cosm = cosmos(3000);
 
-	cosmos hypersomnia_last_snapshot = cosmos(3000);
-	cosmos extrapolated_hypersomnia = cosmos(3000);
+	cosmos cosm_last_snapshot = cosmos(3000);
+	cosmos extrapolated_cosm = cosmos(3000);
 
 	cosmic_entropy total_collected_entropy;
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);

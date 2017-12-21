@@ -7,34 +7,11 @@
 #include "augs/templates/exception_templates.h"
 
 #include "augs/readwrite/memory_stream.h"
-#include "augs/misc/timing/delta.h"
 #include "augs/misc/enum/enum_boolset.h"
 #include "augs/templates/subscript_handle_getters_mixin.h"
-#include "augs/templates/introspection_utils/rewrite_members.h"
-#include "augs/misc/enum/enum_associative_array.h"
 #include "augs/misc/randomization_declaration.h"
 
-#include "augs/entity_system/operations_on_all_components_mixin.h"
-#include "augs/entity_system/storage_for_systems.h"
-
-#include "game/assets/ids/behaviour_tree_id.h"
-#include "game/assets/behaviour_tree.h"
-
-#include "game/organization/all_fundamental_component_includes.h"
-#include "augs/entity_system/component_aggregate.h"
-
-#include "game/transcendental/cosmic_entropy.h"
-#include "game/transcendental/cosmic_profiler.h"
-
-#if STATICALLY_ALLOCATE_ENTITIES_NUM
-#include "game/organization/all_component_includes.h"
-#else
-#include "game/organization/all_components_declaration.h"
-#endif
-
-#include "game/organization/all_messages_declaration.h"
-#include "game/organization/all_inferred_caches.h"
-#include "game/transcendental/cosmos_significant_state.h"
+#include "game/transcendental/cosmos_solvable_state.h"
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
 
@@ -70,31 +47,19 @@ auto subscript_handle_getter(C& cosm, const entity_guid guid) {
 	return subscript_handle_getter(cosm, cosm.get_entity_id_by(guid));
 }
 
-class cosmos : private cosmos_base,
-	public augs::subscript_handle_getters_mixin<cosmos>
-{
+class cosmos : public augs::subscript_handle_getters_mixin<cosmos> {
 	friend augs::subscript_handle_getters_mixin<cosmos>;
-	friend cosmos_base;
 
-	/* State of the cosmos begins here ***************************/
-	std::map<entity_guid, entity_id> guid_to_id;
+	cosmos_common_state common;
 
-public:
+public: 
+	cosmos_solvable_state solvable;
+
 	static const cosmos zero;
-
-	cosmos_significant_state significant;
-	all_inferred_caches inferred;
-
-	/* A detail only for performance benchmarks */
-	mutable cosmic_profiler profiler;
-	
-	/* State of the cosmos ends here *****************************/
 
 	cosmos() = default;
 	explicit cosmos(const cosmic_pool_size_type reserved_entities);
 	cosmos& operator=(const cosmos_significant_state&);
-
-	void reserve_storage_for_entities(const cosmic_pool_size_type);
 
 	entity_handle create_entity(const std::wstring& name);
 	entity_handle create_entity(const std::string& name);
@@ -108,14 +73,14 @@ public:
 		augs::enum_boolset<subjects_iteration_flag> flags = {}
 	) {
 		if (flags.test(subjects_iteration_flag::POSSIBLE_ITERATOR_INVALIDATION)) {
-			const auto targets = inferred.processing_lists.get(list_type);
+			const auto targets = solvable.inferred.processing_lists.get(list_type);
 
 			for (const auto& subject : targets) {
 				operator()(subject, callback);
 			}
 		}
 		else {
-			for (const auto& subject : inferred.processing_lists.get(list_type)) {
+			for (const auto& subject : solvable.inferred.processing_lists.get(list_type)) {
 				operator()(subject, callback);
 			}
 		}
@@ -123,19 +88,9 @@ public:
 
 	template <class F>
 	void for_each(const processing_subjects list_type, F callback) const {
-		for (const auto& subject : inferred.processing_lists.get(list_type)) {
+		for (const auto& subject : solvable.inferred.processing_lists.get(list_type)) {
 			operator()(subject, callback);
 		}
-	}
-
-	template <class D>
-	void for_each_entity_id(D pred) {
-		get_entity_pool().for_each_id(pred);
-	}
-
-	template <class D>
-	void for_each_entity_id(D pred) const {
-		get_entity_pool().for_each_id(pred);
 	}
 
 	void infer_cache_for(const const_entity_handle);
@@ -143,7 +98,7 @@ public:
 	
 	template <class cache_type>
 	void reinfer_cache(const entity_handle handle) {
-		inferred.for_each([&](auto& sys) {
+		solvable.inferred.for_each([&](auto& sys) {
 			using T = std::decay_t<decltype(sys)>;
 
 			if constexpr(std::is_same_v<T, cache_type>) {
@@ -160,97 +115,19 @@ public:
 	void reinfer_all_caches_for(const const_entity_handle);
 
 	void refresh_for_new_significant_state();
-	void remap_guids();
-	void clear();
-
-	void increment_step();
-
-	entity_id make_versioned(const unversioned_entity_id) const;
-
-	entity_id get_entity_id_by(const entity_guid) const;
-	bool entity_exists_by(const entity_guid) const;
-
-	template <template <class> class Guidized, class source_id_type>
-	Guidized<entity_guid> guidize(const Guidized<source_id_type>& id_source) const {
-		return rewrite_members_and_transform_templated_type_into<entity_guid>(
-			id_source,
-			[this](auto& guid_member, const auto& id_member) {
-				const auto handle = operator[](id_member);
-			
-				if (handle.alive()) {
-					guid_member = operator[](id_member).get_guid();
-				}
-				else {
-					guid_member = entity_guid();
-				}
-			}
-		);
-	}
-
-	template <template <class> class Deguidized, class source_id_type>
-	Deguidized<entity_id> deguidize(const Deguidized<source_id_type>& guid_source) const {
-		return rewrite_members_and_transform_templated_type_into<entity_id>(
-			guid_source,
-			[this](auto& id_member, const auto& guid_member) {
-				if (guid_member != entity_guid()) {
-					id_member = guid_to_id.at(guid_member);
-				}
-			}
-		);
-	}
 
 	si_scaling get_si() const;
 
 	randomization get_rng_for(const entity_id) const;
 	rng_seed_type get_rng_seed_for(const entity_id) const;
-
-	std::size_t get_count_of(const processing_subjects list_type) const {
-		return inferred.processing_lists.get(list_type).size();
-	}
 	
-	std::unordered_set<entity_id> get_entities_by_name(const entity_name_type&) const;
-	std::unordered_set<entity_id> get_entities_by_type_id(const entity_type_id&) const;
-	
-	entity_handle get_entity_by_name(const entity_name_type&);
-	const_entity_handle get_entity_by_name(const entity_name_type&) const;
-	
-	std::size_t get_entities_count() const;
-	std::size_t get_maximum_entities() const;
 	std::wstring summary() const;
-
-	double get_total_seconds_passed(const double view_interpolation_ratio) const;
-	double get_total_seconds_passed() const;
-	decltype(augs::stepped_timestamp::step) get_total_steps_passed() const;
-
-	augs::stepped_timestamp get_timestamp() const;
-
-	augs::delta get_fixed_delta() const;
-	void set_steps_per_second(const unsigned steps_per_second);
-	unsigned get_steps_per_second() const;
 
 	cosmos_common_state& get_common_state();
 	const cosmos_common_state& get_common_state() const;
 
 	common_assets& get_common_assets();
 	const common_assets& get_common_assets() const;
-
-	auto& get_entity_pool() {
-		return significant.entity_pool;
-	}
-
-	const auto& get_entity_pool() const {
-		return significant.entity_pool;
-	}
-
-	template<class T>
-	auto& get_component_pool() {
-		return std::get<cosmic_object_pool<T>>(significant.component_pools);
-	}
-
-	template<class T>
-	const auto& get_component_pool() const {
-		return std::get<cosmic_object_pool<T>>(significant.component_pools);
-	}
 
 	bool operator==(const cosmos&) const;
 	bool operator!=(const cosmos&) const;
@@ -265,53 +142,30 @@ public:
 		callback(operator[](subject));
 	}
 	
+	bool clear();
 	bool empty() const;
 
 private:
 	friend class cosmic_delta;
 
-	template <class T>
-	friend void transform_component_guids_to_ids_in_place(T&, const cosmos&);
-
-	void assign_next_guid(const entity_handle);
-	void clear_guid(const entity_handle);
-	entity_guid get_guid(const const_entity_handle) const;
-
 	entity_handle create_entity_with_specific_guid(
 		const entity_guid specific_guid
 	);
 
-	void advance_systems(const logic_step step_state);
-	void perform_deletions(const logic_step);
-
 	void destroy_all_caches();
 	void infer_all_caches();
-
-	entity_handle allocate_new_entity();
 };
 
 inline si_scaling cosmos::get_si() const {
-	return significant.common.si;
-}
-
-inline entity_id cosmos::get_entity_id_by(const entity_guid guid) const {
-	return guid_to_id.at(guid);
-}
-
-inline bool cosmos::entity_exists_by(const entity_guid guid) const {
-	return guid_to_id.find(guid) != guid_to_id.end();
-}
-
-inline entity_guid cosmos::get_guid(const const_entity_handle handle) const {
-	return handle.get_guid();
+	return common.si;
 }
 
 inline cosmos_common_state& cosmos::get_common_state() {
-	return significant.common;
+	return common;
 }
 
 inline const cosmos_common_state& cosmos::get_common_state() const {
-	return significant.common;
+	return common;
 }
 
 inline common_assets& cosmos::get_common_assets() {
@@ -320,50 +174,6 @@ inline common_assets& cosmos::get_common_assets() {
 
 inline const common_assets& cosmos::get_common_assets() const {
 	return get_common_state().assets;
-}
-
-inline std::unordered_set<entity_id> cosmos::get_entities_by_name(const entity_name_type& name) const {
-	return inferred.name.get_entities_by_name(name);
-}
-
-inline std::unordered_set<entity_id> cosmos::get_entities_by_type_id(const entity_type_id& id) const {
-	return inferred.name.get_entities_by_type_id(id);
-}
-
-inline entity_handle cosmos::get_entity_by_name(const entity_name_type& name) {
-	const auto entities = get_entities_by_name(name);
-	ensure(entities.size() <= 1);
-
-	if (entities.empty()) {
-		return operator[](entity_id());		
-	}
-	else {
-		return operator[](*entities.begin());
-	}
-}
-
-inline const_entity_handle cosmos::get_entity_by_name(const entity_name_type& name) const {
-	const auto entities = get_entities_by_name(name);
-	ensure(entities.size() <= 1);
-
-	if (entities.empty()) {
-		return operator[](entity_id());
-	}
-	else {
-		return operator[](*entities.begin());
-	}
-}
-
-inline entity_id cosmos::make_versioned(const unversioned_entity_id id) const {
-	return get_entity_pool().make_versioned(id);
-}
-
-inline std::size_t cosmos::get_entities_count() const {
-	return significant.entity_pool.size();
-}
-
-inline std::size_t cosmos::get_maximum_entities() const {
-	return significant.entity_pool.capacity();
 }
 
 #if READWRITE_OVERLOAD_TRAITS_INCLUDED || LUA_READWRITE_OVERLOAD_TRAITS_INCLUDED

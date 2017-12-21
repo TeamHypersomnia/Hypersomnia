@@ -51,7 +51,7 @@ server_setup::endpoint& server_setup::get_endpoint(const augs::network::endpoint
 void server_setup::deinit_endpoint(endpoint& end, const bool gracefully) {
 	LOG("%x disconnected.", end.nick_and_ip());
 
-	if (hypersomnia[end.controlled_entity].alive()) {
+	if (cosm[end.controlled_entity].alive()) {
 		scene.free_character(end.controlled_entity);
 	}
 
@@ -88,14 +88,14 @@ void server_setup::process(const config_lua_table& cfg, game_window& window, con
 
 	session_report rep;
 
-	cosmos hypersomnia_last_snapshot(3000);
+	cosmos cosm_last_snapshot(3000);
 
-	cosmos initial_hypersomnia(3000);
+	cosmos initial_cosm(3000);
 
 	augs::fixed_delta_timer timer = augs::fixed_delta_timer(5);
 
 
-	hypersomnia.load_from_file("server_save.state");
+	cosm.load_from_file("server_save.state");
 	const bool detailed_step_log = cfg.default_tickrate <= 2;
 
 	if (cfg.get_input_recording_mode() != input_recording_type::DISABLED) {
@@ -174,7 +174,7 @@ void server_setup::process(const config_lua_table& cfg, game_window& window, con
 
 				endpoint new_endpoint;
 				new_endpoint.addr = net_event.address;
-				new_endpoint.commands.set_lower_limit(static_cast<size_t>(cfg.client_commands_jitter_buffer_ms / hypersomnia.get_fixed_delta().in_milliseconds()));
+				new_endpoint.commands.set_lower_limit(static_cast<size_t>(cfg.client_commands_jitter_buffer_ms / cosm.solvable.get_fixed_delta().in_milliseconds()));
 				endpoints.push_back(new_endpoint);
 			}
 
@@ -219,17 +219,17 @@ void server_setup::process(const config_lua_table& cfg, game_window& window, con
 								if (!should_skip) {
 									LOG("%x chose nickname %x.", address.get_readable_ip(), endpoint.nickname);
 
-									auto& complete_state = initial_hypersomnia.reserved_memory_for_serialization;
+									auto& complete_state = initial_cosm.reserved_memory_for_serialization;
 									complete_state.reset_write_pos();
 
 									augs::write(complete_state, network_command::COMPLETE_STATE);
 
-									cosmic_delta::encode(initial_hypersomnia, hypersomnia, complete_state);
+									cosmic_delta::encode(initial_cosm, cosm, complete_state);
 
 									reinfer = true;
 
 									endpoint.controlled_entity = scene.assign_new_character();
-									augs::write(complete_state, hypersomnia[endpoint.controlled_entity].get_guid());
+									augs::write(complete_state, cosm[endpoint.controlled_entity].get_guid());
 
 									choose_server(address).send_reliable(complete_state, address);
 								}
@@ -265,7 +265,7 @@ void server_setup::process(const config_lua_table& cfg, game_window& window, con
 			}
 		}
 
-		auto steps = timer.count_logic_steps_to_perform(hypersomnia.get_fixed_delta());
+		auto steps = timer.count_logic_steps_to_perform(cosm.solvable.get_fixed_delta());
 
 		while (steps--) {
 			if (detailed_step_log) {
@@ -291,13 +291,13 @@ void server_setup::process(const config_lua_table& cfg, game_window& window, con
 
 						new_intent.is_pressed = test_entropy_randomizer.randval(0, 1) == 0;
 
-						total_unpacked_entropy.intents_per_entity[hypersomnia[scene.characters[i].id].get_guid()].push_back(new_intent);
+						total_unpacked_entropy.intents_per_entity[cosm[scene.characters[i].id].get_guid()].push_back(new_intent);
 					}
 				}
 			}
 
 			erase_if(endpoints, [this](endpoint& e) {
-				if (choose_server(e.addr).has_timed_out(e.addr, hypersomnia.get_fixed_delta().in_milliseconds())) {
+				if (choose_server(e.addr).has_timed_out(e.addr, cosm.solvable.get_fixed_delta().in_milliseconds())) {
 					LOG("%x has timed out. Disconnecting.", e.nick_and_ip());
 					deinit_endpoint(e);
 					return true;
@@ -335,7 +335,7 @@ void server_setup::process(const config_lua_table& cfg, game_window& window, con
 				step_packaged_for_network transported_step;
 
 				if (reinfer) {
-					LOG("Ser sends resub request at step: %x", hypersomnia.get_total_steps_passed());
+					LOG("Ser sends resub request at step: %x", cosm.get_total_steps_passed());
 				}
 
 				transported_step.step_type = step_packaged_for_network::type::NEW_ENTROPY;
@@ -353,15 +353,15 @@ void server_setup::process(const config_lua_table& cfg, game_window& window, con
 			serv.send_pending_redundant();
 			if(start_alternative_server) alternative_serv.send_pending_redundant();
 
-			cosmic_entropy id_mapped_entropy(total_unpacked_entropy, hypersomnia);
+			cosmic_entropy id_mapped_entropy(total_unpacked_entropy, cosm);
 			
 			if (reinfer) {
-				LOG("Ser: resubs at step: %x", hypersomnia.get_total_steps_passed());
-				hypersomnia.reinfer_all_caches();
+				LOG("Ser: resubs at step: %x", cosm.get_total_steps_passed());
+				cosm.reinfer_all_caches();
 				reinfer = false;
 			}
 
-			hypersomnia.advance_deterministic_schemata(
+			cosm.advance_deterministic_schemata(
 				{ id_mapped_entropy, metas_of_assets }
 			);
 
@@ -373,7 +373,7 @@ void server_setup::process(const config_lua_table& cfg, game_window& window, con
 				const char* ipb = "<span class=\"vstype\">";
 				const char* ipe = "</span>";
 
-				this_step_stats += typesafe_sprintf("Uptime: %x%x%x seconds\n", whb, hypersomnia.get_total_time_passed_in_seconds(), whe);
+				this_step_stats += typesafe_sprintf("Uptime: %x%x%x seconds\n", whb, cosm.get_total_time_passed_in_seconds(), whe);
 				this_step_stats += typesafe_sprintf("Players online: %x%x%x", whb, endpoints.size(), whe);
 
 				if (endpoints.size() > 0) {
@@ -381,7 +381,7 @@ void server_setup::process(const config_lua_table& cfg, game_window& window, con
 				}
 
 				for (size_t i = 0; i < endpoints.size(); ++i) {
-					const const_entity_handle character = hypersomnia[endpoints[i].controlled_entity];
+					const const_entity_handle character = cosm[endpoints[i].controlled_entity];
 
 					if (character.alive()) {
 						const auto pos = character.get_logic_transform().pos;

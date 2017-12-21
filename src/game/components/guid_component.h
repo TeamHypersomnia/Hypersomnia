@@ -5,14 +5,14 @@ namespace augs {
 	struct introspection_access;
 }
 
-class cosmos;
+class cosmos_solvable_state;
 
 namespace components {
 	struct guid {
 		static constexpr bool is_fundamental = true;
-private:
-		friend ::cosmos;
+	private:
 		friend augs::introspection_access;
+		friend class cosmos_solvable_state;
 
 		// GEN INTROSPECTOR struct components::guid
 		entity_guid value = 0;

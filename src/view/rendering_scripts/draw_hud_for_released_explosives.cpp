@@ -10,7 +10,7 @@
 #include "view/audiovisual_state/systems/interpolation_system.h"
 
 void draw_hud_for_released_explosives(const draw_hud_for_released_explosives_input in) {
-	const auto dt = in.cosm.get_fixed_delta();
+	const auto dt = in.cosm.solvable.get_fixed_delta();
 
 	const auto& cosmos = in.cosm;
 

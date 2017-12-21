@@ -107,7 +107,7 @@ void value_bar::draw(
 	const const_this_pointer this_id
 ) {
 	const auto& cosmos = context.get_cosmos();
-	const auto dt = cosmos.get_fixed_delta();
+	const auto dt = cosmos.solvable.get_fixed_delta();
 	const auto now = cosmos.get_timestamp();
 	const auto& game_images = context.get_game_images();
 
@@ -340,7 +340,7 @@ bool value_bar::is_enabled(
 	if (const auto sentience = context.get_subject_entity().find<components::sentience>()) {
 		const auto& cosm = context.get_cosmos();
 
-		const auto dt = cosm.get_fixed_delta();
+		const auto dt = cosm.solvable.get_fixed_delta();
 		const auto now = cosm.get_timestamp();
 
 		result =
@@ -371,7 +371,7 @@ void value_bar::rebuild_layouts(
 
 	const auto& cosmos = context.get_cosmos();
 
-	const auto dt = cosmos.get_fixed_delta();
+	const auto dt = cosmos.solvable.get_fixed_delta();
 	const auto now = cosmos.get_timestamp();
 
 	if (!is_enabled(context, vertical_index)) {

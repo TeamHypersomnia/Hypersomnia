@@ -21,9 +21,8 @@ class basic_inventory_slot_handle {
 	using slot_pointer = maybe_const_ptr_t<is_const, inventory_slot>;
 
 	using entity_handle_type = basic_entity_handle<is_const>;
+
 public:
-	static constexpr bool is_const_value = is_const;
-	
 	basic_inventory_slot_handle(owner_reference owner, const inventory_slot_id raw_id);
 	
 	owner_reference get_cosmos() const;

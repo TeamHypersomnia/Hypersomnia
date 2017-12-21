@@ -154,7 +154,7 @@ void standard_solve(const logic_step step) {
 	//position_copying_system().update_transforms(step);
 	//rotation_copying_system().update_rotations(cosmos);
 
-	performance.raycasts.measure(cosmos.inferred.physics.ray_casts_since_last_step);
+	performance.raycasts.measure(cosmos.solvable.inferred.physics.ray_casts_since_last_step);
 
 	cosmos.increment_step();
 

@@ -41,7 +41,7 @@ public:
 	recording_type recording_mode = recording_type::ALL;
 
 	augs::event::state events;
-	cosmos hypersomnia = cosmos(3000);
+	cosmos cosm = cosmos(3000);
 	debug_character_selection characters;
 
 	std::string input_director_path;

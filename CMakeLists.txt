@@ -435,7 +435,6 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/application/setups/editor/editor_setup.cpp"
 	"src/application/setups/editor/editor_tab.cpp"
 	"src/application/setups/editor/editor_recent_paths.cpp"
-#	"src/application/setups/choreographic_setup.cpp" #
 #	"src/application/setups/director_setup.cpp" #
 	"src/application/setups/main_menu_setup.cpp"
 #	"src/application/setups/client_setup.cpp" #
@@ -506,6 +505,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/components/trace_component.cpp"
 	"src/game/stateless_systems/physics_system.cpp"
 	"src/game/transcendental/standard_solver.cpp"
+	"src/game/transcendental/cosmos_solvable_state.cpp"
 )
 
 if(BUILD_WINDOW_FRAMEWORK)

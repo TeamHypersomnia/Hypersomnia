@@ -4,7 +4,6 @@
 #include "game/transcendental/cosmos_common_state.h"
 #include "game/transcendental/cosmic_types.h"
 
-using cosmos_base = component_list_t<augs::operations_on_all_components_mixin, cosmos>;
 
 using dynamic_component_pools_type = 
 	replace_list_type_t<
@@ -20,7 +19,7 @@ using entity_pool_type = cosmic_object_pool<cosmic_entity>;
 
 class cosmos_significant_state {
 	// GEN INTROSPECTOR class cosmos_significant_state
-	friend class cosmos;
+	friend class cosmos_solvable_state;
 	friend class cosmic_delta;
 	friend augs::introspection_access;
 

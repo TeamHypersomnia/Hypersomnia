@@ -59,9 +59,6 @@ class physics_world_cache {
 
 	void destroy_cache_of(const const_entity_handle);
 
-	void infer_additional_cache(const cosmos_common_state&) {}
-	void destroy_additional_cache_of(const cosmos_common_state&) {}
-
 	friend class cosmos;
 	friend class physics_system;
 	friend class contact_listener;

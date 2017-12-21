@@ -22,46 +22,34 @@ namespace augs {
 			(reserver(components()), ...);
 		}
 
-		template <class... excluded_components, class handle_type>
+		template <class... excluded_components, class aggregate_type>
 		void clone_all_components_except(
-			const handle_type into,
-			const handle_type from 
+			aggregate_type& into,
+			const aggregate_type& from 
 		) {
+			auto& self = *static_cast<derived*>(this);
+
 			auto cloner = [&](auto c) {
 				using component = decltype(c);
-				using allocator_base = typename handle_type::allocator;
 
 				if constexpr(!is_one_of_v<component, excluded_components...>) {
-					if constexpr(is_component_fundamental_v<component>) {
-						into.allocator_base::template get<component>() = from.allocator_base::template get<component>();
-					}
-					else {
-						if (from.allocator_base::template has<component>()) {
-							if (into.allocator_base::template has<component>()) {
-								into.allocator_base::template get<component>() = from.allocator_base::template get<component>();
-							}
-							else {
-								into.allocator_base::template add<component>(from.allocator_base::template get<component>());
-							}
-						}
-					}
+					into.template get<component>(self) = from.template get<component>(self);
 				}
 			};
 			
 			(cloner(components()), ...);
 		}
 
-		template <class handle_type>
-		void free_all_components(const handle_type handle) {
+		template <class aggregate_type>
+		void free_all_components(aggregate_type& agg) {
 			auto& self = *static_cast<derived*>(this);
 
 			auto freer = [&](auto c) {
 				using component = decltype(c);
-				using allocator_base = typename handle_type::allocator;
 
 				if constexpr(!is_component_fundamental_v<component>) {
-					if (handle.allocator_base::template has<component>()) {
-						handle.allocator_base::template remove<component>();
+					if (agg.template has<component>(self)) {
+						agg.template remove<component>(self);
 					}
 				}
 			};

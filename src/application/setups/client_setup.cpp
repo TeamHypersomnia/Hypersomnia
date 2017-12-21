@@ -55,8 +55,8 @@ void client_setup::init(
 
 	detailed_step_log = session.config.default_tickrate <= 2;
 
-	if (!hypersomnia.load_from_file("save.state")) {
-		hypersomnia.set_fixed_delta(session.config.default_tickrate);
+	if (!cosm.load_from_file("save.state")) {
+		cosm.set_fixed_delta(session.config.default_tickrate);
 	}
 
 	if (session.config.get_input_recording_mode() != input_recording_type::DISABLED) {
@@ -65,7 +65,7 @@ void client_setup::init(
 		//}
 	}
 
-	receiver.jitter_buffer.set_lower_limit(static_cast<unsigned>(session.config.jitter_buffer_ms / hypersomnia.get_fixed_delta().in_milliseconds()));
+	receiver.jitter_buffer.set_lower_limit(static_cast<unsigned>(session.config.jitter_buffer_ms / cosm.solvable.get_fixed_delta().in_milliseconds()));
 	receiver.misprediction_smoothing_multiplier = static_cast<float>(session.config.misprediction_smoothing_multiplier);
 
 	const bool is_replaying =
@@ -138,7 +138,7 @@ void client_setup::process_once(
 	session.switch_between_gui_and_back(new_machine_entropy.local);
 
 	session.fetch_gui_events(
-		hypersomnia[currently_controlled_character],
+		cosm[currently_controlled_character],
 		new_machine_entropy.local
 	);
 
@@ -147,7 +147,7 @@ void client_setup::process_once(
 	session.fetch_session_intents(translated.intents);
 
 	auto new_cosmic_entropy = cosmic_entropy(
-		hypersomnia[currently_controlled_character],
+		cosm[currently_controlled_character],
 		translated
 	);
 
@@ -179,16 +179,16 @@ void client_setup::process_once(
 				case network_command::COMPLETE_STATE:
 					ensure(!should_skip);
 
-					cosmic_delta::decode(initial_hypersomnia, stream);
-					hypersomnia = initial_hypersomnia;
-					extrapolated_hypersomnia = initial_hypersomnia;
+					cosmic_delta::decode(initial_cosm, stream);
+					cosm = initial_cosm;
+					extrapolated_cosm = initial_cosm;
 
-					LOG("Decoded cosm at step: %x", hypersomnia.get_total_steps_passed());
+					LOG("Decoded cosm at step: %x", cosm.get_total_steps_passed());
 
 					unsigned controlled_character_guid;
 					augs::read(stream, controlled_character_guid);
 
-					currently_controlled_character = hypersomnia.get_handle(controlled_character_guid);
+					currently_controlled_character = cosm.get_handle(controlled_character_guid);
 
 					complete_state_received = true;
 					break;
@@ -210,7 +210,7 @@ void client_setup::process_once(
 		}
 	}
 
-	auto steps = timer.count_logic_steps_to_perform(hypersomnia.get_fixed_delta());
+	auto steps = timer.count_logic_steps_to_perform(cosm.solvable.get_fixed_delta());
 
 	while (steps--) {
 		if (!still_downloading) {
@@ -220,12 +220,12 @@ void client_setup::process_once(
 				receiver.send_commands_and_predict(
 					client,
 					total_collected_entropy,
-					extrapolated_hypersomnia,
+					extrapolated_cosm,
 					step_callback_with_audiovisual_response
 				);
 			}
 
-			// LOG("Predicting to step: %x; predicted steps: %x", extrapolated_hypersomnia.get_total_steps_passed(), receiver.predicted_step_entropies.size());
+			// LOG("Predicting to step: %x; predicted steps: %x", extrapolated_cosm.get_total_steps_passed(), receiver.predicted_step_entropies.size());
 
 			{
 				auto scope = measure_scope(get_profiler().unpack_remote_steps);
@@ -234,15 +234,15 @@ void client_setup::process_once(
 					session.systems_audiovisual.get<interpolation_system>(),
 					session.systems_audiovisual.get<past_infection_system>(),
 					currently_controlled_character,
-					hypersomnia,
-					hypersomnia_last_snapshot,
-					extrapolated_hypersomnia,
+					cosm,
+					cosm_last_snapshot,
+					extrapolated_cosm,
 					step_callback
 				);
 			}
 		}
 		
-		if (client.has_timed_out(hypersomnia.get_fixed_delta().in_milliseconds(), 2000)) {
+		if (client.has_timed_out(cosm.solvable.get_fixed_delta().in_milliseconds(), 2000)) {
 			LOG("Connection to server timed out.");
 			client.forceful_disconnect();
 		}
@@ -262,10 +262,10 @@ void client_setup::process_once(
 		;
 		
 		thread_local visible_entities all_visible;
-		session.get_visible_entities(all_visible, hypersomnia);
+		session.get_visible_entities(all_visible, cosm);
 
 		session.advance_audiovisual_systems(
-			extrapolated_hypersomnia, 
+			extrapolated_cosm, 
 			currently_controlled_character,
 			all_visible,
 			vdt
@@ -279,10 +279,10 @@ void client_setup::process_once(
 
 		session.view(
 			renderer,
-			extrapolated_hypersomnia,
+			extrapolated_cosm,
 			currently_controlled_character,
 			all_visible,
-			timer.fraction_of_step_until_next_step(extrapolated_hypersomnia.get_fixed_delta()),
+			timer.fraction_of_step_until_next_step(extrapolated_cosm.solvable.get_fixed_delta()),
 			client
 		);
 

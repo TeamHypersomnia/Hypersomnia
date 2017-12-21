@@ -21,7 +21,7 @@
 void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
 	const auto si = cosmos.get_si();
-	const auto& settings = cosmos.significant.common.pathfinding;
+	const auto& settings = cosmos.common.pathfinding;
 
 	const auto get_world_vertices = [&](
 		const const_entity_handle subject, 
@@ -57,7 +57,7 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 	const float epsilon_distance_visible_point_sq = settings.epsilon_distance_visible_point * settings.epsilon_distance_visible_point;
 	
 	/* we'll need a reference to physics system for raycasting */
-	physics_world_cache& physics = cosmos.inferred.physics;
+	physics_world_cache& physics = cosmos.solvable.inferred.physics;
 
 	auto& lines = DEBUG_LOGIC_STEP_LINES;
 

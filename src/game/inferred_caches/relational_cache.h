@@ -25,9 +25,6 @@ class relational_cache {
 	void infer_cache_for(const const_entity_handle);
 	void destroy_cache_of(const const_entity_handle);
 
-	void infer_additional_cache(const cosmos_common_state&) {}
-	void destroy_additional_cache_of(const cosmos_common_state&) {}
-
 	void handle_deletion_of_potential_parent(const entity_id);
 
 	augs::children_vector_tracker<unversioned_entity_id, 1> fixtures_of_bodies;

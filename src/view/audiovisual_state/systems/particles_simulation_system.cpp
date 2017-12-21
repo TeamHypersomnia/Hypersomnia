@@ -274,7 +274,7 @@ void particles_simulation_system::advance_visible_streams_and_all_particles(
 		}
 	};
 
-	cosmos.inferred.tree_of_npo.for_each_in_camera(
+	cosmos.solvable.inferred.tree_of_npo.for_each_in_camera(
 		update_target,
 		cone,
 		screen_size,

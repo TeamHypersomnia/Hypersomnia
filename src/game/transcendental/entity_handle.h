@@ -9,7 +9,6 @@
 #include "augs/templates/type_matching_and_indexing.h"
 
 #include "augs/entity_system/component_setters_mixin.h"
-#include "augs/entity_system/component_allocators_mixin.h"
 
 #include "game/detail/inventory/inventory_slot_handle_declaration.h"
 #include "game/transcendental/entity_handle_declaration.h"
@@ -41,7 +40,6 @@ namespace augs {
 
 template <bool is_const>
 class basic_entity_handle :
-	private augs::component_allocators_mixin<is_const, basic_entity_handle<is_const>>,
 	public augs::component_setters_mixin<is_const, basic_entity_handle<is_const>>,
 
 	public inventory_mixin<is_const, basic_entity_handle<is_const>>,
@@ -49,21 +47,17 @@ class basic_entity_handle :
 	public relations_mixin<is_const, basic_entity_handle<is_const>>,
 	public spatial_properties_mixin<is_const, basic_entity_handle<is_const>>
 {
-	template <typename T>
-	static void check_component_type() {
-		static_assert(is_one_of_list_v<T, component_list_t<type_list>>, "Unknown component type!");
-	}
 
-public:
-	static constexpr bool is_const_value = is_const;
-private:
-	template <class, class...> friend class augs::operations_on_all_components_mixin;
-
+	/* For cloning */
 	template <bool, class> friend class relations_mixin;
 	template <bool, class> friend class basic_relations_mixin;
+
 	template <bool> friend class basic_entity_handle;
-	// for debug names
-	friend class component_synchronizer<false, components::type>;
+
+	friend class cosmic_delta;
+	friend class cosmos;
+
+	friend void augs::read_object_lua(sol::table, cosmos&);
 
 	using owner_reference = maybe_const_ref_t<is_const, cosmos>;
 	using entity_ptr = maybe_const_ptr_t<is_const, cosmic_entity>;
@@ -72,16 +66,17 @@ private:
 	owner_reference owner;
 	entity_id raw_id;
 
-	using allocator = augs::component_allocators_mixin<is_const, basic_entity_handle<is_const>>;
-
-	friend class augs::component_allocators_mixin<is_const, basic_entity_handle<is_const>>;
-	friend class cosmic_delta;
-	friend class cosmos;
-
-	friend void augs::read_object_lua(sol::table, cosmos&);
+	template <typename T>
+	static void check_component_type() {
+		static_assert(is_one_of_list_v<T, component_list_t<type_list>>, "Unknown component type!");
+	}
 
 	auto& get() const {
 		return *ptr;
+	}
+
+	auto& pool_provider() const {
+		return owner.solvable;
 	}
 
 private:
@@ -102,7 +97,7 @@ public:
 	) : basic_entity_handle(
 		owner, 
 		raw_id, 
-		owner.get_entity_pool().find(raw_id)
+		owner.solvable.get_entity_pool().find(raw_id)
 	) {
 	}
 
@@ -157,7 +152,7 @@ public:
 
 	template <class component>
 	bool has() const {
-		return allocator::template has<component>();
+		return get().template has<component>(pool_provider());
 	}
 
 	template <class T>
@@ -167,10 +162,10 @@ public:
 		ensure(alive());
 		
 		if constexpr(is_component_synchronized_v<T>) {
-			return component_synchronizer<is_const, T>(&allocator::template get<T>(), *this);
+			return component_synchronizer<is_const, T>(&get().template get<T>(pool_provider()), *this);
 		}
 		else {
-			return allocator::template get<T>();
+			return get().template get<T>(pool_provider());
 		}
 	}
 
@@ -180,11 +175,11 @@ public:
 		ensure(alive());
 		
 		if constexpr(is_component_synchronized_v<T>) {
-			allocator::template add<T>(c);
+			get().template add<T>(c, pool_provider());
 			owner.reinfer_all_caches_for(*this);
 		}
 		else {
-			allocator::template add<T>(c);
+			get().template add<T>(c, pool_provider());
 		}
 	}
 
@@ -200,10 +195,10 @@ public:
 		ensure(alive());
 
 		if constexpr(is_component_synchronized_v<T>) {
-			return component_synchronizer<is_const, T>(allocator::template find<T>(), *this);
+			return component_synchronizer<is_const, T>(get().template find<T>(pool_provider()), *this);
 		}
 		else {
-			return allocator::template find<T>();
+			return get().template find<T>(pool_provider());
 		}
 	}
 
@@ -214,11 +209,11 @@ public:
 		ensure(alive());
 
 		if constexpr(is_component_synchronized_v<T>) {
-			allocator::template remove<T>();
+			get().template remove<T>(pool_provider());
 			owner.reinfer_all_caches_for(*this);
 		}
 		else {
-			allocator::template remove<T>();
+			get().template remove<T>(pool_provider());
 		}
 	}
 
@@ -264,6 +259,8 @@ public:
 
 	template <class F>
 	void for_each_component(F&& callback) const {
+		ensure(alive());
+
 		auto& self = get();
 		const auto& ids = self.component_ids;
 		auto& fundamentals = self.fundamentals;
@@ -276,16 +273,20 @@ public:
 
 		for_each_through_std_get(
 			ids,
-			[&](const auto& id) {
-				using component_type = typename std::decay_t<decltype(id)>::mapped_type;
+			[&](auto id) {
+				using component_type = typename decltype(id)::mapped_type;
 
-				if (const auto maybe_component = cosm.template get_component_pool<component_type>().find(id)) {
+				if (const auto maybe_component = get().template find<component_type>(pool_provider())) {
 					callback(*maybe_component);
 				}
 			}
 		);
 	}
 	
+	entity_guid get_guid() const {
+		return get_cosmos().solvable.get_guid(raw_id);
+	}
+
 	auto& get_type() const {
 		return get<components::type>().get_type();
 	}

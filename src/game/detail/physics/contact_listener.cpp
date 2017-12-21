@@ -21,7 +21,7 @@
 #define FRICTION_FIELDS_COLLIDE 0
 
 physics_world_cache& contact_listener::get_sys() const {
-	return cosm.inferred.physics;
+	return cosm.solvable.inferred.physics;
 }
 
 contact_listener::contact_listener(cosmos& cosm) : cosm(cosm) {
@@ -36,7 +36,7 @@ void contact_listener::BeginContact(b2Contact* contact) {
 	auto& sys = get_sys();
 	auto& cosmos = cosm;
 	
-	const auto delta = cosm.get_fixed_delta();
+	const auto delta = cosm.solvable.get_fixed_delta();
 	const auto now = cosm.get_timestamp();
 	const auto si = cosmos.get_si();
 	
@@ -249,7 +249,7 @@ void contact_listener::PreSolve(b2Contact* contact, const b2Manifold* oldManifol
 	auto& cosmos = cosm;
 
 	const auto si = cosmos.get_si();
-	const auto delta = cosm.get_fixed_delta();
+	const auto delta = cosm.solvable.get_fixed_delta();
 	const auto now = cosm.get_timestamp();
 
 	std::array<messages::collision_message, 2> msgs;

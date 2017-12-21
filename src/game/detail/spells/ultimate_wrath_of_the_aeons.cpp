@@ -17,7 +17,7 @@ void ultimate_wrath_of_the_aeons_instance::perform_logic(const spell_logic_input
 	const auto caster = in.subject;
 	const auto caster_transform = caster.get_logic_transform();
 	const auto step = in.step;
-	const auto dt = cosmos.get_fixed_delta();
+	const auto dt = cosmos.solvable.get_fixed_delta();
 	const auto now = in.now;
 	const auto when_casted = in.when_casted;
 

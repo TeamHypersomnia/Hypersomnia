@@ -582,6 +582,7 @@ int work(const int argc, const char* const * const argv) try {
 #if IS_PRODUCTION_BUILD // If debugging, we use SIGINT for simulating a debugger break
 	std::signal(SIGINT, signal_handler);
 #endif
+
 	std::signal(SIGTERM, signal_handler);
 	std::signal(SIGSTOP, signal_handler);
 #endif
@@ -663,7 +664,7 @@ int work(const int argc, const char* const * const argv) try {
 		const auto viewed_character = get_viewed_character();
 		const auto& cosmos = viewed_character.get_cosmos();
 		
-		audiovisuals.reserve_caches_for_entities(viewed_character.get_cosmos().get_entity_pool().capacity());
+		audiovisuals.reserve_caches_for_entities(viewed_character.get_cosmos().solvable.get_entity_pool().capacity());
 		
 		auto& interp = audiovisuals.get<interpolation_system>();
 
@@ -674,7 +675,7 @@ int work(const int argc, const char* const * const argv) try {
 				viewing_config.interpolation, 
 				cosmos, 
 				augs::delta(frame_delta) *= speed_multiplier, 
-				cosmos.get_fixed_delta()
+				cosmos.solvable.get_fixed_delta()
 			);
 		}
 

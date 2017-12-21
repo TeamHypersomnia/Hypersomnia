@@ -39,7 +39,7 @@ class server_setup : public setup_base {
 		}
 	};
 
-	cosmos hypersomnia = cosmos(3000);
+	cosmos cosm = cosmos(3000);
 
 	std::vector<endpoint> endpoints;
 

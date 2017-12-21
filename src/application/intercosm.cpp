@@ -21,11 +21,11 @@ void intercosm::make_test_scene(sol::state& lua, const bool minimal) {
 	populate_test_scene_assets(lua, logicals, viewables);
 
 	if (minimal) {
-		test_scenes::minimal_scene().populate(world.significant.common);
+		test_scenes::minimal_scene().populate(world.common);
 		locally_viewed = test_scenes::minimal_scene().populate_with_entities(make_logic_step_input({}));
 	}
 	else {
-		test_scenes::testbed().populate(world.significant.common);
+		test_scenes::testbed().populate(world.common);
 		locally_viewed = test_scenes::testbed().populate_with_entities(make_logic_step_input({}));
 	}
 }

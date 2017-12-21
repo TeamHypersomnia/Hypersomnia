@@ -9,10 +9,39 @@
 namespace augs {
 	template <template <class T> class make_pool_id, class... components>
 	class component_aggregate {
+		template <class component>
+		void set_id(const make_pool_id<component> to) {
+			std::get<make_pool_id<component>>(component_ids) = to;
+		}
+
+		template <class component>
+		auto get_id() const {
+			return std::get<make_pool_id<component>>(component_ids);
+		}
+
+		template <class component, class Aggregate, class PoolProvider>
+		static auto* find_impl(Aggregate& a, PoolProvider& p) {
+			if constexpr(is_component_fundamental_v<component>) {
+				return &std::get<component>(a.fundamentals);
+			}
+			else {
+				return p.template get_component_pool<component>().find(a.template get_id<component>());
+			}
+		}
+
+		template <class component, class Aggregate, class PoolProvider>
+		static auto& get_impl(Aggregate& a, PoolProvider& p) {
+			if constexpr(!is_component_fundamental_v<component>) {
+				ensure(a.template has<component>(p));
+			}
+
+			return *find_impl<component>(a, p);
+		}
+
 	public:
 		using dynamic_components_list = filter_types<apply_negation<is_component_fundamental>::template type, components...>;
 		using fundamental_components_list = filter_types<is_component_fundamental, components...>;
-		
+
 		using dynamic_component_id_tuple = 
 			replace_list_type_t<
 				transform_types_in_list_t<
@@ -35,14 +64,58 @@ namespace augs {
 		dynamic_component_id_tuple component_ids;
 		// END GEN INTROSPECTOR
 
-		template <class component>
-		void set_id(const make_pool_id<component> to) {
-			std::get<make_pool_id<component>>(component_ids) = to;
+		template <class component, class PoolProvider>
+		auto& get(PoolProvider& p) {
+			return get_impl<component>(*this, p);
 		}
 
-		template <class component>
-		auto get_id() const {
-			return std::get<make_pool_id<component>>(component_ids);
+		template <class component, class PoolProvider>
+		auto& get(const PoolProvider& p) const {
+			return get_impl<component>(*this, p);
+		}
+
+		template <class component, class PoolProvider>
+		auto* find(PoolProvider& p) {
+			return find_impl<component>(*this, p);
+		}
+
+		template <class component, class PoolProvider>
+		auto* find(const PoolProvider& p) const {
+			return find_impl<component>(*this, p);
+		}
+
+		template <class component, class PoolProvider>
+		bool has(PoolProvider& p) const {
+			if constexpr(is_component_fundamental_v<component>) {
+				return true;
+			}
+			else {
+				return find<component>(p) != nullptr;
+			}
+		}
+
+		template <class component, class PoolProvider>
+		void add(const component& c, PoolProvider& p) {
+			if constexpr(is_component_fundamental_v<component>) {
+				get<component>(p) = c;
+			}
+			else {
+				ensure(!has<component>(p));
+
+				set_id(p.template get_component_pool<component>().allocate(c));
+			}
+		}
+
+		template <class component, class PoolProvider>
+		void remove(PoolProvider& p) {
+			static_assert(!is_component_fundamental_v<component>, "Can't remove a fundamental component.");
+
+			ensure(has<component>(p));
+
+			const auto id_of_deleted = get_id<component>();
+
+			p.template get_component_pool<component>().free(id_of_deleted);
+			set_id(decltype(id_of_deleted)());
 		}
 	};
 }

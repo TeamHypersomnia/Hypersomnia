@@ -40,26 +40,26 @@ void director_setup::init(
 ) {
 	metas_of_assets = *get_assets_manager().generate_logical_metas_of_assets();
 
-	if (!hypersomnia.load_from_file("save.state")) {
-		hypersomnia.set_fixed_delta(session.config.default_tickrate);
+	if (!cosm.load_from_file("save.state")) {
+		cosm.set_fixed_delta(session.config.default_tickrate);
 
 		if (session.config.debug_minimal_test_scene) {
 			test_scenes::minimal_scene().populate_with_entities(
-				hypersomnia,
+				cosm,
 				metas_of_assets,
 				session.get_standard_post_solve()
 			);
 		}
 		else {
 			test_scenes::testbed().populate_with_entities(
-				hypersomnia,
+				cosm,
 				metas_of_assets,
 				session.get_standard_post_solve()
 			);
 		}
 	}
 
-	characters.acquire_available_characters(hypersomnia);
+	characters.acquire_available_characters(cosm);
 
 	input_director_path = session.config.director_input_scene_entropy_path;
 	output_director_path = session.config.director_input_scene_entropy_path;
@@ -70,13 +70,13 @@ void director_setup::init(
 	
 	set_snapshot_frequency_in_seconds(3.0);
 
-	initial_step_number = hypersomnia.get_total_steps_passed();
+	initial_step_number = cosm.get_total_steps_passed();
 
 	timer.reset_timer();
 }
 
 void director_setup::set_snapshot_frequency_in_seconds(const double seconds_between_snapshots) {
-	snapshot_frequency_in_steps = static_cast<unsigned>(seconds_between_snapshots / hypersomnia.get_fixed_delta().in_seconds());
+	snapshot_frequency_in_steps = static_cast<unsigned>(seconds_between_snapshots / cosm.solvable.get_fixed_delta().in_seconds());
 	snapshots_for_rewinding.clear();
 }
 
@@ -113,21 +113,21 @@ augs::gui::text::formatted_string director_setup::get_status_text() const {
 	}
 
 	status_text += format(typesafe_sprintf(L"\nRequested playing speed: %x", requested_playing_speed), white_font);
-	status_text += format(typesafe_sprintf(L"\nStep number: %x", get_step_number(hypersomnia)), white_font);
-	status_text += format(typesafe_sprintf(L"\nTime: %x", get_step_number(hypersomnia)*hypersomnia.get_fixed_delta().in_seconds()), white_font);
+	status_text += format(typesafe_sprintf(L"\nStep number: %x", get_step_number(cosm)), white_font);
+	status_text += format(typesafe_sprintf(L"\nTime: %x", get_step_number(cosm)*cosm.solvable.get_fixed_delta().in_seconds()), white_font);
 	status_text += 
 		format(
 			typesafe_sprintf(
 				L"\nControlling entity %x of %x (guid: %x)", 
 				characters.current_character_index, 
 				characters.characters.size(),
-				hypersomnia[characters.get_selected_character()].get_guid()
+				cosm[characters.get_selected_character()].get_guid()
 			), 
 		white_font
 	);
 
 	if (bookmarked_step != 0) {
-		status_text += format(typesafe_sprintf(L"\nBookmarked time: %x", bookmarked_step*hypersomnia.get_fixed_delta().in_seconds()), white_font);
+		status_text += format(typesafe_sprintf(L"\nBookmarked time: %x", bookmarked_step*cosm.solvable.get_fixed_delta().in_seconds()), white_font);
 	}
 
 	if (unsaved_changes_exist) {
@@ -218,11 +218,11 @@ augs::machine_entropy director_setup::control_player(
 				clear_accumulated_inputs();
 			}
 			if (raw_input.key == key::NUMPAD9) {
-				bookmarked_step = get_step_number(hypersomnia);
+				bookmarked_step = get_step_number(cosm);
 				clear_accumulated_inputs();
 			}
 			if (raw_input.key == key::NUMPAD0) {
-				advance_steps_forward = static_cast<long long>(bookmarked_step) - static_cast<long long>(get_step_number(hypersomnia));
+				advance_steps_forward = static_cast<long long>(bookmarked_step) - static_cast<long long>(get_step_number(cosm));
 				current_director_state = director_state::PLAYING;
 				clear_accumulated_inputs();
 			}
@@ -232,7 +232,7 @@ augs::machine_entropy director_setup::control_player(
 	session.switch_between_gui_and_back(new_machine_entropy.local);
 
 	session.fetch_gui_events(
-		hypersomnia[characters.get_selected_character()],
+		cosm[characters.get_selected_character()],
 		new_machine_entropy.local
 	);
 
@@ -250,7 +250,7 @@ augs::machine_entropy director_setup::control_player(
 	characters.control_character_selection(translated.intents);
 
 	auto new_cosmic_entropy = cosmic_entropy(
-		hypersomnia[characters.get_selected_character()],
+		cosm[characters.get_selected_character()],
 		translated
 	);
 
@@ -260,7 +260,7 @@ augs::machine_entropy director_setup::control_player(
 		total_collected_entropy += new_cosmic_entropy;
 	}
 
-	const auto current_step = get_step_number(hypersomnia);
+	const auto current_step = get_step_number(cosm);
 
 	if (advance_steps_forward < 0) {
 		/* Trim to zero if we want to rewind too much */
@@ -284,26 +284,26 @@ void director_setup::seek_to_step(
 		seeked_step / snapshot_frequency_in_steps
 	);
 
-	if (seeked_step < get_step_number(hypersomnia)) {
-		hypersomnia = snapshots_for_rewinding.at(previous_snapshot_index);
+	if (seeked_step < get_step_number(cosm)) {
+		cosm = snapshots_for_rewinding.at(previous_snapshot_index);
 	}
 
 	// at this point the seeked_step is either equal or greater than the current
 
 	const auto distance_from_previous_snapshot = seeked_step - previous_snapshot_index * snapshot_frequency_in_steps;
-	const auto distance_from_current = seeked_step - get_step_number(hypersomnia);
+	const auto distance_from_current = seeked_step - get_step_number(cosm);
 
 	if (distance_from_previous_snapshot < distance_from_current) {
-		hypersomnia = snapshots_for_rewinding.at(previous_snapshot_index);
+		cosm = snapshots_for_rewinding.at(previous_snapshot_index);
 	}
 
-	while (get_step_number(hypersomnia) < seeked_step) {
+	while (get_step_number(cosm) < seeked_step) {
 		advance_player_by_single_step(session);
 	}
 }
 
 void director_setup::push_snapshot_if_needed() {
-	const auto current_step = get_step_number(hypersomnia);
+	const auto current_step = get_step_number(cosm);
 
 	if (current_step % snapshot_frequency_in_steps == 0) {
 		const auto snapshot_index = current_step / snapshot_frequency_in_steps;
@@ -311,7 +311,7 @@ void director_setup::push_snapshot_if_needed() {
 		const bool valid_snapshot_exists = snapshot_index < snapshots_for_rewinding.size();
 
 		if (!valid_snapshot_exists) {
-			snapshots_for_rewinding.push_back(hypersomnia);
+			snapshots_for_rewinding.push_back(cosm);
 		}
 	}
 }
@@ -347,14 +347,14 @@ void director_setup::process(
 
 void director_setup::advance_player_by_single_step(viewing_session& session) {
 	cosmic_entropy cosmic_entropy_for_this_advancement;
-	const auto current_step = get_step_number(hypersomnia);
+	const auto current_step = get_step_number(cosm);
 
 	push_snapshot_if_needed();
 
 	if (current_director_state == director_state::PLAYING) {
 		guid_mapped_entropy replayed_entropy = director.get_entropy_for_step(current_step);
 
-		cosmic_entropy_for_this_advancement = cosmic_entropy(replayed_entropy, hypersomnia);
+		cosmic_entropy_for_this_advancement = cosmic_entropy(replayed_entropy, cosm);
 	}
 	else if (current_director_state == director_state::RECORDING) {
 		const auto next_snapshot_index = 1 + current_step / snapshot_frequency_in_steps;
@@ -367,18 +367,18 @@ void director_setup::advance_player_by_single_step(viewing_session& session) {
 			);
 		}
 		
-		const auto total_collected_guid_entropy = guid_mapped_entropy(total_collected_entropy, hypersomnia);
+		const auto total_collected_guid_entropy = guid_mapped_entropy(total_collected_entropy, cosm);
 
 		guid_mapped_entropy& entropy_for_this_advancement = director.step_to_entropy[current_step];
 
 		entropy_for_this_advancement.override_transfers_leaving_other_entities(
-			hypersomnia,
+			cosm,
 			*total_collected_guid_entropy.transfer_requests
 		);
 
 		const auto flags = get_flags();
 
-		const auto selected_character_guid = hypersomnia[characters.get_selected_character()].get_guid();
+		const auto selected_character_guid = cosm[characters.get_selected_character()].get_guid();
 
 		if (flags.test(recording_flags::ALLOW_KEYS)) {
 			entropy_for_this_advancement.cast_spells_per_entity.erase(selected_character_guid);
@@ -407,14 +407,14 @@ void director_setup::advance_player_by_single_step(viewing_session& session) {
 			}
 		}
 
-		cosmic_entropy_for_this_advancement = cosmic_entropy(entropy_for_this_advancement, hypersomnia);
+		cosmic_entropy_for_this_advancement = cosmic_entropy(entropy_for_this_advancement, cosm);
 
 		unsaved_changes_exist = true;
 	}
 
 	augs::renderer::get_current().clear_logic_lines();
 
-	hypersomnia.advance_deterministic_schemata(
+	cosm.advance_deterministic_schemata(
 		{ cosmic_entropy_for_this_advancement, metas_of_assets },
 		[](auto) {},
 		session.get_standard_post_solve()
@@ -426,7 +426,7 @@ void director_setup::advance_player_by_single_step(viewing_session& session) {
 }
 
 void director_setup::advance_player(viewing_session& session) {
-	auto steps = timer.count_logic_steps_to_perform(hypersomnia.get_fixed_delta());
+	auto steps = timer.count_logic_steps_to_perform(cosm.solvable.get_fixed_delta());
 
 	const auto speed = requested_playing_speed * basic_playback_speed;
 
@@ -456,7 +456,7 @@ thread_local visible_entities all_visible;
 void director_setup::advance_audiovisuals(
 	viewing_session& session
 ) {
-	session.get_visible_entities(all_visible, hypersomnia);
+	session.get_visible_entities(all_visible, cosm);
 	
 	const augs::delta vdt =
 		timer.get_stepping_speed_multiplier()
@@ -464,7 +464,7 @@ void director_setup::advance_audiovisuals(
 	;
 
 	session.advance_audiovisual_systems(
-		hypersomnia,
+		cosm,
 		characters.get_selected_character(),
 		all_visible,
 		vdt
@@ -481,10 +481,10 @@ void director_setup::view(
 
 	session.view(
 		renderer,
-		hypersomnia,
+		cosm,
 		characters.get_selected_character(),
 		all_visible,
-		timer.fraction_of_step_until_next_step(hypersomnia.get_fixed_delta()),
+		timer.fraction_of_step_until_next_step(cosm.solvable.get_fixed_delta()),
 		get_status_text()
 	);
 

@@ -30,12 +30,12 @@ void components::rigid_body::set_transform(
 
 template<bool C>
 bool basic_physics_synchronizer<C>::is_constructed() const {
-	return handle.get_cosmos().inferred.physics.cache_exists_for_rigid_body(handle);
+	return handle.get_cosmos().solvable.inferred.physics.cache_exists_for_rigid_body(handle);
 }
 
 template<bool C>
 maybe_const_ref_t<C, rigid_body_cache>& basic_physics_synchronizer<C>::get_cache() const {
-	return handle.get_cosmos().inferred.physics.get_rigid_body_cache(handle);
+	return handle.get_cosmos().solvable.inferred.physics.get_rigid_body_cache(handle);
 }
 
 void component_synchronizer<false, P>::reinfer_caches() const {
@@ -131,7 +131,7 @@ void component_synchronizer<false, P>::apply_force(
 	const auto body = get_cache().body;
 	auto& data = get_raw_component();
 
-	const auto force = handle.get_cosmos().get_fixed_delta().in_seconds() * to_meters(pixels);
+	const auto force = handle.get_cosmos().solvable.get_fixed_delta().in_seconds() * to_meters(pixels);
 	const auto location = vec2(body->GetWorldCenter() + b2Vec2(to_meters(center_offset)));
 
 	body->ApplyLinearImpulse(
@@ -251,7 +251,7 @@ void component_synchronizer<false, P>::set_transform(const components::transform
 	auto& data = get_raw_component();
 
 	data.set_transform(
-		handle.get_cosmos().significant.common.si,
+		handle.get_cosmos().get_common_state().si,
 		transform
 	);
 

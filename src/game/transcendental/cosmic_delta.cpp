@@ -66,7 +66,7 @@ void transform_component_guids_to_ids_in_place(
 			id.unset();
 
 			if (guid_inside != 0) {
-				id = cosm.guid_to_id.at(guid_inside);
+				id = cosm.solvable.guid_to_id.at(guid_inside);
 			}
 		}
 		else {
@@ -105,9 +105,9 @@ bool cosmic_delta::encode(
 	enco.significant.entity_pool.for_each_id([&](const entity_id id) {
 		const const_entity_handle enco_entity = enco[id];
 		const auto stream_written_id = enco_entity.get_guid();
-		const auto maybe_base_entity = base.guid_to_id.find(stream_written_id);
+		const auto maybe_base_entity = base.solvable.guid_to_id.find(stream_written_id);
 
-		const bool is_new = maybe_base_entity == base.guid_to_id.end();
+		const bool is_new = maybe_base_entity == base.solvable.guid_to_id.end();
 		const entity_id base_entity_id = is_new ? entity_id() : (*maybe_base_entity).second;
 
 		const const_entity_handle base_entity = base[base_entity_id];
@@ -130,8 +130,8 @@ bool cosmic_delta::encode(
 				if constexpr(!std::is_same_v<component_type, components::guid>) {
 					constexpr size_t idx = component_index_v<component_type>;
 		
-					const auto maybe_base = is_new ? nullptr : base_entity.allocator::template find<component_type>();
-					const auto maybe_enco = enco_entity.allocator::template find<component_type>();
+					const auto maybe_base = is_new ? nullptr : base_entity.get().find<component_type>(base.solvable);
+					const auto maybe_enco = enco_entity.get().find<component_type>(enco);
 		
 					if (!maybe_enco && !maybe_base) {
 						return;
@@ -190,8 +190,8 @@ bool cosmic_delta::encode(
 	base.significant.entity_pool.for_each_id([&base, &enco, &dt](const entity_id id) {
 		const const_entity_handle base_entity = base[id];
 		const auto stream_written_id = base_entity.get_guid();
-		const auto maybe_enco_entity = enco.guid_to_id.find(stream_written_id);
-		const bool is_dead = maybe_enco_entity == enco.guid_to_id.end();
+		const auto maybe_enco_entity = enco.solvable.guid_to_id.find(stream_written_id);
+		const bool is_dead = maybe_enco_entity == enco.solvable.guid_to_id.end();
 
 		if (is_dead) {
 			++dt.deleted_entities;
@@ -202,8 +202,8 @@ bool cosmic_delta::encode(
 	augs::memory_stream new_meta_content;
 
 	const bool has_meta_changed = augs::write_delta(
-		base.significant.common, 
-		enco.significant.common, 
+		base.meta, 
+		enco.meta, 
 		new_meta_content, 
 		true
 	);
@@ -258,9 +258,9 @@ void cosmic_delta::decode(
 	
 	deco.profiler.delta_decoding.start();
 
-	deco.destroy_all_caches();
+	deco.solvable.destroy_all_caches();
 
-	augs::read_delta(deco.significant.common, in, true);
+	augs::read_delta(deco.meta, in, true);
 
 	delted_stream_of_entities dt;
 
@@ -301,7 +301,7 @@ void cosmic_delta::decode(
 						augs::read_delta(decoded_component, in, true);
 						transform_component_guids_to_ids_in_place(decoded_component, deco);
 		
-						new_entity.allocator::template add(decoded_component);
+						new_entity.get().add(decoded_component, deco);
 					}
 				}
 			}
@@ -328,7 +328,7 @@ void cosmic_delta::decode(
 					constexpr size_t idx = component_index_v<component_type>;
 		
 					if (overridden_components[idx]) {
-						const auto maybe_component = changed_entity.allocator::template find<component_type>();
+						const auto maybe_component = changed_entity.get().find<component_type>(deco.solvable);
 						
 						if (maybe_component == nullptr) {
 							component_type decoded_component;
@@ -336,7 +336,7 @@ void cosmic_delta::decode(
 							augs::read_delta(decoded_component, in, true);
 							
 							transform_component_guids_to_ids_in_place(decoded_component, deco);
-							changed_entity.allocator::template add(decoded_component);
+							changed_entity.get().add(decoded_component, deco);
 						}
 						else {
 							transform_component_ids_to_guids_in_place(*maybe_component, deco);
@@ -346,7 +346,7 @@ void cosmic_delta::decode(
 					}
 					else if (removed_components[idx]) {
 						if constexpr(!is_component_fundamental_v<component_type>) {
-							changed_entity.allocator::template remove<component_type>();
+							changed_entity.get().remove<component_type>(deco);
 						}
 					}
 				}

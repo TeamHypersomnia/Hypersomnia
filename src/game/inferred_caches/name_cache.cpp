@@ -4,20 +4,6 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
 
-void name_cache::infer_additional_cache(const cosmos_common_state& global) {
-	const bool is_already_constructed = name_to_id_lookup.size() > 0;
-
-	ensure(!is_already_constructed);
-
-	for (const auto& meta : global.all_entity_types.metas) {
-		name_to_id_lookup[meta.second.name] = meta.first;
-	}
-}
-
-void name_cache::destroy_additional_cache_of(const cosmos_common_state& global) {
-	name_to_id_lookup.clear();
-}
-
 void name_cache::infer_cache_for(const entity_id id, const components::type& name) {
 	entities_by_type_id[name.type_id].emplace(id);
 }
@@ -35,29 +21,12 @@ void name_cache::destroy_cache_of(const entity_id id, const components::type& na
 
 void name_cache::infer_cache_for(const const_entity_handle h) {
 	infer_cache_for(h, h.get<components::type>().get_raw_component());
-	lexicographic_names.insert({ h.get_name(), h.get_guid() });
 }
 
 void name_cache::destroy_cache_of(const const_entity_handle h) {
-	lexicographic_names.erase({ h.get_name(), h.get_guid() });
 	destroy_cache_of(h, h.get<components::type>().get_raw_component());
 }
 
 std::unordered_set<entity_id> name_cache::get_entities_by_type_id(const entity_type_id id) const {
 	return mapped_or_default(entities_by_type_id, id);
-}
-
-std::unordered_set<entity_id> name_cache::get_entities_by_name(const entity_name_type& full_name) const {
-	if (const auto* const id = mapped_or_nullptr(name_to_id_lookup, full_name)) {
-		return get_entities_by_type_id(*id);
-	}
-	
-	return {};
-}
-
-const entity_name_type& name_cache::get_name(
-	const entity_types& metas,
-	const components::type& from
-) const {
-	return metas.metas.at(from.type_id).name;
 }

@@ -119,7 +119,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
 	const auto& delta = step.get_delta();
 
-	auto& physics_sys = cosmos.inferred.physics;
+	auto& physics_sys = cosmos.solvable.inferred.physics;
 
 	cosmos.for_each(
 		processing_subjects::WITH_GUN,

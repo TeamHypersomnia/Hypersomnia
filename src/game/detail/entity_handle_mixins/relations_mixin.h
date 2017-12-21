@@ -39,8 +39,6 @@ public:
 		return self.template get<components::rigid_body>().get_attached_joints();
 	}
 
-	entity_guid get_guid() const;
-
 	inventory_slot_handle_type operator[](const slot_function) const;
 	entity_handle_type operator[](const child_entity_name) const;
 	

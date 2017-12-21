@@ -39,7 +39,6 @@ enum class launch_type {
 	LOCAL_DETERMINISM_TEST,
 
 	DIRECTOR,
-	CHOREOGRAPHIC,
 
 	ONLY_CLIENT,
 	ONLY_SERVER,
@@ -115,7 +114,6 @@ struct config_lua_table {
 	std::string last_session_update_link;
 
 	augs::path_type director_input_scene_entropy_path;
-	augs::path_type choreographic_input_scenario_path;
 
 	bool server_launch_http_daemon = 0;
 	unsigned short server_http_daemon_port = 0;

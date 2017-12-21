@@ -671,7 +671,7 @@ void editor_setup::perform_custom_imgui(
 			
 						unsigned hits = 0;
 							
-						for (const auto& lex : self.work().world.inferred.name.get_lexicographic_names()) {
+						for (const auto& lex : self.work().world.solvable.inferred.name.get_lexicographic_names()) {
 							const auto& name = lex.first;
 			
 							if (query.empty() || to_lowercase(name).find(query) != std::wstring::npos) {

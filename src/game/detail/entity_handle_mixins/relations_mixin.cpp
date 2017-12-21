@@ -34,8 +34,8 @@ void relations_mixin<false, D>::make_cloned_child_entities_recursive(const entit
 		if (self.template has<component_type>()) {
 			using allocator_base = typename D::allocator;
 
-			auto& cloned_to_component = self.allocator_base::template get<component_type>();
-			const auto& cloned_from_component = from.allocator::template get<component_type>();
+			auto& cloned_to_component = self.get().get<component_type>(cosm.solvable);
+			const auto& cloned_from_component = from.get().get<component_type>(cosm.solvable);
 
 			if constexpr(allows_nontriviality_v<component_type>) {
 				component_type::clone_children(
@@ -144,12 +144,6 @@ D basic_relations_mixin<C, D>::get_owner_body() const {
 	auto& self = *static_cast<const D*>(this);
 	const auto fixtures = self.template find<components::fixtures>();
 	return fixtures != nullptr ? self.get_cosmos()[fixtures.get_owner_body()] : self.get_cosmos()[entity_id()];
-}
-
-template <bool C, class D>
-entity_guid basic_relations_mixin<C, D>::get_guid() const {
-	auto& self = *static_cast<const D*>(this);
-	return self.template get<components::guid>().get_value();
 }
 
 template <bool C, class D>
