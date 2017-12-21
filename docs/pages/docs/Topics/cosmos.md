@@ -14,7 +14,7 @@ summary: |
 The cosmos is arguably the most complex structure in the entire codebase.  
 Its methods allow to, for example, create entities, access and modify them via returned [handles](entity_handle), clone or delete them.
 
-There are, however, exactly two *member fields* in the class:
+There are, however, exactly these *member fields* in the class:
 
 - 
 ### Significant
@@ -30,6 +30,11 @@ There are, however, exactly two *member fields* in the class:
 ### Inferred
 
     The storage of all [caches](inferred_cache) that are at any time regenerable from the contents of the [significant](cosmos#significant) field.
+
+- 
+### guid_to_id
+
+    todo: move to inferred?
 
 <br/>
 The reason that these two are coupled together into a single object is because one is so rarely (if ever) needed without the other that separating them would only accomplish so much as to introduce unnecessary noise, in the form of twice as many references passed across the entire game's logic.  

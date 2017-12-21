@@ -36,7 +36,10 @@ Most of the time, only the programmers are concerned with the second type of dat
 	- In particular, the **initial value** for a component may change even though some entities of this type already exist.
 		- This is not important. The field, in practice, serves two purposes:
 			- Used by the logic when it gets a type identifier to spawn (e.g. ``gun::magic_missile_definition``), so that it can set reasonable initial values. Thus, a change to initial value needs not updating here as the logic will naturally catch up, storing only the type identifier.
+	- Whatever changes in the type (during content creation), reinfer all objects of this type with help of the ame cache; currently we'll just reinfer the whole cosmos.
 			- Optionally as a helper for the author when they want to spawn some very specific entities. The author shouldn't worry that the initial value changes something for the existent entities.
+- Entity should be reinferred if it changes a type (during content creation).
+	- It should only be implemented as an editor feature. Let us not make this an actual feature in the game code and let us always assume that an entity's type stays constant throughout its lifetime.
 - There won't be many types, but access is **frequent** during [solve](solver#the-solve). 
 	- We allocate all definitions **statically**, as memory won't suffer relatively to the speed gain.
 - On creating an entity, the chosen type's id is passed.  
