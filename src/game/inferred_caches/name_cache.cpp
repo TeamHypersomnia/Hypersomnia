@@ -43,40 +43,6 @@ void name_cache::destroy_cache_of(const const_entity_handle h) {
 	destroy_cache_of(h, h.get<components::type>().get_raw_component());
 }
 
-void name_cache::set_type_id(
-	const entity_type_id new_type_id, 
-	components::type& name_of_subject, 
-	const entity_id subject
-) {
-	destroy_cache_of(subject, name_of_subject);
-	name_of_subject.type_id = new_type_id;
-	infer_cache_for(subject, name_of_subject);
-}
-
-void name_cache::set_name(
-	entity_types& metas,
-	const entity_name_type& full_name,
-	components::type& name_of_subject, 
-	const entity_id subject
-) {
-	const auto maybe_existent_id = name_to_id_lookup.find(full_name);
-
-	entity_type_id id = 0u;
-
-	/* Incremental reinference for entity_types */
-	if (maybe_existent_id != name_to_id_lookup.end()) {
-		id = (*maybe_existent_id).second;
-	}
-	else {
-		id = metas.next_type_id++;
-		metas.metas[id].name = full_name;
-		name_to_id_lookup[full_name] = id;
-	}
-
-	/* Actual reinference for the entity */
-	set_type_id(id, name_of_subject, subject);
-}
-
 std::unordered_set<entity_id> name_cache::get_entities_by_type_id(const entity_type_id id) const {
 	return mapped_or_default(entities_by_type_id, id);
 }

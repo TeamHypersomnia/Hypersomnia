@@ -47,29 +47,6 @@ class name_cache {
 	void infer_additional_cache(const cosmos_common_state&);
 	void destroy_additional_cache_of(const cosmos_common_state&);
 	
-	
-	/* 
-		For access of name synchronizer
-	*/
-
-	/*
-		If a name exists, assigns the id of the existent name to the name component.
-		If a name does not exist, generates a new id and assigns it to the name component.
-	*/
-
-	void set_name(
-		entity_types& metas,
-		const entity_name_type& full_name,
-		components::type& name_of_subject,
-		const entity_id subject
-	);
-
-	void set_type_id(
-		const entity_type_id type_id,
-		components::type& name_of_subject,
-		const entity_id subject
-	);
-
 public:
 	std::unordered_set<entity_id> get_entities_by_type_id(const entity_type_id) const;
 	std::unordered_set<entity_id> get_entities_by_name(const entity_name_type& full_name) const;

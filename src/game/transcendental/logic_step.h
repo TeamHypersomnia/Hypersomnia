@@ -14,11 +14,10 @@ struct basic_logic_step_input {
 
 	cosmos_ref cosm;
 	const cosmic_entropy& entropy;
-	const cosmos_common_state& common;
 	const all_logical_assets& logical_assets;
 
 	operator const_logic_step_input() const {
-		return { cosm, entropy, common, logical_assets };
+		return { cosm, entropy, logical_assets };
 	}
 };
 
@@ -49,7 +48,6 @@ public:
 
 	const auto& get_common() const {
 		return get_cosmos().get_common_state();
-		// return input.common;
 	}
 
 	const auto& get_logical_assets() const {

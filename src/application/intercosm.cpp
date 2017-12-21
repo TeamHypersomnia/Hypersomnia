@@ -16,7 +16,6 @@ void intercosm::make_test_scene(sol::state& lua, const bool minimal) {
 	world.clear();
 	logicals = {};
 	viewables = {};
-	common = {};
 	world.reserve_storage_for_entities(3000u);
 
 	populate_test_scene_assets(lua, logicals, viewables);

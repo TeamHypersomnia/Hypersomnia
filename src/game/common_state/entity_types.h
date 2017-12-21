@@ -48,10 +48,18 @@ public:
 	}
 
 	entity_type& get_type(const entity_type_id id) {
+		static entity_type t;
+		return t;
+#if TODO_NAMES
 		return metas.at(id);
+#endif
 	}
 
 	const entity_type& get_type(const entity_type_id id) const {
+		static entity_type t;
+		return t;
+#if TODO_NAMES
 		return metas.at(id);
+#endif
 	}
 };

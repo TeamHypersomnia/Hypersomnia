@@ -37,39 +37,7 @@ entity_type_id basic_type_synchronizer<C>::get_type_id() const {
 
 template <bool C>
 const entity_name_type& basic_type_synchronizer<C>::get_name() const {
-	const auto& cosmos = handle.get_cosmos();
-
-	return cosmos.inferred.name.get_name(
-		cosmos.get_common_state().all_entity_types,
-		get_raw_component()
-	);
-}
-
-void component_synchronizer<false, N>::set_name(const entity_name_type& full_name) const {
-	auto& cosmos = handle.get_cosmos();
-
-	cosmos.inferred.name.set_name(
-		cosmos.get_common_state().all_entity_types,
-		full_name,
-		get_raw_component(),
-		handle
-	);
-
-#if DEBUG_TRACK_ENTITY_NAME
-	/* TODO: Come up with something so that we can check entity names while debugging */
-#endif
-}
-
-void component_synchronizer<false, N>::set_type_id(const entity_type_id id) const {
-	handle.get_cosmos().inferred.name.set_type_id(
-		id,
-		get_raw_component(),
-		handle
-	);
-
-#if DEBUG_TRACK_ENTITY_NAME
-	/* TODO: Come up with something so that we can check entity names while debugging */
-#endif
+	return get_type().get_name();
 }
 
 template class basic_type_synchronizer<false>;

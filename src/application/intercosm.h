@@ -28,7 +28,6 @@ struct intercosm {
 	hypersomnia_version version;
 
 	cosmos world;
-	cosmos_common_state common;
 	all_logical_assets logicals;
 	all_viewables_defs viewables;
 	
@@ -45,7 +44,7 @@ struct intercosm {
 	void save(const intercosm_path_op) const;
 
 	auto make_logic_step_input(const cosmic_entropy& entropy) {
-		return logic_step_input{ world, entropy, common, logicals };	
+		return logic_step_input{ world, entropy, logicals };	
 	}
 
 	template <class... Callbacks>

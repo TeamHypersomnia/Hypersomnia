@@ -368,8 +368,6 @@ namespace prefabs {
 			perform_transfer({ load_mag[slot_function::ITEM_DEPOSIT].get_items_inside()[0], weapon[slot_function::GUN_CHAMBER], 1 }, step);
 		}
 
-		weapon.get_type().description = L"Robi super naclick.";
-
 		return weapon;
 	}
 
@@ -432,8 +430,6 @@ namespace prefabs {
 			perform_transfer({ load_mag[slot_function::ITEM_DEPOSIT].get_items_inside()[0], weapon[slot_function::GUN_CHAMBER], 1 }, step);
 		}
 
-		weapon.get_type().description = L"Robi super naclick.";
-
 		return weapon;
 	}
 	entity_handle create_kek9(const logic_step step, vec2 pos, entity_id load_mag_id) {
@@ -492,8 +488,6 @@ namespace prefabs {
 			perform_transfer({ load_mag, weapon[slot_function::GUN_DETACHABLE_MAGAZINE] }, step);
 			perform_transfer({ load_mag[slot_function::ITEM_DEPOSIT].get_items_inside()[0], weapon[slot_function::GUN_CHAMBER], 1 }, step);
 		}
-
-		weapon.get_type().description = L"Robi super naclick.";
 
 		return weapon;
 	}

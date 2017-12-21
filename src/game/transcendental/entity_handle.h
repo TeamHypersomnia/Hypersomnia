@@ -68,9 +68,9 @@ private:
 	using owner_reference = maybe_const_ref_t<is_const, cosmos>;
 	using entity_ptr = maybe_const_ptr_t<is_const, cosmic_entity>;
 
+	entity_ptr ptr;
 	owner_reference owner;
 	entity_id raw_id;
-	entity_ptr ptr;
 
 	using allocator = augs::component_allocators_mixin<is_const, basic_entity_handle<is_const>>;
 
@@ -290,12 +290,13 @@ public:
 		return get<components::type>().get_type();
 	}
 
+	auto get_type_id() const {
+		return get<components::type>().get_type_id();
+	}
+
 	const auto& get_name() const {
 		return get<components::type>().get_name();
 	}
-
-	template <bool C = !is_const, class = std::enable_if_t<C>>
-	void set_name(const entity_name_type& new_name) const;
 
 	bool is_inferred_state_activated() const {
 		const auto inferred = find<components::all_inferred_state>();

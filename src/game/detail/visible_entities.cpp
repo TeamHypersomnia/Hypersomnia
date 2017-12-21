@@ -77,7 +77,6 @@ void visible_entities::acquire_physical(const visible_entities_query input) {
 			filters::renderable_query(),
 			[&](const b2Fixture* const fix, auto, auto) {
 				unique_from_physics.insert(cosmos.make_versioned(get_entity_that_owns(fix)));
-				LOG(to_string(cosmos[cosmos.make_versioned(get_entity_that_owns(fix))].get_name()));
 				return callback_result::CONTINUE;
 			}
 		);

@@ -254,7 +254,6 @@ entity_handle cosmos::create_entity(const std::string& name) {
 
 entity_handle cosmos::create_entity(const std::wstring& name_str) {
 	auto new_entity = allocate_new_entity();
-	new_entity.set_name(name_str);
 
 	assign_next_guid(new_entity);
 	return new_entity;
