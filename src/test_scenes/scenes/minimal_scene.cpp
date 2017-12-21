@@ -30,7 +30,7 @@ namespace test_scenes {
 		//std::get<electric_triad>(common.spells).missile_definition = prefabs::create_electric_missile_def(step, {});
 	}
 
-	void minimal_scene::populate(const logic_step step) const {
+	entity_id minimal_scene::populate(const logic_step step) const {
 		auto& world = step.get_cosmos();
 
 		//prefabs::create_force_grenade(step, { 254, 611 });
@@ -123,5 +123,6 @@ namespace test_scenes {
 		//		prefabs::create_cyan_charge(step, vec2(0, 0), true ? 1000 : 30)));
 
 		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
+		return new_characters[0];
 	}
 }

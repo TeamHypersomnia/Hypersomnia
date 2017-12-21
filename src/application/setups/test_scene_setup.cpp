@@ -6,10 +6,6 @@
 #include "application/config_lua_table.h"
 #include "application/setups/test_scene_setup.h"
 
-
-
-using namespace augs::event::keys;
-
 test_scene_setup::test_scene_setup(
 	sol::state& lua,
 	const bool make_minimal_test_scene,
@@ -17,7 +13,6 @@ test_scene_setup::test_scene_setup(
 ) {
 #if BUILD_TEST_SCENES
 	scene.make_test_scene(lua, make_minimal_test_scene);
-	characters.acquire_available_characters(scene.world);
 #endif
 
 	if (recording_type != input_recording_type::DISABLED) {

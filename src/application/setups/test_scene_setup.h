@@ -14,7 +14,6 @@
 
 #include "application/setups/default_setup_settings.h"
 
-#include "application/debug_character_selection.h"
 #include "application/debug_settings.h"
 
 struct config_lua_table;
@@ -27,7 +26,6 @@ class test_scene_setup : public default_setup_settings {
 	intercosm scene;
 	cosmic_entropy total_collected_entropy;
 	augs::fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
-	debug_character_selection characters;
 
 public:
 	test_scene_setup(
@@ -49,7 +47,7 @@ public:
 	}
 
 	auto get_viewed_character_id() const {
-		return characters.get_selected_character();
+		return scene.locally_viewed;
 	}
 
 	auto get_viewed_character() const {

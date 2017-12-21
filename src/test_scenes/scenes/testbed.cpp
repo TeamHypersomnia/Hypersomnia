@@ -50,7 +50,7 @@ namespace test_scenes {
 		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
 	}
 
-	void testbed::populate(const logic_step step) const {
+	entity_id testbed::populate(const logic_step step) const {
 		auto& world = step.get_cosmos();
 		const auto& metas = step.get_logical_assets();
 		
@@ -791,5 +791,6 @@ namespace test_scenes {
 			perform_transfer({ pis2, character(3).get_primary_hand() }, step);
 		}
 
+		return character(0);
 	}
 }

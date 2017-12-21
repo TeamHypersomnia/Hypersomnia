@@ -15,7 +15,6 @@
 
 #include "application/intercosm.h"
 
-#include "application/debug_character_selection.h"
 #include "application/debug_settings.h"
 
 #include "application/setups/editor/editor_settings.h"

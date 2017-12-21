@@ -9,16 +9,20 @@ struct all_logical_assets;
 
 namespace test_scenes {
 	class minimal_scene {
-		void populate(const logic_step) const;
+		entity_id populate(const logic_step) const;
 	public:
 		void populate(cosmos_common_state&) const;
-		void populate_with_entities(const logic_step_input input) {
+		entity_id populate_with_entities(const logic_step_input input) {
+			entity_id controlled;
+
 			standard_solver(
 				input,
-				[&](const logic_step step) { populate(step); }, 
+				[&](const logic_step step) { controlled = populate(step); }, 
 				[](auto) {},
 				[](auto) {}
 			);
+
+			return controlled;
 		}
 	};
 }
