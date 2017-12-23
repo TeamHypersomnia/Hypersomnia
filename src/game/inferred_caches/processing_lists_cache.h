@@ -13,7 +13,7 @@ class cosmos;
 
 class processing_lists_cache {
 	friend class cosmos;
-	friend class cosmos_solvable_state;
+	friend class cosmos_solvable;
 
 	friend class component_synchronizer<false, components::processing>;
 	template<bool> friend class basic_processing_synchronizer;

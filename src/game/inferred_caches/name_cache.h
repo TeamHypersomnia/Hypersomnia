@@ -23,7 +23,7 @@ class name_cache {
 	> entities_by_type_id;
 
 	friend class cosmos;
-	friend class cosmos_solvable_state;
+	friend class cosmos_solvable;
 	friend class component_synchronizer<false, components::type>;
 
 	void reserve_caches_for_entities(const std::size_t n) const {}

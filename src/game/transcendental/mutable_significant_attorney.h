@@ -11,7 +11,7 @@ class cosmos;
 
 class mutable_significant_attorney {
 	/*
-		The following domains are free to arbitrarily change the cosmos_solvable_state::significant,
+		The following domains are free to arbitrarily change the cosmos_solvable::significant,
 		as they take proper precautions to keep state consistent or otherwise refresh it.
 	*/
 

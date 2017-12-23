@@ -13,7 +13,7 @@ class component_synchronizer;
 
 class relational_cache {
 	friend class cosmos;
-	friend class cosmos_solvable_state;
+	friend class cosmos_solvable;
 	friend class physics_world_cache;
 
 	friend class component_synchronizer<false, components::fixtures>;

@@ -10,7 +10,7 @@
 #include "augs/misc/enum/enum_boolset.h"
 #include "augs/misc/randomization_declaration.h"
 
-#include "game/transcendental/cosmos_solvable_state.h"
+#include "game/transcendental/cosmos_solvable.h"
 #include "game/transcendental/cosmos_common_significant.h"
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
@@ -54,7 +54,7 @@ class cosmos {
 
 	cosmos_common_significant common;
 public: 
-	cosmos_solvable_state solvable;
+	cosmos_solvable solvable;
 
 	/* A detail only for performance benchmarks */
 	mutable cosmic_profiler profiler;

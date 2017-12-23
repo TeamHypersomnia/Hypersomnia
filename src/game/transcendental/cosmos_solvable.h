@@ -29,10 +29,10 @@
 
 #include "game/assets/behaviour_tree.h"
 
-class cosmos_solvable_state {
+class cosmos_solvable {
 	using guid_cache = std::map<entity_guid, entity_id>;
 
-	static const cosmos_solvable_state zero;
+	static const cosmos_solvable zero;
 
 	entity_id allocate_new_entity();
 	void clear_guid(const entity_id);
@@ -45,8 +45,8 @@ public:
 	cosmos_solvable_inferred inferred;
 
 	/* State ends here */
-	cosmos_solvable_state() = default;
-	explicit cosmos_solvable_state(const cosmic_pool_size_type reserved_entities);
+	cosmos_solvable() = default;
+	explicit cosmos_solvable(const cosmic_pool_size_type reserved_entities);
 
 	void reserve_storage_for_entities(const cosmic_pool_size_type);
 
@@ -162,8 +162,8 @@ public:
 		return std::get<cosmic_object_pool<T>>(significant.component_pools);
 	}
 
-	bool operator==(const cosmos_solvable_state&) const;
-	bool operator!=(const cosmos_solvable_state&) const;
+	bool operator==(const cosmos_solvable&) const;
+	bool operator!=(const cosmos_solvable&) const;
 
 	bool empty() const;
 
@@ -194,7 +194,7 @@ private:
 	}	
 };
 
-inline entity_id cosmos_solvable_state::get_entity_id_by(const entity_guid guid) const {
+inline entity_id cosmos_solvable::get_entity_id_by(const entity_guid guid) const {
 	if (const auto id = mapped_or_nullptr(guid_to_id, guid)) {
 		return *id;
 	}
@@ -202,23 +202,23 @@ inline entity_id cosmos_solvable_state::get_entity_id_by(const entity_guid guid)
 	return {};
 }
 
-inline std::unordered_set<entity_id> cosmos_solvable_state::get_entities_by_type_id(const entity_type_id& id) const {
+inline std::unordered_set<entity_id> cosmos_solvable::get_entities_by_type_id(const entity_type_id& id) const {
 	return inferred.name.get_entities_by_type_id(id);
 }
 
-inline entity_id cosmos_solvable_state::make_versioned(const unversioned_entity_id id) const {
+inline entity_id cosmos_solvable::make_versioned(const unversioned_entity_id id) const {
 	return get_entity_pool().make_versioned(id);
 }
 
-inline std::size_t cosmos_solvable_state::get_entities_count() const {
+inline std::size_t cosmos_solvable::get_entities_count() const {
 	return significant.entity_pool.size();
 }
 
-inline std::size_t cosmos_solvable_state::get_maximum_entities() const {
+inline std::size_t cosmos_solvable::get_maximum_entities() const {
 	return significant.entity_pool.capacity();
 }
 
-inline entity_guid cosmos_solvable_state::get_guid(const entity_id id) const {
+inline entity_guid cosmos_solvable::get_guid(const entity_id id) const {
 	return get_aggregate(id).get<components::guid>(*this).get_value();
 }
 

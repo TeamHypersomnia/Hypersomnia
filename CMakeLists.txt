@@ -505,7 +505,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/components/trace_component.cpp"
 	"src/game/stateless_systems/physics_system.cpp"
 	"src/game/transcendental/standard_solver.cpp"
-	"src/game/transcendental/cosmos_solvable_state.cpp"
+	"src/game/transcendental/cosmos_solvable.cpp"
 )
 
 if(BUILD_WINDOW_FRAMEWORK)
