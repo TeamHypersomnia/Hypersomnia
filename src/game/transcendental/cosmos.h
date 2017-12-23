@@ -15,6 +15,7 @@
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/transcendental/mutable_significant_attorney.h"
+#include "game/transcendental/mutable_solvable_inferred_key.h"
 
 #include "game/assets/behaviour_tree.h"
 
@@ -45,7 +46,7 @@ auto subscript_handle_getter(C& cosm, const unversioned_entity_id id) {
 
 template <class C>
 auto subscript_handle_getter(C& cosm, const entity_guid guid) {
-	return subscript_handle_getter(cosm, cosm.solvable.get_entity_id_by(guid));
+	return subscript_handle_getter(cosm, cosm.get_solvable().get_entity_id_by(guid));
 }
 
 class cosmos {
@@ -53,9 +54,9 @@ class cosmos {
 	void reinfer_solvable();
 
 	cosmos_common_significant common;
-public: 
 	cosmos_solvable solvable;
 
+public: 
 	/* A detail only for performance benchmarks */
 	mutable cosmic_profiler profiler;
 
@@ -63,6 +64,10 @@ public:
 
 	cosmos() = default;
 	explicit cosmos(const cosmic_pool_size_type reserved_entities);
+
+	void reserve_storage_for_entities(const cosmic_pool_size_type s) {
+		solvable.reserve_storage_for_entities(s);
+	}
 
 	entity_handle create_entity(const std::wstring& name);
 	entity_handle create_entity(const std::string& name);
@@ -98,6 +103,10 @@ public:
 		for (const auto& subject : solvable.inferred.processing_lists.get(list_type)) {
 			operator()(subject, callback);
 		}
+	}
+
+	void increment_step() {
+		solvable.increment_step();
 	}
 
 	void infer_caches_for(const const_entity_handle);
@@ -149,7 +158,7 @@ public:
 			}
 		});
 
-		status = callback(solvable.get_significant({}));
+		status = callback(solvable.significant);
 	}
 
 	void set(const cosmos_solvable_significant& signi) {
@@ -169,6 +178,30 @@ public:
 	rng_seed_type get_rng_seed_for(const entity_id) const;
 	
 	std::wstring summary() const;
+
+	auto& get_solvable(mutable_significant_attorney) {
+		return solvable;
+	}
+
+	const auto& get_solvable(mutable_significant_attorney) const {
+		return solvable;
+	}
+
+	const auto& get_solvable() const {
+		return solvable;
+	}
+
+	auto& get_solvable_inferred(mutable_solvable_inferred_key) {
+		return solvable.inferred;
+	}
+
+	const auto& get_solvable_inferred(mutable_solvable_inferred_key) const {
+		return solvable.inferred;
+	}
+
+	const auto& get_solvable_inferred() const {
+		return solvable.inferred;
+	}
 
 	const cosmos_common_significant& get_common_state() const;
 	const common_assets& get_common_assets() const;

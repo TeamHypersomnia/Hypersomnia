@@ -242,12 +242,12 @@ TEST_CASE("CosmicDelta3 GuidizeTests") {
 	item_slot_transfer_request dt;
 	dt.item = new_ent1;
 
-	const auto guidized = c1.solvable.guidize(dt);
+	const auto guidized = c1.get_solvable().guidize(dt);
 
 	REQUIRE(0 == guidized.target_slot.container_entity);
 	REQUIRE(1 == guidized.item);
 
-	const auto deguidized = c1.solvable.deguidize(guidized);
+	const auto deguidized = c1.get_solvable().deguidize(guidized);
 	REQUIRE(dt.item == deguidized.item);
 	REQUIRE(dt.target_slot.container_entity == deguidized.target_slot.container_entity);
 	entity_id dead;

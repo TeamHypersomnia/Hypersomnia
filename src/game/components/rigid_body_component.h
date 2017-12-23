@@ -64,7 +64,7 @@ protected:
 	template <bool> 
 	friend class basic_fixtures_synchronizer;
 
-	maybe_const_ref_t<is_const, rigid_body_cache>& get_cache() const;
+	const rigid_body_cache& get_cache() const;
 
 	template <class T>
 	auto to_pixels(const T meters) const {
@@ -97,11 +97,11 @@ public:
 	rigid_body_type get_body_type() const;
 
 	auto get_fixture_entities() const {
-		return handle.get_cosmos().solvable.inferred.relational.fixtures_of_bodies.get_children_of(handle);
+		return handle.get_cosmos().get_solvable_inferred().relational.fixtures_of_bodies.get_children_of(handle);
 	}
 
 	auto get_attached_joints() const {
-		return handle.get_cosmos().solvable.inferred.relational.joints_of_bodies.get_all_children_of(handle);
+		return handle.get_cosmos().get_solvable_inferred().relational.joints_of_bodies.get_all_children_of(handle);
 	}
 
 	bool test_point(const vec2) const;
@@ -110,6 +110,8 @@ public:
 template<>
 class component_synchronizer<false, components::rigid_body> : public basic_physics_synchronizer<false> {
 	void reinfer_caches() const;
+	rigid_body_cache& get_cache() const;
+
 public:
 	using basic_physics_synchronizer<false>::basic_physics_synchronizer;
 

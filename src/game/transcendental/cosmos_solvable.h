@@ -22,7 +22,6 @@
 #endif
 
 #include "game/organization/all_messages_declaration.h"
-#include "game/transcendental/mutable_significant_attorney.h"
 #include "game/transcendental/cosmos_solvable_inferred.h"
 #include "game/transcendental/cosmos_solvable_significant.h"
 #include "game/transcendental/entity_id.h"
@@ -37,14 +36,12 @@ class cosmos_solvable {
 	entity_id allocate_new_entity();
 	void clear_guid(const entity_id);
 
-	/* State begins here */
 	guid_cache guid_to_id;
-	cosmos_solvable_significant significant;
-	
+
 public:
+	cosmos_solvable_significant significant;
 	cosmos_solvable_inferred inferred;
 
-	/* State ends here */
 	cosmos_solvable() = default;
 	explicit cosmos_solvable(const cosmic_pool_size_type reserved_entities);
 
@@ -123,23 +120,7 @@ public:
 	augs::delta get_fixed_delta() const;
 	unsigned get_steps_per_second() const;
 
-	auto& get_significant(const mutable_significant_attorney&) {
-		return significant;
-	}
-
-	const auto& get_significant(const mutable_significant_attorney&) const {
-		return significant;
-	}
-
-	const auto& get_significant() const {
-		return significant;
-	}
-
-	auto& get_entity_pool(const mutable_significant_attorney&) {
-		return significant.entity_pool;
-	}
-
-	const auto& get_entity_pool(const mutable_significant_attorney&) const {
+	auto& get_entity_pool() {
 		return significant.entity_pool;
 	}
 
@@ -148,12 +129,7 @@ public:
 	}
 
 	template <class T>
-	auto& get_component_pool(const mutable_significant_attorney&) {
-		return std::get<cosmic_object_pool<T>>(significant.component_pools);
-	}
-
-	template <class T>
-	const auto& get_component_pool(const mutable_significant_attorney&) const {
+	auto& get_component_pool() {
 		return std::get<cosmic_object_pool<T>>(significant.component_pools);
 	}
 
@@ -169,12 +145,6 @@ public:
 
 	const auto& get_guid_to_id() const {
 		return guid_to_id;
-	}
-
-private:
-
-	auto& get_entity_pool() {
-		return significant.entity_pool;
 	}
 
 	const auto& get_aggregate(const entity_id id) const {

@@ -32,8 +32,8 @@ void relations_mixin<false, D>::make_cloned_child_entities_recursive(const entit
 		using component_type = decltype(c);
 		
 		if (self.template has<component_type>()) {
-			auto& cloned_to_component = self.get().template get<component_type>(cosm.solvable);
-			const auto& cloned_from_component = from.get().template get<component_type>(cosm.solvable);
+			auto& cloned_to_component = self.get({}).template get<component_type>(cosm.get_solvable({}));
+			const auto& cloned_from_component = from.get({}).template get<component_type>(cosm.get_solvable());
 
 			if constexpr(allows_nontriviality_v<component_type>) {
 				component_type::clone_children(
@@ -121,7 +121,7 @@ maybe_const_ptr_t<C, child_entity_id> basic_relations_mixin<C, D>::get_id_ptr(co
 template <bool C, class D>
 typename basic_relations_mixin<C, D>::inventory_slot_handle_type basic_relations_mixin<C, D>::operator[](const slot_function func) const {
 	auto& self = *static_cast<const D*>(this);
-	return inventory_slot_handle_type(self.owner, inventory_slot_id(func, self.raw_id));
+	return inventory_slot_handle_type(self.get_cosmos(), inventory_slot_id(func, self.get_id()));
 }
 
 template <bool C, class D>

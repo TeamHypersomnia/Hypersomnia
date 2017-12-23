@@ -15,7 +15,7 @@ namespace augs {
 				return &std::get<component>(a.fundamentals);
 			}
 			else {
-				return p.template get_component_pool<component>({}).find(a.template get_id<component>());
+				return p.template get_component_pool<component>().find(a.template get_id<component>());
 			}
 		}
 
@@ -130,7 +130,7 @@ namespace augs {
 			else {
 				ensure(!has<component>(p));
 
-				set_id(p.template get_component_pool<component>({}).allocate(c));
+				set_id(p.template get_component_pool<component>().allocate(c));
 			}
 		}
 
@@ -142,7 +142,7 @@ namespace augs {
 
 			const auto id_of_deleted = get_id<component>();
 
-			p.template get_component_pool<component>({}).free(id_of_deleted);
+			p.template get_component_pool<component>().free(id_of_deleted);
 			set_id(decltype(id_of_deleted)());
 		}
 

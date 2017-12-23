@@ -110,7 +110,7 @@ void physics_world_cache::destroy_cache_of(const const_entity_handle handle) {
 
 void physics_world_cache::infer_cache_for(const const_entity_handle handle) {
 	const auto& cosmos = handle.get_cosmos();
-	const auto& relational = cosmos.solvable.inferred.relational;
+	const auto& relational = cosmos.get_solvable_inferred().relational;
 
 	if (const bool is_already_constructed = cache_exists_for_rigid_body(handle)) {
 		return;
@@ -294,7 +294,7 @@ void physics_world_cache::reserve_caches_for_entities(const size_t n) {
 b2Fixture_index_in_component physics_world_cache::get_index_in_component(
 	const b2Fixture* const f, 
 	const const_entity_handle handle
-) {
+) const {
 	ensure(f->index_in_component != -1);
 
 	b2Fixture_index_in_component result;

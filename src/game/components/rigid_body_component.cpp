@@ -30,12 +30,16 @@ void components::rigid_body::set_transform(
 
 template<bool C>
 bool basic_physics_synchronizer<C>::is_constructed() const {
-	return handle.get_cosmos().solvable.inferred.physics.cache_exists_for_rigid_body(handle);
+	return handle.get_cosmos().get_solvable_inferred().physics.cache_exists_for_rigid_body(handle);
 }
 
-template<bool C>
-maybe_const_ref_t<C, rigid_body_cache>& basic_physics_synchronizer<C>::get_cache() const {
-	return handle.get_cosmos().solvable.inferred.physics.get_rigid_body_cache(handle);
+template <bool C>
+const rigid_body_cache& basic_physics_synchronizer<C>::get_cache() const {
+	return handle.get_cosmos().get_solvable_inferred().physics.get_rigid_body_cache(handle);
+}
+
+rigid_body_cache& component_synchronizer<false, P>::get_cache() const {
+	return handle.get_cosmos().get_solvable_inferred({}).physics.get_rigid_body_cache(handle);
 }
 
 void component_synchronizer<false, P>::reinfer_caches() const {

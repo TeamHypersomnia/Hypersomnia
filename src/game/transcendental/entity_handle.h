@@ -10,6 +10,7 @@
 
 #include "game/detail/inventory/inventory_slot_handle_declaration.h"
 #include "game/transcendental/entity_handle_declaration.h"
+#include "game/transcendental/mutable_significant_attorney.h"
 #include "game/transcendental/entity_id.h"
 #include "game/organization/all_components_declaration.h"
 
@@ -24,14 +25,9 @@
 #include "game/components/flags_component.h"
 
 class cosmos;
-struct cosmic_delta;
 
 template <bool, class>
 class component_synchronizer;
-
-namespace augs {
-	void read_object_lua(sol::table ar, cosmos& cosm);
-}
 
 template <bool is_const>
 class basic_entity_handle :
@@ -40,17 +36,10 @@ class basic_entity_handle :
 	public relations_mixin<is_const, basic_entity_handle<is_const>>,
 	public spatial_properties_mixin<is_const, basic_entity_handle<is_const>>
 {
-	/* For cloning */
-	template <bool, class> friend class relations_mixin;
-	template <bool, class> friend class basic_relations_mixin;
-
-	template <bool> friend class basic_entity_handle;
-
-	friend cosmic_delta;
-	friend cosmos;
-
 	using owner_reference = maybe_const_ref_t<is_const, cosmos>;
 	using entity_ptr = maybe_const_ptr_t<is_const, cosmic_entity>;
+
+	friend basic_entity_handle<!is_const>;
 
 	entity_ptr ptr;
 	owner_reference owner;
@@ -61,23 +50,23 @@ class basic_entity_handle :
 		static_assert(is_one_of_list_v<T, component_list_t<type_list>>, "Unknown component type!");
 	}
 
-	auto& get() const {
-		return *ptr;
+	auto& pool_provider() const {
+		return owner.get_solvable({});
 	}
 
-	auto& pool_provider() const {
-		return owner.solvable;
+	auto& agg() const {
+		return *ptr;
 	}
 
 private:
 	basic_entity_handle(
+		const entity_ptr ptr,
 		owner_reference owner,
-		const entity_id raw_id,
-		const entity_ptr ptr
+		const entity_id raw_id
 	) :
-		raw_id(raw_id),
+		ptr(ptr),
 		owner(owner),
-		ptr(ptr)
+		raw_id(raw_id)
 	{}
 
 public:
@@ -85,10 +74,14 @@ public:
 		owner_reference owner, 
 		const entity_id raw_id
 	) : basic_entity_handle(
+		owner.get_solvable({}).get_entity_pool().find(raw_id),
 		owner, 
-		raw_id, 
-		owner.solvable.get_entity_pool({}).find(raw_id)
+		raw_id 
 	) {
+	}
+
+	auto& get(mutable_significant_attorney) const {
+		return agg();
 	}
 
 	entity_id get_id() const {
@@ -121,7 +114,7 @@ public:
 
 	template <bool C = !is_const, class = std::enable_if_t<C>>
 	operator const_entity_handle() const {
-		return const_entity_handle(owner, raw_id, ptr);
+		return const_entity_handle(ptr, owner, raw_id);
 	}
 
 	operator entity_id() const {
@@ -142,7 +135,7 @@ public:
 
 	template <class component>
 	bool has() const {
-		return get().template has<component>(pool_provider());
+		return agg().template has<component>(pool_provider());
 	}
 
 	template <class T>
@@ -152,10 +145,10 @@ public:
 		ensure(alive());
 		
 		if constexpr(is_component_synchronized_v<T>) {
-			return component_synchronizer<is_const, T>(&get().template get<T>(pool_provider()), *this);
+			return component_synchronizer<is_const, T>(&agg().template get<T>(pool_provider()), *this);
 		}
 		else {
-			return get().template get<T>(pool_provider());
+			return agg().template get<T>(pool_provider());
 		}
 	}
 
@@ -165,11 +158,11 @@ public:
 		ensure(alive());
 		
 		if constexpr(is_component_synchronized_v<T>) {
-			get().template add<T>(c, pool_provider());
+			agg().template add<T>(c, pool_provider());
 			owner.reinfer_caches_of(*this);
 		}
 		else {
-			get().template add<T>(c, pool_provider());
+			agg().template add<T>(c, pool_provider());
 		}
 	}
 
@@ -185,10 +178,10 @@ public:
 		ensure(alive());
 
 		if constexpr(is_component_synchronized_v<T>) {
-			return component_synchronizer<is_const, T>(get().template find<T>(pool_provider()), *this);
+			return component_synchronizer<is_const, T>(agg().template find<T>(pool_provider()), *this);
 		}
 		else {
-			return get().template find<T>(pool_provider());
+			return agg().template find<T>(pool_provider());
 		}
 	}
 
@@ -199,11 +192,11 @@ public:
 		ensure(alive());
 
 		if constexpr(is_component_synchronized_v<T>) {
-			get().template remove<T>(pool_provider());
+			agg().template remove<T>(pool_provider());
 			owner.reinfer_caches_of(*this);
 		}
 		else {
-			get().template remove<T>(pool_provider());
+			agg().template remove<T>(pool_provider());
 		}
 	}
 
@@ -257,14 +250,14 @@ public:
 	void for_each_component(F&& callback) const {
 		ensure(alive());
 
-		get().for_each_component(
+		agg().for_each_component(
 			std::forward<F>(callback),
 		   	pool_provider()
 		);
 	}
 	
 	entity_guid get_guid() const {
-		return get_cosmos().solvable.get_guid(raw_id);
+		return get_cosmos().get_solvable().get_guid(raw_id);
 	}
 
 	auto& get_type() const {

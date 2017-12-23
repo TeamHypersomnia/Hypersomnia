@@ -21,7 +21,7 @@
 #define FRICTION_FIELDS_COLLIDE 0
 
 physics_world_cache& contact_listener::get_sys() const {
-	return cosm.solvable.inferred.physics;
+	return cosm.get_solvable_inferred({}).physics;
 }
 
 contact_listener::contact_listener(cosmos& cosm) : cosm(cosm) {

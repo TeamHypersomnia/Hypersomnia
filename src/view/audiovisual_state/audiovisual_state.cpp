@@ -119,7 +119,7 @@ void audiovisual_state::standard_post_solve(const const_logic_step step) {
 	auto scope = measure_scope(profiler.post_solve);
 
 	const auto& cosmos = step.get_cosmos();
-	reserve_caches_for_entities(cosmos.solvable.get_entity_pool().capacity());
+	reserve_caches_for_entities(cosmos.get_solvable().get_entity_pool().capacity());
 
 	const auto& healths = step.get_queue<messages::health_event>();
 	const auto& new_thunders = step.get_queue<thunder_input>();

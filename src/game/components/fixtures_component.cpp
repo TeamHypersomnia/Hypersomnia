@@ -14,10 +14,15 @@
 
 using F = components::fixtures;
 
-template<bool C>
-maybe_const_ref_t<C, colliders_cache>& basic_fixtures_synchronizer<C>::get_cache() const {
+template <bool C>
+const colliders_cache& basic_fixtures_synchronizer<C>::get_cache() const {
 	auto& cosmos = handle.get_cosmos();
-	return cosmos.solvable.inferred.physics.get_colliders_cache(handle);
+	return cosmos.get_solvable_inferred().physics.get_colliders_cache(handle);
+}
+
+colliders_cache& component_synchronizer<false, F>::get_cache() const {
+	auto& cosmos = handle.get_cosmos();
+	return cosmos.get_solvable_inferred({}).physics.get_colliders_cache(handle);
 }
 
 template<bool C>
@@ -162,7 +167,7 @@ void component_synchronizer<false, F>::set_owner_body(const entity_id owner_id) 
 	const auto former_owner = cosmos[get_raw_component().owner_body];
 	get_raw_component().owner_body = new_owner;
 
-	auto& relational = cosmos.solvable.inferred.relational.fixtures_of_bodies;
+	auto& relational = cosmos.get_solvable_inferred({}).relational.fixtures_of_bodies;
 	relational.set_parent(self, new_owner);
 
 	if (former_owner.alive()) {
@@ -205,7 +210,7 @@ bool basic_fixtures_synchronizer<C>::is_activated() const {
 
 template<bool C>
 bool basic_fixtures_synchronizer<C>::is_constructed() const {
-	return handle.get_cosmos().solvable.inferred.physics.cache_exists_for_colliders(handle);
+	return handle.get_cosmos().get_solvable_inferred().physics.cache_exists_for_colliders(handle);
 }
 
 template<bool C>

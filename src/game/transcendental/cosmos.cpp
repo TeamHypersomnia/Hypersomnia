@@ -57,7 +57,7 @@ bool cosmos::operator==(const cosmos& b) const {
 		return false;
 	}
 
-	return solvable == b.solvable;
+	return solvable == b.get_solvable();
 }
 
 bool cosmos::operator!=(const cosmos& b) const {
@@ -114,7 +114,7 @@ entity_handle cosmos::clone_entity(const entity_id source_entity_id) {
 
 	const auto new_entity = create_entity(L"");
 	
-	new_entity.get().clone_components_except<
+	solvable.get_aggregate(new_entity).clone_components_except<
 		/*
 			These components will be cloned shortly,
 			with due care to each of them.
@@ -128,7 +128,7 @@ entity_handle cosmos::clone_entity(const entity_id source_entity_id) {
 			to avoid unnecessary regeneration.
 		*/
 		components::all_inferred_state
-	>(source_entity.get(), solvable);
+	>(solvable.get_aggregate(source_entity), solvable);
 
 	if (new_entity.has<components::item>()) {
 		new_entity.get<components::item>().current_slot.unset();
@@ -234,7 +234,7 @@ namespace augs {
 			{
 				auto scope = measure_scope(profiler.size_calculation_pass);
 				augs::write_bytes(counter_stream, cosm.get_common_state());
-				augs::write_bytes(counter_stream, cosm.solvable.get_significant());
+				augs::write_bytes(counter_stream, cosm.get_solvable().significant);
 			}
 
 			auto scope = measure_scope(profiler.memory_allocation_pass);
@@ -245,7 +245,7 @@ namespace augs {
 		{
 			auto scope = measure_scope(profiler.serialization_pass);
 			augs::write_bytes(into, cosm.get_common_state());
-			augs::write_bytes(into, cosm.solvable.get_significant());
+			augs::write_bytes(into, cosm.get_solvable().significant);
 		}
 	}
 
@@ -279,7 +279,7 @@ namespace augs {
 		{
 			auto pool_meta_table = ar.create();
 			ar["pool_meta"] = pool_meta_table;
-			pool_meta_table["reserved_entities_count"] = static_cast<unsigned>(cosm.solvable.get_maximum_entities());
+			pool_meta_table["reserved_entities_count"] = static_cast<unsigned>(cosm.get_solvable().get_maximum_entities());
 		}
 
 		auto entities_table = ar.create();
@@ -287,7 +287,7 @@ namespace augs {
 		
 		int entity_table_counter = 1;
 
-		for (const auto& ent : cosm.solvable.get_entity_pool()) {
+		for (const auto& ent : cosm.get_solvable().get_entity_pool()) {
 			auto this_entity_table = entities_table.create();
 	
 			ent.for_each_component(
@@ -301,7 +301,7 @@ namespace augs {
 
 					write_lua(this_component_table, comp);
 				},
-				cosm.solvable
+				cosm.get_solvable()
 			);
 
 			entities_table[entity_table_counter++] = this_entity_table;
@@ -320,7 +320,7 @@ namespace augs {
 
 		{
 			sol::object reserved_count = ar["pool_meta"]["reserved_entities_count"];
-			cosm.solvable.reserve_storage_for_entities(reserved_count.as<unsigned>());
+			cosm.reserve_storage_for_entities(reserved_count.as<unsigned>());
 		}
 
 		cosm.change_common_state([&](cosmos_common_significant& common) {
@@ -350,7 +350,7 @@ namespace augs {
 							if (this_component_name == component_name) {
 								component_type c;
 								read_lua(key_value_pair.second, c);
-								new_entity.get().add<component_type>(c, cosm.solvable);
+								new_entity.get({}).add<component_type>(c, cosm.get_solvable());
 							}
 						}
 					);

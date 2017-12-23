@@ -45,11 +45,6 @@ class physics_world_cache {
 	std::vector<colliders_cache> colliders_caches;
 	std::vector<joint_cache> joint_caches;
 
-	b2Fixture_index_in_component get_index_in_component(
-		const b2Fixture* const f, 
-		const const_entity_handle
-	);
-	
 	void reserve_caches_for_entities(const size_t n);
 
 	void infer_cache_for(const const_entity_handle);
@@ -60,32 +55,20 @@ class physics_world_cache {
 
 	friend class cosmos;
 	friend class cosmos_solvable;
-	friend class physics_system;
-	friend class contact_listener;
-	friend class component_synchronizer<false, components::rigid_body>;
-	friend class component_synchronizer<true, components::rigid_body>;
-	friend class component_synchronizer<false, components::motor_joint>;
-	friend class component_synchronizer<true, components::motor_joint>;
-	friend class component_synchronizer<false, components::fixtures>;
-	friend class component_synchronizer<true, components::fixtures>;
-	template <bool> friend class basic_physics_synchronizer;
-	template <bool> friend class basic_fixtures_synchronizer;
 
-	bool cache_exists_for_rigid_body(const const_entity_handle) const;
-	bool cache_exists_for_colliders(const const_entity_handle) const;
-	bool cache_exists_for_joint(const const_entity_handle) const;
-
-	rigid_body_cache& get_rigid_body_cache(const entity_id);
-	colliders_cache& get_colliders_cache(const entity_id);
-	joint_cache& get_joint_cache(const entity_id);
-	const rigid_body_cache& get_rigid_body_cache(const entity_id) const;
-	const colliders_cache& get_colliders_cache(const entity_id) const;
-	const joint_cache& get_joint_cache(const entity_id) const;
+public:
+	// b2World on stack causes a stack overflow due to a large stack allocator, therefore it must be dynamically allocated
+	std::unique_ptr<b2World> b2world;
 
 	std::vector<messages::collision_message> accumulated_messages;
 
-public:
 	physics_world_cache();
+
+	physics_world_cache(const physics_world_cache&);
+	physics_world_cache& operator=(const physics_world_cache&);
+
+	physics_world_cache& operator=(physics_world_cache&&) = delete;
+	physics_world_cache(physics_world_cache&&) = delete;
 
 	std::vector<physics_raycast_output> ray_cast_all_intersections(
 		const vec2 p1_meters,
@@ -164,6 +147,18 @@ public:
 
 	mutable std::size_t ray_casts_since_last_step = 0u;
 
+	rigid_body_cache& get_rigid_body_cache(const entity_id);
+	colliders_cache& get_colliders_cache(const entity_id);
+	joint_cache& get_joint_cache(const entity_id);
+
+	const rigid_body_cache& get_rigid_body_cache(const entity_id) const;
+	const colliders_cache& get_colliders_cache(const entity_id) const;
+	const joint_cache& get_joint_cache(const entity_id) const;
+
+	bool cache_exists_for_rigid_body(const const_entity_handle) const;
+	bool cache_exists_for_colliders(const const_entity_handle) const;
+	bool cache_exists_for_joint(const const_entity_handle) const;
+
 	b2World& get_b2world() {
 		return *b2world.get();
 	}
@@ -172,26 +167,10 @@ public:
 		return *b2world.get();
 	}
 
-	// b2World on stack causes a stack overflow due to a large stack allocator, therefore it must be dynamically allocated
-	std::unique_ptr<b2World> b2world;
-
-	physics_world_cache(const physics_world_cache&);
-	physics_world_cache& operator=(const physics_world_cache&);
-
-	physics_world_cache& operator=(physics_world_cache&&) = delete;
-	physics_world_cache(physics_world_cache&&) = delete;
-private:	
-	struct raycast_input : public b2RayCastCallback {
-		entity_id subject;
-		b2Filter subject_filter;
-
-		bool save_all = false;
-		physics_raycast_output output;
-		std::vector<physics_raycast_output> outputs;
-
-		bool ShouldRaycast(b2Fixture* fixture) override;
-		float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction) override;
-	};
+	b2Fixture_index_in_component get_index_in_component(
+		const b2Fixture* const f, 
+		const const_entity_handle
+	) const;
 
 	void rechoose_owner_friction_body(entity_handle);
 	void recurential_friction_handler(const logic_step, b2Body* const entity, b2Body* const friction_owner);

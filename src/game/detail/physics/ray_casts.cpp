@@ -6,14 +6,26 @@
 #include "game/detail/physics/physics_scripts.h"
 #include "game/enums/filters.h"
 
-bool physics_world_cache::raycast_input::ShouldRaycast(b2Fixture* const fixture) {
+struct raycast_input : public b2RayCastCallback {
+	entity_id subject;
+	b2Filter subject_filter;
+
+	bool save_all = false;
+	physics_raycast_output output;
+	std::vector<physics_raycast_output> outputs;
+
+	bool ShouldRaycast(b2Fixture* fixture) override;
+	float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction) override;
+};
+
+bool raycast_input::ShouldRaycast(b2Fixture* const fixture) {
 	const auto fixture_entity = fixture->GetBody()->GetUserData();
 	return
 		(subject == entity_id() || fixture_entity != subject) &&
 		(b2ContactFilter::ShouldCollide(&subject_filter, &fixture->GetFilterData()));
 }
 
-float32 physics_world_cache::raycast_input::ReportFixture(
+float32 raycast_input::ReportFixture(
 	b2Fixture* const fixture, 
 	const b2Vec2& point,
 	const b2Vec2& normal, 

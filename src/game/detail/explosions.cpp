@@ -77,7 +77,7 @@ void standard_explosion_input::instantiate(
 		{ request }
 	);
 
-	const auto& physics = cosmos.solvable.inferred.physics;
+	const auto& physics = cosmos.get_solvable_inferred().physics;
 
 	std::unordered_set<unversioned_entity_id> affected_entities_of_bodies;
 

@@ -521,7 +521,7 @@ void editor_setup::perform_custom_imgui(
 			auto summary = scoped_window("Summary", &show_summary, ImGuiWindowFlags_AlwaysAutoResize);
 
 			if (has_current_tab()) {
-				//text("Tick rate: %x/s", get_viewed_cosmos().solvable.get_steps_per_second()));
+				//text("Tick rate: %x/s", get_viewed_cosmos().get_solvable().get_steps_per_second()));
 				text("Cursor: %x", world_cursor_pos);
 				
 				const auto printed_camera = get_custom_camera() ? *get_custom_camera() : current_cone;
@@ -532,7 +532,7 @@ void editor_setup::perform_custom_imgui(
 
 				text("Total entities: %x/%x",
 					get_viewed_cosmos().get_entities_count(),
-					get_viewed_cosmos().solvable.get_maximum_entities()
+					get_viewed_cosmos().get_solvable().get_maximum_entities()
 				);
 
 				text("World time: %x (%x steps)",
@@ -574,7 +574,7 @@ void editor_setup::perform_custom_imgui(
 			static ImGuiTextFilter filter;
 			filter.Draw();
 			
-			work().world.solvable.for_each_entity_id([&](const entity_id id) {
+			work().world.get_solvable().for_each_entity_id([&](const entity_id id) {
 				const auto handle = work().world[id];
 				const auto name = to_string(handle.get_name());
 
@@ -672,7 +672,7 @@ void editor_setup::perform_custom_imgui(
 			
 						unsigned hits = 0;
 							
-						for (const auto& lex : self.work().world.solvable.inferred.name.get_lexicographic_names()) {
+						for (const auto& lex : self.work().world.get_solvable_inferred().name.get_lexicographic_names()) {
 							const auto& name = lex.first;
 			
 							if (query.empty() || to_lowercase(name).find(query) != std::wstring::npos) {

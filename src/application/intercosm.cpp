@@ -16,7 +16,7 @@ void intercosm::make_test_scene(sol::state& lua, const bool minimal) {
 	world.clear();
 	logicals = {};
 	viewables = {};
-	world.solvable.reserve_storage_for_entities(3000u);
+	world.reserve_storage_for_entities(3000u);
 
 	populate_test_scene_assets(lua, logicals, viewables);
 
@@ -43,7 +43,7 @@ void intercosm::make_test_scene(sol::state& lua, const bool minimal) {
 
 void intercosm::make_blank() {
 	world.clear();
-	world.solvable.reserve_storage_for_entities(100);
+	world.reserve_storage_for_entities(100);
 
 	auto origin = world.create_entity("origin_entity");
 	origin += components::transform();

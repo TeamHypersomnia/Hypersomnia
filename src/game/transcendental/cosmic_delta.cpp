@@ -67,7 +67,7 @@ void transform_component_guids_to_ids_in_place(
 			id.unset();
 
 			if (guid_inside != 0) {
-				id = cosm.solvable.get_entity_id_by(guid_inside);
+				id = cosm.get_solvable().get_entity_id_by(guid_inside);
 			}
 		}
 		else {
@@ -103,10 +103,10 @@ bool cosmic_delta::encode(
 	
 	delted_stream_of_entities dt;
 
-	enco.solvable.for_each_entity_id([&](const entity_id id) {
+	enco.get_solvable().for_each_entity_id([&](const entity_id id) {
 		const const_entity_handle enco_entity = enco[id];
 		const auto stream_written_guid = enco_entity.get_guid();
-		const const_entity_handle base_entity = base[base.solvable.get_entity_id_by(stream_written_guid)];
+		const const_entity_handle base_entity = base[base.get_solvable().get_entity_id_by(stream_written_guid)];
 		const bool is_new = base_entity.dead();
 
 		bool has_entity_changed = false;
@@ -127,8 +127,8 @@ bool cosmic_delta::encode(
 				if constexpr(!std::is_same_v<component_type, components::guid>) {
 					constexpr size_t idx = component_index_v<component_type>;
 		
-					const auto maybe_base = is_new ? nullptr : base_entity.get().find<component_type>(base.solvable);
-					const auto maybe_enco = enco_entity.get().find<component_type>(enco.solvable);
+					const auto maybe_base = is_new ? nullptr : base_entity.get({}).find<component_type>(base.get_solvable());
+					const auto maybe_enco = enco_entity.get({}).find<component_type>(enco.get_solvable());
 		
 					if (!maybe_enco && !maybe_base) {
 						return;
@@ -184,10 +184,10 @@ bool cosmic_delta::encode(
 		}
 	});
 
-	base.solvable.for_each_entity_id([&base, &enco, &dt](const entity_id id) {
+	base.get_solvable().for_each_entity_id([&base, &enco, &dt](const entity_id id) {
 		const const_entity_handle base_entity = base[id];
 		const auto stream_written_guid = base_entity.get_guid();
-		const auto maybe_enco_entity = enco.solvable.get_entity_id_by(stream_written_guid);
+		const auto maybe_enco_entity = enco.get_solvable().get_entity_id_by(stream_written_guid);
 		const bool is_dead = !maybe_enco_entity.is_set();
 
 		if (is_dead) {
@@ -199,8 +199,8 @@ bool cosmic_delta::encode(
 	augs::memory_stream new_meta_content;
 
 	const bool has_meta_changed = augs::write_delta(
-		base.solvable.get_significant().clock, 
-		enco.solvable.get_significant().clock, 
+		base.get_solvable().significant.clock, 
+		enco.get_solvable().significant.clock, 
 		new_meta_content, 
 		true
 	);
@@ -255,9 +255,9 @@ void cosmic_delta::decode(
 	
 	deco.profiler.delta_decoding.start();
 
-	deco.solvable.destroy_all_caches();
+	deco.get_solvable({}).destroy_all_caches();
 
-	augs::read_delta(deco.solvable.get_significant({}).clock, in, true);
+	augs::read_delta(deco.get_solvable({}).significant.clock, in, true);
 
 	delted_stream_of_entities dt;
 
@@ -298,7 +298,7 @@ void cosmic_delta::decode(
 						augs::read_delta(decoded_component, in, true);
 						transform_component_guids_to_ids_in_place(decoded_component, deco);
 		
-						new_entity.get().add(decoded_component, deco.solvable);
+						new_entity.get({}).add(decoded_component, deco.get_solvable({}));
 					}
 				}
 			}
@@ -325,7 +325,7 @@ void cosmic_delta::decode(
 					constexpr size_t idx = component_index_v<component_type>;
 		
 					if (overridden_components[idx]) {
-						const auto maybe_component = changed_entity.get().find<component_type>(deco.solvable);
+						const auto maybe_component = changed_entity.get({}).find<component_type>(deco.get_solvable({}));
 						
 						if (maybe_component == nullptr) {
 							component_type decoded_component;
@@ -333,7 +333,7 @@ void cosmic_delta::decode(
 							augs::read_delta(decoded_component, in, true);
 							
 							transform_component_guids_to_ids_in_place(decoded_component, deco);
-							changed_entity.get().add(decoded_component, deco.solvable);
+							changed_entity.get({}).add(decoded_component, deco.get_solvable({}));
 						}
 						else {
 							transform_component_ids_to_guids_in_place(*maybe_component, deco);
@@ -343,7 +343,7 @@ void cosmic_delta::decode(
 					}
 					else if (removed_components[idx]) {
 						if constexpr(!is_component_fundamental_v<component_type>) {
-							changed_entity.get().remove<component_type>(deco.solvable);
+							changed_entity.get({}).remove<component_type>(deco.get_solvable({}));
 						}
 					}
 				}

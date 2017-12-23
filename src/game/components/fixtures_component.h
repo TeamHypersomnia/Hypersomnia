@@ -57,7 +57,7 @@ protected:
 	using base = component_synchronizer_base<is_const, components::fixtures>;
 	using base::handle;
 
-	maybe_const_ref_t<is_const, colliders_cache>& get_cache() const;
+	const colliders_cache& get_cache() const;
 public:
 	using base::get_raw_component;
 	using base::component_synchronizer_base;
@@ -89,6 +89,7 @@ class component_synchronizer<false, components::fixtures> : public basic_fixture
 	void rebuild_density() const;
 
 	void reinfer_caches() const;
+	colliders_cache& get_cache() const;
 
 public:
 	using basic_fixtures_synchronizer<false>::basic_fixtures_synchronizer;

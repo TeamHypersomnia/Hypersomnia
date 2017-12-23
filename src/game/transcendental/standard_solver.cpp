@@ -154,9 +154,9 @@ void standard_solve(const logic_step step) {
 	//position_copying_system().update_transforms(step);
 	//rotation_copying_system().update_rotations(cosmos);
 
-	performance.raycasts.measure(cosmos.solvable.inferred.physics.ray_casts_since_last_step);
+	performance.raycasts.measure(cosmos.get_solvable_inferred().physics.ray_casts_since_last_step);
 
-	cosmos.solvable.increment_step();
+	cosmos.increment_step();
 
 	const size_t queued_at_end_num = step.get_queue<messages::queue_destruction>().size();
 
