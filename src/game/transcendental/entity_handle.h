@@ -8,8 +8,6 @@
 #include "augs/templates/component_traits.h"
 #include "augs/templates/type_matching_and_indexing.h"
 
-#include "augs/entity_system/component_setters_mixin.h"
-
 #include "game/detail/inventory/inventory_slot_handle_declaration.h"
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/transcendental/entity_id.h"
@@ -37,14 +35,11 @@ namespace augs {
 
 template <bool is_const>
 class basic_entity_handle :
-	public augs::component_setters_mixin<is_const, basic_entity_handle<is_const>>,
-
 	public inventory_mixin<is_const, basic_entity_handle<is_const>>,
 	public physics_mixin<is_const, basic_entity_handle<is_const>>,
 	public relations_mixin<is_const, basic_entity_handle<is_const>>,
 	public spatial_properties_mixin<is_const, basic_entity_handle<is_const>>
 {
-
 	/* For cloning */
 	template <bool, class> friend class relations_mixin;
 	template <bool, class> friend class basic_relations_mixin;
@@ -212,6 +207,12 @@ public:
 		else {
 			get().template remove<T>(pool_provider());
 		}
+	}
+
+	template <class component, bool C = !is_const, class = std::enable_if_t<C>>
+	decltype(auto) operator+=(const component& c) const {
+		add(c);
+		return get<component>();
 	}
 
 	template <bool C = !is_const, class = std::enable_if_t<C>>

@@ -8,7 +8,6 @@
 
 #include "augs/readwrite/memory_stream.h"
 #include "augs/misc/enum/enum_boolset.h"
-#include "augs/templates/subscript_handle_getters_mixin.h"
 #include "augs/misc/randomization_declaration.h"
 
 #include "game/transcendental/cosmos_solvable_state.h"
@@ -47,7 +46,7 @@ auto subscript_handle_getter(C& cosm, const entity_guid guid) {
 	return subscript_handle_getter(cosm, cosm.solvable.get_entity_id_by(guid));
 }
 
-class cosmos : public augs::subscript_handle_getters_mixin<cosmos> {
+class cosmos {
 	cosmos_common_state common;
 public: 
 	cosmos_solvable_state solvable;
@@ -144,6 +143,16 @@ public:
 
 	bool operator==(const cosmos&) const;
 	bool operator!=(const cosmos&) const;
+
+	template <class id_type>
+	decltype(auto) operator[](const id_type id) {
+		return subscript_handle_getter(*this, id);
+	}
+
+	template <class id_type>
+	decltype(auto) operator[](const id_type id) const {
+		return subscript_handle_getter(*this, id);
+	}
 
 	template <class F>
 	decltype(auto) operator()(const entity_id subject, F callback) {
