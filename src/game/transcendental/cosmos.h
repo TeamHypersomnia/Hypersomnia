@@ -49,8 +49,8 @@ auto subscript_handle_getter(C& cosm, const entity_guid guid) {
 }
 
 class cosmos {
-	void infer_all_caches();
-	void refresh_for_new_significant();
+	void infer_all_entities();
+	void reinfer_solvable();
 
 	cosmos_common_significant common;
 public: 
@@ -100,8 +100,9 @@ public:
 		}
 	}
 
-	void infer_cache_for(const const_entity_handle);
-	void destroy_cache_of(const const_entity_handle);
+	void infer_caches_for(const const_entity_handle);
+	void destroy_caches_of(const const_entity_handle);
+	void reinfer_caches_of(const const_entity_handle);
 	
 	template <class cache_type>
 	void reinfer_cache(const entity_handle handle) {
@@ -118,8 +119,7 @@ public:
 		});
 	}
 
-	void reinfer_all_caches();
-	void reinfer_all_caches_for(const const_entity_handle);
+	void reinfer_all_entities();
 
 	/* 
 		If exception is thrown during alteration,
@@ -132,7 +132,7 @@ public:
 
 		auto refresh_when_done = augs::make_scope_guard([&]() {
 			if (status != changer_callback_result::DONT_REFRESH) {
-				reinfer_all_caches();
+				reinfer_all_entities();
 			}
 		});
 
@@ -145,7 +145,7 @@ public:
 
 		auto refresh_when_done = augs::make_scope_guard([&]() {
 			if (status != changer_callback_result::DONT_REFRESH) {
-				refresh_for_new_significant();
+				reinfer_solvable();
 			}
 		});
 

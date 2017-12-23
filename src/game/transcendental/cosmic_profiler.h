@@ -6,7 +6,7 @@ public:
 	cosmic_profiler();
 
 	// GEN INTROSPECTOR class cosmic_profiler
-	augs::time_measurements reinfer_all_caches_for = 1;
+	augs::time_measurements reinferring_all_entities = 1;
 
 	augs::amount_measurements<std::size_t> raycasts;
 	augs::amount_measurements<std::size_t> entropy_length;

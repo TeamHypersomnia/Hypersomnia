@@ -166,7 +166,7 @@ public:
 		
 		if constexpr(is_component_synchronized_v<T>) {
 			get().template add<T>(c, pool_provider());
-			owner.reinfer_all_caches_for(*this);
+			owner.reinfer_caches_of(*this);
 		}
 		else {
 			get().template add<T>(c, pool_provider());
@@ -200,7 +200,7 @@ public:
 
 		if constexpr(is_component_synchronized_v<T>) {
 			get().template remove<T>(pool_provider());
-			owner.reinfer_all_caches_for(*this);
+			owner.reinfer_caches_of(*this);
 		}
 		else {
 			get().template remove<T>(pool_provider());

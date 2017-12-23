@@ -21,26 +21,20 @@ void cosmos::clear() {
 	*this = zero;
 }
 
-void cosmos::reinfer_all_caches() {
-	auto scope = measure_scope(profiler.reinfer_all_caches_for);
+void cosmos::reinfer_all_entities() {
+	auto scope = measure_scope(profiler.reinferring_all_entities);
 	
 	solvable.destroy_all_caches();
-	infer_all_caches();
+	infer_all_entities();
 }
 
-void cosmos::infer_all_caches() {
+void cosmos::infer_all_entities() {
 	for (const auto& ordered_pair : solvable.get_guid_to_id()) {
-		infer_cache_for(operator[](ordered_pair.second));
+		infer_caches_for(operator[](ordered_pair.second));
 	}
-
-#if TODO_NAMES
-	inferred.for_each([this](auto& sys) {
-		sys.infer_additional_cache(common);
-	});
-#endif
 }
 
-void cosmos::destroy_cache_of(const const_entity_handle h) {
+void cosmos::destroy_caches_of(const const_entity_handle h) {
 	auto destructor = [h](auto& sys) {
 		sys.destroy_cache_of(h);
 	};
@@ -48,7 +42,7 @@ void cosmos::destroy_cache_of(const const_entity_handle h) {
 	solvable.inferred.for_each(destructor);
 }
 
-void cosmos::infer_cache_for(const const_entity_handle h) {
+void cosmos::infer_caches_for(const const_entity_handle h) {
 	if (h.is_inferred_state_activated()) {
 		auto constructor = [h](auto& sys) {
 			sys.infer_cache_for(h);
@@ -70,14 +64,14 @@ bool cosmos::operator!=(const cosmos& b) const {
 	return !operator==(b);
 }
 
-void cosmos::refresh_for_new_significant() {
+void cosmos::reinfer_solvable() {
 	solvable.remap_guids();
-	reinfer_all_caches();
+	reinfer_all_entities();
 }
 
-void cosmos::reinfer_all_caches_for(const const_entity_handle h) {
-	destroy_cache_of(h);
-	infer_cache_for(h);
+void cosmos::reinfer_caches_of(const const_entity_handle h) {
+	destroy_caches_of(h);
+	infer_caches_for(h);
 }
 
 std::wstring cosmos::summary() const {
@@ -321,7 +315,7 @@ namespace augs {
 #if TODO
 		/* TODO: Fix it to use tuples of initial values when creating entities */
 		auto refresh_when_done = augs::make_scope_guard([&cosm]() {
-			cosm.refresh_for_new_significant();
+			cosm.reinfer_solvable();
 		});
 
 		{

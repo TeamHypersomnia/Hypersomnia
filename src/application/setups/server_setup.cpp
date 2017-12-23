@@ -357,7 +357,7 @@ void server_setup::process(const config_lua_table& cfg, game_window& window, con
 			
 			if (reinfer) {
 				LOG("Ser: resubs at step: %x", cosm.get_total_steps_passed());
-				cosm.reinfer_all_caches();
+				cosm.reinfer_all_entities();
 				reinfer = false;
 			}
 
