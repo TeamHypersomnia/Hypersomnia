@@ -5,7 +5,6 @@
 #include "augs/misc/randomization_declaration.h"
 #include "augs/templates/introspection_utils/rewrite_members.h"
 
-#include "augs/entity_system/operations_on_all_components_mixin.h"
 #include "augs/entity_system/storage_for_systems.h"
 
 #include "game/assets/ids/behaviour_tree_id.h"
@@ -29,8 +28,11 @@
 
 #include "game/assets/behaviour_tree.h"
 
-class cosmos_solvable_state : private component_list_t<augs::operations_on_all_components_mixin, cosmos> {
+class cosmos_solvable_state {
 	std::map<entity_guid, entity_id> guid_to_id;
+
+	entity_id allocate_new_entity();
+	void clear_guid(const entity_id);
 
 public:
 	static const cosmos_solvable_state zero;
@@ -38,13 +40,20 @@ public:
 	cosmos_significant_state significant;
 	all_inferred_caches inferred;
 
-	/* A detail only for performance benchmarks */
-	mutable cosmic_profiler profiler;
-	
 	cosmos_solvable_state() = default;
 	explicit cosmos_solvable_state(const cosmic_pool_size_type reserved_entities);
 
 	void reserve_storage_for_entities(const cosmic_pool_size_type);
+
+	entity_id allocate_next_entity();
+	entity_id allocate_entity_with_specific_guid(const entity_guid specific_guid);
+
+	void clone_components_except_sensitives(
+		cosmic_entity& into,
+		const cosmic_entity& from
+	);
+
+	void free_entity(entity_id);
 
 	template <class D>
 	void for_each_entity_id(D pred) {
@@ -56,16 +65,18 @@ public:
 		get_entity_pool().for_each_id(pred);
 	}
 
+	void destroy_all_caches();
+
+	void increment_step();
 	void remap_guids();
 	void clear();
 
-	void increment_step();
+	void set_steps_per_second(const unsigned steps_per_second);
 
 	entity_guid get_guid(const entity_id) const;
 	entity_id make_versioned(const unversioned_entity_id) const;
 
 	entity_id get_entity_id_by(const entity_guid) const;
-	bool entity_exists_by(const entity_guid) const;
 
 	template <template <class> class Guidized, class source_id_type>
 	Guidized<entity_guid> guidize(const Guidized<source_id_type>& id_source) const {
@@ -110,7 +121,6 @@ public:
 	augs::stepped_timestamp get_timestamp() const;
 
 	augs::delta get_fixed_delta() const;
-	void set_steps_per_second(const unsigned steps_per_second);
 	unsigned get_steps_per_second() const;
 
 	auto& get_entity_pool() {
@@ -136,35 +146,24 @@ public:
 
 	bool empty() const;
 
-	entity_id allocate_next_entity();
+	const auto& get_guid_to_id() const {
+		return guid_to_id;
+	}
 
-private:
-	friend class cosmic_delta;
-
-	template <class T>
-	friend void transform_component_guids_to_ids_in_place(T&, const cosmos&);
-
-	void destroy_all_caches();
-
-	entity_id allocate_new_entity();
-	entity_id allocate_entity_with_specific_guid(const entity_guid specific_guid);
-
-	void clear_guid(const entity_id);
-
-	auto& get_agg(const entity_id id) {
+	auto& get_aggregate(const entity_id id) {
 		return get_entity_pool().get(id);
 	}	
 
-	const auto& get_agg(const entity_id id) const {
+	const auto& get_aggregate(const entity_id id) const {
 		return get_entity_pool().get(id);
 	}	
-	
-	auto& get_agg(const entity_guid guid) {
-		return get_agg(get_entity_id_by(guid));
+
+	auto& get_aggregate(const entity_guid guid) {
+		return get_aggregate(get_entity_id_by(guid));
 	}	
 
-	const auto& get_agg(const entity_guid guid) const {
-		return get_agg(get_entity_id_by(guid));
+	const auto& get_aggregate(const entity_guid guid) const {
+		return get_aggregate(get_entity_id_by(guid));
 	}	
 };
 
@@ -174,10 +173,6 @@ inline entity_id cosmos_solvable_state::get_entity_id_by(const entity_guid guid)
 	}
 
 	return {};
-}
-
-inline bool cosmos_solvable_state::entity_exists_by(const entity_guid guid) const {
-	return guid_to_id.find(guid) != guid_to_id.end();
 }
 
 inline std::unordered_set<entity_id> cosmos_solvable_state::get_entities_by_type_id(const entity_type_id& id) const {
@@ -197,6 +192,6 @@ inline std::size_t cosmos_solvable_state::get_maximum_entities() const {
 }
 
 inline entity_guid cosmos_solvable_state::get_guid(const entity_id id) const {
-	return get_agg(id).get<components::guid>(*this).get_value();
+	return get_aggregate(id).get<components::guid>(*this).get_value();
 }
 

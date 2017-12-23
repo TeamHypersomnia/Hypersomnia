@@ -14,12 +14,12 @@ void basic_cosmic_entropy<key>::override_transfers_leaving_other_entities(
 	std::vector<basic_item_slot_transfer_request<key>> new_transfers
 ) {
 	erase_if(transfer_requests, [&](const basic_item_slot_transfer_request<key> o) {
-		const auto overridden_transfer = match_transfer_capabilities(cosm, cosm.deguidize(o));
+		const auto overridden_transfer = match_transfer_capabilities(cosm, cosm.solvable.deguidize(o));
 		
 		ensure(overridden_transfer.is_legal());
 
 		for (const auto n : new_transfers) {
-			const auto new_transfer = cosm.deguidize(n);
+			const auto new_transfer = cosm.solvable.deguidize(n);
 			
 			if (
 				match_transfer_capabilities(cosm, new_transfer).authorized_capability
@@ -129,7 +129,7 @@ guid_mapped_entropy::guid_mapped_entropy(
 	}
 
 	for (const auto& entry : b.transfer_requests) {
-		transfer_requests.push_back(mapper.guidize(entry));
+		transfer_requests.push_back(mapper.solvable.guidize(entry));
 	}
 }
 
@@ -150,7 +150,7 @@ cosmic_entropy::cosmic_entropy(
 	}
 
 	for (const auto& entry : b.transfer_requests) {
-		transfer_requests.push_back(mapper.deguidize(entry));
+		transfer_requests.push_back(mapper.solvable.deguidize(entry));
 	}
 }
 

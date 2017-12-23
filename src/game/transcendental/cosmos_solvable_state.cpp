@@ -1,4 +1,7 @@
 #include "game/transcendental/cosmos_solvable_state.h"
+#include "game/organization/for_each_component_type.h"
+
+#include "augs/templates/introspect.h"
 
 const cosmos_solvable_state cosmos_solvable_state::zero;
 
@@ -6,13 +9,23 @@ void cosmos_solvable_state::clear() {
 	*this = zero;
 }
 
-cosmos_solvable_state::cosmos(const cosmic_pool_size_type reserved_entities) : solvable(reserved_entities) {
+bool cosmos_solvable_state::empty() const {
+	return get_entities_count() == 0 && guid_to_id.empty();
+}
+
+cosmos_solvable_state::cosmos_solvable_state(const cosmic_pool_size_type reserved_entities) {
 	reserve_storage_for_entities(reserved_entities);
 }
 
 void cosmos_solvable_state::reserve_storage_for_entities(const cosmic_pool_size_type n) {
 	get_entity_pool().reserve(n);
-	reserve_all_components(n);
+
+	for_each_through_std_get(
+		significant.component_pools, 
+		[n](auto& p){
+			p.reserve(n);
+		}
+	);
 
 	inferred.for_each([n](auto& sys) {
 		sys.reserve_caches_for_entities(n);
@@ -36,7 +49,7 @@ void cosmos_solvable_state::increment_step() {
 
 template <class T, class agg>
 static bool components_equal_in_entities(
-	const T& provider,
+	const cosmos_solvable_state& provider,
 	const agg& e1, 
 	const agg& e2
 ) {
@@ -75,13 +88,15 @@ bool cosmos_solvable_state::operator==(const cosmos_solvable_state& b) const {
 	for (const auto& it : guid_to_id) {
 		const auto guid = it.first;
 
-		const auto& left = get_agg(it.second);
+		const auto& left = get_aggregate(it.second);
 
-		if (!b.entity_exists_by(guid)) {
+		const auto b_id = b.get_entity_id_by(guid);
+
+		if (!b_id.is_set()) {
 			return false;
 		}
 
-		const auto& right = b.get_agg(guid);
+		const auto& right = b.get_aggregate(b_id);
 
 		bool difference_found = false;
 
@@ -99,7 +114,7 @@ bool cosmos_solvable_state::operator==(const cosmos_solvable_state& b) const {
 	return true;
 }
 
-bool cosmos_solvable_state::operator!=(const cosmos& b) const {
+bool cosmos_solvable_state::operator!=(const cosmos_solvable_state& b) const {
 	return !operator==(b);
 }
 
@@ -141,15 +156,30 @@ entity_id cosmos_solvable_state::allocate_new_entity() {
 
 entity_id cosmos_solvable_state::allocate_entity_with_specific_guid(const entity_guid specific_guid) {
 	const auto id = allocate_new_entity();
-	get_agg(id).get<components::guid>(*this).value = specific_guid;
+	get_aggregate(id).get<components::guid>(*this).value = specific_guid;
 	guid_to_id[specific_guid] = id;
 
 	return id;
 }
 
 entity_id cosmos_solvable_state::allocate_next_entity() {
-	const auto next_guid = s.significant.meta.next_entity_guid.value++;
+	const auto next_guid = significant.meta.next_entity_guid.value++;
 	return allocate_entity_with_specific_guid(next_guid);
+}
+
+void cosmos_solvable_state::free_entity(const entity_id id) {
+	clear_guid(id);
+	
+	auto& agg = get_aggregate(id);
+
+	agg.for_each_dynamic_component(
+		[&](auto& c) {
+			agg.remove<std::decay_t<decltype(c)>>(*this);
+		},
+		*this
+	);
+	
+	get_entity_pool().free(id);
 }
 
 void cosmos_solvable_state::clear_guid(const entity_id cleared) {

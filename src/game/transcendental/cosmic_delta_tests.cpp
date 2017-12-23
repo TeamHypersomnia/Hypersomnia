@@ -242,12 +242,12 @@ TEST_CASE("CosmicDelta3 GuidizeTests") {
 	item_slot_transfer_request dt;
 	dt.item = new_ent1;
 
-	const auto guidized = c1.guidize(dt);
+	const auto guidized = c1.solvable.guidize(dt);
 
 	REQUIRE(0 == guidized.target_slot.container_entity);
 	REQUIRE(1 == guidized.item);
 
-	const auto deguidized = c1.deguidize(guidized);
+	const auto deguidized = c1.solvable.deguidize(guidized);
 	REQUIRE(dt.item == deguidized.item);
 	REQUIRE(dt.target_slot.container_entity == deguidized.target_slot.container_entity);
 	entity_id dead;
@@ -721,15 +721,14 @@ TEST_CASE("CosmicDelta6 ThreeEntitiesWithReferencesAndDestroyedChild") {
 		// note: we were also setting this child to ent2, so we need to nullify it too before ensuring equality
 		c2[c2_first_guid].map_child_entity(child_entity_name::CHARACTER_CROSSHAIR, entity_id());
 		
-		// Only now shall the two cosmoi be equal. (the following expression is  equivalent to c1 == c2)
-		// REQUIRE(c1.significant.get_first_mismatch_pos(c2.significant) == -1);
+		// Only now shall the two cosmoi be equal.
 		REQUIRE(c1 == c2);
 
 		REQUIRE(1 == comparatory.size());
 	}
 
 	const auto ent1 = c1[c1_first_guid];
-	REQUIRE(!c1.entity_exists_by(c1_second_guid));
+	REQUIRE(c1.get_entity_id_by(c1_second_guid).is_set());
 	const auto ent3 = c1[c1_third_guid];
 
 	REQUIRE(ent1.has<components::position_copying>());

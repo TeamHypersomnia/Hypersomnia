@@ -8,7 +8,7 @@ namespace augs {
 
 class cosmos_meta {
 	// GEN INTROSPECTOR class cosmos_meta
-	friend class cosmos;
+	friend class cosmos_solvable_state;
 	friend augs::introspection_access;
 
 	augs::delta delta = augs::delta::steps_per_second(60);

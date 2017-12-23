@@ -60,6 +60,7 @@ class physics_world_cache {
 	void destroy_cache_of(const const_entity_handle);
 
 	friend class cosmos;
+	friend class cosmos_solvable_state;
 	friend class physics_system;
 	friend class contact_listener;
 	friend class component_synchronizer<false, components::rigid_body>;

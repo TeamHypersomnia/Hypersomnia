@@ -109,9 +109,4 @@ struct type_count {
 
 class cosmos;
 
-namespace augs {
-	template<class, class...>
-	class operations_on_all_components_mixin;
-}
-
 constexpr unsigned COMPONENTS_COUNT = component_list_t<type_count>::value;

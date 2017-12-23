@@ -5,6 +5,7 @@
 #include "augs/misc/children_vector_tracker.h"
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
+#include "game/components/type_component_declaration.h"
 
 namespace components {
 	struct type;
@@ -23,6 +24,7 @@ class name_cache {
 	> entities_by_type_id;
 
 	friend class cosmos;
+	friend class cosmos_solvable_state;
 	friend class component_synchronizer<false, components::type>;
 
 	void reserve_caches_for_entities(const std::size_t n) const {}

@@ -44,16 +44,16 @@ auto subscript_handle_getter(C& cosm, const unversioned_entity_id id) {
 
 template <class C>
 auto subscript_handle_getter(C& cosm, const entity_guid guid) {
-	return subscript_handle_getter(cosm, cosm.get_entity_id_by(guid));
+	return subscript_handle_getter(cosm, cosm.solvable.get_entity_id_by(guid));
 }
 
 class cosmos : public augs::subscript_handle_getters_mixin<cosmos> {
-	friend augs::subscript_handle_getters_mixin<cosmos>;
-
 	cosmos_common_state common;
-
 public: 
 	cosmos_solvable_state solvable;
+
+	/* A detail only for performance benchmarks */
+	mutable cosmic_profiler profiler;
 
 	static const cosmos zero;
 
@@ -63,6 +63,10 @@ public:
 
 	entity_handle create_entity(const std::wstring& name);
 	entity_handle create_entity(const std::string& name);
+	entity_handle create_entity_with_specific_guid(
+		const entity_guid specific_guid
+	);
+
 	entity_handle clone_entity(const entity_id);
 	void delete_entity(const entity_id);
 
@@ -111,10 +115,19 @@ public:
 		});
 	}
 
+	void infer_all_caches();
+
 	void reinfer_all_caches();
 	void reinfer_all_caches_for(const const_entity_handle);
 
-	void refresh_for_new_significant_state();
+	template <class F>
+	void change_common_state(F&& callback) {
+		if (callback(common) == changer_callback_result::REFRESH) {
+			reinfer_all_caches();
+		}
+	}
+
+	void refresh_for_new_significant();
 
 	si_scaling get_si() const;
 
@@ -142,18 +155,41 @@ public:
 		callback(operator[](subject));
 	}
 	
-	bool clear();
+	void clear();
 	bool empty() const;
 
-private:
-	friend class cosmic_delta;
+	/*
+		Shortcuts for heavily used functions for sanity
+	*/
 
-	entity_handle create_entity_with_specific_guid(
-		const entity_guid specific_guid
-	);
+	auto get_entities_count() const {
+		return solvable.get_entities_count();
+	}
 
-	void destroy_all_caches();
-	void infer_all_caches();
+	auto get_total_seconds_passed(const double v) const {
+		return solvable.get_total_seconds_passed(v);
+	}
+
+	auto get_total_seconds_passed() const {
+		return solvable.get_total_seconds_passed();
+	}
+
+	auto get_total_steps_passed() const {
+		return solvable.get_total_steps_passed();
+	}
+
+	auto get_timestamp() const {
+		return solvable.get_timestamp();
+	}
+
+	auto get_fixed_delta() const {
+		return solvable.get_fixed_delta();
+	}
+
+	auto make_versioned(const unversioned_entity_id id) const {
+		return solvable.make_versioned(id);
+	}
+
 };
 
 inline si_scaling cosmos::get_si() const {

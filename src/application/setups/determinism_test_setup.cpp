@@ -147,19 +147,19 @@ void determinism_test_setup::process(
 			auto& first_cosm = hypersomnias[0].reserved_memory_for_serialization;
 
 			augs::output_stream_reserver first_cosm_reserver;
-			augs::write(first_cosm_reserver, hypersomnias[0].significant);
+			augs::write(first_cosm_reserver, hypersomnias[0].solvable.significant);
 			first_cosm.reserve(first_cosm_reserver.get_write_pos());
 			first_cosm.reset_write_pos();
-			augs::write(first_cosm, hypersomnias[0].significant);
+			augs::write(first_cosm, hypersomnias[0].solvable.significant);
 
 			for (unsigned i = 1; i < cosmoi_count; ++i) {
 				auto& second_cosm = hypersomnias[i].reserved_memory_for_serialization;
 
 				augs::output_stream_reserver second_cosm_reserver;
-				augs::write(second_cosm_reserver, hypersomnias[i].significant);
+				augs::write(second_cosm_reserver, hypersomnias[i].solvable.significant);
 				second_cosm.reserve(second_cosm_reserver.get_write_pos());
 				second_cosm.reset_write_pos();
-				augs::write(second_cosm, hypersomnias[i].significant);
+				augs::write(second_cosm, hypersomnias[i].solvable.significant);
 
 				if (!(first_cosm == second_cosm)) {
 					divergence_detected = true;

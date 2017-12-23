@@ -13,6 +13,9 @@ class cosmos;
 struct cosmos_common_state;
 
 class processing_lists_cache {
+	friend class cosmos;
+	friend class cosmos_solvable_state;
+
 	friend class component_synchronizer<false, components::processing>;
 	template<bool> friend class basic_processing_synchronizer;
 
@@ -27,8 +30,6 @@ class processing_lists_cache {
 	void infer_cache_for(const const_entity_handle);
 
 	void reserve_caches_for_entities(const size_t n);
-
-	friend class cosmos;
 
 public:
 	const std::vector<entity_id>& get(const processing_subjects) const;

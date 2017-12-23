@@ -9,16 +9,6 @@
 namespace augs {
 	template <template <class T> class make_pool_id, class... components>
 	class component_aggregate {
-		template <class component>
-		void set_id(const make_pool_id<component> to) {
-			std::get<make_pool_id<component>>(component_ids) = to;
-		}
-
-		template <class component>
-		auto get_id() const {
-			return std::get<make_pool_id<component>>(component_ids);
-		}
-
 		template <class component, class Aggregate, class PoolProvider>
 		static auto* find_impl(Aggregate& a, PoolProvider& p) {
 			if constexpr(is_component_fundamental_v<component>) {
@@ -36,6 +26,34 @@ namespace augs {
 			}
 
 			return *find_impl<component>(a, p);
+		}
+
+		template <class F, class Aggregate, class PoolProvider>
+		static void for_each_component_impl(F&& callback, Aggregate& a, PoolProvider& p) {
+			auto callbacker = [&](auto c){
+				using component_type = decltype(c);
+
+				if (const auto maybe_component = a.template find<component_type>(p)) {
+					callback(*maybe_component);
+				}
+			};
+
+			(callbacker(components()), ...);
+		}
+
+		template <class F, class Aggregate, class PoolProvider>
+		static void for_each_dynamic_component_impl(F&& callback, Aggregate& a, PoolProvider& p) {
+			auto callbacker = [&](auto c){
+				using component_type = decltype(c);
+
+				if constexpr(!is_component_fundamental_v<component_type>) {
+					if (const auto maybe_component = a.template find<component_type>(p)) {
+						callback(*maybe_component);
+					}
+				}
+			};
+
+			(callbacker(components()), ...);
 		}
 
 	public:
@@ -63,6 +81,16 @@ namespace augs {
 		fundamental_components_tuple fundamentals;
 		dynamic_component_id_tuple component_ids;
 		// END GEN INTROSPECTOR
+
+		template <class component>
+		void set_id(const make_pool_id<component> to) {
+			std::get<make_pool_id<component>>(component_ids) = to;
+		}
+
+		template <class component>
+		auto get_id() const {
+			return std::get<make_pool_id<component>>(component_ids);
+		}
 
 		template <class component, class PoolProvider>
 		auto& get(PoolProvider& p) {
@@ -116,6 +144,43 @@ namespace augs {
 
 			p.template get_component_pool<component>().free(id_of_deleted);
 			set_id(decltype(id_of_deleted)());
+		}
+
+		template <class F, class PoolProvider>
+		void for_each_component(F&& callback, PoolProvider& p) {
+			for_each_component_impl(std::forward<F>(callback), *this, p);
+		}
+
+		template <class F, class PoolProvider>
+		void for_each_component(F&& callback, PoolProvider& p) const {
+			for_each_component_impl(std::forward<F>(callback), *this, p);
+		}
+
+		template <class F, class PoolProvider>
+		void for_each_dynamic_component(F&& callback, PoolProvider& p) {
+			for_each_dynamic_component_impl(std::forward<F>(callback), *this, p);
+		}
+
+		template <class F, class PoolProvider>
+		void for_each_dynamic_component(F&& callback, PoolProvider& p) const {
+			for_each_dynamic_component_impl(std::forward<F>(callback), *this, p);
+		}
+
+		template <class... excluded_components, class PoolProvider>
+		void clone_components_except(
+			const component_aggregate& from,
+			PoolProvider& p
+		) {
+			from.for_each_component(
+				[&](const auto& c){
+					using component = std::decay_t<decltype(c)>;
+
+					if constexpr(!is_one_of_v<component, excluded_components...>) {
+						add(c, p);
+					}
+				}, 
+				p
+			);
 		}
 	};
 }

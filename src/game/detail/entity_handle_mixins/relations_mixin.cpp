@@ -32,10 +32,8 @@ void relations_mixin<false, D>::make_cloned_child_entities_recursive(const entit
 		using component_type = decltype(c);
 		
 		if (self.template has<component_type>()) {
-			using allocator_base = typename D::allocator;
-
-			auto& cloned_to_component = self.get().get<component_type>(cosm.solvable);
-			const auto& cloned_from_component = from.get().get<component_type>(cosm.solvable);
+			auto& cloned_to_component = self.get().template get<component_type>(cosm.solvable);
+			const auto& cloned_from_component = from.get().template get<component_type>(cosm.solvable);
 
 			if constexpr(allows_nontriviality_v<component_type>) {
 				component_type::clone_children(

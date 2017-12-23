@@ -6,7 +6,6 @@
 
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
-
 #include "game/organization/for_each_component_type.h"
 
 #include "augs/readwrite/lua_readwrite.h"
@@ -25,12 +24,12 @@ void cosmos::clear() {
 void cosmos::reinfer_all_caches() {
 	auto scope = measure_scope(profiler.reinfer_all_caches_for);
 	
-	destroy_all_caches();
+	solvable.destroy_all_caches();
 	infer_all_caches();
 }
 
 void cosmos::infer_all_caches() {
-	for (const auto& ordered_pair : solvable.guid_to_id) {
+	for (const auto& ordered_pair : solvable.get_guid_to_id()) {
 		infer_cache_for(operator[](ordered_pair.second));
 	}
 
@@ -77,13 +76,13 @@ cosmos& cosmos::operator=(const cosmos_significant_state& b) {
 		solvable.significant = b;
 	}
 
-	refresh_for_new_significant_state();
+	refresh_for_new_significant();
 	return *this;
 }
 
 
-void cosmos::refresh_for_new_significant_state() {
-	remap_guids();
+void cosmos::refresh_for_new_significant() {
+	solvable.remap_guids();
 	reinfer_all_caches();
 }
 
@@ -132,7 +131,7 @@ entity_handle cosmos::clone_entity(const entity_id source_entity_id) {
 
 	const auto new_entity = create_entity(L"");
 	
-	solvable.clone_all_components_except<
+	new_entity.get().clone_components_except<
 		/*
 			These components will be cloned shortly,
 			with due care to each of them.
@@ -146,7 +145,7 @@ entity_handle cosmos::clone_entity(const entity_id source_entity_id) {
 			to avoid unnecessary regeneration.
 		*/
 		components::all_inferred_state
-	>(new_entity.get(), source_entity.get());
+	>(source_entity.get(), solvable);
 
 	if (new_entity.has<components::item>()) {
 		new_entity.get<components::item>().current_slot.unset();
@@ -210,7 +209,6 @@ void cosmos::delete_entity(const entity_id e) {
 		handle.get<components::all_inferred_state>().set_activated(false);
 	}
 
-	clear_guid(handle);
 	// now manipulation of an entity without all_inferred_state component won't trigger redundant regeneration
 
 	const auto maybe_fixtures = handle.find<components::fixtures>();
@@ -225,14 +223,13 @@ void cosmos::delete_entity(const entity_id e) {
 		}
 	}
 
-	solvable.free_all_components(operator[](e).get());
-	solvable.get_entity_pool().free(e);
-
 	/*
 		Unregister that id as a parent from the relational system
 	*/
 
 	solvable.inferred.relational.handle_deletion_of_potential_parent(e);
+
+	solvable.free_entity(e);
 }
 
 randomization cosmos::get_rng_for(const entity_id id) const {
@@ -240,7 +237,7 @@ randomization cosmos::get_rng_for(const entity_id id) const {
 }
 
 bool cosmos::empty() const {
-	return get_entities_count() == 0 && solvable.guid_to_id.empty();
+	return solvable.empty();
 }
 
 namespace augs {
@@ -253,7 +250,7 @@ namespace augs {
 
 			{
 				auto scope = measure_scope(profiler.size_calculation_pass);
-				augs::write_bytes(counter_stream, cosm.common);
+				augs::write_bytes(counter_stream, cosm.get_common_state());
 				augs::write_bytes(counter_stream, cosm.solvable.significant);
 			}
 
@@ -264,7 +261,7 @@ namespace augs {
 
 		{
 			auto scope = measure_scope(profiler.serialization_pass);
-			augs::write_bytes(into, cosm.common);
+			augs::write_bytes(into, cosm.get_common_state());
 			augs::write_bytes(into, cosm.solvable.significant);
 		}
 	}
@@ -276,11 +273,17 @@ namespace augs {
 		auto& profiler = cosm.profiler;
 
 		auto refresh_when_done = augs::make_scope_guard([&cosm]() {
-			cosm.refresh_for_new_significant_state();
+			cosm.refresh_for_new_significant();
 		});
 
 		auto scope = measure_scope(profiler.deserialization_pass);
-		augs::read_bytes(from, cosm.common);
+
+		cosm.change_common_state([&](cosmos_common_state& common) {
+			augs::read_bytes(from, common);
+
+			return changer_callback_result::DONT_REFRESH;
+		});
+
 		augs::read_bytes(from, cosm.solvable.significant);
 	}
 
@@ -289,13 +292,13 @@ namespace augs {
 			auto common_table = ar.create();
 			ar["common"] = common_table;
 
-			write_lua(common_table, cosm.common);
+			write_lua(common_table, cosm.get_common_state());
 		}
 		
 		{
 			auto pool_meta_table = ar.create();
 			ar["pool_meta"] = pool_meta_table;
-			pool_meta_table["reserved_entities_count"] = static_cast<unsigned>(cosm.get_maximum_entities());
+			pool_meta_table["reserved_entities_count"] = static_cast<unsigned>(cosm.solvable.get_maximum_entities());
 		}
 
 		auto entities_table = ar.create();
@@ -306,30 +309,18 @@ namespace augs {
 		for (const auto& ent : cosm.solvable.get_entity_pool()) {
 			auto this_entity_table = entities_table.create();
 	
-			for_each_component_type(
-				[&](auto c) {
-					using component_type = decltype(c);
+			ent.for_each_component(
+				[&](const auto& comp) {
+					using component_type = std::decay_t<decltype(comp)>;
 
-					auto create_component_table = [&](){
-						const auto this_component_name = get_type_name_strip_namespace<component_type>();
+					const auto this_component_name = get_type_name_strip_namespace<component_type>();
 
-						auto this_component_table = this_entity_table.create();
-						this_entity_table[this_component_name] = this_component_table;
-						
-						return this_component_table;
-					};
-					
-					if constexpr(is_component_fundamental_v<component_type>) {
-						write_lua(create_component_table(), std::get<component_type>(ent.fundamentals)); 
-					}
-					else {
-						const auto& pool = cosm.get_component_pool<component_type>();
+					auto this_component_table = this_entity_table.create();
+					this_entity_table[this_component_name] = this_component_table;
 
-						if (const auto maybe_component = pool.find(ent.get_id<component_type>())) {
-							write_lua(create_component_table(), *maybe_component);
-						}
-					}
-				}
+					write_lua(this_component_table, comp);
+				},
+				cosm.solvable
 			);
 
 			entities_table[entity_table_counter++] = this_entity_table;
@@ -340,15 +331,19 @@ namespace augs {
 		ensure(cosm.empty());
 
 		auto refresh_when_done = augs::make_scope_guard([&cosm]() {
-			cosm.refresh_for_new_significant_state();
+			cosm.refresh_for_new_significant();
 		});
 
 		{
 			sol::object reserved_count = ar["pool_meta"]["reserved_entities_count"];
-			cosm.reserve_storage_for_entities(reserved_count.as<unsigned>());
+			cosm.solvable.reserve_storage_for_entities(reserved_count.as<unsigned>());
 		}
 
-		read_lua(ar["common"], cosm.common);
+		cosm.change_common_state([&](cosmos_common_state& common) {
+			read_lua(ar["common"], common);
+
+			return changer_callback_result::DONT_REFRESH;
+		});
 
 		int entity_table_counter = 1;
 		auto entities_table = ar["entities"];

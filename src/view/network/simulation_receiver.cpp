@@ -130,7 +130,7 @@ std::vector<misprediction_candidate_entry> simulation_receiver::acquire_potentia
 	const auto& cosmos = predicted_cosmos_before_reconciliation;
 	
 	potential_mispredictions.reserve(
-		cosmos.get_count_of(processing_subjects::WITH_ENABLED_PAST_CONTAGIOUS) + unpredictables_infected.size()
+		cosmos.solvable.get_count_of(processing_subjects::WITH_ENABLED_PAST_CONTAGIOUS) + unpredictables_infected.size()
 	);
 
 	cosmos.for_each(

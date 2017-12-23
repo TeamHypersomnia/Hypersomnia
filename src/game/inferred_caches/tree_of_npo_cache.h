@@ -28,6 +28,7 @@ union tree_of_npo_node {
 
 class tree_of_npo_cache {
 	friend class cosmos;
+	friend class cosmos_solvable_state;
 	
 	friend class component_synchronizer<false, components::tree_of_npo_node>;
 

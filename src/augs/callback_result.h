@@ -10,3 +10,8 @@ enum class recursive_callback_result {
 	CONTINUE_DONT_RECURSE,
 	ABORT
 };
+
+enum class changer_callback_result {
+	REFRESH,
+	DONT_REFRESH
+};

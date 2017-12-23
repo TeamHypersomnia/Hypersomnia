@@ -32,9 +32,6 @@ template <bool, class>
 class component_synchronizer;
 
 namespace augs {
-	template <class, class...>
-	class operations_on_all_components_mixin;
-	
 	void read_object_lua(sol::table ar, cosmos& cosm);
 }
 
@@ -261,25 +258,9 @@ public:
 	void for_each_component(F&& callback) const {
 		ensure(alive());
 
-		auto& self = get();
-		const auto& ids = self.component_ids;
-		auto& fundamentals = self.fundamentals;
-		auto& cosm = get_cosmos();
-
-		for_each_through_std_get(
-			fundamentals,
-			std::forward<F>(callback)
-		);
-
-		for_each_through_std_get(
-			ids,
-			[&](auto id) {
-				using component_type = typename decltype(id)::mapped_type;
-
-				if (const auto maybe_component = get().template find<component_type>(pool_provider())) {
-					callback(*maybe_component);
-				}
-			}
+		get().for_each_component(
+			std::forward<F>(callback),
+		   	pool_provider()
 		);
 	}
 	
