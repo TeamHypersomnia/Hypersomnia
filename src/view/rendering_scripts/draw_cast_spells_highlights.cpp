@@ -9,7 +9,7 @@
 
 void draw_cast_spells_highlights(const draw_cast_spells_highlights_input in) {
 	const auto& cosmos = in.cosm;
-	const auto dt = cosmos.solvable.get_fixed_delta();
+	const auto dt = cosmos.get_fixed_delta();
 
 	cosmos.for_each(
 		processing_subjects::WITH_SENTIENCE,

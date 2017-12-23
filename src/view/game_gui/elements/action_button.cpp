@@ -37,7 +37,7 @@ void action_button::draw(
 
 		const auto output = context.get_output();
 		const auto now = cosmos.get_timestamp();
-		const auto dt = cosmos.solvable.get_fixed_delta();
+		const auto dt = cosmos.get_fixed_delta();
 
 		const auto& necessarys = context.get_necessary_images();
 		const auto& game_images = context.get_game_images();

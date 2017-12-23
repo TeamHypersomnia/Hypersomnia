@@ -64,7 +64,7 @@ void movement_system::set_movement_flags_from_input(const logic_step step) {
 
 void movement_system::apply_movement_forces(cosmos& cosmos) {
 	auto& physics_sys = cosmos.solvable.inferred.physics;
-	const auto& delta = cosmos.solvable.get_fixed_delta();
+	const auto& delta = cosmos.get_fixed_delta();
 
 	cosmos.for_each(
 		processing_subjects::WITH_MOVEMENT,
@@ -107,7 +107,7 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 
 				const auto& haste = sentience->get<haste_perk_instance>();
 
-				if (haste.timing.is_enabled(cosmos.get_timestamp(), cosmos.solvable.get_fixed_delta())) {
+				if (haste.timing.is_enabled(cosmos.get_timestamp(), cosmos.get_fixed_delta())) {
 					if (haste.is_greater) {
 						movement_force_mult *= 1.45f;
 					}

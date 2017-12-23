@@ -33,7 +33,7 @@ entity_handle sound_existence_input::create_sound_effect_entity(
 	const auto duration_in_seconds = info->max_duration_in_seconds;
 
 	existence.max_lifetime_in_steps =
-		static_cast<unsigned>(duration_in_seconds / cosmos.solvable.get_fixed_delta().in_seconds()) + 1;
+		static_cast<unsigned>(duration_in_seconds / cosmos.get_fixed_delta().in_seconds()) + 1;
 
 	const auto chased_subject = cosmos[chased_subject_id];
 

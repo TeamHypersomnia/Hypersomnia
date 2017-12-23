@@ -103,7 +103,7 @@ public:
 			advance(cosmic_entropy_for_this_step, referential_cosmos);
 
 			const auto total_steps = referential_cosmos.get_total_steps_passed();
-			const auto reinfer_once_per_steps = static_cast<int>(reinfer_prediction_every_ms / referential_cosmos.solvable.get_fixed_delta().in_milliseconds());
+			const auto reinfer_once_per_steps = static_cast<int>(reinfer_prediction_every_ms / referential_cosmos.get_fixed_delta().in_milliseconds());
 
 			if (total_steps % reinfer_once_per_steps == 0) {
 				reconciliate_predicted = true;

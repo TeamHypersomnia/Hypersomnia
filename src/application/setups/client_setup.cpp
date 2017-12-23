@@ -65,7 +65,7 @@ void client_setup::init(
 		//}
 	}
 
-	receiver.jitter_buffer.set_lower_limit(static_cast<unsigned>(session.config.jitter_buffer_ms / cosm.solvable.get_fixed_delta().in_milliseconds()));
+	receiver.jitter_buffer.set_lower_limit(static_cast<unsigned>(session.config.jitter_buffer_ms / cosm.get_fixed_delta().in_milliseconds()));
 	receiver.misprediction_smoothing_multiplier = static_cast<float>(session.config.misprediction_smoothing_multiplier);
 
 	const bool is_replaying =
@@ -210,7 +210,7 @@ void client_setup::process_once(
 		}
 	}
 
-	auto steps = timer.count_logic_steps_to_perform(cosm.solvable.get_fixed_delta());
+	auto steps = timer.count_logic_steps_to_perform(cosm.get_fixed_delta());
 
 	while (steps--) {
 		if (!still_downloading) {
@@ -242,7 +242,7 @@ void client_setup::process_once(
 			}
 		}
 		
-		if (client.has_timed_out(cosm.solvable.get_fixed_delta().in_milliseconds(), 2000)) {
+		if (client.has_timed_out(cosm.get_fixed_delta().in_milliseconds(), 2000)) {
 			LOG("Connection to server timed out.");
 			client.forceful_disconnect();
 		}
@@ -282,7 +282,7 @@ void client_setup::process_once(
 			extrapolated_cosm,
 			currently_controlled_character,
 			all_visible,
-			timer.fraction_of_step_until_next_step(extrapolated_cosm.solvable.get_fixed_delta()),
+			timer.fraction_of_step_until_next_step(extrapolated_cosm.get_fixed_delta()),
 			client
 		);
 

@@ -174,7 +174,7 @@ void server_setup::process(const config_lua_table& cfg, game_window& window, con
 
 				endpoint new_endpoint;
 				new_endpoint.addr = net_event.address;
-				new_endpoint.commands.set_lower_limit(static_cast<size_t>(cfg.client_commands_jitter_buffer_ms / cosm.solvable.get_fixed_delta().in_milliseconds()));
+				new_endpoint.commands.set_lower_limit(static_cast<size_t>(cfg.client_commands_jitter_buffer_ms / cosm.get_fixed_delta().in_milliseconds()));
 				endpoints.push_back(new_endpoint);
 			}
 
@@ -265,7 +265,7 @@ void server_setup::process(const config_lua_table& cfg, game_window& window, con
 			}
 		}
 
-		auto steps = timer.count_logic_steps_to_perform(cosm.solvable.get_fixed_delta());
+		auto steps = timer.count_logic_steps_to_perform(cosm.get_fixed_delta());
 
 		while (steps--) {
 			if (detailed_step_log) {
@@ -297,7 +297,7 @@ void server_setup::process(const config_lua_table& cfg, game_window& window, con
 			}
 
 			erase_if(endpoints, [this](endpoint& e) {
-				if (choose_server(e.addr).has_timed_out(e.addr, cosm.solvable.get_fixed_delta().in_milliseconds())) {
+				if (choose_server(e.addr).has_timed_out(e.addr, cosm.get_fixed_delta().in_milliseconds())) {
 					LOG("%x has timed out. Disconnecting.", e.nick_and_ip());
 					deinit_endpoint(e);
 					return true;

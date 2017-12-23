@@ -675,7 +675,7 @@ int work(const int argc, const char* const * const argv) try {
 				viewing_config.interpolation, 
 				cosmos, 
 				augs::delta(frame_delta) *= speed_multiplier, 
-				cosmos.solvable.get_fixed_delta()
+				cosmos.get_fixed_delta()
 			);
 		}
 

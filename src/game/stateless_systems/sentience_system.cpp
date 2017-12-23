@@ -35,7 +35,7 @@ void sentience_system::cast_spells(const logic_step step) const {
 	auto& cosmos = step.get_cosmos();
 	const auto& spell_metas = step.get_common().spells;
 	const auto now = cosmos.get_timestamp();
-	const auto delta = cosmos.solvable.get_fixed_delta();
+	const auto delta = cosmos.get_fixed_delta();
 
 	constexpr float standard_cooldown_for_all_spells_ms = 2000.f;
 
@@ -101,7 +101,7 @@ void sentience_system::cast_spells(const logic_step step) const {
 void sentience_system::regenerate_values_and_advance_spell_logic(const logic_step step) const {
 	const auto now = step.get_cosmos().get_timestamp();
 	auto& cosmos = step.get_cosmos();
-	const auto delta = cosmos.solvable.get_fixed_delta();
+	const auto delta = cosmos.get_fixed_delta();
 
 	const auto regeneration_frequency_in_steps = static_cast<unsigned>(1 / delta.in_seconds() * 3);
 	const auto consciousness_regeneration_frequency_in_steps = static_cast<unsigned>(1 / delta.in_seconds() * 2);
@@ -328,7 +328,7 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 	const auto& damages = step.get_queue<messages::damage_message>();
 	auto& cosmos = step.get_cosmos();
 	const auto now = cosmos.get_timestamp();
-	const auto delta = cosmos.solvable.get_fixed_delta();
+	const auto delta = cosmos.get_fixed_delta();
 
 	for (const auto& d : damages) {
 		const auto subject = cosmos[d.subject];

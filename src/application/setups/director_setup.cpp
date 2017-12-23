@@ -76,7 +76,7 @@ void director_setup::init(
 }
 
 void director_setup::set_snapshot_frequency_in_seconds(const double seconds_between_snapshots) {
-	snapshot_frequency_in_steps = static_cast<unsigned>(seconds_between_snapshots / cosm.solvable.get_fixed_delta().in_seconds());
+	snapshot_frequency_in_steps = static_cast<unsigned>(seconds_between_snapshots / cosm.get_fixed_delta().in_seconds());
 	snapshots_for_rewinding.clear();
 }
 
@@ -114,7 +114,7 @@ augs::gui::text::formatted_string director_setup::get_status_text() const {
 
 	status_text += format(typesafe_sprintf(L"\nRequested playing speed: %x", requested_playing_speed), white_font);
 	status_text += format(typesafe_sprintf(L"\nStep number: %x", get_step_number(cosm)), white_font);
-	status_text += format(typesafe_sprintf(L"\nTime: %x", get_step_number(cosm)*cosm.solvable.get_fixed_delta().in_seconds()), white_font);
+	status_text += format(typesafe_sprintf(L"\nTime: %x", get_step_number(cosm)*cosm.get_fixed_delta().in_seconds()), white_font);
 	status_text += 
 		format(
 			typesafe_sprintf(
@@ -127,7 +127,7 @@ augs::gui::text::formatted_string director_setup::get_status_text() const {
 	);
 
 	if (bookmarked_step != 0) {
-		status_text += format(typesafe_sprintf(L"\nBookmarked time: %x", bookmarked_step*cosm.solvable.get_fixed_delta().in_seconds()), white_font);
+		status_text += format(typesafe_sprintf(L"\nBookmarked time: %x", bookmarked_step*cosm.get_fixed_delta().in_seconds()), white_font);
 	}
 
 	if (unsaved_changes_exist) {
@@ -426,7 +426,7 @@ void director_setup::advance_player_by_single_step(viewing_session& session) {
 }
 
 void director_setup::advance_player(viewing_session& session) {
-	auto steps = timer.count_logic_steps_to_perform(cosm.solvable.get_fixed_delta());
+	auto steps = timer.count_logic_steps_to_perform(cosm.get_fixed_delta());
 
 	const auto speed = requested_playing_speed * basic_playback_speed;
 
@@ -484,7 +484,7 @@ void director_setup::view(
 		cosm,
 		characters.get_selected_character(),
 		all_visible,
-		timer.fraction_of_step_until_next_step(cosm.solvable.get_fixed_delta()),
+		timer.fraction_of_step_until_next_step(cosm.get_fixed_delta()),
 		get_status_text()
 	);
 

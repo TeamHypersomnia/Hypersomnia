@@ -131,7 +131,7 @@ void component_synchronizer<false, P>::apply_force(
 	const auto body = get_cache().body;
 	auto& data = get_raw_component();
 
-	const auto force = handle.get_cosmos().solvable.get_fixed_delta().in_seconds() * to_meters(pixels);
+	const auto force = handle.get_cosmos().get_fixed_delta().in_seconds() * to_meters(pixels);
 	const auto location = vec2(body->GetWorldCenter() + b2Vec2(to_meters(center_offset)));
 
 	body->ApplyLinearImpulse(

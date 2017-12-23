@@ -55,7 +55,7 @@ public:
 	}
 
 	auto get_delta() const {
-		return get_cosmos().solvable.get_fixed_delta();
+		return get_cosmos().get_fixed_delta();
 	}
 
 	operator const_logic_step() const {

@@ -95,7 +95,7 @@ void world_camera::tick(
 				player_position_at_previous_step = player_pos;
 			}
 
-			target_value = (player_pos - player_position_previously_seen) * cosm.solvable.get_fixed_delta().in_milliseconds();
+			target_value = (player_pos - player_position_previously_seen) * cosm.get_fixed_delta().in_milliseconds();
 
 			if (target_value.length() < additional_position_smoothing.value.length()) {
 				// braking
