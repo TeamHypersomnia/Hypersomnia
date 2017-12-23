@@ -9,6 +9,7 @@
 #include "game/transcendental/cosmos.h"
 #include "game/organization/all_component_includes.h"
 #include "game/organization/for_each_component_type.h"
+#include "game/transcendental/mutable_significant_attorney.h"
 
 #include "augs/readwrite/byte_readwrite.h"
 
@@ -102,7 +103,7 @@ bool cosmic_delta::encode(
 	
 	delted_stream_of_entities dt;
 
-	enco.solvable.significant.entity_pool.for_each_id([&](const entity_id id) {
+	enco.solvable.for_each_entity_id([&](const entity_id id) {
 		const const_entity_handle enco_entity = enco[id];
 		const auto stream_written_guid = enco_entity.get_guid();
 		const const_entity_handle base_entity = base[base.solvable.get_entity_id_by(stream_written_guid)];
@@ -183,7 +184,7 @@ bool cosmic_delta::encode(
 		}
 	});
 
-	base.solvable.significant.entity_pool.for_each_id([&base, &enco, &dt](const entity_id id) {
+	base.solvable.for_each_entity_id([&base, &enco, &dt](const entity_id id) {
 		const const_entity_handle base_entity = base[id];
 		const auto stream_written_guid = base_entity.get_guid();
 		const auto maybe_enco_entity = enco.solvable.get_entity_id_by(stream_written_guid);
@@ -198,8 +199,8 @@ bool cosmic_delta::encode(
 	augs::memory_stream new_meta_content;
 
 	const bool has_meta_changed = augs::write_delta(
-		base.solvable.significant.meta, 
-		enco.solvable.significant.meta, 
+		base.solvable.get_significant().meta, 
+		enco.solvable.get_significant().meta, 
 		new_meta_content, 
 		true
 	);
@@ -256,7 +257,7 @@ void cosmic_delta::decode(
 
 	deco.solvable.destroy_all_caches();
 
-	augs::read_delta(deco.solvable.significant.meta, in, true);
+	augs::read_delta(deco.solvable.get_significant({}).meta, in, true);
 
 	delted_stream_of_entities dt;
 
@@ -361,7 +362,7 @@ void cosmic_delta::decode(
 	const auto unread_bits = in.get_unread_bytes();
 	//should_eq(0, unread_bits);
 
-	deco.infer_all_caches();
+	deco.reinfer_all_caches();
 
 	deco.profiler.delta_decoding.stop();
 }

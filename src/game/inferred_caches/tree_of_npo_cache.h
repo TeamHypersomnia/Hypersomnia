@@ -10,7 +10,6 @@
 #include "augs/math/camera_cone.h"
 
 class physics_world_cache;
-struct cosmos_common_state;
 
 /* NPO stands for "non-physical objects" */
 

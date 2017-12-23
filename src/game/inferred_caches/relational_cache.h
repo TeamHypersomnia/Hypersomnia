@@ -7,7 +7,6 @@ namespace components {
 	struct fixtures;
 }
 
-struct cosmos_common_state;
 
 template <bool, class>
 class component_synchronizer;

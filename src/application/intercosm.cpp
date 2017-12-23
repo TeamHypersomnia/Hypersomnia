@@ -21,7 +21,7 @@ void intercosm::make_test_scene(sol::state& lua, const bool minimal) {
 	populate_test_scene_assets(lua, logicals, viewables);
 
 	if (minimal) {
-		world.change_common_state([](cosmos_common_state& common){
+		world.change_common_state([](cosmos_common_significant& common){
 			test_scenes::minimal_scene().populate(common);
 
 			return changer_callback_result::REFRESH;
@@ -30,7 +30,7 @@ void intercosm::make_test_scene(sol::state& lua, const bool minimal) {
 		locally_viewed = test_scenes::minimal_scene().populate_with_entities(make_logic_step_input({}));
 	}
 	else {
-		world.change_common_state([](cosmos_common_state& common){
+		world.change_common_state([](cosmos_common_significant& common){
 			test_scenes::testbed().populate(common);
 
 			return changer_callback_result::REFRESH;

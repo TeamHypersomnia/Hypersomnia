@@ -29,7 +29,7 @@
 #include "game/transcendental/cosmic_delta.h"
 
 namespace test_scenes {
-	void testbed::populate(cosmos_common_state& common) const {
+	void testbed::populate(cosmos_common_significant& common) const {
 		auto& common_assets = common.assets;
 		common_assets.cast_unsuccessful_sound.id = assets::sound_buffer_id::CAST_UNSUCCESSFUL;
 		common_assets.ped_shield_impact_sound.id = assets::sound_buffer_id::EXPLOSION;

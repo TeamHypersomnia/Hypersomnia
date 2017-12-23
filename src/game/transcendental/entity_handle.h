@@ -24,7 +24,7 @@
 #include "game/components/flags_component.h"
 
 class cosmos;
-class cosmic_delta;
+struct cosmic_delta;
 
 template <bool, class>
 class component_synchronizer;
@@ -46,10 +46,8 @@ class basic_entity_handle :
 
 	template <bool> friend class basic_entity_handle;
 
-	friend class cosmic_delta;
-	friend class cosmos;
-
-	friend void augs::read_object_lua(sol::table, cosmos&);
+	friend cosmic_delta;
+	friend cosmos;
 
 	using owner_reference = maybe_const_ref_t<is_const, cosmos>;
 	using entity_ptr = maybe_const_ptr_t<is_const, cosmic_entity>;
@@ -89,7 +87,7 @@ public:
 	) : basic_entity_handle(
 		owner, 
 		raw_id, 
-		owner.solvable.get_entity_pool().find(raw_id)
+		owner.solvable.get_entity_pool({}).find(raw_id)
 	) {
 	}
 

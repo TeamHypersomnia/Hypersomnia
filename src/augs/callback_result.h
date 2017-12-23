@@ -12,6 +12,8 @@ enum class recursive_callback_result {
 };
 
 enum class changer_callback_result {
+	INVALID,
+
 	REFRESH,
 	DONT_REFRESH
 };

@@ -10,7 +10,6 @@
 #include "game/components/processing_component.h"
 
 class cosmos;
-struct cosmos_common_state;
 
 class processing_lists_cache {
 	friend class cosmos;

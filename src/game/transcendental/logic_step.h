@@ -6,7 +6,7 @@
 
 struct data_living_one_step;
 struct all_logical_assets;
-struct cosmos_common_state;
+struct cosmos_common_significant;
 
 template <bool C>
 struct basic_logic_step_input {

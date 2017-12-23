@@ -6,7 +6,7 @@
 
 struct all_logical_assets;
 struct all_viewables_defs;
-struct cosmos_common_state;
+struct cosmos_common_significant;
 
 // test scene content
 
@@ -40,4 +40,4 @@ void populate_test_scene_assets(
 	all_viewables_defs& output_sources
 );
 
-void load_test_scene_sentience_properties(cosmos_common_state&);
+void load_test_scene_sentience_properties(cosmos_common_significant&);

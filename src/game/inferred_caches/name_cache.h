@@ -12,7 +12,6 @@ namespace components {
 }
 
 class entity_types;
-struct cosmos_common_state;
 
 template <bool, class>
 class component_synchronizer;

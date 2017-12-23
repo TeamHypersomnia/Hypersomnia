@@ -5,8 +5,6 @@
 #include "augs/templates/type_in_list_id.h"
 #include "augs/templates/always_false.h"
 
-#include "game/transcendental/cosmos_meta.h"
-
 #include "game/common_state/visibility_settings.h"
 #include "game/common_state/pathfinding_settings.h"
 #include "game/common_state/common_assets.h"
@@ -23,8 +21,8 @@ using perk_tuple = perk_list_t<std::tuple>;
 using spell_meta_id = type_in_list_id<spell_tuple>;
 using perk_meta_id = type_in_list_id<meter_tuple>;
 
-struct cosmos_common_state {
-	// GEN INTROSPECTOR struct cosmos_common_state
+struct cosmos_common_significant {
+	// GEN INTROSPECTOR struct cosmos_common_significant
 	visibility_settings visibility;
 	pathfinding_settings pathfinding;
 	si_scaling si;
@@ -40,7 +38,7 @@ struct cosmos_common_state {
 
 namespace std {
 	template <class T>
-	auto& get(const cosmos_common_state& s) {
+	auto& get(const cosmos_common_significant& s) {
 		if constexpr(is_one_of_list_v<T, decltype(s.meters)>) {
 			return std::get<T>(s.meters);
 		}
@@ -53,7 +51,7 @@ namespace std {
 	}
 
 	template <class T>
-	const auto& get(const cosmos_common_state& s) {
+	const auto& get(const cosmos_common_significant& s) {
 		if constexpr(is_one_of_list_v<T, decltype(s.meters)>) {
 			return std::get<T>(s.meters);
 		}

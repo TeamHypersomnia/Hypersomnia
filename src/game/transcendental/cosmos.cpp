@@ -70,17 +70,6 @@ bool cosmos::operator!=(const cosmos& b) const {
 	return !operator==(b);
 }
 
-cosmos& cosmos::operator=(const cosmos_solvable_significant& b) {
-	{
-		auto scope = measure_scope(profiler.duplication);
-		solvable.significant = b;
-	}
-
-	refresh_for_new_significant();
-	return *this;
-}
-
-
 void cosmos::refresh_for_new_significant() {
 	solvable.remap_guids();
 	reinfer_all_caches();
@@ -251,7 +240,7 @@ namespace augs {
 			{
 				auto scope = measure_scope(profiler.size_calculation_pass);
 				augs::write_bytes(counter_stream, cosm.get_common_state());
-				augs::write_bytes(counter_stream, cosm.solvable.significant);
+				augs::write_bytes(counter_stream, cosm.solvable.get_significant());
 			}
 
 			auto scope = measure_scope(profiler.memory_allocation_pass);
@@ -262,7 +251,7 @@ namespace augs {
 		{
 			auto scope = measure_scope(profiler.serialization_pass);
 			augs::write_bytes(into, cosm.get_common_state());
-			augs::write_bytes(into, cosm.solvable.significant);
+			augs::write_bytes(into, cosm.solvable.get_significant());
 		}
 	}
 
@@ -272,19 +261,17 @@ namespace augs {
 
 		auto& profiler = cosm.profiler;
 
-		auto refresh_when_done = augs::make_scope_guard([&cosm]() {
-			cosm.refresh_for_new_significant();
-		});
-
 		auto scope = measure_scope(profiler.deserialization_pass);
 
-		cosm.change_common_state([&](cosmos_common_state& common) {
+		cosm.change_common_state([&](cosmos_common_significant& common) {
 			augs::read_bytes(from, common);
-
 			return changer_callback_result::DONT_REFRESH;
 		});
 
-		augs::read_bytes(from, cosm.solvable.significant);
+		cosm.change_solvable_significant([&](cosmos_solvable_significant& significant) {
+			augs::read_bytes(from, significant);
+			return changer_callback_result::REFRESH;
+		});
 	}
 
 	void write_object_lua(sol::table ar, const cosmos& cosm) {
@@ -330,6 +317,9 @@ namespace augs {
 	void read_object_lua(sol::table ar, cosmos& cosm) {
 		ensure(cosm.empty());
 
+		ensure(false);
+#if TODO
+		/* TODO: Fix it to use tuples of initial values when creating entities */
 		auto refresh_when_done = augs::make_scope_guard([&cosm]() {
 			cosm.refresh_for_new_significant();
 		});
@@ -339,7 +329,7 @@ namespace augs {
 			cosm.solvable.reserve_storage_for_entities(reserved_count.as<unsigned>());
 		}
 
-		cosm.change_common_state([&](cosmos_common_state& common) {
+		cosm.change_common_state([&](cosmos_common_significant& common) {
 			read_lua(ar["common"], common);
 
 			return changer_callback_result::DONT_REFRESH;
@@ -353,11 +343,6 @@ namespace augs {
 
 			if (maybe_next_entity.valid()) {
 				const auto new_entity = cosm.create_entity("");
-
-				/* guid entry must always exist */
-				//components::guid g;
-				//read_lua(maybe_next_entity["guid"], g);
-				//cosm.
 
 				for (auto key_value_pair : maybe_next_entity) {
 					const auto component_name = key_value_pair.first.as<std::string>();
@@ -383,6 +368,7 @@ namespace augs {
 
 			++entity_table_counter;
 		}
+#endif
 	}
 }
 

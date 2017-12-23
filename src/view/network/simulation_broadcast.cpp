@@ -3,7 +3,7 @@
 #include "game/organization/all_component_includes.h"
 
 void simulation_broadcast::push_duplicate(const cosmos& from) {
-	last_state_snapshot = from.solvable.significant;
+	last_state_snapshot = from.solvable.get_significant();
 }
 
 void simulation_broadcast::set_state_heartbeat_interval(const augs::delta& dt, float ms) {

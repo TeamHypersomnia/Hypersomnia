@@ -34,8 +34,7 @@ public:
 	using base::get_raw_component;
 	using base::component_synchronizer_base;
 	
-	maybe_const_ref_t<is_const, entity_type> get_type() const;
-
+	const entity_type& get_type() const;
 	const entity_name_type& get_name() const;
 	entity_type_id get_type_id() const;
 };

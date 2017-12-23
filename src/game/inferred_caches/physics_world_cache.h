@@ -20,7 +20,6 @@
 #include "game/detail/physics/physics_queries_declaration.h"
 
 class cosmos;
-struct cosmos_common_state;
 
 struct rigid_body_cache {
 	b2Body* body = nullptr;

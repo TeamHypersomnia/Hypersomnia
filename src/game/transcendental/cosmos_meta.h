@@ -2,15 +2,8 @@
 #include "augs/misc/timing/stepped_timing.h"
 #include "game/transcendental/entity_id.h"
 
-namespace augs {
-	struct introspection_access;
-}
-
-class cosmos_meta {
-	// GEN INTROSPECTOR class cosmos_meta
-	friend class cosmos_solvable_state;
-	friend augs::introspection_access;
-
+struct cosmos_meta {
+	// GEN INTROSPECTOR struct cosmos_meta
 	augs::delta delta = augs::delta::steps_per_second(60);
 	augs::stepped_timestamp now = 0;
 

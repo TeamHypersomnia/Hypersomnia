@@ -22,6 +22,7 @@
 #endif
 
 #include "game/organization/all_messages_declaration.h"
+#include "game/transcendental/mutable_significant_attorney.h"
 #include "game/transcendental/cosmos_solvable_inferred.h"
 #include "game/transcendental/cosmos_solvable_significant.h"
 #include "game/transcendental/entity_id.h"
@@ -31,17 +32,19 @@
 class cosmos_solvable_state {
 	using guid_cache = std::map<entity_guid, entity_id>;
 
-	guid_cache guid_to_id;
+	static const cosmos_solvable_state zero;
 
 	entity_id allocate_new_entity();
 	void clear_guid(const entity_id);
 
-public:
-	static const cosmos_solvable_state zero;
-
+	/* State begins here */
+	guid_cache guid_to_id;
 	cosmos_solvable_significant significant;
+	
+public:
 	cosmos_solvable_inferred inferred;
 
+	/* State ends here */
 	cosmos_solvable_state() = default;
 	explicit cosmos_solvable_state(const cosmic_pool_size_type reserved_entities);
 
@@ -56,11 +59,6 @@ public:
 	);
 
 	void free_entity(entity_id);
-
-	template <class D>
-	void for_each_entity_id(D pred) {
-		get_entity_pool().for_each_id(pred);
-	}
 
 	template <class D>
 	void for_each_entity_id(D pred) const {
@@ -125,7 +123,23 @@ public:
 	augs::delta get_fixed_delta() const;
 	unsigned get_steps_per_second() const;
 
-	auto& get_entity_pool() {
+	auto& get_significant(const mutable_significant_attorney&) {
+		return significant;
+	}
+
+	const auto& get_significant(const mutable_significant_attorney&) const {
+		return significant;
+	}
+
+	const auto& get_significant() const {
+		return significant;
+	}
+
+	auto& get_entity_pool(const mutable_significant_attorney&) {
+		return significant.entity_pool;
+	}
+
+	const auto& get_entity_pool(const mutable_significant_attorney&) const {
 		return significant.entity_pool;
 	}
 
@@ -133,12 +147,17 @@ public:
 		return significant.entity_pool;
 	}
 
-	template<class T>
-	auto& get_component_pool() {
+	template <class T>
+	auto& get_component_pool(const mutable_significant_attorney&) {
 		return std::get<cosmic_object_pool<T>>(significant.component_pools);
 	}
 
-	template<class T>
+	template <class T>
+	const auto& get_component_pool(const mutable_significant_attorney&) const {
+		return std::get<cosmic_object_pool<T>>(significant.component_pools);
+	}
+
+	template <class T>
 	const auto& get_component_pool() const {
 		return std::get<cosmic_object_pool<T>>(significant.component_pools);
 	}
@@ -152,11 +171,17 @@ public:
 		return guid_to_id;
 	}
 
-	auto& get_aggregate(const entity_id id) {
+private:
+
+	auto& get_entity_pool() {
+		return significant.entity_pool;
+	}
+
+	const auto& get_aggregate(const entity_id id) const {
 		return get_entity_pool().get(id);
 	}	
 
-	const auto& get_aggregate(const entity_id id) const {
+	auto& get_aggregate(const entity_id id) {
 		return get_entity_pool().get(id);
 	}	
 

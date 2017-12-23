@@ -26,7 +26,7 @@ entity_id get_first_named_ancestor(const const_entity_handle p) {
 typedef components::type N;
 
 template <bool C>
-maybe_const_ref_t<C, entity_type> basic_type_synchronizer<C>::get_type() const {
+const entity_type& basic_type_synchronizer<C>::get_type() const {
 	return handle.get_cosmos().get_common_state().all_entity_types.get_type(get_type_id());
 }
 

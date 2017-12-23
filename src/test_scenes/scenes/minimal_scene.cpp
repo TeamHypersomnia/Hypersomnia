@@ -15,7 +15,7 @@
 #include "game/detail/inventory/inventory_utils.h"
 
 namespace test_scenes {
-	void minimal_scene::populate(cosmos_common_state& common) const {
+	void minimal_scene::populate(cosmos_common_significant& common) const {
 		load_test_scene_sentience_properties(common);
 
 		auto& common_assets = common.assets;

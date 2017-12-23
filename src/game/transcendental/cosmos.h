@@ -11,8 +11,10 @@
 #include "augs/misc/randomization_declaration.h"
 
 #include "game/transcendental/cosmos_solvable_state.h"
+#include "game/transcendental/cosmos_common_significant.h"
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
+#include "game/transcendental/mutable_significant_attorney.h"
 
 #include "game/assets/behaviour_tree.h"
 
@@ -47,7 +49,10 @@ auto subscript_handle_getter(C& cosm, const entity_guid guid) {
 }
 
 class cosmos {
-	cosmos_common_state common;
+	void infer_all_caches();
+	void refresh_for_new_significant();
+
+	cosmos_common_significant common;
 public: 
 	cosmos_solvable_state solvable;
 
@@ -58,7 +63,6 @@ public:
 
 	cosmos() = default;
 	explicit cosmos(const cosmic_pool_size_type reserved_entities);
-	cosmos& operator=(const cosmos_solvable_significant&);
 
 	entity_handle create_entity(const std::wstring& name);
 	entity_handle create_entity(const std::string& name);
@@ -114,19 +118,50 @@ public:
 		});
 	}
 
-	void infer_all_caches();
-
 	void reinfer_all_caches();
 	void reinfer_all_caches_for(const const_entity_handle);
 
+	/* 
+		If exception is thrown during alteration,
+		these metods will properly refresh inferred caches with what state was left.
+	*/
+
 	template <class F>
 	void change_common_state(F&& callback) {
-		if (callback(common) == changer_callback_result::REFRESH) {
-			reinfer_all_caches();
-		}
+		auto status = changer_callback_result::INVALID;
+
+		auto refresh_when_done = augs::make_scope_guard([&]() {
+			if (status != changer_callback_result::DONT_REFRESH) {
+				reinfer_all_caches();
+			}
+		});
+
+		status = callback(common);
 	}
 
-	void refresh_for_new_significant();
+	template <class F>
+	void change_solvable_significant(F&& callback) {
+		auto status = changer_callback_result::INVALID;
+
+		auto refresh_when_done = augs::make_scope_guard([&]() {
+			if (status != changer_callback_result::DONT_REFRESH) {
+				refresh_for_new_significant();
+			}
+		});
+
+		status = callback(solvable.get_significant({}));
+	}
+
+	void set(const cosmos_solvable_significant& signi) {
+		change_solvable_significant([&](cosmos_solvable_significant& s){ 
+			{
+				auto scope = measure_scope(profiler.duplication);
+				s = signi; 
+			}
+
+			return changer_callback_result::REFRESH; 
+		});
+	}
 
 	si_scaling get_si() const;
 
@@ -135,10 +170,7 @@ public:
 	
 	std::wstring summary() const;
 
-	cosmos_common_state& get_common_state();
-	const cosmos_common_state& get_common_state() const;
-
-	common_assets& get_common_assets();
+	const cosmos_common_significant& get_common_state() const;
 	const common_assets& get_common_assets() const;
 
 	bool operator==(const cosmos&) const;
@@ -205,16 +237,8 @@ inline si_scaling cosmos::get_si() const {
 	return common.si;
 }
 
-inline cosmos_common_state& cosmos::get_common_state() {
+inline const cosmos_common_significant& cosmos::get_common_state() const {
 	return common;
-}
-
-inline const cosmos_common_state& cosmos::get_common_state() const {
-	return common;
-}
-
-inline common_assets& cosmos::get_common_assets() {
-	return get_common_state().assets;
 }
 
 inline const common_assets& cosmos::get_common_assets() const {

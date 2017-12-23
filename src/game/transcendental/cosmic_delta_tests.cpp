@@ -209,9 +209,9 @@ TEST_CASE("CosmicDelta2 PaddingTest") {
 		augs::save_as_text(LOG_FILES_DIR "other_types.txt", other_types);
 	}
 	
-	/* Validate cosmos_common_state. It will also be written and compared. */
+	/* Validate cosmos_common_significant. It will also be written and compared. */
 
-	cosmos_common_state common;
+	cosmos_common_significant common;
 
 	augs::introspect(
 		augs::recursive([&](auto&& self, auto, auto m) {
