@@ -3,7 +3,7 @@
 #include "augs/misc/pool/pool.h"
 
 #include "game/transcendental/cosmic_types.h"
-#include "game/transcendental/cosmos_meta.h"
+#include "game/transcendental/cosmos_clock.h"
 
 using dynamic_component_pools_type = 
 	replace_list_type_t<
@@ -22,7 +22,7 @@ struct cosmos_solvable_significant {
 	entity_pool_type entity_pool;
 	dynamic_component_pools_type component_pools;
 
-	cosmos_meta meta;
+	cosmos_clock clock;
 	// END GEN INTROSPECTOR
 
 	void clear();

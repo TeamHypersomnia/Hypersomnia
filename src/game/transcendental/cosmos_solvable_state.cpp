@@ -44,7 +44,7 @@ void cosmos_solvable_state::destroy_all_caches() {
 }
 
 void cosmos_solvable_state::increment_step() {
-	++significant.meta.now.step;
+	++significant.clock.now.step;
 }
 
 template <class T, class agg>
@@ -123,23 +123,23 @@ double cosmos_solvable_state::get_total_seconds_passed(const double view_interpo
 }
 
 double cosmos_solvable_state::get_total_seconds_passed() const {
-	return significant.meta.now.step * get_fixed_delta().in_seconds<double>();
+	return significant.clock.now.step * get_fixed_delta().in_seconds<double>();
 }
 
 decltype(augs::stepped_timestamp::step) cosmos_solvable_state::get_total_steps_passed() const {
-	return significant.meta.now.step;
+	return significant.clock.now.step;
 }
 
 augs::stepped_timestamp cosmos_solvable_state::get_timestamp() const {
-	return significant.meta.now;
+	return significant.clock.now;
 }
 
 augs::delta cosmos_solvable_state::get_fixed_delta() const {
-	return significant.meta.delta;
+	return significant.clock.delta;
 }
 
 void cosmos_solvable_state::set_steps_per_second(const unsigned steps) {
-	significant.meta.delta = augs::delta::steps_per_second(steps);
+	significant.clock.delta = augs::delta::steps_per_second(steps);
 }
 
 unsigned cosmos_solvable_state::get_steps_per_second() const {
@@ -163,7 +163,7 @@ entity_id cosmos_solvable_state::allocate_entity_with_specific_guid(const entity
 }
 
 entity_id cosmos_solvable_state::allocate_next_entity() {
-	const auto next_guid = significant.meta.next_entity_guid.value++;
+	const auto next_guid = significant.clock.next_entity_guid.value++;
 	return allocate_entity_with_specific_guid(next_guid);
 }
 
