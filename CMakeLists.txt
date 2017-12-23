@@ -428,17 +428,11 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/view/rendering_scripts/draw_crosshair_lasers.cpp"
 	"src/view/rendering_scripts/draw_hud_for_released_explosives.cpp"
 	"src/view/audiovisual_state/world_camera.cpp"
-#	"src/application/setups/server_setup.cpp" #
-#	"src/application/setups/setup_base.cpp" #
-#	"src/application/setups/two_clients_and_server_setup.cpp" #
 	"src/application/setups/test_scene_setup.cpp"
 	"src/application/setups/editor/editor_setup.cpp"
 	"src/application/setups/editor/editor_tab.cpp"
 	"src/application/setups/editor/editor_recent_paths.cpp"
-#	"src/application/setups/director_setup.cpp" #
 	"src/application/setups/main_menu_setup.cpp"
-#	"src/application/setups/client_setup.cpp" #
-#	"src/application/setups/determinism_test_setup.cpp" #
 	"src/application/web_daemon/session_report.cpp"
 	"src/augs/global_libraries.cpp"
 	"src/augs/graphics/fbo.cpp"
