@@ -17,7 +17,7 @@ class simulation_broadcast {
 	std::thread delta_production;
 	unsigned steps_since_last_heartbeat = 0;
 
-	cosmos_significant_state last_state_snapshot;
+	cosmos_solvable_significant last_state_snapshot;
 
 	void push_duplicate(const cosmos& from);
 

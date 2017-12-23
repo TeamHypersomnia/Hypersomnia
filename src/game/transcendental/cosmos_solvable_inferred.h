@@ -7,7 +7,7 @@
 #include "game/inferred_caches/relational_cache.h"
 #include "game/inferred_caches/name_cache.h"
 
-struct all_inferred_caches {
+struct cosmos_solvable_inferred {
 	relational_cache relational;
 	name_cache name;
 	physics_world_cache physics;

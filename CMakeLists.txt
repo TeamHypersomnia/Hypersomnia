@@ -401,7 +401,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/enums/filters.cpp"
 	"src/game/detail/describers.cpp"
 	"src/game/detail/names_and_descriptions.cpp"
-	"src/game/transcendental/cosmos_significant_state.cpp"
+	"src/game/transcendental/cosmos_solvable_significant.cpp"
 	"src/view/network/simulation_broadcast.cpp"
 	"src/view/network/simulation_receiver.cpp"
 	"src/game/stateless_systems/animation_system.cpp"

@@ -33,8 +33,8 @@ void cosmos_solvable_state::reserve_storage_for_entities(const cosmic_pool_size_
 }
 
 void cosmos_solvable_state::destroy_all_caches() {
-	inferred.~all_inferred_caches();
-	new (&inferred) all_inferred_caches;
+	inferred.~cosmos_solvable_inferred();
+	new (&inferred) cosmos_solvable_inferred;
 
 	const auto n = significant.entity_pool.capacity();
 

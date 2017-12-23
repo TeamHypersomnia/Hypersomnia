@@ -58,7 +58,7 @@ public:
 
 	cosmos() = default;
 	explicit cosmos(const cosmic_pool_size_type reserved_entities);
-	cosmos& operator=(const cosmos_significant_state&);
+	cosmos& operator=(const cosmos_solvable_significant&);
 
 	entity_handle create_entity(const std::wstring& name);
 	entity_handle create_entity(const std::string& name);

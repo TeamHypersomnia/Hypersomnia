@@ -7,6 +7,6 @@
 
 #include "augs/readwrite/byte_readwrite.h"
 
-void cosmos_significant_state::clear() {
-	*this = cosmos_significant_state();
+void cosmos_solvable_significant::clear() {
+	*this = cosmos_solvable_significant();
 }

@@ -22,14 +22,16 @@
 #endif
 
 #include "game/organization/all_messages_declaration.h"
-#include "game/organization/all_inferred_caches.h"
-#include "game/transcendental/cosmos_significant_state.h"
+#include "game/transcendental/cosmos_solvable_inferred.h"
+#include "game/transcendental/cosmos_solvable_significant.h"
 #include "game/transcendental/entity_id.h"
 
 #include "game/assets/behaviour_tree.h"
 
 class cosmos_solvable_state {
-	std::map<entity_guid, entity_id> guid_to_id;
+	using guid_cache = std::map<entity_guid, entity_id>;
+
+	guid_cache guid_to_id;
 
 	entity_id allocate_new_entity();
 	void clear_guid(const entity_id);
@@ -37,8 +39,8 @@ class cosmos_solvable_state {
 public:
 	static const cosmos_solvable_state zero;
 
-	cosmos_significant_state significant;
-	all_inferred_caches inferred;
+	cosmos_solvable_significant significant;
+	cosmos_solvable_inferred inferred;
 
 	cosmos_solvable_state() = default;
 	explicit cosmos_solvable_state(const cosmic_pool_size_type reserved_entities);

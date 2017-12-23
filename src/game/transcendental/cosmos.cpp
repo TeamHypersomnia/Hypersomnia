@@ -70,7 +70,7 @@ bool cosmos::operator!=(const cosmos& b) const {
 	return !operator==(b);
 }
 
-cosmos& cosmos::operator=(const cosmos_significant_state& b) {
+cosmos& cosmos::operator=(const cosmos_solvable_significant& b) {
 	{
 		auto scope = measure_scope(profiler.duplication);
 		solvable.significant = b;
