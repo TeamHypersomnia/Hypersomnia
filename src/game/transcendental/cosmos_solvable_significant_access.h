@@ -11,7 +11,7 @@ namespace augs {
 
 struct cosmic_delta;
 
-class mutable_significant_attorney {
+class cosmos_solvable_significant_access {
 	/*
 		The following domains are free to arbitrarily change the cosmos_solvable::significant,
 		as they take proper precautions to keep state consistent or otherwise refresh it.
@@ -25,5 +25,5 @@ class mutable_significant_attorney {
 	template <bool, class D>
 	friend class relations_mixin;
 
-	mutable_significant_attorney() {}
+	cosmos_solvable_significant_access() {}
 };

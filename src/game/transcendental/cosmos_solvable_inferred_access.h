@@ -6,7 +6,7 @@ class component_synchronizer;
 class physics_system;
 struct contact_listener;
 
-class mutable_solvable_inferred_key {
+class cosmos_solvable_inferred_access {
 	/*
 		The following domains are free to change the cosmos_solvable::inferred,
 		as they take proper precautions to keep state consistent.
@@ -19,5 +19,5 @@ class mutable_solvable_inferred_key {
 	friend physics_system;
 	friend contact_listener;
 
-	mutable_solvable_inferred_key() {}
+	cosmos_solvable_inferred_access() {}
 };
