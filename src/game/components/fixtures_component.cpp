@@ -83,7 +83,7 @@ void component_synchronizer<false, F>::reinfer_caches() const {
 }
 
 void component_synchronizer<false, F>::rebuild_density() const {
-	for (auto f : get_cache().all_fixtures_in_component) {
+	for (auto& f : get_cache().all_fixtures_in_component) {
 		f->SetDensity(get_raw_component().density * get_raw_component().density_multiplier);
 	}
 
@@ -132,7 +132,7 @@ void component_synchronizer<false, F>::set_friction(
 		return;
 	}
 
-	for (auto f : get_cache().all_fixtures_in_component) {
+	for (auto& f : get_cache().all_fixtures_in_component) {
 		f->SetFriction(fr);
 	}
 }
@@ -146,7 +146,7 @@ void component_synchronizer<false, F>::set_restitution(
 		return;
 	}
 
-	for (auto f : get_cache().all_fixtures_in_component) {
+	for (auto& f : get_cache().all_fixtures_in_component) {
 		f->SetRestitution(r);
 	}
 }

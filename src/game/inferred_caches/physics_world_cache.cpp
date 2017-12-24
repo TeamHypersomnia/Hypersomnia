@@ -222,7 +222,7 @@ void physics_world_cache::infer_cache_for_fixtures(const const_entity_handle han
 				ensure(static_cast<short>(ci) < std::numeric_limits<short>::max());
 				new_fix->index_in_component = static_cast<short>(ci);
 
-				all_fixtures_in_component.push_back(new_fix);
+				all_fixtures_in_component.emplace_back(new_fix);
 			}
 
 			return;
@@ -240,7 +240,7 @@ void physics_world_cache::infer_cache_for_fixtures(const const_entity_handle han
 			b2Fixture* const new_fix = owner_b2Body->CreateFixture(&fixdef);
 			
 			new_fix->index_in_component = 0u;
-			all_fixtures_in_component.push_back(new_fix);
+			all_fixtures_in_component.emplace_back(new_fix);
 			
 			return;
 		}
@@ -301,7 +301,7 @@ b2Fixture_index_in_component physics_world_cache::get_index_in_component(
 	b2Fixture_index_in_component result;
 	result.convex_shape_index = static_cast<std::size_t>(f->index_in_component);
 
-	ensure_eq(f, colliders_caches[linear_cache_key(handle)].all_fixtures_in_component[result.convex_shape_index]);
+	ensure_eq(f, colliders_caches[linear_cache_key(handle)].all_fixtures_in_component[result.convex_shape_index].get());
 
 	return result;
 
@@ -637,8 +637,8 @@ physics_world_cache& physics_world_cache::operator=(const physics_world_cache& b
 
 	for (std::size_t i = 0; i < colliders_caches.size(); ++i) {
 		for (auto& f : b.colliders_caches[i].all_fixtures_in_component) {
-			colliders_caches[i].all_fixtures_in_component.push_back(
-				reinterpret_cast<b2Fixture*>(pointer_migrations.at(reinterpret_cast<const void*>(f)))
+			colliders_caches[i].all_fixtures_in_component.emplace_back(
+				reinterpret_cast<b2Fixture*>(pointer_migrations.at(reinterpret_cast<const void*>(f.get())))
 			);
 		}
 	}

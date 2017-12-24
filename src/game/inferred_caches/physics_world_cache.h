@@ -27,7 +27,10 @@ struct rigid_body_cache {
 };
 
 struct colliders_cache {
-	augs::constant_size_vector<b2Fixture*, CONVEX_POLYS_COUNT> all_fixtures_in_component;
+	augs::constant_size_vector<
+		std::experimental::propagate_const<b2Fixture*>, 
+		CONVEX_POLYS_COUNT
+	> all_fixtures_in_component;
 };
 
 struct joint_cache {
