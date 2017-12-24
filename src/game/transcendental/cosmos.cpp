@@ -53,7 +53,7 @@ void cosmos::infer_caches_for(const const_entity_handle h) {
 }
 
 bool cosmos::operator==(const cosmos& b) const {
-	if (!augs::equal_by_introspection(common, b.common)) {
+	if (!augs::equal_by_introspection(common.significant, b.common.significant)) {
 		return false;
 	}
 
@@ -233,7 +233,7 @@ namespace augs {
 
 			{
 				auto scope = measure_scope(profiler.size_calculation_pass);
-				augs::write_bytes(counter_stream, cosm.get_common_state());
+				augs::write_bytes(counter_stream, cosm.get_common_significant());
 				augs::write_bytes(counter_stream, cosm.get_solvable().significant);
 			}
 
@@ -244,7 +244,7 @@ namespace augs {
 
 		{
 			auto scope = measure_scope(profiler.serialization_pass);
-			augs::write_bytes(into, cosm.get_common_state());
+			augs::write_bytes(into, cosm.get_common_significant());
 			augs::write_bytes(into, cosm.get_solvable().significant);
 		}
 	}
@@ -257,7 +257,7 @@ namespace augs {
 
 		auto scope = measure_scope(profiler.deserialization_pass);
 
-		cosm.change_common_state([&](cosmos_common_significant& common) {
+		cosm.change_common_significant([&](cosmos_common_significant& common) {
 			augs::read_bytes(from, common);
 			return changer_callback_result::DONT_REFRESH;
 		});
@@ -273,7 +273,7 @@ namespace augs {
 			auto common_table = ar.create();
 			ar["common"] = common_table;
 
-			write_lua(common_table, cosm.get_common_state());
+			write_lua(common_table, cosm.get_common_significant());
 		}
 		
 		{
@@ -323,7 +323,7 @@ namespace augs {
 			cosm.reserve_storage_for_entities(reserved_count.as<unsigned>());
 		}
 
-		cosm.change_common_state([&](cosmos_common_significant& common) {
+		cosm.change_common_significant([&](cosmos_common_significant& common) {
 			read_lua(ar["common"], common);
 
 			return changer_callback_result::DONT_REFRESH;

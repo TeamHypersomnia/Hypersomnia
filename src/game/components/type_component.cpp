@@ -27,7 +27,7 @@ typedef components::type N;
 
 template <bool C>
 const entity_type& basic_type_synchronizer<C>::get_type() const {
-	return handle.get_cosmos().get_common_state().all_entity_types.get_type(get_type_id());
+	return handle.get_cosmos().get_common_significant().all_entity_types.get_type(get_type_id());
 }
 
 template <bool C>

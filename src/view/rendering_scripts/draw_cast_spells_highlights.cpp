@@ -25,7 +25,7 @@ void draw_cast_spells_highlights(const draw_cast_spells_highlights_input in) {
 						const auto highlight_amount = 1.f - (in.global_time_seconds - sentience.time_of_last_spell_cast.in_seconds(dt)) / 0.4f;
 
 						if (highlight_amount > 0.f) {
-							const auto spell_data = get_meta_of(spell, cosmos.get_common_state().spells);
+							const auto spell_data = get_meta_of(spell, cosmos.get_common_significant().spells);
 
 							auto highlight_col = spell_data.common.associated_color;
 							highlight_col.a = static_cast<rgba_channel>(255 * highlight_amount);

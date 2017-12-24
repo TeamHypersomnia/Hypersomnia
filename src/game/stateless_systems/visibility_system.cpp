@@ -169,7 +169,7 @@ void visibility_system::respond_to_visibility_information_requests(
 	std::vector<messages::line_of_sight_response>& los_responses,
 	std::vector<messages::visibility_information_response>& vis_responses
 ) const {
-	const auto& settings = cosmos.get_common_state().visibility;
+	const auto& settings = cosmos.get_common_significant().visibility;
 	const auto si = cosmos.get_si();
 
 	ensure(settings.epsilon_distance_vertex_hit > 0.f);

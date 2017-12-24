@@ -10,8 +10,9 @@
 #include "augs/misc/enum/enum_boolset.h"
 #include "augs/misc/randomization_declaration.h"
 
+#include "game/transcendental/cosmos_common.h"
 #include "game/transcendental/cosmos_solvable.h"
-#include "game/transcendental/cosmos_common_significant.h"
+
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/transcendental/cosmos_solvable_access.h"
@@ -53,7 +54,7 @@ class cosmos {
 	void infer_all_entities();
 	void reinfer_solvable();
 
-	cosmos_common_significant common;
+	cosmos_common common;
 	cosmos_solvable solvable;
 
 public: 
@@ -136,7 +137,7 @@ public:
 	*/
 
 	template <class F>
-	void change_common_state(F&& callback) {
+	void change_common_significant(F&& callback) {
 		auto status = changer_callback_result::INVALID;
 
 		auto refresh_when_done = augs::make_scope_guard([&]() {
@@ -145,7 +146,7 @@ public:
 			}
 		});
 
-		status = callback(common);
+		status = callback(common.significant);
 	}
 
 	template <class F>
@@ -203,7 +204,7 @@ public:
 		return solvable.inferred;
 	}
 
-	const cosmos_common_significant& get_common_state() const;
+	const cosmos_common_significant& get_common_significant() const;
 	const common_assets& get_common_assets() const;
 
 	bool operator==(const cosmos&) const;
@@ -267,15 +268,15 @@ public:
 };
 
 inline si_scaling cosmos::get_si() const {
-	return common.si;
+	return get_common_significant().si;
 }
 
-inline const cosmos_common_significant& cosmos::get_common_state() const {
-	return common;
+inline const cosmos_common_significant& cosmos::get_common_significant() const {
+	return common.significant;
 }
 
 inline const common_assets& cosmos::get_common_assets() const {
-	return get_common_state().assets;
+	return get_common_significant().assets;
 }
 
 #if READWRITE_OVERLOAD_TRAITS_INCLUDED || LUA_READWRITE_OVERLOAD_TRAITS_INCLUDED

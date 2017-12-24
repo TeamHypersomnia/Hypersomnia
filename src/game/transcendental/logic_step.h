@@ -46,10 +46,6 @@ public:
 		return input.entropy;
 	}
 
-	const auto& get_common() const {
-		return get_cosmos().get_common_state();
-	}
-
 	const auto& get_logical_assets() const {
 		return input.logical_assets;
 	}
