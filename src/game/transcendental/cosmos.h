@@ -14,7 +14,7 @@
 #include "game/transcendental/cosmos_common_significant.h"
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
-#include "game/transcendental/cosmos_solvable_significant_access.h"
+#include "game/transcendental/cosmos_solvable_access.h"
 #include "game/transcendental/cosmos_solvable_inferred_access.h"
 
 #include "game/assets/behaviour_tree.h"
@@ -179,11 +179,11 @@ public:
 	
 	std::wstring summary() const;
 
-	auto& get_solvable(cosmos_solvable_significant_access) {
+	auto& get_solvable(cosmos_solvable_access) {
 		return solvable;
 	}
 
-	const auto& get_solvable(cosmos_solvable_significant_access) const {
+	const auto& get_solvable(cosmos_solvable_access) const {
 		return solvable;
 	}
 

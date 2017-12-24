@@ -9,7 +9,7 @@
 #include "game/transcendental/cosmos.h"
 #include "game/organization/all_component_includes.h"
 #include "game/organization/for_each_component_type.h"
-#include "game/transcendental/cosmos_solvable_significant_access.h"
+#include "game/transcendental/cosmos_solvable_access.h"
 
 #include "augs/readwrite/byte_readwrite.h"
 

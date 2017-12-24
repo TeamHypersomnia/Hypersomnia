@@ -10,7 +10,7 @@
 
 #include "game/detail/inventory/inventory_slot_handle_declaration.h"
 #include "game/transcendental/entity_handle_declaration.h"
-#include "game/transcendental/cosmos_solvable_significant_access.h"
+#include "game/transcendental/cosmos_solvable_access.h"
 #include "game/transcendental/entity_id.h"
 #include "game/organization/all_components_declaration.h"
 
@@ -80,7 +80,7 @@ public:
 	) {
 	}
 
-	auto& get(cosmos_solvable_significant_access) const {
+	auto& get(cosmos_solvable_access) const {
 		return agg();
 	}
 
