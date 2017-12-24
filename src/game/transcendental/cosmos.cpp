@@ -108,8 +108,8 @@ entity_handle cosmos::clone_entity(const entity_id source_entity_id) {
 	}
 
 	ensure(
-		!source_entity.has<components::child>() 
-		&& "Cloning of entities with child component is not yet supported"
+		!source_entity.get<components::child>().parent.is_set() 
+		&& "Cloning of entities that are children is not yet supported"
 	);
 
 	const auto new_entity = create_entity(L"");

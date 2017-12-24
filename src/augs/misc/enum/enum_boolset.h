@@ -16,7 +16,7 @@ namespace augs {
 		static_assert(sizeof(bool) == sizeof(unsigned char), "Not on this platform, sorry.");
 
 		// GEN INTROSPECTOR class augs::enum_boolset class _enum std::size_t alignment
-		alignas(alignment) std::array<bool, aligned_flag_count> flags;
+		alignas(alignment) std::array<bool, aligned_flag_count> flags = {};
 		// END GEN INTROSPECTOR
 	public:
 		bool operator==(const enum_boolset<_enum, alignment>& b) const {

@@ -4,6 +4,8 @@
 
 namespace components {
 	struct child {
+		static constexpr bool is_fundamental = true;
+
 		// GEN INTROSPECTOR struct components::child
 		entity_id parent;
 		// END GEN INTROSPECTOR

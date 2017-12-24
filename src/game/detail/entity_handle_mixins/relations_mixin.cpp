@@ -148,12 +148,7 @@ template <bool C, class D>
 D basic_relations_mixin<C, D>::get_parent() const {
 	auto& self = *static_cast<const D*>(this);
 
-	if (self.template has<components::child>()) {
-		return self.get_cosmos()[self.template get<components::child>().parent];
-	}
-	else {
-		return self.get_cosmos()[entity_id()];
-	}
+	return self.get_cosmos()[self.template get<components::child>().parent];
 }
 
 template class basic_relations_mixin<false, basic_entity_handle<false>>;

@@ -217,32 +217,18 @@ public:
 
 	bool get_flag(const entity_flag f) const {
 		ensure(alive());
-		components::flags from;
-
-		if (has<components::flags>()) {
-			from = get<components::flags>();
-		}
-
-		return from.values.test(f);
+		return get<components::flags>().values.test(f);
 	}
 
 	template <bool C = !is_const, class = std::enable_if_t<C>>
 	void set_flag(const entity_flag f) const {
 		ensure(alive());
-		if (!has<components::flags>()) {
-			add(components::flags());
-		}
-
 		get<components::flags>().values.set(f, true);
 	}
 
 	template <bool C = !is_const, class = std::enable_if_t<C>>
 	void unset_flag(const entity_flag f) const {
 		ensure(alive());
-		if (!has<components::flags>()) {
-			add(components::flags());
-		}
-
 		get<components::flags>().values.set(f, false);
 	}
 
