@@ -181,7 +181,8 @@ void physics_world_cache::infer_cache_for_fixtures(const const_entity_handle han
 		const auto si = handle.get_cosmos().get_si();
 		const auto owner_body_entity = handle.get_owner_body();
 		ensure(owner_body_entity.alive());
-		auto* const owner_b2Body = get_rigid_body_cache(owner_body_entity).body;
+
+		const auto owner_b2Body = get_rigid_body_cache(owner_body_entity).body.get();
 		const auto& colliders_data = colliders.get_raw_component();
 
 		b2FixtureDef fixdef;
@@ -353,9 +354,9 @@ physics_world_cache& physics_world_cache::operator=(const physics_world_cache& b
 	// reset the allocator pointer to the new one
 	migrated_b2World.m_contactManager.m_allocator = &migrated_b2World.m_blockAllocator;
 
-	std::unordered_map<void*, void*> pointer_migrations;
-	std::unordered_map<void*, bool> contact_edge_a_or_b_in_contacts;
-	std::unordered_map<void*, bool> joint_edge_a_or_b_in_joints;
+	std::unordered_map<const void*, void*> pointer_migrations;
+	std::unordered_map<const void*, bool> contact_edge_a_or_b_in_contacts;
+	std::unordered_map<const void*, bool> joint_edge_a_or_b_in_joints;
 
 	b2BlockAllocator& migrated_allocator = migrated_b2World.m_blockAllocator;
 
@@ -389,7 +390,7 @@ physics_world_cache& physics_world_cache::operator=(const physics_world_cache& b
 		typedef std::remove_pointer_t<std::decay_t<decltype(pointer_to_be_migrated)>> type;
 		static_assert(!std::is_same_v<type, b2Joint>, "Can't migrate an abstract base class");
 
-		void* const void_ptr = reinterpret_cast<void*>(pointer_to_be_migrated);
+		const auto void_ptr = reinterpret_cast<const void*>(pointer_to_be_migrated);
 
 		if (pointer_to_be_migrated == nullptr) {
 			return;
@@ -626,18 +627,25 @@ physics_world_cache& physics_world_cache::operator=(const physics_world_cache& b
 		inside the loop that migrated all bodies and fixtures.
 	*/
 
-	colliders_caches = b.colliders_caches;
-	rigid_body_caches = b.rigid_body_caches;
+	colliders_caches.clear();
+	rigid_body_caches.clear();
 
-	for (auto& c : colliders_caches) {
-		for (auto& f : c.all_fixtures_in_component) {
-			f = reinterpret_cast<b2Fixture*>(pointer_migrations.at(reinterpret_cast<void*>(f)));
+	colliders_caches.resize(b.colliders_caches.size());
+	rigid_body_caches.resize(b.rigid_body_caches.size());
+
+	for (std::size_t i = 0; i < colliders_caches.size(); ++i) {
+		for (auto& f : b.colliders_caches[i].all_fixtures_in_component) {
+			colliders_caches[i].all_fixtures_in_component.push_back(
+				reinterpret_cast<b2Fixture*>(pointer_migrations.at(reinterpret_cast<const void*>(f)))
+			);
 		}
 	}
 	
-	for (auto& c : rigid_body_caches) {
-		if (c.body) {
-			c.body = reinterpret_cast<b2Body*>(pointer_migrations.at(reinterpret_cast<void*>(c.body)));
+	for (std::size_t i = 0; i < rigid_body_caches.size(); ++i) {
+		const auto b_body = b.rigid_body_caches[i].body.get();
+
+		if (b_body) {
+			rigid_body_caches[i].body = reinterpret_cast<b2Body*>(pointer_migrations.at(reinterpret_cast<const void*>(b_body)));
 		}
 	}
 

@@ -132,7 +132,7 @@ void component_synchronizer<false, P>::apply_force(
 		return;
 	}
 
-	const auto body = get_cache().body;
+	const auto body = get_cache().body.get();
 	auto& data = get_raw_component();
 
 	const auto force = handle.get_cosmos().get_fixed_delta().in_seconds() * to_meters(pixels);
@@ -168,7 +168,7 @@ void component_synchronizer<false, P>::apply_impulse(
 		return;
 	}
 
-	const auto body = get_cache().body;
+	const auto body = get_cache().body.get();
 	auto& data = get_raw_component();
 
 	const vec2 force = to_meters(pixels);
@@ -185,7 +185,7 @@ void component_synchronizer<false, P>::apply_impulse(
 
 void component_synchronizer<false, P>::apply_angular_impulse(const float imp) const {
 	ensure(is_constructed());
-	const auto body = get_cache().body;
+	const auto body = get_cache().body.get();
 	auto& data = get_raw_component();
 
 	body->ApplyAngularImpulse(imp, true);
@@ -251,7 +251,7 @@ void component_synchronizer<false, P>::set_transform(const entity_id id) const {
 }
 
 void component_synchronizer<false, P>::set_transform(const components::transform& transform) const {
-	const auto body = get_cache().body;
+	const auto body = get_cache().body.get();
 	auto& data = get_raw_component();
 
 	data.set_transform(

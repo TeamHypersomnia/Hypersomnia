@@ -28,7 +28,8 @@ void physics_world_cache::rechoose_owner_friction_body(const entity_handle entit
 		});
 	}
 
-	auto* const body = get_rigid_body_cache(entity).body;
+	const auto body = get_rigid_body_cache(entity).body.get();
+
 	if (!feasible_grounds.empty()) {
 		std::stable_sort(feasible_grounds.begin(), feasible_grounds.end(), [this, &cosmos](const entity_id a, const entity_id b) {
 			return are_connected_by_friction(cosmos[a], cosmos[b]);
