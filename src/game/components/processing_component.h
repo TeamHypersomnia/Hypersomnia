@@ -8,6 +8,7 @@
 namespace components {
 	struct processing {
 		static constexpr bool is_synchronized = true;
+		static constexpr bool is_fundamental = true;
 
 		using flagset_type = augs::enum_boolset<processing_subjects>;
 		

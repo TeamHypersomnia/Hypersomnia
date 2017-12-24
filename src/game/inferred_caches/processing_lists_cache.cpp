@@ -19,10 +19,6 @@ void processing_lists_cache::destroy_cache_of(const const_entity_handle handle) 
 }
 
 void processing_lists_cache::infer_cache_for(const const_entity_handle handle) {
-	if (!handle.has<components::processing>()) {
-		return;
-	}
-
 	const auto index = linear_cache_key(handle);
 	
 	ensure(!per_entity_cache[index].is_constructed);

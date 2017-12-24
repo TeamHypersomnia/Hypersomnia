@@ -105,12 +105,7 @@ void basic_entity_handle<C>::recalculate_basic_processing_categories() const {
 	ensure(alive());
 	const auto default_processing = components::processing::get_default(*this);
 
-	if (!has<components::processing>()) {
-		add(default_processing);
-	}
-	else {
-		get<components::processing>().set_basic_categories(default_processing.processing_subject_categories);
-	}
+	get<components::processing>().set_basic_categories(default_processing.processing_subject_categories);
 }
 
 // explicit instantiation

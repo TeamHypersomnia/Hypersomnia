@@ -34,7 +34,6 @@ void sound_system::clear_dead_entities(const cosmos& new_cosmos) {
 	for (const auto& it : per_entity_cache) {
 		if (
 			new_cosmos[it.first].dead() 
-			|| !new_cosmos[it.first].has<components::processing>()
 			|| !new_cosmos[it.first].get<components::processing>().is_in(processing_subjects::WITH_SOUND_EXISTENCE)
 		) {
 			to_erase.push_back(it.first);
