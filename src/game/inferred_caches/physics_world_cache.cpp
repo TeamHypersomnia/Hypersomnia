@@ -629,9 +629,11 @@ physics_world_cache& physics_world_cache::operator=(const physics_world_cache& b
 
 	colliders_caches.clear();
 	rigid_body_caches.clear();
+	joint_caches.clear();
 
 	colliders_caches.resize(b.colliders_caches.size());
 	rigid_body_caches.resize(b.rigid_body_caches.size());
+	joint_caches.resize(b.joint_caches.size());
 
 	for (std::size_t i = 0; i < colliders_caches.size(); ++i) {
 		for (auto& f : b.colliders_caches[i].all_fixtures_in_component) {
@@ -646,6 +648,14 @@ physics_world_cache& physics_world_cache::operator=(const physics_world_cache& b
 
 		if (b_body) {
 			rigid_body_caches[i].body = reinterpret_cast<b2Body*>(pointer_migrations.at(reinterpret_cast<const void*>(b_body)));
+		}
+	}
+
+	for (std::size_t i = 0; i < joint_caches.size(); ++i) {
+		const auto b_joint = b.joint_caches[i].joint.get();
+
+		if (b_joint) {
+			joint_caches[i].joint = reinterpret_cast<b2Joint*>(pointer_migrations.at(reinterpret_cast<const void*>(b_joint)));
 		}
 	}
 

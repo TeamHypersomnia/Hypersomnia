@@ -31,7 +31,7 @@ struct colliders_cache {
 };
 
 struct joint_cache {
-	b2Joint* joint = nullptr;
+	std::experimental::propagate_const<b2Joint*> joint = nullptr;
 };
 
 struct physics_raycast_output {
