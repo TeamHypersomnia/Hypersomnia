@@ -209,12 +209,13 @@ TEST_CASE("CosmicDelta2 PaddingTest") {
 		augs::save_as_text(LOG_FILES_DIR "other_types.txt", other_types);
 	}
 	
-	/* Validate cosmos_common_significant. It will also be written and compared. */
+#if !STATICALLY_ALLOCATE_ENTITY_TYPES_NUM
+	/* Too much space would be wasted and stack overflows would occur. */
 
 	cosmos_common_significant common;
 
 	augs::introspect(
-		augs::recursive([&](auto&& self, auto, auto m) {
+		augs::recursive([padding_checker](auto self, auto, auto m) {
 			using T = std::decay_t<decltype(m)>;
 
 			if constexpr(std::is_same_v<T, augs::delta>) {
@@ -223,16 +224,21 @@ TEST_CASE("CosmicDelta2 PaddingTest") {
 			else if constexpr(augs::is_byte_readwrite_safe_v<augs::memory_stream, T> && !is_introspective_leaf_v<T>) {
 				padding_checker(m);
 			}
+			else if constexpr(is_container_v<T>){
+				auto t = typename T::value_type();
+				self(self, t, t);
+			}
 			else if constexpr(has_introspect_v<T>){
 				augs::introspect(augs::recursive(self), m);
 			}
 		}),
 		common
 	);
+#endif
 }
 
 #if !STATICALLY_ALLOCATE_ENTITIES_NUM
-/* Too much space would be wasted. */
+/* Too much space would be wasted and stack overflows would occur. */
 
 TEST_CASE("CosmicDelta3 GuidizeTests") {
 	cosmos c1(2);

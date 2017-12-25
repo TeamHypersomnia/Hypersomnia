@@ -12,10 +12,6 @@ struct friction_connection {
 	// END GEN INTROSPECTOR
 	friction_connection(entity_id t = entity_id()) : target(t) {}
 
-	bool operator==(const entity_id b) const {
-		return target == b;
-	}
-
 	operator entity_id() const {
 		return target;
 	}

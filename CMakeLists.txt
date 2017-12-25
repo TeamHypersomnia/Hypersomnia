@@ -76,15 +76,25 @@ set(HYPERSOMNIA_GENERATED_FILES_DIR "cache/gen/")
 
 set(HYPERSOMNIA_LOCAL_FILES_DIR "cache/usr/")
 
-# If this variable is positive, the cosmos class will use a statically allocated number
-# of entities, possibly improving performance. Might be very useful for a sever application.
+# If this variable is positive, the cosmos will use a statically allocated number
+# of entities, drastically improving access performance. Might be very useful for a sever application.
 # Pros: 
 # 	+ Dereferencing entities with speed of light
 # Cons:
 #	- Compilation might be longer due to component includes needed everywhere
 #	- Can't tweak maximum number of entities at runtime
-#	- For every game world, there's always maximum of possible memory allocated 
-set(STATICALLY_ALLOCATE_ENTITIES_NUM "5000" CACHE STRING "Statically allocate entities in cosmos class")
+#	- Even empty game worlds occupy as much space as those filled to the maximum
+set(STATICALLY_ALLOCATE_ENTITIES_NUM "5000" CACHE STRING "Statically allocate entities in the cosmos")
+
+# If this variable is positive, the cosmos common will use a statically allocated number
+# of entity types, drastically improving access performance. Might be very useful for a sever application.
+# Pros: 
+# 	+ Operating on entities with speed of light
+# Cons:
+#	- Compilation might be longer due to component includes needed everywhere
+#	- Can't tweak maximum number of entity types at runtime
+#	- Even empty game worlds occupy as much space as those filled to the maximum
+set(STATICALLY_ALLOCATE_ENTITY_TYPES_NUM "500" CACHE STRING "Statically allocate entity types in the cosmos common")
 
 set(STATICALLY_ALLOCATE_ASSETS "1" CACHE STRING "Statically allocate assets using container_sizes.h")
 set(STATICALLY_ALLOCATE_BAKED_FONTS "1" CACHE STRING "Statically allocate fonts for faster rendering. One font weights 3 MB.")
@@ -975,6 +985,10 @@ endif()
 
 if(STATICALLY_ALLOCATE_ENTITIES_NUM)
 	add_definitions(-DSTATICALLY_ALLOCATE_ENTITIES_NUM=${STATICALLY_ALLOCATE_ENTITIES_NUM})
+endif()
+
+if(STATICALLY_ALLOCATE_ENTITY_TYPES_NUM)
+	add_definitions(-DSTATICALLY_ALLOCATE_ENTITY_TYPES_NUM=${STATICALLY_ALLOCATE_ENTITY_TYPES_NUM})
 endif()
 
 if(STATICALLY_ALLOCATE_ASSETS)

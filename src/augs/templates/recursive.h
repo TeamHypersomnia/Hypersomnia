@@ -3,10 +3,10 @@
 
 namespace augs {
 	template <class F>
-	auto recursive(F&& callback) {
-		return [&](auto&&... args) { 
+	auto recursive(F callback) {
+		return [callback](auto&&... args) { 
 			callback(
-				std::forward<F>(callback), 
+				callback, 
 				std::forward<decltype(args)>(args)...
 			);
 		};

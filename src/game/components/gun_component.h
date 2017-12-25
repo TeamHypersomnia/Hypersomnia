@@ -24,9 +24,11 @@ namespace augs {
 
 namespace definitions {
 	struct gun {
+		// GEN INTROSPECTOR struct definitions::gun
 		augs::stepped_cooldown shot_cooldown = augs::stepped_cooldown(100);
 		unsigned short num_last_bullets_to_trigger_low_ammo_cue = 0;
 		gun_action_type action_mode = gun_action_type::INVALID;
+		// END GEN INTROSPECTOR
 	};
 }
 

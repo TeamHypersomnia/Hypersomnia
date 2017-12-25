@@ -6,6 +6,8 @@
 #include "augs/math/vec2.h"
 #include "augs/math/rects.h"
 
+#include "augs/templates/introspect_declaration.h"
+
 #include "augs/graphics/vertex.h"
 
 #include "augs/drawing/drawing_input_base.h"
@@ -98,6 +100,10 @@ namespace augs {
 		special_effect effect = special_effect::NONE;
 		pad_bytes<1> pad;
 		// END GEN INTROSPECTOR
+
+		bool operator==(const sprite& b) const {
+			return equal_by_introspection(*this, b);
+		}
 
 		vec2 get_size() const {
 			return size;

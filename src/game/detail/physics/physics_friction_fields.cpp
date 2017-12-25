@@ -41,7 +41,7 @@ void physics_world_cache::rechoose_owner_friction_body(const entity_handle entit
 		// make the new owner first in order in case it is later compared to the same ancestor-level parents
 
 		for (auto& it : special_physics.owner_friction_grounds) {
-			if (it == special_physics.owner_friction_ground) {
+			if (it.target == special_physics.owner_friction_ground) {
 				std::swap(special_physics.owner_friction_grounds[0], it);
 			}
 		}

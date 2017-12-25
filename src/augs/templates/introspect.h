@@ -72,7 +72,7 @@ namespace augs {
 
 		introspect(
 			recursive([&are_equal](
-				auto&& self,
+				auto self,
 				const auto label,
 				const auto& aa, 
 				const auto& bb
@@ -83,14 +83,11 @@ namespace augs {
 				if constexpr(is_optional_v<AA>) {
 					static_assert(is_optional_v<BB>);
 
-					if (!aa && !bb) {
-						are_equal = are_equal && true;
+					if (aa.has_value() != bb.has_value()) {
+						are_equal = false;
 					}
 					else if (aa && bb) {
-						self(self, "", *aa, *bb);
-					}
-					else {
-						are_equal = are_equal && false;
+						recursive(self)("", *aa, *bb);
 					}
 				}
 				else if constexpr(is_tuple_v<AA>) {
@@ -115,7 +112,7 @@ namespace augs {
 
 	template <class T>
 	void recursive_clear(T& object) {
-		introspect(recursive([](auto&& self, auto, auto& field) {
+		introspect(recursive([](auto self, auto, auto& field) {
 			using Field = std::decay_t<decltype(field)>;
 
 			if constexpr(can_clear_v<Field>) {

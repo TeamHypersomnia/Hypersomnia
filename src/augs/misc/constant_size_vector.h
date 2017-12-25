@@ -5,6 +5,8 @@
 
 #include "augs/misc/simple_pair.h"
 #include "augs/templates/type_matching_and_indexing.h"
+#include "augs/templates/algorithm_templates.h"
+#include "augs/templates/is_comparable.h"
 
 #include "augs/misc/declare_containers.h"
 
@@ -49,7 +51,7 @@ namespace augs {
 
 		// GEN INTROSPECTOR class augs::constant_size_vector_base class T unsigned const_count
 		size_type count = 0;
-		storage_type raw;
+		storage_type raw = storage_type();
 		// END GEN INTROSPECTOR
 
 		friend augs::introspection_access;
@@ -372,6 +374,14 @@ namespace augs {
 
 	template <unsigned const_count>
 	using constant_size_wstring = constant_size_vector<zeroed_pod<wchar_t>, const_count>;
+
+	template <class T, unsigned C, class = std::enable_if_t<is_comparable_v<T, T>>>
+	bool operator==(
+		const constant_size_vector<T, C>& a,
+		const constant_size_vector<T, C>& b
+	) {
+		return a.size() == b.size() && ranges_equal(a, b, a.size());
+	}
 }
 
 template <unsigned I>

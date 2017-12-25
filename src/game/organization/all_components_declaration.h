@@ -6,6 +6,10 @@
 #include "game/components/sprite_component_declaration.h"
 #include "game/components/polygon_component_declaration.h"
 
+namespace definitions {
+	struct gun;
+}
+
 namespace components {
 	struct tree_of_npo_node;
 	struct special_physics;
@@ -52,8 +56,8 @@ namespace components {
 	struct all_inferred_state;
 }
 
-template <template <class...> class List, class... prepend>
-using component_list_t = List<prepend...,
+template <template <class...> class List>
+using component_list_t = List<
 	components::tree_of_npo_node,
 	components::special_physics,
 	components::animation,
@@ -102,6 +106,11 @@ using component_list_t = List<prepend...,
 	components::all_inferred_state
 >;
 
+template <template <class...> class List>
+using definition_list_t = List<
+	definitions::gun
+>;
+
 template <class... Types>
 struct type_count {
 	static const unsigned value = sizeof...(Types);
@@ -110,3 +119,4 @@ struct type_count {
 class cosmos;
 
 constexpr unsigned COMPONENTS_COUNT = component_list_t<type_count>::value;
+constexpr unsigned DEFINITIONS_COUNT = definition_list_t<type_count>::value;

@@ -131,7 +131,12 @@ void contact_listener::BeginContact(b2Contact* contact) {
 					friction_connection connection(new_owner);
 					connection.fixtures_connected = 1;
 
-					if (const auto found = find_in(grounds, new_owner);
+					if (const auto found = find_in_if(
+							grounds, 
+							[new_owner](const entity_id candidate) { 
+								return new_owner == candidate; 
+							}
+						);
 						found != grounds.end()
 					) {
 						LOG("Incr: %x", new_owner);
