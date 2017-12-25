@@ -7,8 +7,6 @@
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
 
-#include "game/components/processing_component.h"
-
 class processing_lists_cache {
 	struct cache {
 		bool is_constructed = false;

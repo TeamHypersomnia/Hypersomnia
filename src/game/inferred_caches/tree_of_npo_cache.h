@@ -4,14 +4,16 @@
 
 #include "augs/misc/enum/enum_array.h"
 
+#include "game/enums/tree_of_npo_type.h"
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
-#include "game/components/tree_of_npo_node_component.h"
+
 #include "augs/math/camera_cone.h"
-
-class physics_world_cache;
-
 /* NPO stands for "non-physical objects" */
+
+namespace components {
+	struct tree_of_npo_node;
+};
 
 union tree_of_npo_node {
 	using payload_type = unversioned_entity_id;

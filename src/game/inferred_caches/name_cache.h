@@ -7,15 +7,6 @@
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/components/type_component_declaration.h"
 
-namespace components {
-	struct type;
-}
-
-class entity_types;
-
-template <bool, class>
-class component_synchronizer;
-
 class name_cache {
 	std::unordered_map<
 		entity_type_id,

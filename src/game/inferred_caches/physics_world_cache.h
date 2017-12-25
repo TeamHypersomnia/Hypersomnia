@@ -14,10 +14,6 @@
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/transcendental/step_declaration.h"
 
-#include "game/components/rigid_body_component.h"
-#include "game/components/transform_component.h"
-#include "game/components/motor_joint_component.h"
-
 #include "game/messages/collision_message.h"
 #include "game/detail/physics/physics_queries_declaration.h"
 

@@ -9,6 +9,10 @@
 #include "game/components/shape_circle_component.h"
 #include "game/components/all_inferred_state_component.h"
 
+#include "game/components/rigid_body_component.h"
+#include "game/components/transform_component.h"
+#include "game/components/motor_joint_component.h"
+
 #include "game/messages/collision_message.h"
 #include "game/messages/queue_destruction.h"
 #include "game/messages/will_soon_be_deleted.h"
