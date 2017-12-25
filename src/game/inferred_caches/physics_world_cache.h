@@ -6,6 +6,7 @@
 #include "3rdparty/Box2D/Box2D.h"
 
 #include "augs/misc/convex_partitioned_shape.h"
+#include "augs/templates/propagate_const.h"
 
 #include "game/assets/all_logical_assets_declarations.h"
 
@@ -23,18 +24,18 @@
 class cosmos;
 
 struct rigid_body_cache {
-	std::experimental::propagate_const<b2Body*> body = nullptr;
+	augs::propagate_const<b2Body*> body = nullptr;
 };
 
 struct colliders_cache {
 	augs::constant_size_vector<
-		std::experimental::propagate_const<b2Fixture*>, 
+		augs::propagate_const<b2Fixture*>, 
 		CONVEX_POLYS_COUNT
 	> all_fixtures_in_component;
 };
 
 struct joint_cache {
-	std::experimental::propagate_const<b2Joint*> joint = nullptr;
+	augs::propagate_const<b2Joint*> joint = nullptr;
 };
 
 struct physics_raycast_output {
