@@ -7,7 +7,7 @@
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/components/type_component_declaration.h"
 
-class name_cache {
+class type_id_cache {
 	std::unordered_map<
 		entity_type_id,
 		std::unordered_set<entity_id>

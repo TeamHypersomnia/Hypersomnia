@@ -12,7 +12,7 @@ namespace augs {
 class entity_type {
 	// GEN INTROSPECTOR class entity_type
 	friend augs::introspection_access;
-	friend class name_cache;
+	friend class type_id_cache;
 	
 	entity_name_type name;
 public:
@@ -35,7 +35,7 @@ public:
 
 class entity_types {
 	friend augs::introspection_access;
-	friend class name_cache;
+	friend class type_id_cache;
 
 	// GEN INTROSPECTOR class entity_types
 	entity_type_id next_type_id = 1;

@@ -26,7 +26,7 @@ namespace components {
 
 template <bool is_const>
 class basic_type_synchronizer : public component_synchronizer_base<is_const, components::type> {
-	friend class name_cache;
+	friend class type_id_cache;
 protected:
 	using base = component_synchronizer_base<is_const, components::type>;
 	using base::handle;
@@ -41,7 +41,7 @@ public:
 
 template<>
 class component_synchronizer<false, components::type> : public basic_type_synchronizer<false> {
-	friend class name_cache;
+	friend class type_id_cache;
 
 public:
 	using basic_type_synchronizer<false>::basic_type_synchronizer;

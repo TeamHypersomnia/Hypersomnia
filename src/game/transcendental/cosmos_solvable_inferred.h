@@ -5,11 +5,11 @@
 #include "game/inferred_caches/physics_world_cache.h"
 #include "game/inferred_caches/processing_lists_cache.h"
 #include "game/inferred_caches/relational_cache.h"
-#include "game/inferred_caches/name_cache.h"
+#include "game/inferred_caches/type_id_cache.h"
 
 struct cosmos_solvable_inferred {
 	relational_cache relational;
-	name_cache name;
+	type_id_cache name;
 	physics_world_cache physics;
 	tree_of_npo_cache tree_of_npo;
 	processing_lists_cache processing_lists;
