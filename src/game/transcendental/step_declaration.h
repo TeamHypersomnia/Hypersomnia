@@ -1,7 +1,7 @@
 #pragma once
 
 template <bool is_const>
-class basic_logic_step_input;
+struct basic_logic_step_input;
 
 template <bool is_const>
 class basic_logic_step;
