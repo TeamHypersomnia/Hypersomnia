@@ -167,8 +167,7 @@ void component_synchronizer<false, F>::set_owner_body(const entity_id owner_id) 
 	const auto former_owner = cosmos[get_raw_component().owner_body];
 	get_raw_component().owner_body = new_owner;
 
-	auto& relational = cosmos.get_solvable_inferred({}).relational.fixtures_of_bodies;
-	relational.set_parent(self, new_owner);
+	cosmos.get_solvable_inferred({}).relational.set_fixtures_parent(self, new_owner);
 
 	if (former_owner.alive()) {
 		cosmos.reinfer_cache<physics_world_cache>(former_owner);

@@ -41,22 +41,8 @@ void component_synchronizer<false, D>::reinfer_caches() const {
 }
 
 void component_synchronizer<false, D>::update_proxy(const logic_step step) const {
-	const auto new_aabb = components::tree_of_npo_node::create_default_for(handle).aabb;
-	auto& data = get_raw_component();
-
-	const vec2 displacement = new_aabb.get_center() - data.aabb.get_center();
-	data.aabb = new_aabb;
-
 	auto& sys = handle.get_cosmos().get_solvable_inferred({}).tree_of_npo;
-	const auto& cache = sys.get_cache(handle.get_id());
-	
-	if (cache.is_constructed()) {
-		b2AABB aabb;
-		aabb.lowerBound = b2Vec2(data.aabb.left_top());
-		aabb.upperBound = b2Vec2(data.aabb.right_bottom());
-
-		sys.get_tree(cache).nodes.MoveProxy(cache.tree_proxy_id, aabb, b2Vec2(displacement));
-	}
+	sys.update_proxy(handle, get_raw_component());
 }
 
 void component_synchronizer<false, D>::set_activated(const bool flag) const {

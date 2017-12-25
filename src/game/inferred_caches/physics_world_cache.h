@@ -50,16 +50,8 @@ class physics_world_cache {
 	std::vector<colliders_cache> colliders_caches;
 	std::vector<joint_cache> joint_caches;
 
-	void reserve_caches_for_entities(const size_t n);
-
-	void infer_cache_for(const const_entity_handle);
 	void infer_cache_for_fixtures(const const_entity_handle);
 	void infer_cache_for_joint(const const_entity_handle);
-
-	void destroy_cache_of(const const_entity_handle);
-
-	friend class cosmos;
-	friend class cosmos_solvable;
 
 public:
 	// b2World on stack causes a stack overflow due to a large stack allocator, therefore it must be dynamically allocated
@@ -179,4 +171,9 @@ public:
 
 	void rechoose_owner_friction_body(entity_handle);
 	void recurential_friction_handler(const logic_step, b2Body* const entity, b2Body* const friction_owner);
+
+	void reserve_caches_for_entities(const size_t n);
+
+	void infer_cache_for(const const_entity_handle);
+	void destroy_cache_of(const const_entity_handle);
 };

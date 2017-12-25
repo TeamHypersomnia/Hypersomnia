@@ -26,11 +26,6 @@ union tree_of_npo_node {
 };
 
 class tree_of_npo_cache {
-	friend class cosmos;
-	friend class cosmos_solvable;
-	
-	friend class component_synchronizer<false, components::tree_of_npo_node>;
-
 	struct tree {
 		b2DynamicTree nodes;
 	};
@@ -46,10 +41,6 @@ class tree_of_npo_cache {
 	};
 
 	std::vector<cache> per_entity_cache;
-
-	void reserve_caches_for_entities(const size_t n);
-	void infer_cache_for(const const_entity_handle);
-	void destroy_cache_of(const const_entity_handle);
 
 	tree& get_tree(const cache&);
 	cache& get_cache(const unversioned_entity_id);
@@ -86,4 +77,11 @@ public:
 
 		tree.nodes.Query(&aabb_listener, input);
 	}
+
+	void update_proxy(const_entity_handle, components::tree_of_npo_node&);
+
+	void reserve_caches_for_entities(const size_t n);
+
+	void infer_cache_for(const const_entity_handle);
+	void destroy_cache_of(const const_entity_handle);
 };
