@@ -125,7 +125,7 @@ If you are not a programmer and only intend to use the editor to author actual c
 There are several classes defined for commands that change a value.
 Generally, they should follow this format:
 
-- The kind of object that has changed (the [cosmos common state](cosmos_common_state) or the [component](component) type).
+- The kind of object that has changed (the [cosmos common significant](cosmos_common_significant) or the [component](component) type).
 - Given the type, an introspective index of the changed field.
 - A vector of bytes representing the new value (for execution).
 - A vector of bytes representing the old value (for undoing).

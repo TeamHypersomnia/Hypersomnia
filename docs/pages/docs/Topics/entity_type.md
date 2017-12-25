@@ -11,7 +11,6 @@ summary: |
 
 ## Overview
 
-
 So that working with content is easier, and so that less memory is wasted, each entity is divided into two kinds of data:
 1. state that should never change and is supposed to be shared between entities,
 	- ``gun::muzzle_velocity``
@@ -22,7 +21,7 @@ So that working with content is easier, and so that less memory is wasted, each 
 The first is more like "input" to the processing, in which [authors](author) in particular are interested.  
 Most of the time, only the programmers are concerned with the second type of data.
 
-- An *entity type* contains a tuple of [definitions](definition), along with a flag for each definition to signify whether it is *enabled*.
+- An *entity type* contains a tuple of [definitions](definition), a tuple of initial [component](component) values, and an array of flags for each definition to signify whether it is *enabled*.
 	- An author may specify which definitions to enable.
 	- The flags will be held separate:``std::array<bool, DEFINITION_COUNT_V> enabled_definitions;``
 		- A lot better cache coherency than the more idiomatic ``std::optional``.
@@ -33,13 +32,16 @@ Most of the time, only the programmers are concerned with the second type of dat
 		- In fact, the [logic step](logic_step) simply provides only const getters for the type information.
 	- Should only be done by [authors](author).
 	- In particular, the **enabled** flags for definitions may change even though some entities of this type already exist.
+		- We warn the author and ask if the existent entities should be recreated with new components with new initial values (preserving what was already set).
+			- The warning can be ticked to never pop up again.
 	- In particular, the **initial value** for a component may change even though some entities of this type already exist.
 		- This is not important. The field, in practice, serves two purposes:
 			- Used by the logic when it gets a type identifier to spawn (e.g. ``gun::magic_missile_definition``), so that it can set reasonable initial values. Thus, a change to initial value needs not updating here as the logic will naturally catch up, storing only the type identifier.
 	- Whatever changes in the type (during content creation), reinfer all objects of this type with help of the ame cache; currently we'll just reinfer the whole cosmos.
 			- Optionally as a helper for the author when they want to spawn some very specific entities. The author shouldn't worry that the initial value changes something for the existent entities.
-- Entity should be reinferred if it changes a type (during content creation).
-	- It should only be implemented as an editor feature. Let us not make this an actual feature in the game code and let us always assume that an entity's type stays constant throughout its lifetime.
+- ~~Entity should be reinferred if it changes a type (during content creation).~~ Type id for an entity should stay constant until its death.
+	- If at all, changing the type should be implemented as an editor feature. Let us not make this an actual feature in the game code and let us always assume that an entity's type stays constant throughout its lifetime.
+	- It will be easier in the beginning if we disallow this and require the author to just create a new entity.
 - There won't be many types, but access is **frequent** during [solve](solver#the-solve). 
 	- We allocate all definitions **statically**, as memory won't suffer relatively to the speed gain.
 - On creating an entity, the chosen type's id is passed.  
@@ -110,6 +112,10 @@ That state should most likely be held separate from the cosmos, because it will 
 It will most likely only ever change during the stage of content creation.
 Thus, in ordinary multiplayer gameplays, it should be inferred exactly once.
 
+#### Editor-specific inferred state
+
+See [main article](editor_setup#inferred-state).
+
 <!--
 ### Frequent new types
 
@@ -172,7 +178,7 @@ However, the type information:
 -->
 ## Storage
 
-Inside the [cosmos common state](cosmos_common_state), there is an object named ``types``.  
+Inside the [cosmos common significant](cosmos_common_significant), there is an object named ``types``.  
 It maps type identifiers found in the [type component](type_component) to the respective **entity type**.  
 Preferably, the container should be a constant size vector as the type ids will just be consecutive integers.  
 We will treat a type with blank name as not set.  

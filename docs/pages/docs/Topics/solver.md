@@ -22,7 +22,7 @@ It makes much more sense to just design the solver so that all posted messages a
 
 ## The solve
 
-It calls all [stateless systems](stateless_system) to effectively move the game forward in time by a specified [delta time](cosmos_meta#fixed-delta).
+It calls all [stateless systems](stateless_system) to effectively move the game forward in time by a specified [delta time](cosmos_clock#fixed-delta).
 <!--The *advance* function accepts [entropy](cosmic_entropy) along with a reference to all [logical assets](logical_asset) referenced via ids from inside [significant](#significant), in order to perform a single simulation step.  -->
 
 ## Post solve

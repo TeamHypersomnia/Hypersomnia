@@ -462,7 +462,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/augs/misc/enum/enum_boolset.cpp"
 	"src/augs/templates/string_templates.cpp"
 	"src/game/components/sender_component.cpp"
-	"src/game/inferred_caches/name_cache.cpp"
+	"src/game/inferred_caches/type_id_cache.cpp"
 	"src/game/detail/spells/electric_shield.cpp"
 	"src/game/detail/spells/electric_triad.cpp"
 	"src/game/detail/spells/fury_of_the_aeons.cpp"

@@ -4,7 +4,7 @@ tags: [topics, ECS]
 hide_sidebar: true
 permalink: cosmos
 summary: |
-    The **cosmos** stores [entities](entities), [components](components), the [cosmos meta](cosmos_meta) and all [caches inferred](inferred_state) from the three.  
+    The **cosmos** stores [entities](entities), [components](components), the [cosmos clock](cosmos_clock) and all [caches inferred](inferred_state) from the three.  
     It represents the part of the application model that continuously changes as the [time flows forward](solver).  
     It could be thought of as the "game world".  
 ---
@@ -23,7 +23,7 @@ There are, however, exactly these *member fields* in the class:
     
     - All [entities](entity).
     - All [components](component).
-    - [cosmos meta](cosmos_meta).
+    - [cosmos clock](cosmos_clock).
     
 
 - 

@@ -1,7 +1,6 @@
 #pragma once
 #include <set>
 #include <unordered_set>
-#include <experimental/propagate_const>
 
 #include "3rdparty/Box2D/Box2D.h"
 
