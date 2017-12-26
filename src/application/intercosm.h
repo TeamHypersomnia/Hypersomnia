@@ -38,8 +38,6 @@ struct intercosm {
 	void make_test_scene(sol::state&, const bool minimal);
 #endif
 
-	void make_blank();
-
 	void open(const intercosm_path_op);
 	void save(const intercosm_path_op) const;
 

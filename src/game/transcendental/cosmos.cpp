@@ -88,12 +88,10 @@ rng_seed_type cosmos::get_rng_seed_for(const entity_id id) const {
 	return operator[](id).get_guid() + transform_hash;
 }
 
-entity_handle cosmos::create_entity(const std::string& name) {
-	return create_entity(to_wstring(name));
-}
-
-entity_handle cosmos::create_entity(const std::wstring& name_str) {
-	return { *this, solvable.allocate_next_entity() };
+entity_handle cosmos::create_entity(const entity_type_id type_id) {
+	const auto new_handle = entity_handle { *this, solvable.allocate_next_entity() };
+	new_handle.get<components::type>().change_type_to(type_id);
+	return new_handle; 
 }
 
 entity_handle cosmos::create_entity_with_specific_guid(const entity_guid specific_guid) {
@@ -112,7 +110,7 @@ entity_handle cosmos::clone_entity(const entity_id source_entity_id) {
 		&& "Cloning of entities that are children is not yet supported"
 	);
 
-	const auto new_entity = create_entity(L"");
+	const auto new_entity = create_entity(source_entity.get_type_id());
 	
 	solvable.get_aggregate(new_entity).clone_components_except<
 		/*
@@ -314,6 +312,7 @@ namespace augs {
 		ensure(false);
 #if TODO
 		/* TODO: Fix it to use tuples of initial values when creating entities */
+		/* TODO: Fix it to read guids properly instead of entity ids */
 		auto refresh_when_done = augs::make_scope_guard([&cosm]() {
 			cosm.reinfer_solvable();
 		});
@@ -336,7 +335,7 @@ namespace augs {
 			sol::table maybe_next_entity = entities_table[entity_table_counter];
 
 			if (maybe_next_entity.valid()) {
-				const auto new_entity = cosm.create_entity("");
+				const auto new_entity = cosm.create_entity();
 
 				for (auto key_value_pair : maybe_next_entity) {
 					const auto component_name = key_value_pair.first.as<std::string>();

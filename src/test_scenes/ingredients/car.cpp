@@ -31,9 +31,9 @@ namespace prefabs {
 		auto& world = step.get_cosmos();
 		const auto& metas = step.get_logical_assets();
 
-		auto front = world.create_entity("front");
-		auto interior = world.create_entity("interior");
-		auto left_wheel = world.create_entity("left_wheel");
+		auto front = create_test_scene_entity(world, test_scene_type::TRUCK_FRONT);
+		auto interior = create_test_scene_entity(world, test_scene_type::TRUCK_INTERIOR);
+		auto left_wheel = create_test_scene_entity(world, test_scene_type::TRUCK_LEFT_WHEEL);
 		left_wheel.make_as_child_of(front);
 
 		const auto si = world.get_si();
@@ -145,7 +145,7 @@ namespace prefabs {
 		{
 			for (int i = 0; i < 4; ++i) {
 				components::transform this_engine_transform;
-				const auto engine_physical = world.create_entity("engine_body");
+				const auto engine_physical = create_test_scene_entity(world, test_scene_type::TRUCK_ENGINE_BODY);
 				engine_physical.make_as_child_of(front);
 
 				{

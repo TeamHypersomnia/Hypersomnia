@@ -325,6 +325,7 @@ namespace augs {
 		using base = constant_size_vector_base<T, N>;
 		using base::constant_size_vector_base;
 		using base::insert;
+		using base::assign;
 		using base::clear;
 		using base::begin;
 		using base::end;
@@ -336,8 +337,7 @@ namespace augs {
 		}
 
 		constant_size_vector& operator=(const constant_size_vector& b) {
-			clear();
-			insert(begin(), b.begin(), b.end());
+			assign(b.begin(), b.end());
 
 			return *this;
 		}

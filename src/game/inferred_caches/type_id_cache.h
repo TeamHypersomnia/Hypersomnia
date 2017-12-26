@@ -5,7 +5,12 @@
 #include "augs/misc/children_vector_tracker.h"
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
-#include "game/components/type_component_declaration.h"
+
+#include "game/transcendental/entity_type_declaration.h"
+
+namespace components {
+	struct type;
+}
 
 class type_id_cache {
 	std::unordered_map<

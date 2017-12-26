@@ -3,6 +3,8 @@
 #include "augs/misc/minmax.h"
 #include "augs/pad_bytes.h"
 
+#include "game/transcendental/entity_type_declaration.h"
+
 struct randomization;
 
 namespace components {
@@ -22,6 +24,8 @@ namespace components {
 
 		bool is_it_a_finishing_trace = false;
 		pad_bytes<3> pad;
+
+		entity_type_id finishing_trace_type = 0;
 		// END GEN INTROSPECTOR
 
 		void reset(randomization& p);

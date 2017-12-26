@@ -3,21 +3,18 @@
 
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
-
-#include "game/components/type_component_declaration.h"
+#include "game/transcendental/entity_type_declaration.h"
 
 namespace augs {
 	struct introspection_access;
 }
 
-class entity_type;
 
 namespace components {
 	struct type {
 		static constexpr bool is_fundamental = true;
 		static constexpr bool is_synchronized = true;
 
-		friend augs::introspection_access;
 		// GEN INTROSPECTOR struct components::type
 		entity_type_id type_id = 0u;
 		// END GEN INTROSPECTOR
@@ -45,6 +42,25 @@ class component_synchronizer<false, components::type> : public basic_type_synchr
 
 public:
 	using basic_type_synchronizer<false>::basic_type_synchronizer;
+
+	void change_type_to(const entity_type_id id) const; 
+
+	template <class F>
+	void change_type_to(
+		const entity_type_id id,
+		F before_inference
+	) const {
+		auto& cosm = handle.get_cosmos();
+
+		cosm.destroy_caches_of(handle);
+		get_raw_component().type_id = id;
+
+		/* TODO: Add initial components */
+
+		before_inference();
+		cosm.infer_caches_for(handle);
+	}
+
 };
 
 template<>

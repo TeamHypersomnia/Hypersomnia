@@ -8,7 +8,7 @@
 #include "game/enums/slot_function.h"
 #include "game/enums/item_category.h"
 
-#include "game/components/type_component_declaration.h"
+#include "game/transcendental/entity_type_declaration.h"
 #include "game/common_state/entity_types.h"
 
 /*
@@ -28,11 +28,6 @@
 */
 
 entity_name_type get_bbcoded_entity_name(const const_entity_handle maybe_overridden_by_nickname);
-
-void set_bbcoded_entity_description(
-	const entity_handle, 
-	const entity_description_type&
-);
 
 const entity_description_type& get_bbcoded_entity_description(const const_entity_handle);
 

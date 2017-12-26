@@ -21,7 +21,6 @@
 
 #include "game/enums/entity_flag.h"
 #include "game/transcendental/step_declaration.h"
-#include "game/components/type_component_declaration.h"
 #include "game/components/flags_component.h"
 
 class cosmos;

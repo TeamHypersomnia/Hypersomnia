@@ -112,7 +112,7 @@ namespace prefabs {
 
 		const auto& metas = step.get_logical_assets();
 
-		auto sample_magazine = cosmos.create_entity("sample_magazine");
+		auto sample_magazine = create_test_scene_entity(cosmos, test_scene_type::SAMPLE_MAGAZINE);
 		
 
 		{
@@ -144,7 +144,7 @@ namespace prefabs {
 
 	entity_handle create_sample_suppressor(const logic_step step, vec2 pos) {
 		auto& cosmos = step.get_cosmos();
-		auto sample_suppressor = cosmos.create_entity("sample_suppressor");
+		auto sample_suppressor = create_test_scene_entity(cosmos, test_scene_type::SAMPLE_SUPPRESSOR);
 		
 		const auto& metas = step.get_logical_assets();
 
@@ -163,9 +163,9 @@ namespace prefabs {
 
 	entity_handle create_damped_cyan_charge(const logic_step step, vec2 pos, int charges) {
 		auto& cosmos = step.get_cosmos();
-		const auto cyan_charge = cosmos.create_entity("Cyan charge");
-		const auto round_definition = cosmos.create_entity("round_definition");
-		const auto shell_definition = cosmos.create_entity("shell_definition");
+		const auto cyan_charge = create_test_scene_entity(cosmos, test_scene_type::DAMPED_CYAN_CHARGE);
+		const auto round_definition = create_test_scene_entity(cosmos, test_scene_type::DAMPED_CYAN_ROUND_DEFINITION);
+		const auto shell_definition = create_test_scene_entity(cosmos, test_scene_type::DAMPED_CYAN_SHELL_DEFINITION);
 
 		const auto& metas = step.get_logical_assets();
 
@@ -241,9 +241,9 @@ namespace prefabs {
 
 	entity_handle create_cyan_charge(const logic_step step, vec2 pos, int charges) {
 		auto& cosmos = step.get_cosmos();
-		const auto cyan_charge = cosmos.create_entity("Cyan charge");
-		const auto round_definition = cosmos.create_entity("round_definition");
-		const auto shell_definition = cosmos.create_entity("shell_definition");
+		const auto cyan_charge = create_test_scene_entity(cosmos, test_scene_type::CYAN_CHARGE);
+		const auto round_definition = create_test_scene_entity(cosmos, test_scene_type::CYAN_ROUND_DEFINITION);
+		const auto shell_definition = create_test_scene_entity(cosmos, test_scene_type::CYAN_SHELL_DEFINITION);
 		
 		const auto& metas = step.get_logical_assets();
 
@@ -316,7 +316,7 @@ namespace prefabs {
 		auto& cosmos = step.get_cosmos();
 		auto load_mag = cosmos[load_mag_id];
 
-		auto weapon = cosmos.create_entity("Sample rifle");
+		auto weapon = create_test_scene_entity(cosmos, test_scene_type::SAMPLE_RIFLE);
 
 		auto& sprite = ingredients::add_sprite(metas, weapon, assets::game_image_id::ASSAULT_RIFLE, white, render_layer::SMALL_DYNAMIC_BODY);
 		ingredients::add_see_through_dynamic_body(step, weapon, pos);
@@ -378,7 +378,7 @@ namespace prefabs {
 		auto& cosmos = step.get_cosmos();
 		auto load_mag = cosmos[load_mag_id];
 
-		auto weapon = cosmos.create_entity("SN Six-Nine");
+		auto weapon = create_test_scene_entity(cosmos, test_scene_type::SN_SIX_NINE);
 
 		auto& sprite = ingredients::add_sprite(metas, weapon, assets::game_image_id::SN69, white, render_layer::SMALL_DYNAMIC_BODY);
 		ingredients::add_see_through_dynamic_body(step, weapon, pos);
@@ -437,7 +437,7 @@ namespace prefabs {
 		auto& cosmos = step.get_cosmos();
 		auto load_mag = cosmos[load_mag_id];
 
-		auto weapon = cosmos.create_entity("SN Six-Nine");
+		auto weapon = create_test_scene_entity(cosmos, test_scene_type::SN_SIX_NINE);
 
 		auto& sprite = ingredients::add_sprite(metas, weapon, assets::game_image_id::KEK9, white, render_layer::SMALL_DYNAMIC_BODY);
 		ingredients::add_see_through_dynamic_body(step, weapon, pos);
@@ -499,7 +499,7 @@ namespace prefabs {
 	) {
 		const auto& metas = step.get_logical_assets();
 		auto& cosmos = step.get_cosmos();
-		auto weapon = cosmos.create_entity("Amplifier arm");
+		auto weapon = create_test_scene_entity(cosmos, test_scene_type::AMPLIFIER_ARM);
 
 		auto& sprite = ingredients::add_sprite(metas, weapon, assets::game_image_id::AMPLIFIER_ARM, white, render_layer::SMALL_DYNAMIC_BODY);
 		ingredients::add_see_through_dynamic_body(step, weapon, pos);
@@ -525,7 +525,7 @@ namespace prefabs {
 		weapon.add_standard_components(step);
 
 		{
-			const auto round_definition = cosmos.create_entity("round_definition");
+			const auto round_definition = create_test_scene_entity(cosmos, test_scene_type::ROUND_DEFINITION);
 
 			auto& s = ingredients::add_sprite(metas, round_definition, assets::game_image_id::ENERGY_BALL, cyan, render_layer::FLYING_BULLETS);
 			ingredients::add_bullet_round_physics(step, round_definition, pos);
@@ -569,7 +569,7 @@ namespace prefabs {
 	}
 
 	entity_handle create_electric_missile_def(const logic_step step, const components::transform transform) {
-		const auto energy_ball = step.get_cosmos().create_entity("electric_missile");
+		const auto energy_ball = create_test_scene_entity(step.get_cosmos(), test_scene_type::ELECTRIC_MISSILE);
 		const auto& metas = step.get_logical_assets();
 
 		ingredients::add_sprite(metas, 

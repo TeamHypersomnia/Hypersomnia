@@ -26,8 +26,8 @@ namespace prefabs {
 		auto& world = step.get_cosmos();
 		const auto& metas = step.get_logical_assets();
 
-		auto front = world.create_entity("front");
-		auto left_wheel = world.create_entity("left_wheel");
+		auto front = create_test_scene_entity(world, test_scene_type::MOTORCYCLE_FRONT);
+		auto left_wheel = create_test_scene_entity(world, test_scene_type::MOTORCYCLE_LEFT_WHEEL);
 		left_wheel.make_as_child_of(front);
 
 		const auto si = world.get_si();

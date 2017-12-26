@@ -261,6 +261,9 @@ set(HYPERSOMNIA_TEST_SCENES_CPPS
 	"src/test_scenes/test_scene_sound_buffers.cpp"
 	"src/test_scenes/test_scene_recoil_players.cpp"
 
+	"src/test_scenes/test_scene_types.cpp"
+	"src/test_scenes/scenes/minimal_scene.cpp"
+
 	"src/test_scenes/scenes/minimal_scene.cpp"
 	"src/test_scenes/scenes/testbed.cpp"
 )
@@ -626,6 +629,7 @@ file(GLOB_RECURSE HYPERSOMNIA_HEADERS_WITH_INTROSPECTED_CLASSES
 	"src/application/*.h"
 	"src/3rdparty/Box2D/Common/*.h"
 	"src/3rdparty/Box2D/Dynamics/*.h"
+	"src/test_scenes/test_scene_types.h"
 )
 
 # The correct input configuration file shall contain paths to all headers for whom the generator should create introspectors,

@@ -6,7 +6,7 @@
 
 namespace prefabs {
 	entity_handle create_crate(const logic_step step, const components::transform pos, vec2i size) {
-		const auto crate = step.get_cosmos().create_entity("crate");
+		const auto crate = create_test_scene_entity(step.get_cosmos(), test_scene_type::CRATE);
 		
 		if (size.is_zero()) {
 			size = step.get_logical_assets().at(assets::game_image_id::CRATE).get_size();
@@ -24,7 +24,7 @@ namespace prefabs {
 	}
 
 	entity_handle create_brick_wall(const logic_step step, const components::transform pos, vec2i size) {
-		const auto crate = step.get_cosmos().create_entity("brick_wall");
+		const auto crate = create_test_scene_entity(step.get_cosmos(), test_scene_type::BRICK_WALL);
 		
 		if (size.is_zero()) {
 			size = step.get_logical_assets().at(assets::game_image_id::CRATE).get_size();

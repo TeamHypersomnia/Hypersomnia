@@ -41,16 +41,6 @@ void intercosm::make_test_scene(sol::state& lua, const bool minimal) {
 }
 #endif
 
-void intercosm::make_blank() {
-	world.clear();
-	world.reserve_storage_for_entities(100);
-
-	auto origin = world.create_entity("origin_entity");
-	origin += components::transform();
-
-	locally_viewed = origin;
-}
-
 void intercosm::save(const intercosm_path_op op) const {
 	auto target_extension = op.path.extension();
 

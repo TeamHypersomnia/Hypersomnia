@@ -13,7 +13,7 @@
 
 namespace prefabs {
 	entity_handle create_cyan_urban_machete(const logic_step step, vec2 pos) {
-		const auto machete = step.get_cosmos().create_entity("urban_cyan_machete");
+		const auto machete = create_test_scene_entity(step.get_cosmos(), test_scene_type::URBAN_CYAN_MACHETE);
 
 		const auto& metas = step.get_logical_assets();
 		auto& sprite = ingredients::add_sprite(metas, machete, assets::game_image_id::URBAN_CYAN_MACHETE, white, render_layer::SMALL_DYNAMIC_BODY);

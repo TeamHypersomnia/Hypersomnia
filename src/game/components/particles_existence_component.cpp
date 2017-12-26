@@ -15,7 +15,7 @@ entity_handle particles_existence_input::create_particle_effect_entity(
 		return step.get_cosmos()[entity_id()];
 	}
 
-	const entity_handle new_stream_entity = step.get_cosmos().create_entity("particle_stream");
+	const entity_handle new_stream_entity = step.get_cosmos().create_entity(/*test_scene_type::PARTICLE_STREAM*/);
 
 	create_particle_effect_components(
 		new_stream_entity += components::transform(),

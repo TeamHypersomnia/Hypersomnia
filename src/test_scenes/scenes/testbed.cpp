@@ -6,6 +6,7 @@
 #include "game/assets/ids/game_image_id.h"
 #include "game/assets/all_logical_assets.h"
 
+#include "test_scenes/test_scene_types.h"
 #include "test_scenes/scenes/testbed.h"
 #include "test_scenes/ingredients/ingredients.h"
 #include "test_scenes/test_scenes_content.h"
@@ -30,6 +31,8 @@
 
 namespace test_scenes {
 	void testbed::populate(cosmos_common_significant& common) const {
+		populate_test_scene_types(common.all_entity_types);
+
 		auto& common_assets = common.assets;
 		common_assets.cast_unsuccessful_sound.id = assets::sound_buffer_id::CAST_UNSUCCESSFUL;
 		common_assets.ped_shield_impact_sound.id = assets::sound_buffer_id::EXPLOSION;
@@ -71,7 +74,7 @@ namespace test_scenes {
 
 		//for (int x = -4 * 1; x < 4 * 1; ++x)
 		//{
-		//	auto frog = world.create_entity("frog");
+		//	auto frog = create_test_scene_entity(world, test_scene_type::FROG);
 		//	ingredients::add_sprite(metas, frog, vec2(100 + x * 40, 200 + 400), assets::game_image_id::TEST_SPRITE, white, render_layer::SMALL_DYNAMIC_BODY);
 		//	ingredients::add_see_through_dynamic_body(frog, pos);
 		//	
@@ -281,8 +284,6 @@ namespace test_scenes {
 			// 		spell.common.learned = true;
 			// 	}
 			// );
-
-			set_bbcoded_entity_description(new_character, L"Member of Atlantic nations.");
 		}
 
 		// street wandering pixels
@@ -311,7 +312,7 @@ namespace test_scenes {
 			const auto reach = xywh(0, 0, 1500, 32000);
 
 			{
-				const auto e = world.create_entity("wandering_pixels");
+				const auto e = create_test_scene_entity(world, test_scene_type::WANDERING_PIXELS);
 				auto& w = e += components::wandering_pixels();
 				auto& r = e += components::render();
 
@@ -325,7 +326,7 @@ namespace test_scenes {
 			}
 
 			{
-				const auto e = world.create_entity("wandering_pixels");
+				const auto e = create_test_scene_entity(world, test_scene_type::WANDERING_PIXELS);
 				auto& w = e += components::wandering_pixels();
 				auto& r = e += components::render();
 
@@ -340,7 +341,7 @@ namespace test_scenes {
 			}
 
 			{
-				const auto e = world.create_entity("wandering_pixels");
+				const auto e = create_test_scene_entity(world, test_scene_type::WANDERING_PIXELS);
 				auto& w = e += components::wandering_pixels();
 				auto& r = e += components::render();
 
@@ -375,7 +376,7 @@ namespace test_scenes {
 				const auto light_cyan = c.x < 0 ? orange : rgba(30, 255, 255, 255);
 
 				{
-					const auto l = world.create_entity("l");
+					const auto l = create_test_scene_entity(world, test_scene_type::LAMP);
 					l += components::transform(light_pos);
 					auto& light = l += components::light();
 					light.color = light_cyan;
@@ -395,7 +396,7 @@ namespace test_scenes {
 
 
 				{
-					const auto e = world.create_entity("wandering_pixels");
+					const auto e = create_test_scene_entity(world, test_scene_type::WANDERING_PIXELS);
 					auto& w = e += components::wandering_pixels();
 					auto& r = e += components::render();
 
@@ -409,7 +410,7 @@ namespace test_scenes {
 				}
 
 				{
-					const auto e = world.create_entity("wandering_pixels");
+					const auto e = create_test_scene_entity(world, test_scene_type::WANDERING_PIXELS);
 					auto& w = e += components::wandering_pixels();
 					auto& r = e += components::render();
 
@@ -423,7 +424,7 @@ namespace test_scenes {
 				}
 
 				{
-					const auto e = world.create_entity("wandering_pixels");
+					const auto e = create_test_scene_entity(world, test_scene_type::WANDERING_PIXELS);
 					auto& w = e += components::wandering_pixels();
 					auto& r = e += components::render();
 
@@ -440,7 +441,7 @@ namespace test_scenes {
 
 		{
 			{
-				const auto l = world.create_entity("l");
+				const auto l = create_test_scene_entity(world, test_scene_type::LAMP);
 				l += components::transform(164.f - 8.f + 90.f, 220);
 				auto& light = l += components::light();
 				light.color = cyan;
@@ -449,7 +450,7 @@ namespace test_scenes {
 				l.add_standard_components(step);
 			}
 			{
-				const auto l = world.create_entity("l");
+				const auto l = create_test_scene_entity(world, test_scene_type::LAMP);
 				l += components::transform(1164.f + 24.f - 90.f, 220);
 				auto& light = l += components::light();
 				light.color = orange;
@@ -462,7 +463,7 @@ namespace test_scenes {
 				const auto right_reach = xywh(1164.f - 8.f + 90.f - 600, 220 - 250, 1000, 600);
 
 				{
-					const auto e = world.create_entity("wandering_pixels");
+					const auto e = create_test_scene_entity(world, test_scene_type::WANDERING_PIXELS);
 					auto& w = e += components::wandering_pixels();
 					auto& r = e += components::render();
 
@@ -476,7 +477,7 @@ namespace test_scenes {
 				}
 
 				{
-					const auto e = world.create_entity("wandering_pixels");
+					const auto e = create_test_scene_entity(world, test_scene_type::WANDERING_PIXELS);
 					auto& w = e += components::wandering_pixels();
 					auto& r = e += components::render();
 
@@ -490,7 +491,7 @@ namespace test_scenes {
 				}
 
 				{
-					const auto e = world.create_entity("wandering_pixels");
+					const auto e = create_test_scene_entity(world, test_scene_type::WANDERING_PIXELS);
 					auto& w = e += components::wandering_pixels();
 					auto& r = e += components::render();
 
@@ -504,7 +505,7 @@ namespace test_scenes {
 				}
 
 				{
-					const auto e = world.create_entity("wandering_pixels");
+					const auto e = create_test_scene_entity(world, test_scene_type::WANDERING_PIXELS);
 					auto& w = e += components::wandering_pixels();
 					auto& r = e += components::render();
 
@@ -518,7 +519,7 @@ namespace test_scenes {
 				}
 
 				{
-					const auto e = world.create_entity("wandering_pixels");
+					const auto e = create_test_scene_entity(world, test_scene_type::WANDERING_PIXELS);
 					auto& w = e += components::wandering_pixels();
 					auto& r = e += components::render();
 
@@ -532,7 +533,7 @@ namespace test_scenes {
 				}
 
 				{
-					const auto e = world.create_entity("wandering_pixels");
+					const auto e = create_test_scene_entity(world, test_scene_type::WANDERING_PIXELS);
 					auto& w = e += components::wandering_pixels();
 					auto& r = e += components::render();
 
@@ -547,7 +548,7 @@ namespace test_scenes {
 			}
 
 			{
-				const auto l = world.create_entity("l");
+				const auto l = create_test_scene_entity(world, test_scene_type::LAMP);
 				l += components::transform(664.f + 24.f, -1100);
 				auto& light = l += components::light();
 				light.color = orange;
@@ -568,7 +569,7 @@ namespace test_scenes {
 			).add_standard_components(step);
 
 			{
-				const auto e = world.create_entity("have_a_pleasant");
+				const auto e = create_test_scene_entity(world, test_scene_type::HAVE_A_PLEASANT);
 
 				ingredients::add_sprite(metas, 
 					e,
@@ -605,11 +606,11 @@ namespace test_scenes {
 				for (int x = -side; x < side; ++x) {
 					for (int y = -side; y < side * 16; ++y)
 					{
-						//auto background = world.create_entity("bg[-]");
+						//auto background = create_test_scene_entity(world, test_scene_type::GROUND);
 						//ingredients::add_sprite(metas, background, vec2(-1000, 0) + vec2(x, y) * (bg_size + vec2(1500, 550)), assets::game_image_id::TEST_BACKGROUND, white, render_layer::GROUND);
 						//ingredients::add_standard_static_body(background);
 
-						auto street = world.create_entity("street[-]");
+						auto street = create_test_scene_entity(world, test_scene_type::STREET);
 						ingredients::add_sprite(metas, street,
 							assets::game_image_id::TEST_BACKGROUND, gray1, render_layer::GROUND);
 
@@ -623,7 +624,7 @@ namespace test_scenes {
 				{
 					const vec2 size = metas.at(assets::game_image_id::ROAD_FRONT_DIRT).get_size();
 
-					auto road_dirt = world.create_entity("road_dirt[-]");
+					auto road_dirt = create_test_scene_entity(world, test_scene_type::ROAD_DIRT);
 					ingredients::add_sprite(metas, road_dirt,
 						assets::game_image_id::ROAD_FRONT_DIRT, white, render_layer::ON_GROUND);
 
@@ -635,7 +636,7 @@ namespace test_scenes {
 				for (int r = 0; r < 38; ++r) {
 					const vec2 size = metas.at(assets::game_image_id::ROAD).get_size();
 
-					auto road = world.create_entity("road[-]");
+					auto road = create_test_scene_entity(world, test_scene_type::ROAD);
 					ingredients::add_sprite(metas, road,
 						assets::game_image_id::ROAD, white, render_layer::ON_GROUND);
 
@@ -646,7 +647,7 @@ namespace test_scenes {
 			}
 
 			{
-				const auto e = world.create_entity("awakening");
+				const auto e = create_test_scene_entity(world, test_scene_type::AWAKENING);
 				auto& sprite = ingredients::add_sprite(metas, 
 					e,
 					assets::game_image_id::AWAKENING,
@@ -662,7 +663,7 @@ namespace test_scenes {
 			}
 
 			{
-				const auto e = world.create_entity("metropolis");
+				const auto e = create_test_scene_entity(world, test_scene_type::METROPOLIS);
 
 				ingredients::add_sprite(metas, 
 					e,

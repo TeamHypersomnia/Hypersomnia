@@ -13,7 +13,7 @@ entity_handle sound_existence_input::create_sound_effect_entity(
 ) const {
 	auto& cosmos = step.get_cosmos();
 
-	const auto new_sound_entity = cosmos.create_entity("particle_stream");
+	const auto new_sound_entity = cosmos.create_entity(/*test_scene_type::PARTICLE_STREAM*/);
 	new_sound_entity += place_of_birth;
 
 	auto& existence = new_sound_entity += components::sound_existence();

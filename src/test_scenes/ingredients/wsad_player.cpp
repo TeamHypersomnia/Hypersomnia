@@ -28,6 +28,12 @@
 #include "game/enums/party_category.h"
 #include "game/detail/inventory/inventory_utils.h"
 
+namespace prefabs {
+	void populate_character_types(entity_types& types) {
+		get_test_type(types, test_scene_type::PLAYER).description = L"Member of Atlantic nations.";
+	}
+}
+
 namespace ingredients {
 	void add_character_movement(const entity_handle e) {
 		components::movement& movement = e.get<components::movement>();
@@ -150,8 +156,7 @@ namespace prefabs {
 	) {
 		auto& world = step.get_cosmos();
 
-		const auto character = world.create_entity(name);
-
+		const auto character = create_test_scene_entity(world, test_scene_type::PLAYER);
 		
 		const auto& metas = step.get_logical_assets();
 		const auto crosshair = create_character_crosshair(step);
@@ -189,9 +194,9 @@ namespace prefabs {
 
 	entity_handle create_character_crosshair(const logic_step step) {
 		auto& world = step.get_cosmos();
-		auto root = world.create_entity("crosshair");
-		auto recoil = world.create_entity("crosshair_recoil_body");
-		auto zero_target = world.create_entity("zero_target");
+		auto root = create_test_scene_entity(world, test_scene_type::CROSSHAIR);
+		auto recoil = create_test_scene_entity(world, test_scene_type::CROSSHAIR_RECOIL_BODY);
+		auto zero_target = create_test_scene_entity(world, test_scene_type::ZERO_TARGET);
 		const auto& metas = step.get_logical_assets();
 
 		{

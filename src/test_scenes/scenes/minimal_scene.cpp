@@ -4,6 +4,7 @@
 
 #include "game/enums/party_category.h"
 
+#include "test_scenes/test_scene_types.h"
 #include "test_scenes/ingredients/ingredients.h"
 #include "test_scenes/test_scenes_content.h"
 
@@ -16,6 +17,7 @@
 
 namespace test_scenes {
 	void minimal_scene::populate(cosmos_common_significant& common) const {
+		populate_test_scene_types(common.all_entity_types);
 		load_test_scene_sentience_properties(common);
 
 		auto& common_assets = common.assets;

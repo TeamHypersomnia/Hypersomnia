@@ -31,9 +31,8 @@ namespace ingredients {
 namespace prefabs {
 	entity_handle create_sample_backpack(const logic_step step, vec2 pos) {
 		auto& world = step.get_cosmos();
-		const auto def = world.create_entity("sample_backpack");
+		const auto def = create_test_scene_entity(world, test_scene_type::SAMPLE_BACKPACK);
 		const auto& metas = step.get_logical_assets();
-
 		
 		ingredients::add_backpack_container(def);
 

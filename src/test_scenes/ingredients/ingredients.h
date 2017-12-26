@@ -4,7 +4,6 @@
 #include "augs/math/vec2.h"
 #include "augs/graphics/rgba.h"
 
-
 #include "game/assets/ids/game_image_id.h"
 
 #include "game/transcendental/entity_handle.h"
@@ -13,6 +12,7 @@
 
 #include "game/components/render_component.h"
 #include "game/components/sprite_component.h"
+#include "test_scenes/test_scene_types.h"
 
 class cosmos;
 
@@ -66,6 +66,9 @@ namespace ingredients {
 }
 
 namespace prefabs {
+	void populate_grenade_types(entity_types& types);
+	void populate_character_types(entity_types& types);
+
 	entity_handle create_car(const logic_step, const components::transform&);
 	entity_handle create_motorcycle(const logic_step, const components::transform&);
 

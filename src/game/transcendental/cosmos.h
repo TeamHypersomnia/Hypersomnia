@@ -70,8 +70,8 @@ public:
 		solvable.reserve_storage_for_entities(s);
 	}
 
-	entity_handle create_entity(const std::wstring& name);
-	entity_handle create_entity(const std::string& name);
+	entity_handle create_entity(entity_type_id = 0);
+
 	entity_handle create_entity_with_specific_guid(
 		const entity_guid specific_guid
 	);

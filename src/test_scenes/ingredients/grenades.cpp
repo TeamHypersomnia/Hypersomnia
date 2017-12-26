@@ -19,10 +19,36 @@
 #include "game/detail/inventory/inventory_utils.h"
 
 namespace prefabs {
+	void populate_grenade_types(entity_types& types) {
+		{
+			auto& meta = get_test_type(types, test_scene_type::FORCE_GRENADE);
+
+			meta.description =
+				L"Throwable explosive with a three seconds delay.\nDeals damage to [color=red]Health[/color]."
+			;
+		}
+
+		{
+			auto& meta = get_test_type(types, test_scene_type::INTERFERENCE_GRENADE);
+
+			meta.description =
+				L"Throwable explosive with a three seconds delay.\nDeals damage to [color=orange]Consciousness[/color].\nCauses massive aimpunch."
+			;
+		}
+
+		{
+			auto& meta = get_test_type(types, test_scene_type::PED_GRENADE);
+
+			meta.description =
+				L"Throwable explosive with a three seconds delay.\nDrains [color=cyan]Personal Electricity[/color].\nIf the subject has [color=turquoise]Electric Shield[/color] enabled,\nthe effect is doubled."
+			;
+		}
+	}
+
 	entity_handle create_force_grenade(const logic_step step, vec2 pos) {
 		auto& world = step.get_cosmos();
 		const auto& metas = step.get_logical_assets();
-		const auto grenade_entity = world.create_entity("Force grenade");
+		const auto grenade_entity = create_test_scene_entity(world, test_scene_type::FORCE_GRENADE);
 
 		auto& sender = grenade_entity += components::sender();
 		auto& explosive = grenade_entity += components::explosive();
@@ -56,13 +82,6 @@ namespace prefabs {
 
 		grenade_entity.add_standard_components(step);
 		
-#if TODO_NAME
-		auto& meta = grenade_entity.get_type();
-
-		meta.description =
-			L"Throwable explosive with a three seconds delay.\nDeals damage to [color=red]Health[/color]."
-		;
-#endif
 
 		return grenade_entity;
 	}
@@ -70,7 +89,7 @@ namespace prefabs {
 	entity_handle create_ped_grenade(const logic_step step, vec2 pos) {
 		auto& world = step.get_cosmos();
 		const auto& metas = step.get_logical_assets();
-		const auto grenade_entity = world.create_entity("PED grenade");
+		const auto grenade_entity = create_test_scene_entity(world, test_scene_type::PED_GRENADE);
 
 		auto& sender = grenade_entity += components::sender();
 		auto& explosive = grenade_entity += components::explosive();
@@ -105,21 +124,13 @@ namespace prefabs {
 
 		grenade_entity.add_standard_components(step);
 
-#if TODO_NAME
-		auto& meta = grenade_entity.get_type();
-
-		meta.description =
-			L"Throwable explosive with a three seconds delay.\nDrains [color=cyan]Personal Electricity[/color].\nIf the subject has [color=turquoise]Electric Shield[/color] enabled,\nthe effect is doubled."
-		;
-#endif
-
 		return grenade_entity;
 	}
 
 	entity_handle create_interference_grenade(const logic_step step, vec2 pos) {
 		auto& world = step.get_cosmos();
 		const auto& metas = step.get_logical_assets();
-		const auto grenade_entity = world.create_entity("Interference grenade");
+		const auto grenade_entity = create_test_scene_entity(world, test_scene_type::INTERFERENCE_GRENADE);
 		
 		auto& sender = grenade_entity += components::sender();
 		auto& explosive = grenade_entity += components::explosive();
@@ -153,14 +164,6 @@ namespace prefabs {
 		grenade_entity += shape_circle;
 
 		grenade_entity.add_standard_components(step);
-
-#if TODO_NAME
-		auto& meta = grenade_entity.get_type();
-
-		meta.description =
-			L"Throwable explosive with a three seconds delay.\nDeals damage to [color=orange]Consciousness[/color].\nCauses massive aimpunch."
-		;
-#endif
 
 		return grenade_entity;
 	}

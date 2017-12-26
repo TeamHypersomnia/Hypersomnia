@@ -463,29 +463,3 @@ void sentience_system::cooldown_aimpunches(const logic_step step) const {
 		}
 	);
 }
-
-/*
-
-#include <catch.hpp>
-
-TEST_CASE("SentienceSystem", "SentienceMeters") {
-	{
-		cosmos c1(1);
-
-		const auto new_ent1 = c1.create_entity("e1");
-		auto& sent = new_ent1 += components::sentience();
-
-		messages::damage_message msg;
-		msg.amount = 40.f;
-
-		c1.advance(
-		{},
-			[](const logic_step step) {
-			//step.post_message
-		},
-			[](auto...) {
-
-			}
-			);
-	}
-}*/
