@@ -25,21 +25,21 @@
 #include "augs/build_settings/setting_debug_physics_world_cache_copy.h"
 #include "game/inferred_caches/relational_cache.h"
 
-bool physics_world_cache::cache_exists_for_rigid_body(const const_entity_handle handle) const {
+bool physics_world_cache::rigid_body_cache_exists_for(const const_entity_handle handle) const {
 	return 
 		handle.alive() 
 		&& get_rigid_body_cache(handle).body != nullptr
 	;
 }
 
-bool physics_world_cache::cache_exists_for_colliders(const const_entity_handle handle) const {
+bool physics_world_cache::colliders_cache_exists_for(const const_entity_handle handle) const {
 	return
 		handle.alive()
 		&& get_colliders_cache(handle).all_fixtures_in_component.size() > 0u
 	;
 }
 
-bool physics_world_cache::cache_exists_for_joint(const const_entity_handle handle) const {
+bool physics_world_cache::joint_cache_exists_for(const const_entity_handle handle) const {
 	return 
 		handle.alive() 
 		&& get_joint_cache(handle).joint != nullptr
@@ -73,7 +73,7 @@ const joint_cache& physics_world_cache::get_joint_cache(const entity_id id) cons
 void physics_world_cache::destroy_cache_of(const const_entity_handle handle) {
 	const auto& cosmos = handle.get_cosmos();
 
-	if (cache_exists_for_rigid_body(handle)) {
+	if (rigid_body_cache_exists_for(handle)) {
 		auto& cache = get_rigid_body_cache(handle);
 		
 		for (const b2Fixture* f = cache.body->m_fixtureList; f != nullptr; f = f->m_next) {
@@ -92,7 +92,7 @@ void physics_world_cache::destroy_cache_of(const const_entity_handle handle) {
 		cache = rigid_body_cache();
 	}
 	
-	if (cache_exists_for_colliders(handle)) {
+	if (colliders_cache_exists_for(handle)) {
 		auto& cache = get_colliders_cache(handle);
 		auto& owner_body_cache = get_rigid_body_cache(cosmos[cache.all_fixtures_in_component[0]->GetBody()->GetUserData()]);
 
@@ -103,7 +103,7 @@ void physics_world_cache::destroy_cache_of(const const_entity_handle handle) {
 		cache = colliders_cache();
 	}
 
-	if (cache_exists_for_joint(handle)) {
+	if (joint_cache_exists_for(handle)) {
 		auto& cache = get_joint_cache(handle);
 
 		b2world->DestroyJoint(cache.joint);
@@ -116,7 +116,7 @@ void physics_world_cache::infer_cache_for(const const_entity_handle handle) {
 	const auto& cosmos = handle.get_cosmos();
 	const auto& relational = cosmos.get_solvable_inferred().relational;
 
-	if (const bool is_already_constructed = cache_exists_for_rigid_body(handle)) {
+	if (const bool is_already_constructed = rigid_body_cache_exists_for(handle)) {
 		return;
 	}
 
@@ -171,7 +171,7 @@ void physics_world_cache::infer_cache_for(const const_entity_handle handle) {
 }
 
 void physics_world_cache::infer_cache_for_fixtures(const const_entity_handle handle) {
-	if (const bool is_already_constructed = cache_exists_for_colliders(handle)) {
+	if (const bool is_already_constructed = colliders_cache_exists_for(handle)) {
 		return;
 	}
 	
@@ -180,7 +180,7 @@ void physics_world_cache::infer_cache_for_fixtures(const const_entity_handle han
 
 		colliders != nullptr
 		&& colliders.is_activated()
-		&& cache_exists_for_rigid_body(handle.get_owner_body())
+		&& rigid_body_cache_exists_for(handle.get_owner_body())
 	) {
 		const auto si = handle.get_cosmos().get_si();
 		const auto owner_body_entity = handle.get_owner_body();
@@ -254,7 +254,7 @@ void physics_world_cache::infer_cache_for_fixtures(const const_entity_handle han
 }
 
 void physics_world_cache::infer_cache_for_joint(const const_entity_handle handle) {
-	if (const bool is_already_constructed = cache_exists_for_joint(handle)) {
+	if (const bool is_already_constructed = joint_cache_exists_for(handle)) {
 		return;
 	}
 
@@ -265,8 +265,8 @@ void physics_world_cache::infer_cache_for_joint(const const_entity_handle handle
 
 		motor_joint != nullptr
 		&& motor_joint.is_activated()
-		&& cache_exists_for_rigid_body(cosmos[motor_joint.get_target_bodies()[0]])
-		&& cache_exists_for_rigid_body(cosmos[motor_joint.get_target_bodies()[1]])
+		&& rigid_body_cache_exists_for(cosmos[motor_joint.get_target_bodies()[0]])
+		&& rigid_body_cache_exists_for(cosmos[motor_joint.get_target_bodies()[1]])
 	) {
 		const components::motor_joint joint_data = motor_joint.get_raw_component();
 

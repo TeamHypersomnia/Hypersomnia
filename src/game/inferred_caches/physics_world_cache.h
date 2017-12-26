@@ -147,9 +147,9 @@ public:
 	const colliders_cache& get_colliders_cache(const entity_id) const;
 	const joint_cache& get_joint_cache(const entity_id) const;
 
-	bool cache_exists_for_rigid_body(const const_entity_handle) const;
-	bool cache_exists_for_colliders(const const_entity_handle) const;
-	bool cache_exists_for_joint(const const_entity_handle) const;
+	bool rigid_body_cache_exists_for(const const_entity_handle) const;
+	bool colliders_cache_exists_for(const const_entity_handle) const;
+	bool joint_cache_exists_for(const const_entity_handle) const;
 
 	b2World& get_b2world() {
 		return *b2world.get();

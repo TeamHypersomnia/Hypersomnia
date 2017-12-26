@@ -209,7 +209,7 @@ bool basic_fixtures_synchronizer<C>::is_activated() const {
 
 template<bool C>
 bool basic_fixtures_synchronizer<C>::is_constructed() const {
-	return handle.get_cosmos().get_solvable_inferred().physics.cache_exists_for_colliders(handle);
+	return handle.get_cosmos().get_solvable_inferred().physics.colliders_cache_exists_for(handle);
 }
 
 template<bool C>
