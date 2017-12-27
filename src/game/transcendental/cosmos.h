@@ -142,6 +142,11 @@ public:
 
 		auto refresh_when_done = augs::make_scope_guard([&]() {
 			if (status != changer_callback_result::DONT_REFRESH) {
+				/*	
+					Always first reinfer the common,
+				   	only later the entities, as they might use the common inferred during their own reinference. 
+				*/
+				common.reinfer();
 				reinfer_all_entities();
 			}
 		});

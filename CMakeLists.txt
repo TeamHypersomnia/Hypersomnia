@@ -513,6 +513,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/stateless_systems/physics_system.cpp"
 	"src/game/transcendental/standard_solver.cpp"
 	"src/game/transcendental/cosmos_solvable.cpp"
+	"src/game/transcendental/cosmos_common.cpp"
 )
 
 if(BUILD_WINDOW_FRAMEWORK)

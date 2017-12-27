@@ -27,6 +27,8 @@ Most of the time, only the programmers are concerned with the second type of dat
 		- A lot better cache coherency than the more idiomatic ``std::optional``.
 	- An *enabled* definition implies that the entity needs a component of type ``definition_type::instance`` (if specified) for the definition to be ever used by the logic.  
 		- If instance type is specified, it additionally stores an **initial value** for the component.
+- A type with a blank name is treated as being 'not set' (a null type).
+	- We will always require the author to set a non-empty name for a type.  
 - Types can be created, copied and then modified, or destroyed.  
 	- It is a separate stage that never occurs in logic itself.
 		- In fact, the [logic step](logic_step) simply provides only const getters for the type information.
@@ -38,21 +40,19 @@ Most of the time, only the programmers are concerned with the second type of dat
 		- This is not important. The field, in practice, serves two purposes:
 			- Used by the logic when it gets a type identifier to spawn (e.g. ``gun::magic_missile_definition``), so that it can set reasonable initial values. Thus, a change to initial value needs not updating here as the logic will naturally catch up, storing only the type identifier.
 			- Exists as an optional helper for the author when they want to spawn some very specific entities. The author shouldn't worry that the initial value changes something for the existent entities.
+	- Disallow deleting a type if entities with that type exist.
+		- The author will be able to change the type of an existing entity, optionally keeping the values that were already set in components.
 	- If a field of a definition changes, (during content creation), reinfer all objects of this type with help of the [type id cache](type_id_cache); currently we'll just reinfer the whole cosmos.
-- Entity can change the type during its lifetime, in which case it should be completely reinferred.
-	- That will be helpful when we want to make a change to entity (that is impossible by just changing the components) while preserving correctness of all identificators that point to it.
-	- Example: a grenade that changes from a normal body to a bullet body on being thrown (its sprite might change as well).
-<!--
-- ~~Entity should be reinferred if it changes a type (during content creation).~~ Type id for an entity should stay constant until its death.
-	- If at all, changing the type should be implemented as an editor feature. Let us not make this an actual feature in the game code and let us always assume that an entity's type stays constant throughout its lifetime.
-	- It will be easier in the beginning if we disallow this and require the author to just create a new entity.
--->
 - There won't be many types, but access is **frequent** during [solve](solver#the-solve). 
 	- We allocate all definitions **statically**, as memory won't suffer relatively to the speed gain.
 - On creating an entity, the chosen type's id is passed.  
-	- The [cosmos](cosmos) adds all components implied by the definitions are added automatically.
-- A type with a blank name is treated as being 'not set' (a null type).
-	- We will always require the author to set a non-empty name for a type.  
+	- The [``cosmos::create_entity``](cosmos#create_entity) automatically adds all components implied by the enabled definitions.
+- Entity can change the type during its lifetime, in which case it should be completely reinferred.
+	- That will be helpful when we want to make a change to entity (that is impossible by just changing the components) while preserving correctness of all identificators that point to it.
+	- Example: a grenade that changes from a normal body to a bullet body on being thrown (its sprite might change as well).
+	- **Care**: some state is sensitive to random deletion. For example, if we nuke the [car component](car_component), some child entities might be left dangling and not get deleted.
+		- We might change the design so that there is nothing like ``child_entity_id``; a "delete_with" component should exist instead of "child_component". relational system keeps track of all "delete_with" entities for a "parent" entity every time an make_child_of is invoked. This way, state of the parent might be altered at any time, and its children will still get properly deleted.
+		- Most ``child_entity_id`` types will anyway be replaced with a entity_type_id. For other cases, it makes little sense to also enforce deletion of those entities just because they are meant to be related.
 - Some components do not need any definition data.
 	- examples: child, flags, **sender**
 		- Looks like most of them should anyway be transparent to the author.
@@ -69,32 +69,82 @@ Most of the time, only the programmers are concerned with the second type of dat
 -->
 - Some definitions do not need any instance data.
 	- Example: render component.
-		- That doesnt change anything at all, except for the way of getting that data.
+		- That does not change anything at all, except for the way of getting that data.
 - Some definitions might be so heavily used that an immutable copy in the entity itself would be beneficial.
 	- Example: render component.
 		- Perfectly viable; just declare it with a ``static constexpr bool`` inside the definition and make the field constant.
-		- Care: if the type information changes, so must the copied definition. So let's save it for later.
-- Some definitions and components serve exactly the same role but the component counterpart lets us customize each instance without creating new type for each.
+		- Care: if the type information changes, so must the copied definition. **So let's save it for later**.
+- There is a case that it would be best if data existed both as a definition and a component.
 	- Example: shape polygon component.
-		- We then must disable storing of an initial value; or just never specify the implied component type in the first place.
+	- See: [overrides](#overrides).
 
 We might be tempted to make some of the definitions fundamental, thus always defined as "enabled".
 However, there is no benefit seen in doing so. It is a wiser choice to have a flag for each definition and assume that the contents of a default-constructed definition are always in a valid state.
-Provide a "set" function?
 
-<!--
-### Performance
+## Overrides
 
-Some concern could be falsely raised to the fact that an entity's type id first need to be obtained, and only later the type information;  
-as, compared to just a single component lookup, this could potentially be slower.
+There are examples of data that, on one hand, will very frequently be shared identical,  
+but, on the other hand, may have cases where practically each new entity needs a slight alteration of it.  
+  
+A perfect example is a shape polygon component.  
 
-However, at the time of having an entity handle, the type id is already available, possibly in cache.  
-The only thing left is to perform the lookup in the type information map.
-Then, the only thing to compare performance-wise is a lookup in an ``unordered_map`` vs a [``pool``](pool).
-If the container was optimized for deterministic identificators, it could possibly be faster;
-Note that types won't be altered during logic, usually only during the creation of content.  
-So, they could be stored in a fixed-sized container. **There can even be a vast performance improvement**. 
--->
+While things like bullet types or rifle types may each have just one shape for all instances,  
+take for example terrain: each of its pieces might possibly have a completely different shape,  
+especially if it is some kind of curvy corridor or dungeon.  
+These terrain pieces might, to the exception of their shape, behave identically, so it would make sense to have just one type for them.
+
+In that case, we may:
+- Leave things as they are.
+	- We require the [author](author) to create a new type for each of the piece;
+		- or somehow facilitate this or maybe do this under the hood?
+	- Conceptually the easiest.
+	- Most memory wasted.
+	- Lowest flexibility, e.g. the solver can't alter that state or it may with additional effort to make that information stateless.
+- Enable dynamical overrides.
+	- Mutable or not, by the solver.
+		- Preferably not, but it might be useful when partitioning polygons into destructed pieces.
+	- They would take precedence over what would possibly be found in the correspondent definitions in the type.
+	- When we will need to copy the game world, how do we determine if a shape is owned by an override or a pre-inferred definition? 
+		- we need to take proper measures so as to never copy the shapes that are indeed flyweights; as opposed to the custom shapes.
+	- The problem will not be frequent besides names and polygons, so it is a viable solution.
+	- **Solution**: for each such case, create a dynamic component that, on its own, will not consume memory when not used, but can be named for example "custom polygon shape"
+		- additionally, the dynamic component might have different assumptions about storage, since it will not be so common; it could even have plain ``std::vector``s instead of fixed-size containers.
+			- although I would not advocate this.
+		- Least memory wasted.
+		- Best performance as the override checks will be limited to several specific domains.
+		- Medium-hard conceptually.
+			- Additionally, it will be pretty much known from the get-go which data is possibly altered.
+			- Nobody will also be surprised if the solver needs to alter that state, because they are plain components.
+		- Good flexibility, until something unexpected needs to change.
+	- **Solution**: create overrides for definitions and let an entity have its own set of definitions, if so is required.
+		- Most memory wasted.
+			- An entity with an override costs the size of all the definitions, unless we make each definition dynamically allocated, hindering overridden-entities performance all the more.
+			- Additionally, as the type is the same, we must assume the same storage rules as with the definitions. In particular, we won't be able to use a dynamically allocated vector of vertices if the definition object already uses a constant size vector.
+		- Worst performance as upon getting any definition we check for an existing override.
+			- The only impact is on non-overridden entities.
+			- Overidden entities would otherwise still need to get a component.
+			- The impact might not be so great for the non-overriden entities as we might make the definiton id to already reside in cache once the type id is in cache.
+		- Hardest conceptually.
+			- Is it predictable when modifying any definition field? Some state might need to be updated to be consistent.
+			- For example, rigid body parameters like type (static or dynamic, if it is a bullet etc.).
+				- If we anyway allow for changing a type, then reinference should be enough.
+		- Most flexibility in altering the game's behaviour.
+	- The memory waste calculations for these two solutions actually assume that there will be a lot of overridden entities. 
+		- If there are just a few, than having a dynamic component id for each possible override actually costs more in terms of aggregate size.
+		- If there are many, then yes, per-entity overrides are worse. 
+		- The actual serialized size should stay pretty much the same.
+
+
+### Simple per-field overrides
+
+Consider this: usually, we specify damping values once for a given type of physical entity.  
+However, the logic itself may want to alter the damping value due to some special circumstances (being inert, riding a motorcycle, sprinting, etc.).
+Two approaches can be taken:
+
+- ``std::optional<field_type> overridden_field;``
+- ``field_type field_scalar;``
+
+We'll probably use scalars most of the time.
 
 ### Polygon shape concern
 
@@ -123,42 +173,22 @@ Thus, in ordinary multiplayer gameplays, it should be inferred exactly once.
 
 See [main article](editor_setup#inferred-state).
 
+
+## Storage
+
+Inside the [cosmos common significant](cosmos_common_significant), there is an object named ``types``.  
+It maps type identifiers found in the [type component](type_component) to the respective **entity type**.  
+Preferably, the container should be a constant size vector as the type ids will just be consecutive integers.  
+
+Care must be taken that the storage is not treated like trivially copyable types during byte readwrite:
+A custom readwrite overloads will be in order, both for lua and binary, which will take note of which initial component values are set, and serialize only the according definitions;  
+At that point, serialization performance pretty much does not matter at all, and disk space may or may not come in handy.
+
 <!--
-### Frequent new types
-
-There are examples of data that, on one hand, will very frequently be shared identical,  
-but, on the other hand, may have cases where practically each new entity needs a slight alteration of it.  
-  
-A perfect example is a shape polygon component.  
-
-While things like bullet types or rifle types may each have just one shape for all instances,  
-take for example terrain: each of its pieces might possibly have a completely different shape,  
-especially if it is some kind of curvy corridor or dungeon.  
-These terrain pieces might, to the exception of their shape, behave identically, so it would make sense to have just one type for them.
-
-In that case, we may:
-- require the [author](author) to create a new type for each of the piece;
-	- or somehow facilitate this or maybe do this under the hood?
-- create a dynamic component that, on its own, will not consume memory when not used, but can be named for example "custom polygon shape"
-	- it would take precedence over what would possibly be found in the type.
-	- the problem will not be frequent besides that thing with polygon, so it is a viable solution.
-	- additionally, the dynamic component might have different assumptions about storage, since it will not be so common; it could even have plain ``std::vector``s instead of fixed-size containers.
-		- although I would not advocate this.
-	- problem arises when we will need to copy the game world. Precisely, how do we determine if a shape is owned by the physics world cache? 
-		- we need to take proper measures so as to never copy the shapes that are indeed flyweights; as opposed to the custom shapes.
+- ~~Entity should be reinferred if it changes a type (during content creation).~~ Type id for an entity should stay constant until its death.
+	- If at all, changing the type should be implemented as an editor feature. Let us not make this an actual feature in the game code and let us always assume that an entity's type stays constant throughout its lifetime.
+	- It will be easier in the beginning if we disallow this and require the author to just create a new entity.
 -->
-
-### Per-field overrides
-
-Consider this: usually, we specify damping values once for a given type of physical entity.  
-However, the logic itself may want to alter the damping value due to some special circumstances (being inert, riding a motorcycle, sprinting, etc.).
-Two approaches can be taken:
-
-- ``std::optional<field_type> overridden_field;``
-- ``field_type field_scalar;``
-
-We'll probably use scalars most of the time.
-
 <!--
 ### Components considerations
 An author should not be concerned with adding components to a new entity, that properly correspond to what they've already set in the definitions.  
@@ -184,13 +214,16 @@ However, the type information:
 
 -->
 
-## Storage
+<!--
+### Performance
 
-Inside the [cosmos common significant](cosmos_common_significant), there is an object named ``types``.  
-It maps type identifiers found in the [type component](type_component) to the respective **entity type**.  
-Preferably, the container should be a constant size vector as the type ids will just be consecutive integers.  
+Some concern could be falsely raised to the fact that an entity's type id first need to be obtained, and only later the type information;  
+as, compared to just a single component lookup, this could potentially be slower.
 
-
-Care must be taken that the storage is not treated like trivially copyable types during byte readwrite:
-A custom readwrite overloads will be in order, both for lua and binary, which will take note of which initial component values are set, and serialize only the according definitions;  
-At that point, serialization performance pretty much does not matter at all, and disk space may or may not come in handy.
+However, at the time of having an entity handle, the type id is already available, possibly in cache.  
+The only thing left is to perform the lookup in the type information map.
+Then, the only thing to compare performance-wise is a lookup in an ``unordered_map`` vs a [``pool``](pool).
+If the container was optimized for deterministic identificators, it could possibly be faster;
+Note that types won't be altered during logic, usually only during the creation of content.  
+So, they could be stored in a fixed-sized container. **There can even be a vast performance improvement**. 
+-->

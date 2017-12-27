@@ -54,3 +54,9 @@ Somewhat good solution:
 - Nothing more will be passed.
 - Will have to pass common state to cosmos constructor (a bit ugly)
 - define own assignment operators or an explicit "clone" method.
+
+## Notes
+
+Implementation note: **always ensure that the cosmos solvable is reinferred after reinferring the cosmos common.** That is because, if the order of operation was reversed...  
+~~...well, actually, nothing bad should happen. That is because physics world caches will have a flag of whether a particular ``b2Shape`` belongs to an entity, and thus should be freed on destruction, or if it belongs to the common, and should not touch it at all.~~
+**However**: it might be the case that a ``b2PolygonShape`` or so might end up at a completely different address then from before reinference. Better safe then sorry.

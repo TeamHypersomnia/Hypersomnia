@@ -3,4 +3,6 @@
 
 struct cosmos_common {
 	cosmos_common_significant significant;
+
+	void reinfer();
 };

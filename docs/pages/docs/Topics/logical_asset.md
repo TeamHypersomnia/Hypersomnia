@@ -28,4 +28,9 @@ The distinction comes here:
 ## Further work
 <!-- TODO -->
 
-Animation, 
+Animation, recoil player and physical material currently have no "viewable" counterpart, but they are nevertheless logical assets in the code.  
+Under the current definitions, they should be part of [entity types](entity_type), but maybe it makes sense to share animations and materials?  
+It, however, makes little sense to make a physical material a viewable as it may very well influence state of the simulation (sounds etc.).
+The recoil player could very well be a part of gun definition.
+
+We might change the definition of a logical asset not to be tied to a viewable whatsoever; only that it is a resource not tied to any entity type.
