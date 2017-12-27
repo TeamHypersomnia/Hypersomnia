@@ -4,7 +4,7 @@ tags: [topics, flyweights]
 hide_sidebar: true
 permalink: logical_asset
 summary: | 
-  A **logical asset** is an object that, given a particular [viewable](viewable), holds only that part of its state which is necessary for [solvers](solver) (the game *logic*).  
+  A **logical asset** is an object that, given a particular [viewable](viewable), holds only that part of whose knowledge is necessary for [solvers](solver) (the game *logic*).  
   It is always completely regenerable from the given viewable.
 ---
 
@@ -24,4 +24,8 @@ It may need, however, to know the duration of the sound, to know when to delete 
 The distinction comes here:  
 - A *viewable* may contain a path to the resource file.
 - A **logical asset** may contain something like the duration in seconds, or width and height in pixels. 
- 
+
+## Further work
+<!-- TODO -->
+
+Animation, 

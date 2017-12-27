@@ -7,8 +7,6 @@
 
 #include "test_scenes/test_scenes_content.h"
 
-
-
 void load_test_scene_sound_buffers(sound_buffer_inputs_map& sounds) {
 	using id_type = assets::sound_buffer_id;
 	const auto directory = "content/official/sfx/";

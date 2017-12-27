@@ -37,15 +37,22 @@ Most of the time, only the programmers are concerned with the second type of dat
 	- In particular, the **initial value** for a component may change even though some entities of this type already exist.
 		- This is not important. The field, in practice, serves two purposes:
 			- Used by the logic when it gets a type identifier to spawn (e.g. ``gun::magic_missile_definition``), so that it can set reasonable initial values. Thus, a change to initial value needs not updating here as the logic will naturally catch up, storing only the type identifier.
-	- Whatever changes in the type (during content creation), reinfer all objects of this type with help of the ame cache; currently we'll just reinfer the whole cosmos.
-			- Optionally as a helper for the author when they want to spawn some very specific entities. The author shouldn't worry that the initial value changes something for the existent entities.
+			- Exists as an optional helper for the author when they want to spawn some very specific entities. The author shouldn't worry that the initial value changes something for the existent entities.
+	- If a field of a definition changes, (during content creation), reinfer all objects of this type with help of the [type id cache](type_id_cache); currently we'll just reinfer the whole cosmos.
+- Entity can change the type during its lifetime, in which case it should be completely reinferred.
+	- That will be helpful when we want to make a change to entity (that is impossible by just changing the components) while preserving correctness of all identificators that point to it.
+	- Example: a grenade that changes from a normal body to a bullet body on being thrown (its sprite might change as well).
+<!--
 - ~~Entity should be reinferred if it changes a type (during content creation).~~ Type id for an entity should stay constant until its death.
 	- If at all, changing the type should be implemented as an editor feature. Let us not make this an actual feature in the game code and let us always assume that an entity's type stays constant throughout its lifetime.
 	- It will be easier in the beginning if we disallow this and require the author to just create a new entity.
+-->
 - There won't be many types, but access is **frequent** during [solve](solver#the-solve). 
 	- We allocate all definitions **statically**, as memory won't suffer relatively to the speed gain.
 - On creating an entity, the chosen type's id is passed.  
 	- The [cosmos](cosmos) adds all components implied by the definitions are added automatically.
+- A type with a blank name is treated as being 'not set' (a null type).
+	- We will always require the author to set a non-empty name for a type.  
 - Some components do not need any definition data.
 	- examples: child, flags, **sender**
 		- Looks like most of them should anyway be transparent to the author.
@@ -160,7 +167,7 @@ Regardless of the fact that the definitions are statically allocated (and thus a
 Additionally, the author might want to specify initial values for the component that is added, that corresponds to the given definition type.
 For example, some physical bodies might want to have some particular initial velocity set.  
 
-However, the logic should, for the sake of performance and simplicity of code, always assume that a correspondent definition is present, so that we can take full advantage of the static allocation.  
+However, the logic should, for the sake of performance and simplicity of code, always assume that a correspondent definition is present, to avoid noise.  
 Thus the logic should derive usage of definitions from the presence of components.  
 However, the presence of components will be initially derived from the presence of definitions.
 It will thus be always required to define at least an empty type that specifies the correspondent component type,  
@@ -176,14 +183,14 @@ However, the type information:
 	- Should have the topmost access performance, which would suffer from facilitating the structure for better serialization performance.
 
 -->
+
 ## Storage
 
 Inside the [cosmos common significant](cosmos_common_significant), there is an object named ``types``.  
 It maps type identifiers found in the [type component](type_component) to the respective **entity type**.  
 Preferably, the container should be a constant size vector as the type ids will just be consecutive integers.  
-We will treat a type with blank name as not set.  
 
-Care must be taken that the storage is not treated like trivially copyable types during byte readwrite.
 
+Care must be taken that the storage is not treated like trivially copyable types during byte readwrite:
 A custom readwrite overloads will be in order, both for lua and binary, which will take note of which initial component values are set, and serialize only the according definitions;  
 At that point, serialization performance pretty much does not matter at all, and disk space may or may not come in handy.

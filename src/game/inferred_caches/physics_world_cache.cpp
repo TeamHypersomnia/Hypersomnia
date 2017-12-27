@@ -23,7 +23,6 @@
 
 #include "augs/templates/dynamic_cast_dispatch.h"
 #include "augs/build_settings/setting_debug_physics_world_cache_copy.h"
-#include "game/inferred_caches/relational_cache.h"
 
 bool physics_world_cache::rigid_body_cache_exists_for(const const_entity_handle handle) const {
 	return 
@@ -114,7 +113,6 @@ void physics_world_cache::destroy_cache_of(const const_entity_handle handle) {
 
 void physics_world_cache::infer_cache_for(const const_entity_handle handle) {
 	const auto& cosmos = handle.get_cosmos();
-	const auto& relational = cosmos.get_solvable_inferred().relational;
 
 	if (const bool is_already_constructed = rigid_body_cache_exists_for(handle)) {
 		return;

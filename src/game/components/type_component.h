@@ -45,6 +45,12 @@ public:
 
 	void change_type_to(const entity_type_id id) const; 
 
+	/* 
+		Usually, type of an entity stays the same until its death.
+		This function allows to change type of an already existing entity without changing its identity,
+		so that existing entity_ids pointing to that entity are not broken.
+	*/
+
 	template <class F>
 	void change_type_to(
 		const entity_type_id id,
