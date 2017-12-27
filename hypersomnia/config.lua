@@ -235,7 +235,7 @@ return {
   },
   launch_mode = "MAIN_MENU",
   main_menu = {
-    latest_news_url = "http://hypersomnia.pl/latest_post/",
+    latest_news_url = "http://hypersomnia.xyz/latest_post/",
     menu_intro_scene_entropy_path = "abc",
     menu_intro_scene_intercosm_path = "abc",
     menu_theme_path = "",

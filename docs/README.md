@@ -1,1 +1,1 @@
-This documentation project is hosted at [wiki.hypersomnia.pl](http://wiki.hypersomnia.pl).
+This documentation project is hosted at [wiki.hypersomnia.xyz](http://wiki.hypersomnia.xyz).

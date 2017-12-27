@@ -22,8 +22,8 @@ Set in a hypothetical afterlife reality, it shall provide joy through altruistic
 Declare allegiance to one of the three factions whose apple of discord is a disparity between prevailing notions of moral excellence.
 **Metropolis. Atlantis. Resistance.**
 
-See the game's [wiki](http://wiki.hypersomnia.pl) to get familiar with the universe.  
-To understand the repository's folder structure, make sure to read the [documentation](http://wiki.hypersomnia.pl/docs).
+See the game's [wiki](http://wiki.hypersomnia.xyz) to get familiar with the universe.  
+To understand the repository's folder structure, make sure to read the [documentation](http://wiki.hypersomnia.xyz/docs).
 
 ## Gallery
 
@@ -37,7 +37,7 @@ Watch gameplays on YouTube:
 ![enter image description here][3]
 ![enter image description here][4]
 
-  [1]: http://hypersomnia.pl/pics/summary.png
+  [1]: http://hypersomnia.xyz/pics/summary.png
   [8]: https://gifyu.com/images/16.main_menu_reup.png
   [3]: http://gifyu.com/images/23.light.png
   [4]: http://gifyu.com/images/30.smoke.png
@@ -169,7 +169,7 @@ Pull requests are welcomed, should they even be typo fixes, missing const guaran
 If you however plan to add a completely new feature, create a relevant [issue](https://github.com/TeamHypersomnia/Hypersomnia/issues) so that everybody knows about it,
 because the project is continuously in a very, very active development and may undergo a revolution when it is the least expected.
 
-For documentation, please make sure to read the [wiki](http://wiki.hypersomnia.pl) to learn about the game and the source code.
+For documentation, please make sure to read the [wiki](http://wiki.hypersomnia.xyz) to learn about the game and the source code.
 
 You will be added to [TeamHypersomnia](https://github.com/TeamHypersomnia) organization once at least one of your pull requests is accepted.
 
