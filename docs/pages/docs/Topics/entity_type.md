@@ -227,3 +227,11 @@ If the container was optimized for deterministic identificators, it could possib
 Note that types won't be altered during logic, usually only during the creation of content.  
 So, they could be stored in a fixed-sized container. **There can even be a vast performance improvement**. 
 -->
+
+<!--
+		- if a definition implies more than one component, perhaps they should be merged?
+		- That ensures that each component has a corresponding definition.
+		- missile will imply both missile and sender?
+			- we'll just add the sender component where necessary and where it wasn't yet added.
+			- the sender, child components will anyway be hidden from the author as they are detail.~~
+-->

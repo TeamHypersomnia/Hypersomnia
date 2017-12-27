@@ -62,10 +62,10 @@ bool basic_inventory_slot_handle<C>::is_physically_connected_until(const entity_
 	const auto* const maybe_item = get_container().template find<components::item>();
 
 	if (maybe_item) {
-		//if (maybe_item->current_slot.get_container().alive() && maybe_item->current_slot.get_container() == until_parent)
+		//if (maybe_item->get_current_slot().get_container().alive() && maybe_item->get_current_slot().get_container() == until_parent)
 		//	return should_item_here_keep_physical_body;
 		//else 
-		const auto slot = owner[maybe_item->current_slot];
+		const auto slot = owner[maybe_item->get_current_slot()];
 
 		if (slot.alive()) {
 			return std::min(should_item_here_keep_physical_body, slot.is_physically_connected_until(until_parent));
@@ -82,7 +82,7 @@ float basic_inventory_slot_handle<C>::calculate_density_multiplier_due_to_being_
 	const auto* const maybe_item = get_container().template find<components::item>();
 	
 	if (maybe_item) {
-		const auto slot = owner[maybe_item->current_slot];
+		const auto slot = owner[maybe_item->get_current_slot()];
 
 		if (slot.alive()) {
 			return density_multiplier * slot.calculate_density_multiplier_due_to_being_attached();
@@ -145,8 +145,8 @@ unsigned basic_inventory_slot_handle<C>::calculate_real_space_available() const 
 
 	const auto* const maybe_item = get_container().template find<components::item>();
 
-	if (maybe_item != nullptr && get_cosmos()[maybe_item->current_slot].alive()) {
-		return std::min(lsa, get_cosmos()[maybe_item->current_slot].calculate_real_space_available());
+	if (maybe_item != nullptr && get_cosmos()[maybe_item->get_current_slot()].alive()) {
+		return std::min(lsa, get_cosmos()[maybe_item->get_current_slot()].calculate_real_space_available());
 	}
 
 	return lsa;

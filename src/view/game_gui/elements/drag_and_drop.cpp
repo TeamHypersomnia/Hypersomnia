@@ -50,7 +50,7 @@ void drag_and_drop_callback(
 				const vec2i griddified = griddify(total_dragged_amount);
 
 				const auto this_button = context.dereference_location(item_button_in_item{ transfer_data.item_id });
-				const auto parent_slot = cosmos[item.template get<components::item>().current_slot];
+				const auto parent_slot = cosmos[item.template get<components::item>().get_current_slot()];
 				const auto parent_button = context.dereference_location(slot_button_in_container{ parent_slot.get_id() });
 
 				if (parent_slot->always_allow_exactly_one_item) {
@@ -183,7 +183,7 @@ std::optional<drag_and_drop_result> prepare_drag_and_drop_result(
 					}
 				}
 				else if (can_stack_entities(target_item_handle, dragged_item_handle)) {
-					simulated_transfer.target_slot = target_item_handle.template get<components::item>().current_slot;
+					simulated_transfer.target_slot = target_item_handle.template get<components::item>().get_current_slot();
 					was_pointing_to_a_stack_target = true;
 				}
 			}

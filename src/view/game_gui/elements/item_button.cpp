@@ -207,7 +207,7 @@ void item_button::draw_proc(
 	
 	const auto this_absolute_rect = this_tree_entry.get_absolute_rect();
 
-	auto parent_slot = cosmos[item.get<components::item>().current_slot];
+	auto parent_slot = cosmos[item.get<components::item>().get_current_slot()];
 
 	rgba inside_col = cyan;
 	rgba border_col = cyan;
@@ -276,7 +276,7 @@ void item_button::draw_proc(
 				size_t attachment_index = 1;
 
 				const auto iteration_lambda = [&](const const_entity_handle desc, const inventory_traversal& trav) {
-					const auto parent_slot = cosmos[desc.get<components::item>().current_slot];
+					const auto parent_slot = cosmos[desc.get<components::item>().get_current_slot()];
 
 					if (parent_slot.is_physically_connected_until(item)) {
 						auto attachment_sprite = desc.get<components::sprite>();
@@ -453,7 +453,7 @@ void item_button::rebuild_layouts(const game_gui_context context, const this_in_
 		this_id->rc.set_size(rounded_size);
 	}
 
-	auto parent_slot = cosmos[item.get<components::item>().current_slot];
+	auto parent_slot = cosmos[item.get<components::item>().get_current_slot()];
 
 	if (parent_slot->always_allow_exactly_one_item) {
 		const_dereferenced_location<slot_button_in_container> parent_button = context.dereference_location(slot_button_in_container{ parent_slot.get_id() });

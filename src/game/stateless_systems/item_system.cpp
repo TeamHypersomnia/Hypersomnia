@@ -177,7 +177,7 @@ void item_system::process_mounting_and_unmounting(const logic_step step) {
 			if (currently_mounted_item.alive()) {
 				auto& item = currently_mounted_item.get<components::item>();
 
-				if (item.current_slot != item_slot_transfers.mounting.intented_mounting_slot) {
+				if (item.get_current_slot() != item_slot_transfers.mounting.intented_mounting_slot) {
 					item_slot_transfers.interrupt_mounting();
 				}
 				else {

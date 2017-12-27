@@ -16,7 +16,7 @@ namespace components {
 	//					parent_maybe_item->request_unmount();
 	//			}
 	//
-	//			iterated_slot = parent_maybe_item->current_slot;
+	//			iterated_slot = parent_maybe_item->get_current_slot();
 	//		}
 	//		else
 	//			return;
@@ -33,7 +33,7 @@ namespace components {
 	//			auto* maybe_item = iterated_slot.container_entity.find<components::item>();
 	//
 	//			if (maybe_item)
-	//				iterated_slot = maybe_item->current_slot;
+	//				iterated_slot = maybe_item->get_current_slot();
 	//			else
 	//				return true;
 	//		}

@@ -194,7 +194,7 @@ containment_result query_containment_result(
 	containment_result output;
 	auto& result = output.result;
 
-	if (item.current_slot == target_slot) {
+	if (item.get_current_slot() == target_slot) {
 		result = containment_result_type::THE_SAME_SLOT;
 	}
 	else if (!slot.is_category_compatible_with(item_entity)) {
@@ -446,7 +446,7 @@ void perform_transfer(
 		return;
 	}
 
-	const auto previous_slot = cosmos[item.current_slot];
+	const auto previous_slot = cosmos[item.get_current_slot()];
 	const auto target_slot = cosmos[r.target_slot];
 
 	const auto previous_slot_container = previous_slot.get_container();
@@ -532,7 +532,7 @@ void perform_transfer(
 	) {
 		const auto& cosmos = descendant.get_cosmos();
 
-		const auto slot = cosmos[descendant.get<components::item>().current_slot];
+		const auto slot = cosmos[descendant.get<components::item>().get_current_slot()];
 		
 		entity_id owner_body = descendant;
 		bool should_fixtures_persist = true;

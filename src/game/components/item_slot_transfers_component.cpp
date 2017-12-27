@@ -15,7 +15,7 @@ namespace components {
 		//if (item) {
 		//	if (item->intended_mounting != item->current_mounting) {
 		//		operation.current_item = parent_container;
-		//		operation.intented_mounting_slot = item->current_slot;
+		//		operation.intented_mounting_slot = item->get_current_slot();
 		//
 		//		return operation;
 		//	}

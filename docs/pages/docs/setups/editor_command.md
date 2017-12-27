@@ -52,11 +52,12 @@ If there exists a value that fails to satisfy the above criteria, the following 
 - On changing to a problematic value, alter some other state (but it should be state invisible to the author) such that the problem no longer exists.
 - The bounds for the value prevent the author from setting a problematic value in the first place.
 
-<!---
 Existing problems with state consistency:
 - processing::processing_subject_categories needs be hidden and updated when components are removed.
--->
 
+Solutions to keep state consistency in check:
+- [Synchronizers](component_synchronizer). They always incrementally update the relevant inferred state. 
+- [Complete reinference](reinference). 
 
 ### Multiplicity
 

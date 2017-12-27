@@ -85,8 +85,8 @@ void resolve_density_of_associated_fixtures(const entity_handle id) {
 
 	const auto* const item = id.find<components::item>();
 
-	if (item != nullptr && cosmos[item->current_slot].alive() && cosmos[item->current_slot].is_physically_connected_until()) {
-		density_multiplier *= cosmos[item->current_slot].calculate_density_multiplier_due_to_being_attached();
+	if (item != nullptr && cosmos[item->get_current_slot()].alive() && cosmos[item->get_current_slot()].is_physically_connected_until()) {
+		density_multiplier *= cosmos[item->get_current_slot()].calculate_density_multiplier_due_to_being_attached();
 	}
 
 	const auto owner_body = id.get_owner_body();

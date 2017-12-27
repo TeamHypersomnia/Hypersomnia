@@ -27,11 +27,11 @@ D basic_inventory_mixin<C, D>::get_owning_transfer_capability() const {
 
 	const auto* const maybe_item = self.template find<components::item>();
 
-	if (!maybe_item || cosmos[maybe_item->current_slot].dead()) {
+	if (!maybe_item || cosmos[maybe_item->get_current_slot()].dead()) {
 		return cosmos[entity_id()];
 	}
 
-	return cosmos[maybe_item->current_slot].get_container().get_owning_transfer_capability();
+	return cosmos[maybe_item->get_current_slot()].get_container().get_owning_transfer_capability();
 }
 
 template <bool C, class D>
@@ -124,7 +124,7 @@ typename basic_inventory_mixin<C, D>::inventory_slot_handle_type basic_inventory
 		return self.get_cosmos()[inventory_slot_id()];
 	}
 
-	return self.get_cosmos()[maybe_item->current_slot];
+	return self.get_cosmos()[maybe_item->get_current_slot()];
 }
 
 template <bool C, class D>
