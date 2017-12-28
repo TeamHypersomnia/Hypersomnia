@@ -1166,13 +1166,14 @@ bool editor_setup::handle_unfetched_window_input(
 				}
 
 				auto& camera = *tab().panned_camera;
+				const auto scroll_amount = e.data.scroll.amount;
 
 				const auto old_zoom = camera.zoom;
-				const auto zoom_offset = 0.09f * camera.zoom * e.data.scroll.amount;
-				camera.zoom = std::clamp(camera.zoom + zoom_offset, 0.01f, 10.f);
-				const auto new_zoom = camera.zoom;
+				const auto zoom_offset = 0.09f * old_zoom * scroll_amount;
+				const auto new_zoom = std::clamp(old_zoom + zoom_offset, 0.01f, 10.f);
 				const auto zoom_point = world_cursor_pos;
-				
+
+				camera.zoom = new_zoom;	
 				camera.transform.pos += (1 - 1 / (new_zoom/old_zoom))*(zoom_point - camera.transform.pos);
 			}
 		}
