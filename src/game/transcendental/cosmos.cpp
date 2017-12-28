@@ -224,6 +224,12 @@ void cosmos::delete_entity(const entity_id e) {
 }
 
 void cosmos::delete_entity_with_children(const entity_id id) {
+	const auto handle = operator[](id);
+
+	if (handle.dead()) {
+		return;
+	}
+
 	destruction_queue q {id};
 	deletion_queue d;
 

@@ -10,19 +10,11 @@ void processing_lists_cache::destroy_cache_of(const const_entity_handle handle) 
 	const auto index = linear_cache_key(handle);
 
 	if (per_entity_cache[index].is_constructed) {
-		LOG("Cache destroyed: %x", handle.get_id());
-
 		for (auto& list : lists) {
 			erase_element(list, handle.get_id());
 		}
 
 		per_entity_cache[index] = cache();
-
-		entity_id ii;
-		ii.indirection_index = 2991;
-		ii.version = 1;
-
-		LOG("Found 2991:1:i %x", found_in(lists[processing_subjects::WITH_INTERPOLATION], ii));
 	}
 }
 
