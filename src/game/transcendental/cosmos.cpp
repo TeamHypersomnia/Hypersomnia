@@ -189,7 +189,7 @@ void cosmos::delete_entity(const entity_id e) {
 	}
 	
 	if (const auto current_slot = handle.get_current_slot()) {
-		detail_remove_item(current_slot, handle);
+		detail_unset_current_slot(handle);
 	}
 
 	const bool should_deactivate_inferred_state_to_avoid_repeated_regeneration 

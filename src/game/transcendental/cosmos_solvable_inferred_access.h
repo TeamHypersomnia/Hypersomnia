@@ -3,7 +3,7 @@
 #include "game/detail/inventory/inventory_slot_handle_declaration.h"
 
 void detail_add_item(const inventory_slot_handle handle, const entity_handle new_item);
-void detail_remove_item(const inventory_slot_handle handle, const entity_handle removed_item);
+void detail_unset_current_slot(const entity_handle removed_item);
 
 template <bool is_const, class component_type>
 class component_synchronizer;
@@ -25,7 +25,7 @@ class cosmos_solvable_inferred_access {
 	friend contact_listener;
 
 	friend void ::detail_add_item(const inventory_slot_handle handle, const entity_handle new_item);
-	friend void ::detail_remove_item(const inventory_slot_handle handle, const entity_handle removed_item);
+	friend void ::detail_unset_current_slot(const entity_handle removed_item);
 
 	cosmos_solvable_inferred_access() {}
 };

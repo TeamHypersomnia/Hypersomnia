@@ -50,7 +50,7 @@ void detail_add_item(const inventory_slot_handle handle, const entity_handle new
 	new_item.get_cosmos().get_solvable_inferred({}).relational.set_current_slot(new_item, handle.get_id());
 }
 
-void detail_remove_item(const inventory_slot_handle handle, const entity_handle removed_item) {
+void detail_unset_current_slot(const entity_handle removed_item) {
 	removed_item.get<components::item>().current_slot.unset();
 	removed_item.get_cosmos().get_solvable_inferred({}).relational.set_current_slot(removed_item, {});
 }
@@ -112,7 +112,7 @@ perform_transfer_result perform_transfer(
 		previous_container_transform = previous_slot_container.get_logic_transform();
 
 		if (whole_item_grabbed) {
-			detail_remove_item(previous_slot, transferred_item);
+			detail_unset_current_slot(transferred_item);
 		}
 
 		if (previous_slot.is_hand_slot()) {

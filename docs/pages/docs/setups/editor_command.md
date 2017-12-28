@@ -51,11 +51,15 @@ Care must be taken so that whatever field is exposed to the user:
 If there exists a value that fails to satisfy the above criteria, the following approaches can be taken:
 - Do not show the sensitive field to the author in the first place and let it stay the implementation detail.
 	- Example: though not at all intuivie at first a first glance, the **item component** (as opposed to the **definition**) should be completely immutable to the author. It should not be able to be deleted or added on demand.
+- Make information stateless.
+	- E.g.: make position_copying be considered in get_logic_transform calculations
+	- Make density and damping calculations be always dependent on the current driver ownership or sprint state? Performance might suffer, though.
 - On changing to a problematic value, alter some other state (but it should be state invisible to the author) such that the problem no longer exists.
 - The bounds for the value prevent the author from setting a problematic value in the first place.
 
 Existing problems with state consistency:
 - processing::processing_subject_categories needs be hidden and updated when components are removed.
+- if a car is deleted but the driver is not, the drive
 
 Solutions to keep state consistency in check:
 - [Synchronizers](component_synchronizer). They always incrementally update the relevant inferred state. 

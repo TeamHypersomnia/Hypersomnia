@@ -13,7 +13,7 @@ namespace augs {
 }
 
 void detail_add_item(const inventory_slot_handle handle, const entity_handle new_item);
-void detail_remove_item(const inventory_slot_handle handle, const entity_handle removed_item);
+void detail_unset_current_slot(const entity_handle removed_item);
 class cosmos;
 
 namespace components {
@@ -42,7 +42,7 @@ namespace components {
 
 		friend cosmos;
 		friend void ::detail_add_item(const inventory_slot_handle handle, const entity_handle new_item);
-		friend void ::detail_remove_item(const inventory_slot_handle handle, const entity_handle removed_item);
+		friend void ::detail_unset_current_slot(const entity_handle removed_item);
 
 		inventory_slot_id current_slot;
 
