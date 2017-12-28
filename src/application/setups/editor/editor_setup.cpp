@@ -1325,6 +1325,11 @@ bool editor_setup::handle_unfetched_window_input(
 			}
 
 			switch (k) {
+				case key::C: 
+					if (tab().selected_entities.size() == 1) { 
+						set_locally_viewed(*tab().selected_entities.begin()); 
+						return true;
+					}
 				case key::I: play(); return true;
 				case key::DEL: del(); return true;
 				case key::HOME: tab().panned_camera = std::nullopt; return true;
