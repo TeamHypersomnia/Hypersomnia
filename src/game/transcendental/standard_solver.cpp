@@ -6,7 +6,7 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/data_living_one_step.h"
 
-#include "game/detail/inventory/inventory_utils.h"
+#include "game/detail/inventory/perform_transfer.h"
 #include "game/detail/physics/contact_listener.h"
 
 #include "game/stateless_systems/movement_system.h"

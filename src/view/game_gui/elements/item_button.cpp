@@ -8,7 +8,7 @@
 
 #include "game/enums/item_category.h"
 #include "game/detail/inventory/inventory_slot.h"
-#include "game/detail/inventory/inventory_utils.h"
+#include "game/detail/inventory/perform_transfer.h"
 #include "game/components/sprite_component.h"
 #include "game/components/item_component.h"
 #include "game/components/fixtures_component.h"

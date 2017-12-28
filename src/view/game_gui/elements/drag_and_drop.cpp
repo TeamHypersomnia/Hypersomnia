@@ -6,7 +6,7 @@
 #include "view/game_gui/elements/grid.h"
 #include "view/game_gui/elements/character_gui.h"
 #include "game/components/item_component.h"
-#include "game/detail/inventory/inventory_utils.h"
+#include "game/detail/inventory/perform_transfer.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/logic_step.h"

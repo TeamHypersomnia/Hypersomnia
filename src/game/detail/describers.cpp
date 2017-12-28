@@ -13,7 +13,7 @@
 #include "game/components/sentience_component.h"
 #include "game/components/item_component.h"
 #include "game/components/catridge_component.h"
-#include "game/detail/inventory/inventory_utils.h"
+#include "game/detail/inventory/perform_transfer.h"
 #include "game/detail/inventory/inventory_slot.h"
 #include "game/detail/inventory/inventory_slot_id.h"
 #include "game/transcendental/cosmos.h"

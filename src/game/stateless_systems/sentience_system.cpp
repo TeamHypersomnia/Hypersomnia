@@ -25,7 +25,7 @@
 
 #include "game/detail/inventory/inventory_slot.h"
 #include "game/detail/inventory/inventory_slot_id.h"
-#include "game/detail/inventory/inventory_utils.h"
+#include "game/detail/inventory/perform_transfer.h"
 #include "game/detail/physics/physics_scripts.h"
 #include "game/detail/spells/spell_logic_input.h"
 
@@ -270,17 +270,8 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 		const auto* const container = subject.find<components::container>();
 
 		if (container) {
-			//drop_from_all_slots(subject, step);
-
 			const auto& container = subject.get<components::container>();
-
-			for (const auto& s : container.slots) {
-				for (const auto item_id : get_items_inside(subject, s.first)) {
-					const auto item = cosmos[item_id];
-
-					perform_transfer({ item, inventory_slot_id() }, step);
-				}
-			}
+			drop_from_all_slots(container, subject, step);
 		}
 
 		//

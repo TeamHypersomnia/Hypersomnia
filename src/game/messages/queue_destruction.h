@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 #include "message.h"
 
 namespace messages {
@@ -6,3 +7,5 @@ namespace messages {
 		queue_destruction(entity_id s) : message(s) {}
 	};
 }
+
+using destruction_queue = std::vector<messages::queue_destruction>;

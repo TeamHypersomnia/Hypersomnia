@@ -7,6 +7,8 @@
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/organization/for_each_component_type.h"
+#include "game/stateless_systems/destroy_system.h"
+#include "game/detail/inventory/perform_transfer.h"
 
 #include "augs/readwrite/lua_readwrite.h"
 #include "augs/readwrite/byte_readwrite.h"
@@ -182,6 +184,14 @@ void cosmos::delete_entity(const entity_id e) {
 		return;
 	}
 
+	if (const auto container = handle.find<components::container>()) {
+		drop_from_all_slots(*container, handle, [](const auto&){});
+	}
+	
+	if (const auto current_slot = handle.get_current_slot()) {
+		detail_remove_item(current_slot, handle);
+	}
+
 	const bool should_deactivate_inferred_state_to_avoid_repeated_regeneration 
 		= handle.is_inferred_state_activated()
 	;
@@ -211,6 +221,14 @@ void cosmos::delete_entity(const entity_id e) {
 	solvable.inferred.relational.handle_deletion_of_potential_parent(e);
 
 	solvable.free_entity(e);
+}
+
+void cosmos::delete_entity_with_children(const entity_id id) {
+	destruction_queue q {id};
+	deletion_queue d;
+
+	destroy_system().mark_queued_entities_and_their_children_for_deletion(q, d, *this);
+	destroy_system().perform_deletions(d, *this);
 }
 
 randomization cosmos::get_rng_for(const entity_id id) const {

@@ -69,6 +69,10 @@ public:
 	inventory_slot_id get_id() const;
 	operator inventory_slot_id() const;
 	operator basic_inventory_slot_handle<true>() const;
+
+	operator bool() const {
+		return alive();
+	}
 };
 
 const std::vector<entity_id>& get_items_inside(const const_entity_handle h, const slot_function s);

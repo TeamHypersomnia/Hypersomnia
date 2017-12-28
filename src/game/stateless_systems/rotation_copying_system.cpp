@@ -9,7 +9,7 @@
 #include "game/components/hand_fuse_component.h"
 #include "game/detail/inventory/inventory_slot_id.h"
 #include "game/detail/inventory/inventory_slot.h"
-#include "game/detail/inventory/inventory_utils.h"
+#include "game/detail/inventory/perform_transfer.h"
 
 #include "augs/ensure.h"
 

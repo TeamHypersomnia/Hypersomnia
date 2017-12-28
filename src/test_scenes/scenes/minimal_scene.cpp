@@ -13,7 +13,7 @@
 #include "game/organization/all_messages_includes.h"
 #include "game/transcendental/logic_step.h"
 
-#include "game/detail/inventory/inventory_utils.h"
+#include "game/detail/inventory/perform_transfer.h"
 
 namespace test_scenes {
 	void minimal_scene::populate(cosmos_common_significant& common) const {

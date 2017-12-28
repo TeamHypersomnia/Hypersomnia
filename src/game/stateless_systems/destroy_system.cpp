@@ -14,7 +14,7 @@
 
 #include "game/organization/all_component_includes.h"
 
-#include "game/detail/inventory/inventory_utils.h"
+#include "game/detail/inventory/perform_transfer.h"
 
 void destroy_system::mark_queued_entities_and_their_children_for_deletion(
 	const destruction_queue& queued, 
@@ -39,13 +39,6 @@ void destroy_system::perform_deletions(const deletion_queue& deletions, cosmos& 
 
 		if (subject.dead()) {
 			continue;
-		}
-
-		const auto current_slot = subject.get_current_slot();
-		const bool should_release_item_ownership = current_slot.alive();
-
-		if (should_release_item_ownership) {
-			detail_remove_item(current_slot, subject);
 		}
 
 		cosmos.delete_entity((*it).subject);

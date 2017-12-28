@@ -14,7 +14,8 @@ struct basic_item_slot_transfer_request {
 	int specified_quantity = -1;
 	float impulse_applied_on_drop = 2000.f;
 	bool force_immediate_mount = false;
-	pad_bytes<3> pad;
+	bool allow_unauthorized_transfers = false;
+	pad_bytes<2> pad;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const basic_item_slot_transfer_request& b) const {

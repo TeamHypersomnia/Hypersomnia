@@ -2,7 +2,7 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/logic_step.h"
 
-#include "game/detail/inventory/inventory_utils.h"
+#include "game/detail/inventory/perform_transfer.h"
 #include "game/components/rigid_body_component.h"
 #include "game/components/sprite_component.h"
 #include "game/components/fixtures_component.h"

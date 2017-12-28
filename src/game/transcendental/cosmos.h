@@ -78,6 +78,7 @@ public:
 
 	entity_handle clone_entity(const entity_id);
 	void delete_entity(const entity_id);
+	void delete_entity_with_children(const entity_id);
 
 	template <class F>
 	void for_each(

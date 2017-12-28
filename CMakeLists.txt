@@ -514,6 +514,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/transcendental/standard_solver.cpp"
 	"src/game/transcendental/cosmos_solvable.cpp"
 	"src/game/transcendental/cosmos_common.cpp"
+	"src/game/detail/inventory/perform_transfer.cpp"
 )
 
 if(BUILD_WINDOW_FRAMEWORK)

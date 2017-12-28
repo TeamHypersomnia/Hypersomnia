@@ -26,7 +26,7 @@
 #include "game/detail/inventory/item_slot_transfer_request.h"
 
 #include "ingredients.h"
-#include "game/detail/inventory/inventory_utils.h"
+#include "game/detail/inventory/perform_transfer.h"
 
 void add_muzzle_particles(
 	const entity_handle weapon,

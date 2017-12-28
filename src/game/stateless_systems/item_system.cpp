@@ -16,7 +16,7 @@
 #include "game/components/fixtures_component.h"
 #include "game/components/sentience_component.h"
 
-#include "game/detail/inventory/inventory_utils.h"
+#include "game/detail/inventory/perform_transfer.h"
 #include "game/detail/inventory/inventory_slot.h"
 #include "game/detail/inventory/inventory_slot_handle.h"
 #include "game/detail/entity_scripts.h"

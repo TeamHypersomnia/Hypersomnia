@@ -7,7 +7,7 @@
 #include "game/components/fixtures_component.h"
 #include "game/components/item_component.h"
 #include "game/components/item_slot_transfers_component.h"
-#include "game/detail/inventory/inventory_utils.h"
+#include "game/detail/inventory/perform_transfer.h"
 
 namespace ingredients {
 	void add_character_head_inventory(const logic_step step, entity_handle e) {

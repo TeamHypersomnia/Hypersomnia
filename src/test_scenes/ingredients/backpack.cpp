@@ -5,7 +5,7 @@
 #include "game/enums/item_category.h"
 #include "game/assets/all_logical_assets.h"
 
-#include "game/detail/inventory/inventory_utils.h"
+#include "game/detail/inventory/perform_transfer.h"
 #include "game/components/container_component.h"
 #include "game/components/item_component.h"
 

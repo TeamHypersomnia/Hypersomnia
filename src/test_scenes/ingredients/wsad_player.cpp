@@ -26,7 +26,7 @@
 
 #include "game/enums/filters.h"
 #include "game/enums/party_category.h"
-#include "game/detail/inventory/inventory_utils.h"
+#include "game/detail/inventory/perform_transfer.h"
 
 namespace prefabs {
 	void populate_character_types(entity_types& types) {

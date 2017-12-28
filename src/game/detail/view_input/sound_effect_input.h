@@ -1,5 +1,6 @@
 #pragma once
 #include "augs/pad_bytes.h"
+#include "game/assets/ids/sound_buffer_id.h"
 
 struct sound_effect_modifier {
 	// GEN INTROSPECTOR struct sound_effect_modifier

@@ -16,7 +16,7 @@
 
 #include "game/enums/filters.h"
 
-#include "game/detail/inventory/inventory_utils.h"
+#include "game/detail/inventory/perform_transfer.h"
 
 namespace prefabs {
 	void populate_grenade_types(entity_types& types) {

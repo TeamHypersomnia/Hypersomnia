@@ -69,7 +69,19 @@ public:
 
 	template <class T, bool C = !is_const, class = std::enable_if_t<C>>
 	void post_message(const T& msg) const {
-		return transient.messages.post(msg);
+		transient.messages.post(msg);
+	}
+
+	template <class T, bool C = !is_const, class = std::enable_if_t<C>>
+	void post_messages(const T& msgs) const {
+		transient.messages.post(msgs);
+	}
+
+	template <class T, bool C = !is_const, class = std::enable_if_t<C>>
+	void post_message_if(const std::optional<T>& msg) const {
+		if (msg.has_value()) {
+			transient.messages.post(*msg);
+		}
 	}
 
 	template <bool C = !is_const, class = std::enable_if_t<C>>

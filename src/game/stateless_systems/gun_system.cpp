@@ -14,7 +14,7 @@
 #include "game/messages/interpolation_correction_request.h"
 
 #include "game/detail/inventory/item_slot_transfer_request.h"
-#include "game/detail/inventory/inventory_utils.h"
+#include "game/detail/inventory/perform_transfer.h"
 
 #include "game/components/rigid_body_component.h"
 #include "game/components/missile_component.h"

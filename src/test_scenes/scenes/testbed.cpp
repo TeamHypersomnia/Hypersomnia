@@ -24,7 +24,7 @@
 #include "game/detail/describers.h"
 
 #include "game/messages/intent_message.h"
-#include "game/detail/inventory/inventory_utils.h"
+#include "game/detail/inventory/perform_transfer.h"
 
 #include "game/transcendental/logic_step.h"
 #include "game/transcendental/cosmic_delta.h"

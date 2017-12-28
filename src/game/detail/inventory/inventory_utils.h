@@ -6,20 +6,6 @@
 
 #define SPACE_ATOMS_PER_UNIT 1000
 
-#include "game/transcendental/step_declaration.h"
-
-void perform_transfer(
-	const item_slot_transfer_request, 
-	const logic_step step
-);
-
-template <class C, class step_type>
-void perform_transfers(const C requests, const step_type step) {
-	for (const auto r : requests) {
-		perform_transfer(r, step);
-	}
-}
-
 augs::constant_size_vector<item_slot_transfer_request, 4> swap_slots_for_items(
 	const const_entity_handle first, 
 	const const_entity_handle second 
@@ -46,7 +32,6 @@ containment_result query_containment_result(
 );
 
 enum class capability_relation {
-	BOTH_DEAD,
 	UNMATCHING,
 	THE_SAME,
 	PICKUP,
@@ -80,8 +65,3 @@ std::wstring format_space_units(unsigned);
 
 int count_charges_in_deposit(const_entity_handle item);
 int count_charges_inside(const_inventory_slot_handle);
-
-void drop_from_all_slots(entity_handle container, const logic_step);
-
-void detail_add_item(const inventory_slot_handle handle, const entity_handle new_item);
-void detail_remove_item(const inventory_slot_handle handle, const entity_handle removed_item);

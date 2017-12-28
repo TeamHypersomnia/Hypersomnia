@@ -9,7 +9,7 @@
 #include "game/components/item_component.h"
 #include "game/components/melee_component.h"
 
-#include "game/detail/inventory/inventory_utils.h"
+#include "game/detail/inventory/perform_transfer.h"
 
 namespace prefabs {
 	entity_handle create_cyan_urban_machete(const logic_step step, vec2 pos) {
