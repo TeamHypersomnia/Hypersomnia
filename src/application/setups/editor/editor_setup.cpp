@@ -1164,23 +1164,6 @@ bool editor_setup::handle_unfetched_window_input(
 	}
 
 	if (player_paused) {
-		if (e.msg == message::wheel) {
-			if (!tab().panned_camera.has_value()) {
-				tab().panned_camera = current_cone;
-			}
-
-			auto& camera = *tab().panned_camera;
-			const auto scroll_amount = e.data.scroll.amount;
-
-			const auto old_zoom = camera.zoom;
-			const auto zoom_offset = 0.09f * old_zoom * scroll_amount;
-			const auto new_zoom = std::clamp(old_zoom + zoom_offset, 0.01f, 10.f);
-			const auto zoom_point = world_cursor_pos;
-
-			camera.zoom = new_zoom;	
-			camera.transform.pos += (1 - 1 / (new_zoom/old_zoom))*(zoom_point - camera.transform.pos);
-		}
-
 		auto pan_scene = [&](const auto amount) {
 			if (!tab().panned_camera.has_value()) {
 				tab().panned_camera = current_cone;
@@ -1190,6 +1173,25 @@ bool editor_setup::handle_unfetched_window_input(
 
 			camera.transform.pos -= amount / camera.zoom;
 		};
+
+		auto zoom_scene = [&](const auto zoom_amount, const auto zoom_point) {
+			if (!tab().panned_camera.has_value()) {
+				tab().panned_camera = current_cone;
+			}
+
+			auto& camera = *tab().panned_camera;
+
+			const auto old_zoom = camera.zoom;
+			const auto zoom_offset = 0.09f * old_zoom * zoom_amount;
+			const auto new_zoom = std::clamp(old_zoom + zoom_offset, 0.01f, 10.f);
+
+			camera.zoom = new_zoom;	
+			camera.transform.pos += (1 - 1 / (new_zoom/old_zoom))*(zoom_point - camera.transform.pos);
+		};
+
+		if (e.msg == message::wheel) {
+			zoom_scene(e.data.scroll.amount, world_cursor_pos);
+		}
 
 		if (e.msg == message::mousemotion) {
 			if (common_input_state[key::RMOUSE]) {
@@ -1305,14 +1307,17 @@ bool editor_setup::handle_unfetched_window_input(
 				}
 			}
 
+			float zoom_amount = 1.f;
 			float pan_amount = 50.f;
 
 			if (has_ctrl) {
 				pan_amount *= 5;
+				zoom_amount *= 5;
 			}
 			
 			if (has_shift) {
 				pan_amount /= 5;
+				zoom_amount /= 5;
 			}
 
 			switch (k) {
@@ -1322,6 +1327,8 @@ bool editor_setup::handle_unfetched_window_input(
 				case key::DOWN: pan_scene(vec2(0, -pan_amount)); return true;
 				case key::RIGHT: pan_scene(vec2(-pan_amount, 0)); return true;
 				case key::LEFT: pan_scene(vec2(pan_amount, 0)); return true;
+				case key::MINUS: zoom_scene(-zoom_amount, world_screen_center); return true;
+				case key::EQUAL: zoom_scene(zoom_amount, world_screen_center); return true;
 				default: break;
 			}
 		}
