@@ -369,16 +369,16 @@ void editor_setup::perform_custom_imgui(
 					ImGui::Separator();
 
 #if BUILD_TEST_SCENES
-					if (item_if_tabs("Fill with minimal scene", "SHIFT+F5")) {
-						fill_with_minimal_scene(lua);
-					}
-
-					if (item_if_tabs("Fill with test scene")) {
+					if (item_if_tabs("Fill with test scene", "SHIFT+F5")) {
 						fill_with_test_scene(lua);
 					}
+
+					if (item_if_tabs("Fill with minimal scene", "CTRL+SHIFT+F5")) {
+						fill_with_minimal_scene(lua);
+					}
 #else
-					if (item_if_tabs_and(false, "Fill with minimal scene", "SHIFT+F5")) {}
-					if (item_if_tabs_and(false, "Fill with test scene")) {}
+					if (item_if_tabs_and(false, "Fill with test scene", "SHIFT+F5")) {}
+					if (item_if_tabs_and(false, "Fill with minimal scene", "CTRL+SHIFT+F5")) {}
 #endif
 				}
 				if (auto menu = scoped_menu("View")) {
@@ -1108,6 +1108,7 @@ bool editor_setup::handle_top_level_window_input(
 					switch (k) {
 						case key::E: open_containing_folder(); return true;
 						case key::TAB: prev_tab(); return true;
+						case key::F5: fill_with_minimal_scene(lua); return true;
 						default: break;
 					}
 				}
@@ -1125,7 +1126,7 @@ bool editor_setup::handle_top_level_window_input(
 
 			if (has_shift) {
 				switch (k) {
-					case key::F5: fill_with_minimal_scene(lua); return true;
+					case key::F5: fill_with_test_scene(lua); return true;
 				}
 			}
 
