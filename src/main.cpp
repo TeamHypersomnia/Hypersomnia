@@ -956,11 +956,11 @@ int work(const int argc, const char* const * const argv) try {
 
 						if constexpr(T::handles_window_input) {
 							/* 
-								Let's a setup fetch an input before IMGUI does,
+								Lets a setup fetch an input before IMGUI does,
 								For example when IMGUI wants to capture keyboard input.	
 							*/
 
-							return setup.handle_top_level_window_input(
+							return setup.handle_input_before_imgui(
 								_simulated_state, e, _window, _lua
 							);
 						}

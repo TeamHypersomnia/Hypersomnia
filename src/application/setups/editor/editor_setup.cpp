@@ -892,6 +892,10 @@ bool editor_setup::escape() {
 		current_popup = std::nullopt;
 		return true;
 	}
+	else if(!player_paused) {
+		player_paused = true;
+		return true;
+	}
 
 	return false;
 }
@@ -1077,7 +1081,7 @@ void editor_setup::close_tab() {
 	}
 }
 
-bool editor_setup::handle_top_level_window_input(
+bool editor_setup::handle_input_before_imgui(
 	const augs::event::state& common_input_state,
 	const augs::event::change e,
 
@@ -1321,6 +1325,7 @@ bool editor_setup::handle_unfetched_window_input(
 			}
 
 			switch (k) {
+				case key::I: play(); return true;
 				case key::DEL: del(); return true;
 				case key::HOME: tab().panned_camera = std::nullopt; return true;
 				case key::UP: pan_scene(vec2(0, pan_amount)); return true;

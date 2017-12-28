@@ -233,7 +233,7 @@ public:
 	void control(const cosmic_entropy&);
 	void accept_game_gui_events(const cosmic_entropy&);
 
-	bool handle_top_level_window_input(
+	bool handle_input_before_imgui(
 		const augs::event::state& common_input_state,
 		const augs::event::change change,
 
