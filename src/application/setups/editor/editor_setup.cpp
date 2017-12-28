@@ -1285,7 +1285,7 @@ bool editor_setup::handle_unfetched_window_input(
 		if (e.was_any_key_pressed()) {
 			const auto k = e.data.key.key;
 
-			const bool has_ctrl{ common_input_state[key::LCTRL] };
+			const bool has_ctrl{ common_input_state[key::LCTRL] || common_input_state[key::RCTRL] };
 			const bool has_shift{ common_input_state[key::LSHIFT] };
 
 			if (has_ctrl) {
@@ -1305,9 +1305,23 @@ bool editor_setup::handle_unfetched_window_input(
 				}
 			}
 
+			float pan_amount = 50.f;
+
+			if (has_ctrl) {
+				pan_amount *= 5;
+			}
+			
+			if (has_shift) {
+				pan_amount /= 5;
+			}
+
 			switch (k) {
 				case key::DEL: del(); return true;
 				case key::HOME: tab().panned_camera = std::nullopt; return true;
+				case key::UP: pan_scene(vec2(0, pan_amount)); return true;
+				case key::DOWN: pan_scene(vec2(0, -pan_amount)); return true;
+				case key::RIGHT: pan_scene(vec2(-pan_amount, 0)); return true;
+				case key::LEFT: pan_scene(vec2(pan_amount, 0)); return true;
 				default: break;
 			}
 		}
