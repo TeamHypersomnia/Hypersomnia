@@ -1159,140 +1159,127 @@ bool editor_setup::handle_unfetched_window_input(
 	const auto world_cursor_pos = current_cone.to_world_space(screen_size, mouse_pos);
 	const auto world_screen_center = current_cone.to_world_space(screen_size, screen_size/2);
 
+	if (!has_current_tab()) {
+		return false;
+	}
+
 	if (player_paused) {
 		if (e.msg == message::wheel) {
-			if (has_current_tab()) {
-				if (!tab().panned_camera.has_value()) {
-					tab().panned_camera = current_cone;
-				}
-
-				auto& camera = *tab().panned_camera;
-				const auto scroll_amount = e.data.scroll.amount;
-
-				const auto old_zoom = camera.zoom;
-				const auto zoom_offset = 0.09f * old_zoom * scroll_amount;
-				const auto new_zoom = std::clamp(old_zoom + zoom_offset, 0.01f, 10.f);
-				const auto zoom_point = world_cursor_pos;
-
-				camera.zoom = new_zoom;	
-				camera.transform.pos += (1 - 1 / (new_zoom/old_zoom))*(zoom_point - camera.transform.pos);
+			if (!tab().panned_camera.has_value()) {
+				tab().panned_camera = current_cone;
 			}
+
+			auto& camera = *tab().panned_camera;
+			const auto scroll_amount = e.data.scroll.amount;
+
+			const auto old_zoom = camera.zoom;
+			const auto zoom_offset = 0.09f * old_zoom * scroll_amount;
+			const auto new_zoom = std::clamp(old_zoom + zoom_offset, 0.01f, 10.f);
+			const auto zoom_point = world_cursor_pos;
+
+			camera.zoom = new_zoom;	
+			camera.transform.pos += (1 - 1 / (new_zoom/old_zoom))*(zoom_point - camera.transform.pos);
 		}
+
+		auto pan_scene = [&](const auto amount) {
+			if (!tab().panned_camera.has_value()) {
+				tab().panned_camera = current_cone;
+			}
+
+			auto& camera = *tab().panned_camera;
+
+			camera.transform.pos -= amount / camera.zoom;
+		};
 
 		if (e.msg == message::mousemotion) {
 			if (common_input_state[key::RMOUSE]) {
-				if (has_current_tab()) {
-					if (!tab().panned_camera.has_value()) {
-						tab().panned_camera = current_cone;
-					}
-					
-					auto& camera = *tab().panned_camera;
-
-					camera.transform.pos -= vec2(e.data.mouse.rel) * (settings.camera_panning_speed / camera.zoom);
-
-					return true;
-				}
+				pan_scene(vec2(e.data.mouse.rel) * settings.camera_panning_speed);
+				return true;
 			}
 			else {
 				hovered_entity = {};
 
-				if (has_current_tab()) {
-					{
-						const auto drag_dead_area = 3.f;
-						const auto drag_offset = world_cursor_pos - last_ldown_position;
-						
-						if (common_input_state[key::LMOUSE] && !drag_offset.is_epsilon(drag_dead_area)) {
-							rectangular_drag_origin = last_ldown_position;
-							held_entity = {};
-						}
+				{
+					const auto drag_dead_area = 3.f;
+					const auto drag_offset = world_cursor_pos - last_ldown_position;
+
+					if (common_input_state[key::LMOUSE] && !drag_offset.is_epsilon(drag_dead_area)) {
+						rectangular_drag_origin = last_ldown_position;
+						held_entity = {};
 					}
+				}
 
-					if (rectangular_drag_origin.has_value()) {
-						auto world_range = ltrb::from_points(*rectangular_drag_origin, world_cursor_pos);
+				if (rectangular_drag_origin.has_value()) {
+					auto world_range = ltrb::from_points(*rectangular_drag_origin, world_cursor_pos);
 
-						in_rectangular_selection.clear();
-						
-						const auto query = visible_entities_query{
-							work().world,
-							{ world_range.get_center(), 1.f },
-							world_range.get_size()
-						};
+					in_rectangular_selection.clear();
 
-						in_rectangular_selection.acquire_non_physical(query);
-						in_rectangular_selection.acquire_physical(query);
-					}
-					else {
-						hovered_entity = get_hovered_world_entity(
-							work().world, 
-							world_cursor_pos, 
-							[&](const entity_id id) { 
-								if (work().world[id].has<components::wandering_pixels>()) {
-									return false;
-								}
+					const auto query = visible_entities_query{
+						work().world,
+						{ world_range.get_center(), 1.f },
+						world_range.get_size()
+					};
 
-								return true; 
+					in_rectangular_selection.acquire_non_physical(query);
+					in_rectangular_selection.acquire_physical(query);
+				}
+				else {
+					hovered_entity = get_hovered_world_entity(
+						work().world, 
+						world_cursor_pos, 
+						[&](const entity_id id) { 
+							if (work().world[id].has<components::wandering_pixels>()) {
+								return false;
 							}
-						);
-					}
+
+							return true; 
+						}
+					);
 				}
 			}
 		}
 
 		if (e.was_pressed(key::SLASH)) {
-			if (has_current_tab()) {
-		  		go_to_entity();
-				return true;
-			}
+			go_to_entity();
+			return true;
 		}
 		else if (e.was_pressed(key::LMOUSE)) {
-			if (has_current_tab()) {
-				const bool has_ctrl{ common_input_state[key::LCTRL] };
+			const bool has_ctrl{ common_input_state[key::LCTRL] };
 
-				const auto world_cursor_pos = current_cone.to_world_space(
-					window.get_screen_size(),
-					common_input_state.mouse.pos
-				);
+			const auto world_cursor_pos = current_cone.to_world_space(
+				window.get_screen_size(),
+				common_input_state.mouse.pos
+			);
 
-				last_ldown_position = world_cursor_pos;
-				held_entity = hovered_entity;
+			last_ldown_position = world_cursor_pos;
+			held_entity = hovered_entity;
 
-				auto& selections = tab().selected_entities;
+			auto& selections = tab().selected_entities;
 
-				if (const bool new_selection = !has_ctrl) {
-					selections.clear();
-				}
-
-				return true;
+			if (const bool new_selection = !has_ctrl) {
+				selections.clear();
 			}
+
+			return true;
 		}
 		else if (e.was_released(key::LMOUSE)) {
-			if (has_current_tab()) {
-				const auto held = work().world[held_entity];
+			const auto held = work().world[held_entity];
 
-				if (held.alive()) {
-					const bool has_ctrl{ common_input_state[key::LCTRL] };
-					auto& selections = tab().selected_entities;
+			if (held.alive()) {
+				const bool has_ctrl{ common_input_state[key::LCTRL] };
+				auto& selections = tab().selected_entities;
 
-					if (has_ctrl && found_in(selections, held)) {
-						selections.erase(held);
-					}
-					else {
-						selections.emplace(hovered_entity);
-					}
+				if (has_ctrl && found_in(selections, held)) {
+					selections.erase(held);
+				}
+				else {
+					selections.emplace(hovered_entity);
 				}
 			}
 
 			held_entity = {};
 
 			finish_rectangular_selection();
-		}
-
-		if (e.was_pressed(key::HOME)) {
-			if (has_current_tab()) {
-				tab().panned_camera = std::nullopt;
-
-				return true;
-			}
 		}
 
 		if (e.was_any_key_pressed()) {
@@ -1319,8 +1306,9 @@ bool editor_setup::handle_unfetched_window_input(
 			}
 
 			switch (k) {
-			case key::DEL: del(); return true;
-			default: break;
+				case key::DEL: del(); return true;
+				case key::HOME: tab().panned_camera = std::nullopt; return true;
+				default: break;
 			}
 		}
 	}
