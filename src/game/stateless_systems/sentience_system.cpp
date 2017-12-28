@@ -275,7 +275,7 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 			const auto& container = subject.get<components::container>();
 
 			for (const auto& s : container.slots) {
-				for (const auto item_id : s.second.items_inside) {
+				for (const auto item_id : get_items_inside(subject, s.first)) {
 					const auto item = cosmos[item_id];
 
 					perform_transfer({ item, inventory_slot_id() }, step);

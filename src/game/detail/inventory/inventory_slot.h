@@ -13,6 +13,10 @@
 
 class cosmos;
 
+namespace augs {
+	struct introspection_access;
+}
+
 struct inventory_slot {
 	// GEN INTROSPECTOR struct inventory_slot
 	item_category category_allowed = item_category::GENERAL;
@@ -32,7 +36,6 @@ struct inventory_slot {
 	rectangle_sticking attachment_sticking_mode = rectangle_sticking::LEFT;
 	components::transform attachment_offset;
 
-	augs::constant_size_vector<entity_id, ITEMS_INSIDE_COUNT> items_inside;
 	// END GEN INTROSPECTOR
 
 	item_category_flagset get_allowed_categories() const;

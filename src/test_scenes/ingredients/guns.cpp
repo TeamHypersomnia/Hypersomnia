@@ -365,7 +365,10 @@ namespace prefabs {
 
 		if (load_mag.alive()) {
 			perform_transfer({ load_mag, weapon[slot_function::GUN_DETACHABLE_MAGAZINE] }, step);
-			perform_transfer({ load_mag[slot_function::ITEM_DEPOSIT].get_items_inside()[0], weapon[slot_function::GUN_CHAMBER], 1 }, step);
+
+			if (load_mag[slot_function::ITEM_DEPOSIT].has_items()) {
+				perform_transfer({ load_mag[slot_function::ITEM_DEPOSIT].get_items_inside()[0], weapon[slot_function::GUN_CHAMBER], 1 }, step);
+			}
 		}
 
 		return weapon;

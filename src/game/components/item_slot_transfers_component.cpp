@@ -22,7 +22,7 @@ namespace components {
 		//}
 		//else if (container) {
 		//	for (auto& s : container->slots) {
-		//		for (auto& i : s.second.items_inside) {
+			//		for (auto& i : s.second.get_items_inside()) {
 		//			operation = find_suitable_montage_operation(parent_container.get_cosmos()[i]);
 		//			
 		//			if (operation.alive())

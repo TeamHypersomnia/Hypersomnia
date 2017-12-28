@@ -14,7 +14,6 @@
 #include "game/components/item_slot_transfers_component.h"
 #include "game/components/item_component.h"
 #include "game/messages/item_picked_up_message.h"
-#include "game/messages/will_soon_be_deleted.h"
 
 #include "view/game_gui/game_gui_system.h"
 #include "view/game_gui/game_gui_element_location.h"

@@ -201,13 +201,14 @@ containment_result query_containment_result(
 		result = containment_result_type::INCOMPATIBLE_CATEGORIES;
 	}
 	else {
+		const auto& items = target_slot.get_items_inside();
+
+		/* TODO: If we want to do so, impose a limit on the number of items in a container here. */
+
 		const bool slot_would_have_too_many_items =
-			slot.items_inside.size() == slot.items_inside.capacity()
-			|| (
-				slot.always_allow_exactly_one_item
-				&& slot.items_inside.size() == 1
-				&& !can_stack_entities(cosmos[target_slot.get_items_inside().at(0)], item_entity)
-			)
+			slot.always_allow_exactly_one_item
+			&& items.size() == 1
+			&& !can_stack_entities(cosmos[target_slot.get_items_inside().at(0)], item_entity)
 		;
 
 		if (slot_would_have_too_many_items) {
@@ -313,7 +314,7 @@ int count_charges_in_deposit(const const_entity_handle item) {
 int count_charges_inside(const const_inventory_slot_handle id) {
 	int charges = 0;
 
-	for (const auto i : id->items_inside) {
+	for (const auto i : id.get_items_inside()) {
 		charges += id.get_cosmos()[i].get<components::item>().charges;
 	}
 
@@ -330,9 +331,10 @@ std::wstring format_space_units(const unsigned u) {
 
 void drop_from_all_slots(const entity_handle c, const logic_step step) {
 	const auto& container = c.get<components::container>();
+	const auto& cosm = step.get_cosmos();
 
 	for (const auto& s : container.slots) {
-		for (const auto item : s.second.items_inside) {
+		for (const auto item : get_items_inside(c, s.first)) {
 			perform_transfer( item_slot_transfer_request{ item, inventory_slot_id() }, step);
 		}
 	}
@@ -340,12 +342,13 @@ void drop_from_all_slots(const entity_handle c, const logic_step step) {
 
 unsigned calculate_space_occupied_with_children(const const_entity_handle item) {
 	auto space_occupied = item.get<components::item>().get_space_occupied();
+	const auto& cosm = item.get_cosmos();
 
 	if (item.find<components::container>()) {
 		ensure(item.get<components::item>().charges == 1);
 
 		for (const auto& slot : item.get<components::container>().slots) {
-			for (const auto entity_in_slot : slot.second.items_inside) {
+			for (const auto entity_in_slot : get_items_inside(item, slot.first)) {
 				space_occupied += calculate_space_occupied_with_children(item.get_cosmos()[entity_in_slot]);
 			}
 		}
@@ -355,14 +358,13 @@ unsigned calculate_space_occupied_with_children(const const_entity_handle item) 
 }
 
 void detail_add_item(const inventory_slot_handle handle, const entity_handle new_item) {
-	handle->items_inside.push_back(new_item);
 	new_item.get<components::item>().current_slot = handle;
+	new_item.get_cosmos().get_solvable_inferred({}).relational.set_current_slot(new_item, handle.get_id());
 }
 
 void detail_remove_item(const inventory_slot_handle handle, const entity_handle removed_item) {
-	auto& v = handle->items_inside;
-	erase_element(v, removed_item);
 	removed_item.get<components::item>().current_slot.unset();
+	removed_item.get_cosmos().get_solvable_inferred({}).relational.set_current_slot(removed_item, {});
 }
 
 components::transform get_attachment_offset(

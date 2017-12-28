@@ -81,7 +81,7 @@ private:
 				else if (slot_callback_result == recursive_callback_result::CONTINUE_AND_RECURSE) {
 					const bool is_this_slot_physical = does_this_item_remain_physical && s.second.makes_physical_connection();
 
-					for (const auto& id : s.second.items_inside) {
+					for (const auto& id : get_items_inside(this_item_handle, s.first)) {
 						const auto child_item_handle = cosm[id];
 						trav.parent_slot = this_slot_id;
 						trav.current_address.directions.back() = this_slot_id.type;

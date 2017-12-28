@@ -53,7 +53,7 @@ void components::gun::load_next_round(
 	auto& cosmos = step.get_cosmos();
 	const auto gun_entity = step.get_cosmos()[subject];
 
-	thread_local decltype(inventory_slot::items_inside) next_catridge_from;
+	thread_local std::vector<entity_id> next_catridge_from;
 	next_catridge_from.clear();
 
 	const auto chamber_magazine_slot = gun_entity[slot_function::GUN_CHAMBER_MAGAZINE];
@@ -216,11 +216,14 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 					response.catridge_definition = catridge_in_chamber.get<components::catridge>();
 
-					thread_local decltype(inventory_slot::items_inside) bullet_stacks;
+					thread_local std::vector<entity_id> bullet_stacks;
 					bullet_stacks.clear();
 
 					const auto pellets_slot = catridge_in_chamber[slot_function::ITEM_DEPOSIT];
 
+					thread_local destruction_queue destructions;
+					destructions.clear();
+					
 					if (pellets_slot.alive()) {
 						bullet_stacks = pellets_slot.get_items_inside();
 						
@@ -229,7 +232,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 							we must additionally queue the catridge itself
 						*/
 
-						step.post_message(messages::queue_destruction(catridge_in_chamber));
+						destructions.emplace_back(catridge_in_chamber);
 					}
 					else {
 						bullet_stacks.push_back(catridge_in_chamber);
@@ -305,7 +308,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 							shell_entity.add_standard_components(step);
 						}
 						
-						step.post_message(messages::queue_destruction(single_bullet_or_pellet_stack));
+						destructions.emplace_back(single_bullet_or_pellet_stack);
 					}
 
 					step.post_message(response);
@@ -314,8 +317,22 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 						by now every item inside the chamber is queued for destruction.
 						we do not clear items_inside by dropping them by perform_transfers 
 						to avoid unnecessary activation of the rigid bodies of the bullets, due to being dropped.
+
+						TODO: Maybe delete in-place with all children entities? This would need to probably move the logic inside destroy_system to the cosmos?
 					*/
-					chamber_slot->items_inside.clear();
+
+					{
+						deletion_queue q;
+
+						destroy_system().mark_queued_entities_and_their_children_for_deletion(destructions, q, cosmos);
+						destroy_system().perform_deletions(q, cosmos);
+					}
+
+					/*
+						Note that the above operation would happen automatically once all children entities are destroyed
+						(and thus their inferred relational caches are also destroyed)
+						But we need the result now so that the 
+					*/
 
 					if (gun.action_mode >= gun_action_type::SEMI_AUTOMATIC) {
 						components::gun::load_next_round(gun_entity, step);

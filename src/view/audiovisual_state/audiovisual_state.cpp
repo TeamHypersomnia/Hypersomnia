@@ -11,7 +11,6 @@
 #include "game/messages/health_event.h"
 #include "game/messages/item_picked_up_message.h"
 #include "game/messages/interpolation_correction_request.h"
-#include "game/messages/will_soon_be_deleted.h"
 
 #include "view/audiovisual_state/audiovisual_state.h"
 #include "view/audiovisual_state/systems/interpolation_system.h"

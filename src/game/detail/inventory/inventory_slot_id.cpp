@@ -28,6 +28,10 @@ template <class T>
 void basic_inventory_slot_id<T>::unset() {
 	*this = basic_inventory_slot_id();
 }
+template <class T>
+bool basic_inventory_slot_id<T>::is_set() const {
+	return *this != basic_inventory_slot_id();
+}
 
 template struct basic_inventory_slot_id<entity_id>;
 template struct basic_inventory_slot_id<entity_guid>;

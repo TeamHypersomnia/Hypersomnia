@@ -17,6 +17,8 @@ struct basic_inventory_slot_id {
 	basic_inventory_slot_id();
 	basic_inventory_slot_id(const slot_function, const id_type);
 
+	bool is_set() const;
+
 	void unset();
 
 	bool operator==(const basic_inventory_slot_id b) const;

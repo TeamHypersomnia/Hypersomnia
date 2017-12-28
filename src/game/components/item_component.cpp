@@ -27,7 +27,7 @@ namespace components {
 	//	inventory_slot_id iterated_slot = current_slot;
 	//
 	//	while (iterated_slot.alive()) {
-	//		if (iterated_slot->only_last_inserted_is_movable && (*iterated_slot->items_inside.rbegin()).find<components::item>() != this)
+		//		if (iterated_slot->only_last_inserted_is_movable && (*iterated_slot->get_items_inside().rbegin()).find<components::item>() != this)
 	//			return false;
 	//		else {
 	//			auto* maybe_item = iterated_slot.container_entity.find<components::item>();

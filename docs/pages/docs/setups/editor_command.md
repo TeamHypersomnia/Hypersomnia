@@ -49,6 +49,8 @@ Care must be taken so that whatever field is exposed to the user:
     - Efforts can be made, but this is virtually impossible to ensure. In any case, the author can always undo the problematic change.
 
 If there exists a value that fails to satisfy the above criteria, the following approaches can be taken:
+- Do not show the sensitive field to the author in the first place and let it stay the implementation detail.
+	- Example: though not at all intuivie at first a first glance, the **item component** (as opposed to the **definition**) should be completely immutable to the author. It should not be able to be deleted or added on demand.
 - On changing to a problematic value, alter some other state (but it should be state invisible to the author) such that the problem no longer exists.
 - The bounds for the value prevent the author from setting a problematic value in the first place.
 

@@ -165,7 +165,7 @@ void intent_contextualization_system::contextualize_movement_intents(const logic
 				if (e.intent == game_intent_type::SPACE_BUTTON) {
 					const auto hand = subject.get_primary_hand();
 
-					if (hand.alive() && hand->items_inside.size() > 0) {
+					if (hand.alive() && hand.get_items_inside().size() > 0) {
 						e.intent = game_intent_type::MELEE_TERTIARY_MOVE;
 						callee = hand.get_items_inside()[0];
 						callee_resolved = true;

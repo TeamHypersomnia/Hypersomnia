@@ -51,9 +51,7 @@ public:
 
 	bool is_child_of(const entity_id container_entity) const;
 
-	auto get_items_inside() const {
-		return get().items_inside;
-	}
+	const std::vector<entity_id>& get_items_inside() const;
 
 	bool has_items() const;
 	bool is_empty_slot() const;
@@ -72,6 +70,8 @@ public:
 	operator inventory_slot_id() const;
 	operator basic_inventory_slot_handle<true>() const;
 };
+
+const std::vector<entity_id>& get_items_inside(const const_entity_handle h, const slot_function s);
 
 template <bool C>
 inline basic_inventory_slot_handle<C>::basic_inventory_slot_handle(owner_reference owner, const inventory_slot_id raw_id) : owner(owner), raw_id(raw_id) {}

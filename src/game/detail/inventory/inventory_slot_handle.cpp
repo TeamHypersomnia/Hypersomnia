@@ -38,7 +38,7 @@ std::size_t basic_inventory_slot_handle<C>::get_hand_index() const {
 
 template <bool C>
 bool basic_inventory_slot_handle<C>::has_items() const {
-	return get().items_inside.size() > 0;
+	return get_items_inside().size() > 0;
 }
 
 template <bool C>
@@ -48,7 +48,7 @@ typename basic_inventory_slot_handle<C>::entity_handle_type basic_inventory_slot
 
 template <bool C>
 bool basic_inventory_slot_handle<C>::is_empty_slot() const {
-	return get().items_inside.size() == 0;
+	return get_items_inside().size() == 0;
 }
 
 template <bool C>
@@ -176,6 +176,15 @@ unsigned basic_inventory_slot_handle<C>::calculate_local_space_available() const
 	}
 
 	return lsa;
+}
+
+template <bool C>
+const std::vector<entity_id>& basic_inventory_slot_handle<C>::get_items_inside() const {
+	return get_cosmos().get_solvable_inferred().relational.get_items_of_slots().get_children_of(get_id());
+}
+
+const std::vector<entity_id>& get_items_inside(const const_entity_handle h, const slot_function s) {
+	return h.get_cosmos()[inventory_slot_id{s, h.get_id()}].get_items_inside();  
 }
 
 //template <bool C>

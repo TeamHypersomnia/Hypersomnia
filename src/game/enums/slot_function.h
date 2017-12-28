@@ -3,6 +3,7 @@
 enum class slot_function {
 	INVALID,
 
+	// GEN INTROSPECTOR enum class slot_function
 	ITEM_DEPOSIT,
 
 	GUN_CHAMBER,
@@ -16,6 +17,6 @@ enum class slot_function {
 
 	SHOULDER,
 	TORSO_ARMOR,
-	
+	// END GEN INTROSPECTOR
 	COUNT
 };

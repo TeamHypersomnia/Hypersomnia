@@ -270,6 +270,10 @@ namespace augs {
 				count = 0;
 			}
 		}
+
+		operator std::vector<value_type>() const {
+			return { begin(), end() };
+		}
 	};
 
 	// GEN INTROSPECTOR class augs::constant_size_vector class T unsigned const_count class dummy
@@ -294,6 +298,8 @@ namespace augs {
 		using base::assign;
 		using base::begin;
 		using base::end;
+		using value_type = typename base::value_type;
+		using base::operator std::vector<value_type>;
 
 		constant_size_vector() = default;
 
@@ -329,6 +335,8 @@ namespace augs {
 		using base::clear;
 		using base::begin;
 		using base::end;
+		using value_type = typename base::value_type;
+		using base::operator std::vector<value_type>;
 
 		constant_size_vector() = default;
 
