@@ -38,6 +38,31 @@ struct ingame_menu_gui {
 		const augs::event::change change,
 		B button_callback
 	) {
+		if (change.was_pressed(augs::event::keys::key::Q)) {
+			button_callback(ingame_menu_button_type::QUIT_TO_MENU);
+			return true;
+		}
+
+		if (change.was_pressed(augs::event::keys::key::R)) {
+			button_callback(ingame_menu_button_type::RESUME);
+			return true;
+		}
+
+		if (change.was_pressed(augs::event::keys::key::S)) {
+			button_callback(ingame_menu_button_type::SETTINGS);
+			return true;
+		}
+
+		if (change.was_pressed(augs::event::keys::key::B)) {
+			button_callback(ingame_menu_button_type::BROWSE_UNOFFICIAL_UNIVERSES);
+			return true;
+		}
+
+		if (change.was_pressed(augs::event::keys::key::C)) {
+			button_callback(ingame_menu_button_type::CONNECTION_INFO);
+			return true;
+		}
+
 		const auto gui_entropies = 
 			world.consume_raw_input_and_generate_gui_events(
 				context, 

@@ -38,6 +38,46 @@ struct main_menu_gui {
 		const augs::event::change change,
 		B button_callback
 	) {
+		if (change.was_pressed(augs::event::keys::key::E)) {
+			button_callback(main_menu_button_type::EDITOR);
+			return true;
+		}
+
+		if (change.was_pressed(augs::event::keys::key::L)) {
+			button_callback(main_menu_button_type::LOCAL_UNIVERSE);
+			return true;
+		}
+
+		if (change.was_pressed(augs::event::keys::key::S)) {
+			button_callback(main_menu_button_type::SETTINGS);
+			return true;
+		}
+
+		if (change.was_pressed(augs::event::keys::key::C)) {
+			button_callback(main_menu_button_type::CONNECT_TO_UNIVERSE);
+			return true;
+		}
+
+		if (change.was_pressed(augs::event::keys::key::O)) {
+			button_callback(main_menu_button_type::CONNECT_TO_OFFICIAL_UNIVERSE);
+			return true;
+		}
+
+		if (change.was_pressed(augs::event::keys::key::B)) {
+			button_callback(main_menu_button_type::BROWSE_UNOFFICIAL_UNIVERSES);
+			return true;
+		}
+
+		if (change.was_pressed(augs::event::keys::key::H)) {
+			button_callback(main_menu_button_type::HOST_UNIVERSE);
+			return true;
+		}
+
+		if (change.was_pressed(augs::event::keys::key::Q)) {
+			button_callback(main_menu_button_type::QUIT);
+			return true;
+		}
+
 		const auto gui_entropies = 
 			world.consume_raw_input_and_generate_gui_events(
 				context, 
