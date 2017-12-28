@@ -1,4 +1,6 @@
 #pragma once
+#include <optional>
+
 #include "game/messages/queue_destruction.h"
 #include "game/messages/item_picked_up_message.h"
 #include "game/messages/interpolation_correction_request.h"

@@ -9,7 +9,7 @@ namespace augs {
 	class component_aggregate; 
 }
 
-struct cosmic_delta;
+class cosmic_delta;
 
 class cosmos_solvable_access {
 	/*

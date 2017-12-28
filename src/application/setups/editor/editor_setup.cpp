@@ -765,7 +765,7 @@ void editor_setup::perform_custom_imgui(
 				for (const auto& m : matching_go_to_entities) {
 					if (current_index == go_to_entities_selected_index) {
 						bool s = true;
-						ImGui::PushID(reinterpret_cast<void*>(current_index));
+						ImGui::PushID(static_cast<int>(current_index));
 						ImGui::Selectable("##gotoentity", &s);
 						ImGui::PopID();
 						ImGui::SameLine(0.f, 0.f);
