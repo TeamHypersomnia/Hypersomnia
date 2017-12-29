@@ -4,8 +4,7 @@ tags: [topics, ECS]
 hide_sidebar: true
 permalink: message
 summary: |
-    A **message** is a piece of information generated when a [stateless system](stateless_system) runs its logic.  
-    A message, after being written to a [**message queue**](message_queue), can later be read and executed by one or more unrelated [systematic functions](systematic_function).
+    A **message** is a piece of information that, after being written to a [**message queue**](message_queue), can later be read and executed by one or more [systematic functions](systematic_function) that are completely unrelated to the one that has generated the message.
 ---
 
 ## Overview

@@ -59,7 +59,7 @@ If there exists a value that fails to satisfy the above criteria, the following 
 
 Existing problems with state consistency:
 - processing::processing_subject_categories needs be hidden and updated when components are removed.
-- if a car is deleted but the driver is not, the drive
+- if a car is deleted but the driver is not, the driver might be left with dangling properties
 
 Solutions to keep state consistency in check:
 - [Synchronizers](component_synchronizer). They always incrementally update the relevant inferred state. 

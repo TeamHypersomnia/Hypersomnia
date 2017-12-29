@@ -3,7 +3,7 @@ title: Inferred cache
 tags: [topics, ECS] 
 hide_sidebar: true
 permalink: inferred_cache
-summary: An **inferred cache** is a portion of state that only ever exists at [run time](https://en.wikipedia.org/wiki/Run_time_(program_lifecycle_phase)) and can always be completely generated from some [significant state](significant_state).
+summary: An **inferred cache** is a portion of state that only ever exists at [run time](https://en.wikipedia.org/wiki/Run_time_(program_lifecycle_phase)) *and* can always be completely generated from some [significant state](significant_state).
 ---
 
 ## Etymology
@@ -120,5 +120,5 @@ Iterating two distinct ``std::unordered_map``s and expecting the order to be the
 However, once we reinfer the map, we pass it elements (entity names) in a possibly completely different order from when it was incrementally kept up to date - entity creations, deletions and renames might have happened arbitrarily. Which means that our inferred cache is not quite identical to the one before reinference, even though they were generated from the same significant state. 
 
 This is an important implication when dealing with simulation's [determinism](determinism).  
-For example, if one client needs to completely [reinfer](reinference) from their significant state, all others should do the same so that the simulation does not diverge across machines.  
+For example, if one client needs to completely [reinfer](reinference) from their significant state, all others **should reinfer too**, so that the simulation does not diverge across machines.  
 This is particularly important when dealing with [``physics_cache``](physics_cache), which also keeps all contact information in a ``b2World``.

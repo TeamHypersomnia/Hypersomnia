@@ -3,7 +3,7 @@ title: Stateless system
 tags: [topics, ECS] 
 hide_sidebar: true
 summary: |
-    A [system](system) is called *stateless* if the side effects of all of its [systematic functions](systematic_function) are limited to the fields of the [logic step](logic_step) (or just the [cosmos](cosmos)) that each takes as input.
+    A [system](system) is called *stateless* if the side effects of all of its [systematic functions](systematic_function) are limited to the [cosmos solvable](cosmos#solvable) or [message queues](message_queue); objects that are usually given as input through a [logic step](logic_step) object.
 permalink: stateless_system
 ---
 

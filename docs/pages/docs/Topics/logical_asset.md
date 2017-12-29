@@ -4,33 +4,18 @@ tags: [topics, flyweights]
 hide_sidebar: true
 permalink: logical_asset
 summary: | 
-  A **logical asset** is an object that, given a particular [viewable](viewable), holds only that part of whose knowledge is necessary for [solvers](solver) (the game *logic*).  
-  It is always completely regenerable from the given viewable.
+  A **logical asset** is a piece of information that is stored once and may be referenced by ids throughout the entire [cosmos](cosmos).  
+  Formally, it is a [flyweight](flyweight) whose instance is an integer identifier.  
+  
+  While [entity types](entity_type) exist to be shared between entities, a **logical asset** can be shared even by entity types themselves.
+  
 ---
 
-## Notes
+## Overview
 
-One may be tempted to think of logical assets as of another case of [inferred cache](inferred_cache).  
-That is not quite the case, because logical assets might be serialized to the disk so that an [intercosm](intercosm) is guaranteed to play correctly, regardless if some viewables change on the disk.  
-For example, someone may replace an image or a sound on the disk, effectively giving it different dimensions or duration, but, as we have saved the original value of logical assets,  
-we may still use them, keeping the behaviour of the simulation identical, despite the viewables now looking different.  
-Thus, logical assets are indeed **inferred**, but they are not **caches**.  
+Examples of a logical asset:
+- a physical material, containing a matrix of sound identificators for collisions.
+- a recoil player, containing a vector of forces to be applied to a gun when it is firing. 
 
-## Examples
-
-A definition of a game sound, which is a *viewable*, contains a path to the sound file.  
-However, the game logic needs no such information.  
-It may need, however, to know the duration of the sound, to know when to delete the entity containing the corresponding [sound existence component](sound_existence_component).  
-The distinction comes here:  
-- A *viewable* may contain a path to the resource file.
-- A **logical asset** may contain something like the duration in seconds, or width and height in pixels. 
-
-## Further work
-<!-- TODO -->
-
-Animation, recoil player and physical material currently have no "viewable" counterpart, but they are nevertheless logical assets in the code.  
-Under the current definitions, they should be part of [entity types](entity_type), but maybe it makes sense to share animations and materials?  
-It, however, makes little sense to make a physical material a viewable as it may very well influence state of the simulation (sounds etc.).
-The recoil player could very well be a part of gun definition.
-
-We might change the definition of a logical asset not to be tied to a viewable whatsoever; only that it is a resource not tied to any entity type.
+There also exist logical assets that are not directly defined by the [author](author), but are generated automatically from a given [viewable](viewable).  
+In this case, such a logical asset is called a [logical viewable](logical_viewable).

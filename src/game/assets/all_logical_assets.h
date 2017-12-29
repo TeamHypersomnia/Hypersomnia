@@ -44,13 +44,15 @@ struct particle_effect_logical {
 #include "augs/misc/trivially_copyable_tuple.h"
 
 using tuple_of_logical_assets = augs::trivially_copyable_tuple<
-	asset_map<assets::game_image_id, game_image_logical>,
-	asset_map<assets::particle_effect_id, particle_effect_logical>,
-	asset_map<assets::sound_buffer_id, sound_buffer_logical>,
-
+	/* Standalone logical assets */
 	asset_map<assets::animation_id, animation>,
 	asset_map<assets::recoil_player_id, recoil_player>,
-	asset_map<assets::physical_material_id, physical_material>
+	asset_map<assets::physical_material_id, physical_material>,
+
+	/* Logical viewables - generated */
+	asset_map<assets::game_image_id, game_image_logical>,
+	asset_map<assets::particle_effect_id, particle_effect_logical>,
+	asset_map<assets::sound_buffer_id, sound_buffer_logical>
 >;
 #else
 #include <tuple>
