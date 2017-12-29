@@ -5,7 +5,7 @@ hide_sidebar: true
 permalink: cosmos_solvable
 summary: |
     There exist two *equivalent* definitions for a **cosmos solvable**:  
-    1. that part of the [replicated state](replicated_state) which is in any way mutable by a [solver](solver);  
+    1. that part of the entire game's [replicated state](replicated_state) which is in any way mutable by a [solver](solver);  
     2. that, which stores [entities](entities), [components](components), the [cosmos clock](cosmos_clock) and all [caches inferred](inferred_state) from the three.  
 
 

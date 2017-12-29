@@ -5,7 +5,7 @@ hide_sidebar: true
 permalink: solver
 summary: |
    A **solver** is a free-standing function that, given a [logic step input](logic_step#input) and *pre/post solve callbacks*,  
-   instantiates a [logic step](logic_step) on the stack and moves the [cosmos](cosmos) forward in time.
+   instantiates a [logic step](logic_step) on the stack and moves the [cosmos solvable](cosmos_solvable) forward in time.
 ---
 
 ## Overview

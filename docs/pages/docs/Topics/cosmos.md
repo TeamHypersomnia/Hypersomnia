@@ -7,6 +7,8 @@ summary: |
     The **cosmos** stores [cosmos common](cosmos_common) and [cosmos solvable](cosmos_solvable).  
     The class itself only exists to tie these two functionalities into a single, comfortable object;  
     it provides many handy helper functions to perform common operations that require both of these objects.  
+
+    The entire state of the cosmos is considered [replicated](replicated_state).
 ---
 
 ## Overview

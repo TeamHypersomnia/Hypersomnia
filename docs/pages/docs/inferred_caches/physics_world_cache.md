@@ -6,7 +6,7 @@ permalink: physics_world_cache
 summary: | 
   A **physics world cache** is a [cache](inferred_cache) inferred from the contents of all [rigid body components](rigid_body_component), [fixtures components](fixtures_component)  
   and all types of joint components (e.g. [motor joint component](motor_joint_component)).  
-  In practice, it means that it stores the physics world object (e.g. Box2D's ``b2World``) and its native body, fixture, shape and joint types.  
+  In practice, it means that it stores the physics world object (e.g. Box2D's ``b2World``) and pointers to its native body, fixture, shape and joint types.  
 ---
 
 ## Copy-assignment operator

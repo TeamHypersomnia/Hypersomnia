@@ -33,6 +33,7 @@ Most of the time, only the programmers are concerned with the second type of dat
 	- It is a separate stage that never occurs in logic itself.
 		- In fact, the [logic step](logic_step) simply provides only const getters for the type information.
 	- Should only be done by [authors](author).
+	- In particular, types can be deleted, in which case the [vector of types](#storage) will have to be shrunk. Then we will need to remap types of all existing entities.
 	- In particular, the **enabled** flags for definitions may change even though some entities of this type already exist.
 		- We warn the author and ask if the existent entities should be recreated with new components with new initial values (preserving what was already set).
 			- The warning can be ticked to never pop up again.

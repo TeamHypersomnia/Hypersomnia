@@ -4,7 +4,7 @@ tags: [topics, ECS]
 hide_sidebar: true
 permalink: cosmos_clock
 summary: |
-    The **``cosmos_clock``** is an object holding the current step number, the fixed delta time and the [entity guid](entity_guid) to be assigned to the next created entity.  
+    The **cosmos clock** is an object holding the current step number, the fixed delta time and the [entity guid](entity_guid) to be assigned to the next created entity.  
     It is a part of the [cosmos's solvable significant](cosmos_solvable#significant).
 ---
 

@@ -17,6 +17,11 @@ class cosmos_solvable_access {
 		as they take proper precautions to keep state consistent or otherwise refresh it.
 	*/
 
+	/*
+		Note that, additionally, all cosmos functons can mutate the solvable state.
+		We might want to make some of the cosmos member functions free-standing so that they don't have write access automatically.
+	*/
+
 	friend cosmic_delta;
 
 	template <bool is_const>
