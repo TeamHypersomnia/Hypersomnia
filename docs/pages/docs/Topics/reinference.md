@@ -9,4 +9,4 @@ summary: |
 
 ## Examples
 
-- When a [cosmos](cosmos) receives new [significant state](cosmos#significant), either from disk or through the network, it must perform reinference so that the inferred caches remain consistent.
+- When a [cosmos](cosmos) receives new solvable [significant state](cosmos_solvable#significant), either from disk or through the network, it must perform reinference so that the inferred caches remain consistent.

@@ -176,7 +176,7 @@ See [main article](editor_setup#inferred-state).
 
 ## Storage
 
-Inside the [cosmos common significant](cosmos_common_significant), there is an object named ``types``.  
+Inside the [cosmos common significant](cosmos_common#significant), there is an object named ``types``.  
 It maps type identifiers found in the [type component](type_component) to the respective **entity type**.  
 Preferably, the container should be a constant size vector as the type ids will just be consecutive integers.  
 

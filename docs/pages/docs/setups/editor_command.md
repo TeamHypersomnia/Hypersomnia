@@ -13,11 +13,11 @@ summary: |
 As for determinism of the editor commands, it is debatable if it must be as strict as during networking.
  
 Those approaches to command implementation have been considered so far:
-1. With each command, store a snapshot of both the cosmos's entire [significant state](cosmos#significant) and [inferred state](cosmos#inferred). Additionally, store only the new value for redoing, as undoing is already possible thanks to the snapshot. 
+1. With each command, store a snapshot of both the solvable's entire [significant state](cosmos_solvable#significant) and [inferred state](cosmos_solvable#inferred). Additionally, store only the new value for redoing, as undoing is already possible thanks to the snapshot. 
     - Maximum determinism.
     - Easiest to get right without bugs.
     - Unacceptable memory and processing performance.
-2. With each command, store a snapshot of the cosmos's entire [significant](cosmos#significant) state. Additionally, store only the bytes of the new value for redoing, as undoing is already possible thanks to the snapshot. [Reinfer](reinference) on undo.
+2. With each command, store a snapshot of the solvable's entire [significant](cosmos_solvable#significant) state. Additionally, store only the bytes of the new value for redoing, as undoing is already possible thanks to the snapshot. [Reinfer](reinference) on undo.
     - Slightly less determinism.
         - If the author has done undo and then redo, their further actions and recordings might result in a different cosmos than if they would have stayed on the current change.
     - Unacceptable memory and processing performance.
@@ -132,13 +132,13 @@ If you are not a programmer and only intend to use the editor to author actual c
 There are several classes defined for commands that change a value.
 Generally, they should follow this format:
 
-- The kind of object that has changed (the [cosmos common significant](cosmos_common_significant) or the [component](component) type).
+- The kind of object that has changed (e.g. the type of the component, the [cosmos common significant](cosmos_common#significant)).
 - Given the type, an introspective index of the changed field.
 - A vector of bytes representing the new value (for execution).
 - A vector of bytes representing the old value (for undoing).
 
-Writing chunks of bytes *to* and *from* the [significant state](cosmos#significant) should be entirely deterministic.  
-What happens with the [inferred state](cosmos#inferred) on undos and redos is considered [above](#considerations). 
+Writing chunks of bytes *to* and *from* the solvable's [significant state](cosmos_solvable#significant) should be entirely deterministic.  
+What happens with the [inferred state](cosmos_solvable#inferred) on undos and redos is considered [above](#considerations). 
 
 #### Type granularity
 
