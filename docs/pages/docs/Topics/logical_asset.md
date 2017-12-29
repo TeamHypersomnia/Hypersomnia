@@ -19,3 +19,7 @@ Examples of a logical asset:
 
 There also exist logical assets that are not directly defined by the [author](author), but are generated automatically from a given [viewable](viewable).  
 In this case, such a logical asset is called a [logical viewable](logical_viewable).
+
+## Storage
+
+Currently, the **logical assets** are stored in an *intercosm*, as 

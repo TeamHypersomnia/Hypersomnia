@@ -11,7 +11,7 @@ summary: |
 
 A definition of a game sound, which is a *viewable*, contains a path to the sound file.  
 However, the game logic needs no such information.  
-It may need, however, to know the duration of the sound, to know when to delete the entity containing the corresponding [sound existence component](sound_existence_component).  
+It may need, however, to know the duration of the sound, to know after how long to delete the entity containing the corresponding [sound existence component](sound_existence_component).  
 The distinction comes here:  
 - A *viewable* may contain a path to the resource file.
 - A **logical viewable** may contain something like the duration in seconds, or width and height in pixels. 

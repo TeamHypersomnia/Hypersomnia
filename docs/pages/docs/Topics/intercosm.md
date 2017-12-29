@@ -10,7 +10,7 @@ summary: |
 ## Overview
 
 An intercosm is the exact minimum that is needed to run an interactive simulation of the game.  
-It serves a similar purpose to what is referred to as a "game map" in other games.  
+It serves a purpose that is similar to that of "game maps" in other projects.
 
 ## Inside editor
 
