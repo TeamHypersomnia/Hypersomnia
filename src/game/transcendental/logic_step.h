@@ -5,7 +5,6 @@
 #include "game/stateless_systems/destroy_system.h"
 
 struct data_living_one_step;
-struct all_logical_assets;
 struct cosmos_common_significant;
 
 template <bool C>
@@ -14,10 +13,9 @@ struct basic_logic_step_input {
 
 	cosmos_ref cosm;
 	const cosmic_entropy& entropy;
-	const all_logical_assets& logical_assets;
 
 	operator const_logic_step_input() const {
-		return { cosm, entropy, logical_assets };
+		return { cosm, entropy };
 	}
 };
 
@@ -47,7 +45,7 @@ public:
 	}
 
 	const auto& get_logical_assets() const {
-		return input.logical_assets;
+		return input.cosm.get_common_significant().logical_assets;
 	}
 
 	auto get_delta() const {

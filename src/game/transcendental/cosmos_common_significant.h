@@ -14,6 +14,8 @@
 #include "game/detail/perks/all_perks.h"
 #include "game/detail/all_sentience_meters.h"
 
+#include "game/assets/all_logical_assets.h"
+
 using meter_tuple = meter_list_t<std::tuple>;
 using spell_tuple = spell_list_t<std::tuple>;
 using perk_tuple = perk_list_t<std::tuple>;
@@ -23,6 +25,8 @@ using perk_meta_id = type_in_list_id<meter_tuple>;
 
 struct cosmos_common_significant {
 	// GEN INTROSPECTOR struct cosmos_common_significant
+	all_logical_assets logical_assets;
+
 	visibility_settings visibility;
 	pathfinding_settings pathfinding;
 	si_scaling si;

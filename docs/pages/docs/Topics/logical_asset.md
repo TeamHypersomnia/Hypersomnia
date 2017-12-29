@@ -6,6 +6,7 @@ permalink: logical_asset
 summary: | 
   A **logical asset** is a piece of information that is stored once and may be referenced by ids throughout the entire [cosmos](cosmos).  
   Formally, it is a [flyweight](flyweight) whose instance is an integer identifier.  
+  They are stored in the significant part of the [cosmos common](cosmos_common).
   
   While [entity types](entity_type) exist to be shared between entities, a **logical asset** can be shared even by entity types themselves.
   
