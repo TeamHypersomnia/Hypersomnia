@@ -94,14 +94,26 @@ take for example terrain: each of its pieces might possibly have a completely di
 especially if it is some kind of curvy corridor or dungeon.  
 These terrain pieces might, to the exception of their shape, behave identically, so it would make sense to have just one type for them.
 
+~~Another case is names and custom names.~~  
+Names are completely transparent to the logic so custom names will be managed only by domains that need it (client setup with custom nicknames, editor setup with custom overridden names just for marking, etc).
+
 In that case, we may:
 - Leave things as they are.
-	- We require the [author](author) to create a new type for each of the piece;
-		- or somehow facilitate this or maybe do this under the hood?
+	- **Chosen solution**: We require the [author](author) to create a new type for each of the piece;
+		- the editor shall, obviously, facilitate this to the utmost. 
+		- while each type will have their own copy of data for speed, the editor can associate types and enable per-definition overrides, so we could create a new type from an existing base type.
+			- a type could be per-entity or per-
 	- Conceptually the easiest.
+	- **Easiest to get right**.
+		- We can always improve it if needed.
 	- Most memory wasted.
+		- But not necessarily: no additional identifiers inside aggregates will be needed.
 	- Lowest flexibility, e.g. the solver can't alter that state or it may with additional effort to make that information stateless.
-- Enable dynamical overrides.
+		- The solver shall not alter definition state.
+		- If we find that it would be nice to actually alter that definition state, it might be the case that we should always calculate this value from some other circumstances and not just read it straight from the definition. Just like we do with ``resolve_density_of_associated_fixtures`` or ``resolve_dampings_of_body`` 
+- ~~Enable dynamical overrides.~~
+
+<!--
 	- Mutable or not, by the solver.
 		- Preferably not, but it might be useful when partitioning polygons into destructed pieces.
 	- They would take precedence over what would possibly be found in the correspondent definitions in the type.
@@ -114,7 +126,7 @@ In that case, we may:
 		- Least memory wasted.
 		- Best performance as the override checks will be limited to several specific domains.
 		- Medium-hard conceptually.
-			- Additionally, it will be pretty much known from the get-go which data is possibly altered.
+	CCCCCCCCCC		- Additionally, it will be pretty much known from the get-go which data is possibly altered.
 			- Nobody will also be surprised if the solver needs to alter that state, because they are plain components.
 		- Good flexibility, until something unexpected needs to change.
 	- **Solution**: create overrides for definitions and let an entity have its own set of definitions, if so is required.
@@ -134,8 +146,9 @@ In that case, we may:
 		- If there are just a few, than having a dynamic component id for each possible override actually costs more in terms of aggregate size.
 		- If there are many, then yes, per-entity overrides are worse. 
 		- The actual serialized size should stay pretty much the same.
+-->
 
-
+<!--
 ### Simple per-field overrides
 
 Consider this: usually, we specify damping values once for a given type of physical entity.  
@@ -147,6 +160,9 @@ Two approaches can be taken:
 
 We'll probably use scalars most of the time.
 
+COMMENTED OUT: Such things will be calculated statelessly.
+-->
+
 ### Polygon shape concern
 
 Deserves a separate topic because it is the biggest component currently, second only to the [container component](container_component).  
@@ -156,24 +172,14 @@ That was not at all efficient.
 #### physics world cache copy-assignment operator
 
 There is further potential in reducing the amount of shape that the [physics world cache](physics_world_cache) keeps internally.
-Unless the shape was allocated for a custom polygon shape component, the ``physics_world_cache::operator=`` should disregard copying of shapes.
+<!-- Unless the shape was allocated for a custom polygon shape component, the ``physics_world_cache::operator=`` should disregard copying of shapes.-->
+The cache should always disregard copying of shapes since they belong to the types, which don't change at all and are shared.  
 This will additionally dramatically improve performance of copying the cosmoi along with their inferred states.
 
-Additionally, ``b2PolygonShape``s and others will need to be inferred from the vertex data. That is because the struct is virtual, so may prevent direct std::memcpy, and also because it will hold convex-partitioned information.
+``b2PolygonShape``s and others will need to be inferred from the significant vertex data in the entity types.  
+That is because the struct is virtual, so may prevent direct std::memcpy, and also because it will hold convex-partitioned information.  
 
-**We should disregard tailoring the assignment operator until we get to networking, where we'll probably switch to another physics engine with the features we need.**
-
-### Inferred state
-
-Some things like polygon shape component might need some inferred state.
-That state should most likely be held separate from the cosmos, because it will hardly ever change and copying it every time the state of the cosmos needs be copied around would be a waste of time.
-It will most likely only ever change during the stage of content creation.
-Thus, in ordinary multiplayer gameplays, it should be inferred exactly once.
-
-#### Editor-specific inferred state
-
-See [main article](editor_setup#inferred-state).
-
+<!-- **We should disregard tailoring the assignment operator until we get to networking, where we'll probably switch to another physics engine with the features we need.** -->
 
 ## Storage
 
