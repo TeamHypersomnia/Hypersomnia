@@ -11,12 +11,11 @@
 #include "augs/misc/randomization_declaration.h"
 
 #include "game/transcendental/cosmos_common.h"
-#include "game/transcendental/cosmos_solvable.h"
+#include "game/transcendental/private_cosmos_solvable.h"
 
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
-#include "game/transcendental/cosmos_solvable_access.h"
-#include "game/transcendental/cosmos_solvable_inferred_access.h"
+#include "game/transcendental/cosmic_functions.h"
 
 #include "game/assets/behaviour_tree.h"
 
@@ -51,11 +50,8 @@ auto subscript_handle_getter(C& cosm, const entity_guid guid) {
 }
 
 class cosmos {
-	void infer_all_entities();
-	void reinfer_solvable();
-
 	cosmos_common common;
-	cosmos_solvable solvable;
+	private_cosmos_solvable solvable;
 
 public: 
 	/* A detail only for performance benchmarks */
@@ -66,8 +62,28 @@ public:
 	cosmos() = default;
 	explicit cosmos(const cosmic_pool_size_type reserved_entities);
 
-	void reserve_storage_for_entities(const cosmic_pool_size_type s) {
-		solvable.reserve_storage_for_entities(s);
+	auto& get_solvable(cosmos_solvable_access k) {
+		return solvable.get_solvable(k);
+	}
+
+	const auto& get_solvable(cosmos_solvable_access k) const {
+		return solvable.get_solvable(k);
+	}
+
+	const auto& get_solvable() const {
+		return solvable.get_solvable();
+	}
+
+	auto& get_solvable_inferred(cosmos_solvable_inferred_access k) {
+		return solvable.get_solvable_inferred(k);
+	}
+
+	const auto& get_solvable_inferred(cosmos_solvable_inferred_access k) const {
+		return solvable.get_solvable_inferred(k);
+	}
+
+	const auto& get_solvable_inferred() const {
+		return solvable.get_solvable_inferred();
 	}
 
 	entity_handle create_entity(entity_type_id = 0);
@@ -87,14 +103,14 @@ public:
 		augs::enum_boolset<subjects_iteration_flag> flags = {}
 	) {
 		if (flags.test(subjects_iteration_flag::POSSIBLE_ITERATOR_INVALIDATION)) {
-			const auto targets = solvable.inferred.processing_lists.get(list_type);
+			const auto targets = get_solvable_inferred().processing_lists.get(list_type);
 
 			for (const auto& subject : targets) {
 				operator()(subject, callback);
 			}
 		}
 		else {
-			for (const auto& subject : solvable.inferred.processing_lists.get(list_type)) {
+			for (const auto& subject : get_solvable_inferred().processing_lists.get(list_type)) {
 				operator()(subject, callback);
 			}
 		}
@@ -102,36 +118,11 @@ public:
 
 	template <class F>
 	void for_each(const processing_subjects list_type, F callback) const {
-		for (const auto& subject : solvable.inferred.processing_lists.get(list_type)) {
+		for (const auto& subject : get_solvable().inferred.processing_lists.get(list_type)) {
 			operator()(subject, callback);
 		}
 	}
-
-	void increment_step() {
-		solvable.increment_step();
-	}
-
-	void infer_caches_for(const const_entity_handle);
-	void destroy_caches_of(const const_entity_handle);
-	void reinfer_caches_of(const const_entity_handle);
 	
-	template <class cache_type>
-	void reinfer_cache(const entity_handle handle) {
-		solvable.inferred.for_each([&](auto& sys) {
-			using T = std::decay_t<decltype(sys)>;
-
-			if constexpr(std::is_same_v<T, cache_type>) {
-				sys.destroy_cache_of(handle);
-
-				if (handle.is_inferred_state_activated()) {
-					sys.infer_cache_for(handle);
-				}
-			}
-		});
-	}
-
-	void reinfer_all_entities();
-
 	/* 
 		If exception is thrown during alteration,
 		these metods will properly refresh inferred caches with what state was left.
@@ -140,6 +131,7 @@ public:
 	template <class F>
 	void change_common_significant(F&& callback) {
 		auto status = changer_callback_result::INVALID;
+		auto& self = *this;
 
 		auto refresh_when_done = augs::make_scope_guard([&]() {
 			if (status != changer_callback_result::DONT_REFRESH) {
@@ -148,28 +140,15 @@ public:
 				   	only later the entities, as they might use the common inferred during their own reinference. 
 				*/
 				common.reinfer();
-				reinfer_all_entities();
+				cosmic::reinfer_all_entities(self);
 			}
 		});
 
 		status = callback(common.significant);
 	}
 
-	template <class F>
-	void change_solvable_significant(F&& callback) {
-		auto status = changer_callback_result::INVALID;
-
-		auto refresh_when_done = augs::make_scope_guard([&]() {
-			if (status != changer_callback_result::DONT_REFRESH) {
-				reinfer_solvable();
-			}
-		});
-
-		status = callback(solvable.significant);
-	}
-
 	void set(const cosmos_solvable_significant& signi) {
-		change_solvable_significant([&](cosmos_solvable_significant& s){ 
+		cosmic::change_solvable_significant(*this, [&](cosmos_solvable_significant& s){ 
 			{
 				auto scope = measure_scope(profiler.duplication);
 				s = signi; 
@@ -185,30 +164,6 @@ public:
 	rng_seed_type get_rng_seed_for(const entity_id) const;
 	
 	std::wstring summary() const;
-
-	auto& get_solvable(cosmos_solvable_access) {
-		return solvable;
-	}
-
-	const auto& get_solvable(cosmos_solvable_access) const {
-		return solvable;
-	}
-
-	const auto& get_solvable() const {
-		return solvable;
-	}
-
-	auto& get_solvable_inferred(cosmos_solvable_inferred_access) {
-		return solvable.inferred;
-	}
-
-	const auto& get_solvable_inferred(cosmos_solvable_inferred_access) const {
-		return solvable.inferred;
-	}
-
-	const auto& get_solvable_inferred() const {
-		return solvable.inferred;
-	}
 
 	const cosmos_common_significant& get_common_significant() const;
 	const common_assets& get_common_assets() const;
@@ -244,31 +199,31 @@ public:
 	*/
 
 	auto get_entities_count() const {
-		return solvable.get_entities_count();
+		return get_solvable().get_entities_count();
 	}
 
 	auto get_total_seconds_passed(const double v) const {
-		return solvable.get_total_seconds_passed(v);
+		return get_solvable().get_total_seconds_passed(v);
 	}
 
 	auto get_total_seconds_passed() const {
-		return solvable.get_total_seconds_passed();
+		return get_solvable().get_total_seconds_passed();
 	}
 
 	auto get_total_steps_passed() const {
-		return solvable.get_total_steps_passed();
+		return get_solvable().get_total_steps_passed();
 	}
 
 	auto get_timestamp() const {
-		return solvable.get_timestamp();
+		return get_solvable().get_timestamp();
 	}
 
 	auto get_fixed_delta() const {
-		return solvable.get_fixed_delta();
+		return get_solvable().get_fixed_delta();
 	}
 
 	auto make_versioned(const unversioned_entity_id id) const {
-		return solvable.make_versioned(id);
+		return get_solvable().make_versioned(id);
 	}
 
 };

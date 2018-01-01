@@ -97,7 +97,7 @@ bool basic_processing_synchronizer<C>::is_in(const processing_subjects list) con
 }
 
 void component_synchronizer<false, P>::reinfer_caches() const {
-	handle.get_cosmos().reinfer_cache<processing_lists_cache>(handle);
+	cosmic::reinfer_cache<processing_lists_cache>(handle);
 }
 
 void component_synchronizer<false, P>::disable_in(const processing_subjects list) const {

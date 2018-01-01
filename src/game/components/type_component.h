@@ -9,7 +9,6 @@ namespace augs {
 	struct introspection_access;
 }
 
-
 namespace components {
 	struct type {
 		static constexpr bool is_fundamental = true;
@@ -44,29 +43,6 @@ public:
 	using basic_type_synchronizer<false>::basic_type_synchronizer;
 
 	void change_type_to(const entity_type_id id) const; 
-
-	/* 
-		Usually, type of an entity stays the same until its death.
-		This function allows to change type of an already existing entity without changing its identity,
-		so that existing entity_ids pointing to that entity are not broken.
-	*/
-
-	template <class F>
-	void change_type_to(
-		const entity_type_id id,
-		F before_inference
-	) const {
-		auto& cosm = handle.get_cosmos();
-
-		cosm.destroy_caches_of(handle);
-		get_raw_component().type_id = id;
-
-		/* TODO: Add initial components */
-
-		before_inference();
-		cosm.infer_caches_for(handle);
-	}
-
 };
 
 template<>

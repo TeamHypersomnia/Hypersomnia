@@ -9,7 +9,7 @@ bool basic_all_inferred_state_synchronizer<C>::is_activated() const {
 using A = components::all_inferred_state;
 
 void component_synchronizer<false, A>::reinfer_caches() const {
-	handle.get_cosmos().reinfer_caches_of(handle);
+	cosmic::reinfer_caches_of(handle);
 }
 
 void component_synchronizer<false, A>::set_activated(const bool flag) const {

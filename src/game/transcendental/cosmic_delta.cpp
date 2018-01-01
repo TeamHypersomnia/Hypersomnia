@@ -362,7 +362,7 @@ void cosmic_delta::decode(
 	const auto unread_bits = in.get_unread_bytes();
 	//should_eq(0, unread_bits);
 
-	deco.reinfer_all_entities();
+	cosmic::reinfer_all_entities(deco);
 
 	deco.profiler.delta_decoding.stop();
 }

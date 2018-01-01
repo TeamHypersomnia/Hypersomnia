@@ -83,6 +83,10 @@ public:
 		return agg();
 	}
 
+	const auto& get() const {
+		return agg();
+	}
+
 	entity_id get_id() const {
 		return raw_id;
 	}
@@ -158,7 +162,7 @@ public:
 		
 		if constexpr(is_component_synchronized_v<T>) {
 			agg().template add<T>(c, pool_provider());
-			owner.reinfer_caches_of(*this);
+			cosmic::reinfer_caches_of(*this);
 		}
 		else {
 			agg().template add<T>(c, pool_provider());
@@ -192,7 +196,7 @@ public:
 
 		if constexpr(is_component_synchronized_v<T>) {
 			agg().template remove<T>(pool_provider());
-			owner.reinfer_caches_of(*this);
+			cosmic::reinfer_caches_of(*this);
 		}
 		else {
 			agg().template remove<T>(pool_provider());

@@ -156,7 +156,7 @@ void standard_solve(const logic_step step) {
 
 	performance.raycasts.measure(cosmos.get_solvable_inferred().physics.ray_casts_since_last_step);
 
-	cosmos.increment_step();
+	cosmic::increment_step(cosmos);
 
 	const size_t queued_at_end_num = step.get_queue<messages::queue_destruction>().size();
 

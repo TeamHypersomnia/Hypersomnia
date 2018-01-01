@@ -23,57 +23,16 @@ void cosmos::clear() {
 	*this = zero;
 }
 
-void cosmos::reinfer_all_entities() {
-	auto scope = measure_scope(profiler.reinferring_all_entities);
-	
-	solvable.destroy_all_caches();
-	infer_all_entities();
-}
-
-void cosmos::infer_all_entities() {
-	for (const auto& ordered_pair : solvable.get_guid_to_id()) {
-		infer_caches_for(operator[](ordered_pair.second));
-	}
-}
-
-void cosmos::destroy_caches_of(const const_entity_handle h) {
-	auto destructor = [h](auto& sys) {
-		sys.destroy_cache_of(h);
-	};
-
-	solvable.inferred.for_each(destructor);
-}
-
-void cosmos::infer_caches_for(const const_entity_handle h) {
-	if (h.is_inferred_state_activated()) {
-		auto constructor = [h](auto& sys) {
-			sys.infer_cache_for(h);
-		};
-
-		solvable.inferred.for_each(constructor);
-	}
-}
-
 bool cosmos::operator==(const cosmos& b) const {
 	if (!augs::equal_by_introspection(common.significant, b.common.significant)) {
 		return false;
 	}
 
-	return solvable == b.get_solvable();
+	return get_solvable() == b.get_solvable();
 }
 
 bool cosmos::operator!=(const cosmos& b) const {
 	return !operator==(b);
-}
-
-void cosmos::reinfer_solvable() {
-	solvable.remap_guids();
-	reinfer_all_entities();
-}
-
-void cosmos::reinfer_caches_of(const const_entity_handle h) {
-	destroy_caches_of(h);
-	infer_caches_for(h);
 }
 
 std::wstring cosmos::summary() const {
@@ -91,13 +50,13 @@ rng_seed_type cosmos::get_rng_seed_for(const entity_id id) const {
 }
 
 entity_handle cosmos::create_entity(const entity_type_id type_id) {
-	const auto new_handle = entity_handle { *this, solvable.allocate_next_entity() };
+	const auto new_handle = entity_handle { *this, get_solvable({}).allocate_next_entity() };
 	new_handle.get<components::type>().change_type_to(type_id);
 	return new_handle; 
 }
 
 entity_handle cosmos::create_entity_with_specific_guid(const entity_guid specific_guid) {
-	return { *this, solvable.allocate_entity_with_specific_guid(specific_guid) };
+	return { *this, get_solvable({}).allocate_entity_with_specific_guid(specific_guid) };
 }
 
 entity_handle cosmos::clone_entity(const entity_id source_entity_id) {
@@ -114,7 +73,7 @@ entity_handle cosmos::clone_entity(const entity_id source_entity_id) {
 
 	const auto new_entity = create_entity(source_entity.get_type_id());
 	
-	solvable.get_aggregate(new_entity).clone_components_except<
+	get_solvable({}).get_aggregate(new_entity).clone_components_except<
 		/*
 			These components will be cloned shortly,
 			with due care to each of them.
@@ -128,13 +87,44 @@ entity_handle cosmos::clone_entity(const entity_id source_entity_id) {
 			to avoid unnecessary regeneration.
 		*/
 		components::all_inferred_state
-	>(solvable.get_aggregate(source_entity), solvable);
+	>(get_solvable({}).get_aggregate(source_entity), get_solvable({}));
 
 	if (new_entity.has<components::item>()) {
 		new_entity.get<components::item>().current_slot.unset();
 	}
 
-	new_entity.make_cloned_child_entities_recursive(source_entity_id);
+	{
+		for_each_component_type([&](auto c) {
+			using component_type = decltype(c);
+
+			if (const auto cloned_to_component = new_entity.get({}).find<component_type>(get_solvable({}))) {
+				const auto& cloned_from_component = source_entity.get({}).template get<component_type>(get_solvable());
+
+				if constexpr(allows_nontriviality_v<component_type>) {
+					component_type::clone_children(
+						*this,
+						*cloned_to_component, 
+						cloned_from_component
+					);
+				}
+				else {
+					augs::introspect(
+						augs::recursive([&](auto&& self, auto, auto& into, const auto& from) {
+							if constexpr(std::is_same_v<decltype(into), child_entity_id&>) {
+								into = clone_entity(from);
+							}
+							else {
+								augs::introspect_if_not_leaf(augs::recursive(self), into, from);
+							}
+						}),
+						*cloned_to_component,
+						cloned_from_component
+					);
+				}
+			}
+		});
+	}
+
 	
 	if (source_entity.has<components::fixtures>()) {
 		/*
@@ -218,9 +208,9 @@ void cosmos::delete_entity(const entity_id e) {
 		Unregister that id as a parent from the relational system
 	*/
 
-	solvable.inferred.relational.handle_deletion_of_potential_parent(e);
+	get_solvable_inferred({}).relational.handle_deletion_of_potential_parent(e);
 
-	solvable.free_entity(e);
+	get_solvable({}).free_entity(e);
 }
 
 void cosmos::delete_entity_with_children(const entity_id id) {
@@ -242,7 +232,7 @@ randomization cosmos::get_rng_for(const entity_id id) const {
 }
 
 bool cosmos::empty() const {
-	return solvable.empty();
+	return get_solvable().empty();
 }
 
 namespace augs {
@@ -284,7 +274,7 @@ namespace augs {
 			return changer_callback_result::DONT_REFRESH;
 		});
 
-		cosm.change_solvable_significant([&](cosmos_solvable_significant& significant) {
+		cosmic::change_solvable_significant(cosm, [&](cosmos_solvable_significant& significant) {
 			augs::read_bytes(from, significant);
 			return changer_callback_result::REFRESH;
 		});

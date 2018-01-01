@@ -15,7 +15,7 @@
 void intercosm::make_test_scene(sol::state& lua, const bool minimal) {
 	world.clear();
 	viewables = {};
-	world.reserve_storage_for_entities(3000u);
+	cosmic::reserve_storage_for_entities(world, 3000u);
 
 	if (minimal) {
 		world.change_common_significant([&](cosmos_common_significant& common){

@@ -77,7 +77,6 @@ public:
 	void make_as_child_of(const entity_id) const;
 
 	void set_owner_body(const entity_id) const;
-	void make_cloned_child_entities_recursive(const entity_id copied) const;
 
 	void map_child_entity(const child_entity_name n, const entity_id p) const;
 };
