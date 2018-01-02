@@ -14,11 +14,7 @@ animation should work statelessly, in particular it should not set values to spr
 
 pass display size and implement augs::get_display
 
-restore the backup if the quickfix works better in grepper there
-
 rename "fundamental" to something else?
-
-fix cosmic_delta so that it operates on solvable state only without handles. 
 
 we could make dynamically allocated tuple of overridden definitions for an entity that would normally just take one id,
 that would map to a tuple of ids. as overriddes would be anyway rare that is will not hinder performance
@@ -64,9 +60,7 @@ editor should print "types of selected entities" and their common properties, id
 editor bindings:
 v - begin selection with arrows
 
-
-we dont want clone entity as separate; use safe entity handle interface to perform the clone instead of meddling directly with the signi
-after you're done eating you can create a new branch with existing changes
+shouldnt clone entity use a safe entity handle interface?
 
 describe kinds of sensitive state and document their behaviour
 
