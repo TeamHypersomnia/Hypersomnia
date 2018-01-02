@@ -172,7 +172,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 				float total_recoil_scale = 1.f;
 
 				if (is_magic_launcher) {
-					const auto round_entity = cosmos.clone_entity(magic_missile_def); //??
+					const auto round_entity = cosmic::clone_entity(magic_missile_def); //??
 
 					auto& sender = round_entity.get<components::sender>();
 					sender.set(gun_entity);
@@ -246,7 +246,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 						int charges = single_bullet_or_pellet_stack.get<components::item>().charges;
 
 						while (charges--) {
-							const auto round_entity = cosmos.clone_entity(single_bullet_or_pellet_stack[child_entity_name::CATRIDGE_BULLET]);
+							const auto round_entity = cosmic::clone_entity(single_bullet_or_pellet_stack[child_entity_name::CATRIDGE_BULLET]);
 
 							auto& sender = round_entity.get<components::sender>();
 							sender.set(gun_entity);
@@ -290,7 +290,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 						const auto shell_definition = single_bullet_or_pellet_stack[child_entity_name::CATRIDGE_SHELL];
 
 						if (shell_definition.alive()) {
-							const auto shell_entity = cosmos.clone_entity(shell_definition);
+							const auto shell_entity = cosmic::clone_entity(shell_definition);
 
 							auto rng = cosmos.get_rng_for(shell_entity);
 
@@ -317,16 +317,9 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 						by now every item inside the chamber is queued for destruction.
 						we do not clear items_inside by dropping them by perform_transfers 
 						to avoid unnecessary activation of the rigid bodies of the bullets, due to being dropped.
-
-						TODO: Maybe delete in-place with all children entities? This would need to probably move the logic inside destroy_system to the cosmos?
 					*/
 
-					{
-						deletion_queue q;
-
-						destroy_system().mark_queued_entities_and_their_children_for_deletion(destructions, q, cosmos);
-						destroy_system().perform_deletions(q, cosmos);
-					}
+					reverse_perform_deletions(make_deletion_queue(destructions, cosmos), cosmos);
 
 					/*
 						Note that the above operation would happen automatically once all children entities are destroyed

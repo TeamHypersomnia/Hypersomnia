@@ -84,6 +84,6 @@ public:
 
 	template <bool C = !is_const, class = std::enable_if_t<C>>
 	void perform_deletions() const {
-		destroy_system().perform_deletions(*this);
+		destroy_system().reverse_perform_deletions(*this);
 	}
 };

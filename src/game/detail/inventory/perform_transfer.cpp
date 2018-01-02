@@ -141,7 +141,7 @@ perform_transfer_result perform_transfer(
 		grabbed_item_part = transferred_item;
 	}
 	else {
-		grabbed_item_part = cosmos.clone_entity(transferred_item);
+		grabbed_item_part = cosmic::clone_entity(transferred_item);
 		item.charges -= result.transferred_charges;
 		cosmos[grabbed_item_part].get<components::item>().charges = result.transferred_charges;
 	}

@@ -39,7 +39,7 @@ void aabb_highlighter::draw(const aabb_highlighter_drawing_input in) const {
 
 	const auto aabb_expansion_lambda = [&aabb, in](const const_entity_handle e) {
 		if (!is_hoverable(e)) {
-			return false;
+			return callback_result::ABORT;
 		}
 
 		const auto new_aabb = e.get_aabb(in.interp);
@@ -51,7 +51,7 @@ void aabb_highlighter::draw(const aabb_highlighter_drawing_input in) const {
 			aabb = new_aabb;
 		}
 		
-		return true;
+		return callback_result::CONTINUE;
 	};
 
 	aabb_expansion_lambda(in.subject);

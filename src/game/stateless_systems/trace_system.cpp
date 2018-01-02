@@ -91,7 +91,7 @@ void trace_system::spawn_finishing_traces_for_deleted_entities(const logic_step 
 			&& trace != nullptr
 			&& !trace->is_it_a_finishing_trace
 		) {
-			const auto finishing_trace = cosmos.create_entity(trace->finishing_trace_type);
+			const auto finishing_trace = cosmic::create_entity(cosmos, trace->finishing_trace_type);
 			
 			auto copied_trace = *trace;
 			copied_trace.lengthening_time_passed_ms = 0.f;

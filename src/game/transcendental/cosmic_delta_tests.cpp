@@ -243,7 +243,7 @@ TEST_CASE("CosmicDelta2 PaddingTest") {
 TEST_CASE("CosmicDelta3 GuidizeTests") {
 	cosmos c1(2);
 
-	const auto new_ent1 = c1.create_entity(/*test_scene_type::E1*/);
+	const auto new_ent1 = cosmic::create_entity(c1, {} /*test_scene_type::E1*/);
 
 	item_slot_transfer_request dt;
 	dt.item = new_ent1;
@@ -272,8 +272,8 @@ TEST_CASE("Cosmos ComparisonTest") {
 	REQUIRE(c2 == c2);
 
 	{
-		const auto new_ent1 = c1.create_entity(/*test_scene_type::E1*/);
-		const auto new_ent2 = c1.create_entity(/*test_scene_type::E2*/);
+		const auto new_ent1 = cosmic::create_entity(c1, {} /*test_scene_type::E1*/);
+		const auto new_ent2 = cosmic::create_entity(c1, {} /*test_scene_type::E2*/);
 		
 		components::transform first_transform(21, 0, 12.4f);
 		
@@ -290,8 +290,8 @@ TEST_CASE("Cosmos ComparisonTest") {
 	}
 
 	{
-		const auto new_ent1 = c2.create_entity(/*test_scene_type::E1*/);
-		const auto new_ent2 = c2.create_entity(/*test_scene_type::E2*/);
+		const auto new_ent1 = cosmic::create_entity(c2, {} /*test_scene_type::E1*/);
+		const auto new_ent2 = cosmic::create_entity(c2, {} /*test_scene_type::E2*/);
 		
 		components::transform first_transform(21, 0, 12.4f);
 		
@@ -366,8 +366,8 @@ TEST_CASE("CosmicDelta4 EmptyAndTwoNew") {
 	
 	REQUIRE(c1 == c2);
 
-	const auto new_ent1 = c2.create_entity(/*test_scene_type::E1*/);
-	const auto new_ent2 = c2.create_entity(/*test_scene_type::E2*/);
+	const auto new_ent1 = cosmic::create_entity(c2, {} /*test_scene_type::E1*/);
+	const auto new_ent2 = cosmic::create_entity(c2, {} /*test_scene_type::E2*/);
 
 	const auto first_guid = new_ent1.get_guid();
 	const auto second_guid = new_ent2.get_guid();
@@ -516,9 +516,9 @@ TEST_CASE("CosmicDelta5 EmptyAndCreatedThreeEntitiesWithReferences") {
 	{
 		// (in)sanity check
 		cosmos t(3);
-		const auto id = t.create_entity();
-		t.delete_entity(id);
-		const auto new_id = t.create_entity();
+		const auto id = cosmic::create_entity(t);
+		cosmic::delete_entity(id);
+		const auto new_id = cosmic::create_entity(t);
 		REQUIRE(id != new_id);
 	}
 
@@ -527,20 +527,20 @@ TEST_CASE("CosmicDelta5 EmptyAndCreatedThreeEntitiesWithReferences") {
 	// once it allocates its own entities when decoding
 	{
 		entity_id ids[3] = {
-			c1.create_entity(/*test_scene_type::E1*/),
-			c1.create_entity(/*test_scene_type::E2*/),
-			c1.create_entity(/*test_scene_type::E3*/)
+			cosmic::create_entity(c1, {} /*test_scene_type::E1*/),
+			cosmic::create_entity(c1, {} /*test_scene_type::E2*/),
+			cosmic::create_entity(c1, {} /*test_scene_type::E3*/)
 		};
 
 		for(const auto i : ids) {
-			c1.delete_entity(i);
+			cosmic::delete_entity(c1[i]);
 		}
 	}
 	cosmos c2(3);
 
-	const auto new_ent1 = c2.create_entity(/*test_scene_type::E1*/);
-	const auto new_ent2 = c2.create_entity(/*test_scene_type::E2*/);
-	const auto new_ent3 = c2.create_entity(/*test_scene_type::E3*/);
+	const auto new_ent1 = cosmic::create_entity(c2, {} /*test_scene_type::E1*/);
+	const auto new_ent2 = cosmic::create_entity(c2, {} /*test_scene_type::E2*/);
+	const auto new_ent3 = cosmic::create_entity(c2, {} /*test_scene_type::E3*/);
 
 	const auto first_guid = new_ent1.get_guid();
 	const auto second_guid = new_ent2.get_guid();
@@ -614,9 +614,9 @@ TEST_CASE("CosmicDelta6 ThreeEntitiesWithReferencesAndDestroyedChild") {
 
 	cosmos c1(3);
 	{
-		const auto new_ent1 = c1.create_entity(/*test_scene_type::E1*/);
-		const auto new_ent2 = c1.create_entity(/*test_scene_type::E2*/);
-		const auto new_ent3 = c1.create_entity(/*test_scene_type::E3*/);
+		const auto new_ent1 = cosmic::create_entity(c1, {} /*test_scene_type::E1*/);
+		const auto new_ent2 = cosmic::create_entity(c1, {} /*test_scene_type::E2*/);
+		const auto new_ent3 = cosmic::create_entity(c1, {} /*test_scene_type::E3*/);
 
 		c1_first_guid = new_ent1.get_guid();
 		c1_second_guid = new_ent2.get_guid();
@@ -636,9 +636,9 @@ TEST_CASE("CosmicDelta6 ThreeEntitiesWithReferencesAndDestroyedChild") {
 
 	cosmos c2(3);
 	{
-		const auto new_ent1 = c2.create_entity(/*test_scene_type::E1*/);
-		const auto new_ent2 = c2.create_entity(/*test_scene_type::E2*/);
-		const auto new_ent3 = c2.create_entity(/*test_scene_type::E3*/);
+		const auto new_ent1 = cosmic::create_entity(c2, {} /*test_scene_type::E1*/);
+		const auto new_ent2 = cosmic::create_entity(c2, {} /*test_scene_type::E2*/);
+		const auto new_ent3 = cosmic::create_entity(c2, {} /*test_scene_type::E3*/);
 
 		c2_first_guid = new_ent1.get_guid();
 		c2_second_guid = new_ent2.get_guid();
@@ -671,7 +671,7 @@ TEST_CASE("CosmicDelta6 ThreeEntitiesWithReferencesAndDestroyedChild") {
 		REQUIRE(1 == comparatory.size());
 	}
 
-	c2.delete_entity(c2[c2_second_guid]);
+	cosmic::delete_entity(c2[c2_second_guid]);
 	REQUIRE(2 == c2.get_entities_count());
 
 	{

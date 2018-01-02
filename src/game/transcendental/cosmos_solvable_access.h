@@ -19,7 +19,6 @@ class cosmos_solvable_access {
 		as they take proper precautions to keep state consistent or otherwise refresh it.
 	*/
 
-	friend cosmos;
 	friend cosmic_delta;
 	friend cosmic;
 

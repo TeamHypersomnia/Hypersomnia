@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 
+#include "augs/callback_result.h"
 #include "augs/build_settings/platform_defines.h"
 
 #include "augs/templates/introspect_declaration.h"
@@ -54,7 +55,7 @@ public:
 						if constexpr(std::is_same_v<std::decay_t<decltype(member)>, child_entity_id>) {
 							const auto child_handle = cosmos[member];
 
-							if (child_handle.alive() && callback(child_handle)) {
+							if (child_handle.alive() && callback(child_handle) == callback_result::CONTINUE) {
 								child_handle.for_each_child_entity_recursive(std::forward<F>(callback));
 							}
 						}

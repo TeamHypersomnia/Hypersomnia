@@ -62,40 +62,6 @@ public:
 	cosmos() = default;
 	explicit cosmos(const cosmic_pool_size_type reserved_entities);
 
-	auto& get_solvable(cosmos_solvable_access k) {
-		return solvable.get_solvable(k);
-	}
-
-	const auto& get_solvable(cosmos_solvable_access k) const {
-		return solvable.get_solvable(k);
-	}
-
-	const auto& get_solvable() const {
-		return solvable.get_solvable();
-	}
-
-	auto& get_solvable_inferred(cosmos_solvable_inferred_access k) {
-		return solvable.get_solvable_inferred(k);
-	}
-
-	const auto& get_solvable_inferred(cosmos_solvable_inferred_access k) const {
-		return solvable.get_solvable_inferred(k);
-	}
-
-	const auto& get_solvable_inferred() const {
-		return solvable.get_solvable_inferred();
-	}
-
-	entity_handle create_entity(entity_type_id = 0);
-
-	entity_handle create_entity_with_specific_guid(
-		const entity_guid specific_guid
-	);
-
-	entity_handle clone_entity(const entity_id);
-	void delete_entity(const entity_id);
-	void delete_entity_with_children(const entity_id);
-
 	template <class F>
 	void for_each(
 		const processing_subjects list_type, 
@@ -198,6 +164,30 @@ public:
 		Shortcuts for heavily used functions for sanity
 	*/
 
+	auto& get_solvable(cosmos_solvable_access k) {
+		return solvable.get_solvable(k);
+	}
+
+	const auto& get_solvable(cosmos_solvable_access k) const {
+		return solvable.get_solvable(k);
+	}
+
+	const auto& get_solvable() const {
+		return solvable.get_solvable();
+	}
+
+	auto& get_solvable_inferred(cosmos_solvable_inferred_access k) {
+		return solvable.get_solvable_inferred(k);
+	}
+
+	const auto& get_solvable_inferred(cosmos_solvable_inferred_access k) const {
+		return solvable.get_solvable_inferred(k);
+	}
+
+	const auto& get_solvable_inferred() const {
+		return solvable.get_solvable_inferred();
+	}
+
 	auto get_entities_count() const {
 		return get_solvable().get_entities_count();
 	}
@@ -225,7 +215,6 @@ public:
 	auto make_versioned(const unversioned_entity_id id) const {
 		return get_solvable().make_versioned(id);
 	}
-
 };
 
 inline si_scaling cosmos::get_si() const {

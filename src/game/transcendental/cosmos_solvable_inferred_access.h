@@ -19,7 +19,6 @@ class cosmos_solvable_inferred_access {
 		as they take proper precautions to keep state consistent.
 	*/
 
-	friend cosmos;
 	friend cosmic;
 
 	template <bool is_const, class component_type>

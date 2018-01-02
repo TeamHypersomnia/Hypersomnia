@@ -14,7 +14,8 @@ namespace augs {
 
 void detail_add_item(const inventory_slot_handle handle, const entity_handle new_item);
 void detail_unset_current_slot(const entity_handle removed_item);
-class cosmos;
+
+class cosmic;
 
 namespace components {
 	struct item {
@@ -40,7 +41,7 @@ namespace components {
 	private:
 		friend augs::introspection_access;
 
-		friend cosmos;
+		friend cosmic;
 		friend void ::detail_add_item(const inventory_slot_handle handle, const entity_handle new_item);
 		friend void ::detail_unset_current_slot(const entity_handle removed_item);
 

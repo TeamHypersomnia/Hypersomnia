@@ -972,7 +972,7 @@ void editor_setup::del() {
 	if (has_current_tab()) {
 		for_each_selected_entity(
 			[&](const auto e) {
-				work().world.delete_entity_with_children(e);
+				delete_entity_with_children(work().world[e]);
 			}
 		);
 

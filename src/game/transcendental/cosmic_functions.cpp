@@ -1,5 +1,8 @@
 #include "game/transcendental/cosmic_functions.h"
 #include "game/transcendental/cosmos.h"
+#include "game/organization/for_each_component_type.h"
+#include "game/detail/inventory/perform_transfer.h"
+#include "augs/templates/introspect.h"
 
 void cosmic::infer_caches_for(const entity_handle h) {
 	auto& cosm = h.get_cosmos();
@@ -52,5 +55,238 @@ void cosmic::reinfer_solvable(cosmos& cosm) {
 void cosmic::reinfer_caches_of(const entity_handle h) {
 	destroy_caches_of(h);
 	infer_caches_for(h);
+}
+
+entity_handle cosmic::create_entity(cosmos& cosm, const entity_type_id type_id) {
+	const auto new_handle = entity_handle { cosm, cosm.get_solvable({}).allocate_next_entity() };
+	new_handle.get<components::type>().change_type_to(type_id);
+	return new_handle; 
+}
+
+entity_handle cosmic::create_entity_with_specific_guid(cosmos& cosm, const entity_guid specific_guid) {
+	return { cosm, cosm.get_solvable({}).allocate_entity_with_specific_guid(specific_guid) };
+}
+
+entity_handle cosmic::clone_entity(const entity_handle source_entity) {
+	auto& cosmos = source_entity.get_cosmos();
+
+	if (source_entity.dead()) {
+		return cosmos[entity_id()];
+	}
+
+	ensure(
+		!source_entity.get<components::child>().parent.is_set() 
+		&& "Cloning of entities that are children is not yet supported"
+	);
+
+	const auto new_entity = create_entity(cosmos, source_entity.get_type_id());
+	auto& solvable = cosmos.get_solvable({});
+
+	solvable.get_aggregate(new_entity).clone_components_except<
+		/*
+			These components will be cloned shortly,
+			with due care to each of them.
+		*/
+		components::guid,
+		components::fixtures,
+		components::child,
+
+		/*
+			Let us keep the inferred state of the new entity disabled for a while,
+			to avoid unnecessary regeneration.
+		*/
+		components::all_inferred_state
+	>(solvable.get_aggregate(source_entity), solvable);
+
+	if (new_entity.has<components::item>()) {
+		new_entity.get<components::item>().current_slot.unset();
+	}
+
+	{
+		for_each_component_type([&](auto c) {
+			using component_type = decltype(c);
+
+			if (const auto cloned_to_component = new_entity.get({}).find<component_type>(solvable)) {
+				const auto& cloned_from_component = source_entity.get({}).template get<component_type>(solvable);
+
+				if constexpr(allows_nontriviality_v<component_type>) {
+					component_type::clone_children(
+						cosmos,
+						*cloned_to_component, 
+						cloned_from_component
+					);
+				}
+				else {
+					augs::introspect(
+						augs::recursive([&](auto&& self, auto, auto& into, const auto& from) {
+							if constexpr(std::is_same_v<decltype(into), child_entity_id&>) {
+								into = clone_entity(cosmos[from]);
+							}
+							else {
+								augs::introspect_if_not_leaf(augs::recursive(self), into, from);
+							}
+						}),
+						*cloned_to_component,
+						cloned_from_component
+					);
+				}
+			}
+		});
+	}
+
+
+	if (source_entity.has<components::fixtures>()) {
+		/*
+			Copy all properties from the component of the source entity except the owner_body field.
+			Exactly as if we were creating that component by hand.
+		*/
+
+		components::fixtures fixtures = source_entity.get<components::fixtures>().get_raw_component();
+		const auto owner_of_the_source = fixtures.owner_body;
+		fixtures.owner_body = entity_id();
+
+		new_entity += fixtures;
+
+		/*
+			Only now assign the owner_body in a controllable manner.
+		*/
+
+		const bool source_owns_itself = owner_of_the_source == source_entity;
+
+		if (source_owns_itself) {
+			/*
+				If the fixtures of the source entity were owned by the same entity,
+				let the cloned entity also own itself
+			*/
+			new_entity.set_owner_body(new_entity);
+		}
+		else {
+			/*
+				If the fixtures of the source entity were owned by a different entity,
+				let the cloned entity also be owned by that different entity
+			*/
+			new_entity.set_owner_body(owner_of_the_source);
+		}
+	}
+
+	if (source_entity.is_inferred_state_activated()) {
+		new_entity.get<components::all_inferred_state>().set_activated(true);
+	}
+
+	return new_entity;
+}
+
+void cosmic::delete_entity(const entity_handle handle) {
+	auto& cosmos = handle.get_cosmos();
+
+	if (handle.dead()) {
+		return;
+	}
+
+	if (const auto container = handle.find<components::container>()) {
+		drop_from_all_slots(*container, handle, [](const auto&){});
+	}
+
+	if (const auto current_slot = handle.get_current_slot()) {
+		detail_unset_current_slot(handle);
+	}
+
+	const bool should_deactivate_inferred_state_to_avoid_repeated_regeneration =
+		handle.is_inferred_state_activated()
+	;
+
+	if (should_deactivate_inferred_state_to_avoid_repeated_regeneration) {
+		handle.get<components::all_inferred_state>().set_activated(false);
+	}
+
+	// now manipulation of an entity without all_inferred_state component won't trigger redundant regeneration
+
+	const auto maybe_fixtures = handle.find<components::fixtures>();
+
+	if (maybe_fixtures != nullptr) {
+		const auto owner_body = maybe_fixtures.get_owner_body();
+
+		const bool should_release_dependency = owner_body != handle;
+
+		if (should_release_dependency) {
+			maybe_fixtures.set_owner_body(handle);
+		}
+	}
+
+	/*
+		Unregister that id as a parent from the relational system
+	*/
+
+	cosmos.get_solvable_inferred({}).relational.handle_deletion_of_potential_parent(handle);
+	cosmos.get_solvable({}).free_entity(handle);
+}
+
+void delete_entity_with_children(const entity_handle handle) {
+	if (handle.dead()) {
+		return;
+	}
+
+	reverse_perform_deletions(make_deletion_queue(handle), handle.get_cosmos());
+}
+
+void make_deletion_queue(
+	const const_entity_handle h,
+	deletion_queue& q
+) {
+	q.push_back({ h.get_id() });
+
+	h.for_each_child_entity_recursive([&](const child_entity_id descendant) {
+		q.push_back(descendant);
+		return callback_result::CONTINUE;
+	});
+}
+
+void make_deletion_queue(
+	const destruction_queue& queued, 
+	deletion_queue& deletions, 
+	const cosmos& cosmos
+) {
+	for (const auto& it : queued) {
+		make_deletion_queue(cosmos[it.subject], deletions);
+	}
+}
+
+deletion_queue make_deletion_queue(const const_entity_handle h) {
+	thread_local deletion_queue q;
+	q.clear();
+
+	h.for_each_child_entity_recursive([&](const child_entity_id descendant) {
+		q.push_back(descendant);
+		return callback_result::CONTINUE;
+	});
+
+	return q;
+}
+
+deletion_queue make_deletion_queue(
+	const destruction_queue& queued, 
+	const cosmos& cosmos
+) {
+	thread_local deletion_queue q;
+	q.clear();
+	make_deletion_queue(queued, q, cosmos);
+	return q;
+}
+
+void reverse_perform_deletions(const deletion_queue& deletions, cosmos& cosmos) {
+	/* 
+		The queue is usually populated with entities and their children.
+		It makes sense to delete children first, so we iterate it backwards.
+	*/
+
+	for (auto it = deletions.rbegin(); it != deletions.rend(); ++it) {
+		const auto subject = cosmos[(*it).subject];
+
+		if (subject.dead()) {
+			continue;
+		}
+
+		cosmic::delete_entity(subject);
+	}
 }
 

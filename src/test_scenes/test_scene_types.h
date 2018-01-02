@@ -1,5 +1,6 @@
 #pragma once
 #include "game/transcendental/entity_type_declaration.h"
+#include "game/transcendental/cosmic_functions.h"
 
 enum class test_scene_type {
 	// GEN INTROSPECTOR enum class test_scene_type
@@ -50,7 +51,7 @@ enum class test_scene_type {
 
 template <class C>
 auto create_test_scene_entity(C& cosm, const test_scene_type id) {
-	return cosm.create_entity(static_cast<entity_type_id>(id));
+	return cosmic::create_entity(cosm, static_cast<entity_type_id>(id));
 }
 
 template <class C>

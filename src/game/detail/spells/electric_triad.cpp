@@ -50,7 +50,7 @@ void electric_triad_instance::perform_logic(const spell_logic_input in) {
 		const auto next_hostile = cosmos[hostiles[i]];
 		LOG_NVPS(next_hostile.get_id());
 
-		const auto new_energy_ball = cosmos.clone_entity(spell_data.missile_definition);
+		const auto new_energy_ball = cosmic::clone_entity(cosmos[spell_data.missile_definition]);
 
 		auto new_energy_ball_transform = caster_transform;
 		
