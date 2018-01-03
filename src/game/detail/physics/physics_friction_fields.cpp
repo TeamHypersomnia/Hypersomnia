@@ -61,12 +61,18 @@ void physics_world_cache::rechoose_owner_friction_body(const entity_handle entit
 }
 
 void physics_world_cache::recurential_friction_handler(const logic_step step, b2Body* const body, b2Body* const friction_entity) {
-	if (friction_entity == nullptr) return;
+	if (friction_entity == nullptr) {
+		return;
+	}
 
-	const float dt = static_cast<float>(step.get_delta().in_seconds());
-
+	/* TODO: ensure that m_ownerFrictionGround cannot point to a dead body */
 	recurential_friction_handler(step, body, friction_entity->m_ownerFrictionGround);
 
+	/*
+		Start "fricting" positions from the deepest level
+	*/
+
+	const auto dt = static_cast<float>(step.get_delta().in_seconds());
 	const auto fricted_pos = body->GetPosition() + dt* friction_entity->GetLinearVelocityFromWorldPoint(body->GetPosition());
 
 	body->SetTransform(fricted_pos, body->GetAngle() + dt*friction_entity->GetAngularVelocity());

@@ -83,6 +83,26 @@ namespace augs {
 			}
 		}
 
+		bool is_child_constructed(
+			const child_id_type child_id,
+			const parent_id_type current_significant_parent,
+			const std::size_t parent_index
+		) const {
+			if (const auto parent_cache = mapped_or_nullptr(parent_caches, current_significant_parent)) {
+				return found_in(parent_cache->children_vectors.at(parent_index), child_id);
+			}
+
+			return false;
+		}
+
+		template <bool C = parent_count == 1, class = std::enable_if_t<C>>
+		bool is_child_constructed(
+			const child_id_type child_id,
+			const parent_id_type current_significant_parent
+		) const {
+			return is_child_constructed(child_id, current_significant_parent, 0u);
+		}
+
 		bool is_parent_set(
 			const child_id_type child_id,
 			const std::size_t parent_index
