@@ -36,6 +36,8 @@ This will greatly reduce code duplication.
 
 &nbsp;&nbsp;&nbsp;&nbsp;*Main article: [State consistency](state#consistency)*
 
+There are more things to consider about state consistency when potentially exposing sensitive fields to the author.
+
 ### Problematic values 
 
 For some components, it is easy to guarantee that any possible combination of member values results in a valid game behaviour,  

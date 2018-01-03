@@ -76,3 +76,12 @@ components should be templatized by id
 	lets us define groups in definitions 
 	synchronizers will anyway work with entity_id specialization thus not much more will be templatized
 	introspectors could static assert against usage of entity ids in non-template components
+
+
+Reiteration #1:
+
+- Getting information about success from reinference
+Some configurations of solvable significant do not allow for an inferred counterpart that is consistent.  
+E.g. if vector of items inside a container is inferred, and one would like to perform a transfer by 
+Here's where helper functions might be necessary. A perform_transfer function should only do as much as predict the outcome of reinferring the item component with newly set current slot,
+and if it is successful, do set it and reinfer the item.
