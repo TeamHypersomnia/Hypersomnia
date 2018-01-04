@@ -4,7 +4,7 @@
     <DisplayString>{{ Name={ptr->debug_name} Id={raw_id} }}</DisplayString>
 <!-- <Expand>
 
-      <Item Name="[capacity]" ExcludeView="simple">{{ std::get<components::guid>(ptr->fundamentals).guid }}</Item>
+      <Item Name="[capacity]" ExcludeView="simple">{{ std::get<components::guid>(ptr->always_presents).guid }}</Item>
 
     </Expand>
     -->

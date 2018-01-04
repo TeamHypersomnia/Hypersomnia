@@ -57,7 +57,7 @@ Most of the time, only the programmers are concerned with the second type of dat
 - Some components do not need any definition data.
 	- examples: child, flags, **sender**
 		- Looks like most of them should anyway be transparent to the author.
-		- Their existence is either fundamental or implied by a specific circumstance in the logic (as logic can add or remove components (rarely))
+		- Their existence is either always_present or implied by a specific circumstance in the logic (as logic can add or remove components (rarely))
 	- ~~They will have an empty definition struct that will not take up space and will define "implied_component" type.~~
 		- We've decided that the author should not be concerned with such obscurities and existence of these components should not be implied by definitions, but by a circumstance.  
 
@@ -79,7 +79,7 @@ Most of the time, only the programmers are concerned with the second type of dat
 	- Example: shape polygon component.
 	- See: [overrides](#overrides).
 
-We might be tempted to make some of the definitions fundamental, thus always defined as "enabled".
+We might be tempted to make some of the definitions always_present, thus always defined as "enabled".
 However, there is no benefit seen in doing so. It is a wiser choice to have a flag for each definition and assume that the contents of a default-constructed definition are always in a valid state.
 
 ## Overrides

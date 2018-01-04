@@ -5,6 +5,32 @@ permalink: todo_now
 summary: Just a hidden scratchpad.
 ---
 
+## Contents
+
+### Microplanned implementation order:  
+- strip children vector tracker of children caches as we'll take that data from signi
+	- was anyway used only for ensuring
+- replace "reinfer all caches of" calls in entity handle with correspondent on_remove and on_add which will then infer or destroy
+	- handle calls it either if the member function is present or if component is synchronized
+		- so required in the latter case
+#### Later
+- remove all_inferred_state as it is essentially pointless once we have types implemented
+
+### Microplanned implementation order (done):  
+- rename fundamental to always_present
+	- so that it is intuitive that there are no callbacks for adding and removing
+
+as complete entity reinference wont be an explicit op but rather implied by removing all components,
+
+just make it so each synchronizer defines infer and deinfer(or on_add/on_remove as there might be more ops under the hood) and there does not have to be "for each tracker" or something
+because complete reinference can use all_inferred_state destructor anyway
+so physics world cache would still be a single class because joint, fixtures and rigid body caches wouldnt be able to exist without the other anyway.
+	It can also hold children vector  tracker for rigid bodies.
+	likewise all caches might just be named after components and not that they track things
+static constexpr bool can_inference_fail = true
+
+theoretically some state could be so expensive to calculate that it needs to be a part of signi instead of inferred?
+
 describe kinds of sensitive state and document their behaviour
 
 - too costly to be calculated each time and thus cached in some other significant state?

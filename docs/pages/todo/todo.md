@@ -14,8 +14,6 @@ animation should work statelessly, in particular it should not set values to spr
 
 pass display size and implement augs::get_display
 
-rename "fundamental" to something else?
-
 we could make dynamically allocated tuple of overridden definitions for an entity that would normally just take one id,
 that would map to a tuple of ids. as overriddes would be anyway rare that is will not hinder performance
 we could always just say that we will always require new type to be defined wherever we would like to override something

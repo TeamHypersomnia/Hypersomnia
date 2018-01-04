@@ -4,7 +4,7 @@
 
 namespace components {
 	struct all_inferred_state {
-		static constexpr bool is_fundamental = true;
+		static constexpr bool is_always_present = true;
 		static constexpr bool is_synchronized = true;
 
 		// GEN INTROSPECTOR struct components::all_inferred_state

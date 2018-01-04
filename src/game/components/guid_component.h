@@ -9,7 +9,7 @@ class cosmos_solvable;
 
 namespace components {
 	struct guid {
-		static constexpr bool is_fundamental = true;
+		static constexpr bool is_always_present = true;
 	private:
 		friend augs::introspection_access;
 		friend class ::cosmos_solvable;

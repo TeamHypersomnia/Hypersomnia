@@ -10,7 +10,7 @@
 #include "game/assets/ids/behaviour_tree_id.h"
 #include "game/assets/behaviour_tree.h"
 
-#include "game/organization/all_fundamental_component_includes.h"
+#include "game/organization/all_always_present_component_includes.h"
 #include "augs/entity_system/component_aggregate.h"
 
 #include "game/transcendental/cosmic_profiler.h"

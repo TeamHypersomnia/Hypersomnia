@@ -455,16 +455,16 @@ TEST_CASE("CosmicDelta4 EmptyAndTwoNew") {
 			component_checker(dec_ent2, new_ent2, components::position_copying());
 		}
 		
-		auto check_fundamentals = [&](auto e1, auto e2) {
+		auto check_always_presents = [&](auto e1, auto e2) {
 			synchronizer_component_checker(e1, e2, components::type());
 			synchronizer_component_checker(e1, e2, components::all_inferred_state());
 		};
 		
-		check_fundamentals(new_ent1, dec_ent1);
-		check_fundamentals(new_ent2, dec_ent2);
+		check_always_presents(new_ent1, dec_ent1);
+		check_always_presents(new_ent2, dec_ent2);
 		
-		check_fundamentals(dec_ent1, new_ent1);
-		check_fundamentals(dec_ent2, new_ent2);
+		check_always_presents(dec_ent1, new_ent1);
+		check_always_presents(dec_ent2, new_ent2);
 
 		REQUIRE(c1 == c2);
 	}

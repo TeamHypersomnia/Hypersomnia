@@ -4,7 +4,7 @@
 
 namespace components {
 	struct flags {
-		static constexpr bool is_fundamental = true;
+		static constexpr bool is_always_present = true;
 
 		// GEN INTROSPECTOR struct components::flags
 		augs::enum_boolset<entity_flag> values;

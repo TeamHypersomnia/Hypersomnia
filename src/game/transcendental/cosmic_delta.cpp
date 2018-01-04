@@ -342,7 +342,7 @@ void cosmic_delta::decode(
 						}
 					}
 					else if (removed_components[idx]) {
-						if constexpr(!is_component_fundamental_v<component_type>) {
+						if constexpr(!is_component_always_present_v<component_type>) {
 							changed_entity.get({}).remove<component_type>(deco.get_solvable({}));
 						}
 					}

@@ -36,6 +36,8 @@ TODO: Make a graph.
 					- A helper function that predicts that the reinference with such altered field won't succeed...
 					- ...and the modifier function itself that will notify the client that it would fail and then does nothing at all (does not even destroy the existing cache).
 	- Incorrect deletion of an existing sensitive field that is already spoken truth about.
+		- Always present components don't suffer from this.
+			- In fact they can only suffer from alteration, not from creation or deletion
 		- Can only happen with deletion of a component.
 			- A component, on removal, shall either destroy the relevant caches or call its own destructor if the sensitive state is inside significant.
 	- Creation of a new sensitive field that introduces a lie. 
@@ -113,7 +115,7 @@ Theoretically, inconsistent state wouldn't always crash the application, but it 
 	- Farily easy now with introduction of the [cosmic functions](cosmic_function).
 	- **Know exactly** what entity handle lets us do and when.
 - Provide a safe function that deletes all entity's components while preserving its identity.
-	- Just call **remove** on all dynamic components and set fundamental components **to default values**. **(except guid)**
+	- Just call **remove** on all dynamic components and set always_present components **to default values**. **(except guid)**
 	- Implies complete destruction of caches for an entity.
 	- It is, however, required to move from one **consistent state to the next**.
 		- If all sensitive state would only be sensitive by virtue of having an inferred cache...
