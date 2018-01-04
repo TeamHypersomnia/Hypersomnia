@@ -1,7 +1,8 @@
 #pragma once
+#include <tuple>
+
 #include "augs/callback_result.h"
 #include "augs/misc/scope_guard.h"
-
 #include "game/transcendental/cosmic_types.h"
 #include "game/transcendental/entity_type_declaration.h"
 #include "game/transcendental/entity_handle_declaration.h"
@@ -79,18 +80,13 @@ public:
 	template <class cache_type, class handle_type>
 	static void reinfer_cache(const handle_type handle) {
 		auto& cosm = handle.get_cosmos();
+		auto& sys = std::get<cache_type&>(cosm.get_solvable_inferred({}).tie());
 
-		cosm.get_solvable_inferred({}).for_each([&](auto& sys) {
-			using T = std::decay_t<decltype(sys)>;
+		sys.destroy_cache_of(handle);
 
-			if constexpr(std::is_same_v<T, cache_type>) {
-				sys.destroy_cache_of(handle);
-
-				if (handle.is_inferred_state_activated()) {
-					sys.infer_cache_for(handle);
-				}
-			}
-		});
+		if (handle.is_inferred_state_activated()) {
+			sys.infer_cache_for(handle);
+		}
 	}
 };
 

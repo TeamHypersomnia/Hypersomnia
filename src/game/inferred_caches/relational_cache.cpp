@@ -84,11 +84,6 @@ void relational_cache::infer_cache_for(const const_entity_handle h) {
 }
 
 void relational_cache::destroy_cache_of(const const_entity_handle h) {
-	/* 
-		Only destroys the information of h being a child.
-		If it is a parent, its children vectors are untouched
-	*/
-
 	for_each_tracker(
 		[h](auto& tracker){
 			tracker.unset_parents_of(h);

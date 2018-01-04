@@ -10,9 +10,17 @@ summary: Just a hidden scratchpad.
 ### Microplanned implementation order:  
 - strip children vector tracker of children caches as we'll take that data from signi
 	- was anyway used only for ensuring
+- separate "relational cache" into several classes
 - replace "reinfer all caches of" calls in entity handle with correspondent on_remove and on_add which will then infer or destroy
 	- handle calls it either if the member function is present or if component is synchronized
 		- so required in the latter case
+- separate a "custom_rigid_body_owner" component so that caches/components have 1:1 ratio
+	- so that fixtures cache does not need to construct both the relational and fixtural caches
+- introduce dependencies between caches (or just for now make them in proper order and reinfer all on adding a sensitive component)
+	- e.g. fixtures of bodies would depend on items of slots
+	- each cache defines ``using depends_on = type_list<items_of_bodies, ...>`` etc.
+		- on inference or destruction, iterate through all caches and reinfer them if they depend on the currently modified one  
+
 #### Later
 - remove all_inferred_state as it is essentially pointless once we have types implemented
 
@@ -54,7 +62,7 @@ component types:
 
 components order matter for reinferences order
 
-order here will be important, in particular, systems should also be ordered well so that:
+order here will be important, in particular, caches should also be ordered well so that:
 circumstantial_fixtures_owner_cache
 circumstantial_damping_cache
 circumstantial_density_cache
