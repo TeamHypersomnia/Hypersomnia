@@ -19,7 +19,7 @@ Caches are often [reinferred](reinference).
 An inferred cache is a classical example of a [time–memory trade-off](https://en.wikipedia.org/wiki/Space%E2%80%93time_tradeoff).
 If our computers had infinite processing speed, existence of inferred caches would be pretty much pointless.
 
-### Explanation
+### Example
 
 Consider how you would manage names for your game objects.
 Say that the state for your game looks like this:
@@ -97,7 +97,7 @@ Assume also, that, at some point in your code, you do this:
 for (const auto& e : entities_by_name) {
 	std::cout << e.first.name << std::endl;
 }
-````
+```
 It may print something like:
 
 ```
@@ -105,7 +105,7 @@ Road
 Tree
 BILMER2000
 Motorcycle
-````
+```
 
 If, however, you now completely [reinfer](reinference) ``entities_by_name``, the same code may produce:
 
@@ -114,7 +114,7 @@ BILMER2000
 Tree
 Motorcycle
 Road
-````
+```
 
 Iterating two distinct ``std::unordered_map``s and expecting the order to be the same is only reasonable when the elements are identical and inserted in the same order (this, however, [*is not* enforced by the standard](https://stackoverflow.com/a/13623172/503776), but can be easily verified empirically).
 However, once we reinfer the map, we pass it elements (entity names) in a possibly completely different order from when it was incrementally kept up to date - entity creations, deletions and renames might have happened arbitrarily. Which means that our inferred cache is not quite identical to the one before reinference, even though they were generated from the same significant state. 
@@ -122,3 +122,9 @@ However, once we reinfer the map, we pass it elements (entity names) in a possib
 This is an important implication when dealing with simulation's [determinism](determinism).  
 For example, if one client needs to completely [reinfer](reinference) from their significant state, all others **should reinfer too**, so that the simulation does not diverge across machines.  
 This is particularly important when dealing with [``physics_cache``](physics_cache), which also keeps all contact information in a ``b2World``.
+
+### Children tracker
+
+Some inferred caches are simple enough that, if they are defined per-object, there is always a single cache per-object to generate or destroy.  
+That is not necessarily the case with caches that 
+There exists a special case of an inferred cache.

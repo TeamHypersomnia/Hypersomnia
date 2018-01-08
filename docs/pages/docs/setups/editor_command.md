@@ -21,7 +21,7 @@ Those approaches to command implementation have been considered so far:
     - Slightly less determinism.
         - If the author has done undo and then redo, their further actions and recordings might result in a different cosmos than if they would have stayed on the current change.
     - Unacceptable memory and processing performance.
-3. (Chosen approach) **With each command, store the bytes of both the new and the old value. If part of sensitive common state, or if part of a synchronized component, [reinfer](reinference).**
+3. (Chosen approach) **With each command, store the bytes of both the new and the old value. If part of associated common state, or if part of a synchronized component, [reinfer](reinference).**
     - Even less determinism, but the problem is solvable or tolerable equally well as in 2.
         - If the author has jumped once 10 commands back, their further actions and recordings might result in a different cosmos than if they would have just repeated undo ten times.
         - Solved if both redos and undos are reinferred completely.
@@ -36,7 +36,7 @@ This will greatly reduce code duplication.
 
 &nbsp;&nbsp;&nbsp;&nbsp;*Main article: [State consistency](state#consistency)*
 
-There are more things to consider about state consistency when potentially exposing sensitive fields to the author.
+There are more things to consider about state consistency when potentially exposing associated fields to the author.
 
 ### Problematic values 
 

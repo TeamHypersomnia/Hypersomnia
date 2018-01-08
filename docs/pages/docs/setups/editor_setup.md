@@ -75,5 +75,5 @@ Can click on each command to go back to a given point in time.
 
 An editor will most likely need some inferred caches, like entities sorted lexicographically.  
 We might always facilitate this by adding some inferred caches for [cosmos common], because it is very rarely reinferred.  
-As we will also always trigger cosmos's reinference manually when the editor changes some sensitive state, we might just reinfer along with the cosmos, never needing to hold additional information in the common inferred.  
+As we will also always trigger cosmos's reinference manually when the editor changes some associated state, we might just reinfer along with the cosmos, never needing to hold additional information in the common inferred.  
  
