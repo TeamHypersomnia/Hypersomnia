@@ -1,0 +1,59 @@
+digraph G {
+	/*
+		Legend:
+
+		Black node: significant field(s)
+		Red node: inferred cache
+		Pink node: calculated information that is not stored
+
+		Orange edge: necessary to know which caches are dependent on the pointed node
+		Blue edge: state that may come from this entity and one or more of its parents 
+		Cyan edge: state that may come from a single remote source
+	*/
+	
+	"determined damping/density"[color="pink"]
+	"determined attachment joint"[color="pink"]
+	"determined owning body"[color="pink"]
+	"determined body properties"[color="pink"]
+	"b2Body cache"[color="red"]
+	"b2Fixture cache"[color="red"]
+	"attachment joint cache"[color="red"]
+	"custom joint cache"[color="red"]
+
+	"joints of bodies"[color="orange"]
+	"fixtures of bodies"[color="orange"]
+	"items of slots"[color="orange"]
+
+	"identity"[color=red]
+
+	"slot's method of phys. connection [d]"->"determined attachment joint"[color=blue]
+	"slot's method of phys. connection [d]"->"determined owning body"[color=blue]
+	"current slot of item"->"determined attachment joint"[color=blue]
+	"current slot of item"->"items of slots"[color=blue]
+	"custom joint [d/c]"->"custom joint cache"
+	"custom joint [d/c]"->"joints of bodies"[color=blue]
+	"determined attachment joint"->"attachment joint cache"
+	"determined attachment joint"->"joints of bodies"[color=blue]
+	"body [d]"->"determined damping/density"
+	"body [d]"->"determined body properties"
+	"body [c]"->"determined body properties"
+	"determined body properties"->"b2Body cache"
+	"driver [c]"->"determined damping/density"
+	"movement [d/c]"->"determined damping/density"
+	"determined damping/density"->"determined body properties"
+	"fixtures [d]"->"b2Fixture cache"
+	"determined owning body"->"b2Fixture cache"
+	"determined owning body"->"fixtures of bodies"[color=blue]
+	"custom owning body [c]"->"determined owning body"
+	"current slot of item"->"determined owning body"[color=blue]
+	"b2Body cache"->"b2Fixture cache"[color=cyan]
+	"b2Body cache"->"attachment joint cache"[color=blue]
+	"b2Body cache"->"custom joint cache"[color=blue]
+
+	"fixtures of bodies"->"b2Body cache"[color=orange]
+	"joints of bodies"->"b2Body cache"[color=orange]
+
+	"fixtures of bodies"->"identity"[constraint=false,color=orange]
+	"joints of bodies"->"identity"[constraint=false,color=orange]
+	"items of slots"->"identity"[constraint=false,color=orange]
+}
