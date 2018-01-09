@@ -1,0 +1,57 @@
+digraph G {
+	/*
+		Parent is a dependency of a child.
+		Child is dependent on the parent.
+
+		Legend:
+
+		Red node - cache
+
+		Black edge - calls [target node label] this entity only
+		Red edge - [target node label] depends on [source node label]
+		Blue edge - calls [target node label] of one or more entities
+	*/
+
+	ordering=out;
+	"Decremental cache dtor"->"Cache children calc"
+	"Children vectors"[color=red]
+	"Children vectors"->"Cache children calc"[color=red]
+	
+	"Decremental cache dtor"->"Cache class dtor"
+	"Decremental cache dtor"->"Incremental inferrer"[color=blue]
+	//"Incremental inferrer"->"Decremental cache dtor"
+
+	"Incremental inferrer"->"Incremental inferrer"[color=blue/* label="of" labeltooltip="of child(dependency)"*/]
+
+	"Incremental inferrer"->"Cache children calc"
+
+	"Entity ctor"->"Lifetime-immutables inferrer"
+	"Entity ctor"->"Incremental inferrer"
+
+	"Children vectors"->"Signi children calc"[color=red]
+
+	"Entity dtor"->"Signi children calc"
+	"Entity dtor"->"Signi dtor"
+	"Entity dtor"->"Decremental cache dtor"
+	"Entity dtor"->"Lifetime-immutables dtor"
+	"Lifetime-immutables dtor"->"Cache class dtor"
+	"Signi dtor"->"Incremental inferrer"[color=blue]
+
+	"Create entity"->"Entity ctor"
+	"Clone entity"->"Create entity"
+	"Delete entity"->"Entity dtor"
+
+	"Complete reinference"->"Complete destruction"
+	"Complete reinference"->"Complete inference"
+
+	"Complete inference"->"Entity ctor"
+	"Complete destruction"->"Cache class dtor"
+
+	"Lifetime-immutables inferrer"->"GUID cache"
+	"Lifetime-immutables inferrer"->"Type id cache"
+
+//	"Assoc-signi field changer"->"Incremental inferrer"[constraint=false]
+
+//	"Signi"[color=green]	
+//	"Signi"->"Incremental inferrer"[constraint=false,color=green]
+}

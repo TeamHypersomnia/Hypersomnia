@@ -34,12 +34,12 @@ digraph G {
 	"custom joint [d/c]"->"joints of bodies"[color=blue]
 	"determined attachment joint"->"attachment joint cache"
 	"determined attachment joint"->"joints of bodies"[color=blue]
-	"body [d]"->"determined damping/density"
-	"body [d]"->"determined body properties"
-	"body [c]"->"determined body properties"
+	"standard body properties"->"determined damping/density"
+	"standard body properties"->"determined body properties"
+	"current vel/pos"->"determined body properties"
 	"determined body properties"->"b2Body cache"
-	"driver [c]"->"determined damping/density"
-	"movement [d/c]"->"determined damping/density"
+	"currently driven vehicle"->"determined damping/density"
+	"current \"is running\" flag"->"determined damping/density"
 	"determined damping/density"->"determined body properties"
 	"fixtures [d]"->"b2Fixture cache"
 	"determined owning body"->"b2Fixture cache"
