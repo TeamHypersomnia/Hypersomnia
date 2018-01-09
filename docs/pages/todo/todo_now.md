@@ -27,17 +27,17 @@ Memory is somewhat safe because it can only grow as far as the children grow.
 
 ### Microplanned implementation order:  
 
-- Remove owner_body from fixtures component and create a component named "rigid body owner" that overrides anything else
+- Remove owner_body from fixtures component and create a component named "custom rigid body owner" that overrides anything else
 - Current slot should stay in the item component as other fields of item will anyway be a private
 - **moving disabled processing lists out of the significant state**
 	- for now ditch the setter of rotation copying when switching driver ownership
 	- most stateless, thence easiest is when we just easily determine when not to process an entity without relying on having proper fields set in processing lists
 		- we should then only ever optimize when it is needed
-	- or it can be part of inferred state and we can complicate things a little
+	- or it can be part of inferred state which will complicate things a little
 - force joint components should be "custom" in a sense that they can be added and they do not override anything else
 	- there should be one cache per joint type, e.g. attachment joint cache which is inferred from current inventory state 
 
-#### Cosmos operations that **always move from one consistent state to the next**:
+#### Cosmic functions that **always move from one consistent state to the next**:
 
 - Create an entity with a specific type.
 	- Without side effects, allocates and adds data needed by the simulation to store intermediate results (aka components).
@@ -49,8 +49,6 @@ Memory is somewhat safe because it can only grow as far as the children grow.
 			- Initializes any identity-related cache.
 				- At this time, only the parenthood cache (but this is initialization is only theoretical. In practice nothing is done in this regard until the first child appears.)
 		- Calls all other dynamic inferrers.
-		- Infers caches whose existence is implied by the content of the type.
-			- It uses standard inferrers that are also used for reinferring. The logic for inferring for the first time shall not differ from the one used for reinferring.
 - Create a group with a specific type.
 	- Allocates identificators to all entities in the group.
 	- Unpacks the group by creating components with correspondent identificators.
@@ -73,8 +71,7 @@ Memory is somewhat safe because it can only grow as far as the children grow.
 - Get a component and do an operation on an associated, insensitive field through a method.
 	- The method is responsible for upholding the consistency of state.
 - Get a component and do an operation on a sensitive field through a method.
-	- If reinference predicted to fail, a no-op.
-	- Otherwise the method is responsible for upholding the consistency of state.
+	- The method is responsible for upholding the consistency of state.
 - Set a new common significant state and reinfer the whole cosmos.
 	- WARNING: Reinference of some existent entities may fail (e.g. less space was specified for a container).
 		- Throw on reinference error? Then the editor could catch it and revert the change.
@@ -82,16 +79,11 @@ Memory is somewhat safe because it can only grow as far as the children grow.
 - Set a new solvable siginficant state and reinfer the cosmos solvable.
 	- WARNING: Reinference of some existent entities may fail (e.g. more items were specified for a container).
 		- May throw [cosmos inconsistent error](cosmos_inconsistent_error).
-- ~~Change type of an entity~~. We will forbid this for simplicity. Later we might just facilitate this in the editor somehow.
-	- It would be dangerous to change type of an existing entity without invalidating its identity.
-		- That is because, if it was a container, and it changed to a container with less space, and its identity cache is left intact (e.g. its parenthood cache wasn't destroyed), then the state becomes inconsistent.
-	- Destroys all caches of the existent entity, ~~except identity cache (e.g. does not destroy parenthood)~~ (poses a risk of breaking consistency).
 - T: Except inside the methods responsible for creating, destroying and cloning entities, at no point in time is any existing entity *partially inferred*.
 - T: Except inside the methods responsible for creating, destroying and cloning entities, changing the entity's type and methods that deal with complicated reading (e.g. cosmic delta), any existing entity is at all times *fully inferred*.
-<!--- T: Creating, cloning or destroying an entity does never break consistency.
-- T: Changing an entity's type may possibly breaking
--->
-Editor operations with regard to cosmos that move from one consistent state to the next:
+
+#### Editor operations with regard to cosmos that move from one consistent state to the next:
+
 - Write directly to an unassociated field in the cosmos common/solvable significant.
 - Write directly to an associated field in the cosmos common/solvable significant. 
 	- Reinfer the whole cosmos.
@@ -101,17 +93,12 @@ Editor operations with regard to cosmos that move from one consistent state to t
 	- Reinfer the whole cosmos.
 	- Catch cosmos inconsistent state exception and revert if it occurred.
 
-#### Cosmos detalic operations:
 - Inferrer of cache.
 	- If the cache exists, update it incrementally.
 	- If the cache does not exist, quickly update it fully.
 	- For domains that don't need much performance, incremental update might always do the same thing as the full update.
 	- If we provide incremental update logic, it might as well be used by the full update logic, without much of loss.
 		- Be wary though of comparing to default values.
-	- **T: Despite the solver only ever sees fully inferred cosmos, inferences and destructions of entities must be made to work when they happen arbitrarily.**
-		- P: Complete reinference of the cosmos must somehow be implemented, right?
-		- Additionally, methods that change sensitive state while upholding consistency, may need to arbitrarily reinfer some caches.
-		- **This is especially important implication when dealing with parent/child relationships.**
 	- Dependent caches
 		- Caches can depend on calculated information that **does not physically exist in significant state**.
 			- Inference of some cache depends on an already inferred value of some other cache(s).

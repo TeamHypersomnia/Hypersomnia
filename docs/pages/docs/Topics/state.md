@@ -15,7 +15,18 @@ TODO: Make a graph.
 
 ### Definitions
 
-- For state to be considered **consistent**, the name(s) of its field(s) must **tell the truth**.  
+- For state to be considered **consistent**, the name(s) of its field(s) must **tell the truth**.    
+
+E.g. if, for a container entity **C**, there exists a ``std::vector<entity_id>`` named ``items_inside`` (that tracks which items have set **C** as their *current container*),  
+then all entities referred to by the ids in this vector must have an [item component](item_component) whose ``current_slot`` field points to **C**. If one of those items had, for example, ``current_slot`` set to null identificator, then the ``items_inside`` field would introduce a lie, effectively breaking consistency of state.
+
+There are more subtle cases:  
+
+For example, if we make an unwritten contract that if a character currently drives a car, it has half its usual linear damping, then, for example, the following lie may occur:  
+- The ``driver::owned_vehicle`` points to a correct car entity, but the ``b2Body`` of the character reports that it has its usual linear damping set. In this case, the ``b2Body`` is inconsistent, because considering the unwritten contract, it lies.
+
+Theoretically, inconsistent state wouldn't always crash the application, but it is nevertheless a requirement at all times.  
+
 - If a field implies truths about other fields, or if truths about a field are implied by another field, such field is called **associated**.
 	- In particular, if a significant field has an inferred cache, both are considered **associated**.
 - A field that is not associated is called **unassociated**.
@@ -53,60 +64,73 @@ TODO: Make a graph.
 		- If a field is associated only by virtue of being inferred, and reinference always succeeds, regardless of the initial value...
 			- ...let the entity type specify the initial value.
 			- On adding, reinfer.
-- Examples of conduct with associated fields:
-	- At **no point in time** can an entity have destroyed caches or only partially inferred, except as a part of reinference cycle.
-	- Existence of components might be part of associated state itself.
-		- but only for processing categories.
-	- Alteration of some inferred cache might require reinference of other caches.
-		- Car might be deleted while still being driven.
-			- Car destructor releases driver ownership or just destruction of its cache later reinfers the driver.
-		- Container can be deleted while it still holds items
-			- the items' current_slot fields will now point to a dead entity, so it always means they are dropped
-			- but for this to take effect, all items need to be reinferred before destroying all caches of the container (we'll need its relational cache to know the held items)
-			- if an item in a container is deleted
-				- incrementally update the relational cache of the container 
-	- Currently, friction fields can be deleted while still being pointed to by m_ownerFrictionGround.
-		- Relational cache should keep track of entities that have such pointer and reset pointers to null properly once the friction field gets deleted.
+
+### Requirements
+
+We will list here all possible corner cases and what code is expected to correctly do.
+
+- Car's hand brake may be altered, requiring a change in physical properties of the car.
+	- Required by: solver
+	- **Expected:** update the damping and/or density of the car without resetting the body.
+		- Reinfer rigid body cache of the car incrementally, only resetting what's changed.
+- Item can change a slot.
+	- Required by: solver
+	- **Expected:** this entity, as well as all its children items need to be reinferred recursively with regard to their owner bodies. 
+		- Since the complete reinference must be able to rebuild these caches from scratch, it makes sense that we would just overwrite the field, reinfer the dependent caches and catch potential inconsistency exceptions.
+			- The GUI will have predictors so that an erroneous transfer will not happen in the first place.
+- Item can change a slot requiring the physical b2Body to start functioning.
+	- Which means we need to reinfer the rigid body cache.
+		- Which means we will need to reinfer caches that depend on b2Body.
+- A fixture of an item in item deposit (with deactivated body) gets reinferred.
+	- Expected: determines that the body cache is inferred but b2Body does not exist, therefore does not create b2Fixtures; still, ends up considered inferred. 
+- Car gets deleted while still being driven.
+	- Required by: editor, possibly some logic?
+	- **Expected:** Car destructor releases driver ownership or just destruction of its cache later reinfers the driver.
+- The body may be deleted while it is still referred to by other entities via custom_rigid_body.
+	- Reinfers all fixtures_of_bodies effectively making them standalone bodies.
+- Container gets deleted while it still holds items.
+	- Needs to reinfer completely fixture and joint caches of children items. 
+	- the items' current_slot fields will now point to a dead entity, so it always means they are dropped
+	- but for this to take effect, all items need to be reinferred before destroying all caches of the container (we'll need its relational cache to know the held items)
+	- if an item in a container is deleted
+		- incrementally update the relational cache of the container 
+- Currently, friction fields can be deleted while still being pointed to by m_ownerFrictionGround.
+	- Required by: editor, possibly some logic?
+		- Solution: a separate relational cache keeps track of entities that have such pointer and reset pointers to null properly once the friction field gets deleted.
 			- For now we'll just disallow removal? 
 			- For now let's just iterate through all bodies and unset the pointers to the deleted body.
-
-E.g. if there exists a ``std::vector`` named ``items_inside`` that tracks which items have set this container as current,  
-then it must not lie about those items, e.g. amongst its items there cannot be found any which has a null identificator for a ``current_slot``  
-(which means that it is dropped to the ground).  
-
-There are more subtle cases:  
-For example, if we make an unwritten contract that if a character currently drives a car, it has half the standard linear damping, then, among others, the following lie may occur:  
-
-- The ``driver::owned_vehicle`` points to a correct car entity, but the inferred state of the character body returns the standard linear damping. In this case, the inferred state is inconsistent, because considering the unwritten contract, it lies.
-
-Theoretically, inconsistent state wouldn't always crash the application, but it is nevertheless a requirement at all times.  
-
-**Most of the time**, it is fairly easy to ensure **state consistency**, since upon the need to change some state, we always have helper methods at hand and can write code so as to update all other dependent state. Heck, we can even have FSMs.  
-- Still, [solver](solver) can change type of an entity, which, without proper attention, could cause all sorts of funny bugs. 
-	- E.g. the hand fuse logic changes type of the grenade to a released counterpart.
-- During content creation stage, without proper care, associated significant state might be altered **arbitrarily**
-	- In particular, entities might frequently change types with arbitrary differences in enabled definitions (and thus implied components).  
-	- We might as well later enable the author to freely alter, add or remove components themselves.  
+- Complete inference can encounter:
+	- fixtures first, only later bodies to which they belong.
+	- engines first, only later the body car to which they belong.
+	- items first, only later containers to which they belong.
+	- ~~**Expected:** infer the parent, then infer the children, and don't later infer children.~~
+	- **Expected:** NOTHING NEEDS BE DONE EXCEPT FOR PERFORMANCE. Since **inferrers themselves will be designed to always traverse the dependency tree** and infer the root first, the complete reinference should get the information from the inferrer which caches have been already inferred, to improve performance.
+- During complete reinference, container can be found to have been assigned less space than it had and can no longer contain items.
+	- Required by: editor
+	- **Expected:** throw cosmos inconsistent state when, during complete reinference, items of an entity are found to occupy too much space. 
 
 #### Strategies for keeping consistency 
 
+- Provide a separate function that determines dependencies of caches? 
+
+- While caches can be made to only depend on significant, dependencies of caches might need other caches to be calculated.
+
+- Observation: If a cache depends on exclusively significant fields, and they belong to one or more entities, those entities are either the one to which tied is existence of this cache or its parents.
+	- Briefly: If cache is calculated only with help of signi, it depends only on the owner entity or its parents.
+		- Even if intuitively an id is not a "parent" it could be made conceptually so
+	- That is because we never store children information in the significant state.
+- If calculation of a cache starts depending on some children tracker, then caches that depend on a certain significant field could be found wherever.
+- T: if an associated significant information (or identity) is a dependency of a cache, then all caches that depend on it are found:
+	- either in this entity,
+	- or in one or more entities in children vector tracker(s) in the inferred state.
+	- Example: slot physical behaviour is dependency of children attachments only, but not the parent inventory nodes
+
 - Determine all associated fields in the cosmos solvable.
-	- **Hide** all significant associated fields (no inferred state will be editable anyway) from the author, so that they only ever influence it through specialized methods that move them from one consistent state to the next.
-		- Example: though not at all intuitive at a first glance, the **item component** (as opposed to the **definition**) should be completely immutable to the author. It should not be able to be deleted or added on demand.
-			- Only expose a predictable ``perform_transfer`` function.
-		- Although, obviously, in case of physics (velocity and others) an author might just see a slider like any else.
+	- This state, not even sensitive fields, needs not be hidden from author because inferrers are required to throw cosmos inconsistent error and the editor is supposed to catch it.
+		- Otherwise we would need to hide container's capacity as well, which is unreasonable.
 - **Know exactly** what code can directly and arbitrarily write to the associated fields.
 	- Farily easy now with introduction of the [cosmic functions](cosmic_function).
 	- **Know exactly** what entity handle lets us do and when.
-- Provide a safe function that deletes all entity's components while preserving its identity.
-	- Just call **remove** on all dynamic components and set always_present components **to default values**. **(except guid)**
-	- Implies complete destruction of caches for an entity.
-	- It is, however, required to move from one **consistent state to the next**.
-		- If all associated state would only be associated by virtue of having an inferred cache...
-			-  ...this would be as simple as destroying all caches related to that component.
-		- Otherwise...
-			- ...let components have "destructors". 
-			- We'll probably go with this first for associateds that will take a lot of effort to move to the associated state.
 - If a significant associated field is only associated by virtue of having an inferred cache, reinference always makes that field stop breaking consistency.
 	- Except if it is possible for the reinference to not lead to a logical success.
 		- E.g. item component might be reinferred with a current slot that is not viable.

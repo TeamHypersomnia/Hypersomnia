@@ -144,3 +144,70 @@ Assumptions that are the most relaxing:
 	- ...whose any value in the significant ends in successful reinference.
 	- ...for whom exist some values in the significant whose inference may fail
 		- called **sensitive**.
+
+
+#### Consistency upholders
+
+These are the only functions that ever actually touch the associated (and thus sensitive) fields when the state is already consistent.  
+They are callable from the cosmic functions and it is their requirement to uphold consistency of state.  
+- ~~Change type of an entity~~. We will forbid this for simplicity. Later we might just facilitate this in the editor somehow.
+	- It would be dangerous to change type of an existing entity without invalidating its identity.
+		- That is because, if it was a container, and it changed to a container with less space, and its identity cache is left intact (e.g. its parenthood cache wasn't destroyed), then the state becomes inconsistent.
+	- Destroys all caches of the existent entity, ~~except identity cache (e.g. does not destroy parenthood)~~ (poses a risk of breaking consistency).
+<!--- T: Creating, cloning or destroying an entity does never break consistency.
+- T: Changing an entity's type may possibly breaking
+-->
+
+- Examples of conduct with associated fields:
+	- At **no point in time** can an entity have destroyed caches or only partially inferred, except as a part of reinference cycle.
+	- Existence of components might be part of associated state itself.
+		- but only for processing categories.
+<!--
+	- **Hide** all significant associated fields (no inferred state will be editable anyway) from the author, so that they only ever influence it through specialized methods that move them from one consistent state to the next.
+		- Example: though not at all intuitive at a first glance, the **item component** (as opposed to the **definition**) should be completely immutable to the author. It should not be able to be deleted or added on demand.
+			- Only expose a predictable ``perform_transfer`` function.
+		- Although, obviously, in case of physics (velocity and others) an author might just see a slider like any else.
+-->
+- Provide a safe function that deletes all entity's components while preserving its identity.
+	- Just call **remove** on all dynamic components and set always_present components **to default values**. **(except guid)**
+	- Implies complete destruction of caches for an entity.
+	- It is, however, required to move from one **consistent state to the next**.
+		- If all associated state would only be associated by virtue of having an inferred cache...
+			-  ...this would be as simple as destroying all caches related to that component.
+		- Otherwise...
+			- ...let components have "destructors". 
+			- We'll probably go with this first for associateds that will take a lot of effort to move to the associated state.
+
+- ~~with the current architecture, get_fixture_entities will only be needed in resolve_density_of_associated_fixtures; as dependencies will be well managed during inferences, the rigid body inferrer won't need to query the children~~
+	- ~~thus we will be able to do away with fixtures_of_bodies cache?~~
+	- Notice that when an item is hidden in deposit, then even though the body cache might be considered inferred, the b2Body will not exist for performance. Then when the current slot for this hidden item changes, it will need to iterate the children fixtures to reinfer them too as their caches are order-dependent on the body.
+
+#### Detail cache functions
+
+Domains in direct need of creating cache:
+- Creating entity (whether by a clone, a delta or a genuinely new entity)
+	- Should always easily succeed, problem starts with incremental alteration
+- Complete reinference of the cosmos
+- Methods for incremental alteration?
+	- What is the largest alteration possible at a time?
+
+Domains in direct need of destruction of some cache:
+- Deleting entity
+- Methods for incremental alteration?
+- ~~Complete reinference of the cosmos~~
+	- Complete reinference will just use class destructors.
+
+- **Domains where inference and destruction of caches could happen arbitrarily:**
+	- Complete reinference of the cosmos
+	- Methods that change sensitive state while upholding consistency may need to arbitrarily reinfer some caches.
+	- **This is especially important implication when dealing with parent/child relationships.**
+
+- Component synchronizer's method that alters sensitive state and updates the caches to uphold consistency.
+	- Calls responsible inferrer that will update incrementally.
+	- If the associated field is sensitive
+		- Catch [cosmos inconsistent error](cosmos_inconsistent_error) in case of failure.
+			- Now the cache is destroyed.
+			- In this case, restore old value and reinfer again with guarantee of success.
+
+- What if complete reinference could be implemented in terms of entity creations/deletions?
+	- Corner cases could theoretically be mitigated by enforcing order of construction?	
