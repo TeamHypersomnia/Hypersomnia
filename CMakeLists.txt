@@ -247,7 +247,6 @@ set(HYPERSOMNIA_TEST_SCENES_CPPS
 	"src/test_scenes/ingredients/guns.cpp"
 	"src/test_scenes/ingredients/ingredients.cpp"
 	"src/test_scenes/ingredients/melee_weapons.cpp"
-	"src/test_scenes/ingredients/motorcycle.cpp"
 	"src/test_scenes/ingredients/obstacles.cpp"
 	"src/test_scenes/ingredients/sprite.cpp"
 	"src/test_scenes/ingredients/wsad_player.cpp"

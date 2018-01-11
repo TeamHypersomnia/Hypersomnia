@@ -1,5 +1,4 @@
 #pragma once
-
 #if BUILD_TEST_SCENES
 #include "augs/math/vec2.h"
 #include "augs/graphics/rgba.h"
@@ -13,8 +12,6 @@
 #include "game/components/render_component.h"
 #include "game/components/sprite_component.h"
 #include "test_scenes/test_scene_types.h"
-
-class cosmos;
 
 namespace components {
 	struct item;
@@ -70,13 +67,11 @@ namespace prefabs {
 	void populate_character_types(entity_types& types);
 
 	entity_handle create_car(const logic_step, const components::transform&);
-	entity_handle create_motorcycle(const logic_step, const components::transform&);
 
 	entity_handle create_sample_suppressor(const logic_step world, const vec2 pos);
 
 	entity_handle create_sample_magazine(const logic_step, components::transform pos, std::string space = "0.30", entity_id charge_inside = entity_id());
 	entity_handle create_sample_rifle(const logic_step, vec2 pos, entity_id load_mag = entity_id());
-	entity_handle create_sn69(const logic_step step, vec2 pos, entity_id load_mag_id);
 	entity_handle create_kek9(const logic_step step, vec2 pos, entity_id load_mag_id);
 
 	entity_handle create_amplifier_arm(
@@ -84,7 +79,6 @@ namespace prefabs {
 		const vec2 pos 
 	);
 
-	entity_handle create_damped_cyan_charge(const logic_step, vec2 pos, int charges = 30);
 	entity_handle create_cyan_charge(const logic_step, vec2 pos, int charges = 30);
 
 	entity_handle create_sample_backpack(const logic_step, vec2 pos);

@@ -115,10 +115,9 @@ We will list here all possible corner cases and what code is expected to correct
 
 - While caches can be made to only depend on significant, dependencies of caches might need other caches to be calculated.
 
-- Observation: If a cache depends on exclusively significant fields, and they belong to one or more entities, those entities are either the one to which tied is existence of this cache or its parents.
-	- Briefly: If cache is calculated only with help of signi, it depends only on the owner entity or its parents.
-		- Even if intuitively an id is not a "parent" it could be made conceptually so
+- Observation: If a cache ascribed to entity **E** depends on exclusively significant fields of one or more entities, among them can be found only **E** or parents of **E**.
 	- That is because we never store children information in the significant state.
+	- Even if intuitively an id is not a "parent" it could be made conceptually so
 - If calculation of a cache starts depending on some children tracker, then caches that depend on a certain significant field could be found wherever.
 - T: if an associated significant information (or identity) is a dependency of a cache, then all caches that depend on it are found:
 	- either in this entity,

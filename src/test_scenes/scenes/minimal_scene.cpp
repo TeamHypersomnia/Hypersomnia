@@ -35,10 +35,6 @@ namespace test_scenes {
 	entity_id minimal_scene::populate(const logic_step step) const {
 		auto& world = step.get_cosmos();
 
-		//prefabs::create_force_grenade(step, { 254, 611 });
-		//prefabs::create_force_grenade(step, { 254, 711 });
-		//prefabs::create_force_grenade(step, { 254, 811 });
-
 		const int num_characters = 1;
 
 		std::vector<entity_id> new_characters;
@@ -52,10 +48,8 @@ namespace test_scenes {
 			components::transform transform;
 
 			if (i == 0) {
-				//torso_set = assets::animation_response_id::TORSO_SET;
 			}
 			else if (i == 1) {
-				//torso_set = assets::animation_response_id::VIOLET_TORSO_SET;
 				transform.pos.x += 200;
 			}
 
@@ -80,49 +74,15 @@ namespace test_scenes {
 
 
 			fill_range(sentience.learned_spells, true);
-			//for_each_through_std_get(
-			//	sentience.spells,
-			//	[](auto& spell) {
-			//		spell.common.learned = true;
-			//	}
-			//);
 		}
-
-		//const auto amplifier = prefabs::create_amplifier_arm(step, vec2(-300, -500 + 50));
-
-		//const auto backpack = prefabs::create_sample_backpack(step, vec2(100, -150));
 
 		const auto rifle2 = prefabs::create_sample_rifle(step, vec2(100, -500 + 50),
 			prefabs::create_sample_magazine(step, vec2(100, -650), true ? "10" : "0.3",
 				prefabs::create_cyan_charge(step, vec2(0, 0), true ? 1000 : 5)));
 		
-		//prefabs::create_rocket_launcher(step, { -100, 0, -180 }, prefabs::create_force_rocket(step, {}));
-		//prefabs::create_motorcycle(step, {0, 0, -90});
-
-		//prefabs::create_force_rocket(step, { 0, 100 });
-		//prefabs::create_force_rocket(step, { 100, 100 });
-		//prefabs::create_force_rocket(step, { 200, 100 });
-
 		prefabs::create_force_grenade(step, { 100, 100 });
 		prefabs::create_force_grenade(step, { 200, 100 });
 		prefabs::create_force_grenade(step, { 300, 100});
-
-		//prefabs::create_sample_rifle(step, vec2(300, -500 + 50));
-		//
-		//prefabs::create_sample_rifle(step, vec2(100, -500),
-		//	prefabs::create_sample_magazine(step, vec2(100, -650), "0.4",
-		//		prefabs::create_cyan_charge(step, vec2(0, 0), 30)));
-
-		//perform_transfer({ backpack, character(0)[slot_function::SHOULDER] }, step);
-
-		//const auto rifle = prefabs::create_sample_rifle(step, vec2(100, -500),
-		//	prefabs::create_sample_magazine(step, vec2(100, -650), false ? "10" : "0.3",
-		//		prefabs::create_cyan_charge(step, vec2(0, 0), false ? 1000 : 30)));
-		//
-		//
-		//prefabs::create_sample_rifle(step, vec2(100, -700),
-		//	prefabs::create_sample_magazine(step, vec2(100, -650), true ? "10" : "0.3",
-		//		prefabs::create_cyan_charge(step, vec2(0, 0), true ? 1000 : 30)));
 
 		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
 		return new_characters[0];

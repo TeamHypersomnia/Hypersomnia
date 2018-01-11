@@ -22,8 +22,6 @@ When we do "get_children_of" in a relational mixin, we can ensure that the entit
 Memory is somewhat safe because it can only grow as far as the children grow.
 		- Concern could be raised becasue that would mean that, after reinference, that cache would be drastically different. However, we make no guarantee of 0% reinference error. Functionally, the parent cache with dead parent id is equal to no cache. The code, however, will be simpler.
 			- We will save that correction for later though.
-- reinference order constraints
-	- it would make sense to, on inference of a child, first enforce inference of the parent
 
 ### Microplanned implementation order:  
 

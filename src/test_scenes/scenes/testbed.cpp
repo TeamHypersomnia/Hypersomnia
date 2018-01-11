@@ -57,43 +57,13 @@ namespace test_scenes {
 		auto& world = step.get_cosmos();
 		const auto& metas = step.get_logical_assets();
 		
-		//const auto crate = prefabs::create_crate(step, vec2(200, 200 + 300), vec2i(100, 100) / 3);
-		//const auto crate2 = prefabs::create_crate(step, vec2(400, 200 + 400), vec2i(300, 300));
-		//const auto crate4 = prefabs::create_crate(step, vec2(500, 200 + 0), vec2i(100, 100));
-		//
-		//crates.push_back(crate);
-		//crates.push_back(crate2);
-		//crates.push_back(crate4);
-
-		//for (int x = -4; x < 4; ++x) {
-		//	for (int y = -4; y < 4; ++y) {
-		//		auto obstacle = prefabs::create_crate(step, vec2(2000 + x * 300, 2000 + y * 300), vec2i(100, 100));
-		//		crates.push_back(obstacle);
-		//	}
-		//}
-
-		//for (int x = -4 * 1; x < 4 * 1; ++x)
-		//{
-		//	auto frog = create_test_scene_entity(world, test_scene_type::FROG);
-		//	ingredients::add_sprite(metas, frog, vec2(100 + x * 40, 200 + 400), assets::game_image_id::TEST_SPRITE, white, render_layer::SMALL_DYNAMIC_BODY);
-		//	ingredients::add_see_through_dynamic_body(frog, pos);
-		//	
-		//	frog.add_standard_components(step);
-		//}
-
 		const auto car = prefabs::create_car(step, components::transform( 1490, 340, -180));
 		const auto car2 = prefabs::create_car(step, components::transform(1490, 340 + 400, -180));
 		const auto car3 = prefabs::create_car(step, components::transform(1490, 340 + 800, -180));
 
-		const auto motorcycle = prefabs::create_motorcycle(step, components::transform(250, 400, -90 + 180));
-		//prefabs::create_motorcycle(step, components::transform(100, -600, -90));
-		//const auto main_character_motorcycle = prefabs::create_motorcycle(step, components::transform(900, 48200, -90));
-		const auto main_character_motorcycle = prefabs::create_motorcycle(step, components::transform(900, 200, -90));
-		
 		const auto riding_car = prefabs::create_car(step, components::transform(850, 1000, -90));
 
 		const auto riding_car2 = prefabs::create_car(step, components::transform(-850 + 1000, -8200, -90 + 180));
-		const auto motorcycle2 = prefabs::create_motorcycle(step, components::transform(-1150 + 1000, -8200, -90 + 180));
 
 		const int num_characters = 4 + 3 + 3 + 2;
 
@@ -120,8 +90,7 @@ namespace test_scenes {
 			components::transform transform;
 
 			if (i == 0) {
-				transform = main_character_motorcycle.get_logic_transform();
-				//transform = { 0, 300, 0 };
+				transform = { 0, 300, 0 };
 				//torso_set = assets::animation_response_id::TORSO_SET;
 			}
 			else if (i == 1 || i == 2) {
@@ -132,52 +101,30 @@ namespace test_scenes {
 					transform = { 1102, 213, 110 };
 				}
 
-				//torso_set = assets::animation_response_id::VIOLET_TORSO_SET;
 			}
 			else if (i == 3) {
-				//torso_set = assets::animation_response_id::VIOLET_TORSO_SET;
 				transform = riding_car.get_logic_transform();
 			}
 
-			// three rebels
-
 			else if (i == 4) {
 				transform = { -100, 20000, 0 };
-
-				//torso_set = assets::animation_response_id::BLUE_TORSO_SET;
 			}
 			else if (i == 5) {
 				transform = { 1200, 15000, 0 };
-
-				//torso_set = assets::animation_response_id::BLUE_TORSO_SET;
 			}
 			else if (i == 6) {
 				transform = { -300, 20000, 0 };
-
-				//torso_set = assets::animation_response_id::BLUE_TORSO_SET;
 			}
 
 			// three metropolitan soldiers
 			else if (i == 7) {
 				transform = { -300, -2000, 0 };
-
-				//torso_set = assets::animation_response_id::VIOLET_TORSO_SET;
 			}
 			else if (i == 8) {
 				transform = { -400, -2000, 0 };
-
-				//torso_set = assets::animation_response_id::VIOLET_TORSO_SET;
 			}
 			else if (i == 9) {
 				transform = { -500, -2000, 0 };
-
-				//torso_set = assets::animation_response_id::VIOLET_TORSO_SET;
-			}
-			else if(i == 10) {
-				transform = riding_car2.get_logic_transform();
-			}
-			else if(i == 11) {
-				transform = motorcycle2.get_logic_transform();
 			}
 
 			const auto new_character = prefabs::create_sample_complete_character(step, transform, typesafe_sprintf("player%x", i), i ? 2 : 0);
@@ -229,13 +176,6 @@ namespace test_scenes {
 			if (
 				i == 7 || i == 8 || i == 9
 				) {
-
-				
-				
-				if (i == 8) {
-					
-				}
-
 				if (i == 9) {
 					const auto rifle = prefabs::create_sample_rifle(step, vec2(100, -500),
 						prefabs::create_sample_magazine(step, vec2(100, -650), "3.4",
@@ -255,14 +195,6 @@ namespace test_scenes {
 				perform_transfer({ backpack, new_character[slot_function::SHOULDER] }, step);
 			}
 
-			if (i == 10) {
-				driver_system().assign_car_ownership(new_character, riding_car2);
-			}
-
-			if (i == 11) {
-				driver_system().assign_car_ownership(new_character, motorcycle2);
-			}
-
 			auto& sentience = new_character.get<components::sentience>();
 
 			sentience.get<consciousness_meter_instance>().set_maximum_value(400);
@@ -277,13 +209,6 @@ namespace test_scenes {
 			}
 
 			fill_range(sentience.learned_spells, true);
-
-			// for_each_through_std_get(
-			// 	sentience.spells,
-			// 	[](auto& spell) {
-			// 		spell.common.learned = true;
-			// 	}
-			// );
 		}
 
 		// street wandering pixels
@@ -678,42 +603,11 @@ namespace test_scenes {
 			}
 		}
 
-		if (character(0).alive()) {
-			driver_system().assign_car_ownership(character(0), main_character_motorcycle);
-			//main_character_motorcycle.get<components::car>().accelerating = true;
-		}
-
-		if (character(3).alive()) {
-			driver_system().assign_car_ownership(character(3), riding_car);
-			//riding_car.get<components::car>().accelerating = true;
-		}
-
 		prefabs::create_sample_suppressor(step, vec2(300, -500));
 
 		const bool many_charges = false;
 
-
-		prefabs::create_kek9(step, vec2(-800, -100),
-			prefabs::create_sample_magazine(step, vec2(100, -650), many_charges ? "10" : "0.3",
-				prefabs::create_damped_cyan_charge(step, vec2(0, 0), many_charges ? 1000 : 30)));
-
 		prefabs::create_kek9(step, vec2(-800, -200),
-			prefabs::create_sample_magazine(step, vec2(100, -650), many_charges ? "10" : "0.3",
-				prefabs::create_cyan_charge(step, vec2(0, 0), many_charges ? 1000 : 30)));
-
-		prefabs::create_sn69(step, vec2(-400, -100),
-			prefabs::create_sample_magazine(step, vec2(100, -650), many_charges ? "10" : "0.3",
-				prefabs::create_damped_cyan_charge(step, vec2(0, 0), many_charges ? 1000 : 30)));
-		
-		prefabs::create_sn69(step, vec2(-400, -200),
-			prefabs::create_sample_magazine(step, vec2(100, -650), many_charges ? "10" : "0.3",
-				prefabs::create_damped_cyan_charge(step, vec2(0, 0), many_charges ? 1000 : 30)));
-		
-		prefabs::create_sn69(step, vec2(-600, -300),
-			prefabs::create_sample_magazine(step, vec2(100, -650), many_charges ? "10" : "0.3",
-				prefabs::create_cyan_charge(step, vec2(0, 0), many_charges ? 1000 : 30)));
-		
-		prefabs::create_sn69(step, vec2(-600, -400),
 			prefabs::create_sample_magazine(step, vec2(100, -650), many_charges ? "10" : "0.3",
 				prefabs::create_cyan_charge(step, vec2(0, 0), many_charges ? 1000 : 30)));
 
@@ -726,26 +620,9 @@ namespace test_scenes {
 				prefabs::create_cyan_charge(step, vec2(0, 0), true ? 1000 : 30)));
 
 		const auto amplifier = prefabs::create_amplifier_arm(step, vec2(-300, -500 + 50));
-		prefabs::create_amplifier_arm(step, vec2(-370, + 50));
 
 		prefabs::create_sample_rifle(step, vec2(100, -500 + 100), prefabs::create_sample_magazine(step, vec2(100, -650), many_charges ? "10" : "0.3",
 			prefabs::create_cyan_charge(step, vec2(0, 0), many_charges ? 1000 : 30)));
-
-		prefabs::create_sample_rifle(step, vec2(200, -600 + 100), prefabs::create_sample_magazine(step, vec2(100, -650), many_charges ? "10" : "0.3",
-				prefabs::create_cyan_charge(step, vec2(0, 0), many_charges ? 1000 : 30)));
-		prefabs::create_sample_rifle(step, vec2(300, -700 + 100), prefabs::create_sample_magazine(step, vec2(100, -650), many_charges ? "10" : "0.3",
-				prefabs::create_cyan_charge(step, vec2(0, 0), many_charges ? 1000 : 30)));
-		prefabs::create_sample_rifle(step, vec2(400, -800 + 100), prefabs::create_sample_magazine(step, vec2(100, -650), many_charges ? "10" : "0.3",
-				prefabs::create_cyan_charge(step, vec2(0, 0), many_charges ? 1000 : 30)));
-		prefabs::create_sample_rifle(step, vec2(500, -900 + 100), prefabs::create_sample_magazine(step, vec2(100, -650), many_charges ? "10" : "0.3",
-				prefabs::create_cyan_charge(step, vec2(0, 0), many_charges ? 1000 : 30)));
-
-		prefabs::create_sample_rifle(step, vec2(700, -600 + 100), prefabs::create_sample_magazine(step, vec2(100, -650), many_charges ? "10" : "0.3",
-				prefabs::create_cyan_charge(step, vec2(0, 0), many_charges ? 1000 : 30)));
-		prefabs::create_sample_rifle(step, vec2(800, -700 + 100), prefabs::create_sample_magazine(step, vec2(100, -650), many_charges ? "10" : "0.3",
-				prefabs::create_cyan_charge(step, vec2(0, 0), many_charges ? 1000 : 30)));
-		prefabs::create_sample_rifle(step, vec2(900, -800 + 100), prefabs::create_sample_magazine(step, vec2(100, -650), many_charges ? "10" : "0.3",
-				prefabs::create_cyan_charge(step, vec2(0, 0), many_charges ? 1000 : 30)));
 
 		prefabs::create_sample_rifle(step, vec2(300, -500 + 50));
 
@@ -755,24 +632,6 @@ namespace test_scenes {
 
 		const auto submachine = prefabs::create_sample_rifle(step, vec2(500, -500 + 50),
 			prefabs::create_sample_magazine(step, vec2(100 - 50, -650), many_charges ? "10" : "0.5", prefabs::create_cyan_charge(step, vec2(0, 0), many_charges ? 500 : 50)));
-
-		prefabs::create_sample_rifle(step, vec2(0, -1000),
-			prefabs::create_sample_magazine(step, vec2(100 - 50, -650), many_charges ? "10" : "0.5", prefabs::create_cyan_charge(step, vec2(0, 0), many_charges ? 500 : 50)));
-
-		prefabs::create_sample_rifle(step, vec2(150, -1000 + 150),
-			prefabs::create_sample_magazine(step, vec2(100 - 50, -650), many_charges ? "10" : "0.5", prefabs::create_cyan_charge(step, vec2(0, 0), many_charges ? 500 : 50)));
-
-		prefabs::create_sample_rifle(step, vec2(300, -1000 + 300),
-			prefabs::create_sample_magazine(step, vec2(100 - 50, -650), many_charges ? "10" : "0.5", prefabs::create_cyan_charge(step, vec2(0, 0), many_charges ? 500 : 50)));
-
-		prefabs::create_sample_rifle(step, vec2(450, -1000 + 450),
-			prefabs::create_sample_magazine(step, vec2(100 - 50, -650), many_charges ? "10" : "0.5", prefabs::create_cyan_charge(step, vec2(0, 0), many_charges ? 500 : 50)));
-
-
-		prefabs::create_sample_magazine(step, vec2(100 - 50, -650));
-		prefabs::create_sample_magazine(step, vec2(100 - 100, -650), "0.30");
-		prefabs::create_cyan_charge(step, vec2(150, -500));
-		prefabs::create_cyan_charge(step, vec2(200, -500));
 
 		prefabs::create_cyan_urban_machete(step, vec2(100, 100));
 		const auto second_machete = prefabs::create_cyan_urban_machete(step, vec2(0, 300));
