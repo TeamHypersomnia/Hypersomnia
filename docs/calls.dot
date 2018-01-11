@@ -49,7 +49,8 @@ digraph G {
 
 	"Lifetime-immutables inferrer"->"GUID cache"
 	"Lifetime-immutables inferrer"->"Type id cache"
-
+		
+//	"Incremental inferrer"->"Cache class dtor"
 //	"Assoc-signi field changer"->"Incremental inferrer"[constraint=false]
 
 //	"Signi"[color=green]	

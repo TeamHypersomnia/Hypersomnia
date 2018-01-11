@@ -296,7 +296,6 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/augs/misc/action_list/action_list.cpp"
 	"src/augs/misc/enum/enum_bitset.cpp"
 	"src/augs/misc/http/http_requests.cpp"
-	"src/augs/misc/machine_entropy.cpp"
 	"src/augs/misc/readable_bytesize.cpp"
 	"src/augs/misc/action_list/standard_actions.cpp"
 	"src/augs/readwrite/memory_stream.cpp"
