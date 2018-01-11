@@ -43,7 +43,7 @@ rigid_body_cache& component_synchronizer<false, P>::get_cache() const {
 }
 
 void component_synchronizer<false, P>::reinfer_caches() const {
-	cosmic::reinfer_cache<physics_world_cache>(handle);
+	cosmic::reinfer_cache(handle.get_cosmos().get_solvable_inferred({}).physics, handle);
 }
 
 void component_synchronizer<false, P>::set_body_type(const rigid_body_type t) const {

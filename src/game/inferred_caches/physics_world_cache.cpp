@@ -154,6 +154,17 @@ void physics_world_cache::infer_cache_for(const const_entity_handle handle) {
 		
 		const auto fixture_entities = rigid_body.get_fixture_entities();
 
+		/* 
+			Here we'd read from parenthood cache which would additionally initialize fixtures
+			belonging to the same entity that has the rigid body.
+		*/
+
+		/*
+			During complete reinference, this loop will be a no-op:
+			dependencies will be resolved so that always the rigid body is inferred before the fixtures.
+			Normally however, we need to update the dependent caches.
+		*/
+
 		for (const auto f : fixture_entities) {
 			infer_cache_for_fixtures(cosmos[f]);
 		}

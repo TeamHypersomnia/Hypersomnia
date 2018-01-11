@@ -50,7 +50,7 @@ public:
 	entity_id allocate_next_entity();
 	entity_id allocate_entity_with_specific_guid(const entity_guid specific_guid);
 
-	void clone_components_except_sensitives(
+	void clone_components_except_associateds(
 		cosmic_entity& into,
 		const cosmic_entity& from
 	);

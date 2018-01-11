@@ -51,35 +51,48 @@ namespace augs {
 		std::unordered_map<parent_id_type, parent_state> parent_caches;
 
 	public:
-		void reserve(const std::size_t n) {
-
-		}
-		
-		void handle_deletion_of_parent(
-			const parent_id_type this_id
+		void set_parent(
+			const child_id_type child_id, 
+			const parent_id_type parent_id,
+			const std::size_t parent_index
 		) {
-			if (const auto cache = mapped_or_nullptr(parent_caches, this_id)) {
-				/* Clear all references to it in the caches of the children of this parent */
+			unset_parent_of(child_id, parent_index);
 
-				for (const auto& children_vector : cache->children_vectors) {
-					for (const auto& c : children_vector) {
-						for (std::size_t p = 0; p < parent_count; ++p) {
-							auto& child_cache = child_caches.at(c);
-							auto& parent_id = child_cache.parents.at(p);
+			if (!parent_id.is_set()) {
+				return;
+			}
 
-							if (parent_id == this_id) {
-								parent_id = parent_id_type();
-							}
+			auto& child_cache = child_caches[child_id];
+			child_cache.parents.at(parent_index) = parent_id;
 
-							if (child_cache.orphan()) {
-								erase_element(child_caches, c);
-								break;
-							}
-						}
-					}
+			for (std::size_t p = 0; p < parent_count; ++p) {
+				if (p != parent_index) {
+					const bool the_same_parent_in_different_slot_exists =
+						child_cache.parents.at(p) == parent_id
+					;
+
+					ensure(!the_same_parent_in_different_slot_exists);
 				}
+			}
 
-				erase_element(parent_caches, this_id);
+			auto& parent_cache = parent_caches[parent_id];
+			parent_cache.children_vectors.at(parent_index).push_back(child_id);
+		}
+
+		template <bool C = parent_count == 1, class = std::enable_if_t<C>>
+		void set_parent(
+			const child_id_type child_id, 
+			const parent_id_type parent_id
+		) {
+			set_parent(child_id, parent_id, 0u);
+		}
+
+		void set_parents(
+			const child_id_type child_id, 
+			const parent_array_type parents
+		) {
+			for (std::size_t p = 0; p < parent_count; ++p) {
+				set_parent(child_id, parents.at(p), p);
 			}
 		}
 
@@ -93,33 +106,6 @@ namespace augs {
 			}
 
 			return false;
-		}
-
-		template <bool C = parent_count == 1, class = std::enable_if_t<C>>
-		bool is_child_constructed(
-			const child_id_type child_id,
-			const parent_id_type current_significant_parent
-		) const {
-			return is_child_constructed(child_id, current_significant_parent, 0u);
-		}
-
-		bool is_parent_set(
-			const child_id_type child_id,
-			const std::size_t parent_index
-		) const {
-			if (const auto child_cache = mapped_or_nullptr(child_caches, child_id)) {
-				auto& parent_entry = child_cache->parents.at(parent_index);
-				return parent_entry.is_set();
-			}
-
-			return false;
-		}
-
-		template <bool C = parent_count == 1, class = std::enable_if_t<C>>
-		bool is_parent_set(
-			const child_id_type child_id
-		) {
-			return is_parent_set(child_id, 0u);
 		}
 
 		void unset_parent_of(
@@ -160,42 +146,33 @@ namespace augs {
 			}
 		}
 
-		void set_parent(
-			const child_id_type child_id, 
-			const parent_id_type parent_id,
-			const std::size_t parent_index
+		void destroy_caches_of_children_of(
+			const parent_id_type this_id
 		) {
-			unset_parent_of(child_id, parent_index);
+			if (const auto cache = mapped_or_nullptr(parent_caches, this_id)) {
+				/* Clear all references to it in the caches of the children of this parent */
 
-			if (!parent_id.is_set()) {
-				return;
-			}
+				for (const auto& children_vector : cache->children_vectors) {
+					for (const auto& c : children_vector) {
+						for (std::size_t p = 0; p < parent_count; ++p) {
+							auto& child_cache = child_caches.at(c);
+							auto& parent_id = child_cache.parents.at(p);
 
-			auto& child_cache = child_caches[child_id];
-			child_cache.parents.at(parent_index) = parent_id;
-			
-			for (std::size_t p = 0; p < parent_count; ++p) {
-				if (p != parent_index) {
-					const bool the_same_parent_in_different_slot_exists =
-						child_cache.parents.at(p) == parent_id
-					;
+							if (parent_id == this_id) {
+								parent_id = parent_id_type();
+							}
 
-					ensure(!the_same_parent_in_different_slot_exists);
+							if (child_cache.orphan()) {
+								erase_element(child_caches, c);
+								break;
+							}
+						}
+					}
 				}
+
+				erase_element(parent_caches, this_id);
 			}
-
-			auto& parent_cache = parent_caches[parent_id];
-			parent_cache.children_vectors.at(parent_index).push_back(child_id);
 		}
-
-		template <bool C = parent_count == 1, class = std::enable_if_t<C>>
-		void set_parent(
-			const child_id_type child_id, 
-			const parent_id_type parent_id
-		) {
-			set_parent(child_id, parent_id, 0u);
-		}
-
 
 		const auto& get_children_of(
 			const parent_id_type parent, 
@@ -231,13 +208,31 @@ namespace augs {
 			return all_children;
 		}
 
-		void set_parents(
-			const child_id_type child_id, 
-			const parent_array_type parents
-		) {
-			for (std::size_t p = 0; p < parent_count; ++p) {
-				set_parent(child_id, parents.at(p), p);
+		template <bool C = parent_count == 1, class = std::enable_if_t<C>>
+		bool is_child_constructed(
+			const child_id_type child_id,
+			const parent_id_type current_significant_parent
+		) const {
+			return is_child_constructed(child_id, current_significant_parent, 0u);
+		}
+
+		bool is_parent_set(
+			const child_id_type child_id,
+			const std::size_t parent_index
+		) const {
+			if (const auto child_cache = mapped_or_nullptr(child_caches, child_id)) {
+				auto& parent_entry = child_cache->parents.at(parent_index);
+				return parent_entry.is_set();
 			}
+
+			return false;
+		}
+
+		template <bool C = parent_count == 1, class = std::enable_if_t<C>>
+		bool is_parent_set(
+			const child_id_type child_id
+		) {
+			return is_parent_set(child_id, 0u);
 		}
 	};
 }

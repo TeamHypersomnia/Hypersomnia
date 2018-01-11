@@ -40,9 +40,5 @@ const entity_name_type& basic_type_synchronizer<C>::get_name() const {
 	return get_type().name;
 }
 
-void component_synchronizer<false, N>::change_type_to(const entity_type_id id) const {
-	cosmic::change_type(handle, id, [](){});
-}
-
 template class basic_type_synchronizer<false>;
 template class basic_type_synchronizer<true>;

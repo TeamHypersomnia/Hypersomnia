@@ -78,8 +78,8 @@ const component_synchronizer<false, F>& component_synchronizer<false, F>::operat
 }
 
 void component_synchronizer<false, F>::reinfer_caches() const {
-	cosmic::reinfer_cache<relational_cache>(handle);
-	cosmic::reinfer_cache<physics_world_cache>(handle);
+	cosmic::reinfer_cache(handle.get_cosmos().get_solvable_inferred({}).relational, handle);
+	cosmic::reinfer_cache(handle.get_cosmos().get_solvable_inferred({}).physics, handle);
 }
 
 void component_synchronizer<false, F>::rebuild_density() const {
@@ -170,11 +170,11 @@ void component_synchronizer<false, F>::set_owner_body(const entity_id owner_id) 
 	cosmos.get_solvable_inferred({}).relational.set_fixtures_parent(self, new_owner);
 
 	if (former_owner.alive()) {
-		cosmic::reinfer_cache<physics_world_cache>(former_owner);
+		cosmic::reinfer_cache(former_owner.get_cosmos().get_solvable_inferred({}).physics, former_owner);
 	}
 
 	ensure(new_owner.alive());
-	cosmic::reinfer_cache<physics_world_cache>(new_owner);
+	cosmic::reinfer_cache(new_owner.get_cosmos().get_solvable_inferred({}).physics, new_owner);
 }
 
 template<bool C>

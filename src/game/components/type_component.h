@@ -41,8 +41,6 @@ class component_synchronizer<false, components::type> : public basic_type_synchr
 
 public:
 	using basic_type_synchronizer<false>::basic_type_synchronizer;
-
-	void change_type_to(const entity_type_id id) const; 
 };
 
 template<>

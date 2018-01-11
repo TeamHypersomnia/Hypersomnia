@@ -55,6 +55,8 @@ struct AAA {
 };
 
 struct tests_of_traits {
+	static_assert(!can_reserve_caches_v<type_id_cache>);
+	static_assert(can_reserve_caches_v<physics_world_cache>);
 	static_assert(std::is_trivially_copyable_v<game_intent_type>);
 	static_assert(has_string_v<augs::path_type>);
 	static_assert(has_wstring_v<augs::path_type>);

@@ -6,6 +6,7 @@
 #include "game/detail/inventory/inventory_slot_id.h"
 
 class relational_cache {
+public:
 	augs::children_vector_tracker<entity_id, inventory_slot_id, 1> items_of_slots;
 	augs::children_vector_tracker<unversioned_entity_id, unversioned_entity_id, 1> fixtures_of_bodies;
 	augs::children_vector_tracker<unversioned_entity_id, unversioned_entity_id, 2> joints_of_bodies;
@@ -17,12 +18,10 @@ class relational_cache {
 		f(joints_of_bodies);
 	}
 
-public:
-	void handle_deletion_of_potential_parent(const entity_id);
-
-	void reserve_caches_for_entities(const size_t n);
 	void infer_cache_for(const const_entity_handle);
 	void destroy_cache_of(const const_entity_handle);
+
+	void destroy_caches_of_children_of(const entity_id);
 
 	void set_current_slot(
 		const entity_id item, 

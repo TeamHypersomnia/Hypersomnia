@@ -6,26 +6,18 @@
 
 #include "augs/templates/enum_introspect.h"
 
-void relational_cache::reserve_caches_for_entities(const size_t n) {
-	for_each_tracker(
-		[n](auto& tracker){
-			tracker.reserve(n);
-		}
-	);
-}
-
-void relational_cache::handle_deletion_of_potential_parent(const entity_id h) {
+void relational_cache::destroy_caches_of_children_of(const entity_id h) {
 	for_each_tracker(
 		[h](auto& tracker){
 			using T = std::decay_t<decltype(tracker)>;
 
 			if constexpr(std::is_same_v<typename T::parent_id_type, inventory_slot_id>) {
 				augs::for_each_enum([&](const slot_function s){
-					tracker.handle_deletion_of_parent({s, h});
+					tracker.destroy_caches_of_children_of({s, h});
 				});
 			}
 			else {
-				tracker.handle_deletion_of_parent(h);
+				tracker.destroy_caches_of_children_of(h);
 			}
 		}
 	);

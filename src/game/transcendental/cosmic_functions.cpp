@@ -8,22 +8,22 @@ void cosmic::infer_caches_for(const entity_handle h) {
 	auto& cosm = h.get_cosmos();
 
 	if (h.is_inferred_state_activated()) {
-		auto constructor = [h](auto& sys) {
+		auto constructor = [h](auto, auto& sys) {
 			sys.infer_cache_for(h);
 		};
 
-		cosm.get_solvable_inferred({}).for_each(constructor);
+		augs::introspect(constructor, cosm.get_solvable_inferred({}));
 	}
 }
 
 void cosmic::destroy_caches_of(const entity_handle h) {
 	auto& cosm = h.get_cosmos();
 
-	auto destructor = [h](auto& sys) {
+	auto destructor = [h](auto, auto& sys) {
 		sys.destroy_cache_of(h);
 	};
 
-	cosm.get_solvable_inferred({}).for_each(destructor);
+	augs::introspect(destructor, cosm.get_solvable_inferred({}));
 }
 
 void cosmic::infer_all_entities(cosmos& cosm) {
@@ -59,7 +59,6 @@ void cosmic::reinfer_caches_of(const entity_handle h) {
 
 entity_handle cosmic::create_entity(cosmos& cosm, const entity_type_id type_id) {
 	const auto new_handle = entity_handle { cosm, cosm.get_solvable({}).allocate_next_entity() };
-	new_handle.get<components::type>().change_type_to(type_id);
 	return new_handle; 
 }
 
@@ -217,7 +216,7 @@ void cosmic::delete_entity(const entity_handle handle) {
 		Unregister that id as a parent from the relational system
 	*/
 
-	cosmos.get_solvable_inferred({}).relational.handle_deletion_of_potential_parent(handle);
+	cosmos.get_solvable_inferred({}).relational.destroy_caches_of_children_of(handle);
 	cosmos.get_solvable({}).free_entity(handle);
 }
 

@@ -23,8 +23,6 @@ class type_id_cache {
 public:
 	std::unordered_set<entity_id> get_entities_by_type_id(const entity_type_id) const;
 
-	void reserve_caches_for_entities(const std::size_t n) const {}
-
 	void infer_cache_for(const const_entity_handle);
 	void destroy_cache_of(const const_entity_handle);
 };

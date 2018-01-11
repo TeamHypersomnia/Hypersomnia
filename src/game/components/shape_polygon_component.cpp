@@ -13,7 +13,7 @@ bool basic_shape_polygon_synchronizer<C>::is_activated() const {
 using S = components::shape_polygon;
 
 void component_synchronizer<false, S>::reinfer_caches() const {
-	cosmic::reinfer_cache<physics_world_cache>(handle);
+	cosmic::reinfer_cache(handle.get_cosmos().get_solvable_inferred({}).physics, handle);
 }
 
 convex_poly_destruction_data& component_synchronizer<false, S>::get_modifiable_destruction_data(

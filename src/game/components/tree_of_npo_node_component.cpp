@@ -37,7 +37,7 @@ bool basic_tree_of_npo_node_synchronizer<C>::is_activated() const {
 }
 
 void component_synchronizer<false, D>::reinfer_caches() const {
-	cosmic::reinfer_cache<tree_of_npo_cache>(handle);
+	cosmic::reinfer_cache(handle.get_cosmos().get_solvable_inferred({}).tree_of_npo, handle);
 }
 
 void component_synchronizer<false, D>::update_proxy(const logic_step step) const {

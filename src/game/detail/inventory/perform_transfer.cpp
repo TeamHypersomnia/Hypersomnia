@@ -47,12 +47,12 @@ void perform_transfer(
 
 void detail_add_item(const inventory_slot_handle handle, const entity_handle new_item) {
 	new_item.get<components::item>().current_slot = handle;
-	new_item.get_cosmos().get_solvable_inferred({}).relational.set_current_slot(new_item, handle.get_id());
+	new_item.get_cosmos().get_solvable_inferred({}).relational.items_of_slots.set_parent(new_item, handle.get_id());
 }
 
 void detail_unset_current_slot(const entity_handle removed_item) {
 	removed_item.get<components::item>().current_slot.unset();
-	removed_item.get_cosmos().get_solvable_inferred({}).relational.set_current_slot(removed_item, {});
+	removed_item.get_cosmos().get_solvable_inferred({}).relational.items_of_slots.set_parent(removed_item, {});
 }
 
 perform_transfer_result perform_transfer(

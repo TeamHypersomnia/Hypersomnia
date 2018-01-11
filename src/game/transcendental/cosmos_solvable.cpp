@@ -17,6 +17,17 @@ cosmos_solvable::cosmos_solvable(const cosmic_pool_size_type reserved_entities) 
 	reserve_storage_for_entities(reserved_entities);
 }
 
+
+static auto make_reserver(const std::size_t n) {
+	return [n](auto, auto& sys) {
+		using T = std::decay_t<decltype(sys)>;
+
+		if constexpr(can_reserve_caches_v<T>) {
+			sys.reserve_caches_for_entities(n);
+		}
+	};
+}
+
 void cosmos_solvable::reserve_storage_for_entities(const cosmic_pool_size_type n) {
 	get_entity_pool().reserve(n);
 
@@ -27,9 +38,7 @@ void cosmos_solvable::reserve_storage_for_entities(const cosmic_pool_size_type n
 		}
 	);
 
-	inferred.for_each([n](auto& sys) {
-		sys.reserve_caches_for_entities(n);
-	});
+	augs::introspect(make_reserver(n), inferred);
 }
 
 void cosmos_solvable::destroy_all_caches() {
@@ -38,9 +47,7 @@ void cosmos_solvable::destroy_all_caches() {
 
 	const auto n = significant.entity_pool.capacity();
 
-	inferred.for_each([n](auto& sys) {
-		sys.reserve_caches_for_entities(n);
-	});
+	augs::introspect(make_reserver(n), inferred);
 }
 
 void cosmos_solvable::increment_step() {
