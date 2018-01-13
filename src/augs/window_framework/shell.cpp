@@ -1,3 +1,5 @@
+#include "augs/filesystem/file.h"
+
 #include "augs/window_framework/shell.h"
 #include "augs/templates/string_templates.h"
 
@@ -32,7 +34,8 @@ namespace augs {
 #if PLATFORM_WINDOWS
 		command = on_file;
 #elif PLATFORM_UNIX
-		command = "$VISUAL " + on_file;
+		const auto full_path = std::experimental::filesystem::system_complete(augs::path_type(on_file));
+		command = augs::path_type("$VISUAL ") += full_path; 
 #else
 #error "Unsupported platform!"
 #endif
