@@ -25,9 +25,44 @@ namespace augs {
 namespace definitions {
 	struct gun {
 		// GEN INTROSPECTOR struct definitions::gun
-		augs::stepped_cooldown shot_cooldown = augs::stepped_cooldown(100);
+		float shot_cooldown_ms = 100.f;
 		unsigned short num_last_bullets_to_trigger_low_ammo_cue = 0;
 		gun_action_type action_mode = gun_action_type::INVALID;
+
+		augs::minmax<float> muzzle_velocity;
+
+		float damage_multiplier = 1.f;
+
+		vec2 bullet_spawn_offset;
+
+		float camera_shake_radius = 0.f;
+		float camera_shake_spread_degrees = 0.f;
+
+		augs::minmax<float> shell_velocity;
+		augs::minmax<float> shell_angular_velocity;
+
+		float shell_spread_degrees = 20.f;
+
+		components::transform shell_spawn_offset;
+
+		float current_heat = 0.f;
+		float gunshot_adds_heat = 0.05f;
+		float maximum_heat = 1.f;
+		float engine_sound_strength = 1.f;
+
+#if TO_DEFINITIONIZE
+		child_entity_id magic_missile_definition;
+
+		child_entity_id firing_engine_sound;
+		child_entity_id muzzle_particles;
+#endif
+
+		sound_effect_input muzzle_shot_sound;
+		sound_effect_input low_ammo_cue_sound;
+
+		float cocking_handle_pull_duration_ms = 500.f;
+
+		recoil_player_instance recoil;
 		// END GEN INTROSPECTOR
 	};
 }
@@ -35,7 +70,9 @@ namespace definitions {
 namespace components {
 	struct gun  {
 		// GEN INTROSPECTOR struct components::gun
-		augs::stepped_cooldown shot_cooldown = augs::stepped_cooldown(100);
+		augs::stepped_timestamp when_last_fired;
+		float shot_cooldown_ms = 100.f;
+
 		unsigned short num_last_bullets_to_trigger_low_ammo_cue = 0;
 		gun_action_type action_mode = gun_action_type::INVALID;
 		bool is_trigger_pressed = false;
@@ -69,14 +106,11 @@ namespace components {
 		sound_effect_input muzzle_shot_sound;
 		sound_effect_input low_ammo_cue_sound;
 
-	private:
-		friend augs::introspection_access;
-
 		bool is_cocking_handle_being_pulled = false;
 		pad_bytes<3> pad;
 
 		augs::stepped_timestamp when_began_pulling_cocking_handle;
-	public:
+
 		float cocking_handle_pull_duration_ms = 500.f;
 
 		recoil_player_instance recoil;

@@ -11,12 +11,21 @@ struct recoil_player {
 	// END GEN INTROSPECTOR
 };
 
+struct recoil_player_instance_def {
+	// GEN INTROSPECTOR struct recoil_player_instance_def
+	assets::recoil_player_id id = assets::recoil_player_id::INVALID;
+
+	real32 heat_per_shot = 1;
+	real32 heat_cooldown_per_ms = 0.01f;
+	// END GEN INTROSPECTOR
+};
+
 struct recoil_player_instance {
 	// GEN INTROSPECTOR struct recoil_player_instance
 	assets::recoil_player_id id = assets::recoil_player_id::INVALID;
 
 	real32 heat_per_shot = 1;
-	real32 cooldown_speed = 0.01f; // heat/ms
+	real32 heat_cooldown_per_ms = 0.01f;
 
 	real32 current_heat = 0;
 	// END GEN INTROSPECTOR

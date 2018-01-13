@@ -117,7 +117,8 @@ vec2  components::gun::calculate_barrel_center(const components::transform gun_t
 
 void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
-	const auto& delta = step.get_delta();
+	const auto delta = step.get_delta();
+	const auto now = cosmos.get_timestamp();
 
 	cosmos.for_each(
 		processing_subjects::WITH_GUN,
@@ -156,7 +157,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 				gun.is_trigger_pressed 
 				&& has_enough_mana
 				&& has_enough_physical_bullets
-				&& gun.shot_cooldown.try_to_fire_and_reset(cosmos.get_timestamp(), delta)
+				&& try_to_fire_and_reset(gun.shot_cooldown_ms, gun.when_last_fired, now, delta)
 			) {
 				if (gun.action_mode != gun_action_type::AUTOMATIC) {
 					gun.is_trigger_pressed = false;
@@ -348,7 +349,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					gun.current_heat = std::min(gun.maximum_heat, gun.current_heat + gun.gunshot_adds_heat);
 				}
 			}
-			else if (gun.shot_cooldown.is_ready(cosmos.get_timestamp(), delta)) {
+			else if (is_ready(gun.shot_cooldown_ms, gun.when_last_fired, now, delta)) {
 				gun.recoil.cooldown(delta.in_milliseconds());
 				gun.current_heat = std::max(0.f, gun.current_heat - delta.in_seconds()/gun.maximum_heat);
 			}

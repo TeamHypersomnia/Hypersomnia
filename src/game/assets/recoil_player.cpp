@@ -24,5 +24,5 @@ void recoil_player_instance::cooldown(const real32 amount_ms) {
 	}
 #endif
 
-	current_heat -= std::min(current_heat, cooldown_speed * amount_ms);
+	current_heat -= std::min(current_heat, heat_cooldown_per_ms * amount_ms);
 }

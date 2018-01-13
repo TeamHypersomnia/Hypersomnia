@@ -250,7 +250,7 @@ namespace prefabs {
 
 		gun.action_mode = gun_action_type::AUTOMATIC;
 		gun.muzzle_velocity = {4000.f, 4000.f};
-		gun.shot_cooldown = augs::stepped_cooldown(100);
+		gun.shot_cooldown_ms = 100.f;
 		gun.bullet_spawn_offset.set(sprite.get_size(/*metas*/).x / 2, 0);
 		gun.camera_shake_radius = 5.f;
 		gun.camera_shake_spread_degrees = 45.f;
@@ -313,7 +313,7 @@ namespace prefabs {
 
 		gun.action_mode = gun_action_type::SEMI_AUTOMATIC;
 		gun.muzzle_velocity = {3000.f, 3000.f};
-		gun.shot_cooldown = augs::stepped_cooldown(100);
+		gun.shot_cooldown_ms = 100.f;
 		gun.bullet_spawn_offset.set(sprite.get_size(/*metas*/).x / 2, -7);
 		gun.camera_shake_radius = 5.f;
 		gun.camera_shake_spread_degrees = 45.f;
@@ -376,7 +376,7 @@ namespace prefabs {
 
 		gun.action_mode = gun_action_type::AUTOMATIC;
 		gun.muzzle_velocity = {2000.f, 2000.f};
-		gun.shot_cooldown = augs::stepped_cooldown(500);
+		gun.shot_cooldown_ms = 100.f;
 		gun.bullet_spawn_offset.set(sprite.get_size(/*metas*/).x / 2, 0);
 		gun.camera_shake_radius = 5.f;
 		gun.camera_shake_spread_degrees = 45.f;
