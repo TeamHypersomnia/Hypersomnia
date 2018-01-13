@@ -47,51 +47,38 @@ namespace augs {
 		when_last_fired = now;
 	}
 
-	bool stepped_cooldown::is_ready(
-		const stepped_timestamp s,
-		const delta t
-	) const {
-		return !when_last_fired.step || (s - when_last_fired).in_milliseconds(t) > cooldown_duration_ms;
-	}
-
-	float stepped_cooldown::get_remaining_time_ms(
-		const stepped_timestamp s, 
-		const delta t
-	) const {
-		if (!when_last_fired.step) {
-			return 0.f;
-		}
-
-		return cooldown_duration_ms - (s - when_last_fired).in_milliseconds(t);
-	}
-
-	float stepped_cooldown::get_ratio_of_remaining_time(
-		const stepped_timestamp s, 
-		const delta t
-	) const {
-		if (!when_last_fired.step) {
-			return 0.f;
-		}
-
-		return 1.f - ((s - when_last_fired).in_milliseconds(t) / cooldown_duration_ms);
-	}
-
 	bool stepped_cooldown::lasts(
 		const stepped_timestamp s,
 		const delta t
 	) const {
-		return !is_ready(s, t);
+		return augs::lasts(cooldown_duration_ms, when_last_fired, s, t);
 	}
 
 	bool stepped_cooldown::try_to_fire_and_reset(
 		const stepped_timestamp s, 
 		const delta t
 	) {
-		if (is_ready(s, t)) {
-			when_last_fired = s;
-			return true;
-		}
+		return augs::try_to_fire_and_reset(cooldown_duration_ms, when_last_fired, s, t);
+	}
 
-		return false;
+	bool stepped_cooldown::is_ready(
+		const stepped_timestamp s,
+		const delta t
+	) const {
+		return augs::is_ready(cooldown_duration_ms, when_last_fired, s, t);
+	}
+
+	float stepped_cooldown::get_remaining_time_ms(
+		const stepped_timestamp s, 
+		const delta t
+	) const {
+		return augs::get_remaining_time_ms(cooldown_duration_ms, when_last_fired, s, t);
+	}
+
+	float stepped_cooldown::get_ratio_of_remaining_time(
+		const stepped_timestamp s, 
+		const delta t
+	) const {
+		return augs::get_ratio_of_remaining_time(cooldown_duration_ms, when_last_fired, s, t);
 	}
 }

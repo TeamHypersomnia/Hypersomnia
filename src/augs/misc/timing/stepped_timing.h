@@ -1,5 +1,6 @@
 #pragma once
 #include "augs/ensure.h"
+#include "augs/misc/timing/delta.h"
 
 namespace augs {
 	class delta;
@@ -45,4 +46,66 @@ namespace augs {
 		}
 	};
 
+	template <class T>
+	bool is_ready(
+		const T cooldown_ms, 
+		const stepped_timestamp stamp, 
+		const stepped_timestamp now,
+		const delta dt
+	) {
+		return !stamp.step || (now - stamp).in_milliseconds(dt) > cooldown_ms;
+	}
+
+	template <class T>
+	bool lasts(
+		const T cooldown_ms, 
+		const stepped_timestamp stamp, 
+		const stepped_timestamp now,
+		const delta dt
+	) {
+		return !is_ready(cooldown_ms, stamp, now, dt);
+	}
+
+	template <class T>
+	bool try_to_fire_and_reset(
+		const T cooldown_ms, 
+		stepped_timestamp& stamp, 
+		const stepped_timestamp now,
+		const delta dt
+	) {
+		if (is_ready(cooldown_ms, stamp, now, dt)) {
+			stamp = now;
+			return true;
+		}
+
+		return false;
+	}
+
+	template <class T>
+	auto get_ratio_of_remaining_time(
+		const T cooldown_ms, 
+		const stepped_timestamp stamp, 
+		const stepped_timestamp now,
+		const delta dt
+	) {
+		if (!stamp.step) {
+			return 0.f;
+		}
+
+		return 1.f - ((now - stamp).in_milliseconds(dt) / cooldown_ms);
+	}
+
+	template <class T>
+	auto get_remaining_time_ms(
+		const T cooldown_ms, 
+		const stepped_timestamp stamp, 
+		const stepped_timestamp now,
+		const delta dt
+	) {
+		if (!stamp.step) {
+			return 0.f;
+		}
+
+		return cooldown_ms - (now - stamp).in_milliseconds(dt);
+	}
 }
