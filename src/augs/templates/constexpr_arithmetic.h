@@ -47,8 +47,8 @@ struct sum_sizes_until_nth<I, Current, List<T, Args...>, std::enable_if_t<Curren
 template <std::size_t num_bytes, std::size_t alignment>
 constexpr std::size_t aligned_num_of_bytes_v = aligned_num_of_bytes<num_bytes, alignment>::value;
 
-template <class T, T First, T Second, T... Rest>
-constexpr T constexpr_max_v = constexpr_max<T, First, Second, Rest...>::value;
+template <class T, T First, T... Rest>
+constexpr T constexpr_max_v = constexpr_max<T, First, Rest...>::value;
 
 template <std::size_t I, class List>
 constexpr std::size_t sum_sizes_until_nth_v = sum_sizes_until_nth<I, 0, List>::value;
