@@ -156,12 +156,13 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 		{
 			const auto subject = cosmos[g.subject];
 			const auto& gun = subject.get<components::gun>();
+			const auto& gun_def = subject.get_def<definitions::gun>();
 			const auto gun_transform = subject.get_logic_transform();
 			const auto owning_capability = subject.get_owning_transfer_capability();
 
 			{
 				sound_existence_input in;
-				in.effect = gun.muzzle_shot_sound;
+				in.effect = gun_def.muzzle_shot_sound;
 				in.direct_listener = owning_capability;
 
 				in.create_sound_effect_entity(step, subject.get_logic_transform(), entity_id()).add_standard_components(step);
@@ -169,14 +170,14 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 
 			{
 
-				const auto cued_count = gun.num_last_bullets_to_trigger_low_ammo_cue;
+				const auto cued_count = gun_def.num_last_bullets_to_trigger_low_ammo_cue;
 
 				if (cued_count > 0) {
 					const auto ammo_info = get_ammunition_information(subject);
 
 					if (ammo_info.total_charges < cued_count) {
 						sound_existence_input in;
-						in.effect = gun.low_ammo_cue_sound;
+						in.effect = gun_def.low_ammo_cue_sound;
 
 						if (ammo_info.total_charges == cued_count - 1) {
 							in.effect.modifier.gain *= 0.65f;

@@ -2,6 +2,9 @@
 // disables the warning due to type name length exceeded
 #pragma warning(disable : 4503)
 
+#include "augs/templates/type_list.h"
+#include "augs/templates/type_matching_and_indexing.h"
+
 #include "game/components/transform_component_declaration.h"
 #include "game/components/sprite_component_declaration.h"
 #include "game/components/polygon_component_declaration.h"
@@ -120,3 +123,6 @@ class cosmos;
 
 constexpr unsigned COMPONENTS_COUNT = component_list_t<type_count>::value;
 constexpr unsigned DEFINITIONS_COUNT = definition_list_t<type_count>::value;
+
+template <class D>
+static constexpr auto definition_index_v = index_in_list_v<D, definition_list_t<type_list>>;

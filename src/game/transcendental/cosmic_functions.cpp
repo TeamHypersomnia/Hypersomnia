@@ -59,10 +59,31 @@ void cosmic::reinfer_caches_of(const entity_handle h) {
 
 entity_handle cosmic::create_entity(cosmos& cosm, const entity_type_id type_id) {
 	const auto new_handle = entity_handle { cosm, cosm.get_solvable({}).allocate_next_entity() };
+
+	if (type_id != entity_type_id()) {
+		auto& solvable = cosm.get_solvable({});
+
+		solvable.get_aggregate(new_handle.get_id()).get<components::type>(solvable).type_id = type_id;
+
+		for_each_definition_type([&](auto d) {
+			using D = decltype(d);
+			const auto& t = new_handle.get_type(); 
+
+			if (const auto* const def = t.find<D>()) {
+				using C = typename D::implied_component;
+				new_handle += std::get<C>(t.initial_components);
+			}
+		});
+	}
+
 	return new_handle; 
 }
 
-entity_handle cosmic::create_entity_with_specific_guid(cosmos& cosm, const entity_guid specific_guid) {
+entity_handle cosmic::create_entity_with_specific_guid(
+	specific_guid_creation_access,
+	cosmos& cosm,
+   	const entity_guid specific_guid
+) {
 	return { cosm, cosm.get_solvable({}).allocate_entity_with_specific_guid(specific_guid) };
 }
 

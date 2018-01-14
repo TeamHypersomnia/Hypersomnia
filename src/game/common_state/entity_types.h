@@ -3,6 +3,8 @@
 
 #include "augs/pad_bytes.h"
 #include "augs/templates/introspect_declaration.h"
+#include "augs/templates/type_matching_and_indexing.h"
+#include "augs/templates/maybe_const.h"
 #include "game/transcendental/entity_type_declaration.h"
 #include "game/organization/all_component_includes.h"
 
@@ -10,14 +12,66 @@ using entity_description_type = entity_name_type;
 using entity_initial_components = component_list_t<std::tuple>;
 using definition_tuple = definition_list_t<augs::trivially_copyable_tuple>;
 
-struct entity_type {
-	// GEN INTROSPECTOR struct entity_type
+class entity_type {
+	template <class D>
+	static constexpr auto idx = definition_index_v<D>;
+
+	template <class D, class E>
+	static auto find_impl(E& self) -> maybe_const_ptr_t<std::is_const_v<E>, D> {
+		if (self.enabled_definitions[idx<D>]) {
+			return std::addressof(std::get<D>(self.definitions));
+		}
+
+		return nullptr; 
+	}
+
+	template <class D, class E>
+	static auto& get_impl(E& self) {
+		ensure(self.enabled_definitions[idx<D>]); 
+		return std::get<D>(self.definitions); 
+	}
+
+public:
+	// GEN INTROSPECTOR class entity_type
 	entity_name_type name;
 	entity_description_type description;
 
-	entity_initial_components initial_components;
 	std::array<bool, DEFINITIONS_COUNT> enabled_definitions = {};
+	definition_tuple definitions;
+
+	entity_initial_components initial_components;
 	// END GEN INTROSPECTOR
+
+	template <class D>
+	void set(const D& def) {
+		enabled_definitions[idx<D>] = true;
+		std::get<D>(definitions) = def;
+	}
+
+	template <class D>
+	void remove() {
+		enabled_definitions[idx<D>] = false;
+	}
+
+	template <class D>
+	D* find() {
+		return find_impl<D>(*this);
+	}
+
+	template <class D>
+	const D* find() const {
+		return find_impl<D>(*this);
+	}
+
+	template <class D>
+	D& get() {
+		return get_impl<D>(*this);
+	}
+
+	template <class D>
+	const D& get() const {
+		return get_impl<D>(*this);
+	}
 
 	bool operator==(const entity_type& b) const {
 		return augs::equal_by_introspection(*this, b);

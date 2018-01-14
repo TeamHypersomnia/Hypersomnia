@@ -31,7 +31,7 @@
 
 namespace test_scenes {
 	void testbed::populate(cosmos_common_significant& common) const {
-		populate_test_scene_types(common.all_entity_types);
+		populate_test_scene_types(common.logical_assets, common.all_entity_types);
 
 		auto& common_assets = common.assets;
 		common_assets.cast_unsuccessful_sound.id = assets::sound_buffer_id::CAST_UNSUCCESSFUL;

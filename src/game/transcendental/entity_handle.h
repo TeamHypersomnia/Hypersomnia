@@ -49,6 +49,11 @@ class basic_entity_handle :
 		static_assert(is_one_of_list_v<T, component_list_t<type_list>>, "Unknown component type!");
 	}
 
+	template <typename T>
+	static void check_definition_type() {
+		static_assert(is_one_of_list_v<T, definition_list_t<type_list>>, "Unknown definition type!");
+	}
+
 	auto& pool_provider() const {
 		return owner.get_solvable({});
 	}
@@ -249,7 +254,7 @@ public:
 		return get_cosmos().get_solvable().get_guid(raw_id);
 	}
 
-	auto& get_type() const {
+	const entity_type& get_type() const {
 		return get<components::type>().get_type();
 	}
 
@@ -265,6 +270,18 @@ public:
 		const auto inferred = find<components::all_inferred_state>();
 
 		return inferred != nullptr && inferred.is_activated();
+	}
+
+	template <class D>
+	const D& get_def() const {
+		check_definition_type<D>();
+		return get_type().template get<D>();
+	}
+
+	template <class D>
+	const D* find_def() const {
+		check_definition_type<D>();
+		return get_type().template find<D>();
 	}
 };
 

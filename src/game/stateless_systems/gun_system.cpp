@@ -107,11 +107,11 @@ void gun_system::consume_gun_intents(const logic_step step) {
 	}
 }
 
-vec2 components::gun::calculate_muzzle_position(const components::transform gun_transform) const {
+vec2 definitions::gun::calculate_muzzle_position(const components::transform gun_transform) const {
 	return (gun_transform * components::transform(bullet_spawn_offset)).pos;
 }
 
-vec2  components::gun::calculate_barrel_center(const components::transform gun_transform) const {
+vec2 definitions::gun::calculate_barrel_center(const components::transform gun_transform) const {
 	return (gun_transform * components::transform(vec2(0, bullet_spawn_offset.y))).pos;
 }
 
@@ -130,7 +130,8 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 				(owning_capability.alive() && owning_capability.has<components::sentience>()) ? owning_capability : cosmos[entity_id()]
 			;
 
-			components::gun& gun = gun_entity.get<components::gun>();
+			auto& gun = gun_entity.get<components::gun>();
+			const auto& gun_def = gun_entity.get_def<definitions::gun>();
 
 			const auto magic_missile_def = cosmos[gun.magic_missile_definition];
 			const auto is_magic_launcher = magic_missile_def.alive();
@@ -157,13 +158,13 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 				gun.is_trigger_pressed 
 				&& has_enough_mana
 				&& has_enough_physical_bullets
-				&& try_to_fire_and_reset(gun.shot_cooldown_ms, gun.when_last_fired, now, delta)
+				&& try_to_fire_and_reset(gun_def.shot_cooldown_ms, gun.when_last_fired, now, delta)
 			) {
-				if (gun.action_mode != gun_action_type::AUTOMATIC) {
+				if (gun_def.action_mode != gun_action_type::AUTOMATIC) {
 					gun.is_trigger_pressed = false;
 				}
 
-				const auto muzzle_transform = components::transform { gun.calculate_muzzle_position(gun_transform), gun_transform.rotation };
+				const auto muzzle_transform = components::transform { gun_def.calculate_muzzle_position(gun_transform), gun_transform.rotation };
 				
 				messages::gunshot_response response;
 
@@ -188,7 +189,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 						const auto missile_velocity = vec2::from_degrees(muzzle_transform.rotation)
 							* missile.muzzle_velocity_mult
-							* rng.randval(gun.muzzle_velocity)
+							* rng.randval(gun_def.muzzle_velocity)
 						;
 
 						round_entity.get<components::rigid_body>().set_velocity(missile_velocity);
@@ -253,14 +254,14 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 							sender.set(gun_entity);
 
 							auto& missile = round_entity.get<components::missile>();
-							missile.damage_amount *= gun.damage_multiplier;
-							missile.impulse_upon_hit *= gun.damage_multiplier;
+							missile.damage_amount *= gun_def.damage_multiplier;
+							missile.impulse_upon_hit *= gun_def.damage_multiplier;
 							total_recoil_scale *= missile.recoil_multiplier;
 
 							if (round_entity.has<components::explosive>()) {
 								auto& explosive = round_entity.get<components::explosive>();
-								explosive.explosion.damage *= gun.damage_multiplier;
-								explosive.explosion.impact_force *= gun.damage_multiplier;
+								explosive.explosion.damage *= gun_def.damage_multiplier;
+								explosive.explosion.impact_force *= gun_def.damage_multiplier;
 							}
 
 							round_entity.set_logic_transform(step, muzzle_transform);
@@ -270,7 +271,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 								const auto missile_velocity = vec2::from_degrees(muzzle_transform.rotation)
 									* missile.muzzle_velocity_mult
-									* rng.randval(gun.muzzle_velocity)
+									* rng.randval(gun_def.muzzle_velocity)
 								;
 
 								round_entity.get<components::rigid_body>().set_velocity(missile_velocity);
@@ -295,15 +296,15 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 							auto rng = cosmos.get_rng_for(shell_entity);
 
-							const auto spread_component = rng.randval(gun.shell_spread_degrees) + gun.shell_spawn_offset.rotation;
+							const auto spread_component = rng.randval(gun_def.shell_spread_degrees) + gun_def.shell_spawn_offset.rotation;
 
 							auto shell_transform = gun_transform;
-							shell_transform.pos += vec2(gun.shell_spawn_offset.pos).rotate(gun_transform.rotation, vec2());
+							shell_transform.pos += vec2(gun_def.shell_spawn_offset.pos).rotate(gun_transform.rotation, vec2());
 							shell_transform.rotation += spread_component;
 
 							shell_entity.set_logic_transform(step, shell_transform);
 
-							shell_entity.get<components::rigid_body>().set_velocity(vec2::from_degrees(muzzle_transform.rotation + spread_component).set_length(rng.randval(gun.shell_velocity)));
+							shell_entity.get<components::rigid_body>().set_velocity(vec2::from_degrees(muzzle_transform.rotation + spread_component).set_length(rng.randval(gun_def.shell_velocity)));
 							response.spawned_shell = shell_entity;
 
 							shell_entity.add_standard_components(step);
@@ -328,7 +329,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 						But we need the result now so that the 
 					*/
 
-					if (gun.action_mode >= gun_action_type::SEMI_AUTOMATIC) {
+					if (gun_def.action_mode >= gun_action_type::SEMI_AUTOMATIC) {
 						components::gun::load_next_round(gun_entity, step);
 					}
 				}
@@ -346,17 +347,17 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 						}
 					}
 
-					gun.current_heat = std::min(gun.maximum_heat, gun.current_heat + gun.gunshot_adds_heat);
+					gun.current_heat = std::min(gun_def.maximum_heat, gun.current_heat + gun_def.gunshot_adds_heat);
 				}
 			}
-			else if (is_ready(gun.shot_cooldown_ms, gun.when_last_fired, now, delta)) {
+			else if (is_ready(gun_def.shot_cooldown_ms, gun.when_last_fired, now, delta)) {
 				gun.recoil.cooldown(delta.in_milliseconds());
-				gun.current_heat = std::max(0.f, gun.current_heat - delta.in_seconds()/gun.maximum_heat);
+				gun.current_heat = std::max(0.f, gun.current_heat - delta.in_seconds()/gun_def.maximum_heat);
 			}
 
 			const auto firing_engine_sound = cosmos[gun.firing_engine_sound];
 			const bool sound_enabled = gun.current_heat > 0.20f && firing_engine_sound.alive();
-			const float pitch = gun.current_heat / gun.maximum_heat;
+			const auto pitch = static_cast<float>(gun.current_heat / gun_def.maximum_heat);
 
 			if (firing_engine_sound.alive() && firing_engine_sound.has<components::sound_existence>()) {
 				auto& existence = firing_engine_sound.get<components::sound_existence>();
@@ -364,10 +365,10 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 				if (sound_enabled) {
 					existence.input.direct_listener = owning_capability;
 					existence.input.effect.modifier.pitch = pitch;
-					existence.input.effect.modifier.gain = (gun.current_heat - 0.20f) / gun.maximum_heat;
+					existence.input.effect.modifier.gain = (gun.current_heat - 0.20f) / gun_def.maximum_heat;
 
-					existence.input.effect.modifier.pitch = pow(existence.input.effect.modifier.pitch, 2) * gun.engine_sound_strength;
-					existence.input.effect.modifier.gain = pow(existence.input.effect.modifier.gain, 2)* gun.engine_sound_strength;
+					existence.input.effect.modifier.pitch = pow(existence.input.effect.modifier.pitch, 2) * gun_def.engine_sound_strength;
+					existence.input.effect.modifier.gain = pow(existence.input.effect.modifier.gain, 2)* gun_def.engine_sound_strength;
 
 					components::sound_existence::activate(firing_engine_sound);
 				}

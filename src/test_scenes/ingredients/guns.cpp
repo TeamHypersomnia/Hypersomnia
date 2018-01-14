@@ -28,28 +28,230 @@
 #include "ingredients.h"
 #include "game/detail/inventory/perform_transfer.h"
 
-void add_muzzle_particles(
-	const entity_handle weapon,
-	components::gun& gun,
-	const logic_step step
-) {
-	particles_existence_input effect;
-	const auto place_of_birth = gun.calculate_muzzle_position(weapon.get_logic_transform());
+namespace prefabs {
+	void populate_gun_types(const all_logical_assets& logicals, entity_types& types) {
+		{
+			auto& meta = get_test_type(types, test_scene_type::SAMPLE_RIFLE);
 
-	effect.effect.id = assets::particle_effect_id::MUZZLE_SMOKE;
-	effect.delete_entity_after_effect_lifetime = false;
+			meta.description =
+				L"Standard issue sample rifle."
+			;
 
-	const auto engine = effect.create_particle_effect_entity(
-		step,
-		place_of_birth,
-		weapon
-	);
+			definitions::gun gun_def;
 
-	engine.add_standard_components(step);
+			gun_def.muzzle_shot_sound.id = assets::sound_buffer_id::ASSAULT_RIFLE_MUZZLE;
 
-	components::particles_existence::deactivate(engine);
+			gun_def.action_mode = gun_action_type::AUTOMATIC;
+			gun_def.muzzle_velocity = {4000.f, 4000.f};
+			gun_def.shot_cooldown_ms = 100.f;
+			gun_def.bullet_spawn_offset.set(logicals.at(assets::game_image_id::ASSAULT_RIFLE).get_size().x / 2, 0);
 
-	gun.muzzle_particles = engine;
+			gun_def.shell_spawn_offset.pos.set(0, 10);
+			gun_def.shell_spawn_offset.rotation = 45;
+			gun_def.shell_angular_velocity = {2.f, 14.f};
+			gun_def.shell_spread_degrees = 20.f;
+			gun_def.shell_velocity = {300.f, 1700.f};
+			gun_def.damage_multiplier = 2.2f;
+			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 6;
+			gun_def.low_ammo_cue_sound.id = assets::sound_buffer_id::LOW_AMMO_CUE;
+
+			gun_def.maximum_heat = 2.1f;
+			gun_def.gunshot_adds_heat = 0.052f;
+			gun_def.engine_sound_strength = 0.5f;
+
+			meta.set(gun_def);
+		}
+
+		{
+			auto& meta = get_test_type(types, test_scene_type::KEK9);
+
+			definitions::gun gun_def;
+
+			gun_def.muzzle_shot_sound.id = assets::sound_buffer_id::KEK9_MUZZLE;
+
+			gun_def.action_mode = gun_action_type::SEMI_AUTOMATIC;
+			gun_def.muzzle_velocity = {3000.f, 3000.f};
+			gun_def.shot_cooldown_ms = 100.f;
+			gun_def.bullet_spawn_offset.set(logicals.at(assets::game_image_id::KEK9).get_size().x / 2, -7);
+
+			gun_def.shell_spawn_offset.pos.set(0, 10);
+			gun_def.shell_spawn_offset.rotation = 45;
+			gun_def.shell_angular_velocity = {2.f, 14.f};
+			gun_def.shell_spread_degrees = 20.f;
+			gun_def.shell_velocity = {300.f, 1700.f};
+			gun_def.damage_multiplier = 1.4f;
+			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 6;
+			gun_def.low_ammo_cue_sound.id = assets::sound_buffer_id::LOW_AMMO_CUE;
+
+			gun_def.maximum_heat = 2.1f;
+			gun_def.gunshot_adds_heat = 0.052f;
+			gun_def.engine_sound_strength = 0.5f;
+
+			meta.set(gun_def);
+		}
+
+		{
+			auto& meta = get_test_type(types, test_scene_type::AMPLIFIER_ARM);
+
+			definitions::gun gun_def;
+
+			gun_def.muzzle_shot_sound.id = assets::sound_buffer_id::ASSAULT_RIFLE_MUZZLE;
+
+			gun_def.action_mode = gun_action_type::AUTOMATIC;
+			gun_def.muzzle_velocity = {2000.f, 2000.f};
+			gun_def.shot_cooldown_ms = 300.f;
+			gun_def.bullet_spawn_offset.set(logicals.at(assets::game_image_id::AMPLIFIER_ARM).get_size().x / 2, 0);
+
+			gun_def.damage_multiplier = 1.f;
+
+			meta.set(gun_def);
+		}
+	}
+
+	entity_handle create_sample_rifle(const logic_step step, vec2 pos, entity_id load_mag_id) {
+		const auto& metas = step.get_logical_assets();
+		auto& cosmos = step.get_cosmos();
+		auto load_mag = cosmos[load_mag_id];
+
+		auto weapon = create_test_scene_entity(cosmos, test_scene_type::SAMPLE_RIFLE);
+
+		auto& sprite = ingredients::add_sprite(metas, weapon, assets::game_image_id::ASSAULT_RIFLE, white, render_layer::SMALL_DYNAMIC_BODY);
+		ingredients::add_see_through_dynamic_body(step, weapon, pos);
+		ingredients::add_default_gun_container(step, weapon);
+
+		auto& gun = weapon.get<components::gun>();
+		auto& gun_def = weapon.get_def<definitions::gun>();
+
+		gun.recoil.id = assets::recoil_player_id::GENERIC;
+
+		{
+			sound_existence_input in;
+			in.effect.id = assets::sound_buffer_id::FIREARM_ENGINE;
+			in.effect.modifier.repetitions = -1;
+			in.delete_entity_after_effect_lifetime = false;
+			const auto engine_sound = in.create_sound_effect_entity(step, gun_def.calculate_muzzle_position(weapon.get_logic_transform()), weapon);
+			engine_sound.add_standard_components(step);
+			gun.firing_engine_sound = engine_sound;
+			components::sound_existence::deactivate(engine_sound);
+		}
+
+		// add_muzzle_particles(weapon, gun, step);
+
+		weapon.add_standard_components(step);
+
+		if (load_mag.alive()) {
+			perform_transfer({ load_mag, weapon[slot_function::GUN_DETACHABLE_MAGAZINE] }, step);
+
+			if (load_mag[slot_function::ITEM_DEPOSIT].has_items()) {
+				perform_transfer({ load_mag[slot_function::ITEM_DEPOSIT].get_items_inside()[0], weapon[slot_function::GUN_CHAMBER], 1 }, step);
+			}
+		}
+
+		return weapon;
+	}
+
+	entity_handle create_kek9(const logic_step step, vec2 pos, entity_id load_mag_id) {
+		const auto& metas = step.get_logical_assets();
+		auto& cosmos = step.get_cosmos();
+		auto load_mag = cosmos[load_mag_id];
+
+		auto weapon = create_test_scene_entity(cosmos, test_scene_type::KEK9);
+
+		auto& sprite = ingredients::add_sprite(metas, weapon, assets::game_image_id::KEK9, white, render_layer::SMALL_DYNAMIC_BODY);
+		ingredients::add_see_through_dynamic_body(step, weapon, pos);
+		ingredients::add_default_gun_container(step, weapon, 0.f, true);
+
+		auto& gun = weapon.get<components::gun>();
+		auto& gun_def = weapon.get_def<definitions::gun>();
+
+		gun.recoil.id = assets::recoil_player_id::GENERIC;
+
+		{
+			sound_existence_input in;
+			in.effect.id = assets::sound_buffer_id::FIREARM_ENGINE;
+			in.effect.modifier.repetitions = -1;
+			in.delete_entity_after_effect_lifetime = false;
+			const auto engine_sound = in.create_sound_effect_entity(step, gun_def.calculate_muzzle_position(weapon.get_logic_transform()), weapon);
+			engine_sound.add_standard_components(step);
+			gun.firing_engine_sound = engine_sound;
+			components::sound_existence::deactivate(engine_sound);
+		}
+
+		// add_muzzle_particles(weapon, gun, step);
+
+		weapon.add_standard_components(step);
+
+		if (load_mag.alive()) {
+			perform_transfer({ load_mag, weapon[slot_function::GUN_DETACHABLE_MAGAZINE] }, step);
+			perform_transfer({ load_mag[slot_function::ITEM_DEPOSIT].get_items_inside()[0], weapon[slot_function::GUN_CHAMBER], 1 }, step);
+		}
+
+		return weapon;
+	}
+
+	entity_handle create_amplifier_arm(
+		const logic_step step,
+		vec2 pos
+	) {
+		const auto& metas = step.get_logical_assets();
+		auto& cosmos = step.get_cosmos();
+		auto weapon = create_test_scene_entity(cosmos, test_scene_type::AMPLIFIER_ARM);
+
+		auto& sprite = ingredients::add_sprite(metas, weapon, assets::game_image_id::AMPLIFIER_ARM, white, render_layer::SMALL_DYNAMIC_BODY);
+		ingredients::add_see_through_dynamic_body(step, weapon, pos);
+
+		auto& item = ingredients::make_item(weapon);
+		item.space_occupied_per_charge = to_space_units("3.0");
+
+		auto& gun = weapon.get<components::gun>();
+
+		gun.recoil.id = assets::recoil_player_id::GENERIC;
+
+		weapon.add_standard_components(step);
+
+		{
+			const auto round_definition = create_test_scene_entity(cosmos, test_scene_type::ROUND_DEFINITION);
+
+			auto& s = ingredients::add_sprite(metas, round_definition, assets::game_image_id::ENERGY_BALL, cyan, render_layer::FLYING_BULLETS);
+			ingredients::add_bullet_round_physics(step, round_definition, pos);
+
+			auto& sender = round_definition += components::sender();
+			auto& missile = round_definition += components::missile();
+
+			missile.destruction_particles.id = assets::particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION;
+			missile.destruction_particles.modifier.colorize = cyan;
+
+			missile.trace_particles.id = assets::particle_effect_id::WANDERING_PIXELS_DIRECTED;
+			missile.trace_particles.modifier.colorize = cyan;
+
+			missile.muzzle_leave_particles.id = assets::particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION;
+			missile.muzzle_leave_particles.modifier.colorize = cyan;
+
+			auto& trace_modifier = missile.trace_sound.modifier;
+
+			trace_modifier.max_distance = 1020.f;
+			trace_modifier.reference_distance = 100.f;
+			trace_modifier.gain = 1.3f;
+			trace_modifier.repetitions = -1;
+			trace_modifier.fade_on_exit = false;
+
+			missile.trace_sound.id = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;
+			missile.destruction_sound.id = assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION;
+
+			missile.homing_towards_hostile_strength = 1.0f;
+			missile.damage_amount = 42;
+
+			auto& trace = round_definition += components::trace();
+			trace.max_multiplier_x = {0.0f, 0.f};
+			trace.max_multiplier_y = {0.f, 0.f};
+			trace.lengthening_duration_ms = {200.f, 250.f};
+			trace.additional_multiplier = vec2(1.f, 1.f);
+
+			gun.magic_missile_definition = round_definition;
+		}
+
+		return weapon;
+	}
 }
 
 namespace ingredients {
@@ -231,204 +433,6 @@ namespace prefabs {
 		cyan_charge.add_standard_components(step);
 
 		return cyan_charge;
-	}
-
-	entity_handle create_sample_rifle(const logic_step step, vec2 pos, entity_id load_mag_id) {
-		const auto& metas = step.get_logical_assets();
-		auto& cosmos = step.get_cosmos();
-		auto load_mag = cosmos[load_mag_id];
-
-		auto weapon = create_test_scene_entity(cosmos, test_scene_type::SAMPLE_RIFLE);
-
-		auto& sprite = ingredients::add_sprite(metas, weapon, assets::game_image_id::ASSAULT_RIFLE, white, render_layer::SMALL_DYNAMIC_BODY);
-		ingredients::add_see_through_dynamic_body(step, weapon, pos);
-		ingredients::add_default_gun_container(step, weapon);
-
-		auto& gun = weapon += components::gun();
-
-		gun.muzzle_shot_sound.id = assets::sound_buffer_id::ASSAULT_RIFLE_MUZZLE;
-
-		gun.action_mode = gun_action_type::AUTOMATIC;
-		gun.muzzle_velocity = {4000.f, 4000.f};
-		gun.shot_cooldown_ms = 100.f;
-		gun.bullet_spawn_offset.set(sprite.get_size(/*metas*/).x / 2, 0);
-		gun.camera_shake_radius = 5.f;
-		gun.camera_shake_spread_degrees = 45.f;
-
-		gun.shell_spawn_offset.pos.set(0, 10);
-		gun.shell_spawn_offset.rotation = 45;
-		gun.shell_angular_velocity = {2.f, 14.f};
-		gun.shell_spread_degrees = 20.f;
-		gun.shell_velocity = {300.f, 1700.f};
-		gun.damage_multiplier = 2.2f;
-		gun.num_last_bullets_to_trigger_low_ammo_cue = 6;
-		gun.low_ammo_cue_sound.id = assets::sound_buffer_id::LOW_AMMO_CUE;
-
-		{
-			sound_existence_input in;
-			in.effect.id = assets::sound_buffer_id::FIREARM_ENGINE;
-			in.effect.modifier.repetitions = -1;
-			in.delete_entity_after_effect_lifetime = false;
-			const auto engine_sound = in.create_sound_effect_entity(step, gun.calculate_muzzle_position(weapon.get_logic_transform()), weapon);
-			engine_sound.add_standard_components(step);
-			gun.firing_engine_sound = engine_sound;
-			components::sound_existence::deactivate(engine_sound);
-
-			gun.maximum_heat = 2.1f;
-			gun.gunshot_adds_heat = 0.052f;
-			gun.engine_sound_strength = 0.5f;
-		}
-
-		add_muzzle_particles(weapon, gun, step);
-
-		gun.recoil.id = assets::recoil_player_id::GENERIC;
-
-		weapon.add_standard_components(step);
-
-		if (load_mag.alive()) {
-			perform_transfer({ load_mag, weapon[slot_function::GUN_DETACHABLE_MAGAZINE] }, step);
-
-			if (load_mag[slot_function::ITEM_DEPOSIT].has_items()) {
-				perform_transfer({ load_mag[slot_function::ITEM_DEPOSIT].get_items_inside()[0], weapon[slot_function::GUN_CHAMBER], 1 }, step);
-			}
-		}
-
-		return weapon;
-	}
-
-	entity_handle create_kek9(const logic_step step, vec2 pos, entity_id load_mag_id) {
-		const auto& metas = step.get_logical_assets();
-		auto& cosmos = step.get_cosmos();
-		auto load_mag = cosmos[load_mag_id];
-
-		auto weapon = create_test_scene_entity(cosmos, test_scene_type::SN_SIX_NINE);
-
-		auto& sprite = ingredients::add_sprite(metas, weapon, assets::game_image_id::KEK9, white, render_layer::SMALL_DYNAMIC_BODY);
-		ingredients::add_see_through_dynamic_body(step, weapon, pos);
-		ingredients::add_default_gun_container(step, weapon, 0.f, true);
-
-		auto& gun = weapon += components::gun();
-
-		gun.muzzle_shot_sound.id = assets::sound_buffer_id::KEK9_MUZZLE;
-
-		gun.action_mode = gun_action_type::SEMI_AUTOMATIC;
-		gun.muzzle_velocity = {3000.f, 3000.f};
-		gun.shot_cooldown_ms = 100.f;
-		gun.bullet_spawn_offset.set(sprite.get_size(/*metas*/).x / 2, -7);
-		gun.camera_shake_radius = 5.f;
-		gun.camera_shake_spread_degrees = 45.f;
-
-		gun.shell_spawn_offset.pos.set(0, 10);
-		gun.shell_spawn_offset.rotation = 45;
-		gun.shell_angular_velocity = {2.f, 14.f};
-		gun.shell_spread_degrees = 20.f;
-		gun.shell_velocity = {300.f, 1700.f};
-		gun.damage_multiplier = 1.4f;
-		gun.num_last_bullets_to_trigger_low_ammo_cue = 6;
-		gun.low_ammo_cue_sound.id = assets::sound_buffer_id::LOW_AMMO_CUE;
-
-		{
-			sound_existence_input in;
-			in.effect.id = assets::sound_buffer_id::FIREARM_ENGINE;
-			in.effect.modifier.repetitions = -1;
-			in.delete_entity_after_effect_lifetime = false;
-			const auto engine_sound = in.create_sound_effect_entity(step, gun.calculate_muzzle_position(weapon.get_logic_transform()), weapon);
-			engine_sound.add_standard_components(step);
-			gun.firing_engine_sound = engine_sound;
-			components::sound_existence::deactivate(engine_sound);
-
-			gun.maximum_heat = 2.1f;
-			gun.gunshot_adds_heat = 0.052f;
-			gun.engine_sound_strength = 0.5f;
-		}
-
-		add_muzzle_particles(weapon, gun, step);
-
-		gun.recoil.id = assets::recoil_player_id::GENERIC;
-
-		weapon.add_standard_components(step);
-
-		if (load_mag.alive()) {
-			perform_transfer({ load_mag, weapon[slot_function::GUN_DETACHABLE_MAGAZINE] }, step);
-			perform_transfer({ load_mag[slot_function::ITEM_DEPOSIT].get_items_inside()[0], weapon[slot_function::GUN_CHAMBER], 1 }, step);
-		}
-
-		return weapon;
-	}
-
-	entity_handle create_amplifier_arm(
-		const logic_step step,
-		vec2 pos
-	) {
-		const auto& metas = step.get_logical_assets();
-		auto& cosmos = step.get_cosmos();
-		auto weapon = create_test_scene_entity(cosmos, test_scene_type::AMPLIFIER_ARM);
-
-		auto& sprite = ingredients::add_sprite(metas, weapon, assets::game_image_id::AMPLIFIER_ARM, white, render_layer::SMALL_DYNAMIC_BODY);
-		ingredients::add_see_through_dynamic_body(step, weapon, pos);
-
-		auto& item = ingredients::make_item(weapon);
-		item.space_occupied_per_charge = to_space_units("3.0");
-
-		auto& gun = weapon += components::gun();
-
-		gun.muzzle_shot_sound.id = assets::sound_buffer_id::ASSAULT_RIFLE_MUZZLE;
-
-		gun.action_mode = gun_action_type::AUTOMATIC;
-		gun.muzzle_velocity = {2000.f, 2000.f};
-		gun.shot_cooldown_ms = 100.f;
-		gun.bullet_spawn_offset.set(sprite.get_size(/*metas*/).x / 2, 0);
-		gun.camera_shake_radius = 5.f;
-		gun.camera_shake_spread_degrees = 45.f;
-
-		gun.damage_multiplier = 1.f;
-
-		gun.recoil.id = assets::recoil_player_id::GENERIC;
-
-		weapon.add_standard_components(step);
-
-		{
-			const auto round_definition = create_test_scene_entity(cosmos, test_scene_type::ROUND_DEFINITION);
-
-			auto& s = ingredients::add_sprite(metas, round_definition, assets::game_image_id::ENERGY_BALL, cyan, render_layer::FLYING_BULLETS);
-			ingredients::add_bullet_round_physics(step, round_definition, pos);
-
-			auto& sender = round_definition += components::sender();
-			auto& missile = round_definition += components::missile();
-
-			missile.destruction_particles.id = assets::particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION;
-			missile.destruction_particles.modifier.colorize = cyan;
-
-			missile.trace_particles.id = assets::particle_effect_id::WANDERING_PIXELS_DIRECTED;
-			missile.trace_particles.modifier.colorize = cyan;
-
-			missile.muzzle_leave_particles.id = assets::particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION;
-			missile.muzzle_leave_particles.modifier.colorize = cyan;
-
-			auto& trace_modifier = missile.trace_sound.modifier;
-
-			trace_modifier.max_distance = 1020.f;
-			trace_modifier.reference_distance = 100.f;
-			trace_modifier.gain = 1.3f;
-			trace_modifier.repetitions = -1;
-			trace_modifier.fade_on_exit = false;
-
-			missile.trace_sound.id = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;
-			missile.destruction_sound.id = assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION;
-
-			missile.homing_towards_hostile_strength = 1.0f;
-			missile.damage_amount = 42;
-
-			auto& trace = round_definition += components::trace();
-			trace.max_multiplier_x = {0.0f, 0.f};
-			trace.max_multiplier_y = {0.f, 0.f};
-			trace.lengthening_duration_ms = {200.f, 250.f};
-			trace.additional_multiplier = vec2(1.f, 1.f);
-
-			gun.magic_missile_definition = round_definition;
-		}
-
-		return weapon;
 	}
 
 	entity_handle create_electric_missile_def(const logic_step step, const components::transform transform) {

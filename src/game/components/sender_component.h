@@ -4,6 +4,10 @@
 
 namespace components {
 	struct sender {
+		/*
+			We are only interested in the vehicle driven by capability at the time of sending.
+		*/
+		
 		// GEN INTROSPECTOR struct components::sender
 		entity_id direct_sender;
 		entity_id capability_of_sender;

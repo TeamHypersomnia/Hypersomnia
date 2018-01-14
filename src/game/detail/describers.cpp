@@ -33,6 +33,7 @@ std::wstring get_bbcoded_entity_properties(const const_entity_handle id) {
 
 	const auto* const melee = id.find<components::melee>();
 	const auto* const gun = id.find<components::gun>();
+	const auto* const gun_def = id.find_def<definitions::gun>();
 	const auto* const damage = id.find<components::missile>();
 	const auto* const container = id.find<components::container>();
 	const auto* const item = id.find<components::item>();
@@ -58,11 +59,11 @@ std::wstring get_bbcoded_entity_properties(const const_entity_handle id) {
 	if (gun) {
 		if (cosmos[gun->magic_missile_definition].alive()) {
 			result << typesafe_sprintf(L"Muzzle velocity: [color=vscyan]%x[/color]\nAmplification multiplier: [color=vscyan]%x[/color]\n", 
-				(gun->muzzle_velocity.first + gun->muzzle_velocity.second) / 2, gun->damage_multiplier);
+				(gun_def->muzzle_velocity.first + gun_def->muzzle_velocity.second) / 2, gun_def->damage_multiplier);
 		}
 		else {
 			result << typesafe_sprintf(L"Muzzle velocity: [color=vscyan]%x[/color]\nDamage multiplier: [color=vscyan]%x[/color]\n",
-				(gun->muzzle_velocity.first + gun->muzzle_velocity.second) / 2, gun->damage_multiplier);
+				(gun_def->muzzle_velocity.first + gun_def->muzzle_velocity.second) / 2, gun_def->damage_multiplier);
 		}
 	}
 

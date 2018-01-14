@@ -33,7 +33,7 @@ enum class test_scene_type {
 	CYAN_ROUND_DEFINITION,
 	CYAN_SHELL_DEFINITION,
 	SAMPLE_RIFLE,
-	SN_SIX_NINE,
+	KEK9,
 	AMPLIFIER_ARM,
 	ROUND_DEFINITION,
 	ELECTRIC_MISSILE,
@@ -57,4 +57,4 @@ auto& get_test_type(C& container, const test_scene_type id) {
 	return container.get_type(static_cast<entity_type_id>(id));
 }
 
-void populate_test_scene_types(entity_types&);
+void populate_test_scene_types(const all_logical_assets& logicals, entity_types& into);

@@ -5,7 +5,7 @@
 #include "augs/templates/enum_introspect.h"
 #include "augs/templates/format_enum.h"
 
-void populate_test_scene_types(entity_types& into) {
+void populate_test_scene_types(const all_logical_assets& logicals, entity_types& into) {
 	into.types.resize(static_cast<std::size_t>(test_scene_type::COUNT));
 
 	augs::for_each_enum([&](const test_scene_type e) {
@@ -14,5 +14,6 @@ void populate_test_scene_types(entity_types& into) {
 	});
 
 	prefabs::populate_grenade_types(into);
+	prefabs::populate_gun_types(logicals, into);
 	prefabs::populate_character_types(into);
 }

@@ -38,7 +38,9 @@ digraph G {
 	"Signi dtor"->"Incremental inferrer"[color=blue]
 
 	"Create entity"->"Entity ctor"
-	"Clone entity"->"Create entity"
+	// The clone entity, instead of just creating entity and modifying components causing redundant reinferences,
+	// will just use ctor in the same way that create entity does. 
+	"Clone entity"->"Entity ctor"
 	"Delete entity"->"Entity dtor"
 
 	"Complete reinference"->"Complete destruction"

@@ -273,7 +273,7 @@ void cosmic_delta::decode(
 
 		augs::read_bytes(in, new_guid);
 		
-		new_entities_ids.push_back(cosmic::create_entity_with_specific_guid(deco, new_guid).get_id());
+		new_entities_ids.push_back(cosmic::create_entity_with_specific_guid({}, deco, new_guid).get_id());
 	}
 
 	for(const auto new_entity_id : new_entities_ids) {

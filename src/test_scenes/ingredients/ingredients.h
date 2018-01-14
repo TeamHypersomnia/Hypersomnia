@@ -63,6 +63,7 @@ namespace ingredients {
 }
 
 namespace prefabs {
+	void populate_gun_types(const all_logical_assets& logicals, entity_types& types);
 	void populate_grenade_types(entity_types& types);
 	void populate_character_types(entity_types& types);
 

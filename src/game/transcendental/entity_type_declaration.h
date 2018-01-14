@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 
-struct entity_type;
+class entity_type;
 struct entity_types;
 
 using entity_type_id = unsigned;

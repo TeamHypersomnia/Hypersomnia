@@ -10,6 +10,7 @@
 #include "game/messages/will_soon_be_deleted.h"
 #include "game/messages/queue_destruction.h"
 
+class cosmic_delta;
 class cosmos;
 
 /*
@@ -27,9 +28,16 @@ class cosmic {
 	static void reinfer_solvable(cosmos&);
 	
 public:
+	class specific_guid_creation_access {
+		friend cosmic_delta;
+
+		specific_guid_creation_access() {}
+	};
+
 	static entity_handle create_entity(cosmos&, entity_type_id);
 
 	static entity_handle create_entity_with_specific_guid(
+		specific_guid_creation_access,
 		cosmos&,
 		const entity_guid specific_guid
 	);
