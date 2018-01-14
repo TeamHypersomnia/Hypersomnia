@@ -62,7 +62,7 @@ namespace augs {
 			;
 		}
 
-		bool versions_match(const pool_indirector_type& indirector, const key_type key) const {
+		static bool versions_match(const pool_indirector_type& indirector, const key_type key) {
 			return indirector.version == key.version;
 		}
 
@@ -167,52 +167,49 @@ namespace augs {
 			return ver;
 		}
 
-		mapped_type& get(const key_type key) {
-			ensure(correct_range(key));
+	private:
+		template <class S>
+		static auto& get_impl(S& self, key_type key) {
+			ensure(self.correct_range(key));
 
-			const auto& indirector = get_indirector(key);
+			const auto& indirector = self.get_indirector(key);
 
 			ensure(versions_match(indirector, key));
 
-			return objects[indirector.real_index];
+			return self.objects[indirector.real_index];
+		}
+
+		
+		template <class S>
+		static auto find_impl(S& self, key_type key) -> maybe_const_ptr_t<std::is_const_v<S>, mapped_type> {
+			if (!self.correct_range(key)) {
+				return nullptr;
+			}
+
+			const auto& indirector = self.get_indirector(key);
+
+			if (!versions_match(indirector, key)) {
+				return nullptr;
+			}
+
+			return &self.objects[indirector.real_index];
+		}
+
+	public:
+		mapped_type& get(const key_type key) {
+			return get_impl(*this, key);
 		}
 
 		const mapped_type& get(const key_type key) const {
-			ensure(correct_range(key));
-
-			const auto& indirector = get_indirector(key);
-
-			ensure(versions_match(indirector, key));
-
-			return objects[indirector.real_index];
+			return get_impl(*this, key);
 		}
 
 		mapped_type* find(const key_type key) {
-			if (!correct_range(key)) {
-				return nullptr;
-			}
-
-			const auto& indirector = get_indirector(key);
-
-			if (!versions_match(indirector, key)) {
-				return nullptr;
-			}
-
-			return &objects[indirector.real_index];
+			return find_impl(*this, key);
 		}
 
 		const mapped_type* find(const key_type key) const {
-			if (!correct_range(key)) {
-				return nullptr;
-			}
-
-			const auto& indirector = get_indirector(key);
-
-			if (!versions_match(indirector, key)) {
-				return nullptr;
-			}
-
-			return &objects[indirector.real_index];
+			return find_impl(*this, key);
 		}
 
 		bool alive(const key_type key) const {
