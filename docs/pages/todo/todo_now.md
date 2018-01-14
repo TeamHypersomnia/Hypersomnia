@@ -7,7 +7,33 @@ summary: Just a hidden scratchpad.
 
 ## Contents
 
-Needing confirmation:
+
+### Microplanned implementation order:  
+
+- Implement entity types to some degree.
+	- That is to not repeat the code when we'll be writing improvements to inferences 
+	- Order:
+		- Implement passively the architecture.
+		- Begin by, for example, definitionizing a gun component, so slowly making it use the definitions.
+			- firing engine sound and muzzle particles are "persistent child entities"
+				- thus they should become group entities.
+			- magic missile def is just a child entity to be cloned around as needed.
+				- thus it only becomes type id.
+		- At some point, remove the definition data from the component.
+		- Build and test.
+		- Repeat with all components.
+	- Get rid of component adders and deleters.
+- Remove owner_body from fixtures component and create a component named "custom rigid body owner" that overrides anything else
+- Current slot should stay in the item component as other fields of item will anyway be a private
+- **moving disabled processing lists out of the significant state**
+	- for now ditch the setter of rotation copying when switching driver ownership
+	- most stateless, thence easiest is when we just easily determine when not to process an entity without relying on having proper fields set in processing lists
+		- we should then only ever optimize when it is needed
+	- or it can be part of inferred state which will complicate things a little
+- force joint components should be "custom" in a sense that they can be added and they do not override anything else
+	- there should be one cache per joint type, e.g. attachment joint cache which is inferred from current inventory state 
+
+#### Needing confirmation:
 
 - parenthood caches design:  
 Current design with relational caches is correct.  
@@ -22,18 +48,6 @@ When we do "get_children_of" in a relational mixin, we can ensure that the entit
 Memory is somewhat safe because it can only grow as far as the children grow.
 		- Concern could be raised becasue that would mean that, after reinference, that cache would be drastically different. However, we make no guarantee of 0% reinference error. Functionally, the parent cache with dead parent id is equal to no cache. The code, however, will be simpler.
 			- We will save that correction for later though.
-
-### Microplanned implementation order:  
-
-- Remove owner_body from fixtures component and create a component named "custom rigid body owner" that overrides anything else
-- Current slot should stay in the item component as other fields of item will anyway be a private
-- **moving disabled processing lists out of the significant state**
-	- for now ditch the setter of rotation copying when switching driver ownership
-	- most stateless, thence easiest is when we just easily determine when not to process an entity without relying on having proper fields set in processing lists
-		- we should then only ever optimize when it is needed
-	- or it can be part of inferred state which will complicate things a little
-- force joint components should be "custom" in a sense that they can be added and they do not override anything else
-	- there should be one cache per joint type, e.g. attachment joint cache which is inferred from current inventory state 
 
 #### Cosmic functions that **always move from one consistent state to the next**:
 
@@ -147,6 +161,7 @@ Memory is somewhat safe because it can only grow as far as the children grow.
 - remove all_inferred_state as it is essentially pointless once we have types implemented
 - fix car component to calculate damping statelessly, it will need to be synchronized
 	- in practice car won't ever be an item or a driver or have movement... 
+- implement instances of cooldowns for casts statelessly when there is such a need
 
 ### Plans
 
