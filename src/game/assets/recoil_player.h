@@ -22,15 +22,18 @@ struct recoil_player_instance_def {
 
 struct recoil_player_instance {
 	// GEN INTROSPECTOR struct recoil_player_instance
-	assets::recoil_player_id id = assets::recoil_player_id::INVALID;
-
-	real32 heat_per_shot = 1;
-	real32 heat_cooldown_per_ms = 0.01f;
-
 	real32 current_heat = 0;
 	// END GEN INTROSPECTOR
 
-	real32 shoot_and_get_impulse(const recoil_player& meta);
+	real32 shoot_and_get_impulse(
+		const recoil_player_instance_def& def,
+		const recoil_player& meta
+	);
+
+	void cooldown(
+		const recoil_player_instance_def& def,
+		real32 amount_ms
+	);
 
 	void cooldown(real32 amount_ms);
 };

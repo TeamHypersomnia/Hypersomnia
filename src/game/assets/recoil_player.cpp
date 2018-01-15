@@ -3,26 +3,26 @@
 
 #include "game/assets/recoil_player.h"
 
-real32 recoil_player_instance::shoot_and_get_impulse(const recoil_player& meta) {
+real32 recoil_player_instance::shoot_and_get_impulse(
+	const recoil_player_instance_def& def,
+	const recoil_player& meta
+) {
 	const auto heat = current_heat;
-	current_heat += heat_per_shot;
+	current_heat += def.heat_per_shot;
 
 	const auto index = static_cast<std::size_t>(heat);
 
 	if (index >= meta.offsets.size()) {
-		fast_randomization rng{static_cast<rng_seed_type>(heat * 100)};
+		fast_randomization rng { static_cast<rng_seed_type>(heat * 100) };
 		return rng.randval(meta.fallback_random_magnitude);
 	}
 
 	return meta.offsets[index];
 }
 
-void recoil_player_instance::cooldown(const real32 amount_ms) {
-#if 0
-	if (current_heat > 0) {
-		DEBUG_LOG("%x", current_heat);
-	}
-#endif
-
-	current_heat -= std::min(current_heat, heat_cooldown_per_ms * amount_ms);
+void recoil_player_instance::cooldown(
+	const recoil_player_instance_def& def,
+	real32 amount_ms
+) {
+	current_heat -= std::min(current_heat, def.heat_cooldown_per_ms * amount_ms);
 }

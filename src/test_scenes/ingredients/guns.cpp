@@ -59,6 +59,8 @@ namespace prefabs {
 			gun_def.gunshot_adds_heat = 0.052f;
 			gun_def.engine_sound_strength = 0.5f;
 
+			gun_def.recoil.id = assets::recoil_player_id::GENERIC;
+
 			meta.set(gun_def);
 		}
 
@@ -87,6 +89,8 @@ namespace prefabs {
 			gun_def.gunshot_adds_heat = 0.052f;
 			gun_def.engine_sound_strength = 0.5f;
 
+			gun_def.recoil.id = assets::recoil_player_id::GENERIC;
+
 			meta.set(gun_def);
 		}
 
@@ -103,6 +107,8 @@ namespace prefabs {
 			gun_def.bullet_spawn_offset.set(logicals.at(assets::game_image_id::AMPLIFIER_ARM).get_size().x / 2, 0);
 
 			gun_def.damage_multiplier = 1.f;
+
+			gun_def.recoil.id = assets::recoil_player_id::GENERIC;
 
 			meta.set(gun_def);
 		}
@@ -121,8 +127,6 @@ namespace prefabs {
 
 		auto& gun = weapon.get<components::gun>();
 		auto& gun_def = weapon.get_def<definitions::gun>();
-
-		gun.recoil.id = assets::recoil_player_id::GENERIC;
 
 		{
 			sound_existence_input in;
@@ -164,8 +168,6 @@ namespace prefabs {
 		auto& gun = weapon.get<components::gun>();
 		auto& gun_def = weapon.get_def<definitions::gun>();
 
-		gun.recoil.id = assets::recoil_player_id::GENERIC;
-
 		{
 			sound_existence_input in;
 			in.effect.id = assets::sound_buffer_id::FIREARM_ENGINE;
@@ -204,8 +206,6 @@ namespace prefabs {
 		item.space_occupied_per_charge = to_space_units("3.0");
 
 		auto& gun = weapon.get<components::gun>();
-
-		gun.recoil.id = assets::recoil_player_id::GENERIC;
 
 		weapon.add_standard_components(step);
 

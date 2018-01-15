@@ -67,6 +67,8 @@ Most of the time, only the programmers are concerned with the second type of dat
 			- It would require us to prioritize initial values for definitions that share an implied component. Ugh.
 	- Which ones would need it by the way?
 		- If we're talking missile component, sender will anyways be "always_present" because the circumstance might or might not otherwise need to add it.
+- Since there is a bijection between definitions and impliable components, the code can assume that, if a component exists, so shall the relevant definition.
+	- Theoretically there will be no crash as we do not hold optionals but actual, properly constructed objects.
 - Some definitions do not need any instance data.
 	- Example: render component.
 		- That does not change anything at all, except for the way of getting that data.

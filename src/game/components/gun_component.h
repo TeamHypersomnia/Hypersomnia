@@ -23,7 +23,7 @@ namespace augs {
 }
 
 namespace components {
-	struct gun  {
+	struct gun {
 		// GEN INTROSPECTOR struct components::gun
 		augs::stepped_timestamp when_last_fired;
 
@@ -85,6 +85,8 @@ namespace definitions {
 		sound_effect_input low_ammo_cue_sound;
 
 		float cocking_handle_pull_duration_ms = 500.f;
+
+		recoil_player_instance_def recoil;
 		// END GEN INTROSPECTOR
 
 		vec2 calculate_muzzle_position(components::transform gun_transform) const;
