@@ -4,7 +4,6 @@
 #include "game/components/render_component.h"
 #include "game/components/all_inferred_state_component.h"
 #include "game/components/processing_component.h"
-#include "game/components/tree_of_npo_node_component.h"
 #include "game/components/special_physics_component.h"
 #include "game/components/interpolation_component.h"
 #include "game/components/crosshair_component.h"
@@ -61,18 +60,6 @@ entity_handle basic_entity_handle<C>::add_standard_components(const logic_step s
 	) {
 		add(components::interpolation());
 		get<components::interpolation>().place_of_birth = this->get_logic_transform();
-	}
-
-	if ((
-		has<components::render>() 
-		|| has<components::particles_existence>()
-		//|| has<components::sound_existence>()
-		)
-		&& !has<components::fixtures>() 
-		&& !has<components::rigid_body>() 
-		&& !has<components::tree_of_npo_node>()
-	) {
-		add(components::tree_of_npo_node::create_default_for(*this));
 	}
 
 	if (has<components::rigid_body>()) {

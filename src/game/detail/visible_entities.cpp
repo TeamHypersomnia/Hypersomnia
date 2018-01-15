@@ -108,7 +108,7 @@ void visible_entities::acquire_non_physical(const visible_entities_query input) 
 			const auto versioned_id = cosmos.make_versioned(id);
 			
 			if (input.exact) {
-				if (!camera_aabb.hover(cosmos[versioned_id].get<components::tree_of_npo_node>().get_raw_component().aabb)) {
+				if (!camera_aabb.hover(cosmos[versioned_id].get_aabb())) {
 					return;
 				}
 			}

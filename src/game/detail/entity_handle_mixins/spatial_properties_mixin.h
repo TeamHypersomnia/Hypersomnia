@@ -61,29 +61,25 @@ public:
 	ltrb get_aabb(const components::transform transform) const {
 		const auto handle = *static_cast<const entity_handle_type*>(this);
 
-		if (
-			const auto* const sprite = handle.template find<components::sprite>();
+		if (const auto* const sprite = handle.template find<components::sprite>();
 			sprite != nullptr
 		) {
 			return sprite->get_aabb(transform);
 		}
 
-		if (
-			const auto* const polygon = handle.template find<components::polygon>();
+		if (const auto* const polygon = handle.template find<components::polygon>();
 			polygon != nullptr
 		) {
 			return polygon->get_aabb(transform);
 		}
 
-		if (
-			const auto* const wandering_pixels = handle.template find<components::wandering_pixels>();
+		if (const auto* const wandering_pixels = handle.template find<components::wandering_pixels>();
 			wandering_pixels != nullptr
 		) {
 			return wandering_pixels->reach;
 		}
 
-		if (
-			const auto* const particles_existence = handle.template find<components::particles_existence>();
+		if (const auto* const particles_existence = handle.template find<components::particles_existence>();
 			particles_existence != nullptr
 		) {
 			ltrb aabb;

@@ -19,7 +19,6 @@
 #include "game/components/type_component.h"
 #include "game/components/sentience_component.h"
 #include "game/components/attitude_component.h"
-#include "game/components/tree_of_npo_node_component.h"
 #include "game/components/flags_component.h"
 #include "game/components/shape_polygon_component.h"
 #include "game/stateless_systems/particles_existence_system.h"

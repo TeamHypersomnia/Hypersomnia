@@ -14,7 +14,6 @@ namespace definitions {
 }
 
 namespace components {
-	struct tree_of_npo_node;
 	struct special_physics;
 	struct animation;
 	struct behaviour_tree;
@@ -61,7 +60,6 @@ namespace components {
 
 template <template <class...> class List>
 using component_list_t = List<
-	components::tree_of_npo_node,
 	components::special_physics,
 	components::animation,
 	components::behaviour_tree,

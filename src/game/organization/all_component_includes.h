@@ -1,5 +1,4 @@
 #pragma once
-#include "game/components/tree_of_npo_node_component.h"
 #include "game/components/special_physics_component.h"
 #include "game/components/behaviour_tree_component.h"
 #include "game/components/pathfinding_component.h"

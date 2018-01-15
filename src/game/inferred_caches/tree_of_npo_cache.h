@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <optional>
 #include <Box2D/Collision/b2DynamicTree.h>
 
 #include "augs/misc/enum/enum_array.h"
@@ -27,6 +28,17 @@ union tree_of_npo_node {
 	}
 };
 
+struct tree_of_npo_node_input {		
+	static constexpr bool is_synchronized = true;
+
+	// GEN INTROSPECTOR struct tree_of_npo_node_input
+	tree_of_npo_type type = tree_of_npo_type::RENDERABLES;
+	ltrb aabb;
+	// END GEN INTROSPECTOR
+
+	static std::optional<tree_of_npo_node_input> create_default_for(const_entity_handle);
+};
+
 class tree_of_npo_cache {
 	struct tree {
 		b2DynamicTree nodes;
@@ -37,6 +49,7 @@ class tree_of_npo_cache {
 	struct cache {
 		bool constructed = false;
 		tree_of_npo_type type = tree_of_npo_type::COUNT;
+		ltrb recorded_aabb;
 		int tree_proxy_id = -1;
 
 		bool is_constructed() const;
@@ -46,6 +59,7 @@ class tree_of_npo_cache {
 
 	tree& get_tree(const cache&);
 	cache& get_cache(const unversioned_entity_id);
+	const cache& get_cache(const unversioned_entity_id) const;
 
 public:
 	template <class F>
@@ -80,10 +94,10 @@ public:
 		tree.nodes.Query(&aabb_listener, input);
 	}
 
-	void update_proxy(const_entity_handle, components::tree_of_npo_node&);
-
 	void reserve_caches_for_entities(const size_t n);
 
 	void infer_cache_for(const const_entity_handle);
 	void destroy_cache_of(const const_entity_handle);
+
+	bool is_tree_node_constructed_for(const entity_id) const;
 };

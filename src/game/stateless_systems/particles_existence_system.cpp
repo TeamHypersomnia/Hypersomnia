@@ -21,7 +21,9 @@
 #include "game/stateless_systems/particles_existence_system.h"
 
 bool components::particles_existence::is_activated(const const_entity_handle h) {
-	return h.get<components::tree_of_npo_node>().is_activated() 
+	const auto& npo = h.get_cosmos().get_solvable_inferred().tree_of_npo;
+
+	return npo.is_tree_node_constructed_for(h.get_id())
 		&& h.get<components::processing>().is_in(processing_subjects::WITH_PARTICLES_EXISTENCE)
 	;
 }
@@ -33,7 +35,7 @@ void components::particles_existence::activate(const entity_handle h) {
 
 	auto& existence = h.get<components::particles_existence>();
 	existence.time_of_birth = h.get_cosmos().get_timestamp();
-	h.get<components::tree_of_npo_node>().set_activated(true);
+
 	h.get<components::processing>().enable_in(processing_subjects::WITH_PARTICLES_EXISTENCE);
 }
 
@@ -42,7 +44,6 @@ void components::particles_existence::deactivate(const entity_handle h) {
 		return;
 	}
 
-	h.get<components::tree_of_npo_node>().set_activated(false);
 	h.get<components::processing>().disable_in(processing_subjects::WITH_PARTICLES_EXISTENCE);
 }
 

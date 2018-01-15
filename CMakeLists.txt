@@ -319,7 +319,6 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/components/rigid_body_component.cpp"
 	"src/game/components/sentience_component.cpp"
 	"src/game/components/sound_existence_component.cpp"
-	"src/game/components/tree_of_npo_node_component.cpp"
 	"src/game/detail/entity_handle_mixins/inventory_mixin.cpp"
 	"src/game/detail/entity_handle_mixins/physics_mixin.cpp"
 	"src/game/detail/entity_handle_mixins/relations_mixin.cpp"

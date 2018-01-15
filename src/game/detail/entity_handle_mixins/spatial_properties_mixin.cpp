@@ -134,9 +134,7 @@ void spatial_properties_mixin<false, D>::set_logic_transform(
 	else {
 		handle.template get<components::transform>() = t;
 
-		if (handle.template has<components::tree_of_npo_node>()) {
-			handle.template get<components::tree_of_npo_node>().update_proxy(step);
-		}
+		// TODO: reinfer the npo cache where necessary
 	}
 }
 

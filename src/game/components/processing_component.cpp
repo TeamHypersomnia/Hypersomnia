@@ -100,13 +100,23 @@ void component_synchronizer<false, P>::reinfer_caches() const {
 	cosmic::reinfer_cache(handle.get_cosmos().get_solvable_inferred({}).processing_lists, handle);
 }
 
-void component_synchronizer<false, P>::disable_in(const processing_subjects list) const {
-	get_raw_component().disabled_categories.set(list, true);
+void component_synchronizer<false, P>::disable_in(const processing_subjects l) const {
+	get_raw_component().disabled_categories.set(l, true);
+
+	if (l == processing_subjects::WITH_PARTICLES_EXISTENCE) {
+		cosmic::reinfer_cache(handle.get_cosmos().get_solvable_inferred({}).tree_of_npo, handle);
+	}
+
 	reinfer_caches();
 }
 
-void component_synchronizer<false, P>::enable_in(const processing_subjects list) const {
-	get_raw_component().disabled_categories.set(list, false);
+void component_synchronizer<false, P>::enable_in(const processing_subjects l) const {
+	get_raw_component().disabled_categories.set(l, false);
+
+	if (l == processing_subjects::WITH_PARTICLES_EXISTENCE) {
+		cosmic::reinfer_cache(handle.get_cosmos().get_solvable_inferred({}).tree_of_npo, handle);
+	}
+
 	reinfer_caches();
 }
 
