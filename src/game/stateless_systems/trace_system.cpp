@@ -32,8 +32,6 @@ void trace_system::lengthen_sprites_of_traces(const logic_step step) const {
 			auto& trace = t.get<components::trace>();
 			const auto& trace_def = t.get_def<definitions::trace>();
 
-			auto& sprite = t.get_def<definitions::sprite>();
-
 			if (trace.chosen_lengthening_duration_ms < 0.f) {
 				auto rng = cosmos.get_rng_for(t);
 				trace.reset(trace_def, rng);
@@ -48,13 +46,10 @@ void trace_system::lengthen_sprites_of_traces(const logic_step step) const {
 				surplus_multiplier = (trace.chosen_multiplier + vec2(1, 1)) * (1.f - (trace.lengthening_time_passed_ms / trace.chosen_lengthening_duration_ms)) - vec2(1, 1);
 			}
 
-			const auto original_image_size = metas.at(sprite.tex).get_size();
 			const auto size_multiplier = trace_def.additional_multiplier + surplus_multiplier;
 
-#if TODO
-			sprite.size = size_multiplier * original_image_size;
-			sprite.center_offset = original_image_size * (surplus_multiplier / 2.f);
-#endif
+			trace.last_size_mult = size_multiplier; 
+			trace.last_center_offset_mult = surplus_multiplier / 2.f;
 
 			trace.lengthening_time_passed_ms += static_cast<float>(delta.in_milliseconds());
 		}
@@ -97,7 +92,6 @@ void trace_system::spawn_finishing_traces_for_deleted_entities(const logic_step 
 		) {
 			const auto& trace_def = deleted_entity.get_def<definitions::trace>();
 
-			LOG("type spawned: %x", static_cast<int>(trace_def.finishing_trace_type));
 			const auto finishing_trace = cosmic::create_entity(cosmos, trace_def.finishing_trace_type);
 			
 			auto& copied_trace = finishing_trace.get<components::trace>();

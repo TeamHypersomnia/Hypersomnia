@@ -391,7 +391,7 @@ namespace prefabs {
 			auto& sender = arm_missile += components::sender();
 			auto& missile = arm_missile += components::missile();
 
-			missile.destruction_particles.id = assets::particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION;
+			//missile.destruction_particles.id = assets::particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION;
 			missile.destruction_particles.modifier.colorize = cyan;
 
 			missile.trace_particles.id = assets::particle_effect_id::WANDERING_PIXELS_DIRECTED;

@@ -56,6 +56,7 @@ entity_handle basic_entity_handle<C>::add_standard_components(const logic_step s
 			(has_physics && get<components::rigid_body>().get_body_type() != rigid_body_type::STATIC)
 			|| has<components::crosshair>() 
 			|| has<components::position_copying>()
+			|| has<components::trace>()
 		)
 	) {
 		add(components::interpolation());

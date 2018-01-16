@@ -174,6 +174,13 @@ Memory is somewhat safe because it can only grow as far as the children grow.
 	- will be serialized in binary as well to improve memcpy speed 
 		- will need manual rebuild of that data
 	- but will be omitted from lua serialization to decrease script size
+- calculate trace component statelessly
+	- fix interpolation issue or just customize it when editor is ready
+		- should really be done once we have that facility in editor because debugging will be a LOT easier when we have the internals to tweak and inspect
+	- should be fast enough
+	- otherwise make it a super quick cache?
+	- chosen_lengthening_duration_ms should be randomized statelessly with help of guid
+	- store just stepped timestamp of when the trace was fired instead of incrementing the passed time 
 
 
 ### Plans

@@ -86,11 +86,21 @@ FORCE_INLINE void draw_border(
 
 template <class F>
 FORCE_INLINE void on_renderable_component(const const_entity_handle h, F callback) {
-	if (const auto renderable = h.find_def<definitions::sprite>()) {
-		callback(*renderable);
+	if (const auto sprite = h.find_def<definitions::sprite>()) {
+		if (const auto trace = h.find<components::trace>()) {
+			auto tracified_sprite = *sprite;
+
+			tracified_sprite.center_offset = tracified_sprite.size * trace->last_center_offset_mult;
+			tracified_sprite.size *= trace->last_size_mult;
+
+			callback(tracified_sprite);
+		}
+		else {
+			callback(*sprite);
+		}
 	}
-	else if (const auto renderable = h.find_def<definitions::polygon>()) {
-		callback(*renderable);
+	else if (const auto polygon = h.find_def<definitions::polygon>()) {
+		callback(*polygon);
 	}
 }
 
