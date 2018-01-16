@@ -67,11 +67,15 @@ entity_handle cosmic::create_entity(cosmos& cosm, const entity_type_id type_id) 
 
 		for_each_definition_type([&](auto d) {
 			using D = decltype(d);
-			const auto& t = new_handle.get_type(); 
 
-			if (const auto* const def = t.find<D>()) {
+			if constexpr(has_implied_component_v<D>) {
 				using C = typename D::implied_component;
-				new_handle += std::get<C>(t.initial_components);
+
+				const auto& t = new_handle.get_type(); 
+
+				if (const auto* const def = t.find<D>()) {
+					new_handle += std::get<C>(t.initial_components);
+				}
 			}
 		});
 	}

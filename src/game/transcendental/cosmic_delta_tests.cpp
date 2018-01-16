@@ -83,7 +83,8 @@ TEST_CASE("CosmicDelta2 PaddingTest") {
 		
 		static_assert(
 			augs::is_byte_readwrite_safe_v<augs::memory_stream, checked_type> || allows_nontriviality_v<checked_type>,
-			"Non-trivially copyable component detected! If you need a non-trivial component, explicitly define static constexpr bool allow_nontriviality = true; within the class"
+			"Non-trivially copyable component/definition detected! If you need a non-trivial component/definition"
+			", explicitly define static constexpr bool allow_nontriviality = true; within the class"
 		);
 	};
 
@@ -178,6 +179,9 @@ TEST_CASE("CosmicDelta2 PaddingTest") {
 	for_each_component_type(assert_component_trivial);
 	for_each_component_type(padding_checker);
 
+	for_each_definition_type(assert_component_trivial);
+	for_each_definition_type(padding_checker);
+
 	padding_checker(item_slot_transfer_request());
 
 	padding_checker(augs::pool_indirector<unsigned short>());
@@ -237,6 +241,7 @@ TEST_CASE("CosmicDelta2 PaddingTest") {
 #endif
 }
 
+#if DEFINITIONS_COMPLETE
 #if !STATICALLY_ALLOCATE_ENTITIES_NUM
 /* Too much space would be wasted and stack overflows would occur. */
 
@@ -279,7 +284,6 @@ TEST_CASE("Cosmos ComparisonTest") {
 		
 		new_ent1 += first_transform;
 		new_ent1 += components::rigid_body();
-		new_ent1 += components::render();
 		new_ent1 += components::sprite();
 		
 		components::position_copying p;
@@ -297,7 +301,6 @@ TEST_CASE("Cosmos ComparisonTest") {
 		
 		new_ent1 += first_transform;
 		new_ent1 += components::rigid_body();
-		new_ent1 += components::render();
 		new_ent1 += components::sprite();
 		
 		components::position_copying p;
@@ -376,7 +379,6 @@ TEST_CASE("CosmicDelta4 EmptyAndTwoNew") {
 
 	new_ent1 += first_transform;
 	new_ent1 += components::rigid_body();
-	new_ent1 += components::render();
 	new_ent1 += components::sprite();
 
 	new_ent2 += components::transform();
@@ -401,7 +403,6 @@ TEST_CASE("CosmicDelta4 EmptyAndTwoNew") {
 			const bool transform_intact = ent1.get<components::transform>() == first_transform;
 			REQUIRE(transform_intact);
 			REQUIRE(ent1.has<components::rigid_body>());
-			REQUIRE(ent1.has<components::render>());
 			REQUIRE(ent1.has<components::sprite>());
 			REQUIRE(!ent1.has<components::trace>());
 
@@ -409,7 +410,6 @@ TEST_CASE("CosmicDelta4 EmptyAndTwoNew") {
 			const bool default_transform_intact = ent2.get<components::transform>() == components::transform();
 			REQUIRE(default_transform_intact);
 			REQUIRE(!ent2.has<components::rigid_body>());
-			REQUIRE(!ent2.has<components::render>());
 			REQUIRE(!ent2.has<components::sprite>());
 			REQUIRE(ent2.has<components::trace>());
 		}
@@ -433,7 +433,6 @@ TEST_CASE("CosmicDelta4 EmptyAndTwoNew") {
 		
 			component_checker(new_ent1, dec_ent1, components::transform());
 			synchronizer_component_checker(new_ent1, dec_ent1, components::rigid_body());
-			component_checker(new_ent1, dec_ent1, components::render());
 			component_checker(new_ent1, dec_ent1, components::sprite());
 			
 			component_checker(new_ent2, dec_ent2, components::transform());
@@ -447,7 +446,6 @@ TEST_CASE("CosmicDelta4 EmptyAndTwoNew") {
 		
 			component_checker(dec_ent1, new_ent1, components::transform());
 			synchronizer_component_checker(dec_ent1, new_ent1, components::rigid_body());
-			component_checker(dec_ent1, new_ent1, components::render());
 			component_checker(dec_ent1, new_ent1, components::sprite());
 		
 			component_checker(dec_ent2, new_ent2, components::transform());
@@ -748,4 +746,5 @@ TEST_CASE("CosmicDelta6 ThreeEntitiesWithReferencesAndDestroyedChild") {
 }
 #endif
 
+#endif
 #endif

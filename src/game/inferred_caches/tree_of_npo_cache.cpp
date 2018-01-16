@@ -6,7 +6,7 @@
 
 std::optional<tree_of_npo_node_input> tree_of_npo_node_input::create_default_for(const const_entity_handle e) {
 	const bool has_renderable = 
-		e.find<components::render>() 
+		e.find_def<definitions::render>() 
 		|| e.has<components::particles_existence>()
 		//|| has<components::sound_existence>()
 	;

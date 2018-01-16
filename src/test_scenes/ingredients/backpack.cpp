@@ -29,6 +29,17 @@ namespace ingredients {
 }
 
 namespace prefabs {
+	void populate_backpack_types(const all_logical_assets& logicals, entity_types& types) {
+		{
+			auto& meta = get_test_type(types, test_scene_type::SAMPLE_BACKPACK);
+
+			definitions::render render_def;
+			render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
+
+			meta.set(render_def);
+		}
+	}
+
 	entity_handle create_sample_backpack(const logic_step step, vec2 pos) {
 		auto& world = step.get_cosmos();
 		const auto def = create_test_scene_entity(world, test_scene_type::SAMPLE_BACKPACK);
@@ -36,7 +47,7 @@ namespace prefabs {
 		
 		ingredients::add_backpack_container(def);
 
-		ingredients::add_sprite(metas, def, assets::game_image_id::BACKPACK, white, render_layer::SMALL_DYNAMIC_BODY);
+		ingredients::add_sprite(metas, def, assets::game_image_id::BACKPACK, white);
 		ingredients::add_see_through_dynamic_body(step, def, pos);
 		
 		def.add_standard_components(step);

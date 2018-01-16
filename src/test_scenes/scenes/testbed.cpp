@@ -239,9 +239,7 @@ namespace test_scenes {
 			{
 				const auto e = create_test_scene_entity(world, test_scene_type::WANDERING_PIXELS);
 				auto& w = e += components::wandering_pixels();
-				auto& r = e += components::render();
 
-				r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
 				w.frames = get_frames_col(cyan);
 				w.frame_duration_ms = duration_ms;
@@ -253,9 +251,7 @@ namespace test_scenes {
 			{
 				const auto e = create_test_scene_entity(world, test_scene_type::WANDERING_PIXELS);
 				auto& w = e += components::wandering_pixels();
-				auto& r = e += components::render();
 
-				r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
 				w.frames = get_frames_col(cyan);
 				w.frame_duration_ms = duration_ms;
@@ -268,9 +264,7 @@ namespace test_scenes {
 			{
 				const auto e = create_test_scene_entity(world, test_scene_type::WANDERING_PIXELS);
 				auto& w = e += components::wandering_pixels();
-				auto& r = e += components::render();
 
-				r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
 				w.frames = get_frames_col(cyan);
 				w.frame_duration_ms = duration_ms;
@@ -323,9 +317,7 @@ namespace test_scenes {
 				{
 					const auto e = create_test_scene_entity(world, test_scene_type::WANDERING_PIXELS);
 					auto& w = e += components::wandering_pixels();
-					auto& r = e += components::render();
 
-					r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
 					w.frames = get_frames_col(light_cyan);
 					w.frame_duration_ms = duration_ms;
@@ -337,9 +329,7 @@ namespace test_scenes {
 				{
 					const auto e = create_test_scene_entity(world, test_scene_type::WANDERING_PIXELS);
 					auto& w = e += components::wandering_pixels();
-					auto& r = e += components::render();
 
-					r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
 					w.frames = get_frames_col(light_cyan);
 					w.frame_duration_ms = duration_ms;
@@ -351,9 +341,7 @@ namespace test_scenes {
 				{
 					const auto e = create_test_scene_entity(world, test_scene_type::WANDERING_PIXELS);
 					auto& w = e += components::wandering_pixels();
-					auto& r = e += components::render();
 
-					r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
 					w.frames = get_frames_col(light_cyan);
 					w.frame_duration_ms = duration_ms;
@@ -390,9 +378,7 @@ namespace test_scenes {
 				{
 					const auto e = create_test_scene_entity(world, test_scene_type::WANDERING_PIXELS);
 					auto& w = e += components::wandering_pixels();
-					auto& r = e += components::render();
 
-					r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
 					w.frames = get_frames_col(cyan);
 					w.frame_duration_ms = duration_ms;
@@ -404,9 +390,7 @@ namespace test_scenes {
 				{
 					const auto e = create_test_scene_entity(world, test_scene_type::WANDERING_PIXELS);
 					auto& w = e += components::wandering_pixels();
-					auto& r = e += components::render();
 
-					r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
 					w.frames = get_frames_col(orange);
 					w.frame_duration_ms = duration_ms;
@@ -418,9 +402,7 @@ namespace test_scenes {
 				{
 					const auto e = create_test_scene_entity(world, test_scene_type::WANDERING_PIXELS);
 					auto& w = e += components::wandering_pixels();
-					auto& r = e += components::render();
 
-					r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
 					w.frames = get_frames_col(cyan);
 					w.frame_duration_ms = duration_ms;
@@ -432,9 +414,7 @@ namespace test_scenes {
 				{
 					const auto e = create_test_scene_entity(world, test_scene_type::WANDERING_PIXELS);
 					auto& w = e += components::wandering_pixels();
-					auto& r = e += components::render();
 
-					r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
 					w.frames = get_frames_col(orange);
 					w.frame_duration_ms = duration_ms;
@@ -446,9 +426,7 @@ namespace test_scenes {
 				{
 					const auto e = create_test_scene_entity(world, test_scene_type::WANDERING_PIXELS);
 					auto& w = e += components::wandering_pixels();
-					auto& r = e += components::render();
 
-					r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
 					w.frames = get_frames_col(cyan);
 					w.frame_duration_ms = duration_ms;
@@ -460,9 +438,7 @@ namespace test_scenes {
 				{
 					const auto e = create_test_scene_entity(world, test_scene_type::WANDERING_PIXELS);
 					auto& w = e += components::wandering_pixels();
-					auto& r = e += components::render();
 
-					r.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
 					w.frames = get_frames_col(orange);
 					w.frame_duration_ms = duration_ms;
@@ -499,9 +475,7 @@ namespace test_scenes {
 				ingredients::add_sprite(metas, 
 					e,
 					assets::game_image_id::HAVE_A_PLEASANT,
-					white,
-					render_layer::NEON_CAPTIONS
-				);
+					white);
 
 				e += components::transform(164.f - 8.f, -60.f - 20.f);
 
@@ -532,12 +506,12 @@ namespace test_scenes {
 					for (int y = -side; y < side * 16; ++y)
 					{
 						//auto background = create_test_scene_entity(world, test_scene_type::GROUND);
-						//ingredients::add_sprite(metas, background, vec2(-1000, 0) + vec2(x, y) * (bg_size + vec2(1500, 550)), assets::game_image_id::TEST_BACKGROUND, white, render_layer::GROUND);
+						//ingredients::add_sprite(metas, background, vec2(-1000, 0) + vec2(x, y) * (bg_size + vec2(1500, 550)), assets::game_image_id::TEST_BACKGROUND, white);
 						//ingredients::add_standard_static_body(background);
 
 						auto street = create_test_scene_entity(world, test_scene_type::STREET);
 						ingredients::add_sprite(metas, street,
-							assets::game_image_id::TEST_BACKGROUND, gray1, render_layer::GROUND);
+							assets::game_image_id::TEST_BACKGROUND, gray1);
 
 						street += components::transform{ bg_size * vec2i(x, y) };
 
@@ -551,7 +525,7 @@ namespace test_scenes {
 
 					auto road_dirt = create_test_scene_entity(world, test_scene_type::ROAD_DIRT);
 					ingredients::add_sprite(metas, road_dirt,
-						assets::game_image_id::ROAD_FRONT_DIRT, white, render_layer::ON_GROUND);
+						assets::game_image_id::ROAD_FRONT_DIRT, white);
 
 					road_dirt += components::transform{ vec2(-3 - 16 + 100 + 160 + 80 + size.x / 2, -32 - 96 + 160 + 80 - size.y / 2) };
 
@@ -563,7 +537,7 @@ namespace test_scenes {
 
 					auto road = create_test_scene_entity(world, test_scene_type::ROAD);
 					ingredients::add_sprite(metas, road,
-						assets::game_image_id::ROAD, white, render_layer::ON_GROUND);
+						assets::game_image_id::ROAD, white);
 
 					road += components::transform{ vec2(-3 - 16 + 100 + 160 + 80 + size.x / 2, -32 - 96 + 160 + 80 + size.y / 2 + size.y*r) };
 
@@ -576,9 +550,7 @@ namespace test_scenes {
 				auto& sprite = ingredients::add_sprite(metas, 
 					e,
 					assets::game_image_id::AWAKENING,
-					white,
-					render_layer::NEON_CAPTIONS
-				);
+					white);
 
 				e += components::transform(164.f - 8.f, -60.f - 20.f + 40.f);
 
@@ -593,17 +565,13 @@ namespace test_scenes {
 				ingredients::add_sprite(metas, 
 					e,
 					assets::game_image_id::METROPOLIS,
-					white,
-					render_layer::NEON_CAPTIONS
-				);
+					white);
 
 				e += components::transform(1164.f + 24.f, -60.f);
 
 				e.add_standard_components(step);
 			}
 		}
-
-		prefabs::create_sample_suppressor(step, vec2(300, -500));
 
 		const bool many_charges = false;
 

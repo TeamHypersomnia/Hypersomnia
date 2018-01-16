@@ -103,7 +103,6 @@ void trace_system::spawn_finishing_traces_for_deleted_entities(const logic_step 
 			finishing_trace += copied_trace;
 			finishing_trace += deleted_entity.get<components::sprite>();
 			finishing_trace += transform_of_deleted;
-			finishing_trace += deleted_entity.get<components::render>();
 			
 			components::interpolation interp;
 			interp.place_of_birth = transform_of_deleted;

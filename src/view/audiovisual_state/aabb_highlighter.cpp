@@ -19,7 +19,7 @@ bool aabb_highlighter::is_hoverable(const const_entity_handle e) {
 		return false;
 	}
 
-	if (const auto maybe_render = e.find<components::render>()) {
+	if (const auto maybe_render = e.find_def<definitions::render>()) {
 		switch (maybe_render->layer) {
 			case render_layer::SMALL_DYNAMIC_BODY: return true;
 			case render_layer::DYNAMIC_BODY: return true;

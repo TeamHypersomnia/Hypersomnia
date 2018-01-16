@@ -35,7 +35,11 @@ namespace augs {
 		command = on_file;
 #elif PLATFORM_UNIX
 		const auto full_path = std::experimental::filesystem::system_complete(augs::path_type(on_file));
-		command = augs::path_type("$VISUAL ") += full_path; 
+
+		auto command_with_path = augs::path_type("$VISUAL ");
+		command_with_path += full_path;
+
+		command = command_with_path;
 #else
 #error "Unsupported platform!"
 #endif

@@ -43,7 +43,6 @@ TEST_CASE("Ca TriviallyCopyableTuple") {
 		using aggr = augs::trivially_copyable_tuple<
 			cosmic_object_pool_id<components::transform>,
 			cosmic_object_pool_id<components::rigid_body>, 
-			cosmic_object_pool_id<components::render>
 		>;
 
 		std::vector<aggr> pool;

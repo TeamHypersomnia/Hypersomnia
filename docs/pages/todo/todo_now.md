@@ -10,6 +10,8 @@ summary: Just a hidden scratchpad.
 
 ### Microplanned implementation order:  
 
+- Now definitionize renders for entities created in testbed
+
 - Implement entity types to some degree.
 	- That is to not repeat the code when we'll be writing improvements to inferences 
 	- Order:
@@ -162,6 +164,16 @@ Memory is somewhat safe because it can only grow as far as the children grow.
 - fix car component to calculate damping statelessly, it will need to be synchronized
 	- in practice car won't ever be an item or a driver or have movement... 
 - implement instances of cooldowns for casts statelessly when there is such a need
+- describe concept: quick caches
+	- stored directly in the aggregate
+	- will be used to store copies of definitions for super quick access
+		- e.g. render
+	- will be used for super quick inferred caches
+		- e.g. if we ever need a transform or sprite cache if they become too costly to calculate (either computationally or because of fetches)
+	- will be serialized in binary as well to improve memcpy speed 
+		- will need manual rebuild of that data
+	- but will be omitted from lua serialization to decrease script size
+
 
 ### Plans
 

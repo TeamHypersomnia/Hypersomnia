@@ -7,9 +7,9 @@
 
 #include "augs/pad_bytes.h"
 
-namespace components {
+namespace definitions {
 	struct render {
-		// GEN INTROSPECTOR struct components::render
+		// GEN INTROSPECTOR struct definitions::render
 		render_layer layer = render_layer::UNDER_GROUND;
 		// END GEN INTROSPECTOR
 	};

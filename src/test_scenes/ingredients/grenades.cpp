@@ -26,6 +26,13 @@ namespace prefabs {
 			meta.description =
 				L"Throwable explosive with a three seconds delay.\nDeals damage to [color=red]Health[/color]."
 			;
+
+			{
+				definitions::render render_def;
+				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
+
+				meta.set(render_def);
+			}
 		}
 
 		{
@@ -34,6 +41,13 @@ namespace prefabs {
 			meta.description =
 				L"Throwable explosive with a three seconds delay.\nDeals damage to [color=orange]Consciousness[/color].\nCauses massive aimpunch."
 			;
+
+			{
+				definitions::render render_def;
+				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
+
+				meta.set(render_def);
+			}
 		}
 
 		{
@@ -42,6 +56,13 @@ namespace prefabs {
 			meta.description =
 				L"Throwable explosive with a three seconds delay.\nDrains [color=cyan]Personal Electricity[/color].\nIf the subject has [color=turquoise]Electric Shield[/color] enabled,\nthe effect is doubled."
 			;
+
+			{
+				definitions::render render_def;
+				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
+
+				meta.set(render_def);
+			}
 		}
 	}
 
@@ -66,7 +87,7 @@ namespace prefabs {
 		in.sound_gain = 1.8f;
 		in.sound_effect = assets::sound_buffer_id::GREAT_EXPLOSION;
 
-		auto& sprite = ingredients::add_sprite(metas, grenade_entity, assets::game_image_id::FORCE_GRENADE, white, render_layer::SMALL_DYNAMIC_BODY);
+		auto& sprite = ingredients::add_sprite(metas, grenade_entity, assets::game_image_id::FORCE_GRENADE, white);
 		ingredients::add_see_through_dynamic_body(step, grenade_entity, pos);
 
 		explosive.released_image_id = assets::game_image_id::FORCE_GRENADE_RELEASED;
@@ -108,7 +129,7 @@ namespace prefabs {
 		in.type = adverse_element_type::PED;
 		in.create_thunders_effect = true;
 
-		auto& sprite = ingredients::add_sprite(metas, grenade_entity, assets::game_image_id::PED_GRENADE, white, render_layer::SMALL_DYNAMIC_BODY);
+		auto& sprite = ingredients::add_sprite(metas, grenade_entity, assets::game_image_id::PED_GRENADE, white);
 		ingredients::add_see_through_dynamic_body(step, grenade_entity, pos);
 
 		auto& item = ingredients::make_item(grenade_entity);
@@ -149,7 +170,7 @@ namespace prefabs {
 		in.sound_effect = assets::sound_buffer_id::INTERFERENCE_EXPLOSION;
 		in.type = adverse_element_type::INTERFERENCE;
 
-		auto& sprite = ingredients::add_sprite(metas, grenade_entity, assets::game_image_id::INTERFERENCE_GRENADE, white, render_layer::SMALL_DYNAMIC_BODY);
+		auto& sprite = ingredients::add_sprite(metas, grenade_entity, assets::game_image_id::INTERFERENCE_GRENADE, white);
 		ingredients::add_see_through_dynamic_body(step, grenade_entity, pos);
 
 		auto& item = ingredients::make_item(grenade_entity);

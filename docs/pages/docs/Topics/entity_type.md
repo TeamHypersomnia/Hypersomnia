@@ -46,6 +46,8 @@ Most of the time, only the programmers are concerned with the second type of dat
 	- If a field of a definition changes, (during content creation), reinfer all objects of this type with help of the [type id cache](type_id_cache); currently we'll just reinfer the whole cosmos.
 - There won't be many types, but access is **frequent** during [solve](solver#the-solve). 
 	- We allocate all definitions **statically**, as memory won't suffer relatively to the speed gain.
+- The logic should always first check for the existence of component, only later the definition that the component is implied by
+	- One less indirection because checking for the id being unset is just a single arithmetic operation when the id is cached.
 - On creating an entity, the chosen type's id is passed.  
 	- The [``cosmos::create_entity``](cosmos#create_entity) automatically adds all components implied by the enabled definitions.
 - Some components do not need any definition data.

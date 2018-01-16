@@ -6,7 +6,6 @@
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 
-#include "game/components/position_copying_component.h"
 #include "game/components/interpolation_component.h"
 #include "game/components/fixtures_component.h"
 

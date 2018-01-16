@@ -29,7 +29,16 @@
 
 namespace prefabs {
 	void populate_character_types(entity_types& types) {
-		get_test_type(types, test_scene_type::PLAYER).description = L"Member of Atlantic nations.";
+		auto& meta = get_test_type(types, test_scene_type::PLAYER);
+
+		meta.description = L"Member of Atlantic nations.";
+
+		{
+			definitions::render render_def;
+			render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
+
+			meta.set(render_def);
+		}
 	}
 }
 
@@ -58,12 +67,9 @@ namespace ingredients {
 
 		body.set_transform(si, spawn_transform);
 
-		components::special_physics special;
-
 		add_character_movement(e);
 
 		e += body;
-		e += special;
 
 		e.add_shape_component_from_renderable(
 			step
@@ -80,13 +86,11 @@ namespace ingredients {
 
 	void add_character_legs(const entity_handle legs, const entity_handle player) {
 		components::sprite sprite;
-		components::render render;
 		components::animation animation;
 	}
 
 	void add_character(const all_logical_assets& metas, const entity_handle e, const entity_handle crosshair_entity) {
 		auto& sprite = e += components::sprite();
-		auto& render = e += components::render();
 		auto& animation = e += components::animation();
 		auto& movement = e += components::movement();
 		auto& rotation_copying = e += components::rotation_copying();
@@ -135,8 +139,6 @@ namespace ingredients {
 		crosshair_entity.make_as_child_of(e);
 
 		sprite.set(assets::game_image_id::STANDARD_HEAD, metas);
-
-		render.layer = render_layer::SMALL_DYNAMIC_BODY;
 
 		rotation_copying.target = crosshair_entity;
 		rotation_copying.look_mode = components::rotation_copying::look_type::POSITION;

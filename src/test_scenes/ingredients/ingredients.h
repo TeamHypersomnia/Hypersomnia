@@ -26,16 +26,14 @@ namespace ingredients {
 		const all_logical_assets& metas,
 		entity_handle, 
 		assets::game_image_id = assets::game_image_id::INVALID,
-		rgba col = rgba(255, 255, 255, 255), 
-		render_layer = render_layer::GROUND
+		rgba col = rgba(255, 255, 255, 255)
 	);
 
 	components::sprite& add_sprite_scaled(
 		entity_handle, 
 		vec2i size = vec2i(), 
 		assets::game_image_id = assets::game_image_id::INVALID,
-		rgba col = rgba(255, 255, 255, 255), 
-		render_layer = render_layer::GROUND
+		rgba col = rgba(255, 255, 255, 255)
 	);
 	
 	void add_bullet_round_physics(const logic_step, entity_handle, const components::transform);
@@ -63,24 +61,28 @@ namespace ingredients {
 }
 
 namespace prefabs {
+	void populate_other_types(const all_logical_assets& logicals, entity_types& types);
+
+	void populate_car_types(const all_logical_assets& logicals, entity_types& types);
+	void populate_crate_types(const all_logical_assets& logicals, entity_types& types);
+	void populate_melee_types(const all_logical_assets& logicals, entity_types& types);
+	void populate_backpack_types(const all_logical_assets& logicals, entity_types& types);
 	void populate_gun_types(const all_logical_assets& logicals, entity_types& types);
 	void populate_grenade_types(entity_types& types);
 	void populate_character_types(entity_types& types);
 
 	entity_handle create_car(const logic_step, const components::transform&);
 
-	entity_handle create_sample_suppressor(const logic_step world, const vec2 pos);
-
+	// guns
 	entity_handle create_sample_magazine(const logic_step, components::transform pos, std::string space = "0.30", entity_id charge_inside = entity_id());
 	entity_handle create_sample_rifle(const logic_step, vec2 pos, entity_id load_mag = entity_id());
 	entity_handle create_kek9(const logic_step step, vec2 pos, entity_id load_mag_id);
-
 	entity_handle create_amplifier_arm(
 		const logic_step,
 		const vec2 pos 
 	);
-
 	entity_handle create_cyan_charge(const logic_step, vec2 pos, int charges = 30);
+
 
 	entity_handle create_sample_backpack(const logic_step, vec2 pos);
 
@@ -101,7 +103,5 @@ namespace prefabs {
 	entity_handle create_force_grenade(const logic_step, const vec2 pos);
 	entity_handle create_ped_grenade(const logic_step, const vec2 pos);
 	entity_handle create_interference_grenade(const logic_step, const vec2 pos);
-
-	entity_handle create_electric_missile_def(const logic_step, const components::transform);
 }
 #endif

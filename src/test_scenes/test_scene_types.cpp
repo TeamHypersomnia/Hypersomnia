@@ -14,6 +14,11 @@ void populate_test_scene_types(const all_logical_assets& logicals, entity_types&
 	});
 
 	prefabs::populate_grenade_types(into);
-	prefabs::populate_gun_types(logicals, into);
 	prefabs::populate_character_types(into);
+	prefabs::populate_gun_types(logicals, into);
+	prefabs::populate_other_types(logicals, into);
+	prefabs::populate_car_types(logicals, into);
+	prefabs::populate_crate_types(logicals, into);
+	prefabs::populate_melee_types(logicals, into);
+	prefabs::populate_backpack_types(logicals, into);
 }

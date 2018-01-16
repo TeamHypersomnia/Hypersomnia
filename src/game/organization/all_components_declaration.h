@@ -11,6 +11,7 @@
 
 namespace definitions {
 	struct gun;
+	struct render;
 }
 
 namespace components {
@@ -27,7 +28,6 @@ namespace components {
 	struct particles_existence;
 	struct pathfinding;
 	struct rigid_body;
-	struct render;
 	struct car;
 	struct driver;
 	struct fixtures;
@@ -73,7 +73,6 @@ using component_list_t = List<
 	components::particles_existence,
 	components::pathfinding,
 	components::rigid_body,
-	components::render,
 	components::transform,
 	components::sprite,
 	components::polygon,
@@ -109,7 +108,8 @@ using component_list_t = List<
 
 template <template <class...> class List>
 using definition_list_t = List<
-	definitions::gun
+	definitions::gun,
+	definitions::render
 >;
 
 template <class... Types>

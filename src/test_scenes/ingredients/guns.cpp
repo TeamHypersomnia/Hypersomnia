@@ -30,8 +30,72 @@
 
 namespace prefabs {
 	void populate_gun_types(const all_logical_assets& logicals, entity_types& types) {
+		/* Types for bullets etc. */
+
+		{
+			auto& meta = get_test_type(types, test_scene_type::CYAN_ROUND_DEFINITION);
+
+			{
+				definitions::render render_def;
+				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
+
+				meta.set(render_def);
+			}
+		}
+
+		{
+			auto& meta = get_test_type(types, test_scene_type::CYAN_SHELL_DEFINITION);
+
+			{
+				definitions::render render_def;
+				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
+
+				meta.set(render_def);
+			}
+		}
+
+		{
+			auto& meta = get_test_type(types, test_scene_type::SAMPLE_MAGAZINE);
+
+			{
+				definitions::render render_def;
+				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
+
+				meta.set(render_def);
+			}
+		}
+
+		{
+			auto& meta = get_test_type(types, test_scene_type::FINISHING_TRACE);
+			
+			{
+				definitions::render render_def;
+				render_def.layer = render_layer::FLYING_BULLETS;
+
+				meta.set(render_def);
+			}
+		}
+
+		{
+			auto& meta = get_test_type(types, test_scene_type::AMPLIFIER_ARM_MISSILE);
+			
+			{
+				definitions::render render_def;
+				render_def.layer = render_layer::FLYING_BULLETS;
+
+				meta.set(render_def);
+			}
+		}
+
 		{
 			auto& meta = get_test_type(types, test_scene_type::SAMPLE_RIFLE);
+
+			{
+				definitions::render render_def;
+				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
+
+				meta.set(render_def);
+			}
 
 			meta.description =
 				L"Standard issue sample rifle."
@@ -67,6 +131,13 @@ namespace prefabs {
 		{
 			auto& meta = get_test_type(types, test_scene_type::KEK9);
 
+			{
+				definitions::render render_def;
+				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
+
+				meta.set(render_def);
+			}
+
 			definitions::gun gun_def;
 
 			gun_def.muzzle_shot_sound.id = assets::sound_buffer_id::KEK9_MUZZLE;
@@ -97,6 +168,13 @@ namespace prefabs {
 		{
 			auto& meta = get_test_type(types, test_scene_type::AMPLIFIER_ARM);
 
+			{
+				definitions::render render_def;
+				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
+
+				meta.set(render_def);
+			}
+
 			definitions::gun gun_def;
 
 			gun_def.muzzle_shot_sound.id = assets::sound_buffer_id::ASSAULT_RIFLE_MUZZLE;
@@ -121,7 +199,7 @@ namespace prefabs {
 
 		auto weapon = create_test_scene_entity(cosmos, test_scene_type::SAMPLE_RIFLE);
 
-		auto& sprite = ingredients::add_sprite(metas, weapon, assets::game_image_id::ASSAULT_RIFLE, white, render_layer::SMALL_DYNAMIC_BODY);
+		auto& sprite = ingredients::add_sprite(metas, weapon, assets::game_image_id::ASSAULT_RIFLE, white);
 		ingredients::add_see_through_dynamic_body(step, weapon, pos);
 		ingredients::add_default_gun_container(step, weapon);
 
@@ -161,7 +239,7 @@ namespace prefabs {
 
 		auto weapon = create_test_scene_entity(cosmos, test_scene_type::KEK9);
 
-		auto& sprite = ingredients::add_sprite(metas, weapon, assets::game_image_id::KEK9, white, render_layer::SMALL_DYNAMIC_BODY);
+		auto& sprite = ingredients::add_sprite(metas, weapon, assets::game_image_id::KEK9, white);
 		ingredients::add_see_through_dynamic_body(step, weapon, pos);
 		ingredients::add_default_gun_container(step, weapon, 0.f, true);
 
@@ -199,7 +277,7 @@ namespace prefabs {
 		auto& cosmos = step.get_cosmos();
 		auto weapon = create_test_scene_entity(cosmos, test_scene_type::AMPLIFIER_ARM);
 
-		auto& sprite = ingredients::add_sprite(metas, weapon, assets::game_image_id::AMPLIFIER_ARM, white, render_layer::SMALL_DYNAMIC_BODY);
+		auto& sprite = ingredients::add_sprite(metas, weapon, assets::game_image_id::AMPLIFIER_ARM, white);
 		ingredients::add_see_through_dynamic_body(step, weapon, pos);
 
 		auto& item = ingredients::make_item(weapon);
@@ -210,13 +288,13 @@ namespace prefabs {
 		weapon.add_standard_components(step);
 
 		{
-			const auto round_definition = create_test_scene_entity(cosmos, test_scene_type::ROUND_DEFINITION);
+			const auto arm_missile = create_test_scene_entity(cosmos, test_scene_type::AMPLIFIER_ARM_MISSILE);
 
-			auto& s = ingredients::add_sprite(metas, round_definition, assets::game_image_id::ENERGY_BALL, cyan, render_layer::FLYING_BULLETS);
-			ingredients::add_bullet_round_physics(step, round_definition, pos);
+			auto& s = ingredients::add_sprite(metas, arm_missile, assets::game_image_id::ENERGY_BALL, cyan);
+			ingredients::add_bullet_round_physics(step, arm_missile, pos);
 
-			auto& sender = round_definition += components::sender();
-			auto& missile = round_definition += components::missile();
+			auto& sender = arm_missile += components::sender();
+			auto& missile = arm_missile += components::missile();
 
 			missile.destruction_particles.id = assets::particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION;
 			missile.destruction_particles.modifier.colorize = cyan;
@@ -241,13 +319,13 @@ namespace prefabs {
 			missile.homing_towards_hostile_strength = 1.0f;
 			missile.damage_amount = 42;
 
-			auto& trace = round_definition += components::trace();
+			auto& trace = arm_missile += components::trace();
 			trace.max_multiplier_x = {0.0f, 0.f};
 			trace.max_multiplier_y = {0.f, 0.f};
 			trace.lengthening_duration_ms = {200.f, 250.f};
 			trace.additional_multiplier = vec2(1.f, 1.f);
 
-			gun.magic_missile_definition = round_definition;
+			gun.magic_missile_definition = arm_missile;
 		}
 
 		return weapon;
@@ -318,7 +396,7 @@ namespace prefabs {
 		
 
 		{
-			ingredients::add_sprite(metas, sample_magazine, assets::game_image_id::SAMPLE_MAGAZINE, white, render_layer::SMALL_DYNAMIC_BODY);
+			ingredients::add_sprite(metas, sample_magazine, assets::game_image_id::SAMPLE_MAGAZINE, white);
 			ingredients::add_see_through_dynamic_body(step, sample_magazine, pos);
 
 			auto& item = ingredients::make_item(sample_magazine);
@@ -344,25 +422,6 @@ namespace prefabs {
 		return sample_magazine;
 	}
 
-	entity_handle create_sample_suppressor(const logic_step step, vec2 pos) {
-		auto& cosmos = step.get_cosmos();
-		auto sample_suppressor = create_test_scene_entity(cosmos, test_scene_type::SAMPLE_SUPPRESSOR);
-		
-		const auto& metas = step.get_logical_assets();
-
-		ingredients::add_sprite(metas, sample_suppressor, assets::game_image_id::SAMPLE_SUPPRESSOR, white, render_layer::SMALL_DYNAMIC_BODY);
-		ingredients::add_see_through_dynamic_body(step, sample_suppressor, pos);
-
-		auto& item = ingredients::make_item(sample_suppressor);
-
-		item.categories_for_slot_compatibility.set(item_category::MUZZLE_ATTACHMENT);
-		item.space_occupied_per_charge = to_space_units("0.2");
-
-		sample_suppressor.add_standard_components(step);
-
-		return sample_suppressor;
-	}
-
 	entity_handle create_cyan_charge(const logic_step step, vec2 pos, int charges) {
 		auto& cosmos = step.get_cosmos();
 		const auto cyan_charge = create_test_scene_entity(cosmos, test_scene_type::CYAN_CHARGE);
@@ -372,7 +431,7 @@ namespace prefabs {
 		const auto& metas = step.get_logical_assets();
 
 		{
-			ingredients::add_sprite(metas, cyan_charge, assets::game_image_id::CYAN_CHARGE, white, render_layer::SMALL_DYNAMIC_BODY);
+			ingredients::add_sprite(metas, cyan_charge, assets::game_image_id::CYAN_CHARGE, white);
 			ingredients::add_see_through_dynamic_body(step, cyan_charge, pos);
 
 			auto& item = ingredients::make_item(cyan_charge);
@@ -388,7 +447,7 @@ namespace prefabs {
 		}
 
 		{
-			auto& s = ingredients::add_sprite(metas, round_definition, assets::game_image_id::ROUND_TRACE, cyan, render_layer::FLYING_BULLETS);
+			auto& s = ingredients::add_sprite(metas, round_definition, assets::game_image_id::ROUND_TRACE, cyan);
 			ingredients::add_bullet_round_physics(step, round_definition, pos);
 
 			auto& sender = round_definition += components::sender();
@@ -420,10 +479,11 @@ namespace prefabs {
 			trace.max_multiplier_y = {0.f, 0.f};
 			trace.lengthening_duration_ms = {200.f, 250.f};
 			trace.additional_multiplier = vec2(1.f, 1.f);
+			trace.finishing_trace_type = static_cast<entity_type_id>(test_scene_type::FINISHING_TRACE);
 		}
 
 		{
-			ingredients::add_sprite(metas, shell_definition, assets::game_image_id::CYAN_SHELL, white, render_layer::SMALL_DYNAMIC_BODY);
+			ingredients::add_sprite(metas, shell_definition, assets::game_image_id::CYAN_SHELL, white);
 			ingredients::add_shell_dynamic_body(step, shell_definition, pos);
 		}
 
@@ -433,57 +493,5 @@ namespace prefabs {
 		cyan_charge.add_standard_components(step);
 
 		return cyan_charge;
-	}
-
-	entity_handle create_electric_missile_def(const logic_step step, const components::transform transform) {
-		const auto energy_ball = create_test_scene_entity(step.get_cosmos(), test_scene_type::ELECTRIC_MISSILE);
-		const auto& metas = step.get_logical_assets();
-
-		ingredients::add_sprite(metas, 
-			energy_ball, 
-			assets::game_image_id::ENERGY_BALL, 
-			cyan, 
-			render_layer::FLYING_BULLETS
-		);
-
-		ingredients::add_bullet_round_physics(
-			step, 
-			energy_ball,
-			transform
-		);
-
-		auto& missile = energy_ball += components::missile();
-
-		missile.destruction_particles.id = assets::particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION;
-		missile.destruction_particles.modifier.colorize = cyan;
-
-		missile.trace_particles.id = assets::particle_effect_id::WANDERING_PIXELS_DIRECTED;
-		missile.trace_particles.modifier.colorize = cyan;
-
-		missile.muzzle_leave_particles.id = assets::particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION;
-		missile.muzzle_leave_particles.modifier.colorize = cyan;
-
-		auto& trace_modifier = missile.trace_sound.modifier;
-
-		trace_modifier.max_distance = 1020.f;
-		trace_modifier.reference_distance = 100.f;
-		trace_modifier.gain = 1.3f;
-		trace_modifier.repetitions = -1;
-		trace_modifier.fade_on_exit = false;
-
-		missile.trace_sound.id = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;
-		missile.destruction_sound.id = assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION;
-
-		missile.homing_towards_hostile_strength = 1.0f;
-		missile.damage_amount = 42;
-
-		auto& sender = energy_ball += components::sender();
-		components::all_inferred_state inferred;
-		inferred.activated = false;
-		energy_ball += inferred;
-
-		energy_ball.add_standard_components(step, false);
-
-		return energy_ball;
 	}
 }

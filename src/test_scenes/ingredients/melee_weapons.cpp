@@ -12,11 +12,22 @@
 #include "game/detail/inventory/perform_transfer.h"
 
 namespace prefabs {
+	void populate_melee_types(const all_logical_assets& logicals, entity_types& types) {
+		{
+			auto& meta = get_test_type(types, test_scene_type::URBAN_CYAN_MACHETE);
+
+			definitions::render render_def;
+			render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
+
+			meta.set(render_def);
+		}
+	}
+
 	entity_handle create_cyan_urban_machete(const logic_step step, vec2 pos) {
 		const auto machete = create_test_scene_entity(step.get_cosmos(), test_scene_type::URBAN_CYAN_MACHETE);
 
 		const auto& metas = step.get_logical_assets();
-		auto& sprite = ingredients::add_sprite(metas, machete, assets::game_image_id::URBAN_CYAN_MACHETE, white, render_layer::SMALL_DYNAMIC_BODY);
+		auto& sprite = ingredients::add_sprite(metas, machete, assets::game_image_id::URBAN_CYAN_MACHETE, white);
 		ingredients::add_see_through_dynamic_body(step, machete, pos);
 
 		auto& item = ingredients::make_item(machete);
