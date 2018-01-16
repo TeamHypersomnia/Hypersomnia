@@ -13,6 +13,7 @@ namespace definitions {
 	struct gun;
 	struct render;
 	struct shape_polygon;
+	struct trace;
 }
 
 namespace components {
@@ -110,7 +111,8 @@ using definition_list_t = List<
 	definitions::render,
 	definitions::shape_polygon,
 	definitions::polygon,
-	definitions::sprite
+	definitions::sprite,
+	definitions::trace
 >;
 
 template <class... Types>

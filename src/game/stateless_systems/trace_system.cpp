@@ -30,11 +30,13 @@ void trace_system::lengthen_sprites_of_traces(const logic_step step) const {
 		processing_subjects::WITH_TRACE,
 		[&](const entity_handle t) {
 			auto& trace = t.get<components::trace>();
+			const auto& trace_def = t.get_def<definitions::trace>();
+
 			auto& sprite = t.get_def<definitions::sprite>();
 
 			if (trace.chosen_lengthening_duration_ms < 0.f) {
 				auto rng = cosmos.get_rng_for(t);
-				trace.reset(rng);
+				trace.reset(trace_def, rng);
 			}
 
 			vec2 surplus_multiplier;
@@ -47,7 +49,7 @@ void trace_system::lengthen_sprites_of_traces(const logic_step step) const {
 			}
 
 			const auto original_image_size = metas.at(sprite.tex).get_size();
-			const auto size_multiplier = trace.additional_multiplier + surplus_multiplier;
+			const auto size_multiplier = trace_def.additional_multiplier + surplus_multiplier;
 
 #if TODO
 			sprite.size = size_multiplier * original_image_size;
@@ -93,16 +95,18 @@ void trace_system::spawn_finishing_traces_for_deleted_entities(const logic_step 
 			&& trace != nullptr
 			&& !trace->is_it_a_finishing_trace
 		) {
-			const auto finishing_trace = cosmic::create_entity(cosmos, trace->finishing_trace_type);
+			const auto& trace_def = deleted_entity.get_def<definitions::trace>();
+
+			LOG("type spawned: %x", static_cast<int>(trace_def.finishing_trace_type));
+			const auto finishing_trace = cosmic::create_entity(cosmos, trace_def.finishing_trace_type);
 			
-			auto copied_trace = *trace;
+			auto& copied_trace = finishing_trace.get<components::trace>();
 			copied_trace.lengthening_time_passed_ms = 0.f;
 			copied_trace.chosen_lengthening_duration_ms /= 4;
+			copied_trace.is_it_a_finishing_trace = true;
 
 			const auto transform_of_deleted = deleted_entity.get_logic_transform();
 
-			copied_trace.is_it_a_finishing_trace = true;
-			finishing_trace += copied_trace;
 			finishing_trace += transform_of_deleted;
 			
 			components::interpolation interp;

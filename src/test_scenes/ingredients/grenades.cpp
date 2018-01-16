@@ -111,7 +111,6 @@ namespace prefabs {
 		grenade_entity += shape_circle;
 
 		grenade_entity.add_standard_components(step);
-		
 
 		return grenade_entity;
 	}

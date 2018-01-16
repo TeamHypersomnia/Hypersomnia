@@ -128,9 +128,12 @@ namespace augs {
 				get<component>(p) = c;
 			}
 			else {
-				ensure(!has<component>(p));
-
-				set_id(p.template get_component_pool<component>().allocate(c));
+				if (!has<component>(p)) {
+					set_id(p.template get_component_pool<component>().allocate(c));
+				}
+				else {
+					get<component>(p) = c;
+				}
 			}
 		}
 

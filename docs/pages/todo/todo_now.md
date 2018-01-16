@@ -10,21 +10,16 @@ summary: Just a hidden scratchpad.
 
 ### Microplanned implementation order:  
 
-- Implement entity types to some degree.
-	- That is to not repeat the code when we'll be writing improvements to inferences 
-	- Order:
-		- Implement passively the architecture.
-		- Begin by, for example, definitionizing a gun component, so slowly making it use the definitions.
+- Implement entity types incrementally.
+	- We do it now to not repeat the code when we'll be writing improvements to inferences 
+		- gun component 
 			- firing engine sound and muzzle particles are "persistent child entities"
 				- thus they should become group entities.
 					- That will be only possible once we definitionize practically everything.
 			- magic missile def is just a child entity to be cloned around as needed.
 				- thus it only becomes type id.
-		- At some point, remove the definition data from the component.
-		- Build and test.
-		- Repeat with all components.
-			- Next should come the render component.
-			- We should perhaps do it with other harmless components as well.
+		- catridge component
+			- whole component should become definitions and its child entity id fields should just become type ids
 	- Get rid of component adders and deleters.
 		- That will be only possible once we definitionize practically everything in the test scenes.
 		- We'll thus need to make sender and others "always present".

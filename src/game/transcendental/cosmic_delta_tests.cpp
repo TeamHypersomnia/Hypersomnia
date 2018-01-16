@@ -288,7 +288,6 @@ TEST_CASE("Cosmos ComparisonTest") {
 		components::position_copying p;
 		p.target = new_ent1;
 		new_ent2 += components::transform();
-		new_ent2 += components::trace();
 		new_ent2 += p;
 	}
 
@@ -304,7 +303,6 @@ TEST_CASE("Cosmos ComparisonTest") {
 		components::position_copying p;
 		p.target = new_ent1;
 		new_ent2 += components::transform();
-		new_ent2 += components::trace();
 		new_ent2 += p;
 	}
 	
@@ -379,7 +377,6 @@ TEST_CASE("CosmicDelta4 EmptyAndTwoNew") {
 	new_ent1 += components::rigid_body();
 
 	new_ent2 += components::transform();
-	new_ent2 += components::trace();
 	new_ent2 += components::position_copying();
 
 	{
@@ -400,13 +397,11 @@ TEST_CASE("CosmicDelta4 EmptyAndTwoNew") {
 			const bool transform_intact = ent1.get<components::transform>() == first_transform;
 			REQUIRE(transform_intact);
 			REQUIRE(ent1.has<components::rigid_body>());
-			REQUIRE(!ent1.has<components::trace>());
 
 			REQUIRE(ent2.has<components::transform>());
 			const bool default_transform_intact = ent2.get<components::transform>() == components::transform();
 			REQUIRE(default_transform_intact);
 			REQUIRE(!ent2.has<components::rigid_body>());
-			REQUIRE(ent2.has<components::trace>());
 		}
 
 		// general comparisons
@@ -430,7 +425,6 @@ TEST_CASE("CosmicDelta4 EmptyAndTwoNew") {
 			synchronizer_component_checker(new_ent1, dec_ent1, components::rigid_body());
 			
 			component_checker(new_ent2, dec_ent2, components::transform());
-			component_checker(new_ent2, dec_ent2, components::trace());
 			component_checker(new_ent2, dec_ent2, components::position_copying());
 		}
 		
@@ -442,7 +436,6 @@ TEST_CASE("CosmicDelta4 EmptyAndTwoNew") {
 			synchronizer_component_checker(dec_ent1, new_ent1, components::rigid_body());
 		
 			component_checker(dec_ent2, new_ent2, components::transform());
-			component_checker(dec_ent2, new_ent2, components::trace());
 			component_checker(dec_ent2, new_ent2, components::position_copying());
 		}
 		
@@ -471,7 +464,6 @@ TEST_CASE("CosmicDelta4 EmptyAndTwoNew") {
 
 	// test removals of components
 	new_ent1.remove<components::rigid_body>();
-	new_ent2.remove<components::trace>();
 	new_ent2.remove<components::position_copying>();
 
 	{
@@ -486,7 +478,6 @@ TEST_CASE("CosmicDelta4 EmptyAndTwoNew") {
 	const auto ent2 = c1[second_guid];
 
 	REQUIRE(!ent1.has<components::rigid_body>());
-	REQUIRE(!ent2.has<components::trace>());
 	REQUIRE(!ent2.has<components::position_copying>());
 
 	// if both remove a transform, cosmoi shall be identical

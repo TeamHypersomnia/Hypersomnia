@@ -44,6 +44,20 @@ namespace test_types {
 
 			test_types::add_sprite(meta, logicals, assets::game_image_id::ROUND_TRACE, cyan);
 			meta.add_shape_definition_from_renderable(logicals);
+
+			{
+				{
+					definitions::trace trace_def;
+
+					trace_def.max_multiplier_x = {0.0f, 1.2f};
+					trace_def.max_multiplier_y = {0.f, 0.f};
+					trace_def.lengthening_duration_ms = {200.f, 250.f};
+					trace_def.additional_multiplier = vec2(1.f, 1.f);
+					trace_def.finishing_trace_type = static_cast<entity_type_id>(test_scene_type::CYAN_ROUND_FINISHING_TRACE);
+
+					meta.set(trace_def);
+				}
+			}
 		}
 
 		{
@@ -89,7 +103,7 @@ namespace test_types {
 		}
 
 		{
-			auto& meta = get_test_type(types, test_scene_type::FINISHING_TRACE);
+			auto& meta = get_test_type(types, test_scene_type::CYAN_ROUND_FINISHING_TRACE);
 			
 			{
 				definitions::render render_def;
@@ -97,6 +111,40 @@ namespace test_types {
 
 				meta.set(render_def);
 				test_types::add_sprite(meta, logicals, assets::game_image_id::ROUND_TRACE, cyan);
+			}
+
+			{
+				definitions::trace trace_def;
+
+				trace_def.max_multiplier_x = {0.0f, 0.f};
+				trace_def.max_multiplier_y = {0.f, 0.f};
+				trace_def.lengthening_duration_ms = {200.f, 250.f};
+				trace_def.additional_multiplier = vec2(1.f, 1.f);
+
+				meta.set(trace_def);
+			}
+		}
+
+		{
+			auto& meta = get_test_type(types, test_scene_type::ENERGY_BALL_FINISHING_TRACE);
+
+			{
+				definitions::render render_def;
+				render_def.layer = render_layer::FLYING_BULLETS;
+
+				meta.set(render_def);
+				test_types::add_sprite(meta, logicals, assets::game_image_id::ENERGY_BALL, cyan);
+			}
+
+			{
+				definitions::trace trace_def;
+
+				trace_def.max_multiplier_x = {0.0f, 0.f};
+				trace_def.max_multiplier_y = {0.f, 0.f};
+				trace_def.lengthening_duration_ms = {200.f, 250.f};
+				trace_def.additional_multiplier = vec2(1.f, 1.f);
+
+				meta.set(trace_def);
 			}
 		}
 
@@ -113,6 +161,18 @@ namespace test_types {
 
 			test_types::add_sprite(meta, logicals, assets::game_image_id::ENERGY_BALL, cyan);
 			meta.add_shape_definition_from_renderable(logicals);
+			{
+				definitions::trace trace_def;
+
+				trace_def.max_multiplier_x = {0.0f, 0.f};
+				trace_def.max_multiplier_y = {0.f, 0.f};
+				trace_def.lengthening_duration_ms = {200.f, 250.f};
+				trace_def.additional_multiplier = vec2(1.f, 1.f);
+
+				trace_def.finishing_trace_type = static_cast<entity_type_id>(test_scene_type::ENERGY_BALL_FINISHING_TRACE);
+
+				meta.set(trace_def);
+			}
 		}
 
 		{
@@ -354,13 +414,6 @@ namespace prefabs {
 			missile.homing_towards_hostile_strength = 1.0f;
 			missile.damage_amount = 42;
 
-			auto& trace = arm_missile += components::trace();
-			trace.max_multiplier_x = {0.0f, 0.f};
-			trace.max_multiplier_y = {0.f, 0.f};
-			trace.lengthening_duration_ms = {200.f, 250.f};
-			trace.additional_multiplier = vec2(1.f, 1.f);
-			trace.finishing_trace_type = static_cast<entity_type_id>(test_scene_type::FINISHING_TRACE);
-
 			gun.magic_missile_definition = arm_missile;
 		}
 
@@ -506,13 +559,6 @@ namespace prefabs {
 
 			missile.trace_sound.id = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;
 			missile.destruction_sound.id = assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION;
-
-			auto& trace = round_definition += components::trace();
-			trace.max_multiplier_x = {0.0f, 1.2f};
-			trace.max_multiplier_y = {0.f, 0.f};
-			trace.lengthening_duration_ms = {200.f, 250.f};
-			trace.additional_multiplier = vec2(1.f, 1.f);
-			trace.finishing_trace_type = static_cast<entity_type_id>(test_scene_type::FINISHING_TRACE);
 		}
 
 		{
