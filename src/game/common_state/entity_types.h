@@ -84,6 +84,10 @@ public:
 	void unset() {
 		name.clear();
 	}
+
+	void add_shape_definition_from_renderable(
+		const all_logical_assets& assets
+	);
 };
 
 #if STATICALLY_ALLOCATE_ENTITY_TYPES_NUM

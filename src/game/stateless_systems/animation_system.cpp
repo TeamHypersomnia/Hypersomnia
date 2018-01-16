@@ -167,12 +167,16 @@ void animation_system::progress_animation_states(const logic_step step) {
 					else break;
 				}
 
+#if TODO
+				// TODO: stateless calculation
+
 				auto& sprite = it.get<components::sprite>();
 
 				sprite.set(
 					animation.frames[animation_state.get_current_frame()].image_id,
 					metas
 				);
+#endif
 			}
 		}
 	);

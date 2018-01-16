@@ -10,30 +10,17 @@
 
 #include "game/enums/filters.h"
 
-namespace ingredients {
-	components::sprite& add_sprite(
-		const all_logical_assets& metas,
-		const entity_handle e,
+namespace test_types {
+	void add_sprite(
+		entity_type& t, 
+		const all_logical_assets& logicals,
 		const assets::game_image_id id, 
-		const rgba col 
+		const rgba col,
+		const definitions::sprite::special_effect effect
 	) {
-		auto& sprite = e += components::sprite();
-		sprite.set(id, metas, col);
-
-		return sprite;
-	}
-
-	components::sprite& add_sprite_scaled(
-		const entity_handle e, 
-		const vec2i size, 
-		const assets::game_image_id id, 
-		const rgba col 
-	) {
-		ensure(size.non_zero());
-
-		auto& sprite = e += components::sprite();
-		sprite.set(id, size, col);
-
-		return sprite;
+		definitions::sprite sprite_def;
+		sprite_def.set(id, logicals, col);
+		sprite_def.effect = effect;
+		t.set(sprite_def);
 	}
 }

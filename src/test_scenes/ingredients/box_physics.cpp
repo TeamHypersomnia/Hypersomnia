@@ -15,10 +15,6 @@ namespace ingredients {
 
 		body.set_transform(si, target_transform);
 
-		e.add_shape_component_from_renderable(
-			step
-		);
-
 		components::fixtures group;
 
 		group.destructible = destructible;
@@ -36,10 +32,6 @@ namespace ingredients {
 		const auto si = e.get_cosmos().get_si();
 
 		body.set_transform(si, target_transform);
-
-		e.add_shape_component_from_renderable(
-			step
-		);
 
 		components::fixtures group;
 
@@ -59,10 +51,6 @@ namespace ingredients {
 		const auto si = e.get_cosmos().get_si();
 		
 		body.set_transform(si, target_transform);
-
-		e.add_shape_component_from_renderable(
-			step
-		);
 
 		components::fixtures group;
 
@@ -87,10 +75,6 @@ namespace ingredients {
 
 		body.set_transform(si, target_transform);
 
-		e.add_shape_component_from_renderable(
-			step
-		);
-
 		components::fixtures group;
 
 		group.filter = filters::dynamic_object();
@@ -111,14 +95,9 @@ namespace ingredients {
 		body.bullet = true;
 		body.angular_damping = 0.f,
 		body.linear_damping = 0.f,
-		body.gravity_scale = 0.f;
 		body.fixed_rotation = false;
 		body.angled_damping = false;
 		
-		e.add_shape_component_from_renderable(
-			step
-		);
-
 		components::fixtures group;
 
 		group.filter = filters::bullet();

@@ -30,7 +30,7 @@ namespace augs {
 		};
 
 		enum class special_effect : unsigned char {
-			NONE,
+			NONE = 0,
 			COLOR_WAVE
 		};
 

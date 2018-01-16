@@ -22,20 +22,6 @@ namespace ingredients {
 	
 	void make_always_visible(entity_handle);
 
-	components::sprite& add_sprite(
-		const all_logical_assets& metas,
-		entity_handle, 
-		assets::game_image_id = assets::game_image_id::INVALID,
-		rgba col = rgba(255, 255, 255, 255)
-	);
-
-	components::sprite& add_sprite_scaled(
-		entity_handle, 
-		vec2i size = vec2i(), 
-		assets::game_image_id = assets::game_image_id::INVALID,
-		rgba col = rgba(255, 255, 255, 255)
-	);
-	
 	void add_bullet_round_physics(const logic_step, entity_handle, const components::transform);
 	void add_see_through_dynamic_body(const logic_step, entity_handle, const components::transform);
 	void add_shell_dynamic_body(const logic_step, entity_handle, const components::transform);
@@ -60,16 +46,17 @@ namespace ingredients {
 	void add_soldier_intelligence(entity_handle);
 }
 
-namespace prefabs {
-	void populate_other_types(const all_logical_assets& logicals, entity_types& types);
+namespace test_types {
+	void add_sprite(
+		entity_type& t, 
+		const all_logical_assets& logicals,
+		assets::game_image_id = assets::game_image_id::INVALID,
+		rgba col = rgba(255, 255, 255, 255),
+		definitions::sprite::special_effect = {}
+	);
+}
 
-	void populate_car_types(const all_logical_assets& logicals, entity_types& types);
-	void populate_crate_types(const all_logical_assets& logicals, entity_types& types);
-	void populate_melee_types(const all_logical_assets& logicals, entity_types& types);
-	void populate_backpack_types(const all_logical_assets& logicals, entity_types& types);
-	void populate_gun_types(const all_logical_assets& logicals, entity_types& types);
-	void populate_grenade_types(entity_types& types);
-	void populate_character_types(entity_types& types);
+namespace prefabs {
 
 	entity_handle create_car(const logic_step, const components::transform&);
 

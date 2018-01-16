@@ -136,7 +136,7 @@ public:
 	template <class M>
 	void draw_particles_as_sprites(
 		const M& manager,
-		const components::sprite::drawing_input basic_input,
+		const definitions::sprite::drawing_input basic_input,
 		const render_layer layer
 	) const {
 		for (const auto& it : general_particles[layer]) {

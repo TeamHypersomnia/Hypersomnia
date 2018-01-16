@@ -25,46 +25,10 @@ struct convex_poly_destruction_data {
 	// END GEN INTROSPECTOR
 };
 
-namespace components {
+namespace definitions {
 	struct shape_polygon {
-		static constexpr bool is_synchronized = true;
-
-		// GEN INTROSPECTOR struct components::shape_polygon
+		// GEN INTROSPECTOR struct definitions::shape_polygon
 		convex_partitioned_shape shape;
-		std::array<convex_poly_destruction_data, CONVEX_POLYS_COUNT> destruction;
-		bool activated = true;
-		pad_bytes<3> pad;
 		// END GEN INTROSPECTOR
 	};
 }
-
-template<bool is_const>
-class basic_shape_polygon_synchronizer : public component_synchronizer_base<is_const, components::shape_polygon> {
-protected:
-	using base = component_synchronizer_base<is_const, components::shape_polygon>;
-	using base::handle;
-public:
-	using base::component_synchronizer_base;
-	using base::get_raw_component;
-
-	bool is_activated() const;
-};
-
-template<>
-class component_synchronizer<false, components::shape_polygon> : public basic_shape_polygon_synchronizer<false> {
-	void reinfer_caches() const;
-public:
-	using basic_shape_polygon_synchronizer<false>::basic_shape_polygon_synchronizer;
-
-	convex_poly_destruction_data& get_modifiable_destruction_data(
-		const b2Fixture_index_in_component indices
-	) const;
-
-	void set_activated(const bool flag) const;
-};
-
-template<>
-class component_synchronizer<true, components::shape_polygon> : public basic_shape_polygon_synchronizer<true> {
-public:
-	using basic_shape_polygon_synchronizer<true>::basic_shape_polygon_synchronizer;
-};

@@ -10,8 +10,6 @@ summary: Just a hidden scratchpad.
 
 ### Microplanned implementation order:  
 
-- Now definitionize renders for entities created in testbed
-
 - Implement entity types to some degree.
 	- That is to not repeat the code when we'll be writing improvements to inferences 
 	- Order:
@@ -19,12 +17,17 @@ summary: Just a hidden scratchpad.
 		- Begin by, for example, definitionizing a gun component, so slowly making it use the definitions.
 			- firing engine sound and muzzle particles are "persistent child entities"
 				- thus they should become group entities.
+					- That will be only possible once we definitionize practically everything.
 			- magic missile def is just a child entity to be cloned around as needed.
 				- thus it only becomes type id.
 		- At some point, remove the definition data from the component.
 		- Build and test.
 		- Repeat with all components.
+			- Next should come the render component.
+			- We should perhaps do it with other harmless components as well.
 	- Get rid of component adders and deleters.
+		- That will be only possible once we definitionize practically everything in the test scenes.
+		- We'll thus need to make sender and others "always present".
 - Remove owner_body from fixtures component and create a component named "custom rigid body owner" that overrides anything else
 - Current slot should stay in the item component as other fields of item will anyway be a private
 - **moving disabled processing lists out of the significant state**
@@ -34,6 +37,9 @@ summary: Just a hidden scratchpad.
 	- or it can be part of inferred state which will complicate things a little
 - force joint components should be "custom" in a sense that they can be added and they do not override anything else
 	- there should be one cache per joint type, e.g. attachment joint cache which is inferred from current inventory state 
+- Describe two kinds of state: constant-divergent and exponentially-divergent
+	- tree of NPO, sprites, polygons, renders: constant divergence
+	- sentience, fixtures, rigid body: exponential divergence
 
 #### Needing confirmation:
 

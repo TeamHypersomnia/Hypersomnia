@@ -28,7 +28,7 @@
 #include "ingredients.h"
 #include "game/detail/inventory/perform_transfer.h"
 
-namespace prefabs {
+namespace test_types {
 	void populate_gun_types(const all_logical_assets& logicals, entity_types& types) {
 		/* Types for bullets etc. */
 
@@ -37,10 +37,13 @@ namespace prefabs {
 
 			{
 				definitions::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
+				render_def.layer = render_layer::FLYING_BULLETS;
 
 				meta.set(render_def);
 			}
+
+			test_types::add_sprite(meta, logicals, assets::game_image_id::ROUND_TRACE, cyan);
+			meta.add_shape_definition_from_renderable(logicals);
 		}
 
 		{
@@ -52,6 +55,23 @@ namespace prefabs {
 
 				meta.set(render_def);
 			}
+
+			test_types::add_sprite(meta, logicals, assets::game_image_id::CYAN_SHELL, white);
+			meta.add_shape_definition_from_renderable(logicals);
+		}
+
+		{
+			auto& meta = get_test_type(types, test_scene_type::CYAN_CHARGE);
+
+			{
+				definitions::render render_def;
+				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
+
+				meta.set(render_def);
+			}
+
+			test_types::add_sprite(meta, logicals, assets::game_image_id::CYAN_CHARGE, white);
+			meta.add_shape_definition_from_renderable(logicals);
 		}
 
 		{
@@ -63,6 +83,9 @@ namespace prefabs {
 
 				meta.set(render_def);
 			}
+
+			test_types::add_sprite(meta, logicals, assets::game_image_id::SAMPLE_MAGAZINE, white);
+			meta.add_shape_definition_from_renderable(logicals);
 		}
 
 		{
@@ -73,6 +96,7 @@ namespace prefabs {
 				render_def.layer = render_layer::FLYING_BULLETS;
 
 				meta.set(render_def);
+				test_types::add_sprite(meta, logicals, assets::game_image_id::ROUND_TRACE, cyan);
 			}
 		}
 
@@ -85,6 +109,10 @@ namespace prefabs {
 
 				meta.set(render_def);
 			}
+
+
+			test_types::add_sprite(meta, logicals, assets::game_image_id::ENERGY_BALL, cyan);
+			meta.add_shape_definition_from_renderable(logicals);
 		}
 
 		{
@@ -126,6 +154,9 @@ namespace prefabs {
 			gun_def.recoil.id = assets::recoil_player_id::GENERIC;
 
 			meta.set(gun_def);
+
+			test_types::add_sprite(meta, logicals, assets::game_image_id::ASSAULT_RIFLE, white);
+			meta.add_shape_definition_from_renderable(logicals);
 		}
 
 		{
@@ -163,6 +194,9 @@ namespace prefabs {
 			gun_def.recoil.id = assets::recoil_player_id::GENERIC;
 
 			meta.set(gun_def);
+
+			test_types::add_sprite(meta, logicals, assets::game_image_id::KEK9, white);
+			meta.add_shape_definition_from_renderable(logicals);
 		}
 
 		{
@@ -189,9 +223,14 @@ namespace prefabs {
 			gun_def.recoil.id = assets::recoil_player_id::GENERIC;
 
 			meta.set(gun_def);
+
+			test_types::add_sprite(meta, logicals, assets::game_image_id::AMPLIFIER_ARM, white);
+			meta.add_shape_definition_from_renderable(logicals);
 		}
 	}
+}
 
+namespace prefabs {
 	entity_handle create_sample_rifle(const logic_step step, vec2 pos, entity_id load_mag_id) {
 		const auto& metas = step.get_logical_assets();
 		auto& cosmos = step.get_cosmos();
@@ -199,7 +238,6 @@ namespace prefabs {
 
 		auto weapon = create_test_scene_entity(cosmos, test_scene_type::SAMPLE_RIFLE);
 
-		auto& sprite = ingredients::add_sprite(metas, weapon, assets::game_image_id::ASSAULT_RIFLE, white);
 		ingredients::add_see_through_dynamic_body(step, weapon, pos);
 		ingredients::add_default_gun_container(step, weapon);
 
@@ -239,7 +277,6 @@ namespace prefabs {
 
 		auto weapon = create_test_scene_entity(cosmos, test_scene_type::KEK9);
 
-		auto& sprite = ingredients::add_sprite(metas, weapon, assets::game_image_id::KEK9, white);
 		ingredients::add_see_through_dynamic_body(step, weapon, pos);
 		ingredients::add_default_gun_container(step, weapon, 0.f, true);
 
@@ -277,7 +314,6 @@ namespace prefabs {
 		auto& cosmos = step.get_cosmos();
 		auto weapon = create_test_scene_entity(cosmos, test_scene_type::AMPLIFIER_ARM);
 
-		auto& sprite = ingredients::add_sprite(metas, weapon, assets::game_image_id::AMPLIFIER_ARM, white);
 		ingredients::add_see_through_dynamic_body(step, weapon, pos);
 
 		auto& item = ingredients::make_item(weapon);
@@ -290,7 +326,6 @@ namespace prefabs {
 		{
 			const auto arm_missile = create_test_scene_entity(cosmos, test_scene_type::AMPLIFIER_ARM_MISSILE);
 
-			auto& s = ingredients::add_sprite(metas, arm_missile, assets::game_image_id::ENERGY_BALL, cyan);
 			ingredients::add_bullet_round_physics(step, arm_missile, pos);
 
 			auto& sender = arm_missile += components::sender();
@@ -396,7 +431,6 @@ namespace prefabs {
 		
 
 		{
-			ingredients::add_sprite(metas, sample_magazine, assets::game_image_id::SAMPLE_MAGAZINE, white);
 			ingredients::add_see_through_dynamic_body(step, sample_magazine, pos);
 
 			auto& item = ingredients::make_item(sample_magazine);
@@ -431,7 +465,6 @@ namespace prefabs {
 		const auto& metas = step.get_logical_assets();
 
 		{
-			ingredients::add_sprite(metas, cyan_charge, assets::game_image_id::CYAN_CHARGE, white);
 			ingredients::add_see_through_dynamic_body(step, cyan_charge, pos);
 
 			auto& item = ingredients::make_item(cyan_charge);
@@ -447,7 +480,6 @@ namespace prefabs {
 		}
 
 		{
-			auto& s = ingredients::add_sprite(metas, round_definition, assets::game_image_id::ROUND_TRACE, cyan);
 			ingredients::add_bullet_round_physics(step, round_definition, pos);
 
 			auto& sender = round_definition += components::sender();
@@ -483,7 +515,6 @@ namespace prefabs {
 		}
 
 		{
-			ingredients::add_sprite(metas, shell_definition, assets::game_image_id::CYAN_SHELL, white);
 			ingredients::add_shell_dynamic_body(step, shell_definition, pos);
 		}
 

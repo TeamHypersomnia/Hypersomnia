@@ -12,6 +12,7 @@
 namespace definitions {
 	struct gun;
 	struct render;
+	struct shape_polygon;
 }
 
 namespace components {
@@ -74,8 +75,6 @@ using component_list_t = List<
 	components::pathfinding,
 	components::rigid_body,
 	components::transform,
-	components::sprite,
-	components::polygon,
 	components::car,
 	components::driver,
 	components::fixtures,
@@ -97,7 +96,6 @@ using component_list_t = List<
 	components::sound_existence,
 	components::explosive,
 	components::catridge,
-	components::shape_polygon,
 	components::shape_circle,
 	components::motor_joint,
 	components::hand_fuse,
@@ -109,7 +107,10 @@ using component_list_t = List<
 template <template <class...> class List>
 using definition_list_t = List<
 	definitions::gun,
-	definitions::render
+	definitions::render,
+	definitions::shape_polygon,
+	definitions::polygon,
+	definitions::sprite
 >;
 
 template <class... Types>

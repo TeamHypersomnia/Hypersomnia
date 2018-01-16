@@ -51,11 +51,38 @@ Most of the time, only the programmers are concerned with the second type of dat
 - On creating an entity, the chosen type's id is passed.  
 	- The [``cosmos::create_entity``](cosmos#create_entity) automatically adds all components implied by the enabled definitions.
 - Some components do not need any definition data.
-	- examples: child, flags, **sender**
-		- Looks like most of them should anyway be transparent to the author.
-		- Their existence is either always_present or implied by a specific circumstance in the logic (as logic can add or remove components (rarely))
-	- ~~They will have an empty definition struct that will not take up space and will define "implied_component" type.~~
-		- We've decided that the author should not be concerned with such obscurities and existence of these components should not be implied by definitions, but by a circumstance.  
+	- examples: child, flags, **sender**, transform, ~~tree of npo~~ (will be a cache), ~~special physics~~ (will be merged with rigid body)
+		- Their existence is implied by:
+			- Being always present: child and flags.
+				- Always specifiable initial values.
+			- Circumstance in the logic or mere thereof possibility, which is implied by...
+				- sender
+			- ...configuration of components at the entity construction time.
+				- sender by missiles or other kinds of launched objects
+				- Always pecifiable initial values when the required configuration of components holds.
+		- The real question is whether they should be visible to the author, as lack of definition data implies that it is some kind of detail.
+			- Otherwise we might simulate empty definition struct just as well
+		- **Chosen solutions**:
+			- child, flags - for author, always specifiable in initial values
+			- transform - for author, appears specifiable when the entity has no physical components
+			- sender - for author, appears specifiable in initial values when it has either missile or explosive
+			- Currently no components whose existence upon construction would depend on **value** of other components.
+			- Currently no components exist whose actual **initial value** upon construction would depend on value/existence of other components.
+				- because tree of npo will not be a component soon.
+			- rotation_copying
+				- instead of rotation_copying_system::update_rotations, implement sentience_system::rotate_towards_crosshairs
+					- effectively removes the need for "entity_id stashed_target"
+				- instead of rotation_copying_system::update_rotations, implement driver_system::rotate_towards_vehicles
+					- even less setup in driver system
+				- we have no more cases of rotation copying
+			- position_copying
+				- the only current use: particles existence that chase after the entity
+					- we will then store a relevant field in the particles existence component 	 
+					- what if other component requires identical functionality?
+						- then we will store the relevant fields as well there and calculate it in get_logic_transform
+				- ~~current use: astral body~~
+					- **should be removed**
+						- ``		//subject.get<components::position_copying>().set_target(corpse);``
 - ~~Some definitions imply more than one component.~~
 	- **Disproved**.
 		- A component's existence may only be implied by:
@@ -69,8 +96,11 @@ Most of the time, only the programmers are concerned with the second type of dat
 			- It would require us to prioritize initial values for definitions that share an implied component. Ugh.
 	- Which ones would need it by the way?
 		- If we're talking missile component, sender will anyways be "always_present" because the circumstance might or might not otherwise need to add it.
-- Since there is a bijection between definitions and impliable components, the code can assume that, if a component exists, so shall the relevant definition.
-	- Theoretically there will be no crash as we do not hold optionals but actual, properly constructed objects.
+- Observation: there is a bijection between definitions and impliable components.
+	- Therefore, the code can assume that, if a component exists, so shall the definition (if it exists) which implies this component.
+	- Theoretically there will be no crash if we get a definition that is not enabled.
+		- That is because we do not hold optionals but actual, properly constructed objects.
+	- If a definition does not imply any component, its existence can only be queried by actually checking whether it is enabled.
 - Some definitions do not need any instance data.
 	- Example: render component.
 		- That does not change anything at all, except for the way of getting that data.
@@ -88,6 +118,44 @@ Most of the time, only the programmers are concerned with the second type of dat
 - There is a case that it would be best if data existed both as a definition and a component.
 	- Example: shape polygon component.
 	- See: [overrides](#overrides).
+
+## Concern: performance of stateless calculation
+
+If we definitionize a component like sprite, where some domains were free to set any value they wished, e.g.:
+- [trace system](trace_system) that lengthens them over time.
+- [animation system](animation_system) that sets the sprites in accordance with animation time.
+
+- Performance concern: if we definitionize sprite, we must then calculate it statelessly.
+	- Will it only be the problem for the special case domains?
+		- Animation and trace ids may be made to fall into cache when sprite is accessed 
+			- Which will not cause a fetch for plain sprites
+		- Animation will anyway override sprite
+			- Animation should be stateless?
+				- In that case it might become more expensive to calculate?
+	- If it becomes bad, we can make an inferred cache for sprites.
+	- If it really becomes bad, we can store inferred caches in components somewhat.
+	- Notice that we will update the tree of npo cache for non-physical objects or even make its size predefined to a maximum.
+		- That cache will be dependent on many significant states probably.
+		- In any case the cost of querying for rendering will be the same.
+	- Notice that for the physical bodies it will always make sense that the animations do not stray much from the area of the body. 
+
+Plan:
+- Animation will be stateful to make calculation easier.
+	- Usually, only one problem domain will use the animation controllably, just like it is with AI and pathfinding.
+	- We can always store animation priority so that other domains do not interfere. 
+		- We don't have to make everything stateless right away while we're just definitionizing things.
+- Tree of npo node component 
+	- Currently, update_proxy is only called from set_transform
+	- We don't need the component; let's just hold the cache and update it whenever.
+		- It is not much critical state so we might update it arbitrarily often, not even needing to protect consistency much.
+	- Update the cache when:
+		- transform changes
+		- sprite changes very greatly
+	- Existence of caches is implied by existence of components at entity construction
+- Components implied by configuration of components
+	- Theoretically could make sense as existence of components is immutable
+	- Initial values not customizable, but calculated on the go or left default?
+		- tree of npo would be added if there is no rigid body or fixtures but there is a sprite
 
 We might be tempted to make some of the definitions always_present, thus always defined as "enabled".
 However, there is no benefit seen in doing so. It is a wiser choice to have a flag for each definition and assume that the contents of a default-constructed definition are always in a valid state.

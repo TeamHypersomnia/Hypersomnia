@@ -9,7 +9,6 @@
 #include "game/messages/damage_message.h"
 
 #include "game/components/fixtures_component.h"
-#include "game/components/shape_polygon_component.h"
 #include "game/components/shape_circle_component.h"
 
 void destruction_system::generate_damages_from_forceful_collisions(const logic_step step) const {
@@ -45,31 +44,5 @@ void destruction_system::generate_damages_from_forceful_collisions(const logic_s
 }
 
 void destruction_system::apply_damages_and_split_fixtures(const logic_step step) const {
-	auto& cosmos = step.get_cosmos();
-	const auto delta = step.get_delta();
-	const auto& damages = step.get_queue<messages::damage_message>();
 
-	for (const auto& d : damages) {
-		const auto subject = cosmos[d.subject];
-
-		auto fixtures = subject.find<components::fixtures>();
-		auto shape_polygon = subject.find<components::shape_polygon>();
-
-		if (fixtures != nullptr && shape_polygon != nullptr) {
-			const auto fixtures = subject.get<components::fixtures>();
-			
-			const auto& data_indices = d.subject_b2Fixture_index;
-
-			if (data_indices.is_set()) {
-				if (fixtures.is_destructible()) {
-					auto& dest_data = shape_polygon.get_modifiable_destruction_data(data_indices);
-					dest_data.scars.resize(1);
-					dest_data.scars[0].first_impact = d.point_of_impact;
-					dest_data.scars[0].depth_point = d.point_of_impact + d.impact_velocity;
-
-					//LOG("Destructible fixture has been applied damage to with direction: %x", d.impact_velocity);
-				}
-			}
-		}
-	}
 }

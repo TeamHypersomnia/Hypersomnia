@@ -36,7 +36,6 @@ namespace components {
 		float angular_damping = 6.5f;
 		float linear_damping = 6.5f;
 		vec2 linear_damping_vec;
-		float gravity_scale = 0.f;
 
 		b2Transform transform;
 		b2Sweep sweep;

@@ -66,9 +66,12 @@ void release_or_throw_fused_object(
 			
 			in.create_sound_effect_entity(step, thrower_transform, thrower).add_standard_components(step);
 
+#if TODO
+			// TODO: this information will be specified by another type
 			fused_entity.get<components::sprite>().set(
 				explosive.released_image_id, metas
 			);
+#endif
 
 			const auto rigid_body = fused_entity.get<components::rigid_body>();
 			
@@ -97,8 +100,11 @@ void release_or_throw_fused_object(
 			
 			fixtures = new_def;
 
+#if TODO
+			// TODO: this information will be specified by another type
 			fused_entity.get<components::shape_polygon>().set_activated(false);
 			fused_entity.get<components::shape_circle>().set_activated(true);
+#endif
 		}
 	}
 }

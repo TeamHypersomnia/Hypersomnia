@@ -261,7 +261,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 	draw_neons(render_layer::ON_GROUND);
 
 	{
-		components::sprite::drawing_input basic(output);
+		definitions::sprite::drawing_input basic(output);
 		basic.use_neon_map = true;
 
 		particles.draw_particles_as_sprites(

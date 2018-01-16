@@ -86,10 +86,10 @@ FORCE_INLINE void draw_border(
 
 template <class F>
 FORCE_INLINE void on_renderable_component(const const_entity_handle h, F callback) {
-	if (const auto renderable = h.find<components::sprite>()) {
+	if (const auto renderable = h.find_def<definitions::sprite>()) {
 		callback(*renderable);
 	}
-	else if (const auto renderable = h.find<components::polygon>()) {
+	else if (const auto renderable = h.find_def<definitions::polygon>()) {
 		callback(*renderable);
 	}
 }

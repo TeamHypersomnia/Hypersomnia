@@ -30,7 +30,7 @@ void trace_system::lengthen_sprites_of_traces(const logic_step step) const {
 		processing_subjects::WITH_TRACE,
 		[&](const entity_handle t) {
 			auto& trace = t.get<components::trace>();
-			auto& sprite = t.get<components::sprite>();
+			auto& sprite = t.get_def<definitions::sprite>();
 
 			if (trace.chosen_lengthening_duration_ms < 0.f) {
 				auto rng = cosmos.get_rng_for(t);
@@ -49,8 +49,10 @@ void trace_system::lengthen_sprites_of_traces(const logic_step step) const {
 			const auto original_image_size = metas.at(sprite.tex).get_size();
 			const auto size_multiplier = trace.additional_multiplier + surplus_multiplier;
 
+#if TODO
 			sprite.size = size_multiplier * original_image_size;
 			sprite.center_offset = original_image_size * (surplus_multiplier / 2.f);
+#endif
 
 			trace.lengthening_time_passed_ms += static_cast<float>(delta.in_milliseconds());
 		}
@@ -101,7 +103,6 @@ void trace_system::spawn_finishing_traces_for_deleted_entities(const logic_step 
 
 			copied_trace.is_it_a_finishing_trace = true;
 			finishing_trace += copied_trace;
-			finishing_trace += deleted_entity.get<components::sprite>();
 			finishing_trace += transform_of_deleted;
 			
 			components::interpolation interp;
@@ -113,7 +114,7 @@ void trace_system::spawn_finishing_traces_for_deleted_entities(const logic_step 
 			if (deleted_entity.find<components::missile>()) {
 				finishing_trace.get<components::transform>().pos = 
 					deleted_entity.get<components::missile>().saved_point_of_impact_before_death
-					- (deleted_entity.get<components::sprite>().get_size() / 2)
+					- (deleted_entity.get_def<definitions::sprite>().get_size() / 2)
 						.rotate(finishing_trace.get<components::transform>().rotation, vec2(0, 0))
 				;
 			}

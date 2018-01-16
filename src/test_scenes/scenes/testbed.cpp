@@ -142,8 +142,6 @@ namespace test_scenes {
 				new_character.get<components::sentience>().minimum_danger_amount_to_evade = 20;
 				new_character.get<components::sentience>().get<health_meter_instance>().set_value(300);
 				new_character.get<components::sentience>().get<health_meter_instance>().set_maximum_value(300);
-				//ingredients::add_standard_pathfinding_capability(new_character);
-				//ingredients::add_soldier_intelligence(new_character);
 				new_character.recalculate_basic_processing_categories();
 			}
 			if (i == 2) {
@@ -154,8 +152,6 @@ namespace test_scenes {
 				new_character.get<components::sentience>().minimum_danger_amount_to_evade = 20;
 				new_character.get<components::sentience>().get<health_meter_instance>().set_value(300);
 				new_character.get<components::sentience>().get<health_meter_instance>().set_maximum_value(300);
-				//ingredients::add_standard_pathfinding_capability(new_character);
-				//ingredients::add_soldier_intelligence(new_character);
 				new_character.recalculate_basic_processing_categories();
 			}
 
@@ -472,11 +468,6 @@ namespace test_scenes {
 			{
 				const auto e = create_test_scene_entity(world, test_scene_type::HAVE_A_PLEASANT);
 
-				ingredients::add_sprite(metas, 
-					e,
-					assets::game_image_id::HAVE_A_PLEASANT,
-					white);
-
 				e += components::transform(164.f - 8.f, -60.f - 20.f);
 
 				e.add_standard_components(step);
@@ -505,17 +496,10 @@ namespace test_scenes {
 				for (int x = -side; x < side; ++x) {
 					for (int y = -side; y < side * 16; ++y)
 					{
-						//auto background = create_test_scene_entity(world, test_scene_type::GROUND);
-						//ingredients::add_sprite(metas, background, vec2(-1000, 0) + vec2(x, y) * (bg_size + vec2(1500, 550)), assets::game_image_id::TEST_BACKGROUND, white);
-						//ingredients::add_standard_static_body(background);
-
 						auto street = create_test_scene_entity(world, test_scene_type::STREET);
-						ingredients::add_sprite(metas, street,
-							assets::game_image_id::TEST_BACKGROUND, gray1);
 
 						street += components::transform{ bg_size * vec2i(x, y) };
 
-						//background.add_standard_components(step);
 						street.add_standard_components(step);
 					}
 				}
@@ -524,8 +508,7 @@ namespace test_scenes {
 					const vec2 size = metas.at(assets::game_image_id::ROAD_FRONT_DIRT).get_size();
 
 					auto road_dirt = create_test_scene_entity(world, test_scene_type::ROAD_DIRT);
-					ingredients::add_sprite(metas, road_dirt,
-						assets::game_image_id::ROAD_FRONT_DIRT, white);
+					
 
 					road_dirt += components::transform{ vec2(-3 - 16 + 100 + 160 + 80 + size.x / 2, -32 - 96 + 160 + 80 - size.y / 2) };
 
@@ -536,8 +519,7 @@ namespace test_scenes {
 					const vec2 size = metas.at(assets::game_image_id::ROAD).get_size();
 
 					auto road = create_test_scene_entity(world, test_scene_type::ROAD);
-					ingredients::add_sprite(metas, road,
-						assets::game_image_id::ROAD, white);
+					
 
 					road += components::transform{ vec2(-3 - 16 + 100 + 160 + 80 + size.x / 2, -32 - 96 + 160 + 80 + size.y / 2 + size.y*r) };
 
@@ -547,14 +529,9 @@ namespace test_scenes {
 
 			{
 				const auto e = create_test_scene_entity(world, test_scene_type::AWAKENING);
-				auto& sprite = ingredients::add_sprite(metas, 
-					e,
-					assets::game_image_id::AWAKENING,
-					white);
+				
 
 				e += components::transform(164.f - 8.f, -60.f - 20.f + 40.f);
-
-				sprite.effect = components::sprite::special_effect::COLOR_WAVE;
 
 				e.add_standard_components(step);
 			}
@@ -562,10 +539,7 @@ namespace test_scenes {
 			{
 				const auto e = create_test_scene_entity(world, test_scene_type::METROPOLIS);
 
-				ingredients::add_sprite(metas, 
-					e,
-					assets::game_image_id::METROPOLIS,
-					white);
+				
 
 				e += components::transform(1164.f + 24.f, -60.f);
 

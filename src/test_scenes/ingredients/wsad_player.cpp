@@ -27,17 +27,34 @@
 #include "game/enums/party_category.h"
 #include "game/detail/inventory/perform_transfer.h"
 
-namespace prefabs {
-	void populate_character_types(entity_types& types) {
-		auto& meta = get_test_type(types, test_scene_type::PLAYER);
+namespace test_types {
+	void populate_character_types(const all_logical_assets& logicals, entity_types& types) {
+		{
+			auto& meta = get_test_type(types, test_scene_type::PLAYER);
 
-		meta.description = L"Member of Atlantic nations.";
+			meta.description = L"Member of Atlantic nations.";
+
+			{
+				definitions::render render_def;
+				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
+
+				meta.set(render_def);
+			}
+
+			add_sprite(meta, logicals, assets::game_image_id::STANDARD_HEAD);
+			meta.add_shape_definition_from_renderable(logicals);
+		}
 
 		{
-			definitions::render render_def;
-			render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
+			auto& meta = get_test_type(types, test_scene_type::CROSSHAIR);
+			add_sprite(meta, logicals, assets::game_image_id::TEST_CROSSHAIR);
+		}
 
-			meta.set(render_def);
+		{
+			auto& meta = get_test_type(types, test_scene_type::CROSSHAIR_RECOIL_BODY);
+			add_sprite(meta, logicals, assets::game_image_id::TEST_CROSSHAIR);
+
+			meta.add_shape_definition_from_renderable(logicals);
 		}
 	}
 }
@@ -71,10 +88,6 @@ namespace ingredients {
 
 		e += body;
 
-		e.add_shape_component_from_renderable(
-			step
-		);
-
 		components::fixtures group;
 
 		group.filter = filters::controlled_character();
@@ -85,12 +98,10 @@ namespace ingredients {
 	}
 
 	void add_character_legs(const entity_handle legs, const entity_handle player) {
-		components::sprite sprite;
 		components::animation animation;
 	}
 
 	void add_character(const all_logical_assets& metas, const entity_handle e, const entity_handle crosshair_entity) {
-		auto& sprite = e += components::sprite();
 		auto& animation = e += components::animation();
 		auto& movement = e += components::movement();
 		auto& rotation_copying = e += components::rotation_copying();
@@ -137,8 +148,6 @@ namespace ingredients {
 
 		e.map_child_entity(child_entity_name::CHARACTER_CROSSHAIR, crosshair_entity);
 		crosshair_entity.make_as_child_of(e);
-
-		sprite.set(assets::game_image_id::STANDARD_HEAD, metas);
 
 		rotation_copying.target = crosshair_entity;
 		rotation_copying.look_mode = components::rotation_copying::look_type::POSITION;
@@ -201,13 +210,10 @@ namespace prefabs {
 		const auto& metas = step.get_logical_assets();
 
 		{
-			auto& sprite = root += components::sprite();
 			auto& transform = root += components::transform();
 			auto& crosshair = root += components::crosshair();
 			const auto processing = root += components::processing();
 			
-			sprite.set(assets::game_image_id::TEST_CROSSHAIR, metas, rgba(255, 255, 255, 255));
-
 			crosshair.base_offset.set(-20, 0);
 			crosshair.sensitivity.set(3, 3);
 			crosshair.base_offset_bound.set(1920, 1080);
@@ -217,10 +223,6 @@ namespace prefabs {
 			auto& force_joint = recoil += components::force_joint();
 			zero_target += components::transform();
 			components::rigid_body body;
-
-			auto& sprite = recoil += components::sprite();
-
-			sprite.set(assets::game_image_id::TEST_CROSSHAIR, metas, rgba(0, 255, 0, 0));
 
 			body.linear_damping = 5;
 			body.angular_damping = 5;
@@ -233,10 +235,6 @@ namespace prefabs {
 			force_joint.divide_transform_mode = true;
 
 			recoil += body;
-
-			recoil.add_shape_component_from_renderable(
-				step
-			);
 
 			components::fixtures group;
 

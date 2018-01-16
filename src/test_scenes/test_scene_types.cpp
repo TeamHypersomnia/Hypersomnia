@@ -13,12 +13,12 @@ void populate_test_scene_types(const all_logical_assets& logicals, entity_types&
 		new_type.name = to_wstring(format_enum(e));
 	});
 
-	prefabs::populate_grenade_types(into);
-	prefabs::populate_character_types(into);
-	prefabs::populate_gun_types(logicals, into);
-	prefabs::populate_other_types(logicals, into);
-	prefabs::populate_car_types(logicals, into);
-	prefabs::populate_crate_types(logicals, into);
-	prefabs::populate_melee_types(logicals, into);
-	prefabs::populate_backpack_types(logicals, into);
+	test_types::populate_grenade_types(logicals, into);
+	test_types::populate_character_types(logicals, into);
+	test_types::populate_gun_types(logicals, into);
+	test_types::populate_other_types(logicals, into);
+	test_types::populate_car_types(logicals, into);
+	test_types::populate_crate_types(logicals, into);
+	test_types::populate_melee_types(logicals, into);
+	test_types::populate_backpack_types(logicals, into);
 }

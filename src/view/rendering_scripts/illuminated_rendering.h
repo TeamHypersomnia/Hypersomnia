@@ -109,7 +109,7 @@ void illuminated_rendering(
 	renderer.clear_current_fbo();
 	renderer.set_additive_blending();
 	
-	auto basic_sprite_input = components::sprite::drawing_input(output);
+	auto basic_sprite_input = definitions::sprite::drawing_input(output);
 
 	auto draw_particles = [&](const render_layer layer) {
 		particles.draw_particles_as_sprites(
@@ -291,7 +291,7 @@ void illuminated_rendering(
 		cosmos.for_each(
 			processing_subjects::WITH_CROSSHAIR,
 			[&](const const_entity_handle it) {
-				if (const auto s = it.find<components::sprite>()) {
+				if (const auto s = it.find_def<definitions::sprite>()) {
 					const auto p = it.get_parent();
 
 					if (p.dead()) {

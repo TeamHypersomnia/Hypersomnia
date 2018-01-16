@@ -61,13 +61,13 @@ public:
 	ltrb get_aabb(const components::transform transform) const {
 		const auto handle = *static_cast<const entity_handle_type*>(this);
 
-		if (const auto* const sprite = handle.template find<components::sprite>();
+		if (const auto* const sprite = handle.template find_def<definitions::sprite>();
 			sprite != nullptr
 		) {
 			return sprite->get_aabb(transform);
 		}
 
-		if (const auto* const polygon = handle.template find<components::polygon>();
+		if (const auto* const polygon = handle.template find_def<definitions::polygon>();
 			polygon != nullptr
 		) {
 			return polygon->get_aabb(transform);

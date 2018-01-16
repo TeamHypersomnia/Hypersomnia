@@ -18,8 +18,8 @@
 
 #include "game/detail/inventory/perform_transfer.h"
 
-namespace prefabs {
-	void populate_grenade_types(entity_types& types) {
+namespace test_types {
+	void populate_grenade_types(const all_logical_assets& logicals, entity_types& types) {
 		{
 			auto& meta = get_test_type(types, test_scene_type::FORCE_GRENADE);
 
@@ -32,7 +32,10 @@ namespace prefabs {
 				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
 
 				meta.set(render_def);
+
 			}
+			test_types::add_sprite(meta, logicals, assets::game_image_id::FORCE_GRENADE, white);
+			meta.add_shape_definition_from_renderable(logicals);
 		}
 
 		{
@@ -48,6 +51,9 @@ namespace prefabs {
 
 				meta.set(render_def);
 			}
+			test_types::add_sprite(meta, logicals, assets::game_image_id::INTERFERENCE_GRENADE, white);
+			meta.add_shape_definition_from_renderable(logicals);
+
 		}
 
 		{
@@ -63,9 +69,13 @@ namespace prefabs {
 
 				meta.set(render_def);
 			}
+			test_types::add_sprite(meta, logicals, assets::game_image_id::PED_GRENADE, white);
+			meta.add_shape_definition_from_renderable(logicals);
 		}
 	}
+}
 
+namespace prefabs {
 	entity_handle create_force_grenade(const logic_step step, vec2 pos) {
 		auto& world = step.get_cosmos();
 		const auto& metas = step.get_logical_assets();
@@ -87,7 +97,6 @@ namespace prefabs {
 		in.sound_gain = 1.8f;
 		in.sound_effect = assets::sound_buffer_id::GREAT_EXPLOSION;
 
-		auto& sprite = ingredients::add_sprite(metas, grenade_entity, assets::game_image_id::FORCE_GRENADE, white);
 		ingredients::add_see_through_dynamic_body(step, grenade_entity, pos);
 
 		explosive.released_image_id = assets::game_image_id::FORCE_GRENADE_RELEASED;
@@ -129,7 +138,6 @@ namespace prefabs {
 		in.type = adverse_element_type::PED;
 		in.create_thunders_effect = true;
 
-		auto& sprite = ingredients::add_sprite(metas, grenade_entity, assets::game_image_id::PED_GRENADE, white);
 		ingredients::add_see_through_dynamic_body(step, grenade_entity, pos);
 
 		auto& item = ingredients::make_item(grenade_entity);
@@ -170,7 +178,6 @@ namespace prefabs {
 		in.sound_effect = assets::sound_buffer_id::INTERFERENCE_EXPLOSION;
 		in.type = adverse_element_type::INTERFERENCE;
 
-		auto& sprite = ingredients::add_sprite(metas, grenade_entity, assets::game_image_id::INTERFERENCE_GRENADE, white);
 		ingredients::add_see_through_dynamic_body(step, grenade_entity, pos);
 
 		auto& item = ingredients::make_item(grenade_entity);

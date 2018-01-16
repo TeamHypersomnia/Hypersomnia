@@ -26,7 +26,7 @@
 
 #include "game/enums/filters.h"
 
-namespace prefabs {
+namespace test_types {
 	void populate_car_types(const all_logical_assets& logicals, entity_types& types) {
 		{
 			auto& meta = get_test_type(types, test_scene_type::TRUCK_FRONT);
@@ -35,6 +35,14 @@ namespace prefabs {
 			render_def.layer = render_layer::DYNAMIC_BODY;
 
 			meta.set(render_def);
+
+			definitions::polygon poly;
+			poly.add_convex_polygons(logicals.at(assets::game_image_id::TRUCK_FRONT).shape.convex_polys);
+			poly.texture_map_id = assets::game_image_id::TRUCK_FRONT;
+
+			meta.set(poly);
+
+			meta.add_shape_definition_from_renderable(logicals);
 		}
 		{
 			auto& meta = get_test_type(types, test_scene_type::TRUCK_INTERIOR);
@@ -43,6 +51,10 @@ namespace prefabs {
 			render_def.layer = render_layer::CAR_INTERIOR;
 
 			meta.set(render_def);
+
+			add_sprite(meta, logicals, assets::game_image_id::TRUCK_INSIDE);
+						meta.add_shape_definition_from_renderable(logicals);
+
 		}
 
 		{
@@ -52,6 +64,10 @@ namespace prefabs {
 			render_def.layer = render_layer::CAR_WHEEL;
 
 			meta.set(render_def);
+			definitions::sprite sprite_def;
+			sprite_def.set(assets::game_image_id::BLANK, vec2 ( 40, 20 ), rgba(255, 255, 255, 0));
+			meta.set(sprite_def);
+			meta.add_shape_definition_from_renderable(logicals);
 		}
 
 		{
@@ -61,9 +77,14 @@ namespace prefabs {
 			render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
 
 			meta.set(render_def);
+
+			add_sprite(meta, logicals, assets::game_image_id::TRUCK_ENGINE);
+			meta.add_shape_definition_from_renderable(logicals);
 		}
 	}
+}
 
+namespace prefabs {
 	entity_handle create_car(const logic_step step, const components::transform& spawn_transform) {
 		auto& world = step.get_cosmos();
 		const auto& metas = step.get_logical_assets();
@@ -79,8 +100,6 @@ namespace prefabs {
 		const vec2 interior_size = metas.at(assets::game_image_id::TRUCK_INSIDE).get_size();
 
 		{
-			//auto& sprite = front += components::sprite();
-			auto& poly = front += components::polygon();
 			auto& car = front += components::car();
 			components::rigid_body physics_definition(si, spawn_transform);
 			components::fixtures colliders;
@@ -92,19 +111,9 @@ namespace prefabs {
 			car.acceleration_length = 4500 / 6.2f;
 			car.speed_for_pitch_unit = 2000.f;
 
-			poly.add_convex_polygons(metas.at(assets::game_image_id::TRUCK_FRONT).shape.convex_polys);
-			poly.texture_map_id = assets::game_image_id::TRUCK_FRONT;
-			//sprite.set(assets::game_image_id::TRUCK_FRONT, world);
-			//sprite.get_size(/*metas*/).x = 200;
-			//sprite.get_size(/*metas*/).y = 100;
-
 
 			physics_definition.linear_damping = 0.4f;
 			physics_definition.angular_damping = 2.f;
-
-			front.add_shape_component_from_renderable(
-				step
-			);
 
 			components::fixtures group;
 
@@ -119,19 +128,10 @@ namespace prefabs {
 		}
 		
 		{
-			auto& sprite = interior += components::sprite();
+			auto sprite = interior.get_def<definitions::sprite>();
 			components::fixtures colliders;
-
-			sprite.set(assets::game_image_id::TRUCK_INSIDE, metas);
-			//sprite.set(assets::game_image_id::TRUCK_INSIDE, rgba(122, 0, 122, 255));
-			//sprite.get_size(/*metas*/).x = 250;
-			//sprite.get_size(/*metas*/).y = 550;
 			
 			vec2 offset((front_size.x / 2 + sprite.get_size(/*metas*/).x / 2) * -1, 0);
-
-			interior.add_shape_component_from_renderable(
-				step
-			);
 
 			components::fixtures group;
 
@@ -148,16 +148,10 @@ namespace prefabs {
 		}
 
 		{
-			auto& sprite = left_wheel += components::sprite();
+			auto sprite = left_wheel.get_def<definitions::sprite>();
 			components::fixtures colliders;
 
-			sprite.set(assets::game_image_id::BLANK, vec2 ( 40, 20 ), rgba(255, 255, 255, 0));
-
 			vec2 offset((front_size.x / 2 + sprite.get_size(/*metas*/).x / 2 + 20) * -1, 0);
-
-			left_wheel.add_shape_component_from_renderable(
-				step
-			);
 
 			components::fixtures group;
 
@@ -179,12 +173,7 @@ namespace prefabs {
 
 				{
 
-					auto& sprite = engine_physical += components::sprite();
-
-					sprite.set(assets::game_image_id::TRUCK_ENGINE, metas);
-					//sprite.set(assets::game_image_id::TRUCK_INSIDE, rgba(122, 0, 122, 255));
-					//sprite.get_size(/*metas*/).x = 250;
-					//sprite.get_size(/*metas*/).y = 550;
+					auto sprite = engine_physical.get_def<definitions::sprite>();
 
 					components::transform offset;
 
@@ -203,10 +192,6 @@ namespace prefabs {
 						offset.rotation = 90;
 					}
 					
-					engine_physical.add_shape_component_from_renderable(
-						step
-					);
-
 					components::fixtures group;
 
 					group.filter = filters::see_through_dynamic_object();

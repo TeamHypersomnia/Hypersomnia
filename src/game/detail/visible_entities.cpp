@@ -23,12 +23,6 @@ static void get_visible_per_layer(
 
 	for (const auto it_id : entities) {
 		const auto it = cosmos[it_id];
-
-#if ENABLE_ENSURE
-		if (!it.find_def<definitions::render>()) {
-			LOG("WARNING! %x has no render definition.", it.get_type_id());
-		}
-#endif
 		const auto layer = it.get_def<definitions::render>().layer;
 		// ensure(layer < static_cast<render_layer>(output_layers.size()));
 		output_layers[layer].push_back(it);

@@ -284,7 +284,6 @@ TEST_CASE("Cosmos ComparisonTest") {
 		
 		new_ent1 += first_transform;
 		new_ent1 += components::rigid_body();
-		new_ent1 += components::sprite();
 		
 		components::position_copying p;
 		p.target = new_ent1;
@@ -301,7 +300,6 @@ TEST_CASE("Cosmos ComparisonTest") {
 		
 		new_ent1 += first_transform;
 		new_ent1 += components::rigid_body();
-		new_ent1 += components::sprite();
 		
 		components::position_copying p;
 		p.target = new_ent1;
@@ -379,7 +377,6 @@ TEST_CASE("CosmicDelta4 EmptyAndTwoNew") {
 
 	new_ent1 += first_transform;
 	new_ent1 += components::rigid_body();
-	new_ent1 += components::sprite();
 
 	new_ent2 += components::transform();
 	new_ent2 += components::trace();
@@ -403,14 +400,12 @@ TEST_CASE("CosmicDelta4 EmptyAndTwoNew") {
 			const bool transform_intact = ent1.get<components::transform>() == first_transform;
 			REQUIRE(transform_intact);
 			REQUIRE(ent1.has<components::rigid_body>());
-			REQUIRE(ent1.has<components::sprite>());
 			REQUIRE(!ent1.has<components::trace>());
 
 			REQUIRE(ent2.has<components::transform>());
 			const bool default_transform_intact = ent2.get<components::transform>() == components::transform();
 			REQUIRE(default_transform_intact);
 			REQUIRE(!ent2.has<components::rigid_body>());
-			REQUIRE(!ent2.has<components::sprite>());
 			REQUIRE(ent2.has<components::trace>());
 		}
 
@@ -433,7 +428,6 @@ TEST_CASE("CosmicDelta4 EmptyAndTwoNew") {
 		
 			component_checker(new_ent1, dec_ent1, components::transform());
 			synchronizer_component_checker(new_ent1, dec_ent1, components::rigid_body());
-			component_checker(new_ent1, dec_ent1, components::sprite());
 			
 			component_checker(new_ent2, dec_ent2, components::transform());
 			component_checker(new_ent2, dec_ent2, components::trace());
@@ -446,7 +440,6 @@ TEST_CASE("CosmicDelta4 EmptyAndTwoNew") {
 		
 			component_checker(dec_ent1, new_ent1, components::transform());
 			synchronizer_component_checker(dec_ent1, new_ent1, components::rigid_body());
-			component_checker(dec_ent1, new_ent1, components::sprite());
 		
 			component_checker(dec_ent2, new_ent2, components::transform());
 			component_checker(dec_ent2, new_ent2, components::trace());

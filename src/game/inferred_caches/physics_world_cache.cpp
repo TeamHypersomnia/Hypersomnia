@@ -144,7 +144,6 @@ void physics_world_cache::infer_cache_for(const const_entity_handle handle) {
 		def.linearDamping = physics_data.linear_damping;
 		def.fixedRotation = physics_data.fixed_rotation;
 		def.allowSleep = physics_data.allow_sleep;
-		def.gravityScale = physics_data.gravity_scale;
 		def.active = true;
 		def.linearVelocity = b2Vec2(physics_data.velocity);
 		def.angularVelocity = physics_data.angular_velocity;
@@ -184,8 +183,7 @@ void physics_world_cache::infer_cache_for_fixtures(const const_entity_handle han
 		return;
 	}
 	
-	if (
-		const auto colliders = handle.find<components::fixtures>();
+	if (const auto colliders = handle.find<components::fixtures>();
 
 		colliders != nullptr
 		&& colliders.is_activated()
@@ -209,13 +207,8 @@ void physics_world_cache::infer_cache_for_fixtures(const const_entity_handle han
 		auto& all_fixtures_in_component = get_colliders_cache(handle).all_fixtures_in_component;
 		ensure(all_fixtures_in_component.empty());
 		
-		if (
-			const auto shape_polygon = handle.find<components::shape_polygon>();
-			
-			shape_polygon != nullptr 
-			&& shape_polygon.is_activated()
-		) {
-			auto transformed_shape = shape_polygon.get_raw_component().shape;
+		if (const auto shape_polygon = handle.find_def<definitions::shape_polygon>()) {
+			auto transformed_shape = shape_polygon->shape;
 			transformed_shape.offset_vertices(colliders.get_total_offset());
 
 			for (std::size_t ci = 0; ci < transformed_shape.convex_polys.size(); ++ci) {
@@ -242,8 +235,7 @@ void physics_world_cache::infer_cache_for_fixtures(const const_entity_handle han
 		}
 		
 		
-		if (
-			const auto shape_circle = handle.find<components::shape_circle>();
+		if (const auto shape_circle = handle.find<components::shape_circle>();
 			shape_circle != nullptr && shape_circle.is_activated()
 		) {
 			b2CircleShape shape;

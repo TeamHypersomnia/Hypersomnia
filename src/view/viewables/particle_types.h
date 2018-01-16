@@ -30,7 +30,7 @@ struct general_particle {
 	template <class M>
 	void draw_as_sprite(
 		const M& manager,
-		components::sprite::drawing_input basic_input
+		definitions::sprite::drawing_input basic_input
 	) const {
 		float size_mult = 1.f;
 
@@ -55,7 +55,7 @@ struct general_particle {
 			size_mult *= std::min(1.f, (current_lifetime_ms / unshrinking_time_ms)*(current_lifetime_ms / unshrinking_time_ms));
 		}
 
-		components::sprite f;
+		definitions::sprite f;
 		f.set(image_id, size_mult * size, color);
 
 		basic_input.renderable_transform = { pos, rotation };
@@ -100,9 +100,9 @@ struct animated_particle {
 	template <class M>
 	void draw_as_sprite(
 		const M& manager,
-		components::sprite::drawing_input basic_input
+		definitions::sprite::drawing_input basic_input
 	) const {
-		thread_local components::sprite face;
+		thread_local definitions::sprite face;
 		const auto frame_num = std::min(static_cast<unsigned>(current_lifetime_ms / frame_duration_ms), frame_count - 1);
 
 		const auto target_id = static_cast<assets::game_image_id>(static_cast<int>(first_face) + frame_num);
@@ -151,9 +151,9 @@ struct homing_animated_particle {
 	template <class M>
 	void draw_as_sprite(
 		const M& manager,
-		components::sprite::drawing_input basic_input
+		definitions::sprite::drawing_input basic_input
 	) const {
-		thread_local components::sprite face;
+		thread_local definitions::sprite face;
 		const auto frame_num = std::min(static_cast<unsigned>(current_lifetime_ms / frame_duration_ms), frame_count - 1);
 
 		//face.set(static_cast<assets::game_image_id>(static_cast<int>(first_face) + frame_count - frame_num - 1));
