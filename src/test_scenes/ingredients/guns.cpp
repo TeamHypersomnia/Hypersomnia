@@ -359,6 +359,7 @@ namespace prefabs {
 			trace.max_multiplier_y = {0.f, 0.f};
 			trace.lengthening_duration_ms = {200.f, 250.f};
 			trace.additional_multiplier = vec2(1.f, 1.f);
+			trace.finishing_trace_type = static_cast<entity_type_id>(test_scene_type::FINISHING_TRACE);
 
 			gun.magic_missile_definition = arm_missile;
 		}

@@ -279,6 +279,8 @@ deletion_queue make_deletion_queue(const const_entity_handle h) {
 	thread_local deletion_queue q;
 	q.clear();
 
+	q.push_back({ h.get_id() });
+
 	h.for_each_child_entity_recursive([&](const child_entity_id descendant) {
 		q.push_back(descendant);
 		return callback_result::CONTINUE;
