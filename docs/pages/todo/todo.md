@@ -42,4 +42,13 @@ v - begin selection with arrows
 			- it anyways creates and destroys entities
 		- what about copy assignment?
 			- not quite applicable...
+			- we could however provide our custom operators which will just do std::memcpy.
 		- so we ditch it
+
+- animation in our architecture
+	- callbacks
+		- normally, one would have std::function per each frame.
+		- what we will to is to store a variant per each animation frame.
+			- even if the variant is big, the animation will be an asset anyway.
+		- then the animation system will perform the logic and e.g. spawn particles and sounds.
+		- we won't separate concerns here because we're not writing an engine, rather a game.

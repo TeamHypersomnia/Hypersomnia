@@ -5,7 +5,6 @@
 #include "game/components/render_component.h"
 #include "game/components/all_inferred_state_component.h"
 #include "game/components/processing_component.h"
-#include "game/components/special_physics_component.h"
 #include "game/components/interpolation_component.h"
 #include "game/components/crosshair_component.h"
 #include "game/components/container_component.h"
@@ -61,12 +60,8 @@ entity_handle basic_entity_handle<C>::add_standard_components(const logic_step s
 		trace->reset(get_def<definitions::trace>(), rng);
 	}
 
-	if (has<components::rigid_body>()) {
-		if (!has<components::special_physics>()) {
-			add(components::special_physics());
-		}
-
-		get<components::special_physics>().dropped_or_created_cooldown.set(200, get_cosmos().get_timestamp());
+	if (auto rigid_body = find<components::rigid_body>()) {
+		rigid_body.get_special().dropped_or_created_cooldown.set(200, get_cosmos().get_timestamp());
 	}
 
 	if (

@@ -9,8 +9,13 @@ public:
 	entity_handle_type get_owner_friction_ground() const;
 	
 	bool is_physical() const {
-		const auto& handle = *static_cast<const entity_handle_type*>(this);
+		const auto handle = *static_cast<const entity_handle_type*>(this);
 		return handle.template has<components::fixtures>() || handle.template has<components::rigid_body>();
+	}
+
+	auto& get_special_physics() const {
+		const auto handle = *static_cast<const entity_handle_type*>(this);
+		return handle.template get<components::rigid_body>().get_special();
 	}
 };
 

@@ -16,7 +16,6 @@
 #include "game/components/container_component.h"
 #include "game/components/fixtures_component.h"
 #include "game/components/position_copying_component.h"
-#include "game/components/special_physics_component.h"
 #include "game/components/sentience_component.h"
 #include "game/components/render_component.h"
 #include "game/components/animation_component.h"

@@ -1,7 +1,6 @@
 #include "augs/templates/container_templates.h"
 #include "game/inferred_caches/physics_world_cache.h"
 #include "game/components/fixtures_component.h"
-#include "game/components/special_physics_component.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/logic_step.h"
 #include "physics_scripts.h"
@@ -9,7 +8,7 @@
 void physics_world_cache::rechoose_owner_friction_body(const entity_handle entity) {
 	ensure(entity.get<components::rigid_body>().is_constructed());
 	
-	auto& special_physics = entity.get<components::special_physics>();
+	auto& special_physics = entity.get_special_physics();
 	auto& cosmos = entity.get_cosmos();
 	// purge of dead entities
 
@@ -77,5 +76,5 @@ void physics_world_cache::recurential_friction_handler(const logic_step step, b2
 
 	body->SetTransform(fricted_pos, body->GetAngle() + dt*friction_entity->GetAngularVelocity());
 
-	//friction_entity.get<components::special_physics>().measured_carried_mass += rigid_body.get_mass() + entity.get<components::special_physics>().measured_carried_mass;
+	//friction_entity.get_special_physics().measured_carried_mass += rigid_body.get_mass() + entity.get_special_physics().measured_carried_mass;
 }

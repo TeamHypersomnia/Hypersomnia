@@ -82,9 +82,7 @@ void world_camera::tick(
 	if (entity_to_chase.alive()) {
 		vec2 target_value;
 
-		if (entity_to_chase.has<components::rigid_body>()) {
-			const auto rigid_body = entity_to_chase.get<components::rigid_body>();
-
+		if (const auto rigid_body = entity_to_chase.find<components::rigid_body>()) {
 			vec2 player_pos;
 
 			player_pos = rigid_body.get_position();//entity_to_chase.get_logic_transform().interpolated(dt.view_interpolation_ratio());

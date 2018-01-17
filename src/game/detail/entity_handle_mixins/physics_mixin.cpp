@@ -5,7 +5,6 @@
 #include "game/assets/all_logical_assets.h"
 
 #include "game/components/rigid_body_component.h"
-#include "game/components/special_physics_component.h"
 #include "game/components/fixtures_component.h"
 #include "game/components/polygon_component.h"
 #include "game/components/sprite_component.h"
@@ -15,7 +14,7 @@
 template <bool C, class D>
 D basic_physics_mixin<C, D>::get_owner_friction_ground() const {
 	auto& self = *static_cast<const D*>(this);
-	return self.get_cosmos()[self.get_owner_body().template get<components::special_physics>().owner_friction_ground];
+	return self.get_cosmos()[self.get_owner_body().get_special_physics().owner_friction_ground];
 }
 
 // explicit instantiation

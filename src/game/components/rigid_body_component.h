@@ -14,6 +14,29 @@
 
 class relational_cache;
 
+struct friction_connection {
+	// GEN INTROSPECTOR struct friction_connection
+	entity_id target;
+	unsigned fixtures_connected = 0;
+	// END GEN INTROSPECTOR
+	friction_connection(entity_id t = entity_id()) : target(t) {}
+
+	operator entity_id() const {
+		return target;
+	}
+};
+
+struct special_physics {
+	// GEN INTROSPECTOR struct special_physics
+	augs::stepped_cooldown dropped_or_created_cooldown;
+	entity_id during_cooldown_ignore_collision_with;
+	entity_id owner_friction_ground;
+	augs::constant_size_vector<friction_connection, OWNER_FRICTION_GROUNDS_COUNT> owner_friction_grounds;
+	// END GEN INTROSPECTOR
+
+	//float measured_carried_mass = 0.f;
+};
+
 namespace components {
 	struct rigid_body {
 		static constexpr bool is_synchronized = true;
@@ -42,6 +65,8 @@ namespace components {
 
 		vec2 velocity;
 		float angular_velocity = 0.f;
+
+		special_physics special;
 
 		// END GEN INTROSPECTOR
 
@@ -77,6 +102,7 @@ protected:
 
 	using base = component_synchronizer_base<is_const, components::rigid_body>;
 	using base::handle;
+
 public:
 	using base::component_synchronizer_base;
 	using base::get_raw_component;
@@ -104,6 +130,10 @@ public:
 	}
 
 	bool test_point(const vec2) const;
+
+	auto& get_special() const {
+		return get_raw_component().special;
+	}
 };
 
 template<>

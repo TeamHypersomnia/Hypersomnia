@@ -7,7 +7,6 @@
 #include "game/components/sprite_component.h"
 #include "game/components/fixtures_component.h"
 #include "game/components/explosive_component.h"
-#include "game/components/special_physics_component.h"
 #include "game/components/sound_existence_component.h"
 #include "game/components/hand_fuse_component.h"
 

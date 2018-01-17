@@ -4,7 +4,6 @@
 
 #include "game/components/fixtures_component.h"
 #include "game/components/driver_component.h"
-#include "game/components/special_physics_component.h"
 #include "game/components/flags_component.h"
 #include "game/components/missile_component.h"
 
@@ -85,7 +84,7 @@ void contact_listener::BeginContact(b2Contact* contact) {
 			if (!collider_fixtures.is_friction_ground)
 #endif
 			{
-				auto& collider_physics = collider.get_owner_body().get<components::special_physics>();
+				auto& collider_physics = collider.get_owner_body().get_special_physics();
 
 				bool found_suitable = false;
 
@@ -214,7 +213,7 @@ void contact_listener::EndContact(b2Contact* contact) {
 		const auto subject_fixtures = subject.get<components::fixtures>();
 		const auto collider_fixtures = collider.get<components::fixtures>();
 
-		auto& collider_physics = collider.get_owner_body().get<components::special_physics>();
+		auto& collider_physics = collider.get_owner_body().get_special_physics();
 
 		if (subject_fixtures.is_friction_ground() && during_step) {
 #if FRICTION_FIELDS_COLLIDE
@@ -300,7 +299,7 @@ void contact_listener::PreSolve(b2Contact* contact, const b2Manifold* oldManifol
 				break;
 			}
 
-			auto& collider_physics = collider_owner_body.get<components::special_physics>();
+			auto& collider_physics = collider_owner_body.get_special_physics();
 
 			for (const auto& it : collider_physics.owner_friction_grounds) {
 				if (it.target == subject_owner_body) {
@@ -326,7 +325,7 @@ void contact_listener::PreSolve(b2Contact* contact, const b2Manifold* oldManifol
 			}
 		}
 		
-		const auto& collider_special_physics = collider_owner_body.get<components::special_physics>();
+		const auto& collider_special_physics = collider_owner_body.get_special_physics();
 
 		const bool dropped_item_colliding_with_container =
 			collider_special_physics.dropped_or_created_cooldown.lasts(now, delta)

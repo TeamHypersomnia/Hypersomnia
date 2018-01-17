@@ -18,7 +18,6 @@ namespace definitions {
 }
 
 namespace components {
-	struct special_physics;
 	struct animation;
 	struct behaviour_tree;
 	struct position_copying;
@@ -63,7 +62,6 @@ namespace components {
 
 template <template <class...> class List>
 using component_list_t = List<
-	components::special_physics,
 	components::animation,
 	components::behaviour_tree,
 	components::position_copying,
