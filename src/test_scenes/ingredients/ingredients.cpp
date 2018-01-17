@@ -18,16 +18,6 @@ namespace test_types {
 				meta.set(render_def);
 			}
 		}
-		{
-			auto& meta = get_test_type(types, test_scene_type::WANDERING_PIXELS);
-
-			{
-				definitions::render render_def;
-				render_def.layer = render_layer::WANDERING_PIXELS_EFFECTS;
-
-				meta.set(render_def);
-			}
-		}
 
 		{
 			auto& meta = get_test_type(types, test_scene_type::HAVE_A_PLEASANT);

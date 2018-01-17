@@ -73,7 +73,8 @@ void interpolation_system::integrate_interpolated_transforms(
 	cosmos.for_each(
 		processing_subjects::WITH_INTERPOLATION, 
 		[&](const const_entity_handle e) {
-			const auto& info = e.get<components::interpolation>();
+			const auto info = e.get<components::interpolation>();
+			const auto def = e.get_def<definitions::interpolation>();
 
 			auto& integrated = get_interpolated(e);
 			auto& cache = per_entity_cache[linear_cache_key(e)];
@@ -97,8 +98,8 @@ void interpolation_system::integrate_interpolated_transforms(
 				}
 			}
 
-			const auto positional_averaging_constant = 1.0f - static_cast<float>(pow(info.base_exponent, considered_positional_speed * seconds));
-			const auto rotational_averaging_constant = 1.0f - static_cast<float>(pow(info.base_exponent, considered_rotational_speed * seconds));
+			const auto positional_averaging_constant = 1.0f - static_cast<float>(pow(def.base_exponent, considered_positional_speed * seconds));
+			const auto rotational_averaging_constant = 1.0f - static_cast<float>(pow(def.base_exponent, considered_rotational_speed * seconds));
 
 			auto& recorded_pob = cache.recorded_place_of_birth;
 			auto& recorded_ver = cache.recorded_version;

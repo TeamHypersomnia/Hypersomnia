@@ -14,6 +14,7 @@ namespace definitions {
 	struct render;
 	struct shape_polygon;
 	struct trace;
+	struct interpolation;
 }
 
 namespace components {
@@ -112,7 +113,8 @@ using definition_list_t = List<
 	definitions::shape_polygon,
 	definitions::polygon,
 	definitions::sprite,
-	definitions::trace
+	definitions::trace,
+	definitions::interpolation
 >;
 
 template <class... Types>

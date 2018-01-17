@@ -70,6 +70,12 @@ Can click on each command to go back to a given point in time.
 
 ### Property editor
 
+### Type editor
+
+See: [entity type](entity_type).
+
+When creating a new entity type, the editor should add some recommended definitions from the start, e.g.
+- interpolation (unless we make its existence implied/recommended?)
 
 ## Inferred state
 

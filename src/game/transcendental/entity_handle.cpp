@@ -1,3 +1,4 @@
+#include "augs/misc/randomization.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
 
@@ -51,16 +52,13 @@ entity_handle basic_entity_handle<C>::add_standard_components(const logic_step s
 		ensure(!has_transform);
 	}
 
-	if (!has<components::interpolation>() 
-		&& (
-			(has_physics && get<components::rigid_body>().get_body_type() != rigid_body_type::STATIC)
-			|| has<components::crosshair>() 
-			|| has<components::position_copying>()
-			|| has<components::trace>()
-		)
-	) {
-		add(components::interpolation());
-		get<components::interpolation>().place_of_birth = this->get_logic_transform();
+	if (auto interpolation = find<components::interpolation>()) {
+		interpolation->place_of_birth = this->get_logic_transform();
+	}
+
+	if (auto trace = find<components::trace>()) {
+		auto rng = get_cosmos().get_fast_rng_for(get_id());
+		trace->reset(get_def<definitions::trace>(), rng);
 	}
 
 	if (has<components::rigid_body>()) {

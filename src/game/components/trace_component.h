@@ -5,7 +5,7 @@
 
 #include "game/transcendental/entity_type_declaration.h"
 
-struct randomization;
+struct fast_randomization;
 
 namespace definitions {
 	struct trace;
@@ -27,7 +27,7 @@ namespace components {
 
 		void reset(
 			const definitions::trace&,
-			randomization& p
+			fast_randomization& p
 		);
 	};
 }

@@ -31,3 +31,15 @@ editor should print "types of selected entities" and their common properties, id
 editor bindings:
 v - begin selection with arrows
 
+- immutable fields within component aggregate
+	- applicable components: type, guid
+	- applicable: quick definition copies
+		- what about byte readwrite?
+			- it anyway reinterpret casts to mutable bytes
+		- what about lua readwrite?
+			- it anyways creates and destroys entities
+		- what about delta?
+			- it anyways creates and destroys entities
+		- what about copy assignment?
+			- not quite applicable...
+		- so we ditch it

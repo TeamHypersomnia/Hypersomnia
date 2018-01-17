@@ -21,4 +21,12 @@ void populate_test_scene_types(const all_logical_assets& logicals, entity_types&
 	test_types::populate_crate_types(logicals, into);
 	test_types::populate_melee_types(logicals, into);
 	test_types::populate_backpack_types(logicals, into);
+
+	/* Let all renderables have interpolation by default */
+
+	for (auto& t : into.types) {
+		if (t.find<definitions::render>()) {
+			t.set(definitions::interpolation());
+		}
+	}
 }

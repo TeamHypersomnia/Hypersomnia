@@ -46,7 +46,7 @@ Most of the time, only the programmers are concerned with the second type of dat
 	- If a field of a definition changes, (during content creation), reinfer all objects of this type with help of the [type id cache](type_id_cache); currently we'll just reinfer the whole cosmos.
 - There won't be many types, but access is **frequent** during [solve](solver#the-solve). 
 	- We allocate all definitions **statically**, as memory won't suffer relatively to the speed gain.
-- The logic should always first check for the existence of component, only later the definition that the component is implied by
+- The logic should always first check for the existence of component, only later the definition that the component is implied by.
 	- One less indirection because checking for the id being unset is just a single arithmetic operation when the id is cached.
 - On creating an entity, the chosen type's id is passed.  
 	- The [``cosmos::create_entity``](cosmos#create_entity) automatically adds all components implied by the enabled definitions.
@@ -57,16 +57,16 @@ Most of the time, only the programmers are concerned with the second type of dat
 				- Always specifiable initial values.
 			- Circumstance in the logic or mere thereof possibility, which is implied by...
 				- sender
-			- ...configuration of components at the entity construction time.
+			- **...configuration of components at the entity construction time.**
 				- sender by missiles or other kinds of launched objects
-				- Always pecifiable initial values when the required configuration of components holds.
+				- **Always specifiable initial values when the required configuration of components holds**.
 		- The real question is whether they should be visible to the author, as lack of definition data implies that it is some kind of detail.
 			- Otherwise we might simulate empty definition struct just as well
 		- **Chosen solutions**:
 			- child, flags - for author, always specifiable in initial values
 			- transform - for author, appears specifiable when the entity has no physical components
 			- sender - for author, appears specifiable in initial values when it has either missile or explosive
-			- Currently no components whose existence upon construction would depend on **value** of other components.
+			- Currently no components exist whose existence upon construction would depend on **value** of other components.
 			- Currently no components exist whose actual **initial value** upon construction would depend on value/existence of other components.
 				- because tree of npo will not be a component soon.
 			- rotation_copying
@@ -96,11 +96,30 @@ Most of the time, only the programmers are concerned with the second type of dat
 			- It would require us to prioritize initial values for definitions that share an implied component. Ugh.
 	- Which ones would need it by the way?
 		- If we're talking missile component, sender will anyways be "always_present" because the circumstance might or might not otherwise need to add it.
-- Observation: there is a bijection between definitions and impliable components.
+- Observation: there is a bijection between definitions that imply and impliable components.
 	- Therefore, the code can assume that, if a component exists, so shall the definition (if it exists) which implies this component.
 	- Theoretically there will be no crash if we get a definition that is not enabled.
 		- That is because we do not hold optionals but actual, properly constructed objects.
 	- If a definition does not imply any component, its existence can only be queried by actually checking whether it is enabled.
+- **Editor**: Recommended definitions
+	- Instead of a definition strictly implying another definition or more than one component, we can make a notion of "recommended" definitions in the editor. 
+	- Thus, the actual logic code should never assume that a definition exists if one other exists, the same about components.
+	- But in the editor, depending on the current definitions configuration, the type editor dialog may recommend:
+		- to add a specific component (e.g. interpolation if there exists a render and dynamic body)
+		- to remove a specific component that is considered redundant (e.g. interpolation if the type only has a static body)
+		- the reason it will not be done automatically is because the author might want to experiment while having full control, and maybe persist some values between various attempts.
+	- Currently no case of recommended definitions exist apart from interpolation.
+		- if it ever so happens that a circumstantial component like a "sender" would be too costly to be always present, we might also make it a recommended definition.
+			- then the code will obviously have to be modified so that it does not always assume that the component is always present			
+		- or we might make it a component added upon construction?
+- **Editor**: Initial values
+	- in a separate tree node.
+	- modifiable are all that are implied by the definitions
+	- and those that will be added on construction based on existence of other components. 
+		- e.g. sender.
+- Components might need some special construction.
+	- interpolation might need to save the place of birth.
+	- trace might want to roll the dice for its first values.
 - Some definitions do not need any instance data.
 	- Example: render component.
 		- That does not change anything at all, except for the way of getting that data.

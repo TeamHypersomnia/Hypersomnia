@@ -127,6 +127,7 @@ public:
 	si_scaling get_si() const;
 
 	randomization get_rng_for(const entity_id) const;
+	fast_randomization get_fast_rng_for(const entity_id) const;
 	rng_seed_type get_rng_seed_for(const entity_id) const;
 	
 	std::wstring summary() const;

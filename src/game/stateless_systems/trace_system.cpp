@@ -32,11 +32,6 @@ void trace_system::lengthen_sprites_of_traces(const logic_step step) const {
 			auto& trace = t.get<components::trace>();
 			const auto& trace_def = t.get_def<definitions::trace>();
 
-			if (trace.chosen_lengthening_duration_ms < 0.f) {
-				auto rng = cosmos.get_rng_for(t);
-				trace.reset(trace_def, rng);
-			}
-
 			vec2 surplus_multiplier;
 			
 			if (!trace.is_it_a_finishing_trace) {
