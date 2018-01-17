@@ -116,7 +116,7 @@ namespace test_types {
 			{
 				definitions::trace trace_def;
 
-				trace_def.max_multiplier_x = {0.0f, 0.f};
+				trace_def.max_multiplier_x = {0.0f, 1.2f};
 				trace_def.max_multiplier_y = {0.f, 0.f};
 				trace_def.lengthening_duration_ms = {200.f, 250.f};
 				trace_def.additional_multiplier = vec2(1.f, 1.f);
@@ -391,7 +391,7 @@ namespace prefabs {
 			auto& sender = arm_missile += components::sender();
 			auto& missile = arm_missile += components::missile();
 
-			//missile.destruction_particles.id = assets::particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION;
+			missile.destruction_particles.id = assets::particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION;
 			missile.destruction_particles.modifier.colorize = cyan;
 
 			missile.trace_particles.id = assets::particle_effect_id::WANDERING_PIXELS_DIRECTED;

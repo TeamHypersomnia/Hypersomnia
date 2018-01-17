@@ -160,6 +160,14 @@ struct basic_transform {
 	auto get_orientation() const {
 		return vec2::from_degrees(rotation);
 	}
+
+	bool compare(
+		const transform& b,
+		const T positional_eps = AUGS_EPSILON<T>,
+		const T rotational_eps = AUGS_EPSILON<T>
+	) const {
+		return pos.compare(b.pos) && std::abs(rotation - b.rotation) <= rotational_eps;
+	}
 };
 
 namespace augs {

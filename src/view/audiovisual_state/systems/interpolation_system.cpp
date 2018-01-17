@@ -100,7 +100,7 @@ void interpolation_system::integrate_interpolated_transforms(
 			const auto& pob = info.place_of_birth;
 			const auto& ver = e.get_id().version;
 
-			if (recorded_pob == pob && recorded_ver == ver) {
+			if (recorded_pob.compare(pob, 0.01f, 1.f) && recorded_ver == ver) {
 				integrated = integrated.interp_separate(actual, positional_averaging_constant, rotational_averaging_constant);
 			}
 			else {

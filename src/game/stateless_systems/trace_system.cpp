@@ -94,28 +94,26 @@ void trace_system::spawn_finishing_traces_for_deleted_entities(const logic_step 
 
 			const auto finishing_trace = cosmic::create_entity(cosmos, trace_def.finishing_trace_type);
 			
+			auto transform_of_finishing = deleted_entity.get_logic_transform();
+
+			if (deleted_entity.find<components::missile>()) {
+				transform_of_finishing.pos = 
+					deleted_entity.get<components::missile>().saved_point_of_impact_before_death
+					- (deleted_entity.get_def<definitions::sprite>().get_size() / 2)
+					.rotate(transform_of_finishing.rotation, vec2(0, 0))
+				;
+			}
+
+			finishing_trace += transform_of_finishing;
+
+			components::interpolation interp;
+			interp.place_of_birth = transform_of_finishing;
+			finishing_trace += interp;
+
 			auto& copied_trace = finishing_trace.get<components::trace>();
 			copied_trace.lengthening_time_passed_ms = 0.f;
 			copied_trace.chosen_lengthening_duration_ms /= 4;
 			copied_trace.is_it_a_finishing_trace = true;
-
-			const auto transform_of_deleted = deleted_entity.get_logic_transform();
-
-			finishing_trace += transform_of_deleted;
-			
-			components::interpolation interp;
-			interp.place_of_birth = transform_of_deleted;
-			finishing_trace += interp;
-
-			//finishing_trace.get<components::transform>().rotation = 90;// e.get<components::rigid_body>().velocity().degrees();
-
-			if (deleted_entity.find<components::missile>()) {
-				finishing_trace.get<components::transform>().pos = 
-					deleted_entity.get<components::missile>().saved_point_of_impact_before_death
-					- (deleted_entity.get_def<definitions::sprite>().get_size() / 2)
-						.rotate(finishing_trace.get<components::transform>().rotation, vec2(0, 0))
-				;
-			}
 
 			finishing_trace.add_standard_components(step);
 
