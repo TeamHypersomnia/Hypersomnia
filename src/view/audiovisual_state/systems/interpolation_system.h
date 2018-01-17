@@ -19,7 +19,7 @@ public:
 	struct cache {
 		components::transform recorded_place_of_birth;
 		components::transform interpolated_transform;
-		unsigned recorded_version = 0;
+		decltype(entity_id::version) recorded_version = entity_id().version;
 		float rotational_slowdown_multiplier = 1.f;
 		float positional_slowdown_multiplier = 1.f;
 	};

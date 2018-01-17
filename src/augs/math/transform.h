@@ -166,7 +166,7 @@ struct basic_transform {
 		const T positional_eps = AUGS_EPSILON<T>,
 		const T rotational_eps = AUGS_EPSILON<T>
 	) const {
-		return pos.compare(b.pos) && std::abs(rotation - b.rotation) <= rotational_eps;
+		return pos.compare_abs(b.pos, positional_eps) && std::abs(rotation - b.rotation) <= rotational_eps;
 	}
 };
 

@@ -63,13 +63,18 @@ void interpolation_system::integrate_interpolated_transforms(
 	}
 	
 	const auto seconds = delta.in_seconds();
+
+	if (seconds < 0.00001f) {
+		return;
+	}
+
 	const float slowdown_multipliers_decrease = seconds / fixed_delta_for_slowdowns.in_seconds();
 
 	cosmos.for_each(
 		processing_subjects::WITH_INTERPOLATION, 
 		[&](const const_entity_handle e) {
-			const auto& actual = e.get_logic_transform();
 			const auto& info = e.get<components::interpolation>();
+
 			auto& integrated = get_interpolated(e);
 			auto& cache = per_entity_cache[linear_cache_key(e)];
 
@@ -97,8 +102,11 @@ void interpolation_system::integrate_interpolated_transforms(
 
 			auto& recorded_pob = cache.recorded_place_of_birth;
 			auto& recorded_ver = cache.recorded_version;
-			const auto& pob = info.place_of_birth;
-			const auto& ver = e.get_id().version;
+
+			const auto pob = info.place_of_birth;
+			const auto ver = e.get_id().version;
+
+			const auto actual = e.get_logic_transform();
 
 			if (recorded_pob.compare(pob, 0.01f, 1.f) && recorded_ver == ver) {
 				integrated = integrated.interp_separate(actual, positional_averaging_constant, rotational_averaging_constant);

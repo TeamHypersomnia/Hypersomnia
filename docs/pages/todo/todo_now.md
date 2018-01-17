@@ -182,7 +182,6 @@ Memory is somewhat safe because it can only grow as far as the children grow.
 	- chosen_lengthening_duration_ms should be randomized statelessly with help of guid
 	- store just stepped timestamp of when the trace was fired instead of incrementing the passed time 
 
-
 ### Plans
 
 current slot will also have index in container

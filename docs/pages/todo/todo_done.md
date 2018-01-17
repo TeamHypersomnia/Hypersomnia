@@ -28,3 +28,10 @@ we consider whole type overrides too complex architeciturally:
 - noise while getting those definitions
 - we should discourage solver from ever modifying that state
 	- otherwise to look good we would need to always completely destroy that entity and recreate it with components with default associated values
+
+- fix trace interpolation problems (possibly others) in release
+	- observation: debug works
+		- divergence is consistent after clearing the build folder
+	- numerical problem perhaps?
+		- "looks like" the interpolation cache may be getting reset too often
+	- fixed: a temporary for the version was invalidated
