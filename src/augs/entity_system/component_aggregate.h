@@ -15,7 +15,7 @@ namespace augs {
 				return &std::get<component>(a.always_presents);
 			}
 			else {
-				return p.template get_component_pool<component>().find(a.template get_id<component>());
+				return p.template get_component_pool<component>().find_no_check(a.template get_id<component>());
 			}
 		}
 
@@ -25,7 +25,12 @@ namespace augs {
 				ensure(a.template has<component>(p));
 			}
 
-			return *find_impl<component>(a, p);
+			if constexpr(is_component_always_present_v<component>) {
+				return std::get<component>(a.always_presents);
+			}
+			else {
+				return p.template get_component_pool<component>().get_no_check(a.template get_id<component>());
+			}
 		}
 
 		template <class F, class Aggregate, class PoolProvider>
@@ -129,7 +134,7 @@ namespace augs {
 			}
 			else {
 				if (!has<component>(p)) {
-					set_id(p.template get_component_pool<component>().allocate(c));
+					set_id(make_pool_id<component>(p.template get_component_pool<component>().allocate(c)));
 				}
 				else {
 					get<component>(p) = c;

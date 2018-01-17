@@ -34,4 +34,4 @@ template <class T>
 using cosmic_object_unversioned_id = augs::unversioned_id<T, cosmic_pool_size_type>;
 
 template <class... components>
-using cosmic_aggregate = augs::component_aggregate<cosmic_object_pool_id, components...>;
+using cosmic_aggregate = augs::component_aggregate<cosmic_object_unversioned_id, components...>;

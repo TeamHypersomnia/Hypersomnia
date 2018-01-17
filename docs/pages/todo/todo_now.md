@@ -181,6 +181,10 @@ Memory is somewhat safe because it can only grow as far as the children grow.
 	- otherwise make it a super quick cache?
 	- chosen_lengthening_duration_ms should be randomized statelessly with help of guid
 	- store just stepped timestamp of when the trace was fired instead of incrementing the passed time 
+- fix the feel of traces (maybe shrink them only horizontally?)
+	- **only do this after we have editor**, obviously
+- for better cache coherency, we might be inclined to store "has_component" array of bools alongside processing ids so that they land in cache and "find" queries are faster. 
+	- possibly only optimization for bottlenecks.
 
 ### Plans
 

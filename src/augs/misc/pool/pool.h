@@ -125,6 +125,10 @@ namespace augs {
 			return allocated_id;
 		}
 
+		bool free(const unversioned_id_type key) {
+			free(make_versioned(key));
+		}
+
 		bool free(const key_type key) {
 			if (!correct_range(key)) {
 				return false;
@@ -169,7 +173,7 @@ namespace augs {
 
 	private:
 		template <class S>
-		static auto& get_impl(S& self, key_type key) {
+		static auto& get_impl(S& self, const key_type key) {
 			ensure(self.correct_range(key));
 
 			const auto& indirector = self.get_indirector(key);
@@ -178,8 +182,12 @@ namespace augs {
 
 			return self.objects[indirector.real_index];
 		}
-
 		
+		template <class S>
+		static auto& get_no_check_impl(S& self, const unversioned_id_type key) {
+			return self.objects[self.indirectors[key.indirection_index].real_index];
+		}
+
 		template <class S>
 		static auto find_impl(S& self, key_type key) -> maybe_const_ptr_t<std::is_const_v<S>, mapped_type> {
 			if (!self.correct_range(key)) {
@@ -195,7 +203,32 @@ namespace augs {
 			return &self.objects[indirector.real_index];
 		}
 
+		template <class S>
+		static auto find_no_check_impl(S& self, const unversioned_id_type key) -> maybe_const_ptr_t<std::is_const_v<S>, mapped_type> {
+			if (key.is_set()) {
+				return &get_no_check_impl(self, key); 
+			}
+
+			return nullptr;
+		}
+
 	public:
+		mapped_type& get_no_check(const unversioned_id_type key) {
+			return get_no_check_impl(*this, key);
+		}
+
+		const mapped_type& get_no_check(const unversioned_id_type key) const {
+			return get_no_check_impl(*this, key);
+		}
+
+		mapped_type* find_no_check(const unversioned_id_type key) {
+			return find_no_check_impl(*this, key);
+		}
+
+		const mapped_type* find_no_check(const unversioned_id_type key) const {
+			return find_no_check_impl(*this, key);
+		}
+
 		mapped_type& get(const key_type key) {
 			return get_impl(*this, key);
 		}
