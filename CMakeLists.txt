@@ -376,8 +376,6 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/stateless_systems/particles_existence_system.cpp"
 	"src/game/stateless_systems/sound_existence_system.cpp"
 	"src/game/other_unit_tests.cpp"
-	"src/game/transcendental/cosmic_delta.cpp"
-	"src/game/transcendental/cosmic_delta_tests.cpp"
 	"src/game/transcendental/cosmic_entropy.cpp"
 	"src/game/components/processing_component.cpp"
 	"src/game/transcendental/cosmic_movie_director.cpp"

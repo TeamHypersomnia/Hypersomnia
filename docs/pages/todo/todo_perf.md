@@ -11,7 +11,11 @@ summary: Just a hidden scratchpad.
 	- so that the static rigid body does not store velocities and dampings needlessly
 	- and so that we only add interpolation component for dynamic rigid bodies
 - it is quite possible that step_and_set_new_transforms might become a bottleneck. In this case, it would be beneficial to:
-	- 
+	- allow for destroy_cache_of to accept entity_handle. 
+		- Then, upon reinference of entity, significant state will be written with the new data.
+			- care must be taken so that reinference happens BEFORE network transfer of any sort.
+		- **Then, upon complete destruction of the cosmos, caches will call their "clear" method that will also reuse any memory.**
+			- It is better than calling class destructor because later inferences will be quicker.
 - for better cache coherency, we might be inclined to store "has_component" array of bools alongside processing ids so that they land in cache and "find" queries are faster. 
 	- possibly only optimization for bottlenecks.
 - for better cache coherency, we might, inside systematic functions, iterate components and keep track in some cache to which entities they belong

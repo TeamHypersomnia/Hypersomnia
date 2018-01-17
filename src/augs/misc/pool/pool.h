@@ -126,7 +126,7 @@ namespace augs {
 		}
 
 		bool free(const unversioned_id_type key) {
-			free(make_versioned(key));
+			return free(make_versioned(key));
 		}
 
 		bool free(const key_type key) {
