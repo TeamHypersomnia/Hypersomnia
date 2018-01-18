@@ -201,7 +201,6 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					auto& pe = sentience.get<personal_electricity_meter_instance>();
 					pe.value -= pe.calculate_damage_result(mana_needed).effective;
 
-					round_entity.set_flag(entity_flag::IS_IMMUNE_TO_PAST);
 					round_entity.add_standard_components(step);
 					
 					step.post_message(response);
@@ -279,7 +278,6 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 							response.spawned_rounds.push_back(round_entity);
 
-							round_entity.set_flag(entity_flag::IS_IMMUNE_TO_PAST);
 							round_entity.add_standard_components(step);
 
 							messages::interpolation_correction_request request;

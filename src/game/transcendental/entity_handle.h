@@ -152,7 +152,7 @@ public:
 
 		ensure(alive());
 		
-		if constexpr(is_component_synchronized_v<T>) {
+		if constexpr(is_synchronized_v<T>) {
 			return component_synchronizer<is_const, T>(&agg().template get<T>(pool_provider()), *this);
 		}
 		else {
@@ -165,7 +165,7 @@ public:
 		check_component_type<T>();
 		ensure(alive());
 		
-		if constexpr(is_component_synchronized_v<T>) {
+		if constexpr(is_synchronized_v<T>) {
 			agg().template add<T>(c, pool_provider());
 			cosmic::reinfer_caches_of(*this);
 		}
@@ -185,7 +185,7 @@ public:
 
 		ensure(alive());
 
-		if constexpr(is_component_synchronized_v<T>) {
+		if constexpr(is_synchronized_v<T>) {
 			return component_synchronizer<is_const, T>(agg().template find<T>(pool_provider()), *this);
 		}
 		else {
@@ -199,7 +199,7 @@ public:
 
 		ensure(alive());
 
-		if constexpr(is_component_synchronized_v<T>) {
+		if constexpr(is_synchronized_v<T>) {
 			agg().template remove<T>(pool_provider());
 			cosmic::reinfer_caches_of(*this);
 		}
@@ -225,19 +225,7 @@ public:
 
 	bool get_flag(const entity_flag f) const {
 		ensure(alive());
-		return get<components::flags>().values.test(f);
-	}
-
-	template <bool C = !is_const, class = std::enable_if_t<C>>
-	void set_flag(const entity_flag f) const {
-		ensure(alive());
-		get<components::flags>().values.set(f, true);
-	}
-
-	template <bool C = !is_const, class = std::enable_if_t<C>>
-	void unset_flag(const entity_flag f) const {
-		ensure(alive());
-		get<components::flags>().values.set(f, false);
+		return get_def<definitions::flags>().values.test(f);
 	}
 
 	template <class F>

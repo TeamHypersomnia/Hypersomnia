@@ -176,9 +176,6 @@ Plan:
 	- Initial values not customizable, but calculated on the go or left default?
 		- tree of npo would be added if there is no rigid body or fixtures but there is a sprite
 
-We might be tempted to make some of the definitions always_present, thus always defined as "enabled".
-However, there is no benefit seen in doing so. It is a wiser choice to have a flag for each definition and assume that the contents of a default-constructed definition are always in a valid state.
-
 ## Overrides
 
 There are examples of data that, on one hand, will very frequently be shared identical,  

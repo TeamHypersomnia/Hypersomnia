@@ -11,7 +11,7 @@ namespace augs {
 	class component_aggregate {
 		template <class component, class Aggregate, class PoolProvider>
 		static auto* find_impl(Aggregate& a, PoolProvider& p) {
-			if constexpr(is_component_always_present_v<component>) {
+			if constexpr(is_always_present_v<component>) {
 				return &std::get<component>(a.always_presents);
 			}
 			else {
@@ -21,11 +21,11 @@ namespace augs {
 
 		template <class component, class Aggregate, class PoolProvider>
 		static auto& get_impl(Aggregate& a, PoolProvider& p) {
-			if constexpr(!is_component_always_present_v<component>) {
+			if constexpr(!is_always_present_v<component>) {
 				ensure(a.template has<component>(p));
 			}
 
-			if constexpr(is_component_always_present_v<component>) {
+			if constexpr(is_always_present_v<component>) {
 				return std::get<component>(a.always_presents);
 			}
 			else {
@@ -51,7 +51,7 @@ namespace augs {
 			auto callbacker = [&](auto c){
 				using component_type = decltype(c);
 
-				if constexpr(!is_component_always_present_v<component_type>) {
+				if constexpr(!is_always_present_v<component_type>) {
 					if (const auto maybe_component = a.template find<component_type>(p)) {
 						callback(*maybe_component);
 					}
@@ -62,8 +62,8 @@ namespace augs {
 		}
 
 	public:
-		using dynamic_components_list = filter_types<apply_negation<is_component_always_present>::template type, components...>;
-		using always_present_components_list = filter_types<is_component_always_present, components...>;
+		using dynamic_components_list = filter_types<apply_negation<is_always_present>::template type, components...>;
+		using always_present_components_list = filter_types<is_always_present, components...>;
 
 		using dynamic_component_id_tuple = 
 			replace_list_type_t<
@@ -119,7 +119,7 @@ namespace augs {
 
 		template <class component, class PoolProvider>
 		bool has(PoolProvider& p) const {
-			if constexpr(is_component_always_present_v<component>) {
+			if constexpr(is_always_present_v<component>) {
 				return true;
 			}
 			else {
@@ -129,7 +129,7 @@ namespace augs {
 
 		template <class component, class PoolProvider>
 		void add(const component& c, PoolProvider& p) {
-			if constexpr(is_component_always_present_v<component>) {
+			if constexpr(is_always_present_v<component>) {
 				get<component>(p) = c;
 			}
 			else {
@@ -144,7 +144,7 @@ namespace augs {
 
 		template <class component, class PoolProvider>
 		void remove(PoolProvider& p) {
-			static_assert(!is_component_always_present_v<component>, "Can't remove an always_present component.");
+			static_assert(!is_always_present_v<component>, "Can't remove an always_present component.");
 
 			ensure(has<component>(p));
 

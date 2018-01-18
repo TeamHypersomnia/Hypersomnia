@@ -15,6 +15,7 @@ namespace definitions {
 	struct shape_polygon;
 	struct trace;
 	struct interpolation;
+	struct flags;
 }
 
 namespace components {
@@ -23,7 +24,6 @@ namespace components {
 	struct position_copying;
 	struct crosshair;
 	struct missile;
-	struct flags;
 	struct gun;
 	struct rotation_copying;
 	struct movement;
@@ -67,7 +67,6 @@ using component_list_t = List<
 	components::position_copying,
 	components::crosshair,
 	components::missile,
-	components::flags,
 	components::gun,
 	components::rotation_copying,
 	components::movement,
@@ -112,6 +111,7 @@ using definition_list_t = List<
 	definitions::polygon,
 	definitions::sprite,
 	definitions::trace,
+	definitions::flags,
 	definitions::interpolation
 >;
 

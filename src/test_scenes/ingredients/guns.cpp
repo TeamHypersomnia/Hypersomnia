@@ -42,6 +42,13 @@ namespace test_types {
 				meta.set(render_def);
 			}
 
+
+			{
+				definitions::flags flags_def;
+				flags_def.values.set(entity_flag::IS_IMMUNE_TO_PAST);
+				meta.set(flags_def);
+			}
+
 			test_types::add_sprite(meta, logicals, assets::game_image_id::ROUND_TRACE, cyan);
 			meta.add_shape_definition_from_renderable(logicals);
 

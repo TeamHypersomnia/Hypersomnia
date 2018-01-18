@@ -17,18 +17,26 @@ class entity_type {
 	static constexpr auto idx = definition_index_v<D>;
 
 	template <class D, class E>
-	static auto find_impl(E& self) -> maybe_const_ptr_t<std::is_const_v<E>, D> {
-		if (self.enabled_definitions[idx<D>]) {
-			return std::addressof(std::get<D>(self.definitions));
+	static auto& get_impl(E& self) {
+		if constexpr(!is_always_present_v<D>) {
+			ensure(self.enabled_definitions[idx<D>]); 
 		}
 
-		return nullptr; 
+		return std::get<D>(self.definitions); 
 	}
 
 	template <class D, class E>
-	static auto& get_impl(E& self) {
-		ensure(self.enabled_definitions[idx<D>]); 
-		return std::get<D>(self.definitions); 
+	static auto find_impl(E& self) -> maybe_const_ptr_t<std::is_const_v<E>, D> {
+		if constexpr(is_always_present_v<D>) {
+			return &get_impl<D>(self);
+		}
+		else {
+			if (self.enabled_definitions[idx<D>]) {
+				return std::addressof(std::get<D>(self.definitions));
+			}
+
+			return nullptr; 
+		}
 	}
 
 public:
@@ -50,7 +58,12 @@ public:
 
 	template <class D>
 	void remove() {
-		enabled_definitions[idx<D>] = false;
+		if constexpr(is_always_present_v<D>) {
+			get<D>() = {};
+		}
+		else {
+			enabled_definitions[idx<D>] = false;
+		}
 	}
 
 	template <class D>

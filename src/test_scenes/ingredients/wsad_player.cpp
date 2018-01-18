@@ -42,6 +42,12 @@ namespace test_types {
 
 			add_sprite(meta, logicals, assets::game_image_id::STANDARD_HEAD);
 			meta.add_shape_definition_from_renderable(logicals);
+
+			{
+				definitions::flags flags_def;
+				flags_def.values.set(entity_flag::IS_PAST_CONTAGIOUS);
+				meta.set(flags_def);
+			}
 		}
 
 		{
@@ -111,7 +117,6 @@ namespace ingredients {
 		
 		auto& attitude = e += components::attitude();
 		const auto processing = e += components::processing();
-		e.set_flag(entity_flag::IS_PAST_CONTAGIOUS);
 
 		attitude.parties = party_category::METROPOLIS_CITIZEN;
 		attitude.hostile_parties = party_category::RESISTANCE_CITIZEN;
