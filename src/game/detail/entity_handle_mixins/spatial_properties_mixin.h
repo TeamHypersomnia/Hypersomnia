@@ -1,4 +1,5 @@
 #pragma once
+#include <optional>
 #include "augs/build_settings/platform_defines.h"
 
 #include "game/transcendental/entity_handle_declaration.h"

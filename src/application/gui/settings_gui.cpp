@@ -283,6 +283,22 @@ void settings_gui_state::perform(
 				revertable_checkbox("Show developer console", config.session.show_developer_console);
 				revertable_checkbox("Log keystrokes", config.window.log_keystrokes);
 				revertable_slider("Camera query expansion", config.session.camera_query_expansion, -4.f, 0.9f);
+				
+				revertable_checkbox("Draw debug lines", config.debug_drawing.enabled);
+
+				if (config.debug_drawing.enabled) {
+					auto indent = scoped_indent();
+
+					augs::introspect(
+						[&](const std::string& label, auto& field){
+							if (label != "enabled") {
+								revertable_checkbox(format_field_name(label), field);
+							}
+						},
+						config.debug_drawing
+					); 
+				}
+
 				break;
 			}
 			default: {

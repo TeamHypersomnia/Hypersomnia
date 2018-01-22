@@ -107,7 +107,7 @@ namespace ingredients {
 		movement.enable_braking_damping = true;
 	}
 
-	void add_character_head_physics(const logic_step step, const entity_handle e, const components::transform spawn_transform) {
+	void add_character_head_physics(const logic_step step, const entity_handle e) {
 		add_character_movement(e);
 	}
 
@@ -178,10 +178,11 @@ namespace prefabs {
 
 		ingredients::add_character(metas, character, crosshair);
 		
-		ingredients::add_character_head_physics(step, character, spawn_transform);
+		ingredients::add_character_head_physics(step, character);
 
 		ingredients::add_character_head_inventory(step, character);
 
+		character.set_logic_transform(step, spawn_transform);
 		character.add_standard_components(step);
 
 		{
