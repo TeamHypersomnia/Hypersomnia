@@ -13,6 +13,9 @@ namespace test_types {
 		definitions::fixtures fixtures_def;
 		definitions::rigid_body body_def;
 
+		body_def.damping.linear = 6.5f;
+		body_def.damping.angular = 6.5f;
+
 		fixtures_def.filter = filters::dynamic_object();
 		fixtures_def.density = 1;
 		fixtures_def.material = assets::physical_material_id::METAL;
@@ -24,6 +27,9 @@ namespace test_types {
 	void add_see_through_dynamic_body(entity_type& meta) {
 		definitions::fixtures fixtures_def;
 		definitions::rigid_body body_def;
+
+		body_def.damping.linear = 6.5f;
+		body_def.damping.angular = 6.5f;
 
 		fixtures_def.filter = filters::see_through_dynamic_object();
 		fixtures_def.density = 0.2f;
@@ -37,6 +43,9 @@ namespace test_types {
 	void add_shell_dynamic_body(entity_type& meta) {
 		definitions::fixtures fixtures_def;
 		definitions::rigid_body body_def;
+
+		body_def.damping.linear = 6.5f;
+		body_def.damping.angular = 6.5f;
 
 		fixtures_def.filter = filters::shell();
 		fixtures_def.density = 1;
@@ -52,6 +61,9 @@ namespace test_types {
 	void add_standard_static_body(entity_type& meta) {
 		definitions::fixtures fixtures_def;
 		definitions::rigid_body body_def;
+
+		body_def.damping.linear = 6.5f;
+		body_def.damping.angular = 6.5f;
 
 		body_def.body_type = rigid_body_type::STATIC;
 
