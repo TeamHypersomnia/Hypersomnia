@@ -20,7 +20,10 @@ public:
 	owner_of_colliders calculate_owner_of_colliders() const;
 
 	/* Assumes that the fixtures component is found. */
-	real32 calculate_density(const owner_of_colliders calculated_owner) const;
+	real32 calculate_density(
+		const owner_of_colliders calculated_owner,
+		const definitions::fixtures& def	
+	) const;
 };
 
 template <bool, class>

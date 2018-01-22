@@ -38,11 +38,14 @@ owner_of_colliders basic_physics_mixin<C, D>::calculate_owner_of_colliders() con
 }
 
 template <bool C, class D>
-real32 basic_physics_mixin<C, D>::calculate_density(const owner_of_colliders calculated_owner) const {
+real32 basic_physics_mixin<C, D>::calculate_density(
+	const owner_of_colliders calculated_owner,
+	const definitions::fixtures& def	
+) const {
 	const auto self = *static_cast<const D*>(this);
 	const auto& cosmos = self.get_cosmos();
 
-	real32 density = 1.f;
+	real32 density = def.density;
 
 	if (const auto* const item = self.template find<components::item>()) {
 		if (const auto slot = cosmos[item->get_current_slot()]) {

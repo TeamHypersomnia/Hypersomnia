@@ -202,6 +202,11 @@ void component_synchronizer<false, P>::apply_force(
 	data.velocity = body->GetLinearVelocity();
 
 	if (DEBUG_DRAWING.draw_forces && force.non_zero()) {
+		/* 
+			Warning: bodies like player's crosshair recoil might have their forces drawn 
+			in the vicinity of (0, 0) coordinates instead of near wherever the player is.
+		*/
+
 		auto& lines = DEBUG_LOGIC_STEP_LINES;
 		lines.emplace_back(green, to_pixels(location) + to_pixels(force), to_pixels(location));
 	}
@@ -232,8 +237,13 @@ void component_synchronizer<false, P>::apply_impulse(
 	data.angular_velocity = body->GetAngularVelocity();
 	data.velocity = body->GetLinearVelocity();
 
-	if (DEBUG_DRAWING.draw_forces && force.non_zero()) {
-		DEBUG_PERSISTENT_LINES.emplace_back(green, to_pixels(location) + to_pixels(force), to_pixels(location));
+	if (DEBUG_DRAWING.draw_forces && pixels.non_zero()) {
+		/* 
+			Warning: bodies like player's crosshair recoil might have their forces drawn 
+			in the vicinity of (0, 0) coordinates instead of near wherever the player is.
+		*/
+
+		DEBUG_PERSISTENT_LINES.emplace_back(green, to_pixels(location) + pixels, to_pixels(location));
 	}
 }
 

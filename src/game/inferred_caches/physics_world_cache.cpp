@@ -251,8 +251,13 @@ void physics_world_cache::infer_cache_for_colliders(const const_entity_handle ha
 
 		if (!needs_full_rebuild) {
 			auto& compared = *cache.all_fixtures_in_component[0].get();
+			const auto& colliders_data = handle.get_def<definitions::fixtures>();
 
-			if (const auto new_density = handle.calculate_density(get_calculated_owner());
+			if (const auto new_density = handle.calculate_density(
+					get_calculated_owner(), 
+					colliders_data
+				);
+
 				compared.GetDensity() != new_density
 			) {
 				for (auto& f : cache.all_fixtures_in_component) {
@@ -262,7 +267,6 @@ void physics_world_cache::infer_cache_for_colliders(const const_entity_handle ha
 				compared.GetBody()->ResetMassData();
 			}
 
-			const auto& colliders_data = handle.get_def<definitions::fixtures>();
 			const bool rebuild_filters = compared.GetFilterData() != colliders_data.filter;
 
 			for (auto& f : cache.all_fixtures_in_component) {
@@ -317,7 +321,7 @@ void physics_world_cache::infer_cache_for_colliders(const const_entity_handle ha
 
 		fixdef.userData = handle.get_id();
 
-		fixdef.density = handle.calculate_density(get_calculated_owner());
+		fixdef.density = handle.calculate_density(get_calculated_owner(), colliders_data);
 
 		fixdef.friction = colliders_data.friction;
 		fixdef.restitution = colliders_data.restitution;
