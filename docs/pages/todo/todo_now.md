@@ -9,21 +9,13 @@ summary: Just a hidden scratchpad.
 
 - Bugs:
 	- particles spawn not where they should
-	- editor crash
+	- Bad calculation of grenade explosion locations
+		- perhaps get_logic_transform?
+	- explosion sounds dont get played, but this is due to the previous
 
-
-- particle exitence will later have an entity id which to chase thus it won't need get logic transform
+- particle existence will later have an entity id which to chase thus it won't need get logic transform
 	- check if there are no problems with its NPO detection
 	- there might however occur a need to optionally set initial transform in a definition group to one of other group entity (maybe + offset) 
-
-- set transforms everywhere?
-- Currently, logic transform might be ambiguous if:
-	- The entity has a rigid body and also fixtures that belong to some remote rigid body.
-		- We will always prefer fixtures if they exist.
-- If we want to destroy b2Body data once all fixtures are destroyed, it would be a case without precedent where the state of the parent cache depends on some of its children.
-	- Let's just allow bodies to stay without fixtures for now as it will be easier. We'll see what happens.
-	- Thus the former owner body won't have to be reinferred once a remote fixture entity gets destroyed.
-	- In any case, we could just implement it in the physics engine side that the body gets removed from the world list if the last fixture was removed.
 
 - Rename "fixtures" to "colliders"
 
@@ -42,10 +34,6 @@ summary: Just a hidden scratchpad.
 			- We know that a driver will only need a correction to damping and not entire body
 	- Notice that there is no point in having fixtures component
 
-- What now? An all-out attack?
-- Definitionizing rigid body
-	- velocity and transform should always be able to be set directly as they are temporary parameters of the simulation, not statelessly calculated on any state.
-		- better wording: these variables are accumulators
 - Implement entity types incrementally.
 	- We do it now to not repeat the code when we'll be writing improvements to inferences 
 		- gun component 
@@ -59,7 +47,6 @@ summary: Just a hidden scratchpad.
 	- Get rid of component adders and deleters.
 		- That will be only possible once we definitionize practically everything in the test scenes.
 		- We'll thus need to make sender and others "always present".
-- Remove owner_body from fixtures component and create a component named "custom rigid body owner" that overrides anything else
 - Current slot should stay in the item component as other fields of item will anyway be a private
 - **moving disabled processing lists out of the significant state**
 	- for now ditch the setter of rotation copying when switching driver ownership

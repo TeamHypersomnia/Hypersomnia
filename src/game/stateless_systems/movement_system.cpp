@@ -76,12 +76,17 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 				return;
 			}
 
+			auto* const sentience = it.find<components::sentience>();
+			const bool is_sentient = sentience != nullptr;
+
+			if (const bool unconscious = is_sentient && !sentience->is_conscious()) {
+				/* Behave as if all input was unset */
+				movement.reset_movement_flags();
+			}
+
 			auto movement_force_mult = 1.f;
 
 			movement.was_sprint_effective = movement.sprint_enabled;
-
-			auto* const sentience = it.find<components::sentience>();
-			const bool is_sentient = sentience != nullptr;
 
 			value_meter::damage_result consciousness_damage_by_sprint;
 			float minimum_consciousness_to_sprint = 0.f;

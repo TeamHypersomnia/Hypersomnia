@@ -40,3 +40,24 @@ we consider whole type overrides too complex architeciturally:
 	- numerical problem perhaps?
 		- "looks like" the interpolation cache may be getting reset too often
 	- fixed: a temporary for the version was invalidated
+
+- Currently, logic transform might be ambiguous if:
+	- The entity has a rigid body and also fixtures that belong to some remote rigid body.
+		- We will always prefer fixtures if they exist.
+
+- If we want to destroy b2Body data once all fixtures are destroyed, it would be a case without precedent where the state of the parent cache depends on some of its children.
+	- Let's just allow bodies to stay without fixtures for now as it will be easier. We'll see what happens.
+	- Thus the former owner body won't have to be reinferred once a remote fixture entity gets destroyed.
+	- In any case, we could just implement it in the physics engine side that the body gets removed from the world list if the last fixture was removed.
+
+- Get logic transform will always acquire values using caches for speed.
+	- **If it doesnt destroy performance, we can check if cache exists and fall back to value in the component.**
+	- But such a thing would anyway probably be needed only in constructor?
+		- not if we allow b2body to be destroyed
+	- For now let's just leave it as it is so that we hit assert when we acquire logic transform at a suspicious time
+
+- Definitionizing rigid body
+	- velocity and transform should always be able to be set directly as they are temporary parameters of the simulation, not statelessly calculated on any state.
+		- better wording: these variables are accumulators
+
+- Remove owner_body from fixtures component and create a component named "custom rigid body owner" that overrides anything else
