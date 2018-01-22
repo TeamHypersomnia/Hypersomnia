@@ -76,9 +76,7 @@ void item_system::pick_up_touching_items(const logic_step step) {
 			) {
 				const auto actual_picker = cosmos[picker_id];
 
-				if (const auto* sentience = actual_picker.find<components::sentience>();
-					sentience && !sentience->is_conscious()
-				) {
+				if (actual_picker.sentient_and_unconscious()) {
 					continue;
 				}
 

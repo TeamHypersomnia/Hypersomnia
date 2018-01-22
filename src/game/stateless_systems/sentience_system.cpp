@@ -279,12 +279,6 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 			driver_system().release_car_ownership(subject);
 		}
 		
-		driver.take_hold_of_wheel_when_touched = false;
-
-		/*
-			TODO: disable moving when dead!
-		*/
-
 		subject.get<components::processing>().disable_in(processing_subjects::WITH_ROTATION_COPYING);
 #if TODO
 		resolve_dampings_of_body(subject);

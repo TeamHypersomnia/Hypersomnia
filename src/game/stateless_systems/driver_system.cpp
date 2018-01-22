@@ -34,9 +34,14 @@ void driver_system::assign_drivers_who_touch_wheels(const logic_step step) {
 		}
 
 		const auto driver = cosmos[e.subject];
-		const auto maybe_driver = driver.find<components::driver>();
 
-		if (maybe_driver != nullptr && maybe_driver->take_hold_of_wheel_when_touched) {
+		if (const auto maybe_driver = driver.find<components::driver>();
+			maybe_driver != nullptr && maybe_driver->take_hold_of_wheel_when_touched
+		) {
+			if (driver.sentient_and_unconscious()) {
+				continue;
+			}
+
 			const auto car = cosmos[e.collider].get_owner_of_colliders();
 			const auto maybe_car = car.find<components::car>();
 
@@ -83,9 +88,7 @@ void driver_system::release_drivers_due_to_requests(const logic_step step) {
 		else if (e.intent == game_intent_type::TAKE_HOLD_OF_WHEEL) {
 			const auto subject = cosmos[e.subject];
 
-			const auto* const sentience = subject.find<components::sentience>();
-
-			if (sentience && !sentience->is_conscious()) {
+			if (subject.sentient_and_unconscious()) {
 				continue;
 			}
 

@@ -246,6 +246,14 @@ public:
 		check_definition_type<D>();
 		return get_type().template find<D>();
 	}
+
+	bool sentient_and_unconscious() const {
+		if (const auto sentience = find<components::sentience>()) {
+			return !sentience->is_conscious();
+		}
+
+		return false;
+	}
 };
 
 std::ostream& operator<<(std::ostream& out, const entity_handle&x);

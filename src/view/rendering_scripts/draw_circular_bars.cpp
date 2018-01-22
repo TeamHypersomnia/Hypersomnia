@@ -30,9 +30,10 @@ augs::vertex_triangle_buffer draw_circular_bars_and_get_textual_info(const draw_
 
 	for (const auto v_id : visible_entities) {
 		const auto v = cosmos[v_id];
-		const auto* const sentience = v.find<components::sentience>();
 
-		if (sentience && sentience->is_conscious()) {
+		if (const auto* const sentience = v.find<components::sentience>();
+			sentience && sentience->is_conscious()
+		) {
 			const auto& health = sentience->get<health_meter_instance>();
 			const auto hr = health.get_ratio();
 			const auto one_less_hr = 1 - hr;

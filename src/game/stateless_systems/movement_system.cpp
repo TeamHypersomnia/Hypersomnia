@@ -79,7 +79,7 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 			auto* const sentience = it.find<components::sentience>();
 			const bool is_sentient = sentience != nullptr;
 
-			if (const bool unconscious = is_sentient && !sentience->is_conscious()) {
+			if (it.sentient_and_unconscious()) {
 				/* Behave as if all input was unset */
 				movement.reset_movement_flags();
 			}
