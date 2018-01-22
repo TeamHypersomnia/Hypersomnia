@@ -71,7 +71,7 @@ void standard_explosion_input::instantiate(
 	request.square_side = effective_radius * 2;
 	request.subject = subject_if_any;
 
-	const auto response = visibility_system().respond_to_visibility_information_requests(
+	const auto response = visibility_system(DEBUG_LOGIC_STEP_LINES).respond_to_visibility_information_requests(
 		cosmos,
 		{},
 		{ request }

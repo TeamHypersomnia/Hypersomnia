@@ -296,6 +296,7 @@ namespace augs {
 	void renderer::draw_debug_lines(
 		const debug_lines& logic_step_lines,
 		const debug_lines& persistent_lines,
+		const debug_lines& frame_lines,
 
 		const augs::texture_atlas_entry tex,
 		const float interpolation_ratio
@@ -323,8 +324,8 @@ namespace augs {
 			for_each_in(logic_step_lines, line_lambda);
 		}
 
-		for_each_in(frame_lines, line_lambda);
 		for_each_in(persistent_lines, line_lambda);
+		for_each_in(frame_lines, line_lambda);
 	}
 
 	int renderer::get_max_texture_size() const {

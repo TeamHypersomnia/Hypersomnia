@@ -115,7 +115,7 @@ void standard_solve(const logic_step step) {
 
 	{
 		auto scope = measure_scope(performance.visibility);
-		visibility_system().respond_to_visibility_information_requests(step);
+		visibility_system(DEBUG_LOGIC_STEP_LINES).respond_to_visibility_information_requests(step);
 	}
 
 	{

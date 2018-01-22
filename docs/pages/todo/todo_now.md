@@ -7,6 +7,10 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order:  
 
+- Bugs:
+	- particles spawn not where they should
+	- editor crash
+
 
 - particle exitence will later have an entity id which to chase thus it won't need get logic transform
 	- check if there are no problems with its NPO detection

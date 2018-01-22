@@ -2,10 +2,16 @@
 #include <vector>
 #include "game/messages/visibility_information.h"
 
+#include "game/debug_drawing_settings.h"
 #include "game/transcendental/step_declaration.h"
 
 class visibility_system {
+	using lines_ref = std::vector<debug_line>&;
+
 public:
+	lines_ref DEBUG_LINES_TARGET;
+	visibility_system(lines_ref ref) : DEBUG_LINES_TARGET(ref) {}
+
 	struct visibility_responses {
 		std::vector<messages::line_of_sight_response> los;
 		std::vector<messages::visibility_information_response> vis;

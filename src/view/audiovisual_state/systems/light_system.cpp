@@ -136,7 +136,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 	{
 		std::vector<messages::line_of_sight_response> dummy;
-		visibility_system().respond_to_visibility_information_requests(cosmos, {}, requests, dummy, responses);
+		visibility_system(DEBUG_FRAME_LINES).respond_to_visibility_information_requests(cosmos, {}, requests, dummy, responses);
 	}
 
 	renderer.set_additive_blending();

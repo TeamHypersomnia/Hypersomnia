@@ -1489,6 +1489,7 @@ int work(const int argc, const char* const * const argv) try {
 				renderer.draw_debug_lines(
 					DEBUG_LOGIC_STEP_LINES,
 					DEBUG_PERSISTENT_LINES,
+					DEBUG_FRAME_LINES,
 
 					get_drawer().default_texture,
 					interpolation_ratio
@@ -1496,7 +1497,7 @@ int work(const int argc, const char* const * const argv) try {
 
 				renderer.call_and_clear_lines();
 
-				renderer.frame_lines.clear();
+				DEBUG_FRAME_LINES.clear();
 			}
 
 			shaders.standard->set_projection(augs::orthographic_projection(vec2(screen_size)));

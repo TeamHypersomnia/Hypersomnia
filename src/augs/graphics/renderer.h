@@ -18,7 +18,6 @@ namespace augs {
 	};
 
 	struct renderer {
-		debug_lines frame_lines;
 		debug_lines prev_logic_step_lines;
 		
 		GLuint triangle_buffer_id = 0xdeadbeef;
@@ -55,6 +54,7 @@ namespace augs {
 		void draw_debug_lines(
 			const debug_lines& logic_step_lines,
 			const debug_lines& persistent_lines,
+			const debug_lines& frame_lines,
 
 			const augs::texture_atlas_entry line_texture, 
 			const float interpolation_ratio
