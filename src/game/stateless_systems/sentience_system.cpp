@@ -44,6 +44,10 @@ void sentience_system::cast_spells(const logic_step step) const {
 
 		auto& sentience = subject.get<components::sentience>();
 
+		if (!sentience.is_conscious()) {
+			continue;
+		}
+
 		ensure(spell.is_set());
 
 		get_by_dynamic_id(
