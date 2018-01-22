@@ -61,9 +61,6 @@ P P::get_default(const const_entity_handle id) {
 	if (id.has<components::position_copying>()) {
 		matching.push_back(processing_subjects::WITH_POSITION_COPYING);
 	}
-	if (id.has<components::rotation_copying>()) {
-		matching.push_back(processing_subjects::WITH_ROTATION_COPYING);
-	}
 	if (id.has<components::sentience>()) {
 		matching.push_back(processing_subjects::WITH_SENTIENCE);
 	}

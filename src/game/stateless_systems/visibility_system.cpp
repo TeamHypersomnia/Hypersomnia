@@ -3,6 +3,7 @@
 
 #include <Box2D/Box2D.h>
 
+#include "augs/math/math.h"
 #include "augs/templates/container_templates.h"
 #include "augs/templates/algorithm_templates.h"
 #include "augs/misc/simple_pair.h"

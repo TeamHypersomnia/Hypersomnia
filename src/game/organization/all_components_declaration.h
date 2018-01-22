@@ -27,7 +27,6 @@ namespace components {
 	struct crosshair;
 	struct missile;
 	struct gun;
-	struct rotation_copying;
 	struct movement;
 	struct particles_existence;
 	struct pathfinding;
@@ -70,7 +69,6 @@ using component_list_t = List<
 	components::crosshair,
 	components::missile,
 	components::gun,
-	components::rotation_copying,
 	components::movement,
 	components::particles_existence,
 	components::pathfinding,

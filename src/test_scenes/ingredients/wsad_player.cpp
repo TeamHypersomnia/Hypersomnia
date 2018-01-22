@@ -9,7 +9,6 @@
 #include "game/components/crosshair_component.h"
 #include "game/components/sprite_component.h"
 #include "game/components/movement_component.h"
-#include "game/components/rotation_copying_component.h"
 #include "game/components/animation_component.h"
 #include "game/components/fixtures_component.h"
 #include "game/components/rigid_body_component.h"
@@ -54,6 +53,9 @@ namespace test_types {
 
 			body.angled_damping = true;
 			body.allow_sleep = false;
+
+			body.damping.linear = 6.5f;
+			body.damping.angular = 6.5f;
 
 			group.filter = filters::controlled_character();
 			group.density = 1.0;
@@ -114,7 +116,6 @@ namespace ingredients {
 	void add_character(const all_logical_assets& metas, const entity_handle e, const entity_handle crosshair_entity) {
 		auto& animation = e += components::animation();
 		auto& movement = e += components::movement();
-		auto& rotation_copying = e += components::rotation_copying();
 		auto& driver = e += components::driver();
 		auto& sentience = e += components::sentience();
 		e += components::position_copying(); // used when it is an astral body
@@ -151,10 +152,6 @@ namespace ingredients {
 
 		e.map_child_entity(child_entity_name::CHARACTER_CROSSHAIR, crosshair_entity);
 		crosshair_entity.make_as_child_of(e);
-
-		rotation_copying.target = crosshair_entity;
-		rotation_copying.look_mode = components::rotation_copying::look_type::POSITION;
-		rotation_copying.colinearize_item_in_hand = true;
 
 		add_character_movement(e);
 	}

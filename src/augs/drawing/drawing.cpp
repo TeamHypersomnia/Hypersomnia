@@ -1,5 +1,6 @@
 #include "3rdparty/polypartition/src/polypartition.h"
 
+#include "augs/math/math.h"
 #include "augs/drawing/drawing.h"
 #include "augs/texture_atlas/texture_atlas_entry.h"
 #include "augs/drawing/polygon.h"

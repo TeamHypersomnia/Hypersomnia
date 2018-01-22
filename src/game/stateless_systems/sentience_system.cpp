@@ -1,7 +1,10 @@
 #include "sentience_system.h"
 
 #include "augs/templates/get_by_dynamic_id.h"
+#include "augs/math/math.h"
 #include "augs/misc/randomization.h"
+
+#include "game/debug_drawing_settings.h"
 #include "game/messages/damage_message.h"
 #include "game/messages/health_event.h"
 #include "game/messages/health_event.h"
@@ -283,7 +286,6 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 			driver_system().release_car_ownership(subject);
 		}
 		
-		subject.get<components::processing>().disable_in(processing_subjects::WITH_ROTATION_COPYING);
 #if TODO
 		resolve_dampings_of_body(subject);
 #endif
@@ -440,6 +442,95 @@ void sentience_system::cooldown_aimpunches(const logic_step step) const {
 		processing_subjects::WITH_SENTIENCE,
 		[&](const const_entity_handle t) {
 
+		}
+	);
+}
+
+void sentience_system::rotate_towards_crosshairs_and_driven_vehicles(const logic_step step) const {
+	static auto debug_line_drawer = [](const rgba col, const vec2 a, const vec2 b){
+		DEBUG_LOGIC_STEP_LINES.emplace_back(col, a, b);
+	};
+
+	auto& cosmos = step.get_cosmos();
+
+	cosmos.for_each(
+		processing_subjects::WITH_SENTIENCE,
+		[&](const entity_handle subject) {
+			auto& sentience = subject.get<components::sentience>();
+
+			if (!sentience.is_conscious()) {
+				return;
+			}
+
+			const auto subject_transform = subject.get_logic_transform();
+			
+			std::optional<float> requested_angle;
+
+			if (const auto crosshair = cosmos[sentience.character_crosshair]) {
+				const auto items = subject.get_wielded_items();
+				const auto target_transform = crosshair.get_logic_transform();
+
+				{
+					const auto diff = target_transform.pos - subject_transform.pos;
+
+					if (diff.is_epsilon(1.f)) {
+						requested_angle = 0.f;
+					}
+					else {
+						requested_angle = diff.degrees();
+					}
+				}
+
+				if (items.size() > 0) {
+					const auto subject_item = cosmos[items[0]];
+
+					if (const auto* const maybe_gun_def = subject_item.find_def<definitions::gun>()) {
+						const auto& gun_def = *maybe_gun_def;
+
+						const auto rifle_transform = subject_item.get_logic_transform();
+						auto barrel_center = gun_def.calculate_barrel_center(rifle_transform);
+						auto muzzle = gun_def.calculate_muzzle_position(rifle_transform);
+						const auto mc = subject_transform.pos;
+
+						barrel_center.rotate(-subject_transform.rotation, mc);
+						muzzle.rotate(-subject_transform.rotation, mc);
+
+						auto crosshair_vector = target_transform.pos - mc;
+
+						if (const bool centers_apart = !mc.compare_abs(barrel_center)) {
+							requested_angle = colinearize_AB_with_C(mc, barrel_center, muzzle, target_transform.pos, debug_line_drawer);
+						}
+					}
+					else if (subject_item.find<components::hand_fuse>()) {
+						auto throwable_transform = subject_item.get_logic_transform();
+						auto throwable_target_vector = throwable_transform.pos + vec2::from_degrees(throwable_transform.rotation);
+
+						const auto mc = subject_transform.pos;
+
+						throwable_transform.pos.rotate(-subject_transform.rotation, mc);
+						throwable_target_vector.rotate(-subject_transform.rotation, mc);
+
+						if (const auto centers_apart = !mc.compare_abs(throwable_transform.pos)) {
+							requested_angle = colinearize_AB_with_C(mc, throwable_transform.pos, throwable_target_vector, target_transform.pos, debug_line_drawer);
+						}
+					}
+				}
+			}
+
+			if (const auto driver = subject.find<components::driver>()) {
+				if (const auto vehicle = cosmos[driver->owned_vehicle]) {
+					const auto target_transform = vehicle.get_logic_transform();
+					const auto diff = target_transform.pos - subject_transform.pos;
+					requested_angle = diff.degrees();
+				}
+			}
+
+			if (auto rigid_body = subject.find<components::rigid_body>();
+				rigid_body != nullptr && requested_angle
+			) {
+				rigid_body.set_transform({ rigid_body.get_position(), *requested_angle });
+				rigid_body.set_angular_velocity(0);
+			}
 		}
 	);
 }

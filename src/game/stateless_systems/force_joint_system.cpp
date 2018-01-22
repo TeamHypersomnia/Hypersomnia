@@ -5,7 +5,6 @@
 #include "game/components/force_joint_component.h"
 #include "game/components/rigid_body_component.h"
 #include "game/components/transform_component.h"
-#include "game/components/rotation_copying_component.h"
 
 #include "game/transcendental/cosmos.h"
 
@@ -88,9 +87,6 @@ void force_joint_system::apply_forces_towards_target_entities(const logic_step s
 					const auto& chased_physics = cosmos[force_joint.chased_entity].get<components::rigid_body>();
 					chased_physics.apply_force(force_for_chaser * chased_physics.get_mass());
 				}
-
-				//if (force_joint.consider_rotation)
-				//	it.get<components::rotation_copying>().target_angle = chased_transform.rotation;
 
 				//LOG("F: %x", rigid_body.body->GetLinearDamping());
 			}

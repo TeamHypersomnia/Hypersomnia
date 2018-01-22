@@ -5,7 +5,6 @@
 #include "game/components/car_component.h"
 
 #include "game/components/movement_component.h"
-#include "game/components/rotation_copying_component.h"
 #include "game/components/rigid_body_component.h"
 #include "game/components/force_joint_component.h"
 #include "game/components/sentience_component.h"
@@ -117,7 +116,6 @@ bool driver_system::change_car_ownership(
 	auto& cosmos = driver_entity.get_cosmos();
 	const auto& physics = cosmos.get_solvable_inferred().physics;
 
-	auto* const maybe_rotation_copying = driver_entity.find<components::rotation_copying>();
 	const auto maybe_rigid_body = driver_entity.find<components::rigid_body>();
 	const bool has_physics = maybe_rigid_body != nullptr;
 	auto* const maybe_movement = driver_entity.find<components::movement>();
@@ -147,12 +145,6 @@ bool driver_system::change_car_ownership(
 			maybe_movement->reset_movement_flags();
 			maybe_movement->enable_braking_damping = false;
 			maybe_movement->enable_animation = false;
-		}
-
-		if (maybe_rotation_copying && has_physics) {
-			maybe_rotation_copying->stash();
-			maybe_rotation_copying->target = car.left_wheel_trigger;
-			maybe_rotation_copying->look_mode = components::rotation_copying::look_type::ROTATION;
 		}
 
 		if (has_physics) {
@@ -190,10 +182,6 @@ bool driver_system::change_car_ownership(
 		}
 		
 		car.reset_movement_flags();
-
-		if (maybe_rotation_copying && has_physics) {
-			maybe_rotation_copying->unstash();
-		}
 
 		if (has_physics) {
 #if TODO

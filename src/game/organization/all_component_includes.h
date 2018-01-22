@@ -7,7 +7,6 @@
 #include "game/components/missile_component.h"
 #include "game/components/gun_component.h"
 
-#include "game/components/rotation_copying_component.h"
 #include "game/components/movement_component.h"
 #include "game/components/particles_existence_component.h"
 #include "game/components/rigid_body_component.h"

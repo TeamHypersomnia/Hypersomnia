@@ -1,4 +1,4 @@
-#include "vec2.h"
+#include "augs/math/math.h"
 #include <3rdparty/Box2D/Collision/Shapes/b2CircleShape.h>
 #include <3rdparty/Box2D/Collision/Shapes/b2PolygonShape.h>
 #include <3rdparty/Box2D/Collision/Shapes/b2EdgeShape.h>

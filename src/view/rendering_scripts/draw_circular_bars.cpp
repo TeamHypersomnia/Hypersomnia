@@ -9,6 +9,7 @@
 #include "augs/graphics/vertex.h"
 #include "augs/gui/text/printer.h"
 #include "augs/image/font.h"
+#include "augs/math/math.h"
 
 #include "game/components/interpolation_component.h"
 #include "game/components/fixtures_component.h"

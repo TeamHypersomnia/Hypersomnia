@@ -16,7 +16,6 @@
 #include "game/stateless_systems/input_system.h"
 #include "game/stateless_systems/gun_system.h"
 #include "game/stateless_systems/crosshair_system.h"
-#include "game/stateless_systems/rotation_copying_system.h"
 #include "game/stateless_systems/position_copying_system.h"
 #include "game/stateless_systems/missile_system.h"
 #include "game/stateless_systems/destroy_system.h"
@@ -80,7 +79,7 @@ void standard_solve(const logic_step step) {
 		listener.during_step = false;
 	}
 
-	rotation_copying_system().update_rotations(cosmos);
+	sentience_system().rotate_towards_crosshairs_and_driven_vehicles(step);
 	position_copying_system().update_transforms(step);
 
 	trace_system().lengthen_sprites_of_traces(step);
@@ -152,7 +151,6 @@ void standard_solve(const logic_step step) {
 	animation_system().progress_animation_states(step);
 
 	//position_copying_system().update_transforms(step);
-	//rotation_copying_system().update_rotations(cosmos);
 
 	performance.raycasts.measure(cosmos.get_solvable_inferred().physics.ray_casts_since_last_step);
 
