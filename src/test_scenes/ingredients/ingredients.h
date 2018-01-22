@@ -20,16 +20,7 @@ namespace components {
 namespace ingredients {
 	components::item& make_item(const entity_handle);
 	
-	void make_always_visible(entity_handle);
-
-	void add_bullet_round_physics(const logic_step, entity_handle, const components::transform);
-	void add_see_through_dynamic_body(const logic_step, entity_handle, const components::transform);
-	void add_shell_dynamic_body(const logic_step, entity_handle, const components::transform);
-	void add_standard_dynamic_body(const logic_step, entity_handle, const components::transform, const bool destructible = false);
-	void add_standard_static_body(const logic_step, entity_handle, const components::transform);
-
 	void add_character_head_physics(const logic_step, entity_handle, const components::transform);
-	void add_character_legs(const logic_step, entity_handle legs, entity_handle player);
 	void add_character(const logic_step, entity_handle, entity_handle crosshair_entity);
 
 	void add_character_head_inventory(const logic_step, entity_handle);
@@ -47,6 +38,12 @@ namespace ingredients {
 }
 
 namespace test_types {
+	void add_bullet_round_physics(entity_type& meta);
+	void add_see_through_dynamic_body(entity_type& meta);
+	void add_shell_dynamic_body(entity_type& meta);
+	void add_standard_dynamic_body(entity_type& meta);
+	void add_standard_static_body(entity_type& meta);
+
 	void add_sprite(
 		entity_type& t, 
 		const all_logical_assets& logicals,
@@ -57,7 +54,6 @@ namespace test_types {
 }
 
 namespace prefabs {
-
 	entity_handle create_car(const logic_step, const components::transform&);
 
 	// guns
@@ -70,7 +66,6 @@ namespace prefabs {
 	);
 	entity_handle create_cyan_charge(const logic_step, vec2 pos, int charges = 30);
 
-
 	entity_handle create_sample_backpack(const logic_step, vec2 pos);
 
 	entity_handle create_character_crosshair(const logic_step);
@@ -82,8 +77,8 @@ namespace prefabs {
 		const int create_arm_count = 2
 	);
 
-	entity_handle create_crate(const logic_step, const components::transform pos, vec2i size = {});
-	entity_handle create_brick_wall(const logic_step, const components::transform pos, vec2i size = {});
+	entity_handle create_crate(const logic_step, const components::transform pos);
+	entity_handle create_brick_wall(const logic_step, const components::transform pos);
 
 	entity_handle create_cyan_urban_machete(const logic_step, const vec2 pos);
 

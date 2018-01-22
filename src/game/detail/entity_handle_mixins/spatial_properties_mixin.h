@@ -11,37 +11,37 @@
 
 struct all_logical_assets;
 
-components::transform transform_around_body(
-	const const_entity_handle fe,
-	const components::transform body_transform
-);
-
 template <bool is_const, class entity_handle_type>
 class basic_spatial_properties_mixin {
 public:
-	bool has_logic_transform() const;
 	components::transform get_logic_transform() const;
+	std::optional<components::transform> find_logic_transform() const;
 
 	template <class interpolation_system_type>
 	components::transform get_viewing_transform(const interpolation_system_type& sys, const bool integerize = false) const {
 		const auto handle = *static_cast<const entity_handle_type*>(this);
 
-		const auto& owner = handle.get_owner_body();
-
-		if (owner.alive() && owner.template has<components::interpolation>() && owner != handle) {
-			auto in = sys.get_interpolated(owner);
+		if (const auto owner = handle.get_owner_of_colliders();
+			owner.alive() && owner != handle 
+		) {
+			auto body_transform = sys.get_interpolated(owner);
 
 			if (integerize) {
-				in.pos.discard_fract();
+				body_transform.pos.discard_fract();
 			}
 
-			return transform_around_body(handle, in);
-		}
-		else if (handle.template has<components::interpolation>()) {
-			return sys.get_interpolated(handle);
-		}
+			const auto offset = handle.calculate_owner_of_colliders();
 
-		return handle.get_logic_transform();
+			auto displacement = offset.shape_offset;
+
+			if (!displacement.pos.is_zero()) {
+				displacement.pos.rotate(body_transform.rotation, vec2(0, 0));
+			}
+
+			return body_transform + displacement;
+		}
+		
+		return sys.get_interpolated(handle);
 	}
 	
 	vec2 get_effective_velocity() const;
@@ -111,7 +111,7 @@ public:
 
 		/* TODO: Implement get_aabb for physical entities */
 		ensure(!handle.template has<components::rigid_body>());
-		ensure(!handle.template has<components::fixtures>());
+		ensure(nullptr == handle.template find_def<definitions::fixtures>());
 
 		return{};
 	}

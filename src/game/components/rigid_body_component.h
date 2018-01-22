@@ -10,6 +10,7 @@
 #include "augs/math/si_scaling.h"
 #include "game/enums/rigid_body_type.h"
 
+#include "game/detail/physics/damping_info.h"
 #include "game/components/transform_component.h"
 
 class relational_cache;
@@ -37,6 +38,9 @@ struct special_physics {
 	//float measured_carried_mass = 0.f;
 };
 
+template <bool, class>
+class basic_physics_mixin;
+
 namespace components {
 	struct rigid_body {
 		static constexpr bool is_synchronized = true;
@@ -47,19 +51,6 @@ namespace components {
 		);
 
 		// GEN INTROSPECTOR struct components::rigid_body
-		bool fixed_rotation = false;
-		bool bullet = false;
-		bool angled_damping = false;
-		bool activated = true;
-
-		bool allow_sleep = true;
-		rigid_body_type body_type = rigid_body_type::DYNAMIC;
-		pad_bytes<2> pad;
-
-		float angular_damping = 6.5f;
-		float linear_damping = 6.5f;
-		vec2 linear_damping_vec;
-
 		b2Transform transform;
 		b2Sweep sweep;
 
@@ -77,18 +68,34 @@ namespace components {
 	};
 }
 
+namespace definitions {
+	struct rigid_body {
+		using implied_component = components::rigid_body;
+
+		// GEN INTROSPECTOR struct definitions::rigid_body
+		bool bullet = false;
+		bool angled_damping = false;
+		bool allow_sleep = true;
+
+		rigid_body_type body_type = rigid_body_type::DYNAMIC;
+
+		damping_info damping;
+		// END GEN INTROSPECTOR
+	};
+};
+
 class physics_world_cache;
 struct rigid_body_cache;
+
+class b2Body;
 
 template <bool is_const>
 class basic_physics_synchronizer : public component_synchronizer_base<is_const, components::rigid_body> {
 protected:
 	friend class ::physics_world_cache;
-	friend class component_synchronizer<is_const, components::fixtures>;
-	template <bool> 
-	friend class basic_fixtures_synchronizer;
 
 	const rigid_body_cache& get_cache() const;
+	const b2Body& body() const;
 
 	template <class T>
 	auto to_pixels(const T meters) const {
@@ -110,50 +117,40 @@ public:
 	bool is_activated() const;
 	bool is_constructed() const;
 
-	vec2 velocity() const;
-	float get_mass() const;
-	float get_angle() const;
-	float get_angular_velocity() const;
-	float get_inertia() const;
-	vec2 get_position() const;
-	vec2 get_mass_position() const;
-	vec2 get_world_center() const;
-
-	rigid_body_type get_body_type() const;
-
-	auto get_fixture_entities() const {
-		return handle.get_cosmos().get_solvable_inferred().relational.get_fixtures_of_bodies().get_children_of(handle);
-	}
-
-	auto get_attached_joints() const {
-		return handle.get_cosmos().get_solvable_inferred().relational.get_joints_of_bodies().get_all_children_of(handle);
-	}
-
-	bool test_point(const vec2) const;
-
 	auto& get_special() const {
 		return get_raw_component().special;
 	}
+
+	damping_info calculate_damping_info(const definitions::rigid_body&) const;
+
+	vec2 get_velocity() const;
+	float get_mass() const;
+	float get_degrees() const;
+	float get_radians() const;
+	float get_degree_velocity() const;
+	float get_radian_velocity() const;
+	float get_inertia() const;
+	vec2 get_position() const;
+	components::transform get_transform() const;
+	vec2 get_mass_position() const;
+	vec2 get_world_center() const;
+	bool test_point(const vec2) const;
 };
 
 template<>
 class component_synchronizer<false, components::rigid_body> : public basic_physics_synchronizer<false> {
-	void reinfer_caches() const;
 	rigid_body_cache& get_cache() const;
 
 public:
+	void infer_caches() const;
+
 	using basic_physics_synchronizer<false>::basic_physics_synchronizer;
 
-	void set_body_type(const rigid_body_type) const;
-	void set_bullet_body(const bool flag) const;
-	void set_activated(const bool) const;
 	void set_velocity(const vec2) const;
 	void set_angular_velocity(const float) const;
+
 	void set_transform(const components::transform&) const;
 	void set_transform(const entity_id) const;
-	void set_angular_damping(const float) const;
-	void set_linear_damping(const float) const;
-	void set_linear_damping_vec(const vec2) const;
 
 	void apply_force(const vec2) const;
 	void apply_force(const vec2, const vec2 center_offset, const bool wake = true) const;

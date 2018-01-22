@@ -79,13 +79,13 @@ template <bool C>
 float basic_inventory_slot_handle<C>::calculate_density_multiplier_due_to_being_attached() const {
 	const float density_multiplier = get().attachment_density_multiplier;
 
-	const auto* const maybe_item = get_container().template find<components::item>();
-	
-	if (maybe_item) {
-		const auto slot = owner[maybe_item->get_current_slot()];
+	if (const auto* const maybe_item = get_container().template find<components::item>()) {
+		if (const auto slot = owner[maybe_item->get_current_slot()]) {
+			if (slot->physical_behaviour == slot_physical_behaviour::CONNECT_AS_FIXTURE_OF_BODY) {
+				return density_multiplier * slot.calculate_density_multiplier_due_to_being_attached();
+			}
 
-		if (slot.alive()) {
-			return density_multiplier * slot.calculate_density_multiplier_due_to_being_attached();
+			return density_multiplier;
 		}
 	}
 
@@ -104,18 +104,21 @@ typename basic_inventory_slot_handle<C>::entity_handle_type basic_inventory_slot
 }
 
 template <bool C>
-typename basic_inventory_slot_handle<C>::entity_handle_type basic_inventory_slot_handle<C>::get_first_ancestor_with_body_connection() const {
+owner_of_colliders basic_inventory_slot_handle<C>::calc_parent_who_owns_colliders() const {
 	const auto slot = get_container().get_current_slot();
+	const auto& cosmos = get_cosmos();
 
 	if (slot.alive()) {
-		if (slot->physical_behaviour == slot_physical_behaviour::CONNECT_AS_JOINTED_BODY) {
-			return get_container();
+		if (slot->physical_behaviour == slot_physical_behaviour::DEACTIVATE_BODIES) {
+			return { cosmos[entity_id()], {} };
 		}
 
-		return slot.get_first_ancestor_with_body_connection();
+		ensure(slot->physical_behaviour == slot_physical_behaviour::CONNECT_AS_FIXTURE_OF_BODY); 
+		/* TODO: calculate attachment offsets from a matrix */
+		return slot.calc_parent_who_owns_colliders();
 	}
 
-	return get_container();
+	return get_container().calculate_owner_of_colliders();
 }
 
 template <bool C>

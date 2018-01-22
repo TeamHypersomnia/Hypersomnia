@@ -217,7 +217,7 @@ void visibility_system::respond_to_visibility_information_requests(
 			[&](const b2Fixture* const fix) {
 				const auto candidate = cosmos[get_entity_that_owns(fix)];
 				
-				if (candidate.get_owner_body() == it) {
+				if (candidate.get_owner_of_colliders() == it) {
 					return callback_result::CONTINUE;
 				}
 

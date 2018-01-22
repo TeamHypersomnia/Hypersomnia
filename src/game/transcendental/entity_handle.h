@@ -167,7 +167,6 @@ public:
 		
 		if constexpr(is_synchronized_v<T>) {
 			agg().template add<T>(c, pool_provider());
-			cosmic::reinfer_caches_of(*this);
 		}
 		else {
 			agg().template add<T>(c, pool_provider());
@@ -193,29 +192,11 @@ public:
 		}
 	}
 
-	template <class T, bool C = !is_const, class = std::enable_if_t<C>>
-	void remove() const {
-		check_component_type<T>();
-
-		ensure(alive());
-
-		if constexpr(is_synchronized_v<T>) {
-			agg().template remove<T>(pool_provider());
-			cosmic::reinfer_caches_of(*this);
-		}
-		else {
-			agg().template remove<T>(pool_provider());
-		}
-	}
-
 	template <class component, bool C = !is_const, class = std::enable_if_t<C>>
 	decltype(auto) operator+=(const component& c) const {
 		add(c);
 		return get<component>();
 	}
-
-	template <bool C = !is_const, class = std::enable_if_t<C>>
-	entity_handle add_standard_components(const logic_step step, const bool activate_inferred) const;
 
 	template <bool C = !is_const, class = std::enable_if_t<C>>
 	entity_handle add_standard_components(const logic_step step) const;
@@ -252,12 +233,6 @@ public:
 
 	const auto& get_name() const {
 		return get<components::type>().get_name();
-	}
-
-	bool is_inferred_state_activated() const {
-		const auto inferred = find<components::all_inferred_state>();
-
-		return inferred != nullptr && inferred.is_activated();
 	}
 
 	template <class D>

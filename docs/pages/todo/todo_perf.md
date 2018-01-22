@@ -16,6 +16,13 @@ summary: Just a hidden scratchpad.
 			- care must be taken so that reinference happens BEFORE network transfer of any sort.
 		- **Then, upon complete destruction of the cosmos, caches will call their "clear" method that will also reuse any memory.**
 			- It is better than calling class destructor because later inferences will be quicker.
+	- transform, sweep and velocity fields shall be immutable by the solver, only when:
+		- the author wants to displace an object after which shall come complete reinference
+			- ~~first, complete deinference~~
+			- the author sets new value
+			- then complete reinference
+		- destroy cache wants to update sweep transform and velocities for consistency 
+	- otherwise settransform and others will be called directly
 - for better cache coherency, we might be inclined to store "has_component" array of bools alongside processing ids so that they land in cache and "find" queries are faster. 
 	- possibly only optimization for bottlenecks.
 - for better cache coherency, we might, inside systematic functions, iterate components and keep track in some cache to which entities they belong

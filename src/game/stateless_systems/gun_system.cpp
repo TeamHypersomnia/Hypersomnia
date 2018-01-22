@@ -174,7 +174,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 				float total_recoil_scale = 1.f;
 
 				if (is_magic_launcher) {
-					const auto round_entity = cosmic::clone_entity(magic_missile_def); //??
+					const auto round_entity = cosmic::clone_entity(magic_missile_def);
 
 					auto& sender = round_entity.get<components::sender>();
 					sender.set(gun_entity);
@@ -183,6 +183,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					total_recoil_scale *= missile.recoil_multiplier;
 
 					round_entity.set_logic_transform(step, muzzle_transform);
+					round_entity.add_standard_components(step);
 
 					{
 						auto rng = cosmos.get_rng_for(round_entity);
@@ -201,8 +202,6 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					auto& pe = sentience.get<personal_electricity_meter_instance>();
 					pe.value -= pe.calculate_damage_result(mana_needed).effective;
 
-					round_entity.add_standard_components(step);
-					
 					step.post_message(response);
 
 					messages::interpolation_correction_request request;
@@ -265,20 +264,21 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 							round_entity.set_logic_transform(step, muzzle_transform);
 							
+							response.spawned_rounds.push_back(round_entity);
+
+							round_entity.add_standard_components(step);
+
 							{
 								auto rng = cosmos.get_rng_for(round_entity);
 
-								const auto missile_velocity = vec2::from_degrees(muzzle_transform.rotation)
+								const auto missile_velocity = 
+									vec2::from_degrees(muzzle_transform.rotation)
 									* missile.muzzle_velocity_mult
 									* rng.randval(gun_def.muzzle_velocity)
 								;
 
 								round_entity.get<components::rigid_body>().set_velocity(missile_velocity);
 							}
-
-							response.spawned_rounds.push_back(round_entity);
-
-							round_entity.add_standard_components(step);
 
 							messages::interpolation_correction_request request;
 							request.subject = round_entity;
@@ -291,6 +291,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 						if (shell_definition.alive()) {
 							const auto shell_entity = cosmic::clone_entity(shell_definition);
+							shell_entity.add_standard_components(step);
 
 							auto rng = cosmos.get_rng_for(shell_entity);
 
@@ -304,8 +305,6 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 							shell_entity.get<components::rigid_body>().set_velocity(vec2::from_degrees(muzzle_transform.rotation + spread_component).set_length(rng.randval(gun_def.shell_velocity)));
 							response.spawned_shell = shell_entity;
-
-							shell_entity.add_standard_components(step);
 						}
 						
 						destructions.emplace_back(single_bullet_or_pellet_stack);

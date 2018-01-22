@@ -57,6 +57,7 @@ namespace test_scenes {
 		auto& world = step.get_cosmos();
 		const auto& metas = step.get_logical_assets();
 		
+#if TODO
 		const auto car = prefabs::create_car(step, components::transform( 1490, 340, -180));
 		const auto car2 = prefabs::create_car(step, components::transform(1490, 340 + 400, -180));
 		const auto car3 = prefabs::create_car(step, components::transform(1490, 340 + 800, -180));
@@ -64,6 +65,7 @@ namespace test_scenes {
 		const auto riding_car = prefabs::create_car(step, components::transform(850, 1000, -90));
 
 		const auto riding_car2 = prefabs::create_car(step, components::transform(-850 + 1000, -8200, -90 + 180));
+#endif
 
 		const int num_characters = 4 + 3 + 3 + 2;
 
@@ -103,7 +105,9 @@ namespace test_scenes {
 
 			}
 			else if (i == 3) {
+#if TODO
 				transform = riding_car.get_logic_transform();
+#endif
 			}
 
 			else if (i == 4) {
@@ -472,20 +476,20 @@ namespace test_scenes {
 
 				e.add_standard_components(step);
 
-				prefabs::create_brick_wall(step, components::transform(3 + 1 + 1100, -32 - 96), { 160, 160 });
-				prefabs::create_brick_wall(step, components::transform(3 + 1 + 1100 + 160, -32 - 96), { 160, 160 });
-				prefabs::create_brick_wall(step, components::transform(3 + 1 + 1100 + 160, -32 - 96 + 160), { 160, 160 });
-				prefabs::create_brick_wall(step, components::transform(3 + 1 + 1100, -32 - 96 + 160), { 160, 160 });
+				prefabs::create_brick_wall(step, components::transform(3 + 1 + 1100, -32 - 96));
+				prefabs::create_brick_wall(step, components::transform(3 + 1 + 1100 + 160, -32 - 96));
+				prefabs::create_brick_wall(step, components::transform(3 + 1 + 1100 + 160, -32 - 96 + 160));
+				prefabs::create_brick_wall(step, components::transform(3 + 1 + 1100, -32 - 96 + 160));
 
 
-				prefabs::create_brick_wall(step, components::transform(-3 -16 + 100, -32 - 96), { 160, 160 });
-				prefabs::create_brick_wall(step, components::transform(-3 -16 + 100 + 160, -32 - 96), { 160, 160 });
-				prefabs::create_brick_wall(step, components::transform(-3 -16 + 100 + 160, -32 - 96 + 160), { 160, 160 });
-				prefabs::create_brick_wall(step, components::transform(-3 -16 + 100, -32 - 96 + 160), { 160, 160 });
+				prefabs::create_brick_wall(step, components::transform(-3 -16 + 100, -32 - 96));
+				prefabs::create_brick_wall(step, components::transform(-3 -16 + 100 + 160, -32 - 96));
+				prefabs::create_brick_wall(step, components::transform(-3 -16 + 100 + 160, -32 - 96 + 160));
+				prefabs::create_brick_wall(step, components::transform(-3 -16 + 100, -32 - 96 + 160));
 
 				for (int b = 0; b < 8; ++b) {
-					prefabs::create_brick_wall(step, components::transform(3 + 1 + 1100 + 160 + 160, -32 - 96 + 160 - 160.f * b, 90), { 160, 160 });
-					prefabs::create_brick_wall(step, components::transform(-3 - 16 + 100 - 160, -32 - 96 + 160 - 160*b, 90), { 160, 160 });
+					prefabs::create_brick_wall(step, components::transform(3 + 1 + 1100 + 160 + 160, -32 - 96 + 160 - 160.f * b, 90));
+					prefabs::create_brick_wall(step, components::transform(-3 - 16 + 100 - 160, -32 - 96 + 160 - 160*b, 90));
 				}
 
 				const vec2 bg_size = metas.at(assets::game_image_id::TEST_BACKGROUND).get_size();

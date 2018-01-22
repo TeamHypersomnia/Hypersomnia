@@ -103,8 +103,8 @@ void audiovisual_state::spread_past_infection(const const_logic_step step) {
 	const auto& events = step.get_queue<messages::collision_message>();
 
 	for (const auto& it : events) {
-		const const_entity_handle subject_owner_body = cosm[it.subject].get_owner_body();
-		const const_entity_handle collider_owner_body = cosm[it.collider].get_owner_body();
+		const const_entity_handle subject_owner_body = cosm[it.subject].get_owner_of_colliders();
+		const const_entity_handle collider_owner_body = cosm[it.collider].get_owner_of_colliders();
 
 		auto& past_system = get<past_infection_system>();
 

@@ -78,7 +78,7 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 
 			auto movement_force_mult = 1.f;
 
-			bool is_sprint_effective = movement.sprint_enabled;
+			movement.was_sprint_effective = movement.sprint_enabled;
 
 			auto* const sentience = it.find<components::sentience>();
 			const bool is_sentient = sentience != nullptr;
@@ -101,7 +101,7 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 				);
 
 				if (consciousness_damage_by_sprint.excessive > 0) {
-					is_sprint_effective = false;
+					movement.was_sprint_effective = false;
 				}
 
 				const auto& haste = sentience->get<haste_perk_instance>();
@@ -125,7 +125,7 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 			const auto requested_by_input = movement.get_force_requested_by_input();
 
 			if (requested_by_input.non_zero()) {
-				if (is_sprint_effective) {
+				if (movement.was_sprint_effective) {
 					movement_force_mult /= 2.f;
 
 					if (is_sentient) {
@@ -159,8 +159,8 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 					movement.applied_force_offset
 				);
 			}
-			
-			resolve_dampings_of_body(it, is_sprint_effective);
+
+			rigid_body.infer_caches();
 		}
 	);
 }
@@ -178,7 +178,7 @@ void movement_system::generate_movement_events(const logic_step step) {
 
 			if (movement.enable_animation) {
 				if (it.has<components::rigid_body>()) {
-					speed = it.get<components::rigid_body>().velocity().length();
+					speed = it.get<components::rigid_body>().get_velocity().length();
 				}
 			}
 

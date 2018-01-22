@@ -33,31 +33,14 @@ std::ostream& operator<<(std::ostream& out, const const_entity_handle &x) {
 template <bool C>
 template <bool, class>
 entity_handle basic_entity_handle<C>::add_standard_components(const logic_step step) const {
-	return add_standard_components<true, void>(step, true);
-}
-
-template <bool C>
-template <bool, class>
-entity_handle basic_entity_handle<C>::add_standard_components(const logic_step step, const bool activate_inferred) const {
 	if (dead()) {
 		return *this;
 	}
 
-	const bool has_physics = has<components::rigid_body>();
-
-	if (has_physics || has<components::fixtures>()) {
+	if (has<components::rigid_body>() || find_def<definitions::fixtures>()) {
 		const bool has_transform = has<components::transform>();
 
 		ensure(!has_transform);
-	}
-
-	if (auto interpolation = find<components::interpolation>()) {
-		interpolation->place_of_birth = this->get_logic_transform();
-	}
-
-	if (auto trace = find<components::trace>()) {
-		auto rng = get_cosmos().get_fast_rng_for(get_id());
-		trace->reset(get_def<definitions::trace>(), rng);
 	}
 
 	if (auto rigid_body = find<components::rigid_body>()) {
@@ -73,8 +56,15 @@ entity_handle basic_entity_handle<C>::add_standard_components(const logic_step s
 
 	recalculate_basic_processing_categories<true, void>();
 	
-	if (activate_inferred) {
-		get<components::all_inferred_state>().set_activated(true);
+	cosmic::infer_caches_for(*this);
+
+	if (auto* const interpolation = find<components::interpolation>()) {
+		interpolation->place_of_birth = this->get_logic_transform();
+	}
+
+	if (auto* const trace = find<components::trace>()) {
+		auto rng = get_cosmos().get_fast_rng_for(get_id());
+		trace->reset(get_def<definitions::trace>(), rng);
 	}
 
 	return *this;
@@ -90,6 +80,5 @@ void basic_entity_handle<C>::recalculate_basic_processing_categories() const {
 }
 
 // explicit instantiation
-template entity_handle basic_entity_handle<false>::add_standard_components<true, void>(const logic_step, const bool) const;
 template entity_handle basic_entity_handle<false>::add_standard_components<true, void>(const logic_step) const;
 template void basic_entity_handle<false>::recalculate_basic_processing_categories<true, void>() const;

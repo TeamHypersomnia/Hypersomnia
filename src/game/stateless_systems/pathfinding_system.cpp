@@ -38,7 +38,7 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 		for (auto& v : verts) {
 			auto position = b.get_position();
 			/* transform angle to degrees */
-			auto rotation = b.get_angle();
+			auto rotation = b.get_degrees();
 
 			/* transform vertex to current entity's position and rotation */
 			vec2 out_vert = (vec2(v).rotate(rotation, vec2(0, 0)) + position);
@@ -398,7 +398,7 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 						current_target = pathfinding.session().persistent_navpoint;
 					}
 					else {
-						vec2 unit_vel = body.velocity();
+						vec2 unit_vel = body.get_velocity();
 						unit_vel.normalize();
 						
 						auto local_minimum_predicate = [&pathfinding, &transform, unit_vel](const pathfinding_navigation_vertex& a,

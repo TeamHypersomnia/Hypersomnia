@@ -22,6 +22,8 @@ namespace test_types {
 			meta.set(render_def);
 			test_types::add_sprite(meta, logicals, assets::game_image_id::URBAN_CYAN_MACHETE, white);
 			meta.add_shape_definition_from_renderable(logicals);
+
+			test_types::add_see_through_dynamic_body(meta);
 		}
 	}
 }
@@ -29,8 +31,6 @@ namespace test_types {
 namespace prefabs {
 	entity_handle create_cyan_urban_machete(const logic_step step, vec2 pos) {
 		const auto machete = create_test_scene_entity(step.get_cosmos(), test_scene_type::URBAN_CYAN_MACHETE);
-
-		ingredients::add_see_through_dynamic_body(step, machete, pos);
 
 		auto& item = ingredients::make_item(machete);
 		item.space_occupied_per_charge = to_space_units("2.5");
@@ -45,6 +45,7 @@ namespace prefabs {
 		missile.impulse_upon_hit = 1000.f;
 		missile.constrain_lifetime = false;
 
+		machete.set_logic_transform(step, pos);
 		machete.add_standard_components(step);
 
 		return machete;

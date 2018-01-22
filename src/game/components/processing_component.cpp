@@ -87,37 +87,32 @@ P P::get_default(const const_entity_handle id) {
 }
 
 template<bool C>
-bool basic_processing_synchronizer<C>::is_activated() const {
-	return get_raw_component().activated;
-}
-
-template<bool C>
 bool basic_processing_synchronizer<C>::is_in(const processing_subjects list) const {
 	return get_raw_component().processing_subject_categories.test(list) && !get_raw_component().disabled_categories.test(list);
 }
 
-void component_synchronizer<false, P>::reinfer_caches() const {
-	cosmic::reinfer_cache(handle.get_cosmos().get_solvable_inferred({}).processing_lists, handle);
+void component_synchronizer<false, P>::infer_caches() const {
+	handle.get_cosmos().get_solvable_inferred({}).processing_lists.infer_cache_for(handle);
 }
 
 void component_synchronizer<false, P>::disable_in(const processing_subjects l) const {
 	get_raw_component().disabled_categories.set(l, true);
 
 	if (l == processing_subjects::WITH_PARTICLES_EXISTENCE) {
-		cosmic::reinfer_cache(handle.get_cosmos().get_solvable_inferred({}).tree_of_npo, handle);
+		handle.get_cosmos().get_solvable_inferred({}).tree_of_npo.infer_cache_for(handle);
 	}
 
-	reinfer_caches();
+	infer_caches();
 }
 
 void component_synchronizer<false, P>::enable_in(const processing_subjects l) const {
 	get_raw_component().disabled_categories.set(l, false);
 
 	if (l == processing_subjects::WITH_PARTICLES_EXISTENCE) {
-		cosmic::reinfer_cache(handle.get_cosmos().get_solvable_inferred({}).tree_of_npo, handle);
+		handle.get_cosmos().get_solvable_inferred({}).tree_of_npo.infer_cache_for(handle);
 	}
 
-	reinfer_caches();
+	infer_caches();
 }
 
 template<bool C>
@@ -132,12 +127,12 @@ P::flagset_type basic_processing_synchronizer<C>::get_basic_categories() const {
 
 void component_synchronizer<false, P>::set_disabled_categories(const P::flagset_type& categories) const {
 	get_raw_component().disabled_categories = categories;
-	reinfer_caches();
+	infer_caches();
 }
 
 void component_synchronizer<false, P>::set_basic_categories(const P::flagset_type& categories) const {
 	get_raw_component().processing_subject_categories = categories;
-	reinfer_caches();
+	infer_caches();
 }
 
 template class basic_processing_synchronizer<false>;

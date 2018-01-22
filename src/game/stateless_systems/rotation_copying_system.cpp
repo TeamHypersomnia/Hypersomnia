@@ -124,7 +124,9 @@ float rotation_copying_system::resolve_rotation_copying_value(const const_entity
 
 					auto crosshair_vector = target_transform.pos - mc;
 
-					new_angle = colinearize_AB_with_C(mc, barrel_center, muzzle, target_transform.pos);
+					if (const bool centers_apart = !mc.compare_abs(barrel_center)) {
+						new_angle = colinearize_AB_with_C(mc, barrel_center, muzzle, target_transform.pos);
+					}
 				}
 				else if (subject_item.has<components::hand_fuse>()) {
 					auto throwable_transform = subject_item.get_logic_transform();
@@ -135,7 +137,9 @@ float rotation_copying_system::resolve_rotation_copying_value(const const_entity
 					throwable_transform.pos.rotate(-subject_transform.rotation, mc);
 					throwable_target_vector.rotate(-subject_transform.rotation, mc);
 
-					new_angle = colinearize_AB_with_C(mc, throwable_transform.pos, throwable_target_vector, target_transform.pos);
+					if (const auto centers_apart = !mc.compare_abs(throwable_transform.pos)) {
+						new_angle = colinearize_AB_with_C(mc, throwable_transform.pos, throwable_target_vector, target_transform.pos);
+					}
 				}
 			}
 		}
@@ -147,7 +151,7 @@ float rotation_copying_system::resolve_rotation_copying_value(const const_entity
 			vec2 direction;
 
 			if (rotation_copying.look_mode == components::rotation_copying::look_type::VELOCITY) {
-				direction = vec2(target_physics.velocity());
+				direction = vec2(target_physics.get_velocity());
 			}
 
 			if (direction.non_zero()) {

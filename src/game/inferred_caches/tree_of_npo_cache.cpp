@@ -12,7 +12,7 @@ std::optional<tree_of_npo_node_input> tree_of_npo_node_input::create_default_for
 	;
 
 	const bool has_physical = 
-		e.has<components::fixtures>() 
+		e.find_def<definitions::fixtures>() 
 		|| e.has<components::rigid_body>() 
 	;
 

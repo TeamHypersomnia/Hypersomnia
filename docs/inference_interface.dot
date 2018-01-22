@@ -1,0 +1,36 @@
+digraph G {
+	"Solver"->"Get inferred value"
+	"Solver"->"Request field recalculation"
+	"Solver"->"Request complete recalculation"
+
+	"Request complete recalculation"->"Inferrer"
+	"Inferrer"->"Full inferrer"[dir=none]
+	"Inferrer"->"Incr. inferrer"[dir=none]
+
+	"Cache"->"Get inferred value"[dir=none]
+
+	"mixin/comp"->"Request field recalculation"[dir=none]
+
+	/*
+		If there exists no component for a particular definition,
+		we will move the request logic to the mixins, e.g. for fixtures.
+	*/
+
+	"mixin/comp"->"Request complete recalculation"[dir=none]
+
+	"Request field recalculation"->"Up-to-date calculator"
+	"Full inferrer"->"Up-to-date calculator"
+	"Incr. inferrer"->"Request field recalculation"
+
+	//"Request field recalculation"->"Detail with refs"[label="if\nexists"]
+	//"Request field recalculation"->"Field inferrer"
+	//"Field inferrer"->"Inferrer"[label=""]
+	
+	// Inferrer shall not call requesters directly because, for example,
+	// it will be better to set those properties right when creating the body with b2BodyDef.
+	// The simulation might be less glitchy.
+	//"Inferrer"->"Request field recalculation"[label="if\nperf\nsuffices"]
+	
+	//"Inferrer"->"Detail with refs"[label="if\nperf\ninsufficient"]
+	//"Detail with refs"->"Get inferred value"
+}

@@ -59,7 +59,6 @@ option(BUILD_WINDOW_FRAMEWORK "Build code specific to a given platfom, e.g. wind
 option(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE "Add command to archive builds in Release." ${DEFAULT_OPT})
 option(ADD_APPLICATION_ICON "Add application icon." ${DEFAULT_OPT})
 
-#set(BUILD_TEST_SCENES OFF)
 # Other variables.
 
 # Where the game will save logs.

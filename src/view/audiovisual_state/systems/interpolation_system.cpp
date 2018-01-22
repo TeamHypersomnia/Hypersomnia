@@ -20,7 +20,11 @@ components::transform& interpolation_system::get_interpolated(const const_entity
 
 components::transform interpolation_system::get_interpolated(const const_entity_handle id) const {
 	if (enabled) {
-		return per_entity_cache[linear_cache_key(id)].interpolated_transform;
+		if (const auto& cache = per_entity_cache[linear_cache_key(id)];
+			cache.is_constructed()
+		) {
+			return cache.interpolated_transform;
+		}
 	}
 	
 	return id.get_logic_transform();

@@ -124,7 +124,7 @@ Note that now on_add and on_remove become obsolete because helper methods can de
 	- each cache defines ``using depends_on = type_list<items_of_bodies, ...>`` etc.
 		- on inference or destruction, iterate through all caches and reinfer them if they depend on the currently modified one  
 - use augs::introspect to reserve entities on all caches and later optionally reinfer all caches 
-- get_owner_body should return value from the inferred cache as technically an entity should always be inferred
+- get_owner_of_colliders should return value from the inferred cache as technically an entity should always be inferred
 	- the inferred cache should provide actual calculation from circumstances
 - separate a "custom_rigid_body_owner" component so that caches/components have 1:1 ratio
 	- so that fixtures cache does not need to construct both the relational and fixtural caches

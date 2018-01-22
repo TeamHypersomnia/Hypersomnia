@@ -66,7 +66,7 @@ void draw_debug_details(
 		}
 
 		if (const auto maybe_body = viewed_character.find<components::rigid_body>()) {
-			const auto vel = maybe_body.velocity();
+			const auto vel = maybe_body.get_velocity();
 
 			total_details += {
 				typesafe_sprintf(

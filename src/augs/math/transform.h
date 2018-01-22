@@ -168,6 +168,10 @@ struct basic_transform {
 	) const {
 		return pos.compare_abs(b.pos, positional_eps) && std::abs(rotation - b.rotation) <= rotational_eps;
 	}
+
+	bool negliglible() const {
+		return compare({});
+	}
 };
 
 namespace augs {

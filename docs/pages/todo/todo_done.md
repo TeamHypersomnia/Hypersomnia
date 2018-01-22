@@ -12,6 +12,11 @@
 		- we'd still need to cache this value and make more state associated
 
 ### Microplanned implementation order (done):  
+
+- Should rigid body synchronizer check whether the cache is constructed or always assume that it is?
+	- **We might later implement it so that a body might be absent under certain circumstances to save memory.**
+		- A single check does not hurt so we'll leave it as it is.
+
 - rename fundamental to always_present
 	- so that it is intuitive that there are no callbacks for adding and removing
 

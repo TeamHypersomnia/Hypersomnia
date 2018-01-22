@@ -73,7 +73,8 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 			;
 
 			if (should_send_damage) {
-				const auto subject_of_impact = subject_handle.get_owner_body().get<components::rigid_body>();
+				const auto subject_of_impact = subject_handle.get_owner_of_colliders().get<components::rigid_body>();
+				const auto subject_of_impact_mass_pos = subject_of_impact.get_mass_position(); 
 
 				vec2 impact_velocity = missile.custom_impact_velocity;
 
@@ -90,7 +91,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 						}
 					}
 
-					subject_of_impact.apply_force(vec2(impact_velocity).set_length(considered_impulse), it.point - subject_of_impact.get_mass_position());
+					subject_of_impact.apply_force(vec2(impact_velocity).set_length(considered_impulse), it.point - subject_of_impact_mass_pos);
 				}
 
 				missile.saved_point_of_impact_before_death = it.point;
@@ -178,7 +179,7 @@ void missile_system::detonate_expired_missiles(const logic_step step) {
 					particular_homing_target.alive() ? particular_homing_target : cosmos[get_closest_hostile(it, sender_attitude, 250, filters::bullet())]
 				;
 
-				const auto current_velocity = it.get<components::rigid_body>().velocity();
+				const auto current_velocity = it.get<components::rigid_body>().get_velocity();
 
 				it.set_logic_transform(step, { it.get_logic_transform().pos, current_velocity.degrees() });
 

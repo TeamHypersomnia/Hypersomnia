@@ -151,92 +151,13 @@ perform_transfer_result perform_transfer(
 		detail_add_item(target_slot, grabbed_item_part_handle);
 	}
 
-	const auto physics_updater = [&output, previous_container_transform, initial_transform_of_transferred, &cosmos](
-		const entity_handle descendant, 
-		auto... args
-	) {
-		const auto& cosmos = descendant.get_cosmos();
-
-		const auto slot = cosmos[descendant.get<components::item>().get_current_slot()];
-
-		entity_id owner_body = descendant;
-		bool should_fixtures_persist = true;
-		bool should_body_persist = true;
-		components::transform fixtures_offset;
-		components::transform force_joint_offset;
-		components::transform target_transform = initial_transform_of_transferred;
-		bool slot_requests_connection_of_bodies = false;
-
-		if (slot.alive()) {
-			should_fixtures_persist = slot.is_physically_connected_until();
-
-			if (should_fixtures_persist) {
-				const auto first_with_body = slot.get_first_ancestor_with_body_connection();
-
-				fixtures_offset = sum_attachment_offsets(cosmos, descendant.get_address_from_root(first_with_body));
-
-				if (slot->physical_behaviour == slot_physical_behaviour::CONNECT_AS_JOINTED_BODY) {
-					slot_requests_connection_of_bodies = true;
-					force_joint_offset = fixtures_offset;
-					target_transform = first_with_body.get_logic_transform() * force_joint_offset;
-					fixtures_offset.reset();
-				}
-				else {
-					should_body_persist = false;
-					owner_body = first_with_body;
-				}
-			}
-			else {
-				should_body_persist = false;
-				owner_body = descendant;
-			}
-		}
-
-		auto def = descendant.get<components::fixtures>().get_raw_component();
-		def.offsets_for_created_shapes[colliders_offset_type::ITEM_ATTACHMENT_DISPLACEMENT] = fixtures_offset;
-		def.activated = should_fixtures_persist;
-		def.owner_body = owner_body;
-
-		descendant.get<components::fixtures>() = def;
-
-		const auto rigid_body = descendant.get<components::rigid_body>();
-		rigid_body.set_activated(should_body_persist);
-
-		if (should_body_persist) {
-			rigid_body.set_transform(target_transform);
-			rigid_body.set_velocity({ 0.f, 0.f });
-			rigid_body.set_angular_velocity(0.f);
-		}
-
-		{
-			const auto motor_handle = descendant.get<components::motor_joint>();
-			components::motor_joint motor = motor_handle.get_raw_component();
-
-			if (slot_requests_connection_of_bodies) {
-				motor.activated = true;  
-				motor.target_bodies[0] = slot.get_container();
-				motor.target_bodies[1] = descendant;
-				motor.linear_offset = force_joint_offset.pos;
-				motor.angular_offset = force_joint_offset.rotation;
-				motor.collide_connected = false;
-			}
-			else {
-				motor.activated = false;  
-			}
-
-			motor_handle = motor;
-		}
-
-		messages::interpolation_correction_request request;
-		request.subject = descendant;
-		request.set_previous_transform_value = target_transform;
-		output.interpolation_corrected.push_back(request);
+	grabbed_item_part_handle.infer_colliders();
+	
+	grabbed_item_part_handle.for_each_contained_item_recursive([](entity_handle h, auto&&...){
+		h.infer_colliders();	
 
 		return recursive_callback_result::CONTINUE_AND_RECURSE;
-	};
-
-	physics_updater(grabbed_item_part_handle);
-	grabbed_item_part_handle.for_each_contained_item_recursive(physics_updater);
+	});
 
 	if (is_pickup) {
 		const auto target_capability = target_slot_container.get_owning_transfer_capability();
@@ -263,8 +184,8 @@ perform_transfer_result perform_transfer(
 
 		const auto rigid_body = grabbed_item_part_handle.get<components::rigid_body>();
 
-		// LOG_NVPS(rigid_body.velocity());
-		// ensure(rigid_body.velocity().is_epsilon());
+		// LOG_NVPS(rigid_body.get_velocity());
+		// ensure(rigid_body.get_velocity().is_epsilon());
 
 		rigid_body.set_velocity({ 0.f, 0.f });
 		rigid_body.set_angular_velocity(0.f);

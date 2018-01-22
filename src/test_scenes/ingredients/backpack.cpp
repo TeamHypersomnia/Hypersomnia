@@ -40,6 +40,7 @@ namespace test_types {
 
 			test_types::add_sprite(meta, logicals, assets::game_image_id::BACKPACK, white);
 			meta.add_shape_definition_from_renderable(logicals);
+			test_types::add_see_through_dynamic_body(meta);
 		}
 	}
 }
@@ -47,14 +48,13 @@ namespace test_types {
 namespace prefabs {
 	entity_handle create_sample_backpack(const logic_step step, vec2 pos) {
 		auto& world = step.get_cosmos();
-		const auto def = create_test_scene_entity(world, test_scene_type::SAMPLE_BACKPACK);
+		const auto backpack = create_test_scene_entity(world, test_scene_type::SAMPLE_BACKPACK);
 		const auto& metas = step.get_logical_assets();
 		
-		ingredients::add_backpack_container(def);
+		ingredients::add_backpack_container(backpack);
 
-		ingredients::add_see_through_dynamic_body(step, def, pos);
-		
-		def.add_standard_components(step);
-		return def;
+		backpack.set_logic_transform(step, pos);
+		backpack.add_standard_components(step);
+		return backpack;
 	}
 }

@@ -63,7 +63,7 @@ void car_system::apply_movement_forces(const logic_step step) {
 			auto& car = it.get<components::car>();
 			const auto rigid_body = it.get<components::rigid_body>();
 
-			const auto body_angle = rigid_body.get_angle();
+			const auto body_angle = rigid_body.get_degrees();
 			const vec2 forward_dir = vec2::from_degrees(body_angle);
 			const vec2 right_normal = forward_dir.perpendicular_cw();
 			
@@ -88,7 +88,7 @@ void car_system::apply_movement_forces(const logic_step step) {
 				rigid_body.apply_force(forward_tire_force * rigid_body.get_mass()/4, forward_dir * -off.x - vec2(right_normal).set_length(off.y));
 			}
 
-			const vec2 vel = rigid_body.velocity();
+			const vec2 vel = rigid_body.get_velocity();
 			const auto speed = vel.length();
 
 			vec2 lateral = right_normal * right_normal.dot(vel);
@@ -109,7 +109,7 @@ void car_system::apply_movement_forces(const logic_step step) {
 				base_damping += resultant.x > 0 ? 0.0f : car.braking_damping;
 			}
 
-			const float angular_velocity = rigid_body.get_angular_velocity();
+			const float angular_velocity = rigid_body.get_degree_velocity();
 			float base_angular_damping = 0.f;
 
 			if (car.braking_angular_damping >= 0.f) {
@@ -124,22 +124,22 @@ void car_system::apply_movement_forces(const logic_step step) {
 				}
 			}
 
-			rigid_body.set_linear_damping(base_damping);
-
 			if (lateral.length() > car.maximum_lateral_cancellation_impulse) {
 				lateral.set_length(car.maximum_lateral_cancellation_impulse);
 			}
 				
 			float angular_resistance = 0;
+			/* TODO: Handle damping in the calculators */
+			// rigid_body.set_linear_damping(base_damping);
 
 			if (!car.hand_brake) {
-				rigid_body.set_angular_damping(base_angular_damping + car.angular_damping);
+				// rigid_body.set_angular_damping(base_angular_damping + car.angular_damping);
 				rigid_body.apply_impulse(-lateral * rigid_body.get_mass() * car.lateral_impulse_multiplier);
 				angular_resistance = car.angular_air_resistance;
 			}
 			else {
 				angular_resistance = car.angular_air_resistance_while_hand_braking;
-				rigid_body.set_angular_damping(base_angular_damping + car.angular_damping_while_hand_braking);
+				// rigid_body.set_angular_damping(base_angular_damping + car.angular_damping_while_hand_braking);
 			}
 
 			if (forwardal_speed > car.minimum_speed_for_maneuverability_decrease) {

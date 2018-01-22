@@ -20,7 +20,6 @@ class cosmos;
 */
 
 class cosmic {
-	static void infer_caches_for(const entity_handle h);
 	static void destroy_caches_of(const entity_handle h);
 
 	static void infer_all_entities(cosmos& cosm);
@@ -49,7 +48,7 @@ public:
 	static void increment_step(cosmos&);
 
 	static void reinfer_all_entities(cosmos&);
-	static void reinfer_caches_of(const entity_handle h);
+	static void infer_caches_for(const entity_handle h);
 
 	template <class C, class F>
 	static void change_solvable_significant(C& cosm, F&& callback) {
@@ -62,15 +61,6 @@ public:
 		});
 
 		status = callback(cosm.get_solvable({}).significant);
-	}
-
-	template <class cache_type, class handle_type>
-	static void reinfer_cache(cache_type& sys, const handle_type handle) {
-		sys.destroy_cache_of(handle);
-
-		if (handle.is_inferred_state_activated()) {
-			sys.infer_cache_for(handle);
-		}
 	}
 };
 

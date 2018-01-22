@@ -122,9 +122,10 @@ void standard_explosion_input::instantiate(
 					if (is_yet_unaffected) {
 						const auto body_entity = cosmos[body_entity_id];
 						const auto& affected_physics = body_entity.get<components::rigid_body>();
+						const auto affected_physics_mass_pos = affected_physics.get_mass_position();
 
 						auto impact = (point_b - explosion_location.pos).set_length(impact_force);
-						const auto center_offset = (point_b - affected_physics.get_mass_position()) * 0.8f;
+						const auto center_offset = (point_b - affected_physics_mass_pos) * 0.8f;
 
 						messages::damage_message damage_msg;
 						damage_msg.type = type;
@@ -144,12 +145,12 @@ void standard_explosion_input::instantiate(
 
 								if (DEBUG_DRAWING.draw_explosion_forces) {
 									DEBUG_PERSISTENT_LINES.emplace_back(cyan,
-										affected_physics.get_mass_position() + center_offset,
-										affected_physics.get_mass_position() + center_offset + impact
+										affected_physics_mass_pos + center_offset,
+										affected_physics_mass_pos + center_offset + impact
 									);
 								}
 
-								// LOG("Impact %x dealt to: %x. Resultant angular: %x", impact, body_entity.get_name(), affected_physics.get_angular_velocity());
+								// LOG("Impact %x dealt to: %x. Resultant angular: %x", impact, body_entity.get_name(), affected_physics.get_degree_velocity());
 							}
 							break;
 

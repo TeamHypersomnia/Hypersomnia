@@ -17,27 +17,20 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
 
-
 void unset_input_flags_of_orphaned_entity(entity_handle e) {
-	auto* const gun = e.find<components::gun>();
-	auto* const melee = e.find<components::melee>();
-	auto* const car = e.find<components::car>();
-	auto* const movement = e.find<components::movement>();
-	auto* const damage = e.find<components::missile>();
-
-	if (car) {
+	if (auto* const car = e.find<components::car>()) {
 		car->reset_movement_flags();
 	}
 
-	if (movement) {
+	if (auto* const movement = e.find<components::movement>()) {
 		movement->reset_movement_flags();
 	}
 
-	if (gun) {
+	if (auto* const gun = e.find<components::gun>()) {
 		gun->is_trigger_pressed = false;
 	}
 
-	if (melee) {
+	if (auto* const melee = e.find<components::melee>()) {
 		melee->reset_weapon(e);
 	}
 }
@@ -69,7 +62,7 @@ identified_danger assess_danger(
 
 	const auto victim_pos = victim.get_logic_transform().pos;
 	const auto danger_pos = danger.get_logic_transform().pos;
-	const auto danger_vel = danger.get_owner_body().get_effective_velocity();
+	const auto danger_vel = danger.get_owner_of_colliders().get_effective_velocity();
 	const auto danger_speed = danger_vel.length();
 	const auto danger_dir = (danger_pos - victim_pos);
 	const float danger_distance = danger_dir.length();

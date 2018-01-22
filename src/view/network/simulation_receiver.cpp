@@ -111,8 +111,8 @@ misprediction_candidate_entry simulation_receiver::acquire_potential_mispredicti
 ) const {
 	misprediction_candidate_entry candidate;
 	
-	if (e.has_logic_transform()) {
-		candidate.transform = e.get_logic_transform();
+	if (const auto transform = e.find_logic_transform()) {
+		candidate.transform = *transform;
 	}
 
 	candidate.id = e.get_id();
@@ -158,35 +158,36 @@ void simulation_receiver::drag_mispredictions_into_past(
 	for (const auto e : mispredictions) {
 		const const_entity_handle reconciliated_entity = predicted_cosmos[e.id];
 		
-		const bool identity_matches = reconciliated_entity.alive() && reconciliated_entity.has_logic_transform();
-
-		if (!identity_matches) {
+		if (reconciliated_entity.dead()) {
 			continue;
 		}
 
-		const auto& reconciliated_transform = reconciliated_entity.get_logic_transform();
-		const bool is_contagious_agent = reconciliated_entity.get_flag(entity_flag::IS_PAST_CONTAGIOUS);
-		const bool should_smooth_rotation = !is_contagious_agent || predicted_cosmos[reconciliated_entity.get<components::driver>().owned_vehicle].alive();
+		if (const auto maybe_transform = reconciliated_entity.find_logic_transform()) {
+			/* Identity matches */
+			const auto reconciliated_transform = *maybe_transform;
+			const bool is_contagious_agent = reconciliated_entity.get_flag(entity_flag::IS_PAST_CONTAGIOUS);
+			const bool should_smooth_rotation = !is_contagious_agent || predicted_cosmos[reconciliated_entity.get<components::driver>().owned_vehicle].alive();
 
-		auto& interp_data = interp.get_cache_of(reconciliated_entity);
+			auto& interp_data = interp.get_cache_of(reconciliated_entity);
 
-		const bool shouldnt_smooth = reconciliated_entity.has<components::crosshair>();
-		bool misprediction_detected = false;
+			const bool shouldnt_smooth = reconciliated_entity.has<components::crosshair>();
+			bool misprediction_detected = false;
 
-		const float num_predicted_steps = static_cast<float>(predicted_step_entropies.size());
+			const float num_predicted_steps = static_cast<float>(predicted_step_entropies.size());
 
-		if (!shouldnt_smooth && (reconciliated_transform.pos - e.transform.pos).length_sq() > 1.f) {
-			interp_data.positional_slowdown_multiplier = std::max(1.f, settings.misprediction_smoothing_multiplier * num_predicted_steps);
-			misprediction_detected = true;
-		}
+			if (!shouldnt_smooth && (reconciliated_transform.pos - e.transform.pos).length_sq() > 1.f) {
+				interp_data.positional_slowdown_multiplier = std::max(1.f, settings.misprediction_smoothing_multiplier * num_predicted_steps);
+				misprediction_detected = true;
+			}
 
-		if (should_smooth_rotation && std::abs(reconciliated_transform.rotation - e.transform.rotation) > 1.f) {
-			interp_data.rotational_slowdown_multiplier = std::max(1.f, settings.misprediction_smoothing_multiplier * num_predicted_steps);
-			misprediction_detected = true;
-		}
+			if (should_smooth_rotation && std::abs(reconciliated_transform.rotation - e.transform.rotation) > 1.f) {
+				interp_data.rotational_slowdown_multiplier = std::max(1.f, settings.misprediction_smoothing_multiplier * num_predicted_steps);
+				misprediction_detected = true;
+			}
 
-		if (identity_matches || (!misprediction_detected && !is_contagious_agent)) {
-			past.uninfect(reconciliated_entity);
+			if (!misprediction_detected && !is_contagious_agent) {
+				past.uninfect(reconciliated_entity);
+			}
 		}
 	}
 }

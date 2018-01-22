@@ -12,10 +12,37 @@ digraph G {
 		Blue edge - calls [target node label] of one or more entities
 	*/
 
+	/*
+		Theoretically, there is no need for incremental inferrer if,
+		at the point of reinferring a single field, we require to exactly and perfectly determine
+		all other fields, in children on not, calculated with help of the now modified field, and call relevant updaters.
+		
+		With such explicit field recalculators, we can always be specific as to what changes. 
+		Duplicate code may arise, but we have perfect control with regards to caches.
+
+		With incremental inferrer that checks for modifications, we may manage dependencies in one place, 
+		but have potentially less control with speed of updates (since we don't have to needlessly compare for change if we know everything).
+		Obviously, incremental inferrer updates dependent caches only if the value has changed. Otherwise it shall set it without checking.
+
+		We can always go with incremental inferrers first as it will simplify code, and then wherever there are bottlenecks,
+		just introduce explicit inferrers of that single field. 
+		For other fields that we know have no dependencies in signi or remote caches (e.g. transform, velocity)
+		we can expose direct setters. (also for application of forces)
+		This also has the advantage of simplifying the relation between cache destructors and inferrers. 
+
+		Notice that incremental inferrer will never update too much! 
+		Because it will always check for what value there is in the cache already.
+		
+		E.g. even if we call the entire fixtural inferrer whenever the subject starts driving a car,
+		it will anyway be detected that the fixtures should still exist and only that their density changed.
+	*/
+
 	ordering=out;
 	"Decremental cache dtor"->"Cache children calc"
 	"Children vectors"[color=red]
 	"Children vectors"->"Cache children calc"[color=red]
+	"Signi children calc"[color=blue]
+	"Cache children calc"[color=blue]
 	
 	"Decremental cache dtor"->"Cache class dtor"
 	"Decremental cache dtor"->"Incremental inferrer"[color=blue]

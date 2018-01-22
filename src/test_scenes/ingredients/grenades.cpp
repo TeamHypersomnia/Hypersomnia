@@ -36,6 +36,8 @@ namespace test_types {
 			}
 			test_types::add_sprite(meta, logicals, assets::game_image_id::FORCE_GRENADE, white);
 			meta.add_shape_definition_from_renderable(logicals);
+			test_types::add_see_through_dynamic_body(meta);
+
 		}
 
 		{
@@ -53,6 +55,7 @@ namespace test_types {
 			}
 			test_types::add_sprite(meta, logicals, assets::game_image_id::INTERFERENCE_GRENADE, white);
 			meta.add_shape_definition_from_renderable(logicals);
+			test_types::add_see_through_dynamic_body(meta);
 
 		}
 
@@ -71,6 +74,7 @@ namespace test_types {
 			}
 			test_types::add_sprite(meta, logicals, assets::game_image_id::PED_GRENADE, white);
 			meta.add_shape_definition_from_renderable(logicals);
+			test_types::add_see_through_dynamic_body(meta);
 		}
 	}
 }
@@ -97,8 +101,6 @@ namespace prefabs {
 		in.sound_gain = 1.8f;
 		in.sound_effect = assets::sound_buffer_id::GREAT_EXPLOSION;
 
-		ingredients::add_see_through_dynamic_body(step, grenade_entity, pos);
-
 		explosive.released_image_id = assets::game_image_id::FORCE_GRENADE_RELEASED;
 		explosive.released_physical_material = assets::physical_material_id::GRENADE;
 
@@ -110,6 +112,7 @@ namespace prefabs {
 
 		grenade_entity += shape_circle;
 
+		grenade_entity.set_logic_transform(step, pos);
 		grenade_entity.add_standard_components(step);
 
 		return grenade_entity;
@@ -137,8 +140,6 @@ namespace prefabs {
 		in.type = adverse_element_type::PED;
 		in.create_thunders_effect = true;
 
-		ingredients::add_see_through_dynamic_body(step, grenade_entity, pos);
-
 		auto& item = ingredients::make_item(grenade_entity);
 		item.space_occupied_per_charge = to_space_units("0.6");
 
@@ -150,6 +151,7 @@ namespace prefabs {
 
 		grenade_entity += shape_circle;
 
+		grenade_entity.set_logic_transform(step, pos);
 		grenade_entity.add_standard_components(step);
 
 		return grenade_entity;
@@ -177,8 +179,6 @@ namespace prefabs {
 		in.sound_effect = assets::sound_buffer_id::INTERFERENCE_EXPLOSION;
 		in.type = adverse_element_type::INTERFERENCE;
 
-		ingredients::add_see_through_dynamic_body(step, grenade_entity, pos);
-
 		auto& item = ingredients::make_item(grenade_entity);
 		item.space_occupied_per_charge = to_space_units("0.6");
 		
@@ -190,6 +190,7 @@ namespace prefabs {
 
 		grenade_entity += shape_circle;
 
+		grenade_entity.set_logic_transform(step, pos);
 		grenade_entity.add_standard_components(step);
 
 		return grenade_entity;

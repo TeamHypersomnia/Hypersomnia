@@ -65,6 +65,8 @@ namespace test_types {
 					meta.set(trace_def);
 				}
 			}
+
+			test_types::add_bullet_round_physics(meta);
 		}
 
 		{
@@ -79,6 +81,7 @@ namespace test_types {
 
 			test_types::add_sprite(meta, logicals, assets::game_image_id::CYAN_SHELL, white);
 			meta.add_shape_definition_from_renderable(logicals);
+			test_types::add_shell_dynamic_body(meta);
 		}
 
 		{
@@ -93,6 +96,7 @@ namespace test_types {
 
 			test_types::add_sprite(meta, logicals, assets::game_image_id::CYAN_CHARGE, white);
 			meta.add_shape_definition_from_renderable(logicals);
+			test_types::add_see_through_dynamic_body(meta);
 		}
 
 		{
@@ -107,6 +111,7 @@ namespace test_types {
 
 			test_types::add_sprite(meta, logicals, assets::game_image_id::SAMPLE_MAGAZINE, white);
 			meta.add_shape_definition_from_renderable(logicals);
+			test_types::add_see_through_dynamic_body(meta);
 		}
 
 		{
@@ -180,6 +185,8 @@ namespace test_types {
 
 				meta.set(trace_def);
 			}
+
+			test_types::add_bullet_round_physics(meta);
 		}
 
 		{
@@ -224,6 +231,7 @@ namespace test_types {
 
 			test_types::add_sprite(meta, logicals, assets::game_image_id::ASSAULT_RIFLE, white);
 			meta.add_shape_definition_from_renderable(logicals);
+			test_types::add_see_through_dynamic_body(meta);
 		}
 
 		{
@@ -264,6 +272,7 @@ namespace test_types {
 
 			test_types::add_sprite(meta, logicals, assets::game_image_id::KEK9, white);
 			meta.add_shape_definition_from_renderable(logicals);
+			test_types::add_see_through_dynamic_body(meta);
 		}
 
 		{
@@ -293,6 +302,7 @@ namespace test_types {
 
 			test_types::add_sprite(meta, logicals, assets::game_image_id::AMPLIFIER_ARM, white);
 			meta.add_shape_definition_from_renderable(logicals);
+			test_types::add_see_through_dynamic_body(meta);
 		}
 	}
 }
@@ -305,11 +315,16 @@ namespace prefabs {
 
 		auto weapon = create_test_scene_entity(cosmos, test_scene_type::SAMPLE_RIFLE);
 
-		ingredients::add_see_through_dynamic_body(step, weapon, pos);
 		ingredients::add_default_gun_container(step, weapon);
 
 		auto& gun = weapon.get<components::gun>();
 		auto& gun_def = weapon.get_def<definitions::gun>();
+
+
+		// add_muzzle_particles(weapon, gun, step);
+
+		weapon.set_logic_transform(step, pos);
+		weapon.add_standard_components(step);
 
 		{
 			sound_existence_input in;
@@ -321,10 +336,6 @@ namespace prefabs {
 			gun.firing_engine_sound = engine_sound;
 			components::sound_existence::deactivate(engine_sound);
 		}
-
-		// add_muzzle_particles(weapon, gun, step);
-
-		weapon.add_standard_components(step);
 
 		if (load_mag.alive()) {
 			perform_transfer({ load_mag, weapon[slot_function::GUN_DETACHABLE_MAGAZINE] }, step);
@@ -344,11 +355,15 @@ namespace prefabs {
 
 		auto weapon = create_test_scene_entity(cosmos, test_scene_type::KEK9);
 
-		ingredients::add_see_through_dynamic_body(step, weapon, pos);
 		ingredients::add_default_gun_container(step, weapon, 0.f, true);
 
 		auto& gun = weapon.get<components::gun>();
 		auto& gun_def = weapon.get_def<definitions::gun>();
+
+		// add_muzzle_particles(weapon, gun, step);
+
+		weapon.set_logic_transform(step, pos);
+		weapon.add_standard_components(step);
 
 		{
 			sound_existence_input in;
@@ -360,10 +375,6 @@ namespace prefabs {
 			gun.firing_engine_sound = engine_sound;
 			components::sound_existence::deactivate(engine_sound);
 		}
-
-		// add_muzzle_particles(weapon, gun, step);
-
-		weapon.add_standard_components(step);
 
 		if (load_mag.alive()) {
 			perform_transfer({ load_mag, weapon[slot_function::GUN_DETACHABLE_MAGAZINE] }, step);
@@ -381,19 +392,16 @@ namespace prefabs {
 		auto& cosmos = step.get_cosmos();
 		auto weapon = create_test_scene_entity(cosmos, test_scene_type::AMPLIFIER_ARM);
 
-		ingredients::add_see_through_dynamic_body(step, weapon, pos);
-
 		auto& item = ingredients::make_item(weapon);
 		item.space_occupied_per_charge = to_space_units("3.0");
 
 		auto& gun = weapon.get<components::gun>();
 
+		weapon.set_logic_transform(step, pos);
 		weapon.add_standard_components(step);
 
 		{
 			const auto arm_missile = create_test_scene_entity(cosmos, test_scene_type::AMPLIFIER_ARM_MISSILE);
-
-			ingredients::add_bullet_round_physics(step, arm_missile, pos);
 
 			auto& sender = arm_missile += components::sender();
 			auto& missile = arm_missile += components::missile();
@@ -492,8 +500,6 @@ namespace prefabs {
 		
 
 		{
-			ingredients::add_see_through_dynamic_body(step, sample_magazine, pos);
-
 			auto& item = ingredients::make_item(sample_magazine);
 			auto& container = sample_magazine += components::container();
 
@@ -507,6 +513,7 @@ namespace prefabs {
 			container.slots[slot_function::ITEM_DEPOSIT] = charge_deposit_def;
 		}
 
+		sample_magazine.set_logic_transform(step, pos);
 		sample_magazine.add_standard_components(step);
 
 		if (charge_inside.alive()) {
@@ -526,8 +533,6 @@ namespace prefabs {
 		const auto& metas = step.get_logical_assets();
 
 		{
-			ingredients::add_see_through_dynamic_body(step, cyan_charge, pos);
-
 			auto& item = ingredients::make_item(cyan_charge);
 			item.space_occupied_per_charge = to_space_units("0.01");
 			item.categories_for_slot_compatibility.set(item_category::SHOT_CHARGE);
@@ -541,8 +546,6 @@ namespace prefabs {
 		}
 
 		{
-			ingredients::add_bullet_round_physics(step, round_definition, pos);
-
 			auto& sender = round_definition += components::sender();
 			auto& missile = round_definition += components::missile();
 
@@ -568,13 +571,10 @@ namespace prefabs {
 			missile.destruction_sound.id = assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION;
 		}
 
-		{
-			ingredients::add_shell_dynamic_body(step, shell_definition, pos);
-		}
-
 		cyan_charge.map_child_entity(child_entity_name::CATRIDGE_BULLET, round_definition);
 		cyan_charge.map_child_entity(child_entity_name::CATRIDGE_SHELL, shell_definition);
 
+		cyan_charge.set_logic_transform(step, pos);
 		cyan_charge.add_standard_components(step);
 
 		return cyan_charge;

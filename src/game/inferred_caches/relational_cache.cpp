@@ -42,37 +42,9 @@ void relational_cache::infer_cache_for(const const_entity_handle h) {
 		}
 	}
 
-	if (const auto fixtures = h.find<components::fixtures>();
-		fixtures != nullptr && fixtures.is_activated()
-	) {
-		const auto owner_body = fixtures.get_owner_body();
-		ensure(!fixtures_of_bodies.is_child_constructed(h, owner_body));
-		fixtures_of_bodies.set_parent(h, owner_body);
-	}
-
-	if (const auto motor_joint = h.find<components::motor_joint>();
-		motor_joint != nullptr && motor_joint.is_activated()
-	) {
-		static_assert(std::is_same_v<std::array<unversioned_entity_id, 2>, decltype(joints_of_bodies)::parent_array_type>, "Make it work for more joints plx");
-		
-		const auto bodies = motor_joint.get_target_bodies();
-
-		const auto& cosmos = h.get_cosmos();
-
-		ensure(!joints_of_bodies.is_child_constructed(h, cosmos[bodies[0]], 0));
-		ensure(!joints_of_bodies.is_child_constructed(h, cosmos[bodies[1]], 1));
-
-		ensure(cosmos[bodies[0]].alive());
-		ensure(cosmos[bodies[1]].alive());
-
-		joints_of_bodies.set_parents(
-			h, 
-			std::array<unversioned_entity_id, 2> { 
-				bodies[0], 
-				bodies[1] 
-			} 
-		);
-	}
+	/*
+		The physics system tracks the joints of bodies and fixtures of bodies for us.
+	*/
 }
 
 void relational_cache::destroy_cache_of(const const_entity_handle h) {

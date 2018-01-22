@@ -48,6 +48,18 @@ namespace test_types {
 				flags_def.values.set(entity_flag::IS_PAST_CONTAGIOUS);
 				meta.set(flags_def);
 			}
+
+			definitions::rigid_body body;
+			definitions::fixtures group;
+
+			body.angled_damping = true;
+			body.allow_sleep = false;
+
+			group.filter = filters::controlled_character();
+			group.density = 1.0;
+
+			meta.set(body);
+			meta.set(group);
 		}
 
 		{
@@ -60,6 +72,21 @@ namespace test_types {
 			add_sprite(meta, logicals, assets::game_image_id::TEST_CROSSHAIR);
 
 			meta.add_shape_definition_from_renderable(logicals);
+
+			definitions::rigid_body body;
+			definitions::fixtures group;
+
+			body.damping.linear = 5;
+			body.damping.angular = 5;
+
+			group.filter = filters::none();
+			//group.filter.categoryBits = 0;
+			group.density = 0.1f;
+			group.sensor = true;
+			group.material = assets::physical_material_id::METAL;
+
+			meta.set(body);
+			meta.set(group);
 		}
 	}
 }
@@ -81,29 +108,7 @@ namespace ingredients {
 	}
 
 	void add_character_head_physics(const logic_step step, const entity_handle e, const components::transform spawn_transform) {
-		components::rigid_body body;
-		body.fixed_rotation = false;
-		body.angled_damping = true;
-		body.allow_sleep = false;
-		const auto si = step.get_cosmos().get_si();
-
-		body.set_transform(si, spawn_transform);
-
 		add_character_movement(e);
-
-		e += body;
-
-		components::fixtures group;
-
-		group.filter = filters::controlled_character();
-		group.density = 1.0;
-
-		e  += group;
-		e.get<components::fixtures>().set_owner_body(e);
-	}
-
-	void add_character_legs(const entity_handle legs, const entity_handle player) {
-		components::animation animation;
 	}
 
 	void add_character(const all_logical_assets& metas, const entity_handle e, const entity_handle crosshair_entity) {
@@ -111,7 +116,6 @@ namespace ingredients {
 		auto& movement = e += components::movement();
 		auto& rotation_copying = e += components::rotation_copying();
 		auto& driver = e += components::driver();
-		components::motor_joint force_joint;
 		auto& sentience = e += components::sentience();
 		e += components::position_copying(); // used when it is an astral body
 		
@@ -136,11 +140,6 @@ namespace ingredients {
 
 		processing.disable_in(processing_subjects::WITH_FORCE_JOINT);
 
-		force_joint.max_force = 800000.f;
-		force_joint.max_torque = 2000.f;
-		force_joint.correction_factor = 0.8f;
-		force_joint.activated = false;
-		e += force_joint;
 		//force_joint.force_towards_chased_entity = 92000.f;
 		//force_joint.distance_when_force_easing_starts = 10.f;
 		//force_joint.power_of_force_easing_multiplier = 2.f;
@@ -183,10 +182,11 @@ namespace prefabs {
 
 		ingredients::add_character_head_inventory(step, character);
 
+		character.add_standard_components(step);
 
 		{
 			particles_existence_input effect;
-			
+
 			effect.effect.id = assets::particle_effect_id::HEALTH_DAMAGE_SPARKLES;
 			effect.delete_entity_after_effect_lifetime = false;
 
@@ -200,8 +200,6 @@ namespace prefabs {
 			character.get<components::sentience>().health_damage_particles = particles;
 			components::particles_existence::deactivate(particles);
 		}
-
-		character.add_standard_components(step);
 		// LOG("Character mass: %x", character.get<components::rigid_body>().get_mass());
 		return character;
 	}
@@ -226,10 +224,6 @@ namespace prefabs {
 		{
 			auto& force_joint = recoil += components::force_joint();
 			zero_target += components::transform();
-			components::rigid_body body;
-
-			body.linear_damping = 5;
-			body.angular_damping = 5;
 
 			force_joint.chased_entity = zero_target;
 			//force_joint.consider_rotation = false;
@@ -237,19 +231,6 @@ namespace prefabs {
 			//force_joint.force_towards_chased_entity = 1000.f;
 			//force_joint.power_of_force_easing_multiplier = 1.f;
 			force_joint.divide_transform_mode = true;
-
-			recoil += body;
-
-			components::fixtures group;
-
-			group.filter = filters::none();
-			//group.filter.categoryBits = 0;
-			group.density = 0.1f;
-			group.sensor = true;
-			group.material = assets::physical_material_id::METAL;
-
-			recoil += group;
-			recoil.get<components::fixtures>().set_owner_body(recoil);
 		}
 
 		root.map_child_entity(child_entity_name::CROSSHAIR_RECOIL_BODY, recoil);

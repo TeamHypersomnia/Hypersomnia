@@ -120,14 +120,6 @@ namespace ingredients {
 	components::item& make_item(const entity_handle e) {
 		auto& item = e += components::item();
 
-		components::motor_joint motor;
-		motor.activated = false;
-		motor.max_force = 20000.f;
-		motor.max_torque = 2000.f;
-		motor.correction_factor = 0.9f;
-
-		e += motor;
-		
 		return item;
 	}
 }

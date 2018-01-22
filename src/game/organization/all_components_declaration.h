@@ -16,6 +16,8 @@ namespace definitions {
 	struct trace;
 	struct interpolation;
 	struct flags;
+	struct fixtures;
+	struct rigid_body;
 }
 
 namespace components {
@@ -32,7 +34,7 @@ namespace components {
 	struct rigid_body;
 	struct car;
 	struct driver;
-	struct fixtures;
+	struct specific_body_owner;
 	struct container;
 	struct item;
 	struct force_joint;
@@ -73,10 +75,10 @@ using component_list_t = List<
 	components::particles_existence,
 	components::pathfinding,
 	components::rigid_body,
+	components::specific_body_owner,
 	components::transform,
 	components::car,
 	components::driver,
-	components::fixtures,
 	components::container,
 	components::item,
 	components::force_joint,
@@ -112,7 +114,9 @@ using definition_list_t = List<
 	definitions::sprite,
 	definitions::trace,
 	definitions::flags,
-	definitions::interpolation
+	definitions::interpolation,
+	definitions::fixtures,
+	definitions::rigid_body
 >;
 
 template <class... Types>

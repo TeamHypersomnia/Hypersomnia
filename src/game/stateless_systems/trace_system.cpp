@@ -80,15 +80,13 @@ void trace_system::spawn_finishing_traces_for_deleted_entities(const logic_step 
 
 		const auto* const trace = deleted_entity.find<components::trace>();
 
-		if (
-			deleted_entity.is_inferred_state_activated()
-			&& trace != nullptr
+		if (trace != nullptr
 			&& !trace->is_it_a_finishing_trace
 		) {
 			const auto& trace_def = deleted_entity.get_def<definitions::trace>();
 
 			const auto finishing_trace = cosmic::create_entity(cosmos, trace_def.finishing_trace_type);
-			
+		
 			auto transform_of_finishing = deleted_entity.get_logic_transform();
 
 			if (deleted_entity.find<components::missile>()) {

@@ -37,7 +37,7 @@ void driver_system::assign_drivers_who_touch_wheels(const logic_step step) {
 		const auto maybe_driver = driver.find<components::driver>();
 
 		if (maybe_driver != nullptr && maybe_driver->take_hold_of_wheel_when_touched) {
-			const auto car = cosmos[e.collider].get_owner_body();
+			const auto car = cosmos[e.collider].get_owner_of_colliders();
 			const auto maybe_car = car.find<components::car>();
 
 			if(maybe_car != nullptr) {
@@ -58,7 +58,7 @@ void driver_system::release_drivers_due_to_ending_contact_with_wheel(const logic
 	for (const auto& c : contacts) {
 		if (c.type == messages::collision_message::event_type::END_CONTACT) {
 			const auto& driver = cosmos[c.subject];
-			const auto& car = cosmos[c.collider].get_owner_body();
+			const auto& car = cosmos[c.collider].get_owner_of_colliders();
 
 			const auto* const maybe_driver = driver.find<components::driver>();
 
@@ -118,7 +118,6 @@ bool driver_system::change_car_ownership(
 	const auto maybe_rigid_body = driver_entity.find<components::rigid_body>();
 	const bool has_physics = maybe_rigid_body != nullptr;
 	auto* const maybe_movement = driver_entity.find<components::movement>();
-	auto force_joint = driver_entity.get<components::motor_joint>().get_raw_component();
 
 	if (const bool new_ownership = car_entity.alive()) {
 		auto& car = car_entity.get<components::car>();
@@ -135,10 +134,11 @@ bool driver_system::change_car_ownership(
 
 		car.last_turned_on = cosmos.get_timestamp();
 
+#if TODO
 		force_joint.target_bodies[0] = driver_entity;
 		force_joint.target_bodies[1] = car.left_wheel_trigger;
 		force_joint.activated = true;
-		driver_entity.get<components::motor_joint>() = force_joint;
+#endif
 
 		if (maybe_movement) {
 			maybe_movement->reset_movement_flags();
@@ -155,7 +155,9 @@ bool driver_system::change_car_ownership(
 		if (has_physics) {
 			//maybe_rigid_body.set_transform(car.left_wheel_trigger);
 			//maybe_rigid_body.set_velocity(vec2(0, 0));
+#if TODO
 			resolve_density_of_associated_fixtures(driver_entity);
+#endif
 		}
 	}
 	else if (
@@ -169,8 +171,9 @@ bool driver_system::change_car_ownership(
 		driver.owned_vehicle.unset();
 		car.current_driver.unset();
 
+#if TODO
 		force_joint.activated = false;
-		driver_entity.get<components::motor_joint>() = force_joint;
+#endif
 
 		if (maybe_movement) {
 			maybe_movement->reset_movement_flags();
@@ -190,7 +193,9 @@ bool driver_system::change_car_ownership(
 		}
 
 		if (has_physics) {
+#if TODO
 			resolve_density_of_associated_fixtures(driver_entity);
+#endif
 		}
 	}
 

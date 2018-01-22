@@ -15,10 +15,6 @@ void aabb_highlighter::update(const augs::delta dt) {
 }
 
 bool aabb_highlighter::is_hoverable(const const_entity_handle e) {
-	if (!e.is_inferred_state_activated()) {
-		return false;
-	}
-
 	if (const auto maybe_render = e.find_def<definitions::render>()) {
 		switch (maybe_render->layer) {
 			case render_layer::SMALL_DYNAMIC_BODY: return true;

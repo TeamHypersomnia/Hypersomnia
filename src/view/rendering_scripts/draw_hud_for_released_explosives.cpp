@@ -19,10 +19,6 @@ void draw_hud_for_released_explosives(const draw_hud_for_released_explosives_inp
 		[&](const const_entity_handle it) {
 			const components::hand_fuse& hand_fuse = it.get<components::hand_fuse>();
 
-			if (!it.get<components::fixtures>().is_activated()) {
-				return;
-			}
-
 			if (hand_fuse.when_detonates.was_set()) {
 				const auto highlight_amount = static_cast<float>(1 - (
 					(in.global_time_seconds - hand_fuse.when_released.in_seconds(dt))

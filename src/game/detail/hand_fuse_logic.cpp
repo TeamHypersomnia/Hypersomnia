@@ -70,18 +70,17 @@ void release_or_throw_fused_object(
 			fused_entity.get<components::sprite>().set(
 				explosive.released_image_id, metas
 			);
-#endif
 
+			rigid_body.set_linear_damping(3.0f);
+			rigid_body.set_bullet_body(true);
 			const auto rigid_body = fused_entity.get<components::rigid_body>();
 			
-			//ensure(rigid_body.velocity().is_epsilon());
+			//ensure(rigid_body.get_velocity().is_epsilon());
 
 			rigid_body.set_velocity({ 0.f, 0.f });
 			rigid_body.set_angular_velocity(0.f);
 			rigid_body.apply_angular_impulse(1.5f * rigid_body.get_mass());
 			rigid_body.apply_impulse(vec2::from_degrees(fused_entity.get_logic_transform().rotation) * 5000 * rigid_body.get_mass());
-			rigid_body.set_bullet_body(true);
-			rigid_body.set_linear_damping(3.0f);
 
 			const auto fixtures = fused_entity.get<components::fixtures>();
 			
@@ -99,8 +98,6 @@ void release_or_throw_fused_object(
 			
 			fixtures = new_def;
 
-#if TODO
-			// TODO: this information will be specified by another type
 			fused_entity.get<components::shape_polygon>().set_activated(false);
 			fused_entity.get<components::shape_circle>().set_activated(true);
 #endif

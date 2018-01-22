@@ -8,14 +8,10 @@
 class relational_cache {
 public:
 	augs::children_vector_tracker<entity_id, inventory_slot_id, 1> items_of_slots;
-	augs::children_vector_tracker<unversioned_entity_id, unversioned_entity_id, 1> fixtures_of_bodies;
-	augs::children_vector_tracker<unversioned_entity_id, unversioned_entity_id, 2> joints_of_bodies;
 
 	template <class F>
 	void for_each_tracker(F f) {
 		f(items_of_slots);
-		f(fixtures_of_bodies);
-		f(joints_of_bodies);
 	}
 
 	void infer_cache_for(const const_entity_handle);
@@ -28,21 +24,6 @@ public:
 		const inventory_slot_id new_slot
 	) {
 		items_of_slots.set_parent(item, new_slot);
-	}
-
-	void set_fixtures_parent(
-		const entity_id fixtures, 
-		const entity_id new_owner
-	) {
-		fixtures_of_bodies.set_parent(fixtures, new_owner);
-	}
-
-	const auto& get_fixtures_of_bodies() const {
-		return fixtures_of_bodies;
-	}
-
-	const auto& get_joints_of_bodies() const {
-		return joints_of_bodies;
 	}
 
 	const auto& get_items_of_slots() const {

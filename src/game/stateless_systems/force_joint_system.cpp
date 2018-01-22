@@ -76,11 +76,11 @@ void force_joint_system::apply_forces_towards_target_entities(const logic_step s
 						rigid_body.apply_force(force_for_chaser * rigid_body.get_mass() / offsets_count, offset);
 					}
 
-					//LOG("F: %x, %x, %x", force_for_chaser, rigid_body.velocity(), rigid_body.get_position());
+					//LOG("F: %x, %x, %x", force_for_chaser, rigid_body.get_velocity(), rigid_body.get_position());
 				}
-				//else if (is_force_epsilon && rigid_body.velocity().is_epsilon(1.f)) {
+				//else if (is_force_epsilon && rigid_body.get_velocity().is_epsilon(1.f)) {
 				//	rigid_body.set_velocity(vec2(0, 0));
-				//	//rigid_body.set_transform(components::transform(chased_transform.pos, rigid_body.get_angle()));
+				//	//rigid_body.set_transform(components::transform(chased_transform.pos, rigid_body.get_degrees()));
 				//	LOG("Zeroed");
 				//}
 

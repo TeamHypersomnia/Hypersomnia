@@ -26,7 +26,7 @@ Those approaches to command implementation have been considered so far:
         - If the author has jumped once 10 commands back, their further actions and recordings might result in a different cosmos than if they would have just repeated undo ten times.
         - Solved if both redos and undos are reinferred completely.
     - Memory and processing performance is ok. 
-    - If we accidentally forget to reinfer something, some state might be corrupted and even result in a crash.
+    - If we accidentally forget to infer something, some state might be corrupted and even result in a crash.
 
 Further: commands, whether they are redone or executed for the first time, should do so via the same method: redo.
 This wouldn't be acceptable only if the redo performance was for some reason unacceptable.
@@ -72,16 +72,16 @@ No other considerations are needed at this point.
 - What do we store?
     - whole significant + inferred - maximum determinism, no bugs, unacceptable performance
     - only whole significant...
-        - ...and incrementally reinfer redos - unacceptable performance, slightly less determinism, some bugs possible
+        - ...and incrementally infer redos - unacceptable performance, slightly less determinism, some bugs possible
         - ...and completely reinfer redos - even more unacceptable performance, maximum determinism, some bugs possible
         - undos have to be completely reinferred either way
     - only the new value and the old value...
-        - ...and incrementally reinfer redos, incrementally reinfer undos - best performance, poor determinism, some bugs possible
+        - ...and incrementally infer redos, incrementally infer undos - best performance, poor determinism, some bugs possible
         - ...and completely reinfer redos, completely reinfer undos - slightly worse processing performance due to reinferences, maximum determinism, less bugs possible
             - note that complete reinference can still be skipped for components that aren't synchronized
         - we could make a flag out of this; both are pretty much acceptable.
             - **we might begin with complete reinferences, as it will be easier.**
-        - perhaps mixing complete and incremental reinference makes no sense, as a "slightly worse" assumption about determinism means no assumption
+        - perhaps mixing complete and incremental inference makes no sense, as a "slightly worse" assumption about determinism means no assumption
 
 
 ### Notes

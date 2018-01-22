@@ -9,6 +9,9 @@ void detail_unset_current_slot(const entity_handle removed_item);
 template <bool is_const, class component_type>
 class component_synchronizer;
 
+template <bool, class>
+class physics_mixin;
+
 class physics_system;
 struct contact_listener;
 class cosmic;
@@ -27,6 +30,9 @@ class cosmos_solvable_inferred_access {
 	/* Special processors */
 	friend physics_system;
 	friend contact_listener;
+
+	template <bool, class>
+	friend class physics_mixin;
 
 	friend void ::detail_add_item(const inventory_slot_handle handle, const entity_handle new_item);
 	friend void ::detail_unset_current_slot(const entity_handle removed_item);

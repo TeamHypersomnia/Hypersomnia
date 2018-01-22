@@ -273,19 +273,6 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 			drop_from_all_slots(container, subject, step);
 		}
 
-		//
-		//auto place_of_death = subject.get_logic_transform();
-		//place_of_death.rotation = h.impact_velocity.degrees();
-		//
-		//corpse.set_logic_transform(step, place_of_death);
-		//
-		//subject.get<components::fixtures>().set_activated(false);
-		//subject.get<components::position_copying>().set_target(corpse);
-		//
-		//corpse.add_standard_components(step);
-		//
-		
-		//
 		auto& driver = subject.get<components::driver>();
 		
 		if(cosmos[driver.owned_vehicle].alive()) {
@@ -294,9 +281,14 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 		
 		driver.take_hold_of_wheel_when_touched = false;
 
-		subject.get<components::processing>().disable_in(processing_subjects::WITH_MOVEMENT);
+		/*
+			TODO: disable moving when dead!
+		*/
+
 		subject.get<components::processing>().disable_in(processing_subjects::WITH_ROTATION_COPYING);
+#if TODO
 		resolve_dampings_of_body(subject);
+#endif
 		
 		const auto subject_transform = subject.get_logic_transform();
 

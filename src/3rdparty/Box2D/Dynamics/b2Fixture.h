@@ -46,6 +46,18 @@ struct b2Filter
 	uint16 maskBits;
 	int16 groupIndex;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const b2Filter& b) const {
+		return 
+			categoryBits == b.categoryBits 
+			&& maskBits == b.maskBits
+			&& groupIndex == b.groupIndex
+		;
+	}
+
+	bool operator!=(const b2Filter& b) const {
+		return !operator==(b);
+	}
 };
 
 /// A fixture definition is used to create a fixture. This class defines an

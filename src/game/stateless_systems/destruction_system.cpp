@@ -21,7 +21,7 @@ void destruction_system::generate_damages_from_forceful_collisions(const logic_s
 		}
 		
 		const auto subject = cosmos[it.subject];
-		const auto& fixtures = subject.get<components::fixtures>();
+		const auto& fixtures = subject.get_def<definitions::fixtures>();
 
 		const auto& data_indices = it.subject_b2Fixture_index;
 

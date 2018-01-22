@@ -14,88 +14,88 @@
 #include "spatial_properties_mixin.h"
 #include "augs/drawing/drawing.h"
 
-components::transform transform_around_body(
-	const const_entity_handle fe,
-	const components::transform body_transform
-) {
-	const auto total_offset = fe.get<components::fixtures>().get_total_offset();
-
-	components::transform displaced = body_transform + total_offset;
-	displaced.pos.rotate(body_transform.rotation, body_transform.pos);
-
-	return displaced;
-}
-
-template <bool C, class D>
-bool basic_spatial_properties_mixin<C, D>::has_logic_transform() const {
-	const auto handle = *static_cast<const D*>(this);
-	const auto owner = handle.get_owner_body();
-	
-	if (owner.alive() && owner != handle) {
-		return true;
-	}
-	else if (handle.template has<components::rigid_body>()) {
-		return true;
-	}
-	else if (handle.template has<components::transform>()) {
-		return true;
-	}
-	else if (handle.template has<components::wandering_pixels>()) {
-		return true;
-	}
-
-	return false;
-}
-
 template <bool C, class D>
 components::transform basic_spatial_properties_mixin<C, D>::get_logic_transform() const {
+	const auto t = find_logic_transform();
+	ensure(t.has_value());
+	return *find_logic_transform();
+}
+
+template <bool C, class D>
+std::optional<components::transform> basic_spatial_properties_mixin<C, D>::find_logic_transform() const {
 	const auto handle = *static_cast<const D*>(this);
 
-	const auto owner = handle.get_owner_body();
+	/*
+		Since an alive owner body always implies that the entity has fixtures component,
+		it is equivalent to the call of:
 
-	if (owner.alive()) {
-		ensure(!handle.template has<components::transform>());
+		const auto fixtures = owner.template find_def<definitions::fixtures>()
 
-		const auto& phys = owner.template get<components::rigid_body>();
+		But we would anyway need to get the owner body so we do it this way.
+	*/
 
-		if (owner != handle) {
-			const auto& fixtures = handle.template get<components::fixtures>();
+	if (const auto owner = handle.get_owner_of_colliders();
+		owner.alive()
+	) {
+		const auto offset = handle.calculate_owner_of_colliders();
 
-			if (fixtures.is_activated() && phys.is_activated()) {
-				return transform_around_body(handle, owner.get_logic_transform());
-			}
-			else {
-				ensure(handle.template has<components::item>());
+		/*
+			TODO: retrieve the offset from fixtures cache instead of recalculating it.
+		*/
 
-				return handle.get_current_slot().get_container().get_logic_transform();
-			}
+		ensure_eq(owner, offset.owner);
+		const auto body_transform = owner.template get<components::rigid_body>().get_transform();
+
+		auto displacement = offset.shape_offset;
+
+		if (!displacement.pos.is_zero()) {
+			displacement.pos.rotate(body_transform.rotation, vec2(0, 0));
 		}
-		else {
-			if (phys.is_activated()) {
-				return{ phys.get_position(), phys.get_angle() };
-			}
-			else {
-				ensure(handle.template has<components::item>());
 
-				return handle.get_current_slot().get_container().get_logic_transform();
-			}
+		return body_transform + displacement;
+	}
+
+	/*
+		We only ever ask for transforms of fixtures, not rigid bodies. 
+		We deem it pointless to ask for a position of a rigid body without fixtures.
+		We will always assume that a potential rigid body comes with a fixtures component.	
+		Otherwise there is anyway pretty much no reasonable way to simulate a fixtureless body.
+
+		Thus let's have this commented out.
+
+		if (const auto rigid_body = owner.template find<components::rigid_body>()) {
+			ensure(false);
+
+			// Should only ever happen for (entities without fixtures, but with rigid bodies), which is almost never
+
+			return owner.template get<components::rigid_body>().get_transform();
 		}
+	*/
+
+	/* The owner might have been dead due to the item being in a backpack, for example */
+	if (const auto item = handle.template find<components::item>()) {
+		const auto& cosmos = handle.get_cosmos();
+		return cosmos[item->get_current_slot()].get_container().find_logic_transform();
 	}
-	else if (handle.template has<components::wandering_pixels>()) {
-		return handle.template get<components::wandering_pixels>().reach.center();
-	}
-	else {
-		return handle.template get<components::transform>();
+
+	if (const auto transform = handle.template find<components::transform>()) {
+		return *transform;
 	}	
+
+	if (const auto wandering_pixels = handle.template find<components::wandering_pixels>()) {
+		return wandering_pixels->reach.center();
+	}
+
+	return std::nullopt;
 }
 
 template <bool C, class D>
 vec2 basic_spatial_properties_mixin<C, D>::get_effective_velocity() const {
 	const auto handle = *static_cast<const D*>(this);
-	const auto owner = handle.get_owner_body();
+	const auto owner = handle.get_owner_of_colliders();
 
 	if (owner.alive()) {
-		return owner.template get<components::rigid_body>().velocity();
+		return owner.template get<components::rigid_body>().get_velocity();
 	}
 	else if (handle.template has<components::position_copying>()) {
 		ensure(handle.template has<components::transform>());
@@ -112,12 +112,8 @@ void spatial_properties_mixin<false, D>::set_logic_transform(
 	const logic_step step,
 	const components::transform t
 ) const {
-	if (this->get_logic_transform() == t) {
-		return;
-	}
-	
 	const auto handle = *static_cast<const D*>(this);
-	const auto owner_body = handle.get_owner_body();
+	const auto owner_body = handle.get_owner_of_colliders();
 
 	const bool this_entity_does_not_have_its_own_transform = 
 		owner_body.alive() 

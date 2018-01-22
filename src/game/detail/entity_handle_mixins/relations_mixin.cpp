@@ -31,12 +31,6 @@ void relations_mixin<false, D>::map_child_entity(
 	}
 }
 
-template <class D>
-void relations_mixin<false, D>::set_owner_body(const entity_id parent_id) const {
-	auto& self = *static_cast<const D*>(this);
-	self.template get<components::fixtures>().set_owner_body(parent_id);
-}
-
 template <bool C, class D>
 maybe_const_ptr_t<C, child_entity_id> basic_relations_mixin<C, D>::get_id_ptr(const child_entity_name n) const {
 	const auto& self = *static_cast<const D*>(this);
@@ -96,13 +90,6 @@ D basic_relations_mixin<C, D>::operator[](const child_entity_name child) const {
 	}
 	
 	return self.get_cosmos()[id];
-}
-
-template <bool C, class D>
-D basic_relations_mixin<C, D>::get_owner_body() const {
-	auto& self = *static_cast<const D*>(this);
-	const auto fixtures = self.template find<components::fixtures>();
-	return fixtures != nullptr ? self.get_cosmos()[fixtures.get_owner_body()] : self.get_cosmos()[entity_id()];
 }
 
 template <bool C, class D>

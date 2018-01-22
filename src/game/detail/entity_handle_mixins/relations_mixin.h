@@ -26,20 +26,6 @@ protected:
 public:
 	entity_handle_type get_parent() const;
 	
-	entity_handle_type get_owner_body() const;
-	
-	auto get_fixture_entities() const {
-		const auto self = *static_cast<const entity_handle_type*>(this);
-
-		return self.template get<components::rigid_body>().get_fixture_entities();
-	}
-
-	auto get_attached_joints() const {
-		const auto self = *static_cast<const entity_handle_type*>(this);
-
-		return self.template get<components::rigid_body>().get_attached_joints();
-	}
-
 	inventory_slot_handle_type operator[](const slot_function) const;
 	entity_handle_type operator[](const child_entity_name) const;
 	
@@ -76,8 +62,6 @@ class relations_mixin<false, entity_handle_type> : public basic_relations_mixin<
 	using base::get_id_ptr;
 public:
 	void make_as_child_of(const entity_id) const;
-
-	void set_owner_body(const entity_id) const;
 
 	void map_child_entity(const child_entity_name n, const entity_id p) const;
 };

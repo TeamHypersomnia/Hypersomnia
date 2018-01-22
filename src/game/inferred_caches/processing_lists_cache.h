@@ -6,10 +6,12 @@
 #include "game/enums/processing_subjects.h"
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
+#include "game/components/processing_component.h"
 
 class processing_lists_cache {
 	struct cache {
 		bool is_constructed = false;
+		components::processing recorded_component;
 	};
 	
 	augs::enum_array<std::vector<entity_id>, processing_subjects> lists;

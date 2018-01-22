@@ -22,6 +22,10 @@ public:
 		decltype(entity_id::version) recorded_version = entity_id().version;
 		float rotational_slowdown_multiplier = 1.f;
 		float positional_slowdown_multiplier = 1.f;
+
+		bool is_constructed() const {
+			return recorded_version != entity_id().version;
+		}
 	};
 
 	std::vector<cache> per_entity_cache;

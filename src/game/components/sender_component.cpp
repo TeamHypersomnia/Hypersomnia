@@ -27,14 +27,14 @@ namespace components {
 	}
 
 	bool sender::is_sender_subject(const const_entity_handle potential_sender) const {
-		const auto sender_owner_body = potential_sender.get_owner_body();
+		const auto sender_owner_body = potential_sender.get_owner_of_colliders();
 
 		const bool matches =
 			direct_sender == sender_owner_body
 			|| capability_of_sender == sender_owner_body.get_owning_transfer_capability()
 			|| (
 				vehicle_driven_by_capability == potential_sender 
-				&& potential_sender.get<components::fixtures>().can_driver_shoot_through()
+				&& potential_sender.get_def<definitions::fixtures>().can_driver_shoot_through()
 			)
 		;
 

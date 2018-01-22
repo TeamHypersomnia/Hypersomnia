@@ -302,6 +302,7 @@ struct b2Mat33
 };
 
 bool operator == (const b2Vec2& a, const b2Vec2& b);
+bool operator != (const b2Vec2& a, const b2Vec2& b);
 
 /// Rotation
 struct b2Rot
@@ -497,6 +498,11 @@ inline b2Vec2 operator * (float32 s, const b2Vec2& a)
 inline bool operator == (const b2Vec2& a, const b2Vec2& b)
 {
 	return a.x == b.x && a.y == b.y;
+}
+
+inline bool operator != (const b2Vec2& a, const b2Vec2& b)
+{
+	return !operator==(a, b);
 }
 
 inline float32 b2Distance(const b2Vec2& a, const b2Vec2& b)

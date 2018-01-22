@@ -14,12 +14,18 @@
 #include "game/transcendental/step_declaration.h"
 
 #include "game/messages/collision_message.h"
+
 #include "game/detail/physics/physics_queries_declaration.h"
+#include "game/detail/physics/owner_of_colliders.h"
 
 class cosmos;
 
 struct rigid_body_cache {
 	augs::propagate_const<b2Body*> body = nullptr;
+
+	bool is_constructed() const {
+		return body.get() != nullptr;
+	}
 };
 
 struct colliders_cache {
@@ -27,10 +33,20 @@ struct colliders_cache {
 		augs::propagate_const<b2Fixture*>, 
 		CONVEX_POLYS_COUNT
 	> all_fixtures_in_component;
+
+	owner_of_colliders owner;
+
+	bool is_constructed() const {
+		return all_fixtures_in_component.size() > 0;
+	}
 };
 
 struct joint_cache {
 	augs::propagate_const<b2Joint*> joint = nullptr;
+
+	bool is_constructed() const {
+		return joint.get() != nullptr;
+	}
 };
 
 struct physics_raycast_output {
@@ -45,8 +61,6 @@ class physics_world_cache {
 	std::vector<colliders_cache> colliders_caches;
 	std::vector<joint_cache> joint_caches;
 
-	void infer_cache_for_fixtures(const const_entity_handle);
-	void infer_cache_for_joint(const const_entity_handle);
 
 public:
 	// b2World on stack causes a stack overflow due to a large stack allocator, therefore it must be dynamically allocated
@@ -147,10 +161,6 @@ public:
 	const colliders_cache& get_colliders_cache(const entity_id) const;
 	const joint_cache& get_joint_cache(const entity_id) const;
 
-	bool rigid_body_cache_exists_for(const const_entity_handle) const;
-	bool colliders_cache_exists_for(const const_entity_handle) const;
-	bool joint_cache_exists_for(const const_entity_handle) const;
-
 	b2World& get_b2world() {
 		return *b2world.get();
 	}
@@ -171,4 +181,14 @@ public:
 
 	void infer_cache_for(const const_entity_handle);
 	void destroy_cache_of(const const_entity_handle);
+
+	void infer_rigid_body_existence(const const_entity_handle);
+
+	void infer_cache_for_colliders(const const_entity_handle);
+	void infer_cache_for_rigid_body(const const_entity_handle);
+	void infer_cache_for_joint(const const_entity_handle);
+
+	void destroy_colliders_cache(const const_entity_handle);
+	void destroy_rigid_body_cache(const const_entity_handle);
+	void destroy_joint_cache(const const_entity_handle);
 };

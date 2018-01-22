@@ -21,17 +21,13 @@ public:
 	using base::component_synchronizer_base;
 	using base::get_raw_component;
 	using base::handle;
-
-	bool is_activated() const;
 };
 
 template<>
 class component_synchronizer<false, components::all_inferred_state> : public basic_all_inferred_state_synchronizer<false> {
-	void reinfer_caches() const;
 public:
 	using basic_all_inferred_state_synchronizer<false>::basic_all_inferred_state_synchronizer;
 
-	void set_activated(const bool flag) const;
 };
 
 template<>

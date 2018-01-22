@@ -12,12 +12,10 @@ digraph G {
 	*/
 	
 	"determined damping/density"[color="pink"]
-	"determined attachment joint"[color="pink"]
 	"determined owning body"[color="pink"]
 	"determined body properties"[color="pink"]
 	"b2Body cache"[color="red"]
 	"b2Fixture cache"[color="red"]
-	"attachment joint cache"[color="red"]
 	"custom joint cache"[color="red"]
 
 	"joints of bodies"[color="orange"]
@@ -26,14 +24,10 @@ digraph G {
 
 	"identity"[color=red]
 
-	"slot's method of phys. connection [d]"->"determined attachment joint"[color=blue]
-	"slot's method of phys. connection [d]"->"determined owning body"[color=blue]
-	"current slot of item"->"determined attachment joint"[color=blue]
+	"slot's is_item_deposit [d]"->"determined owning body"[color=blue]
 	"current slot of item"->"items of slots"[color=blue]
 	"custom joint [d/c]"->"custom joint cache"
 	"custom joint [d/c]"->"joints of bodies"[color=blue]
-	"determined attachment joint"->"attachment joint cache"
-	"determined attachment joint"->"joints of bodies"[color=blue]
 	"standard body properties"->"determined damping/density"
 	"standard body properties"->"determined body properties"
 	"current vel/pos"->"determined body properties"
@@ -47,7 +41,6 @@ digraph G {
 	"custom owning body [c]"->"determined owning body"
 	"current slot of item"->"determined owning body"[color=blue]
 	"b2Body cache"->"b2Fixture cache"[color=cyan]
-	"b2Body cache"->"attachment joint cache"[color=blue]
 	"b2Body cache"->"custom joint cache"[color=blue]
 
 	"fixtures of bodies"->"b2Body cache"[color=orange]
@@ -56,4 +49,22 @@ digraph G {
 	"fixtures of bodies"->"identity"[constraint=false,color=orange]
 	"joints of bodies"->"identity"[constraint=false,color=orange]
 	"items of slots"->"identity"[constraint=false,color=orange]
+
+	/*
+		To be done only once we determine that we really want the physical joint connections for attachments.
+		Probably will never happen.
+	*/
+
+	/*
+		"determined attachment joint"[color="pink"]
+		"attachment joint cache"[color="red"]
+
+		"slot's method of phys. connection [d]"->"determined attachment joint"[color=blue]
+
+		"current slot of item"->"determined attachment joint"[color=blue]
+		"determined attachment joint"->"attachment joint cache"
+		"determined attachment joint"->"joints of bodies"[color=blue]
+		"b2Body cache"->"attachment joint cache"[color=blue]
+	*/
 }
+

@@ -83,6 +83,7 @@ namespace test_types {
 	}
 }
 
+#if TODO
 namespace prefabs {
 	entity_handle create_car(const logic_step step, const components::transform& spawn_transform) {
 		auto& world = step.get_cosmos();
@@ -111,8 +112,8 @@ namespace prefabs {
 			car.speed_for_pitch_unit = 2000.f;
 
 
-			physics_definition.linear_damping = 0.4f;
-			physics_definition.angular_damping = 2.f;
+			physics_definition.damping.linear = 0.4f;
+			physics_definition.damping.angular = 2.f;
 
 			components::fixtures group;
 
@@ -137,7 +138,7 @@ namespace prefabs {
 			group.filter = filters::friction_ground();
 			group.density = 0.6f;
 			group.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET].pos = offset;
-			group.is_friction_ground = true;
+			group.friction_ground = true;
 			group.material = assets::physical_material_id::METAL;
 
 			interior  += group;
@@ -276,5 +277,5 @@ namespace prefabs {
 
 		return front;
 	}
-
 }
+#endif

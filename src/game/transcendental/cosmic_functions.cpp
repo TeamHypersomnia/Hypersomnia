@@ -7,13 +7,11 @@
 void cosmic::infer_caches_for(const entity_handle h) {
 	auto& cosm = h.get_cosmos();
 
-	if (h.is_inferred_state_activated()) {
-		auto constructor = [h](auto, auto& sys) {
-			sys.infer_cache_for(h);
-		};
+	auto constructor = [h](auto, auto& sys) {
+		sys.infer_cache_for(h);
+	};
 
-		augs::introspect(constructor, cosm.get_solvable_inferred({}));
-	}
+	augs::introspect(constructor, cosm.get_solvable_inferred({}));
 }
 
 void cosmic::destroy_caches_of(const entity_handle h) {
@@ -50,11 +48,6 @@ void cosmic::reinfer_all_entities(cosmos& cosm) {
 void cosmic::reinfer_solvable(cosmos& cosm) {
 	cosm.get_solvable({}).remap_guids();
 	reinfer_all_entities(cosm);
-}
-
-void cosmic::reinfer_caches_of(const entity_handle h) {
-	destroy_caches_of(h);
-	infer_caches_for(h);
 }
 
 entity_handle cosmic::create_entity(cosmos& cosm, const entity_type_id type_id) {
@@ -112,14 +105,7 @@ entity_handle cosmic::clone_entity(const entity_handle source_entity) {
 			with due care to each of them.
 		*/
 		components::guid,
-		components::fixtures,
-		components::child,
-
-		/*
-			Let us keep the inferred state of the new entity disabled for a while,
-			to avoid unnecessary regeneration.
-		*/
-		components::all_inferred_state
+		components::child
 	>(solvable.get_aggregate(source_entity), solvable);
 
 	if (new_entity.has<components::item>()) {
@@ -158,45 +144,6 @@ entity_handle cosmic::clone_entity(const entity_handle source_entity) {
 		});
 	}
 
-
-	if (source_entity.has<components::fixtures>()) {
-		/*
-			Copy all properties from the component of the source entity except the owner_body field.
-			Exactly as if we were creating that component by hand.
-		*/
-
-		components::fixtures fixtures = source_entity.get<components::fixtures>().get_raw_component();
-		const auto owner_of_the_source = fixtures.owner_body;
-		fixtures.owner_body = entity_id();
-
-		new_entity += fixtures;
-
-		/*
-			Only now assign the owner_body in a controllable manner.
-		*/
-
-		const bool source_owns_itself = owner_of_the_source == source_entity;
-
-		if (source_owns_itself) {
-			/*
-				If the fixtures of the source entity were owned by the same entity,
-				let the cloned entity also own itself
-			*/
-			new_entity.set_owner_body(new_entity);
-		}
-		else {
-			/*
-				If the fixtures of the source entity were owned by a different entity,
-				let the cloned entity also be owned by that different entity
-			*/
-			new_entity.set_owner_body(owner_of_the_source);
-		}
-	}
-
-	if (source_entity.is_inferred_state_activated()) {
-		new_entity.get<components::all_inferred_state>().set_activated(true);
-	}
-
 	return new_entity;
 }
 
@@ -215,31 +162,7 @@ void cosmic::delete_entity(const entity_handle handle) {
 		detail_unset_current_slot(handle);
 	}
 
-	const bool should_deactivate_inferred_state_to_avoid_repeated_regeneration =
-		handle.is_inferred_state_activated()
-	;
-
-	if (should_deactivate_inferred_state_to_avoid_repeated_regeneration) {
-		handle.get<components::all_inferred_state>().set_activated(false);
-	}
-
-	// now manipulation of an entity without all_inferred_state component won't trigger redundant regeneration
-
-	const auto maybe_fixtures = handle.find<components::fixtures>();
-
-	if (maybe_fixtures != nullptr) {
-		const auto owner_body = maybe_fixtures.get_owner_body();
-
-		const bool should_release_dependency = owner_body != handle;
-
-		if (should_release_dependency) {
-			maybe_fixtures.set_owner_body(handle);
-		}
-	}
-
-	/*
-		Unregister that id as a parent from the relational system
-	*/
+	cosmic::destroy_caches_of(handle);
 
 	cosmos.get_solvable_inferred({}).relational.destroy_caches_of_children_of(handle);
 	cosmos.get_solvable({}).free_entity(handle);

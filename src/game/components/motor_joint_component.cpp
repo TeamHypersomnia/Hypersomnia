@@ -18,14 +18,14 @@ decltype(M::target_bodies) basic_motor_joint_synchronizer<C>::get_target_bodies(
 	return get_raw_component().target_bodies;
 }
 
-void component_synchronizer<false, M>::reinfer_caches() const {
-	cosmic::reinfer_cache(handle.get_cosmos().get_solvable_inferred({}).relational, handle);
-	cosmic::reinfer_cache(handle.get_cosmos().get_solvable_inferred({}).physics, handle);
+void component_synchronizer<false, M>::infer_caches() const {
+	handle.get_cosmos().get_solvable_inferred({}).relational.infer_cache_for(handle);
+	handle.get_cosmos().get_solvable_inferred({}).physics.infer_cache_for(handle);
 }
 
 const component_synchronizer<false, M>& component_synchronizer<false, M>::operator=(const M& m) const {
 	get_raw_component() = m;
-	reinfer_caches();
+	infer_caches();
 	return *this;
 }
 

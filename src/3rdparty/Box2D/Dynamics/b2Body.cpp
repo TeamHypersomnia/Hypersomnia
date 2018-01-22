@@ -33,7 +33,6 @@ b2Body::b2Body(const b2BodyDef* bd, b2World* world)
 	enable_angled_damping = false;
 
 	m_linearDampingVec = b2Vec2(0.f, 0.f);
-	m_linearDampingAngle = 0.f;
 
 	if (bd->bullet)
 	{

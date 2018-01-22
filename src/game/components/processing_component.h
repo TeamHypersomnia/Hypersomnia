@@ -13,12 +13,16 @@ namespace components {
 		using flagset_type = augs::enum_boolset<processing_subjects>;
 		
 		// GEN INTROSPECTOR struct components::processing
-		bool activated = true;
-		pad_bytes<3> pad;
-
 		flagset_type processing_subject_categories;
 		flagset_type disabled_categories;
 		// END GEN INTROSPECTOR
+
+		bool operator==(const processing& b) const {
+			return 
+				processing_subject_categories == b.processing_subject_categories
+				&& disabled_categories == b.disabled_categories
+			;
+		}
 
 		static components::processing get_default(const const_entity_handle);
 	};
@@ -33,7 +37,6 @@ public:
 	using base::component_synchronizer_base;
 	using base::get_raw_component;
 
-	bool is_activated() const;
 	bool is_in(const processing_subjects) const;
 	components::processing::flagset_type get_disabled_categories() const;
 	components::processing::flagset_type get_basic_categories() const;
@@ -41,7 +44,7 @@ public:
 
 template<>
 class component_synchronizer<false, components::processing> : public basic_processing_synchronizer<false> {
-	void reinfer_caches() const;
+	void infer_caches() const;
 public:
 	using basic_processing_synchronizer<false>::basic_processing_synchronizer;
 
