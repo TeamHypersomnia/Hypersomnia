@@ -22,11 +22,8 @@ The first is more like "input" to the processing, in which [authors](author) in 
 Most of the time, only the programmers are concerned with the second type of data.
 
 - An *entity type* contains a tuple of [definitions](definition), a tuple of initial [component](component) values, and an array of flags for each definition to signify whether it is *enabled*.
-	- An author may specify which definitions to enable.
-	- The flags will be held separate:``std::array<bool, DEFINITION_COUNT_V> enabled_definitions;``
-		- A lot better cache coherency than the more idiomatic ``std::optional``.
-	- An *enabled* definition implies that the entity needs a component of type ``definition_type::implied_component`` (if specified) for the definition to be ever used by the logic.  
-		- If instance type is specified, it additionally stores an **initial value** for the component.
+	- An existent definition implies that the entity needs a component of type ``definition_type::implied_component`` (if specified) for the definition to be ever used by the logic.  
+		- Thus if implied_component type is specified, it additionally stores an **initial value** for the component.
 - A type with a blank name is treated as being 'not set' (a null type).
 	- We will always require the author to set a non-empty name for a type.  
 - Types can be created, copied and then modified, or destroyed.  
@@ -34,18 +31,15 @@ Most of the time, only the programmers are concerned with the second type of dat
 		- In fact, the [logic step](logic_step) simply provides only const getters for the type information.
 	- Should only be done by [authors](author).
 	- In particular, types can be deleted, in which case the [vector of types](#storage) will have to be shrunk. Then we will need to remap types of all existing entities.
-	- In particular, the **enabled** flags for definitions may change even though some entities of this type already exist.
-		- We warn the author and ask if the existent entities should be recreated with new components with new initial values (preserving what was already set).
-			- The warning can be ticked to never pop up again.
+	- But disallow deleting a type if entities with that type exist.
+		- The author will be able to change the type of an existing entity, optionally keeping the values that were already set in components.
 	- In particular, the **initial value** for a component may change even though some entities of this type already exist.
 		- This is not important. The field, in practice, serves two purposes:
 			- Used by the logic when it gets a type identifier to spawn (e.g. ``gun::magic_missile_definition``), so that it can set reasonable initial values. Thus, a change to initial value needs not updating here as the logic will naturally catch up, storing only the type identifier.
 			- Exists as an optional helper for the author when they want to spawn some very specific entities. The author shouldn't worry that the initial value changes something for the existent entities.
-	- Disallow deleting a type if entities with that type exist.
-		- The author will be able to change the type of an existing entity, optionally keeping the values that were already set in components.
 	- If a field of a definition changes, (during content creation), reinfer all objects of this type with help of the [type id cache](type_id_cache); currently we'll just reinfer the whole cosmos.
 - There won't be many types, but access is **frequent** during [solve](solver#the-solve). 
-	- We allocate all definitions **statically**, as memory won't suffer relatively to the speed gain.
+	- All possible configurations of definitions will be determined by types at compilation time.
 - The logic should always first check for the existence of component, only later the definition that the component is implied by.
 	- One less indirection because checking for the id being unset is just a single arithmetic operation when the id is cached.
 - On creating an entity, the chosen type's id is passed.  
@@ -76,13 +70,6 @@ Most of the time, only the programmers are concerned with the second type of dat
 					- even less setup in driver system
 				- we have no more cases of rotation copying
 			- position_copying
-				- the only current use: particles existence that chase after the entity
-					- we will then store a relevant field in the particles existence component 	 
-					- what if other component requires identical functionality?
-						- then we will store the relevant fields as well there and calculate it in get_logic_transform
-				- ~~current use: astral body~~
-					- **should be removed**
-						- ``		//subject.get<components::position_copying>().set_target(corpse);``
 - ~~Some definitions imply more than one component.~~
 	- **Disproved**.
 		- A component's existence may only be implied by:

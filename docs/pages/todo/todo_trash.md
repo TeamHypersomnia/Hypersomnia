@@ -335,3 +335,13 @@ COMMENTED OUT: Such things will be calculated statelessly.
 
 
 <!-- **We should disregard tailoring the assignment operator until we get to networking, where we'll probably switch to another physics engine with the features we need.** -->
+
+## entity_type.md trash
+
+	- An author may specify which definitions to enable.
+	- The flags will be held separate:``std::array<bool, DEFINITION_COUNT_V> enabled_definitions;``
+		- A lot better cache coherency than the more idiomatic ``std::optional``.
+
+	- In particular, the **enabled** flags for definitions may change even though some entities of this type already exist.
+		- We warn the author and ask if the existent entities should be recreated with new components with new initial values (preserving what was already set).
+			- The warning can be ticked to never pop up again.
