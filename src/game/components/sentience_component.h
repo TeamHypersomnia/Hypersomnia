@@ -59,7 +59,6 @@ namespace components {
 		float minimum_danger_amount_to_evade = 5.f;
 		float danger_amount_from_hostile_attitude = 100.f;
 
-		child_entity_id health_damage_particles;
 		child_entity_id character_crosshair;
 
 		sound_effect_input health_decrease_sound;

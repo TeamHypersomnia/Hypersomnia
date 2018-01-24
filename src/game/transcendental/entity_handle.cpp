@@ -15,7 +15,7 @@
 #include "game/components/explosive_component.h"
 
 #include "game/components/sound_existence_component.h"
-#include "game/components/particles_existence_component.h"
+#include "game/detail/view_input/particle_effect_input.h"
 
 #include "game/detail/physics/physics_scripts.h"
 #include "game/detail/inventory/inventory_slot_handle.h"
@@ -37,13 +37,7 @@ entity_handle basic_entity_handle<C>::add_standard_components(const logic_step s
 		return *this;
 	}
 
-	if (has<components::rigid_body>() || find_def<definitions::fixtures>()) {
-		const bool has_transform = has<components::transform>();
-
-		ensure(!has_transform);
-	}
-
-	if (auto rigid_body = find<components::rigid_body>()) {
+	if (const auto rigid_body = find<components::rigid_body>()) {
 		rigid_body.get_special().dropped_or_created_cooldown.set(200, get_cosmos().get_timestamp());
 	}
 
@@ -58,11 +52,11 @@ entity_handle basic_entity_handle<C>::add_standard_components(const logic_step s
 	
 	cosmic::infer_caches_for(*this);
 
-	if (auto* const interpolation = find<components::interpolation>()) {
+	if (const auto interpolation = find<components::interpolation>()) {
 		interpolation->place_of_birth = this->get_logic_transform();
 	}
 
-	if (auto* const trace = find<components::trace>()) {
+	if (const auto trace = find<components::trace>()) {
 		auto rng = get_cosmos().get_fast_rng_for(get_id());
 		trace->reset(get_def<definitions::trace>(), rng);
 	}

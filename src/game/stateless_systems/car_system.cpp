@@ -13,7 +13,7 @@
 #include "game/components/rigid_body_component.h"
 #include "game/components/transform_component.h"
 #include "game/components/processing_component.h"
-#include "game/components/particles_existence_component.h"
+#include "game/detail/view_input/particle_effect_input.h"
 #include "game/components/sound_existence_component.h"
 
 #include "game/stateless_systems/car_system.h"
@@ -158,6 +158,7 @@ void car_system::apply_movement_forces(const logic_step step) {
 				rigid_body.apply_angular_impulse(delta.in_seconds() * (angular_resistance * angular_speed * angular_speed)* -augs::sgn(angular_speed) * rigid_body.get_inertia());
 			}
 
+#if TODO
 			auto engine_handler = [&](const entity_handle h, const bool particles_enabled) {
 				if (h.alive() && h.has<components::particles_existence>()) {
 					if (particles_enabled) {
@@ -214,6 +215,7 @@ void car_system::apply_movement_forces(const logic_step step) {
 					}
 				}
 			}
+#endif
 		}
 	);
 }

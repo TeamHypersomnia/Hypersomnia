@@ -3,8 +3,6 @@
 #include "game/transcendental/entity_handle_declaration.h"
 #include "augs/math/vec2.h"
 
-class position_copying_system;
-
 namespace components {
 	struct position_copying {
 		enum position_copying_type : unsigned char {
@@ -17,7 +15,7 @@ namespace components {
 		entity_id target;
 
 		vec2 offset;
-		vec2 rotation_orbit_offset;
+		vec2 orbit_offset;
 		
 		vec2 reference_position;
 		vec2 target_reference_position;

@@ -27,14 +27,12 @@ components::position_copying components::position_copying::configure_chasing(
 	copying.previous = chaser_place_of_birth;
 	copying.set_target(target);
 
-	if (cfg == chasing_configuration::RELATIVE_ORBIT) {
-		const auto target_transform = target.get_logic_transform();
-		copying.position_copying_mode = components::position_copying::position_copying_type::ORBIT;
+	const auto target_transform = target.get_logic_transform();
+	copying.position_copying_mode = components::position_copying::position_copying_type::ORBIT;
 
-		copying.position_copying_rotation = true;
-		copying.rotation_offset = chaser_place_of_birth.rotation - target_transform.rotation;
-		copying.rotation_orbit_offset = (chaser_place_of_birth.pos - target_transform.pos).rotate(-target_transform.rotation, vec2(0.f, 0.f));
-	}
+	copying.position_copying_rotation = true;
+	copying.rotation_offset = chaser_place_of_birth.rotation - target_transform.rotation;
+	copying.orbit_offset = (chaser_place_of_birth.pos - target_transform.pos).rotate(-target_transform.rotation, vec2(0.f, 0.f));
 
 	return copying;
 }
@@ -63,25 +61,13 @@ void position_copying_system::update_transforms(const logic_step step) {
 			target_transform.rotation *= position_copying.rotation_multiplier;
 			target_transform.pos.discard_fract();
 
-			if (position_copying.position_copying_mode == components::position_copying::position_copying_type::OFFSET) {
-				transform.pos = target_transform.pos;
-				transform.pos += position_copying.offset;
-
-				if (position_copying.position_copying_rotation) {
-					transform.rotation = target_transform.rotation;
-					transform.rotation += position_copying.rotation_offset;
-				}
-			}
 			else if (position_copying.position_copying_mode == components::position_copying::position_copying_type::ORBIT) {
-				transform.pos = target_transform.pos + position_copying.rotation_orbit_offset;
+				transform.pos = target_transform.pos + position_copying.orbit_offset;
 				transform.pos.rotate(target_transform.rotation, target_transform.pos);
 				
 				if (position_copying.position_copying_rotation) {
 					transform.rotation = target_transform.rotation + position_copying.rotation_offset;
 				}
-			}
-			else if (position_copying.position_copying_mode == components::position_copying::position_copying_type::PARALLAX) {
-				transform.pos = position_copying.reference_position + (target_transform.pos - position_copying.target_reference_position) * position_copying.scrolling_speed;
 			}
 
 			if (position_copying.target_newly_set) {

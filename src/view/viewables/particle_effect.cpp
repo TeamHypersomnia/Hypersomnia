@@ -27,6 +27,4 @@ void particles_emission::apply_modifier(const particle_effect_modifier m) {
 		stream_lifetime_ms.first *= m.scale_lifetimes;
 		stream_lifetime_ms.second *= m.scale_lifetimes;
 	}
-
-	homing_target = m.homing_target;
 }

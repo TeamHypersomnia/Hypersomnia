@@ -65,8 +65,6 @@ struct particles_emission {
 	minmax starting_homing_force = minmax(0.f, 0.f);
 	minmax ending_homing_force = minmax(0.f, 0.f);
 
-	entity_id homing_target;
-
 	float initial_rotation_variation = 0.f;
 	bool randomize_acceleration = false;
 	bool should_particles_look_towards_velocity = true;

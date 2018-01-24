@@ -2,7 +2,7 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
 #include "game/components/sentience_component.h"
-#include "game/components/particles_existence_component.h"
+#include "game/detail/view_input/particle_effect_input.h"
 #include "game/components/sound_existence_component.h"
 #include "game/detail/spells/spell_logic_input.h"
 #include "game/detail/spells/spell_utils.h"

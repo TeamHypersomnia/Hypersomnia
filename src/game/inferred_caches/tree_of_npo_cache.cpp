@@ -7,8 +7,6 @@
 std::optional<tree_of_npo_node_input> tree_of_npo_node_input::create_default_for(const const_entity_handle e) {
 	const bool has_renderable = 
 		e.find_def<definitions::render>() 
-		|| e.has<components::particles_existence>()
-		//|| has<components::sound_existence>()
 	;
 
 	const bool has_physical = 
@@ -17,20 +15,11 @@ std::optional<tree_of_npo_node_input> tree_of_npo_node_input::create_default_for
 	;
 
 	if (has_renderable && !has_physical) {
-		tree_of_npo_node_input result;
-
-		result.aabb = e.get_aabb();
-
-		if (e.has<components::particles_existence>()) {
-			if (e.get<components::processing>().is_in(processing_subjects::WITH_PARTICLES_EXISTENCE)) {
-				result.type = tree_of_npo_type::PARTICLE_EXISTENCES;
-			}
-			else {
-				return std::nullopt;		
-			}
+		if (const auto aabb = e.get_aabb(); aabb.good()) {
+			tree_of_npo_node_input result;
+			result.aabb = aabb;
+			return result;
 		}
-
-		return result;
 	}
 
 	return std::nullopt;

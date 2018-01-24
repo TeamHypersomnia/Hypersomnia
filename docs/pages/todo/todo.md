@@ -52,3 +52,7 @@ v - begin selection with arrows
 			- even if the variant is big, the animation will be an asset anyway.
 		- then the animation system will perform the logic and e.g. spawn particles and sounds.
 		- we won't separate concerns here because we're not writing an engine, rather a game.
+
+- Maps could be git repositories, maybe even hosted on github
+	- Server could specify upstream url
+	- Updating a map just involves pulling

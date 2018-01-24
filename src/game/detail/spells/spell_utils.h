@@ -10,14 +10,12 @@ void ignite_cast_sparkles(
 	const components::transform caster_transform,
 	const entity_id subject
 ) {
-	particles_existence_input burst;
-	burst.effect = spell_data.common.cast_sparkles;
+	const auto& effect = spell_data.common.cast_sparkles;
 
-	burst.create_particle_effect_entity(
+	effect.start(
 		step,
-		caster_transform,
-		subject
-	).add_standard_components(step);
+		{ particle_effect_start_input::at_entity(subject) }
+	);
 }
 
 template <class T>
@@ -28,16 +26,13 @@ void ignite_charging_particles(
 	const entity_id subject,
 	const rgba col
 ) {
-	particles_existence_input burst;
-	burst.effect = spell_data.charging_particles;
-	burst.effect.modifier.colorize = col;
-	burst.effect.modifier.homing_target = subject;
+	auto effect = spell_data.charging_particles;
+	effect.modifier.colorize = col;
 
-	burst.create_particle_effect_entity(
+	effect.start(
 		step,
-		caster_transform,
-		subject
-	).add_standard_components(step);
+		{ particle_effect_start_input::at_entity(subject).set_homing(subject) }
+	);
 }
 
 template <class T>

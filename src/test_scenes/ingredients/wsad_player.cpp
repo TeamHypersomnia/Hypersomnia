@@ -118,7 +118,6 @@ namespace ingredients {
 		auto& movement = e += components::movement();
 		auto& driver = e += components::driver();
 		auto& sentience = e += components::sentience();
-		e += components::position_copying(); // used when it is an astral body
 		
 		auto& attitude = e += components::attitude();
 		const auto processing = e += components::processing();
@@ -182,22 +181,6 @@ namespace prefabs {
 		character.set_logic_transform(step, spawn_transform);
 		character.add_standard_components(step);
 
-		{
-			particles_existence_input effect;
-
-			effect.effect.id = assets::particle_effect_id::HEALTH_DAMAGE_SPARKLES;
-			effect.delete_entity_after_effect_lifetime = false;
-
-			const auto particles = effect.create_particle_effect_entity(
-				step,
-				character.get_logic_transform(),
-				character
-			);
-
-			particles.add_standard_components(step);
-			character.get<components::sentience>().health_damage_particles = particles;
-			components::particles_existence::deactivate(particles);
-		}
 		// LOG("Character mass: %x", character.get<components::rigid_body>().get_mass());
 		return character;
 	}

@@ -14,7 +14,7 @@
 #include "game/components/rigid_body_component.h"
 #include "game/components/fixtures_component.h"
 #include "game/components/type_component.h"
-#include "game/components/particles_existence_component.h"
+#include "game/detail/view_input/particle_effect_input.h"
 #include "game/components/sound_existence_component.h"
 #include "game/components/polygon_component.h"
 #include "game/components/shape_polygon_component.h"
@@ -224,7 +224,7 @@ namespace prefabs {
 						place_of_birth.rotation += 180;
 					}
 
-					const auto engine_particles = input.create_particle_effect_entity(
+					const auto engine_particles = input.start_particle_effect_entity(
 						step,
 						place_of_birth,
 						front

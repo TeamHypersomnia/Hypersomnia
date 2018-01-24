@@ -18,7 +18,7 @@
 
 #include "game/components/rigid_body_component.h"
 #include "game/components/missile_component.h"
-#include "game/components/particles_existence_component.h"
+#include "game/detail/view_input/particle_effect_input.h"
 #include "game/components/position_copying_component.h"
 #include "game/components/container_component.h"
 #include "game/components/item_component.h"
@@ -374,6 +374,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 				}
 			}
 			
+#if TODO
 			const auto muzzle_particles = cosmos[gun.muzzle_particles];
 
 			if (muzzle_particles.alive() && muzzle_particles.has<components::particles_existence>()) {
@@ -384,6 +385,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					components::particles_existence::deactivate(muzzle_particles);
 				}
 			}
+#endif
 		}
 	);
 }

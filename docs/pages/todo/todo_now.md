@@ -7,6 +7,30 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order:  
 
+- change path of #include "message.h"
+
+- ditch stream displacement for a while
+- remove completely the particles existence and sound existence component
+	- logic will post relevant messages to create bursts
+		- fire and forget bursts:
+			- no owner assigned, just starting world transform
+			- separate vector in particles simulation system
+		- stream can be created in the name of an entity/offset
+			- don't use purpose, just differentiate by orbital transforms
+			- car will be able to stop engine's stream by looking up its orbital transform
+				- bytewise comparisons should work after just assigning			
+		- in which case the stream will be reset to the new value instead of creating additional stream
+			- removes the need to hold child entity ids in sentience	
+		- burst can be stopped in the name of an entity
+			- used by the car
+		- continuous streams could be queried statelessly by the simulation system
+
+- sentience component should have integrated crosshair
+	- provide a get crosshair transform function
+
+- when neither crosshair, nor shared particle/sound objects, nor car engines at all need to be tracked as children, we can basically remove child component
+	- except we can't, because we need crosshair's recoil body
+
 - position copying becomes the only way to change the entity's logic transform beside the rigid body and the wandering pixels
 	- thus the only one with the problem of properly updating NPO 
 		- We don't need NPO to track particle existences for now as there really won't be that many. 200 static ones would be so, so much already.
@@ -32,6 +56,15 @@ summary: Just a hidden scratchpad.
 	- additionally, expose a "get_particles_transform" to disambiguate get_logic_transform - the latter should not check for particles existence.
 		- because a fixtural entity might additionally have a particles existence that chases upon itself.
 			- e.g. truck engine
+
+- cars could just hold several particle effect inputs and we would iterate cars to also perform
+	- handle cars later please
+	- particles simulation system can have a "iterate cars and perform engine particles"
+		- would just create particle effect inputs and pass them to the simulation
+	- same with sound system
+
+- rename "definitions" to "invariants"
+- remove "get_attachment_offset" and introduce attachment matrix for flavours
 
 - Thoughts about native types
 	- We will totally get rid of processing component and calculate statelessly which that which needs to be calculated.

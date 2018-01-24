@@ -7,7 +7,7 @@
 #include "game/components/transform_component.h"
 #include "game/components/polygon_component.h"
 #include "game/components/sprite_component.h"
-#include "game/components/particles_existence_component.h"
+#include "game/detail/view_input/particle_effect_input.h"
 #include "game/components/wandering_pixels_component.h"
 
 struct all_logical_assets;
@@ -80,41 +80,11 @@ public:
 			return wandering_pixels->reach;
 		}
 
-		if (const auto* const particles_existence = handle.template find<components::particles_existence>();
-			particles_existence != nullptr
-		) {
-			ltrb aabb;
-			aabb.set_position(transform.pos);
-			aabb.set_size({ 2.f, 2.f });
-
-			const auto enlarge = std::max(
-				particles_existence->input.displace_source_position_within_radius, 
-				particles_existence->distribute_within_segment_of_length
-			);
-
-			aabb.expand_from_center({ enlarge, enlarge });
-
-			return aabb;
-		}
-
-		//const auto* const sound_existence = e.find<components::sound_existence>();
-		//if (sound_existence) {
-		//	result.type = tree_type::SOUND_EXISTENCES;
-		//	result.aabb.set_position(e.get_logic_transform().pos);
-		//
-		//	const float artifacts_avoidance_epsilon = 20.f;
-		//
-		//	const float distance = sound_existence->calculate_max_audible_distance() + artifacts_avoidance_epsilon;
-		//	result.aabb.set_size({ distance*2, distance * 2 });
-		//}
-
-		//ensure(false);
-
 		/* TODO: Implement get_aabb for physical entities */
 		ensure(!handle.template has<components::rigid_body>());
 		ensure(nullptr == handle.template find_def<definitions::fixtures>());
 
-		return{};
+		return {};
 	}
 };
 

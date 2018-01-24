@@ -717,7 +717,7 @@ int work(const int argc, const char* const * const argv) try {
 	};
 
 	static auto setup_post_solve = [](const const_logic_step step) {
-		audiovisuals.standard_post_solve(step);
+		audiovisuals.standard_post_solve(step, { get_viewable_defs().particle_effects });
 		game_gui.standard_post_solve(step);
 	};
 

@@ -92,19 +92,12 @@ std::optional<components::transform> basic_spatial_properties_mixin<C, D>::find_
 template <bool C, class D>
 vec2 basic_spatial_properties_mixin<C, D>::get_effective_velocity() const {
 	const auto handle = *static_cast<const D*>(this);
-	const auto owner = handle.get_owner_of_colliders();
 
-	if (owner.alive()) {
+	if (const auto owner = handle.get_owner_of_colliders()) {
 		return owner.template get<components::rigid_body>().get_velocity();
 	}
-	else if (handle.template has<components::position_copying>()) {
-		ensure(handle.template has<components::transform>());
-		return 
-			(handle.template get<components::transform>().pos - handle.template get<components::position_copying>().get_previous_transform().pos)
-			/ static_cast<float>(handle.get_cosmos().get_fixed_delta().in_seconds());
-	}
-	
-	return{};
+
+	return {};
 }
 
 template <class D>

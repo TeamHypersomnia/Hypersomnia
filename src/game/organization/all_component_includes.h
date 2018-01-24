@@ -8,7 +8,7 @@
 #include "game/components/gun_component.h"
 
 #include "game/components/movement_component.h"
-#include "game/components/particles_existence_component.h"
+#include "game/detail/view_input/particle_effect_input.h"
 #include "game/components/rigid_body_component.h"
 #include "game/components/transform_component.h"
 #include "game/components/render_component.h"

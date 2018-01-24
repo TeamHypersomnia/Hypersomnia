@@ -395,7 +395,6 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/components/item_slot_transfers_component.cpp"
 	"src/game/components/movement_component.cpp"
 	"src/game/components/type_component.cpp"
-	"src/game/components/particles_existence_component.cpp"
 	"src/game/components/pathfinding_component.cpp"
 	"src/game/transcendental/cosmos.cpp"
 	"src/game/detail/ai/behaviours.cpp"
@@ -426,7 +425,6 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/stateless_systems/item_system.cpp"
 	"src/game/stateless_systems/movement_system.cpp"
 	"src/game/stateless_systems/pathfinding_system.cpp"
-	"src/game/stateless_systems/position_copying_system.cpp"
 	"src/game/stateless_systems/sentience_system.cpp"
 	"src/game/stateless_systems/trace_system.cpp"
 	"src/game/stateless_systems/visibility_system.cpp"
@@ -510,6 +508,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/detail/inventory/perform_transfer.cpp"
 	"src/game/transcendental/cosmic_functions.cpp"
 	"src/game/common_state/entity_types.cpp"
+	"src/game/detail/view_input/particle_effect_input.cpp"
 )
 
 if(BUILD_WINDOW_FRAMEWORK)

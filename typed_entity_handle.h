@@ -39,6 +39,18 @@ struct typed_entity_id : public cosmic_object_pool_id<cosmic_entity> {
 
 using entity_type_id = type_in_list_id<entity_type_list_t<type_list>>;
 
+using basic_flavour_id = unsigned;
+
+struct entity_flavour_id {
+	entity_type_id type_id;
+	basic_flavour_id flavour_id;
+};
+
+template <class T>
+struct typed_entity_flavour_id {
+	basic_flavour_id flavour_id;
+};	
+
 template <bool is_const, class entity_type, class... accessed_components>
 class typed_entity_handle {
 	static constexpr constrained_access = sizeof...(accessed_components) > 0;

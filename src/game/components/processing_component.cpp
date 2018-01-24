@@ -49,9 +49,6 @@ P P::get_default(const const_entity_handle id) {
 	if (id.has<components::movement>()) {
 		matching.push_back(processing_subjects::WITH_MOVEMENT);
 	}
-	if (id.has<components::particles_existence>()) {
-		matching.push_back(processing_subjects::WITH_PARTICLES_EXISTENCE);
-	}
 	if (id.has<components::sound_existence>()) {
 		matching.push_back(processing_subjects::WITH_SOUND_EXISTENCE);
 	}
@@ -94,21 +91,11 @@ void component_synchronizer<false, P>::infer_caches() const {
 
 void component_synchronizer<false, P>::disable_in(const processing_subjects l) const {
 	get_raw_component().disabled_categories.set(l, true);
-
-	if (l == processing_subjects::WITH_PARTICLES_EXISTENCE) {
-		handle.get_cosmos().get_solvable_inferred({}).tree_of_npo.infer_cache_for(handle);
-	}
-
 	infer_caches();
 }
 
 void component_synchronizer<false, P>::enable_in(const processing_subjects l) const {
 	get_raw_component().disabled_categories.set(l, false);
-
-	if (l == processing_subjects::WITH_PARTICLES_EXISTENCE) {
-		handle.get_cosmos().get_solvable_inferred({}).tree_of_npo.infer_cache_for(handle);
-	}
-
 	infer_caches();
 }
 

@@ -12,7 +12,7 @@
 #include "game/components/sender_component.h"
 #include "game/components/all_inferred_state_component.h"
 
-#include "game/messages/create_particle_effect.h"
+#include "game/messages/start_particle_effect.h"
 
 #include "game/stateless_systems/sound_existence_system.h"
 #include "game/stateless_systems/particles_existence_system.h"

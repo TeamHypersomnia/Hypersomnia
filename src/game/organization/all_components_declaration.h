@@ -28,7 +28,6 @@ namespace components {
 	struct missile;
 	struct gun;
 	struct movement;
-	struct particles_existence;
 	struct pathfinding;
 	struct rigid_body;
 	struct car;
@@ -70,7 +69,6 @@ using component_list_t = List<
 	components::missile,
 	components::gun,
 	components::movement,
-	components::particles_existence,
 	components::pathfinding,
 	components::rigid_body,
 	components::specific_body_owner,

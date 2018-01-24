@@ -38,11 +38,13 @@ entity_handle sound_existence_input::create_sound_effect_entity(
 	const auto chased_subject = cosmos[chased_subject_id];
 
 	if (chased_subject.alive()) {
+#if TODO
 		new_sound_entity += components::position_copying::configure_chasing(
 			chased_subject,
 			place_of_birth,
 			components::position_copying::chasing_configuration::RELATIVE_ORBIT
 		);
+#endif
 	}
 
 	return new_sound_entity;

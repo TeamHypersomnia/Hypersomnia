@@ -458,17 +458,6 @@ namespace test_scenes {
 				l.add_standard_components(step);
 			}
 
-			particles_existence_input effect;
-			effect.effect.id = assets::particle_effect_id::WANDERING_SMOKE;
-			effect.displace_source_position_within_radius = 500.f;
-			effect.single_displacement_duration_ms.set(400.f, 1500.f);
-
-			effect.create_particle_effect_entity(
-				step, 
-				components::transform(-164, 500, 0),
-				entity_id()
-			).add_standard_components(step);
-
 			{
 				const auto e = create_test_scene_entity(world, test_scene_type::HAVE_A_PLEASANT);
 

@@ -10,7 +10,7 @@
 
 #include "game/components/polygon_component.h"
 #include "game/components/sprite_component.h"
-#include "game/components/particles_existence_component.h"
+#include "game/detail/view_input/particle_effect_input.h"
 #include "game/components/render_component.h"
 
 #include "game/detail/physics/physics_scripts.h"

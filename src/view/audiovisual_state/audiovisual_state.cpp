@@ -23,7 +23,11 @@ void audiovisual_state::clear() {
 
 void audiovisual_state::reserve_caches_for_entities(const std::size_t n) {
 	systems.for_each([n](auto& sys) {
-		sys.reserve_caches_for_entities(n);
+		using T = std::decay_t<decltype(sys)>;
+
+		if constexpr(can_reserve_caches_v<T>) {
+			sys.reserve_caches_for_entities(n);
+		}
 	});
 }
 
@@ -51,7 +55,13 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 	{
 		auto scope = measure_scope(profiler.particle_logic);
 
-		particles.advance_visible_streams_and_all_particles(
+		particles.integrate_all_particles(
+			cosm,
+			dt,
+			interp
+		);
+
+		particles.advance_visible_streams(
 			input.cone,
 			screen_size,
 			cosm,
@@ -114,7 +124,7 @@ void audiovisual_state::spread_past_infection(const const_logic_step step) {
 	}
 }
 
-void audiovisual_state::standard_post_solve(const const_logic_step step) {
+void audiovisual_state::standard_post_solve(const const_logic_step step, const audiovisual_post_solve_input input) {
 	auto scope = measure_scope(profiler.post_solve);
 
 	const auto& cosmos = step.get_cosmos();
@@ -158,6 +168,9 @@ void audiovisual_state::standard_post_solve(const const_logic_step step) {
 	auto& exploding_rings = get<exploding_ring_system>();
 	auto& flying_numbers = get<flying_number_indicator_system>();
 	auto& highlights = get<pure_color_highlight_system>();
+	auto& particles = get<particles_simulation_system>();
+
+	particles.update_effects_from_messages(step, input.particle_effects, interp);
 
 	for (const auto& h : healths) {
 		flying_number_indicator_system::number::input vn;

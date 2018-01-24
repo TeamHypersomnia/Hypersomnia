@@ -3,12 +3,13 @@
 
 #include "augs/misc/timing/delta.h"
 #include "augs/misc/minmax.h"
+#include "augs/misc/enum/enum_array.h"
 
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/transcendental/step_declaration.h"
 
 #include "game/enums/render_layer.h"
-#include "game/components/particles_existence_component.h"
+#include "game/detail/view_input/particle_effect_input.h"
 
 #include "view/viewables/all_viewables_declarations.h"
 #include "view/viewables/particle_types_declaration.h"
@@ -54,30 +55,53 @@ public:
 		float fade_when_ms_remaining = 0.f;
 
 		particles_emission source_emission;
+		entity_id homing_target;
 
-		void stop_streaming() {
-			enable_streaming = false;
+		bool is_over() const {
+			return stream_lifetime_ms > stream_max_lifetime_ms;
 		}
 	};
 
-	struct cache {
-		components::particles_existence recorded_existence;
+	using emission_instances = std::vector<emission_instance>;
 
+	static bool are_over(const emission_instances& instances) {
+		for (const auto& instance : instances) {
+			if (!instance.is_over()) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	struct orbital_cache {
 		std::vector<emission_instance> emission_instances;
-		bool constructed = false;
+
+		bool is_over() const {
+			return are_over(emission_instances);
+		}
 	};
 
+	struct faf_cache {
+		components::transform transform;
+		std::vector<emission_instance> emission_instances;
+
+		bool is_over() const {
+			return are_over(emission_instances);
+		}
+	};
+
+	/* Particle vectors */
 	per_render_layer_t<std::vector<general_particle>> general_particles;
 	per_render_layer_t<std::vector<animated_particle>> animated_particles;
 	per_render_layer_t<std::unordered_map<entity_id, std::vector<homing_animated_particle>>> homing_animated_particles;
 
-	std::unordered_map<entity_id, cache> per_entity_cache;
+	/* Current streams vectors */
+	std::unordered_map<orbital_chasing, orbital_cache> orbital_emissions;
+	std::vector<faf_cache> fire_and_forget_emissions;
 
-	void reserve_caches_for_entities(const size_t) {}
 	void clear();
 	void clear_dead_entities(const cosmos&);
-
-	cache& get_cache(const const_entity_handle);
 
 	void add_particle(const render_layer, const general_particle&);
 	void add_particle(const render_layer, const animated_particle&);
@@ -124,13 +148,25 @@ public:
 		return new_particle;
 	}
 
-	void advance_visible_streams_and_all_particles(
+	void integrate_all_particles(
+		const cosmos&,
+		augs::delta dt,
+		const interpolation_system&
+	);
+
+	void advance_visible_streams(
 		camera_cone,
-		const vec2 screen_size,
+		vec2 screen_size,
 		const cosmos&,
 		const particle_effects_map&,
-		const augs::delta dt,
+		augs::delta dt,
 		const interpolation_system&
+	);
+
+	void update_effects_from_messages(
+		const_logic_step step,
+		const particle_effects_map& manager,
+		const interpolation_system& interp
 	);
 
 	template <class M>

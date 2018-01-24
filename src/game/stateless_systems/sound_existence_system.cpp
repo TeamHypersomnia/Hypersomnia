@@ -15,7 +15,6 @@
 
 #include "game/messages/collision_message.h"
 #include "game/messages/gunshot_response.h"
-#include "game/messages/create_particle_effect.h"
 #include "game/messages/queue_destruction.h"
 #include "game/messages/damage_message.h"
 #include "game/messages/melee_swing_response.h"

@@ -24,6 +24,10 @@ class cosmos;
 struct visible_entities;
 class session_profiler;
 
+struct audiovisual_post_solve_input {
+	const particle_effects_map& particle_effects;
+};
+
 struct audiovisual_advance_input {
 	const augs::delta frame_delta;
 	const double speed_multiplier;
@@ -86,15 +90,9 @@ struct audiovisual_state {
 		return systems.get<T>();
 	}
 
-	auto get_standard_post_solve() {
-		return [this](const const_logic_step step) {
-			standard_post_solve(step);
-		};
-	}
-
 	void advance(const audiovisual_advance_input);
 
-	void standard_post_solve(const const_logic_step);
+	void standard_post_solve(const const_logic_step, audiovisual_post_solve_input);
 	void standard_post_cleanup(const const_logic_step);
 
 	void spread_past_infection(const const_logic_step);
