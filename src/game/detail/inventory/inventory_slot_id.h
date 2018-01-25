@@ -32,13 +32,6 @@ struct inventory_item_address {
 	std::vector<slot_function> directions;
 };
 
-struct inventory_traversal {
-	inventory_slot_id parent_slot;
-	inventory_item_address current_address;
-	components::transform attachment_offset;
-	bool item_remains_physical = true;
-};
-
 namespace std {
 	template <>
 	struct hash<inventory_slot_id> {

@@ -33,9 +33,6 @@ struct inventory_slot {
 
 	float attachment_density_multiplier = 1.f;
 
-	rectangle_sticking attachment_sticking_mode = rectangle_sticking::LEFT;
-	components::transform attachment_offset;
-
 	// END GEN INTROSPECTOR
 
 	item_category_flagset get_allowed_categories() const;

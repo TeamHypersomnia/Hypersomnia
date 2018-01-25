@@ -153,7 +153,7 @@ perform_transfer_result perform_transfer(
 
 	grabbed_item_part_handle.infer_colliders();
 	
-	grabbed_item_part_handle.for_each_contained_item_recursive([](entity_handle h, auto&&...){
+	grabbed_item_part_handle.for_each_contained_item_recursive([](entity_handle h){
 		h.infer_colliders();	
 
 		return recursive_callback_result::CONTINUE_AND_RECURSE;

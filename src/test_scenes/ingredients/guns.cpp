@@ -459,9 +459,6 @@ namespace ingredients {
 
 			slot_def.always_allow_exactly_one_item = true;
 			slot_def.category_allowed = item_category::MAGAZINE;
-			slot_def.attachment_sticking_mode = rectangle_sticking::TOP;
-			slot_def.attachment_offset.pos.set(10, 5 - bbox.y / 2 + 2);
-			slot_def.attachment_offset.rotation = mag_rotation;
 
 			container.slots[slot_function::GUN_DETACHABLE_MAGAZINE] = slot_def;
 		}
@@ -481,8 +478,6 @@ namespace ingredients {
 			slot_def.physical_behaviour = slot_physical_behaviour::CONNECT_AS_FIXTURE_OF_BODY;
 			slot_def.always_allow_exactly_one_item = true;
 			slot_def.category_allowed = item_category::MUZZLE_ATTACHMENT;
-			slot_def.attachment_sticking_mode = rectangle_sticking::RIGHT;
-			slot_def.attachment_offset.pos.x = bbox.x / 2 - 1;
 
 			container.slots[slot_function::GUN_MUZZLE] = slot_def;
 		}

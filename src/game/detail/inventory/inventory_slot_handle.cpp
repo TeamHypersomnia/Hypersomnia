@@ -104,7 +104,7 @@ typename basic_inventory_slot_handle<C>::entity_handle_type basic_inventory_slot
 }
 
 template <bool C>
-colliders_connection basic_inventory_slot_handle<C>::calc_parent_who_owns_colliders() const {
+colliders_connection basic_inventory_slot_handle<C>::calculate_connection_until(const entity_id until) const {
 	const auto slot = get_container().get_current_slot();
 	const auto& cosmos = get_cosmos();
 
@@ -114,8 +114,9 @@ colliders_connection basic_inventory_slot_handle<C>::calc_parent_who_owns_collid
 		}
 
 		ensure(slot->physical_behaviour == slot_physical_behaviour::CONNECT_AS_FIXTURE_OF_BODY); 
-		/* TODO: calculate attachment offsets from a matrix */
-		return slot.calc_parent_who_owns_colliders();
+		/* TODO: calculate and sum attachment offsets from a matrix */
+		/* TODO: return when until is found */
+		return slot.calculate_connection_until();
 	}
 
 	return get_container().calculate_colliders_connection();

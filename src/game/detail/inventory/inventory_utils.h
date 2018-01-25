@@ -11,17 +11,6 @@ augs::constant_size_vector<item_slot_transfer_request, 4> swap_slots_for_items(
 	const const_entity_handle second 
 );
 
-components::transform get_attachment_offset(
-	const inventory_slot& slot,
-	const components::transform container_transform,
-	const const_entity_handle item
-);
-
-components::transform sum_attachment_offsets(
-	const cosmos&, 
-	const inventory_item_address addr
-);
-
 unsigned calculate_space_occupied_with_children(const_entity_handle item);
 
 containment_result query_containment_result(

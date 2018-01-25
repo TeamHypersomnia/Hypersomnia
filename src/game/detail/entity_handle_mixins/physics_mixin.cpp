@@ -28,7 +28,7 @@ colliders_connection basic_physics_mixin<C, D>::calculate_colliders_connection()
 
 	if (const auto item = self.template find<components::item>()) {
 		if (const auto slot = cosmos[item->get_current_slot()]) {
-			return slot.calc_parent_who_owns_colliders();
+			return slot.calculate_connection_until();
 		}
 
 		return { self, {} };

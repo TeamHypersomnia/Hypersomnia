@@ -56,20 +56,14 @@ private:
 	template <class S, class I>
 	callback_result for_each_contained_slot_and_item_recursive(
 		S slot_callback, 
-		I item_callback, 
-		inventory_traversal& trav
+		I item_callback
 	) const {
 		const auto this_item_handle = *static_cast<const entity_handle_type*>(this);
 		auto& cosm = this_item_handle.get_cosmos();
 
 		if (this_item_handle.template has<components::container>()) {
-			trav.current_address.directions.push_back(slot_function());
-			const auto this_item_attachment_offset = trav.attachment_offset;
-			const bool does_this_item_remain_physical = trav.item_remains_physical;
-
 			for (const auto& s : this_item_handle.template get<components::container>().slots) {
 				const auto this_slot_id = inventory_slot_id(s.first, this_item_handle.get_id());
-				
 				const auto slot_callback_result = slot_callback(cosm[this_slot_id]);
 
 				if (slot_callback_result == recursive_callback_result::ABORT) {
@@ -79,25 +73,9 @@ private:
 					continue;
 				}
 				else if (slot_callback_result == recursive_callback_result::CONTINUE_AND_RECURSE) {
-					const bool is_this_slot_physical = does_this_item_remain_physical && s.second.makes_physical_connection();
-
 					for (const auto& id : get_items_inside(this_item_handle, s.first)) {
 						const auto child_item_handle = cosm[id];
-						trav.parent_slot = this_slot_id;
-						trav.current_address.directions.back() = this_slot_id.type;
-						trav.item_remains_physical = is_this_slot_physical;
-
-						if (trav.item_remains_physical) {
-							trav.attachment_offset =
-								this_item_attachment_offset + get_attachment_offset(
-									s.second,
-									this_item_attachment_offset,
-									child_item_handle
-								)
-							;
-						}
-
-						const auto item_callback_result = item_callback(child_item_handle, static_cast<const inventory_traversal&>(trav));
+						const auto item_callback_result = item_callback(child_item_handle);
 
 						if (item_callback_result == recursive_callback_result::ABORT) {
 							return callback_result::ABORT;
@@ -108,8 +86,7 @@ private:
 						else if (item_callback_result == recursive_callback_result::CONTINUE_AND_RECURSE) {
 							if (child_item_handle.for_each_contained_slot_and_item_recursive(
 								slot_callback,
-								item_callback,
-								trav
+								item_callback
 							) == callback_result::ABORT) {
 								return callback_result::ABORT;
 							}
@@ -129,23 +106,6 @@ private:
 	}
 
 public:
-
-	template <class S, class I>
-	void for_each_contained_slot_and_item_recursive(
-		S&& slot_callback, 
-		I&& item_callback
-	) const {
-		const auto this_item_handle = *static_cast<const entity_handle_type*>(this);
-
-		inventory_traversal trav;
-		trav.current_address.root_container = this_item_handle.get_id();
-		
-		for_each_contained_slot_and_item_recursive(
-			std::forward<S>(slot_callback),
-			std::forward<I>(item_callback),
-			trav
-		);
-	}
 
 	template <class I>
 	void for_each_contained_item_recursive(I&& item_callback) const {

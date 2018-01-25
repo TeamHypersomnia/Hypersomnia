@@ -45,7 +45,7 @@ public:
 	entity_handle_type get_item_if_any() const;
 	entity_handle_type get_container() const;
 
-	colliders_connection calc_parent_who_owns_colliders() const;
+	colliders_connection calculate_connection_until(entity_id = {}) const;
 
 	entity_handle_type get_root_container() const;
 	entity_handle_type get_root_container_until(const entity_id container_entity) const;

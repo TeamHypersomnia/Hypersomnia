@@ -326,51 +326,6 @@ unsigned calculate_space_occupied_with_children(const const_entity_handle item) 
 	return space_occupied;
 }
 
-components::transform get_attachment_offset(
-	const inventory_slot& slot,
-	const components::transform container_transform,
-	const const_entity_handle item
-) {
-	ensure(slot.makes_physical_connection());
-
-	components::transform total;
-
-	const auto sticking = slot.attachment_sticking_mode;
-
-	total = slot.attachment_offset;
-	total.pos += item.get_aabb(components::transform()).get_size().get_sticking_offset(sticking);
-	total.pos.rotate(container_transform.rotation, vec2(0, 0));
-
-	return total;
-}
-
-components::transform sum_attachment_offsets(
-	const cosmos& cosm,
-	const inventory_item_address addr
-) {
-	components::transform total;
-
-	inventory_slot_id current_slot;
-	current_slot.container_entity = addr.root_container;
-	
-	for (size_t i = 0; i < addr.directions.size(); ++i) {
-		current_slot.type = addr.directions[i];
-
-		const auto slot_handle = cosm[current_slot];
-
-		ensure(slot_handle->makes_physical_connection());
-		ensure(slot_handle->always_allow_exactly_one_item);
-
-		const auto item_in_slot = slot_handle.get_items_inside()[0];
-
-		total += get_attachment_offset(*slot_handle, total, cosm[item_in_slot]);
-
-		current_slot.container_entity = item_in_slot;
-	}
-
-	return total;
-}
-
 augs::constant_size_vector<item_slot_transfer_request, 4> swap_slots_for_items(
 	const const_entity_handle first_handle,
 	const const_entity_handle second_handle
