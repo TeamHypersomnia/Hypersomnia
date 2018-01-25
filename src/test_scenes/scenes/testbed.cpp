@@ -58,13 +58,13 @@ namespace test_scenes {
 		const auto& metas = step.get_logical_assets();
 		
 #if TODO
-		const auto car = prefabs::create_car(step, components::transform( 1490, 340, -180));
-		const auto car2 = prefabs::create_car(step, components::transform(1490, 340 + 400, -180));
-		const auto car3 = prefabs::create_car(step, components::transform(1490, 340 + 800, -180));
+		const auto car = prefabs::create_car(step, components::transform( { 1490, 340 }, -180));
+		const auto car2 = prefabs::create_car(step, components::transform({ 1490, 340 + 400 }, -180));
+		const auto car3 = prefabs::create_car(step, components::transform({ 1490, 340 + 800 }, -180));
 
-		const auto riding_car = prefabs::create_car(step, components::transform(850, 1000, -90));
+		const auto riding_car = prefabs::create_car(step, components::transform({ 850, 1000 }, -90));
 
-		const auto riding_car2 = prefabs::create_car(step, components::transform(-850 + 1000, -8200, -90 + 180));
+		const auto riding_car2 = prefabs::create_car(step, components::transform({ -850 + 1000, -8200 }, -90 + 180));
 #endif
 
 		const int num_characters = 4 + 3 + 3 + 2;
@@ -92,15 +92,15 @@ namespace test_scenes {
 			components::transform transform;
 
 			if (i == 0) {
-				transform = { 0, 300, 0 };
+				transform = { { 0, 300 }, 0 };
 				//torso_set = assets::animation_response_id::TORSO_SET;
 			}
 			else if (i == 1 || i == 2) {
 				if (i == 1) {
-					transform = { 254, 211, 68 };
+					transform = { { 254, 211 }, 68 };
 				}
 				if (i == 2) {
-					transform = { 1102, 213, 110 };
+					transform = { { 1102, 213 }, 110 };
 				}
 
 			}
@@ -111,24 +111,24 @@ namespace test_scenes {
 			}
 
 			else if (i == 4) {
-				transform = { -100, 20000, 0 };
+				transform = { { -100, 20000 }, 0 };
 			}
 			else if (i == 5) {
-				transform = { 1200, 15000, 0 };
+				transform = { { 1200, 15000 }, 0 };
 			}
 			else if (i == 6) {
-				transform = { -300, 20000, 0 };
+				transform = { { -300, 20000 }, 0 };
 			}
 
 			// three metropolitan soldiers
 			else if (i == 7) {
-				transform = { -300, -2000, 0 };
+				transform = { { -300, -2000 }, 0 };
 			}
 			else if (i == 8) {
-				transform = { -400, -2000, 0 };
+				transform = { { -400, -2000 }, 0 };
 			}
 			else if (i == 9) {
-				transform = { -500, -2000, 0 };
+				transform = { { -500, -2000 }, 0 };
 			}
 
 			const auto new_character = prefabs::create_sample_complete_character(step, transform, typesafe_sprintf("player%x", i), i ? 2 : 0);
@@ -355,7 +355,7 @@ namespace test_scenes {
 		{
 			{
 				const auto l = create_test_scene_entity(world, test_scene_type::LAMP);
-				l += components::transform(164.f - 8.f + 90.f, 220);
+				l += components::transform(vec2(164.f - 8.f + 90.f, 220));
 				auto& light = l += components::light();
 				light.color = cyan;
 				light.max_distance.base_value = 4500.f;
@@ -364,7 +364,7 @@ namespace test_scenes {
 			}
 			{
 				const auto l = create_test_scene_entity(world, test_scene_type::LAMP);
-				l += components::transform(1164.f + 24.f - 90.f, 220);
+				l += components::transform(vec2(1164.f + 24.f - 90.f, 220));
 				auto& light = l += components::light();
 				light.color = orange;
 				light.max_distance.base_value = 4500.f;
@@ -450,7 +450,7 @@ namespace test_scenes {
 
 			{
 				const auto l = create_test_scene_entity(world, test_scene_type::LAMP);
-				l += components::transform(664.f + 24.f, -1100);
+				l += components::transform(vec2(664.f + 24.f, -1100));
 				auto& light = l += components::light();
 				light.color = orange;
 				light.max_distance.base_value = 4500.f;
@@ -461,24 +461,22 @@ namespace test_scenes {
 			{
 				const auto e = create_test_scene_entity(world, test_scene_type::HAVE_A_PLEASANT);
 
-				e += components::transform(164.f - 8.f, -60.f - 20.f);
+				e += components::transform(vec2(164.f - 8.f, -60.f - 20.f));
 
 				e.add_standard_components(step);
 
-				prefabs::create_brick_wall(step, components::transform(3 + 1 + 1100, -32 - 96));
-				prefabs::create_brick_wall(step, components::transform(3 + 1 + 1100 + 160, -32 - 96));
-				prefabs::create_brick_wall(step, components::transform(3 + 1 + 1100 + 160, -32 - 96 + 160));
-				prefabs::create_brick_wall(step, components::transform(3 + 1 + 1100, -32 - 96 + 160));
-
-
-				prefabs::create_brick_wall(step, components::transform(-3 -16 + 100, -32 - 96));
-				prefabs::create_brick_wall(step, components::transform(-3 -16 + 100 + 160, -32 - 96));
-				prefabs::create_brick_wall(step, components::transform(-3 -16 + 100 + 160, -32 - 96 + 160));
-				prefabs::create_brick_wall(step, components::transform(-3 -16 + 100, -32 - 96 + 160));
+				prefabs::create_brick_wall(step, vec2(3 + 1 + 1100, -32 - 96));
+				prefabs::create_brick_wall(step, vec2(3 + 1 + 1100 + 160, -32 - 96));
+				prefabs::create_brick_wall(step, vec2(3 + 1 + 1100 + 160, -32 - 96 + 160));
+				prefabs::create_brick_wall(step, vec2(3 + 1 + 1100, -32 - 96 + 160));
+				prefabs::create_brick_wall(step, vec2(-3 -16 + 100, -32 - 96));
+				prefabs::create_brick_wall(step, vec2(-3 -16 + 100 + 160, -32 - 96));
+				prefabs::create_brick_wall(step, vec2(-3 -16 + 100 + 160, -32 - 96 + 160));
+				prefabs::create_brick_wall(step, vec2(-3 -16 + 100, -32 - 96 + 160));
 
 				for (int b = 0; b < 8; ++b) {
-					prefabs::create_brick_wall(step, components::transform(3 + 1 + 1100 + 160 + 160, -32 - 96 + 160 - 160.f * b, 90));
-					prefabs::create_brick_wall(step, components::transform(-3 - 16 + 100 - 160, -32 - 96 + 160 - 160*b, 90));
+					prefabs::create_brick_wall(step, components::transform({ 3.f + 1 + 1100 + 160 + 160, -32 - 96 + 160 - 160.f * b }, 90));
+					prefabs::create_brick_wall(step, components::transform({ -3.f - 16 + 100 - 160, -32.f - 96 + 160 - 160*b }, 90));
 				}
 
 				const vec2 bg_size = metas.at(assets::game_image_id::TEST_BACKGROUND).get_size();
@@ -524,7 +522,7 @@ namespace test_scenes {
 				const auto e = create_test_scene_entity(world, test_scene_type::AWAKENING);
 				
 
-				e += components::transform(164.f - 8.f, -60.f - 20.f + 40.f);
+				e += components::transform(vec2(164.f - 8.f, -60.f - 20.f + 40.f));
 
 				e.add_standard_components(step);
 			}
@@ -534,7 +532,7 @@ namespace test_scenes {
 
 				
 
-				e += components::transform(1164.f + 24.f, -60.f);
+				e += components::transform(vec2(1164.f + 24.f, -60.f));
 
 				e.add_standard_components(step);
 			}

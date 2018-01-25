@@ -129,8 +129,8 @@ namespace augs {
 template <class type>
 struct basic_vec2 {
 	// GEN INTROSPECTOR struct basic_vec2 class type
-	type x;
-	type y;
+	type x = static_cast<type>(0);
+	type y = static_cast<type>(0);
 	// END GEN INTROSPECTOR
 
 	static basic_vec2 zero;
@@ -184,10 +184,9 @@ struct basic_vec2 {
 		y(static_cast<type>(v.y)) 
 	{}
 
-	basic_vec2(
-		const type x = static_cast<type>(0), 
-		const type y = static_cast<type>(0)
-	) : 
+	basic_vec2() = default;
+
+	basic_vec2(const type x, const type y) : 
 		x(x), 
 		y(y) 
 	{}

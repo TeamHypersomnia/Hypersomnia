@@ -18,8 +18,8 @@ namespace components {
 		float chosen_lengthening_duration_ms = -1.f;
 		float lengthening_time_passed_ms = 0.f;
 
-		vec2 last_size_mult = 0.f;
-		vec2 last_center_offset_mult = 0.f;
+		vec2 last_size_mult;
+		vec2 last_center_offset_mult;
 
 		bool is_it_a_finishing_trace = false;
 		pad_bytes<3> pad;

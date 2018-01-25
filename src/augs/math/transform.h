@@ -11,17 +11,10 @@ struct basic_transform {
 
 	// GEN INTROSPECTOR struct basic_transform class T
 	vec2 pos;
-	T rotation;
+	T rotation = static_cast<T>(0);
 	// END GEN INTROSPECTOR
 
-	basic_transform(
-		const T x = static_cast<T>(0),
-		const T y = static_cast<T>(0),
-		const T rotation = static_cast<T>(0)
-	) :
-		pos(vec2(x, y)),
-		rotation(rotation)
-	{}
+	basic_transform() = default;
 
 	basic_transform(
 		const vec2 pos,
