@@ -25,8 +25,8 @@ void populate_test_scene_types(const all_logical_assets& logicals, entity_types&
 	/* Let all renderables have interpolation by default */
 
 	for (auto& t : into.types) {
-		if (t.find<definitions::render>()) {
-			t.set(definitions::interpolation());
+		if (t.find<invariants::render>()) {
+			t.set(invariants::interpolation());
 		}
 	}
 }

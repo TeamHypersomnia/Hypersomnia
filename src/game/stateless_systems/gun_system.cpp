@@ -107,11 +107,11 @@ void gun_system::consume_gun_intents(const logic_step step) {
 	}
 }
 
-vec2 definitions::gun::calculate_muzzle_position(const components::transform gun_transform) const {
+vec2 invariants::gun::calculate_muzzle_position(const components::transform gun_transform) const {
 	return (gun_transform * components::transform(bullet_spawn_offset)).pos;
 }
 
-vec2 definitions::gun::calculate_barrel_center(const components::transform gun_transform) const {
+vec2 invariants::gun::calculate_barrel_center(const components::transform gun_transform) const {
 	return (gun_transform * components::transform(vec2(0, bullet_spawn_offset.y))).pos;
 }
 
@@ -131,7 +131,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 			;
 
 			auto& gun = gun_entity.get<components::gun>();
-			const auto& gun_def = gun_entity.get_def<definitions::gun>();
+			const auto& gun_def = gun_entity.get_def<invariants::gun>();
 
 			const auto magic_missile_def = cosmos[gun.magic_missile_definition];
 			const auto is_magic_launcher = magic_missile_def.alive();

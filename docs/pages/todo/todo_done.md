@@ -30,7 +30,7 @@ and if it is successful, do set it and reinfer the item.
 
 we consider whole type overrides too complex architeciturally:
 - the assumptions about inferred state for entity types are gone; previously it was just generated once and set in stone, always correct
-- noise while getting those definitions
+- noise while getting those invariants
 - we should discourage solver from ever modifying that state
 	- otherwise to look good we would need to always completely destroy that entity and recreate it with components with default associated values
 
@@ -56,7 +56,7 @@ we consider whole type overrides too complex architeciturally:
 		- not if we allow b2body to be destroyed
 	- For now let's just leave it as it is so that we hit assert when we acquire logic transform at a suspicious time
 
-- Definitionizing rigid body
+- Invariantizing rigid body
 	- velocity and transform should always be able to be set directly as they are temporary parameters of the simulation, not statelessly calculated on any state.
 		- better wording: these variables are accumulators
 

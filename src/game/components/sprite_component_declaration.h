@@ -6,6 +6,6 @@ namespace augs {
 	struct sprite;
 }
 
-namespace definitions {
+namespace invariants {
 	using sprite = augs::sprite<assets::game_image_id>;
 }

@@ -33,13 +33,13 @@ namespace test_types {
 		{
 			auto& meta = get_test_type(types, test_scene_type::SAMPLE_BACKPACK);
 
-			definitions::render render_def;
+			invariants::render render_def;
 			render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
 
 			meta.set(render_def);
 
 			test_types::add_sprite(meta, logicals, assets::game_image_id::BACKPACK, white);
-			meta.add_shape_definition_from_renderable(logicals);
+			meta.add_shape_invariant_from_renderable(logicals);
 			test_types::add_see_through_dynamic_body(meta);
 		}
 	}

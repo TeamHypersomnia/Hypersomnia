@@ -25,9 +25,9 @@ struct convex_poly_destruction_data {
 	// END GEN INTROSPECTOR
 };
 
-namespace definitions {
+namespace invariants {
 	struct shape_polygon {
-		// GEN INTROSPECTOR struct definitions::shape_polygon
+		// GEN INTROSPECTOR struct invariants::shape_polygon
 		convex_partitioned_shape shape;
 		// END GEN INTROSPECTOR
 	};

@@ -9,6 +9,6 @@ void for_each_component_type(F&& callback) {
 }
 
 template <class F>
-void for_each_definition_type(F&& callback) {
-	for_each_type_in_list<definition_list_t<type_list>>(std::forward<F>(callback));
+void for_each_invariant_type(F&& callback) {
+	for_each_type_in_list<invariant_list_t<type_list>>(std::forward<F>(callback));
 }

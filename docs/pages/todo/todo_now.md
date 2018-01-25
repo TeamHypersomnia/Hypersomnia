@@ -39,21 +39,20 @@ summary: Just a hidden scratchpad.
 		- because a fixtural entity might additionally have a particles existence that chases upon itself.
 			- e.g. truck engine
 
-- rename "definitions" to "invariants"
 - remove "get_attachment_offset" and introduce attachment matrix for flavours
 
 - Thoughts about native types
 	- We will totally get rid of processing component and calculate statelessly which that which needs to be calculated.
 		- We anyway very rarely ever disabled something in processing subjects and we must always account for the worst case.
 	- Refer to typed_entity_handle for draft.
-	- Rename "entity_type" to "entity_flavour" and use "entity type" to represent the natively assembled aggregate of definitions and its counterpart
+	- Rename "entity_type" to "entity_flavour" and use "entity type" to represent the natively assembled aggregate of invariants and its counterpart
 		- entity_flavour_type vs entity_type 
 	- Since the architecture will be corrected to the point where the solvers won't add any component,
 	we could actually introduce native entity types.
 		- dynamic_obstacle = sprite + render + rigid body + fixtures 
-	- The authors should not be concerned with customizing definition sets but with choosing native, well-understood presets.
+	- The authors should not be concerned with customizing invariant sets but with choosing native, well-understood presets.
 	- This could be even introduced incrementally, e.g. entity handle would still perform type erasure to not compile everything in headers.
-		- For now the authors may also see just presets without being able to add or remove definitions
+		- For now the authors may also see just presets without being able to add or remove invariants
 		- Specialized handles would be returned by for_each for processing_subjects in the cosmos
 		
 	- Storage
@@ -77,7 +76,7 @@ summary: Just a hidden scratchpad.
 				- then the logic can just get the cache once.
 			- const-valued caches should be gettable.
 			- some funny special logic will probably use it to do some additional physics calculations?
-			- will probably be nice to pass around the definition ref to avoid repeated getting
+			- will probably be nice to pass around the invariant ref to avoid repeated getting
 				- or just do so once we determine the bottleneck
 		- Calculates the value to be passed to cache - slow, works always
 		- Requests for a certain field to be recalculated
@@ -89,13 +88,13 @@ summary: Just a hidden scratchpad.
 		- gun component 
 			- firing engine sound and muzzle particles are "persistent child entities"
 				- thus they should become group entities.
-					- That will be only possible once we definitionize practically everything.
+					- That will be only possible once we invariantize practically everything.
 			- magic missile def is just a child entity to be cloned around as needed.
 				- thus it only becomes type id.
 		- catridge component
-			- whole component should become definitions and its child entity id fields should just become type ids
+			- whole component should become invariants and its child entity id fields should just become type ids
 	- Get rid of component adders and deleters.
-		- That will be only possible once we definitionize practically everything in the test scenes.
+		- That will be only possible once we invariantize practically everything in the test scenes.
 		- We'll thus need to make sender and others "always present".
 - Current slot should stay in the item component as other fields of item will anyway be a private
 - **moving disabled processing lists out of the significant state**

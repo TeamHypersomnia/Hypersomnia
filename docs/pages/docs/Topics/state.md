@@ -155,8 +155,8 @@ We will list here all possible corner cases and what code is expected to correct
 - Now:
 	- Solvers proceed as usual with due care.
 	- If the author makes *any* action that somehow alters the associated fields, call the safe deleter and, if components are to be readded, make sure their associated fields are always default.
-		- In particular, if a type of an entity changes, or if enabled definitions change, call safe deleter and re-add intial component values from the definitions. 
-			- In particular, the definitions will be guaranteed to always have associated fields at their default values.
+		- In particular, if a type of an entity changes, or if enabled invariants change, call safe deleter and re-add intial component values from the invariants. 
+			- In particular, the invariants will be guaranteed to always have associated fields at their default values.
 			- We don't care that if we change an item's type it will be dropped to the ground. Life's harsh.
 
 Existing problems with state consistency:

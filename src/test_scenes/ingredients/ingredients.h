@@ -49,7 +49,7 @@ namespace test_types {
 		const all_logical_assets& logicals,
 		assets::game_image_id = assets::game_image_id::INVALID,
 		rgba col = rgba(255, 255, 255, 255),
-		definitions::sprite::special_effect = {}
+		invariants::sprite::special_effect = {}
 	);
 }
 

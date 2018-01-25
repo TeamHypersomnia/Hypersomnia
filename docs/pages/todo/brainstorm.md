@@ -30,7 +30,7 @@ fixtures can form scene graph as they have relative transforms.
 transform logic might need refactoring for statelessness?
 
 components should be templatized by id
-	lets us define groups in definitions 
+	lets us define groups in invariants 
 	synchronizers will anyway work with entity_id specialization thus not much more will be templatized
 	introspectors could static assert against usage of entity ids in non-template components
 

@@ -50,8 +50,8 @@ class basic_entity_handle :
 	}
 
 	template <typename T>
-	static void check_definition_type() {
-		static_assert(is_one_of_list_v<T, definition_list_t<type_list>>, "Unknown definition type!");
+	static void check_invariant_type() {
+		static_assert(is_one_of_list_v<T, invariant_list_t<type_list>>, "Unknown invariant type!");
 	}
 
 	auto& pool_provider() const {
@@ -206,7 +206,7 @@ public:
 
 	bool get_flag(const entity_flag f) const {
 		ensure(alive());
-		return get_def<definitions::flags>().values.test(f);
+		return get_def<invariants::flags>().values.test(f);
 	}
 
 	template <class F>
@@ -237,13 +237,13 @@ public:
 
 	template <class D>
 	const D& get_def() const {
-		check_definition_type<D>();
+		check_invariant_type<D>();
 		return get_type().template get<D>();
 	}
 
 	template <class D>
 	const D* find_def() const {
-		check_definition_type<D>();
+		check_invariant_type<D>();
 		return get_type().template find<D>();
 	}
 

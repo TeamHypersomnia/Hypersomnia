@@ -34,7 +34,7 @@ namespace components {
 			|| capability_of_sender == sender_owner_body.get_owning_transfer_capability()
 			|| (
 				vehicle_driven_by_capability == potential_sender 
-				&& potential_sender.get_def<definitions::fixtures>().can_driver_shoot_through()
+				&& potential_sender.get_def<invariants::fixtures>().can_driver_shoot_through()
 			)
 		;
 

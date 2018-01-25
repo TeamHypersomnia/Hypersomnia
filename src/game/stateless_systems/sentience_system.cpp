@@ -484,7 +484,7 @@ void sentience_system::rotate_towards_crosshairs_and_driven_vehicles(const logic
 				if (items.size() > 0) {
 					const auto subject_item = cosmos[items[0]];
 
-					if (const auto* const maybe_gun_def = subject_item.find_def<definitions::gun>()) {
+					if (const auto* const maybe_gun_def = subject_item.find_def<invariants::gun>()) {
 						const auto& gun_def = *maybe_gun_def;
 
 						const auto rifle_transform = subject_item.get_logic_transform();

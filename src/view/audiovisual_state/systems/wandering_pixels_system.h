@@ -60,7 +60,7 @@ public:
 	void draw_wandering_pixels_as_sprites(
 		const const_entity_handle subject,
 		const M& manager,
-		definitions::sprite::drawing_input basic_input
+		invariants::sprite::drawing_input basic_input
 	) const {
 		const auto& wandering = subject.get<components::wandering_pixels>();
 		const auto& cache = get_cache(subject);

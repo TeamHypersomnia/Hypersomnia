@@ -4,7 +4,7 @@
 
 namespace components {
 	void trace::reset(
-		const definitions::trace& def,
+		const invariants::trace& def,
 		fast_randomization& p
 	) {
 		lengthening_time_passed_ms = 0.f;

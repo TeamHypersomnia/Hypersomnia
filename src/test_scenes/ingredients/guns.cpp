@@ -36,7 +36,7 @@ namespace test_types {
 			auto& meta = get_test_type(types, test_scene_type::CYAN_ROUND_DEFINITION);
 
 			{
-				definitions::render render_def;
+				invariants::render render_def;
 				render_def.layer = render_layer::FLYING_BULLETS;
 
 				meta.set(render_def);
@@ -44,17 +44,17 @@ namespace test_types {
 
 
 			{
-				definitions::flags flags_def;
+				invariants::flags flags_def;
 				flags_def.values.set(entity_flag::IS_IMMUNE_TO_PAST);
 				meta.set(flags_def);
 			}
 
 			test_types::add_sprite(meta, logicals, assets::game_image_id::ROUND_TRACE, cyan);
-			meta.add_shape_definition_from_renderable(logicals);
+			meta.add_shape_invariant_from_renderable(logicals);
 
 			{
 				{
-					definitions::trace trace_def;
+					invariants::trace trace_def;
 
 					trace_def.max_multiplier_x = {0.0f, 1.2f};
 					trace_def.max_multiplier_y = {0.f, 0.f};
@@ -73,14 +73,14 @@ namespace test_types {
 			auto& meta = get_test_type(types, test_scene_type::CYAN_SHELL_DEFINITION);
 
 			{
-				definitions::render render_def;
+				invariants::render render_def;
 				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
 
 				meta.set(render_def);
 			}
 
 			test_types::add_sprite(meta, logicals, assets::game_image_id::CYAN_SHELL, white);
-			meta.add_shape_definition_from_renderable(logicals);
+			meta.add_shape_invariant_from_renderable(logicals);
 			test_types::add_shell_dynamic_body(meta);
 		}
 
@@ -88,14 +88,14 @@ namespace test_types {
 			auto& meta = get_test_type(types, test_scene_type::CYAN_CHARGE);
 
 			{
-				definitions::render render_def;
+				invariants::render render_def;
 				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
 
 				meta.set(render_def);
 			}
 
 			test_types::add_sprite(meta, logicals, assets::game_image_id::CYAN_CHARGE, white);
-			meta.add_shape_definition_from_renderable(logicals);
+			meta.add_shape_invariant_from_renderable(logicals);
 			test_types::add_see_through_dynamic_body(meta);
 		}
 
@@ -103,14 +103,14 @@ namespace test_types {
 			auto& meta = get_test_type(types, test_scene_type::SAMPLE_MAGAZINE);
 
 			{
-				definitions::render render_def;
+				invariants::render render_def;
 				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
 
 				meta.set(render_def);
 			}
 
 			test_types::add_sprite(meta, logicals, assets::game_image_id::SAMPLE_MAGAZINE, white);
-			meta.add_shape_definition_from_renderable(logicals);
+			meta.add_shape_invariant_from_renderable(logicals);
 			test_types::add_see_through_dynamic_body(meta);
 		}
 
@@ -118,7 +118,7 @@ namespace test_types {
 			auto& meta = get_test_type(types, test_scene_type::CYAN_ROUND_FINISHING_TRACE);
 			
 			{
-				definitions::render render_def;
+				invariants::render render_def;
 				render_def.layer = render_layer::FLYING_BULLETS;
 
 				meta.set(render_def);
@@ -126,7 +126,7 @@ namespace test_types {
 			}
 
 			{
-				definitions::trace trace_def;
+				invariants::trace trace_def;
 
 				trace_def.max_multiplier_x = {0.0f, 1.2f};
 				trace_def.max_multiplier_y = {0.f, 0.f};
@@ -141,7 +141,7 @@ namespace test_types {
 			auto& meta = get_test_type(types, test_scene_type::ENERGY_BALL_FINISHING_TRACE);
 
 			{
-				definitions::render render_def;
+				invariants::render render_def;
 				render_def.layer = render_layer::FLYING_BULLETS;
 
 				meta.set(render_def);
@@ -149,7 +149,7 @@ namespace test_types {
 			}
 
 			{
-				definitions::trace trace_def;
+				invariants::trace trace_def;
 
 				trace_def.max_multiplier_x = {0.0f, 0.f};
 				trace_def.max_multiplier_y = {0.f, 0.f};
@@ -164,7 +164,7 @@ namespace test_types {
 			auto& meta = get_test_type(types, test_scene_type::AMPLIFIER_ARM_MISSILE);
 			
 			{
-				definitions::render render_def;
+				invariants::render render_def;
 				render_def.layer = render_layer::FLYING_BULLETS;
 
 				meta.set(render_def);
@@ -172,9 +172,9 @@ namespace test_types {
 
 
 			test_types::add_sprite(meta, logicals, assets::game_image_id::ENERGY_BALL, cyan);
-			meta.add_shape_definition_from_renderable(logicals);
+			meta.add_shape_invariant_from_renderable(logicals);
 			{
-				definitions::trace trace_def;
+				invariants::trace trace_def;
 
 				trace_def.max_multiplier_x = {0.0f, 0.f};
 				trace_def.max_multiplier_y = {0.f, 0.f};
@@ -193,7 +193,7 @@ namespace test_types {
 			auto& meta = get_test_type(types, test_scene_type::SAMPLE_RIFLE);
 
 			{
-				definitions::render render_def;
+				invariants::render render_def;
 				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
 
 				meta.set(render_def);
@@ -203,7 +203,7 @@ namespace test_types {
 				L"Standard issue sample rifle."
 			;
 
-			definitions::gun gun_def;
+			invariants::gun gun_def;
 
 			gun_def.muzzle_shot_sound.id = assets::sound_buffer_id::ASSAULT_RIFLE_MUZZLE;
 
@@ -230,7 +230,7 @@ namespace test_types {
 			meta.set(gun_def);
 
 			test_types::add_sprite(meta, logicals, assets::game_image_id::ASSAULT_RIFLE, white);
-			meta.add_shape_definition_from_renderable(logicals);
+			meta.add_shape_invariant_from_renderable(logicals);
 			test_types::add_see_through_dynamic_body(meta);
 		}
 
@@ -238,13 +238,13 @@ namespace test_types {
 			auto& meta = get_test_type(types, test_scene_type::KEK9);
 
 			{
-				definitions::render render_def;
+				invariants::render render_def;
 				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
 
 				meta.set(render_def);
 			}
 
-			definitions::gun gun_def;
+			invariants::gun gun_def;
 
 			gun_def.muzzle_shot_sound.id = assets::sound_buffer_id::KEK9_MUZZLE;
 
@@ -271,7 +271,7 @@ namespace test_types {
 			meta.set(gun_def);
 
 			test_types::add_sprite(meta, logicals, assets::game_image_id::KEK9, white);
-			meta.add_shape_definition_from_renderable(logicals);
+			meta.add_shape_invariant_from_renderable(logicals);
 			test_types::add_see_through_dynamic_body(meta);
 		}
 
@@ -279,13 +279,13 @@ namespace test_types {
 			auto& meta = get_test_type(types, test_scene_type::AMPLIFIER_ARM);
 
 			{
-				definitions::render render_def;
+				invariants::render render_def;
 				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
 
 				meta.set(render_def);
 			}
 
-			definitions::gun gun_def;
+			invariants::gun gun_def;
 
 			gun_def.muzzle_shot_sound.id = assets::sound_buffer_id::ASSAULT_RIFLE_MUZZLE;
 
@@ -301,7 +301,7 @@ namespace test_types {
 			meta.set(gun_def);
 
 			test_types::add_sprite(meta, logicals, assets::game_image_id::AMPLIFIER_ARM, white);
-			meta.add_shape_definition_from_renderable(logicals);
+			meta.add_shape_invariant_from_renderable(logicals);
 			test_types::add_see_through_dynamic_body(meta);
 		}
 	}
@@ -318,7 +318,7 @@ namespace prefabs {
 		ingredients::add_default_gun_container(step, weapon);
 
 		auto& gun = weapon.get<components::gun>();
-		auto& gun_def = weapon.get_def<definitions::gun>();
+		auto& gun_def = weapon.get_def<invariants::gun>();
 
 
 		// add_muzzle_particles(weapon, gun, step);
@@ -358,7 +358,7 @@ namespace prefabs {
 		ingredients::add_default_gun_container(step, weapon, 0.f, true);
 
 		auto& gun = weapon.get<components::gun>();
-		auto& gun_def = weapon.get_def<definitions::gun>();
+		auto& gun_def = weapon.get_def<invariants::gun>();
 
 		// add_muzzle_particles(weapon, gun, step);
 

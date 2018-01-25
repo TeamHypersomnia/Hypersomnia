@@ -14,7 +14,7 @@ animation should work statelessly, in particular it should not set values to spr
 
 pass display size and implement augs::get_display
 
-we could make dynamically allocated tuple of overridden definitions for an entity that would normally just take one id,
+we could make dynamically allocated tuple of overridden invariants for an entity that would normally just take one id,
 that would map to a tuple of ids. as overriddes would be anyway rare that is will not hinder performance
 we could always just say that we will always require new type to be defined wherever we would like to override something
 so instead of explicitly making the thrown body bullet in the hand fuse logic, we'll just always leave it to the author to create a bullet body and assign a type id into the proper component
@@ -33,7 +33,7 @@ v - begin selection with arrows
 
 - immutable fields within component aggregate
 	- applicable components: type, guid
-	- applicable: quick definition copies
+	- applicable: quick invariant copies
 		- what about byte readwrite?
 			- it anyway reinterpret casts to mutable bytes
 		- what about lua readwrite?

@@ -23,7 +23,7 @@ static void get_visible_per_layer(
 
 	for (const auto it_id : entities) {
 		const auto it = cosmos[it_id];
-		const auto layer = it.get_def<definitions::render>().layer;
+		const auto layer = it.get_def<invariants::render>().layer;
 		// ensure(layer < static_cast<render_layer>(output_layers.size()));
 		output_layers[layer].push_back(it);
 	}

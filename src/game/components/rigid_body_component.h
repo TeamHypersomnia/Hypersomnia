@@ -68,11 +68,11 @@ namespace components {
 	};
 }
 
-namespace definitions {
+namespace invariants {
 	struct rigid_body {
 		using implied_component = components::rigid_body;
 
-		// GEN INTROSPECTOR struct definitions::rigid_body
+		// GEN INTROSPECTOR struct invariants::rigid_body
 		bool bullet = false;
 		bool angled_damping = false;
 		bool allow_sleep = true;
@@ -121,7 +121,7 @@ public:
 		return get_raw_component().special;
 	}
 
-	damping_info calculate_damping_info(const definitions::rigid_body&) const;
+	damping_info calculate_damping_info(const invariants::rigid_body&) const;
 
 	vec2 get_velocity() const;
 	float get_mass() const;

@@ -16,9 +16,9 @@ namespace test_types {
 		const all_logical_assets& logicals,
 		const assets::game_image_id id, 
 		const rgba col,
-		const definitions::sprite::special_effect effect
+		const invariants::sprite::special_effect effect
 	) {
-		definitions::sprite sprite_def;
+		invariants::sprite sprite_def;
 		sprite_def.set(id, logicals, col);
 		sprite_def.effect = effect;
 		t.set(sprite_def);

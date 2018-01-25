@@ -29,7 +29,7 @@ std::optional<components::transform> basic_spatial_properties_mixin<C, D>::find_
 		Since an alive owner body always implies that the entity has fixtures component,
 		it is equivalent to the call of:
 
-		const auto fixtures = owner.template find_def<definitions::fixtures>()
+		const auto fixtures = owner.template find_def<invariants::fixtures>()
 
 		But we would anyway need to get the owner body so we do it this way.
 	*/

@@ -55,11 +55,11 @@ namespace components {
 	};
 }
 
-namespace definitions {
+namespace invariants {
 	struct gun {
 		using implied_component = components::gun;
 
-		// GEN INTROSPECTOR struct definitions::gun
+		// GEN INTROSPECTOR struct invariants::gun
 		float shot_cooldown_ms = 100.f;
 
 		unsigned short num_last_bullets_to_trigger_low_ammo_cue = 0;

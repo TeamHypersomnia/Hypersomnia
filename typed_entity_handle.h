@@ -2,8 +2,8 @@
 
 namespace entity_types {
 	using character = augs::trivially_copyable_tuple<
-		definitions::rigid_body,
-		definitions::fixtures
+		invariants::rigid_body,
+		invariants::fixtures
 	>
 }
 

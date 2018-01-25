@@ -25,9 +25,9 @@ namespace components {
 	};
 }
 
-namespace definitions {
+namespace invariants {
 	struct fixtures {
-		// GEN INTROSPECTOR struct definitions::fixtures
+		// GEN INTROSPECTOR struct invariants::fixtures
 		bool friction_ground = false;
 		bool disable_standard_collision_resolution = false;
 		bool driver_shoot_through = false;

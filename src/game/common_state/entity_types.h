@@ -10,19 +10,19 @@
 
 using entity_description_type = entity_name_type;
 using entity_initial_components = component_list_t<std::tuple>;
-using definition_tuple = definition_list_t<augs::trivially_copyable_tuple>;
+using invariant_tuple = invariant_list_t<augs::trivially_copyable_tuple>;
 
 class entity_type {
 	template <class D>
-	static constexpr auto idx = definition_index_v<D>;
+	static constexpr auto idx = invariant_index_v<D>;
 
 	template <class D, class E>
 	static auto& get_impl(E& self) {
 		if constexpr(!is_always_present_v<D>) {
-			ensure(self.enabled_definitions[idx<D>]); 
+			ensure(self.enabled_invariants[idx<D>]); 
 		}
 
-		return std::get<D>(self.definitions); 
+		return std::get<D>(self.invariants); 
 	}
 
 	template <class D, class E>
@@ -31,8 +31,8 @@ class entity_type {
 			return &get_impl<D>(self);
 		}
 		else {
-			if (self.enabled_definitions[idx<D>]) {
-				return std::addressof(std::get<D>(self.definitions));
+			if (self.enabled_invariants[idx<D>]) {
+				return std::addressof(std::get<D>(self.invariants));
 			}
 
 			return nullptr; 
@@ -44,16 +44,16 @@ public:
 	entity_name_type name;
 	entity_description_type description;
 
-	std::array<bool, DEFINITIONS_COUNT> enabled_definitions = {};
-	definition_tuple definitions;
+	std::array<bool, INVARIANTS_COUNT> enabled_invariants = {};
+	invariant_tuple invariants;
 
 	entity_initial_components initial_components;
 	// END GEN INTROSPECTOR
 
 	template <class D>
 	void set(const D& def) {
-		enabled_definitions[idx<D>] = true;
-		std::get<D>(definitions) = def;
+		enabled_invariants[idx<D>] = true;
+		std::get<D>(invariants) = def;
 	}
 
 	template <class D>
@@ -62,7 +62,7 @@ public:
 			get<D>() = {};
 		}
 		else {
-			enabled_definitions[idx<D>] = false;
+			enabled_invariants[idx<D>] = false;
 		}
 	}
 
@@ -98,7 +98,7 @@ public:
 		name.clear();
 	}
 
-	void add_shape_definition_from_renderable(
+	void add_shape_invariant_from_renderable(
 		const all_logical_assets& assets
 	);
 };

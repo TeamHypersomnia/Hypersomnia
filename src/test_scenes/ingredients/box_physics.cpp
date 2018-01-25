@@ -10,8 +10,8 @@
 
 namespace test_types {
 	void add_standard_dynamic_body(entity_type& meta) {
-		definitions::fixtures fixtures_def;
-		definitions::rigid_body body_def;
+		invariants::fixtures fixtures_def;
+		invariants::rigid_body body_def;
 
 		body_def.damping.linear = 6.5f;
 		body_def.damping.angular = 6.5f;
@@ -25,8 +25,8 @@ namespace test_types {
 	}
 
 	void add_see_through_dynamic_body(entity_type& meta) {
-		definitions::fixtures fixtures_def;
-		definitions::rigid_body body_def;
+		invariants::fixtures fixtures_def;
+		invariants::rigid_body body_def;
 
 		body_def.damping.linear = 6.5f;
 		body_def.damping.angular = 6.5f;
@@ -41,8 +41,8 @@ namespace test_types {
 	}
 
 	void add_shell_dynamic_body(entity_type& meta) {
-		definitions::fixtures fixtures_def;
-		definitions::rigid_body body_def;
+		invariants::fixtures fixtures_def;
+		invariants::rigid_body body_def;
 
 		body_def.damping.linear = 6.5f;
 		body_def.damping.angular = 6.5f;
@@ -59,8 +59,8 @@ namespace test_types {
 	}
 
 	void add_standard_static_body(entity_type& meta) {
-		definitions::fixtures fixtures_def;
-		definitions::rigid_body body_def;
+		invariants::fixtures fixtures_def;
+		invariants::rigid_body body_def;
 
 		body_def.damping.linear = 6.5f;
 		body_def.damping.angular = 6.5f;
@@ -76,8 +76,8 @@ namespace test_types {
 	}
 	
 	void add_bullet_round_physics(entity_type& meta) {
-		definitions::fixtures fixtures_def;
-		definitions::rigid_body body_def;
+		invariants::fixtures fixtures_def;
+		invariants::rigid_body body_def;
 
 		body_def.bullet = true;
 		body_def.damping.angular = 0.f,

@@ -7,7 +7,7 @@
 
 struct fast_randomization;
 
-namespace definitions {
+namespace invariants {
 	struct trace;
 }
 
@@ -26,18 +26,18 @@ namespace components {
 		// END GEN INTROSPECTOR
 
 		void reset(
-			const definitions::trace&,
+			const invariants::trace&,
 			fast_randomization& p
 		);
 	};
 }
 
-namespace definitions {
+namespace invariants {
 	struct trace {
 		using implied_component = components::trace;
 		using minmax = augs::minmax<float>;
 
-		// GEN INTROSPECTOR struct definitions::trace
+		// GEN INTROSPECTOR struct invariants::trace
 		minmax max_multiplier_x = minmax(1.f, 1.f);
 		minmax max_multiplier_y = minmax(1.f, 1.f);
 

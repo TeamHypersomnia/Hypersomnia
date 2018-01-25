@@ -7,9 +7,9 @@
 
 #include "augs/pad_bytes.h"
 
-namespace definitions {
+namespace invariants {
 	struct render {
-		// GEN INTROSPECTOR struct definitions::render
+		// GEN INTROSPECTOR struct invariants::render
 		render_layer layer = render_layer::UNDER_GROUND;
 		// END GEN INTROSPECTOR
 	};

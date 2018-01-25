@@ -6,11 +6,11 @@
 
 std::optional<tree_of_npo_node_input> tree_of_npo_node_input::create_default_for(const const_entity_handle e) {
 	const bool has_renderable = 
-		e.find_def<definitions::render>() 
+		e.find_def<invariants::render>() 
 	;
 
 	const bool has_physical = 
-		e.find_def<definitions::fixtures>() 
+		e.find_def<invariants::fixtures>() 
 		|| e.has<components::rigid_body>() 
 	;
 

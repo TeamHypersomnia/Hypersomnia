@@ -25,8 +25,8 @@ summary: Just a hidden scratchpad.
 - replace "reinfer all caches of" calls in entity handle with something else
 	- existence of components should imply these things
 		- basic processing categories
-		- existence of correspondent definitions
-			- in particular, it should be unsafe to access definitions if component has not been checked beforehand 
+		- existence of correspondent invariants
+			- in particular, it should be unsafe to access invariants if component has not been checked beforehand 
 		- existence of caches
 			- as for always_present components which need caches...
 				- ...the cache should be inferred right with creation of the entity,
@@ -40,7 +40,7 @@ summary: Just a hidden scratchpad.
 		- provide a container component with activated flag?
 			- no activation flag. Just an empty component.
 			- even if there is no circumstantial data that we need now, it may change in the future
-		- provide per-entity cache destroyer that takes definitions into account?
+		- provide per-entity cache destroyer that takes invariants into account?
 		- make type dynamic but statically allocated and let it handle that?
 	- especially since a component removed in one entity may trigger change of caches for other entities, dependencies will not be as easy to determine as specifying some types
 		- thus each callback should do it on their own. Examples:
@@ -103,10 +103,10 @@ Note that now on_add and on_remove become obsolete because helper methods can de
 	- all possible mutables/fluxing input to the simulation shall be determined at definition and creation stage
 	- let an entity's type imply existence of some caches
 	- solver shall not mutate component existence
-- note that author can also mutate variables of definitions which would theoretically need reinference
+- note that author can also mutate variables of invariants which would theoretically need reinference
 	- currently we say that we reinfer the whole cosmos so not a problem and associateds will be private 
-- existence of components is directly implied by definitions
-	- if anything is implied by existence of components, it is then implied by definitions
+- existence of components is directly implied by invariants
+	- if anything is implied by existence of components, it is then implied by invariants
 	- dependencies
 		- any function that changes associated state is on its own responsible for upholding consistency
 - Make damping, density and owner bodies always possible to be calculated from the significant state.
@@ -237,20 +237,20 @@ Domains in direct need of destruction of some cache:
 -->
 <!--
 ### Components considerations
-An author should not be concerned with adding components to a new entity, that properly correspond to what they've already set in the definitions.  
-Regardless of the fact that the definitions are statically allocated (and thus always "present"), the author should be able to specify which definitions they are interested in.  
+An author should not be concerned with adding components to a new entity, that properly correspond to what they've already set in the invariants.  
+Regardless of the fact that the invariants are statically allocated (and thus always "present"), the author should be able to specify which invariants they are interested in.  
 
 Additionally, the author might want to specify initial values for the component that is added, that corresponds to the given definition type.
 For example, some physical bodies might want to have some particular initial velocity set.  
 
 However, the logic should, for the sake of performance and simplicity of code, always assume that a correspondent definition is present, to avoid noise.  
-Thus the logic should derive usage of definitions from the presence of components.  
-However, the presence of components will be initially derived from the presence of definitions.
+Thus the logic should derive usage of invariants from the presence of components.  
+However, the presence of components will be initially derived from the presence of invariants.
 It will thus be always required to define at least an empty type that specifies the correspondent component type,  
 event if the component type itself does not need any definition-like data.
 
 A concern could be raised because with this design, performance of serializing types could suffer.  
-That is because, if we serialize linearly without regard for which definitions are set, we serialize possibly a lot of unneeded data.  
+That is because, if we serialize linearly without regard for which invariants are set, we serialize possibly a lot of unneeded data.  
 On the other hand, if we do serialize only that which was set, we may suffer from instruction cache misses as the code will not degrade to a simple memcpy anymore.
 
 However, the type information:
@@ -286,7 +286,7 @@ So, they could be stored in a fixed-sized container. **There can even be a vast 
 <!--
 	- Mutable or not, by the solver.
 		- Preferably not, but it might be useful when partitioning polygons into destructed pieces.
-	- They would take precedence over what would possibly be found in the correspondent definitions in the type.
+	- They would take precedence over what would possibly be found in the correspondent invariants in the type.
 	- When we will need to copy the game world, how do we determine if a shape is owned by an override or a pre-inferred definition? 
 		- we need to take proper measures so as to never copy the shapes that are indeed flyweights; as opposed to the custom shapes.
 	- The problem will not be frequent besides names and polygons, so it is a viable solution.
@@ -299,10 +299,10 @@ So, they could be stored in a fixed-sized container. **There can even be a vast 
 	## ENTITY TYPE TRAS		- Additionally, it will be pretty much known from the get-go which data is possibly altered.
 			- Nobody will also be surprised if the solver needs to alter that state, because they are plain components.
 		- Good flexibility, until something unexpected needs to change.
-	- **Solution**: create overrides for definitions and let an entity have its own set of definitions, if so is required.
+	- **Solution**: create overrides for invariants and let an entity have its own set of invariants, if so is required.
 		- Most memory wasted.
-			- An entity with an override costs the size of all the definitions, unless we make each definition dynamically allocated, hindering overridden-entities performance all the more.
-			- Additionally, as the type is the same, we must assume the same storage rules as with the definitions. In particular, we won't be able to use a dynamically allocated vector of vertices if the definition object already uses a constant size vector.
+			- An entity with an override costs the size of all the invariants, unless we make each definition dynamically allocated, hindering overridden-entities performance all the more.
+			- Additionally, as the type is the same, we must assume the same storage rules as with the invariants. In particular, we won't be able to use a dynamically allocated vector of vertices if the definition object already uses a constant size vector.
 		- Worst performance as upon getting any definition we check for an existing override.
 			- The only impact is on non-overridden entities.
 			- Overidden entities would otherwise still need to get a component.
@@ -338,10 +338,10 @@ COMMENTED OUT: Such things will be calculated statelessly.
 
 ## entity_type.md trash
 
-	- An author may specify which definitions to enable.
-	- The flags will be held separate:``std::array<bool, DEFINITION_COUNT_V> enabled_definitions;``
+	- An author may specify which invariants to enable.
+	- The flags will be held separate:``std::array<bool, INVARIANT_COUNT_V> enabled_invariants;``
 		- A lot better cache coherency than the more idiomatic ``std::optional``.
 
-	- In particular, the **enabled** flags for definitions may change even though some entities of this type already exist.
+	- In particular, the **enabled** flags for invariants may change even though some entities of this type already exist.
 		- We warn the author and ask if the existent entities should be recreated with new components with new initial values (preserving what was already set).
 			- The warning can be ticked to never pop up again.

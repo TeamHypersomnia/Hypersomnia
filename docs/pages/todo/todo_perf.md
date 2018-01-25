@@ -30,7 +30,7 @@ summary: Just a hidden scratchpad.
 - statically allocated constexpr flag for entities
 - describe concept: quick caches
 	- stored directly in the aggregate
-	- will be used to store copies of definitions for super quick access
+	- will be used to store copies of invariants for super quick access
 		- e.g. render
 	- will be used for super quick inferred caches
 		- e.g. if we ever need a transform or sprite cache if they become too costly to calculate (either computationally or because of fetches)

@@ -29,55 +29,55 @@ namespace test_types {
 		{
 			auto& meta = get_test_type(types, test_scene_type::TRUCK_FRONT);
 			
-			definitions::render render_def;
+			invariants::render render_def;
 			render_def.layer = render_layer::DYNAMIC_BODY;
 
 			meta.set(render_def);
 
-			definitions::polygon poly;
+			invariants::polygon poly;
 			poly.add_convex_polygons(logicals.at(assets::game_image_id::TRUCK_FRONT).shape.convex_polys);
 			poly.texture_map_id = assets::game_image_id::TRUCK_FRONT;
 
 			meta.set(poly);
 
-			meta.add_shape_definition_from_renderable(logicals);
+			meta.add_shape_invariant_from_renderable(logicals);
 		}
 		{
 			auto& meta = get_test_type(types, test_scene_type::TRUCK_INTERIOR);
 
-			definitions::render render_def;
+			invariants::render render_def;
 			render_def.layer = render_layer::CAR_INTERIOR;
 
 			meta.set(render_def);
 
 			add_sprite(meta, logicals, assets::game_image_id::TRUCK_INSIDE);
-						meta.add_shape_definition_from_renderable(logicals);
+						meta.add_shape_invariant_from_renderable(logicals);
 
 		}
 
 		{
 			auto& meta = get_test_type(types, test_scene_type::TRUCK_LEFT_WHEEL);
 
-			definitions::render render_def;
+			invariants::render render_def;
 			render_def.layer = render_layer::CAR_WHEEL;
 
 			meta.set(render_def);
-			definitions::sprite sprite_def;
+			invariants::sprite sprite_def;
 			sprite_def.set(assets::game_image_id::BLANK, vec2 ( 40, 20 ), rgba(255, 255, 255, 0));
 			meta.set(sprite_def);
-			meta.add_shape_definition_from_renderable(logicals);
+			meta.add_shape_invariant_from_renderable(logicals);
 		}
 
 		{
 			auto& meta = get_test_type(types, test_scene_type::TRUCK_ENGINE_BODY);
 
-			definitions::render render_def;
+			invariants::render render_def;
 			render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
 
 			meta.set(render_def);
 
 			add_sprite(meta, logicals, assets::game_image_id::TRUCK_ENGINE);
-			meta.add_shape_definition_from_renderable(logicals);
+			meta.add_shape_invariant_from_renderable(logicals);
 		}
 	}
 }
@@ -100,9 +100,8 @@ namespace prefabs {
 
 		{
 			auto& car = front += components::car();
-			components::rigid_body physics_definition(si, spawn_transform);
-			components::fixtures colliders;
 
+			components::rigid_body physics_invariant(si, spawn_transform);
 			car.interior = interior;
 			car.left_wheel_trigger = left_wheel;
 			car.input_acceleration.set(2500, 4500) /= 3;
@@ -111,56 +110,54 @@ namespace prefabs {
 			car.speed_for_pitch_unit = 2000.f;
 
 
-			physics_definition.damping.linear = 0.4f;
-			physics_definition.damping.angular = 2.f;
+			physics_invariant.damping.linear = 0.4f;
+			physics_invariant.damping.angular = 2.f;
 
-			components::fixtures group;
+			components::fixtures fixtures_invariant;
 
-			group.filter = filters::dynamic_object();
-			group.density = 0.6f;
-			group.material = assets::physical_material_id::METAL;
+			fixtures_invariant.filter = filters::dynamic_object();
+			fixtures_invariant.density = 0.6f;
+			fixtures_invariant.material = assets::physical_material_id::METAL;
 
-			front += group;
-			front += physics_definition;
+			front += fixtures_invariant;
+			front += physics_invariant;
 			front.get<components::fixtures>().set_owner_body(front);
 			//rigid_body.air_resistance = 0.2f;
 		}
 		
 		{
-			auto sprite = interior.get_def<definitions::sprite>();
-			components::fixtures colliders;
+			auto sprite = interior.get_def<invariants::sprite>();
 			
 			vec2 offset((front_size.x / 2 + sprite.get_size(/*metas*/).x / 2) * -1, 0);
 
-			components::fixtures group;
+			components::fixtures fixtures_invariant;
 
-			group.filter = filters::friction_ground();
-			group.density = 0.6f;
-			group.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET].pos = offset;
-			group.friction_ground = true;
-			group.material = assets::physical_material_id::METAL;
+			fixtures_invariant.filter = filters::friction_ground();
+			fixtures_invariant.density = 0.6f;
+			fixtures_invariant.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET].pos = offset;
+			fixtures_invariant.friction_ground = true;
+			fixtures_invariant.material = assets::physical_material_id::METAL;
 
-			interior  += group;
+			interior  += fixtures_invariant;
 
 			interior.get<components::fixtures>().set_owner_body(front);
 			interior.make_as_child_of(front);
 		}
 
 		{
-			auto sprite = left_wheel.get_def<definitions::sprite>();
-			components::fixtures colliders;
+			auto sprite = left_wheel.get_def<invariants::sprite>();
 
 			vec2 offset((front_size.x / 2 + sprite.get_size(/*metas*/).x / 2 + 20) * -1, 0);
 
-			components::fixtures group;
+			components::fixtures fixtures_invariant;
 
-			group.filter = filters::trigger();
-			group.density = 0.6f;
-			group.disable_standard_collision_resolution = true;
-			group.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET].pos = offset;
-			group.material = assets::physical_material_id::METAL;
+			fixtures_invariant.filter = filters::trigger();
+			fixtures_invariant.density = 0.6f;
+			fixtures_invariant.disable_standard_collision_resolution = true;
+			fixtures_invariant.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET].pos = offset;
+			fixtures_invariant.material = assets::physical_material_id::METAL;
 
-			left_wheel  += group;
+			left_wheel  += fixtures_invariant;
 			left_wheel.get<components::fixtures>().set_owner_body(front);
 		}
 
@@ -172,7 +169,7 @@ namespace prefabs {
 
 				{
 
-					auto sprite = engine_physical.get_def<definitions::sprite>();
+					auto sprite = engine_physical.get_def<invariants::sprite>();
 
 					components::transform offset;
 
@@ -191,15 +188,15 @@ namespace prefabs {
 						offset.rotation = 90;
 					}
 					
-					components::fixtures group;
+					components::fixtures fixtures_invariant;
 
-					group.filter = filters::see_through_dynamic_object();
-					group.density = 1.0f;
-					group.sensor = true;
-					group.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET] = offset;
-					group.material = assets::physical_material_id::METAL;
+					fixtures_invariant.filter = filters::see_through_dynamic_object();
+					fixtures_invariant.density = 1.0f;
+					fixtures_invariant.sensor = true;
+					fixtures_invariant.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET] = offset;
+					fixtures_invariant.material = assets::physical_material_id::METAL;
 
-					engine_physical  += group;
+					engine_physical  += fixtures_invariant;
 
 					engine_physical.get<components::fixtures>().set_owner_body(front);
 					engine_physical.add_standard_components(step);

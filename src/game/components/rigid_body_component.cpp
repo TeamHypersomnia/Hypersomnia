@@ -104,7 +104,7 @@ const rigid_body_cache& basic_physics_synchronizer<C>::get_cache() const {
 }
 
 template <bool C>
-damping_info basic_physics_synchronizer<C>::calculate_damping_info(const definitions::rigid_body& def) const {
+damping_info basic_physics_synchronizer<C>::calculate_damping_info(const invariants::rigid_body& def) const {
 	damping_info damping = def.damping;
 
 	if (const auto* const maybe_movement = handle.template find<components::movement>()) {

@@ -55,7 +55,7 @@ struct AAA {
 };
 
 struct tests_of_traits {
-	// static_assert(definition_index_v<definitions::gun> == 0);
+	// static_assert(invariant_index_v<invariants::gun> == 0);
 
 	static_assert(!can_reserve_caches_v<type_id_cache>);
 	static_assert(can_reserve_caches_v<physics_world_cache>);

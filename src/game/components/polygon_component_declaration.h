@@ -7,7 +7,7 @@ namespace augs {
 	struct polygon_with_id;
 }
 
-namespace definitions {
+namespace invariants {
 	using polygon = augs::polygon_with_id<
 		assets::game_image_id,
 		RENDERING_POLYGON_VERTEX_COUNT,

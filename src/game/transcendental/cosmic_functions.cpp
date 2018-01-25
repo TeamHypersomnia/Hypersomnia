@@ -58,7 +58,7 @@ entity_handle cosmic::create_entity(cosmos& cosm, const entity_type_id type_id) 
 
 		solvable.get_aggregate(new_handle.get_id()).get<components::type>(solvable).type_id = type_id;
 
-		for_each_definition_type([&](auto d) {
+		for_each_invariant_type([&](auto d) {
 			using D = decltype(d);
 
 			if constexpr(has_implied_component_v<D>) {

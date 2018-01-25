@@ -12,7 +12,7 @@ namespace test_types {
 			auto& meta = get_test_type(types, test_scene_type::WANDERING_PIXELS);
 
 			{
-				definitions::render render_def;
+				invariants::render render_def;
 				render_def.layer = render_layer::WANDERING_PIXELS_EFFECTS;
 
 				meta.set(render_def);
@@ -23,7 +23,7 @@ namespace test_types {
 			auto& meta = get_test_type(types, test_scene_type::HAVE_A_PLEASANT);
 
 			{
-				definitions::render render_def;
+				invariants::render render_def;
 				render_def.layer = render_layer::NEON_CAPTIONS;
 
 				meta.set(render_def);
@@ -41,7 +41,7 @@ namespace test_types {
 			auto& meta = get_test_type(types, test_scene_type::GROUND);
 
 			{
-				definitions::render render_def;
+				invariants::render render_def;
 				render_def.layer = render_layer::GROUND;
 
 				meta.set(render_def);
@@ -51,7 +51,7 @@ namespace test_types {
 			auto& meta = get_test_type(types, test_scene_type::STREET);
 
 			{
-				definitions::render render_def;
+				invariants::render render_def;
 				render_def.layer = render_layer::GROUND;
 
 				meta.set(render_def);
@@ -64,7 +64,7 @@ namespace test_types {
 			auto& meta = get_test_type(types, test_scene_type::ROAD_DIRT);
 
 			{
-				definitions::render render_def;
+				invariants::render render_def;
 				render_def.layer = render_layer::ON_GROUND;
 
 				meta.set(render_def);
@@ -77,7 +77,7 @@ namespace test_types {
 			auto& meta = get_test_type(types, test_scene_type::ROAD);
 
 			{
-				definitions::render render_def;
+				invariants::render render_def;
 				render_def.layer = render_layer::ON_GROUND;
 
 				meta.set(render_def);
@@ -89,7 +89,7 @@ namespace test_types {
 			auto& meta = get_test_type(types, test_scene_type::AWAKENING);
 
 			{
-				definitions::render render_def;
+				invariants::render render_def;
 				render_def.layer = render_layer::NEON_CAPTIONS;
 
 				meta.set(render_def);
@@ -97,14 +97,14 @@ namespace test_types {
 			test_types::add_sprite(meta, logicals,
 			assets::game_image_id::AWAKENING,
 			white,
-			definitions::sprite::special_effect::COLOR_WAVE
+			invariants::sprite::special_effect::COLOR_WAVE
 		);
 		}
 		{
 			auto& meta = get_test_type(types, test_scene_type::METROPOLIS);
 
 			{
-				definitions::render render_def;
+				invariants::render render_def;
 				render_def.layer = render_layer::NEON_CAPTIONS;
 
 				meta.set(render_def);

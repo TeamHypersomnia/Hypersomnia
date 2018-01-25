@@ -150,7 +150,7 @@ item_button::layout_with_attachments item_button::calculate_button_layout(
 		b += -origin;
 	}
 
-	const auto flip = defs.at(component_owner.get_def<definitions::sprite>().tex).usage_as_button.flip;
+	const auto flip = defs.at(component_owner.get_def<invariants::sprite>().tex).usage_as_button.flip;
 
 	if (flip.horizontally()) {
 		for (auto& b : output.boxes) {
@@ -245,7 +245,7 @@ void item_button::draw_proc(
 	if (f.draw_item) {
 		{
 			const bool draw_attachments = !this_id->is_container_open || f.draw_attachments_even_if_open;
-			auto item_sprite = item.get_def<definitions::sprite>();
+			auto item_sprite = item.get_def<invariants::sprite>();
 			const auto gui_def = context.get_game_image_metas().at(item_sprite.tex).usage_as_button;
 
 			const auto layout = calculate_button_layout(item, context.get_game_image_metas(), draw_attachments);
@@ -267,7 +267,7 @@ void item_button::draw_proc(
 				item_sprite.color.a = 255;
 			}
 
-			auto state = definitions::sprite::drawing_input{ augs::drawer (output) };
+			auto state = invariants::sprite::drawing_input{ augs::drawer (output) };
 
 			const auto rc_pos = this_absolute_rect.get_position();
 			state.renderable_transform.pos = layout.get_base_item_pos().get_center() + rc_pos + expansion_offset;
@@ -279,13 +279,13 @@ void item_button::draw_proc(
 					const auto parent_slot = cosmos[desc.get<components::item>().get_current_slot()];
 
 					if (parent_slot.is_physically_connected_until(item)) {
-						auto attachment_sprite = desc.get_def<definitions::sprite>();
+						auto attachment_sprite = desc.get_def<invariants::sprite>();
 
 						attachment_sprite.flip = flip;
 
 						attachment_sprite.color.a = item_sprite.color.a;
 
-						auto attachment_state = definitions::sprite::drawing_input(output);
+						auto attachment_state = invariants::sprite::drawing_input(output);
 
 						attachment_state.renderable_transform.pos = rc_pos + layout.boxes[attachment_index].get_center() + expansion_offset;
 						attachment_state.renderable_transform.rotation = trav.attachment_offset.rotation;
@@ -443,13 +443,13 @@ void item_button::rebuild_layouts(const game_gui_context context, const this_in_
 
 	vec2i parent_position;
 
-	const auto* const sprite = item.find_def<definitions::sprite>();
+	const auto* const sprite = item.find_def<invariants::sprite>();
 
 	const auto& manager = context.get_game_image_metas();
 
 	if (sprite) {
 		vec2i rounded_size = calculate_button_layout(item, manager, !this_id->is_container_open).aabb.get_size();
-		rounded_size = griddify_size(rounded_size, manager.at(item.get_def<definitions::sprite>().tex).usage_as_button.bbox_expander);
+		rounded_size = griddify_size(rounded_size, manager.at(item.get_def<invariants::sprite>().tex).usage_as_button.bbox_expander);
 		this_id->rc.set_size(rounded_size);
 	}
 

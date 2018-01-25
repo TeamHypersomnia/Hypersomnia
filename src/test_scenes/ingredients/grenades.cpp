@@ -28,14 +28,14 @@ namespace test_types {
 			;
 
 			{
-				definitions::render render_def;
+				invariants::render render_def;
 				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
 
 				meta.set(render_def);
 
 			}
 			test_types::add_sprite(meta, logicals, assets::game_image_id::FORCE_GRENADE, white);
-			meta.add_shape_definition_from_renderable(logicals);
+			meta.add_shape_invariant_from_renderable(logicals);
 			test_types::add_see_through_dynamic_body(meta);
 
 		}
@@ -48,13 +48,13 @@ namespace test_types {
 			;
 
 			{
-				definitions::render render_def;
+				invariants::render render_def;
 				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
 
 				meta.set(render_def);
 			}
 			test_types::add_sprite(meta, logicals, assets::game_image_id::INTERFERENCE_GRENADE, white);
-			meta.add_shape_definition_from_renderable(logicals);
+			meta.add_shape_invariant_from_renderable(logicals);
 			test_types::add_see_through_dynamic_body(meta);
 
 		}
@@ -67,13 +67,13 @@ namespace test_types {
 			;
 
 			{
-				definitions::render render_def;
+				invariants::render render_def;
 				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
 
 				meta.set(render_def);
 			}
 			test_types::add_sprite(meta, logicals, assets::game_image_id::PED_GRENADE, white);
-			meta.add_shape_definition_from_renderable(logicals);
+			meta.add_shape_invariant_from_renderable(logicals);
 			test_types::add_see_through_dynamic_body(meta);
 		}
 	}

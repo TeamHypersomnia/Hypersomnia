@@ -58,7 +58,7 @@ entity_handle basic_entity_handle<C>::add_standard_components(const logic_step s
 
 	if (const auto trace = find<components::trace>()) {
 		auto rng = get_cosmos().get_fast_rng_for(get_id());
-		trace->reset(get_def<definitions::trace>(), rng);
+		trace->reset(get_def<invariants::trace>(), rng);
 	}
 
 	return *this;

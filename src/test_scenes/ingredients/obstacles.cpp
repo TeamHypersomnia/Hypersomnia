@@ -9,17 +9,17 @@ namespace test_types {
 		{
 			auto& meta = get_test_type(types, test_scene_type::CRATE);
 
-			definitions::render render_def;
+			invariants::render render_def;
 			render_def.layer = render_layer::DYNAMIC_BODY;
 
 			meta.set(render_def);
 
 			test_types::add_sprite(meta, logicals, assets::game_image_id::CRATE, white);
-			meta.add_shape_definition_from_renderable(logicals);
+			meta.add_shape_invariant_from_renderable(logicals);
 
 			test_types::add_standard_dynamic_body(meta);
 
-			auto& fixtures_def = meta.get<definitions::fixtures>();
+			auto& fixtures_def = meta.get<invariants::fixtures>();
 
 			fixtures_def.restitution = 0.8f;
 			fixtures_def.density = 0.7f;
@@ -29,18 +29,18 @@ namespace test_types {
 		{
 			auto& meta = get_test_type(types, test_scene_type::BRICK_WALL);
 
-			definitions::render render_def;
+			invariants::render render_def;
 			render_def.layer = render_layer::DYNAMIC_BODY;
 
 			meta.set(render_def);
 
 			test_types::add_sprite(meta, logicals, assets::game_image_id::BRICK_WALL, white);
-			meta.get<definitions::sprite>().size = vec2(160, 160);
-			meta.add_shape_definition_from_renderable(logicals);
+			meta.get<invariants::sprite>().size = vec2(160, 160);
+			meta.add_shape_invariant_from_renderable(logicals);
 
 			test_types::add_standard_static_body(meta);
 
-			auto& fixtures_def = meta.get<definitions::fixtures>();
+			auto& fixtures_def = meta.get<invariants::fixtures>();
 
 			fixtures_def.restitution = 0.0f;
 			fixtures_def.density = 100.f;

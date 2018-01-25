@@ -33,23 +33,23 @@ namespace test_types {
 			meta.description = L"Member of Atlantic nations.";
 
 			{
-				definitions::render render_def;
+				invariants::render render_def;
 				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
 
 				meta.set(render_def);
 			}
 
 			add_sprite(meta, logicals, assets::game_image_id::STANDARD_HEAD);
-			meta.add_shape_definition_from_renderable(logicals);
+			meta.add_shape_invariant_from_renderable(logicals);
 
 			{
-				definitions::flags flags_def;
+				invariants::flags flags_def;
 				flags_def.values.set(entity_flag::IS_PAST_CONTAGIOUS);
 				meta.set(flags_def);
 			}
 
-			definitions::rigid_body body;
-			definitions::fixtures group;
+			invariants::rigid_body body;
+			invariants::fixtures fixtures_invariant;
 
 			body.angled_damping = true;
 			body.allow_sleep = false;
@@ -57,11 +57,11 @@ namespace test_types {
 			body.damping.linear = 6.5f;
 			body.damping.angular = 6.5f;
 
-			group.filter = filters::controlled_character();
-			group.density = 1.0;
+			fixtures_invariant.filter = filters::controlled_character();
+			fixtures_invariant.density = 1.0;
 
 			meta.set(body);
-			meta.set(group);
+			meta.set(fixtures_invariant);
 		}
 
 		{
@@ -73,22 +73,22 @@ namespace test_types {
 			auto& meta = get_test_type(types, test_scene_type::CROSSHAIR_RECOIL_BODY);
 			add_sprite(meta, logicals, assets::game_image_id::TEST_CROSSHAIR);
 
-			meta.add_shape_definition_from_renderable(logicals);
+			meta.add_shape_invariant_from_renderable(logicals);
 
-			definitions::rigid_body body;
-			definitions::fixtures group;
+			invariants::rigid_body body;
+			invariants::fixtures fixtures_invariant;
 
 			body.damping.linear = 5;
 			body.damping.angular = 5;
 
-			group.filter = filters::none();
-			//group.filter.categoryBits = 0;
-			group.density = 0.1f;
-			group.sensor = true;
-			group.material = assets::physical_material_id::METAL;
+			fixtures_invariant.filter = filters::none();
+			//fixtures_invariant.filter.categoryBits = 0;
+			fixtures_invariant.density = 0.1f;
+			fixtures_invariant.sensor = true;
+			fixtures_invariant.material = assets::physical_material_id::METAL;
 
 			meta.set(body);
-			meta.set(group);
+			meta.set(fixtures_invariant);
 		}
 	}
 }

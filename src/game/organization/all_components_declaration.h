@@ -9,7 +9,7 @@
 #include "game/components/sprite_component_declaration.h"
 #include "game/components/polygon_component_declaration.h"
 
-namespace definitions {
+namespace invariants {
 	struct gun;
 	struct render;
 	struct shape_polygon;
@@ -102,17 +102,17 @@ using component_list_t = List<
 >;
 
 template <template <class...> class List>
-using definition_list_t = List<
-	definitions::gun,
-	definitions::render,
-	definitions::shape_polygon,
-	definitions::polygon,
-	definitions::sprite,
-	definitions::trace,
-	definitions::flags,
-	definitions::interpolation,
-	definitions::fixtures,
-	definitions::rigid_body
+using invariant_list_t = List<
+	invariants::gun,
+	invariants::render,
+	invariants::shape_polygon,
+	invariants::polygon,
+	invariants::sprite,
+	invariants::trace,
+	invariants::flags,
+	invariants::interpolation,
+	invariants::fixtures,
+	invariants::rigid_body
 >;
 
 template <class... Types>
@@ -123,7 +123,7 @@ struct type_count {
 class cosmos;
 
 constexpr unsigned COMPONENTS_COUNT = component_list_t<type_count>::value;
-constexpr unsigned DEFINITIONS_COUNT = definition_list_t<type_count>::value;
+constexpr unsigned INVARIANTS_COUNT = invariant_list_t<type_count>::value;
 
 template <class D>
-static constexpr auto definition_index_v = index_in_list_v<D, definition_list_t<type_list>>;
+static constexpr auto invariant_index_v = index_in_list_v<D, invariant_list_t<type_list>>;

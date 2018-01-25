@@ -22,7 +22,7 @@ public:
 	/* Assumes that the fixtures component is found. */
 	real32 calculate_density(
 		const owner_of_colliders calculated_owner,
-		const definitions::fixtures& def	
+		const invariants::fixtures& def	
 	) const;
 };
 
