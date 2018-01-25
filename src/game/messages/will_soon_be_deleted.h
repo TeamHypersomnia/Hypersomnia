@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "message.h"
+#include "game/messages/message.h"
 
 namespace messages {
 	struct will_soon_be_deleted : message {

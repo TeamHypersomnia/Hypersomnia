@@ -1,5 +1,5 @@
 #pragma once
-#include "message.h"
+#include "game/messages/message.h"
 
 namespace messages {
 	struct movement_event : message {

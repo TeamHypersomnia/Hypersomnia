@@ -1,5 +1,5 @@
 #pragma once
-#include "message.h"
+#include "game/messages/message.h"
 #include "game/enums/game_intent_type.h"
 
 namespace messages {

@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "message.h"
+#include "game/messages/message.h"
 
 namespace messages {
 	struct queue_destruction : public message {

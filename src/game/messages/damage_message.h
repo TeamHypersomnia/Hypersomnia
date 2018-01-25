@@ -1,5 +1,5 @@
 #pragma once
-#include "message.h"
+#include "game/messages/message.h"
 #include "augs/math/vec2.h"
 #include "game/detail/physics/b2Fixture_index_in_component.h"
 #include "game/enums/adverse_element_type.h"

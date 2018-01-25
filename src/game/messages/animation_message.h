@@ -1,5 +1,5 @@
 #pragma once
-#include "message.h"
+#include "game/messages/message.h"
 #include "game/assets/ids/animation_id.h"
 
 namespace messages {

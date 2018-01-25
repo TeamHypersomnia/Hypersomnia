@@ -7,24 +7,6 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order:  
 
-- change path of #include "message.h"
-
-- ditch stream displacement for a while
-- remove completely the particles existence and sound existence component
-	- logic will post relevant messages to create bursts
-		- fire and forget bursts:
-			- no owner assigned, just starting world transform
-			- separate vector in particles simulation system
-		- stream can be created in the name of an entity/offset
-			- don't use purpose, just differentiate by orbital transforms
-			- car will be able to stop engine's stream by looking up its orbital transform
-				- bytewise comparisons should work after just assigning			
-		- in which case the stream will be reset to the new value instead of creating additional stream
-			- removes the need to hold child entity ids in sentience	
-		- burst can be stopped in the name of an entity
-			- used by the car
-		- continuous streams could be queried statelessly by the simulation system
-
 - sentience component should have integrated crosshair
 	- provide a get crosshair transform function
 
@@ -57,12 +39,6 @@ summary: Just a hidden scratchpad.
 		- because a fixtural entity might additionally have a particles existence that chases upon itself.
 			- e.g. truck engine
 
-- cars could just hold several particle effect inputs and we would iterate cars to also perform
-	- handle cars later please
-	- particles simulation system can have a "iterate cars and perform engine particles"
-		- would just create particle effect inputs and pass them to the simulation
-	- same with sound system
-
 - rename "definitions" to "invariants"
 - remove "get_attachment_offset" and introduce attachment matrix for flavours
 
@@ -91,17 +67,6 @@ summary: Just a hidden scratchpad.
 			- So we don't have to do it now.
 			- We will specify storage for native types in tuples, thus we will be able to change SoA to AoS and back with just one compilation flag. 
 	
-
-- Bugs:
-	- particles spawn not where they should
-	- Bad calculation of grenade explosion locations
-		- perhaps get_logic_transform?
-	- explosion sounds dont get played, but this is due to the previous
-
-- particle existence will later have an entity id which to chase thus it won't need get logic transform
-	- check if there are no problems with its NPO detection
-	- there might however occur a need to optionally set initial transform in a definition group to one of other group entity (maybe + offset) 
-
 - Rename "fixtures" to "colliders"
 
 - Instead of having "force joint" at all, make it so that while processing the cars, they additionally apply forces to drivers to keep them

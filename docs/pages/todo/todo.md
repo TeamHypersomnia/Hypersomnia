@@ -56,3 +56,10 @@ v - begin selection with arrows
 - Maps could be git repositories, maybe even hosted on github
 	- Server could specify upstream url
 	- Updating a map just involves pulling
+
+- cars could just hold several particle effect inputs and we would iterate cars to also perform
+	- handle cars later please
+	- particles simulation system can have a "iterate cars and perform engine particles"
+		- would just create particle effect inputs and pass them to the simulation
+	- same with sound system
+

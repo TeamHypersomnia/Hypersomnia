@@ -1,5 +1,5 @@
 #pragma once
-#include "message.h"
+#include "game/messages/message.h"
 
 #include "augs/misc/value_meter.h"
 

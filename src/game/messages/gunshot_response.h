@@ -1,5 +1,5 @@
 #pragma once
-#include "message.h"
+#include "game/messages/message.h"
 #include "game/components/transform_component.h"
 #include "game/components/catridge_component.h"
 

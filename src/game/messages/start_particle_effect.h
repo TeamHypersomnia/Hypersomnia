@@ -1,5 +1,5 @@
 #pragma once
-#include "message.h"
+#include "game/messages/message.h"
 #include "augs/math/vec2.h"
 
 #include "game/transcendental/entity_id.h"

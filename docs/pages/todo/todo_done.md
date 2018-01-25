@@ -61,3 +61,21 @@ we consider whole type overrides too complex architeciturally:
 		- better wording: these variables are accumulators
 
 - Remove owner_body from fixtures component and create a component named "custom rigid body owner" that overrides anything else
+
+- change path of #include "game/messages/message.h"
+
+- ditch stream displacement for a while
+- remove completely the particles existence and sound existence component
+	- logic will post relevant messages to create bursts
+		- fire and forget bursts:
+			- no owner assigned, just starting world transform
+			- separate vector in particles simulation system
+		- stream can be created in the name of an entity/offset
+			- don't use purpose, just differentiate by orbital transforms
+			- car will be able to stop engine's stream by looking up its orbital transform
+				- bytewise comparisons should work after just assigning			
+		- in which case the stream will be reset to the new value instead of creating additional stream
+			- removes the need to hold child entity ids in sentience	
+		- burst can be stopped in the name of an entity
+			- used by the car
+		- continuous streams could be queried statelessly by the simulation system
