@@ -1,4 +1,5 @@
 #pragma once
+#include "augs/templates/hash_templates.h"
 
 namespace augs {
 	/*
@@ -35,6 +36,24 @@ namespace augs {
 
 		bool operator!=(const simple_pair& b) const {
 			return first != b.first || second != b.second;
+		}
+	};
+
+	template <class A, class B>
+	simple_pair<A, B> make_simple_pair(const A& a, const B& b) {
+		return { a, b };
+	}
+}
+
+
+namespace std {
+	template <class H>
+	struct hash;
+
+	template <class A, class B>
+	struct hash<augs::simple_pair<A, B>> {
+		std::size_t operator()(const augs::simple_pair<A, B>& p) const {
+			return augs::simple_two_hash(p.first, p.second); 
 		}
 	};
 }
