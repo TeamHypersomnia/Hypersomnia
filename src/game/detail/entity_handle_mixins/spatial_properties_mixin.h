@@ -31,7 +31,7 @@ public:
 				body_transform.pos.discard_fract();
 			}
 
-			const auto offset = handle.calculate_owner_of_colliders();
+			const auto offset = handle.calculate_colliders_connection();
 
 			auto displacement = offset.shape_offset;
 

@@ -37,7 +37,7 @@ std::optional<components::transform> basic_spatial_properties_mixin<C, D>::find_
 	if (const auto owner = handle.get_owner_of_colliders();
 		owner.alive()
 	) {
-		const auto offset = handle.calculate_owner_of_colliders();
+		const auto offset = handle.calculate_colliders_connection();
 
 		/*
 			TODO: retrieve the offset from fixtures cache instead of recalculating it.

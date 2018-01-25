@@ -72,7 +72,7 @@ void physics_world_cache::destroy_colliders_cache(const const_entity_handle hand
 	const auto& cosmos = handle.get_cosmos();
 
 	if (auto& cache = get_colliders_cache(handle); cache.is_constructed()) {
-		auto& owner_body_cache = get_rigid_body_cache(cosmos[cache.owner.owner]);
+		auto& owner_body_cache = get_rigid_body_cache(cosmos[cache.connection.owner]);
 
 		for (b2Fixture* f : cache.all_fixtures_in_component) {
 			owner_body_cache.body->DestroyFixture(f);
@@ -230,14 +230,14 @@ void physics_world_cache::infer_cache_for_colliders(const const_entity_handle ha
 
 	const auto& cosmos = handle.get_cosmos();
 
-	std::optional<owner_of_colliders> calculated_owner;
+	std::optional<colliders_connection> calculated_connection;
 
-	auto get_calculated_owner = [&](){
-		if (!calculated_owner) {
-			calculated_owner = handle.calculate_owner_of_colliders();
+	auto get_calculated_connection = [&](){
+		if (!calculated_connection) {
+			calculated_connection = handle.calculate_colliders_connection();
 		}
 
-		return *calculated_owner;
+		return *calculated_connection;
 	};
 
 	if (auto& cache = get_colliders_cache(handle); 
@@ -245,7 +245,7 @@ void physics_world_cache::infer_cache_for_colliders(const const_entity_handle ha
 	) {
 		bool needs_full_rebuild = false;
 		
-		if (get_calculated_owner() != cache.owner) {
+		if (get_calculated_connection() != cache.connection) {
 			needs_full_rebuild = true;
 		}
 
@@ -254,7 +254,7 @@ void physics_world_cache::infer_cache_for_colliders(const const_entity_handle ha
 			const auto& colliders_data = handle.get_def<invariants::fixtures>();
 
 			if (const auto new_density = handle.calculate_density(
-					get_calculated_owner(), 
+					get_calculated_connection(), 
 					colliders_data
 				);
 
@@ -293,7 +293,7 @@ void physics_world_cache::infer_cache_for_colliders(const const_entity_handle ha
 	*/
 
 	if (const auto colliders = handle.find_def<invariants::fixtures>()) {
-		const auto new_owner = cosmos[get_calculated_owner().owner];
+		const auto new_owner = cosmos[get_calculated_connection().owner];
 
 		if (new_owner.dead()) {
 			return;
@@ -321,7 +321,7 @@ void physics_world_cache::infer_cache_for_colliders(const const_entity_handle ha
 
 		fixdef.userData = handle.get_id();
 
-		fixdef.density = handle.calculate_density(get_calculated_owner(), colliders_data);
+		fixdef.density = handle.calculate_density(get_calculated_connection(), colliders_data);
 
 		fixdef.friction = colliders_data.friction;
 		fixdef.restitution = colliders_data.restitution;
@@ -329,14 +329,14 @@ void physics_world_cache::infer_cache_for_colliders(const const_entity_handle ha
 		fixdef.filter = colliders_data.filter;
 
 		auto& cache = get_colliders_cache(handle);
-		cache.owner = get_calculated_owner();
+		cache.connection = get_calculated_connection();
 
 		auto& all_fixtures_in_component = cache.all_fixtures_in_component;
 		ensure(all_fixtures_in_component.empty());
 		
 		if (const auto* const shape_polygon = handle.find_def<invariants::shape_polygon>()) {
 			auto transformed_shape = shape_polygon->shape;
-			transformed_shape.offset_vertices(get_calculated_owner().shape_offset);
+			transformed_shape.offset_vertices(get_calculated_connection().shape_offset);
 
 			for (std::size_t ci = 0; ci < transformed_shape.convex_polys.size(); ++ci) {
 				const auto& convex = transformed_shape.convex_polys[ci];

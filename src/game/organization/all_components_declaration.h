@@ -32,7 +32,7 @@ namespace components {
 	struct rigid_body;
 	struct car;
 	struct driver;
-	struct specific_body_owner;
+	struct specific_colliders_connection;
 	struct container;
 	struct item;
 	struct force_joint;
@@ -71,7 +71,7 @@ using component_list_t = List<
 	components::movement,
 	components::pathfinding,
 	components::rigid_body,
-	components::specific_body_owner,
+	components::specific_colliders_connection,
 	components::transform,
 	components::car,
 	components::driver,

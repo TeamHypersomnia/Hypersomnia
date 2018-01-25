@@ -18,12 +18,12 @@ D basic_physics_mixin<C, D>::get_owner_friction_ground() const {
 }
 
 template <bool C, class D>
-owner_of_colliders basic_physics_mixin<C, D>::calculate_owner_of_colliders() const {
+colliders_connection basic_physics_mixin<C, D>::calculate_colliders_connection() const {
 	const auto self = *static_cast<const D*>(this);
 	const auto& cosmos = self.get_cosmos();
 	
-	if (const auto overridden = self.template find<components::specific_body_owner>()) {
-		return overridden->owner;
+	if (const auto overridden = self.template find<components::specific_colliders_connection>()) {
+		return overridden->connection;
 	}
 
 	if (const auto item = self.template find<components::item>()) {
@@ -39,7 +39,7 @@ owner_of_colliders basic_physics_mixin<C, D>::calculate_owner_of_colliders() con
 
 template <bool C, class D>
 real32 basic_physics_mixin<C, D>::calculate_density(
-	const owner_of_colliders calculated_owner,
+	const colliders_connection calculated_connection,
 	const invariants::fixtures& def	
 ) const {
 	const auto self = *static_cast<const D*>(this);
@@ -53,7 +53,7 @@ real32 basic_physics_mixin<C, D>::calculate_density(
 		}
 	}
 
-	const auto owner_body = cosmos[calculated_owner.owner];
+	const auto owner_body = cosmos[calculated_connection.owner];
 
 	if (const auto* const driver = owner_body.template find<components::driver>()) {
 		if (cosmos[driver->owned_vehicle].alive()) {
@@ -65,14 +65,26 @@ real32 basic_physics_mixin<C, D>::calculate_density(
 }
 
 template <bool C, class D>
-D basic_physics_mixin<C, D>::get_owner_of_colliders() const {
+std::optional<colliders_connection> basic_physics_mixin<C, D>::get_colliders_connection() const {
 	const auto self = *static_cast<const D*>(this);
 	auto& cosmos = self.get_cosmos();
 
 	if (const auto& cache = cosmos.get_solvable_inferred().physics.get_colliders_cache(self);
 		cache.is_constructed()
 	) {
-		return cosmos[cache.owner.owner];
+		return cache.connection;
+	}
+
+	return std::nullopt;
+}
+
+template <bool C, class D>
+D basic_physics_mixin<C, D>::get_owner_of_colliders() const {
+	const auto self = *static_cast<const D*>(this);
+	auto& cosmos = self.get_cosmos();
+
+	if (const auto connection = get_colliders_connection()) {
+		return cosmos[connection->owner];
 	}
 
 	return cosmos[entity_id()];

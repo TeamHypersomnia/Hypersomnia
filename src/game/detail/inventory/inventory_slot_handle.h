@@ -5,7 +5,7 @@
 #include "game/transcendental/entity_id.h"
 #include "game/enums/slot_function.h"
 
-#include "game/detail/physics/owner_of_colliders.h"
+#include "game/detail/physics/colliders_connection.h"
 #include "game/detail/inventory/inventory_slot_handle_declaration.h"
 #include "game/detail/inventory/inventory_slot_id.h"
 
@@ -45,7 +45,7 @@ public:
 	entity_handle_type get_item_if_any() const;
 	entity_handle_type get_container() const;
 
-	owner_of_colliders calc_parent_who_owns_colliders() const;
+	colliders_connection calc_parent_who_owns_colliders() const;
 
 	entity_handle_type get_root_container() const;
 	entity_handle_type get_root_container_until(const entity_id container_entity) const;

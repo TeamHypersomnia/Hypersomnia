@@ -2,17 +2,17 @@
 #include "game/transcendental/entity_id.h"
 #include "game/components/transform_component.h"
 
-struct owner_of_colliders {
-	// GEN INTROSPECTOR struct owner_of_colliders
+struct colliders_connection {
+	// GEN INTROSPECTOR struct colliders_connection
 	entity_id owner;
 	components::transform shape_offset;
 	// END GEN INTROSPECTOR
 
-	bool operator==(const owner_of_colliders& b) const {
+	bool operator==(const colliders_connection& b) const {
 		return owner == b.owner && shape_offset == b.shape_offset;
 	}
 
-	bool operator!=(const owner_of_colliders& b) const {
+	bool operator!=(const colliders_connection& b) const {
 		return !operator==(b);
 	}
 };

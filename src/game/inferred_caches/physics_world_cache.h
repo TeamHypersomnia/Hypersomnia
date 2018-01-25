@@ -16,7 +16,7 @@
 #include "game/messages/collision_message.h"
 
 #include "game/detail/physics/physics_queries_declaration.h"
-#include "game/detail/physics/owner_of_colliders.h"
+#include "game/detail/physics/colliders_connection.h"
 
 class cosmos;
 
@@ -34,7 +34,7 @@ struct colliders_cache {
 		CONVEX_POLYS_COUNT
 	> all_fixtures_in_component;
 
-	owner_of_colliders owner;
+	colliders_connection connection;
 
 	bool is_constructed() const {
 		return all_fixtures_in_component.size() > 0;

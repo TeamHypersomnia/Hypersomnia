@@ -1,8 +1,9 @@
 #pragma once
+#include <optional>
 #include "augs/math/vec2.h"
 #include "augs/build_settings/platform_defines.h"
 #include "game/organization/all_components_declaration.h"
-#include "game/detail/physics/owner_of_colliders.h"
+#include "game/detail/physics/colliders_connection.h"
 
 struct rigid_body_cache_info;
 
@@ -16,12 +17,15 @@ public:
 		return handle.template get<components::rigid_body>().get_special();
 	}
 
+	std::optional<colliders_connection> get_colliders_connection() const;
+	colliders_connection calculate_colliders_connection() const;
+
+	/* Shortcut for getting only the entity handle without shape offset */
 	entity_handle_type get_owner_of_colliders() const;
-	owner_of_colliders calculate_owner_of_colliders() const;
 
 	/* Assumes that the fixtures component is found. */
 	real32 calculate_density(
-		const owner_of_colliders calculated_owner,
+		const colliders_connection calculated_connection,
 		const invariants::fixtures& def	
 	) const;
 };

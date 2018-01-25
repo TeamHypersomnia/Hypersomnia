@@ -18,9 +18,9 @@
 #include "game/components/transform_component.h"
 
 namespace components {
-	struct specific_body_owner {
-		// GEN INTROSPECTOR struct components::specific_body_owner
-		owner_of_colliders owner;
+	struct specific_colliders_connection {
+		// GEN INTROSPECTOR struct components::specific_colliders_connection
+		colliders_connection connection;
 		// END GEN INTROSPECTOR
 	};
 }
