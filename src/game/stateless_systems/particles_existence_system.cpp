@@ -132,6 +132,12 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 					effect.modifier.scale_lifetimes = 1.25f + h.effective_amount / 100.f;
 				}
 
+				messages::stop_particle_effect stop;
+				stop.match_chased_subject = h.subject;
+				stop.match_orbit_offset = vec2::zero;
+				stop.match_effect_id = effect.id;
+				step.post_message(stop);
+
 				auto start_in = particle_effect_start_input::orbit_local(h.subject, { vec2::zero, (h.impact_velocity).degrees() });
 				start_in.homing_target = h.subject;
 

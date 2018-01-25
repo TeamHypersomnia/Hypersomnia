@@ -26,7 +26,7 @@ void particles_simulation_system::clear() {
 
 void particles_simulation_system::clear_dead_entities(const cosmos& new_cosmos) {
 	erase_if(orbital_emissions, [&](const auto& it) {
-		return new_cosmos[it.first.target].dead();
+		return new_cosmos[it.chasing.target].dead();
 	});
 }
 
@@ -48,6 +48,40 @@ void particles_simulation_system::update_effects_from_messages(
 	const interpolation_system& interp
 ) {
 	thread_local randomization rng;
+
+	{
+		const auto& events = step.get_queue<messages::stop_particle_effect>();
+
+		for (auto& e : events) {
+			erase_if(orbital_emissions, [&e](const orbital_cache& c){	
+				if (const auto m = e.match_chased_subject) {
+					if (*m != c.chasing.target) {
+						return false;
+					}	
+				}
+
+				if (const auto m = e.match_orbit_offset) {
+					if (*m != c.chasing.offset.pos) {
+						return false;
+					}	
+				}
+
+				if (const auto m = e.match_effect_id) {
+					if (*m != c.original_effect) {
+						return false;
+					}	
+				}
+
+#if MORE_LOGS
+				if (c.original_effect == assets::particle_effect_id::HEALTH_DAMAGE_SPARKLES) {
+					LOG("Removing health sparkles");
+				}
+#endif
+
+				return true;
+			});
+		}
+	}
 
 	const auto& events = step.get_queue<messages::start_particle_effect>();
 
@@ -105,9 +139,19 @@ void particles_simulation_system::update_effects_from_messages(
 				}
 
 				const auto chasing = std::get<orbital_chasing>(start.positioning);
-				auto& cache = orbital_emissions[chasing];
-				cache = {};
-				return cache.emission_instances;
+
+				orbital_cache c;
+				c.chasing = chasing;
+				c.original_effect = effect.id;
+				orbital_emissions.push_back(c);
+
+#if MORE_LOGS
+				if (effect.id == assets::particle_effect_id::HEALTH_DAMAGE_SPARKLES) {
+					LOG("Adding health sparkles");
+				}
+#endif
+
+				return orbital_emissions.back().emission_instances;
 			}();
 
 			for (auto emission : source_effect->emissions) {
@@ -308,17 +352,17 @@ void particles_simulation_system::advance_visible_streams(
 		}
 
 		for (auto& c : orbital_emissions) { 
-			const auto chase = c.first;
+			const auto chase = c.chasing;
 			const auto where = chase.get_transform(cosmos, interp);
 
 			if (!checked_cone.get_visible_world_rect_aabb(screen_size).hover(where.pos)) {
 				continue;
 			}
 
-			advance_emissions(c.second.emission_instances, where);
+			advance_emissions(c.emission_instances, where);
 		}
 	}
 
 	erase_if(fire_and_forget_emissions, [](const faf_cache& c){ return c.is_over(); });
-	erase_if(orbital_emissions, [](const auto& c){ return c.second.is_over(); });
+	erase_if(orbital_emissions, [](const orbital_cache& c){ return c.is_over(); });
 }

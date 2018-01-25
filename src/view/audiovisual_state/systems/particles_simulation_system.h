@@ -1,5 +1,6 @@
 #pragma once
 #include <unordered_map>
+#include "augs/misc/simple_pair.h"
 
 #include "augs/misc/timing/delta.h"
 #include "augs/misc/minmax.h"
@@ -76,6 +77,8 @@ public:
 
 	struct orbital_cache {
 		std::vector<emission_instance> emission_instances;
+		orbital_chasing chasing;
+		assets::particle_effect_id original_effect;
 
 		bool is_over() const {
 			return are_over(emission_instances);
@@ -97,7 +100,7 @@ public:
 	per_render_layer_t<std::unordered_map<entity_id, std::vector<homing_animated_particle>>> homing_animated_particles;
 
 	/* Current streams vectors */
-	std::unordered_map<orbital_chasing, orbital_cache> orbital_emissions;
+	std::vector<orbital_cache> orbital_emissions;
 	std::vector<faf_cache> fire_and_forget_emissions;
 
 	void clear();

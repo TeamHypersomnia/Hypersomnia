@@ -1,4 +1,5 @@
 #pragma once
+#include <optional>
 #include "game/messages/message.h"
 #include "augs/math/vec2.h"
 
@@ -8,8 +9,14 @@
 #include "game/assets/ids/particle_effect_id.h"
 
 namespace messages {
-	struct start_particle_effect : message {
+	struct start_particle_effect {
 		particle_effect_input effect;
 		particle_effect_start_input start;
+	};
+
+	struct stop_particle_effect {
+		std::optional<entity_id> match_chased_subject;
+		std::optional<vec2> match_orbit_offset;
+		std::optional<assets::particle_effect_id> match_effect_id;
 	};
 }
