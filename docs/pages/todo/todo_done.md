@@ -79,3 +79,6 @@ we consider whole type overrides too complex architeciturally:
 		- burst can be stopped in the name of an entity
 			- used by the car
 		- continuous streams could be queried statelessly by the simulation system
+
+- should find_logic_transform return nullopt if entity is dead?
+	- perhaps, for simplicity. we don't gain much by ensuring there

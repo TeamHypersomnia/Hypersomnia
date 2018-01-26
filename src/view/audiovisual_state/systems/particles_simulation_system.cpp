@@ -354,13 +354,17 @@ void particles_simulation_system::advance_visible_streams(
 
 		for (auto& c : orbital_emissions) { 
 			const auto chase = c.chasing;
-			const auto where = chase.get_transform(cosmos, interp);
+			const auto where = find_transform(chase, cosmos, interp);
 
-			if (!checked_cone.get_visible_world_rect_aabb(screen_size).hover(where.pos)) {
+			if (!where) {
 				continue;
 			}
 
-			advance_emissions(c.emission_instances, where);
+			if (!checked_cone.get_visible_world_rect_aabb(screen_size).hover(where->pos)) {
+				continue;
+			}
+
+			advance_emissions(c.emission_instances, *where);
 		}
 	}
 

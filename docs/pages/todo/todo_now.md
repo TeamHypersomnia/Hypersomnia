@@ -8,14 +8,12 @@ summary: Just a hidden scratchpad.
 ## Microplanned implementation order:  
 
 
+- Audiovisual caches should always check if the transform exist because sometimes the transform might be lost even due to having been put into a backpack.
 
 renaming: 
 	input->effect
 	absolute_or_local
 	chasing -> positioning
-
-should find_logic_transform return nullopt if entity is dead?
-	- perhaps, for simplicity. we don't gain much by ensuring there
  
 find_def->find
 get_def->get

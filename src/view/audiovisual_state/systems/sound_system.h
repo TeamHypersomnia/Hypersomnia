@@ -31,7 +31,7 @@ class sound_system {
 		sound_effect_start_input original_start;
 
 		/* For calculating sound's velocity */
-		components::transform previous_transform;
+		std::optional<components::transform> previous_transform;
 	};
 
 	struct fading_source {

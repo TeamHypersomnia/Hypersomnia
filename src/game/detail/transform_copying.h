@@ -1,5 +1,6 @@
 #pragma once
 #include <variant>
+#include <optional>
 #include "game/transcendental/entity_id.h"
 #include "game/components/transform_component.h"
 
@@ -8,15 +9,15 @@ struct orbital_chasing {
 	components::transform offset;
 
 	template <class C, class I>
-	components::transform get_transform(C& cosm, I& interp) const {
-		if (const auto target_handle = cosm[target]) {
-			const auto target_transform = target_handle.get_logic_transform();
-			auto result = target_transform + offset;
-			result.pos.rotate(target_transform.rotation, target_transform.pos);
+	std::optional<components::transform> find_transform(C& cosm, I& interp) const {
+		if (const auto target_transform  = cosm[target].find_logic_transform()) {
+			auto result = *target_transform + offset;
+			result.pos.rotate(target_transform->rotation, target_transform->pos);
+
 			return result;
 		}
 
-		return {};
+		return std::nullopt;
 	}
 
 	bool operator==(const orbital_chasing b) const {
@@ -27,9 +28,9 @@ struct orbital_chasing {
 using absolute_or_local = std::variant<components::transform, orbital_chasing>;
 
 template <class C, class I>
-auto get_transform(const absolute_or_local& l, C& cosm, I& interp) {
+std::optional<components::transform> find_transform(const absolute_or_local& l, C& cosm, I& interp) {
 	if (auto chasing = std::get_if<orbital_chasing>(&l)) {
-		return chasing->get_transform(cosm, interp);
+		return chasing->find_transform(cosm, interp);
 	}
 
 	return std::get<components::transform>(l);

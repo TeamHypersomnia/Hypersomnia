@@ -40,11 +40,17 @@ void sound_system::clear_sources_playing(const assets::sound_buffer_id id) {
 }
 
 void sound_system::clear_dead_entities(const cosmos& new_cosmos) {
-	for (auto& it : short_sounds) {
+	erase_if(short_sounds, [&](short_sound_cache& it) {
 		if (new_cosmos[get_target_if_any(it.positioning)].dead()) {
-			it.positioning = it.previous_transform;
+			if (!it.previous_transform) {
+				return true;
+			}
+
+			it.positioning = *it.previous_transform;
 		}
-	};
+
+		return false;
+	});
 }
 
 void sound_system::update_listener(
@@ -111,7 +117,7 @@ void sound_system::update_effects_from_messages(
 		cache.original_start = e.start;
 
 		cache.positioning = e.start.positioning;
-		cache.previous_transform = get_transform(e.start.positioning, cosmos, interp);
+		cache.previous_transform = find_transform(e.start.positioning, cosmos, interp);
 
 		auto& source = cache.source;
 
@@ -165,9 +171,15 @@ void sound_system::update_sound_properties(
 
 	erase_if(short_sounds, [&](short_sound_cache& cache) {
 		const auto& positioning = cache.positioning;
-		const auto current_transform = get_transform(positioning, cosmos, interp);
+		const auto maybe_transform = find_transform(positioning, cosmos, interp);
 
 		auto& source = cache.source;
+
+		if (!maybe_transform) {
+			source.set_gain(0.f);
+		}
+
+		const auto current_transform = *maybe_transform;
 
 		{
 			const auto dist_from_listener = (listener_pos - current_transform.pos).length();
@@ -177,11 +189,13 @@ void sound_system::update_sound_properties(
 		}
 
 		{
-			const auto displacement = current_transform - cache.previous_transform;
-			cache.previous_transform = current_transform;
+			if (cache.previous_transform) {
+				const auto displacement = current_transform - *cache.previous_transform;
+				cache.previous_transform = current_transform;
 
-			const auto effective_velocity = displacement.pos * dt.in_seconds();
-			source.set_velocity(si, effective_velocity);
+				const auto effective_velocity = displacement.pos * dt.in_seconds();
+				source.set_velocity(si, effective_velocity);
+			}
 		}
 
 		const auto& input = cache.original_input;

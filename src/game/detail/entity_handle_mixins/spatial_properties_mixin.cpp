@@ -25,6 +25,10 @@ template <bool C, class D>
 std::optional<components::transform> basic_spatial_properties_mixin<C, D>::find_logic_transform() const {
 	const auto handle = *static_cast<const D*>(this);
 
+	if (!handle) {
+		return std::nullopt;
+	}
+
 	/*
 		Since an alive owner body always implies that the entity has fixtures component,
 		it is equivalent to the call of:
