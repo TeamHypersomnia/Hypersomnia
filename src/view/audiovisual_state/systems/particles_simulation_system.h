@@ -78,7 +78,7 @@ public:
 	struct orbital_cache {
 		std::vector<emission_instance> emission_instances;
 		orbital_chasing chasing;
-		assets::particle_effect_id original_effect;
+		particle_effect_input original_input;
 
 		bool is_over() const {
 			return are_over(emission_instances);

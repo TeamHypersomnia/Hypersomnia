@@ -11,5 +11,5 @@ struct loaded_sounds : public asset_map<
 	augs::sound_buffer
 > {
 	loaded_sounds() = default;
-	loaded_sounds(const sound_buffer_inputs_map&);
+	explicit loaded_sounds(const sound_buffer_inputs_map&);
 };

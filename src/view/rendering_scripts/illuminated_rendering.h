@@ -20,6 +20,7 @@
 #include "game/components/interpolation_component.h"
 #include "game/components/fixtures_component.h"
 
+#include "view/viewer_eye.h"
 #include "view/rendering_scripts/rendering_scripts.h"
 #include "view/rendering_scripts/illuminated_rendering.h"
 
@@ -43,19 +44,17 @@ using illuminated_rendering_fbos = necessary_fbos;
 using illuminated_rendering_shaders = necessary_shaders;
 
 struct illuminated_rendering_input {
-	const const_entity_handle& viewed_character;
+	const viewer_eye eye;
 	const audiovisual_state& audiovisuals;
 	const game_drawing_settings drawing;
 	const necessary_images_in_atlas& necessary_images;
 	const augs::baked_font& gui_font;
 	const game_images_in_atlas_map& game_images;
-	const vec2i screen_size;
 	const double interpolation_ratio = 0.0;
 	augs::renderer& renderer;
 	const augs::graphics::texture& game_world_atlas;
 	const illuminated_rendering_fbos& fbos;
 	const illuminated_rendering_shaders& shaders;
-	const camera_cone camera;
 	const visible_entities& all_visible;
 };
 
@@ -68,11 +67,11 @@ void illuminated_rendering(
 ) {
 	auto& renderer = in.renderer;
 	
-	const auto viewed_character = in.viewed_character;
+	const auto viewed_character = in.eye.viewed_character;
+	const auto screen_size = in.eye.screen_size;
+	const auto camera = in.eye.cone;
 
-	const auto screen_size = in.screen_size;
 	const auto& cosmos = viewed_character.get_cosmos();
-	const auto camera = in.camera;
 	const auto viewed_crosshair = viewed_character[child_entity_name::CHARACTER_CROSSHAIR];
 	const auto& interp = in.audiovisuals.get<interpolation_system>();
 	const auto& particles = in.audiovisuals.get<particles_simulation_system>();

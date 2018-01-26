@@ -318,7 +318,6 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/components/light_component.cpp"
 	"src/game/components/rigid_body_component.cpp"
 	"src/game/components/sentience_component.cpp"
-	"src/game/components/sound_existence_component.cpp"
 	"src/game/detail/entity_handle_mixins/inventory_mixin.cpp"
 	"src/game/detail/entity_handle_mixins/physics_mixin.cpp"
 	"src/game/detail/entity_handle_mixins/relations_mixin.cpp"
@@ -509,6 +508,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/transcendental/cosmic_functions.cpp"
 	"src/game/common_state/entity_types.cpp"
 	"src/game/detail/view_input/particle_effect_input.cpp"
+	"src/game/detail/view_input/sound_effect_input.cpp"
 )
 
 if(BUILD_WINDOW_FRAMEWORK)

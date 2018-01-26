@@ -1,6 +1,13 @@
 #pragma once
+
 #include "augs/pad_bytes.h"
 #include "game/assets/ids/sound_buffer_id.h"
+#include "augs/templates/hash_templates.h"
+#include "game/detail/view_input/sound_effect_input.h"
+#include "game/components/transform_component.h"
+#include "game/detail/transform_copying.h"
+#include "game/transcendental/entity_handle_declaration.h"
+#include "game/transcendental/step_declaration.h"
 
 struct sound_effect_modifier {
 	// GEN INTROSPECTOR struct sound_effect_modifier
@@ -14,9 +21,55 @@ struct sound_effect_modifier {
 	// END GEN INTROSPECTOR
 };
 
+struct sound_effect_start_input {
+	absolute_or_local positioning;
+	entity_id direct_listener;
+	std::size_t variation_number = static_cast<std::size_t>(-1);
+
+	static sound_effect_start_input fire_and_forget(const components::transform where) {
+		sound_effect_start_input in;
+		in.positioning = where;
+		return in; 
+	}
+
+	static sound_effect_start_input orbit_local(const entity_id id, const components::transform offset) {
+		sound_effect_start_input in;
+		in.positioning = orbital_chasing { id, offset };
+		return in; 
+	}
+
+	static sound_effect_start_input orbit_absolute(const const_entity_handle h, components::transform offset);
+
+	auto& set_listener(const entity_id id) {
+		direct_listener = id;
+		return *this;	
+	}
+
+	static sound_effect_start_input at_entity(const entity_id id) {
+		return orbit_local(id, {});
+	}
+
+	static sound_effect_start_input at_listener(const entity_id id) {
+		return at_entity(id).set_listener(id);
+	}
+
+	auto& set_variation_from(const components::transform t) {
+		variation_number = std::hash<components::transform>()(t);
+		return *this;
+	}
+
+	sound_effect_start_input& set_variation_from(const const_entity_handle h);
+};
+
 struct sound_effect_input {
 	// GEN INTROSPECTOR struct sound_effect_input
 	assets::sound_buffer_id id = assets::sound_buffer_id::INVALID;
 	sound_effect_modifier modifier;
 	// END GEN INTROSPECTOR
+
+	float calculate_max_audible_distance() const {
+		return modifier.max_distance + modifier.reference_distance;
+	}
+
+	void start(logic_step, sound_effect_start_input) const;
 };

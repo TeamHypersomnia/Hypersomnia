@@ -1,4 +1,5 @@
 #pragma once
+#include <variant>
 #include "game/transcendental/entity_id.h"
 #include "game/components/transform_component.h"
 
@@ -22,6 +23,17 @@ struct orbital_chasing {
 		return target == b.target && offset == b.offset;
 	}
 };
+
+using absolute_or_local = std::variant<components::transform, orbital_chasing>;
+
+template <class C, class I>
+auto get_transform(const absolute_or_local& l, C& cosm, I& interp) {
+	if (auto chasing = std::get_if<orbital_chasing>(&l)) {
+		return chasing->get_transform(cosm, interp);
+	}
+
+	return std::get<components::transform>(l);
+}	
 
 namespace std {
 	template <class H>

@@ -14,7 +14,7 @@
 #include "game/components/transform_component.h"
 #include "game/components/processing_component.h"
 #include "game/detail/view_input/particle_effect_input.h"
-#include "game/components/sound_existence_component.h"
+#include "game/detail/view_input/sound_effect_input.h"
 
 #include "game/stateless_systems/car_system.h"
 

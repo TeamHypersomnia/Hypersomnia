@@ -17,6 +17,7 @@
 #include "game/assets/recoil_player.h"
 
 #include "game/detail/view_input/sound_effect_input.h"
+#include "game/detail/view_input/particle_effect_input.h"
 
 namespace augs {
 	struct introspection_access;
@@ -36,8 +37,8 @@ namespace components {
 
 		float current_heat = 0.f;
 
-		child_entity_id firing_engine_sound;
-		child_entity_id muzzle_particles;
+		sound_effect_input firing_engine_sound;
+		particle_effect_input muzzle_particles;
 		augs::stepped_timestamp when_began_pulling_cocking_handle;
 
 		recoil_player_instance recoil;

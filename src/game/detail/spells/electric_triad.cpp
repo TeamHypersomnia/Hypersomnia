@@ -3,7 +3,7 @@
 #include "game/transcendental/cosmos.h"
 #include "game/components/sentience_component.h"
 #include "game/detail/view_input/particle_effect_input.h"
-#include "game/components/sound_existence_component.h"
+#include "game/detail/view_input/sound_effect_input.h"
 #include "game/components/sender_component.h"
 #include "game/components/missile_component.h"
 #include "game/components/all_inferred_state_component.h"

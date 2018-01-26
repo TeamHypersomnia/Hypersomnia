@@ -14,7 +14,7 @@
 #include "game/components/missile_component.h"
 #include "game/components/explosive_component.h"
 
-#include "game/components/sound_existence_component.h"
+#include "game/detail/view_input/sound_effect_input.h"
 #include "game/detail/view_input/particle_effect_input.h"
 
 #include "game/detail/physics/physics_scripts.h"

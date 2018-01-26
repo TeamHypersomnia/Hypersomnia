@@ -26,7 +26,8 @@ void particles_simulation_system::clear() {
 
 void particles_simulation_system::clear_dead_entities(const cosmos& new_cosmos) {
 	erase_if(orbital_emissions, [&](const auto& it) {
-		return new_cosmos[it.chasing.target].dead();
+		const auto target = new_cosmos[it.chasing.target];
+		return target.dead() || !target.find_logic_transform().has_value();
 	});
 }
 
@@ -67,13 +68,13 @@ void particles_simulation_system::update_effects_from_messages(
 				}
 
 				if (const auto m = e.match_effect_id) {
-					if (*m != c.original_effect) {
+					if (*m != c.original_input.id) {
 						return false;
 					}	
 				}
 
 #if MORE_LOGS
-				if (c.original_effect == assets::particle_effect_id::HEALTH_DAMAGE_SPARKLES) {
+				if (c.original_input.id == assets::particle_effect_id::HEALTH_DAMAGE_SPARKLES) {
 					LOG("Removing health sparkles");
 				}
 #endif
@@ -142,7 +143,7 @@ void particles_simulation_system::update_effects_from_messages(
 
 				orbital_cache c;
 				c.chasing = chasing;
-				c.original_effect = effect.id;
+				c.original_input = effect;
 				orbital_emissions.push_back(c);
 
 #if MORE_LOGS

@@ -34,8 +34,10 @@ void audiovisual_state::reserve_caches_for_entities(const std::size_t n) {
 void audiovisual_state::advance(const audiovisual_advance_input input) {
 	auto scope = measure_scope(profiler.advance);
 
-	const auto screen_size = input.screen_size;
-	const auto& cosm = input.viewed_character.get_cosmos();
+	const auto screen_size = input.eye.screen_size;
+	const auto viewed_character = input.eye.viewed_character;
+	const auto cone = input.eye.cone;
+	const auto& cosm = viewed_character.get_cosmos();
 	const auto dt = augs::delta(input.frame_delta) *= input.speed_multiplier;
 
 	auto& thunders = get<thunder_system>();
@@ -44,8 +46,6 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 	auto& highlights = get<pure_color_highlight_system>();
 	auto& interp = get<interpolation_system>();
 	auto& particles = get<particles_simulation_system>();
-
-	const auto viewed_character = input.viewed_character;
 
 	thunders.advance(cosm, input.particle_effects, dt, particles);
 	exploding_rings.advance(cosm, input.particle_effects, dt, particles);
@@ -62,7 +62,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 		);
 
 		particles.advance_visible_streams(
-			input.cone,
+			cone,
 			screen_size,
 			cosm,
 			input.particle_effects,
@@ -91,16 +91,15 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 	if (viewed_character.alive()) {
 		auto scope = measure_scope(profiler.sound_logic);
 
-		auto listener_cone = input.cone;
-		listener_cone.transform = viewed_character.get_viewing_transform(interp);
+		auto ear = input.eye;
+		ear.cone.transform = viewed_character.get_viewing_transform(interp);
 		
-		sounds.track_new_sound_existences_near_camera(
+		sounds.update_sound_properties(
 			input.audio_volume,
 			input.sounds,
-			listener_cone,
-			screen_size,
-			viewed_character,
-			interp
+			interp,
+			ear,
+			dt
 		);
 	}
 
@@ -169,8 +168,16 @@ void audiovisual_state::standard_post_solve(const const_logic_step step, const a
 	auto& flying_numbers = get<flying_number_indicator_system>();
 	auto& highlights = get<pure_color_highlight_system>();
 	auto& particles = get<particles_simulation_system>();
+	auto& sounds = get<sound_system>();
 
 	particles.update_effects_from_messages(step, input.particle_effects, interp);
+
+	auto ear = input.eye;
+	const auto viewed_character = ear.viewed_character;
+
+	ear.cone.transform = viewed_character.get_viewing_transform(interp);
+
+	sounds.update_effects_from_messages(step, input.sounds, interp, ear);
 
 	for (const auto& h : healths) {
 		flying_number_indicator_system::number::input vn;

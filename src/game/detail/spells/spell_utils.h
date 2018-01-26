@@ -42,16 +42,10 @@ void play_cast_successful_sound(
 	const components::transform caster_transform,
 	const entity_id subject
 ) {
-	sound_existence_input sound;
-	sound.delete_entity_after_effect_lifetime = true;
-	sound.direct_listener = subject;
-	sound.effect = spell_data.common.cast_successful_sound;
-
-	sound.create_sound_effect_entity(
-		step, 
-		caster_transform,
-		entity_id()
-	).add_standard_components(step);
+	spell_data.common.cast_successful_sound.start(
+		step,
+		sound_effect_start_input::at_listener(subject)
+	);
 }
 
 template <class T>
@@ -61,14 +55,8 @@ void play_cast_charging_sound(
 	const components::transform caster_transform,
 	const entity_id subject
 ) {
-	sound_existence_input sound;
-	sound.delete_entity_after_effect_lifetime = true;
-	sound.direct_listener = subject;
-	sound.effect = spell_data.charging_sound;
-
-	sound.create_sound_effect_entity(
-		step, 
-		caster_transform,
-		entity_id()
-	).add_standard_components(step);
+	spell_data.charging_sound.start(
+		step,
+		sound_effect_start_input::at_listener(subject)
+	);
 }

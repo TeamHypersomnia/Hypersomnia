@@ -7,7 +7,7 @@
 #include "game/components/item_slot_transfers_component.h"
 #include "game/components/type_component.h"
 #include "game/components/motor_joint_component.h"
-#include "game/components/sound_existence_component.h"
+#include "game/detail/view_input/sound_effect_input.h"
 
 #include "game/transcendental/logic_step.h"
 #include "game/transcendental/data_living_one_step.h"
@@ -29,11 +29,7 @@ void perform_transfer_result::notify(const logic_step step) const {
 	if (dropped.has_value()) {
 		auto& d = *dropped;
 
-		d.sound.create_sound_effect_entity(
-			step,
-			d.sound_transform,
-			cosmos[d.sound_subject]
-		).add_standard_components(step);
+		d.sound_input.start(step, d.sound_start);
 	}
 }
 
@@ -204,13 +200,11 @@ perform_transfer_result perform_transfer(
 		output.dropped.emplace();
 		auto& dropped = *output.dropped;
 
-		auto& sound = dropped.sound;
-		sound.delete_entity_after_effect_lifetime = true;
-		sound.direct_listener = previous_slot_container.get_owning_transfer_capability();
-		sound.effect = cosmos.get_common_assets().item_throw_sound;
+		dropped.sound_input = cosmos.get_common_assets().item_throw_sound;
 
-		dropped.sound_transform = initial_transform_of_transferred;
-		dropped.sound_subject = grabbed_item_part_handle;
+		dropped.sound_start = sound_effect_start_input::orbit_absolute(
+			grabbed_item_part_handle, initial_transform_of_transferred
+		).set_listener(previous_slot_container.get_owning_transfer_capability());
 	}
 
 	return output;

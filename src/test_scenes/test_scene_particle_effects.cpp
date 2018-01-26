@@ -104,6 +104,9 @@ void load_test_scene_particle_effects(
 
 			em.spread_degrees = float_minmax(7, 7);
 			em.particles_per_sec.set(80 / 4.5, 80 / 4.5);
+			// TODO: the stream lifetimes for dynamically enablable streams
+			// should be just about enough to last a message interval or a step (if we save audiovisual caches), say 100 ms
+			// Bursts won't be nicely granular
 			em.stream_lifetime_ms = float_minmax(3000000, 3000000);
 
 			em.base_speed = float_minmax(100, 110);

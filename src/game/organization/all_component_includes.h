@@ -31,7 +31,7 @@
 #include "game/components/flags_component.h"
 #include "game/components/light_component.h"
 #include "game/components/wandering_pixels_component.h"
-#include "game/components/sound_existence_component.h"
+#include "game/detail/view_input/sound_effect_input.h"
 #include "game/components/explosive_component.h"
 #include "game/components/catridge_component.h"
 #include "game/components/shape_polygon_component.h"

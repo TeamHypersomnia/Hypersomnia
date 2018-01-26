@@ -7,6 +7,80 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order:  
 
+
+
+renaming: 
+	input->effect
+	absolute_or_local
+	chasing -> positioning
+
+should find_logic_transform return nullopt if entity is dead?
+	- perhaps, for simplicity. we don't gain much by ensuring there
+ 
+find_def->find
+get_def->get
+
+- Later, bullet trace sounds should as be calculated statelessly
+- Sound system should probably assume the same strategy as an inferred cache:
+
+- PROBLEM: entity-chasing sound/particle streams might start chasing wrong entities if a cosmos gets reassigned from prediction correction!
+	- Streams will either be very, very short in which case it won't matter (and it would suck to replay a sfx or move it in time randomly)
+	- Or they will be continuous in which case they will be statelessly calculated.
+		- Car engines and decorations.
+
+- Discriminate sound/particle effect types and treat them accordingly. Might turn out that some caches might need to be copied, some not.
+	- Think of explosions and how unpredicted explosions shall be handled, because it is important for the future.
+		- Just played from the beginning, I believe.
+	- Actually, no caches will need to be copied around.
+	- Very short streams of sound or particles (e.g. sound on damage, but also its particle stream effect!) should be treated exactly like fire-and-forgets, despite the name.
+	- E.g. it might make sense to make continuous stream of messages for continuous streams or enablable streams, because it is important for logic to catch up on them quickly.
+	- Continuous streams in case of sound system might be music, for example.
+		- Car engine and gun engine sounds as well!
+	- Continuous streams might even be handled completely without messages, but statelessly.
+	- So don't worry, we'll reuse what was written and add new things later for continuous objects. 
+	- You've actually written about those stateless things...
+
+<!--
+	- On prediction correction, we could:
+		- disable all streams?
+		- if each cosmos timeline held its copy of audiovisual caches... we could reassign along it.
+		- In any case, logic is presumed to catch up quickly with sending messages for e.g. continuous streams 
+			- because a cosmos might be at any time read from disk in which case it will have no audiovisual state
+
+- Fire and forget streams should never last long.
+- For continuous streams (e.g. decorations), we could make it so the logic is required to send a message once in a while so that the invalid caches "burn out" and the valid caches quickly start
+	- Best if it only happens on startup and we keep copies of audiovisual caches for each cosmos and don't worry that they're not synchronized
+
+- Particles are easy, can we pause all sounds if we want to keep a copy of audiovisual state for later revival?
+	- Might anyway be implemented later.
+-->
+
+- Messages for particles and sounds are the best compromise because this state is then not synchronized and server might just opt out of processing messages itself with some compilation flag.
+	- It's easier for audiovisual state not to iterate through all entities.
+	- Startup catching up will not be that much of an issue
+	- We can always do some "circumstantial" magic when overwriting cosmos signi because we have original input/start values saved
+		- wouldn't anyways be perfect with particle existences, though at least you have times of births there
+		- but storing audiovisual caches will provide the same flexibility
+
+- Message intervals vs message every step
+	- Message every step amortizes side-effects and would theoretically remove the need to store and reassign visual caches
+		- as every time we can rebuild from messages
+		- pro: don't have to come up with a sensible interval
+			- no interval at all, actually, just persist caches through entire step and clear it on next post solve
+		- pro: caches quickly catch up on any change
+		- con: many messages posted 
+			- but server can anyway opt out
+		- con: has to clear audiovisual caches every time and prepare it anew? 
+			- but ONLY for continuous streams
+			- or just compare message contents to some last one so that it finds a suitable resource and determine whether some of it should be continued
+	- Message per some interval
+		- con: has to come up with nice interval for every effect 	
+			- important only on startup
+			- perhaps a stateless method that determines initial state of continuous streams?
+				- decorations would have their own existential component with particle effect id
+				- thus they would be somewhat similar to particle existences
+		- con: has to cache audiovisual state for every timeline to avoid glitches
+
 - sentience component should have integrated crosshair
 	- provide a get crosshair transform function
 
@@ -38,8 +112,6 @@ summary: Just a hidden scratchpad.
 	- additionally, expose a "get_particles_transform" to disambiguate get_logic_transform - the latter should not check for particles existence.
 		- because a fixtural entity might additionally have a particles existence that chases upon itself.
 			- e.g. truck engine
-
-- remove "get_attachment_offset" and introduce attachment matrix for flavours
 
 - Thoughts about native types
 	- We will totally get rid of processing component and calculate statelessly which that which needs to be calculated.

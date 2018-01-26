@@ -24,7 +24,7 @@
 #include "game/components/item_component.h"
 #include "game/components/flags_component.h"
 #include "game/components/sentience_component.h"
-#include "game/components/sound_existence_component.h"
+#include "game/detail/view_input/sound_effect_input.h"
 #include "game/components/explosive_component.h"
 #include "game/components/sender_component.h"
 #include "game/components/transform_component.h"
@@ -352,6 +352,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 				gun.current_heat = std::max(0.f, gun.current_heat - delta.in_seconds()/gun_def.maximum_heat);
 			}
 
+#if TODO
 			const auto firing_engine_sound = cosmos[gun.firing_engine_sound];
 			const bool sound_enabled = gun.current_heat > 0.20f && firing_engine_sound.alive();
 			const auto pitch = static_cast<float>(gun.current_heat / gun_def.maximum_heat);
@@ -373,8 +374,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					components::sound_existence::deactivate(firing_engine_sound);
 				}
 			}
-			
-#if TODO
+
 			const auto muzzle_particles = cosmos[gun.muzzle_particles];
 
 			if (muzzle_particles.alive() && muzzle_particles.has<components::particles_existence>()) {

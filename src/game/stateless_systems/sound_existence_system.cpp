@@ -21,62 +21,6 @@
 #include "game/messages/health_event.h"
 #include "game/messages/exhausted_cast_message.h"
 
-bool components::sound_existence::is_activated(const const_entity_handle h) {
-	return
-		//h.get<tree_of_npo_node_input>().is_activated() && 
-		h.get<components::processing>().is_in(processing_subjects::WITH_SOUND_EXISTENCE);
-}
-
-void components::sound_existence::activate(const entity_handle h) {
-	if (is_activated(h)) {
-		return;
-	}
-
-	auto& existence = h.get<components::sound_existence>();
-	existence.time_of_birth = h.get_cosmos().get_timestamp();
-	h.get<components::processing>().enable_in(processing_subjects::WITH_SOUND_EXISTENCE);
-}
-
-void components::sound_existence::deactivate(const entity_handle h) {
-	if (!is_activated(h)) {
-		return;
-	}
-
-	h.get<components::processing>().disable_in(processing_subjects::WITH_SOUND_EXISTENCE);
-}
-
-size_t components::sound_existence::random_variation_number_from_transform(const components::transform t) const {
-	return time_of_birth.step + std::hash<vec2>()(t.pos);
-}
-
-float components::sound_existence::calculate_max_audible_distance() const {
-	return input.effect.modifier.max_distance + input.effect.modifier.reference_distance;
-}
-
-void sound_existence_system::destroy_dead_sounds(const logic_step step) const {
-	auto& cosmos = step.get_cosmos();
-	const auto timestamp = cosmos.get_timestamp();
-
-	cosmos.for_each(
-		processing_subjects::WITH_SOUND_EXISTENCE,
-		[&](const entity_handle it) {
-			auto& existence = it.get<components::sound_existence>();
-
-			const auto repetitions = existence.input.effect.modifier.repetitions;
-
-			if (repetitions > -1 && (timestamp - existence.time_of_birth).step > existence.max_lifetime_in_steps * repetitions) {
-				if (existence.input.delete_entity_after_effect_lifetime) {
-					step.post_message(messages::queue_destruction(it));
-				}
-				else {
-					components::sound_existence::deactivate(it);
-				}
-			}
-		},
-		subjects_iteration_flag::POSSIBLE_ITERATOR_INVALIDATION
-	);
-}
-
 void sound_existence_system::create_sounds_from_game_events(const logic_step step) const {
 	const auto& collisions = step.get_queue<messages::collision_message>();
 	const auto& gunshots = step.get_queue<messages::gunshot_response>();
@@ -113,16 +57,18 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 				const auto pitch_mult = impulse / 185.f;
 
 				if (gain_mult > 0.01f) {
-					sound_existence_input in;
-					in.delete_entity_after_effect_lifetime = true;
-					in.effect.modifier.pitch = std::min(1.5f, 0.85f + pitch_mult);
+					sound_effect_input effect;
+					effect.modifier.pitch = std::min(1.5f, 0.85f + pitch_mult);
 					
-					in.effect.modifier.gain = gain_mult;
-					in.effect.id = sound_id;
+					effect.modifier.gain = gain_mult;
+					effect.id = sound_id;
 
 					// LOG("Coll. gain/pitch: %f3/%f3", in.effect.modifier.gain, in.effect.modifier.pitch);
 
-					in.create_sound_effect_entity(step, c.point, entity_id()).add_standard_components(step);
+					effect.start(
+						step, 
+						sound_effect_start_input::fire_and_forget(c.point)
+					);
 				}
 			}
 
@@ -132,21 +78,6 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 	}
 
 	for (const auto& g : gunshots) {
-		for (const auto r : g.spawned_rounds) {
-			const auto subject = cosmos[r];
-
-			auto& missile = subject.get<components::missile>();
-
-			sound_existence_input in;
-			in.effect = missile.trace_sound;
-
-			missile.trace_sound_entity = in.create_sound_effect_entity(
-				step,
-				g.muzzle_transform,
-				r
-			).add_standard_components(step);
-		}
-
 		{
 			const auto subject = cosmos[g.subject];
 			const auto& gun = subject.get<components::gun>();
@@ -155,11 +86,12 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 			const auto owning_capability = subject.get_owning_transfer_capability();
 
 			{
-				sound_existence_input in;
-				in.effect = gun_def.muzzle_shot_sound;
-				in.direct_listener = owning_capability;
+				const auto& effect = gun_def.muzzle_shot_sound;
 
-				in.create_sound_effect_entity(step, subject.get_logic_transform(), entity_id()).add_standard_components(step);
+				effect.start(
+					step,
+					sound_effect_start_input::at_entity(subject).set_listener(owning_capability)
+				);
 			}
 
 			{
@@ -170,20 +102,16 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 					const auto ammo_info = get_ammunition_information(subject);
 
 					if (ammo_info.total_charges < cued_count) {
-						sound_existence_input in;
-						in.effect = gun_def.low_ammo_cue_sound;
+						auto effect = gun_def.low_ammo_cue_sound;
 
 						if (ammo_info.total_charges == cued_count - 1) {
-							in.effect.modifier.gain *= 0.65f;
+							effect.modifier.gain *= 0.65f;
 						}
 
-						in.direct_listener = owning_capability;
-
-						in.create_sound_effect_entity(
+						effect.start(
 							step,
-							gun_transform,
-							entity_id()
-						).add_standard_components(step);
+							sound_effect_start_input::fire_and_forget(gun_transform).set_listener(owning_capability)
+						);
 					}
 				}
 			}
@@ -194,15 +122,14 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 		const auto subject = cosmos[h.subject];
 		const auto& sentience = subject.get<components::sentience>();
 
-		sound_existence_input in;
-		in.direct_listener = subject;
+		sound_effect_input effect;
 
 		if (h.target == messages::health_event::target_type::HEALTH) {
 			if (h.special_result == messages::health_event::result_type::DEATH) {
-				in.effect = sentience.death_sound;
+				effect = sentience.death_sound;
 			}
 			else if (h.effective_amount > 0) {
-				in.effect = sentience.health_decrease_sound;
+				effect = sentience.health_decrease_sound;
 			}
 			else {
 				continue;
@@ -210,12 +137,12 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 		}
 		else if (h.target == messages::health_event::target_type::PERSONAL_ELECTRICITY) {
 			if (h.effective_amount > 0.f) {
-				in.effect = cosmos.get_common_assets().ped_shield_impact_sound;
-				in.effect.modifier.pitch *= 1.2f + h.effective_amount / 100.f;
+				effect = cosmos.get_common_assets().ped_shield_impact_sound;
+				effect.modifier.pitch *= 1.2f + h.effective_amount / 100.f;
 
 				if (h.special_result == messages::health_event::result_type::PERSONAL_ELECTRICITY_DESTRUCTION) {
-					in.effect = cosmos.get_common_assets().ped_shield_destruction_sound;
-					in.effect.modifier.pitch *= 1.5f;
+					effect = cosmos.get_common_assets().ped_shield_destruction_sound;
+					effect.modifier.pitch *= 1.5f;
 				}
 			}
 			else {
@@ -224,12 +151,12 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 		}
 		else if (h.target == messages::health_event::target_type::CONSCIOUSNESS) {
 			if (h.effective_amount > 0.f) {
-				in.effect = sentience.consciousness_decrease_sound;
-				in.effect.modifier.pitch *= 1.2f + h.effective_amount / 100.f;
+				effect = sentience.consciousness_decrease_sound;
+				effect.modifier.pitch *= 1.2f + h.effective_amount / 100.f;
 
 				if (h.special_result == messages::health_event::result_type::LOSS_OF_CONSCIOUSNESS) {
-					in.effect = sentience.loss_of_consciousness_sound;
-					in.effect.modifier.pitch *= 1.5f;
+					effect = sentience.loss_of_consciousness_sound;
+					effect.modifier.pitch *= 1.5f;
 				}
 			}
 			else {
@@ -240,40 +167,31 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 			continue;
 		}
 
-		in.create_sound_effect_entity(
-			step, 
-			subject.get_logic_transform(), 
-			subject
-		).add_standard_components(step);
+		effect.start(
+			step,
+			sound_effect_start_input::at_listener(subject)
+		);
 	}
 
 	for (const auto& d : damages) {
 		if (d.inflictor_destructed) {
 			const auto inflictor = cosmos[d.inflictor];
 			
-			sound_existence_input in;
-			in.direct_listener = d.subject;
-			in.effect = inflictor.get<components::missile>().destruction_sound;
-			
-			in.create_sound_effect_entity(
-				step, 
-				d.point_of_impact, 
-				entity_id()
-			).add_standard_components(step);
+			const auto& effect = inflictor.get<components::missile>().destruction_sound;
+
+			effect.start(
+				step,
+				sound_effect_start_input::orbit_absolute(cosmos[d.subject], d.point_of_impact).set_listener(d.subject)
+			);
 		}
 	}
 
 	for (const auto& e : exhausted_casts) {
-		const auto subject = cosmos[e.subject];
+		const auto& effect = cosmos.get_common_assets().cast_unsuccessful_sound;
 
-		sound_existence_input in;
-		in.direct_listener = e.subject;
-		in.effect = cosmos.get_common_assets().cast_unsuccessful_sound;
-
-		in.create_sound_effect_entity(
-			step, 
-			e.transform, 
-			entity_id()
-		).add_standard_components(step);
+		effect.start(
+			step,
+			sound_effect_start_input::at_listener(e.subject)
+		);
 	}
 }

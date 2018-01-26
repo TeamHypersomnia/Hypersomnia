@@ -44,19 +44,16 @@ void standard_explosion_input::instantiate(
 		}
 	}
 
+	sound_effect_input effect;
+	effect.id = sound_effect; 
+	effect.modifier.gain = sound_gain;
+
+	effect.start(
+		step,
+		sound_effect_start_input::fire_and_forget(explosion_location).set_listener(subject_if_any)
+	);
+
 	auto& cosmos = step.get_cosmos();
-
-	sound_existence_input sound_in;
-	sound_in.delete_entity_after_effect_lifetime = true;
-	sound_in.direct_listener = subject_if_any;
-	sound_in.effect.id = sound_effect;
-	sound_in.effect.modifier.gain = sound_gain;
-
-	sound_in.create_sound_effect_entity(
-		step, 
-		explosion_location,
-		entity_id()
-	).add_standard_components(step);
 
 	const auto delta = cosmos.get_fixed_delta();
 	const auto now = cosmos.get_timestamp();

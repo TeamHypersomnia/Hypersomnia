@@ -17,13 +17,14 @@ void save_log_and_terminate() {
 
 	augs::open_text_editor(failure_log_path.string());
 
-#if !IS_PRODUCTION_BUILD
-	#if PLATFORM_WINDOWS
+#if PLATFORM_WINDOWS
 	__debugbreak();
-	#elif PLATFORM_UNIX
-	std::raise(SIGINT);	
-	#endif
-#else
-	std::terminate();
 #endif
+
+	/* 
+		Should force a core dump on Linux platforms, 
+		and will also act as a breakpoint for gdb
+	*/
+
+	std::abort();	
 }

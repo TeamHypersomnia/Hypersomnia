@@ -15,7 +15,7 @@
 #include "game/components/fixtures_component.h"
 #include "game/components/type_component.h"
 #include "game/detail/view_input/particle_effect_input.h"
-#include "game/components/sound_existence_component.h"
+#include "game/detail/view_input/sound_effect_input.h"
 #include "game/components/polygon_component.h"
 #include "game/components/shape_polygon_component.h"
 #include "game/transcendental/cosmos.h"
@@ -256,7 +256,6 @@ namespace prefabs {
 			{
 				sound_existence_input in;
 				in.effect.id = assets::sound_buffer_id::ENGINE;
-				in.effect.modifier.repetitions = -1;
 				in.delete_entity_after_effect_lifetime = false;
 
 				const auto engine_sound = in.create_sound_effect_entity(step, spawn_transform, front);

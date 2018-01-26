@@ -5,7 +5,7 @@
 #include "game/components/sprite_component.h"
 #include "game/components/type_component.h"
 #include "game/components/trace_component.h"
-#include "game/components/sound_existence_component.h"
+#include "game/detail/view_input/sound_effect_input.h"
 #include "game/components/fixtures_component.h"
 #include "game/components/catridge_component.h"
 #include "game/components/explosive_component.h"
@@ -326,16 +326,7 @@ namespace prefabs {
 		weapon.set_logic_transform(step, pos);
 		weapon.add_standard_components(step);
 
-		{
-			sound_existence_input in;
-			in.effect.id = assets::sound_buffer_id::FIREARM_ENGINE;
-			in.effect.modifier.repetitions = -1;
-			in.delete_entity_after_effect_lifetime = false;
-			const auto engine_sound = in.create_sound_effect_entity(step, gun_def.calculate_muzzle_position(weapon.get_logic_transform()), weapon);
-			engine_sound.add_standard_components(step);
-			gun.firing_engine_sound = engine_sound;
-			components::sound_existence::deactivate(engine_sound);
-		}
+		gun.firing_engine_sound.id = assets::sound_buffer_id::FIREARM_ENGINE;
 
 		if (load_mag.alive()) {
 			perform_transfer({ load_mag, weapon[slot_function::GUN_DETACHABLE_MAGAZINE] }, step);
@@ -365,16 +356,7 @@ namespace prefabs {
 		weapon.set_logic_transform(step, pos);
 		weapon.add_standard_components(step);
 
-		{
-			sound_existence_input in;
-			in.effect.id = assets::sound_buffer_id::FIREARM_ENGINE;
-			in.effect.modifier.repetitions = -1;
-			in.delete_entity_after_effect_lifetime = false;
-			const auto engine_sound = in.create_sound_effect_entity(step, gun_def.calculate_muzzle_position(weapon.get_logic_transform()), weapon);
-			engine_sound.add_standard_components(step);
-			gun.firing_engine_sound = engine_sound;
-			components::sound_existence::deactivate(engine_sound);
-		}
+		gun.firing_engine_sound.id = assets::sound_buffer_id::FIREARM_ENGINE;
 
 		if (load_mag.alive()) {
 			perform_transfer({ load_mag, weapon[slot_function::GUN_DETACHABLE_MAGAZINE] }, step);
@@ -420,7 +402,6 @@ namespace prefabs {
 			trace_modifier.max_distance = 1020.f;
 			trace_modifier.reference_distance = 100.f;
 			trace_modifier.gain = 1.3f;
-			trace_modifier.repetitions = -1;
 			trace_modifier.fade_on_exit = false;
 
 			missile.trace_sound.id = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;
@@ -559,7 +540,6 @@ namespace prefabs {
 			trace_modifier.max_distance = 1020.f;
 			trace_modifier.reference_distance = 100.f;
 			trace_modifier.gain = 1.3f;
-			trace_modifier.repetitions = -1;
 			trace_modifier.fade_on_exit = false;
 
 			missile.trace_sound.id = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;

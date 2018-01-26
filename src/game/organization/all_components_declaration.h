@@ -90,7 +90,6 @@ using component_list_t = List<
 	components::interpolation,
 	components::light,
 	components::wandering_pixels,
-	components::sound_existence,
 	components::explosive,
 	components::catridge,
 	components::shape_circle,

@@ -14,7 +14,7 @@
 #include "game/components/transform_component.h"
 #include "game/components/driver_component.h"
 #include "game/components/fixtures_component.h"
-#include "game/components/sound_existence_component.h"
+#include "game/detail/view_input/sound_effect_input.h"
 #include "game/components/sentience_component.h"
 #include "game/components/attitude_component.h"
 #include "game/components/sender_component.h"
@@ -105,12 +105,10 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 				damage_msg.collider_b2Fixture_index = it.collider_b2Fixture_index;
 
 				if (is_victim_a_held_item) {
-					sound_existence_input in;
-					in.effect = missile.pass_through_held_item_sound; 
-					in.delete_entity_after_effect_lifetime = true;
-					in.direct_listener = owning_capability;
-
-					in.create_sound_effect_entity(step, { it.point, 0.f }, entity_id()).add_standard_components(step);
+					missile.pass_through_held_item_sound.start(
+						step,
+						sound_effect_start_input::fire_and_forget( { it.point, 0.f } ).set_listener(owning_capability)
+					);
 				}
 
 				if (!is_victim_a_held_item && missile.destroy_upon_damage) {

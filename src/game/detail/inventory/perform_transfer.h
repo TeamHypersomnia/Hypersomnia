@@ -9,7 +9,7 @@
 #include "game/components/container_component.h"
 
 #include "game/detail/inventory/perform_transfer.h"
-#include "game/components/sound_existence_component.h"
+#include "game/detail/view_input/sound_effect_input.h"
 #include "game/detail/inventory/inventory_utils.h"
 
 struct perform_transfer_result {
@@ -18,7 +18,9 @@ struct perform_transfer_result {
 	std::optional<messages::item_picked_up_message> picked;
 
 	struct drop {
-		sound_existence_input sound;
+		sound_effect_input sound_input;
+		sound_effect_start_input sound_start;
+
 		components::transform sound_transform;
 		entity_id sound_subject;
 	};

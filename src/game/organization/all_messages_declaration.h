@@ -27,6 +27,8 @@ namespace messages {
 	struct item_picked_up_message;
 	struct start_particle_effect;
 	struct stop_particle_effect;
+	struct start_sound_effect;
+	struct stop_sound_effect;
 	struct exhausted_cast;
 }
 
@@ -55,6 +57,8 @@ typedef augs::storage_for_message_queues <
 	messages::exhausted_cast,
 	messages::start_particle_effect,
 	messages::stop_particle_effect,
+	messages::start_sound_effect,
+	messages::stop_sound_effect,
 	exploding_ring_input,
 	thunder_input,
 	item_slot_transfer_request

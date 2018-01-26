@@ -579,10 +579,7 @@ int work(const int argc, const char* const * const argv) try {
    		signal_status = signal_type;
 	};
 
-#if IS_PRODUCTION_BUILD // If debugging, we use SIGINT for simulating a debugger break
 	std::signal(SIGINT, signal_handler);
-#endif
-
 	std::signal(SIGTERM, signal_handler);
 	std::signal(SIGSTOP, signal_handler);
 #endif
@@ -655,6 +652,10 @@ int work(const int argc, const char* const * const argv) try {
 
 	static visible_entities all_visible;
 
+	static auto get_viewer_eye = []() -> viewer_eye {
+		return { get_viewed_character(), get_camera(), window.get_screen_size() };
+	};
+
 	static auto audiovisual_step = [](
 		const augs::delta frame_delta,
 		const double speed_multiplier,
@@ -702,9 +703,7 @@ int work(const int argc, const char* const * const argv) try {
 			frame_delta,
 			{ speed_multiplier },
 
-			get_viewed_character(),
-			get_camera(),
-			vec2(screen_size),
+			get_viewer_eye(),
 			all_visible,
 
 			get_viewable_defs().particle_effects,
@@ -717,7 +716,16 @@ int work(const int argc, const char* const * const argv) try {
 	};
 
 	static auto setup_post_solve = [](const const_logic_step step) {
-		audiovisuals.standard_post_solve(step, { get_viewable_defs().particle_effects });
+		{
+			const auto& defs = get_viewable_defs();
+
+			audiovisuals.standard_post_solve(step, { 
+				defs.particle_effects, 
+				game_sounds,
+				get_viewer_eye() 
+			});
+		}
+
 		game_gui.standard_post_solve(step);
 	};
 
@@ -1456,19 +1464,17 @@ int work(const int argc, const char* const * const argv) try {
 			/* #1 */
 			illuminated_rendering(
 				{
-					viewed_character,
+					{ viewed_character, get_camera(), screen_size },
 					audiovisuals,
 					viewing_config.drawing,
 					necessary_atlas_entries,
 					get_gui_font(),
 					game_atlas_entries,
-					screen_size,
 					interpolation_ratio,
 					renderer,
 					*game_world_atlas,
 					fbos,
 					shaders,
-					get_camera(),
 					all_visible
 				},
 				false,

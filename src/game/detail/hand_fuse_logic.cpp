@@ -7,7 +7,7 @@
 #include "game/components/sprite_component.h"
 #include "game/components/fixtures_component.h"
 #include "game/components/explosive_component.h"
-#include "game/components/sound_existence_component.h"
+#include "game/detail/view_input/sound_effect_input.h"
 #include "game/components/hand_fuse_component.h"
 
 #include "game/components/shape_polygon_component.h"
@@ -40,12 +40,10 @@ void release_or_throw_fused_object(
 		fuse.when_released = now;
 		fuse.when_detonates.step = static_cast<unsigned>(now.step + (1 / delta.in_seconds() * 1.0));
 
-		sound_existence_input in;
-		in.delete_entity_after_effect_lifetime = true;
-		in.direct_listener = thrower;
-		in.effect = fuse.unpin_sound;
-
-		in.create_sound_effect_entity(step, thrower_transform, thrower).add_standard_components(step);
+		fuse.unpin_sound.start(
+			step,
+			sound_effect_start_input::fire_and_forget(thrower_transform).set_listener(thrower)
+		);
 	}
 	else if (!is_pressed_flag && fuse.when_released.was_set()) {
 		auto* const maybe_explosive = fused_entity.find<components::explosive>();
@@ -58,12 +56,10 @@ void release_or_throw_fused_object(
 				step
 			);
 			
-			sound_existence_input in;
-			in.delete_entity_after_effect_lifetime = true;
-			in.direct_listener = thrower;
-			in.effect = fuse.throw_sound;
-			
-			in.create_sound_effect_entity(step, thrower_transform, thrower).add_standard_components(step);
+			fuse.throw_sound.start(
+				step,
+				sound_effect_start_input::fire_and_forget(thrower_transform).set_listener(thrower)
+			);
 
 #if TODO
 			// TODO: this information will be specified by another type

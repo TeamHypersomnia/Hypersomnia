@@ -34,9 +34,7 @@ std::optional<components::transform> basic_spatial_properties_mixin<C, D>::find_
 		But we would anyway need to get the owner body so we do it this way.
 	*/
 
-	if (const auto owner = handle.get_owner_of_colliders();
-		owner.alive()
-	) {
+	if (const auto owner = handle.get_owner_of_colliders()) {
 		const auto offset = handle.calculate_colliders_connection();
 
 		/*

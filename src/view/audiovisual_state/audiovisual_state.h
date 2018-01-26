@@ -16,6 +16,8 @@
 #include "view/game_gui/elements/slot_button.h"
 
 #include "augs/audio/audio_settings.h"
+
+#include "view/viewer_eye.h"
 #include "view/audiovisual_state/systems/interpolation_settings.h"
 
 #include "view/audiovisual_state/all_audiovisual_systems.h"
@@ -26,16 +28,16 @@ class session_profiler;
 
 struct audiovisual_post_solve_input {
 	const particle_effects_map& particle_effects;
+	const loaded_sounds& sounds;
+
+	const viewer_eye eye;
 };
 
 struct audiovisual_advance_input {
 	const augs::delta frame_delta;
 	const double speed_multiplier;
 
-	const const_entity_handle viewed_character;
-	
-	const camera_cone cone;
-	const vec2 screen_size;
+	const viewer_eye eye;
 
 	const visible_entities& all_visible;
 	const particle_effects_map& particle_effects;
@@ -48,9 +50,7 @@ struct audiovisual_advance_input {
 		const augs::delta frame_delta,
 		const double speed_multiplier,
 
-		const const_entity_handle viewed_character,
-		const camera_cone cone,
-		const vec2 screen_size,
+		const viewer_eye eye,
 		const visible_entities& all_visible,
 
 		const particle_effects_map& particle_effects,
@@ -61,9 +61,7 @@ struct audiovisual_advance_input {
 		frame_delta(frame_delta),
 		speed_multiplier(speed_multiplier),
 
-		viewed_character(viewed_character),
-		cone(cone),
-		screen_size(screen_size),
+		eye(eye),
 		all_visible(all_visible),
 		particle_effects(particle_effects),
 

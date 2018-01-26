@@ -169,6 +169,18 @@ struct basic_transform {
 
 namespace augs {
 	template <class T>
+	basic_transform<T> get_relative_offset(
+		const basic_transform<T> chased_origin, 
+		const basic_transform<T> chasing_point 
+	) {
+		auto offset = chasing_point - chased_origin;
+		offset.pos.rotate(-chased_origin.rotation, basic_vec2<T>::zero);
+		return offset;
+	}
+}
+
+namespace augs {
+	template <class T>
 	auto interp(
 		const basic_transform<T> a,
 		const basic_transform<T> b,

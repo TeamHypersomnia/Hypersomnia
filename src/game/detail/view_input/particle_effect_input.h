@@ -1,5 +1,4 @@
 #pragma once
-#include <variant>
 #include "augs/graphics/rgba.h"
 
 #include "game/transcendental/step_declaration.h"

@@ -3,6 +3,9 @@
 
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
+#include "game/transcendental/data_living_one_step.h"
+
+#include "game/messages/start_sound_effect.h"
 
 #include "game/components/interpolation_component.h"
 #include "game/components/fixtures_component.h"
@@ -13,8 +16,16 @@
 
 #include "augs/audio/audio_settings.h"
 
+entity_id get_target_if_any(const absolute_or_local& l) {
+	if (const auto chasing = std::get_if<orbital_chasing>(&l)) {
+		return chasing->target;
+	}
+
+	return {};
+}
+
 void sound_system::clear() {
-	per_entity_cache.clear();
+	short_sounds.clear();
 	fading_sources.clear();
 }
 
@@ -23,41 +34,17 @@ void sound_system::clear_sources_playing(const assets::sound_buffer_id id) {
 		return id == source.id;
 	});
 	
-	erase_if(per_entity_cache, [id](auto& it) {
-		return id == it.second.recorded_component.input.effect.id;
+	erase_if(short_sounds, [id](short_sound_cache& it) {
+		return id == it.original_input.id;
 	});
 }
 
 void sound_system::clear_dead_entities(const cosmos& new_cosmos) {
-	std::vector<entity_id> to_erase;
-
-	for (const auto& it : per_entity_cache) {
-		if (
-			new_cosmos[it.first].dead() 
-			|| !new_cosmos[it.first].get<components::processing>().is_in(processing_subjects::WITH_SOUND_EXISTENCE)
-		) {
-			to_erase.push_back(it.first);
+	for (auto& it : short_sounds) {
+		if (new_cosmos[get_target_if_any(it.positioning)].dead()) {
+			it.positioning = it.previous_transform;
 		}
-	}
-
-	for (const auto it : to_erase) {
-		const auto& effect = per_entity_cache[it].recorded_component.input.effect;
-
-		if (effect.modifier.fade_on_exit) {
-			const auto buffer_id = effect.id;
-			fading_sources.push_back({ buffer_id, std::move(per_entity_cache[it].source) });
-		}
-
-		per_entity_cache.erase(it);
-	}
-}
-
-sound_system::cache& sound_system::get_cache(const const_entity_handle id) {
-	return per_entity_cache[id.get_id()];
-}
-
-const sound_system::cache& sound_system::get_cache(const const_entity_handle id) const {
-	return per_entity_cache.at(id.get_id());
+	};
 }
 
 void sound_system::update_listener(
@@ -72,80 +59,139 @@ void sound_system::update_listener(
 	augs::set_listener_orientation({ 0.f, -1.f, 0.f, 0.f, 0.f, -1.f });
 }
 
-void sound_system::track_new_sound_existences_near_camera(
+void sound_system::update_effects_from_messages(
+	const_logic_step step,
+	const loaded_sounds& manager,
+	const interpolation_system& interp,
+	const viewer_eye ear
+) {
+	const auto listening_character = ear.viewed_character;
+	const auto& cosmos = listening_character.get_cosmos();
+	const auto si = cosmos.get_si();
+
+	{
+		const auto& events = step.get_queue<messages::stop_sound_effect>();
+
+		for (auto& e : events) {
+			erase_if(short_sounds, [&](short_sound_cache& c){	
+				if (const auto m = e.match_chased_subject) {
+					if (*m != get_target_if_any(c.positioning)) { 
+						return false;
+					}
+				}
+
+				if (const auto m = e.match_effect_id) {
+					if (*m != c.original_input.id) {
+						return false;
+					}	
+				}
+
+				if (const auto& effect = c.original_input;
+					effect.modifier.fade_on_exit
+				) {
+					auto& source = c.source;
+
+					if (source.is_playing()) {
+						fading_sources.push_back({ effect.id, std::move(source) });
+					}
+				}
+
+				return true;
+			});
+		}
+	}
+
+	const auto& events = step.get_queue<messages::start_sound_effect>();
+
+	for (auto& e : events) {
+		short_sounds.emplace_back();
+		auto& cache = short_sounds.back();
+
+		cache.original_input = e.effect;
+		cache.original_start = e.start;
+
+		cache.positioning = e.start.positioning;
+		cache.previous_transform = get_transform(e.start.positioning, cosmos, interp);
+
+		auto& source = cache.source;
+
+		{
+			const auto effect_id = e.effect.id;
+
+			const auto& variations = manager.at(effect_id).variations;
+			const auto chosen_variation = e.start.variation_number % variations.size();
+			const auto& buffer = variations[chosen_variation];
+
+			const bool is_direct_listener = listening_character == e.start.direct_listener;
+
+			const auto& requested_buf = 
+				is_direct_listener ? buffer.stereo_or_mono() : buffer.mono_or_stereo()
+			;
+
+			source.bind_buffer(requested_buf);
+			source.set_direct_channels(is_direct_listener);
+		}
+
+		source.play();
+
+		const auto& modifier = e.effect.modifier;
+
+		source.set_max_distance(si, modifier.max_distance);
+		source.set_reference_distance(si, modifier.reference_distance);
+		source.set_looping(modifier.repetitions == -1);
+	}
+}
+
+void sound_system::update_sound_properties(
 	const augs::audio_volume_settings& settings,
 	const loaded_sounds& manager,
-	const camera_cone cone,
-	const vec2 screen_size,
-	const const_entity_handle listening_character,
-	const interpolation_system& sys
+	const interpolation_system& interp,
+	const viewer_eye ear,
+	const augs::delta dt
 ) {
 #if 0
 	auto queried_size = cone.visible_world_area;
 	queried_size.set(10000.f, 10000.f);
 #endif
 
-	update_listener(listening_character, sys);
+	const auto listening_character = ear.viewed_character;
+
+	update_listener(listening_character, interp);
 
 	const auto& cosmos = listening_character.get_cosmos();
-	const auto listener_pos = listening_character.get_viewing_transform(sys).pos;
 	const auto si = cosmos.get_si();
 
-	cosmos.for_each(
-		processing_subjects::WITH_SOUND_EXISTENCE, 
-		[&](const const_entity_handle it) {
-			auto& cache = get_cache(it);
-			const auto& existence = it.get<components::sound_existence>();
-			auto& source = cache.source;
+	const auto listener_pos = listening_character.get_viewing_transform(interp).pos;
 
-			const auto buffer_id = existence.input.effect.id;
-			const auto& buffer = manager.at(buffer_id).variations[existence.input.variation_number];
+	erase_if(short_sounds, [&](short_sound_cache& cache) {
+		const auto& positioning = cache.positioning;
+		const auto current_transform = get_transform(positioning, cosmos, interp);
 
-			const auto& requested_buf = 
-				existence.input.direct_listener == listening_character ? 
-				buffer.stereo_or_mono() : 
-				buffer.mono_or_stereo()
-			;
+		auto& source = cache.source;
 
-			if (const bool refresh_cache =
-				cache.recorded_component.time_of_birth != existence.time_of_birth
-				|| cache.recorded_component.input.effect.id != existence.input.effect.id
-				|| &requested_buf != source.get_bound_buffer()
-			) {
-				if (source.is_playing() && cache.recorded_component.input.effect.modifier.fade_on_exit) {
-					fading_sources.push_back({ buffer_id, std::move(source) });
-
-					source = augs::sound_source();
-				}
-
-				if (listening_character == existence.input.direct_listener) {
-					source.bind_buffer(buffer.stereo_or_mono());
-					source.set_direct_channels(true);
-				}
-				else {
-					source.bind_buffer(buffer.mono_or_stereo());
-					source.set_direct_channels(false);
-				}
-
-				source.play();
-				source.set_max_distance(si, existence.input.effect.modifier.max_distance);
-				source.set_reference_distance(si, existence.input.effect.modifier.reference_distance);
-				source.set_looping(existence.input.effect.modifier.repetitions == -1);
-
-				cache.recorded_component = existence;
-			}
-
-			const auto source_pos = it.get_viewing_transform(sys).pos;
-			const auto dist_from_listener = (listener_pos - source_pos).length();
+		{
+			const auto dist_from_listener = (listener_pos - current_transform.pos).length();
 			const float absorption = std::min(10.f, static_cast<float>(pow(std::max(0.f, dist_from_listener - 2220.f)/520.f, 2)));
 
 			source.set_air_absorption_factor(absorption);
-			source.set_pitch(existence.input.effect.modifier.pitch);
-			source.set_gain(existence.input.effect.modifier.gain * settings.sound_effects);
-			source.set_position(si, source_pos);
-			source.set_velocity(si, it.get_effective_velocity());
 		}
-	);
+
+		{
+			const auto displacement = current_transform - cache.previous_transform;
+			cache.previous_transform = current_transform;
+
+			const auto effective_velocity = displacement.pos * dt.in_seconds();
+			source.set_velocity(si, effective_velocity);
+		}
+
+		const auto& input = cache.original_input;
+
+		source.set_pitch(input.modifier.pitch);
+		source.set_gain(input.modifier.gain * settings.sound_effects);
+		source.set_position(si, current_transform.pos);
+
+		return !source.is_playing();
+	});
 }
 
 void sound_system::fade_sources(const augs::delta dt) {
@@ -163,8 +209,7 @@ void sound_system::fade_sources(const augs::delta dt) {
 			source.set_gain(new_gain);
 			return false;
 		}
-		else {
-			return true;
-		}
+
+		return true;
 	});
 }

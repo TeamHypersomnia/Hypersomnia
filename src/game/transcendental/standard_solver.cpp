@@ -128,8 +128,6 @@ void standard_solve(const logic_step step) {
 	auto& transfers = step.get_queue<item_slot_transfer_request>();
 	perform_transfers(transfers, step);
 
-	sound_existence_system().destroy_dead_sounds(step);
-
 	trace_system().destroy_outdated_traces(step);
 
 	const size_t queued_before_marking_num = step.get_queue<messages::queue_destruction>().size();

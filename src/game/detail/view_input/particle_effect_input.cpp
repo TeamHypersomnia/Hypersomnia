@@ -16,9 +16,5 @@ void particle_effect_input::start(
 }
 
 particle_effect_start_input particle_effect_start_input::orbit_absolute(const const_entity_handle h, components::transform world_transform) {
-	const auto target_transform = h.get_logic_transform();
-	auto local_offset = world_transform - target_transform;
-	local_offset.pos.rotate(-target_transform.rotation, vec2::zero);
-
-	return orbit_local(h.get_id(), local_offset);
+	return orbit_local(h.get_id(), augs::get_relative_offset(h.get_logic_transform(), world_transform));
 }
