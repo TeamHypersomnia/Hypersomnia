@@ -24,9 +24,7 @@ void relational_cache::destroy_caches_of_children_of(const entity_id h) {
 }
 
 void relational_cache::infer_cache_for(const const_entity_handle h) {
-	if (const auto item = h.find<components::item>();
-		item != nullptr
-	) {
+	if (const auto item = h.find<components::item>()) {
 		/*
 			WHEN ORDER OF ITEMS IN THE CONTAINER BECOMES RELEVANT,
 			This procedure should be fixed or otherwise the reinference might break the order of items!

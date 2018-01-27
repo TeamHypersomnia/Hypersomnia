@@ -171,6 +171,7 @@ containment_result query_containment_result(
 ) {
 	const auto& cosmos = item_entity.get_cosmos();
 	const auto& item = item_entity.get<components::item>();
+	const auto& item_def = item_entity.get<invariants::item>();
 	const auto& slot = *target_slot;
 
 	containment_result output;
@@ -200,7 +201,7 @@ containment_result query_containment_result(
 			const auto rsa = target_slot.calculate_real_space_available();
 
 			if (rsa > 0) {
-				const bool item_indivisible = item.charges == 1 || !item.stackable;
+				const bool item_indivisible = item.charges == 1 || !item_def.stackable;
 
 				if (item_indivisible) {
 					if (rsa >= calculate_space_occupied_with_children(item_entity)) {
@@ -208,7 +209,7 @@ containment_result query_containment_result(
 					}
 				}
 				else {
-					const int maximum_charges_fitting_inside = rsa / item.space_occupied_per_charge;
+					const int maximum_charges_fitting_inside = rsa / item_def.space_occupied_per_charge;
 					output.transferred_charges = std::min(item.charges, maximum_charges_fitting_inside);
 
 					if (specified_quantity > -1) {
@@ -237,7 +238,7 @@ bool can_stack_entities(
 	
 	const auto name = a.get_name();
 
-	if (name == b.get_name() && a.get<components::item>().stackable) {
+	if (name == b.get_name() && a.get<invariants::item>().stackable) {
 		return true;
 	}
 
@@ -312,7 +313,7 @@ std::wstring format_space_units(const unsigned u) {
 }
 
 unsigned calculate_space_occupied_with_children(const const_entity_handle item) {
-	auto space_occupied = item.get<components::item>().get_space_occupied();
+	auto space_occupied = *item.get_space_occupied();
 	const auto& cosm = item.get_cosmos();
 
 	if (item.find<invariants::container>()) {

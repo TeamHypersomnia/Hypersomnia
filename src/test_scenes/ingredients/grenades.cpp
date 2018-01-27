@@ -38,6 +38,9 @@ namespace test_types {
 			meta.add_shape_invariant_from_renderable(logicals);
 			test_types::add_see_through_dynamic_body(meta);
 
+			invariants::item item;
+			item.space_occupied_per_charge = to_space_units("0.6");
+			meta.set(item);
 		}
 
 		{
@@ -57,6 +60,10 @@ namespace test_types {
 			meta.add_shape_invariant_from_renderable(logicals);
 			test_types::add_see_through_dynamic_body(meta);
 
+			invariants::item item;
+			item.space_occupied_per_charge = to_space_units("0.6");
+			meta.set(item);
+
 		}
 
 		{
@@ -75,6 +82,10 @@ namespace test_types {
 			test_types::add_sprite(meta, logicals, assets::game_image_id::PED_GRENADE, white);
 			meta.add_shape_invariant_from_renderable(logicals);
 			test_types::add_see_through_dynamic_body(meta);
+
+			invariants::item item;
+			item.space_occupied_per_charge = to_space_units("0.6");
+			meta.set(item);
 		}
 	}
 }
@@ -103,9 +114,6 @@ namespace prefabs {
 
 		explosive.released_image_id = assets::game_image_id::FORCE_GRENADE_RELEASED;
 		explosive.released_physical_material = assets::physical_material_id::GRENADE;
-
-		auto& item = ingredients::make_item(grenade_entity);
-		item.space_occupied_per_charge = to_space_units("0.6");
 
 		components::shape_circle shape_circle;
 		shape_circle.radius = 1.f;
@@ -139,9 +147,6 @@ namespace prefabs {
 		in.sound_effect = assets::sound_buffer_id::PED_EXPLOSION;
 		in.type = adverse_element_type::PED;
 		in.create_thunders_effect = true;
-
-		auto& item = ingredients::make_item(grenade_entity);
-		item.space_occupied_per_charge = to_space_units("0.6");
 
 		explosive.released_image_id = assets::game_image_id::PED_GRENADE_RELEASED;
 		explosive.released_physical_material = assets::physical_material_id::GRENADE;
@@ -179,9 +184,6 @@ namespace prefabs {
 		in.sound_effect = assets::sound_buffer_id::INTERFERENCE_EXPLOSION;
 		in.type = adverse_element_type::INTERFERENCE;
 
-		auto& item = ingredients::make_item(grenade_entity);
-		item.space_occupied_per_charge = to_space_units("0.6");
-		
 		explosive.released_image_id = assets::game_image_id::INTERFERENCE_GRENADE_RELEASED;
 		explosive.released_physical_material = assets::physical_material_id::GRENADE;
 

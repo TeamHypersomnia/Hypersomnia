@@ -18,18 +18,10 @@ namespace components {
 }
 
 namespace ingredients {
-	components::item& make_item(const entity_handle);
-	
 	void add_character_head_physics(const logic_step, entity_handle);
 	void add_character(const logic_step, entity_handle, entity_handle crosshair_entity);
 
 	void add_character_head_inventory(const logic_step, entity_handle);
-	void add_backpack_container(entity_handle);
-
-	void add_default_gun_container(
-		const logic_step, 
-		entity_handle 
-	);
 
 	void add_standard_pathfinding_capability(entity_handle);
 	void add_soldier_intelligence(entity_handle);

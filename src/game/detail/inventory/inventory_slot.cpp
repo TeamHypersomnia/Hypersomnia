@@ -19,7 +19,7 @@ bool inventory_slot::has_unlimited_space() const {
 }
 
 bool inventory_slot::is_category_compatible_with(const const_entity_handle id) const {
-	auto& item = id.get<components::item>();
+	auto& item_def = id.get<invariants::item>();
 	
-	return item.categories_for_slot_compatibility.test(category_allowed);
+	return item_def.categories_for_slot_compatibility.test(category_allowed);
 }

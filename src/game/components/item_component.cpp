@@ -77,8 +77,4 @@ namespace components {
 		intended_mounting = MOUNTED;
 	}
 #endif
-
-	unsigned item::get_space_occupied() const {
-		return charges * space_occupied_per_charge;
-	}
 }

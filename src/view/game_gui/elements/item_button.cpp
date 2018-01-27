@@ -332,7 +332,7 @@ void item_button::draw_proc(
 				printing_charge_count = true;
 			}
 			else if (element.draw_space_available_inside_container_icons && item[slot_function::ITEM_DEPOSIT].alive()) {
-				if (item.get<components::item>().categories_for_slot_compatibility.test(item_category::MAGAZINE)) {
+				if (item.get<invariants::item>().categories_for_slot_compatibility.test(item_category::MAGAZINE)) {
 					if (!this_id->is_container_open) {
 						printing_charge_count = true;
 					}

@@ -1,4 +1,6 @@
 #pragma once
+#include <optional>
+
 #include "game/detail/inventory/inventory_slot_handle_declaration.h"
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/transcendental/step_declaration.h"
@@ -13,6 +15,8 @@ class basic_inventory_mixin {
 public:
 	static constexpr size_t hand_count = 2;
 	typedef std::array<entity_id, hand_count> hand_selections_array;
+
+	std::optional<unsigned> get_space_occupied() const;	
 
 	entity_handle_type get_owning_transfer_capability() const;
 	bool owning_transfer_capability_alive_and_same_as_of(const entity_id) const;

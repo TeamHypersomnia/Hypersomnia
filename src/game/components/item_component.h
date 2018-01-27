@@ -17,33 +17,10 @@ void detail_unset_current_slot(const entity_handle removed_item);
 
 class cosmic;
 
-namespace invariants {
-	struct item {
-		// GEN INTROSPECTOR struct invariants::item
-		bool stackable = false;
-
-		unsigned space_occupied_per_charge = 1;
-
-		unsigned dual_wield_accuracy_loss_percentage = 50;
-		unsigned dual_wield_accuracy_loss_multiplier = 1;
-		// END GEN INTROSPECTOR
-	};
-}
-
 namespace components {
 	struct item {
 		// GEN INTROSPECTOR struct components::item
-		item_category_flagset categories_for_slot_compatibility = { item_category::GENERAL };
-
 		int charges = 1;
-
-		bool stackable = false;
-		pad_bytes<3> pad;
-
-		unsigned space_occupied_per_charge = 1;
-
-		unsigned dual_wield_accuracy_loss_percentage = 50;
-		unsigned dual_wield_accuracy_loss_multiplier = 1;
 
 	private:
 		friend augs::introspection_access;
@@ -60,8 +37,6 @@ namespace components {
 		auto get_current_slot() const {
 			return current_slot;
 		}
-
-		unsigned get_space_occupied() const;
 
 #if TODO_MOUNTING
 		enum mounting_state : unsigned char {
@@ -83,5 +58,23 @@ namespace components {
 
 		bool is_mounted() const;
 #endif
+	};
+}
+
+namespace invariants {
+	struct item {
+		using implied_component = components::item;
+
+		// GEN INTROSPECTOR struct invariants::item
+		bool stackable = false;
+		pad_bytes<3> pad;
+
+		unsigned space_occupied_per_charge = 1;
+
+		unsigned dual_wield_accuracy_loss_percentage = 50;
+		unsigned dual_wield_accuracy_loss_multiplier = 1;
+
+		item_category_flagset categories_for_slot_compatibility = { item_category::GENERAL };
+		// END GEN INTROSPECTOR
 	};
 }

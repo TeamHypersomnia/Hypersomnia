@@ -13,6 +13,17 @@
 #include "game/transcendental/cosmos.h"
 
 template <bool C, class D>
+std::optional<unsigned> basic_inventory_mixin<C, D>::get_space_occupied() const {
+	const auto& self = *static_cast<const D*>(this);
+
+	if (const auto item = self.template find<components::item>()) {
+		return item->charges * self.template get<invariants::item>().space_occupied_per_charge;
+	}
+
+	return std::nullopt;
+}
+
+template <bool C, class D>
 D basic_inventory_mixin<C, D>::get_owning_transfer_capability() const {
 	const auto& self = *static_cast<const D*>(this);
 	auto& cosmos = self.get_cosmos();

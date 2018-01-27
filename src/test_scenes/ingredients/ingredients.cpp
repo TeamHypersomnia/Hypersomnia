@@ -115,11 +115,3 @@ namespace test_types {
 		}
 	}
 }
-
-namespace ingredients {
-	components::item& make_item(const entity_handle e) {
-		auto& item = e += components::item();
-
-		return item;
-	}
-}

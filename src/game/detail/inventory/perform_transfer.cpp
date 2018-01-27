@@ -163,9 +163,9 @@ perform_transfer_result perform_transfer(
 		output.picked->item = grabbed_item_part_handle;
 	}
 
+#if TODO_MOUNTING
 	auto& grabbed_item = grabbed_item_part_handle.get<components::item>();
 
-#if TODO_MOUNTING
 	if (target_slot_exists) {
 		if (target_slot->items_need_mounting) {
 			grabbed_item.intended_mounting = components::item::MOUNTED;

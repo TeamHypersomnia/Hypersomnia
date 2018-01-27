@@ -24,6 +24,10 @@ namespace test_types {
 			meta.add_shape_invariant_from_renderable(logicals);
 
 			test_types::add_see_through_dynamic_body(meta);
+
+			invariants::item item;
+			item.space_occupied_per_charge = to_space_units("2.5");
+			meta.set(item);
 		}
 	}
 }
@@ -31,9 +35,6 @@ namespace test_types {
 namespace prefabs {
 	entity_handle create_cyan_urban_machete(const logic_step step, vec2 pos) {
 		const auto machete = create_test_scene_entity(step.get_cosmos(), test_scene_type::URBAN_CYAN_MACHETE);
-
-		auto& item = ingredients::make_item(machete);
-		item.space_occupied_per_charge = to_space_units("2.5");
 
 		auto& melee = machete += components::melee();
 

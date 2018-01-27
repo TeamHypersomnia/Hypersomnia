@@ -74,6 +74,10 @@ namespace test_types {
 			}
 
 			meta.set(container);
+
+			invariants::item item;
+			item.space_occupied_per_charge = to_space_units("3.5");
+			meta.set(item);
 		};
 	
 		{
@@ -141,6 +145,18 @@ namespace test_types {
 			test_types::add_sprite(meta, logicals, assets::game_image_id::CYAN_CHARGE, white);
 			meta.add_shape_invariant_from_renderable(logicals);
 			test_types::add_see_through_dynamic_body(meta);
+
+			invariants::item item;
+			item.space_occupied_per_charge = to_space_units("0.01");
+			item.categories_for_slot_compatibility.set(item_category::SHOT_CHARGE);
+			item.stackable = true;
+
+			meta.set(item);
+
+			components::item item_inst;
+			item_inst.charges = 30;
+			meta.set(item_inst);
+
 		}
 
 		{
@@ -165,6 +181,14 @@ namespace test_types {
 
 			container.slots[slot_function::ITEM_DEPOSIT] = charge_deposit_def;
 			meta.set(container);
+
+			{
+				invariants::item item;
+
+				item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
+				item.space_occupied_per_charge = to_space_units("0.5");
+				meta.set(item);
+			}
 		}
 
 		{
@@ -358,6 +382,10 @@ namespace test_types {
 			test_types::add_sprite(meta, logicals, assets::game_image_id::AMPLIFIER_ARM, white);
 			meta.add_shape_invariant_from_renderable(logicals);
 			test_types::add_see_through_dynamic_body(meta);
+
+			invariants::item item;
+			item.space_occupied_per_charge = to_space_units("3.0");
+			meta.set(item);
 		}
 	}
 }
@@ -369,8 +397,6 @@ namespace prefabs {
 		auto load_mag = cosmos[load_mag_id];
 
 		auto weapon = create_test_scene_entity(cosmos, test_scene_type::SAMPLE_RIFLE);
-
-		ingredients::add_default_gun_container(step, weapon);
 
 		auto& gun = weapon.get<components::gun>();
 		auto& gun_def = weapon.get<invariants::gun>();
@@ -401,8 +427,6 @@ namespace prefabs {
 
 		auto weapon = create_test_scene_entity(cosmos, test_scene_type::KEK9);
 
-		ingredients::add_default_gun_container(step, weapon);
-
 		auto& gun = weapon.get<components::gun>();
 		auto& gun_def = weapon.get<invariants::gun>();
 
@@ -428,9 +452,6 @@ namespace prefabs {
 		const auto& metas = step.get_logical_assets();
 		auto& cosmos = step.get_cosmos();
 		auto weapon = create_test_scene_entity(cosmos, test_scene_type::AMPLIFIER_ARM);
-
-		auto& item = ingredients::make_item(weapon);
-		item.space_occupied_per_charge = to_space_units("3.0");
 
 		auto& gun = weapon.get<components::gun>();
 
@@ -472,13 +493,6 @@ namespace prefabs {
 	}
 }
 
-namespace ingredients {
-	void add_default_gun_container(const logic_step step, entity_handle e) {
-		auto& item = make_item(e);
-		item.space_occupied_per_charge = to_space_units("3.5");
-	}
-}
-
 namespace prefabs {
 	entity_handle create_sample_magazine(const logic_step step, components::transform pos, entity_id charge_inside_id) {
 		auto& cosmos = step.get_cosmos();
@@ -487,13 +501,8 @@ namespace prefabs {
 		const auto& metas = step.get_logical_assets();
 
 		auto sample_magazine = create_test_scene_entity(cosmos, test_scene_type::SAMPLE_MAGAZINE);
-		
-		{
-			auto& item = ingredients::make_item(sample_magazine);
 
-			item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
-			item.space_occupied_per_charge = to_space_units("0.5");
-		}
+		
 
 		sample_magazine.set_logic_transform(step, pos);
 		sample_magazine.add_standard_components(step);
@@ -511,16 +520,10 @@ namespace prefabs {
 		const auto cyan_charge = create_test_scene_entity(cosmos, test_scene_type::CYAN_CHARGE);
 		const auto round_definition = create_test_scene_entity(cosmos, test_scene_type::CYAN_ROUND_DEFINITION);
 		const auto shell_definition = create_test_scene_entity(cosmos, test_scene_type::CYAN_SHELL_DEFINITION);
-		
+
 		const auto& metas = step.get_logical_assets();
 
 		{
-			auto& item = ingredients::make_item(cyan_charge);
-			item.space_occupied_per_charge = to_space_units("0.01");
-			item.categories_for_slot_compatibility.set(item_category::SHOT_CHARGE);
-			item.charges = charges;
-			item.stackable = true;
-
 			auto& cat = cyan_charge += components::catridge();
 
 			cat.shell_trace_particles.id = assets::particle_effect_id::CONCENTRATED_WANDERING_PIXELS;

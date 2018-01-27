@@ -18,11 +18,16 @@ class entity_type {
 
 	template <class D, class E>
 	static auto& get_impl(E& self) {
-		if constexpr(!is_always_present_v<D>) {
-			ensure(self.enabled_invariants[idx<D>]); 
-		}
+		if constexpr(is_invariant_v<D>) {
+			if constexpr(!is_always_present_v<D>) {
+				ensure(self.enabled_invariants[idx<D>]); 
+			}
 
-		return std::get<D>(self.invariants); 
+			return std::get<D>(self.invariants); 
+		}
+		else {
+			return std::get<D>(self.initial_components); 
+		}
 	}
 
 	template <class D, class E>
@@ -52,8 +57,13 @@ public:
 
 	template <class D>
 	void set(const D& def) {
-		enabled_invariants[idx<D>] = true;
-		std::get<D>(invariants) = def;
+		if constexpr(is_invariant_v<D>) {
+			enabled_invariants[idx<D>] = true;
+			std::get<D>(invariants) = def;
+		}
+		else {
+			std::get<D>(initial_components) = def;
+		}
 	}
 
 	template <class D>

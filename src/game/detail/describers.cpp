@@ -36,13 +36,15 @@ std::wstring get_bbcoded_entity_properties(const const_entity_handle id) {
 	const auto* const gun_def = id.find<invariants::gun>();
 	const auto* const damage = id.find<components::missile>();
 	const auto* const container = id.find<invariants::container>();
+
+	const auto* const item_def = id.find<invariants::item>();
 	const auto* const item = id.find<components::item>();
 
-	if (item) {
-		result << L"[color=vsblue]" << get_bbcoded_item_categories(item->categories_for_slot_compatibility) << L"[/color]\n";
+	if (item && item_def) {
+		result << L"[color=vsblue]" << get_bbcoded_item_categories(item_def->categories_for_slot_compatibility) << L"[/color]\n";
 		
 		const auto total_occupied = format_space_units(calculate_space_occupied_with_children(id));
-		const auto per_charge = format_space_units(item->space_occupied_per_charge);
+		const auto per_charge = format_space_units(item_def->space_occupied_per_charge);
 
 		result << "Occupies: [color=vscyan]" << total_occupied << " [/color]";
 		

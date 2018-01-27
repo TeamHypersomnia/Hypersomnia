@@ -19,6 +19,7 @@ namespace invariants {
 	struct fixtures;
 	struct rigid_body;
 	struct container;
+	struct item;
 }
 
 namespace components {
@@ -109,7 +110,8 @@ using invariant_list_t = List<
 	invariants::interpolation,
 	invariants::fixtures,
 	invariants::rigid_body,
-	invariants::container
+	invariants::container,
+	invariants::item
 >;
 
 template <class... Types>

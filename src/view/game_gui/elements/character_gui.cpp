@@ -142,7 +142,7 @@ void character_gui::assign_item_to_first_free_hotbar_button(
 	const const_entity_handle gui_entity,
 	const const_entity_handle item_entity
 ) {
-	const auto categories = item_entity.get<components::item>().categories_for_slot_compatibility;
+	const auto categories = item_entity.get<invariants::item>().categories_for_slot_compatibility;
 
 	clear_hotbar_selection_for_item(gui_entity, item_entity);
 
@@ -206,7 +206,7 @@ wielding_result character_gui::make_wielding_transfers_for_previous_hotbar_selec
 			const auto candidate_entity = cosm[tried_setup.hand_selections[0]];
 
 			if (candidate_entity.alive()) {
-				if (!is_clothing(candidate_entity.get<components::item>().categories_for_slot_compatibility)) {
+				if (!is_clothing(candidate_entity.get<invariants::item>().categories_for_slot_compatibility)) {
 					const bool finally_found_differing_setup = !(tried_setup == previous_setup);
 
 					if (finally_found_differing_setup) {

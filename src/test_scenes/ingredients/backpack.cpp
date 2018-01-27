@@ -11,17 +11,6 @@
 
 #include "game/transcendental/entity_handle.h"
 
-namespace ingredients {
-	void add_backpack_container(entity_handle e) {
-		auto& item = make_item(e);
-
-		item.dual_wield_accuracy_loss_multiplier = 1;
-		item.dual_wield_accuracy_loss_percentage = 50;
-		item.space_occupied_per_charge = to_space_units("1");
-		item.categories_for_slot_compatibility.set(item_category::SHOULDER_CONTAINER);
-	}
-}
-
 namespace test_types {
 	void populate_backpack_types(const all_logical_assets& logicals, entity_types& types) {
 		{
@@ -42,6 +31,15 @@ namespace test_types {
 
 			container.slots[slot_function::ITEM_DEPOSIT] = slot_def;
 			meta.set(container);
+
+			invariants::item item;
+
+			item.dual_wield_accuracy_loss_multiplier = 1;
+			item.dual_wield_accuracy_loss_percentage = 50;
+			item.space_occupied_per_charge = to_space_units("1");
+			item.categories_for_slot_compatibility.set(item_category::SHOULDER_CONTAINER);
+
+			meta.set(item);
 		}
 	}
 }
@@ -52,8 +50,6 @@ namespace prefabs {
 		const auto backpack = create_test_scene_entity(world, test_scene_type::SAMPLE_BACKPACK);
 		const auto& metas = step.get_logical_assets();
 		
-		ingredients::add_backpack_container(backpack);
-
 		backpack.set_logic_transform(step, pos);
 		backpack.add_standard_components(step);
 		return backpack;
