@@ -4,7 +4,6 @@
 
 #include "game/assets/all_logical_assets.h"
 
-#include "game/components/position_copying_component.h"
 
 #include "game/components/crosshair_component.h"
 #include "game/components/sprite_component.h"

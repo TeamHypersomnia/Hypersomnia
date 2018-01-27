@@ -17,7 +17,6 @@
 #include "game/components/rigid_body_component.h"
 #include "game/components/missile_component.h"
 #include "game/detail/view_input/particle_effect_input.h"
-#include "game/components/position_copying_component.h"
 #include "game/components/container_component.h"
 #include "game/components/item_component.h"
 #include "game/components/flags_component.h"

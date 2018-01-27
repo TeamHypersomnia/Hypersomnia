@@ -5,7 +5,6 @@
 
 #include "game/components/missile_component.h"
 #include "game/components/render_component.h"
-#include "game/components/position_copying_component.h"
 #include "game/detail/view_input/particle_effect_input.h"
 #include "game/components/sentience_component.h"
 

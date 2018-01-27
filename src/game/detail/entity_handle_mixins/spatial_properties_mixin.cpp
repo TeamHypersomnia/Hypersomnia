@@ -4,7 +4,6 @@
 #include "game/components/rigid_body_component.h"
 #include "game/components/fixtures_component.h"
 #include "game/components/wandering_pixels_component.h"
-#include "game/components/position_copying_component.h"
 #include "game/components/interpolation_component.h"
 #include "game/components/item_component.h"
 
