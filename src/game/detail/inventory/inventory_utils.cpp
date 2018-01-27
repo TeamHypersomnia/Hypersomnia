@@ -134,11 +134,13 @@ item_transfer_result query_transfer_result(
 		}
 	}
 
-	// if (predicted_result == item_transfer_result_type::SUCCESSFUL_TRANSFER) {
-	// 	if (item.current_mounting == components::item::MOUNTED && !r.force_immediate_mount) {
-	// 		predicted_result = item_transfer_result_type::UNMOUNT_BEFOREHAND;
-	// 	}
-	// }
+#if TODO_MOUNTING
+	 if (predicted_result == item_transfer_result_type::SUCCESSFUL_TRANSFER) {
+	 	if (item.current_mounting == components::item::MOUNTED && !r.force_immediate_mount) {
+	 		predicted_result = item_transfer_result_type::UNMOUNT_BEFOREHAND;
+	 	}
+	 }
+#endif
 
 	return output;
 }

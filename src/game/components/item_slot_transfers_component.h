@@ -20,7 +20,6 @@ namespace components {
 	struct item_slot_transfers {
 		// GEN INTROSPECTOR struct components::item_slot_transfers
 		augs::stepped_cooldown pickup_timeout = augs::stepped_cooldown(200);
-		item_slot_mounting_operation mounting;
 
 		augs::constant_size_vector<entity_id, ONLY_PICK_THESE_ITEMS_COUNT> only_pick_these_items;
 		bool pick_all_touched_items_if_list_to_pick_empty = true;
@@ -28,8 +27,11 @@ namespace components {
 		pad_bytes<2> pad;
 		// END GEN INTROSPECTOR
 
+#if TODO_MOUNTING
+		item_slot_mounting_operation mounting;
+		
 		static item_slot_mounting_operation find_suitable_montage_operation(const_entity_handle parent_container);
-
 		void interrupt_mounting();
+#endif
 	};
 }

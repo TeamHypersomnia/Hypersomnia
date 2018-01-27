@@ -4,6 +4,7 @@
 #include "game/transcendental/entity_handle.h"
 
 namespace components {
+#if TODO_MOUNTING
 	item_slot_mounting_operation item_slot_transfers::find_suitable_montage_operation(const_entity_handle parent_container) {
 		ensure(false);
 		item_slot_mounting_operation operation;
@@ -33,4 +34,5 @@ namespace components {
 		//
 		//return operation;
 	}
+#endif
 }

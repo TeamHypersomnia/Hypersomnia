@@ -17,22 +17,29 @@ void detail_unset_current_slot(const entity_handle removed_item);
 
 class cosmic;
 
+namespace invariants {
+	struct item {
+		// GEN INTROSPECTOR struct invariants::item
+		bool stackable = false;
+
+		unsigned space_occupied_per_charge = 1;
+
+		unsigned dual_wield_accuracy_loss_percentage = 50;
+		unsigned dual_wield_accuracy_loss_multiplier = 1;
+		// END GEN INTROSPECTOR
+	};
+}
+
 namespace components {
 	struct item {
-		enum mounting_state : unsigned char {
-			MOUNTED,
-			UNMOUNTED,
-		};
-
 		// GEN INTROSPECTOR struct components::item
-		mounting_state current_mounting = UNMOUNTED;
-		mounting_state intended_mounting = UNMOUNTED;
-		bool stackable = false;
-		pad_bytes<1> pad;
-
 		item_category_flagset categories_for_slot_compatibility = { item_category::GENERAL };
 
 		int charges = 1;
+
+		bool stackable = false;
+		pad_bytes<3> pad;
+
 		unsigned space_occupied_per_charge = 1;
 
 		unsigned dual_wield_accuracy_loss_percentage = 50;
@@ -48,11 +55,6 @@ namespace components {
 		inventory_slot_id current_slot;
 
 	public:
-		inventory_slot_id target_slot_after_unmount;
-
-		float montage_time_ms = 1000;
-		float montage_time_left_ms = 0.f;
-
 		// END GEN INTROSPECTOR
 
 		auto get_current_slot() const {
@@ -61,7 +63,17 @@ namespace components {
 
 		unsigned get_space_occupied() const;
 
-		/* TODO: Implement mounting */
+#if TODO_MOUNTING
+		enum mounting_state : unsigned char {
+			MOUNTED,
+			UNMOUNTED,
+		};
+
+		inventory_slot_id target_slot_after_unmount;
+
+		mounting_state current_mounting = UNMOUNTED;
+		mounting_state intended_mounting = UNMOUNTED;
+
 		void set_mounted();
 		void request_mount();
 		void cancel_montage();
@@ -70,5 +82,6 @@ namespace components {
 		void reset_mounting_timer();
 
 		bool is_mounted() const;
+#endif
 	};
 }

@@ -21,13 +21,15 @@ struct inventory_slot {
 	// GEN INTROSPECTOR struct inventory_slot
 	item_category category_allowed = item_category::GENERAL;
 
+#if TODO_MOUNTING
 	bool items_need_mounting = false;
+#else
+	pad_bytes<1> pad;
+#endif
 	bool only_last_inserted_is_movable = false;
 
 	slot_physical_behaviour physical_behaviour = slot_physical_behaviour::DEACTIVATE_BODIES;
 	bool always_allow_exactly_one_item = false;
-
-	float montage_time_multiplier = 1.f;
 
 	unsigned space_available = 0;
 

@@ -11,5 +11,7 @@ public:
 	
 	void handle_throw_item_intents(const logic_step step);
 	
+#if TODO_MOUNTING
 	void process_mounting_and_unmounting(const logic_step step);
+#endif
 };

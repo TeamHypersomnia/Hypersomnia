@@ -154,14 +154,13 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 	}
 }
 
+#if TODO_MOUNTING
 void components::item_slot_transfers::interrupt_mounting() {
 	mounting.current_item.unset();
 	mounting.intented_mounting_slot.unset();
 }
 
 void item_system::process_mounting_and_unmounting(const logic_step step) {
-	ensure(false);
-	
 	auto& cosmos = step.get_cosmos();
 	const auto delta = step.get_delta();
 	
@@ -200,3 +199,4 @@ void item_system::process_mounting_and_unmounting(const logic_step step) {
 		}
 	);
 }
+#endif

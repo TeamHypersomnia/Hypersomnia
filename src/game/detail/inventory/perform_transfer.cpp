@@ -165,6 +165,7 @@ perform_transfer_result perform_transfer(
 
 	auto& grabbed_item = grabbed_item_part_handle.get<components::item>();
 
+#if TODO_MOUNTING
 	if (target_slot_exists) {
 		if (target_slot->items_need_mounting) {
 			grabbed_item.intended_mounting = components::item::MOUNTED;
@@ -174,6 +175,7 @@ perform_transfer_result perform_transfer(
 			}
 		}
 	}
+#endif
 
 	if (is_drop_request) {
 		ensure(previous_slot_container.alive());
