@@ -53,10 +53,10 @@ identified_danger assess_danger(
 
 	result.danger = danger;
 
-	const auto* const damage = danger.find<components::missile>();
+	const auto* const missile = danger.find<invariants::missile>();
 	const auto* const attitude = danger.find<components::attitude>();
 
-	if ((!damage && !attitude) || (damage && danger.get<components::sender>().is_sender_subject(victim))) {
+	if ((!missile && !attitude) || (missile && danger.get<components::sender>().is_sender_subject(victim))) {
 		return result;
 	}
 
@@ -84,8 +84,8 @@ identified_danger assess_danger(
 		return result;
 	}
 
-	if (damage) {
-		result.amount += comfort_zone_disturbance_ratio * damage->damage_amount*4;
+	if (missile) {
+		result.amount += comfort_zone_disturbance_ratio * missile->damage_amount*4;
 	}
 
 	if (attitude) {
@@ -125,13 +125,8 @@ float assess_projectile_velocity_of_weapon(const const_entity_handle weapon) {
 		return 0.f;
 	}
 
-	// auto ch = weapon[slot_function::GUN_CHAMBER];
-	// 
-	// if (ch.has_items()) {
-	// 	ch.get_items_inside()[0][child_entity_name::CATRIDGE_BULLET].get<components::missile>();
-	// }
-
 	if (const auto* const gun_def = weapon.find<invariants::gun>()) {
+		// TODO: Take into consideration the missile invariant found in the chamber
 		return (gun_def->muzzle_velocity.first + gun_def->muzzle_velocity.second) / 2;
 	}
 

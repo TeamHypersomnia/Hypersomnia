@@ -177,7 +177,7 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 		if (d.inflictor_destructed) {
 			const auto inflictor = cosmos[d.inflictor];
 			
-			const auto& effect = inflictor.get<components::missile>().destruction_sound;
+			const auto& effect = inflictor.get<invariants::missile>().destruction_sound;
 
 			effect.start(
 				step,

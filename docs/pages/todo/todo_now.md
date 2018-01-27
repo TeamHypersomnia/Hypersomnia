@@ -25,8 +25,6 @@ summary: Just a hidden scratchpad.
 	- This is really important in the face of bugs.
 	- Or just get rid of test scene setup for now and let it by default launch a scene in editor that records inputs
 
-- invariantizing inventory
-
 - Later, bullet trace sounds should as be calculated statelessly
 - Sound system should probably assume the same strategy as an inferred cache:
 
@@ -121,6 +119,8 @@ summary: Just a hidden scratchpad.
 			- e.g. truck engine
 
 - Thoughts about native types
+	- We can make the entity_type's populators in ingredients just templated functions
+		- For the sake of not repeating test scene flavour logic for some different native types
 	- We will totally get rid of processing component and calculate statelessly which that which needs to be calculated.
 		- We anyway very rarely ever disabled something in processing subjects and we must always account for the worst case.
 	- Refer to typed_entity_handle for draft.

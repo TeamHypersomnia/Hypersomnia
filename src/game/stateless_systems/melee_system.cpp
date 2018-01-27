@@ -21,8 +21,10 @@ void components::melee::reset_weapon(const entity_handle e) {
 	m.reset_move_flags();
 	m.current_state = melee_state::FREE;
 
+#if TODO
 	auto& d = e.get<components::missile>();
 	d.damage_upon_collision = false;
+#endif
 }
 
 void melee_system::consume_melee_intents(const logic_step step) {

@@ -34,7 +34,7 @@ std::wstring get_bbcoded_entity_properties(const const_entity_handle id) {
 	const auto* const melee = id.find<components::melee>();
 	const auto* const gun = id.find<components::gun>();
 	const auto* const gun_def = id.find<invariants::gun>();
-	const auto* const damage = id.find<components::missile>();
+	const auto* const missile = id.find<invariants::missile>();
 	const auto* const container = id.find<invariants::container>();
 
 	const auto* const item_def = id.find<invariants::item>();
@@ -69,16 +69,16 @@ std::wstring get_bbcoded_entity_properties(const const_entity_handle id) {
 		}
 	}
 
-	if (damage) {
-		if (damage->damage_amount > 0) {
-			result << L"Base damage: [color=vscyan]" << damage->damage_amount << L"[/color]\n";
+	if (missile) {
+		if (missile->damage_amount > 0) {
+			result << L"Base missile: [color=vscyan]" << missile->damage_amount << L"[/color]\n";
 		}
-		else if (damage->damage_amount < 0) {
-			result << L"Restores health: [color=vscyan]" << -damage->damage_amount << L"[/color]\n";
+		else if (missile->damage_amount < 0) {
+			result << L"Restores health: [color=vscyan]" << -missile->damage_amount << L"[/color]\n";
 		}
 
-		if (damage->constrain_lifetime) {
-			result << L"Max lifetime: [color=vscyan]" << damage->max_lifetime_ms << L" ms[/color]\n";
+		if (missile->constrain_lifetime) {
+			result << L"Max lifetime: [color=vscyan]" << missile->max_lifetime_ms << L" ms[/color]\n";
 		}
 	}
 

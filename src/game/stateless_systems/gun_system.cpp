@@ -132,7 +132,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 			const auto magic_missile_def = cosmos[gun.magic_missile_definition];
 			const auto is_magic_launcher = magic_missile_def.alive();
-			const auto mana_needed = is_magic_launcher ? magic_missile_def.get<components::missile>().damage_amount / 4 : 0;
+			const auto mana_needed = is_magic_launcher ? magic_missile_def.get<invariants::missile>().damage_amount / 4 : 0;
 			
 			bool has_enough_physical_bullets = false;
 
@@ -176,7 +176,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					auto& sender = round_entity.get<components::sender>();
 					sender.set(gun_entity);
 
-					auto& missile = round_entity.get<components::missile>();
+					auto& missile = round_entity.get<invariants::missile>();
 					total_recoil_scale *= missile.recoil_multiplier;
 
 					round_entity.set_logic_transform(step, muzzle_transform);
@@ -248,10 +248,13 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 							auto& sender = round_entity.get<components::sender>();
 							sender.set(gun_entity);
 
-							auto& missile = round_entity.get<components::missile>();
-							missile.damage_amount *= gun_def.damage_multiplier;
-							missile.impulse_upon_hit *= gun_def.damage_multiplier;
-							total_recoil_scale *= missile.recoil_multiplier;
+							{
+								auto& missile = round_entity.get<components::missile>();
+								missile.power_multiplier_of_sender = gun_def.damage_multiplier;
+							}
+							
+							const auto& missile_def = round_entity.get<invariants::missile>();
+							total_recoil_scale *= missile_def.recoil_multiplier;
 
 							if (round_entity.has<components::explosive>()) {
 								auto& explosive = round_entity.get<components::explosive>();
@@ -270,7 +273,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 								const auto missile_velocity = 
 									vec2::from_degrees(muzzle_transform.rotation)
-									* missile.muzzle_velocity_mult
+									* missile_def.muzzle_velocity_mult
 									* rng.randval(gun_def.muzzle_velocity)
 								;
 

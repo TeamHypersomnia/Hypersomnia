@@ -9,7 +9,6 @@
 #include "game/components/fixtures_component.h"
 #include "game/components/catridge_component.h"
 #include "game/components/explosive_component.h"
-#include "game/components/sender_component.h"
 #include "game/components/all_inferred_state_component.h"
 
 #include "game/messages/start_particle_effect.h"
@@ -115,6 +114,30 @@ namespace test_types {
 			}
 
 			test_types::add_bullet_round_physics(meta);
+
+			invariants::missile missile;
+
+			missile.destruction_particles.id = assets::particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION;
+			missile.destruction_particles.modifier.colorize = cyan;
+
+			missile.trace_particles.id = assets::particle_effect_id::WANDERING_PIXELS_DIRECTED;
+			missile.trace_particles.modifier.colorize = cyan;
+
+			missile.muzzle_leave_particles.id = assets::particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION;
+			missile.muzzle_leave_particles.modifier.colorize = cyan;
+			missile.pass_through_held_item_sound.id = assets::sound_buffer_id::BULLET_PASSES_THROUGH_HELD_ITEM;
+
+			missile.trace_sound.id = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;
+			missile.destruction_sound.id = assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION;
+
+			auto& trace_modifier = missile.trace_sound.modifier;
+
+			trace_modifier.max_distance = 1020.f;
+			trace_modifier.reference_distance = 100.f;
+			trace_modifier.gain = 1.3f;
+			trace_modifier.fade_on_exit = false;
+
+			meta.set(missile);
 		}
 
 		{
@@ -264,6 +287,32 @@ namespace test_types {
 			}
 
 			test_types::add_bullet_round_physics(meta);
+
+			invariants::missile missile;
+
+			missile.destruction_particles.id = assets::particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION;
+			missile.destruction_particles.modifier.colorize = cyan;
+
+			missile.trace_particles.id = assets::particle_effect_id::WANDERING_PIXELS_DIRECTED;
+			missile.trace_particles.modifier.colorize = cyan;
+
+			missile.muzzle_leave_particles.id = assets::particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION;
+			missile.muzzle_leave_particles.modifier.colorize = cyan;
+
+			missile.trace_sound.id = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;
+			missile.destruction_sound.id = assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION;
+
+			missile.homing_towards_hostile_strength = 1.0f;
+			missile.damage_amount = 42;
+
+			auto& trace_modifier = missile.trace_sound.modifier;
+
+			trace_modifier.max_distance = 1020.f;
+			trace_modifier.reference_distance = 100.f;
+			trace_modifier.gain = 1.3f;
+			trace_modifier.fade_on_exit = false;
+
+			meta.set(missile);
 		}
 
 		{
@@ -462,29 +511,6 @@ namespace prefabs {
 			const auto arm_missile = create_test_scene_entity(cosmos, test_scene_type::AMPLIFIER_ARM_MISSILE);
 
 			auto& sender = arm_missile += components::sender();
-			auto& missile = arm_missile += components::missile();
-
-			missile.destruction_particles.id = assets::particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION;
-			missile.destruction_particles.modifier.colorize = cyan;
-
-			missile.trace_particles.id = assets::particle_effect_id::WANDERING_PIXELS_DIRECTED;
-			missile.trace_particles.modifier.colorize = cyan;
-
-			missile.muzzle_leave_particles.id = assets::particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION;
-			missile.muzzle_leave_particles.modifier.colorize = cyan;
-
-			auto& trace_modifier = missile.trace_sound.modifier;
-
-			trace_modifier.max_distance = 1020.f;
-			trace_modifier.reference_distance = 100.f;
-			trace_modifier.gain = 1.3f;
-			trace_modifier.fade_on_exit = false;
-
-			missile.trace_sound.id = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;
-			missile.destruction_sound.id = assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION;
-
-			missile.homing_towards_hostile_strength = 1.0f;
-			missile.damage_amount = 42;
 
 			gun.magic_missile_definition = arm_missile;
 		}
@@ -526,34 +552,11 @@ namespace prefabs {
 		{
 			auto& cat = cyan_charge += components::catridge();
 
+			auto& sender = round_definition += components::sender();
 			cat.shell_trace_particles.id = assets::particle_effect_id::CONCENTRATED_WANDERING_PIXELS;
 			cat.shell_trace_particles.modifier.colorize = cyan;
 		}
 
-		{
-			auto& sender = round_definition += components::sender();
-			auto& missile = round_definition += components::missile();
-
-			missile.destruction_particles.id = assets::particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION;
-			missile.destruction_particles.modifier.colorize = cyan;
-
-			missile.trace_particles.id = assets::particle_effect_id::WANDERING_PIXELS_DIRECTED;
-			missile.trace_particles.modifier.colorize = cyan;
-
-			missile.muzzle_leave_particles.id = assets::particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION;
-			missile.muzzle_leave_particles.modifier.colorize = cyan;
-			missile.pass_through_held_item_sound.id = assets::sound_buffer_id::BULLET_PASSES_THROUGH_HELD_ITEM;
-
-			auto& trace_modifier = missile.trace_sound.modifier;
-
-			trace_modifier.max_distance = 1020.f;
-			trace_modifier.reference_distance = 100.f;
-			trace_modifier.gain = 1.3f;
-			trace_modifier.fade_on_exit = false;
-
-			missile.trace_sound.id = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;
-			missile.destruction_sound.id = assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION;
-		}
 
 		cyan_charge.map_child_entity(child_entity_name::CATRIDGE_BULLET, round_definition);
 		cyan_charge.map_child_entity(child_entity_name::CATRIDGE_SHELL, shell_definition);

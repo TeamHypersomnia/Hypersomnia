@@ -40,11 +40,8 @@ entity_handle basic_entity_handle<C>::add_standard_components(const logic_step s
 		rigid_body.get_special().dropped_or_created_cooldown.set(200, get_cosmos().get_timestamp());
 	}
 
-	if (
-		has<components::missile>()
-		|| has<components::explosive>()
-	) {
-		ensure(has<components::sender>());
+	if ((has<components::missile>() || has<components::explosive>()) && !has<components::sender>()) {
+		add(components::sender());
 	}
 
 	recalculate_basic_processing_categories<true, void>();

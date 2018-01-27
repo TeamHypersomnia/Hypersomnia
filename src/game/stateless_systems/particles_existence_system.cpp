@@ -32,7 +32,7 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 			const auto spawned_round = cosmos[r];
 
 			{
-				const auto& effect = spawned_round.get<components::missile>().muzzle_leave_particles;
+				const auto& effect = spawned_round.get<invariants::missile>().muzzle_leave_particles;
 
 				effect.start(
 					step,
@@ -41,7 +41,7 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 			}
 
 			{
-				if (const auto missile = spawned_round.find<components::missile>()) {
+				if (const auto missile = spawned_round.find<invariants::missile>()) {
 					const auto& effect = missile->trace_particles;
 
 					effect.start(
@@ -78,7 +78,7 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 			}
 
 			place_of_birth.rotation = 0;
-			const auto& effect = inflictor.get<components::missile>().destruction_particles;
+			const auto& effect = inflictor.get<invariants::missile>().destruction_particles;
 
 			{
 				effect.start(

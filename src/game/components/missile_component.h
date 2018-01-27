@@ -20,6 +20,24 @@
 namespace components {
 	struct missile {
 		// GEN INTROSPECTOR struct components::missile
+		int damage_charges_before_destruction = 1;
+		float power_multiplier_of_sender = 1.f;
+
+		augs::stepped_timestamp when_released;
+		augs::stepped_timestamp when_detonates;
+
+		entity_id particular_homing_target;
+		
+		vec2 saved_point_of_impact_before_death;
+		// END GEN INTROSPECTOR
+	};
+}
+
+namespace invariants {
+	struct missile {
+		using implied_component = components::missile;
+
+		// GEN INTROSPECTOR struct invariants::missile
 		meter_value_type damage_amount = 12;
 
 		float muzzle_velocity_mult = 1.f;
@@ -32,23 +50,13 @@ namespace components {
 		bool constrain_lifetime = true;
 		bool damage_falloff = false;
 
-		int damage_charges_before_destruction = 1;
-
-		vec2 custom_impact_velocity;
-
 		float damage_falloff_starting_distance = 500.f;
 		float minimum_amount_after_falloff = 5.f;
 
 		float max_lifetime_ms = 2000.f;
 		float recoil_multiplier = 1.f;
 
-		augs::stepped_timestamp when_released;
-		augs::stepped_timestamp when_detonates;
-
 		float homing_towards_hostile_strength = 0.f;
-		entity_id particular_homing_target;
-		
-		child_entity_id trace_sound_entity;
 
 		sound_effect_input trace_sound;
 		sound_effect_input destruction_sound;
@@ -57,8 +65,6 @@ namespace components {
 		particle_effect_input muzzle_leave_particles;
 		particle_effect_input trace_particles;
 		particle_effect_input destruction_particles;
-
-		vec2 saved_point_of_impact_before_death;
 		// END GEN INTROSPECTOR
 	};
 }

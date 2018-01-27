@@ -63,3 +63,6 @@ v - begin selection with arrows
 		- would just create particle effect inputs and pass them to the simulation
 	- same with sound system
 
+- In production build, let the ensure throw an ensure_exception. 
+Then, in the editor, when the game is still unstable, we will catch an error during whenever we step the cosmos or change some sensitive valuesa,
+then upon catching, we will save the last known correct version to hdd.
