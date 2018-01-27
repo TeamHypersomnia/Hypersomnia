@@ -30,11 +30,13 @@ void draw_cast_spells_highlights(const draw_cast_spells_highlights_input in) {
 							auto highlight_col = spell_data.common.associated_color;
 							highlight_col.a = static_cast<rgba_channel>(255 * highlight_amount);
 
-							in.output.aabb_centered(
-								in.cast_highlight_tex,
-								it.get_viewing_transform(in.interpolation).pos,
-								highlight_col
-							);
+							if (const auto tr = it.find_viewing_transform(in.interpolation)) {
+								in.output.aabb_centered(
+									in.cast_highlight_tex,
+									tr->pos,
+									highlight_col
+								);
+							}
 						}
 					}
 				);

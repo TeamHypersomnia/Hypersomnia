@@ -19,47 +19,60 @@ public:
 	std::optional<components::transform> find_logic_transform() const;
 
 	template <class interpolation_system_type>
-	components::transform get_viewing_transform(const interpolation_system_type& sys, const bool integerize = false) const {
+	std::optional<components::transform> find_viewing_transform(const interpolation_system_type& sys, const bool integerize = false) const {
 		const auto handle = *static_cast<const entity_handle_type*>(this);
 
 		if (const auto owner = handle.get_owner_of_colliders();
 			owner.alive() && owner != handle 
 		) {
-			auto body_transform = sys.get_interpolated(owner);
+			if (auto body_transform = sys.find_interpolated(owner)) {
+				auto bt = *body_transform;
 
-			if (integerize) {
-				body_transform.pos.discard_fract();
+				if (integerize) {
+					bt.pos.discard_fract();
+				}
+
+				const auto offset = handle.calculate_colliders_connection();
+
+				auto displacement = offset.shape_offset;
+
+				if (!displacement.pos.is_zero()) {
+					displacement.pos.rotate(bt.rotation, vec2(0, 0));
+				}
+
+				return bt + displacement;
 			}
 
-			const auto offset = handle.calculate_colliders_connection();
-
-			auto displacement = offset.shape_offset;
-
-			if (!displacement.pos.is_zero()) {
-				displacement.pos.rotate(body_transform.rotation, vec2(0, 0));
-			}
-
-			return body_transform + displacement;
+			return std::nullopt;
 		}
 		
-		return sys.get_interpolated(handle);
+		return sys.find_interpolated(handle);
 	}
 	
 	vec2 get_effective_velocity() const;
 
-	ltrb get_aabb() const {
+	std::optional<ltrb> find_aabb() const {
 		const auto handle = *static_cast<const entity_handle_type*>(this);
-		return get_aabb(handle.get_logic_transform());
+
+		if (const auto transform = handle.find_logic_transform()) {
+			return find_aabb(*transform);
+		}
+
+		return std::nullopt;
 	}
 
 	template <class interpolation_system_type>
-	ltrb get_aabb(const interpolation_system_type& interp) const {
+	std::optional<ltrb> find_aabb(const interpolation_system_type& interp) const {
 		const auto handle = *static_cast<const entity_handle_type*>(this);
 
-		return get_aabb(handle.get_viewing_transform(interp, true));
+		if (const auto t = handle.find_viewing_transform(interp, true)) {
+			return find_aabb(*t);
+		}
+
+		return std::nullopt;
 	}
 
-	ltrb get_aabb(const components::transform transform) const {
+	std::optional<ltrb> find_aabb(const components::transform transform) const {
 		const auto handle = *static_cast<const entity_handle_type*>(this);
 
 		if (const auto* const sprite = handle.template find<invariants::sprite>();
@@ -84,7 +97,20 @@ public:
 		ensure(!handle.template has<components::rigid_body>());
 		ensure(nullptr == handle.template find<invariants::fixtures>());
 
-		return {};
+		return std::nullopt;
+	}
+
+
+	/* Compatibility shortcuts. Their use is not recommended henceforth. */
+
+	template <class... Args>
+	auto get_aabb(Args&&... args) const {
+		return *find_aabb(std::forward<Args>(args)...);
+	}
+
+	template <class... Args>
+	auto get_viewing_transform(Args&&... args) const {
+		return *find_viewing_transform(std::forward<Args>(args)...);
 	}
 };
 

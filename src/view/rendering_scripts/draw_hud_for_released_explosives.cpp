@@ -28,23 +28,25 @@ void draw_hud_for_released_explosives(const draw_hud_for_released_explosives_inp
 				if (highlight_amount > 0.f) {
 					const auto highlight_color = augs::interp(white, red_violet, (1 - highlight_amount)* (1 - highlight_amount));
 					
-					in.output.aabb_centered(in.circular_bar_tex, it.get_viewing_transform(in.interpolation).pos, highlight_color);
+					if (const auto tr = it.find_viewing_transform(in.interpolation)) {
+						in.output.aabb_centered(in.circular_bar_tex, tr->pos, highlight_color);
 
-					augs::special s;
+						augs::special s;
 
-					const auto full_rot = 360;
-					const auto empty_angular_amount = full_rot * (1 - highlight_amount);
+						const auto full_rot = 360;
+						const auto empty_angular_amount = full_rot * (1 - highlight_amount);
 
-					s.v1.set(-90, -90 + full_rot) /= 180;
-					s.v2.set(-90 + empty_angular_amount, -90) /= 180;
+						s.v1.set(-90, -90 + full_rot) /= 180;
+						s.v2.set(-90 + empty_angular_amount, -90) /= 180;
 
-					in.specials.push_back(s);
-					in.specials.push_back(s);
-					in.specials.push_back(s);
+						in.specials.push_back(s);
+						in.specials.push_back(s);
+						in.specials.push_back(s);
 
-					in.specials.push_back(s);
-					in.specials.push_back(s);
-					in.specials.push_back(s);
+						in.specials.push_back(s);
+						in.specials.push_back(s);
+						in.specials.push_back(s);
+					}
 				}
 			}
 		}

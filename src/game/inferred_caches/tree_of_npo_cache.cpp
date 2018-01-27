@@ -15,9 +15,9 @@ std::optional<tree_of_npo_node_input> tree_of_npo_node_input::create_default_for
 	;
 
 	if (has_renderable && !has_physical) {
-		if (const auto aabb = e.get_aabb(); aabb.good()) {
+		if (const auto aabb = e.find_aabb()) {
 			tree_of_npo_node_input result;
-			result.aabb = aabb;
+			result.aabb = *aabb;
 			return result;
 		}
 	}

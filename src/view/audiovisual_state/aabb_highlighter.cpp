@@ -38,15 +38,15 @@ void aabb_highlighter::draw(const aabb_highlighter_drawing_input in) const {
 			return callback_result::ABORT;
 		}
 
-		const auto new_aabb = e.get_aabb(in.interp);
+		if (const auto new_aabb = e.find_aabb(in.interp)) {
+			if (aabb.good()) {
+				aabb.contain(*new_aabb);
+			}
+			else {
+				aabb = *new_aabb;
+			}
+		}
 
-		if (aabb.good() && new_aabb.good()) {
-			aabb.contain(new_aabb);
-		}
-		else if (new_aabb.good()) {
-			aabb = new_aabb;
-		}
-		
 		return callback_result::CONTINUE;
 	};
 

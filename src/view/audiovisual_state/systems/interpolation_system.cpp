@@ -18,7 +18,7 @@ components::transform& interpolation_system::get_interpolated(const const_entity
 	return per_entity_cache[linear_cache_key(id)].interpolated_transform;
 }
 
-components::transform interpolation_system::get_interpolated(const const_entity_handle id) const {
+std::optional<components::transform> interpolation_system::find_interpolated(const const_entity_handle id) const {
 	if (enabled) {
 		if (const auto& cache = per_entity_cache[linear_cache_key(id)];
 			cache.is_constructed()
@@ -27,7 +27,7 @@ components::transform interpolation_system::get_interpolated(const const_entity_
 		}
 	}
 	
-	return id.get_logic_transform();
+	return id.find_logic_transform();
 }
 
 interpolation_system::cache& interpolation_system::get_cache_of(const entity_id id) {

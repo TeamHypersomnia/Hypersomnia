@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <optional>
 
 #include "augs/misc/timing/delta.h"
 #include "augs/misc/pool/pooled_object_id.h"
@@ -37,7 +38,7 @@ public:
 		const augs::delta fixed_delta_for_slowdowns
 	);
 
-	components::transform get_interpolated(const const_entity_handle) const;
+	std::optional<components::transform> find_interpolated(const const_entity_handle) const;
 	components::transform& get_interpolated(const const_entity_handle);
 
 	void reserve_caches_for_entities(const size_t);
