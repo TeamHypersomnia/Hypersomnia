@@ -8,8 +8,6 @@
 
 #include "game/assets/all_logical_assets.h"
 #include "game/messages/intent_message.h"
-#include "game/messages/damage_message.h"
-#include "game/messages/queue_destruction.h"
 #include "game/messages/gunshot_response.h"
 #include "game/messages/interpolation_correction_request.h"
 

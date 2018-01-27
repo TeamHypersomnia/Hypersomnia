@@ -9,6 +9,21 @@ summary: Just a hidden scratchpad.
 
 
 - Audiovisual caches should always check if the transform exist because sometimes the transform might be lost even due to having been put into a backpack.
+	- especially the interpolation system.
+		- **it should crash on transfer to backpack when we correct the transfers **
+	- just use find transform
+	- use clear dead entities as well because it minimizes sampling errors if e.g. the solve wouldn't run between steps
+		- though I think we always run audiovisual advance after step
+
+- There was a crash due to dead entity in driver setup finding a component
+	- possible cause is that the gun system destroys item in chamber, but technically they should not trigger END_CONTACT
+	as they are devoid of... hey, actually that might be because we still see those entities even if they are in backpack. 
+	In that case, if the owner body of an item chamber is badly determined, it might make sense that it crashes
+	- ensure that the posted subject in contact listener is alive, but that is most likely the case since we get physical components from them anyway
+		- but ensures won't hurt
+- Local setup should record session live
+	- This is really important in the face of bugs.
+	- Or just get rid of test scene setup for now and let it by default launch a scene in editor that records inputs
 
 renaming: 
 	input->effect
@@ -17,6 +32,8 @@ renaming:
  
 find_def->find
 get_def->get
+
+- invariantizing inventory
 
 - Later, bullet trace sounds should as be calculated statelessly
 - Sound system should probably assume the same strategy as an inferred cache:
