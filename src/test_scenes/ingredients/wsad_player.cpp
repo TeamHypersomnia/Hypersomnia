@@ -91,6 +91,25 @@ namespace test_types {
 
 				meta.set(container);
 			}
+
+			invariants::sentience sentience; 
+			components::sentience sentience_inst;
+
+			sentience.health_decrease_particles.id = assets::particle_effect_id::HEALTH_DAMAGE_SPARKLES;
+			sentience.health_decrease_particles.modifier.colorize = red;
+			sentience.health_decrease_particles.modifier.scale_lifetimes = 1.5f;
+
+			sentience.health_decrease_sound.id = assets::sound_buffer_id::IMPACT;
+			sentience.death_sound.id = assets::sound_buffer_id::DEATH;
+
+			sentience.loss_of_consciousness_sound.id = assets::sound_buffer_id::DEATH;
+			sentience.consciousness_decrease_sound.id = assets::sound_buffer_id::IMPACT;
+
+			sentience_inst.get<health_meter_instance>().set_value(100);
+			sentience_inst.get<health_meter_instance>().set_maximum_value(100);
+
+			meta.set(sentience);
+			meta.set(sentience_inst);
 		}
 
 		{
@@ -146,26 +165,12 @@ namespace ingredients {
 		auto& animation = e += components::animation();
 		auto& movement = e += components::movement();
 		auto& driver = e += components::driver();
-		auto& sentience = e += components::sentience();
 		
 		auto& attitude = e += components::attitude();
 		const auto processing = e += components::processing();
 
 		attitude.parties = party_category::METROPOLIS_CITIZEN;
 		attitude.hostile_parties = party_category::RESISTANCE_CITIZEN;
-
-		sentience.health_decrease_particles.id = assets::particle_effect_id::HEALTH_DAMAGE_SPARKLES;
-		sentience.health_decrease_particles.modifier.colorize = red;
-		sentience.health_decrease_particles.modifier.scale_lifetimes = 1.5f;
-
-		sentience.health_decrease_sound.id = assets::sound_buffer_id::IMPACT;
-		sentience.death_sound.id = assets::sound_buffer_id::DEATH;
-
-		sentience.get<health_meter_instance>().set_value(100);
-		sentience.get<health_meter_instance>().set_maximum_value(100);
-
-		sentience.loss_of_consciousness_sound.id = assets::sound_buffer_id::DEATH;
-		sentience.consciousness_decrease_sound.id = assets::sound_buffer_id::IMPACT;
 
 		processing.disable_in(processing_subjects::WITH_FORCE_JOINT);
 

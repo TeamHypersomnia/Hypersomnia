@@ -21,6 +21,7 @@ namespace invariants {
 	struct container;
 	struct item;
 	struct missile;
+	struct sentience;
 }
 
 namespace components {
@@ -113,7 +114,8 @@ using invariant_list_t = List<
 	invariants::rigid_body,
 	invariants::container,
 	invariants::item,
-	invariants::missile
+	invariants::missile,
+	invariants::sentience
 >;
 
 template <class... Types>

@@ -55,19 +55,7 @@ namespace components {
 		augs::stepped_timestamp time_of_last_shake;
 		float shake_for_ms = 0.f;
 
-		float comfort_zone = 500.f;
-		float minimum_danger_amount_to_evade = 5.f;
-		float danger_amount_from_hostile_attitude = 100.f;
-
 		child_entity_id character_crosshair;
-
-		sound_effect_input health_decrease_sound;
-		sound_effect_input consciousness_decrease_sound;
-
-		sound_effect_input death_sound;
-		sound_effect_input loss_of_consciousness_sound;
-
-		particle_effect_input health_decrease_particles;
 
 		// END GEN INTROSPECTOR
 
@@ -110,5 +98,25 @@ namespace components {
 				static_assert(always_false_v<T>);
 			}
 		}
+	};
+}
+
+namespace invariants {
+	struct sentience {
+		using implied_component = components::sentience;
+
+		// GEN INTROSPECTOR struct invariants::sentience
+		float comfort_zone = 500.f;
+		float minimum_danger_amount_to_evade = 20.f;
+		float danger_amount_from_hostile_attitude = 100.f;
+
+		sound_effect_input health_decrease_sound;
+		sound_effect_input consciousness_decrease_sound;
+
+		sound_effect_input death_sound;
+		sound_effect_input loss_of_consciousness_sound;
+
+		particle_effect_input health_decrease_particles;
+		// END GEN INTROSPECTOR
 	};
 }

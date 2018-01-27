@@ -120,7 +120,7 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 
 	for (const auto& h : healths) {
 		const auto subject = cosmos[h.subject];
-		const auto& sentience = subject.get<components::sentience>();
+		const auto& sentience = subject.get<invariants::sentience>();
 
 		sound_effect_input effect;
 

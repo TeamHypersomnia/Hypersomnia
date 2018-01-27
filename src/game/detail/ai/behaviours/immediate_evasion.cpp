@@ -29,7 +29,7 @@ namespace behaviours {
 			goal.dangers.push_back(danger);
 		}
 
-		if (total_danger < subject.get<components::sentience>().minimum_danger_amount_to_evade) {
+		if (total_danger < subject.get<invariants::sentience>().minimum_danger_amount_to_evade) {
 			return tree::goal_availability::ALREADY_ACHIEVED;
 		}
 		else {

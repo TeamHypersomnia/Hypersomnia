@@ -78,7 +78,9 @@ identified_danger assess_danger(
 
 	//-danger_dir / danger_distance;
 
-	const float comfort_zone_disturbance_ratio = (s.comfort_zone - danger_distance)/s.comfort_zone;
+	const auto& sentience_def = victim.get<invariants::sentience>();
+	const auto comfort_zone = sentience_def.comfort_zone;
+	const float comfort_zone_disturbance_ratio = (comfort_zone - danger_distance)/comfort_zone;
 
 	if (comfort_zone_disturbance_ratio < 0) {
 		return result;
@@ -92,7 +94,7 @@ identified_danger assess_danger(
 		const auto att = calculate_attitude(danger, victim);
 		
 		if (is_hostile(att)) {
-			result.amount += comfort_zone_disturbance_ratio * sentience->danger_amount_from_hostile_attitude;
+			result.amount += comfort_zone_disturbance_ratio * sentience_def.danger_amount_from_hostile_attitude;
 		}
 	}
 	

@@ -112,10 +112,9 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 
 	for (const auto& h : healths) {
 		const auto subject = cosmos[h.subject];
-		const auto& sentience = subject.get<components::sentience>();
 
 		if (h.target == messages::health_event::target_type::HEALTH) {
-			const auto& sentience = subject.get<components::sentience>();
+			const auto& sentience = subject.get<invariants::sentience>();
 
 			if (h.effective_amount > 0) {
 				auto effect = sentience.health_decrease_particles;

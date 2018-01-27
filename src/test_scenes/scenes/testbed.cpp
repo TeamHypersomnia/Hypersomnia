@@ -143,7 +143,6 @@ namespace test_scenes {
 			}
 			if (i == 1) {
 				new_character.get<components::attitude>().maximum_divergence_angle_before_shooting = 25;
-				new_character.get<components::sentience>().minimum_danger_amount_to_evade = 20;
 				new_character.get<components::sentience>().get<health_meter_instance>().set_value(300);
 				new_character.get<components::sentience>().get<health_meter_instance>().set_maximum_value(300);
 				new_character.recalculate_basic_processing_categories();
@@ -153,7 +152,6 @@ namespace test_scenes {
 			}
 			if (i == 5) {
 				new_character.get<components::attitude>().maximum_divergence_angle_before_shooting = 25;
-				new_character.get<components::sentience>().minimum_danger_amount_to_evade = 20;
 				new_character.get<components::sentience>().get<health_meter_instance>().set_value(300);
 				new_character.get<components::sentience>().get<health_meter_instance>().set_maximum_value(300);
 				new_character.recalculate_basic_processing_categories();
