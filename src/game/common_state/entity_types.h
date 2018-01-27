@@ -5,7 +5,7 @@
 #include "augs/templates/introspect_declaration.h"
 #include "augs/templates/type_matching_and_indexing.h"
 #include "augs/templates/maybe_const.h"
-#include "game/transcendental/entity_type_declaration.h"
+#include "game/transcendental/entity_flavour_id.h"
 #include "game/organization/all_component_includes.h"
 
 using entity_description_type = entity_name_type;
@@ -115,7 +115,6 @@ public:
 
 #if STATICALLY_ALLOCATE_ENTITY_TYPES_NUM
 #include "augs/misc/constant_size_vector.h"
-static_assert(std::is_integral_v<entity_type_id>);
 using entity_types_container = augs::constant_size_vector<entity_type, STATICALLY_ALLOCATE_ENTITY_TYPES_NUM>;
 #else
 #include <vector>

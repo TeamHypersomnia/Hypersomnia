@@ -17,6 +17,18 @@ struct zeroed_pod {
 };
 
 
+namespace std {
+	template <class T>
+	struct hash;
+
+	template <class T>
+	struct hash<zeroed_pod<T>> {
+		std::size_t operator()(const zeroed_pod<T>& z) const {
+			return std::hash<T>()(T(z));
+		}
+	};
+}
+
 template <class T>
 struct zeroed_pod_internal_type {
 	typedef T type;

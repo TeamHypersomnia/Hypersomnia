@@ -4,7 +4,7 @@
 #include "augs/callback_result.h"
 #include "augs/misc/scope_guard.h"
 #include "game/transcendental/cosmic_types.h"
-#include "game/transcendental/entity_type_declaration.h"
+#include "game/transcendental/entity_flavour_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
 
 #include "game/messages/will_soon_be_deleted.h"

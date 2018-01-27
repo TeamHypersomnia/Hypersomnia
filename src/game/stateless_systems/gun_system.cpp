@@ -287,10 +287,8 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 							step.post_message(request);
 						}
 
-						const auto shell_definition = single_bullet_or_pellet_stack[child_entity_name::CATRIDGE_SHELL];
-
-						if (shell_definition.alive()) {
-							const auto shell_entity = cosmic::clone_entity(shell_definition);
+						if (const auto shell_flavour = single_bullet_or_pellet_stack.get<components::catridge>().shell_flavour) {
+							const auto shell_entity = cosmic::create_entity(cosmos, shell_flavour);
 							shell_entity.add_standard_components(step);
 
 							auto rng = cosmos.get_rng_for(shell_entity);

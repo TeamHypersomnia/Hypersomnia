@@ -1,5 +1,5 @@
 #pragma once
-#include "game/transcendental/entity_type_declaration.h"
+#include "game/transcendental/entity_flavour_id.h"
 #include "game/transcendental/cosmic_functions.h"
 
 enum class test_scene_type {
@@ -49,14 +49,18 @@ enum class test_scene_type {
 	COUNT
 };
 
+inline auto to_entity_type_id(const test_scene_type id) {
+	return static_cast<entity_type_id>(static_cast<unsigned>(id));
+}
+
 template <class C>
 auto create_test_scene_entity(C& cosm, const test_scene_type id) {
-	return cosmic::create_entity(cosm, static_cast<entity_type_id>(id));
+	return cosmic::create_entity(cosm, to_entity_type_id(id));
 }
 
 template <class C>
 auto& get_test_type(C& container, const test_scene_type id) {
-	return container.get_type(static_cast<entity_type_id>(id));
+	return container.get_type(to_entity_type_id(id));
 }
 
 namespace test_types {

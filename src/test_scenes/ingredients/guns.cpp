@@ -107,7 +107,7 @@ namespace test_types {
 					trace_def.max_multiplier_y = {0.f, 0.f};
 					trace_def.lengthening_duration_ms = {200.f, 250.f};
 					trace_def.additional_multiplier = vec2(1.f, 1.f);
-					trace_def.finishing_trace_type = static_cast<entity_type_id>(test_scene_type::CYAN_ROUND_FINISHING_TRACE);
+					trace_def.finishing_trace_type = to_entity_type_id(test_scene_type::CYAN_ROUND_FINISHING_TRACE);
 
 					meta.set(trace_def);
 				}
@@ -281,7 +281,7 @@ namespace test_types {
 				trace_def.lengthening_duration_ms = {200.f, 250.f};
 				trace_def.additional_multiplier = vec2(1.f, 1.f);
 
-				trace_def.finishing_trace_type = static_cast<entity_type_id>(test_scene_type::ENERGY_BALL_FINISHING_TRACE);
+				trace_def.finishing_trace_type = to_entity_type_id(test_scene_type::ENERGY_BALL_FINISHING_TRACE);
 
 				meta.set(trace_def);
 			}
@@ -545,7 +545,6 @@ namespace prefabs {
 		auto& cosmos = step.get_cosmos();
 		const auto cyan_charge = create_test_scene_entity(cosmos, test_scene_type::CYAN_CHARGE);
 		const auto round_definition = create_test_scene_entity(cosmos, test_scene_type::CYAN_ROUND_DEFINITION);
-		const auto shell_definition = create_test_scene_entity(cosmos, test_scene_type::CYAN_SHELL_DEFINITION);
 
 		const auto& metas = step.get_logical_assets();
 
@@ -555,11 +554,11 @@ namespace prefabs {
 			auto& sender = round_definition += components::sender();
 			cat.shell_trace_particles.id = assets::particle_effect_id::CONCENTRATED_WANDERING_PIXELS;
 			cat.shell_trace_particles.modifier.colorize = cyan;
+			cat.shell_flavour = to_entity_type_id(test_scene_type::CYAN_SHELL_DEFINITION);
 		}
 
 
 		cyan_charge.map_child_entity(child_entity_name::CATRIDGE_BULLET, round_definition);
-		cyan_charge.map_child_entity(child_entity_name::CATRIDGE_SHELL, shell_definition);
 
 		cyan_charge.set_logic_transform(step, pos);
 		cyan_charge.add_standard_components(step);

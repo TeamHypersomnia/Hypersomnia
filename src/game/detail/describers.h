@@ -8,7 +8,7 @@
 #include "game/enums/slot_function.h"
 #include "game/enums/item_category.h"
 
-#include "game/transcendental/entity_type_declaration.h"
+#include "game/transcendental/entity_flavour_id.h"
 #include "game/common_state/entity_types.h"
 
 /*
