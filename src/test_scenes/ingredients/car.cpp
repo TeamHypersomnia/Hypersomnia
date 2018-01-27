@@ -126,7 +126,7 @@ namespace prefabs {
 		}
 		
 		{
-			auto sprite = interior.get_def<invariants::sprite>();
+			auto sprite = interior.get<invariants::sprite>();
 			
 			vec2 offset((front_size.x / 2 + sprite.get_size(/*metas*/).x / 2) * -1, 0);
 
@@ -145,7 +145,7 @@ namespace prefabs {
 		}
 
 		{
-			auto sprite = left_wheel.get_def<invariants::sprite>();
+			auto sprite = left_wheel.get<invariants::sprite>();
 
 			vec2 offset((front_size.x / 2 + sprite.get_size(/*metas*/).x / 2 + 20) * -1, 0);
 
@@ -169,7 +169,7 @@ namespace prefabs {
 
 				{
 
-					auto sprite = engine_physical.get_def<invariants::sprite>();
+					auto sprite = engine_physical.get<invariants::sprite>();
 
 					components::transform offset;
 

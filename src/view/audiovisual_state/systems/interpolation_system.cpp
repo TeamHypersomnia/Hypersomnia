@@ -78,7 +78,7 @@ void interpolation_system::integrate_interpolated_transforms(
 		processing_subjects::WITH_INTERPOLATION, 
 		[&](const const_entity_handle e) {
 			const auto info = e.get<components::interpolation>();
-			const auto def = e.get_def<invariants::interpolation>();
+			const auto def = e.get<invariants::interpolation>();
 
 			auto& integrated = get_interpolated(e);
 			auto& cache = per_entity_cache[linear_cache_key(e)];

@@ -30,7 +30,7 @@ void trace_system::lengthen_sprites_of_traces(const logic_step step) const {
 		processing_subjects::WITH_TRACE,
 		[&](const entity_handle t) {
 			auto& trace = t.get<components::trace>();
-			const auto& trace_def = t.get_def<invariants::trace>();
+			const auto& trace_def = t.get<invariants::trace>();
 
 			vec2 surplus_multiplier;
 			
@@ -83,7 +83,7 @@ void trace_system::spawn_finishing_traces_for_deleted_entities(const logic_step 
 		if (trace != nullptr
 			&& !trace->is_it_a_finishing_trace
 		) {
-			const auto& trace_def = deleted_entity.get_def<invariants::trace>();
+			const auto& trace_def = deleted_entity.get<invariants::trace>();
 
 			const auto finishing_trace = cosmic::create_entity(cosmos, trace_def.finishing_trace_type);
 		
@@ -92,7 +92,7 @@ void trace_system::spawn_finishing_traces_for_deleted_entities(const logic_step 
 			if (deleted_entity.find<components::missile>()) {
 				transform_of_finishing.pos = 
 					deleted_entity.get<components::missile>().saved_point_of_impact_before_death
-					- (deleted_entity.get_def<invariants::sprite>().get_size() / 2)
+					- (deleted_entity.get<invariants::sprite>().get_size() / 2)
 					.rotate(transform_of_finishing.rotation, vec2(0, 0))
 				;
 			}

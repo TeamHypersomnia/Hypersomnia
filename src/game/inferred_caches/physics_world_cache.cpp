@@ -112,7 +112,7 @@ void physics_world_cache::infer_cache_for_rigid_body(const const_entity_handle h
    			and changing type content implies reinference of the entire cosmos.
 		*/
 
-		const auto& def = handle.get_def<invariants::rigid_body>();
+		const auto& def = handle.get<invariants::rigid_body>();
 		const auto rigid_body = handle.get<components::rigid_body>();
 		const auto damping = rigid_body.calculate_damping_info(def);
 		const auto& data = rigid_body.get_raw_component();
@@ -163,7 +163,7 @@ void physics_world_cache::infer_cache_for_rigid_body(const const_entity_handle h
 	*/
 
 	if (const auto rigid_body = handle.find<components::rigid_body>()) {
-		const auto& physics_def = handle.get_def<invariants::rigid_body>();
+		const auto& physics_def = handle.get<invariants::rigid_body>();
 		const auto& physics_data = rigid_body.get_raw_component();
 		auto& cache = get_rigid_body_cache(handle);
 
@@ -251,7 +251,7 @@ void physics_world_cache::infer_cache_for_colliders(const const_entity_handle ha
 
 		if (!needs_full_rebuild) {
 			auto& compared = *cache.all_fixtures_in_component[0].get();
-			const auto& colliders_data = handle.get_def<invariants::fixtures>();
+			const auto& colliders_data = handle.get<invariants::fixtures>();
 
 			if (const auto new_density = handle.calculate_density(
 					get_calculated_connection(), 
@@ -292,7 +292,7 @@ void physics_world_cache::infer_cache_for_colliders(const const_entity_handle ha
 	    there is indeed a invariant to construct from.	
 	*/
 
-	if (const auto colliders = handle.find_def<invariants::fixtures>()) {
+	if (const auto colliders = handle.find<invariants::fixtures>()) {
 		const auto new_owner = cosmos[get_calculated_connection().owner];
 
 		if (new_owner.dead()) {
@@ -334,7 +334,7 @@ void physics_world_cache::infer_cache_for_colliders(const const_entity_handle ha
 		auto& all_fixtures_in_component = cache.all_fixtures_in_component;
 		ensure(all_fixtures_in_component.empty());
 		
-		if (const auto* const shape_polygon = handle.find_def<invariants::shape_polygon>()) {
+		if (const auto* const shape_polygon = handle.find<invariants::shape_polygon>()) {
 			auto transformed_shape = shape_polygon->shape;
 			transformed_shape.offset_vertices(get_calculated_connection().shape_offset);
 

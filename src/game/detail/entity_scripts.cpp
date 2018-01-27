@@ -131,7 +131,7 @@ float assess_projectile_velocity_of_weapon(const const_entity_handle weapon) {
 	// 	ch.get_items_inside()[0][child_entity_name::CATRIDGE_BULLET].get<components::missile>();
 	// }
 
-	if (const auto* const gun_def = weapon.find_def<invariants::gun>()) {
+	if (const auto* const gun_def = weapon.find<invariants::gun>()) {
 		return (gun_def->muzzle_velocity.first + gun_def->muzzle_velocity.second) / 2;
 	}
 

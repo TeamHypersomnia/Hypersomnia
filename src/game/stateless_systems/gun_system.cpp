@@ -129,7 +129,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 			;
 
 			auto& gun = gun_entity.get<components::gun>();
-			const auto& gun_def = gun_entity.get_def<invariants::gun>();
+			const auto& gun_def = gun_entity.get<invariants::gun>();
 
 			const auto magic_missile_def = cosmos[gun.magic_missile_definition];
 			const auto is_magic_launcher = magic_missile_def.alive();

@@ -290,7 +290,7 @@ void illuminated_rendering(
 		cosmos.for_each(
 			processing_subjects::WITH_CROSSHAIR,
 			[&](const const_entity_handle it) {
-				if (const auto s = it.find_def<invariants::sprite>()) {
+				if (const auto s = it.find<invariants::sprite>()) {
 					const auto p = it.get_parent();
 
 					if (p.dead()) {

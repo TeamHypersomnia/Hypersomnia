@@ -30,9 +30,6 @@ renaming:
 	absolute_or_local
 	chasing -> positioning
  
-find_def->find
-get_def->get
-
 - invariantizing inventory
 
 - Later, bullet trace sounds should as be calculated statelessly

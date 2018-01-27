@@ -318,7 +318,7 @@ namespace prefabs {
 		ingredients::add_default_gun_container(step, weapon);
 
 		auto& gun = weapon.get<components::gun>();
-		auto& gun_def = weapon.get_def<invariants::gun>();
+		auto& gun_def = weapon.get<invariants::gun>();
 
 
 		// add_muzzle_particles(weapon, gun, step);
@@ -349,7 +349,7 @@ namespace prefabs {
 		ingredients::add_default_gun_container(step, weapon, 0.f, true);
 
 		auto& gun = weapon.get<components::gun>();
-		auto& gun_def = weapon.get_def<invariants::gun>();
+		auto& gun_def = weapon.get<invariants::gun>();
 
 		// add_muzzle_particles(weapon, gun, step);
 

@@ -62,13 +62,13 @@ public:
 	ltrb get_aabb(const components::transform transform) const {
 		const auto handle = *static_cast<const entity_handle_type*>(this);
 
-		if (const auto* const sprite = handle.template find_def<invariants::sprite>();
+		if (const auto* const sprite = handle.template find<invariants::sprite>();
 			sprite != nullptr
 		) {
 			return sprite->get_aabb(transform);
 		}
 
-		if (const auto* const polygon = handle.template find_def<invariants::polygon>();
+		if (const auto* const polygon = handle.template find<invariants::polygon>();
 			polygon != nullptr
 		) {
 			return polygon->get_aabb(transform);
@@ -82,7 +82,7 @@ public:
 
 		/* TODO: Implement get_aabb for physical entities */
 		ensure(!handle.template has<components::rigid_body>());
-		ensure(nullptr == handle.template find_def<invariants::fixtures>());
+		ensure(nullptr == handle.template find<invariants::fixtures>());
 
 		return {};
 	}

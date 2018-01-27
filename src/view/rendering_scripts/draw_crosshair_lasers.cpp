@@ -70,7 +70,7 @@ void draw_crosshair_lasers(const draw_crosshair_lasers_input in) {
 
 			if (subject_item.has<components::gun>()) {
 				const auto& gun = subject_item.get<components::gun>();
-				const auto& gun_def = subject_item.get_def<invariants::gun>();
+				const auto& gun_def = subject_item.get<invariants::gun>();
 
 				const auto rifle_transform = subject_item.get_viewing_transform(in.interpolation);
 				const auto barrel_center = gun_def.calculate_barrel_center(rifle_transform);

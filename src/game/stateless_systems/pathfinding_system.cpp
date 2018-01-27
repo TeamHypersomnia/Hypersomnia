@@ -32,7 +32,7 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 
 		const auto b = subject.get<components::rigid_body>();
 
-		const auto& verts = subject.get_def<invariants::shape_polygon>().shape.convex_polys[fixture_num];
+		const auto& verts = subject.get<invariants::shape_polygon>().shape.convex_polys[fixture_num];
 
 		/* for every vertex in given fixture's shape */
 		for (auto& v : verts) {

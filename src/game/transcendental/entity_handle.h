@@ -148,15 +148,20 @@ public:
 
 	template <class T>
 	decltype(auto) get() const {
-		check_component_type<T>();
-
-		ensure(alive());
-		
-		if constexpr(is_synchronized_v<T>) {
-			return component_synchronizer<is_const, T>(&agg().template get<T>(pool_provider()), *this);
+		if constexpr(is_invariant_v<T>) {
+			return get_type().template get<T>();
 		}
 		else {
-			return agg().template get<T>(pool_provider());
+			check_component_type<T>();
+
+			ensure(alive());
+
+			if constexpr(is_synchronized_v<T>) {
+				return component_synchronizer<is_const, T>(&agg().template get<T>(pool_provider()), *this);
+			}
+			else {
+				return agg().template get<T>(pool_provider());
+			}
 		}
 	}
 
@@ -180,15 +185,20 @@ public:
 
 	template<class T>
 	decltype(auto) find() const {
-		check_component_type<T>();
-
-		ensure(alive());
-
-		if constexpr(is_synchronized_v<T>) {
-			return component_synchronizer<is_const, T>(agg().template find<T>(pool_provider()), *this);
+		if constexpr(is_invariant_v<T>) {
+			return get_type().template find<T>();
 		}
 		else {
-			return agg().template find<T>(pool_provider());
+			check_component_type<T>();
+
+			ensure(alive());
+
+			if constexpr(is_synchronized_v<T>) {
+				return component_synchronizer<is_const, T>(agg().template find<T>(pool_provider()), *this);
+			}
+			else {
+				return agg().template find<T>(pool_provider());
+			}
 		}
 	}
 
@@ -206,7 +216,7 @@ public:
 
 	bool get_flag(const entity_flag f) const {
 		ensure(alive());
-		return get_def<invariants::flags>().values.test(f);
+		return get<invariants::flags>().values.test(f);
 	}
 
 	template <class F>
@@ -233,18 +243,6 @@ public:
 
 	const auto& get_name() const {
 		return get<components::type>().get_name();
-	}
-
-	template <class D>
-	const D& get_def() const {
-		check_invariant_type<D>();
-		return get_type().template get<D>();
-	}
-
-	template <class D>
-	const D* find_def() const {
-		check_invariant_type<D>();
-		return get_type().template find<D>();
 	}
 
 	bool sentient_and_unconscious() const {

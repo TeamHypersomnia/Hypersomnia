@@ -79,8 +79,8 @@ void contact_listener::BeginContact(b2Contact* contact) {
 		ensure(subject.alive());
 		ensure(collider.alive());
 
-		const auto subject_fixtures = subject.get_def<invariants::fixtures>();
-		const auto collider_fixtures = collider.get_def<invariants::fixtures>();
+		const auto subject_fixtures = subject.get<invariants::fixtures>();
+		const auto collider_fixtures = collider.get<invariants::fixtures>();
 
 		if (subject_fixtures.is_friction_ground()) {
 #if FRICTION_FIELDS_COLLIDE
@@ -216,8 +216,8 @@ void contact_listener::EndContact(b2Contact* contact) {
 		msg.subject = subject;
 		msg.collider = collider;
 
-		const auto subject_fixtures = subject.get_def<invariants::fixtures>();
-		const auto collider_fixtures = collider.get_def<invariants::fixtures>();
+		const auto subject_fixtures = subject.get<invariants::fixtures>();
+		const auto collider_fixtures = collider.get<invariants::fixtures>();
 
 		auto& collider_physics = collider.get_owner_of_colliders().get_special_physics();
 
@@ -293,8 +293,8 @@ void contact_listener::PreSolve(b2Contact* contact, const b2Manifold* oldManifol
 		ensure(subject.alive());
 		ensure(collider.alive());
 
-		const auto subject_fixtures = subject.get_def<invariants::fixtures>();
-		const auto collider_fixtures = subject.get_def<invariants::fixtures>();
+		const auto subject_fixtures = subject.get<invariants::fixtures>();
+		const auto collider_fixtures = subject.get<invariants::fixtures>();
 
 		const const_entity_handle subject_owner_body = subject.get_owner_of_colliders();
 		const const_entity_handle subject_capability = subject.get_owning_transfer_capability();

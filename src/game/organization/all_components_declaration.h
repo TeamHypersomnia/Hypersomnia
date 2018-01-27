@@ -126,3 +126,6 @@ constexpr unsigned INVARIANTS_COUNT = invariant_list_t<type_count>::value;
 
 template <class D>
 static constexpr auto invariant_index_v = index_in_list_v<D, invariant_list_t<type_list>>;
+
+template <class D>
+static constexpr bool is_invariant_v = is_one_of_list_v<D, invariant_list_t<type_list>>;

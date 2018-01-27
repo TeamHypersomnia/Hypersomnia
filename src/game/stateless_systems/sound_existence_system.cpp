@@ -37,8 +37,8 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 			const auto subject = cosmos[c.subject];
 			const auto collider = cosmos[c.collider];
 
-			const auto subject_coll = subject.get_def<invariants::fixtures>();
-			const auto collider_coll = collider.get_def<invariants::fixtures>();
+			const auto subject_coll = subject.get<invariants::fixtures>();
+			const auto collider_coll = collider.get<invariants::fixtures>();
 
 			const auto* const subject_coll_material = step.get_logical_assets().find(subject_coll.material);
 			const auto* const collider_coll_material = step.get_logical_assets().find(collider_coll.material);
@@ -81,7 +81,7 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 		{
 			const auto subject = cosmos[g.subject];
 			const auto& gun = subject.get<components::gun>();
-			const auto& gun_def = subject.get_def<invariants::gun>();
+			const auto& gun_def = subject.get<invariants::gun>();
 			const auto gun_transform = subject.get_logic_transform();
 			const auto owning_capability = subject.get_owning_transfer_capability();
 

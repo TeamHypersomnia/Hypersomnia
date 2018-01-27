@@ -86,7 +86,7 @@ FORCE_INLINE void draw_border(
 
 template <class F>
 FORCE_INLINE void on_renderable_component(const const_entity_handle h, F callback) {
-	if (const auto sprite = h.find_def<invariants::sprite>()) {
+	if (const auto sprite = h.find<invariants::sprite>()) {
 		if (const auto trace = h.find<components::trace>()) {
 			auto tracified_sprite = *sprite;
 
@@ -99,7 +99,7 @@ FORCE_INLINE void on_renderable_component(const const_entity_handle h, F callbac
 			callback(*sprite);
 		}
 	}
-	else if (const auto polygon = h.find_def<invariants::polygon>()) {
+	else if (const auto polygon = h.find<invariants::polygon>()) {
 		callback(*polygon);
 	}
 }
