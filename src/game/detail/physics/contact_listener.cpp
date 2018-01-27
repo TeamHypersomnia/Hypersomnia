@@ -76,6 +76,9 @@ void contact_listener::BeginContact(b2Contact* contact) {
 		msg.subject = subject;
 		msg.collider = collider;
 
+		ensure(subject.alive());
+		ensure(collider.alive());
+
 		const auto subject_fixtures = subject.get_def<invariants::fixtures>();
 		const auto collider_fixtures = collider.get_def<invariants::fixtures>();
 
@@ -207,6 +210,9 @@ void contact_listener::EndContact(b2Contact* contact) {
 		const auto subject = cosmos[fix_a->GetUserData()];
 		const auto collider = cosmos[fix_b->GetUserData()];
 
+		ensure(subject.alive());
+		ensure(collider.alive());
+
 		msg.subject = subject;
 		msg.collider = collider;
 
@@ -283,6 +289,9 @@ void contact_listener::PreSolve(b2Contact* contact, const b2Manifold* oldManifol
 
 		msg.subject = subject;
 		msg.collider = collider;
+
+		ensure(subject.alive());
+		ensure(collider.alive());
 
 		const auto subject_fixtures = subject.get_def<invariants::fixtures>();
 		const auto collider_fixtures = subject.get_def<invariants::fixtures>();
@@ -407,6 +416,9 @@ void contact_listener::PostSolve(b2Contact* contact, const b2ContactImpulse* imp
 
 		msg.subject = subject;
 		msg.collider = collider;
+
+		ensure(subject.alive());
+		ensure(collider.alive());
 
 		msg.subject_b2Fixture_index = sys.get_index_in_component(fix_a, subject);
 		msg.collider_b2Fixture_index = sys.get_index_in_component(fix_b, collider);
