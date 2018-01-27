@@ -6,9 +6,19 @@ namespace components {
 	struct wandering_pixels {
 		// GEN INTROSPECTOR struct components::wandering_pixels
 		xywh reach = xywh(0.f, 0.f, 0.f, 0.f);
+		rgba colorize = white;
+		unsigned particles_count = 20u;
+		// END GEN INTROSPECTOR
+	};
+}
+
+namespace invariants {
+	struct wandering_pixels {
+		using implied_component = components::wandering_pixels;
+
+		// GEN INTROSPECTOR struct invariants::wandering_pixels
 		augs::constant_size_vector<invariants::sprite, 10> frames;
 		float frame_duration_ms = 300.f;
-		unsigned particles_count = 0u;
 		// END GEN INTROSPECTOR
 
 		const invariants::sprite& get_face_after(const float passed_lifetime_ms) const {

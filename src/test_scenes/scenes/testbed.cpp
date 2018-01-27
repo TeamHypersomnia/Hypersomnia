@@ -210,37 +210,15 @@ namespace test_scenes {
 		}
 
 		// street wandering pixels
-		auto wandering_pixels_frames = decltype(components::wandering_pixels::frames){};
-		wandering_pixels_frames.resize(5);
-
-		wandering_pixels_frames[0] = { assets::game_image_id::BLANK, vec2(1, 1), cyan };
-		wandering_pixels_frames[1] = { assets::game_image_id::BLANK, vec2(2, 2), cyan };
-		wandering_pixels_frames[2] = { assets::game_image_id(int(assets::game_image_id::CAST_BLINK_1) + 1), metas, cyan };
-		wandering_pixels_frames[3] = { assets::game_image_id(int(assets::game_image_id::CAST_BLINK_1) + 2), metas, cyan };
-		wandering_pixels_frames[4] = { assets::game_image_id::BLANK, vec2(2, 2), cyan };
-
-		auto get_frames_col = [&](rgba col) {
-			auto f = wandering_pixels_frames;
-
-			for (auto& o : f) {
-				o.color = col;
-			}
-
-			return f;
-		};
-
-		const auto duration_ms = 6000.f;
 
 		{
 			const auto reach = xywh(0, 0, 1500, 32000);
 
 			{
 				const auto e = create_test_scene_entity(world, test_scene_type::WANDERING_PIXELS);
-				auto& w = e += components::wandering_pixels();
+				auto& w = e.get<components::wandering_pixels>();
 
-
-				w.frames = get_frames_col(cyan);
-				w.frame_duration_ms = duration_ms;
+				w.colorize = cyan;
 				w.particles_count = 200;
 				w.reach = reach;
 				e.add_standard_components(step);
@@ -248,11 +226,10 @@ namespace test_scenes {
 
 			{
 				const auto e = create_test_scene_entity(world, test_scene_type::WANDERING_PIXELS);
-				auto& w = e += components::wandering_pixels();
+				auto& w = e.get<components::wandering_pixels>();
 
 
-				w.frames = get_frames_col(cyan);
-				w.frame_duration_ms = duration_ms;
+				w.colorize = cyan;
 				//w.face.size.set(1, 1);
 				w.particles_count = 80;
 				w.reach = reach;
@@ -261,11 +238,10 @@ namespace test_scenes {
 
 			{
 				const auto e = create_test_scene_entity(world, test_scene_type::WANDERING_PIXELS);
-				auto& w = e += components::wandering_pixels();
+				auto& w = e.get<components::wandering_pixels>();
 
 
-				w.frames = get_frames_col(cyan);
-				w.frame_duration_ms = duration_ms;
+				w.colorize = cyan;
 				//w.face.size.set(1, 1);
 				w.particles_count = 80;
 				w.reach = reach;
@@ -314,11 +290,10 @@ namespace test_scenes {
 
 				{
 					const auto e = create_test_scene_entity(world, test_scene_type::WANDERING_PIXELS);
-					auto& w = e += components::wandering_pixels();
+					auto& w = e.get<components::wandering_pixels>();
 
 
-					w.frames = get_frames_col(light_cyan);
-					w.frame_duration_ms = duration_ms;
+					w.colorize = light_cyan;
 					w.particles_count = 50;
 					w.reach = xywh(light_pos.x- 250, light_pos.y-250, 500, 500);
 					e.add_standard_components(step);
@@ -326,11 +301,10 @@ namespace test_scenes {
 
 				{
 					const auto e = create_test_scene_entity(world, test_scene_type::WANDERING_PIXELS);
-					auto& w = e += components::wandering_pixels();
+					auto& w = e.get<components::wandering_pixels>();
 
 
-					w.frames = get_frames_col(light_cyan);
-					w.frame_duration_ms = duration_ms;
+					w.colorize = light_cyan;
 					w.particles_count = 20;
 					w.reach = xywh(light_pos.x - 150, light_pos.y - 150, 300, 300);
 					e.add_standard_components(step);
@@ -338,11 +312,10 @@ namespace test_scenes {
 
 				{
 					const auto e = create_test_scene_entity(world, test_scene_type::WANDERING_PIXELS);
-					auto& w = e += components::wandering_pixels();
+					auto& w = e.get<components::wandering_pixels>();
 
 
-					w.frames = get_frames_col(light_cyan);
-					w.frame_duration_ms = duration_ms;
+					w.colorize = light_cyan;
 					w.particles_count = 20;
 					w.reach = xywh(light_pos.x - 25, light_pos.y - 25, 50, 50);
 					e.add_standard_components(step);
@@ -375,11 +348,10 @@ namespace test_scenes {
 
 				{
 					const auto e = create_test_scene_entity(world, test_scene_type::WANDERING_PIXELS);
-					auto& w = e += components::wandering_pixels();
+					auto& w = e.get<components::wandering_pixels>();
 
 
-					w.frames = get_frames_col(cyan);
-					w.frame_duration_ms = duration_ms;
+					w.colorize = cyan;
 					w.particles_count = 20;
 					w.reach = left_reach;
 					e.add_standard_components(step);
@@ -387,11 +359,10 @@ namespace test_scenes {
 
 				{
 					const auto e = create_test_scene_entity(world, test_scene_type::WANDERING_PIXELS);
-					auto& w = e += components::wandering_pixels();
+					auto& w = e.get<components::wandering_pixels>();
 
 
-					w.frames = get_frames_col(orange);
-					w.frame_duration_ms = duration_ms;
+					w.colorize = orange;
 					w.particles_count = 20;
 					w.reach = right_reach;
 					e.add_standard_components(step);
@@ -399,11 +370,10 @@ namespace test_scenes {
 
 				{
 					const auto e = create_test_scene_entity(world, test_scene_type::WANDERING_PIXELS);
-					auto& w = e += components::wandering_pixels();
+					auto& w = e.get<components::wandering_pixels>();
 
 
-					w.frames = get_frames_col(cyan);
-					w.frame_duration_ms = duration_ms;
+					w.colorize = cyan;
 					w.particles_count = 50;
 					w.reach = left_reach;
 					e.add_standard_components(step);
@@ -411,11 +381,10 @@ namespace test_scenes {
 
 				{
 					const auto e = create_test_scene_entity(world, test_scene_type::WANDERING_PIXELS);
-					auto& w = e += components::wandering_pixels();
+					auto& w = e.get<components::wandering_pixels>();
 
 
-					w.frames = get_frames_col(orange);
-					w.frame_duration_ms = duration_ms;
+					w.colorize = orange;
 					w.particles_count = 50;
 					w.reach = right_reach;
 					e.add_standard_components(step);
@@ -423,11 +392,10 @@ namespace test_scenes {
 
 				{
 					const auto e = create_test_scene_entity(world, test_scene_type::WANDERING_PIXELS);
-					auto& w = e += components::wandering_pixels();
+					auto& w = e.get<components::wandering_pixels>();
 
 
-					w.frames = get_frames_col(cyan);
-					w.frame_duration_ms = duration_ms;
+					w.colorize = cyan;
 					w.particles_count = 30;
 					w.reach = left_reach;
 					e.add_standard_components(step);
@@ -435,11 +403,10 @@ namespace test_scenes {
 
 				{
 					const auto e = create_test_scene_entity(world, test_scene_type::WANDERING_PIXELS);
-					auto& w = e += components::wandering_pixels();
+					auto& w = e.get<components::wandering_pixels>();
 
 
-					w.frames = get_frames_col(orange);
-					w.frame_duration_ms = duration_ms;
+					w.colorize = orange;
 					w.particles_count = 30;
 					w.reach = right_reach;
 					e.add_standard_components(step);

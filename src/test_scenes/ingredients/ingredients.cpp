@@ -17,6 +17,20 @@ namespace test_types {
 
 				meta.set(render_def);
 			}
+
+			invariants::wandering_pixels wandering;
+
+			auto& frames = wandering.frames;
+			frames.resize(5);
+
+			frames[0] = { assets::game_image_id::BLANK, vec2(1, 1), white };
+			frames[1] = { assets::game_image_id::BLANK, vec2(2, 2), white };
+			frames[2] = { assets::game_image_id(int(assets::game_image_id::CAST_BLINK_1) + 1), logicals, white };
+			frames[3] = { assets::game_image_id(int(assets::game_image_id::CAST_BLINK_1) + 2), logicals, white };
+			frames[4] = { assets::game_image_id::BLANK, vec2(2, 2), white };
+
+			wandering.frame_duration_ms = 6000.f;
+			meta.set(wandering);
 		}
 
 		{

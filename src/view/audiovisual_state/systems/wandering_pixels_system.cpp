@@ -52,6 +52,7 @@ void wandering_pixels_system::advance_for(
 	const auto& cosmos = it.get_cosmos();
 	auto& cache = get_cache(it);
 	const auto& wandering = it.get<components::wandering_pixels>();
+	const auto& wandering_def = it.get<invariants::wandering_pixels>();
 
 	if (const bool refresh_cache = 
 		cache.recorded_component.particles_count != wandering.particles_count
@@ -71,7 +72,7 @@ void wandering_pixels_system::advance_for(
 				wandering.reach.y + cache.rng.randval(0u, static_cast<unsigned>(wandering.reach.h))
 			);
 
-			p.current_lifetime_ms = cache.rng.randval(0.f, wandering.frame_duration_ms);
+			p.current_lifetime_ms = cache.rng.randval(0.f, wandering_def.frame_duration_ms);
 		}
 
 		cache.recorded_component.reach = wandering.reach;

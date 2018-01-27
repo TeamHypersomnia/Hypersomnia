@@ -62,14 +62,19 @@ public:
 		const M& manager,
 		invariants::sprite::drawing_input basic_input
 	) const {
-		const auto& wandering = subject.get<components::wandering_pixels>();
+		const auto& wandering_def = subject.get<invariants::wandering_pixels>();
 		const auto& cache = get_cache(subject);
 
 		for (const auto& p : cache.particles) {
 			basic_input.renderable_transform = p.pos;
 
-			if (wandering.frames.size() > 0) {
-				wandering.get_face_after(p.current_lifetime_ms).draw(manager, basic_input);
+			if (wandering_def.frames.size() > 0) {
+				{
+					const auto& wandering = subject.get<components::wandering_pixels>();
+					basic_input.colorize = wandering.colorize;
+				}
+
+				wandering_def.get_face_after(p.current_lifetime_ms).draw(manager, basic_input);
 			}
 		}
 	}

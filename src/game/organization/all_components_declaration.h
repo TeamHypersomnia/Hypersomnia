@@ -22,6 +22,7 @@ namespace invariants {
 	struct item;
 	struct missile;
 	struct sentience;
+	struct wandering_pixels;
 }
 
 namespace components {
@@ -115,7 +116,8 @@ using invariant_list_t = List<
 	invariants::container,
 	invariants::item,
 	invariants::missile,
-	invariants::sentience
+	invariants::sentience,
+	invariants::wandering_pixels
 >;
 
 template <class... Types>
