@@ -77,7 +77,7 @@ namespace test_scenes {
 		}
 
 		const auto rifle2 = prefabs::create_sample_rifle(step, vec2(100, -500 + 50),
-			prefabs::create_sample_magazine(step, vec2(100, -650), true ? "10" : "0.3",
+			prefabs::create_sample_magazine(step, vec2(100, -650),
 				prefabs::create_cyan_charge(step, vec2(0, 0), true ? 1000 : 5)));
 		
 		prefabs::create_force_grenade(step, { 100, 100 });

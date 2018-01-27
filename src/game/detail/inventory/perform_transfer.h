@@ -50,7 +50,7 @@ void perform_transfers(const C requests, const step_type step) {
 }
 
 template <class F>
-void drop_from_all_slots(const components::container& container, const entity_handle handle, F result_callback) {
+void drop_from_all_slots(const invariants::container& container, const entity_handle handle, F result_callback) {
 	for (const auto& s : container.slots) {
 		for (const auto item : get_items_inside(handle, s.first)) {
 			result_callback(perform_transfer( item_slot_transfer_request{ item, inventory_slot_id() }, handle.get_cosmos()));
@@ -58,7 +58,7 @@ void drop_from_all_slots(const components::container& container, const entity_ha
 	}
 }
 
-void drop_from_all_slots(const components::container& container, const entity_handle handle, const logic_step step);
+void drop_from_all_slots(const invariants::container& container, const entity_handle handle, const logic_step step);
 
 void detail_add_item(const inventory_slot_handle handle, const entity_handle new_item);
 void detail_remove_item(const inventory_slot_handle handle, const entity_handle removed_item);

@@ -154,7 +154,7 @@ void cosmic::delete_entity(const entity_handle handle) {
 		return;
 	}
 
-	if (const auto container = handle.find<components::container>()) {
+	if (const auto container = handle.find<invariants::container>()) {
 		drop_from_all_slots(*container, handle, [](const auto&){});
 	}
 

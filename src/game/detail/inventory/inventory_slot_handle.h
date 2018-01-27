@@ -18,8 +18,10 @@ class cosmos;
 template <bool is_const>
 class basic_inventory_slot_handle {
 	using owner_reference = maybe_const_ref_t<is_const, cosmos>;
-	using slot_reference = maybe_const_ref_t<is_const, inventory_slot>;
-	using slot_pointer = maybe_const_ptr_t<is_const, inventory_slot>;
+
+	/* Inventory slots are invariants, thus always const. */
+	using slot_reference = const inventory_slot&;
+	using slot_pointer = const inventory_slot*;
 
 	using entity_handle_type = basic_entity_handle<is_const>;
 
@@ -88,7 +90,7 @@ inline typename basic_inventory_slot_handle<C>::owner_reference basic_inventory_
 
 template <bool C>
 inline typename basic_inventory_slot_handle<C>::slot_pointer basic_inventory_slot_handle<C>::operator->() const {
-	return &get_container().template get<components::container>().slots.at(raw_id.type);
+	return &get_container().template get<invariants::container>().slots.at(raw_id.type);
 }
 
 template <bool C>
@@ -107,7 +109,7 @@ inline bool basic_inventory_slot_handle<C>::alive() const {
 		return false;
 	}
 
-	const auto* const container = get_container().template find<components::container>();
+	const auto* const container = get_container().template find<invariants::container>();
 
 	return container && container->slots.find(raw_id.type) != container->slots.end();
 }

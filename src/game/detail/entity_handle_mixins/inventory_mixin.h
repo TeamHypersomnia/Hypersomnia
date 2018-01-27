@@ -61,8 +61,8 @@ private:
 		const auto this_item_handle = *static_cast<const entity_handle_type*>(this);
 		auto& cosm = this_item_handle.get_cosmos();
 
-		if (this_item_handle.template has<components::container>()) {
-			for (const auto& s : this_item_handle.template get<components::container>().slots) {
+		if (const auto container = this_item_handle.template find<invariants::container>()) {
+			for (const auto& s : container->slots) {
 				const auto this_slot_id = inventory_slot_id(s.first, this_item_handle.get_id());
 				const auto slot_callback_result = slot_callback(cosm[this_slot_id]);
 

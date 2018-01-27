@@ -35,7 +35,7 @@ std::wstring get_bbcoded_entity_properties(const const_entity_handle id) {
 	const auto* const gun = id.find<components::gun>();
 	const auto* const gun_def = id.find<invariants::gun>();
 	const auto* const damage = id.find<components::missile>();
-	const auto* const container = id.find<components::container>();
+	const auto* const container = id.find<invariants::container>();
 	const auto* const item = id.find<components::item>();
 
 	if (item) {

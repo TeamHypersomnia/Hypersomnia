@@ -403,7 +403,7 @@ void item_button::draw_proc(
 	}
 
 	if (f.draw_container_opened_mark) {
-		if (item.find<components::container>()) {
+		if (item.find<invariants::container>()) {
 			assets::necessary_image_id container_icon;
 
 			if (this_id->is_container_open) {

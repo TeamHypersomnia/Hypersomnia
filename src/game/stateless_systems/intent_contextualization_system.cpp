@@ -82,7 +82,7 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(con
 
 		const auto subject = cosmos[it.subject];
 
-		if (subject.has<components::container>()) {
+		if (subject.find<invariants::container>()) {
 			int hand_index = -1;
 
 			if (it.intent == game_intent_type::CROSSHAIR_PRIMARY_ACTION) {
@@ -140,7 +140,7 @@ void intent_contextualization_system::contextualize_movement_intents(const logic
 		const auto subject = cosmos[e.subject];
 
 		const auto* const maybe_driver = subject.find<components::driver>();
-		const auto* const maybe_container = subject.find<components::container>();
+		const auto* const maybe_container = subject.find<invariants::container>();
 
 		if (maybe_driver && cosmos[maybe_driver->owned_vehicle].alive()) {
 			if (e.intent == game_intent_type::MOVE_FORWARD

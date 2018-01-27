@@ -18,6 +18,7 @@ namespace invariants {
 	struct flags;
 	struct fixtures;
 	struct rigid_body;
+	struct container;
 }
 
 namespace components {
@@ -32,7 +33,6 @@ namespace components {
 	struct car;
 	struct driver;
 	struct specific_colliders_connection;
-	struct container;
 	struct item;
 	struct force_joint;
 	struct item_slot_transfers;
@@ -73,7 +73,6 @@ using component_list_t = List<
 	components::transform,
 	components::car,
 	components::driver,
-	components::container,
 	components::item,
 	components::force_joint,
 	components::item_slot_transfers,
@@ -109,7 +108,8 @@ using invariant_list_t = List<
 	invariants::flags,
 	invariants::interpolation,
 	invariants::fixtures,
-	invariants::rigid_body
+	invariants::rigid_body,
+	invariants::container
 >;
 
 template <class... Types>

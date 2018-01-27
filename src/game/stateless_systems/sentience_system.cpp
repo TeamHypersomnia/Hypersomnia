@@ -272,10 +272,10 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 	}
 
 	if (knockout) {
-		const auto* const container = subject.find<components::container>();
+		const auto* const container = subject.find<invariants::container>();
 
 		if (container) {
-			const auto& container = subject.get<components::container>();
+			const auto& container = subject.get<invariants::container>();
 			drop_from_all_slots(container, subject, step);
 		}
 

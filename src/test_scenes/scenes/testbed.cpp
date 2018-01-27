@@ -163,7 +163,7 @@ namespace test_scenes {
 				i == 4 || i == 5 || i == 6
 				) {
 				const auto rifle = prefabs::create_sample_rifle(step, vec2(100, -500),
-					prefabs::create_sample_magazine(step, vec2(100, -650), "0.4",
+					prefabs::create_sample_magazine(step, vec2(100, -650),
 						(i == 5 ? prefabs::create_cyan_charge : prefabs::create_cyan_charge)(step, vec2(0, 0), 30)));
 
 				
@@ -178,14 +178,14 @@ namespace test_scenes {
 				) {
 				if (i == 9) {
 					const auto rifle = prefabs::create_sample_rifle(step, vec2(100, -500),
-						prefabs::create_sample_magazine(step, vec2(100, -650), "3.4",
+						prefabs::create_sample_magazine(step, vec2(100, -650),
 							prefabs::create_cyan_charge(step, vec2(0, 0), 300)));
 
 					perform_transfer({ rifle, new_character.get_primary_hand() }, step);
 				}
 				else {
 					const auto rifle = (i == 7 ? prefabs::create_sample_rifle : prefabs::create_sample_rifle)(step, vec2(100, -500),
-						prefabs::create_sample_magazine(step, vec2(100, -650), "3.4",
+						prefabs::create_sample_magazine(step, vec2(100, -650),
 							prefabs::create_cyan_charge(step, vec2(0, 0), 300)));
 
 					perform_transfer({ rifle, new_character.get_primary_hand() }, step);
@@ -538,33 +538,32 @@ namespace test_scenes {
 			}
 		}
 
-		const bool many_charges = false;
-
 		prefabs::create_kek9(step, vec2(-800, -200),
-			prefabs::create_sample_magazine(step, vec2(100, -650), many_charges ? "10" : "0.3",
-				prefabs::create_cyan_charge(step, vec2(0, 0), many_charges ? 1000 : 30)));
+			prefabs::create_sample_magazine(step, vec2(100, -650),
+				prefabs::create_cyan_charge(step, vec2(0, 0),  30)));
 
 		const auto rifle = prefabs::create_sample_rifle(step, vec2(100, -500),
-			prefabs::create_sample_magazine(step, vec2(100, -650), many_charges ? "10" : "0.3",
-				prefabs::create_cyan_charge(step, vec2(0, 0), many_charges ? 1000 : 30)));
+			prefabs::create_sample_magazine(step, vec2(100, -650),
+				prefabs::create_cyan_charge(step, vec2(0, 0),  30)));
 
 		const auto rifle2 = prefabs::create_sample_rifle(step, vec2(100, -500 + 50),
-			prefabs::create_sample_magazine(step, vec2(100, -650), true ? "10" : "0.3",
+			prefabs::create_sample_magazine(step, vec2(100, -650),
 				prefabs::create_cyan_charge(step, vec2(0, 0), true ? 1000 : 30)));
 
 		const auto amplifier = prefabs::create_amplifier_arm(step, vec2(-300, -500 + 50));
 
-		prefabs::create_sample_rifle(step, vec2(100, -500 + 100), prefabs::create_sample_magazine(step, vec2(100, -650), many_charges ? "10" : "0.3",
-			prefabs::create_cyan_charge(step, vec2(0, 0), many_charges ? 1000 : 30)));
+		prefabs::create_sample_rifle(step, vec2(100, -500 + 100), prefabs::create_sample_magazine(step, vec2(100, -650),
+			prefabs::create_cyan_charge(step, vec2(0, 0),  30)));
 
 		prefabs::create_sample_rifle(step, vec2(300, -500 + 50));
 
 		const auto pis2 = prefabs::create_sample_rifle(step, vec2(300, 50),
-			prefabs::create_sample_magazine(step, vec2(100, -650), "0.4",
+			prefabs::create_sample_magazine(step, vec2(100, -650),
 				prefabs::create_cyan_charge(step, vec2(0, 0), 40)));
 
 		const auto submachine = prefabs::create_sample_rifle(step, vec2(500, -500 + 50),
-			prefabs::create_sample_magazine(step, vec2(100 - 50, -650), many_charges ? "10" : "0.5", prefabs::create_cyan_charge(step, vec2(0, 0), many_charges ? 500 : 50)));
+			prefabs::create_sample_magazine(step, vec2(100 - 50, -650),
+				prefabs::create_cyan_charge(step, vec2(0, 0),  50)));
 
 		prefabs::create_cyan_urban_machete(step, vec2(100, 100));
 		const auto second_machete = prefabs::create_cyan_urban_machete(step, vec2(0, 300));

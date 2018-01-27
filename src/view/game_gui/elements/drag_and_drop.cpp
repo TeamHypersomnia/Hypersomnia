@@ -175,7 +175,7 @@ std::optional<drag_and_drop_result> prepare_drag_and_drop_result(
 			else if (target_item != nullptr && target_item != dragged_item) {
 				const auto target_item_handle = cosmos[target_item.get_location().item_id];
 
-				if (target_item_handle.template has<components::container>()) {
+				if (target_item_handle.template find<invariants::container>()) {
 					const auto compatible_slot = get_slot_with_compatible_category(dragged_item_handle, target_item_handle);
 
 					if (compatible_slot != slot_function::INVALID) {

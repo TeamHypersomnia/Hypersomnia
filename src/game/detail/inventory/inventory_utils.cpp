@@ -144,7 +144,7 @@ item_transfer_result query_transfer_result(
 }
 
 slot_function get_slot_with_compatible_category(const const_entity_handle item, const const_entity_handle container_entity) {
-	const auto* const container = container_entity.find<components::container>();
+	const auto* const container = container_entity.find<invariants::container>();
 
 	if (container) {
 		if (container_entity[slot_function::ITEM_DEPOSIT].alive()) {
@@ -313,10 +313,10 @@ unsigned calculate_space_occupied_with_children(const const_entity_handle item) 
 	auto space_occupied = item.get<components::item>().get_space_occupied();
 	const auto& cosm = item.get_cosmos();
 
-	if (item.find<components::container>()) {
+	if (item.find<invariants::container>()) {
 		ensure(item.get<components::item>().charges == 1);
 
-		for (const auto& slot : item.get<components::container>().slots) {
+		for (const auto& slot : item.get<invariants::container>().slots) {
 			for (const auto entity_in_slot : get_items_inside(item, slot.first)) {
 				space_occupied += calculate_space_occupied_with_children(item.get_cosmos()[entity_in_slot]);
 			}

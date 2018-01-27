@@ -32,6 +32,50 @@ namespace test_types {
 	void populate_gun_types(const all_logical_assets& logicals, entity_types& types) {
 		/* Types for bullets etc. */
 
+		auto make_default_gun_container = [](entity_type& meta, const float mag_rotation = -90.f, const bool magazine_hidden = false){
+			invariants::container container; 
+
+			{
+				inventory_slot slot_def;
+
+				slot_def.physical_behaviour = 
+					magazine_hidden ? 
+					slot_physical_behaviour::DEACTIVATE_BODIES 
+					: slot_physical_behaviour::CONNECT_AS_FIXTURE_OF_BODY
+				;
+
+				if (magazine_hidden) {
+					slot_def.space_available = 1000000;
+				}
+
+				slot_def.always_allow_exactly_one_item = true;
+				slot_def.category_allowed = item_category::MAGAZINE;
+
+				container.slots[slot_function::GUN_DETACHABLE_MAGAZINE] = slot_def;
+			}
+
+			{
+				inventory_slot slot_def;
+				slot_def.physical_behaviour = slot_physical_behaviour::DEACTIVATE_BODIES;
+				slot_def.always_allow_exactly_one_item = true;
+				slot_def.category_allowed = item_category::SHOT_CHARGE;
+				slot_def.space_available = to_space_units("0.01");
+
+				container.slots[slot_function::GUN_CHAMBER] = slot_def;
+			}
+
+			{
+				inventory_slot slot_def;
+				slot_def.physical_behaviour = slot_physical_behaviour::CONNECT_AS_FIXTURE_OF_BODY;
+				slot_def.always_allow_exactly_one_item = true;
+				slot_def.category_allowed = item_category::MUZZLE_ATTACHMENT;
+
+				container.slots[slot_function::GUN_MUZZLE] = slot_def;
+			}
+
+			meta.set(container);
+		};
+	
 		{
 			auto& meta = get_test_type(types, test_scene_type::CYAN_ROUND_DEFINITION);
 
@@ -112,6 +156,15 @@ namespace test_types {
 			test_types::add_sprite(meta, logicals, assets::game_image_id::SAMPLE_MAGAZINE, white);
 			meta.add_shape_invariant_from_renderable(logicals);
 			test_types::add_see_through_dynamic_body(meta);
+
+			invariants::container container; 
+
+			inventory_slot charge_deposit_def;
+			charge_deposit_def.category_allowed = item_category::SHOT_CHARGE;
+			charge_deposit_def.space_available = to_space_units("1");
+
+			container.slots[slot_function::ITEM_DEPOSIT] = charge_deposit_def;
+			meta.set(container);
 		}
 
 		{
@@ -232,6 +285,7 @@ namespace test_types {
 			test_types::add_sprite(meta, logicals, assets::game_image_id::ASSAULT_RIFLE, white);
 			meta.add_shape_invariant_from_renderable(logicals);
 			test_types::add_see_through_dynamic_body(meta);
+			make_default_gun_container(meta);
 		}
 
 		{
@@ -273,6 +327,7 @@ namespace test_types {
 			test_types::add_sprite(meta, logicals, assets::game_image_id::KEK9, white);
 			meta.add_shape_invariant_from_renderable(logicals);
 			test_types::add_see_through_dynamic_body(meta);
+			make_default_gun_container(meta, 0.f, true);
 		}
 
 		{
@@ -346,7 +401,7 @@ namespace prefabs {
 
 		auto weapon = create_test_scene_entity(cosmos, test_scene_type::KEK9);
 
-		ingredients::add_default_gun_container(step, weapon, 0.f, true);
+		ingredients::add_default_gun_container(step, weapon);
 
 		auto& gun = weapon.get<components::gun>();
 		auto& gun_def = weapon.get<invariants::gun>();
@@ -418,55 +473,14 @@ namespace prefabs {
 }
 
 namespace ingredients {
-	void add_default_gun_container(const logic_step step, entity_handle e, const float mag_rotation, const bool magazine_hidden) {
+	void add_default_gun_container(const logic_step step, entity_handle e) {
 		auto& item = make_item(e);
-		auto& container = e += components::container();
 		item.space_occupied_per_charge = to_space_units("3.5");
-
-		const auto bbox = e.get_aabb(components::transform()).get_size();
-
-		{
-			inventory_slot slot_def;
-			
-			slot_def.physical_behaviour = 
-				magazine_hidden ? 
-				slot_physical_behaviour::DEACTIVATE_BODIES 
-				: slot_physical_behaviour::CONNECT_AS_FIXTURE_OF_BODY
-			;
-
-			if (magazine_hidden) {
-				slot_def.space_available = 1000000;
-			}
-
-			slot_def.always_allow_exactly_one_item = true;
-			slot_def.category_allowed = item_category::MAGAZINE;
-
-			container.slots[slot_function::GUN_DETACHABLE_MAGAZINE] = slot_def;
-		}
-
-		{
-			inventory_slot slot_def;
-			slot_def.physical_behaviour = slot_physical_behaviour::DEACTIVATE_BODIES;
-			slot_def.always_allow_exactly_one_item = true;
-			slot_def.category_allowed = item_category::SHOT_CHARGE;
-			slot_def.space_available = to_space_units("0.01");
-
-			container.slots[slot_function::GUN_CHAMBER] = slot_def;
-		}
-
-		{
-			inventory_slot slot_def;
-			slot_def.physical_behaviour = slot_physical_behaviour::CONNECT_AS_FIXTURE_OF_BODY;
-			slot_def.always_allow_exactly_one_item = true;
-			slot_def.category_allowed = item_category::MUZZLE_ATTACHMENT;
-
-			container.slots[slot_function::GUN_MUZZLE] = slot_def;
-		}
 	}
 }
 
 namespace prefabs {
-	entity_handle create_sample_magazine(const logic_step step, components::transform pos, std::string space, entity_id charge_inside_id) {
+	entity_handle create_sample_magazine(const logic_step step, components::transform pos, entity_id charge_inside_id) {
 		auto& cosmos = step.get_cosmos();
 		auto charge_inside = cosmos[charge_inside_id];
 
@@ -474,19 +488,11 @@ namespace prefabs {
 
 		auto sample_magazine = create_test_scene_entity(cosmos, test_scene_type::SAMPLE_MAGAZINE);
 		
-
 		{
 			auto& item = ingredients::make_item(sample_magazine);
-			auto& container = sample_magazine += components::container();
 
 			item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
 			item.space_occupied_per_charge = to_space_units("0.5");
-
-			inventory_slot charge_deposit_def;
-			charge_deposit_def.category_allowed = item_category::SHOT_CHARGE;
-			charge_deposit_def.space_available = to_space_units(space);
-
-			container.slots[slot_function::ITEM_DEPOSIT] = charge_deposit_def;
 		}
 
 		sample_magazine.set_logic_transform(step, pos);

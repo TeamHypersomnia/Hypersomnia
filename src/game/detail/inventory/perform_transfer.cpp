@@ -15,7 +15,7 @@
 #include "augs/templates/container_templates.h"
 #include "game/transcendental/cosmos.h"
 
-void drop_from_all_slots(const components::container& container, const entity_handle handle, const logic_step step) {
+void drop_from_all_slots(const invariants::container& container, const entity_handle handle, const logic_step step) {
 	drop_from_all_slots(container, handle, [step](const auto& result) { result.notify(step); });
 }
 

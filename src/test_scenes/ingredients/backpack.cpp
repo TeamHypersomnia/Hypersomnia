@@ -13,13 +13,7 @@
 
 namespace ingredients {
 	void add_backpack_container(entity_handle e) {
-		auto& container = e += components::container();
 		auto& item = make_item(e);
-		
-		inventory_slot slot_def;
-		slot_def.space_available = to_space_units("20");
-
-		container.slots[slot_function::ITEM_DEPOSIT] = slot_def;
 
 		item.dual_wield_accuracy_loss_multiplier = 1;
 		item.dual_wield_accuracy_loss_percentage = 50;
@@ -41,6 +35,13 @@ namespace test_types {
 			test_types::add_sprite(meta, logicals, assets::game_image_id::BACKPACK, white);
 			meta.add_shape_invariant_from_renderable(logicals);
 			test_types::add_see_through_dynamic_body(meta);
+
+			invariants::container container; 
+			inventory_slot slot_def;
+			slot_def.space_available = to_space_units("20");
+
+			container.slots[slot_function::ITEM_DEPOSIT] = slot_def;
+			meta.set(container);
 		}
 	}
 }
