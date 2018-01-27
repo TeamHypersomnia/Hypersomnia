@@ -110,41 +110,43 @@ void sound_system::update_effects_from_messages(
 	const auto& events = step.get_queue<messages::start_sound_effect>();
 
 	for (auto& e : events) {
-		short_sounds.emplace_back();
-		auto& cache = short_sounds.back();
+		const auto effect_id = e.effect.id;
 
-		cache.original_effect = e.effect;
-		cache.original_start = e.start;
+		if (const auto source_effect = mapped_or_nullptr(manager, effect_id)) {
+			short_sounds.emplace_back();
+			auto& cache = short_sounds.back();
 
-		cache.positioning = e.start.positioning;
-		cache.previous_transform = find_transform(e.start.positioning, cosmos, interp);
+			cache.original_effect = e.effect;
+			cache.original_start = e.start;
 
-		auto& source = cache.source;
+			cache.positioning = e.start.positioning;
+			cache.previous_transform = find_transform(e.start.positioning, cosmos, interp);
 
-		{
-			const auto effect_id = e.effect.id;
+			auto& source = cache.source;
 
-			const auto& variations = manager.at(effect_id).variations;
-			const auto chosen_variation = e.start.variation_number % variations.size();
-			const auto& buffer = variations[chosen_variation];
+			{
+				const auto& variations = source_effect->variations;
+				const auto chosen_variation = e.start.variation_number % variations.size();
+				const auto& buffer = variations[chosen_variation];
 
-			const bool is_direct_listener = listening_character == e.start.direct_listener;
+				const bool is_direct_listener = listening_character == e.start.direct_listener;
 
-			const auto& requested_buf = 
-				is_direct_listener ? buffer.stereo_or_mono() : buffer.mono_or_stereo()
-			;
+				const auto& requested_buf = 
+					is_direct_listener ? buffer.stereo_or_mono() : buffer.mono_or_stereo()
+				;
 
-			source.bind_buffer(requested_buf);
-			source.set_direct_channels(is_direct_listener);
+				source.bind_buffer(requested_buf);
+				source.set_direct_channels(is_direct_listener);
+			}
+
+			source.play();
+
+			const auto& modifier = e.effect.modifier;
+
+			source.set_max_distance(si, modifier.max_distance);
+			source.set_reference_distance(si, modifier.reference_distance);
+			source.set_looping(modifier.repetitions == -1);
 		}
-
-		source.play();
-
-		const auto& modifier = e.effect.modifier;
-
-		source.set_max_distance(si, modifier.max_distance);
-		source.set_reference_distance(si, modifier.reference_distance);
-		source.set_looping(modifier.repetitions == -1);
 	}
 }
 
