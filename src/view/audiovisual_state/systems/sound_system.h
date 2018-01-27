@@ -27,7 +27,7 @@ class sound_system {
 		augs::sound_source source;
 		absolute_or_local positioning;
 
-		sound_effect_input original_input;
+		sound_effect_input original_effect;
 		sound_effect_start_input original_start;
 
 		/* For calculating sound's velocity */

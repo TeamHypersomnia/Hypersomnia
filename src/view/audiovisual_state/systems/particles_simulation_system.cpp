@@ -68,13 +68,13 @@ void particles_simulation_system::update_effects_from_messages(
 				}
 
 				if (const auto m = e.match_effect_id) {
-					if (*m != c.original_input.id) {
+					if (*m != c.original_effect.id) {
 						return false;
 					}	
 				}
 
 #if MORE_LOGS
-				if (c.original_input.id == assets::particle_effect_id::HEALTH_DAMAGE_SPARKLES) {
+				if (c.original_effect.id == assets::particle_effect_id::HEALTH_DAMAGE_SPARKLES) {
 					LOG("Removing health sparkles");
 				}
 #endif
@@ -143,7 +143,7 @@ void particles_simulation_system::update_effects_from_messages(
 
 				orbital_cache c;
 				c.chasing = chasing;
-				c.original_input = effect;
+				c.original_effect = effect;
 				orbital_emissions.push_back(c);
 
 #if MORE_LOGS

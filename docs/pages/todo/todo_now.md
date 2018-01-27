@@ -25,11 +25,6 @@ summary: Just a hidden scratchpad.
 	- This is really important in the face of bugs.
 	- Or just get rid of test scene setup for now and let it by default launch a scene in editor that records inputs
 
-renaming: 
-	input->effect
-	absolute_or_local
-	chasing -> positioning
- 
 - invariantizing inventory
 
 - Later, bullet trace sounds should as be calculated statelessly

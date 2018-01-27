@@ -35,7 +35,7 @@ void sound_system::clear_sources_playing(const assets::sound_buffer_id id) {
 	});
 	
 	erase_if(short_sounds, [id](short_sound_cache& it) {
-		return id == it.original_input.id;
+		return id == it.original_effect.id;
 	});
 }
 
@@ -87,12 +87,12 @@ void sound_system::update_effects_from_messages(
 				}
 
 				if (const auto m = e.match_effect_id) {
-					if (*m != c.original_input.id) {
+					if (*m != c.original_effect.id) {
 						return false;
 					}	
 				}
 
-				if (const auto& effect = c.original_input;
+				if (const auto& effect = c.original_effect;
 					effect.modifier.fade_on_exit
 				) {
 					auto& source = c.source;
@@ -113,7 +113,7 @@ void sound_system::update_effects_from_messages(
 		short_sounds.emplace_back();
 		auto& cache = short_sounds.back();
 
-		cache.original_input = e.effect;
+		cache.original_effect = e.effect;
 		cache.original_start = e.start;
 
 		cache.positioning = e.start.positioning;
@@ -198,7 +198,7 @@ void sound_system::update_sound_properties(
 			}
 		}
 
-		const auto& input = cache.original_input;
+		const auto& input = cache.original_effect;
 
 		source.set_pitch(input.modifier.pitch);
 		source.set_gain(input.modifier.gain * settings.sound_effects);

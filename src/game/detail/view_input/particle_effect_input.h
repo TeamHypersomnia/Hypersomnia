@@ -17,7 +17,7 @@ struct particle_effect_modifier {
 };	
 
 struct particle_effect_start_input {
-	std::variant<components::transform, orbital_chasing> positioning;
+	absolute_or_local positioning;
 	entity_id homing_target;
 
 	static particle_effect_start_input fire_and_forget(const components::transform where) {
