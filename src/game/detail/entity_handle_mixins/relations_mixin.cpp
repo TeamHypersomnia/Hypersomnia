@@ -51,12 +51,6 @@ maybe_const_ptr_t<C, child_entity_id> basic_relations_mixin<C, D>::get_id_ptr(co
 			}
 			break;
 
-		case child_entity_name::CATRIDGE_BULLET:
-			if (const auto catridge = self.template find<components::catridge>()) {
-				result = &catridge->round;
-			}
-			break;
-
 		default:
 			LOG("Random access abstraction for this child_entity_name is not implemented!");
 			ensure(false);

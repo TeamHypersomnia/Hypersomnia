@@ -7,7 +7,7 @@ namespace components {
 	struct catridge {
 		// GEN INTROSPECTOR struct components::catridge
 		entity_type_id shell_flavour;
-		child_entity_id round;
+		entity_type_id round_flavour;
 
 		particle_effect_input shell_trace_particles;
 		// END GEN INTROSPECTOR

@@ -544,21 +544,18 @@ namespace prefabs {
 	entity_handle create_cyan_charge(const logic_step step, vec2 pos, int charges) {
 		auto& cosmos = step.get_cosmos();
 		const auto cyan_charge = create_test_scene_entity(cosmos, test_scene_type::CYAN_CHARGE);
-		const auto round_definition = create_test_scene_entity(cosmos, test_scene_type::CYAN_ROUND_DEFINITION);
 
 		const auto& metas = step.get_logical_assets();
 
 		{
 			auto& cat = cyan_charge += components::catridge();
 
-			auto& sender = round_definition += components::sender();
 			cat.shell_trace_particles.id = assets::particle_effect_id::CONCENTRATED_WANDERING_PIXELS;
 			cat.shell_trace_particles.modifier.colorize = cyan;
+
 			cat.shell_flavour = to_entity_type_id(test_scene_type::CYAN_SHELL_DEFINITION);
+			cat.round_flavour = to_entity_type_id(test_scene_type::CYAN_ROUND_DEFINITION);
 		}
-
-
-		cyan_charge.map_child_entity(child_entity_name::CATRIDGE_BULLET, round_definition);
 
 		cyan_charge.set_logic_transform(step, pos);
 		cyan_charge.add_standard_components(step);

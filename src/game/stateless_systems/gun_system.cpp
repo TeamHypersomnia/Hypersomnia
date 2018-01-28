@@ -243,48 +243,49 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 						int charges = single_bullet_or_pellet_stack.get<components::item>().charges;
 
 						while (charges--) {
-							const auto round_entity = cosmic::clone_entity(single_bullet_or_pellet_stack[child_entity_name::CATRIDGE_BULLET]);
+							if (const auto round_flavour = single_bullet_or_pellet_stack.get<components::catridge>().round_flavour) {
+								const auto round_entity = cosmic::create_entity(cosmos, round_flavour);
+								round_entity.add_standard_components(step);
 
-							auto& sender = round_entity.get<components::sender>();
-							sender.set(gun_entity);
+								auto& sender = round_entity.get<components::sender>();
+								sender.set(gun_entity);
 
-							{
-								auto& missile = round_entity.get<components::missile>();
-								missile.power_multiplier_of_sender = gun_def.damage_multiplier;
+								{
+									auto& missile = round_entity.get<components::missile>();
+									missile.power_multiplier_of_sender = gun_def.damage_multiplier;
+								}
+
+								const auto& missile_def = round_entity.get<invariants::missile>();
+								total_recoil_scale *= missile_def.recoil_multiplier;
+
+								if (round_entity.has<components::explosive>()) {
+									auto& explosive = round_entity.get<components::explosive>();
+									explosive.explosion.damage *= gun_def.damage_multiplier;
+									explosive.explosion.impact_force *= gun_def.damage_multiplier;
+								}
+
+								round_entity.set_logic_transform(step, muzzle_transform);
+
+								response.spawned_rounds.push_back(round_entity);
+
+								{
+									auto rng = cosmos.get_rng_for(round_entity);
+
+									const auto missile_velocity = 
+										vec2::from_degrees(muzzle_transform.rotation)
+										* missile_def.muzzle_velocity_mult
+										* rng.randval(gun_def.muzzle_velocity)
+									;
+
+									round_entity.get<components::rigid_body>().set_velocity(missile_velocity);
+								}
+
+								messages::interpolation_correction_request request;
+								request.subject = round_entity;
+								request.set_previous_transform_value = muzzle_transform;
+
+								step.post_message(request);
 							}
-							
-							const auto& missile_def = round_entity.get<invariants::missile>();
-							total_recoil_scale *= missile_def.recoil_multiplier;
-
-							if (round_entity.has<components::explosive>()) {
-								auto& explosive = round_entity.get<components::explosive>();
-								explosive.explosion.damage *= gun_def.damage_multiplier;
-								explosive.explosion.impact_force *= gun_def.damage_multiplier;
-							}
-
-							round_entity.set_logic_transform(step, muzzle_transform);
-							
-							response.spawned_rounds.push_back(round_entity);
-
-							round_entity.add_standard_components(step);
-
-							{
-								auto rng = cosmos.get_rng_for(round_entity);
-
-								const auto missile_velocity = 
-									vec2::from_degrees(muzzle_transform.rotation)
-									* missile_def.muzzle_velocity_mult
-									* rng.randval(gun_def.muzzle_velocity)
-								;
-
-								round_entity.get<components::rigid_body>().set_velocity(missile_velocity);
-							}
-
-							messages::interpolation_correction_request request;
-							request.subject = round_entity;
-							request.set_previous_transform_value = muzzle_transform;
-
-							step.post_message(request);
 						}
 
 						if (const auto shell_flavour = single_bullet_or_pellet_stack.get<components::catridge>().shell_flavour) {
