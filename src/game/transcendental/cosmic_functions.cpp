@@ -50,34 +50,59 @@ void cosmic::reinfer_solvable(cosmos& cosm) {
 	reinfer_all_entities(cosm);
 }
 
-entity_handle cosmic::create_entity(cosmos& cosm, const entity_type_id type_id) {
+entity_handle cosmic::instantiate_flavour(cosmos& cosm, const entity_type_id type_id) {
+	ensure (type_id != entity_type_id());
+
 	const auto new_handle = entity_handle { cosm, cosm.get_solvable({}).allocate_next_entity() };
 
-	if (type_id != entity_type_id()) {
-		auto& solvable = cosm.get_solvable({});
+	auto& solvable = cosm.get_solvable({});
 
-		solvable.get_aggregate(new_handle.get_id()).get<components::type>(solvable).type_id = type_id;
+	solvable.get_aggregate(new_handle.get_id()).get<components::type>(solvable).type_id = type_id;
 
-		for_each_invariant_type([&](auto d) {
-			using D = decltype(d);
+	for_each_invariant_type([&](auto d) {
+		using D = decltype(d);
 
-			if constexpr(has_implied_component_v<D>) {
-				using C = typename D::implied_component;
+		if constexpr(has_implied_component_v<D>) {
+			using C = typename D::implied_component;
 
-				const auto& t = new_handle.get_type(); 
+			const auto& t = new_handle.get_type(); 
 
-				if (const auto* const def = t.find<D>()) {
-					new_handle += std::get<C>(t.initial_components);
-				}
+			if (const auto* const def = t.template find<D>()) {
+				new_handle += std::get<C>(t.initial_components);
 			}
-		});
-	}
+		}
+	});
 
 	if (const auto light = new_handle.find<invariants::light>()) {
 		new_handle.add(components::transform());
 	}
 
 	return new_handle; 
+}
+
+entity_handle cosmic::create_entity(
+	cosmos& cosm,
+   	const entity_type_id type_id,
+   	const components::transform where
+) {
+	return create_entity(
+		cosm, 
+		type_id, 
+		[where](const auto handle) {
+			handle.set_logic_transform(where);		
+		}
+	);
+}
+
+entity_handle cosmic::create_entity(
+	cosmos& cosm,
+   	const entity_type_id type_id
+) {
+	return create_entity(
+		cosm, 
+		type_id, 
+		[](const auto handle) {}
+	);
 }
 
 entity_handle cosmic::create_entity_with_specific_guid(

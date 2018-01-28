@@ -176,7 +176,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 							pe.value -= pe.calculate_damage_result(mana_needed).effective;
 
 							const auto round_entity = cosmic::create_entity(cosmos, magic_missile_flavour_id);
-							round_entity.set_logic_transform(step, muzzle_transform);
+							round_entity.set_logic_transform(muzzle_transform);
 							round_entity.add_standard_components(step);
 
 							auto& sender = round_entity.get<components::sender>();
@@ -263,7 +263,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 							const auto& missile_def = round_entity.get<invariants::missile>();
 							total_recoil += missile_def.recoil_multiplier;
 
-							round_entity.set_logic_transform(step, muzzle_transform);
+							round_entity.set_logic_transform(muzzle_transform);
 
 							response.spawned_rounds.push_back(round_entity);
 
@@ -295,7 +295,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 						shell_transform.pos += vec2(gun_def.shell_spawn_offset.pos).rotate(gun_transform.rotation, vec2());
 						shell_transform.rotation += spread_component;
 
-						shell_entity.set_logic_transform(step, shell_transform);
+						shell_entity.set_logic_transform(shell_transform);
 
 						shell_entity.get<components::rigid_body>().set_velocity(vec2::from_degrees(muzzle_transform.rotation + spread_component).set_length(rng.randval(gun_def.shell_velocity)));
 						response.spawned_shell = shell_entity;

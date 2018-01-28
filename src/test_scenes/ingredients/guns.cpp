@@ -518,7 +518,7 @@ namespace prefabs {
 
 		// add_muzzle_particles(weapon, gun, step);
 
-		weapon.set_logic_transform(step, pos);
+		weapon.set_logic_transform(pos);
 		weapon.add_standard_components(step);
 
 		gun.firing_engine_sound.id = assets::sound_buffer_id::FIREARM_ENGINE;
@@ -545,7 +545,7 @@ namespace prefabs {
 
 		// add_muzzle_particles(weapon, gun, step);
 
-		weapon.set_logic_transform(step, pos);
+		weapon.set_logic_transform(pos);
 		weapon.add_standard_components(step);
 
 		gun.firing_engine_sound.id = assets::sound_buffer_id::FIREARM_ENGINE;
@@ -565,7 +565,7 @@ namespace prefabs {
 		auto& cosmos = step.get_cosmos();
 		auto weapon = create_test_scene_entity(cosmos, test_scene_type::AMPLIFIER_ARM);
 
-		weapon.set_logic_transform(step, pos);
+		weapon.set_logic_transform(pos);
 		weapon.add_standard_components(step);
 
 		return weapon;
@@ -579,7 +579,7 @@ namespace prefabs {
 
 		auto sample_magazine = create_test_scene_entity(cosmos, test_scene_type::SAMPLE_MAGAZINE);
 
-		sample_magazine.set_logic_transform(step, pos);
+		sample_magazine.set_logic_transform(pos);
 		sample_magazine.add_standard_components(step);
 
 		if (charge_inside.alive()) {
@@ -594,7 +594,7 @@ namespace prefabs {
 		auto& cosmos = step.get_cosmos();
 		const auto cyan_charge = create_test_scene_entity(cosmos, test_scene_type::CYAN_CHARGE);
 
-		cyan_charge.set_logic_transform(step, pos);
+		cyan_charge.set_logic_transform(pos);
 		cyan_charge.add_standard_components(step);
 
 		return cyan_charge;

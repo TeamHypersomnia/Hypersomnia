@@ -97,10 +97,7 @@ vec2 basic_spatial_properties_mixin<C, D>::get_effective_velocity() const {
 }
 
 template <class D>
-void spatial_properties_mixin<false, D>::set_logic_transform(
-	const logic_step step,
-	const components::transform t
-) const {
+void spatial_properties_mixin<false, D>::set_logic_transform(const components::transform t) const {
 	const auto handle = *static_cast<const D*>(this);
 	const auto owner_body = handle.get_owner_of_colliders();
 

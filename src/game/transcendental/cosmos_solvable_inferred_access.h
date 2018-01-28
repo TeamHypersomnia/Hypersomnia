@@ -1,7 +1,6 @@
 #pragma once
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/detail/inventory/inventory_slot_handle_declaration.h"
-#include "game/transcendental/cosmic_functions.h"
 
 void detail_add_item(const inventory_slot_handle handle, const entity_handle new_item);
 void detail_unset_current_slot(const entity_handle removed_item);

@@ -270,7 +270,7 @@ namespace test_scenes {
 
 				{
 					const auto l = create_test_scene_entity(world, test_scene_type::STRONG_LAMP);
-					l.set_logic_transform(step, components::transform(light_pos));
+					l.set_logic_transform(components::transform(light_pos));
 
 					auto& light = l.get<components::light>();
 
@@ -317,14 +317,14 @@ namespace test_scenes {
 		{
 			{
 				const auto l = create_test_scene_entity(world, test_scene_type::STRONG_LAMP);
-				l.set_logic_transform(step, components::transform(vec2(164.f - 8.f + 90.f, 220)));
+				l.set_logic_transform(components::transform(vec2(164.f - 8.f + 90.f, 220)));
 				auto& light = l.get<components::light>();
 				light.color = cyan;
 				l.add_standard_components(step);
 			}
 			{
 				const auto l = create_test_scene_entity(world, test_scene_type::STRONG_LAMP);
-				l.set_logic_transform(step, components::transform(vec2(1164.f + 24.f - 90.f, 220)));
+				l.set_logic_transform(components::transform(vec2(1164.f + 24.f - 90.f, 220)));
 				auto& light = l.get<components::light>();
 				light.color = orange;
 				l.add_standard_components(step);
@@ -402,7 +402,7 @@ namespace test_scenes {
 
 			{
 				const auto l = create_test_scene_entity(world, test_scene_type::STRONG_LAMP);
-				l.set_logic_transform(step, components::transform(vec2(664.f + 24.f, -1100)));
+				l.set_logic_transform(components::transform(vec2(664.f + 24.f, -1100)));
 				auto& light = l.get<components::light>();
 				light.color = orange;
 				l.add_standard_components(step);

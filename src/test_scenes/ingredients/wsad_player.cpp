@@ -189,11 +189,11 @@ namespace prefabs {
 		const auto& metas = step.get_logical_assets();
 		const auto crosshair = create_character_crosshair(step);
 		crosshair.get<components::crosshair>().character_entity_to_chase = character;
-		crosshair.set_logic_transform(step, spawn_transform.pos);
+		crosshair.set_logic_transform(spawn_transform.pos);
 
 		ingredients::add_character(metas, character, crosshair);
 
-		character.set_logic_transform(step, spawn_transform);
+		character.set_logic_transform(spawn_transform);
 		character.add_standard_components(step);
 
 		// LOG("Character mass: %x", character.get<components::rigid_body>().get_mass());

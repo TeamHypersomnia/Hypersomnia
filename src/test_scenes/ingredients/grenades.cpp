@@ -163,7 +163,7 @@ namespace prefabs {
 		const auto& metas = step.get_logical_assets();
 		const auto grenade_entity = create_test_scene_entity(world, test_scene_type::FORCE_GRENADE);
 
-		grenade_entity.set_logic_transform(step, pos);
+		grenade_entity.set_logic_transform(pos);
 		grenade_entity.add_standard_components(step);
 
 		return grenade_entity;
@@ -174,7 +174,7 @@ namespace prefabs {
 		const auto& metas = step.get_logical_assets();
 		const auto grenade_entity = create_test_scene_entity(world, test_scene_type::PED_GRENADE);
 
-		grenade_entity.set_logic_transform(step, pos);
+		grenade_entity.set_logic_transform(pos);
 		grenade_entity.add_standard_components(step);
 
 		return grenade_entity;
@@ -185,7 +185,7 @@ namespace prefabs {
 		const auto& metas = step.get_logical_assets();
 		const auto grenade_entity = create_test_scene_entity(world, test_scene_type::INTERFERENCE_GRENADE);
 		
-		grenade_entity.set_logic_transform(step, pos);
+		grenade_entity.set_logic_transform(pos);
 		grenade_entity.add_standard_components(step);
 
 		return grenade_entity;

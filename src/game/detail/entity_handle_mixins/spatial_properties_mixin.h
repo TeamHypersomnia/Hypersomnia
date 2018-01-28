@@ -119,10 +119,7 @@ class spatial_properties_mixin;
 template<class entity_handle_type>
 class spatial_properties_mixin<false, entity_handle_type> : public basic_spatial_properties_mixin<false, entity_handle_type> {
 public:
-	void set_logic_transform(
-		const logic_step step,
-		const components::transform
-	) const;
+	void set_logic_transform(const components::transform) const;
 };
 
 template<class entity_handle_type>

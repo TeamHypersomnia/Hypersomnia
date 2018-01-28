@@ -175,7 +175,7 @@ void missile_system::detonate_expired_missiles(const logic_step step) {
 
 				const auto current_velocity = it.get<components::rigid_body>().get_velocity();
 
-				it.set_logic_transform(step, { it.get_logic_transform().pos, current_velocity.degrees() });
+				it.set_logic_transform({ it.get_logic_transform().pos, current_velocity.degrees() });
 
 				if (closest_hostile.alive()) {
 					vec2 dirs[] = { current_velocity.perpendicular_cw(), -current_velocity.perpendicular_cw() };

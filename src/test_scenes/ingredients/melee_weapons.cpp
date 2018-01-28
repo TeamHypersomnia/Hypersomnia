@@ -47,7 +47,7 @@ namespace prefabs {
 		auto& melee = machete += components::melee();
 		auto& sender = machete += components::sender();
 
-		machete.set_logic_transform(step, pos);
+		machete.set_logic_transform(pos);
 		machete.add_standard_components(step);
 
 		return machete;

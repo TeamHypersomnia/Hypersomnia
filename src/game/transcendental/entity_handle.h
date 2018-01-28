@@ -233,7 +233,7 @@ public:
 		return get_cosmos().get_solvable().get_guid(raw_id);
 	}
 
-	const entity_type& get_type() const {
+	const auto& get_type() const {
 		return get<components::type>().get_type();
 	}
 

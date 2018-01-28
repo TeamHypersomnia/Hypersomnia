@@ -6,6 +6,7 @@
 #include "game/transcendental/cosmic_types.h"
 #include "game/transcendental/entity_flavour_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
+#include "game/transcendental/entity_handle.h"
 
 #include "game/messages/will_soon_be_deleted.h"
 #include "game/messages/queue_destruction.h"
@@ -25,7 +26,8 @@ class cosmic {
 	static void infer_all_entities(cosmos& cosm);
 
 	static void reinfer_solvable(cosmos&);
-	
+
+	static entity_handle instantiate_flavour(cosmos&, entity_type_id);
 public:
 	class specific_guid_creation_access {
 		friend cosmic_delta;
@@ -33,7 +35,29 @@ public:
 		specific_guid_creation_access() {}
 	};
 
-	static entity_handle create_entity(cosmos&, entity_type_id);
+	template <class P>
+	static entity_handle create_entity(
+		cosmos& cosm, 
+		const entity_type_id id,
+		P pre_inference
+	) {
+		const auto handle = instantiate_flavour(cosm, id);
+
+		pre_inference(handle);
+		infer_caches_for(handle);
+		return handle;
+	}
+
+	static entity_handle create_entity(
+		cosmos&, 
+		entity_type_id
+	);
+
+	static entity_handle create_entity(
+		cosmos&, 
+		entity_type_id,
+		components::transform where
+	);
 
 	static entity_handle create_entity_with_specific_guid(
 		specific_guid_creation_access,

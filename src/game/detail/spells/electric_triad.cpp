@@ -59,7 +59,7 @@ void electric_triad_instance::perform_logic(const spell_logic_input in) {
 		new_energy_ball_transform.rotation = 
 			(next_hostile.get_logic_transform().pos - caster_transform.pos).degrees();
 		
-		new_energy_ball.set_logic_transform(in.step, new_energy_ball_transform);
+		new_energy_ball.set_logic_transform(new_energy_ball_transform);
 
 		new_energy_ball.get<components::sender>().set(caster);
 		new_energy_ball.get<components::missile>().particular_homing_target = next_hostile;

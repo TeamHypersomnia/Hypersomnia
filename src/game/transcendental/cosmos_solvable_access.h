@@ -1,6 +1,5 @@
 #pragma once
 #include "game/transcendental/entity_handle_declaration.h"
-#include "game/transcendental/cosmic_functions.h"
 
 template <bool, class D>
 class relations_mixin;
