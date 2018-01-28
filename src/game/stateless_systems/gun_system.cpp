@@ -264,12 +264,6 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 							const auto& missile_def = round_entity.get<invariants::missile>();
 							total_recoil += missile_def.recoil_multiplier;
 
-							if (round_entity.has<components::explosive>()) {
-								auto& explosive = round_entity.get<components::explosive>();
-								explosive.explosion.damage *= gun_def.damage_multiplier;
-								explosive.explosion.impact_force *= gun_def.damage_multiplier;
-							}
-
 							round_entity.set_logic_transform(step, muzzle_transform);
 
 							response.spawned_rounds.push_back(round_entity);

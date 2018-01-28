@@ -33,7 +33,7 @@ void hand_fuse_system::detonate_fuses(const logic_step step) {
 				if (const auto when_detonates = when_unpinned.step + fuse_delay_steps;
 					now.step >= when_detonates
 				) {
-					if (const auto* const explosive = it.find<components::explosive>()) {
+					if (const auto* const explosive = it.find<invariants::explosive>()) {
 						/* Note: this assumes that an item inside a backpack returns a transform of the backpack. */
 						const auto explosion_location = it.get_logic_transform();
 						explosive->explosion.instantiate(step, explosion_location, entity_id());

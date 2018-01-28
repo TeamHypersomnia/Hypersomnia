@@ -39,7 +39,7 @@ static void detonate_if_explosive(
 	const vec2 location,
 	const const_entity_handle missile
 ) {
-	if (const auto explosive = missile.find<components::explosive>()) {
+	if (const auto explosive = missile.find<invariants::explosive>()) {
 		explosive->explosion.instantiate(step, location, entity_id());
 	}
 }

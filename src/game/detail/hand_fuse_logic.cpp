@@ -45,10 +45,10 @@ void release_or_throw_fused_object(
 		);
 	}
 	else if (!is_pressed_flag && fuse.when_unpinned.was_set()) {
-		auto* const maybe_explosive = fused_entity.find<components::explosive>();
+		const auto* const maybe_explosive = fused_entity.find<invariants::explosive>();
 
 		if (maybe_explosive != nullptr) {
-			auto& explosive = *maybe_explosive;
+			const auto& explosive = *maybe_explosive;
 
 			perform_transfer(
 				item_slot_transfer_request{ fused_entity, inventory_slot_id(), -1, false, 0.f }, 
