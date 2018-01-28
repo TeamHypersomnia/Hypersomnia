@@ -27,6 +27,7 @@ namespace invariants {
 	struct catridge;
 	struct hand_fuse;
 	struct explosive;
+	struct movement;
 }
 
 namespace components {
@@ -115,6 +116,7 @@ using invariant_list_t = List<
 	invariants::item,
 	invariants::missile,
 	invariants::sentience,
+	invariants::movement,
 	invariants::wandering_pixels,
 	invariants::catridge,
 	invariants::explosive,

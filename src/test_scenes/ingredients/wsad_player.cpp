@@ -110,6 +110,15 @@ namespace test_types {
 
 			meta.set(sentience);
 			meta.set(sentience_inst);
+
+			invariants::movement movement;
+
+			movement.input_acceleration_axes.set(1, 1);
+			movement.acceleration_length = 10000;
+			movement.braking_damping = 12.5f;
+			movement.standard_linear_damping = 20.f;
+
+			meta.set(movement);
 		}
 
 		{
@@ -142,29 +151,10 @@ namespace test_types {
 }
 
 namespace ingredients {
-	void add_character_movement(const entity_handle e) {
-		components::movement& movement = e.get<components::movement>();
-
-		movement.input_acceleration_axes.set(1, 1);
-		movement.acceleration_length = 10000;
-		
-		//movement.input_acceleration_axes.set(8000, 8000);
-		//movement.acceleration_length = -1;
-
-		movement.max_speed_for_movement_event = 1000;
-		movement.braking_damping = 12.5f;
-		
-		movement.enable_braking_damping = true;
-	}
-
-	void add_character_head_physics(const logic_step step, const entity_handle e) {
-		add_character_movement(e);
-	}
-
 	void add_character(const all_logical_assets& metas, const entity_handle e, const entity_handle crosshair_entity) {
 		auto& animation = e += components::animation();
-		auto& movement = e += components::movement();
 		auto& driver = e += components::driver();
+		auto& item_slot_transfers = e += components::item_slot_transfers();
 		
 		auto& attitude = e += components::attitude();
 		const auto processing = e += components::processing();
@@ -180,13 +170,10 @@ namespace ingredients {
 
 		driver.density_multiplier_while_driving = 0.02f;
 
-		movement.standard_linear_damping = 20.f;
 		// driver.linear_damping_while_driving = 4.f;
 
 		e.map_child_entity(child_entity_name::CHARACTER_CROSSHAIR, crosshair_entity);
 		crosshair_entity.make_as_child_of(e);
-
-		add_character_movement(e);
 	}
 }
 
@@ -207,10 +194,6 @@ namespace prefabs {
 		crosshair.set_logic_transform(step, spawn_transform.pos);
 
 		ingredients::add_character(metas, character, crosshair);
-		
-		ingredients::add_character_head_physics(step, character);
-
-		ingredients::add_character_head_inventory(step, character);
 
 		character.set_logic_transform(step, spawn_transform);
 		character.add_standard_components(step);

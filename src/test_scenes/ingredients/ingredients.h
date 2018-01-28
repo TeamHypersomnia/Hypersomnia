@@ -18,7 +18,6 @@ namespace components {
 }
 
 namespace ingredients {
-	void add_character_head_physics(const logic_step, entity_handle);
 	void add_character(const logic_step, entity_handle, entity_handle crosshair_entity);
 
 	void add_character_head_inventory(const logic_step, entity_handle);

@@ -118,7 +118,7 @@ bool driver_system::change_car_ownership(
 
 	const auto maybe_rigid_body = driver_entity.find<components::rigid_body>();
 	const bool has_physics = maybe_rigid_body != nullptr;
-	auto* const maybe_movement = driver_entity.find<components::movement>();
+	auto* const movement = driver_entity.find<components::movement>();
 
 	if (const bool new_ownership = car_entity.alive()) {
 		auto& car = car_entity.get<components::car>();
@@ -141,10 +141,11 @@ bool driver_system::change_car_ownership(
 		force_joint.activated = true;
 #endif
 
-		if (maybe_movement) {
-			maybe_movement->reset_movement_flags();
-			maybe_movement->enable_braking_damping = false;
-			maybe_movement->enable_animation = false;
+		if (movement) {
+			movement->reset_movement_flags();
+#if TODO
+			movement->enable_braking_damping = false;
+#endif
 		}
 
 		if (has_physics) {
@@ -170,15 +171,16 @@ bool driver_system::change_car_ownership(
 		force_joint.activated = false;
 #endif
 
-		if (maybe_movement) {
-			maybe_movement->reset_movement_flags();
-			maybe_movement->enable_braking_damping = true;
-			maybe_movement->enable_animation = true;
+		if (movement) {
+			movement->reset_movement_flags();
+#if TODO
+			movement->enable_braking_damping = true;
+#endif
 
-			maybe_movement->moving_left = car.turning_left;
-			maybe_movement->moving_right = car.turning_right;
-			maybe_movement->moving_forward = car.accelerating;
-			maybe_movement->moving_backward = car.decelerating;
+			movement->moving_left = car.turning_left;
+			movement->moving_right = car.turning_right;
+			movement->moving_forward = car.accelerating;
+			movement->moving_backward = car.decelerating;
 		}
 		
 		car.reset_movement_flags();

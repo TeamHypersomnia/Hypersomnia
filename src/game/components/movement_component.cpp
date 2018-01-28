@@ -55,10 +55,12 @@ namespace components {
 		if (d.y < 0) moving_forward = true;
 	}
 
-	vec2 movement::get_force_requested_by_input() const {
+	vec2 movement::get_force_requested_by_input(const invariants::movement& def) const {
+		const auto axes = def.input_acceleration_axes;
+
 		return {
-			moving_right * input_acceleration_axes.x - moving_left * input_acceleration_axes.x,
-			moving_backward * input_acceleration_axes.y - moving_forward * input_acceleration_axes.y
+			moving_right * axes.x - moving_left * axes.x,
+			moving_backward * axes.y - moving_forward * axes.y
 		};
 	}
 	

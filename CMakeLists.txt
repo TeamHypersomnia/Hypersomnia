@@ -243,7 +243,6 @@ set(HYPERSOMNIA_TEST_SCENES_CPPS
 	"src/test_scenes/ingredients/backpack.cpp"
 	"src/test_scenes/ingredients/box_physics.cpp"
 	"src/test_scenes/ingredients/car.cpp"
-	"src/test_scenes/ingredients/character_inventory.cpp"
 	"src/test_scenes/ingredients/guns.cpp"
 	"src/test_scenes/ingredients/ingredients.cpp"
 	"src/test_scenes/ingredients/melee_weapons.cpp"

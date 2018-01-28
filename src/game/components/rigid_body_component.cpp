@@ -107,33 +107,35 @@ template <bool C>
 damping_info basic_physics_synchronizer<C>::calculate_damping_info(const invariants::rigid_body& def) const {
 	damping_info damping = def.damping;
 
-	if (const auto* const maybe_movement = handle.template find<components::movement>()) {
-		const auto& movement = *maybe_movement; /* Convenience */
+	if (const auto* const movement = handle.template find<components::movement>()) {
+		const auto& movement_def = handle.template get<invariants::movement>();
 
-		const bool is_inert = movement.make_inert_for_ms > 0.f;
+		const bool is_inert = movement->make_inert_for_ms > 0.f;
 
 		if (is_inert) {
 			damping.linear = 2;
 		}
 		else {
-			damping.linear = movement.standard_linear_damping;
+			damping.linear = movement_def.standard_linear_damping;
 		}
 
-		const auto requested_by_input = movement.get_force_requested_by_input();
+		const auto requested_by_input = movement->get_force_requested_by_input(movement_def);
 
 		if (requested_by_input.non_zero()) {
-			if (movement.was_sprint_effective) {
+			if (movement->was_sprint_effective) {
 				if (!is_inert) {
 					damping.linear /= 4;
 				}
 			}
 		}
 
+		const bool make_inert = movement->make_inert_for_ms > 0.f;
+
 		/* the player feels less like a physical projectile if we brake per-axis */
-		if (movement.enable_braking_damping && !(movement.make_inert_for_ms > 0.f)) {
+		if (!make_inert) {
 			damping.linear_axis_aligned += vec2(
-				requested_by_input.x_non_zero() ? 0.f : movement.braking_damping,
-				requested_by_input.y_non_zero() ? 0.f : movement.braking_damping
+				requested_by_input.x_non_zero() ? 0.f : movement_def.braking_damping,
+				requested_by_input.y_non_zero() ? 0.f : movement_def.braking_damping
 			);
 		}
 	}

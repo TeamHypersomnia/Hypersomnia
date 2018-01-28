@@ -29,32 +29,28 @@ void movement_system::set_movement_flags_from_input(const logic_step step) {
 		cosmos(
 			it.subject,
 			[&](const auto subject) {
-				auto* const movement = subject.template find<components::movement>();
-
-				if (movement == nullptr) {
-					return;
-				}
-
-				switch (it.intent) {
-				case game_intent_type::MOVE_FORWARD:
-					movement->moving_forward = it.was_pressed();
-					break;
-				case game_intent_type::MOVE_BACKWARD:
-					movement->moving_backward = it.was_pressed();
-					break;
-				case game_intent_type::MOVE_LEFT:
-					movement->moving_left = it.was_pressed();
-					break;
-				case game_intent_type::MOVE_RIGHT:
-					movement->moving_right = it.was_pressed();
-					break;
-				case game_intent_type::WALK:
-					movement->walking_enabled = it.was_pressed();
-					break;
-				case game_intent_type::SPRINT:
-					movement->sprint_enabled = it.was_pressed();
-					break;
-				default: break;
+				if (auto* const movement = subject.template find<components::movement>()) {
+					switch (it.intent) {
+						case game_intent_type::MOVE_FORWARD:
+						movement->moving_forward = it.was_pressed();
+						break;
+						case game_intent_type::MOVE_BACKWARD:
+						movement->moving_backward = it.was_pressed();
+						break;
+						case game_intent_type::MOVE_LEFT:
+						movement->moving_left = it.was_pressed();
+						break;
+						case game_intent_type::MOVE_RIGHT:
+						movement->moving_right = it.was_pressed();
+						break;
+						case game_intent_type::WALK:
+						movement->walking_enabled = it.was_pressed();
+						break;
+						case game_intent_type::SPRINT:
+						movement->sprint_enabled = it.was_pressed();
+						break;
+						default: break;
+					}
 				}
 			}
 		);
@@ -68,6 +64,7 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 		processing_subjects::WITH_MOVEMENT,
 		[&](const entity_handle it) {
 			auto& movement = it.get<components::movement>();
+			auto& movement_def = it.get<invariants::movement>();
 
 			const auto& rigid_body = it.get<components::rigid_body>();
 
@@ -126,7 +123,7 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 				movement.make_inert_for_ms -= static_cast<float>(delta.in_milliseconds());
 			}
 
-			const auto requested_by_input = movement.get_force_requested_by_input();
+			const auto requested_by_input = movement.get_force_requested_by_input(movement_def);
 
 			if (requested_by_input.non_zero()) {
 				if (movement.was_sprint_effective) {
@@ -151,8 +148,8 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 
 				auto applied_force = requested_by_input;
 
-				if (movement.acceleration_length > 0) {
-					applied_force.set_length(movement.acceleration_length);
+				if (movement_def.acceleration_length > 0) {
+					applied_force.set_length(movement_def.acceleration_length);
 				}
 
 				applied_force *= movement_force_mult;
@@ -160,7 +157,7 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 
 				rigid_body.apply_force(
 					applied_force, 
-					movement.applied_force_offset
+					movement_def.applied_force_offset
 				);
 			}
 
