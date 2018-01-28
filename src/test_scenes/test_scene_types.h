@@ -33,9 +33,7 @@ enum class test_scene_type {
 	KEK9,
 	AMPLIFIER_ARM,
 	AMPLIFIER_ARM_MISSILE,
-#if TODO
 	ELECTRIC_MISSILE,
-#endif
 
 	SAMPLE_BACKPACK,
 	CROSSHAIR,

@@ -2,6 +2,7 @@
 #include "augs/misc/timing/stepped_timing.h"
 #include "game/detail/spells/spell_structs.h"
 #include "game/transcendental/entity_handle_declaration.h"
+#include "game/transcendental/entity_flavour_id.h"
 
 struct spell_logic_input;
 
@@ -20,7 +21,7 @@ struct electric_triad {
 	// GEN INTROSPECTOR struct electric_triad
 	spell_common_data common;
 	spell_appearance appearance;
-	entity_id missile_definition;
+	entity_type_id missile_flavour;
 	// END GEN INTROSPECTOR
 
 	unsigned get_spell_logic_duration_ms() const {

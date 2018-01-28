@@ -35,7 +35,7 @@ void electric_triad_instance::perform_logic(const spell_logic_input in) {
 	const auto caster = in.subject;
 	auto& cosmos = caster.get_cosmos();
 
-	if (cosmos[spell_data.missile_definition].dead()) {
+	if (!spell_data.missile_flavour) {
 		return;
 	}
 	
@@ -50,7 +50,8 @@ void electric_triad_instance::perform_logic(const spell_logic_input in) {
 		const auto next_hostile = cosmos[hostiles[i]];
 		LOG_NVPS(next_hostile.get_id());
 
-		const auto new_energy_ball = cosmic::clone_entity(cosmos[spell_data.missile_definition]);
+		const auto new_energy_ball = cosmic::create_entity(cosmos, spell_data.missile_flavour);
+		new_energy_ball.add_standard_components(in.step);
 
 		auto new_energy_ball_transform = caster_transform;
 		
@@ -64,7 +65,5 @@ void electric_triad_instance::perform_logic(const spell_logic_input in) {
 
 		const auto energy_ball_velocity = vec2::from_degrees(new_energy_ball_transform.rotation) * 2000;
 		new_energy_ball.get<components::rigid_body>().set_velocity(energy_ball_velocity);
-
-		new_energy_ball.add_standard_components(in.step);
 	}
 }

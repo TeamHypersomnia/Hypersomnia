@@ -261,6 +261,61 @@ namespace test_types {
 		}
 
 		{
+			auto& meta = get_test_type(types, test_scene_type::ELECTRIC_MISSILE);
+
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::FLYING_BULLETS;
+
+				meta.set(render_def);
+			}
+
+
+			test_types::add_sprite(meta, logicals, assets::game_image_id::ENERGY_BALL, cyan);
+			meta.add_shape_invariant_from_renderable(logicals);
+			{
+				invariants::trace trace_def;
+
+				trace_def.max_multiplier_x = {2.0f, 0.f};
+				trace_def.max_multiplier_y = {0.f, 0.f};
+				trace_def.lengthening_duration_ms = {300.f, 350.f};
+				trace_def.additional_multiplier = vec2(1.f, 1.f);
+
+				trace_def.finishing_trace_type = to_entity_type_id(test_scene_type::ENERGY_BALL_FINISHING_TRACE);
+
+				meta.set(trace_def);
+			}
+
+			test_types::add_bullet_round_physics(meta);
+
+			invariants::missile missile;
+
+			missile.destruction_particles.id = assets::particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION;
+			missile.destruction_particles.modifier.colorize = cyan;
+
+			missile.trace_particles.id = assets::particle_effect_id::WANDERING_PIXELS_DIRECTED;
+			missile.trace_particles.modifier.colorize = cyan;
+
+			missile.muzzle_leave_particles.id = assets::particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION;
+			missile.muzzle_leave_particles.modifier.colorize = cyan;
+
+			missile.trace_sound.id = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;
+			missile.destruction_sound.id = assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION;
+
+			missile.homing_towards_hostile_strength = 1.0f;
+			missile.damage_amount = 42;
+
+			auto& trace_modifier = missile.trace_sound.modifier;
+
+			trace_modifier.max_distance = 1020.f;
+			trace_modifier.reference_distance = 100.f;
+			trace_modifier.gain = 1.3f;
+			trace_modifier.fade_on_exit = false;
+
+			meta.set(missile);
+		}
+
+		{
 			auto& meta = get_test_type(types, test_scene_type::AMPLIFIER_ARM_MISSILE);
 			
 			{
