@@ -233,7 +233,13 @@ void physics_world_cache::infer_cache_for_colliders(const const_entity_handle ha
 
 	auto get_calculated_connection = [&](){
 		if (!calculated_connection) {
-			calculated_connection = handle.calculate_colliders_connection();
+			if (const auto connection = handle.calculate_colliders_connection()) {
+				calculated_connection = connection; 
+			}
+			else {
+				/* A default with unset owner body will prevent cache from building */
+				calculated_connection = colliders_connection();
+			}
 		}
 
 		return *calculated_connection;

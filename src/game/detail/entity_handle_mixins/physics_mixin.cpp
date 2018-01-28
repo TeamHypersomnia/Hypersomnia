@@ -18,7 +18,7 @@ D basic_physics_mixin<C, D>::get_owner_friction_ground() const {
 }
 
 template <bool C, class D>
-colliders_connection basic_physics_mixin<C, D>::calculate_colliders_connection() const {
+std::optional<colliders_connection> basic_physics_mixin<C, D>::calculate_colliders_connection() const {
 	const auto self = *static_cast<const D*>(this);
 	const auto& cosmos = self.get_cosmos();
 	
@@ -30,11 +30,13 @@ colliders_connection basic_physics_mixin<C, D>::calculate_colliders_connection()
 		if (const auto slot = cosmos[item->get_current_slot()]) {
 			return slot.calculate_connection_until();
 		}
-
-		return { self, {} };
 	}
 
-	return { self, {} };
+	if (self.template find<components::rigid_body>()) {
+		return colliders_connection { self, {} };
+	}
+
+	return std::nullopt;
 }
 
 template <bool C, class D>
@@ -75,7 +77,7 @@ std::optional<colliders_connection> basic_physics_mixin<C, D>::find_colliders_co
 		return cache.connection;
 	}
 
-	return std::nullopt;
+	return calculate_colliders_connection();
 }
 
 template <bool C, class D>

@@ -21,20 +21,19 @@ public:
 	template <class interpolation_system_type>
 	std::optional<components::transform> find_viewing_transform(const interpolation_system_type& sys, const bool integerize = false) const {
 		const auto handle = *static_cast<const entity_handle_type*>(this);
+		const auto& cosmos = handle.get_cosmos();
 
-		if (const auto owner = handle.get_owner_of_colliders();
-			owner.alive() && owner != handle 
+		if (const auto connection = handle.find_colliders_connection();
+			connection && connection->owner != handle
 		) {
-			if (auto body_transform = sys.find_interpolated(owner)) {
+			if (auto body_transform = sys.find_interpolated(cosmos[connection->owner])) {
 				auto bt = *body_transform;
 
 				if (integerize) {
 					bt.pos.discard_fract();
 				}
 
-				const auto offset = handle.calculate_colliders_connection();
-
-				auto displacement = offset.shape_offset;
+				auto displacement = connection->shape_offset;
 
 				if (!displacement.pos.is_zero()) {
 					displacement.pos.rotate(bt.rotation, vec2(0, 0));

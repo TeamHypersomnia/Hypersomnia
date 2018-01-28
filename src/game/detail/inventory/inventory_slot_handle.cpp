@@ -104,13 +104,13 @@ typename basic_inventory_slot_handle<C>::entity_handle_type basic_inventory_slot
 }
 
 template <bool C>
-colliders_connection basic_inventory_slot_handle<C>::calculate_connection_until(const entity_id until) const {
+std::optional<colliders_connection> basic_inventory_slot_handle<C>::calculate_connection_until(const entity_id until) const {
 	const auto slot = get_container().get_current_slot();
 	const auto& cosmos = get_cosmos();
 
 	if (slot.alive()) {
 		if (slot->physical_behaviour == slot_physical_behaviour::DEACTIVATE_BODIES) {
-			return { cosmos[entity_id()], {} };
+			return std::nullopt;
 		}
 
 		ensure(slot->physical_behaviour == slot_physical_behaviour::CONNECT_AS_FIXTURE_OF_BODY); 

@@ -176,14 +176,13 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 							pe.value -= pe.calculate_damage_result(mana_needed).effective;
 
 							const auto round_entity = cosmic::create_entity(cosmos, magic_missile_flavour_id);
+							round_entity.set_logic_transform(step, muzzle_transform);
 							round_entity.add_standard_components(step);
 
 							auto& sender = round_entity.get<components::sender>();
 							sender.set(gun_entity);
 
 							total_recoil += missile.recoil_multiplier;
-
-							round_entity.set_logic_transform(step, muzzle_transform);
 
 							{
 								auto rng = cosmos.get_rng_for(round_entity);

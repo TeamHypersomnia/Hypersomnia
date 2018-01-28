@@ -8,6 +8,8 @@ summary: Just a hidden scratchpad.
 ## Microplanned implementation order:  
 
 
+- The mess with optionals around getters of transform, aabb, and colliders connection
+
 - Constructing entities
 	- Introduction of native types will probably change it
 	- Solver might want to set some initial component values before inference occurs
