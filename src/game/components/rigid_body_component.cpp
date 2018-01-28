@@ -1,7 +1,6 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
 #include "rigid_body_component.h"
-#include "all_inferred_state_component.h"
 
 #include <Box2D/Box2D.h>
 

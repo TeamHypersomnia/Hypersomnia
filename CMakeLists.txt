@@ -312,7 +312,6 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/view/viewables/regeneration/game_image_loadables.cpp"
 	"src/view/viewables/particle_effect.cpp"
 	"src/game/assets/physical_material.cpp"
-	"src/game/components/all_inferred_state_component.cpp"
 	"src/game/components/flags_component.cpp"
 	"src/game/components/light_component.cpp"
 	"src/game/components/rigid_body_component.cpp"

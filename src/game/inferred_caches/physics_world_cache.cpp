@@ -6,7 +6,6 @@
 #include "game/components/fixtures_component.h"
 #include "game/components/shape_polygon_component.h"
 #include "game/components/shape_circle_component.h"
-#include "game/components/all_inferred_state_component.h"
 
 #include "game/components/rigid_body_component.h"
 #include "game/components/transform_component.h"

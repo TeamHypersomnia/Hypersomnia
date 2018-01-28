@@ -3,7 +3,6 @@
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 
-#include "game/components/all_inferred_state_component.h"
 #include "game/components/type_component.h"
 
 #include "game/inferred_caches/type_id_cache.h"

@@ -6,7 +6,6 @@
 #include "game/detail/view_input/sound_effect_input.h"
 #include "game/components/sender_component.h"
 #include "game/components/missile_component.h"
-#include "game/components/all_inferred_state_component.h"
 #include "game/detail/spells/spell_logic_input.h"
 #include "game/detail/spells/spell_utils.h"
 #include "game/enums/filters.h"

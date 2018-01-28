@@ -4,7 +4,6 @@
 
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
-#include "game/components/all_inferred_state_component.h"
 
 typedef components::motor_joint M;
 

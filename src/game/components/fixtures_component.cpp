@@ -7,7 +7,6 @@
 #include "game/transcendental/entity_handle.h"
 
 #include "game/components/fixtures_component.h"
-#include "game/components/all_inferred_state_component.h"
 #include "game/components/rigid_body_component.h"
 
 #include "game/detail/physics/b2Fixture_index_in_component.h"

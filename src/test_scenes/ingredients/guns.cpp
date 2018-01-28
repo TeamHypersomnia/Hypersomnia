@@ -9,7 +9,6 @@
 #include "game/components/fixtures_component.h"
 #include "game/components/catridge_component.h"
 #include "game/components/explosive_component.h"
-#include "game/components/all_inferred_state_component.h"
 
 #include "game/messages/start_particle_effect.h"
 

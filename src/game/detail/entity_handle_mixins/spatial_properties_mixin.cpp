@@ -8,7 +8,6 @@
 #include "game/components/item_component.h"
 
 #include "game/components/transform_component.h"
-#include "game/components/all_inferred_state_component.h"
 
 #include "spatial_properties_mixin.h"
 #include "augs/drawing/drawing.h"

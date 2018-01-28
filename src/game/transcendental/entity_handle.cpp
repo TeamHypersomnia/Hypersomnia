@@ -3,7 +3,6 @@
 #include "game/transcendental/cosmos.h"
 
 #include "game/components/render_component.h"
-#include "game/components/all_inferred_state_component.h"
 #include "game/components/processing_component.h"
 #include "game/components/interpolation_component.h"
 #include "game/components/crosshair_component.h"

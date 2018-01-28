@@ -8,7 +8,6 @@
 #include "game/assets/all_logical_assets_declarations.h"
 #include "game/transcendental/component_synchronizer.h"
 
-#include "game/components/all_inferred_state_component.h"
 
 struct b2Fixture_index_in_component;
 

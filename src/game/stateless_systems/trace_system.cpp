@@ -14,7 +14,6 @@
 #include "game/components/sprite_component.h"
 #include "game/components/missile_component.h"
 #include "game/components/rigid_body_component.h"
-#include "game/components/all_inferred_state_component.h"
 #include "game/components/interpolation_component.h"
 
 #include "game/messages/interpolation_correction_request.h"

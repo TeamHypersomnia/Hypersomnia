@@ -56,12 +56,9 @@ namespace components {
 	struct interpolation;
 	struct light;
 	struct wandering_pixels;
-	struct sound_existence;
 	struct motor_joint;
 	struct hand_fuse;
 	struct sender;
-
-	struct all_inferred_state;
 }
 
 template <template <class...> class List>
@@ -94,9 +91,7 @@ using component_list_t = List<
 	components::wandering_pixels,
 	components::motor_joint,
 	components::hand_fuse,
-	components::sender,
-
-	components::all_inferred_state
+	components::sender
 >;
 
 template <template <class...> class List>

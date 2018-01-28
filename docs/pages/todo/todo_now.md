@@ -197,7 +197,6 @@ summary: Just a hidden scratchpad.
 - child component should be always_present + synchronized
 - strip children vector tracker of children caches as we'll take that data from signi
 	- was anyway used only for ensuring
-- remove all_inferred_state as it is essentially pointless once we have types implemented
 - fix car component to calculate damping statelessly, it will need to be synchronized
 	- in practice car won't ever be an item or a driver or have movement... 
 - implement instances of cooldowns for casts statelessly when there is such a need

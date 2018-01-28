@@ -6,7 +6,6 @@
 #include "game/transcendental/cosmos.h"
 #include "game/organization/all_component_includes.h"
 #include "game/organization/for_each_component_type.h"
-#include "game/components/all_inferred_state_component.h"
 #include "game/components/guid_component.h"
 #include "game/components/child_component.h"
 #include "game/components/crosshair_component.h"
