@@ -60,22 +60,23 @@ void release_or_throw_fused_object(
 				sound_effect_start_input::fire_and_forget(thrower_transform).set_listener(thrower)
 			);
 
-#if TODO
-			// TODO: this information will be specified by another type
-			fused_entity.get<components::sprite>().set(
-				explosive.released_image_id, metas
-			);
-
-			rigid_body.set_linear_damping(3.0f);
-			rigid_body.set_bullet_body(true);
 			const auto rigid_body = fused_entity.get<components::rigid_body>();
-			
+
 			//ensure(rigid_body.get_velocity().is_epsilon());
 
 			rigid_body.set_velocity({ 0.f, 0.f });
 			rigid_body.set_angular_velocity(0.f);
 			rigid_body.apply_angular_impulse(1.5f * rigid_body.get_mass());
 			rigid_body.apply_impulse(vec2::from_degrees(fused_entity.get_logic_transform().rotation) * 5000 * rigid_body.get_mass());
+
+#if TODO
+			rigid_body.set_linear_damping(3.0f);
+			rigid_body.set_bullet_body(true);
+
+			// TODO: this information will be specified by another type
+			fused_entity.get<components::sprite>().set(
+				explosive.released_image_id, metas
+			);
 
 			const auto fixtures = fused_entity.get<components::fixtures>();
 			
@@ -94,7 +95,7 @@ void release_or_throw_fused_object(
 			fixtures = new_def;
 
 			fused_entity.get<components::shape_polygon>().set_activated(false);
-			fused_entity.get<components::shape_circle>().set_activated(true);
+			fused_entity.get<invariants::shape_circle>().set_activated(true);
 #endif
 		}
 	}

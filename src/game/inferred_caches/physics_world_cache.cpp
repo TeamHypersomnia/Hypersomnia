@@ -361,11 +361,12 @@ void physics_world_cache::infer_cache_for_colliders(const const_entity_handle ha
 			return;
 		}
 		
-		if (const auto shape_circle = handle.find<components::shape_circle>();
-			shape_circle != nullptr && shape_circle.is_activated()
-		) {
+		// TODO: let shape circle be chosen over the polygon shape when grenade is thrown
+		// can either have a separate definition in the hand fuse invariant or assume that the entity will have it
+
+		if (const auto shape_circle = handle.find<invariants::shape_circle>()) {
 			b2CircleShape shape;
-			shape.m_radius = si.get_meters(shape_circle.get_radius());
+			shape.m_radius = si.get_meters(shape_circle->get_radius());
 		
 			fixdef.shape = &shape;
 			b2Fixture* const new_fix = owner_b2Body.CreateFixture(&fixdef);

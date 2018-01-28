@@ -163,13 +163,6 @@ namespace prefabs {
 		const auto& metas = step.get_logical_assets();
 		const auto grenade_entity = create_test_scene_entity(world, test_scene_type::FORCE_GRENADE);
 
-		auto& sender = grenade_entity += components::sender();
-
-		components::shape_circle shape_circle;
-		shape_circle.radius = 1.f;
-
-		grenade_entity += shape_circle;
-
 		grenade_entity.set_logic_transform(step, pos);
 		grenade_entity.add_standard_components(step);
 
@@ -180,13 +173,6 @@ namespace prefabs {
 		auto& world = step.get_cosmos();
 		const auto& metas = step.get_logical_assets();
 		const auto grenade_entity = create_test_scene_entity(world, test_scene_type::PED_GRENADE);
-
-		auto& sender = grenade_entity += components::sender();
-
-		components::shape_circle shape_circle;
-		shape_circle.radius = 1.f;
-
-		grenade_entity += shape_circle;
 
 		grenade_entity.set_logic_transform(step, pos);
 		grenade_entity.add_standard_components(step);
@@ -199,13 +185,6 @@ namespace prefabs {
 		const auto& metas = step.get_logical_assets();
 		const auto grenade_entity = create_test_scene_entity(world, test_scene_type::INTERFERENCE_GRENADE);
 		
-		auto& sender = grenade_entity += components::sender();
-
-		components::shape_circle shape_circle;
-		shape_circle.radius = 1.f;
-
-		grenade_entity += shape_circle;
-
 		grenade_entity.set_logic_transform(step, pos);
 		grenade_entity.add_standard_components(step);
 

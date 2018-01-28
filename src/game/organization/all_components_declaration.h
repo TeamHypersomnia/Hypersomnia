@@ -13,6 +13,7 @@ namespace invariants {
 	struct gun;
 	struct render;
 	struct shape_polygon;
+	struct shape_circle;
 	struct trace;
 	struct interpolation;
 	struct flags;
@@ -55,8 +56,6 @@ namespace components {
 	struct light;
 	struct wandering_pixels;
 	struct sound_existence;
-	struct shape_polygon;
-	struct shape_circle;
 	struct motor_joint;
 	struct hand_fuse;
 	struct sender;
@@ -92,7 +91,6 @@ using component_list_t = List<
 	components::interpolation,
 	components::light,
 	components::wandering_pixels,
-	components::shape_circle,
 	components::motor_joint,
 	components::hand_fuse,
 	components::sender,
@@ -105,6 +103,7 @@ using invariant_list_t = List<
 	invariants::gun,
 	invariants::render,
 	invariants::shape_polygon,
+	invariants::shape_circle,
 	invariants::polygon,
 	invariants::sprite,
 	invariants::trace,

@@ -490,7 +490,6 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/application/main/draw_debug_details.cpp"
 	"src/application/main/imgui_pass.cpp"
 	"src/application/main/release_flags.cpp"
-	"src/game/components/shape_circle_component.cpp"
 	"src/game/debug_drawing_settings.cpp"
 	"src/application/session_profiler.cpp"
 	"src/view/viewables/all_viewables_defs.cpp"
