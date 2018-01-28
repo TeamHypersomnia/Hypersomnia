@@ -35,7 +35,7 @@ Most of the time, only the programmers are concerned with the second type of dat
 		- The author will be able to change the type of an existing entity, optionally keeping the values that were already set in components.
 	- In particular, the **initial value** for a component may change even though some entities of this type already exist.
 		- This is not important. The field, in practice, serves two purposes:
-			- Used by the logic when it gets a type identifier to spawn (e.g. ``gun::magic_missile_definition``), so that it can set reasonable initial values. Thus, a change to initial value needs not updating here as the logic will naturally catch up, storing only the type identifier.
+			- Used by the logic when it gets a type identifier to spawn (e.g. ``gun::magic_missile_flavour``), so that it can set reasonable initial values. Thus, a change to initial value needs not updating here as the logic will naturally catch up, storing only the type identifier.
 			- Exists as an optional helper for the author when they want to spawn some very specific entities. The author shouldn't worry that the initial value changes something for the existent entities.
 	- If a field of a invariant changes, (during content creation), reinfer all objects of this type with help of the [type id cache](type_id_cache); currently we'll just reinfer the whole cosmos.
 - There won't be many types, but access is **frequent** during [solve](solver#the-solve). 

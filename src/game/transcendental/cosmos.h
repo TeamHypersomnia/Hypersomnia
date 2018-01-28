@@ -135,6 +135,10 @@ public:
 	const cosmos_common_significant& get_common_significant() const;
 	const common_assets& get_common_assets() const;
 
+	const entity_type& get_flavour(const entity_type_id flavour_id) const {
+		return get_common_significant().all_entity_types.get_type(flavour_id);
+	}
+
 	bool operator==(const cosmos&) const;
 	bool operator!=(const cosmos&) const;
 

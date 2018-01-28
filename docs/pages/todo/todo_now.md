@@ -7,6 +7,7 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order:  
 
+- Resurrect the unit tests for padding that were deleted along with cosmic delta
 
 - Audiovisual caches should always check if the transform exist because sometimes the transform might be lost even due to having been put into a backpack.
 	- especially the interpolation system.

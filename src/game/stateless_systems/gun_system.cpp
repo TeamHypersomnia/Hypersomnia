@@ -122,231 +122,236 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 		[&](const entity_handle gun_entity) {
 			const auto gun_transform = gun_entity.get_logic_transform();
 			const auto owning_capability = gun_entity.get_owning_transfer_capability();
-			
-			const auto owning_sentience = 
-				(owning_capability.alive() && owning_capability.has<components::sentience>()) ? owning_capability : cosmos[entity_id()]
-			;
+			components::sentience* sentience = owning_capability ? owning_capability.find<components::sentience>() : nullptr;
 
 			auto& gun = gun_entity.get<components::gun>();
 			const auto& gun_def = gun_entity.get<invariants::gun>();
 
-			const auto magic_missile_def = cosmos[gun.magic_missile_definition];
-			const auto is_magic_launcher = magic_missile_def.alive();
-			const auto mana_needed = is_magic_launcher ? magic_missile_def.get<invariants::missile>().damage_amount / 4 : 0;
-			
-			bool has_enough_physical_bullets = false;
+			const auto muzzle_transform = components::transform { gun_def.calculate_muzzle_position(gun_transform), gun_transform.rotation };
 
-			if (is_magic_launcher) {
-				has_enough_physical_bullets = true;
-			}
-			else {
-				has_enough_physical_bullets = gun_entity[slot_function::GUN_CHAMBER].get_items_inside().size() > 0;
-			}
-
-			const bool has_enough_mana = (
-					is_magic_launcher 
-					&& owning_sentience.alive() 
-					&& owning_sentience.get<components::sentience>().get<personal_electricity_meter_instance>().value >= mana_needed
-				)
-				|| !is_magic_launcher
-			;
-
-			if (
-				gun.is_trigger_pressed 
-				&& has_enough_mana
-				&& has_enough_physical_bullets
-				&& try_to_fire_and_reset(gun_def.shot_cooldown_ms, gun.when_last_fired, now, delta)
-			) {
-				if (gun_def.action_mode != gun_action_type::AUTOMATIC) {
-					gun.is_trigger_pressed = false;
-				}
-
-				const auto muzzle_transform = components::transform { gun_def.calculate_muzzle_position(gun_transform), gun_transform.rotation };
-				
+			auto make_gunshot_response = [&](){
 				messages::gunshot_response response;
 
 				response.muzzle_transform = muzzle_transform;
 				response.subject = gun_entity;
+				return response;
+			};
 
-				float total_recoil_scale = 1.f;
+			auto correct_interpolation_for = [&](const const_entity_handle round_entity){
+				messages::interpolation_correction_request request;
+				request.subject = round_entity;
+				request.set_previous_transform_value = muzzle_transform;
 
-				if (is_magic_launcher) {
-					const auto round_entity = cosmic::clone_entity(magic_missile_def);
+				step.post_message(request);
+			};
 
-					auto& sender = round_entity.get<components::sender>();
-					sender.set(gun_entity);
+			auto try_to_fire = [&]() -> bool {
+				if (gun.is_trigger_pressed) {
+					if (try_to_fire_and_reset(gun_def.shot_cooldown_ms, gun.when_last_fired, now, delta)) {
+						if (gun_def.action_mode != gun_action_type::AUTOMATIC) {
+							gun.is_trigger_pressed = false;
+						}
 
-					auto& missile = round_entity.get<invariants::missile>();
-					total_recoil_scale *= missile.recoil_multiplier;
-
-					round_entity.set_logic_transform(step, muzzle_transform);
-					round_entity.add_standard_components(step);
-
-					{
-						auto rng = cosmos.get_rng_for(round_entity);
-
-						const auto missile_velocity = vec2::from_degrees(muzzle_transform.rotation)
-							* missile.muzzle_velocity_mult
-							* rng.randval(gun_def.muzzle_velocity)
-						;
-
-						round_entity.get<components::rigid_body>().set_velocity(missile_velocity);
+						return true;
 					}
+				}
 
-					response.spawned_rounds.push_back(round_entity);
+				return false;
+			};
 
-					auto& sentience = owning_sentience.get<components::sentience>();
-					auto& pe = sentience.get<personal_electricity_meter_instance>();
-					pe.value -= pe.calculate_damage_result(mana_needed).effective;
+			/* For common aftermath */
+			float total_recoil = 0.f;
 
-					step.post_message(response);
+			if (const auto magic_missile_flavour_id = gun_def.magic_missile_flavour) {
+				const auto& magic_missile_flavour = cosmos.get_flavour(magic_missile_flavour_id);
+				const auto& missile = magic_missile_flavour.get<invariants::missile>();
 
-					messages::interpolation_correction_request request;
-					request.subject = round_entity;
-					request.set_previous_transform_value = muzzle_transform;
+				const auto mana_needed = missile.damage_amount / 4;
 
-					step.post_message(request);
+				if (sentience) {
+					auto& pe = sentience->get<personal_electricity_meter_instance>();
+
+					if (pe.value >= mana_needed) {
+						if (try_to_fire()) {
+							pe.value -= pe.calculate_damage_result(mana_needed).effective;
+
+							const auto round_entity = cosmic::create_entity(cosmos, magic_missile_flavour_id);
+							round_entity.add_standard_components(step);
+
+							auto& sender = round_entity.get<components::sender>();
+							sender.set(gun_entity);
+
+							total_recoil += missile.recoil_multiplier;
+
+							round_entity.set_logic_transform(step, muzzle_transform);
+
+							{
+								auto rng = cosmos.get_rng_for(round_entity);
+
+								const auto missile_velocity = 
+									vec2::from_degrees(muzzle_transform.rotation)
+									* missile.muzzle_velocity_mult
+									* rng.randval(gun_def.muzzle_velocity)
+								;
+
+								round_entity.get<components::rigid_body>().set_velocity(missile_velocity);
+							}
+
+							{
+								auto response = make_gunshot_response();
+								response.spawned_rounds.push_back(round_entity);
+								step.post_message(response);
+							}
+
+							correct_interpolation_for(round_entity);
+						}
+					}
+				}
+			}
+			else if (
+				gun_entity[slot_function::GUN_CHAMBER].get_items_inside().size() > 0
+				&& try_to_fire()
+			) {
+				/* This is a normal gun */
+				const auto chamber_slot = gun_entity[slot_function::GUN_CHAMBER];
+				const auto catridge_in_chamber = cosmos[chamber_slot.get_items_inside()[0]];
+
+				auto response = make_gunshot_response();
+				response.catridge_definition = catridge_in_chamber.get<components::catridge>();
+
+				thread_local std::vector<entity_id> bullet_stacks;
+				bullet_stacks.clear();
+
+				const auto pellets_slot = catridge_in_chamber[slot_function::ITEM_DEPOSIT];
+
+				thread_local destruction_queue destructions;
+				destructions.clear();
+
+				if (pellets_slot.alive()) {
+					bullet_stacks = pellets_slot.get_items_inside();
+
+					/* 
+						apart from the pellets stacks inside the catridge,
+						we must additionally queue the catridge itself
+					*/
+
+					destructions.emplace_back(catridge_in_chamber);
 				}
 				else {
-					const auto chamber_slot = gun_entity[slot_function::GUN_CHAMBER];
-					const auto catridge_in_chamber = cosmos[chamber_slot.get_items_inside()[0]];
-
-					response.catridge_definition = catridge_in_chamber.get<components::catridge>();
-
-					thread_local std::vector<entity_id> bullet_stacks;
-					bullet_stacks.clear();
-
-					const auto pellets_slot = catridge_in_chamber[slot_function::ITEM_DEPOSIT];
-
-					thread_local destruction_queue destructions;
-					destructions.clear();
-					
-					if (pellets_slot.alive()) {
-						bullet_stacks = pellets_slot.get_items_inside();
-						
-						/* 
-							apart from the pellets stacks inside the catridge,
-							we must additionally queue the catridge itself
-						*/
-
-						destructions.emplace_back(catridge_in_chamber);
-					}
-					else {
-						bullet_stacks.push_back(catridge_in_chamber);
-					}
-
-					ensure(bullet_stacks.size() > 0);
-
-					for (const auto single_bullet_or_pellet_stack_id : bullet_stacks) {
-						const auto single_bullet_or_pellet_stack = cosmos[single_bullet_or_pellet_stack_id];
-
-						int charges = single_bullet_or_pellet_stack.get<components::item>().charges;
-
-						while (charges--) {
-							if (const auto round_flavour = single_bullet_or_pellet_stack.get<components::catridge>().round_flavour) {
-								const auto round_entity = cosmic::create_entity(cosmos, round_flavour);
-								round_entity.add_standard_components(step);
-
-								auto& sender = round_entity.get<components::sender>();
-								sender.set(gun_entity);
-
-								{
-									auto& missile = round_entity.get<components::missile>();
-									missile.power_multiplier_of_sender = gun_def.damage_multiplier;
-								}
-
-								const auto& missile_def = round_entity.get<invariants::missile>();
-								total_recoil_scale *= missile_def.recoil_multiplier;
-
-								if (round_entity.has<components::explosive>()) {
-									auto& explosive = round_entity.get<components::explosive>();
-									explosive.explosion.damage *= gun_def.damage_multiplier;
-									explosive.explosion.impact_force *= gun_def.damage_multiplier;
-								}
-
-								round_entity.set_logic_transform(step, muzzle_transform);
-
-								response.spawned_rounds.push_back(round_entity);
-
-								{
-									auto rng = cosmos.get_rng_for(round_entity);
-
-									const auto missile_velocity = 
-										vec2::from_degrees(muzzle_transform.rotation)
-										* missile_def.muzzle_velocity_mult
-										* rng.randval(gun_def.muzzle_velocity)
-									;
-
-									round_entity.get<components::rigid_body>().set_velocity(missile_velocity);
-								}
-
-								messages::interpolation_correction_request request;
-								request.subject = round_entity;
-								request.set_previous_transform_value = muzzle_transform;
-
-								step.post_message(request);
-							}
-						}
-
-						if (const auto shell_flavour = single_bullet_or_pellet_stack.get<components::catridge>().shell_flavour) {
-							const auto shell_entity = cosmic::create_entity(cosmos, shell_flavour);
-							shell_entity.add_standard_components(step);
-
-							auto rng = cosmos.get_rng_for(shell_entity);
-
-							const auto spread_component = rng.randval(gun_def.shell_spread_degrees) + gun_def.shell_spawn_offset.rotation;
-
-							auto shell_transform = gun_transform;
-							shell_transform.pos += vec2(gun_def.shell_spawn_offset.pos).rotate(gun_transform.rotation, vec2());
-							shell_transform.rotation += spread_component;
-
-							shell_entity.set_logic_transform(step, shell_transform);
-
-							shell_entity.get<components::rigid_body>().set_velocity(vec2::from_degrees(muzzle_transform.rotation + spread_component).set_length(rng.randval(gun_def.shell_velocity)));
-							response.spawned_shell = shell_entity;
-						}
-						
-						destructions.emplace_back(single_bullet_or_pellet_stack);
-					}
-
-					step.post_message(response);
-					
-					/* 
-						by now every item inside the chamber is queued for destruction.
-						we do not clear items_inside by dropping them by perform_transfers 
-						to avoid unnecessary activation of the rigid bodies of the bullets, due to being dropped.
-					*/
-
-					reverse_perform_deletions(make_deletion_queue(destructions, cosmos), cosmos);
-
-					/*
-						Note that the above operation would happen automatically once all children entities are destroyed
-						(and thus their inferred relational caches are also destroyed)
-						But we need the result now so that the 
-					*/
-
-					if (gun_def.action_mode >= gun_action_type::SEMI_AUTOMATIC) {
-						components::gun::load_next_round(gun_entity, step);
-					}
+					bullet_stacks.push_back(catridge_in_chamber);
 				}
 
-				if (total_recoil_scale != 0.f) {
-					if (const auto* recoil_player = step.get_logical_assets().find(gun_def.recoil.id)) {
-						if (const auto recoil_entity = owning_sentience[child_entity_name::CHARACTER_CROSSHAIR][child_entity_name::CROSSHAIR_RECOIL_BODY]) {
+				ensure(bullet_stacks.size() > 0);
+
+				for (const auto single_bullet_or_pellet_stack_id : bullet_stacks) {
+					const auto single_bullet_or_pellet_stack = cosmos[single_bullet_or_pellet_stack_id];
+
+					int charges = single_bullet_or_pellet_stack.get<components::item>().charges;
+
+					while (charges--) {
+						if (const auto round_flavour = single_bullet_or_pellet_stack.get<components::catridge>().round_flavour) {
+							const auto round_entity = cosmic::create_entity(cosmos, round_flavour);
+							round_entity.add_standard_components(step);
+
+							auto& sender = round_entity.get<components::sender>();
+							sender.set(gun_entity);
+
+							{
+								auto& missile = round_entity.get<components::missile>();
+								missile.power_multiplier_of_sender = gun_def.damage_multiplier;
+							}
+
+							const auto& missile_def = round_entity.get<invariants::missile>();
+							total_recoil += missile_def.recoil_multiplier;
+
+							if (round_entity.has<components::explosive>()) {
+								auto& explosive = round_entity.get<components::explosive>();
+								explosive.explosion.damage *= gun_def.damage_multiplier;
+								explosive.explosion.impact_force *= gun_def.damage_multiplier;
+							}
+
+							round_entity.set_logic_transform(step, muzzle_transform);
+
+							response.spawned_rounds.push_back(round_entity);
+
+							{
+								auto rng = cosmos.get_rng_for(round_entity);
+
+								const auto missile_velocity = 
+									vec2::from_degrees(muzzle_transform.rotation)
+									* missile_def.muzzle_velocity_mult
+									* rng.randval(gun_def.muzzle_velocity)
+								;
+
+								round_entity.get<components::rigid_body>().set_velocity(missile_velocity);
+							}
+
+							correct_interpolation_for(round_entity);
+						}
+					}
+
+					if (const auto shell_flavour = single_bullet_or_pellet_stack.get<components::catridge>().shell_flavour) {
+						const auto shell_entity = cosmic::create_entity(cosmos, shell_flavour);
+						shell_entity.add_standard_components(step);
+
+						auto rng = cosmos.get_rng_for(shell_entity);
+
+						const auto spread_component = rng.randval(gun_def.shell_spread_degrees) + gun_def.shell_spawn_offset.rotation;
+
+						auto shell_transform = gun_transform;
+						shell_transform.pos += vec2(gun_def.shell_spawn_offset.pos).rotate(gun_transform.rotation, vec2());
+						shell_transform.rotation += spread_component;
+
+						shell_entity.set_logic_transform(step, shell_transform);
+
+						shell_entity.get<components::rigid_body>().set_velocity(vec2::from_degrees(muzzle_transform.rotation + spread_component).set_length(rng.randval(gun_def.shell_velocity)));
+						response.spawned_shell = shell_entity;
+					}
+
+					destructions.emplace_back(single_bullet_or_pellet_stack);
+				}
+
+				step.post_message(response);
+
+				/* 
+					by now every item inside the chamber is queued for destruction.
+					we do not clear items_inside by dropping them by perform_transfers 
+					to avoid unnecessary activation of the rigid bodies of the bullets, due to being dropped.
+				*/
+
+				reverse_perform_deletions(make_deletion_queue(destructions, cosmos), cosmos);
+
+				/*
+					Note that the above operation would happen automatically once all children entities are destroyed
+					(and thus their inferred relational caches are also destroyed)
+					But we need the result now so that the 
+				*/
+
+				if (gun_def.action_mode >= gun_action_type::SEMI_AUTOMATIC) {
+					components::gun::load_next_round(gun_entity, step);
+				}
+			}
+
+			/* Shot aftermath */
+			if (total_recoil != 0.f) {
+				if (const auto* recoil_player = step.get_logical_assets().find(gun_def.recoil.id)) {
+					if (sentience) {
+						if (const auto recoil_entity = owning_capability[child_entity_name::CHARACTER_CROSSHAIR][child_entity_name::CROSSHAIR_RECOIL_BODY]) {
 							if (const auto recoil_body = recoil_entity.find<components::rigid_body>()) {
 								const auto recoil_value = gun.recoil.shoot_and_get_impulse(gun_def.recoil, *recoil_player);
 
 								recoil_body.apply_angular_impulse(
-									total_recoil_scale * recoil_value * recoil_body.get_inertia()
+									total_recoil * recoil_value * recoil_body.get_inertia()
 								);
 							}
 						}
 					}
-
-					gun.current_heat = std::min(gun_def.maximum_heat, gun.current_heat + gun_def.gunshot_adds_heat);
 				}
+
+				gun.current_heat = std::min(gun_def.maximum_heat, gun.current_heat + gun_def.gunshot_adds_heat);
 			}
 			else if (is_ready(gun_def.shot_cooldown_ms, gun.when_last_fired, now, delta)) {
+				/* Apply idle cooldown */
 				gun.recoil.cooldown(gun_def.recoil, delta.in_milliseconds());
 				gun.current_heat = std::max(0.f, gun.current_heat - delta.in_seconds()/gun_def.maximum_heat);
 			}

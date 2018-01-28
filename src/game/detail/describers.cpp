@@ -59,7 +59,7 @@ std::wstring get_bbcoded_entity_properties(const const_entity_handle id) {
 	}
 
 	if (gun) {
-		if (cosmos[gun->magic_missile_definition].alive()) {
+		if (const auto flavour = gun_def->magic_missile_flavour) {
 			result << typesafe_sprintf(L"Muzzle velocity: [color=vscyan]%x[/color]\nAmplification multiplier: [color=vscyan]%x[/color]\n", 
 				(gun_def->muzzle_velocity.first + gun_def->muzzle_velocity.second) / 2, gun_def->damage_multiplier);
 		}

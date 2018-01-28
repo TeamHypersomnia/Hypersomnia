@@ -9,6 +9,7 @@
 
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/step_declaration.h"
+#include "game/transcendental/entity_flavour_id.h"
 
 #include "game/components/render_component.h"
 
@@ -32,8 +33,6 @@ namespace components {
 		bool is_cocking_handle_being_pulled = false;
 
 		pad_bytes<2> pad;
-
-		child_entity_id magic_missile_definition;
 
 		float current_heat = 0.f;
 
@@ -90,6 +89,7 @@ namespace invariants {
 
 		float cocking_handle_pull_duration_ms = 500.f;
 
+		entity_type_id magic_missile_flavour;
 		recoil_player_instance_def recoil;
 		// END GEN INTROSPECTOR
 

@@ -425,6 +425,7 @@ namespace test_types {
 			gun_def.damage_multiplier = 1.f;
 
 			gun_def.recoil.id = assets::recoil_player_id::GENERIC;
+			gun_def.magic_missile_flavour = to_entity_type_id(test_scene_type::AMPLIFIER_ARM_MISSILE);
 
 			meta.set(gun_def);
 
@@ -502,18 +503,9 @@ namespace prefabs {
 		auto& cosmos = step.get_cosmos();
 		auto weapon = create_test_scene_entity(cosmos, test_scene_type::AMPLIFIER_ARM);
 
-		auto& gun = weapon.get<components::gun>();
-
 		weapon.set_logic_transform(step, pos);
 		weapon.add_standard_components(step);
 
-		{
-			const auto arm_missile = create_test_scene_entity(cosmos, test_scene_type::AMPLIFIER_ARM_MISSILE);
-
-			auto& sender = arm_missile += components::sender();
-
-			gun.magic_missile_definition = arm_missile;
-		}
 
 		return weapon;
 	}
