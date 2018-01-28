@@ -65,7 +65,7 @@ real32 basic_physics_mixin<C, D>::calculate_density(
 }
 
 template <bool C, class D>
-std::optional<colliders_connection> basic_physics_mixin<C, D>::get_colliders_connection() const {
+std::optional<colliders_connection> basic_physics_mixin<C, D>::find_colliders_connection() const {
 	const auto self = *static_cast<const D*>(this);
 	auto& cosmos = self.get_cosmos();
 
@@ -83,7 +83,7 @@ D basic_physics_mixin<C, D>::get_owner_of_colliders() const {
 	const auto self = *static_cast<const D*>(this);
 	auto& cosmos = self.get_cosmos();
 
-	if (const auto connection = get_colliders_connection()) {
+	if (const auto connection = find_colliders_connection()) {
 		return cosmos[connection->owner];
 	}
 

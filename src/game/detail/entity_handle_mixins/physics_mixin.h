@@ -17,7 +17,7 @@ public:
 		return handle.template get<components::rigid_body>().get_special();
 	}
 
-	std::optional<colliders_connection> get_colliders_connection() const;
+	std::optional<colliders_connection> find_colliders_connection() const;
 	colliders_connection calculate_colliders_connection() const;
 
 	/* Shortcut for getting only the entity handle without shape offset */

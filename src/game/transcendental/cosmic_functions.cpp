@@ -73,7 +73,6 @@ entity_handle cosmic::create_entity(cosmos& cosm, const entity_type_id type_id) 
 		});
 	}
 
-
 	if (const auto light = new_handle.find<invariants::light>()) {
 		new_handle.add(components::transform());
 	}

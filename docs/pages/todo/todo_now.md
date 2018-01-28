@@ -7,6 +7,15 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order:  
 
+
+- Constructing entities
+	- Introduction of native types will probably change it
+	- Solver might want to set some initial component values before inference occurs
+		- Should be done in a lambda where a typed entity handle is given 
+		- After which cosmic::create_entity will simply infer all caches
+	- In any case we know already we will at least need to set transforms in such constructors
+		- So we can already make an overload for cosmic::create_entity
+ 
 - Let car calculate statelessly from movement flags in the movement component?
  
 - Resurrect the unit tests for padding that were deleted along with cosmic delta

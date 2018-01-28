@@ -36,17 +36,13 @@ std::optional<components::transform> basic_spatial_properties_mixin<C, D>::find_
 		But we would anyway need to get the owner body so we do it this way.
 	*/
 
-	if (const auto owner = handle.get_owner_of_colliders()) {
-		const auto offset = handle.calculate_colliders_connection();
+	if (const auto connection = handle.find_colliders_connection()) {
+		const auto& cosmos = handle.get_cosmos();
+		const auto owner = cosmos[connection->owner];
 
-		/*
-			TODO: retrieve the offset from fixtures cache instead of recalculating it.
-		*/
-
-		ensure_eq(owner, offset.owner);
 		const auto body_transform = owner.template get<components::rigid_body>().get_transform();
 
-		auto displacement = offset.shape_offset;
+		auto displacement = connection->shape_offset;
 
 		if (!displacement.pos.is_zero()) {
 			displacement.pos.rotate(body_transform.rotation, vec2(0, 0));
