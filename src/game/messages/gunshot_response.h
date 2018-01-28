@@ -6,7 +6,7 @@
 namespace messages {
 	struct gunshot_response : message {
 		components::transform muzzle_transform;
-		components::catridge catridge_definition;
+		invariants::catridge catridge_definition;
 
 		std::vector<entity_id> spawned_rounds;
 		entity_id spawned_shell;

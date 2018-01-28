@@ -217,7 +217,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 				const auto catridge_in_chamber = cosmos[chamber_slot.get_items_inside()[0]];
 
 				auto response = make_gunshot_response();
-				response.catridge_definition = catridge_in_chamber.get<components::catridge>();
+				response.catridge_definition = catridge_in_chamber.get<invariants::catridge>();
 
 				thread_local std::vector<entity_id> bullet_stacks;
 				bullet_stacks.clear();
@@ -249,7 +249,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					int charges = single_bullet_or_pellet_stack.get<components::item>().charges;
 
 					while (charges--) {
-						if (const auto round_flavour = single_bullet_or_pellet_stack.get<components::catridge>().round_flavour) {
+						if (const auto round_flavour = single_bullet_or_pellet_stack.get<invariants::catridge>().round_flavour) {
 							const auto round_entity = cosmic::create_entity(cosmos, round_flavour);
 							round_entity.add_standard_components(step);
 
@@ -290,7 +290,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 						}
 					}
 
-					if (const auto shell_flavour = single_bullet_or_pellet_stack.get<components::catridge>().shell_flavour) {
+					if (const auto shell_flavour = single_bullet_or_pellet_stack.get<invariants::catridge>().shell_flavour) {
 						const auto shell_entity = cosmic::create_entity(cosmos, shell_flavour);
 						shell_entity.add_standard_components(step);
 

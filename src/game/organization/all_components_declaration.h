@@ -23,6 +23,7 @@ namespace invariants {
 	struct missile;
 	struct sentience;
 	struct wandering_pixels;
+	struct catridge;
 }
 
 namespace components {
@@ -53,7 +54,6 @@ namespace components {
 	struct wandering_pixels;
 	struct sound_existence;
 	struct explosive;
-	struct catridge;
 	struct shape_polygon;
 	struct shape_circle;
 	struct motor_joint;
@@ -92,7 +92,6 @@ using component_list_t = List<
 	components::light,
 	components::wandering_pixels,
 	components::explosive,
-	components::catridge,
 	components::shape_circle,
 	components::motor_joint,
 	components::hand_fuse,
@@ -117,7 +116,8 @@ using invariant_list_t = List<
 	invariants::item,
 	invariants::missile,
 	invariants::sentience,
-	invariants::wandering_pixels
+	invariants::wandering_pixels,
+	invariants::catridge
 >;
 
 template <class... Types>

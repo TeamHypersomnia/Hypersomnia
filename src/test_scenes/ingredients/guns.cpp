@@ -180,6 +180,17 @@ namespace test_types {
 			item_inst.charges = 30;
 			meta.set(item_inst);
 
+			{
+				invariants::catridge catridge; 
+
+				catridge.shell_trace_particles.id = assets::particle_effect_id::CONCENTRATED_WANDERING_PIXELS;
+				catridge.shell_trace_particles.modifier.colorize = cyan;
+
+				catridge.shell_flavour = to_entity_type_id(test_scene_type::CYAN_SHELL_DEFINITION);
+				catridge.round_flavour = to_entity_type_id(test_scene_type::CYAN_ROUND_DEFINITION);
+
+				meta.set(catridge);
+			}
 		}
 
 		{
@@ -497,7 +508,6 @@ namespace test_types {
 
 namespace prefabs {
 	entity_handle create_sample_rifle(const logic_step step, vec2 pos, entity_id load_mag_id) {
-		const auto& metas = step.get_logical_assets();
 		auto& cosmos = step.get_cosmos();
 		auto load_mag = cosmos[load_mag_id];
 
@@ -526,7 +536,6 @@ namespace prefabs {
 	}
 
 	entity_handle create_kek9(const logic_step step, vec2 pos, entity_id load_mag_id) {
-		const auto& metas = step.get_logical_assets();
 		auto& cosmos = step.get_cosmos();
 		auto load_mag = cosmos[load_mag_id];
 
@@ -554,13 +563,11 @@ namespace prefabs {
 		const logic_step step,
 		vec2 pos
 	) {
-		const auto& metas = step.get_logical_assets();
 		auto& cosmos = step.get_cosmos();
 		auto weapon = create_test_scene_entity(cosmos, test_scene_type::AMPLIFIER_ARM);
 
 		weapon.set_logic_transform(step, pos);
 		weapon.add_standard_components(step);
-
 
 		return weapon;
 	}
@@ -571,11 +578,7 @@ namespace prefabs {
 		auto& cosmos = step.get_cosmos();
 		auto charge_inside = cosmos[charge_inside_id];
 
-		const auto& metas = step.get_logical_assets();
-
 		auto sample_magazine = create_test_scene_entity(cosmos, test_scene_type::SAMPLE_MAGAZINE);
-
-		
 
 		sample_magazine.set_logic_transform(step, pos);
 		sample_magazine.add_standard_components(step);
@@ -591,18 +594,6 @@ namespace prefabs {
 	entity_handle create_cyan_charge(const logic_step step, vec2 pos, int charges) {
 		auto& cosmos = step.get_cosmos();
 		const auto cyan_charge = create_test_scene_entity(cosmos, test_scene_type::CYAN_CHARGE);
-
-		const auto& metas = step.get_logical_assets();
-
-		{
-			auto& cat = cyan_charge += components::catridge();
-
-			cat.shell_trace_particles.id = assets::particle_effect_id::CONCENTRATED_WANDERING_PIXELS;
-			cat.shell_trace_particles.modifier.colorize = cyan;
-
-			cat.shell_flavour = to_entity_type_id(test_scene_type::CYAN_SHELL_DEFINITION);
-			cat.round_flavour = to_entity_type_id(test_scene_type::CYAN_ROUND_DEFINITION);
-		}
 
 		cyan_charge.set_logic_transform(step, pos);
 		cyan_charge.add_standard_components(step);
