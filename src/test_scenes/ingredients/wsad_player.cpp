@@ -162,8 +162,6 @@ namespace ingredients {
 		attitude.parties = party_category::METROPOLIS_CITIZEN;
 		attitude.hostile_parties = party_category::RESISTANCE_CITIZEN;
 
-		processing.disable_in(processing_subjects::WITH_FORCE_JOINT);
-
 		//force_joint.force_towards_chased_entity = 92000.f;
 		//force_joint.distance_when_force_easing_starts = 10.f;
 		//force_joint.power_of_force_easing_multiplier = 2.f;

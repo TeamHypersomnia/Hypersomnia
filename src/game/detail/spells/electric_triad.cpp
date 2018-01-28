@@ -47,7 +47,9 @@ void electric_triad_instance::perform_logic(const spell_logic_input in) {
 
 	for (unsigned i = 0; i < 3 && i < static_cast<unsigned>(hostiles.size()); ++i) {
 		const auto next_hostile = cosmos[hostiles[i]];
+#if MORE_LOGS
 		LOG_NVPS(next_hostile.get_id());
+#endif
 
 		const auto new_energy_ball = cosmic::create_entity(cosmos, spell_data.missile_flavour);
 		new_energy_ball.add_standard_components(in.step);

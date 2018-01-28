@@ -35,8 +35,6 @@ void release_or_throw_fused_object(
 	auto& fuse_def = fused_entity.get<invariants::hand_fuse>();
 
 	if (is_pressed_flag && !fuse.when_unpinned.was_set()) {
-		fused_entity.get<components::processing>().enable_in(processing_subjects::WITH_HAND_FUSE);
-
 		fuse.when_unpinned = now;
 		fuse_def.unpin_sound.start(
 			step,

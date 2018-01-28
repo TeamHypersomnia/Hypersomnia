@@ -345,3 +345,9 @@ COMMENTED OUT: Such things will be calculated statelessly.
 	- In particular, the **enabled** flags for invariants may change even though some entities of this type already exist.
 		- We warn the author and ask if the existent entities should be recreated with new components with new initial values (preserving what was already set).
 			- The warning can be ticked to never pop up again.
+
+## other trash
+
+- Rename hand_fuse to explosive_fuse and remove fuse timing from missile component;
+	- invariant should have a boolean of whether it is unpinnable by hand
+	- let also hand fuse system detonate explosive missiles

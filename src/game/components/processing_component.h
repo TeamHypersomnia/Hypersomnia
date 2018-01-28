@@ -14,13 +14,11 @@ namespace components {
 		
 		// GEN INTROSPECTOR struct components::processing
 		flagset_type processing_subject_categories;
-		flagset_type disabled_categories;
 		// END GEN INTROSPECTOR
 
 		bool operator==(const processing& b) const {
 			return 
 				processing_subject_categories == b.processing_subject_categories
-				&& disabled_categories == b.disabled_categories
 			;
 		}
 
@@ -38,7 +36,6 @@ public:
 	using base::get_raw_component;
 
 	bool is_in(const processing_subjects) const;
-	components::processing::flagset_type get_disabled_categories() const;
 	components::processing::flagset_type get_basic_categories() const;
 };
 
@@ -48,9 +45,6 @@ class component_synchronizer<false, components::processing> : public basic_proce
 public:
 	using basic_processing_synchronizer<false>::basic_processing_synchronizer;
 
-	void disable_in(const processing_subjects) const;
-	void enable_in(const processing_subjects) const;
-	void set_disabled_categories(const components::processing::flagset_type&) const;
 	void set_basic_categories(const components::processing::flagset_type&) const;
 };
 

@@ -76,36 +76,16 @@ P P::get_default(const const_entity_handle id) {
 
 template<bool C>
 bool basic_processing_synchronizer<C>::is_in(const processing_subjects list) const {
-	return get_raw_component().processing_subject_categories.test(list) && !get_raw_component().disabled_categories.test(list);
+	return get_raw_component().processing_subject_categories.test(list);
 }
 
 void component_synchronizer<false, P>::infer_caches() const {
 	handle.get_cosmos().get_solvable_inferred({}).processing_lists.infer_cache_for(handle);
 }
 
-void component_synchronizer<false, P>::disable_in(const processing_subjects l) const {
-	get_raw_component().disabled_categories.set(l, true);
-	infer_caches();
-}
-
-void component_synchronizer<false, P>::enable_in(const processing_subjects l) const {
-	get_raw_component().disabled_categories.set(l, false);
-	infer_caches();
-}
-
-template<bool C>
-P::flagset_type basic_processing_synchronizer<C>::get_disabled_categories() const {
-	return get_raw_component().disabled_categories;
-}
-
 template<bool C>
 P::flagset_type basic_processing_synchronizer<C>::get_basic_categories() const {
 	return get_raw_component().processing_subject_categories;
-}
-
-void component_synchronizer<false, P>::set_disabled_categories(const P::flagset_type& categories) const {
-	get_raw_component().disabled_categories = categories;
-	infer_caches();
 }
 
 void component_synchronizer<false, P>::set_basic_categories(const P::flagset_type& categories) const {

@@ -8,10 +8,6 @@ summary: Just a hidden scratchpad.
 ## Microplanned implementation order:  
 
 - Let car calculate statelessly from movement flags in the movement component?
-
-- Rename hand_fuse to explosive_fuse and remove fuse timing from missile component;
-	- invariant should have a boolean of whether it is unpinnable by hand
-	- let also hand fuse system detonate explosive missiles
  
 - Resurrect the unit tests for padding that were deleted along with cosmic delta
 
