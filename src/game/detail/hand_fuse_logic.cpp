@@ -33,19 +33,18 @@ void release_or_throw_fused_object(
 	
 	// LOG("throrot: %x", thrower_transform.rotation);
 	auto& fuse = fused_entity.get<components::hand_fuse>();
+	auto& fuse_def = fused_entity.get<invariants::hand_fuse>();
 
-	if (is_pressed_flag && !fuse.when_released.was_set()) {
+	if (is_pressed_flag && !fuse.when_unpinned.was_set()) {
 		fused_entity.get<components::processing>().enable_in(processing_subjects::WITH_HAND_FUSE);
 
-		fuse.when_released = now;
-		fuse.when_detonates.step = static_cast<unsigned>(now.step + (1 / delta.in_seconds() * 1.0));
-
-		fuse.unpin_sound.start(
+		fuse.when_unpinned = now;
+		fuse_def.unpin_sound.start(
 			step,
 			sound_effect_start_input::fire_and_forget(thrower_transform).set_listener(thrower)
 		);
 	}
-	else if (!is_pressed_flag && fuse.when_released.was_set()) {
+	else if (!is_pressed_flag && fuse.when_unpinned.was_set()) {
 		auto* const maybe_explosive = fused_entity.find<components::explosive>();
 
 		if (maybe_explosive != nullptr) {
@@ -56,7 +55,7 @@ void release_or_throw_fused_object(
 				step
 			);
 			
-			fuse.throw_sound.start(
+			fuse_def.throw_sound.start(
 				step,
 				sound_effect_start_input::fire_and_forget(thrower_transform).set_listener(thrower)
 			);

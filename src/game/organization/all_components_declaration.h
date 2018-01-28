@@ -24,6 +24,7 @@ namespace invariants {
 	struct sentience;
 	struct wandering_pixels;
 	struct catridge;
+	struct hand_fuse;
 }
 
 namespace components {
@@ -117,7 +118,8 @@ using invariant_list_t = List<
 	invariants::missile,
 	invariants::sentience,
 	invariants::wandering_pixels,
-	invariants::catridge
+	invariants::catridge,
+	invariants::hand_fuse
 >;
 
 template <class... Types>

@@ -7,6 +7,11 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order:  
 
+
+- Rename hand_fuse to explosive_fuse and remove fuse timing from missile component;
+	- invariant should have a boolean of whether it is unpinnable by hand
+	- let also hand fuse system detonate explosive missiles
+ 
 - Resurrect the unit tests for padding that were deleted along with cosmic delta
 
 - Audiovisual caches should always check if the transform exist because sometimes the transform might be lost even due to having been put into a backpack.
@@ -146,8 +151,6 @@ summary: Just a hidden scratchpad.
 			- So we don't have to do it now.
 			- We will specify storage for native types in tuples, thus we will be able to change SoA to AoS and back with just one compilation flag. 
 	
-- Rename "fixtures" to "colliders"
-
 - Instead of having "force joint" at all, make it so that while processing the cars, they additionally apply forces to drivers to keep them
 - Make it clear which functions get cache content and which actually calculate from the significant
 	- Three? kinds of operations:

@@ -392,7 +392,7 @@ void illuminated_rendering(
 
 		set_center_uniform(tex);
 
-		draw_hud_for_released_explosives({
+		draw_hud_for_unpinned_explosives({
 			output,
 			renderer.get_special_buffer(),
 			interp,

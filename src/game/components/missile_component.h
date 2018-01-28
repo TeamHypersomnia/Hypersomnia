@@ -23,8 +23,7 @@ namespace components {
 		int damage_charges_before_destruction = 1;
 		float power_multiplier_of_sender = 1.f;
 
-		augs::stepped_timestamp when_released;
-		augs::stepped_timestamp when_detonates;
+		augs::stepped_timestamp when_fired;
 
 		entity_id particular_homing_target;
 		

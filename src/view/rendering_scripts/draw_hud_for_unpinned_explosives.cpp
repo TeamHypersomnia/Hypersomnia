@@ -9,7 +9,7 @@
 #include "game/components/fixtures_component.h"
 #include "view/audiovisual_state/systems/interpolation_system.h"
 
-void draw_hud_for_released_explosives(const draw_hud_for_released_explosives_input in) {
+void draw_hud_for_unpinned_explosives(const draw_hud_for_released_explosives_input in) {
 	const auto dt = in.cosm.get_fixed_delta();
 
 	const auto& cosmos = in.cosm;
@@ -18,11 +18,13 @@ void draw_hud_for_released_explosives(const draw_hud_for_released_explosives_inp
 		processing_subjects::WITH_HAND_FUSE,
 		[&](const const_entity_handle it) {
 			const components::hand_fuse& hand_fuse = it.get<components::hand_fuse>();
+			const invariants::hand_fuse& hand_fuse_def = it.get<invariants::hand_fuse>();
+			const auto when_unpinned = hand_fuse.when_unpinned;
 
-			if (hand_fuse.when_detonates.was_set()) {
+			if (hand_fuse.when_unpinned.was_set()) {
 				const auto highlight_amount = static_cast<float>(1 - (
-					(in.global_time_seconds - hand_fuse.when_released.in_seconds(dt))
-					/ (hand_fuse.when_detonates.in_seconds(dt) - hand_fuse.when_released.in_seconds(dt))
+					(in.global_time_seconds - hand_fuse.when_unpinned.in_seconds(dt))
+					/ (hand_fuse_def.fuse_delay_ms / 1000.f) 
 				));
 
 				if (highlight_amount > 0.f) {

@@ -57,5 +57,5 @@ struct draw_crosshair_lasers_input {
 
 augs::vertex_triangle_buffer draw_circular_bars_and_get_textual_info(const draw_circular_bars_input);
 void draw_cast_spells_highlights(const draw_cast_spells_highlights_input);
-void draw_hud_for_released_explosives(const draw_hud_for_released_explosives_input);
+void draw_hud_for_unpinned_explosives(const draw_hud_for_released_explosives_input);
 void draw_crosshair_lasers(const draw_crosshair_lasers_input);

@@ -34,15 +34,13 @@
 
 using namespace augs;
 
-static void detonate_missile(
+static void detonate_if_explosive(
 	const logic_step step,
 	const vec2 location,
 	const const_entity_handle missile
 ) {
-	const auto maybe_explosive = missile.find<components::explosive>();
-
-	if (maybe_explosive != nullptr) {
-		maybe_explosive->explosion.instantiate(step, location, entity_id());
+	if (const auto explosive = missile.find<components::explosive>()) {
+		explosive->explosion.instantiate(step, location, entity_id());
 	}
 }
 
@@ -61,7 +59,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 		const auto missile_handle = cosmos[it.collider];
 
 		if (auto missile = missile_handle.find<components::missile>()) {
-			auto& missile_def = missile_handle.get<invariants::missile>();
+			const auto& missile_def = missile_handle.get<invariants::missile>();
 			const auto& sender = missile_handle.get<components::sender>();
 
 			const bool bullet_colliding_with_any_subject_of_sender = sender.is_sender_subject(subject_handle);
@@ -110,7 +108,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 				if (!is_victim_a_held_item && missile_def.destroy_upon_damage) {
 					missile->damage_charges_before_destruction--;
 					
-					detonate_missile(step, it.point, missile_handle);
+					detonate_if_explosive(step, it.point, missile_handle);
 
 					// delete only once
 					if (missile->damage_charges_before_destruction == 0) {
@@ -146,19 +144,20 @@ void missile_system::detonate_expired_missiles(const logic_step step) {
 			;
 
 			if (missile_def.constrain_lifetime && !already_detonated_in_this_step) {
-				if (!missile.when_released.was_set()) {
-					missile.when_released = now;
-					missile.when_detonates.step = static_cast<unsigned>(now.step + (1 / delta.in_milliseconds() * missile_def.max_lifetime_ms));
+				if (!missile.when_fired.was_set()) {
+					missile.when_fired = now;
 				}
+				else {
+					const auto fuse_delay_steps = static_cast<unsigned>(missile_def.max_lifetime_ms / delta.in_milliseconds());
+					const auto when_detonates = missile.when_fired.step + fuse_delay_steps;
 
-				const bool should_already_detonate = now >= missile.when_detonates;
+					if (const bool should_already_detonate = now.step >= when_detonates) {
+						const auto current_pos = it.get_logic_transform().pos;
 
-				if (should_already_detonate) {
-					const auto current_pos = it.get_logic_transform().pos;
-
-					missile.saved_point_of_impact_before_death = current_pos;
-					detonate_missile(step, current_pos, it);
-					step.post_message(messages::queue_destruction(it));
+						missile.saved_point_of_impact_before_death = current_pos;
+						detonate_if_explosive(step, current_pos, it);
+						step.post_message(messages::queue_destruction(it));
+					}
 				}
 			}
 

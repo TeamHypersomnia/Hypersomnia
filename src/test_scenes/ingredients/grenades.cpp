@@ -41,6 +41,11 @@ namespace test_types {
 			invariants::item item;
 			item.space_occupied_per_charge = to_space_units("0.6");
 			meta.set(item);
+
+			invariants::hand_fuse fuse; 
+			fuse.throw_sound.id = assets::sound_buffer_id::GRENADE_THROW;
+			fuse.unpin_sound.id = assets::sound_buffer_id::GRENADE_UNPIN;
+			meta.set(fuse);
 		}
 
 		{
@@ -64,6 +69,11 @@ namespace test_types {
 			item.space_occupied_per_charge = to_space_units("0.6");
 			meta.set(item);
 
+			invariants::hand_fuse fuse; 
+			fuse.throw_sound.id = assets::sound_buffer_id::GRENADE_THROW;
+			fuse.unpin_sound.id = assets::sound_buffer_id::GRENADE_UNPIN;
+			meta.set(fuse);
+
 		}
 
 		{
@@ -86,6 +96,11 @@ namespace test_types {
 			invariants::item item;
 			item.space_occupied_per_charge = to_space_units("0.6");
 			meta.set(item);
+
+			invariants::hand_fuse fuse; 
+			fuse.throw_sound.id = assets::sound_buffer_id::GRENADE_THROW;
+			fuse.unpin_sound.id = assets::sound_buffer_id::GRENADE_UNPIN;
+			meta.set(fuse);
 		}
 	}
 }
@@ -98,9 +113,6 @@ namespace prefabs {
 
 		auto& sender = grenade_entity += components::sender();
 		auto& explosive = grenade_entity += components::explosive();
-		auto& fuse = grenade_entity += components::hand_fuse();
-		fuse.throw_sound.id = assets::sound_buffer_id::GRENADE_THROW;
-		fuse.unpin_sound.id = assets::sound_buffer_id::GRENADE_UNPIN;
 
 		auto& in = explosive.explosion;
 		in.type = adverse_element_type::FORCE;
@@ -133,9 +145,6 @@ namespace prefabs {
 
 		auto& sender = grenade_entity += components::sender();
 		auto& explosive = grenade_entity += components::explosive();
-		auto& fuse = grenade_entity += components::hand_fuse();
-		fuse.throw_sound.id = assets::sound_buffer_id::GRENADE_THROW;
-		fuse.unpin_sound.id = assets::sound_buffer_id::GRENADE_UNPIN;
 
 		auto& in = explosive.explosion;
 		in.damage = 88.f;
@@ -169,9 +178,6 @@ namespace prefabs {
 		
 		auto& sender = grenade_entity += components::sender();
 		auto& explosive = grenade_entity += components::explosive();
-		auto& fuse = grenade_entity += components::hand_fuse();
-		fuse.throw_sound.id = assets::sound_buffer_id::GRENADE_THROW;
-		fuse.unpin_sound.id = assets::sound_buffer_id::GRENADE_UNPIN;
 
 		auto& in = explosive.explosion;
 
