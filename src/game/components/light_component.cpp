@@ -1,7 +1,7 @@
 #include "augs/misc/randomization.h"
 #include "game/components/light_component.h"
 
-namespace components {
+namespace invariants {
 	light::light() {
 		constant.base_value = 0.4f;
 		linear.base_value = 0.000011f;

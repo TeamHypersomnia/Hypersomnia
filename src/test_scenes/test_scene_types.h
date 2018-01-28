@@ -6,7 +6,7 @@ enum class test_scene_type {
 	// GEN INTROSPECTOR enum class test_scene_type
 	PARTICLE_STREAM = 1,
 	WANDERING_PIXELS,
-	LAMP,
+	STRONG_LAMP,
 	HAVE_A_PLEASANT,
 	GROUND,
 	STREET,

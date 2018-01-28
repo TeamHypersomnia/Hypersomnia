@@ -9,6 +9,19 @@
 namespace test_types {
 	void populate_other_types(const all_logical_assets& logicals, entity_types& types) {
 		{
+			auto& meta = get_test_type(types, test_scene_type::STRONG_LAMP);
+
+			invariants::light light; 
+
+			light.max_distance.base_value = 4500.f;
+			light.constant.base_value = 0.15f;
+			light.linear.base_value = 0.000005f;
+			light.wall_max_distance.base_value = 4000.f;
+
+			meta.set(light);
+		}
+
+		{
 			auto& meta = get_test_type(types, test_scene_type::WANDERING_PIXELS);
 
 			{

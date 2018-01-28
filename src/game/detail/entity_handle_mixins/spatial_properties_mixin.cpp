@@ -78,13 +78,13 @@ std::optional<components::transform> basic_spatial_properties_mixin<C, D>::find_
 		return cosmos[item->get_current_slot()].get_container().find_logic_transform();
 	}
 
-	if (const auto transform = handle.template find<components::transform>()) {
-		return *transform;
-	}	
-
 	if (const auto wandering_pixels = handle.template find<components::wandering_pixels>()) {
 		return wandering_pixels->reach.center();
 	}
+
+	if (const auto transform = handle.template find<components::transform>()) {
+		return *transform;
+	}	
 
 	return std::nullopt;
 }

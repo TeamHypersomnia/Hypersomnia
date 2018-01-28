@@ -269,21 +269,12 @@ namespace test_scenes {
 				const auto light_cyan = c.x < 0 ? orange : rgba(30, 255, 255, 255);
 
 				{
-					const auto l = create_test_scene_entity(world, test_scene_type::LAMP);
-					l += components::transform(light_pos);
-					auto& light = l += components::light();
+					const auto l = create_test_scene_entity(world, test_scene_type::STRONG_LAMP);
+					l.set_logic_transform(step, components::transform(light_pos));
+
+					auto& light = l.get<components::light>();
+
 					light.color = light_cyan;
-					light.max_distance.base_value = 4500.f;
-					light.constant.base_value = 0.15f;
-					light.linear.base_value = 0.000005f;
-
-					if (light_cyan == orange) {
-						light.max_distance.base_value = 5500.f;
-						light.constant.base_value = 0.10f;
-						light.linear.base_value = 0.000002f;
-					}
-
-					light.wall_max_distance.base_value = 4000.f;
 					l.add_standard_components(step);
 				}
 
@@ -325,21 +316,17 @@ namespace test_scenes {
 
 		{
 			{
-				const auto l = create_test_scene_entity(world, test_scene_type::LAMP);
-				l += components::transform(vec2(164.f - 8.f + 90.f, 220));
-				auto& light = l += components::light();
+				const auto l = create_test_scene_entity(world, test_scene_type::STRONG_LAMP);
+				l.set_logic_transform(step, components::transform(vec2(164.f - 8.f + 90.f, 220)));
+				auto& light = l.get<components::light>();
 				light.color = cyan;
-				light.max_distance.base_value = 4500.f;
-				light.wall_max_distance.base_value = 4000.f;
 				l.add_standard_components(step);
 			}
 			{
-				const auto l = create_test_scene_entity(world, test_scene_type::LAMP);
-				l += components::transform(vec2(1164.f + 24.f - 90.f, 220));
-				auto& light = l += components::light();
+				const auto l = create_test_scene_entity(world, test_scene_type::STRONG_LAMP);
+				l.set_logic_transform(step, components::transform(vec2(1164.f + 24.f - 90.f, 220)));
+				auto& light = l.get<components::light>();
 				light.color = orange;
-				light.max_distance.base_value = 4500.f;
-				light.wall_max_distance.base_value = 4000.f;
 				l.add_standard_components(step);
 			}
 			{
@@ -414,12 +401,10 @@ namespace test_scenes {
 			}
 
 			{
-				const auto l = create_test_scene_entity(world, test_scene_type::LAMP);
-				l += components::transform(vec2(664.f + 24.f, -1100));
-				auto& light = l += components::light();
+				const auto l = create_test_scene_entity(world, test_scene_type::STRONG_LAMP);
+				l.set_logic_transform(step, components::transform(vec2(664.f + 24.f, -1100)));
+				auto& light = l.get<components::light>();
 				light.color = orange;
-				light.max_distance.base_value = 4500.f;
-				light.wall_max_distance.base_value = 4000.f;
 				l.add_standard_components(step);
 			}
 

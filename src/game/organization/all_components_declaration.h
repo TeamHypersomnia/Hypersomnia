@@ -28,6 +28,7 @@ namespace invariants {
 	struct hand_fuse;
 	struct explosive;
 	struct movement;
+	struct light;
 }
 
 namespace components {
@@ -115,7 +116,8 @@ using invariant_list_t = List<
 	invariants::wandering_pixels,
 	invariants::catridge,
 	invariants::explosive,
-	invariants::hand_fuse
+	invariants::hand_fuse,
+	invariants::light
 >;
 
 template <class... Types>

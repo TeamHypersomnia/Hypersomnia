@@ -24,13 +24,21 @@ struct light_attenuation {
 namespace components {
 	struct light {
 		// GEN INTROSPECTOR struct components::light
-		rgba color;
+		rgba color = white;
+		// END GEN INTROSPECTOR
+	};
+}
 
+namespace invariants {
+	struct light {
+		using implied_component = components::light;
+
+		// GEN INTROSPECTOR struct invariants::light
 		light_attenuation constant;
 		light_attenuation linear;
 		light_attenuation quadratic;
 		light_attenuation max_distance;
-		
+
 		light_attenuation wall_constant;
 		light_attenuation wall_linear;
 		light_attenuation wall_quadratic;

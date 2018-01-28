@@ -49,7 +49,7 @@ void light_system::advance_attenuation_variations(
 	cosmos.for_each(
 		processing_subjects::WITH_LIGHT,
 		[&](const const_entity_handle it) {
-			const auto& light = it.get<components::light>();
+			const auto& light = it.get<invariants::light>();
 			auto& cache = per_entity_cache[linear_cache_key(it)];
 
 			const auto delta = dt.in_seconds();
@@ -127,7 +127,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 			request.eye_transform = light_entity.get_viewing_transform(interp);
 			request.eye_transform.pos += light_displacement;
 			request.filter = filters::line_of_sight_query();
-			request.square_side = light_entity.get<components::light>().max_distance.base_value;
+			request.square_side = light_entity.get<invariants::light>().max_distance.base_value;
 			request.subject = light_entity;
 
 			requests.push_back(request);
@@ -145,6 +145,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 		const auto& r = responses[i];
 		const auto& light_entity = cosmos[requests[i].subject];
 		const auto& light = light_entity.get<components::light>();
+		const auto& light_def = light_entity.get<invariants::light>();
 		const auto world_light_pos = requests[i].eye_transform.pos;
 
 		for (size_t t = 0; t < r.get_num_triangles(); ++t) {
@@ -203,14 +204,14 @@ void light_system::render_all_lights(const light_system_input in) const {
 		const auto light_frag_pos = in.camera.to_screen_space(in.screen_size, world_light_pos);
 
 		light_shader.set_uniform(light_pos_uniform, light_frag_pos);
-		light_shader.set_uniform(light_max_distance_uniform, light.max_distance.base_value);
+		light_shader.set_uniform(light_max_distance_uniform, light_def.max_distance.base_value);
 		
 		light_shader.set_uniform(
 			light_attenuation_uniform,
 			vec3 {
-				cache.all_variation_values[0] + light.constant.base_value,
-				cache.all_variation_values[1] + light.linear.base_value,
-				cache.all_variation_values[2] + light.quadratic.base_value
+				cache.all_variation_values[0] + light_def.constant.base_value,
+				cache.all_variation_values[1] + light_def.linear.base_value,
+				cache.all_variation_values[2] + light_def.quadratic.base_value
 			}
 		);
 		
@@ -224,13 +225,13 @@ void light_system::render_all_lights(const light_system_input in) const {
 		
 		light_shader.set_as_current();
 
-		light_shader.set_uniform(light_max_distance_uniform, light.wall_max_distance.base_value);
+		light_shader.set_uniform(light_max_distance_uniform, light_def.wall_max_distance.base_value);
 		
 		light_shader.set_uniform(light_attenuation_uniform,
 			vec3 {
-				cache.all_variation_values[3] + light.wall_constant.base_value,
-				cache.all_variation_values[4] + light.wall_linear.base_value,
-				cache.all_variation_values[5] + light.wall_quadratic.base_value
+				cache.all_variation_values[3] + light_def.wall_constant.base_value,
+				cache.all_variation_values[4] + light_def.wall_linear.base_value,
+				cache.all_variation_values[5] + light_def.wall_quadratic.base_value
 			}
 		);
 		
