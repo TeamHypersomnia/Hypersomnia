@@ -19,8 +19,6 @@ struct movement_subscribtion {
 namespace components {
 	struct movement {
 		// GEN INTROSPECTOR struct components::movement
-		augs::constant_size_vector<movement_subscribtion, MOVEMENT_RESPONSE_RECEIVERS_COUNT> response_receivers;
-		
 		bool moving_left = false;
 		bool moving_right = false;
 		bool moving_forward = false;
@@ -48,10 +46,16 @@ namespace components {
 		float max_speed_for_movement_event = 1.f;
 		// END GEN INTROSPECTOR
 
-		void add_animation_receiver(entity_id e, bool stop_at_zero_movement);
 		void reset_movement_flags();
 		vec2 get_force_requested_by_input() const;
 		void set_flags_from_target_direction(vec2 d);
 		void set_flags_from_closest_direction(vec2 d);
+	};
+}
+
+namespace invariants {
+	struct movement {
+		// GEN INTROSPECTOR struct invariants::movement
+		// END GEN INTROSPECTOR
 	};
 }

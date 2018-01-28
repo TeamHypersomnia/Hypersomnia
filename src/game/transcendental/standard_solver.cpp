@@ -138,8 +138,6 @@ void standard_solve(const logic_step step) {
 
 	listener.~contact_listener();
 
-	movement_system().generate_movement_events(step);
-
 	animation_system().game_responses_to_animation_messages(step);
 
 	animation_system().handle_animation_messages(step);

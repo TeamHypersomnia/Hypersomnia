@@ -2,7 +2,6 @@
 #include "movement_system.h"
 #include "game/transcendental/cosmos.h"
 #include "game/messages/intent_message.h"
-#include "game/messages/movement_event.h"
 #include "augs/log.h"
 
 #include "game/components/gun_component.h"
@@ -166,38 +165,6 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 			}
 
 			rigid_body.infer_caches();
-		}
-	);
-}
-
-void movement_system::generate_movement_events(const logic_step step) {
-	auto& cosmos = step.get_cosmos();
-	const auto& delta = step.get_delta();
-
-	cosmos.for_each(
-		processing_subjects::WITH_MOVEMENT,
-		[&](const entity_handle it) {
-			const auto& movement = it.get<components::movement>();
-
-			float32 speed = 0.0f;
-
-			if (movement.enable_animation) {
-				if (it.has<components::rigid_body>()) {
-					speed = it.get<components::rigid_body>().get_velocity().length();
-				}
-			}
-
-			messages::movement_event msg;
-
-			if (movement.max_speed_for_movement_event == 0.f) msg.speed = 0.f;
-			else msg.speed = speed / movement.max_speed_for_movement_event;
-			
-			for (const auto receiver : movement.response_receivers) {
-				messages::movement_event copy(msg);
-				copy.stop_response_at_zero_speed = receiver.stop_response_at_zero_speed;
-				copy.subject = receiver.target;
-				step.post_message(copy);
-			}
 		}
 	);
 }

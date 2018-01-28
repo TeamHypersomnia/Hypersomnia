@@ -14,7 +14,6 @@ namespace messages {
 	struct queue_destruction;
 	struct will_soon_be_deleted;
 	struct animation_message;
-	struct movement_event;
 	struct collision_message;
 	struct gunshot_response;
 	struct crosshair_motion_message;
@@ -43,7 +42,6 @@ typedef augs::storage_for_message_queues <
 	messages::queue_destruction,
 	messages::will_soon_be_deleted,
 	messages::animation_message,
-	messages::movement_event,
 	messages::collision_message,
 	messages::gunshot_response,
 	messages::crosshair_motion_message,

@@ -55,13 +55,6 @@ namespace components {
 		if (d.y < 0) moving_forward = true;
 	}
 
-	void movement::add_animation_receiver(entity_id e, bool stop_at_zero_movement) {
-		movement_subscribtion s;
-		s.target = e;
-		s.stop_response_at_zero_speed = stop_at_zero_movement;
-		response_receivers.push_back(s);
-	}
-
 	vec2 movement::get_force_requested_by_input() const {
 		return {
 			moving_right * input_acceleration_axes.x - moving_left * input_acceleration_axes.x,

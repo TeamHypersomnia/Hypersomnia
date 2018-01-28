@@ -10,8 +10,6 @@ constexpr std::size_t DESTRUCTION_SCARS_COUNT = 6;
 constexpr std::size_t CONVEX_POLYS_COUNT = 10;
 constexpr std::size_t CONVEX_POLY_VERTEX_COUNT = 8;
 
-constexpr std::size_t MOVEMENT_RESPONSE_RECEIVERS_COUNT = 2;
-
 constexpr std::size_t RENDERING_POLYGON_VERTEX_COUNT = 20;
 constexpr std::size_t RENDERING_POLYGON_INDEX_COUNT = 20;
 

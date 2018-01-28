@@ -2,7 +2,6 @@
 
 #include "game/transcendental/cosmos.h"
 
-#include "game/messages/movement_event.h"
 #include "game/messages/animation_message.h"
 #include "game/messages/gunshot_response.h"
 
@@ -21,8 +20,6 @@ using namespace messages;
 void animation_system::game_responses_to_animation_messages(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
 	const auto& delta = step.get_delta();
-	const auto& movements = step.get_queue<movement_event>();
-	const auto& gunshots = step.get_queue<gunshot_response>();
 }
 
 void animation_system::handle_animation_messages(const logic_step step) {
