@@ -17,7 +17,7 @@
 #include "game/components/fixtures_component.h"
 #include "game/components/interpolation_component.h"
 #include "game/components/item_slot_transfers_component.h"
-#include "game/components/type_component.h"
+#include "game/components/flavour_component.h"
 #include "game/components/item_component.h"
 #include "game/components/render_component.h"
 #include "view/rendering_scripts/draw_entity.h"

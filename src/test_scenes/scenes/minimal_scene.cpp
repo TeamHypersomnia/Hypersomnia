@@ -4,7 +4,7 @@
 
 #include "game/enums/party_category.h"
 
-#include "test_scenes/test_scene_types.h"
+#include "test_scenes/test_scene_flavours.h"
 #include "test_scenes/ingredients/ingredients.h"
 #include "test_scenes/test_scenes_content.h"
 
@@ -17,7 +17,7 @@
 
 namespace test_scenes {
 	void minimal_scene::populate(const loaded_game_image_caches& caches, cosmos_common_significant& common) const {
-		populate_test_scene_types(caches, common.all_entity_types);
+		populate_test_scene_flavours(caches, common.all_entity_flavours);
 		load_test_scene_sentience_properties(common);
 
 		auto& common_assets = common.assets;
@@ -29,7 +29,7 @@ namespace test_scenes {
 		common_assets.exploding_ring_sparkles = assets::particle_effect_id::EXPLODING_RING_SPARKLES;
 		common_assets.thunder_remnants = assets::particle_effect_id::THUNDER_REMNANTS;
 
-		std::get<electric_triad>(common.spells).missile_flavour = to_entity_type_id(test_scene_type::ELECTRIC_MISSILE);
+		std::get<electric_triad>(common.spells).missile_flavour = to_entity_flavour_id(test_scene_flavour::ELECTRIC_MISSILE);
 	}
 
 	entity_id minimal_scene::populate(const loaded_game_image_caches& metas, const logic_step step) const {

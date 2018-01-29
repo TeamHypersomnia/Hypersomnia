@@ -21,7 +21,7 @@ struct electric_triad {
 	// GEN INTROSPECTOR struct electric_triad
 	spell_common_data common;
 	spell_appearance appearance;
-	entity_type_id missile_flavour;
+	entity_flavour_id missile_flavour;
 	// END GEN INTROSPECTOR
 
 	unsigned get_spell_logic_duration_ms() const {

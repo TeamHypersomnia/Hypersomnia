@@ -3,7 +3,7 @@
 #include "game/components/item_component.h"
 #include "game/components/missile_component.h"
 #include "game/components/sprite_component.h"
-#include "game/components/type_component.h"
+#include "game/components/flavour_component.h"
 #include "game/components/trace_component.h"
 #include "game/detail/view_input/sound_effect_input.h"
 #include "game/components/fixtures_component.h"
@@ -26,11 +26,11 @@
 #include "ingredients.h"
 #include "game/detail/inventory/perform_transfer.h"
 
-namespace test_types {
-	void populate_gun_types(const loaded_game_image_caches& logicals, entity_types& types) {
+namespace test_flavours {
+	void populate_gun_types(const loaded_game_image_caches& logicals, entity_flavours& flavours) {
 		/* Types for bullets etc. */
 
-		auto make_default_gun_container = [](entity_type& meta, const float mag_rotation = -90.f, const bool magazine_hidden = false){
+		auto make_default_gun_container = [](entity_flavour& meta, const float mag_rotation = -90.f, const bool magazine_hidden = false){
 			invariants::container container; 
 
 			{
@@ -79,7 +79,7 @@ namespace test_types {
 		};
 	
 		{
-			auto& meta = get_test_type(types, test_scene_type::CYAN_ROUND_DEFINITION);
+			auto& meta = get_test_flavour(flavours, test_scene_flavour::CYAN_ROUND_DEFINITION);
 
 			{
 				invariants::render render_def;
@@ -95,7 +95,7 @@ namespace test_types {
 				meta.set(flags_def);
 			}
 
-			test_types::add_sprite(meta, logicals, assets::game_image_id::ROUND_TRACE, cyan);
+			test_flavours::add_sprite(meta, logicals, assets::game_image_id::ROUND_TRACE, cyan);
 			add_shape_invariant_from_renderable(meta, logicals);
 
 			{
@@ -106,13 +106,13 @@ namespace test_types {
 					trace_def.max_multiplier_y = {0.f, 0.f};
 					trace_def.lengthening_duration_ms = {200.f, 250.f};
 					trace_def.additional_multiplier = vec2(1.f, 1.f);
-					trace_def.finishing_trace_type = to_entity_type_id(test_scene_type::CYAN_ROUND_FINISHING_TRACE);
+					trace_def.finishing_trace_type = to_entity_flavour_id(test_scene_flavour::CYAN_ROUND_FINISHING_TRACE);
 
 					meta.set(trace_def);
 				}
 			}
 
-			test_types::add_bullet_round_physics(meta);
+			test_flavours::add_bullet_round_physics(meta);
 
 			invariants::missile missile;
 
@@ -140,7 +140,7 @@ namespace test_types {
 		}
 
 		{
-			auto& meta = get_test_type(types, test_scene_type::CYAN_SHELL_DEFINITION);
+			auto& meta = get_test_flavour(flavours, test_scene_flavour::CYAN_SHELL_DEFINITION);
 
 			{
 				invariants::render render_def;
@@ -149,13 +149,13 @@ namespace test_types {
 				meta.set(render_def);
 			}
 
-			test_types::add_sprite(meta, logicals, assets::game_image_id::CYAN_SHELL, white);
+			test_flavours::add_sprite(meta, logicals, assets::game_image_id::CYAN_SHELL, white);
 			add_shape_invariant_from_renderable(meta, logicals);
-			test_types::add_shell_dynamic_body(meta);
+			test_flavours::add_shell_dynamic_body(meta);
 		}
 
 		{
-			auto& meta = get_test_type(types, test_scene_type::CYAN_CHARGE);
+			auto& meta = get_test_flavour(flavours, test_scene_flavour::CYAN_CHARGE);
 
 			{
 				invariants::render render_def;
@@ -164,9 +164,9 @@ namespace test_types {
 				meta.set(render_def);
 			}
 
-			test_types::add_sprite(meta, logicals, assets::game_image_id::CYAN_CHARGE, white);
+			test_flavours::add_sprite(meta, logicals, assets::game_image_id::CYAN_CHARGE, white);
 			add_shape_invariant_from_renderable(meta, logicals);
-			test_types::add_see_through_dynamic_body(meta);
+			test_flavours::add_see_through_dynamic_body(meta);
 
 			invariants::item item;
 			item.space_occupied_per_charge = to_space_units("0.01");
@@ -185,15 +185,15 @@ namespace test_types {
 				catridge.shell_trace_particles.id = assets::particle_effect_id::CONCENTRATED_WANDERING_PIXELS;
 				catridge.shell_trace_particles.modifier.colorize = cyan;
 
-				catridge.shell_flavour = to_entity_type_id(test_scene_type::CYAN_SHELL_DEFINITION);
-				catridge.round_flavour = to_entity_type_id(test_scene_type::CYAN_ROUND_DEFINITION);
+				catridge.shell_flavour = to_entity_flavour_id(test_scene_flavour::CYAN_SHELL_DEFINITION);
+				catridge.round_flavour = to_entity_flavour_id(test_scene_flavour::CYAN_ROUND_DEFINITION);
 
 				meta.set(catridge);
 			}
 		}
 
 		{
-			auto& meta = get_test_type(types, test_scene_type::SAMPLE_MAGAZINE);
+			auto& meta = get_test_flavour(flavours, test_scene_flavour::SAMPLE_MAGAZINE);
 
 			{
 				invariants::render render_def;
@@ -202,9 +202,9 @@ namespace test_types {
 				meta.set(render_def);
 			}
 
-			test_types::add_sprite(meta, logicals, assets::game_image_id::SAMPLE_MAGAZINE, white);
+			test_flavours::add_sprite(meta, logicals, assets::game_image_id::SAMPLE_MAGAZINE, white);
 			add_shape_invariant_from_renderable(meta, logicals);
-			test_types::add_see_through_dynamic_body(meta);
+			test_flavours::add_see_through_dynamic_body(meta);
 
 			invariants::container container; 
 
@@ -225,14 +225,14 @@ namespace test_types {
 		}
 
 		{
-			auto& meta = get_test_type(types, test_scene_type::CYAN_ROUND_FINISHING_TRACE);
+			auto& meta = get_test_flavour(flavours, test_scene_flavour::CYAN_ROUND_FINISHING_TRACE);
 			
 			{
 				invariants::render render_def;
 				render_def.layer = render_layer::FLYING_BULLETS;
 
 				meta.set(render_def);
-				test_types::add_sprite(meta, logicals, assets::game_image_id::ROUND_TRACE, cyan);
+				test_flavours::add_sprite(meta, logicals, assets::game_image_id::ROUND_TRACE, cyan);
 			}
 
 			{
@@ -248,14 +248,14 @@ namespace test_types {
 		}
 
 		{
-			auto& meta = get_test_type(types, test_scene_type::ENERGY_BALL_FINISHING_TRACE);
+			auto& meta = get_test_flavour(flavours, test_scene_flavour::ENERGY_BALL_FINISHING_TRACE);
 
 			{
 				invariants::render render_def;
 				render_def.layer = render_layer::FLYING_BULLETS;
 
 				meta.set(render_def);
-				test_types::add_sprite(meta, logicals, assets::game_image_id::ENERGY_BALL, cyan);
+				test_flavours::add_sprite(meta, logicals, assets::game_image_id::ENERGY_BALL, cyan);
 			}
 
 			{
@@ -271,7 +271,7 @@ namespace test_types {
 		}
 
 		{
-			auto& meta = get_test_type(types, test_scene_type::ELECTRIC_MISSILE);
+			auto& meta = get_test_flavour(flavours, test_scene_flavour::ELECTRIC_MISSILE);
 
 			{
 				invariants::render render_def;
@@ -281,7 +281,7 @@ namespace test_types {
 			}
 
 
-			test_types::add_sprite(meta, logicals, assets::game_image_id::ENERGY_BALL, cyan);
+			test_flavours::add_sprite(meta, logicals, assets::game_image_id::ENERGY_BALL, cyan);
 			add_shape_invariant_from_renderable(meta, logicals);
 			{
 				invariants::trace trace_def;
@@ -291,12 +291,12 @@ namespace test_types {
 				trace_def.lengthening_duration_ms = {300.f, 350.f};
 				trace_def.additional_multiplier = vec2(1.f, 1.f);
 
-				trace_def.finishing_trace_type = to_entity_type_id(test_scene_type::ENERGY_BALL_FINISHING_TRACE);
+				trace_def.finishing_trace_type = to_entity_flavour_id(test_scene_flavour::ENERGY_BALL_FINISHING_TRACE);
 
 				meta.set(trace_def);
 			}
 
-			test_types::add_bullet_round_physics(meta);
+			test_flavours::add_bullet_round_physics(meta);
 
 			invariants::missile missile;
 
@@ -326,7 +326,7 @@ namespace test_types {
 		}
 
 		{
-			auto& meta = get_test_type(types, test_scene_type::AMPLIFIER_ARM_MISSILE);
+			auto& meta = get_test_flavour(flavours, test_scene_flavour::AMPLIFIER_ARM_MISSILE);
 			
 			{
 				invariants::render render_def;
@@ -336,7 +336,7 @@ namespace test_types {
 			}
 
 
-			test_types::add_sprite(meta, logicals, assets::game_image_id::ENERGY_BALL, cyan);
+			test_flavours::add_sprite(meta, logicals, assets::game_image_id::ENERGY_BALL, cyan);
 			add_shape_invariant_from_renderable(meta, logicals);
 			{
 				invariants::trace trace_def;
@@ -346,12 +346,12 @@ namespace test_types {
 				trace_def.lengthening_duration_ms = {200.f, 250.f};
 				trace_def.additional_multiplier = vec2(1.f, 1.f);
 
-				trace_def.finishing_trace_type = to_entity_type_id(test_scene_type::ENERGY_BALL_FINISHING_TRACE);
+				trace_def.finishing_trace_type = to_entity_flavour_id(test_scene_flavour::ENERGY_BALL_FINISHING_TRACE);
 
 				meta.set(trace_def);
 			}
 
-			test_types::add_bullet_round_physics(meta);
+			test_flavours::add_bullet_round_physics(meta);
 
 			invariants::missile missile;
 
@@ -381,7 +381,7 @@ namespace test_types {
 		}
 
 		{
-			auto& meta = get_test_type(types, test_scene_type::SAMPLE_RIFLE);
+			auto& meta = get_test_flavour(flavours, test_scene_flavour::SAMPLE_RIFLE);
 
 			{
 				invariants::render render_def;
@@ -420,14 +420,14 @@ namespace test_types {
 
 			meta.set(gun_def);
 
-			test_types::add_sprite(meta, logicals, assets::game_image_id::ASSAULT_RIFLE, white);
+			test_flavours::add_sprite(meta, logicals, assets::game_image_id::ASSAULT_RIFLE, white);
 			add_shape_invariant_from_renderable(meta, logicals);
-			test_types::add_see_through_dynamic_body(meta);
+			test_flavours::add_see_through_dynamic_body(meta);
 			make_default_gun_container(meta);
 		}
 
 		{
-			auto& meta = get_test_type(types, test_scene_type::KEK9);
+			auto& meta = get_test_flavour(flavours, test_scene_flavour::KEK9);
 
 			{
 				invariants::render render_def;
@@ -462,14 +462,14 @@ namespace test_types {
 
 			meta.set(gun_def);
 
-			test_types::add_sprite(meta, logicals, assets::game_image_id::KEK9, white);
+			test_flavours::add_sprite(meta, logicals, assets::game_image_id::KEK9, white);
 			add_shape_invariant_from_renderable(meta, logicals);
-			test_types::add_see_through_dynamic_body(meta);
+			test_flavours::add_see_through_dynamic_body(meta);
 			make_default_gun_container(meta, 0.f, true);
 		}
 
 		{
-			auto& meta = get_test_type(types, test_scene_type::AMPLIFIER_ARM);
+			auto& meta = get_test_flavour(flavours, test_scene_flavour::AMPLIFIER_ARM);
 
 			{
 				invariants::render render_def;
@@ -490,13 +490,13 @@ namespace test_types {
 			gun_def.damage_multiplier = 1.f;
 
 			gun_def.recoil.id = assets::recoil_player_id::GENERIC;
-			gun_def.magic_missile_flavour = to_entity_type_id(test_scene_type::AMPLIFIER_ARM_MISSILE);
+			gun_def.magic_missile_flavour = to_entity_flavour_id(test_scene_flavour::AMPLIFIER_ARM_MISSILE);
 
 			meta.set(gun_def);
 
-			test_types::add_sprite(meta, logicals, assets::game_image_id::AMPLIFIER_ARM, white);
+			test_flavours::add_sprite(meta, logicals, assets::game_image_id::AMPLIFIER_ARM, white);
 			add_shape_invariant_from_renderable(meta, logicals);
-			test_types::add_see_through_dynamic_body(meta);
+			test_flavours::add_see_through_dynamic_body(meta);
 
 			invariants::item item;
 			item.space_occupied_per_charge = to_space_units("3.0");
@@ -510,7 +510,7 @@ namespace prefabs {
 		auto& cosmos = step.get_cosmos();
 		auto load_mag = cosmos[load_mag_id];
 
-		auto weapon = create_test_scene_entity(cosmos, test_scene_type::SAMPLE_RIFLE);
+		auto weapon = create_test_scene_entity(cosmos, test_scene_flavour::SAMPLE_RIFLE);
 
 		auto& gun = weapon.get<components::gun>();
 		auto& gun_def = weapon.get<invariants::gun>();
@@ -538,7 +538,7 @@ namespace prefabs {
 		auto& cosmos = step.get_cosmos();
 		auto load_mag = cosmos[load_mag_id];
 
-		auto weapon = create_test_scene_entity(cosmos, test_scene_type::KEK9);
+		auto weapon = create_test_scene_entity(cosmos, test_scene_flavour::KEK9);
 
 		auto& gun = weapon.get<components::gun>();
 		auto& gun_def = weapon.get<invariants::gun>();
@@ -563,7 +563,7 @@ namespace prefabs {
 		vec2 pos
 	) {
 		auto& cosmos = step.get_cosmos();
-		auto weapon = create_test_scene_entity(cosmos, test_scene_type::AMPLIFIER_ARM);
+		auto weapon = create_test_scene_entity(cosmos, test_scene_flavour::AMPLIFIER_ARM);
 
 		weapon.set_logic_transform(pos);
 		weapon.add_standard_components(step);
@@ -577,7 +577,7 @@ namespace prefabs {
 		auto& cosmos = step.get_cosmos();
 		auto charge_inside = cosmos[charge_inside_id];
 
-		auto sample_magazine = create_test_scene_entity(cosmos, test_scene_type::SAMPLE_MAGAZINE);
+		auto sample_magazine = create_test_scene_entity(cosmos, test_scene_flavour::SAMPLE_MAGAZINE);
 
 		sample_magazine.set_logic_transform(pos);
 		sample_magazine.add_standard_components(step);
@@ -592,7 +592,7 @@ namespace prefabs {
 
 	entity_handle create_cyan_charge(const logic_step step, vec2 pos, int charges) {
 		auto& cosmos = step.get_cosmos();
-		const auto cyan_charge = create_test_scene_entity(cosmos, test_scene_type::CYAN_CHARGE);
+		const auto cyan_charge = create_test_scene_entity(cosmos, test_scene_flavour::CYAN_CHARGE);
 
 		cyan_charge.set_logic_transform(pos);
 		cyan_charge.add_standard_components(step);

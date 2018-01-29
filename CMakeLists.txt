@@ -94,7 +94,7 @@ set(STATICALLY_ALLOCATE_ENTITIES_NUM "5000" CACHE STRING "Statically allocate en
 #	- Compilation might be longer due to component includes needed everywhere
 #	- Can't tweak maximum number of entity types at runtime
 #	- Even empty game worlds occupy as much space as those filled to the maximum
-set(STATICALLY_ALLOCATE_ENTITY_TYPES_NUM "500" CACHE STRING "Statically allocate entity types in the cosmos common")
+set(STATICALLY_ALLOCATE_ENTITY_FLAVOURS_NUM "500" CACHE STRING "Statically allocate entity types in the cosmos common")
 
 set(STATICALLY_ALLOCATE_ASSETS "1" CACHE STRING "Statically allocate assets using container_sizes.h")
 set(STATICALLY_ALLOCATE_BAKED_FONTS "1" CACHE STRING "Statically allocate fonts for faster rendering. One font weights 3 MB.")
@@ -259,7 +259,7 @@ set(HYPERSOMNIA_TEST_SCENES_CPPS
 	"src/test_scenes/test_scene_sound_buffers.cpp"
 	"src/test_scenes/test_scene_recoil_players.cpp"
 
-	"src/test_scenes/test_scene_types.cpp"
+	"src/test_scenes/test_scene_flavours.cpp"
 	"src/test_scenes/scenes/minimal_scene.cpp"
 
 	"src/test_scenes/scenes/minimal_scene.cpp"
@@ -391,7 +391,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/components/item_component.cpp"
 	"src/game/components/item_slot_transfers_component.cpp"
 	"src/game/components/movement_component.cpp"
-	"src/game/components/type_component.cpp"
+	"src/game/components/flavour_component.cpp"
 	"src/game/components/pathfinding_component.cpp"
 	"src/game/transcendental/cosmos.cpp"
 	"src/game/detail/ai/behaviours.cpp"
@@ -464,7 +464,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/augs/misc/enum/enum_boolset.cpp"
 	"src/augs/templates/string_templates.cpp"
 	"src/game/components/sender_component.cpp"
-	"src/game/inferred_caches/type_id_cache.cpp"
+	"src/game/inferred_caches/flavour_id_cache.cpp"
 	"src/game/detail/spells/electric_shield.cpp"
 	"src/game/detail/spells/electric_triad.cpp"
 	"src/game/detail/spells/fury_of_the_aeons.cpp"
@@ -503,7 +503,6 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/transcendental/cosmos_common.cpp"
 	"src/game/detail/inventory/perform_transfer.cpp"
 	"src/game/transcendental/cosmic_functions.cpp"
-	"src/game/common_state/entity_types.cpp"
 	"src/game/detail/view_input/particle_effect_input.cpp"
 	"src/game/detail/view_input/sound_effect_input.cpp"
 	"src/view/viewables/game_image.cpp"
@@ -623,7 +622,7 @@ file(GLOB_RECURSE HYPERSOMNIA_HEADERS_WITH_INTROSPECTED_CLASSES
 	"src/application/*.h"
 	"src/3rdparty/Box2D/Common/*.h"
 	"src/3rdparty/Box2D/Dynamics/*.h"
-	"src/test_scenes/test_scene_types.h"
+	"src/test_scenes/test_scene_flavours.h"
 )
 
 # The correct input configuration file shall contain paths to all headers for whom the generator should create introspectors,
@@ -985,8 +984,8 @@ if(STATICALLY_ALLOCATE_ENTITIES_NUM)
 	add_definitions(-DSTATICALLY_ALLOCATE_ENTITIES_NUM=${STATICALLY_ALLOCATE_ENTITIES_NUM})
 endif()
 
-if(STATICALLY_ALLOCATE_ENTITY_TYPES_NUM)
-	add_definitions(-DSTATICALLY_ALLOCATE_ENTITY_TYPES_NUM=${STATICALLY_ALLOCATE_ENTITY_TYPES_NUM})
+if(STATICALLY_ALLOCATE_ENTITY_FLAVOURS_NUM)
+	add_definitions(-DSTATICALLY_ALLOCATE_ENTITY_FLAVOURS_NUM=${STATICALLY_ALLOCATE_ENTITY_FLAVOURS_NUM})
 endif()
 
 if(STATICALLY_ALLOCATE_ASSETS)

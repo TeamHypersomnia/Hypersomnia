@@ -106,7 +106,7 @@ public:
 		return inferred.processing_lists.get(list_type).size();
 	}
 	
-	std::unordered_set<entity_id> get_entities_by_type_id(const entity_type_id&) const;
+	std::unordered_set<entity_id> get_entities_by_flavour_id(const entity_flavour_id&) const;
 	
 	std::size_t get_entities_count() const;
 	std::size_t get_maximum_entities() const;
@@ -172,8 +172,8 @@ inline entity_id cosmos_solvable::get_entity_id_by(const entity_guid guid) const
 	return {};
 }
 
-inline std::unordered_set<entity_id> cosmos_solvable::get_entities_by_type_id(const entity_type_id& id) const {
-	return inferred.name.get_entities_by_type_id(id);
+inline std::unordered_set<entity_id> cosmos_solvable::get_entities_by_flavour_id(const entity_flavour_id& id) const {
+	return inferred.name.get_entities_by_flavour_id(id);
 }
 
 inline entity_id cosmos_solvable::make_versioned(const unversioned_entity_id id) const {

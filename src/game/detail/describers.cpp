@@ -5,7 +5,7 @@
 #include "game/transcendental/entity_handle.h"
 
 #include "game/detail/inventory/inventory_slot_handle.h"
-#include "game/components/type_component.h"
+#include "game/components/flavour_component.h"
 #include "game/components/melee_component.h"
 #include "game/components/gun_component.h"
 #include "game/components/missile_component.h"
@@ -23,7 +23,7 @@ entity_name_type get_bbcoded_entity_name(const const_entity_handle maybe_overrid
 }
 
 const entity_description_type& get_bbcoded_entity_description(const const_entity_handle handle) {
-	return handle.get_type().description;
+	return handle.get_flavour().description;
 }
 
 std::wstring get_bbcoded_entity_properties(const const_entity_handle id) {

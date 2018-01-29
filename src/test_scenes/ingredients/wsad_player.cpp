@@ -13,7 +13,7 @@
 #include "game/components/rigid_body_component.h"
 #include "game/components/driver_component.h"
 #include "game/components/force_joint_component.h"
-#include "game/components/type_component.h"
+#include "game/components/flavour_component.h"
 #include "game/components/sentience_component.h"
 #include "game/components/attitude_component.h"
 #include "game/components/flags_component.h"
@@ -24,10 +24,10 @@
 #include "game/enums/party_category.h"
 #include "game/detail/inventory/perform_transfer.h"
 
-namespace test_types {
-	void populate_character_types(const loaded_game_image_caches& logicals, entity_types& types) {
+namespace test_flavours {
+	void populate_character_types(const loaded_game_image_caches& logicals, entity_flavours& flavours) {
 		{
-			auto& meta = get_test_type(types, test_scene_type::PLAYER);
+			auto& meta = get_test_flavour(flavours, test_scene_flavour::PLAYER);
 
 			meta.description = L"Member of Atlantic nations.";
 
@@ -122,12 +122,12 @@ namespace test_types {
 		}
 
 		{
-			auto& meta = get_test_type(types, test_scene_type::CROSSHAIR);
+			auto& meta = get_test_flavour(flavours, test_scene_flavour::CROSSHAIR);
 			add_sprite(meta, logicals, assets::game_image_id::TEST_CROSSHAIR);
 		}
 
 		{
-			auto& meta = get_test_type(types, test_scene_type::CROSSHAIR_RECOIL_BODY);
+			auto& meta = get_test_flavour(flavours, test_scene_flavour::CROSSHAIR_RECOIL_BODY);
 			add_sprite(meta, logicals, assets::game_image_id::TEST_CROSSHAIR);
 
 			add_shape_invariant_from_renderable(meta, logicals);
@@ -184,7 +184,7 @@ namespace prefabs {
 	) {
 		auto& world = step.get_cosmos();
 
-		const auto character = create_test_scene_entity(world, test_scene_type::PLAYER);
+		const auto character = create_test_scene_entity(world, test_scene_flavour::PLAYER);
 		
 		const auto& metas = step.get_logical_assets();
 		const auto crosshair = create_character_crosshair(step);
@@ -202,9 +202,9 @@ namespace prefabs {
 
 	entity_handle create_character_crosshair(const logic_step step) {
 		auto& world = step.get_cosmos();
-		auto root = create_test_scene_entity(world, test_scene_type::CROSSHAIR);
-		auto recoil = create_test_scene_entity(world, test_scene_type::CROSSHAIR_RECOIL_BODY);
-		auto zero_target = create_test_scene_entity(world, test_scene_type::ZERO_TARGET);
+		auto root = create_test_scene_entity(world, test_scene_flavour::CROSSHAIR);
+		auto recoil = create_test_scene_entity(world, test_scene_flavour::CROSSHAIR_RECOIL_BODY);
+		auto zero_target = create_test_scene_entity(world, test_scene_flavour::ZERO_TARGET);
 		const auto& metas = step.get_logical_assets();
 
 		{

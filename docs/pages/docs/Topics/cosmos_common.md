@@ -15,7 +15,7 @@ For example: if there exist 200 entities named "Road", it makes no sense to stor
 It would be better if those 200 entities could share a single ``std::wstring`` that they could refer to by a simple identifier.
 
 So, for each such entity, we store a **type identifier** inside a [type component](type_component), which is a simple **integer**.  
-Then we store a map from the **type identifier** into an [entity type](entity_type) object (that is a part of the cosmos common significant) that contains the corresponding ``std::wstring``.  
+Then we store a map from the **type identifier** into an [entity type](entity_flavour) object (that is a part of the cosmos common significant) that contains the corresponding ``std::wstring``.  
 
 This has several advantages:  
 - Less state to be synchronized through the network.
@@ -31,7 +31,7 @@ Similarly to [cosmos solvable](cosmos_solvable), the **cosmos common** consists 
     Represents the part of the **cosmos common** that is [significant](significant_state). It holds:
     
     - All [logical assets](logical_asset).
-    - All [entity types](entity_type).
+    - All [entity types](entity_flavour).
     - Descriptions of spells and their properties (e.g. [PE](personal_electricity) points needed to cast).
     - Numerical settings for some stateless systems (e.g. epsilons for visibility and pathfinding systems).
     - Many more.

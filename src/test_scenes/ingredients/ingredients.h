@@ -11,7 +11,7 @@
 
 #include "game/components/render_component.h"
 #include "game/components/sprite_component.h"
-#include "test_scenes/test_scene_types.h"
+#include "test_scenes/test_scene_flavours.h"
 
 namespace components {
 	struct item;
@@ -26,15 +26,15 @@ namespace ingredients {
 	void add_soldier_intelligence(entity_handle);
 }
 
-namespace test_types {
-	void add_bullet_round_physics(entity_type& meta);
-	void add_see_through_dynamic_body(entity_type& meta);
-	void add_shell_dynamic_body(entity_type& meta);
-	void add_standard_dynamic_body(entity_type& meta);
-	void add_standard_static_body(entity_type& meta);
+namespace test_flavours {
+	void add_bullet_round_physics(entity_flavour& meta);
+	void add_see_through_dynamic_body(entity_flavour& meta);
+	void add_shell_dynamic_body(entity_flavour& meta);
+	void add_standard_dynamic_body(entity_flavour& meta);
+	void add_standard_static_body(entity_flavour& meta);
 
 	void add_sprite(
-		entity_type& t, 
+		entity_flavour& t, 
 		const loaded_game_image_caches& logicals,
 		assets::game_image_id = assets::game_image_id::INVALID,
 		rgba col = rgba(255, 255, 255, 255),

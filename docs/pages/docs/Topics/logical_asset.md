@@ -8,7 +8,7 @@ summary: |
   Formally, it is a [flyweight](flyweight) whose instance is an integer identifier.  
   They are stored in the significant part of the [cosmos common](cosmos_common).
   
-  While [entity types](entity_type) exist to be shared between entities, a **logical asset** can be shared even by entity types themselves.
+  While [entity types](entity_flavour) exist to be shared between entities, a **logical asset** can be shared even by entity types themselves.
   
 ---
 

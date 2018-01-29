@@ -89,7 +89,7 @@ namespace invariants {
 
 		float cocking_handle_pull_duration_ms = 500.f;
 
-		entity_type_id magic_missile_flavour;
+		entity_flavour_id magic_missile_flavour;
 		recoil_player_instance_def recoil;
 		// END GEN INTROSPECTOR
 

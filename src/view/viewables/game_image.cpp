@@ -1,6 +1,6 @@
 #include "view/viewables/game_image.h"
 #include "3rdparty/Box2D/Collision/Shapes/b2PolygonShape.h"
-#include "game/common_state/entity_types.h"
+#include "game/common_state/entity_flavours.h"
 #include "game/components/shape_polygon_component.h"
 #include "view/viewables/regeneration/game_image_loadables.h"
 
@@ -62,7 +62,7 @@ loaded_game_image_caches::loaded_game_image_caches(
 }
 
 void add_shape_invariant_from_renderable(
-	entity_type& into,
+	entity_flavour& into,
 	const loaded_game_image_caches& caches
 ) {
 	if (const auto sprite = into.find<invariants::sprite>()) {

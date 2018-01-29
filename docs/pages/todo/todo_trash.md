@@ -218,7 +218,7 @@ Domains in direct need of destruction of some cache:
 - Entity can change the type during its lifetime, in which case it should be completely reinferred.
 	- That will be helpful when we want to make a change to entity (that is impossible by just changing the components) while preserving correctness of all identificators that point to it.
 	- Example: a grenade that changes from a normal body to a bullet body on being thrown (its sprite might change as well).
-		- Most ``child_entity_id`` types will anyway be replaced with a entity_type_id. For other cases, it makes little sense to also enforce deletion of those entities just because they are meant to be related.
+		- Most ``child_entity_id`` types will anyway be replaced with a entity_flavour_id. For other cases, it makes little sense to also enforce deletion of those entities just because they are meant to be related.
 -->
 
 <!--
@@ -336,7 +336,7 @@ COMMENTED OUT: Such things will be calculated statelessly.
 
 <!-- **We should disregard tailoring the assignment operator until we get to networking, where we'll probably switch to another physics engine with the features we need.** -->
 
-## entity_type.md trash
+## entity_flavour.md trash
 
 	- An author may specify which invariants to enable.
 	- The flags will be held separate:``std::array<bool, INVARIANT_COUNT_V> enabled_invariants;``

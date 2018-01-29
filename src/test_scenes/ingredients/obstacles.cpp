@@ -1,23 +1,23 @@
 #include "ingredients.h"
 #include "game/assets/all_logical_assets.h"
 #include "game/transcendental/cosmos.h"
-#include "game/components/type_component.h"
+#include "game/components/flavour_component.h"
 #include "game/components/fixtures_component.h"
 
-namespace test_types {
-	void populate_crate_types(const loaded_game_image_caches& logicals, entity_types& types) {
+namespace test_flavours {
+	void populate_crate_types(const loaded_game_image_caches& logicals, entity_flavours& flavours) {
 		{
-			auto& meta = get_test_type(types, test_scene_type::CRATE);
+			auto& meta = get_test_flavour(flavours, test_scene_flavour::CRATE);
 
 			invariants::render render_def;
 			render_def.layer = render_layer::DYNAMIC_BODY;
 
 			meta.set(render_def);
 
-			test_types::add_sprite(meta, logicals, assets::game_image_id::CRATE, white);
+			test_flavours::add_sprite(meta, logicals, assets::game_image_id::CRATE, white);
 			add_shape_invariant_from_renderable(meta, logicals);
 
-			test_types::add_standard_dynamic_body(meta);
+			test_flavours::add_standard_dynamic_body(meta);
 
 			auto& fixtures_def = meta.get<invariants::fixtures>();
 
@@ -27,18 +27,18 @@ namespace test_types {
 		}
 
 		{
-			auto& meta = get_test_type(types, test_scene_type::BRICK_WALL);
+			auto& meta = get_test_flavour(flavours, test_scene_flavour::BRICK_WALL);
 
 			invariants::render render_def;
 			render_def.layer = render_layer::DYNAMIC_BODY;
 
 			meta.set(render_def);
 
-			test_types::add_sprite(meta, logicals, assets::game_image_id::BRICK_WALL, white);
+			test_flavours::add_sprite(meta, logicals, assets::game_image_id::BRICK_WALL, white);
 			meta.get<invariants::sprite>().size = vec2(160, 160);
 			add_shape_invariant_from_renderable(meta, logicals);
 
-			test_types::add_standard_static_body(meta);
+			test_flavours::add_standard_static_body(meta);
 
 			auto& fixtures_def = meta.get<invariants::fixtures>();
 
@@ -51,14 +51,14 @@ namespace test_types {
 
 namespace prefabs {
 	entity_handle create_crate(const logic_step step, const components::transform pos) {
-		const auto crate = create_test_scene_entity(step.get_cosmos(), test_scene_type::CRATE);
+		const auto crate = create_test_scene_entity(step.get_cosmos(), test_scene_flavour::CRATE);
 		crate.set_logic_transform(pos);
 		crate.add_standard_components(step);
 		return crate;
 	}
 
 	entity_handle create_brick_wall(const logic_step step, const components::transform pos) {
-		const auto crate = create_test_scene_entity(step.get_cosmos(), test_scene_type::BRICK_WALL);
+		const auto crate = create_test_scene_entity(step.get_cosmos(), test_scene_flavour::BRICK_WALL);
 		crate.set_logic_transform(pos);
 		crate.add_standard_components(step);
 		return crate;

@@ -6,10 +6,10 @@
 #include "game/components/item_component.h"
 #include "game/components/container_component.h"
 
-namespace test_types {
-	void populate_other_types(const loaded_game_image_caches& logicals, entity_types& types) {
+namespace test_flavours {
+	void populate_other_types(const loaded_game_image_caches& logicals, entity_flavours& flavours) {
 		{
-			auto& meta = get_test_type(types, test_scene_type::STRONG_LAMP);
+			auto& meta = get_test_flavour(flavours, test_scene_flavour::STRONG_LAMP);
 
 			invariants::light light; 
 
@@ -22,7 +22,7 @@ namespace test_types {
 		}
 
 		{
-			auto& meta = get_test_type(types, test_scene_type::WANDERING_PIXELS);
+			auto& meta = get_test_flavour(flavours, test_scene_flavour::WANDERING_PIXELS);
 
 			{
 				invariants::render render_def;
@@ -47,7 +47,7 @@ namespace test_types {
 		}
 
 		{
-			auto& meta = get_test_type(types, test_scene_type::HAVE_A_PLEASANT);
+			auto& meta = get_test_flavour(flavours, test_scene_flavour::HAVE_A_PLEASANT);
 
 			{
 				invariants::render render_def;
@@ -56,7 +56,7 @@ namespace test_types {
 				meta.set(render_def);
 			}
 
-			test_types::add_sprite(
+			test_flavours::add_sprite(
 				meta, 
 				logicals,
 				assets::game_image_id::HAVE_A_PLEASANT,
@@ -65,7 +65,7 @@ namespace test_types {
 		}
 
 		{
-			auto& meta = get_test_type(types, test_scene_type::GROUND);
+			auto& meta = get_test_flavour(flavours, test_scene_flavour::GROUND);
 
 			{
 				invariants::render render_def;
@@ -75,7 +75,7 @@ namespace test_types {
 			}
 		}
 		{
-			auto& meta = get_test_type(types, test_scene_type::STREET);
+			auto& meta = get_test_flavour(flavours, test_scene_flavour::STREET);
 
 			{
 				invariants::render render_def;
@@ -84,11 +84,11 @@ namespace test_types {
 				meta.set(render_def);
 			}
 
-			test_types::add_sprite(meta, logicals,
+			test_flavours::add_sprite(meta, logicals,
 			assets::game_image_id::TEST_BACKGROUND, gray1);
 		}
 		{
-			auto& meta = get_test_type(types, test_scene_type::ROAD_DIRT);
+			auto& meta = get_test_flavour(flavours, test_scene_flavour::ROAD_DIRT);
 
 			{
 				invariants::render render_def;
@@ -97,11 +97,11 @@ namespace test_types {
 				meta.set(render_def);
 			}
 
-			test_types::add_sprite(meta, logicals,
+			test_flavours::add_sprite(meta, logicals,
 			assets::game_image_id::ROAD_FRONT_DIRT, white);
 		}
 		{
-			auto& meta = get_test_type(types, test_scene_type::ROAD);
+			auto& meta = get_test_flavour(flavours, test_scene_flavour::ROAD);
 
 			{
 				invariants::render render_def;
@@ -109,11 +109,11 @@ namespace test_types {
 
 				meta.set(render_def);
 			}
-			test_types::add_sprite(meta, logicals,
+			test_flavours::add_sprite(meta, logicals,
 						assets::game_image_id::ROAD, white);
 		}
 		{
-			auto& meta = get_test_type(types, test_scene_type::AWAKENING);
+			auto& meta = get_test_flavour(flavours, test_scene_flavour::AWAKENING);
 
 			{
 				invariants::render render_def;
@@ -121,14 +121,14 @@ namespace test_types {
 
 				meta.set(render_def);
 			}
-			test_types::add_sprite(meta, logicals,
+			test_flavours::add_sprite(meta, logicals,
 			assets::game_image_id::AWAKENING,
 			white,
 			invariants::sprite::special_effect::COLOR_WAVE
 		);
 		}
 		{
-			auto& meta = get_test_type(types, test_scene_type::METROPOLIS);
+			auto& meta = get_test_flavour(flavours, test_scene_flavour::METROPOLIS);
 
 			{
 				invariants::render render_def;
@@ -136,7 +136,7 @@ namespace test_types {
 
 				meta.set(render_def);
 			}
-			test_types::add_sprite(meta, logicals,
+			test_flavours::add_sprite(meta, logicals,
 					assets::game_image_id::METROPOLIS,
 					white);
 		}

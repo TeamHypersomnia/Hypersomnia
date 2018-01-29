@@ -6,8 +6,8 @@
 namespace invariants {
 	struct catridge {
 		// GEN INTROSPECTOR struct invariants::catridge
-		entity_type_id shell_flavour;
-		entity_type_id round_flavour;
+		entity_flavour_id shell_flavour;
+		entity_flavour_id round_flavour;
 
 		particle_effect_input shell_trace_particles;
 		// END GEN INTROSPECTOR

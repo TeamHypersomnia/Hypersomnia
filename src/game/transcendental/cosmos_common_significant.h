@@ -8,7 +8,7 @@
 #include "game/common_state/visibility_settings.h"
 #include "game/common_state/pathfinding_settings.h"
 #include "game/common_state/common_assets.h"
-#include "game/common_state/entity_types.h"
+#include "game/common_state/entity_flavours.h"
 
 #include "game/detail/spells/all_spells.h"
 #include "game/detail/perks/all_perks.h"
@@ -31,7 +31,7 @@ struct cosmos_common_significant {
 	pathfinding_settings pathfinding;
 	si_scaling si;
 
-	entity_types all_entity_types;
+	entity_flavours all_entity_flavours;
 	common_assets assets;
 
 	meter_tuple meters;

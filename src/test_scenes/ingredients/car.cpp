@@ -12,7 +12,7 @@
 #include "game/components/car_component.h"
 #include "game/components/rigid_body_component.h"
 #include "game/components/fixtures_component.h"
-#include "game/components/type_component.h"
+#include "game/components/flavour_component.h"
 #include "game/detail/view_input/particle_effect_input.h"
 #include "game/detail/view_input/sound_effect_input.h"
 #include "game/components/polygon_component.h"
@@ -23,10 +23,10 @@
 
 #include "game/enums/filters.h"
 
-namespace test_types {
-	void populate_car_types(const loaded_game_image_caches& logicals, entity_types& types) {
+namespace test_flavours {
+	void populate_car_types(const loaded_game_image_caches& logicals, entity_flavours& flavours) {
 		{
-			auto& meta = get_test_type(types, test_scene_type::TRUCK_FRONT);
+			auto& meta = get_test_flavour(flavours, test_scene_flavour::TRUCK_FRONT);
 			
 			invariants::render render_def;
 			render_def.layer = render_layer::DYNAMIC_BODY;
@@ -42,7 +42,7 @@ namespace test_types {
 			add_shape_invariant_from_renderable(meta, logicals);
 		}
 		{
-			auto& meta = get_test_type(types, test_scene_type::TRUCK_INTERIOR);
+			auto& meta = get_test_flavour(flavours, test_scene_flavour::TRUCK_INTERIOR);
 
 			invariants::render render_def;
 			render_def.layer = render_layer::CAR_INTERIOR;
@@ -55,7 +55,7 @@ namespace test_types {
 		}
 
 		{
-			auto& meta = get_test_type(types, test_scene_type::TRUCK_LEFT_WHEEL);
+			auto& meta = get_test_flavour(flavours, test_scene_flavour::TRUCK_LEFT_WHEEL);
 
 			invariants::render render_def;
 			render_def.layer = render_layer::CAR_WHEEL;
@@ -68,7 +68,7 @@ namespace test_types {
 		}
 
 		{
-			auto& meta = get_test_type(types, test_scene_type::TRUCK_ENGINE_BODY);
+			auto& meta = get_test_flavour(flavours, test_scene_flavour::TRUCK_ENGINE_BODY);
 
 			invariants::render render_def;
 			render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
@@ -87,9 +87,9 @@ namespace prefabs {
 		auto& world = step.get_cosmos();
 		const auto& metas = step.get_logical_assets();
 
-		auto front = create_test_scene_entity(world, test_scene_type::TRUCK_FRONT);
-		auto interior = create_test_scene_entity(world, test_scene_type::TRUCK_INTERIOR);
-		auto left_wheel = create_test_scene_entity(world, test_scene_type::TRUCK_LEFT_WHEEL);
+		auto front = create_test_scene_entity(world, test_scene_flavour::TRUCK_FRONT);
+		auto interior = create_test_scene_entity(world, test_scene_flavour::TRUCK_INTERIOR);
+		auto left_wheel = create_test_scene_entity(world, test_scene_flavour::TRUCK_LEFT_WHEEL);
 		left_wheel.make_as_child_of(front);
 
 		const auto si = world.get_si();
@@ -163,7 +163,7 @@ namespace prefabs {
 		{
 			for (int i = 0; i < 4; ++i) {
 				components::transform this_engine_transform;
-				const auto engine_physical = create_test_scene_entity(world, test_scene_type::TRUCK_ENGINE_BODY);
+				const auto engine_physical = create_test_scene_entity(world, test_scene_flavour::TRUCK_ENGINE_BODY);
 				engine_physical.make_as_child_of(front);
 
 				{

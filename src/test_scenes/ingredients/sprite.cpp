@@ -10,9 +10,9 @@
 
 #include "game/enums/filters.h"
 
-namespace test_types {
+namespace test_flavours {
 	void add_sprite(
-		entity_type& t, 
+		entity_flavour& t, 
 		const loaded_game_image_caches& logicals,
 		const assets::game_image_id id, 
 		const rgba col,

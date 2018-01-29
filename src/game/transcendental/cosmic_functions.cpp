@@ -50,14 +50,14 @@ void cosmic::reinfer_solvable(cosmos& cosm) {
 	reinfer_all_entities(cosm);
 }
 
-entity_handle cosmic::instantiate_flavour(cosmos& cosm, const entity_type_id type_id) {
-	ensure (type_id != entity_type_id());
+entity_handle cosmic::instantiate_flavour(cosmos& cosm, const entity_flavour_id flavour_id) {
+	ensure (flavour_id != entity_flavour_id());
 
 	const auto new_handle = entity_handle { cosm, cosm.get_solvable({}).allocate_next_entity() };
 
 	auto& solvable = cosm.get_solvable({});
 
-	solvable.get_aggregate(new_handle.get_id()).get<components::type>(solvable).type_id = type_id;
+	solvable.get_aggregate(new_handle.get_id()).get<components::flavour>(solvable).flavour_id = flavour_id;
 
 	for_each_invariant_type([&](auto d) {
 		using D = decltype(d);
@@ -65,7 +65,7 @@ entity_handle cosmic::instantiate_flavour(cosmos& cosm, const entity_type_id typ
 		if constexpr(has_implied_component_v<D>) {
 			using C = typename D::implied_component;
 
-			const auto& t = new_handle.get_type(); 
+			const auto& t = new_handle.get_flavour(); 
 
 			if (const auto* const def = t.template find<D>()) {
 				new_handle += std::get<C>(t.initial_components);
@@ -82,12 +82,12 @@ entity_handle cosmic::instantiate_flavour(cosmos& cosm, const entity_type_id typ
 
 entity_handle cosmic::create_entity(
 	cosmos& cosm,
-   	const entity_type_id type_id,
+   	const entity_flavour_id flavour_id,
    	const components::transform where
 ) {
 	return create_entity(
 		cosm, 
-		type_id, 
+		flavour_id, 
 		[where](const auto handle) {
 			handle.set_logic_transform(where);		
 		}
@@ -96,11 +96,11 @@ entity_handle cosmic::create_entity(
 
 entity_handle cosmic::create_entity(
 	cosmos& cosm,
-   	const entity_type_id type_id
+   	const entity_flavour_id flavour_id
 ) {
 	return create_entity(
 		cosm, 
-		type_id, 
+		flavour_id, 
 		[](const auto handle) {}
 	);
 }
@@ -125,7 +125,7 @@ entity_handle cosmic::clone_entity(const entity_handle source_entity) {
 		&& "Cloning of entities that are children is not yet supported"
 	);
 
-	const auto new_entity = create_entity(cosmos, source_entity.get_type_id());
+	const auto new_entity = create_entity(cosmos, source_entity.get_flavour_id());
 	auto& solvable = cosmos.get_solvable({});
 
 	solvable.get_aggregate(new_entity).clone_components_except<

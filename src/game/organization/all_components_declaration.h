@@ -46,7 +46,7 @@ namespace components {
 	struct item;
 	struct force_joint;
 	struct item_slot_transfers;
-	struct type;
+	struct flavour;
 	struct trace;
 	struct melee;
 	struct sentience;
@@ -79,7 +79,7 @@ using component_list_t = List<
 	components::item,
 	components::force_joint,
 	components::item_slot_transfers,
-	components::type,
+	components::flavour,
 	components::trace,
 	components::melee,
 	components::sentience,

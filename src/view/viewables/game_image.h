@@ -62,9 +62,9 @@ struct loaded_game_image_caches : public asset_map<
 	);
 };
 
-class entity_type;
+class entity_flavour;
 
 void add_shape_invariant_from_renderable(
-	entity_type& into,
+	entity_flavour& into,
 	const loaded_game_image_caches& caches
 );

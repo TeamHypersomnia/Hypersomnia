@@ -175,7 +175,11 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 						if (try_to_fire()) {
 							pe.value -= pe.calculate_damage_result(mana_needed).effective;
 
-							const auto round_entity = cosmic::create_entity(cosmos, magic_missile_flavour_id);
+							const auto round_entity = cosmic::create_entity(
+								cosmos, 
+								magic_missile_flavour_id
+							);
+
 							round_entity.set_logic_transform(muzzle_transform);
 							round_entity.add_standard_components(step);
 

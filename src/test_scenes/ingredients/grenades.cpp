@@ -18,10 +18,10 @@
 
 #include "game/detail/inventory/perform_transfer.h"
 
-namespace test_types {
-	void populate_grenade_types(const loaded_game_image_caches& logicals, entity_types& types) {
+namespace test_flavours {
+	void populate_grenade_types(const loaded_game_image_caches& logicals, entity_flavours& flavours) {
 		{
-			auto& meta = get_test_type(types, test_scene_type::FORCE_GRENADE);
+			auto& meta = get_test_flavour(flavours, test_scene_flavour::FORCE_GRENADE);
 
 			meta.description =
 				L"Throwable explosive with a three seconds delay.\nDeals damage to [color=red]Health[/color]."
@@ -34,9 +34,9 @@ namespace test_types {
 				meta.set(render_def);
 
 			}
-			test_types::add_sprite(meta, logicals, assets::game_image_id::FORCE_GRENADE, white);
+			test_flavours::add_sprite(meta, logicals, assets::game_image_id::FORCE_GRENADE, white);
 			add_shape_invariant_from_renderable(meta, logicals);
-			test_types::add_see_through_dynamic_body(meta);
+			test_flavours::add_see_through_dynamic_body(meta);
 
 			invariants::item item;
 			item.space_occupied_per_charge = to_space_units("0.6");
@@ -66,7 +66,7 @@ namespace test_types {
 		}
 
 		{
-			auto& meta = get_test_type(types, test_scene_type::INTERFERENCE_GRENADE);
+			auto& meta = get_test_flavour(flavours, test_scene_flavour::INTERFERENCE_GRENADE);
 
 			meta.description =
 				L"Throwable explosive with a three seconds delay.\nDeals damage to [color=orange]Consciousness[/color].\nCauses massive aimpunch."
@@ -78,9 +78,9 @@ namespace test_types {
 
 				meta.set(render_def);
 			}
-			test_types::add_sprite(meta, logicals, assets::game_image_id::INTERFERENCE_GRENADE, white);
+			test_flavours::add_sprite(meta, logicals, assets::game_image_id::INTERFERENCE_GRENADE, white);
 			add_shape_invariant_from_renderable(meta, logicals);
-			test_types::add_see_through_dynamic_body(meta);
+			test_flavours::add_see_through_dynamic_body(meta);
 
 			invariants::item item;
 			item.space_occupied_per_charge = to_space_units("0.6");
@@ -111,7 +111,7 @@ namespace test_types {
 		}
 
 		{
-			auto& meta = get_test_type(types, test_scene_type::PED_GRENADE);
+			auto& meta = get_test_flavour(flavours, test_scene_flavour::PED_GRENADE);
 
 			meta.description =
 				L"Throwable explosive with a three seconds delay.\nDrains [color=cyan]Personal Electricity[/color].\nIf the subject has [color=turquoise]Electric Shield[/color] enabled,\nthe effect is doubled."
@@ -123,9 +123,9 @@ namespace test_types {
 
 				meta.set(render_def);
 			}
-			test_types::add_sprite(meta, logicals, assets::game_image_id::PED_GRENADE, white);
+			test_flavours::add_sprite(meta, logicals, assets::game_image_id::PED_GRENADE, white);
 			add_shape_invariant_from_renderable(meta, logicals);
-			test_types::add_see_through_dynamic_body(meta);
+			test_flavours::add_see_through_dynamic_body(meta);
 
 			invariants::item item;
 			item.space_occupied_per_charge = to_space_units("0.6");
@@ -161,7 +161,7 @@ namespace prefabs {
 	entity_handle create_force_grenade(const logic_step step, vec2 pos) {
 		auto& world = step.get_cosmos();
 		const auto& metas = step.get_logical_assets();
-		const auto grenade_entity = create_test_scene_entity(world, test_scene_type::FORCE_GRENADE);
+		const auto grenade_entity = create_test_scene_entity(world, test_scene_flavour::FORCE_GRENADE);
 
 		grenade_entity.set_logic_transform(pos);
 		grenade_entity.add_standard_components(step);
@@ -172,7 +172,7 @@ namespace prefabs {
 	entity_handle create_ped_grenade(const logic_step step, vec2 pos) {
 		auto& world = step.get_cosmos();
 		const auto& metas = step.get_logical_assets();
-		const auto grenade_entity = create_test_scene_entity(world, test_scene_type::PED_GRENADE);
+		const auto grenade_entity = create_test_scene_entity(world, test_scene_flavour::PED_GRENADE);
 
 		grenade_entity.set_logic_transform(pos);
 		grenade_entity.add_standard_components(step);
@@ -183,7 +183,7 @@ namespace prefabs {
 	entity_handle create_interference_grenade(const logic_step step, vec2 pos) {
 		auto& world = step.get_cosmos();
 		const auto& metas = step.get_logical_assets();
-		const auto grenade_entity = create_test_scene_entity(world, test_scene_type::INTERFERENCE_GRENADE);
+		const auto grenade_entity = create_test_scene_entity(world, test_scene_flavour::INTERFERENCE_GRENADE);
 		
 		grenade_entity.set_logic_transform(pos);
 		grenade_entity.add_standard_components(step);

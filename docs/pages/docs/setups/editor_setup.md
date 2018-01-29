@@ -72,7 +72,7 @@ Can click on each command to go back to a given point in time.
 
 ### Type editor
 
-See: [entity type](entity_type).
+See: [entity type](entity_flavour).
 
 When creating a new entity type, the editor should add some recommended invariants from the start, e.g.
 - interpolation (unless we make its existence implied/recommended?)

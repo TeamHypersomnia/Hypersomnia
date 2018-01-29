@@ -12,7 +12,7 @@ using entity_description_type = entity_name_type;
 using entity_initial_components = component_list_t<std::tuple>;
 using invariant_tuple = invariant_list_t<augs::trivially_copyable_tuple>;
 
-class entity_type {
+class entity_flavour {
 	template <class D>
 	static constexpr auto idx = invariant_index_v<D>;
 
@@ -45,7 +45,7 @@ class entity_type {
 	}
 
 public:
-	// GEN INTROSPECTOR class entity_type
+	// GEN INTROSPECTOR class entity_flavour
 	entity_name_type name;
 	entity_description_type description;
 
@@ -96,7 +96,7 @@ public:
 		return get_impl<D>(*this);
 	}
 
-	bool operator==(const entity_type& b) const {
+	bool operator==(const entity_flavour& b) const {
 		return augs::equal_by_introspection(*this, b);
 	}
 
@@ -109,24 +109,24 @@ public:
 	}
 };
 
-#if STATICALLY_ALLOCATE_ENTITY_TYPES_NUM
+#if STATICALLY_ALLOCATE_ENTITY_FLAVOURS_NUM
 #include "augs/misc/constant_size_vector.h"
-using entity_types_container = augs::constant_size_vector<entity_type, STATICALLY_ALLOCATE_ENTITY_TYPES_NUM>;
+using entity_flavours_container = augs::constant_size_vector<entity_flavour, STATICALLY_ALLOCATE_ENTITY_FLAVOURS_NUM>;
 #else
 #include <vector>
-using entity_types_container = std::vector<entity_type>;
+using entity_flavours_container = std::vector<entity_flavour>;
 #endif
 
-struct entity_types {
-	// GEN INTROSPECTOR struct entity_types
-	entity_types_container types;
+struct entity_flavours {
+	// GEN INTROSPECTOR struct entity_flavours
+	entity_flavours_container types;
 	// END GEN INTROSPECTOR
 
-	auto& get_type(const entity_type_id id) {
+	auto& get_flavour(const entity_flavour_id id) {
 		return types[id];
 	}
 
-	const auto& get_type(const entity_type_id id) const {
+	const auto& get_flavour(const entity_flavour_id id) const {
 		return types[id];
 	}
 };

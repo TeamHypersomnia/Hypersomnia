@@ -5,7 +5,7 @@
 #include "game/inferred_caches/physics_world_cache.h"
 #include "game/inferred_caches/processing_lists_cache.h"
 #include "game/inferred_caches/relational_cache.h"
-#include "game/inferred_caches/type_id_cache.h"
+#include "game/inferred_caches/flavour_id_cache.h"
 
 #include "game/detail/inventory/inventory_slot_id.h"
 
@@ -21,7 +21,7 @@ constexpr bool can_reserve_caches_v = can_reserve_caches<T>::value;
 struct cosmos_solvable_inferred {
 	// GEN INTROSPECTOR struct cosmos_solvable_inferred
 	relational_cache relational;
-	type_id_cache name;
+	flavour_id_cache name;
 	physics_world_cache physics;
 	tree_of_npo_cache tree_of_npo;
 	processing_lists_cache processing_lists;

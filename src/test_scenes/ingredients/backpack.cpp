@@ -11,19 +11,19 @@
 
 #include "game/transcendental/entity_handle.h"
 
-namespace test_types {
-	void populate_backpack_types(const loaded_game_image_caches& logicals, entity_types& types) {
+namespace test_flavours {
+	void populate_backpack_types(const loaded_game_image_caches& logicals, entity_flavours& flavours) {
 		{
-			auto& meta = get_test_type(types, test_scene_type::SAMPLE_BACKPACK);
+			auto& meta = get_test_flavour(flavours, test_scene_flavour::SAMPLE_BACKPACK);
 
 			invariants::render render_def;
 			render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
 
 			meta.set(render_def);
 
-			test_types::add_sprite(meta, logicals, assets::game_image_id::BACKPACK, white);
+			test_flavours::add_sprite(meta, logicals, assets::game_image_id::BACKPACK, white);
 			add_shape_invariant_from_renderable(meta, logicals);
-			test_types::add_see_through_dynamic_body(meta);
+			test_flavours::add_see_through_dynamic_body(meta);
 
 			invariants::container container; 
 			inventory_slot slot_def;
@@ -47,7 +47,7 @@ namespace test_types {
 namespace prefabs {
 	entity_handle create_sample_backpack(const logic_step step, vec2 pos) {
 		auto& world = step.get_cosmos();
-		const auto backpack = create_test_scene_entity(world, test_scene_type::SAMPLE_BACKPACK);
+		const auto backpack = create_test_scene_entity(world, test_scene_flavour::SAMPLE_BACKPACK);
 		const auto& metas = step.get_logical_assets();
 		
 		backpack.set_logic_transform(pos);

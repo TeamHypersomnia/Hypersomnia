@@ -133,13 +133,13 @@ summary: Just a hidden scratchpad.
 			- e.g. truck engine
 
 - Thoughts about native types
-	- We can make the entity_type's populators in ingredients just templated functions
+	- We can make the entity_flavour's populators in ingredients just templated functions
 		- For the sake of not repeating test scene flavour logic for some different native types
 	- We will totally get rid of processing component and calculate statelessly which that which needs to be calculated.
 		- We anyway very rarely ever disabled something in processing subjects and we must always account for the worst case.
 	- Refer to typed_entity_handle for draft.
-	- Rename "entity_type" to "entity_flavour" and use "entity type" to represent the natively assembled aggregate of invariants and its counterpart
-		- entity_flavour_type vs entity_type 
+	- Rename "entity_flavour" to "entity_flavour" and use "entity type" to represent the natively assembled aggregate of invariants and its counterpart
+		- entity_flavour_type vs entity_flavour 
 	- Since the architecture will be corrected to the point where the solvers won't add any component,
 	we could actually introduce native entity types.
 		- dynamic_obstacle = sprite + render + rigid body + fixtures 

@@ -2,7 +2,7 @@
 title: Entity type
 tags: [topics, ECS, flyweights]
 hide_sidebar: true
-permalink: entity_type
+permalink: entity_flavour
 summary: |
   An **entity type** contains information that is stored once and is later shared by one or more [entities](entity).  
   Formally, an **entity type** is a [flyweight](flyweight) whose instance is an [entity](entity).  
@@ -37,7 +37,7 @@ Most of the time, only the programmers are concerned with the second type of dat
 		- This is not important. The field, in practice, serves two purposes:
 			- Used by the logic when it gets a type identifier to spawn (e.g. ``gun::magic_missile_flavour``), so that it can set reasonable initial values. Thus, a change to initial value needs not updating here as the logic will naturally catch up, storing only the type identifier.
 			- Exists as an optional helper for the author when they want to spawn some very specific entities. The author shouldn't worry that the initial value changes something for the existent entities.
-	- If a field of a invariant changes, (during content creation), reinfer all objects of this type with help of the [type id cache](type_id_cache); currently we'll just reinfer the whole cosmos.
+	- If a field of a invariant changes, (during content creation), reinfer all objects of this type with help of the [type id cache](flavour_id_cache); currently we'll just reinfer the whole cosmos.
 - There won't be many types, but access is **frequent** during [solve](solver#the-solve). 
 	- All possible configurations of invariants will be determined by types at compilation time.
 - The logic should always first check for the existence of component, only later the invariant that the component is implied by.

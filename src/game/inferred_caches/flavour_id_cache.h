@@ -11,17 +11,17 @@ namespace components {
 	struct type;
 }
 
-class type_id_cache {
+class flavour_id_cache {
 	std::unordered_map<
-		entity_type_id,
+		entity_flavour_id,
 		std::unordered_set<entity_id>
-	> entities_by_type_id;
+	> entities_by_flavour_id;
 
-	void infer_cache_for(const entity_id, const components::type&);
-	void destroy_cache_of(const entity_id, const components::type&);
+	void infer_cache_for(const entity_id, const components::flavour&);
+	void destroy_cache_of(const entity_id, const components::flavour&);
 
 public:
-	std::unordered_set<entity_id> get_entities_by_type_id(const entity_type_id) const;
+	std::unordered_set<entity_id> get_entities_by_flavour_id(const entity_flavour_id) const;
 
 	void infer_cache_for(const const_entity_handle);
 	void destroy_cache_of(const const_entity_handle);

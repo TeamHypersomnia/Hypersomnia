@@ -1,6 +1,6 @@
 
 
-namespace entity_types {
+namespace entity_flavours {
 	using character = augs::trivially_copyable_tuple<
 		invariants::rigid_body,
 		invariants::fixtures
@@ -21,11 +21,11 @@ struct entity_id : public cosmic_object_pool_id<cosmic_entity> {
 	}
 };
 
-template <class entity_type>
+template <class entity_flavour>
 struct typed_entity_id : public cosmic_object_pool_id<cosmic_entity> {
 	using base = cosmic_object_pool_id<cosmic_entity>;
 
-	// GEN INTROSPECTOR struct typed_entity_id class entity_type
+	// GEN INTROSPECTOR struct typed_entity_id class entity_flavour
 	// INTROSPECT BASE cosmic_object_pool_id<cosmic_entity>
 	// END GEN INTROSPECTOR
 
@@ -37,12 +37,12 @@ struct typed_entity_id : public cosmic_object_pool_id<cosmic_entity> {
 	}
 }
 
-using entity_type_id = type_in_list_id<entity_type_list_t<type_list>>;
+using entity_flavour_id = type_in_list_id<entity_flavour_list_t<type_list>>;
 
 using basic_flavour_id = unsigned;
 
 struct entity_flavour_id {
-	entity_type_id type_id;
+	entity_flavour_id flavour_id;
 	basic_flavour_id flavour_id;
 };
 
@@ -51,7 +51,7 @@ struct typed_entity_flavour_id {
 	basic_flavour_id flavour_id;
 };	
 
-template <bool is_const, class entity_type, class... accessed_components>
+template <bool is_const, class entity_flavour, class... accessed_components>
 class typed_entity_handle {
 	static constexpr constrained_access = sizeof...(accessed_components) > 0;
 

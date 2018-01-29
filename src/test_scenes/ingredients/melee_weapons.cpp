@@ -11,19 +11,19 @@
 
 #include "game/detail/inventory/perform_transfer.h"
 
-namespace test_types {
-	void populate_melee_types(const loaded_game_image_caches& logicals, entity_types& types) {
+namespace test_flavours {
+	void populate_melee_types(const loaded_game_image_caches& logicals, entity_flavours& flavours) {
 		{
-			auto& meta = get_test_type(types, test_scene_type::URBAN_CYAN_MACHETE);
+			auto& meta = get_test_flavour(flavours, test_scene_flavour::URBAN_CYAN_MACHETE);
 
 			invariants::render render_def;
 			render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
 
 			meta.set(render_def);
-			test_types::add_sprite(meta, logicals, assets::game_image_id::URBAN_CYAN_MACHETE, white);
+			test_flavours::add_sprite(meta, logicals, assets::game_image_id::URBAN_CYAN_MACHETE, white);
 			add_shape_invariant_from_renderable(meta, logicals);
 
-			test_types::add_see_through_dynamic_body(meta);
+			test_flavours::add_see_through_dynamic_body(meta);
 
 			invariants::item item;
 			item.space_occupied_per_charge = to_space_units("2.5");
@@ -42,7 +42,7 @@ namespace test_types {
 
 namespace prefabs {
 	entity_handle create_cyan_urban_machete(const logic_step step, vec2 pos) {
-		const auto machete = create_test_scene_entity(step.get_cosmos(), test_scene_type::URBAN_CYAN_MACHETE);
+		const auto machete = create_test_scene_entity(step.get_cosmos(), test_scene_flavour::URBAN_CYAN_MACHETE);
 
 		auto& melee = machete += components::melee();
 		auto& sender = machete += components::sender();

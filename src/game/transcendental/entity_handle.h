@@ -149,7 +149,7 @@ public:
 	template <class T>
 	decltype(auto) get() const {
 		if constexpr(is_invariant_v<T>) {
-			return get_type().template get<T>();
+			return get_flavour().template get<T>();
 		}
 		else {
 			check_component_type<T>();
@@ -186,7 +186,7 @@ public:
 	template<class T>
 	decltype(auto) find() const {
 		if constexpr(is_invariant_v<T>) {
-			return get_type().template find<T>();
+			return get_flavour().template find<T>();
 		}
 		else {
 			check_component_type<T>();
@@ -233,16 +233,16 @@ public:
 		return get_cosmos().get_solvable().get_guid(raw_id);
 	}
 
-	const auto& get_type() const {
-		return get<components::type>().get_type();
+	const auto& get_flavour() const {
+		return get<components::flavour>().get_flavour();
 	}
 
-	auto get_type_id() const {
-		return get<components::type>().get_type_id();
+	auto get_flavour_id() const {
+		return get<components::flavour>().get_flavour_id();
 	}
 
 	const auto& get_name() const {
-		return get<components::type>().get_name();
+		return get<components::flavour>().get_name();
 	}
 
 	bool sentient_and_unconscious() const {

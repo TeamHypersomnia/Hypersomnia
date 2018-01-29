@@ -27,7 +27,7 @@ class cosmic {
 
 	static void reinfer_solvable(cosmos&);
 
-	static entity_handle instantiate_flavour(cosmos&, entity_type_id);
+	static entity_handle instantiate_flavour(cosmos&, entity_flavour_id);
 public:
 	class specific_guid_creation_access {
 		friend cosmic_delta;
@@ -38,7 +38,7 @@ public:
 	template <class P>
 	static entity_handle create_entity(
 		cosmos& cosm, 
-		const entity_type_id id,
+		const entity_flavour_id id,
 		P pre_inference
 	) {
 		const auto handle = instantiate_flavour(cosm, id);
@@ -50,12 +50,12 @@ public:
 
 	static entity_handle create_entity(
 		cosmos&, 
-		entity_type_id
+		entity_flavour_id
 	);
 
 	static entity_handle create_entity(
 		cosmos&, 
-		entity_type_id,
+		entity_flavour_id,
 		components::transform where
 	);
 
