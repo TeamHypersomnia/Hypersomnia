@@ -468,7 +468,7 @@ int work(const int argc, const char* const * const argv) try {
 				setup_launcher([]() {
 					current_setup.emplace(std::in_place_type_t<test_scene_setup>(),
 						lua,
-						config.session.create_minimal_test_scene,
+						config.test_scene,
 						config.get_input_recording_mode()
 					);
 				});

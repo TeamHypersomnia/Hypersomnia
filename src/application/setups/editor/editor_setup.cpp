@@ -229,7 +229,7 @@ void editor_setup::save_current_tab_to(const path_operation op) {
 void editor_setup::fill_with_minimal_scene(sol::state& lua) {
 #if BUILD_TEST_SCENES
 	if (has_current_tab()) {
-		work().make_test_scene(lua, true);
+		work().make_test_scene(lua, { true, 60 } );
 
 		clear_all_selections();
 	}
@@ -239,7 +239,7 @@ void editor_setup::fill_with_minimal_scene(sol::state& lua) {
 void editor_setup::fill_with_test_scene(sol::state& lua) {
 #if BUILD_TEST_SCENES
 	if (has_current_tab()) {
-		work().make_test_scene(lua, false);
+		work().make_test_scene(lua, { false, 60 } );
 
 		clear_all_selections();
 	}
@@ -535,9 +535,10 @@ void editor_setup::perform_custom_imgui(
 					get_viewed_cosmos().get_solvable().get_maximum_entities()
 				);
 
-				text("World time: %x (%x steps)",
+				text("World time: %x (%x steps at %x Hz)",
 					standard_format_seconds(get_viewed_cosmos().get_total_seconds_passed()),
-					get_viewed_cosmos().get_total_steps_passed()
+					get_viewed_cosmos().get_total_steps_passed(),
+					1.0f / get_viewed_cosmos().get_fixed_delta().in_seconds()
 				);
 
 				text(L"Currently controlling: %x",

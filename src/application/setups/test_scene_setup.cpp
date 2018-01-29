@@ -8,11 +8,11 @@
 
 test_scene_setup::test_scene_setup(
 	sol::state& lua,
-	const bool make_minimal_test_scene,
+	const test_scene_settings settings,
 	const input_recording_type recording_type
 ) {
 #if BUILD_TEST_SCENES
-	scene.make_test_scene(lua, make_minimal_test_scene);
+	scene.make_test_scene(lua, settings);
 #endif
 
 	if (recording_type != input_recording_type::DISABLED) {

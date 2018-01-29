@@ -23,6 +23,8 @@
 #include "view/audiovisual_state/systems/interpolation_settings.h"
 #include "view/network/simulation_receiver_settings.h"
 
+#include "test_scenes/test_scene_settings.h"
+
 #include "application/debug_settings.h"
 #include "application/session_settings.h"
 #include "application/setups/main_menu_settings.h"
@@ -93,6 +95,7 @@ struct config_lua_table {
 	ImGuiStyle gui_style;
 	debug_settings debug;
 	session_settings session;
+	test_scene_settings test_scene;
 	editor_settings editor;
 	augs::font_loading_input gui_font;
 

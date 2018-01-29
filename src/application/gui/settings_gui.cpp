@@ -299,6 +299,15 @@ void settings_gui_state::perform(
 					); 
 				}
 
+				text("Test scenes (%x)", BUILD_TEST_SCENES ? "built-in" : "not built-in");
+
+				{
+					auto indent = scoped_indent();
+
+					revertable_checkbox("Create minimal", config.test_scene.create_minimal);
+					revertable_slider("Tickrate", config.test_scene.scene_tickrate, 10, 300);
+				}
+
 				break;
 			}
 			default: {

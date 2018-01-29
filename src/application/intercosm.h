@@ -23,6 +23,8 @@ struct intercosm_path_op {
 	augs::path_type path;
 };
 
+struct test_scene_settings;
+
 struct intercosm {
 	// GEN INTROSPECTOR struct intercosm
 	hypersomnia_version version;
@@ -34,7 +36,7 @@ struct intercosm {
 	// END GEN INTROSPECTOR
 
 #if BUILD_TEST_SCENES
-	void make_test_scene(sol::state&, const bool minimal);
+	void make_test_scene(sol::state&, test_scene_settings);
 #endif
 
 	void open(const intercosm_path_op);

@@ -7,12 +7,16 @@
 
 #include "test_scenes/scenes/testbed.h"
 #include "test_scenes/scenes/minimal_scene.h"
+#include "test_scenes/test_scene_settings.h"
 
 #include "augs/readwrite/lua_file.h"
 #include "augs/readwrite/byte_file.h"
 
 #if BUILD_TEST_SCENES
-void intercosm::make_test_scene(sol::state& lua, const bool minimal) {
+void intercosm::make_test_scene(
+	sol::state& lua, 
+	const test_scene_settings settings
+) {
 	world.clear();
 	viewables = {};
 	cosmic::reserve_storage_for_entities(world, 3000u);
@@ -31,10 +35,15 @@ void intercosm::make_test_scene(sol::state& lua, const bool minimal) {
 			return changer_callback_result::REFRESH;
 		});
 
+		cosmic::change_solvable_significant(world, [settings](auto& s){
+			s.clock.delta = augs::delta::steps_per_second(settings.scene_tickrate); 
+			return changer_callback_result::REFRESH;
+		});
+
 		locally_viewed = populator.populate_with_entities(caches, make_logic_step_input({}));
 	};
 
-	if (minimal) {
+	if (settings.create_minimal) {
 		reloader(test_scenes::minimal_scene());
 	}
 	else {

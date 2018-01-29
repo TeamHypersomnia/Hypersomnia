@@ -134,7 +134,7 @@ main_menu_setup::main_menu_setup(
 
 	if (is_intro_scene_available) {
 #if BUILD_TEST_SCENES
-		intro.make_test_scene(lua, false);
+		intro.make_test_scene(lua, { false, 60 } );
 #endif
 	}
 

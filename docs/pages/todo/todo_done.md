@@ -82,3 +82,18 @@ we consider whole type overrides too complex architeciturally:
 
 - should find_logic_transform return nullopt if entity is dead?
 	- perhaps, for simplicity. we don't gain much by ensuring there
+
+- Implement entity flavours incrementally.
+	- We do it now to not repeat the code when we'll be writing improvements to inferences 
+		- gun component 
+			- firing engine sound and muzzle particles are "persistent child entities"
+				- thus they should become group entities.
+					- That will be only possible once we invariantize practically everything.
+			- magic missile def is just a child entity to be cloned around as needed.
+				- thus it only becomes type id.
+		- catridge component
+			- whole component should become invariants and its child entity id fields should just become type ids
+	- Get rid of component adders and deleters.
+		- That will be only possible once we invariantize practically everything in the test scenes.
+		- We'll thus need to make sender and others "always present".
+- Current slot should stay in the item component as other fields of item will anyway be a private

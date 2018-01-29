@@ -9,6 +9,7 @@
 #include "game/transcendental/entity_handle.h"
 
 #include "view/viewables/all_viewables_defs.h"
+#include "test_scenes/test_scene_settings.h"
 
 #include "application/intercosm.h"
 
@@ -30,7 +31,7 @@ class test_scene_setup : public default_setup_settings {
 public:
 	test_scene_setup(
 		sol::state& lua,
-		const bool make_minimal_test_scene,
+		const test_scene_settings,
 		const input_recording_type recording_type
 	);
 

@@ -623,6 +623,7 @@ file(GLOB_RECURSE HYPERSOMNIA_HEADERS_WITH_INTROSPECTED_CLASSES
 	"src/3rdparty/Box2D/Common/*.h"
 	"src/3rdparty/Box2D/Dynamics/*.h"
 	"src/test_scenes/test_scene_flavours.h"
+	"src/test_scenes/test_scene_settings.h"
 )
 
 # The correct input configuration file shall contain paths to all headers for whom the generator should create introspectors,
