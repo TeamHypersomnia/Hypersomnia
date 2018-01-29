@@ -35,7 +35,7 @@ namespace test_types {
 
 	void add_sprite(
 		entity_type& t, 
-		const all_logical_assets& logicals,
+		const loaded_game_image_caches& logicals,
 		assets::game_image_id = assets::game_image_id::INVALID,
 		rgba col = rgba(255, 255, 255, 255),
 		invariants::sprite::special_effect = {}

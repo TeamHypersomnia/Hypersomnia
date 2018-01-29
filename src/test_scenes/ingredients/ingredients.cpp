@@ -7,7 +7,7 @@
 #include "game/components/container_component.h"
 
 namespace test_types {
-	void populate_other_types(const all_logical_assets& logicals, entity_types& types) {
+	void populate_other_types(const loaded_game_image_caches& logicals, entity_types& types) {
 		{
 			auto& meta = get_test_type(types, test_scene_type::STRONG_LAMP);
 

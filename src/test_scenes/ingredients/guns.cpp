@@ -27,7 +27,7 @@
 #include "game/detail/inventory/perform_transfer.h"
 
 namespace test_types {
-	void populate_gun_types(const all_logical_assets& logicals, entity_types& types) {
+	void populate_gun_types(const loaded_game_image_caches& logicals, entity_types& types) {
 		/* Types for bullets etc. */
 
 		auto make_default_gun_container = [](entity_type& meta, const float mag_rotation = -90.f, const bool magazine_hidden = false){

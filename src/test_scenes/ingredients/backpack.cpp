@@ -12,7 +12,7 @@
 #include "game/transcendental/entity_handle.h"
 
 namespace test_types {
-	void populate_backpack_types(const all_logical_assets& logicals, entity_types& types) {
+	void populate_backpack_types(const loaded_game_image_caches& logicals, entity_types& types) {
 		{
 			auto& meta = get_test_type(types, test_scene_type::SAMPLE_BACKPACK);
 
