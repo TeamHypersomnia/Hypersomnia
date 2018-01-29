@@ -119,14 +119,14 @@ using entity_flavours_container = std::vector<entity_flavour>;
 
 struct entity_flavours {
 	// GEN INTROSPECTOR struct entity_flavours
-	entity_flavours_container types;
+	entity_flavours_container flavours;
 	// END GEN INTROSPECTOR
 
 	auto& get_flavour(const entity_flavour_id id) {
-		return types[id];
+		return flavours[id];
 	}
 
 	const auto& get_flavour(const entity_flavour_id id) const {
-		return types[id];
+		return flavours[id];
 	}
 };

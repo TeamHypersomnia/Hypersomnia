@@ -58,11 +58,11 @@ Theoretically, inconsistent state wouldn't always crash the application, but it 
 				- then on adding the component, nothing should be done and work should be offloaded to special methods.
 					- assign car ownership
 					- perform transfer
-			- In particular, default values for associated fields shall not be provided by entity type...
+			- In particular, default values for associated fields shall not be provided by entity flavour...
 				- **...let alone mutable by the author.**
 			- Therefore, on changing the entity's type, state should remain consistent.
 		- If a field is associated only by virtue of being inferred, and reinference always succeeds, regardless of the initial value...
-			- ...let the entity type specify the initial value.
+			- ...let the entity flavour specify the initial value.
 			- On adding, reinfer.
 
 ### Requirements

@@ -212,7 +212,7 @@ Domains in direct need of destruction of some cache:
 - What if complete reinference could be implemented in terms of entity creations/deletions?
 	- Corner cases could theoretically be mitigated by enforcing order of construction?	
 
-## ENTITY TYPE TRASH
+## entity flavour TRASH
 
 <!--
 - Entity can change the type during its lifetime, in which case it should be completely reinferred.
@@ -296,7 +296,7 @@ So, they could be stored in a fixed-sized container. **There can even be a vast 
 		- Least memory wasted.
 		- Best performance as the override checks will be limited to several specific domains.
 		- Medium-hard conceptually.
-	## ENTITY TYPE TRAS		- Additionally, it will be pretty much known from the get-go which data is possibly altered.
+	## entity flavour TRAS		- Additionally, it will be pretty much known from the get-go which data is possibly altered.
 			- Nobody will also be surprised if the solver needs to alter that state, because they are plain components.
 		- Good flexibility, until something unexpected needs to change.
 	- **Solution**: create overrides for invariants and let an entity have its own set of invariants, if so is required.

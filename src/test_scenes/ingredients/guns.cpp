@@ -106,7 +106,7 @@ namespace test_flavours {
 					trace_def.max_multiplier_y = {0.f, 0.f};
 					trace_def.lengthening_duration_ms = {200.f, 250.f};
 					trace_def.additional_multiplier = vec2(1.f, 1.f);
-					trace_def.finishing_trace_type = to_entity_flavour_id(test_scene_flavour::CYAN_ROUND_FINISHING_TRACE);
+					trace_def.finishing_trace_flavour = to_entity_flavour_id(test_scene_flavour::CYAN_ROUND_FINISHING_TRACE);
 
 					meta.set(trace_def);
 				}
@@ -291,7 +291,7 @@ namespace test_flavours {
 				trace_def.lengthening_duration_ms = {300.f, 350.f};
 				trace_def.additional_multiplier = vec2(1.f, 1.f);
 
-				trace_def.finishing_trace_type = to_entity_flavour_id(test_scene_flavour::ENERGY_BALL_FINISHING_TRACE);
+				trace_def.finishing_trace_flavour = to_entity_flavour_id(test_scene_flavour::ENERGY_BALL_FINISHING_TRACE);
 
 				meta.set(trace_def);
 			}
@@ -346,7 +346,7 @@ namespace test_flavours {
 				trace_def.lengthening_duration_ms = {200.f, 250.f};
 				trace_def.additional_multiplier = vec2(1.f, 1.f);
 
-				trace_def.finishing_trace_type = to_entity_flavour_id(test_scene_flavour::ENERGY_BALL_FINISHING_TRACE);
+				trace_def.finishing_trace_flavour = to_entity_flavour_id(test_scene_flavour::ENERGY_BALL_FINISHING_TRACE);
 
 				meta.set(trace_def);
 			}

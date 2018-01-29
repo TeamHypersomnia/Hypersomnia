@@ -6,10 +6,10 @@
 #include "augs/templates/format_enum.h"
 
 void populate_test_scene_flavours(const loaded_game_image_caches& logicals, entity_flavours& into) {
-	into.types.resize(static_cast<std::size_t>(test_scene_flavour::COUNT));
+	into.flavours.resize(static_cast<std::size_t>(test_scene_flavour::COUNT));
 
 	augs::for_each_enum([&](const test_scene_flavour e) {
-		auto& new_type = into.types[static_cast<std::size_t>(e)];
+		auto& new_type = into.flavours[static_cast<std::size_t>(e)];
 		new_type.name = to_wstring(format_enum(e));
 	});
 
@@ -24,7 +24,7 @@ void populate_test_scene_flavours(const loaded_game_image_caches& logicals, enti
 
 	/* Let all renderables have interpolation by default */
 
-	for (auto& t : into.types) {
+	for (auto& t : into.flavours) {
 		if (t.find<invariants::render>()) {
 			t.set(invariants::interpolation());
 		}

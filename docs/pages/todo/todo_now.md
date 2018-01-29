@@ -138,10 +138,10 @@ summary: Just a hidden scratchpad.
 	- We will totally get rid of processing component and calculate statelessly which that which needs to be calculated.
 		- We anyway very rarely ever disabled something in processing subjects and we must always account for the worst case.
 	- Refer to typed_entity_handle for draft.
-	- Rename "entity_flavour" to "entity_flavour" and use "entity type" to represent the natively assembled aggregate of invariants and its counterpart
+	- Rename "entity_flavour" to "entity_flavour" and use "entity flavour" to represent the natively assembled aggregate of invariants and its counterpart
 		- entity_flavour_type vs entity_flavour 
 	- Since the architecture will be corrected to the point where the solvers won't add any component,
-	we could actually introduce native entity types.
+	we could actually introduce native entity flavours.
 		- dynamic_obstacle = sprite + render + rigid body + fixtures 
 	- The authors should not be concerned with customizing invariant sets but with choosing native, well-understood presets.
 	- This could be even introduced incrementally, e.g. entity handle would still perform type erasure to not compile everything in headers.
@@ -155,7 +155,7 @@ summary: Just a hidden scratchpad.
 				- general entity handle will have more than now, as it will have to perform type erasure. It will have type id and void* that will be reinterpret-cast. 
 			- Changing ingredients to native types won't require more work than just adding a type specifier to get test scene type. 
 				- meta.set will still apply as always
-				- enums will also apply because many entity types might share the same native type
+				- enums will also apply because many entity flavours might share the same native type
 			- So we don't have to do it now.
 			- We will specify storage for native types in tuples, thus we will be able to change SoA to AoS and back with just one compilation flag. 
 	
@@ -174,7 +174,7 @@ summary: Just a hidden scratchpad.
 			- We know that a driver will only need a correction to damping and not entire body
 	- Notice that there is no point in having fixtures component
 
-- Implement entity types incrementally.
+- Implement entity flavours incrementally.
 	- We do it now to not repeat the code when we'll be writing improvements to inferences 
 		- gun component 
 			- firing engine sound and muzzle particles are "persistent child entities"
