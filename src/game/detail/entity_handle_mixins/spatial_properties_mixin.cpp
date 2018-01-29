@@ -40,15 +40,19 @@ std::optional<components::transform> basic_spatial_properties_mixin<C, D>::find_
 		const auto& cosmos = handle.get_cosmos();
 		const auto owner = cosmos[connection->owner];
 
-		const auto body_transform = owner.template get<components::rigid_body>().get_transform();
+		if (const auto body = owner.template get<components::rigid_body>();
+			body.is_constructed()
+		) {
+			const auto body_transform = body.get_transform();
 
-		auto displacement = connection->shape_offset;
+			auto displacement = connection->shape_offset;
 
-		if (!displacement.pos.is_zero()) {
-			displacement.pos.rotate(body_transform.rotation, vec2(0, 0));
+			if (!displacement.pos.is_zero()) {
+				displacement.pos.rotate(body_transform.rotation, vec2(0, 0));
+			}
+
+			return body_transform + displacement;
 		}
-
-		return body_transform + displacement;
 	}
 
 	/*

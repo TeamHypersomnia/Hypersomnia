@@ -114,7 +114,6 @@ public:
 	using base::component_synchronizer_base;
 	using base::get_raw_component;
 
-	bool is_activated() const;
 	bool is_constructed() const;
 
 	auto& get_special() const {
