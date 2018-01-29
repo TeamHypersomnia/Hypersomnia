@@ -21,7 +21,7 @@ namespace test_types {
 
 			meta.set(render_def);
 			test_types::add_sprite(meta, logicals, assets::game_image_id::URBAN_CYAN_MACHETE, white);
-			meta.add_shape_invariant_from_renderable(logicals);
+			add_shape_invariant_from_renderable(meta, logicals);
 
 			test_types::add_see_through_dynamic_body(meta);
 

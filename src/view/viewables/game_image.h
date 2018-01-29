@@ -6,6 +6,7 @@
 #include "augs/texture_atlas/texture_atlas_entry.h"
 #include "game/assets/ids/game_image_id.h"
 #include "view/viewables/all_viewables_declarations.h"
+#include "game/components/shape_polygon_component.h"
 
 struct game_image_usage_as_button {
 	// GEN INTROSPECTOR struct game_image_usage_as_button
@@ -29,12 +30,11 @@ struct game_image_cache {
 
 	vec2u original_image_size;
 	convex_partitioned_shape partitioned_shape;
-};
 
-void add_shape_invariant_from_renderable(
-	entity_type& into,
-	const game_image_cache_map& caches
-);
+	vec2u get_size() const {
+		return original_image_size;
+	}
+};
 
 struct game_image_in_atlas {
 	augs::texture_atlas_entry diffuse;
@@ -57,7 +57,14 @@ struct loaded_game_image_caches : public asset_map<
 	loaded_game_image_caches() = default;
 
 	explicit loaded_game_image_caches(
-		const game_image_loadables_map&
+		const game_image_loadables_map&,
 		const game_image_metas_map&
 	);
 };
+
+class entity_type;
+
+void add_shape_invariant_from_renderable(
+	entity_type& into,
+	const loaded_game_image_caches& caches
+);

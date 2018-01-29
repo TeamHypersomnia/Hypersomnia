@@ -1,14 +1,9 @@
 #pragma once
 #include "augs/templates/container_templates.h"
-#include "augs/misc/convex_partitioned_shape.h"
 
 #include "game/assets/asset_map.h"
-#include "game/assets/all_logical_assets_declarations.h"
 
-#include "game/assets/ids/game_image_id.h"
 #include "game/assets/ids/animation_id.h"
-#include "game/assets/ids/sound_buffer_id.h"
-#include "game/assets/ids/particle_effect_id.h"
 #include "game/assets/ids/physical_material_id.h"
 #include "game/assets/ids/recoil_player_id.h"
 
@@ -23,7 +18,7 @@ using tuple_of_logical_assets = augs::trivially_copyable_tuple<
 	/* Standalone logical assets */
 	asset_map<assets::animation_id, animation>,
 	asset_map<assets::recoil_player_id, recoil_player>,
-	asset_map<assets::physical_material_id, physical_material>,
+	asset_map<assets::physical_material_id, physical_material>
 >;
 #else
 #include <tuple>

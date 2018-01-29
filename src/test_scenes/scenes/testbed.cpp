@@ -30,8 +30,8 @@
 #include "game/transcendental/cosmic_delta.h"
 
 namespace test_scenes {
-	void testbed::populate(cosmos_common_significant& common) const {
-		populate_test_scene_types(common.logical_assets, common.all_entity_types);
+	void testbed::populate(const loaded_game_image_caches& caches, cosmos_common_significant& common) const {
+		populate_test_scene_types(caches, common.all_entity_types);
 
 		auto& common_assets = common.assets;
 		common_assets.cast_unsuccessful_sound.id = assets::sound_buffer_id::CAST_UNSUCCESSFUL;
@@ -53,9 +53,8 @@ namespace test_scenes {
 		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
 	}
 
-	entity_id testbed::populate(const logic_step step) const {
+	entity_id testbed::populate(const loaded_game_image_caches& metas, const logic_step step) const {
 		auto& world = step.get_cosmos();
-		const auto& metas = step.get_logical_assets();
 		
 #if TODO
 		const auto car = prefabs::create_car(step, components::transform( { 1490, 340 }, -180));

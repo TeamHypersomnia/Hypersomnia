@@ -31,6 +31,4 @@ struct all_viewables_defs {
 	game_image_loadables_map game_image_loadables;
 	game_image_metas_map game_image_metas;
 	// END GEN INTROSPECTOR
-
-	void update_into(all_logical_assets&);
 };

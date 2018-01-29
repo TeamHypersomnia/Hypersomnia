@@ -39,7 +39,7 @@ namespace test_types {
 			}
 
 			add_sprite(meta, logicals, assets::game_image_id::STANDARD_HEAD);
-			meta.add_shape_invariant_from_renderable(logicals);
+			add_shape_invariant_from_renderable(meta, logicals);
 
 			{
 				invariants::flags flags_def;
@@ -130,7 +130,7 @@ namespace test_types {
 			auto& meta = get_test_type(types, test_scene_type::CROSSHAIR_RECOIL_BODY);
 			add_sprite(meta, logicals, assets::game_image_id::TEST_CROSSHAIR);
 
-			meta.add_shape_invariant_from_renderable(logicals);
+			add_shape_invariant_from_renderable(meta, logicals);
 
 			invariants::rigid_body body;
 			invariants::fixtures fixtures_invariant;

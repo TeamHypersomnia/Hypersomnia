@@ -39,7 +39,7 @@ namespace test_types {
 
 			meta.set(poly);
 
-			meta.add_shape_invariant_from_renderable(logicals);
+			add_shape_invariant_from_renderable(meta, logicals);
 		}
 		{
 			auto& meta = get_test_type(types, test_scene_type::TRUCK_INTERIOR);
@@ -50,7 +50,7 @@ namespace test_types {
 			meta.set(render_def);
 
 			add_sprite(meta, logicals, assets::game_image_id::TRUCK_INSIDE);
-						meta.add_shape_invariant_from_renderable(logicals);
+						add_shape_invariant_from_renderable(meta, logicals);
 
 		}
 
@@ -64,7 +64,7 @@ namespace test_types {
 			invariants::sprite sprite_def;
 			sprite_def.set(assets::game_image_id::BLANK, vec2 ( 40, 20 ), rgba(255, 255, 255, 0));
 			meta.set(sprite_def);
-			meta.add_shape_invariant_from_renderable(logicals);
+			add_shape_invariant_from_renderable(meta, logicals);
 		}
 
 		{
@@ -76,7 +76,7 @@ namespace test_types {
 			meta.set(render_def);
 
 			add_sprite(meta, logicals, assets::game_image_id::TRUCK_ENGINE);
-			meta.add_shape_invariant_from_renderable(logicals);
+			add_shape_invariant_from_renderable(meta, logicals);
 		}
 	}
 }

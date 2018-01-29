@@ -15,7 +15,7 @@ namespace test_types {
 			meta.set(render_def);
 
 			test_types::add_sprite(meta, logicals, assets::game_image_id::CRATE, white);
-			meta.add_shape_invariant_from_renderable(logicals);
+			add_shape_invariant_from_renderable(meta, logicals);
 
 			test_types::add_standard_dynamic_body(meta);
 
@@ -36,7 +36,7 @@ namespace test_types {
 
 			test_types::add_sprite(meta, logicals, assets::game_image_id::BRICK_WALL, white);
 			meta.get<invariants::sprite>().size = vec2(160, 160);
-			meta.add_shape_invariant_from_renderable(logicals);
+			add_shape_invariant_from_renderable(meta, logicals);
 
 			test_types::add_standard_static_body(meta);
 

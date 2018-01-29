@@ -343,7 +343,7 @@ int work(const int argc, const char* const * const argv) try {
 			
 			/* Check for new resources */
 			for (const auto& fresh : new_defs.game_image_loadables) {
-				const auto key = old.first;
+				const auto key = fresh.first;
 
 				if (nullptr == mapped_or_nullptr(currently_loaded_defs.game_image_loadables, key)) {
 					new_atlas_required = true;

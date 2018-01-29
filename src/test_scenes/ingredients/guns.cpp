@@ -96,7 +96,7 @@ namespace test_types {
 			}
 
 			test_types::add_sprite(meta, logicals, assets::game_image_id::ROUND_TRACE, cyan);
-			meta.add_shape_invariant_from_renderable(logicals);
+			add_shape_invariant_from_renderable(meta, logicals);
 
 			{
 				{
@@ -150,7 +150,7 @@ namespace test_types {
 			}
 
 			test_types::add_sprite(meta, logicals, assets::game_image_id::CYAN_SHELL, white);
-			meta.add_shape_invariant_from_renderable(logicals);
+			add_shape_invariant_from_renderable(meta, logicals);
 			test_types::add_shell_dynamic_body(meta);
 		}
 
@@ -165,7 +165,7 @@ namespace test_types {
 			}
 
 			test_types::add_sprite(meta, logicals, assets::game_image_id::CYAN_CHARGE, white);
-			meta.add_shape_invariant_from_renderable(logicals);
+			add_shape_invariant_from_renderable(meta, logicals);
 			test_types::add_see_through_dynamic_body(meta);
 
 			invariants::item item;
@@ -203,7 +203,7 @@ namespace test_types {
 			}
 
 			test_types::add_sprite(meta, logicals, assets::game_image_id::SAMPLE_MAGAZINE, white);
-			meta.add_shape_invariant_from_renderable(logicals);
+			add_shape_invariant_from_renderable(meta, logicals);
 			test_types::add_see_through_dynamic_body(meta);
 
 			invariants::container container; 
@@ -282,7 +282,7 @@ namespace test_types {
 
 
 			test_types::add_sprite(meta, logicals, assets::game_image_id::ENERGY_BALL, cyan);
-			meta.add_shape_invariant_from_renderable(logicals);
+			add_shape_invariant_from_renderable(meta, logicals);
 			{
 				invariants::trace trace_def;
 
@@ -337,7 +337,7 @@ namespace test_types {
 
 
 			test_types::add_sprite(meta, logicals, assets::game_image_id::ENERGY_BALL, cyan);
-			meta.add_shape_invariant_from_renderable(logicals);
+			add_shape_invariant_from_renderable(meta, logicals);
 			{
 				invariants::trace trace_def;
 
@@ -421,7 +421,7 @@ namespace test_types {
 			meta.set(gun_def);
 
 			test_types::add_sprite(meta, logicals, assets::game_image_id::ASSAULT_RIFLE, white);
-			meta.add_shape_invariant_from_renderable(logicals);
+			add_shape_invariant_from_renderable(meta, logicals);
 			test_types::add_see_through_dynamic_body(meta);
 			make_default_gun_container(meta);
 		}
@@ -463,7 +463,7 @@ namespace test_types {
 			meta.set(gun_def);
 
 			test_types::add_sprite(meta, logicals, assets::game_image_id::KEK9, white);
-			meta.add_shape_invariant_from_renderable(logicals);
+			add_shape_invariant_from_renderable(meta, logicals);
 			test_types::add_see_through_dynamic_body(meta);
 			make_default_gun_container(meta, 0.f, true);
 		}
@@ -495,7 +495,7 @@ namespace test_types {
 			meta.set(gun_def);
 
 			test_types::add_sprite(meta, logicals, assets::game_image_id::AMPLIFIER_ARM, white);
-			meta.add_shape_invariant_from_renderable(logicals);
+			add_shape_invariant_from_renderable(meta, logicals);
 			test_types::add_see_through_dynamic_body(meta);
 
 			invariants::item item;

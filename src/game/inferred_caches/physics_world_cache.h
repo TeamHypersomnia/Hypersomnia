@@ -4,10 +4,7 @@
 
 #include "3rdparty/Box2D/Box2D.h"
 
-#include "augs/misc/convex_partitioned_shape.h"
 #include "augs/templates/propagate_const.h"
-
-#include "game/assets/all_logical_assets_declarations.h"
 
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"

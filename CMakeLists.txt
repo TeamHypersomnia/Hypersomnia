@@ -506,6 +506,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/common_state/entity_types.cpp"
 	"src/game/detail/view_input/particle_effect_input.cpp"
 	"src/game/detail/view_input/sound_effect_input.cpp"
+	"src/view/viewables/game_image.cpp"
 )
 
 if(BUILD_WINDOW_FRAMEWORK)

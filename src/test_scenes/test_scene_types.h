@@ -1,6 +1,7 @@
 #pragma once
 #include "game/transcendental/entity_flavour_id.h"
 #include "game/transcendental/cosmic_functions.h"
+#include "view/viewables/game_image.h"
 
 enum class test_scene_type {
 	// GEN INTROSPECTOR enum class test_scene_type

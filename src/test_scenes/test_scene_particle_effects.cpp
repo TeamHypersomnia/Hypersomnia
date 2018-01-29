@@ -14,6 +14,7 @@
 #include "view/viewables/particle_effect.h"
 
 #include "test_scenes/test_scenes_content.h"
+#include "view/viewables/game_image.h"
 
 /* 
 	This code is shit. 
@@ -27,7 +28,7 @@ auto float_minmax(const A a, const B b) {
 }
 
 void load_test_scene_particle_effects(
-	const game_image_loadables_map& images,
+	const loaded_game_image_caches& images,
 	particle_effects_map& manager
 ) {
 	auto set = [&images](auto& target, auto id, auto col) {

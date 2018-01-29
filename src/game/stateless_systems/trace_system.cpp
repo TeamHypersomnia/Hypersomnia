@@ -1,8 +1,6 @@
 #include "trace_system.h"
 #include "augs/misc/randomization.h"
 
-#include "game/assets/all_logical_assets.h"
-
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/logic_step.h"

@@ -4,10 +4,15 @@
 #include "augs/misc/constant_size_vector.h"
 #include "augs/misc/enum/enum_array.h"
 #include "augs/misc/convex_partitioned_shape.h"
+#include "game/container_sizes.h"
 
-#include "game/assets/all_logical_assets_declarations.h"
 #include "game/transcendental/component_synchronizer.h"
 
+using convex_partitioned_shape = basic_convex_partitioned_shape<
+	real32,
+	CONVEX_POLYS_COUNT,
+	CONVEX_POLY_VERTEX_COUNT
+>;
 
 struct b2Fixture_index_in_component;
 

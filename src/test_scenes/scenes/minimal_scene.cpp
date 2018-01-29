@@ -16,8 +16,8 @@
 #include "game/detail/inventory/perform_transfer.h"
 
 namespace test_scenes {
-	void minimal_scene::populate(cosmos_common_significant& common) const {
-		populate_test_scene_types(common.logical_assets, common.all_entity_types);
+	void minimal_scene::populate(const loaded_game_image_caches& caches, cosmos_common_significant& common) const {
+		populate_test_scene_types(caches, common.all_entity_types);
 		load_test_scene_sentience_properties(common);
 
 		auto& common_assets = common.assets;
@@ -32,7 +32,7 @@ namespace test_scenes {
 		std::get<electric_triad>(common.spells).missile_flavour = to_entity_type_id(test_scene_type::ELECTRIC_MISSILE);
 	}
 
-	entity_id minimal_scene::populate(const logic_step step) const {
+	entity_id minimal_scene::populate(const loaded_game_image_caches& metas, const logic_step step) const {
 		auto& world = step.get_cosmos();
 
 		const int num_characters = 1;

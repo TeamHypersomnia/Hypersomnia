@@ -1,14 +1,13 @@
 #include "game/assets/all_logical_assets.h"
 #include "view/viewables/all_viewables_defs.h"
 #include "test_scenes/test_scenes_content.h"
+#include "view/viewables/game_image.h"
 
 #if BUILD_TEST_SCENES
 loaded_game_image_caches populate_test_scene_images_and_sounds(
 	sol::state& lua,
 	all_viewables_defs& output_sources
 ) {
-	loaded_game_image_caches output;
-
 	auto& loadables = output_sources.game_image_loadables;
 	auto& metas = output_sources.game_image_metas;
 
@@ -20,11 +19,11 @@ loaded_game_image_caches populate_test_scene_images_and_sounds(
 		LOG(err.what());
 	}
 
-	return { loadables, metas };
+	return loaded_game_image_caches(loadables, metas);
 }
 
 void populate_test_scene_logical_assets(
-	all_logical_assets& output_logicals,
+	all_logical_assets& output_logicals
 ) {
 	load_test_scene_animations(output_logicals);
 	load_test_scene_physical_materials(output_logicals);
