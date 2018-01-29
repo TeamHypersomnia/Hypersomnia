@@ -107,10 +107,6 @@ public:
 	void unset() {
 		name.clear();
 	}
-
-	void add_shape_invariant_from_renderable(
-		const all_logical_assets& assets
-	);
 };
 
 #if STATICALLY_ALLOCATE_ENTITY_TYPES_NUM

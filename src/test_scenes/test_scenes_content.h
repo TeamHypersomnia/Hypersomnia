@@ -34,9 +34,13 @@ void load_test_scene_animations(all_logical_assets&);
 void load_test_scene_physical_materials(all_logical_assets&);
 void load_test_scene_recoil_players(all_logical_assets&);
 
-void populate_test_scene_assets(
+void populate_test_scene_logical_assets(
 	sol::state& lua,
-	all_logical_assets& output_logicals,
+	all_logical_assets& output_logicals
+);
+
+void populate_test_scene_viewables(
+	sol::state& lua,
 	all_viewables_defs& output_sources
 );
 

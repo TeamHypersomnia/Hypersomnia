@@ -62,14 +62,14 @@ auto& get_test_type(C& container, const test_scene_type id) {
 }
 
 namespace test_types {
-	void populate_other_types(const all_logical_assets& logicals, entity_types& types);
-	void populate_car_types(const all_logical_assets& logicals, entity_types& types);
-	void populate_crate_types(const all_logical_assets& logicals, entity_types& types);
-	void populate_melee_types(const all_logical_assets& logicals, entity_types& types);
-	void populate_backpack_types(const all_logical_assets& logicals, entity_types& types);
-	void populate_gun_types(const all_logical_assets& logicals, entity_types& types);
-	void populate_grenade_types(const all_logical_assets& logicals, entity_types& types);
-	void populate_character_types(const all_logical_assets& logicals, entity_types& types);
+	void populate_other_types(const loaded_game_image_caches& caches, entity_types& types);
+	void populate_car_types(const loaded_game_image_caches& caches, entity_types& types);
+	void populate_crate_types(const loaded_game_image_caches& caches, entity_types& types);
+	void populate_melee_types(const loaded_game_image_caches& caches, entity_types& types);
+	void populate_backpack_types(const loaded_game_image_caches& caches, entity_types& types);
+	void populate_gun_types(const loaded_game_image_caches& caches, entity_types& types);
+	void populate_grenade_types(const loaded_game_image_caches& caches, entity_types& types);
+	void populate_character_types(const loaded_game_image_caches& caches, entity_types& types);
 }
 
-void populate_test_scene_types(const all_logical_assets& logicals, entity_types& into);
+void populate_test_scene_types(const loaded_game_image_caches& caches, entity_types& into);

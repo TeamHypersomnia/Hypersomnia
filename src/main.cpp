@@ -226,6 +226,9 @@ int work(const int argc, const char* const * const argv) try {
 
 	static loaded_sounds game_sounds;
 	static game_images_in_atlas_map game_atlas_entries;
+#if LOADED_CACHES
+	static loaded_game_image_caches game_image_caches;
+#endif
 	static necessary_images_in_atlas necessary_atlas_entries;
 	
 #if STATICALLY_ALLOCATE_BAKED_FONTS
@@ -295,7 +298,7 @@ int work(const int argc, const char* const * const argv) try {
 			return augs::equal_by_introspection(a, b);
 		};
 		
-		/* Atlas pass */
+		/* Atlas/meta cache pass */
 
 		{
 			bool new_atlas_required = false;
@@ -306,28 +309,58 @@ int work(const int argc, const char* const * const argv) try {
 
 			/* Check for unloaded and changed resources */
 			for (const auto& old : currently_loaded_defs.game_image_loadables) {
-				if (const auto found = mapped_or_nullptr(new_defs.game_image_loadables, old.first)) {
-					if (const bool reload = !equal(*found, old.second)) {
+				const auto key = old.first;
+
+				const auto& old_loadables = old.second;
+
+				if (const auto new_loadables = mapped_or_nullptr(new_defs.game_image_loadables, key)) {
+					const bool loadables_changed = !equal(*new_loadables, old_loadables);
+
+					if (loadables_changed) {
 						/* Changed, reload */
 						new_atlas_required = true;
+					}
+
+					const auto& new_meta = new_defs.game_image_metas.at(key);
+					const auto& old_meta = currently_loaded_defs.game_image_metas.at(key);
+
+					const bool meta_changed = !equal(old_meta, new_meta);
+
+					if (loadables_changed || meta_changed) {
+#if LOADED_CACHES
+						game_image_caches.at(key) = { *new_loadables, new_meta };
+#endif
 					}
 				}
 				else {
 					/* Missing, unload */
 					new_atlas_required = true;
+#if LOADED_CACHES
+					game_image_caches.erase(key);
+#endif
 				}
 			}
 			
 			/* Check for new resources */
 			for (const auto& fresh : new_defs.game_image_loadables) {
-				if (nullptr == mapped_or_nullptr(currently_loaded_defs.game_image_loadables, fresh.first)) {
+				const auto key = old.first;
+
+				if (nullptr == mapped_or_nullptr(currently_loaded_defs.game_image_loadables, key)) {
 					new_atlas_required = true;
+
+					const auto& new_meta = new_defs.game_image_metas.at(key);
+#if LOADED_CACHES
+					game_image_caches.emplace(fresh.second, new_meta);
+#endif
 				}
 				/* Otherwise it's already taken care of */
 			}
 
 			if (new_atlas_required) {
 				const auto settings = config.content_regeneration;
+
+				game_atlas_entries.clear();
+				necessary_atlas_entries.clear();
 
 				game_world_atlas.emplace(standard_atlas_distribution({
 					new_defs.game_image_loadables,
@@ -352,16 +385,17 @@ int work(const int argc, const char* const * const argv) try {
 		{
 			/* Check for unloaded and changed resources */
 			for (const auto& old : currently_loaded_defs.sounds) {
-				if (const auto found = mapped_or_nullptr(new_defs.sounds, old.first)) {
+				const auto key = old.first;
+
+				if (const auto found = mapped_or_nullptr(new_defs.sounds, key)) {
 					if (const bool reload = !equal(*found, old.second)) {
 						/* Changed, reload */
-						game_sounds.at(old.first) = *found;
 					}
 				}
 				else {
 					/* Missing, unload */
-					audiovisuals.get<sound_system>().clear_sources_playing(old.first);
-					game_sounds.erase(old.first);
+					audiovisuals.get<sound_system>().clear_sources_playing(key);
+					game_sounds.erase(key);
 				}
 			}
 

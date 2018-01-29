@@ -37,12 +37,8 @@ std::optional<augs::path_type> game_image_loadables::get_desaturation_path() con
 	return std::nullopt;
 }
 
-vec2u game_image_loadables::get_size() const {
-	if (cached_source_image_size.is_zero()) {
-		cached_source_image_size = augs::image::get_size(get_source_image_path());
-	}
-
-	return cached_source_image_size;
+vec2u game_image_loadables::read_source_image_size() const {
+	return augs::image::get_size(get_source_image_path());
 }
 
 void game_image_loadables::regenerate_all_needed(

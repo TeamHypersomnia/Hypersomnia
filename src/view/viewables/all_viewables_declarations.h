@@ -18,6 +18,7 @@ namespace augs {
 struct game_image_in_atlas;
 struct game_image_loadables;
 struct game_image_meta;
+struct game_image_cache;
 struct particle_effect;
 
 using sound_buffer_inputs_map = asset_map<

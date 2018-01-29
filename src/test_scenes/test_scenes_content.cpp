@@ -2,34 +2,48 @@
 #include "view/viewables/all_viewables_defs.h"
 #include "test_scenes/test_scenes_content.h"
 
-void populate_test_scene_assets(
+#if BUILD_TEST_SCENES
+loaded_game_image_caches populate_test_scene_images_and_sounds(
 	sol::state& lua,
-	all_logical_assets& output_logicals,
 	all_viewables_defs& output_sources
 ) {
-#if BUILD_TEST_SCENES
+	loaded_game_image_caches output;
+
+	auto& loadables = output_sources.game_image_loadables;
+	auto& metas = output_sources.game_image_metas;
+
 	try {
-		load_test_scene_images(
-			lua,
-			output_sources.game_image_loadables,
-			output_sources.game_image_metas
-		);
-
-		load_test_scene_particle_effects(
-			output_sources.game_image_loadables, 
-			output_sources.particle_effects
-		);
-
+		load_test_scene_images(lua, loadables, metas);
 		load_test_scene_sound_buffers(output_sources.sounds);
-
-		load_test_scene_animations(output_logicals);
-		load_test_scene_physical_materials(output_logicals);
-		load_test_scene_recoil_players(output_logicals);
 	}
 	catch (const test_scene_asset_loading_error err) {
 		LOG(err.what());
 	}
-#endif
 
-	output_sources.update_into(output_logicals);
+	return { loadables, metas };
 }
+
+void populate_test_scene_logical_assets(
+	all_logical_assets& output_logicals,
+) {
+	load_test_scene_animations(output_logicals);
+	load_test_scene_physical_materials(output_logicals);
+	load_test_scene_recoil_players(output_logicals);
+}
+
+void populate_test_scene_viewables(
+	sol::state& lua,
+	const loaded_game_image_caches& caches,
+	all_viewables_defs& output_sources
+) {
+	try {
+		load_test_scene_particle_effects(
+			caches,
+			output_sources.particle_effects
+		);
+	}
+	catch (const test_scene_asset_loading_error err) {
+		LOG(err.what());
+	}
+}
+#endif

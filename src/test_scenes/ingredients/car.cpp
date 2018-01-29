@@ -34,7 +34,7 @@ namespace test_types {
 			meta.set(render_def);
 
 			invariants::polygon poly;
-			poly.add_convex_polygons(logicals.at(assets::game_image_id::TRUCK_FRONT).shape.convex_polys);
+			poly.add_convex_polygons(logicals.at(assets::game_image_id::TRUCK_FRONT).partitioned_shape.convex_polys);
 			poly.texture_map_id = assets::game_image_id::TRUCK_FRONT;
 
 			meta.set(poly);

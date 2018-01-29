@@ -17,33 +17,28 @@ void intercosm::make_test_scene(sol::state& lua, const bool minimal) {
 	viewables = {};
 	cosmic::reserve_storage_for_entities(world, 3000u);
 
-	if (minimal) {
+	auto caches = populate_test_scene_images_and_sounds(lua, viewables);
+	populate_test_scene_viewables(lua, caches, viewables);
+
+	auto reloader = [](auto populator){
 		world.change_common_significant([&](cosmos_common_significant& common){
 			auto& logicals = common.logical_assets;
-
 			logicals = {};
-			populate_test_scene_assets(lua, logicals, viewables);
+			populate_test_scene_logical_assets(logicals, caches);
 
-			test_scenes::minimal_scene().populate(common);
+			populator.populate(caches, common);
 
 			return changer_callback_result::REFRESH;
 		});
 
-		locally_viewed = test_scenes::minimal_scene().populate_with_entities(make_logic_step_input({}));
+		locally_viewed = populator.populate_with_entities(make_logic_step_input({}));
+	};
+
+	if (minimal) {
+		reloader(test_scenes::minimal_scene());
 	}
 	else {
-		world.change_common_significant([&](cosmos_common_significant& common){
-			auto& logicals = common.logical_assets;
-
-			logicals = {};
-			populate_test_scene_assets(lua, logicals, viewables);
-
-			test_scenes::testbed().populate(common);
-
-			return changer_callback_result::REFRESH;
-		});
-
-		locally_viewed = test_scenes::testbed().populate_with_entities(make_logic_step_input({}));
+		reloader(test_scenes::testbed());
 	}
 }
 #endif

@@ -5,6 +5,7 @@
 #include "augs/drawing/flip.h"
 #include "augs/texture_atlas/texture_atlas_entry.h"
 #include "game/assets/ids/game_image_id.h"
+#include "view/viewables/all_viewables_declarations.h"
 
 struct game_image_usage_as_button {
 	// GEN INTROSPECTOR struct game_image_usage_as_button
@@ -20,6 +21,21 @@ struct game_image_meta {
 	// END GEN INTROSPECTOR
 };
 
+struct game_image_cache {
+	game_image_cache(
+		const game_image_loadables&,
+		const game_image_meta&
+	);
+
+	vec2u original_image_size;
+	convex_partitioned_shape partitioned_shape;
+};
+
+void add_shape_invariant_from_renderable(
+	entity_type& into,
+	const game_image_cache_map& caches
+);
+
 struct game_image_in_atlas {
 	augs::texture_atlas_entry diffuse;
 	augs::texture_atlas_entry neon_map;
@@ -32,4 +48,16 @@ struct game_image_in_atlas {
 	vec2u get_size() const {
 		return diffuse.get_original_size();
 	}
+};
+
+struct loaded_game_image_caches : public asset_map<
+	assets::game_image_id,
+	game_image_cache
+> {
+	loaded_game_image_caches() = default;
+
+	explicit loaded_game_image_caches(
+		const game_image_loadables_map&
+		const game_image_metas_map&
+	);
 };
