@@ -12,7 +12,7 @@
 #include "game/enums/game_intent_type.h"
 #include "game/messages/intent_message.h"
 #include "game/detail/inventory/item_slot_transfer_request.h"
-#include "game/components/sentience_component.h"
+#include "game/detail/spells/all_spells.h"
 
 class cosmos;
 

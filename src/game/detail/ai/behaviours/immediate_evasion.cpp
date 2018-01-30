@@ -13,7 +13,7 @@
 
 namespace behaviours {
 	tree::goal_availability immediate_evasion::goal_resolution(tree::state_of_traversal& t) const {
-		const auto subject = t.subject;
+		const auto subject = t.get_subject();
 		const auto& los = t.step.transient.calculated_line_of_sight.at(subject);
 		const auto& cosmos = t.step.get_cosmos();
 
@@ -39,7 +39,7 @@ namespace behaviours {
 	}
 
 	void immediate_evasion::execute_leaf_goal_callback(const tree::execution_occurence o, tree::state_of_traversal& t) const {
-		const auto subject = t.subject;
+		const auto subject = t.get_subject();
 		auto& movement = subject.get<components::movement>();
 
 		if (o == tree::execution_occurence::LAST) {

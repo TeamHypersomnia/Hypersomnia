@@ -10,7 +10,7 @@
 
 namespace behaviours {
 	tree::goal_availability navigate_to_last_seen_position_of_target::goal_resolution(tree::state_of_traversal& t) const {
-		auto subject = t.subject;
+		auto subject = t.get_subject();
 		auto& cosmos = t.step.get_cosmos();
 		auto& attitude = subject.get<components::attitude>();
 		auto currently_attacked_visible_entity = cosmos[attitude.currently_attacked_visible_entity];
@@ -23,7 +23,7 @@ namespace behaviours {
 	}
 
 	void navigate_to_last_seen_position_of_target::execute_leaf_goal_callback(tree::execution_occurence o, tree::state_of_traversal& t) const {
-		auto subject = t.subject;
+		auto subject = t.get_subject();
 		auto& attitude = subject.get<components::attitude>();
 		auto& movement = subject.get<components::movement>();
 		auto& pathfinding = subject.get<components::pathfinding>();

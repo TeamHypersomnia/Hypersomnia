@@ -10,7 +10,7 @@
 
 namespace behaviours {
 	tree::goal_availability pull_trigger::goal_resolution(tree::state_of_traversal& t) const {
-		const auto subject = t.subject;
+		const auto subject = t.get_subject();
 		const auto& attitude = subject.get<components::attitude>();
 		const auto currently_attacked_visible_entity = t.step.get_cosmos()[attitude.currently_attacked_visible_entity];
 
@@ -24,7 +24,7 @@ namespace behaviours {
 	}
 
 	void pull_trigger::execute_leaf_goal_callback(const tree::execution_occurence o, tree::state_of_traversal& t) const {
-		const auto subject = t.subject;
+		const auto subject = t.get_subject();
 		const auto wielded = subject.get_wielded_guns();
 		auto& cosmos = t.step.get_cosmos();
 

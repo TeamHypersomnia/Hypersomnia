@@ -3,13 +3,13 @@
 #include <memory>
 #include <array>
 
-#include "game/transcendental/entity_id.h"
-#include "game/detail/ai/goals.h"
-
 #include "augs/ensure.h"
-#include "game/transcendental/entity_handle.h"
 
+#include "game/transcendental/entity_id.h"
+#include "game/transcendental/entity_handle_declaration.h"
 #include "game/transcendental/logic_step.h"
+
+#include "game/detail/ai/goals.h"
 
 struct state_of_behaviour_tree_instance {
 	// GEN INTROSPECTOR struct state_of_behaviour_tree_instance
@@ -34,15 +34,17 @@ public:
 	struct state_of_traversal {
 		state_of_traversal(
 			const logic_step,
-			const entity_handle,
+			const entity_id,
 			state_of_behaviour_tree_instance&,
 			const behaviour_tree&
 		);
 
 		const logic_step step;
-		const entity_handle subject;
+		const entity_id subject;
 		state_of_behaviour_tree_instance& instance;
 		const behaviour_tree& original_tree;
+
+		entity_handle get_subject() const;
 
 		behaviours::goal_tuple resolved_goals;
 		std::array<bool, std::tuple_size_v<decltype(resolved_goals)>> goals_set;
@@ -90,7 +92,7 @@ public:
 
 	void evaluate_instance_of_tree(
 		const logic_step,
-		const entity_handle,
+		const entity_id,
 		state_of_behaviour_tree_instance&
 	) const;
 

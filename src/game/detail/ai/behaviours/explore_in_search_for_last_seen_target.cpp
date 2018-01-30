@@ -11,7 +11,7 @@
 
 namespace behaviours {
 	tree::goal_availability explore_in_search_for_last_seen_target::goal_resolution(tree::state_of_traversal& t) const {
-		auto subject = t.subject;
+		auto subject = t.get_subject();
 		auto& attitude = subject.get<components::attitude>();
 		auto currently_attacked_visible_entity = t.step.get_cosmos()[attitude.currently_attacked_visible_entity];
 
@@ -23,7 +23,7 @@ namespace behaviours {
 	}
 
 	void explore_in_search_for_last_seen_target::execute_leaf_goal_callback(tree::execution_occurence o, tree::state_of_traversal& t) const {
-		auto subject = t.subject;
+		auto subject = t.get_subject();
 		auto& attitude = subject.get<components::attitude>();
 		auto& movement = subject.get<components::movement>();
 		auto& pathfinding = subject.get<components::pathfinding>();

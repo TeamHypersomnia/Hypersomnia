@@ -1,9 +1,10 @@
 #include "augs/ensure.h"
 #include "game/assets/behaviour_tree.h"
+#include "game/transcendental/cosmos.h"
 
 behaviour_tree::state_of_traversal::state_of_traversal(
 	const logic_step step,
-	const entity_handle subject,
+	const entity_id subject,
 	state_of_behaviour_tree_instance& instance,
 	const behaviour_tree& original_tree
 ) :
@@ -13,6 +14,10 @@ behaviour_tree::state_of_traversal::state_of_traversal(
 	original_tree(original_tree)
 {
 	std::fill(goals_set.begin(), goals_set.end(), false);
+}
+
+entity_handle behaviour_tree::state_of_traversal::get_subject() const {
+	return step.get_cosmos()[subject]; 
 }
 
 const behaviour_tree::node& behaviour_tree::get_node_by_id(const int i) const {
@@ -32,10 +37,10 @@ void behaviour_tree::build_tree() {
 
 void behaviour_tree::evaluate_instance_of_tree(
 	const logic_step step,
-	const entity_handle handle,
+	const entity_id id,
 	state_of_behaviour_tree_instance& inst
 ) const {
-	state_of_traversal traversal(step, handle, inst, *this);
+	state_of_traversal traversal(step, id, inst, *this);
 
 	const auto tree_evaluation_result = root.evaluate_node(traversal);
 

@@ -23,7 +23,7 @@ namespace behaviours {
 			return;
 
 		auto& cosmos = t.step.get_cosmos();
-		auto subject = t.subject;
+		auto subject = t.get_subject();
 		const auto subject_transform = subject.get_logic_transform();
 		auto pos = subject_transform.pos;
 		auto& los = t.step.transient.calculated_line_of_sight.at(subject);

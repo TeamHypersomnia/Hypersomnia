@@ -11,7 +11,7 @@
 
 namespace behaviours {
 	tree::goal_availability minimize_recoil_through_movement::goal_resolution(tree::state_of_traversal& t) const {
-		const auto subject = t.subject;
+		const auto subject = t.get_subject();
 		const auto& cosmos = t.step.get_cosmos();
 		const auto crosshair = subject[child_entity_name::CHARACTER_CROSSHAIR];
 		const auto& attitude = subject.get<components::attitude>();
@@ -34,7 +34,7 @@ namespace behaviours {
 	}
 
 	void minimize_recoil_through_movement::execute_leaf_goal_callback(tree::execution_occurence o, tree::state_of_traversal& t) const {
-		const auto subject = t.subject;
+		const auto subject = t.get_subject();
 		auto& movement = subject.get<components::movement>();
 
 		if (o == tree::execution_occurence::LAST) {
