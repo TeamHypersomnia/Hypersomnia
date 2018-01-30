@@ -23,19 +23,20 @@ bool exaltation_instance::are_additional_conditions_for_casting_fulfilled(const 
 }
 
 void exaltation_instance::perform_logic(const spell_logic_input in) {
-	const auto& spell_data = std::get<exaltation>(in.subject.get_cosmos().get_common_significant().spells);
-	const auto caster_transform = in.subject.get_logic_transform();
+	const auto subject = in.get_subject();
+	const auto& spell_data = std::get<exaltation>(subject.get_cosmos().get_common_significant().spells);
+	const auto caster_transform = subject.get_logic_transform();
 
-	ignite_cast_sparkles(spell_data, in.step, caster_transform, in.subject);
-	play_cast_successful_sound(spell_data, in.step, caster_transform, in.subject);
+	ignite_cast_sparkles(spell_data, in.step, caster_transform, subject);
+	play_cast_successful_sound(spell_data, in.step, caster_transform, subject);
 
 	auto& health = in.sentience.get<health_meter_instance>();
 
 	const auto result = health.calculate_damage_result(-spell_data.basic_healing_amount);
 
 	messages::health_event event;
-	event.subject = in.subject;
-	event.point_of_impact = in.subject.get_logic_transform().pos;
+	event.subject = subject;
+	event.point_of_impact = subject.get_logic_transform().pos;
 	event.impact_velocity = { 0, -200 };
 	event.effective_amount = result.effective;
 	event.target = messages::health_event::target_type::HEALTH;

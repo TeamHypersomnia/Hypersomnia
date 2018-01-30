@@ -1,7 +1,7 @@
 #pragma once
 #include "game/transcendental/logic_step.h"
-#include "game/transcendental/entity_handle.h"
 #include "augs/misc/timing/stepped_timing.h"
+#include "game/transcendental/entity_handle_declaration.h"
 
 namespace components {
 	struct sentience;
@@ -9,8 +9,10 @@ namespace components {
 
 struct spell_logic_input {
 	const logic_step step;
-	const entity_handle subject;
+	const entity_id subject;
 	components::sentience& sentience;
 	const augs::stepped_timestamp when_casted;
 	const augs::stepped_timestamp now;
+
+	entity_handle get_subject() const;
 };
