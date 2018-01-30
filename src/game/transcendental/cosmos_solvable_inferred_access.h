@@ -8,7 +8,7 @@ void detail_unset_current_slot(const entity_handle removed_item);
 template <class, class>
 class component_synchronizer;
 
-template <bool, class>
+template <class>
 class physics_mixin;
 
 class physics_system;
@@ -30,7 +30,7 @@ class cosmos_solvable_inferred_access {
 	friend physics_system;
 	friend contact_listener;
 
-	template <bool, class>
+	template <class>
 	friend class physics_mixin;
 
 	friend void ::detail_add_item(const inventory_slot_handle handle, const entity_handle new_item);

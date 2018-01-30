@@ -1,4 +1,5 @@
 #include "game/detail/view_input/particle_effect_input.h"
+#include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/logic_step.h"
 #include "game/messages/start_particle_effect.h"

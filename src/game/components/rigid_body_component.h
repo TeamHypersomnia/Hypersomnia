@@ -40,9 +40,6 @@ struct special_physics {
 	//float measured_carried_mass = 0.f;
 };
 
-template <bool, class>
-class basic_physics_mixin;
-
 namespace components {
 	struct rigid_body {
 		static constexpr bool is_synchronized = true;
