@@ -1,9 +1,6 @@
 #pragma once
 #include "game/transcendental/entity_handle_declaration.h"
 
-template <bool, class D>
-class relations_mixin;
-
 namespace augs {
 	template <template <class T> class make_pool_id, class... components>
 	class component_aggregate; 

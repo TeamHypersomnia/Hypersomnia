@@ -1,8 +1,11 @@
 #pragma once
-template<bool> class basic_inventory_slot_handle;
+#include "game/transcendental/entity_handle_declaration.h"
 
-typedef basic_inventory_slot_handle<false> inventory_slot_handle;
-typedef basic_inventory_slot_handle<true> const_inventory_slot_handle;
+template <class> 
+class basic_inventory_slot_handle;
+
+using inventory_slot_handle = basic_inventory_slot_handle<entity_handle>;
+using const_inventory_slot_handle = basic_inventory_slot_handle<const_entity_handle>;
 
 struct inventory_item_address;
 struct inventory_traversal;

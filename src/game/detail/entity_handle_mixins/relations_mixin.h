@@ -17,11 +17,41 @@
 
 struct entity_relations;
 
-template<bool is_const, class entity_handle_type>
-class basic_relations_mixin {
+template <class entity_handle_type>
+class relations_mixin {
 protected:
-	using inventory_slot_handle_type = basic_inventory_slot_handle<is_const>;
-	maybe_const_ptr_t<is_const, child_entity_id> get_id_ptr(const child_entity_name) const;
+	static constexpr bool is_const = entity_handle_type::is_const_value;
+
+	using inventory_slot_handle_type = basic_inventory_slot_handle<entity_handle_type>;
+
+	auto* get_id_ptr(const child_entity_name n) const {
+		const auto& self = *static_cast<const entity_handle_type*>(this);
+
+		maybe_const_ptr_t<is_const, child_entity_id> result = nullptr;
+
+		if (self.alive()) {
+			switch (n) {
+				case child_entity_name::CROSSHAIR_RECOIL_BODY:
+				if (const auto crosshair = self.template find<components::crosshair>()) {
+					result = std::addressof(crosshair->recoil_entity);
+				}
+				break;
+
+				case child_entity_name::CHARACTER_CROSSHAIR:
+				if (const auto sentience = self.template find<components::sentience>()) {
+					result = std::addressof(sentience->character_crosshair);
+				}
+				break;
+
+				default:
+				LOG("Random access abstraction for this child_entity_name is not implemented!");
+				ensure(false);
+				break;
+			}
+		}
+
+		return result;
+	}
 
 public:
 	entity_handle_type get_parent() const;
@@ -51,22 +81,51 @@ public:
 			}
 		);
 	}
-};
 
-template<bool, class>
-class relations_mixin;
-
-template<class entity_handle_type>
-class relations_mixin<false, entity_handle_type> : public basic_relations_mixin<false, entity_handle_type> {
-	using base = basic_relations_mixin<false, entity_handle_type>;
-	using base::get_id_ptr;
-public:
 	void make_as_child_of(const entity_id) const;
-
 	void map_child_entity(const child_entity_name n, const entity_id p) const;
 };
 
-template<class entity_handle_type>
-class relations_mixin<true, entity_handle_type> : public basic_relations_mixin<true, entity_handle_type> {
-public:
-};
+template <class E>
+void relations_mixin<E>::make_as_child_of(const entity_id parent_id) const {
+	auto& self = *static_cast<const E*>(this);
+
+	auto& ch = self += components::child();
+	ch.parent = parent_id;
+}
+
+template <class E>
+void relations_mixin<E>::map_child_entity(
+	const child_entity_name n, 
+	const entity_id p
+) const {
+	if (const auto maybe_id = get_id_ptr(n)) {
+		*maybe_id = p;
+	}
+}
+
+template <class E>
+typename relations_mixin<E>::inventory_slot_handle_type relations_mixin<E>::operator[](const slot_function func) const {
+	auto& self = *static_cast<const E*>(this);
+	return inventory_slot_handle_type(self.get_cosmos(), inventory_slot_id(func, self.get_id()));
+}
+
+template <class E>
+E relations_mixin<E>::operator[](const child_entity_name child) const {
+	auto& self = *static_cast<const E*>(this);
+
+	entity_id id;
+
+	if (const auto maybe_id = get_id_ptr(child)) {
+		id = *maybe_id;
+	}
+
+	return self.get_cosmos()[id];
+}
+
+template <class E>
+E relations_mixin<E>::get_parent() const {
+	auto& self = *static_cast<const E*>(this);
+
+	return self.get_cosmos()[self.template get<components::child>().parent];
+}

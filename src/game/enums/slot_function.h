@@ -1,5 +1,7 @@
 #pragma once
 
+constexpr unsigned SPACE_ATOMS_PER_UNIT = 1000;
+
 enum class slot_function {
 	INVALID,
 

@@ -30,16 +30,13 @@ class component_synchronizer;
 
 template <bool is_const>
 class basic_entity_handle :
-	public inventory_mixin<is_const, basic_entity_handle<is_const>>,
+	public inventory_mixin<basic_entity_handle<is_const>>,
 	public physics_mixin<is_const, basic_entity_handle<is_const>>,
-	public relations_mixin<is_const, basic_entity_handle<is_const>>,
+	public relations_mixin<basic_entity_handle<is_const>>,
 	public spatial_properties_mixin<is_const, basic_entity_handle<is_const>>
 {
 	using owner_reference = maybe_const_ref_t<is_const, cosmos>;
 	using entity_ptr = maybe_const_ptr_t<is_const, cosmic_entity>;
-
-	using this_handle_type = basic_entity_handle<is_const>;
-	friend basic_entity_handle<!is_const>;
 
 	entity_ptr ptr;
 	owner_reference owner;
@@ -76,6 +73,9 @@ private:
 
 public:
 	static constexpr bool is_const_value = is_const;
+	using this_handle_type = basic_entity_handle<is_const>;
+	using const_type = basic_entity_handle<!is_const>;
+	friend const_type;
 
 	basic_entity_handle(
 		owner_reference owner, 

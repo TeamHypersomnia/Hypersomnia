@@ -4,8 +4,6 @@
 #include "game/detail/inventory/item_slot_transfer_request.h"
 #include "game/detail/inventory/item_transfer_result.h"
 
-#define SPACE_ATOMS_PER_UNIT 1000
-
 augs::constant_size_vector<item_slot_transfer_request, 4> swap_slots_for_items(
 	const const_entity_handle first, 
 	const const_entity_handle second 
