@@ -18,7 +18,6 @@ struct game_image_usage_as_button {
 struct game_image_meta {
 	// GEN INTROSPECTOR struct game_image_meta
 	game_image_usage_as_button usage_as_button;
-	std::optional<std::vector<vec2u>> physical_shape;
 	// END GEN INTROSPECTOR
 };
 

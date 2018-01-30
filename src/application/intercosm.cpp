@@ -21,7 +21,7 @@ void intercosm::make_test_scene(
 	viewables = {};
 	cosmic::reserve_storage_for_entities(world, 3000u);
 
-	auto caches = populate_test_scene_images_and_sounds(lua, viewables);
+	const auto caches = populate_test_scene_images_and_sounds(lua, viewables);
 	populate_test_scene_viewables(lua, caches, viewables);
 
 	auto reloader = [&](auto populator){

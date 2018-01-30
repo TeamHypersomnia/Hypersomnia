@@ -10,45 +10,20 @@ game_image_cache::game_image_cache(
 ) { 
 	original_image_size = loadables.read_source_image_size();
 
-	if (const auto& original_shape = meta.physical_shape) {
-		const auto& shape = *original_shape;
+	const auto box_size = vec2(original_image_size) / 2;
 
-		std::vector<vec2> new_concave;
+	// TODO: use ltrb
 
-		for (auto v : shape) {
-			v.y = -v.y;
-			new_concave.push_back(v);
-		}
+	b2PolygonShape poly_shape;
+	poly_shape.SetAsBox(box_size.x, box_size.y);
 
-		const auto origin = original_image_size / vec2(-2, 2);
+	convex_partitioned_shape::convex_poly new_convex_polygon;
 
-		for (auto& v : new_concave) {
-			v += origin;
-		}
-
-		partitioned_shape.add_concave_polygon(new_concave);
-		partitioned_shape.scale(vec2(1, -1));
-
-		for (auto& c : partitioned_shape.convex_polys) {
-			reverse_range(c);
-		}
+	for (int i = 0; i < poly_shape.GetVertexCount(); ++i) {
+		new_convex_polygon.push_back(vec2(poly_shape.GetVertex(i)));
 	}
-	else {
-		const auto box_size = vec2(original_image_size) / 2;
 
-		// TODO: use ltrb
-
-		b2PolygonShape poly_shape;
-		poly_shape.SetAsBox(box_size.x, box_size.y);
-
-		convex_partitioned_shape::convex_poly new_convex_polygon;
-
-		for (int i = 0; i < poly_shape.GetVertexCount(); ++i) {
-			new_convex_polygon.push_back(vec2(poly_shape.GetVertex(i)));
-		}
-
-		partitioned_shape.add_convex_polygon(new_convex_polygon);
-	}
+	partitioned_shape.add_convex_polygon(new_convex_polygon);
 }
 
 loaded_game_image_caches::loaded_game_image_caches(
@@ -56,7 +31,9 @@ loaded_game_image_caches::loaded_game_image_caches(
 	const game_image_metas_map& metas
 ) { 
 	for (const auto& l : loadables) {
-		emplace(l.first, l.second, metas.at(l.first));
+		game_image_cache ch(l.second, metas.at(l.first));
+
+		emplace(l.first, ch);
 	}
 }
 
