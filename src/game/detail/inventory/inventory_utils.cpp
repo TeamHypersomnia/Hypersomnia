@@ -16,7 +16,7 @@ bool capability_comparison::is_legal() const {
 	;
 }
 
-bool capability_comparison::is_authorized(const const_entity_handle h) const {
+bool capability_comparison::is_authorized(const entity_id h) const {
 	return is_legal() && authorized_capability == h;
 }
 

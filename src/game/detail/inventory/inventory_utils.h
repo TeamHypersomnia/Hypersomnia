@@ -1,5 +1,5 @@
 #pragma once
-#include "game/transcendental/entity_handle.h"
+#include "game/transcendental/entity_handle_declaration.h"
 #include "game/enums/slot_function.h"
 #include "game/detail/inventory/item_slot_transfer_request.h"
 #include "game/detail/inventory/item_transfer_result.h"
@@ -29,10 +29,10 @@ enum class capability_relation {
 
 struct capability_comparison {
 	capability_relation relation_type;
-	const_entity_handle authorized_capability;
+	entity_id authorized_capability;
 
 	bool is_legal() const;
-	bool is_authorized(const const_entity_handle) const;
+	bool is_authorized(const entity_id) const;
 };
 
 capability_comparison match_transfer_capabilities(

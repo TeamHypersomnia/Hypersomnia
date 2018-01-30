@@ -21,8 +21,7 @@ void basic_cosmic_entropy<key>::override_transfers_leaving_other_entities(
 		for (const auto n : new_transfers) {
 			const auto new_transfer = cosm.get_solvable().deguidize(n);
 			
-			if (
-				match_transfer_capabilities(cosm, new_transfer).authorized_capability
+			if (match_transfer_capabilities(cosm, new_transfer).authorized_capability
 				== overridden_transfer.authorized_capability
 			) {
 				return true;

@@ -6,6 +6,7 @@
 #include "game/messages/interpolation_correction_request.h"
 
 #include "game/transcendental/step_declaration.h"
+#include "game/transcendental/entity_handle_declaration.h"
 #include "game/components/container_component.h"
 
 #include "game/detail/inventory/perform_transfer.h"
@@ -49,8 +50,8 @@ void perform_transfers(const C requests, const step_type step) {
 	}
 }
 
-template <class F>
-void drop_from_all_slots(const invariants::container& container, const entity_handle handle, F result_callback) {
+template <class F, class E>
+void drop_from_all_slots(const invariants::container& container, const E handle, F result_callback) {
 	for (const auto& s : container.slots) {
 		for (const auto item : get_items_inside(handle, s.first)) {
 			result_callback(perform_transfer( item_slot_transfer_request{ item, inventory_slot_id() }, handle.get_cosmos()));

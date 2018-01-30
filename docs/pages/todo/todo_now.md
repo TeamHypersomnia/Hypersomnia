@@ -29,6 +29,8 @@ summary: Just a hidden scratchpad.
 				- We know that a driver will only need a correction to damping and not entire body
 
 - Thoughts about entity types
+	- include fixes
+		- both mixins and component synchronizers will have to be agnostic about entity handle type
 	- specifying types
 		- tuples/trivially copyable tuples, because they will be easy to introspect and reason about
 		- proposition: a struct [[type]] and "using variants" "using components" inside
