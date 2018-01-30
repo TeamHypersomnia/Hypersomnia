@@ -1,5 +1,5 @@
 #pragma once
-#include "game/transcendental/entity_id.h"
+#include "augs/math/vec2.h"
 
 struct damping_info {
 	// GEN INTROSPECTOR struct damping_info

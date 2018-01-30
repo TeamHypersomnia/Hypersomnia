@@ -5,9 +5,7 @@
 #include "game/organization/all_component_includes.h"
 #include "augs/misc/constant_size_vector.h"
 
-typedef components::processing P;
-
-P P::get_default(const const_entity_handle id) {
+components::processing components::processing::get_default(const const_entity_handle id) {
 	augs::constant_size_vector<processing_subjects, static_cast<size_t>(processing_subjects::COUNT)> matching;
 
 	if (id.has<components::animation>()) {
@@ -65,7 +63,7 @@ P P::get_default(const const_entity_handle id) {
 		matching.push_back(processing_subjects::WITH_ENABLED_PAST_CONTAGIOUS);
 	}
 
-	P result;
+	components::processing result;
 
 	for (const auto m : matching) {
 		result.processing_subject_categories.set(m);
@@ -73,25 +71,3 @@ P P::get_default(const const_entity_handle id) {
 
 	return result;
 }
-
-template<bool C>
-bool basic_processing_synchronizer<C>::is_in(const processing_subjects list) const {
-	return get_raw_component().processing_subject_categories.test(list);
-}
-
-void component_synchronizer<false, P>::infer_caches() const {
-	handle.get_cosmos().get_solvable_inferred({}).processing_lists.infer_cache_for(handle);
-}
-
-template<bool C>
-P::flagset_type basic_processing_synchronizer<C>::get_basic_categories() const {
-	return get_raw_component().processing_subject_categories;
-}
-
-void component_synchronizer<false, P>::set_basic_categories(const P::flagset_type& categories) const {
-	get_raw_component().processing_subject_categories = categories;
-	infer_caches();
-}
-
-template class basic_processing_synchronizer<false>;
-template class basic_processing_synchronizer<true>;

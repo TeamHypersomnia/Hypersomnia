@@ -6,8 +6,6 @@
 #include "augs/misc/convex_partitioned_shape.h"
 #include "game/container_sizes.h"
 
-#include "game/transcendental/component_synchronizer.h"
-
 using convex_partitioned_shape = basic_convex_partitioned_shape<
 	real32,
 	CONVEX_POLYS_COUNT,

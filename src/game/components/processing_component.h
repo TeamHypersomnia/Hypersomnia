@@ -4,6 +4,7 @@
 
 #include "augs/pad_bytes.h"
 #include "augs/misc/enum/enum_boolset.h"
+#include "game/transcendental/entity_handle_declaration.h"
 
 namespace components {
 	struct processing {
@@ -26,30 +27,30 @@ namespace components {
 	};
 }
 
-template<bool is_const>
-class basic_processing_synchronizer : public component_synchronizer_base<is_const, components::processing> {
+template <class E>
+class component_synchronizer<E, components::processing> : public synchronizer_base<E, components::processing> {
 protected:
-	using base = component_synchronizer_base<is_const, components::processing>;
+	using base = synchronizer_base<E, components::processing>;
 	using base::handle;
+
+	void infer_caches() const{
+		handle.get_cosmos().get_solvable_inferred({}).processing_lists.infer_cache_for(handle);
+	}
+
 public:
-	using base::component_synchronizer_base;
+	using base::synchronizer_base;
 	using base::get_raw_component;
 
-	bool is_in(const processing_subjects) const;
-	components::processing::flagset_type get_basic_categories() const;
-};
+	bool is_in(const processing_subjects list) const{
+		return get_raw_component().processing_subject_categories.test(list);
+	}
 
-template<>
-class component_synchronizer<false, components::processing> : public basic_processing_synchronizer<false> {
-	void infer_caches() const;
-public:
-	using basic_processing_synchronizer<false>::basic_processing_synchronizer;
+	auto get_basic_categories() const{
+		return get_raw_component().processing_subject_categories;
+	}
 
-	void set_basic_categories(const components::processing::flagset_type&) const;
-};
-
-template<>
-class component_synchronizer<true, components::processing> : public basic_processing_synchronizer<true> {
-public:
-	using basic_processing_synchronizer<true>::basic_processing_synchronizer;
+	void set_basic_categories(const components::processing::flagset_type& categories) const{
+		get_raw_component().processing_subject_categories = categories;
+		infer_caches();
+	}
 };

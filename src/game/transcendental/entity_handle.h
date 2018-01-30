@@ -25,7 +25,7 @@
 
 class cosmos;
 
-template <bool, class>
+template <class, class>
 class component_synchronizer;
 
 template <bool is_const>
@@ -38,6 +38,7 @@ class basic_entity_handle :
 	using owner_reference = maybe_const_ref_t<is_const, cosmos>;
 	using entity_ptr = maybe_const_ptr_t<is_const, cosmic_entity>;
 
+	using this_handle_type = basic_entity_handle<is_const>;
 	friend basic_entity_handle<!is_const>;
 
 	entity_ptr ptr;
@@ -74,6 +75,8 @@ private:
 	{}
 
 public:
+	static constexpr bool is_const_value = is_const;
+
 	basic_entity_handle(
 		owner_reference owner, 
 		const entity_id raw_id
@@ -157,7 +160,7 @@ public:
 			ensure(alive());
 
 			if constexpr(is_synchronized_v<T>) {
-				return component_synchronizer<is_const, T>(&agg().template get<T>(pool_provider()), *this);
+				return component_synchronizer<this_handle_type, T>(&agg().template get<T>(pool_provider()), *this);
 			}
 			else {
 				return agg().template get<T>(pool_provider());
@@ -179,7 +182,7 @@ public:
 	}
 
 	template <class T, bool C = !is_const, class = std::enable_if_t<C>>
-	void add(const component_synchronizer<is_const, T>& c) const {
+	void add(const component_synchronizer<this_handle_type, T>& c) const {
 		add(c.get_raw_component());
 	}
 
@@ -194,7 +197,7 @@ public:
 			ensure(alive());
 
 			if constexpr(is_synchronized_v<T>) {
-				return component_synchronizer<is_const, T>(agg().template find<T>(pool_provider()), *this);
+				return component_synchronizer<this_handle_type, T>(agg().template find<T>(pool_provider()), *this);
 			}
 			else {
 				return agg().template find<T>(pool_provider());

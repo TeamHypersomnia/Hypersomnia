@@ -22,7 +22,7 @@ namespace components {
 
 		// GEN INTROSPECTOR struct components::motor_joint
 		std::array<entity_id, 2> target_bodies;
-		
+
 		bool activated = true;
 		bool collide_connected = false;
 		pad_bytes<2> pad;
@@ -36,33 +36,34 @@ namespace components {
 	};
 }
 
-template <bool is_const>
-class basic_motor_joint_synchronizer : public component_synchronizer_base<is_const, components::motor_joint> {
+template <class E>
+class component_synchronizer<E, components::motor_joint> : public synchronizer_base<E, components::motor_joint> {
 protected:
 	friend class ::physics_world_cache;
 
-	using base = component_synchronizer_base<is_const, components::motor_joint>;
+	using base = synchronizer_base<E, components::motor_joint>;
 	using base::handle;
 public:
+	void infer_caches() const {
+		handle.get_cosmos().get_solvable_inferred({}).relational.infer_cache_for(handle);
+		handle.get_cosmos().get_solvable_inferred({}).physics.infer_cache_for(handle);
+	}
+
 	using base::get_raw_component;
-	using base::component_synchronizer_base;
+	using base::synchronizer_base;
 
-	bool is_activated() const;
-	decltype(components::motor_joint::target_bodies) get_target_bodies() const;
+	bool is_activated() const{
+		return get_raw_component().activated;
+	}
+
+	auto get_target_bodies() const {
+		return get_raw_component().target_bodies;
+	}
+
+	auto& operator=(const components::motor_joint& m) const {
+		get_raw_component() = m;
+		infer_caches();
+		return *this;
+	}
 };
 
-template<>
-class component_synchronizer<false, components::motor_joint> : public basic_motor_joint_synchronizer<false> {
-	void infer_caches() const;
-
-public:
-	using basic_motor_joint_synchronizer<false>::basic_motor_joint_synchronizer;
-
-	const component_synchronizer& operator=(const components::motor_joint& m) const;
-};
-
-template<>
-class component_synchronizer<true, components::motor_joint> : public basic_motor_joint_synchronizer<true> {
-public:
-	using basic_motor_joint_synchronizer<true>::basic_motor_joint_synchronizer;
-};

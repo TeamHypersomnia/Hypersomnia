@@ -5,7 +5,7 @@
 void detail_add_item(const inventory_slot_handle handle, const entity_handle new_item);
 void detail_unset_current_slot(const entity_handle removed_item);
 
-template <bool is_const, class component_type>
+template <class, class>
 class component_synchronizer;
 
 template <bool, class>
@@ -23,7 +23,7 @@ class cosmos_solvable_inferred_access {
 
 	friend cosmic;
 
-	template <bool is_const, class component_type>
+	template <class, class>
     friend class component_synchronizer;
 
 	/* Special processors */

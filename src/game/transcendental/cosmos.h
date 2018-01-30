@@ -14,7 +14,6 @@
 #include "game/transcendental/private_cosmos_solvable.h"
 
 #include "game/transcendental/entity_id.h"
-#include "game/transcendental/entity_handle_declaration.h"
 #include "game/transcendental/cosmic_functions.h"
 
 #include "game/assets/behaviour_tree.h"

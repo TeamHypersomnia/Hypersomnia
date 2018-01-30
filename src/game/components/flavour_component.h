@@ -20,33 +20,27 @@ namespace components {
 	};
 }
 
-template <bool is_const>
-class basic_flavour_synchronizer : public component_synchronizer_base<is_const, components::flavour> {
+template <class E>
+class component_synchronizer<E, components::flavour> : public synchronizer_base<E, components::flavour> {
 	friend class flavour_id_cache;
 protected:
-	using base = component_synchronizer_base<is_const, components::flavour>;
+	using base = synchronizer_base<E, components::flavour>;
 	using base::handle;
 public:
 	using base::get_raw_component;
-	using base::component_synchronizer_base;
-	
-	const entity_flavour& get_flavour() const;
-	const entity_name_type& get_name() const;
-	entity_flavour_id get_flavour_id() const;
-};
+	using base::synchronizer_base;
 
-template<>
-class component_synchronizer<false, components::flavour> : public basic_flavour_synchronizer<false> {
-	friend class flavour_id_cache;
+	const entity_flavour& get_flavour() const{
+		return handle.get_cosmos().get_flavour(get_flavour_id());
+	}
 
-public:
-	using basic_flavour_synchronizer<false>::basic_flavour_synchronizer;
-};
+	const entity_name_type& get_name() const{
+		return get_flavour().name;
+	}
 
-template<>
-class component_synchronizer<true, components::flavour> : public basic_flavour_synchronizer<true> {
-public:
-	using basic_flavour_synchronizer<true>::basic_flavour_synchronizer;
+	entity_flavour_id get_flavour_id() const{
+		return get_raw_component().flavour_id;
+	}
 };
 
 entity_id get_first_named_ancestor(const const_entity_handle);

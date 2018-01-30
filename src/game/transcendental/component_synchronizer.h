@@ -1,18 +1,18 @@
 #pragma once
-#include "game/transcendental/entity_handle.h"
 #include "augs/templates/maybe_const.h"
 
-template <bool is_const, class component_type>
-class component_synchronizer_base {
-	using component_pointer = maybe_const_ptr_t<is_const, component_type>;
-
+template <class entity_handle_type, class component_type>
+class synchronizer_base {
 protected:
 	/*
 		A value of nullptr means that the entity has no such component.
 	*/
 
+	static constexpr bool is_const = entity_handle_type::is_const_value;
+	using component_pointer = maybe_const_ptr_t<is_const, component_type>;
+
 	component_pointer component;
-	basic_entity_handle<is_const> handle;
+	entity_handle_type handle;
 
 public:
 	auto get_handle() const {
@@ -35,14 +35,14 @@ public:
 		return component != nullptr;
 	}
 
-	component_synchronizer_base(
+	synchronizer_base(
 		const component_pointer c, 
-		const basic_entity_handle<is_const> h
+		const entity_handle_type h
 	) : 
 		component(c), 
 		handle(h)
 	{}
 };
 
-template <bool is_const, class component_type>
+template <class, class>
 class component_synchronizer;

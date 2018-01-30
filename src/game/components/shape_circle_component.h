@@ -3,7 +3,6 @@
 #include "augs/misc/enum/enum_array.h"
 
 #include "game/container_sizes.h"
-#include "game/transcendental/component_synchronizer.h"
 
 namespace invariants {
 	struct shape_circle {
