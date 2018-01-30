@@ -72,7 +72,6 @@ private:
 	{}
 
 public:
-	static constexpr bool is_const_value = is_const;
 	using this_handle_type = basic_entity_handle<is_const>;
 	using const_type = basic_entity_handle<!is_const>;
 	friend const_type;

@@ -8,7 +8,7 @@ protected:
 		A value of nullptr means that the entity has no such component.
 	*/
 
-	static constexpr bool is_const = entity_handle_type::is_const_value;
+	static constexpr bool is_const = is_class_const_v<entity_handle_type>;
 	using component_pointer = maybe_const_ptr_t<is_const, component_type>;
 
 	component_pointer component;

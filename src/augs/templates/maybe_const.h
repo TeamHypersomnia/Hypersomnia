@@ -24,3 +24,12 @@ constexpr bool is_const_ptr_v = is_const_ptr<T>::value;
 
 template <class T>
 constexpr bool is_const_ref_v = is_const_ref<T>::value;
+
+template <class>
+struct is_class_const;
+
+template <template <bool> class C, bool B>
+struct is_class_const <C<B>> : std::bool_constant<B> {};
+
+template <class T>
+constexpr bool is_class_const_v = is_class_const<T>::value;

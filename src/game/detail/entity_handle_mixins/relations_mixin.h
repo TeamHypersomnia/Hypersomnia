@@ -20,7 +20,7 @@ struct entity_relations;
 template <class entity_handle_type>
 class relations_mixin {
 protected:
-	static constexpr bool is_const = entity_handle_type::is_const_value;
+	static constexpr bool is_const = is_class_const_v<entity_handle_type>;
 
 	using inventory_slot_handle_type = basic_inventory_slot_handle<entity_handle_type>;
 

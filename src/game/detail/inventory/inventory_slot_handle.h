@@ -20,7 +20,7 @@ class cosmos;
 
 template <class entity_handle_type>
 class basic_inventory_slot_handle {
-	static constexpr bool is_const = entity_handle_type::is_const_value;
+	static constexpr bool is_const = is_class_const_v<entity_handle_type>;
 
 	using owner_reference = maybe_const_ref_t<is_const, cosmos>;
 

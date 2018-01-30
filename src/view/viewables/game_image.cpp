@@ -10,13 +10,12 @@ game_image_cache::game_image_cache(
 ) { 
 	original_image_size = loadables.read_source_image_size();
 
-	const auto& original_shape = meta.physical_shape;
-	auto& shape = partitioned_shape;
+	if (const auto& original_shape = meta.physical_shape) {
+		const auto& shape = *original_shape;
 
-	if (original_shape.has_value()) {
 		std::vector<vec2> new_concave;
 
-		for (vec2 v : original_shape.value()) {
+		for (auto v : shape) {
 			v.y = -v.y;
 			new_concave.push_back(v);
 		}
@@ -27,10 +26,10 @@ game_image_cache::game_image_cache(
 			v += origin;
 		}
 
-		shape.add_concave_polygon(new_concave);
-		shape.scale(vec2(1, -1));
+		partitioned_shape.add_concave_polygon(new_concave);
+		partitioned_shape.scale(vec2(1, -1));
 
-		for (auto& c : shape.convex_polys) {
+		for (auto& c : partitioned_shape.convex_polys) {
 			reverse_range(c);
 		}
 	}
@@ -48,7 +47,7 @@ game_image_cache::game_image_cache(
 			new_convex_polygon.push_back(vec2(poly_shape.GetVertex(i)));
 		}
 
-		shape.add_convex_polygon(new_convex_polygon);
+		partitioned_shape.add_convex_polygon(new_convex_polygon);
 	}
 }
 

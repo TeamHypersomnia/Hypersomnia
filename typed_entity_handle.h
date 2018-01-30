@@ -1,6 +1,5 @@
 
-
-namespace entity_flavours {
+namespace entity_types {
 	using character = augs::trivially_copyable_tuple<
 		invariants::rigid_body,
 		invariants::fixtures
