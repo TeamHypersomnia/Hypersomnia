@@ -1103,7 +1103,7 @@ endif()
 
 target_link_libraries(Hypersomnia ${HYPERSOMNIA_LIBS})
 
-set_target_properties(Hypersomnia PROPERTIES DEBUG_POSTFIX "-Debug")
+set_target_properties(Hypersomnia PROPERTIES DEBUG_POSTFIX "")
 
 if(MSVC)
 	set_target_properties(Hypersomnia PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${HYPERSOMNIA_EXE_RESOURCES_DIR}")
