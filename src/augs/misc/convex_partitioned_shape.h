@@ -38,8 +38,60 @@ struct basic_convex_partitioned_shape {
 		}
 	}
 
-	void add_convex_polygon(const convex_poly& poly) {
-		convex_polys.push_back(poly);
+	template <class C>
+	void add_convex_polygon(const C& new_convex, const unsigned from) {
+		const unsigned max_vertices = convex_poly_vertex_count;
+
+		const auto remaining = new_convex.size() - from;
+
+		if (remaining + 1 > max_vertices) {
+			convex_poly new_poly;
+
+			new_poly.push_back(new_convex[0]);
+
+			new_poly.insert(
+				new_poly.end(),
+				new_convex.begin() + from, 
+				new_convex.begin() + from + max_vertices
+			);
+
+			convex_polys.push_back(new_poly);
+
+			const auto next_starting = from + max_vertices - 2;
+			add_convex_polygon(new_convex, next_starting);
+		}
+		else {
+			convex_poly new_poly;
+
+			new_poly.push_back(new_convex[0]);
+
+			new_poly.insert(
+				new_poly.end(),
+				new_convex.begin() + from, 
+				new_convex.end()
+			);
+
+			convex_polys.push_back(new_poly);
+		}
+	}
+
+	template <class C>
+	void add_convex_polygon(const C& new_convex) {
+		const unsigned max_vertices = convex_poly_vertex_count;
+
+		if (new_convex.size() > max_vertices) {
+			convex_poly new_poly;
+			new_poly.assign(new_convex.begin(), new_convex.begin() + max_vertices);
+			convex_polys.push_back(new_poly);
+
+			const auto next_starting = max_vertices - 1;
+			add_convex_polygon(new_convex, next_starting);
+		}
+		else {
+			convex_poly new_poly;
+			new_poly.assign(new_convex.begin(), new_convex.end());
+			convex_polys.push_back(new_poly);
+		}
 	}
 
 	template <class C>
@@ -68,46 +120,7 @@ struct basic_convex_partitioned_shape {
 			}
 
 			std::reverse(new_convex.begin(), new_convex.end());
-
-			auto first_v = new_convex[0];
-
-			const unsigned max_vertices = convex_poly_vertex_count;
-
-			if (new_convex.size() > max_vertices) {
-				unsigned first = 1;
-
-				while (first + max_vertices - 2 < new_convex.size() - 1) {
-					convex_poly new_poly;
-					new_poly.push_back(new_convex[0]);
-					//new_poly.insert(new_poly.end(), new_convex.begin() + first, new_convex.begin() + first + max_vertices - 2 + 1);
-					auto s = new_convex.begin() + first;
-					auto e = new_convex.begin() + first + max_vertices - 2 + 1;
-					
-					while (s != e)
-						new_poly.push_back(*s++);
-
-					convex_polys.push_back(new_poly);
-					first += max_vertices - 2;
-				}
-
-				convex_poly last_poly;
-				last_poly.push_back(new_convex[0]);
-				last_poly.push_back(new_convex[first]);
-
-				// last_poly.insert(last_poly.end(), new_convex.begin() + first, new_convex.end());
-				auto s = new_convex.begin() + first;
-				auto e = new_convex.end();
-
-				while (s != e)
-					last_poly.push_back(*s++);
-
-				convex_polys.push_back(last_poly);
-			}
-			else {
-				convex_poly new_poly;
-				new_poly.assign(new_convex.begin(), new_convex.end());
-				convex_polys.push_back(new_poly);
-			}
+			add_convex_polygon(new_convex);
 		}
 	}
 };
