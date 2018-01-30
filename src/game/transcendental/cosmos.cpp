@@ -20,18 +20,6 @@ void cosmos::clear() {
 	*this = zero;
 }
 
-bool cosmos::operator==(const cosmos& b) const {
-	if (!augs::equal_by_introspection(common.significant, b.common.significant)) {
-		return false;
-	}
-
-	return get_solvable() == b.get_solvable();
-}
-
-bool cosmos::operator!=(const cosmos& b) const {
-	return !operator==(b);
-}
-
 std::wstring cosmos::summary() const {
 	return typesafe_sprintf(L"Entities: %x\n", get_entities_count());
 }

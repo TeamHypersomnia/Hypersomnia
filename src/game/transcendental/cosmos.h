@@ -138,9 +138,6 @@ public:
 		return get_common_significant().all_entity_flavours.get_flavour(flavour_id);
 	}
 
-	bool operator==(const cosmos&) const;
-	bool operator!=(const cosmos&) const;
-
 	template <class id_type>
 	decltype(auto) operator[](const id_type id) {
 		return subscript_handle_getter(*this, id);
