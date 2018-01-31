@@ -135,7 +135,7 @@ std::optional<unsigned> inventory_mixin<E>::get_space_occupied() const {
 	const auto& self = *static_cast<const E*>(this);
 
 	if (const auto item = self.template find<components::item>()) {
-		return item->charges * self.template get<invariants::item>().space_occupied_per_charge;
+		return item->get_charges() * self.template get<invariants::item>().space_occupied_per_charge;
 	}
 
 	return std::nullopt;

@@ -212,7 +212,7 @@ std::optional<drag_and_drop_result> prepare_drag_and_drop_result(
 					// 	drop.hint_text += L"Unmount & ";
 
 					std::wstring charges_text;
-					const auto item_charges = dragged_item_handle.template get<components::item>().charges;
+					const auto item_charges = dragged_item_handle.template get<components::item>().get_charges();
 
 					if (item_charges > 1) {
 						if (simulated_transfer.specified_quantity == drop.result.transferred_charges) {

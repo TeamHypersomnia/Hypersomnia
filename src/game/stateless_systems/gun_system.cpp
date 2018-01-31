@@ -249,7 +249,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 				for (const auto single_bullet_or_pellet_stack_id : bullet_stacks) {
 					const auto single_bullet_or_pellet_stack = cosmos[single_bullet_or_pellet_stack_id];
 
-					int charges = single_bullet_or_pellet_stack.get<components::item>().charges;
+					int charges = single_bullet_or_pellet_stack.get<components::item>().get_charges();
 
 					while (charges--) {
 						if (const auto round_flavour = single_bullet_or_pellet_stack.get<invariants::catridge>().round_flavour) {

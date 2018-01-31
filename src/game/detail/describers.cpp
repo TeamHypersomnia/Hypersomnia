@@ -48,7 +48,7 @@ std::wstring get_bbcoded_entity_properties(const const_entity_handle id) {
 
 		result << "Occupies: [color=vscyan]" << total_occupied << " [/color]";
 		
-		if (item->charges > 1) {
+		if (item->get_charges() > 1) {
 			result << "[color=vsdarkgray](" << per_charge << L" each)[/color]";
 		}
 		else if (container && total_occupied != per_charge) {

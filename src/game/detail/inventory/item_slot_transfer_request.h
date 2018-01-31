@@ -1,9 +1,12 @@
 #pragma once
-#include "game/transcendental/entity_handle_declaration.h"
-#include "game/detail/inventory/inventory_slot_handle.h"
 #include "augs/pad_bytes.h"
 #include "augs/templates/maybe_const.h"
 #include "augs/templates/triviality_traits.h"
+
+#include "game/transcendental/entity_handle_declaration.h"
+
+#include "game/detail/inventory/item_slot_transfer_request_declaration.h"
+#include "game/detail/inventory/inventory_slot_handle.h"
 
 template <class id_type>
 struct basic_item_slot_transfer_request {
@@ -22,5 +25,3 @@ struct basic_item_slot_transfer_request {
 		return trivial_compare(*this, b);
 	}
 };
-
-typedef basic_item_slot_transfer_request<entity_id> item_slot_transfer_request;

@@ -372,7 +372,7 @@ void character_gui::draw_cursor_with_tooltip(
 
 					const auto& item = context.get_cosmos()[dragged_item_button.get_location().item_id].get<components::item>();
 
-					if (item.charges > 1) {
+					if (item.get_charges() > 1) {
 						const auto gui_cursor_size = manager.at(gui_cursor).get_size();
 
 						const auto charges_text = to_wstring(dragged_charges);

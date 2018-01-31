@@ -158,10 +158,10 @@ bool game_gui_system::control_gui_world(
 				dragged_charges += delta;
 
 				if (dragged_charges <= 0) {
-					dragged_charges = item.charges + dragged_charges;
+					dragged_charges = item.get_charges() + dragged_charges;
 				}
-				if (dragged_charges > item.charges) {
-					dragged_charges = dragged_charges - item.charges;
+				if (dragged_charges > item.get_charges()) {
+					dragged_charges = dragged_charges - item.get_charges();
 				}
 			}
 		}

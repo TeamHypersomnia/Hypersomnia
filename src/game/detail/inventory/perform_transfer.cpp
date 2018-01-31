@@ -40,24 +40,25 @@ void perform_transfer(
 	perform_transfer(r, step.get_cosmos()).notify(step);
 }
 
-void detail_add_item(const inventory_slot_handle handle, const entity_handle new_item) {
-	new_item.get<components::item>().current_slot = handle;
-	new_item.get_cosmos().get_solvable_inferred({}).relational.items_of_slots.set_parent(new_item, handle.get_id());
-}
-
-void detail_unset_current_slot(const entity_handle removed_item) {
-	removed_item.get<components::item>().current_slot.unset();
-	removed_item.get_cosmos().get_solvable_inferred({}).relational.items_of_slots.set_parent(removed_item, {});
-}
-
 perform_transfer_result perform_transfer(
+	const item_slot_transfer_request r, 
+	cosmos& cosmos
+) {
+	cosmos[r.item].get<components::item>().perform_transfer(r, cosmos);
+}
+
+void components::item::detail_unset_current_slot(const entity_handle self) {
+	current_slot.unset();
+	self.get_cosmos().get_solvable_inferred({}).relational.items_of_slots.set_parent(self, {});
+}
+
+perform_transfer_result components::item::perform_transfer(
 	const item_slot_transfer_request r, 
 	cosmos& cosmos
 ) {
 	perform_transfer_result output;
 
 	const auto transferred_item = cosmos[r.item];
-	auto& item = transferred_item.get<components::item>();
 
 	const auto result = query_transfer_result(cosmos, r);
 
@@ -66,7 +67,7 @@ perform_transfer_result perform_transfer(
 		return output;
 	}
 
-	const auto previous_slot = cosmos[item.get_current_slot()];
+	const auto previous_slot = cosmos[get_current_slot()];
 	const auto target_slot = cosmos[r.target_slot];
 
 	const auto previous_slot_container = previous_slot.get_container();
@@ -99,7 +100,7 @@ perform_transfer_result perform_transfer(
 		}
 	}
 
-	const bool whole_item_grabbed = item.charges == result.transferred_charges;
+	const bool whole_item_grabbed = get_charges() == result.transferred_charges;
 
 	components::transform previous_container_transform;
 
@@ -122,7 +123,7 @@ perform_transfer_result perform_transfer(
 			output.destructed.emplace(transferred_item);
 		}
 		else {
-			item.charges -= result.transferred_charges;
+			charges -= result.transferred_charges;
 		}
 
 		target_item_to_stack_with.get<components::item>().charges += result.transferred_charges;
@@ -137,14 +138,17 @@ perform_transfer_result perform_transfer(
 	}
 	else {
 		grabbed_item_part = cosmic::clone_entity(transferred_item);
-		item.charges -= result.transferred_charges;
+		charges -= result.transferred_charges;
 		cosmos[grabbed_item_part].get<components::item>().charges = result.transferred_charges;
 	}
 
 	const auto grabbed_item_part_handle = cosmos[grabbed_item_part];
 
 	if (target_slot_exists) {
-		detail_add_item(target_slot, grabbed_item_part_handle);
+		const auto moved_item = grabbed_item_part_handle;
+
+		moved_item.get<components::item>().current_slot = target_slot;
+		cosmos.get_solvable_inferred({}).relational.items_of_slots.set_parent(moved_item, target_slot);
 	}
 
 	grabbed_item_part_handle.infer_colliders();

@@ -82,10 +82,10 @@ item_transfer_result query_transfer_result(
 		output.result = item_transfer_result_type::SUCCESSFUL_DROP;
 
 		if (r.specified_quantity == -1) {
-			output.transferred_charges = item.charges;
+			output.transferred_charges = item.get_charges();
 		}
 		else {
-			output.transferred_charges = std::min(r.specified_quantity, item.charges);
+			output.transferred_charges = std::min(r.specified_quantity, item.get_charges());
 		}
 	}
 	else {
@@ -201,7 +201,7 @@ containment_result query_containment_result(
 			const auto rsa = target_slot.calculate_real_space_available();
 
 			if (rsa > 0) {
-				const bool item_indivisible = item.charges == 1 || !item_def.stackable;
+				const bool item_indivisible = item.get_charges() == 1 || !item_def.stackable;
 
 				if (item_indivisible) {
 					if (rsa >= calculate_space_occupied_with_children(item_entity)) {
@@ -210,7 +210,7 @@ containment_result query_containment_result(
 				}
 				else {
 					const int maximum_charges_fitting_inside = rsa / item_def.space_occupied_per_charge;
-					output.transferred_charges = std::min(item.charges, maximum_charges_fitting_inside);
+					output.transferred_charges = std::min(item.get_charges(), maximum_charges_fitting_inside);
 
 					if (specified_quantity > -1) {
 						output.transferred_charges = std::min(output.transferred_charges, static_cast<unsigned>(specified_quantity));
@@ -279,7 +279,7 @@ int count_charges_inside(const const_inventory_slot_handle id) {
 	int charges = 0;
 
 	for (const auto i : id.get_items_inside()) {
-		charges += id.get_cosmos()[i].get<components::item>().charges;
+		charges += id.get_cosmos()[i].get<components::item>().get_charges();
 	}
 
 	return charges;
@@ -298,7 +298,7 @@ unsigned calculate_space_occupied_with_children(const const_entity_handle item) 
 	const auto& cosm = item.get_cosmos();
 
 	if (item.find<invariants::container>()) {
-		ensure(item.get<components::item>().charges == 1);
+		ensure(item.get<components::item>().get_charges() == 1);
 
 		for (const auto& slot : item.get<invariants::container>().slots) {
 			for (const auto entity_in_slot : get_items_inside(item, slot.first)) {

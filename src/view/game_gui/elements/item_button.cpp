@@ -38,7 +38,7 @@ bool item_button::is_being_wholely_dragged_or_pending_finish(
 	const auto& cosmos = context.get_cosmos();
 
 	if (rect_world.is_currently_dragging(this_id)) {
-		const bool is_drag_partial = element.dragged_charges < cosmos[this_id.get_location().item_id].get<components::item>().charges;
+		const bool is_drag_partial = element.dragged_charges < cosmos[this_id.get_location().item_id].get<components::item>().get_charges();
 		return !is_drag_partial;
 	}
 	else {
@@ -315,10 +315,10 @@ void item_button::draw_proc(
 		if (f.draw_charges) {
 			const auto& item_data = item.get<components::item>();
 
-			int considered_charges = item_data.charges;
+			int considered_charges = item_data.get_charges();
 
 			if (rect_world.is_currently_dragging(this_id)) {
-				considered_charges = item_data.charges - element.dragged_charges;
+				considered_charges = item_data.get_charges() - element.dragged_charges;
 			}
 
 			double bottom_number_val = -1.0;
@@ -478,7 +478,7 @@ void item_button::respond_to_events(const game_gui_context context, const this_i
 			this_id->detector.update_appearance(info);
 
 			if (info == gui_event::lstarteddrag) {
-				element.dragged_charges = item.get<components::item>().charges;
+				element.dragged_charges = item.get<components::item>().get_charges();
 			}
 
 			if (info == gui_event::rclick) {

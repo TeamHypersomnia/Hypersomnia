@@ -8,6 +8,16 @@
 		- Groups could then easily specify initial values for entities in the group
 			- will just be a common practice to set the delete_with to the root member of the group
 				- Currently would anyway be only used for crosshair
+		- Concern: fast bi-directional access to:
+			- parent having just child, 
+			- or to child having just parent
+		- Concern: childhood type? 
+			- Assumption: a child can only have one delete_with parent
+				- But it may have more logical parents, e.g. it can be attached to some body as an item?
+			- Do we want to assume that, if a child has delete_with set, that the associated parent fulfills some other role as well?
+				- Concerns would mix, but that would imply less data which is fine
+					- And that lets the rest of data stay raw and not synchronized
+				- Rename to "logical_parent"?
 	- crosshair has id to its parent that is used on deletion
 		- we'd still need to cache this value and make more state associated
 
@@ -86,9 +96,6 @@ we consider whole type overrides too complex architeciturally:
 - Implement entity flavours incrementally.
 	- We do it now to not repeat the code when we'll be writing improvements to inferences 
 		- gun component 
-			- firing engine sound and muzzle particles are "persistent child entities"
-				- thus they should become group entities.
-					- That will be only possible once we invariantize practically everything.
 			- magic missile def is just a child entity to be cloned around as needed.
 				- thus it only becomes type id.
 		- catridge component

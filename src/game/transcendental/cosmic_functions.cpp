@@ -188,7 +188,7 @@ void cosmic::delete_entity(const entity_handle handle) {
 	}
 
 	if (const auto current_slot = handle.get_current_slot()) {
-		detail_unset_current_slot(handle);
+		handle.get<components::item>().detail_unset_current_slot(handle);
 	}
 
 	cosmic::destroy_caches_of(handle);

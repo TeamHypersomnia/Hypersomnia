@@ -1,35 +1,9 @@
 #pragma once
-#include <optional>
-
-#include "game/messages/queue_destruction.h"
-#include "game/messages/item_picked_up_message.h"
-#include "game/messages/interpolation_correction_request.h"
-
 #include "game/transcendental/step_declaration.h"
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/components/container_component.h"
-
-#include "game/detail/inventory/perform_transfer.h"
-#include "game/detail/view_input/sound_effect_input.h"
 #include "game/detail/inventory/inventory_utils.h"
-
-struct perform_transfer_result {
-	std::optional<messages::queue_destruction> destructed;
-	std::vector<messages::interpolation_correction_request> interpolation_corrected;
-	std::optional<messages::item_picked_up_message> picked;
-
-	struct drop {
-		sound_effect_input sound_input;
-		sound_effect_start_input sound_start;
-
-		components::transform sound_transform;
-		entity_id sound_subject;
-	};
-
-	std::optional<drop> dropped;
-
-	void notify(logic_step) const;
-};
+#include "game/components/item_component.h"
 
 perform_transfer_result perform_transfer(
 	const item_slot_transfer_request, 
@@ -60,6 +34,3 @@ void drop_from_all_slots(const invariants::container& container, const E handle,
 }
 
 void drop_from_all_slots(const invariants::container& container, const entity_handle handle, const logic_step step);
-
-void detail_add_item(const inventory_slot_handle handle, const entity_handle new_item);
-void detail_remove_item(const inventory_slot_handle handle, const entity_handle removed_item);

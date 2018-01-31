@@ -2,9 +2,6 @@
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/detail/inventory/inventory_slot_handle_declaration.h"
 
-void detail_add_item(const inventory_slot_handle handle, const entity_handle new_item);
-void detail_unset_current_slot(const entity_handle removed_item);
-
 template <class, class>
 class component_synchronizer;
 
@@ -33,8 +30,7 @@ class cosmos_solvable_inferred_access {
 	template <class>
 	friend class physics_mixin;
 
-	friend void ::detail_add_item(const inventory_slot_handle handle, const entity_handle new_item);
-	friend void ::detail_unset_current_slot(const entity_handle removed_item);
+	friend components::item;
 
 	cosmos_solvable_inferred_access() {}
 };
