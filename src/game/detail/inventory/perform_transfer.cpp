@@ -44,7 +44,7 @@ perform_transfer_result perform_transfer(
 	const item_slot_transfer_request r, 
 	cosmos& cosmos
 ) {
-	cosmos[r.item].get<components::item>().perform_transfer(r, cosmos);
+	return cosmos[r.item].get<components::item>().perform_transfer(r, cosmos);
 }
 
 void components::item::detail_unset_current_slot(const entity_handle self) {

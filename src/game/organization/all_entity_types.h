@@ -13,7 +13,7 @@ struct controlled_character {
 		invariants::render
 	>;
 
-	using additional_components = type_list<
+	using components = type_list<
 		components::item_slot_transfers
 		components::rigid_body,
 		components::fixtures,
@@ -25,6 +25,26 @@ struct controlled_character {
 	>;
 };
 
-using all_entity_types = type_list<
+struct environment_obstacle {
 
+};
+
+struct shootable {
+
+};
+
+struct shootable_charge {
+
+};
+
+struct crosshair_recoil {
+
+};
+
+using all_entity_types = type_list<
+	controlled_character,
+	environment_obstacle,
+	shootable,
+	shootable_charge,
+	crosshair_recoil
 >;
