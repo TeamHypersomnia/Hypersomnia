@@ -35,13 +35,7 @@ void physics_system::step_and_set_new_transforms(const logic_step step) {
 		entity_handle entity = cosmos[b->GetUserData()];
 
 		physics.recurential_friction_handler(step, b, b->m_ownerFrictionGround);
-
-		auto& body = entity.get<components::rigid_body>().get_raw_component();
-		
-		body.transform = b->m_xf;
-		body.sweep = b->m_sweep;
-		body.velocity = vec2(b->GetLinearVelocity());
-		body.angular_velocity = b->GetAngularVelocity();
+		entity.get<components::rigid_body>().update_after_step(*b);	
 	}
 }
 

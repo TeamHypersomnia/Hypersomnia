@@ -14,11 +14,16 @@ protected:
 	component_pointer component;
 	entity_handle_type handle;
 
-	auto& get_raw_component() const {
+	auto& get_writable() const {
 		return *component;
 	}
 
 public:
+
+	const auto& get_raw_component() const {
+		return *component;
+	}
+
 	auto get_handle() const {
 		return handle;
 	}
@@ -33,6 +38,10 @@ public:
 
 	operator bool() const {
 		return component != nullptr;
+	}
+
+	auto* operator->() const {
+		return this;
 	}
 
 	synchronizer_base(

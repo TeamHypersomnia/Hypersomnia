@@ -157,6 +157,11 @@ summary: Just a hidden scratchpad.
 - child component should be always_present + synchronized
 - strip children vector tracker of children caches as we'll take that data from signi
 	- was anyway used only for ensuring
+- Groups can be defined separately from flavours, e.g. many groups can share the same flavours.
+	- if we want to have a group wherein a weapon is spawned with a magazine, we can simply set the inventory slot ids beforehand.
+		- We might detect errors early on and disallow some configurations or not care and just throw cosmos_inconsistent_error.
+		- Group ids will not be creatable from the logic anyway?
+			- Could be useful later for spawning cars etc
 - traces
 	- maybe traces should be audiovisual?
 	- fix the feel of traces (maybe shrink them only horizontally?)
