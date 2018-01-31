@@ -288,22 +288,25 @@ void illuminated_rendering(
 	
 	if (settings.draw_crosshairs) {
 		cosmos.for_each(
-			processing_subjects::WITH_CROSSHAIR,
+			processing_subjects::WITH_SENTIENCE,
 			[&](const const_entity_handle it) {
-				if (const auto s = it.find<invariants::sprite>()) {
-					const auto p = it.get_parent();
+				if (const auto s = it.find<components::sentience>()) {
+					auto transform = it.get_viewing_transform(interp, true);
 
-					if (p.dead()) {
-						return;
-					}
+					const auto crosshair_entity = cosmos[s->character_crosshair];
 
-					auto transform = p.get_viewing_transform(interp, true);
-
-					if (const auto crosshair = it.find<components::crosshair>()) {
-						transform.pos += crosshair->calculate_aiming_displacement(it, false);
+					if (crosshair_entity
+						&& crosshair_entity.template has<components::crosshair>()
+						&& cosmos[crosshair_entity.template get<components::crosshair>().recoil_entity]
+						&& crosshair_entity.template find<invariants::sprite>()
+					) {
+						transform.pos += components::crosshair::calculate_aiming_displacement(
+							crosshair_entity, 
+							false
+						);
 					
 						draw_renderable(
-							*s,
+							crosshair_entity.template get<invariants::sprite>(),
 							{ output, game_images, global_time_seconds },
 							transform
 						);

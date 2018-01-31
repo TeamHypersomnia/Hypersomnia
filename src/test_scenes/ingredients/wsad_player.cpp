@@ -182,8 +182,8 @@ namespace prefabs {
 		const auto character = create_test_scene_entity(world, test_scene_flavour::PLAYER);
 		
 		const auto& metas = step.get_logical_assets();
+
 		const auto crosshair = create_character_crosshair(step);
-		crosshair.get<components::crosshair>().character_entity_to_chase = character;
 
 		ingredients::add_character(metas, character, crosshair);
 

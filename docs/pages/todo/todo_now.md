@@ -7,6 +7,27 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order:  
 
+
+- Chosen approach for cloning and child entities:
+	- Let us use the storing of child_entity_ids approach.
+		- This lets us conveniently setup the clones of entities even with children entities.
+		- Existential child becomes redundant, 
+	- Let child_entity_ids be either hidden from the author (by constexpr) or just plain immutable.
+		- can't have consts in components, though.
+		- they will never change either way, but it's good to be sure.
+	- Let there never be a need from a child to access the parent.
+		- E.g. instead of crosshair having an entity_id to its parent, let's handle the motions while knowing about sentience itself, without needlessly contextualizing.
+		- And if there is, let's have a cache.
+	- In any case, whether we need the cache or we only assume that entities marked via child_entity_ids will be deleted, 
+	it would be good and safe to have a synchronizer. But we don't have time to play it safe.
+
+- Cloning entities
+	- Depending on this, we might choose one or the other design for children
+	- We no longer need cloning for charged items because it is highly unlikely they would have a child entity 
+	- An author might want to copy/duplicate something on their screen
+		- Even character would need their crosshair child
+	- The problem is, reassigning ids properly is non trivial if we don't set them as child_entity_id	
+
 - Solutions for "children entities": entities that are cloned with some other entity and deleted with it
 	- **Chosen solution:** delete_with component that is a synchronized component
 		- Most flexibility and separation of concerns; childhood is not really something that will change rapidly, as opposed to damping or density
