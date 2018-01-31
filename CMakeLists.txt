@@ -734,6 +734,10 @@ if(UNIX)
 -Winit-self"
 	)
 
+# TODO: -Wunused-value fails with SFINAE
+	# We could use for example (void)T::value
+# TODO: -Wduplicated-branch fails with some of our custom type traits
+
 	# Latest features of C++17 will be enabled.
 	set(HYPERSOMNIA_CXX_FLAGS "-std=gnu++1z -Werror ${CHOSEN_WARNINGS}")
 

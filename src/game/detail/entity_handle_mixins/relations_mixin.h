@@ -90,7 +90,7 @@ template <class E>
 void relations_mixin<E>::make_as_child_of(const entity_id parent_id) const {
 	auto& self = *static_cast<const E*>(this);
 
-	auto& ch = self += components::logical_child();
+	auto& ch = self += components::existential_child();
 	ch.parent = parent_id;
 }
 
@@ -127,5 +127,5 @@ template <class E>
 E relations_mixin<E>::get_parent() const {
 	auto& self = *static_cast<const E*>(this);
 
-	return self.get_cosmos()[self.template get<components::logical_child>().parent];
+	return self.get_cosmos()[self.template get<components::existential_child>().parent];
 }

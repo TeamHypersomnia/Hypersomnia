@@ -121,7 +121,7 @@ entity_handle cosmic::clone_entity(const entity_handle source_entity) {
 	}
 
 	ensure(
-		!source_entity.get<components::logical_child>().parent.is_set() 
+		!source_entity.get<components::existential_child>().parent.is_set() 
 		&& "Cloning of entities that are children is not yet supported"
 	);
 
@@ -134,7 +134,7 @@ entity_handle cosmic::clone_entity(const entity_handle source_entity) {
 			with due care to each of them.
 		*/
 		components::guid,
-		components::logical_child
+		components::existential_child
 	>(solvable.get_aggregate(source_entity), solvable);
 
 	if (new_entity.has<components::item>()) {

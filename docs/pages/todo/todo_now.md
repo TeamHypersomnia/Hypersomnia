@@ -8,9 +8,6 @@ summary: Just a hidden scratchpad.
 ## Microplanned implementation order:  
 
 - Solutions for "children entities": entities that are cloned with some other entity and deleted with it
-	- Stateless calculation of a parent entity and storing results in a parenthood cache
-		- Makes some other potentially unrelated state now associated
-		- From what do we calculate this?
 	- **Chosen solution:** delete_with component that is a synchronized component
 		- Most flexibility and separation of concerns; childhood is not really something that will change rapidly, as opposed to damping or density
 		- Groups could then easily specify initial values for entities in the group
@@ -23,6 +20,15 @@ summary: Just a hidden scratchpad.
 				- has to access the children vector cache
 				- but what if it has more children with varying functionality?
 					- then we can add an enum to the child
+				- do we say, we always treat the first child as e.g. a crosshair?
+					- NO! We can simply associate a character with any entity as its crosshair!
+					- The existential_child itself will only be used for deletion.
+					- It may coincidentally point at its parent.
+			- The difference is like this:
+				- The parent can have many children, thus it makes no sense to make assumptions about order of children in the cache or some enums.
+				- We'll just have entity_id's scattered through relevant domains that imply some acting upon the other entity or reading therefrom. 
+				- If we have a delete_with component, we may assume some other role of its parent. 
+					- **We should actually just make the child be associated coincidentally with just some entity_id**.
 		- Concern: childhood type? 
 			- Assumption: a child can only have one delete_with parent
 				- But it may have more logical parents, e.g. it can be attached to some body as an item?
@@ -30,8 +36,6 @@ summary: Just a hidden scratchpad.
 				- Concerns would mix, but that would imply less data which is fine
 					- And that lets the rest of data stay raw and not synchronized
 				- Rename to "logical_parent"?
-	- crosshair has id to its parent that is used on deletion
-		- we'd still need to cache this value and make more state associated
 
 - Constructing entities
 	- Solver might want to set some initial component values before inference occurs
@@ -55,8 +59,6 @@ summary: Just a hidden scratchpad.
 				- We know that a driver will only need a correction to damping and not entire body
 
 - Thoughts about entity types
-	- include fixes
-		- both mixins and component synchronizers will have to be agnostic about entity handle type
 	- specifying types
 		- tuples/trivially copyable tuples, because they will be easy to introspect and reason about
 		- should components be added automatically?

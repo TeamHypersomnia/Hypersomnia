@@ -25,7 +25,7 @@
 #include "game/components/sentience_component.h"
 #include "game/components/attitude_component.h"
 #include "game/components/processing_component.h"
-#include "game/components/logical_child_component.h"
+#include "game/components/existential_child_component.h"
 #include "game/components/interpolation_component.h"
 #include "game/components/flags_component.h"
 #include "game/components/light_component.h"

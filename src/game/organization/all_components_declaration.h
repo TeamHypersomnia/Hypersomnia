@@ -53,7 +53,7 @@ namespace components {
 	struct attitude;
 	struct processing;
 	struct guid;
-	struct logical_child;
+	struct existential_child;
 	struct interpolation;
 	struct light;
 	struct wandering_pixels;
@@ -86,7 +86,7 @@ using component_list_t = List<
 	components::attitude,
 	components::processing,
 	components::guid,
-	components::logical_child,
+	components::existential_child,
 	components::interpolation,
 	components::light,
 	components::wandering_pixels,
