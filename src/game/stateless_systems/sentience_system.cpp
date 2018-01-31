@@ -471,7 +471,12 @@ void sentience_system::rotate_towards_crosshairs_and_driven_vehicles(const logic
 
 			if (const auto crosshair = cosmos[sentience.character_crosshair]) {
 				const auto items = subject.get_wielded_items();
-				const auto target_transform = crosshair.get_logic_transform();
+
+				const auto target_transform = [&](){
+					auto t = subject_transform;
+					t.pos += components::crosshair::calculate_aiming_displacement(crosshair, false);
+					return t;
+				}();
 
 				{
 					const auto diff = target_transform.pos - subject_transform.pos;

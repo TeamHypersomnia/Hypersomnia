@@ -46,7 +46,6 @@ void crosshair_system::generate_crosshair_intents(const logic_step step) {
 
 			vec2& base_offset = crosshair.base_offset;
 			const vec2 old_base_offset = base_offset;
-			const vec2 old_pos = subject.get_logic_transform().pos;
 
 			base_offset += delta;
 			base_offset.clamp_rotated(crosshair.get_bounds_in_this_look(), crosshair.rotation_offset);
@@ -56,7 +55,6 @@ void crosshair_system::generate_crosshair_intents(const logic_step step) {
 			crosshair_motion.subject = it.subject;
 			crosshair_motion.crosshair_base_offset_rel = base_offset - old_base_offset;
 			crosshair_motion.crosshair_base_offset = base_offset;
-			crosshair_motion.crosshair_world_pos = base_offset + cosmos[crosshair.character_entity_to_chase].get_logic_transform().pos;
 
 			step.post_message(crosshair_motion);
 		}
@@ -93,22 +91,4 @@ void crosshair_system::apply_crosshair_intents_to_base_offsets(const logic_step 
 	for (const auto& it : events) {
 		cosmos[it.subject].get<components::crosshair>().base_offset = it.crosshair_base_offset;
 	}
-}
-
-void crosshair_system::apply_base_offsets_to_crosshair_transforms(const logic_step step) {
-	auto& cosmos = step.get_cosmos();
-	
-	cosmos.for_each(
-		processing_subjects::WITH_CROSSHAIR,
-		[&](const entity_handle it) {
-			const auto player = cosmos[it.get<components::crosshair>().character_entity_to_chase];
-
-			if (player.alive()) {
-				const vec2 aiming_displacement = components::crosshair::calculate_aiming_displacement(it, true);
-				const vec2 player_center = player.get_logic_transform().pos;
-
-				it.get<components::transform>().pos = aiming_displacement + player_center;
-			}
-		}
-	);
 }

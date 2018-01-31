@@ -184,7 +184,6 @@ namespace prefabs {
 		const auto& metas = step.get_logical_assets();
 		const auto crosshair = create_character_crosshair(step);
 		crosshair.get<components::crosshair>().character_entity_to_chase = character;
-		crosshair.set_logic_transform(spawn_transform.pos);
 
 		ingredients::add_character(metas, character, crosshair);
 
@@ -202,7 +201,6 @@ namespace prefabs {
 		auto zero_target = create_test_scene_entity(world, test_scene_flavour::ZERO_TARGET);
 
 		{
-			root += components::transform();
 			auto& crosshair = root += components::crosshair();
 			root += components::processing();
 			

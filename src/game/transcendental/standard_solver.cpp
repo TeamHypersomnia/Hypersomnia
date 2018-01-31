@@ -84,7 +84,6 @@ void standard_solve(const logic_step step) {
 
 	crosshair_system().generate_crosshair_intents(step);
 	crosshair_system().apply_crosshair_intents_to_base_offsets(step);
-	crosshair_system().apply_base_offsets_to_crosshair_transforms(step);
 
 	//	item_system().translate_gui_intents_to_transfer_requests(step);
 	item_system().start_picking_up_items(step);
