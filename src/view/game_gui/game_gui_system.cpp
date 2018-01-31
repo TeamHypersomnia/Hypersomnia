@@ -151,7 +151,7 @@ bool game_gui_system::control_gui_world(
 			}
 
 			if (change.msg == augs::event::message::wheel) {
-				const auto& item = item_entity.get<components::item>();
+				const auto item = item_entity.get<components::item>();
 
 				const auto delta = change.data.scroll.amount;
 

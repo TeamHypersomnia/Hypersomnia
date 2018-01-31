@@ -134,12 +134,15 @@ entity_handle cosmic::clone_entity(const entity_handle source_entity) {
 			with due care to each of them.
 		*/
 		components::guid,
-		components::existential_child
+		components::existential_child,
+		components::item
 	>(solvable.get_aggregate(source_entity), solvable);
 
+#if TODO
 	if (new_entity.has<components::item>()) {
 		new_entity.get<components::item>().current_slot.unset();
 	}
+#endif
 
 	{
 		for_each_component_type([&](auto c) {
@@ -188,7 +191,7 @@ void cosmic::delete_entity(const entity_handle handle) {
 	}
 
 	if (const auto current_slot = handle.get_current_slot()) {
-		handle.get<components::item>().detail_unset_current_slot(handle);
+		cosmos.get_solvable_inferred({}).relational.items_of_slots.set_parent(handle, {});
 	}
 
 	cosmic::destroy_caches_of(handle);

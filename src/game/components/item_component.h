@@ -10,6 +10,9 @@
 #include "game/detail/inventory/inventory_slot_id.h"
 
 #include "game/transcendental/entity_handle_declaration.h"
+#include "game/transcendental/component_synchronizer.h"
+#include "game/transcendental/cosmos_solvable_inferred_access.h"
+
 #include "game/detail/inventory/inventory_slot_handle_declaration.h"
 #include "game/detail/inventory/item_slot_transfer_request_declaration.h"
 
@@ -35,48 +38,21 @@ struct perform_transfer_result {
 	void notify(logic_step) const;
 };
 
-namespace augs {
-	struct introspection_access;
-}
-
-class cosmic;
-class cosmos;
+perform_transfer_result perform_transfer(
+	writable_component_access,
+	cosmos_solvable_inferred_access,
+	const item_slot_transfer_request r, 
+	cosmos& cosmos
+); 
 
 namespace components {
 	struct item {
-	private:
-		friend augs::introspection_access;
-		friend cosmic;
+		static constexpr bool is_synchronized = true;
 
 		// GEN INTROSPECTOR struct components::item
 		int charges = 1;
 		inventory_slot_id current_slot;
 		// END GEN INTROSPECTOR
-
-		void detail_unset_current_slot(entity_handle);
-
-	public:
-		auto get_current_slot() const {
-			return current_slot;
-		}
-
-		auto get_charges() const {
-			return charges;
-		}
-
-		bool try_set_charges(const int new_charges) {
-			if (current_slot.is_set()) {
-				return false;
-			}
-
-			charges = new_charges;
-			return true;
-		};
-
-		perform_transfer_result perform_transfer(
-			const item_slot_transfer_request r, 
-			cosmos& cosmos
-		); 
 
 #if TODO_MOUNTING
 		enum mounting_state : unsigned char {
@@ -100,6 +76,38 @@ namespace components {
 #endif
 	};
 }
+
+template <class E>
+class component_synchronizer<E, components::item> : public synchronizer_base<E, components::item> {
+protected:
+	using base = synchronizer_base<E, components::item>;
+	using base::get_writable;
+	using base::operator->;
+public:
+	using base::get_raw_component;
+	using base::synchronizer_base;
+
+	template <class... Args>
+	decltype(auto) perform_transfer(Args&&... args) const {
+		return ::perform_transfer(
+			writable_component_access(),
+		   	cosmos_solvable_inferred_access(),
+		   	std::forward<Args>(args)...
+		);
+	};
+
+	auto get_current_slot() const {
+		return get_raw_component().current_slot;
+	}
+
+	auto get_charges() const {
+		return get_raw_component().charges;
+	}
+
+	auto* operator->() const {
+		return this;
+	}
+};
 
 namespace invariants {
 	struct item {

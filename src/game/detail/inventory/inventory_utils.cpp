@@ -68,7 +68,7 @@ item_transfer_result query_transfer_result(
 	item_transfer_result output;
 	const auto transferred_item = cosm[r.item];
 	const auto target_slot = cosm[r.target_slot];
-	const auto& item = transferred_item.get<components::item>();
+	const auto item = transferred_item.get<components::item>();
 
 	ensure(r.specified_quantity != 0);
 
@@ -170,7 +170,7 @@ containment_result query_containment_result(
 	bool allow_replacement
 ) {
 	const auto& cosmos = item_entity.get_cosmos();
-	const auto& item = item_entity.get<components::item>();
+	const auto item = item_entity.get<components::item>();
 	const auto& item_def = item_entity.get<invariants::item>();
 	const auto& slot = *target_slot;
 

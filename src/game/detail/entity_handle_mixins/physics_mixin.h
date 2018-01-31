@@ -71,7 +71,7 @@ real32 physics_mixin<E>::calculate_density(
 
 	real32 density = def.density;
 
-	if (const auto* const item = self.template find<components::item>()) {
+	if (const auto item = self.template find<components::item>()) {
 		if (const auto slot = cosmos[item->get_current_slot()]) {
 			density *= cosmos[item->get_current_slot()].calculate_density_multiplier_due_to_being_attached();
 		}

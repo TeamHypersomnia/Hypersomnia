@@ -68,7 +68,7 @@ void item_system::pick_up_touching_items(const logic_step step) {
 		const auto picker = cosmos[picker_id];
 		const auto item_entity = cosmos[c.collider];
 
-		if (const auto* const item = item_entity.find<components::item>();
+		if (const auto item = item_entity.find<components::item>();
 			item && item_entity.get_owning_transfer_capability().dead()
 		) {
 			if (auto* const transfers = picker.find<components::item_slot_transfers>();

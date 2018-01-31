@@ -311,7 +311,7 @@ void item_button::draw_proc(
 		}
 
 		if (f.draw_charges) {
-			const auto& item_data = item.get<components::item>();
+			const auto item_data = item.get<components::item>();
 
 			int considered_charges = item_data.get_charges();
 

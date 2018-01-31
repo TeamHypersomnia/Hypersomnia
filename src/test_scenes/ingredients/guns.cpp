@@ -176,7 +176,7 @@ namespace test_flavours {
 			meta.set(item);
 
 			components::item item_inst;
-			ensure(item_inst.try_set_charges(30));
+			item_inst.charges = 30;
 			meta.set(item_inst);
 
 			{

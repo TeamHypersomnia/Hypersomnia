@@ -1,6 +1,22 @@
 #pragma once
 #include "augs/templates/maybe_const.h"
 
+template <class, class>
+class component_synchronizer;
+
+template <class, class>
+class synchronizer_base;
+
+class writable_component_access {
+	template <class, class>
+	friend class synchronizer_base;
+
+	template <class, class>
+	friend class component_synchronizer;
+
+	writable_component_access() {}
+};
+
 template <class entity_handle_type, class component_type>
 class synchronizer_base {
 protected:
@@ -19,6 +35,10 @@ protected:
 	}
 
 public:
+
+	auto& get_raw_component(writable_component_access) const {
+		return *component;
+	}
 
 	const auto& get_raw_component() const {
 		return *component;
@@ -52,6 +72,3 @@ public:
 		handle(h)
 	{}
 };
-
-template <class, class>
-class component_synchronizer;

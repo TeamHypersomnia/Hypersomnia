@@ -30,7 +30,5 @@ class cosmos_solvable_inferred_access {
 	template <class>
 	friend class physics_mixin;
 
-	friend components::item;
-
 	cosmos_solvable_inferred_access() {}
 };

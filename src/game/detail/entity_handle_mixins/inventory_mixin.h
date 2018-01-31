@@ -154,7 +154,7 @@ E inventory_mixin<E>::get_owning_transfer_capability() const {
 		return self;
 	}
 
-	const auto* const maybe_item = self.template find<components::item>();
+	const auto maybe_item = self.template find<components::item>();
 
 	if (!maybe_item || cosmos[maybe_item->get_current_slot()].dead()) {
 		return cosmos[entity_id()];
@@ -243,7 +243,7 @@ template <class E>
 typename inventory_mixin<E>::inventory_slot_handle_type inventory_mixin<E>::get_current_slot() const {
 	const auto& self = *static_cast<const E*>(this);
 
-	const auto* const maybe_item = self.template find<components::item>();
+	const auto maybe_item = self.template find<components::item>();
 
 	if (maybe_item == nullptr) {
 		return self.get_cosmos()[inventory_slot_id()];

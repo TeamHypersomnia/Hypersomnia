@@ -35,7 +35,7 @@ std::wstring get_bbcoded_entity_properties(const const_entity_handle id) {
 	const auto* const container = id.find<invariants::container>();
 
 	const auto* const item_def = id.find<invariants::item>();
-	const auto* const item = id.find<components::item>();
+	const auto item = id.find<components::item>();
 
 	if (item && item_def) {
 		result << L"[color=vsblue]" << get_bbcoded_item_categories(item_def->categories_for_slot_compatibility) << L"[/color]\n";

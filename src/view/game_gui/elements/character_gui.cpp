@@ -370,7 +370,7 @@ void character_gui::draw_cursor_with_tooltip(
 						dragged_item_button->draw_grid_border_ghost(context, dragged_item_button, drawn_pos);
 					}
 
-					const auto& item = context.get_cosmos()[dragged_item_button.get_location().item_id].get<components::item>();
+					const auto item = context.get_cosmos()[dragged_item_button.get_location().item_id].get<components::item>();
 
 					if (item.get_charges() > 1) {
 						const auto gui_cursor_size = manager.at(gui_cursor).get_size();
