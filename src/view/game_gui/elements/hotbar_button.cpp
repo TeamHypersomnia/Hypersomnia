@@ -82,7 +82,6 @@ void hotbar_button::draw(
 		return;
 	}
 
-	const auto& rect_world = context.get_rect_world();
 	const auto& this_tree_entry = context.get_tree_entry(this_id);
 	const auto owner_transfer_capability = context.get_subject_entity();
 	const auto settings = context.get_hotbar_settings();
@@ -114,9 +113,6 @@ void hotbar_button::draw(
 	const auto& detector = this_id->detector;
 
 	auto colorize = cyan;
-
-	const bool colorize_background_when_selected = true;
-	const bool increase_alpha_when_selected = false;
 
 	rgba distinguished_border_color = cyan;
 

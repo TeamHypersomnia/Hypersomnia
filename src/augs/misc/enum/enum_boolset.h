@@ -40,8 +40,6 @@ namespace augs {
 		}
 	
 		auto none() const {
-			std::size_t c = 0;
-			
 			for (const auto f : flags) {
 				if (f) {
 					return false;

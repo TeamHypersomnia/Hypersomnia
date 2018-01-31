@@ -23,7 +23,9 @@ void release_or_throw_fused_object(
 	bool is_pressed_flag
 ) {
 	auto& cosmos = step.get_cosmos();
+#if TODO
 	const auto& metas = step.get_logical_assets();
+#endif
 	const auto now = cosmos.get_timestamp();
 	const auto delta = step.get_delta();
 	const auto thrower = cosmos[thrower_id];
@@ -45,7 +47,9 @@ void release_or_throw_fused_object(
 		const auto* const maybe_explosive = fused_entity.find<invariants::explosive>();
 
 		if (maybe_explosive != nullptr) {
+#if TODO
 			const auto& explosive = *maybe_explosive;
+#endif
 
 			perform_transfer(
 				item_slot_transfer_request{ fused_entity, inventory_slot_id(), -1, false, 0.f }, 

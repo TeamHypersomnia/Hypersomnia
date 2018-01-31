@@ -127,8 +127,6 @@ item_button::layout_with_attachments item_button::calculate_button_layout(
 	const game_image_metas_map& defs,
 	const bool include_attachments
 ) {
-	const auto& cosmos = component_owner.get_cosmos();
-	
 	layout_with_attachments output;
 	output.push(component_owner.get_aabb(components::transform()));
 

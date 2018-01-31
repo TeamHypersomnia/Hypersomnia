@@ -236,7 +236,7 @@ E basic_inventory_slot_handle<E>::get_root_container() const {
 template <class E>
 std::optional<colliders_connection> basic_inventory_slot_handle<E>::calculate_connection_until(const entity_id until) const {
 	const auto slot = get_container().get_current_slot();
-	const auto& cosmos = get_cosmos();
+	// const auto& cosmos = get_cosmos();
 
 	if (slot.alive()) {
 		if (slot->physical_behaviour == slot_physical_behaviour::DEACTIVATE_BODIES) {

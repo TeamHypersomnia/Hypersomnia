@@ -595,7 +595,7 @@ void visibility_system::respond_to_visibility_information_requests(
 			if (vertex.is_on_a_bound && (!ray_callbacks[0].hit || (ray_callbacks[0].intersection - vertex.pos).length_sq() < epsilon_distance_vertex_hit_sq)) {
 				/* if it is a vertex on the boundary, handle it accordingly - interpret it as a new discontinuity (e.g. for pathfinding) */
 				discontinuity new_discontinuity;
-				new_discontinuity.edge_index = static_cast<unsigned>(double_rays.size());
+				new_discontinuity.edge_index = static_cast<int>(double_rays.size());
 				new_discontinuity.points.first = vertex.pos;
 
 				vec2 actual_normal;// = (ray_callbacks[0].normal / 2;
@@ -607,8 +607,9 @@ void visibility_system::respond_to_visibility_information_requests(
 					discontinuity::RIGHT : discontinuity::LEFT;
 
 				/* if it is clockwise, we take previous edge as subject */
-				if (new_discontinuity.winding == discontinuity::RIGHT)
+				if (new_discontinuity.winding == discontinuity::RIGHT) {
 					--new_discontinuity.edge_index;
+				}
 
 				new_discontinuity.is_boundary = true;
 				//request.discontinuities.push_back(new_discontinuity);
@@ -681,7 +682,7 @@ void visibility_system::respond_to_visibility_information_requests(
 							new_discontinuity.points.first = vertex.pos;
 							new_discontinuity.points.second = ray_callbacks[1].intersection;
 							new_discontinuity.winding = discontinuity::RIGHT;
-							new_discontinuity.edge_index = static_cast<unsigned>(double_rays.size() - 1);
+							new_discontinuity.edge_index = static_cast<int>(double_rays.size() - 1);
 							if (DEBUG_DRAWING.draw_cast_rays) draw_line(ray_callbacks[1].intersection, rgba(255, 0, 255, 255));
 						}
 						/* otherwise the free area is to the left */
@@ -693,7 +694,7 @@ void visibility_system::respond_to_visibility_information_requests(
 							new_discontinuity.points.first = vertex.pos;
 							new_discontinuity.points.second = ray_callbacks[0].intersection;
 							new_discontinuity.winding = discontinuity::LEFT;
-							new_discontinuity.edge_index = static_cast<unsigned>(double_rays.size());
+							new_discontinuity.edge_index = static_cast<int>(double_rays.size());
 							if (DEBUG_DRAWING.draw_cast_rays) draw_line(ray_callbacks[0].intersection, rgba(255, 0, 255, 255));
 						}
 
@@ -734,13 +735,13 @@ void visibility_system::respond_to_visibility_information_requests(
 									/* if the left-handed ray intersected with boundary and thus the right-handed intersected with an obstacle */
 									if (k == 0) {
 										new_discontinuity.winding = discontinuity::LEFT;
-										new_discontinuity.edge_index = static_cast<unsigned>(double_rays.size());
+										new_discontinuity.edge_index = static_cast<int>(double_rays.size());
 										new_double_ray = double_ray(actual_intersection, vertex.pos, false, true);
 									}
 									/* if the right-handed ray intersected with boundary and thus the left-handed intersected with an obstacle */
 									else if (k == 1) {
 										new_discontinuity.winding = discontinuity::RIGHT;
-										new_discontinuity.edge_index = static_cast<unsigned>(double_rays.size()) - 1;
+										new_discontinuity.edge_index = static_cast<int>(double_rays.size()) - 1;
 										new_double_ray = double_ray(vertex.pos, actual_intersection, true, false);
 									}
 
@@ -785,7 +786,7 @@ void visibility_system::respond_to_visibility_information_requests(
 
 			/* wrap the indices, some may be negative */
 			if (disc.edge_index < 0) {
-				disc.edge_index = static_cast<unsigned>(double_rays.size()) - 1;
+				disc.edge_index = static_cast<int>(double_rays.size()) - 1;
 			}
 		}
 

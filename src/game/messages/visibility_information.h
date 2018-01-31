@@ -50,7 +50,7 @@ namespace messages {
 		using triangle = std::array<vec2, 3>;
 
 		struct discontinuity {
-			unsigned edge_index;
+			int edge_index;
 			bool is_boundary;
 			vec2 normal;
 

@@ -710,7 +710,27 @@ endif()
 
 if(UNIX)
 	set(CHOSEN_WARNINGS 
-		"-Wreturn-type -Wswitch -Wswitch-unreachable -Wparentheses -Wsequence-point -Wduplicated-cond -Wtrigraphs -Wmaybe-uninitialized -Wuninitialized -Winit-self"
+"-Wdangling-else \
+-Wbool-operation \
+-Wbool-compare \
+-Wtautological-compare \
+-Wpointer-arith \
+-Wpointer-compare \
+-Wtype-limits \
+-Wlogical-op \
+-Wlogical-not-parentheses \
+-Wdelete-incomplete \
+-Wplacement-new \
+-Wreturn-type \
+-Wswitch \
+-Wswitch-unreachable \
+-Wparentheses \
+-Wsequence-point \
+-Wduplicated-cond \
+-Wtrigraphs \
+-Wmaybe-uninitialized \
+-Wuninitialized \
+-Winit-self"
 	)
 
 	# Latest features of C++17 will be enabled.

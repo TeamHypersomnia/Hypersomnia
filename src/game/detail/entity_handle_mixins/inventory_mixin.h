@@ -176,18 +176,14 @@ bool inventory_mixin<E>::owning_transfer_capability_alive_and_same_as_of(const e
 template <class E>
 typename inventory_mixin<E>::inventory_slot_handle_type inventory_mixin<E>::get_primary_hand() const {
 	const auto& self = *static_cast<const E*>(this);
-	auto& cosmos = self.get_cosmos();
 	ensure(self.template has<components::sentience>());
-
 	return self[slot_function::PRIMARY_HAND];
 }
 
 template <class E>
 typename inventory_mixin<E>::inventory_slot_handle_type inventory_mixin<E>::get_secondary_hand() const {
 	const auto& self = *static_cast<const E*>(this);
-	auto& cosmos = self.get_cosmos();
 	ensure(self.template has<components::sentience>());
-
 	return self[slot_function::SECONDARY_HAND];
 }
 
@@ -380,7 +376,6 @@ augs::constant_size_vector<entity_id, 2> inventory_mixin<E>::get_wielded_items()
 template <class E>
 wielding_result inventory_mixin<E>::swap_wielded_items() const {
 	const auto& self = *static_cast<const E*>(this);
-	auto& cosmos = self.get_cosmos();
 
 	wielding_result result;
 

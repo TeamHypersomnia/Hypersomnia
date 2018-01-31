@@ -77,8 +77,6 @@ namespace augs {
 	) {
 		resize(new_size);
 
-		const int wbytes = new_size.x*channels;
-
 		if (channels == 1) {
 			for (unsigned j = 0; j < new_size.y; ++j) {
 				for (unsigned i = 0; i < new_size.x; ++i) {

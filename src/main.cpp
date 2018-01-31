@@ -348,8 +348,8 @@ int work(const int argc, const char* const * const argv) try {
 				if (nullptr == mapped_or_nullptr(currently_loaded_defs.game_image_loadables, key)) {
 					new_atlas_required = true;
 
-					const auto& new_meta = new_defs.game_image_metas.at(key);
 #if LOADED_CACHES
+					const auto& new_meta = new_defs.game_image_metas.at(key);
 					game_image_caches.emplace(fresh.second, new_meta);
 #endif
 				}
