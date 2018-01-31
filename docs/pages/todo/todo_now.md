@@ -33,6 +33,9 @@ summary: Just a hidden scratchpad.
 		- both mixins and component synchronizers will have to be agnostic about entity handle type
 	- specifying types
 		- tuples/trivially copyable tuples, because they will be easy to introspect and reason about
+		- should components be added automatically?
+			- we might want to arrange some components for better cache coherency
+			- instead, let's just have "assert_component" instead of "implied_component"
 		- proposition: a struct [[type]] and "using variants" "using components" inside
 			- provides a canonical, consistent way to refer to an entity type everywhere
 			- can also easily forward declare such types
@@ -136,3 +139,6 @@ summary: Just a hidden scratchpad.
 	- otherwise make it a super quick cache?
 	- chosen_lengthening_duration_ms should be randomized statelessly with help of guid
 	- store just stepped timestamp of when the trace was fired instead of incrementing the passed time 
+- let meta.lua have convex partitions and let author just define those convex partitions for simplicity
+	- let invariants::polygon have vector to not make things overly complicated
+	- polygon component makes triangulation anyway

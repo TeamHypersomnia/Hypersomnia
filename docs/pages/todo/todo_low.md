@@ -20,3 +20,5 @@ rename world, cosmos to csm
 	- sentience, fixtures, rigid body: exponential divergence
 
 - implement instances of cooldowns for casts statelessly when there is such a need
+
+- introduce cosmos::retick function that can change delta while preserving timings by updating all stepped timestamps according to lifetimes found in other places

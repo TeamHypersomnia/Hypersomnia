@@ -1,10 +1,4 @@
 
-namespace entity_types {
-	using character = augs::trivially_copyable_tuple<
-		invariants::rigid_body,
-		invariants::fixtures
-	>
-}
 
 struct entity_id : public cosmic_object_pool_id<cosmic_entity> {
 	using base = cosmic_object_pool_id<cosmic_entity>;

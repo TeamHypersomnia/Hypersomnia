@@ -41,6 +41,8 @@ void add_shape_invariant_from_renderable(
 	entity_flavour& into,
 	const loaded_game_image_caches& caches
 ) {
+	static_assert(into.has<invariants::shape_polygon>());
+
 	if (const auto sprite = into.find<invariants::sprite>()) {
 		const auto image_size = caches.at(sprite->tex).get_size();
 		vec2 scale = sprite->get_size() / image_size;

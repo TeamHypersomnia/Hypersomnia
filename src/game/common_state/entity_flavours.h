@@ -88,6 +88,11 @@ public:
 	}
 
 	template <class D>
+	constexpr bool has() const {
+		return true; 
+	}
+
+	template <class D>
 	D& get() {
 		return get_impl<D>(*this);
 	}
