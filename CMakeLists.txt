@@ -710,7 +710,6 @@ endif()
 if(UNIX)
 	set(CHOSEN_WARNINGS 
 "-Wdangling-else \
--Wunused-variable \
 -Wbool-operation \
 -Wbool-compare \
 -Wtautological-compare \
@@ -728,10 +727,16 @@ if(UNIX)
 -Wsequence-point \
 -Wduplicated-cond \
 -Wtrigraphs \
--Wmaybe-uninitialized \
--Wuninitialized \
 -Winit-self"
 	)
+
+	set(WARNINGS_FOR_OUR_CODE_ONLY 
+"-Wunused-variable \
+-Wuninitialized \
+-Wmaybe-uninitialized"
+	)
+
+	set_source_files_properties(${HYPERSOMNIA_CODEBASE_CPPS} PROPERTIES COMPILE_FLAGS ${WARNINGS_FOR_OUR_CODE_ONLY})
 
 # TODO: -Wunused-value fails with SFINAE
 	# We could use for example (void)T::value
