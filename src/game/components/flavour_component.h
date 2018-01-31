@@ -42,5 +42,3 @@ public:
 		return get_raw_component().flavour_id;
 	}
 };
-
-entity_id get_first_named_ancestor(const const_entity_handle);

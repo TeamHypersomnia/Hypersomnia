@@ -7,57 +7,6 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order:  
 
-
-- Chosen approach for cloning and child entities:
-	- Let us use the storing of child_entity_ids approach.
-		- This lets us conveniently setup the clones of entities even with children entities.
-		- Existential child becomes redundant, 
-	- Let child_entity_ids be either hidden from the author (by constexpr) or just plain immutable.
-		- can't have consts in components, though.
-		- they will never change either way, but it's good to be sure.
-	- Let there never be a need from a child to access the parent.
-		- E.g. instead of crosshair having an entity_id to its parent, let's handle the motions while knowing about sentience itself, without needlessly contextualizing.
-		- And if there is, let's have a cache.
-	- In any case, whether we need the cache or we only assume that entities marked via child_entity_ids will be deleted, 
-	it would be good and safe to have a synchronizer. But we don't have time to play it safe.
-
-- Cloning entities
-	- Depending on this, we might choose one or the other design for children
-	- We no longer need cloning for charged items because it is highly unlikely they would have a child entity 
-	- An author might want to copy/duplicate something on their screen
-		- Even character would need their crosshair child
-	- The problem is, reassigning ids properly is non trivial if we don't set them as child_entity_id	
-
-- Solutions for "children entities": entities that are cloned with some other entity and deleted with it
-	- **Chosen solution:** delete_with component that is a synchronized component
-		- Most flexibility and separation of concerns; childhood is not really something that will change rapidly, as opposed to damping or density
-		- Groups could then easily specify initial values for entities in the group
-			- will just be a common practice to set the delete_with to the root member of the group
-				- Currently would anyway be only used for crosshair
-		- Concern: fast bi-directional access to:
-			- parent having just child, 
-				- easy: access delete_with component
-			- or to child having just parent
-				- has to access the children vector cache
-				- but what if it has more children with varying functionality?
-					- then we can add an enum to the child
-				- do we say, we always treat the first child as e.g. a crosshair?
-					- NO! We can simply associate a character with any entity as its crosshair!
-					- The existential_child itself will only be used for deletion.
-					- It may coincidentally point at its parent.
-			- The difference is like this:
-				- The parent can have many children, thus it makes no sense to make assumptions about order of children in the cache or some enums.
-				- We'll just have entity_id's scattered through relevant domains that imply some acting upon the other entity or reading therefrom. 
-				- If we have a delete_with component, we may assume some other role of its parent. 
-					- **We should actually just make the child be associated coincidentally with just some entity_id**.
-		- Concern: childhood type? 
-			- Assumption: a child can only have one delete_with parent
-				- But it may have more logical parents, e.g. it can be attached to some body as an item?
-			- Do we want to assume that, if a child has delete_with set, that the associated parent fulfills some other role as well?
-				- Concerns would mix, but that would imply less data which is fine
-					- And that lets the rest of data stay raw and not synchronized
-				- Rename to "logical_parent"?
-
 - Constructing entities
 	- Solver might want to set some initial component values before inference occurs
 		- Should be done in a lambda where a typed entity handle is given 
@@ -174,8 +123,6 @@ summary: Just a hidden scratchpad.
 	- or it can be part of inferred state which will complicate things a little
 
 ## Later
-- replace child_entity_id with entity_id and let child component be synchronized
-- child component should be always_present + synchronized
 - strip children vector tracker of children caches as we'll take that data from signi
 	- was anyway used only for ensuring
 - Groups can be defined separately from flavours, e.g. many groups can share the same flavours.

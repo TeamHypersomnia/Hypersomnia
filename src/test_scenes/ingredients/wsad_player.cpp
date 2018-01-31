@@ -166,7 +166,6 @@ namespace ingredients {
 		//force_joint.power_of_force_easing_multiplier = 2.f;
 
 		e.map_child_entity(child_entity_name::CHARACTER_CROSSHAIR, crosshair_entity);
-		crosshair_entity.make_as_child_of(e);
 	}
 }
 
@@ -223,7 +222,6 @@ namespace prefabs {
 
 		root.map_child_entity(child_entity_name::CROSSHAIR_RECOIL_BODY, recoil);
 		
-		root.add_standard_components(step);
 		recoil.add_standard_components(step);
 		zero_target.add_standard_components(step);
 

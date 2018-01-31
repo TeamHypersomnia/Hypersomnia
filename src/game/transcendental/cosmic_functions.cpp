@@ -120,11 +120,6 @@ entity_handle cosmic::clone_entity(const entity_handle source_entity) {
 		return cosmos[entity_id()];
 	}
 
-	ensure(
-		!source_entity.get<components::existential_child>().parent.is_set() 
-		&& "Cloning of entities that are children is not yet supported"
-	);
-
 	const auto new_entity = create_entity(cosmos, source_entity.get_flavour_id());
 	auto& solvable = cosmos.get_solvable({});
 
@@ -134,7 +129,6 @@ entity_handle cosmic::clone_entity(const entity_handle source_entity) {
 			with due care to each of them.
 		*/
 		components::guid,
-		components::existential_child,
 		components::item
 	>(solvable.get_aggregate(source_entity), solvable);
 

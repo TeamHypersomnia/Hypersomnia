@@ -90,7 +90,6 @@ namespace prefabs {
 		auto front = create_test_scene_entity(world, test_scene_flavour::TRUCK_FRONT);
 		auto interior = create_test_scene_entity(world, test_scene_flavour::TRUCK_INTERIOR);
 		auto left_wheel = create_test_scene_entity(world, test_scene_flavour::TRUCK_LEFT_WHEEL);
-		left_wheel.make_as_child_of(front);
 
 		const auto si = world.get_si();
 
@@ -140,7 +139,6 @@ namespace prefabs {
 			interior  += fixtures_invariant;
 
 			interior.get<components::fixtures>().set_owner_body(front);
-			interior.make_as_child_of(front);
 		}
 
 		{
@@ -164,7 +162,6 @@ namespace prefabs {
 			for (int i = 0; i < 4; ++i) {
 				components::transform this_engine_transform;
 				const auto engine_physical = create_test_scene_entity(world, test_scene_flavour::TRUCK_ENGINE_BODY);
-				engine_physical.make_as_child_of(front);
 
 				{
 

@@ -83,3 +83,20 @@ we consider whole type overrides too complex architeciturally:
 		- That will be only possible once we invariantize practically everything in the test scenes.
 		- We'll thus need to make sender and others "always present".
 - Current slot should stay in the item component as other fields of item will anyway be a private
+
+- **Chosen approach for cloning and child entities**:
+	- **Let there never be a need from a child to access the parent**.
+		- Thus letting us eradicate the existential_child component.
+		- E.g. instead of crosshair having an entity_id to its parent, let's handle the motions while knowing about sentience itself, without needlessly contextualizing.
+		- E.g. for aabb highlighter, we can always just query the whole body if the entity is fixtural.
+			- there would anyway be no point in otherwise expanding the aabb.
+		- And if there is, let's have a cache.
+	- Let us use the storing of child_entity_ids approach.
+		- Pro: Cache-less calculation of children.
+		- This lets us conveniently setup the clones of entities even with children entities.
+		- Existential child becomes redundant. 
+	- Let child_entity_ids be either hidden from the author (by constexpr) or just plain immutable.
+		- can't have consts in components, though.
+		- they will never change either way, but it's good to be sure.
+	- In any case, whether we need the cache or we only assume that entities marked via child_entity_ids will be deleted, 
+	it would be good and safe to have a synchronizer for each case where we specify an existential child. But we don't have time to play it safe.

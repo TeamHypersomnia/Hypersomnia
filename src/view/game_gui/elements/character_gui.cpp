@@ -587,9 +587,7 @@ entity_id character_gui::get_hovered_world_entity(const cosmos& cosm, const vec2
 			const auto handle = cosm[id];
 
 			if (aabb_highlighter::is_hoverable(handle)) {
-				if (cosm[get_first_named_ancestor(handle)].alive()) {
-					return true;
-				}
+				return true;
 			}
 
 			return false;
