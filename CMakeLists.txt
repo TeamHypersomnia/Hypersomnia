@@ -709,8 +709,12 @@ endif()
 # We configure additional flags for the compiler.
 
 if(UNIX)
+	set(CHOSEN_WARNINGS 
+		"-Wreturn-type -Wswitch -Wswitch-unreachable -Wparentheses -Wsequence-point -Wduplicated-cond"
+	)
+
 	# Latest features of C++17 will be enabled.
-	set(HYPERSOMNIA_CXX_FLAGS "-std=gnu++1z")
+	set(HYPERSOMNIA_CXX_FLAGS "-std=gnu++1z -Werror ${CHOSEN_WARNINGS}")
 
 	if(${ARCHITECTURE} STREQUAL "x64")
 		set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -m64")

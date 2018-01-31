@@ -1132,6 +1132,7 @@ bool editor_setup::handle_input_before_imgui(
 			if (has_shift) {
 				switch (k) {
 					case key::F5: fill_with_test_scene(lua); return true;
+					default: break;
 				}
 			}
 

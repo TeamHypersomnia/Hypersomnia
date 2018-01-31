@@ -6,10 +6,10 @@ namespace augs {
 		template <class T>
 		bool sequence_more_recent(T s1, T s2) {
 			return
-				(s1 > s2) &&
-				(s1 - s2 <= std::numeric_limits<T>::max() / 2)
-			||	(s2 > s1) &&
-				(s2 - s1  > std::numeric_limits<T>::max() / 2)
+				((s1 > s2) &&
+				(s1 - s2 <= std::numeric_limits<T>::max() / 2))
+			||	((s2 > s1) &&
+				(s2 - s1  > std::numeric_limits<T>::max() / 2))
 			;
 		}
 		

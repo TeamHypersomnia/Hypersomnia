@@ -240,6 +240,7 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 		break;
 
 	case messages::health_event::target_type::AIM:
+	{
 		const auto punched = subject;
 
 		if (const auto owning_crosshair_recoil = punched[child_entity_name::CHARACTER_CROSSHAIR][child_entity_name::CROSSHAIR_RECOIL_BODY]) {
@@ -248,6 +249,10 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 			recoil_physics.apply_angular_impulse((h.point_of_impact - punched.get_logic_transform().pos).cross(h.impact_velocity) / 10000000.f * 3.f / 25.f);
 		}
 
+		break;
+	}
+
+	case messages::health_event::target_type::INVALID:
 		break;
 	}
 

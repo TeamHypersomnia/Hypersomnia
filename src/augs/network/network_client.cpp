@@ -201,6 +201,8 @@ namespace augs {
 				case ENET_EVENT_TYPE_DISCONNECT:
 					new_event.message_type = message::type::DISCONNECT;
 					new_event.address = event.peer->address;
+					break;
+					default: break;
 				}
 
 				if(add_event)

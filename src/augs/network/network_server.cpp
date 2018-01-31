@@ -129,6 +129,8 @@ namespace augs {
 					new_event.address = event.peer->address;
 
 					forceful_disconnect(new_event.address);
+					break;
+					default: break;
 				}
 				
 				if(add_event)

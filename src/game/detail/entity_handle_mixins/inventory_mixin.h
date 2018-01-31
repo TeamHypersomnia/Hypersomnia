@@ -430,7 +430,7 @@ wielding_result inventory_mixin<E>::make_wielding_transfers_for(const hand_selec
 		const auto item_in_hand = hand.get_item_if_any();
 
 		const bool identical_outcome =
-			item_in_hand.dead() && item_for_hand.dead()
+			(item_in_hand.dead() && item_for_hand.dead())
 			|| item_in_hand == item_for_hand
 		;
 
