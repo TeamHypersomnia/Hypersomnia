@@ -44,12 +44,9 @@ identified_danger assess_danger(
 	const const_entity_handle danger
 ) {
 	identified_danger result;
-	const auto& cosmos = victim.get_cosmos();
 
 	const auto* const sentience = victim.find<components::sentience>();
 	if (!sentience) return result;
-
-	const auto& s = *sentience;
 
 	result.danger = danger;
 
@@ -239,8 +236,6 @@ std::vector<entity_id> get_closest_hostiles(
 	};
 
 	std::vector<hostile_entry> hostiles;
-
-	float min_distance = std::numeric_limits<float>::max();
 
 	if (subject_attitude.alive()) {
 		const auto subject_attitude_transform = subject_attitude.get_logic_transform();

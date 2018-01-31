@@ -103,7 +103,6 @@ public:
 			return;
 		}
 
-		const auto& rect_world = context.get_rect_world();
 		const auto& this_tree_entry = context.get_tree_entry(this_id);
 		const auto& necessarys = context.get_necessary_images();
 		const auto& gui_font = context.get_gui_font();

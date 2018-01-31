@@ -82,7 +82,7 @@ std::wstring value_bar::get_description_for_hover(
 	const auto& sentience = context.get_subject_entity().get<components::sentience>();
 
 	return visit_by_vertical_index(
-		context.get_subject_entity().get<components::sentience>(),
+		sentience,
 		cosmos,
 		self.get_location().vertical_index,
 		
@@ -182,7 +182,7 @@ void value_bar::draw(
 			[](auto...) { return; }
 		);
 
-		if (const bool should_draw_particles = bar_width >= 1) {
+		if (/* should_draw_particles */ bar_width >= 1) {
 			for (const auto& p : this_id->particles) {
 				const auto particle_col = bar_col + rgba(30, 30, 30, 0);
 			
@@ -195,7 +195,7 @@ void value_bar::draw(
 			}
 		}
 
-		if (const bool should_draw_one_tenth_mark = meter_id(vertical_index).is<consciousness_meter_instance>()) {
+		if (/* should_draw_one_tenth_mark */ meter_id(vertical_index).is<consciousness_meter_instance>()) {
 			auto r = ltrb();
 
 			r.l = value_bar_rect.l + value_bar_rect.w() / 10;

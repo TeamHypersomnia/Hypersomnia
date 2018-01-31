@@ -151,7 +151,7 @@ void missile_system::detonate_expired_missiles(const logic_step step) {
 					const auto fuse_delay_steps = static_cast<unsigned>(missile_def.max_lifetime_ms / delta.in_milliseconds());
 					const auto when_detonates = missile.when_fired.step + fuse_delay_steps;
 
-					if (const bool should_already_detonate = now.step >= when_detonates) {
+					if (/* should_already_detonate */ now.step >= when_detonates) {
 						const auto current_pos = it.get_logic_transform().pos;
 
 						missile.saved_point_of_impact_before_death = current_pos;

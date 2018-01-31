@@ -23,7 +23,6 @@ void ultimate_wrath_of_the_aeons_instance::perform_logic(const spell_logic_input
 
 	auto& sentience = in.sentience;
 
-	const auto seconds_passed = (now - when_casted).in_seconds(dt);
 	const auto first_at = augs::stepped_timestamp{ when_casted.step + static_cast<unsigned>(1.3f / dt.in_seconds()) };
 	const auto second_at = augs::stepped_timestamp{ when_casted.step + static_cast<unsigned>(1.8f / dt.in_seconds()) };
 	const auto third_at = augs::stepped_timestamp{ when_casted.step + static_cast<unsigned>(2.3f / dt.in_seconds()) };

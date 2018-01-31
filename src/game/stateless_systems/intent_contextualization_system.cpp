@@ -55,7 +55,6 @@ void intent_contextualization_system::contextualize_use_button_intents(const log
 
 void intent_contextualization_system::contextualize_crosshair_action_intents(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
-	const auto& delta = step.get_delta();
 
 	{
 		auto& events = step.get_queue<messages::motion_message>();
@@ -130,7 +129,6 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(con
 
 void intent_contextualization_system::contextualize_movement_intents(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
-	const auto& delta = step.get_delta();
 	auto& intents = step.get_queue<messages::intent_message>();
 
 	for (auto& e : intents) {

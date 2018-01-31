@@ -1,3 +1,8 @@
+#if PLATFORM_UNIX
+/* Necessary for some stuff in ogg library */
+#pragma GCC diagnostic ignored "-Wunused-variable"
+#endif
+
 #include <cstring>
 
 #if BUILD_SOUND_FORMAT_DECODERS

@@ -513,8 +513,6 @@ namespace prefabs {
 		auto weapon = create_test_scene_entity(cosmos, test_scene_flavour::SAMPLE_RIFLE);
 
 		auto& gun = weapon.get<components::gun>();
-		auto& gun_def = weapon.get<invariants::gun>();
-
 
 		// add_muzzle_particles(weapon, gun, step);
 
@@ -541,7 +539,6 @@ namespace prefabs {
 		auto weapon = create_test_scene_entity(cosmos, test_scene_flavour::KEK9);
 
 		auto& gun = weapon.get<components::gun>();
-		auto& gun_def = weapon.get<invariants::gun>();
 
 		// add_muzzle_particles(weapon, gun, step);
 

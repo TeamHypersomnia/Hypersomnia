@@ -24,7 +24,6 @@
 
 void driver_system::assign_drivers_who_touch_wheels(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
-	const auto& delta = step.get_delta();
 	const auto& contacts = step.get_queue<messages::collision_message>();
 
 	for (const auto& e : contacts) {
@@ -55,9 +54,7 @@ void driver_system::assign_drivers_who_touch_wheels(const logic_step step) {
 
 void driver_system::release_drivers_due_to_ending_contact_with_wheel(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
-	const auto& delta = step.get_delta();
 	const auto& contacts = step.get_queue<messages::collision_message>();
-	const auto& physics = cosmos.get_solvable_inferred().physics;
 
 	for (const auto& c : contacts) {
 		if (c.type == messages::collision_message::event_type::END_CONTACT) {
@@ -77,7 +74,6 @@ void driver_system::release_drivers_due_to_ending_contact_with_wheel(const logic
 }
 void driver_system::release_drivers_due_to_requests(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
-	const auto& delta = step.get_delta();
 	const auto& intents = step.get_queue<messages::intent_message>();
 
 	for (const auto& e : intents) {
@@ -114,13 +110,12 @@ bool driver_system::change_car_ownership(
 ) {
 	auto& driver = driver_entity.get<components::driver>();
 	auto& cosmos = driver_entity.get_cosmos();
-	const auto& physics = cosmos.get_solvable_inferred().physics;
 
 	const auto maybe_rigid_body = driver_entity.find<components::rigid_body>();
 	const bool has_physics = maybe_rigid_body != nullptr;
 	auto* const movement = driver_entity.find<components::movement>();
 
-	if (const bool new_ownership = car_entity.alive()) {
+	if (/* new_ownership */ car_entity.alive()) {
 		auto& car = car_entity.get<components::car>();
 
 		if (cosmos[car.current_driver].alive()) {

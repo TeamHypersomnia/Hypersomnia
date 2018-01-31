@@ -11,7 +11,8 @@
 
 using namespace augs;
 
-void behaviour_tree_system::evaluate_trees(const logic_step step) {
+void behaviour_tree_system::evaluate_trees(const logic_step) {
+#if TODO
 	auto& cosmos = step.get_cosmos();
 
 	cosmos.for_each(
@@ -21,11 +22,10 @@ void behaviour_tree_system::evaluate_trees(const logic_step step) {
 			
 			for (auto& concurrent_tree : behaviour_tree.concurrent_trees) {
 				// TODO: fix behaviour tree storage
-#if TODO
 				auto& tree = cosmos[concurrent_tree.tree_id];
 				tree.evaluate_instance_of_tree(step, it, concurrent_tree.state);
-#endif
 			}
 		}
 	);
+#endif
 }

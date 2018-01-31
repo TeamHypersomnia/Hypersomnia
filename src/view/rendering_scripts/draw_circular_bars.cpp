@@ -37,7 +37,6 @@ augs::vertex_triangle_buffer draw_circular_bars_and_get_textual_info(const draw_
 		) {
 			const auto& health = sentience->get<health_meter_instance>();
 			const auto hr = health.get_ratio();
-			const auto one_less_hr = 1 - hr;
 
 			const auto pulse_duration = static_cast<int>(1250 - 1000 * (1 - hr));
 			const float time_pulse_ratio = (timestamp_ms % pulse_duration) / float(pulse_duration);

@@ -148,7 +148,7 @@ namespace augs {
 
 			const auto removed_at_index = indirector.real_index;
 
-			if (const bool need_to_move_last = removed_at_index != size() - 1) {
+			if (/* need_to_move_last */ removed_at_index != size() - 1) {
 				const auto indirector_of_last_element = slots.back().pointing_indirector;
 
 				// change last element's indirector - set it to the removed element's index

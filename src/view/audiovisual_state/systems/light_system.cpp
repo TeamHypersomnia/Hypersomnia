@@ -93,7 +93,6 @@ void light_system::render_all_lights(const light_system_input in) const {
 	const auto light_distance_mult_uniform = light_shader.get_uniform_location("distance_mult");
 	const auto light_attenuation_uniform = light_shader.get_uniform_location("light_attenuation");
 	const auto light_multiply_color_uniform = light_shader.get_uniform_location("multiply_color");
-	const auto projection_matrix_uniform = light_shader.get_uniform_location("projection_matrix");
 	const auto& interp = in.interpolation;
 	const auto& particles = in.particles;
 	

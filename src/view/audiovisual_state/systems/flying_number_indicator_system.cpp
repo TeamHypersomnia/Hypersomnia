@@ -38,7 +38,6 @@ void flying_number_indicator_system::draw_numbers(
 ) const {
 	for (const auto& r : numbers) {
 		const auto passed = global_time_seconds - r.time_of_occurence_seconds;
-		const auto ratio = passed / r.in.maximum_duration_seconds;
 
 		if (!r.first_camera_space_pos.has_value()) {
 			r.first_camera_space_pos = camera.to_screen_space(screen_size, r.in.pos);

@@ -49,7 +49,7 @@ namespace test_scenes {
 		load_test_scene_sentience_properties(common);
 
 		auto& spells = common.spells;
-		std::get<electric_triad>(common.spells).missile_flavour = to_entity_flavour_id(test_scene_flavour::ELECTRIC_MISSILE);
+		std::get<electric_triad>(spells).missile_flavour = to_entity_flavour_id(test_scene_flavour::ELECTRIC_MISSILE);
 		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
 	}
 

@@ -89,7 +89,9 @@ void car_system::apply_movement_forces(const logic_step step) {
 			}
 
 			const vec2 vel = rigid_body.get_velocity();
+#if TODO
 			const auto speed = vel.length();
+#endif
 
 			vec2 lateral = right_normal * right_normal.dot(vel);
 			vec2 forwardal = forward_dir * forward_dir.dot(vel);

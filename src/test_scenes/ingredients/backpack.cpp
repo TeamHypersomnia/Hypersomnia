@@ -48,7 +48,6 @@ namespace prefabs {
 	entity_handle create_sample_backpack(const logic_step step, vec2 pos) {
 		auto& world = step.get_cosmos();
 		const auto backpack = create_test_scene_entity(world, test_scene_flavour::SAMPLE_BACKPACK);
-		const auto& metas = step.get_logical_assets();
 		
 		backpack.set_logic_transform(pos);
 		backpack.add_standard_components(step);

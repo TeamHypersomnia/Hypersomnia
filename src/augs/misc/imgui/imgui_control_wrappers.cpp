@@ -42,7 +42,7 @@ namespace ImGui {
 		static ImVec2 draggingtabSize(0, 0);
 		static ImVec2 draggingTabOffset(0, 0);
 
-		const bool isMMBreleased = ImGui::IsMouseReleased(2);
+		//const bool isMMBreleased = ImGui::IsMouseReleased(2);
 		const bool isMouseDragging = ImGui::IsMouseDragging(0, 2.f);
 		int justClosedTabIndex = -1, newtabIndex = tabIndex;
 

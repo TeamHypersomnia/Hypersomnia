@@ -118,7 +118,6 @@ namespace augs {
 			unsigned short received_sequence = 0u;
 
 			bool has_reliable = false;
-			bool request_ack_for_unreliable = false;
 
 			result_data res;
 

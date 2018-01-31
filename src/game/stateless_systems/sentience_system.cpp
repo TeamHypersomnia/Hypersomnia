@@ -111,7 +111,6 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 	const auto regeneration_frequency_in_steps = static_cast<unsigned>(1 / delta.in_seconds() * 3);
 	const auto consciousness_regeneration_frequency_in_steps = static_cast<unsigned>(1 / delta.in_seconds() * 2);
 	const auto pe_regeneration_frequency_in_steps = static_cast<unsigned>(1 / delta.in_seconds() * 3);
-	const auto& metas = step.get_logical_assets();
 
 	cosmos.for_each(
 		processing_subjects::WITH_SENTIENCE,
@@ -501,7 +500,7 @@ void sentience_system::rotate_towards_crosshairs_and_driven_vehicles(const logic
 
 						auto crosshair_vector = target_transform.pos - mc;
 
-						if (const bool centers_apart = !mc.compare_abs(barrel_center)) {
+						if (/* centers_apart */ !mc.compare_abs(barrel_center)) {
 							requested_angle = colinearize_AB_with_C(mc, barrel_center, muzzle, target_transform.pos, debug_line_drawer);
 						}
 					}
@@ -514,7 +513,7 @@ void sentience_system::rotate_towards_crosshairs_and_driven_vehicles(const logic
 						throwable_transform.pos.rotate(-subject_transform.rotation, mc);
 						throwable_target_vector.rotate(-subject_transform.rotation, mc);
 
-						if (const auto centers_apart = !mc.compare_abs(throwable_transform.pos)) {
+						if (/* centers_apart */ !mc.compare_abs(throwable_transform.pos)) {
 							requested_angle = colinearize_AB_with_C(mc, throwable_transform.pos, throwable_target_vector, target_transform.pos, debug_line_drawer);
 						}
 					}

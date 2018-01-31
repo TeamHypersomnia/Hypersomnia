@@ -88,7 +88,6 @@ void crosshair_system::generate_crosshair_intents(const logic_step step) {
 
 void crosshair_system::apply_crosshair_intents_to_base_offsets(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
-	const auto& delta = step.get_delta();
 	const auto& events = step.get_queue<messages::crosshair_motion_message>();
 
 	for (const auto& it : events) {
@@ -98,7 +97,6 @@ void crosshair_system::apply_crosshair_intents_to_base_offsets(const logic_step 
 
 void crosshair_system::apply_base_offsets_to_crosshair_transforms(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
-	const auto& delta = step.get_delta();
 	
 	cosmos.for_each(
 		processing_subjects::WITH_CROSSHAIR,

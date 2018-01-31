@@ -17,14 +17,10 @@ using namespace augs;
 
 using namespace messages;
 
-void animation_system::game_responses_to_animation_messages(const logic_step step) {
-	auto& cosmos = step.get_cosmos();
-	const auto& delta = step.get_delta();
-}
+void animation_system::game_responses_to_animation_messages(const logic_step step) {}
 
 void animation_system::handle_animation_messages(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
-	const auto& delta = step.get_delta();
 	const auto& events = step.get_queue<animation_message>();
 
 	for (auto it : events) {

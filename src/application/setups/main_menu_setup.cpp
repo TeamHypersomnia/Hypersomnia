@@ -119,8 +119,6 @@ main_menu_setup::main_menu_setup(
 		LOG("Failed to load %x:\n%x\nMenu will apply no patch to config.", menu_config_patch_path, err.what());
 	}
 
-	float gain_fade_multiplier = 0.f;
-
 	if (augs::file_exists(settings.menu_theme_path)) {
 		menu_theme_source.bind_buffer(menu_theme);
 		menu_theme_source.set_direct_channels(true);

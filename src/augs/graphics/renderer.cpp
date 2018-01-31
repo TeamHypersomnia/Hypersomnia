@@ -254,7 +254,7 @@ namespace augs {
 
 		if (draw_data != nullptr) {
 			ImGuiIO& io = ImGui::GetIO();
-			const int fb_width = static_cast<int>(io.DisplaySize.x * io.DisplayFramebufferScale.x);
+			// const int fb_width = static_cast<int>(io.DisplaySize.x * io.DisplayFramebufferScale.x);
 			const int fb_height = static_cast<int>(io.DisplaySize.y * io.DisplayFramebufferScale.y);
 
 			GL_CHECK(glEnable(GL_SCISSOR_TEST));

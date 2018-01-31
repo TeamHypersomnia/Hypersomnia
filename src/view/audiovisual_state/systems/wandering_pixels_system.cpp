@@ -54,14 +54,14 @@ void wandering_pixels_system::advance_for(
 	const auto& wandering = it.get<components::wandering_pixels>();
 	const auto& wandering_def = it.get<invariants::wandering_pixels>();
 
-	if (const bool refresh_cache = 
+	if (/* refresh_cache */ 
 		cache.recorded_component.particles_count != wandering.particles_count
 	) {
 		cache.particles.resize(wandering.particles_count);
 		cache.recorded_component.particles_count = wandering.particles_count;
 	}
 
-	if (const bool refresh_cache = 
+	if (/* refresh_cache */ 
 		!(cache.recorded_component.reach == wandering.reach)
 	) {
 		cache.rng = { cosmos.get_rng_seed_for(it) };

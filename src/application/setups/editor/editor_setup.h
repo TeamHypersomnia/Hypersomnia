@@ -106,7 +106,7 @@ class editor_setup : private current_tab_access_cache<editor_setup> {
 		works.emplace(works.begin() + new_index, std::make_unique<intercosm>());
 		base::refresh();
 
-		if (const bool successfully_opened = new_intercosm_provider(tabs[new_index], *works[new_index])) {
+		if (/* successfully_opened */ new_intercosm_provider(tabs[new_index], *works[new_index])) {
 			set_current_tab(new_index);
 			return true;
 		}

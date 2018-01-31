@@ -271,9 +271,6 @@ void settings_gui_state::perform(
 				
 				ImGui::Separator();
 
-				ImGuiStyle& style = config.gui_style;
-				const ImGuiStyle& last_saved_style = last_saved_config.gui_style;
-
 				// TODO: debug behaviour of this
 				ImGui::ShowStyleEditor(&config.gui_style);
 

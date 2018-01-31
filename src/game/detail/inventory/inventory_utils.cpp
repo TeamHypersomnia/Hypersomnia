@@ -33,7 +33,7 @@ capability_comparison match_transfer_capabilities(
 	const auto item_owning_capability = transferred_item.get_owning_transfer_capability();
 	const auto target_slot_owning_capability = target_slot_container.get_owning_transfer_capability();
 
-	if (const bool both_dead = target_slot_owning_capability.dead() && item_owning_capability.dead()) {
+	if (/* both_dead */ target_slot_owning_capability.dead() && item_owning_capability.dead()) {
 		if (target_slot_container) {
 			return { capability_relation::PICKUP, dead_entity };
 		}
@@ -41,7 +41,7 @@ capability_comparison match_transfer_capabilities(
 		return { capability_relation::DROP, dead_entity };
 	}
 
-	if (const bool both_alive = item_owning_capability && target_slot_owning_capability) {
+	if (/* both_alive */ item_owning_capability && target_slot_owning_capability) {
 		if (item_owning_capability == target_slot_owning_capability) {
 			return { capability_relation::THE_SAME, item_owning_capability };
 		}
@@ -293,16 +293,15 @@ std::wstring format_space_units(const unsigned u) {
 	return to_wstring(u / double(SPACE_ATOMS_PER_UNIT), 2);
 }
 
-unsigned calculate_space_occupied_with_children(const const_entity_handle item) {
-	auto space_occupied = *item.get_space_occupied();
-	const auto& cosm = item.get_cosmos();
+unsigned calculate_space_occupied_with_children(const const_entity_handle item_entity) {
+	auto space_occupied = *item_entity.get_space_occupied();
 
-	if (item.find<invariants::container>()) {
-		ensure(item.get<components::item>().get_charges() == 1);
+	if (auto* const container = item_entity.find<invariants::container>()) {
+		ensure(item_entity.get<components::item>().get_charges() == 1);
 
-		for (const auto& slot : item.get<invariants::container>().slots) {
-			for (const auto entity_in_slot : get_items_inside(item, slot.first)) {
-				space_occupied += calculate_space_occupied_with_children(item.get_cosmos()[entity_in_slot]);
+		for (const auto& slot : container->slots) {
+			for (const auto entity_in_slot : get_items_inside(item_entity, slot.first)) {
+				space_occupied += calculate_space_occupied_with_children(item_entity.get_cosmos()[entity_in_slot]);
 			}
 		}
 	}

@@ -202,10 +202,6 @@ namespace augs {
 						return;
 					}
 
-					unsigned select_left = 0;
-					unsigned select_right = 0;
-					unsigned caret_line = 0;
-
 					/* for every visible line */
 					for (unsigned l = visible.first; l <= static_cast<unsigned>(visible.second); ++l) {
 						/* for every character in line */

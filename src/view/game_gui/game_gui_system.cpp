@@ -192,14 +192,13 @@ void game_gui_system::control_hotbar_and_action_button(
 		return;
 	}
 
-	if (const bool not_applicable = 
+	if (/* not_applicable */ 
 		!gui_entity.has<components::item_slot_transfers>()
 		|| !gui_entity.has<components::sentience>()
 	) {
 		return;
 	}
 
-	const auto& cosmos = gui_entity.get_cosmos();
 	auto& gui = get_character_gui(gui_entity);
 
 	{
@@ -331,7 +330,6 @@ void game_gui_system::rebuild_layouts(
 	const game_gui_context context
 ) {
 	const auto root_entity = context.get_subject_entity();
-	const auto& cosmos = root_entity.get_cosmos();
 	const auto& necessarys = context.get_necessary_images();
 	const auto& game_image_defs = context.get_game_image_metas();
 	auto& element = context.get_character_gui();

@@ -44,8 +44,8 @@ namespace prefabs {
 	entity_handle create_cyan_urban_machete(const logic_step step, vec2 pos) {
 		const auto machete = create_test_scene_entity(step.get_cosmos(), test_scene_flavour::URBAN_CYAN_MACHETE);
 
-		auto& melee = machete += components::melee();
-		auto& sender = machete += components::sender();
+		machete += components::melee();
+		machete += components::sender();
 
 		machete.set_logic_transform(pos);
 		machete.add_standard_components(step);

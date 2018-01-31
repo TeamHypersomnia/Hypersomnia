@@ -112,11 +112,12 @@ namespace augs {
 						}
 
 						const auto lower_case_digit = std::towlower(digit);
-						if(digit < L'a' || digit > L'f') {
+
+						if(lower_case_digit < L'a' || lower_case_digit > L'f') {
 							return std::make_tuple(0, first);
 						}
 
-						result_channel += rgba_channel(10 + (digit - L'a'));
+						result_channel += rgba_channel(10 + (lower_case_digit - L'a'));
 					}
 
 					return std::make_tuple(result_channel, current_token);

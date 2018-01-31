@@ -24,7 +24,7 @@ void necessary_fbos::apply(
 	const vec2i screen_size,
 	const game_drawing_settings settings
 ) {
-	if (const bool just_minimized = screen_size.is_zero()) {
+	if (/* just_minimized */ screen_size.is_zero()) {
 		return;
 	}
 
@@ -260,7 +260,7 @@ necessary_image_loadables_map::necessary_image_loadables_map(
 			}
 		}
 
-		if (const bool nothing_loaded = definition_template.source_image_path.empty()) {
+		if (/* nothing_loaded */ definition_template.source_image_path.empty()) {
 			throw necessary_resource_loading_error(
 				"Failed to load necessary image: %x.\n%x",
 				stem,

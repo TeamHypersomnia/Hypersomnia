@@ -388,7 +388,7 @@ int work(const int argc, const char* const * const argv) try {
 				const auto key = old.first;
 
 				if (const auto found = mapped_or_nullptr(new_defs.sounds, key)) {
-					if (const bool reload = !equal(*found, old.second)) {
+					if (/* reload */ !equal(*found, old.second)) {
 						/* Changed, reload */
 					}
 				}
@@ -1072,7 +1072,6 @@ int work(const int argc, const char* const * const argv) try {
 			/* MSVC ICE workaround */
 
 			const auto& _config = config;
-			auto& _window = window;
 
 			const auto viewing_config = visit_current_setup([&_config](auto& setup) {
 				auto config_copy = _config;
@@ -1427,7 +1426,7 @@ int work(const int argc, const char* const * const argv) try {
 			except for usage of graphical resources and profilers.
 		*/
 
-		if (const bool minimized = screen_size.is_zero()) {
+		if (/* minimized */ screen_size.is_zero()) {
 			continue;
 		}
 
@@ -1494,7 +1493,7 @@ int work(const int argc, const char* const * const argv) try {
 
 		renderer.clear_current_fbo();
 
-		if (const bool has_something_to_view = viewed_character.alive()) {
+		if (/* has_something_to_view */ viewed_character.alive()) {
 			/* #1 */
 			illuminated_rendering(
 				{
@@ -1635,8 +1634,7 @@ int work(const int argc, const char* const * const argv) try {
 					get_drawer().cursor(necessary_atlas_entries, augs::imgui::get_cursor<assets::necessary_image_id>(), cursor_drawing_pos, white);
 				}
 			}
-			else if (
-				const bool we_drew_some_menu =
+			else if (/* we_drew_some_menu */
 				menu_chosen_cursor != assets::necessary_image_id::INVALID
 			) {
 				if (should_draw_our_cursor) {

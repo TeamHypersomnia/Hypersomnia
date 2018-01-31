@@ -20,8 +20,6 @@ void drop_from_all_slots(const invariants::container& container, const entity_ha
 }
 
 void perform_transfer_result::notify(const logic_step step) const {
-	const auto& cosmos = step.get_cosmos();
-
 	step.post_message_if(picked);
 	step.post_messages(interpolation_corrected);
 	step.post_message_if(destructed);

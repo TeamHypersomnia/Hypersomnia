@@ -151,9 +151,9 @@ namespace test_flavours {
 
 namespace ingredients {
 	void add_character(const all_logical_assets& metas, const entity_handle e, const entity_handle crosshair_entity) {
-		auto& animation = e += components::animation();
-		auto& driver = e += components::driver();
-		auto& item_slot_transfers = e += components::item_slot_transfers();
+		e += components::animation();
+		e += components::driver();
+		e += components::item_slot_transfers();
 		
 		auto& attitude = e += components::attitude();
 		const auto processing = e += components::processing();
@@ -164,10 +164,6 @@ namespace ingredients {
 		//force_joint.force_towards_chased_entity = 92000.f;
 		//force_joint.distance_when_force_easing_starts = 10.f;
 		//force_joint.power_of_force_easing_multiplier = 2.f;
-
-		driver.density_multiplier_while_driving = 0.02f;
-
-		// driver.linear_damping_while_driving = 4.f;
 
 		e.map_child_entity(child_entity_name::CHARACTER_CROSSHAIR, crosshair_entity);
 		crosshair_entity.make_as_child_of(e);
@@ -204,12 +200,11 @@ namespace prefabs {
 		auto root = create_test_scene_entity(world, test_scene_flavour::CROSSHAIR);
 		auto recoil = create_test_scene_entity(world, test_scene_flavour::CROSSHAIR_RECOIL_BODY);
 		auto zero_target = create_test_scene_entity(world, test_scene_flavour::ZERO_TARGET);
-		const auto& metas = step.get_logical_assets();
 
 		{
-			auto& transform = root += components::transform();
+			root += components::transform();
 			auto& crosshair = root += components::crosshair();
-			const auto processing = root += components::processing();
+			root += components::processing();
 			
 			crosshair.base_offset.set(-20, 0);
 			crosshair.sensitivity.set(3, 3);

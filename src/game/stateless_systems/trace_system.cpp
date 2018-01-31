@@ -21,7 +21,6 @@
 void trace_system::lengthen_sprites_of_traces(const logic_step step) const {
 	auto& cosmos = step.get_cosmos();
 	const auto delta = step.get_delta();
-	const auto& metas = step.get_logical_assets();
 
 	cosmos.for_each(
 		processing_subjects::WITH_TRACE,
@@ -70,7 +69,6 @@ void trace_system::destroy_outdated_traces(const logic_step step) const {
 void trace_system::spawn_finishing_traces_for_deleted_entities(const logic_step step) const {
 	auto& cosmos = step.get_cosmos();
 	const auto& events = step.get_queue<messages::will_soon_be_deleted>();
-	const auto& metas = step.get_logical_assets();
 
 	for (const auto& it : events) {
 		const auto deleted_entity = cosmos[it.subject];

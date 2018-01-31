@@ -29,9 +29,7 @@ void components::melee::reset_weapon(const entity_handle e) {
 
 void melee_system::consume_melee_intents(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
-	const auto& delta = step.get_delta();
 	const auto& events = step.get_queue<messages::intent_message>();
-
 
 	for (const auto& it : events) {
 		/* 
@@ -61,7 +59,4 @@ void melee_system::consume_melee_intents(const logic_step step) {
 	}
 }
 
-void melee_system::initiate_and_update_moves(const logic_step step) {
-	auto& cosmos = step.get_cosmos();
-	const auto& delta = step.get_delta();
-}
+void melee_system::initiate_and_update_moves(const logic_step step) {}

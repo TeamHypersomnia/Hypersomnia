@@ -89,7 +89,7 @@ void item_system::pick_up_touching_items(const logic_step step) {
 				const auto& pick_list = transfers->only_pick_these_items;
 				const bool found_on_subscription_list = found_in(pick_list, item_to_pick);
 
-				if (const bool item_subscribed =
+				if (/* item_subscribed */
 					(pick_list.empty() && transfers->pick_all_touched_items_if_list_to_pick_empty)
 					|| found_on_subscription_list
 				) {
@@ -111,7 +111,6 @@ void item_system::pick_up_touching_items(const logic_step step) {
 
 void item_system::handle_throw_item_intents(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
-	const auto& delta = step.get_delta();
 	const auto& requests = step.get_queue<messages::intent_message>();
 
 	for (auto r : requests) {

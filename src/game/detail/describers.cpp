@@ -29,9 +29,6 @@ const entity_description_type& get_bbcoded_entity_description(const const_entity
 std::wstring get_bbcoded_entity_properties(const const_entity_handle id) {
 	std::wostringstream result;
 
-	const auto& cosmos = id.get_cosmos();
-
-	const auto* const melee = id.find<components::melee>();
 	const auto* const gun = id.find<components::gun>();
 	const auto* const gun_def = id.find<invariants::gun>();
 	const auto* const missile = id.find<invariants::missile>();

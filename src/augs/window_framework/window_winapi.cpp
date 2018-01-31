@@ -53,7 +53,7 @@ namespace augs {
 				return change;
 			}
 			//change.utf32 = unsigned(wParam);
-			if (const bool repeated = ((lParam & (1 << 30)) != 0)) {
+			if (/* repeated */ ((lParam & (1 << 30)) != 0)) {
 				return std::nullopt;
 			}
 
@@ -72,7 +72,7 @@ namespace augs {
 		case WM_KEYDOWN:
 			change.data.key.key = translate_key_with_lparam(lParam, wParam);
 
-			if (const bool repeated = ((lParam & (1 << 30)) != 0)) {
+			if (/* repeated */ ((lParam & (1 << 30)) != 0)) {
 				return std::nullopt;
 			}
 
@@ -84,7 +84,7 @@ namespace augs {
 		case WM_SYSKEYDOWN:
 			change.data.key.key = translate_key_with_lparam(lParam, wParam);
 
-			if (const bool repeated = ((lParam & (1 << 30)) != 0)) {
+			if (/* repeated */ ((lParam & (1 << 30)) != 0)) {
 				return std::nullopt;
 			}
 
@@ -333,7 +333,7 @@ namespace augs {
 
 		const auto app_icon_path = settings.app_icon_path.wstring();
 		
-		if (const bool icon_was_specified = !app_icon_path.empty()) {
+		if (/* icon_was_specified */ !app_icon_path.empty()) {
 			const auto app_icon = (HICON)LoadImage(NULL,
 				app_icon_path.c_str(),
 				IMAGE_ICON,       

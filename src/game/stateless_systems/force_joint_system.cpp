@@ -63,12 +63,12 @@ void force_joint_system::apply_forces_towards_target_entities(const logic_step s
 				const auto force_for_chaser = direction * force_length * (1.f - force_joint.percent_applied_to_chased_entity);
 				const auto force_for_chased = -force_for_chaser * force_joint.percent_applied_to_chased_entity;
 
-				const bool is_force_epsilon = force_for_chaser.length() < 500;
 
 				const auto& offsets = force_joint.force_offsets;
 
 				const auto offsets_count = static_cast<int>(offsets.size());
 
+				//const bool is_force_epsilon = force_for_chaser.length() < 500;
 				//if (!is_force_epsilon) 
 				{
 					for (const auto offset : offsets) {

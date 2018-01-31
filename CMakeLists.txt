@@ -711,6 +711,7 @@ endif()
 if(UNIX)
 	set(CHOSEN_WARNINGS 
 "-Wdangling-else \
+-Wunused-variable \
 -Wbool-operation \
 -Wbool-compare \
 -Wtautological-compare \

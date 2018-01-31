@@ -208,8 +208,6 @@ void physics_world_cache::infer_cache_for_rigid_body(const const_entity_handle h
 }
 
 void physics_world_cache::infer_cache_for(const const_entity_handle handle) {
-	const auto& cosmos = handle.get_cosmos();
-
 	infer_cache_for_rigid_body(handle);
 	infer_cache_for_colliders(handle);
 	infer_cache_for_joint(handle);

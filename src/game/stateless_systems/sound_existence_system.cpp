@@ -25,7 +25,6 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 	const auto& collisions = step.get_queue<messages::collision_message>();
 	const auto& gunshots = step.get_queue<messages::gunshot_response>();
 	const auto& damages = step.get_queue<messages::damage_message>();
-	const auto& swings = step.get_queue<messages::melee_swing_response>();
 	const auto& healths = step.get_queue<messages::health_event>();
 	const auto& exhausted_casts = step.get_queue<messages::exhausted_cast>();
 	auto& cosmos = step.get_cosmos();
@@ -80,7 +79,6 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 	for (const auto& g : gunshots) {
 		{
 			const auto subject = cosmos[g.subject];
-			const auto& gun = subject.get<components::gun>();
 			const auto& gun_def = subject.get<invariants::gun>();
 			const auto gun_transform = subject.get_logic_transform();
 			const auto owning_capability = subject.get_owning_transfer_capability();

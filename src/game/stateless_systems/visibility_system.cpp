@@ -553,9 +553,11 @@ void visibility_system::respond_to_visibility_information_requests(
 						targets[j] = edge_ray_output.intersection + directions[j] * si.get_meters(1.f);
 						continue_checking = false;
 					}
+				/*
 					else {
 						bool breakpoint = true;
 					}
+				*/
 				}
 
 				if (!continue_checking) {

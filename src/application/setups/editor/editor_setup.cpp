@@ -102,7 +102,7 @@ void editor_setup::open_last_tabs(sol::state& lua) {
 			for (std::size_t i = 0; i < tabs.size(); ++i) {
 				works.emplace_back(std::make_unique<intercosm>());
 				
-				if (const bool try_loading_unsaved = !tabs[i].is_untitled()) {
+				if (/* try_loading_unsaved */ !tabs[i].is_untitled()) {
 					const auto unsaved_path = get_unsaved_path(tabs[i].current_path);
 
 					if (const auto popup = open_intercosm(*works.back(), { lua, unsaved_path })) {
@@ -147,11 +147,11 @@ void editor_setup::autosave(const autosave_input in) const {
 			const auto& t = tabs[i];
 			const auto& w = *works[i];
 
-			if (const bool resave_untitled_work = t.is_untitled()) {
+			if (/* resave_untitled_work */ t.is_untitled()) {
 				const auto saving_path = t.current_path;
 				w.save({ lua, saving_path });
 			}
-			else if (const bool cache_changes_of_named_work = t.has_unsaved_changes()) {
+			else if (/* cache_changes_of_named_work */ t.has_unsaved_changes()) {
 				auto extension = t.current_path.extension();
 				const auto saving_path = augs::path_type(t.current_path).replace_extension(extension += ".unsaved");
 				w.save({ lua, saving_path });
@@ -435,10 +435,10 @@ void editor_setup::perform_custom_imgui(
 
 				auto ordering = [&]() {
 					std::vector<int> out;
-					out.reserve(tabs.size());
+					out.resize(tabs.size());
 
-					for (const auto& it : tabs) {
-						out.push_back(static_cast<int>(out.size()));
+					for (int i = 0; i < out.size(); ++i) {
+						out[i] = i;
 					}
 
 					return out;
@@ -1264,7 +1264,7 @@ bool editor_setup::handle_unfetched_window_input(
 
 			auto& selections = tab().selected_entities;
 
-			if (const bool new_selection = !has_ctrl) {
+			if (/* new_selection */ !has_ctrl) {
 				selections.clear();
 			}
 

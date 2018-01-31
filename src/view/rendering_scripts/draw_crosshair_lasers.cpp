@@ -69,7 +69,6 @@ void draw_crosshair_lasers(const draw_crosshair_lasers_input in) {
 			const auto subject_item = cosmos[subject_item_id];
 
 			if (subject_item.has<components::gun>()) {
-				const auto& gun = subject_item.get<components::gun>();
 				const auto& gun_def = subject_item.get<invariants::gun>();
 
 				const auto rifle_transform = subject_item.get_viewing_transform(in.interpolation);

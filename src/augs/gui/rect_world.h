@@ -249,7 +249,7 @@ namespace augs {
 						r->consume_raw_input_and_generate_gui_events(context, r, in, entropies);
 					});
 
-					if (const bool hovered_but_unvisited = context.alive(rect_hovered) && !in.was_hovered_rect_visited) {
+					if (/* hovered_but_unvisited */ context.alive(rect_hovered) && !in.was_hovered_rect_visited) {
 						context(rect_hovered, [&](const auto& r) { 
 							r->unhover(context, r, in, entropies);
 						});

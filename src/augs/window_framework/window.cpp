@@ -30,7 +30,7 @@ namespace augs {
 	}
 
 	std::optional<event::change> window::sync_mouse_on_click_activate(const event::change& new_change) {
-		if (const bool should_sync_mouse = new_change.msg == event::message::click_activate
+		if (/* should_sync_mouse */ new_change.msg == event::message::click_activate
 			&& get_current_settings().raw_mouse_input
 		) {
 			if (const auto screen_space = get_cursor_pos()) {
@@ -159,7 +159,7 @@ namespace augs {
 	}
 
 	void window::set_mouse_pos_paused(const bool flag) {
-		if (const bool unpause = mouse_pos_paused && !flag) {
+		if (/* unpause */ mouse_pos_paused && !flag) {
 			set_cursor_pos(last_mouse_pos);
 		}
 
