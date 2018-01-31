@@ -43,7 +43,6 @@ protected:
 
 	using base = synchronizer_base<E, components::motor_joint>;
 	using base::handle;
-	using base::get_writable;
 public:
 	void infer_caches() const {
 		handle.get_cosmos().get_solvable_inferred({}).relational.infer_cache_for(handle);
@@ -62,7 +61,7 @@ public:
 	}
 
 	auto& operator=(const components::motor_joint& m) const {
-		get_writable() = m;
+		get_raw_component({}) = m;
 		infer_caches();
 		return *this;
 	}

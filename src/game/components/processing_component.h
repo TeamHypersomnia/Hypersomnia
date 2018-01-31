@@ -37,7 +37,6 @@ protected:
 		handle.get_cosmos().get_solvable_inferred({}).processing_lists.infer_cache_for(handle);
 	}
 
-	using base::get_writable;
 public:
 	using base::synchronizer_base;
 	using base::get_raw_component;
@@ -51,7 +50,7 @@ public:
 	}
 
 	void set_basic_categories(const components::processing::flagset_type& categories) const{
-		get_writable().processing_subject_categories = categories;
+		get_raw_component({}).processing_subject_categories = categories;
 		infer_caches();
 	}
 };

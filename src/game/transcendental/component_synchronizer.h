@@ -7,14 +7,14 @@ class component_synchronizer;
 template <class, class>
 class synchronizer_base;
 
-class writable_component_access {
+class write_synchronized_component_access {
 	template <class, class>
 	friend class synchronizer_base;
 
 	template <class, class>
 	friend class component_synchronizer;
 
-	writable_component_access() {}
+	write_synchronized_component_access() {}
 };
 
 template <class entity_handle_type, class component_type>
@@ -30,13 +30,8 @@ protected:
 	component_pointer component;
 	entity_handle_type handle;
 
-	auto& get_writable() const {
-		return *component;
-	}
-
 public:
-
-	auto& get_raw_component(writable_component_access) const {
+	auto& get_raw_component(write_synchronized_component_access) const {
 		return *component;
 	}
 

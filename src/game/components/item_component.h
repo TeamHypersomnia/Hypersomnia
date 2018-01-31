@@ -39,7 +39,7 @@ struct perform_transfer_result {
 };
 
 perform_transfer_result perform_transfer(
-	writable_component_access,
+	write_synchronized_component_access,
 	cosmos_solvable_inferred_access,
 	const item_slot_transfer_request r, 
 	cosmos& cosmos
@@ -81,7 +81,6 @@ template <class E>
 class component_synchronizer<E, components::item> : public synchronizer_base<E, components::item> {
 protected:
 	using base = synchronizer_base<E, components::item>;
-	using base::get_writable;
 	using base::operator->;
 public:
 	using base::get_raw_component;
@@ -90,7 +89,7 @@ public:
 	template <class... Args>
 	decltype(auto) perform_transfer(Args&&... args) const {
 		return ::perform_transfer(
-			writable_component_access(),
+			write_synchronized_component_access(),
 		   	cosmos_solvable_inferred_access(),
 		   	std::forward<Args>(args)...
 		);

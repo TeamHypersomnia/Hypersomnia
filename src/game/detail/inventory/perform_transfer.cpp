@@ -46,7 +46,7 @@ perform_transfer_result perform_transfer(
 }
 
 perform_transfer_result perform_transfer(
-	const writable_component_access access,
+	const write_synchronized_component_access access,
 	const cosmos_solvable_inferred_access inferred_access,
 	const item_slot_transfer_request r, 
 	cosmos& cosmos

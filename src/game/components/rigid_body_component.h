@@ -111,7 +111,6 @@ class component_synchronizer<E, components::rigid_body>
 
 	using base = synchronizer_base<E, components::rigid_body>;
 	using base::handle;
-	using base::get_writable;
 
 public:
 	using base::synchronizer_base;
@@ -133,7 +132,7 @@ public:
 
 	template <class body_type>
 	void update_after_step(const body_type& b) const {
-		auto& body = get_writable();
+		auto& body = get_raw_component({});
 
 		body.transform = b.m_xf;
 		body.sweep = b.m_sweep;
@@ -144,7 +143,7 @@ public:
 	bool is_constructed() const;
 
 	auto& get_special() const {
-		return get_writable().special;
+		return get_raw_component({}).special;
 	}
 
 	damping_info calculate_damping_info(const invariants::rigid_body&) const;
@@ -275,7 +274,7 @@ void component_synchronizer<E, components::rigid_body>::infer_caches() const {
 
 template <class E>
 void component_synchronizer<E, components::rigid_body>::set_velocity(const vec2 pixels) const {
-	auto& v = get_writable().velocity;
+	auto& v = get_raw_component({}).velocity;
 	v = to_meters(pixels);
 
 	if (!is_constructed()) {
@@ -287,7 +286,7 @@ void component_synchronizer<E, components::rigid_body>::set_velocity(const vec2 
 
 template <class E>
 void component_synchronizer<E, components::rigid_body>::set_angular_velocity(const float degrees) const {
-	auto& v = get_writable().angular_velocity;
+	auto& v = get_raw_component({}).angular_velocity;
 	v = DEG_TO_RAD<float> * degrees;
 
 	if (!is_constructed()) {
@@ -315,7 +314,7 @@ void component_synchronizer<E, components::rigid_body>::apply_force(
 	}
 
 	const auto body = get_cache().body.get();
-	auto& data = get_writable();
+	auto& data = get_raw_component({});
 
 	const auto force = handle.get_cosmos().get_fixed_delta().in_seconds() * to_meters(pixels);
 	const auto location = vec2(body->GetWorldCenter() + b2Vec2(to_meters(center_offset)));
@@ -358,7 +357,7 @@ void component_synchronizer<E, components::rigid_body>::apply_impulse(
 	}
 
 	auto body = get_cache().body.get();
-	auto& data = get_writable();
+	auto& data = get_raw_component({});
 
 	const vec2 force = to_meters(pixels);
 	const vec2 location = vec2(body->GetWorldCenter()) + to_meters(center_offset);
@@ -381,7 +380,7 @@ template <class E>
 void component_synchronizer<E, components::rigid_body>::apply_angular_impulse(const float imp) const {
 	ensure(is_constructed());
 	auto& body = *get_cache().body.get();
-	auto& data = get_writable();
+	auto& data = get_raw_component({});
 
 	body.ApplyAngularImpulse(imp, true);
 	data.angular_velocity = body.GetAngularVelocity();
@@ -395,7 +394,7 @@ void component_synchronizer<E, components::rigid_body>::set_transform(const enti
 
 template <class E>
 void component_synchronizer<E, components::rigid_body>::set_transform(const components::transform& transform) const {
-	auto& data = get_writable();
+	auto& data = get_raw_component({});
 
 	data.set_transform(
 		handle.get_cosmos().get_common_significant().si,

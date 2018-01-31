@@ -26,7 +26,6 @@ class component_synchronizer<E, components::flavour> : public synchronizer_base<
 protected:
 	using base = synchronizer_base<E, components::flavour>;
 	using base::handle;
-	using base::get_writable;
 public:
 	using base::get_raw_component;
 	using base::synchronizer_base;
