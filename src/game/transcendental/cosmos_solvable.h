@@ -189,6 +189,6 @@ inline std::size_t cosmos_solvable::get_maximum_entities() const {
 }
 
 inline entity_guid cosmos_solvable::get_guid(const entity_id id) const {
-	return get_aggregate(id).get<components::guid>(*this).get_value();
+	return get_aggregate(id).get<components::guid>(*this).value;
 }
 
