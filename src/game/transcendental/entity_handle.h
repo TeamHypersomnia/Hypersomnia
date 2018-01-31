@@ -145,7 +145,7 @@ public:
 
 	template <class component>
 	bool has() const {
-		return agg().template has<component>(pool_provider());
+		return agg().template has<component>();
 	}
 
 	template <class T>

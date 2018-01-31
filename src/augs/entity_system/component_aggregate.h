@@ -22,7 +22,7 @@ namespace augs {
 		template <class component, class Aggregate, class PoolProvider>
 		static auto& get_impl(Aggregate& a, PoolProvider& p) {
 			if constexpr(!is_always_present_v<component>) {
-				ensure(a.template has<component>(p));
+				ensure(a.template has<component>());
 			}
 
 			if constexpr(is_always_present_v<component>) {
@@ -117,13 +117,13 @@ namespace augs {
 			return find_impl<component>(*this, p);
 		}
 
-		template <class component, class PoolProvider>
-		bool has(PoolProvider& p) const {
+		template <class component>
+		bool has() const {
 			if constexpr(is_always_present_v<component>) {
 				return true;
 			}
 			else {
-				return find<component>(p) != nullptr;
+				return get_id<component>().is_set();
 			}
 		}
 
@@ -133,7 +133,7 @@ namespace augs {
 				get<component>(p) = c;
 			}
 			else {
-				if (!has<component>(p)) {
+				if (!has<component>()) {
 					set_id(make_pool_id<component>(p.template get_component_pool<component>().allocate(c)));
 				}
 				else {
@@ -146,7 +146,7 @@ namespace augs {
 		void remove(PoolProvider& p) {
 			static_assert(!is_always_present_v<component>, "Can't remove an always_present component.");
 
-			ensure(has<component>(p));
+			ensure(has<component>());
 
 			const auto id_of_deleted = get_id<component>();
 

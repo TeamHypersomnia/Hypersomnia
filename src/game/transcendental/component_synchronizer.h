@@ -14,13 +14,13 @@ protected:
 	component_pointer component;
 	entity_handle_type handle;
 
+	auto& get_raw_component() const {
+		return *component;
+	}
+
 public:
 	auto get_handle() const {
 		return handle;
-	}
-
-	auto& get_raw_component() const {
-		return *component;
 	}
 
 	bool operator==(const std::nullptr_t) const {
