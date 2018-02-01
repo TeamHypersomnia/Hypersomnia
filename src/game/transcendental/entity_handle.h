@@ -213,9 +213,6 @@ public:
 	template <bool C = !is_const, class = std::enable_if_t<C>>
 	entity_handle add_standard_components(const logic_step step) const;
 
-	template <bool C = !is_const, class = std::enable_if_t<C>>
-	void recalculate_basic_processing_categories() const;
-
 	bool get_flag(const entity_flag f) const {
 		ensure(alive());
 		return get<invariants::flags>().values.test(f);

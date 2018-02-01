@@ -43,7 +43,8 @@ entity_handle basic_entity_handle<C>::add_standard_components(const logic_step s
 		add(components::sender());
 	}
 
-	recalculate_basic_processing_categories<true, void>();
+	const auto default_processing = components::processing::get_default(*this);
+	get<components::processing>().set_basic_categories(default_processing.processing_subject_categories);
 	
 	cosmic::infer_caches_for(*this);
 
@@ -59,15 +60,5 @@ entity_handle basic_entity_handle<C>::add_standard_components(const logic_step s
 	return *this;
 }
 
-template <bool C>
-template <bool, class>
-void basic_entity_handle<C>::recalculate_basic_processing_categories() const {
-	ensure(alive());
-	const auto default_processing = components::processing::get_default(*this);
-
-	get<components::processing>().set_basic_categories(default_processing.processing_subject_categories);
-}
-
 // explicit instantiation
 template entity_handle basic_entity_handle<false>::add_standard_components<true, void>(const logic_step) const;
-template void basic_entity_handle<false>::recalculate_basic_processing_categories<true, void>() const;
