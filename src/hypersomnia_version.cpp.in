@@ -7,6 +7,7 @@
 
 #if WAS_VERSION_GENERATOR_BUILT
 #include "augs/misc/typesafe_sprintf.h"
+#include "game/transcendental/entity_id.h"
 
 hypersomnia_version::hypersomnia_version() :
 	commit_number(%x),
@@ -27,7 +28,7 @@ std::string hypersomnia_version::get_summary() const {
 		"STATICALLY_ALLOCATE_ENTITIES_NUM=%x\n"
 		"STATICALLY_ALLOCATE_ASSETS=%x\n"
 		"STATICALLY_ALLOCATE_BAKED_FONTS=%x\n"
-		"wchar_t size=%x\n",
+		"sizeofs: wchar_t=%x, entity_id=%x, unversioned=%x\n",
 		commit_number ? std::to_string(commit_number) : "Unknown",
 		commit_number ? working_tree_changes.empty() ? "(clean)" : "(dirty)" : "",
 		commit_date,
@@ -35,7 +36,8 @@ std::string hypersomnia_version::get_summary() const {
 		STATICALLY_ALLOCATE_ENTITIES_NUM,
 		STATICALLY_ALLOCATE_ASSETS,
 		STATICALLY_ALLOCATE_BAKED_FONTS,
-		sizeof(wchar_t)
+		sizeof(wchar_t),
+		sizeof(entity_id), sizeof(unversioned_entity_id)
 	);
 }
 

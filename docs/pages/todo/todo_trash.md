@@ -433,13 +433,6 @@ COMMENTED OUT: Such things will be calculated statelessly.
 	- So don't worry, we'll reuse what was written and add new things later for continuous objects. 
 	- You've actually written about those stateless things...
 
-- Cloning entities
-	- Depending on this, we might choose one or the other design for children
-	- We no longer need cloning for charged items because it is highly unlikely they would have a child entity 
-	- An author might want to copy/duplicate something on their screen
-		- Even character would need their crosshair child
-	- The problem is, reassigning ids properly is non trivial if we don't set them as child_entity_id	
-
 - Solutions for "children entities": entities that are cloned with some other entity and deleted with it
 	- **Chosen solution:** delete_with component that is a synchronized component
 		- Most flexibility and separation of concerns; childhood is not really something that will change rapidly, as opposed to damping or density

@@ -100,3 +100,11 @@ we consider whole type overrides too complex architeciturally:
 		- they will never change either way, but it's good to be sure.
 	- In any case, whether we need the cache or we only assume that entities marked via child_entity_ids will be deleted, 
 	it would be good and safe to have a synchronizer for each case where we specify an existential child. But we don't have time to play it safe.
+
+- Cloning entities
+	- We no longer need cloning for charged items because it is highly unlikely they would have a child entity 
+	- An author might want to copy/duplicate something on their screen
+		- Even character would need their crosshair child
+	- There might be a cosmos inconsistent error thrown if author clones something
+		- well then the editor may controllably catch it and revert
+		- and in the solver we will take proper precautions
