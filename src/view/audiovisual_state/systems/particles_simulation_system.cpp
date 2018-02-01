@@ -55,7 +55,7 @@ void particles_simulation_system::update_effects_from_messages(
 
 		for (auto& e : events) {
 			erase_if(orbital_emissions, [&e](const orbital_cache& c){	
-				if (const auto m = e.match_chased_subject) {
+				if (const auto& m = e.match_chased_subject) {
 					if (*m != c.chasing.target) {
 						return false;
 					}	

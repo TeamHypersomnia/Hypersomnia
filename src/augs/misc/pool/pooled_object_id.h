@@ -7,7 +7,7 @@ namespace augs {
 	struct unversioned_id {
 		using mapped_type = T;
 
-		size_type indirection_index = -1;
+		size_type indirection_index = static_cast<size_type>(-1);
 
 		bool operator==(const unversioned_id& b) const {
 			return indirection_index == b.indirection_index;
@@ -26,7 +26,7 @@ namespace augs {
 	struct pooled_object_id {
 		// GEN INTROSPECTOR struct augs::pooled_object_id class T class size_type
 		size_type version = 0;
-		size_type indirection_index = -1;
+		size_type indirection_index = static_cast<size_type>(-1);
 		// END GEN INTROSPECTOR
 
 		using mapped_type = T;

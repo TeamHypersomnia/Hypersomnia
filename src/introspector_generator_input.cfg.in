@@ -59,9 +59,7 @@ generated-file-format:
 #include "augs/templates/for_each_std_get.h"
 #include "augs/templates/container_templates.h"
 #include "game/transcendental/cosmic_types.h"
-
-#include "game/organization/all_components_declaration.h"
-using cosmic_entity = component_list_t<cosmic_aggregate>;
+#include "game/transcendental/entity_id_declaration.h"
 
 #define FIELD(x) f(#x, _t_.x...)
 

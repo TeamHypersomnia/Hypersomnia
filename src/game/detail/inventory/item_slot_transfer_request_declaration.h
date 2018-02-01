@@ -1,5 +1,5 @@
 #pragma once
-struct entity_id;
+#include "game/transcendental/entity_id_declaration.h"
 
 template <class T>
 struct basic_item_slot_transfer_request;

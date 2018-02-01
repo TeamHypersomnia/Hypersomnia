@@ -7,9 +7,8 @@
 #include "game/assets/ids/sound_buffer_id.h"
 #include "game/components/transform_component.h"
 #include "game/transcendental/step_declaration.h"
+#include "game/transcendental/entity_id_declaration.h"
 #include "game/enums/adverse_element_type.h"
-
-struct entity_id;
 
 struct standard_explosion_input {
 	// GEN INTROSPECTOR struct standard_explosion_input

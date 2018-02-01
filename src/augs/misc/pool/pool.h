@@ -57,7 +57,7 @@ namespace augs {
 
 		bool correct_range(const key_type key) const {
 			return 
-				key.indirection_index != -1 // Quickly eliminate fresh ids without fetching indirectors.size()
+				key.indirection_index != static_cast<size_type>(-1) // Quickly eliminate fresh ids without fetching indirectors.size()
 				&& key.indirection_index < indirectors.size()
 			;
 		}
