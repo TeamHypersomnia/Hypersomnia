@@ -17,9 +17,6 @@ components::processing components::processing::get_default(const const_entity_ha
 	if (id.has<components::car>()) {
 		matching.push_back(processing_subjects::WITH_CAR);
 	}
-	if (id.has<components::crosshair>()) {
-		matching.push_back(processing_subjects::WITH_CROSSHAIR);
-	}
 	if (id.has<components::missile>()) {
 		matching.push_back(processing_subjects::WITH_DAMAGE);
 	}

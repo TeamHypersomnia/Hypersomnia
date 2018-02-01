@@ -63,6 +63,9 @@ namespace components {
 
 template <template <class...> class List>
 using component_list_t = List<
+	components::guid,
+	components::flavour,
+	components::processing,
 	components::animation,
 	components::behaviour_tree,
 	components::crosshair,
@@ -78,13 +81,10 @@ using component_list_t = List<
 	components::item,
 	components::force_joint,
 	components::item_slot_transfers,
-	components::flavour,
 	components::trace,
 	components::melee,
 	components::sentience,
 	components::attitude,
-	components::processing,
-	components::guid,
 	components::interpolation,
 	components::light,
 	components::wandering_pixels,
@@ -95,6 +95,7 @@ using component_list_t = List<
 
 template <template <class...> class List>
 using invariant_list_t = List<
+	invariants::flags,
 	invariants::gun,
 	invariants::render,
 	invariants::shape_polygon,
@@ -102,7 +103,6 @@ using invariant_list_t = List<
 	invariants::polygon,
 	invariants::sprite,
 	invariants::trace,
-	invariants::flags,
 	invariants::interpolation,
 	invariants::fixtures,
 	invariants::rigid_body,

@@ -41,6 +41,10 @@ struct crosshair_recoil {
 
 };
 
+struct crosshair {
+
+};
+
 using all_entity_types = type_list<
 	controlled_character,
 	environment_obstacle,

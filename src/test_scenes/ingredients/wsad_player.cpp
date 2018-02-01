@@ -201,8 +201,7 @@ namespace prefabs {
 
 		{
 			auto& crosshair = root += components::crosshair();
-			root += components::processing();
-			
+
 			crosshair.base_offset.set(-20, 0);
 			crosshair.sensitivity.set(3, 3);
 			crosshair.base_offset_bound.set(1920, 1080);
