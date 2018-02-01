@@ -1,18 +1,5 @@
-
-
-struct entity_id : public cosmic_object_pool_id<cosmic_entity> {
-	using base = cosmic_object_pool_id<cosmic_entity>;
-	// GEN INTROSPECTOR struct entity_id
-	// INTROSPECT BASE cosmic_object_pool_id<cosmic_entity>
-	// END GEN INTROSPECTOR
-
-	entity_id(const child_entity_id c);
-	entity_id(const base b = base()) : base(b) {}
-
-	operator unversioned_entity_id() const {
-		return static_cast<unversioned_entity_id::base>(*static_cast<const base*>(this));
-	}
-};
+#pragma once
+#include "game/organization/all_entity_types.h"
 
 template <class entity_flavour>
 struct typed_entity_id : public cosmic_object_pool_id<cosmic_entity> {

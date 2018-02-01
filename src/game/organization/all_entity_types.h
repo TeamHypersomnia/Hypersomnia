@@ -1,5 +1,7 @@
 #pragma once
 #include "augs/templates/type_list.h"
+#include "augs/templates/type_in_list_id.h"
+#include "game/organization/all_components_declaration.h"
 
 /* E.g. a player as a resistance soldier or metropolitan guard */
 
@@ -119,11 +121,90 @@ struct static_sprite_decoration {
 	>;
 };
 
+struct static_light {
+	using invariants = type_list<
+		invariants::light,
+		invariants::sprite,
+		invariants::render
+	>;
+
+	using components = type_list<
+		components::transform
+	>;
+};
+
+struct throwable_explosive {
+	using invariants = type_list<
+		invariants::sprite,
+		invariants::item,
+		invariants::render,
+		invariants::hand_fuse,
+		invariants::explosive,
+		invariants::shape_polygon
+	>;
+
+	using components = type_list<
+		components::rigid_body,
+		components::hand_fuse,
+		components::item
+	>;
+};
+
+struct plain_missile {
+	using invariants = type_list<
+		invariants::rigid_body,
+		invariants::fixtures,
+		invariants::shape_polygon,
+
+		invariants::sprite,
+		invariants::render,
+
+		invariants::trace,
+
+		invariants::missile
+	>;
+
+	using components = type_list<
+		components::rigid_body,
+		components::hand_fuse,
+		components::item,
+		components::missile
+	>;
+};
+
+struct explosive_missile {
+	using invariants = type_list<
+		invariants::rigid_body,
+		invariants::fixtures,
+		invariants::shape_polygon,
+
+		invariants::sprite,
+		invariants::render,
+
+		invariants::trace,
+
+		invariants::missile,
+		invariants::explosive
+	>;
+
+	using components = type_list<
+		components::rigid_body,
+		components::hand_fuse,
+		components::item,
+		components::missile
+	>;
+};
+
 using all_entity_types = type_list<
 	controlled_character,
 	plain_invisible_body,
 	plain_sprited_body,
 	shootable_weapon,
 	shootable_charge,
-	static_sprite_decoration
+	static_sprite_decoration,
+	throwable_explosive,
+	plain_missile,
+	explosive_missile
 >;
+
+using entity_type_id = type_in_list_id<all_entity_types>;

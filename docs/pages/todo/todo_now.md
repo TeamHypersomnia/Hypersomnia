@@ -11,6 +11,8 @@ summary: Just a hidden scratchpad.
 	- Solver might want to set some initial component values before inference occurs
 		- Should be done in a lambda where a typed entity handle is given 
 		- After which cosmic::create_entity will simply infer all caches
+		- provide an overload which sets transform
+			- static assert if the entity cannot set a transform
 
 - Entity groups will be useful later, not until we make a simple deathmatch where we can include some simple weapon/car creation logic etc
 
