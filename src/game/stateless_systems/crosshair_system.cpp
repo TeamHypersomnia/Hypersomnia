@@ -36,27 +36,23 @@ void crosshair_system::generate_crosshair_intents(const logic_step step) {
 		for (const auto& it : events) {
 			const auto subject = cosmos[it.subject];
 
-			if (!subject.has<components::crosshair>()) {
-				continue;
+			if (const auto crosshair = subject.find_crosshair()) {
+				const vec2 delta = vec2(vec2(it.offset) * crosshair->sensitivity).rotate(crosshair->rotation_offset, vec2());
+
+				vec2& base_offset = crosshair->base_offset;
+				const vec2 old_base_offset = base_offset;
+
+				base_offset += delta;
+				base_offset.clamp_rotated(crosshair->get_bounds_in_this_look(), crosshair->rotation_offset);
+
+				messages::crosshair_motion_message crosshair_motion;
+
+				crosshair_motion.subject = it.subject;
+				crosshair_motion.crosshair_base_offset_rel = base_offset - old_base_offset;
+				crosshair_motion.crosshair_base_offset = base_offset;
+
+				step.post_message(crosshair_motion);
 			}
-
-			auto& crosshair = subject.get<components::crosshair>();
-
-			const vec2 delta = vec2(vec2(it.offset) * crosshair.sensitivity).rotate(crosshair.rotation_offset, vec2());
-
-			vec2& base_offset = crosshair.base_offset;
-			const vec2 old_base_offset = base_offset;
-
-			base_offset += delta;
-			base_offset.clamp_rotated(crosshair.get_bounds_in_this_look(), crosshair.rotation_offset);
-
-			messages::crosshair_motion_message crosshair_motion;
-
-			crosshair_motion.subject = it.subject;
-			crosshair_motion.crosshair_base_offset_rel = base_offset - old_base_offset;
-			crosshair_motion.crosshair_base_offset = base_offset;
-
-			step.post_message(crosshair_motion);
 		}
 	}
 
@@ -65,20 +61,16 @@ void crosshair_system::generate_crosshair_intents(const logic_step step) {
 	for (const auto& it : events) {
 		const auto subject = cosmos[it.subject];
 		
-		if (!subject.has<components::crosshair>()) {
-			continue;
-		}
+		if (const auto crosshair = subject.find_crosshair()) {
+			if (it.intent == game_intent_type::SWITCH_LOOK && it.was_pressed()) {
+				auto& mode = crosshair->orbit_mode;
 
-		auto& crosshair = subject.get<components::crosshair>();
-
-		if (it.intent == game_intent_type::SWITCH_LOOK && it.was_pressed()) {
-			auto& mode = crosshair.orbit_mode;
-
-			if (mode == components::crosshair::LOOK) {
-				mode = components::crosshair::ANGLED;
-			}
-			else {
-				mode = components::crosshair::LOOK;
+				if (mode == components::crosshair::LOOK) {
+					mode = components::crosshair::ANGLED;
+				}
+				else {
+					mode = components::crosshair::LOOK;
+				}
 			}
 		}
 	}
@@ -89,6 +81,6 @@ void crosshair_system::apply_crosshair_intents_to_base_offsets(const logic_step 
 	const auto& events = step.get_queue<messages::crosshair_motion_message>();
 
 	for (const auto& it : events) {
-		cosmos[it.subject].get<components::crosshair>().base_offset = it.crosshair_base_offset;
+		cosmos[it.subject].find_crosshair()->base_offset = it.crosshair_base_offset;
 	}
 }

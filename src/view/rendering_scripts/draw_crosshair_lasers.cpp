@@ -14,11 +14,13 @@
 #include "view/audiovisual_state/systems/interpolation_system.h"
 
 void draw_crosshair_lasers(const draw_crosshair_lasers_input in) {
-	if (in.crosshair.alive()) {
-		const auto& cosmos = in.crosshair.get_cosmos();
+	if (in.character.alive()) {
+		const auto subject_with_crosshair = in.character; 
+
+		const auto& cosmos = in.character.get_cosmos();
 		const auto& physics = cosmos.get_solvable_inferred().physics;
 
-		const auto crosshair_pos = in.crosshair.get_viewing_transform(in.interpolation).pos;
+		const vec2 crosshair_pos = subject_with_crosshair.get_world_crosshair_transform(in.interpolation).pos;
 
 		auto calculate_color = [&](const const_entity_handle target) {
 			const auto att = calculate_attitude(in.character, target);

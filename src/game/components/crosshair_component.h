@@ -3,11 +3,10 @@
 #include "augs/math/rects.h"
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
+#include "game/components/sprite_component.h"
 
 namespace components {
 	struct crosshair {
-		static vec2 calculate_aiming_displacement(const_entity_handle subject_crosshair, bool snap_epsilon_base_offset = false);
-
 		enum orbit_type {
 			NONE,
 			ANGLED,
@@ -27,5 +26,15 @@ namespace components {
 		// END GEN INTROSPECTOR
 
 		vec2 get_bounds_in_this_look() const;
+	};
+}
+
+namespace invariants {
+	struct crosshair {
+		using implied_component = components::crosshair;
+
+		// GEN INTROSPECTOR struct invariants::crosshair
+		invariants::sprite appearance;
+		// END GEN INTROSPECTOR
 	};
 }

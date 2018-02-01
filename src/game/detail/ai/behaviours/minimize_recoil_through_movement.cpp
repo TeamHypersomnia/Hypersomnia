@@ -13,21 +13,20 @@ namespace behaviours {
 	tree::goal_availability minimize_recoil_through_movement::goal_resolution(tree::state_of_traversal& t) const {
 		const auto subject = t.get_subject();
 		const auto& cosmos = t.step.get_cosmos();
-		const auto crosshair = subject[child_entity_name::CHARACTER_CROSSHAIR];
 		const auto& attitude = subject.get<components::attitude>();
 		const auto currently_attacked_visible_entity = cosmos[attitude.currently_attacked_visible_entity];
 
-		if (currently_attacked_visible_entity.alive() && crosshair.alive()) {
-			auto recoil = crosshair[child_entity_name::CROSSHAIR_RECOIL_BODY];
-			auto& c = crosshair.get<components::crosshair>();
+		if (const auto c = subject.find_crosshair()) {
+			if (currently_attacked_visible_entity.alive()) {
+				minimize_recoil_through_movement_goal goal;
 
-			minimize_recoil_through_movement_goal goal;
+				const auto subject_orientation = subject.get_logic_transform().get_orientation();
 
-			const auto subject_orientation = subject.get_logic_transform().get_orientation();
+				goal.movement_direction = (c->base_offset - subject_orientation * c->base_offset.length());
 
-			goal.movement_direction = (c.base_offset - subject_orientation * c.base_offset.length());
-			t.set_goal(goal);
-			return tree::goal_availability::SHOULD_EXECUTE;
+				t.set_goal(goal);
+				return tree::goal_availability::SHOULD_EXECUTE;
+			}
 		}
 
 		return tree::goal_availability::ALREADY_ACHIEVED;

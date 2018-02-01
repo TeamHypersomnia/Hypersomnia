@@ -55,8 +55,6 @@ namespace components {
 		augs::stepped_timestamp time_of_last_shake;
 		float shake_for_ms = 0.f;
 
-		child_entity_id character_crosshair;
-
 		// END GEN INTROSPECTOR
 
 		bool is_learned(const spell_id id) const {

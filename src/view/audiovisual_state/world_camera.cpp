@@ -139,22 +139,18 @@ vec2i world_camera::get_camera_offset_due_to_character_crosshair(
 		return { 0, 0 };
 	}
 
-	if (const auto crosshair_entity = entity_to_chase[child_entity_name::CHARACTER_CROSSHAIR]) {
-		if (const auto maybe_crosshair = crosshair_entity.find<components::crosshair>()) {
-			auto& crosshair = *maybe_crosshair;
+	if (const auto crosshair = entity_to_chase.find_crosshair()) {
+		if (crosshair->orbit_mode != components::crosshair::NONE) {
+			camera_crosshair_offset = entity_to_chase.calculate_crosshair_displacement();
 
-			if (crosshair.orbit_mode != components::crosshair::NONE) {
-				camera_crosshair_offset = components::crosshair::calculate_aiming_displacement(crosshair_entity, false);
+			if (crosshair->orbit_mode == crosshair->ANGLED) {
+				camera_crosshair_offset.set_length(settings.angled_look_length);
+			}
 
-				if (crosshair.orbit_mode == crosshair.ANGLED) {
-					camera_crosshair_offset.set_length(settings.angled_look_length);
-				}
-
-				if (crosshair.orbit_mode == crosshair.LOOK) {
-					/* simple proportion */
-					camera_crosshair_offset /= crosshair.base_offset_bound;
-					camera_crosshair_offset *= current_cone.get_visible_world_area(screen_size) * settings.look_bound_expand;
-				}
+			if (crosshair->orbit_mode == crosshair->LOOK) {
+				/* simple proportion */
+				camera_crosshair_offset /= crosshair->base_offset_bound;
+				camera_crosshair_offset *= current_cone.get_visible_world_area(screen_size) * settings.look_bound_expand;
 			}
 		}
 	}

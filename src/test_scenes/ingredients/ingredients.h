@@ -18,7 +18,7 @@ namespace components {
 }
 
 namespace ingredients {
-	void add_character(const logic_step, entity_handle, entity_handle crosshair_entity);
+	void add_character(const logic_step, entity_handle);
 
 	void add_character_head_inventory(const logic_step, entity_handle);
 
@@ -56,8 +56,6 @@ namespace prefabs {
 	entity_handle create_cyan_charge(const logic_step, vec2 pos, int charges = 30);
 
 	entity_handle create_sample_backpack(const logic_step, vec2 pos);
-
-	entity_handle create_character_crosshair(const logic_step);
 	
 	entity_handle create_sample_complete_character(
 		const logic_step,

@@ -5,7 +5,7 @@
 
 enum class test_scene_flavour {
 	// GEN INTROSPECTOR enum class test_scene_flavour
-	WANDERING_PIXELS,
+	WANDERING_PIXELS = 1,
 	STRONG_LAMP,
 	HAVE_A_PLEASANT,
 	STREET,
@@ -35,7 +35,6 @@ enum class test_scene_flavour {
 	ELECTRIC_MISSILE,
 
 	SAMPLE_BACKPACK,
-	CROSSHAIR,
 	CROSSHAIR_RECOIL_BODY,
 	ZERO_TARGET,
 	URBAN_CYAN_MACHETE,

@@ -380,7 +380,6 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/components/animation_component.cpp"
 	"src/game/components/car_component.cpp"
 	"src/game/components/container_component.cpp"
-	"src/game/components/crosshair_component.cpp"
 	"src/game/components/missile_component.cpp"
 	"src/game/components/fixtures_component.cpp"
 	"src/game/components/item_component.cpp"

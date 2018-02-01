@@ -72,7 +72,6 @@ void illuminated_rendering(
 	const auto camera = in.eye.cone;
 
 	const auto& cosmos = viewed_character.get_cosmos();
-	const auto viewed_crosshair = viewed_character[child_entity_name::CHARACTER_CROSSHAIR];
 	const auto& interp = in.audiovisuals.get<interpolation_system>();
 	const auto& particles = in.audiovisuals.get<particles_simulation_system>();
 	const auto& wandering_pixels = in.audiovisuals.get<wandering_pixels_system>();
@@ -167,7 +166,6 @@ void illuminated_rendering(
 					},
 					[](const vec2, const vec2) {},
 					interp,
-					viewed_crosshair,
 					viewed_character
 				});
 			}
@@ -290,27 +288,12 @@ void illuminated_rendering(
 		cosmos.for_each(
 			processing_subjects::WITH_SENTIENCE,
 			[&](const const_entity_handle it) {
-				if (const auto s = it.find<components::sentience>()) {
-					auto transform = it.get_viewing_transform(interp, true);
-
-					const auto crosshair_entity = cosmos[s->character_crosshair];
-
-					if (crosshair_entity
-						&& crosshair_entity.template has<components::crosshair>()
-						&& cosmos[crosshair_entity.template get<components::crosshair>().recoil_entity]
-						&& crosshair_entity.template find<invariants::sprite>()
-					) {
-						transform.pos += components::crosshair::calculate_aiming_displacement(
-							crosshair_entity, 
-							false
-						);
-					
-						draw_renderable(
-							crosshair_entity.template get<invariants::sprite>(),
-							{ output, game_images, global_time_seconds },
-							transform
-						);
-					}
+				if (const auto s = it.find_crosshair_def()) {
+					draw_renderable(
+						s->appearance,
+						{ output, game_images, global_time_seconds },
+						it.get_world_crosshair_transform(interp)
+					);
 				}
 			}
 		);
@@ -342,7 +325,6 @@ void illuminated_rendering(
 			},
 
 			interp, 
-			viewed_crosshair, 
 			viewed_character
 		});
 

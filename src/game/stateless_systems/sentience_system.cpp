@@ -151,7 +151,7 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 			const auto shake_mult = (sentience.shake_for_ms - (now - sentience.time_of_last_shake).in_milliseconds(delta)) / 400.f;
 
 			if (shake_mult > 0.f) {
-				if (const auto owning_crosshair_recoil = subject[child_entity_name::CHARACTER_CROSSHAIR][child_entity_name::CROSSHAIR_RECOIL_BODY]) {
+				if (const auto owning_crosshair_recoil = subject.find_crosshair_recoil()) {
 					auto rng = cosmos.get_rng_for(subject);
 
 					owning_crosshair_recoil.get<components::rigid_body>().apply_impulse(
@@ -242,7 +242,7 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 	{
 		const auto punched = subject;
 
-		if (const auto owning_crosshair_recoil = punched[child_entity_name::CHARACTER_CROSSHAIR][child_entity_name::CROSSHAIR_RECOIL_BODY]) {
+		if (const auto owning_crosshair_recoil = punched.find_crosshair_recoil()) {
 			const auto recoil_physics = owning_crosshair_recoil.get<components::rigid_body>();
 
 			recoil_physics.apply_angular_impulse((h.point_of_impact - punched.get_logic_transform().pos).cross(h.impact_velocity) / 10000000.f * 3.f / 25.f);
@@ -469,14 +469,10 @@ void sentience_system::rotate_towards_crosshairs_and_driven_vehicles(const logic
 			
 			std::optional<float> requested_angle;
 
-			if (const auto crosshair = cosmos[sentience.character_crosshair]) {
+			if (const auto crosshair = subject.find_crosshair()) {
 				const auto items = subject.get_wielded_items();
 
-				const auto target_transform = [&](){
-					auto t = subject_transform;
-					t.pos += components::crosshair::calculate_aiming_displacement(crosshair, false);
-					return t;
-				}();
+				const auto target_transform = subject.get_world_crosshair_transform();
 
 				{
 					const auto diff = target_transform.pos - subject_transform.pos;

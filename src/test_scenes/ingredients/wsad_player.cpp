@@ -118,17 +118,26 @@ namespace test_flavours {
 			movement.standard_linear_damping = 20.f;
 
 			meta.set(movement);
-		}
 
-		{
-			auto& meta = get_test_flavour(flavours, test_scene_flavour::CROSSHAIR);
-			add_sprite(meta, logicals, assets::game_image_id::TEST_CROSSHAIR);
+			{
+				invariants::crosshair crosshair; 
+				crosshair.appearance.set(assets::game_image_id::TEST_CROSSHAIR, logicals);
+
+				meta.set(crosshair);
+			}
+
+			{
+				components::crosshair crosshair;
+				crosshair.base_offset.set(-20, 0);
+				crosshair.sensitivity.set(3, 3);
+				crosshair.base_offset_bound.set(1920, 1080);
+				meta.set(crosshair);
+			}
 		}
 
 		{
 			auto& meta = get_test_flavour(flavours, test_scene_flavour::CROSSHAIR_RECOIL_BODY);
 			add_sprite(meta, logicals, assets::game_image_id::TEST_CROSSHAIR);
-
 			add_shape_invariant_from_renderable(meta, logicals);
 
 			invariants::rigid_body body;
@@ -150,7 +159,7 @@ namespace test_flavours {
 }
 
 namespace ingredients {
-	void add_character(const all_logical_assets& metas, const entity_handle e, const entity_handle crosshair_entity) {
+	void add_character(const all_logical_assets& metas, const entity_handle e) {
 		e += components::animation();
 		e += components::driver();
 		e += components::item_slot_transfers();
@@ -164,8 +173,6 @@ namespace ingredients {
 		//force_joint.force_towards_chased_entity = 92000.f;
 		//force_joint.distance_when_force_easing_starts = 10.f;
 		//force_joint.power_of_force_easing_multiplier = 2.f;
-
-		e.map_child_entity(child_entity_name::CHARACTER_CROSSHAIR, crosshair_entity);
 	}
 }
 
@@ -182,30 +189,13 @@ namespace prefabs {
 		
 		const auto& metas = step.get_logical_assets();
 
-		const auto crosshair = create_character_crosshair(step);
-
-		ingredients::add_character(metas, character, crosshair);
+		ingredients::add_character(metas, character);
 
 		character.set_logic_transform(spawn_transform);
 		character.add_standard_components(step);
 
-		// LOG("Character mass: %x", character.get<components::rigid_body>().get_mass());
-		return character;
-	}
-
-	entity_handle create_character_crosshair(const logic_step step) {
-		auto& world = step.get_cosmos();
-		auto root = create_test_scene_entity(world, test_scene_flavour::CROSSHAIR);
 		auto recoil = create_test_scene_entity(world, test_scene_flavour::CROSSHAIR_RECOIL_BODY);
 		auto zero_target = create_test_scene_entity(world, test_scene_flavour::ZERO_TARGET);
-
-		{
-			auto& crosshair = root += components::crosshair();
-
-			crosshair.base_offset.set(-20, 0);
-			crosshair.sensitivity.set(3, 3);
-			crosshair.base_offset_bound.set(1920, 1080);
-		}
 
 		{
 			auto& force_joint = recoil += components::force_joint();
@@ -219,11 +209,11 @@ namespace prefabs {
 			force_joint.divide_transform_mode = true;
 		}
 
-		root.map_child_entity(child_entity_name::CROSSHAIR_RECOIL_BODY, recoil);
-		
+		character.map_child_entity(child_entity_name::CROSSHAIR_RECOIL_BODY, recoil);
+
 		recoil.add_standard_components(step);
 		zero_target.add_standard_components(step);
-
-		return root;
+		// LOG("Character mass: %x", character.get<components::rigid_body>().get_mass());
+		return character;
 	}
 }

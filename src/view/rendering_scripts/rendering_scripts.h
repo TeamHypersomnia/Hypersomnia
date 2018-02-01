@@ -51,7 +51,6 @@ struct draw_crosshair_lasers_input {
 	const std::function<void(vec2, vec2, rgba)> callback;
 	const std::function<void(vec2, vec2)> dashed_line_callback;
 	const interpolation_system& interpolation;
-	const const_entity_handle crosshair;
 	const const_entity_handle character;
 };
 

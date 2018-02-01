@@ -32,14 +32,8 @@ protected:
 		if (self.alive()) {
 			switch (n) {
 				case child_entity_name::CROSSHAIR_RECOIL_BODY:
-				if (const auto crosshair = self.template find<components::crosshair>()) {
+				if (const auto crosshair = self.find_crosshair()) {
 					result = std::addressof(crosshair->recoil_entity);
-				}
-				break;
-
-				case child_entity_name::CHARACTER_CROSSHAIR:
-				if (const auto sentience = self.template find<components::sentience>()) {
-					result = std::addressof(sentience->character_crosshair);
 				}
 				break;
 
