@@ -65,16 +65,6 @@ namespace test_flavours {
 		}
 
 		{
-			auto& meta = get_test_flavour(flavours, test_scene_flavour::GROUND);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::GROUND;
-
-				meta.set(render_def);
-			}
-		}
-		{
 			auto& meta = get_test_flavour(flavours, test_scene_flavour::STREET);
 
 			{

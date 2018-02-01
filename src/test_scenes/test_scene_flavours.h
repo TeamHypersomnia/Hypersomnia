@@ -5,11 +5,9 @@
 
 enum class test_scene_flavour {
 	// GEN INTROSPECTOR enum class test_scene_flavour
-	PARTICLE_STREAM = 1,
 	WANDERING_PIXELS,
 	STRONG_LAMP,
 	HAVE_A_PLEASANT,
-	GROUND,
 	STREET,
 	ROAD_DIRT,
 	ROAD,
