@@ -14,6 +14,7 @@
 #include "game/transcendental/entity_id.h"
 #include "game/organization/all_components_declaration.h"
 
+#include "game/detail/entity_handle_mixins/misc_mixin.h"
 #include "game/detail/entity_handle_mixins/inventory_mixin.h"
 #include "game/detail/entity_handle_mixins/physics_mixin.h"
 #include "game/detail/entity_handle_mixins/relations_mixin.h"
@@ -30,6 +31,7 @@ class component_synchronizer;
 
 template <bool is_const>
 class basic_entity_handle :
+	public misc_mixin<basic_entity_handle<is_const>>,
 	public inventory_mixin<basic_entity_handle<is_const>>,
 	public physics_mixin<basic_entity_handle<is_const>>,
 	public relations_mixin<basic_entity_handle<is_const>>,
@@ -37,6 +39,8 @@ class basic_entity_handle :
 {
 	using owner_reference = maybe_const_ref_t<is_const, cosmos>;
 	using entity_ptr = maybe_const_ptr_t<is_const, cosmic_entity>;
+
+	using misc_base = misc_mixin<basic_entity_handle<is_const>>;
 
 	entity_ptr ptr;
 	owner_reference owner;
@@ -75,6 +79,7 @@ public:
 	using this_handle_type = basic_entity_handle<is_const>;
 	using const_type = basic_entity_handle<!is_const>;
 	friend const_type;
+	using misc_base::get_flavour;
 
 	basic_entity_handle(
 		owner_reference owner, 
@@ -213,11 +218,6 @@ public:
 	template <bool C = !is_const, class = std::enable_if_t<C>>
 	entity_handle add_standard_components(const logic_step step) const;
 
-	bool get_flag(const entity_flag f) const {
-		ensure(alive());
-		return get<invariants::flags>().values.test(f);
-	}
-
 	template <class F>
 	void for_each_component(F&& callback) const {
 		ensure(alive());
@@ -226,30 +226,6 @@ public:
 			std::forward<F>(callback),
 		   	pool_provider()
 		);
-	}
-	
-	entity_guid get_guid() const {
-		return get_cosmos().get_solvable().get_guid(raw_id);
-	}
-
-	const auto& get_flavour() const {
-		return get<components::flavour>().get_flavour();
-	}
-
-	auto get_flavour_id() const {
-		return get<components::flavour>().get_flavour_id();
-	}
-
-	const auto& get_name() const {
-		return get<components::flavour>().get_name();
-	}
-
-	bool sentient_and_unconscious() const {
-		if (const auto sentience = find<components::sentience>()) {
-			return !sentience->is_conscious();
-		}
-
-		return false;
 	}
 };
 

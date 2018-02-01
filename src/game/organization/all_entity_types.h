@@ -41,7 +41,7 @@ struct crosshair_recoil {
 
 };
 
-struct crosshair {
+struct sprite_decoration {
 
 };
 
