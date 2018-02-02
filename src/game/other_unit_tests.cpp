@@ -4,7 +4,7 @@
 #include "game/transcendental/cosmos.h"
 #include "augs/misc/trivially_copyable_tuple.h"
 
-#if !STATICALLY_ALLOCATE_ENTITIES_NUM
+#if !STATICALLY_ALLOCATE_ENTITIES
 
 TEST_CASE("Ca TriviallyCopyableTuple") {
 	struct a {

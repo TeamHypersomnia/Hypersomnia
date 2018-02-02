@@ -53,14 +53,14 @@ namespace prefabs {
 	entity_handle create_crate(const logic_step step, const components::transform pos) {
 		const auto crate = create_test_scene_entity(step.get_cosmos(), test_scene_flavour::CRATE);
 		crate.set_logic_transform(pos);
-		crate.add_standard_components(step);
+		crate.construct_entity(step);
 		return crate;
 	}
 
 	entity_handle create_brick_wall(const logic_step step, const components::transform pos) {
 		const auto crate = create_test_scene_entity(step.get_cosmos(), test_scene_flavour::BRICK_WALL);
 		crate.set_logic_transform(pos);
-		crate.add_standard_components(step);
+		crate.construct_entity(step);
 		return crate;
 	}
 }

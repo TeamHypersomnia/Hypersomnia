@@ -25,40 +25,33 @@ std::optional<tree_of_npo_node_input> tree_of_npo_node_input::create_default_for
 	return std::nullopt;
 }
 
-bool tree_of_npo_cache::cache::is_constructed() const {
-	return constructed;
+tree_of_npo_cache::cache* tree_of_npo_cache::find_cache(const unversioned_entity_id id) {
+	return mapped_or_nullptr(per_entity_cache, id);
 }
 
-tree_of_npo_cache::cache& tree_of_npo_cache::get_cache(const unversioned_entity_id id) {
-	return per_entity_cache[linear_cache_key(id)];
-}
-
-const tree_of_npo_cache::cache& tree_of_npo_cache::get_cache(const unversioned_entity_id id) const {
-	return per_entity_cache[linear_cache_key(id)];
+const tree_of_npo_cache::cache* tree_of_npo_cache::find_cache(const unversioned_entity_id id) const {
+	return mapped_or_nullptr(per_entity_cache, id);
 }
 
 tree_of_npo_cache::tree& tree_of_npo_cache::get_tree(const cache& c) {
 	return trees[static_cast<size_t>(c.type)];
 }
 
-bool tree_of_npo_cache::is_tree_node_constructed_for(const entity_id id) const {
-	return get_cache(id).is_constructed();
-}
-
 void tree_of_npo_cache::destroy_cache_of(const const_entity_handle handle) {
-	auto& cache = get_cache(handle.get_id());
-
-	if (cache.is_constructed()) {
-		if (cache.tree_proxy_id != -1) {
-			get_tree(cache).nodes.DestroyProxy(cache.tree_proxy_id);
+	if (const auto cache = find_cache(handle.get_id())) {
+		if (cache->tree_proxy_id != -1) {
+			get_tree(*cache).nodes.DestroyProxy(cache->tree_proxy_id);
 		}
 
-		cache = tree_of_npo_cache::cache();
+		per_entity_cache.erase(id);
 	}
 }
 
 void tree_of_npo_cache::infer_cache_for(const const_entity_handle handle) {
-	auto& cache = get_cache(handle.get_id());
+	const auto it = per_entity_cache.try_emplace(handle.get_id());
+
+	auto& cache = (*it.first).second;
+	const bool cache_existed = !it.second;
 
 	if (const auto tree_node = tree_of_npo_node_input::create_default_for(handle)) {
 		const auto data = *tree_node;
@@ -69,7 +62,7 @@ void tree_of_npo_cache::infer_cache_for(const const_entity_handle handle) {
 		new_b2AABB.upperBound = b2Vec2(new_aabb.right_bottom());
 
 		const bool full_rebuild = 
-			!cache.is_constructed()
+			!cache_existed
 			|| cache.type != data.type
 		;
 		
@@ -83,8 +76,6 @@ void tree_of_npo_cache::infer_cache_for(const const_entity_handle handle) {
 			new_node.payload = handle.get_id().operator unversioned_entity_id();
 
 			cache.tree_proxy_id = get_tree(cache).nodes.CreateProxy(new_b2AABB, new_node.bytes);
-
-			cache.constructed = true;
 		}
 		else {
 			const vec2 displacement = new_aabb.get_center() - cache.recorded_aabb.get_center();
@@ -95,5 +86,5 @@ void tree_of_npo_cache::infer_cache_for(const const_entity_handle handle) {
 }
 
 void tree_of_npo_cache::reserve_caches_for_entities(const size_t n) {
-	per_entity_cache.resize(n);
+	per_entity_cache.reserve(n);
 }

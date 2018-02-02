@@ -9,21 +9,7 @@ game_image_cache::game_image_cache(
 	const game_image_meta& meta
 ) { 
 	original_image_size = loadables.read_source_image_size();
-
-	const auto box_size = vec2(original_image_size) / 2;
-
-	// TODO: use ltrb
-
-	b2PolygonShape poly_shape;
-	poly_shape.SetAsBox(box_size.x, box_size.y);
-
-	convex_partitioned_shape::convex_poly new_convex_polygon;
-
-	for (int i = 0; i < poly_shape.GetVertexCount(); ++i) {
-		new_convex_polygon.push_back(vec2(poly_shape.GetVertex(i)));
-	}
-
-	partitioned_shape.add_convex_polygon(new_convex_polygon);
+	partitioned_shape.make_box(vec2(original_image_size));
 }
 
 loaded_game_image_caches::loaded_game_image_caches(

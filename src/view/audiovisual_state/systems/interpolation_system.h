@@ -10,6 +10,8 @@
 
 #include "game/components/transform_component.h"
 
+#include "view/audiovisual_state/systems/audiovisual_cache_common.h"
+
 struct interpolation_settings;
 
 class interpolation_system {
@@ -29,7 +31,7 @@ public:
 		}
 	};
 
-	std::vector<cache> per_entity_cache;
+	audiovisual_cache_map<cache> per_entity_cache;
 
 	void integrate_interpolated_transforms(
 		const interpolation_settings&,

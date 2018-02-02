@@ -103,7 +103,7 @@ void trace_system::spawn_finishing_traces_for_deleted_entities(const logic_step 
 			copied_trace.chosen_lengthening_duration_ms /= 4;
 			copied_trace.is_it_a_finishing_trace = true;
 
-			finishing_trace.add_standard_components(step);
+			finishing_trace.construct_entity(step);
 
 			messages::interpolation_correction_request request;
 			request.subject = finishing_trace;

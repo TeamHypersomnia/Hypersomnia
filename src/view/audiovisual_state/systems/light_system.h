@@ -7,6 +7,8 @@
 #include "augs/math/camera_cone.h"
 
 #include "view/viewables/all_viewables_declarations.h"
+#include "view/audiovisual_state/systems/audiovisual_cache_common.h"
+
 #include "game/detail/visible_entities.h"
 
 class interpolation_system;
@@ -46,7 +48,7 @@ public:
 		cache();
 	};
 
-	std::vector<cache> per_entity_cache;
+	audiovisual_cache_map<cache> per_entity_cache;
 
 	void reserve_caches_for_entities(const size_t);
 	void clear();

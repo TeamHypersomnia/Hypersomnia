@@ -1,6 +1,7 @@
 #pragma once
 #include "game/transcendental/cosmic_types.h"
 #include "game/organization/all_components_declaration.h"
+#include "game/transcendental/entity_type.h"
 
 struct entity_guid;
 struct child_entity_id;

@@ -15,7 +15,7 @@
 
 #include "game/transcendental/cosmic_profiler.h"
 
-#if STATICALLY_ALLOCATE_ENTITIES_NUM
+#if STATICALLY_ALLOCATE_ENTITIES
 #include "game/organization/all_component_includes.h"
 #else
 #include "game/organization/all_components_declaration.h"
@@ -71,7 +71,7 @@ public:
 	void set_steps_per_second(const unsigned steps_per_second);
 
 	entity_guid get_guid(const entity_id) const;
-	entity_id make_versioned(const unversioned_entity_id) const;
+	entity_id to_versioned(const unversioned_entity_id) const;
 
 	entity_id get_entity_id_by(const entity_guid) const;
 
@@ -176,8 +176,8 @@ inline std::unordered_set<entity_id> cosmos_solvable::get_entities_by_flavour_id
 	return inferred.name.get_entities_by_flavour_id(id);
 }
 
-inline entity_id cosmos_solvable::make_versioned(const unversioned_entity_id id) const {
-	return get_entity_pool().make_versioned(id);
+inline entity_id cosmos_solvable::to_versioned(const unversioned_entity_id id) const {
+	return get_entity_pool().to_versioned(id);
 }
 
 inline std::size_t cosmos_solvable::get_entities_count() const {

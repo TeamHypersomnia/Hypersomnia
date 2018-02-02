@@ -176,16 +176,6 @@ entity_id cosmos_solvable::allocate_next_entity() {
 
 void cosmos_solvable::free_entity(const entity_id id) {
 	clear_guid(id);
-	
-	auto& agg = get_aggregate(id);
-
-	agg.for_each_dynamic_component(
-		[&](auto& c) {
-			agg.remove<std::decay_t<decltype(c)>>(*this);
-		},
-		*this
-	);
-	
 	get_entity_pool().free(id);
 }
 

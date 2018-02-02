@@ -1,11 +1,6 @@
 #pragma once
 #include "game/transcendental/entity_handle_declaration.h"
 
-namespace augs {
-	template <template <class T> class make_pool_id, class... components>
-	class component_aggregate; 
-}
-
 class cosmic_delta;
 class cosmic;
 
@@ -20,6 +15,9 @@ class cosmos_solvable_access {
 
 	template <bool is_const>
 	friend class basic_entity_handle;
+
+	template <class>
+	friend class iterated_entity_handle;
 
 	cosmos_solvable_access() {}
 };

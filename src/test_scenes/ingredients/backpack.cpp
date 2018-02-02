@@ -50,7 +50,7 @@ namespace prefabs {
 		const auto backpack = create_test_scene_entity(world, test_scene_flavour::SAMPLE_BACKPACK);
 		
 		backpack.set_logic_transform(pos);
-		backpack.add_standard_components(step);
+		backpack.construct_entity(step);
 		return backpack;
 	}
 }

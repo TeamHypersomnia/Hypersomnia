@@ -14,13 +14,9 @@
 #include "game/transcendental/entity_id.h"
 #include "game/organization/all_components_declaration.h"
 
-#include "game/detail/entity_handle_mixins/misc_mixin.h"
-#include "game/detail/entity_handle_mixins/inventory_mixin.h"
-#include "game/detail/entity_handle_mixins/physics_mixin.h"
-#include "game/detail/entity_handle_mixins/relations_mixin.h"
-#include "game/detail/entity_handle_mixins/spatial_properties_mixin.h"
-
+#include "game/detail/entity_handle_mixins/all_handle_mixins.h"
 #include "game/enums/entity_flag.h"
+
 #include "game/transcendental/step_declaration.h"
 #include "game/components/flags_component.h"
 
@@ -38,9 +34,10 @@ class basic_entity_handle :
 	public spatial_properties_mixin<basic_entity_handle<is_const>>
 {
 	using owner_reference = maybe_const_ref_t<is_const, cosmos>;
-	using entity_ptr = maybe_const_ptr_t<is_const, cosmic_entity>;
+	using entity_ptr = maybe_const_ptr_t<is_const, void>;
 
-	using misc_base = misc_mixin<basic_entity_handle<is_const>>;
+	using this_handle_type = basic_entity_handle<is_const>;
+	using misc_base = misc_mixin<this_handle_type>;
 
 	entity_ptr ptr;
 	owner_reference owner;
@@ -60,10 +57,6 @@ class basic_entity_handle :
 		return owner.get_solvable({});
 	}
 
-	auto& agg() const {
-		return *ptr;
-	}
-
 private:
 	basic_entity_handle(
 		const entity_ptr ptr,
@@ -76,7 +69,6 @@ private:
 	{}
 
 public:
-	using this_handle_type = basic_entity_handle<is_const>;
 	using const_type = basic_entity_handle<!is_const>;
 	friend const_type;
 	using misc_base::get_flavour;
@@ -103,10 +95,6 @@ public:
 		return raw_id;
 	}
 
-	void set_id(const entity_id id) {
-		raw_id = id;
-	}
-
 	bool alive() const {
 		return ptr != nullptr;
 	}
@@ -124,7 +112,7 @@ public:
 	}
 
 	bool operator!=(const entity_id id) const {
-		return raw_id != id;
+		return !operator==(id);
 	}
 
 	template <bool C = !is_const, class = std::enable_if_t<C>>
@@ -172,24 +160,6 @@ public:
 		}
 	}
 
-	template <class T, bool C = !is_const, class = std::enable_if_t<C>>
-	void add(const T& c) const {
-		check_component_type<T>();
-		ensure(alive());
-		
-		if constexpr(is_synchronized_v<T>) {
-			agg().template add<T>(c, pool_provider());
-		}
-		else {
-			agg().template add<T>(c, pool_provider());
-		}
-	}
-
-	template <class T, bool C = !is_const, class = std::enable_if_t<C>>
-	void add(const component_synchronizer<this_handle_type, T>& c) const {
-		add(c.get_raw_component());
-	}
-
 	template<class T>
 	decltype(auto) find() const {
 		if constexpr(is_invariant_v<T>) {
@@ -209,14 +179,8 @@ public:
 		}
 	}
 
-	template <class component, bool C = !is_const, class = std::enable_if_t<C>>
-	decltype(auto) operator+=(const component& c) const {
-		add(c);
-		return get<component>();
-	}
-
 	template <bool C = !is_const, class = std::enable_if_t<C>>
-	entity_handle add_standard_components(const logic_step step) const;
+	entity_handle construct_entity(const logic_step step) const;
 
 	template <class F>
 	void for_each_component(F&& callback) const {
@@ -231,7 +195,3 @@ public:
 
 std::ostream& operator<<(std::ostream& out, const entity_handle&x);
 std::ostream& operator<<(std::ostream& out, const const_entity_handle &x);
-
-inline auto linear_cache_key(const const_entity_handle handle) {
-	return linear_cache_key(handle.get_id());
-}

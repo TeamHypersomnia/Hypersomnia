@@ -6,7 +6,7 @@
 #include "augs/misc/enum/enum_array.h"
 
 #include "game/enums/tree_of_npo_type.h"
-#include "game/transcendental/entity_id.h"
+#include "game/inferred_caches/inferred_cache_common.h"
 #include "game/transcendental/entity_handle_declaration.h"
 
 #include "augs/math/camera_cone.h"
@@ -47,19 +47,17 @@ class tree_of_npo_cache {
 	augs::enum_array<tree, tree_of_npo_type> trees;
 
 	struct cache {
-		bool constructed = false;
 		tree_of_npo_type type = tree_of_npo_type::COUNT;
 		ltrb recorded_aabb;
 		int tree_proxy_id = -1;
-
-		bool is_constructed() const;
 	};
 
-	std::vector<cache> per_entity_cache;
+	inferred_cache_map<cache> per_entity_cache;
 
 	tree& get_tree(const cache&);
-	cache& get_cache(const unversioned_entity_id);
-	const cache& get_cache(const unversioned_entity_id) const;
+
+	cache* find_cache(const unversioned_entity_id);
+	const cache* find_cache(const unversioned_entity_id) const;
 
 public:
 	template <class F>
@@ -98,6 +96,4 @@ public:
 
 	void infer_cache_for(const const_entity_handle);
 	void destroy_cache_of(const const_entity_handle);
-
-	bool is_tree_node_constructed_for(const entity_id) const;
 };

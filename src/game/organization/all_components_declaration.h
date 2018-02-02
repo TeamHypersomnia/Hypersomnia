@@ -66,7 +66,6 @@ template <template <class...> class List>
 using component_list_t = List<
 	components::guid,
 	components::flavour,
-	components::processing,
 	components::animation,
 	components::behaviour_tree,
 	components::crosshair,

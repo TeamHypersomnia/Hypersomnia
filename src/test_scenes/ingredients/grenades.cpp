@@ -163,7 +163,7 @@ namespace prefabs {
 		const auto grenade_entity = create_test_scene_entity(world, test_scene_flavour::FORCE_GRENADE);
 
 		grenade_entity.set_logic_transform(pos);
-		grenade_entity.add_standard_components(step);
+		grenade_entity.construct_entity(step);
 
 		return grenade_entity;
 	}
@@ -173,7 +173,7 @@ namespace prefabs {
 		const auto grenade_entity = create_test_scene_entity(world, test_scene_flavour::PED_GRENADE);
 
 		grenade_entity.set_logic_transform(pos);
-		grenade_entity.add_standard_components(step);
+		grenade_entity.construct_entity(step);
 
 		return grenade_entity;
 	}
@@ -183,7 +183,7 @@ namespace prefabs {
 		const auto grenade_entity = create_test_scene_entity(world, test_scene_flavour::INTERFERENCE_GRENADE);
 		
 		grenade_entity.set_logic_transform(pos);
-		grenade_entity.add_standard_components(step);
+		grenade_entity.construct_entity(step);
 
 		return grenade_entity;
 	}

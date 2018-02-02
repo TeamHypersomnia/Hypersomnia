@@ -22,70 +22,70 @@
 #include "augs/templates/dynamic_cast_dispatch.h"
 #include "augs/build_settings/setting_debug_physics_world_cache_copy.h"
 
-rigid_body_cache& physics_world_cache::get_rigid_body_cache(const entity_id id) {
-	return rigid_body_caches[linear_cache_key(id)];
+rigid_body_cache* physics_world_cache::find_rigid_body_cache(const entity_id id) {
+	return mapped_or_nullptr(rigid_body_caches, id);
 }
 
-colliders_cache& physics_world_cache::get_colliders_cache(const entity_id id) {
-	return colliders_caches[linear_cache_key(id)];
+colliders_cache* physics_world_cache::find_colliders_cache(const entity_id id) {
+	return mapped_or_nullptr(colliders_caches, id);
 }
 
-joint_cache& physics_world_cache::get_joint_cache(const entity_id id) {
-	return joint_caches[linear_cache_key(id)];
+joint_cache* physics_world_cache::find_joint_cache(const entity_id id) {
+	return mapped_or_nullptr(joint_caches, id);
 }
 
-const rigid_body_cache& physics_world_cache::get_rigid_body_cache(const entity_id id) const {
-	return rigid_body_caches[linear_cache_key(id)];
+const rigid_body_cache* physics_world_cache::find_rigid_body_cache(const entity_id id) const {
+	return mapped_or_nullptr(rigid_body_caches, id);
 }
 
-const colliders_cache& physics_world_cache::get_colliders_cache(const entity_id id) const {
-	return colliders_caches[linear_cache_key(id)];
+const colliders_cache* physics_world_cache::find_colliders_cache(const entity_id id) const {
+	return mapped_or_nullptr(colliders_caches, id);
 }
 
-const joint_cache& physics_world_cache::get_joint_cache(const entity_id id) const {
-	return joint_caches[linear_cache_key(id)];
+const joint_cache* physics_world_cache::find_joint_cache(const entity_id id) const {
+	return mapped_or_nullptr(joint_caches, id);
 }
 
 void physics_world_cache::destroy_rigid_body_cache(const const_entity_handle handle) {
 	const auto& cosmos = handle.get_cosmos();
 
-	if (auto& cache = get_rigid_body_cache(handle); cache.is_constructed()) {
-		for (const b2Fixture* f = cache.body->m_fixtureList; f != nullptr; f = f->m_next) {
-			get_colliders_cache(cosmos[f->GetUserData()]) = colliders_cache();
+	if (auto cache = find_rigid_body_cache(handle)) {
+		for (const b2Fixture* f = cache->body->m_fixtureList; f != nullptr; f = f->m_next) {
+			colliders_caches.erase(cosmos[f->GetUserData()]);
 		}
 
-		for (const b2JointEdge* j = cache.body->m_jointList; j != nullptr; j = j->next) {
-			get_joint_cache(cosmos[j->joint->GetUserData()]) = joint_cache();
+		for (const b2JointEdge* j = cache->body->m_jointList; j != nullptr; j = j->next) {
+			joint_caches.erase(cosmos[j->joint->GetUserData()]);
 		}
 
 		// no need to manually destroy each fixture and joint of the body,
 		// Box2D will take care of that after just deleting the body.
 
-		b2world->DestroyBody(cache.body);
+		b2world->DestroyBody(cache->body);
 
-		cache = rigid_body_cache();
+		rigid_body_caches.erase(handle);
 	}
 }
 
 void physics_world_cache::destroy_colliders_cache(const const_entity_handle handle) {
 	const auto& cosmos = handle.get_cosmos();
 
-	if (auto& cache = get_colliders_cache(handle); cache.is_constructed()) {
-		auto& owner_body_cache = get_rigid_body_cache(cosmos[cache.connection.owner]);
+	if (auto cache = find_colliders_cache(handle)) {
+		auto owner_body_cache = find_rigid_body_cache(cosmos[cache->connection.owner]);
 
-		for (b2Fixture* f : cache.all_fixtures_in_component) {
-			owner_body_cache.body->DestroyFixture(f);
+		for (b2Fixture* f : cache->all_fixtures_in_component) {
+			owner_body_cache->body->DestroyFixture(f);
 		}
 
-		cache = colliders_cache();
+		colliders_caches.erase(handle);
 	}
 }
 
 void physics_world_cache::destroy_joint_cache(const const_entity_handle handle) {
-	if (auto& cache = get_joint_cache(handle); cache.is_constructed()) {
-		b2world->DestroyJoint(cache.joint);
+	if (auto cache = find_joint_cache(handle)) {
+		b2world->DestroyJoint(cache->joint);
 
-		cache = joint_cache();
+		joint_caches.erase(handle);
 	}
 }
 
@@ -96,7 +96,7 @@ void physics_world_cache::destroy_cache_of(const const_entity_handle handle) {
 }
 
 void physics_world_cache::infer_rigid_body_existence(const const_entity_handle handle) {
-	if (auto& cache = get_rigid_body_cache(handle); cache.is_constructed()) {
+	if (const auto cache = find_rigid_body_cache(handle)) {
 		return;
 	}
 
@@ -104,7 +104,10 @@ void physics_world_cache::infer_rigid_body_existence(const const_entity_handle h
 }
 
 void physics_world_cache::infer_cache_for_rigid_body(const const_entity_handle handle) {
-	if (auto& cache = get_rigid_body_cache(handle); cache.is_constructed()) {
+	const auto it = rigid_body_caches.try_emplace(handle.get_id());
+	auto& cache = (*it.first).second;
+
+	if (/* cache_existed */ !it.second) {
 
 		/* 
 			Invariant/component guaranteed to exist because it must have once been created from an existing def,
@@ -164,7 +167,6 @@ void physics_world_cache::infer_cache_for_rigid_body(const const_entity_handle h
 	if (const auto rigid_body = handle.find<components::rigid_body>()) {
 		const auto& physics_def = handle.get<invariants::rigid_body>();
 		const auto& physics_data = rigid_body.get_raw_component();
-		auto& cache = get_rigid_body_cache(handle);
 
 		b2BodyDef def;
 
@@ -243,9 +245,10 @@ void physics_world_cache::infer_cache_for_colliders(const const_entity_handle ha
 		return *calculated_connection;
 	};
 
-	if (auto& cache = get_colliders_cache(handle); 
-		cache.is_constructed()
-	) {
+	const auto it = colliders_caches.try_emplace(handle.get_id());
+	auto& cache = (*it.first).second;
+
+	if (/* cache_existed */ !it.second) {
 		bool needs_full_rebuild = false;
 		
 		if (get_calculated_connection() != cache.connection) {
@@ -304,9 +307,9 @@ void physics_world_cache::infer_cache_for_colliders(const const_entity_handle ha
 
 		infer_rigid_body_existence(new_owner);
 
-		auto& body_cache = get_rigid_body_cache(new_owner);
+		const auto body_cache = find_rigid_body_cache(new_owner);
 
-		if (!body_cache.is_constructed()) {
+		if (!body_cache) {
 			/* 
 				No body to attach to. 
 				Might happen if we once implement it that the logic deactivates bodies for some reason. 
@@ -317,7 +320,7 @@ void physics_world_cache::infer_cache_for_colliders(const const_entity_handle ha
 		}
 
 		const auto si = handle.get_cosmos().get_si();
-		auto& owner_b2Body = *body_cache.body.get();
+		auto& owner_b2Body = *body_cache->body.get();
 		const auto& colliders_data = *colliders;
 
 		b2FixtureDef fixdef;
@@ -331,7 +334,6 @@ void physics_world_cache::infer_cache_for_colliders(const const_entity_handle ha
 		fixdef.isSensor = colliders_data.sensor;
 		fixdef.filter = colliders_data.filter;
 
-		auto& cache = get_colliders_cache(handle);
 		cache.connection = get_calculated_connection();
 
 		auto& all_fixtures_in_component = cache.all_fixtures_in_component;
@@ -397,14 +399,14 @@ void physics_world_cache::infer_cache_for_joint(const const_entity_handle handle
 		const components::motor_joint joint_data = motor_joint.get_raw_component();
 
 		const auto si = handle.get_cosmos().get_si();
-		auto& cache = get_joint_cache(handle);
+		auto cache = find_joint_cache(handle);
 		
-		ensure(nullptr == cache.joint);
+		ensure(nullptr == cache->joint);
 
 		b2MotorJointDef def;
 		def.userData = handle.get_id();
-		def.bodyA = get_rigid_body_cache(cosmos[joint_data.target_bodies[0]]).body;
-		def.bodyB = get_rigid_body_cache(cosmos[joint_data.target_bodies[1]]).body;
+		def.bodyA = find_rigid_body_cache(cosmos[joint_data.target_bodies[0]]).body;
+		def.bodyB = find_rigid_body_cache(cosmos[joint_data.target_bodies[1]]).body;
 		def.collideConnected = joint_data.collide_connected;
 		def.linearOffset = b2Vec2(si.get_meters(joint_data.linear_offset));
 		def.angularOffset = DEG_TO_RAD<float> * joint_data.angular_offset;
@@ -412,15 +414,15 @@ void physics_world_cache::infer_cache_for_joint(const const_entity_handle handle
 		def.maxTorque = joint_data.max_torque;
 		def.correctionFactor = joint_data.correction_factor;
 
-		cache.joint = b2world->CreateJoint(&def);
+		cache->joint = b2world->CreateJoint(&def);
 	}
 #endif
 }
 
 void physics_world_cache::reserve_caches_for_entities(const size_t n) {
-	rigid_body_caches.resize(n);
-	colliders_caches.resize(n);
-	joint_caches.resize(n);
+	rigid_body_caches.reserve(n);
+	colliders_caches.reserve(n);
+	joint_caches.reserve(n);
 }
 
 b2Fixture_index_in_component physics_world_cache::get_index_in_component(
@@ -432,25 +434,9 @@ b2Fixture_index_in_component physics_world_cache::get_index_in_component(
 	b2Fixture_index_in_component result;
 	result.convex_shape_index = static_cast<std::size_t>(f->index_in_component);
 
-	ensure_eq(f, colliders_caches[linear_cache_key(handle)].all_fixtures_in_component[result.convex_shape_index].get());
+	ensure_eq(f, find_colliders_cache(handle.get_id())->all_fixtures_in_component[result.convex_shape_index].get());
 
 	return result;
-
-	//const auto this_cache_id = linear_cache_key(handle);
-	//const auto& cache = colliders_caches[this_cache_id];
-	//const auto& all = cache.all_fixtures_in_component;
-	//
-	//const auto it = std::find(all.begin(), all.end(), f);
-	//
-	//if (it != all.end()) {
-	//	b2Fixture_index_in_component result;
-	//	result.convex_shape_index = it - all.begin();
-	//
-	//	return result;
-	//}
-	//
-	//ensure(false);
-	//return b2Fixture_index_in_component();
 }
 
 physics_world_cache::physics_world_cache() :
@@ -708,9 +694,6 @@ physics_world_cache& physics_world_cache::operator=(const physics_world_cache& b
 	migrate_pointer(migrated_b2World.m_bodyList);
 
 	for (b2Body* b = migrated_b2World.m_bodyList; b; b = b->m_next) {
-		//auto rigid_body_cache_id = linear_cache_key(b->m_userData);
-		//rigid_body_caches[rigid_body_cache_id].body = b;
-
 		migrate_pointer(b->m_fixtureList);
 		migrate_pointer(b->m_prev);
 		migrate_pointer(b->m_next);
@@ -758,37 +741,41 @@ physics_world_cache& physics_world_cache::operator=(const physics_world_cache& b
 		inside the loop that migrated all bodies and fixtures.
 	*/
 
+	ensure(false);
+
 	colliders_caches.clear();
 	rigid_body_caches.clear();
 	joint_caches.clear();
+#if TODO
 
-	colliders_caches.resize(b.colliders_caches.size());
-	rigid_body_caches.resize(b.rigid_body_caches.size());
-	joint_caches.resize(b.joint_caches.size());
+	colliders_caches.reserve(b.colliders_caches.size());
+	rigid_body_caches.reserve(b.rigid_body_caches.size());
+	joint_caches.reserve(b.joint_caches.size());
 
-	for (std::size_t i = 0; i < colliders_caches.size(); ++i) {
-		for (auto& f : b.colliders_caches[i].all_fixtures_in_component) {
+	for (auto& it : colliders_caches) {
+		for (auto& f : b.colliders_caches[it.first].all_fixtures_in_component) {
 			colliders_caches[i].all_fixtures_in_component.emplace_back(
 				reinterpret_cast<b2Fixture*>(pointer_migrations.at(reinterpret_cast<const void*>(f.get())))
 			);
 		}
 	}
 	
-	for (std::size_t i = 0; i < rigid_body_caches.size(); ++i) {
-		const auto b_body = b.rigid_body_caches[i].body.get();
+	for (auto& it : b.rigid_body_caches) {
+		const auto b_body = b.rigid_body_caches[it.first].body.get();
 
 		if (b_body) {
 			rigid_body_caches[i].body = reinterpret_cast<b2Body*>(pointer_migrations.at(reinterpret_cast<const void*>(b_body)));
 		}
 	}
 
-	for (std::size_t i = 0; i < joint_caches.size(); ++i) {
-		const auto b_joint = b.joint_caches[i].joint.get();
+	for (auto& it : joint_caches) {
+		const auto b_joint = b.joint_caches[it.first].joint.get();
 
 		if (b_joint) {
 			joint_caches[i].joint = reinterpret_cast<b2Joint*>(pointer_migrations.at(reinterpret_cast<const void*>(b_joint)));
 		}
 	}
+#endif
 
 #if DEBUG_PHYSICS_SYSTEM_COPY
 	// ensure that all allocations have been migrated

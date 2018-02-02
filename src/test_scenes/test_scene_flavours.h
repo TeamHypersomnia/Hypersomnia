@@ -54,9 +54,9 @@ auto create_test_scene_entity(C& cosm, const test_scene_flavour id) {
 	return cosmic::create_entity(cosm, to_entity_flavour_id(id));
 }
 
-template <class C>
-auto& get_test_flavour(C& container, const test_scene_flavour id) {
-	return container.get_flavour(to_entity_flavour_id(id));
+template <class entity_type, class C>
+auto& get_test_flavour(C& cosm, const test_scene_flavour id) {
+	return cosm.get_flavour<entity_type>(to_entity_flavour_id<entity_type>(id));
 }
 
 namespace test_flavours {

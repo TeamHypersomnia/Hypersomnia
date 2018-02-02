@@ -48,7 +48,7 @@ namespace prefabs {
 		machete += components::sender();
 
 		machete.set_logic_transform(pos);
-		machete.add_standard_components(step);
+		machete.construct_entity(step);
 
 		return machete;
 	}

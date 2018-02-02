@@ -91,12 +91,22 @@ class component_synchronizer<E, components::rigid_body>
 {
 	friend class ::physics_world_cache;
 
-	auto& get_cache() const {
-		return handle.get_cosmos().get_solvable_inferred({}).physics.get_rigid_body_cache(handle);
+	auto find_cache() const {
+		return handle.get_cosmos().get_solvable_inferred({}).physics.find_rigid_body_cache(handle);
 	}
 
-	auto& body() const {
-		return *get_cache().body.get(); 
+	auto find_body() const {
+		if (auto cache = find_cache()) {
+			return cache->body;
+		}
+
+		return nullptr;
+	}
+
+	auto body() const {
+		auto maybe_body = find_body();
+		ensure(maybe_body != nullptr);
+		return *maybe_body;
 	}
 
 	template <class T>
@@ -224,7 +234,7 @@ bool component_synchronizer<E, components::rigid_body>::test_point(const vec2 v)
 
 template <class E>
 bool component_synchronizer<E, components::rigid_body>::is_constructed() const {
-	return get_cache().is_constructed();
+	return find_cache() != nullptr;
 }
 
 template <class E>
@@ -277,11 +287,9 @@ void component_synchronizer<E, components::rigid_body>::set_velocity(const vec2 
 	auto& v = get_raw_component({}).velocity;
 	v = to_meters(pixels);
 
-	if (!is_constructed()) {
-		return;
+	if (const auto body = find_body()) {
+		body->SetLinearVelocity(b2Vec2(v));
 	}
-
-	get_cache().body->SetLinearVelocity(b2Vec2(v));
 }
 
 template <class E>
@@ -289,11 +297,9 @@ void component_synchronizer<E, components::rigid_body>::set_angular_velocity(con
 	auto& v = get_raw_component({}).angular_velocity;
 	v = DEG_TO_RAD<float> * degrees;
 
-	if (!is_constructed()) {
-		return;
+	if (const auto body = find_body()) {
+		body->SetAngularVelocity(v);
 	}
-
-	get_cache().body->SetAngularVelocity(v);
 }
 
 template <class E>
@@ -307,35 +313,34 @@ void component_synchronizer<E, components::rigid_body>::apply_force(
 	const vec2 center_offset, 
 	const bool wake
 ) const {
-	ensure(is_constructed());
-
 	if (pixels.is_epsilon(2.f)) {
 		return;
 	}
 
-	const auto body = get_cache().body.get();
-	auto& data = get_raw_component({});
+	if (const auto body = find_body()) {
+		auto& data = get_raw_component({});
 
-	const auto force = handle.get_cosmos().get_fixed_delta().in_seconds() * to_meters(pixels);
-	const auto location = vec2(body->GetWorldCenter() + b2Vec2(to_meters(center_offset)));
+		const auto force = handle.get_cosmos().get_fixed_delta().in_seconds() * to_meters(pixels);
+		const auto location = vec2(body->GetWorldCenter() + b2Vec2(to_meters(center_offset)));
 
-	body->ApplyLinearImpulse(
-		b2Vec2(force), 
-		b2Vec2(location), 
-		wake
-	);
+		body->ApplyLinearImpulse(
+			b2Vec2(force), 
+			b2Vec2(location), 
+			wake
+		);
 
-	data.angular_velocity = body->GetAngularVelocity();
-	data.velocity = body->GetLinearVelocity();
+		data.angular_velocity = body->GetAngularVelocity();
+		data.velocity = body->GetLinearVelocity();
 
-	if (DEBUG_DRAWING.draw_forces && force.non_zero()) {
-		/* 
-			Warning: bodies like player's crosshair recoil might have their forces drawn 
-			in the vicinity of (0, 0) coordinates instead of near wherever the player is.
-		*/
+		if (DEBUG_DRAWING.draw_forces && force.non_zero()) {
+			/* 
+				Warning: bodies like player's crosshair recoil might have their forces drawn 
+				in the vicinity of (0, 0) coordinates instead of near wherever the player is.
+			*/
 
-		auto& lines = DEBUG_LOGIC_STEP_LINES;
-		lines.emplace_back(green, to_pixels(location) + to_pixels(force), to_pixels(location));
+			auto& lines = DEBUG_LOGIC_STEP_LINES;
+			lines.emplace_back(green, to_pixels(location) + to_pixels(force), to_pixels(location));
+		}
 	}
 }
 
@@ -350,40 +355,39 @@ void component_synchronizer<E, components::rigid_body>::apply_impulse(
 	const vec2 center_offset, 
 	const bool wake
 ) const {
-	ensure(is_constructed());
-
 	if (pixels.is_epsilon(2.f)) {
 		return;
 	}
 
-	auto body = get_cache().body.get();
-	auto& data = get_raw_component({});
+	if (auto body = find_body()) {
+		auto& data = get_raw_component({});
 
-	const vec2 force = to_meters(pixels);
-	const vec2 location = vec2(body->GetWorldCenter()) + to_meters(center_offset);
+		const vec2 force = to_meters(pixels);
+		const vec2 location = vec2(body->GetWorldCenter()) + to_meters(center_offset);
 
-	body->ApplyLinearImpulse(b2Vec2(force), b2Vec2(location), true);
-	data.angular_velocity = body->GetAngularVelocity();
-	data.velocity = body->GetLinearVelocity();
+		body->ApplyLinearImpulse(b2Vec2(force), b2Vec2(location), true);
+		data.angular_velocity = body->GetAngularVelocity();
+		data.velocity = body->GetLinearVelocity();
 
-	if (DEBUG_DRAWING.draw_forces && pixels.non_zero()) {
-		/* 
-			Warning: bodies like player's crosshair recoil might have their forces drawn 
-			in the vicinity of (0, 0) coordinates instead of near wherever the player is.
-		*/
+		if (DEBUG_DRAWING.draw_forces && pixels.non_zero()) {
+			/* 
+				Warning: bodies like player's crosshair recoil might have their forces drawn 
+				in the vicinity of (0, 0) coordinates instead of near wherever the player is.
+			*/
 
-		DEBUG_PERSISTENT_LINES.emplace_back(green, to_pixels(location) + pixels, to_pixels(location));
+			DEBUG_PERSISTENT_LINES.emplace_back(green, to_pixels(location) + pixels, to_pixels(location));
+		}
 	}
 }
 
 template <class E>
 void component_synchronizer<E, components::rigid_body>::apply_angular_impulse(const float imp) const {
-	ensure(is_constructed());
-	auto& body = *get_cache().body.get();
-	auto& data = get_raw_component({});
+	if (auto body = find_body()) {
+		auto& data = get_raw_component({});
 
-	body.ApplyAngularImpulse(imp, true);
-	data.angular_velocity = body.GetAngularVelocity();
+		body->ApplyAngularImpulse(imp, true);
+		data.angular_velocity = body->GetAngularVelocity();
+	}
 }
 
 
@@ -401,21 +405,17 @@ void component_synchronizer<E, components::rigid_body>::set_transform(const comp
 		transform
 	);
 
-	if (!is_constructed()) {
-		return;
-	}
+	if (const auto body = find_body()) {
+		if (!(body->m_xf == data.transform)) {
+			body->m_xf = data.transform;
+			body->m_sweep = data.sweep;
 
-	auto& body = *get_cache().body.get();
+			auto* broadPhase = &body->m_world->m_contactManager.m_broadPhase;
 
-	if (!(body.m_xf == data.transform)) {
-		body.m_xf = data.transform;
-		body.m_sweep = data.sweep;
-
-		auto* broadPhase = &body.m_world->m_contactManager.m_broadPhase;
-
-		for (auto* f = body.m_fixtureList; f; f = f->m_next)
-		{
-			f->Synchronize(broadPhase, body.m_xf, body.m_xf);
+			for (auto* f = body->m_fixtureList; f; f = f->m_next)
+			{
+				f->Synchronize(broadPhase, body->m_xf, body->m_xf);
+			}
 		}
 	}	
 }

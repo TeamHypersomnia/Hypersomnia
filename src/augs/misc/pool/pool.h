@@ -126,7 +126,7 @@ namespace augs {
 		}
 
 		bool free(const unversioned_id_type key) {
-			return free(make_versioned(key));
+			return free(to_versioned(key));
 		}
 
 		bool free(const key_type key) {
@@ -164,11 +164,21 @@ namespace augs {
 			return true;
 		}
 
-		key_type make_versioned(const unversioned_id_type key) const {
+		key_type to_versioned(const unversioned_id_type key) const {
 			key_type ver;
 			ver.indirection_index = key.indirection_index;
 			ver.version = indirectors[key.indirection_index].version;
 			return ver;
+		}
+
+		key_type to_id(const size_type real_object_index) const {
+			const auto& s = slots[real_object_index];
+
+			key_type id;
+			id.indirection_index = s.pointing_indirector;
+			id.version = indirectors[s.pointing_indirector].version;
+
+			return id;
 		}
 
 	private:

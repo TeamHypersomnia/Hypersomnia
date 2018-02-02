@@ -75,11 +75,6 @@ public:
 		return self.get_cosmos().get_solvable().get_guid(self.get_id());
 	}
 
-	const auto& get_flavour() const {
-		const auto self = *static_cast<const E*>(this);
-		return self.template get<components::flavour>().get_flavour();
-	}
-
 	auto get_flavour_id() const {
 		const auto self = *static_cast<const E*>(this);
 		return self.template get<components::flavour>().get_flavour_id();

@@ -30,14 +30,6 @@ public:
 	using base::get_raw_component;
 	using base::synchronizer_base;
 
-	const entity_flavour& get_flavour() const{
-		return handle.get_cosmos().get_flavour(get_flavour_id());
-	}
-
-	const entity_name_type& get_name() const{
-		return get_flavour().name;
-	}
-
 	entity_flavour_id get_flavour_id() const{
 		return get_raw_component().flavour_id;
 	}

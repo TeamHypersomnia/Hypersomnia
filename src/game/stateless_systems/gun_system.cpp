@@ -180,7 +180,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 							);
 
 							round_entity.set_logic_transform(muzzle_transform);
-							round_entity.add_standard_components(step);
+							round_entity.construct_entity(step);
 
 							auto& sender = round_entity.get<components::sender>();
 							sender.set(gun_entity);
@@ -253,7 +253,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					while (charges--) {
 						if (const auto round_flavour = single_bullet_or_pellet_stack.get<invariants::catridge>().round_flavour) {
 							const auto round_entity = cosmic::create_entity(cosmos, round_flavour);
-							round_entity.add_standard_components(step);
+							round_entity.construct_entity(step);
 
 							auto& sender = round_entity.get<components::sender>();
 							sender.set(gun_entity);
@@ -288,7 +288,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 					if (const auto shell_flavour = single_bullet_or_pellet_stack.get<invariants::catridge>().shell_flavour) {
 						const auto shell_entity = cosmic::create_entity(cosmos, shell_flavour);
-						shell_entity.add_standard_components(step);
+						shell_entity.construct_entity(step);
 
 						auto rng = cosmos.get_rng_for(shell_entity);
 

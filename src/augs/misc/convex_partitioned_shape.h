@@ -21,6 +21,18 @@ struct basic_convex_partitioned_shape {
 	augs::constant_size_vector<convex_poly, convex_polys_count> convex_polys;
 	// END GEN INTROSPECTOR
 
+	void make_box(const vec2 size) {
+		auto hx = size.x / 2;
+		auto hy = size.y / 2
+
+		convex_poly new_poly;
+		new_poly[0].set(-hx, -hy);
+		new_poly[1].set( hx, -hy);
+		new_poly[2].set( hx,  hy);
+		new_poly[3].set(-hx,  hy);
+		convex_polys.push_back(new_poly);
+	}
+
 	void offset_vertices(const transform transform) {
 		for (auto& c : convex_polys) {
 			for (auto& v : c) {

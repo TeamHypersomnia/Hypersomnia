@@ -56,6 +56,9 @@ struct AAA {
 
 struct tests_of_traits {
 	// static_assert(invariant_index_v<invariants::gun> == 0);
+	static_assert(is_class_const_v<const_entity_handle>);
+	static_assert(!is_class_const_v<iterated_entity_handle<controlled_character>>);
+	static_assert(is_class_const_v<const_iterated_entity_handle<controlled_character>>);
 
 	static_assert(!can_reserve_caches_v<flavour_id_cache>);
 	static_assert(can_reserve_caches_v<physics_world_cache>);

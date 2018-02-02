@@ -30,7 +30,7 @@ std::ostream& operator<<(std::ostream& out, const const_entity_handle &x) {
 
 template <bool C>
 template <bool, class>
-entity_handle basic_entity_handle<C>::add_standard_components(const logic_step step) const {
+entity_handle basic_entity_handle<C>::construct_entity(const logic_step step) const {
 	if (dead()) {
 		return *this;
 	}
@@ -39,13 +39,6 @@ entity_handle basic_entity_handle<C>::add_standard_components(const logic_step s
 		rigid_body.get_special().dropped_or_created_cooldown.set(200, get_cosmos().get_timestamp());
 	}
 
-	if ((has<components::missile>() || find<invariants::explosive>()) && !has<components::sender>()) {
-		add(components::sender());
-	}
-
-	const auto default_processing = components::processing::get_default(*this);
-	get<components::processing>().set_basic_categories(default_processing.processing_subject_categories);
-	
 	cosmic::infer_caches_for(*this);
 
 	if (const auto interpolation = find<components::interpolation>()) {
@@ -61,4 +54,4 @@ entity_handle basic_entity_handle<C>::add_standard_components(const logic_step s
 }
 
 // explicit instantiation
-template entity_handle basic_entity_handle<false>::add_standard_components<true, void>(const logic_step) const;
+template entity_handle basic_entity_handle<false>::construct_entity<true, void>(const logic_step) const;

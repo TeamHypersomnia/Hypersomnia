@@ -133,12 +133,23 @@ namespace test_flavours {
 				crosshair.base_offset_bound.set(1920, 1080);
 				meta.set(crosshair);
 			}
+
+			{
+				components::attitude attitude;
+
+				attitude.parties = party_category::METROPOLIS_CITIZEN;
+				attitude.hostile_parties = party_category::RESISTANCE_CITIZEN;
+
+				meta.set(attitude);
+			}
 		}
 
 		{
 			auto& meta = get_test_flavour(flavours, test_scene_flavour::CROSSHAIR_RECOIL_BODY);
 			add_sprite(meta, logicals, assets::game_image_id::TEST_CROSSHAIR);
-			add_shape_invariant_from_renderable(meta, logicals);
+
+			invariants::shape_polygon shape_polygon_def;
+			shape_polygon_def.shape.make_box({ 33, 33 });
 
 			invariants::rigid_body body;
 			invariants::fixtures fixtures_invariant;
@@ -154,25 +165,11 @@ namespace test_flavours {
 
 			meta.set(body);
 			meta.set(fixtures_invariant);
+
+			components::force_joint force_joint;
+			force_joint.divide_transform_mode = true;
+			meta.set(force_joint);
 		}
-	}
-}
-
-namespace ingredients {
-	void add_character(const all_logical_assets& metas, const entity_handle e) {
-		e += components::animation();
-		e += components::driver();
-		e += components::item_slot_transfers();
-		
-		auto& attitude = e += components::attitude();
-		const auto processing = e += components::processing();
-
-		attitude.parties = party_category::METROPOLIS_CITIZEN;
-		attitude.hostile_parties = party_category::RESISTANCE_CITIZEN;
-
-		//force_joint.force_towards_chased_entity = 92000.f;
-		//force_joint.distance_when_force_easing_starts = 10.f;
-		//force_joint.power_of_force_easing_multiplier = 2.f;
 	}
 }
 
@@ -187,32 +184,18 @@ namespace prefabs {
 
 		const auto character = create_test_scene_entity(world, test_scene_flavour::PLAYER);
 		
-		const auto& metas = step.get_logical_assets();
-
-		ingredients::add_character(metas, character);
-
 		character.set_logic_transform(spawn_transform);
-		character.add_standard_components(step);
+		character.construct_entity(step);
 
 		auto recoil = create_test_scene_entity(world, test_scene_flavour::CROSSHAIR_RECOIL_BODY);
-		auto zero_target = create_test_scene_entity(world, test_scene_flavour::ZERO_TARGET);
 
 		{
-			auto& force_joint = recoil += components::force_joint();
-			zero_target += components::transform();
-
-			force_joint.chased_entity = zero_target;
-			//force_joint.consider_rotation = false;
-			//force_joint.distance_when_force_easing_starts = 10.f;
-			//force_joint.force_towards_chased_entity = 1000.f;
-			//force_joint.power_of_force_easing_multiplier = 1.f;
-			force_joint.divide_transform_mode = true;
 		}
 
 		character.map_child_entity(child_entity_name::CROSSHAIR_RECOIL_BODY, recoil);
 
-		recoil.add_standard_components(step);
-		zero_target.add_standard_components(step);
+		recoil.construct_entity(step);
+		zero_target.construct_entity(step);
 		// LOG("Character mass: %x", character.get<components::rigid_body>().get_mass());
 		return character;
 	}

@@ -7,6 +7,8 @@
 #include "game/transcendental/entity_id_declaration.h"
 #include "game/transcendental/cosmic_types.h"
 
+#include "game/organization/all_entity_types.h"
+
 struct entity_guid {
 	using guid_value_type = unsigned;
 	// GEN INTROSPECTOR struct entity_guid
@@ -25,32 +27,67 @@ struct entity_guid {
 	}
 };
 
+struct unversioned_entity_id : unversioned_entity_id_base {
+	using base = unversioned_entity_id_base;
+	// GEN INTROSPECTOR struct unversioned_entity_id
+	// INTROSPECT BASE unversioned_entity_id_base
+	entity_type_id type_id;
+	// END GEN INTROSPECTOR
+
+	unversioned_entity_id(
+		const base id = base(),
+		entity_type_id type_id = entity_type_id()
+	) : 
+		base(id)
+		type_id(type_id)
+	{}
+};
+
+struct entity_id : entity_id_base {
+	using base = entity_id_base;
+	// GEN INTROSPECTOR struct entity_id
+	// INTROSPECT BASE entity_id_base
+	entity_type_id type_id;
+	// END GEN INTROSPECTOR
+
+	entity_id(
+		const base id = base(),
+		entity_type_id type_id = entity_type_id()
+	) : 
+		base(id)
+		type_id(type_id)
+	{}
+}; 
+
 struct child_entity_id : entity_id {
 	// GEN INTROSPECTOR struct child_entity_id
 	// INTROSPECT BASE entity_id
 	// END GEN INTROSPECTOR
 
 	using base = entity_id;
-	using entity_id::entity_id;
-	child_entity_id(entity_id id = entity_id()) : entity_id(id) {}
+	child_entity_id(const entity_id id = entity_id()) : entity_id(id) {}
 	using base::operator unversioned_entity_id;
 };
-
-inline auto linear_cache_key(const entity_id id) {
-	ensure(id.is_set());
-	return id.indirection_index;
-}
-
-inline auto linear_cache_key(const unversioned_entity_id id) {
-	ensure(id.is_set());
-	return id.indirection_index;
-}
 
 namespace std {
 	template <>
 	struct hash<entity_guid> {
 		std::size_t operator()(const entity_guid v) const {
 			return hash<entity_guid::guid_value_type>()(v.value);
+		}
+	};
+
+	template <>
+	struct hash<entity_id> {
+		std::size_t operator()(const entity_id v) const {
+			return augs::simple_two_hash(static_cast<entity_id::base&>(v), v.type_id);
+		}
+	};
+
+	template <>
+	struct hash<unversioned_entity_id> {
+		std::size_t operator()(const unversioned_entity_id v) const {
+			return augs::simple_two_hash(static_cast<unversioned_entity_id::base&>(v), v.type_id);
 		}
 	};
 }

@@ -145,3 +145,7 @@ summary: Just a hidden scratchpad.
 - let meta.lua have convex partitions and let author just define those convex partitions for simplicity
 	- let invariants::polygon have vector to not make things overly complicated
 	- polygon component makes triangulation anyway
+- audiovisual/inferred caches and reservation
+	- if it so happens that std::unordered_map is too slow, we can always introduce constant-sized vectors/maps under STATICALLY_ALLOCATE_ENTITIES
+		- each type will specify how many to statically allocate 
+		- we can also make caches only for the types that fulfill given conditions of invariants/components existence

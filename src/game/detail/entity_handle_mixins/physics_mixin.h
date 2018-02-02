@@ -93,10 +93,8 @@ std::optional<colliders_connection> physics_mixin<E>::find_colliders_connection(
 	const auto self = *static_cast<const E*>(this);
 	auto& cosmos = self.get_cosmos();
 
-	if (const auto& cache = cosmos.get_solvable_inferred().physics.get_colliders_cache(self);
-		cache.is_constructed()
-	) {
-		return cache.connection;
+	if (const auto cache = cosmos.get_solvable_inferred().physics.find_colliders_cache(self)) {
+		return cache->connection;
 	}
 
 	return calculate_colliders_connection();

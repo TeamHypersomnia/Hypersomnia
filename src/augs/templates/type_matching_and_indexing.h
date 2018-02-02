@@ -150,8 +150,14 @@ constexpr size_t index_in_list_v = sequence_element_v<0, typename filter_types_i
 template <class S, class... Types>
 constexpr size_t index_in_v = index_in_list_v<S, type_list<Types...>>;
 
+template <template <class...> class Criterion, class List>
+constexpr size_t count_matches_in_list_v = filter_types_in_list<Criterion, List>::indices::size();
+
 template <class S, class List>
-constexpr size_t count_occurences_in_list_v = filter_types_in_list<bind_types<std::is_same, S>::template type, List>::indices::size();
+constexpr size_t count_occurences_in_list_v = count_matches_in_list_v<bind_types<std::is_same>, List>;
 
 template <class S, class... Types>
 constexpr size_t count_occurences_in_v = count_occurences_in_list_v<S, type_list<Types...>>;
+
+template <template <class...> class Criterion, class List>
+constexpr size_t match_exists_in_list_v = count_matches_in_list_v<Criterion, S> > 0;

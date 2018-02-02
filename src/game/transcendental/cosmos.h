@@ -40,7 +40,7 @@ auto subscript_handle_getter(C& cosm, const child_entity_id id) {
 
 template <class C>
 auto subscript_handle_getter(C& cosm, const unversioned_entity_id id) {
-	return basic_entity_handle<std::is_const_v<C>>{ cosm, cosm.make_versioned(id) };
+	return basic_entity_handle<std::is_const_v<C>>{ cosm, cosm.to_versioned(id) };
 }
 
 template <class C>
@@ -213,8 +213,8 @@ public:
 		return get_solvable().get_fixed_delta();
 	}
 
-	auto make_versioned(const unversioned_entity_id id) const {
-		return get_solvable().make_versioned(id);
+	auto to_versioned(const unversioned_entity_id id) const {
+		return get_solvable().to_versioned(id);
 	}
 };
 

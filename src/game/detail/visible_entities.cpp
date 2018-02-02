@@ -76,7 +76,7 @@ void visible_entities::acquire_physical(const visible_entities_query input) {
 			camera_aabb.get_vertices<real32>(),
 			filters::renderable_query(),
 			[&](const b2Fixture* const fix, auto, auto) {
-				unique_from_physics.insert(cosmos.make_versioned(get_entity_that_owns(fix)));
+				unique_from_physics.insert(cosmos.to_versioned(get_entity_that_owns(fix)));
 				return callback_result::CONTINUE;
 			}
 		);
@@ -87,7 +87,7 @@ void visible_entities::acquire_physical(const visible_entities_query input) {
 			camera,
 			input.screen_size,
 			[&](const b2Fixture* const fix) {
-				unique_from_physics.insert(cosmos.make_versioned(get_entity_that_owns(fix)));
+				unique_from_physics.insert(cosmos.to_versioned(get_entity_that_owns(fix)));
 				return callback_result::CONTINUE;
 			}
 		);
@@ -105,7 +105,7 @@ void visible_entities::acquire_non_physical(const visible_entities_query input) 
 	
 	tree_of_npo.for_each_in_camera(
 		[&](const unversioned_entity_id id) {
-			const auto versioned_id = cosmos.make_versioned(id);
+			const auto versioned_id = cosmos.to_versioned(id);
 			
 			if (input.exact) {
 				if (const auto aabb = cosmos[versioned_id].find_aabb(); 
@@ -115,7 +115,7 @@ void visible_entities::acquire_non_physical(const visible_entities_query input) 
 				}
 			}
 
-			all.push_back(cosmos.make_versioned(id));
+			all.push_back(cosmos.to_versioned(id));
 		},
 		camera,
 		input.screen_size,

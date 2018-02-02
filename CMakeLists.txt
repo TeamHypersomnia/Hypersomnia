@@ -84,7 +84,7 @@ set(HYPERSOMNIA_LOCAL_FILES_DIR "cache/usr/")
 #	- Compilation might be longer due to component includes needed everywhere
 #	- Can't tweak maximum number of entities at runtime
 #	- Even empty game worlds occupy as much space as those filled to the maximum
-set(STATICALLY_ALLOCATE_ENTITIES_NUM "5000" CACHE STRING "Statically allocate entities in the cosmos")
+set(STATICALLY_ALLOCATE_ENTITIES "1" CACHE STRING "Statically allocate entities in the cosmos")
 
 # If this variable is positive, the cosmos common will use a statically allocated number
 # of entity flavours, drastically improving access performance. Might be very useful for a sever application.
@@ -358,7 +358,6 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/view/audiovisual_state/systems/flying_number_indicator_system.cpp"
 	"src/view/audiovisual_state/systems/wandering_pixels_system.cpp"
 	"src/game/inferred_caches/physics_world_cache.cpp"
-	"src/game/inferred_caches/processing_lists_cache.cpp"
 	"src/game/inferred_caches/tree_of_npo_cache.cpp"
 	"src/game/stateless_systems/destruction_system.cpp"
 	"src/game/stateless_systems/hand_fuse_system.cpp"
@@ -368,7 +367,6 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/stateless_systems/sound_existence_system.cpp"
 	"src/game/other_unit_tests.cpp"
 	"src/game/transcendental/cosmic_entropy.cpp"
-	"src/game/components/processing_component.cpp"
 	"src/game/transcendental/cosmic_movie_director.cpp"
 	"src/game/transcendental/data_living_one_step.cpp"
 	"src/game/transcendental/entity_handle.cpp"
@@ -1009,7 +1007,7 @@ endif()
 
 # We configure additional user options for building the game.
 
-add_definitions(-DSTATICALLY_ALLOCATE_ENTITIES_NUM=${STATICALLY_ALLOCATE_ENTITIES_NUM})
+add_definitions(-DSTATICALLY_ALLOCATE_ENTITIES=${STATICALLY_ALLOCATE_ENTITIES})
 add_definitions(-DSTATICALLY_ALLOCATE_ENTITY_FLAVOURS_NUM=${STATICALLY_ALLOCATE_ENTITY_FLAVOURS_NUM})
 add_definitions(-DSTATICALLY_ALLOCATE_ASSETS=${STATICALLY_ALLOCATE_ASSETS})
 add_definitions(-DSTATICALLY_ALLOCATE_BAKED_FONTS=${STATICALLY_ALLOCATE_BAKED_FONTS})

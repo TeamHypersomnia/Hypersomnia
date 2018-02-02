@@ -6,7 +6,7 @@
 
 #include "augs/templates/propagate_const.h"
 
-#include "game/transcendental/entity_id.h"
+#include "game/inferred_caches/inferred_cache_common.h"
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/transcendental/step_declaration.h"
 
@@ -54,10 +54,9 @@ struct physics_raycast_output {
 };
 
 class physics_world_cache {
-	std::vector<rigid_body_cache> rigid_body_caches;
-	std::vector<colliders_cache> colliders_caches;
-	std::vector<joint_cache> joint_caches;
-
+	inferred_cache_map<rigid_body_cache> rigid_body_caches;
+	inferred_cache_map<colliders_cache> colliders_caches;
+	inferred_cache_map<joint_cache> joint_caches;
 
 public:
 	// b2World on stack causes a stack overflow due to a large stack allocator, therefore it must be dynamically allocated
@@ -150,13 +149,13 @@ public:
 
 	mutable std::size_t ray_casts_since_last_step = 0u;
 
-	rigid_body_cache& get_rigid_body_cache(const entity_id);
-	colliders_cache& get_colliders_cache(const entity_id);
-	joint_cache& get_joint_cache(const entity_id);
+	rigid_body_cache* find_rigid_body_cache(const entity_id);
+	colliders_cache* find_colliders_cache(const entity_id);
+	joint_cache* find_joint_cache(const entity_id);
 
-	const rigid_body_cache& get_rigid_body_cache(const entity_id) const;
-	const colliders_cache& get_colliders_cache(const entity_id) const;
-	const joint_cache& get_joint_cache(const entity_id) const;
+	const rigid_body_cache* find_rigid_body_cache(const entity_id) const;
+	const colliders_cache* find_colliders_cache(const entity_id) const;
+	const joint_cache* find_joint_cache(const entity_id) const;
 
 	b2World& get_b2world() {
 		return *b2world.get();

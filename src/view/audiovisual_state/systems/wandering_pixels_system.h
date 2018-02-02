@@ -13,6 +13,7 @@
 
 #include "game/components/wandering_pixels_component.h"
 #include "game/components/sprite_component.h"
+#include "view/audiovisual_state/systems/audiovisual_cache_common.h"
 
 struct visible_entities;
 
@@ -39,8 +40,7 @@ public:
 
 	double global_time_seconds = 0.0;
 
-	//std::vector<cache> per_entity_cache;
-	std::unordered_map<entity_id, cache> per_entity_cache;
+	audiovisual_cache_map<cache> per_entity_cache;
 
 	cache& get_cache(const const_entity_handle);
 	const cache& get_cache(const const_entity_handle) const;

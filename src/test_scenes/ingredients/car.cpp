@@ -195,7 +195,7 @@ namespace prefabs {
 					engine_physical  += fixtures_invariant;
 
 					engine_physical.get<components::fixtures>().set_owner_body(front);
-					engine_physical.add_standard_components(step);
+					engine_physical.construct_entity(step);
 
 					this_engine_transform = engine_physical.get_logic_transform();
 				}
@@ -226,7 +226,7 @@ namespace prefabs {
 					auto& existence = engine_particles.get<components::particles_existence>();
 					existence.distribute_within_segment_of_length = engine_size.y;
 
-					engine_particles.add_standard_components(step);
+					engine_particles.construct_entity(step);
 
 					if (i == 0) {
 						front.get<components::car>().acceleration_engine[i].physical = engine_physical;
@@ -255,16 +255,16 @@ namespace prefabs {
 				in.delete_entity_after_effect_lifetime = false;
 
 				const auto engine_sound = in.create_sound_effect_entity(step, spawn_transform, front);
-				engine_sound.add_standard_components(step);
+				engine_sound.construct_entity(step);
 
 				front.get<components::car>().engine_sound = engine_sound;
 				components::sound_existence::deactivate(engine_sound);
 			}
 		}
 
-		front.add_standard_components(step);
-		left_wheel.add_standard_components(step);
-		interior.add_standard_components(step);
+		front.construct_entity(step);
+		left_wheel.construct_entity(step);
+		interior.construct_entity(step);
 
 		return front;
 	}
