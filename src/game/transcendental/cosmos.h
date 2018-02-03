@@ -49,6 +49,25 @@ auto subscript_handle_getter(C& cosm, const entity_guid guid) {
 }
 
 class cosmos {
+	template <class C, class I, class... Types, class F>
+	static decltype(auto) on_flavour_impl(
+		C& self,
+		const I flavour_id,
+		F callback	
+	) {
+		using candidate_types = typename decltype(id)::matching_types; 
+		const auto dynamic_type_index = flavour_id.type_id.get_index();
+
+		return get_by_dynamic_id<candidate_types>(
+			all_entity_types(),
+			flavour_id.type_id,
+			[](auto t) {
+				using flavour_type = decltype(c);
+				return callback(self.get_flavour<flavour_type>(flavour_id.raw_id));
+			}
+		);
+	}
+
 	cosmos_common common;
 	private_cosmos_solvable solvable;
 
@@ -134,8 +153,17 @@ public:
 	const cosmos_common_significant& get_common_significant() const;
 	const common_assets& get_common_assets() const;
 
-	const entity_flavour& get_flavour(const entity_flavour_id flavour_id) const {
-		return get_common_significant().all_entity_flavours.get_flavour(flavour_id);
+	template <class entity_type>
+	const auto& get_flavour(const raw_entity_flavour_id id) const {
+		using flavours_type = entity_flavours<entity_type>;
+
+		const auto& all_flavours = self.get_common_significant().all_entity_flavours;
+		return std::get<flavours_type>(all_flavours).get_flavour(id);
+	}
+
+	template <class I, class... Types, class F>
+	decltype(auto) on_flavour(const I flavour_id, F&& callback) const {
+		return on_flavour_impl(*this, flavour_id, std::forward<F>(callback));
 	}
 
 	template <class id_type>

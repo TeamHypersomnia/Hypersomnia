@@ -15,7 +15,7 @@ namespace components {
 		static constexpr bool is_synchronized = true;
 
 		// GEN INTROSPECTOR struct components::flavour
-		entity_flavour_id flavour_id = 0u;
+		raw_entity_flavour_id raw_id = raw_entity_flavour_id();
 		// END GEN INTROSPECTOR
 	};
 }
@@ -30,7 +30,7 @@ public:
 	using base::get_raw_component;
 	using base::synchronizer_base;
 
-	entity_flavour_id get_flavour_id() const{
-		return get_raw_component().flavour_id;
+	auto get_raw_id() const{
+		return get_raw_component().raw_id();
 	}
 };

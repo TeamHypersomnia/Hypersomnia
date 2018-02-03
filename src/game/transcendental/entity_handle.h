@@ -3,6 +3,7 @@
 #include "3rdparty/sol2/sol/forward.hpp"
 
 #include "augs/build_settings/platform_defines.h"
+#include "augs/templates/get_by_dynamic_id.h"
 
 #include "augs/templates/maybe_const.h"
 #include "augs/templates/component_traits.h"
@@ -57,7 +58,6 @@ class basic_entity_handle :
 		return owner.get_solvable({});
 	}
 
-private:
 	basic_entity_handle(
 		const entity_ptr ptr,
 		owner_reference owner,
@@ -68,10 +68,17 @@ private:
 		raw_id(raw_id)
 	{}
 
+	template <class T>
+	auto* find_ptr() const {
+		return dispatch([](auto& typed_handle) { 
+			return typed_handle.template find<T>(); 
+		});
+	}
+
 public:
 	using const_type = basic_entity_handle<!is_const>;
+	using misc_base::get_raw_flavour_id;
 	friend const_type;
-	using misc_base::get_flavour;
 
 	basic_entity_handle(
 		owner_reference owner, 
@@ -91,8 +98,12 @@ public:
 		return agg();
 	}
 
-	entity_id get_id() const {
+	auto get_id() const {
 		return raw_id;
+	}
+
+	auto get_type_id() const {
+		return raw_id.type_id;
 	}
 
 	bool alive() const {
@@ -136,46 +147,50 @@ public:
 		return alive();
 	}
 
-	template <class component>
-	bool has() const {
-		return agg().template has<component>();
+	template <class F>
+	decltype(auto) dispatch(F&& callback) {
+		return get_by_dynamic_id(
+			all_entity_types(),
+			raw_id.type_id,
+			[&](auto t) {
+				using entity_type = decltype(t);
+				using handle_type = basic_typed_entity_handle<is_const, entity_type>;
+
+				auto& specific_ref = 
+					*reinterpret_cast<
+						maybe_const_ptr_t<is_const>(handle_type::aggregate_type)
+					>(ptr)
+				;
+					
+				return callback(handle_type(owner, specific_ref));
+			}
+		);
 	}
 
 	template <class T>
-	decltype(auto) get() const {
-		if constexpr(is_invariant_v<T>) {
-			return get_flavour().template get<T>();
-		}
-		else {
-			check_component_type<T>();
-
-			ensure(alive());
-
-			if constexpr(is_synchronized_v<T>) {
-				return component_synchronizer<this_handle_type, T>(&agg().template get<T>(pool_provider()), *this);
-			}
-			else {
-				return agg().template get<T>(pool_provider());
-			}
-		}
+	bool has() const {
+		return dispatch([](auto& typed_handle) { 
+			return typed_handle.template has<T>(); 
+		});
 	}
 
 	template<class T>
 	decltype(auto) find() const {
-		if constexpr(is_invariant_v<T>) {
-			return get_flavour().template find<T>();
+		if constexpr(is_synchronized_v<T>) {
+			return component_synchronizer<this_handle_type, T>(find_ptr<T>(), *this);
 		}
 		else {
-			check_component_type<T>();
+			return find_ptr<T>();
+		}
+	}
 
-			ensure(alive());
-
-			if constexpr(is_synchronized_v<T>) {
-				return component_synchronizer<this_handle_type, T>(agg().template find<T>(pool_provider()), *this);
-			}
-			else {
-				return agg().template find<T>(pool_provider());
-			}
+	template<class T>
+	decltype(auto) get() const {
+		if constexpr(is_synchronized_v<T>) {
+			return component_synchronizer<this_handle_type, T>(find_ptr<T>(), *this);
+		}
+		else {
+			return *find_ptr<T>();
 		}
 	}
 

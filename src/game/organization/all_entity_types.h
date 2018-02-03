@@ -1,13 +1,15 @@
 #pragma once
 #include "augs/templates/type_list.h"
-#include "augs/templates/type_in_list_id.h"
 
 #include "game/organization/all_components_declaration.h"
+#include "game/organization/all_components_declaration.h"
+#include "game/organization/all_entity_types_declaration.h"
 
 /* E.g. a player as a resistance soldier or metropolitan guard */
 
 struct controlled_character {
-	static constexpr std::size_t statically_allocated_num = 300;
+	static constexpr std::size_t statically_allocated_aggregates = 300;
+	static constexpr std::size_t statically_allocated_flavours = 20;
 
 	using invariants = type_list<
 		invariants::rigid_body,
@@ -38,7 +40,8 @@ struct controlled_character {
 /* Crosshair's recoil body */
 
 struct plain_invisible_body {
-	static constexpr std::size_t statically_allocated_num = 300;
+	static constexpr std::size_t statically_allocated_aggregates = 300;
+	static constexpr std::size_t statically_allocated_flavours = 20;
 
 	using invariants = type_list<
 		invariants::rigid_body,
@@ -55,7 +58,8 @@ struct plain_invisible_body {
 /* E.g. a crate, a wall, a bullet shell */
 
 struct plain_sprited_body {
-	static constexpr std::size_t statically_allocated_num = 1500;
+	static constexpr std::size_t statically_allocated_aggregates = 1500;
+	static constexpr std::size_t statically_allocated_flavours = 150;
 
 	using invariants = type_list<
 		invariants::rigid_body,
@@ -73,7 +77,8 @@ struct plain_sprited_body {
 /* E.g. an AK or a pistol */
 
 struct shootable_weapon {
-	static constexpr std::size_t statically_allocated_num = 1500;
+	static constexpr std::size_t statically_allocated_aggregates = 1500;
+	static constexpr std::size_t statically_allocated_flavours = 150;
 
 	using invariants = type_list<
 		invariants::gun,
@@ -101,7 +106,8 @@ struct shootable_weapon {
 /* E.g. a cyan charge or an interference charge */
 
 struct shootable_charge {
-	static constexpr std::size_t statically_allocated_num = 1500;
+	static constexpr std::size_t statically_allocated_aggregates = 1500;
+	static constexpr std::size_t statically_allocated_flavours = 150;
 
 	using invariants = type_list<
 		invariants::item,
@@ -122,8 +128,9 @@ struct shootable_charge {
 
 /* E.g. neon captions like "Welcome to metropolis" */
 
-struct static_sprite_decoration {
-	static constexpr std::size_t statically_allocated_num = 1500;
+struct sprite_decoration {
+	static constexpr std::size_t statically_allocated_aggregates = 2000;
+	static constexpr std::size_t statically_allocated_flavours = 300;
 
 	using invariants = type_list<
 		invariants::sprite,
@@ -135,8 +142,23 @@ struct static_sprite_decoration {
 	>;
 };
 
+struct wandering_sprite_decoration {
+	static constexpr std::size_t statically_allocated_aggregates = 100;
+	static constexpr std::size_t statically_allocated_flavours = 20;
+
+	using invariants = type_list<
+		invariants::wandering_pixels,
+		invariants::render
+	>;
+
+	using components = type_list<
+		components::wandering_pixels
+	>;
+};
+
 struct static_light {
-	static constexpr std::size_t statically_allocated_num = 200;
+	static constexpr std::size_t statically_allocated_aggregates = 200;
+	static constexpr std::size_t statically_allocated_flavours = 50;
 
 	using invariants = type_list<
 		invariants::light,
@@ -150,7 +172,8 @@ struct static_light {
 };
 
 struct throwable_explosive {
-	static constexpr std::size_t statically_allocated_num = 1500;
+	static constexpr std::size_t statically_allocated_aggregates = 1500;
+	static constexpr std::size_t statically_allocated_flavours = 150;
 
 	using invariants = type_list<
 		invariants::sprite,
@@ -170,7 +193,8 @@ struct throwable_explosive {
 };
 
 struct plain_missile {
-	static constexpr std::size_t statically_allocated_num = 1500;
+	static constexpr std::size_t statically_allocated_aggregates = 1500;
+	static constexpr std::size_t statically_allocated_flavours = 150;
 
 	using invariants = type_list<
 		invariants::rigid_body,
@@ -190,12 +214,56 @@ struct plain_missile {
 		components::hand_fuse,
 		components::item,
 		components::missile,
-		components::sender
+		components::sender,
+		components::trace
+	>;
+};
+
+struct finishing_trace {
+	static constexpr std::size_t statically_allocated_aggregates = 1500;
+	static constexpr std::size_t statically_allocated_flavours = 150;
+
+	using invariants = type_list<
+		invariants::sprite,
+		invariants::render,
+		invariants::trace
+	>;
+
+	using components = type_list<
+		components::rigid_body,
+		components::hand_fuse,
+		components::item,
+		components::missile,
+		components::sender,
+		components::trace
+	>;
+};
+
+struct container_item {
+	static constexpr std::size_t statically_allocated_aggregates = 1500;
+	static constexpr std::size_t statically_allocated_flavours = 150;
+
+	using invariants = type_list<
+		invariants::rigid_body,
+		invariants::fixtures,
+		invariants::shape_polygon,
+
+		invariants::sprite,
+		invariants::render,
+
+		invariants::container,
+		invariants::item
+	>;
+
+	using components = type_list<
+		components::rigid_body,
+		components::item
 	>;
 };
 
 struct explosive_missile {
-	static constexpr std::size_t statically_allocated_num = 1500;
+	static constexpr std::size_t statically_allocated_aggregates = 1500;
+	static constexpr std::size_t statically_allocated_flavours = 150;
 
 	using invariants = type_list<
 		invariants::rigid_body,
@@ -216,20 +284,7 @@ struct explosive_missile {
 		components::hand_fuse,
 		components::item,
 		components::missile,
-		components::sender
+		components::sender,
+		components::trace
 	>;
 };
-
-using all_entity_types = type_list<
-	controlled_character,
-	plain_invisible_body,
-	plain_sprited_body,
-	shootable_weapon,
-	shootable_charge,
-	static_sprite_decoration,
-	throwable_explosive,
-	plain_missile,
-	explosive_missile
->;
-
-using entity_type_id = type_in_list_id<all_entity_types>;

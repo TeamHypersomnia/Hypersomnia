@@ -118,13 +118,13 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 	cosmos.for_each(
 		processing_subjects::WITH_GUN,
-		[&](const entity_handle gun_entity) {
+		[&](const auto gun_entity) {
 			const auto gun_transform = gun_entity.get_logic_transform();
 			const auto owning_capability = gun_entity.get_owning_transfer_capability();
 			components::sentience* sentience = owning_capability ? owning_capability.find<components::sentience>() : nullptr;
 
-			auto& gun = gun_entity.get<components::gun>();
-			const auto& gun_def = gun_entity.get<invariants::gun>();
+			auto& gun = gun_entity.template get<components::gun>();
+			const auto& gun_def = gun_entity.template get<invariants::gun>();
 
 			const auto muzzle_transform = components::transform { gun_def.calculate_muzzle_position(gun_transform), gun_transform.rotation };
 
@@ -162,8 +162,12 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 			float total_recoil = 0.f;
 
 			if (const auto magic_missile_flavour_id = gun_def.magic_missile_flavour) {
-				const auto& magic_missile_flavour = cosmos.get_flavour(magic_missile_flavour_id);
-				const auto& missile = magic_missile_flavour.get<invariants::missile>();
+				const auto& missile = cosmos.on_flavour(
+					magic_missile_flavour_id,
+					[](auto& f) {
+						return f.template get<invariants::missile>();
+					}
+				);
 
 				const auto mana_needed = missile.damage_amount / 4;
 

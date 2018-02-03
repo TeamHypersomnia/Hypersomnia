@@ -17,26 +17,24 @@ void force_joint_system::apply_forces_towards_target_entities(const logic_step s
 
 	cosmos.for_each(
 		processing_subjects::WITH_FORCE_JOINT,
-		[&](const entity_handle it) {
-			if (!it.has<components::rigid_body>()) {
+		[&](const auto it) {
+			if (!it.template has<components::rigid_body>()) {
 				return;
 			}
 
-			const auto& rigid_body = it.get<components::rigid_body>();
+			const auto& rigid_body = it.template get<components::rigid_body>();
 
 			if (!rigid_body.is_constructed()) {
 				return;
 			}
 
-			const auto& force_joint = it.get<components::force_joint>();
-			const auto chased_entity = cosmos[force_joint.chased_entity];
+			const auto& force_joint = it.template get<components::force_joint>();
 
-			if (chased_entity.dead()) {
+			const auto chased_transform = ::find_transform(force_joint.chasing, cosmos);
+
+			if (!chased_transform) {
 				return;
 			}
-
-			const auto chased_entity_transform = chased_entity.get_logic_transform();
-			const auto chased_transform = chased_entity_transform * force_joint.chased_entity_offset;
 
 			auto direction = chased_transform.pos - rigid_body.get_position();
 			const auto distance = direction.length();
@@ -84,8 +82,10 @@ void force_joint_system::apply_forces_towards_target_entities(const logic_step s
 				//}
 
 				if (force_for_chased.length() > 5) {
-					const auto& chased_physics = cosmos[force_joint.chased_entity].get<components::rigid_body>();
-					chased_physics.apply_force(force_for_chaser * chased_physics.get_mass());
+					if (const auto chased_entity = cosmos[::get_chased(force_joint.chasing)]) {
+						const auto& chased_physics = chased_entity.get<components::rigid_body>();
+						chased_physics.apply_force(force_for_chaser * chased_physics.get_mass());
+					}
 				}
 
 				//LOG("F: %x", rigid_body.body->GetLinearDamping());

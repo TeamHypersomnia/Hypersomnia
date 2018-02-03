@@ -16,16 +16,16 @@ class type_in_list_id {
 	// END GEN INTROSPECTOR
 
 	template <class T>
-	static auto get_index_of() {
-		return static_cast<index_type>(index_in_list_v<T, List>);
-	}
-
-	template <class T>
 	static void assert_correct_type() {
 		static_assert(is_one_of_list_v<T, List>, "The type list does not contain the specified type!");
 	}
 
 public:
+	template <class T>
+	static auto get_index_of() {
+		return static_cast<index_type>(index_in_list_v<T, List>);
+	}
+
 	type_in_list_id(
 		const index_type index = dead_value
 	) : index(index) 

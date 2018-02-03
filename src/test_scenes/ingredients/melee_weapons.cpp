@@ -14,6 +14,7 @@
 namespace test_flavours {
 	void populate_melee_types(const loaded_game_image_caches& logicals, entity_flavours& flavours) {
 		{
+#if TODO
 			auto& meta = get_test_flavour(flavours, test_scene_flavour::URBAN_CYAN_MACHETE);
 
 			invariants::render render_def;
@@ -36,12 +37,14 @@ namespace test_flavours {
 			missile.impulse_upon_hit = 1000.f;
 			missile.constrain_lifetime = false;
 			meta.set(missile);
+#endif
 		}
 	}
 }
 
 namespace prefabs {
 	entity_handle create_cyan_urban_machete(const logic_step step, vec2 pos) {
+#if TODO
 		const auto machete = create_test_scene_entity(step.get_cosmos(), test_scene_flavour::URBAN_CYAN_MACHETE);
 
 		machete += components::melee();
@@ -51,6 +54,7 @@ namespace prefabs {
 		machete.construct_entity(step);
 
 		return machete;
+#endif
 	}
 }
 

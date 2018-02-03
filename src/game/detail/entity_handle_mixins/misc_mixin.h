@@ -6,6 +6,17 @@
 #include "game/components/flavour_component.h"
 #include "game/components/crosshair_component.h"
 
+template <class A, class = void>
+struct has_specific_entity_type : std::false_type {};
+
+template <class A>
+struct has_specific_entity_type<A, decltype(typename A::specific_entity_type(), void())> 
+	: std::bool_constant<A::has_specific_entity_type> 
+{};
+
+template <class A>
+constexpr bool has_specific_entity_type_v = has_specific_entity_type<A>::value;
+
 template <class E>
 class misc_mixin {
 public:
@@ -75,14 +86,53 @@ public:
 		return self.get_cosmos().get_solvable().get_guid(self.get_id());
 	}
 
+	auto get_raw_flavour_id() const {
+		const auto self = *static_cast<const E*>(this);
+		return self.template get<components::flavour>().get_raw_id();
+	}
+
 	auto get_flavour_id() const {
 		const auto self = *static_cast<const E*>(this);
-		return self.template get<components::flavour>().get_flavour_id();
+		
+		entity_flavour_id id;
+
+		id.raw = get_raw_flavour_id();
+		id.type_id = self.get_type_id();
+
+		return id;
+	}
+
+	template <bool C = has_specific_entity_type_v<E>, class = std::enable_if_t<C>>
+	auto& get_flavour() const {
+		const auto self = *static_cast<const E*>(this);
+		auto& cosm = self.get_cosmos();
+		return cosm.get_flavour<typename E::specific_entity_type>(get_raw_flavour_id());
 	}
 
 	const auto& get_name() const {
 		const auto self = *static_cast<const E*>(this);
-		return self.template get<components::flavour>().get_name();
+
+		auto& cosm = self.get_cosmos();
+
+		if constexpr(has_specific_entity_type_v<E>) {
+			return get_flavour().name;
+		}
+		else {
+			return cosm.on_flavour(get_flavour_id(), [](const auto& f) { return f.name; });
+		}
+	}
+
+	const auto& get_description() const {
+		const auto self = *static_cast<const E*>(this);
+
+		auto& cosm = self.get_cosmos();
+
+		if constexpr(has_specific_entity_type_v<E>) {
+			return get_flavour().description;
+		}
+		else {
+			return cosm.on_flavour(get_flavour_id(), [](const auto& f) { return f.description; });
+		}
 	}
 
 	bool sentient_and_unconscious() const {

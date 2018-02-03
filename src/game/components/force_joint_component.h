@@ -1,17 +1,15 @@
 #pragma once
 #include <array>
-#include "transform_component.h"
-
-#include "game/transcendental/entity_id.h"
-
+#include "augs/pad_bytes.h"
 #include "augs/math/vec2.h"
 
-#include "augs/pad_bytes.h"
+#include "game/transcendental/entity_id.h"
+#include "game/components/transform_component.h"
 
 namespace components {
 	struct force_joint {
 		// GEN INTROSPECTOR struct components::force_joint
-		entity_id chased_entity;
+		absolute_or_local chasing;
 
 		float force_towards_chased_entity = 8000.f;
 		float distance_when_force_easing_starts = 10.f;
@@ -22,8 +20,6 @@ namespace components {
 		bool divide_transform_mode = false;
 		bool consider_rotation = true;
 		pad_bytes<2> pad;
-
-		components::transform chased_entity_offset;
 
 		std::array<vec2, 2> force_offsets;
 		// END GEN INTROSPECTOR

@@ -189,9 +189,6 @@ namespace prefabs {
 
 		auto recoil = create_test_scene_entity(world, test_scene_flavour::CROSSHAIR_RECOIL_BODY);
 
-		{
-		}
-
 		character.map_child_entity(child_entity_name::CROSSHAIR_RECOIL_BODY, recoil);
 
 		recoil.construct_entity(step);

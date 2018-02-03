@@ -31,6 +31,11 @@ summary: Just a hidden scratchpad.
 				- We know that a driver will only need a correction to damping and not entire body
 
 - Thoughts about entity types
+	- Storing flavuor ids and retrieving information
+		- Might be useful for a flavour id to assume that some components and/or invariants are in existence
+		- Then we would need to disallow setting incompatible types 
+		- Cosmos could return std::optional<constrained_flavour_id<invariants...>> for a generic flavour id 
+			- these will exist usually in definitions only
 	- specifying types
 		- tuples/trivially copyable tuples, because they will be easy to introspect and reason about
 		- should components be added automatically?

@@ -23,7 +23,7 @@ entity_name_type get_bbcoded_entity_name(const const_entity_handle maybe_overrid
 }
 
 const entity_description_type& get_bbcoded_entity_description(const const_entity_handle handle) {
-	return handle.get_flavour().description;
+	return handle.get_description();
 }
 
 std::wstring get_bbcoded_entity_properties(const const_entity_handle id) {

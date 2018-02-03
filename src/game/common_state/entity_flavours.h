@@ -10,20 +10,18 @@
 #include "game/organization/all_component_includes.h"
 
 using entity_description_type = entity_name_type;
-using entity_initial_components = component_list_t<std::tuple>;
-using invariant_tuple = invariant_list_t<augs::trivially_copyable_tuple>;
 
+template <class entity_type>
 class entity_flavour {
+	using invariants_type = make_invariants<entity_type>;
+	using initial_components_type = make_aggregate<entity_type>;
+
 	template <class D>
 	static constexpr auto idx = invariant_index_v<D>;
 
 	template <class D, class E>
 	static auto& get_impl(E& self) {
 		if constexpr(is_invariant_v<D>) {
-			if constexpr(!is_always_present_v<D>) {
-				ensure(self.enabled_invariants[idx<D>]); 
-			}
-
 			return std::get<D>(self.invariants); 
 		}
 		else {
@@ -33,16 +31,11 @@ class entity_flavour {
 
 	template <class D, class E>
 	static auto find_impl(E& self) -> maybe_const_ptr_t<std::is_const_v<E>, D> {
-		if constexpr(is_always_present_v<D>) {
-			return &get_impl<D>(self);
+		if constexpr(self.has<D>()) {
+			return std::addressof(std::get<D>(self.invariants));
 		}
-		else {
-			if (self.enabled_invariants[idx<D>]) {
-				return std::addressof(std::get<D>(self.invariants));
-			}
 
-			return nullptr; 
-		}
+		return nullptr; 
 	}
 
 public:
@@ -50,16 +43,13 @@ public:
 	entity_name_type name;
 	entity_description_type description;
 
-	std::array<bool, INVARIANTS_COUNT> enabled_invariants = {};
-	invariant_tuple invariants;
-
-	entity_initial_components initial_components;
+	invariants_type invariants;
+	initial_components_type initial_components;
 	// END GEN INTROSPECTOR
 
 	template <class D>
 	void set(const D& def) {
 		if constexpr(is_invariant_v<D>) {
-			enabled_invariants[idx<D>] = true;
 			std::get<D>(invariants) = def;
 		}
 		else {
@@ -68,13 +58,11 @@ public:
 	}
 
 	template <class D>
-	void remove() {
-		if constexpr(is_always_present_v<D>) {
-			get<D>() = {};
-		}
-		else {
-			enabled_invariants[idx<D>] = false;
-		}
+	constexpr bool has() const {
+		return 
+			is_one_of_list_v<D, invariants_type>
+			|| is_one_of_list_v<D, initial_components_type>
+		;
 	}
 
 	template <class D>
@@ -85,11 +73,6 @@ public:
 	template <class D>
 	const D* find() const {
 		return find_impl<D>(*this);
-	}
-
-	template <class D>
-	constexpr bool has() const {
-		return true; 
 	}
 
 	template <class D>
