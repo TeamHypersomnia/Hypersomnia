@@ -14,7 +14,7 @@
 namespace test_flavours {
 	void populate_backpack_types(const loaded_game_image_caches& logicals, entity_flavours& flavours) {
 		{
-			auto& meta = get_test_flavour(flavours, test_scene_flavour::SAMPLE_BACKPACK);
+			auto& meta = get_test_flavour(flavours, test_container_items::SAMPLE_BACKPACK);
 
 			invariants::render render_def;
 			render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
@@ -47,7 +47,7 @@ namespace test_flavours {
 namespace prefabs {
 	entity_handle create_sample_backpack(const logic_step step, vec2 pos) {
 		auto& world = step.get_cosmos();
-		const auto backpack = create_test_scene_entity(world, test_scene_flavour::SAMPLE_BACKPACK);
+		const auto backpack = create_test_scene_entity(world, test_container_items::SAMPLE_BACKPACK);
 		
 		backpack.set_logic_transform(pos);
 		backpack.construct_entity(step);

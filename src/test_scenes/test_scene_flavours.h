@@ -1,4 +1,6 @@
 #pragma once
+#include "augs/templates/type_map.h"
+
 #include "game/transcendental/entity_flavour_id.h"
 #include "game/transcendental/cosmic_functions.h"
 #include "view/viewables/game_image.h"
@@ -78,6 +80,22 @@ enum class test_explosive_missiles {
 
 };
 
+using test_flavours_map = type_map<
+	type_pair<test_controlled_characters, controlled_character>,
+	type_pair<test_plain_invisible_bodys, plain_invisible_body>,
+	type_pair<test_plain_sprited_bodys, plain_sprited_body>,
+	type_pair<test_shootable_weapons, shootable_weapon>,
+	type_pair<test_shootable_charges, shootable_charge>,
+	type_pair<test_sprite_decorations, sprite_decoration>,
+	type_pair<test_wandering_sprite_decorations, wandering_sprite_decoration>,
+	type_pair<test_static_lights, static_light>,
+	type_pair<test_throwable_explosives, throwable_explosive>,
+	type_pair<test_plain_missiles, plain_missile>,
+	type_pair<test_finishing_traces, finishing_trace>,
+	type_pair<test_container_items, container_item>,
+	type_pair<test_explosive_missiles, explosive_missile>
+>;
+
 #if TODO
 TRUCK_FRONT,
 TRUCK_INTERIOR,
@@ -86,8 +104,16 @@ TRUCK_ENGINE_BODY,
 URBAN_CYAN_MACHETE
 #endif
 
-inline auto to_entity_flavour_id(const test_scene_flavour id) {
-	return static_cast<entity_flavour_id>(static_cast<unsigned>(id));
+template <class T>
+inline auto to_raw_flavour_id(const T id) {
+	return static_cast<raw_entity_flavour_id>(id);
+}
+
+template <class T>
+inline auto to_entity_flavour_id(const T id) {
+	entity_flavour_id id;
+	id.type_id.set<test_flavours_map::at<T>>();
+	id.raw = to_raw_flavour_id(id);
 }
 
 template <class C>
@@ -95,9 +121,9 @@ auto create_test_scene_entity(C& cosm, const test_scene_flavour id) {
 	return cosmic::create_entity(cosm, to_entity_flavour_id(id));
 }
 
-template <class C>
-auto& get_test_flavour(C& cosm, const test_scene_flavour id) {
-	return cosm.get_flavour(to_entity_flavour_id(id));
+template <class C, class T>
+auto& get_test_flavour(C& cosm, const T id) {
+	return cosm.get_flavour<test_flavours_map::at<T>>(to_raw_flavour_id(id));
 }
 
 namespace test_flavours {

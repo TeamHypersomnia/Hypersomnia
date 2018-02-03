@@ -26,7 +26,7 @@
 namespace test_flavours {
 	void populate_character_types(const loaded_game_image_caches& logicals, entity_flavours& flavours) {
 		{
-			auto& meta = get_test_flavour(flavours, test_scene_flavour::PLAYER);
+			auto& meta = get_test_flavour(flavours, test_controlled_characters::PLAYER);
 
 			meta.description = L"Member of Atlantic nations.";
 
@@ -145,7 +145,7 @@ namespace test_flavours {
 		}
 
 		{
-			auto& meta = get_test_flavour(flavours, test_scene_flavour::CROSSHAIR_RECOIL_BODY);
+			auto& meta = get_test_flavour(flavours, test_plain_invisible_bodys::CROSSHAIR_RECOIL_BODY);
 			add_sprite(meta, logicals, assets::game_image_id::TEST_CROSSHAIR);
 
 			invariants::shape_polygon shape_polygon_def;
@@ -182,14 +182,14 @@ namespace prefabs {
 	) {
 		auto& world = step.get_cosmos();
 
-		const auto character = create_test_scene_entity(world, test_scene_flavour::PLAYER);
+		const auto character = create_test_scene_entity(world, test_controlled_characters::PLAYER);
 		
 		character.set_logic_transform(spawn_transform);
 		character.construct_entity(step);
 
-		auto recoil = create_test_scene_entity(world, test_scene_flavour::CROSSHAIR_RECOIL_BODY);
+		auto recoil = create_test_scene_entity(world, test_plain_invisible_bodys::CROSSHAIR_RECOIL_BODY);
 
-		character.map_child_entity(child_entity_name::CROSSHAIR_RECOIL_BODY, recoil);
+		test_plain_invisible_bodys.map_child_entity(child_entity_name::CROSSHAIR_RECOIL_BODY, recoil);
 
 		recoil.construct_entity(step);
 		zero_target.construct_entity(step);

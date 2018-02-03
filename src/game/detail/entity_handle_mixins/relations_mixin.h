@@ -31,7 +31,7 @@ protected:
 
 		if (self.alive()) {
 			switch (n) {
-				case child_entity_name::CROSSHAIR_RECOIL_BODY:
+				case test_plain_invisible_bodys::CROSSHAIR_RECOIL_BODY:
 				if (const auto crosshair = self.find_crosshair()) {
 					result = std::addressof(crosshair->recoil_entity);
 				}

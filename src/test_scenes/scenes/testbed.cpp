@@ -49,7 +49,7 @@ namespace test_scenes {
 		load_test_scene_sentience_properties(common);
 
 		auto& spells = common.spells;
-		std::get<electric_triad>(spells).missile_flavour = to_entity_flavour_id(test_scene_flavour::ELECTRIC_MISSILE);
+		std::get<electric_triad>(spells).missile_flavour = to_entity_flavour_id(test_plain_missiles::ELECTRIC_MISSILE);
 		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
 	}
 
@@ -212,7 +212,7 @@ namespace test_scenes {
 			const auto reach = xywh(0, 0, 1500, 32000);
 
 			{
-				const auto e = create_test_scene_entity(world, test_scene_flavour::WANDERING_PIXELS);
+				const auto e = create_test_scene_entity(world, test_wandering_sprite_decorations::WANDERING_PIXELS);
 				auto& w = e.get<components::wandering_pixels>();
 
 				w.colorize = cyan;
@@ -222,7 +222,7 @@ namespace test_scenes {
 			}
 
 			{
-				const auto e = create_test_scene_entity(world, test_scene_flavour::WANDERING_PIXELS);
+				const auto e = create_test_scene_entity(world, test_wandering_sprite_decorations::WANDERING_PIXELS);
 				auto& w = e.get<components::wandering_pixels>();
 
 
@@ -234,7 +234,7 @@ namespace test_scenes {
 			}
 
 			{
-				const auto e = create_test_scene_entity(world, test_scene_flavour::WANDERING_PIXELS);
+				const auto e = create_test_scene_entity(world, test_wandering_sprite_decorations::WANDERING_PIXELS);
 				auto& w = e.get<components::wandering_pixels>();
 
 
@@ -266,7 +266,7 @@ namespace test_scenes {
 				const auto light_cyan = c.x < 0 ? orange : rgba(30, 255, 255, 255);
 
 				{
-					const auto l = create_test_scene_entity(world, test_scene_flavour::STRONG_LAMP);
+					const auto l = create_test_scene_entity(world, test_static_lights::STRONG_LAMP);
 					l.set_logic_transform(components::transform(light_pos));
 
 					auto& light = l.get<components::light>();
@@ -277,7 +277,7 @@ namespace test_scenes {
 
 
 				{
-					const auto e = create_test_scene_entity(world, test_scene_flavour::WANDERING_PIXELS);
+					const auto e = create_test_scene_entity(world, test_wandering_sprite_decorations::WANDERING_PIXELS);
 					auto& w = e.get<components::wandering_pixels>();
 
 
@@ -288,7 +288,7 @@ namespace test_scenes {
 				}
 
 				{
-					const auto e = create_test_scene_entity(world, test_scene_flavour::WANDERING_PIXELS);
+					const auto e = create_test_scene_entity(world, test_wandering_sprite_decorations::WANDERING_PIXELS);
 					auto& w = e.get<components::wandering_pixels>();
 
 
@@ -299,7 +299,7 @@ namespace test_scenes {
 				}
 
 				{
-					const auto e = create_test_scene_entity(world, test_scene_flavour::WANDERING_PIXELS);
+					const auto e = create_test_scene_entity(world, test_wandering_sprite_decorations::WANDERING_PIXELS);
 					auto& w = e.get<components::wandering_pixels>();
 
 
@@ -313,14 +313,14 @@ namespace test_scenes {
 
 		{
 			{
-				const auto l = create_test_scene_entity(world, test_scene_flavour::STRONG_LAMP);
+				const auto l = create_test_scene_entity(world, test_static_lights::STRONG_LAMP);
 				l.set_logic_transform(components::transform(vec2(164.f - 8.f + 90.f, 220)));
 				auto& light = l.get<components::light>();
 				light.color = cyan;
 				l.construct_entity(step);
 			}
 			{
-				const auto l = create_test_scene_entity(world, test_scene_flavour::STRONG_LAMP);
+				const auto l = create_test_scene_entity(world, test_static_lights::STRONG_LAMP);
 				l.set_logic_transform(components::transform(vec2(1164.f + 24.f - 90.f, 220)));
 				auto& light = l.get<components::light>();
 				light.color = orange;
@@ -331,7 +331,7 @@ namespace test_scenes {
 				const auto right_reach = xywh(1164.f - 8.f + 90.f - 600, 220 - 250, 1000, 600);
 
 				{
-					const auto e = create_test_scene_entity(world, test_scene_flavour::WANDERING_PIXELS);
+					const auto e = create_test_scene_entity(world, test_wandering_sprite_decorations::WANDERING_PIXELS);
 					auto& w = e.get<components::wandering_pixels>();
 
 
@@ -342,7 +342,7 @@ namespace test_scenes {
 				}
 
 				{
-					const auto e = create_test_scene_entity(world, test_scene_flavour::WANDERING_PIXELS);
+					const auto e = create_test_scene_entity(world, test_wandering_sprite_decorations::WANDERING_PIXELS);
 					auto& w = e.get<components::wandering_pixels>();
 
 
@@ -353,7 +353,7 @@ namespace test_scenes {
 				}
 
 				{
-					const auto e = create_test_scene_entity(world, test_scene_flavour::WANDERING_PIXELS);
+					const auto e = create_test_scene_entity(world, test_wandering_sprite_decorations::WANDERING_PIXELS);
 					auto& w = e.get<components::wandering_pixels>();
 
 
@@ -364,7 +364,7 @@ namespace test_scenes {
 				}
 
 				{
-					const auto e = create_test_scene_entity(world, test_scene_flavour::WANDERING_PIXELS);
+					const auto e = create_test_scene_entity(world, test_wandering_sprite_decorations::WANDERING_PIXELS);
 					auto& w = e.get<components::wandering_pixels>();
 
 
@@ -375,7 +375,7 @@ namespace test_scenes {
 				}
 
 				{
-					const auto e = create_test_scene_entity(world, test_scene_flavour::WANDERING_PIXELS);
+					const auto e = create_test_scene_entity(world, test_wandering_sprite_decorations::WANDERING_PIXELS);
 					auto& w = e.get<components::wandering_pixels>();
 
 
@@ -386,7 +386,7 @@ namespace test_scenes {
 				}
 
 				{
-					const auto e = create_test_scene_entity(world, test_scene_flavour::WANDERING_PIXELS);
+					const auto e = create_test_scene_entity(world, test_wandering_sprite_decorations::WANDERING_PIXELS);
 					auto& w = e.get<components::wandering_pixels>();
 
 
@@ -398,7 +398,7 @@ namespace test_scenes {
 			}
 
 			{
-				const auto l = create_test_scene_entity(world, test_scene_flavour::STRONG_LAMP);
+				const auto l = create_test_scene_entity(world, test_static_lights::STRONG_LAMP);
 				l.set_logic_transform(components::transform(vec2(664.f + 24.f, -1100)));
 				auto& light = l.get<components::light>();
 				light.color = orange;
@@ -406,7 +406,7 @@ namespace test_scenes {
 			}
 
 			{
-				const auto e = create_test_scene_entity(world, test_scene_flavour::HAVE_A_PLEASANT);
+				const auto e = create_test_scene_entity(world, test_sprite_decorations::HAVE_A_PLEASANT);
 
 				e += components::transform(vec2(164.f - 8.f, -60.f - 20.f));
 
@@ -434,7 +434,7 @@ namespace test_scenes {
 				for (int x = -side; x < side; ++x) {
 					for (int y = -side; y < side * 16; ++y)
 					{
-						auto street = create_test_scene_entity(world, test_scene_flavour::STREET);
+						auto street = create_test_scene_entity(world, test_sprite_decorations::STREET);
 
 						street += components::transform{ bg_size * vec2i(x, y) };
 
@@ -445,7 +445,7 @@ namespace test_scenes {
 				{
 					const vec2 size = metas.at(assets::game_image_id::ROAD_FRONT_DIRT).get_size();
 
-					auto road_dirt = create_test_scene_entity(world, test_scene_flavour::ROAD_DIRT);
+					auto road_dirt = create_test_scene_entity(world, test_sprite_decorations::ROAD_DIRT);
 					
 
 					road_dirt += components::transform{ vec2(-3 - 16 + 100 + 160 + 80 + size.x / 2, -32 - 96 + 160 + 80 - size.y / 2) };
@@ -454,9 +454,9 @@ namespace test_scenes {
 				}
 
 				for (int r = 0; r < 38; ++r) {
-					const vec2 size = metas.at(assets::game_image_id::ROAD).get_size();
+					const vec2 size = test_sprite_decorations.at(assets::game_image_id::ROAD).get_size();
 
-					auto road = create_test_scene_entity(world, test_scene_flavour::ROAD);
+					auto road = create_test_scene_entity(world, test_sprite_decorations::ROAD);
 					
 
 					road += components::transform{ vec2(-3 - 16 + 100 + 160 + 80 + size.x / 2, -32 - 96 + 160 + 80 + size.y / 2 + size.y*r) };
@@ -466,7 +466,7 @@ namespace test_scenes {
 			}
 
 			{
-				const auto e = create_test_scene_entity(world, test_scene_flavour::AWAKENING);
+				const auto e = create_test_scene_entity(world, test_sprite_decorations::AWAKENING);
 				
 
 				e += components::transform(vec2(164.f - 8.f, -60.f - 20.f + 40.f));
@@ -475,7 +475,7 @@ namespace test_scenes {
 			}
 
 			{
-				const auto e = create_test_scene_entity(world, test_scene_flavour::METROPOLIS);
+				const auto e = create_test_scene_entity(world, test_sprite_decorations::METROPOLIS);
 
 				
 

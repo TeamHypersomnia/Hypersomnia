@@ -29,7 +29,7 @@ namespace test_scenes {
 		common_assets.exploding_ring_sparkles = assets::particle_effect_id::EXPLODING_RING_SPARKLES;
 		common_assets.thunder_remnants = assets::particle_effect_id::THUNDER_REMNANTS;
 
-		std::get<electric_triad>(common.spells).missile_flavour = to_entity_flavour_id(test_scene_flavour::ELECTRIC_MISSILE);
+		std::get<electric_triad>(common.spells).missile_flavour = to_entity_flavour_id(test_plain_missiles::ELECTRIC_MISSILE);
 	}
 
 	entity_id minimal_scene::populate(const loaded_game_image_caches& metas, const logic_step step) const {
