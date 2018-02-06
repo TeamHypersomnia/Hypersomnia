@@ -16,20 +16,6 @@ summary: Just a hidden scratchpad.
 
 - Entity groups will be useful later, not until we make a simple deathmatch where we can include some simple weapon/car creation logic etc
 
-- The mess with optionals around getters of transform, aabb, and colliders connection
-	- Make it clear which functions get cache content and which actually calculate from the significant
-		- Three? kinds of operations:
-			- Gets actual value in the cache - fast, works only when constructed - always?
-				- **should be a member function of the cache for fast access.**
-					- then the logic can just get the cache once.
-				- const-valued caches should be gettable.
-				- some funny special logic will probably use it to do some additional physics calculations?
-				- will probably be nice to pass around the invariant ref to avoid repeated getting
-					- or just do so once we determine the bottleneck
-			- Calculates the value to be passed to cache - slow, works always
-			- Requests for a certain field to be recalculated
-				- We know that a driver will only need a correction to damping and not entire body
-
 - Thoughts about entity types
 	- Storing flavuor ids and retrieving information
 		- Might be useful for a flavour id to assume that some components and/or invariants are in existence
@@ -89,6 +75,20 @@ summary: Just a hidden scratchpad.
 				- enums will also apply because many entity flavours might share the same native type
 			- So we don't have to do it now.
 			- We will specify storage for native types in tuples, thus we will be able to change SoA to AoS and back with just one compilation flag. 
+
+- The mess with optionals around getters of transform, aabb, and colliders connection
+	- Make it clear which functions get cache content and which actually calculate from the significant
+		- Three? kinds of operations:
+			- Gets actual value in the cache - fast, works only when constructed - always?
+				- **should be a member function of the cache for fast access.**
+					- then the logic can just get the cache once.
+				- const-valued caches should be gettable.
+				- some funny special logic will probably use it to do some additional physics calculations?
+				- will probably be nice to pass around the invariant ref to avoid repeated getting
+					- or just do so once we determine the bottleneck
+			- Calculates the value to be passed to cache - slow, works always
+			- Requests for a certain field to be recalculated
+				- We know that a driver will only need a correction to damping and not entire body
 
 - Instead of having "force joint" at all, make it so that while processing the cars, they additionally apply forces to drivers to keep them
  

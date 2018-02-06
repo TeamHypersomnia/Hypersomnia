@@ -105,6 +105,7 @@ entity_handle cosmic::create_entity(
 	);
 }
 
+#if TODO
 entity_handle cosmic::create_entity_with_specific_guid(
 	specific_guid_creation_access,
 	cosmos& cosm,
@@ -112,6 +113,7 @@ entity_handle cosmic::create_entity_with_specific_guid(
 ) {
 	return { cosm, cosm.get_solvable({}).allocate_entity_with_specific_guid(specific_guid) };
 }
+#endif
 
 entity_handle cosmic::clone_entity(const entity_handle source_entity) {
 	auto& cosmos = source_entity.get_cosmos();

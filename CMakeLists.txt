@@ -76,7 +76,7 @@ set(HYPERSOMNIA_GENERATED_FILES_DIR "cache/gen/")
 
 set(HYPERSOMNIA_LOCAL_FILES_DIR "cache/usr/")
 
-# If this variable is positive, the cosmos will use a statically allocated number
+# If this variable is nonzero, the cosmos will use a statically allocated number
 # of entities, drastically improving access performance. Might be very useful for a sever application.
 # Pros: 
 # 	+ Dereferencing entities with speed of light
@@ -86,7 +86,7 @@ set(HYPERSOMNIA_LOCAL_FILES_DIR "cache/usr/")
 #	- Even empty game worlds occupy as much space as those filled to the maximum
 set(STATICALLY_ALLOCATE_ENTITIES "1" CACHE STRING "Statically allocate entities in the cosmos")
 
-# If this variable is positive, the cosmos common will use a statically allocated number
+# If this variable is nonzero, the cosmos common will use a statically allocated number
 # of entity flavours, drastically improving access performance. Might be very useful for a sever application.
 # Pros: 
 # 	+ Operating on entities with speed of light
@@ -94,7 +94,7 @@ set(STATICALLY_ALLOCATE_ENTITIES "1" CACHE STRING "Statically allocate entities 
 #	- Compilation might be longer due to component includes needed everywhere
 #	- Can't tweak maximum number of entity flavours at runtime
 #	- Even empty game worlds occupy as much space as those filled to the maximum
-set(STATICALLY_ALLOCATE_ENTITY_FLAVOURS_NUM "500" CACHE STRING "Statically allocate entity flavours in the cosmos common")
+set(STATICALLY_ALLOCATE_ENTITY_FLAVOURS "1" CACHE STRING "Statically allocate entity flavours in the cosmos common")
 
 set(STATICALLY_ALLOCATE_ASSETS "1" CACHE STRING "Statically allocate assets using container_sizes.h")
 set(STATICALLY_ALLOCATE_BAKED_FONTS "1" CACHE STRING "Statically allocate fonts for faster rendering. One font weights 3 MB.")
@@ -1008,7 +1008,7 @@ endif()
 # We configure additional user options for building the game.
 
 add_definitions(-DSTATICALLY_ALLOCATE_ENTITIES=${STATICALLY_ALLOCATE_ENTITIES})
-add_definitions(-DSTATICALLY_ALLOCATE_ENTITY_FLAVOURS_NUM=${STATICALLY_ALLOCATE_ENTITY_FLAVOURS_NUM})
+add_definitions(-DSTATICALLY_ALLOCATE_ENTITY_FLAVOURS=${STATICALLY_ALLOCATE_ENTITY_FLAVOURS})
 add_definitions(-DSTATICALLY_ALLOCATE_ASSETS=${STATICALLY_ALLOCATE_ASSETS})
 add_definitions(-DSTATICALLY_ALLOCATE_BAKED_FONTS=${STATICALLY_ALLOCATE_BAKED_FONTS})
 add_definitions(-DBUILD_IN_CONSOLE_MODE=${BUILD_IN_CONSOLE_MODE})

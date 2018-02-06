@@ -154,7 +154,7 @@ public:
 			raw_id.type_id,
 			[&](auto t) {
 				using entity_type = decltype(t);
-				using handle_type = basic_typed_entity_handle<is_const, entity_type>;
+				using handle_type = basic_typed_entity_handle<is_const, entity_type, stored_id_provider>;
 
 				auto& specific_ref = 
 					*reinterpret_cast<
@@ -162,7 +162,7 @@ public:
 					>(ptr)
 				;
 					
-				return callback(handle_type(owner, specific_ref));
+				return callback(handle_type(owner, specific_ref, get_id()));
 			}
 		);
 	}

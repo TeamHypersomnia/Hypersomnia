@@ -59,11 +59,13 @@ public:
 		components::transform where
 	);
 
+#if TODO
 	static entity_handle create_entity_with_specific_guid(
 		specific_guid_creation_access,
 		cosmos&,
 		const entity_guid specific_guid
 	);
+#endif
 
 	static entity_handle clone_entity(const entity_handle);
 	static void delete_entity(const entity_handle);

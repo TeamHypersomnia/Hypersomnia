@@ -6,9 +6,6 @@
 #include "augs/misc/constant_size_vector.h"
 #include "augs/templates/type_mod_templates.h"
 
-#include "game/transcendental/entity_handle_declaration.h"
-#include "game/detail/entity_handle_mixins/all_handle_mixins.h"
-
 static constexpr bool statically_allocate_entities = STATICALLY_ALLOCATE_ENTITIES;
 
 template <class T>
@@ -63,6 +60,9 @@ struct has_invariants_or_components {
 	>
 	{};	
 };
+
+template <class E, class... Args>
+using has_invariants_or_components_v = has_invariants_or_components<Args...>::template type<E>;
 
 template <class... Types>
 using all_entity_types_having = filter_types_in_list_t<

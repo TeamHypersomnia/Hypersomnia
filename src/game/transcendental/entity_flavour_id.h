@@ -30,10 +30,18 @@ struct constrained_entity_flavour_id {
 
 template <class E>
 struct typed_entity_flavour_id {
+	raw_entity_flavour_id raw;
 
-	template <class... C, >
+	template <
+		class... C,
+		class V = std::enable_if_t<has_invariants_or_components_v<E, Args...>>
+	>
+	operator constrained_entity_flavour_id<C...>() const {
+		entity_type_id type_id;
+		type_id.set<E>();
 
+		return { raw, type_id };
+	}
 };
-
 
 using entity_name_type = std::wstring;

@@ -98,24 +98,33 @@ public:
 	}
 };
 
-#if STATICALLY_ALLOCATE_ENTITY_FLAVOURS_NUM
+#if STATICALLY_ALLOCATE_ENTITY_FLAVOURS
 #include "augs/misc/constant_size_vector.h"
-using entity_flavours_container = augs::constant_size_vector<entity_flavour, STATICALLY_ALLOCATE_ENTITY_FLAVOURS_NUM>;
+
+template <class E>
+using entity_flavours_container = augs::constant_size_vector<
+	entity_flavour<E>, 
+	E::statically_allocated_flavours
+>;
+
 #else
 #include <vector>
-using entity_flavours_container = std::vector<entity_flavour>;
+
+template <class E>
+using entity_flavours_container = std::vector<entity_flavour<E>>;
 #endif
 
+template <class entity_type>
 struct entity_flavours {
 	// GEN INTROSPECTOR struct entity_flavours
-	entity_flavours_container flavours;
+	entity_flavours_container<entity_type> flavours;
 	// END GEN INTROSPECTOR
 
-	auto& get_flavour(const entity_flavour_id id) {
-		return flavours[id];
+	auto& get_flavour(const raw_entity_flavour_id id) {
+		return flavours[static_cast<unsigned>(id)];
 	}
 
-	const auto& get_flavour(const entity_flavour_id id) const {
-		return flavours[id];
+	const auto& get_flavour(const raw_entity_flavour_id id) const {
+		return flavours[static_cast<unsigned>(id)];
 	}
 };
