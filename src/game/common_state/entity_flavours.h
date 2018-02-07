@@ -16,9 +16,6 @@ class entity_flavour {
 	using invariants_type = make_invariants<entity_type>;
 	using initial_components_type = make_aggregate<entity_type>;
 
-	template <class D>
-	static constexpr auto idx = invariant_index_v<D>;
-
 	template <class D, class E>
 	static auto& get_impl(E& self) {
 		if constexpr(is_invariant_v<D>) {

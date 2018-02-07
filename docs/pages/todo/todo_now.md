@@ -130,6 +130,7 @@ summary: Just a hidden scratchpad.
 	- or it can be part of inferred state which will complicate things a little
 
 ## Later
+- fix errors at unit tests when not statically allocating 
 - strip children vector tracker of children caches as we'll take that data from signi
 	- was anyway used only for ensuring
 - Groups can be defined separately from flavours, e.g. many groups can share the same flavours.

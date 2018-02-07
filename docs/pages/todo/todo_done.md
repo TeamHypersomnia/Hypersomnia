@@ -108,3 +108,9 @@ we consider whole type overrides too complex architeciturally:
 	- There might be a cosmos inconsistent error thrown if author clones something
 		- well then the editor may controllably catch it and revert
 		- and in the solver we will take proper precautions
+
+- Consider: what would it gain us to have e.g. cosmos solvable templatized completely upon an entity type,
+ vs having all its members per and functions work manually upon all types?
+	- in the same way with inferred caches since that would be implied?
+	- at some point we must anyway wrap ops for all entity types and at the lowest level we do the better
+

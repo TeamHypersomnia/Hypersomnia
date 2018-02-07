@@ -3,7 +3,9 @@
 
 #include "augs/misc/timing/delta.h"
 #include "augs/misc/randomization_declaration.h"
+
 #include "augs/templates/introspection_utils/rewrite_members.h"
+#include "augs/templates/for_each_std_get.h"
 
 #include "augs/entity_system/storage_for_systems.h"
 
@@ -30,13 +32,14 @@
 
 class cosmos_solvable {
 	using guid_cache = std::map<entity_guid, entity_id>;
+	using all_guid_caches = std::array<guid_cache, ENTITY_TYPES_COUNT>;
 
 	static const cosmos_solvable zero;
 
 	entity_id allocate_new_entity();
 	void clear_guid(const entity_id);
 
-	guid_cache guid_to_id;
+	all_guid_caches guid_to_id;
 
 public:
 	cosmos_solvable_significant significant;
@@ -59,13 +62,16 @@ public:
 
 	template <class D>
 	void for_each_entity_id(D pred) const {
+		for_each_pool([](auto& p) {
+
+		});
+
 		get_entity_pool().for_each_id(pred);
 	}
 
 	void destroy_all_caches();
 
 	void increment_step();
-	void remap_guids();
 	void clear();
 
 	void set_steps_per_second(const unsigned steps_per_second);
@@ -120,12 +126,20 @@ public:
 	augs::delta get_fixed_delta() const;
 	unsigned get_steps_per_second() const;
 
-	auto& get_entity_pool() {
-		return significant.entity_pool;
+	template <class F>
+	void for_each_pool(F callback) {
+		for_each_through_std_get(
+			significant.aggregate_pools,
+			callback
+		);
 	}
 
-	const auto& get_entity_pool() const {
-		return significant.entity_pool;
+	template <class F>
+	void for_each_pool(F callback) const {
+		for_each_through_std_get(
+			significant.aggregate_pools,
+			callback
+		);
 	}
 
 	template <class T>
@@ -181,7 +195,11 @@ inline entity_id cosmos_solvable::to_versioned(const unversioned_entity_id id) c
 }
 
 inline std::size_t cosmos_solvable::get_entities_count() const {
-	return significant.entity_pool.size();
+	std::size_t total = 0u;
+
+	for_each_pool([](const auto& p) { total += p.size(); } );
+
+	return total;
 }
 
 inline std::size_t cosmos_solvable::get_maximum_entities() const {

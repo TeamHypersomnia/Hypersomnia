@@ -575,9 +575,9 @@ void editor_setup::perform_custom_imgui(
 			static ImGuiTextFilter filter;
 			filter.Draw();
 			
-			work().world.get_solvable().for_each_entity_id([&](const entity_id id) {
-				const auto handle = work().world[id];
+			work().world.for_each_entity([&](const auto handle) {
 				const auto name = to_string(handle.get_name());
+				const auto id = handle.get_id();
 
 				if (filter.PassFilter(name.c_str())) {
 					auto scope = scoped_id(id.indirection_index);

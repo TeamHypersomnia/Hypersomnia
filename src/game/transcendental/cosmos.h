@@ -18,12 +18,6 @@
 
 #include "game/assets/behaviour_tree.h"
 
-enum class subjects_iteration_flag {
-	POSSIBLE_ITERATOR_INVALIDATION,
-
-	COUNT
-};
-
 struct cosmos_loading_error : error_with_typesafe_sprintf {
 	using error_with_typesafe_sprintf::error_with_typesafe_sprintf;
 };
@@ -68,6 +62,27 @@ class cosmos {
 		);
 	}
 
+	template <class C, class F>
+	static void for_each_impl(
+		C& self,
+		const processing_subjects list_type, 
+		F callback
+	) {
+		for (const auto& subject : self.get_solvable({})) {
+			operator()(subject, callback);
+		}
+	}
+
+	template <class C, class F>
+	static void for_each_entity_impl(
+		C& self,
+		F callback
+	) {
+		for (const auto& subject : self.get_solvable({})) {
+			operator()(subject, callback);
+		}
+	}
+
 	cosmos_common common;
 	private_cosmos_solvable solvable;
 
@@ -80,33 +95,6 @@ public:
 	cosmos() = default;
 	explicit cosmos(const cosmic_pool_size_type reserved_entities);
 
-	template <class F>
-	void for_each(
-		const processing_subjects list_type, 
-		F callback,
-		augs::enum_boolset<subjects_iteration_flag> flags = {}
-	) {
-		if (flags.test(subjects_iteration_flag::POSSIBLE_ITERATOR_INVALIDATION)) {
-			const auto targets = get_solvable_inferred().processing_lists.get(list_type);
-
-			for (const auto& subject : targets) {
-				operator()(subject, callback);
-			}
-		}
-		else {
-			for (const auto& subject : get_solvable_inferred().processing_lists.get(list_type)) {
-				operator()(subject, callback);
-			}
-		}
-	}
-
-	template <class F>
-	void for_each(const processing_subjects list_type, F callback) const {
-		for (const auto& subject : get_solvable().inferred.processing_lists.get(list_type)) {
-			operator()(subject, callback);
-		}
-	}
-	
 	/* 
 		If exception is thrown during alteration,
 		these metods will properly refresh inferred caches with what state was left.

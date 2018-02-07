@@ -1,5 +1,6 @@
 #pragma once
 #include "augs/templates/type_in_list_id.h"
+#include "augs/templates/type_matching_and_indexing.h"
 
 struct controlled_character;
 struct plain_invisible_body;
@@ -32,3 +33,8 @@ using all_entity_types = type_list<
 >;
 
 using entity_type_id = type_in_list_id<all_entity_types>;
+
+constexpr std::size_t ENTITY_TYPES_COUNT = num_types_in_list_v<all_entity_types>;
+
+template <class T>
+constexpr std::size_t ENTITY_TYPE_IDX = index_in_list_v<all_entity_types>;

@@ -10,7 +10,7 @@ template <class A, class = void>
 struct has_specific_entity_type : std::false_type {};
 
 template <class A>
-struct has_specific_entity_type<A, decltype(typename A::specific_entity_type(), void())> 
+struct has_specific_entity_type<A, decltype(typename A::used_entity_type(), void())> 
 	: std::bool_constant<A::has_specific_entity_type> 
 {};
 
@@ -106,7 +106,7 @@ public:
 	auto& get_flavour() const {
 		const auto self = *static_cast<const E*>(this);
 		auto& cosm = self.get_cosmos();
-		return cosm.get_flavour<typename E::specific_entity_type>(get_raw_flavour_id());
+		return cosm.get_flavour<typename E::used_entity_type>(get_raw_flavour_id());
 	}
 
 	const auto& get_name() const {

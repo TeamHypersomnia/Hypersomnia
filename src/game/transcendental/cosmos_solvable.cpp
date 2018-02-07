@@ -17,7 +17,6 @@ cosmos_solvable::cosmos_solvable(const cosmic_pool_size_type reserved_entities) 
 	reserve_storage_for_entities(reserved_entities);
 }
 
-
 static auto make_reserver(const std::size_t n) {
 	return [n](auto, auto& sys) {
 		using T = std::decay_t<decltype(sys)>;
@@ -183,10 +182,3 @@ void cosmos_solvable::clear_guid(const entity_id cleared) {
 	guid_to_id.erase(get_guid(cleared));
 }
 
-void cosmos_solvable::remap_guids() {
-	guid_to_id.clear();
-
-	for_each_entity_id([this](const entity_id id) {
-		guid_to_id[get_guid(id)] = id;
-	});
-}

@@ -100,7 +100,7 @@ class basic_typed_entity_handle :
 
 public:
 	using misc_base::get_flavour;
-	using specific_entity_type = entity_type;
+	using used_entity_type = entity_type;
 
 	basic_typed_entity_handle(
 		owner_reference owner,

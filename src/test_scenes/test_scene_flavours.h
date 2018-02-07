@@ -8,8 +8,8 @@
 enum class test_static_lights {
 	STRONG_LAMP = 1
 };
+
 enum class test_sprite_decorations {
-num class test_sprite_decorations {
 	HAVE_A_PLEASANT = 1,
 	STREET,
 	ROAD_DIRT,
@@ -44,10 +44,6 @@ enum class test_shootable_charges {
 
 enum class test_wandering_pixels_decorations {
 	WANDERING_PIXELS = 1
-};
-
-enum class test_static_lights {
-
 };
 
 enum class test_throwable_explosives {

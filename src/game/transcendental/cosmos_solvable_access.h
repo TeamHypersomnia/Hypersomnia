@@ -13,11 +13,11 @@ class cosmos_solvable_access {
 	friend cosmic_delta;
 	friend cosmic;
 
-	template <bool is_const>
+	template <bool>
 	friend class basic_entity_handle;
 
-	template <class>
-	friend class iterated_entity_handle;
+	template <bool, class, class>
+	friend class basic_typed_entity_handle;
 
 	cosmos_solvable_access() {}
 };
