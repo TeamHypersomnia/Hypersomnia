@@ -10,7 +10,7 @@ void cosmos_solvable::clear() {
 }
 
 bool cosmos_solvable::empty() const {
-	return get_entities_count() == 0 && guid_to_id.empty();
+	return get_entities_count() == 0;
 }
 
 cosmos_solvable::cosmos_solvable(const cosmic_pool_size_type reserved_entities) {
@@ -51,77 +51,6 @@ void cosmos_solvable::destroy_all_caches() {
 
 void cosmos_solvable::increment_step() {
 	++significant.clock.now.step;
-}
-
-template <class T, class agg>
-static bool components_equal_in_entities(
-	const cosmos_solvable& provider,
-	const agg& e1, 
-	const agg& e2
-) {
-	const auto maybe_1 = e1.template find<T>(provider);
-	const auto maybe_2 = e2.template find<T>(provider);
-
-	if (!maybe_1 && !maybe_2) {
-		return true;
-	}
-
-	if (maybe_1) {
-		if (maybe_2) {
-			bool difference_found = false;
-
-			if (!augs::equal_by_introspection(*maybe_1, *maybe_2)) {
-				difference_found = true;
-			}
-
-			if (!difference_found) {
-				return true;
-			}
-		}
-	}
-
-	return false;
-};
-
-bool cosmos_solvable::operator==(const cosmos_solvable& b) const {
-	ensure(guid_to_id.size() == get_entities_count());
-	ensure(b.guid_to_id.size() == b.get_entities_count());
-
-	if (get_entities_count() != b.get_entities_count()) {
-		return false;
-	}
-
-	for (const auto& it : guid_to_id) {
-		const auto guid = it.first;
-
-		const auto& left = get_aggregate(it.second);
-
-		const auto b_id = b.get_entity_id_by(guid);
-
-		if (!b_id.is_set()) {
-			return false;
-		}
-
-		const auto& right = b.get_aggregate(b_id);
-
-		bool difference_found = false;
-
-		for_each_component_type([&](auto c) {
-			if (!components_equal_in_entities<decltype(c)>(*this, left, right)) {
-				difference_found = true;
-			}
-		});
-
-		if (difference_found) {
-			return false;
-		}
-	}
-
-	return true;
-}
-
-bool cosmos_solvable::operator!=(const cosmos_solvable& b) const {
-	return !operator==(b);
 }
 
 double cosmos_solvable::get_total_seconds_passed(const double view_interpolation_ratio) const {

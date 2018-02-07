@@ -47,17 +47,12 @@ void cosmic::reinfer_all_entities(cosmos& cosm) {
 
 void cosmic::reinfer_solvable(cosmos& cosm) {
 	auto& solvable = cosm.get_solvable({});
-	auto& guid_maps = solvable.guid_to_id;
 
-	for (auto& g : guid_maps) {
-		g.clear();
-	}
+	auto& guids = solvable.guid_to_id;
+	guids.clear();
 
 	cosm.for_each_entity([this](const auto handle) {
-		using T = decltype(handle)::used_entity_type;
-
-		auto& type_specific_map = guid_maps[ENTITY_TYPE_IDX<T>]; 
-		guid_to_id[handle.get_guid()] = handle.get_id();
+		guids[handle.get_guid()] = handle.get_id();
 	});
 
 	reinfer_all_entities(cosm);

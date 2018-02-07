@@ -32,14 +32,13 @@
 
 class cosmos_solvable {
 	using guid_cache = std::map<entity_guid, entity_id>;
-	using all_guid_caches = std::array<guid_cache, ENTITY_TYPES_COUNT>;
 
 	static const cosmos_solvable zero;
 
 	entity_id allocate_new_entity();
 	void clear_guid(const entity_id);
 
-	all_guid_caches guid_to_id;
+	guid_cache guid_to_id;
 
 public:
 	cosmos_solvable_significant significant;
@@ -151,9 +150,6 @@ public:
 	const auto& get_component_pool() const {
 		return std::get<cosmic_object_pool<T>>(significant.component_pools);
 	}
-
-	bool operator==(const cosmos_solvable&) const;
-	bool operator!=(const cosmos_solvable&) const;
 
 	bool empty() const;
 
