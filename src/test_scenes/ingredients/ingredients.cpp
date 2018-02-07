@@ -22,7 +22,7 @@ namespace test_flavours {
 		}
 
 		{
-			auto& meta = get_test_flavour(flavours, test_wandering_sprite_decorations::WANDERING_PIXELS);
+			auto& meta = get_test_flavour(flavours, test_wandering_pixels_decorations::WANDERING_PIXELS);
 
 			{
 				invariants::render render_def;

@@ -212,7 +212,7 @@ namespace test_scenes {
 			const auto reach = xywh(0, 0, 1500, 32000);
 
 			{
-				const auto e = create_test_scene_entity(world, test_wandering_sprite_decorations::WANDERING_PIXELS);
+				const auto e = create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS);
 				auto& w = e.get<components::wandering_pixels>();
 
 				w.colorize = cyan;
@@ -222,7 +222,7 @@ namespace test_scenes {
 			}
 
 			{
-				const auto e = create_test_scene_entity(world, test_wandering_sprite_decorations::WANDERING_PIXELS);
+				const auto e = create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS);
 				auto& w = e.get<components::wandering_pixels>();
 
 
@@ -234,7 +234,7 @@ namespace test_scenes {
 			}
 
 			{
-				const auto e = create_test_scene_entity(world, test_wandering_sprite_decorations::WANDERING_PIXELS);
+				const auto e = create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS);
 				auto& w = e.get<components::wandering_pixels>();
 
 
@@ -277,7 +277,7 @@ namespace test_scenes {
 
 
 				{
-					const auto e = create_test_scene_entity(world, test_wandering_sprite_decorations::WANDERING_PIXELS);
+					const auto e = create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS);
 					auto& w = e.get<components::wandering_pixels>();
 
 
@@ -288,7 +288,7 @@ namespace test_scenes {
 				}
 
 				{
-					const auto e = create_test_scene_entity(world, test_wandering_sprite_decorations::WANDERING_PIXELS);
+					const auto e = create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS);
 					auto& w = e.get<components::wandering_pixels>();
 
 
@@ -299,7 +299,7 @@ namespace test_scenes {
 				}
 
 				{
-					const auto e = create_test_scene_entity(world, test_wandering_sprite_decorations::WANDERING_PIXELS);
+					const auto e = create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS);
 					auto& w = e.get<components::wandering_pixels>();
 
 
@@ -331,7 +331,7 @@ namespace test_scenes {
 				const auto right_reach = xywh(1164.f - 8.f + 90.f - 600, 220 - 250, 1000, 600);
 
 				{
-					const auto e = create_test_scene_entity(world, test_wandering_sprite_decorations::WANDERING_PIXELS);
+					const auto e = create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS);
 					auto& w = e.get<components::wandering_pixels>();
 
 
@@ -342,7 +342,7 @@ namespace test_scenes {
 				}
 
 				{
-					const auto e = create_test_scene_entity(world, test_wandering_sprite_decorations::WANDERING_PIXELS);
+					const auto e = create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS);
 					auto& w = e.get<components::wandering_pixels>();
 
 
@@ -353,7 +353,7 @@ namespace test_scenes {
 				}
 
 				{
-					const auto e = create_test_scene_entity(world, test_wandering_sprite_decorations::WANDERING_PIXELS);
+					const auto e = create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS);
 					auto& w = e.get<components::wandering_pixels>();
 
 
@@ -364,7 +364,7 @@ namespace test_scenes {
 				}
 
 				{
-					const auto e = create_test_scene_entity(world, test_wandering_sprite_decorations::WANDERING_PIXELS);
+					const auto e = create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS);
 					auto& w = e.get<components::wandering_pixels>();
 
 
@@ -375,7 +375,7 @@ namespace test_scenes {
 				}
 
 				{
-					const auto e = create_test_scene_entity(world, test_wandering_sprite_decorations::WANDERING_PIXELS);
+					const auto e = create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS);
 					auto& w = e.get<components::wandering_pixels>();
 
 
@@ -386,7 +386,7 @@ namespace test_scenes {
 				}
 
 				{
-					const auto e = create_test_scene_entity(world, test_wandering_sprite_decorations::WANDERING_PIXELS);
+					const auto e = create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS);
 					auto& w = e.get<components::wandering_pixels>();
 
 

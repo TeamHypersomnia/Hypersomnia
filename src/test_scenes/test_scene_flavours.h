@@ -8,8 +8,8 @@
 enum class test_static_lights {
 	STRONG_LAMP = 1
 };
-
-enum class sprite_decorations {
+enum class test_sprite_decorations {
+num class test_sprite_decorations {
 	HAVE_A_PLEASANT = 1,
 	STREET,
 	ROAD_DIRT,
@@ -42,11 +42,7 @@ enum class test_shootable_charges {
 	CYAN_CHARGE = 1
 };
 
-enum class test_sprite_decorations {
-
-};
-
-enum class test_wandering_sprite_decorations {
+enum class test_wandering_pixels_decorations {
 	WANDERING_PIXELS = 1
 };
 
@@ -87,7 +83,7 @@ using test_flavours_map = type_map<
 	type_pair<test_shootable_weapons, shootable_weapon>,
 	type_pair<test_shootable_charges, shootable_charge>,
 	type_pair<test_sprite_decorations, sprite_decoration>,
-	type_pair<test_wandering_sprite_decorations, wandering_sprite_decoration>,
+	type_pair<test_wandering_pixels_decorations, wandering_pixels_decoration>,
 	type_pair<test_static_lights, static_light>,
 	type_pair<test_throwable_explosives, throwable_explosive>,
 	type_pair<test_plain_missiles, plain_missile>,

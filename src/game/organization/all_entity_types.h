@@ -142,7 +142,7 @@ struct sprite_decoration {
 	>;
 };
 
-struct wandering_sprite_decoration {
+struct wandering_pixels_decoration {
 	static constexpr std::size_t statically_allocated_aggregates = 100;
 	static constexpr std::size_t statically_allocated_flavours = 20;
 
