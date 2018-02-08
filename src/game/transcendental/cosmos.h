@@ -87,7 +87,7 @@ class cosmos {
 
 	template <class C, class F>
 	void for_each_in_impl(C& self, const processing_flags f, F callback) {
-		for (const auto subject : self.get_solvable_inferred().processing_lists.get(f)) {
+		for (const auto subject : self.get_solvable_inferred().processing.get(f)) {
 			callback(f);
 		}
 	}

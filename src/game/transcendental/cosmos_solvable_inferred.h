@@ -22,7 +22,7 @@ struct cosmos_solvable_inferred {
 	relational_cache relational;
 	flavour_id_cache name;
 	physics_world_cache physics;
-	processing_lists_cache processing_lists;
+	processing_lists_cache processing;
 	tree_of_npo_cache tree_of_npo;
 	// END GEN INTROSPECTOR
 };
