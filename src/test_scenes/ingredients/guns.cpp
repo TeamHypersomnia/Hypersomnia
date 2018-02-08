@@ -510,14 +510,11 @@ namespace prefabs {
 		auto& cosmos = step.get_cosmos();
 		auto load_mag = cosmos[load_mag_id];
 
-		auto weapon = create_test_scene_entity(cosmos, test_shootable_weapons::SAMPLE_RIFLE);
+		auto weapon = create_test_scene_entity(cosmos, test_shootable_weapons::SAMPLE_RIFLE, pos);
 
 		auto& gun = weapon.get<components::gun>();
 
 		// add_muzzle_particles(weapon, gun, step);
-
-		weapon.set_logic_transform(pos);
-		weapon.construct_entity(step);
 
 		gun.firing_engine_sound.id = assets::sound_buffer_id::FIREARM_ENGINE;
 
@@ -536,14 +533,11 @@ namespace prefabs {
 		auto& cosmos = step.get_cosmos();
 		auto load_mag = cosmos[load_mag_id];
 
-		auto weapon = create_test_scene_entity(cosmos, test_shootable_weapons::KEK9);
+		auto weapon = create_test_scene_entity(cosmos, test_shootable_weapons::KEK9, pos);
 
 		auto& gun = weapon.get<components::gun>();
 
 		// add_muzzle_particles(weapon, gun, step);
-
-		weapon.set_logic_transform(pos);
-		weapon.construct_entity(step);
 
 		gun.firing_engine_sound.id = assets::sound_buffer_id::FIREARM_ENGINE;
 
@@ -560,10 +554,7 @@ namespace prefabs {
 		vec2 pos
 	) {
 		auto& cosmos = step.get_cosmos();
-		auto weapon = create_test_scene_entity(cosmos, test_shootable_weapons::AMPLIFIER_ARM);
-
-		weapon.set_logic_transform(pos);
-		weapon.construct_entity(step);
+		auto weapon = create_test_scene_entity(cosmos, test_shootable_weapons::AMPLIFIER_ARM, pos);
 
 		return weapon;
 	}
@@ -574,10 +565,7 @@ namespace prefabs {
 		auto& cosmos = step.get_cosmos();
 		auto charge_inside = cosmos[charge_inside_id];
 
-		auto sample_magazine = create_test_scene_entity(cosmos, test_container_items::SAMPLE_MAGAZINE);
-
-		sample_magazine.set_logic_transform(pos);
-		sample_magazine.construct_entity(step);
+		auto sample_magazine = create_test_scene_entity(cosmos, test_container_items::SAMPLE_MAGAZINE, pos);
 
 		if (charge_inside.alive()) {
 			item_slot_transfer_request load_charge{ charge_inside, sample_magazine[slot_function::ITEM_DEPOSIT] };
@@ -589,11 +577,7 @@ namespace prefabs {
 
 	entity_handle create_cyan_charge(const logic_step step, vec2 pos, int charges) {
 		auto& cosmos = step.get_cosmos();
-		const auto cyan_charge = create_test_scene_entity(cosmos, test_shootable_charges::CYAN_CHARGE);
-
-		cyan_charge.set_logic_transform(pos);
-		cyan_charge.construct_entity(step);
-
+		const auto cyan_charge = create_test_scene_entity(cosmos, test_shootable_charges::CYAN_CHARGE, pos);
 		return cyan_charge;
 	}
 }

@@ -45,13 +45,10 @@ namespace test_flavours {
 namespace prefabs {
 	entity_handle create_cyan_urban_machete(const logic_step step, vec2 pos) {
 #if TODO
-		const auto machete = create_test_scene_entity(step.get_cosmos(), test_scene_flavour::URBAN_CYAN_MACHETE);
+		const auto machete = create_test_scene_entity(step.get_cosmos(), test_scene_flavour::URBAN_CYAN_MACHETE, pos);
 
 		machete += components::melee();
 		machete += components::sender();
-
-		machete.set_logic_transform(pos);
-		machete.construct_entity(step);
 
 		return machete;
 #endif

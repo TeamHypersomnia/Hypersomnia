@@ -218,7 +218,6 @@ namespace test_scenes {
 				w.colorize = cyan;
 				w.particles_count = 200;
 				w.reach = reach;
-				e.construct_entity(step);
 			}
 
 			{
@@ -230,7 +229,6 @@ namespace test_scenes {
 				//w.face.size.set(1, 1);
 				w.particles_count = 80;
 				w.reach = reach;
-				e.construct_entity(step);
 			}
 
 			{
@@ -242,7 +240,6 @@ namespace test_scenes {
 				//w.face.size.set(1, 1);
 				w.particles_count = 80;
 				w.reach = reach;
-				e.construct_entity(step);
 			}
 		}
 
@@ -272,7 +269,6 @@ namespace test_scenes {
 					auto& light = l.get<components::light>();
 
 					light.color = light_cyan;
-					l.construct_entity(step);
 				}
 
 
@@ -284,7 +280,6 @@ namespace test_scenes {
 					w.colorize = light_cyan;
 					w.particles_count = 50;
 					w.reach = xywh(light_pos.x- 250, light_pos.y-250, 500, 500);
-					e.construct_entity(step);
 				}
 
 				{
@@ -295,7 +290,6 @@ namespace test_scenes {
 					w.colorize = light_cyan;
 					w.particles_count = 20;
 					w.reach = xywh(light_pos.x - 150, light_pos.y - 150, 300, 300);
-					e.construct_entity(step);
 				}
 
 				{
@@ -306,7 +300,6 @@ namespace test_scenes {
 					w.colorize = light_cyan;
 					w.particles_count = 20;
 					w.reach = xywh(light_pos.x - 25, light_pos.y - 25, 50, 50);
-					e.construct_entity(step);
 				}
 			}
 		}
@@ -317,14 +310,12 @@ namespace test_scenes {
 				l.set_logic_transform(components::transform(vec2(164.f - 8.f + 90.f, 220)));
 				auto& light = l.get<components::light>();
 				light.color = cyan;
-				l.construct_entity(step);
 			}
 			{
 				const auto l = create_test_scene_entity(world, test_static_lights::STRONG_LAMP);
 				l.set_logic_transform(components::transform(vec2(1164.f + 24.f - 90.f, 220)));
 				auto& light = l.get<components::light>();
 				light.color = orange;
-				l.construct_entity(step);
 			}
 			{
 				const auto left_reach = xywh(164.f - 8.f + 90.f - 550, 220 - 250, 1000, 600);
@@ -338,7 +329,6 @@ namespace test_scenes {
 					w.colorize = cyan;
 					w.particles_count = 20;
 					w.reach = left_reach;
-					e.construct_entity(step);
 				}
 
 				{
@@ -349,7 +339,6 @@ namespace test_scenes {
 					w.colorize = orange;
 					w.particles_count = 20;
 					w.reach = right_reach;
-					e.construct_entity(step);
 				}
 
 				{
@@ -360,7 +349,6 @@ namespace test_scenes {
 					w.colorize = cyan;
 					w.particles_count = 50;
 					w.reach = left_reach;
-					e.construct_entity(step);
 				}
 
 				{
@@ -371,7 +359,6 @@ namespace test_scenes {
 					w.colorize = orange;
 					w.particles_count = 50;
 					w.reach = right_reach;
-					e.construct_entity(step);
 				}
 
 				{
@@ -382,7 +369,6 @@ namespace test_scenes {
 					w.colorize = cyan;
 					w.particles_count = 30;
 					w.reach = left_reach;
-					e.construct_entity(step);
 				}
 
 				{
@@ -393,7 +379,6 @@ namespace test_scenes {
 					w.colorize = orange;
 					w.particles_count = 30;
 					w.reach = right_reach;
-					e.construct_entity(step);
 				}
 			}
 
@@ -402,15 +387,10 @@ namespace test_scenes {
 				l.set_logic_transform(components::transform(vec2(664.f + 24.f, -1100)));
 				auto& light = l.get<components::light>();
 				light.color = orange;
-				l.construct_entity(step);
 			}
 
 			{
-				const auto e = create_test_scene_entity(world, test_sprite_decorations::HAVE_A_PLEASANT);
-
-				e += components::transform(vec2(164.f - 8.f, -60.f - 20.f));
-
-				e.construct_entity(step);
+				const auto e = create_test_scene_entity(world, test_sprite_decorations::HAVE_A_PLEASANT, components::transform(vec2(164.f - 8.f, -60.f - 20.f)));
 
 				prefabs::create_brick_wall(step, vec2(3 + 1 + 1100, -32 - 96));
 				prefabs::create_brick_wall(step, vec2(3 + 1 + 1100 + 160, -32 - 96));
@@ -432,57 +412,26 @@ namespace test_scenes {
 				const auto side = static_cast<int>(sqrt(num_floors) / 2);
 
 				for (int x = -side; x < side; ++x) {
-					for (int y = -side; y < side * 16; ++y)
-					{
-						auto street = create_test_scene_entity(world, test_sprite_decorations::STREET);
-
-						street += components::transform{ bg_size * vec2i(x, y) };
-
-						street.construct_entity(step);
+					for (int y = -side; y < side * 16; ++y) {
+						create_test_scene_entity(world, test_sprite_decorations::STREET, components::transform{ bg_size * vec2i(x, y) });
 					}
 				}
 
 				{
 					const vec2 size = metas.at(assets::game_image_id::ROAD_FRONT_DIRT).get_size();
 
-					auto road_dirt = create_test_scene_entity(world, test_sprite_decorations::ROAD_DIRT);
-					
-
-					road_dirt += components::transform{ vec2(-3 - 16 + 100 + 160 + 80 + size.x / 2, -32 - 96 + 160 + 80 - size.y / 2) };
-
-					road_dirt.construct_entity(step);
+					create_test_scene_entity(world, test_sprite_decorations::ROAD_DIRT, components::transform{ vec2(-3 - 16 + 100 + 160 + 80 + size.x / 2, -32 - 96 + 160 + 80 - size.y / 2) });
 				}
 
 				for (int r = 0; r < 38; ++r) {
 					const vec2 size = test_sprite_decorations.at(assets::game_image_id::ROAD).get_size();
 
-					auto road = create_test_scene_entity(world, test_sprite_decorations::ROAD);
-					
-
-					road += components::transform{ vec2(-3 - 16 + 100 + 160 + 80 + size.x / 2, -32 - 96 + 160 + 80 + size.y / 2 + size.y*r) };
-
-					road.construct_entity(step);
+					auto road = create_test_scene_entity(world, test_sprite_decorations::ROAD, components::transform{ vec2(-3 - 16 + 100 + 160 + 80 + size.x / 2, -32 - 96 + 160 + 80 + size.y / 2 + size.y*r) });
 				}
 			}
 
-			{
-				const auto e = create_test_scene_entity(world, test_sprite_decorations::AWAKENING);
-				
-
-				e += components::transform(vec2(164.f - 8.f, -60.f - 20.f + 40.f));
-
-				e.construct_entity(step);
-			}
-
-			{
-				const auto e = create_test_scene_entity(world, test_sprite_decorations::METROPOLIS);
-
-				
-
-				e += components::transform(vec2(1164.f + 24.f, -60.f));
-
-				e.construct_entity(step);
-			}
+			create_test_scene_entity(world, test_sprite_decorations::AWAKENING, components::transform(vec2(164.f - 8.f, -60.f - 20.f + 40.f)));
+			create_test_scene_entity(world, test_sprite_decorations::METROPOLIS, components::transform(vec2(1164.f + 24.f, -60.f)));
 		}
 
 		prefabs::create_kek9(step, vec2(-800, -200),

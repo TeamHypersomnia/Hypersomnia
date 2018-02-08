@@ -108,9 +108,9 @@ inline auto to_entity_flavour_id(const T id) {
 	id.raw = to_raw_flavour_id(id);
 }
 
-template <class C>
-auto create_test_scene_entity(C& cosm, const test_scene_flavour id) {
-	return cosmic::create_entity(cosm, to_entity_flavour_id(id));
+template <class C, class... Args>
+auto create_test_scene_entity(C& cosm, const test_scene_flavour id, Args&& args...) {
+	return cosmic::create_entity(cosm, to_entity_flavour_id(id), std::forward<Args>(args)...);
 }
 
 template <class C, class T>

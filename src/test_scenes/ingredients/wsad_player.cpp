@@ -182,17 +182,11 @@ namespace prefabs {
 	) {
 		auto& world = step.get_cosmos();
 
-		const auto character = create_test_scene_entity(world, test_controlled_characters::PLAYER);
-		
-		character.set_logic_transform(spawn_transform);
-		character.construct_entity(step);
+		const auto character = create_test_scene_entity(world, test_controlled_characters::PLAYER, spawn_transform);
 
 		auto recoil = create_test_scene_entity(world, test_plain_invisible_bodys::CROSSHAIR_RECOIL_BODY);
 
 		test_plain_invisible_bodys.map_child_entity(child_entity_name::CROSSHAIR_RECOIL_BODY, recoil);
-
-		recoil.construct_entity(step);
-		zero_target.construct_entity(step);
 		// LOG("Character mass: %x", character.get<components::rigid_body>().get_mass());
 		return character;
 	}

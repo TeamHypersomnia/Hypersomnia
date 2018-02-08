@@ -47,10 +47,7 @@ namespace test_flavours {
 namespace prefabs {
 	entity_handle create_sample_backpack(const logic_step step, vec2 pos) {
 		auto& world = step.get_cosmos();
-		const auto backpack = create_test_scene_entity(world, test_container_items::SAMPLE_BACKPACK);
-		
-		backpack.set_logic_transform(pos);
-		backpack.construct_entity(step);
+		const auto backpack = create_test_scene_entity(world, test_container_items::SAMPLE_BACKPACK, pos);
 		return backpack;
 	}
 }

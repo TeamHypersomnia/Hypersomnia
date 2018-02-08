@@ -51,16 +51,12 @@ namespace test_flavours {
 
 namespace prefabs {
 	entity_handle create_crate(const logic_step step, const components::transform pos) {
-		const auto crate = create_test_scene_entity(step.get_cosmos(), test_plain_sprited_bodys::CRATE);
-		crate.set_logic_transform(pos);
-		crate.construct_entity(step);
+		const auto crate = create_test_scene_entity(step.get_cosmos(), test_plain_sprited_bodys::CRATE, pos);
 		return crate;
 	}
 
 	entity_handle create_brick_wall(const logic_step step, const components::transform pos) {
-		const auto crate = create_test_scene_entity(step.get_cosmos(), test_plain_sprited_bodys::BRICK_WALL);
-		crate.set_logic_transform(pos);
-		crate.construct_entity(step);
+		const auto crate = create_test_scene_entity(step.get_cosmos(), test_plain_sprited_bodys::BRICK_WALL, pos);
 		return crate;
 	}
 }
