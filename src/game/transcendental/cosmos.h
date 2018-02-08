@@ -16,6 +16,8 @@
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/cosmic_functions.h"
 
+#include "game/enums/processing_subjects.h"
+
 #include "game/assets/behaviour_tree.h"
 
 struct cosmos_loading_error : error_with_typesafe_sprintf {
@@ -172,6 +174,16 @@ public:
 	template <class... Constraints, class F>
 	void for_each_having(F&& callback) const {
 		for_each_entity_impl<Constraints...>(*this, std::forward<F>(callback));
+	}
+
+	template <class F>
+	void for_each_in(const processing_subjects subjects) {
+
+	}
+
+	template <class F>
+	void for_each_in(const processing_subjects subjects) const {
+
 	}
 
 	template <class id_type>

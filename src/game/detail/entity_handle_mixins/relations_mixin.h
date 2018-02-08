@@ -48,8 +48,6 @@ protected:
 	}
 
 public:
-	entity_handle_type get_parent() const;
-	
 	inventory_slot_handle_type operator[](const slot_function) const;
 	entity_handle_type operator[](const child_entity_name) const;
 	
@@ -58,10 +56,10 @@ public:
 		const auto self = *static_cast<const entity_handle_type*>(this);
 		auto& cosmos = self.get_cosmos();
 
-		self.for_each_component(
-			[&cosmos, &callback](auto& subject_component) {
+		self.get().for_each(
+			[&cosmos, &callback](const auto& subject_component) {
 				augs::introspect(
-					[&](auto, auto& member) {
+					[&](auto, const auto& member) {
 						if constexpr(std::is_same_v<std::decay_t<decltype(member)>, child_entity_id>) {
 							const auto child_handle = cosmos[member];
 

@@ -139,8 +139,9 @@ public:
 		);
 	}
 
-	std::size_t get_count_of(const processing_subjects list_type) const {
-		return inferred.processing_lists.get(list_type).size();
+	template <class E>
+	auto get_count_of() const {
+		return get_solvable().significant.template get_pool<E>().size();
 	}
 	
 	std::unordered_set<entity_id> get_entities_by_flavour_id(const entity_flavour_id&) const;

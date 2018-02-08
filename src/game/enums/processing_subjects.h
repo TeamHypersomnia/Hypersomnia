@@ -2,6 +2,7 @@
 
 enum class processing_subjects {
 	// GEN INTROSPECTOR enum class processing_subjects
+#if ERASED
 	WITH_ANIMATION,
 	WITH_BEHAVIOUR_TREE,
 	WITH_CAR,
@@ -18,8 +19,10 @@ enum class processing_subjects {
 	WITH_PATHFINDING,
 	WITH_SENTIENCE,
 	WITH_TRACE,
-	WITH_ENABLED_PAST_CONTAGIOUS,
 	WITH_LIGHT,
+#endif
+
+	WITH_ENABLED_PAST_CONTAGIOUS,
 
 	COUNT
 	// END GEN INTROSPECTOR

@@ -258,7 +258,6 @@ struct finishing_trace {
 		components::rigid_body,
 		components::hand_fuse,
 		components::item,
-		components::missile,
 		components::sender,
 		components::trace,
 
