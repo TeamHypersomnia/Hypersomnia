@@ -17,9 +17,6 @@ class flavour_id_cache {
 		std::unordered_set<entity_id>
 	> entities_by_flavour_id;
 
-	void infer_cache_for(const entity_id, const components::flavour&);
-	void destroy_cache_of(const entity_id, const components::flavour&);
-
 public:
 	std::unordered_set<entity_id> get_entities_by_flavour_id(const entity_flavour_id) const;
 

@@ -88,7 +88,7 @@ public:
 
 	auto get_raw_flavour_id() const {
 		const auto self = *static_cast<const E*>(this);
-		return self.get() <components::flavour>().get_raw_id();
+		return self.get_meta().flavour_id;
 	}
 
 	auto get_flavour_id() const {
