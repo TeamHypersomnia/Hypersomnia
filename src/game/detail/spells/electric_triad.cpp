@@ -52,20 +52,24 @@ void electric_triad_instance::perform_logic(const spell_logic_input in) {
 		LOG_NVPS(next_hostile.get_id());
 #endif
 
-		const auto new_energy_ball = cosmic::create_entity(cosmos, spell_data.missile_flavour);
-		new_energy_ball.construct_entity(in.step);
+		cosmic::create_entity(
+			cosmos, 
+			spell_data.missile_flavour,
+			[&](const auto new_energy_ball){
+				auto new_energy_ball_transform = caster_transform;
 
-		auto new_energy_ball_transform = caster_transform;
-		
-		new_energy_ball_transform.rotation = 
-			(next_hostile.get_logic_transform().pos - caster_transform.pos).degrees();
-		
-		new_energy_ball.set_logic_transform(new_energy_ball_transform);
+				new_energy_ball_transform.rotation = 
+					(next_hostile.get_logic_transform().pos - caster_transform.pos).degrees()
+				;
 
-		new_energy_ball.get<components::sender>().set(caster);
-		new_energy_ball.get<components::missile>().particular_homing_target = next_hostile;
+				new_energy_ball.set_logic_transform(new_energy_ball_transform);
 
-		const auto energy_ball_velocity = vec2::from_degrees(new_energy_ball_transform.rotation) * 2000;
-		new_energy_ball.get<components::rigid_body>().set_velocity(energy_ball_velocity);
+				new_energy_ball.get<components::sender>().set(caster);
+				new_energy_ball.get<components::missile>().particular_homing_target = next_hostile;
+
+				const auto energy_ball_velocity = vec2::from_degrees(new_energy_ball_transform.rotation) * 2000;
+				new_energy_ball.get<components::rigid_body>().set_velocity(energy_ball_velocity);
+			}
+		);
 	}
 }

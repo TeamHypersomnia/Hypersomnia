@@ -11,5 +11,25 @@ struct cosmos_solvable_significant {
 	cosmos_clock clock;
 	// END GEN INTROSPECTOR
 
+	template <class E>
+	auto& get_pool() {
+		return std::get<make_aggregate_pool<E>>(aggregate_pools);
+	}
+
+	template <class E>
+	const auto& get_pool() const {
+		return std::get<make_aggregate_pool<E>>(aggregate_pools);
+	}
+
+	template <class F>
+	decltype(auto) on_pool(const entity_type_id id, F&& callback) {
+		return get_by_dynamic_id(aggregate_pools, id.get_index(), std::forward<F>(callback));
+	}
+
+	template <class F>
+	decltype(auto) on_pool(const entity_type_id id, F&& callback) const {
+		return get_by_dynamic_id(aggregate_pools, id.get_index(), std::forward<F>(callback));
+	}
+
 	void clear();
 };

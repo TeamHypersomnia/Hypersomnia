@@ -530,9 +530,8 @@ void editor_setup::perform_custom_imgui(
 
 				text(typesafe_sprintf("Zoom: %x", printed_camera.zoom * 100.f) + " %");
 
-				text("Total entities: %x/%x",
-					get_viewed_cosmos().get_entities_count(),
-					get_viewed_cosmos().get_solvable().get_maximum_entities()
+				text("Total entities: %x",
+					get_viewed_cosmos().get_entities_count()
 				);
 
 				text("World time: %x (%x steps at %x Hz)",

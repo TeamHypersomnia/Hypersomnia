@@ -54,12 +54,17 @@ struct has_invariants_or_components {
 	template <class E>
 	struct type : std::bool_constant<
 		std::conjunction_v<
-			(is_one_of_list_v<C, typename E::invariants>	
-			|| is_one_of_list_v<C, typename E::components>)...
+			(is_one_of_list_v<Types, typename E::invariants>	
+			|| is_one_of_list_v<Types, typename E::components>)...
 		> 	
 	>
 	{};	
 };
+
+struct has_invariants_or_components<> {
+	template <class E>
+	struct type : std::true_type {} 
+}
 
 template <class E, class... Args>
 using has_invariants_or_components_v = has_invariants_or_components<Args...>::template type<E>;

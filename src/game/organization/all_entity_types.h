@@ -21,7 +21,9 @@ struct controlled_character {
 		invariants::container,
 
 		invariants::sprite,
-		invariants::render
+		invariants::render,
+
+		invariants::interpolation
 	>;
 
 	using components = type_list<
@@ -33,7 +35,9 @@ struct controlled_character {
 
 		components::animation,
 		components::driver,
-		components::attitude
+		components::attitude,
+
+		components::interpolation
 	>;
 };
 
@@ -66,11 +70,15 @@ struct plain_sprited_body {
 		invariants::fixtures,
 		invariants::shape_polygon,
 		invariants::sprite,
-		invariants::render
+		invariants::render,
+
+		invariants::interpolation
 	>;
 
 	using components = type_list<
-		components::rigid_body
+		components::rigid_body,
+
+		components::interpolation
 	>;
 };
 
@@ -90,7 +98,9 @@ struct shootable_weapon {
 		invariants::fixtures,
 		invariants::shape_polygon,
 		invariants::sprite,
-		invariants::render
+		invariants::render,
+
+		invariants::interpolation
 	>;
 
 	using components = type_list<
@@ -99,7 +109,9 @@ struct shootable_weapon {
 		components::container,
 		components::item,
 
-		components::rigid_body
+		components::rigid_body,
+
+		components::interpolation
 	>;
 };
 
@@ -117,12 +129,16 @@ struct shootable_charge {
 		invariants::fixtures,
 		invariants::shape_polygon,
 		invariants::sprite,
-		invariants::render
+		invariants::render,
+
+		invariants::interpolation
 	>;
 
 	using components = type_list<
 		components::item,
-		components::rigid_body
+		components::rigid_body,
+
+		components::interpolation
 	>;
 };
 
@@ -181,14 +197,18 @@ struct throwable_explosive {
 		invariants::render,
 		invariants::hand_fuse,
 		invariants::explosive,
-		invariants::shape_polygon
+		invariants::shape_polygon,
+
+		invariants::interpolation
 	>;
 
 	using components = type_list<
 		components::rigid_body,
 		components::hand_fuse,
 		components::item,
-		components::sender
+		components::sender,
+
+		components::interpolation
 	>;
 };
 
@@ -206,7 +226,9 @@ struct plain_missile {
 
 		invariants::trace,
 
-		invariants::missile
+		invariants::missile,
+
+		invariants::interpolation
 	>;
 
 	using components = type_list<
@@ -215,7 +237,9 @@ struct plain_missile {
 		components::item,
 		components::missile,
 		components::sender,
-		components::trace
+		components::trace,
+
+		components::interpolation
 	>;
 };
 
@@ -226,7 +250,9 @@ struct finishing_trace {
 	using invariants = type_list<
 		invariants::sprite,
 		invariants::render,
-		invariants::trace
+		invariants::trace,
+
+		invariants::interpolation
 	>;
 
 	using components = type_list<
@@ -235,7 +261,9 @@ struct finishing_trace {
 		components::item,
 		components::missile,
 		components::sender,
-		components::trace
+		components::trace,
+
+		components::interpolation
 	>;
 };
 
@@ -252,12 +280,16 @@ struct container_item {
 		invariants::render,
 
 		invariants::container,
-		invariants::item
+		invariants::item,
+
+		invariants::interpolation
 	>;
 
 	using components = type_list<
 		components::rigid_body,
-		components::item
+		components::item,
+
+		components::interpolation
 	>;
 };
 
@@ -276,7 +308,9 @@ struct explosive_missile {
 		invariants::trace,
 
 		invariants::missile,
-		invariants::explosive
+		invariants::explosive,
+
+		invariants::interpolation
 	>;
 
 	using components = type_list<
@@ -285,6 +319,8 @@ struct explosive_missile {
 		components::item,
 		components::missile,
 		components::sender,
-		components::trace
+		components::trace,
+
+		components::interpolation
 	>;
 };

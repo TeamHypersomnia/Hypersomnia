@@ -62,25 +62,25 @@ class cosmos {
 		);
 	}
 
-	template <class C, class F>
-	static void for_each_impl(
-		C& self,
-		const processing_subjects list_type, 
-		F callback
-	) {
-		for (const auto& subject : self.get_solvable({})) {
-			operator()(subject, callback);
-		}
-	}
+	template <class C, class... Constraints, class F>
+	static void for_each_entity_impl(C& self, F callback) {
+		self.get_solvable({}).for_each_pool(
+			[&](auto& p) {
+				using P = decltype(p);
+				using E = typename std::decay_t<P>::mapped_type;
 
-	template <class C, class F>
-	static void for_each_entity_impl(
-		C& self,
-		F callback
-	) {
-		for (const auto& subject : self.get_solvable({})) {
-			operator()(subject, callback);
-		}
+				if constexpr(has_invariants_or_components_v<E, Constraints...>) {
+					using index_type = typename P::used_size_type;
+					using iterated_handle_type = basic_iterated_entity_handle<is_const_ref_v<P>, E>;
+
+					for (index_type i = 0; i < p.size(); ++i) {
+						auto& object = p.data()[i];
+						const auto iterated_handle = iterated_handle_type(self, object, i);
+						callback(iterated_handle);
+					}
+				}
+			}
+		);
 	}
 
 	cosmos_common common;
@@ -152,6 +152,26 @@ public:
 	template <class I, class... Types, class F>
 	decltype(auto) on_flavour(const I flavour_id, F&& callback) const {
 		return on_flavour_impl(*this, flavour_id, std::forward<F>(callback));
+	}
+
+	template <class F>
+	void for_each_entity(F&& callback) {
+		for_each_entity_impl(*this, std::forward<F>(callback));
+	}
+
+	template <class F>
+	void for_each_entity(F&& callback) const {
+		for_each_entity_impl(*this, std::forward<F>(callback));
+	}
+
+	template <class... Constraints, class F>
+	void for_each_having(F&& callback) {
+		for_each_entity_impl<Constraints...>(*this, std::forward<F>(callback));
+	}
+
+	template <class... Constraints, class F>
+	void for_each_having(F&& callback) const {
+		for_each_entity_impl<Constraints...>(*this, std::forward<F>(callback));
 	}
 
 	template <class id_type>

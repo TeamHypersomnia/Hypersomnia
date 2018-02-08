@@ -7,12 +7,18 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order:  
 
+- always present should be added to the invariants or components while making
+- it probably makes no sense to use GUIDs for now if we are anyway going to transfer whole pools for determinism
+- we'll also write the pool states in lua for now, I guess
+
 - Constructing entities
 	- Solver might want to set some initial component values before inference occurs
 		- Should be done in a lambda where a typed entity handle is given 
 		- After which cosmic::create_entity will simply infer all caches
 		- provide an overload which sets transform
 			- static assert if the entity cannot set a transform
+	- Most constructions and clones will request general flavours and thus return general handles
+		- Thus let's for now expose just those general ones
 
 - Entity groups will be useful later, not until we make a simple deathmatch where we can include some simple weapon/car creation logic etc
 

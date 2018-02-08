@@ -3,10 +3,13 @@
 
 #include "augs/callback_result.h"
 #include "augs/misc/scope_guard.h"
+
 #include "game/transcendental/cosmic_types.h"
 #include "game/transcendental/entity_flavour_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
+#include "game/transcendental/typed_entity_handle_declaration.h"
 #include "game/transcendental/entity_handle.h"
+#include "game/transcendental/entity_construction.h"
 
 #include "game/messages/will_soon_be_deleted.h"
 #include "game/messages/queue_destruction.h"
@@ -27,7 +30,12 @@ class cosmic {
 
 	static void reinfer_solvable(cosmos&);
 
-	static entity_handle instantiate_flavour(cosmos&, entity_flavour_id);
+	template <class F>
+	static typed_entity_handle<F> instantiate_flavour(
+		cosmos& cosm, 
+		const typed_entity_flavour_id<F> flavour_id
+	);
+
 public:
 	class specific_guid_creation_access {
 		friend cosmic_delta;

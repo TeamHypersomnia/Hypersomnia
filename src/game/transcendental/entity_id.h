@@ -43,6 +43,20 @@ struct unversioned_entity_id : unversioned_entity_id_base {
 	{}
 };
 
+template <class E>
+struct typed_entity_id : entity_id_base {
+	using base = entity_id_base;
+	using base::base;
+
+	operator entity_id_base() const {
+		return *static_cast<base*>(this);
+	}
+
+	operator entity_id() const {
+		return { *this, entity_type_id::of<E> };
+	}
+}; 
+
 struct entity_id : entity_id_base {
 	using base = entity_id_base;
 	// GEN INTROSPECTOR struct entity_id

@@ -58,7 +58,11 @@ void cosmic::reinfer_solvable(cosmos& cosm) {
 	reinfer_all_entities(cosm);
 }
 
-entity_handle cosmic::instantiate_flavour(cosmos& cosm, const entity_flavour_id flavour_id) {
+template <class F>
+static typed_entity_handle<F> instantiate_flavour(
+	cosmos& cosm, 
+	const typed_entity_flavour_id<F> flavour_id
+) {
 	ensure (flavour_id != entity_flavour_id());
 
 	const auto new_handle = entity_handle { cosm, cosm.get_solvable({}).allocate_next_entity() };
@@ -80,10 +84,6 @@ entity_handle cosmic::instantiate_flavour(cosmos& cosm, const entity_flavour_id 
 			}
 		}
 	});
-
-	if (const auto light = new_handle.find<invariants::light>()) {
-		new_handle.add(components::transform());
-	}
 
 	return new_handle; 
 }

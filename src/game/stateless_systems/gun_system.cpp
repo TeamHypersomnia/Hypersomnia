@@ -177,39 +177,38 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					if (pe.value >= mana_needed) {
 						if (try_to_fire()) {
 							pe.value -= pe.calculate_damage_result(mana_needed).effective;
-
-							const auto round_entity = cosmic::create_entity(
-								cosmos, 
-								magic_missile_flavour_id
-							);
-
-							round_entity.set_logic_transform(muzzle_transform);
-							round_entity.construct_entity(step);
-
-							auto& sender = round_entity.get<components::sender>();
-							sender.set(gun_entity);
-
 							total_recoil += missile.recoil_multiplier;
 
-							{
-								auto rng = cosmos.get_rng_for(round_entity);
+							cosmic::create_entity(
+								cosmos, 
+								magic_missile_flavour_id
+								[&](const auto round_entity) {
+									round_entity.set_logic_transform(muzzle_transform);
 
-								const auto missile_velocity = 
-									vec2::from_degrees(muzzle_transform.rotation)
-									* missile.muzzle_velocity_mult
-									* rng.randval(gun_def.muzzle_velocity)
-								;
+									auto& sender = round_entity.get<components::sender>();
+									sender.set(gun_entity);
 
-								round_entity.get<components::rigid_body>().set_velocity(missile_velocity);
-							}
+									{
+										auto rng = cosmos.get_rng_for(round_entity);
 
-							{
-								auto response = make_gunshot_response();
-								response.spawned_rounds.push_back(round_entity);
-								step.post_message(response);
-							}
+										const auto missile_velocity = 
+											vec2::from_degrees(muzzle_transform.rotation)
+											* missile.muzzle_velocity_mult
+											* rng.randval(gun_def.muzzle_velocity)
+										;
 
-							correct_interpolation_for(round_entity);
+										round_entity.get<components::rigid_body>().set_velocity(missile_velocity);
+									}
+
+									{
+										auto response = make_gunshot_response();
+										response.spawned_rounds.push_back(round_entity);
+										step.post_message(response);
+									}
+
+									correct_interpolation_for(round_entity);
+								}
+							);
 						}
 					}
 				}
@@ -256,56 +255,55 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 					while (charges--) {
 						if (const auto round_flavour = single_bullet_or_pellet_stack.get<invariants::catridge>().round_flavour) {
-							const auto round_entity = cosmic::create_entity(cosmos, round_flavour);
-							round_entity.construct_entity(step);
-
-							auto& sender = round_entity.get<components::sender>();
-							sender.set(gun_entity);
-
-							{
-								auto& missile = round_entity.get<components::missile>();
-								missile.power_multiplier_of_sender = gun_def.damage_multiplier;
-							}
-
-							const auto& missile_def = round_entity.get<invariants::missile>();
 							total_recoil += missile_def.recoil_multiplier;
 
-							round_entity.set_logic_transform(muzzle_transform);
+							cosmic::create_entity(cosmos, round_flavour, [&](const auto round_entity){
+								auto& sender = round_entity.get<components::sender>();
+								sender.set(gun_entity);
 
-							response.spawned_rounds.push_back(round_entity);
+								{
+									auto& missile = round_entity.get<components::missile>();
+									missile.power_multiplier_of_sender = gun_def.damage_multiplier;
+								}
 
-							{
-								auto rng = cosmos.get_rng_for(round_entity);
+								const auto& missile_def = round_entity.get<invariants::missile>();
 
-								const auto missile_velocity = 
-									vec2::from_degrees(muzzle_transform.rotation)
-									* missile_def.muzzle_velocity_mult
-									* rng.randval(gun_def.muzzle_velocity)
-								;
+								round_entity.set_logic_transform(muzzle_transform);
 
-								round_entity.get<components::rigid_body>().set_velocity(missile_velocity);
-							}
+								response.spawned_rounds.push_back(round_entity);
 
-							correct_interpolation_for(round_entity);
+								{
+									auto rng = cosmos.get_rng_for(round_entity);
+
+									const auto missile_velocity = 
+										vec2::from_degrees(muzzle_transform.rotation)
+										* missile_def.muzzle_velocity_mult
+										* rng.randval(gun_def.muzzle_velocity)
+									;
+
+									round_entity.get<components::rigid_body>().set_velocity(missile_velocity);
+								}
+
+								correct_interpolation_for(round_entity);
+							});
 						}
 					}
 
 					if (const auto shell_flavour = single_bullet_or_pellet_stack.get<invariants::catridge>().shell_flavour) {
-						const auto shell_entity = cosmic::create_entity(cosmos, shell_flavour);
-						shell_entity.construct_entity(step);
+						cosmic::create_entity(cosmos, shell_flavour, [&](const auto shell_entity){
+							auto rng = cosmos.get_rng_for(shell_entity);
 
-						auto rng = cosmos.get_rng_for(shell_entity);
+							const auto spread_component = rng.randval(gun_def.shell_spread_degrees) + gun_def.shell_spawn_offset.rotation;
 
-						const auto spread_component = rng.randval(gun_def.shell_spread_degrees) + gun_def.shell_spawn_offset.rotation;
+							auto shell_transform = gun_transform;
+							shell_transform.pos += vec2(gun_def.shell_spawn_offset.pos).rotate(gun_transform.rotation, vec2());
+							shell_transform.rotation += spread_component;
 
-						auto shell_transform = gun_transform;
-						shell_transform.pos += vec2(gun_def.shell_spawn_offset.pos).rotate(gun_transform.rotation, vec2());
-						shell_transform.rotation += spread_component;
+							shell_entity.set_logic_transform(shell_transform);
 
-						shell_entity.set_logic_transform(shell_transform);
-
-						shell_entity.get<components::rigid_body>().set_velocity(vec2::from_degrees(muzzle_transform.rotation + spread_component).set_length(rng.randval(gun_def.shell_velocity)));
-						response.spawned_shell = shell_entity;
+							shell_entity.get<components::rigid_body>().set_velocity(vec2::from_degrees(muzzle_transform.rotation + spread_component).set_length(rng.randval(gun_def.shell_velocity)));
+							response.spawned_shell = shell_entity;
+						});
 					}
 
 					destructions.emplace_back(single_bullet_or_pellet_stack);

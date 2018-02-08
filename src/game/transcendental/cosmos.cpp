@@ -99,6 +99,10 @@ namespace augs {
 			write_lua(common_table, cosm.get_common_significant());
 		}
 		
+		ensure(false);
+#if TODO
+		// TODO: write completely separate tables per each entity type?
+
 		{
 			auto pool_meta_table = ar.create();
 			ar["pool_meta"] = pool_meta_table;
@@ -129,6 +133,7 @@ namespace augs {
 
 			entities_table[entity_table_counter++] = this_entity_table;
 		}
+#endif
 	}
 
 	void read_object_lua(sol::table ar, cosmos& cosm) {

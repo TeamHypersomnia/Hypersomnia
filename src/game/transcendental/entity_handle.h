@@ -1,5 +1,4 @@
 #pragma once
-#include <iosfwd>
 #include "3rdparty/sol2/sol/forward.hpp"
 
 #include "augs/build_settings/platform_defines.h"
@@ -75,6 +74,15 @@ class basic_entity_handle :
 		});
 	}
 
+	static auto dereference(
+		owner_reference owner, 
+		const entity_id raw_id
+	) {
+		return owner.get_solvable({}).on_aggregate(raw_id, [&](auto& agg) {
+			return reinterpret_cast<entity_ptr>(agg);	
+		});
+	}
+
 public:
 	using const_type = basic_entity_handle<!is_const>;
 	using misc_base::get_raw_flavour_id;
@@ -84,7 +92,7 @@ public:
 		owner_reference owner, 
 		const entity_id raw_id
 	) : basic_entity_handle(
-		owner.get_solvable({}).get_entity_pool().find(raw_id),
+		dereference(owner, raw_id),
 		owner, 
 		raw_id 
 	) {
@@ -154,7 +162,7 @@ public:
 			raw_id.type_id,
 			[&](auto t) {
 				using entity_type = decltype(t);
-				using handle_type = basic_typed_entity_handle<is_const, entity_type, stored_id_provider>;
+				using handle_type = basic_typed_entity_handle<is_const, entity_type>;
 
 				auto& specific_ref = 
 					*reinterpret_cast<
@@ -194,9 +202,6 @@ public:
 		}
 	}
 
-	template <bool C = !is_const, class = std::enable_if_t<C>>
-	entity_handle construct_entity(const logic_step step) const;
-
 	template <class F>
 	void for_each_component(F&& callback) const {
 		ensure(alive());
@@ -208,5 +213,10 @@ public:
 	}
 };
 
-std::ostream& operator<<(std::ostream& out, const entity_handle&x);
-std::ostream& operator<<(std::ostream& out, const const_entity_handle &x);
+inline std::ostream& operator<<(std::ostream& out, const entity_handle &x) {
+	return out << typesafe_sprintf("%x %x", to_string(x.get_name()), x.get_id());
+}
+
+inline std::ostream& operator<<(std::ostream& out, const const_entity_handle &x) {
+	return out << typesafe_sprintf("%x %x", to_string(x.get_name()), x.get_id());
+}

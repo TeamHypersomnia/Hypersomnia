@@ -2,6 +2,8 @@
 #include "game/transcendental/entity_type.h"
 
 #include "game/transcendental/entity_handle_declaration.h"
+#include "game/transcendental/typed_entity_handle_declaration.h"
+
 #include "game/detail/entity_handle_mixins/all_handle_mixins.h"
 
 struct empty_id_provider {};
@@ -45,18 +47,18 @@ struct stored_id_provider {
 };
 
 template <bool is_const, class entity_type, class identifier_provider>
-class basic_typed_entity_handle :
-	public misc_mixin<basic_typed_entity_handle<is_const, entity_type, identifier_provider>>,
-	public inventory_mixin<basic_typed_entity_handle<is_const, entity_type, identifier_provider>>,
-	public physics_mixin<basic_typed_entity_handle<is_const, entity_type, identifier_provider>>,
-	public relations_mixin<basic_typed_entity_handle<is_const, entity_type, identifier_provider>>,
-	public spatial_properties_mixin<basic_typed_entity_handle<is_const, entity_type, identifier_provider>>,
+class specific_entity_handle :
+	public misc_mixin<specific_entity_handle<is_const, entity_type, identifier_provider>>,
+	public inventory_mixin<specific_entity_handle<is_const, entity_type, identifier_provider>>,
+	public physics_mixin<specific_entity_handle<is_const, entity_type, identifier_provider>>,
+	public relations_mixin<specific_entity_handle<is_const, entity_type, identifier_provider>>,
+	public spatial_properties_mixin<specific_entity_handle<is_const, entity_type, identifier_provider>>,
 	public identifier_provider
 {
-	using this_handle_type = basic_typed_entity_handle<is_const, entity_type, identifier_provider>;
+	using this_handle_type = specific_entity_handle<is_const, entity_type, identifier_provider>;
 	using misc_base = misc_mixin<this_handle_type>;
 
-	using const_handle_type = basic_typed_entity_handle<true, entity_type, identifier_provider>;
+	using const_handle_type = specific_entity_handle<true, entity_type, identifier_provider>;
 
 	using aggregate_type = make_aggregate<entity_type>;
 	using flavour_type = make_entity_flavour<entity_type>;
@@ -69,7 +71,7 @@ class basic_typed_entity_handle :
 	using owner_reference = maybe_const_ref_t<is_const, cosmos>;
 
 	friend class cosmos;
-	friend basic_typed_entity_handle<!is_const, entity_type, identifier_provider>;
+	friend specific_entity_handle<!is_const, entity_type, identifier_provider>;
 
 	using identifier_provider::get_id;
 
@@ -88,7 +90,8 @@ class basic_typed_entity_handle :
 	template <bool is_const>
 	friend class basic_entity_handle;
 
-	basic_typed_entity_handle(
+public:
+	specific_entity_handle(
 		aggregate_reference subject,
 		owner_reference owner,
 		const identifier_provider identifier
@@ -98,19 +101,8 @@ class basic_typed_entity_handle :
 		identifier_provider(identifier)
 	{}
 
-public:
 	using misc_base::get_flavour;
 	using used_entity_type = entity_type;
-
-	basic_typed_entity_handle(
-		owner_reference owner,
-		const identifier_provider identifier	
-	) : 
-		owner(owner),
-		identifier_provider(identifier),
-		subject(identifier_provider::get_subject<entity_type>(owner))
-	{
-	}
 
 	template <class T>
 	constexpr bool has() const {
@@ -178,9 +170,7 @@ public:
 	}
 
 	auto get_type_id() const {
-		entity_type_id type_id;
-		type_id.set<entity_type>();
-		return type_id;
+		return entity_type_id::of<entity_type>;
 	}
 
 	operator entity_id() const {
@@ -199,15 +189,3 @@ public:
 		return { static_cast<void_entity_ptr>(ptr), owner, get_id() };
 	}
 };
-
-template <class entity_type>
-using typed_entity_handle = basic_typed_entity_handle<false, entity_type, stored_id_provider>;
-
-template <class entity_type>
-using const_typed_entity_handle = basic_typed_entity_handle<true, entity_type, stored_id_provider>;
-
-template <class entity_type>
-using iterated_entity_handle = basic_iterated_entity_handle<false, entity_type, iterated_id_provider>;
-
-template <class entity_type>
-using const_iterated_entity_handle = basic_iterated_entity_handle<true, entity_type, iterated_id_provider>;

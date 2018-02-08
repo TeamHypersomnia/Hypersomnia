@@ -699,7 +699,7 @@ int work(const int argc, const char* const * const argv) try {
 		const auto viewed_character = get_viewed_character();
 		const auto& cosmos = viewed_character.get_cosmos();
 		
-		audiovisuals.reserve_caches_for_entities(viewed_character.get_cosmos().get_solvable().get_entity_pool().capacity());
+		//audiovisuals.reserve_caches_for_entities(viewed_character.get_cosmos().get_solvable().get_entity_pool().capacity());
 		
 		auto& interp = audiovisuals.get<interpolation_system>();
 

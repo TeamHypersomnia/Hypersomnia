@@ -28,14 +28,9 @@ static auto make_reserver(const std::size_t n) {
 }
 
 void cosmos_solvable::reserve_storage_for_entities(const cosmic_pool_size_type n) {
-	get_entity_pool().reserve(n);
-
-	for_each_through_std_get(
-		significant.component_pools, 
-		[n](auto& p){
-			p.reserve(n);
-		}
-	);
+	for_each_pool([n](auto& p){
+		p.reserve(n);
+	});
 
 	augs::introspect(make_reserver(n), inferred);
 }
@@ -81,30 +76,10 @@ unsigned cosmos_solvable::get_steps_per_second() const {
 	return get_fixed_delta().in_steps_per_second();
 }
 
-entity_id cosmos_solvable::allocate_new_entity() {
-	if (get_entity_pool().full()) {
-		throw std::runtime_error("Entities should be controllably reserved to avoid invalidation of entity_handles.");
-	}
-
-	return get_entity_pool().allocate();
-}
-
-entity_id cosmos_solvable::allocate_entity_with_specific_guid(const entity_guid specific_guid) {
-	const auto id = allocate_new_entity();
-	get_aggregate(id).get<components::guid>(*this).value = specific_guid;
-	guid_to_id[specific_guid] = id;
-
-	return id;
-}
-
-entity_id cosmos_solvable::allocate_next_entity() {
-	const auto next_guid = significant.clock.next_entity_guid.value++;
-	return allocate_entity_with_specific_guid(next_guid);
-}
-
 void cosmos_solvable::free_entity(const entity_id id) {
 	clear_guid(id);
-	get_entity_pool().free(id);
+
+	significant.on_pool(id.type_id, [id](auto& p){ p.free(id); });
 }
 
 void cosmos_solvable::clear_guid(const entity_id cleared) {

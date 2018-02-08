@@ -369,7 +369,6 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/transcendental/cosmic_entropy.cpp"
 	"src/game/transcendental/cosmic_movie_director.cpp"
 	"src/game/transcendental/data_living_one_step.cpp"
-	"src/game/transcendental/entity_handle.cpp"
 	"src/augs/filesystem/directory.cpp"
 	"src/augs/gui/appearance_detector.cpp"
 	"src/augs/misc/timing/delta.cpp"

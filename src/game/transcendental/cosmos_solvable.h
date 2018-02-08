@@ -13,7 +13,6 @@
 #include "game/assets/behaviour_tree.h"
 
 #include "game/organization/all_always_present_component_includes.h"
-#include "augs/entity_system/component_aggregate.h"
 
 #include "game/transcendental/cosmic_profiler.h"
 
@@ -35,8 +34,35 @@ class cosmos_solvable {
 
 	static const cosmos_solvable zero;
 
-	entity_id allocate_new_entity();
+	template <class E>
+	typed_entity_id<E> allocate_new_entity(const entity_guid new_guid) {
+		auto& pool = significant.get_pool<E>();
+
+		if (pool.full()) {
+			throw std::runtime_error("Entities should be controllably reserved to avoid invalidation of entity_handles.");
+		}
+
+		auto result = pool.allocate();
+		std::get<components::guid>(result).value = new_guid;
+		return result.key;
+	}
+
 	void clear_guid(const entity_id);
+
+	template <class C, class F>
+	static decltype(auto) on_aggregate_impl(
+		C& self,
+		const entity_id id,
+		F callback	
+	) {
+		return get_by_dynamic_id(
+			significant.aggregate_pools,
+			id.type_id.get_index(),
+			[](auto& pool) {	
+				return callback(pool.get(id));
+			}
+		);
+	}
 
 	guid_cache guid_to_id;
 
@@ -49,24 +75,20 @@ public:
 
 	void reserve_storage_for_entities(const cosmic_pool_size_type);
 
-	entity_id allocate_next_entity();
-	entity_id allocate_entity_with_specific_guid(const entity_guid specific_guid);
+	template <class E>
+	typed_entity_id<E> allocate_next_entity() {
+		const auto next_guid = significant.clock.next_entity_guid.value++;
+		return allocate_entity_with_specific_guid<E>(next_guid);
+	}
 
-	void clone_components_except_associateds(
-		cosmic_entity& into,
-		const cosmic_entity& from
-	);
+	template <class E>
+	typed_entity_id<E> allocate_entity_with_specific_guid(const entity_guid specific_guid) {
+		const auto id = allocate_new_entity<E>(specific_guid);
+		guid_to_id[specific_guid] = entity_id(id);
+		return id;
+	}
 
 	void free_entity(entity_id);
-
-	template <class D>
-	void for_each_entity_id(D pred) const {
-		for_each_pool([](auto& p) {
-
-		});
-
-		get_entity_pool().for_each_id(pred);
-	}
 
 	void destroy_all_caches();
 
@@ -85,7 +107,7 @@ public:
 		return rewrite_members_and_transform_templated_type_into<entity_guid>(
 			id_source,
 			[this](auto& guid_member, const auto& id_member) {
-				if (get_entity_pool().alive(id_member)) {
+				if (operator[](id_member).alive()) {
 					guid_member = get_guid(id_member);
 				}
 				else {
@@ -114,7 +136,11 @@ public:
 	std::unordered_set<entity_id> get_entities_by_flavour_id(const entity_flavour_id&) const;
 	
 	std::size_t get_entities_count() const;
-	std::size_t get_maximum_entities() const;
+	
+	template <class E>
+	std::size_t get_maximum_count_of() const {
+		return significant.get_pool<E>().capacity();
+	}
 
 	double get_total_seconds_passed(const double view_interpolation_ratio) const;
 	double get_total_seconds_passed() const;
@@ -126,18 +152,18 @@ public:
 	unsigned get_steps_per_second() const;
 
 	template <class F>
-	void for_each_pool(F callback) {
+	void for_each_pool(F&& callback) {
 		for_each_through_std_get(
 			significant.aggregate_pools,
-			callback
+			std::forward<F>(callback)
 		);
 	}
 
 	template <class F>
-	void for_each_pool(F callback) const {
+	void for_each_pool(F&& callback) const {
 		for_each_through_std_get(
 			significant.aggregate_pools,
-			callback
+			std::forward<F>(callback)
 		);
 	}
 
@@ -157,20 +183,24 @@ public:
 		return guid_to_id;
 	}
 
-	const auto& get_aggregate(const entity_id id) const {
-		return get_entity_pool().get(id);
+	template <class F>
+	decltype(auto) on_aggregate(const entity_id id, F&& callback) {
+		return on_aggregate_impl(*this, id, std::forward<F>(callback));
 	}	
 
-	auto& get_aggregate(const entity_id id) {
-		return get_entity_pool().get(id);
+	template <class F>
+	decltype(auto) on_aggregate(const entity_id id, F&& callback) const {
+		return on_aggregate_impl(*this, id, std::forward<F>(callback));
 	}	
 
-	auto& get_aggregate(const entity_guid guid) {
-		return get_aggregate(get_entity_id_by(guid));
+	template <class F>
+	decltype(auto) on_aggregate(const entity_guid id, F&& callback) {
+		return on_aggregate_impl(*this, get_entity_id_by(id), std::forward<F>(callback));
 	}	
 
-	const auto& get_aggregate(const entity_guid guid) const {
-		return get_aggregate(get_entity_id_by(guid));
+	template <class F>
+	decltype(auto) on_aggregate(const entity_guid id, F&& callback) const {
+		return on_aggregate_impl(*this, get_entity_id_by(id), std::forward<F>(callback));
 	}	
 };
 
@@ -187,7 +217,10 @@ inline std::unordered_set<entity_id> cosmos_solvable::get_entities_by_flavour_id
 }
 
 inline entity_id cosmos_solvable::to_versioned(const unversioned_entity_id id) const {
-	return get_entity_pool().to_versioned(id);
+	return significant.on_pool(
+		id.type_id, 
+		[](const auto& p){ return p.to_versioned(id); }
+	);
 }
 
 inline std::size_t cosmos_solvable::get_entities_count() const {
@@ -196,10 +229,6 @@ inline std::size_t cosmos_solvable::get_entities_count() const {
 	for_each_pool([](const auto& p) { total += p.size(); } );
 
 	return total;
-}
-
-inline std::size_t cosmos_solvable::get_maximum_entities() const {
-	return significant.entity_pool.capacity();
 }
 
 inline entity_guid cosmos_solvable::get_guid(const entity_id id) const {

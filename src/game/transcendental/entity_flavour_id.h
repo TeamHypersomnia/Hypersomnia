@@ -14,11 +14,7 @@ using entity_flavour_id = constrained_entity_flavour_id<>;
 
 template <class... C>
 struct constrained_entity_flavour_id {
-	using matching_types = std::conditional_t<
-		sizeof...(C) == 0,
-		all_entity_types,
-		all_entity_types_having<C...>
-	>;
+	using matching_types = all_entity_types_having<C...>;
 
 	raw_entity_flavour_id raw;
 	entity_type_id type_id;

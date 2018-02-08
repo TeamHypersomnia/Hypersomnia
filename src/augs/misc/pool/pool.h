@@ -33,6 +33,7 @@ namespace augs {
 		using mapped_type = T;
 		using key_type = pooled_object_id<mapped_type, size_type>;
 		using unversioned_id_type = unversioned_id<mapped_type, size_type>;
+		using used_size_type = size_type;
 
 	protected:
 		using pool_slot_type = pool_slot<size_type>;
@@ -89,6 +90,11 @@ namespace augs {
 			}
 		}
 
+		struct allocation_result {
+			key_type key;
+			mapped_type& object;
+		};
+
 		template <
 			unsigned expansion_mult = 2, 
 			unsigned expansion_add = 1, 
@@ -122,7 +128,7 @@ namespace augs {
 			slots.push_back(allocated_slot);
 			objects.emplace_back(std::forward<Args>(args)...);
 
-			return allocated_id;
+			return { allocated_id, objects.back() };
 		}
 
 		bool free(const unversioned_id_type key) {

@@ -14,11 +14,11 @@ template <
 >
 decltype(auto) get_by_dynamic_id(
 	T&& index_gettable_object,
-	const type_in_list_id<std::decay_t<T>> dynamic_type_index,
+	const std::size_t dynamic_type_index,
 	F&& generic_call
 ) {
 	if constexpr(current_candidate < num_types_in_list_v<std::decay_t<T>>) {
-		if (current_candidate == dynamic_type_index.get_index()) {
+		if (current_candidate == dynamic_type_index) {
 			return generic_call(std::get<current_candidate>(std::forward<T>(index_gettable_object)));
 		}
 
@@ -29,7 +29,7 @@ decltype(auto) get_by_dynamic_id(
 		);
 	}
 	else {
-		LOG_NVPS(dynamic_type_index.get_index());
+		LOG_NVPS(dynamic_type_index);
 		ensure(false && "dynamic_type_index is out of bounds!");
 		return generic_call(std::get<0>(index_gettable_object));
 	}
@@ -43,7 +43,7 @@ template <
 >
 decltype(auto) get_by_dynamic_id(
 	T&& index_gettable_object,
-	const type_in_list_id<std::decay_t<T>> dynamic_type_index,
+	const std::size_t dynamic_type_index,
 	F&& generic_call
 ) {
 	using list_type = std::decay_t<T>;
@@ -55,7 +55,7 @@ decltype(auto) get_by_dynamic_id(
 				OnlyCandidates
 			>
 		) {
-			if (current_candidate == dynamic_type_index.get_index()) {
+			if (current_candidate == dynamic_type_index) {
 				return generic_call(std::get<current_candidate>(std::forward<T>(index_gettable_object)));
 			}
 		}
@@ -67,8 +67,34 @@ decltype(auto) get_by_dynamic_id(
 		);
 	}
 	else {
-		LOG_NVPS(dynamic_type_index.get_index());
+		LOG_NVPS(dynamic_type_index);
 		ensure(false && "dynamic_type_index is out of bounds!");
 		return generic_call(std::get<0>(index_gettable_object));
 	}
+}
+
+template <class T, class F>
+decltype(auto) get_by_dynamic_id(
+	T&& index_gettable_object,
+	const type_in_list_id<std::decay_t<T>> dynamic_type_index,
+	F&& generic_call
+) {
+	return get_by_dynamic_id(
+		std::forward<T>(index_gettable_object), 
+		static_cast<std::size_t>(dynamic_type_index.get_index()),
+		std::forward<F>(genetic_call)
+	);
+}
+
+template <class OnlyCandidates, class T, class F>
+decltype(auto) get_by_dynamic_id(
+	T&& index_gettable_object,
+	const type_in_list_id<std::decay_t<T>> dynamic_type_index,
+	F&& generic_call
+) {
+	return get_by_dynamic_id<OnlyCandidates>(
+		std::forward<T>(index_gettable_object), 
+		static_cast<std::size_t>(dynamic_type_index.get_index()),
+		std::forward<F>(genetic_call)
+	);
 }
