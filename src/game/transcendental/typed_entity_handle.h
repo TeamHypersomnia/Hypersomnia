@@ -1,4 +1,5 @@
 #pragma once
+#include "augs/templates/type_matching_and_indexing.h"
 #include "game/transcendental/entity_type.h"
 
 #include "game/transcendental/entity_handle_declaration.h"
@@ -18,7 +19,7 @@ struct iterated_id_provider {
 	
 	static auto& get_pool(owner_reference owner) {
 		return 
-			std::get<typename handle_type::aggregate_pool_type>(owner.get_solvable({}).significant.aggregate_pools)
+			std::get<typename handle_type::subject_pool_type>(owner.get_solvable({}).significant.entity_pools)
 		;
 	}
 
@@ -60,13 +61,12 @@ class specific_entity_handle :
 
 	using const_handle_type = specific_entity_handle<true, entity_type, identifier_provider>;
 
-	using aggregate_type = make_aggregate<entity_type>;
+	using components_type = make_components<entity_type>;
 	using flavour_type = make_entity_flavour<entity_type>;
 
-	using aggregate_pool_type = make_aggregate_pool<entity_type>;
+	using subject_pool_type = make_entity_pool<entity_type>;
 
-	using aggregate_reference = maybe_const_ref_t<is_const, aggregate_type>;
-	using void_aggregate_ptr = maybe_const_ptr_t<is_const, void>;
+	using subject_reference = maybe_const_ref_t<is_const, entity_solvable<entity_type>>;
 
 	using owner_reference = maybe_const_ref_t<is_const, cosmos>;
 
@@ -75,13 +75,13 @@ class specific_entity_handle :
 
 	using identifier_provider::get_id;
 
-	aggregate_reference subject;
+	subject_reference subject;
 	owner_reference owner;
 
 	template <class T>
 	maybe_const_ptr_t<is_const, T> find_component_ptr() const {
-		if constexpr(has<T>()) {
-			return std::addressof(std::get<T>(subject));
+		if constexpr(subject.template has<T>()) {
+			return std::addressof(subject.template get<T>());
 		}
 
 		return nullptr;
@@ -92,7 +92,7 @@ class specific_entity_handle :
 
 public:
 	specific_entity_handle(
-		aggregate_reference subject,
+		subject_reference subject,
 		owner_reference owner,
 		const identifier_provider identifier
 	) :
@@ -107,7 +107,7 @@ public:
 	template <class T>
 	constexpr bool has() const {
 		return 
-			is_one_of_list_v<T, aggregate_type>
+			subject.template has<components_type> 
 			|| get_flavour().template has<T>
 		;
 	}
@@ -143,6 +143,10 @@ public:
 			}
 		}
 	}
+
+	const auto& get_meta() const {
+		return static_cast<const entity_solvable_meta&>(subject);
+	};
 
 	auto& get(cosmos_solvable_access) const {
 		return subject;
@@ -185,7 +189,22 @@ public:
 		return get_id();
 	}
 
+	template <class F>
+	void for_each_component(F&& callback) const {
+		const auto& immutable_subject = subject;
+
+		for_each_std_through_get(
+			immutable_subject.components, 
+			std::forward<F>(callback)
+		);
+	}
+
 	operator basic_entity_handle<is_const>() const {
 		return { static_cast<void_entity_ptr>(ptr), owner, get_id() };
 	}
 };
+
+/* Shortcut */
+
+template <class T>
+using entity_type_of = typename std::decay_t<T>::used_entity_type;

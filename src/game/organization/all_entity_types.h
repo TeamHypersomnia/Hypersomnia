@@ -2,13 +2,12 @@
 #include "augs/templates/type_list.h"
 
 #include "game/organization/all_components_declaration.h"
-#include "game/organization/all_components_declaration.h"
 #include "game/organization/all_entity_types_declaration.h"
 
 /* E.g. a player as a resistance soldier or metropolitan guard */
 
 struct controlled_character {
-	static constexpr std::size_t statically_allocated_aggregates = 300;
+	static constexpr std::size_t statically_allocated_entities = 300;
 	static constexpr std::size_t statically_allocated_flavours = 20;
 
 	using invariants = type_list<
@@ -44,7 +43,7 @@ struct controlled_character {
 /* Crosshair's recoil body */
 
 struct plain_invisible_body {
-	static constexpr std::size_t statically_allocated_aggregates = 300;
+	static constexpr std::size_t statically_allocated_entities = 300;
 	static constexpr std::size_t statically_allocated_flavours = 20;
 
 	using invariants = type_list<
@@ -62,7 +61,7 @@ struct plain_invisible_body {
 /* E.g. a crate, a wall, a bullet shell */
 
 struct plain_sprited_body {
-	static constexpr std::size_t statically_allocated_aggregates = 1500;
+	static constexpr std::size_t statically_allocated_entities = 1500;
 	static constexpr std::size_t statically_allocated_flavours = 150;
 
 	using invariants = type_list<
@@ -85,7 +84,7 @@ struct plain_sprited_body {
 /* E.g. an AK or a pistol */
 
 struct shootable_weapon {
-	static constexpr std::size_t statically_allocated_aggregates = 1500;
+	static constexpr std::size_t statically_allocated_entities = 1500;
 	static constexpr std::size_t statically_allocated_flavours = 150;
 
 	using invariants = type_list<
@@ -118,7 +117,7 @@ struct shootable_weapon {
 /* E.g. a cyan charge or an interference charge */
 
 struct shootable_charge {
-	static constexpr std::size_t statically_allocated_aggregates = 1500;
+	static constexpr std::size_t statically_allocated_entities = 1500;
 	static constexpr std::size_t statically_allocated_flavours = 150;
 
 	using invariants = type_list<
@@ -145,7 +144,7 @@ struct shootable_charge {
 /* E.g. neon captions like "Welcome to metropolis" */
 
 struct sprite_decoration {
-	static constexpr std::size_t statically_allocated_aggregates = 2000;
+	static constexpr std::size_t statically_allocated_entities = 2000;
 	static constexpr std::size_t statically_allocated_flavours = 300;
 
 	using invariants = type_list<
@@ -159,7 +158,7 @@ struct sprite_decoration {
 };
 
 struct wandering_pixels_decoration {
-	static constexpr std::size_t statically_allocated_aggregates = 100;
+	static constexpr std::size_t statically_allocated_entities = 100;
 	static constexpr std::size_t statically_allocated_flavours = 20;
 
 	using invariants = type_list<
@@ -173,7 +172,7 @@ struct wandering_pixels_decoration {
 };
 
 struct static_light {
-	static constexpr std::size_t statically_allocated_aggregates = 200;
+	static constexpr std::size_t statically_allocated_entities = 200;
 	static constexpr std::size_t statically_allocated_flavours = 50;
 
 	using invariants = type_list<
@@ -188,7 +187,7 @@ struct static_light {
 };
 
 struct throwable_explosive {
-	static constexpr std::size_t statically_allocated_aggregates = 1500;
+	static constexpr std::size_t statically_allocated_entities = 1500;
 	static constexpr std::size_t statically_allocated_flavours = 150;
 
 	using invariants = type_list<
@@ -213,7 +212,7 @@ struct throwable_explosive {
 };
 
 struct plain_missile {
-	static constexpr std::size_t statically_allocated_aggregates = 1500;
+	static constexpr std::size_t statically_allocated_entities = 1500;
 	static constexpr std::size_t statically_allocated_flavours = 150;
 
 	using invariants = type_list<
@@ -244,7 +243,7 @@ struct plain_missile {
 };
 
 struct finishing_trace {
-	static constexpr std::size_t statically_allocated_aggregates = 1500;
+	static constexpr std::size_t statically_allocated_entities = 1500;
 	static constexpr std::size_t statically_allocated_flavours = 150;
 
 	using invariants = type_list<
@@ -268,7 +267,7 @@ struct finishing_trace {
 };
 
 struct container_item {
-	static constexpr std::size_t statically_allocated_aggregates = 1500;
+	static constexpr std::size_t statically_allocated_entities = 1500;
 	static constexpr std::size_t statically_allocated_flavours = 150;
 
 	using invariants = type_list<
@@ -294,7 +293,7 @@ struct container_item {
 };
 
 struct explosive_missile {
-	static constexpr std::size_t statically_allocated_aggregates = 1500;
+	static constexpr std::size_t statically_allocated_entities = 1500;
 	static constexpr std::size_t statically_allocated_flavours = 150;
 
 	using invariants = type_list<

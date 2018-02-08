@@ -12,6 +12,8 @@
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/transcendental/cosmos_solvable_access.h"
 #include "game/transcendental/entity_id.h"
+#include "game/transcendental/entity_solvable.h"
+
 #include "game/organization/all_components_declaration.h"
 
 #include "game/detail/entity_handle_mixins/all_handle_mixins.h"
@@ -69,7 +71,7 @@ class basic_entity_handle :
 
 	template <class T>
 	auto* find_ptr() const {
-		return dispatch([](auto& typed_handle) { 
+		return dispatch([](const auto typed_handle) { 
 			return typed_handle.template find<T>(); 
 		});
 	}
@@ -78,8 +80,8 @@ class basic_entity_handle :
 		owner_reference owner, 
 		const entity_id raw_id
 	) {
-		return owner.get_solvable({}).on_aggregate(raw_id, [&](auto& agg) {
-			return reinterpret_cast<entity_ptr>(agg);	
+		return owner.get_solvable({}).on_entity(raw_id, [&](auto& agg) {
+			return reinterpret_cast<entity_ptr>(std::addressof(agg));	
 		});
 	}
 
@@ -98,12 +100,16 @@ public:
 	) {
 	}
 
+	const auto& get_meta() const {
+		return *reinterpret_cast<entity_solvable_meta*>(ptr);
+	};
+
 	auto& get(cosmos_solvable_access) const {
-		return agg();
+		return *ptr;
 	}
 
 	const auto& get() const {
-		return agg();
+		return *ptr;
 	}
 
 	auto get_id() const {
@@ -157,6 +163,8 @@ public:
 
 	template <class F>
 	decltype(auto) dispatch(F&& callback) {
+		ensure(alive());
+
 		return get_by_dynamic_id(
 			all_entity_types(),
 			raw_id.type_id,
@@ -166,18 +174,18 @@ public:
 
 				auto& specific_ref = 
 					*reinterpret_cast<
-						maybe_const_ptr_t<is_const>(handle_type::aggregate_type)
+						maybe_const_ptr_t<is_const>(entity_solvable<entity_type>)
 					>(ptr)
 				;
 					
-				return callback(handle_type(owner, specific_ref, get_id()));
+				return callback(handle_type(specific_ref, owner, get_id()));
 			}
 		);
 	}
 
 	template <class T>
 	bool has() const {
-		return dispatch([](auto& typed_handle) { 
+		return dispatch([](const auto typed_handle) { 
 			return typed_handle.template has<T>(); 
 		});
 	}
@@ -204,12 +212,9 @@ public:
 
 	template <class F>
 	void for_each_component(F&& callback) const {
-		ensure(alive());
-
-		agg().for_each_component(
-			std::forward<F>(callback),
-		   	pool_provider()
-		);
+		dispatch([&](const auto typed_handle) {
+			typed_handle.for_each_component(std::forward<F>(callback));
+		});
 	}
 };
 

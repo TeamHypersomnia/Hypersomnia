@@ -58,36 +58,6 @@ void cosmic::reinfer_solvable(cosmos& cosm) {
 	reinfer_all_entities(cosm);
 }
 
-template <class F>
-static typed_entity_handle<F> instantiate_flavour(
-	cosmos& cosm, 
-	const typed_entity_flavour_id<F> flavour_id
-) {
-	ensure (flavour_id != entity_flavour_id());
-
-	const auto new_handle = entity_handle { cosm, cosm.get_solvable({}).allocate_next_entity() };
-
-	auto& solvable = cosm.get_solvable({});
-
-	solvable.get_aggregate(new_handle.get_id()).get<components::flavour>(solvable).flavour_id = flavour_id;
-
-	for_each_invariant_type([&](auto d) {
-		using D = decltype(d);
-
-		if constexpr(has_implied_component_v<D>) {
-			using C = typename D::implied_component;
-
-			const auto& t = new_handle.get_flavour(); 
-
-			if (const auto* const def = t.template find<D>()) {
-				new_handle += std::get<C>(t.initial_components);
-			}
-		}
-	});
-
-	return new_handle; 
-}
-
 entity_handle cosmic::create_entity(
 	cosmos& cosm,
    	const entity_flavour_id flavour_id,
@@ -113,6 +83,18 @@ entity_handle cosmic::create_entity(
 	);
 }
 
+auto clone_entity(const const_entity_handle source_entity) {
+	if (source_entity.dead()) {
+		return cosmos[entity_id()];
+	}
+
+	return source_entity.dispatch([](const auto typed_handle){
+		using E = entity_type_of<decltype(typed_handle)>;
+
+		return entity_handle(clone_entity<E>(typed_handle));
+	});
+}
+
 #if TODO
 entity_handle cosmic::create_entity_with_specific_guid(
 	specific_guid_creation_access,
@@ -123,65 +105,6 @@ entity_handle cosmic::create_entity_with_specific_guid(
 }
 #endif
 
-entity_handle cosmic::clone_entity(const entity_handle source_entity) {
-	auto& cosmos = source_entity.get_cosmos();
-
-	if (source_entity.dead()) {
-		return cosmos[entity_id()];
-	}
-
-	const auto new_entity = create_entity(cosmos, source_entity.get_flavour_id());
-	auto& solvable = cosmos.get_solvable({});
-
-	solvable.get_aggregate(new_entity).clone_components_except<
-		/*
-			These components will be cloned shortly,
-			with due care to each of them.
-		*/
-		components::guid,
-		components::item
-	>(solvable.get_aggregate(source_entity), solvable);
-
-#if TODO
-	if (new_entity.has<components::item>()) {
-		new_entity.get<components::item>().current_slot.unset();
-	}
-#endif
-
-	{
-		for_each_component_type([&](auto c) {
-			using component_type = decltype(c);
-
-			if (const auto cloned_to_component = new_entity.get({}).find<component_type>(solvable)) {
-				const auto& cloned_from_component = source_entity.get({}).template get<component_type>(solvable);
-
-				if constexpr(allows_nontriviality_v<component_type>) {
-					component_type::clone_children(
-						cosmos,
-						*cloned_to_component, 
-						cloned_from_component
-					);
-				}
-				else {
-					augs::introspect(
-						augs::recursive([&](auto&& self, auto, auto& into, const auto& from) {
-							if constexpr(std::is_same_v<decltype(into), child_entity_id&>) {
-								into = clone_entity(cosmos[from]);
-							}
-							else {
-								augs::introspect_if_not_leaf(augs::recursive(self), into, from);
-							}
-						}),
-						*cloned_to_component,
-						cloned_from_component
-					);
-				}
-			}
-		});
-	}
-
-	return new_entity;
-}
 
 void cosmic::delete_entity(const entity_handle handle) {
 	auto& cosmos = handle.get_cosmos();

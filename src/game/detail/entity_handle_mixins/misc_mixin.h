@@ -88,7 +88,7 @@ public:
 
 	auto get_raw_flavour_id() const {
 		const auto self = *static_cast<const E*>(this);
-		return self.template get<components::flavour>().get_raw_id();
+		return self.get() <components::flavour>().get_raw_id();
 	}
 
 	auto get_flavour_id() const {
@@ -106,7 +106,7 @@ public:
 	auto& get_flavour() const {
 		const auto self = *static_cast<const E*>(this);
 		auto& cosm = self.get_cosmos();
-		return cosm.get_flavour<typename E::used_entity_type>(get_raw_flavour_id());
+		return cosm.get_flavour<entity_type_of<E>>(get_raw_flavour_id());
 	}
 
 	const auto& get_name() const {

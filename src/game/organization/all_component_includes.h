@@ -37,5 +37,3 @@
 #include "game/components/motor_joint_component.h"
 #include "game/components/hand_fuse_component.h"
 #include "game/components/sender_component.h"
-
-#include "game/organization/all_always_present_component_includes.h"

@@ -14,7 +14,7 @@ using entity_description_type = entity_name_type;
 template <class entity_type>
 class entity_flavour {
 	using invariants_type = make_invariants<entity_type>;
-	using initial_components_type = make_aggregate<entity_type>;
+	using initial_components_type = make_components<entity_type>;
 
 	template <class D, class E>
 	static auto& get_impl(E& self) {

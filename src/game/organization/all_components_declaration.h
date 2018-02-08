@@ -47,13 +47,11 @@ namespace components {
 	struct item;
 	struct force_joint;
 	struct item_slot_transfers;
-	struct flavour;
 	struct trace;
 	struct melee;
 	struct sentience;
 	struct attitude;
 	struct processing;
-	struct guid;
 	struct interpolation;
 	struct light;
 	struct wandering_pixels;
@@ -64,8 +62,6 @@ namespace components {
 
 template <template <class...> class List>
 using component_list_t = List<
-	components::guid,
-	components::flavour,
 	components::animation,
 	components::behaviour_tree,
 	components::crosshair,

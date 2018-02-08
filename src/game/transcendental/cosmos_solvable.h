@@ -12,8 +12,6 @@
 #include "game/assets/ids/behaviour_tree_id.h"
 #include "game/assets/behaviour_tree.h"
 
-#include "game/organization/all_always_present_component_includes.h"
-
 #include "game/transcendental/cosmic_profiler.h"
 
 #if STATICALLY_ALLOCATE_ENTITIES
@@ -34,32 +32,44 @@ class cosmos_solvable {
 
 	static const cosmos_solvable zero;
 
-	template <class E>
-	typed_entity_id<E> allocate_new_entity(const entity_guid new_guid) {
+	template <class A, class B>
+	struct allocation_result {
+		A key;
+		B& object;
+	};
+
+	template <class E, class... Args>
+	auto allocate_new_entity(const entity_guid new_guid, Args&&... args) {
 		auto& pool = significant.get_pool<E>();
 
 		if (pool.full()) {
 			throw std::runtime_error("Entities should be controllably reserved to avoid invalidation of entity_handles.");
 		}
 
-		auto result = pool.allocate();
-		std::get<components::guid>(result).value = new_guid;
-		return result.key;
+		const auto result = pool.allocate(new_guid, std::forward<Args>(args)...);
+
+		allocation_result<typed_entity_id<E>, decltype(result.object)> output {
+			result.key, result.object
+		};
+
+		return output;
 	}
 
 	void clear_guid(const entity_id);
 
 	template <class C, class F>
-	static decltype(auto) on_aggregate_impl(
+	static decltype(auto) on_entity_impl(
 		C& self,
 		const entity_id id,
 		F callback	
 	) {
 		return get_by_dynamic_id(
-			significant.aggregate_pools,
+			significant.entity_pools,
 			id.type_id.get_index(),
 			[](auto& pool) {	
-				return callback(pool.get(id));
+				if (const auto agg = pool.get(id)) {
+					return callback();
+				}
 			}
 		);
 	}
@@ -75,17 +85,17 @@ public:
 
 	void reserve_storage_for_entities(const cosmic_pool_size_type);
 
-	template <class E>
-	typed_entity_id<E> allocate_next_entity() {
+	template <class E, class... Args>
+	auto allocate_next_entity(Args&&... args) {
 		const auto next_guid = significant.clock.next_entity_guid.value++;
-		return allocate_entity_with_specific_guid<E>(next_guid);
+		return allocate_entity_with_specific_guid<E>(next_guid, std::forward<Args>(args)...);
 	}
 
-	template <class E>
-	typed_entity_id<E> allocate_entity_with_specific_guid(const entity_guid specific_guid) {
-		const auto id = allocate_new_entity<E>(specific_guid);
-		guid_to_id[specific_guid] = entity_id(id);
-		return id;
+	template <class E, class... Args>
+	auto allocate_entity_with_specific_guid(const entity_guid specific_guid, Args&&... args) {
+		const auto result = allocate_new_entity<E>(specific_guid, std::forward<Args>(args)...);
+		guid_to_id[specific_guid] = entity_id(result.key);
+		return result;
 	}
 
 	void free_entity(entity_id);
@@ -154,7 +164,7 @@ public:
 	template <class F>
 	void for_each_pool(F&& callback) {
 		for_each_through_std_get(
-			significant.aggregate_pools,
+			significant.entity_pools,
 			std::forward<F>(callback)
 		);
 	}
@@ -162,7 +172,7 @@ public:
 	template <class F>
 	void for_each_pool(F&& callback) const {
 		for_each_through_std_get(
-			significant.aggregate_pools,
+			significant.entity_pools,
 			std::forward<F>(callback)
 		);
 	}
@@ -184,23 +194,23 @@ public:
 	}
 
 	template <class F>
-	decltype(auto) on_aggregate(const entity_id id, F&& callback) {
-		return on_aggregate_impl(*this, id, std::forward<F>(callback));
+	decltype(auto) on_entity(const entity_id id, F&& callback) {
+		return on_entity_impl(*this, id, std::forward<F>(callback));
 	}	
 
 	template <class F>
-	decltype(auto) on_aggregate(const entity_id id, F&& callback) const {
-		return on_aggregate_impl(*this, id, std::forward<F>(callback));
+	decltype(auto) on_entity(const entity_id id, F&& callback) const {
+		return on_entity_impl(*this, id, std::forward<F>(callback));
 	}	
 
 	template <class F>
-	decltype(auto) on_aggregate(const entity_guid id, F&& callback) {
-		return on_aggregate_impl(*this, get_entity_id_by(id), std::forward<F>(callback));
+	decltype(auto) on_entity(const entity_guid id, F&& callback) {
+		return on_entity_impl(*this, get_entity_id_by(id), std::forward<F>(callback));
 	}	
 
 	template <class F>
-	decltype(auto) on_aggregate(const entity_guid id, F&& callback) const {
-		return on_aggregate_impl(*this, get_entity_id_by(id), std::forward<F>(callback));
+	decltype(auto) on_entity(const entity_guid id, F&& callback) const {
+		return on_entity_impl(*this, get_entity_id_by(id), std::forward<F>(callback));
 	}	
 };
 
@@ -232,6 +242,6 @@ inline std::size_t cosmos_solvable::get_entities_count() const {
 }
 
 inline entity_guid cosmos_solvable::get_guid(const entity_id id) const {
-	return get_aggregate(id).get<components::guid>(*this).value;
+	return get_entity(id).guid;
 }
 

@@ -28,6 +28,13 @@ template <class E>
 struct typed_entity_flavour_id {
 	raw_entity_flavour_id raw;
 
+	typed_entity_flavour_id() = default;
+	explicit typed_entity_flavour_id(raw_entity_flavour_id id) : id(id) {};
+
+	operator raw_entity_flavour_id() const {
+		return raw;
+	}
+
 	template <
 		class... C,
 		class V = std::enable_if_t<has_invariants_or_components_v<E, Args...>>

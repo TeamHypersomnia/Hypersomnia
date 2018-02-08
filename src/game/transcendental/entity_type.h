@@ -21,7 +21,7 @@ using make_invariants =
 ;
 
 template <class T>
-using make_aggregate = 
+using make_components = 
 	replace_list_type_t<
 		T::components, 
 		std::conditional_v<
@@ -33,17 +33,17 @@ using make_aggregate =
 ;
 
 template <class T>
-using make_aggregate_pool = std::conditional_v<
+using make_entity_pool = std::conditional_v<
 	statically_allocate_entities,
-	augs::pool<make_aggregate<T>, of_size<T::statically_allocated_aggregates>::make_constant_vector, cosmic_pool_size_type>,
-	augs::pool<make_aggregate<T>, make_vector, cosmic_pool_size_type>
+	augs::pool<make_entity<T>, of_size<T::statically_allocated_entities>::make_constant_vector, cosmic_pool_size_type>,
+	augs::pool<make_entity<T>, make_vector, cosmic_pool_size_type>
 >;
 
-using all_aggregate_pools = 
+using all_entity_pools = 
 	replace_list_type_t<
 		transform_types_in_list_v<
 			all_entity_types,
-			make_aggregate_pool
+			make_entity_pool
 		>,
 		std::tuple
 	>

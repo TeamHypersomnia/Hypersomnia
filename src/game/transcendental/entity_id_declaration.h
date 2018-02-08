@@ -4,7 +4,7 @@
 #include "game/transcendental/cosmic_types.h"
 #include "game/transcendental/entity_type.h"
 
-using cosmic_entity = component_list_t<cosmic_aggregate>;
+using cosmic_entity = component_list_t<cosmic_entity>;
 
 using unversioned_entity_id_base = cosmic_object_unversioned_id<cosmic_entity>;
 using entity_id_base = cosmic_object_pool_id<cosmic_entity>;
