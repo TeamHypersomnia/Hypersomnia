@@ -16,7 +16,7 @@
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/cosmic_functions.h"
 
-#include "game/enums/processing_subjects.h"
+#include "game/enums/processing_flags.h"
 
 #include "game/assets/behaviour_tree.h"
 
@@ -83,6 +83,13 @@ class cosmos {
 				}
 			}
 		);
+	}
+
+	template <class C, class F>
+	void for_each_in_impl(C& self, const processing_flags f, F callback) {
+		for (const auto subject : self.get_solvable_inferred().processing_lists.get(f)) {
+			callback(f);
+		}
 	}
 
 	cosmos_common common;
@@ -177,13 +184,13 @@ public:
 	}
 
 	template <class F>
-	void for_each_in(const processing_subjects subjects) {
-
+	void for_each_in(const processing_flags f, F&& callback) {
+		for_each_in_impl(f, std::forward<F>(callback));
 	}
 
 	template <class F>
-	void for_each_in(const processing_subjects subjects) const {
-
+	void for_each_in(const processing_flags f, F&& callback) const {
+		for_each_in_impl(f, std::forward<F>(callback));
 	}
 
 	template <class id_type>

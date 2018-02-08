@@ -83,6 +83,9 @@ void tree_of_npo_cache::infer_cache_for(const const_entity_handle handle) {
 			cache.recorded_aabb = new_aabb;
 		}
 	}
+	else {
+		// TODO: delete cache?
+	}
 }
 
 void tree_of_npo_cache::reserve_caches_for_entities(const size_t n) {

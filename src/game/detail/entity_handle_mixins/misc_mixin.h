@@ -1,6 +1,8 @@
 #pragma once
 #include "game/transcendental/entity_id.h"
 
+#include "game/enums/entity_flag.h"
+
 #include "game/components/flags_component.h"
 #include "game/components/sentience_component.h"
 #include "game/components/flavour_component.h"

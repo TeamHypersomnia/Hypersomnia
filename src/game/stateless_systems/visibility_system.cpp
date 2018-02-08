@@ -19,8 +19,6 @@
 #include "game/stateless_systems/visibility_system.h"
 #include "game/inferred_caches/physics_world_cache.h"
 
-#include "game/enums/processing_subjects.h"
-
 #include "game/components/rigid_body_component.h"
 #include "game/components/transform_component.h"
 #include "game/components/item_component.h"

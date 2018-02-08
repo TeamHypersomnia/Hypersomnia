@@ -17,7 +17,6 @@
 #include "game/organization/all_components_declaration.h"
 
 #include "game/detail/entity_handle_mixins/all_handle_mixins.h"
-#include "game/enums/entity_flag.h"
 
 #include "game/transcendental/step_declaration.h"
 #include "game/components/flags_component.h"
