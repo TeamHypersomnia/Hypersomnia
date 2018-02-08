@@ -21,7 +21,7 @@ void simulation_receiver::predict_intents_of_remote_entities(
 	const cosmos& predicted_cosmos
 ) {
 	predicted_cosmos.for_each_in(
-		processing_flags::WITH_ENABLED_PAST_CONTAGIOUS,
+		processing_subjects::WITH_ENABLED_PAST_CONTAGIOUS,
 		[&](const auto e) {
 			const bool is_locally_controlled_entity = e == locally_controlled_entity;
 			

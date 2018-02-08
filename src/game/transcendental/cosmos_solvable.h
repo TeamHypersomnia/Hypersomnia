@@ -149,7 +149,7 @@ public:
 	}
 	
 	auto get_count_of(const processing_subjects list_type) const {
-		return inferred.processing_lists.get(list_type).size();
+		return inferred.processing.get(list_type).size();
 	}
 
 	template <class E>

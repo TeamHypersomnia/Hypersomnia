@@ -1,7 +1,7 @@
 #pragma once
 
-enum class processing_flags {
-	// GEN INTROSPECTOR enum class processing_flags
+enum class processing_subjects {
+	// GEN INTROSPECTOR enum class processing_subjects
 #if ERASED
 	WITH_ANIMATION,
 	WITH_BEHAVIOUR_TREE,
