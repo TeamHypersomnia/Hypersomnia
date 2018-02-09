@@ -34,7 +34,7 @@ public:
 	}
 
 	template <class T>
-	static type_in_list_id of = make<T>();
+	static type_in_list_id of; 
 
 	type_in_list_id() = default;
 	explicit type_in_list_id(const index_type index) : index(index) {}

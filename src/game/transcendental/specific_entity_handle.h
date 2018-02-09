@@ -4,6 +4,7 @@
 
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/transcendental/specific_entity_handle_declaration.h"
+#include "game/transcendental/entity_solvable.h"
 
 #include "game/detail/entity_handle_mixins/all_handle_mixins.h"
 

@@ -1,6 +1,5 @@
 #include "augs/templates/container_templates.h"
 #include "flavour_id_cache.h"
-#include "game/components/flavour_component.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
 

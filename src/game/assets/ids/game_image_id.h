@@ -8,7 +8,7 @@ namespace assets {
 
 #if BUILD_TEST_SCENES
 		BLANK,
-test_plain_sprited_bodys
+
 		CRATE,
 
 		TRUCK_INSIDE,
@@ -34,20 +34,20 @@ test_plain_sprited_bodys
 		PIXEL_THUNDER_5,
 
 		ASSAULT_RIFLE,
-		test_shootable_weapons,
+		BILMER2000,
 		KEK9,
 		SUBMACHINE,
 		URBAN_CYAN_MACHETE,
 		ROCKET_LAUNCHER,
 
 		TEST_BACKGROUND,
-test_container_items
+
 		SAMPLE_MAGAZINE,
 		SMALL_MAGAZINE,
 		ROUND_TRACE,
 		ENERGY_BALL,
 		PINK_CHARGE,
-		test_shootable_charges,
+		PINK_SHELL,
 		CYAN_CHARGE,
 		CYAN_SHELL,
 		RED_CHARGE,
@@ -55,12 +55,12 @@ test_container_items
 		GREEN_CHARGE,
 		GREEN_SHELL,
 		BACKPACK,
-test_sprite_decorations
-		test_sprite_decorations,
-		test_sprite_decorations,
+
+		HAVE_A_PLEASANT,
+		AWAKENING,
 		METROPOLIS,
 
-		test_sprite_decorations,
+		BRICK_WALL,
 		ROAD,
 		ROAD_FRONT_DIRT,
 
@@ -89,7 +89,7 @@ test_sprite_decorations
 		HEALTH_ICON,
 		PERSONAL_ELECTRICITY_ICON,
 		CONSCIOUSNESS_ICON,
-test_shootable_weapons
+
 		AMPLIFIER_ARM,
 
 		SPELL_HASTE_ICON,
@@ -102,9 +102,9 @@ test_shootable_weapons
 
 		PERK_HASTE_ICON,
 		PERK_ELECTRIC_SHIELD_ICON,
-test_throwable_explosives
-		test_throwable_explosives,
-		test_throwable_explosives,
+
+		FORCE_GRENADE,
+		PED_GRENADE,
 		INTERFERENCE_GRENADE,
 
 		FORCE_GRENADE_RELEASED,

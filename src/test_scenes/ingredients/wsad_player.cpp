@@ -12,7 +12,6 @@
 #include "game/components/rigid_body_component.h"
 #include "game/components/driver_component.h"
 #include "game/components/force_joint_component.h"
-#include "game/components/flavour_component.h"
 #include "game/components/sentience_component.h"
 #include "game/components/attitude_component.h"
 #include "game/components/flags_component.h"

@@ -1,7 +1,6 @@
 #include "ingredients.h"
 #include "game/assets/all_logical_assets.h"
 #include "game/transcendental/cosmos.h"
-#include "game/components/flavour_component.h"
 #include "game/components/fixtures_component.h"
 
 namespace test_flavours {

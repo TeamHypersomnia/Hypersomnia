@@ -1,5 +1,5 @@
 #pragma once
-#include "game/transcendental/entity_type.h"
+#include "augs/misc/pool/pool_declaration.h"
 
 namespace augs {
 	template <class mapped_type, template <class> class make_container_type, class size_type>

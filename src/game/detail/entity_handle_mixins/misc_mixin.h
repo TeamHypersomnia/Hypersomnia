@@ -5,7 +5,6 @@
 
 #include "game/components/flags_component.h"
 #include "game/components/sentience_component.h"
-#include "game/components/flavour_component.h"
 #include "game/components/crosshair_component.h"
 
 template <class A, class = void>

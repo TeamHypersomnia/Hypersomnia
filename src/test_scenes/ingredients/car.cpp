@@ -12,7 +12,6 @@
 #include "game/components/car_component.h"
 #include "game/components/rigid_body_component.h"
 #include "game/components/fixtures_component.h"
-#include "game/components/flavour_component.h"
 #include "game/detail/view_input/particle_effect_input.h"
 #include "game/detail/view_input/sound_effect_input.h"
 #include "game/components/polygon_component.h"

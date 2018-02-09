@@ -55,6 +55,8 @@ struct AAA {
 };
 
 struct tests_of_traits {
+	static_assert(all_are_v<std::is_trivially_copyable, type_list<int, double, float>>);
+
 	static_assert(std::is_same_v<
 		type_list<int, int, double, double>,
 		concatenate_lists_t<type_list<int, int>, type_list<double, double>>

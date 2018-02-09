@@ -5,9 +5,7 @@
 #include "augs/templates/predicate_templates.h"
 #include "augs/templates/nth_type_in.h"
 #include "augs/templates/list_utils.h"
-
-template <class...>
-struct type_list;
+#include "augs/templates/type_list.h"
 
 template <
 	size_t Index,
@@ -112,4 +110,7 @@ template <class S, class... Types>
 constexpr size_t count_occurences_in_v = count_occurences_in_list_v<S, type_list<Types...>>;
 
 template <template <class...> class Criterion, class List>
-constexpr size_t match_exists_in_list_v = count_matches_in_list_v<Criterion, S> > 0;
+constexpr size_t match_exists_in_list_v = count_matches_in_list_v<Criterion, List> > 0;
+
+template <template <class...> class Criterion, class List>
+constexpr size_t all_are_v = count_matches_in_list_v<Criterion, List> == num_types_in_list_v<List>;

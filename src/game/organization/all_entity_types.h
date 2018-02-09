@@ -30,7 +30,7 @@ struct controlled_character {
 		components::movement,
 
 		components::item_slot_transfers,
-		components::sentience
+		components::sentience,
 
 		components::animation,
 		components::driver,
@@ -105,7 +105,6 @@ struct shootable_weapon {
 	using components = type_list<
 		components::gun,
 
-		components::container,
 		components::item,
 
 		components::rigid_body,

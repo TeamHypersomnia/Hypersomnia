@@ -1,5 +1,6 @@
 #pragma once
 #include "game/transcendental/entity_handle_declaration.h"
+#include "game/transcendental/specific_entity_handle_declaration.h"
 
 class cosmic_delta;
 class cosmic;

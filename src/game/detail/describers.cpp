@@ -5,7 +5,6 @@
 #include "game/transcendental/entity_handle.h"
 
 #include "game/detail/inventory/inventory_slot_handle.h"
-#include "game/components/flavour_component.h"
 #include "game/components/melee_component.h"
 #include "game/components/gun_component.h"
 #include "game/components/missile_component.h"
