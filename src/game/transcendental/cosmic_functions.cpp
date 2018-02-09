@@ -1,6 +1,5 @@
 #include "game/transcendental/cosmic_functions.h"
 #include "game/transcendental/cosmos.h"
-#include "game/organization/for_each_component_type.h"
 #include "game/detail/inventory/perform_transfer.h"
 #include "augs/templates/introspect.h"
 

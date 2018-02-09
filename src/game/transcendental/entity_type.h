@@ -1,19 +1,30 @@
 #pragma once
 #include <tuple>
 #include "augs/misc/trivially_copyable_tuple.h"
+#include "augs/misc/constant_size_vector.h"
+
+#include "augs/templates/list_utils.h"
+#include "augs/templates/type_mod_templates.h"
 
 #include "game/organization/all_entity_types.h"
-#include "augs/misc/constant_size_vector.h"
-#include "augs/templates/type_mod_templates.h"
 
 static constexpr bool statically_allocate_entities = STATICALLY_ALLOCATE_ENTITIES;
 
 template <class T>
+using invariants_of = concatenate_lists_t<
+	typename T::invariants, 
+	always_present_invariants
+>;
+
+template <class T>
 using make_invariants = 
 	replace_list_type_t<
-		T::invariants, 
+		invariants_of<T>, 
 		std::conditional_v<
-			match_exists_in_list_v<apply_negation<std::is_trivially_copyable>, T::invariants>,
+			match_exists_in_list_v<
+				apply_negation<std::is_trivially_copyable>, 
+				invariants_of<T>
+			>,
 			std::tuple,
 			augs::trivially_copyable_tuple
 		>

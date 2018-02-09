@@ -4,8 +4,6 @@
 
 namespace invariants {
 	struct flags {
-		static constexpr bool is_always_present = true;
-
 		// GEN INTROSPECTOR struct invariants::flags
 		augs::enum_boolset<entity_flag> values;
 		// END GEN INTROSPECTOR

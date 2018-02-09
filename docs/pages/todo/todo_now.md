@@ -8,6 +8,8 @@ summary: Just a hidden scratchpad.
 ## Microplanned implementation order:  
 
 - always present should be added to the invariants or components while making
+	- flags?
+- remove redundant logic for componnt/inv lists once all is done and works
 - it probably makes no sense to use GUIDs for now if we are anyway going to transfer whole pools for determinism
 - we'll also write the pool states in lua for now, I guess
 

@@ -1,5 +1,4 @@
 #include "game/transcendental/cosmos_solvable.h"
-#include "game/organization/for_each_component_type.h"
 
 #include "augs/templates/introspect.h"
 

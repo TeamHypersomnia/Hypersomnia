@@ -55,7 +55,16 @@ struct AAA {
 };
 
 struct tests_of_traits {
-	// static_assert(invariant_index_v<invariants::gun> == 0);
+	static_assert(std::is_same_v<
+		type_list<int, int, double, double>,
+		concatenate_lists_t<type_list<int, int>, type_list<double, double>>
+	);
+
+	static_assert(std::is_same_v<
+		std::tuple<int, int, double, double>,
+		concatenate_lists_t<std::tuple<int, int>, type_list<double, double>>
+	);
+
 	static_assert(is_class_const_v<const_entity_handle>);
 	static_assert(!is_class_const_v<iterated_entity_handle<controlled_character>>);
 	static_assert(is_class_const_v<const_iterated_entity_handle<controlled_character>>);

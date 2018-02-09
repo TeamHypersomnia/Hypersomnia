@@ -60,6 +60,10 @@ namespace components {
 	struct sender;
 }
 
+using always_present_invariants = type_list<
+	invariants::flags
+>;
+
 template <template <class...> class List>
 using component_list_t = List<
 	components::animation,

@@ -19,9 +19,11 @@ class entity_flavour {
 	template <class D, class E>
 	static auto& get_impl(E& self) {
 		if constexpr(is_invariant_v<D>) {
+			static_assert(self.template has<D>(), "Unknown invariant type.")
 			return std::get<D>(self.invariants); 
 		}
 		else {
+			static_assert(self.template has<D>(), "Unknown initial component type.")
 			return std::get<D>(self.initial_components); 
 		}
 	}
@@ -43,16 +45,6 @@ public:
 	invariants_type invariants;
 	initial_components_type initial_components;
 	// END GEN INTROSPECTOR
-
-	template <class D>
-	void set(const D& def) {
-		if constexpr(is_invariant_v<D>) {
-			std::get<D>(invariants) = def;
-		}
-		else {
-			std::get<D>(initial_components) = def;
-		}
-	}
 
 	template <class D>
 	constexpr bool has() const {
@@ -80,6 +72,11 @@ public:
 	template <class D>
 	const D& get() const {
 		return get_impl<D>(*this);
+	}
+
+	template <class D>
+	void set(const D& something) {
+		get<D>() = something;
 	}
 
 	bool operator==(const entity_flavour& b) const {
