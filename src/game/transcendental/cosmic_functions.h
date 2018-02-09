@@ -7,7 +7,7 @@
 #include "game/transcendental/cosmic_types.h"
 #include "game/transcendental/entity_flavour_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
-#include "game/transcendental/typed_entity_handle_declaration.h"
+#include "game/transcendental/specific_entity_handle_declaration.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/entity_construction.h"
 
