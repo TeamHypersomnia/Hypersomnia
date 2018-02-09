@@ -70,7 +70,7 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 				return;
 			}
 
-			components::sentience* const sentience = it.find<components::sentience>();
+			components::sentience* const sentience = it.template find<components::sentience>();
 			const bool is_sentient = sentience != nullptr;
 
 			if (it.sentient_and_unconscious()) {

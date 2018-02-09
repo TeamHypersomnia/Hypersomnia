@@ -485,7 +485,7 @@ void sentience_system::rotate_towards_crosshairs_and_driven_vehicles(const logic
 				if (items.size() > 0) {
 					const auto subject_item = cosmos[items[0]];
 
-					if (const auto* const maybe_gun_def = subject_item.find<invariants::gun>()) {
+					if (const auto* const maybe_gun_def = subject_item.template find<invariants::gun>()) {
 						const auto& gun_def = *maybe_gun_def;
 
 						const auto rifle_transform = subject_item.get_logic_transform();
@@ -502,7 +502,7 @@ void sentience_system::rotate_towards_crosshairs_and_driven_vehicles(const logic
 							requested_angle = colinearize_AB_with_C(mc, barrel_center, muzzle, target_transform.pos, debug_line_drawer);
 						}
 					}
-					else if (subject_item.find<components::hand_fuse>()) {
+					else if (subject_item.template find<components::hand_fuse>()) {
 						auto throwable_transform = subject_item.get_logic_transform();
 						auto throwable_target_vector = throwable_transform.pos + vec2::from_degrees(throwable_transform.rotation);
 
@@ -518,7 +518,7 @@ void sentience_system::rotate_towards_crosshairs_and_driven_vehicles(const logic
 				}
 			}
 
-			if (const auto driver = subject.find<components::driver>()) {
+			if (const auto driver = subject.template find<components::driver>()) {
 				if (const auto vehicle = cosmos[driver->owned_vehicle]) {
 					const auto target_transform = vehicle.get_logic_transform();
 					const auto diff = target_transform.pos - subject_transform.pos;
@@ -526,7 +526,7 @@ void sentience_system::rotate_towards_crosshairs_and_driven_vehicles(const logic
 				}
 			}
 
-			if (auto rigid_body = subject.find<components::rigid_body>();
+			if (auto rigid_body = subject.template find<components::rigid_body>();
 				rigid_body != nullptr && requested_angle
 			) {
 				rigid_body.set_transform({ rigid_body.get_position(), *requested_angle });

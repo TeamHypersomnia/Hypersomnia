@@ -120,7 +120,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 		[&](const auto gun_entity) {
 			const auto gun_transform = gun_entity.get_logic_transform();
 			const auto owning_capability = gun_entity.get_owning_transfer_capability();
-			components::sentience* sentience = owning_capability ? owning_capability.find<components::sentience>() : nullptr;
+			components::sentience* sentience = owning_capability ? owning_capability.template find<components::sentience>() : nullptr;
 
 			auto& gun = gun_entity.template get<components::gun>();
 			const auto& gun_def = gun_entity.template get<invariants::gun>();
@@ -334,7 +334,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 				if (const auto* recoil_player = step.get_logical_assets().find(gun_def.recoil.id)) {
 					if (sentience) {
 						if (const auto recoil_entity = owning_capability.find_crosshair_recoil()) {
-							if (const auto recoil_body = recoil_entity.find<components::rigid_body>()) {
+							if (const auto recoil_body = recoil_entity.template find<components::rigid_body>()) {
 								const auto recoil_value = gun.recoil.shoot_and_get_impulse(gun_def.recoil, *recoil_player);
 
 								recoil_body.apply_angular_impulse(

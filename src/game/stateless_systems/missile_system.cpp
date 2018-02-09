@@ -160,7 +160,7 @@ void missile_system::detonate_expired_missiles(const logic_step step) {
 				}
 			}
 
-			const auto* const maybe_sender = it.find<components::sender>();
+			const auto* const maybe_sender = it.template find<components::sender>();
 
 			if (maybe_sender != nullptr && missile_def.homing_towards_hostile_strength > 0.f) {
 				const auto sender_capability = cosmos[maybe_sender->capability_of_sender];
