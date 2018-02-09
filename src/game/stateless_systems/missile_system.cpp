@@ -135,8 +135,8 @@ void missile_system::detonate_expired_missiles(const logic_step step) {
 
 	cosmos.for_each_having<components::missile>(
 		[&](const auto it) {
-			auto& missile = it.get<components::missile>();
-			auto& missile_def = it.get<invariants::missile>();
+			auto& missile = it.template get<components::missile>();
+			auto& missile_def = it.template get<invariants::missile>();
 		
 			const bool already_detonated_in_this_step = 
 				missile.damage_charges_before_destruction == 0
@@ -172,7 +172,7 @@ void missile_system::detonate_expired_missiles(const logic_step step) {
 					particular_homing_target.alive() ? particular_homing_target : cosmos[get_closest_hostile(it, sender_attitude, 250, filters::bullet())]
 				;
 
-				const auto current_velocity = it.get<components::rigid_body>().get_velocity();
+				const auto current_velocity = it.template get<components::rigid_body>().get_velocity();
 
 				it.set_logic_transform({ it.get_logic_transform().pos, current_velocity.degrees() });
 
@@ -185,7 +185,7 @@ void missile_system::detonate_expired_missiles(const logic_step step) {
 						std::swap(dirs[0], dirs[1]);
 					}
 
-					it.get<components::rigid_body>().apply_force(
+					it.template get<components::rigid_body>().apply_force(
 						dirs[0].set_length(homing_vector.length()) * missile_def.homing_towards_hostile_strength
 					);
 				}

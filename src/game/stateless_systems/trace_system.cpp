@@ -24,8 +24,8 @@ void trace_system::lengthen_sprites_of_traces(const logic_step step) const {
 
 	cosmos.for_each_having<components::trace>(
 		[&](const auto t) {
-			auto& trace = t.get<components::trace>();
-			const auto& trace_def = t.get<invariants::trace>();
+			auto& trace = t.template get<components::trace>();
+			const auto& trace_def = t.template get<invariants::trace>();
 
 			vec2 surplus_multiplier;
 			
@@ -51,7 +51,7 @@ void trace_system::destroy_outdated_traces(const logic_step step) const {
 
 	cosmos.for_each_having<components::trace>(
 		[&](const auto t) {
-			auto& trace = t.get<components::trace>();
+			auto& trace = t.template get<components::trace>();
 
 			if (trace.lengthening_time_passed_ms > trace.chosen_lengthening_duration_ms) {
 				trace.lengthening_time_passed_ms = trace.chosen_lengthening_duration_ms;

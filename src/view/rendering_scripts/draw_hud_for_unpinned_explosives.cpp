@@ -16,8 +16,8 @@ void draw_hud_for_unpinned_explosives(const draw_hud_for_released_explosives_inp
 
 	cosmos.for_each_having<components::hand_fuse>(
 		[&](const auto it) {
-			const components::hand_fuse& hand_fuse = it.get<components::hand_fuse>();
-			const invariants::hand_fuse& hand_fuse_def = it.get<invariants::hand_fuse>();
+			const components::hand_fuse& hand_fuse = it.template get<components::hand_fuse>();
+			const invariants::hand_fuse& hand_fuse_def = it.template get<invariants::hand_fuse>();
 			const auto when_unpinned = hand_fuse.when_unpinned;
 
 			if (hand_fuse.when_unpinned.was_set()) {

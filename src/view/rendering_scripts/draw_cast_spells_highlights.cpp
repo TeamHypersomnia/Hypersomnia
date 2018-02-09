@@ -13,7 +13,7 @@ void draw_cast_spells_highlights(const draw_cast_spells_highlights_input in) {
 
 	cosmos.for_each_having<components::sentience>(
 		[&](const auto it) {
-			const auto& sentience = it.get<components::sentience>();
+			const auto& sentience = it.template get<components::sentience>();
 			const auto casted_spell = sentience.currently_casted_spell;
 
 			if (casted_spell.is_set()) {

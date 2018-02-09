@@ -76,8 +76,8 @@ void interpolation_system::integrate_interpolated_transforms(
 
 	cosmos.for_each_having<components::interpolation>( 
 		[&](const auto e) {
-			const auto info = e.get<components::interpolation>();
-			const auto def = e.get<invariants::interpolation>();
+			const auto info = e.template get<components::interpolation>();
+			const auto def = e.template get<invariants::interpolation>();
 
 			auto& integrated = get_interpolated(e);
 			auto& cache = per_entity_cache[e];

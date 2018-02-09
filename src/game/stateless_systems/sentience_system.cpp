@@ -114,7 +114,7 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 
 	cosmos.for_each_having<components::sentience>(
 		[&](const auto subject) {
-			auto& sentience = subject.get<components::sentience>();
+			components::sentience& sentience = subject.template get<components::sentience>();
 			auto& health = sentience.get<health_meter_instance>();
 			auto& consciousness = sentience.get<consciousness_meter_instance>();
 			auto& personal_electricity = sentience.get<personal_electricity_meter_instance>();
@@ -153,7 +153,7 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 				if (const auto owning_crosshair_recoil = subject.find_crosshair_recoil()) {
 					auto rng = cosmos.get_rng_for(subject);
 
-					owning_crosshair_recoil.get<components::rigid_body>().apply_impulse(
+					owning_crosshair_recoil.template get<components::rigid_body>().apply_impulse(
 						shake_mult *shake_mult * 100 * vec2{ rng.randval(-1.f, 1.f), rng.randval(-1.f, 1.f) }
 					);
 				}
@@ -191,7 +191,7 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 	auto& cosmos = step.get_cosmos();
 	const auto subject = cosmos[h.subject];
 	const auto now = cosmos.get_timestamp();
-	auto& sentience = subject.get<components::sentience>();
+	components::sentience& sentience = subject.get<components::sentience>();
 	auto& health = sentience.get<health_meter_instance>();
 	auto& consciousness = sentience.get<consciousness_meter_instance>();
 	auto& personal_electricity = sentience.get<personal_electricity_meter_instance>();
@@ -456,7 +456,7 @@ void sentience_system::rotate_towards_crosshairs_and_driven_vehicles(const logic
 
 	cosmos.for_each_having<components::sentience>(
 		[&](const auto subject) {
-			auto& sentience = subject.get<components::sentience>();
+			components::sentience& sentience = subject.template get<components::sentience>();
 
 			if (!sentience.is_conscious()) {
 				return;

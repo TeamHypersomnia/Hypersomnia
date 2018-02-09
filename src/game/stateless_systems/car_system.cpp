@@ -59,8 +59,8 @@ void car_system::apply_movement_forces(const logic_step step) {
 
 	cosmos.for_each_having<components::car>( 
 		[&](const auto it) {
-			auto& car = it.get<components::car>();
-			const auto rigid_body = it.get<components::rigid_body>();
+			auto& car = it.template get<components::car>();
+			const auto rigid_body = it.template get<components::rigid_body>();
 
 			const auto body_angle = rigid_body.get_degrees();
 			const vec2 forward_dir = vec2::from_degrees(body_angle);
@@ -190,7 +190,7 @@ void car_system::apply_movement_forces(const logic_step step) {
 			;
 
 			if (sound_entity.alive() && sound_entity.has<components::sound_existence>()) {
-				auto& existence = sound_entity.get<components::sound_existence>();
+				auto& existence = sound_entity.template get<components::sound_existence>();
 
 				if (cosmos[car.current_driver].alive()) {
 					const auto since_last_turn_on = (cosmos.get_timestamp() - car.last_turned_on).in_seconds(cosmos.get_fixed_delta());

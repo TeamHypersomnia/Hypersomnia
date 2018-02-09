@@ -96,7 +96,7 @@ void animation_system::progress_animation_states(const logic_step step) {
 
 	cosmos.for_each_having<components::animation>(
 		[&](const auto it) {
-			auto& animation_state = it.get<components::animation>();
+			auto& animation_state = it.template get<components::animation>();
 
 			if (animation_state.state != components::animation::playing_state::PAUSED) {
 				auto& animation = metas.at(animation_state.current_animation);
@@ -162,7 +162,7 @@ void animation_system::progress_animation_states(const logic_step step) {
 #if TODO
 				// TODO: stateless calculation
 
-				auto& sprite = it.get<components::sprite>();
+				auto& sprite = it.template get<components::sprite>();
 
 				sprite.set(
 					animation.frames[animation_state.get_current_frame()].image_id,

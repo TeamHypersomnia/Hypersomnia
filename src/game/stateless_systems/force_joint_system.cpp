@@ -82,7 +82,7 @@ void force_joint_system::apply_forces_towards_target_entities(const logic_step s
 
 				if (force_for_chased.length() > 5) {
 					if (const auto chased_entity = cosmos[::get_chased(force_joint.chasing)]) {
-						const auto& chased_physics = chased_entity.get<components::rigid_body>();
+						const auto& chased_physics = chased_entity.template get<components::rigid_body>();
 						chased_physics.apply_force(force_for_chaser * chased_physics.get_mass());
 					}
 				}

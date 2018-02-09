@@ -48,7 +48,7 @@ void light_system::advance_attenuation_variations(
 
 	cosmos.for_each_having<components::light>(
 		[&](const auto it) {
-			const auto& light = it.get<invariants::light>();
+			const auto& light = it.template get<invariants::light>();
 			auto& cache = per_entity_cache[it];
 
 			const auto delta = dt.in_seconds();
@@ -124,7 +124,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 			request.eye_transform = light_entity.get_viewing_transform(interp);
 			request.eye_transform.pos += light_displacement;
 			request.filter = filters::line_of_sight_query();
-			request.square_side = light_entity.get<invariants::light>().max_distance.base_value;
+			request.square_side = light_entity.template get<invariants::light>().max_distance.base_value;
 			request.subject = light_entity;
 
 			requests.push_back(request);

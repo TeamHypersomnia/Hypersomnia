@@ -22,11 +22,11 @@ void hand_fuse_system::detonate_fuses(const logic_step step) {
 
 	cosmos.for_each_having<components::hand_fuse>(
 		[&](const auto it) {
-			const auto& fuse = it.get<components::hand_fuse>();
+			const auto& fuse = it.template get<components::hand_fuse>();
 			const auto when_unpinned = fuse.when_unpinned;
 
 			if (when_unpinned.was_set()) {
-				const auto& fuse_def = it.get<invariants::hand_fuse>();
+				const auto& fuse_def = it.template get<invariants::hand_fuse>();
 				const auto fuse_delay_steps = static_cast<unsigned>(fuse_def.fuse_delay_ms / delta.in_milliseconds());
 
 				if (const auto when_detonates = when_unpinned.step + fuse_delay_steps;

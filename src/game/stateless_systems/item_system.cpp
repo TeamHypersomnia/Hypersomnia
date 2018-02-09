@@ -165,12 +165,12 @@ void item_system::process_mounting_and_unmounting(const logic_step step) {
 	
 	cosmos.for_each_having<components::item_slot_transfers>( 
 		[&](const auto e) {
-			auto& item_slot_transfers = e.get<components::item_slot_transfers>();
+			auto& item_slot_transfers = e.template get<components::item_slot_transfers>();
 
 			const auto currently_mounted_item = cosmos[item_slot_transfers.mounting.current_item];
 
 			if (currently_mounted_item.alive()) {
-				auto& item = currently_mounted_item.get<components::item>();
+				auto& item = currently_mounted_item.template get<components::item>();
 
 				if (item.get_current_slot() != item_slot_transfers.mounting.intented_mounting_slot) {
 					item_slot_transfers.interrupt_mounting();

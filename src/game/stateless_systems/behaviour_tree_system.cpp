@@ -17,7 +17,7 @@ void behaviour_tree_system::evaluate_trees(const logic_step) {
 
 	cosmos.for_each_having<components::behaviour_tree>( 
 		[&](const auto it) {
-			auto& behaviour_tree = it.get<components::behaviour_tree>();
+			auto& behaviour_tree = it.template get<components::behaviour_tree>();
 			
 			for (auto& concurrent_tree : behaviour_tree.concurrent_trees) {
 				// TODO: fix behaviour tree storage

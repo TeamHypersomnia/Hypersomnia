@@ -61,16 +61,16 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 
 	cosmos.for_each_having<components::movement>(
 		[&](const auto it) {
-			auto& movement = it.get<components::movement>();
-			auto& movement_def = it.get<invariants::movement>();
+			auto& movement = it.template get<components::movement>();
+			auto& movement_def = it.template get<invariants::movement>();
 
-			const auto& rigid_body = it.get<components::rigid_body>();
+			const auto& rigid_body = it.template get<components::rigid_body>();
 
 			if (!rigid_body.is_constructed()) {
 				return;
 			}
 
-			auto* const sentience = it.find<components::sentience>();
+			components::sentience* const sentience = it.find<components::sentience>();
 			const bool is_sentient = sentience != nullptr;
 
 			if (it.sentient_and_unconscious()) {
