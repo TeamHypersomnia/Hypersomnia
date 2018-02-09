@@ -22,9 +22,8 @@ void trace_system::lengthen_sprites_of_traces(const logic_step step) const {
 	auto& cosmos = step.get_cosmos();
 	const auto delta = step.get_delta();
 
-	cosmos.for_each(
-		processing_subjects::WITH_TRACE,
-		[&](const entity_handle t) {
+	cosmos.for_each_having<components::trace>(
+		[&](const auto t) {
 			auto& trace = t.get<components::trace>();
 			const auto& trace_def = t.get<invariants::trace>();
 
@@ -50,9 +49,8 @@ void trace_system::lengthen_sprites_of_traces(const logic_step step) const {
 void trace_system::destroy_outdated_traces(const logic_step step) const {
 	auto& cosmos = step.get_cosmos();
 
-	cosmos.for_each(
-		processing_subjects::WITH_TRACE,
-		[&](const entity_handle t) {
+	cosmos.for_each_having<components::trace>(
+		[&](const auto t) {
 			auto& trace = t.get<components::trace>();
 
 			if (trace.lengthening_time_passed_ms > trace.chosen_lengthening_duration_ms) {

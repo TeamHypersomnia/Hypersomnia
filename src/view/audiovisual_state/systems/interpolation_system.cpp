@@ -74,9 +74,8 @@ void interpolation_system::integrate_interpolated_transforms(
 
 	const float slowdown_multipliers_decrease = seconds / fixed_delta_for_slowdowns.in_seconds();
 
-	cosmos.for_each(
-		processing_subjects::WITH_INTERPOLATION, 
-		[&](const const_entity_handle e) {
+	cosmos.for_each_having<components::interpolation>( 
+		[&](const auto e) {
 			const auto info = e.get<components::interpolation>();
 			const auto def = e.get<invariants::interpolation>();
 

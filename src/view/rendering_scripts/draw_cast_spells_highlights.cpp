@@ -11,9 +11,8 @@ void draw_cast_spells_highlights(const draw_cast_spells_highlights_input in) {
 	const auto& cosmos = in.cosm;
 	const auto dt = cosmos.get_fixed_delta();
 
-	cosmos.for_each(
-		processing_subjects::WITH_SENTIENCE,
-		[&](const const_entity_handle it) {
+	cosmos.for_each_having<components::sentience>(
+		[&](const auto it) {
 			const auto& sentience = it.get<components::sentience>();
 			const auto casted_spell = sentience.currently_casted_spell;
 

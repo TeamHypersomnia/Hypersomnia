@@ -133,9 +133,8 @@ void missile_system::detonate_expired_missiles(const logic_step step) {
 	const auto now = cosmos.get_timestamp();
 	const auto& delta = step.get_delta();
 
-	cosmos.for_each(
-		processing_subjects::WITH_DAMAGE,
-		[&](const entity_handle it) {
+	cosmos.for_each_having<components::missile>(
+		[&](const auto it) {
 			auto& missile = it.get<components::missile>();
 			auto& missile_def = it.get<invariants::missile>();
 		

@@ -20,9 +20,8 @@ void hand_fuse_system::detonate_fuses(const logic_step step) {
 	const auto delta = step.get_delta();
 	const auto now = cosmos.get_timestamp();
 
-	cosmos.for_each(
-		processing_subjects::WITH_HAND_FUSE,
-		[&](const entity_handle it) {
+	cosmos.for_each_having<components::hand_fuse>(
+		[&](const auto it) {
 			const auto& fuse = it.get<components::hand_fuse>();
 			const auto when_unpinned = fuse.when_unpinned;
 

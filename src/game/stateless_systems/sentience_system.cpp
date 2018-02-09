@@ -112,9 +112,8 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 	const auto consciousness_regeneration_frequency_in_steps = static_cast<unsigned>(1 / delta.in_seconds() * 2);
 	const auto pe_regeneration_frequency_in_steps = static_cast<unsigned>(1 / delta.in_seconds() * 3);
 
-	cosmos.for_each(
-		processing_subjects::WITH_SENTIENCE,
-		[&](const entity_handle subject) {
+	cosmos.for_each_having<components::sentience>(
+		[&](const auto subject) {
 			auto& sentience = subject.get<components::sentience>();
 			auto& health = sentience.get<health_meter_instance>();
 			auto& consciousness = sentience.get<consciousness_meter_instance>();
@@ -441,9 +440,8 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 void sentience_system::cooldown_aimpunches(const logic_step step) const {
 	const auto& cosmos = step.get_cosmos();
 
-	cosmos.for_each(
-		processing_subjects::WITH_SENTIENCE,
-		[&](const const_entity_handle t) {
+	cosmos.for_each_having<components::sentience>(
+		[&](const auto t) {
 
 		}
 	);
@@ -456,9 +454,8 @@ void sentience_system::rotate_towards_crosshairs_and_driven_vehicles(const logic
 
 	auto& cosmos = step.get_cosmos();
 
-	cosmos.for_each(
-		processing_subjects::WITH_SENTIENCE,
-		[&](const entity_handle subject) {
+	cosmos.for_each_having<components::sentience>(
+		[&](const auto subject) {
 			auto& sentience = subject.get<components::sentience>();
 
 			if (!sentience.is_conscious()) {

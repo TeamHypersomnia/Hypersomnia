@@ -60,9 +60,8 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 
 	auto& lines = DEBUG_LOGIC_STEP_LINES;
 
-	cosmos.for_each(
-		processing_subjects::WITH_PATHFINDING,
-		[&](const entity_handle it) {
+	cosmos.for_each_having<components::pathfinding>(
+		[&](const auto it) {
 		/* get necessary components */
 			auto& pathfinding = it.get<components::pathfinding>();
 			const auto& transform = it.get_logic_transform() + pathfinding.eye_offset;

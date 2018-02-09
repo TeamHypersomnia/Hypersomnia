@@ -57,9 +57,8 @@ void car_system::apply_movement_forces(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
 	const auto delta = step.get_delta();
 
-	cosmos.for_each(
-		processing_subjects::WITH_CAR, 
-		[&](const entity_handle it) {
+	cosmos.for_each_having<components::car>( 
+		[&](const auto it) {
 			auto& car = it.get<components::car>();
 			const auto rigid_body = it.get<components::rigid_body>();
 

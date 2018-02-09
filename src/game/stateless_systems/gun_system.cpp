@@ -116,8 +116,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 	const auto delta = step.get_delta();
 	const auto now = cosmos.get_timestamp();
 
-	cosmos.for_each(
-		processing_subjects::WITH_GUN,
+	cosmos.for_each_having<components::gun>(
 		[&](const auto gun_entity) {
 			const auto gun_transform = gun_entity.get_logic_transform();
 			const auto owning_capability = gun_entity.get_owning_transfer_capability();

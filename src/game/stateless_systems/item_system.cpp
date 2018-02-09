@@ -163,9 +163,8 @@ void item_system::process_mounting_and_unmounting(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
 	const auto delta = step.get_delta();
 	
-	cosmos.for_each(
-		processing_subjects::WITH_ITEM_SLOT_TRANSFERS, 
-		[&](const entity_handle e) {
+	cosmos.for_each_having<components::item_slot_transfers>( 
+		[&](const auto e) {
 			auto& item_slot_transfers = e.get<components::item_slot_transfers>();
 
 			const auto currently_mounted_item = cosmos[item_slot_transfers.mounting.current_item];

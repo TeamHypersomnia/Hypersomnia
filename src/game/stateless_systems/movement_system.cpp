@@ -59,9 +59,8 @@ void movement_system::set_movement_flags_from_input(const logic_step step) {
 void movement_system::apply_movement_forces(cosmos& cosmos) {
 	const auto delta = cosmos.get_fixed_delta();
 
-	cosmos.for_each(
-		processing_subjects::WITH_MOVEMENT,
-		[&](const entity_handle it) {
+	cosmos.for_each_having<components::movement>(
+		[&](const auto it) {
 			auto& movement = it.get<components::movement>();
 			auto& movement_def = it.get<invariants::movement>();
 

@@ -94,9 +94,8 @@ void animation_system::progress_animation_states(const logic_step step) {
 	const auto& metas = step.get_logical_assets();
 	const auto& delta = step.get_delta();
 
-	cosmos.for_each(
-		processing_subjects::WITH_ANIMATION,
-		[&](const entity_handle it) {
+	cosmos.for_each_having<components::animation>(
+		[&](const auto it) {
 			auto& animation_state = it.get<components::animation>();
 
 			if (animation_state.state != components::animation::playing_state::PAUSED) {

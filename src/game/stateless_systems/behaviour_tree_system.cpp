@@ -15,9 +15,8 @@ void behaviour_tree_system::evaluate_trees(const logic_step) {
 #if TODO
 	auto& cosmos = step.get_cosmos();
 
-	cosmos.for_each(
-		processing_subjects::WITH_BEHAVIOUR_TREE, 
-		[&](const entity_handle it) {
+	cosmos.for_each_having<components::behaviour_tree>( 
+		[&](const auto it) {
 			auto& behaviour_tree = it.get<components::behaviour_tree>();
 			
 			for (auto& concurrent_tree : behaviour_tree.concurrent_trees) {

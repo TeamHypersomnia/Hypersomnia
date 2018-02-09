@@ -15,8 +15,7 @@ void force_joint_system::apply_forces_towards_target_entities(const logic_step s
 	auto& cosmos = step.get_cosmos();
 	const auto delta = step.get_delta();
 
-	cosmos.for_each(
-		processing_subjects::WITH_FORCE_JOINT,
+	cosmos.for_each_having<components::force_joint>(
 		[&](const auto it) {
 			if (!it.template has<components::rigid_body>()) {
 				return;
