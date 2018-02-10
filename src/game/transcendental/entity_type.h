@@ -82,6 +82,6 @@ using has_invariants_or_components_v = typename has_invariants_or_components<Arg
 
 template <class... Types>
 using all_entity_types_having = filter_types_in_list_t<
-	all_entity_types,
-	has_invariants_or_components<Types...>::template type
+	has_invariants_or_components<Types...>::template type,
+	all_entity_types
 >;

@@ -31,8 +31,8 @@ namespace augs {
 	class pool {
 	public:
 		using mapped_type = T;
-		using key_type = pooled_object_id<mapped_type, size_type>;
-		using unversioned_id_type = unversioned_id<mapped_type, size_type>;
+		using key_type = pooled_object_id<size_type>;
+		using unversioned_id_type = unversioned_id<size_type>;
 		using used_size_type = size_type;
 
 	protected:
