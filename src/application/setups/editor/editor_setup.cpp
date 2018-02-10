@@ -574,7 +574,7 @@ void editor_setup::perform_custom_imgui(
 			static ImGuiTextFilter filter;
 			filter.Draw();
 			
-			work().world.for_each_entity([&](const auto handle) {
+			cosmic::for_each_entity(work().world, [&](const auto handle) {
 				const auto name = to_string(handle.get_name());
 				const auto id = handle.get_id();
 

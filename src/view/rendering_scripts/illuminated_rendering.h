@@ -285,7 +285,7 @@ void illuminated_rendering(
 	draw_layer(render_layer::NEON_CAPTIONS);
 	
 	if (settings.draw_crosshairs) {
-		cosmos.for_each_having<components::sentience>(
+		cosmos.template for_each_having<components::sentience>(
 			[&](const auto it) {
 				if (const auto s = it.find_crosshair_def()) {
 					draw_renderable(

@@ -9,6 +9,7 @@
 #include "game/transcendental/entity_solvable.h"
 
 #include "game/detail/entity_handle_mixins/all_handle_mixins.h"
+#include "game/common_state/entity_flavours.h"
 
 template <class E>
 struct entity_solvable;
@@ -114,8 +115,8 @@ public:
 	template <class T>
 	static constexpr bool has() {
 		return 
-			subject_type::template has<T> 
-			|| get_flavour().template has<T>
+			subject_type::template has<T>() 
+			|| entity_flavour<entity_type>::template has<T>()
 		;
 	}
 

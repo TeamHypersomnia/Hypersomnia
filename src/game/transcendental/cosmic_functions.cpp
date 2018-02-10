@@ -50,7 +50,7 @@ void cosmic::reinfer_solvable(cosmos& cosm) {
 	auto& guids = solvable.guid_to_id;
 	guids.clear();
 
-	cosm.for_each_entity([this](const auto handle) {
+	for_each_entity(cosm, [this](const auto handle) {
 		guids[handle.get_guid()] = handle.get_id();
 	});
 

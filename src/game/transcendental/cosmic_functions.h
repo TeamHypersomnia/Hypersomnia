@@ -7,7 +7,7 @@
 #include "game/transcendental/entity_type_traits.h"
 #include "game/transcendental/entity_flavour_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
-#include "game/transcendental/specific_entity_handle_declaration.h"
+#include "game/transcendental/specific_entity_handle.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/entity_construction.h"
 
@@ -173,6 +173,27 @@ public:
 		});
 
 		status = callback(cosm.get_solvable({}).significant);
+	}
+
+	template <class... Constraints, class C, class F>
+	static void for_each_entity(C& self, F callback) {
+		self.get_solvable({}).for_each_pool(
+			[&](auto& p) {
+				using P = decltype(p);
+				using E = typename std::decay_t<P>::mapped_type;
+
+				if constexpr(has_invariants_or_components_v<E, Constraints...>) {
+					using index_type = typename P::used_size_type;
+					using iterated_handle_type = basic_iterated_entity_handle<is_const_ref_v<P>, E>;
+
+					for (index_type i = 0; i < p.size(); ++i) {
+						auto& object = p.data()[i];
+						const auto iterated_handle = iterated_handle_type(self, object, i);
+						callback(iterated_handle);
+					}
+				}
+			}
+		);
 	}
 };
 

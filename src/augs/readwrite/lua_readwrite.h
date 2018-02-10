@@ -20,11 +20,13 @@
 #include "augs/readwrite/lua_traits.h"
 
 namespace augs {
-	inline const char* get_variant_type_label() {
+	template <class... T>
+	inline const char* get_variant_type_label(T&&...) {
 		return "type";
 	}
 
-	inline const char* get_variant_content_label() {
+	template <class... T>
+	inline const char* get_variant_content_label(T&&...) {
 		return "fields";
 	}
 
@@ -296,9 +298,9 @@ namespace augs {
 				[output_table](const auto& resolved){
 					using T = std::decay_t<decltype(resolved)>;
 					
-					const auto variant_type_label = get_variant_type_label(std::declval<Serialized&>());
-					const auto variant_content_label = get_variant_content_label(std::declval<Serialized&>());
-					const auto this_type_name = get_type_name_strip_namespace(std::declval<T&>());
+					const auto variant_type_label = get_variant_type_label();
+					const auto variant_content_label = get_variant_content_label();
+					const auto this_type_name = get_type_name_strip_namespace(resolved);
 
 					output_table[variant_type_label] = this_type_name;
 					write_table_or_field(output_table, resolved, variant_content_label);

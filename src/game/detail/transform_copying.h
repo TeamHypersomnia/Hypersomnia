@@ -5,8 +5,10 @@
 #include "game/components/transform_component.h"
 
 struct orbital_chasing {
+	// GEN INTROSPECTOR struct orbital_chasing
 	entity_id target;
 	components::transform offset;
+	// END GEN INTROSPECTOR
 
 	template <class C, class I>
 	std::optional<components::transform> find_transform(C& cosm, I& interp) const {

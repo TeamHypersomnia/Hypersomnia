@@ -8,8 +8,9 @@
 
 namespace components {
 	struct force_joint {
+		static constexpr bool allow_nontriviality = true;
+
 		// GEN INTROSPECTOR struct components::force_joint
-		absolute_or_local chasing;
 
 		float force_towards_chased_entity = 8000.f;
 		float distance_when_force_easing_starts = 10.f;

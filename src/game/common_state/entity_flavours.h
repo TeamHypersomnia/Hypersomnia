@@ -48,7 +48,7 @@ public:
 	// END GEN INTROSPECTOR
 
 	template <class D>
-	constexpr bool has() const {
+	static constexpr bool has() {
 		return 
 			is_one_of_list_v<D, invariants_type>
 			|| is_one_of_list_v<D, initial_components_type>
