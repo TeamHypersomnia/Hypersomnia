@@ -38,7 +38,9 @@ tree_of_npo_cache::tree& tree_of_npo_cache::get_tree(const cache& c) {
 }
 
 void tree_of_npo_cache::destroy_cache_of(const const_entity_handle handle) {
-	if (const auto cache = find_cache(handle.get_id())) {
+	const auto id = handle.get_id();
+
+	if (const auto cache = find_cache(id)) {
 		if (cache->tree_proxy_id != -1) {
 			get_tree(*cache).nodes.DestroyProxy(cache->tree_proxy_id);
 		}

@@ -20,6 +20,10 @@ struct constrained_entity_flavour_id {
 	entity_type_id type_id;
 	// END GEN INTROSPECTOR
 
+	operator bool() const {
+		return raw != raw_entity_flavour_id();
+	}
+
 	operator entity_flavour_id() const {
 		return { raw, type_id };
 	}
@@ -34,6 +38,10 @@ struct typed_entity_flavour_id {
 
 	operator raw_entity_flavour_id() const {
 		return raw;
+	}
+
+	operator bool() const {
+		return raw != raw_entity_flavour_id();
 	}
 
 	template <

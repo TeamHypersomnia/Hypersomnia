@@ -6,9 +6,7 @@
 
 void interpolation_system::set_interpolation_enabled(const bool flag) {
 	if (!enabled && flag) {
-		for (auto& c : per_entity_cache) {
-			c = cache();
-		}
+		per_entity_cache.clear();
 	}
 	
 	enabled = flag;

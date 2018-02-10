@@ -231,7 +231,6 @@ struct plain_missile {
 
 	using components = type_list<
 		components::rigid_body,
-		components::hand_fuse,
 		components::item,
 		components::missile,
 		components::sender,
@@ -255,7 +254,6 @@ struct finishing_trace {
 
 	using components = type_list<
 		components::rigid_body,
-		components::hand_fuse,
 		components::item,
 		components::sender,
 		components::trace,
@@ -304,6 +302,7 @@ struct explosive_missile {
 
 		invariants::trace,
 
+		invariants::hand_fuse,
 		invariants::missile,
 		invariants::explosive,
 

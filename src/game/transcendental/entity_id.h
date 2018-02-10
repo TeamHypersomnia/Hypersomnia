@@ -92,6 +92,14 @@ struct child_entity_id : entity_id {
 	using base = entity_id;
 	child_entity_id(const entity_id id = entity_id()) : entity_id(id) {}
 	using base::operator unversioned_entity_id;
+
+	auto basic() const {
+		return *static_cast<const base*>(this);
+	}
+
+	operator entity_id() const {
+		return basic(); 
+	}
 };
 
 namespace std {

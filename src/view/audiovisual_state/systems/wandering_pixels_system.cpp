@@ -10,7 +10,7 @@ void wandering_pixels_system::clear() {
 }
 
 void wandering_pixels_system::clear_dead_entities(const cosmos& new_cosmos) {
-	std::vector<entity_id> to_erase;
+	std::vector<unversioned_entity_id> to_erase;
 
 	for (const auto it : per_entity_cache) {
 		if (new_cosmos[it.first].dead()) {

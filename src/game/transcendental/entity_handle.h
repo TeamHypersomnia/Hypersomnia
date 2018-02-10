@@ -35,6 +35,9 @@ class basic_entity_handle :
 	public relations_mixin<basic_entity_handle<is_const>>,
 	public spatial_properties_mixin<basic_entity_handle<is_const>>
 {
+	template <bool, class, template <class> class>
+	friend class specific_entity_handle;
+
 	using owner_reference = maybe_const_ref_t<is_const, cosmos>;
 	using entity_ptr = maybe_const_ptr_t<is_const, void>;
 
@@ -175,7 +178,7 @@ public:
 		return get_by_dynamic_id(
 			all_entity_types(),
 			raw_id.type_id,
-			[&](auto t) {
+			[&](auto t) -> decltype(auto) {
 				using entity_type = decltype(t);
 				using handle_type = basic_typed_entity_handle<is_const, entity_type>;
 

@@ -132,7 +132,7 @@ std::vector<misprediction_candidate_entry> simulation_receiver::acquire_potentia
 		cosmos.get_solvable().get_count_of(processing_subjects::WITH_ENABLED_PAST_CONTAGIOUS) + unpredictables_infected.size()
 	);
 
-	cosmos.for_each(
+	cosmos.for_each_in(
 		processing_subjects::WITH_ENABLED_PAST_CONTAGIOUS,
 		[&](const const_entity_handle e) {
 			potential_mispredictions.push_back(acquire_potential_misprediction(e));

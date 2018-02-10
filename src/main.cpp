@@ -269,7 +269,7 @@ int work(const int argc, const char* const * const argv) try {
 	};
 
 	static auto on_specific_setup = [](auto callback) -> decltype(auto) {
-		using T = std::decay_t<argument_of_t<decltype(callback), 0>>;
+		using T = std::decay_t<argument_t<decltype(callback), 0>>;
 
 		if constexpr(std::is_same_v<T, main_menu_setup>) {
 			if (main_menu.has_value()) {

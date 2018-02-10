@@ -116,12 +116,14 @@ public:
 		return rewrite_members_and_transform_templated_type_into<entity_guid>(
 			id_source,
 			[this](auto& guid_member, const auto& id_member) {
-				if (operator[](id_member).alive()) {
-					guid_member = get_guid(id_member);
-				}
-				else {
-					guid_member = entity_guid();
-				}
+				on_entity(id_member, [&](const auto* e){ 
+					if (e) {
+						guid_member = e->guid;
+					}
+					else {
+						guid_member = entity_guid();
+					}
+				});
 			}
 		);
 	}

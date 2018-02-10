@@ -7,6 +7,8 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order:  
 
+- add "direct_construction_access" for entity handles
+
 - always present should be added to the invariants or components while making
 	- flags?
 - remove redundant logic for componnt/inv lists once all is done and works

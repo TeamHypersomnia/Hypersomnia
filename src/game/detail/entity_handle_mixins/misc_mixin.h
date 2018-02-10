@@ -128,7 +128,7 @@ public:
 			return get_flavour().name;
 		}
 		else {
-			return cosm.on_flavour(get_flavour_id(), [](const auto& f) { return f.name; });
+			return cosm.on_flavour(get_flavour_id(), [](const auto& f) -> const auto& { return f.name; });
 		}
 	}
 
@@ -141,7 +141,7 @@ public:
 			return get_flavour().description;
 		}
 		else {
-			return cosm.on_flavour(get_flavour_id(), [](const auto& f) { return f.description; });
+			return cosm.on_flavour(get_flavour_id(), [](const auto& f) -> const auto& { return f.description; });
 		}
 	}
 

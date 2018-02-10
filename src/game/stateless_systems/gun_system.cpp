@@ -180,11 +180,11 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 							cosmic::create_entity(
 								cosmos, 
-								magic_missile_flavour_id
+								magic_missile_flavour_id,
 								[&](const auto round_entity) {
 									round_entity.set_logic_transform(muzzle_transform);
 
-									auto& sender = round_entity.get<components::sender>();
+									auto& sender = round_entity.template get<components::sender>();
 									sender.set(gun_entity);
 
 									{
@@ -196,7 +196,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 											* rng.randval(gun_def.muzzle_velocity)
 										;
 
-										round_entity.get<components::rigid_body>().set_velocity(missile_velocity);
+										round_entity.template get<components::rigid_body>().set_velocity(missile_velocity);
 									}
 
 									{
@@ -221,7 +221,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 				const auto catridge_in_chamber = cosmos[chamber_slot.get_items_inside()[0]];
 
 				auto response = make_gunshot_response();
-				response.catridge_definition = catridge_in_chamber.get<invariants::catridge>();
+				response.catridge_definition = catridge_in_chamber.template get<invariants::catridge>();
 
 				thread_local std::vector<entity_id> bullet_stacks;
 				bullet_stacks.clear();
@@ -254,18 +254,17 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 					while (charges--) {
 						if (const auto round_flavour = single_bullet_or_pellet_stack.get<invariants::catridge>().round_flavour) {
-							total_recoil += missile_def.recoil_multiplier;
-
 							cosmic::create_entity(cosmos, round_flavour, [&](const auto round_entity){
-								auto& sender = round_entity.get<components::sender>();
+								auto& sender = round_entity.template get<components::sender>();
 								sender.set(gun_entity);
 
 								{
-									auto& missile = round_entity.get<components::missile>();
+									auto& missile = round_entity.template get<components::missile>();
 									missile.power_multiplier_of_sender = gun_def.damage_multiplier;
 								}
 
-								const auto& missile_def = round_entity.get<invariants::missile>();
+								const auto& missile_def = round_entity.template get<invariants::missile>();
+								total_recoil += missile_def.recoil_multiplier;
 
 								round_entity.set_logic_transform(muzzle_transform);
 
@@ -280,7 +279,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 										* rng.randval(gun_def.muzzle_velocity)
 									;
 
-									round_entity.get<components::rigid_body>().set_velocity(missile_velocity);
+									round_entity.template get<components::rigid_body>().set_velocity(missile_velocity);
 								}
 
 								correct_interpolation_for(round_entity);
@@ -300,7 +299,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 							shell_entity.set_logic_transform(shell_transform);
 
-							shell_entity.get<components::rigid_body>().set_velocity(vec2::from_degrees(muzzle_transform.rotation + spread_component).set_length(rng.randval(gun_def.shell_velocity)));
+							shell_entity.template get<components::rigid_body>().set_velocity(vec2::from_degrees(muzzle_transform.rotation + spread_component).set_length(rng.randval(gun_def.shell_velocity)));
 							response.spawned_shell = shell_entity;
 						});
 					}

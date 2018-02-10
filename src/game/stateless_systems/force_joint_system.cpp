@@ -29,11 +29,10 @@ void force_joint_system::apply_forces_towards_target_entities(const logic_step s
 
 			const auto& force_joint = it.template get<components::force_joint>();
 
+#if TODO
 			const auto chased_transform = ::find_transform(force_joint.chasing, cosmos);
-
-			if (!chased_transform) {
-				return;
-			}
+#endif
+			components::transform chased_transform;
 
 			auto direction = chased_transform.pos - rigid_body.get_position();
 			const auto distance = direction.length();
@@ -81,10 +80,12 @@ void force_joint_system::apply_forces_towards_target_entities(const logic_step s
 				//}
 
 				if (force_for_chased.length() > 5) {
+#if TODO
 					if (const auto chased_entity = cosmos[::get_chased(force_joint.chasing)]) {
 						const auto& chased_physics = chased_entity.template get<components::rigid_body>();
 						chased_physics.apply_force(force_for_chaser * chased_physics.get_mass());
 					}
+#endif
 				}
 
 				//LOG("F: %x", rigid_body.body->GetLinearDamping());

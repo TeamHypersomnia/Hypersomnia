@@ -25,7 +25,7 @@ constexpr bool has_INVALID_v = has_INVALID<T>::value;
 namespace augs {
 	template <class F>
 	void for_each_enum(F callback) {
-		using Enum = argument_of_t<F, 0>;
+		using Enum = argument_t<F, 0>;
 
 		enum_to_args_impl(
 			Enum(),
@@ -39,7 +39,7 @@ namespace augs {
 
 	template <class F>
 	void for_each_enum_except_bounds(F callback) {
-		using Enum = argument_of_t<F, 0>;
+		using Enum = argument_t<F, 0>;
 
 		enum_to_args_impl(
 			Enum(),

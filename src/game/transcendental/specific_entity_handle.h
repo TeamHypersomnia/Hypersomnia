@@ -20,19 +20,19 @@ struct empty_id_provider {};
 template <class derived_handle_type>
 struct iterated_id_provider {
 	const unsigned iteration_index;
-	using pool_type = typename derived_handle_type::subject_pool_type;
-	using owner_reference = typename derived_handle_type::owner_reference;
 	
 	iterated_id_provider(const unsigned iteration_index) 
 		: iteration_index(iteration_index) 
 	{}
 	
-	static pool_type& get_pool(owner_reference owner) {
-		return std::get<pool_type>(owner.get_solvable({}).significant.entity_pools);
+	template <class C>
+	static const auto& get_pool(C& owner) {
+		using pool_type = typename derived_handle_type::subject_pool_type;
+		return std::get<pool_type>(owner.get_solvable().significant.entity_pools);
 	}
 
 	entity_id get_id() const {
-		const auto h = *static_cast<derived_handle_type*>(this);
+		const auto h = *static_cast<const derived_handle_type*>(this);
 
 		return {
 			get_pool(h.get_cosmos()).to_id(iteration_index),
@@ -78,10 +78,10 @@ class specific_entity_handle :
 
 	using owner_reference = maybe_const_ref_t<is_const, cosmos>;
 
+	// cosmos shall only be able to construct directly
 	friend class cosmos;
 	friend specific_entity_handle<!is_const, entity_type, identifier_provider>;
-
-	using used_identifier_provider::get_id;
+	friend used_identifier_provider;
 
 	subject_reference subject;
 	owner_reference owner;
@@ -109,7 +109,11 @@ public:
 		used_identifier_provider(identifier)
 	{}
 
+	using const_type = specific_entity_handle<true, entity_type, identifier_provider>;
+
 	using misc_base::get_flavour;
+	using used_identifier_provider::get_id;
+
 	using used_entity_type = entity_type;
 
 	template <class T>
@@ -195,6 +199,10 @@ public:
 
 	operator unversioned_entity_id() const {
 		return get_id();
+	}
+
+	constexpr operator bool() const {
+		return true;
 	}
 
 	template <class F>

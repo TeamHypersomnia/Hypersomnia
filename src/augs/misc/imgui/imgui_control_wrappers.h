@@ -18,7 +18,7 @@ namespace augs {
 		namespace detail {
 			template <class T, class F>
 			decltype(auto) direct_or_convert(T& into, F callback) {
-				using Target = std::decay_t<argument_of_t<F, 0>>;
+				using Target = std::decay_t<argument_t<F, 0>>;
 
 				if constexpr(std::is_same_v<T, Target>) {
 					return callback(into);

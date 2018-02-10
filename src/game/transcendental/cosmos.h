@@ -10,6 +10,8 @@
 #include "augs/misc/enum/enum_boolset.h"
 #include "augs/misc/randomization_declaration.h"
 
+#include "game/organization/all_entity_types_declaration.h"
+
 #include "game/transcendental/cosmos_common.h"
 #include "game/transcendental/private_cosmos_solvable.h"
 #include "game/transcendental/specific_entity_handle.h"
@@ -46,21 +48,20 @@ auto subscript_handle_getter(C& cosm, const entity_guid guid) {
 }
 
 class cosmos {
-	template <class C, class I, class F>
+	template <class C, class... Types, class F>
 	static decltype(auto) on_flavour_impl(
 		C& self,
-		const I flavour_id,
+		const constrained_entity_flavour_id<Types...> flavour_id,
 		F callback	
 	) {
 		using candidate_types = typename decltype(flavour_id)::matching_types; 
-		const auto dynamic_type_index = flavour_id.type_id.get_index();
 
-		return get_by_dynamic_id<candidate_types>(
-			all_entity_types(),
+		return get_by_dynamic_id<candidate_types, all_entity_types>(
+			{},
 			flavour_id.type_id,
-			[&](auto t) {
+			[&](auto t) -> decltype(auto) {
 				using flavour_type = decltype(t);
-				return callback(self.template get_flavour<flavour_type>(flavour_id.raw_id));
+				return callback(self.template get_flavour<flavour_type>(flavour_id.raw));
 			}
 		);
 	}
@@ -138,8 +139,11 @@ public:
 		return std::get<flavours_type>(all_flavours).get_flavour(id);
 	}
 
-	template <class I, class... Types, class F>
-	decltype(auto) on_flavour(const I flavour_id, F&& callback) const {
+	template <class... Types, class F>
+	decltype(auto) on_flavour(
+		const constrained_entity_flavour_id<Types...> flavour_id,
+	   	F&& callback
+	) const {
 		return on_flavour_impl(*this, flavour_id, std::forward<F>(callback));
 	}
 

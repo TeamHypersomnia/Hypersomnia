@@ -14,4 +14,4 @@ struct function_traits<R(T::*)(Args...) const> {
 };
 
 template <class T, std::size_t I>
-using argument_of_t = typename function_traits<T>::template arg<I>::type;
+using argument_t = typename function_traits<T>::template arg<I>::type;

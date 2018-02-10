@@ -3,6 +3,7 @@
 
 #include "augs/callback_result.h"
 #include "augs/misc/scope_guard.h"
+#include "augs/templates/type_templates.h"
 
 #include "game/transcendental/entity_type_traits.h"
 #include "game/transcendental/entity_flavour_id.h"
@@ -180,15 +181,17 @@ public:
 		self.get_solvable({}).for_each_pool(
 			[&](auto& p) {
 				using P = decltype(p);
-				using E = typename std::decay_t<P>::mapped_type;
+				using pool_type = std::decay_t<P>;
+
+				using E = type_argument_t<typename pool_type::mapped_type>;
 
 				if constexpr(has_invariants_or_components_v<E, Constraints...>) {
-					using index_type = typename P::used_size_type;
+					using index_type = typename pool_type::used_size_type;
 					using iterated_handle_type = basic_iterated_entity_handle<is_const_ref_v<P>, E>;
 
 					for (index_type i = 0; i < p.size(); ++i) {
 						auto& object = p.data()[i];
-						const auto iterated_handle = iterated_handle_type(self, object, i);
+						const auto iterated_handle = iterated_handle_type(object, self, i);
 						callback(iterated_handle);
 					}
 				}
