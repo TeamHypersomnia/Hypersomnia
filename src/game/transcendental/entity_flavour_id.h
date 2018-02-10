@@ -2,8 +2,6 @@
 #include <string>
 #include "game/organization/all_entity_types_declaration.h"
 
-struct entity_flavours;
-
 using raw_entity_flavour_id = zeroed_pod<unsigned>;
 
 template <class...>
