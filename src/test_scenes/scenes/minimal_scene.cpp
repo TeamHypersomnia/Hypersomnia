@@ -17,7 +17,7 @@
 
 namespace test_scenes {
 	void minimal_scene::populate(const loaded_game_image_caches& caches, cosmos_common_significant& common) const {
-		populate_test_scene_flavours(caches, common.all_entity_flavours);
+		populate_test_scene_flavours(caches, common.flavours);
 		load_test_scene_sentience_properties(common);
 
 		auto& common_assets = common.assets;

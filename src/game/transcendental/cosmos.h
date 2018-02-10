@@ -152,9 +152,9 @@ public:
 
 	template <class entity_type>
 	const auto& get_flavour(const raw_entity_flavour_id id) const {
-		using flavours_type = entity_flavours<entity_type>;
+		using flavours_type = make_entity_flavours<entity_type>;
 
-		const auto& all_flavours = self.get_common_significant().all_entity_flavours;
+		const auto& all_flavours = self.get_common_significant().flavours;
 		return std::get<flavours_type>(all_flavours).get_flavour(id);
 	}
 

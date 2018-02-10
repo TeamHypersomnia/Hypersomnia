@@ -31,7 +31,7 @@
 
 namespace test_scenes {
 	void testbed::populate(const loaded_game_image_caches& caches, cosmos_common_significant& common) const {
-		populate_test_scene_flavours(caches, common.all_entity_flavours);
+		populate_test_scene_flavours(caches, common.flavours);
 
 		auto& common_assets = common.assets;
 		common_assets.cast_unsuccessful_sound.id = assets::sound_buffer_id::CAST_UNSUCCESSFUL;

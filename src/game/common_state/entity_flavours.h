@@ -8,6 +8,7 @@
 #include "augs/templates/component_traits.h"
 #include "game/transcendental/entity_flavour_id.h"
 #include "game/organization/all_component_includes.h"
+#include "game/organization/all_entity_types_declaration.h"
 
 using entity_description_type = entity_name_type;
 
@@ -122,3 +123,16 @@ struct entity_flavours {
 		return flavours[static_cast<unsigned>(id)];
 	}
 };
+
+template <class E>
+using make_entity_flavours = entity_flavours<E>;
+
+using all_entity_flavours = 
+	replace_list_type_t<
+		transform_types_in_list_t<
+			all_entity_types,
+			make_entity_flavours
+		>,
+		std::tuple
+	>
+;

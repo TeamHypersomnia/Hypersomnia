@@ -31,7 +31,7 @@ struct cosmos_common_significant {
 	pathfinding_settings pathfinding;
 	si_scaling si;
 
-	entity_flavours all_entity_flavours;
+	all_entity_flavours flavours;
 	common_assets assets;
 
 	meter_tuple meters;
