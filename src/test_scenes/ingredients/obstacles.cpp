@@ -1,10 +1,10 @@
-#include "ingredients.h"
+#include "test_scenes/ingredients/ingredients.h"
 #include "game/assets/all_logical_assets.h"
 #include "game/transcendental/cosmos.h"
 #include "game/components/fixtures_component.h"
 
 namespace test_flavours {
-	void populate_crate_types(const loaded_game_image_caches& logicals, entity_flavours& flavours) {
+	void populate_crate_types(const loaded_game_image_caches& logicals, all_entity_flavours& flavours) {
 		{
 			auto& meta = get_test_flavour(flavours, test_plain_sprited_bodys::CRATE);
 

@@ -5,7 +5,7 @@
 #include "augs/templates/enum_introspect.h"
 #include "augs/templates/format_enum.h"
 
-void populate_test_scene_flavours(const loaded_game_image_caches& logicals, entity_flavours& into) {
+void populate_test_scene_flavours(const loaded_game_image_caches& logicals, all_entity_flavours& into) {
 	for_each_through_std_get
 	into.flavours.resize(static_cast<std::size_t>(test_scene_flavour::COUNT));
 

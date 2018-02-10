@@ -1,4 +1,4 @@
-#include "ingredients.h"
+#include "test_scenes/ingredients/ingredients.h"
 
 #include "game/assets/all_logical_assets.h"
 

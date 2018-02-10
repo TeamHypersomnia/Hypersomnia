@@ -1,4 +1,4 @@
-#include "ingredients.h"
+#include "test_scenes/ingredients/ingredients.h"
 #include "augs/drawing/polygon.h"
 #include "game/transcendental/cosmos.h"
 #include "game/stateless_systems/particles_existence_system.h"
@@ -23,7 +23,7 @@
 #include "game/enums/filters.h"
 
 namespace test_flavours {
-	void populate_car_types(const loaded_game_image_caches& logicals, entity_flavours& flavours) {
+	void populate_car_types(const loaded_game_image_caches& logicals, all_entity_flavours& flavours) {
 		{
 			auto& meta = get_test_flavour(flavours, test_scene_flavour::TRUCK_FRONT);
 			

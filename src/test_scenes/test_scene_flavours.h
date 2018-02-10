@@ -119,14 +119,14 @@ auto& get_test_flavour(C& cosm, const T id) {
 }
 
 namespace test_flavours {
-	void populate_other_types(const loaded_game_image_caches& caches, entity_flavours& flavours);
-	void populate_car_types(const loaded_game_image_caches& caches, entity_flavours& flavours);
-	void populate_crate_types(const loaded_game_image_caches& caches, entity_flavours& flavours);
-	void populate_melee_types(const loaded_game_image_caches& caches, entity_flavours& flavours);
-	void populate_backpack_types(const loaded_game_image_caches& caches, entity_flavours& flavours);
-	void populate_gun_types(const loaded_game_image_caches& caches, entity_flavours& flavours);
-	void populate_grenade_types(const loaded_game_image_caches& caches, entity_flavours& flavours);
-	void populate_character_types(const loaded_game_image_caches& caches, entity_flavours& flavours);
+	void populate_other_types(const loaded_game_image_caches& caches, all_entity_flavours& flavours);
+	void populate_car_types(const loaded_game_image_caches& caches, all_entity_flavours& flavours);
+	void populate_crate_types(const loaded_game_image_caches& caches, all_entity_flavours& flavours);
+	void populate_melee_types(const loaded_game_image_caches& caches, all_entity_flavours& flavours);
+	void populate_backpack_types(const loaded_game_image_caches& caches, all_entity_flavours& flavours);
+	void populate_gun_types(const loaded_game_image_caches& caches, all_entity_flavours& flavours);
+	void populate_grenade_types(const loaded_game_image_caches& caches, all_entity_flavours& flavours);
+	void populate_character_types(const loaded_game_image_caches& caches, all_entity_flavours& flavours);
 }
 
-void populate_test_scene_flavours(const loaded_game_image_caches& caches, entity_flavours& into);
+void populate_test_scene_flavours(const loaded_game_image_caches& caches, all_entity_flavours& into);

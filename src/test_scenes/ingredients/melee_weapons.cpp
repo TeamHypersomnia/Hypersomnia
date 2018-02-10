@@ -1,4 +1,4 @@
-#include "ingredients.h"
+#include "test_scenes/ingredients/ingredients.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 
@@ -12,7 +12,7 @@
 #include "game/detail/inventory/perform_transfer.h"
 
 namespace test_flavours {
-	void populate_melee_types(const loaded_game_image_caches& logicals, entity_flavours& flavours) {
+	void populate_melee_types(const loaded_game_image_caches& logicals, all_entity_flavours& flavours) {
 		{
 #if TODO
 			auto& meta = get_test_flavour(flavours, test_scene_flavour::URBAN_CYAN_MACHETE);

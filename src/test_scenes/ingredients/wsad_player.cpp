@@ -1,4 +1,4 @@
-#include "ingredients.h"
+#include "test_scenes/ingredients/ingredients.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
 
@@ -23,7 +23,7 @@
 #include "game/detail/inventory/perform_transfer.h"
 
 namespace test_flavours {
-	void populate_character_types(const loaded_game_image_caches& logicals, entity_flavours& flavours) {
+	void populate_character_types(const loaded_game_image_caches& logicals, all_entity_flavours& flavours) {
 		{
 			auto& meta = get_test_flavour(flavours, test_controlled_characters::PLAYER);
 
