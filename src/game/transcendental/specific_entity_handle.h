@@ -201,8 +201,16 @@ public:
 		return get_id();
 	}
 
-	constexpr operator bool() const {
+	constexpr bool alive() const {
 		return true;
+	}
+
+	constexpr bool dead() const {
+		return !alive();
+	}
+
+	constexpr operator bool() const {
+		return alive();
 	}
 
 	template <class F>

@@ -46,6 +46,8 @@ struct unversioned_entity_id : unversioned_entity_id_base {
 	{}
 };
 
+struct child_entity_id;
+
 struct entity_id : entity_id_base {
 	using base = entity_id_base;
 	// GEN INTROSPECTOR struct entity_id
@@ -60,6 +62,10 @@ struct entity_id : entity_id_base {
 		base(id),
 		type_id(type_id)
 	{}
+
+	entity_id(
+		const child_entity_id& id
+	);
 
 	auto basic() const {
 		return *static_cast<const base*>(this);
@@ -96,11 +102,11 @@ struct child_entity_id : entity_id {
 	auto basic() const {
 		return *static_cast<const base*>(this);
 	}
-
-	operator entity_id() const {
-		return basic(); 
-	}
 };
+
+inline entity_id::entity_id(
+	const child_entity_id& id
+) : entity_id(id.basic()) {}
 
 namespace std {
 	template <>
