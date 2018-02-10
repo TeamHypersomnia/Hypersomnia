@@ -82,7 +82,7 @@ entity_handle cosmic::create_entity(
 	);
 }
 
-auto clone_entity(const const_entity_handle source_entity) {
+const_entity_handle cosmic::clone_entity(const const_entity_handle source_entity) {
 	if (source_entity.dead()) {
 		return cosmos[entity_id()];
 	}

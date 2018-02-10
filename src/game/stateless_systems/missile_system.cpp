@@ -135,6 +135,8 @@ void missile_system::detonate_expired_missiles(const logic_step step) {
 
 	cosmos.for_each_having<components::missile>(
 		[&](const auto it) {
+			using handle_type = std::decay_t<decltype(it)>;
+
 			auto& missile = it.template get<components::missile>();
 			auto& missile_def = it.template get<invariants::missile>();
 		
@@ -164,7 +166,9 @@ void missile_system::detonate_expired_missiles(const logic_step step) {
 
 			if (maybe_sender != nullptr && missile_def.homing_towards_hostile_strength > 0.f) {
 				const auto sender_capability = cosmos[maybe_sender->capability_of_sender];
-				const auto sender_attitude = sender_capability.alive() && sender_capability.template has<components::attitude>() ? sender_capability : cosmos[entity_id()];
+				const auto sender_attitude = 
+					sender_capability && sender_capability.template has<components::attitude>() ? sender_capability : cosmos[entity_id()]
+				;
 
 				const auto particular_homing_target = cosmos[missile.particular_homing_target];
 				
