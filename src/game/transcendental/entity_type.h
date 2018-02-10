@@ -63,10 +63,8 @@ template <class... Types>
 struct has_invariants_or_components {
 	template <class E>
 	struct type : std::bool_constant<
-		std::conjunction_v<
-			(is_one_of_list_v<Types, typename E::invariants>	
-			|| is_one_of_list_v<Types, typename E::components>)...
-		> 	
+		(is_one_of_list_v<Types, invariants_of<E>> || ...)
+		||	(is_one_of_list_v<Types, components_of<E>> || ...)
 	>
 	{};	
 };
@@ -78,7 +76,7 @@ struct has_invariants_or_components<> {
 };
 
 template <class E, class... Args>
-using has_invariants_or_components_v = typename has_invariants_or_components<Args...>::template type<E>;
+constexpr bool has_invariants_or_components_v = has_invariants_or_components<Args...>::template type<E>::value;
 
 template <class... Types>
 using all_entity_types_having = filter_types_in_list_t<

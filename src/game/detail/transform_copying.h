@@ -11,7 +11,7 @@ struct orbital_chasing {
 	template <class C, class I>
 	std::optional<components::transform> find_transform(C& cosm, I& interp) const {
 		if (const auto target_transform  = cosm[target].find_viewing_transform(interp)) {
-			return *result * offset;
+			return *target_transform * offset;
 		}
 
 		return std::nullopt;
@@ -20,7 +20,7 @@ struct orbital_chasing {
 	template <class C>
 	std::optional<components::transform> find_transform(C& cosm) const {
 		if (const auto target_transform  = cosm[target].find_logic_transform()) {
-			return *result * offset;
+			return *target_transform * offset;
 		}
 
 		return std::nullopt;
@@ -47,7 +47,7 @@ inline auto get_chased(const absolute_or_local& l) {
 		return chasing->target;
 	}
 
-	return {};
+	return entity_id {};
 }
 
 namespace std {

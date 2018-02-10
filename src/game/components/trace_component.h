@@ -45,7 +45,7 @@ namespace invariants {
 
 		minmax lengthening_duration_ms = minmax(200.f, 400.f);
 
-		entity_flavour_id finishing_trace_flavour = 0;
+		entity_flavour_id finishing_trace_flavour;
 
 		// END GEN INTROSPECTOR
 	};

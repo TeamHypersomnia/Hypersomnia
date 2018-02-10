@@ -23,7 +23,7 @@ struct basic_convex_partitioned_shape {
 
 	void make_box(const vec2 size) {
 		auto hx = size.x / 2;
-		auto hy = size.y / 2
+		auto hy = size.y / 2;
 
 		convex_poly new_poly;
 		new_poly[0].set(-hx, -hy);

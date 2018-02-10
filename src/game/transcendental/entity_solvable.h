@@ -24,7 +24,7 @@ template <class E>
 struct entity_solvable : entity_solvable_meta {
 	using components_type = make_components<E>;
 
-	// GEN INTROSPECTOR struct entity_solvable
+	// GEN INTROSPECTOR struct entity_solvable class E
 	// INTROSPECT BASE entity_solvable_meta
 	components_type components;	
 	// END GEN INTROSPECTOR

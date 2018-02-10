@@ -34,28 +34,18 @@ struct unversioned_entity_id : unversioned_entity_id_base {
 	entity_type_id type_id;
 	// END GEN INTROSPECTOR
 
+	auto basic() const {
+		return *static_cast<const base*>(this);
+	}
+
 	unversioned_entity_id(
 		const base id = base(),
 		entity_type_id type_id = entity_type_id()
 	) : 
-		base(id)
+		base(id),
 		type_id(type_id)
 	{}
 };
-
-template <class E>
-struct typed_entity_id : entity_id_base {
-	using base = entity_id_base;
-	using base::base;
-
-	operator entity_id_base() const {
-		return *static_cast<base*>(this);
-	}
-
-	operator entity_id() const {
-		return { *this, entity_type_id::of<E> };
-	}
-}; 
 
 struct entity_id : entity_id_base {
 	using base = entity_id_base;
@@ -68,9 +58,31 @@ struct entity_id : entity_id_base {
 		const base id = base(),
 		entity_type_id type_id = entity_type_id()
 	) : 
-		base(id)
+		base(id),
 		type_id(type_id)
 	{}
+
+	auto basic() const {
+		return *static_cast<const base*>(this);
+	}
+
+	operator unversioned_entity_id() const {
+		return { basic(), type_id };
+	}
+}; 
+
+template <class E>
+struct typed_entity_id : entity_id_base {
+	using base = entity_id_base;
+	using base::base;
+
+	auto basic() const {
+		return *static_cast<const base*>(this);
+	}
+
+	operator entity_id() const {
+		return { *this, entity_type_id::of<E> };
+	}
 }; 
 
 struct child_entity_id : entity_id {
@@ -94,14 +106,14 @@ namespace std {
 	template <>
 	struct hash<entity_id> {
 		std::size_t operator()(const entity_id v) const {
-			return augs::simple_two_hash(static_cast<entity_id::base&>(v), v.type_id);
+			return augs::simple_two_hash(v.basic(), v.type_id);
 		}
 	};
 
 	template <>
 	struct hash<unversioned_entity_id> {
 		std::size_t operator()(const unversioned_entity_id v) const {
-			return augs::simple_two_hash(static_cast<unversioned_entity_id::base&>(v), v.type_id);
+			return augs::simple_two_hash(v.basic(), v.type_id);
 		}
 	};
 }

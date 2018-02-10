@@ -2,7 +2,6 @@
 #include <string>
 #include "game/organization/all_entity_types_declaration.h"
 
-class entity_flavour;
 struct entity_flavours;
 
 using raw_entity_flavour_id = zeroed_pod<unsigned>;
@@ -29,7 +28,7 @@ struct typed_entity_flavour_id {
 	raw_entity_flavour_id raw;
 
 	typed_entity_flavour_id() = default;
-	explicit typed_entity_flavour_id(raw_entity_flavour_id id) : id(id) {};
+	explicit typed_entity_flavour_id(raw_entity_flavour_id raw) : raw(raw) {};
 
 	operator raw_entity_flavour_id() const {
 		return raw;
@@ -37,7 +36,7 @@ struct typed_entity_flavour_id {
 
 	template <
 		class... C,
-		class V = std::enable_if_t<has_invariants_or_components_v<E, Args...>>
+		class V = std::enable_if_t<has_invariants_or_components_v<E, C...>>
 	>
 	operator constrained_entity_flavour_id<C...>() const {
 		entity_type_id type_id;
