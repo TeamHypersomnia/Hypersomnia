@@ -28,7 +28,7 @@ namespace augs {
 		rgba filling = white;
 		// END GEN INTROSPECTOR
 
-		static std::string get_command_name() {
+		static const char* get_custom_type_name() {
 			return "circle_midpoint";
 		}
 	};
@@ -39,7 +39,7 @@ namespace augs {
 		rgba filling = white;
 		// END GEN INTROSPECTOR
 
-		static std::string get_command_name() {
+		static const char* get_custom_type_name() {
 			return "circle_filled";
 		}
 	};
@@ -51,36 +51,16 @@ namespace augs {
 		rgba filling;
 		// END GEN INTROSPECTOR
 
-		static std::string get_command_name() {
+		static const char* get_custom_type_name() {
 			return "line";
 		}
 	};
-
-	inline const char* get_custom_type_name(const paint_circle_midpoint_command&) {
-		return "circle_midpoint";
-	}
-	
-	inline const char* get_custom_type_name(const paint_circle_filled_command&) {
-		return "circle_filled";
-	}
-
-	inline const char* get_custom_type_name(const paint_line_command&) {
-		return "line";
-	}
 
 	using paint_command_variant = std::variant<
 		paint_circle_midpoint_command,
 		paint_circle_filled_command,
 		paint_line_command
 	>;
-
-	inline const char* get_variant_type_label(const paint_command_variant&) {
-		return "command";
-	}
-
-	inline const char* get_variant_content_label(const paint_command_variant&) {
-		return "input";
-	}
 
 	class image {
 		std::vector<rgba> v;

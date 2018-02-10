@@ -14,6 +14,8 @@ struct entity_solvable_meta {
 	entity_guid guid;
 	// END GEN INTROSPECTOR
 
+	entity_solvable_meta() = default;
+
 	entity_solvable_meta(
 		const raw_entity_flavour_id flavour_id,
 		const entity_guid guid

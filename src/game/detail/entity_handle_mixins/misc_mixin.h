@@ -1,4 +1,6 @@
 #pragma once
+#include "augs/templates/always_false.h"
+
 #include "game/transcendental/entity_id.h"
 
 #include "game/enums/entity_flag.h"
@@ -14,7 +16,7 @@ struct has_specific_entity_type : std::false_type {};
 
 template <class A>
 struct has_specific_entity_type<A, decltype(typename A::used_entity_type(), void())> 
-	: std::bool_constant<A::has_specific_entity_type> 
+	: std::true_type
 {};
 
 template <class A>
@@ -105,11 +107,16 @@ public:
 		return id;
 	}
 
-	template <bool C = has_specific_entity_type_v<E>, class = std::enable_if_t<C>>
 	auto& get_flavour() const {
-		const auto self = *static_cast<const E*>(this);
-		auto& cosm = self.get_cosmos();
-		return cosm.template get_flavour<entity_type_of<E>>(get_raw_flavour_id());
+		if constexpr(has_specific_entity_type_v<E>) {
+			const auto self = *static_cast<const E*>(this);
+			auto& cosm = self.get_cosmos();
+			return cosm.template get_flavour<entity_type_of<E>>(get_raw_flavour_id());
+		}
+		else {
+			static_assert(always_false_v<E>, "You can't get a flavour out of a non-specific handle.");
+			return *this;
+		}
 	}
 
 	const auto& get_name() const {

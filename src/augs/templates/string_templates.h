@@ -173,6 +173,15 @@ auto format_as_bytes(const T& t) {
 
 std::string demangle(const char*);
 
+template <class T, class = void>
+struct has_custom_type_name : std::false_type {};
+
+template <class T>
+struct has_custom_type_name<T, decltype(T::get_custom_type_name(), void())> : std::true_type {};
+
+template <class T>
+constexpr bool has_custom_type_name_v = has_custom_type_name<T>::value;
+
 template <class T>
 std::string get_type_name() {
 	auto name = std::string(demangle(typeid(T).name()));
@@ -187,15 +196,25 @@ std::string get_type_name(const T&) {
 
 template <class T>
 std::string get_type_name_strip_namespace() {
-	auto name = get_type_name<T>();
-
-	if (const auto it = name.rfind("::");
-		it != std::string::npos
-	) {
-		name = name.substr(it + 2);
+	if constexpr(has_custom_type_name_v<T>) {
+		return T::get_custom_type_name();
 	}
+	else {
+		auto name = get_type_name<T>();
 
-	return name;
+		if (const auto it = name.rfind("::");
+			it != std::string::npos
+		) {
+			name = name.substr(it + 2);
+		}
+
+		return name;
+	}
+}
+
+template <class T>
+std::string get_type_name_strip_namespace(const T& t) {
+	return get_type_name_strip_namespace<std::decay_t<T>>();
 }
 
 std::string to_forward_slashes(std::string);

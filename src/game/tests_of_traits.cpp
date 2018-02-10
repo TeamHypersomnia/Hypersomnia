@@ -65,11 +65,29 @@ static void ff () {
 		return 20.0;	
 	});
 
+	using candidates = type_list<controlled_character, explosive_missile>;
+
+	auto tester = [](auto a){
+		using T = decltype(a);
+		static_assert(std::is_same_v<T, controlled_character> || std::is_same_v<T, explosive_missile>);
+		return 20.0;	
+	};
+
+	auto okay3 = get_by_dynamic_id<candidates>(t, std::size_t(0), tester);
+	auto okay4 = get_by_dynamic_id<candidates>(t, type_in_list_id<all_entity_types>(), tester);
+
 	static_assert(std::is_same_v<double, decltype(okay)>);
 	static_assert(std::is_same_v<double, decltype(okay2)>);
+	static_assert(std::is_same_v<double, decltype(okay3)>);
+	static_assert(std::is_same_v<double, decltype(okay4)>);
 }
 
 struct tests_of_traits {
+	static_assert(std::is_trivially_copyable_v<absolute_or_local>);
+
+	static_assert(has_specific_entity_type_v<typed_entity_handle<controlled_character>>);
+	static_assert(!has_specific_entity_type_v<const_entity_handle>);
+
 	static_assert(all_are_v<std::is_trivially_copyable, type_list<int, double, float>>);
 
 	static_assert(std::is_same_v<

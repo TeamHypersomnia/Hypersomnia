@@ -96,12 +96,14 @@ class component_synchronizer<E, components::rigid_body>
 		return handle.get_cosmos().get_solvable_inferred({}).physics.find_rigid_body_cache(handle);
 	}
 
-	auto find_body() const {
+	auto find_body() const {	
+		using T = decltype(find_cache()->body.get());
+
 		if (auto cache = find_cache()) {
-			return cache->body;
+			return cache->body.get();
 		}
 
-		return nullptr;
+		return T(nullptr);
 	}
 
 	auto body() const {

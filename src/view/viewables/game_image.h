@@ -68,7 +68,7 @@ void add_shape_invariant_from_renderable(
 ) {
 	static_assert(into.template has<invariants::shape_polygon>());
 
-	if (const auto sprite = into.find<invariants::sprite>()) {
+	if (const auto sprite = into.template find<invariants::sprite>()) {
 		const auto image_size = caches.at(sprite->tex).get_size();
 		vec2 scale = sprite->get_size() / image_size;
 
@@ -77,10 +77,10 @@ void add_shape_invariant_from_renderable(
 		shape_polygon_def.shape = caches.at(sprite->tex).partitioned_shape;
 		shape_polygon_def.shape.scale(scale);
 
-		into.set(shape_polygon_def);
+		into.template set(shape_polygon_def);
 	}
 
-	if (const auto polygon = into.find<invariants::polygon>()) {
+	if (const auto polygon = into.template find<invariants::polygon>()) {
 		std::vector<vec2> input;
 
 		input.reserve(polygon->vertices.size());
@@ -92,6 +92,6 @@ void add_shape_invariant_from_renderable(
 		invariants::shape_polygon shape_polygon_def;
 		shape_polygon_def.shape.add_concave_polygon(input);
 
-		into.set(shape_polygon_def);
+		into.template set(shape_polygon_def);
 	}
 }

@@ -15,8 +15,10 @@ template <class... C>
 struct constrained_entity_flavour_id {
 	using matching_types = all_entity_types_having<C...>;
 
+	// GEN INTROSPECTOR struct constrained_entity_flavour_id class... C
 	raw_entity_flavour_id raw;
 	entity_type_id type_id;
+	// END GEN INTROSPECTOR
 
 	operator entity_flavour_id() const {
 		return { raw, type_id };

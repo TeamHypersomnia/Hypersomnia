@@ -20,6 +20,14 @@
 #include "augs/readwrite/lua_traits.h"
 
 namespace augs {
+	inline const char* get_variant_type_label() {
+		return "type";
+	}
+
+	inline const char* get_variant_content_label() {
+		return "fields";
+	}
+
 	struct lua_deserialization_error : error_with_typesafe_sprintf {
 		using error_with_typesafe_sprintf::error_with_typesafe_sprintf;
 	};
@@ -89,7 +97,7 @@ namespace augs {
 
 			for_each_type_in_list<Serialized>(
 				[variant_content, variant_type, &into](const auto& specific_object){
-					const auto this_type_name = get_custom_type_name(specific_object);
+					const auto this_type_name = get_type_name_strip_namespace(specific_object);
 
 					if (this_type_name == variant_type) {
 						using T = std::decay_t<decltype(specific_object)>;
@@ -290,7 +298,7 @@ namespace augs {
 					
 					const auto variant_type_label = get_variant_type_label(std::declval<Serialized&>());
 					const auto variant_content_label = get_variant_content_label(std::declval<Serialized&>());
-					const auto this_type_name = get_custom_type_name(std::declval<T&>());
+					const auto this_type_name = get_type_name_strip_namespace(std::declval<T&>());
 
 					output_table[variant_type_label] = this_type_name;
 					write_table_or_field(output_table, resolved, variant_content_label);
