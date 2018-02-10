@@ -7,6 +7,8 @@
 #include "game/components/sentience_component.h"
 #include "game/components/crosshair_component.h"
 
+#include "game/transcendental/specific_entity_handle_declaration.h"
+
 template <class A, class = void>
 struct has_specific_entity_type : std::false_type {};
 
@@ -107,7 +109,7 @@ public:
 	auto& get_flavour() const {
 		const auto self = *static_cast<const E*>(this);
 		auto& cosm = self.get_cosmos();
-		return cosm.get_flavour<entity_type_of<E>>(get_raw_flavour_id());
+		return cosm.template get_flavour<entity_type_of<E>>(get_raw_flavour_id());
 	}
 
 	const auto& get_name() const {

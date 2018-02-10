@@ -20,7 +20,7 @@ struct entity_relations;
 template <class entity_handle_type>
 class relations_mixin {
 protected:
-	static constexpr bool is_const = is_class_const_v<entity_handle_type>;
+	static constexpr bool is_const = is_handle_const_v<entity_handle_type>;
 
 	using inventory_slot_handle_type = basic_inventory_slot_handle<entity_handle_type>;
 
@@ -31,7 +31,7 @@ protected:
 
 		if (self.alive()) {
 			switch (n) {
-				case test_plain_invisible_bodys::CROSSHAIR_RECOIL_BODY:
+				case child_entity_name::CROSSHAIR_RECOIL_BODY:
 				if (const auto crosshair = self.find_crosshair()) {
 					result = std::addressof(crosshair->recoil_entity);
 				}

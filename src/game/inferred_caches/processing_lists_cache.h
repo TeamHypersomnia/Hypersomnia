@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 
+#include "augs/misc/enum/enum_boolset.h"
 #include "augs/misc/enum/enum_array.h"
 
 #include "game/enums/processing_subjects.h"
@@ -8,7 +9,7 @@
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
 
-using all_processing_flags = augs::enum_boolset<processing_subjects> 
+using all_processing_flags = augs::enum_boolset<processing_subjects>;
 
 class processing_lists_cache {
 	struct cache {

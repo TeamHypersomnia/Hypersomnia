@@ -3,7 +3,12 @@
 
 #include "game/transcendental/entity_flavour_id.h"
 #include "game/transcendental/cosmic_functions.h"
+
+#include "game/common_state/entity_flavours.h"
+
 #include "view/viewables/game_image.h"
+
+#include "augs/templates/format_enum.h"
 
 enum class test_static_lights {
 	STRONG_LAMP = 1
@@ -113,9 +118,18 @@ auto create_test_scene_entity(C& cosm, const test_scene_flavour id, Args&& args.
 	return cosmic::create_entity(cosm, to_entity_flavour_id(id), std::forward<Args>(args)...);
 }
 
-template <class C, class T>
-auto& get_test_flavour(C& cosm, const T id) {
-	return cosm.get_flavour<test_flavours_map::at<T>>(to_raw_flavour_id(id));
+template <class T>
+auto& get_test_flavour(all_entity_flavours& flavours, const T id) {
+	using E = test_flavours_map::at<T>;
+	const auto idx = static_cast<std::size_t>(id);
+
+	auto& into = std::get<make_entity_flavours<E>>(flavours);
+	into.flavours.resize(idx+1);
+
+	auto& new_flavour = into.flavours[idx];
+	new_flavour.name = to_wstring(format_enum(id));
+
+	return new_flavour;
 }
 
 namespace test_flavours {

@@ -1,5 +1,7 @@
 #pragma once
 #include <string>
+#include "augs/zeroed_pod.h"
+#include "game/transcendental/entity_type_traits.h"
 #include "game/organization/all_entity_types_declaration.h"
 
 using raw_entity_flavour_id = zeroed_pod<unsigned>;
@@ -45,3 +47,19 @@ struct typed_entity_flavour_id {
 };
 
 using entity_name_type = std::wstring;
+
+namespace std {
+	template <>
+	struct hash<entity_flavour_id> {
+		std::size_t operator()(const entity_flavour_id v) const {
+			return augs::simple_two_hash(v.raw, v.type_id);
+		}
+	};
+
+	template <class T>
+	struct hash<typed_entity_flavour_id<T>> {
+		std::size_t operator()(const typed_entity_flavour_id<T> v) const {
+			return augs::simple_two_hash(typeid(T).hash_code(), v.raw);
+		}
+	};
+}

@@ -36,19 +36,10 @@ namespace augs {
 
 		using value_array = std::array<T, const_count>;
 
-		using storage_type = std::array<
-			std::conditional_t<is_trivially_copyable, 
-				value_type,
-				std::aligned_storage_t<sizeof(value_type), alignof(value_type)>
-			>,
-			const_count
+		using storage_type = std::aligned_storage_t<
+			sizeof(value_type) * const_count, alignof(value_type)
 		>;
 		
-		static_assert(
-			!is_trivially_copyable || std::is_default_constructible_v<value_type>,
-			"No support for a type that is trivially copyable but not default constructible."
-		);
-
 		// GEN INTROSPECTOR class augs::constant_size_vector_base class T unsigned const_count
 		size_type count = 0;
 		storage_type raw = storage_type();
@@ -391,9 +382,3 @@ namespace augs {
 		return a.size() == b.size() && ranges_equal(a, b, a.size());
 	}
 }
-
-template <unsigned I>
-struct of_size {
-	template <class T>
-	using make_constant_vector = augs::constant_size_vector<T, I>;
-};

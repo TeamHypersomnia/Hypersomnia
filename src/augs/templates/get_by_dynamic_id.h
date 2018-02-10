@@ -82,7 +82,7 @@ decltype(auto) get_by_dynamic_id(
 	return get_by_dynamic_id(
 		std::forward<T>(index_gettable_object), 
 		static_cast<std::size_t>(dynamic_type_index.get_index()),
-		std::forward<F>(genetic_call)
+		std::forward<F>(generic_call)
 	);
 }
 
@@ -95,6 +95,6 @@ decltype(auto) get_by_dynamic_id(
 	return get_by_dynamic_id<OnlyCandidates>(
 		std::forward<T>(index_gettable_object), 
 		static_cast<std::size_t>(dynamic_type_index.get_index()),
-		std::forward<F>(genetic_call)
+		std::forward<F>(generic_call)
 	);
 }

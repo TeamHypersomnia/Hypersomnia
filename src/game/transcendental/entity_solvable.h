@@ -3,7 +3,10 @@
 #include "augs/templates/for_each_std_get.h"
 
 #include "game/transcendental/entity_flavour_id.h"
-#include "game/transcendental/entity_type.h"
+#include "game/transcendental/entity_type_traits.h"
+
+#include "game/organization/all_entity_types.h"
+#include "game/organization/all_component_includes.h"
 
 struct entity_solvable_meta {
 	// GEN INTROSPECTOR struct entity_solvable_meta

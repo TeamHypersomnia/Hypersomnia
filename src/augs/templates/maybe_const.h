@@ -26,10 +26,24 @@ template <class T>
 constexpr bool is_const_ref_v = is_const_ref<T>::value;
 
 template <class>
-struct is_class_const;
+struct is_handle_const;
 
-template <template <bool, class...> class C, bool B, class... Args>
-struct is_class_const <C<B, Args...>> : std::bool_constant<B> {};
+template <>
+
+template <
+	template <bool, class, template<class> class> class H, 
+	bool A, 
+	class B, 
+	template <class> class C
+>
+struct is_handle_const <H<A, B, C>> : std::bool_constant<A> {};
+
+
+template <
+	template <bool> class H, 
+	bool A
+>
+struct is_handle_const <H<A>> : std::bool_constant<A> {};
 
 template <class T>
-constexpr bool is_class_const_v = is_class_const<T>::value;
+constexpr bool is_handle_const_v = is_handle_const<T>::value;

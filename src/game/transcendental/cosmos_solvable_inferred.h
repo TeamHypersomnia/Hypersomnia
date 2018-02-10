@@ -5,6 +5,7 @@
 #include "game/inferred_caches/physics_world_cache.h"
 #include "game/inferred_caches/relational_cache.h"
 #include "game/inferred_caches/flavour_id_cache.h"
+#include "game/inferred_caches/processing_lists_cache.h"
 
 #include "game/detail/inventory/inventory_slot_id.h"
 

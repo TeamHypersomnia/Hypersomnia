@@ -1,5 +1,6 @@
 #pragma once
 
+template <class>
 struct empty_id_provider;
 
 template <class derived_handle_type>
@@ -8,7 +9,7 @@ struct iterated_id_provider;
 template <class derived_handle_type>
 struct stored_id_provider;
 
-template <bool is_const, class entity_type, class identifier_provider>
+template <bool is_const, class entity_type, template <class> class identifier_provider>
 class specific_entity_handle;
 
 
@@ -40,3 +41,8 @@ using noid_entity_handle = basic_noid_entity_handle<false, entity_type>;
 
 template <class entity_type>
 using const_noid_entity_handle = basic_noid_entity_handle<true, entity_type>;
+
+/* Shortcut */
+
+template <class T>
+using entity_type_of = typename std::decay_t<T>::used_entity_type;

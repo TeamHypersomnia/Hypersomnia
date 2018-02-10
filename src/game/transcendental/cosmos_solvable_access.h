@@ -17,7 +17,7 @@ class cosmos_solvable_access {
 	template <bool>
 	friend class basic_entity_handle;
 
-	template <bool, class, class>
+	template <bool, class, template <class> class>
 	friend class specific_entity_handle;
 
 	cosmos_solvable_access() {}

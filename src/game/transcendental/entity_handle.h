@@ -79,8 +79,8 @@ class basic_entity_handle :
 		owner_reference owner, 
 		const entity_id raw_id
 	) {
-		return owner.get_solvable({}).on_entity(raw_id, [&](auto& agg) {
-			return reinterpret_cast<entity_ptr>(std::addressof(agg));	
+		return owner.get_solvable({}).on_entity(raw_id, [&](auto* const agg) {
+			return reinterpret_cast<entity_ptr>(agg);	
 		});
 	}
 
@@ -173,7 +173,7 @@ public:
 
 				auto& specific_ref = 
 					*reinterpret_cast<
-						maybe_const_ptr_t<is_const>(entity_solvable<entity_type>)
+						maybe_const_ptr_t<is_const, entity_solvable<entity_type>>
 					>(ptr)
 				;
 					
@@ -217,10 +217,7 @@ public:
 	}
 };
 
-inline std::ostream& operator<<(std::ostream& out, const entity_handle &x) {
-	return out << typesafe_sprintf("%x %x", to_string(x.get_name()), x.get_id());
-}
-
-inline std::ostream& operator<<(std::ostream& out, const const_entity_handle &x) {
+template <bool is_const>
+std::ostream& operator<<(std::ostream& out, const basic_entity_handle<is_const> &x) {
 	return out << typesafe_sprintf("%x %x", to_string(x.get_name()), x.get_id());
 }

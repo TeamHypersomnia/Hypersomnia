@@ -64,15 +64,15 @@ class cosmos_solvable {
 		F callback	
 	) {
 		return get_by_dynamic_id(
-			significant.entity_pools,
+			self.significant.entity_pools,
 			id.type_id.get_index(),
-			[](auto& pool) {	
-				if (const auto agg = pool.get(id)) {
-					return callback();
-				}
+			[&](auto& pool) {	
+				return callback(pool.find(id.basic()));
 			}
 		);
 	}
+
+	entity_guid get_guid(const entity_id) const;
 
 	guid_cache guid_to_id;
 
@@ -107,7 +107,6 @@ public:
 
 	void set_steps_per_second(const unsigned steps_per_second);
 
-	entity_guid get_guid(const entity_id) const;
 	entity_id to_versioned(const unversioned_entity_id) const;
 
 	entity_id get_entity_id_by(const entity_guid) const;
@@ -145,7 +144,7 @@ public:
 	
 	template <class E>
 	auto get_count_of() const {
-		return get_solvable().significant.template get_pool<E>().size();
+		return significant.template get_pool<E>().size();
 	}
 	
 	auto get_count_of(const processing_subjects list_type) const {
@@ -180,16 +179,6 @@ public:
 			significant.entity_pools,
 			std::forward<F>(callback)
 		);
-	}
-
-	template <class T>
-	auto& get_component_pool() {
-		return std::get<cosmic_object_pool<T>>(significant.component_pools);
-	}
-
-	template <class T>
-	const auto& get_component_pool() const {
-		return std::get<cosmic_object_pool<T>>(significant.component_pools);
 	}
 
 	bool empty() const;
@@ -232,21 +221,24 @@ inline std::unordered_set<entity_id> cosmos_solvable::get_entities_by_flavour_id
 }
 
 inline entity_id cosmos_solvable::to_versioned(const unversioned_entity_id id) const {
-	return significant.on_pool(
-		id.type_id, 
-		[](const auto& p){ return p.to_versioned(id); }
-	);
+	return { 
+		significant.on_pool(
+			id.type_id, 
+			[id](const auto& p){ return p.to_versioned(id); }
+		), 
+		id.type_id 
+	};
 }
 
 inline std::size_t cosmos_solvable::get_entities_count() const {
 	std::size_t total = 0u;
 
-	for_each_pool([](const auto& p) { total += p.size(); } );
+	for_each_pool([&total](const auto& p) { total += p.size(); } );
 
 	return total;
 }
 
 inline entity_guid cosmos_solvable::get_guid(const entity_id id) const {
-	return get_entity(id).guid;
+	return on_entity(id, [](const auto* const e) { return e->guid; });
 }
 

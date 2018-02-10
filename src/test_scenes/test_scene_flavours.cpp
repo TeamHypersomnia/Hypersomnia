@@ -6,14 +6,6 @@
 #include "augs/templates/format_enum.h"
 
 void populate_test_scene_flavours(const loaded_game_image_caches& logicals, all_entity_flavours& into) {
-	for_each_through_std_get
-	into.flavours.resize(static_cast<std::size_t>(test_scene_flavour::COUNT));
-
-	augs::for_each_enum([&](const test_scene_flavour e) {
-		auto& new_type = into.flavours[static_cast<std::size_t>(e)];
-		new_type.name = to_wstring(format_enum(e));
-	});
-
 	test_flavours::populate_grenade_types(logicals, into);
 	test_flavours::populate_character_types(logicals, into);
 	test_flavours::populate_gun_types(logicals, into);

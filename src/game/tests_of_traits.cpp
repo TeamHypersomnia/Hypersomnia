@@ -60,16 +60,16 @@ struct tests_of_traits {
 	static_assert(std::is_same_v<
 		type_list<int, int, double, double>,
 		concatenate_lists_t<type_list<int, int>, type_list<double, double>>
-	);
+	>);
 
 	static_assert(std::is_same_v<
 		std::tuple<int, int, double, double>,
 		concatenate_lists_t<std::tuple<int, int>, type_list<double, double>>
-	);
+	>);
 
-	static_assert(is_class_const_v<const_entity_handle>);
-	static_assert(!is_class_const_v<iterated_entity_handle<controlled_character>>);
-	static_assert(is_class_const_v<const_iterated_entity_handle<controlled_character>>);
+	static_assert(is_handle_const_v<const_entity_handle>);
+	static_assert(!is_handle_const_v<iterated_entity_handle<controlled_character>>);
+	static_assert(is_handle_const_v<const_iterated_entity_handle<controlled_character>>);
 
 	static_assert(!can_reserve_caches_v<flavour_id_cache>);
 	static_assert(can_reserve_caches_v<physics_world_cache>);
@@ -248,8 +248,6 @@ struct tests_of_traits {
 	static_assert(augs::representable_as_lua_value_v<std::wstring>);
 	static_assert(augs::representable_as_lua_value_v<const std::wstring*>);
 	
-	static_assert(!augs::has_byte_readwrite_overloads_v<augs::memory_stream, cosmic_entity>);
-
 	static_assert(aligned_num_of_bytes_v<0, 4> == 0, "Trait is wrong");
 	static_assert(aligned_num_of_bytes_v<1, 4> == 4, "Trait is wrong");
 	static_assert(aligned_num_of_bytes_v<2, 4> == 4, "Trait is wrong");

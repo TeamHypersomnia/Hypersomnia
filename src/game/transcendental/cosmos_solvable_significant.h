@@ -2,8 +2,11 @@
 #include "augs/misc/constant_size_vector.h"
 #include "augs/misc/pool/pool.h"
 
-#include "game/transcendental/cosmic_types.h"
+#include "augs/templates/get_by_dynamic_id.h"
+
+#include "game/transcendental/pool_types.h"
 #include "game/transcendental/cosmos_clock.h"
+#include "game/transcendental/entity_solvable.h"
 
 struct cosmos_solvable_significant {
 	// GEN INTROSPECTOR struct cosmos_solvable_significant

@@ -5,7 +5,6 @@
 #include "augs/build_settings/platform_defines.h"
 
 #include "game/transcendental/entity_id_declaration.h"
-#include "game/transcendental/cosmic_types.h"
 
 #include "game/organization/all_entity_types.h"
 

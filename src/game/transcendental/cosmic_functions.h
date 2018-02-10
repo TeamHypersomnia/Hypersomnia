@@ -4,7 +4,7 @@
 #include "augs/callback_result.h"
 #include "augs/misc/scope_guard.h"
 
-#include "game/transcendental/cosmic_types.h"
+#include "game/transcendental/entity_type_traits.h"
 #include "game/transcendental/entity_flavour_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/transcendental/specific_entity_handle_declaration.h"
@@ -30,14 +30,14 @@ class cosmic {
 
 	static void reinfer_solvable(cosmos&);
 
-	template <class E>
+	template <class E, class C>
 	static auto instantiate_flavour(
-		cosmos& cosm, 
-		const typed_entity_flavour_id<F> flavour_id
+		C& cosm, 
+		const typed_entity_flavour_id<E> flavour_id
 	) {
 		ensure (flavour_id != entity_flavour_id());
 
-		const auto new_allocation = cosm.get_solvable({}).allocate_next_entity<F>(flavour_id);
+		const auto new_allocation = cosm.get_solvable({}).template allocate_next_entity<E>(flavour_id);
 
 		const auto result = typed_entity_handle<E> { new_allocation.object, cosm, new_allocation.key };
 		new_allocation.object.components = result.get_flavour().initial_components;
@@ -51,9 +51,9 @@ public:
 		specific_guid_creation_access() {}
 	};
 
-	template <class E, class P>
+	template <class E, class C, class P>
 	static auto create_entity(
-		cosmos& cosm, 
+		C& cosm, 
 		const raw_entity_flavour_id id,
 		P pre_construction
 	) {
@@ -66,9 +66,9 @@ public:
 		return handle;
 	}
 
-	template <class P>
-	static entity_handle cosmic::create_entity(
-		cosmos& cosm,
+	template <class C, class P>
+	static entity_handle create_entity(
+		C& cosm,
 		const entity_flavour_id flavour_id,
 		P&& pre_construction
 	) {
@@ -114,13 +114,13 @@ public:
 			auto& new_components = new_entity.get({}).components;
 			new_components = source_entity.get({}).components;
 
-			if (new_components.has<components::item>()) {
-				new_components.get<components::item>().current_slot.unset();
+			if (new_components.template has<components::item>()) {
+				new_components.template get<components::item>().current_slot.unset();
 			}
 
 			{
 				new_components.for_each([&](auto& cloned_to_component) {
-					using component_type = std::decay_t<decltype(cloned_to_component);
+					using component_type = std::decay_t<decltype(cloned_to_component)>;
 
 					const auto& cloned_from_component = source_entity.get({}).template get<component_type>();
 

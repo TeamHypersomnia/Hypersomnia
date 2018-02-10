@@ -51,15 +51,15 @@ class cosmos {
 		const I flavour_id,
 		F callback	
 	) {
-		using candidate_types = typename decltype(id)::matching_types; 
+		using candidate_types = typename decltype(flavour_id)::matching_types; 
 		const auto dynamic_type_index = flavour_id.type_id.get_index();
 
 		return get_by_dynamic_id<candidate_types>(
 			all_entity_types(),
 			flavour_id.type_id,
-			[](auto t) {
-				using flavour_type = decltype(c);
-				return callback(self.get_flavour<flavour_type>(flavour_id.raw_id));
+			[&](auto t) {
+				using flavour_type = decltype(t);
+				return callback(self.template get_flavour<flavour_type>(flavour_id.raw_id));
 			}
 		);
 	}
@@ -154,7 +154,7 @@ public:
 	const auto& get_flavour(const raw_entity_flavour_id id) const {
 		using flavours_type = make_entity_flavours<entity_type>;
 
-		const auto& all_flavours = self.get_common_significant().flavours;
+		const auto& all_flavours = get_common_significant().flavours;
 		return std::get<flavours_type>(all_flavours).get_flavour(id);
 	}
 

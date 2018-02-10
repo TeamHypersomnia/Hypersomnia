@@ -17,7 +17,7 @@ void construct_entity(const handle_type h) {
 	}
 
 	if (const auto trace = h.template find<components::trace>()) {
-		auto rng = cosmos.get_fast_rng_for(get_id());
-		trace->reset(get<invariants::trace>(), rng);
+		auto rng = cosmos.get_fast_rng_for(h.get_id());
+		trace->reset(h.template get<invariants::trace>(), rng);
 	}
 }

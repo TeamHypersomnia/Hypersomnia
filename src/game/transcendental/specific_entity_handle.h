@@ -1,13 +1,18 @@
 #pragma once
 #include "augs/templates/type_matching_and_indexing.h"
-#include "game/transcendental/entity_type.h"
+
+#include "game/transcendental/pool_types.h"
+#include "game/transcendental/entity_type_traits.h"
 
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/transcendental/specific_entity_handle_declaration.h"
-#include "game/transcendental/entity_solvable.h"
 
 #include "game/detail/entity_handle_mixins/all_handle_mixins.h"
 
+template <class E>
+struct entity_solvable;
+
+template <class E>
 struct empty_id_provider {};
 
 template <class derived_handle_type>
@@ -48,16 +53,18 @@ struct stored_id_provider {
 	}
 };
 
-template <bool is_const, class entity_type, class identifier_provider>
+template <bool is_const, class entity_type, template <class> class identifier_provider>
 class specific_entity_handle :
 	public misc_mixin<specific_entity_handle<is_const, entity_type, identifier_provider>>,
 	public inventory_mixin<specific_entity_handle<is_const, entity_type, identifier_provider>>,
 	public physics_mixin<specific_entity_handle<is_const, entity_type, identifier_provider>>,
 	public relations_mixin<specific_entity_handle<is_const, entity_type, identifier_provider>>,
 	public spatial_properties_mixin<specific_entity_handle<is_const, entity_type, identifier_provider>>,
-	public identifier_provider
+	public identifier_provider<specific_entity_handle<is_const, entity_type, identifier_provider>>
 {
 	using this_handle_type = specific_entity_handle<is_const, entity_type, identifier_provider>;
+	using used_identifier_provider = identifier_provider<this_handle_type>;
+
 	using misc_base = misc_mixin<this_handle_type>;
 
 	using const_handle_type = specific_entity_handle<true, entity_type, identifier_provider>;
@@ -74,7 +81,7 @@ class specific_entity_handle :
 	friend class cosmos;
 	friend specific_entity_handle<!is_const, entity_type, identifier_provider>;
 
-	using identifier_provider::get_id;
+	using used_identifier_provider::get_id;
 
 	subject_reference subject;
 	owner_reference owner;
@@ -95,11 +102,11 @@ public:
 	specific_entity_handle(
 		subject_reference subject,
 		owner_reference owner,
-		const identifier_provider identifier
+		const used_identifier_provider identifier
 	) :
 		subject(subject),
 		owner(owner),
-		identifier_provider(identifier)
+		used_identifier_provider(identifier)
 	{}
 
 	using misc_base::get_flavour;
@@ -205,7 +212,3 @@ public:
 	}
 };
 
-/* Shortcut */
-
-template <class T>
-using entity_type_of = typename std::decay_t<T>::used_entity_type;
