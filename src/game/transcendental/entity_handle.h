@@ -13,6 +13,7 @@
 #include "game/transcendental/cosmos_solvable_access.h"
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_solvable.h"
+#include "game/transcendental/specific_entity_handle.h"
 
 #include "game/organization/all_components_declaration.h"
 
@@ -69,9 +70,16 @@ class basic_entity_handle :
 	{}
 
 	template <class T>
-	auto* find_ptr() const {
+	auto* find_invariant_ptr() const {
 		return dispatch([](const auto typed_handle) { 
-			return typed_handle.template find<T>(); 
+			return typed_handle.get_flavour().template find<T>(); 
+		});
+	}
+
+	template <class T>
+	auto* find_component_ptr() const {
+		return dispatch([](const auto typed_handle) { 
+			return typed_handle.template find_component_ptr<T>(); 
 		});
 	}
 
@@ -100,7 +108,7 @@ public:
 	}
 
 	const auto& get_meta() const {
-		return *reinterpret_cast<entity_solvable_meta*>(ptr);
+		return *reinterpret_cast<const entity_solvable_meta*>(ptr);
 	};
 
 	auto& get(cosmos_solvable_access) const {
@@ -161,7 +169,7 @@ public:
 	}
 
 	template <class F>
-	decltype(auto) dispatch(F&& callback) {
+	decltype(auto) dispatch(F&& callback) const {
 		ensure(alive());
 
 		return get_by_dynamic_id(
@@ -191,21 +199,33 @@ public:
 
 	template<class T>
 	decltype(auto) find() const {
-		if constexpr(is_synchronized_v<T>) {
-			return component_synchronizer<this_handle_type, T>(find_ptr<T>(), *this);
+		if constexpr(is_invariant_v<T>) {
+			return find_invariant_ptr<T>();
 		}
 		else {
-			return find_ptr<T>();
+			if constexpr(is_synchronized_v<T>) {
+				return component_synchronizer<this_handle_type, T>(find_component_ptr<T>(), *this);
+			}
+			else {
+				return find_component_ptr<T>();
+			}
 		}
 	}
 
 	template<class T>
 	decltype(auto) get() const {
-		if constexpr(is_synchronized_v<T>) {
-			return component_synchronizer<this_handle_type, T>(find_ptr<T>(), *this);
+		if constexpr(is_invariant_v<T>) {
+			const auto p = find_invariant_ptr<T>();
+			ensure(p != nullptr);
+			return *p;
 		}
 		else {
-			return *find_ptr<T>();
+			if constexpr(is_synchronized_v<T>) {
+				return component_synchronizer<this_handle_type, T>(find_component_ptr<T>(), *this);
+			}
+			else {
+				return *find_component_ptr<T>();
+			}
 		}
 	}
 

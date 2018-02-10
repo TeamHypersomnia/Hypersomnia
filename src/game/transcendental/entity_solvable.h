@@ -33,7 +33,7 @@ struct entity_solvable : entity_solvable_meta {
 	// END GEN INTROSPECTOR
 
 	template <class C>
-	constexpr bool has() const {
+	static constexpr bool has() {
 		return is_one_of_list_v<C, components_type>;
 	}
 

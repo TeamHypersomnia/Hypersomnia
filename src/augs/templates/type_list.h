@@ -2,10 +2,18 @@
 #include <type_traits>
 #include <cstddef>
 
-template <class...>
-struct type_list {
+#include "augs/templates/nth_type_in.h"
 
-};
+template <class...>
+struct type_list {};
+
+namespace std {
+	template <std::size_t I, class... Types>
+	auto get(const type_list<Types...>& t) {
+		using type = nth_type_in_t<I, Types...>;
+		return type();
+	}
+}
 
 /*
 	Applicable to any kind of list, not just struct type_list,

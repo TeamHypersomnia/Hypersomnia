@@ -1,11 +1,12 @@
 #pragma once
 #include "augs/templates/type_matching_and_indexing.h"
 
+#include "game/transcendental/component_synchronizer.h"
 #include "game/transcendental/pool_types.h"
-#include "game/transcendental/entity_type_traits.h"
 
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/transcendental/specific_entity_handle_declaration.h"
+#include "game/transcendental/entity_solvable.h"
 
 #include "game/detail/entity_handle_mixins/all_handle_mixins.h"
 
@@ -18,15 +19,15 @@ struct empty_id_provider {};
 template <class derived_handle_type>
 struct iterated_id_provider {
 	const unsigned iteration_index;
+	using pool_type = typename derived_handle_type::subject_pool_type;
+	using owner_reference = typename derived_handle_type::owner_reference;
 	
 	iterated_id_provider(const unsigned iteration_index) 
 		: iteration_index(iteration_index) 
 	{}
 	
-	static auto& get_pool(owner_reference owner) {
-		return 
-			std::get<typename handle_type::subject_pool_type>(owner.get_solvable({}).significant.entity_pools)
-		;
+	static pool_type& get_pool(owner_reference owner) {
+		return std::get<pool_type>(owner.get_solvable({}).significant.entity_pools);
 	}
 
 	entity_id get_id() const {
@@ -69,12 +70,10 @@ class specific_entity_handle :
 
 	using const_handle_type = specific_entity_handle<true, entity_type, identifier_provider>;
 
-	using components_type = make_components<entity_type>;
-	using flavour_type = make_entity_flavour<entity_type>;
-
 	using subject_pool_type = make_entity_pool<entity_type>;
 
-	using subject_reference = maybe_const_ref_t<is_const, entity_solvable<entity_type>>;
+	using subject_type = entity_solvable<entity_type>;
+	using subject_reference = maybe_const_ref_t<is_const, subject_type>;
 
 	using owner_reference = maybe_const_ref_t<is_const, cosmos>;
 
@@ -88,14 +87,14 @@ class specific_entity_handle :
 
 	template <class T>
 	maybe_const_ptr_t<is_const, T> find_component_ptr() const {
-		if constexpr(subject.template has<T>()) {
+		if constexpr(subject_type::template has<T>()) {
 			return std::addressof(subject.template get<T>());
 		}
 
 		return nullptr;
 	}
 
-	template <bool is_const>
+	template <bool>
 	friend class basic_entity_handle;
 
 public:
@@ -113,9 +112,9 @@ public:
 	using used_entity_type = entity_type;
 
 	template <class T>
-	constexpr bool has() const {
+	static constexpr bool has() {
 		return 
-			subject.template has<components_type> 
+			subject_type::template has<T> 
 			|| get_flavour().template has<T>
 		;
 	}
@@ -141,7 +140,7 @@ public:
 			return get_flavour().template get<T>();
 		}
 		else {
-			static_assert(has<component>());
+			static_assert(has<T>());
 
 			if constexpr(is_synchronized_v<T>) {
 				return find<T>();
@@ -178,7 +177,7 @@ public:
 
 	template <bool C = !is_const, class = std::enable_if_t<C>>
 	operator const_handle_type() const {
-		return const_handle_type(subject, owner, identifier);
+		return const_handle_type(subject, owner, get_id());
 	}
 
 	auto get_type_id() const {
@@ -208,7 +207,9 @@ public:
 	}
 
 	operator basic_entity_handle<is_const>() const {
-		return { static_cast<void_entity_ptr>(ptr), owner, get_id() };
+		using void_entity_ptr = maybe_const_ptr_t<is_const, void>;
+
+		return { static_cast<void_entity_ptr>(std::addressof(subject)), owner, get_id() };
 	}
 };
 

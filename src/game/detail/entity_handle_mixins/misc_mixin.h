@@ -86,7 +86,7 @@ public:
 
 	entity_guid get_guid() const {
 		const auto self = *static_cast<const E*>(this);
-		return self.get_cosmos().get_solvable().get_guid(self.get_id());
+		return self.get_meta().guid;
 	}
 
 	auto get_raw_flavour_id() const {

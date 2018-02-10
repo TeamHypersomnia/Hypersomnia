@@ -12,6 +12,7 @@
 
 #include "game/transcendental/cosmos_common.h"
 #include "game/transcendental/private_cosmos_solvable.h"
+#include "game/transcendental/specific_entity_handle.h"
 
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/cosmic_functions.h"

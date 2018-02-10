@@ -1,6 +1,7 @@
 #pragma once
 #include "3rdparty/Box2D/Common/b2Math.h"
 
+#include "augs/misc/constant_size_vector.h"
 #include "augs/misc/timing/stepped_timing.h"
 #include "augs/templates/maybe_const.h"
 

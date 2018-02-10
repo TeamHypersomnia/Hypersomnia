@@ -54,6 +54,21 @@ struct AAA {
 	int& czo;
 };
 
+static void ff () {
+	all_entity_types t;
+
+	auto okay = get_by_dynamic_id(t, std::size_t(0), [](auto a){
+		return 20.0;	
+	});
+
+	auto okay2 = get_by_dynamic_id(t, type_in_list_id<all_entity_types>(), [](auto a){
+		return 20.0;	
+	});
+
+	static_assert(std::is_same_v<double, decltype(okay)>);
+	static_assert(std::is_same_v<double, decltype(okay2)>);
+}
+
 struct tests_of_traits {
 	static_assert(all_are_v<std::is_trivially_copyable, type_list<int, double, float>>);
 
