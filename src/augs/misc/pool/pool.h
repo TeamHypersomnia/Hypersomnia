@@ -1,6 +1,7 @@
 #pragma once
 #include "augs/ensure.h"
 #include "augs/misc/pool/pooled_object_id.h"
+#include "augs/templates/container_traits.h"
 #include "augs/readwrite/byte_readwrite_declaration.h"
 
 namespace augs {
@@ -41,9 +42,12 @@ namespace augs {
 
 		friend struct introspection_access;
 
+		using object_pool_type = make_container_type<mapped_type>;
+		static constexpr bool constexpr_capacity = is_constexpr_capacity_v<object_pool_type>;
+
 		// GEN INTROSPECTOR class augs::pool class mapped_type template<class>class C class size_type
 		make_container_type<pool_slot_type> slots;
-		make_container_type<mapped_type> objects;
+		object_pool_type objects;
 		make_container_type<pool_indirector_type> indirectors;
 		make_container_type<size_type> free_indirectors;
 		// END GEN INTROSPECTOR
@@ -69,7 +73,12 @@ namespace augs {
 
 	public:
 		pool(const size_type slot_count = 0u) {
-			reserve(slot_count);
+			if constexpr(constexpr_capacity) {
+				reserve(object_pool_type::capacity());
+			}
+			else {
+				reserve(slot_count);
+			}
 		}
 
 		void reserve(const size_type new_capacity) {
@@ -102,12 +111,17 @@ namespace augs {
 		>
 		allocation_result allocate(Args&&... args) {
 			if (full()) {
-				const auto old_size = size();
-				const auto new_size = std::size_t(old_size) * expansion_mult + expansion_add;
+				if constexpr(constexpr_capacity) {
+					throw std::runtime_error("This static pool cannot be further expanded.");
+				}
+				else {
+					const auto old_size = size();
+					const auto new_size = std::size_t(old_size) * expansion_mult + expansion_add;
 
-				ensure(new_size <= std::numeric_limits<size_type>::max());
+					ensure(new_size <= std::numeric_limits<size_type>::max());
 
-				reserve(static_cast<size_type>(new_size));
+					reserve(static_cast<size_type>(new_size));
+				}
 			}
 
 			const auto next_free_indirector = free_indirectors.back();

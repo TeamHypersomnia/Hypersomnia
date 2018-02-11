@@ -180,6 +180,10 @@ struct tests_of_traits {
 	static_assert(is_constexpr_size_v<std::array<int, 3>>, "Trait has failed");
 	static_assert(is_constexpr_size_v<std::array<vec2, 3>>, "Trait has failed");
 	static_assert(is_constexpr_size_v<decltype(pad_bytes<3>::pad)>, "Trait has failed");
+
+	static_assert(is_constexpr_capacity_v<augs::constant_size_vector<int, 20>>, "Trait has failed");
+	static_assert(!is_constexpr_capacity_v<std::vector<int>>, "Trait has failed");
+
 	static_assert(!is_container_v<decltype(pad_bytes<3>::pad)>, "Trait has failed");
 	static_assert(is_container_v<augs::enum_associative_array<game_intent_type, vec2>>, "Trait has failed");
 	static_assert(!is_container_v<augs::enum_array<basic_transform<float>, colliders_offset_type>>, "Trait has failed");

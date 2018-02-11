@@ -46,10 +46,7 @@ struct typed_entity_flavour_id {
 		class V = std::enable_if_t<has_invariants_or_components_v<E, C...>>
 	>
 	operator constrained_entity_flavour_id<C...>() const {
-		entity_type_id type_id;
-		type_id.set<E>();
-
-		return { raw, type_id };
+		return { raw, entity_type_id::of<E> };
 	}
 };
 

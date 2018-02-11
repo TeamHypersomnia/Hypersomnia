@@ -17,7 +17,8 @@ cosmos::cosmos(const cosmic_pool_size_type reserved_entities)
 const cosmos cosmos::zero = {};
 
 void cosmos::clear() {
-	*this = zero;
+	change_common_significant([](auto& c) { c = {}; return changer_callback_result::REFRESH; });
+	set({});
 }
 
 std::wstring cosmos::summary() const {

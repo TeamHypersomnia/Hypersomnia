@@ -4,6 +4,25 @@
 #include <cstddef>
 #include <utility>
 
+template <typename Trait>
+struct capacity_test_detail {
+	static Trait ttt;
+
+	template<int Value = ttt.capacity()>
+	static std::true_type do_call(int) { return std::true_type(); }
+
+	static std::false_type do_call(...) { return std::false_type(); }
+
+	static auto call() { return do_call(0); }
+};
+
+template <typename Trait>
+struct capacity_test : decltype(capacity_test_detail<Trait>::call()) {};
+
+template <class T>
+constexpr bool is_constexpr_capacity_v = capacity_test<T>::value;
+
+
 template <class T, class = void>
 struct is_associative : std::false_type {};
 

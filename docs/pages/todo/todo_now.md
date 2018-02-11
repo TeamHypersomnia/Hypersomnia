@@ -7,6 +7,11 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order:  
 
+- assume using component_entity_id = entity_guid for now
+	- fix when performance problems
+	- assert with component introspectors that no entity_ids, pointers, unversioned_ids are stored
+		- revive from cosmic delta tests
+
 - remove introspectors from container and manually insert for (auto) s for introspection
 	- or else do it automatically for unary introspectors
 - if a cons

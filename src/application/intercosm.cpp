@@ -19,7 +19,10 @@ void intercosm::make_test_scene(
 ) {
 	world.clear();
 	viewables = {};
+
+#if !STATICALLY_ALLOCATE_ENTITIES
 	cosmic::reserve_storage_for_entities(world, 3000u);
+#endif
 
 	const auto caches = populate_test_scene_images_and_sounds(lua, viewables);
 	populate_test_scene_viewables(lua, caches, viewables);
