@@ -183,7 +183,8 @@ struct static_light {
 	>;
 
 	using components = type_list<
-		components::transform
+		components::transform,
+		components::light
 	>;
 };
 

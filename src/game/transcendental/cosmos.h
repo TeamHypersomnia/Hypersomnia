@@ -32,6 +32,11 @@ auto subscript_handle_getter(C& cosm, const entity_id id) {
 	return basic_entity_handle<std::is_const_v<C>>{ cosm, id };
 }
 
+template <class C, class E>
+auto subscript_handle_getter(C& cosm, const typed_entity_id<E> id) {
+	return basic_typed_entity_handle<std::is_const_v<C>, E>{ cosm, id };
+}
+
 template <class C>
 auto subscript_handle_getter(C& cosm, const child_entity_id id) {
 	return subscript_handle_getter(cosm, entity_id(id));

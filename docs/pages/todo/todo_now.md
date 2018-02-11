@@ -16,15 +16,12 @@ summary: Just a hidden scratchpad.
 	- or else do it automatically for unary introspectors
 - if a cons
 - let allocators return typed entity ids and let subscript getters return typed handles
+
 - replace "alive"/"dead" checks with optionals of handles
 	- and assume that an existing handle always points to an entity
 	- a lot of work but it will be worth it
 	- in any case do it once everything else works
 	
-- add "direct_construction_access" for entity handles
-
-- always present should be added to the invariants or components while making
-	- flags?
 - remove redundant logic for componnt/inv lists once all is done and works
 - it probably makes no sense to use GUIDs for now if we are anyway going to transfer whole pools for determinism
 - we'll also write the pool states in lua for now, I guess
@@ -154,6 +151,8 @@ summary: Just a hidden scratchpad.
 	- or it can be part of inferred state which will complicate things a little
 
 ## Later
+- add "direct_construction_access" for entity handles
+
 - fix errors at unit tests when not statically allocating 
 - strip children vector tracker of children caches as we'll take that data from signi
 	- was anyway used only for ensuring

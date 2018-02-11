@@ -68,7 +68,7 @@ public:
 	}
 
 	template <class C, class E, class P>
-	static entity_handle create_entity(
+	static typed_entity_handle<E> create_entity(
 		C& cosm,
 		const typed_entity_flavour_id<E> flavour_id,
 		P&& pre_construction

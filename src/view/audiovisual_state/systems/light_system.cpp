@@ -117,17 +117,18 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 	cosmos.for_each_having<components::light>(
 		[&](const auto light_entity) {
-			const auto& cache = per_entity_cache[light_entity];
-			const auto light_displacement = vec2(cache.all_variation_values[6], cache.all_variation_values[7]);
+			if (const auto cache = mapped_or_nullptr(per_entity_cache, light_entity.get_id())) {
+				const auto light_displacement = vec2(cache->all_variation_values[6], cache->all_variation_values[7]);
 
-			messages::visibility_information_request request;
-			request.eye_transform = light_entity.get_viewing_transform(interp);
-			request.eye_transform.pos += light_displacement;
-			request.filter = filters::line_of_sight_query();
-			request.square_side = light_entity.template get<invariants::light>().max_distance.base_value;
-			request.subject = light_entity;
+				messages::visibility_information_request request;
+				request.eye_transform = light_entity.get_viewing_transform(interp);
+				request.eye_transform.pos += light_displacement;
+				request.filter = filters::line_of_sight_query();
+				request.square_side = light_entity.template get<invariants::light>().max_distance.base_value;
+				request.subject = light_entity;
 
-			requests.push_back(request);
+				requests.push_back(request);
+			}
 		}
 	);
 

@@ -222,6 +222,16 @@ public:
 		return guid_to_id;
 	}
 
+	template <class E>
+	auto* dereference_entity(const typed_entity_id<E> id) {
+		return significant.get_pool<E>().find(id.basic());
+	}
+
+	template <class E>
+	const auto* dereference_entity(const typed_entity_id<E> id) const {
+		return significant.get_pool<E>().find(id.basic());
+	}
+
 	template <class F>
 	decltype(auto) on_entity_meta(const entity_id id, F&& callback) {
 		return on_entity_meta_impl(*this, id, std::forward<F>(callback));

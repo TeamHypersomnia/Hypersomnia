@@ -63,6 +63,12 @@ struct stored_id_provider {
 		const auto h = *static_cast<const derived_handle_type*>(this);
 		return { stored_id, h.get_type_id() };
 	}
+
+protected:
+	template <class C>
+	auto* dereference(C& owner, cosmos_solvable_access key) const {
+		return owner.get_solvable(key).dereference_entity(stored_id);
+	}
 };
 
 template <bool is_const, class entity_type, template <class> class identifier_provider>
@@ -117,6 +123,17 @@ public:
 		subject(subject),
 		owner(owner),
 		used_identifier_provider(identifier)
+	{}
+
+	specific_entity_handle(
+		owner_reference owner,
+		const used_identifier_provider identifier
+	) :
+		specific_entity_handle(
+			identifier.dereference(owner, {}),
+			owner,
+			identifier
+		)
 	{}
 
 	using const_type = specific_entity_handle<true, entity_type, identifier_provider>;
