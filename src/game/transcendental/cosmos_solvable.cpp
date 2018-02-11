@@ -38,9 +38,11 @@ void cosmos_solvable::destroy_all_caches() {
 	inferred.~cosmos_solvable_inferred();
 	new (&inferred) cosmos_solvable_inferred;
 
+#if TODO
 	const auto n = significant.entity_pool.capacity();
 
 	augs::introspect(make_reserver(n), inferred);
+#endif
 }
 
 void cosmos_solvable::increment_step() {

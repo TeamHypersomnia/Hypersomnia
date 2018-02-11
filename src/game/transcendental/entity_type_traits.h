@@ -8,6 +8,9 @@
 
 #include "game/transcendental/pool_size_type.h"
 
+#include "game/organization/all_components_declaration.h"
+#include "game/organization/all_entity_types_declaration.h"
+
 template <class T>
 using invariants_of = concatenate_lists_t<
 	typename T::invariants, 

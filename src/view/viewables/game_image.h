@@ -7,6 +7,8 @@
 #include "game/assets/ids/game_image_id.h"
 #include "view/viewables/all_viewables_declarations.h"
 #include "game/components/shape_polygon_component.h"
+#include "game/components/sprite_component.h"
+#include "game/components/polygon_component.h"
 
 struct game_image_usage_as_button {
 	// GEN INTROSPECTOR struct game_image_usage_as_button

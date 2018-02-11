@@ -9,7 +9,8 @@
 #include "game/transcendental/entity_handle.h"
 
 namespace test_flavours {
-	void add_standard_dynamic_body(entity_flavour& meta) {
+	template <class E>
+	void add_standard_dynamic_body(E& meta) {
 		invariants::fixtures fixtures_def;
 		invariants::rigid_body body_def;
 
@@ -24,7 +25,8 @@ namespace test_flavours {
 		meta.set(body_def);
 	}
 
-	void add_see_through_dynamic_body(entity_flavour& meta) {
+	template <class E>
+	void add_see_through_dynamic_body(E& meta) {
 		invariants::fixtures fixtures_def;
 		invariants::rigid_body body_def;
 
@@ -40,7 +42,8 @@ namespace test_flavours {
 		meta.set(body_def);
 	}
 
-	void add_shell_dynamic_body(entity_flavour& meta) {
+	template <class E>
+	void add_shell_dynamic_body(E& meta) {
 		invariants::fixtures fixtures_def;
 		invariants::rigid_body body_def;
 
@@ -58,7 +61,8 @@ namespace test_flavours {
 		meta.set(body_def);
 	}
 
-	void add_standard_static_body(entity_flavour& meta) {
+	template <class E>
+	void add_standard_static_body(E& meta) {
 		invariants::fixtures fixtures_def;
 		invariants::rigid_body body_def;
 
@@ -75,7 +79,8 @@ namespace test_flavours {
 		meta.set(body_def);
 	}
 	
-	void add_bullet_round_physics(entity_flavour& meta) {
+	template <class E>
+	void add_bullet_round_physics(E& meta) {
 		invariants::fixtures fixtures_def;
 		invariants::rigid_body body_def;
 

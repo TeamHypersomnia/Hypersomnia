@@ -11,8 +11,9 @@
 #include "game/enums/filters.h"
 
 namespace test_flavours {
+	template <class E>
 	void add_sprite(
-		entity_flavour& t, 
+		E& t, 
 		const loaded_game_image_caches& logicals,
 		const assets::game_image_id id, 
 		const rgba col,
