@@ -7,6 +7,8 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order:  
 
+- if a cons
+- let allocators return typed entity ids and let subscript getters return typed handles
 - replace "alive"/"dead" checks with optionals of handles
 	- and assume that an existing handle always points to an entity
 	- a lot of work but it will be worth it

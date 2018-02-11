@@ -58,7 +58,7 @@ struct stored_id_provider {
 	{}
 
 	entity_id get_id() const {
-		const auto h = *static_cast<derived_handle_type*>(this);
+		const auto h = *static_cast<const derived_handle_type*>(this);
 		return { stored_id, h.get_type_id() };
 	}
 };

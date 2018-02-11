@@ -17,17 +17,18 @@ struct entity_solvable_meta {
 	entity_solvable_meta() = default;
 
 	entity_solvable_meta(
-		const raw_entity_flavour_id flavour_id,
-		const entity_guid guid
+		const entity_guid guid,
+		const raw_entity_flavour_id flavour_id
 	) :
-		flavour_id(flavour_id),
-		guid(guid)
+		guid(guid),
+		flavour_id(flavour_id)
 	{}
 };
 
 template <class E>
 struct entity_solvable : entity_solvable_meta {
 	using components_type = make_components<E>;
+	using entity_solvable_meta::entity_solvable_meta;
 
 	// GEN INTROSPECTOR struct entity_solvable class E
 	// INTROSPECT BASE entity_solvable_meta

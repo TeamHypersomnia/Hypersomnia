@@ -34,7 +34,7 @@ class cosmic {
 	template <class E, class C>
 	static auto instantiate_flavour(
 		C& cosm, 
-		const typed_entity_flavour_id<E> flavour_id
+		const raw_entity_flavour_id flavour_id
 	) {
 		ensure (flavour_id != entity_flavour_id());
 
@@ -53,7 +53,7 @@ public:
 	};
 
 	template <class E, class C, class P>
-	static auto create_entity(
+	static auto specific_create_entity(
 		C& cosm, 
 		const raw_entity_flavour_id id,
 		P pre_construction
@@ -67,19 +67,21 @@ public:
 		return handle;
 	}
 
-	template <class C, class P>
+	template <class C, class... Types, class P>
 	static entity_handle create_entity(
 		C& cosm,
-		const entity_flavour_id flavour_id,
+		const constrained_entity_flavour_id<Types...> flavour_id,
 		P&& pre_construction
 	) {
-		return get_by_dynamic_id(
+		using candidate_types = typename decltype(flavour_id)::matching_types; 
+
+		return only_get_by_dynamic_id<candidate_types>(
 			all_entity_types(),
 			flavour_id.type_id,
 			[&](auto e) {
 				using E = decltype(e);
 
-				return entity_handle(create_entity<E>(
+				return entity_handle(specific_create_entity<E>(
 					cosm, 
 					flavour_id.raw, 
 					std::forward<P>(pre_construction)
@@ -108,10 +110,10 @@ public:
 #endif
 
 	template <class E>
-	static auto clone_entity(const const_typed_entity_handle<E> source_entity) {
+	static auto specific_clone_entity(const const_typed_entity_handle<E> source_entity) {
 		auto& cosmos = source_entity.get_cosmos();
 
-		return create_entity<E>(cosmos, source_entity.get_flavour_id(), [&](const auto new_entity) {
+		return specific_create_entity<E>(cosmos, source_entity.get_flavour_id(), [&](const auto new_entity) {
 			auto& new_components = new_entity.get({}).components;
 			new_components = source_entity.get({}).components;
 

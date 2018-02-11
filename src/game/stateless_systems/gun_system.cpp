@@ -182,7 +182,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 							cosmic::create_entity(
 								cosmos, 
-								entity_flavour_id(magic_missile_flavour_id),
+								magic_missile_flavour_id,
 								[&](const auto round_entity) {
 									round_entity.set_logic_transform(muzzle_transform);
 

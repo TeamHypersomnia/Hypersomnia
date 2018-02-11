@@ -18,6 +18,9 @@ template <class T>
 using components_of = typename T::components;
 
 template <class T>
+using invariants_and_components_of = concatenate_lists_t<invariants_of<T>, components_of<T>>;
+
+template <class T>
 using make_invariants = 
 	std::conditional_t<
 		all_are_v<std::is_trivially_copyable, invariants_of<T>>,
@@ -39,8 +42,7 @@ template <class... Types>
 struct has_invariants_or_components {
 	template <class E>
 	struct type : std::bool_constant<
-		(is_one_of_list_v<Types, invariants_of<E>> || ...)
-		||	(is_one_of_list_v<Types, components_of<E>> || ...)
+		(is_one_of_list_v<Types, invariants_and_components_of<E>> && ...)
 	>
 	{};	
 };

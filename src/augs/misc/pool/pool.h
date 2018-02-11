@@ -100,7 +100,7 @@ namespace augs {
 			unsigned expansion_add = 1, 
 			class... Args
 		>
-		key_type allocate(Args&&... args) {
+		allocation_result allocate(Args&&... args) {
 			if (full()) {
 				const auto old_size = size();
 				const auto new_size = std::size_t(old_size) * expansion_mult + expansion_add;
