@@ -21,8 +21,6 @@ summary: Just a hidden scratchpad.
 	- a lot of work but it will be worth it
 	- in any case do it once everything else works
 	
-- constize entity_ptr in handle
-
 - add "direct_construction_access" for entity handles
 
 - always present should be added to the invariants or components while making

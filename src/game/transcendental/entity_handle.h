@@ -44,7 +44,7 @@ class basic_entity_handle :
 	using this_handle_type = basic_entity_handle<is_const>;
 	using misc_base = misc_mixin<this_handle_type>;
 
-	entity_ptr ptr;
+	const entity_ptr ptr;
 	owner_reference owner;
 	entity_id raw_id;
 
