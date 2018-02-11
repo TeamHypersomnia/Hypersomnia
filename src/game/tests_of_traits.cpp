@@ -1,5 +1,6 @@
 #include "augs/filesystem/path.h"
 
+#include "augs/templates/type_map.h"
 #include "augs/readwrite/custom_lua_representations.h"
 
 #include "augs/readwrite/memory_stream.h"
@@ -21,6 +22,10 @@
 #include "augs/readwrite/byte_readwrite.h"
 
 #include "3rdparty/imgui/imgui.h"
+
+// shortcut
+template <class A, class B>
+constexpr bool same = std::is_same_v<A, B>;
 
 template <typename Trait>
 struct size_test_detail {
@@ -54,7 +59,7 @@ struct AAA {
 	int& czo;
 };
 
-static void ff () {
+static void ff() {
 	all_entity_types t;
 
 	auto okay = get_by_dynamic_index(t, std::size_t(0), [](auto a){
@@ -69,35 +74,50 @@ static void ff () {
 
 	auto tester = [](auto a) -> decltype(auto) {
 		using T = std::decay_t<decltype(a)>;
-		static_assert(std::is_same_v<T, plain_missile> || std::is_same_v<T, explosive_missile>);
+		static_assert(same<T, plain_missile> || same<T, explosive_missile>);
 		return 20.0;	
 	};
 
 	auto okay3 = only_get_by_dynamic_index<candidates>(t, std::size_t(0), tester);
 	auto okay4 = only_get_by_dynamic_id<candidates>(t, type_in_list_id<all_entity_types>(), tester);
 
-	static_assert(std::is_same_v<double, decltype(okay)>);
-	static_assert(std::is_same_v<double, decltype(okay2)>);
-	static_assert(std::is_same_v<double, decltype(okay3)>);
-	static_assert(std::is_same_v<double, decltype(okay4)>);
+	static_assert(same<double, decltype(okay)>);
+	static_assert(same<double, decltype(okay2)>);
+	static_assert(same<double, decltype(okay3)>);
+	static_assert(same<double, decltype(okay4)>);
 }
 
+static void gg() {
+	{
+		using tp = type_map<
+			type_pair<int, double>,
+			type_pair<double, int>,
+			type_pair<float, const char*>,
+			type_pair<const int, std::string>
+		>;
+
+		static_assert(same<tp::at<int>, double>);
+		static_assert(same<tp::at<double>, int>);
+		static_assert(same<tp::at<float>, const char*>);
+		static_assert(same<tp::at<const int>, std::string>);
+	}
+}
 struct tests_of_traits {
 	//static_assert(std::is_trivially_copyable_v<absolute_or_local>);
-	static_assert(std::is_same_v<double, type_argument_t<std::is_trivially_copyable<double>>>);
-	static_assert(std::is_same_v<constrained_entity_flavour_id<invariants::missile>::matching_types, type_list<plain_missile, explosive_missile>>);
+	static_assert(same<double, type_argument_t<std::is_trivially_copyable<double>>>);
+	static_assert(same<constrained_entity_flavour_id<invariants::missile>::matching_types, type_list<plain_missile, explosive_missile>>);
 
 	static_assert(has_specific_entity_type_v<typed_entity_handle<controlled_character>>);
 	static_assert(!has_specific_entity_type_v<const_entity_handle>);
 
 	static_assert(all_are_v<std::is_trivially_copyable, type_list<int, double, float>>);
 
-	static_assert(std::is_same_v<
+	static_assert(same<
 		type_list<int, int, double, double>,
 		concatenate_lists_t<type_list<int, int>, type_list<double, double>>
 	>);
 
-	static_assert(std::is_same_v<
+	static_assert(same<
 		std::tuple<int, int, double, double>,
 		concatenate_lists_t<std::tuple<int, int>, type_list<double, double>>
 	>);
@@ -137,8 +157,8 @@ struct tests_of_traits {
 	static_assert(has_introspect_v<augs::delta>, "Trait has failed");
 	static_assert(alignof(meter_instance_tuple) == 4, "Trait has failed");
 
-	static_assert(std::is_same_v<std::tuple<int, double, float>, reverse_types_in_list_t<std::tuple<float, double, int>>>, "Trait has failed");
-	static_assert(std::is_same_v<type_list<int, double, float>, reverse_types_in_list_t<type_list<float, double, int>>>, "Trait has failed");
+	static_assert(same<std::tuple<int, double, float>, reverse_types_in_list_t<std::tuple<float, double, int>>>, "Trait has failed");
+	static_assert(same<type_list<int, double, float>, reverse_types_in_list_t<type_list<float, double, int>>>, "Trait has failed");
 
 	static_assert(sum_sizes_until_nth_v<0, std::tuple<int, double, float>> == 0, "Trait has failed");
 	static_assert(sum_sizes_until_nth_v<1, std::tuple<int, double, float>> == 4, "Trait has failed");
@@ -181,9 +201,9 @@ struct tests_of_traits {
 
 	static_assert(bind_types<std::is_same, const int>::type<const int>::value, "Trait has failed");
 
-	static_assert(std::is_same_v<filter_types_in_list<std::is_integral, type_list<double, int, float>>::indices, std::index_sequence<1>>, "Trait has failed");
-	static_assert(std::is_same_v<filter_types_in_list<std::is_integral, type_list<double, int, float>>::types, type_list<int>>, "Trait has failed");
-	static_assert(std::is_same_v<filter_types_in_list<std::is_integral, type_list<double, int, float>>::get_type<0>, int>, "Trait has failed");
+	static_assert(same<filter_types_in_list<std::is_integral, type_list<double, int, float>>::indices, std::index_sequence<1>>, "Trait has failed");
+	static_assert(same<filter_types_in_list<std::is_integral, type_list<double, int, float>>::types, type_list<int>>, "Trait has failed");
+	static_assert(same<filter_types_in_list<std::is_integral, type_list<double, int, float>>::get_type<0>, int>, "Trait has failed");
 	
 	static_assert(is_one_of_list_v<unsigned, std::tuple<float, float, double, unsigned>>, "Trait has failed");
 	static_assert(!is_one_of_v<int, float, double>, "Trait has failed");
@@ -193,13 +213,13 @@ struct tests_of_traits {
 	static_assert(index_in_list_v<unsigned, std::tuple<float, float, double, unsigned>> == 3, "Trait has failed");
 	static_assert(index_in_v<unsigned, float, float, double, unsigned> == 3, "Trait has failed");
 	
-	static_assert(std::is_same_v<unsigned, nth_type_in_t<0, unsigned, float, float>>, "Trait has failed");
-	static_assert(std::is_same_v<float, nth_type_in_t<1, unsigned, float, float>>, "Trait has failed");
-	static_assert(std::is_same_v<float, nth_type_in_t<2, unsigned, float, float>>, "Trait has failed");
-	static_assert(std::is_same_v<double, nth_type_in_t<3, unsigned, float, float, double, unsigned>>, "Trait has failed");
+	static_assert(same<unsigned, nth_type_in_t<0, unsigned, float, float>>, "Trait has failed");
+	static_assert(same<float, nth_type_in_t<1, unsigned, float, float>>, "Trait has failed");
+	static_assert(same<float, nth_type_in_t<2, unsigned, float, float>>, "Trait has failed");
+	static_assert(same<double, nth_type_in_t<3, unsigned, float, float, double, unsigned>>, "Trait has failed");
 	
 	static_assert(
-		std::is_same_v<
+		same<
 			filter_types_in_list<std::is_integral, type_list<int, double, float, unsigned>>::types, 
 			type_list<int, unsigned>
 		>, 
@@ -207,7 +227,7 @@ struct tests_of_traits {
 	);
 	
 	static_assert(
-		std::is_same_v<
+		same<
 		filter_types_in_list<std::is_integral, type_list<int, double, float, unsigned>>::indices,
 			std::index_sequence<0, 3>
 		>, 
@@ -215,7 +235,7 @@ struct tests_of_traits {
 	);
 	
 	static_assert(
-		!std::is_same_v<
+		!same<
 		filter_types_in_list<std::is_floating_point, type_list<int, double, float, unsigned>>::types,
 			std::tuple<int, unsigned>
 		>, 
@@ -223,17 +243,17 @@ struct tests_of_traits {
 	);
 
 	static_assert(
-		std::is_same_v<type_list<int&, double&, float&>, transform_types_in_list_t<type_list<int, double, float>, std::add_lvalue_reference_t>>,
+		same<type_list<int&, double&, float&>, transform_types_in_list_t<type_list<int, double, float>, std::add_lvalue_reference_t>>,
 		"Trait has failed."
 	);
 	
 	static_assert(
-		std::is_same_v<type_list<int, double, float>, transform_types_in_list_t<type_list<const int&, double&&, float&>, std::decay_t>>,
+		same<type_list<int, double, float>, transform_types_in_list_t<type_list<const int&, double&&, float&>, std::decay_t>>,
 		"Trait has failed."
 	);
 	
 	static_assert(
-		std::is_same_v<type_list<const int&, double&&, float&>, transform_types_in_list_t<type_list<const int&, double&&, float&>, templates_detail::identity_t>>,
+		same<type_list<const int&, double&&, float&>, transform_types_in_list_t<type_list<const int&, double&&, float&>, templates_detail::identity_t>>,
 		"Trait has failed."
 	);
 
@@ -261,12 +281,12 @@ struct tests_of_traits {
 		char a[65537];
 	};
 
-	static_assert(std::is_same_v<unsigned char, get_index_type_for_size_of_t<A>>, "Trait has failed");
-	static_assert(std::is_same_v<unsigned char, get_index_type_for_size_of_t<B>>, "Trait has failed");
-	static_assert(std::is_same_v<unsigned char, get_index_type_for_size_of_t<C>>, "Trait has failed");
-	static_assert(std::is_same_v<unsigned short, get_index_type_for_size_of_t<D>>, "Trait has failed");
-	static_assert(std::is_same_v<unsigned short, get_index_type_for_size_of_t<E>>, "Trait has failed");
-	static_assert(std::is_same_v<unsigned int, get_index_type_for_size_of_t<F>>, "Trait has failed");
+	static_assert(same<unsigned char, get_index_type_for_size_of_t<A>>, "Trait has failed");
+	static_assert(same<unsigned char, get_index_type_for_size_of_t<B>>, "Trait has failed");
+	static_assert(same<unsigned char, get_index_type_for_size_of_t<C>>, "Trait has failed");
+	static_assert(same<unsigned short, get_index_type_for_size_of_t<D>>, "Trait has failed");
+	static_assert(same<unsigned short, get_index_type_for_size_of_t<E>>, "Trait has failed");
+	static_assert(same<unsigned int, get_index_type_for_size_of_t<F>>, "Trait has failed");
 
 	//static_assert(sizeof(cosmos) < 1000000, "Possible stack overflow due to cosmos on the stack");
 

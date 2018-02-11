@@ -15,7 +15,7 @@ struct type_map_impl {
 		template <class Candidate>
 		struct match_first : std::bool_constant<std::is_same_v<typename Candidate::First, T>> {};
 
-		using type = typename find_matching_type_in_list<L, match_first>::Second;
+		using type = typename find_matching_type_in_list<match_first, L>::Second;
 	};
 
 	template <class S>
