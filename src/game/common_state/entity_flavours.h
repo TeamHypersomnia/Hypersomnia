@@ -20,7 +20,7 @@ class entity_flavour {
 	template <class D, class E>
 	static auto& get_impl(E& self) {
 		if constexpr(is_invariant_v<D>) {
-			static_assert(self.template has<D>(), "Entity type does not request this invariant.");
+			static_assert(self.template has<D>(), "Entity type does not have this invariant.");
 			return std::get<D>(self.invariants); 
 		}
 		else {

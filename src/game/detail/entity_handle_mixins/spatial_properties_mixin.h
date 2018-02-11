@@ -214,12 +214,10 @@ void spatial_properties_mixin<E>::set_logic_transform(const components::transfor
 	ensure(!this_entity_does_not_have_its_own_transform);
 	
 	if (const auto rigid_body = handle.template find<components::rigid_body>()) {
-		ensure(!handle.template has<components::transform>());
 		rigid_body.set_transform(t);
 	}
-	else {
-		handle.template get<components::transform>() = t;
-
+	else if (auto tr = handle.template find<components::transform>()) {
+		*tr = t;
 		// TODO: reinfer the npo cache where necessary
 	}
 }

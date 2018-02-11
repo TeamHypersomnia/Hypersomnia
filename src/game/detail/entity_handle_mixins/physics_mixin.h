@@ -8,13 +8,16 @@
 
 struct rigid_body_cache_info;
 
-template <class entity_handle_type>
+template <class derived_handle_type>
 class physics_mixin {
 public:
-	entity_handle_type get_owner_friction_ground() const;
+	static constexpr bool is_const = is_handle_const_v<derived_handle_type>;
+	using generic_handle_type = basic_entity_handle<is_const>;
+
+	generic_handle_type get_owner_friction_ground() const;
 	
 	auto& get_special_physics() const {
-		const auto handle = *static_cast<const entity_handle_type*>(this);
+		const auto handle = *static_cast<const derived_handle_type*>(this);
 		return handle.template get<components::rigid_body>().get_special();
 	}
 
@@ -22,7 +25,7 @@ public:
 	std::optional<colliders_connection> calculate_colliders_connection() const;
 
 	/* Shortcut for getting only the entity handle without shape offset */
-	entity_handle_type get_owner_of_colliders() const;
+	generic_handle_type get_owner_of_colliders() const;
 
 	/* Assumes that the fixtures component is found. */
 	real32 calculate_density(
@@ -34,7 +37,7 @@ public:
 };
 
 template <class E>
-E physics_mixin<E>::get_owner_friction_ground() const {
+typename physics_mixin<E>::generic_handle_type physics_mixin<E>::get_owner_friction_ground() const {
 	const auto self = *static_cast<const E*>(this);
 	return self.get_cosmos()[self.get_owner_of_colliders().get_special_physics().owner_friction_ground];
 }
@@ -101,7 +104,7 @@ std::optional<colliders_connection> physics_mixin<E>::find_colliders_connection(
 }
 
 template <class E>
-E physics_mixin<E>::get_owner_of_colliders() const {
+typename physics_mixin<E>::generic_handle_type physics_mixin<E>::get_owner_of_colliders() const {
 	const auto self = *static_cast<const E*>(this);
 	auto& cosmos = self.get_cosmos();
 

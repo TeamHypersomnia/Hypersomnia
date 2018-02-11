@@ -33,6 +33,7 @@ template <class entity_type>
 using const_iterated_entity_handle = basic_iterated_entity_handle<true, entity_type>;
 
 
+#if TODO
 template <bool C, class E>
 using basic_noid_entity_handle = specific_entity_handle<C, E, empty_id_provider>;
 
@@ -41,6 +42,7 @@ using noid_entity_handle = basic_noid_entity_handle<false, entity_type>;
 
 template <class entity_type>
 using const_noid_entity_handle = basic_noid_entity_handle<true, entity_type>;
+#endif
 
 /* Shortcut */
 

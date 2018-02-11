@@ -81,7 +81,7 @@ public:
 
 				return entity_handle(create_entity<E>(
 					cosm, 
-					flavour_id, 
+					flavour_id.raw, 
 					std::forward<P>(pre_construction)
 				));
 			}

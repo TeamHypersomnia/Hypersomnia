@@ -56,8 +56,8 @@ class cosmos {
 	) {
 		using candidate_types = typename decltype(flavour_id)::matching_types; 
 
-		return get_by_dynamic_id<candidate_types, all_entity_types>(
-			{},
+		return only_get_by_dynamic_id<candidate_types>(
+			all_entity_types(),
 			flavour_id.type_id,
 			[&](auto t) -> decltype(auto) {
 				using flavour_type = decltype(t);
@@ -67,9 +67,9 @@ class cosmos {
 	}
 
 	template <class C, class F>
-	void for_each_in_impl(C& self, const processing_subjects f, F callback) {
+	static void for_each_in_impl(C& self, const processing_subjects f, F callback) {
 		for (const auto subject : self.get_solvable_inferred().processing.get(f)) {
-			callback(f);
+			callback(self[subject]);
 		}
 	}
 
@@ -159,12 +159,12 @@ public:
 
 	template <class F>
 	void for_each_in(const processing_subjects f, F&& callback) {
-		for_each_in_impl(f, std::forward<F>(callback));
+		for_each_in_impl(*this, f, std::forward<F>(callback));
 	}
 
 	template <class F>
 	void for_each_in(const processing_subjects f, F&& callback) const {
-		for_each_in_impl(f, std::forward<F>(callback));
+		for_each_in_impl(*this, f, std::forward<F>(callback));
 	}
 
 	template <class id_type>

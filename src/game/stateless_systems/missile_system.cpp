@@ -167,7 +167,7 @@ void missile_system::detonate_expired_missiles(const logic_step step) {
 			if (maybe_sender != nullptr && missile_def.homing_towards_hostile_strength > 0.f) {
 				const auto sender_capability = cosmos[maybe_sender->capability_of_sender];
 				const auto sender_attitude = 
-					sender_capability && sender_capability.template has<components::attitude>() ? sender_capability : cosmos[entity_id()]
+					sender_capability && sender_capability.template has<components::attitude>() ? sender_capability : entity_handle::dead_handle(cosmos)
 				;
 
 				const auto particular_homing_target = cosmos[missile.particular_homing_target];

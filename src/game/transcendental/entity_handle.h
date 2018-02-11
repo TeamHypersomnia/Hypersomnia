@@ -100,6 +100,10 @@ public:
 	using misc_base::get_raw_flavour_id;
 	friend const_type;
 
+	static this_handle_type dead_handle(owner_reference owner) {
+		return { nullptr, owner, {} };
+	}
+
 	basic_entity_handle(
 		owner_reference owner, 
 		const entity_id raw_id

@@ -63,7 +63,7 @@ class cosmos_solvable {
 		const entity_id id,
 		F callback	
 	) {
-		return get_by_dynamic_id(
+		return get_by_dynamic_index(
 			self.significant.entity_pools,
 			id.type_id.get_index(),
 			[&](auto& pool) {	

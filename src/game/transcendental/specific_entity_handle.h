@@ -21,7 +21,11 @@ template <class derived_handle_type>
 struct iterated_id_provider {
 	const unsigned iteration_index;
 	
-	iterated_id_provider(const unsigned iteration_index) 
+	bool operator==(const iterated_id_provider b) const {
+		return iteration_index == b.iteration_index;
+	}
+
+	iterated_id_provider(const unsigned iteration_index = static_cast<unsigned>(-1)) 
 		: iteration_index(iteration_index) 
 	{}
 	
@@ -44,6 +48,10 @@ struct iterated_id_provider {
 template <class derived_handle_type>
 struct stored_id_provider {
 	const entity_id_base stored_id;
+
+	bool operator==(const stored_id_provider b) const {
+		return stored_id == b.stored_id;
+	}
 
 	stored_id_provider(const entity_id_base stored_id) 
 		: stored_id(stored_id) 
@@ -202,7 +210,11 @@ public:
 	}
 
 	constexpr bool alive() const {
+#if TODO
+		return !used_identifier_provider::operator==(used_identifier_provider());
+#else
 		return true;
+#endif
 	}
 
 	constexpr bool dead() const {
@@ -223,9 +235,13 @@ public:
 		);
 	}
 
-	operator basic_entity_handle<is_const>() const {
-		using void_entity_ptr = maybe_const_ptr_t<is_const, void>;
+	template <bool C>
+	operator basic_entity_handle<C>() const {
+		if constexpr(is_const && !C) {
+			static_assert(always_false_v<entity_type>, "Can't convert to a non-const generic handle");
+		}
 
+		using void_entity_ptr = maybe_const_ptr_t<is_const, void>;
 		return { static_cast<void_entity_ptr>(std::addressof(subject)), owner, get_id() };
 	}
 };

@@ -7,6 +7,13 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order:  
 
+- replace "alive"/"dead" checks with optionals of handles
+	- and assume that an existing handle always points to an entity
+	- a lot of work but it will be worth it
+	- in any case do it once everything else works
+	
+- constize entity_ptr in handle
+
 - add "direct_construction_access" for entity handles
 
 - always present should be added to the invariants or components while making

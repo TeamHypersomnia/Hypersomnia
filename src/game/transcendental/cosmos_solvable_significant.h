@@ -26,12 +26,12 @@ struct cosmos_solvable_significant {
 
 	template <class F>
 	decltype(auto) on_pool(const entity_type_id id, F&& callback) {
-		return get_by_dynamic_id(entity_pools, id.get_index(), std::forward<F>(callback));
+		return get_by_dynamic_index(entity_pools, id.get_index(), std::forward<F>(callback));
 	}
 
 	template <class F>
 	decltype(auto) on_pool(const entity_type_id id, F&& callback) const {
-		return get_by_dynamic_id(entity_pools, id.get_index(), std::forward<F>(callback));
+		return get_by_dynamic_index(entity_pools, id.get_index(), std::forward<F>(callback));
 	}
 
 	void clear();

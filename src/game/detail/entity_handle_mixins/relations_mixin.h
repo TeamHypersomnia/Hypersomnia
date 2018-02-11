@@ -21,8 +21,8 @@ template <class entity_handle_type>
 class relations_mixin {
 protected:
 	static constexpr bool is_const = is_handle_const_v<entity_handle_type>;
-
-	using inventory_slot_handle_type = basic_inventory_slot_handle<entity_handle_type>;
+	using generic_handle_type = basic_entity_handle<is_const>;
+	using inventory_slot_handle_type = basic_inventory_slot_handle<generic_handle_type>;
 
 	auto* get_id_ptr(const child_entity_name n) const {
 		const auto& self = *static_cast<const entity_handle_type*>(this);
@@ -49,7 +49,7 @@ protected:
 
 public:
 	inventory_slot_handle_type operator[](const slot_function) const;
-	entity_handle_type operator[](const child_entity_name) const;
+	generic_handle_type operator[](const child_entity_name) const;
 	
 	template <class F>
 	void for_each_child_entity_recursive(F&& callback) const {
@@ -94,7 +94,7 @@ typename relations_mixin<E>::inventory_slot_handle_type relations_mixin<E>::oper
 }
 
 template <class E>
-E relations_mixin<E>::operator[](const child_entity_name child) const {
+typename relations_mixin<E>::generic_handle_type relations_mixin<E>::operator[](const child_entity_name child) const {
 	auto& self = *static_cast<const E*>(this);
 
 	entity_id id;

@@ -10,21 +10,83 @@
 #include "game/detail/inventory/wielding_result.h"
 #include "augs/callback_result.h"
 
-template <class entity_handle_type>
+template <class derived_handle_type>
 class inventory_mixin {
-	using inventory_slot_handle_type = basic_inventory_slot_handle<entity_handle_type>;
-
 public:
+	static constexpr bool is_const = is_handle_const_v<derived_handle_type>;
+
+	using generic_handle_type = basic_entity_handle<is_const>;
+	using inventory_slot_handle_type = basic_inventory_slot_handle<generic_handle_type>;
+
 	static constexpr size_t hand_count = 2;
 	typedef std::array<entity_id, hand_count> hand_selections_array;
 
 	std::optional<unsigned> get_space_occupied() const;	
 
-	entity_handle_type get_owning_transfer_capability() const;
+	generic_handle_type get_owning_transfer_capability() const;
 	bool owning_transfer_capability_alive_and_same_as_of(const entity_id) const;
 
-	inventory_slot_handle_type determine_holstering_slot_for(const entity_handle_type holstered_item) const;
-	inventory_slot_handle_type determine_pickup_target_slot_for(const entity_handle_type picked_item) const;
+	template <class handle_type>
+	inventory_slot_handle_type determine_holstering_slot_for(const handle_type holstered_item) const {
+		const auto& searched_root_container = *static_cast<const derived_handle_type*>(this);
+		auto& cosmos = holstered_item.get_cosmos();
+
+		ensure(holstered_item.alive()) 
+		ensure(searched_root_container.alive());
+		ensure(holstered_item.get_id() != searched_root_container.get_id());
+
+		inventory_slot_id target_slot;
+
+		searched_root_container.for_each_contained_slot_recursive(
+			[&](const auto slot) {
+				if (slot.get_container() == holstered_item) {
+					return recursive_callback_result::CONTINUE_DONT_RECURSE;
+				}
+
+				if (!slot.is_hand_slot() && slot.can_contain(holstered_item)) {
+					target_slot = slot;
+					return recursive_callback_result::ABORT;
+				}
+
+				return recursive_callback_result::CONTINUE_AND_RECURSE;
+			}
+		);
+
+		return cosmos[target_slot];
+	}
+
+	template <class handle_type>
+	inventory_slot_handle_type determine_pickup_target_slot_for(const handle_type picked_item) const {
+		const auto& searched_root_container = *static_cast<const derived_handle_type*>(this);
+
+		ensure(picked_item.alive());
+		ensure(searched_root_container.alive());
+
+		auto& cosmos = picked_item.get_cosmos();
+
+		inventory_slot_id target_slot;
+
+		const auto holster_slot = searched_root_container.determine_holstering_slot_for(picked_item);
+
+		if (holster_slot.alive()) {
+			target_slot = holster_slot;
+		}
+		else {
+			searched_root_container.for_each_hand(
+				[&](const auto hand) {
+					if (hand.can_contain(picked_item)) {
+						target_slot = hand;
+
+						return callback_result::ABORT;
+					}
+
+					return callback_result::CONTINUE;
+				}
+			);
+		}
+
+		return cosmos[target_slot];
+	}
 	
 	inventory_slot_handle_type get_current_slot() const;
 
@@ -34,7 +96,7 @@ public:
 	inventory_slot_handle_type get_secondary_hand() const;
 
 	inventory_slot_handle_type get_hand_no(const size_t) const;
-	entity_handle_type get_if_any_item_in_hand_no(const size_t) const;
+	generic_handle_type get_if_any_item_in_hand_no(const size_t) const;
 
 	template <class F>
 	void for_each_hand(F callback) const {
@@ -64,7 +126,7 @@ private:
 		S slot_callback, 
 		I item_callback
 	) const {
-		const auto this_item_handle = *static_cast<const entity_handle_type*>(this);
+		const auto this_item_handle = *static_cast<const derived_handle_type*>(this);
 		auto& cosm = this_item_handle.get_cosmos();
 
 		if (const auto container = this_item_handle.template find<invariants::container>()) {
@@ -142,7 +204,7 @@ std::optional<unsigned> inventory_mixin<E>::get_space_occupied() const {
 }
 
 template <class E>
-E inventory_mixin<E>::get_owning_transfer_capability() const {
+typename inventory_mixin<E>::generic_handle_type inventory_mixin<E>::get_owning_transfer_capability() const {
 	const auto& self = *static_cast<const E*>(this);
 	auto& cosmos = self.get_cosmos();
 
@@ -204,7 +266,7 @@ typename inventory_mixin<E>::inventory_slot_handle_type inventory_mixin<E>::get_
 }
 
 template <class E>
-E inventory_mixin<E>::get_if_any_item_in_hand_no(const size_t index) const {
+typename inventory_mixin<E>::generic_handle_type inventory_mixin<E>::get_if_any_item_in_hand_no(const size_t index) const {
 	const auto& self = *static_cast<const E*>(this);
 	const auto hand = self.get_hand_no(index);
 
@@ -274,68 +336,6 @@ inventory_item_address inventory_mixin<E>::get_address_from_root(const entity_id
 	std::reverse(output.directions.begin(), output.directions.end());
 
 	return output;
-}
-
-template <class E>
-typename inventory_mixin<E>::inventory_slot_handle_type inventory_mixin<E>::determine_holstering_slot_for(const E holstered_item) const {
-	const auto& searched_root_container = *static_cast<const E*>(this);
-	auto& cosmos = holstered_item.get_cosmos();
-
-	ensure(holstered_item.alive()) 
-	ensure(searched_root_container.alive());
-	ensure(holstered_item != searched_root_container);
-
-	inventory_slot_id target_slot;
-
-	searched_root_container.for_each_contained_slot_recursive(
-		[&](const auto slot) {
-			if (slot.get_container() == holstered_item) {
-				return recursive_callback_result::CONTINUE_DONT_RECURSE;
-			}
-
-			if (!slot.is_hand_slot() && slot.can_contain(holstered_item)) {
-				target_slot = slot;
-				return recursive_callback_result::ABORT;
-			}
-
-			return recursive_callback_result::CONTINUE_AND_RECURSE;
-		}
-	);
-
-	return cosmos[target_slot];
-}
-
-template <class E>
-typename inventory_mixin<E>::inventory_slot_handle_type inventory_mixin<E>::determine_pickup_target_slot_for(const E picked_item) const {
-	const auto& searched_root_container = *static_cast<const E*>(this);
-
-	ensure(picked_item.alive());
-	ensure(searched_root_container.alive());
-
-	auto& cosmos = picked_item.get_cosmos();
-
-	inventory_slot_id target_slot;
-
-	const auto holster_slot = searched_root_container.determine_holstering_slot_for(picked_item);
-
-	if (holster_slot.alive()) {
-		target_slot = holster_slot;
-	}
-	else {
-		searched_root_container.for_each_hand(
-			[&](const auto hand) {
-				if (hand.can_contain(picked_item)) {
-					target_slot = hand;
-
-					return callback_result::ABORT;
-				}
-
-				return callback_result::CONTINUE;
-			}
-		);
-	}
-
-	return cosmos[target_slot];
 }
 
 template <class E>
