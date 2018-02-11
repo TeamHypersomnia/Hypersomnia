@@ -12,9 +12,6 @@ summary: Just a hidden scratchpad.
 	- assert with component introspectors that no entity_ids, pointers, unversioned_ids are stored
 		- revive from cosmic delta tests
 
-- remove introspectors from container and manually insert for (auto) s for introspection
-	- or else do it automatically for unary introspectors
-- if a cons
 - let allocators return typed entity ids and let subscript getters return typed handles
 
 - replace "alive"/"dead" checks with optionals of handles
@@ -151,6 +148,13 @@ summary: Just a hidden scratchpad.
 	- or it can be part of inferred state which will complicate things a little
 
 ## Later
+- if a constant size vector needs to be introspected for example for description of fields in a component,
+	add some special case code that checks if it is a container or something else
+	- padding checker should just check the value type?
+		- maybe we should ditch padding checks whatsoever
+			- at least for the interior of the container, useless totally
+				- maybe just verify the value type
+
 - add "direct_construction_access" for entity handles
 
 - fix errors at unit tests when not statically allocating 
@@ -160,7 +164,7 @@ summary: Just a hidden scratchpad.
 	- if we want to have a group wherein a weapon is spawned with a magazine, we can simply set the inventory slot ids beforehand.
 		- We might detect errors early on and disallow some configurations or not care and just throw cosmos_inconsistent_error.
 		- Group ids will not be creatable from the logic anyway?
-			- Could be useful later for spawning cars etc
+			- Could be useful later for spawning cars or character via the logic etc
 - traces
 	- maybe traces should be audiovisual?
 	- fix the feel of traces (maybe shrink them only horizontally?)

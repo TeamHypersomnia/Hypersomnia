@@ -22,8 +22,6 @@ ForwardIt binary_find(ForwardIt first, ForwardIt last, const T& value, Compare c
 }
 
 namespace augs {
-	struct introspection_access;
-
 	template <class T, unsigned const_count>
 	class constant_size_vector_base {
 	public:
@@ -40,12 +38,8 @@ namespace augs {
 			sizeof(value_type) * const_count, alignof(value_type)
 		>;
 		
-		// GEN INTROSPECTOR class augs::constant_size_vector_base class T unsigned const_count
 		size_type count = 0;
 		storage_type raw = storage_type();
-		// END GEN INTROSPECTOR
-
-		friend augs::introspection_access;
 
 		auto& as_value_array() {
 			return reinterpret_cast<value_array&>(raw);
@@ -266,10 +260,6 @@ namespace augs {
 			return { begin(), end() };
 		}
 	};
-
-	// GEN INTROSPECTOR class augs::constant_size_vector class T unsigned const_count class dummy
-	// INTROSPECT BASE augs::constant_size_vector_base<T, const_count>
-	// END GEN INTROSPECTOR
 
 	template <class T, unsigned N>
 	class constant_size_vector<T, N, std::enable_if_t<std::is_trivially_copyable_v<T>>>

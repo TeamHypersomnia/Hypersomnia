@@ -9,8 +9,6 @@
 #include "augs/misc/declare_containers.h"
 
 namespace augs {
-	struct introspection_access;
-
 	template <class Enum, class T>
 	class enum_associative_array_base {
 	public:
@@ -30,12 +28,8 @@ namespace augs {
 		);
 #endif
 
-		using storage_type = std::array<
-			std::conditional_t<is_trivially_copyable && is_default_constructible,
-				mapped_type,
-				std::aligned_storage_t<sizeof(mapped_type), alignof(mapped_type)>
-			>,
-			max_n
+		using storage_type = std::aligned_storage_t<
+			sizeof(mapped_type) * max_n, alignof(mapped_type)
 		>;
 
 		//using storage_type = std::array<
@@ -44,13 +38,9 @@ namespace augs {
 		//>;
 
 		using flagset_type = augs::enum_boolset<Enum>;
-		friend augs::introspection_access;
 
-		/* Introspection will fail if the storage type involves an aligned storage */
-		// GEN INTROSPECTOR class augs::enum_associative_array_base class key_type class mapped_type
 		flagset_type is_value_set;
-		storage_type data;
-		// END GEN INTROSPECTOR
+		storage_type data = storage_type();
 		
 		bool is_set(const size_type index) const {
 			return is_value_set.test(static_cast<Enum>(index));
@@ -71,11 +61,11 @@ namespace augs {
 		}
 
 		auto& nth(const size_type n) {
-			return *reinterpret_cast<mapped_type*>(&data[n]);
+			return reinterpret_cast<mapped_type*>(&data)[n];
 		}
 
 		const auto& nth(const size_type n) const {
-			return *reinterpret_cast<const mapped_type*>(&data[n]);
+			return reinterpret_cast<const mapped_type*>(&data)[n];
 		}
 
 	public:
@@ -240,10 +230,6 @@ namespace augs {
 			is_value_set = flagset_type();
 		}
 	};
-
-	// GEN INTROSPECTOR class augs::enum_associative_array class key_type class mapped_type class dummy
-	// INTROSPECT BASE augs::enum_associative_array_base<key_type, mapped_type>
-	// END GEN INTROSPECTOR
 
 	template <class Enum, class T>
 	class enum_associative_array<Enum, T, std::enable_if_t<std::is_trivially_copyable_v<T>>>
