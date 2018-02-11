@@ -4,7 +4,7 @@
 #include "game/transcendental/cosmos.h"
 
 void flavour_id_cache::infer_cache_for(const const_entity_handle h) {
-	entities_by_flavour_id[h.get_flavour_id()].emplace(id.get_id());
+	entities_by_flavour_id[h.get_flavour_id()].emplace(h.get_id());
 }
 
 void flavour_id_cache::destroy_cache_of(const const_entity_handle h) {

@@ -56,7 +56,7 @@ public:
 		const auto self = *static_cast<const entity_handle_type*>(this);
 		auto& cosmos = self.get_cosmos();
 
-		self.get().for_each(
+		self.for_each_component(
 			[&cosmos, &callback](const auto& subject_component) {
 				augs::introspect(
 					[&](auto, const auto& member) {

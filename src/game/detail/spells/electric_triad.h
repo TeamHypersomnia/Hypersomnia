@@ -18,10 +18,16 @@ struct electric_triad_instance {
 struct electric_triad {
 	using instance = electric_triad_instance;
 
+	using missile_flavour_type = constrained_entity_flavour_id<
+		invariants::rigid_body, 
+		invariants::missile, 
+		components::sender
+	>;
+
 	// GEN INTROSPECTOR struct electric_triad
 	spell_common_data common;
 	spell_appearance appearance;
-	entity_flavour_id missile_flavour;
+	missile_flavour_type missile_flavour;
 	// END GEN INTROSPECTOR
 
 	unsigned get_spell_logic_duration_ms() const {
