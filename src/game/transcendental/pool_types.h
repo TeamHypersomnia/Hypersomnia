@@ -2,8 +2,10 @@
 #include <tuple>
 
 #include "augs/misc/declare_containers.h"
+#include "augs/misc/pool/pool_declaration.h"
+
 #include "game/transcendental/pool_size_type.h"
-#include "game/organization/all_entity_types_declaration.h"
+#include "game/organization/all_entity_types.h"
 
 static constexpr bool statically_allocate_entities = STATICALLY_ALLOCATE_ENTITIES;
 

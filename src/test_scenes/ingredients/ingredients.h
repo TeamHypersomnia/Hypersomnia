@@ -11,7 +11,10 @@
 
 #include "game/components/render_component.h"
 #include "game/components/sprite_component.h"
+
 #include "test_scenes/test_scene_flavours.h"
+#include "test_scenes/ingredients/box_physics.h"
+#include "test_scenes/ingredients/sprite.h"
 
 namespace components {
 	struct item;

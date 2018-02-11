@@ -4,6 +4,7 @@
 #include "augs/misc/timing/delta.h"
 #include "augs/misc/randomization_declaration.h"
 
+#include "augs/templates/type_templates.h"
 #include "augs/templates/introspection_utils/rewrite_members.h"
 #include "augs/templates/for_each_std_get.h"
 
@@ -68,6 +69,26 @@ class cosmos_solvable {
 			id.type_id.get_index(),
 			[&](auto& pool) {	
 				return callback(pool.find(id.basic()));
+			}
+		);
+	}
+
+	template <class... Constraints, class S, class F>
+	static void for_each_entity_impl(S& self, F callback) {
+		self.for_each_pool(
+			[&](auto& p) {
+				using P = decltype(p);
+				using pool_type = std::decay_t<P>;
+
+				using E = type_argument_t<typename pool_type::mapped_type>;
+
+				if constexpr(has_invariants_or_components_v<E, Constraints...>) {
+					using index_type = typename pool_type::used_size_type;
+
+					for (index_type i = 0; i < p.size(); ++i) {
+						callback(p.data()[i], i);
+					}
+				}
 			}
 		);
 	}
@@ -183,7 +204,19 @@ public:
 		);
 	}
 
+	template <class... Constraints, class F>
+	void for_each_entity(F&& callback) {
+		for_each_entity_impl(*this, std::forward<F>(callback));
+	}
+	
+	template <class... Constraints, class F>
+	void for_each_entity(F&& callback) const {
+		for_each_entity_impl(*this, std::forward<F>(callback));
+	}
+
 	bool empty() const;
+
+	void remap_guids();
 
 	const auto& get_guid_to_id() const {
 		return guid_to_id;

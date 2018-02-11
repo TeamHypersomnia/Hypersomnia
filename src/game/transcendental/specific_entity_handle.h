@@ -8,6 +8,7 @@
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/transcendental/specific_entity_handle_declaration.h"
 #include "game/transcendental/entity_solvable.h"
+#include "game/transcendental/cosmos_solvable_access.h"
 
 #include "game/detail/entity_handle_mixins/all_handle_mixins.h"
 #include "game/common_state/entity_flavours.h"
@@ -125,6 +126,18 @@ public:
 
 	using used_entity_type = entity_type;
 
+	const auto& get_meta() const {
+		return static_cast<const entity_solvable_meta&>(subject);
+	};
+
+	auto& get(cosmos_solvable_access) const {
+		return subject;
+	}
+
+	const auto& get() const {
+		return subject;
+	}
+
 	template <class T>
 	static constexpr bool has() {
 		return 
@@ -163,18 +176,6 @@ public:
 				return *find<T>();
 			}
 		}
-	}
-
-	const auto& get_meta() const {
-		return static_cast<const entity_solvable_meta&>(subject);
-	};
-
-	auto& get(cosmos_solvable_access) const {
-		return subject;
-	}
-
-	const auto& get() const {
-		return subject;
 	}
 
 	auto& get_cosmos() const {
@@ -230,7 +231,7 @@ public:
 	void for_each_component(F&& callback) const {
 		const auto& immutable_subject = subject;
 
-		for_each_std_through_get(
+		for_each_through_std_get(
 			immutable_subject.components, 
 			std::forward<F>(callback)
 		);

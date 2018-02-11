@@ -241,13 +241,11 @@ set(HYPERSOMNIA_BOX2D_CPPS
 set(HYPERSOMNIA_TEST_SCENES_CPPS
 	"src/test_scenes/ingredients/artificial_life.cpp"
 	"src/test_scenes/ingredients/backpack.cpp"
-	"src/test_scenes/ingredients/box_physics.cpp"
 	"src/test_scenes/ingredients/car.cpp"
 	"src/test_scenes/ingredients/guns.cpp"
 	"src/test_scenes/ingredients/ingredients.cpp"
 	"src/test_scenes/ingredients/melee_weapons.cpp"
 	"src/test_scenes/ingredients/obstacles.cpp"
-	"src/test_scenes/ingredients/sprite.cpp"
 	"src/test_scenes/ingredients/wsad_player.cpp"
 	"src/test_scenes/ingredients/grenades.cpp"
 	

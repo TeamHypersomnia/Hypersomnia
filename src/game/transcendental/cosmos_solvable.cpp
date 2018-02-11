@@ -45,6 +45,18 @@ void cosmos_solvable::destroy_all_caches() {
 #endif
 }
 
+void cosmos_solvable::remap_guids() {
+	auto& guids = guid_to_id;
+	guids.clear();
+
+	for_each_entity([&](auto& subject, const auto iteration_index) {
+		using P = type_argument_t<std::decay_t<decltype(subject)>>;
+
+		const auto id = significant.template get_pool<P>().to_id(iteration_index);
+		guids[subject.guid] = id;
+	});
+}
+
 void cosmos_solvable::increment_step() {
 	++significant.clock.now.step;
 }

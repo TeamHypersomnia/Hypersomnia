@@ -47,13 +47,7 @@ void cosmic::reinfer_all_entities(cosmos& cosm) {
 void cosmic::reinfer_solvable(cosmos& cosm) {
 	auto& solvable = cosm.get_solvable({});
 
-	auto& guids = solvable.guid_to_id;
-	guids.clear();
-
-	for_each_entity(cosm, [this](const auto handle) {
-		guids[handle.get_guid()] = handle.get_id();
-	});
-
+	solvable.remap_guids();
 	reinfer_all_entities(cosm);
 }
 
