@@ -59,18 +59,25 @@ class cosmos_solvable {
 	void clear_guid(const entity_id);
 
 	template <class C, class F>
-	static decltype(auto) on_entity_impl(
+	static decltype(auto) on_entity_meta_impl(
 		C& self,
 		const entity_id id,
 		F callback	
 	) {
-		return get_by_dynamic_index(
-			self.significant.entity_pools,
-			id.type_id.get_index(),
-			[&](auto& pool) {	
-				return callback(pool.find(id.basic()));
-			}
-		);
+		using meta_ptr = maybe_const_ptr_t<std::is_const_v<C>, entity_solvable_meta>;
+
+		if (id.type_id.is_set()) {
+			return get_by_dynamic_index(
+				self.significant.entity_pools,
+				id.type_id.get_index(),
+				[&](auto& pool) -> decltype(auto) {	
+					return callback(static_cast<meta_ptr>(pool.find(id.basic())));
+				}
+			);
+		}
+		else {
+			return callback(static_cast<meta_ptr>(nullptr));
+		}
 	}
 
 	template <class... Constraints, class S, class F>
@@ -137,14 +144,7 @@ public:
 		return rewrite_members_and_transform_templated_type_into<entity_guid>(
 			id_source,
 			[this](auto& guid_member, const auto& id_member) {
-				on_entity(id_member, [&](const auto* e){ 
-					if (e) {
-						guid_member = e->guid;
-					}
-					else {
-						guid_member = entity_guid();
-					}
-				});
+				guid_member = get_guid(id_member);
 			}
 		);
 	}
@@ -223,23 +223,23 @@ public:
 	}
 
 	template <class F>
-	decltype(auto) on_entity(const entity_id id, F&& callback) {
-		return on_entity_impl(*this, id, std::forward<F>(callback));
+	decltype(auto) on_entity_meta(const entity_id id, F&& callback) {
+		return on_entity_meta_impl(*this, id, std::forward<F>(callback));
 	}	
 
 	template <class F>
-	decltype(auto) on_entity(const entity_id id, F&& callback) const {
-		return on_entity_impl(*this, id, std::forward<F>(callback));
+	decltype(auto) on_entity_meta(const entity_id id, F&& callback) const {
+		return on_entity_meta_impl(*this, id, std::forward<F>(callback));
 	}	
 
 	template <class F>
-	decltype(auto) on_entity(const entity_guid id, F&& callback) {
-		return on_entity_impl(*this, get_entity_id_by(id), std::forward<F>(callback));
+	decltype(auto) on_entity_meta(const entity_guid id, F&& callback) {
+		return on_entity_meta_impl(*this, get_entity_id_by(id), std::forward<F>(callback));
 	}	
 
 	template <class F>
-	decltype(auto) on_entity(const entity_guid id, F&& callback) const {
-		return on_entity_impl(*this, get_entity_id_by(id), std::forward<F>(callback));
+	decltype(auto) on_entity_meta(const entity_guid id, F&& callback) const {
+		return on_entity_meta_impl(*this, get_entity_id_by(id), std::forward<F>(callback));
 	}	
 };
 
@@ -274,6 +274,15 @@ inline std::size_t cosmos_solvable::get_entities_count() const {
 }
 
 inline entity_guid cosmos_solvable::get_guid(const entity_id id) const {
-	return on_entity(id, [](const auto* const e) { return e->guid; });
+	return on_entity_meta(
+		id, 
+		[](const entity_solvable_meta* const e) { 
+			if (e) {
+				return e->guid;
+			}	 
+
+			return entity_guid();
+		}
+	);
 }
 

@@ -51,31 +51,6 @@ void cosmic::reinfer_solvable(cosmos& cosm) {
 	reinfer_all_entities(cosm);
 }
 
-entity_handle cosmic::create_entity(
-	cosmos& cosm,
-   	const entity_flavour_id flavour_id,
-   	const components::transform where
-) {
-	return create_entity(
-		cosm, 
-		flavour_id, 
-		[where](const auto handle) {
-			handle.set_logic_transform(where);		
-		}
-	);
-}
-
-entity_handle cosmic::create_entity(
-	cosmos& cosm,
-   	const entity_flavour_id flavour_id
-) {
-	return create_entity(
-		cosm, 
-		flavour_id, 
-		[](const auto handle) {}
-	);
-}
-
 entity_handle cosmic::clone_entity(const entity_handle source_entity) {
 	auto& cosmos = source_entity.get_cosmos();
 

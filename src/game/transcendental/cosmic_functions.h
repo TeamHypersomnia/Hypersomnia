@@ -67,6 +67,15 @@ public:
 		return handle;
 	}
 
+	template <class C, class E, class P>
+	static entity_handle create_entity(
+		C& cosm,
+		const typed_entity_flavour_id<E> flavour_id,
+		P&& pre_construction
+	) {
+		return specific_create_entity<E>(cosm, flavour_id.raw, std::forward<P>(pre_construction));
+	}
+
 	template <class C, class... Types, class P>
 	static entity_handle create_entity(
 		C& cosm,
@@ -89,17 +98,6 @@ public:
 			}
 		);
 	}
-
-	static entity_handle create_entity(
-		cosmos&, 
-		entity_flavour_id
-	);
-
-	static entity_handle create_entity(
-		cosmos&, 
-		entity_flavour_id,
-		components::transform where
-	);
 
 #if TODO
 	static entity_handle create_entity_with_specific_guid(

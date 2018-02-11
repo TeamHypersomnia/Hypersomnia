@@ -80,7 +80,8 @@ void trace_system::spawn_finishing_traces_for_deleted_entities(const logic_step 
 
 			const auto finishing_trace = cosmic::create_entity(
 				cosmos, 
-				trace_def.finishing_trace_flavour
+				trace_def.finishing_trace_flavour,
+				[](const auto){}
 			);
 		
 			auto transform_of_finishing = deleted_entity.get_logic_transform();

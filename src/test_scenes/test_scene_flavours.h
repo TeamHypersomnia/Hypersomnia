@@ -138,9 +138,31 @@ inline auto to_entity_flavour_id(const T enum_id) {
 	return typed_entity_flavour_id<E>(to_raw_flavour_id(enum_id));
 }
 
-template <class C, class E, class... Args>
-auto create_test_scene_entity(C& cosm, const E enum_flavour, Args&&... args) {
-	return cosmic::create_entity(cosm, to_entity_flavour_id(enum_flavour), std::forward<Args>(args)...);
+template <class T>
+auto transform_setter(const T& where) {
+	return [where](const auto handle) {
+		handle.set_logic_transform(where);		
+	};
+}
+
+template <class C, class E, class F>
+auto create_test_scene_entity(C& cosm, const E enum_flavour, F&& callback) {
+	return cosmic::create_entity(cosm, to_entity_flavour_id(enum_flavour), std::forward<F>(callback));
+}
+
+template <class C, class E>
+auto create_test_scene_entity(C& cosm, const E enum_flavour, const vec2 pos) {
+	return cosmic::create_entity(cosm, to_entity_flavour_id(enum_flavour), transform_setter(pos));
+}
+
+template <class C, class E>
+auto create_test_scene_entity(C& cosm, const E enum_flavour, const components::transform where) {
+	return cosmic::create_entity(cosm, to_entity_flavour_id(enum_flavour), transform_setter(where));
+}
+
+template <class C, class E>
+auto create_test_scene_entity(C& cosm, const E enum_flavour) {
+	return cosmic::create_entity(cosm, to_entity_flavour_id(enum_flavour), [](const auto) {});
 }
 
 template <class T>

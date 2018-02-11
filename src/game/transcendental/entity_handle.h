@@ -90,7 +90,7 @@ class basic_entity_handle :
 		owner_reference owner, 
 		const entity_id raw_id
 	) {
-		return owner.get_solvable({}).on_entity(raw_id, [&](auto* const agg) {
+		return owner.get_solvable({}).on_entity_meta(raw_id, [&](auto* const agg) {
 			return reinterpret_cast<entity_ptr>(agg);	
 		});
 	}
