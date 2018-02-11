@@ -11,70 +11,96 @@
 #include "augs/templates/format_enum.h"
 
 enum class test_static_lights {
+	// GEN INTROSPECTOR enum class test_static_lights
 	STRONG_LAMP = 1
+	// END GEN INTROSPECTOR
 };
 
 enum class test_sprite_decorations {
+	// GEN INTROSPECTOR enum class test_sprite_decorations
 	HAVE_A_PLEASANT = 1,
 	STREET,
 	ROAD_DIRT,
 	ROAD,
 	AWAKENING,
 	METROPOLIS
+	// END GEN INTROSPECTOR
 };
 
 enum class test_controlled_characters {
+	// GEN INTROSPECTOR enum class test_controlled_characters
 	PLAYER = 1
+	// END GEN INTROSPECTOR
 };
 
 enum class test_plain_invisible_bodys {
+	// GEN INTROSPECTOR enum class test_plain_invisible_bodys
 	CROSSHAIR_RECOIL_BODY = 1
+	// END GEN INTROSPECTOR
 };
 
 enum class test_plain_sprited_bodys {
+	// GEN INTROSPECTOR enum class test_plain_sprited_bodys
 	CRATE = 1,
 	CYAN_SHELL_DEFINITION,
 	BRICK_WALL
+	// END GEN INTROSPECTOR
 };
 
 enum class test_shootable_weapons {
+	// GEN INTROSPECTOR enum class test_shootable_weapons
 	SAMPLE_RIFLE = 1,
 	KEK9,
 	AMPLIFIER_ARM
+	// END GEN INTROSPECTOR
 };
 
 enum class test_shootable_charges {
+	// GEN INTROSPECTOR enum class test_shootable_charges
 	CYAN_CHARGE = 1
+	// END GEN INTROSPECTOR
 };
 
 enum class test_wandering_pixels_decorations {
+	// GEN INTROSPECTOR enum class test_wandering_pixels_decorations
 	WANDERING_PIXELS = 1
+	// END GEN INTROSPECTOR
 };
 
 enum class test_throwable_explosives {
+	// GEN INTROSPECTOR enum class test_throwable_explosives
 	FORCE_GRENADE = 1,
 	PED_GRENADE,
 	INTERFERENCE_GRENADE
+	// END GEN INTROSPECTOR
 };
 
 enum class test_plain_missiles {
+	// GEN INTROSPECTOR enum class test_plain_missiles
 	CYAN_ROUND_DEFINITION = 1,
 	AMPLIFIER_ARM_MISSILE,
 	ELECTRIC_MISSILE
+	// END GEN INTROSPECTOR
 };
 
 enum class test_finishing_traces {
+	// GEN INTROSPECTOR enum class test_finishing_traces
 	CYAN_ROUND_FINISHING_TRACE = 1,
 	ENERGY_BALL_FINISHING_TRACE
+	// END GEN INTROSPECTOR
 };
 
 enum class test_container_items {
+	// GEN INTROSPECTOR enum class test_container_items
 	SAMPLE_BACKPACK = 1,
 	SAMPLE_MAGAZINE
+	// END GEN INTROSPECTOR
 };
 
 enum class test_explosive_missiles {
-
+	// GEN INTROSPECTOR enum class test_explosive_missiles
+	INVALID
+	// END GEN INTROSPECTOR
 };
 
 using test_flavours_map = type_map<
@@ -102,16 +128,14 @@ URBAN_CYAN_MACHETE
 #endif
 
 template <class T>
-inline auto to_raw_flavour_id(const T id) {
-	return static_cast<raw_entity_flavour_id>(id);
+inline auto to_raw_flavour_id(const T enum_id) {
+	return static_cast<raw_entity_flavour_id>(static_cast<unsigned>(enum_id));
 }
 
 template <class T>
 inline auto to_entity_flavour_id(const T enum_id) {
-	entity_flavour_id id;
-	id.type_id.set<test_flavours_map::at<T>>();
-	id.raw = to_raw_flavour_id(enum_id);
-	return id;
+	using E = test_flavours_map::at<T>;
+	return typed_entity_flavour_id<E>(to_raw_flavour_id(enum_id));
 }
 
 template <class C, class E, class... Args>

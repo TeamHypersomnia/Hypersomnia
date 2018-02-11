@@ -424,7 +424,7 @@ namespace test_scenes {
 				}
 
 				for (int r = 0; r < 38; ++r) {
-					const vec2 size = test_sprite_decorations.at(assets::game_image_id::ROAD).get_size();
+					const vec2 size = metas.at(assets::game_image_id::ROAD).get_size();
 
 					auto road = create_test_scene_entity(world, test_sprite_decorations::ROAD, components::transform{ vec2(-3 - 16 + 100 + 160 + 80 + size.x / 2, -32 - 96 + 160 + 80 + size.y / 2 + size.y*r) });
 				}

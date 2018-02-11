@@ -29,7 +29,7 @@ namespace test_flavours {
 	void populate_gun_types(const loaded_game_image_caches& logicals, all_entity_flavours& flavours) {
 		/* Types for bullets etc. */
 
-		auto make_default_gun_container = [](entity_flavour& meta, const float mag_rotation = -90.f, const bool magazine_hidden = false){
+		auto make_default_gun_container = [](auto& meta, const float mag_rotation = -90.f, const bool magazine_hidden = false){
 			invariants::container container; 
 
 			{

@@ -110,22 +110,29 @@ public:
 #endif
 
 	template <class E>
-	static auto specific_clone_entity(const const_typed_entity_handle<E> source_entity) {
+	static auto specific_clone_entity(const typed_entity_handle<E> source_entity) {
 		auto& cosmos = source_entity.get_cosmos();
 
-		return specific_create_entity<E>(cosmos, source_entity.get_flavour_id(), [&](const auto new_entity) {
+		return specific_create_entity<E>(cosmos, source_entity.get_raw_flavour_id(), [&](const auto new_entity) {
+			const auto& source_components = source_entity.get({}).components;
 			auto& new_components = new_entity.get({}).components;
-			new_components = source_entity.get({}).components;
 
-			if (new_components.template has<components::item>()) {
-				new_components.template get<components::item>().current_slot.unset();
+			/* Initial copy-assignment */
+			new_components = source_components; 
+
+			/* Corrections */
+			if constexpr(new_entity.template has<components::item>()) {
+				std::get<components::item>(new_components).current_slot.unset();
 			}
 
+			/* Cloning the children recursively */
+#if TODO
+			/* TODO: remove child_entity_id from code and introduce groups */
 			{
-				new_components.for_each([&](auto& cloned_to_component) {
+				for_each_through_std_get(new_components, [&](auto& cloned_to_component) {
 					using component_type = std::decay_t<decltype(cloned_to_component)>;
 
-					const auto& cloned_from_component = source_entity.get({}).template get<component_type>();
+					const auto& cloned_from_component = std::get<component_type>(source_components);
 
 					if constexpr(allows_nontriviality_v<component_type>) {
 						component_type::clone_children(
@@ -150,12 +157,13 @@ public:
 					}
 				});
 			}
+#endif
 
 			return new_entity;
 		});
 	}
 
-	static entity_handle clone_entity(const const_entity_handle source_entity);
+	static entity_handle clone_entity(const entity_handle source_entity);
 
 	static void delete_entity(const entity_handle);
 

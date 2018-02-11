@@ -8,8 +8,6 @@
 
 namespace components {
 	struct force_joint {
-		static constexpr bool allow_nontriviality = true;
-
 		// GEN INTROSPECTOR struct components::force_joint
 
 		float force_towards_chased_entity = 8000.f;

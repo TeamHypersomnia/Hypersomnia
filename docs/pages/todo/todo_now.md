@@ -7,6 +7,8 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order:  
 
+- remove introspectors from container and manually insert for (auto) s for introspection
+	- or else do it automatically for unary introspectors
 - if a cons
 - let allocators return typed entity ids and let subscript getters return typed handles
 - replace "alive"/"dead" checks with optionals of handles

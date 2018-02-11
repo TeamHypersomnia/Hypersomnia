@@ -21,12 +21,12 @@ void processing_lists_cache::destroy_cache_of(const const_entity_handle handle) 
 void processing_lists_cache::infer_cache_for(const const_entity_handle handle) {
 	const auto id = handle.get_id();
 
-	const auto it = rigid_body_caches.try_emplace(id);
+	const auto it = per_entity_cache.try_emplace(id);
 	auto& cache = (*it.first).second;
 
 	all_processing_flags new_flags;
 
-	if (handle.get_flag(entity_flag::IS_PAST_CONTAGIOUS) {
+	if (handle.get_flag(entity_flag::IS_PAST_CONTAGIOUS)) {
 		new_flags.set(processing_subjects::WITH_ENABLED_PAST_CONTAGIOUS);
 	}
 
@@ -46,7 +46,7 @@ void processing_lists_cache::infer_cache_for(const const_entity_handle handle) {
 		}
 	});
 
-	cache.recorded_flags = flags;
+	cache.recorded_flags = new_flags;
 }
 
 void processing_lists_cache::reserve_caches_for_entities(size_t n) {

@@ -14,12 +14,4 @@ void populate_test_scene_flavours(const loaded_game_image_caches& logicals, all_
 	test_flavours::populate_crate_types(logicals, into);
 	test_flavours::populate_melee_types(logicals, into);
 	test_flavours::populate_backpack_types(logicals, into);
-
-	/* Let all renderables have interpolation by default */
-
-	for (auto& t : into.flavours) {
-		if (t.find<invariants::render>()) {
-			t.set(invariants::interpolation());
-		}
-	}
 }

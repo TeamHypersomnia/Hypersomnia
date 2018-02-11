@@ -59,7 +59,7 @@ namespace test_flavours {
 			test_flavours::add_sprite(
 				meta, 
 				logicals,
-				test_sprite_decorations::game_image_id::HAVE_A_PLEASANT,
+				assets::game_image_id::HAVE_A_PLEASANT,
 				white
 			);
 		}
@@ -100,7 +100,7 @@ namespace test_flavours {
 				meta.set(render_def);
 			}
 			test_flavours::add_sprite(meta, logicals,
-						test_sprite_decorations::game_image_id::ROAD, white);
+						assets::game_image_id::ROAD, white);
 		}
 		{
 			auto& meta = get_test_flavour(flavours, test_sprite_decorations::AWAKENING);
@@ -112,7 +112,7 @@ namespace test_flavours {
 				meta.set(render_def);
 			}
 			test_flavours::add_sprite(meta, logicals,
-			test_sprite_decorations::game_image_id::AWAKENING,
+			assets::game_image_id::AWAKENING,
 			white,
 			invariants::sprite::special_effect::COLOR_WAVE
 		);
@@ -127,7 +127,7 @@ namespace test_flavours {
 				meta.set(render_def);
 			}
 			test_flavours::add_sprite(meta, logicals,
-					test_sprite_decorations::game_image_id::METROPOLIS,
+					assets::game_image_id::METROPOLIS,
 					white);
 		}
 	}

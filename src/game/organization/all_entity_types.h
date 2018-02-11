@@ -16,6 +16,7 @@ struct controlled_character {
 		invariants::movement,
 		invariants::shape_polygon,
 
+		invariants::crosshair,
 		invariants::sentience,
 		invariants::container,
 
@@ -30,6 +31,7 @@ struct controlled_character {
 		components::movement,
 
 		components::item_slot_transfers,
+		components::crosshair,
 		components::sentience,
 
 		components::animation,
@@ -195,6 +197,8 @@ struct throwable_explosive {
 		invariants::render,
 		invariants::hand_fuse,
 		invariants::explosive,
+		invariants::rigid_body,
+		invariants::fixtures,
 		invariants::shape_polygon,
 
 		invariants::interpolation

@@ -145,7 +145,6 @@ namespace test_flavours {
 
 		{
 			auto& meta = get_test_flavour(flavours, test_plain_invisible_bodys::CROSSHAIR_RECOIL_BODY);
-			add_sprite(meta, logicals, assets::game_image_id::TEST_CROSSHAIR);
 
 			invariants::shape_polygon shape_polygon_def;
 			shape_polygon_def.shape.make_box({ 33, 33 });
@@ -185,7 +184,7 @@ namespace prefabs {
 
 		auto recoil = create_test_scene_entity(world, test_plain_invisible_bodys::CROSSHAIR_RECOIL_BODY);
 
-		test_plain_invisible_bodys.map_child_entity(child_entity_name::CROSSHAIR_RECOIL_BODY, recoil);
+		character.map_child_entity(child_entity_name::CROSSHAIR_RECOIL_BODY, recoil);
 		// LOG("Character mass: %x", character.get<components::rigid_body>().get_mass());
 		return character;
 	}

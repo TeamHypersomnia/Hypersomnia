@@ -44,14 +44,10 @@ namespace test_flavours {
 
 namespace prefabs {
 	entity_handle create_cyan_urban_machete(const logic_step step, vec2 pos) {
-#if TODO
-		const auto machete = create_test_scene_entity(step.get_cosmos(), test_scene_flavour::URBAN_CYAN_MACHETE, pos);
+		// TODO: spawn a machete actually
 
-		machete += components::melee();
-		machete += components::sender();
-
+		const auto machete = create_test_scene_entity(step.get_cosmos(), test_throwable_explosives::FORCE_GRENADE, pos);
 		return machete;
-#endif
 	}
 }
 
