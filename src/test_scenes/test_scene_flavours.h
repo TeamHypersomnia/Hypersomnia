@@ -107,15 +107,16 @@ inline auto to_raw_flavour_id(const T id) {
 }
 
 template <class T>
-inline auto to_entity_flavour_id(const T id) {
+inline auto to_entity_flavour_id(const T enum_id) {
 	entity_flavour_id id;
 	id.type_id.set<test_flavours_map::at<T>>();
-	id.raw = to_raw_flavour_id(id);
+	id.raw = to_raw_flavour_id(enum_id);
+	return id;
 }
 
-template <class C, class... Args>
-auto create_test_scene_entity(C& cosm, const test_scene_flavour id, Args&& args...) {
-	return cosmic::create_entity(cosm, to_entity_flavour_id(id), std::forward<Args>(args)...);
+template <class C, class E, class... Args>
+auto create_test_scene_entity(C& cosm, const E enum_flavour, Args&&... args) {
+	return cosmic::create_entity(cosm, to_entity_flavour_id(enum_flavour), std::forward<Args>(args)...);
 }
 
 template <class T>

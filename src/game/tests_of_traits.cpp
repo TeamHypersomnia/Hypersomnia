@@ -103,6 +103,9 @@ static void gg() {
 	}
 }
 struct tests_of_traits {
+	static_assert(has_invariants_or_components_v<controlled_character, components::interpolation>);
+	static_assert(!has_invariants_or_components_v<plain_invisible_body, components::interpolation>);
+
 	//static_assert(std::is_trivially_copyable_v<absolute_or_local>);
 	static_assert(same<double, type_argument_t<std::is_trivially_copyable<double>>>);
 	static_assert(same<constrained_entity_flavour_id<invariants::missile>::matching_types, type_list<plain_missile, explosive_missile>>);

@@ -16,33 +16,9 @@
 #include "test_scenes/ingredients/box_physics.h"
 #include "test_scenes/ingredients/sprite.h"
 
-namespace components {
-	struct item;
-}
-
 namespace ingredients {
-	void add_character(const logic_step, entity_handle);
-
-	void add_character_head_inventory(const logic_step, entity_handle);
-
 	void add_standard_pathfinding_capability(entity_handle);
 	void add_soldier_intelligence(entity_handle);
-}
-
-namespace test_flavours {
-	void add_bullet_round_physics(entity_flavour& meta);
-	void add_see_through_dynamic_body(entity_flavour& meta);
-	void add_shell_dynamic_body(entity_flavour& meta);
-	void add_standard_dynamic_body(entity_flavour& meta);
-	void add_standard_static_body(entity_flavour& meta);
-
-	void add_sprite(
-		entity_flavour& t, 
-		const loaded_game_image_caches& logicals,
-		assets::game_image_id = assets::game_image_id::INVALID,
-		rgba col = rgba(255, 255, 255, 255),
-		invariants::sprite::special_effect = {}
-	);
 }
 
 namespace prefabs {

@@ -206,12 +206,12 @@ public:
 
 	template <class... Constraints, class F>
 	void for_each_entity(F&& callback) {
-		for_each_entity_impl(*this, std::forward<F>(callback));
+		for_each_entity_impl<Constraints...>(*this, std::forward<F>(callback));
 	}
 	
 	template <class... Constraints, class F>
 	void for_each_entity(F&& callback) const {
-		for_each_entity_impl(*this, std::forward<F>(callback));
+		for_each_entity_impl<Constraints...>(*this, std::forward<F>(callback));
 	}
 
 	bool empty() const;
