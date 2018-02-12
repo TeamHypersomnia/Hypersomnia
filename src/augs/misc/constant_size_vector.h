@@ -93,10 +93,16 @@ namespace augs {
 		}
 
 		value_type& operator[](const std::size_t i) {
+#if !IS_PRODUCTION_BUILD
+			ensure(static_cast<size_type>(i) < count);
+#endif
 			return nth(static_cast<size_type>(i));
 		}
 
 		const value_type& operator[](const std::size_t i) const {
+#if !IS_PRODUCTION_BUILD
+			ensure(static_cast<size_type>(i) < count);
+#endif
 			return nth(static_cast<size_type>(i));
 		}
 

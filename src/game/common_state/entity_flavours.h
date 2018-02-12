@@ -109,11 +109,27 @@ template <class E>
 using entity_flavours_container = std::vector<entity_flavour<E>>;
 #endif
 
+namespace augs {
+	struct introspection_access;
+}
+
 template <class entity_type>
-struct entity_flavours {
+class entity_flavours {
+	friend augs::introspection_access;
+
 	// GEN INTROSPECTOR struct entity_flavours class entity_type
 	entity_flavours_container<entity_type> flavours;
 	// END GEN INTROSPECTOR
+
+public:
+
+	void resize(const std::size_t n) {
+		flavours.resize(n);
+	}
+
+	auto get_num_flavours() const {
+		return flavours.size();
+	}
 
 	auto& get_flavour(const raw_entity_flavour_id id) {
 		return flavours[static_cast<unsigned>(id)];

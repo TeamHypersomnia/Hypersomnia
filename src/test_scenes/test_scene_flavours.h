@@ -171,9 +171,12 @@ auto& get_test_flavour(all_entity_flavours& flavours, const T id) {
 	const auto idx = static_cast<std::size_t>(id);
 
 	auto& into = std::get<make_entity_flavours<E>>(flavours);
-	into.flavours.resize(idx+1);
 
-	auto& new_flavour = into.flavours[idx];
+	if (into.get_num_flavours() < idx + 1) {
+		into.resize(idx+1);
+	}
+
+	auto& new_flavour = into.get_flavour(idx);
 	new_flavour.name = to_wstring(format_enum(id));
 
 	return new_flavour;

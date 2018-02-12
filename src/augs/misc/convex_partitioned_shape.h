@@ -26,6 +26,7 @@ struct basic_convex_partitioned_shape {
 		auto hy = size.y / 2;
 
 		convex_poly new_poly;
+		new_poly.resize(4);
 		new_poly[0].set(-hx, -hy);
 		new_poly[1].set( hx, -hy);
 		new_poly[2].set( hx,  hy);

@@ -61,8 +61,9 @@ public:
 		const auto handle = instantiate_flavour<E>(cosm, id);
 
 		pre_construction(handle);
-		construct_entity(handle);
+		construct_pre_inference(handle);
 		infer_caches_for(handle);
+		construct_post_inference(handle);
 
 		return handle;
 	}
