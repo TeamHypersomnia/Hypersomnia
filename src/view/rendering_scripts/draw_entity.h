@@ -83,14 +83,14 @@ FORCE_INLINE void draw_border(
 	}
 }
 
-using entities_with_renderables = all_entity_types_having_any<
+using entities_with_renderables = entity_types_with_any_of<
 	invariants::sprite,
    	invariants::polygon
 >;
 
 template <class E, class F>
 FORCE_INLINE void on_renderable_component(const E h, F callback) {
-	h.template conditional_dispatch<all_entity_types_having<invariants::sprite>>(
+	h.template dispatch_on_having<invariants::sprite>(
 		[&callback](const auto handle) {
 			const auto& sprite = handle.template get<invariants::sprite>();
 
@@ -108,7 +108,7 @@ FORCE_INLINE void on_renderable_component(const E h, F callback) {
 		}
 	);
 
-	h.template conditional_dispatch<all_entity_types_having<invariants::polygon>>(
+	h.template dispatch_on_having<invariants::polygon>(
 		[&callback](const auto handle) {
 			callback(handle.template get<invariants::polygon>());
 		}

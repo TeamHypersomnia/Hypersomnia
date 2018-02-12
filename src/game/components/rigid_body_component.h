@@ -247,7 +247,7 @@ template <class E>
 damping_info component_synchronizer<E, components::rigid_body>::calculate_damping_info(const invariants::rigid_body& def) const {
 	damping_info damping = def.damping;
 
-	handle.template conditional_dispatch<all_entity_types_having<components::movement>>([&damping](const auto typed_handle) {
+	handle.template dispatch_on_having<components::movement>([&damping](const auto typed_handle) {
 		const auto& movement = typed_handle.template get<components::movement>();
 		const auto& movement_def = typed_handle.template get<invariants::movement>();
 

@@ -111,8 +111,8 @@ struct tests_of_traits {
 	static_assert(has_any_of_v<controlled_character, invariants::sprite, invariants::polygon>);
 	static_assert(!has_any_of_v<controlled_character, invariants::trace>);
 
-	static_assert(has_invariants_or_components_v<controlled_character, components::interpolation>);
-	static_assert(!has_invariants_or_components_v<plain_invisible_body, components::interpolation>);
+	static_assert(has_all_of_v<controlled_character, components::interpolation>);
+	static_assert(!has_all_of_v<plain_invisible_body, components::interpolation>);
 
 	//static_assert(std::is_trivially_copyable_v<absolute_or_local>);
 	static_assert(same<double, type_argument_t<std::is_trivially_copyable<double>>>);

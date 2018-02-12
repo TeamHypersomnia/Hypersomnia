@@ -89,7 +89,7 @@ class cosmos_solvable {
 
 				using E = type_argument_t<typename pool_type::mapped_type>;
 
-				if constexpr(has_invariants_or_components_v<E, Constraints...>) {
+				if constexpr(has_all_of_v<E, Constraints...>) {
 					using index_type = typename pool_type::used_size_type;
 
 					for (index_type i = 0; i < p.size(); ++i) {

@@ -105,7 +105,7 @@ void physics_world_cache::destroy_cache_of(const const_entity_handle handle) {
 }
 
 void physics_world_cache::infer_cache_for_rigid_body(const const_entity_handle h) {
-	h.conditional_dispatch<all_entity_types_having<components::rigid_body>>([this](const auto handle) {
+	h.dispatch_on_having<components::rigid_body>([this](const auto handle) {
 		const auto it = rigid_body_caches.try_emplace(handle.get_id());
 		auto& cache = (*it.first).second;
 	
@@ -218,7 +218,7 @@ void physics_world_cache::infer_cache_for(const const_entity_handle handle) {
 }
 
 void physics_world_cache::infer_cache_for_colliders(const const_entity_handle h) {
-	h.conditional_dispatch<all_entity_types_having<components::rigid_body>>([this](const auto handle) {
+	h.dispatch_on_having<components::rigid_body>([this](const auto handle) {
 		/*
 			Algorithm:
 	

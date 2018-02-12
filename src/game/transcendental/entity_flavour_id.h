@@ -14,7 +14,7 @@ using entity_flavour_id = constrained_entity_flavour_id<>;
 
 template <class... C>
 struct constrained_entity_flavour_id {
-	using matching_types = all_entity_types_having<C...>;
+	using matching_types = entity_types_having_all_of<C...>;
 
 	// GEN INTROSPECTOR struct constrained_entity_flavour_id class... C
 	raw_entity_flavour_id raw;
@@ -43,7 +43,7 @@ struct typed_entity_flavour_id {
 
 	template <
 		class... C,
-		class V = std::enable_if_t<has_invariants_or_components_v<E, C...>>
+		class V = std::enable_if_t<has_all_of_v<E, C...>>
 	>
 	operator constrained_entity_flavour_id<C...>() const {
 		return { raw, entity_type_id::of<E> };

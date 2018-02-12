@@ -24,7 +24,7 @@ void relational_cache::destroy_caches_of_children_of(const entity_id h) {
 }
 
 void relational_cache::infer_cache_for(const const_entity_handle h) {
-	h.conditional_dispatch<all_entity_types_having<components::item>>([this](const auto handle) {
+	h.dispatch_on_having<components::item>([this](const auto handle) {
 		/*
 			WHEN ORDER OF ITEMS IN THE CONTAINER BECOMES RELEVANT,
 			This procedure should be fixed or otherwise the reinference might break the order of items!

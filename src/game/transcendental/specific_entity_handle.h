@@ -264,6 +264,11 @@ public:
 		}
 	}
 
+	template <class... List, class F>
+	void dispatch_on_having(F&& callback) const {
+		conditional_dispatch<entity_types_having_all_of<List...>>(std::forward<F>(callback));
+	}
+
 	template <class F>
 	decltype(auto) dispatch(F callback) const {
 		return callback(*this);

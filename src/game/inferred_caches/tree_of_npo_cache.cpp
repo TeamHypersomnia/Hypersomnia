@@ -51,7 +51,7 @@ void tree_of_npo_cache::destroy_cache_of(const const_entity_handle handle) {
 }
 
 void tree_of_npo_cache::infer_cache_for(const const_entity_handle e) {
-	e.conditional_dispatch<all_entity_types_having<invariants::render>>([this](const auto handle) {
+	e.dispatch_on_having<invariants::render>([this](const auto handle) {
 		const auto it = per_entity_cache.try_emplace(handle.get_id());
 
 		auto& cache = (*it.first).second;

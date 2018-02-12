@@ -42,10 +42,10 @@ using make_components =
 ;
 
 template <template <class> class Predicate>
-using all_entity_types_passing = filter_types_in_list_t<Predicate, all_entity_types>;
+using entity_types_passing = filter_types_in_list_t<Predicate, all_entity_types>;
 
 template <class... Types>
-struct has_invariants_or_components {
+struct has_all_of {
 	template <class E>
 	struct type : std::bool_constant<
 		(... && is_one_of_list_v<Types, invariants_and_components_of<E>>)
@@ -54,16 +54,16 @@ struct has_invariants_or_components {
 };
 
 template <>
-struct has_invariants_or_components<> {
+struct has_all_of<> {
 	template <class E>
 	struct type : std::true_type {};
 };
 
 template <class E, class... Args>
-constexpr bool has_invariants_or_components_v = has_invariants_or_components<Args...>::template type<E>::value;
+constexpr bool has_all_of_v = has_all_of<Args...>::template type<E>::value;
 
 template <class... Types>
-using all_entity_types_having = all_entity_types_passing<has_invariants_or_components<Types...>::template type>;
+using entity_types_having_all_of = entity_types_passing<has_all_of<Types...>::template type>;
 
 template <class... Types>
 struct has_any_of {
@@ -84,4 +84,4 @@ template <class E, class... Args>
 constexpr bool has_any_of_v = has_any_of<Args...>::template type<E>::value;
 
 template <class... Types>
-using all_entity_types_having_any = all_entity_types_passing<has_any_of<Types...>::template type>;
+using entity_types_with_any_of = entity_types_passing<has_any_of<Types...>::template type>;
