@@ -28,8 +28,6 @@ constexpr bool is_const_ref_v = is_const_ref<T>::value;
 template <class>
 struct is_handle_const;
 
-template <>
-
 template <
 	template <bool, class, template<class> class> class H, 
 	bool A, 
@@ -37,7 +35,6 @@ template <
 	template <class> class C
 >
 struct is_handle_const <H<A, B, C>> : std::bool_constant<A> {};
-
 
 template <
 	template <bool> class H, 
