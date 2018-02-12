@@ -175,6 +175,28 @@ public:
 		return alive();
 	}
 
+	template <class E>
+	decltype(auto) get_specific() const {
+		using handle_type = basic_typed_entity_handle<is_const, E>;
+		using specific_ptr_type = maybe_const_ptr_t<is_const, entity_solvable<E>>;
+
+		auto& specific_ref = *reinterpret_cast<specific_ptr_type>(ptr);
+		return handle_type(specific_ref, owner, get_id());
+	}
+
+	template <class List, class F>
+	void conditional_dispatch(F&& callback) const {
+		ensure(alive());
+
+		for_each_through_std_get(List(), [&](auto t) { 
+			using E = decltype(t);
+
+			if (raw_id.type_id == entity_type_id::of<E>) {
+				callback(this->get_specific<E>());
+			}
+		});
+	}
+
 	template <class F>
 	decltype(auto) dispatch(F&& callback) const {
 		ensure(alive());
@@ -183,16 +205,8 @@ public:
 			all_entity_types(),
 			raw_id.type_id,
 			[&](auto t) -> decltype(auto) {
-				using entity_type = decltype(t);
-				using handle_type = basic_typed_entity_handle<is_const, entity_type>;
-
-				auto& specific_ref = 
-					*reinterpret_cast<
-						maybe_const_ptr_t<is_const, entity_solvable<entity_type>>
-					>(ptr)
-				;
-					
-				return callback(handle_type(specific_ref, owner, get_id()));
+				using E = decltype(t);
+				return callback(this->get_specific<E>());
 			}
 		);
 	}

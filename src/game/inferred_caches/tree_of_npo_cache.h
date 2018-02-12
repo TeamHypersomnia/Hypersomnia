@@ -36,7 +36,6 @@ struct tree_of_npo_node_input {
 	ltrb aabb;
 	// END GEN INTROSPECTOR
 
-	static std::optional<tree_of_npo_node_input> create_default_for(const_entity_handle);
 };
 
 class tree_of_npo_cache {

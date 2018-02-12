@@ -4,18 +4,15 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/enums/filters.h"
 
-std::optional<tree_of_npo_node_input> tree_of_npo_node_input::create_default_for(const const_entity_handle e) {
-	const bool has_renderable = 
-		e.find<invariants::render>() 
-	;
-
+template <class E>
+std::optional<tree_of_npo_node_input> create_default_for(const E handle) {
 	const bool has_physical = 
-		e.find<invariants::fixtures>() 
-		|| e.has<components::rigid_body>() 
+		handle.template find<invariants::fixtures>() 
+		|| handle.template has<components::rigid_body>() 
 	;
 
-	if (has_renderable && !has_physical) {
-		if (const auto aabb = e.find_aabb()) {
+	if (!has_physical) {
+		if (const auto aabb = handle.find_aabb()) {
 			tree_of_npo_node_input result;
 			result.aabb = *aabb;
 			return result;
@@ -53,45 +50,47 @@ void tree_of_npo_cache::destroy_cache_of(const const_entity_handle handle) {
 	}
 }
 
-void tree_of_npo_cache::infer_cache_for(const const_entity_handle handle) {
-	const auto it = per_entity_cache.try_emplace(handle.get_id());
+void tree_of_npo_cache::infer_cache_for(const const_entity_handle e) {
+	e.conditional_dispatch<all_entity_types_having<invariants::render>>([this](const auto handle) {
+		const auto it = per_entity_cache.try_emplace(handle.get_id());
 
-	auto& cache = (*it.first).second;
-	const bool cache_existed = !it.second;
+		auto& cache = (*it.first).second;
+		const bool cache_existed = !it.second;
 
-	if (const auto tree_node = tree_of_npo_node_input::create_default_for(handle)) {
-		const auto data = *tree_node;
-		const auto new_aabb = data.aabb;
+		if (const auto tree_node = create_default_for(handle)) {
+			const auto data = *tree_node;
+			const auto new_aabb = data.aabb;
 
-		b2AABB new_b2AABB;
-		new_b2AABB.lowerBound = b2Vec2(new_aabb.left_top());
-		new_b2AABB.upperBound = b2Vec2(new_aabb.right_bottom());
+			b2AABB new_b2AABB;
+			new_b2AABB.lowerBound = b2Vec2(new_aabb.left_top());
+			new_b2AABB.upperBound = b2Vec2(new_aabb.right_bottom());
 
-		const bool full_rebuild = 
-			!cache_existed
-			|| cache.type != data.type
-		;
-		
-		if (full_rebuild) {
-			cache.clear(*this);
-			
-			cache.type = data.type;
-			cache.recorded_aabb = new_aabb;
+			const bool full_rebuild = 
+				!cache_existed
+				|| cache.type != data.type
+			;
 
-			tree_of_npo_node new_node;
-			new_node.payload = handle.get_id().operator unversioned_entity_id();
+			if (full_rebuild) {
+				cache.clear(*this);
 
-			cache.tree_proxy_id = get_tree(cache).nodes.CreateProxy(new_b2AABB, new_node.bytes);
+				cache.type = data.type;
+				cache.recorded_aabb = new_aabb;
+
+				tree_of_npo_node new_node;
+				new_node.payload = handle.get_id().operator unversioned_entity_id();
+
+				cache.tree_proxy_id = get_tree(cache).nodes.CreateProxy(new_b2AABB, new_node.bytes);
+			}
+			else {
+				const vec2 displacement = new_aabb.get_center() - cache.recorded_aabb.get_center();
+				get_tree(cache).nodes.MoveProxy(cache.tree_proxy_id, new_b2AABB, b2Vec2(displacement));
+				cache.recorded_aabb = new_aabb;
+			}
 		}
 		else {
-			const vec2 displacement = new_aabb.get_center() - cache.recorded_aabb.get_center();
-			get_tree(cache).nodes.MoveProxy(cache.tree_proxy_id, new_b2AABB, b2Vec2(displacement));
-			cache.recorded_aabb = new_aabb;
+			// TODO: delete cache?
 		}
-	}
-	else {
-		// TODO: delete cache?
-	}
+	});
 }
 
 void tree_of_npo_cache::reserve_caches_for_entities(const size_t n) {

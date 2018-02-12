@@ -24,25 +24,26 @@ void relational_cache::destroy_caches_of_children_of(const entity_id h) {
 }
 
 void relational_cache::infer_cache_for(const const_entity_handle h) {
-	if (const auto item = h.find<components::item>()) {
+	h.conditional_dispatch<all_entity_types_having<components::item>>([this](const auto handle) {
 		/*
 			WHEN ORDER OF ITEMS IN THE CONTAINER BECOMES RELEVANT,
 			This procedure should be fixed or otherwise the reinference might break the order of items!
 		*/
 
+		const auto& item = handle.template get<components::item>();
 		const auto current_slot = item->get_current_slot();
 
 		/* Contrary to other relations, here having a parent is optional */
 
 		if (current_slot.is_set()) {
-			ensure(!items_of_slots.is_child_constructed(h, current_slot));
-			items_of_slots.set_parent(h, current_slot);
+			ensure(!items_of_slots.is_child_constructed(handle, current_slot));
+			items_of_slots.set_parent(handle, current_slot);
 		}
-	}
 
-	/*
-		The physics system tracks the joints of bodies and fixtures of bodies for us.
-	*/
+		/*
+			The physics system tracks the joints of bodies and fixtures of bodies for us.
+		*/
+	});
 }
 
 void relational_cache::destroy_cache_of(const const_entity_handle h) {

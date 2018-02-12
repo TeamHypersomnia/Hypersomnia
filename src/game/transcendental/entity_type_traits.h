@@ -59,8 +59,8 @@ struct has_invariants_or_components<> {
 template <class E, class... Args>
 constexpr bool has_invariants_or_components_v = has_invariants_or_components<Args...>::template type<E>::value;
 
+template <template <class> class Predicate>
+using all_entity_types_passing = filter_types_in_list_t<Predicate, all_entity_types>;
+
 template <class... Types>
-using all_entity_types_having = filter_types_in_list_t<
-	has_invariants_or_components<Types...>::template type,
-	all_entity_types
->;
+using all_entity_types_having = all_entity_types_passing<has_invariants_or_components<Types...>::template type>;
