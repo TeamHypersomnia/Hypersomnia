@@ -45,7 +45,7 @@ template <class... Types>
 struct has_invariants_or_components {
 	template <class E>
 	struct type : std::bool_constant<
-		(is_one_of_list_v<Types, invariants_and_components_of<E>> && ...)
+		(... && is_one_of_list_v<Types, invariants_and_components_of<E>>)
 	>
 	{};	
 };
