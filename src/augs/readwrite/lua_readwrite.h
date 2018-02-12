@@ -22,7 +22,7 @@
 namespace augs {
 	template <class... T>
 	inline const char* get_variant_type_label(T&&...) {
-		return "type";
+		return "kind";
 	}
 
 	template <class... T>

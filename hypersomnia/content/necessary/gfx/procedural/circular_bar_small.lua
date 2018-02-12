@@ -1,8 +1,8 @@
 return {image_from_commands = {
 		commands = {
 			{
-				command = "circle_midpoint",
-				input = {
+				kind = "circle_midpoint",
+				fields = {
 					radius = 17,
 					border_width = 1,		
 					scale_alpha = false,
@@ -14,8 +14,8 @@ return {image_from_commands = {
 			},
 
 			{
-				command = "circle_midpoint",
-				input = {
+				kind = "circle_midpoint",
+				fields = {
 					radius = 15,
 					border_width = 5,		
 					scale_alpha = false,
