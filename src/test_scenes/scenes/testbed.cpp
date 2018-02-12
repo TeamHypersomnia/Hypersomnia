@@ -217,7 +217,7 @@ namespace test_scenes {
 
 				w.colorize = cyan;
 				w.particles_count = 200;
-				w.reach = reach;
+				w.set_reach(reach);
 			}
 
 			{
@@ -228,7 +228,7 @@ namespace test_scenes {
 				w.colorize = cyan;
 				//w.face.size.set(1, 1);
 				w.particles_count = 80;
-				w.reach = reach;
+				w.set_reach(reach);
 			}
 
 			{
@@ -239,7 +239,7 @@ namespace test_scenes {
 				w.colorize = cyan;
 				//w.face.size.set(1, 1);
 				w.particles_count = 80;
-				w.reach = reach;
+				w.set_reach(reach);
 			}
 		}
 
@@ -279,7 +279,7 @@ namespace test_scenes {
 
 					w.colorize = light_cyan;
 					w.particles_count = 50;
-					w.reach = xywh(light_pos.x- 250, light_pos.y-250, 500, 500);
+					w.set_reach(xywh(light_pos.x- 250, light_pos.y-250, 500, 500));
 				}
 
 				{
@@ -289,7 +289,7 @@ namespace test_scenes {
 
 					w.colorize = light_cyan;
 					w.particles_count = 20;
-					w.reach = xywh(light_pos.x - 150, light_pos.y - 150, 300, 300);
+					w.set_reach(xywh(light_pos.x - 150, light_pos.y - 150, 300, 300));
 				}
 
 				{
@@ -299,7 +299,7 @@ namespace test_scenes {
 
 					w.colorize = light_cyan;
 					w.particles_count = 20;
-					w.reach = xywh(light_pos.x - 25, light_pos.y - 25, 50, 50);
+					w.set_reach(xywh(light_pos.x - 25, light_pos.y - 25, 50, 50));
 				}
 			}
 		}
@@ -328,7 +328,7 @@ namespace test_scenes {
 
 					w.colorize = cyan;
 					w.particles_count = 20;
-					w.reach = left_reach;
+					w.set_reach(left_reach);
 				}
 
 				{
@@ -338,7 +338,7 @@ namespace test_scenes {
 
 					w.colorize = orange;
 					w.particles_count = 20;
-					w.reach = right_reach;
+					w.set_reach(right_reach);
 				}
 
 				{
@@ -348,7 +348,7 @@ namespace test_scenes {
 
 					w.colorize = cyan;
 					w.particles_count = 50;
-					w.reach = left_reach;
+					w.set_reach(left_reach);
 				}
 
 				{
@@ -358,7 +358,7 @@ namespace test_scenes {
 
 					w.colorize = orange;
 					w.particles_count = 50;
-					w.reach = right_reach;
+					w.set_reach(right_reach);
 				}
 
 				{
@@ -368,7 +368,7 @@ namespace test_scenes {
 
 					w.colorize = cyan;
 					w.particles_count = 30;
-					w.reach = left_reach;
+					w.set_reach(left_reach);
 				}
 
 				{
@@ -378,7 +378,7 @@ namespace test_scenes {
 
 					w.colorize = orange;
 					w.particles_count = 30;
-					w.reach = right_reach;
+					w.set_reach(right_reach);
 				}
 			}
 

@@ -62,7 +62,7 @@ void wandering_pixels_system::advance_for(
 	}
 
 	if (/* refresh_cache */ 
-		!(cache.recorded_component.reach == wandering.reach)
+		!(cache.recorded_component.reach == wandering.get_reach())
 	) {
 		cache.rng = { cosmos.get_rng_seed_for(it) };
 
@@ -75,7 +75,7 @@ void wandering_pixels_system::advance_for(
 			p.current_lifetime_ms = cache.rng.randval(0.f, wandering_def.frame_duration_ms);
 		}
 
-		cache.recorded_component.reach = wandering.reach;
+		cache.recorded_component.reach = wandering.get_reach();
 	}
 
 	constexpr unsigned max_direction_time = 4000u;
@@ -90,7 +90,7 @@ void wandering_pixels_system::advance_for(
 			p.current_direction = p.current_direction.perpendicular_cw();
 
 			const auto dir = p.current_direction;
-			const auto reach = wandering.reach;
+			const auto reach = wandering.get_reach();
 
 			float chance_to_flip = 0.f;
 

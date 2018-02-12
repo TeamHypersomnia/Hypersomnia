@@ -89,7 +89,10 @@ public:
 		if (const auto* const wandering_pixels = handle.template find<components::wandering_pixels>();
 			wandering_pixels != nullptr
 		) {
-			return wandering_pixels->reach;
+			return xywh::center_and_size(
+				transform.pos, 
+				wandering_pixels->size
+			);
 		}
 
 		/* TODO: Implement get_aabb for physical entities */
@@ -180,7 +183,7 @@ std::optional<components::transform> spatial_properties_mixin<E>::find_logic_tra
 	}
 
 	if (const auto wandering_pixels = handle.template find<components::wandering_pixels>()) {
-		return wandering_pixels->reach.center();
+		return wandering_pixels->center;
 	}
 
 	if (const auto transform = handle.template find<components::transform>()) {

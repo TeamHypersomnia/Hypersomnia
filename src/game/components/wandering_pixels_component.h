@@ -5,10 +5,22 @@
 namespace components {
 	struct wandering_pixels {
 		// GEN INTROSPECTOR struct components::wandering_pixels
+		vec2 center;
+		vec2 size;
+
 		xywh reach = xywh(0.f, 0.f, 0.f, 0.f);
 		rgba colorize = white;
 		unsigned particles_count = 20u;
 		// END GEN INTROSPECTOR
+
+		void set_reach(const xywh a) {
+			center = a.center();
+			size = a.get_size();
+		}
+
+		auto get_reach() const {
+			return xywh::center_and_size(center, size);
+		}
 	};
 }
 

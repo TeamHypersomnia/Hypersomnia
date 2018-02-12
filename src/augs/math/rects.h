@@ -332,11 +332,20 @@ struct basic_xywh {
 	T h;
 	// END GEN INTROSPECTOR
 
+	using vec2_type = basic_vec2<T>;
+
 	basic_xywh() : x(static_cast<T>(0)), y(static_cast<T>(0)), w(static_cast<T>(0)), h(static_cast<T>(0)) {}
 	basic_xywh(const basic_ltrb<T> rc) : x(rc.l), y(rc.t) { b(rc.b); r(rc.r); }
 	basic_xywh(const T x, const T y, const T w, const T h) : x(x), y(y), w(w), h(h) {}
 	basic_xywh(const T x, const T y, const basic_vec2<T>& s) : x(x), y(y), w(s.x), h(s.y) {}
 	basic_xywh(const basic_vec2<T>& p, const basic_vec2<T>& s) : x(p.x), y(p.y), w(s.x), h(s.y) {}
+
+	static basic_xywh center_and_size(
+		const vec2_type center, 
+		const vec2_type size
+	) {
+		return { center - size / 2, size };
+	}
 
 	void set(const T _x, const T _y, const T _w, const T _h) {
 		*this = basic_xywh(_x, _y, _w, _h);
