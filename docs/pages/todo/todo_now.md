@@ -7,7 +7,6 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order:  
 
-- fix step_and_set_new_transforms to iterate over entities instead
 - inventory slot handle should itself decide when to use generic handle
 - dispatch in draw entity for speed
 - add post construction callbacks and use it e.g. in trace system

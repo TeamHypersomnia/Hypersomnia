@@ -7,6 +7,8 @@
 
 #include "game/stateless_systems/physics_system.h"
 
+#define OVER_BODIES 0
+
 void physics_system::post_and_clear_accumulated_collision_messages(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
 	auto& physics = cosmos.get_solvable_inferred({}).physics;
@@ -30,6 +32,7 @@ void physics_system::step_and_set_new_transforms(const logic_step step) {
 
 	post_and_clear_accumulated_collision_messages(step);
 
+#if OVER_BODIES
 	for (b2Body* b = physics.b2world->GetBodyList(); b != nullptr; b = b->GetNext()) {
 		if (b->GetType() == b2_staticBody) continue;
 		entity_handle entity = cosmos[b->GetUserData()];
@@ -37,5 +40,17 @@ void physics_system::step_and_set_new_transforms(const logic_step step) {
 		physics.recurential_friction_handler(step, b, b->m_ownerFrictionGround);
 		entity.get<components::rigid_body>().update_after_step(*b);	
 	}
+#else
+	cosmos.for_each_having<components::rigid_body>(
+		[&](const auto handle){
+			const auto rigid_body = handle.template get<components::rigid_body>();
+
+			auto& body = *rigid_body.find_cache()->body.get();
+			rigid_body.update_after_step(body);
+
+			physics.recurential_friction_handler(step, &body, body.m_ownerFrictionGround);
+		}
+	);
+#endif
 }
 

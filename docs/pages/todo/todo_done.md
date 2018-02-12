@@ -180,3 +180,4 @@ we consider whole type overrides too complex architeciturally:
 	- most stateless, thence easiest is when we just easily determine when not to process an entity without relying on having proper fields set in processing lists
 		- we should then only ever optimize when it is needed
 	- or it can be part of inferred state which will complicate things a little
+- fix step_and_set_new_transforms to iterate over entities instead

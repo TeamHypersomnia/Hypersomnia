@@ -86,12 +86,14 @@ namespace invariants {
 };
 
 class physics_world_cache;
+class physics_system;
 
 template <class E>
 class component_synchronizer<E, components::rigid_body> 
 	: public synchronizer_base<E, components::rigid_body> 
 {
-	friend class ::physics_world_cache;
+	friend ::physics_world_cache;
+	friend ::physics_system;
 
 	auto find_cache() const {
 		return handle.get_cosmos().get_solvable_inferred({}).physics.find_rigid_body_cache(handle);
