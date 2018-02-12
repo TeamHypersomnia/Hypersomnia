@@ -104,77 +104,70 @@ void physics_world_cache::destroy_cache_of(const const_entity_handle handle) {
 	destroy_joint_cache(handle);
 }
 
-void physics_world_cache::infer_rigid_body_existence(const const_entity_handle handle) {
-	if (const auto cache = find_rigid_body_cache(handle)) {
-		return;
-	}
-
-	infer_cache_for_rigid_body(handle);
-}
-
-void physics_world_cache::infer_cache_for_rigid_body(const const_entity_handle handle) {
-	const auto it = rigid_body_caches.try_emplace(handle.get_id());
-	auto& cache = (*it.first).second;
-
-	if (/* cache_existed */ !it.second) {
-
-		/* 
-			Invariant/component guaranteed to exist because it must have once been created from an existing def,
-   			and changing type content implies reinference of the entire cosmos.
-		*/
-
-		const auto& def = handle.get<invariants::rigid_body>();
-		const auto rigid_body = handle.get<components::rigid_body>();
-		const auto damping = rigid_body.calculate_damping_info(def);
-		const auto& data = rigid_body.get_raw_component();
-
-		auto& body = *cache.body;
-
-		/* 
-			Currently, nothing that can change inside the component could possibly trigger the need to rebuild the body.
-			This may change once we want to delete bodies without fixtures.
-		*/
-
-		/* These have no side-effects */
-		body.SetLinearDamping(damping.linear);
-		body.SetAngularDamping(damping.angular);
-		body.SetLinearDampingVec(b2Vec2(damping.linear_axis_aligned));
-		body.SetAngledDampingEnabled(def.angled_damping);
-
-		/* These have side-effects, thus we guard */
-		if (body.IsSleepingAllowed() != def.allow_sleep) {
-			body.SetSleepingAllowed(def.allow_sleep);
-		}
-
-		if (body.GetLinearVelocity() != b2Vec2(data.velocity)) {
-			body.SetLinearVelocity(b2Vec2(data.velocity));
-		}
-
-		if (body.GetAngularVelocity() != data.angular_velocity) {
-			body.SetAngularVelocity(data.angular_velocity);
-		}
-
-		if (!(body.m_xf == data.transform)) {
-			body.m_xf = data.transform;
-			body.m_sweep = data.sweep;
-
-			b2BroadPhase* broadPhase = &body.m_world->m_contactManager.m_broadPhase;
-
-			for (b2Fixture* f = body.m_fixtureList; f; f = f->m_next)
-			{
-				f->Synchronize(broadPhase, body.m_xf, body.m_xf);
+void physics_world_cache::infer_cache_for_rigid_body(const const_entity_handle h) {
+	h.conditional_dispatch<all_entity_types_having<components::rigid_body>>([this](const auto handle) {
+		const auto it = rigid_body_caches.try_emplace(handle.get_id());
+		auto& cache = (*it.first).second;
+	
+		if (/* cache_existed */ !it.second) {
+	
+			/* 
+				Invariant/component guaranteed to exist because it must have once been created from an existing def,
+	   			and changing type content implies reinference of the entire cosmos.
+			*/
+	
+			const auto& def = handle.template get<invariants::rigid_body>();
+			const auto rigid_body = handle.template get<components::rigid_body>();
+			const auto damping = rigid_body.calculate_damping_info(def);
+			const auto& data = rigid_body.get_raw_component();
+	
+			auto& body = *cache.body;
+	
+			/* 
+				Currently, nothing that can change inside the component could possibly trigger the need to rebuild the body.
+				This may change once we want to delete bodies without fixtures.
+			*/
+	
+			/* These have no side-effects */
+			body.SetLinearDamping(damping.linear);
+			body.SetAngularDamping(damping.angular);
+			body.SetLinearDampingVec(b2Vec2(damping.linear_axis_aligned));
+			body.SetAngledDampingEnabled(def.angled_damping);
+	
+			/* These have side-effects, thus we guard */
+			if (body.IsSleepingAllowed() != def.allow_sleep) {
+				body.SetSleepingAllowed(def.allow_sleep);
 			}
+	
+			if (body.GetLinearVelocity() != b2Vec2(data.velocity)) {
+				body.SetLinearVelocity(b2Vec2(data.velocity));
+			}
+	
+			if (body.GetAngularVelocity() != data.angular_velocity) {
+				body.SetAngularVelocity(data.angular_velocity);
+			}
+	
+			if (!(body.m_xf == data.transform)) {
+				body.m_xf = data.transform;
+				body.m_sweep = data.sweep;
+	
+				b2BroadPhase* broadPhase = &body.m_world->m_contactManager.m_broadPhase;
+	
+				for (b2Fixture* f = body.m_fixtureList; f; f = f->m_next)
+				{
+					f->Synchronize(broadPhase, body.m_xf, body.m_xf);
+				}
+			}
+	
+			return;
 		}
-
-		return;
-	}
-
-	/*
-		Here the cache is not constructed so we rebuild from scratch.
-	*/
-
-	if (const auto rigid_body = handle.find<components::rigid_body>()) {
-		const auto& physics_def = handle.get<invariants::rigid_body>();
+	
+		/*
+			Here the cache is not constructed so we rebuild from scratch.
+		*/
+	
+		const auto& physics_def = handle.template get<invariants::rigid_body>();
+		const auto rigid_body = handle.template get<components::rigid_body>();
 		const auto& physics_data = rigid_body.get_raw_component();
 
 		b2BodyDef def;
@@ -195,7 +188,7 @@ void physics_world_cache::infer_cache_for_rigid_body(const const_entity_handle h
 
 		def.angularDamping = damping.angular;
 		def.linearDamping = damping.linear;
-		
+
 		def.transform = physics_data.transform;
 		def.sweep = physics_data.sweep;
 
@@ -208,14 +201,14 @@ void physics_world_cache::infer_cache_for_rigid_body(const const_entity_handle h
 
 		cache.body->SetAngledDampingEnabled(physics_def.angled_damping);
 		cache.body->SetLinearDampingVec(b2Vec2(damping.linear_axis_aligned));
-	}
-
-	/*
-		All colliders caches manually infer the existence of the rigid body.
-		Thus if the rigid body should exist in the first place,
-		there can be no case where a rigid body would be inferred on its own but having the need to inform the fixtures
-		that it has just appeared.
-	*/
+	
+		/*
+			All colliders caches manually infer the existence of the rigid body.
+			Thus if the rigid body should exist in the first place,
+			there can be no case where a rigid body would be inferred on its own but having the need to inform the fixtures
+			that it has just appeared.
+		*/
+	});
 }
 
 void physics_world_cache::infer_cache_for(const const_entity_handle handle) {
@@ -224,90 +217,90 @@ void physics_world_cache::infer_cache_for(const const_entity_handle handle) {
 	infer_cache_for_joint(handle);
 }
 
-void physics_world_cache::infer_cache_for_colliders(const const_entity_handle handle) {
-	/*
-		Algorithm:
-
-		If the cache exists, check if it must be rebuilt.
-			Lazy-init new values for rebuild-triggering fields.
-				If no change, only update relevant fields in place.
-				If there are changes, save those new values and perform full rebuild.
-		If the cache does not exist, perform full rebuild.
-			If some rebuild-triggering values were already calculated, use them.
-	*/
-
-	const auto& cosmos = handle.get_cosmos();
-
-	std::optional<colliders_connection> calculated_connection;
-
-	auto get_calculated_connection = [&](){
-		if (!calculated_connection) {
-			if (const auto connection = handle.calculate_colliders_connection()) {
-				calculated_connection = connection; 
+void physics_world_cache::infer_cache_for_colliders(const const_entity_handle h) {
+	h.conditional_dispatch<all_entity_types_having<components::rigid_body>>([this](const auto handle) {
+		/*
+			Algorithm:
+	
+			If the cache exists, check if it must be rebuilt.
+				Lazy-init new values for rebuild-triggering fields.
+					If no change, only update relevant fields in place.
+					If there are changes, save those new values and perform full rebuild.
+			If the cache does not exist, perform full rebuild.
+				If some rebuild-triggering values were already calculated, use them.
+		*/
+	
+		const auto& cosmos = handle.get_cosmos();
+	
+		std::optional<colliders_connection> calculated_connection;
+	
+		auto get_calculated_connection = [&](){
+			if (!calculated_connection) {
+				if (const auto connection = handle.calculate_colliders_connection()) {
+					calculated_connection = connection; 
+				}
+				else {
+					/* A default with unset owner body will prevent cache from building */
+					calculated_connection = colliders_connection();
+				}
+			}
+	
+			return *calculated_connection;
+		};
+	
+		const auto it = colliders_caches.try_emplace(handle.get_id());
+		auto& cache = (*it.first).second;
+	
+		if (/* cache_existed */ !it.second) {
+			bool needs_full_rebuild = false;
+			
+			if (get_calculated_connection() != cache.connection) {
+				needs_full_rebuild = true;
+			}
+	
+			if (!needs_full_rebuild) {
+				auto& compared = *cache.all_fixtures_in_component[0].get();
+				const auto& colliders_data = handle.template get<invariants::fixtures>();
+	
+				if (const auto new_density = handle.calculate_density(
+						get_calculated_connection(), 
+						colliders_data
+					);
+	
+					compared.GetDensity() != new_density
+				) {
+					for (auto& f : cache.all_fixtures_in_component) {
+						f.get()->SetDensity(new_density);
+					}
+	
+					compared.GetBody()->ResetMassData();
+				}
+	
+				const bool rebuild_filters = compared.GetFilterData() != colliders_data.filter;
+	
+				for (auto& f : cache.all_fixtures_in_component) {
+					f.get()->SetRestitution(colliders_data.restitution);
+					f.get()->SetFriction(colliders_data.friction);
+					f.get()->SetSensor(colliders_data.sensor);
+	
+					if (rebuild_filters) {
+						f.get()->SetFilterData(colliders_data.filter);
+					}
+				}
+				
+				return;
 			}
 			else {
-				/* A default with unset owner body will prevent cache from building */
-				calculated_connection = colliders_connection();
+				cache.clear(*this);
 			}
 		}
-
-		return *calculated_connection;
-	};
-
-	const auto it = colliders_caches.try_emplace(handle.get_id());
-	auto& cache = (*it.first).second;
-
-	if (/* cache_existed */ !it.second) {
-		bool needs_full_rebuild = false;
 		
-		if (get_calculated_connection() != cache.connection) {
-			needs_full_rebuild = true;
-		}
-
-		if (!needs_full_rebuild) {
-			auto& compared = *cache.all_fixtures_in_component[0].get();
-			const auto& colliders_data = handle.get<invariants::fixtures>();
-
-			if (const auto new_density = handle.calculate_density(
-					get_calculated_connection(), 
-					colliders_data
-				);
-
-				compared.GetDensity() != new_density
-			) {
-				for (auto& f : cache.all_fixtures_in_component) {
-					f.get()->SetDensity(new_density);
-				}
-
-				compared.GetBody()->ResetMassData();
-			}
-
-			const bool rebuild_filters = compared.GetFilterData() != colliders_data.filter;
-
-			for (auto& f : cache.all_fixtures_in_component) {
-				f.get()->SetRestitution(colliders_data.restitution);
-				f.get()->SetFriction(colliders_data.friction);
-				f.get()->SetSensor(colliders_data.sensor);
-
-				if (rebuild_filters) {
-					f.get()->SetFilterData(colliders_data.filter);
-				}
-			}
-			
-			return;
-		}
-		else {
-			cache.clear(*this);
-		}
-	}
+		/*
+			Here the cache is not constructed, or needs full rebuild, so we do it from scratch.
+			The logic might have end up here for just about any entity, so we must check whether 
+		    there is indeed a invariant to construct from.	
+		*/
 	
-	/*
-		Here the cache is not constructed, or needs full rebuild, so we do it from scratch.
-		The logic might have end up here for just about any entity, so we must check whether 
-	    there is indeed a invariant to construct from.	
-	*/
-
-	if (const auto colliders = handle.find<invariants::fixtures>()) {
 		const auto new_owner = cosmos[get_calculated_connection().owner];
 
 		if (new_owner.dead()) {
@@ -330,7 +323,8 @@ void physics_world_cache::infer_cache_for_colliders(const const_entity_handle ha
 
 		const auto si = handle.get_cosmos().get_si();
 		auto& owner_b2Body = *body_cache->body.get();
-		const auto& colliders_data = *colliders;
+
+		const auto& colliders_data = handle.template get<invariants::fixtures>(); 
 
 		b2FixtureDef fixdef;
 
@@ -347,8 +341,8 @@ void physics_world_cache::infer_cache_for_colliders(const const_entity_handle ha
 
 		auto& all_fixtures_in_component = cache.all_fixtures_in_component;
 		ensure(all_fixtures_in_component.empty());
-		
-		if (const auto* const shape_polygon = handle.find<invariants::shape_polygon>()) {
+
+		if (const auto* const shape_polygon = handle.template find<invariants::shape_polygon>()) {
 			auto transformed_shape = shape_polygon->shape;
 			transformed_shape.offset_vertices(get_calculated_connection().shape_offset);
 
@@ -374,25 +368,25 @@ void physics_world_cache::infer_cache_for_colliders(const const_entity_handle ha
 
 			return;
 		}
-		
+
 		// TODO: let shape circle be chosen over the polygon shape when grenade is thrown
 		// can either have a separate definition in the hand fuse invariant or assume that the entity will have it
 
-		if (const auto shape_circle = handle.find<invariants::shape_circle>()) {
+		if (const auto shape_circle = handle.template find<invariants::shape_circle>()) {
 			b2CircleShape shape;
 			shape.m_radius = si.get_meters(shape_circle->get_radius());
-		
+
 			fixdef.shape = &shape;
 			b2Fixture* const new_fix = owner_b2Body.CreateFixture(&fixdef);
-			
+
 			new_fix->index_in_component = 0u;
 			all_fixtures_in_component.emplace_back(new_fix);
-			
+
 			return;
 		}
-		
+
 		ensure(false && "fixtures requested with no shape attached!");
-	}
+	});
 }
 
 void physics_world_cache::infer_cache_for_joint(const const_entity_handle handle) {

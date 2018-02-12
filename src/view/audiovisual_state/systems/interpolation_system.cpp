@@ -18,10 +18,8 @@ components::transform& interpolation_system::get_interpolated(const const_entity
 
 std::optional<components::transform> interpolation_system::find_interpolated(const const_entity_handle id) const {
 	if (enabled) {
-		if (const auto& cache = per_entity_cache.at(id);
-			cache.is_constructed()
-		) {
-			return cache.interpolated_transform;
+		if (const auto cache = mapped_or_nullptr(per_entity_cache, id)) {
+			return cache->interpolated_transform;
 		}
 	}
 	

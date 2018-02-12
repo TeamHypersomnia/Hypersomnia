@@ -5,6 +5,7 @@
 #include "augs/misc/timing/stepped_timing.h"
 #include "augs/templates/maybe_const.h"
 
+#include "game/transcendental/entity_type_traits.h"
 #include "game/transcendental/component_synchronizer.h"
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/transcendental/entity_id.h"
@@ -244,10 +245,11 @@ template <class E>
 damping_info component_synchronizer<E, components::rigid_body>::calculate_damping_info(const invariants::rigid_body& def) const {
 	damping_info damping = def.damping;
 
-	if (const auto* const movement = handle.template find<components::movement>()) {
-		const auto& movement_def = handle.template get<invariants::movement>();
+	handle.template conditional_dispatch<all_entity_types_having<components::movement>>([&damping](const auto typed_handle) {
+		const auto& movement = typed_handle.template get<components::movement>();
+		const auto& movement_def = typed_handle.template get<invariants::movement>();
 
-		const bool is_inert = movement->make_inert_for_ms > 0.f;
+		const bool is_inert = movement.make_inert_for_ms > 0.f;
 
 		if (is_inert) {
 			damping.linear = 2;
@@ -256,17 +258,17 @@ damping_info component_synchronizer<E, components::rigid_body>::calculate_dampin
 			damping.linear = movement_def.standard_linear_damping;
 		}
 
-		const auto requested_by_input = movement->get_force_requested_by_input(movement_def);
+		const auto requested_by_input = movement.get_force_requested_by_input(movement_def);
 
 		if (requested_by_input.non_zero()) {
-			if (movement->was_sprint_effective) {
+			if (movement.was_sprint_effective) {
 				if (!is_inert) {
 					damping.linear /= 4;
 				}
 			}
 		}
 
-		const bool make_inert = movement->make_inert_for_ms > 0.f;
+		const bool make_inert = movement.make_inert_for_ms > 0.f;
 
 		/* the player feels less like a physical projectile if we brake per-axis */
 		if (!make_inert) {
@@ -275,7 +277,7 @@ damping_info component_synchronizer<E, components::rigid_body>::calculate_dampin
 				requested_by_input.y_non_zero() ? 0.f : movement_def.braking_damping
 			);
 		}
-	}
+	});
 
 	return damping;
 }

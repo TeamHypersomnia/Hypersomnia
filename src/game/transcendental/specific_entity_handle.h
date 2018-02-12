@@ -254,6 +254,14 @@ public:
 		);
 	}
 
+	/* For compatibility with the general handle */
+	template <class List, class F>
+	void conditional_dispatch(F callback) const {
+		if constexpr(is_one_of_list_v<entity_type, List>) {
+			callback(*this);
+		}
+	}
+
 	template <bool C>
 	operator basic_entity_handle<C>() const {
 		if constexpr(is_const && !C) {

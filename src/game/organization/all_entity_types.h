@@ -253,16 +253,11 @@ struct finishing_trace {
 		invariants::sprite,
 		invariants::render,
 		invariants::trace,
-
 		invariants::interpolation
 	>;
 
 	using components = type_list<
-		components::rigid_body,
-		components::item,
-		components::sender,
 		components::trace,
-
 		components::interpolation
 	>;
 };

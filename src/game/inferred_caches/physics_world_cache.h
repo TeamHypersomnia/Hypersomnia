@@ -190,7 +190,14 @@ public:
 	void infer_cache_for(const const_entity_handle);
 	void destroy_cache_of(const const_entity_handle);
 
-	void infer_rigid_body_existence(const const_entity_handle);
+	template <class E>
+	void infer_rigid_body_existence(const E handle) {
+		if (const auto cache = find_rigid_body_cache(handle)) {
+			return;
+		}
+
+		infer_cache_for_rigid_body(handle);
+	}
 
 	void infer_cache_for_colliders(const const_entity_handle);
 	void infer_cache_for_rigid_body(const const_entity_handle);
