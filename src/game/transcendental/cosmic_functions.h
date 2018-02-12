@@ -58,6 +58,7 @@ public:
 		const raw_entity_flavour_id id,
 		P pre_construction
 	) {
+		ensure(id);
 		const auto handle = instantiate_flavour<E>(cosm, id);
 
 		pre_construction(handle);
@@ -75,6 +76,7 @@ public:
 		const typed_entity_flavour_id<E> flavour_id,
 		P&& pre_construction
 	) {
+		ensure(flavour_id);
 		return specific_create_entity<E>(cosm, flavour_id.raw, std::forward<P>(pre_construction));
 	}
 
@@ -84,6 +86,7 @@ public:
 		const constrained_entity_flavour_id<Types...> flavour_id,
 		P&& pre_construction
 	) {
+		ensure(flavour_id);
 		using candidate_types = typename decltype(flavour_id)::matching_types; 
 
 		return conditional_get_by_dynamic_id<candidate_types>(

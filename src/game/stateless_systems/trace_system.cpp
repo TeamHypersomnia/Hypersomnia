@@ -1,6 +1,7 @@
 #include "trace_system.h"
 #include "augs/misc/randomization.h"
 
+#include "game/debug_utils.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/logic_step.h"
@@ -77,6 +78,11 @@ void trace_system::spawn_finishing_traces_for_deleted_entities(const logic_step 
 			&& !trace->is_it_a_finishing_trace
 		) {
 			const auto& trace_def = deleted_entity.get<invariants::trace>();
+
+			if (!trace_def.finishing_trace_flavour) {
+				warning_unset_field(deleted_entity, "invariants::trace::finishing_trace_flavour");
+				continue;
+			}
 
 			const auto finishing_trace = cosmic::create_entity(
 				cosmos, 
