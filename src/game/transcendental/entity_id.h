@@ -37,6 +37,22 @@ struct unversioned_entity_id : unversioned_entity_id_base {
 		return *static_cast<const base*>(this);
 	}
 
+	bool is_set() const {
+		return base::is_set() && type_id.is_set();
+	}
+
+	void unset() {
+		*this = unversioned_entity_id();
+	}
+
+	bool operator==(const unversioned_entity_id b) const {
+		return type_id == b.type_id && basic() == b.basic();
+	}
+
+	bool operator!=(const unversioned_entity_id b) const {
+		return !operator==(b);
+	}
+
 	unversioned_entity_id(
 		const base id = base(),
 		entity_type_id type_id = entity_type_id()
@@ -44,6 +60,10 @@ struct unversioned_entity_id : unversioned_entity_id_base {
 		base(id),
 		type_id(type_id)
 	{}
+
+private:
+	using base::operator==;
+	using base::operator!=;
 };
 
 struct child_entity_id;
@@ -71,8 +91,20 @@ struct entity_id : entity_id_base {
 		return *static_cast<const base*>(this);
 	}
 
+	bool operator==(const entity_id b) const {
+		return type_id == b.type_id && basic() == b.basic();
+	}
+
+	bool operator!=(const entity_id b) const {
+		return !operator==(b);
+	}
+
+	void unset() {
+		*this = entity_id();
+	}
+
 	bool is_set() const {
-		return entity_id_base::is_set() && type_id.is_set();
+		return base::is_set() && type_id.is_set();
 	}
 
 	operator bool() const {
@@ -82,6 +114,10 @@ struct entity_id : entity_id_base {
 	operator unversioned_entity_id() const {
 		return { basic(), type_id };
 	}
+
+private:
+	using base::operator==;
+	using base::operator!=;
 }; 
 
 template <class E>
@@ -96,6 +132,18 @@ struct typed_entity_id : entity_id_base {
 	operator entity_id() const {
 		return { *this, entity_type_id::of<E> };
 	}
+
+	bool operator==(const typed_entity_id<E> b) const {
+		return basic() == b.basic();
+	}
+
+	bool operator!=(const typed_entity_id<E> b) const {
+		return !operator==(b);
+	}
+
+private:
+	using base::operator==;
+	using base::operator!=;
 }; 
 
 struct child_entity_id : entity_id {

@@ -21,7 +21,7 @@ struct raycast_input : public b2RayCastCallback {
 bool raycast_input::ShouldRaycast(b2Fixture* const fixture) {
 	const auto fixture_entity = fixture->GetBody()->GetUserData();
 	return
-		(subject == entity_id() || fixture_entity != subject) &&
+		(subject == entity_id() || fixture_entity != FixtureUserdata(subject)) &&
 		(b2ContactFilter::ShouldCollide(&subject_filter, &fixture->GetFilterData()));
 }
 

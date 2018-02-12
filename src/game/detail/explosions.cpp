@@ -96,7 +96,7 @@ void standard_explosion_input::instantiate(
 				const bool is_self = 
 					subject_alive
 					&& (
-						body_entity_id == subject.get_id()
+						body_entity_id == FixtureUserdata(subject.get_id())
 						|| cosmos[body_entity_id].get_owning_transfer_capability() == subject.get_id()
 					)
 				;

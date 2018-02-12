@@ -1,5 +1,6 @@
 #include "augs/filesystem/path.h"
 
+#include "augs/templates/is_comparable.h"
 #include "augs/templates/type_map.h"
 #include "augs/readwrite/custom_lua_representations.h"
 
@@ -101,8 +102,12 @@ static void gg() {
 		static_assert(same<tp::at<float>, const char*>);
 		static_assert(same<tp::at<const int>, std::string>);
 	}
+	typed_entity_id<controlled_character>() == typed_entity_id<controlled_character>();
 }
 struct tests_of_traits {
+	static_assert(is_comparable_v<const int, int>);
+	static_assert(!is_comparable_v<typed_entity_id<controlled_character>, typed_entity_id<plain_missile>>);
+
 	static_assert(has_invariants_or_components_v<controlled_character, components::interpolation>);
 	static_assert(!has_invariants_or_components_v<plain_invisible_body, components::interpolation>);
 

@@ -346,7 +346,7 @@ void visibility_system::respond_to_visibility_information_requests(
 			aabb, 
 			request.filter,
 			[&](const b2Fixture* const f) {
-				if (get_body_entity_that_owns(f) == ignored_entity) {
+				if (get_body_entity_that_owns(f) == Userdata(ignored_entity)) {
 					return callback_result::CONTINUE;
 				}
 
