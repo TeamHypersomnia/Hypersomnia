@@ -208,7 +208,8 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 									}
 
 									correct_interpolation_for(round_entity);
-								}
+								},
+								[&](const auto) {}
 							);
 						}
 					}
@@ -285,7 +286,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 								}
 
 								correct_interpolation_for(round_entity);
-							});
+							}, [&](const auto) {});
 						}
 					}
 
@@ -303,7 +304,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 							shell_entity.template get<components::rigid_body>().set_velocity(vec2::from_degrees(muzzle_transform.rotation + spread_component).set_length(rng.randval(gun_def.shell_velocity)));
 							response.spawned_shell = shell_entity;
-						});
+						}, [&](const auto) {});
 					}
 
 					destructions.emplace_back(single_bullet_or_pellet_stack);

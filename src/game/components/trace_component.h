@@ -4,6 +4,7 @@
 #include "augs/pad_bytes.h"
 
 #include "game/transcendental/entity_flavour_id.h"
+#include "game/organization/all_entity_types.h"
 
 struct fast_randomization;
 
@@ -36,6 +37,10 @@ namespace invariants {
 	struct trace {
 		using implied_component = components::trace;
 		using minmax = augs::minmax<float>;
+		using finishing_trace_flavour_type = constrained_entity_flavour_id<
+			components::trace,
+			components::interpolation
+		>; 
 
 		// GEN INTROSPECTOR struct invariants::trace
 		minmax max_multiplier_x = minmax(1.f, 1.f);
@@ -45,7 +50,7 @@ namespace invariants {
 
 		minmax lengthening_duration_ms = minmax(200.f, 400.f);
 
-		entity_flavour_id finishing_trace_flavour;
+		finishing_trace_flavour_type finishing_trace_flavour;
 
 		// END GEN INTROSPECTOR
 	};

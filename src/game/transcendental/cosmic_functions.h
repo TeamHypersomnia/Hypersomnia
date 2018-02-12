@@ -80,11 +80,12 @@ public:
 		return specific_create_entity<E>(cosm, flavour_id.raw, std::forward<P>(pre_construction));
 	}
 
-	template <class C, class... Types, class P>
+	template <class C, class... Types, class Pre, class Post>
 	static entity_handle create_entity(
 		C& cosm,
 		const constrained_entity_flavour_id<Types...> flavour_id,
-		P&& pre_construction
+		Pre&& pre_construction,
+		Post post_construction
 	) {
 		ensure(flavour_id);
 		using candidate_types = typename decltype(flavour_id)::matching_types; 
@@ -95,11 +96,14 @@ public:
 			[&](auto e) {
 				using E = decltype(e);
 
-				return entity_handle(specific_create_entity<E>(
+				const auto typed_handle = specific_create_entity<E>(
 					cosm, 
 					flavour_id.raw, 
-					std::forward<P>(pre_construction)
-				));
+					std::forward<Pre>(pre_construction)
+				);
+
+				post_construction(typed_handle);
+				return entity_handle(typed_handle);
 			}
 		);
 	}

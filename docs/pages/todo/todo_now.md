@@ -7,17 +7,11 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order:  
 
-- dispatch_to_having<...
 - inventory slot handle should itself decide when to use generic handle
-- dispatch in draw entity for speed
-- add post construction callbacks and use it e.g. in trace system
 - replace "alive"/"dead" checks with optionals of handles
 	- and assume that an existing handle always points to an entity
 	- a lot of work but it will be worth it
 	- in any case do it once everything else works
-	
-- remove redundant logic for componnt/inv lists once all is done and works
-- remove "implied components"
 
 - Constructing entities
 	- Solver might want to set some initial component values before inference occurs
@@ -72,6 +66,8 @@ summary: Just a hidden scratchpad.
 
 ## Later
 
+- remove redundant logic for componnt/inv lists once all is done and works
+- remove "implied components"
 - remove build info printing from hypersomnia version
 - it probably makes no sense to use GUIDs for now if we are anyway going to transfer whole pools for determinism
 - consider having entity guids in components instead of ids for simplicity of network transfers

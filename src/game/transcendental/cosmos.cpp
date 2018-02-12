@@ -26,13 +26,7 @@ std::wstring cosmos::summary() const {
 }
 
 rng_seed_type cosmos::get_rng_seed_for(const entity_id id) const {
-	rng_seed_type transform_hash = 0;
-	const auto tr = operator[](id).get_logic_transform();
-	transform_hash = static_cast<rng_seed_type>(std::abs(tr.pos.x)*100.0);
-	transform_hash += static_cast<rng_seed_type>(std::abs(tr.pos.y)*100.0);
-	transform_hash += static_cast<rng_seed_type>(std::abs(tr.rotation)*100.0);
-
-	return operator[](id).get_guid() + transform_hash;
+	return augs::simple_two_hash(operator[](id).get_guid(), get_total_steps_passed());
 }
 
 randomization cosmos::get_rng_for(const entity_id id) const {
