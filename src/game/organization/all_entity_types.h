@@ -177,9 +177,7 @@ struct static_light {
 	static constexpr std::size_t statically_allocated_flavours = 50;
 
 	using invariants = type_list<
-		invariants::light,
-		invariants::sprite,
-		invariants::render
+		invariants::light
 	>;
 
 	using components = type_list<

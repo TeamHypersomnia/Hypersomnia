@@ -7,6 +7,7 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order:  
 
+- remove build info printing from hypersomnia version
 - add post construction callbacks and use it e.g. in trace system
 - replace "alive"/"dead" checks with optionals of handles
 	- and assume that an existing handle always points to an entity

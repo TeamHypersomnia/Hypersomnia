@@ -447,7 +447,7 @@ struct basic_xywh {
 	}
 
 	bool operator!=(const basic_xywh r) const {
-		return x != r.x || y != r.y || w != r.w || h != r.h;
+		return !operator==(r);
 	}
 
 	template <class P>

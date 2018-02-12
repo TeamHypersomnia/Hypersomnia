@@ -64,6 +64,7 @@ public:
 		construct_pre_inference(handle);
 		infer_caches_for(handle);
 		construct_post_inference(handle);
+		emit_warnings(handle);
 
 		return handle;
 	}

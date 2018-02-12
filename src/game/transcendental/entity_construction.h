@@ -25,3 +25,24 @@ void construct_post_inference(const handle_type h) {
 	}
 }
 
+std::string to_string(const std::wstring& val);
+
+template <class handle_type>
+void emit_warnings(const handle_type h) {
+	auto get_subject_info = [&h]() {
+		return to_string(h.get_name()) + typesafe_sprintf("'s (g: %x)", h.get_guid().value);
+	};
+
+	if (const auto sprite = h.template find<invariants::sprite>()) {
+		if (sprite->tex == assets::game_image_id::INVALID || sprite->size.is_zero()) {
+			LOG("WARNING: %x sprite was not set.", get_subject_info());
+		}
+	}
+
+	if (const auto render = h.template find<invariants::render>()) {
+		if (render->layer == render_layer::INVALID) {
+			LOG("WARNING: %x render layer was not set.", get_subject_info());
+		}
+	}
+}
+

@@ -7,8 +7,6 @@ namespace components {
 		// GEN INTROSPECTOR struct components::wandering_pixels
 		vec2 center;
 		vec2 size;
-
-		xywh reach = xywh(0.f, 0.f, 0.f, 0.f);
 		rgba colorize = white;
 		unsigned particles_count = 20u;
 		// END GEN INTROSPECTOR

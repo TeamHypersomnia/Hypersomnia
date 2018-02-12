@@ -71,7 +71,7 @@ struct particles_emission {
 	pad_bytes<2> pad;
 
 	tuple_of_particle_definitions_vectors particle_definitions;
-	render_layer target_render_layer = render_layer::INVALID;
+	render_layer target_render_layer = render_layer::ILLUMINATING_PARTICLES;
 
 	// END GEN INTROSPECTOR
 

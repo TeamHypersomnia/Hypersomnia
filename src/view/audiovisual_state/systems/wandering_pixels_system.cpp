@@ -61,21 +61,22 @@ void wandering_pixels_system::advance_for(
 		cache.recorded_component.particles_count = wandering.particles_count;
 	}
 
-	if (/* refresh_cache */ 
-		!(cache.recorded_component.reach == wandering.get_reach())
-	) {
+	const auto new_reach = wandering.get_reach();
+
+	if (cache.recorded_component.get_reach() != new_reach) {
+		/* refresh_cache */ 
 		cache.rng = { cosmos.get_rng_seed_for(it) };
 
 		for (auto& p : cache.particles) {
 			p.pos.set(
-				wandering.reach.x + cache.rng.randval(0u, static_cast<unsigned>(wandering.reach.w)), 
-				wandering.reach.y + cache.rng.randval(0u, static_cast<unsigned>(wandering.reach.h))
+				new_reach.x + cache.rng.randval(0u, static_cast<unsigned>(new_reach.w)), 
+				new_reach.y + cache.rng.randval(0u, static_cast<unsigned>(new_reach.h))
 			);
 
 			p.current_lifetime_ms = cache.rng.randval(0.f, wandering_def.frame_duration_ms);
 		}
 
-		cache.recorded_component.reach = wandering.get_reach();
+		cache.recorded_component.set_reach(new_reach);
 	}
 
 	constexpr unsigned max_direction_time = 4000u;
@@ -90,7 +91,7 @@ void wandering_pixels_system::advance_for(
 			p.current_direction = p.current_direction.perpendicular_cw();
 
 			const auto dir = p.current_direction;
-			const auto reach = wandering.get_reach();
+			const auto reach = new_reach;
 
 			float chance_to_flip = 0.f;
 
