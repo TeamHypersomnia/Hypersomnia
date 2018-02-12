@@ -85,7 +85,7 @@ public:
 	) {
 		using candidate_types = typename decltype(flavour_id)::matching_types; 
 
-		return only_get_by_dynamic_id<candidate_types>(
+		return conditional_get_by_dynamic_id<candidate_types>(
 			all_entity_types(),
 			flavour_id.type_id,
 			[&](auto e) {

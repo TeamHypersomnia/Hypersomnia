@@ -41,7 +41,7 @@ template <
 	class T,
 	class F
 >
-decltype(auto) only_get_by_dynamic_index(
+decltype(auto) conditional_get_by_dynamic_index(
 	T&& index_gettable_object,
 	const std::size_t dynamic_type_index,
 	F&& generic_call
@@ -60,7 +60,7 @@ decltype(auto) only_get_by_dynamic_index(
 			}
 		}
 
-		return only_get_by_dynamic_index<OnlyCandidates, current_candidate + 1>(
+		return conditional_get_by_dynamic_index<OnlyCandidates, current_candidate + 1>(
 			std::forward<T>(index_gettable_object),
 			dynamic_type_index,
 			std::forward<F>(generic_call)
@@ -92,12 +92,12 @@ decltype(auto) get_by_dynamic_id(
 }
 
 template <class OnlyCandidates, class T, class F>
-decltype(auto) only_get_by_dynamic_id(
+decltype(auto) conditional_get_by_dynamic_id(
 	T&& index_gettable_object,
 	const type_in_list_id<std::decay_t<T>> dynamic_type_index,
 	F&& generic_call
 ) {
-	return only_get_by_dynamic_index<OnlyCandidates, 0>(
+	return conditional_get_by_dynamic_index<OnlyCandidates, 0>(
 		std::forward<T>(index_gettable_object), 
 		static_cast<std::size_t>(dynamic_type_index.get_index()),
 		std::forward<F>(generic_call)

@@ -79,8 +79,8 @@ static void ff() {
 		return 20.0;	
 	};
 
-	auto okay3 = only_get_by_dynamic_index<candidates>(t, std::size_t(0), tester);
-	auto okay4 = only_get_by_dynamic_id<candidates>(t, type_in_list_id<all_entity_types>(), tester);
+	auto okay3 = conditional_get_by_dynamic_index<candidates>(t, std::size_t(0), tester);
+	auto okay4 = conditional_get_by_dynamic_id<candidates>(t, type_in_list_id<all_entity_types>(), tester);
 
 	static_assert(same<double, decltype(okay)>);
 	static_assert(same<double, decltype(okay2)>);
