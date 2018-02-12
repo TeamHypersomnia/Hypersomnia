@@ -255,6 +255,7 @@ struct finishing_trace {
 	>;
 
 	using components = type_list<
+		components::transform,
 		components::trace,
 		components::interpolation
 	>;

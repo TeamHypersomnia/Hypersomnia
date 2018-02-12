@@ -20,7 +20,12 @@ void construct_post_inference(const handle_type h) {
 	auto& cosmos = h.get_cosmos();
 
 	if (const auto interpolation = h.template find<components::interpolation>()) {
-		interpolation->place_of_birth = h.get_logic_transform();
+		if (const auto t = h.find_logic_transform()) {
+			interpolation->place_of_birth = *t;
+		}
+		else {
+			warning_other(h, "interpolation found but no transform could be found at time of birth");
+		}
 	}
 
 	if (const auto trace = h.template find<components::trace>()) {

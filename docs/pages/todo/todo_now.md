@@ -9,7 +9,7 @@ summary: Just a hidden scratchpad.
 
 - fix step_and_set_new_transforms to iterate over entities instead
 - inventory slot handle should itself decide when to use generic handle
-- remove build info printing from hypersomnia version
+- dispatch in draw entity for speed
 - add post construction callbacks and use it e.g. in trace system
 - replace "alive"/"dead" checks with optionals of handles
 	- and assume that an existing handle always points to an entity
@@ -72,6 +72,7 @@ summary: Just a hidden scratchpad.
 
 ## Later
 
+- remove build info printing from hypersomnia version
 - it probably makes no sense to use GUIDs for now if we are anyway going to transfer whole pools for determinism
 - consider having entity guids in components instead of ids for simplicity of network transfers
 	- there ain't really that many and it will be greatly useful
