@@ -257,9 +257,16 @@ public:
 	/* For compatibility with the general handle */
 	template <class List, class F>
 	void conditional_dispatch(F callback) const {
-		if constexpr(is_one_of_list_v<entity_type, List>) {
-			callback(*this);
+		if constexpr(num_types_in_list_v<List>) {
+			if constexpr(is_one_of_list_v<entity_type, List>) {
+				callback(*this);
+			}
 		}
+	}
+
+	template <class F>
+	decltype(auto) dispatch(F callback) const {
+		return callback(*this);
 	}
 
 	template <bool C>

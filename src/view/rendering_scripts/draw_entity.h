@@ -5,7 +5,6 @@
 
 #include "game/enums/render_layer.h"
 
-#include "game/transcendental/entity_handle_declaration.h"
 #include "game/transcendental/cosmos.h"
 
 #include "game/components/polygon_component.h"
@@ -84,75 +83,98 @@ FORCE_INLINE void draw_border(
 	}
 }
 
-template <class F>
-FORCE_INLINE void on_renderable_component(const const_entity_handle h, F callback) {
-	if (const auto sprite = h.find<invariants::sprite>()) {
-		if (const auto trace = h.find<components::trace>()) {
-			auto tracified_sprite = *sprite;
+using entities_with_renderables = all_entity_types_having_any<
+	invariants::sprite,
+   	invariants::polygon
+>;
 
-			tracified_sprite.center_offset = tracified_sprite.size * trace->last_center_offset_mult;
-			tracified_sprite.size *= trace->last_size_mult;
+template <class E, class F>
+FORCE_INLINE void on_renderable_component(const E h, F callback) {
+	h.template conditional_dispatch<all_entity_types_having<invariants::sprite>>(
+		[&callback](const auto handle) {
+			const auto& sprite = handle.template get<invariants::sprite>();
 
-			callback(tracified_sprite);
+			if (const auto trace = handle.template find<components::trace>()) {
+				auto tracified_sprite = sprite;
+
+				tracified_sprite.center_offset = tracified_sprite.size * trace->last_center_offset_mult;
+				tracified_sprite.size *= trace->last_size_mult;
+
+				callback(tracified_sprite);
+			}
+			else {
+				callback(sprite);
+			}
 		}
-		else {
-			callback(*sprite);
+	);
+
+	h.template conditional_dispatch<all_entity_types_having<invariants::polygon>>(
+		[&callback](const auto handle) {
+			callback(handle.template get<invariants::polygon>());
 		}
-	}
-	else if (const auto polygon = h.find<invariants::polygon>()) {
-		callback(*polygon);
-	}
+	);
 }
 
+template <class E>
 FORCE_INLINE void draw_entity(
-	const const_entity_handle e,
+	const E e,
 	const draw_renderable_input in,
 	const interpolation_system& interp
 ) {
-	on_renderable_component(e, [&](const auto& r) {
-		draw_renderable(r, in, e.get_viewing_transform(interp, true));
+	e.template conditional_dispatch<entities_with_renderables>([&in, &interp](const auto typed_handle){
+		on_renderable_component(typed_handle, [&](const auto& r) {
+			draw_renderable(r, in, typed_handle.get_viewing_transform(interp, true));
+		});
 	});
 }
 
+template <class E>
 FORCE_INLINE void draw_color_highlight(
-	const const_entity_handle h,
+	const E e,
 	const rgba color,
 	const draw_renderable_input in,
 	const interpolation_system& interp
 ) {
-	on_renderable_component(h, [&](auto copy) {
-		copy.set_color(color);
+	e.template conditional_dispatch<entities_with_renderables>([&in, &interp, color](const auto typed_handle){
+		on_renderable_component(typed_handle, [&](auto copy) {
+			copy.set_color(color);
 
-		draw_renderable(
-			copy,
-			in,
-			h.get_viewing_transform(interp, true)
-		);
+			draw_renderable(
+				copy,
+				in,
+				typed_handle.get_viewing_transform(interp, true)
+			);
+		});
 	});
 }
 
+template <class E>
 FORCE_INLINE void draw_neon_map(
-	const const_entity_handle e,
+	const E e,
 	const draw_renderable_input in,
 	const interpolation_system& interp
 ) {
-	on_renderable_component(e, [&](const auto& r) {
-		draw_neon_map(r, in, e.get_viewing_transform(interp, true));
+	e.template conditional_dispatch<entities_with_renderables>([&in, &interp](const auto typed_handle){
+		on_renderable_component(typed_handle, [&](const auto& r) {
+			draw_neon_map(r, in, typed_handle.get_viewing_transform(interp, true));
+		});
 	});
 }
 
-template <class border_provider>
+template <class E, class border_provider>
 FORCE_INLINE void draw_border(
-	const const_entity_handle e,
+	const E e,
 	const draw_renderable_input in,
 	const interpolation_system& interp,
 	const border_provider& borders
 ) {
-	const auto border_info = borders(e);
+	e.template conditional_dispatch<entities_with_renderables>([&in, &interp, borders](const auto typed_handle){
+		const auto border_info = borders(typed_handle);
 
-	if (border_info) {
-		on_renderable_component(e, [&](const auto& r) {
-			draw_border(r, in, e.get_viewing_transform(interp, true), *border_info);
-		});
-	}
+		if (border_info) {
+			on_renderable_component(typed_handle, [&](const auto& r) {
+				draw_border(r, in, typed_handle.get_viewing_transform(interp, true), *border_info);
+			});
+		}
+	});
 }

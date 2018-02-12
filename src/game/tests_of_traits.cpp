@@ -108,6 +108,9 @@ struct tests_of_traits {
 	static_assert(is_comparable_v<const int, int>);
 	static_assert(!is_comparable_v<typed_entity_id<controlled_character>, typed_entity_id<plain_missile>>);
 
+	static_assert(has_any_of_v<controlled_character, invariants::sprite, invariants::polygon>);
+	static_assert(!has_any_of_v<controlled_character, invariants::trace>);
+
 	static_assert(has_invariants_or_components_v<controlled_character, components::interpolation>);
 	static_assert(!has_invariants_or_components_v<plain_invisible_body, components::interpolation>);
 
