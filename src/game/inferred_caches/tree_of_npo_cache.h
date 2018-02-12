@@ -50,6 +50,8 @@ class tree_of_npo_cache {
 		tree_of_npo_type type = tree_of_npo_type::COUNT;
 		ltrb recorded_aabb;
 		int tree_proxy_id = -1;
+
+		void clear(tree_of_npo_cache& owner);
 	};
 
 	inferred_cache_map<cache> per_entity_cache;

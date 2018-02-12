@@ -17,9 +17,12 @@
 #include "game/detail/physics/colliders_connection.h"
 
 class cosmos;
+class physics_world_cache;
 
 struct rigid_body_cache {
 	augs::propagate_const<b2Body*> body = nullptr;
+
+	void clear(physics_world_cache&);
 
 	bool is_constructed() const {
 		return body.get() != nullptr;
@@ -34,6 +37,8 @@ struct colliders_cache {
 
 	colliders_connection connection;
 
+	void clear(physics_world_cache&);
+
 	bool is_constructed() const {
 		return all_fixtures_in_component.size() > 0;
 	}
@@ -41,6 +46,8 @@ struct colliders_cache {
 
 struct joint_cache {
 	augs::propagate_const<b2Joint*> joint = nullptr;
+
+	void clear(physics_world_cache&);
 
 	bool is_constructed() const {
 		return joint.get() != nullptr;
@@ -55,6 +62,10 @@ struct physics_raycast_output {
 };
 
 class physics_world_cache {
+	friend rigid_body_cache;
+	friend colliders_cache;
+	friend joint_cache;
+
 	inferred_cache_map<rigid_body_cache> rigid_body_caches;
 	inferred_cache_map<colliders_cache> colliders_caches;
 	inferred_cache_map<joint_cache> joint_caches;

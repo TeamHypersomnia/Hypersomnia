@@ -37,14 +37,18 @@ tree_of_npo_cache::tree& tree_of_npo_cache::get_tree(const cache& c) {
 	return trees[static_cast<size_t>(c.type)];
 }
 
+void tree_of_npo_cache::cache::clear(tree_of_npo_cache& owner) {
+	if (tree_proxy_id != -1) {
+		owner.get_tree(*this).nodes.DestroyProxy(tree_proxy_id);
+		tree_proxy_id = -1;
+	}
+}
+
 void tree_of_npo_cache::destroy_cache_of(const const_entity_handle handle) {
 	const auto id = handle.get_id();
 
 	if (const auto cache = find_cache(id)) {
-		if (cache->tree_proxy_id != -1) {
-			get_tree(*cache).nodes.DestroyProxy(cache->tree_proxy_id);
-		}
-
+		cache->clear(*this);
 		per_entity_cache.erase(id);
 	}
 }
@@ -69,7 +73,7 @@ void tree_of_npo_cache::infer_cache_for(const const_entity_handle handle) {
 		;
 		
 		if (full_rebuild) {
-			destroy_cache_of(handle);
+			cache.clear(*this);
 			
 			cache.type = data.type;
 			cache.recorded_aabb = new_aabb;

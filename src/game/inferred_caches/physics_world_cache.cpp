@@ -46,45 +46,54 @@ const joint_cache* physics_world_cache::find_joint_cache(const entity_id id) con
 	return mapped_or_nullptr(joint_caches, id);
 }
 
+void rigid_body_cache::clear(physics_world_cache& owner) {
+	for (const b2Fixture* f = body->m_fixtureList; f != nullptr; f = f->m_next) {
+		owner.colliders_caches.erase(f->GetUserData());
+	}
+
+	for (const b2JointEdge* j = body->m_jointList; j != nullptr; j = j->next) {
+		owner.joint_caches.erase(j->joint->GetUserData());
+	}
+
+	// no need to manually destroy each fixture and joint of the body,
+	// Box2D will take care of that after just deleting the body.
+
+	owner.b2world->DestroyBody(body);
+	body = nullptr;
+}
+
+void colliders_cache::clear(physics_world_cache& owner) {
+	auto owner_body_cache = owner.find_rigid_body_cache(connection.owner);
+
+	for (b2Fixture* f : all_fixtures_in_component) {
+		owner_body_cache->body->DestroyFixture(f);
+	}
+
+	all_fixtures_in_component.clear();
+}
+
+void joint_cache::clear(physics_world_cache& owner) {
+	owner.b2world->DestroyJoint(joint);
+	joint = nullptr;
+}
+
 void physics_world_cache::destroy_rigid_body_cache(const const_entity_handle handle) {
-	const auto& cosmos = handle.get_cosmos();
-
 	if (auto cache = find_rigid_body_cache(handle)) {
-		for (const b2Fixture* f = cache->body->m_fixtureList; f != nullptr; f = f->m_next) {
-			colliders_caches.erase(cosmos[f->GetUserData()]);
-		}
-
-		for (const b2JointEdge* j = cache->body->m_jointList; j != nullptr; j = j->next) {
-			joint_caches.erase(cosmos[j->joint->GetUserData()]);
-		}
-
-		// no need to manually destroy each fixture and joint of the body,
-		// Box2D will take care of that after just deleting the body.
-
-		b2world->DestroyBody(cache->body);
-
+		cache->clear(*this);
 		rigid_body_caches.erase(handle);
 	}
 }
 
 void physics_world_cache::destroy_colliders_cache(const const_entity_handle handle) {
-	const auto& cosmos = handle.get_cosmos();
-
 	if (auto cache = find_colliders_cache(handle)) {
-		auto owner_body_cache = find_rigid_body_cache(cosmos[cache->connection.owner]);
-
-		for (b2Fixture* f : cache->all_fixtures_in_component) {
-			owner_body_cache->body->DestroyFixture(f);
-		}
-
+		cache->clear(*this);
 		colliders_caches.erase(handle);
 	}
 }
 
 void physics_world_cache::destroy_joint_cache(const const_entity_handle handle) {
 	if (auto cache = find_joint_cache(handle)) {
-		b2world->DestroyJoint(cache->joint);
-
+		cache->clear(*this);
 		joint_caches.erase(handle);
 	}
 }
@@ -288,7 +297,7 @@ void physics_world_cache::infer_cache_for_colliders(const const_entity_handle ha
 			return;
 		}
 		else {
-			destroy_colliders_cache(handle);
+			cache.clear(*this);
 		}
 	}
 	
