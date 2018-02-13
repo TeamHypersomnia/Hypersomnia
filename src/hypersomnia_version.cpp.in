@@ -23,21 +23,11 @@ std::string hypersomnia_version::get_summary() const {
 	return typesafe_sprintf(
 		"Revision no.: %x %x\n"
 		"Build date: %x\n"
-		"Commit message:\n%x\n"
-		"Compilation flags:\n"
-		"STATICALLY_ALLOCATE_ENTITIES=%x\n"
-		"STATICALLY_ALLOCATE_ASSETS=%x\n"
-		"STATICALLY_ALLOCATE_BAKED_FONTS=%x\n"
-		"sizeofs: wchar_t=%x, entity_id=%x, unversioned=%x\n",
+		"Commit message:\n%x\n",
 		commit_number ? std::to_string(commit_number) : "Unknown",
 		commit_number ? working_tree_changes.empty() ? "(clean)" : "(dirty)" : "",
 		commit_date,
-		commit_message.size() < 30 ? commit_message : commit_message.substr(0, 30) + "(...)",
-		STATICALLY_ALLOCATE_ENTITIES,
-		STATICALLY_ALLOCATE_ASSETS,
-		STATICALLY_ALLOCATE_BAKED_FONTS,
-		sizeof(wchar_t),
-		sizeof(entity_id), sizeof(unversioned_entity_id)
+		commit_message.size() < 30 ? commit_message : commit_message.substr(0, 30) + "(...)"
 	);
 }
 

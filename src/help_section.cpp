@@ -1,8 +1,7 @@
-#include "hypersomnia_version.h"
+#include "build_info.h"
 
 std::string help_contents = 
 	std::string("Hypersomnia\nA community-centered shooter released as free software.\n") 
-	+ hypersomnia_version().get_summary()
 	+ R"(
 usage: Hypersomnia [flag|file_path]
 
@@ -12,4 +11,7 @@ Flags:
 
 If file_path is supplied and its extension is either lua or wp,
 the file will be automatically opened in the editor.
-)";
+
+)"
++ complete_build_info()
+;

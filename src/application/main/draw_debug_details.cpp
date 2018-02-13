@@ -9,7 +9,7 @@
 #include "application/session_profiler.h"
 #include "application/main/draw_debug_details.h"
 
-#include "hypersomnia_version.h"
+#include "build_info.h"
 
 void draw_debug_details(
 	const augs::drawer output,
@@ -42,7 +42,7 @@ void draw_debug_details(
 	);
 
 	total_details += {
-		to_wstring(hypersomnia_version().get_summary()),
+		to_wstring(hypersomnia_version().get_summary()) + to_wstring(static_allocations_info()),
 		
 		text_style
 	};
