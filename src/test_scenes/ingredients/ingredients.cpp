@@ -91,6 +91,19 @@ namespace test_flavours {
 			assets::game_image_id::ROAD_FRONT_DIRT, white);
 		}
 		{
+			auto& meta = get_test_flavour(flavours, test_sprite_decorations::FLOOR);
+
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::ON_GROUND;
+
+				meta.set(render_def);
+			}
+
+			test_flavours::add_sprite(meta, logicals,
+			assets::game_image_id::FLOOR, white);
+		}
+		{
 			auto& meta = get_test_flavour(flavours, test_sprite_decorations::ROAD);
 
 			{

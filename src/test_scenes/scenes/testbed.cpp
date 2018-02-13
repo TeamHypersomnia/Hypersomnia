@@ -386,7 +386,7 @@ namespace test_scenes {
 				const auto l = create_test_scene_entity(world, test_static_lights::STRONG_LAMP);
 				l.set_logic_transform(components::transform(vec2(664.f + 24.f, -1100)));
 				auto& light = l.get<components::light>();
-				light.color = orange;
+				light.color = cyan;
 			}
 
 			{
@@ -406,14 +406,16 @@ namespace test_scenes {
 					prefabs::create_brick_wall(step, components::transform({ -3.f - 16 + 100 - 160, -32.f - 96 + 160 - 160*b }, 90));
 				}
 
-				const vec2 bg_size = metas.at(assets::game_image_id::TEST_BACKGROUND).get_size();
+				{
+					const vec2 bg_size = metas.at(assets::game_image_id::TEST_BACKGROUND).get_size();
 
-				const auto num_floors = 10 * 10;
-				const auto side = static_cast<int>(sqrt(num_floors) / 2);
+					const auto num_roads = 10 * 10;
+					const auto side = static_cast<int>(sqrt(num_roads) / 2);
 
-				for (int x = -side; x < side; ++x) {
-					for (int y = -side; y < side * 16; ++y) {
-						create_test_scene_entity(world, test_sprite_decorations::STREET, components::transform{ bg_size * vec2i(x, y) });
+					for (int x = -side; x < side; ++x) {
+						for (int y = -side; y < side * 16; ++y) {
+							create_test_scene_entity(world, test_sprite_decorations::STREET, components::transform{ bg_size * vec2i(x, y) });
+						}
 					}
 				}
 
@@ -421,6 +423,19 @@ namespace test_scenes {
 					const vec2 size = metas.at(assets::game_image_id::ROAD_FRONT_DIRT).get_size();
 
 					create_test_scene_entity(world, test_sprite_decorations::ROAD_DIRT, components::transform{ vec2(-3 - 16 + 100 + 160 + 80 + size.x / 2, -32 - 96 + 160 + 80 - size.y / 2) });
+				}
+
+				{
+					const vec2 size = metas.at(assets::game_image_id::FLOOR).get_size();
+
+					const auto num_floors = 10 * 10;
+					const auto side = static_cast<int>(sqrt(num_floors) / 2);
+
+					for (int x = -side; x < side + 1; ++x) {
+						for (int y = -side; y < side + 1; ++y) {
+							create_test_scene_entity(world, test_sprite_decorations::FLOOR, components::transform(vec2(700, -1000 + 320)) + components::transform{ size * vec2i(x, y) });
+						}
+					}
 				}
 
 				for (int r = 0; r < 38; ++r) {

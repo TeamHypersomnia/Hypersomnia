@@ -22,6 +22,7 @@ enum class test_sprite_decorations {
 	STREET,
 	ROAD_DIRT,
 	ROAD,
+	FLOOR,
 	AWAKENING,
 	METROPOLIS
 	// END GEN INTROSPECTOR

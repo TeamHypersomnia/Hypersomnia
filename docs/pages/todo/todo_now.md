@@ -7,6 +7,7 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
+- fix disappearing wandering pixels?
 - editor setup might come in handy for debugging
 
 - inventory slot handle should itself decide when to use generic handle
