@@ -24,6 +24,32 @@
 
 #include "3rdparty/imgui/imgui.h"
 
+void validate_entity_types() {
+	for_each_through_std_get(
+		all_entity_types(), 
+		[](auto e) {
+			using E = decltype(e);
+			using List = invariants_and_components_of<E>;
+
+			for_each_through_std_get(
+				assert_always_together(),
+				[](auto constraint) {
+					using C = decltype(constraint);
+					using F = typename C::First;
+					using S = typename C::Second;
+
+					if constexpr(is_one_of_list_v<F, List>) {
+						static_assert(is_one_of_list_v<S, List>, "An entity type lacks a component/invariant to function properly.");
+					}
+
+					if constexpr(is_one_of_list_v<F, List>) {
+						static_assert(is_one_of_list_v<F, List>, "An entity type lacks a component/invariant to function properly.");
+					}
+				}
+			);
+		}
+	);
+}
 // shortcut
 template <class A, class B>
 constexpr bool same = std::is_same_v<A, B>;

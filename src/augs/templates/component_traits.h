@@ -22,12 +22,3 @@ constexpr bool is_synchronized_v = is_synchronized<A>::value;
 
 template <class A>
 constexpr bool is_always_present_v = is_always_present<A>::value;
-
-template <class T, class = void>
-struct has_implied_component : std::false_type {};
-
-template <class T>
-struct has_implied_component<T, decltype(typename T::implied_component(), void())> : std::true_type {};
-
-template <class A>
-constexpr bool has_implied_component_v = has_implied_component<A>::value;

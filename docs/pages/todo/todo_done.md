@@ -181,3 +181,5 @@ we consider whole type overrides too complex architeciturally:
 		- we should then only ever optimize when it is needed
 	- or it can be part of inferred state which will complicate things a little
 - fix step_and_set_new_transforms to iterate over entities instead
+- make static asserts for presence of respective components and invariants, because it turns out that sometimes code may compile with one missing
+	- as was the case with missing item invariant

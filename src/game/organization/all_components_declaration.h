@@ -2,6 +2,7 @@
 // disables the warning due to type name length exceeded
 #pragma warning(disable : 4503)
 
+#include "augs/templates/type_pair.h"
 #include "augs/templates/type_list.h"
 #include "augs/templates/type_matching_and_indexing.h"
 
@@ -59,6 +60,21 @@ namespace components {
 	struct hand_fuse;
 	struct sender;
 }
+
+using assert_always_together = type_list<
+	type_pair<invariants::gun, components::gun>,
+	type_pair<invariants::trace, components::trace>,
+	type_pair<invariants::interpolation, components::interpolation>,
+	type_pair<invariants::rigid_body, components::rigid_body>,
+	type_pair<invariants::item, components::item>,
+	type_pair<invariants::missile, components::missile>,
+	type_pair<invariants::sentience, components::sentience>,
+	type_pair<invariants::wandering_pixels, components::wandering_pixels>,
+	type_pair<invariants::hand_fuse, components::hand_fuse>,
+	type_pair<invariants::movement, components::movement>,
+	type_pair<invariants::light, components::light>,
+	type_pair<invariants::crosshair, components::crosshair>
+>;
 
 using always_present_invariants = type_list<
 	invariants::flags

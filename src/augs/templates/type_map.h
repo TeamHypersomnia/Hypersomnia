@@ -1,12 +1,7 @@
 #pragma once
 #include "augs/templates/type_list.h"
+#include "augs/templates/type_pair.h"
 #include "augs/templates/type_matching_and_indexing.h"
-
-template <class A, class B>
-struct type_pair {
-	using First = A;
-	using Second = B;
-};
 
 template <class L>
 struct type_map_impl {
