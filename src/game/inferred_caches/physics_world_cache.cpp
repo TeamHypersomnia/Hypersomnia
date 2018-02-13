@@ -218,7 +218,7 @@ void physics_world_cache::infer_cache_for(const const_entity_handle handle) {
 }
 
 void physics_world_cache::infer_cache_for_colliders(const const_entity_handle h) {
-	h.dispatch_on_having<components::rigid_body>([this](const auto handle) {
+	h.dispatch_on_having<invariants::fixtures>([this](const auto handle) {
 		/*
 			Algorithm:
 	
@@ -255,6 +255,11 @@ void physics_world_cache::infer_cache_for_colliders(const const_entity_handle h)
 			bool needs_full_rebuild = false;
 			
 			if (get_calculated_connection() != cache.connection) {
+				needs_full_rebuild = true;
+			}
+
+			if (cache.all_fixtures_in_component.empty()) {
+				/* nothing to compare against */
 				needs_full_rebuild = true;
 			}
 	

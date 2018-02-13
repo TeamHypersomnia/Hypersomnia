@@ -234,7 +234,6 @@ struct plain_missile {
 
 	using components = type_list<
 		components::rigid_body,
-		components::item,
 		components::missile,
 		components::sender,
 		components::trace,

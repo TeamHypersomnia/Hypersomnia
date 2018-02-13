@@ -7,6 +7,8 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
+- make static asserts for presence of respective components and invariants, because it turns out that sometimes code may compile with one missing
+	- as was the case with missing item invariant
 - editor setup might come in handy for debugging
 
 - inventory slot handle should itself decide when to use generic handle
