@@ -23,7 +23,7 @@ namespace augs {
 	template <class size_type>
 	struct pool_indirector {
 		// GEN INTROSPECTOR struct augs::pool_indirector class size_type
-		size_type real_index = 0;
+		size_type real_index = static_cast<size_type>(-1);
 		size_type version = 1;
 		// END GEN INTROSPECTOR
 	};
@@ -68,7 +68,7 @@ namespace augs {
 		}
 
 		static bool versions_match(const pool_indirector_type& indirector, const key_type key) {
-			return indirector.version == key.version;
+			return indirector.version == key.version && indirector.real_index != static_cast<size_type>(-1);
 		}
 
 	public:
@@ -82,6 +82,10 @@ namespace augs {
 		}
 
 		void reserve(const size_type new_capacity) {
+			if (new_capacity == static_cast<size_type>(-1)) {
+				throw std::runtime_error("Last element index is reserved for signifying unused indirectors.");
+			}
+
 			const auto old_capacity = capacity();
 
 			if (new_capacity <= old_capacity) {
@@ -163,8 +167,11 @@ namespace augs {
 			// add dead key's indirector to the list of free indirectors
 			free_indirectors.push_back(key.indirection_index);
 
-			// therefore we must increase version of the dead indirector
+			// therefore we must increase version of the dead indirector...
 			++indirector.version;
+
+			// ...and mark it as unused.
+			indirector.real_index = static_cast<size_type>(-1);
 
 			const auto removed_at_index = indirector.real_index;
 

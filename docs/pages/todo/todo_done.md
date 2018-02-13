@@ -183,3 +183,4 @@ we consider whole type overrides too complex architeciturally:
 - fix step_and_set_new_transforms to iterate over entities instead
 - make static asserts for presence of respective components and invariants, because it turns out that sometimes code may compile with one missing
 	- as was the case with missing item invariant
+- fix possible crash in pool due to fabricated ids?
