@@ -53,5 +53,11 @@ void emit_warnings(const handle_type h) {
 			warning_unset_field(h, "invariants::render::layer");
 		}
 	}
+
+	if (const auto polygon = h.template find<invariants::shape_polygon>()) {
+		if (polygon->shape.convex_polys.empty()) {
+			warning_unset_field(h, "invariants::shape_polygon::shape.convex_polys");
+		}
+	}
 }
 
