@@ -137,6 +137,7 @@ regenerated_atlas::regenerated_atlas(
 			input_for_packing_algorithm.data(), 
 			static_cast<int>(input_for_packing_algorithm.size()), 
 			static_cast<int>(settings.packer_detail_max_atlas_size),
+			true,
 			packing_output
 		);
 
