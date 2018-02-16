@@ -16,11 +16,11 @@ namespace augs {
 	}
 }
 #elif PLATFORM_UNIX
-#include <stdlib.h>
+#include <cstdlib>
 
 namespace augs {
 	int shell(const std::string& s) {
-		return system(s.c_str());
+		return std::system( s.c_str());
 	}
 }
 #else
@@ -34,15 +34,19 @@ namespace augs {
 #if PLATFORM_WINDOWS
 		command = on_file;
 #elif PLATFORM_UNIX
-		const auto full_path = std::experimental::filesystem::system_complete(augs::path_type(on_file));
+		{
+			auto command_with_path = augs::path_type("$VISUAL ");
 
-		auto command_with_path = augs::path_type("$VISUAL ");
-		command_with_path += full_path;
+			{
+				const auto full_path = std::experimental::filesystem::system_complete(augs::path_type(on_file));
+				command_with_path += full_path;
+			}
 
-		command = command_with_path;
+			command = command_with_path;
+		}
 #else
 #error "Unsupported platform!"
 #endif
-		shell(command.c_str());
+		shell("$SHELL -c \"" + command + "\"");
 	}
 }
