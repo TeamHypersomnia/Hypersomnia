@@ -47,8 +47,8 @@ using entity_types_passing = filter_types_in_list_t<Predicate, all_entity_types>
 template <class... Types>
 struct has_all_of {
 	template <class E>
-	struct type : std::bool_constant<
-		(... && is_one_of_list_v<Types, invariants_and_components_of<E>>)
+	struct type : value_conjunction<
+		is_one_of_list_v<Types, invariants_and_components_of<E>>...
 	>
 	{};	
 };
@@ -68,8 +68,8 @@ using entity_types_having_all_of = entity_types_passing<has_all_of<Types...>::te
 template <class... Types>
 struct has_any_of {
 	template <class E>
-	struct type : std::bool_constant<
-		(... || is_one_of_list_v<Types, invariants_and_components_of<E>>)
+	struct type : value_disjunction<
+		is_one_of_list_v<Types, invariants_and_components_of<E>>...
 	>
 	{};	
 };

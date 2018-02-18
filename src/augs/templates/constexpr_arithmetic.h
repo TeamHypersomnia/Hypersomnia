@@ -2,6 +2,32 @@
 #include <cstddef>
 #include "augs/templates/type_list.h"
 
+template <bool...>
+struct value_disjunction; 
+
+template <>
+struct value_disjunction<> {
+	static constexpr bool value = false;
+};
+
+template <bool A, bool... Rest>
+struct value_disjunction<A, Rest...> {
+	static constexpr bool value = A || value_disjunction<Rest...>::value;
+};
+
+template <bool...>
+struct value_conjunction; 
+
+template <>
+struct value_conjunction<> {
+	static constexpr bool value = true;
+};
+
+template <bool A, bool... Rest>
+struct value_conjunction<A, Rest...> {
+	static constexpr bool value = A && value_conjunction<Rest...>::value;
+};
+
 template <std::size_t num_bytes, std::size_t alignment>
 struct aligned_num_of_bytes {
 	static constexpr std::size_t value = (((num_bytes - 1) / alignment) + 1) * alignment;

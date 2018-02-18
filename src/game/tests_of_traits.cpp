@@ -131,6 +131,9 @@ static void gg() {
 	typed_entity_id<controlled_character>() == typed_entity_id<controlled_character>();
 }
 struct tests_of_traits {
+	static_assert(!value_conjunction<true, false, true, false>::value);
+	static_assert(value_disjunction<true, false, true, false>::value);
+
 	static_assert(augs::is_pool_v<augs::pool<int, make_vector, unsigned>>);
 	static_assert(augs::is_pool_v<augs::pool<int, of_size<300>::make_constant_vector, unsigned short>>);
 	static_assert(!augs::is_pool_v<std::vector<int>>);
