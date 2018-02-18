@@ -36,22 +36,15 @@ private:
 public:
 
 	template <class T>
-	static auto get_index_of() {
+	static constexpr auto get_index_of() {
 		return static_cast<index_type>(index_in_list_v<T, list_type>);
 	}
 
-	template <class T>
-	static auto make() {
-		type_in_list_id id;
-		id.set<T>();
-		return id;
-	}
-
-	template <class T>
-	static type_in_list_id of; 
-
 	type_in_list_id() = default;
-	explicit type_in_list_id(const index_type index) : index(index) {}
+	constexpr explicit type_in_list_id(const index_type index) : index(index) {}
+
+	template <class T>
+	static constexpr type_in_list_id of = type_in_list_id(get_index_of<T>());
 
 	bool is_set() const {
 		return index < num_types_in_list_v<list_type>;
@@ -90,10 +83,6 @@ public:
 		return !operator==(b);
 	}
 };
-
-template <class A>
-template <class B>
-type_in_list_id<A> type_in_list_id<A>::of = type_in_list_id<A>::template make<B>();
 
 namespace std {
 	template <class List>
