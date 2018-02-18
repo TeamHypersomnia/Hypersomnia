@@ -191,9 +191,6 @@ namespace augs {
 }
 
 namespace std {
-	template <class H>
-	struct hash;
-
 	template <class T>
 	struct hash<basic_transform<T>> {
 		std::size_t operator()(const basic_transform<T> t) const {

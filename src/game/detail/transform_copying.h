@@ -53,9 +53,6 @@ inline auto get_chased(const absolute_or_local& l) {
 }
 
 namespace std {
-	template <class H>
-	struct hash;
-
 	template <>
 	struct hash<orbital_chasing> {
 		std::size_t operator()(const orbital_chasing t) const {

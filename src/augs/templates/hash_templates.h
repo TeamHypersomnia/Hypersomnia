@@ -1,4 +1,5 @@
 #pragma once
+#include "augs/templates/hash_fwd.h"
 
 namespace augs {
 	template <class A, class B>

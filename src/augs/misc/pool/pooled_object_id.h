@@ -56,9 +56,6 @@ namespace augs {
 }
 
 namespace std {
-	template <class T>
-	struct hash;
-
 	template <class S>
 	struct hash<augs::pooled_object_id<S>> {
 		std::size_t operator()(const augs::pooled_object_id<S> k) const {

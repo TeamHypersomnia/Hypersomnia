@@ -47,9 +47,6 @@ namespace augs {
 
 
 namespace std {
-	template <class H>
-	struct hash;
-
 	template <class A, class B>
 	struct hash<augs::simple_pair<A, B>> {
 		std::size_t operator()(const augs::simple_pair<A, B>& p) const {

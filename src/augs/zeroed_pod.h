@@ -1,5 +1,6 @@
 #pragma once
 #include <type_traits>
+#include "augs/templates/hash_fwd.h"
 
 template <class T>
 struct zeroed_pod {
@@ -18,9 +19,6 @@ struct zeroed_pod {
 
 
 namespace std {
-	template <class T>
-	struct hash;
-
 	template <class T>
 	struct hash<zeroed_pod<T>> {
 		std::size_t operator()(const zeroed_pod<T>& z) const {
