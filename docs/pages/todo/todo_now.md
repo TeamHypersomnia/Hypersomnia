@@ -7,6 +7,7 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
+- "unique" naming for unique sprite decorations et cetera
 - fix absolute or local
 - fix disappearing wandering pixels?
 - editor setup might come in handy for debugging

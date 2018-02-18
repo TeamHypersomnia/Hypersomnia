@@ -1,5 +1,8 @@
 #if BUILD_UNIT_TESTS
 #include <catch.hpp>
+#include "augs/misc/pool/pool.h"
+#include "augs/misc/constant_size_vector.h"
+
 #include "augs/readwrite/memory_stream.h"
 #include "augs/readwrite/byte_file.h"
 #include "augs/math/vec2.h"
@@ -16,24 +19,35 @@ static void report(const T& v, const T& reloaded) {
 }
 
 template <class T>
-static bool try_to_reload_with_file(const T& v) {
-	augs::save_as_bytes(v, path);
-	T test;
-	augs::load_from_bytes(test, path);
-
-	augs::remove_file(path);
-
-	const auto success = test == v;
+bool report_compare(const T& tmp, const T& v) {
+	const auto success = tmp == v;
 
 	if (!success) {
-		report(v, test);
+		report(tmp, v);
 	}
 
 	return success;
 }
 
 template <class T>
-static bool try_to_reload_with_bytes(const T& v) {
+static bool try_to_reload_with_file(T& v) {
+	const T tmp = v;
+	augs::save_as_bytes(v, path);
+	augs::load_from_bytes(v, path);
+
+	augs::remove_file(path);
+
+	if constexpr(augs::is_pool_v<T>) {
+		return true;
+	}
+	else {
+		return report_compare(tmp, v);
+	}
+}
+
+template <class T>
+static bool try_to_reload_with_bytes(T& v) {
+	const T tmp = v;
 	{
 		std::vector<std::byte> bytes;
 		bytes = augs::to_bytes(v);
@@ -41,22 +55,20 @@ static bool try_to_reload_with_bytes(const T& v) {
 		augs::save_as_bytes(bytes, path);
 	}
 
-	T test;
-	augs::load_from_bytes(test, path);
-
+	augs::load_from_bytes(v, path);
 	augs::remove_file(path);
 	
-	const auto success = test == v;
-
-	if (!success) {
-		report(v, test);
+	if constexpr(augs::is_pool_v<T>) {
+		return true;
 	}
-
-	return success;
+	else {
+		return report_compare(tmp, v);
+	}
 }
 
 template <class T>
-static bool try_to_reload_with_memory_stream(const T& v) {
+static bool try_to_reload_with_memory_stream(T& v) {
+	const T tmp = v;
 	{
 		std::vector<std::byte> bytes;
 		bytes = augs::to_bytes(v);
@@ -64,20 +76,18 @@ static bool try_to_reload_with_memory_stream(const T& v) {
 		augs::save_as_bytes(bytes, path);
 	}
 
-	T test;
 	auto bytes = augs::file_to_bytes(path);
 	augs::memory_stream ss = std::move(bytes);
-	augs::read_bytes(ss, test);
+	augs::read_bytes(ss, v);
 
 	augs::remove_file(path);
 
-	const auto success = test == v;
-
-	if (!success) {
-		report(v, test);
+	if constexpr(augs::is_pool_v<T>) {
+		return true;
 	}
-
-	return success;
+	else {
+		return report_compare(tmp, v);
+	}
 }
 
 #define test_cycle(variable) \
@@ -186,6 +196,22 @@ TEST_CASE("Byte readwrite Containers") {
 	test_cycle(abcdef);
 }
 
+TEST_CASE("Byte readwrite FixedContainers") {
+	augs::constant_size_vector<int, 20> cc;
+	cc.resize(8);
+	test_cycle(cc);
+	cc[0] = 483297;
+	cc[1] = 478;
+	cc[7] = 764;
+	test_cycle(cc);
+	cc.resize(2);
+	test_cycle(cc);
+	cc.resize(20);
+	test_cycle(cc);
+	cc[19] = 489;
+	test_cycle(cc);
+}
+
 TEST_CASE("Byte readwrite Optionals") {
 	std::optional<std::vector<float>> abc = std::vector<float>();
 	std::optional<std::vector<int>> abcd = std::vector<int>();
@@ -202,6 +228,44 @@ TEST_CASE("Byte readwrite Optionals") {
 	test_cycle(abcd);
 	test_cycle(abcde);
 	test_cycle(abcdef);
+}
+
+template <class T>
+void test_pool() {
+	T p;
+
+	test_cycle(p);
+	p.allocate(1);
+	test_cycle(p);
+	p.allocate(2);
+	test_cycle(p);
+	p.allocate(33);
+	test_cycle(p);
+
+	auto id = p.allocate(1);
+	test_cycle(p);
+	auto id2 = p.allocate(3);
+	test_cycle(p);
+	auto id3 = p.allocate(3);
+	test_cycle(p);
+	auto id4 = p.allocate(3);
+	test_cycle(p);
+	p.free(id2);
+	test_cycle(p);
+	p.free(id4);
+	test_cycle(p);
+
+	REQUIRE(p.find(id4) == nullptr);
+	REQUIRE(p.find(id2) == nullptr);
+	REQUIRE(p.find(id) != nullptr);
+	REQUIRE(p.find(id3) != nullptr);
+
+	REQUIRE(5 == p.size());
+}
+
+TEST_CASE("Byte readwrite Pools") {
+	test_pool<augs::pool<float, of_size<100>::make_constant_vector, unsigned short>>();
+	test_pool<augs::pool<float, std::vector, unsigned char>>();
 }
 
 TEST_CASE("Byte readwrite Variants and optionals") {

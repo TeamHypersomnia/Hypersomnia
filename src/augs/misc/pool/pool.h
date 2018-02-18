@@ -1,6 +1,7 @@
 #pragma once
 #include "augs/ensure.h"
 #include "augs/misc/pool/pooled_object_id.h"
+#include "augs/templates/maybe_const.h"
 #include "augs/templates/container_traits.h"
 #include "augs/readwrite/byte_readwrite_declaration.h"
 
@@ -62,7 +63,8 @@ namespace augs {
 
 		bool correct_range(const key_type key) const {
 			return 
-				key.indirection_index != static_cast<size_type>(-1) // Quickly eliminate fresh ids without fetching indirectors.size()
+				/* Quickly eliminate fresh ids without fetching indirectors.size() */
+				key.indirection_index != static_cast<size_type>(-1) 
 				&& key.indirection_index < indirectors.size()
 			;
 		}
@@ -106,6 +108,10 @@ namespace augs {
 		struct allocation_result {
 			key_type key;
 			mapped_type& object;
+
+			operator key_type() const {
+				return key;
+			}
 		};
 
 		template <
@@ -164,21 +170,26 @@ namespace augs {
 				return false;
 			}
 
-			// add dead key's indirector to the list of free indirectors
-			free_indirectors.push_back(key.indirection_index);
-
-			// therefore we must increase version of the dead indirector...
-			++indirector.version;
-
-			// ...and mark it as unused.
-			indirector.real_index = static_cast<size_type>(-1);
+			/*
+				before we mess with the to-be-deleted indirector,
+				save the stored real index 
+			*/
 
 			const auto removed_at_index = indirector.real_index;
+
+			/* add dead key's indirector to the list of free indirectors */
+			free_indirectors.push_back(key.indirection_index);
+
+			/* therefore we must increase version of the dead indirector... */
+			++indirector.version;
+
+			/* ...and mark it as unused. */
+			indirector.real_index = static_cast<size_type>(-1);
 
 			if (/* need_to_move_last */ removed_at_index != size() - 1) {
 				const auto indirector_of_last_element = slots.back().pointing_indirector;
 
-				// change last element's indirector - set it to the removed element's index
+				/* change last element's indirector - set it to the removed element's index */
 				indirectors[indirector_of_last_element].real_index = removed_at_index;
 
 				slots[removed_at_index] = std::move(slots.back());
