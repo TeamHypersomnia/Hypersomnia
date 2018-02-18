@@ -53,9 +53,11 @@ struct unversioned_entity_id : unversioned_entity_id_base {
 		return !operator==(b);
 	}
 
+	unversioned_entity_id() = default;
+
 	unversioned_entity_id(
-		const base id = base(),
-		entity_type_id type_id = entity_type_id()
+		const base id,
+		entity_type_id type_id
 	) : 
 		base(id),
 		type_id(type_id)
@@ -74,10 +76,11 @@ struct entity_id : entity_id_base {
 	// INTROSPECT BASE entity_id_base
 	entity_type_id type_id;
 	// END GEN INTROSPECTOR
+	entity_id() = default;
 
 	entity_id(
-		const base id = base(),
-		entity_type_id type_id = entity_type_id()
+		const base id,
+		entity_type_id type_id
 	) : 
 		base(id),
 		type_id(type_id)
@@ -114,6 +117,8 @@ struct entity_id : entity_id_base {
 	operator unversioned_entity_id() const {
 		return { basic(), type_id };
 	}
+
+	friend std::ostream& operator<<(std::ostream& out, const entity_id x);
 
 private:
 	using base::operator==;

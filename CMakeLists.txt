@@ -496,6 +496,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/view/viewables/game_image.cpp"
 	"src/game/detail/spells/spell_logic_input.cpp"
 	"src/game/inferred_caches/processing_lists_cache.cpp"
+	"src/game/transcendental/entity_id.cpp"
 )
 
 if(BUILD_WINDOW_FRAMEWORK)

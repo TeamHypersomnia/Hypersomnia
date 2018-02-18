@@ -1,29 +1,43 @@
 #pragma once
 #include "augs/templates/type_list.h"
 #include "augs/templates/type_matching_and_indexing.h"
+#include "augs/templates/transform_types.h"
 
 namespace augs {
 	struct introspection_access;
 }
 
+template <class T>
+std::string get_type_name_strip_namespace(); 
+
+template <class List>
+class type_in_list_id;
+
+template <class T, class F>
+decltype(auto) get_by_dynamic_id(T&&, const type_in_list_id<std::decay_t<T>>, F&&); 
+
 template <class List>
 class type_in_list_id {
+public:
+	using list_type = replace_list_type_t<List, type_list>;
+private:
+
 	using index_type = unsigned;
 	friend augs::introspection_access;
 	static constexpr unsigned dead_value = static_cast<unsigned>(-1);
-	// GEN INTROSPECTOR class type_in_list_id class List
+	// GEN INTROSPECTOR class type_in_list_id class L
 	index_type index = dead_value;
 	// END GEN INTROSPECTOR
 
 	template <class T>
 	static void assert_correct_type() {
-		static_assert(is_one_of_list_v<T, List>, "The type list does not contain the specified type!");
+		static_assert(is_one_of_list_v<T, list_type>, "The type list does not contain the specified type!");
 	}
-
 public:
+
 	template <class T>
 	static auto get_index_of() {
-		return static_cast<index_type>(index_in_list_v<T, List>);
+		return static_cast<index_type>(index_in_list_v<T, list_type>);
 	}
 
 	template <class T>
@@ -40,7 +54,7 @@ public:
 	explicit type_in_list_id(const index_type index) : index(index) {}
 
 	bool is_set() const {
-		return index < num_types_in_list_v<List>;
+		return index < num_types_in_list_v<list_type>;
 	}
 
 	void unset() {

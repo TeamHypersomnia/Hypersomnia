@@ -11,6 +11,9 @@
 #include "augs/templates/maybe_const.h"
 #include "augs/templates/get_underlying_char_type.h"
 
+#include "augs/templates/type_in_list_id.h"
+#include "augs/templates/get_by_dynamic_id.h"
+
 std::string to_string(const std::wstring& val);
 
 template <class T>
@@ -192,6 +195,18 @@ std::string get_type_name() {
 template <class T>
 std::string get_type_name(const T&) {
 	return get_type_name<T>();
+}
+
+
+template <class T>
+std::string get_type_name(const type_in_list_id<T>& id) {
+	return get_by_dynamic_id(
+		typename type_in_list_id<T>::list_type(),
+		id,
+		[](auto e){
+			return get_type_name(e);
+		}
+	);
 }
 
 template <class T>

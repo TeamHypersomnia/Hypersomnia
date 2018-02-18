@@ -50,7 +50,7 @@ class cosmos_solvable {
 		const auto result = pool.allocate(new_guid, std::forward<Args>(args)...);
 
 		allocation_result<entity_id, decltype(result.object)> output {
-			result.key, result.object
+			entity_id(result.key, entity_type_id::of<E>), result.object
 		};
 
 		return output;
@@ -122,7 +122,7 @@ public:
 	template <class E, class... Args>
 	auto allocate_entity_with_specific_guid(const entity_guid specific_guid, Args&&... args) {
 		const auto result = allocate_new_entity<E>(specific_guid, std::forward<Args>(args)...);
-		guid_to_id[specific_guid] = entity_id(result.key);
+		guid_to_id[specific_guid] = result.key;
 		return result;
 	}
 
@@ -273,14 +273,6 @@ inline entity_id cosmos_solvable::to_versioned(const unversioned_entity_id id) c
 		), 
 		id.type_id 
 	};
-}
-
-inline std::size_t cosmos_solvable::get_entities_count() const {
-	std::size_t total = 0u;
-
-	for_each_pool([&total](const auto& p) { total += p.size(); } );
-
-	return total;
 }
 
 inline entity_guid cosmos_solvable::get_guid(const entity_id id) const {

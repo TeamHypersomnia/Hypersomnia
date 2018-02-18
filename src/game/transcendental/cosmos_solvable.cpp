@@ -8,6 +8,14 @@ void cosmos_solvable::clear() {
 	*this = zero;
 }
 
+std::size_t cosmos_solvable::get_entities_count() const {
+	std::size_t total = 0u;
+
+	for_each_pool([&total](const auto& p) { total += p.size(); } );
+	ensure(guid_to_id.size() == total);
+	return total;
+}
+
 bool cosmos_solvable::empty() const {
 	return get_entities_count() == 0;
 }
@@ -50,9 +58,13 @@ void cosmos_solvable::remap_guids() {
 	guids.clear();
 
 	for_each_entity([&](auto& subject, const auto iteration_index) {
-		using P = type_argument_t<std::decay_t<decltype(subject)>>;
+		using E = type_argument_t<std::decay_t<decltype(subject)>>;
 
-		const auto id = significant.template get_pool<P>().to_id(iteration_index);
+		const auto id = entity_id(
+			significant.template get_pool<E>().to_id(iteration_index),
+			entity_type_id::of<E>
+		);
+
 		guids[subject.guid] = id;
 	});
 }
