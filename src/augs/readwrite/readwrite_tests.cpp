@@ -3,6 +3,7 @@
 #include "augs/misc/pool/pool.h"
 #include "augs/misc/constant_size_vector.h"
 
+#include "augs/templates/type_mod_templates.h"
 #include "augs/readwrite/memory_stream.h"
 #include "augs/readwrite/byte_file.h"
 #include "augs/math/vec2.h"
@@ -265,7 +266,7 @@ void test_pool() {
 
 TEST_CASE("Byte readwrite Pools") {
 	test_pool<augs::pool<float, of_size<100>::make_constant_vector, unsigned short>>();
-	test_pool<augs::pool<float, std::vector, unsigned char>>();
+	test_pool<augs::pool<float, make_vector, unsigned char>>();
 }
 
 TEST_CASE("Byte readwrite Variants and optionals") {

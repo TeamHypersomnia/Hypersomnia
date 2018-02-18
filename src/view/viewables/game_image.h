@@ -68,7 +68,7 @@ void add_shape_invariant_from_renderable(
 	E& into,
 	const loaded_game_image_caches& caches
 ) {
-	static_assert(into.template has<invariants::shape_polygon>());
+	static_assert(E::template has<invariants::shape_polygon>());
 
 	if (const auto sprite = into.template find<invariants::sprite>()) {
 		const auto image_size = caches.at(sprite->tex).get_size();

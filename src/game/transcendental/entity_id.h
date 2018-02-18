@@ -135,7 +135,7 @@ struct typed_entity_id : entity_id_base {
 	}
 
 	operator entity_id() const {
-		return { *this, entity_type_id::of<E> };
+		return { *this, entity_type_id::of<E>() };
 	}
 
 	bool operator==(const typed_entity_id<E> b) const {

@@ -50,7 +50,7 @@ public:
 	}
 
 	using base::get_raw_component;
-	using base::synchronizer_base;
+	using base::base;
 
 	bool is_activated() const{
 		return get_raw_component().activated;

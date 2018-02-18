@@ -129,7 +129,7 @@ class component_synchronizer<E, components::rigid_body>
 	using base::handle;
 
 public:
-	using base::synchronizer_base;
+	using base::base;
 	using base::get_raw_component;
 
 	void infer_caches() const;

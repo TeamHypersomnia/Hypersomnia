@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "3rdparty/imgui/imgui.h"
 #include "augs/graphics/rgba.h"
 #include "augs/templates/string_templates.h"
 #include "augs/filesystem/path.h"

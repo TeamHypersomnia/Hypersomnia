@@ -50,7 +50,7 @@ class cosmos_solvable {
 		const auto result = pool.allocate(new_guid, std::forward<Args>(args)...);
 
 		allocation_result<entity_id, decltype(result.object)> output {
-			entity_id(result.key, entity_type_id::of<E>), result.object
+			entity_id(result.key, entity_type_id::of<E>()), result.object
 		};
 
 		return output;

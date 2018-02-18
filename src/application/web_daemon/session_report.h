@@ -1,5 +1,6 @@
 #pragma once
 #include <mutex>
+#include <string>
 #include <functional>
 
 struct config_lua_table;

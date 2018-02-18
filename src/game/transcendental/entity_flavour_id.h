@@ -46,7 +46,7 @@ struct typed_entity_flavour_id {
 		class V = std::enable_if_t<has_all_of_v<E, C...>>
 	>
 	operator constrained_entity_flavour_id<C...>() const {
-		return { raw, entity_type_id::of<E> };
+		return { raw, entity_type_id::of<E>() };
 	}
 };
 

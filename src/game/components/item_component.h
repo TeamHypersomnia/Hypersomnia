@@ -84,7 +84,7 @@ protected:
 	using base::operator->;
 public:
 	using base::get_raw_component;
-	using base::synchronizer_base;
+	using base::base;
 
 	template <class... Args>
 	decltype(auto) perform_transfer(Args&&... args) const {

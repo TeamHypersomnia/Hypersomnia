@@ -289,11 +289,11 @@ void visibility_system::respond_to_visibility_information_requests(
 			real32 angle;
 			vec2 pos;
 
-			bool operator<(const target_vertex& b) {
+			bool operator<(const target_vertex& b) const {
 				return angle < b.angle;
 			}
 
-			bool operator==(const target_vertex& b) {
+			bool operator==(const target_vertex& b) const {
 				return pos.compare(b.pos) || (b.angle - angle) <= std::numeric_limits<decltype(angle)>::epsilon();
 			}
 		};

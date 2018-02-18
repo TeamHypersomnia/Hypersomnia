@@ -37,4 +37,4 @@ using entity_type_id = type_in_list_id<all_entity_types>;
 constexpr std::size_t ENTITY_TYPES_COUNT = num_types_in_list_v<all_entity_types>;
 
 template <class T>
-constexpr std::size_t ENTITY_TYPE_IDX = index_in_list_v<all_entity_types>;
+constexpr std::size_t ENTITY_TYPE_IDX = index_in_list_v<T, all_entity_types>;

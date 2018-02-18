@@ -62,7 +62,7 @@ void cosmos_solvable::remap_guids() {
 
 		const auto id = entity_id(
 			significant.template get_pool<E>().to_id(iteration_index),
-			entity_type_id::of<E>
+			entity_type_id::of<E>()
 		);
 
 		guids[subject.guid] = id;

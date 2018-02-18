@@ -52,7 +52,7 @@ void release_or_throw_fused_object(
 #endif
 
 			perform_transfer(
-				item_slot_transfer_request{ fused_entity, inventory_slot_id(), -1, false, 0.f }, 
+				item_slot_transfer_request{ fused_entity, inventory_slot_id(), -1, 0.f, false }, 
 				step
 			);
 			

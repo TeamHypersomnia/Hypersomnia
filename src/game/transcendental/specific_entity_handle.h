@@ -213,7 +213,7 @@ public:
 	}
 
 	auto get_type_id() const {
-		return entity_type_id::of<entity_type>;
+		return entity_type_id::of<entity_type>();
 	}
 
 	operator entity_id() const {

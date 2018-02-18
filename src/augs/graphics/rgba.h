@@ -1,13 +1,9 @@
 #pragma once
+#include <array>
 #include <sstream>
 
 struct ImVec4;
 struct hsv;
-
-namespace std {
-	template <class T, std::size_t I>
-	class array;
-}
 
 using vec3 = std::array<float, 3>;
 using vec4 = std::array<float, 4>;

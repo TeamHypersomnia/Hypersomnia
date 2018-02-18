@@ -191,7 +191,7 @@ public:
 		for_each_through_std_get(List(), [&](auto t) { 
 			using E = decltype(t);
 
-			if (raw_id.type_id == entity_type_id::of<E>) {
+			if (raw_id.type_id == entity_type_id::of<E>()) {
 				callback(this->get_specific<E>());
 			}
 		});

@@ -2,19 +2,11 @@
 #include "augs/templates/type_list.h"
 #include "augs/templates/type_matching_and_indexing.h"
 #include "augs/templates/transform_types.h"
+#include "augs/templates/hash_fwd.h"
 
 namespace augs {
 	struct introspection_access;
 }
-
-template <class T>
-std::string get_type_name_strip_namespace(); 
-
-template <class List>
-class type_in_list_id;
-
-template <class T, class F>
-decltype(auto) get_by_dynamic_id(T&&, const type_in_list_id<std::decay_t<T>>, F&&); 
 
 template <class List>
 class type_in_list_id {
@@ -36,15 +28,17 @@ private:
 public:
 
 	template <class T>
-	static constexpr auto get_index_of() {
+	static auto get_index_of() {
 		return static_cast<index_type>(index_in_list_v<T, list_type>);
 	}
 
 	type_in_list_id() = default;
-	constexpr explicit type_in_list_id(const index_type index) : index(index) {}
+	explicit type_in_list_id(const index_type index) : index(index) {}
 
 	template <class T>
-	static constexpr type_in_list_id of = type_in_list_id(get_index_of<T>());
+	static auto of() {
+		return type_in_list_id(get_index_of<T>());
+	}
 
 	bool is_set() const {
 		return index < num_types_in_list_v<list_type>;

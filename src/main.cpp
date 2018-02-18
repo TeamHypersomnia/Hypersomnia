@@ -921,10 +921,12 @@ int work(const int argc, const char* const * const argv) try {
 			The result, which is the collection of new game commands, will be passed further down the loop. 
 		*/
 
-		const auto [
-			new_game_entropy, 
-			viewing_config
-		] = [frame_delta]() {
+		struct input_pass_result {
+			cosmic_entropy game_entropy;
+			config_lua_table viewing_config;
+		};
+		
+		const auto result = [frame_delta]() -> input_pass_result {
 			static game_intents game_intents;
 			static game_motions game_motions;
 
@@ -1350,15 +1352,17 @@ int work(const int argc, const char* const * const argv) try {
 				beyond the closing of this scope.
 			*/
 
-			return std::make_tuple(
+			return {
 				cosmic_entropy(
 					get_viewed_character(),
 					game_intents,
 					game_motions
 				),
 				viewing_config
-			);
+			};
 		}();
+
+		const auto& new_viewing_config = result.viewing_config;
 
 		/* 
 			Viewables reloading pass.
@@ -1391,8 +1395,8 @@ int work(const int argc, const char* const * const argv) try {
 
 		const auto screen_size = window.get_screen_size();
 
-		auto create_menu_context = make_create_menu_context(viewing_config);
-		auto create_game_gui_context = make_create_game_gui_context(viewing_config);
+		auto create_menu_context = make_create_menu_context(new_viewing_config);
+		auto create_game_gui_context = make_create_game_gui_context(new_viewing_config);
 
 		/* 
 			Advance the current setup's logic,
@@ -1400,7 +1404,7 @@ int work(const int argc, const char* const * const argv) try {
 			that it chooses via get_viewed_cosmos.
 		*/
 
-		advance_current_setup(frame_delta, new_game_entropy, viewing_config);
+		advance_current_setup(frame_delta, result.game_entropy, new_viewing_config);
 		
 		/*
 			Game GUI might have been altered by the step's post-solve,
@@ -1453,9 +1457,9 @@ int work(const int argc, const char* const * const argv) try {
 			{
 				audiovisuals.get<interpolation_system>(),
 				audiovisuals.world_hover_highlighter,
-				viewing_config.hotbar,
-				viewing_config.drawing,
-				viewing_config.game_gui_controls,
+				new_viewing_config.hotbar,
+				new_viewing_config.drawing,
+				new_viewing_config.game_gui_controls,
 				get_camera(),
 				get_drawer()
 			}
@@ -1499,7 +1503,7 @@ int work(const int argc, const char* const * const argv) try {
 				{
 					{ viewed_character, get_camera(), screen_size },
 					audiovisuals,
-					viewing_config.drawing,
+					new_viewing_config.drawing,
 					necessary_atlas_entries,
 					get_gui_font(),
 					game_atlas_entries,
@@ -1560,8 +1564,8 @@ int work(const int argc, const char* const * const argv) try {
 
 						get_drawer().aabb_with_border(
 							rectangular_selection,
-							viewing_config.editor.rectangular_selection_color,
-							viewing_config.editor.rectangular_selection_border_color
+							new_viewing_config.editor.rectangular_selection_color,
+							new_viewing_config.editor.rectangular_selection_border_color
 						);
 					}
 				});
@@ -1624,7 +1628,7 @@ int work(const int argc, const char* const * const argv) try {
 		);
 
 		/* #6 */
-		const bool should_draw_our_cursor = viewing_config.window.raw_mouse_input && !window.is_mouse_pos_paused();
+		const bool should_draw_our_cursor = new_viewing_config.window.raw_mouse_input && !window.is_mouse_pos_paused();
 
 		{
 			const auto cursor_drawing_pos = common_input_state.mouse.pos;
@@ -1657,7 +1661,7 @@ int work(const int argc, const char* const * const argv) try {
 			}
 		}
 
-		if (viewing_config.session.show_developer_console) {
+		if (new_viewing_config.session.show_developer_console) {
 			draw_debug_details(
 				get_drawer(),
 				get_gui_font(),
