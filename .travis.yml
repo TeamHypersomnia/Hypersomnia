@@ -10,12 +10,8 @@ addons:
      - gcc-7
      - g++-7
      - cmake
-     - clang-5.0
     sources:
      - ubuntu-toolchain-r-test
-     - llvm-toolchain-trusty-5.0
-     - sourceline: 'deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-4.0 main'
-     - key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
 
 python:
   - "3.6"
@@ -37,27 +33,21 @@ before_install:
 script:
   - |
     if [[ "${c_compiler}" == "clang" ]]; then
-      LLVM_VERSION="5.0.1"
-
-      LLVM_URL="http://llvm.org/releases/${LLVM_VERSION}/llvm-${LLVM_VERSION}.src.tar.xz"
-      LIBCXX_URL="http://llvm.org/releases/${LLVM_VERSION}/libcxx-${LLVM_VERSION}.src.tar.xz"
-      LIBCXXABI_URL="http://llvm.org/releases/${LLVM_VERSION}/libcxxabi-${LLVM_VERSION}.src.tar.xz"
-      mkdir -p llvm llvm/build llvm/projects/libcxx llvm/projects/libcxxabi
-      travis_retry wget -O - ${LLVM_URL} | tar --strip-components=1 -xJ -C llvm
-      travis_retry wget -O - ${LIBCXX_URL} | tar --strip-components=1 -xJ -C llvm/projects/libcxx
-      travis_retry wget -O - ${LIBCXXABI_URL} | tar --strip-components=1 -xJ -C llvm/projects/libcxxabi
-      (cd llvm/build && cmake .. -DCMAKE_INSTALL_PREFIX=${DEPS_DIR}/llvm/install)
-      (cd llvm/build/projects/libcxx && make install -j2)
-      (cd llvm/build/projects/libcxxabi && make install -j2)
-      export CXXFLAGS="-isystem ${DEPS_DIR}/llvm/install/include/c++/v1 -stdlib=libc++"
-      export LDFLAGS="-L ${DEPS_DIR}/llvm/install/lib -l c++ -l c++abi"
-      export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${DEPS_DIR}/llvm/install/lib"
+      clang++ -v
+      mkdir TMP_CLANG
+      cd TMP_CLANG
+      git clone https://chromium.googlesource.com/chromium/src/tools/clang
+      cd ..
+      TMP_CLANG/clang/scripts/update.py
+      ln -s ./third_party/llvm-build/Release+Asserts/bin/clang
+      ln -s ./third_party/llvm-build/Release+Asserts/bin/clang++
+      sudo apt-get install -y libc++-dev libc++abi-dev
     fi
   - ${c_compiler} -v && ${cxx_compiler} -v && cmake --version && make --version && python --version
   - cmake/build.sh ${config} x64 ${c_compiler} ${cxx_compiler} "-DBUILD_IN_CONSOLE_MODE=1 -DBUILD_WINDOW_FRAMEWORK=0 ${other_cmake_flags}"
   - ulimit -c unlimited -S
   - cd build/${config}-x64-${c_compiler}
-  - make tests -j2 --keep-going
+  - make VERBOSE=1 tests -j2 --keep-going
   - ls -l
   - for i in $(find ./ -maxdepth 1 -name 'core*' -print); do gdb $(pwd)/../dev/${EXECUTABLE_NAME} core* -ex "thread apply all bt" -ex "set pagination 0" -batch; done;
 

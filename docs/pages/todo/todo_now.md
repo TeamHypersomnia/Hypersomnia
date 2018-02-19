@@ -7,8 +7,6 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
-- throw exception when max sources reached
-
 - fix absolute or local
 	- really, because we're even getting a crash
 
@@ -141,3 +139,10 @@ summary: Just a hidden scratchpad.
 	- if it so happens that std::unordered_map is too slow, we can always introduce constant-sized vectors/maps under STATICALLY_ALLOCATE_ENTITIES
 		- each type will specify how many to statically allocate 
 		- we can also make caches only for the types that fulfill given conditions of invariants/components existence
+
+- fix mess with sound sources
+	- currently the app might crash if the sound system exceeds maximum sound sources and main menu suddenly is set
+		- we can either let main menu be always present (not in optional), and just clear the intercosm
+			- I think this is the way. We can later remove completely main menu from build for the server app.
+				- because optional or not, it wastes space on the stack.
+	- perhaps the audio context should preallocate some hover/click sounds that are omnipresent?

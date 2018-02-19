@@ -805,6 +805,10 @@ endif()
 
 # We configure additional flags for linker.
 
+if (CLANG)
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lpthread -stdlib=libc++")
+endif()
+
 set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
 set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
 
@@ -895,6 +899,9 @@ set(CMAKE_CXX_FLAGS_RELWITHDEBINFO
 message("All CXX flags: ${CMAKE_CXX_FLAGS}")
 message("Debug CXX flags: ${CMAKE_CXX_FLAGS_DEBUG}")
 message("Release CXX flags: ${CMAKE_CXX_FLAGS_RELEASE}")
+message("ALl linker flags: ${CMAKE_EXE_LINKER_FLAGS}")
+message("Linker debug flags: ${CMAKE_EXE_LINKER_FLAGS_DEBUG}")
+message("Linker release flags: ${CMAKE_EXE_LINKER_FLAGS_RELEASE}")
 
 # We configure MSVC to use static runtime libraries ("/MT" switch),
 # instead of DLL ones.

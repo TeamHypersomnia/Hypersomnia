@@ -18,6 +18,13 @@ namespace augs {
 #elif PLATFORM_UNIX
 #include <cstdlib>
 
+#ifdef __clang__
+extern "C" int __cxa_thread_atexit(void (*func)(), void *obj, void *dso_symbol) {
+	int __cxa_thread_atexit_impl(void (*)(), void *, void *);
+	return __cxa_thread_atexit_impl(func, obj, dso_symbol);
+}
+#endif
+
 namespace augs {
 	int shell(const std::string& s) {
 		return std::system( s.c_str());

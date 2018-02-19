@@ -1711,6 +1711,11 @@ catch (const augs::unit_test_session_error err) {
 
 	return EXIT_FAILURE;
 }
+catch (const augs::too_many_sound_sources_error err) {
+	LOG("Runtime error: %x", err.what());
+
+	return EXIT_FAILURE;
+}
 catch (const std::runtime_error err) {
 	LOG("Runtime error: %x", err.what());
 
