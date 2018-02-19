@@ -1,10 +1,18 @@
 #pragma once
 #include <array>
+#include <stdexcept>
 
 #include "augs/math/vec2.h"
 #include "augs/math/si_scaling.h"
 
 typedef unsigned int ALuint;
+
+namespace augs {
+	struct too_many_sound_sources_error : std::runtime_error {
+		explicit too_many_sound_sources_error() 
+			: std::runtime_error("Too many sound sources. This should never happen.") {}
+	};
+}
 
 namespace augs {
 	class single_sound_buffer;

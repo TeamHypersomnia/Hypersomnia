@@ -23,8 +23,8 @@ python:
 
 matrix:
   include:
-  - env: c_compiler=clang cxx_compiler=clang++ config=Debug
-  - env: c_compiler=gcc-7 cxx_compiler=g++-7 config=Debug
+  - env: c_compiler=clang cxx_compiler=clang++ config=Debug other_cmake_flags="-DBUILD_OPENAL=0"
+  - env: c_compiler=gcc-7 cxx_compiler=g++-7 config=Debug other_cmake_flags=""
 
 before_install:
  - ulimit -c
@@ -55,7 +55,7 @@ script:
       export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${DEPS_DIR}/llvm/install/lib"
     fi
   - ${c_compiler} -v && ${cxx_compiler} -v && cmake --version && make --version && python --version
-  - cmake/build.sh ${config} x64 ${c_compiler} ${cxx_compiler} "-DBUILD_IN_CONSOLE_MODE=1 -DBUILD_WINDOW_FRAMEWORK=0"
+  - cmake/build.sh ${config} x64 ${c_compiler} ${cxx_compiler} "-DBUILD_IN_CONSOLE_MODE=1 -DBUILD_WINDOW_FRAMEWORK=0 ${other_cmake_flags}"
   - ulimit -c unlimited -S
   - cd build/${config}-x64-${c_compiler}
   - make tests -j2 --keep-going

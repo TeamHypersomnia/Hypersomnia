@@ -23,7 +23,15 @@ int g_num_sources = 0;
 
 namespace augs {
 	sound_source::sound_source() {
-		AL_CHECK(alGenSources(1, &id));
+#if BUILD_OPENAL
+		alGenSources(1, &id);
+		const ALenum err { alGetError() };
+
+		if (err == AL_OUT_OF_MEMORY) {
+			throw too_many_sound_sources_error();
+		}
+#endif
+
 #if TRACE_CONSTRUCTORS_DESTRUCTORS
 		++g_num_sources;
 		LOG("alGenSources: %x (now %x sources)", id, g_num_sources);

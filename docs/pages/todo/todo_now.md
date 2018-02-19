@@ -7,9 +7,19 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
+- throw exception when max sources reached
+
+- fix absolute or local
+	- really, because we're even getting a crash
+
+- clang
+	- test clang in RAM (tmpfs)
+	- set more warnings and fix them
+	- consider running static analyzer
+	- lldb for vim
+
 - make matrix for gcc and clang in travis build
 - "unique" naming for unique sprite decorations et cetera
-- fix absolute or local
 - fix disappearing wandering pixels?
 - editor setup might come in handy for debugging
 

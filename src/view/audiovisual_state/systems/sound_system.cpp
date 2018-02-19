@@ -112,7 +112,7 @@ void sound_system::update_effects_from_messages(
 	for (auto& e : events) {
 		const auto effect_id = e.effect.id;
 
-		if (const auto source_effect = mapped_or_nullptr(manager, effect_id)) {
+		if (const auto source_effect = mapped_or_nullptr(manager, effect_id)) try {
 			short_sounds.emplace_back();
 			auto& cache = short_sounds.back();
 
@@ -146,6 +146,9 @@ void sound_system::update_effects_from_messages(
 			source.set_max_distance(si, modifier.max_distance);
 			source.set_reference_distance(si, modifier.reference_distance);
 			source.set_looping(modifier.repetitions == -1);
+		}
+		catch (augs::too_many_sound_sources_error err) {
+			LOG("Warning: maxmimum number of sound sources reached at sound_system.cpp.");
 		}
 	}
 }
