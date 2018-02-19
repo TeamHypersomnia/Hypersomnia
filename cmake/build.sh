@@ -30,3 +30,9 @@ export CC=$C_COMPILER
 export CXX=$CXX_COMPILER
 
 cmake -DARCHITECTURE=$ARCHITECTURE -DCMAKE_BUILD_TYPE=$CONFIGURATION $@ $OLDPWD
+
+# It is necessary to build this sub-sub project because otherwise
+# it will assume the default compiler on the platform.
+# Only here do we have a chance to effectively set CC and CXX.
+
+make native-tools

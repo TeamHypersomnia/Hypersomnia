@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.2)
 
 project(Hypersomnia)
 
+message("C: ${CMAKE_C_COMPILER}")
+message("CXX: ${CMAKE_CXX_COMPILER}")
+
 # Determine the used compiler.
 # In case of MSVC, CMake sets it to ON on its own.
 
