@@ -29,9 +29,9 @@ before_install:
 
 script:
   - gcc -v && g++ -v && cmake --version && make --version && python --version
-  - cmake/build.sh ${config} x64 gcc-7 g++7 "-DBUILD_IN_CONSOLE_MODE=1 -DBUILD_WINDOW_FRAMEWORK=0"
+  - cmake/build.sh ${config} x64 gcc-7 g++-7 "-DBUILD_IN_CONSOLE_MODE=1 -DBUILD_WINDOW_FRAMEWORK=0"
   - ulimit -c unlimited -S
-  - cd build/${config}-x64
+  - cd build/${config}-x64-gcc-7
   - make tests -j2 --keep-going
   - ls -l
   - for i in $(find ./ -maxdepth 1 -name 'core*' -print); do gdb $(pwd)/../dev/${EXECUTABLE_NAME} core* -ex "thread apply all bt" -ex "set pagination 0" -batch; done;
