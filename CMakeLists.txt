@@ -2,6 +2,17 @@ cmake_minimum_required(VERSION 3.2)
 
 project(Hypersomnia)
 
+# Determine the used compiler.
+# In case of MSVC, CMake sets it to ON on its own.
+
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+	message("Building with Clang.")
+	set(CLANG ON)
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+	message("Building with gcc.")
+	set(GCC ON)
+endif()
+
 if(UNIX)
 	message("Building for UNIX systems.")
 
@@ -111,6 +122,18 @@ if(UNIX)
 	set(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE OFF)
 endif()
 
+# Here we set some internal flags for programmers' use. 
+# Don't set them manually without a good reason.
+
+if (MSVC OR CLANG) 
+	set(ADD_MCMODEL_LARGE_FLAG OFF CACHE STRING "Needed to suppress some crazy linker errors")
+elseif (GCC)
+	set(ADD_MCMODEL_LARGE_FLAG ON CACHE STRING "Needed to suppress some crazy linker errors")
+endif()
+
+set (BUILD_LUA_AS_CPP OFF)
+# End of internal flags
+
 if(NOT BUILD_WINDOW_FRAMEWORK)
 	set(BUILD_IN_CONSOLE_MODE "1")
 endif()
@@ -130,12 +153,6 @@ if(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE)
 
 		message("Built Hypersomnia archives will be copied to ${HYPERSOMNIA_RUNTIME_ARCHIVE_DIR}")
 	endif()
-endif()
-
-if(UNIX)
-	set(ADD_MCMODEL_LARGE_FLAG ON CACHE STRING "Needed to suppress some crazy linker errors")
-else()
-	set(ADD_MCMODEL_LARGE_FLAG OFF CACHE STRING "Needed to suppress some crazy linker errors")
 endif()
 
 # Used by archiver and to set the working directory under VS.
@@ -183,7 +200,9 @@ set(LUA_CPPS
 	"src/3rdparty/lua/lzio.c"
 )
 
-set_source_files_properties(${LUA_CPPS} PROPERTIES LANGUAGE CXX)
+if(BUILD_LUA_AS_CPP)
+	set_source_files_properties(${LUA_CPPS} PROPERTIES LANGUAGE CXX)
+endif()
 
 # We will be building Box2D manually, as it is hacked to the utmost.
 
@@ -702,8 +721,36 @@ if(BUILD_UNIT_TESTS)
 endif()
 
 # We configure additional flags for the compiler.
+if(GCC OR CLANG)
+	# Architecture switches
+	if(${ARCHITECTURE} STREQUAL "x64")
+		set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -m64")
+		set(HYPERSOMNIA_C_FLAGS "${HYPERSOMNIA_C_FLAGS} -m64")
+	endif()
 
-if(UNIX)
+	# Generate debug information (we don't care about C libraries at this point)
+	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -g")
+
+	message("-O0 will be specified for Debug build.")
+	set(HYPERSOMNIA_CXX_DEBUG_FLAGS "${HYPERSOMNIA_CXX_DEBUG_FLAGS} -O0")
+	set(HYPERSOMNIA_C_DEBUG_FLAGS "${HYPERSOMNIA_C_DEBUG_FLAGS} -O0")
+endif()
+
+if(CLANG)
+	set(CHOSEN_WARNINGS " ")
+	set(WARNINGS_FOR_OUR_CODE_ONLY " ")
+
+	# Latest features of C++17 will be enabled.
+	set(HYPERSOMNIA_CXX_FLAGS "-stdlib=libc++ -Wno-everything -std=gnu++1z ${CHOSEN_WARNINGS}")
+	set_source_files_properties(${HYPERSOMNIA_CODEBASE_CPPS} PROPERTIES COMPILE_FLAGS ${WARNINGS_FOR_OUR_CODE_ONLY})
+endif()
+
+if(GCC)
+
+# TODO: -Wunused-value fails with SFINAE
+	# We could use for example (void)T::value
+# TODO: -Wduplicated-branch fails with some of our custom type traits
+
 	set(CHOSEN_WARNINGS 
 "-Wdangling-else \
 -Wbool-operation \
@@ -732,26 +779,11 @@ if(UNIX)
 -Wmaybe-uninitialized"
 	)
 
+	set(HYPERSOMNIA_CXX_FLAGS "-std=gnu++1z -w ${CHOSEN_WARNINGS}")
 	set_source_files_properties(${HYPERSOMNIA_CODEBASE_CPPS} PROPERTIES COMPILE_FLAGS ${WARNINGS_FOR_OUR_CODE_ONLY})
+endif()
 
-# TODO: -Wunused-value fails with SFINAE
-	# We could use for example (void)T::value
-# TODO: -Wduplicated-branch fails with some of our custom type traits
-
-	# Latest features of C++17 will be enabled.
-	set(HYPERSOMNIA_CXX_FLAGS "-std=gnu++1z -Werror ${CHOSEN_WARNINGS}")
-
-	if(${ARCHITECTURE} STREQUAL "x64")
-		set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -m64")
-		set(HYPERSOMNIA_C_FLAGS "${HYPERSOMNIA_C_FLAGS} -m64")
-	endif()
-
-	if(CMAKE_COMPILER_IS_GNUCC)
-		message("-O0 will be specified for Debug build.")
-		set(HYPERSOMNIA_CXX_DEBUG_FLAGS "${HYPERSOMNIA_CXX_DEBUG_FLAGS} -O0")
-		set(HYPERSOMNIA_C_DEBUG_FLAGS "${HYPERSOMNIA_C_DEBUG_FLAGS} -O0")
-	endif()
-elseif(MSVC)
+if(MSVC)
 	# Latest features of C++17 will be enabled.
 	set(HYPERSOMNIA_CXX_FLAGS "/std:c++latest /MP /Gm- /fp:strict /bigobj /permissive-")
 	set(HYPERSOMNIA_CXX_DEBUG_FLAGS " ")
@@ -759,19 +791,19 @@ elseif(MSVC)
 	set(HYPERSOMNIA_CXX_RELWITHDEBINFO_FLAGS "/Ob2 /GL /Oi")
 endif()
 
-set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
-set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
-
 if(ADD_MCMODEL_LARGE_FLAG)
 	message("-mcmodel=large -no-pie flag will be specified.")
 	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -mcmodel=large -no-pie")
 endif()
 
 if(UNIX)
-	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -g -pthread")
+	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -pthread")
 endif()
 
 # We configure additional flags for linker.
+
+set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
+set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
 
 if(UNIX)
 
@@ -790,9 +822,10 @@ if(UNIX)
 	add_definitions(-DLUA_USE_LINUX)
 endif()
 
-# Lua is configured to compile as C++, of which sol2 library must necessarily know.
-
-add_definitions(-DSOL_USING_CXX_LUA)
+if(BUILD_LUA_AS_CPP)
+	# Lua is configured to compile as C++, of which sol2 library must necessarily know.
+	add_definitions(-DSOL_USING_CXX_LUA)
+endif()
 
 # We must wait till SOL will fixes these warnings.
 
@@ -1108,8 +1141,10 @@ if(MSVC)
 	endif()
 endif()
 
-if(UNIX)
+if(GCC)
 	list(APPEND HYPERSOMNIA_LIBS stdc++fs)
+elseif(CLANG)
+	list(APPEND HYPERSOMNIA_LIBS c++experimental)
 endif()
 
 target_link_libraries(Hypersomnia ${HYPERSOMNIA_LIBS})
