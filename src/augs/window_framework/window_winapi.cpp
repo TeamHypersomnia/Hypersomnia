@@ -283,8 +283,8 @@ namespace augs {
 		}();
 
 		triple_click_delay = GetDoubleClickTime();
-
-		ensure((hwnd = CreateWindowEx(0, L"augwin", L"invalid_name", 0, 0, 0, 0, 0, 0, 0, GetModuleHandle(NULL), this)));
+		hwnd = CreateWindowEx(0, L"augwin", L"invalid_name", 0, 0, 0, 0, 0, 0, 0, GetModuleHandle(NULL), this);
+		ensure(hwnd);
 
 		PIXELFORMATDESCRIPTOR p;
 		ZeroMemory(&p, sizeof(p));
@@ -297,22 +297,31 @@ namespace augs {
 		p.cAlphaBits = 8;
 		p.cDepthBits = 0;
 		p.iLayerType = PFD_MAIN_PLANE;
-		ensure(hdc = GetDC(hwnd));
+		hdc = GetDC(hwnd);
+		ensure(hdc);
 
 		const auto pf = ChoosePixelFormat(hdc, &p);
 		
 		ensure(pf);
-		ensure(SetPixelFormat(hdc, pf, &p));
+
+		{
+			const auto result = SetPixelFormat(hdc, pf, &p);
+			ensure(result);
+		}
 
 #if BUILD_OPENGL
-		ensure(hglrc = wglCreateContext(hdc));
+		hglrc = wglCreateContext(hdc);
+		ensure(hglrc);
 #endif
-
-		ensure(set_as_current());
+		const auto sc = set_as_current();
+		ensure(sc);
 		show();
 
 		SetLastError(0);
-		ensure(!(SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)this) == 0 && GetLastError() != 0));
+		{
+			const auto result = !(SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)this) == 0 && GetLastError() != 0);
+			ensure(result);
+		}
 
 #ifndef HID_USAGE_PAGE_GENERIC
 #define HID_USAGE_PAGE_GENERIC         ((USHORT) 0x01)
@@ -428,9 +437,13 @@ namespace augs {
 
 	void window::set_window_rect(const xywhi r) {
 		static RECT wr = { 0 };
-		ensure(SetRect(&wr, r.x, r.y, r.r(), r.b()));
-		ensure(AdjustWindowRectEx(&wr, style, FALSE, exstyle));
-		ensure(MoveWindow(hwnd, wr.left, wr.top, wr.right - wr.left, wr.bottom - wr.top, TRUE));
+		const auto result = 
+			(SetRect(&wr, r.x, r.y, r.r(), r.b())) &&
+			(AdjustWindowRectEx(&wr, style, FALSE, exstyle)) &&
+			(MoveWindow(hwnd, wr.left, wr.top, wr.right - wr.left, wr.bottom - wr.top, TRUE))
+		;
+
+		ensure(result);
 	}
 
 	xywhi window::get_window_rect() const {

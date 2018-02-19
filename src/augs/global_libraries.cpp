@@ -28,14 +28,16 @@ namespace augs {
 	void global_libraries::init(const library_flagset to_initialize) {
 		if(to_initialize.test(library::FREETYPE)) {
 #if BUILD_FREETYPE
-			ensure(!FT_Init_FreeType(freetype_library.get()) && "freetype initialization");
+			const auto success = !FT_Init_FreeType(freetype_library.get()) && "freetype initialization";
+			ensure(success);
 			initialized.set(library::FREETYPE);
 #endif
 		}
 		
 		if(to_initialize.test(library::ENET)) {
 #if BUILD_ENET
-			ensure(enet_initialize() == 0 && L"Failed to initialize enet");
+			const auto success = enet_initialize() == 0;
+			ensure(success && L"Failed to initialize enet");
 			initialized.set(library::ENET);
 #endif
 		}
@@ -44,8 +46,9 @@ namespace augs {
 	void global_libraries::deinit(const library_flagset to_deinitialize) {
 		if(to_deinitialize.test(library::FREETYPE)) {
 #if BUILD_FREETYPE
+			const auto success = !FT_Done_FreeType(*freetype_library.get()) && "freetype deinitialization";
 			ensure(initialized.test(library::FREETYPE));
-			ensure(!FT_Done_FreeType(*freetype_library.get()) && "freetype deinitialization");
+			ensure(success);
 			initialized.set(library::FREETYPE, false);
 #endif
 		}

@@ -24,8 +24,8 @@ void save_log_and_terminate();
     LOG( "should_eq(%x, %x) failed:\nexpected: %x\nactual: %x\nfile: %x\nline: %x", #expected, #actual, expected, actual, __FILE__, __LINE__ );\
 }
 #else
-#define ensure(x) (void)(x)
-#define ensure_eq(x, y) (void)(x, y)
-#define should(x) (void)(x)
-#define should_eq(x, y) (void)(x, y)
+#define ensure(x)
+#define ensure_eq(x, y)
+#define should(x)
+#define should_eq(x, y)
 #endif

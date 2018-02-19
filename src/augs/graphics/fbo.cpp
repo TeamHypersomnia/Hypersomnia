@@ -1,6 +1,5 @@
 #include "fbo.h"
 #include "augs/log.h"
-#include "augs/ensure.h"
 #include "augs/graphics/OpenGL_includes.h"
 
 namespace augs {
