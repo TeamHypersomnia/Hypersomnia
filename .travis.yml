@@ -10,7 +10,6 @@ addons:
      - gcc-7
      - g++-7
      - cmake
-     - libc++1
      - clang-5.0
     sources:
      - ubuntu-toolchain-r-test
@@ -50,7 +49,7 @@ script:
       (cd llvm/build && cmake .. -DCMAKE_INSTALL_PREFIX=${DEPS_DIR}/llvm/install)
       (cd llvm/build/projects/libcxx && make install -j2)
       (cd llvm/build/projects/libcxxabi && make install -j2)
-      export CXXFLAGS="-isystem ${DEPS_DIR}/llvm/install/include/c++/v1"
+      export CXXFLAGS="-isystem ${DEPS_DIR}/llvm/install/include/c++/v1 -stdlib=libc++"
       export LDFLAGS="-L ${DEPS_DIR}/llvm/install/lib -l c++ -l c++abi"
       export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${DEPS_DIR}/llvm/install/lib"
     fi
