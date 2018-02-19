@@ -154,9 +154,10 @@ public:
 		return !operator==(id);
 	}
 
+	/* Enable non-const to const handle conversion */
 	template <bool C = !is_const, class = std::enable_if_t<C>>
-	operator const_entity_handle() const {
-		return const_entity_handle(ptr, owner, raw_id);
+	operator basic_entity_handle<!is_const>() const {
+		return basic_entity_handle<!is_const>(ptr, owner, raw_id);
 	}
 
 	operator entity_id() const {

@@ -42,21 +42,21 @@ namespace augs {
 			memory_stream reliable_bs;
 
 			for (auto& msg : reliable_buf) {
-				reliable_bs;//name_property("reliable message");
+				//reliable_bs.name_property("reliable message");
 				reliable_bs.write(msg);
 			}
 
 			if (reliable_bs.size() > 0) {
-				output;//name_property("has_reliable");
+				//output.name_property("has_reliable");
 				augs::write_bytes(output, bool(1));
-				output;//name_property("sequence");
+				//output.name_property("sequence");
 				augs::write_bytes(output, ++sequence);
-				output;//name_property("most_recent_acked_sequence");
+				//output.name_property("most_recent_acked_sequence");
 				augs::write_bytes(output, most_recent_acked_sequence);
 
-				output;//name_property("first_message");
+				//output.name_property("first_message");
 				augs::write_bytes(output, first_message);
-				output;//name_property("last_message");
+				//output.name_property("last_message");
 				
 				//if (last_message - first_message > std::numeric_limits<unsigned char>::max()) {
 				//	ensure(false);
@@ -69,18 +69,18 @@ namespace augs {
 				sequence_to_reliable_range[sequence] = last_message;
 			}
 			else {
-				output;//name_property("has_reliable");
+				//output.name_property("has_reliable");
 				augs::write_bytes(output, bool(0));
 			}
 
-			output;//name_property("reliable_buffer");
+			//output.name_property("reliable_buffer");
 			output.write(reliable_bs);
 		}
 
 		bool reliable_sender::read_ack(memory_stream& input) {
 			unsigned short reliable_ack = 0u;
 
-			input;//name_property("reliable_ack");
+			//input.name_property("reliable_ack");
 			
 			augs::read_bytes(input, reliable_ack);
 			
@@ -121,19 +121,19 @@ namespace augs {
 
 			result_data res;
 
-			input;//name_property("has_reliable");
+			//input.name_property("has_reliable");
 			augs::read_bytes(input, has_reliable);
 
 			/* reliable + maybe unreliable */
 			if (has_reliable) {
-				input;//name_property("sequence");
+				//input.name_property("sequence");
 				augs::read_bytes(input, received_sequence);
-				input;//name_property("most_recent_acked_sequence");
+				//input.name_property("most_recent_acked_sequence");
 				augs::read_bytes(input, update_from_sequence);
 
-				input;//name_property("first_message");
+				//input.name_property("first_message");
 				augs::read_bytes(input, received_first_message);
-				input;//name_property("last_message");
+				//input.name_property("last_message");
 				augs::read_bytes(input, received_message_count);
 
 				if (!sequence_more_recent(received_sequence, last_received_sequence)) {
@@ -153,7 +153,7 @@ namespace augs {
 		}
 
 		void reliable_receiver::write_ack(memory_stream& output) {
-			output;//name_property("reliable_ack");
+			//output.name_property("reliable_ack");
 			augs::write_bytes(output, last_received_sequence);
 		}
 
@@ -198,7 +198,7 @@ namespace augs {
 				receiver.ack_requested = false;
 
 				if (output_bs.size() > 0) {
-					out;//name_property("sender channel");
+					//out.name_property("sender channel");
 					out.write(output_bs);
 				}
 			//}

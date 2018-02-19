@@ -741,7 +741,7 @@ if(CLANG)
 	set(WARNINGS_FOR_OUR_CODE_ONLY " ")
 
 	# Latest features of C++17 will be enabled.
-	set(HYPERSOMNIA_CXX_FLAGS "-stdlib=libc++ -Wno-everything -std=gnu++1z ${CHOSEN_WARNINGS}")
+	set(HYPERSOMNIA_CXX_FLAGS "-stdlib=libc++ -Werror -std=gnu++1z ${CHOSEN_WARNINGS}")
 	set_source_files_properties(${HYPERSOMNIA_CODEBASE_CPPS} PROPERTIES COMPILE_FLAGS ${WARNINGS_FOR_OUR_CODE_ONLY})
 endif()
 
@@ -779,7 +779,7 @@ if(GCC)
 -Wmaybe-uninitialized"
 	)
 
-	set(HYPERSOMNIA_CXX_FLAGS "-std=gnu++1z -w ${CHOSEN_WARNINGS}")
+	set(HYPERSOMNIA_CXX_FLAGS "-std=gnu++1z -Werror ${CHOSEN_WARNINGS}")
 	set_source_files_properties(${HYPERSOMNIA_CODEBASE_CPPS} PROPERTIES COMPILE_FLAGS ${WARNINGS_FOR_OUR_CODE_ONLY})
 endif()
 

@@ -47,7 +47,7 @@ namespace augs {
 		}
 
 		inline bool checkbox(const std::string& label, bool& into) {
-			return { ImGui::Checkbox(label.c_str(), &into) };
+			return ImGui::Checkbox(label.c_str(), &into);
 		}
 
 		template <class T, class... Args>
@@ -84,7 +84,7 @@ namespace augs {
 			vec2i upper_bound, 
 			const std::string& display_format
 		) {
-			return { 
+			return 
 				ImGui::DragIntN(
 					label.c_str(), 
 					&into.x, 
@@ -93,8 +93,8 @@ namespace augs {
 					&lower_bound.x,
 					&upper_bound.x,
 					display_format.c_str()
-				) 
-			};
+				)
+			;
 		}
 
 		inline bool color_edit(

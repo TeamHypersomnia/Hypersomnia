@@ -56,9 +56,7 @@ constexpr bool same = std::is_same_v<A, B>;
 
 template <typename Trait>
 struct size_test_detail {
-	static Trait ttt;
-
-	template<int Value = ttt.size()>
+	template<int Value = Trait().size()>
 	static std::true_type do_call(int) { return std::true_type(); }
 
 	static std::false_type do_call(...) { return std::false_type(); }
@@ -128,7 +126,8 @@ static void gg() {
 		static_assert(same<tp::at<float>, const char*>);
 		static_assert(same<tp::at<const int>, std::string>);
 	}
-	typed_entity_id<controlled_character>() == typed_entity_id<controlled_character>();
+	
+	(void)(typed_entity_id<controlled_character>() == typed_entity_id<controlled_character>());
 }
 struct tests_of_traits {
 	static_assert(!value_conjunction<true, false, true, false>::value);

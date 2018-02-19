@@ -207,8 +207,9 @@ public:
 		return !operator==(id);
 	}
 
+	/* Enable non-const to const handle conversion */
 	template <bool C = !is_const, class = std::enable_if_t<C>>
-	operator const_handle_type() const {
+	operator specific_entity_handle<!is_const, entity_type, identifier_provider>() const {
 		return const_handle_type(subject, owner, get_id());
 	}
 
@@ -257,7 +258,7 @@ public:
 	/* For compatibility with the general handle */
 	template <class List, class F>
 	void conditional_dispatch(F callback) const {
-		if constexpr(num_types_in_list_v<List>) {
+		if constexpr(num_types_in_list_v<List> > 0) {
 			if constexpr(is_one_of_list_v<entity_type, List>) {
 				callback(*this);
 			}

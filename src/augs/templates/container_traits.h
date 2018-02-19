@@ -6,9 +6,7 @@
 
 template <typename Trait>
 struct capacity_test_detail {
-	static Trait ttt;
-
-	template<int Value = ttt.capacity()>
+	template<int Value = Trait().capacity()>
 	static std::true_type do_call(int) { return std::true_type(); }
 
 	static std::false_type do_call(...) { return std::false_type(); }

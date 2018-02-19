@@ -735,7 +735,7 @@ int work(const int argc, const char* const * const argv) try {
 
 		const audiovisual_advance_input in(
 			frame_delta,
-			{ speed_multiplier },
+			speed_multiplier,
 
 			get_viewer_eye(),
 			all_visible,

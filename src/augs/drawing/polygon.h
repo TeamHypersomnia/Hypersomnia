@@ -30,8 +30,8 @@ void map_uv(vertex_container& vertices, const uv_mapping_mode mapping_mode) {
 
 	using vc = const augs::vertex&;
 
-	const auto x_pred = [](const vc a, const vc b) { return a.pos.x < b.pos.x; };
-	const auto y_pred = [](const vc a, const vc b) { return a.pos.y < b.pos.y; };
+	const auto x_pred = [](vc a, vc b) { return a.pos.x < b.pos.x; };
+	const auto y_pred = [](vc a, vc b) { return a.pos.y < b.pos.y; };
 
 	const auto lower = vec2i(
 		static_cast<int>(minimum_of(vertices, x_pred).pos.x),

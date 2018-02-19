@@ -7,6 +7,7 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
+- make matrix for gcc and clang in travis build
 - "unique" naming for unique sprite decorations et cetera
 - fix absolute or local
 - fix disappearing wandering pixels?
