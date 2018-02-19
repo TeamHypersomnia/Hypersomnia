@@ -14,10 +14,6 @@ namespace augs {
 		using error_with_typesafe_sprintf::error_with_typesafe_sprintf;
 	};
 
-	void generate_alsoft_ini(
-		const unsigned max_number_of_sound_sources
-	);
-	
 	void log_all_audio_devices(const path_type& output_path);
 	
 	class audio_device {
@@ -37,7 +33,7 @@ namespace augs {
 		audio_device& operator=(const audio_device&) = delete;
 
 	public:
-		void set_hrtf_enabled(const bool);
+		void reset_device(audio_settings);
 		void log_hrtf_status() const;
 
 		operator ALCdevice*() {

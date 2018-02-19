@@ -160,8 +160,6 @@ int work(const int argc, const char* const * const argv) try {
 		}
 	}
 
-	augs::generate_alsoft_ini(config.audio.max_number_of_sound_sources);
-
 	static const augs::global_libraries libraries;
 	
 	static augs::window window(config.window);

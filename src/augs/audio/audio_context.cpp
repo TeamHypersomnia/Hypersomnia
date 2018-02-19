@@ -3,10 +3,6 @@
 #include "augs/audio/OpenAL_error.h"
 
 #if BUILD_OPENAL
-extern "C" {
-	#include <compat.h>
-}
-
 #include <AL/al.h>
 #include <AL/alc.h>
 #include <AL/efx.h>
@@ -39,26 +35,6 @@ static std::string list_audio_devices(const ALCchar * const devices) {
 #endif
 
 namespace augs {
-	void generate_alsoft_ini(
-		const unsigned max_number_of_sound_sources
-	) {
-#if BUILD_OPENAL
-		std::string alsoft_ini_file;
-		alsoft_ini_file += "# Do not modify.";
-		alsoft_ini_file += "\n# Hypersomnia generates this file every launch to speak with OpenAL.";
-		alsoft_ini_file += "\n# Modification will have no effect.";
-		alsoft_ini_file += "\nhrtf-paths = " + augs::get_executable_directory().string() + "\\hrtf";
-		alsoft_ini_file += typesafe_sprintf("\nsources = %x", max_number_of_sound_sources);
-
-		auto where_openal_expects_alsoft_ini = GetProcPath();
-		alstr_append_cstr(&where_openal_expects_alsoft_ini, "/alsoft.ini");
-
-		const auto alsoft_ini_path = augs::path_type(alstr_get_cstr(where_openal_expects_alsoft_ini));
-
-		augs::save_as_text(alsoft_ini_path, alsoft_ini_file);
-#endif
-	}
-
 	void log_all_audio_devices(const path_type& output_path) {
 #if BUILD_OPENAL
 		const auto all_audio_devices = list_audio_devices(alcGetString(nullptr, ALC_ALL_DEVICES_SPECIFIER));
@@ -136,11 +112,12 @@ namespace augs {
 #endif
 	}
 
-	void audio_device::set_hrtf_enabled(const bool enabled) {
+	void audio_device::reset_device(audio_settings settings) {
 #if BUILD_OPENAL
 		ALCint attrs[] = {
-			ALC_HRTF_SOFT, enabled, /* request HRTF */
-			0 /* end of list */
+			ALC_HRTF_SOFT, settings.enable_hrtf, /* request HRTF */
+			ALC_MONO_SOURCES, static_cast<ALCint>(settings.max_number_of_sound_sources),
+		   	0	/* end of list */
 		};
 
 		alcResetDeviceSOFT(device, attrs);
@@ -171,7 +148,18 @@ namespace augs {
 		AL_CHECK(alListenerf(AL_METERS_PER_UNIT, 1.3f));
 
 		device.log_hrtf_status();
+
 		apply(settings, true);
+
+		{
+			ALint num_stereo_sources;
+			ALint num_mono_sources;
+
+			alcGetIntegerv(device, ALC_STEREO_SOURCES, 1, &num_stereo_sources);
+			alcGetIntegerv(device, ALC_MONO_SOURCES, 1, &num_mono_sources);
+
+			LOG_NVPS(num_stereo_sources, num_mono_sources);
+		}
 #endif
 	}
 
@@ -223,8 +211,11 @@ namespace augs {
 			return !(field == augs::get_corresponding_field(field, settings, current_settings));
 		};
 
-		if (force || changed(settings.enable_hrtf)) {
-			device.set_hrtf_enabled(settings.enable_hrtf);
+		if (force 
+			|| changed(settings.enable_hrtf)
+			|| changed(settings.max_number_of_sound_sources)
+		) {
+			device.reset_device(settings);
 		}
 
 		current_settings = settings;
