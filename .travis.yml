@@ -10,6 +10,7 @@ addons:
      - gcc-7
      - g++-7
      - cmake
+     - libc++1
      - clang-5.0
     sources:
      - ubuntu-toolchain-r-test
