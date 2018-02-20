@@ -800,7 +800,7 @@ if(ADD_MCMODEL_LARGE_FLAG)
 endif()
 
 if(UNIX)
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lpthread -lc++ -lc++abi -lm -lc -lgcc_s -lgcc")
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lpthread ")
 endif()
 
 # We configure additional flags for linker.
@@ -1154,7 +1154,7 @@ endif()
 if(GCC)
 	list(APPEND HYPERSOMNIA_LIBS stdc++fs)
 elseif(CLANG)
-	list(APPEND HYPERSOMNIA_LIBS c++experimental)
+	list(APPEND HYPERSOMNIA_LIBS c++experimental c++ c++abi m c gcc_s gcc)
 endif()
 
 target_link_libraries(Hypersomnia ${HYPERSOMNIA_LIBS})
