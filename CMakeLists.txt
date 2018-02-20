@@ -800,13 +800,13 @@ if(ADD_MCMODEL_LARGE_FLAG)
 endif()
 
 if(UNIX)
-	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -pthread")
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lpthread -lc++ -lc++abi -lm -lc -lgcc_s -lgcc")
 endif()
 
 # We configure additional flags for linker.
 
 if (CLANG)
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lpthread -stdlib=libc++")
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++")
 endif()
 
 set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
