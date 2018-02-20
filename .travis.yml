@@ -32,6 +32,7 @@ before_install:
  - initctl list || true
 
 script:
+  - SAVED_PWD=$PWD
   - |
     if [[ "${c_compiler}" == "clang" ]]; then
       DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
@@ -61,6 +62,7 @@ script:
       export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${LLVM_DIR}/install/lib"
       export PATH="${LLVM_DIR}/clang/bin:${PATH}"
     fi
+  - cd $SAVED_PWD
   - ${c_compiler} -v && ${cxx_compiler} -v && cmake --version && make --version && python --version
   - cmake/build.sh ${config} x64 ${c_compiler} ${cxx_compiler} "-DBUILD_IN_CONSOLE_MODE=1 -DBUILD_WINDOW_FRAMEWORK=0 ${other_cmake_flags}"
   - ulimit -c unlimited -S
