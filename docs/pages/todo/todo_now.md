@@ -7,19 +7,27 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
+- test travis build at introspector-generator
+	- with matrix and specifying build names for better naming?
+		- or just add custom names
+
 - fix absolute or local
 	- really, because we're even getting a crash
 
 - clang
+	- ASSEMBLE COMPLETE TOOLCHAIN
+		- llvm? multilib?
+		- add lld (optionally?) to cmakelists.txt
+			- also build it on travis
+		- describe in readme the tested toolchains
 	- test clang in RAM (tmpfs)
 	- set more warnings and fix them
 	- consider running static analyzer
 	- lldb for vim
 
-- make matrix for gcc and clang in travis build
 - "unique" naming for unique sprite decorations et cetera
 - fix disappearing wandering pixels?
-- editor setup might come in handy for debugging
+- complete editor setup might come in handy for debugging
 
 - inventory slot handle should itself decide when to use generic handle
 - replace "alive"/"dead" checks with optionals of handles

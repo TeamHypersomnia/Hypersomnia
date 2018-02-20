@@ -744,7 +744,9 @@ if(CLANG)
 	set(WARNINGS_FOR_OUR_CODE_ONLY " ")
 
 	# Latest features of C++17 will be enabled.
-	set(HYPERSOMNIA_CXX_FLAGS "-stdlib=libc++ -Werror -std=gnu++1z ${CHOSEN_WARNINGS}")
+	# Looks like stdlib=libc++ is duplicated for the linker as well,
+	# so we only have to add it to CXX.
+	set(HYPERSOMNIA_CXX_FLAGS "-std=gnu++1z -stdlib=libc++ ${CHOSEN_WARNINGS}")
 	set_source_files_properties(${HYPERSOMNIA_CODEBASE_CPPS} PROPERTIES COMPILE_FLAGS ${WARNINGS_FOR_OUR_CODE_ONLY})
 endif()
 
@@ -782,7 +784,7 @@ if(GCC)
 -Wmaybe-uninitialized"
 	)
 
-	set(HYPERSOMNIA_CXX_FLAGS "-std=gnu++1z -Werror ${CHOSEN_WARNINGS}")
+	set(HYPERSOMNIA_CXX_FLAGS "-std=gnu++1z ${CHOSEN_WARNINGS}")
 	set_source_files_properties(${HYPERSOMNIA_CODEBASE_CPPS} PROPERTIES COMPILE_FLAGS ${WARNINGS_FOR_OUR_CODE_ONLY})
 endif()
 
@@ -800,13 +802,13 @@ if(ADD_MCMODEL_LARGE_FLAG)
 endif()
 
 if(UNIX)
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lpthread ")
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
 endif()
 
 # We configure additional flags for linker.
 
 if (CLANG)
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++")
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fuse-ld=lld")
 endif()
 
 set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
@@ -1151,10 +1153,10 @@ if(MSVC)
 	endif()
 endif()
 
-if(GCC)
+if(CLANG)
+	list(APPEND HYPERSOMNIA_LIBS c++experimental)
+elseif(GCC)
 	list(APPEND HYPERSOMNIA_LIBS stdc++fs)
-elseif(CLANG)
-	list(APPEND HYPERSOMNIA_LIBS c++experimental c++ c++abi m c gcc_s gcc)
 endif()
 
 target_link_libraries(Hypersomnia ${HYPERSOMNIA_LIBS})
