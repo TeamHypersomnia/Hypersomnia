@@ -44,7 +44,7 @@ Watch gameplays on YouTube:
 
 # How to build
 To build Hypersomnia, you will need some dependencies installed on your system:
- - **CMake 3.2** or newer.
+ - The newest **CMake**.
  - **git** to clone the respository and later generate version information.
  - Optional: **7-Zip** so that the **Release** configuration can automatically create a compressed archive with the executable and game resources, ready to be sent to someone. 
  - Optional: **Python 3.6** or newer for the script that prepares an archive with the executable.
@@ -56,7 +56,7 @@ open git bash and paste:
 git clone https://github.com/TeamHypersomnia/Hypersomnia.git --recursive
 ```
 
-The repository will start downloading. Once complete, create a ```build/``` folder next to ```CMakeLists.txt``` file. 
+The repository will start downloading. Once complete, create a ```build/``` folder next to ```CMakeLists.txt``` file.  
 Next steps depend on the platform you are on.
 
 ## Windows
@@ -78,14 +78,45 @@ If, for some reason, some step fails, refer to the latest working Appveyor build
 
 ## Linux
 
-Hypersomnia has currently been tested on:
-- Arch Linux with i3 window manager 
+Current platforms are actively supported:
+- Arch Linux with i3 window manager
+- Ubuntu 14.04 trusty, but it was only tested via Travis - the unit tests all pass.
 
-Additional dependencies:
-- gcc 7.2 or newer
-- libx11
-- libxcb
-- xcb-util-keysyms
+### Dependencies
+
+#### Compiler toolchain
+
+You can go with:
+
+- ``gcc 7.2`` and newer, or...
+- ...[``llvm``](http://llvm.org/) toolchain
+	- ``clang 5.0.1`` or newer
+	- ``libc++``
+	- ``libc++abi``
+	- ``libc++experimental``
+	- ``lld``
+		- This one is optional, but it speeds up the relink time *a great deal*.
+
+If you don't know which one to choose, ``llvm`` is recommended.  
+Here are some test full-rebuild timings for ``Intel(R) Core(TM) i7-4770K CPU @ 3.50GHz``:
+
+```
+gcc:
+make all -j8 -C build/current  1115.80s user 55.62s system 660% cpu 2:57.26 total
+clang with gnu ld:
+make all -j8 -C build/current  789.00s user 34.62s system 668% cpu 2:03.24 total
+clang with lld:
+make all -j8 -C build/current  781.58s user 33.29s system 696% cpu 1:57.04 total
+```
+
+LLVM toolchain is expected to yield much faster build times, even on the order of minutes.  
+The generated binary is also more performant (e.g. a simple benchmark yielded ``700 FPS`` versus ``800 FPS`` on a default main menu scene)
+
+#### Other dependencies
+
+- ``libx11``
+- ``libxcb``
+- ``xcb-util-keysyms``
 
 ### One-shot launch
 
@@ -102,14 +133,23 @@ Use your favorite shell to enter the repository's directory.
 Then run:
 
 ```
-cmake/build.sh [Debug|Release|RelWithDebInfo|MinSizeRel] [x86|x64] ["ADDITIONAL CMAKE FLAGS"]
+cmake/build.sh [Debug|Release|RelWithDebInfo|MinSizeRel] [x86|x64] [C_COMPILER CXX_COMPILER] ["ADDITIONAL CMAKE FLAGS"]
 ```
 For example:
 
 ```
-cmake/build.sh Debug x64
+cmake/build.sh Debug x64 clang clang++
 ```
-After which, the resultant Makefile should appear in the build/Debug-x64 directory.
+After which, the resultant Makefile should appear in the build/Debug-x64-clang directory.
+
+Example for gcc:
+
+```
+cmake/build.sh Debug x64 gcc g++
+```
+
+After which, the resultant Makefile should appear in the build/Debug-x64-gcc directory.
+
 There are several additional make targets defined:
 
 ```
@@ -121,16 +161,6 @@ Launches the game normally.
 make tests
 ```
 Launches unit tests only and exits cleanly.
-
-```
-make debug
-```
-Launches the game through ```cgdb```.
-
-```
-make memdeb
-```
-Launches the game through ```valgrind```.
 
 All the above targets set the working directory automatically to ```${PROJECT_SOURCE_DIR}/hypersomnia```.
 Remember to pass ``-j4`` or so to speed up the build.
