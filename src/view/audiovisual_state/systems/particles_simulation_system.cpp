@@ -131,18 +131,16 @@ void particles_simulation_system::update_effects_from_messages(
 
 		if (const auto* const source_effect = mapped_or_nullptr(manager, effect.id)) {
 			auto& instances = [&]() -> emission_instances& {
-				if (const auto absolute_transform = std::get_if<components::transform>(&start.positioning)) {
+				if (!start.positioning.target.is_set()) {
 					faf_cache c;
-					c.transform = *absolute_transform;
+					c.transform = start.positioning.offset;
 					fire_and_forget_emissions.push_back(c);
 
 					return fire_and_forget_emissions.back().emission_instances;
 				}
 
-				const auto chasing = std::get<orbital_chasing>(start.positioning);
-
 				orbital_cache c;
-				c.chasing = chasing;
+				c.chasing = start.positioning;
 				c.original_effect = effect;
 				orbital_emissions.push_back(c);
 

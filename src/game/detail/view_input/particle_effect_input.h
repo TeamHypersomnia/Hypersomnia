@@ -22,13 +22,13 @@ struct particle_effect_start_input {
 
 	static particle_effect_start_input fire_and_forget(const components::transform where) {
 		particle_effect_start_input	in;
-		in.positioning = where;
+		in.positioning.offset = where;
 		return in; 
 	}
 
 	static particle_effect_start_input orbit_local(const entity_id id, const components::transform offset) {
 		particle_effect_start_input	in;
-		in.positioning = orbital_chasing { id, offset };
+		in.positioning = { id, offset };
 		return in; 
 	}
 

@@ -192,3 +192,12 @@ we consider whole type overrides too complex architeciturally:
 - fix absolute or local
 	- really, because we're even getting a crash
 
+
+- Constructing entities
+	- Solver might want to set some initial component values before inference occurs
+		- Should be done in a lambda where a typed entity handle is given 
+		- After which cosmic::create_entity will simply infer all caches
+		- provide an overload which sets transform
+			- static assert if the entity cannot set a transform
+	- Most constructions and clones will request general flavours and thus return general handles
+		- Thus let's for now expose just those general ones

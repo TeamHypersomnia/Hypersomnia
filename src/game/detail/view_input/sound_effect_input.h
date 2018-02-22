@@ -28,13 +28,13 @@ struct sound_effect_start_input {
 
 	static sound_effect_start_input fire_and_forget(const components::transform where) {
 		sound_effect_start_input in;
-		in.positioning = where;
+		in.positioning.offset = where;
 		return in; 
 	}
 
 	static sound_effect_start_input orbit_local(const entity_id id, const components::transform offset) {
 		sound_effect_start_input in;
-		in.positioning = orbital_chasing { id, offset };
+		in.positioning = { id, offset };
 		return in; 
 	}
 
@@ -57,8 +57,6 @@ struct sound_effect_start_input {
 		variation_number = std::hash<components::transform>()(t);
 		return *this;
 	}
-
-	sound_effect_start_input& set_variation_from(const const_entity_handle h);
 };
 
 struct sound_effect_input {

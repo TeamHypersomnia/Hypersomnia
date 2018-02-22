@@ -16,14 +16,6 @@ void fire_and_forget_particle_effect(
 }
 
 void start_orbital_particle_effect(
-	const particle_effect_input in,
-	const logic_step step,  
-	const orbital_chasing where,
-	const entity_id homing_target = {}
-) {
-}
-
-void start_orbital_particle_effect(
 	const logic_step step,  
 	const particle_effect_input in,
 	const entity_id subject,

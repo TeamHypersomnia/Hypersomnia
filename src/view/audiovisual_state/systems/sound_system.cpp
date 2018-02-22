@@ -16,14 +16,6 @@
 
 #include "augs/audio/audio_settings.h"
 
-entity_id get_target_if_any(const absolute_or_local& l) {
-	if (const auto chasing = std::get_if<orbital_chasing>(&l)) {
-		return chasing->target;
-	}
-
-	return {};
-}
-
 void sound_system::clear() {
 	short_sounds.clear();
 	fading_sources.clear();
@@ -41,12 +33,17 @@ void sound_system::clear_sources_playing(const assets::sound_buffer_id id) {
 
 void sound_system::clear_dead_entities(const cosmos& new_cosmos) {
 	erase_if(short_sounds, [&](short_sound_cache& it) {
-		if (new_cosmos[get_target_if_any(it.positioning)].dead()) {
-			if (!it.previous_transform) {
-				return true;
-			}
+		const auto target = it.positioning.target;
 
-			it.positioning = *it.previous_transform;
+		if (target.is_set()) {
+			if (new_cosmos[target].dead()) {
+				if (!it.previous_transform) {
+					return true;
+				}
+
+				it.positioning.offset = *it.previous_transform;
+				it.positioning.target = {};
+			}
 		}
 
 		return false;
@@ -81,7 +78,7 @@ void sound_system::update_effects_from_messages(
 		for (auto& e : events) {
 			erase_if(short_sounds, [&](short_sound_cache& c){	
 				if (const auto m = e.match_chased_subject) {
-					if (*m != get_target_if_any(c.positioning)) { 
+					if (*m != c.positioning.target) { 
 						return false;
 					}
 				}
