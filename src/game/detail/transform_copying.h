@@ -12,8 +12,12 @@ struct orbital_chasing {
 
 	template <class C, class I>
 	std::optional<components::transform> find_transform(C& cosm, I& interp) const {
-		if (const auto target_transform  = cosm[target].find_viewing_transform(interp)) {
-			return *target_transform * offset;
+		const auto target_handle = cosm[target];
+
+		if (target_handle) {
+			if (const auto target_transform  = target_handle.find_viewing_transform(interp)) {
+				return *target_transform * offset;
+			}
 		}
 
 		return std::nullopt;
@@ -21,8 +25,12 @@ struct orbital_chasing {
 
 	template <class C>
 	std::optional<components::transform> find_transform(C& cosm) const {
-		if (const auto target_transform  = cosm[target].find_logic_transform()) {
-			return *target_transform * offset;
+		const auto target_handle = cosm[target];
+
+		if (target_handle) {
+			if (const auto target_transform  = target_handle.find_logic_transform()) {
+				return *target_transform * offset;
+			}
 		}
 
 		return std::nullopt;
