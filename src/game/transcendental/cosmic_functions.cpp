@@ -83,17 +83,20 @@ void cosmic::delete_entity(const entity_handle handle) {
 		return;
 	}
 
-	if (const auto container = handle.find<invariants::container>()) {
-		drop_from_all_slots(*container, handle, [](const auto&){});
-	}
+	/* #1: destroy data associated to the significant fields that will now be gone */
+	destruct_pre_deinference(handle);
 
-	if (const auto current_slot = handle.get_current_slot()) {
-		cosmos.get_solvable_inferred({}).relational.items_of_slots.set_parent(handle, {});
-	}
+	/* 
+		#2: destroy all associated caches 
+		At the moment, all cache classes are designed to be independent.
+
+		There are inter-dependencies inside physics world cache,
+		but no top-level cache class in cosmos_solvable_inferred depends on the other.
+	*/
 
 	cosmic::destroy_caches_of(handle);
 
-	cosmos.get_solvable_inferred({}).relational.destroy_caches_of_children_of(handle);
+	/* #3: finally, deallocate */
 	cosmos.get_solvable({}).free_entity(handle);
 }
 

@@ -184,3 +184,8 @@ we consider whole type overrides too complex architeciturally:
 - make static asserts for presence of respective components and invariants, because it turns out that sometimes code may compile with one missing
 	- as was the case with missing item invariant
 - fix possible crash in pool due to fabricated ids?
+
+- test travis build at introspector-generator
+	- with matrix and specifying build names for better naming?
+		- or just add custom names
+

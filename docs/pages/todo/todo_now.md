@@ -7,33 +7,12 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
-- test travis build at introspector-generator
-	- with matrix and specifying build names for better naming?
-		- or just add custom names
-
 - fix absolute or local
 	- really, because we're even getting a crash
-
-- clang
-	- ASSEMBLE COMPLETE TOOLCHAIN
-		- llvm? multilib?
-		- add lld (optionally?) to cmakelists.txt
-			- also build it on travis
-		- describe in readme the tested toolchains
-	- test clang in RAM (tmpfs)
-	- set more warnings and fix them
-	- consider running static analyzer
-	- lldb for vim
 
 - "unique" naming for unique sprite decorations et cetera
 - fix disappearing wandering pixels?
 - complete editor setup might come in handy for debugging
-
-- inventory slot handle should itself decide when to use generic handle
-- replace "alive"/"dead" checks with optionals of handles
-	- and assume that an existing handle always points to an entity
-	- a lot of work but it will be worth it
-	- in any case do it once everything else works
 
 - Constructing entities
 	- Solver might want to set some initial component values before inference occurs
@@ -60,12 +39,6 @@ summary: Just a hidden scratchpad.
 			- Requests for a certain field to be recalculated
 				- We know that a driver will only need a correction to damping and not entire body
 
-- Instead of having "force joint" at all, make it so that while processing the cars, they additionally apply forces to drivers to keep them
- 
-- Let car calculate statelessly from movement flags in the movement component?
- 
-- Resurrect the unit tests for padding that were deleted along with cosmic delta
-
 - Audiovisual caches should always check if the transform exist because sometimes the transform might be lost even due to having been put into a backpack.
 	- especially the interpolation system.
 		- **it should crash on transfer to backpack when we correct the transfers **
@@ -83,10 +56,29 @@ summary: Just a hidden scratchpad.
 	- This is really important in the face of bugs.
 	- Or just get rid of test scene setup for now and let it by default launch a scene in editor that records inputs
 
-- Later, bullet trace sounds should be calculated statelessly
 - For continuous sounds, sound system should probably assume the same strategy as an inferred cache.
 
-## Later
+## Low prio
+
+- Later, bullet trace sounds should be calculated statelessly
+- Resurrect the unit tests for padding that were deleted along with cosmic delta
+
+- Instead of having "force joint" at all, make it so that while processing the cars, they additionally apply forces to drivers to keep them
+- Let car calculate statelessly from movement flags in the movement component?
+
+- replace "alive"/"dead" checks with optionals of handles
+	- and assume that an existing handle always points to an entity
+	- a lot of work but it will be worth it
+	- in any case do it once everything else works
+
+- inventory slot handle should itself decide when to use generic handle
+	- at this point it is only a performance improvement
+	- or perhaps several compilation error checks?
+
+- clang
+	- test clang in RAM (tmpfs)
+	- set more warnings and fix them
+	- consider running static analyzer
 
 - remove redundant logic for componnt/inv lists once all is done and works
 - remove "implied components"
@@ -123,8 +115,6 @@ summary: Just a hidden scratchpad.
 - add "direct_construction_access" for entity handles
 
 - fix errors at unit tests when not statically allocating 
-- strip children vector tracker of children caches as we'll take that data from signi
-	- was anyway used only for ensuring
 - Groups can be defined separately from flavours, e.g. many groups can share the same flavours.
 	- if we want to have a group wherein a weapon is spawned with a magazine, we can simply set the inventory slot ids beforehand.
 		- We might detect errors early on and disallow some configurations or not care and just throw cosmos_inconsistent_error.

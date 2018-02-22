@@ -110,7 +110,7 @@ perform_transfer_result perform_transfer(
 
 		if (whole_item_grabbed) {
 			item.current_slot.unset();
-			items_of_slots.set_parent(transferred_item, {});
+			items_of_slots.unset_parenthood(transferred_item, previous_slot);
 		}
 
 		if (previous_slot.is_hand_slot()) {
@@ -149,8 +149,17 @@ perform_transfer_result perform_transfer(
 	if (target_slot_exists) {
 		const auto moved_item = grabbed_item_part_handle;
 
-		get_item_of(moved_item).current_slot = target_slot;
-		items_of_slots.set_parent(moved_item, target_slot);
+		{
+			auto& slot = get_item_of(moved_item).current_slot;
+
+			if (slot.is_set()) {
+				items_of_slots.unset_parenthood(moved_item, slot);
+			}
+
+			slot = target_slot;
+		}
+
+		items_of_slots.assign_parenthood(moved_item, target_slot);
 	}
 
 	grabbed_item_part_handle.infer_colliders();
