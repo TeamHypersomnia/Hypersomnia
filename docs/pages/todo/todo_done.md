@@ -201,3 +201,6 @@ we consider whole type overrides too complex architeciturally:
 			- static assert if the entity cannot set a transform
 	- Most constructions and clones will request general flavours and thus return general handles
 		- Thus let's for now expose just those general ones
+
+- Fix bad transforms issue when dropping items
+
