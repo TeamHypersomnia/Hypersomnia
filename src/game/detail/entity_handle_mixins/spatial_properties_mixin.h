@@ -127,6 +127,10 @@ template <class E>
 std::optional<components::transform> spatial_properties_mixin<E>::find_logic_transform() const {
 	const auto handle = *static_cast<const E*>(this);
 
+#if MORE_LOGS
+	LOG("Finding transform for %x.", handle);
+#endif
+
 	if (!handle) {
 		return std::nullopt;
 	}
@@ -183,7 +187,7 @@ std::optional<components::transform> spatial_properties_mixin<E>::find_logic_tra
 	}
 
 	if (const auto wandering_pixels = handle.template find<components::wandering_pixels>()) {
-		return wandering_pixels->center;
+		return components::transform(wandering_pixels->center, 0);
 	}
 
 	if (const auto transform = handle.template find<components::transform>()) {

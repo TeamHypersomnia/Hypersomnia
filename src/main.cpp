@@ -724,7 +724,7 @@ int work(const int argc, const char* const * const argv) try {
 			auto scope = measure_scope(profiler.camera_visibility_query);
 
 			auto queried_camera = get_camera();
-			queried_camera.zoom -= viewing_config.session.camera_query_expansion;
+			queried_camera.zoom /= viewing_config.session.camera_query_aabb_mult;
 
 			all_visible.reacquire_all_and_sort({ viewed_character.get_cosmos(), queried_camera, screen_size, false });
 
@@ -1527,6 +1527,19 @@ int work(const int argc, const char* const * const argv) try {
 
 			if (DEBUG_DRAWING.enabled) {
 				/* #2 */
+				if (DEBUG_DRAWING.draw_npo_tree_nodes) {
+					const auto& cosm = viewed_character.get_cosmos();
+
+					cosm.get_solvable_inferred().tree_of_npo.for_each_aabb([](const ltrb aabb){
+						auto& lines = DEBUG_LOGIC_STEP_LINES;
+
+						lines.emplace_back(red, aabb.left_top(), aabb.right_top());
+						lines.emplace_back(red, aabb.right_top(), aabb.right_bottom());
+						lines.emplace_back(red, aabb.right_bottom(), aabb.left_bottom());
+						lines.emplace_back(red, aabb.left_bottom(), aabb.left_top());
+					});
+				}
+
 				renderer.draw_debug_lines(
 					DEBUG_LOGIC_STEP_LINES,
 					DEBUG_PERSISTENT_LINES,
@@ -1535,7 +1548,7 @@ int work(const int argc, const char* const * const argv) try {
 					get_drawer().default_texture,
 					interpolation_ratio
 				);
-
+				
 				renderer.call_and_clear_lines();
 
 				DEBUG_FRAME_LINES.clear();

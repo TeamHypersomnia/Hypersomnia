@@ -12,7 +12,7 @@ namespace components {
 		// END GEN INTROSPECTOR
 
 		void set_reach(const xywh a) {
-			center = a.center();
+			center = a.get_center();
 			size = a.get_size();
 		}
 

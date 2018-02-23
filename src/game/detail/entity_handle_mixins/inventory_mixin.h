@@ -32,7 +32,7 @@ public:
 	generic_handle_type get_owning_transfer_capability() const;
 	bool owning_transfer_capability_alive_and_same_as_of(const entity_id) const;
 
-	std::optional<colliders_connection> calculate_connection_until_container() const {
+	std::optional<colliders_connection> calc_connection_to_topmost_container() const {
 		const auto& self = *static_cast<const derived_handle_type*>(this);
 		ensure(self);
 
@@ -59,13 +59,15 @@ public:
 
 			it = slot.get_container().get_current_slot();
 		}
-
+		
 		return result;
 	}
 
-	std::optional<colliders_connection> calculate_connection_until_container(const entity_id until) const {
+	std::optional<colliders_connection> calc_connection_until_container(const entity_id until) const {
 		const auto& self = *static_cast<const derived_handle_type*>(this);
+
 		ensure(self);
+		ensure(until.is_set());
 
 		const auto& cosmos = self.get_cosmos();
 

@@ -134,7 +134,7 @@ item_button::layout_with_attachments item_button::calculate_button_layout(
 		component_owner.for_each_contained_item_recursive(
 			[&](const const_entity_handle desc) {
 				if (desc.get_owner_of_colliders()) {
-					output.push(desc.get_aabb(desc.calculate_connection_until_container(component_owner)->shape_offset));
+					output.push(desc.get_aabb(desc.calc_connection_until_container(component_owner)->shape_offset));
 				}
 
 				return recursive_callback_result::CONTINUE_AND_RECURSE;
@@ -286,7 +286,7 @@ void item_button::draw_proc(
 						auto attachment_state = invariants::sprite::drawing_input(output);
 
 						attachment_state.renderable_transform.pos = rc_pos + layout.boxes[attachment_index].get_center() + expansion_offset;
-						attachment_state.renderable_transform.rotation = desc.calculate_connection_until_container(item)->shape_offset.rotation;
+						attachment_state.renderable_transform.rotation = desc.calc_connection_until_container(item)->shape_offset.rotation;
 
 						if (flip.horizontally()) {
 							attachment_state.renderable_transform.flip_rotation();

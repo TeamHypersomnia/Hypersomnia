@@ -1,4 +1,5 @@
 #pragma once
+#include <ostream>
 #include "3rdparty/sol2/sol/forward.hpp"
 
 #include "augs/build_settings/platform_defines.h"
@@ -266,5 +267,5 @@ public:
 
 template <bool is_const>
 std::ostream& operator<<(std::ostream& out, const basic_entity_handle<is_const> &x) {
-	return out << typesafe_sprintf("%x %x", to_string(x.get_name()), x.get_id());
+	return out << typesafe_sprintf("%x-%x", to_string(x.get_name()), x.get_id());
 }

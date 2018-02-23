@@ -22,7 +22,7 @@ public:
 	}
 
 	std::optional<colliders_connection> find_colliders_connection() const;
-	std::optional<colliders_connection> calculate_colliders_connection() const;
+	std::optional<colliders_connection> calc_colliders_connection() const;
 
 	/* Shortcut for getting only the entity handle without shape offset */
 	generic_handle_type get_owner_of_colliders() const;
@@ -43,7 +43,7 @@ typename physics_mixin<E>::generic_handle_type physics_mixin<E>::get_owner_frict
 }
 
 template <class E>
-std::optional<colliders_connection> physics_mixin<E>::calculate_colliders_connection() const {
+std::optional<colliders_connection> physics_mixin<E>::calc_colliders_connection() const {
 	const auto self = *static_cast<const E*>(this);
 	const auto& cosmos = self.get_cosmos();
 	
@@ -53,11 +53,26 @@ std::optional<colliders_connection> physics_mixin<E>::calculate_colliders_connec
 
 	if (const auto item = self.template find<components::item>()) {
 		if (const auto slot = cosmos[item->get_current_slot()]) {
-			return self.calculate_connection_until_container();
+			if (const auto topmost_container = self.calc_connection_to_topmost_container()) {
+				if (auto topmost_container_connection = 
+					cosmos[topmost_container->owner].calc_colliders_connection()
+				) {
+					// TODO: use attachment matrix
+#if MORE_LOGS
+					LOG("%x (item) owned by %x", self, cosmos[topmost_container_connection->owner]);
+#endif
+					return topmost_container_connection;
+				}
+			}
+
+			return std::nullopt;
 		}
 	}
 
 	if (self.template find<components::rigid_body>()) {
+#if MORE_LOGS
+		LOG("%x (body) owned by itself", self);
+#endif
 		return colliders_connection { self, {} };
 	}
 
@@ -100,7 +115,7 @@ std::optional<colliders_connection> physics_mixin<E>::find_colliders_connection(
 		return cache->connection;
 	}
 
-	return calculate_colliders_connection();
+	return calc_colliders_connection();
 }
 
 template <class E>

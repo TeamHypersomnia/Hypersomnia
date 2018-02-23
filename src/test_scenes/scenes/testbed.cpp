@@ -66,7 +66,7 @@ namespace test_scenes {
 		const auto riding_car2 = prefabs::create_car(step, components::transform({ -850 + 1000, -8200 }, -90 + 180));
 #endif
 
-		const int num_characters = 4 + 3 + 3 + 2;
+		const int num_characters = 10;
 
 		for (int i = 0; i < 10; ++i) {
 			prefabs::create_force_grenade(step, { 254, 611 + i *100.f });
@@ -104,9 +104,7 @@ namespace test_scenes {
 
 			}
 			else if (i == 3) {
-#if TODO
-				transform = riding_car.get_logic_transform();
-#endif
+				transform = { { 1102, 413 }, 110 };
 			}
 
 			else if (i == 4) {

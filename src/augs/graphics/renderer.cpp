@@ -10,7 +10,7 @@
 #include "augs/texture_atlas/texture_atlas_entry.h"
 
 #if PLATFORM_UNIX
-#define USE_BUFFER_SUB_DATA 1
+#define USE_BUFFER_SUB_DATA 0
 #endif
 
 void buffer_data(

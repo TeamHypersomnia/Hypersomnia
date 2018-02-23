@@ -61,6 +61,14 @@ class tree_of_npo_cache {
 	const cache* find_cache(const unversioned_entity_id) const;
 
 public:
+	/* Used for example for debugging the created nodes */
+	template <class F>
+	void for_each_aabb(F callback) const {
+		for (const auto& cache : per_entity_cache) {
+			callback(cache.second.recorded_aabb);
+		}
+	}
+
 	template <class F>
 	void for_each_in_camera(
 		F callback,

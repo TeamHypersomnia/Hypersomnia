@@ -399,10 +399,6 @@ struct basic_xywh {
 		return y + this->h;
 	}
 
-	basic_vec2<T> center() const {
-		return{ x + this->w / 2, y + this->h / 2 };
-	}
-
 	auto& set_size(const basic_vec2<T> v) {
 		w = v.x;
 		h = v.y;
@@ -412,6 +408,10 @@ struct basic_xywh {
 
 	basic_vec2<T> get_size() const {
 		return{ w, h };
+	}
+
+	basic_vec2<T> get_center() const {
+		return get_position() + get_size() / 2;
 	}
 
 	bool hover(const basic_vec2<T> m) const {

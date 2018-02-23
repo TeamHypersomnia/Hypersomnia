@@ -246,7 +246,7 @@ return {
   session = {
     automatically_hide_settings_ingame = false,
     show_developer_console = true,
-    camera_query_expansion = 0.1
+    camera_query_aabb_mult = 1.0
   },
   test_scene = {
     create_minimal_test_scene = false,

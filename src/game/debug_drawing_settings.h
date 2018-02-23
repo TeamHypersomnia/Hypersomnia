@@ -34,6 +34,7 @@ struct debug_drawing_settings {
 
 	bool draw_memorised_walls = false;
 	bool draw_undiscovered_locations = false;
+	bool draw_npo_tree_nodes = false;
 	// END GEN INTROSPECTOR
 };
 

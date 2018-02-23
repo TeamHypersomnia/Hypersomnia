@@ -286,3 +286,10 @@ public:
 	}
 };
 
+template <bool is_const, class entity_type, template <class> class identifier_provider>
+std::ostream& operator<<(
+	std::ostream& out,
+   	const specific_entity_handle<is_const, entity_type, identifier_provider> x
+) {
+	return out << typesafe_sprintf("%x-%x", to_string(x.get_name()), x.get_id());
+}

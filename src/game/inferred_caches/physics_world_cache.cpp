@@ -236,7 +236,7 @@ void physics_world_cache::infer_cache_for_colliders(const const_entity_handle h)
 	
 		auto get_calculated_connection = [&](){
 			if (!calculated_connection) {
-				if (const auto connection = handle.calculate_colliders_connection()) {
+				if (const auto connection = handle.calc_colliders_connection()) {
 					calculated_connection = connection; 
 				}
 				else {
@@ -307,6 +307,7 @@ void physics_world_cache::infer_cache_for_colliders(const const_entity_handle h)
 		const auto new_owner = cosmos[get_calculated_connection().owner];
 
 		if (new_owner.dead()) {
+			colliders_caches.erase(it.first);
 			return;
 		}
 

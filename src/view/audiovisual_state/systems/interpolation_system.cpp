@@ -106,15 +106,15 @@ void interpolation_system::integrate_interpolated_transforms(
 			const auto pob = info.place_of_birth;
 			const auto ver = e.get_id().version;
 
-			const auto actual = e.get_logic_transform();
-
-			if (recorded_pob.compare(pob, 0.01f, 1.f) && recorded_ver == ver) {
-				integrated = integrated.interp_separate(actual, positional_averaging_constant, rotational_averaging_constant);
-			}
-			else {
-				integrated = actual;
-				recorded_pob = pob;
-				recorded_ver = ver;
+			if (const auto actual = e.find_logic_transform()) {
+				if (recorded_pob.compare(pob, 0.01f, 1.f) && recorded_ver == ver) {
+					integrated = integrated.interp_separate(*actual, positional_averaging_constant, rotational_averaging_constant);
+				}
+				else {
+					integrated = *actual;
+					recorded_pob = pob;
+					recorded_ver = ver;
+				}
 			}
 		}
 	);

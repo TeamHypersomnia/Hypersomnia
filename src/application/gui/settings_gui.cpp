@@ -279,7 +279,7 @@ void settings_gui_state::perform(
 			case settings_pane::DEBUG: {
 				revertable_checkbox("Show developer console", config.session.show_developer_console);
 				revertable_checkbox("Log keystrokes", config.window.log_keystrokes);
-				revertable_slider("Camera query expansion", config.session.camera_query_expansion, -4.f, 0.9f);
+				revertable_slider("Camera query aabb mult", config.session.camera_query_aabb_mult, 0.10f, 5.f);
 				
 				revertable_checkbox("Draw debug lines", config.debug_drawing.enabled);
 
