@@ -53,7 +53,7 @@ std::optional<colliders_connection> physics_mixin<E>::calculate_colliders_connec
 
 	if (const auto item = self.template find<components::item>()) {
 		if (const auto slot = cosmos[item->get_current_slot()]) {
-			return slot.calculate_connection_until();
+			return self.calculate_connection_until_container();
 		}
 	}
 

@@ -12,6 +12,12 @@
 
 template <class derived_handle_type>
 class inventory_mixin {
+	static void sum(colliders_connection& into, const colliders_connection from) {
+		into.owner = from.owner;
+		// TODO: Sum from a matrix
+		into.shape_offset += components::transform();
+	}
+
 public:
 	static constexpr bool is_const = is_handle_const_v<derived_handle_type>;
 
@@ -25,6 +31,74 @@ public:
 
 	generic_handle_type get_owning_transfer_capability() const;
 	bool owning_transfer_capability_alive_and_same_as_of(const entity_id) const;
+
+	std::optional<colliders_connection> calculate_connection_until_container() const {
+		const auto& self = *static_cast<const derived_handle_type*>(this);
+		ensure(self);
+
+		const auto& cosmos = self.get_cosmos();
+
+		colliders_connection result;
+
+		inventory_slot_id it = self.get_current_slot();
+
+		while (const auto slot = cosmos[it]) {
+			if (slot->physical_behaviour == slot_physical_behaviour::DEACTIVATE_BODIES) {
+				/* 
+					Failed: "until" not found before meeting an item deposit.
+					This nullopt will be used to determine
+					that the fixtures for this item should be deactivated now.
+				*/
+
+				return std::nullopt;
+			}
+
+			ensure(slot->physical_behaviour == slot_physical_behaviour::CONNECT_AS_FIXTURE_OF_BODY); 
+
+			sum(result, { it.container_entity });
+
+			it = slot.get_container().get_current_slot();
+		}
+
+		return result;
+	}
+
+	std::optional<colliders_connection> calculate_connection_until_container(const entity_id until) const {
+		const auto& self = *static_cast<const derived_handle_type*>(this);
+		ensure(self);
+
+		const auto& cosmos = self.get_cosmos();
+
+		if (until == self) {
+			return colliders_connection { self, {} };
+		}
+
+		colliders_connection result;
+
+		inventory_slot_id it = self.get_current_slot();
+
+		do {
+			const auto slot = cosmos[it];
+
+			if (slot.dead()) {
+				/* Failed: found a dead slot before could reach "until" */
+				return std::nullopt;
+			}
+
+			if (slot->physical_behaviour == slot_physical_behaviour::DEACTIVATE_BODIES) {
+				/* Failed: "until" not found before meeting an item deposit. */
+				return std::nullopt;
+			}
+
+			ensure(slot->physical_behaviour == slot_physical_behaviour::CONNECT_AS_FIXTURE_OF_BODY); 
+
+			sum(result, { it.container_entity });
+
+			it = slot.get_container().get_current_slot();
+		} while(it.container_entity != until);
+
+		return result;
+	}
 
 	template <class handle_type>
 	inventory_slot_handle_type determine_holstering_slot_for(const handle_type holstered_item) const {

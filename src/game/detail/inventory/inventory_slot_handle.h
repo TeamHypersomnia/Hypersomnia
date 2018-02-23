@@ -50,8 +50,6 @@ public:
 	entity_handle_type get_item_if_any() const;
 	entity_handle_type get_container() const;
 
-	std::optional<colliders_connection> calculate_connection_until(entity_id = {}) const;
-
 	entity_handle_type get_root_container() const;
 	entity_handle_type get_root_container_until(const entity_id container_entity) const;
 
@@ -231,25 +229,6 @@ E basic_inventory_slot_handle<E>::get_root_container() const {
 	}
 
 	return get_container();
-}
-
-template <class E>
-std::optional<colliders_connection> basic_inventory_slot_handle<E>::calculate_connection_until(const entity_id until) const {
-	const auto slot = get_container().get_current_slot();
-	// const auto& cosmos = get_cosmos();
-
-	if (slot.alive()) {
-		if (slot->physical_behaviour == slot_physical_behaviour::DEACTIVATE_BODIES) {
-			return std::nullopt;
-		}
-
-		ensure(slot->physical_behaviour == slot_physical_behaviour::CONNECT_AS_FIXTURE_OF_BODY); 
-		/* TODO: calculate and sum attachment offsets from a matrix */
-		/* TODO: return when until is found */
-		return slot.calculate_connection_until();
-	}
-
-	return get_container().calculate_colliders_connection();
 }
 
 template <class E>

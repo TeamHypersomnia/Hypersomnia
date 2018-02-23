@@ -302,8 +302,6 @@ void physics_world_cache::infer_cache_for_colliders(const const_entity_handle h)
 		
 		/*
 			Here the cache is not constructed, or needs full rebuild, so we do it from scratch.
-			The logic might have end up here for just about any entity, so we must check whether 
-		    there is indeed a invariant to construct from.	
 		*/
 	
 		const auto new_owner = cosmos[get_calculated_connection().owner];
