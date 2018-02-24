@@ -17,7 +17,8 @@ public:
 	augs::time_measurements gui;
 	augs::time_measurements interpolation;
 	augs::time_measurements visibility;
-	augs::time_measurements physics;
+	augs::time_measurements physics_step;
+	augs::time_measurements physics_readback;
 	augs::time_measurements particles;
 	augs::time_measurements ai;
 	augs::time_measurements pathfinding;

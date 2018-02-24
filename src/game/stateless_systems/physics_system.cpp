@@ -21,16 +21,28 @@ void physics_system::step_and_set_new_transforms(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
 	auto& physics = cosmos.get_solvable_inferred({}).physics;
 
-	const auto delta = step.get_delta();
+	auto& performance = cosmos.profiler;
 
-	int32 velocityIterations = 8;
-	int32 positionIterations = 3;
+	{
+		auto scope = measure_scope(performance.physics_step);
 
-	physics.ray_casts_since_last_step = 0;
+		const auto delta = step.get_delta();
 
-	physics.b2world->Step(static_cast<float32>(delta.in_seconds()), velocityIterations, positionIterations);
+		const int32 velocityIterations = 8;
+		const int32 positionIterations = 3;
 
-	post_and_clear_accumulated_collision_messages(step);
+		physics.ray_casts_since_last_step = 0;
+
+		physics.b2world->Step(
+			static_cast<float32>(delta.in_seconds()),
+			velocityIterations,
+			positionIterations
+		);
+
+		post_and_clear_accumulated_collision_messages(step);
+	}
+
+	auto scope = measure_scope(performance.physics_readback);
 
 #if OVER_BODIES
 	for (b2Body* b = physics.b2world->GetBodyList(); b != nullptr; b = b->GetNext()) {

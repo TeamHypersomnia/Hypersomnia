@@ -71,8 +71,6 @@ void standard_solve(const logic_step step) {
 	hand_fuse_system().detonate_fuses(step);
 
 	{
-		auto scope = measure_scope(performance.physics);
-
 		listener.during_step = true;
 		physics_system().step_and_set_new_transforms(step);
 		listener.during_step = false;
