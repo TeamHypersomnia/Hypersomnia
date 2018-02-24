@@ -908,15 +908,17 @@ int work(const int argc, const char* const * const argv) try {
 
 		/* 
 			The centralized transformation of all window inputs.
-			No window inputs will be acquired and/or used beyond the scope of this lambda
-			(except remote packets, received by the client/server setups).
+			No window inputs will be acquired and/or used beyond the scope of this lambda,
+			to the exception of remote packets, received by the client/server setups.
 			
 			This is necessary because we need some complicated interactions between multiple GUI contexts,
 			primarily in deciding what events should be propagated further, down to the gameplay itself.
 			It is the easiest if every possibility is considered in one place. 
 			We have decided that some stronger decoupling here would benefit nobody.
 
-			The result, which is the collection of new game commands, will be passed further down the loop. 
+			The lambda is called right away, like so: 
+				result = [...](){...}().
+			The result of the call, which is the collection of new game commands, will be passed further down the loop. 
 		*/
 
 		struct input_pass_result {
