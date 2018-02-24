@@ -210,34 +210,40 @@ namespace test_scenes {
 			const auto reach = xywh(0, 0, 1500, 32000);
 
 			{
-				const auto e = create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS);
-				auto& w = e.get<components::wandering_pixels>();
+				const auto e = create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS, [&](const auto e){
 
-				w.colorize = cyan;
-				w.particles_count = 200;
-				w.set_reach(reach);
+					auto& w = e.template get<components::wandering_pixels>();
+
+					w.colorize = cyan;
+					w.particles_count = 200;
+					w.set_reach(reach);
+				});
 			}
 
 			{
-				const auto e = create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS);
-				auto& w = e.get<components::wandering_pixels>();
+				const auto e = create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS, [&](const auto e){
+
+					auto& w = e.template get<components::wandering_pixels>();
 
 
-				w.colorize = cyan;
-				//w.face.size.set(1, 1);
-				w.particles_count = 80;
-				w.set_reach(reach);
+					w.colorize = cyan;
+					//w.face.size.set(1, 1);
+					w.particles_count = 80;
+					w.set_reach(reach);
+				});
 			}
 
 			{
-				const auto e = create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS);
-				auto& w = e.get<components::wandering_pixels>();
+				const auto e = create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS, [&](const auto e){
+
+					auto& w = e.template get<components::wandering_pixels>();
 
 
-				w.colorize = cyan;
-				//w.face.size.set(1, 1);
-				w.particles_count = 80;
-				w.set_reach(reach);
+					w.colorize = cyan;
+					//w.face.size.set(1, 1);
+					w.particles_count = 80;
+					w.set_reach(reach);
+				});
 			}
 		}
 
@@ -271,33 +277,37 @@ namespace test_scenes {
 
 
 				{
-					const auto e = create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS);
-					auto& w = e.get<components::wandering_pixels>();
+					const auto e = create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS, [&](const auto e){
 
+						auto& w = e.template get<components::wandering_pixels>();
 
-					w.colorize = light_cyan;
-					w.particles_count = 50;
-					w.set_reach(xywh(light_pos.x- 250, light_pos.y-250, 500, 500));
+						w.colorize = light_cyan;
+						w.particles_count = 50;
+						w.set_reach(xywh(light_pos.x- 250, light_pos.y-250, 500, 500));
+					});
 				}
 
 				{
-					const auto e = create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS);
-					auto& w = e.get<components::wandering_pixels>();
+					const auto e = create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS, [&](const auto e){
+
+						auto& w = e.template get<components::wandering_pixels>();
 
 
-					w.colorize = light_cyan;
-					w.particles_count = 20;
-					w.set_reach(xywh(light_pos.x - 150, light_pos.y - 150, 300, 300));
+						w.colorize = light_cyan;
+						w.particles_count = 20;
+						w.set_reach(xywh(light_pos.x - 150, light_pos.y - 150, 300, 300));
+					});
 				}
 
 				{
-					const auto e = create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS);
-					auto& w = e.get<components::wandering_pixels>();
+					const auto e = create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS, [&](const auto e){
 
+						auto& w = e.template get<components::wandering_pixels>();
 
-					w.colorize = light_cyan;
-					w.particles_count = 20;
-					w.set_reach(xywh(light_pos.x - 25, light_pos.y - 25, 50, 50));
+						w.colorize = light_cyan;
+						w.particles_count = 20;
+						w.set_reach(xywh(light_pos.x - 25, light_pos.y - 25, 50, 50));
+					});
 				}
 			}
 		}
@@ -320,63 +330,75 @@ namespace test_scenes {
 				const auto right_reach = xywh(1164.f - 8.f + 90.f - 600, 220 - 250, 1000, 600);
 
 				{
-					const auto e = create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS);
-					auto& w = e.get<components::wandering_pixels>();
+					const auto e = create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS, [&](const auto e){
+
+						auto& w = e.template get<components::wandering_pixels>();
 
 
-					w.colorize = cyan;
-					w.particles_count = 20;
-					w.set_reach(left_reach);
+						w.colorize = cyan;
+						w.particles_count = 20;
+						w.set_reach(left_reach);
+					});
 				}
 
 				{
-					const auto e = create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS);
-					auto& w = e.get<components::wandering_pixels>();
+					const auto e = create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS, [&](const auto e){
+
+						auto& w = e.template get<components::wandering_pixels>();
 
 
-					w.colorize = orange;
-					w.particles_count = 20;
-					w.set_reach(right_reach);
+						w.colorize = orange;
+						w.particles_count = 20;
+						w.set_reach(right_reach);
+					});
 				}
 
 				{
-					const auto e = create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS);
-					auto& w = e.get<components::wandering_pixels>();
+					const auto e = create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS, [&](const auto e){
+
+						auto& w = e.template get<components::wandering_pixels>();
 
 
-					w.colorize = cyan;
-					w.particles_count = 50;
-					w.set_reach(left_reach);
+						w.colorize = cyan;
+						w.particles_count = 50;
+						w.set_reach(left_reach);
+					});
 				}
 
 				{
-					const auto e = create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS);
-					auto& w = e.get<components::wandering_pixels>();
+					const auto e = create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS, [&](const auto e){
+
+						auto& w = e.template get<components::wandering_pixels>();
 
 
-					w.colorize = orange;
-					w.particles_count = 50;
-					w.set_reach(right_reach);
+						w.colorize = orange;
+						w.particles_count = 50;
+						w.set_reach(right_reach);
+					});
 				}
 
 				{
-					const auto e = create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS);
-					auto& w = e.get<components::wandering_pixels>();
+					const auto e = create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS, [&](const auto e){
+
+						auto& w = e.template get<components::wandering_pixels>();
 
 
-					w.colorize = cyan;
-					w.particles_count = 30;
-					w.set_reach(left_reach);
+						w.colorize = cyan;
+						w.particles_count = 30;
+						w.set_reach(left_reach);
+					});
 				}
 
 				{
-					const auto e = create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS);
-					auto& w = e.get<components::wandering_pixels>();
+					const auto e = create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS, [&](const auto e){
+
+						auto& w = e.template get<components::wandering_pixels>();
 
 
-					w.colorize = orange;
-					w.particles_count = 30;
-					w.set_reach(right_reach);
+						w.colorize = orange;
+						w.particles_count = 30;
+						w.set_reach(right_reach);
+					});
 				}
 			}
 

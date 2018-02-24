@@ -467,3 +467,15 @@ struct basic_xywh {
 		return basic_xywh(x + T(p.x), y + T(p.y), this->w, this->h);
 	}
 };
+
+template<class T>
+std::ostream& operator<<(std::ostream& out, const basic_xywh<T>& x) {
+	out << typesafe_sprintf("(xywh: %x;%x;%x;%x)", x.x, x.y, x.w, x.h);
+	return out;
+}
+
+template<class T>
+std::ostream& operator<<(std::ostream& out, const basic_ltrb<T>& x) {
+	out << typesafe_sprintf("(ltrb: %x;%x;%x;%x)", x.l, x.t, x.r, x.b);
+	return out;
+}

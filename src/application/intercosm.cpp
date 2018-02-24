@@ -35,7 +35,7 @@ void intercosm::make_test_scene(
 
 			populator.populate(caches, common);
 
-			return changer_callback_result::REFRESH;
+			return changer_callback_result::DONT_REFRESH;
 		});
 
 		cosmic::change_solvable_significant(world, [settings](auto& s){

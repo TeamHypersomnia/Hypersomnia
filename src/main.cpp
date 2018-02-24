@@ -1531,7 +1531,7 @@ int work(const int argc, const char* const * const argv) try {
 					const auto& cosm = viewed_character.get_cosmos();
 
 					cosm.get_solvable_inferred().tree_of_npo.for_each_aabb([](const ltrb aabb){
-						auto& lines = DEBUG_LOGIC_STEP_LINES;
+						auto& lines = DEBUG_FRAME_LINES;
 
 						lines.emplace_back(red, aabb.left_top(), aabb.right_top());
 						lines.emplace_back(red, aabb.right_top(), aabb.right_bottom());

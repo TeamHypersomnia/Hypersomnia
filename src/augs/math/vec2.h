@@ -135,9 +135,6 @@ struct basic_vec2 {
 
 	static basic_vec2 zero;
 
-	template <class B> friend std::ostream& operator<<(std::ostream& out, const basic_vec2<B>& x);
-	template <class B> friend std::istream& operator>>(std::istream& out, basic_vec2<B>& x);
-
 	using real = real32;
 
 	void reset() {
