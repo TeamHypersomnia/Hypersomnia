@@ -76,13 +76,21 @@ namespace test_scenes {
 			fill_range(sentience.learned_spells, true);
 		}
 
-		const auto rifle2 = prefabs::create_sample_rifle(step, vec2(100, -500 + 50),
+		const auto rifle2 = 
+			prefabs::create_sample_rifle(step, vec2(100, -500 + 50),
 			prefabs::create_sample_magazine(step, vec2(100, -650),
-				prefabs::create_cyan_charge(step, vec2(0, 0), true ? 1000 : 5)));
-		
+			prefabs::create_cyan_charge(step, vec2(0, 0), true ? 1000 : 5)))
+		;
+
 		prefabs::create_force_grenade(step, { 100, 100 });
 		prefabs::create_force_grenade(step, { 200, 100 });
 		prefabs::create_force_grenade(step, { 300, 100});
+
+		/* Test: create cyan charges first, only then magazine, and reinfer. */
+		const auto charge = prefabs::create_cyan_charge(step, vec2(0, 0), true ? 1000 : 5);
+		prefabs::create_sample_magazine(step, vec2(100, -650), charge);
+
+		cosmic::reinfer_all_entities(step.get_cosmos());
 
 		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
 		return new_characters[0];

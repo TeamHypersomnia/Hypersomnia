@@ -203,10 +203,11 @@ void physics_world_cache::infer_cache_for_rigid_body(const const_entity_handle h
 		cache.body->SetLinearDampingVec(b2Vec2(damping.linear_axis_aligned));
 	
 		/*
-			All colliders caches manually infer the existence of the rigid body.
-			Thus if the rigid body should exist in the first place,
-			there can be no case where a rigid body would be inferred on its own but having the need to inform the fixtures
-			that it has just appeared.
+			All colliders caches, before their own inference,
+			manually infer the existence of the rigid body.
+
+			Thus the rigid body, on its own inference, does not have to inform all fixtures
+			about that it has just come into existence.
 		*/
 	});
 }
