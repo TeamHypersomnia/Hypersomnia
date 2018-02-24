@@ -32,7 +32,7 @@ float value_meter::get_ratio() const {
 	return value / static_cast<float>(maximum);
 }
 
-value_meter::damage_result value_meter::calculate_damage_result(
+value_meter::damage_result value_meter::calc_damage_result(
 	const meter_value_type dealt,
 	const meter_value_type lower_bound
 ) const {

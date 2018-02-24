@@ -39,7 +39,7 @@ struct item_button : game_gui_rect_node {
 		}
 	};
 
-	static layout_with_attachments calculate_button_layout(
+	static layout_with_attachments calc_button_layout(
 		const const_entity_handle component_owner,
 		const game_image_metas_map&,
 		const bool include_attachments = true

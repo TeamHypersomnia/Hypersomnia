@@ -5,7 +5,7 @@ namespace components {
 		return get<health_meter_instance>().is_positive() && get<consciousness_meter_instance>().is_positive();
 	}
 
-	rgba sentience::calculate_health_color(const float time_pulse_multiplier) const {
+	rgba sentience::calc_health_color(const float time_pulse_multiplier) const {
 		using namespace augs;
 		auto hr = get<health_meter_instance>().get_ratio();
 		hr *= 1.f - (0.2f * time_pulse_multiplier);

@@ -63,10 +63,10 @@ public:
 	bool is_hand_slot() const;
 	size_t get_hand_index() const;
 
-	float calculate_density_multiplier_due_to_being_attached() const;
+	float calc_density_multiplier_due_to_being_attached() const;
 
-	unsigned calculate_local_space_available() const;
-	unsigned calculate_real_space_available() const;
+	unsigned calc_local_space_available() const;
+	unsigned calc_real_space_available() const;
 
 	bool is_physically_connected_until(const entity_id until_parent = entity_id()) const;
 
@@ -204,13 +204,13 @@ bool basic_inventory_slot_handle<E>::is_physically_connected_until(const entity_
 }
 
 template <class E>
-float basic_inventory_slot_handle<E>::calculate_density_multiplier_due_to_being_attached() const {
+float basic_inventory_slot_handle<E>::calc_density_multiplier_due_to_being_attached() const {
 	const float density_multiplier = get().attachment_density_multiplier;
 
 	if (const auto maybe_item = get_container().template find<components::item>()) {
 		if (const auto slot = owner[maybe_item->get_current_slot()]) {
 			if (slot->physical_behaviour == slot_physical_behaviour::CONNECT_AS_FIXTURE_OF_BODY) {
-				return density_multiplier * slot.calculate_density_multiplier_due_to_being_attached();
+				return density_multiplier * slot.calc_density_multiplier_due_to_being_attached();
 			}
 
 			return density_multiplier;
@@ -253,13 +253,13 @@ E basic_inventory_slot_handle<E>::get_container() const {
 }
 
 template <class E>
-unsigned basic_inventory_slot_handle<E>::calculate_real_space_available() const {
-	const auto lsa = calculate_local_space_available();
+unsigned basic_inventory_slot_handle<E>::calc_real_space_available() const {
+	const auto lsa = calc_local_space_available();
 
 	const auto maybe_item = get_container().template find<components::item>();
 
 	if (maybe_item != nullptr && get_cosmos()[maybe_item->get_current_slot()].alive()) {
-		return std::min(lsa, get_cosmos()[maybe_item->get_current_slot()].calculate_real_space_available());
+		return std::min(lsa, get_cosmos()[maybe_item->get_current_slot()].calc_real_space_available());
 	}
 
 	return lsa;
@@ -275,7 +275,7 @@ bool basic_inventory_slot_handle<E>::can_contain(const entity_id id) const {
 }
 
 template <class E>
-unsigned basic_inventory_slot_handle<E>::calculate_local_space_available() const {
+unsigned basic_inventory_slot_handle<E>::calc_local_space_available() const {
 	if (get().has_unlimited_space()) {
 		return 1000000 * SPACE_ATOMS_PER_UNIT;
 	}
@@ -283,7 +283,7 @@ unsigned basic_inventory_slot_handle<E>::calculate_local_space_available() const
 	unsigned lsa = get().space_available;
 
 	for (const auto e : get_items_inside()) {
-		const auto occupied = calculate_space_occupied_with_children(get_cosmos()[e]);
+		const auto occupied = calc_space_occupied_with_children(get_cosmos()[e]);
 		ensure(occupied <= lsa);
 		lsa -= occupied;
 	}

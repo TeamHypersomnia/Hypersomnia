@@ -35,7 +35,7 @@ namespace behaviours {
 
 		for (auto s_raw : los.visible_sentiences) {
 			auto s = cosmos[s_raw];
-			const auto calculated_attitude = calculate_attitude(s, subject);
+			const auto calculated_attitude = calc_attitude(s, subject);
 
 			if (is_hostile(calculated_attitude)) {
 				auto dist = (s.get_logic_transform().pos - subject_transform.pos).length_sq();

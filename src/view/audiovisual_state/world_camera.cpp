@@ -141,7 +141,7 @@ vec2i world_camera::get_camera_offset_due_to_character_crosshair(
 
 	if (const auto crosshair = entity_to_chase.find_crosshair()) {
 		if (crosshair->orbit_mode != components::crosshair::NONE) {
-			camera_crosshair_offset = entity_to_chase.calculate_crosshair_displacement();
+			camera_crosshair_offset = entity_to_chase.calc_crosshair_displacement();
 
 			if (crosshair->orbit_mode == crosshair->ANGLED) {
 				camera_crosshair_offset.set_length(settings.angled_look_length);

@@ -22,8 +22,8 @@ void draw_crosshair_lasers(const draw_crosshair_lasers_input in) {
 
 		const vec2 crosshair_pos = subject_with_crosshair.get_world_crosshair_transform(in.interpolation).pos;
 
-		auto calculate_color = [&](const const_entity_handle target) {
-			const auto att = calculate_attitude(in.character, target);
+		auto calc_color = [&](const const_entity_handle target) {
+			const auto att = calc_attitude(in.character, target);
 
 			if (att == attitude_type::WANTS_TO_KILL || att == attitude_type::WANTS_TO_KNOCK_UNCONSCIOUS) {
 				return red;
@@ -55,7 +55,7 @@ void draw_crosshair_lasers(const draw_crosshair_lasers_input in) {
 				in.callback(
 					line_from, 
 					raycast.intersection, 
-					calculate_color(cosmos[raycast.what_entity])
+					calc_color(cosmos[raycast.what_entity])
 				);
 			}
 			else {
@@ -74,8 +74,8 @@ void draw_crosshair_lasers(const draw_crosshair_lasers_input in) {
 				const auto& gun_def = subject_item.get<invariants::gun>();
 
 				const auto rifle_transform = subject_item.get_viewing_transform(in.interpolation);
-				const auto barrel_center = gun_def.calculate_barrel_center(rifle_transform);
-				const auto muzzle = gun_def.calculate_muzzle_position(rifle_transform);
+				const auto barrel_center = gun_def.calc_barrel_center(rifle_transform);
+				const auto muzzle = gun_def.calc_muzzle_position(rifle_transform);
 
 				const auto proj = crosshair_pos.get_projection_multiplier(barrel_center, muzzle);
 

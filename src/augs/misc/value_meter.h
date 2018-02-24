@@ -14,7 +14,7 @@ struct value_meter {
 	meter_value_type maximum = 100;
 	// END GEN INTROSPECTOR
 
-	damage_result calculate_damage_result(
+	damage_result calc_damage_result(
 		const meter_value_type amount,
 		const meter_value_type lower_bound = 0
 	) const;

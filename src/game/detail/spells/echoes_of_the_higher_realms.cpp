@@ -16,7 +16,7 @@ bool echoes_of_the_higher_realms_instance::are_additional_conditions_for_casting
 	auto& consciousness = subject.get<components::sentience>().get<consciousness_meter_instance>();
 	
 	const bool would_heal_anything =
-		consciousness.calculate_damage_result(-spell_data.basic_healing_amount).effective < 0
+		consciousness.calc_damage_result(-spell_data.basic_healing_amount).effective < 0
 	;
 
 	return would_heal_anything;
@@ -32,7 +32,7 @@ void echoes_of_the_higher_realms_instance::perform_logic(const spell_logic_input
 
 	auto& consciousness = in.sentience.get<consciousness_meter_instance>();
 
-	const auto result = consciousness.calculate_damage_result(-spell_data.basic_healing_amount);
+	const auto result = consciousness.calc_damage_result(-spell_data.basic_healing_amount);
 
 	messages::health_event event;
 	event.subject = subject;

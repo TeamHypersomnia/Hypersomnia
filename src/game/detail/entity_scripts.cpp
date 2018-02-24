@@ -88,7 +88,7 @@ identified_danger assess_danger(
 	}
 
 	if (attitude) {
-		const auto att = calculate_attitude(danger, victim);
+		const auto att = calc_attitude(danger, victim);
 		
 		if (is_hostile(att)) {
 			result.amount += comfort_zone_disturbance_ratio * sentience_def.danger_amount_from_hostile_attitude;
@@ -98,7 +98,7 @@ identified_danger assess_danger(
 	return result;
 }
 
-attitude_type calculate_attitude(const const_entity_handle targeter, const const_entity_handle target) {
+attitude_type calc_attitude(const const_entity_handle targeter, const const_entity_handle target) {
 	const auto& targeter_attitude = targeter.get<components::attitude>();
 	const auto* const target_attitude = target.find<components::attitude>();
 
@@ -143,7 +143,7 @@ ammunition_information get_ammunition_information(const const_entity_handle item
 		out.total_charges += count_charges_in_deposit(mag);
 
 		out.total_ammunition_space_available += ammo_depo->space_available;
-		out.total_lsa += ammo_depo.calculate_local_space_available();
+		out.total_lsa += ammo_depo.calc_local_space_available();
 	}
 
 	const auto chamber_slot = item[slot_function::GUN_CHAMBER];
@@ -152,7 +152,7 @@ ammunition_information get_ammunition_information(const const_entity_handle item
 		out.total_charges += count_charges_inside(chamber_slot);
 
 		out.total_ammunition_space_available += chamber_slot->space_available;
-		out.total_lsa += chamber_slot.calculate_local_space_available();
+		out.total_lsa += chamber_slot.calc_local_space_available();
 	}
 
 	return out;
@@ -186,7 +186,7 @@ entity_id get_closest_hostile(
 				const const_entity_handle s = cosmos[get_body_entity_that_owns(fix)];
 
 				if (s != subject && s.has<components::attitude>()) {
-					const auto calculated_attitude = calculate_attitude(s, subject_attitude);
+					const auto calculated_attitude = calc_attitude(s, subject_attitude);
 
 					if (is_hostile(calculated_attitude)) {
 						const auto dist = (s.get_logic_transform().pos - subject_attitude_transform.pos).length_sq();
@@ -249,7 +249,7 @@ std::vector<entity_id> get_closest_hostiles(
 				const const_entity_handle s = cosmos[get_body_entity_that_owns(fix)];
 
 				if (s != subject && s.has<components::attitude>()) {
-					const auto calculated_attitude = calculate_attitude(s, subject_attitude);
+					const auto calculated_attitude = calc_attitude(s, subject_attitude);
 
 					if (is_hostile(calculated_attitude)) {
 						const auto dist = (s.get_logic_transform().pos - subject_attitude_transform.pos).length_sq();

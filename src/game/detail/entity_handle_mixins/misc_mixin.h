@@ -48,7 +48,7 @@ public:
 		return self.get_cosmos()[entity_id()];
 	};
 
-	auto calculate_crosshair_displacement(
+	auto calc_crosshair_displacement(
 		const bool snap_epsilon_base_offset = false
 	) const {
 		const auto self = *static_cast<const E*>(this);
@@ -72,12 +72,12 @@ public:
 	template <class I>
 	auto get_world_crosshair_transform(I& interp, const bool integerize = false) const {
 		const auto self = *static_cast<const E*>(this);
-		return self.get_viewing_transform(interp, integerize) + self.calculate_crosshair_displacement();
+		return self.get_viewing_transform(interp, integerize) + self.calc_crosshair_displacement();
 	};
 
 	auto get_world_crosshair_transform() const {
 		const auto self = *static_cast<const E*>(this);
-		return self.get_logic_transform() + self.calculate_crosshair_displacement();
+		return self.get_logic_transform() + self.calc_crosshair_displacement();
 	};
 
 	bool get_flag(const entity_flag f) const {

@@ -28,7 +28,7 @@ public:
 	generic_handle_type get_owner_of_colliders() const;
 
 	/* Assumes that the fixtures component is found. */
-	real32 calculate_density(
+	real32 calc_density(
 		const colliders_connection calculated_connection,
 		const invariants::fixtures& def	
 	) const;
@@ -80,7 +80,7 @@ std::optional<colliders_connection> physics_mixin<E>::calc_colliders_connection(
 }
 
 template <class E>
-real32 physics_mixin<E>::calculate_density(
+real32 physics_mixin<E>::calc_density(
 	const colliders_connection calculated_connection,
 	const invariants::fixtures& def	
 ) const {
@@ -91,7 +91,7 @@ real32 physics_mixin<E>::calculate_density(
 
 	if (const auto item = self.template find<components::item>()) {
 		if (const auto slot = cosmos[item->get_current_slot()]) {
-			density *= cosmos[item->get_current_slot()].calculate_density_multiplier_due_to_being_attached();
+			density *= cosmos[item->get_current_slot()].calc_density_multiplier_due_to_being_attached();
 		}
 	}
 

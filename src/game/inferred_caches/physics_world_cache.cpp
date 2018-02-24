@@ -118,7 +118,7 @@ void physics_world_cache::infer_cache_for_rigid_body(const const_entity_handle h
 	
 			const auto& def = handle.template get<invariants::rigid_body>();
 			const auto rigid_body = handle.template get<components::rigid_body>();
-			const auto damping = rigid_body.calculate_damping_info(def);
+			const auto damping = rigid_body.calc_damping_info(def);
 			const auto& data = rigid_body.get_raw_component();
 	
 			auto& body = *cache.body;
@@ -179,7 +179,7 @@ void physics_world_cache::infer_cache_for_rigid_body(const const_entity_handle h
 			default: ensure(false) break;
 		}
 
-		const auto damping = rigid_body.calculate_damping_info(physics_def);
+		const auto damping = rigid_body.calc_damping_info(physics_def);
 
 		def.userData = handle.get_id();
 
@@ -268,7 +268,7 @@ void physics_world_cache::infer_cache_for_colliders(const const_entity_handle h)
 				auto& compared = *cache.all_fixtures_in_component[0].get();
 				const auto& colliders_data = handle.template get<invariants::fixtures>();
 	
-				if (const auto new_density = handle.calculate_density(
+				if (const auto new_density = handle.calc_density(
 						get_calculated_connection(), 
 						colliders_data
 					);
@@ -335,7 +335,7 @@ void physics_world_cache::infer_cache_for_colliders(const const_entity_handle h)
 
 		fixdef.userData = handle.get_id();
 
-		fixdef.density = handle.calculate_density(get_calculated_connection(), colliders_data);
+		fixdef.density = handle.calc_density(get_calculated_connection(), colliders_data);
 
 		fixdef.friction = colliders_data.friction;
 		fixdef.restitution = colliders_data.restitution;

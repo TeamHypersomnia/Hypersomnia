@@ -21,7 +21,7 @@ identified_danger assess_danger(
 	const const_entity_handle danger
 );
 
-attitude_type calculate_attitude(
+attitude_type calc_attitude(
 	const const_entity_handle targeter, 
 	const const_entity_handle target
 );

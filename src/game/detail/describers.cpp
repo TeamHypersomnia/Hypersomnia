@@ -39,7 +39,7 @@ std::wstring get_bbcoded_entity_properties(const const_entity_handle id) {
 	if (item && item_def) {
 		result << L"[color=vsblue]" << get_bbcoded_item_categories(item_def->categories_for_slot_compatibility) << L"[/color]\n";
 		
-		const auto total_occupied = format_space_units(calculate_space_occupied_with_children(id));
+		const auto total_occupied = format_space_units(calc_space_occupied_with_children(id));
 		const auto per_charge = format_space_units(item_def->space_occupied_per_charge);
 
 		result << "Occupies: [color=vscyan]" << total_occupied << " [/color]";
@@ -86,13 +86,13 @@ std::wstring get_bbcoded_entity_properties(const const_entity_handle id) {
 	const auto& depo = id[slot_function::ITEM_DEPOSIT];
 
 	if (depo.alive()) {
-		const auto children_space = format_space_units(depo.calculate_local_space_available());
-		const auto with_parents_space = format_space_units(depo.calculate_real_space_available());
+		const auto children_space = format_space_units(depo.calc_local_space_available());
+		const auto with_parents_space = format_space_units(depo.calc_real_space_available());
 
-		result << L"Deposit space: [color=vsgreen]" << format_space_units(depo.calculate_real_space_available()) << L"[/color]/";
+		result << L"Deposit space: [color=vsgreen]" << format_space_units(depo.calc_real_space_available()) << L"[/color]/";
 
 		if (children_space != with_parents_space)
-			result << L"[color=vsyellow]" << format_space_units(depo.calculate_local_space_available()) << L"[/color]/";
+			result << L"[color=vsyellow]" << format_space_units(depo.calc_local_space_available()) << L"[/color]/";
 			
 		result << L"[color=vscyan]" << format_space_units(depo->space_available) << L"[/color]\n";
 	}

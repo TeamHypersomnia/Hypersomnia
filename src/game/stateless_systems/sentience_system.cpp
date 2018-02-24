@@ -126,7 +126,7 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 					const auto passed = (now.step - sentience.time_of_last_received_damage.step);
 
 					if (passed > 0 && passed % regeneration_frequency_in_steps == 0) {
-						health.value -= health.calculate_damage_result(-2).effective;
+						health.value -= health.calc_damage_result(-2).effective;
 					}
 				}
 
@@ -134,7 +134,7 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 					const auto passed = (now.step - sentience.time_of_last_exertion.step);
 
 					if (passed > 0 && passed % consciousness_regeneration_frequency_in_steps == 0) {
-						consciousness.value -= consciousness.calculate_damage_result(-2).effective;
+						consciousness.value -= consciousness.calc_damage_result(-2).effective;
 					}
 				}
 
@@ -142,7 +142,7 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 					const auto passed = now.step;
 
 					if (passed > 0 && passed % pe_regeneration_frequency_in_steps == 0) {
-						personal_electricity.value -= personal_electricity.calculate_damage_result(-4).effective;
+						personal_electricity.value -= personal_electricity.calc_damage_result(-4).effective;
 					}
 				}
 			}
@@ -342,7 +342,7 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 
 				event.target = messages::health_event::target_type::PERSONAL_ELECTRICITY;
 
-				const auto damaged = personal_electricity.calculate_damage_result(amount);
+				const auto damaged = personal_electricity.calc_damage_result(amount);
 				event.effective_amount = damaged.effective;
 				event.ratio_effective_to_maximum = damaged.ratio_effective_to_maximum;
 
@@ -365,7 +365,7 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 				if (after_shield_damage > 0) {
 					event.target = messages::health_event::target_type::HEALTH;
 
-					const auto damaged = health.calculate_damage_result(after_shield_damage);
+					const auto damaged = health.calc_damage_result(after_shield_damage);
 					event.effective_amount = damaged.effective;
 					event.ratio_effective_to_maximum = damaged.ratio_effective_to_maximum;
 
@@ -389,7 +389,7 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 				if (after_shield_damage > 0) {
 					event.target = messages::health_event::target_type::CONSCIOUSNESS;
 
-					const auto damaged = consciousness.calculate_damage_result(after_shield_damage);
+					const auto damaged = consciousness.calc_damage_result(after_shield_damage);
 					event.effective_amount = damaged.effective;
 					event.ratio_effective_to_maximum = damaged.ratio_effective_to_maximum;
 
@@ -489,8 +489,8 @@ void sentience_system::rotate_towards_crosshairs_and_driven_vehicles(const logic
 						const auto& gun_def = *maybe_gun_def;
 
 						const auto rifle_transform = subject_item.get_logic_transform();
-						auto barrel_center = gun_def.calculate_barrel_center(rifle_transform);
-						auto muzzle = gun_def.calculate_muzzle_position(rifle_transform);
+						auto barrel_center = gun_def.calc_barrel_center(rifle_transform);
+						auto muzzle = gun_def.calc_muzzle_position(rifle_transform);
 						const auto mc = subject_transform.pos;
 
 						barrel_center.rotate(-subject_transform.rotation, mc);

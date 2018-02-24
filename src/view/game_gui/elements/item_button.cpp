@@ -122,7 +122,7 @@ void item_button::draw_complete_dragged_ghost(
 	draw_dragged_ghost_inside(context, this_id, absolute_xy_offset);
 }
 
-item_button::layout_with_attachments item_button::calculate_button_layout(
+item_button::layout_with_attachments item_button::calc_button_layout(
 	const const_entity_handle component_owner,
 	const game_image_metas_map& defs,
 	const bool include_attachments
@@ -246,7 +246,7 @@ void item_button::draw_proc(
 			auto item_sprite = item.get<invariants::sprite>();
 			const auto gui_def = context.get_game_image_metas().at(item_sprite.tex).usage_as_button;
 
-			const auto layout = calculate_button_layout(item, context.get_game_image_metas(), draw_attachments);
+			const auto layout = calc_button_layout(item, context.get_game_image_metas(), draw_attachments);
 			
 			vec2 expansion_offset;
 
@@ -340,7 +340,7 @@ void item_button::draw_proc(
 					bottom_number_val = count_charges_in_deposit(item);
 				}
 				else {
-					bottom_number_val = item[slot_function::ITEM_DEPOSIT].calculate_real_space_available() / double(SPACE_ATOMS_PER_UNIT);
+					bottom_number_val = item[slot_function::ITEM_DEPOSIT].calc_real_space_available() / double(SPACE_ATOMS_PER_UNIT);
 
 					if (bottom_number_val < 1.0 && bottom_number_val > 0.0) {
 						trim_zero = true;
@@ -446,7 +446,7 @@ void item_button::rebuild_layouts(const game_gui_context context, const this_in_
 	const auto& manager = context.get_game_image_metas();
 
 	if (sprite) {
-		vec2i rounded_size = calculate_button_layout(item, manager, !this_id->is_container_open).aabb.get_size();
+		vec2i rounded_size = calc_button_layout(item, manager, !this_id->is_container_open).aabb.get_size();
 		rounded_size = griddify_size(rounded_size, manager.at(item.get<invariants::sprite>().tex).usage_as_button.bbox_expander);
 		this_id->rc.set_size(rounded_size);
 	}

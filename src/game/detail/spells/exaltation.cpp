@@ -16,7 +16,7 @@ bool exaltation_instance::are_additional_conditions_for_casting_fulfilled(const 
 	auto& health = subject.get<components::sentience>().get<health_meter_instance>();
 	
 	const bool would_heal_anything =
-		health.calculate_damage_result(-spell_data.basic_healing_amount).effective < 0
+		health.calc_damage_result(-spell_data.basic_healing_amount).effective < 0
 	;
 
 	return would_heal_anything;
@@ -32,7 +32,7 @@ void exaltation_instance::perform_logic(const spell_logic_input in) {
 
 	auto& health = in.sentience.get<health_meter_instance>();
 
-	const auto result = health.calculate_damage_result(-spell_data.basic_healing_amount);
+	const auto result = health.calc_damage_result(-spell_data.basic_healing_amount);
 
 	messages::health_event event;
 	event.subject = subject;

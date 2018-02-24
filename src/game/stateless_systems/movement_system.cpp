@@ -94,7 +94,7 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 					movement_force_mult /= 2;
 				}
 
-				consciousness_damage_by_sprint = consciousness.calculate_damage_result(
+				consciousness_damage_by_sprint = consciousness.calc_damage_result(
 					2 * delta.in_seconds(),
 					minimum_consciousness_to_sprint
 				);

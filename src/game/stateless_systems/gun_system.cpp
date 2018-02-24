@@ -103,11 +103,11 @@ void gun_system::consume_gun_intents(const logic_step step) {
 	}
 }
 
-vec2 invariants::gun::calculate_muzzle_position(const components::transform gun_transform) const {
+vec2 invariants::gun::calc_muzzle_position(const components::transform gun_transform) const {
 	return (gun_transform * components::transform(bullet_spawn_offset)).pos;
 }
 
-vec2 invariants::gun::calculate_barrel_center(const components::transform gun_transform) const {
+vec2 invariants::gun::calc_barrel_center(const components::transform gun_transform) const {
 	return (gun_transform * components::transform(vec2(0, bullet_spawn_offset.y))).pos;
 }
 
@@ -125,7 +125,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 			auto& gun = gun_entity.template get<components::gun>();
 			const auto& gun_def = gun_entity.template get<invariants::gun>();
 
-			const auto muzzle_transform = components::transform { gun_def.calculate_muzzle_position(gun_transform), gun_transform.rotation };
+			const auto muzzle_transform = components::transform { gun_def.calc_muzzle_position(gun_transform), gun_transform.rotation };
 
 			auto make_gunshot_response = [&](){
 				messages::gunshot_response response;
@@ -177,7 +177,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 					if (pe.value >= mana_needed) {
 						if (try_to_fire()) {
-							pe.value -= pe.calculate_damage_result(mana_needed).effective;
+							pe.value -= pe.calc_damage_result(mana_needed).effective;
 							total_recoil += missile.recoil_multiplier;
 
 							cosmic::create_entity(

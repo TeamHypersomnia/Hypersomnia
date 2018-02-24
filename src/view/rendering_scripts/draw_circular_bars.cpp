@@ -41,7 +41,7 @@ augs::vertex_triangle_buffer draw_circular_bars_and_get_textual_info(const draw_
 			const auto pulse_duration = static_cast<int>(1250 - 1000 * (1 - hr));
 			const float time_pulse_ratio = (timestamp_ms % pulse_duration) / float(pulse_duration);
 
-			const auto health_col = sentience->calculate_health_color(time_pulse_ratio);
+			const auto health_col = sentience->calc_health_color(time_pulse_ratio);
 
 			const auto transform = v.get_viewing_transform(interp);
 

@@ -9,7 +9,7 @@ augs::constant_size_vector<item_slot_transfer_request, 4> swap_slots_for_items(
 	const const_entity_handle second 
 );
 
-unsigned calculate_space_occupied_with_children(const_entity_handle item);
+unsigned calc_space_occupied_with_children(const_entity_handle item);
 
 containment_result query_containment_result(
 	const const_entity_handle item, 

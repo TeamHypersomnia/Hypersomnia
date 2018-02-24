@@ -198,13 +198,13 @@ containment_result query_containment_result(
 			result = containment_result_type::TOO_MANY_ITEMS;
 		}
 		else {
-			const auto rsa = target_slot.calculate_real_space_available();
+			const auto rsa = target_slot.calc_real_space_available();
 
 			if (rsa > 0) {
 				const bool item_indivisible = item.get_charges() == 1 || !item_def.stackable;
 
 				if (item_indivisible) {
-					if (rsa >= calculate_space_occupied_with_children(item_entity)) {
+					if (rsa >= calc_space_occupied_with_children(item_entity)) {
 						output.transferred_charges = 1;
 					}
 				}
@@ -293,7 +293,7 @@ std::wstring format_space_units(const unsigned u) {
 	return to_wstring(u / double(SPACE_ATOMS_PER_UNIT), 2);
 }
 
-unsigned calculate_space_occupied_with_children(const const_entity_handle item_entity) {
+unsigned calc_space_occupied_with_children(const const_entity_handle item_entity) {
 	auto space_occupied = *item_entity.get_space_occupied();
 
 	if (auto* const container = item_entity.find<invariants::container>()) {
@@ -301,7 +301,7 @@ unsigned calculate_space_occupied_with_children(const const_entity_handle item_e
 
 		for (const auto& slot : container->slots) {
 			for (const auto entity_in_slot : get_items_inside(item_entity, slot.first)) {
-				space_occupied += calculate_space_occupied_with_children(item_entity.get_cosmos()[entity_in_slot]);
+				space_occupied += calc_space_occupied_with_children(item_entity.get_cosmos()[entity_in_slot]);
 			}
 		}
 	}
