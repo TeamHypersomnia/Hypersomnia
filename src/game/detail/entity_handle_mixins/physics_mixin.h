@@ -27,7 +27,6 @@ public:
 	/* Shortcut for getting only the entity handle without shape offset */
 	generic_handle_type get_owner_of_colliders() const;
 
-	/* Assumes that the fixtures component is found. */
 	real32 calc_density(
 		const colliders_connection calculated_connection,
 		const invariants::fixtures& def	

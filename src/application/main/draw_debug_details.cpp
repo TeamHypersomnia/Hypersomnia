@@ -48,9 +48,9 @@ void draw_debug_details(
 	};
 
 	if (viewed_character.alive()) {
-		{
-			const auto coords = viewed_character.get_logic_transform().pos;
-			const auto rot = viewed_character.get_logic_transform().rotation;
+		if (const auto transform = viewed_character.find_logic_transform()) {
+			const auto coords = transform->pos;
+			const auto rot = transform->rotation;
 
 			total_details += {
 				typesafe_sprintf(

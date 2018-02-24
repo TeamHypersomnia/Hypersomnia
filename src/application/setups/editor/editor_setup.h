@@ -350,7 +350,13 @@ public:
 					panning = camera_cone();
 				}
 
-				panning->transform.pos = match.get_logic_transform().pos;
+				if (const auto transform = match.find_logic_transform()) {
+					panning->transform.pos = transform->pos;
+				}
+				else {
+					LOG("WARNING: transform of %x could not be found.", match);
+				}
+
 				return panning;
 			}
 		}

@@ -754,7 +754,12 @@ void editor_setup::perform_custom_imgui(
 						tab().panned_camera = current_cone;
 					}
 
-					tab().panned_camera->transform.pos = match.get_logic_transform().pos;
+					if (const auto transform = match.find_logic_transform()) {
+						tab().panned_camera->transform.pos = transform->pos;
+					}
+					else {
+						LOG("WARNING: transform of %x could not be found.", match);
+					}
 				}
 			}
 	

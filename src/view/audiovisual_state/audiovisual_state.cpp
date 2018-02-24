@@ -198,9 +198,11 @@ void audiovisual_state::standard_post_solve(const const_logic_step step, const a
 				if (destroyed) {
 					vn.text = L"Death";
 					vn.color = number_col;
-					vn.pos = cosmos[h.subject].get_logic_transform().pos;
 
-					flying_numbers.add(vn);
+					if (const auto transform = cosmos[h.subject].find_logic_transform()) {
+						vn.pos = transform->pos;
+						flying_numbers.add(vn);
+					}
 				}
 
 				const auto base_radius = destroyed ? 80.f : h.effective_amount * 1.5f;
@@ -324,9 +326,11 @@ void audiovisual_state::standard_post_solve(const const_logic_step step, const a
 				if (destroyed) {
 					vn.text = L"Unconscious";
 					vn.color = number_col;
-					vn.pos = cosmos[h.subject].get_logic_transform().pos;
 
-					flying_numbers.add(vn);
+					if (const auto transform = cosmos[h.subject].find_logic_transform()) {
+						vn.pos = transform->pos;
+						flying_numbers.add(vn);
+					}
 				}
 
 				const auto base_radius = destroyed ? 80.f : h.effective_amount * 2.f;
