@@ -22,7 +22,7 @@ then all entities referred to by the ids in this vector must have an [item compo
 
 There are more subtle cases:  
 
-For example, if we make an unwritten contract that if a character currently drives a car, it has half its usual linear damping, then, for example, the following lie may occur:  
+For example, if we make an unwritten contract that if a character currently drives a car, it has **half its usual linear damping**, then, for example, the following lie may occur:  
 - The ``driver::owned_vehicle`` points to a correct car entity, but the ``b2Body`` of the character reports that it has its usual linear damping set. In this case, the ``b2Body`` is inconsistent, because considering the unwritten contract, it lies.
 
 Theoretically, inconsistent state wouldn't always crash the application, but it is nevertheless a requirement at all times.  
@@ -34,6 +34,8 @@ Theoretically, inconsistent state wouldn't always crash the application, but it 
 	- Sensitive fields are protected:
 		- By inferrers throwing [cosmos inconsistent error](cosmos inconsistent error) if the sensitive field(s) lie(s).
 		- Similarly as the rest of associated fields, by only being writable by special functions; those will additionally try and catch the inconsistency exception. Upon getting one, they shall revert to the original state and reinfer again.
+		- By carefully determining that we do not care if it is inconsistent.
+			- E.g. it won't be much of a catastrophy if we allow too much items in a container, e.g. while editing.
 - If all **associated** fields in existence were given their respective **default values**, the state would be **consistent**.
 	- Default values for **sensitive** fields shall be carefully chosen by the default constructor so that they meet this criterion.
 	- For the rest of **associated** fields, the default constructor is free to set any value that is just intuitive to have.
@@ -161,3 +163,54 @@ We will list here all possible corner cases and what code is expected to correct
 
 Existing problems with state consistency:
 - special physics component holds owner friction grounds, which could be made inferred
+
+## Getter ecosystem
+
+- Retrieving values that may or may not exist at the moment.
+	- Examples
+		- Logic transforms.
+			- Only finder.
+			- Since an item in a container takes transform of its container, the transform will almost always exist.
+			- Might not exist due to not having necessary components.
+				- Some entities representing processes.
+				- An item in a container that does not have a transform on its own? 
+					- Possible but unlikely.
+		- AABBs.
+			- Existence similar to that of logic transform.
+			- Only finder.
+		- Colliders connections.
+			- May very well stop existing at arbitrary times. We must thus be defensive here.
+			- Finder and calculator.
+		- b2Body-gettable properties.
+			- Only found after finding cache.
+			- TestPoint.
+	- This is a case of defensive programming?
+	- Ultimately, we should probably move away from any kind of "get" even if it serves brevity.
+		- Theoretically, we can sometimes expect that the entity will ALWAYS have this logic transform or other value
+			- e.g. a character
+		- But we can never be sure.
+			- Unless we prove at compile time that an entity will have a transform.
+		- And if the value does not exist, it means a crash.
+				- One could argue that functions like this could always be implemented without a need for an existing cache
+	- Operation types:
+		- Finds actual value in the cache - fast, works only when constructed - always?
+			- Preffix: find_
+			- If cache exists, return the value from the cache.
+				- The thing is, we might at some time decide that it is only upon destruction of cache that we write back to the significant.
+					- Because of possible bottleneck in e.g. step and set new transforms.
+				- Otherwise	recalculate it.
+			- If it becomes too slow, we can make the synchronizer cache the cache pointer.
+			- const-valued caches should also be gettable for special kinds of processors.
+		- Obsolete: assumes that the value will be found through find and dereferences it right away for brevity
+			- Preffix: get_
+			- We should stop using it right away.
+		- Operations that both do find and calculate at some point.
+			- Named "find", because finders anyway calculate if they do not find the existing cached value.
+		- Calculates the value to be passed to cache - slow, works always
+			- Preffix: calc_
+			- Some calculators might provide overloads taking a needed invariant/component ref
+				- So that the inferrers can pass the one that they've already got
+		- Requests for a certain field to be recalculated - e.g. we know that a driver will only need a correction to damping and not entire body
+			- ONLY IN CASE OF EXTREME BOTTLENECK INSIDE INFERRERS.
+			- Notice that the same can be accomplished by just incrementally inferring the whole related domain.
+			- We thus reduce code duplication.

@@ -21,12 +21,7 @@ Currently supported:
 An entity token is of the form
 
 ## Modes
-
-
-
-
 ## Autosave behaviour
-
 ## Multiple selection of entities
 
 ## Editor command

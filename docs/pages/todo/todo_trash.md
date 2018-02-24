@@ -463,3 +463,18 @@ COMMENTED OUT: Such things will be calculated statelessly.
 					- And that lets the rest of data stay raw and not synchronized
 				- Rename to "logical_parent"?
 
+## Needing confirmation:
+
+- parenthood caches design:  
+Current design with relational caches is correct.  
+Parenthood requested by current values in signi should be tracked even if it is determined that, for a while, the actual functionality of the parent should be disabled (e.g. rigid body hidden in a backpack).  
+Parenthood can be invalidated only with death of the parent itself, as even though only correct parents can be set in the first place,  
+it is irrelevant for the relational cache whether the parents pointed to by ids do indeed fulfill parenthood conditions.  
+Since possibility of parenthood is implied at definition stage, it makes sense to destroy that cache with death of the entity.  
+	- Other than a memory optimization, we don't at all need to remove caches for a parent once it gets destroyed.  
+Once children get destroyed, the cache will be freed automatically.
+Additionally, the children will anyway be destroyed.
+When we do "get_children_of" in a relational mixin, we can ensure that the entity is alive.
+Memory is somewhat safe because it can only grow as far as the children grow.
+		- Concern could be raised becasue that would mean that, after reinference, that cache would be drastically different. However, we make no guarantee of 0% reinference error. Functionally, the parent cache with dead parent id is equal to no cache. The code, however, will be simpler.
+			- We will save that correction for later though.

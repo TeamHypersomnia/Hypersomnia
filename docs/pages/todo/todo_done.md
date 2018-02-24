@@ -204,3 +204,5 @@ we consider whole type overrides too complex architeciturally:
 
 - Fix bad transforms issue when dropping items
 
+- fix disappearing wandering pixels?
+	- we weren't initializing them properly

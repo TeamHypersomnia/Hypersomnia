@@ -1,54 +1,34 @@
 ---
 title: ToDo now
 hide_sidebar: true
-permalink: todo_now
+permalink: brainstorm
 summary: Just a hidden scratchpad.
 ---
 
 ## Plans
 
-current slot will also have index in container
-drivers dont need one as there's always one
+- components should be templatized by id
+	- lets us define groups in invariants 
+	- synchronizers will anyway work with entity_id specialization thus not much more will be templatized
+	- introspectors could static assert against usage of entity ids in non-template components
 
-what about AI?
-- let pathfinding be a circumstantial component?
-- we don't care much about that AI alters some state because virtually only ai will use that pathfinding
+- WHEN ORDER OF ITEMS IN THE CONTAINER BECOMES RELEVANT, 
+	- current slot will also have index in container
+	- This procedure should be fixed or otherwise the reinference might break the order of items!
+	- drivers dont need one as there's always one
 
-Currently, cloning performance of cosmos solvable with static allocation may suffer due to the fact that constant size vector uses default array's operator=, (as component aggregate is trivially copyable).
-This means that all slots for entities will get cloned, not just allocated ones.
-On the other hand, it is good that some components use default operator= so that all can be cloned in a single pass.
-
-**We will just need to create an operator=(cosmos_solvable_significant&) for the solvable signi that takes note of that and clones the pools manually.**
+- what about AI?
+	- let pathfinding be a circumstantial component?
+	- we don't care much about that AI alters some state because virtually only ai will use that pathfinding
+	
+- Currently, cloning performance of cosmos solvable with static allocation may suffer due to the fact that constant size vector uses default array's operator=, (as component aggregate is trivially copyable).
+	- This means that all slots for entities will get cloned, not just allocated ones.
+	- **We will just need to create an operator=(cosmos_solvable_significant&) for the solvable signi that takes note of that and clones the pools manually.**
 
 move "game/common_state" files to a more proper location
 
-WHEN ORDER OF ITEMS IN THE CONTAINER BECOMES RELEVANT, 
-This procedure should be fixed or otherwise the reinference might break the order of items!
-
 fixtures can form scene graph as they have relative transforms.
 	position copyings could be calculated statelessly in get_logic_transform, and only changed when performance so requires
-transform logic might need refactoring for statelessness?
-
-components should be templatized by id
-	lets us define groups in invariants 
-	synchronizers will anyway work with entity_id specialization thus not much more will be templatized
-	introspectors could static assert against usage of entity ids in non-template components
-
-## Needing confirmation:
-
-- parenthood caches design:  
-Current design with relational caches is correct.  
-Parenthood requested by current values in signi should be tracked even if it is determined that, for a while, the actual functionality of the parent should be disabled (e.g. rigid body hidden in a backpack).  
-Parenthood can be invalidated only with death of the parent itself, as even though only correct parents can be set in the first place,  
-it is irrelevant for the relational cache whether the parents pointed to by ids do indeed fulfill parenthood conditions.  
-Since possibility of parenthood is implied at definition stage, it makes sense to destroy that cache with death of the entity.  
-	- Other than a memory optimization, we don't at all need to remove caches for a parent once it gets destroyed.  
-Once children get destroyed, the cache will be freed automatically.
-Additionally, the children will anyway be destroyed.
-When we do "get_children_of" in a relational mixin, we can ensure that the entity is alive.
-Memory is somewhat safe because it can only grow as far as the children grow.
-		- Concern could be raised becasue that would mean that, after reinference, that cache would be drastically different. However, we make no guarantee of 0% reinference error. Functionally, the parent cache with dead parent id is equal to no cache. The code, however, will be simpler.
-			- We will save that correction for later though.
 
 ## Cosmic functions that **always move from one consistent state to the next**:
 

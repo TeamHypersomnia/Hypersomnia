@@ -21,7 +21,7 @@ So that working with content is easier, and so that less memory is wasted, each 
 The first is more like "input" to the processing, in which [authors](author) in particular are interested.  
 Most of the time, only the programmers are concerned with the second type of data.
 
-- An *entity flavour* contains a tuple of [invariants](invariant), a tuple of initial [component](component) values, and an array of flags for each invariant to signify whether it is *enabled*.
+- An *entity flavour* contains a tuple of [invariants](invariant) and a tuple of initial [component](component) values, as specified in the [entity's type](entity_type).
 	- An existent invariant implies that the entity needs a component of type ``invariant_type::implied_component`` (if specified) for the invariant to be ever used by the logic.  
 		- Thus if implied_component type is specified, it additionally stores an **initial value** for the component.
 - A flavour with a blank name is treated as being 'not set' (a null flavour).
