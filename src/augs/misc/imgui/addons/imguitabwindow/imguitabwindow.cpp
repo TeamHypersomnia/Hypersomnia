@@ -13,6 +13,9 @@
 #if !defined(alloca)
 #   ifdef _WIN32
 #       include <malloc.h>     // alloca
+#       if !defined(alloca)
+#           define alloca _alloca  // for clang with MS Codegen
+#       endif //alloca
 #   elif defined(__GLIBC__) || defined(__sun)
 #       include <alloca.h>     // alloca
 #   else
@@ -89,15 +92,15 @@ inline static ImU32 GetVerticalGradient(const ImVec4& ct,const ImVec4& cb,float 
         ct.w * fc + cb.w * fa)
     );
 }
-void ImDrawListAddConvexPolyFilledWithVerticalGradient(ImDrawList *dl, const ImVec2 *points, const int points_count, ImU32 colTop, ImU32 colBot, bool anti_aliased,float miny=-1.f,float maxy=-1.f)
+void ImDrawListAddConvexPolyFilledWithVerticalGradient(ImDrawList *dl, const ImVec2 *points, const int points_count, ImU32 colTop, ImU32 colBot,float miny=-1.f,float maxy=-1.f)
 {
     if (!dl) return;
     if (colTop==colBot)  {
-        dl->AddConvexPolyFilled(points,points_count,colTop,anti_aliased);
+        dl->AddConvexPolyFilled(points,points_count,colTop);
         return;
     }
-    const ImVec2 uv = GImGui->FontTexUvWhitePixel;
-    anti_aliased &= GImGui->Style.AntiAliasedShapes;
+    const ImVec2 uv = GImGui->DrawListSharedData.TexUvWhitePixel;
+    const bool anti_aliased = GImGui->Style.AntiAliasedFill;
     //if (ImGui::GetIO().KeyCtrl) anti_aliased = false; // Debug
 
     int height=0;
@@ -196,51 +199,467 @@ void ImDrawListAddConvexPolyFilledWithVerticalGradient(ImDrawList *dl, const ImV
         dl->_VtxCurrentIdx += (ImDrawIdx)vtx_count;
     }
 }
-void ImDrawListPathFillWithVerticalGradientAndStroke(ImDrawList *dl, const ImU32 &fillColorTop, const ImU32 &fillColorBottom, const ImU32 &strokeColor, bool strokeClosed, float strokeThickness, bool antiAliased,float miny,float maxy)    {
+void ImDrawListPathFillWithVerticalGradientAndStroke(ImDrawList *dl, const ImU32 &fillColorTop, const ImU32 &fillColorBottom, const ImU32 &strokeColor, bool strokeClosed, float strokeThickness,float miny,float maxy)    {
     if (!dl) return;
-    if (fillColorTop==fillColorBottom) dl->AddConvexPolyFilled(dl->_Path.Data,dl->_Path.Size, fillColorTop, antiAliased);
-    else if ((fillColorTop & IM_COL32_A_MASK) != 0 || (fillColorBottom & IM_COL32_A_MASK) != 0) ImDrawListAddConvexPolyFilledWithVerticalGradient(dl, dl->_Path.Data, dl->_Path.Size, fillColorTop, fillColorBottom, antiAliased,miny,maxy);
-    if ((strokeColor& IM_COL32_A_MASK)!= 0 && strokeThickness>0) dl->AddPolyline(dl->_Path.Data, dl->_Path.Size, strokeColor, strokeClosed, strokeThickness, antiAliased);
+    if (fillColorTop==fillColorBottom) dl->AddConvexPolyFilled(dl->_Path.Data,dl->_Path.Size, fillColorTop);
+    else if ((fillColorTop & IM_COL32_A_MASK) != 0 || (fillColorBottom & IM_COL32_A_MASK) != 0) ImDrawListAddConvexPolyFilledWithVerticalGradient(dl, dl->_Path.Data, dl->_Path.Size, fillColorTop, fillColorBottom,miny,maxy);
+    if ((strokeColor& IM_COL32_A_MASK)!= 0 && strokeThickness>0) dl->AddPolyline(dl->_Path.Data, dl->_Path.Size, strokeColor, strokeClosed, strokeThickness);
     dl->PathClear();
 }
-void ImDrawListPathFillAndStroke(ImDrawList *dl, const ImU32 &fillColor, const ImU32 &strokeColor, bool strokeClosed, float strokeThickness, bool antiAliased)    {
+void ImDrawListPathFillAndStroke(ImDrawList *dl, const ImU32 &fillColor, const ImU32 &strokeColor, bool strokeClosed, float strokeThickness)    {
     if (!dl) return;
-    if ((fillColor & IM_COL32_A_MASK) != 0) dl->AddConvexPolyFilled(dl->_Path.Data, dl->_Path.Size, fillColor, antiAliased);
-    if ((strokeColor& IM_COL32_A_MASK)!= 0 && strokeThickness>0) dl->AddPolyline(dl->_Path.Data, dl->_Path.Size, strokeColor, strokeClosed, strokeThickness, antiAliased);
+    if ((fillColor & IM_COL32_A_MASK) != 0) dl->AddConvexPolyFilled(dl->_Path.Data, dl->_Path.Size, fillColor);
+    if ((strokeColor& IM_COL32_A_MASK)!= 0 && strokeThickness>0) dl->AddPolyline(dl->_Path.Data, dl->_Path.Size, strokeColor, strokeClosed, strokeThickness);
     dl->PathClear();
 }
-void ImDrawListAddRect(ImDrawList *dl, const ImVec2 &a, const ImVec2 &b, const ImU32 &fillColor, const ImU32 &strokeColor, float rounding, int rounding_corners, float strokeThickness, bool antiAliased) {
+void ImDrawListAddRect(ImDrawList *dl, const ImVec2 &a, const ImVec2 &b, const ImU32 &fillColor, const ImU32 &strokeColor, float rounding, int rounding_corners, float strokeThickness) {
     if (!dl || (((fillColor & IM_COL32_A_MASK) == 0) && ((strokeColor & IM_COL32_A_MASK) == 0)))  return;
     dl->PathRect(a, b, rounding, rounding_corners);
-    ImDrawListPathFillAndStroke(dl,fillColor,strokeColor,true,strokeThickness,antiAliased);
+    ImDrawListPathFillAndStroke(dl,fillColor,strokeColor,true,strokeThickness);
 }
-void ImDrawListAddRectWithVerticalGradient(ImDrawList *dl, const ImVec2 &a, const ImVec2 &b, const ImU32 &fillColorTop, const ImU32 &fillColorBottom, const ImU32 &strokeColor, float rounding, int rounding_corners, float strokeThickness, bool antiAliased) {
+void ImDrawListAddRectWithVerticalGradient(ImDrawList *dl, const ImVec2 &a, const ImVec2 &b, const ImU32 &fillColorTop, const ImU32 &fillColorBottom, const ImU32 &strokeColor, float rounding, int rounding_corners, float strokeThickness) {
     if (!dl || (((fillColorTop & IM_COL32_A_MASK) == 0) && ((fillColorBottom & IM_COL32_A_MASK) == 0) && ((strokeColor & IM_COL32_A_MASK) == 0)))  return;
     if (rounding==0.f || rounding_corners==0) {
         dl->AddRectFilledMultiColor(a,b,fillColorTop,fillColorTop,fillColorBottom,fillColorBottom); // Huge speedup!
         if ((strokeColor& IM_COL32_A_MASK)!= 0 && strokeThickness>0.f) {
             dl->PathRect(a, b, rounding, rounding_corners);
-            dl->AddPolyline(dl->_Path.Data, dl->_Path.Size, strokeColor, true, strokeThickness, antiAliased);
+            dl->AddPolyline(dl->_Path.Data, dl->_Path.Size, strokeColor, true, strokeThickness);
             dl->PathClear();
         }
     }
     else    {
         dl->PathRect(a, b, rounding, rounding_corners);
-        ImDrawListPathFillWithVerticalGradientAndStroke(dl,fillColorTop,fillColorBottom,strokeColor,true,strokeThickness,antiAliased,a.y,b.y);
+        ImDrawListPathFillWithVerticalGradientAndStroke(dl,fillColorTop,fillColorBottom,strokeColor,true,strokeThickness,a.y,b.y);
     }
 }
-void ImDrawListAddRectWithVerticalGradient(ImDrawList *dl, const ImVec2 &a, const ImVec2 &b, const ImU32 &fillColor, float fillColorGradientDeltaIn0_05, const ImU32 &strokeColor, float rounding, int rounding_corners, float strokeThickness, bool antiAliased)
+void ImDrawListAddRectWithVerticalGradient(ImDrawList *dl, const ImVec2 &a, const ImVec2 &b, const ImU32 &fillColor, float fillColorGradientDeltaIn0_05, const ImU32 &strokeColor, float rounding, int rounding_corners, float strokeThickness)
 {
     ImU32 fillColorTop,fillColorBottom;GetVerticalGradientTopAndBottomColors(fillColor,fillColorGradientDeltaIn0_05,fillColorTop,fillColorBottom);
-    ImDrawListAddRectWithVerticalGradient(dl,a,b,fillColorTop,fillColorBottom,strokeColor,rounding,rounding_corners,strokeThickness,antiAliased);
+    ImDrawListAddRectWithVerticalGradient(dl,a,b,fillColorTop,fillColorBottom,strokeColor,rounding,rounding_corners,strokeThickness);
+}
+
+void ImDrawListAddConvexPolyFilledWithHorizontalGradient(ImDrawList *dl, const ImVec2 *points, const int points_count, ImU32 colLeft, ImU32 colRight, float minx, float maxx)
+{
+    if (!dl) return;
+    if (colLeft==colRight)  {
+        dl->AddConvexPolyFilled(points,points_count,colLeft);
+        return;
+    }
+    const ImVec2 uv = GImGui->DrawListSharedData.TexUvWhitePixel;
+    const bool anti_aliased = GImGui->Style.AntiAliasedFill;
+    //if (ImGui::GetIO().KeyCtrl) anti_aliased = false; // Debug
+
+    int width=0;
+    if (minx<=0 || maxx<=0) {
+        const float max_float = 999999999999999999.f;
+        minx=max_float;maxx=-max_float;
+        for (int i = 0; i < points_count; i++) {
+            const float w = points[i].x;
+            if (w < minx) minx = w;
+            else if (w > maxx) maxx = w;
+        }
+    }
+    width = maxx-minx;
+    const ImVec4 colLeftf  = ColorConvertU32ToFloat4(colLeft);
+    const ImVec4 colRightf = ColorConvertU32ToFloat4(colRight);
+
+
+    if (anti_aliased)
+    {
+        // Anti-aliased Fill
+        const float AA_SIZE = 1.0f;
+
+        const ImVec4 colTransLeftf(colLeftf.x,colLeftf.y,colLeftf.z,0.f);
+        const ImVec4 colTransRightf(colRightf.x,colRightf.y,colRightf.z,0.f);
+        const int idx_count = (points_count-2)*3 + points_count*6;
+        const int vtx_count = (points_count*2);
+        dl->PrimReserve(idx_count, vtx_count);
+
+        // Add indexes for fill
+        unsigned int vtx_inner_idx = dl->_VtxCurrentIdx;
+        unsigned int vtx_outer_idx = dl->_VtxCurrentIdx+1;
+        for (int i = 2; i < points_count; i++)
+        {
+            dl->_IdxWritePtr[0] = (ImDrawIdx)(vtx_inner_idx); dl->_IdxWritePtr[1] = (ImDrawIdx)(vtx_inner_idx+((i-1)<<1)); dl->_IdxWritePtr[2] = (ImDrawIdx)(vtx_inner_idx+(i<<1));
+            dl->_IdxWritePtr += 3;
+        }
+
+        // Compute normals
+        ImVec2* temp_normals = (ImVec2*)alloca(points_count * sizeof(ImVec2));
+        for (int i0 = points_count-1, i1 = 0; i1 < points_count; i0 = i1++)
+        {
+            const ImVec2& p0 = points[i0];
+            const ImVec2& p1 = points[i1];
+            ImVec2 diff = p1 - p0;
+            diff *= ImInvLength(diff, 1.0f);
+            temp_normals[i0].x = diff.y;
+            temp_normals[i0].y = -diff.x;
+        }
+
+        for (int i0 = points_count-1, i1 = 0; i1 < points_count; i0 = i1++)
+        {
+            // Average normals
+            const ImVec2& n0 = temp_normals[i0];
+            const ImVec2& n1 = temp_normals[i1];
+            ImVec2 dm = (n0 + n1) * 0.5f;
+            float dmr2 = dm.x*dm.x + dm.y*dm.y;
+            if (dmr2 > 0.000001f)
+            {
+                float scale = 1.0f / dmr2;
+                if (scale > 100.0f) scale = 100.0f;
+                dm *= scale;
+            }
+            dm *= AA_SIZE * 0.5f;
+
+            // Add vertices
+            //_VtxWritePtr[0].pos = (points[i1] - dm); _VtxWritePtr[0].uv = uv; _VtxWritePtr[0].col = col;        // Inner
+            //_VtxWritePtr[1].pos = (points[i1] + dm); _VtxWritePtr[1].uv = uv; _VtxWritePtr[1].col = col_trans;  // Outer
+            dl->_VtxWritePtr[0].pos = (points[i1] - dm); dl->_VtxWritePtr[0].uv = uv; dl->_VtxWritePtr[0].col = GetVerticalGradient(colLeftf,colRightf,points[i1].x-minx,width);        // Inner
+            dl->_VtxWritePtr[1].pos = (points[i1] + dm); dl->_VtxWritePtr[1].uv = uv; dl->_VtxWritePtr[1].col = GetVerticalGradient(colTransLeftf,colTransRightf,points[i1].x-minx,width);  // Outer
+            dl->_VtxWritePtr += 2;
+
+            // Add indexes for fringes
+            dl->_IdxWritePtr[0] = (ImDrawIdx)(vtx_inner_idx+(i1<<1)); dl->_IdxWritePtr[1] = (ImDrawIdx)(vtx_inner_idx+(i0<<1)); dl->_IdxWritePtr[2] = (ImDrawIdx)(vtx_outer_idx+(i0<<1));
+            dl->_IdxWritePtr[3] = (ImDrawIdx)(vtx_outer_idx+(i0<<1)); dl->_IdxWritePtr[4] = (ImDrawIdx)(vtx_outer_idx+(i1<<1)); dl->_IdxWritePtr[5] = (ImDrawIdx)(vtx_inner_idx+(i1<<1));
+            dl->_IdxWritePtr += 6;
+        }
+        dl->_VtxCurrentIdx += (ImDrawIdx)vtx_count;
+    }
+    else
+    {
+        // Non Anti-aliased Fill
+        const int idx_count = (points_count-2)*3;
+        const int vtx_count = points_count;
+        dl->PrimReserve(idx_count, vtx_count);
+        for (int i = 0; i < vtx_count; i++)
+        {
+            //_VtxWritePtr[0].pos = points[i]; _VtxWritePtr[0].uv = uv; _VtxWritePtr[0].col = col;
+            dl->_VtxWritePtr[0].pos = points[i]; dl->_VtxWritePtr[0].uv = uv; dl->_VtxWritePtr[0].col = GetVerticalGradient(colLeftf,colRightf,points[i].x-minx,width);
+            dl->_VtxWritePtr++;
+        }
+        for (int i = 2; i < points_count; i++)
+        {
+            dl->_IdxWritePtr[0] = (ImDrawIdx)(dl->_VtxCurrentIdx); dl->_IdxWritePtr[1] = (ImDrawIdx)(dl->_VtxCurrentIdx+i-1); dl->_IdxWritePtr[2] = (ImDrawIdx)(dl->_VtxCurrentIdx+i);
+            dl->_IdxWritePtr += 3;
+        }
+        dl->_VtxCurrentIdx += (ImDrawIdx)vtx_count;
+    }
+}
+void ImDrawListPathFillWithHorizontalGradientAndStroke(ImDrawList *dl, const ImU32 &fillColorLeft, const ImU32 &fillColorRight, const ImU32 &strokeColor, bool strokeClosed, float strokeThickness, float minx, float maxx)    {
+    if (!dl) return;
+    if (fillColorLeft==fillColorRight) dl->AddConvexPolyFilled(dl->_Path.Data,dl->_Path.Size, fillColorLeft);
+    else if ((fillColorLeft & IM_COL32_A_MASK) != 0 || (fillColorRight & IM_COL32_A_MASK) != 0) ImDrawListAddConvexPolyFilledWithHorizontalGradient(dl, dl->_Path.Data, dl->_Path.Size, fillColorLeft, fillColorRight,minx,maxx);
+    if ((strokeColor& IM_COL32_A_MASK)!= 0 && strokeThickness>0) dl->AddPolyline(dl->_Path.Data, dl->_Path.Size, strokeColor, strokeClosed, strokeThickness);
+    dl->PathClear();
+}
+void ImDrawListAddRectWithHorizontalGradient(ImDrawList *dl, const ImVec2 &a, const ImVec2 &b, const ImU32 &fillColorLeft, const ImU32 &fillColoRight, const ImU32 &strokeColor, float rounding, int rounding_corners, float strokeThickness) {
+    if (!dl || (((fillColorLeft & IM_COL32_A_MASK) == 0) && ((fillColoRight & IM_COL32_A_MASK) == 0) && ((strokeColor & IM_COL32_A_MASK) == 0)))  return;
+    if (rounding==0.f || rounding_corners==0) {
+        dl->AddRectFilledMultiColor(a,b,fillColorLeft,fillColoRight,fillColoRight,fillColorLeft); // Huge speedup!
+        if ((strokeColor& IM_COL32_A_MASK)!= 0 && strokeThickness>0.f) {
+            dl->PathRect(a, b, rounding, rounding_corners);
+            dl->AddPolyline(dl->_Path.Data, dl->_Path.Size, strokeColor, true, strokeThickness);
+            dl->PathClear();
+        }
+    }
+    else    {
+        dl->PathRect(a, b, rounding, rounding_corners);
+        ImDrawListPathFillWithHorizontalGradientAndStroke(dl,fillColorLeft,fillColoRight,strokeColor,true,strokeThickness,a.x,b.x);
+    }
+}
+void ImDrawListAddRectWithHorizontalGradient(ImDrawList *dl, const ImVec2 &a, const ImVec2 &b, const ImU32 &fillColor, float fillColorGradientDeltaIn0_05, const ImU32 &strokeColor, float rounding, int rounding_corners, float strokeThickness)   {
+    ImU32 fillColorTop,fillColorBottom;GetVerticalGradientTopAndBottomColors(fillColor,fillColorGradientDeltaIn0_05,fillColorTop,fillColorBottom);
+    ImDrawListAddRectWithHorizontalGradient(dl,a,b,fillColorTop,fillColorBottom,strokeColor,rounding,rounding_corners,strokeThickness);
 }
 
 }   //DrawListHelper
+
+namespace VerticalTextHelper {
+ImVec2 CalcVerticalTextSize(const char* text, const char* text_end = NULL, bool hide_text_after_double_hash = false, float wrap_width = -1.0f) {
+    const ImVec2 rv = ImGui::CalcTextSize(text,text_end,hide_text_after_double_hash,wrap_width);
+    return ImVec2(rv.y,rv.x);
+}
+void RenderTextVertical(const ImFont* font,ImDrawList* draw_list, float size, ImVec2 pos, ImU32 col, const ImVec4& clip_rect, const char* text_begin,  const char* text_end=NULL, float wrap_width=0.0f, bool cpu_fine_clip=false, bool rotateCCW=false) {
+    if (!text_end) text_end = text_begin + strlen(text_begin);
+
+    const float scale = size / font->FontSize;
+    const float line_height = font->FontSize * scale;
+
+    // Align to be pixel perfect
+    pos.x = (float)(int)pos.x;// + (rotateCCW ? (font->FontSize-font->DisplayOffset.y) : 0);  // Not sure it's correct
+    pos.y = (float)(int)pos.y + font->DisplayOffset.x;
+
+
+    float x = pos.x;
+    float y = pos.y;
+    if (x > clip_rect.z)
+        return;
+
+    const bool word_wrap_enabled = (wrap_width > 0.0f);
+    const char* word_wrap_eol = NULL;
+    const float y_dir = rotateCCW ? -1.f : 1.f;
+
+    // Skip non-visible lines
+    const char* s = text_begin;
+    if (!word_wrap_enabled && y + line_height < clip_rect.y)
+        while (s < text_end && *s != '\n')  // Fast-forward to next line
+            s++;
+
+    // Reserve vertices for remaining worse case (over-reserving is useful and easily amortized)
+    const int vtx_count_max = (int)(text_end - s) * 4;
+    const int idx_count_max = (int)(text_end - s) * 6;
+    const int idx_expected_size = draw_list->IdxBuffer.Size + idx_count_max;
+    draw_list->PrimReserve(idx_count_max, vtx_count_max);
+
+    ImDrawVert* vtx_write = draw_list->_VtxWritePtr;
+    ImDrawIdx* idx_write = draw_list->_IdxWritePtr;
+    unsigned int vtx_current_idx = draw_list->_VtxCurrentIdx;
+    float x1=0.f,x2=0.f,y1=0.f,y2=0.f;
+
+    while (s < text_end)
+    {
+        if (word_wrap_enabled)
+        {
+            // Calculate how far we can render. Requires two passes on the string data but keeps the code simple and not intrusive for what's essentially an uncommon feature.
+            if (!word_wrap_eol)
+            {
+                word_wrap_eol = font->CalcWordWrapPositionA(scale, s, text_end, wrap_width - (y - pos.y));
+                if (word_wrap_eol == s) // Wrap_width is too small to fit anything. Force displaying 1 character to minimize the height discontinuity.
+                    word_wrap_eol++;    // +1 may not be a character start point in UTF-8 but it's ok because we use s >= word_wrap_eol below
+            }
+
+            if (s >= word_wrap_eol)
+            {
+                y = pos.y;
+                x += line_height;
+                word_wrap_eol = NULL;
+
+                // Wrapping skips upcoming blanks
+                while (s < text_end)
+                {
+                    const char c = *s;
+                    if (ImCharIsSpace(c)) { s++; } else if (c == '\n') { s++; break; } else { break; }
+                }
+                continue;
+            }
+        }
+
+        // Decode and advance source
+        unsigned int c = (unsigned int)*s;
+        if (c < 0x80)
+        {
+            s += 1;
+        }
+        else
+        {
+            s += ImTextCharFromUtf8(&c, s, text_end);
+            if (c == 0)
+                break;
+        }
+
+        if (c < 32)
+        {
+            if (c == '\n')
+            {
+                y = pos.y;
+                x += line_height;
+
+                if (x > clip_rect.z)
+                    break;
+                if (!word_wrap_enabled && x + line_height < clip_rect.x)
+                    while (s < text_end && *s != '\n')  // Fast-forward to next line
+                        s++;
+                continue;
+            }
+            if (c == '\r')
+                continue;
+        }
+
+        float char_width = 0.0f;
+        if (const ImFontGlyph* glyph = font->FindGlyph((unsigned short)c))
+        {
+            char_width = glyph->AdvanceX * scale;
+            //fprintf(stderr,"%c [%1.4f]\n",(unsigned char) glyph->Codepoint,char_width);
+
+            // Arbitrarily assume that both space and tabs are empty glyphs as an optimization
+            if (c != ' ' && c != '\t')
+            {
+                // We don't do a second finer clipping test on the Y axis as we've already skipped anything before clip_rect.y and exit once we pass clip_rect.w
+                if (!rotateCCW)  {
+                    x1 = x + (font->FontSize-glyph->Y1) * scale;
+                    x2 = x + (font->FontSize-glyph->Y0) * scale;
+                    y1 = y + glyph->X0 * scale;
+                    y2 = y + glyph->X1 * scale;
+                }
+                else {
+                    x1 = x + glyph->Y0 * scale;
+                    x2 = x + glyph->Y1 * scale;
+                    y1 = y - glyph->X1 * scale;
+                    y2 = y - glyph->X0 * scale;
+                }
+                if (y1 <= clip_rect.w && y2 >= clip_rect.y)
+                {
+                    // Render a character
+                    float u1 = glyph->U0;
+                    float v1 = glyph->V0;
+                    float u2 = glyph->U1;
+                    float v2 = glyph->V1;
+
+                    // CPU side clipping used to fit text in their frame when the frame is too small. Only does clipping for axis aligned quads.
+                    if (cpu_fine_clip)
+                    {
+                        if (x1 < clip_rect.x)
+                        {
+                            u1 = u1 + (1.0f - (x2 - clip_rect.x) / (x2 - x1)) * (u2 - u1);
+                            x1 = clip_rect.x;
+                        }
+                        if (y1 < clip_rect.y)
+                        {
+                            v1 = v1 + (1.0f - (y2 - clip_rect.y) / (y2 - y1)) * (v2 - v1);
+                            y1 = clip_rect.y;
+                        }
+                        if (x2 > clip_rect.z)
+                        {
+                            u2 = u1 + ((clip_rect.z - x1) / (x2 - x1)) * (u2 - u1);
+                            x2 = clip_rect.z;
+                        }
+                        if (y2 > clip_rect.w)
+                        {
+                            v2 = v1 + ((clip_rect.w - y1) / (y2 - y1)) * (v2 - v1);
+                            y2 = clip_rect.w;
+                        }
+                        if (x1 >= x2)
+                        {
+                            y += char_width*y_dir;
+                            continue;
+                        }
+                    }
+
+                    // We are NOT calling PrimRectUV() here because non-inlined causes too much overhead in a debug build.
+                    // Inlined here:
+                    {
+                        idx_write[0] = (ImDrawIdx)(vtx_current_idx); idx_write[1] = (ImDrawIdx)(vtx_current_idx+1); idx_write[2] = (ImDrawIdx)(vtx_current_idx+2);
+                        idx_write[3] = (ImDrawIdx)(vtx_current_idx); idx_write[4] = (ImDrawIdx)(vtx_current_idx+2); idx_write[5] = (ImDrawIdx)(vtx_current_idx+3);
+                        vtx_write[0].col = vtx_write[1].col = vtx_write[2].col = vtx_write[3].col = col;
+                        vtx_write[0].pos.x = x1; vtx_write[0].pos.y = y1;
+                        vtx_write[1].pos.x = x2; vtx_write[1].pos.y = y1;
+                        vtx_write[2].pos.x = x2; vtx_write[2].pos.y = y2;
+                        vtx_write[3].pos.x = x1; vtx_write[3].pos.y = y2;
+
+                        if (rotateCCW) {
+                            vtx_write[0].uv.x = u2; vtx_write[0].uv.y = v1;
+                            vtx_write[1].uv.x = u2; vtx_write[1].uv.y = v2;
+                            vtx_write[2].uv.x = u1; vtx_write[2].uv.y = v2;
+                            vtx_write[3].uv.x = u1; vtx_write[3].uv.y = v1;
+                        }
+                        else {
+                            vtx_write[0].uv.x = u1; vtx_write[0].uv.y = v2;
+                            vtx_write[1].uv.x = u1; vtx_write[1].uv.y = v1;
+                            vtx_write[2].uv.x = u2; vtx_write[2].uv.y = v1;
+                            vtx_write[3].uv.x = u2; vtx_write[3].uv.y = v2;
+                        }
+
+                        vtx_write += 4;
+                        vtx_current_idx += 4;
+                        idx_write += 6;
+                    }
+                }
+            }
+        }
+
+        y += char_width*y_dir;
+    }
+
+    // Give back unused vertices
+    draw_list->VtxBuffer.resize((int)(vtx_write - draw_list->VtxBuffer.Data));
+    draw_list->IdxBuffer.resize((int)(idx_write - draw_list->IdxBuffer.Data));
+    draw_list->CmdBuffer[draw_list->CmdBuffer.Size-1].ElemCount -= (idx_expected_size - draw_list->IdxBuffer.Size);
+    draw_list->_VtxWritePtr = vtx_write;
+    draw_list->_IdxWritePtr = idx_write;
+    draw_list->_VtxCurrentIdx = (unsigned int)draw_list->VtxBuffer.Size;
+}
+void AddTextVertical(ImDrawList* drawList,const ImFont* font, float font_size, const ImVec2& pos, ImU32 col, const char* text_begin, const char* text_end=NULL, float wrap_width=0.0f, const ImVec4* cpu_fine_clip_rect=NULL,bool rotateCCW = false)    {
+    if ((col & IM_COL32_A_MASK) == 0)
+        return;
+
+    if (text_end == NULL)
+        text_end = text_begin + strlen(text_begin);
+    if (text_begin == text_end)
+        return;
+
+    // Note: This is one of the few instance of breaking the encapsulation of ImDrawList, as we pull this from ImGui state, but it is just SO useful.
+    // Might just move Font/FontSize to ImDrawList?
+    if (font == NULL)
+        font = GImGui->Font;
+    if (font_size == 0.0f)
+        font_size = GImGui->FontSize;
+
+    IM_ASSERT(drawList && font->ContainerAtlas->TexID == drawList->_TextureIdStack.back());  // Use high-level ImGui::PushFont() or low-level ImDrawList::PushTextureId() to change font.
+
+    ImVec4 clip_rect = drawList->_ClipRectStack.back();
+    if (cpu_fine_clip_rect)
+    {
+        clip_rect.x = ImMax(clip_rect.x, cpu_fine_clip_rect->x);
+        clip_rect.y = ImMax(clip_rect.y, cpu_fine_clip_rect->y);
+        clip_rect.z = ImMin(clip_rect.z, cpu_fine_clip_rect->z);
+        clip_rect.w = ImMin(clip_rect.w, cpu_fine_clip_rect->w);
+    }
+    RenderTextVertical(font, drawList, font_size, pos, col, clip_rect, text_begin, text_end, wrap_width, cpu_fine_clip_rect != NULL,rotateCCW);
+}
+void AddTextVertical(ImDrawList* drawList,const ImVec2& pos, ImU32 col, const char* text_begin, const char* text_end=NULL,bool rotateCCW=false)    {
+    AddTextVertical(drawList,GImGui->Font, GImGui->FontSize, pos, col, text_begin, text_end,0.0f,NULL,rotateCCW);
+}
+void RenderTextVerticalClipped(const ImVec2& pos_min, const ImVec2& pos_max, const char* text, const char* text_end, const ImVec2* text_size_if_known, const ImVec2& align =  ImVec2(0.0f,0.0f), const ImVec2* clip_min=NULL, const ImVec2* clip_max=NULL,bool rotateCCW=false)    {
+    // Hide anything after a '##' string
+    const char* text_display_end = FindRenderedTextEnd(text, text_end);
+    const int text_len = (int)(text_display_end - text);
+    if (text_len == 0)
+        return;
+
+    ImGuiContext& g = *GImGui;
+    ImGuiWindow* window = GetCurrentWindow();
+
+    // Perform CPU side clipping for single clipped element to avoid using scissor state
+    ImVec2 pos = pos_min;
+    const ImVec2 text_size = text_size_if_known ? *text_size_if_known : CalcVerticalTextSize(text, text_display_end, false, 0.0f);
+
+    if (!clip_max) clip_max = &pos_max;
+    bool need_clipping = (pos.x + text_size.x >= clip_max->x) || (pos.y + text_size.y >= clip_max->y);
+    if (!clip_min) clip_min = &pos_min; else need_clipping |= (pos.x < clip_min->x) || (pos.y < clip_min->y);
+
+    // Align
+    /*if (align & ImGuiAlign_Center) pos.x = ImMax(pos.x, (pos.x + pos_max.x - text_size.x) * 0.5f);
+    else if (align & ImGuiAlign_Right) pos.x = ImMax(pos.x, pos_max.x - text_size.x);
+    if (align & ImGuiAlign_VCenter) pos.y = ImMax(pos.y, (pos.y + pos_max.y - text_size.y) * 0.5f);*/
+
+    //if (align & ImGuiAlign_Center) pos.y = ImMax(pos.y, (pos.y + pos_max.y - text_size.y) * 0.5f);
+    //else if (align & ImGuiAlign_Right) pos.y = ImMax(pos.y, pos_max.y - text_size.y);
+    //if (align & ImGuiAlign_VCenter) pos.x = ImMax(pos.x, (pos.x + pos_max.x - text_size.x) * 0.5f);
+
+    // Align whole block (we should defer that to the better rendering function
+    if (align.x > 0.0f) pos.x = ImMax(pos.x, pos.x + (pos_max.x - pos.x - text_size.x) * align.x);
+    if (align.y > 0.0f) pos.y = ImMax(pos.y, pos.y + (pos_max.y - pos.y - text_size.y) * align.y);
+
+
+    if (rotateCCW) pos.y+=text_size.y;
+    // Render
+    if (need_clipping)
+    {
+        ImVec4 fine_clip_rect(clip_min->x, clip_min->y, clip_max->x, clip_max->y);
+        AddTextVertical(window->DrawList,g.Font, g.FontSize, pos, GetColorU32(ImGuiCol_Text), text, text_display_end, 0.0f, &fine_clip_rect,rotateCCW);
+    }
+    else
+    {
+        AddTextVertical(window->DrawList,g.Font, g.FontSize, pos, GetColorU32(ImGuiCol_Text), text, text_display_end, 0.0f, NULL,rotateCCW);
+    }
+}
+}
 
 namespace RevertUpstreamBeginChildCommit   {
 // That commit [2016/11/06 (1.50)] broke everything!
 static bool OldBeginChild(const char* str_id, const ImVec2& size_arg = ImVec2(0,0), ImGuiWindowFlags extra_flags = 0)    {
     ImGuiWindow* parent_window = ImGui::GetCurrentWindow();
+    const ImGuiID id = parent_window->GetID(str_id);
     ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoSavedSettings|ImGuiWindowFlags_ChildWindow;
 
     const ImVec2 content_avail = ImGui::GetContentRegionAvail();
@@ -261,13 +680,22 @@ static bool OldBeginChild(const char* str_id, const ImVec2& size_arg = ImVec2(0,
     char title[256];
     ImFormatString(title, IM_ARRAYSIZE(title), "%s.%s", parent_window->Name, str_id);
 
-    //bool ret = ImGui::Begin(title, NULL, size, -1.0f, flags); // This triggers an asset now, but this is OK:
     ImGui::SetNextWindowSize(size);
     bool ret = ImGui::Begin(title, NULL, flags);
 
     ImGuiWindow* child_window = ImGui::GetCurrentWindow();
+    child_window->ChildId = id;
     child_window->AutoFitChildAxises = auto_fit_axises;
     //if (!(parent_window->Flags & ImGuiWindowFlags_ShowBorders)) child_window->Flags &= ~ImGuiWindowFlags_ShowBorders;
+
+    // Process navigation-in immediately so NavInit can run on first frame
+    if (!(flags & ImGuiWindowFlags_NavFlattened) && (child_window->DC.NavLayerActiveMask != 0 || child_window->DC.NavHasScroll) && GImGui->NavActivateId == id)
+    {
+        ImGui::FocusWindow(child_window);
+        ImGui::NavInitWindow(child_window, false);
+        ImGui::SetActiveID(id+1, child_window); // Steal ActiveId with a dummy id so that key-press won't activate child item
+        GImGui->ActiveIdSource = ImGuiInputSource_Nav;
+    }
 
     return ret;
 }
@@ -322,7 +750,6 @@ TabLabelStyle::TabLabelStyle()    {
 
     fillColorGradientDeltaIn0_05 = 0.0f;rounding = 6.f;borderWidth = 0.f;
     closeButtonRounding = 0.f;closeButtonBorderWidth = 1.f;closeButtonTextWidth = 2.5f;//3.f;
-    antialiasing = false;
 
     TabLabelStyleSetSelectedTabColors(*this,ImColor(0.267f,0.282f,0.396f,1.0f),ImColor(0.925f,0.945f,0.957,1.0f),ImColor(0.090f,0.106f,0.157f,0.000f));
     TabLabelStyleSetTabColors(*this,ImColor(0.161f,0.188f,0.204f,1.f),ImColor(0.239f,0.259f,0.275f,1.f),ImColor(0.549f,0.565f,0.576f,0.784f),ColorDarken(colors[Col_TabLabelSelectedBorder],.0225f));
@@ -421,7 +848,7 @@ bool TabLabelStyle::Edit(TabLabelStyle &s)  {
     ImGui::Spacing();
     ImGui::PopItemWidth();
 
-    changed|=ImGui::Checkbox("antialiasing",&s.antialiasing);
+    //changed|=ImGui::Checkbox("antialiasing",&s.antialiasing);
     ImGui::Spacing();
 
     ImGui::Text("Colors:");
@@ -531,7 +958,7 @@ bool ResetTabLabelStyle(int tabLabelStyleEnum,ImGui::TabLabelStyle& style) {
         TabLabelStyleSetCloseButtonColors(style);
         break;
     case ImGuiTabLabelStyle_White:  {
-        style.fillColorGradientDeltaIn0_05 = 0.0f;style.rounding = 6.f;style.borderWidth = 1.0f;style.antialiasing = false;
+        style.fillColorGradientDeltaIn0_05 = 0.0f;style.rounding = 6.f;style.borderWidth = 1.0f;
         TabLabelStyleSetSelectedTabColors(style,ImColor(1.f,1.f,1.f),ImColor(0.059f,0.059f,0.059f,1.f),ImColor(0.090f,0.106f,0.157f,0.706f));
         TabLabelStyleSetTabColors(style,ImColor(0.925f,0.953f,0.969f,1.f),ImColor(1.f,1.f,1.f,1.f),ImColor(0.247f,0.286f,0.294f,0.765f),ImColor(0.067f,0.082f,0.133f,0.353f));
         style.closeButtonBorderWidth = 1.f;style.closeButtonTextWidth = 2.5f;ImColor btc(1.f,1.f,1.f,1.),bbc(0.090f,0.106f,0.157,1.f);
@@ -551,7 +978,7 @@ bool ResetTabLabelStyle(int tabLabelStyleEnum,ImGui::TabLabelStyle& style) {
         }
         break;
     case ImGuiTabLabelStyle_Tidy:   {
-        style.fillColorGradientDeltaIn0_05 = 0.0f;style.rounding = 6.f;style.borderWidth = 1.5f;style.antialiasing = true;
+        style.fillColorGradientDeltaIn0_05 = 0.0f;style.rounding = 6.f;style.borderWidth = 1.5f;
         TabLabelStyleSetSelectedTabColors(style,ImColor(0.682f,0.682f,0.682f,0.941f),ImColor(0.000f,0.000f,0.000f,1.000f),ImColor(0.992f,0.992f,0.992f,1.000f));
         TabLabelStyleSetTabColors(style,ImColor(0.212f,0.212f,0.212f,1.000f),ImColor(0.392f,0.392f,0.392f,1.000f),ImColor(0.784f,0.784f,0.784f,1.000f),ImColor(0.541f,0.541f,0.541f,0.588f));
         style.closeButtonBorderWidth = 3.f;style.closeButtonTextWidth = 2.5f;ImColor btc(0.949f,0.949f,0.949f,1.000f),bbc(0.749f,0.749f,0.749f,0.549f);
@@ -582,7 +1009,7 @@ bool TabLabelStyle::Save(const TabLabelStyle &style, ImGuiHelper::Serializer& s)
     s.save(ImGui::FT_FLOAT,&style.closeButtonBorderWidth,"closeButtonBorderWidth");
     s.save(ImGui::FT_FLOAT,&style.closeButtonTextWidth,"closeButtonTextWidth");
 
-    s.save(&style.antialiasing,"antialiasing");
+    //s.save(&style.antialiasing,"antialiasing");
 
     ImVec4 tmpColor(1,1,1,1);
     for (int i=0;i<Col_TabLabel_Count;i++)    {
@@ -622,8 +1049,9 @@ static bool TabLabelStyleParser(ImGuiHelper::FieldType ft,int /*numArrayElements
 	}
     break;
     case ImGui::FT_BOOL:
-	if (strcmp(name,"antialiasing")==0)				s.antialiasing = *((bool*)pValue);
-	else if (strcmp(name,"tabWindowLabelShowAreaSeparator")==0)	s.tabWindowLabelShowAreaSeparator = *((bool*)pValue);
+    //if (strcmp(name,"antialiasing")==0)				s.antialiasing = *((bool*)pValue);
+    //else
+    if (strcmp(name,"tabWindowLabelShowAreaSeparator")==0)	s.tabWindowLabelShowAreaSeparator = *((bool*)pValue);
     break;
     case ImGui::FT_COLOR:
 	if (strcmp(name,"tabWindowLabelBackgroundColor")==0)		    s.tabWindowLabelBackgroundColor = ImColor(tmp);
@@ -659,7 +1087,7 @@ const TabLabelStyle& TabLabelStyle::GetMergedWithWindowAlpha()    {
     static int frameCnt=-1;    
     if (frameCnt!=ImGui::GetFrameCount())   {
         frameCnt=ImGui::GetFrameCount();
-    const float alpha = GImGui->Style.Alpha;
+    const float alpha = GImGui->Style.Alpha * GImGui->Style.Colors[ImGuiCol_WindowBg].w;
         S = TabLabelStyle::style;
     for (int i=0;i<Col_TabLabel_Count;i++) S.colors[i] = ColorMergeWithAlpha(style.colors[i],alpha);
 	S.tabWindowLabelBackgroundColor.w*=alpha;
@@ -751,7 +1179,7 @@ static bool TabButton(const char *label, bool selected, bool *pCloseButtonPresse
     if (!drawListOverride) drawListOverride = window->DrawList;
 
     // Canvas
-    DrawListHelper::ImDrawListAddRectWithVerticalGradient(drawListOverride,bb.Min, bb.Max,col,(selected || hovered || held)?tabStyle.fillColorGradientDeltaIn0_05:(-tabStyle.fillColorGradientDeltaIn0_05),tabStyle.colors[selected ? TabLabelStyle::Col_TabLabelSelectedBorder : TabLabelStyle::Col_TabLabelBorder],tabStyle.rounding,1|2,tabStyle.borderWidth,tabStyle.antialiasing);
+    DrawListHelper::ImDrawListAddRectWithVerticalGradient(drawListOverride,bb.Min, bb.Max,col,(selected || hovered || held)?tabStyle.fillColorGradientDeltaIn0_05:(-tabStyle.fillColorGradientDeltaIn0_05),tabStyle.colors[selected ? TabLabelStyle::Col_TabLabelSelectedBorder : TabLabelStyle::Col_TabLabelBorder],tabStyle.rounding,1|2,tabStyle.borderWidth);
 
     // Text
     ImGui::PushStyleColor(ImGuiCol_Text,ImGui::ColorConvertU32ToFloat4(colText));
@@ -767,7 +1195,7 @@ static bool TabButton(const char *label, bool selected, bool *pCloseButtonPresse
     //fprintf(stderr,"bb.Min=%d,%d bb.Max=%d,%d label_size=%d,%d extraWidthForBtn=%d\n",(int)bb.Min.x,(int)bb.Min.y,(int)bb.Max.x,(int)bb.Max.y,(int)label_size.x,(int)label_size.y,(int)extraWidthForBtn);
     if (hasCloseButton && (hovered || selected)) {
     const ImU32 col = (held && btnHovered) ? tabStyle.colors[TabLabelStyle::Col_TabLabelCloseButtonActive] : btnHovered ? tabStyle.colors[TabLabelStyle::Col_TabLabelCloseButtonHovered] : 0;
-    if (btnHovered) DrawListHelper::ImDrawListAddRect(drawListOverride,startBtn, endBtn, col,tabStyle.colors[TabLabelStyle::Col_TabLabelCloseButtonBorder],tabStyle.closeButtonRounding,0x0F,tabStyle.closeButtonBorderWidth,tabStyle.antialiasing);
+    if (btnHovered) DrawListHelper::ImDrawListAddRect(drawListOverride,startBtn, endBtn, col,tabStyle.colors[TabLabelStyle::Col_TabLabelCloseButtonBorder],tabStyle.closeButtonRounding,0x0F,tabStyle.closeButtonBorderWidth);
 
         const float cross_extent = (btnWidth * 0.5f * 0.7071f);// - 1.0f;
         const ImVec2 center((startBtn.x+endBtn.x)*0.5f,(startBtn.y+endBtn.y)*0.5f);
@@ -1320,6 +1748,7 @@ static TabWindowDragData gDragData;
 struct MyTabWindowHelperStruct {
     bool isRMBclicked;
     static bool isMouseDragging;
+    static bool isMouseDraggingJustStarted;
     static bool LockedDragging; // better dragging experience when trying to drag non-draggable tab labels
     bool isASplitterActive;
     static TabWindow::TabLabel* tabLabelPopup;
@@ -1355,12 +1784,13 @@ struct MyTabWindowHelperStruct {
     ImGuiWindowFlags flags;
 
     MyTabWindowHelperStruct(TabWindow* _tabWindow) {
-        isMouseDragging = ImGui::IsMouseDragging(0,2.f);
+        isMouseDragging = ImGui::IsMouseDragging(0,3.f);
+        isMouseDraggingJustStarted = isMouseDragging && (ImGui::GetIO().MouseDownDuration[0] < 0.35f);// ImGui::GetIO().MouseDown[0] does not work!
         isRMBclicked = ImGui::IsMouseClicked(1);
         isASplitterActive = false;
         tabWindow = _tabWindow;
         allowExchangeTabLabels = !gDragData.draggingTabSrc || (gDragData.draggingTabWindowSrc && gDragData.draggingTabWindowSrc->canExchangeTabLabelsWith(tabWindow));
-    //mustOpenAskForClosingPopup = false;
+        //mustOpenAskForClosingPopup = false;
 
         ImGuiStyle& style = ImGui::GetStyle();
         itemSpacing =   style.ItemSpacing;
@@ -1375,7 +1805,7 @@ struct MyTabWindowHelperStruct {
 
         textHeightWithSpacing = ImGui::GetTextLineHeightWithSpacing();
 
-        isWindowHovered = ImGui::IsRootWindowOrAnyChildFocused();
+        isWindowHovered = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
 
         flags = TabWindow::ExtraWindowFlags;// | ((ImGui::GetCurrentWindow()->Flags&ImGuiWindowFlags_ShowBorders) ? ImGuiWindowFlags_ShowBorders : 0);
     }
@@ -1413,6 +1843,7 @@ bool  MyTabWindowHelperStruct::tabLabelPopupChanged = false;
 bool  MyTabWindowHelperStruct::tabLabelGroupPopupChanged = false;
 TabWindowNode*  MyTabWindowHelperStruct::tabLabelGroupPopupNode = NULL;
 bool MyTabWindowHelperStruct::isMouseDragging = false;
+bool MyTabWindowHelperStruct::isMouseDraggingJustStarted = false;
 bool MyTabWindowHelperStruct::LockedDragging = false;
 ImVector<TabWindow::TabLabel*> MyTabWindowHelperStruct::TabsToClose;
 ImVector<TabWindow*> MyTabWindowHelperStruct::TabsToCloseParents;
@@ -1440,7 +1871,7 @@ void TabWindowNode::render(const ImVec2 &windowSize, MyTabWindowHelperStruct *pt
     MyTabWindowHelperStruct& mhs = *ptr;
     const TabLabelStyle& tabStyle = TabLabelStyle::GetMergedWithWindowAlpha();  // Or just Get() ?
     ImGuiStyle& style = ImGui::GetStyle();
-    const ImVec4 colorChildWindowBg = style.Colors[ImGuiCol_ChildWindowBg];
+    const ImVec4 colorChildWindowBg = style.Colors[ImGuiCol_ChildBg];
     const float splitterSize = tabStyle.tabWindowSplitterSize;
     bool splitterActive = false;
     static ImVec4 colorTransparent(0,0,0,0);
@@ -1450,9 +1881,9 @@ void TabWindowNode::render(const ImVec2 &windowSize, MyTabWindowHelperStruct *pt
         IM_ASSERT(child[1]);
         IM_ASSERT(tabs.size()==0);
         const float minSplitSize = 10;  // If size is smaller, the child won't be displayed
-        style.Colors[ImGuiCol_ChildWindowBg] = colorTransparent;
+        style.Colors[ImGuiCol_ChildBg] = colorTransparent;
         if (ImGui::RevertUpstreamBeginChildCommit::OldBeginChild(name,windowSize,ImGuiWindowFlags_NoScrollbar))   {
-            style.Colors[ImGuiCol_ChildWindowBg] = colorChildWindowBg;
+            style.Colors[ImGuiCol_ChildBg] = colorChildWindowBg;
             ImVec2 ws = windowSize;
             float splitterPercToPixels = 0.f,splitterDelta = 0.f;
             if (horizontal && ws.y>splitterSize && ws.x>minSplitSize) {
@@ -1525,7 +1956,7 @@ void TabWindowNode::render(const ImVec2 &windowSize, MyTabWindowHelperStruct *pt
             }
             //else {/* Window too tiny: better not to draw it, otherwise the splitters overlap and may cause bad stuff */}
         }
-        else style.Colors[ImGuiCol_ChildWindowBg] = colorChildWindowBg;
+        else style.Colors[ImGuiCol_ChildBg] = colorChildWindowBg;
         ImGui::EndChild();  // name
         return;
     }
@@ -1537,13 +1968,13 @@ void TabWindowNode::render(const ImVec2 &windowSize, MyTabWindowHelperStruct *pt
     //TabWindow::TabLabel* hoveredTab = NULL;
     //----------------------------------------------------------------
     {
-        style.Colors[ImGuiCol_ChildWindowBg] = colorTransparent;
+        style.Colors[ImGuiCol_ChildBg] = colorTransparent;
         if (ImGui::RevertUpstreamBeginChildCommit::OldBeginChild(name,windowSize,ImGuiWindowFlags_NoScrollbar)) {
             if (tabStyle.tabWindowLabelBackgroundColor.w!=0)    {
                 ImGuiWindow* window = ImGui::GetCurrentWindow();
                 window->DrawList->AddRectFilled(window->Pos, window->Pos+ImVec2(windowSize.x,allTabsSize.y), GetColorU32(tabStyle.tabWindowLabelBackgroundColor), 0);
             }
-            style.Colors[ImGuiCol_ChildWindowBg] = colorChildWindowBg;
+            style.Colors[ImGuiCol_ChildBg] = colorChildWindowBg;
             ImGuiContext& g = *GImGui;
             TabWindowDragData& dd = gDragData;
             const ImFont* fontOverride = NULL;
@@ -1607,44 +2038,46 @@ void TabWindowNode::render(const ImVec2 &windowSize, MyTabWindowHelperStruct *pt
                         mhs.MustOpenAskForClosingPopup = true;
                     }
                 }
-                else if (ImGui::IsItemHoveredRect()) {
+                else if (ImGui::IsItemHovered(ImGuiHoveredFlags_RectOnly)) {
                     isAItemHovered = true;
                     //hoveredTab = &tab;
                     if (tab.tooltip && mhs.isWindowHovered && strlen(tab.tooltip)>0 && (&tab!=mhs.tabLabelPopup || GImGui->OpenPopupStack.size()==0) )  ImGui::SetTooltip("%s",tab.tooltip);
 
                     if (isDraggingCorrectly) {
-                        if (!dd.draggingTabSrc) {
-                            if (mhs.isWindowHovered)    {
-                                if (!tab.draggable) mhs.LockedDragging = true;
-                                else    {
-                                    dd.draggingTabSrc = &tab;
-                                    dd.draggingTabNodeSrc = this;
-                                    dd.draggingTabImGuiWindowSrc = g.HoveredWindow;
-                                    dd.draggingTabWindowSrc = mhs.tabWindow;
-                                    dd.draggingTabSrcIsSelected = (selectedTab == &tab);
+                        if (mhs.isMouseDraggingJustStarted)  {
+                            if (!dd.draggingTabSrc) {
+                                if (mhs.isWindowHovered)    {
+                                    if (!tab.draggable) mhs.LockedDragging = true;
+                                    else {
+                                        dd.draggingTabSrc = &tab;
+                                        dd.draggingTabNodeSrc = this;
+                                        dd.draggingTabImGuiWindowSrc = g.HoveredWindow;
+                                        dd.draggingTabWindowSrc = mhs.tabWindow;
+                                        dd.draggingTabSrcIsSelected = (selectedTab == &tab);
 
-                                    dd.draggingTabSrcSize = ImGui::GetItemRectSize();
-                                    const ImVec2& mp = ImGui::GetIO().MousePos;
-                                    const ImVec2 draggingTabCursorPos = ImGui::GetCursorPos();
-                                    dd.draggingTabSrcOffset=ImVec2(
-                                                mp.x+dd.draggingTabSrcSize.x*0.5f-sumX+ImGui::GetScrollX(),
-                                                mp.y+dd.draggingTabSrcSize.y*0.5f-draggingTabCursorPos.y+ImGui::GetScrollY()
-                                                );
+                                        dd.draggingTabSrcSize = ImGui::GetItemRectSize();
+                                        const ImVec2& mp = ImGui::GetIO().MousePos;
+                                        const ImVec2 draggingTabCursorPos = ImGui::GetCursorPos();
+                                        dd.draggingTabSrcOffset=ImVec2(
+                                                    mp.x+dd.draggingTabSrcSize.x*0.5f-sumX+ImGui::GetScrollX(),
+                                                    mp.y+dd.draggingTabSrcSize.y*0.5f-draggingTabCursorPos.y+ImGui::GetScrollY()
+                                                    );
 
-                                    //fprintf(stderr,"Hovered Start Window:%s\n",g.HoveredWindow ? g.HoveredWindow->Name : "NULL");
+                                        //fprintf(stderr,"Hovered Start Window:%s\n",g.HoveredWindow ? g.HoveredWindow->Name : "NULL");
+                                    }
                                 }
                             }
-                        }
-                        else if (dd.draggingTabSrc && (!tab.draggable || !mhs.allowExchangeTabLabels)) {
-                            // Prohibition sign-------
-                            const ImVec2& itemSize = ImGui::GetItemRectSize();
-                            const ImVec2 itemPos =ImVec2(
-                                        sumX-itemSize.x*0.5f-ImGui::GetScrollX(),
-                                        ImGui::GetCursorPos().y-itemSize.y*0.5f-ImGui::GetScrollY()
-                                        );
-                            ImDrawList* drawList = ImGui::GetWindowDrawList();  // main problem is that the sign is covered by the dragging tab (even if the latter is semi-transparent...)
-                            const ImVec2 wp = g.HoveredWindow->Pos;
-                            dd.drawProhibitionSign(drawList,wp,itemPos,dd.draggingTabSrcSize.y*1.2f);
+                            else if (dd.draggingTabSrc && (!tab.draggable || !mhs.allowExchangeTabLabels)) {
+                                // Prohibition sign-------
+                                const ImVec2& itemSize = ImGui::GetItemRectSize();
+                                const ImVec2 itemPos =ImVec2(
+                                            sumX-itemSize.x*0.5f-ImGui::GetScrollX(),
+                                            ImGui::GetCursorPos().y-itemSize.y*0.5f-ImGui::GetScrollY()
+                                            );
+                                ImDrawList* drawList = ImGui::GetWindowDrawList();  // main problem is that the sign is covered by the dragging tab (even if the latter is semi-transparent...)
+                                const ImVec2 wp = g.HoveredWindow->Pos;
+                                dd.drawProhibitionSign(drawList,wp,itemPos,dd.draggingTabSrcSize.y*1.2f);
+                            }
                         }
                     }
                     else if (dd.draggingTabSrc && dd.draggingTabSrc!=&tab && g.HoveredRootWindow && g.CurrentWindow) {
@@ -1660,7 +2093,7 @@ void TabWindowNode::render(const ImVec2 &windowSize, MyTabWindowHelperStruct *pt
                         }
                     }
 
-                    if (mhs.isRMBclicked && mhs.isWindowHovered) {
+                    if (mhs.isRMBclicked && mhs.isWindowHovered && !dd.draggingTabSrc) {
                         // select it
                         selection_changed = (selectedTab != &tab);
                         newSelectedTab = &tab;
@@ -1728,7 +2161,7 @@ void TabWindowNode::render(const ImVec2 &windowSize, MyTabWindowHelperStruct *pt
             ImGui::EndChild();  // user
             mhs.storeStyleVars();
         }
-        else style.Colors[ImGuiCol_ChildWindowBg] = colorChildWindowBg;
+        else style.Colors[ImGuiCol_ChildBg] = colorChildWindowBg;
         ImGui::EndChild();  // "name"
     }
     //----------------------------------------------------------------
@@ -2069,7 +2502,7 @@ void TabWindow::render()
             dd.drawDragButton(drawList,wp,mp);
             lastFrameNoDragTabLabelHasBeenDrawn = false;
             // -------------------------------------------------------------------
-            ImGui::SetMouseCursor(ImGuiMouseCursor_Move);
+            ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeAll);
         }
 
         // Drop tab label onto another
@@ -2502,7 +2935,7 @@ bool TabLabels(int numTabs, const char** tabLabels, int& selectedIndex, const ch
     const TabLabelStyle& tabStyle = TabLabelStyle::GetMergedWithWindowAlpha();
 
     const ImVec2 itemSpacing =  style.ItemSpacing;
-    style.ItemSpacing.x =       0;
+	style.ItemSpacing.x =       0;
     style.ItemSpacing.y =       1;
 
     if (numTabs>0 && (selectedIndex<0 || selectedIndex>=numTabs)) {
@@ -2523,7 +2956,8 @@ bool TabLabels(int numTabs, const char** tabLabels, int& selectedIndex, const ch
     static bool draggingLocked = false;
 
     const bool isRMBclicked = ImGui::IsMouseClicked(1);
-    const bool isMouseDragging = ImGui::IsMouseDragging(0,2.f);
+    const bool isMouseDragging = ImGui::IsMouseDragging(0,3.f);
+    const bool isMouseDraggingJustStarted = isMouseDragging && (ImGui::GetIO().MouseDownDuration[0] < 0.35f);// ImGui::GetIO().MouseDown[0] does not work!
     int justClosedTabIndex = -1,newSelectedIndex = selectedIndex;
 
     ImVec2 startGroupCursorPos = ImGui::GetCursorPos();
@@ -2536,20 +2970,20 @@ bool TabLabels(int numTabs, const char** tabLabels, int& selectedIndex, const ch
         i = pOptionalItemOrdering ? pOptionalItemOrdering[j] : j;
         if (i==-1) continue;
 
-	if (!wrapMode) {if (!noButtonDrawn) ImGui::SameLine();canUseSizeOptimization=false;}
+        if (!wrapMode) {if (!noButtonDrawn) ImGui::SameLine();canUseSizeOptimization=false;}
         else if (sumX > 0.f) {
             sumX+=style.ItemSpacing.x;   // Maybe we can skip it if we use SameLine(0,0) below
             ImGui::TabButton(tabLabels[i],(i == selectedIndex),allowTabClosing ? &mustCloseTab : NULL,NULL,&tabButtonSz,&tabStyle);
             sumX+=tabButtonSz.x;
             if (sumX>windowWidth) sumX = 0.f;
             else ImGui::SameLine();
-	    canUseSizeOptimization = true;
+            canUseSizeOptimization = true;
         }
-	else canUseSizeOptimization = false;
+        else canUseSizeOptimization = false;
 
         // Draw the button
         ImGui::PushID(i);   // otherwise two tabs with the same name would clash.
-	if (ImGui::TabButton(tabLabels[i],i == selectedIndex,allowTabClosing ? &mustCloseTab : NULL,NULL,NULL,&tabStyle,NULL,NULL,NULL,canUseSizeOptimization))   {
+        if (ImGui::TabButton(tabLabels[i],i == selectedIndex,allowTabClosing ? &mustCloseTab : NULL,NULL,NULL,&tabStyle,NULL,NULL,NULL,canUseSizeOptimization))   {
             selection_changed = (selectedIndex!=i);
             newSelectedIndex = i;
         }
@@ -2566,14 +3000,14 @@ bool TabLabels(int numTabs, const char** tabLabels, int& selectedIndex, const ch
 
         }
 
-        if (isWindowHovered && ImGui::IsItemHoveredRect() && !mustCloseTab) {
+        if (isWindowHovered && ImGui::IsItemHovered(ImGuiHoveredFlags_RectOnly) && !mustCloseTab) {
             if (pOptionalHoveredIndex) *pOptionalHoveredIndex = i;
             if (tabLabelTooltips && !isRMBclicked && tabLabelTooltips[i] && strlen(tabLabelTooltips[i])>0)  ImGui::SetTooltip("%s",tabLabelTooltips[i]);
 
             if (pOptionalItemOrdering)  {
                 if (allowTabReorder)  {
-            if (isMouseDragging) {
-            if (draggingTabIndex==-1 && !draggingLocked) {
+                    if (isMouseDragging) {
+                        if (draggingTabIndex==-1 && !draggingLocked && isMouseDraggingJustStarted) {
                             draggingTabIndex = j;
                             draggingTabWasSelected = (i == selectedIndex);
                             draggingTabSize = ImGui::GetItemRectSize();
@@ -2605,7 +3039,7 @@ bool TabLabels(int numTabs, const char** tabLabels, int& selectedIndex, const ch
     ImVec2 groupSize = ImGui::GetItemRectSize();
 
     // Draw tab label while mouse drags it
-    if (draggingTabIndex>=0 && draggingTabIndex<numTabs && pOptionalItemOrdering[draggingTabIndex] != -1) {
+	if (draggingTabIndex>=0 && draggingTabIndex<numTabs && pOptionalItemOrdering[draggingTabIndex] != -1) {
         const ImVec2 wp = ImGui::GetWindowPos();
         startGroupCursorPos.x+=wp.x;
         startGroupCursorPos.y+=wp.y;
@@ -2623,7 +3057,7 @@ bool TabLabels(int numTabs, const char** tabLabels, int& selectedIndex, const ch
             const TabLabelStyle& tabStyle = TabLabelStyleGetMergedWithAlphaForOverlayUsage();
             ImFont* fontOverride = (ImFont*) (draggingTabWasSelected ? TabLabelStyle::ImGuiFonts[tabStyle.fontStyles[TabLabelStyle::TAB_STATE_SELECTED]] : TabLabelStyle::ImGuiFonts[tabStyle.fontStyles[TabLabelStyle::TAB_STATE_NORMAL]]);
             ImGui::TabButton(tabLabels[pOptionalItemOrdering[draggingTabIndex]],draggingTabWasSelected,allowTabClosing ? &mustCloseTab : NULL,NULL,NULL,&tabStyle,fontOverride,&start,drawList,false,true);
-            ImGui::SetMouseCursor(ImGuiMouseCursor_Move);
+            ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeAll);
 
             if (TabWindow::DockPanelIconTextureID)	{
                 // Optional: draw prohibition sign when dragging too far (you can remove this if you want)
@@ -2638,11 +3072,11 @@ bool TabLabels(int numTabs, const char** tabLabels, int& selectedIndex, const ch
                     drawList->AddImage(TabWindow::DockPanelIconTextureID,start,end,ImVec2(0.5f,0.75f),ImVec2(0.75f,1.f),ImGui::ColorConvertFloat4ToU32(color));
                 }
             }
-        //}
-        //else {
-        //    draggingTabIndex = -1;draggingTabTargetIndex=-1;
-        //    draggingLocked = true;// consume one mouse release
-        //}
+			//}
+			//else {
+				//draggingTabIndex = -1;draggingTabTargetIndex=-1;
+				//draggingLocked = true;// consume one mouse release
+				//}
     }
 
     // Drop tab label
@@ -2734,73 +3168,80 @@ bool TabLabels(int numTabs, const char** tabLabels, int& selectedIndex, const ch
 
 
 ImTextureID TabWindow::DockPanelIconTextureID = NULL;
-const unsigned char* TabWindow::GetDockPanelIconImagePng(int* bufferSizeOut) {
+void TabWindow::GetDockPanelIconImageRGBA(ImVector<unsigned char>& rgba_buffer_out, int* w_out, int* h_out) {
     // I have drawn all the icons that compose this image myself.
     // I took inspiration from the icons bundled with: https://github.com/dockpanelsuite/dockpanelsuite (that is MIT licensed).
     // So no copyright issues for this AFAIK.
-    static const unsigned char png[] =
-{
- 137,80,78,71,13,10,26,10,0,0,0,13,73,72,68,82,0,0,0,128,0,0,0,128,8,3,0,0,0,244,224,145,249,0,0,0,192,80,76,84,69,0,0,0,0,0,0,0,
- 0,0,0,0,0,0,0,0,0,0,0,1,2,3,0,4,5,1,5,6,2,5,5,12,7,4,30,10,2,77,16,0,255,255,255,255,255,255,255,255,255,255,255,255,252,253,254,221,
- 234,248,226,234,245,227,228,229,229,229,233,227,228,229,204,228,253,200,226,253,194,222,251,221,221,222,189,221,253,220,220,220,219,219,219,180,216,252,217,217,217,218,217,221,177,214,252,213,
- 213,213,212,212,212,212,212,213,210,210,219,205,205,206,164,204,250,199,199,199,200,199,200,198,197,201,189,189,189,181,181,184,181,181,181,180,178,181,168,164,192,96,151,230,148,141,190,144,
- 138,198,65,135,229,44,132,235,122,126,174,62,108,205,83,106,175,102,102,104,91,97,152,113,67,50,142,58,26,186,36,1,186,35,0,164,31,0,130,25,0,170,71,225,164,0,0,0,
- 13,116,82,78,83,0,0,0,0,1,0,37,84,119,159,204,223,252,116,102,245,63,0,0,0,1,98,75,71,68,9,241,217,165,236,0,0,8,42,73,68,65,84,120,218,213,155,91,
- 147,162,58,16,128,183,106,166,240,186,15,72,49,186,140,23,70,23,180,194,40,171,179,140,98,237,209,255,255,175,78,46,92,18,210,9,1,29,183,182,31,144,82,233,254,236,116,154,
- 238,16,191,61,233,100,171,147,39,51,169,209,241,77,127,49,66,104,163,16,99,128,72,169,98,99,0,176,217,132,10,49,6,64,97,184,82,136,9,64,184,80,136,49,0,86,49,83,
- 72,61,0,190,248,40,73,146,164,203,169,103,14,176,154,193,58,102,158,25,192,111,34,31,88,126,229,178,78,162,197,75,35,0,72,7,90,222,0,176,93,221,14,16,173,204,0,14,
- 107,89,14,13,1,64,29,198,0,115,42,111,188,52,6,128,116,24,3,188,202,178,111,10,0,233,48,6,152,200,210,24,0,210,97,12,48,146,165,241,16,64,58,254,25,128,189,45,
- 75,220,16,0,212,97,236,1,199,117,70,46,57,248,142,235,58,62,57,109,236,1,72,135,41,64,226,135,190,27,250,1,57,248,190,139,95,3,183,41,0,168,195,120,8,190,203,210,
- 120,8,32,29,255,30,128,29,219,55,3,240,58,154,2,216,135,180,184,186,45,128,160,163,33,128,29,167,105,113,117,75,0,81,71,51,0,59,166,117,196,187,125,3,64,69,71,35,
- 0,27,37,76,252,246,0,85,29,6,0,219,18,192,15,152,184,37,192,182,41,64,69,71,61,0,46,202,53,211,208,155,110,191,120,26,210,166,224,231,84,5,240,226,153,21,198,173,
- 1,200,239,199,14,240,148,0,134,4,109,1,168,255,177,253,151,244,32,203,145,2,152,17,16,0,80,135,30,128,141,63,182,255,178,136,128,158,14,151,229,166,4,4,96,137,34,89,
- 178,178,92,213,54,82,0,143,26,1,122,42,250,9,35,168,107,93,9,192,108,9,232,200,26,19,117,255,25,230,86,116,226,45,194,154,214,149,0,120,10,97,0,138,254,243,167,137,
- 125,66,240,83,223,186,238,116,194,0,224,254,115,202,236,227,236,157,86,219,58,220,216,149,116,222,244,150,214,21,3,176,254,51,11,205,68,136,83,98,133,117,85,149,182,138,54,135,
- 248,51,238,203,249,149,9,86,198,183,174,187,173,94,190,101,237,223,250,237,117,130,75,213,192,230,102,234,129,88,81,0,208,121,120,224,190,236,59,246,104,52,121,157,175,127,255,62,
- 242,173,235,110,163,17,20,85,1,144,0,64,172,36,147,81,224,227,90,210,199,135,17,57,224,83,199,63,72,0,200,199,0,99,6,192,223,170,118,43,181,132,33,210,123,128,2,172,
- 215,113,188,142,217,97,77,15,248,69,239,1,1,96,166,22,60,131,42,0,142,43,3,196,235,55,73,214,178,7,220,145,2,192,155,45,85,177,50,91,109,84,67,96,219,165,7,222,
- 0,41,1,236,236,138,208,87,1,44,145,202,83,37,192,199,135,56,4,118,236,232,0,230,220,16,184,168,162,248,227,163,2,176,138,84,177,82,0,124,86,0,236,125,194,1,204,101,
- 225,134,32,72,88,145,23,184,102,0,160,7,42,0,206,254,88,2,28,70,243,249,235,235,92,236,237,5,128,35,37,240,13,1,248,88,145,1,104,16,58,73,122,228,61,0,44,46,
- 136,0,233,129,92,53,210,3,64,177,82,198,0,206,45,69,16,226,218,93,4,248,33,203,155,8,144,198,133,226,183,245,175,95,32,0,20,43,0,0,25,2,87,244,64,32,47,110,
- 140,185,32,36,0,100,12,178,33,80,2,64,177,162,0,192,49,120,76,220,2,0,77,198,85,25,33,101,12,104,0,228,88,81,1,224,89,200,1,140,129,213,141,137,114,22,232,0,
- 164,88,145,1,242,76,104,35,110,8,0,128,184,4,112,125,155,143,110,45,64,53,86,224,32,172,166,98,4,0,132,114,42,14,252,122,128,106,172,40,135,64,0,112,168,73,52,14,
- 198,147,96,52,249,49,14,70,227,31,72,6,104,24,3,34,64,82,12,129,47,3,208,33,136,125,244,142,80,28,210,3,138,3,249,110,232,58,133,226,196,96,22,40,0,32,15,176,
- 24,112,19,92,188,70,239,40,69,239,113,28,191,203,0,156,98,16,0,138,149,18,0,223,226,231,74,15,144,49,64,110,204,222,75,184,143,96,15,172,215,137,46,21,7,80,16,166,
- 9,187,75,199,113,18,115,66,127,102,18,142,162,216,143,237,61,0,192,127,155,92,205,245,77,234,155,17,52,4,203,8,46,24,105,77,152,211,176,151,148,189,28,105,81,186,80,95,
- 167,190,25,113,177,82,0,76,23,112,205,70,170,98,47,204,173,68,40,42,143,161,178,105,98,215,169,135,192,5,0,60,125,231,145,171,165,156,217,177,174,105,169,247,0,142,21,6,
- 160,16,163,182,136,88,170,233,13,9,128,42,86,40,128,170,167,157,154,17,212,118,64,164,38,140,64,65,75,29,192,211,214,168,53,172,239,192,72,85,12,71,202,114,166,5,40,8,
- 142,192,226,66,146,125,102,208,1,238,60,181,232,1,114,130,3,184,188,178,48,180,95,223,27,62,213,17,28,148,107,68,198,29,176,182,59,126,170,35,80,2,220,197,126,221,74,41,
- 38,160,0,182,227,50,113,26,175,148,214,45,80,232,1,112,146,58,8,203,172,97,243,165,90,93,8,214,175,21,255,156,178,33,192,133,42,145,125,139,197,106,79,177,68,101,6,16,
- 46,178,24,176,247,105,154,238,157,22,203,245,158,98,145,174,33,0,105,152,146,86,15,44,112,46,6,115,73,83,0,220,50,185,223,91,2,128,51,169,49,64,219,135,86,255,62,192,
- 173,143,110,115,128,106,46,49,5,72,2,228,187,40,8,3,124,8,200,193,15,252,67,43,128,74,46,49,246,128,208,19,209,54,197,105,55,4,149,92,210,14,32,235,13,219,197,128,
- 152,75,254,2,128,152,75,140,1,110,221,194,193,207,2,62,151,24,3,0,107,68,135,135,78,67,96,157,240,177,0,183,110,100,34,0,80,46,49,5,184,121,43,23,105,12,160,92,
- 242,72,0,48,151,24,3,48,249,252,252,44,31,217,164,55,1,100,83,217,20,96,25,213,244,191,95,13,48,93,212,244,191,38,0,80,46,49,5,240,90,119,101,28,0,148,75,140,
- 0,238,177,173,151,0,64,185,196,4,224,30,66,1,160,92,242,72,0,112,42,63,14,96,137,254,50,192,108,9,230,146,135,1,232,158,26,62,4,64,247,220,244,33,0,186,39,199,
- 15,1,184,101,123,255,3,228,126,0,207,86,183,135,165,219,121,54,119,192,118,187,187,23,128,213,237,15,134,87,44,195,65,191,103,85,54,209,104,22,202,238,5,208,237,15,47,127,
- 50,185,12,7,221,231,250,77,52,108,31,205,125,0,172,94,105,158,33,244,173,218,109,68,108,39,209,93,0,172,254,240,79,69,174,5,65,246,255,6,112,143,74,180,106,0,16,239,
- 113,250,60,49,57,159,207,124,244,149,246,255,147,9,178,191,23,192,123,84,154,0,44,208,110,87,16,156,78,220,39,189,204,62,142,191,193,96,152,15,198,181,255,12,0,160,246,0,
- 241,134,7,224,60,208,25,48,131,131,126,199,178,172,78,175,159,17,12,187,173,60,16,47,227,252,108,17,87,87,28,11,128,21,247,118,255,202,126,112,135,141,71,238,143,63,23,54,
- 8,2,64,101,143,10,4,176,71,40,59,219,160,125,21,46,7,224,223,100,14,200,135,188,180,159,187,0,30,2,182,71,5,2,72,232,250,41,91,97,77,76,0,122,212,1,3,241,
- 247,103,78,41,0,20,123,84,64,128,252,209,138,33,192,51,29,242,97,79,176,63,164,111,254,55,176,50,0,213,30,21,16,128,23,3,0,139,142,0,53,197,217,103,39,195,14,12,
- 80,236,81,225,0,246,185,156,56,251,39,3,128,206,144,198,219,179,96,223,234,12,139,32,16,0,42,123,84,10,128,83,150,25,177,156,120,169,204,130,184,156,134,34,192,181,39,218,
- 207,252,82,0,168,246,168,100,0,103,242,107,11,15,168,0,98,196,3,156,37,0,222,190,26,64,220,163,146,123,224,204,187,93,5,176,20,0,78,34,64,95,180,175,7,40,247,168,
- 148,49,112,174,7,80,220,11,168,169,203,192,18,236,63,117,196,32,84,237,81,129,102,129,38,6,104,154,218,87,230,70,54,13,251,130,253,60,57,88,85,128,202,30,149,123,0,48,
- 91,87,209,62,203,142,108,110,72,65,88,147,138,207,185,93,241,142,163,6,232,112,185,55,179,111,177,219,3,151,138,21,59,52,180,0,43,67,128,103,102,77,182,127,25,20,55,35,
- 213,30,21,24,224,44,157,113,0,145,4,240,212,29,10,246,173,238,128,17,101,233,89,0,184,165,32,81,2,100,17,135,227,160,143,171,114,92,27,95,132,146,136,2,40,246,168,52,
- 175,9,65,0,43,31,132,11,41,203,179,114,228,146,221,31,217,230,122,197,30,149,230,85,49,8,80,18,112,117,113,110,95,251,175,95,44,141,1,18,0,64,46,139,175,133,125,237,
- 255,158,177,52,45,203,49,192,25,108,12,6,156,19,174,67,174,55,210,253,243,27,75,83,128,19,228,0,154,14,122,164,51,187,92,46,164,55,235,124,97,111,8,58,128,121,1,23,
- 196,88,122,93,235,75,187,227,179,190,67,126,110,220,86,253,15,153,69,4,221,29,74,239,182,0,0,0,0,73,69,78,68,174,66,96,130
-};
 
-    if (bufferSizeOut) *bufferSizeOut = (int) (sizeof(png)/sizeof(png[0]));
-    return png;
+    const int w = 128;const int h = 128;
+    if (w_out) *w_out = w;
+    if (h_out) *h_out = h;
+
+    const unsigned int palette[54] = {	// each is a 4 bytes (RGBA) unsigned integer in little-endian encoding
+                                        0U,4290098613U,4291413446U,4291282887U,4290624957U,4291743181U,4292138196U,4292467161U,4292598747U,4289686099U,4289625722U,4288176475U,4292203989U,4292664540U,4292795869U,4293624876U,4293232449U,4293302112U,4294626468U,4293256419U,4291201680U,4294760628U,4294760113U,4294827453U,4290678164U,4294828744U,4294503133U,4294901244U,4290815144U,4294306530U,
+                                        4293518821U,4292729306U,4292596434U,4294967295U,4290295221U,4292203732U,4290097844U,4294829260U,4291652670U,4294696642U,16777216U,620954113U,1996883201U,2667906306U,1409614848U,3422816012U,3741452830U,4227862605U,4278196610U,4278198180U,4278265018U,4285032038U,4281484145U,4278199226U};
+
+    unsigned char indices[w*h+1] = 	// [width x height (+ end string char)]: each (char-'0'), [skipping (char)92], points to a palette entry
+            "00000000000000000000000000000111111111111111111111111111110000000000000000000000000000000000000001111111111111111111111111111100000000000000000000000000000001222333333333333333333333333100000000000000000000000000000000000000014233333333333333333333333331000000000000000000000000000000012335555555555555555555555551000000000000000000000000000000000000000125566666666666666666666666610000000000000000000000000000000123577777777777777777777777710000000000000000000000000000000000000001357888888888888888888888888100000000000000000000000000000001357999999999999999999::;<=>10000000000000000000000000000000000000001368999999999999999999::;<8>1000000000000000000000000000000013579?""?""?""?""?@@@@AAAAAAAAAB:47C100000000000000000000000000000000000000013689?""?""?""?""?@@@@AAAAAAAAAB:2<>10000000000000000000000000000000135"	\
+            "79?""?""?""?""?@@@@AAAAAAAAAB:16C100000000000000000000000000000000000000013689?""?""?""?""?@@@@AAAAAAAAAB:46>100000000000000000000000000000001357DBBBBBBBBBBBBBBBBBBBD16C10000000000000000000000000000000000000001368DBBBBBBBBBBBBBBBBBBBD46>100000000000000000000000000000001357DEEEEEEFFFFFFFFFFFFFD16C10000000000000000000000000000000000000001368DEEEEEEFFFFFFFFFFFFFD46>100000000000000000000000000000001357DGGGGGGGGGGGGGGGGGGGH16C10000000000000000000000000000000000000001368DGGGGGGGGGGGGGGGGGGGH46>100000000000000000000000000000001357DIIIIIIIIIIIIIIIIIIIH16C10000000000000000000000000000000000000001368DIIIIIIIIIIIIIIIIIIIH46>100000000000000000000000000000001357DJJJJJJJJJJJJJJJJJJJD16C10000000000000000000000000000000000000001368DJJJJJJJJJJJJJJJJJJJD46>100000000000000000000000000000001357DJJJJJJJJJJJJJJJJJJJD16C1000000"	\
+            "0000000000000000000000000000000001368DJJJJJJJJJJJJJJJJJJJD46>100000000000000000000000000000001357HKKKKKKKKKKKKKKKKKKKL16C10000000000000000000000000000000000000001368HKKKKKKKKKKKKKKKKKKKL46>100000000000000000000000000000001357DMNMJNMNMJOMNNMONMNMD16C10000000000000000000000000000000000000001368DMNMJNMNMJOMNNMONMNMD46>100000000000000000000000000000001357:O5ON5OPON5OOONPONPND16C10000000000000000000000000000000000000001368:O5ON5OPON5OOONPONPND46>100000000000000000000000000000001357HQQQQQQQQQQQQQQQQQQQL16C10000000000000000000000000000000000000001368HQQQQQQQQQQQQQQQQQQQL46>100000000000000000000000000000001357HQQQQQQQQQQQQQQQQQQQL16C10000000000000000000000000000000000000001368HQQQQQQQQQQQQQQQQQQQL46>100000000000000000000000000000001357HQQQQQQQQKLKQQQQQQQQL16C100000000000000000000000000000000000000"	\
+            "01368HQQQQQQQQKLKQQQQQQQQL46>100000000000000000000000000000001357HQQQQQQQKD;LKQQQQQQQL16C10000000000000000000000000000000000000001368HQQQQQQQKD;LKQQQQQQQL46>100000000000000000000000000000001357HQQQQQQKL;;;LKQQQQQQL16C10000000000000000000000000000000000000001368HQQQQQQKL;;;LKQQQQQQL46>100000000000000000000000000000001357HQQQQQKL99999RKQQQQQL16C10000000000000000000000000000000000000001368HQQQQQKL99999RKQQQQQL46>100000000000000000000000000000001357HQQQQK2:::::::OQQQQQL16C10000000000000000000000000000000000000001368HQQQQK2:::::::OQQQQQL46>100000000000000000000000000000011357HQQQQKOPPPPPPPNQQQQQL16C11000000000000000000000000000000000000001368HQQQQKOPPPPPPPNQQQQQL46>100000000000000000000000000000122357HQQQQQQQQQQQQQQQQQQQL16C>=100000000000000000000000000000000000001368HQQQQQQQQQQQQQQQQQQQL46>100"	\
+            "0000000000000000000000000012223S=HQQQQQQQQQQQQQQQQQQQL16CC>710000000000000000000000000000000000001368HQQQQQQQQQQQQQQQQQQQL46>10000000000000000000000000001223357>HQQQQQQQQQQQQQQQQQQQL16CCC>71000000000000000000000000000000000001368HQQQQQQQQQQQQQQQQQQQL46>1000000000000000000000000001223557>C;DDDDDDDDDDDDDDDDDDD916CCCC>7100000000000000000000000000000000001368;DDDDDDDDDDDDDDDDDDD946>100000000000000000000000001223577>CC74111111111111111111147CCCCC>710000000000000000000000000000000001368<244444444444444444442<>10011111111111111111111111122357>CCC>766666666666666666667>CCCCCC>711111111111111111111111100000000013688<6666666666666666666<8>1001222333333333333333333333357>CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC>7533333333333333333333310000000001368>>>>>>>>>>>>>>>>>>>>>>>>1001233555555555555555555555S7>CCCC"	\
+            "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC>7S555555555555555555551000000000TTTTTTTTTTTTTTTTTTTTTTTTTTTTT001235777777777777777777777=>CCCCC;;;;99999999999999::::;7>CCCCCCCC>=77777777777777777777100000000000000000000000000000000000000001357999DDDDDDD:DDDDDDDDDDDD97>CC9?""?""?""?""?""?@@@@AAAAAAAAABB:47CCC9DDDDDDDDDDD:DDDDDDD:999<=>100000000T111111111111111111111111111111113579?""?BFGIJJJPKQQQQQQQQQQQD47CC9?""?""?""?""?""?@@@@AAAAAAAAABB:16CCCDQQQQQQQQQQQOMKJJIGEB?""?947C100000000T333333333333333333333333333324113579?""?BFGIJJJ2KQQQQQQQQQQQD16CC:IJPOJOMOOJOJOOJOOMOMOD16CCCDQQQQQQQQQQQ2OKJJUGEB?""?916C100000000T666666666666666666666666666552113579?""?BFGIJJJPKQQQQQQQQQQQD16CC:BBLLBLBLLBLBBLBLBBBBL:16CCCDQQQQQQQQQQQOMKJJIGEB?""?916C100000000T888888888888888888888888888753113579?""?BFGIJJMNKQQQQQQQQQQQD16CC:LBFFFFFFFFFFFFFFFFFFBD16CCCDQQQ"	\
+            "QQQQQQQQNJKJJIGEB?""?916C100000000T>8<9DDDDDDDDDDD:DDDDDDD:999863113579?""?BFGIJJJ2KQQQQQQKKQQQD16CC:BFFFFFFFFFFFFFFFFFFFFD16CCCDQQQKKQQQQQQ5OKJJIGEB?""?916C100000000T><2DQQQQQQQQQQQOMKJJIGEB?""?9863113579@@BFGIJJJPKQQQQQKLMQQQD16CC:BFFFFFFFFFFFFFFFFFFEL:16CCCDQQQN2QQQQQQOMKJJIGEB@@916C100000000T>64DQQQQQQQQQQQ2OKJJUGEB?""?986311357V@@BFGIJJJPKQQQQKH:MQQQD16CC:BEEEEEEEEEEEEEEEEEEEBD16CCCDQQQP:LKQQQQPNKJJIGEB@@916C100000000T>64DQQQQQQQQQQQOMKJJIGEB?""?986311357V@@BFGIJJJPKQQQMH9:MQQQD16CCDJEEGGEGGGGGGGGGGGGGGBD16CCCDQQQP:9LKQQQONKJJIGEB@@916C100000000T>64DQQQQQQQQQQQNJKJJIGEB?""?986311357V@@BFGIJJMNKQQM:;9:MQQQD16CC:BGGGGGGGGGGGGGGGGGGGBD16CCCDQQQP:9;DKQQMJKJJIGEB@@916C100000000T>64DQQQKKQQQQQQ5OKJJIGEB?""?9863113579AABFGIJJJ2KQKD;;9:MQQQD16CC:BWWWWWWWWWWWWWWWWWWWFD16CCCDQQQP:9;;LQQ5OKJJIGFBAA916C100000000"	\
+            "T>64DQQQN2QQQQQQOMKJJIGEB@@9863113579AABFGIJJJPKQQN:;9:MQQQD16CC:PIIIIIIIIIIIIIIIIIIUL:16CCCDQQQP:9;LKQQONKJJIGFBAA916C100000000T>64DQQQP:LKQQQQPNKJJIGEB@@9863113579AABFGIJJJPKQQQKH9:NQQQD16CC:2IUUUUUUUUUUUUUUUUUJ2D16CCCDQQQP:9LKQQQONKJJIGFBAA916C100000000T>64DQQQP:9LKQQQONKJJIGEB@@9863113579AABFGIJJJPKQQQQKL:NQQQD16CC:UJJJJJJJJJJJJJJJJJJJID16CCCDQQQP:LKQQQQPNKJJIGFBAA916C100000000T>64DQQQP:9;DKQQMJKJJIGEB@@9863113579AABFGIJJMNKQQQQQK2MQQQD16CC:PJJJJJJJJJJJJJJJJJJJLD16CCCDQQQNOKQQQQQNJKJJIGFBAA916C100000000T>64DQQQP:9;;LQQ5OKJJIGFBAA9863113579AABFGIJJJ2KQQQQQQQQQQQD16CC:2JJJJJJJJJJJJJJJJJJJ5D16CCCDQQQQQQQQQQQPOKJJIGFBAA916C100000000T>64DQQQP:9;LKQQONKJJIGFBAA9863113579AABFGIJJJPKQQQQQQQQQQQD16CC:MJJJJJ2UPUIPJIWUPJUW2D16CCCDQQQQQQQQQQQONKJJIGFBAA916C100000000T>64DQQQP:9LKQQQONKJJIGFBAA98631"	\
+            "1357:AABFGIJJMOKQQQQQQQQQQQD16CC:PJJJJLO2R22L5R22L52LP:16CCCDQQQQQQQQQQQNMKJJIGFBAA:16C100000000T>64DQQQP:LKQQQQPNKJJIGFBAA986311357:AABFGIJJJPKQQQQQQQQQQQD16CC:PJJJJJN:2224R2;2RLLLR:16CCCDQQQQQQQQQQQPNKJJIGFBAA:16C100000000T>64DQQQNOKQQQQQNJKJJIGFBAA986311357:BBBEGIJJMOKQQQQQQQQQQQD16CC:PMJJJ2NLQQQQQQ:QQQQQQD16CCCDQQQQQQQQQQQNMKJJIGFBBB:16C100000000T>64DQQQQQQQQQQQPOKJJIGFBAA986311357;::DDDDDLL:LLLLLLLLLLLL:16CC:5J4LOLKHQQQQQQ:QQQQQQD16CCC:LLLLLLLLLLLDDLLDDDDDDD916C100000000T>64DQQQQQQQQQQQONKJJIGFBAA986311357<4111111111111111111111147CC9LLLLLLL:LLLLLL;LLLLLL947CCC74111111111111111111111147C100000000T>64DQQQQQQQQQQQNMKJJIGFBAA:86311357=766666666666666666666667>CC>54111111142411142411145>CCC>766666666666666666666667>C100000000T>64DQQQQQQQQQQQPNKJJIGFBAA:86311357>CCCCCCCCCCCCCCCCCCCCCCCCCCC"	\
+            "C>766666667=76667=76667>CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC100000000T>64DQQQQQQQQQQQNMKJJIGFBBB:8631111111111111111111111111>CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC11111111111111111111111100000000T>64:LLLLLLLLLLLDDLLDDDDDDD98631000000000000000000000001=>CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC100000000000000000000000000000000T><244444444444444444444442<863100000000000000000000000017>CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC1000000000000000000000000000000000T>8<6666666666666666666666<88631000000000000000000000000017>CCCCC9DDDDDDDDDDDDDDDDDDD:7>CCCCC10000000000000000000000000000000000T>>>>>>>>>>>>>>>>>>>>>>>>>>>86310000000000000000000000000017>CCCCDQQQQQQQQQQQQQQQQQQQL47CCCC100000000000000000000000000000000000T111111111111111111111111111111100000000000000000000000000017>CCCDQQQQQQQQQQQQQQQQQQQL16CCC10000"	\
+            "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000017>CCDQQQQQQQQQQQQQQQQQQQL16CC10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000017>CDQQQQKMNNNNNNNMQQQQQL16C1000000000000000000000000000000000000000TTTTTTTTTTTTTTTTTTTTTTTTTTTTT0000000000000000000000000000000157>DQQQQK2:::::::5QQQQQL16C10000000000000000000000000000000000000001>>>>>>>>>>>>>>>>>>>>>>>>8631000000000000000000000000000000013S=DQQQQQKH99999HKQQQQQL16C10000000000000000000000000000000000000001>8<6666666666666666666<8863100000000000000000000000000000001357DQQQQQQKH;;;HMQQQQQQL16C10000000000000000000000000000000000000001><244444444444444444442<863100000000000000000000000000000001357DQQQQQQQM:;:KQQQQQQQL16C100000000000000000000000000000000000000"	\
+            "01>649DDDDDDDDDDDDDDDDDDD:863100000000000000000000000000000001357DQQQQQQQQKDNQQQQQQQQL16C10000000000000000000000000000000000000001>64DQQQQQQQQQQQQQQQQQQQL863100000000000000000000000000000001357DQQQQQQQQQQQQQQQQQQQL16C10000000000000000000000000000000000000001>64DQQQQQQQQQQQQQQQQQQQL863100000000000000000000000000000001357DQQQQQQQQQQQQQQQQQQQL16C10000000000000000000000000000000000000001>64DQQQQQQQQQQQQQQQQQQQL863100000000000000000000000000000001357DKKKKKKKKKKKKKKKKKKKL16C10000000000000000000000000000000000000001>64DQQQQKMNNNNNNNMQQQQQL863100000000000000000000000000000001357:P2ON2P5PN2PPPN2POPOD16C10000000000000000000000000000000000000001>64DQQQQK2:::::::5QQQQQL863100000000000000000000000000000001357DJJJJJJJJJJJJJMJJJJML16C10000000000000000000000000000000000000001>64DQQQQQKH99999HKQQQQQL863100"	\
+            "000000000000000000000000000001357DJJJJJJJJJJJJJJJJJJJL16C10000000000000000000000000000000000000001>64DQQQQQQKH;;;HMQQQQQQL863100000000000000000000000000000001357DJJJJJJJJJJJJJJJJJJJL16C10000000000000000000000000000000000000001>64DQQQQQQQM:;:KQQQQQQQL863100000000000000000000000000000001357DIIIIIIIIIIIIIIIIIIIH16C10000000000000000000000000000000000000001>64DQQQQQQQQKDNQQQQQQQQL863100000000000000000000000000000001357DGGGGGGGGGGGGGGGGGGGD16C10000000000000000000000000000000000000001>64DQQQQQQQQQQQQQQQQQQQL863100000000000000000000000000000001357DFFFFFFFFFFFFFFFFFFED16C10000000000000000000000000000000000000001>64DQQQQQQQQQQQQQQQQQQQL863100000000000000000000000000000001357DBBBBBBBBBBBBBBBBBBBD16C10000000000000000000000000000000000000001>64DKKKKKKKKKKKKKKKKKKKL86310000000000000000000000000000000135"	\
+            "79?""?""?""?""?@@@@AAAAAAAAAB:16C10000000000000000000000000000000000000001>64:P2ON2P5PN2PPPN2POPOD8631000000000000000000000000000000013579?""?""?""?""?@@@@AAAAAAAAAB:16C10000000000000000000000000000000000000001>64DJJJJJJJJJJJJJMJJJJML8631000000000000000000000000000000013579999999VVV9999999:::;16C10000000000000000000000000000000000000001>64DJJJJJJJJJJJJJJJJJJJL863100000000000000000000000000000001357<4111111111111111111147C10000000000000000000000000000000000000001>64DJJJJJJJJJJJJJJJJJJJL863100000000000000000000000000000001357=766666666666666666667>C10000000000000000000000000000000000000001>64DIIIIIIIIIIIIIIIIIIIH863100000000000000000000000000000001357>CCCCCCCCCCCCCCCCCCCCCCC10000000000000000000000000000000000000001>64DGGGGGGGGGGGGGGGGGGGD8631000000000000000000000000000000011111111111111111111111111111000000"	\
+            "0000000000000000000000000000000001>64DFFFFFFFFFFFFFFFFFFED86310000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001>64DBBBBBBBBBBBBBBBBBBBD86310000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001>649?""?""?""?""?@@@@AAAAAAAAAB:86310000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001><29?""?""?""?""?@@@@AAAAAAAAAB:86310000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001>8<9999999VVV9999999:::;86310000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001888888888888888888888888753100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"	\
+            "016666666666666666666666665521000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000133333333333333333333333332410000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001111111111111111111111111111100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000XYZ[[[[Z]X00000000000001111111111111111111111111111111T00000000000000000000000000000000000000000000000000000000000000000000000YZ^_`aaaa`_^[Y000000000001368>>>>>>>>>>>>>>>>>>>>>>>>>>>T0000000000000000000000000000000000000000000000000000000000000000000000Z^`bccccccccb`_ZX00000000013688<6666666666666666666666<8>T"	\
+            "00000000000000000000000000000000000000000000000000000000000000000000Y[`bccccccccccccb`^Y000000001368<244444444444444444444442<>T0000000000000000000000000000000000000000000000000000000000000000000Y^`cccccccccccccccca^Y00000001368999DDDDDDD:DDDDDDDDDDDD946>T0000000000000000000000000000000000000000LH:::dddddddeee00000000000X^`ccccccccfccccccccca^Y00000013689?""?BFGIJJJPKQQQQQQQQQQQD46>T000000000000000000000000000000000000000072TT::ddddddddd00000000000[`cccccca`___``bcccccca^X0000013689?""?BFGIJJJ2KQQQQQQQQQQQD46>T0000000000000000000000000000000000000000L3TT::dddddddde0000000000]_ccccca_^]YYY][^bcccccc`Z0000013689?""?BFGIJJJPKQQQQQQQQQQQD46>T000000000000000L<L0000000L7L00000000000000TT::ddddddd600000000000^acccca^]00000X[`cccccccb^Y000013689?""?BFGIJJMNKQQQQQQQQQQQD46>T000000000000000H22000000032H0000"	\
+            "00000000000L::dddddd000000000000]_cccca^Y00000X[`ccccccccc`Z000013689?""?BFGIJJJ2KQQQQQQKKQQQD46>T000000000000000:TTT00000TTT:000000000000000L::dddddd000000000000[acccc_]00000X[`cccccacccca^000013689@@BFGIJJJPKQQQQQKLMQQQD46>T000000000000000:LLLLLLLLTTT:000000000000000L::dddddd00000000000X^bccc`[00000X[`ccccc`^bcccf_Y0001368V@@BFGIJJJPKQQQQKH:MQQQD46>T000000000000000:::::::::::::000000000000000L::dddddd00000000000Y_cccc_Y0000X[`ccccc`^[`cccc`]0001368V@@BFGIJJJPKQQQMH9:MQQQD46>T000000HHHHHHHHHd:::::::::::d000000000000000L::dddddd00000000000]`cccb^X000X[`ccccc`^Y]`cccc`Z0001368V@@BFGIJJMNKQQM:;9:MQQQD46>T0000d4444442222ddddddddddddd00000000000000TL::dddddddd000000000]`ccca[000X[`ccccc`^Y0Y_cccc`Z00013689AABFGIJJJ2KQKD;;9:MQQQD46>T00e::::HHHHHHHHddddddddddddd000000000000L2TL::dddddddde00000000]"	\
+            "`ccca[00X[`ccccc`^Y00Y_cccc`Z00013689AABFGIJJJPKQQN:;9:MQQQD46>T000e:::::::::::ddddddddddddd000000000000<2TL::ddddddddd00000000]`ccca^0X[`ccccc`^Y000Y_cccc`Z00013689AABFGIJJJPKQQQKH9:NQQQD46>T00000e:::::::::ddddddddddddd000000000000LH:::dddddddeee00000000Y_cccb_Y[`ccccc`^Y0000]`cccc`]00013689AABFGIJJJPKQQQQKL:NQQQD46>T000000000000000ddddddddddddd00000000000000000H2H::0000000000000X^bccc`^`ccccc`^Y00000[acccc_Y00013689AABFGIJJMNKQQQQQK2MQQQD46>T000000000000000ddddddddddddd00000000000000000H2H::00000000000000[accca`ccccc`^Y00000]_ccccb^X00013689AABFGIJJJ2KQQQQQQQQQQQD46>T000000000000000eddd00000ddde00000000000000000H2H::00000000000000]`ccccccccc`^Y00000Y^acccc`Z000013689AABFGIJJJPKQQQQQQQQQQQD46>T000000000000000eddd000006dde00000000000000000H2H::00000000000000X^accccccc`^Y00000Y^accccb_Y0000"	\
+            "1368:AABFGIJJMOKQQQQQQQQQQQD46>T000000000000000ede0000000ede00000000000000000H4H::000000000000000Z`cccccc`^Y0000YZ_accccc`[000001368:AABFGIJJJPKQQQQQQQQQQQD46>T000000000000000000000000000000000000000000000H4H::0000000000000000[accccca`^[[[^_`bccccca^Y000001368:BBBEGIJJMOKQQQQQQQQQQQD2<>T000000000000000000000000000000000000000000000H4H::0000000000000000Y^accccccbaaaabccccccb_]0000001368;::DDDDDLL:LLLLLLLLLLLL:<8>T000000000000000000000000000000000000000000000H4H::00000000000000000Y^accccccccccccccccb_]00000001357888888888888888888888888888T000000000000000000000000000000000000000000000H4:::000000000000000000Y^`cccccccccccccca_]000000001255666666666666666666666666666T00000000000000000000000000000000000000000000004::e0000000000000000000Y[_acccccccccca`[Y0000000001423333333333333333333333333333T"	\
+            "0000000000000000000000000000000000000000000000d::0000000000000000000000][_`aabbba`_^]000000000001111111111111111111111111111111T00000000000000000000000000000000000000000000000:e000000000000000000000000Y][^^^^[ZY00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000XX0000000000000000000000000000000000000000000000000";
+
+    // Decode 'indices':
+    const unsigned num_indices = sizeof(indices)/sizeof(indices[0])-1;  // or strlen(indices);
+    IM_ASSERT(w*h==num_indices);
+    for (unsigned i=0;i<num_indices;i++)	{
+        unsigned char& c=indices[i];
+        if (c>=']') c-='1'; // This skips the backslash char
+        else c-='0';
+    }
+
+    // Fill 'rgba_buffer_out'
+    rgba_buffer_out.resize(w*h*4);
+    int idx;unsigned int pal;const unsigned char *pPal;unsigned char *pRGBA=(unsigned char *) &rgba_buffer_out[0];
+    const int maxPaletteIdx = sizeof(palette)/sizeof(palette[0]);
+    for (unsigned i=0,isz=w*h;i<isz;i++)    {
+        idx = indices[i];
+        IM_ASSERT(idx<maxPaletteIdx);
+        pal = palette[idx];
+
+        pPal=(unsigned char*) &pal;
+
+        // debug line:
+        //printf("[");for (int c=0;c<4;c++) printf("%X",pPal[c]);printf("]");if (i%wOut==(wOut-1)) {printf("\n");fflush(stdout);}
+#               ifndef IM_BIG_ENDIAN
+        for (int c=0;c<4;c++) *pRGBA++=*pPal++;     // This works only on little-endian machines
+#               else
+        for (int c=3;c>=0;--c) *pRGBA++=pPal[c];  // This works only on big-endian machines (maybe)
+#               endif
+        //}
+    }
+
+    // TODO: Add optional code guarded by the definition IMGUITABWINDOW_RGBA_FLIP_Y or something like that is somebody request it
 }
 
 
 } // namespace ImGui
 
 
-#ifdef IMGUIHELPER_HAS_VERTICAL_TEXT_SUPPORT
+
 namespace ImGui {
 
 //=======================================================================================
@@ -2828,7 +3269,7 @@ static bool TabButtonVertical(bool rotateCCW,const char *label, bool selected, b
     if (fontOverride) ImGui::PushFont(fontOverride);
     static ImVec2 staticLabelSize(0,0);
     ImVec2 label_size(0,0);
-    if (!privateReuseLastCalculatedLabelSizeDoNotUse) label_size = staticLabelSize = ImGui::CalcVerticalTextSize(label, NULL, true);
+    if (!privateReuseLastCalculatedLabelSizeDoNotUse) label_size = staticLabelSize = ImGui::VerticalTextHelper::CalcVerticalTextSize(label, NULL, true);
     else label_size = staticLabelSize;
 
     ImVec2 pos = window ? window->DC.CursorPos : ImVec2(0,0);
@@ -2877,19 +3318,19 @@ static bool TabButtonVertical(bool rotateCCW,const char *label, bool selected, b
     if (!drawListOverride) drawListOverride = window->DrawList;
 
     // Canvas
-    if (rotateCCW) ImGui::ImDrawListAddRectWithHorizontalGradient(drawListOverride,bb.Min, bb.Max,col,(selected || hovered || held)?tabStyle.fillColorGradientDeltaIn0_05:(-tabStyle.fillColorGradientDeltaIn0_05),tabStyle.colors[selected ? TabLabelStyle::Col_TabLabelSelectedBorder : TabLabelStyle::Col_TabLabelBorder],tabStyle.rounding,invertRounding ? (2|4) : (1|8),tabStyle.borderWidth,tabStyle.antialiasing);
-    else ImGui::ImDrawListAddRectWithHorizontalGradient(drawListOverride,bb.Min, bb.Max,col,(selected || hovered || held)?(-tabStyle.fillColorGradientDeltaIn0_05):tabStyle.fillColorGradientDeltaIn0_05,tabStyle.colors[selected ? TabLabelStyle::Col_TabLabelSelectedBorder : TabLabelStyle::Col_TabLabelBorder],tabStyle.rounding,invertRounding ? (1|8) : (2|4),tabStyle.borderWidth,tabStyle.antialiasing);
+    if (rotateCCW) ImGui::DrawListHelper::ImDrawListAddRectWithHorizontalGradient(drawListOverride,bb.Min, bb.Max,col,(selected || hovered || held)?tabStyle.fillColorGradientDeltaIn0_05:(-tabStyle.fillColorGradientDeltaIn0_05),tabStyle.colors[selected ? TabLabelStyle::Col_TabLabelSelectedBorder : TabLabelStyle::Col_TabLabelBorder],tabStyle.rounding,invertRounding ? (2|4) : (1|8),tabStyle.borderWidth);
+    else ImGui::DrawListHelper::ImDrawListAddRectWithHorizontalGradient(drawListOverride,bb.Min, bb.Max,col,(selected || hovered || held)?(-tabStyle.fillColorGradientDeltaIn0_05):tabStyle.fillColorGradientDeltaIn0_05,tabStyle.colors[selected ? TabLabelStyle::Col_TabLabelSelectedBorder : TabLabelStyle::Col_TabLabelBorder],tabStyle.rounding,invertRounding ? (1|8) : (2|4),tabStyle.borderWidth);
 
     // Text
     ImGui::PushStyleColor(ImGuiCol_Text,ImGui::ColorConvertU32ToFloat4(colText));
     if (!pOptionalJustDrawTabButtonGraphicsUnderMouseWithThisOffset)  {
         if (!rotateCCW)
-            RenderTextVerticalClipped(
+            VerticalTextHelper::RenderTextVerticalClipped(
                         bb.Min,
                         ImVec2(bb.Max.x,bb.Max.y-extraWidthForBtn),//ImVec2(bb.Max.x-extraHeightForBtn,bb.Max.y),
                         label, NULL, &label_size, ImVec2(0.5f,0.5f),NULL,NULL,rotateCCW);
         else
-            RenderTextVerticalClipped(
+            VerticalTextHelper::RenderTextVerticalClipped(
                         ImVec2(bb.Min.x,bb.Min.y+extraWidthForBtn),
                         bb.Max,
                         label, NULL, &label_size, ImVec2(0.5f,0.5f),NULL,NULL,rotateCCW);
@@ -2902,7 +3343,7 @@ static bool TabButtonVertical(bool rotateCCW,const char *label, bool selected, b
                        :
                        (bb.Min.y+(bb.Max.y-bb.Min.y-label_size.y-extraWidthForBtn)*0.5f)
                        );
-        AddTextVertical(drawListOverride,textPos,colText,label,NULL,rotateCCW);
+        VerticalTextHelper::AddTextVertical(drawListOverride,textPos,colText,label,NULL,rotateCCW);
     }
     ImGui::PopStyleColor();
 
@@ -2911,7 +3352,7 @@ static bool TabButtonVertical(bool rotateCCW,const char *label, bool selected, b
     //fprintf(stderr,"bb.Min=%d,%d bb.Max=%d,%d label_size=%d,%d extraWidthForBtn=%d\n",(int)bb.Min.x,(int)bb.Min.y,(int)bb.Max.x,(int)bb.Max.y,(int)label_size.x,(int)label_size.y,(int)extraWidthForBtn);
     if (hasCloseButton) {
     const ImU32 col = (held && btnHovered) ? tabStyle.colors[TabLabelStyle::Col_TabLabelCloseButtonActive] : btnHovered ? tabStyle.colors[TabLabelStyle::Col_TabLabelCloseButtonHovered] : 0;
-    if (btnHovered) DrawListHelper::ImDrawListAddRect(drawListOverride,startBtn, endBtn, col,tabStyle.colors[TabLabelStyle::Col_TabLabelCloseButtonBorder],tabStyle.closeButtonRounding,0x0F,tabStyle.closeButtonBorderWidth,tabStyle.antialiasing);
+    if (btnHovered) DrawListHelper::ImDrawListAddRect(drawListOverride,startBtn, endBtn, col,tabStyle.colors[TabLabelStyle::Col_TabLabelCloseButtonBorder],tabStyle.closeButtonRounding,0x0F,tabStyle.closeButtonBorderWidth);
 
         const float cross_extent = (btnSize * 0.5f * 0.7071f);// - 1.0f;
         const ImVec2 center((startBtn.x+endBtn.x)*0.5f,(startBtn.y+endBtn.y)*0.5f);
@@ -2954,7 +3395,8 @@ bool TabLabelsVertical(bool textIsRotatedCCW, int numTabs, const char** tabLabel
     static bool draggingLocked = false;
 
     const bool isRMBclicked = ImGui::IsMouseClicked(1);
-    const bool isMouseDragging = ImGui::IsMouseDragging(0,2.f);
+    const bool isMouseDragging = ImGui::IsMouseDragging(0,3.f);
+    const bool isMouseDraggingJustStarted = isMouseDragging && (ImGui::GetIO().MouseDownDuration[0] < 0.35f);// ImGui::GetIO().MouseDown[0] does not work!
     int justClosedTabIndex = -1,newSelectedIndex = selectedIndex;
 
     ImVec2 startGroupCursorPos = ImGui::GetCursorPos();
@@ -2962,7 +3404,7 @@ bool TabLabelsVertical(bool textIsRotatedCCW, int numTabs, const char** tabLabel
     //ImVec2 tabButtonSz(0,0);
     bool mustCloseTab = false;bool canUseSizeOptimization = false;
     const bool isWindowHovered = ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem);
-    bool selection_changed = false;bool noButtonDrawn = true;
+    bool selection_changed = false;//bool noButtonDrawn = true;
     for (int j = 0,i; j < numTabs; j++)
     {
         i = pOptionalItemOrdering ? pOptionalItemOrdering[j] : j;
@@ -2990,7 +3432,7 @@ bool TabLabelsVertical(bool textIsRotatedCCW, int numTabs, const char** tabLabel
             newSelectedIndex = i;
         }
         ImGui::PopID();
-        noButtonDrawn = false;
+        //noButtonDrawn = false;
 
         /*if (wrapMode) {
             if (sumX==0.f) sumX = style.WindowPadding.x + ImGui::GetItemRectSize().x; // First element of a line
@@ -3002,14 +3444,14 @@ bool TabLabelsVertical(bool textIsRotatedCCW, int numTabs, const char** tabLabel
 
         }*/
 
-        if (isWindowHovered && ImGui::IsItemHoveredRect() && !mustCloseTab) {
+        if (isWindowHovered && ImGui::IsItemHovered(ImGuiHoveredFlags_RectOnly) && !mustCloseTab) {
             if (pOptionalHoveredIndex) *pOptionalHoveredIndex = i;
             if (tabLabelTooltips && !isRMBclicked && tabLabelTooltips[i] && strlen(tabLabelTooltips[i])>0)  ImGui::SetTooltip("%s",tabLabelTooltips[i]);
 
             if (pOptionalItemOrdering)  {
                 if (allowTabReorder)  {
                     if (isMouseDragging) {
-                        if (draggingTabIndex==-1 && !draggingLocked) {
+                        if (draggingTabIndex==-1 && !draggingLocked && isMouseDraggingJustStarted) {
                             draggingTabIndex = j;
                             draggingTabWasSelected = (i == selectedIndex);
                             draggingTabSize = ImGui::GetItemRectSize();
@@ -3059,7 +3501,7 @@ bool TabLabelsVertical(bool textIsRotatedCCW, int numTabs, const char** tabLabel
             const TabLabelStyle& tabStyle = TabLabelStyleGetMergedWithAlphaForOverlayUsage();
             ImFont* fontOverride = (ImFont*) (draggingTabWasSelected ? TabLabelStyle::ImGuiFonts[tabStyle.fontStyles[TabLabelStyle::TAB_STATE_SELECTED]] : TabLabelStyle::ImGuiFonts[tabStyle.fontStyles[TabLabelStyle::TAB_STATE_NORMAL]]);
             ImGui::TabButtonVertical(textIsRotatedCCW,tabLabels[pOptionalItemOrdering[draggingTabIndex]],draggingTabWasSelected,allowTabClosing ? &mustCloseTab : NULL,NULL,NULL,&tabStyle,fontOverride,&start,drawList,false,true,invertRounding);
-            ImGui::SetMouseCursor(ImGuiMouseCursor_Move);
+            ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeAll);
 
             if (TabWindow::DockPanelIconTextureID)	{
                 // Optional: draw prohibition sign when dragging too far (you can remove this if you want)
@@ -3116,5 +3558,4 @@ float CalcVerticalTabLabelsWidth()  {
 }
 
 } //namespace ImGui
-#endif //IMGUIHELPER_HAS_VERTICAL_TEXT_SUPPORT
 

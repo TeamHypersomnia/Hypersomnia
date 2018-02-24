@@ -195,8 +195,9 @@ struct ImVec4;
 			FIELD(ButtonTextAlign);
 			FIELD(DisplayWindowPadding);
 			FIELD(DisplaySafeAreaPadding);
+			FIELD(MouseCursorScale);
 			FIELD(AntiAliasedLines);
-			FIELD(AntiAliasedShapes);
+			FIELD(AntiAliasedFill);
 			FIELD(CurveTessellationTol);
 			
 #define imcol(x) f(#x, _t_.Colors[static_cast<std::size_t>(imguicol_helper::x)]...)
@@ -243,6 +244,9 @@ struct ImVec4;
 			imcol(ImGuiCol_TextSelectedBg);
 			imcol(ImGuiCol_ModalWindowDarkening);  // darken entire screen when a modal window is active
 			imcol(ImGuiCol_DragDropTarget);
+			imcol(ImGuiCol_DragDropTarget);
+			imcol(ImGuiCol_NavHighlight);
+			imcol(ImGuiCol_NavWindowingHighlight);
 #undef imcol
 		}
 

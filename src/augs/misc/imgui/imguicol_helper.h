@@ -44,5 +44,7 @@ enum class imguicol_helper {
     ImGuiCol_TextSelectedBg,
     ImGuiCol_ModalWindowDarkening,  // darken entire screen when a modal window is active
     ImGuiCol_DragDropTarget,
+    ImGuiCol_NavHighlight,          // gamepad/keyboard: current highlighted item 
+    ImGuiCol_NavWindowingHighlight, // gamepad/keyboard: when holding NavMenu to focus/move/resize windows
     ImGuiCol_COUNT
 };

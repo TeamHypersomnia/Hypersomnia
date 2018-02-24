@@ -122,7 +122,7 @@ namespace ImGui {
 			const ImVec4& txtColor = style.Colors[ImGuiCol_Text];
 			drawList->AddText(start, ImColor(txtColor.x, txtColor.y, txtColor.z, txtColor.w*draggedBtnAlpha), tabLabels[tabOrder[draggingTabIndex]]);
 
-			ImGui::SetMouseCursor(ImGuiMouseCursor_Move);
+			ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeAll);
 		}
 
 		// Drop tab label

@@ -15,6 +15,8 @@ namespace augs {
 			const char* const log_filename,
 			const ImGuiStyle& initial_style
 		) {
+			ImGui::CreateContext();
+
 			auto& io = GetIO();
 			
 			using namespace augs::event::keys;
