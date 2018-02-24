@@ -4,6 +4,7 @@
 class session_profiler;
 class cosmic_profiler;
 class audiovisual_profiler;
+class frame_profiler;
 
 namespace augs {
 	struct drawer;
@@ -15,6 +16,7 @@ void draw_debug_details(
 	const augs::baked_font& gui_font,
 	const vec2i screen_size,
 	const const_entity_handle viewed_character,
+	const frame_profiler& frame_performance,
 	const session_profiler& session_performance,
 	const audiovisual_profiler& audiovisual_performance
 );

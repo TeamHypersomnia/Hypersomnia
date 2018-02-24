@@ -4,6 +4,7 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
 
+#include "view/frame_profiler.h"
 #include "view/audiovisual_state/audiovisual_profiler.h"
 
 #include "application/session_profiler.h"
@@ -16,6 +17,7 @@ void draw_debug_details(
 	const augs::baked_font& gui_font,
 	const vec2i screen_size,
 	const const_entity_handle viewed_character,
+	const frame_profiler& frame_performance,
 	const session_profiler& session_performance,
 	const audiovisual_profiler& audiovisual_performance
 ) {
@@ -81,6 +83,8 @@ void draw_debug_details(
 
 	}
 
+	total_details += { L"Frame\n", category_style };
+	total_details += { frame_performance.summary(), text_style };
 	total_details += { L"Session\n", category_style };
 	total_details += { session_performance.summary(), text_style };
 	total_details += { L"Audiovisual\n", category_style };

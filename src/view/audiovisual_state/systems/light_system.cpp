@@ -19,6 +19,7 @@
 
 #include "game/stateless_systems/visibility_system.h"
 
+#include "view/frame_profiler.h"
 #include "view/viewables/game_image.h"
 #include "view/rendering_scripts/draw_entity.h"
 
@@ -69,6 +70,7 @@ void light_system::advance_attenuation_variations(
 
 void light_system::render_all_lights(const light_system_input in) const {
 	auto& renderer = in.renderer;
+	auto& performance = in.profiler;
 	
 	const auto output = augs::drawer{ renderer.get_triangle_buffer() };
 	const auto& light_shader = in.light_shader;
@@ -115,27 +117,33 @@ void light_system::render_all_lights(const light_system_input in) const {
 		}
 	};
 
-	cosmos.for_each_having<components::light>(
-		[&](const auto light_entity) {
-			if (const auto cache = mapped_or_nullptr(per_entity_cache, light_entity.get_id())) {
-				const auto light_displacement = vec2(cache->all_variation_values[6], cache->all_variation_values[7]);
-
-				messages::visibility_information_request request;
-				request.eye_transform = light_entity.get_viewing_transform(interp);
-				request.eye_transform.pos += light_displacement;
-				request.filter = filters::line_of_sight_query();
-				request.square_side = light_entity.template get<invariants::light>().max_distance.base_value;
-				request.subject = light_entity;
-
-				requests.push_back(request);
-			}
-		}
-	);
-
 	{
+		auto scope = measure_scope(performance.light_visibility);
+
+		cosmos.for_each_having<components::light>(
+			[&](const auto light_entity) {
+				if (const auto cache = mapped_or_nullptr(per_entity_cache, light_entity.get_id())) {
+					const auto light_displacement = vec2(cache->all_variation_values[6], cache->all_variation_values[7]);
+
+					messages::visibility_information_request request;
+					request.eye_transform = light_entity.get_viewing_transform(interp);
+					request.eye_transform.pos += light_displacement;
+					request.filter = filters::line_of_sight_query();
+					request.square_side = light_entity.template get<invariants::light>().max_distance.base_value;
+					request.subject = light_entity;
+
+					requests.push_back(request);
+				}
+			}
+		);
+
 		std::vector<messages::line_of_sight_response> dummy;
 		visibility_system(DEBUG_FRAME_LINES).respond_to_visibility_information_requests(cosmos, {}, requests, dummy, responses);
+
+		performance.num_visible_lights.measure(requests.size());
 	}
+
+	auto scope = measure_scope(performance.light_rendering);
 
 	renderer.set_additive_blending();
 

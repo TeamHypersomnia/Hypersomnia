@@ -520,6 +520,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/inferred_caches/processing_lists_cache.cpp"
 	"src/game/transcendental/entity_id.cpp"
 	"src/augs/misc/children_vector_tracker.cpp"
+	"src/view/frame_profiler.cpp"
 )
 
 if(BUILD_WINDOW_FRAMEWORK)

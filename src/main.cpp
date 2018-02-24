@@ -288,6 +288,7 @@ int work(const int argc, const char* const * const argv) try {
 	static bool game_gui_mode = false;
 
 	static session_profiler profiler;
+	static frame_profiler frame_performance;
 
 	static auto load_all = [](const all_viewables_defs& new_defs) {
 		auto scope = measure_scope(profiler.reloading_viewables);
@@ -1434,7 +1435,7 @@ int work(const int argc, const char* const * const argv) try {
 			continue;
 		}
 
-		auto frame = measure_scope(profiler.frame);
+		auto frame = measure_scope(frame_performance.total);
 		
 		auto get_drawer = [&]() { 
 			return augs::drawer_with_default {
@@ -1509,6 +1510,7 @@ int work(const int argc, const char* const * const argv) try {
 					game_atlas_entries,
 					interpolation_ratio,
 					renderer,
+					frame_performance,
 					*game_world_atlas,
 					fbos,
 					shaders,
@@ -1680,6 +1682,7 @@ int work(const int argc, const char* const * const argv) try {
 				get_gui_font(),
 				screen_size,
 				viewed_character,
+				frame_performance,
 				profiler,
 				audiovisuals.profiler
 			);
@@ -1687,7 +1690,7 @@ int work(const int argc, const char* const * const argv) try {
 
 		renderer.call_and_clear_triangles();
 
-		profiler.num_triangles.measure(renderer.num_total_triangles_drawn);
+		frame_performance.num_triangles.measure(renderer.num_total_triangles_drawn);
 		renderer.num_total_triangles_drawn = 0u;
 
 		window.swap_buffers();

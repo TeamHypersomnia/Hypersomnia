@@ -23,8 +23,12 @@ namespace augs {
 	}
 }
 
+class frame_profiler;
+
 struct light_system_input {
 	augs::renderer& renderer;
+	frame_profiler& profiler;
+
 	const cosmos& cosm;
 	std::array<float, 16> projection_matrix;
 	const augs::graphics::fbo& light_fbo;

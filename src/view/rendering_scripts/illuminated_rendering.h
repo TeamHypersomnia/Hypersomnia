@@ -10,6 +10,7 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmos.h"
 
+#include "view/frame_profiler.h"
 #include "view/rendering_scripts/draw_entity.h"
 
 #include "game/components/item_slot_transfers_component.h"
@@ -52,6 +53,7 @@ struct illuminated_rendering_input {
 	const game_images_in_atlas_map& game_images;
 	const double interpolation_ratio = 0.0;
 	augs::renderer& renderer;
+	frame_profiler& frame_performance;
 	const augs::graphics::texture& game_world_atlas;
 	const illuminated_rendering_fbos& fbos;
 	const illuminated_rendering_shaders& shaders;
@@ -72,6 +74,8 @@ void illuminated_rendering(
 	const auto camera = in.eye.cone;
 
 	const auto& cosmos = viewed_character.get_cosmos();
+	auto& profiler = in.frame_performance;
+	
 	const auto& interp = in.audiovisuals.get<interpolation_system>();
 	const auto& particles = in.audiovisuals.get<particles_simulation_system>();
 	const auto& wandering_pixels = in.audiovisuals.get<wandering_pixels_system>();
@@ -142,6 +146,7 @@ void illuminated_rendering(
 
 	light.render_all_lights({
 		renderer,
+		profiler,
 		cosmos, 
 		matrix,
 		fbos.light.value(),
