@@ -53,20 +53,24 @@ public:
 	) const {
 		const auto self = *static_cast<const E*>(this);
 
-		const auto recoil_body = self.find_crosshair_recoil();
-		const auto recoil_body_transform = recoil_body.get_logic_transform();
-		const auto crosshair = self.find_crosshair();
+		if (const auto recoil_body = self.find_crosshair_recoil()) {
+			if (const auto recoil_body_transform = recoil_body.find_logic_transform()) {
+				if (const auto crosshair = self.find_crosshair()) {
+					auto considered_base_offset = crosshair->base_offset;
 
-		auto considered_base_offset = crosshair->base_offset;
+					if (snap_epsilon_base_offset && considered_base_offset.is_epsilon(4)) {
+						considered_base_offset.set(4, 0);
+					}
 
-		if (snap_epsilon_base_offset && considered_base_offset.is_epsilon(4)) {
-			considered_base_offset.set(4, 0);
+					considered_base_offset += recoil_body_transform->pos;
+					considered_base_offset.rotate(recoil_body_transform->rotation, vec2());
+
+					return considered_base_offset;
+				}
+			}
 		}
 
-		considered_base_offset += recoil_body_transform.pos;
-		considered_base_offset.rotate(recoil_body_transform.rotation, vec2());
-
-		return considered_base_offset;
+		return vec2(0, 0);
 	}
 
 	template <class I>

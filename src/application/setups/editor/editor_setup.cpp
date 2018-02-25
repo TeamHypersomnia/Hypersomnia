@@ -519,7 +519,8 @@ void editor_setup::perform_custom_imgui(
 
 	if (has_current_tab()) {
 		if (show_summary) {
-			auto summary = scoped_window("Summary", &show_summary, ImGuiWindowFlags_AlwaysAutoResize);
+			const auto summary_text = typesafe_sprintf("Summary - %x", tab().current_path); 
+			auto summary = scoped_window(summary_text.c_str(), &show_summary, ImGuiWindowFlags_AlwaysAutoResize);
 
 			if (has_current_tab()) {
 				//text("Tick rate: %x/s", get_viewed_cosmos().get_solvable().get_steps_per_second()));
@@ -1000,7 +1001,7 @@ void editor_setup::go_to_entity() {
 }
 
 void editor_setup::reveal_in_explorer() {
-	auto path_str = augs::path_type(tab().current_path).string();
+	auto path_str = tab().current_path.string();
 
 	if (path_str.empty()) {
 		path_str = augs::get_current_working_directory();

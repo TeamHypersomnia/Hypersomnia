@@ -314,14 +314,12 @@ bool inventory_mixin<E>::owning_transfer_capability_alive_and_same_as_of(const e
 template <class E>
 typename inventory_mixin<E>::inventory_slot_handle_type inventory_mixin<E>::get_primary_hand() const {
 	const auto& self = *static_cast<const E*>(this);
-	ensure(self.template has<components::sentience>());
 	return self[slot_function::PRIMARY_HAND];
 }
 
 template <class E>
 typename inventory_mixin<E>::inventory_slot_handle_type inventory_mixin<E>::get_secondary_hand() const {
 	const auto& self = *static_cast<const E*>(this);
-	ensure(self.template has<components::sentience>());
 	return self[slot_function::SECONDARY_HAND];
 }
 
