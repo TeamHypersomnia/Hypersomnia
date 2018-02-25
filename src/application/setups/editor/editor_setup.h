@@ -279,7 +279,7 @@ public:
 
 	void go_to_all();
 	void go_to_entity();
-	void open_containing_folder();
+	void reveal_in_explorer();
 
 	void unhover() {
 		hovered_entity = {};

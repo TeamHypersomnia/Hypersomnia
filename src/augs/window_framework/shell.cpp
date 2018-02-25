@@ -10,8 +10,9 @@
 
 namespace augs {
 	int shell(const std::string& s) {
-		const auto wide = to_wstring(s);
+		LOG("SHELL COMMAND: %x", s);
 
+		const auto wide = to_wstring(s);
 		return static_cast<int>(reinterpret_cast<INT_PTR>(ShellExecute(NULL, NULL, wide.c_str(), NULL, NULL, SW_SHOW)));
 	}
 }
@@ -27,7 +28,9 @@ extern "C" int __cxa_thread_atexit(void (*func)(), void *obj, void *dso_symbol) 
 
 namespace augs {
 	int shell(const std::string& s) {
-		return std::system( s.c_str());
+		const auto command = "$SHELL -c \"" + s + "\"";
+		LOG("SHELL COMMAND: %x", command);
+		return std::system(command.c_str());
 	}
 }
 #else
@@ -54,6 +57,6 @@ namespace augs {
 #else
 #error "Unsupported platform!"
 #endif
-		shell("$SHELL -c \"" + command + "\"");
+		augs::shell(command);
 	}
 }

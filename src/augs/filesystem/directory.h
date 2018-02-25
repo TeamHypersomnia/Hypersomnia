@@ -10,5 +10,5 @@ namespace augs {
 	bool create_directory(const path_type& dir_path);
 	bool create_directories(path_type dir_path);
 
-	path_type get_executable_directory();
+	path_type get_current_working_directory();
 }

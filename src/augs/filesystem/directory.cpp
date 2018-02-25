@@ -16,7 +16,7 @@ namespace augs {
 		return fs::create_directories(input_path.remove_filename());
 	}
 
-	path_type get_executable_directory() {
+	path_type get_current_working_directory() {
 		return fs::current_path();
 	}
 }

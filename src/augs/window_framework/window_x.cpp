@@ -596,13 +596,13 @@ xcb_ewmh_init_atoms_replies(&EWMH, EWMHCookie, NULL);
 		const std::vector<file_dialog_filter>& filters,
 		std::string custom_title
 	) const {
-		const auto script_path = "scripts/unix/open_file.local.sh";
+		const auto script_path = "scripts/unix/open_file.local";
 
 		if (!file_exists(script_path)) {
 			return std::nullopt;
 		}
 
-		shell(script_path);
+		augs::shell(script_path);
 
 		const auto result_path = temp_file_with_result_path;
 
@@ -619,13 +619,13 @@ xcb_ewmh_init_atoms_replies(&EWMH, EWMHCookie, NULL);
 		const std::vector<file_dialog_filter>& filters,
 		std::string custom_title
 	) const {
-		const auto script_path = "scripts/unix/open_file.local.sh";
+		const auto script_path = "scripts/unix/open_file.local";
 
 		if (!file_exists(script_path)) {
 			return std::nullopt;
 		}
 
-		shell(script_path);
+		augs::shell(script_path);
 
 		const auto result_path = temp_file_with_result_path;
 

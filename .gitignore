@@ -206,6 +206,6 @@ dev_unix/
 tags
 .gdb.break
 .gdb.file
-*.local.sh
+*.local
 core
 bt.txt

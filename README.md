@@ -181,8 +181,9 @@ Needless to say, such a thing does not exist on Linux.
 Hypersomnia provides bash scripts for common file managers in ``hypersomnia/scripts/unix/managers``.  
 Choose one for opening and one for saving, then ``cd`` to ``hypersomnia/scripts/unix`` and, assuming you want to use ``ranger`` as your file manager, create symlinks as such: 
 
-- ``ln -s managers/save_file_ranger.sh save_file.local.sh``
-- ``ln -s managers/open_file_ranger.sh open_file.local.sh``
+- ``ln -s managers/save_file_ranger.zsh save_file.local``
+- ``ln -s managers/open_file_ranger.zsh open_file.local``
+- ``ln -s managers/select_file_ranger.zsh select_file.local`` (e.g. for when there is a need to reveal the file in explorer)
 
 The symlinks will not be tracked by git.  
 

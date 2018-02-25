@@ -116,6 +116,8 @@ int main(const int argc, const char* const * const argv) {
 */
 
 int work(const int argc, const char* const * const argv) try {
+	LOG("Working directory: %x", augs::get_current_working_directory().string());
+
 	static const auto params = cmd_line_params(argc, argv);
 
 	augs::create_directories(LOG_FILES_DIR);

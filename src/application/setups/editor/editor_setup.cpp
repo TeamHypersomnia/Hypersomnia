@@ -999,15 +999,24 @@ void editor_setup::go_to_entity() {
 	ImGui::SetWindowFocus("Go to entity");
 }
 
-void editor_setup::open_containing_folder() {
-	if (const auto path_str = augs::path_type(tab().current_path).replace_filename("").string();
-		path_str.size() > 0
-	) {
-		augs::shell(path_str);
+void editor_setup::reveal_in_explorer() {
+	auto path_str = augs::path_type(tab().current_path).string();
+
+	if (path_str.empty()) {
+		path_str = augs::get_current_working_directory();
 	}
-	else {
-		augs::shell(std::experimental::filesystem::current_path().replace_filename("").string());
+
+#if PLATFORM_UNIX
+	const auto script_path = "scripts/unix/select_file.local";
+
+	if (!augs::file_exists(script_path)) {
+		return;
 	}
+
+	augs::shell(typesafe_sprintf("%x %x", script_path, path_str));
+#else
+	augs::shell(path_str);
+#endif
 }
 
 void editor_setup::play() {
@@ -1116,7 +1125,7 @@ bool editor_setup::handle_input_before_imgui(
 			if (has_ctrl) {
 				if (has_shift) {
 					switch (k) {
-						case key::E: open_containing_folder(); return true;
+						case key::E: reveal_in_explorer(); return true;
 						case key::TAB: prev_tab(); return true;
 						case key::F5: fill_with_minimal_scene(lua); return true;
 						default: break;
