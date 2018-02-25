@@ -41,6 +41,16 @@ struct editor_popup {
 	bool details_expanded = false;
 };
 
+struct editor_player {
+	bool show = true;
+	bool paused = true;
+	double speed = 1.0;
+
+	auto get_speed() const {
+		return paused ? 0.0 : speed;
+	}
+};
+
 class editor_setup : private current_tab_access_cache<editor_setup> {
 	using base = current_tab_access_cache<editor_setup>;
 	friend base;
@@ -58,8 +68,8 @@ class editor_setup : private current_tab_access_cache<editor_setup> {
 
 	std::optional<editor_popup> current_popup;
 
+	editor_player player;
 	bool show_summary = true;
-	bool show_player = true;
 	bool show_common_state = false;
 	bool show_entities = false;
 	bool show_go_to_all = false;
@@ -71,9 +81,6 @@ class editor_setup : private current_tab_access_cache<editor_setup> {
 	std::vector<entity_guid> matching_go_to_entities;
 
 	const_entity_handle get_matching_go_to_entity() const;
-
-	double player_speed = 1.0;
-	bool player_paused = true;
 
 	editor_recent_paths recent;
 
@@ -133,23 +140,6 @@ class editor_setup : private current_tab_access_cache<editor_setup> {
 	void autosave(const autosave_input) const;
 	void open_last_tabs(sol::state& lua);
 
-	template <class F>
-	void for_each_selected_entity(F callback) const {
-		if (has_current_tab()) {
-			for (const auto e : tab().selected_entities) {
-				if (!found_in(in_rectangular_selection.all, e)) {
-					callback(e);
-				}
-			}
-
-			for (const auto e : in_rectangular_selection.all) {
-				if (!found_in(tab().selected_entities, e)) {
-					callback(e);
-				}
-			}
-		}
-	}
-
 	void clear_all_selections();
 
 public:
@@ -189,8 +179,8 @@ public:
 	) {
 		global_time_seconds += frame_delta.in_seconds();
 
-		if (!player_paused) {
-			timer.advance(frame_delta *= player_speed);
+		if (!player.paused) {
+			timer.advance(frame_delta *= player.speed);
 		}
 
 		auto steps = timer.extract_num_of_logic_steps(get_viewed_cosmos().get_fixed_delta());
@@ -263,13 +253,30 @@ public:
 	std::optional<camera_cone> get_custom_camera() const; 
 
 	template <class F>
+	void for_each_selected_entity(F callback) const {
+		if (has_current_tab()) {
+			for (const auto e : tab().selected_entities) {
+				if (!found_in(in_rectangular_selection.all, e)) {
+					callback(e);
+				}
+			}
+
+			for (const auto e : in_rectangular_selection.all) {
+				if (!found_in(tab().selected_entities, e)) {
+					callback(e);
+				}
+			}
+		}
+	}
+
+	template <class F>
 	void for_each_line(F callback) const {
 
 	}
 
 	template <class F>
 	void for_each_highlight(F callback) const {
-		if (has_current_tab() && player_paused) {
+		if (has_current_tab() && player.paused) {
 			if (get_viewed_character().alive()) {
 				auto color = settings.controlled_entity_color;
 				color.a += static_cast<rgba_channel>(augs::zigzag(global_time_seconds, 1.0 / 2) * 25);
@@ -303,7 +310,7 @@ public:
 };
 
 inline double editor_setup::get_audiovisual_speed() const {
-	return player_paused ? 0.0 : player_speed;
+	return player.get_speed();
 }
 
 inline const cosmos& editor_setup::get_viewed_cosmos() const {

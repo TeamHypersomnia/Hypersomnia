@@ -26,7 +26,7 @@ void editor_setup::unhover() {
 }
 
 bool editor_setup::is_paused() const {
-	return player_paused;
+	return player.paused;
 }
 
 std::optional<camera_cone> editor_setup::get_custom_camera() const {
@@ -72,7 +72,7 @@ const_entity_handle editor_setup::get_matching_go_to_entity() const {
 
 void editor_setup::on_tab_changed() {
 	hovered_entity = {};
-	player_paused = true;
+	player.paused = true;
 	finish_rectangular_selection();
 }
 
@@ -231,7 +231,7 @@ void editor_setup::customize_for_viewing(config_lua_table& config) const {
 		config.window.name = "Editor";
 	}
 
-	if (player_paused) {
+	if (player.paused) {
 		config.drawing.draw_aabb_highlighter = false;
 		config.interpolation.enabled = false;
 	}
@@ -436,7 +436,7 @@ void editor_setup::perform_custom_imgui(
 						show_summary = true;
 					}
 					if (item_if_tabs("Player")) {
-						show_player = true;
+						player.show = true;
 					}
 
 					ImGui::Separator();
@@ -597,8 +597,8 @@ void editor_setup::perform_custom_imgui(
 			}
 		}
 
-		if (show_player) {
-			auto player = scoped_window("Player", &show_player, ImGuiWindowFlags_AlwaysAutoResize);
+		if (player.show) {
+			auto player_window = scoped_window("Player", &player.show, ImGuiWindowFlags_AlwaysAutoResize);
 
 			if (ImGui::Button("Play")) {
 				play();
@@ -944,8 +944,8 @@ bool editor_setup::escape() {
 		current_popup = std::nullopt;
 		return true;
 	}
-	else if(!player_paused) {
-		player_paused = true;
+	else if(!player.paused) {
+		player.paused = true;
 		return true;
 	}
 
@@ -1066,28 +1066,28 @@ void editor_setup::reveal_in_explorer() {
 }
 
 void editor_setup::play() {
-	player_paused = false;
+	player.paused = false;
 }
 
 void editor_setup::pause() {
-	player_paused = true;
+	player.paused = true;
 }
 
 void editor_setup::play_pause() {
-	bool& f = player_paused;
+	bool& f = player.paused;
 	f = !f;
 }
 
 void editor_setup::stop() {
-	player_paused = true;
+	player.paused = true;
 }
 
 void editor_setup::prev() {
-	player_paused = true;
+	player.paused = true;
 }
 
 void editor_setup::next() {
-	player_paused = true;
+	player.paused = true;
 }
 
 void editor_setup::new_tab() {
@@ -1164,7 +1164,7 @@ bool editor_setup::handle_input_before_imgui(
 			default: break;
 		}
 
-		if (player_paused) {
+		if (player.paused) {
 			const bool has_ctrl{ common_input_state[key::LCTRL] };
 			const bool has_shift{ common_input_state[key::LSHIFT] };
 
@@ -1229,7 +1229,7 @@ bool editor_setup::handle_unfetched_window_input(
 		return false;
 	}
 
-	if (player_paused) {
+	if (player.paused) {
 		auto pan_scene = [&](const auto amount) {
 			if (!tab().panned_camera.has_value()) {
 				tab().panned_camera = current_cone;
