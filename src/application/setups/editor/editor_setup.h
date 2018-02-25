@@ -17,6 +17,8 @@
 
 #include "application/debug_settings.h"
 
+#include "application/setups/editor/editor_significant.h"
+#include "application/setups/editor/editor_autosave.h"
 #include "application/setups/editor/editor_settings.h"
 #include "application/setups/editor/editor_tab.h"
 #include "application/setups/editor/editor_recent_paths.h"
@@ -51,19 +53,18 @@ struct editor_player {
 	}
 };
 
+struct editor_destructor_input {
+	sol::state& lua;
+};
+
 class editor_setup : private current_tab_access_cache<editor_setup> {
 	using base = current_tab_access_cache<editor_setup>;
 	friend base;
 
 	double global_time_seconds = 0.0;
 
-	struct autosave_input {
-		sol::state& lua;
-	};
-
-	const autosave_input destructor_autosave_input;
-	augs::timer autosave_timer;
-
+	editor_destructor_input destructor_input;
+	editor_autosave autosave;
 	editor_settings settings;
 
 	std::optional<editor_popup> current_popup;
@@ -84,8 +85,7 @@ class editor_setup : private current_tab_access_cache<editor_setup> {
 
 	editor_recent_paths recent;
 
-	std::vector<editor_tab> tabs;
-	std::vector<std::unique_ptr<intercosm>> works;
+	editor_significant signi;
 	
 	entity_id hovered_entity;
 	entity_id held_entity;
@@ -98,22 +98,22 @@ class editor_setup : private current_tab_access_cache<editor_setup> {
 
 	template <class F>
 	bool try_to_open_new_tab(F&& new_intercosm_provider) {
-		const auto new_index = has_current_tab() ? current_index + 1 : 0;
+		const auto new_index = has_current_tab() ? signi.current_index + 1 : 0;
 
-		works.reserve(works.size() + 1);
-		tabs.reserve(tabs.size() + 1);
+		signi.works.reserve(signi.works.size() + 1);
+		signi.tabs.reserve(signi.tabs.size() + 1);
 
-		tabs.emplace(tabs.begin() + new_index);
-		works.emplace(works.begin() + new_index, std::make_unique<intercosm>());
+		signi.tabs.emplace(signi.tabs.begin() + new_index);
+		signi.works.emplace(signi.works.begin() + new_index, std::make_unique<intercosm>());
 		base::refresh();
 
-		if (/* successfully_opened */ new_intercosm_provider(tabs[new_index], *works[new_index])) {
+		if (/* successfully_opened */ new_intercosm_provider(signi.tabs[new_index], *signi.works[new_index])) {
 			set_current_tab(new_index);
 			return true;
 		}
 
-		tabs.erase(tabs.begin() + new_index);
-		works.erase(works.begin() + new_index);
+		signi.tabs.erase(signi.tabs.begin() + new_index);
+		signi.works.erase(signi.works.begin() + new_index);
 
 		return false;
 	}
@@ -137,7 +137,6 @@ class editor_setup : private current_tab_access_cache<editor_setup> {
 	void fill_with_minimal_scene(sol::state& lua);
 	void fill_with_test_scene(sol::state& lua);
 
-	void autosave(const autosave_input) const;
 	void open_last_tabs(sol::state& lua);
 
 	void clear_all_selections();

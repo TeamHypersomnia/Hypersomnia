@@ -521,6 +521,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/transcendental/entity_id.cpp"
 	"src/augs/misc/children_vector_tracker.cpp"
 	"src/view/frame_profiler.cpp"
+	"src/application/setups/editor/editor_autosave.cpp"
 )
 
 if(BUILD_WINDOW_FRAMEWORK)

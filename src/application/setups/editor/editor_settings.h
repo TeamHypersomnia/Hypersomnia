@@ -1,5 +1,6 @@
 #pragma once
 #include "augs/filesystem/path.h"
+#include "augs/graphics/rgba.h"
 
 struct editor_autosave_settings {
 	// GEN INTROSPECTOR struct editor_autosave_settings

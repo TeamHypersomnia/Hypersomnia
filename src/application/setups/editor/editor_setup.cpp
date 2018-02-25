@@ -134,7 +134,7 @@ std::optional<editor_popup> open_intercosm(intercosm& work, const intercosm_path
 editor_setup::editor_setup(
 	sol::state& lua
 ) : 
-	destructor_autosave_input{ lua },
+	destructor_input{ lua },
 	recent(lua) 
 {
 	augs::create_directories(get_untitled_dir());
@@ -146,7 +146,7 @@ editor_setup::editor_setup(
 	sol::state& lua, 
 	const augs::path_type& intercosm_path
 ) : 
-	destructor_autosave_input{ lua },
+	destructor_input{ lua },
 	recent(lua) 
 {
 	augs::create_directories(get_untitled_dir());
@@ -156,35 +156,35 @@ editor_setup::editor_setup(
 }
 
 editor_setup::~editor_setup() {
-	autosave(destructor_autosave_input);
+	autosave.save(destructor_input.lua, signi);
 }
 
 void editor_setup::open_last_tabs(sol::state& lua) {
-	ensure(tabs.empty());
-	ensure(works.empty());
+	ensure(signi.tabs.empty());
+	ensure(signi.works.empty());
 
 	try {
 		const auto opened_tabs = augs::load_from_lua_table<editor_saved_tabs>(lua, get_editor_tabs_path());
-		tabs = opened_tabs.tabs;
+		signi.tabs = opened_tabs.tabs;
 
-		if (!tabs.empty()) {
+		if (!signi.tabs.empty()) {
 			/* Reload intercosms */
 
 			std::vector<tab_index_type> tabs_that_failed;
 
-			for (std::size_t i = 0; i < tabs.size(); ++i) {
-				works.emplace_back(std::make_unique<intercosm>());
+			for (std::size_t i = 0; i < signi.tabs.size(); ++i) {
+				signi.works.emplace_back(std::make_unique<intercosm>());
 				
-				if (!tabs[i].is_untitled()) {
+				if (!signi.tabs[i].is_untitled()) {
 					/* 
 						This work was explicitly named.
 						First try to load an adjacent .unsaved file, if it exists.
 					*/
 
-					const auto unsaved_path = get_unsaved_path(tabs[i].current_path);
+					const auto unsaved_path = get_unsaved_path(signi.tabs[i].current_path);
 
-					if (const auto popup = open_intercosm(*works.back(), { lua, unsaved_path })) {
-						if (const auto popup = open_intercosm(*works.back(), { lua, tabs[i].current_path })) {
+					if (const auto popup = open_intercosm(*signi.works.back(), { lua, unsaved_path })) {
+						if (const auto popup = open_intercosm(*signi.works.back(), { lua, signi.tabs[i].current_path })) {
 							set_popup(*popup);
 							tabs_that_failed.push_back(static_cast<tab_index_type>(i));
 						}
@@ -195,7 +195,7 @@ void editor_setup::open_last_tabs(sol::state& lua) {
 						This work was untitled, thus always written to in place, 
 						so it cannot have an "unsaved" neighbor.
 					*/
-					if (const auto popup = open_intercosm(*works.back(), { lua, tabs[i].current_path })) {
+					if (const auto popup = open_intercosm(*signi.works.back(), { lua, signi.tabs[i].current_path })) {
 						set_popup(*popup);
 						tabs_that_failed.push_back(static_cast<tab_index_type>(i));
 					}
@@ -214,41 +214,6 @@ void editor_setup::open_last_tabs(sol::state& lua) {
 	catch (...) {
 
 	}
-}
-
-void editor_setup::autosave(const autosave_input in) const {
-	editor_saved_tabs saved_tabs;
-
-	auto& lua = in.lua;
-
-	if (has_current_tab()) {
-		saved_tabs.tabs = tabs;
-		saved_tabs.current_tab_index = current_index;
-
-		for (std::size_t i = 0; i < tabs.size(); ++i) {
-			const auto& t = tabs[i];
-			const auto& w = *works[i];
-
-			if (t.is_untitled()) {
-				/* The work is untitled anyway, so we save it in place. */ 
-
-				const auto saving_path = t.current_path;
-				w.save({ lua, saving_path });
-			}
-			else if (t.has_unsaved_changes()) {
-				/* 
-					The work was explicitly saved at some point, so create a backup file with yet unsaved changes. 
-					The .unsaved file will be prioritized when loading.
-				*/ 
-
-				auto extension = t.current_path.extension();
-				const auto saving_path = augs::path_type(t.current_path).replace_extension(extension += ".unsaved");
-				w.save({ lua, saving_path });
-			}
-		}
-	}
-
-	augs::save_as_lua_table(lua, saved_tabs, get_editor_tabs_path());
 }
 
 void editor_setup::control(
@@ -280,18 +245,13 @@ void editor_setup::customize_for_viewing(config_lua_table& config) const {
 }
 
 void editor_setup::apply(const config_lua_table& cfg) {
-	if (cfg.editor.autosave != settings.autosave) {
-		autosave_timer = {};
-	}
-		
 	settings = cfg.editor;
-
 	return;
 }
 
 bool editor_setup::open_intercosm_in_new_tab(const path_operation op) {
-	for (std::size_t i = 0; i < tabs.size(); ++i) {
-		if (tabs[i].current_path == op.path) {
+	for (std::size_t i = 0; i < signi.tabs.size(); ++i) {
+		if (signi.tabs[i].current_path == op.path) {
 			set_current_tab(static_cast<tab_index_type>(i));
 			return true;
 		}
@@ -352,12 +312,7 @@ void editor_setup::perform_custom_imgui(
 ) {
 	using namespace augs::imgui;
 
-	if (settings.autosave.enabled 
-		&& settings.autosave.once_every_min <= autosave_timer.get<std::chrono::minutes>()
-	) {
-		autosave({ lua });
-		autosave_timer.reset();
-	}
+	autosave.advance(lua, signi, settings.autosave);
 
 	auto in_path = [&](const auto& path) {
 		return path_operation{ lua, path };
@@ -519,12 +474,12 @@ void editor_setup::perform_custom_imgui(
 
 				// Tab algorithm i/o
 
-				auto selected_index = static_cast<int>(current_index);
+				auto selected_index = static_cast<int>(signi.current_index);
 				int closed_tab_index{ -1 };
 
 				auto ordering = [&]() {
 					std::vector<int> out;
-					out.resize(tabs.size());
+					out.resize(signi.tabs.size());
 
 					for (int i = 0; i < out.size(); ++i) {
 						out[i] = i;
@@ -536,9 +491,9 @@ void editor_setup::perform_custom_imgui(
 				{
 					const auto tab_names = [&]() {
 						std::vector<std::string> out;
-						out.reserve(tabs.size());
+						out.reserve(signi.tabs.size());
 
-						for (const auto& it : tabs) {
+						for (const auto& it : signi.tabs) {
 							out.push_back(it.get_display_path());
 						}
 
@@ -547,7 +502,7 @@ void editor_setup::perform_custom_imgui(
 
 					auto tab_names_cstrs = [&]() {
 						std::vector<const char*> out;
-						out.reserve(tabs.size());
+						out.reserve(signi.tabs.size());
 
 						for (const auto& it : tab_names) {
 							out.push_back(it.c_str());
@@ -557,7 +512,7 @@ void editor_setup::perform_custom_imgui(
 					}();
 
 					auto style = scoped_style_var(ImGuiStyleVar_FramePadding, []() { auto padding = ImGui::GetStyle().FramePadding; padding.x *= 2; return padding; }());
-					ImGui::TabLabels(static_cast<int>(tabs.size()), tab_names_cstrs.data(), selected_index, nullptr, false, nullptr, ordering.data(), true, true, &closed_tab_index, nullptr);
+					ImGui::TabLabels(static_cast<int>(signi.tabs.size()), tab_names_cstrs.data(), selected_index, nullptr, false, nullptr, ordering.data(), true, true, &closed_tab_index, nullptr);
 				}
 
 				/* Read back */
@@ -579,23 +534,23 @@ void editor_setup::perform_custom_imgui(
 						auto index_to_set = static_cast<tab_index_type>(selected_index);
 
 						if (changed_order) {
-							decltype(tabs) new_tabs;
-							decltype(works) new_works;
+							decltype(signi.tabs) new_tabs;
+							decltype(signi.works) new_works;
 
-							new_tabs.reserve(tabs.size());
-							new_works.reserve(works.size());
+							new_tabs.reserve(signi.tabs.size());
+							new_works.reserve(signi.works.size());
 
 							for (const auto o : ordering) {
 								if (o == selected_index) {
 									index_to_set = static_cast<tab_index_type>(new_tabs.size());
 								}
 
-								new_tabs.push_back(tabs[o]);
-								new_works.push_back(std::move(works[o]));
+								new_tabs.push_back(signi.tabs[o]);
+								new_works.push_back(std::move(signi.works[o]));
 							}
 
-							tabs = new_tabs;
-							works = std::move(new_works);
+							signi.tabs = new_tabs;
+							signi.works = std::move(new_works);
 						}
 
 						set_current_tab(index_to_set);
@@ -851,12 +806,12 @@ void editor_setup::perform_custom_imgui(
 			{
 				const auto last_input = to_wstring(last_go_to_entities_input);
 
-				unsigned current_index = 0;
+				unsigned go_to_index = 0;
 
 				for (const auto& m : matching_go_to_entities) {
-					if (current_index == go_to_entities_selected_index) {
+					if (go_to_index == go_to_entities_selected_index) {
 						bool s = true;
-						ImGui::PushID(static_cast<int>(current_index));
+						ImGui::PushID(static_cast<int>(go_to_index));
 						ImGui::Selectable("##gotoentity", &s);
 						ImGui::PopID();
 						ImGui::SameLine(0.f, 0.f);
@@ -883,7 +838,7 @@ void editor_setup::perform_custom_imgui(
 
 					text("(guid: %x)", m);
 
-					++current_index;
+					++go_to_index;
 				}
 			}
 
@@ -1141,18 +1096,18 @@ void editor_setup::new_tab() {
 
 void editor_setup::next_tab() {
 	if (has_current_tab()) {
-		set_current_tab((current_index + 1) % tabs.size());
+		set_current_tab((signi.current_index + 1) % signi.tabs.size());
 	}
 }
 
 void editor_setup::prev_tab() {
 	if (has_current_tab()) {
-		set_current_tab(current_index == 0 ? static_cast<tab_index_type>(tabs.size() - 1) : current_index - 1);
+		set_current_tab(signi.current_index == 0 ? static_cast<tab_index_type>(signi.tabs.size() - 1) : signi.current_index - 1);
 	}
 }
 
 void editor_setup::close_tab(const tab_index_type i) {
-	auto& tab_to_close = tabs[i];
+	auto& tab_to_close = signi.tabs[i];
 
 	if (tab_to_close.has_unsaved_changes()) {
 		set_popup({ "Nie", "Nie", "Nie" });
@@ -1163,11 +1118,11 @@ void editor_setup::close_tab(const tab_index_type i) {
 		augs::remove_file(tab_to_close.current_path);
 	}
 
-	tabs.erase(tabs.begin() + i);
-	works.erase(works.begin() + i);
+	signi.tabs.erase(signi.tabs.begin() + i);
+	signi.works.erase(signi.works.begin() + i);
 
-	if (!tabs.empty()) {
-		set_current_tab(std::min(current_index, static_cast<tab_index_type>(tabs.size() - 1)));
+	if (!signi.tabs.empty()) {
+		set_current_tab(std::min(signi.current_index, static_cast<tab_index_type>(signi.tabs.size() - 1)));
 	}
 	else {
 		unset_current_tab();
@@ -1177,7 +1132,7 @@ void editor_setup::close_tab(const tab_index_type i) {
 
 void editor_setup::close_tab() {
 	if (has_current_tab()) {
-		close_tab(current_index);
+		close_tab(signi.current_index);
 	}
 }
 

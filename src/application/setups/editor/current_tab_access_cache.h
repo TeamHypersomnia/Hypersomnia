@@ -12,30 +12,30 @@ class current_tab_access_cache {
 	intercosm* current_work = nullptr;
 
 protected:
-	tab_index_type current_index = static_cast<tab_index_type>(-1);
-
 	void refresh() {
 		auto& self = *static_cast<derived*>(this);
 
-		if (current_index != static_cast<tab_index_type>(-1)) {
-			current_tab = &self.tabs[current_index];
-			current_work = self.works[current_index].get();
+		if (self.signi.current_index != static_cast<tab_index_type>(-1)) {
+			current_tab = &self.signi.tabs[self.signi.current_index];
+			current_work = self.signi.works[self.signi.current_index].get();
 		}
 	}
 
 	void set_current_tab(const tab_index_type i) {
 		auto& self = *static_cast<derived*>(this);
 
-		if (current_index != i) {
+		if (self.signi.current_index != i) {
 			self.on_tab_changed();
 		}
 
-		current_index = i;
+		self.signi.current_index = i;
 		refresh();
 	}
 
 	void unset_current_tab() {
-		current_index = static_cast<tab_index_type>(-1);
+		auto& self = *static_cast<derived*>(this);
+
+		self.signi.current_index = static_cast<tab_index_type>(-1);
 
 		current_tab = nullptr;
 		current_work = nullptr;
