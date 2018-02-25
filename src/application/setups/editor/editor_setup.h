@@ -306,29 +306,4 @@ public:
 			}
 		}
 	}
-
 };
-
-inline double editor_setup::get_audiovisual_speed() const {
-	return player.get_speed();
-}
-
-inline const cosmos& editor_setup::get_viewed_cosmos() const {
-	return has_current_tab() ? work().world : cosmos::zero; 
-}
-
-inline real32 editor_setup::get_interpolation_ratio() const {
-	return timer.fraction_of_step_until_next_step(get_viewed_cosmos().get_fixed_delta());
-}
-
-inline entity_id editor_setup::get_viewed_character_id() const {
-	return has_current_tab() ? work().locally_viewed : entity_id();
-}
-
-inline const_entity_handle editor_setup::get_viewed_character() const {
-	return get_viewed_cosmos()[get_viewed_character_id()];
-}
-
-inline const all_viewables_defs& editor_setup::get_viewable_defs() const {
-	return has_current_tab() ? work().viewables : all_viewables_defs::empty;
-}

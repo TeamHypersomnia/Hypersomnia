@@ -85,7 +85,7 @@ set(HYPERSOMNIA_LOG_FILES_DIR "cache/log/")
 
 set(HYPERSOMNIA_GENERATED_FILES_DIR "cache/gen/")
 
-# Where the game will save editor autosaves, gui layouts, user config etc.
+# Where the game will save untitled works from editor, gui layouts, user config etc.
 # Deleting this folder might reset some user settings.
 
 set(HYPERSOMNIA_LOCAL_FILES_DIR "cache/usr/")

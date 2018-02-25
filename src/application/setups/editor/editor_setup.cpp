@@ -21,6 +21,30 @@
 #include "augs/readwrite/byte_file.h"
 #include "augs/readwrite/lua_file.h"
 
+double editor_setup::get_audiovisual_speed() const {
+	return player.get_speed();
+}
+
+const cosmos& editor_setup::get_viewed_cosmos() const {
+	return has_current_tab() ? work().world : cosmos::zero; 
+}
+
+real32 editor_setup::get_interpolation_ratio() const {
+	return timer.fraction_of_step_until_next_step(get_viewed_cosmos().get_fixed_delta());
+}
+
+entity_id editor_setup::get_viewed_character_id() const {
+	return has_current_tab() ? work().locally_viewed : entity_id();
+}
+
+const_entity_handle editor_setup::get_viewed_character() const {
+	return get_viewed_cosmos()[get_viewed_character_id()];
+}
+
+const all_viewables_defs& editor_setup::get_viewable_defs() const {
+	return has_current_tab() ? work().viewables : all_viewables_defs::empty;
+}
+
 void editor_setup::unhover() {
 	hovered_entity = {};
 }
@@ -146,34 +170,43 @@ void editor_setup::open_last_tabs(sol::state& lua) {
 		if (!tabs.empty()) {
 			/* Reload intercosms */
 
-			std::vector<tab_index_type> tabs_to_close;
+			std::vector<tab_index_type> tabs_that_failed;
 
 			for (std::size_t i = 0; i < tabs.size(); ++i) {
 				works.emplace_back(std::make_unique<intercosm>());
 				
-				if (/* try_loading_unsaved */ !tabs[i].is_untitled()) {
+				if (!tabs[i].is_untitled()) {
+					/* 
+						This work was explicitly named.
+						First try to load an adjacent .unsaved file, if it exists.
+					*/
+
 					const auto unsaved_path = get_unsaved_path(tabs[i].current_path);
 
 					if (const auto popup = open_intercosm(*works.back(), { lua, unsaved_path })) {
 						if (const auto popup = open_intercosm(*works.back(), { lua, tabs[i].current_path })) {
 							set_popup(*popup);
-							tabs_to_close.push_back(static_cast<tab_index_type>(i));
+							tabs_that_failed.push_back(static_cast<tab_index_type>(i));
 						}
 					}
 				}
 				else {
+					/* 
+						This work was untitled, thus always written to in place, 
+						so it cannot have an "unsaved" neighbor.
+					*/
 					if (const auto popup = open_intercosm(*works.back(), { lua, tabs[i].current_path })) {
 						set_popup(*popup);
-						tabs_to_close.push_back(static_cast<tab_index_type>(i));
+						tabs_that_failed.push_back(static_cast<tab_index_type>(i));
 					}
 				}
 			}
 			
 			set_current_tab(opened_tabs.current_tab_index);
 
-			sort_range(tabs_to_close);
+			sort_range(tabs_that_failed);
 
-			for (const auto i : reverse(tabs_to_close)) {
+			for (const auto i : reverse(tabs_that_failed)) {
 				close_tab(i);
 			}
 		}
@@ -196,11 +229,18 @@ void editor_setup::autosave(const autosave_input in) const {
 			const auto& t = tabs[i];
 			const auto& w = *works[i];
 
-			if (/* resave_untitled_work */ t.is_untitled()) {
+			if (t.is_untitled()) {
+				/* The work is untitled anyway, so we save it in place. */ 
+
 				const auto saving_path = t.current_path;
 				w.save({ lua, saving_path });
 			}
-			else if (/* cache_changes_of_named_work */ t.has_unsaved_changes()) {
+			else if (t.has_unsaved_changes()) {
+				/* 
+					The work was explicitly saved at some point, so create a backup file with yet unsaved changes. 
+					The .unsaved file will be prioritized when loading.
+				*/ 
+
 				auto extension = t.current_path.extension();
 				const auto saving_path = augs::path_type(t.current_path).replace_extension(extension += ".unsaved");
 				w.save({ lua, saving_path });
@@ -312,8 +352,7 @@ void editor_setup::perform_custom_imgui(
 ) {
 	using namespace augs::imgui;
 
-	if (
-		settings.autosave.enabled 
+	if (settings.autosave.enabled 
 		&& settings.autosave.once_every_min <= autosave_timer.get<std::chrono::minutes>()
 	) {
 		autosave({ lua });
