@@ -70,13 +70,7 @@ class editor_setup : private current_tab_access_cache<editor_setup> {
 	unsigned go_to_entities_selected_index = 0;
 	std::vector<entity_guid> matching_go_to_entities;
 
-	auto get_matched_entity() const {
-		if (show_go_to_entity && matching_go_to_entities.size() > 0) {
-			return work().world[matching_go_to_entities[go_to_entities_selected_index]];
-		}
-		
-		return work().world[entity_id()];
-	}
+	const_entity_handle get_matching_go_to_entity() const;
 
 	double player_speed = 1.0;
 	bool player_paused = true;
@@ -171,29 +165,12 @@ public:
 	
 	~editor_setup();
 
-	FORCE_INLINE auto get_audiovisual_speed() const {
-		return player_paused ? 0.0 : player_speed;
-	}
-
-	FORCE_INLINE const auto& get_viewed_cosmos() const {
-		return has_current_tab() ? work().world : cosmos::zero; 
-	}
-
-	FORCE_INLINE auto get_interpolation_ratio() const {
-		return timer.fraction_of_step_until_next_step(get_viewed_cosmos().get_fixed_delta());
-	}
-
-	FORCE_INLINE auto get_viewed_character_id() const {
-		return has_current_tab() ? work().locally_viewed : entity_id();
-	}
-
-	FORCE_INLINE auto get_viewed_character() const {
-		return get_viewed_cosmos()[get_viewed_character_id()];
-	}
-
-	FORCE_INLINE const auto& get_viewable_defs() const {
-		return has_current_tab() ? work().viewables : all_viewables_defs::empty;
-	}
+	double get_audiovisual_speed() const;
+	const cosmos& get_viewed_cosmos() const;
+	real32 get_interpolation_ratio() const;
+	entity_id get_viewed_character_id() const;
+	const_entity_handle get_viewed_character() const;
+	const all_viewables_defs& get_viewable_defs() const;
 
 	void perform_custom_imgui(
 		sol::state& lua,
@@ -281,8 +258,13 @@ public:
 	void go_to_entity();
 	void reveal_in_explorer();
 
-	void unhover() {
-		hovered_entity = {};
+	void unhover();
+	bool is_paused() const;
+	std::optional<camera_cone> get_custom_camera() const; 
+
+	template <class F>
+	void for_each_line(F callback) const {
+
 	}
 
 	template <class F>
@@ -309,9 +291,7 @@ public:
 				callback(hovered_entity, settings.hovered_entity_color);
 			}
 			
-			if (const auto match = get_matched_entity(); 
-				match.alive()
-			) {
+			if (const auto match = get_matching_go_to_entity()) {
 				auto color = green;
 				color.a += static_cast<rgba_channel>(augs::zigzag(global_time_seconds, 1.0 / 2) * 25);
 				
@@ -320,47 +300,28 @@ public:
 		}
 	}
 
-	bool is_paused() const {
-		return player_paused;
-	}
-
-	template <class F>
-	void for_each_line(F callback) const {
-	
-	}
-
-	FORCE_INLINE std::optional<camera_cone> get_custom_camera() const {
-		auto normal_panning = [this]() -> std::optional<camera_cone> { 
-			if (has_current_tab() && is_paused()) {
-				if (tab().panned_camera) {
-					return tab().panned_camera;
-				}
-			}
-
-			return std::nullopt;
-		};
-
-		if (has_current_tab() && is_paused()) {
-			if (const auto match = get_matched_entity(); 
-				match.alive()
-			) {
-				auto panning = normal_panning();
-
-				if (!panning) {
-					panning = camera_cone();
-				}
-
-				if (const auto transform = match.find_logic_transform()) {
-					panning->transform.pos = transform->pos;
-				}
-				else {
-					LOG("WARNING: transform of %x could not be found.", match);
-				}
-
-				return panning;
-			}
-		}
-
-		return normal_panning();
-	}
 };
+
+inline double editor_setup::get_audiovisual_speed() const {
+	return player_paused ? 0.0 : player_speed;
+}
+
+inline const cosmos& editor_setup::get_viewed_cosmos() const {
+	return has_current_tab() ? work().world : cosmos::zero; 
+}
+
+inline real32 editor_setup::get_interpolation_ratio() const {
+	return timer.fraction_of_step_until_next_step(get_viewed_cosmos().get_fixed_delta());
+}
+
+inline entity_id editor_setup::get_viewed_character_id() const {
+	return has_current_tab() ? work().locally_viewed : entity_id();
+}
+
+inline const_entity_handle editor_setup::get_viewed_character() const {
+	return get_viewed_cosmos()[get_viewed_character_id()];
+}
+
+inline const all_viewables_defs& editor_setup::get_viewable_defs() const {
+	return has_current_tab() ? work().viewables : all_viewables_defs::empty;
+}

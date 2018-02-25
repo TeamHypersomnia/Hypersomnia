@@ -21,6 +21,55 @@
 #include "augs/readwrite/byte_file.h"
 #include "augs/readwrite/lua_file.h"
 
+void editor_setup::unhover() {
+	hovered_entity = {};
+}
+
+bool editor_setup::is_paused() const {
+	return player_paused;
+}
+
+std::optional<camera_cone> editor_setup::get_custom_camera() const {
+	auto normal_panning = [this]() -> std::optional<camera_cone> { 
+		if (has_current_tab() && is_paused()) {
+			if (tab().panned_camera) {
+				return tab().panned_camera;
+			}
+		}
+
+		return std::nullopt;
+	};
+
+	if (has_current_tab() && is_paused()) {
+		if (const auto match = get_matching_go_to_entity()) {
+			auto panning = normal_panning();
+
+			if (!panning) {
+				panning = camera_cone();
+			}
+
+			if (const auto transform = match.find_logic_transform()) {
+				panning->transform.pos = transform->pos;
+			}
+			else {
+				LOG("WARNING: transform of %x could not be found.", match);
+			}
+
+			return panning;
+		}
+	}
+
+	return normal_panning();
+}
+
+const_entity_handle editor_setup::get_matching_go_to_entity() const {
+	if (show_go_to_entity && matching_go_to_entities.size() > 0) {
+		return work().world[matching_go_to_entities[go_to_entities_selected_index]];
+	}
+
+	return work().world[entity_id()];
+}
+
 void editor_setup::on_tab_changed() {
 	hovered_entity = {};
 	player_paused = true;
@@ -699,9 +748,7 @@ void editor_setup::perform_custom_imgui(
 					break;
 					
 					case ImGuiInputTextFlags_CallbackCompletion: {
-						if (const auto match = self.get_matched_entity();
-							match.alive()
-						) {
+						if (const auto match = self.get_matching_go_to_entity()) {
 							const auto name = to_string(match.get_name());
 
 							if (name.length() < data->BufSize) {
@@ -746,9 +793,7 @@ void editor_setup::perform_custom_imgui(
 				const auto selected_name = to_wstring(go_to_entity_query);
 
 				// LOG(selected_name);
-				if (const auto match = get_matched_entity();
-					match.alive()
-				) {	
+				if (const auto match = get_matching_go_to_entity()) {	
 					tab().selected_entities = { match };
 
 					if (!tab().panned_camera.has_value()) {
