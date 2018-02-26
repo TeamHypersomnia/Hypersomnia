@@ -209,3 +209,7 @@ we consider whole type overrides too complex architeciturally:
 
 - Fix open current directory for editor in linux
 
+- what if there is just "unsaved" file?
+	- we load as if there were a real file
+	- but we're emitting a warning
+
