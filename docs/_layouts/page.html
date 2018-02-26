@@ -33,6 +33,10 @@ layout: default
    {% include note.html content=page.note %}
    {% endif %}
 
+   {% if page.tip %}
+   {% include tip.html content=page.tip %}
+   {% endif %}
+
    {% if page.summary %}
     <div class="summary">{{page.summary | markdownify }}</div>
    {% endif %}

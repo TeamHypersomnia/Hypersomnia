@@ -1168,6 +1168,37 @@ bool editor_setup::handle_unfetched_window_input(
 	}
 
 	if (player.paused) {
+		const bool has_ctrl{ common_input_state[key::LCTRL] || common_input_state[key::RCTRL] };
+		const bool has_shift{ common_input_state[key::LSHIFT] };
+
+		const auto pan_mult = [&](){
+			float result = 1.f;
+
+			if (has_ctrl) {
+				result *= 5;
+			}
+
+			if (has_shift) {
+				result /= 5;
+			}
+
+			return result;
+		}();
+
+		const auto zoom_mult = [&](){
+			float result = 1.f;
+
+			if (has_ctrl) {
+				result *= 5;
+			}
+
+			if (has_shift) {
+				result /= 5;
+			}
+
+			return result;
+		}();
+
 		auto pan_scene = [&](const auto amount) {
 			if (!tab().panned_camera.has_value()) {
 				tab().panned_camera = current_cone;
@@ -1175,7 +1206,7 @@ bool editor_setup::handle_unfetched_window_input(
 
 			auto& camera = *tab().panned_camera;
 
-			camera.transform.pos -= amount / camera.zoom;
+			camera.transform.pos -= pan_mult * amount / camera.zoom;
 		};
 
 		auto zoom_scene = [&](const auto zoom_amount, const auto zoom_point) {
@@ -1186,7 +1217,7 @@ bool editor_setup::handle_unfetched_window_input(
 			auto& camera = *tab().panned_camera;
 
 			const auto old_zoom = camera.zoom;
-			const auto zoom_offset = 0.09f * old_zoom * zoom_amount;
+			const auto zoom_offset = 0.09f * old_zoom * zoom_amount * zoom_mult;
 			const auto new_zoom = std::clamp(old_zoom + zoom_offset, 0.01f, 10.f);
 
 			camera.zoom = new_zoom;	
@@ -1291,9 +1322,6 @@ bool editor_setup::handle_unfetched_window_input(
 		if (e.was_any_key_pressed()) {
 			const auto k = e.data.key.key;
 
-			const bool has_ctrl{ common_input_state[key::LCTRL] || common_input_state[key::RCTRL] };
-			const bool has_shift{ common_input_state[key::LSHIFT] };
-
 			if (has_ctrl) {
 				if (has_shift) {
 					switch (k) {
@@ -1311,18 +1339,8 @@ bool editor_setup::handle_unfetched_window_input(
 				}
 			}
 
-			float zoom_amount = 1.f;
-			float pan_amount = 50.f;
-
-			if (has_ctrl) {
-				pan_amount *= 5;
-				zoom_amount *= 5;
-			}
-			
-			if (has_shift) {
-				pan_amount /= 5;
-				zoom_amount /= 5;
-			}
+			const auto key_pan_amount = 50.f;
+			const auto key_zoom_amount = 1.f;
 
 			switch (k) {
 				case key::C: 
@@ -1333,12 +1351,12 @@ bool editor_setup::handle_unfetched_window_input(
 				case key::I: play(); return true;
 				case key::DEL: del(); return true;
 				case key::HOME: tab().panned_camera = std::nullopt; return true;
-				case key::UP: pan_scene(vec2(0, pan_amount)); return true;
-				case key::DOWN: pan_scene(vec2(0, -pan_amount)); return true;
-				case key::RIGHT: pan_scene(vec2(-pan_amount, 0)); return true;
-				case key::LEFT: pan_scene(vec2(pan_amount, 0)); return true;
-				case key::MINUS: zoom_scene(-zoom_amount, world_screen_center); return true;
-				case key::EQUAL: zoom_scene(zoom_amount, world_screen_center); return true;
+				case key::UP: pan_scene(vec2(0, key_pan_amount)); return true;
+				case key::DOWN: pan_scene(vec2(0, -key_pan_amount)); return true;
+				case key::RIGHT: pan_scene(vec2(-key_pan_amount, 0)); return true;
+				case key::LEFT: pan_scene(vec2(key_pan_amount, 0)); return true;
+				case key::MINUS: zoom_scene(-key_zoom_amount, world_screen_center); return true;
+				case key::EQUAL: zoom_scene(key_zoom_amount, world_screen_center); return true;
 				default: break;
 			}
 		}

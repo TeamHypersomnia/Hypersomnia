@@ -4,10 +4,13 @@ tags: [topics]
 hide_sidebar: true
 permalink: setup
 summary: |
-    **Setups** are the highest-level objects in the entire source code. They are allocated and used directly by [``main.cpp``](main_cpp).  
-    Usually, each *setup* has a single dedicated button in the game's main menu.  
+    **Setups** are the most abstract chunks of functionality,  
+    e.g. a server, a client, an editor or a local test scene.  
 
-    An application may choose which setup to launch on startup via a relevant [``config.lua``](config_lua) setting.
+    Usually, each *setup* has a single dedicated button in the game's main menu.  
+    Users may choose which setup to launch on startup via a relevant [``config.lua``](config_lua) setting.
+
+    They are allocated and used directly by [``main.cpp``](main_cpp).  
 ---
 
 ## Interface

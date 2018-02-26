@@ -3,6 +3,7 @@ title: Intercosm
 tags: [topics, ECS] 
 hide_sidebar: true
 permalink: intercosm
+tip: This page serves as a manual suitable for both programmers and content designers.
 summary: |
     An **intercosm**, a short for an *interactive cosmos*, is an object that holds a [cosmos](cosmos), [viewables](viewable) and extra information like [id](entity_id) of the [entity](entity) that is to be controlled during the game.  
 
@@ -13,11 +14,11 @@ summary: |
 ## Overview
 
 An intercosm holds the minimum [significant state](significant_state) required to run an interactive simulation of the game.  
-An [author](author) has complete control over its content.  
+An [author](author) has complete control over its contents.
 
 ## File formats
 
-An intercosm can currently be read or written in two different ways:
+An intercosm can currently be read or written to disk in two different ways:
 
 - As an ``.int`` file, which contains a binary representation of the content, native to the machine that the intercosm was created on.
 	- **Purpose:** to have a lightning-fast format for manipulation of files while they are still being worked on.
