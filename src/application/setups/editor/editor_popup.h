@@ -19,7 +19,7 @@ struct editor_popup {
 			}
 
 			if (p.details.size() > 0) {
-				result.details += p.details + "\n\n";
+				result.details += p.details + "\n";
 			}
 		}
 
@@ -34,6 +34,10 @@ struct editor_popup {
 
 		if (result.message.size() >= 1) {
 			result.message.pop_back();
+		}
+
+		if (result.details.size() >= 1) {
+			result.details.pop_back();
 		}
 
 		return result;

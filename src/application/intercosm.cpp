@@ -55,18 +55,33 @@ void intercosm::make_test_scene(
 }
 #endif
 
-void intercosm::save(const intercosm_path_op op) const {
-	auto target_extension = op.path.extension();
+static auto get_effective_extension(const augs::path_type& file_path) {
+	const auto file_extension = file_path.extension();
 
-	if (target_extension == ".unsaved") {
-		target_extension = augs::path_type(op.path).replace_extension("").extension();
+	if (file_extension == ".unsaved") {
+		/* Eat the .unsaved suffix to get the effective extension */
+		return augs::path_type(file_path).replace_extension("").extension();
 	}
 
-	if (target_extension == ".int") {
+	return file_extension;
+}
+
+void intercosm::save(const intercosm_path_op op) const {
+	const auto file_extension = op.path.extension();
+	const auto effective_extension = get_effective_extension(op.path);
+
+	if (effective_extension == ".int") {
 		augs::save_as_bytes(*this, op.path);
 	}
-	else if (target_extension == ".lua") {
+	else if (effective_extension == ".lua") {
 		augs::save_as_lua_table(op.lua, *this, op.path);
+	}
+
+	if (const auto unneeded_backup_path = augs::path_type(op.path) += ".unsaved";
+		file_extension != ".unsaved" && augs::file_exists(unneeded_backup_path)
+	) {
+		/* Clear the backup file */
+		augs::remove_file(unneeded_backup_path);
 	}
 }
 
@@ -74,20 +89,16 @@ void intercosm::open(const intercosm_path_op op) {
 	const auto display_path = augs::to_display_path(op.path);
 
 	try {
-		auto target_extension = op.path.extension();
-
-		if (target_extension == ".unsaved") {
-			/* Get the extension before ".unsaved" */
-			target_extension = augs::path_type(op.path).replace_extension("").extension();
-		}
+		const auto file_extension = op.path.extension();
+		const auto effective_extension = get_effective_extension(op.path);
 
 		augs::recursive_clear(version);
 		version.commit_number = 0;
 
-		if (target_extension == ".int") {
+		if (effective_extension == ".int") {
 			augs::load_from_bytes(*this, op.path);
 		}
-		else if (target_extension == ".lua") {
+		else if (effective_extension == ".lua") {
 			augs::load_from_lua_table(op.lua, *this, op.path);
 		}
 
