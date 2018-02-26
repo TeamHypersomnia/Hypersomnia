@@ -831,14 +831,16 @@ void editor_setup::perform_custom_imgui(
 			text(p.message);
 
 			{
-				auto& f = p.details_expanded;
+				if (p.details.size() > 0) {
+					auto& f = p.details_expanded;
 
-				if (ImGui::Button(f ? "Hide details" : "Show details")) {
-					f = !f;
-				}
+					if (ImGui::Button(f ? "Hide details" : "Show details")) {
+						f = !f;
+					}
 
-				if (f) {
-					text(p.details);
+					if (f) {
+						text(p.details);
+					}
 				}
 			}
 

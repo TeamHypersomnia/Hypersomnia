@@ -14,8 +14,13 @@ struct editor_popup {
 		for (const auto& p : popups) {
 			counts[p.title]++;
 
-			result.message += p.message + "\n";
-			result.details += p.details + "\n";
+			if (p.message.size() > 0) {
+				result.message += p.message + "\n\n";
+			}
+
+			if (p.details.size() > 0) {
+				result.details += p.details + "\n\n";
+			}
 		}
 
 		for (const auto& e : counts) {
@@ -25,6 +30,10 @@ struct editor_popup {
 		if (result.title.size() >= 2) {
 			result.title.pop_back();
 			result.title.pop_back();
+		}
+
+		if (result.message.size() >= 1) {
+			result.message.pop_back();
 		}
 
 		return result;

@@ -70,12 +70,26 @@ std::optional<editor_popup> open_last_tabs(
 
 					const auto maybe_unsaved_path = get_unsaved_path(opened_tabs.tabs[i].current_path);
 
-					if (const auto popup = open_intercosm(new_intercosm, { lua, maybe_unsaved_path })) {
-						const auto real_path = opened_tabs.tabs[i].current_path;
+					const auto real_path = opened_tabs.tabs[i].current_path;
 
+					if (const auto popup = open_intercosm(new_intercosm, { lua, maybe_unsaved_path })) {
 						if (const auto popup = open_intercosm(new_intercosm, { lua, real_path })) {
 							failures.push_back(*popup);
 							continue;
+						}
+					}
+					else {
+						if (!augs::file_exists(real_path)) {
+							const auto display_unsaved = augs::to_display_path(maybe_unsaved_path);
+							const auto display_real = augs::to_display_path(real_path);
+
+							const auto message = typesafe_sprintf(
+								"Found the autosave file %x,\nbut there is no %x!\nSave the file immediately!",
+								display_unsaved,
+								display_real
+						   	);
+
+							failures.push_back({"Warning", message, ""});
 						}
 					}
 				}
