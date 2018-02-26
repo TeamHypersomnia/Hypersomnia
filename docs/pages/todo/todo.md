@@ -36,3 +36,10 @@ summary: Just a hidden scratchpad.
 - In production build, let the ensure throw an ensure_exception. 
 	- Then, in the editor, when the game is still unstable, we will catch an error during whenever we step the cosmos or change some sensitive valuesa,
 	- then upon catching, we will save the last known correct version to hdd.
+
+- For continuous sounds, sound system should probably assume the same strategy as an inferred cache.
+
+- Local setup should record session live
+	- This is really important in the face of bugs.
+	- Or just get rid of test scene setup for now and let it by default launch a scene in editor that records inputs
+

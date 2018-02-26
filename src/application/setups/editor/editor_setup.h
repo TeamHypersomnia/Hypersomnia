@@ -9,6 +9,7 @@
 #include "game/organization/all_component_includes.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
+#include "game/detail/visible_entities.h"
 
 #include "view/viewables/all_viewables_defs.h"
 #include "view/viewables/viewables_loading_type.h"
@@ -35,14 +36,6 @@ namespace augs {
 	}
 }
 
-struct editor_popup {
-	std::string title;
-	std::string message;
-	std::string details;
-
-	bool details_expanded = false;
-};
-
 struct editor_player {
 	bool show = true;
 	bool paused = true;
@@ -61,15 +54,18 @@ class editor_setup : private current_tab_access_cache<editor_setup> {
 	using base = current_tab_access_cache<editor_setup>;
 	friend base;
 
-	double global_time_seconds = 0.0;
+	editor_significant signi;
+	editor_autosave autosave;
+	editor_recent_paths recent;
+	editor_settings settings;
+	editor_player player;
 
 	editor_destructor_input destructor_input;
-	editor_autosave autosave;
-	editor_settings settings;
+
+	double global_time_seconds = 0.0;
 
 	std::optional<editor_popup> current_popup;
 
-	editor_player player;
 	bool show_summary = true;
 	bool show_common_state = false;
 	bool show_entities = false;
@@ -82,10 +78,6 @@ class editor_setup : private current_tab_access_cache<editor_setup> {
 	std::vector<entity_guid> matching_go_to_entities;
 
 	const_entity_handle get_matching_go_to_entity() const;
-
-	editor_recent_paths recent;
-
-	editor_significant signi;
 	
 	entity_id hovered_entity;
 	entity_id held_entity;
@@ -127,6 +119,7 @@ class editor_setup : private current_tab_access_cache<editor_setup> {
 	std::future<std::optional<std::string>> open_file_dialog;
 	std::future<std::optional<std::string>> save_file_dialog;
 
+	void set_if_popup(const std::optional<editor_popup> p); 
 	void set_popup(const editor_popup);
 	
 	using path_operation = intercosm_path_op;

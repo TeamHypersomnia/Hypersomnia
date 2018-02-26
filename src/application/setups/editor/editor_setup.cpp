@@ -21,6 +21,11 @@
 #include "augs/readwrite/byte_file.h"
 #include "augs/readwrite/lua_file.h"
 
+void editor_setup::open_last_tabs(sol::state& lua) {
+	set_if_popup(::open_last_tabs(lua, signi));
+	base::refresh();
+}
+
 double editor_setup::get_audiovisual_speed() const {
 	return player.get_speed();
 }
@@ -100,36 +105,29 @@ void editor_setup::on_tab_changed() {
 	finish_rectangular_selection();
 }
 
-void editor_setup::set_popup(const editor_popup p) {
+void editor_setup::set_if_popup(const std::optional<editor_popup> p) {
 	current_popup = p;
+
+	if (p) {
+		const auto logged = typesafe_sprintf(
+			"%x\n%x\n%x", 
+			p->title, p->message, p->details
+		);
+
+		LOG(logged);
+
+		augs::save_as_text(LOG_FILES_DIR "last_editor_message.txt", logged);
+	}
+}
+
+void editor_setup::set_popup(const editor_popup p) {
+	set_if_popup(p);
 }
 
 void editor_setup::set_locally_viewed(const entity_id id) {
 	work().locally_viewed = id;
 	tab().panned_camera = std::nullopt;
 }
-
-std::optional<editor_popup> open_intercosm(intercosm& work, const intercosm_path_op op) {
-	if (op.path.empty()) {
-		return std::nullopt;
-	}
-
-	try {
-		work.open(op);
-	}
-	catch (const intercosm_loading_error err) {
-		editor_popup p;
-
-		p.title = err.title;
-		p.details = err.details;
-		p.message = err.message;
-
-		return p;
-	}
-
-	return std::nullopt;
-}
-
 
 editor_setup::editor_setup(
 	sol::state& lua
@@ -157,63 +155,6 @@ editor_setup::editor_setup(
 
 editor_setup::~editor_setup() {
 	autosave.save(destructor_input.lua, signi);
-}
-
-void editor_setup::open_last_tabs(sol::state& lua) {
-	ensure(signi.tabs.empty());
-	ensure(signi.works.empty());
-
-	try {
-		const auto opened_tabs = augs::load_from_lua_table<editor_saved_tabs>(lua, get_editor_tabs_path());
-		signi.tabs = opened_tabs.tabs;
-
-		if (!signi.tabs.empty()) {
-			/* Reload intercosms */
-
-			std::vector<tab_index_type> tabs_that_failed;
-
-			for (std::size_t i = 0; i < signi.tabs.size(); ++i) {
-				signi.works.emplace_back(std::make_unique<intercosm>());
-				
-				if (!signi.tabs[i].is_untitled()) {
-					/* 
-						This work was explicitly named.
-						First try to load an adjacent .unsaved file, if it exists.
-					*/
-
-					const auto unsaved_path = get_unsaved_path(signi.tabs[i].current_path);
-
-					if (const auto popup = open_intercosm(*signi.works.back(), { lua, unsaved_path })) {
-						if (const auto popup = open_intercosm(*signi.works.back(), { lua, signi.tabs[i].current_path })) {
-							set_popup(*popup);
-							tabs_that_failed.push_back(static_cast<tab_index_type>(i));
-						}
-					}
-				}
-				else {
-					/* 
-						This work was untitled, thus always written to in place, 
-						so it cannot have an "unsaved" neighbor.
-					*/
-					if (const auto popup = open_intercosm(*signi.works.back(), { lua, signi.tabs[i].current_path })) {
-						set_popup(*popup);
-						tabs_that_failed.push_back(static_cast<tab_index_type>(i));
-					}
-				}
-			}
-			
-			set_current_tab(opened_tabs.current_tab_index);
-
-			sort_range(tabs_that_failed);
-
-			for (const auto i : reverse(tabs_that_failed)) {
-				close_tab(i);
-			}
-		}
-	}
-	catch (...) {
-
-	}
 }
 
 void editor_setup::control(
@@ -562,10 +503,10 @@ void editor_setup::perform_custom_imgui(
 
 	if (has_current_tab()) {
 		if (show_summary) {
-			const auto summary_text = typesafe_sprintf("Summary - %x", tab().current_path); 
-			auto summary = scoped_window(summary_text.c_str(), &show_summary, ImGuiWindowFlags_AlwaysAutoResize);
+			auto summary = scoped_window("Summary", &show_summary, ImGuiWindowFlags_AlwaysAutoResize);
 
 			if (has_current_tab()) {
+				text(typesafe_sprintf("File path: %x", tab().current_path));
 				//text("Tick rate: %x/s", get_viewed_cosmos().get_solvable().get_steps_per_second()));
 				text("Cursor: %x", world_cursor_pos);
 				
@@ -1110,7 +1051,7 @@ void editor_setup::close_tab(const tab_index_type i) {
 	auto& tab_to_close = signi.tabs[i];
 
 	if (tab_to_close.has_unsaved_changes()) {
-		set_popup({ "Nie", "Nie", "Nie" });
+		set_popup({ "Error", "Nie", "Nie" });
 		return;
 	}
 		

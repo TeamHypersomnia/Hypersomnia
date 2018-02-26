@@ -32,6 +32,15 @@ The editor keeps a history of changes, thanks to which an author can **undo** or
 
 ## Dialogs
 
+### Opened entities
+- They will be opened in tabs via quick searches
+	- will enable us to quickly copy around things
+	- textbox focus might be lost though
+- Tab/ctrl+tab, ctrl+k/j, c+w work
+	- conflict with editor tabs
+- shift+k/j move the tab?
+	- would be best if they could move to a field
+
 ### Go to all
 
 Default shortcut: ``ctrl + ,``.

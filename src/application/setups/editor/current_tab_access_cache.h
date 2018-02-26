@@ -15,10 +15,16 @@ protected:
 	void refresh() {
 		auto& self = *static_cast<derived*>(this);
 
-		if (self.signi.current_index != static_cast<tab_index_type>(-1)) {
-			current_tab = &self.signi.tabs[self.signi.current_index];
-			current_work = self.signi.works[self.signi.current_index].get();
+		auto& tabs = self.signi.tabs;
+		auto& works = self.signi.works;
+
+		if (tabs.empty() || self.signi.current_index == static_cast<tab_index_type>(-1)) {
+			unset_current_tab();
+			return;
 		}
+
+		current_tab = &tabs[self.signi.current_index];
+		current_work = works[self.signi.current_index].get();
 	}
 
 	void set_current_tab(const tab_index_type i) {

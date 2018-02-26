@@ -206,3 +206,6 @@ we consider whole type overrides too complex architeciturally:
 
 - fix disappearing wandering pixels?
 	- we weren't initializing them properly
+
+- Fix open current directory for editor in linux
+
