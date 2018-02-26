@@ -523,7 +523,7 @@ int work(const int argc, const char* const * const argv) try {
 			bool should = true;
 
 			on_specific_setup([&](editor_setup& setup) {
-				if (setup.is_paused()) {
+				if (setup.is_normal_mode()) {
 					should = false;
 				}
 			});
@@ -1670,7 +1670,7 @@ int work(const int argc, const char* const * const argv) try {
 			else {
 				if (should_draw_our_cursor) {
 					on_specific_setup([&](editor_setup& setup) {
-						if (setup.is_paused()) {
+						if (setup.is_normal_mode()) {
 							get_drawer().cursor(necessary_atlas_entries, assets::necessary_image_id::GUI_CURSOR, cursor_drawing_pos, white);
 						}
 					});

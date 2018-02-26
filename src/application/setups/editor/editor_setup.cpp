@@ -54,13 +54,13 @@ void editor_setup::unhover() {
 	hovered_entity = {};
 }
 
-bool editor_setup::is_paused() const {
+bool editor_setup::is_normal_mode() const {
 	return player.paused;
 }
 
 std::optional<camera_cone> editor_setup::get_custom_camera() const {
-	auto normal_panning = [this]() -> std::optional<camera_cone> { 
-		if (has_current_tab() && is_paused()) {
+	auto maybe_panning = [this]() -> std::optional<camera_cone> { 
+		if (has_current_tab() && is_normal_mode()) {
 			if (tab().panned_camera) {
 				return tab().panned_camera;
 			}
@@ -69,26 +69,27 @@ std::optional<camera_cone> editor_setup::get_custom_camera() const {
 		return std::nullopt;
 	};
 
-	if (has_current_tab() && is_paused()) {
+	if (has_current_tab() && is_normal_mode()) {
 		if (const auto match = get_matching_go_to_entity()) {
-			auto panning = normal_panning();
+			camera_cone centered_on_match;
 
-			if (!panning) {
-				panning = camera_cone();
+			if (const auto panning = maybe_panning()) {
+				/* Propagate zoom from custom panning */
+				centered_on_match = *panning;
 			}
 
 			if (const auto transform = match.find_logic_transform()) {
-				panning->transform.pos = transform->pos;
+				centered_on_match.transform.pos = transform->pos;
 			}
 			else {
 				LOG("WARNING: transform of %x could not be found.", match);
 			}
 
-			return panning;
+			return centered_on_match;
 		}
 	}
 
-	return normal_panning();
+	return maybe_panning();
 }
 
 const_entity_handle editor_setup::get_matching_go_to_entity() const {

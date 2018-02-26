@@ -241,7 +241,7 @@ public:
 	void reveal_in_explorer();
 
 	void unhover();
-	bool is_paused() const;
+	bool is_normal_mode() const;
 	std::optional<camera_cone> get_custom_camera() const; 
 
 	template <class F>
