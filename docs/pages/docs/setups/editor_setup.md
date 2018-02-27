@@ -38,7 +38,7 @@ the editor would later load that unrelated file instead of your save.
 
 ## Modes
 
-- Normal mode - this is the default mode that the editor is put in when it is launched. 
+- Editing mode - this is the default mode that the editor is put in when it is launched. 
 	- The game world is frozen, allowing to perform precise operations on all entities and other intercosm data.
 	- It keeps track of history of changes.
 - Gameplay mode - this is when you start playing the game controlling the entity you have earlier chosen for this.
@@ -114,7 +114,7 @@ When creating a new entity flavour, the editor should add some recommended invar
 In **gameplay mode**, the camera always behaves in accordance with the game mechanics,
 e.g. it is centered around the character and panned with respect to the crosshair's position.
 
-In **normal mode**, the camera's position can panned by:
+In **editing mode**, the camera's position can panned by:
 
 - Holding the Right Mouse Button and moving the mouse around.
 - Pressing the arrow keys.

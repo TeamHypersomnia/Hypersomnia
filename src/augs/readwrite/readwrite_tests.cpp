@@ -12,6 +12,14 @@
 
 static const auto path = GENERATED_FILES_DIR "test_byte_readwrite.bin";
 
+TEST_CASE("Filesystem test") {
+	augs::save_as_text(path, "");
+	REQUIRE(augs::file_exists_and_non_empty(path));
+	augs::remove_file(path);
+	REQUIRE(!augs::file_exists_and_non_empty(path));
+	REQUIRE(!augs::file_exists_and_non_empty(path));
+}
+
 template <class T>
 static void report(const T& v, const T& reloaded) {
 	if constexpr(can_stream_left_v<std::ostringstream, T>) {

@@ -17,8 +17,13 @@ void save_log_and_terminate() {
 
 	augs::open_text_editor(failure_log_path.string());
 
+#if !IS_PRODUCTION_BUILD
+	/* If we're not in production, trigger a debugger break so that we know the trace */
 #if PLATFORM_WINDOWS
 	__debugbreak();
+#else
+	/* On linux we can just script it to always break here */
+#endif
 #endif
 
 	/* 

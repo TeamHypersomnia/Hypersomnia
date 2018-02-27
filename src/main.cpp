@@ -523,7 +523,7 @@ int work(const int argc, const char* const * const argv) try {
 			bool should = true;
 
 			on_specific_setup([&](editor_setup& setup) {
-				if (setup.is_normal_mode()) {
+				if (setup.is_editing_mode()) {
 					should = false;
 				}
 			});
@@ -1655,9 +1655,9 @@ int work(const int argc, const char* const * const argv) try {
 					get_drawer().cursor(necessary_atlas_entries, augs::imgui::get_cursor<assets::necessary_image_id>(), cursor_drawing_pos, white);
 				}
 			}
-			else if (/* we_drew_some_menu */
-				menu_chosen_cursor != assets::necessary_image_id::INVALID
-			) {
+			else if (menu_chosen_cursor != assets::necessary_image_id::INVALID) {
+				/* We must have drawn some menu */
+
 				if (should_draw_our_cursor) {
 					get_drawer().cursor(necessary_atlas_entries, menu_chosen_cursor, cursor_drawing_pos, white);
 				}
@@ -1670,7 +1670,7 @@ int work(const int argc, const char* const * const argv) try {
 			else {
 				if (should_draw_our_cursor) {
 					on_specific_setup([&](editor_setup& setup) {
-						if (setup.is_normal_mode()) {
+						if (setup.is_editing_mode()) {
 							get_drawer().cursor(necessary_atlas_entries, assets::necessary_image_id::GUI_CURSOR, cursor_drawing_pos, white);
 						}
 					});

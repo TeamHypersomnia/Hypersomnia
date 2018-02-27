@@ -54,13 +54,13 @@ void editor_setup::unhover() {
 	hovered_entity = {};
 }
 
-bool editor_setup::is_normal_mode() const {
+bool editor_setup::is_editing_mode() const {
 	return player.paused;
 }
 
 std::optional<camera_cone> editor_setup::get_custom_camera() const {
 	auto maybe_panning = [this]() -> std::optional<camera_cone> { 
-		if (has_current_tab() && is_normal_mode()) {
+		if (has_current_tab() && is_editing_mode()) {
 			if (tab().panned_camera) {
 				return tab().panned_camera;
 			}
@@ -69,7 +69,7 @@ std::optional<camera_cone> editor_setup::get_custom_camera() const {
 		return std::nullopt;
 	};
 
-	if (has_current_tab() && is_normal_mode()) {
+	if (has_current_tab() && is_editing_mode()) {
 		if (const auto match = get_matching_go_to_entity()) {
 			camera_cone centered_on_match;
 
@@ -221,7 +221,7 @@ void editor_setup::save_current_tab_to(const path_operation op) {
 void editor_setup::fill_with_minimal_scene(sol::state& lua) {
 #if BUILD_TEST_SCENES
 	if (has_current_tab()) {
-		work().make_test_scene(lua, { true, 60 } );
+		work().make_test_scene(lua, { true, 144 } );
 
 		clear_all_selections();
 	}
@@ -231,7 +231,7 @@ void editor_setup::fill_with_minimal_scene(sol::state& lua) {
 void editor_setup::fill_with_test_scene(sol::state& lua) {
 #if BUILD_TEST_SCENES
 	if (has_current_tab()) {
-		work().make_test_scene(lua, { false, 60 } );
+		work().make_test_scene(lua, { false, 144 } );
 
 		clear_all_selections();
 	}

@@ -13,19 +13,6 @@ struct changed_field_record {
 	// END GEN INTROSPECTOR
 };
 
-struct add_component_command {
-	// GEN INTROSPECTOR struct add_component_command 
-	unsigned component_index = static_cast<unsigned>(-1);
-	// END GEN INTROSPECTOR
-};
-
-struct remove_component_command {
-	// GEN INTROSPECTOR struct remove_component_command 
-	unsigned component_index = static_cast<unsigned>(-1);
-	std::vector<std::byte> removed_content;
-	// END GEN INTROSPECTOR
-};
-
 struct change_component_command {
 	// GEN INTROSPECTOR struct change_component_command
 	unsigned component_index = static_cast<unsigned>(-1);
@@ -45,10 +32,7 @@ struct delete_entity_command {
 
 struct existing_entity_command {
 	using op_type = std::variant<
-		add_component_command,
 		change_component_command,
-		remove_component_command,
-
 		duplicate_entity_command,
 		delete_entity_command
 	>;
