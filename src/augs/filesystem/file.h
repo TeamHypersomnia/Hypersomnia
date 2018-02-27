@@ -82,6 +82,15 @@ namespace augs {
 		return buffer.str();
 	}
 
+	inline bool file_exists_and_non_empty(const path_type& path) {
+		try {
+			return file_to_string(path).size() > 0;
+		}
+		catch(...) {
+			return false;
+		}
+	}
+
 	template <class S>
 	void save_as_text(const path_type& path, const S& text) {
 		auto out = with_exceptions<std::ofstream>();
