@@ -78,6 +78,10 @@ The textual content used in the context menus is found in ``editor/help/*.txt`` 
 - shift+k/j move the tab?
 	- would be best if they could move to a field
 
+### Viewables
+
+- Contains a summary of all paths
+
 ### Go to entity
 
 Default shortcut: ``/``.

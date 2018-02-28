@@ -5,6 +5,9 @@ permalink: todo_disregarded
 summary: Just a hidden scratchpad.
 ---
 
+- fix filesystem design to have tries instead of file_exists
+	- disregarded because ours is I guess a common technique
+
 - immutable (const) fields within component aggregate
 	- applicable components: type, guid
 	- applicable: quick invariant copies

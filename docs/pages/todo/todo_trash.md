@@ -478,3 +478,67 @@ When we do "get_children_of" in a relational mixin, we can ensure that the entit
 Memory is somewhat safe because it can only grow as far as the children grow.
 		- Concern could be raised becasue that would mean that, after reinference, that cache would be drastically different. However, we make no guarantee of 0% reinference error. Functionally, the parent cache with dead parent id is equal to no cache. The code, however, will be simpler.
 			- We will save that correction for later though.
+
+### Add a component
+
+- Stores the component index.
+- Removes the component on undo.
+    - This must obviously take proper measures to update processing lists and whatnot.
+
+### Remove a component
+
+- Stores the component index and the byte content.
+- Adds the component on undo with the previous byte content.
+
+	- how do we implement simple testbed fill?
+		- overall support for other paths
+		- %GAME_CONTENT% variable
+			- if it is going to resolve to "content" then we might just as well write "content"
+			- we're anyway not going to specify full paths and we want the map to be able to be read anywhere
+			- so we must have a prioritization scheme, we first look in game's pwd, later in the map's dir
+- proposed solution: .int + .tab + .autosave
+	- con: a lot of files, **but that's not really a con**
+		- because we will anyway have the image and sound files separate
+			- because we want to advocate customizability and own versions
+	- .autosave is guaranteed to always have both
+	- .tab has history etc
+	- later on saving perhaps more files could come into existence, like ".ruleset"
+		- for plots and/or arenas
+	- manual saving updates all other files and then purges autosave
+	- we assume the editor is supposed to only ever work on int files as subjects
+		- so we avoid some shenaningans with importing and exporting ints, it will just be for lua
+- Filetype design
+	- Saving should also write the history to disk.
+	- It would be best if the unsaved file were either separate or just be one, maybe called "autosave".
+		- Notice: since on autosave, we're writing all files, we could as well hold a single file.
+			- Could just be a single blob held somewhere in cache.
+			- Most of the time we will anyways edit just a single world.
+			- We could name it "session".
+	- Solution: separate .tab, .int and .history files 
+		- Con: more checks for file existence
+		- Con: a lot of files on disk
+		- Pro? easier design on the side of code? possibly better separation and correspondence of structs and files
+		- Pro: on saving, everything immediately relevant is already exported
+		- Editor could create a folder for files
+			- check how VS did it, maybe we could likewise use ranger?
+			- it is nice though to have safety for extensions while writing, e.g. only allow particular extension as output
+				- prevents accidents
+			- I guess only intercosm files are important anyway.
+				- We should also only allow lua imports and exports, without working explicitly on them.
+		- Maybe we should ditch unsaved works and always save because it will only complicate things otherwise
+			- Even Vim doesn't have the concept of untitled files
+			- let alone a heavy editor like this should
+	- Solution: .tab and .tab.unsaved
+		- Pro: just one file for whole workspace, export specific things for the public
+		- .tab is always binary
+		- also contains binary history
+		- can then export to .int or .lua
+		
+	- ``rules/``
+		- ``rules/my.deathmatch`` - can be created and modified in editor, contains your own rules for a deathmatch, e.g. spawn points or identificators of flavours of guns that are available to each team, their costs as well
+		- ``rules/duel.deathmatch`` - same as above but if you want to have specific spawnpoints for 1v1 you could define a separate file
+		- ``rules/two_bombs.bombdefuse`` - setup for a bomb defusal game
+		- ``rules/local.test`` with locally viewed entity for viewing in testbed and in the editor itself.
+			- We could just have an entity_id locally viewed in the intercosm but it will be nice to start testing rulesets from such a simple example.
+			- Editor will ask if a test ruleset should be created for viewing or always do so automatically when selecting a controlled entity.
+				- It might automatically adjust other rulesets, or just the one currently selected.

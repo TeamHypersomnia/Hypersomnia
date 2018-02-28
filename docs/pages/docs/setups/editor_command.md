@@ -13,11 +13,11 @@ summary: |
 As for determinism of the editor commands, it is debatable if it must be as strict as during networking.
  
 Those approaches to command implementation have been considered so far:
-1. With each command, store a snapshot of both the solvable's entire [significant state](cosmos_solvable#significant) and [inferred state](cosmos_solvable#inferred). Additionally, store only the new value for redoing, as undoing is already possible thanks to the snapshot. 
+1. With each command, store a snapshot of both the solvable's entire [significant state](cosmos_solvable#significant) and [inferred state](cosmos_solvable#inferred).
     - Maximum determinism.
     - Easiest to get right without bugs.
     - Unacceptable memory and processing performance.
-2. With each command, store a snapshot of the solvable's entire [significant](cosmos_solvable#significant) state. Additionally, store only the bytes of the new value for redoing, as undoing is already possible thanks to the snapshot. [Reinfer](reinference) on undo.
+2. With each command, store a snapshot of the solvable's entire [significant](cosmos_solvable#significant) state. [Reinfer](reinference) on undo.
     - Slightly less determinism.
         - If the author has done undo and then redo, their further actions and recordings might result in a different cosmos than if they would have stayed on the current change.
     - Unacceptable memory and processing performance.
@@ -27,10 +27,11 @@ Those approaches to command implementation have been considered so far:
         - Solved if both redos and undos are reinferred completely.
     - Memory and processing performance is ok. 
     - If we accidentally forget to infer something, some state might be corrupted and even result in a crash.
+		- (Chosen approach) For now, since the cosmoi will be relatively small, **reinfer the entire cosmos** upon change to any sensitive field.
 
 Further: commands, whether they are redone or executed for the first time, should do so via the same method: redo.
-This wouldn't be acceptable only if the redo performance was for some reason unacceptable.
-This will greatly reduce code duplication.
+- This wouldn't be acceptable only if the redo performance was for some reason unacceptable.
+- This will greatly reduce code duplication.
 
 ### State consistency
 
@@ -48,10 +49,9 @@ For other components, it is considerably harder.
 Apart from consistency itself, care must be taken so that whatever field is exposed to the user: 
 
 - There exists no value that would crash the application.
-    - In particular, something must be done about processing lists which assume that a relevant component is always existent within an entity.
+    - In particular, something must be done about getters that assume that relevant state will be present, e.g. get_logic_transform.
         - Theoretically, replacing ``get`` with ``find`` should not considerably impair performance.
         - On the other hand, buggy behaviour might be more hard to spot and debug if we can't make basic assumptions in the code.
-        - **It might then be advisable to, once a component is removed or added, make proper changes to state, e.g. the processing lists.**
 - There exists no value that, shortly after setting it and playing the cosmos, the game becomes unplayable, or the state becomes completely broken.
     - Efforts can be made, but this is virtually impossible to ensure. In any case, the author can always undo the problematic change.
 
@@ -107,20 +107,13 @@ If you are not a programmer and only intend to use the editor to author actual c
 
 - Stores the previous byte content of all components.
 
+### Paste entities
+- Makes sense since we might want to cut something from testbed for example
+- Will need to have whole entity content, just like delete command (just the other way around)
+
 ### Duplicate entity
 
 - Stores nothing?
-
-### Add a component
-
-- Stores the component index.
-- Removes the component on undo.
-    - This must obviously take proper measures to update processing lists and whatnot.
-
-### Remove a component
-
-- Stores the component index and the byte content.
-- Adds the component on undo with the previous byte content.
 
 ### Change of a value
 
