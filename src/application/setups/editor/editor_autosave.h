@@ -7,13 +7,11 @@
 
 struct editor_significant;
 
-std::optional<editor_popup> open_intercosm(intercosm& work, const intercosm_path_op op);
-
 template <class derived>
-class current_tab_access_cache;
+class current_access_cache;
 class editor_setup;
 
-std::optional<editor_popup> open_last_tabs(
+void open_last_folders(
 	sol::state& lua,
 	editor_significant& signi
 );

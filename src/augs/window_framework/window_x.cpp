@@ -590,51 +590,56 @@ xcb_ewmh_init_atoms_replies(&EWMH, EWMHCookie, NULL);
 		}
 	}
 
-	const auto temp_file_with_result_path = GENERATED_FILES_DIR "last_file_path.txt";
+	static std::optional<std::string> read_chosen_path(const augs::path_type& script_path) {
+		const auto& temp_result = GENERATED_FILES_DIR "last_file_path.txt";
 
-	std::optional<std::string> window::open_file_dialog(
-		const std::vector<file_dialog_filter>& filters,
-		std::string custom_title
-	) const {
-		const auto script_path = "scripts/unix/open_file.local";
+		try {
+			const auto result = file_to_string(temp_result);
+			remove_file(temp_result);
+			return result;
+		}
+		catch (augs::ifstream_error) {
+			LOG("Error: %x did not produce %x", script_path, temp_result);
+			return std::nullopt;
+		}
+	}
 
+	static std::optional<std::string> choose_path(const augs::path_type& script_path) {
 		if (!file_exists(script_path)) {
 			return std::nullopt;
 		}
 
 		augs::shell(script_path);
+		return read_chosen_path(script_path);
+	}
 
-		const auto result_path = temp_file_with_result_path;
-
-		if (file_exists(result_path)) {
-			const auto result = file_to_string(result_path);
-			remove_file(result_path);
-			return result;
-		}
-
-		return std::nullopt;
+	std::optional<std::string> window::open_file_dialog(
+		const std::vector<file_dialog_filter>& filters,
+		const std::string& custom_title
+	) const {
+		return choose_path("scripts/unix/open_file.local");
 	}
 
 	std::optional<std::string> window::save_file_dialog(
 		const std::vector<file_dialog_filter>& filters,
-		std::string custom_title
+		const std::string& custom_title
 	) const {
-		const auto script_path = "scripts/unix/open_file.local";
+		return choose_path("scripts/unix/save_file.local");
+	}
 
-		if (!file_exists(script_path)) {
-			return std::nullopt;
+	std::optional<std::string> window::choose_directory_dialog(
+		const std::string& custom_title
+	) const {
+		return choose_path("scripts/unix/choose_directory.local");
+	}
+
+	void window::reveal_in_explorer(const augs::path_type& p) const {
+		const auto script_path = "scripts/unix/select_file.local";
+
+		if (!augs::file_exists(script_path)) {
+			return;
 		}
 
-		augs::shell(script_path);
-
-		const auto result_path = temp_file_with_result_path;
-
-		if (file_exists(result_path)) {
-			const auto result = file_to_string(result_path);
-			remove_file(result_path);
-			return result;
-		}
-
-		return std::nullopt;
+		augs::shell(typesafe_sprintf("%x %x", script_path, p.string()));
 	}
 }

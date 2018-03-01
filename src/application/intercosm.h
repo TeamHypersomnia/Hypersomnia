@@ -39,8 +39,14 @@ struct intercosm {
 	void make_test_scene(sol::state&, test_scene_settings);
 #endif
 
-	void open(const intercosm_path_op);
+	void load(const intercosm_path_op);
 	void save(const intercosm_path_op) const;
+
+	void load_as_int(const augs::path_type&);
+	void save_as_int(const augs::path_type&) const;
+
+	void load_as_lua(const intercosm_path_op);
+	void save_as_lua(const intercosm_path_op) const;
 
 	auto make_logic_step_input(const cosmic_entropy& entropy) {
 		return logic_step_input{ world, entropy };	

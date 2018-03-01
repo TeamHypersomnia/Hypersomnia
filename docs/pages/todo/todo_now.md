@@ -7,9 +7,8 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
-- move firing_engine_sound and the like from component to invariant
-
 - tab names will be Project1, Project2 etc
+	- basically directory names
 	- without the extension cause it's useless
 
 - game mode property is a part of game mode definition
@@ -31,10 +30,6 @@ summary: Just a hidden scratchpad.
 		- still can be changed and customized, just saying we'll make UI for this in editor and save/load ops.
 	- things like round time, c4 time, they can be specified completely regardless of the intercosm contents.
 		- thus they should be textual configs, for which we can nevertheless provide some GUIs.
-
-- rename locally_viewed to local_test_subject
-	- even choreographic data will have their own viewers specified
-	- useful to always have one
 
 - Each game mode definition file will be named after its stem, and the extension will determine its type
 	- **(Implemented first)** struct team_deathmatch
@@ -73,7 +68,11 @@ summary: Just a hidden scratchpad.
 	- ``ProjectName.tab`` file - the editor tab metadata. History, current camera panning, all selected entities. Designed to let you start where you left off after restarting the editor.
 		- **It does not store paths.** 
 	- ``ProjectName.int`` file - the meat of the map - all entity flavours (e.g. ak, pistol, sword,  confetti grenade) , floors, obstacles, decorations, also relative paths to used images, sounds etc.
-	- ``ProjectName.autosave`` file - a binary blob that contains all of the above that has not yet been saved.
+	- ``autosave/`` - a directory with all unsaved files.
+		- most intuitive solution
+		- it's a little like git index
+		- we won't have to create templates and will be able to reuse the logic easily
+			- cause it's just like a different project
 	- ``game_modes/`` - directory for all game modes. Editor iterates recursively through this directory and loads them into std::vector<std::pair<std::string, team_deathmatch>>.
 - editor_tabs maintains a list of folders only.
 - on saving an untitled work, we will have to move the folder.
@@ -95,7 +94,7 @@ summary: Just a hidden scratchpad.
 			- Are you sure you want to overwrite 3 file(s)
 				/home/pbc/x.int
 				/home/pbc/x.hyproj
-				/home/pbc/x.autosave
+				/home/pbc/autosave/x.int
 			?	
 			- (non-existent files and files with 0 size will be excluded)
 			- a different popup design will be in order
@@ -123,13 +122,23 @@ summary: Just a hidden scratchpad.
 - autosave on focus lost
 - autosave should also not repeat itself when there is nothing more to save
 
+- rename locally_viewed to local_test_subject
+	- even choreographic data will have their own viewers specified
+	- useful to always have one
+
+- switching tabs with entities should always refocus on the same kind of property
+
 - ensure should throw so that the editor destructor can perform autosave
 	- for cores, just emit them programatically on unix
 	- and on windows it makes little sense to abort there, just debugbreak and throw.
 
-- implement constrained handles and entity ids
-	- thanks to that we can avoid problems with having many entity types and enlarging the dispatch code
-- inventory slot handle item getters should return handles that guarantee presence of an item
-- switching tabs with entities should always refocus on the same kind of property
-
 - "unique" naming for unique sprite decorations et cetera
+- move firing_engine_sound and the like from component to invariant
+
+- make reveal in explorer work for both files and folders
+- rename "tab()" to "view()"
+- rename augs::ifstream_error to augs::file_open_error
+- rename "file_exists" to "path_exists"
+	- cause it also works for dirs
+- rename "significant" to "persistent" and remove the mention of "transferred through the network"editor_tab_signi
+	- because "replicated" implies being transferred

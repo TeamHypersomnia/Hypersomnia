@@ -55,52 +55,40 @@ void intercosm::make_test_scene(
 }
 #endif
 
-static auto get_effective_extension(const augs::path_type& file_path) {
-	const auto file_extension = file_path.extension();
-
-	if (file_extension == ".unsaved") {
-		/* Eat the .unsaved suffix to get the effective extension */
-		return augs::path_type(file_path).replace_extension("").extension();
-	}
-
-	return file_extension;
-}
-
 void intercosm::save(const intercosm_path_op op) const {
-	const auto file_extension = op.path.extension();
-	const auto effective_extension = get_effective_extension(op.path);
+	const auto effective_extension = op.path.extension();
 
 	if (effective_extension == ".int") {
-		augs::save_as_bytes(*this, op.path);
+		save_as_int(op.path);
 	}
 	else if (effective_extension == ".lua") {
-		augs::save_as_lua_table(op.lua, *this, op.path);
-	}
-
-	if (const auto unneeded_backup_path = augs::path_type(op.path) += ".unsaved";
-		file_extension != ".unsaved" && augs::file_exists(unneeded_backup_path)
-	) {
-		/* Clear the backup file */
-		augs::remove_file(unneeded_backup_path);
+		save_as_lua(op);
 	}
 }
 
-void intercosm::open(const intercosm_path_op op) {
+void intercosm::load(const intercosm_path_op op) {
+	const auto effective_extension = op.path.extension();
+
+	if (effective_extension == ".int") {
+		load_as_int(op.path);
+	}
+	else if (effective_extension == ".lua") {
+		load_as_lua(op);
+	}
+}
+
+void intercosm::save_as_lua(const intercosm_path_op op) const {
+	augs::save_as_lua_table(op.lua, *this, op.path);
+}
+
+void intercosm::load_as_lua(const intercosm_path_op op) {
 	const auto display_path = augs::to_display_path(op.path);
 
 	try {
-		const auto file_extension = op.path.extension();
-		const auto effective_extension = get_effective_extension(op.path);
-
 		augs::recursive_clear(version);
 		version.commit_number = 0;
 
-		if (effective_extension == ".int") {
-			augs::load_from_bytes(*this, op.path);
-		}
-		else if (effective_extension == ".lua") {
-			augs::load_from_lua_table(op.lua, *this, op.path);
-		}
+		augs::load_from_lua_table(op.lua, *this, op.path);
 
 		/* TODO: Check version integrity */
 
@@ -109,14 +97,14 @@ void intercosm::open(const intercosm_path_op op) {
 	catch (const cosmos_loading_error err) {
 		throw intercosm_loading_error {
 			"Error",
-			typesafe_sprintf("Failed to load %x.\nFile(s) might be corrupt.", display_path),
+			typesafe_sprintf("Failed to load %x.\nFile might be corrupt.", display_path),
 			err.what()
 		};
 	}
 	catch (const augs::stream_read_error err) {
 		throw intercosm_loading_error{
 			"Error",
-			typesafe_sprintf("Failed to load %x.\nFile(s) might be corrupt.", display_path),
+			typesafe_sprintf("Failed to load %x.\nFile might be corrupt.", display_path),
 			err.what()
 		};
 	}
@@ -130,7 +118,47 @@ void intercosm::open(const intercosm_path_op op) {
 	catch (const augs::ifstream_error err) {
 		throw intercosm_loading_error {
 			"Error",
-			typesafe_sprintf("Failed to load %x.\nFile(s) might be missing.", display_path),
+			typesafe_sprintf("Failed to load %x.\nFile might be missing.", display_path),
+			err.what()
+		};
+	}
+}
+
+void intercosm::save_as_int(const augs::path_type& path) const {
+	augs::save_as_bytes(*this, path);
+}
+
+void intercosm::load_as_int(const augs::path_type& path) {
+	const auto display_path = augs::to_display_path(path);
+
+	try {
+		augs::recursive_clear(version);
+		version.commit_number = 0;
+
+		augs::load_from_bytes(*this, path);
+
+		/* TODO: Check version integrity */
+
+		version = hypersomnia_version();
+	}
+	catch (const cosmos_loading_error err) {
+		throw intercosm_loading_error {
+			"Error",
+			typesafe_sprintf("Failed to load %x.\nFile might be corrupt.", display_path),
+			err.what()
+		};
+	}
+	catch (const augs::stream_read_error err) {
+		throw intercosm_loading_error{
+			"Error",
+			typesafe_sprintf("Failed to load %x.\nFile might be corrupt.", display_path),
+			err.what()
+		};
+	}
+	catch (const augs::ifstream_error err) {
+		throw intercosm_loading_error {
+			"Error",
+			typesafe_sprintf("Failed to load %x.\nFile might be missing.", display_path),
 			err.what()
 		};
 	}

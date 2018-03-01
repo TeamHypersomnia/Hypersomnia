@@ -1,3 +1,5 @@
+#include "augs/filesystem/directory.h"
+
 #include "application/intercosm.h"
 
 #include "application/setups/editor/editor_autosave.h"
@@ -10,149 +12,98 @@ void editor_autosave::save(
 	sol::state& lua,
 	const editor_significant& signi
 ) const {
-	editor_saved_tabs saved_tabs;
+	{
+		editor_last_folders last_folders;
+		last_folders.current_index = signi.current_index;
+		last_folders.paths.reserve(signi.folders.size());
 
-	const auto& tabs = signi.tabs;
-	const auto& works = signi.works;
-
-	saved_tabs.tabs = tabs;
-	saved_tabs.current_tab_index = signi.current_index;
-
-	for (std::size_t i = 0; i < tabs.size(); ++i) {
-		const auto& t = tabs[i];
-		const auto& w = *works[i];
-
-		if (t.is_untitled()) {
-			/* The work is untitled anyway, so we save it in place. */ 
-
-			const auto saving_path = t.current_path;
-			w.save({ lua, saving_path });
+		for (const auto& f : signi.folders) {
+			last_folders.paths.push_back(f.current_path);
 		}
-		else if (t.has_unsaved_changes()) {
-			/* 
-				The work was explicitly saved at some point, so create a backup file with yet unsaved changes. 
-				The .unsaved file will be prioritized when loading.
-			*/ 
 
-			auto extension = t.current_path.extension();
-			const auto saving_path = augs::path_type(t.current_path).replace_extension(extension += ".unsaved");
-			w.save({ lua, saving_path });
-		}
+		augs::save_as_lua_table(lua, last_folders, get_last_folders_path());
 	}
 
-	augs::save_as_lua_table(lua, saved_tabs, get_editor_tabs_path());
+	for (const auto& f : signi.folders) {
+		if (!f.has_unsaved_changes()) {
+			/* If everything's been written, no point in repeating ourselves */
+			continue;
+		}
+
+		if (f.is_untitled()) {
+			/* The work is untitled anyway, so we save it in place. */ 
+			f.save_folder();
+		}
+		else {
+			auto autosave_path = f.get_autosave_path();
+			augs::create_directories(autosave_path += "/");
+			f.save_folder(autosave_path, ::get_project_name(f.current_path));
+		}
+	}
 }
 
-std::optional<editor_popup> open_last_tabs(
+void open_last_folders(
 	sol::state& lua,
 	editor_significant& signi
 ) {
-	ensure(signi.tabs.empty());
-	ensure(signi.works.empty());
+	ensure(signi.folders.empty());
 
 	std::vector<editor_popup> failures;
 
 	try {
-		auto opened_tabs = augs::load_from_lua_table<editor_saved_tabs>(lua, get_editor_tabs_path());
+		const auto opened_folders = augs::load_from_lua_table<editor_last_folders>(lua, get_last_folders_path());
 
-		if (!opened_tabs.tabs.empty()) {
-			/* Reload intercosms */
+		for (const auto& real_path : opened_folders.paths) {
+			try {
+				try {
+					auto new_folder = editor_folder(real_path);
+					const auto autosave_path = new_folder.get_autosave_path();
+					new_folder.load_folder(autosave_path, ::get_project_name(real_path));
+					signi.folders.emplace_back(std::move(new_folder));
 
-			for (std::size_t i = 0; i < opened_tabs.tabs.size(); ++i) {
-				auto new_intercosm_ptr = std::make_unique<intercosm>();
-				auto& new_intercosm = *new_intercosm_ptr;
+					if (!augs::file_exists(real_path)) {
+						const auto display_autosave = augs::to_display_path(autosave_path);
+						const auto display_real = augs::to_display_path(real_path);
 
-				if (!opened_tabs.tabs[i].is_untitled()) {
-					/* 
-						This work was explicitly named.
-						First try to load an adjacent .unsaved file, if it exists.
-					*/
+						const auto message = typesafe_sprintf(
+							"Found the autosave file %x,\nbut there is no %x!\nSave the file immediately!",
+							display_autosave,
+							display_real
+						);
 
-					const auto maybe_unsaved_path = get_unsaved_path(opened_tabs.tabs[i].current_path);
-
-					const auto real_path = opened_tabs.tabs[i].current_path;
-
-					if (const auto popup = open_intercosm(new_intercosm, { lua, maybe_unsaved_path })) {
-						if (const auto popup = open_intercosm(new_intercosm, { lua, real_path })) {
-							failures.push_back(*popup);
-							continue;
-						}
-					}
-					else {
-						if (!augs::file_exists(real_path)) {
-							const auto display_unsaved = augs::to_display_path(maybe_unsaved_path);
-							const auto display_real = augs::to_display_path(real_path);
-
-							const auto message = typesafe_sprintf(
-								"Found the autosave file %x,\nbut there is no %x!\nSave the file immediately!",
-								display_unsaved,
-								display_real
-						   	);
-
-							failures.push_back({"Warning", message, ""});
-						}
+						failures.push_back({"Warning", message, ""});
 					}
 				}
-				else {
-					/* 
-						This work was untitled, thus always written to in place, 
-						so it cannot have an "unsaved" neighbor.
-					*/
-					const auto untitled_path = opened_tabs.tabs[i].current_path;
-
-					if (const auto popup = open_intercosm(new_intercosm, { lua, untitled_path })) {
-						failures.push_back(*popup);
-						continue;
-					}
+				catch (editor_popup p) {
+					auto new_folder = editor_folder(real_path);
+					new_folder.load_folder();
+					signi.folders.emplace_back(std::move(new_folder));
 				}
-
-				signi.tabs.emplace_back(std::move(opened_tabs.tabs[i]));
-				signi.works.emplace_back(std::move(new_intercosm_ptr));
 			}
-
-			if (signi.tabs.empty()) {
-				signi.current_index = static_cast<tab_index_type>(-1);
+			catch (editor_popup p) {
+				failures.push_back(p);
 			}
-			else {
-				/* The tab that was originally specified as current could have failed to load */
+		}
 
-				signi.current_index = std::min(
-					static_cast<tab_index_type>(signi.tabs.size()) - 1,
-					opened_tabs.current_tab_index
-				);
-			}
+		if (signi.folders.empty()) {
+			signi.current_index = static_cast<folder_index>(-1);
+		}
+		else {
+			/* The folder that was originally specified as current could have failed to load */
+
+			signi.current_index = std::min(
+				static_cast<folder_index>(signi.folders.size()) - 1,
+				opened_folders.current_index
+			);
 		}
 	}
 	catch (...) {
 
 	}
 
-	if (failures.empty()) {
-		return std::nullopt;
+	if (!failures.empty()) {
+		throw editor_popup::sum_all(failures);
 	}
-
-	return editor_popup::sum_all(failures);
-}
-
-std::optional<editor_popup> open_intercosm(intercosm& work, const intercosm_path_op op) {
-	if (op.path.empty()) {
-		return std::nullopt;
-	}
-
-	try {
-		work.open(op);
-	}
-	catch (const intercosm_loading_error err) {
-		editor_popup p;
-
-		p.title = err.title;
-		p.details = err.details;
-		p.message = err.message;
-
-		return p;
-	}
-
-	return std::nullopt;
 }
 
 void editor_autosave::advance(

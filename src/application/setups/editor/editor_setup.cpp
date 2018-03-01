@@ -21,8 +21,8 @@
 #include "augs/readwrite/byte_file.h"
 #include "augs/readwrite/lua_file.h"
 
-void editor_setup::open_last_tabs(sol::state& lua) {
-	set_if_popup(::open_last_tabs(lua, signi));
+void editor_setup::open_last_folders(sol::state& lua) {
+	catch_popup([&]() { ::open_last_folders(lua, signi); });
 	base::refresh();
 }
 
@@ -31,7 +31,7 @@ double editor_setup::get_audiovisual_speed() const {
 }
 
 const cosmos& editor_setup::get_viewed_cosmos() const {
-	return has_current_tab() ? work().world : cosmos::zero; 
+	return anything_opened() ? work().world : cosmos::zero; 
 }
 
 real32 editor_setup::get_interpolation_ratio() const {
@@ -39,7 +39,7 @@ real32 editor_setup::get_interpolation_ratio() const {
 }
 
 entity_id editor_setup::get_viewed_character_id() const {
-	return has_current_tab() ? work().locally_viewed : entity_id();
+	return anything_opened() ? work().locally_viewed : entity_id();
 }
 
 const_entity_handle editor_setup::get_viewed_character() const {
@@ -47,7 +47,7 @@ const_entity_handle editor_setup::get_viewed_character() const {
 }
 
 const all_viewables_defs& editor_setup::get_viewable_defs() const {
-	return has_current_tab() ? work().viewables : all_viewables_defs::empty;
+	return anything_opened() ? work().viewables : all_viewables_defs::empty;
 }
 
 void editor_setup::unhover() {
@@ -60,7 +60,7 @@ bool editor_setup::is_editing_mode() const {
 
 std::optional<camera_cone> editor_setup::get_custom_camera() const {
 	auto maybe_panning = [this]() -> std::optional<camera_cone> { 
-		if (has_current_tab() && is_editing_mode()) {
+		if (anything_opened() && is_editing_mode()) {
 			if (tab().panned_camera) {
 				return tab().panned_camera;
 			}
@@ -69,7 +69,7 @@ std::optional<camera_cone> editor_setup::get_custom_camera() const {
 		return std::nullopt;
 	};
 
-	if (has_current_tab() && is_editing_mode()) {
+	if (anything_opened() && is_editing_mode()) {
 		if (const auto match = get_matching_go_to_entity()) {
 			camera_cone centered_on_match;
 
@@ -100,29 +100,23 @@ const_entity_handle editor_setup::get_matching_go_to_entity() const {
 	return work().world[entity_id()];
 }
 
-void editor_setup::on_tab_changed() {
+void editor_setup::on_folder_changed() {
 	hovered_entity = {};
 	player.paused = true;
 	finish_rectangular_selection();
 }
 
-void editor_setup::set_if_popup(const std::optional<editor_popup> p) {
-	current_popup = p;
-
-	if (p) {
-		const auto logged = typesafe_sprintf(
-			"%x\n%x\n%x", 
-			p->title, p->message, p->details
-		);
-
-		LOG(logged);
-
-		augs::save_as_text(LOG_FILES_DIR "last_editor_message.txt", logged);
-	}
-}
-
 void editor_setup::set_popup(const editor_popup p) {
-	set_if_popup(p);
+	ok_only_popup = p;
+
+	const auto logged = typesafe_sprintf(
+		"%x\n%x\n%x", 
+		p.title, p.message, p.details
+	);
+
+	LOG(logged);
+
+	augs::save_as_text(LOG_FILES_DIR "last_editor_message.txt", logged);
 }
 
 void editor_setup::set_locally_viewed(const entity_id id) {
@@ -138,7 +132,7 @@ editor_setup::editor_setup(
 {
 	augs::create_directories(get_untitled_dir());
 
-	open_last_tabs(lua);
+	open_last_folders(lua);
 }
 
 editor_setup::editor_setup(
@@ -150,8 +144,8 @@ editor_setup::editor_setup(
 {
 	augs::create_directories(get_untitled_dir());
 
-	open_last_tabs(lua);
-	open_intercosm_in_new_tab({ lua, intercosm_path });
+	open_last_folders(lua);
+	open_folder_in_new_tab({ lua, intercosm_path });
 }
 
 editor_setup::~editor_setup() {
@@ -171,8 +165,8 @@ void editor_setup::accept_game_gui_events(
 }
 
 void editor_setup::customize_for_viewing(config_lua_table& config) const {
-	if (has_current_tab()) {
-		config.window.name = "Editor - " + tab().get_display_path();
+	if (anything_opened()) {
+		config.window.name = "Editor - " + folder().get_display_path();
 	}
 	else {
 		config.window.name = "Editor";
@@ -191,36 +185,34 @@ void editor_setup::apply(const config_lua_table& cfg) {
 	return;
 }
 
-bool editor_setup::open_intercosm_in_new_tab(const path_operation op) {
-	for (std::size_t i = 0; i < signi.tabs.size(); ++i) {
-		if (signi.tabs[i].current_path == op.path) {
-			set_current_tab(static_cast<tab_index_type>(i));
-			return true;
+void editor_setup::open_folder_in_new_tab(const path_operation op) {
+	for (std::size_t i = 0; i < signi.folders.size(); ++i) {
+		if (signi.folders[i].current_path == op.path) {
+			set_current(static_cast<folder_index>(i));
+			return;
 		}
 	}
 
-	return try_to_open_new_tab(
-		[this, op](editor_tab& t, intercosm& work) {
-			if (const auto popup = open_intercosm(work, op)) {
-				set_popup(*popup);
-				return false;
-			}
-			
-			t.set_intercosm_path(op.lua, op.path, recent);
-
-			return true;
+	try_to_open_new_folder(
+		[this, op](editor_folder& f) {
+			f.set_folder_path(op.lua, op.path, recent);
+			f.load_folder();
 		}
 	);
 }
 
-void editor_setup::save_current_tab_to(const path_operation op) {
-	work().save(op);
-	tab().set_intercosm_path(op.lua, op.path, recent);
+void editor_setup::save_current_folder() {
+	folder().save_folder();
+}
+
+void editor_setup::save_current_folder_to(const path_operation op) {
+	folder().set_folder_path(op.lua, op.path, recent);
+	save_current_folder();
 }
 
 void editor_setup::fill_with_minimal_scene(sol::state& lua) {
 #if BUILD_TEST_SCENES
-	if (has_current_tab()) {
+	if (anything_opened()) {
 		work().make_test_scene(lua, { true, 144 } );
 
 		clear_all_selections();
@@ -230,19 +222,12 @@ void editor_setup::fill_with_minimal_scene(sol::state& lua) {
 
 void editor_setup::fill_with_test_scene(sol::state& lua) {
 #if BUILD_TEST_SCENES
-	if (has_current_tab()) {
+	if (anything_opened()) {
 		work().make_test_scene(lua, { false, 144 } );
 
 		clear_all_selections();
 	}
 #endif
-}
-
-static auto get_filters() {
-	return std::vector<augs::window::file_dialog_filter> {
-		{ "Hypersomnia intercosm file (*.int)", ".int" },
-		{ "Hypersomnia compatibile intercosm file (*.lua)", ".lua" }
-	};
 }
 
 void editor_setup::perform_custom_imgui(
@@ -261,7 +246,7 @@ void editor_setup::perform_custom_imgui(
 	};
 
 	auto item_if_tabs_and = [this](const bool condition, const char* label, const char* shortcut = nullptr) {
-		return ImGui::MenuItem(label, shortcut, nullptr, condition && has_current_tab());
+		return ImGui::MenuItem(label, shortcut, nullptr, condition && anything_opened());
 	};
 
 	auto item_if_tabs = [&](const char* label, const char* shortcut = nullptr) {
@@ -303,7 +288,7 @@ void editor_setup::perform_custom_imgui(
 							const auto str = augs::to_display_path(target_path).string();
 
 							if (ImGui::MenuItem(str.c_str())) {
-								open_intercosm_in_new_tab(in_path(target_path));
+								open_folder_in_new_tab(in_path(target_path));
 							}
 						}
 
@@ -327,20 +312,20 @@ void editor_setup::perform_custom_imgui(
 					ImGui::Separator();
 
 					const auto close_str = [&]() -> std::string {
-						if (has_current_tab()) {
-							return std::string("Close ") + tab().get_display_path();
+						if (anything_opened()) {
+							return std::string("Close ") + folder().get_display_path();
 						}
 
 						return "Close";
 					}();
 
 					if (item_if_tabs(close_str.c_str(), "CTRL+W")) {
-						close_tab();
+						close_folder();
 					}
 
 					if (item_if_tabs("Close all")) {
-						while (has_current_tab()) {
-							close_tab();
+						while (anything_opened()) {
+							close_folder();
 						}
 					}
 				}
@@ -389,7 +374,7 @@ void editor_setup::perform_custom_imgui(
 			}
 		}
 
-		if (has_current_tab()) {
+		if (anything_opened()) {
 			if (const auto tab_menu = scoped_tab_menu_bar(menu_bar_size.y)) {
 				{
 					using namespace ImGui;
@@ -421,7 +406,7 @@ void editor_setup::perform_custom_imgui(
 
 				auto ordering = [&]() {
 					std::vector<int> out;
-					out.resize(signi.tabs.size());
+					out.resize(signi.folders.size());
 
 					for (int i = 0; i < out.size(); ++i) {
 						out[i] = i;
@@ -433,9 +418,9 @@ void editor_setup::perform_custom_imgui(
 				{
 					const auto tab_names = [&]() {
 						std::vector<std::string> out;
-						out.reserve(signi.tabs.size());
+						out.reserve(signi.folders.size());
 
-						for (const auto& it : signi.tabs) {
+						for (const auto& it : signi.folders) {
 							out.push_back(it.get_display_path());
 						}
 
@@ -444,7 +429,7 @@ void editor_setup::perform_custom_imgui(
 
 					auto tab_names_cstrs = [&]() {
 						std::vector<const char*> out;
-						out.reserve(signi.tabs.size());
+						out.reserve(signi.folders.size());
 
 						for (const auto& it : tab_names) {
 							out.push_back(it.c_str());
@@ -454,14 +439,14 @@ void editor_setup::perform_custom_imgui(
 					}();
 
 					auto style = scoped_style_var(ImGuiStyleVar_FramePadding, []() { auto padding = ImGui::GetStyle().FramePadding; padding.x *= 2; return padding; }());
-					ImGui::TabLabels(static_cast<int>(signi.tabs.size()), tab_names_cstrs.data(), selected_index, nullptr, false, nullptr, ordering.data(), true, true, &closed_tab_index, nullptr);
+					ImGui::TabLabels(static_cast<int>(signi.folders.size()), tab_names_cstrs.data(), selected_index, nullptr, false, nullptr, ordering.data(), true, true, &closed_tab_index, nullptr);
 				}
 
 				/* Read back */
 
 				{
 					if (closed_tab_index != -1) {
-						close_tab(static_cast<tab_index_type>(closed_tab_index));
+						close_folder(static_cast<folder_index>(closed_tab_index));
 					}
 					else {
 						bool changed_order = false;
@@ -473,41 +458,36 @@ void editor_setup::perform_custom_imgui(
 							}
 						}
 
-						auto index_to_set = static_cast<tab_index_type>(selected_index);
+						auto index_to_set = static_cast<folder_index>(selected_index);
 
 						if (changed_order) {
-							decltype(signi.tabs) new_tabs;
-							decltype(signi.works) new_works;
-
-							new_tabs.reserve(signi.tabs.size());
-							new_works.reserve(signi.works.size());
+							decltype(signi.folders) new_tabs;
+							new_tabs.reserve(signi.folders.size());
 
 							for (const auto o : ordering) {
 								if (o == selected_index) {
-									index_to_set = static_cast<tab_index_type>(new_tabs.size());
+									index_to_set = static_cast<folder_index>(new_tabs.size());
 								}
 
-								new_tabs.push_back(signi.tabs[o]);
-								new_works.push_back(std::move(signi.works[o]));
+								new_tabs.push_back(std::move(signi.folders[o]));
 							}
 
-							signi.tabs = new_tabs;
-							signi.works = std::move(new_works);
+							signi.folders = std::move(new_tabs);
 						}
 
-						set_current_tab(index_to_set);
+						set_current(index_to_set);
 					}
 				}
 			}
 		}
 	}
 
-	if (has_current_tab()) {
+	if (anything_opened()) {
 		if (show_summary) {
 			auto summary = scoped_window("Summary", &show_summary, ImGuiWindowFlags_AlwaysAutoResize);
 
-			if (has_current_tab()) {
-				text(typesafe_sprintf("File path: %x", tab().current_path));
+			if (anything_opened()) {
+				text(typesafe_sprintf("Folder path: %x", folder().current_path));
 				//text("Tick rate: %x/s", get_viewed_cosmos().get_solvable().get_steps_per_second()));
 				text("Cursor: %x", world_cursor_pos);
 				
@@ -790,39 +770,27 @@ void editor_setup::perform_custom_imgui(
 		}
 	}
 
-	if (open_file_dialog.valid() && is_ready(open_file_dialog)) {
-		const auto result_path = open_file_dialog.get();
+	if (open_folder_dialog.valid() && is_ready(open_folder_dialog)) {
+		const auto result_path = open_folder_dialog.get();
 
 		if (result_path) {
-			open_intercosm_in_new_tab(in_path(*result_path));
+			open_folder_in_new_tab(in_path(*result_path));
 		}
 	}
 
-	if (save_file_dialog.valid() && is_ready(save_file_dialog)) {
-		const auto result_path = save_file_dialog.get();
+	if (save_project_dialog.valid() && is_ready(save_project_dialog)) {
+		const auto result_path = save_project_dialog.get();
 
 		if (result_path) {
-			const auto extension = augs::path_type(*result_path).extension();
+			const auto directory_name = augs::path_type(*result_path).filename();
+			const auto project_name = directory_name;
 
-			const auto filters = get_filters();
-			bool found_extension = false;
-
-			for (const auto& f : filters) {
-				if (f.extension == extension) {
-					found_extension = true;
-					save_current_tab_to(in_path(*result_path));
-					break;
-				}
-			}
-
-			if (!found_extension) {
-				set_popup({ "Error", "Unrecognized extension: " + extension.string() });
-			}
+			save_current_folder_to(in_path(*result_path));
 		}
 	}
 
-	if (current_popup) {
-		auto& p = *current_popup;
+	if (ok_only_popup) {
+		auto& p = *ok_only_popup;
 
 		if (!ImGui::IsPopupOpen(p.title.c_str())) {
 			ImGui::OpenPopup(p.title.c_str());
@@ -847,14 +815,14 @@ void editor_setup::perform_custom_imgui(
 
 			if (ImGui::Button("OK", ImVec2(120, 0))) { 
 				ImGui::CloseCurrentPopup();
-				current_popup = std::nullopt;
+				ok_only_popup = std::nullopt;
 			}
 		}
 	}
 }
 
 void editor_setup::finish_rectangular_selection() {
-	if (has_current_tab()) {
+	if (anything_opened()) {
 		decltype(tab().selected_entities) new_selections;
 
 		for_each_selected_entity(
@@ -871,15 +839,15 @@ void editor_setup::finish_rectangular_selection() {
 }
 
 void editor_setup::clear_all_selections() {
-	if (has_current_tab()) {
+	if (anything_opened()) {
 		tab().selected_entities.clear();
 		in_rectangular_selection.clear();
 	}
 }
 
 bool editor_setup::escape() {
-	if (current_popup) {
-		current_popup = std::nullopt;
+	if (ok_only_popup) {
+		ok_only_popup = std::nullopt;
 		return true;
 	}
 	else if(!player.paused) {
@@ -891,8 +859,8 @@ bool editor_setup::escape() {
 }
 
 bool editor_setup::confirm_modal_popup() {
-	if (current_popup) {
-		current_popup = std::nullopt;
+	if (ok_only_popup) {
+		ok_only_popup = std::nullopt;
 		return true;
 	}
 
@@ -900,40 +868,40 @@ bool editor_setup::confirm_modal_popup() {
 }
 
 void editor_setup::open(const augs::window& owner) {
-	if (current_popup) {
+	if (ok_only_popup) {
 		return;
 	}
 
-	open_file_dialog = std::async(
+	open_folder_dialog = std::async(
 		std::launch::async,
 		[&](){
-			return owner.open_file_dialog(get_filters(), "Open intercosm");
+			return owner.choose_directory_dialog("Open folder with project files");
 		}
 	);
 }
 
 void editor_setup::save(sol::state& lua, const augs::window& owner) {
-	if (!has_current_tab()) {
+	if (!anything_opened()) {
 		return;
 	}
 
-	if (tab().is_untitled()) {
+	if (folder().is_untitled()) {
 		save_as(owner);
 	}
 	else {
-		save_current_tab_to({ lua, tab().current_path });
+		save_current_folder();
 	}
 }
 
 void editor_setup::save_as(const augs::window& owner) {
-	if (!has_current_tab() || current_popup) {
+	if (!anything_opened() || ok_only_popup) {
 		return;
 	}
 
-	save_file_dialog = std::async(
+	save_project_dialog = std::async(
 		std::launch::async,
 		[&](){
-			return owner.save_file_dialog(get_filters());
+			return owner.choose_directory_dialog("Choose folder for project files");
 		}
 	);
 }
@@ -959,7 +927,7 @@ void editor_setup::paste() {
 }
 
 void editor_setup::del() {
-	if (has_current_tab()) {
+	if (anything_opened()) {
 		for_each_selected_entity(
 			[&](const auto e) {
 				delete_entity_with_children(work().world[e]);
@@ -983,24 +951,14 @@ void editor_setup::go_to_entity() {
 	ImGui::SetWindowFocus("Go to entity");
 }
 
-void editor_setup::reveal_in_explorer() {
-	auto path_str = tab().current_path.string();
+void editor_setup::reveal_in_explorer(const augs::window& owner) {
+	auto path_str = folder().current_path.string();
 
 	if (path_str.empty()) {
 		path_str = augs::get_current_working_directory();
 	}
 
-#if PLATFORM_UNIX
-	const auto script_path = "scripts/unix/select_file.local";
-
-	if (!augs::file_exists(script_path)) {
-		return;
-	}
-
-	augs::shell(typesafe_sprintf("%x %x", script_path, path_str));
-#else
-	augs::shell(path_str);
-#endif
+	owner.reveal_in_explorer(path_str);
 }
 
 void editor_setup::play() {
@@ -1029,54 +987,51 @@ void editor_setup::next() {
 }
 
 void editor_setup::new_tab() {
-	try_to_open_new_tab([&](editor_tab& t, intercosm& w) {
-		const auto path = get_first_free_untitled_path("Intercosm%x.int");
-		augs::save_as_text(path, "empty");
-
-		t.current_path = path;
-		return true; 
+	try_to_open_new_folder([&](editor_folder& t) {
+		const auto new_path = get_first_free_untitled_path("Project%x");
+		augs::create_directories(augs::path_type(new_path) += "/");
+		t.current_path = new_path;
 	});
 }
 
 void editor_setup::next_tab() {
-	if (has_current_tab()) {
-		set_current_tab((signi.current_index + 1) % signi.tabs.size());
+	if (anything_opened()) {
+		set_current((signi.current_index + 1) % signi.folders.size());
 	}
 }
 
 void editor_setup::prev_tab() {
-	if (has_current_tab()) {
-		set_current_tab(signi.current_index == 0 ? static_cast<tab_index_type>(signi.tabs.size() - 1) : signi.current_index - 1);
+	if (anything_opened()) {
+		set_current(signi.current_index == 0 ? static_cast<folder_index>(signi.folders.size() - 1) : signi.current_index - 1);
 	}
 }
 
-void editor_setup::close_tab(const tab_index_type i) {
-	auto& tab_to_close = signi.tabs[i];
+void editor_setup::close_folder(const folder_index i) {
+	auto& folder_to_close = signi.folders[i];
 
-	if (tab_to_close.has_unsaved_changes()) {
+	if (folder_to_close.has_unsaved_changes()) {
 		set_popup({ "Error", "Nie", "Nie" });
 		return;
 	}
 		
-	if (tab_to_close.is_untitled()) {
-		augs::remove_file(tab_to_close.current_path);
+	if (folder_to_close.is_untitled()) {
+		augs::remove_file(folder_to_close.current_path);
 	}
 
-	signi.tabs.erase(signi.tabs.begin() + i);
-	signi.works.erase(signi.works.begin() + i);
+	signi.folders.erase(signi.folders.begin() + i);
 
-	if (!signi.tabs.empty()) {
-		set_current_tab(std::min(signi.current_index, static_cast<tab_index_type>(signi.tabs.size() - 1)));
+	if (signi.folders.empty()) {
+		signi.current_index = -1;
+		pause();
 	}
 	else {
-		unset_current_tab();
-		pause();
+		signi.current_index = std::min(signi.current_index, static_cast<folder_index>(signi.folders.size() - 1));
 	}
 }
 
-void editor_setup::close_tab() {
-	if (has_current_tab()) {
-		close_tab(signi.current_index);
+void editor_setup::close_folder() {
+	if (anything_opened()) {
+		close_folder(signi.current_index);
 	}
 }
 
@@ -1109,7 +1064,7 @@ bool editor_setup::handle_input_before_imgui(
 			if (has_ctrl) {
 				if (has_shift) {
 					switch (k) {
-						case key::E: reveal_in_explorer(); return true;
+						case key::E: reveal_in_explorer(window); return true;
 						case key::TAB: prev_tab(); return true;
 						case key::F5: fill_with_minimal_scene(lua); return true;
 						default: break;
@@ -1121,7 +1076,7 @@ bool editor_setup::handle_input_before_imgui(
 					case key::O: open(window); return true;
 					case key::COMMA: go_to_all(); return true;
 					case key::N: new_tab(); return true;
-					case key::W: close_tab(); return true;
+					case key::W: close_folder(); return true;
 					case key::TAB: next_tab(); return true;
 					default: break;
 				}
@@ -1163,7 +1118,7 @@ bool editor_setup::handle_unfetched_window_input(
 	const auto world_cursor_pos = current_cone.to_world_space(screen_size, mouse_pos);
 	const auto world_screen_center = current_cone.to_world_space(screen_size, screen_size/2);
 
-	if (!has_current_tab()) {
+	if (!anything_opened()) {
 		return false;
 	}
 

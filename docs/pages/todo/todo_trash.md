@@ -500,7 +500,7 @@ Memory is somewhat safe because it can only grow as far as the children grow.
 	- con: a lot of files, **but that's not really a con**
 		- because we will anyway have the image and sound files separate
 			- because we want to advocate customizability and own versions
-	- .autosave is guaranteed to always have both
+	- autosave is guaranteed to always have all
 	- .tab has history etc
 	- later on saving perhaps more files could come into existence, like ".ruleset"
 		- for plots and/or arenas

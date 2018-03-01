@@ -5,6 +5,10 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- implement constrained handles and entity ids
+	- because inventory slot handle item getters should return handles that guarantee presence of an item
+	- thanks to that we can avoid problems with having many entity types and enlarging the dispatch code
+
 - animation in our architecture
 	- should work statelessly, in particular it should not set values to sprite.
 	- callbacks

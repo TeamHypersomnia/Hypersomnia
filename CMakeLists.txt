@@ -442,7 +442,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/view/audiovisual_state/world_camera.cpp"
 	"src/application/setups/test_scene_setup.cpp"
 	"src/application/setups/editor/editor_setup.cpp"
-	"src/application/setups/editor/editor_tab.cpp"
+	"src/application/setups/editor/editor_folder.cpp"
 	"src/application/setups/editor/editor_recent_paths.cpp"
 	"src/application/setups/main_menu_setup.cpp"
 	"src/application/web_daemon/session_report.cpp"

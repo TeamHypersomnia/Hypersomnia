@@ -39,7 +39,7 @@ namespace augs {
 	}
 
 	inline bool file_exists(const path_type& path) {
-		return std::ifstream(path).good();
+		return std::experimental::filesystem::exists(path);
 	}
 
 	inline void remove_file(const path_type& path) {

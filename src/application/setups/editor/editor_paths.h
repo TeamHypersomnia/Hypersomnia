@@ -4,8 +4,8 @@
 
 #define EDITOR_DIR LOCAL_FILES_DIR "editor/"
 
-inline auto get_editor_tabs_path() {
-	return EDITOR_DIR "editor_tabs.lua";
+inline auto get_last_folders_path() {
+	return EDITOR_DIR "last_folders.lua";
 }
 
 inline auto get_recent_paths_path() {

@@ -21,9 +21,9 @@
 #include "application/setups/editor/editor_significant.h"
 #include "application/setups/editor/editor_autosave.h"
 #include "application/setups/editor/editor_settings.h"
-#include "application/setups/editor/editor_tab.h"
+#include "application/setups/editor/editor_folder.h"
 #include "application/setups/editor/editor_recent_paths.h"
-#include "application/setups/editor/current_tab_access_cache.h"
+#include "application/setups/editor/current_access_cache.h"
 
 struct config_lua_table;
 
@@ -50,8 +50,8 @@ struct editor_destructor_input {
 	sol::state& lua;
 };
 
-class editor_setup : private current_tab_access_cache<editor_setup> {
-	using base = current_tab_access_cache<editor_setup>;
+class editor_setup : private current_access_cache<editor_setup> {
+	using base = current_access_cache<editor_setup>;
 	friend base;
 
 	editor_significant signi;
@@ -64,7 +64,17 @@ class editor_setup : private current_tab_access_cache<editor_setup> {
 
 	double global_time_seconds = 0.0;
 
-	std::optional<editor_popup> current_popup;
+	std::optional<editor_popup> ok_only_popup;
+
+	template <class F>
+	void catch_popup(F&& callback) {
+		try {
+			callback();
+		}
+		catch (editor_popup p) {
+			set_popup(p);
+		}
+	}
 
 	bool show_summary = true;
 	bool show_common_state = false;
@@ -84,30 +94,31 @@ class editor_setup : private current_tab_access_cache<editor_setup> {
 	vec2 last_ldown_position;
 	visible_entities in_rectangular_selection;
 
-	void on_tab_changed();
+	void on_folder_changed();
 	void set_locally_viewed(const entity_id);
 	void finish_rectangular_selection();
 
 	template <class F>
-	bool try_to_open_new_tab(F&& new_intercosm_provider) {
-		const auto new_index = has_current_tab() ? signi.current_index + 1 : 0;
+	void try_to_open_new_folder(F&& new_folder_provider) {
+		const auto new_index = signi.current_index + 1;
 
-		signi.works.reserve(signi.works.size() + 1);
-		signi.tabs.reserve(signi.tabs.size() + 1);
+		signi.folders.reserve(signi.folders.size() + 1);
+		signi.folders.emplace(signi.folders.begin() + new_index);
 
-		signi.tabs.emplace(signi.tabs.begin() + new_index);
-		signi.works.emplace(signi.works.begin() + new_index, std::make_unique<intercosm>());
+		auto& new_folder = signi.folders[new_index];
+
 		base::refresh();
 
-		if (/* successfully_opened */ new_intercosm_provider(signi.tabs[new_index], *signi.works[new_index])) {
-			set_current_tab(new_index);
-			return true;
+		try {
+			new_folder_provider(new_folder);
+			set_current(new_index);
+		}
+		catch (editor_popup p) {
+			signi.folders.erase(signi.folders.begin() + new_index);
+			set_popup(p);
 		}
 
-		signi.tabs.erase(signi.tabs.begin() + new_index);
-		signi.works.erase(signi.works.begin() + new_index);
-
-		return false;
+		base::refresh();
 	}
 
 	void play();
@@ -116,21 +127,22 @@ class editor_setup : private current_tab_access_cache<editor_setup> {
 	cosmic_entropy total_collected_entropy;
 	augs::fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
 
-	std::future<std::optional<std::string>> open_file_dialog;
-	std::future<std::optional<std::string>> save_file_dialog;
+	std::future<std::optional<std::string>> open_folder_dialog;
+	std::future<std::optional<std::string>> save_project_dialog;
 
-	void set_if_popup(const std::optional<editor_popup> p); 
 	void set_popup(const editor_popup);
 	
 	using path_operation = intercosm_path_op;
 
-	bool open_intercosm_in_new_tab(path_operation);
-	void save_current_tab_to(path_operation);
+	void open_folder_in_new_tab(path_operation);
+
+	void save_current_folder();
+	void save_current_folder_to(path_operation);
 
 	void fill_with_minimal_scene(sol::state& lua);
 	void fill_with_test_scene(sol::state& lua);
 
-	void open_last_tabs(sol::state& lua);
+	void open_last_folders(sol::state& lua);
 
 	void clear_all_selections();
 
@@ -233,12 +245,13 @@ public:
 	void new_tab();
 	void next_tab();
 	void prev_tab();
-	void close_tab();
-	void close_tab(const tab_index_type i);
+
+	void close_folder();
+	void close_folder(const folder_index i);
 
 	void go_to_all();
 	void go_to_entity();
-	void reveal_in_explorer();
+	void reveal_in_explorer(const augs::window& owner);
 
 	void unhover();
 	bool is_editing_mode() const;
@@ -246,7 +259,7 @@ public:
 
 	template <class F>
 	void for_each_selected_entity(F callback) const {
-		if (has_current_tab()) {
+		if (anything_opened()) {
 			for (const auto e : tab().selected_entities) {
 				if (!found_in(in_rectangular_selection.all, e)) {
 					callback(e);
@@ -268,7 +281,7 @@ public:
 
 	template <class F>
 	void for_each_highlight(F callback) const {
-		if (has_current_tab() && player.paused) {
+		if (anything_opened() && player.paused) {
 			if (get_viewed_character().alive()) {
 				auto color = settings.controlled_entity_color;
 				color.a += static_cast<rgba_channel>(augs::zigzag(global_time_seconds, 1.0 / 2) * 25);

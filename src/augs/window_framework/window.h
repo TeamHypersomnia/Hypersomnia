@@ -170,12 +170,18 @@ namespace augs {
 
 		std::optional<std::string> open_file_dialog(
 			const std::vector<file_dialog_filter>& filters,
-			std::string custom_title = std::string()
+			const std::string& custom_title = std::string()
 		) const;
 
 		std::optional<std::string> save_file_dialog(
 			const std::vector<file_dialog_filter>& filters,
-			std::string custom_title = std::string()
+			const std::string& custom_title = std::string()
 		) const;
+
+		std::optional<std::string> choose_directory_dialog(
+			const std::string& custom_title = std::string()
+		) const;
+
+		void reveal_in_explorer(const augs::path_type&) const;
 	};
 }
