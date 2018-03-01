@@ -17,6 +17,12 @@ elseif(MSVC)
 	)
 endif()
 
+if(CLANG)
+	set(CMAKE_CXX_FLAGS
+		"${CMAKE_CXX_FLAGS} -stdlib=libc++"
+	)
+endif()
+
 include_directories("../../src/")
 
 if(UNIX)
@@ -37,6 +43,8 @@ add_executable(version_file_generator
 	"../../src/augs/misc/time_utils.cpp"
 )
 
-if(UNIX)
+if (CLANG)
+	target_link_libraries(version_file_generator c++experimental)
+elseif(GCC)
 	target_link_libraries(version_file_generator stdc++fs)
 endif()
