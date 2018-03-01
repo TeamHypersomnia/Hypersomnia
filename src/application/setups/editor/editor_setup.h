@@ -260,14 +260,14 @@ public:
 	template <class F>
 	void for_each_selected_entity(F callback) const {
 		if (anything_opened()) {
-			for (const auto e : tab().selected_entities) {
+			for (const auto e : view().selected_entities) {
 				if (!found_in(in_rectangular_selection.all, e)) {
 					callback(e);
 				}
 			}
 
 			for (const auto e : in_rectangular_selection.all) {
-				if (!found_in(tab().selected_entities, e)) {
+				if (!found_in(view().selected_entities, e)) {
 					callback(e);
 				}
 			}

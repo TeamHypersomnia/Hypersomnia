@@ -61,8 +61,8 @@ bool editor_setup::is_editing_mode() const {
 std::optional<camera_cone> editor_setup::get_custom_camera() const {
 	auto maybe_panning = [this]() -> std::optional<camera_cone> { 
 		if (anything_opened() && is_editing_mode()) {
-			if (tab().panned_camera) {
-				return tab().panned_camera;
+			if (view().panned_camera) {
+				return view().panned_camera;
 			}
 		}
 
@@ -121,7 +121,7 @@ void editor_setup::set_popup(const editor_popup p) {
 
 void editor_setup::set_locally_viewed(const entity_id id) {
 	work().locally_viewed = id;
-	tab().panned_camera = std::nullopt;
+	view().panned_camera = std::nullopt;
 }
 
 editor_setup::editor_setup(
@@ -710,14 +710,14 @@ void editor_setup::perform_custom_imgui(
 
 				// LOG(selected_name);
 				if (const auto match = get_matching_go_to_entity()) {	
-					tab().selected_entities = { match };
+					view().selected_entities = { match };
 
-					if (!tab().panned_camera.has_value()) {
-						tab().panned_camera = current_cone;
+					if (!view().panned_camera.has_value()) {
+						view().panned_camera = current_cone;
 					}
 
 					if (const auto transform = match.find_logic_transform()) {
-						tab().panned_camera->transform.pos = transform->pos;
+						view().panned_camera->transform.pos = transform->pos;
 					}
 					else {
 						LOG("WARNING: transform of %x could not be found.", match);
@@ -823,7 +823,7 @@ void editor_setup::perform_custom_imgui(
 
 void editor_setup::finish_rectangular_selection() {
 	if (anything_opened()) {
-		decltype(tab().selected_entities) new_selections;
+		decltype(view().selected_entities) new_selections;
 
 		for_each_selected_entity(
 			[&](const auto e) {
@@ -831,7 +831,7 @@ void editor_setup::finish_rectangular_selection() {
 			}
 		);
 
-		tab().selected_entities = new_selections;
+		view().selected_entities = new_selections;
 
 		rectangular_drag_origin = std::nullopt;
 		in_rectangular_selection.clear();
@@ -840,7 +840,7 @@ void editor_setup::finish_rectangular_selection() {
 
 void editor_setup::clear_all_selections() {
 	if (anything_opened()) {
-		tab().selected_entities.clear();
+		view().selected_entities.clear();
 		in_rectangular_selection.clear();
 	}
 }
@@ -1149,21 +1149,21 @@ bool editor_setup::handle_unfetched_window_input(
 		}();
 
 		auto pan_scene = [&](const auto amount) {
-			if (!tab().panned_camera.has_value()) {
-				tab().panned_camera = current_cone;
+			if (!view().panned_camera.has_value()) {
+				view().panned_camera = current_cone;
 			}
 
-			auto& camera = *tab().panned_camera;
+			auto& camera = *view().panned_camera;
 
 			camera.transform.pos -= pan_mult * amount / camera.zoom;
 		};
 
 		auto zoom_scene = [&](const auto zoom_amount, const auto zoom_point) {
-			if (!tab().panned_camera.has_value()) {
-				tab().panned_camera = current_cone;
+			if (!view().panned_camera.has_value()) {
+				view().panned_camera = current_cone;
 			}
 
-			auto& camera = *tab().panned_camera;
+			auto& camera = *view().panned_camera;
 
 			const auto old_zoom = camera.zoom;
 			const auto zoom_offset = 0.09f * old_zoom * zoom_amount * zoom_mult;
@@ -1240,7 +1240,7 @@ bool editor_setup::handle_unfetched_window_input(
 			last_ldown_position = world_cursor_pos;
 			held_entity = hovered_entity;
 
-			auto& selections = tab().selected_entities;
+			auto& selections = view().selected_entities;
 
 			if (/* new_selection */ !has_ctrl) {
 				selections.clear();
@@ -1253,7 +1253,7 @@ bool editor_setup::handle_unfetched_window_input(
 
 			if (held.alive()) {
 				const bool has_ctrl{ common_input_state[key::LCTRL] };
-				auto& selections = tab().selected_entities;
+				auto& selections = view().selected_entities;
 
 				if (has_ctrl && found_in(selections, held)) {
 					selections.erase(held);
@@ -1293,13 +1293,13 @@ bool editor_setup::handle_unfetched_window_input(
 
 			switch (k) {
 				case key::C: 
-					if (tab().selected_entities.size() == 1) { 
-						set_locally_viewed(*tab().selected_entities.begin()); 
+					if (view().selected_entities.size() == 1) { 
+						set_locally_viewed(*view().selected_entities.begin()); 
 						return true;
 					}
 				case key::I: play(); return true;
 				case key::DEL: del(); return true;
-				case key::HOME: tab().panned_camera = std::nullopt; return true;
+				case key::HOME: view().panned_camera = std::nullopt; return true;
 				case key::UP: pan_scene(vec2(0, key_pan_amount)); return true;
 				case key::DOWN: pan_scene(vec2(0, -key_pan_amount)); return true;
 				case key::RIGHT: pan_scene(vec2(-key_pan_amount, 0)); return true;

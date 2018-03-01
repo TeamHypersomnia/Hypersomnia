@@ -136,7 +136,6 @@ summary: Just a hidden scratchpad.
 - move firing_engine_sound and the like from component to invariant
 
 - make reveal in explorer work for both files and folders
-- rename "tab()" to "view()"
 - rename augs::ifstream_error to augs::file_open_error
 - rename "file_exists" to "path_exists"
 	- cause it also works for dirs

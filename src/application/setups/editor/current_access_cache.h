@@ -63,11 +63,11 @@ protected:
 		return *current_folder;
 	}
 
-	FORCE_INLINE auto& tab() {
+	FORCE_INLINE auto& view() {
 		return folder().view;
 	}
 
-	FORCE_INLINE const auto& tab() const {
+	FORCE_INLINE const auto& view() const {
 		return folder().view;
 	}
 };
