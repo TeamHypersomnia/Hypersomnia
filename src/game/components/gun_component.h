@@ -36,8 +36,6 @@ namespace components {
 
 		float current_heat = 0.f;
 
-		sound_effect_input firing_engine_sound;
-		particle_effect_input muzzle_particles;
 		augs::stepped_timestamp when_began_pulling_cocking_handle;
 
 		recoil_player_instance recoil;
@@ -86,6 +84,9 @@ namespace invariants {
 
 		sound_effect_input muzzle_shot_sound;
 		sound_effect_input low_ammo_cue_sound;
+
+		sound_effect_input firing_engine_sound;
+		particle_effect_input muzzle_particles;
 
 		float cocking_handle_pull_duration_ms = 500.f;
 

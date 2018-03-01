@@ -5,6 +5,10 @@ permalink: todo_disregarded
 summary: Just a hidden scratchpad.
 ---
 
+- rename "significant" to "persistent" and remove the mention of "transferred through the network"editor_tab_signi
+	- because "replicated" implies being transferred
+	- too much pain in the ass though. We've changed the definition, though.
+
 - fix filesystem design to have tries instead of file_exists
 	- disregarded because ours is I guess a common technique
 

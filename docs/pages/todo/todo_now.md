@@ -117,10 +117,7 @@ summary: Just a hidden scratchpad.
 		- e.g. "gfx/my_rifle.png"
 - makes work testbed out of the box
 
-- Reuse autosave loading logic for loading projects
-- we could still handle untitled files maybe, could be useful
 - autosave on focus lost
-- autosave should also not repeat itself when there is nothing more to save
 
 - rename locally_viewed to local_test_subject
 	- even choreographic data will have their own viewers specified
@@ -133,11 +130,7 @@ summary: Just a hidden scratchpad.
 	- and on windows it makes little sense to abort there, just debugbreak and throw.
 
 - "unique" naming for unique sprite decorations et cetera
-- move firing_engine_sound and the like from component to invariant
 
 - check in editor if the saving/opening path is a valid folder?
-
 - make reveal in explorer work for both files and folders
 	- cause it also works for dirs
-- rename "significant" to "persistent" and remove the mention of "transferred through the network"editor_tab_signi
-	- because "replicated" implies being transferred

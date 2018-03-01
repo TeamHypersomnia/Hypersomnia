@@ -416,6 +416,7 @@ namespace test_flavours {
 			gun_def.engine_sound_strength = 0.5f;
 
 			gun_def.recoil.id = assets::recoil_player_id::GENERIC;
+			gun_def.firing_engine_sound.id = assets::sound_buffer_id::FIREARM_ENGINE;
 
 			meta.set(gun_def);
 
@@ -456,6 +457,7 @@ namespace test_flavours {
 			gun_def.maximum_heat = 2.1f;
 			gun_def.gunshot_adds_heat = 0.052f;
 			gun_def.engine_sound_strength = 0.5f;
+			gun_def.firing_engine_sound.id = assets::sound_buffer_id::FIREARM_ENGINE;
 
 			gun_def.recoil.id = assets::recoil_player_id::GENERIC;
 
@@ -515,8 +517,6 @@ namespace prefabs {
 
 		// add_muzzle_particles(weapon, gun, step);
 
-		gun.firing_engine_sound.id = assets::sound_buffer_id::FIREARM_ENGINE;
-
 		if (load_mag.alive()) {
 			perform_transfer({ load_mag, weapon[slot_function::GUN_DETACHABLE_MAGAZINE] }, step);
 
@@ -537,8 +537,6 @@ namespace prefabs {
 		auto& gun = weapon.get<components::gun>();
 
 		// add_muzzle_particles(weapon, gun, step);
-
-		gun.firing_engine_sound.id = assets::sound_buffer_id::FIREARM_ENGINE;
 
 		if (load_mag.alive()) {
 			perform_transfer({ load_mag, weapon[slot_function::GUN_DETACHABLE_MAGAZINE] }, step);
