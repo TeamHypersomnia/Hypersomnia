@@ -43,7 +43,7 @@ void intercosm::make_test_scene(
 			return changer_callback_result::REFRESH;
 		});
 
-		locally_viewed = populator.populate_with_entities(caches, make_logic_step_input({}));
+		local_test_subject = populator.populate_with_entities(caches, make_logic_step_input({}));
 	};
 
 	if (settings.create_minimal) {

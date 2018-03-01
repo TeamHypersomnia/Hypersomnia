@@ -286,7 +286,7 @@ public:
 				auto color = settings.controlled_entity_color;
 				color.a += static_cast<rgba_channel>(augs::zigzag(global_time_seconds, 1.0 / 2) * 25);
 
-				callback(work().locally_viewed, color);
+				callback(work().local_test_subject, color);
 			}
 
 			for_each_selected_entity(

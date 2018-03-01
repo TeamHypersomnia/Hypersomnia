@@ -32,7 +32,7 @@ struct intercosm {
 	cosmos world;
 	all_viewables_defs viewables;
 	
-	entity_id locally_viewed;
+	entity_id local_test_subject;
 	// END GEN INTROSPECTOR
 
 #if BUILD_TEST_SCENES

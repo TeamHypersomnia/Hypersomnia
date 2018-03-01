@@ -213,3 +213,7 @@ we consider whole type overrides too complex architeciturally:
 	- we load as if there were a real file
 	- but we're emitting a warning
 
+- rename local_test_subject to local_test_subject
+	- even choreographic data will have their own viewers specified
+	- useful to always have one
+

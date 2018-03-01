@@ -7,10 +7,6 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
-- tab names will be Project1, Project2 etc
-	- basically directory names
-	- without the extension cause it's useless
-
 - game mode property is a part of game mode definition
 - game mode definition = all game mode properties
 - a **game mode marker** is a game mode property of game mode definition that has a spatial representation
@@ -115,13 +111,9 @@ summary: Just a hidden scratchpad.
 		- e.g. a path could be "official/gfx/assault_rifle.png"
 	- local directory of the map
 		- e.g. "gfx/my_rifle.png"
-- makes work testbed out of the box
+	- makes work testbed out of the box
 
 - autosave on focus lost
-
-- rename locally_viewed to local_test_subject
-	- even choreographic data will have their own viewers specified
-	- useful to always have one
 
 - switching tabs with entities should always refocus on the same kind of property
 

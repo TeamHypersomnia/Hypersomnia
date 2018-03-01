@@ -48,7 +48,7 @@ public:
 	}
 
 	auto get_viewed_character_id() const {
-		return scene.locally_viewed;
+		return scene.local_test_subject;
 	}
 
 	auto get_viewed_character() const {

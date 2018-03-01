@@ -80,7 +80,7 @@ public:
 	}
 
 	auto get_viewed_character_id() const {
-		return intro.locally_viewed;
+		return intro.local_test_subject;
 	}
 
 	auto get_viewed_character() const {

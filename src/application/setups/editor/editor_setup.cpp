@@ -39,7 +39,7 @@ real32 editor_setup::get_interpolation_ratio() const {
 }
 
 entity_id editor_setup::get_viewed_character_id() const {
-	return anything_opened() ? work().locally_viewed : entity_id();
+	return anything_opened() ? work().local_test_subject : entity_id();
 }
 
 const_entity_handle editor_setup::get_viewed_character() const {
@@ -120,7 +120,7 @@ void editor_setup::set_popup(const editor_popup p) {
 }
 
 void editor_setup::set_locally_viewed(const entity_id id) {
-	work().locally_viewed = id;
+	work().local_test_subject = id;
 	view().panned_camera = std::nullopt;
 }
 
