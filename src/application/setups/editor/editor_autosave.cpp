@@ -61,7 +61,7 @@ void open_last_folders(
 					new_folder.load_folder(autosave_path, ::get_project_name(real_path));
 					signi.folders.emplace_back(std::move(new_folder));
 
-					if (!augs::file_exists(real_path)) {
+					if (!augs::exists(real_path)) {
 						const auto display_autosave = augs::to_display_path(autosave_path);
 						const auto display_real = augs::to_display_path(real_path);
 

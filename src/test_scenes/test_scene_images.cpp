@@ -36,14 +36,14 @@ void load_test_scene_images(
 		try {
 			if (
 				const auto extra_loadables_path = augs::path_type(directory) += stem + ".extras.lua";
-				augs::file_exists(extra_loadables_path)
+				augs::exists(extra_loadables_path)
 			) {
 				augs::load_from_lua_table(lua, loadables.extras, extra_loadables_path);
 			}
 
 			if (
 				const auto meta_path = augs::path_type(directory) += stem + ".meta.lua";
-				augs::file_exists(meta_path)
+				augs::exists(meta_path)
 			) {
 				augs::load_from_lua_table(lua, meta, meta_path);
 			}
@@ -55,7 +55,7 @@ void load_test_scene_images(
 				err.what()
 			);
 		}
-		catch (augs::ifstream_error err) {
+		catch (augs::file_open_error err) {
 			throw test_scene_asset_loading_error(
 				"Failed to load additional properties for %x:\nFile might be corrupt.\n%x",
 				stem,

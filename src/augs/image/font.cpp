@@ -123,7 +123,7 @@ namespace augs {
 				}
 			}
 		}
-		catch (const augs::ifstream_error err) {
+		catch (const augs::file_open_error err) {
 			throw_error("Failed to load charset file: %x\nFile might be missing.\n%x", in.charset_path, err.what());
 		}
 #endif

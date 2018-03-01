@@ -25,11 +25,11 @@ void regenerate_desaturation(
 
 	bool should_regenerate = force_regenerate;
 
-	if (!augs::file_exists(output_path)) {
+	if (!augs::exists(output_path)) {
 		should_regenerate = true;
 	}
 	else {
-		if (!augs::file_exists(desaturation_stamp_path)) {
+		if (!augs::exists(desaturation_stamp_path)) {
 			should_regenerate = true;
 		}
 		else {

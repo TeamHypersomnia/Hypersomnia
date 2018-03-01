@@ -96,7 +96,7 @@ bool session_report::start_daemon(const config_lua_table& cfg) {
 	std::thread ttr(last_seen_updater);
 	ttr.detach();
 
-	if (augs::file_exists(survey_num_path)) {
+	if (augs::exists(survey_num_path)) {
 		std::ifstream t(survey_num_path);
 		t >> survey_num;
 	}

@@ -129,7 +129,7 @@ namespace augs {
 		augs::read_bytes(in, size);
 		augs::read_bytes(in, v);
 	}
-	catch (const augs::ifstream_error& err) {
+	catch (const augs::file_open_error& err) {
 		throw image_loading_error(
 			"Failed to load image %x:\n%x", path, err.what()
 		);

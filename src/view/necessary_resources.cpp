@@ -150,7 +150,7 @@ necessary_image_loadables_map::necessary_image_loadables_map(
 
 		if (
 			const auto additional_properties_path = typesafe_sprintf("%x/%x.lua", directory, stem);
-			augs::file_exists(additional_properties_path)
+			augs::exists(additional_properties_path)
 		) {
 			try {
 				augs::load_from_lua_table(
@@ -167,7 +167,7 @@ necessary_image_loadables_map::necessary_image_loadables_map(
 					err.what()
 				);
 			}
-			catch (augs::ifstream_error err) {
+			catch (augs::file_open_error err) {
 				throw necessary_resource_loading_error(
 					"Failed to load additional properties for %x (%x).\nFile might be corrupt.\n%x",
 					stem,
@@ -179,14 +179,14 @@ necessary_image_loadables_map::necessary_image_loadables_map(
 
 		if (
 			const auto source_image_path = typesafe_sprintf("%x/%x.png", directory, stem);
-			augs::file_exists(source_image_path)
+			augs::exists(source_image_path)
 		) {
 			definition_template.source_image_path = source_image_path;
 			emplace(id, definition_template);
 		}
 		else if (
 			const auto procedural_definition_path = typesafe_sprintf("%x/procedural/%x.lua", directory, stem);
-			augs::file_exists(procedural_definition_path)
+			augs::exists(procedural_definition_path)
 		) {
 			procedural_image_definition def;
 
@@ -201,7 +201,7 @@ necessary_image_loadables_map::necessary_image_loadables_map(
 					err.what()
 				);
 			}
-			catch (augs::ifstream_error err) {
+			catch (augs::file_open_error err) {
 				throw necessary_resource_loading_error(
 					"Failed to load procedural image definition for %x (%x).\nFile might be corrupt.\n%x",
 					stem,

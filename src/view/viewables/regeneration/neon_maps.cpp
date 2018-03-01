@@ -53,11 +53,11 @@ void regenerate_neon_map(
 
 	bool should_regenerate = force_regenerate;
 
-	if (!augs::file_exists(neon_map_path)) {
+	if (!augs::exists(neon_map_path)) {
 		should_regenerate = true;
 	}
 	else {
-		if (!augs::file_exists(neon_map_stamp_path)) {
+		if (!augs::exists(neon_map_stamp_path)) {
 			should_regenerate = true;
 		}
 		else {

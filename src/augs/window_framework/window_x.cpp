@@ -598,14 +598,14 @@ xcb_ewmh_init_atoms_replies(&EWMH, EWMHCookie, NULL);
 			remove_file(temp_result);
 			return result;
 		}
-		catch (augs::ifstream_error) {
+		catch (augs::file_open_error) {
 			LOG("Error: %x did not produce %x", script_path, temp_result);
 			return std::nullopt;
 		}
 	}
 
 	static std::optional<std::string> choose_path(const augs::path_type& script_path) {
-		if (!file_exists(script_path)) {
+		if (!augs::exists(script_path)) {
 			return std::nullopt;
 		}
 
@@ -636,7 +636,7 @@ xcb_ewmh_init_atoms_replies(&EWMH, EWMHCookie, NULL);
 	void window::reveal_in_explorer(const augs::path_type& p) const {
 		const auto script_path = "scripts/unix/select_file.local";
 
-		if (!augs::file_exists(script_path)) {
+		if (!augs::exists(script_path)) {
 			return;
 		}
 

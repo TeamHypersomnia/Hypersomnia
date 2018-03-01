@@ -28,7 +28,7 @@ void regenerate_button_with_corners(
 		const auto type = static_cast<button_corner_type>(i);
 
 		if (
-			!augs::file_exists(
+			!augs::exists(
 				typesafe_sprintf(
 					output_path_template.string(),
 					get_filename_for(type)
@@ -41,7 +41,7 @@ void regenerate_button_with_corners(
 	}
 
 	if (!should_regenerate) {
-		if (!augs::file_exists(button_with_corners_stamp_path)) {
+		if (!augs::exists(button_with_corners_stamp_path)) {
 			should_regenerate = true;
 		}
 		else {

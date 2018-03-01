@@ -135,9 +135,9 @@ summary: Just a hidden scratchpad.
 - "unique" naming for unique sprite decorations et cetera
 - move firing_engine_sound and the like from component to invariant
 
+- check in editor if the saving/opening path is a valid folder?
+
 - make reveal in explorer work for both files and folders
-- rename augs::ifstream_error to augs::file_open_error
-- rename "file_exists" to "path_exists"
 	- cause it also works for dirs
 - rename "significant" to "persistent" and remove the mention of "transferred through the network"editor_tab_signi
 	- because "replicated" implies being transferred

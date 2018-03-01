@@ -65,7 +65,7 @@ namespace augs {
 		) try {
 			create(shader_type, "// " + path.string() + "\n" + file_to_string(path));
 		}
-		catch (const augs::ifstream_error& err) {
+		catch (const augs::file_open_error& err) {
 			throw shader_error(
 				"Failed to load shader file %x:\n%x", path, err.what()
 			);

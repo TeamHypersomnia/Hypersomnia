@@ -115,11 +115,11 @@ main_menu_setup::main_menu_setup(
 			LOG("Warning: problem loading %x: \n%x.", menu_config_patch_path, pfr.operator std::string());
 		}
 	}
-	catch (const augs::ifstream_error& err) {
+	catch (const augs::file_open_error& err) {
 		LOG("Failed to load %x:\n%x\nMenu will apply no patch to config.", menu_config_patch_path, err.what());
 	}
 
-	if (augs::file_exists(settings.menu_theme_path)) {
+	if (augs::exists(settings.menu_theme_path)) {
 		menu_theme_source.bind_buffer(menu_theme);
 		menu_theme_source.set_direct_channels(true);
 		menu_theme_source.seek_to(static_cast<float>(settings.start_menu_music_at_secs));

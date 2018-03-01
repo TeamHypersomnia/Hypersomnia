@@ -85,7 +85,7 @@ void editor_folder::load_folder(const augs::path_type& from, const augs::path_ty
 		augs::load_from_bytes(view, paths.view_file);
 		augs::load_from_bytes(history, paths.hist_file);
 	}
-	catch (augs::ifstream_error) {
+	catch (augs::file_open_error) {
 		/* We just let it happen. These files are not necessary. */
 	}
 }

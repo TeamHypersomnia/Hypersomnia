@@ -19,11 +19,11 @@ void regenerate_image_from_commands(
 
 	bool should_regenerate = force_regenerate;
 
-	if (!augs::file_exists(output_image_path)) {
+	if (!augs::exists(output_image_path)) {
 		should_regenerate = true;
 	}
 	else {
-		if (!augs::file_exists(output_image_stamp_path)) {
+		if (!augs::exists(output_image_stamp_path)) {
 			should_regenerate = true;
 		}
 		else {

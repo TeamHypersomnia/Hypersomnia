@@ -14,15 +14,15 @@ static const auto path = GENERATED_FILES_DIR "test_byte_readwrite.bin";
 
 TEST_CASE("Filesystem test") {
 	augs::save_as_text(path, "");
-	REQUIRE(augs::file_exists(path));
+	REQUIRE(augs::exists(path));
 	REQUIRE(!augs::file_exists_and_non_empty(path));
 
 	augs::save_as_text(path, "a");
-	REQUIRE(augs::file_exists(path));
+	REQUIRE(augs::exists(path));
 	REQUIRE(augs::file_exists_and_non_empty(path));
 
 	augs::remove_file(path);
-	REQUIRE(!augs::file_exists(path));
+	REQUIRE(!augs::exists(path));
 	REQUIRE(!augs::file_exists_and_non_empty(path));
 }
 

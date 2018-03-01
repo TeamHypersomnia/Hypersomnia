@@ -36,11 +36,11 @@ regenerated_atlas::regenerated_atlas(
 			new_stamp.font_stamps[fnt_id] = augs::last_write_time(fnt_id.source_font_path);
 		}
 
-		if (!augs::file_exists(atlas_image_path)) {
+		if (!augs::exists(atlas_image_path)) {
 			should_regenerate = true;
 		}
 		else {
-			if (!augs::file_exists(atlas_stamp_path)) {
+			if (!augs::exists(atlas_stamp_path)) {
 				should_regenerate = true;
 			}
 			else {

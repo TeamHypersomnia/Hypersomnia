@@ -154,7 +154,7 @@ namespace augs {
 			for (size_t i = 1;; ++i) {
 				const auto target_path = augs::path_type(typesafe_sprintf(path.string(), i));
 
-				if (!augs::file_exists(target_path)) {
+				if (!augs::exists(target_path)) {
 					break;
 				}
 

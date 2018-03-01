@@ -19,15 +19,15 @@ void load_test_scene_sound_buffers(sound_buffer_inputs_map& sounds) {
 
 		augs::sound_buffer_loading_input def;
 
-		if (augs::file_exists(path(without_ext) += ".ogg")) {
+		if (augs::exists(path(without_ext) += ".ogg")) {
 			def.generate_mono = false;
 			def.path_template = path(without_ext) += ".ogg";
 		}
 		else {
-			if (augs::file_exists(path(without_ext) += ".wav")) {
+			if (augs::exists(path(without_ext) += ".wav")) {
 				def.path_template = path(without_ext) += ".wav";
 			}
-			else if (augs::file_exists(path(without_ext) += "_1.wav")) {
+			else if (augs::exists(path(without_ext) += "_1.wav")) {
 				def.path_template = path(without_ext) += "_%x.wav";
 			}
 

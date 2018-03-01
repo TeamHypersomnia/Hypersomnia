@@ -32,13 +32,13 @@ namespace augs {
 		return s;
 	}
 
-	using ifstream_error = std::ifstream::failure;
+	using file_open_error = std::ifstream::failure;
 	
 	inline std::chrono::system_clock::time_point last_write_time(const path_type& path) {
 		return std::experimental::filesystem::last_write_time(path);
 	}
 
-	inline bool file_exists(const path_type& path) {
+	inline bool exists(const path_type& path) {
 		return std::experimental::filesystem::exists(path);
 	}
 
@@ -53,7 +53,7 @@ namespace augs {
 				: typesafe_sprintf(path_template.string(), "")
 			;
 
-			if (!file_exists(candidate_path)) {
+			if (!augs::exists(candidate_path)) {
 				return candidate_path;
 			}
 		}
@@ -63,7 +63,7 @@ namespace augs {
 		const path_type canon_path,
 		const path_type local_path
 	) {
-		if (file_exists(local_path)) {
+		if (augs::exists(local_path)) {
 			return local_path;
 		}
 		else {
@@ -100,7 +100,7 @@ namespace augs {
 
 	template <class S>
 	void save_as_text_if_different(const path_type& path, const S& text) {
-		if (!file_exists(path) || text != file_to_string(path)) {
+		if (!augs::exists(path) || text != file_to_string(path)) {
 			auto out = with_exceptions<std::ofstream>();
 			out.open(path, std::ios::out);
 			out << text;

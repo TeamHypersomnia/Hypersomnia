@@ -115,7 +115,7 @@ void intercosm::load_as_lua(const intercosm_path_op op) {
 			err.what()
 		};
 	}
-	catch (const augs::ifstream_error err) {
+	catch (const augs::file_open_error err) {
 		throw intercosm_loading_error {
 			"Error",
 			typesafe_sprintf("Failed to load %x.\nFile might be missing.", display_path),
@@ -155,7 +155,7 @@ void intercosm::load_as_int(const augs::path_type& path) {
 			err.what()
 		};
 	}
-	catch (const augs::ifstream_error err) {
+	catch (const augs::file_open_error err) {
 		throw intercosm_loading_error {
 			"Error",
 			typesafe_sprintf("Failed to load %x.\nFile might be missing.", display_path),
