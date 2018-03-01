@@ -571,7 +571,11 @@ namespace augs {
 	}
 
 	void window::reveal_in_explorer(const augs::path_type& p) const {
-		augs::shell(p.string());
+		/*
+			Could be implemented as:
+			augs::shell(p.string());
+			At least for directories. What about files?
+		*/
 	}
 
 	void window::set_cursor_pos(vec2i pos) {

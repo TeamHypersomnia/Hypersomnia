@@ -522,6 +522,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/augs/misc/children_vector_tracker.cpp"
 	"src/view/frame_profiler.cpp"
 	"src/application/setups/editor/editor_autosave.cpp"
+	"src/application/setups/editor/editor_paths.cpp"
 )
 
 if(BUILD_WINDOW_FRAMEWORK)

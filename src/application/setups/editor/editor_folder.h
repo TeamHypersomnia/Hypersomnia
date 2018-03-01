@@ -20,6 +20,7 @@ namespace sol {
 
 struct intercosm;
 struct editor_recent_paths;
+struct editor_paths;
 
 struct editor_view {
 	// GEN INTROSPECTOR struct editor_view
@@ -56,6 +57,8 @@ struct editor_folder {
 	void load_folder();
 	void load_folder(const augs::path_type& from);
 	void load_folder(const augs::path_type& from, const augs::path_type& name);
+
+	editor_paths get_paths() const;
 };
 
 struct editor_last_folders {

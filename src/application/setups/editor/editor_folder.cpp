@@ -14,26 +14,11 @@ std::string editor_folder::get_display_path() const {
 	return ::get_project_name(current_path);
 }
 
-struct editor_paths {
-	augs::path_type int_file;
-	augs::path_type view_file;
-	augs::path_type hist_file;
-
-	editor_paths(
-		const augs::path_type& target_folder,
-		const std::string& project_name
-	) {
-		auto in_folder = [&](const auto ext) {
-			return augs::path_type(target_folder) += ("/" + project_name + ext);
-		};
-
-		int_file = in_folder(".int");
-		view_file = in_folder(".view");
-		hist_file = in_folder(".hist");
-	}
-};
-
 editor_folder::editor_folder(const augs::path_type& p) : work(std::make_unique<intercosm>()), current_path(p) {}
+
+editor_paths editor_folder::get_paths() const {
+	return { current_path, ::get_project_name(current_path) };
+}
 
 augs::path_type editor_folder::get_autosave_path() const {
 	return augs::path_type(current_path) += "/autosave";

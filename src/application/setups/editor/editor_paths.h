@@ -36,3 +36,15 @@ auto get_first_free_untitled_path(const T& path_template) {
 inline auto get_unsaved_path(augs::path_type path) {
 	return path.replace_extension(path.extension() += ".unsaved");
 }
+
+struct editor_paths {
+	augs::path_type int_file;
+	augs::path_type view_file;
+	augs::path_type hist_file;
+
+	editor_paths(
+		const augs::path_type& target_folder,
+		const std::string& project_name
+	);
+};
+

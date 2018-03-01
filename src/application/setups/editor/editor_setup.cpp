@@ -952,13 +952,7 @@ void editor_setup::go_to_entity() {
 }
 
 void editor_setup::reveal_in_explorer(const augs::window& owner) {
-	auto path_str = folder().current_path.string();
-
-	if (path_str.empty()) {
-		path_str = augs::get_current_working_directory();
-	}
-
-	owner.reveal_in_explorer(path_str);
+	owner.reveal_in_explorer(folder().get_paths().int_file);
 }
 
 void editor_setup::play() {
