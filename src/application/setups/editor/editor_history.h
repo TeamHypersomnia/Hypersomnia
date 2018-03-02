@@ -57,6 +57,7 @@ using editor_command = std::variant<
 struct editor_history {
 	// GEN INTROSPECTOR struct editor_history
 	unsigned current_index = 0;
+	unsigned last_saved_at = 0;
 	std::vector<editor_command> commands;
 	// END GEN INTROSPECTOR
 };

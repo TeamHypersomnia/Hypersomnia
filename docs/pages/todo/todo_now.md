@@ -70,7 +70,6 @@ summary: Just a hidden scratchpad.
 		- we won't have to create templates and will be able to reuse the logic easily
 			- cause it's just like a different project
 	- ``game_modes/`` - directory for all game modes. Editor iterates recursively through this directory and loads them into std::vector<std::pair<std::string, team_deathmatch>>.
-- editor_tabs maintains a list of folders only.
 - on saving an untitled work, we will have to move the folder.
 	- And possibly rename all of (tab, int, autosave will be absent though) that is inside to match the folder's name.
 	- We'd anyway need this as "save as"
@@ -114,7 +113,6 @@ summary: Just a hidden scratchpad.
 	- makes work testbed out of the box
 
 - autosave on focus lost
-
 - switching tabs with entities should always refocus on the same kind of property
 
 - ensure should throw so that the editor destructor can perform autosave

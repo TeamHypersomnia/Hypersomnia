@@ -145,6 +145,7 @@ class editor_setup : private current_access_cache<editor_setup> {
 	void open_last_folders(sol::state& lua);
 
 	void clear_all_selections();
+	void force_autosave_now() const;
 
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;

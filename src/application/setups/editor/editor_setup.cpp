@@ -148,8 +148,12 @@ editor_setup::editor_setup(
 	open_folder_in_new_tab({ lua, intercosm_path });
 }
 
-editor_setup::~editor_setup() {
+void editor_setup::force_autosave_now() const {
 	autosave.save(destructor_input.lua, signi);
+}
+
+editor_setup::~editor_setup() {
+	force_autosave_now();
 }
 
 void editor_setup::control(
@@ -1036,7 +1040,12 @@ bool editor_setup::handle_input_before_imgui(
 	augs::window& window,
 	sol::state& lua
 ) {
-	using namespace augs::event::keys;
+	using namespace augs::event;
+	using namespace keys;
+
+	if (e.msg == message::deactivate) {
+		force_autosave_now();
+	}
 
 	if (e.was_any_key_pressed()) {
 		const auto k = e.data.key.key;

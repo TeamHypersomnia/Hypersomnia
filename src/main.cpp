@@ -973,13 +973,12 @@ int work(const int argc, const char* const * const argv) try {
 
 					simulated_state.apply(e);
 
-					if (e.is_exit_message()) {
-						should_quit = true;
-						return true;
-					}
-					
 					if (e.msg == message::deactivate) {
 						releases.set_all();
+					}
+
+					if (e.is_exit_message()) {
+						should_quit = true;
 						return true;
 					}
 					
@@ -989,31 +988,33 @@ int work(const int argc, const char* const * const argv) try {
 						return true;
 					}
 
-					if (ingame_menu.show) {
-						return false;
-					}
-					
-					/* MSVC ICE workaround */
-					auto& _simulated_state = simulated_state;
-					auto& _lua = lua;
-					auto& _window = window;
+					if (!ingame_menu.show) {
+						/* MSVC ICE workaround */
+						auto& _simulated_state = simulated_state;
+						auto& _lua = lua;
+						auto& _window = window;
 
-					return visit_current_setup([&](auto& setup) {
-						using T = std::decay_t<decltype(setup)>;
+						if (visit_current_setup([&](auto& setup) {
+							using T = std::decay_t<decltype(setup)>;
 
-						if constexpr(T::handles_window_input) {
-							/* 
-								Lets a setup fetch an input before IMGUI does,
-								For example when IMGUI wants to capture keyboard input.	
-							*/
+							if constexpr(T::handles_window_input) {
+								/* 
+									Lets a setup fetch an input before IMGUI does,
+									For example when IMGUI wants to capture keyboard input.	
+								*/
 
-							return setup.handle_input_before_imgui(
-								_simulated_state, e, _window, _lua
-							);
+								return setup.handle_input_before_imgui(
+									_simulated_state, e, _window, _lua
+								);
+							}
+
+							return false;
+						})) {
+							return true;
 						}
+					}
 
-						return false;
-					});
+					return false;
 				});
 			}
 
