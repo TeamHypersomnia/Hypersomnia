@@ -4,8 +4,9 @@
 
 struct editor_autosave_settings {
 	// GEN INTROSPECTOR struct editor_autosave_settings
-	double once_every_min = 1.0;
 	bool enabled = true;
+	bool on_lost_focus = true;
+	double once_every_min = 1.0;
 	// END GEN INTROSPECTOR
 
 	bool operator!=(const editor_autosave_settings b) const {

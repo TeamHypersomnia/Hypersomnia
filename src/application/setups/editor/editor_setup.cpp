@@ -1043,7 +1043,7 @@ bool editor_setup::handle_input_before_imgui(
 	using namespace augs::event;
 	using namespace keys;
 
-	if (e.msg == message::deactivate) {
+	if (settings.autosave.on_lost_focus && e.msg == message::deactivate) {
 		force_autosave_now();
 	}
 
