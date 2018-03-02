@@ -112,7 +112,6 @@ summary: Just a hidden scratchpad.
 		- e.g. "gfx/my_rifle.png"
 	- makes work testbed out of the box
 
-- autosave on focus lost
 - switching tabs with entities should always refocus on the same kind of property
 
 - ensure should throw so that the editor destructor can perform autosave

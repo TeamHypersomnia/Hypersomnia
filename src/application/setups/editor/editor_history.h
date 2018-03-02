@@ -1,8 +1,12 @@
 #pragma once
 #include <vector>
 #include <variant>
+
+#include "augs/templates/history.h"
 #include "augs/readwrite/memory_stream.h"
 #include "game/transcendental/entity_id.h"
+
+class editor_setup;
 
 struct changed_field_record {
 	// GEN INTROSPECTOR struct changed_field_record
@@ -49,15 +53,9 @@ struct change_common_state_command {
 	// END GEN INTROSPECTOR
 };
 
-using editor_command = std::variant<
+using editor_history = augs::history<
 	change_common_state_command,
 	existing_entity_command
 >;
 
-struct editor_history {
-	// GEN INTROSPECTOR struct editor_history
-	unsigned current_index = 0;
-	unsigned last_saved_at = 0;
-	std::vector<editor_command> commands;
-	// END GEN INTROSPECTOR
-};
+using editor_command = editor_history::command_type;

@@ -3,7 +3,7 @@ title: Editor setup
 tags: [topics, setups] 
 hide_sidebar: true
 permalink: editor_setup
-tip: This page serves as a manual suitable for both programmers and content designers.
+tip: This page is a manual targeted both for programmers and content designers.
 summary: |
     The **editor setup** is a [setup](setup) that allows [authors](author) to work with [intercosm](intercosm) objects.  
     It can read intercosms from files on the disk and perform various operations on them, like create new entities or record and replay simulations.  

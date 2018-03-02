@@ -523,6 +523,9 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/view/frame_profiler.cpp"
 	"src/application/setups/editor/editor_autosave.cpp"
 	"src/application/setups/editor/editor_paths.cpp"
+	"src/augs/templates/container_templates.cpp"
+	"src/application/setups/editor/editor_history.cpp"
+	"src/augs/templates/history.cpp"
 )
 
 if(BUILD_WINDOW_FRAMEWORK)

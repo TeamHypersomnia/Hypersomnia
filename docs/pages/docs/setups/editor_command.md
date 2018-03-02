@@ -89,12 +89,8 @@ No other considerations are needed at this point.
 - There is currently little benefit seen in making history of changes be compatible with future releases.
   - Required lifetime of a history of changes is rather short. 
     - An artist probably won't care about the history after closing the editor.
-  <!--- - Managing changes in binary format will be significantly more performant and easier to code. -->
-  - In extreme case, we may export history of changes to lua.
+		- Managing changes in binary format will be significantly more performant and easier to code.
 
-<!---
-If you are not a programmer and only intend to use the editor to author actual content, you can safely skip this section.
--->-
 ## Commmand types
 
 ### Create an entity

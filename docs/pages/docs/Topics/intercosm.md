@@ -3,7 +3,7 @@ title: Intercosm
 tags: [topics, ECS] 
 hide_sidebar: true
 permalink: intercosm
-tip: This page serves as a manual suitable for both programmers and content designers.
+tip: This page is a manual targeted both for programmers and content designers.
 summary: |
     An **intercosm**, a short for an *interactive cosmos*, is an object that holds a [cosmos](cosmos), [viewables](viewable) and extra information like [id](entity_id) of the [entity](entity) that is to be controlled during the game.  
 
