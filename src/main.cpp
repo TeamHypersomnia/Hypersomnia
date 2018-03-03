@@ -118,8 +118,6 @@ int main(const int argc, const char* const * const argv) {
 */
 
 int work(const int argc, const char* const * const argv) try {
-	dump_detailed_sizeof_information(LOG_FILES_DIR "detailed_sizeofs.txt");
-
 	LOG("Started at %x", augs::get_readable_timestamp());
 	LOG("Working directory: %x", augs::get_current_working_directory().string());
 
@@ -128,6 +126,8 @@ int work(const int argc, const char* const * const argv) try {
 	augs::create_directories(LOG_FILES_DIR);
 	augs::create_directories(GENERATED_FILES_DIR);
 	augs::create_directories(LOCAL_FILES_DIR);
+
+	dump_detailed_sizeof_information(LOG_FILES_DIR "detailed_sizeofs.txt");
 
 	static const auto canon_config_path = augs::path_type("config.lua");
 	static const auto local_config_path = augs::path_type(LOCAL_FILES_DIR "config.local.lua");
