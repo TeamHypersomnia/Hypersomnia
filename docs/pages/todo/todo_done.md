@@ -217,3 +217,6 @@ we consider whole type overrides too complex architeciturally:
 	- even choreographic data will have their own viewers specified
 	- useful to always have one
 
+- timestamp all logs for convenience
+- delete untitled folder on saving
+

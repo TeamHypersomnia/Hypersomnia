@@ -15,6 +15,7 @@
 
 #include "augs/math/matrix.h"
 
+#include "augs/misc/time_utils.h"
 #include "augs/misc/imgui/imgui_utils.h"
 #include "augs/misc/machine_entropy.h"
 #include "augs/misc/lua/lua_utils.h"
@@ -116,6 +117,7 @@ int main(const int argc, const char* const * const argv) {
 */
 
 int work(const int argc, const char* const * const argv) try {
+	LOG("Started at %x", augs::get_readable_timestamp());
 	LOG("Working directory: %x", augs::get_current_working_directory().string());
 
 	static const auto params = cmd_line_params(argc, argv);

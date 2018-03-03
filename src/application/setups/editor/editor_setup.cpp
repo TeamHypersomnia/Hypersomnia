@@ -1,5 +1,6 @@
 #include "augs/templates/string_templates.h"
 #include "augs/templates/algorithm_templates.h"
+#include "augs/misc/time_utils.h"
 #include "augs/misc/imgui/imgui_utils.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/misc/imgui/addons/imguitabwindow/imguitabwindow.h"
@@ -116,7 +117,7 @@ void editor_setup::set_popup(const editor_popup p) {
 
 	LOG(logged);
 
-	augs::save_as_text(LOG_FILES_DIR "last_editor_message.txt", logged);
+	augs::save_as_text(LOG_FILES_DIR "last_editor_message.txt", augs::get_readable_timestamp() + '\n' + logged);
 }
 
 void editor_setup::set_locally_viewed(const entity_id id) {

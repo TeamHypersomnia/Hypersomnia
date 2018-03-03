@@ -16,6 +16,18 @@ static std::string leading_zero(const t component) {
 	return result;
 }
 
+std::string augs::get_readable_timestamp() {
+	time_t current_time;
+	time(&current_time);
+
+	struct tm *local_time;
+	local_time = localtime(&current_time);
+
+	char buffer [50];
+	strftime(buffer, sizeof(buffer), "%H:%M:%S on %m.%d.%y", local_time);
+	return std::string(buffer);
+}
+
 std::string augs::get_timestamp() {
 	time_t current_time;
 	time(&current_time);
