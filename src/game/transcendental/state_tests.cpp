@@ -211,8 +211,4 @@ TEST_CASE("StateTest2 PaddingTest") {
 	);
 #endif
 }
-
-TEST_CASE("StateTest3 IdContentTests") {
-
-}
 #endif

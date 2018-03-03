@@ -362,6 +362,38 @@ struct tests_of_traits {
 	static_assert(aligned_num_of_bytes_v<9, 4> == 12, "Trait is wrong");
 };
 
+template <class T>
+static void check_no_ids_in_impl(T& object) {
+	static_assert(!std::is_same_v<entity_id, T>);
+
+	if constexpr(is_container_v<T>){
+		if constexpr(is_associative_v<T>) {
+			typename T::key_type k;
+			typename T::mapped_type m;
+
+			check_no_ids_in_impl(k);
+			check_no_ids_in_impl(m);
+		}
+		else {
+			typename T::value_type v;
+			check_no_ids_in_impl(v);
+		}
+	}
+	else if constexpr(has_introspect_v<T>){
+		augs::introspect([](auto, auto& m){
+			check_no_ids_in_impl(m);
+		}, object);
+	}
+}
+
+template <class T>
+static void check_no_ids_in() {
+	T object;
+	check_no_ids_in_impl(object);
+}
+
+template void check_no_ids_in<components::pathfinding>();
+
 /*
 constexpr auto all_assets_size = sizeof(all_assets);
 constexpr auto tuple_of_assets_size = sizeof(tuple_of_all_assets);
