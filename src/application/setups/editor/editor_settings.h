@@ -19,7 +19,9 @@ struct editor_settings {
 	editor_autosave_settings autosave;
 	float camera_panning_speed = 1.f;
 	
+#if TODO
 	unsigned remember_last_n_commands = 200;
+#endif
 
 	unsigned go_to_dialog_width = 400;
 	unsigned lines_in_go_to_dialogs = 15;

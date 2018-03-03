@@ -44,7 +44,7 @@ namespace augs {
 		template <class T, class... RedoArgs>
 		void execute_new(T&& command, RedoArgs&&... redo_args) {
 			/* 
-				Remove all redoable entries.
+				Remove all redoable entries past the current revision.
 				Later we might support branches. 
 			*/
 
@@ -53,7 +53,7 @@ namespace augs {
 			if (saved_at_revision 
 				&& saved_at_revision.value() >= current_revision + 1
 			) {
-				/* Revision last saved at has beed deleted */
+				/* The revision that has been saved has just been deleted */
 				saved_at_revision = std::nullopt;
 			}
 

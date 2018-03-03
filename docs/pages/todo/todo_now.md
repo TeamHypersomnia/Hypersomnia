@@ -7,6 +7,7 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
+- delete untitled folder on saving
 - pool_types -> entity pool types
 - entity container types
 - Important: make components contain entity guids instead of entity ids

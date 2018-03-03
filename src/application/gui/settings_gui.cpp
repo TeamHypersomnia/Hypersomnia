@@ -233,10 +233,12 @@ void settings_gui_state::perform(
 						revertable_checkbox("Autosave when window loses focus", config.editor.autosave.on_lost_focus);
 					}
 					
+#if TODO
 					text("Remember last");
 					ImGui::SameLine();
 
 					revertable_drag("commands for undoing", config.editor.remember_last_n_commands, 1, 10, 2000);
+#endif
 				}	
 				
 				if (auto node = scoped_tree_node("Interface")) {
