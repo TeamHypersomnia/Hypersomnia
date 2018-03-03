@@ -46,6 +46,10 @@ namespace augs {
 		std::experimental::filesystem::remove(path);
 	}
 
+	inline void remove_directory(const path_type& path) {
+		std::experimental::filesystem::remove_all(path);
+	}
+
 	inline path_type first_free_path(const path_type path_template) {
 		for (std::size_t candidate = 0;; ++candidate) {
 			const auto candidate_path = candidate ? 

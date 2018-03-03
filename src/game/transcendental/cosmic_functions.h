@@ -108,13 +108,27 @@ public:
 		);
 	}
 
-#if TODO
-	static entity_handle create_entity_with_specific_guid(
-		specific_guid_creation_access,
-		cosmos&,
-		const entity_guid specific_guid
-	);
-#endif
+	template <class C, class E>
+	static auto undelete_entity(
+		C& cosm,
+		const entity_solvable<E>& deleted_content
+	) {
+		const auto desired_guid = deleted_content.guid;
+		const auto desired_flavour_id = deleted_content.flavour_id;
+
+		auto& s = cosm.get_solvable({});
+
+		const auto new_allocation = s.template allocate_entity_with_specific_guid<E>(
+			desired_guid,
+			desired_flavour_id
+		);
+
+		new_allocation.object.components = deleted_content.components;
+		
+		const auto handle = typed_entity_handle<E> { new_allocation.object, cosm, new_allocation.key };
+		infer_caches_for(handle);
+		return handle;
+	}
 
 	template <class E>
 	static auto specific_clone_entity(const typed_entity_handle<E> source_entity) {

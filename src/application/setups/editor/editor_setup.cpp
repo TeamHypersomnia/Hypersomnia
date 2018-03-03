@@ -201,12 +201,14 @@ void editor_setup::open_folder_in_new_tab(const path_operation op) {
 		[this, op](editor_folder& f) {
 			f.set_folder_path(op.lua, op.path, recent);
 			f.load_folder();
+			f.history.mark_current_revision_as_saved();
 		}
 	);
 }
 
 void editor_setup::save_current_folder() {
 	folder().save_folder();
+	folder().history.mark_current_revision_as_saved();
 }
 
 void editor_setup::save_current_folder_to(const path_operation op) {
@@ -425,7 +427,13 @@ void editor_setup::perform_custom_imgui(
 						out.reserve(signi.folders.size());
 
 						for (const auto& it : signi.folders) {
-							out.push_back(it.get_display_path());
+							auto p = it.get_display_path();
+
+							if (it.has_unsaved_changes()) {
+								p += " *";
+							}
+
+							out.push_back(p);
 						}
 
 						return out;
@@ -911,11 +919,11 @@ void editor_setup::save_as(const augs::window& owner) {
 }
 
 void editor_setup::undo() {
-
+	folder().history.undo(folder());
 }
 
 void editor_setup::redo() {
-
+	folder().history.redo(folder());
 }
 
 void editor_setup::copy() {
@@ -932,13 +940,18 @@ void editor_setup::paste() {
 
 void editor_setup::del() {
 	if (anything_opened()) {
+		delete_entities_command command;
+
 		for_each_selected_entity(
 			[&](const auto e) {
-				delete_entity_with_children(work().world[e]);
+				command.push_entry(work().world[e]);
 			}
 		);
 
-		clear_all_selections();
+		if (!command.empty()) {
+			folder().history.execute_new(std::move(command), folder());
+			clear_all_selections();
+		}
 	}
 }
 
@@ -989,6 +1002,13 @@ void editor_setup::new_tab() {
 		const auto new_path = get_first_free_untitled_path("Project%x");
 		augs::create_directories(augs::path_type(new_path) += "/");
 		t.current_path = new_path;
+
+		/* 
+			Initial write-out so that we have some empty intercosms
+			in the folder to be loaded later on restart
+		*/
+
+		t.save_folder();
 	});
 }
 
@@ -1013,7 +1033,7 @@ void editor_setup::close_folder(const folder_index i) {
 	}
 		
 	if (folder_to_close.is_untitled()) {
-		augs::remove_file(folder_to_close.current_path);
+		augs::remove_directory(folder_to_close.current_path);
 	}
 
 	signi.folders.erase(signi.folders.begin() + i);

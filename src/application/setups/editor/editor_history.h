@@ -3,10 +3,17 @@
 #include <variant>
 
 #include "augs/templates/history.h"
-#include "augs/readwrite/memory_stream.h"
-#include "game/transcendental/entity_id.h"
+#include "augs/templates/type_mod_templates.h"
 
-class editor_setup;
+#include "augs/readwrite/memory_stream.h"
+
+#include "game/transcendental/entity_id.h"
+#include "game/transcendental/entity_handle_declaration.h"
+
+#include "game/transcendental/entity_container_types.h"
+#include "game/transcendental/entity_solvable.h"
+
+class editor_folder;
 
 struct changed_field_record {
 	// GEN INTROSPECTOR struct changed_field_record
@@ -24,27 +31,21 @@ struct change_component_command {
 	// END GEN INTROSPECTOR
 };
 
-struct duplicate_entity_command {
+struct duplicate_entities_command {
 
 };
 
-struct delete_entity_command {
-	// GEN INTROSPECTOR struct delete_entity_command
-	std::vector<std::byte> deleted_content;
+struct delete_entities_command {
+	// GEN INTROSPECTOR struct delete_entities_command
+	all_entity_vectors deleted_entities;
 	// END GEN INTROSPECTOR
-};
 
-struct existing_entity_command {
-	using op_type = std::variant<
-		change_component_command,
-		duplicate_entity_command,
-		delete_entity_command
-	>;
+	void push_entry(const_entity_handle);
 
-	// GEN INTROSPECTOR struct existing_entity_command
-	std::vector<entity_id> entities;
-	op_type operation;
-	// END GEN INTROSPECTOR
+	void redo(editor_folder&) const;
+	void undo(editor_folder&) const;
+
+	bool empty() const;
 };
 
 struct change_common_state_command {
@@ -54,8 +55,7 @@ struct change_common_state_command {
 };
 
 using editor_history = augs::history<
-	change_common_state_command,
-	existing_entity_command
+	delete_entities_command
 >;
 
 using editor_command = editor_history::command_type;

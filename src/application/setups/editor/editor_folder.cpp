@@ -34,7 +34,7 @@ void editor_folder::set_folder_path(
 }
 
 bool editor_folder::has_unsaved_changes() const {
-	return true;
+	return history.has_unsaved_changes();
 }
 
 bool editor_folder::is_untitled() const {

@@ -7,6 +7,20 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
+- pool_types -> entity pool types
+- entity container types
+- Important: make components contain entity guids instead of entity ids
+	- And let the cosmos only serialize entities and not pools
+	- that is because then we won't have to serialize entire pools
+	- and operations like undeleting entities will be a lot easier because we won't have to simulate an old entity id
+	- signi_entity_id
+	- really resuscitate that checks from cosmic delta
+	- in case of groups, we're not doing something twice, because we'd anyway need to narrow down those ids
+	- let entity_id be said about as "a temporary id", could later even become something with a pointer cache
+
+- for now do an undelete test with a floor and some walls perhaps
+- storage format for deleted entities
+
 - game mode property is a part of game mode definition
 - game mode definition = all game mode properties
 - a **game mode marker** is a game mode property of game mode definition that has a spatial representation

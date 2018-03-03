@@ -77,6 +77,7 @@ void open_last_folders(
 				catch (editor_popup p) {
 					auto new_folder = editor_folder(real_path);
 					new_folder.load_folder();
+					new_folder.history.mark_current_revision_as_saved();
 					signi.folders.emplace_back(std::move(new_folder));
 				}
 			}
