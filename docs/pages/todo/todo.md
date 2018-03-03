@@ -47,3 +47,6 @@ summary: Just a hidden scratchpad.
 	- This is really important in the face of bugs.
 	- Or just get rid of test scene setup for now and let it by default launch a scene in editor that records inputs
 
+- for now do an undelete test with a floor and some walls perhaps
+- storage format for deleted entities
+

@@ -526,6 +526,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/augs/templates/container_templates.cpp"
 	"src/application/setups/editor/editor_history.cpp"
 	"src/augs/templates/history.cpp"
+	"src/game/transcendental/state_tests.cpp"
 )
 
 if(BUILD_WINDOW_FRAMEWORK)

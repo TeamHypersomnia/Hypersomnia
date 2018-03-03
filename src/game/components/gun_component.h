@@ -65,14 +65,14 @@ namespace invariants {
 
 		pad_bytes<1> pad;
 
-		augs::minmax<float> muzzle_velocity;
+		augs::minmax<float> muzzle_velocity = { 2000.f, 2000.f };
 
 		float damage_multiplier = 1.f;
 
 		vec2 bullet_spawn_offset;
 
-		augs::minmax<float> shell_velocity;
-		augs::minmax<float> shell_angular_velocity;
+		augs::minmax<float> shell_velocity = { 300.f, 1700.f };
+		augs::minmax<float> shell_angular_velocity = { 2.f, 14.f };
 
 		float shell_spread_degrees = 20.f;
 

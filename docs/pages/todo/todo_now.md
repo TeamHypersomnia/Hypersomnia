@@ -16,9 +16,6 @@ summary: Just a hidden scratchpad.
 	- in case of groups, we're not doing something twice, because we'd anyway need to narrow down those ids
 	- let entity_id be said about as "a temporary id", could later even become something with a pointer cache
 
-- for now do an undelete test with a floor and some walls perhaps
-- storage format for deleted entities
-
 - game mode property is a part of game mode definition
 - game mode definition = all game mode properties
 - a **game mode marker** is a game mode property of game mode definition that has a spatial representation

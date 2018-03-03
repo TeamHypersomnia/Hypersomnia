@@ -32,8 +32,11 @@ namespace invariants {
 		bool disable_standard_collision_resolution = false;
 		bool driver_shoot_through = false;
 		bool destructible = false;
+
 		bool sensor = false;
-		pad_bytes<3> pad;
+
+		pad_bytes<1> pad;
+		b2Filter filter;
 
 		assets::physical_material_id material = assets::physical_material_id::INVALID;
 
@@ -42,8 +45,6 @@ namespace invariants {
 		float density = 1.f;
 		float friction = 0.f;
 		float restitution = 0.f;
-
-		b2Filter filter;
 		// END GEN INTROSPECTOR
 
 		/*

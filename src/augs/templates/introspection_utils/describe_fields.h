@@ -41,7 +41,7 @@ auto describe_fields(const T& object) {
 
 			const auto type_name = get_type_name<decltype(field)>();
 
-			result += typesafe_sprintf("%x - %x (%x) (%x) %x",
+			result += std::string(fields.size() * 4, ' ') + typesafe_sprintf("%x - %x (%x) (%x) %x",
 				this_offset,
 				this_offset + sizeof(field),
 				sizeof(field),
@@ -59,7 +59,13 @@ auto describe_fields(const T& object) {
 			result += "\n";
 
 			fields.push_back(label);
-			augs::introspect_if_not_leaf(augs::recursive(self), field);
+
+			using F = std::decay_t<decltype(field)>;
+
+			if constexpr(!is_container_v<F> && !is_introspective_leaf_v<F>) {
+				augs::introspect(augs::recursive(self), field);
+			}
+
 			fields.pop_back();
 		}), 
 		object
@@ -79,7 +85,9 @@ auto determine_breaks_in_fields_continuity_by_introspection(const T& object) {
 	augs::introspect(
 		augs::recursive(
 			[&](auto&& self, const std::string& label, auto& field) {
-				if constexpr(is_introspective_leaf_v<std::decay_t<decltype(field)>>) {
+				using F = std::decay_t<decltype(field)>;
+
+				if constexpr(is_container_v<F> || is_introspective_leaf_v<F>) {
 					auto make_full_field_name = [&]() {
 						std::string name;
 
