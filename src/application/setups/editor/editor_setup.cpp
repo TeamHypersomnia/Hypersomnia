@@ -247,7 +247,7 @@ void editor_setup::perform_custom_imgui(
 
 	autosave.advance(lua, signi, settings.autosave);
 
-	auto in_path = [&](const auto& path) {
+	auto path_op = [&](const auto& path) {
 		return path_operation{ lua, path };
 	};
 
@@ -294,7 +294,7 @@ void editor_setup::perform_custom_imgui(
 							const auto str = augs::to_display_path(target_path).string();
 
 							if (ImGui::MenuItem(str.c_str())) {
-								open_folder_in_new_tab(in_path(target_path));
+								open_folder_in_new_tab(path_op(target_path));
 							}
 						}
 
@@ -786,18 +786,25 @@ void editor_setup::perform_custom_imgui(
 		const auto result_path = open_folder_dialog.get();
 
 		if (result_path) {
-			open_folder_in_new_tab(in_path(*result_path));
+			open_folder_in_new_tab(path_op(*result_path));
 		}
 	}
 
 	if (save_project_dialog.valid() && is_ready(save_project_dialog)) {
-		const auto result_path = save_project_dialog.get();
+		if (const auto result_path = save_project_dialog.get()) {
+			if (::is_untitled_path(*result_path)) {
+				set_popup({"Error", "Can't save to a directory with untitled projects.", ""});
+			}
+			else {
+				const auto previous_path = folder().current_path;
+				const bool was_untitled = folder().is_untitled();
 
-		if (result_path) {
-			const auto directory_name = augs::path_type(*result_path).filename();
-			const auto project_name = directory_name;
+				save_current_folder_to(path_op(*result_path));
 
-			save_current_folder_to(in_path(*result_path));
+				if (was_untitled) {
+					augs::remove_directory(previous_path);
+				}
+			}
 		}
 	}
 

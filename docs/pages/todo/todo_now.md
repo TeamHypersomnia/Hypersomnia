@@ -7,9 +7,9 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
+- timestamp all logs for convenience
 - delete untitled folder on saving
-- pool_types -> entity pool types
-- entity container types
+
 - Important: make components contain entity guids instead of entity ids
 	- And let the cosmos only serialize entities and not pools
 	- that is because then we won't have to serialize entire pools

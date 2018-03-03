@@ -1,6 +1,7 @@
 #pragma once
 #include "augs/filesystem/path.h"
 #include "augs/filesystem/file.h"
+#include "augs/filesystem/directory.h"
 
 #define EDITOR_DIR LOCAL_FILES_DIR "editor/"
 
@@ -20,7 +21,7 @@ inline bool is_untitled_path(augs::path_type path) {
 	const auto untitled_dir = augs::path_type(get_untitled_dir()).make_preferred().string();
 	const auto checked_path = path.make_preferred().string();
 
-	return untitled_dir == checked_path.substr(0, untitled_dir.length());
+	return checked_path.find(untitled_dir) != std::string::npos;
 }
 
 template <class T>
