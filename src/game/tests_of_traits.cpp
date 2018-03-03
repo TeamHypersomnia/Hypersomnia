@@ -362,26 +362,26 @@ struct tests_of_traits {
 	static_assert(aligned_num_of_bytes_v<9, 4> == 12, "Trait is wrong");
 };
 
-template <class T>
-static void check_no_ids_in_impl(T& object) {
-	static_assert(!std::is_same_v<entity_id, T>);
+template <class F, class T>
+static void validate_fields_in(T& object, F condition) {
+	condition(object);
 
 	if constexpr(is_container_v<T>){
 		if constexpr(is_associative_v<T>) {
 			typename T::key_type k;
 			typename T::mapped_type m;
 
-			check_no_ids_in_impl(k);
-			check_no_ids_in_impl(m);
+			validate_fields_in(k, condition);
+			validate_fields_in(m, condition);
 		}
 		else {
 			typename T::value_type v;
-			check_no_ids_in_impl(v);
+			validate_fields_in(v, condition);
 		}
 	}
 	else if constexpr(has_introspect_v<T>){
-		augs::introspect([](auto, auto& m){
-			check_no_ids_in_impl(m);
+		augs::introspect([&](auto, auto& m){
+			validate_fields_in(m, condition);
 		}, object);
 	}
 }
@@ -389,10 +389,38 @@ static void check_no_ids_in_impl(T& object) {
 template <class T>
 static void check_no_ids_in() {
 	T object;
-	check_no_ids_in_impl(object);
+
+	validate_fields_in(object, [](auto m){
+		using M = decltype(m);
+		static_assert(!std::is_same_v<entity_id, M>, "No entity ids allowed here!");
+	});
+}
+
+template <class T>
+static void check_no_pointers_in() {
+	T object;
+
+	validate_fields_in(object, [](auto m){
+		using M = decltype(m);
+		static_assert(!std::is_pointer_v<M> && !std::is_reference_v<M>, "No pointers allowed here!");
+	});
 }
 
 template void check_no_ids_in<components::pathfinding>();
+
+template void check_no_pointers_in<cosmos_solvable_significant>();
+template void check_no_pointers_in<cosmos_common_significant>();
+
+#if 0
+struct sometest {
+	// GEN INTROSPECTOR struct sometest
+	int aaaa;
+	int* ptr;
+	// END GEN INTROSPECTOR
+};
+
+template void check_no_pointers_in<sometest>();
+#endif
 
 /*
 constexpr auto all_assets_size = sizeof(all_assets);
