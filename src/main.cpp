@@ -57,6 +57,7 @@
 #include "application/main/release_flags.h"
 
 #include "cmd_line_params.h"
+#include "build_info.h"
 
 extern std::string help_contents;
 
@@ -117,6 +118,8 @@ int main(const int argc, const char* const * const argv) {
 */
 
 int work(const int argc, const char* const * const argv) try {
+	dump_detailed_sizeof_information(LOG_FILES_DIR "detailed_sizeofs.txt");
+
 	LOG("Started at %x", augs::get_readable_timestamp());
 	LOG("Working directory: %x", augs::get_current_working_directory().string());
 

@@ -1,11 +1,12 @@
 #pragma once
 #include "hypersomnia_version.h"
+#include "augs/filesystem/path.h"
 #include "augs/templates/for_each_std_get.h"
 #include "augs/templates/string_templates.h"
 
 #include "augs/misc/typesafe_sprintf.h"
 
-#include "game/organization/all_entity_types_declaration.h"
+#include "game/organization/for_each_entity_type.h"
 #include "game/transcendental/entity_id.h"
 
 inline auto static_allocations_info() {
@@ -29,7 +30,7 @@ inline auto sizeofs_info() {
 inline auto entity_types_info() {
 	std::string output;
 
-	for_each_through_std_get(all_entity_types(), [&](auto e){
+	for_each_entity_type([&](auto e){
 		output += get_type_name_strip_namespace(e) + '\n';
 	});
 
@@ -48,3 +49,5 @@ inline auto complete_build_info() {
 		+ "\n"
 	;
 }
+
+void dump_detailed_sizeof_information(const augs::path_type& where);

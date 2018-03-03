@@ -75,9 +75,6 @@ TEST_CASE("StateTest1 PaddingSanityCheck2") {
 
 
 TEST_CASE("StateTest2 PaddingTest") {
-	std::string component_size_information;
-	std::size_t total_components_size = 0u;
-
 	auto assert_component_trivial = [](auto c) {
 		using checked_type = decltype(c);
 		
@@ -91,9 +88,6 @@ TEST_CASE("StateTest2 PaddingTest") {
 	auto padding_checker = [&](auto c, auto... args) {
 		using checked_type = decltype(c);
 		static_assert(std::is_same_v<std::decay_t<checked_type>, checked_type>, "Something's wrong with the types");
-
-		total_components_size += sizeof(checked_type);
-		component_size_information += typesafe_sprintf("%x == sizeof %x\n", sizeof(checked_type), get_type_name<checked_type>());
 
 		if constexpr(!allows_nontriviality_v<checked_type>) {
 			constexpr size_t type_size = sizeof(checked_type);
@@ -189,21 +183,6 @@ TEST_CASE("StateTest2 PaddingTest") {
 
 	padding_checker(augs::pool_indirector<unsigned>());
 	padding_checker(augs::pool_slot<unsigned>());
-
-	component_size_information += typesafe_sprintf("Total size in bytes: %x", total_components_size);
-	augs::save_as_text(LOG_FILES_DIR "components.txt", component_size_information);
-
-	std::string other_types;
-
-	auto report_type = [&other_types](auto t) {
-		other_types += typesafe_sprintf("Type: %x\nsizeof: %x\nFields:\n", get_type_name<decltype(t)>(), sizeof(t));
-
-		other_types += describe_fields(t) + '\n';	
-	};
-	
-	if (other_types.size() > 0) {
-		augs::save_as_text(LOG_FILES_DIR "other_types.txt", other_types);
-	}
 	
 #if !STATICALLY_ALLOCATE_ENTITY_TYPES_NUM
 	/* Too much space would be wasted and stack overflows would occur. */
