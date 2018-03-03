@@ -15,3 +15,5 @@ struct child_entity_id;
 
 template <class E>
 struct typed_entity_id;
+
+using signi_entity_id = entity_guid;

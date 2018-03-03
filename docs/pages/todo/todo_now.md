@@ -7,6 +7,12 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
+- should inferred caches map from guids or from ids?
+	- should perhaps be both
+	- fastest access
+	- will have to templatize cache finders
+	- most of the time, retrievals will happen
+
 - Important: make components contain entity guids instead of entity ids
 	- And let the cosmos only serialize entities and not pools
 	- that is because then we won't have to serialize entire pools

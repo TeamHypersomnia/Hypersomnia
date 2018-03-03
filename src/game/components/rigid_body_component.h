@@ -21,12 +21,12 @@ class relational_cache;
 
 struct friction_connection {
 	// GEN INTROSPECTOR struct friction_connection
-	entity_id target;
+	signi_entity_id target;
 	unsigned fixtures_connected = 0;
 	// END GEN INTROSPECTOR
-	friction_connection(entity_id t = entity_id()) : target(t) {}
+	friction_connection(signi_entity_id t = signi_entity_id()) : target(t) {}
 
-	operator entity_id() const {
+	operator signi_entity_id() const {
 		return target;
 	}
 };
@@ -34,8 +34,8 @@ struct friction_connection {
 struct special_physics {
 	// GEN INTROSPECTOR struct special_physics
 	augs::stepped_cooldown dropped_or_created_cooldown;
-	entity_id during_cooldown_ignore_collision_with;
-	entity_id owner_friction_ground;
+	signi_entity_id during_cooldown_ignore_collision_with;
+	signi_entity_id owner_friction_ground;
 	augs::constant_size_vector<friction_connection, OWNER_FRICTION_GROUNDS_COUNT> owner_friction_grounds;
 	// END GEN INTROSPECTOR
 
@@ -138,7 +138,11 @@ public:
 	void set_angular_velocity(const float) const;
 
 	void set_transform(const components::transform&) const;
-	void set_transform(const entity_id) const;
+	
+	template <class id_type>
+	void set_transform(const id_type id) const {
+		set_transform(handle.get_cosmos()[id].get_logic_transform());
+	}
 
 	void apply_force(const vec2) const;
 	void apply_force(const vec2, const vec2 center_offset, const bool wake = true) const;
@@ -395,12 +399,6 @@ void component_synchronizer<E, components::rigid_body>::apply_angular_impulse(co
 		body->ApplyAngularImpulse(imp, true);
 		data.angular_velocity = body->GetAngularVelocity();
 	}
-}
-
-
-template <class E>
-void component_synchronizer<E, components::rigid_body>::set_transform(const entity_id id) const {
-	set_transform(handle.get_cosmos()[id].get_logic_transform());
 }
 
 template <class E>

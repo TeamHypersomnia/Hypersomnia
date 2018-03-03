@@ -199,6 +199,14 @@ public:
 		return owner;
 	}
 
+	bool operator==(const this_handle_type& h) const {
+		return this->get_id() == h.get_id();
+	}
+
+	bool operator==(const specific_entity_handle<!is_const, entity_type, identifier_provider>& h) const {
+		return this->get_id() == h.get_id();
+	}
+
 	bool operator==(const entity_id id) const {
 		return get_id() == id;
 	}

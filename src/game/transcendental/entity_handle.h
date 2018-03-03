@@ -147,18 +147,28 @@ public:
 		return owner;
 	}
 
+	bool operator==(const this_handle_type& h) const {
+		return this->get_id() == h.get_id();
+	}
+
+	bool operator==(const basic_entity_handle<!is_const>& h) const {
+		return this->get_id() == h.get_id();
+	}
+
 	bool operator==(const entity_id id) const {
 		return raw_id == id;
+	}
+
+	bool operator==(const entity_guid id) const {
+		return this->get_guid() == id;
 	}
 
 	bool operator!=(const entity_id id) const {
 		return !operator==(id);
 	}
 
-	/* Enable non-const to const handle conversion */
-	template <bool C = !is_const, class = std::enable_if_t<C>>
-	operator basic_entity_handle<!is_const>() const {
-		return basic_entity_handle<!is_const>(ptr, owner, raw_id);
+	operator entity_guid() const {
+		return this->get_guid();
 	}
 
 	operator entity_id() const {
@@ -171,6 +181,12 @@ public:
 
 	operator unversioned_entity_id() const {
 		return raw_id;
+	}
+
+	/* Enable non-const to const handle conversion */
+	template <bool C = !is_const, class = std::enable_if_t<C>>
+	operator basic_entity_handle<!is_const>() const {
+		return basic_entity_handle<!is_const>(ptr, owner, raw_id);
 	}
 
 	operator bool() const {

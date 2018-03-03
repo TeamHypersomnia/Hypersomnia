@@ -127,7 +127,7 @@ void contact_listener::BeginContact(b2Contact* contact) {
 				}
 
 				if (found_suitable) {
-					auto new_owner = subject.get_owner_of_colliders().get_id();
+					auto new_owner = subject.get_owner_of_colliders();
 					auto& grounds = collider_physics.owner_friction_grounds;
 					
 					friction_connection connection(new_owner);
@@ -135,7 +135,7 @@ void contact_listener::BeginContact(b2Contact* contact) {
 
 					if (const auto found = find_in_if(
 							grounds, 
-							[new_owner](const entity_id candidate) { 
+							[new_owner](const auto candidate) { 
 								return new_owner == candidate; 
 							}
 						);

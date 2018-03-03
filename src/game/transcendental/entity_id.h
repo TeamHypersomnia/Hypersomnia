@@ -14,15 +14,21 @@ struct entity_guid {
 	guid_value_type value = 0u;
 	// END GEN INTROSPECTOR
 
-	entity_guid(const guid_value_type b = 0u) : value(b) {}
+	entity_guid() = default;
+	entity_guid(const guid_value_type b) : value(b) {}
 	
-	entity_guid& operator=(const guid_value_type b) {
-		value = b;
-		return *this;
+	entity_guid& operator=(const entity_guid& b) = default;
+
+	bool operator==(const entity_guid& b) const {
+		return value == b.value;
 	}
 
 	operator guid_value_type() const {
 		return value;
+	}
+
+	void unset() {
+		*this = {};
 	}
 };
 

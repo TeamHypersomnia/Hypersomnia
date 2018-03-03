@@ -220,3 +220,7 @@ we consider whole type overrides too complex architeciturally:
 - timestamp all logs for convenience
 - delete untitled folder on saving
 
+- should inferred caches map from both guids and from ids?
+	- no point. some indirection would be necessary anyway
+	- just provide overload for getters that have a cosmos at hand
+
