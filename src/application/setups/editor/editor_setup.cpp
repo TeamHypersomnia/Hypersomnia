@@ -556,20 +556,27 @@ void editor_setup::perform_custom_imgui(
 			}
 
 			static ImGuiTextFilter filter;
-			filter.Draw("##EntitiesInput");
+			filter.Draw();
 
 			cosmic::for_each_entity(work().world, [&](const auto handle) {
 				const auto name = to_string(handle.get_name());
 				const auto id = handle.get_id();
 
 				if (filter.PassFilter(name.c_str())) {
-					auto scope = scoped_id(id.indirection_index);
+					auto scope = scoped_id(handle.get_guid());
 
-					if (auto node = scoped_tree_node(name.c_str())) {
-						if (ImGui::Button("Control")) {
-							set_locally_viewed(id);
-						}
+					int flags = ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_Leaf;
+
+					if (work().local_test_subject == id) {
+						flags |= ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_Selected;
 					}
+
+					ImGui::TreeNodeEx(name.c_str(), flags);
+
+					if (ImGui::IsItemClicked()) {
+						set_locally_viewed(id);
+					}
+					ImGui::TreePop();
 				}
 
 			});
@@ -711,21 +718,11 @@ void editor_setup::perform_custom_imgui(
 				was_acquired = true;
 			}
 			
-        	if (input_text<256>(
-				"##GoToEntityInput", 
-				go_to_entity_query,
-					ImGuiInputTextFlags_CallbackHistory 
-					| ImGuiInputTextFlags_EnterReturnsTrue 
-					| ImGuiInputTextFlags_CallbackAlways
-					| ImGuiInputTextFlags_CallbackCompletion
-				, 
-				arrow_callback,
-				reinterpret_cast<void*>(this)
-			)) {
+			auto confirm_go_to_selection = [&](const auto match) {
+				/* Confirm selection with quick search */
 				const auto selected_name = to_wstring(go_to_entity_query);
 
-				// LOG(selected_name);
-				if (const auto match = get_matching_go_to_entity()) {	
+				if (match) {	
 					view().selected_entities = { match };
 
 					if (!view().panned_camera.has_value()) {
@@ -739,6 +736,20 @@ void editor_setup::perform_custom_imgui(
 						LOG("WARNING: transform of %x could not be found.", match);
 					}
 				}
+			};
+
+        	if (input_text<256>(
+				"##GoToEntityInput", 
+				go_to_entity_query,
+					ImGuiInputTextFlags_CallbackHistory 
+					| ImGuiInputTextFlags_EnterReturnsTrue 
+					| ImGuiInputTextFlags_CallbackAlways
+					| ImGuiInputTextFlags_CallbackCompletion
+				, 
+				arrow_callback,
+				reinterpret_cast<void*>(this)
+			)) {
+				confirm_go_to_selection(get_matching_go_to_entity());
 			}
 	
 			{
