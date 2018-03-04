@@ -18,6 +18,8 @@
 
 #include "application/debug_settings.h"
 
+#include "application/setups/setup_common.h"
+
 #include "application/setups/editor/editor_significant.h"
 #include "application/setups/editor/editor_autosave.h"
 #include "application/setups/editor/editor_settings.h"
@@ -223,7 +225,7 @@ public:
 		const camera_cone current_cone
 	);
 
-	bool escape();
+	std::optional<setup_escape_result> escape();
 	bool confirm_modal_popup();
 
 	void open(const augs::window& owner);

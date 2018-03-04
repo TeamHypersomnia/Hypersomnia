@@ -1188,24 +1188,35 @@ int work(const int argc, const char* const * const argv) try {
 
 				common_input_state.apply(e);
 
-				if (
-					current_setup.has_value()
+				if (current_setup.has_value()
 					&& e.was_pressed(key::ESC)
 				) {
-					if (visit_current_setup([&](auto& setup) {
+					if (ingame_menu.show) {
+						ingame_menu.show = false;
+					}
+					else if (!visit_current_setup([&](auto& setup) {
 						using T = std::decay_t<decltype(setup)>;
 
 						if constexpr(T::handles_escape) {
-							return setup.escape();
+							const auto result = setup.escape();
+
+							if (result) {
+								switch (*result) {
+									case setup_escape_result::LAUNCH_INGAME_MENU: ingame_menu.show = true; break;
+									case setup_escape_result::SWITCH_TO_GAME_GUI: game_gui_mode = true; break;
+									default: break;
+								}
+
+								return true;
+							}
 						}
-						
+
 						return false;
 					})) {
-						continue;
+						/* Setup does not handle ESC */
+						ingame_menu.show = true;
 					}
 
-					bool& f = ingame_menu.show;
-					f = !f;
 					releases.set_all();
 					
 					continue;

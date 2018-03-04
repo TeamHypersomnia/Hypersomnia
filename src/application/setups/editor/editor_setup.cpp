@@ -865,17 +865,17 @@ void editor_setup::clear_all_selections() {
 	}
 }
 
-bool editor_setup::escape() {
+std::optional<setup_escape_result> editor_setup::escape() {
 	if (ok_only_popup) {
 		ok_only_popup = std::nullopt;
-		return true;
+		return std::nullopt;
 	}
-	else if(!player.paused) {
+	else if (!player.paused) {
 		player.paused = true;
-		return true;
+		return setup_escape_result::SWITCH_TO_GAME_GUI;
 	}
 
-	return false;
+	return setup_escape_result::LAUNCH_INGAME_MENU;
 }
 
 bool editor_setup::confirm_modal_popup() {
