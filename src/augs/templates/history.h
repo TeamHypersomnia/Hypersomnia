@@ -32,11 +32,11 @@ namespace augs {
 			return current_revision == static_cast<index_type>(-1);
 		}
 
-		const auto& last_command() const {
+		auto& last_command() {
 			return commands[current_revision];
 		}
 
-		const auto& next_command() const {
+		auto& next_command() {
 			return commands[current_revision + 1];
 		}
 
@@ -80,7 +80,7 @@ namespace augs {
 			}
 
 			std::visit(
-				[&](const auto& command) {
+				[&](auto& command) {
 					command.redo(std::forward<Args>(args)...); 
 				},
 				next_command()
@@ -96,7 +96,7 @@ namespace augs {
 			}
 
 			std::visit(
-				[&](const auto& command) {
+				[&](auto& command) {
 					command.undo(std::forward<Args>(args)...); 
 				},
 				last_command()

@@ -7,16 +7,13 @@
 template <class E>
 struct entity_solvable;
 
-template <class T>
-using make_entity_vector = std::vector<entity_solvable<T>>;
-
-using all_entity_vectors = 
+template <template <class> class Mod>
+using per_entity_type = 
 	replace_list_type_t<
 		transform_types_in_list_t<
 			all_entity_types,
-			make_entity_vector
+			Mod
 		>,
 		std::tuple
 	>
 ;
-

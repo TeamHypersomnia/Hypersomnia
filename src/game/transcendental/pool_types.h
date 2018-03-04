@@ -4,8 +4,10 @@
 #include "augs/misc/declare_containers.h"
 #include "augs/misc/pool/pool_declaration.h"
 
-#include "game/transcendental/pool_size_type.h"
 #include "game/organization/all_entity_types.h"
+
+#include "game/transcendental/pool_size_type.h"
+#include "game/transcendental/entity_type_templates.h"
 
 static constexpr bool statically_allocate_entities = STATICALLY_ALLOCATE_ENTITIES;
 
@@ -19,12 +21,4 @@ using make_entity_pool = std::conditional_t<
 	augs::pool<entity_solvable<T>, make_vector, cosmic_pool_size_type>
 >;
 
-using all_entity_pools = 
-	replace_list_type_t<
-		transform_types_in_list_t<
-			all_entity_types,
-			make_entity_pool
-		>,
-		std::tuple
-	>
-;
+using all_entity_pools = per_entity_type<make_entity_pool>;

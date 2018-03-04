@@ -224,3 +224,39 @@ we consider whole type overrides too complex architeciturally:
 	- no point. some indirection would be necessary anyway
 	- just provide overload for getters that have a cosmos at hand
 
+- you might want to write tests for pool, especially now that we have undo_free
+- PROBLEM: guids as signi entity ids might:
+	- hinder processing performance
+	- increase code complexity
+- on the other hand, plain entity_ids avoid these
+	- **The overhead of pool metadata is really insignificant, even during frequent cloning.**
+	- entity count * 4 shorts. So literally 2 ints per entity.
+		- more is added with addition of a single component.
+	- thus let's just implement undo_freeing in the pool
+- the problem with entity ids in common signi is the same as with guids in common signi
+	- won't be solved until after we introduce groups + templated components
+- PROBLEM: simulating undo_delete_entitys in the pool is actually hard
+- PROBLEM: if we're not storing whole pools and undoing/redoing with allocates/frees, we're anyway violating determinism
+	- because order of entities in the pool will be different completely 
+	- unless we properly simulate those undo_frees
+		- plan
+			- we store the real id where the deletion happened
+			- on undo_free, move the element at real index to past the last element 
+			- slot needs moving as well
+			- write undo_delete_entityd content to the gap
+			- decrease version
+
+- (DISREGARDED) Important: make components contain entity guids instead of entity ids
+	- And let the cosmos only serialize entities and not pools
+	- that is because then we won't have to serialize entire pools
+	- and operations like undeleting entities will be a lot easier because we won't have to simulate an old entity id
+	- signi_entity_id
+	- in case of groups, we're not doing something twice, because we'd anyway need to narrow down those ids
+	- let entity_id be said about as "a temporary id", could later even become something with a pointer cache
+
+- (DISREGARDED) should inferred caches map from guids or from ids?
+	- should perhaps be both
+	- fastest access
+	- will have to templatize cache finders
+	- most of the time, retrievals will happen
+

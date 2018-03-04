@@ -164,19 +164,13 @@ perform_transfer_result perform_transfer(
 				items_of_slots.unset_parenthood(moved_item, deguidize(slot));
 			}
 
-			slot = guidize(target_slot.operator inventory_slot_id());
+			slot = target_slot.operator inventory_slot_id();
 		}
 
 		items_of_slots.assign_parenthood(moved_item, target_slot);
 	}
 
-	grabbed_item_part_handle.infer_colliders();
-	
-	grabbed_item_part_handle.for_each_contained_item_recursive([](entity_handle h){
-		h.infer_colliders();	
-
-		return recursive_callback_result::CONTINUE_AND_RECURSE;
-	});
+	grabbed_item_part_handle.infer_changed_slot();
 
 	if (is_pickup) {
 		const auto target_capability = target_slot_container.get_owning_transfer_capability();

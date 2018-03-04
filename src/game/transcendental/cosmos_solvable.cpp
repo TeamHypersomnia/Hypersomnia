@@ -101,14 +101,17 @@ unsigned cosmos_solvable::get_steps_per_second() const {
 	return get_fixed_delta().in_steps_per_second();
 }
 
-void cosmos_solvable::free_entity(const entity_id id) {
+std::optional<cosmic_pool_undo_free_input> cosmos_solvable::free_entity(const entity_id id) {
 	clear_guid(id);
 
-	significant.on_pool(id.type_id, [id](auto& p){ p.free(id); });
+	return significant.on_pool(id.type_id, [id](auto& p){ return p.free(id); });
 }
 
 void cosmos_solvable::clear_guid(const entity_id cleared) {
-	guid_to_id.erase(get_guid(cleared));
+	const auto guid = get_guid(cleared);
+	const auto erased_num = guid_to_id.erase(guid);
+
+	ensure(erased_num == 1);
 }
 
 template <template <class> class Guidized, class source_id_type>

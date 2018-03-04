@@ -56,6 +56,18 @@ class cosmos_solvable {
 		return output;
 	}
 
+	template <class E, class... Args>
+	auto undo_free_entity_detail(Args&&... args) {
+		auto& pool = significant.get_pool<E>();
+		const auto result = pool.undo_free(std::forward<Args>(args)...);
+
+		allocation_result<entity_id, decltype(result.object)> output {
+			entity_id(result.key, entity_type_id::of<E>()), result.object
+		};
+
+		return output;
+	}
+
 	void clear_guid(const entity_id);
 
 	template <class C, class F>
@@ -120,13 +132,21 @@ public:
 	}
 
 	template <class E, class... Args>
+	auto undo_free_entity(Args&&... undo_free_args) {
+		const auto result = undo_free_entity_detail<E>(std::forward<Args>(undo_free_args)...);
+		const auto it = guid_to_id.emplace(result.object.guid, result.key);
+		ensure(it.second);
+		return result;
+	}
+
+	template <class E, class... Args>
 	auto allocate_entity_with_specific_guid(const entity_guid specific_guid, Args&&... args) {
 		const auto result = allocate_new_entity<E>(specific_guid, std::forward<Args>(args)...);
 		guid_to_id[specific_guid] = result.key;
 		return result;
 	}
 
-	void free_entity(entity_id);
+	std::optional<cosmic_pool_undo_free_input> free_entity(entity_id);
 
 	void destroy_all_caches();
 
@@ -138,6 +158,16 @@ public:
 	entity_id to_versioned(const unversioned_entity_id) const;
 
 	entity_id get_entity_id_by(const entity_guid) const;
+
+	template <template <class> class Guidized>
+	Guidized<entity_guid> guidize(const Guidized<entity_guid>& id_source) const {
+		return id_source;
+	}
+
+	template <template <class> class Deguidized>
+	Deguidized<entity_id> deguidize(const Deguidized<entity_id>& id_source) const {
+		return id_source;
+	}
 
 	template <template <class> class Guidized, class source_id_type>
 	Guidized<entity_guid> guidize(const Guidized<source_id_type>& id_source) const;

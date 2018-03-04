@@ -60,12 +60,3 @@ void emit_warnings(const handle_type h) {
 		}
 	}
 }
-
-template <class handle_type>
-void destruct_pre_deinference(const handle_type handle) {
-	auto& cosmos = handle.get_cosmos();
-
-	if (const auto container = handle.template find<invariants::container>()) {
-		drop_from_all_slots(*container, handle, [](const auto&){});
-	}
-}

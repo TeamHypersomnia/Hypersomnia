@@ -2,6 +2,8 @@
 #include "augs/misc/pool/pool_declaration.h"
 #include "game/transcendental/pool_size_type.h"
 
+using cosmic_pool_undo_free_input = augs::pool_undo_free_input<cosmic_pool_size_type>;
+
 using cosmic_object_pool_id = augs::pooled_object_id<cosmic_pool_size_type>;
 using cosmic_object_unversioned_id = augs::unversioned_id<cosmic_pool_size_type>;
 
@@ -16,4 +18,4 @@ struct child_entity_id;
 template <class E>
 struct typed_entity_id;
 
-using signi_entity_id = entity_guid;
+using signi_entity_id = entity_id;

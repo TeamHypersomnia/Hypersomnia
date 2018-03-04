@@ -9,9 +9,9 @@ namespace components {
 		*/
 		
 		// GEN INTROSPECTOR struct components::sender
-		entity_id direct_sender;
-		entity_id capability_of_sender;
-		entity_id vehicle_driven_by_capability;
+		signi_entity_id direct_sender;
+		signi_entity_id capability_of_sender;
+		signi_entity_id vehicle_driven_by_capability;
 		// END GEN INTROSPECTOR
 
 		void set(const const_entity_handle direct_sender);

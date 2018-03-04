@@ -11,6 +11,9 @@ namespace augs {
 	template <class>
 	struct unversioned_id;
 
+	template <class size_type>
+	struct pool_undo_free_input;
+
 	template <class>
 	struct is_pool : std::false_type {};
 

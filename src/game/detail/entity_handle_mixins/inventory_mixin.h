@@ -28,6 +28,17 @@ public:
 	static constexpr size_t hand_count = 2;
 	typedef std::array<entity_id, hand_count> hand_selections_array;
 
+	void infer_changed_slot() const {
+		const auto& self = *static_cast<const derived_handle_type*>(this);
+		ensure(self);
+
+		self.infer_colliders();
+		self.for_each_contained_item_recursive([](const auto h){
+			h.infer_colliders();	
+			return recursive_callback_result::CONTINUE_AND_RECURSE;
+		});
+	}
+
 	std::optional<unsigned> get_space_occupied() const;	
 
 	generic_handle_type get_owning_transfer_capability() const;

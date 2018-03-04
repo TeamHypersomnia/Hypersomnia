@@ -30,18 +30,12 @@ struct iterated_id_provider {
 	iterated_id_provider(const unsigned iteration_index = static_cast<unsigned>(-1)) 
 		: iteration_index(iteration_index) 
 	{}
-	
-	template <class C>
-	static const auto& get_pool(C& owner) {
-		using pool_type = typename derived_handle_type::subject_pool_type;
-		return std::get<pool_type>(owner.get_solvable().significant.entity_pools);
-	}
 
 	entity_id get_id() const {
 		const auto h = *static_cast<const derived_handle_type*>(this);
 
 		return {
-			get_pool(h.get_cosmos()).to_id(iteration_index),
+			h.get_pool().to_id(iteration_index),
 			h.get_type_id()
 		};
 	}
@@ -153,6 +147,10 @@ public:
 
 	const auto& get() const {
 		return subject;
+	}
+
+	const auto& get_pool() const {
+		return std::get<subject_pool_type>(get_cosmos().get_solvable().significant.entity_pools);
 	}
 
 	template <class T>

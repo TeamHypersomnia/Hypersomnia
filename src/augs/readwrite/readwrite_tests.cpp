@@ -3,16 +3,15 @@
 #include "augs/misc/pool/pool.h"
 #include "augs/misc/constant_size_vector.h"
 
-#include "augs/templates/type_mod_templates.h"
-#include "augs/readwrite/memory_stream.h"
-#include "augs/readwrite/byte_file.h"
+#include "augs/readwrite/readwrite_test_cycle.h"
+
 #include "augs/math/vec2.h"
 #include "augs/math/transform.h"
 #include "augs/math/camera_cone.h"
 
-static const auto path = GENERATED_FILES_DIR "test_byte_readwrite.bin";
-
 TEST_CASE("Filesystem test") {
+	const auto& path = test_file_path;
+
 	augs::save_as_text(path, "");
 	REQUIRE(augs::exists(path));
 	REQUIRE(!augs::file_exists_and_non_empty(path));
@@ -25,90 +24,6 @@ TEST_CASE("Filesystem test") {
 	REQUIRE(!augs::exists(path));
 	REQUIRE(!augs::file_exists_and_non_empty(path));
 }
-
-template <class T>
-static void report(const T& v, const T& reloaded) {
-	if constexpr(can_stream_left_v<std::ostringstream, T>) {
-		LOG("Original %x\nReloaded: %x", v, reloaded);
-	}
-}
-
-template <class T>
-bool report_compare(const T& tmp, const T& v) {
-	const auto success = tmp == v;
-
-	if (!success) {
-		report(tmp, v);
-	}
-
-	return success;
-}
-
-template <class T>
-static bool try_to_reload_with_file(T& v) {
-	const T tmp = v;
-	augs::save_as_bytes(v, path);
-	augs::load_from_bytes(v, path);
-
-	augs::remove_file(path);
-
-	if constexpr(augs::is_pool_v<T>) {
-		return true;
-	}
-	else {
-		return report_compare(tmp, v);
-	}
-}
-
-template <class T>
-static bool try_to_reload_with_bytes(T& v) {
-	const T tmp = v;
-	{
-		std::vector<std::byte> bytes;
-		bytes = augs::to_bytes(v);
-
-		augs::save_as_bytes(bytes, path);
-	}
-
-	augs::load_from_bytes(v, path);
-	augs::remove_file(path);
-	
-	if constexpr(augs::is_pool_v<T>) {
-		return true;
-	}
-	else {
-		return report_compare(tmp, v);
-	}
-}
-
-template <class T>
-static bool try_to_reload_with_memory_stream(T& v) {
-	const T tmp = v;
-	{
-		std::vector<std::byte> bytes;
-		bytes = augs::to_bytes(v);
-
-		augs::save_as_bytes(bytes, path);
-	}
-
-	auto bytes = augs::file_to_bytes(path);
-	augs::memory_stream ss = std::move(bytes);
-	augs::read_bytes(ss, v);
-
-	augs::remove_file(path);
-
-	if constexpr(augs::is_pool_v<T>) {
-		return true;
-	}
-	else {
-		return report_compare(tmp, v);
-	}
-}
-
-#define test_cycle(variable) \
-REQUIRE(try_to_reload_with_file(variable)); \
-REQUIRE(try_to_reload_with_bytes(variable)); \
-REQUIRE(try_to_reload_with_memory_stream(variable));
 
 TEST_CASE("Byte readwrite Sanity check") {
 	using T = std::variant<double, std::string, std::unordered_map<int, double>, std::optional<std::string>>;
@@ -150,9 +65,9 @@ TEST_CASE("Byte readwrite Trivial types") {
 	double b = 512.0;
 	float C = 432.f;
 	
-	test_cycle(a);
-	test_cycle(b);
-	test_cycle(C);
+	readwrite_test_cycle(a);
+	readwrite_test_cycle(b);
+	readwrite_test_cycle(C);
 }
 
 TEST_CASE("Byte readwrite Classes") {
@@ -161,9 +76,9 @@ TEST_CASE("Byte readwrite Classes") {
 	std::vector<transform> v;
 	v.resize(3);
 
-	test_cycle(ab);
-	test_cycle(tr);
-	test_cycle(v);
+	readwrite_test_cycle(ab);
+	readwrite_test_cycle(tr);
+	readwrite_test_cycle(v);
 }
 
 TEST_CASE("Byte readwrite Arrays") {
@@ -176,9 +91,9 @@ TEST_CASE("Byte readwrite Arrays") {
 	std::array<std::array<float, 12>, 12> some_more{};
 	std::array<std::array<std::array<std::array<std::array<float, 2>, 2>, 2>, 2>, 2> even_more{};
 
-	test_cycle(some);
-	test_cycle(some_more);
-	test_cycle(even_more);
+	readwrite_test_cycle(some);
+	readwrite_test_cycle(some_more);
+	readwrite_test_cycle(even_more);
 }
 
 TEST_CASE("Byte readwrite Containers") {
@@ -204,27 +119,27 @@ TEST_CASE("Byte readwrite Containers") {
 	abcdef[0][412] = { 2, 3, 4 };
 	abcdef[1][420] = { 997, 1 };
 
-	test_cycle(mm);
-	test_cycle(abc);
-	test_cycle(abcd);
-	test_cycle(abcde);
-	test_cycle(abcdef);
+	readwrite_test_cycle(mm);
+	readwrite_test_cycle(abc);
+	readwrite_test_cycle(abcd);
+	readwrite_test_cycle(abcde);
+	readwrite_test_cycle(abcdef);
 }
 
 TEST_CASE("Byte readwrite FixedContainers") {
 	augs::constant_size_vector<int, 20> cc;
 	cc.resize(8);
-	test_cycle(cc);
+	readwrite_test_cycle(cc);
 	cc[0] = 483297;
 	cc[1] = 478;
 	cc[7] = 764;
-	test_cycle(cc);
+	readwrite_test_cycle(cc);
 	cc.resize(2);
-	test_cycle(cc);
+	readwrite_test_cycle(cc);
 	cc.resize(20);
-	test_cycle(cc);
+	readwrite_test_cycle(cc);
 	cc[19] = 489;
-	test_cycle(cc);
+	readwrite_test_cycle(cc);
 }
 
 TEST_CASE("Byte readwrite Optionals") {
@@ -239,51 +154,15 @@ TEST_CASE("Byte readwrite Optionals") {
 	abcdef[0][412] = { { 2, 3, 4 } };
 	abcdef[1][420] = { { 997, 1 } };
 
-	test_cycle(abc);
-	test_cycle(abcd);
-	test_cycle(abcde);
-	test_cycle(abcdef);
-}
-
-template <class T>
-void test_pool() {
-	T p;
-
-	test_cycle(p);
-	p.allocate(1);
-	test_cycle(p);
-	p.allocate(2);
-	test_cycle(p);
-	p.allocate(33);
-	test_cycle(p);
-
-	auto id = p.allocate(1);
-	test_cycle(p);
-	auto id2 = p.allocate(3);
-	test_cycle(p);
-	auto id3 = p.allocate(3);
-	test_cycle(p);
-	auto id4 = p.allocate(3);
-	test_cycle(p);
-	p.free(id2);
-	test_cycle(p);
-	p.free(id4);
-	test_cycle(p);
-
-	REQUIRE(p.find(id4) == nullptr);
-	REQUIRE(p.find(id2) == nullptr);
-	REQUIRE(p.find(id) != nullptr);
-	REQUIRE(p.find(id3) != nullptr);
-
-	REQUIRE(5 == p.size());
-}
-
-TEST_CASE("Byte readwrite Pools") {
-	test_pool<augs::pool<float, of_size<100>::make_constant_vector, unsigned short>>();
-	test_pool<augs::pool<float, make_vector, unsigned char>>();
+	readwrite_test_cycle(abc);
+	readwrite_test_cycle(abcd);
+	readwrite_test_cycle(abcde);
+	readwrite_test_cycle(abcdef);
 }
 
 TEST_CASE("Byte readwrite Variants and optionals") {
+	const auto& path = test_file_path;
+
 	using map_type = std::unordered_map<int, double>;
 	using T = std::variant<double, std::string, map_type, std::optional<std::string>>;
 
@@ -291,7 +170,7 @@ TEST_CASE("Byte readwrite Variants and optionals") {
 
 	{
 		v = 2.0;
-		test_cycle(v);
+		readwrite_test_cycle(v);
 	}
 
 	{
@@ -348,13 +227,13 @@ TEST_CASE("Byte readwrite Variants and optionals") {
 	{
 		std::optional<std::string> mm = "Hello world!";
 		v = mm;
-		test_cycle(v);
+		readwrite_test_cycle(v);
 	}
 
 	{
 		std::string mm = "Hello world!";
 		v = mm;
-		test_cycle(v);
+		readwrite_test_cycle(v);
 	}
 }
 #endif

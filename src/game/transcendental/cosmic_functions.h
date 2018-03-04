@@ -24,6 +24,12 @@ class cosmos;
    	e.g. change fields of synchronized components and then refresh them accordingly.
 */
 
+enum class reinference_type {
+	NONE,
+	ONLY_AFFECTED,
+	ENTIRE_COSMOS
+};
+
 class cosmic {
 	static void destroy_caches_of(const entity_handle h);
 
@@ -108,25 +114,30 @@ public:
 		);
 	}
 
-	template <class C, class E>
-	static auto undelete_entity(
+	template <class C, class I, class E>
+	static auto undo_delete_entity(
 		C& cosm,
-		const entity_solvable<E>& deleted_content
+		const I undo_delete_input,
+		const entity_solvable<E>& deleted_content,
+		const reinference_type reinference
 	) {
 		const auto desired_guid = deleted_content.guid;
 		const auto desired_flavour_id = deleted_content.flavour_id;
 
 		auto& s = cosm.get_solvable({});
 
-		const auto new_allocation = s.template allocate_entity_with_specific_guid<E>(
-			desired_guid,
-			desired_flavour_id
-		);
-
+		const auto new_allocation = s.template undo_free_entity<E>(undo_delete_input, deleted_content);
 		new_allocation.object.components = deleted_content.components;
 		
 		const auto handle = typed_entity_handle<E> { new_allocation.object, cosm, new_allocation.key };
-		infer_caches_for(handle);
+
+		if (reinference == reinference_type::ONLY_AFFECTED) {
+			infer_caches_for(handle);
+		}
+		else if (reinference == reinference_type::ENTIRE_COSMOS) {
+			reinfer_solvable(cosm);
+		}
+
 		return handle;
 	}
 
@@ -186,7 +197,7 @@ public:
 
 	static entity_handle clone_entity(const entity_handle source_entity);
 
-	static void delete_entity(const entity_handle);
+	static std::optional<cosmic_pool_undo_free_input> delete_entity(const entity_handle);
 
 	static void reserve_storage_for_entities(cosmos&, const cosmic_pool_size_type s);
 	static void increment_step(cosmos&);

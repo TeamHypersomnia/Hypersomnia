@@ -10,7 +10,7 @@
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
 
-#include "game/transcendental/entity_container_types.h"
+#include "game/transcendental/entity_type_templates.h"
 #include "game/transcendental/entity_solvable.h"
 
 class editor_folder;
@@ -36,13 +36,22 @@ struct duplicate_entities_command {
 };
 
 struct delete_entities_command {
+	template <class E>
+	struct deleted_entry {
+		entity_solvable<E> content;
+		cosmic_pool_undo_free_input undo_delete_input;
+	};
+
+	template <class T>
+	using make_data_vector = std::vector<deleted_entry<T>>;
+
 	// GEN INTROSPECTOR struct delete_entities_command
-	all_entity_vectors deleted_entities;
+	per_entity_type<make_data_vector> deleted_entities;
 	// END GEN INTROSPECTOR
 
 	void push_entry(const_entity_handle);
 
-	void redo(editor_folder&) const;
+	void redo(editor_folder&);
 	void undo(editor_folder&) const;
 
 	bool empty() const;

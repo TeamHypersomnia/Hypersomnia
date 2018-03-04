@@ -76,15 +76,23 @@ entity_handle cosmic::create_entity_with_specific_guid(
 #endif
 
 
-void cosmic::delete_entity(const entity_handle handle) {
+std::optional<cosmic_pool_undo_free_input> cosmic::delete_entity(const entity_handle handle) {
 	auto& cosmos = handle.get_cosmos();
 
 	if (handle.dead()) {
-		return;
+		return std::nullopt;
 	}
 
-	/* #1: destroy data associated to the significant fields that will now be gone */
-	destruct_pre_deinference(handle);
+	/* Collect dependent entities so that we might reinfer them */
+	std::vector<entity_id> dependent_items;
+
+	handle.dispatch_on_having<invariants::container>([&](const auto typed_handle){
+		const auto& container = typed_handle.template get<invariants::container>();
+
+		for (const auto& s : container.slots) {
+			concatenate(dependent_items, get_items_inside(typed_handle, s.first));
+		}
+	});
 
 	/* 
 		#2: destroy all associated caches 
@@ -97,7 +105,14 @@ void cosmic::delete_entity(const entity_handle handle) {
 	cosmic::destroy_caches_of(handle);
 
 	/* #3: finally, deallocate */
-	cosmos.get_solvable({}).free_entity(handle);
+	const auto result = cosmos.get_solvable({}).free_entity(handle);
+
+	/* After identity is destroyed, reinfer entities dependent on the identity */
+	for (const auto& d : dependent_items) {
+		cosmos[d].infer_changed_slot();
+	}
+
+	return result;
 }
 
 void delete_entity_with_children(const entity_handle handle) {

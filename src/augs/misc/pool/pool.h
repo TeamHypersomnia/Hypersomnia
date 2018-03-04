@@ -1,8 +1,11 @@
 #pragma once
+#include <optional>
+
 #include "augs/ensure.h"
 #include "augs/misc/pool/pooled_object_id.h"
 #include "augs/templates/maybe_const.h"
 #include "augs/templates/container_traits.h"
+#include "augs/templates/container_templates.h"
 #include "augs/readwrite/byte_readwrite_declaration.h"
 
 namespace augs {
@@ -29,6 +32,12 @@ namespace augs {
 		// END GEN INTROSPECTOR
 	};
 
+	template <class size_type>
+	struct pool_undo_free_input {
+		size_type real_index = static_cast<size_type>(-1);
+		size_type indirection_index = static_cast<size_type>(-1);
+	};
+
 	template <class T, template <class> class make_container_type, class size_type>
 	class pool {
 	public:
@@ -36,6 +45,7 @@ namespace augs {
 		using key_type = pooled_object_id<size_type>;
 		using unversioned_id_type = unversioned_id<size_type>;
 		using used_size_type = size_type;
+		using undo_free_input_type = pool_undo_free_input<size_type>;
 
 	protected:
 		using pool_slot_type = pool_slot<size_type>;
@@ -155,19 +165,19 @@ namespace augs {
 			return { allocated_id, objects.back() };
 		}
 
-		bool free(const unversioned_id_type key) {
+		auto free(const unversioned_id_type key) {
 			return free(to_versioned(key));
 		}
 
-		bool free(const key_type key) {
+		std::optional<undo_free_input_type> free(const key_type key) {
 			if (!correct_range(key)) {
-				return false;
+				return std::nullopt;
 			}
 
 			auto& indirector = get_indirector(key);
 
 			if (!versions_match(indirector, key)) {
-				return false;
+				return std::nullopt;
 			}
 
 			/*
@@ -176,6 +186,11 @@ namespace augs {
 			*/
 
 			const auto removed_at_index = indirector.real_index;
+
+			/* Prepare also the return value */
+			undo_free_input_type result;
+			result.indirection_index = key.indirection_index;
+			result.real_index = removed_at_index;
 
 			/* add dead key's indirector to the list of free indirectors */
 			free_indirectors.push_back(key.indirection_index);
@@ -187,10 +202,12 @@ namespace augs {
 			indirector.real_index = static_cast<size_type>(-1);
 
 			if (/* need_to_move_last */ removed_at_index != size() - 1) {
-				const auto indirector_of_last_element = slots.back().pointing_indirector;
+				{
+					const auto indirector_of_last_element = slots.back().pointing_indirector;
 
-				/* change last element's indirector - set it to the removed element's index */
-				indirectors[indirector_of_last_element].real_index = removed_at_index;
+					/* change last element's indirector - set it to the removed element's index */
+					indirectors[indirector_of_last_element].real_index = removed_at_index;
+				}
 
 				slots[removed_at_index] = std::move(slots.back());
 				objects[removed_at_index] = std::move(objects.back());
@@ -199,7 +216,67 @@ namespace augs {
 			slots.pop_back();
 			objects.pop_back();
 
-			return true;
+			return result;
+		}
+
+		template <class... Args>
+		allocation_result undo_free(
+			const undo_free_input_type in,
+			Args&&... removed_content
+		) {
+			const auto indirection_index = in.indirection_index;
+			const auto real_index = in.real_index;
+
+			if (free_indirectors.back() == indirection_index) {
+				/* This will be usually the case */
+				free_indirectors.pop_back();
+			}
+			else {
+				/* This might happen if a reserve happened after free */
+				erase_element(free_indirectors, indirection_index);
+			}
+
+			auto& indirector = indirectors[indirection_index];
+
+			indirector.real_index = real_index;
+			--indirector.version;
+
+			auto get_new_key = [&](){
+				key_type new_key;
+				new_key.version = indirector.version;
+				new_key.indirection_index = indirection_index;
+				return new_key;
+			};
+
+			if (real_index < objects.size()) {
+				auto& new_slot_space = slots[real_index];
+				auto& new_object_space = objects[real_index];
+
+				{
+					const auto indirector_of_moved_element = new_slot_space.pointing_indirector;
+
+					/* change moved element's indirector - set it back to the last index */
+					indirectors[indirector_of_moved_element].real_index = objects.size();
+				}
+
+				slots.emplace_back(std::move(new_slot_space));
+				objects.emplace_back(std::move(new_object_space));
+
+				new_slot_space.pointing_indirector = indirection_index;
+				new_object_space.~mapped_type();
+				new (std::addressof(new_object_space)) mapped_type(std::forward<Args>(removed_content)...);
+
+				return { get_new_key(), new_object_space };
+			}
+			else {
+				pool_slot_type slot; 
+				slot.pointing_indirector = indirection_index;
+
+				objects.emplace_back(std::forward<Args>(removed_content)...);
+				slots.emplace_back(std::move(slot));
+
+				return { get_new_key(), objects.back() };
+			}
 		}
 
 		key_type to_versioned(const unversioned_id_type key) const {

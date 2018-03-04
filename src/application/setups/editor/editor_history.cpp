@@ -7,9 +7,11 @@
 void delete_entities_command::push_entry(const const_entity_handle handle) {
 	handle.dispatch([&](const auto typed_handle) {
 		using E = entity_type_of<decltype(typed_handle)>;
-		using vector_type = make_entity_vector<E>;
+		using vector_type = make_data_vector<E>;
 
-		std::get<vector_type>(deleted_entities).push_back(typed_handle.get());
+		const auto id = typed_handle.get_id();
+
+		std::get<vector_type>(deleted_entities).push_back({ typed_handle.get() });
 	});
 }
 
@@ -23,12 +25,12 @@ bool delete_entities_command::empty() const {
 	return total == 0;
 }
 
-void delete_entities_command::redo(editor_folder& f) const {
+void delete_entities_command::redo(editor_folder& f) {
 	auto& cosm = f.work->world;
 
-	for_each_through_std_get(deleted_entities, [&](const auto& v) {
-		for (const auto& e : v) {
-			delete_entity_with_children(cosm[e.guid]);
+	for_each_through_std_get(deleted_entities, [&](auto& v) {
+		for (auto& e : v) {
+			e.undo_delete_input = *cosmic::delete_entity(cosm[e.content.guid]);
 		}	
 	});
 }
@@ -36,9 +38,16 @@ void delete_entities_command::redo(editor_folder& f) const {
 void delete_entities_command::undo(editor_folder& f) const {
 	auto& cosm = f.work->world;
 
+	/* 
+		NOTE: Pools should be independent, but to be theoretically pure,
+		we should implement reverse_for_each_through_std_get.
+	*/
+
 	for_each_through_std_get(deleted_entities, [&](const auto& v) {
-		for (const auto& e : v) {
-			cosmic::undelete_entity(cosm, e);
+		for (const auto& e : reverse(v)) {
+			cosmic::undo_delete_entity(cosm, e.undo_delete_input, e.content, reinference_type::NONE);
 		}	
 	});
+
+	cosmic::reinfer_all_entities(cosm);
 }
