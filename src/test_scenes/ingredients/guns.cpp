@@ -513,10 +513,6 @@ namespace prefabs {
 
 		auto weapon = create_test_scene_entity(cosmos, test_shootable_weapons::SAMPLE_RIFLE, pos);
 
-		auto& gun = weapon.get<components::gun>();
-
-		// add_muzzle_particles(weapon, gun, step);
-
 		if (load_mag.alive()) {
 			perform_transfer({ load_mag, weapon[slot_function::GUN_DETACHABLE_MAGAZINE] }, step);
 
@@ -533,10 +529,6 @@ namespace prefabs {
 		auto load_mag = cosmos[load_mag_id];
 
 		auto weapon = create_test_scene_entity(cosmos, test_shootable_weapons::KEK9, pos);
-
-		auto& gun = weapon.get<components::gun>();
-
-		// add_muzzle_particles(weapon, gun, step);
 
 		if (load_mag.alive()) {
 			perform_transfer({ load_mag, weapon[slot_function::GUN_DETACHABLE_MAGAZINE] }, step);

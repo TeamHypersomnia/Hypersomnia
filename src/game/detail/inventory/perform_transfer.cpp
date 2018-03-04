@@ -52,6 +52,14 @@ perform_transfer_result perform_transfer(
 ) {
 	perform_transfer_result output;
 
+	auto guidize = [&](const auto s) {
+		return cosmos.get_solvable().guidize(s);
+	};
+
+	auto deguidize = [&](const auto s) {
+		return cosmos.get_solvable().deguidize(s);
+	};
+
 	auto get_item_of = [access](auto handle) -> components::item& {
 		return handle.template get<components::item>().get_raw_component(access); 
 	};
@@ -68,7 +76,7 @@ perform_transfer_result perform_transfer(
 
 	auto& items_of_slots = cosmos.get_solvable_inferred(inferred_access).relational.items_of_slots;
 
-	const auto previous_slot = cosmos[item.current_slot];
+	const auto previous_slot = cosmos[deguidize(item.current_slot)];
 	const auto target_slot = cosmos[r.target_slot];
 
 	const auto previous_slot_container = previous_slot.get_container();
@@ -153,10 +161,10 @@ perform_transfer_result perform_transfer(
 			auto& slot = get_item_of(moved_item).current_slot;
 
 			if (slot.is_set()) {
-				items_of_slots.unset_parenthood(moved_item, slot);
+				items_of_slots.unset_parenthood(moved_item, deguidize(slot));
 			}
 
-			slot = target_slot;
+			slot = guidize(target_slot.operator inventory_slot_id());
 		}
 
 		items_of_slots.assign_parenthood(moved_item, target_slot);

@@ -140,26 +140,10 @@ public:
 	entity_id get_entity_id_by(const entity_guid) const;
 
 	template <template <class> class Guidized, class source_id_type>
-	Guidized<entity_guid> guidize(const Guidized<source_id_type>& id_source) const {
-		return rewrite_members_and_transform_templated_type_into<entity_guid>(
-			id_source,
-			[this](auto& guid_member, const auto& id_member) {
-				guid_member = get_guid(id_member);
-			}
-		);
-	}
+	Guidized<entity_guid> guidize(const Guidized<source_id_type>& id_source) const;
 
 	template <template <class> class Deguidized, class source_id_type>
-	Deguidized<entity_id> deguidize(const Deguidized<source_id_type>& guid_source) const {
-		return rewrite_members_and_transform_templated_type_into<entity_id>(
-			guid_source,
-			[this](auto& id_member, const auto& guid_member) {
-				if (guid_member != entity_guid()) {
-					id_member = guid_to_id.at(guid_member);
-				}
-			}
-		);
-	}
+	Deguidized<entity_id> deguidize(const Deguidized<source_id_type>& guid_source) const;
 
 	std::unordered_set<entity_id> get_entities_by_flavour_id(const entity_flavour_id&) const;
 	

@@ -392,7 +392,7 @@ static void check_no_ids_in() {
 
 	validate_fields_in(object, [](auto m){
 		using M = decltype(m);
-		static_assert(!std::is_same_v<entity_id, M>, "No entity ids allowed here!");
+		static_assert(!std::is_base_of_v<entity_id_base, M>, "No entity ids allowed here!");
 	});
 }
 

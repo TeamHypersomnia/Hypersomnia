@@ -51,7 +51,7 @@ namespace components {
 
 		// GEN INTROSPECTOR struct components::item
 		int charges = 1;
-		inventory_slot_id current_slot;
+		signi_inventory_slot_id current_slot;
 		// END GEN INTROSPECTOR
 
 #if TODO_MOUNTING
@@ -96,7 +96,8 @@ public:
 	};
 
 	auto get_current_slot() const {
-		return get_raw_component().current_slot;
+		const auto& cosmos = this->get_handle().get_cosmos();
+		return cosmos.get_solvable().deguidize(get_raw_component().current_slot);
 	}
 
 	auto get_charges() const {

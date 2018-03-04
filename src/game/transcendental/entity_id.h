@@ -23,8 +23,16 @@ struct entity_guid {
 		return value == b.value;
 	}
 
+	bool operator!=(const entity_guid& b) const {
+		return value != b.value;
+	}
+
 	operator guid_value_type() const {
 		return value;
+	}
+
+	bool is_set() const {
+		return *this != entity_guid();
 	}
 
 	void unset() {

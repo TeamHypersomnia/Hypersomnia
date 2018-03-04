@@ -8,6 +8,7 @@
 
 #include "game/detail/inventory/perform_transfer.h"
 
+#if TODO
 template <class key>
 void basic_cosmic_entropy<key>::override_transfers_leaving_other_entities(
 	const cosmos& cosm,
@@ -33,6 +34,7 @@ void basic_cosmic_entropy<key>::override_transfers_leaving_other_entities(
 
 	concatenate(transfer_requests, new_transfers);
 }
+#endif
 
 template <class key>
 size_t basic_cosmic_entropy<key>::length() const {

@@ -1,6 +1,7 @@
 #pragma once
 #include <optional>
 
+#include "augs/templates/maybe_const.h"
 #include "augs/templates/container_templates.h"
 #include "game/detail/inventory/inventory_slot_handle_declaration.h"
 #include "game/transcendental/entity_handle_declaration.h"

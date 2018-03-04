@@ -9,14 +9,14 @@ template <
 >
 T<destination_type> rewrite_members_and_transform_templated_type_into(
 	const T<source_type>& source,
-	F&& transformator,
-	std::enable_if_t<!std::is_same_v<destination_type, source_type>>* = nullptr
+	F transformator
 ) {
+	static_assert(!std::is_same_v<source_type, destination_type>);
 	T<destination_type> destination;
 
 	augs::introspect(
 		augs::recursive(
-			[&](auto&& self, auto, auto& rewritten_to, const auto& rewritten_from) {
+			[&](auto self, auto, auto& rewritten_to, const auto& rewritten_from) {
 				using To = std::decay_t<decltype(rewritten_to)>;
 				using From = std::decay_t<decltype(rewritten_from)>;
 
@@ -39,15 +39,4 @@ T<destination_type> rewrite_members_and_transform_templated_type_into(
 	);
 
 	return destination;
-}
-template <
-	class destination_type,
-	template <class> class T,
-	class F
->
-T<destination_type> rewrite_members_and_transform_templated_type_into(
-	const T<destination_type>& source,
-	F transformator
-) {
-	return source;
 }
