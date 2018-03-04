@@ -288,10 +288,6 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 			driver_system().release_car_ownership(subject);
 		}
 		
-#if TODO
-		resolve_dampings_of_body(subject);
-#endif
-		
 		const auto subject_transform = subject.get_logic_transform();
 
 		subject.get<components::rigid_body>().apply_impulse(

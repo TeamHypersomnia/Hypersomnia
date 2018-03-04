@@ -551,9 +551,13 @@ void editor_setup::perform_custom_imgui(
 		if (show_entities) {
 			auto entities = scoped_window("Entities", &show_entities);
 
+			if (ImGui::IsRootWindowOrAnyChildFocused() && !ImGui::IsAnyItemActive() && !ImGui::IsMouseClicked(0)) {
+				ImGui::SetKeyboardFocusHere();
+			}
+
 			static ImGuiTextFilter filter;
-			filter.Draw();
-			
+			filter.Draw("##EntitiesInput");
+
 			cosmic::for_each_entity(work().world, [&](const auto handle) {
 				const auto name = to_string(handle.get_name());
 				const auto id = handle.get_id();
@@ -577,9 +581,13 @@ void editor_setup::perform_custom_imgui(
 
 		if (show_go_to_entity) {
 			{
+				const auto max_lines = static_cast<std::size_t>(settings.lines_in_go_to_dialogs);
+				const auto left = go_to_entities_selected_index / max_lines * max_lines;
+				const auto right = std::min(left + max_lines, matching_go_to_entities.size());
+
 				const auto size = vec2 {
 					static_cast<float>(settings.go_to_dialog_width),
-					(matching_go_to_entities.size() + 2) * ImGui::GetTextLineHeightWithSpacing()
+					(right - left + 2) * ImGui::GetTextLineHeightWithSpacing()
 				};
 
 				set_next_window_rect(
@@ -633,7 +641,6 @@ void editor_setup::perform_custom_imgui(
 					break;
 
 					case ImGuiInputTextFlags_CallbackAlways: {
-#if TODO_NAMES
 						const auto current_input_text = std::string(data->Buf, data->BufTextLen);
 			
 						const bool should_rebuild = 
@@ -652,19 +659,16 @@ void editor_setup::perform_custom_imgui(
 			
 						unsigned hits = 0;
 							
-						for (const auto& lex : self.work().world.get_solvable_inferred().name.get_lexicographic_names()) {
-							const auto& name = lex.first;
+						cosmic::for_each_entity(self.work().world, [&](const auto handle) {
+							const auto name = handle.get_name();
+							const auto id = handle.get_id();
 			
 							if (query.empty() || to_lowercase(name).find(query) != std::wstring::npos) {
 								++hits;
 			
-								self.matching_go_to_entities.push_back(lex.second);
-			
-								if (hits >= self.settings.lines_in_go_to_dialogs) {
-									break;
-								}
+								self.matching_go_to_entities.push_back(handle.get_guid());	
 							}
-						}	
+						});	
 
 						if (self.matching_go_to_entities.size() > 0) {
 							self.go_to_entities_selected_index %= self.matching_go_to_entities.size();
@@ -672,7 +676,6 @@ void editor_setup::perform_custom_imgui(
 						else {
 							self.go_to_entities_selected_index = 0;
 						}
-#endif
 					}
 					break;
 					
@@ -741,17 +744,20 @@ void editor_setup::perform_custom_imgui(
 			{
 				const auto last_input = to_wstring(last_go_to_entities_input);
 
-				unsigned go_to_index = 0;
+				const auto max_lines = static_cast<std::size_t>(settings.lines_in_go_to_dialogs);
+				const auto left = go_to_entities_selected_index / max_lines * max_lines;
+				const auto right = std::min(left + max_lines, matching_go_to_entities.size());
 
-				for (const auto& m : matching_go_to_entities) {
-					if (go_to_index == go_to_entities_selected_index) {
+				for (std::size_t i = left; i < right; ++i) {
+					if (i == go_to_entities_selected_index) {
 						bool s = true;
-						ImGui::PushID(static_cast<int>(go_to_index));
+						ImGui::PushID(static_cast<int>(i));
 						ImGui::Selectable("##gotoentity", &s);
 						ImGui::PopID();
 						ImGui::SameLine(0.f, 0.f);
 					}
 
+					const auto m = matching_go_to_entities[i];
 					const auto name = work().world[m].get_name();
 					const auto matched_name = to_lowercase(name);
 
@@ -772,8 +778,6 @@ void editor_setup::perform_custom_imgui(
 					ImGui::SameLine(settings.go_to_dialog_width * 0.7);
 
 					text("(guid: %x)", m);
-
-					++go_to_index;
 				}
 			}
 
@@ -1318,6 +1322,11 @@ bool editor_setup::handle_unfetched_window_input(
 
 				switch (k) {
 					case key::Z: undo(); return true;
+					case key::F: {
+						show_entities = true;
+						ImGui::SetWindowFocus("Entities");
+						return true;
+					} 
 					case key::C: copy(); return true;
 					case key::X: cut(); return true;
 					case key::V: paste(); return true;

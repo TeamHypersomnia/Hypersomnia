@@ -7,6 +7,7 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
+- resuscitate quick search because there's some useful highlight logic 
 - Also check that there are no guids in common state
 
 - game mode property is a part of game mode definition

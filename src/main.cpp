@@ -1297,6 +1297,8 @@ int work(const int argc, const char* const * const argv) try {
 					)
 				;
 
+				const bool direct_gameplay = direct_gameplay_or_game_gui && !game_gui_mode; 
+
 				if (was_pressed || was_released) {
 					const auto key = e.get_key();
 
@@ -1330,11 +1332,7 @@ int work(const int argc, const char* const * const argv) try {
 						}
 					}
 				}
-				if (
-					e.msg == message::mousemotion
-					&& direct_gameplay_or_game_gui
-					&& !game_gui_mode
-				) {
+				if (e.msg == message::mousemotion && direct_gameplay) {
 					game_motions.push_back({ game_motion_type::MOVE_CROSSHAIR, e.data.mouse.rel });
 					continue;
 				}
