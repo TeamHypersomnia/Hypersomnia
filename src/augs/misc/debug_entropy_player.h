@@ -72,7 +72,7 @@ namespace augs {
 		}
 
 		void record_and_save_this_session(const path_type& folder, const path_type& path) {
-			const auto target_folder = path_type(folder.string() + augs::get_timestamp() + "/");
+			const auto target_folder = path_type(folder.string() + augs::date_time().get_stamp() + "/");
 			augs::create_directories(target_folder);
 
 			live_saving_path = target_folder.string() + "/" + path.string();

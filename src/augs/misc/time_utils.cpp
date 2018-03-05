@@ -18,12 +18,9 @@ static std::string leading_zero(const t component) {
 	return result;
 }
 
-std::string augs::get_readable_timestamp() {
-	return date_time().get_readable();
-}
+augs::date_time::date_time() : t(std::time(nullptr)) {}
 
-std::string augs::get_timestamp() {
-    std::time_t t = std::time(nullptr);
+std::string augs::date_time::get_stamp() const {
     std::tm local_time = *std::localtime(&t);
 
 	return	
@@ -37,8 +34,6 @@ std::string augs::get_timestamp() {
 		+ "]"
 	;
 }
-
-augs::date_time::date_time() : t(std::time(nullptr)) {}
 
 std::string augs::date_time::get_readable() const {
 	std::tm local_time = *std::localtime(&t);

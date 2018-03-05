@@ -117,7 +117,7 @@ void editor_setup::set_popup(const editor_popup p) {
 
 	LOG(logged);
 
-	augs::save_as_text(LOG_FILES_DIR "last_editor_message.txt", augs::get_readable_timestamp() + '\n' + logged);
+	augs::save_as_text(LOG_FILES_DIR "last_editor_message.txt", augs::date_time().get_readable() + '\n' + logged);
 }
 
 void editor_setup::set_locally_viewed(const entity_id id) {
