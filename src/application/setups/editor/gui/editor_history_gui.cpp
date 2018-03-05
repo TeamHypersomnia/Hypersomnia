@@ -46,14 +46,10 @@ void editor_history_gui::perform(editor_folder& f) {
 
 		ImGui::SameLine(200.f);
 
-		{
-			auto scope = scoped_style_color(ImGuiCol_Text, style.Colors[ImGuiCol_TextDisabled]);
-			text(how_long_ago + " (?)");	
+		text_disabled(how_long_ago + " (?)");	
 
-			if (ImGui::IsItemHovered()) {
-				auto tooltip = augs::imgui::scoped_tooltip();
-				text(when.get_readable());
-			}
+		if (ImGui::IsItemHovered()) {
+			text_tooltip(when.get_readable());
 		}
 	};
 

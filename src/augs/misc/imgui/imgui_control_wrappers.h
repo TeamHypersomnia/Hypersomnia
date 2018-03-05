@@ -125,6 +125,10 @@ namespace augs {
 			text(t);
 		}
 
+		inline void text_disabled(const std::string& t) {
+			ImGui::TextDisabled("%s", t.c_str());
+		}
+
 		template <class... Args>
 		inline void text(const std::string& format, Args&&... args) {
 			text(typesafe_sprintf(format, std::forward<Args>(args)...));
