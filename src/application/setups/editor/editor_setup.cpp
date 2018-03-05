@@ -16,6 +16,7 @@
 #include "application/config_lua_table.h"
 #include "application/setups/editor/editor_setup.h"
 #include "application/setups/editor/editor_paths.h"
+#include "application/setups/editor/editor_camera.h"
 
 #include <imgui/imgui_internal.h>
 
@@ -56,62 +57,14 @@ void editor_setup::unhover() {
 }
 
 bool editor_setup::is_editing_mode() const {
-	return player.paused;
+	return player.is_editing_mode();
 }
 
 std::optional<camera_cone> editor_setup::get_current_camera() const {
-	if (anything_opened() ) {
-		std::optional<components::transform> viewed_transform;
-		const auto panning = view().panned_camera;
-
-		if (const auto viewed = get_viewed_character()) {
-			viewed_transform = viewed.find_logic_transform();
-		}
-
-		if (is_editing_mode()) {
-			if (const auto match = get_matching_go_to_entity()) {
-				camera_cone centered_on_match;
-
-				if (panning) {
-					/* Propagate zoom taken from custom panning */
-					centered_on_match = *panning;
-				}
-
-				if (const auto transform = match.find_logic_transform()) {
-					centered_on_match.transform.pos = transform->pos;
-				}
-				else {
-					LOG("WARNING: transform of %x could not be found.", match);
-				}
-
-				return centered_on_match;
-			}
-			else if (panning) {
-				return panning;
-			}
-			else {
-				if (viewed_transform) {
-					camera_cone centered_on_viewed;
-					centered_on_viewed.transform.pos = viewed_transform->pos;
-
-					return centered_on_viewed;
-				}
-
-				return camera_cone();
-			}
-		}
-		else {
-			if (panning) {
-				return panning;
-			}
-
-			if (!get_viewed_character()) {
-				return camera_cone();
-			}
-		}
+	if (anything_opened()) {
+		return editor_detail::calculate_camera(player, view(), get_matching_go_to_entity(), work());
 	}
 
-	/* Let the standard gameplay camera kick-in in the main */
 	return std::nullopt;
 }
 

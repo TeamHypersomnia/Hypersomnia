@@ -6,10 +6,6 @@
 
 #include "augs/readwrite/byte_file.h"
 
-std::string get_project_name(const augs::path_type& p) {
-	return p.filename().string();
-}
-
 std::string editor_folder::get_display_path() const {
 	return ::get_project_name(current_path);
 }

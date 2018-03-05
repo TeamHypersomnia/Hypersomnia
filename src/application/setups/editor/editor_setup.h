@@ -20,6 +20,7 @@
 
 #include "application/setups/setup_common.h"
 
+#include "application/setups/editor/editor_player.h"
 #include "application/setups/editor/editor_popup.h"
 #include "application/setups/editor/editor_significant.h"
 #include "application/setups/editor/editor_autosave.h"
@@ -40,16 +41,6 @@ namespace augs {
 		struct state;
 	}
 }
-
-struct editor_player {
-	bool show = true;
-	bool paused = true;
-	double speed = 1.0;
-
-	auto get_speed() const {
-		return paused ? 0.0 : speed;
-	}
-};
 
 struct editor_destructor_input {
 	sol::state& lua;

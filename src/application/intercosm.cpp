@@ -55,6 +55,10 @@ void intercosm::make_test_scene(
 }
 #endif
 
+const_entity_handle intercosm::get_viewed_character() const {
+	return world[local_test_subject];
+}
+
 void intercosm::save(const intercosm_path_op op) const {
 	const auto effective_extension = op.path.extension();
 

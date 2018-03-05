@@ -25,6 +25,10 @@ inline bool is_untitled_path(augs::path_type path) {
 	return checked_path.find(untitled_dir) != std::string::npos;
 }
 
+inline auto get_project_name(const augs::path_type& p) {
+	return p.filename().string();
+}
+
 template <class T>
 auto get_path_in_untitled(const T& p) {
 	return augs::path_type(get_untitled_dir()) += p;

@@ -1,17 +1,12 @@
 #pragma once
 #include <string>
-#include <unordered_set>
 #include <vector>
-#include <optional>
 
-#include "augs/misc/time_utils.h"
 #include "augs/filesystem/path.h"
 #include "augs/graphics/vertex.h"
-#include "augs/math/camera_cone.h"
-
-#include "game/transcendental/entity_id.h"
 
 #include "application/setups/editor/editor_history.h"
+#include "application/setups/editor/editor_view.h"
 
 using folder_index = unsigned;
 
@@ -22,23 +17,6 @@ namespace sol {
 struct intercosm;
 struct editor_recent_paths;
 struct editor_paths;
-
-struct editor_folder_meta {
-	// GEN INTROSPECTOR struct editor_folder_meta
-	augs::date_time timestamp;
-	// END GEN INTROSPECTOR
-};
-
-struct editor_view {
-	// GEN INTROSPECTOR struct editor_view
-	editor_folder_meta meta;
-
-	std::unordered_set<entity_id> selected_entities;
-	std::optional<camera_cone> panned_camera;
-	// END GEN INTROSPECTOR
-};
-
-std::string get_project_name(const augs::path_type& p);
 
 struct editor_folder {
 	editor_folder(const augs::path_type& p = {});

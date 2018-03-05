@@ -52,6 +52,8 @@ struct intercosm {
 		return logic_step_input{ world, entropy };	
 	}
 
+	const_entity_handle get_viewed_character() const;
+
 	template <class... Callbacks>
 	void advance(
 		const cosmic_entropy& entropy,
