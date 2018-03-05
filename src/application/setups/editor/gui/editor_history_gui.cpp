@@ -11,7 +11,7 @@ void editor_history_gui::perform(editor_folder& f) {
 
 	using namespace ImGui;
 	using namespace augs::imgui;
-
+	using index_type = editor_history::index_type;
 
 	auto window = scoped_window("History", &show, ImGuiWindowFlags_AlwaysAutoResize);
 
@@ -20,33 +20,39 @@ void editor_history_gui::perform(editor_folder& f) {
 	thread_local ImGuiTextFilter filter;
 	filter.Draw();
 
-	{
-		const auto d = "Created project files";
-		const auto when = f.view.meta.timestamp.how_long_ago();
+	auto do_history_node = [&](
+		const index_type command_index,
+		const std::string& description,
+		const augs::timer& when	
+	){
+		const auto how_long_ago = when.how_long_ago();
+		const bool passes_filter = filter.PassFilter(description.c_str()) || filter.PassFilter(how_long_ago.c_str());
 
-		if (filter.PassFilter(d) || filter.PassFilter(when.c_str())) {
-			int flags = ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet;
-
-			if (-1 == f.history.get_current_revision()) {
-				flags |= ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_Selected;
-			}
-
-			ImGui::TreeNodeEx(d, flags);
-
-			if (ImGui::IsItemClicked()) {
-				f.history.seek_to_revision(-1, f);
-			}
-
-			ImGui::SameLine(200.f);
-
-			{
-				auto scope = scoped_style_color(ImGuiCol_Text, style.Colors[ImGuiCol_TextDisabled]);
-				text(f.view.meta.timestamp.how_long_ago());	
-			}
-
-			ImGui::TreePop();
+		if (!passes_filter) {
+			return;
 		}
-	}
+
+		int flags = ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet;
+
+		if (command_index == f.history.get_current_revision()) {
+			flags |= ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_Selected;
+		}
+
+		scoped_tree_node_ex(description.c_str(), flags);
+
+		if (ImGui::IsItemClicked()) {
+			f.history.seek_to_revision(command_index, f);
+		}
+
+		ImGui::SameLine(200.f);
+
+		{
+			auto scope = scoped_style_color(ImGuiCol_Text, style.Colors[ImGuiCol_TextDisabled]);
+			text(f.view.meta.timestamp.how_long_ago());	
+		}
+	};
+
+	do_history_node(-1, "Created project files", f.view.meta.timestamp);
 
 	const auto& commands = f.history.get_commands();
 
@@ -55,31 +61,7 @@ void editor_history_gui::perform(editor_folder& f) {
 
 		std::visit(
 			[&](const auto& command) {
-				const auto d = command.describe();
-				const auto when = command.timestamp.how_long_ago();
-
-				if (filter.PassFilter(d.c_str()) || filter.PassFilter(when.c_str())) {
-					int flags = ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet;
-
-					if (i == f.history.get_current_revision()) {
-						flags |= ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_Selected;
-					}
-
-					ImGui::TreeNodeEx(d.c_str(), flags);
-
-					if (ImGui::IsItemClicked()) {
-						f.history.seek_to_revision(i, f);
-					}
-
-					ImGui::SameLine(200.f);
-
-					{
-						auto scope = scoped_style_color(ImGuiCol_Text, style.Colors[ImGuiCol_TextDisabled]);
-						text(when);	
-					}
-
-					ImGui::TreePop();
-				}
+				do_history_node(i, command.describe(), command.timestamp);
 			},
 			c
 		);
