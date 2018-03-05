@@ -4,6 +4,7 @@
 #include <vector>
 #include <optional>
 
+#include "augs/misc/time_utils.h"
 #include "augs/filesystem/path.h"
 #include "augs/graphics/vertex.h"
 #include "augs/math/camera_cone.h"
@@ -24,7 +25,7 @@ struct editor_paths;
 
 struct editor_folder_meta {
 	// GEN INTROSPECTOR struct editor_folder_meta
-	augs::timer timestamp;
+	augs::date_time timestamp;
 	// END GEN INTROSPECTOR
 };
 

@@ -2,7 +2,7 @@
 #include <vector>
 #include <variant>
 
-#include "augs/misc/timing/timer.h"
+#include "augs/misc/time_utils.h"
 #include "augs/misc/pool/pool_structs.h"
 
 #include "augs/templates/history.h"
@@ -49,7 +49,7 @@ struct delete_entities_command {
 	using make_data_vector = std::vector<deleted_entry<T>>;
 
 	// GEN INTROSPECTOR struct delete_entities_command
-	augs::timer timestamp;
+	augs::date_time timestamp;
 	per_entity_type<make_data_vector> deleted_entities;
 	// END GEN INTROSPECTOR
 

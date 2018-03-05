@@ -1,6 +1,5 @@
 #pragma once
 #include <ratio>
-#include <string>
 #include <chrono>
 
 #include "augs/misc/timing/delta.h"
@@ -36,7 +35,5 @@ namespace augs {
 		auto extract_delta() {
 			return augs::delta{ extract<std::chrono::seconds>() };
 		}
-
-		std::string how_long_ago() const;
 	};
 }

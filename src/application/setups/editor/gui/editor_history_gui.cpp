@@ -23,7 +23,7 @@ void editor_history_gui::perform(editor_folder& f) {
 	auto do_history_node = [&](
 		const index_type command_index,
 		const std::string& description,
-		const augs::timer& when	
+		const augs::date_time& when	
 	){
 		const auto how_long_ago = when.how_long_ago();
 		const bool passes_filter = filter.PassFilter(description.c_str()) || filter.PassFilter(how_long_ago.c_str());
@@ -48,7 +48,12 @@ void editor_history_gui::perform(editor_folder& f) {
 
 		{
 			auto scope = scoped_style_color(ImGuiCol_Text, style.Colors[ImGuiCol_TextDisabled]);
-			text(f.view.meta.timestamp.how_long_ago());	
+			text(how_long_ago + " (?)");	
+
+			if (ImGui::IsItemHovered()) {
+				auto tooltip = augs::imgui::scoped_tooltip();
+				text(when.get_readable());
+			}
 		}
 	};
 
