@@ -13,6 +13,9 @@ summary: Just a hidden scratchpad.
 	- why not calculate it statelessly?
 	- just always finish the rectangular selection before redoing/undoing
 
+- add entity names for descriptions
+- text_color and relevant text_disabled
+
 - add history gui
 	- some simple description
 	- perhaps timestamps?

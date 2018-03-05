@@ -94,7 +94,7 @@ public:
 	void control(const cosmic_entropy&);
 	void accept_game_gui_events(const cosmic_entropy&);
 
-	std::optional<camera_cone> get_custom_camera() const {
+	std::optional<camera_cone> get_current_camera() const {
 		return std::nullopt;
 	}
 };

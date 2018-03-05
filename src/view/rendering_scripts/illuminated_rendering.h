@@ -153,7 +153,7 @@ void illuminated_rendering(
 		*shaders.light, 
 		*shaders.standard, 
 		[&]() {
-			if (viewed_character.alive()) {
+			if (viewed_character) {
 				draw_crosshair_lasers({
 					[&](const vec2 from, const vec2 to, const rgba col) {
 						if (!settings.draw_weapon_laser) {
@@ -356,7 +356,7 @@ void illuminated_rendering(
 
 	augs::vertex_triangle_buffer textual_infos;
 
-	{
+	if (viewed_character) {
 		const auto tex = necessarys.at(assets::necessary_image_id::CIRCULAR_BAR_MEDIUM);
 
 		set_center_uniform(tex);

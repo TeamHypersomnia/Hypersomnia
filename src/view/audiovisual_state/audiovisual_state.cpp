@@ -88,7 +88,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 
 	auto& sounds = get<sound_system>();
 
-	if (viewed_character.alive()) {
+	if (viewed_character) {
 		auto scope = measure_scope(profiler.sound_logic);
 
 		auto ear = input.eye;
@@ -173,9 +173,12 @@ void audiovisual_state::standard_post_solve(const const_logic_step step, const a
 	particles.update_effects_from_messages(step, input.particle_effects, interp);
 
 	auto ear = input.eye;
-	const auto viewed_character = ear.viewed_character;
 
-	ear.cone.transform = viewed_character.get_viewing_transform(interp);
+	if (const auto viewed_character = ear.viewed_character) {
+		if (const auto transform = viewed_character.find_viewing_transform(interp)) {
+			ear.cone.transform = *transform;
+		}
+	}
 
 	sounds.update_effects_from_messages(step, input.sounds, interp, ear);
 

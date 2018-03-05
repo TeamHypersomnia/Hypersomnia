@@ -59,38 +59,60 @@ bool editor_setup::is_editing_mode() const {
 	return player.paused;
 }
 
-std::optional<camera_cone> editor_setup::get_custom_camera() const {
-	auto maybe_panning = [this]() -> std::optional<camera_cone> { 
-		if (anything_opened() && is_editing_mode()) {
-			if (view().panned_camera) {
-				return view().panned_camera;
-			}
+std::optional<camera_cone> editor_setup::get_current_camera() const {
+	if (anything_opened() ) {
+		std::optional<components::transform> viewed_transform;
+		const auto panning = view().panned_camera;
+
+		if (const auto viewed = get_viewed_character()) {
+			viewed_transform = viewed.find_logic_transform();
 		}
 
-		return std::nullopt;
-	};
+		if (is_editing_mode()) {
+			if (const auto match = get_matching_go_to_entity()) {
+				camera_cone centered_on_match;
 
-	if (anything_opened() && is_editing_mode()) {
-		if (const auto match = get_matching_go_to_entity()) {
-			camera_cone centered_on_match;
+				if (panning) {
+					/* Propagate zoom taken from custom panning */
+					centered_on_match = *panning;
+				}
 
-			if (const auto panning = maybe_panning()) {
-				/* Propagate zoom from custom panning */
-				centered_on_match = *panning;
+				if (const auto transform = match.find_logic_transform()) {
+					centered_on_match.transform.pos = transform->pos;
+				}
+				else {
+					LOG("WARNING: transform of %x could not be found.", match);
+				}
+
+				return centered_on_match;
 			}
-
-			if (const auto transform = match.find_logic_transform()) {
-				centered_on_match.transform.pos = transform->pos;
+			else if (panning) {
+				return panning;
 			}
 			else {
-				LOG("WARNING: transform of %x could not be found.", match);
+				if (viewed_transform) {
+					camera_cone centered_on_viewed;
+					centered_on_viewed.transform.pos = viewed_transform->pos;
+
+					return centered_on_viewed;
+				}
+
+				return camera_cone();
+			}
+		}
+		else {
+			if (panning) {
+				return panning;
 			}
 
-			return centered_on_match;
+			if (!get_viewed_character()) {
+				return camera_cone();
+			}
 		}
 	}
 
-	return maybe_panning();
+	/* Let the standard gameplay camera kick-in in the main */
+	return std::nullopt;
 }
 
 const_entity_handle editor_setup::get_matching_go_to_entity() const {
@@ -240,9 +262,7 @@ void editor_setup::fill_with_test_scene(sol::state& lua) {
 void editor_setup::perform_custom_imgui(
 	sol::state& lua,
 	augs::window& owner,
-	const bool in_direct_gameplay,
-
-	const camera_cone current_cone
+	const bool in_direct_gameplay
 ) {
 	using namespace augs::imgui;
 
@@ -262,7 +282,6 @@ void editor_setup::perform_custom_imgui(
 
 	const auto mouse_pos = vec2i(ImGui::GetIO().MousePos);
 	const auto screen_size = vec2i(ImGui::GetIO().DisplaySize);
-	const auto world_cursor_pos = current_cone.to_world_space(screen_size, mouse_pos);
 
 	const auto& g = *ImGui::GetCurrentContext();
 	const auto menu_bar_size = ImVec2(g.IO.DisplaySize.x, g.FontBaseSize + g.Style.FramePadding.y * 2.0f);
@@ -508,13 +527,13 @@ void editor_setup::perform_custom_imgui(
 			if (anything_opened()) {
 				text(typesafe_sprintf("Folder path: %x", folder().current_path));
 				//text("Tick rate: %x/s", get_viewed_cosmos().get_solvable().get_steps_per_second()));
-				text("Cursor: %x", world_cursor_pos);
-				
-				const auto printed_camera = get_custom_camera() ? *get_custom_camera() : current_cone;
-				
-				text("View center: %x", printed_camera.transform.pos);
 
-				text(typesafe_sprintf("Zoom: %x", printed_camera.zoom * 100.f) + " %");
+				if (const auto current_cone = get_current_camera()) {
+					const auto world_cursor_pos = current_cone->to_world_space(screen_size, mouse_pos);
+					text("Cursor: %x", world_cursor_pos);
+					text("View center: %x", current_cone->transform.pos);
+					text(typesafe_sprintf("Zoom: %x", current_cone->zoom * 100.f) + " %");
+				}
 
 				text("Total entities: %x",
 					get_viewed_cosmos().get_entities_count()
@@ -732,7 +751,7 @@ void editor_setup::perform_custom_imgui(
 					view().selected_entities = { match };
 
 					if (!view().panned_camera.has_value()) {
-						view().panned_camera = current_cone;
+						view().panned_camera = camera_cone();
 					}
 
 					if (const auto transform = match.find_logic_transform()) {
@@ -1158,21 +1177,21 @@ bool editor_setup::handle_unfetched_window_input(
 	const augs::event::change e,
 
 	augs::window& window,
-	sol::state& lua,
-	
-	const camera_cone current_cone
+	sol::state& lua
 ) {
 	using namespace augs::event;
 	using namespace augs::event::keys;
 
 	const auto mouse_pos = vec2i(ImGui::GetIO().MousePos);
 	const auto screen_size = vec2i(ImGui::GetIO().DisplaySize);
-	const auto world_cursor_pos = current_cone.to_world_space(screen_size, mouse_pos);
-	const auto world_screen_center = current_cone.to_world_space(screen_size, screen_size/2);
 
 	if (!anything_opened()) {
 		return false;
 	}
+
+	const auto current_cone = *get_current_camera();
+	const auto world_cursor_pos = current_cone.to_world_space(screen_size, mouse_pos);
+	const auto world_screen_center = current_cone.to_world_space(screen_size, screen_size/2);
 
 	if (player.paused) {
 		const bool has_ctrl{ common_input_state[key::LCTRL] || common_input_state[key::RCTRL] };

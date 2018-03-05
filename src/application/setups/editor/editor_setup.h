@@ -178,8 +178,7 @@ public:
 	void perform_custom_imgui(
 		sol::state& lua,
 		augs::window& owner,
-		const bool in_direct_gameplay,
-		const camera_cone current_cone
+		const bool in_direct_gameplay
 	);
 
 	void customize_for_viewing(config_lua_table& cfg) const;
@@ -226,9 +225,7 @@ public:
 		const augs::event::change change,
 
 		augs::window& window,
-		sol::state& lua,
-
-		const camera_cone current_cone
+		sol::state& lua
 	);
 
 	std::optional<setup_escape_result> escape();
@@ -264,7 +261,7 @@ public:
 
 	void unhover();
 	bool is_editing_mode() const;
-	std::optional<camera_cone> get_custom_camera() const; 
+	std::optional<camera_cone> get_current_camera() const; 
 
 	template <class F>
 	void for_each_selected_entity(F callback) const {

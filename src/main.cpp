@@ -511,6 +511,12 @@ int work(const int argc, const char* const * const argv) try {
 		};
 	};
 
+	static auto get_viewed_cosmos = []() -> const cosmos& {
+		return visit_current_setup([](auto& setup) -> const cosmos& {
+			return setup.get_viewed_cosmos();
+		});
+	};
+
 	static auto get_viewed_character = []() -> const_entity_handle {
 		const auto& viewed_cosmos = visit_current_setup([](auto& setup) -> const cosmos& {
 			return setup.get_viewed_cosmos();
@@ -558,7 +564,7 @@ int work(const int argc, const char* const * const argv) try {
 	static auto get_camera = []() {		
 		if(const auto custom = visit_current_setup(
 			[](const auto& setup) { 
-				return setup.get_custom_camera(); 
+				return setup.get_current_camera(); 
 			}
 		)) {
 			return *custom;
@@ -1064,7 +1070,9 @@ int work(const int argc, const char* const * const argv) try {
 
 						if constexpr(std::is_same_v<T, editor_setup>) {
 							/* Editor needs more goods */
-							setup.perform_custom_imgui(_lua, _window, in_direct_gameplay, get_camera());
+							setup.perform_custom_imgui(
+								_lua, _window, in_direct_gameplay
+							);
 						}
 						else {
 							setup.perform_custom_imgui();
@@ -1354,7 +1362,7 @@ int work(const int argc, const char* const * const argv) try {
 
 						if constexpr(T::handles_window_input) {
 							return setup.handle_unfetched_window_input(
-								_common_input_state, e, _window, _lua, get_camera()
+								_common_input_state, e, _window, _lua
 							);
 						}
 
@@ -1515,7 +1523,9 @@ int work(const int argc, const char* const * const argv) try {
 
 		renderer.clear_current_fbo();
 
-		if (/* has_something_to_view */ viewed_character.alive()) {
+		if (const auto& viewed_cosmos = viewed_character.get_cosmos();
+			std::addressof(viewed_cosmos) != std::addressof(cosmos::zero)
+		) {
 			/* #1 */
 			illuminated_rendering(
 				{
@@ -1549,9 +1559,7 @@ int work(const int argc, const char* const * const argv) try {
 			if (DEBUG_DRAWING.enabled) {
 				/* #2 */
 				if (DEBUG_DRAWING.draw_npo_tree_nodes) {
-					const auto& cosm = viewed_character.get_cosmos();
-
-					cosm.get_solvable_inferred().tree_of_npo.for_each_aabb([](const ltrb aabb){
+					viewed_cosmos.get_solvable_inferred().tree_of_npo.for_each_aabb([](const ltrb aabb){
 						auto& lines = DEBUG_FRAME_LINES;
 
 						lines.emplace_back(red, aabb.left_top(), aabb.right_top());
@@ -1613,11 +1621,7 @@ int work(const int argc, const char* const * const argv) try {
 			shaders.standard->set_as_current();
 			shaders.standard->set_projection(augs::orthographic_projection(vec2(screen_size)));
 
-			if (std::addressof(viewed_character.get_cosmos()) ==
-				std::addressof(cosmos::zero)
-			) {
-				get_drawer().color_overlay(screen_size, darkgray);
-			}
+			get_drawer().color_overlay(screen_size, darkgray);
 		}
 
 		const auto menu_chosen_cursor = [&](){
@@ -1678,9 +1682,11 @@ int work(const int argc, const char* const * const argv) try {
 				}
 			}
 			else if (game_gui_mode && should_draw_game_gui()) {
-				const auto& character_gui = game_gui.get_character_gui(viewed_character);
+				if (viewed_character) {
+					const auto& character_gui = game_gui.get_character_gui(viewed_character);
 
-				character_gui.draw_cursor_with_tooltip(context, should_draw_our_cursor);
+					character_gui.draw_cursor_with_tooltip(context, should_draw_our_cursor);
+				}
 			}
 			else {
 				if (should_draw_our_cursor) {

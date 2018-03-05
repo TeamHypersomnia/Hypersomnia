@@ -26,15 +26,17 @@ void world_camera::tick(
 	const auto averages_per_sec = settings.smoothing.averages_per_sec;
 	
 	const auto target_cone = [&]() {
-		auto cone = camera_cone();
-
 		/* we obtain transform as a copy because we'll be now offsetting it by crosshair position */
 		if (entity_to_chase.alive()) {
+			auto cone = camera_cone();
+
 			cone.transform = entity_to_chase.get_viewing_transform(interp, true);
 			cone.transform.rotation = 0;
+
+			return cone;
 		}
 
-		return cone;
+		return current_cone;
 	}();
 
 	const vec2i camera_crosshair_offset = get_camera_offset_due_to_character_crosshair(entity_to_chase, settings, screen_size);
