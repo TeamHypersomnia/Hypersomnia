@@ -34,6 +34,9 @@ bool delete_entities_command::empty() const {
 }
 
 void delete_entities_command::redo(editor_folder& f) {
+	auto& selections = f.view.selected_entities;
+	selections.clear();
+
 	auto& cosm = f.work->world;
 
 	for_each_through_std_get(deleted_entities, [&](auto& v) {
@@ -51,11 +54,17 @@ void delete_entities_command::undo(editor_folder& f) const {
 		we should implement reverse_for_each_through_std_get.
 	*/
 
-	for_each_through_std_get(deleted_entities, [&](const auto& v) {
-		for (const auto& e : reverse(v)) {
-			cosmic::undo_delete_entity(cosm, e.undo_delete_input, e.content, reinference_type::NONE);
-		}	
-	});
+	{
+		auto& selections = f.view.selected_entities;
+		selections.clear();
+
+		for_each_through_std_get(deleted_entities, [&](const auto& v) {
+			for (const auto& e : reverse(v)) {
+				const auto undeleted = cosmic::undo_delete_entity(cosm, e.undo_delete_input, e.content, reinference_type::NONE);
+				selections.emplace(undeleted.get_id());
+			}	
+		});
+	}
 
 	cosmic::reinfer_all_entities(cosm);
 }

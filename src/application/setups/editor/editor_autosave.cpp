@@ -2,6 +2,7 @@
 
 #include "application/intercosm.h"
 
+#include "application/setups/editor/editor_popup.h"
 #include "application/setups/editor/editor_autosave.h"
 #include "application/setups/editor/editor_paths.h"
 #include "application/setups/editor/editor_significant.h"

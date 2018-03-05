@@ -3,13 +3,8 @@
 
 #include "augs/misc/timing/timer.h"
 #include "application/setups/editor/editor_settings.h"
-#include "application/setups/editor/editor_popup.h"
 
 struct editor_significant;
-
-template <class derived>
-class current_access_cache;
-class editor_setup;
 
 void open_last_folders(
 	sol::state& lua,

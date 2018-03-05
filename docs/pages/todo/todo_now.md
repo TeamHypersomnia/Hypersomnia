@@ -9,6 +9,10 @@ summary: Just a hidden scratchpad.
 
 - clear selections on history changes!
 
+- rectangular selection could crash while undoing/redoing
+	- why not calculate it statelessly?
+	- just always finish the rectangular selection before redoing/undoing
+
 - add history gui
 	- some simple description
 	- perhaps timestamps?

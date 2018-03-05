@@ -13,7 +13,7 @@ void editor_history_gui::perform(editor_folder& f) {
 	using namespace augs::imgui;
 	using index_type = editor_history::index_type;
 
-	auto window = scoped_window("History", &show, ImGuiWindowFlags_AlwaysAutoResize);
+	auto window = scoped_window("History", &show);
 
 	const auto& style = GetStyle();
 
@@ -34,11 +34,30 @@ void editor_history_gui::perform(editor_folder& f) {
 
 		int flags = ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet;
 
-		if (command_index == f.history.get_current_revision()) {
-			flags |= ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_Selected;
+		const auto current_revision = f.history.get_current_revision();
+
+		if (command_index == current_revision) {
+			flags |= ImGuiTreeNodeFlags_Selected;
+		}
+
+		if (command_index > current_revision) {
+			auto disabled_color = style.Colors[ImGuiCol_CloseButton];
+			auto header_hover_color = style.Colors[ImGuiCol_CloseButton];
+
+			header_hover_color.x /= 1.3;
+			header_hover_color.y /= 1.3;
+			header_hover_color.z /= 1.3;
+
+			ImGui::PushStyleColor(ImGuiCol_Text, disabled_color);
+			ImGui::PushStyleColor(ImGuiCol_HeaderHovered, header_hover_color);
 		}
 
 		scoped_tree_node_ex(description.c_str(), flags);
+
+		if (command_index > current_revision) {
+			ImGui::PopStyleColor();
+			ImGui::PopStyleColor();
+		}
 
 		if (ImGui::IsItemClicked()) {
 			f.history.seek_to_revision(command_index, f);
@@ -46,7 +65,7 @@ void editor_history_gui::perform(editor_folder& f) {
 
 		ImGui::SameLine(200.f);
 
-		text_disabled(how_long_ago + " (?)");	
+		text_disabled(how_long_ago /* + " (?)" */);	
 
 		if (ImGui::IsItemHovered()) {
 			text_tooltip(when.get_readable());

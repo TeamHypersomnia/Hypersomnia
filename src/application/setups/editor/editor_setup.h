@@ -20,6 +20,7 @@
 
 #include "application/setups/setup_common.h"
 
+#include "application/setups/editor/editor_popup.h"
 #include "application/setups/editor/editor_significant.h"
 #include "application/setups/editor/editor_autosave.h"
 #include "application/setups/editor/editor_settings.h"
