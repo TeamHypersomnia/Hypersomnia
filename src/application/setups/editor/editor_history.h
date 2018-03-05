@@ -2,6 +2,9 @@
 #include <vector>
 #include <variant>
 
+#include "augs/misc/timing/timer.h"
+#include "augs/misc/pool/pool_structs.h"
+
 #include "augs/templates/history.h"
 #include "augs/templates/type_mod_templates.h"
 
@@ -46,6 +49,7 @@ struct delete_entities_command {
 	using make_data_vector = std::vector<deleted_entry<T>>;
 
 	// GEN INTROSPECTOR struct delete_entities_command
+	augs::timer timestamp;
 	per_entity_type<make_data_vector> deleted_entities;
 	// END GEN INTROSPECTOR
 
@@ -55,6 +59,8 @@ struct delete_entities_command {
 	void undo(editor_folder&) const;
 
 	bool empty() const;
+	std::size_t count_deleted() const;
+	std::string describe() const;
 };
 
 struct change_common_state_command {

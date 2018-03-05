@@ -22,8 +22,16 @@ struct intercosm;
 struct editor_recent_paths;
 struct editor_paths;
 
+struct editor_folder_meta {
+	// GEN INTROSPECTOR struct editor_folder_meta
+	augs::timer timestamp;
+	// END GEN INTROSPECTOR
+};
+
 struct editor_view {
 	// GEN INTROSPECTOR struct editor_view
+	editor_folder_meta meta;
+
 	std::unordered_set<entity_id> selected_entities;
 	std::optional<camera_cone> panned_camera;
 	// END GEN INTROSPECTOR

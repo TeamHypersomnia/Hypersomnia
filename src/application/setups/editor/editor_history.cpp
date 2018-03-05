@@ -4,6 +4,10 @@
 #include "application/setups/editor/editor_history.h"
 #include "application/setups/editor/editor_folder.h"
 
+std::string delete_entities_command::describe() const {
+	return typesafe_sprintf("Deleted %x entities", count_deleted());
+}
+
 void delete_entities_command::push_entry(const const_entity_handle handle) {
 	handle.dispatch([&](const auto typed_handle) {
 		using E = entity_type_of<decltype(typed_handle)>;
@@ -15,14 +19,18 @@ void delete_entities_command::push_entry(const const_entity_handle handle) {
 	});
 }
 
-bool delete_entities_command::empty() const {
+std::size_t delete_entities_command::count_deleted() const {
 	std::size_t total = 0;
 
 	for_each_through_std_get(deleted_entities, [&](const auto& v) {
 		total += v.size();
 	});
 
-	return total == 0;
+	return total;
+}
+
+bool delete_entities_command::empty() const {
+	return count_deleted() == 0;
 }
 
 void delete_entities_command::redo(editor_folder& f) {

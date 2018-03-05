@@ -1,12 +1,15 @@
 #pragma once
 #include <ratio>
+#include <string>
 #include <chrono>
 
 #include "augs/misc/timing/delta.h"
 
 namespace augs {
 	class timer {
+		// GEN INTROSPECTOR class augs::timer
 		std::chrono::high_resolution_clock::time_point ticks;
+		// END GEN INTROSPECTOR
 
 		static auto now() {
 			return std::chrono::high_resolution_clock::now();
@@ -33,5 +36,7 @@ namespace augs {
 		auto extract_delta() {
 			return augs::delta{ extract<std::chrono::seconds>() };
 		}
+
+		std::string how_long_ago() const;
 	};
 }

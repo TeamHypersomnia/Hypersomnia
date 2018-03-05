@@ -377,6 +377,10 @@ void editor_setup::perform_custom_imgui(
 					if (item_if_tabs("Entities")) {
 						show_entities = true;
 					}
+
+					if (item_if_tabs("History")) {
+						history_gui.show = true;
+					}
 				}
 			}
 		}
@@ -496,6 +500,8 @@ void editor_setup::perform_custom_imgui(
 	}
 
 	if (anything_opened()) {
+		history_gui.perform(folder());
+
 		if (show_summary) {
 			auto summary = scoped_window("Summary", &show_summary, ImGuiWindowFlags_AlwaysAutoResize);
 
@@ -555,7 +561,7 @@ void editor_setup::perform_custom_imgui(
 				ImGui::SetKeyboardFocusHere();
 			}
 
-			static ImGuiTextFilter filter;
+			thread_local ImGuiTextFilter filter;
 			filter.Draw();
 
 			cosmic::for_each_entity(work().world, [&](const auto handle) {
@@ -1336,6 +1342,11 @@ bool editor_setup::handle_unfetched_window_input(
 					case key::F: {
 						show_entities = true;
 						ImGui::SetWindowFocus("Entities");
+						return true;
+					} 
+					case key::H: {
+						history_gui.show = true;
+						ImGui::SetWindowFocus("History");
 						return true;
 					} 
 					case key::C: copy(); return true;

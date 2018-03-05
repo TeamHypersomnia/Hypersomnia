@@ -41,6 +41,7 @@ namespace augs {
 		}
 
 	public:
+
 		template <class T, class... RedoArgs>
 		void execute_new(T&& command, RedoArgs&&... redo_args) {
 			/* 
@@ -105,5 +106,23 @@ namespace augs {
 			--current_revision;
 		}
 
+		template <class... Args>
+		void seek_to_revision(const index_type n, Args&&... args) {
+			while (current_revision < n) {
+				redo(std::forward<Args>(args)...);
+			}
+
+			while (current_revision > n) {
+				undo(std::forward<Args>(args)...);
+			}
+		}
+
+		const auto& get_commands() const {
+			return commands;
+		}
+
+		auto get_current_revision() const {
+			return current_revision;
+		}
 	};
 }

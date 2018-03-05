@@ -27,6 +27,8 @@
 #include "application/setups/editor/editor_recent_paths.h"
 #include "application/setups/editor/current_access_cache.h"
 
+#include "application/setups/editor/gui/editor_history_gui.h"
+
 struct config_lua_table;
 
 namespace augs {
@@ -56,31 +58,22 @@ class editor_setup : private current_access_cache<editor_setup> {
 	using base = current_access_cache<editor_setup>;
 	friend base;
 
+	double global_time_seconds = 0.0;
+
 	editor_significant signi;
 	editor_autosave autosave;
 	editor_recent_paths recent;
 	editor_settings settings;
 	editor_player player;
 
-	editor_destructor_input destructor_input;
-
-	double global_time_seconds = 0.0;
+	editor_history_gui history_gui;
 
 	std::optional<editor_popup> ok_only_popup;
-
-	template <class F>
-	void catch_popup(F&& callback) {
-		try {
-			callback();
-		}
-		catch (editor_popup p) {
-			set_popup(p);
-		}
-	}
 
 	bool show_summary = true;
 	bool show_common_state = false;
 	bool show_entities = false;
+
 	bool show_go_to_all = false;
 	bool show_go_to_entity = false;
 	std::string go_to_entity_query;
@@ -88,6 +81,8 @@ class editor_setup : private current_access_cache<editor_setup> {
 	std::string last_go_to_entities_input;
 	unsigned go_to_entities_selected_index = 0;
 	std::vector<entity_guid> matching_go_to_entities;
+
+	editor_destructor_input destructor_input;
 
 	const_entity_handle get_matching_go_to_entity() const;
 	
@@ -99,6 +94,16 @@ class editor_setup : private current_access_cache<editor_setup> {
 	void on_folder_changed();
 	void set_locally_viewed(const entity_id);
 	void finish_rectangular_selection();
+
+	template <class F>
+	void catch_popup(F&& callback) {
+		try {
+			callback();
+		}
+		catch (editor_popup p) {
+			set_popup(p);
+		}
+	}
 
 	template <class F>
 	void try_to_open_new_folder(F&& new_folder_provider) {

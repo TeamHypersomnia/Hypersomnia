@@ -260,3 +260,4 @@ we consider whole type overrides too complex architeciturally:
 	- will have to templatize cache finders
 	- most of the time, retrievals will happen
 
+- resuscitate quick search because there's some useful highlight logic 

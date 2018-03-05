@@ -7,7 +7,12 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
-- resuscitate quick search because there's some useful highlight logic 
+- clear selections on history changes!
+
+- add history gui
+	- some simple description
+	- perhaps timestamps?
+- refactor go to all
 - Also check that there are no guids in common state
 
 - game mode property is a part of game mode definition
