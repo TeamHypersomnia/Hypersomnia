@@ -48,4 +48,5 @@ struct editor_popup {
 	std::string details;
 
 	bool details_expanded = false;
+	bool perform();
 };

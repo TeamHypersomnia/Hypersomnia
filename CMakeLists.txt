@@ -532,6 +532,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/application/setups/editor/gui/editor_history_gui.cpp"
 	"src/application/setups/editor/gui/editor_go_to_gui.cpp"
 	"src/application/setups/editor/editor_camera.cpp"
+	"src/application/setups/editor/editor_popup.cpp"
 )
 
 if(BUILD_WINDOW_FRAMEWORK)

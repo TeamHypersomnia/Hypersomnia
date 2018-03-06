@@ -487,35 +487,8 @@ void editor_setup::perform_custom_imgui(
 		}
 	}
 
-	if (ok_only_popup) {
-		auto& p = *ok_only_popup;
-
-		if (!ImGui::IsPopupOpen(p.title.c_str())) {
-			ImGui::OpenPopup(p.title.c_str());
-		}
-
-		if (auto popup = scoped_modal_popup(p.title.c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
-			text(p.message);
-
-			{
-				if (p.details.size() > 0) {
-					auto& f = p.details_expanded;
-
-					if (ImGui::Button(f ? "Hide details" : "Show details")) {
-						f = !f;
-					}
-
-					if (f) {
-						text(p.details);
-					}
-				}
-			}
-
-			if (ImGui::Button("OK", ImVec2(120, 0))) { 
-				ImGui::CloseCurrentPopup();
-				ok_only_popup = std::nullopt;
-			}
-		}
+	if (ok_only_popup && ok_only_popup->perform()) {
+		ok_only_popup = std::nullopt;
 	}
 }
 
