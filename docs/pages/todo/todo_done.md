@@ -261,3 +261,16 @@ we consider whole type overrides too complex architeciturally:
 	- most of the time, retrievals will happen
 
 - resuscitate quick search because there's some useful highlight logic 
+
+- clear selections on history changes!
+	- really fix them
+
+- rectangular selection could crash while undoing/redoing
+	- why not calculate it statelessly?
+	- just always finish the rectangular selection before redoing/undoing
+
+- add entity names for descriptions
+- add history gui
+	- some simple description
+	- perhaps timestamps?
+- refactor go to all

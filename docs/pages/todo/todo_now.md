@@ -7,20 +7,8 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
-- clear selections on history changes!
-	- really fix them
-
-- rectangular selection could crash while undoing/redoing
-	- why not calculate it statelessly?
-	- just always finish the rectangular selection before redoing/undoing
-
-- add entity names for descriptions
 - text_color and relevant text_disabled
 
-- add history gui
-	- some simple description
-	- perhaps timestamps?
-- refactor go to all
 - Also check that there are no guids in common state
 
 - game mode property is a part of game mode definition

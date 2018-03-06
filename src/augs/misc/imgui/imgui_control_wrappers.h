@@ -112,6 +112,15 @@ namespace augs {
 			ImGui::TextUnformatted(t.c_str());
 		}
 
+		inline void text_color(const std::string& t, const rgba& r) {
+			auto scope = scoped_text_color(r);
+			text(t);
+		}
+
+		inline void text_color(const std::wstring& t, const rgba& r) {
+			text_color(to_string(t), r);
+		}
+
 		inline void text(const std::wstring& t) {
 			text(to_string(t));
 		}
@@ -126,7 +135,7 @@ namespace augs {
 		}
 
 		inline void text_disabled(const std::string& t) {
-			ImGui::TextDisabled("%s", t.c_str());
+			text_color(t, ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]);
 		}
 
 		template <class... Args>

@@ -248,11 +248,8 @@ std::optional<const_entity_handle> editor_go_to_entity_gui::perform(
 			text(name.substr(0, unmatched_left));
 			ImGui::SameLine(0.f, 0.f);
 
-			{
-				auto scope = scoped_style_color(ImGuiCol_Text, ImVec4(0.f, 1.f, 0.f, 1.f));
-				text(name.substr(unmatched_left, unmatched_right - unmatched_left));
-				ImGui::SameLine(0.f, 0.f);
-			}
+			text_color(name.substr(unmatched_left, unmatched_right - unmatched_left), green);
+			ImGui::SameLine(0.f, 0.f);
 
 			text(name.substr(unmatched_right));
 

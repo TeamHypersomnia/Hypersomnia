@@ -27,6 +27,10 @@ namespace augs {
 			return make_scope_guard([]() { ImGui::PopStyleColor(); });
 		}
 		
+		inline auto scoped_text_color(const rgba& col) {
+			return scoped_style_color(ImGuiCol_Text, col);
+		}
+
 		template <class... T>
 		auto scoped_style_var(T&&... args) {
 			ImGui::PushStyleVar(std::forward<T>(args)...);
