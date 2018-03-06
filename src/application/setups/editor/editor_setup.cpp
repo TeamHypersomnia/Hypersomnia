@@ -10,6 +10,7 @@
 #include "augs/window_framework/shell.h"
 
 #include "game/detail/visible_entities.h"
+#include "game/detail/describers.h"
 
 #include "application/config_lua_table.h"
 #include "application/setups/editor/editor_setup.h"
@@ -600,13 +601,25 @@ void editor_setup::paste() {
 
 void editor_setup::del() {
 	if (anything_opened()) {
+		thread_local std::vector<entity_id> all_deleted;
+		all_deleted.clear();
+
+		const auto& cosm = work().world;
 		delete_entities_command command;
 
 		for_each_selected_entity(
 			[&](const auto e) {
-				command.push_entry(work().world[e]);
+				command.push_entry(cosm[e]);
+				all_deleted.push_back(e);
 			}
 		);
+
+		if (all_deleted.size() == cosm.get_entities_count()) {
+			command.built_description = "Deleted all entities";
+		}
+		else {
+			command.built_description = to_string(L"Deleted " + ::describe_names_of(all_deleted, cosm));
+		}
 
 		if (!command.empty()) {
 			folder().history.execute_new(std::move(command), make_command_input());
@@ -711,6 +724,17 @@ void editor_setup::close_folder() {
 
 editor_command_input editor_setup::make_command_input() {
 	return { folder(), selector };
+}
+
+void editor_setup::select_all_entities() {
+	const auto& cosm = work().world;
+
+	auto& selections = view().selected_entities;
+	selections.reserve(cosm.get_entities_count());
+
+	cosmic::for_each_entity(cosm, [&](const auto handle) {
+		selections.emplace(handle.get_id());
+	});
 }
 
 bool editor_setup::handle_input_before_imgui(
@@ -859,6 +883,7 @@ bool editor_setup::handle_input_before_game(
 				}
 
 				switch (k) {
+					case key::A: select_all_entities(); return true;
 					case key::Z: undo(); return true;
 					case key::F: {
 						show_entities = true;

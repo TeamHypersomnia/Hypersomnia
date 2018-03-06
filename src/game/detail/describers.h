@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <map>
 
 #include "game/transcendental/entity_id.h"
 
@@ -52,4 +53,49 @@ std::wstring get_bbcoded_spell_description(
 	);
 
 	return spell.appearance.name + L"\n" + properties + L"\n" + spell.appearance.description;
+}
+
+template <class C, class Container>
+std::wstring describe_names_of(const Container& all_entities, const C& cosm) {
+	if (all_entities.empty()) {
+		return L"";
+	}
+
+	auto quoted = [](const auto& s) {
+#if 0
+		return L'"' + s + L'"';
+#endif
+		return s;
+	};
+
+	if (all_entities.size() == 1) {
+		return quoted(cosm[(*all_entities.begin())].get_name());
+	}
+
+	/* More than one. */
+
+	thread_local std::map<std::wstring, std::size_t> counts;
+	counts.clear();
+
+	for (const auto& e : all_entities) {
+		++counts[cosm[e].get_name()];
+	}
+
+	std::wstring result;
+
+	std::size_t total = 0;
+
+	for (const auto& c : counts) {
+		result += typesafe_sprintf(L"%x of %x, ", c.second, quoted(c.first));
+		total += c.second;
+	}
+
+	if (counts.size() > 1) {
+		result = typesafe_sprintf(L"%x: ", total) + result;
+	}
+
+	result.pop_back();
+	result.pop_back();
+
+	return result;
 }

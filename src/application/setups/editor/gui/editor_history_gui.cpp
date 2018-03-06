@@ -22,6 +22,13 @@ void editor_history_gui::perform(const editor_command_input in) {
 	thread_local ImGuiTextFilter filter;
 	filter.Draw();
 
+	ImGui::Columns(2, "mycolumns"); // 4-ways, with border
+	text_disabled("Operation");
+	ImGui::NextColumn();
+	text_disabled("When");
+	ImGui::NextColumn();
+	ImGui::Separator();
+
 	auto do_history_node = [&](
 		const index_type command_index,
 		const std::string& description,
@@ -34,13 +41,8 @@ void editor_history_gui::perform(const editor_command_input in) {
 			return;
 		}
 
-		int flags = ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet;
-
 		const auto current_revision = history.get_current_revision();
-
-		if (command_index == current_revision) {
-			flags |= ImGuiTreeNodeFlags_Selected;
-		}
+		const bool is_selected = command_index == current_revision;
 
 		int colors = 0;
 
@@ -69,7 +71,7 @@ void editor_history_gui::perform(const editor_command_input in) {
 			ImGui::PushStyleColor(ImGuiCol_Text, disabled_color);
 		}
 
-		scoped_tree_node_ex(description.c_str(), flags);
+		ImGui::Selectable(description.c_str(), is_selected);
 
 		ImGui::PopStyleColor(colors);
 
@@ -77,13 +79,15 @@ void editor_history_gui::perform(const editor_command_input in) {
 			history.seek_to_revision(command_index, in);
 		}
 
-		ImGui::SameLine(200.f);
+		ImGui::NextColumn();
 
 		text_disabled(how_long_ago /* + " (?)" */);	
 
 		if (ImGui::IsItemHovered()) {
 			text_tooltip(when.get_readable());
 		}
+
+		ImGui::NextColumn();
 	};
 
 	do_history_node(-1, "Created project files", in.folder.view.meta.timestamp);

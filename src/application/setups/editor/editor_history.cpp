@@ -6,7 +6,7 @@
 #include "application/setups/editor/editor_entity_selector.h"
 
 std::string delete_entities_command::describe() const {
-	return typesafe_sprintf("Deleted %x entities", count_deleted());
+	return built_description;
 }
 
 void delete_entities_command::push_entry(const const_entity_handle handle) {
