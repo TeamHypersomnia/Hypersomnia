@@ -30,6 +30,7 @@
 #include "application/setups/editor/current_access_cache.h"
 
 #include "application/setups/editor/gui/editor_history_gui.h"
+#include "application/setups/editor/gui/editor_go_to_gui.h"
 
 struct config_lua_table;
 
@@ -66,14 +67,7 @@ class editor_setup : private current_access_cache<editor_setup> {
 	bool show_common_state = false;
 	bool show_entities = false;
 
-	bool show_go_to_all = false;
-	bool show_go_to_entity = false;
-	std::string go_to_entity_query;
-
-	std::string last_go_to_entities_input;
-	unsigned go_to_entities_selected_index = 0;
-	std::vector<entity_guid> matching_go_to_entities;
-
+	editor_go_to_entity_gui go_to_entity_gui;
 	editor_destructor_input destructor_input;
 
 	const_entity_handle get_matching_go_to_entity() const;
@@ -86,6 +80,8 @@ class editor_setup : private current_access_cache<editor_setup> {
 	void on_folder_changed();
 	void set_locally_viewed(const entity_id);
 	void finish_rectangular_selection();
+
+	void clear_id_caches();
 
 	template <class F>
 	void catch_popup(F&& callback) {

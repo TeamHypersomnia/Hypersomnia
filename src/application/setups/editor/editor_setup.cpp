@@ -18,7 +18,7 @@
 #include "application/setups/editor/editor_paths.h"
 #include "application/setups/editor/editor_camera.h"
 
-#include <imgui/imgui_internal.h>
+#include "3rdparty/imgui/imgui_internal.h"
 
 #include "augs/readwrite/byte_file.h"
 #include "augs/readwrite/lua_file.h"
@@ -69,11 +69,7 @@ std::optional<camera_cone> editor_setup::get_current_camera() const {
 }
 
 const_entity_handle editor_setup::get_matching_go_to_entity() const {
-	if (show_go_to_entity && matching_go_to_entities.size() > 0) {
-		return work().world[matching_go_to_entities[go_to_entities_selected_index]];
-	}
-
-	return work().world[entity_id()];
+	return go_to_entity_gui.get_matching_go_to_entity(work().world);
 }
 
 void editor_setup::on_folder_changed() {
@@ -560,219 +556,12 @@ void editor_setup::perform_custom_imgui(
 			});
 		}
 
-		if (show_go_to_all) {
-			auto go_to_all = scoped_window("Go to all", &show_go_to_all);
-		}
+		const auto go_to_dialog_pos = vec2 { static_cast<float>(screen_size.x / 2), menu_bar_size.y * 2 + 1 };
 
-		if (show_go_to_entity) {
-			{
-				const auto max_lines = static_cast<std::size_t>(settings.lines_in_go_to_dialogs);
-				const auto left = go_to_entities_selected_index / max_lines * max_lines;
-				const auto right = std::min(left + max_lines, matching_go_to_entities.size());
-
-				const auto size = vec2 {
-					static_cast<float>(settings.go_to_dialog_width),
-					(right - left + 2) * ImGui::GetTextLineHeightWithSpacing()
-				};
-
-				set_next_window_rect(
-					{
-						{ screen_size.x / 2 - size.x / 2, menu_bar_size.y * 2 + 1 },
-						size	
-					},
-					ImGuiCond_Always
-				);
-			}
-
-			auto go_to_entity = scoped_window(
-				"Go to entity", 
-				&show_go_to_entity,
-			   	ImGuiWindowFlags_NoTitleBar 
-				| ImGuiWindowFlags_NoResize 
-				| ImGuiWindowFlags_NoScrollbar 
-				| ImGuiWindowFlags_NoScrollWithMouse
-				| ImGuiWindowFlags_NoMove 
-				| ImGuiWindowFlags_NoSavedSettings
-			);
-
-			static auto arrow_callback = [](ImGuiTextEditCallbackData* data) {
-				LOG_NVPS(data->EventFlag);
-				LOG_NVPS(data->Buf);			
-
-				auto& self = *reinterpret_cast<editor_setup*>(data->UserData);
-
-				switch (data->EventFlag) {
-					case ImGuiInputTextFlags_CallbackHistory: {
-						const auto max_index = self.matching_go_to_entities.size();
-
-						if (max_index == 0) {
-							break;
-						}
-						
-						if (data->EventKey == ImGuiKey_UpArrow) {
-							if (self.go_to_entities_selected_index == 0) {
-								self.go_to_entities_selected_index = max_index - 1;
-							}
-							else {
-								--self.go_to_entities_selected_index; 	
-							}
-						}
-						else if (data->EventKey == ImGuiKey_DownArrow) {
-							++self.go_to_entities_selected_index; 	
-							self.go_to_entities_selected_index %= max_index;
-						}
-					}
-
-					break;
-
-					case ImGuiInputTextFlags_CallbackAlways: {
-						const auto current_input_text = std::string(data->Buf, data->BufTextLen);
-			
-						const bool should_rebuild = 
-							current_input_text != self.last_go_to_entities_input
-							|| (current_input_text.empty() && self.matching_go_to_entities.empty())
-						;
-			
-						if (!should_rebuild) {
-							break;
-						}
-			
-						self.last_go_to_entities_input = current_input_text;
-			
-						self.matching_go_to_entities.clear();
-						const auto query = to_wstring(current_input_text);
-			
-						unsigned hits = 0;
-							
-						cosmic::for_each_entity(self.work().world, [&](const auto handle) {
-							const auto name = handle.get_name();
-							const auto id = handle.get_id();
-			
-							if (query.empty() || to_lowercase(name).find(query) != std::wstring::npos) {
-								++hits;
-			
-								self.matching_go_to_entities.push_back(handle.get_guid());	
-							}
-						});	
-
-						if (self.matching_go_to_entities.size() > 0) {
-							self.go_to_entities_selected_index %= self.matching_go_to_entities.size();
-						}
-						else {
-							self.go_to_entities_selected_index = 0;
-						}
-					}
-					break;
-					
-					case ImGuiInputTextFlags_CallbackCompletion: {
-						if (const auto match = self.get_matching_go_to_entity()) {
-							const auto name = to_string(match.get_name());
-
-							if (name.length() < data->BufSize) {
-								std::copy(name.c_str(), name.c_str() + name.length() + 1, data->Buf);
-
-								data->BufTextLen = name.length();
-								data->CursorPos = name.length();
-								data->BufDirty = true;
-							}
-						}
-
-						break;
-					}
-
-					default: break;
-				}
-
-				return 0;
-			};
-
-			text("Go to entity");
-			ImGui::SameLine();
-			
-			bool was_acquired = false;
-			
-			if (ImGui::GetCurrentWindow()->GetID("##GoToEntityInput") != GImGui->ActiveId) {
-				ImGui::SetKeyboardFocusHere();
-				was_acquired = true;
-			}
-			
-			auto confirm_go_to_selection = [&](const auto match) {
-				/* Confirm selection with quick search */
-				const auto selected_name = to_wstring(go_to_entity_query);
-
-				if (match) {	
-					view().selected_entities = { match };
-
-					if (!view().panned_camera.has_value()) {
-						view().panned_camera = camera_cone();
-					}
-
-					if (const auto transform = match.find_logic_transform()) {
-						view().panned_camera->transform.pos = transform->pos;
-					}
-					else {
-						LOG("WARNING: transform of %x could not be found.", match);
-					}
-				}
-			};
-
-        	if (input_text<256>(
-				"##GoToEntityInput", 
-				go_to_entity_query,
-					ImGuiInputTextFlags_CallbackHistory 
-					| ImGuiInputTextFlags_EnterReturnsTrue 
-					| ImGuiInputTextFlags_CallbackAlways
-					| ImGuiInputTextFlags_CallbackCompletion
-				, 
-				arrow_callback,
-				reinterpret_cast<void*>(this)
-			)) {
-				confirm_go_to_selection(get_matching_go_to_entity());
-			}
-	
-			{
-				const auto last_input = to_wstring(last_go_to_entities_input);
-
-				const auto max_lines = static_cast<std::size_t>(settings.lines_in_go_to_dialogs);
-				const auto left = go_to_entities_selected_index / max_lines * max_lines;
-				const auto right = std::min(left + max_lines, matching_go_to_entities.size());
-
-				for (std::size_t i = left; i < right; ++i) {
-					if (i == go_to_entities_selected_index) {
-						bool s = true;
-						ImGui::PushID(static_cast<int>(i));
-						ImGui::Selectable("##gotoentity", &s);
-						ImGui::PopID();
-						ImGui::SameLine(0.f, 0.f);
-					}
-
-					const auto m = matching_go_to_entities[i];
-					const auto name = work().world[m].get_name();
-					const auto matched_name = to_lowercase(name);
-
-					const auto unmatched_left = matched_name.find(last_input);
-					const auto unmatched_right = unmatched_left + last_input.length();
-
-					text(name.substr(0, unmatched_left));
-					ImGui::SameLine(0.f, 0.f);
-
-					{
-						auto scope = scoped_style_color(ImGuiCol_Text, ImVec4(0.f, 1.f, 0.f, 1.f));
-						text(name.substr(unmatched_left, unmatched_right - unmatched_left));
-						ImGui::SameLine(0.f, 0.f);
-					}
-
-					text(name.substr(unmatched_right));
-
-					ImGui::SameLine(settings.go_to_dialog_width * 0.7);
-
-					text("(guid: %x)", m);
-				}
-			}
-
-			if (!was_acquired && ImGui::GetCurrentWindow()->GetID("##GoToEntityInput") != GImGui->ActiveId) {
-				show_go_to_entity = false;
-			}
+		if (const auto confirmation = 
+			go_to_entity_gui.perform(settings.go_to, work().world, go_to_dialog_pos)
+		) {
+			::standard_confirm_go_to(*confirmation, view());
 		}
 	}
 
@@ -832,6 +621,10 @@ void editor_setup::perform_custom_imgui(
 			}
 		}
 	}
+}
+
+void editor_setup::clear_id_caches() {
+	in_rectangular_selection.clear();
 }
 
 void editor_setup::finish_rectangular_selection() {
@@ -957,16 +750,11 @@ void editor_setup::del() {
 }
 
 void editor_setup::go_to_all() {
-	show_go_to_all = true;
+
 }
 
 void editor_setup::go_to_entity() {
-	show_go_to_entity = true;
-	go_to_entity_query.clear();
-	matching_go_to_entities.clear();
-	last_go_to_entities_input.clear();
-	go_to_entities_selected_index = 0;
-	ImGui::SetWindowFocus("Go to entity");
+	go_to_entity_gui.init();
 }
 
 void editor_setup::reveal_in_explorer(const augs::window& owner) {

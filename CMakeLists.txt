@@ -530,6 +530,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/build_info.cpp"
 	"src/augs/misc/pool/pool.cpp"
 	"src/application/setups/editor/gui/editor_history_gui.cpp"
+	"src/application/setups/editor/gui/editor_go_to_gui.cpp"
 	"src/application/setups/editor/editor_camera.cpp"
 )
 
