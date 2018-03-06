@@ -60,6 +60,7 @@ class editor_setup : private current_access_cache<editor_setup> {
 	editor_player player;
 
 	editor_history_gui history_gui;
+	editor_go_to_entity_gui go_to_entity_gui;
 
 	std::optional<editor_popup> ok_only_popup;
 
@@ -67,7 +68,6 @@ class editor_setup : private current_access_cache<editor_setup> {
 	bool show_common_state = false;
 	bool show_entities = false;
 
-	editor_go_to_entity_gui go_to_entity_gui;
 	editor_destructor_input destructor_input;
 
 	const_entity_handle get_matching_go_to_entity() const;

@@ -2,8 +2,6 @@
 #include "augs/templates/algorithm_templates.h"
 #include "augs/misc/time_utils.h"
 #include "augs/misc/imgui/imgui_utils.h"
-#include "augs/misc/imgui/imgui_control_wrappers.h"
-#include "augs/misc/imgui/addons/imguitabwindow/imguitabwindow.h"
 #include "augs/filesystem/directory.h"
 #include "augs/templates/thread_templates.h"
 #include "augs/templates/chrono_templates.h"
@@ -17,6 +15,8 @@
 #include "application/setups/editor/editor_setup.h"
 #include "application/setups/editor/editor_paths.h"
 #include "application/setups/editor/editor_camera.h"
+
+#include "application/setups/editor/gui/editor_tab_gui.h"
 
 #include "3rdparty/imgui/imgui_internal.h"
 
@@ -354,116 +354,12 @@ void editor_setup::perform_custom_imgui(
 		}
 
 		if (anything_opened()) {
-			if (const auto tab_menu = scoped_tab_menu_bar(menu_bar_size.y)) {
-				{
-					using namespace ImGui;
-					
-					const auto& in_style = GetStyle();
-					auto& out_style = TabLabelStyle::style;
-
-					using col = TabLabelStyle::Colors;
-
-					out_style.rounding = 0;
-					out_style.closeButtonRounding = 0;
-					out_style.closeButtonBorderWidth = 0;
-					out_style.colors[col::Col_TabLabel] = 0;
-					out_style.colors[col::Col_TabLabelHovered] = GetColorU32(in_style.Colors[ImGuiCol_ButtonHovered]);
-					out_style.colors[col::Col_TabLabelActive] = GetColorU32(in_style.Colors[ImGuiCol_ButtonActive]);
-					out_style.colors[col::Col_TabLabelText] = GetColorU32(in_style.Colors[ImGuiCol_Text]);
-					out_style.colors[col::Col_TabLabelSelected] = GetColorU32(in_style.Colors[ImGuiCol_ButtonActive]);
-					out_style.colors[col::Col_TabLabelSelectedHovered] = GetColorU32(in_style.Colors[ImGuiCol_ButtonActive]);
-					out_style.colors[col::Col_TabLabelSelectedActive] = GetColorU32(in_style.Colors[ImGuiCol_ButtonActive]);
-					out_style.colors[col::Col_TabLabelSelectedText] = GetColorU32(in_style.Colors[ImGuiCol_Text]);
-					out_style.colors[col::Col_TabLabelCloseButtonHovered] = GetColorU32(in_style.Colors[ImGuiCol_CloseButtonHovered]);
-					out_style.colors[col::Col_TabLabelCloseButtonActive] = GetColorU32(in_style.Colors[ImGuiCol_CloseButtonActive]);
-				}
-
-				// Tab algorithm i/o
-
-				auto selected_index = static_cast<int>(signi.current_index);
-				int closed_tab_index{ -1 };
-
-				auto ordering = [&]() {
-					std::vector<int> out;
-					out.resize(signi.folders.size());
-
-					for (int i = 0; i < out.size(); ++i) {
-						out[i] = i;
-					}
-
-					return out;
-				}();
-
-				{
-					const auto tab_names = [&]() {
-						std::vector<std::string> out;
-						out.reserve(signi.folders.size());
-
-						for (const auto& it : signi.folders) {
-							auto p = it.get_display_path();
-
-							if (it.has_unsaved_changes()) {
-								p += " *";
-							}
-
-							out.push_back(p);
-						}
-
-						return out;
-					}();
-
-					auto tab_names_cstrs = [&]() {
-						std::vector<const char*> out;
-						out.reserve(signi.folders.size());
-
-						for (const auto& it : tab_names) {
-							out.push_back(it.c_str());
-						}
-
-						return out;
-					}();
-
-					auto style = scoped_style_var(ImGuiStyleVar_FramePadding, []() { auto padding = ImGui::GetStyle().FramePadding; padding.x *= 2; return padding; }());
-					ImGui::TabLabels(static_cast<int>(signi.folders.size()), tab_names_cstrs.data(), selected_index, nullptr, false, nullptr, ordering.data(), true, true, &closed_tab_index, nullptr);
-				}
-
-				/* Read back */
-
-				{
-					if (closed_tab_index != -1) {
-						close_folder(static_cast<folder_index>(closed_tab_index));
-					}
-					else {
-						bool changed_order = false;
-
-						for (std::size_t i = 0; i < ordering.size(); ++i) {
-							if (ordering[i] != i) {
-								changed_order = true;
-								break;
-							}
-						}
-
-						auto index_to_set = static_cast<folder_index>(selected_index);
-
-						if (changed_order) {
-							decltype(signi.folders) new_tabs;
-							new_tabs.reserve(signi.folders.size());
-
-							for (const auto o : ordering) {
-								if (o == selected_index) {
-									index_to_set = static_cast<folder_index>(new_tabs.size());
-								}
-
-								new_tabs.push_back(std::move(signi.folders[o]));
-							}
-
-							signi.folders = std::move(new_tabs);
-						}
-
-						set_current(index_to_set);
-					}
-				}
-			}
+			perform_editor_tab_gui(
+				[&](const auto index_to_close){ close_folder(index_to_close); },
+				[&](const auto index_to_set){ set_current(index_to_set); },
+				signi,
+				menu_bar_size.y
+			);
 		}
 	}
 
