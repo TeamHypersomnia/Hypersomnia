@@ -26,14 +26,6 @@ namespace augs {
 		std::vector<command_type> commands; 
 		// END GEN INTROSPECTOR
 
-		bool is_revision_newest() const {
-			return current_revision == static_cast<index_type>(commands.size()) - 1;
-		}
-
-		bool is_revision_oldest() const {
-			return current_revision == static_cast<index_type>(-1);
-		}
-
 		auto& last_command() {
 			return commands[current_revision];
 		}
@@ -83,8 +75,12 @@ namespace augs {
 			mark_current_revision_as_saved();
 		}
 
+		bool is_revision_saved(const index_type candidate) const {
+			return saved_at_revision == candidate;
+		}
+
 		bool at_unsaved_revision() const {
-			return saved_at_revision != current_revision;
+			return !is_revision_saved(current_revision);
 		}
 
 		bool was_modified() const {
@@ -144,6 +140,14 @@ namespace augs {
 
 		auto get_current_revision() const {
 			return current_revision;
+		}
+
+		bool is_revision_newest() const {
+			return current_revision == static_cast<index_type>(commands.size()) - 1;
+		}
+
+		bool is_revision_oldest() const {
+			return current_revision == static_cast<index_type>(-1);
 		}
 	};
 }

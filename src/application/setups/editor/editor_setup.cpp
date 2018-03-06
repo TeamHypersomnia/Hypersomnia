@@ -316,8 +316,9 @@ void editor_setup::perform_custom_imgui(
 				}
 
 				if (auto menu = scoped_menu("Edit")) {
-					if (item_if_tabs("Undo", "CTRL+Z")) {}
-					if (item_if_tabs("Redo", "CTRL+SHIFT+Z")) {}
+					if (item_if_tabs_and(!folder().history.is_revision_oldest(), "Undo", "CTRL+Z")) { undo(); }
+					if (item_if_tabs_and(!folder().history.is_revision_newest(), "Redo", "CTRL+SHIFT+Z")) { redo(); }
+
 					ImGui::Separator();
 					if (item_if_tabs("Cut", "CTRL+X")) {}
 					if (item_if_tabs("Copy", "CTRL+C")) {}

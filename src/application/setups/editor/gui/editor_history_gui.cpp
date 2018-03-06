@@ -40,24 +40,36 @@ void editor_history_gui::perform(editor_folder& f) {
 			flags |= ImGuiTreeNodeFlags_Selected;
 		}
 
+		int colors = 0;
+
 		if (command_index > current_revision) {
-			auto disabled_color = style.Colors[ImGuiCol_CloseButton];
+			++colors;
+
 			auto header_hover_color = style.Colors[ImGuiCol_CloseButton];
 
 			header_hover_color.x /= 1.3;
 			header_hover_color.y /= 1.3;
 			header_hover_color.z /= 1.3;
 
-			ImGui::PushStyleColor(ImGuiCol_Text, disabled_color);
 			ImGui::PushStyleColor(ImGuiCol_HeaderHovered, header_hover_color);
+		}
+
+		if (f.history.is_revision_saved(command_index)) {
+			++colors;
+
+			auto saved_color = rgba(0, 200, 0, 255);
+			ImGui::PushStyleColor(ImGuiCol_Text, saved_color);
+		}
+		else if (command_index > current_revision) {
+			++colors;
+
+			auto disabled_color = style.Colors[ImGuiCol_CloseButton];
+			ImGui::PushStyleColor(ImGuiCol_Text, disabled_color);
 		}
 
 		scoped_tree_node_ex(description.c_str(), flags);
 
-		if (command_index > current_revision) {
-			ImGui::PopStyleColor();
-			ImGui::PopStyleColor();
-		}
+		ImGui::PopStyleColor(colors);
 
 		if (ImGui::IsItemClicked()) {
 			f.history.seek_to_revision(command_index, f);
