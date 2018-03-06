@@ -375,7 +375,7 @@ void editor_setup::perform_custom_imgui(
 	}
 
 	if (anything_opened()) {
-		history_gui.perform(folder());
+		history_gui.perform(make_command_input());
 
 		if (show_summary) {
 			auto summary = scoped_window("Summary", &show_summary, ImGuiWindowFlags_AlwaysAutoResize);
@@ -579,11 +579,11 @@ void editor_setup::save_as(const augs::window& owner) {
 }
 
 void editor_setup::undo() {
-	folder().history.undo(folder());
+	folder().history.undo(make_command_input());
 }
 
 void editor_setup::redo() {
-	folder().history.redo(folder());
+	folder().history.redo(make_command_input());
 }
 
 void editor_setup::copy() {
@@ -609,7 +609,7 @@ void editor_setup::del() {
 		);
 
 		if (!command.empty()) {
-			folder().history.execute_new(std::move(command), folder());
+			folder().history.execute_new(std::move(command), make_command_input());
 			clear_id_caches();
 		}
 	}
@@ -706,6 +706,11 @@ void editor_setup::close_folder() {
 	if (anything_opened()) {
 		close_folder(signi.current_index);
 	}
+}
+
+
+editor_command_input editor_setup::make_command_input() {
+	return { folder(), selector };
 }
 
 bool editor_setup::handle_input_before_imgui(

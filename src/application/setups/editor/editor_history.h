@@ -17,6 +17,12 @@
 #include "game/transcendental/entity_solvable.h"
 
 class editor_folder;
+class editor_entity_selector;
+
+struct editor_command_input {
+	editor_folder& folder;
+	editor_entity_selector& selector;
+};
 
 struct changed_field_record {
 	// GEN INTROSPECTOR struct changed_field_record
@@ -55,8 +61,8 @@ struct delete_entities_command {
 
 	void push_entry(const_entity_handle);
 
-	void redo(editor_folder&);
-	void undo(editor_folder&) const;
+	void redo(editor_command_input);
+	void undo(editor_command_input) const;
 
 	bool empty() const;
 	std::size_t count_deleted() const;

@@ -4,7 +4,7 @@
 #include "application/setups/editor/editor_folder.h"
 #include "application/setups/editor/gui/editor_history_gui.h"
 
-void editor_history_gui::perform(editor_folder& f) {
+void editor_history_gui::perform(const editor_command_input in) {
 	if (!show) {
 		return;
 	}
@@ -12,6 +12,8 @@ void editor_history_gui::perform(editor_folder& f) {
 	using namespace ImGui;
 	using namespace augs::imgui;
 	using index_type = editor_history::index_type;
+
+	auto& history = in.folder.history;
 
 	auto window = scoped_window("History", &show);
 
@@ -34,7 +36,7 @@ void editor_history_gui::perform(editor_folder& f) {
 
 		int flags = ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet;
 
-		const auto current_revision = f.history.get_current_revision();
+		const auto current_revision = history.get_current_revision();
 
 		if (command_index == current_revision) {
 			flags |= ImGuiTreeNodeFlags_Selected;
@@ -54,7 +56,7 @@ void editor_history_gui::perform(editor_folder& f) {
 			ImGui::PushStyleColor(ImGuiCol_HeaderHovered, header_hover_color);
 		}
 
-		if (f.history.is_revision_saved(command_index)) {
+		if (history.is_revision_saved(command_index)) {
 			++colors;
 
 			auto saved_color = rgba(0, 200, 0, 255);
@@ -72,7 +74,7 @@ void editor_history_gui::perform(editor_folder& f) {
 		ImGui::PopStyleColor(colors);
 
 		if (ImGui::IsItemClicked()) {
-			f.history.seek_to_revision(command_index, f);
+			history.seek_to_revision(command_index, in);
 		}
 
 		ImGui::SameLine(200.f);
@@ -84,9 +86,9 @@ void editor_history_gui::perform(editor_folder& f) {
 		}
 	};
 
-	do_history_node(-1, "Created project files", f.view.meta.timestamp);
+	do_history_node(-1, "Created project files", in.folder.view.meta.timestamp);
 
-	const auto& commands = f.history.get_commands();
+	const auto& commands = history.get_commands();
 
 	for (std::size_t i = 0; i < commands.size(); ++i) {
 		const auto& c = commands[i];

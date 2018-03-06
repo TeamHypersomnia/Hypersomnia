@@ -3,6 +3,7 @@
 #include "application/intercosm.h"
 #include "application/setups/editor/editor_history.h"
 #include "application/setups/editor/editor_folder.h"
+#include "application/setups/editor/editor_entity_selector.h"
 
 std::string delete_entities_command::describe() const {
 	return typesafe_sprintf("Deleted %x entities", count_deleted());
@@ -33,9 +34,11 @@ bool delete_entities_command::empty() const {
 	return count_deleted() == 0;
 }
 
-void delete_entities_command::redo(editor_folder& f) {
+void delete_entities_command::redo(const editor_command_input in) {
+	auto& f = in.folder;
 	auto& selections = f.view.selected_entities;
 	selections.clear();
+	in.selector.clear();
 
 	auto& cosm = f.work->world;
 
@@ -46,7 +49,8 @@ void delete_entities_command::redo(editor_folder& f) {
 	});
 }
 
-void delete_entities_command::undo(editor_folder& f) const {
+void delete_entities_command::undo(const editor_command_input in) const {
+	auto& f = in.folder;
 	auto& cosm = f.work->world;
 
 	/* 

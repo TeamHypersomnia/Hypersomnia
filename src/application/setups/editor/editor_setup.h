@@ -138,6 +138,7 @@ class editor_setup : private current_access_cache<editor_setup> {
 	void open_last_folders(sol::state& lua);
 
 	void force_autosave_now() const;
+	editor_command_input make_command_input();
 
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
