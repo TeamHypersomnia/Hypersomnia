@@ -5,7 +5,7 @@ return {
   app_ingame_controls = {
     Backspace = "CLEAR_DEBUG_LINES",
     CapsLock = "SWITCH_CHARACTER",
-    L = "SWITCH_WEAPON_LASER",
+    F = "SWITCH_WEAPON_LASER",
     MouseButton4 = "SWITCH_GAME_GUI_MODE"
   },
   audio = {

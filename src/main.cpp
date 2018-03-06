@@ -1230,6 +1230,27 @@ int work(const int argc, const char* const * const argv) try {
 					continue;
 				}
 
+				{
+					/* MSVC ICE workaround */
+					auto& _common_input_state = common_input_state;
+					auto& _lua = lua;
+					auto& _window = window;
+
+					if (visit_current_setup([&](auto& setup) {
+						using T = std::decay_t<decltype(setup)>;
+
+						if constexpr(T::handles_window_input) {
+							return setup.handle_input_before_game(
+								_common_input_state, e, _window, _lua
+							);
+						}
+
+						return false;
+					})) {
+						continue;
+					}
+				}
+
 				std::optional<intent_change> key_change;
 
 				if (e.was_any_key_pressed()) {
@@ -1347,27 +1368,6 @@ int work(const int argc, const char* const * const argv) try {
 
 				if (should_draw_game_gui() && (direct_gameplay_or_game_gui || was_released)) {
 					if (game_gui.control_gui_world(create_game_gui_context(), e)) {
-						continue;
-					}
-				}
-
-				{
-					/* MSVC ICE workaround */
-					auto& _common_input_state = common_input_state;
-					auto& _lua = lua;
-					auto& _window = window;
-
-					if (visit_current_setup([&](auto& setup) {
-						using T = std::decay_t<decltype(setup)>;
-
-						if constexpr(T::handles_window_input) {
-							return setup.handle_unfetched_window_input(
-								_common_input_state, e, _window, _lua
-							);
-						}
-
-						return false;
-					})) {
 						continue;
 					}
 				}

@@ -784,7 +784,7 @@ bool editor_setup::handle_input_before_imgui(
 }
 
 
-bool editor_setup::handle_unfetched_window_input(
+bool editor_setup::handle_input_before_game(
 	const augs::event::state& common_input_state,
 	const augs::event::change e,
 

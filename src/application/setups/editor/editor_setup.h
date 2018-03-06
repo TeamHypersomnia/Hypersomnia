@@ -203,7 +203,7 @@ public:
 		sol::state& lua
 	);
 
-	bool handle_unfetched_window_input(
+	bool handle_input_before_game(
 		const augs::event::state& common_input_state,
 		const augs::event::change change,
 
