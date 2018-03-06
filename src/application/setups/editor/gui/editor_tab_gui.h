@@ -61,7 +61,7 @@ void perform_editor_tab_gui(
 				for (const auto& it : signi.folders) {
 					auto p = it.get_display_path();
 
-					if (it.has_unsaved_changes()) {
+					if (it.at_unsaved_revision()) {
 						p += " *";
 					}
 

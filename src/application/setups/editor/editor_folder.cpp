@@ -29,8 +29,8 @@ void editor_folder::set_folder_path(
 	recent.add(lua, path);
 }
 
-bool editor_folder::has_unsaved_changes() const {
-	return history.has_unsaved_changes();
+bool editor_folder::at_unsaved_revision() const {
+	return history.at_unsaved_revision();
 }
 
 bool editor_folder::is_untitled() const {

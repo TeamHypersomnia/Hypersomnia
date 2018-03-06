@@ -183,14 +183,14 @@ void editor_setup::open_folder_in_new_tab(const path_operation op) {
 		[this, op](editor_folder& f) {
 			f.set_folder_path(op.lua, op.path, recent);
 			f.load_folder();
-			f.history.mark_current_revision_as_saved();
+			f.history.mark_as_just_saved();
 		}
 	);
 }
 
 void editor_setup::save_current_folder() {
 	folder().save_folder();
-	folder().history.mark_current_revision_as_saved();
+	folder().history.mark_as_just_saved();
 }
 
 void editor_setup::save_current_folder_to(const path_operation op) {
@@ -681,7 +681,7 @@ void editor_setup::prev_tab() {
 void editor_setup::close_folder(const folder_index i) {
 	auto& folder_to_close = signi.folders[i];
 
-	if (folder_to_close.has_unsaved_changes()) {
+	if (folder_to_close.at_unsaved_revision()) {
 		set_popup({ "Error", "Nie", "Nie" });
 		return;
 	}

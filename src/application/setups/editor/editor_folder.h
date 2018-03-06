@@ -35,7 +35,7 @@ struct editor_folder {
 
 	bool is_untitled() const;
 
-	bool has_unsaved_changes() const;
+	bool at_unsaved_revision() const;
 
 	void save_folder() const;
 	void save_folder(const augs::path_type& to) const;

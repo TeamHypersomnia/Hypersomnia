@@ -18,6 +18,8 @@ namespace augs {
 		friend augs::introspection_access;
 
 		// GEN INTROSPECTOR class augs::history class... CommandTypes 
+		bool modified_flag = false;
+
 		index_type current_revision = static_cast<index_type>(-1);
 		std::optional<index_type> saved_at_revision = static_cast<index_type>(-1);
 
@@ -49,6 +51,8 @@ namespace augs {
 				Later we might support branches. 
 			*/
 
+			modified_flag = true;
+
 			erase_from_to(commands, current_revision + 1);
 
 			if (saved_at_revision 
@@ -70,8 +74,21 @@ namespace augs {
 			saved_at_revision = current_revision;
 		}
 
-		bool has_unsaved_changes() const {
+		void mark_as_not_modified() {
+			modified_flag = false;
+		}
+
+		void mark_as_just_saved() {
+			mark_as_not_modified();
+			mark_current_revision_as_saved();
+		}
+
+		bool at_unsaved_revision() const {
 			return saved_at_revision != current_revision;
+		}
+
+		bool was_modified() const {
+			return modified_flag;
 		}
 
 		template <class... Args>
@@ -79,6 +96,8 @@ namespace augs {
 			if (is_revision_newest()) {
 				return;
 			}
+
+			modified_flag = true;
 
 			std::visit(
 				[&](auto& command) {
@@ -95,6 +114,8 @@ namespace augs {
 			if (is_revision_oldest()) {
 				return;
 			}
+
+			modified_flag = true;
 
 			std::visit(
 				[&](auto& command) {

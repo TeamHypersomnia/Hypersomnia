@@ -26,19 +26,19 @@ void editor_autosave::save(
 	}
 
 	for (const auto& f : signi.folders) {
-		if (!f.has_unsaved_changes()) {
-			/* If everything's been written, no point in repeating ourselves */
-			continue;
-		}
-
-		if (f.is_untitled()) {
-			/* The work is untitled anyway, so we save it in place. */ 
-			f.save_folder();
-		}
-		else {
-			auto autosave_path = f.get_autosave_path();
-			augs::create_directories(autosave_path += "/");
-			f.save_folder(autosave_path, ::get_project_name(f.current_path));
+		if (const auto& h = f.history;
+			h.at_unsaved_revision() || h.was_modified()
+		) {
+			/* A write is required */
+			if (f.is_untitled()) {
+				/* The work is untitled anyway, so we save it in place. */ 
+				f.save_folder();
+			}
+			else {
+				auto autosave_path = f.get_autosave_path();
+				augs::create_directories(autosave_path += "/");
+				f.save_folder(autosave_path, ::get_project_name(f.current_path));
+			}
 		}
 	}
 }
@@ -78,7 +78,7 @@ void open_last_folders(
 				catch (editor_popup p) {
 					auto new_folder = editor_folder(real_path);
 					new_folder.load_folder();
-					new_folder.history.mark_current_revision_as_saved();
+					new_folder.history.mark_as_just_saved();
 					signi.folders.emplace_back(std::move(new_folder));
 				}
 			}

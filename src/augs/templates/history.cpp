@@ -42,15 +42,15 @@ struct B_command {
 };
 
 #define test_mark_as_current() \
-REQUIRE(hist.has_unsaved_changes()); \
+REQUIRE(hist.at_unsaved_revision()); \
 hist.mark_current_revision_as_saved(); \
-REQUIRE(!hist.has_unsaved_changes());
+REQUIRE(!hist.at_unsaved_revision());
 
 TEST_CASE("Templates History") {
 	command_context context;
 	augs::history<A_command, B_command> hist;
 
-	REQUIRE(!hist.has_unsaved_changes());
+	REQUIRE(!hist.at_unsaved_revision());
 
 	REQUIRE(context.a_value == 0);
 	REQUIRE(context.b_value == 0);
@@ -68,7 +68,7 @@ TEST_CASE("Templates History") {
 		hist.execute_new(A_command { context, 3 }, context);
 		hist.execute_new(A_command { context, 8 }, context);
 
-		REQUIRE(hist.has_unsaved_changes());
+		REQUIRE(hist.at_unsaved_revision());
 		REQUIRE(context.a_value == 8);
 		REQUIRE(context.b_value == 0);
 
@@ -92,18 +92,18 @@ TEST_CASE("Templates History") {
 
 		hist.undo(context);
 
-		REQUIRE(!hist.has_unsaved_changes());
+		REQUIRE(!hist.at_unsaved_revision());
 
 		hist.redo(context);
-		REQUIRE(hist.has_unsaved_changes());
+		REQUIRE(hist.at_unsaved_revision());
 		hist.undo(context);
-		REQUIRE(!hist.has_unsaved_changes());
+		REQUIRE(!hist.at_unsaved_revision());
 	}
 
 	{
 		hist.execute_new(B_command { context, 23 }, context);
 
-		REQUIRE(hist.has_unsaved_changes());
+		REQUIRE(hist.at_unsaved_revision());
 		REQUIRE(context.a_value == 0);
 		REQUIRE(context.b_value == 23);
 
@@ -134,7 +134,7 @@ TEST_CASE("Templates History") {
 		hist.redo(context);
 		hist.redo(context);
 
-		REQUIRE(!hist.has_unsaved_changes()); 
+		REQUIRE(!hist.at_unsaved_revision()); 
 
 		REQUIRE(context.a_value == 389);
 		REQUIRE(context.b_value == 58);
@@ -172,7 +172,7 @@ TEST_CASE("Templates HistoryUnsavedChangesTest") {
 	command_context context;
 	augs::history<A_command, B_command> hist;
 
-	REQUIRE(!hist.has_unsaved_changes());
+	REQUIRE(!hist.at_unsaved_revision());
 
 	REQUIRE(context.a_value == 0);
 	REQUIRE(context.b_value == 0);
