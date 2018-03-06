@@ -798,96 +798,48 @@ bool editor_setup::handle_unfetched_window_input(
 
 	const auto current_cone = *get_current_camera();
 	const auto world_cursor_pos = current_cone.to_world_space(screen_size, mouse_pos);
-	const auto world_screen_center = current_cone.to_world_space(screen_size, screen_size/2);
+
+	const bool has_ctrl{ common_input_state[key::LCTRL] };
+	const bool has_shift{ common_input_state[key::LSHIFT] };
 
 	if (is_editing_mode()) {
-		const bool has_ctrl{ common_input_state[key::LCTRL] || common_input_state[key::RCTRL] };
-		const bool has_shift{ common_input_state[key::LSHIFT] };
-
-		const auto pan_mult = [&](){
-			float result = 1.f;
-
-			if (has_ctrl) {
-				result *= 5;
-			}
-
-			if (has_shift) {
-				result /= 5;
-			}
-
-			return result;
-		}();
-
-		const auto zoom_mult = [&](){
-			float result = 1.f;
-
-			if (has_ctrl) {
-				result *= 5;
-			}
-
-			if (has_shift) {
-				result /= 5;
-			}
-
-			return result;
-		}();
-
-		auto pan_scene = [&](const auto amount) {
-			if (!view().panned_camera.has_value()) {
-				view().panned_camera = current_cone;
-			}
-
-			auto& camera = *view().panned_camera;
-
-			camera.transform.pos -= pan_mult * amount / camera.zoom;
-		};
-
-		auto zoom_scene = [&](const auto zoom_amount, const auto zoom_point) {
-			if (!view().panned_camera.has_value()) {
-				view().panned_camera = current_cone;
-			}
-
-			auto& camera = *view().panned_camera;
-
-			const auto old_zoom = camera.zoom;
-			const auto zoom_offset = 0.09f * old_zoom * zoom_amount * zoom_mult;
-			const auto new_zoom = std::clamp(old_zoom + zoom_offset, 0.01f, 10.f);
-
-			camera.zoom = new_zoom;	
-			camera.transform.pos += (1 - 1 / (new_zoom/old_zoom))*(zoom_point - camera.transform.pos);
-		};
-
-		if (e.msg == message::wheel) {
-			zoom_scene(e.data.scroll.amount, world_cursor_pos);
-		}
-
-		if (e.msg == message::mousemotion) {
-			if (common_input_state[key::RMOUSE]) {
-				pan_scene(vec2(e.data.mouse.rel) * settings.camera_panning_speed);
-			}
-			else {
-				selector.do_mousemotion(
-					work().world,
-					world_cursor_pos,
-					common_input_state[key::LMOUSE]
-				);
-			}
-
+		if (editor_detail::handle_camera_input(
+			settings.camera,
+			current_cone,
+			common_input_state,
+			e,
+			world_cursor_pos,
+			screen_size,
+			view().panned_camera
+		)) {
 			return true;
 		}
 
-		auto& selections = view().selected_entities;
+		if (e.msg == message::mousemotion) {
+			selector.do_mousemotion(
+				work().world,
+				world_cursor_pos,
+				common_input_state[key::LMOUSE]
+			);
+
+			return true;
+		}
 
 		if (e.was_pressed(key::SLASH)) {
 			go_to_entity();
 			return true;
 		}
-		else if (e.was_pressed(key::LMOUSE)) {
-			selector.do_left_press(has_ctrl, world_cursor_pos, selections);
-			return true;
-		}
-		else if (e.was_released(key::LMOUSE)) {
-			selector.do_left_release(has_ctrl, selections);
+
+		{
+			auto& selections = view().selected_entities;
+
+			if (e.was_pressed(key::LMOUSE)) {
+				selector.do_left_press(has_ctrl, world_cursor_pos, selections);
+				return true;
+			}
+			if (e.was_released(key::LMOUSE)) {
+				selector.do_left_release(has_ctrl, selections);
+			}
 		}
 
 		if (e.was_any_key_pressed()) {
@@ -920,9 +872,6 @@ bool editor_setup::handle_unfetched_window_input(
 				}
 			}
 
-			const auto key_pan_amount = 50.f;
-			const auto key_zoom_amount = 1.f;
-
 			switch (k) {
 				case key::C: 
 					if (view().selected_entities.size() == 1) { 
@@ -931,13 +880,6 @@ bool editor_setup::handle_unfetched_window_input(
 					}
 				case key::I: play(); return true;
 				case key::DEL: del(); return true;
-				case key::HOME: view().panned_camera = std::nullopt; return true;
-				case key::UP: pan_scene(vec2(0, key_pan_amount)); return true;
-				case key::DOWN: pan_scene(vec2(0, -key_pan_amount)); return true;
-				case key::RIGHT: pan_scene(vec2(-key_pan_amount, 0)); return true;
-				case key::LEFT: pan_scene(vec2(key_pan_amount, 0)); return true;
-				case key::MINUS: zoom_scene(-key_zoom_amount, world_screen_center); return true;
-				case key::EQUAL: zoom_scene(key_zoom_amount, world_screen_center); return true;
 				default: break;
 			}
 		}

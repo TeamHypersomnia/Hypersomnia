@@ -65,15 +65,17 @@ return {
       once_every_min = 1
     },
     go_to = {
-      dialog_width = 400;
-      num_lines = 15;
+      dialog_width = 400,
+      num_lines = 15,
+    },
+    camera = {
+      panning_speed = 1
     },
     entity_selector = {
       hovered_color = "255 255 255 20",
       selected_color = "65 131 196 80",
       held_color = "65 131 196 120"
     },
-    camera_panning_speed = 1,
     controlled_entity_color = "255 255 0 120",
     matched_entity_color = "0 255 0 80",
 

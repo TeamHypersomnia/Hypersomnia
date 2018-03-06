@@ -29,15 +29,21 @@ struct editor_entity_selector_settings {
 	// END GEN INTROSPECTOR
 };
 
+struct editor_camera_settings {
+	// GEN INTROSPECTOR struct editor_camera_settings
+	float panning_speed = 1.f;
+	// END GEN INTROSPECTOR
+};
+
 struct editor_settings {
 	// GEN INTROSPECTOR struct editor_settings
 	editor_autosave_settings autosave;
-	float camera_panning_speed = 1.f;
 	
 #if TODO
 	unsigned remember_last_n_commands = 200;
 #endif
 
+	editor_camera_settings camera;
 	editor_go_to_settings go_to;
 	editor_entity_selector_settings entity_selector;
 

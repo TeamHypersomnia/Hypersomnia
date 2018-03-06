@@ -242,7 +242,9 @@ void settings_gui_state::perform(
 				}	
 				
 				if (auto node = scoped_tree_node("Interface")) {
-					revertable_drag("Camera panning speed", config.editor.camera_panning_speed, 0.001f, -10.f, 10.f);
+					if (auto node = scoped_tree_node("Camera")) {
+						revertable_drag("Panning speed", config.editor.camera.panning_speed, 0.001f, -10.f, 10.f);
+					}
 
 					if (auto node = scoped_tree_node("\"Go to\" dialogs")) {
 						revertable_slider("Width", config.editor.go_to.dialog_width, 30, screen_size.x);
