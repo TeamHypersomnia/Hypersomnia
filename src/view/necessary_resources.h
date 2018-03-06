@@ -83,7 +83,7 @@ namespace sol {
 }
 
 struct necessary_image_loadables_map :
-	public augs::enum_associative_array<assets::necessary_image_id, game_image_loadables>
+	public augs::enum_map<assets::necessary_image_id, game_image_loadables>
 {
 	necessary_image_loadables_map(
 		sol::state& lua,
@@ -92,7 +92,7 @@ struct necessary_image_loadables_map :
 	);
 };
 
-using necessary_images_in_atlas = augs::enum_associative_array<
+using necessary_images_in_atlas = augs::enum_map<
 	assets::necessary_image_id,
 	/* necessary images have only diffuse maps, thus no need for neon/desaturation entries */
 	augs::texture_atlas_entry

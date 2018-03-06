@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "augs/misc/enum/enum_associative_array.h"
+#include "augs/misc/enum/enum_map.h"
 
 #include "augs/misc/basic_input_intent.h"
 #include "augs/misc/basic_input_motion.h"
@@ -58,7 +58,7 @@ enum class game_intent_type {
 	// END GEN INTROSPECTOR
 };
 
-using game_intent_map = augs::enum_associative_array<
+using game_intent_map = augs::enum_map<
 	augs::event::keys::key, 
 	game_intent_type
 >;

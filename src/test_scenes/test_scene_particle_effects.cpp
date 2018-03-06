@@ -4,7 +4,7 @@
 #pragma warning(disable : 4244)
 #pragma warning(disable : 4267)
 
-#include "augs/misc/enum/enum_associative_array.h"
+#include "augs/misc/enum/enum_map.h"
 
 #include "game/assets/ids/particle_effect_id.h"
 #include "game/assets/animation.h"

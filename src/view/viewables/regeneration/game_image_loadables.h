@@ -2,7 +2,7 @@
 #include <optional>
 
 #include "augs/misc/enum/enum_array.h"
-#include "augs/misc/enum/enum_associative_array.h"
+#include "augs/misc/enum/enum_map.h"
 #include "augs/filesystem/path.h"
 
 #include "augs/drawing/flip.h"

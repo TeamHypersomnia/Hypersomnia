@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/misc/enum/enum_associative_array.h"
+#include "augs/misc/enum/enum_map.h"
 #include "augs/audio/sound_buffer.h"
 
 #include "view/viewables/particle_types.h"

@@ -18,7 +18,7 @@ or, in other words, having an awesome and accessible community.
 
 ## Commercial usage
 
-{% include important.html content="The official Hypersomnia is and will always remain, regardless of its stage of development, **free for everyone** to play without charge, tamper with and host custom servers with." %}
+{% include tip.html content="The official Hypersomnia is and will always remain, regardless of its stage of development, **free for everyone** to play without charge, tamper with and host custom servers with." %}
 
 Hypersomnia is licensed under [AGPL-3.0](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/LICENSE.md), which briefly means that you can do whatever you want with the code and other content, as long as:
 - The binaries you distribute provide their complete source code.

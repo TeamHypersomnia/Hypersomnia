@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/misc/enum/enum_associative_array.h"
+#include "augs/misc/enum/enum_map.h"
 #include "augs/misc/basic_input_intent.h"
 
 #include "augs/window_framework/event.h"
@@ -44,7 +44,7 @@ enum class game_gui_intent_type {
 
 using game_gui_intent = basic_input_intent<game_gui_intent_type>;
 
-using game_gui_intent_map = augs::enum_associative_array<
+using game_gui_intent_map = augs::enum_map<
 	augs::event::keys::key,
 	game_gui_intent_type
 >;

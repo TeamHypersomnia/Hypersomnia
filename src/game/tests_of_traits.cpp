@@ -225,12 +225,12 @@ struct tests_of_traits {
 	static_assert(!is_constexpr_capacity_v<std::vector<int>>, "Trait has failed");
 
 	static_assert(!is_container_v<decltype(pad_bytes<3>::pad)>, "Trait has failed");
-	static_assert(is_container_v<augs::enum_associative_array<game_intent_type, vec2>>, "Trait has failed");
+	static_assert(is_container_v<augs::enum_map<game_intent_type, vec2>>, "Trait has failed");
 	static_assert(!is_container_v<augs::enum_array<basic_transform<float>, colliders_offset_type>>, "Trait has failed");
 
 	static_assert(is_container_v<augs::constant_size_vector<vec2, 20>>, "Trait has failed");
 	static_assert(augs::is_byte_readwrite_appropriate_v<augs::memory_stream, augs::constant_size_vector<vec2, 20>>, "Trait has failed");
-	static_assert(augs::is_byte_readwrite_appropriate_v<augs::memory_stream, augs::enum_associative_array<game_intent_type, vec2>>, "Trait has failed");
+	static_assert(augs::is_byte_readwrite_appropriate_v<augs::memory_stream, augs::enum_map<game_intent_type, vec2>>, "Trait has failed");
 	static_assert(is_container_v<std::vector<int>>, "Trait has failed");
 	static_assert(is_container_v<std::vector<vec2>>, "Trait has failed");
 	static_assert(is_container_v<std::vector<cosmos>>, "Trait has failed");
@@ -427,15 +427,15 @@ constexpr auto all_assets_size = sizeof(all_assets);
 constexpr auto tuple_of_assets_size = sizeof(tuple_of_all_assets);
 constexpr auto tuple_of_logical_assets_size = sizeof(tuple_of_all_logical_assets);
 
-sizeof(augs::enum_associative_array<assets::animation_id, animation>);
-sizeof(augs::enum_associative_array<assets::game_image_id, game_image_baked>);
-sizeof(augs::enum_associative_array<assets::font_id, game_font_baked>);
-sizeof(augs::enum_associative_array<assets::particle_effect_id, particle_effect>);
-sizeof(augs::enum_associative_array<assets::physical_material_id, physical_material>);
-sizeof(augs::enum_associative_array<assets::shader_id, augs::graphics::shader>);
-sizeof(augs::enum_associative_array<assets::shader_program_id, augs::graphics::shader_program>);
-sizeof(augs::enum_associative_array<assets::sound_buffer_id, augs::sound_buffer>);
-sizeof(augs::enum_associative_array<assets::gl_texture_id, augs::graphics::texture>);
+sizeof(augs::enum_map<assets::animation_id, animation>);
+sizeof(augs::enum_map<assets::game_image_id, game_image_baked>);
+sizeof(augs::enum_map<assets::font_id, game_font_baked>);
+sizeof(augs::enum_map<assets::particle_effect_id, particle_effect>);
+sizeof(augs::enum_map<assets::physical_material_id, physical_material>);
+sizeof(augs::enum_map<assets::shader_id, augs::graphics::shader>);
+sizeof(augs::enum_map<assets::shader_program_id, augs::graphics::shader_program>);
+sizeof(augs::enum_map<assets::sound_buffer_id, augs::sound_buffer>);
+sizeof(augs::enum_map<assets::gl_texture_id, augs::graphics::texture>);
 sizeof(particle_effect_logical);
 
 static_assert(

@@ -4,7 +4,7 @@
 #include "augs/graphics/rgba.h"
 
 #include "augs/misc/timing/stepped_timing.h"
-#include "augs/misc/enum/enum_associative_array.h"
+#include "augs/misc/enum/enum_map.h"
 #include "augs/misc/value_meter.h"
 
 #include "augs/zeroed_pod.h"

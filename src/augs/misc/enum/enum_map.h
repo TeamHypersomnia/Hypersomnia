@@ -10,7 +10,7 @@
 
 namespace augs {
 	template <class Enum, class T>
-	class enum_associative_array_base {
+	class enum_map_base {
 	public:
 		using key_type = Enum;
 		using mapped_type = T;
@@ -71,13 +71,13 @@ namespace augs {
 	public:
 		template <bool is_const>
 		class basic_iterator {
-			using owner_ptr_type = maybe_const_ptr_t<is_const, enum_associative_array_base>;
+			using owner_ptr_type = maybe_const_ptr_t<is_const, enum_map_base>;
 			using pair_type = simple_pair<const key_type, maybe_const_ref_t<is_const, mapped_type>>;
 			
 			owner_ptr_type ptr = nullptr;
 			size_type idx = 0;
 
-			friend class enum_associative_array_base<Enum, T>;
+			friend class enum_map_base<Enum, T>;
 
 		public:
 			basic_iterator(const owner_ptr_type ptr, const size_type idx) : ptr(ptr), idx(idx) {}
@@ -232,19 +232,19 @@ namespace augs {
 	};
 
 	template <class Enum, class T>
-	class enum_associative_array<Enum, T, std::enable_if_t<std::is_trivially_copyable_v<T>>>
-		: public enum_associative_array_base<Enum, T> {
+	class enum_map<Enum, T, std::enable_if_t<std::is_trivially_copyable_v<T>>>
+		: public enum_map_base<Enum, T> {
 	public:
-		using base = enum_associative_array_base<Enum, T>;
+		using base = enum_map_base<Enum, T>;
 		using typename base::key_type;
 		using typename base::mapped_type;
 	};
 
 	template <class Enum, class T>
-	class enum_associative_array<Enum, T, std::enable_if_t<!std::is_trivially_copyable_v<T>>>
-		: public enum_associative_array_base<Enum, T> {
+	class enum_map<Enum, T, std::enable_if_t<!std::is_trivially_copyable_v<T>>>
+		: public enum_map_base<Enum, T> {
 	public:
-		using base = enum_associative_array_base<Enum, T>;
+		using base = enum_map_base<Enum, T>;
 		using typename base::key_type;
 		using typename base::mapped_type;
 		using typename base::flagset_type;
@@ -254,15 +254,15 @@ namespace augs {
 		using base::begin;
 		using base::end;
 
-		enum_associative_array() = default;
+		enum_map() = default;
 		
-		enum_associative_array(const enum_associative_array& b) {
+		enum_map(const enum_map& b) {
 			for (auto& v : b) {
 				emplace(v.first, v.second);
 			}
 		}
 
-		enum_associative_array& operator=(const enum_associative_array& b) {
+		enum_map& operator=(const enum_map& b) {
 			clear();
 
 			for (const auto& v : b) {
@@ -272,7 +272,7 @@ namespace augs {
 			return *this;
 		}
 
-		enum_associative_array(enum_associative_array&& b) {
+		enum_map(enum_map&& b) {
 			for (auto&& v : b) {
 				emplace(v.first, std::move(v.second));
 			}
@@ -280,7 +280,7 @@ namespace augs {
 			b.is_value_set = flagset_type();
 		}
 
-		enum_associative_array& operator=(enum_associative_array&& b) {
+		enum_map& operator=(enum_map&& b) {
 			clear();
 
 			for (auto&& v : b) {
@@ -292,15 +292,15 @@ namespace augs {
 			return *this;
 		}
 
-		~enum_associative_array() {
+		~enum_map() {
 			clear();
 		}
 	};
 
 	template <class Enum, class T, class = std::enable_if_t<is_comparable_v<T, T>>>
 	bool operator==(
-		const enum_associative_array<Enum, T>& left, 
-		const enum_associative_array<Enum, T>& right
+		const enum_map<Enum, T>& left, 
+		const enum_map<Enum, T>& right
 	) {
 		for (const auto& it : left) {
 			const auto ptr = mapped_or_nullptr(right, it.first);

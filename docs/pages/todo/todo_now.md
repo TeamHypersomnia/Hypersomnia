@@ -8,6 +8,7 @@ summary: Just a hidden scratchpad.
 ## Microplanned implementation order
 
 - clear selections on history changes!
+	- really fix them
 
 - rectangular selection could crash while undoing/redoing
 	- why not calculate it statelessly?
