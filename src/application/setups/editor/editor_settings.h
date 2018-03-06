@@ -21,6 +21,14 @@ struct editor_go_to_settings {
 	// END GEN INTROSPECTOR
 };
 
+struct editor_entity_selector_settings {
+	// GEN INTROSPECTOR struct editor_entity_selector_settings
+	rgba held_color = { 65, 131, 196, 160 };
+	rgba selected_color = { 65, 131, 196, 120 };
+	rgba hovered_color = { 255, 255, 255, 80 };
+	// END GEN INTROSPECTOR
+};
+
 struct editor_settings {
 	// GEN INTROSPECTOR struct editor_settings
 	editor_autosave_settings autosave;
@@ -31,12 +39,9 @@ struct editor_settings {
 #endif
 
 	editor_go_to_settings go_to;
+	editor_entity_selector_settings entity_selector;
 
 	rgba controlled_entity_color = { 255, 255, 0, 120 };
-	rgba held_entity_color = { 65, 131, 196, 160 };
-	rgba selected_entity_color = { 65, 131, 196, 120 };
-	rgba hovered_entity_color = { 255, 255, 255, 80 };
-
 	rgba matched_entity_color = { 0, 255, 0, 80 };
 
 	rgba rectangular_selection_color = { 65, 131, 196, 60 };

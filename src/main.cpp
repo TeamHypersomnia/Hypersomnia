@@ -1594,16 +1594,11 @@ int work(const int argc, const char* const * const argv) try {
 
 			if (current_setup) {
 				on_specific_setup([&](editor_setup& editor) {
-					if (editor.rectangular_drag_origin.has_value()) {
-						const auto camera = get_camera();
+					const auto mouse = common_input_state.mouse.pos;
 
-						const auto rectangular_selection = ltrb::from_points(
-							common_input_state.mouse.pos,
-							camera.to_screen_space(screen_size, *editor.rectangular_drag_origin)
-						);
-
+					if (const auto r = editor.get_screen_space_rect_selection(screen_size, mouse)) {
 						get_drawer().aabb_with_border(
-							rectangular_selection,
+							*r,
 							new_viewing_config.editor.rectangular_selection_color,
 							new_viewing_config.editor.rectangular_selection_border_color
 						);

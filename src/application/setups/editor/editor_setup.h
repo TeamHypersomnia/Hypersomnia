@@ -27,6 +27,8 @@
 #include "application/setups/editor/editor_settings.h"
 #include "application/setups/editor/editor_folder.h"
 #include "application/setups/editor/editor_recent_paths.h"
+#include "application/setups/editor/editor_entity_selector.h"
+
 #include "application/setups/editor/current_access_cache.h"
 
 #include "application/setups/editor/gui/editor_history_gui.h"
@@ -58,6 +60,7 @@ class editor_setup : private current_access_cache<editor_setup> {
 	editor_recent_paths recent;
 	editor_settings settings;
 	editor_player player;
+	editor_entity_selector selector;
 
 	editor_history_gui history_gui;
 	editor_go_to_entity_gui go_to_entity_gui;
@@ -71,11 +74,6 @@ class editor_setup : private current_access_cache<editor_setup> {
 	editor_destructor_input destructor_input;
 
 	const_entity_handle get_matching_go_to_entity() const;
-	
-	entity_id hovered_entity;
-	entity_id held_entity;
-	vec2 last_ldown_position;
-	visible_entities in_rectangular_selection;
 
 	void on_folder_changed();
 	void set_locally_viewed(const entity_id);
@@ -139,7 +137,6 @@ class editor_setup : private current_access_cache<editor_setup> {
 
 	void open_last_folders(sol::state& lua);
 
-	void clear_all_selections();
 	void force_autosave_now() const;
 
 public:
@@ -147,8 +144,6 @@ public:
 	static constexpr bool handles_window_input = true;
 	static constexpr bool handles_escape = true;
 	static constexpr bool has_additional_highlights = true;
-
-	std::optional<vec2> rectangular_drag_origin;
 
 	editor_setup(sol::state& lua);
 	editor_setup(sol::state& lua, const augs::path_type& intercosm_path);
@@ -250,20 +245,12 @@ public:
 	bool is_editing_mode() const;
 	std::optional<camera_cone> get_current_camera() const; 
 
-	template <class F>
-	void for_each_selected_entity(F callback) const {
-		if (anything_opened()) {
-			for (const auto e : view().selected_entities) {
-				if (!found_in(in_rectangular_selection.all, e)) {
-					callback(e);
-				}
-			}
+	std::optional<ltrb> get_screen_space_rect_selection(vec2i screen_size, vec2i mouse_pos) const;
 
-			for (const auto e : in_rectangular_selection.all) {
-				if (!found_in(view().selected_entities, e)) {
-					callback(e);
-				}
-			}
+	template <class F>
+	void for_each_selected_entity(F&& callback) const {
+		if (anything_opened()) {
+			selector.for_each_selected_entity(std::forward<F>(callback), view().selected_entities);
 		}
 	}
 
@@ -282,20 +269,13 @@ public:
 				callback(work().local_test_subject, color);
 			}
 
-			for_each_selected_entity(
-				[&](const auto e) {
-					callback(e, settings.selected_entity_color);
-				}
+			selector.for_each_highlight(
+				callback,
+				settings.entity_selector,
+				work().world,
+				view().selected_entities
 			);
 
-			if (work().world[held_entity].alive()) {
-				callback(held_entity, settings.held_entity_color);
-			}
-
-			if (work().world[hovered_entity].alive()) {
-				callback(hovered_entity, settings.hovered_entity_color);
-			}
-			
 			if (const auto match = get_matching_go_to_entity()) {
 				auto color = green;
 				color.a += static_cast<rgba_channel>(augs::zigzag(global_time_seconds, 1.0 / 2) * 25);

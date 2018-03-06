@@ -23,6 +23,17 @@
 #include "augs/readwrite/byte_file.h"
 #include "augs/readwrite/lua_file.h"
 
+std::optional<ltrb> editor_setup::get_screen_space_rect_selection(
+	const vec2i screen_size,
+	const vec2i mouse_pos
+) const {
+	if (const auto cam = get_current_camera()) {
+		return selector.get_screen_space_rect_selection(*cam, screen_size, mouse_pos);
+	}
+
+	return std::nullopt;
+}
+
 void editor_setup::open_last_folders(sol::state& lua) {
 	catch_popup([&]() { ::open_last_folders(lua, signi); });
 	base::refresh();
@@ -53,7 +64,7 @@ const all_viewables_defs& editor_setup::get_viewable_defs() const {
 }
 
 void editor_setup::unhover() {
-	hovered_entity = {};
+	selector.unhover();
 }
 
 bool editor_setup::is_editing_mode() const {
@@ -73,9 +84,8 @@ const_entity_handle editor_setup::get_matching_go_to_entity() const {
 }
 
 void editor_setup::on_folder_changed() {
-	hovered_entity = {};
 	player.paused = true;
-	finish_rectangular_selection();
+	selector.clear();
 }
 
 void editor_setup::set_popup(const editor_popup p) {
@@ -191,9 +201,9 @@ void editor_setup::save_current_folder_to(const path_operation op) {
 void editor_setup::fill_with_minimal_scene(sol::state& lua) {
 #if BUILD_TEST_SCENES
 	if (anything_opened()) {
-		work().make_test_scene(lua, { true, 144 } );
+		clear_id_caches();
 
-		clear_all_selections();
+		work().make_test_scene(lua, { true, 144 } );
 	}
 #endif
 }
@@ -201,9 +211,9 @@ void editor_setup::fill_with_minimal_scene(sol::state& lua) {
 void editor_setup::fill_with_test_scene(sol::state& lua) {
 #if BUILD_TEST_SCENES
 	if (anything_opened()) {
-		work().make_test_scene(lua, { false, 144 } );
+		clear_id_caches();
 
-		clear_all_selections();
+		work().make_test_scene(lua, { false, 144 } );
 	}
 #endif
 }
@@ -493,30 +503,16 @@ void editor_setup::perform_custom_imgui(
 }
 
 void editor_setup::clear_id_caches() {
-	in_rectangular_selection.clear();
+	selector.clear();
+
+	if (anything_opened()) {
+		view().selected_entities.clear();
+	}
 }
 
 void editor_setup::finish_rectangular_selection() {
 	if (anything_opened()) {
-		decltype(view().selected_entities) new_selections;
-
-		for_each_selected_entity(
-			[&](const auto e) {
-				new_selections.emplace(e);
-			}
-		);
-
-		view().selected_entities = new_selections;
-
-		rectangular_drag_origin = std::nullopt;
-		in_rectangular_selection.clear();
-	}
-}
-
-void editor_setup::clear_all_selections() {
-	if (anything_opened()) {
-		view().selected_entities.clear();
-		in_rectangular_selection.clear();
+		selector.finish_rectangular(view().selected_entities);
 	}
 }
 
@@ -613,7 +609,7 @@ void editor_setup::del() {
 
 		if (!command.empty()) {
 			folder().history.execute_new(std::move(command), folder());
-			clear_all_selections();
+			clear_id_caches();
 		}
 	}
 }
@@ -803,7 +799,7 @@ bool editor_setup::handle_unfetched_window_input(
 	const auto world_cursor_pos = current_cone.to_world_space(screen_size, mouse_pos);
 	const auto world_screen_center = current_cone.to_world_space(screen_size, screen_size/2);
 
-	if (player.paused) {
+	if (is_editing_mode()) {
 		const bool has_ctrl{ common_input_state[key::LCTRL] || common_input_state[key::RCTRL] };
 		const bool has_shift{ common_input_state[key::LSHIFT] };
 
@@ -867,92 +863,30 @@ bool editor_setup::handle_unfetched_window_input(
 		if (e.msg == message::mousemotion) {
 			if (common_input_state[key::RMOUSE]) {
 				pan_scene(vec2(e.data.mouse.rel) * settings.camera_panning_speed);
-				return true;
 			}
 			else {
-				hovered_entity = {};
-
-				{
-					const auto drag_dead_area = 3.f;
-					const auto drag_offset = world_cursor_pos - last_ldown_position;
-
-					if (common_input_state[key::LMOUSE] && !drag_offset.is_epsilon(drag_dead_area)) {
-						rectangular_drag_origin = last_ldown_position;
-						held_entity = {};
-					}
-				}
-
-				if (rectangular_drag_origin.has_value()) {
-					auto world_range = ltrb::from_points(*rectangular_drag_origin, world_cursor_pos);
-
-					in_rectangular_selection.clear();
-
-					const auto query = visible_entities_query{
-						work().world,
-						{ world_range.get_center(), 1.f },
-						world_range.get_size()
-					};
-
-					in_rectangular_selection.acquire_non_physical(query);
-					in_rectangular_selection.acquire_physical(query);
-				}
-				else {
-					hovered_entity = get_hovered_world_entity(
-						work().world, 
-						world_cursor_pos, 
-						[&](const entity_id id) { 
-							if (work().world[id].has<components::wandering_pixels>()) {
-								return false;
-							}
-
-							return true; 
-						}
-					);
-				}
+				selector.do_mousemotion(
+					work().world,
+					world_cursor_pos,
+					common_input_state[key::LMOUSE]
+				);
 			}
+
+			return true;
 		}
+
+		auto& selections = view().selected_entities;
 
 		if (e.was_pressed(key::SLASH)) {
 			go_to_entity();
 			return true;
 		}
 		else if (e.was_pressed(key::LMOUSE)) {
-			const bool has_ctrl{ common_input_state[key::LCTRL] };
-
-			const auto world_cursor_pos = current_cone.to_world_space(
-				window.get_screen_size(),
-				common_input_state.mouse.pos
-			);
-
-			last_ldown_position = world_cursor_pos;
-			held_entity = hovered_entity;
-
-			auto& selections = view().selected_entities;
-
-			if (/* new_selection */ !has_ctrl) {
-				selections.clear();
-			}
-
+			selector.do_left_press(has_ctrl, world_cursor_pos, selections);
 			return true;
 		}
 		else if (e.was_released(key::LMOUSE)) {
-			const auto held = work().world[held_entity];
-
-			if (held.alive()) {
-				const bool has_ctrl{ common_input_state[key::LCTRL] };
-				auto& selections = view().selected_entities;
-
-				if (has_ctrl && found_in(selections, held)) {
-					selections.erase(held);
-				}
-				else {
-					selections.emplace(hovered_entity);
-				}
-			}
-
-			held_entity = {};
-
-			finish_rectangular_selection();
+			selector.do_left_release(has_ctrl, selections);
 		}
 
 		if (e.was_any_key_pressed()) {
