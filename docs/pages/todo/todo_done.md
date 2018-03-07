@@ -276,3 +276,5 @@ we consider whole type overrides too complex architeciturally:
 - refactor go to all
 
 - text_color and relevant text_disabled
+- simple commands for filling
+

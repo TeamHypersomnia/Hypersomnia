@@ -327,16 +327,16 @@ int work(const int argc, const char* const * const argv) try {
 						new_atlas_required = true;
 					}
 
+#if LOADED_CACHES
 					const auto& new_meta = new_defs.game_image_metas.at(key);
 					const auto& old_meta = currently_loaded_defs.game_image_metas.at(key);
 
 					const bool meta_changed = !equal(old_meta, new_meta);
 
 					if (loadables_changed || meta_changed) {
-#if LOADED_CACHES
 						game_image_caches.at(key) = { *new_loadables, new_meta };
-#endif
 					}
+#endif
 				}
 				else {
 					/* Missing, unload */
@@ -393,15 +393,21 @@ int work(const int argc, const char* const * const argv) try {
 			for (const auto& old : currently_loaded_defs.sounds) {
 				const auto key = old.first;
 
-				if (const auto found = mapped_or_nullptr(new_defs.sounds, key)) {
-					if (/* reload */ !equal(*found, old.second)) {
-						/* Changed, reload */
+				auto unload = [&](){
+					audiovisuals.get<sound_system>().clear_sources_playing(key);
+					game_sounds.erase(key);
+				};
+
+				if (const auto fresh = mapped_or_nullptr(new_defs.sounds, key)) {
+					if (!equal(*fresh, old.second)) {
+						/* Different from the fresh one, reload */
+						unload();
+						game_sounds.try_emplace(key, *fresh);
 					}
 				}
 				else {
 					/* Missing, unload */
-					audiovisuals.get<sound_system>().clear_sources_playing(key);
-					game_sounds.erase(key);
+					unload();
 				}
 			}
 

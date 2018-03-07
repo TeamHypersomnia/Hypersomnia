@@ -5,6 +5,8 @@ permalink: todo_perf
 summary: Just a hidden scratchpad.
 ---
 
+- destroy_all_caches -> clear_all_caches and use clears
+
 - arrange components in such an order that the fundamentals go first, and frequently used go next to each other
 	- so that component ids are cached more frequently
 - separate rigid body and static rigid body
