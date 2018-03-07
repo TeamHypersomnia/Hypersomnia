@@ -13,7 +13,13 @@
 
 #include "application/setups/editor/editor_command_structs.h"
 
+namespace augs {
+	struct introspection_access;
+}
+
 struct delete_entities_command {
+	friend augs::introspection_access;
+
 	template <class E>
 	struct deleted_entry {
 		entity_solvable<E> content;
@@ -25,7 +31,9 @@ struct delete_entities_command {
 
 	// GEN INTROSPECTOR struct delete_entities_command
 	editor_command_common common;
+private:
 	per_entity_type<make_data_vector> deleted_entities;
+public:
 	std::string built_description;
 	// END GEN INTROSPECTOR
 

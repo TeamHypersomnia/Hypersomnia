@@ -6,12 +6,23 @@
 
 struct editor_command_input;
 
+namespace augs {
+	struct introspection_access;
+}
+
 struct fill_with_test_scene_command {
+	friend augs::introspection_access;
+
 	// GEN INTROSPECTOR struct fill_with_test_scene_command
 	editor_command_common common;
+private:
 	std::vector<std::byte> intercosm_before_fill;
 	bool minimal = false;
+public:
 	// END GEN INTROSPECTOR
+
+	fill_with_test_scene_command() = default;
+	fill_with_test_scene_command(const bool minimal) : minimal(minimal) {}
 
 	std::string describe() const;
 

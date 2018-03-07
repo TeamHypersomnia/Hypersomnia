@@ -202,22 +202,14 @@ void editor_setup::save_current_folder_to(const path_operation op) {
 void editor_setup::fill_with_minimal_scene(sol::state& lua) {
 	if (anything_opened()) {
 		clear_id_caches();
-
-		fill_with_test_scene_command command;
-		command.minimal = true;
-
-		folder().history.execute_new(command, make_command_input());
+		folder().history.execute_new(fill_with_test_scene_command(true), make_command_input());
 	}
 }
 
 void editor_setup::fill_with_test_scene(sol::state& lua) {
 	if (anything_opened()) {
 		clear_id_caches();
-
-		fill_with_test_scene_command command;
-		command.minimal = false;
-
-		folder().history.execute_new(command, make_command_input());
+		folder().history.execute_new(fill_with_test_scene_command(false), make_command_input());
 	}
 }
 

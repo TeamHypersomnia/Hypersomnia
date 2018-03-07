@@ -7,6 +7,10 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
+- make transforms always show some special imgui control
+	- we could also add some choice for reference entity to be shown
+	- the owning entity by default
+
 - fix that build page warning
 - simple property editor
 
