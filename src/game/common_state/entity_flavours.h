@@ -127,7 +127,7 @@ public:
 		flavours.resize(n);
 	}
 
-	auto get_num_flavours() const {
+	auto count() const {
 		return flavours.size();
 	}
 

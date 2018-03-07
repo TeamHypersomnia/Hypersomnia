@@ -42,7 +42,7 @@ class cosmic {
 		C& cosm, 
 		const raw_entity_flavour_id flavour_id
 	) {
-		ensure (flavour_id != entity_flavour_id());
+		ensure(flavour_id);
 
 		const auto new_allocation = cosm.get_solvable({}).template allocate_next_entity<E>(flavour_id);
 

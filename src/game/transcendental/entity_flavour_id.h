@@ -5,7 +5,7 @@
 #include "game/transcendental/entity_type_traits.h"
 #include "game/organization/all_entity_types_declaration.h"
 
-using raw_entity_flavour_id = zeroed_pod<unsigned>;
+using raw_entity_flavour_id = minus_oned_pod<unsigned>;
 
 template <class...>
 struct constrained_entity_flavour_id; 
@@ -22,7 +22,15 @@ struct constrained_entity_flavour_id {
 	// END GEN INTROSPECTOR
 
 	operator bool() const {
-		return raw != raw_entity_flavour_id();
+		return raw.operator bool();
+	}
+
+	bool operator==(const constrained_entity_flavour_id b) const {
+		return raw == b.raw && type_id == b.type_id; 
+	}
+
+	bool operator!=(const constrained_entity_flavour_id b) const {
+		return !operator==(b);
 	}
 
 	operator entity_flavour_id() const {
@@ -38,7 +46,15 @@ struct typed_entity_flavour_id {
 	explicit typed_entity_flavour_id(raw_entity_flavour_id raw) : raw(raw) {};
 
 	operator bool() const {
-		return raw != raw_entity_flavour_id();
+		return raw.operator bool();
+	}
+
+	bool operator==(const typed_entity_flavour_id<E> b) const {
+		return raw == b.raw;
+	}
+
+	bool operator!=(const typed_entity_flavour_id<E> b) const {
+		return !operator==(b);
 	}
 
 	template <
