@@ -4,6 +4,8 @@
 #include "augs/templates/type_mod_templates.h"
 #include "augs/templates/transform_types.h"
 
+#include "game/organization/all_entity_types_declaration.h"
+
 template <class E>
 struct entity_solvable;
 

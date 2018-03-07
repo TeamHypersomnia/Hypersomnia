@@ -99,7 +99,7 @@ void editor_history_gui::perform(const editor_command_input in) {
 
 		std::visit(
 			[&](const auto& command) {
-				do_history_node(i, command.describe(), command.timestamp);
+				do_history_node(i, command.describe(), command.common.timestamp);
 			},
 			c
 		);

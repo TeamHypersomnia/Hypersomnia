@@ -1,4 +1,4 @@
-#include "simulation_receiver.h"
+#include "view/network/simulation_receiver.h"
 
 #include "game/components/driver_component.h"
 #include "game/components/flags_component.h"

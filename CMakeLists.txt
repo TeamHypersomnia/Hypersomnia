@@ -417,7 +417,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/detail/names_and_descriptions.cpp"
 	"src/game/transcendental/cosmos_solvable_significant.cpp"
 	"src/view/network/simulation_broadcast.cpp"
-	"src/view/network/simulation_receiver.cpp"
+	# "src/view/network/simulation_receiver.cpp"
 	"src/game/stateless_systems/animation_system.cpp"
 	"src/game/stateless_systems/behaviour_tree_system.cpp"
 	"src/game/stateless_systems/car_system.cpp"
@@ -534,6 +534,9 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/application/setups/editor/editor_camera.cpp"
 	"src/application/setups/editor/editor_popup.cpp"
 	"src/application/setups/editor/editor_entity_selector.cpp"
+	"src/application/setups/editor/commands/fill_with_test_scene_command.cpp"
+	"src/application/setups/editor/commands/delete_entities_command.cpp"
+	"src/application/setups/editor/editor_command_structs.cpp"
 )
 
 if(BUILD_WINDOW_FRAMEWORK)

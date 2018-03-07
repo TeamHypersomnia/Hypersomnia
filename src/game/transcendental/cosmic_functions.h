@@ -58,6 +58,8 @@ public:
 		specific_guid_creation_access() {}
 	};
 
+	static void clear(cosmos& cosm);
+
 	template <class E, class C, class P>
 	static auto specific_create_entity(
 		C& cosm, 

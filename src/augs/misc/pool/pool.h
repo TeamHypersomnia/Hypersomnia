@@ -432,6 +432,17 @@ namespace augs {
 			return objects.end();
 		}
 
+		void clear() {
+			const auto c = capacity();
+
+			objects.clear();
+			slots.clear();
+			indirectors.clear();
+			free_indirectors.clear();
+
+			reserve(c);
+		}
+
 		template <class Archive>
 		void write_object_bytes(Archive& ar) const {
 			auto w = [&ar](const auto& object) {

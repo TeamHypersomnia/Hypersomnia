@@ -5,7 +5,13 @@
 const cosmos_solvable cosmos_solvable::zero;
 
 void cosmos_solvable::clear() {
-	*this = zero;
+	destroy_all_caches();
+
+	for_each_pool([](auto& p){
+		p.clear();
+	});
+
+	guid_to_id.clear();
 }
 
 std::size_t cosmos_solvable::get_entities_count() const {

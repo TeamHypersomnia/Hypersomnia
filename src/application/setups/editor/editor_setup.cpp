@@ -200,23 +200,25 @@ void editor_setup::save_current_folder_to(const path_operation op) {
 }
 
 void editor_setup::fill_with_minimal_scene(sol::state& lua) {
-#if BUILD_TEST_SCENES
 	if (anything_opened()) {
 		clear_id_caches();
 
-		work().make_test_scene(lua, { true, 144 } );
+		fill_with_test_scene_command command;
+		command.minimal = true;
+
+		folder().history.execute_new(command, make_command_input());
 	}
-#endif
 }
 
 void editor_setup::fill_with_test_scene(sol::state& lua) {
-#if BUILD_TEST_SCENES
 	if (anything_opened()) {
 		clear_id_caches();
 
-		work().make_test_scene(lua, { false, 144 } );
+		fill_with_test_scene_command command;
+		command.minimal = false;
+
+		folder().history.execute_new(command, make_command_input());
 	}
-#endif
 }
 
 void editor_setup::perform_custom_imgui(
@@ -580,11 +582,15 @@ void editor_setup::save_as(const augs::window& owner) {
 }
 
 void editor_setup::undo() {
-	folder().history.undo(make_command_input());
+	if (anything_opened()) {
+		folder().history.undo(make_command_input());
+	}
 }
 
 void editor_setup::redo() {
-	folder().history.redo(make_command_input());
+	if (anything_opened()) {
+		folder().history.redo(make_command_input());
+	}
 }
 
 void editor_setup::copy() {
@@ -723,7 +729,7 @@ void editor_setup::close_folder() {
 
 
 editor_command_input editor_setup::make_command_input() {
-	return { folder(), selector };
+	return { destructor_input.lua, folder(), selector };
 }
 
 void editor_setup::select_all_entities() {

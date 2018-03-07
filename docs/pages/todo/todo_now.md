@@ -7,7 +7,11 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
-- text_color and relevant text_disabled
+- destroy_all_caches -> clear_all_caches and use clears
+- fix that build page warning
+- simple commands for filling
+
+- simple property editor
 
 - Also check that there are no guids in common state
 

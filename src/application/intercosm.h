@@ -35,6 +35,14 @@ struct intercosm {
 	entity_id local_test_subject;
 	// END GEN INTROSPECTOR
 
+	intercosm() = default;
+
+	intercosm(intercosm&&) = delete;
+	intercosm& operator=(intercosm&&) = delete;
+
+	intercosm(const intercosm&) = delete;
+	intercosm& operator=(const intercosm&) = delete;
+
 #if BUILD_TEST_SCENES
 	void make_test_scene(sol::state&, test_scene_settings);
 #endif
@@ -48,9 +56,14 @@ struct intercosm {
 	void load_as_lua(const intercosm_path_op);
 	void save_as_lua(const intercosm_path_op) const;
 
+	std::vector<std::byte> to_bytes() const;
+	void from_bytes(std::vector<std::byte>&&);
+
 	auto make_logic_step_input(const cosmic_entropy& entropy) {
 		return logic_step_input{ world, entropy };	
 	}
+
+	void clear();
 
 	const_entity_handle get_viewed_character() const;
 

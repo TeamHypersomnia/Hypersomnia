@@ -90,6 +90,12 @@ public:
 	cosmos() = default;
 	explicit cosmos(const cosmic_pool_size_type reserved_entities);
 
+	cosmos(cosmos&&) = delete;
+	cosmos& operator=(cosmos&&) = delete;
+
+	cosmos(const cosmos&) = delete;
+	cosmos& operator=(const cosmos&) = delete;
+
 	/* 
 		If exception is thrown during alteration,
 		these metods will properly refresh inferred caches with what state was left.
@@ -192,7 +198,6 @@ public:
 		callback(operator[](subject));
 	}
 	
-	void clear();
 	bool empty() const;
 
 	/*

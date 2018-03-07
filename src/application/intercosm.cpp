@@ -12,13 +12,22 @@
 #include "augs/readwrite/lua_file.h"
 #include "augs/readwrite/byte_file.h"
 
+void intercosm::clear() {
+	cosmic::clear(world);
+	viewables.clear();
+
+	augs::recursive_clear(version);
+	version.commit_number = 0;
+
+	local_test_subject.unset();
+}
+
 #if BUILD_TEST_SCENES
 void intercosm::make_test_scene(
 	sol::state& lua, 
 	const test_scene_settings settings
 ) {
-	world.clear();
-	viewables = {};
+	clear();
 
 #if !STATICALLY_ALLOCATE_ENTITIES
 	cosmic::reserve_storage_for_entities(world, 3000u);
@@ -89,8 +98,7 @@ void intercosm::load_as_lua(const intercosm_path_op op) {
 	const auto display_path = augs::to_display_path(op.path);
 
 	try {
-		augs::recursive_clear(version);
-		version.commit_number = 0;
+		clear();
 
 		augs::load_from_lua_table(op.lua, *this, op.path);
 
@@ -128,6 +136,15 @@ void intercosm::load_as_lua(const intercosm_path_op op) {
 	}
 }
 
+std::vector<std::byte> intercosm::to_bytes() const {
+	return augs::to_bytes(*this);
+}
+
+void intercosm::from_bytes(std::vector<std::byte>&& bytes) {
+	clear();
+	augs::from_bytes(std::move(bytes), *this);
+}
+
 void intercosm::save_as_int(const augs::path_type& path) const {
 	augs::save_as_bytes(*this, path);
 }
@@ -136,8 +153,7 @@ void intercosm::load_as_int(const augs::path_type& path) {
 	const auto display_path = augs::to_display_path(path);
 
 	try {
-		augs::recursive_clear(version);
-		version.commit_number = 0;
+		clear();
 
 		augs::load_from_bytes(*this, path);
 

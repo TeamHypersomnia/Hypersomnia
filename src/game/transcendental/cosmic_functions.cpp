@@ -3,6 +3,11 @@
 #include "game/detail/inventory/perform_transfer.h"
 #include "augs/templates/introspect.h"
 
+void cosmic::clear(cosmos& cosm) {
+	cosm.get_solvable({}).clear();
+	cosm.change_common_significant([](auto& c) { c = {}; return changer_callback_result::DONT_REFRESH; });
+}
+
 void cosmic::infer_caches_for(const entity_handle h) {
 	auto& cosm = h.get_cosmos();
 
