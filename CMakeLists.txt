@@ -537,6 +537,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/application/setups/editor/commands/fill_with_test_scene_command.cpp"
 	"src/application/setups/editor/commands/delete_entities_command.cpp"
 	"src/application/setups/editor/editor_command_structs.cpp"
+	"src/application/setups/editor/gui/editor_all_entities_gui.cpp"
 )
 
 if(BUILD_WINDOW_FRAMEWORK)

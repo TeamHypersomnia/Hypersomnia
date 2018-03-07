@@ -356,12 +356,12 @@ void editor_setup::perform_custom_imgui(
 						show_common_state = true;
 					}
 
-					if (item_if_tabs("Entities")) {
-						show_entities = true;
+					if (item_if_tabs("All entities")) {
+						all_entities_gui.open();
 					}
 
 					if (item_if_tabs("History")) {
-						history_gui.show = true;
+						history_gui.open();
 					}
 				}
 			}
@@ -432,39 +432,7 @@ void editor_setup::perform_custom_imgui(
 			auto common = scoped_window("Common", &show_common_state, ImGuiWindowFlags_AlwaysAutoResize);
 		}
 
-		if (show_entities) {
-			auto entities = scoped_window("Entities", &show_entities);
-
-			if (ImGui::IsRootWindowOrAnyChildFocused() && !ImGui::IsAnyItemActive() && !ImGui::IsMouseClicked(0)) {
-				ImGui::SetKeyboardFocusHere();
-			}
-
-			thread_local ImGuiTextFilter filter;
-			filter.Draw();
-
-			cosmic::for_each_entity(work().world, [&](const auto handle) {
-				const auto name = to_string(handle.get_name());
-				const auto id = handle.get_id();
-
-				if (filter.PassFilter(name.c_str())) {
-					auto scope = scoped_id(handle.get_guid());
-
-					int flags = ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_Leaf;
-
-					if (work().local_test_subject == id) {
-						flags |= ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_Selected;
-					}
-
-					ImGui::TreeNodeEx(name.c_str(), flags);
-
-					if (ImGui::IsItemClicked()) {
-						set_locally_viewed(id);
-					}
-					ImGui::TreePop();
-				}
-
-			});
-		}
+		all_entities_gui.perform(make_command_input());
 
 		const auto go_to_dialog_pos = vec2 { static_cast<float>(screen_size.x / 2), menu_bar_size.y * 2 + 1 };
 
@@ -891,16 +859,8 @@ bool editor_setup::handle_input_before_game(
 				switch (k) {
 					case key::A: select_all_entities(); return true;
 					case key::Z: undo(); return true;
-					case key::F: {
-						show_entities = true;
-						ImGui::SetWindowFocus("Entities");
-						return true;
-					} 
-					case key::H: {
-						history_gui.show = true;
-						ImGui::SetWindowFocus("History");
-						return true;
-					} 
+					case key::F: all_entities_gui.open(); return true;
+					case key::H: history_gui.open(); return true;
 					case key::C: copy(); return true;
 					case key::X: cut(); return true;
 					case key::V: paste(); return true;

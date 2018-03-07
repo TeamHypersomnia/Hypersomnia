@@ -4,6 +4,11 @@
 #include "application/setups/editor/editor_folder.h"
 #include "application/setups/editor/gui/editor_history_gui.h"
 
+void editor_history_gui::open() {
+	show = true;
+	ImGui::SetWindowFocus("History");
+}
+
 void editor_history_gui::perform(const editor_command_input in) {
 	if (!show) {
 		return;

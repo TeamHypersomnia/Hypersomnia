@@ -2,6 +2,9 @@
 #include <optional>
 #include <imgui/imgui.h>
 
+#include "augs/misc/imgui/imgui_controls.h"
+
+#include "augs/graphics/rgba.h"
 #include "augs/misc/scope_guard.h"
 
 namespace augs {
