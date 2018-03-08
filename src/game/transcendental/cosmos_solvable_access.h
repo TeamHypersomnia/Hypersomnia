@@ -7,7 +7,7 @@ class cosmic;
 
 class cosmos_solvable_access {
 	/*
-		The following domains are free to arbitrarily change the cosmos_solvable:significant,
+		The following domains are free to arbitrarily change the solvable inside cosmos,
 		as they take proper precautions to keep state consistent or otherwise refresh it.
 	*/
 

@@ -38,6 +38,16 @@ struct cosmos_common_significant {
 	spell_tuple spells;
 	perk_tuple perks;
 	// END GEN INTROSPECTOR
+
+	template <class entity_type>
+	auto& get_flavours() {
+		return std::get<make_entity_flavours<entity_type>>(flavours);	
+	}
+
+	template <class entity_type>
+	const auto& get_flavours() const {
+		return std::get<make_entity_flavours<entity_type>>(flavours);	
+	}
 };
 
 namespace std {

@@ -143,27 +143,8 @@ public:
 	const common_assets& get_common_assets() const;
 
 	template <class entity_type>
-	const auto& get_flavours() const {
-		const auto& all_flavours = get_common_significant().flavours;
-		using flavours_type = make_entity_flavours<entity_type>;
-		return std::get<flavours_type>(all_flavours);	
-	}
-
-	template <class entity_type>
 	const auto& get_flavour(const raw_entity_flavour_id id) const {
-		return get_flavours<entity_type>().get_flavour(id);
-	}
-
-	template <class entity_type, class F>
-	void for_each_flavour(F callback) const {
-		auto& all_flavours = get_flavours<entity_type>();
-		const auto num_flavours = all_flavours.count();
-
-		for (std::size_t i = 0; i < num_flavours; ++i) {
-			const auto id = raw_entity_flavour_id(static_cast<unsigned>(i));
-
-			callback(typed_entity_flavour_id<entity_type>(id), all_flavours.get_flavour(id));
-		}
+		return get_common_significant().get_flavours<entity_type>().get_flavour(id);
 	}
 
 	template <class... Types, class F>

@@ -121,7 +121,24 @@ class entity_flavours {
 	entity_flavours_container<entity_type> flavours;
 	// END GEN INTROSPECTOR
 
+	template <class S, class F>
+	static void for_each_impl(S& self, F callback) {
+		for (std::size_t i = 0; i < self.count(); ++i) {
+			const auto id = raw_entity_flavour_id(static_cast<unsigned>(i));
+			callback(typed_entity_flavour_id<entity_type>(id), self.get_flavour(id));
+		}
+	}
+
 public:
+	template <class F>
+	void for_each(F&& callback) {
+		for_each_impl(*this, std::forward<F>(callback));
+	}
+
+	template <class F>
+	void for_each(F&& callback) const {
+		for_each_impl(*this, std::forward<F>(callback));
+	}
 
 	void resize(const std::size_t n) {
 		flavours.resize(n);
