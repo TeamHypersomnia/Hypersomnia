@@ -102,7 +102,7 @@ namespace augs {
 		// END GEN INTROSPECTOR
 
 		bool operator==(const sprite& b) const {
-			return equal_by_introspection(*this, b);
+			return recursive_equal(*this, b);
 		}
 
 		vec2 get_size() const {

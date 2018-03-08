@@ -538,6 +538,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/application/setups/editor/commands/delete_entities_command.cpp"
 	"src/application/setups/editor/editor_command_structs.cpp"
 	"src/application/setups/editor/gui/editor_all_entities_gui.cpp"
+	"src/augs/templates/introspect.cpp"
 )
 
 if(BUILD_WINDOW_FRAMEWORK)
@@ -658,6 +659,7 @@ file(GLOB_RECURSE HYPERSOMNIA_HEADERS_WITH_INTROSPECTED_CLASSES
 	"src/test_scenes/test_scene_settings.h"
 
 	"src/game/tests_of_traits.cpp"
+	"src/augs/templates/introspect.cpp"
 )
 
 # The correct input configuration file shall contain paths to all headers for whom the generator should create introspectors,

@@ -9,8 +9,22 @@
 #include "application/setups/editor/gui/editor_properties_gui.h"
 
 template <class T>
-void edit_properties_of(T& object) {
+void edit_properties_of(T& object, const editor_command_input in) {
+	auto& history = in.folder.history;
 
+	augs::introspect(
+		[&](auto label, auto& member){
+			using M = std::decay_t<decltype(member)>;
+
+			/* if constexpr() { */
+			
+			/* } */
+			/* else { */
+
+			/* 	edit_properties_of(); */
+			/* } */
+		}
+	);
 }
 
 void editor_all_entities_gui::open() {
@@ -28,7 +42,7 @@ void editor_all_entities_gui::perform(const editor_command_input in) {
 
 	auto entities = scoped_window("All entities", &show);
 	auto& work = *in.folder.work;
-	auto& cosm = in.folder.work->world;
+	auto& cosm = work->world;
 
 	if (acquire_once) {
 		ImGui::SetKeyboardFocusHere();

@@ -301,7 +301,7 @@ int work(const int argc, const char* const * const argv) try {
 		auto scope = measure_scope(profiler.reloading_viewables);
 
 		auto equal = [](const auto& a, const auto& b) {
-			return augs::equal_by_introspection(a, b);
+			return augs::recursive_equal(a, b);
 		};
 		
 		/* Atlas/meta cache pass */

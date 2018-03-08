@@ -62,51 +62,53 @@ namespace augs {
 	}
 
 	template <class A, class B>
-	bool equal_by_introspection(
+	bool introspective_equal(A& a, B& b);
+
+	template <class A, class B>
+	bool recursive_equal(
 		const A& a,
 		const B& b
 	) {
+		if constexpr(is_optional_v<A>) {
+			static_assert(is_optional_v<B>);
+
+			if (a.has_value() != b.has_value()) {
+				return false;
+			}
+			else if (a && b) {
+				return recursive_equal(*a, *b);
+			}
+			else {
+				ensure(!a && !b);
+				return true;
+			}
+		}
+		else if constexpr(
+			is_tuple_v<A>
+			|| is_std_array_v<A>
+		) {
+			return introspective_equal(a, b);
+		}
+		else if constexpr(is_comparable_v<A, B>) {
+			return a == b;
+		}
+		else {
+			return introspective_equal(a, b);
+		}
+	}
+
+	template <class A, class B>
+	bool introspective_equal(A& a, B& b) {
 		static_assert(has_introspect_v<A> && has_introspect_v<B>, "Comparison requested on type(s) without introspectors!");
 
 		bool are_equal = true;
 
 		introspect(
-			recursive([&are_equal](
-				auto self,
-				const auto label,
-				const auto& aa, 
-				const auto& bb
-			) {
-				using AA = std::decay_t<decltype(aa)>;
-				using BB = std::decay_t<decltype(bb)>;
-
-				if constexpr(is_optional_v<AA>) {
-					static_assert(is_optional_v<BB>);
-
-					if (aa.has_value() != bb.has_value()) {
-						are_equal = false;
-					}
-					else if (aa && bb) {
-						recursive(self)("", *aa, *bb);
-					}
-				}
-				else if constexpr(is_tuple_v<AA>) {
-					introspect(recursive(self), aa, bb);
-				}
-				else if constexpr(is_std_array_v<AA>) {
-					introspect(recursive(self), aa, bb);
-				}
-				else if constexpr(is_comparable_v<AA, BB>) {
-					are_equal = are_equal && aa == bb;
-				}
-				else {
-					introspect(recursive(self), aa, bb);
-				}
-			}),
-			a,
-			b
+			[&are_equal](const auto label, const auto& aa, const auto& bb) {
+				are_equal = are_equal && recursive_equal(aa, bb);
+			}, a, b
 		);
-		
+
 		return are_equal;
 	}
 

@@ -81,7 +81,7 @@ public:
 	}
 
 	bool operator==(const entity_flavour& b) const {
-		return augs::equal_by_introspection(*this, b);
+		return augs::recursive_equal(*this, b);
 	}
 
 	bool is_set() const {

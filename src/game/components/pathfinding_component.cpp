@@ -2,7 +2,7 @@
 #include "augs/templates/introspect.h"
 
 bool pathfinding_session::operator==(const pathfinding_session& b) const {
-	return augs::equal_by_introspection(*this, b);
+	return augs::recursive_equal(*this, b);
 }
 
 namespace components {

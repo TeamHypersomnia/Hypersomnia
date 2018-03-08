@@ -328,7 +328,7 @@ void settings_gui_state::perform(
 
 	{
 		const bool has_config_changed =
-			!augs::equal_by_introspection(
+			!augs::recursive_equal(
 				config,
 				last_saved_config
 			)
