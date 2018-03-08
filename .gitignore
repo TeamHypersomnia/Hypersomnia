@@ -209,3 +209,4 @@ tags
 *.local
 core
 bt.txt
+Gemfile.lock

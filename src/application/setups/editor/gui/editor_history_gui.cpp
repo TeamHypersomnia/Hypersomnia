@@ -6,6 +6,7 @@
 
 void editor_history_gui::open() {
 	show = true;
+	acquire_once = true;
 	ImGui::SetWindowFocus("History");
 }
 
@@ -24,10 +25,15 @@ void editor_history_gui::perform(const editor_command_input in) {
 
 	const auto& style = GetStyle();
 
+	if (acquire_once) {
+		ImGui::SetKeyboardFocusHere();
+		acquire_once = false;
+	}
+
 	thread_local ImGuiTextFilter filter;
 	filter.Draw();
 
-	ImGui::Columns(2, "mycolumns"); // 4-ways, with border
+	ImGui::Columns(2); // 4-ways, with border
 	text_disabled("Operation");
 	ImGui::NextColumn();
 	text_disabled("When");

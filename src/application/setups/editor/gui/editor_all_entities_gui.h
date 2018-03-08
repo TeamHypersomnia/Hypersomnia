@@ -3,6 +3,7 @@
 
 struct editor_all_entities_gui {
 	bool show = false;
+	bool acquire_once = false;
 
 	void open();
 	void perform(editor_command_input);

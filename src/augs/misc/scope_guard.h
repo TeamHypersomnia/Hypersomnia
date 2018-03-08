@@ -1,5 +1,6 @@
 #pragma once
 #include <type_traits>
+#include <optional>
 #include <utility>
 
 namespace augs {
@@ -11,20 +12,19 @@ namespace augs {
 		{}
 
 		scope_guard(scope_guard&& f) :
-			exit_function(std::move(f.exit_function)),
-			execute_on_destruction(f.execute_on_destruction) 
+			exit_function(std::move(f.exit_function))
 		{
 			f.release();
 		}
 
 		~scope_guard() {
-			if (execute_on_destruction) {
-				exit_function();
+			if (exit_function) {
+				(*exit_function)();
 			}
 		}
 
 		void release() {
-			execute_on_destruction = false;
+			exit_function.reset();
 		}
 
 		scope_guard(const scope_guard&) = delete;
@@ -32,8 +32,7 @@ namespace augs {
 		scope_guard& operator=(scope_guard&&) = delete;
 
 	private:
-		F exit_function;
-		bool execute_on_destruction = true;
+		std::optional<F> exit_function;
 	};
 
 	template <class F>

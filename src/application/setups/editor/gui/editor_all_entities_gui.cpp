@@ -6,8 +6,16 @@
 #include "application/setups/editor/editor_folder.h"
 #include "application/setups/editor/gui/editor_all_entities_gui.h"
 
+#include "application/setups/editor/gui/editor_properties_gui.h"
+
+template <class T>
+void edit_properties_of(T& object) {
+
+}
+
 void editor_all_entities_gui::open() {
 	show = true;
+	acquire_once = true;
 	ImGui::SetWindowFocus("All entities");
 }
 
@@ -22,10 +30,15 @@ void editor_all_entities_gui::perform(const editor_command_input in) {
 	auto& work = *in.folder.work;
 	auto& cosm = in.folder.work->world;
 
+	if (acquire_once) {
+		ImGui::SetKeyboardFocusHere();
+		acquire_once = false;
+	}
+
 	thread_local ImGuiTextFilter filter;
 	filter.Draw();
 
-	ImGui::Columns(2, "mycolumns"); // 4-ways, with border
+	ImGui::Columns(2); // 4-ways, with border
 	ImGui::NextColumn();
 	text_disabled("Details");
 	ImGui::NextColumn();

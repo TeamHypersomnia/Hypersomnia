@@ -746,6 +746,8 @@ bool editor_setup::handle_input_before_imgui(
 
 				switch (k) {
 					case key::S: save(lua, window); return true;
+					case key::F: all_entities_gui.open(); return true;
+					case key::H: history_gui.open(); return true;
 					case key::O: open(window); return true;
 					case key::COMMA: go_to_all(); return true;
 					case key::N: new_tab(); return true;
@@ -851,8 +853,6 @@ bool editor_setup::handle_input_before_game(
 				switch (k) {
 					case key::A: select_all_entities(); return true;
 					case key::Z: undo(); return true;
-					case key::F: all_entities_gui.open(); return true;
-					case key::H: history_gui.open(); return true;
 					case key::C: copy(); return true;
 					case key::X: cut(); return true;
 					case key::V: paste(); return true;

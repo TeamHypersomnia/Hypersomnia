@@ -7,11 +7,16 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
+- generalize editor_tab_gui to be also able to handle the entities/flavours windows
+- implement ctrl+tab for tabs, either in settings or anywhere. It should just handle the current window
+	- shortcuts shall always focus relevant window
+
 - make transforms always show some special imgui control
 	- we could also add some choice for reference entity to be shown
 	- the owning entity by default
 
 - fix that build page warning
+	- revert back to that A record if it doesnt work by tomorrow
 - simple property editor
 
 - Also check that there are no guids in common state

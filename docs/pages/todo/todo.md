@@ -5,6 +5,10 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- implement some stupid simple physical logic for crosshair recoil entity
+	- so that a separate child entity is not needed
+	- maybe even copy some from b2Body
+
 - implement constrained handles and entity ids
 	- because inventory slot handle item getters should return handles that guarantee presence of an item
 	- thanks to that we can avoid problems with having many entity types and enlarging the dispatch code
