@@ -116,6 +116,7 @@ editor_setup::editor_setup(
 	augs::create_directories(get_untitled_dir());
 
 	open_last_folders(lua);
+	load_gui_state();
 }
 
 editor_setup::editor_setup(
@@ -129,14 +130,24 @@ editor_setup::editor_setup(
 
 	open_last_folders(lua);
 	open_folder_in_new_tab({ lua, intercosm_path });
+	load_gui_state();
+}
+
+void editor_setup::load_gui_state() {
+	augs::load_from_lua_table(destructor_input.lua, *this, get_editor_gui_state_path());
+}
+
+void editor_setup::save_gui_state() {
+	augs::save_as_lua_table(destructor_input.lua, *this, get_editor_gui_state_path());
+}
+
+editor_setup::~editor_setup() {
+	save_gui_state();
+	force_autosave_now();
 }
 
 void editor_setup::force_autosave_now() const {
 	autosave.save(destructor_input.lua, signi);
-}
-
-editor_setup::~editor_setup() {
-	force_autosave_now();
 }
 
 void editor_setup::control(

@@ -39,6 +39,7 @@ struct config_lua_table;
 
 namespace augs {
 	class window;
+	struct introspection_access;
 
 	namespace event {
 		struct change;
@@ -53,6 +54,7 @@ struct editor_destructor_input {
 class editor_setup : private current_access_cache<editor_setup> {
 	using base = current_access_cache<editor_setup>;
 	friend base;
+	friend augs::introspection_access;
 
 	double global_time_seconds = 0.0;
 
@@ -63,9 +65,12 @@ class editor_setup : private current_access_cache<editor_setup> {
 	editor_player player;
 	editor_entity_selector selector;
 
-	editor_history_gui history_gui;
 	editor_go_to_entity_gui go_to_entity_gui;
+
+	// GEN INTROSPECTOR class editor_setup
+	editor_history_gui history_gui;
 	editor_all_entities_gui all_entities_gui;
+	// END GEN INTROSPECTOR
 
 	std::optional<editor_popup> ok_only_popup;
 
@@ -140,6 +145,9 @@ class editor_setup : private current_access_cache<editor_setup> {
 
 	void force_autosave_now() const;
 	editor_command_input make_command_input();
+
+	void load_gui_state();
+	void save_gui_state();
 
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;

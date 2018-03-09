@@ -14,6 +14,10 @@ inline auto get_recent_paths_path() {
 	return EDITOR_DIR "editor_recent_paths.lua";
 }
 
+inline auto get_editor_gui_state_path() {
+	return EDITOR_DIR "editor_gui_state.lua";
+}
+
 inline auto get_untitled_dir() {
 	return EDITOR_DIR "untitled/";
 }
