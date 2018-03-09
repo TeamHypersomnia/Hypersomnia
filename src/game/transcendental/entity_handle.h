@@ -283,5 +283,5 @@ public:
 
 template <bool is_const>
 std::ostream& operator<<(std::ostream& out, const basic_entity_handle<is_const> &x) {
-	return out << typesafe_sprintf("%x-%x", to_string(x.get_name()), x.get_id());
+	return out << typesafe_sprintf("%x-%x", x.get_name(), x.get_id());
 }

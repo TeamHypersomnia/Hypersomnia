@@ -98,7 +98,7 @@ struct ingame_menu_gui {
 
 		for (std::size_t i = 0; i < root.buttons.size(); ++i) {
 			const auto e = static_cast<ingame_menu_button_type>(i);
-			root.buttons[i].set_complete_caption(to_string(format_enum(e)));
+			root.buttons[i].set_complete_caption(format_enum(e));
 		}
 
 		world.advance_elements(context, vdt);

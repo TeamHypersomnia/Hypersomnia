@@ -19,7 +19,7 @@ namespace augs {
 				lines_remaining = std::min(lines_remaining, entries.size());
 
 				for (auto it = entries.end() - lines_remaining; it != entries.end(); ++it) {
-					auto str = to_string((*it).text + "\n");
+					const auto str = (*it).text + "\n";
 					concatenate(result, formatted_string{ str, { f, white /* rgba((*it).color) */ } });
 
 					--lines_remaining;

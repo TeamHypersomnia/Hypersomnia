@@ -44,7 +44,7 @@ void draw_debug_details(
 	);
 
 	total_details += {
-		to_string(hypersomnia_version().get_summary()) + to_string(static_allocations_info()),
+		hypersomnia_version().get_summary() + static_allocations_info(),
 		
 		text_style
 	};

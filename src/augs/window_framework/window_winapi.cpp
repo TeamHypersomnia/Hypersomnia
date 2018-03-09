@@ -517,7 +517,7 @@ namespace augs {
 		// Display the Open dialog box. 
 
 		if (GetOpenFileName(&ofn) == TRUE) {
-			return str_ops(to_string(ofn.lpstrFile)).replace_all("\\", "/");
+			return str_ops(narrow(ofn.lpstrFile)).replace_all("\\", "/");
 		}
 		else {
 			return std::nullopt;

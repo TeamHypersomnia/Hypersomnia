@@ -13,7 +13,7 @@ namespace augs {
 	
 			introspect(
 				[](const auto label, auto& m){
-					m.title = to_string(format_field_name(std::string(label)));
+					m.title = format_field_name(std::string(label));
 				}, 
 				self
 			);

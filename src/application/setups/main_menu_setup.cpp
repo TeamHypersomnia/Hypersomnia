@@ -85,7 +85,7 @@ void main_menu_setup::query_latest_news(const std::string& url) {
 			;
 
 			if (html.size() > 0) {
-				return to_string(html);
+				return html;
 			}
 		}
 

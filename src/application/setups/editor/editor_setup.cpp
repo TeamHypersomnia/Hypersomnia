@@ -584,7 +584,7 @@ void editor_setup::del() {
 			command.built_description = "Deleted all entities";
 		}
 		else {
-			command.built_description = to_string("Deleted " + ::describe_names_of(all_deleted, cosm));
+			command.built_description = "Deleted " + ::describe_names_of(all_deleted, cosm);
 		}
 
 		if (!command.empty()) {

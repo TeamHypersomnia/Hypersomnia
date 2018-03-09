@@ -178,7 +178,7 @@ auto& get_test_flavour(all_entity_flavours& flavours, const T id) {
 	}
 
 	auto& new_flavour = into.get_flavour(idx);
-	new_flavour.name = to_string(format_enum(id));
+	new_flavour.name = format_enum(id);
 
 	return new_flavour;
 }

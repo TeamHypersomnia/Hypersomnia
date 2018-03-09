@@ -124,7 +124,7 @@ void editor_all_entities_gui::perform(const editor_command_input in) {
 				cosm.change_common_significant([&](cosmos_common_significant& common_signi){
 					common_signi.get_flavours<E>().for_each(
 						[&](const auto flavour_id, auto& flavour){
-							const auto flavour_label = to_string(flavour.name);
+							const auto flavour_label = flavour.name;
 
 							const auto all_having_flavour = cosm.get_solvable_inferred().name.get_entities_by_flavour_id(flavour_id);
 

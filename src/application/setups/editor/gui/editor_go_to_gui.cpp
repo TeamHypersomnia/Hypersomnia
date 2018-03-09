@@ -141,7 +141,7 @@ std::optional<const_entity_handle> editor_go_to_entity_gui::perform(
 				self.last_input = current_input_text;
 	
 				self.matches.clear();
-				const auto query = to_string(current_input_text);
+				const auto query = current_input_text;
 	
 				unsigned hits = 0;
 					
@@ -167,7 +167,7 @@ std::optional<const_entity_handle> editor_go_to_entity_gui::perform(
 			
 			case ImGuiInputTextFlags_CallbackCompletion: {
 				if (const auto match = self.get_matching_go_to_entity(cosm)) {
-					const auto name = to_string(match.get_name());
+					const auto name = match.get_name();
 
 					if (name.length() < data->BufSize) {
 						std::copy(name.c_str(), name.c_str() + name.length() + 1, data->Buf);
@@ -223,7 +223,7 @@ std::optional<const_entity_handle> editor_go_to_entity_gui::perform(
 	}
 
 	{
-		const auto query = to_string(last_input);
+		const auto query = last_input;
 
 		const auto max_lines = static_cast<std::size_t>(settings.num_lines);
 		const auto left = selected_index / max_lines * max_lines;
