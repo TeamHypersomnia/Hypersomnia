@@ -16,7 +16,7 @@ class flying_number_indicator_system {
 public:
 	struct number {
 		struct input {
-			std::wstring text;
+			std::string text;
 			rgba color;
 			
 			float maximum_duration_seconds = 0.f;

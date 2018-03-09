@@ -22,8 +22,8 @@ inline auto static_allocations_info() {
 
 inline auto sizeofs_info() {
 	return typesafe_sprintf(
-		"sizeofs: wchar_t=%x, entity_id=%x, unversioned=%x\n",
-		sizeof(wchar_t), sizeof(entity_id), sizeof(unversioned_entity_id)
+		"entity_id=%x, unversioned=%x\n",
+		sizeof(entity_id), sizeof(unversioned_entity_id)
 	);
 }
 

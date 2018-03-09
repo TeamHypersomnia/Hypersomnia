@@ -21,7 +21,7 @@ namespace augs {
 		bool measured = false;
 
 	public:
-		std::wstring title = L"Untitled";
+		std::string title = "Untitled";
 		std::vector<T> tracked;
 
 		measurements(const std::size_t tracked_count = 20u) {
@@ -47,7 +47,7 @@ namespace augs {
 			last_minimum = minimum_of(tracked);
 		}
 
-		std::wstring summary() const {
+		std::string summary() const {
 			if (!was_measured()) {
 				return {};
 			}
@@ -91,7 +91,7 @@ namespace augs {
 		friend base;
 
 		auto summary_impl() const {
-			return typesafe_sprintf(L"%x: %f2\n", base::title, base::get_average_units());
+			return typesafe_sprintf("%x: %f2\n", base::title, base::get_average_units());
 		}
 
 	public:
@@ -111,7 +111,7 @@ namespace augs {
 
 			if (division_by_secs_safe) {
 				return typesafe_sprintf(
-					L"%x: %f2 ms (%f2 FPS)\n", 
+					"%x: %f2 ms (%f2 FPS)\n", 
 					title,
 					avg_secs * 1000,
 					1 / avg_secs
@@ -119,7 +119,7 @@ namespace augs {
 			}
 			else {
 				return typesafe_sprintf(
-					L"%x: %f2 ms\n", 
+					"%x: %f2 ms\n", 
 					title,
 					avg_secs * 1000
 				);

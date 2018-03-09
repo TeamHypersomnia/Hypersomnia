@@ -142,14 +142,14 @@ std::optional<drag_and_drop_result> prepare_drag_and_drop_result(
 				hotbar_drop.source_hotbar_button_id = source_hotbar_button_id;
 
 				if (assigned_entity == dragged_item_handle) {
-					hotbar_drop.hint_text = typesafe_sprintf(L"Current assignment");
+					hotbar_drop.hint_text = typesafe_sprintf("Current assignment");
 				}
 				else {
 					if (assigned_entity.dead()) {
-						hotbar_drop.hint_text = typesafe_sprintf(L"Assign %x", hotbar_button_location.index);
+						hotbar_drop.hint_text = typesafe_sprintf("Assign %x", hotbar_button_location.index);
 					}
 					else {
-						hotbar_drop.hint_text = typesafe_sprintf(L"Reassign %x", hotbar_button_location.index);
+						hotbar_drop.hint_text = typesafe_sprintf("Reassign %x", hotbar_button_location.index);
 					}
 				}
 
@@ -196,7 +196,7 @@ std::optional<drag_and_drop_result> prepare_drag_and_drop_result(
 
 			if (possible_target_hovered) {
 				if (target_item != nullptr && cosmos[simulated_transfer.target_slot].dead()) {
-					drop.hint_text = L"No compatible slot available";
+					drop.hint_text = "No compatible slot available";
 					drop.result.transferred_charges = 0;
 				}
 				else {
@@ -206,42 +206,42 @@ std::optional<drag_and_drop_result> prepare_drag_and_drop_result(
 				const auto predicted_result = drop.result.result;
 
 				if (predicted_result == item_transfer_result_type::THE_SAME_SLOT) {
-					drop.hint_text = L"Current slot";
+					drop.hint_text = "Current slot";
 				}
 				else if (predicted_result == item_transfer_result_type::SUCCESSFUL_TRANSFER) {
-					// 	drop.hint_text += L"Unmount & ";
+					// 	drop.hint_text += "Unmount & ";
 
-					std::wstring charges_text;
+					std::string charges_text;
 					const auto item_charges = dragged_item_handle.template get<components::item>().get_charges();
 
 					if (item_charges > 1) {
 						if (simulated_transfer.specified_quantity == drop.result.transferred_charges) {
-							charges_text = L" all";
+							charges_text = " all";
 						}
 						else {
-							charges_text = L" " + to_wstring(drop.result.transferred_charges);
+							charges_text = " " + to_string(drop.result.transferred_charges);
 						}
 					}
 
 					if (target_drop_item) {
-						drop.hint_text += L"Drop" + charges_text + L" to ground";
+						drop.hint_text += "Drop" + charges_text + " to ground";
 					}
 					else if (was_pointing_to_a_stack_target) {
-						drop.hint_text += L"Stack" + charges_text;
+						drop.hint_text += "Stack" + charges_text;
 					}
 					else {
 						switch (simulated_transfer.target_slot.type) {
-						case slot_function::ITEM_DEPOSIT: drop.hint_text += L"Insert"; break;
-						case slot_function::GUN_CHAMBER: drop.hint_text += L"Place"; break;
-						case slot_function::GUN_CHAMBER_MAGAZINE: drop.hint_text += L"Place"; break;
-						case slot_function::GUN_DETACHABLE_MAGAZINE: drop.hint_text += L"Reload"; break;
-						case slot_function::GUN_RAIL: drop.hint_text += L"Install"; break;
-						case slot_function::TORSO_ARMOR: drop.hint_text += L"Wear"; break;
-						case slot_function::SHOULDER: drop.hint_text += L"Wear"; break;
-						case slot_function::PRIMARY_HAND: drop.hint_text += L"Wield"; break;
-						case slot_function::SECONDARY_HAND: drop.hint_text += L"Wield"; break;
-						case slot_function::GUN_MUZZLE: drop.hint_text += L"Install"; break;
-						default: drop.hint_text += L"Unknown slot"; break;
+						case slot_function::ITEM_DEPOSIT: drop.hint_text += "Insert"; break;
+						case slot_function::GUN_CHAMBER: drop.hint_text += "Place"; break;
+						case slot_function::GUN_CHAMBER_MAGAZINE: drop.hint_text += "Place"; break;
+						case slot_function::GUN_DETACHABLE_MAGAZINE: drop.hint_text += "Reload"; break;
+						case slot_function::GUN_RAIL: drop.hint_text += "Install"; break;
+						case slot_function::TORSO_ARMOR: drop.hint_text += "Wear"; break;
+						case slot_function::SHOULDER: drop.hint_text += "Wear"; break;
+						case slot_function::PRIMARY_HAND: drop.hint_text += "Wield"; break;
+						case slot_function::SECONDARY_HAND: drop.hint_text += "Wield"; break;
+						case slot_function::GUN_MUZZLE: drop.hint_text += "Install"; break;
+						default: drop.hint_text += "Unknown slot"; break;
 						}
 
 						drop.hint_text += charges_text;
@@ -249,12 +249,12 @@ std::optional<drag_and_drop_result> prepare_drag_and_drop_result(
 				}
 				else {
 					switch (predicted_result) {
-					case item_transfer_result_type::INSUFFICIENT_SPACE: drop.hint_text = L"No space"; break;
-					case item_transfer_result_type::INVALID_CAPABILITIES: drop.hint_text = L"Impossible"; break;
-					case item_transfer_result_type::INCOMPATIBLE_CATEGORIES: drop.hint_text = L"Incompatible item"; break;
-					case item_transfer_result_type::TOO_MANY_ITEMS: drop.hint_text = L"Too many items"; break;
-					case item_transfer_result_type::SUCCESSFUL_DROP: drop.hint_text = L"Drop to ground"; break;
-					default: drop.hint_text = L"Unknown problem"; break;
+					case item_transfer_result_type::INSUFFICIENT_SPACE: drop.hint_text = "No space"; break;
+					case item_transfer_result_type::INVALID_CAPABILITIES: drop.hint_text = "Impossible"; break;
+					case item_transfer_result_type::INCOMPATIBLE_CATEGORIES: drop.hint_text = "Incompatible item"; break;
+					case item_transfer_result_type::TOO_MANY_ITEMS: drop.hint_text = "Too many items"; break;
+					case item_transfer_result_type::SUCCESSFUL_DROP: drop.hint_text = "Drop to ground"; break;
+					default: drop.hint_text = "Unknown problem"; break;
 					}
 				}
 

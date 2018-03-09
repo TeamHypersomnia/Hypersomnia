@@ -9,11 +9,17 @@
 #undef max
 
 namespace augs {
+	std::wstring widen(const std::string& s); 
+
 	int shell(const std::string& s) {
 		LOG("SHELL COMMAND: %x", s);
 
-		const auto wide = to_wstring(s);
+#if TODO_STRINGS
+		const auto wide = widen(s);
 		return static_cast<int>(reinterpret_cast<INT_PTR>(ShellExecute(NULL, NULL, wide.c_str(), NULL, NULL, SW_SHOW)));
+#else
+		return 0;
+#endif
 	}
 }
 #elif PLATFORM_UNIX

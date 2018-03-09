@@ -356,24 +356,24 @@ void item_button::draw_proc(
 			}
 
 			if (bottom_number_val > -1.f) {
-				std::wstring label_wstr;
+				std::string label_str;
 
 				if (printing_charge_count) {
-					//label_wstr = L'x';
+					//label_str = 'x';
 					label_color.rgb() = white.rgb();
-					label_wstr += to_wstring(bottom_number_val);
+					label_str += to_string(bottom_number_val);
 				}
 				else
-					label_wstr = to_wstring(bottom_number_val, 2);
+					label_str = to_string(bottom_number_val, 2);
 
-				if (trim_zero && label_wstr[0] == L'0') {
-					label_wstr.erase(label_wstr.begin());
+				if (trim_zero && label_str[0] == '0') {
+					label_str.erase(label_str.begin());
 				}
 
-				// else label_wstr = L'{' + label_wstr + L'}';
+				// else label_str = '{' + label_str + '}';
 
 				const auto label_text = formatted_string {
-					label_wstr, { context.get_gui_font(), label_color }
+					label_str, { context.get_gui_font(), label_color }
 				};
 
 				const auto label_bbox = get_text_bbox(label_text);

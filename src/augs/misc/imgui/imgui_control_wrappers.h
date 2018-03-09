@@ -117,14 +117,6 @@ namespace augs {
 			text(t);
 		}
 
-		inline void text_color(const std::wstring& t, const rgba& r) {
-			text_color(to_string(t), r);
-		}
-
-		inline void text(const std::wstring& t) {
-			text(to_string(t));
-		}
-
 		inline void text(const char* const t) {
 			ImGui::TextUnformatted(t);
 		}
@@ -140,11 +132,6 @@ namespace augs {
 
 		template <class... Args>
 		inline void text(const std::string& format, Args&&... args) {
-			text(typesafe_sprintf(format, std::forward<Args>(args)...));
-		}
-
-		template <class... Args>
-		inline void text(const std::wstring& format, Args&&... args) {
 			text(typesafe_sprintf(format, std::forward<Args>(args)...));
 		}
 

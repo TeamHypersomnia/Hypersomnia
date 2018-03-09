@@ -39,7 +39,7 @@ struct value_bar : game_gui_rect_node {
 	static bool is_sentience_meter(const const_this_pointer);
 	static bool is_enabled(const const_game_gui_context context, const unsigned vertical_index);
 
-	static std::wstring get_description_for_hover(
+	static std::string get_description_for_hover(
 		const const_game_gui_context context,
 		const const_this_pointer
 	);

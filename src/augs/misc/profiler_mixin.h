@@ -13,7 +13,7 @@ namespace augs {
 	
 			introspect(
 				[](const auto label, auto& m){
-					m.title = to_wstring(format_field_name(std::string(label)));
+					m.title = to_string(format_field_name(std::string(label)));
 				}, 
 				self
 			);
@@ -21,8 +21,8 @@ namespace augs {
 	
 		auto summary() const {
 			std::vector<const time_measurements*> all_with_time;
-			std::wstring times_summary;
-			std::wstring amounts_summary;
+			std::string times_summary;
+			std::string amounts_summary;
 			
 			auto& self = *static_cast<const derived*>(this);
 	

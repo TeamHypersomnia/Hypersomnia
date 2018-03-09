@@ -233,7 +233,7 @@ void hotbar_button::draw(
 						bound_key != augs::event::keys::key::INVALID
 					) {
 						const auto label_text = formatted_string{
-							key_to_wstring(bound_key).substr(0, 1),
+							key_to_string(bound_key).substr(0, 1),
 							label_style
 						};
 

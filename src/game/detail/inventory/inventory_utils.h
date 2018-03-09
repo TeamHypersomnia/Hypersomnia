@@ -48,7 +48,7 @@ slot_function get_slot_with_compatible_category(const_entity_handle item, const_
 bool can_stack_entities(const_entity_handle, const_entity_handle);
 
 unsigned to_space_units(const std::string& s);
-std::wstring format_space_units(unsigned);
+std::string format_space_units(unsigned);
 
 int count_charges_in_deposit(const_entity_handle item);
 int count_charges_inside(const_inventory_slot_handle);

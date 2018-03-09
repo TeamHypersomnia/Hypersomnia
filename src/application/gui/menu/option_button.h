@@ -42,12 +42,12 @@ public:
 		) - vec2i(0, 3);
 	}
 
-	void set_complete_caption(const std::wstring& text) {
+	void set_complete_caption(const std::string& text) {
 		set_appearing_caption(text);
 		make_complete();
 	}
 
-	void set_appearing_caption(const std::wstring& text) {
+	void set_appearing_caption(const std::string& text) {
 		appearing_caption.population_interval = 100.f;
 
 		appearing_caption.should_disappear = false;

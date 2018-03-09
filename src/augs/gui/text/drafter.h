@@ -40,7 +40,7 @@ namespace augs {
 				bool kerning = true;
 				bool password_mode = false;
 
-				wchar_t password_character = L'*';
+				char password_character = '*';
 
 				augs::font_glyph_metadata default_glyph;
 

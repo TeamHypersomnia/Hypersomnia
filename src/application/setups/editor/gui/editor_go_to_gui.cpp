@@ -141,7 +141,7 @@ std::optional<const_entity_handle> editor_go_to_entity_gui::perform(
 				self.last_input = current_input_text;
 	
 				self.matches.clear();
-				const auto query = to_wstring(current_input_text);
+				const auto query = to_string(current_input_text);
 	
 				unsigned hits = 0;
 					
@@ -149,7 +149,7 @@ std::optional<const_entity_handle> editor_go_to_entity_gui::perform(
 					const auto name = handle.get_name();
 					const auto id = handle.get_id();
 	
-					if (query.empty() || to_lowercase(name).find(query) != std::wstring::npos) {
+					if (query.empty() || to_lowercase(name).find(query) != std::string::npos) {
 						++hits;
 	
 						self.matches.push_back(handle.get_guid());	
@@ -223,7 +223,7 @@ std::optional<const_entity_handle> editor_go_to_entity_gui::perform(
 	}
 
 	{
-		const auto query = to_wstring(last_input);
+		const auto query = to_string(last_input);
 
 		const auto max_lines = static_cast<std::size_t>(settings.num_lines);
 		const auto left = selected_index / max_lines * max_lines;

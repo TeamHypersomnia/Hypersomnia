@@ -27,7 +27,7 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_controlled_characters::PLAYER);
 
-			meta.description = L"Member of Atlantic nations.";
+			meta.description = "Member of Atlantic nations.";
 
 			{
 				invariants::render render_def;

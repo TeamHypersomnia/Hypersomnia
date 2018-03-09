@@ -186,9 +186,9 @@ namespace augs {
 
 				bool is_mouse_key(const key);
 				bool is_numpad_key(const key);
+
 				std::string key_to_string(const key);
-				std::wstring key_to_wstring(const key);
-				key wstring_to_key(const std::wstring&);
+				key string_to_key(const std::string&);
 			}
 
 			enum class key_change {
@@ -212,7 +212,7 @@ namespace augs {
 				};
 
 				struct character_data {
-					long utf16;
+					unsigned code_point;
 				};
 
 				union data_type {

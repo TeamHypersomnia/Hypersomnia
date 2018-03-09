@@ -360,7 +360,7 @@ void character_gui::draw_cursor_with_tooltip(
 						gui_cursor = assets::necessary_image_id::GUI_CURSOR_MINUS;
 						gui_cursor_color = red;
 
-						gui_cursor_position = draw_cursor_hint(L"Clear assignment", get_gui_crosshair_position(), manager.at(gui_cursor).get_size());
+						gui_cursor_position = draw_cursor_hint("Clear assignment", get_gui_crosshair_position(), manager.at(gui_cursor).get_size());
 					}
 					else {
 						const auto drawn_pos = drag_amount;
@@ -374,7 +374,7 @@ void character_gui::draw_cursor_with_tooltip(
 					if (item.get_charges() > 1) {
 						const auto gui_cursor_size = manager.at(gui_cursor).get_size();
 
-						const auto charges_text = to_wstring(dragged_charges);
+						const auto charges_text = to_string(dragged_charges);
 
 						augs::gui::text::print_stroked(
 							output,
@@ -490,7 +490,7 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 						tooltip_text = text::from_bbcode(get_bbcoded_entity_details(assigned_entity), description_style);
 					}
 					else {
-						tooltip_text = { L"Empty slot", description_style };
+						tooltip_text = { "Empty slot", description_style };
 					}
 				}
 				else if constexpr(std::is_same_v<T, value_bar_in_character_gui>) {

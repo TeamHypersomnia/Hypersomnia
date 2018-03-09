@@ -23,7 +23,7 @@ namespace augs {
 						auto& vk = get_cached(i).kerning;
 						
 						for (unsigned k = 0; k < vk.size(); ++k) {
-							if (vk[k].first == source[i - 1].unicode) {
+							if (vk[k].first == source[i - 1].utf8_unit) {
 								return vk[k].second;
 							}
 						}
@@ -194,10 +194,10 @@ namespace augs {
 				for (unsigned i = 0; i < source.size(); ++i) {
 					const auto& ff = getf(source, i);
 
-					const auto* const g = ff.get_glyph(password_mode ? password_character : source[i].unicode);
+					const auto* const g = ff.find_glyph(password_mode ? password_character : source[i].utf8_unit);
 
 					/* if we allowed a null glyph in string, it must be newline */
-					const auto* const final_ptr = g ? g : ff.get_glyph(L' ');
+					const auto* const final_ptr = g ? g : ff.find_glyph(' ');
 
 					if (final_ptr != nullptr) {
 						cached.push_back(final_ptr);
@@ -219,7 +219,7 @@ namespace augs {
 
 					/* if we have just encountered a newline character or there is need to wrap, we have to break the current line and
 					create another */
-					if (augs::is_character_newline(source[i].unicode) || wrap) {
+					if (augs::is_character_newline(source[i].utf8_unit) || wrap) {
 						/* take care of the current line */
 						lines[l].wrapped = wrap;
 						/* this will be moved left if we're wrapping */

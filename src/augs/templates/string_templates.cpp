@@ -1,24 +1,6 @@
 #include "string_templates.h"
 
-std::wstring to_wstring(const std::string& val) {
-	return std::wstring(val.begin(), val.end());
-}
-
-std::string to_string(const std::wstring& val) {
-	return std::string(val.begin(), val.end());
-}
-
 std::string to_forward_slashes(std::string in_str) {
-	for (auto& s : in_str) {
-		if (s == '\\') {
-			s = '/';
-		}
-	}
-
-	return in_str;
-}
-
-std::wstring to_forward_slashes(std::wstring in_str) {
 	for (auto& s : in_str) {
 		if (s == '\\') {
 			s = '/';

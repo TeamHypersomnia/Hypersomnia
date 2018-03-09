@@ -137,7 +137,7 @@ public:
 	fast_randomization get_fast_rng_for(const entity_id) const;
 	rng_seed_type get_rng_seed_for(const entity_id) const;
 	
-	std::wstring summary() const;
+	std::string summary() const;
 
 	const cosmos_common_significant& get_common_significant() const;
 	const common_assets& get_common_assets() const;

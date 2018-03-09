@@ -390,7 +390,7 @@ namespace test_flavours {
 			}
 
 			meta.description =
-				L"Standard issue sample rifle."
+				"Standard issue sample rifle."
 			;
 
 			invariants::gun gun_def;

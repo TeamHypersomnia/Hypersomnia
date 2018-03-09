@@ -57,9 +57,3 @@ void write_log_entry(const std::string& f) {
 #endif
 #endif
 }
-
-void write_log_entry(const std::wstring& f) {
-#if ENABLE_LOG 
-	write_log_entry(to_string(f));
-#endif
-}

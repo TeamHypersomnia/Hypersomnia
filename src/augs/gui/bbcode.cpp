@@ -18,13 +18,6 @@
 namespace augs {
 	namespace gui {
 		namespace text {
-			formatted_string from_bbcode(
-				const std::string& str, 
-				const style default_style
-			) {
-				return from_bbcode(to_wstring(str), default_style);
-			}
-
 			namespace {
 				enum class tag_type {
 					COLOR,
@@ -47,14 +40,14 @@ namespace augs {
 					tag_position position = tag_position::INVALID;
 				};
 
-				using input_iterator_t = std::wstring::const_iterator;
+				using input_iterator_t = std::string::const_iterator;
 
 				std::tuple<tag_data, input_iterator_t> parse_tag(const input_iterator_t first, const input_iterator_t last) {
 					tag_data result;
 
 					auto current_token = first;
 
-					if(current_token != last && *current_token == L'/') {
+					if(current_token != last && *current_token == '/') {
 						result.position = tag_position::END;
 						++current_token;
 					} else {
@@ -64,13 +57,13 @@ namespace augs {
 					const auto tag_name_token_end = std::find_if_not(current_token, last, std::iswalpha);
 
 					struct name_type_corresp {
-						std::wstring_view name;
+						std::string_view name;
 						tag_type type;
 					};
 
 					// constexpr // msvc 14.1: some implementation from C++17 is missing
 					thread_local const name_type_corresp corresp_table[] = {
-						{L"color", tag_type::COLOR},
+						{"color", tag_type::COLOR},
 					};
 
 					static_assert(std::size(corresp_table) == std::size_t(tag_type::COUNT));
@@ -107,17 +100,17 @@ namespace augs {
 						const auto digit = *current_token++;
 
 						if(std::iswdigit(digit)) {
-							result_channel += rgba_channel(digit - L'0');
+							result_channel += rgba_channel(digit - '0');
 							continue;
 						}
 
 						const auto lower_case_digit = std::towlower(digit);
 
-						if(lower_case_digit < L'a' || lower_case_digit > L'f') {
+						if(lower_case_digit < 'a' || lower_case_digit > 'f') {
 							return std::make_tuple(0, first);
 						}
 
-						result_channel += rgba_channel(10 + (lower_case_digit - L'a'));
+						result_channel += rgba_channel(10 + (lower_case_digit - 'a'));
 					}
 
 					return std::make_tuple(result_channel, current_token);
@@ -129,41 +122,41 @@ namespace augs {
 						// named color
 
 						struct name_color_corresp {
-							std::wstring_view name;
+							std::string_view name;
 							rgba color;
 						};
 
 						// constexpr
 						thread_local const name_color_corresp corresp_table[] = {
 							// standard CSS colors
-							{L"maroon", maroon},
-							{L"red", red},
-							{L"orange", orange},
-							{L"yellow", yellow},
-							{L"olive", olive},
-							{L"purple", purple},
-							{L"fuchsia", fuchsia},
-							{L"white", white},
-							{L"lime", lime},
-							{L"green", green},
-							{L"navy", navy},
-							{L"blue", blue},
-							{L"aqua", aqua},
-							{L"teal", teal},
-							{L"black", black},
-							{L"silver", silver},
-							{L"gray", gray},
+							{"maroon", maroon},
+							{"red", red},
+							{"orange", orange},
+							{"yellow", yellow},
+							{"olive", olive},
+							{"purple", purple},
+							{"fuchsia", fuchsia},
+							{"white", white},
+							{"lime", lime},
+							{"green", green},
+							{"navy", navy},
+							{"blue", blue},
+							{"aqua", aqua},
+							{"teal", teal},
+							{"black", black},
+							{"silver", silver},
+							{"gray", gray},
 
 							// custom colors
-							{L"vsyellow", vsyellow},
-							{L"vsblue", vsblue},
-							{L"vscyan", vscyan},
-							{L"cyan", cyan},
-							{L"vsgreen", vsgreen},
-							{L"vsdarkgray", vsdarkgray},
-							{L"vslightgray", vslightgray},
-							{L"violet", violet},
-							{L"turquoise", turquoise},
+							{"vsyellow", vsyellow},
+							{"vsblue", vsblue},
+							{"vscyan", vscyan},
+							{"cyan", cyan},
+							{"vsgreen", vsgreen},
+							{"vsdarkgray", vsdarkgray},
+							{"vslightgray", vslightgray},
+							{"violet", violet},
+							{"turquoise", turquoise},
 						};
 
 						const auto corresp_entry_iter = std::find_if(
@@ -192,7 +185,7 @@ namespace augs {
 					auto current_token = first;
 
 					// #
-					if(current_token == last || *current_token != L'#') {
+					if(current_token == last || *current_token != '#') {
 						return {rgba{}, first};
 					}
 					++current_token;
@@ -256,7 +249,7 @@ namespace augs {
 			} // anonymous namespace
 
 			formatted_string from_bbcode(
-				const std::wstring& input_str_,
+				const std::string& input_str_,
 				const style default_style
 			) {
 				formatted_string result;
@@ -273,7 +266,7 @@ namespace augs {
 				tag_stack.clear();
 
 				const auto append_with_current_style = [&](const auto first, const auto last) {
-					std::transform(first, last, std::back_inserter(result), [&](const wchar_t character) -> formatted_char {
+					std::transform(first, last, std::back_inserter(result), [&](const char character) -> formatted_char {
 						return {current_style, character};
 					});
 				};
@@ -281,7 +274,7 @@ namespace augs {
 				for(auto current_token = input_str_.begin(), input_end = input_str_.end(); current_token != input_str_.end(); ) {
 					{
 						// parse normal text
-						const auto text_end = std::find(current_token, input_end, L'[');
+						const auto text_end = std::find(current_token, input_end, '[');
 						append_with_current_style(current_token, text_end);
 
 						current_token = text_end;
@@ -300,7 +293,7 @@ namespace augs {
 						current_token = brace_token_end;
 					});
 
-					++current_token; // skip L'['
+					++current_token; // skip '['
 
 					// parse openning/closing tag name
 					tag_data current_tag;
@@ -337,7 +330,7 @@ namespace augs {
 									// =color
 
 									// =
-									if(current_token == input_end || *current_token != L'=') {
+									if(current_token == input_end || *current_token != '=') {
 										continue;
 									}
 
@@ -400,7 +393,7 @@ namespace augs {
 					}
 
 					// ]
-					if(current_token == input_end || *current_token != L']') {
+					if(current_token == input_end || *current_token != ']') {
 						continue;
 					}
 					++current_token;

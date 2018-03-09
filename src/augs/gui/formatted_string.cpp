@@ -19,8 +19,8 @@ namespace augs {
 				lines_remaining = std::min(lines_remaining, entries.size());
 
 				for (auto it = entries.end() - lines_remaining; it != entries.end(); ++it) {
-					auto wstr = to_wstring((*it).text + "\n");
-					concatenate(result, formatted_string{ wstr, { f, white /* rgba((*it).color) */ } });
+					auto str = to_string((*it).text + "\n");
+					concatenate(result, formatted_string{ str, { f, white /* rgba((*it).color) */ } });
 
 					--lines_remaining;
 				}
@@ -28,14 +28,14 @@ namespace augs {
 				return result;
 			}
 
-			formatted_string::operator std::wstring() const {
+			formatted_string::operator std::string() const {
 				const auto l = size();
 				
-				std::wstring out;
+				std::string out;
 				out.reserve(l);
 
 				for (const auto& c : *this) {
-					out += c.unicode;
+					out += c.utf8_unit;
 				}
 
 				return out;
@@ -67,7 +67,7 @@ namespace augs {
 			}
 
 			formatted_string::formatted_string(
-				const std::wstring& str, 
+				const std::string& str, 
 				const style s
 			) {
 				reserve(str.size());
@@ -79,17 +79,17 @@ namespace augs {
 
 			formatted_char::formatted_char(
 				const style format,
-				const wchar_t unicode
+				const char utf8_unit
 			) : 
 				format(format), 
-				unicode(unicode) 
+				utf8_unit(utf8_unit) 
 			{}
 
 			void formatted_char::set(
-				const wchar_t code,
+				const char code,
 				const style _format
 			) {
-				unicode = code;
+				utf8_unit = code;
 				set_format(_format);
 			}
 
@@ -106,7 +106,7 @@ namespace augs {
 			}
 
 			bool formatted_char::operator==(const formatted_char& second) const {
-				return unicode == second.unicode && format == second.format;
+				return utf8_unit == second.utf8_unit && format == second.format;
 			}
 
 			style::style(

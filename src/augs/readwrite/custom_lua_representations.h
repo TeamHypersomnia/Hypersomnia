@@ -42,13 +42,4 @@ namespace augs {
 		r.from_stream(s);
 		v = r;
 	}
-
-	inline auto to_lua_value(const std::wstring r) {
-		return to_string(r);
-	}
-
-	template <class I>
-	void from_lua_value(I& in, std::wstring& r) {
-		r = to_wstring(in.template as<std::string>());
-	}
 }

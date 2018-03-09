@@ -12,6 +12,10 @@
 #include "augs/window_framework/translate_winapi_enums.h"
 
 namespace augs {
+	std::wstring widen(const std::string& s) {
+		return std::wstring(s.begin(), s.end());
+	}
+
 	LRESULT CALLBACK wndproc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 		if (umsg == WM_GETMINMAXINFO || umsg == WM_INPUT) {
 			return DefWindowProc(hwnd, umsg, wParam, lParam);
@@ -48,8 +52,8 @@ namespace augs {
 
 		switch (m) {
 		case WM_CHAR:
-			change.data.character.utf16 = wchar_t(wParam);
-			if (change.data.character.utf16 > 255) {
+			change.data.character.code_point = wchar_t(wParam);
+			if (change.data.character.code_point > 255) {
 				return change;
 			}
 			//change.utf32 = unsigned(wParam);
@@ -249,7 +253,7 @@ namespace augs {
 	}
 
 	void window::set_window_name(const std::string& name) {
-		SetWindowText(hwnd, to_wstring(name).c_str());
+		SetWindowText(hwnd, widen(name).c_str());
 	}
 
 	window::window(
@@ -472,13 +476,13 @@ namespace augs {
 		filter.reserve(to_reserve);
 
 		for (const auto& f : filters) {
-			const auto description = to_wstring(f.description);
-			const auto extension = to_wstring(f.extension);
+			const auto description = widen(f.description);
+			const auto extension = widen(f.extension);
 
-			filter += to_wstring(f.description);
+			filter += widen(f.description);
 			filter.push_back(L'\0');
 			filter += L'*';
-			filter += to_wstring(f.extension);
+			filter += widen(f.extension);
 			filter.push_back(L'\0');
 		}
 
@@ -490,7 +494,7 @@ namespace augs {
 		const std::string& custom_title
 	) const {
 		const auto filter = get_filter(filters);
-		const auto title = to_wstring(custom_title);
+		const auto title = widen(custom_title);
 		
 		OPENFILENAME ofn;       // common dialog box structure
 		std::array<wchar_t, 400> szFile;
@@ -531,7 +535,7 @@ namespace augs {
 		const std::string& custom_title
 	) const {
 		const auto filter = get_filter(filters);
-		const auto title = to_wstring(custom_title);
+		const auto title = widen(custom_title);
 
 		OPENFILENAME ofn;       // common dialog box structure
 		std::array<wchar_t, 400> szFile;

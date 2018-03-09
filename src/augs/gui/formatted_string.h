@@ -27,15 +27,15 @@ namespace augs {
 
 			struct formatted_char {
 				style format;
-				wchar_t unicode = 0;
+				char utf8_unit = 0;
 
 				formatted_char(
 					const style,
-					const wchar_t = 0
+					const char = 0
 				);
 
 				void set(
-					const wchar_t code,
+					const char code,
 					const style format
 				);
 
@@ -50,7 +50,7 @@ namespace augs {
 				using self = formatted_string&;
 				
 				formatted_string() = default;
-				formatted_string(const std::wstring&, const style);
+				formatted_string(const std::string&, const style);
 
 				self multiply_alpha(const float);
 				self set_alpha(const rgba_channel);
@@ -58,7 +58,7 @@ namespace augs {
 
 				formatted_string& operator+=(const formatted_string&);
 
-				operator std::wstring() const;
+				operator std::string() const;
 			};
 
 			formatted_string format_recent_program_log(
@@ -67,7 +67,6 @@ namespace augs {
 			);
 
 			formatted_string from_bbcode(const std::string&, const style default_style);
-			formatted_string from_bbcode(const std::wstring&, const style default_style);
 		}
 	}
 }

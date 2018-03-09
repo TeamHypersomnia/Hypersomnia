@@ -66,11 +66,14 @@ namespace augs {
 		ft_indices.clear();
 
 		try {
-			const auto unicodes = to_wstring(augs::file_to_string(in.charset_path)); 
+#if TODO_STRINGS
+			const auto code_points = widen(augs::file_to_string(in.charset_path));
+#endif
+			const auto code_points = augs::file_to_string(in.charset_path); 
 
-			glyph_bitmaps.reserve(unicodes.size());
+			glyph_bitmaps.reserve(code_points.size());
 
-			for (const auto j : unicodes) {
+			for (const auto j : code_points) {
 				g_index = FT_Get_Char_Index(face, j);
 
 				if (g_index) {
@@ -84,7 +87,7 @@ namespace augs {
 						throw_error("FT_Render_Glyph returned %x", result);
 					}
 
-					auto& g = meta.glyphs_by_unicode[j];
+					auto& g = meta.glyphs_by_code_point[j];
 					g = face->glyph->metrics;
 					g.index = static_cast<unsigned>(glyph_bitmaps.size());
 
@@ -109,13 +112,13 @@ namespace augs {
 			FT_Vector delta;
 			if (FT_HAS_KERNING(face)) {
 				for (unsigned i = 0; i < ft_indices.size(); ++i) {
-					auto& subject = meta.glyphs_by_unicode[unicodes[i]];
+					auto& subject = meta.glyphs_by_code_point[code_points[i]];
 
 					for (unsigned j = 0; j < ft_indices.size(); ++j) {
 						FT_Get_Kerning(face, ft_indices[j], ft_indices[i], FT_KERNING_DEFAULT, &delta);
 						
 						if (delta.x) {
-							subject.kerning.push_back({ unicodes[j], static_cast<short>(delta.x >> 6) });
+							subject.kerning.push_back({ code_points[j], static_cast<short>(delta.x >> 6) });
 						}
 					}
 

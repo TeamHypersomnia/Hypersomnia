@@ -9,6 +9,8 @@
 #include "game/detail/view_input/sound_effect_input.h"
 #include "game/detail/view_input/particle_effect_input.h"
 
+#include "game/common_state/entity_name_str.h"
+
 struct spell_common_data {
 	// GEN INTROSPECTOR struct spell_common_data
 	particle_effect_input cast_sparkles;
@@ -23,8 +25,8 @@ struct spell_common_data {
 struct spell_appearance {
 	// GEN INTROSPECTOR struct spell_appearance
 	assets::game_image_id icon = assets::game_image_id::INVALID;
-	std::wstring incantation;
-	std::wstring name;
-	std::wstring description;
+	entity_name_str incantation;
+	entity_name_str name;
+	entity_name_str description;
 	// END GEN INTROSPECTOR
 };

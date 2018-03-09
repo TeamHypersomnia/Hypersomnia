@@ -7,6 +7,8 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
+- fix std::array<internal_glyph, glyph_count> glyphs;
+
 - generalize editor_tab_gui to be also able to handle the entities/flavours windows
 - implement ctrl+tab for tabs, either in settings or anywhere. It should just handle the current window
 	- shortcuts shall always focus relevant window

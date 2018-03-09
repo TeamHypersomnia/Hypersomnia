@@ -28,42 +28,42 @@
 	0-3 (the whole): entity details
 */
 
-entity_name_type get_bbcoded_entity_name(const const_entity_handle maybe_overridden_by_nickname);
+entity_name_str get_bbcoded_entity_name(const const_entity_handle maybe_overridden_by_nickname);
 
-const entity_description_type& get_bbcoded_entity_description(const const_entity_handle);
+const entity_name_str& get_bbcoded_entity_description(const const_entity_handle);
 
-std::wstring get_bbcoded_item_categories(const item_category_flagset& flags);
+entity_name_str get_bbcoded_item_categories(const item_category_flagset& flags);
 
-std::wstring get_bbcoded_slot_function_name(const slot_function);
-std::wstring get_bbcoded_slot_function_description(const slot_function);
+entity_name_str get_bbcoded_slot_function_name(const slot_function);
+entity_name_str get_bbcoded_slot_function_description(const slot_function);
 
-std::wstring get_bbcoded_slot_details(const const_inventory_slot_handle);
-std::wstring get_bbcoded_entity_details(const const_entity_handle);
+entity_name_str get_bbcoded_slot_details(const const_inventory_slot_handle);
+entity_name_str get_bbcoded_entity_details(const const_entity_handle);
 
 template <class entity_handle_type, class T>
-std::wstring get_bbcoded_spell_description(
+entity_name_str get_bbcoded_spell_description(
 	const entity_handle_type subject,
 	const T& spell
 ) {
 	const auto properties = typesafe_sprintf(
-		L"Incantation: [color=yellow]%x[/color]\nPE to cast: [color=vscyan]%x[/color]\nCooldown: [color=vscyan]%x[/color]",
+		"Incantation: [color=yellow]%x[/color]\nPE to cast: [color=vscyan]%x[/color]\nCooldown: [color=vscyan]%x[/color]",
 		spell.appearance.incantation, 
 		spell.common.personal_electricity_required, 
 		spell.common.cooldown_ms
 	);
 
-	return spell.appearance.name + L"\n" + properties + L"\n" + spell.appearance.description;
+	return spell.appearance.name + "\n" + properties + "\n" + spell.appearance.description;
 }
 
 template <class C, class Container>
-std::wstring describe_names_of(const Container& all_entities, const C& cosm) {
+entity_name_str describe_names_of(const Container& all_entities, const C& cosm) {
 	if (all_entities.empty()) {
-		return L"";
+		return "";
 	}
 
 	auto quoted = [](const auto& s) {
 #if 0
-		return L'"' + s + L'"';
+		return '"' + s + '"';
 #endif
 		return s;
 	};
@@ -74,24 +74,24 @@ std::wstring describe_names_of(const Container& all_entities, const C& cosm) {
 
 	/* More than one. */
 
-	thread_local std::map<std::wstring, std::size_t> counts;
+	thread_local std::map<entity_name_str, std::size_t> counts;
 	counts.clear();
 
 	for (const auto& e : all_entities) {
 		++counts[cosm[e].get_name()];
 	}
 
-	std::wstring result;
+	entity_name_str result;
 
 	std::size_t total = 0;
 
 	for (const auto& c : counts) {
-		result += typesafe_sprintf(L"%x of %x, ", c.second, quoted(c.first));
+		result += typesafe_sprintf("%x of %x, ", c.second, quoted(c.first));
 		total += c.second;
 	}
 
 	if (counts.size() > 1) {
-		result = typesafe_sprintf(L"%x: ", total) + result;
+		result = typesafe_sprintf("%x: ", total) + result;
 	}
 
 	result.pop_back();

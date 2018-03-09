@@ -9,20 +9,17 @@
 #include "augs/ensure.h"
 
 #include "augs/templates/maybe_const.h"
-#include "augs/templates/get_underlying_char_type.h"
 
 #include "augs/templates/type_in_list_id.h"
 #include "augs/templates/get_by_dynamic_id.h"
 
-std::string to_string(const std::wstring& val);
-
 template <class T>
-std::wstring to_wstring(
+std::string to_string(
 	const T& val, 
 	const int decimal_precision = -1, 
 	bool fixed_precision = false
 ) {
-	std::wostringstream ss;
+	std::ostringstream ss;
 
 	if (decimal_precision > -1) {
 		if (fixed_precision) {
@@ -36,11 +33,9 @@ std::wstring to_wstring(
 	return ss.str();
 }
 
-std::wstring to_wstring(const std::string& val);
-
-template <class T, class CharType>
-T to_value(const std::basic_string<CharType> s) {
-	std::basic_istringstream<CharType> ss(s);
+template <class T>
+T to_value(const std::string& s) {
+	std::istringstream ss(s);
 	
 	T val;
 	ss >> val;
@@ -116,19 +111,16 @@ struct str_ops_impl {
 	}
 };
 
-template <class Ch>
-auto str_ops(std::basic_string<Ch>& s) {
-	return str_ops_impl<std::basic_string<Ch>&> { s };
+inline auto str_ops(std::string& s) {
+	return str_ops_impl<std::string&> { s };
 }
 
-template <class Ch>
-auto str_ops(const std::basic_string<Ch>& s) {
-	return str_ops_impl<std::basic_string<Ch>> { s };
+inline auto str_ops(const std::string& s) {
+	return str_ops_impl<std::string> { s };
 }
 
-template <class Ch>
-auto str_ops(const Ch* const s) {
-	return str_ops(std::basic_string<Ch>(s));
+inline auto str_ops(const char* const s) {
+	return str_ops(std::string(s));
 }
 
 template <class S>
@@ -233,4 +225,4 @@ std::string get_type_name_strip_namespace(const T& t) {
 }
 
 std::string to_forward_slashes(std::string);
-std::wstring to_forward_slashes(std::wstring);
+std::string to_forward_slashes(std::string);

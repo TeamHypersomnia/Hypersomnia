@@ -66,8 +66,6 @@ struct typed_entity_flavour_id {
 	}
 };
 
-using entity_name_type = std::wstring;
-
 namespace std {
 	template <>
 	struct hash<entity_flavour_id> {

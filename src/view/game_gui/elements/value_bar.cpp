@@ -74,7 +74,7 @@ bool value_bar::is_sentience_meter(const const_this_pointer this_id) {
 	return this_id.get_location().vertical_index < num_sentience_meters;
 }
 
-std::wstring value_bar::get_description_for_hover(
+std::string value_bar::get_description_for_hover(
 	const const_game_gui_context context,
 	const const_this_pointer self
 ) {
@@ -175,7 +175,7 @@ void value_bar::draw(
 				print_stroked(
 					output,
 					vec2{ full_bar_rect_bordered.r + total_spacing * 2, full_bar_rect_bordered.t - total_spacing },
-					{ typesafe_sprintf(L"%x", static_cast<int>(value)),{ context.get_gui_font(), white } }
+					{ typesafe_sprintf("%x", static_cast<int>(value)),{ context.get_gui_font(), white } }
 				);
 			},
 
@@ -218,7 +218,7 @@ ltrb value_bar::get_bar_rect_with_borders(
 	auto icon_tex = get_bar_icon(context, this_id);
 	icon_rect.set_size(context.get_game_images().at(icon_tex).get_size());
 
-	const auto max_value_caption_size = get_text_bbox({ L"99999", context.get_gui_font() });
+	const auto max_value_caption_size = get_text_bbox({ "99999", context.get_gui_font() });
 
 	auto value_bar_rect = icon_rect;
 	value_bar_rect.set_position(icon_rect.get_position() + vec2(this_id->border.get_total_expansion() + icon_rect.get_size().x, 0));

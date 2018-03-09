@@ -5,13 +5,13 @@ namespace augs {
 	namespace gui {
 		namespace text {
 			struct word_separator {
-				static int default_word_type(wchar_t);
-				static bool default_is_newline(wchar_t);
+				static int default_word_type(char);
+				static bool default_is_newline(char);
 
-				int(*word_type)(wchar_t);
-				bool(*is_character_newline)(wchar_t);
+				int(*word_type)(char);
+				bool(*is_character_newline)(char);
 
-				word_separator(int(*is_word)(wchar_t) = 0); /* 0 - default comparator */
+				word_separator(int(*is_word)(char) = 0); /* 0 - default comparator */
 
 				void set_default();
 

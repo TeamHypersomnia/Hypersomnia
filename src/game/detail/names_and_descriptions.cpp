@@ -1,119 +1,120 @@
 #include "game/enums/slot_function.h"
 #include "game/enums/item_category.h"
+#include "game/common_state/entity_name_str.h"
 #include "augs/ensure.h"
 
-std::wstring get_bbcoded_item_categories(const item_category_flagset& flags) {
-	std::wstring result;
+entity_name_str get_bbcoded_item_categories(const item_category_flagset& flags) {
+	entity_name_str result;
 
 	if (flags.test(item_category::MAGAZINE)) {
-		result += L"Magazine, ";
+		result += "Magazine, ";
 	}
 	if (flags.test(item_category::MUZZLE_ATTACHMENT)) {
-		result += L"Muzzle attachment, ";
+		result += "Muzzle attachment, ";
 	}
 	if (flags.test(item_category::RAIL_ATTACHMENT)) {
-		result += L"Rail attachment, ";
+		result += "Rail attachment, ";
 	}
 	if (flags.test(item_category::SHOT_CHARGE)) {
-		result += L"Shot charge, ";
+		result += "Shot charge, ";
 	}
 	if (flags.test(item_category::SHOULDER_CONTAINER)) {
-		result += L"Shoulder container, ";
+		result += "Shoulder container, ";
 	}
 	if (flags.test(item_category::TORSO_ARMOR)) {
-		result += L"Torso armor, ";
+		result += "Torso armor, ";
 	}
 
 	if (!result.empty()) {
 		result = result.substr(0, result.length() - 2);
 	}
 	else {
-		result = L"Everything";
+		result = "Everything";
 	}
 
 	return result;
 }
 
-std::wstring get_bbcoded_slot_function_name(const slot_function f) {
+entity_name_str get_bbcoded_slot_function_name(const slot_function f) {
 	switch (f) {
 	case slot_function::GUN_CHAMBER:
 		return{
-			L"Chamber",
+			"Chamber",
 		};
 	case slot_function::GUN_CHAMBER_MAGAZINE:
 		return{
-			L"Integral magazine",
+			"Integral magazine",
 		};
 	case slot_function::GUN_DETACHABLE_MAGAZINE:
 		return{
-			L"Magazine slot",
+			"Magazine slot",
 		};
 	case slot_function::GUN_RAIL:
 		return{
-			L"Rail",
+			"Rail",
 		};
 	case slot_function::GUN_MUZZLE:
 		return{
-			L"Muzzle",
+			"Muzzle",
 		};
 	case slot_function::PRIMARY_HAND:
 		return{
-			L"Primary arm",
+			"Primary arm",
 		};
 	case slot_function::SECONDARY_HAND:
 		return{
-			L"Secondary arm",
+			"Secondary arm",
 		};
 	case slot_function::TORSO_ARMOR:
 		return{
-			L"Torso",
+			"Torso",
 		};
 	case slot_function::SHOULDER:
 		return{
-			L"Shoulder",
+			"Shoulder",
 		};
-	default: return{ L"Unknown" };
+	default: return{ "Unknown" };
 	}
 }
 
-std::wstring get_bbcoded_slot_function_description(const slot_function f) {
+entity_name_str get_bbcoded_slot_function_description(const slot_function f) {
 	switch (f) {
 	case slot_function::GUN_CHAMBER:
 		return{
-			L"Single charge is inserted here\nprior to being fired."
+			"Single charge is inserted here\nprior to being fired."
 		};
 	case slot_function::GUN_CHAMBER_MAGAZINE:
 		return{
-			L"Internal storage for charges\nremoving the need for detachable mag."
+			"Internal storage for charges\nremoving the need for detachable mag."
 		};
 	case slot_function::GUN_DETACHABLE_MAGAZINE:
 		return{
-			L"Detachable magazine goes here."
+			"Detachable magazine goes here."
 		};
 	case slot_function::GUN_RAIL:
 		return{
-			L" "
+			" "
 		};
 	case slot_function::GUN_MUZZLE:
 		return{
-			L"Various gunshot modifiers go here."
+			"Various gunshot modifiers go here."
 		};
 	case slot_function::PRIMARY_HAND:
 		return{
-			L"Primary hand."
+			"Primary hand."
 		};
 	case slot_function::SECONDARY_HAND:
 		return{
-			L"Secondary hand."
+			"Secondary hand."
 		};
 	case slot_function::TORSO_ARMOR:
 		return{
-			L"Clothing or armors go here."
+			"Clothing or armors go here."
 		};
 	case slot_function::SHOULDER:
 		return{
-			L"For backpacks or items with belts."
+			"For backpacks or items with belts."
 		};
-	default: return{ L"Unknown" };
+	default: return{ "Unknown" };
 	}
 }

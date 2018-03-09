@@ -28,7 +28,7 @@ namespace augs {
 				virtual void on_end(bool select);
 				virtual void on_pagedown();
 				virtual void on_pageup();
-				virtual void on_character(wchar_t);
+				virtual void on_character(char);
 				virtual void on_cut(rect_world&);
 				virtual void on_bold();
 				virtual void on_italics();
@@ -63,15 +63,15 @@ namespace augs {
 				virtual void consume_gui_event(event_info) override;
 
 				/* we should not pass newlines through */
-				virtual void on_character(wchar_t) override;
+				virtual void on_character(char) override;
 
-				std::function<void(std::wstring&)> property_guard;
+				std::function<void(std::string&)> property_guard;
 
-				property_textbox(vec2i pos, int width, text::style default_style, std::function<void(std::wstring&)> property_guard = nullptr);
+				property_textbox(vec2i pos, int width, text::style default_style, std::function<void(std::string&)> property_guard = nullptr);
 
 				template <class T>
 				void set(T val) {
-					auto s = std::wstring(val);
+					auto s = std::string(val);
 					if (property_guard) property_guard(s);
 
 					editor.select_all();
@@ -79,7 +79,7 @@ namespace augs {
 				}
 
 				template <>
-				void set(std::wstring s) {
+				void set(std::string s) {
 					if (property_guard) property_guard(s);
 
 					editor.select_all();
@@ -91,7 +91,7 @@ namespace augs {
 					return wnum<T>(editor.get_str());
 				}
 
-				std::wstring get_str() const;
+				std::string get_str() const;
 
 			};
 		}

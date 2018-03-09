@@ -96,7 +96,7 @@ namespace augs {
 			void textbox::on_end(bool s) { editor.end(s);									view_caret = true; }
 			void textbox::on_pagedown() { scroll.y += get_rect_absolute().h(); }
 			void textbox::on_pageup() { scroll.y -= get_rect_absolute().h(); }
-			void textbox::on_character(wchar_t c) { editor.character(c);								view_caret = true; blink_reset = true; }
+			void textbox::on_character(char c) { editor.character(c);								view_caret = true; blink_reset = true; }
 			void textbox::on_cut(rect_world& sys) { editor.cut(sys.global_clipboard);					view_caret = true; }
 			void textbox::on_bold() { editor.bold();									view_caret = true; }
 			void textbox::on_italics() { editor.italics();									view_caret = true; }
@@ -168,7 +168,7 @@ namespace augs {
 					break;
 
 				case rect::gui_event::character:
-					if (editable && w.key != BACKSPACE && !c) on_character(w.utf16);
+					if (editable && w.key != BACKSPACE && !c) on_character(w.code_point);
 
 					break;
 
@@ -207,17 +207,17 @@ namespace augs {
 			}
 
 
-			property_textbox::property_textbox(vec2i pos, int width, text::style default_style, std::function<void(std::wstring&)> property_guard)
+			property_textbox::property_textbox(vec2i pos, int width, text::style default_style, std::function<void(std::string&)> property_guard)
 				: textbox(rects::xywh<float>(pos.x, pos.y, width, (*default_style.f).get_height()), default_style), property_guard(property_guard) {
 			}
 
-			std::wstring property_textbox::get_str() const {
-				return formatted_string_to_wstring(editor.get_str());
+			std::string property_textbox::get_str() const {
+				return formatted_string_to_string(editor.get_str());
 			}
 
 			void property_textbox::consume_gui_event(event_info e) {
 				if (e.msg == rect::gui_event::blur) {
-					std::wstring ws = formatted_string_to_wstring(editor.get_str());
+					std::string ws = formatted_string_to_string(editor.get_str());
 					if (property_guard) property_guard(ws);
 					editor.select_all();
 					editor.insert(text::format(ws, editor.get_default_style()));
@@ -233,7 +233,7 @@ namespace augs {
 				scroll_content_with_wheel(e);
 			}
 
-			void property_textbox::on_character(wchar_t c) {
+			void property_textbox::on_character(char c) {
 				if (!augs::window::is_character_newline(c)) textbox::on_character(c);
 			}
 		}

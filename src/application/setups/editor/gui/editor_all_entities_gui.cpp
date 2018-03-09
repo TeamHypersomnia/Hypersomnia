@@ -24,8 +24,17 @@ void edit_properties_of(T& object, const editor_command_input in) {
 		[&](const std::string& label, auto& member) {
 			using M = std::decay_t<decltype(member)>;
 
+			auto id = scoped_id(std::addressof(member));
 			if constexpr(is_padding_field_v<M>) {
 				return;	
+			}
+			else if constexpr(std::is_same_v<M, std::string>) {
+				input_text<256>(
+					label,
+					member
+				);
+
+				details_text(get_type_name<M>());
 			}
 			else if constexpr(is_container_v<M>) {
 
@@ -126,7 +135,7 @@ void editor_all_entities_gui::perform(const editor_command_input in) {
 
 							if (f_node) {
 								ImGui::Separator();
-								//edit_properties_of(flavour, in);
+								edit_properties_of(flavour, in);
 								ImGui::Separator();
 
 								for (const auto& e : all_having_flavour) {

@@ -396,8 +396,8 @@ void editor_setup::perform_custom_imgui(
 					1.0f / get_viewed_cosmos().get_fixed_delta().in_seconds()
 				);
 
-				text(L"Currently controlling: %x",
-					get_viewed_character().alive() ? get_viewed_character().get_name() : L"no entity"
+				text("Currently controlling: %x",
+					get_viewed_character().alive() ? get_viewed_character().get_name() : "no entity"
 				);
 			}
 		}
@@ -584,7 +584,7 @@ void editor_setup::del() {
 			command.built_description = "Deleted all entities";
 		}
 		else {
-			command.built_description = to_string(L"Deleted " + ::describe_names_of(all_deleted, cosm));
+			command.built_description = to_string("Deleted " + ::describe_names_of(all_deleted, cosm));
 		}
 
 		if (!command.empty()) {

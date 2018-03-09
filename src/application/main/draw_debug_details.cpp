@@ -44,7 +44,7 @@ void draw_debug_details(
 	);
 
 	total_details += {
-		to_wstring(hypersomnia_version().get_summary()) + to_wstring(static_allocations_info()),
+		to_string(hypersomnia_version().get_summary()) + to_string(static_allocations_info()),
 		
 		text_style
 	};
@@ -56,7 +56,7 @@ void draw_debug_details(
 
 			total_details += {
 				typesafe_sprintf(
-					L"Entities: %x\nX: %f2\nY: %f2\nRot: %f2\n",
+					"Entities: %x\nX: %f2\nY: %f2\nRot: %f2\n",
 					viewed_character.get_cosmos().get_entities_count(),
 					coords.x,
 					coords.y,
@@ -72,7 +72,7 @@ void draw_debug_details(
 
 			total_details += {
 				typesafe_sprintf(
-					L"VelX: %x\nVelY : %x\n",
+					"VelX: %x\nVelY : %x\n",
 					vel.x,
 					vel.y
 				),
@@ -83,13 +83,13 @@ void draw_debug_details(
 
 	}
 
-	total_details += { L"Frame\n", category_style };
+	total_details += { "Frame\n", category_style };
 	total_details += { frame_performance.summary(), text_style };
-	total_details += { L"Session\n", category_style };
+	total_details += { "Session\n", category_style };
 	total_details += { session_performance.summary(), text_style };
-	total_details += { L"Audiovisual\n", category_style };
+	total_details += { "Audiovisual\n", category_style };
 	total_details += { audiovisual_performance.summary(), text_style };
-	total_details += { L"Cosmos\n", category_style };
+	total_details += { "Cosmos\n", category_style };
 
 	if (viewed_character.alive()) {
 		total_details += { viewed_character.get_cosmos().profiler.summary(), text_style };

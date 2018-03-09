@@ -52,7 +52,7 @@ namespace augs {
 			public:
 				word_separator separator;
 				/* nullptr - no whitelisting */
-				const wchar_t* whitelist, *blacklist;
+				const char* whitelist, *blacklist;
 				/* 0 - unlimited */
 				unsigned max_characters;
 				rgba global_color;
@@ -63,7 +63,7 @@ namespace augs {
 				/* editor */
 				ui(style default_style);
 				/* define word function for CTRL+arrow traversal, 0 sets default */
-				void is_word_func(bool(*)(wchar_t, bool) = 0),
+				void is_word_func(bool(*)(char, bool) = 0),
 					set_caret(unsigned pos, bool select = false),
 					set_caret_end(bool select = false),
 
@@ -87,7 +87,7 @@ namespace augs {
 					paste(clipboard&),
 
 					insert(formatted_string&),
-					character(const wchar_t&),
+					character(const char&),
 					character(const formatted_char&),
 					backspace(bool ctrl = false),
 					del(bool ctrl = false),
@@ -111,8 +111,8 @@ namespace augs {
 				bool get_italics_status() const;
 
 				bool is_valid_glyph(const formatted_char& c);
-				bool is_whitelisted(wchar_t c) const;
-				bool is_blacklisted(wchar_t c) const;
+				bool is_whitelisted(char c) const;
+				bool is_blacklisted(char c) const;
 
 				/* font getting helper, shortens _str[i].format.font */
 				const augs::baked_font& getf(unsigned i) const;

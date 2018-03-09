@@ -85,11 +85,11 @@ void main_menu_setup::query_latest_news(const std::string& url) {
 			;
 
 			if (html.size() > 0) {
-				return to_wstring(html);
+				return to_string(html);
 			}
 		}
 
-		return std::wstring(L"Couldn't download and/or parse the latest news.");
+		return std::string("Couldn't download and/or parse the latest news.");
 	});
 }
 
@@ -146,15 +146,15 @@ main_menu_setup::main_menu_setup(
 		m.hover_highlight_duration_ms = 300.f;
 	}
 
-	gui.root.buttons[main_menu_button_type::CONNECT_TO_OFFICIAL_UNIVERSE].set_appearing_caption(L"Login to official universe");
-	gui.root.buttons[main_menu_button_type::BROWSE_UNOFFICIAL_UNIVERSES].set_appearing_caption(L"Browse unofficial universes");
-	gui.root.buttons[main_menu_button_type::HOST_UNIVERSE].set_appearing_caption(L"Host universe");
-	gui.root.buttons[main_menu_button_type::CONNECT_TO_UNIVERSE].set_appearing_caption(L"Connect to universe");
-	gui.root.buttons[main_menu_button_type::LOCAL_UNIVERSE].set_appearing_caption(L"Local universe");
-	gui.root.buttons[main_menu_button_type::EDITOR].set_appearing_caption(L"Editor");
-	gui.root.buttons[main_menu_button_type::SETTINGS].set_appearing_caption(L"Settings");
-	gui.root.buttons[main_menu_button_type::CREATORS].set_appearing_caption(L"Founders");
-	gui.root.buttons[main_menu_button_type::QUIT].set_appearing_caption(L"Quit");
+	gui.root.buttons[main_menu_button_type::CONNECT_TO_OFFICIAL_UNIVERSE].set_appearing_caption("Login to official universe");
+	gui.root.buttons[main_menu_button_type::BROWSE_UNOFFICIAL_UNIVERSES].set_appearing_caption("Browse unofficial universes");
+	gui.root.buttons[main_menu_button_type::HOST_UNIVERSE].set_appearing_caption("Host universe");
+	gui.root.buttons[main_menu_button_type::CONNECT_TO_UNIVERSE].set_appearing_caption("Connect to universe");
+	gui.root.buttons[main_menu_button_type::LOCAL_UNIVERSE].set_appearing_caption("Local universe");
+	gui.root.buttons[main_menu_button_type::EDITOR].set_appearing_caption("Editor");
+	gui.root.buttons[main_menu_button_type::SETTINGS].set_appearing_caption("Settings");
+	gui.root.buttons[main_menu_button_type::CREATORS].set_appearing_caption("Founders");
+	gui.root.buttons[main_menu_button_type::QUIT].set_appearing_caption("Quit");
 
 	if (is_recording_available) {
 		while (intro.world.get_total_seconds_passed() < settings.rewind_intro_scene_by_secs) {

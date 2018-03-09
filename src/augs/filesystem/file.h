@@ -75,12 +75,11 @@ namespace augs {
 		}
 	}
 
-	template <class C = char>
-	auto file_to_string(const path_type& path, const C = C()) {
-		auto t = with_exceptions<std::basic_ifstream<C>>();
+	inline auto file_to_string(const path_type& path) {
+		auto t = with_exceptions<std::ifstream>();
 		t.open(path);
 
-		std::basic_stringstream<C> buffer;
+		std::stringstream buffer;
 		buffer << t.rdbuf();
 
 		return buffer.str();

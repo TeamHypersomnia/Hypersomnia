@@ -272,12 +272,6 @@ namespace augs {
 		: public constant_size_vector_base<T, N> {
 		using underlying_char_type = zeroed_pod_internal_type_t<T>;
 
-		static constexpr bool should_act_like_string =
-			is_one_of_v<underlying_char_type, char, wchar_t>
-			;
-
-		using string_type = std::basic_string<underlying_char_type>;
-
 	public:
 		using base = constant_size_vector_base<T, N>;
 		using base::constant_size_vector_base;
@@ -289,26 +283,6 @@ namespace augs {
 		using base::operator std::vector<value_type>;
 
 		constant_size_vector() = default;
-
-		template <bool C = should_act_like_string, class = std::enable_if_t<C>>
-		constant_size_vector(const string_type& s) : constant_size_vector(s.begin(), s.end()) {}
-
-		template <bool C = should_act_like_string, class = std::enable_if_t<C>>
-		constant_size_vector& operator=(const string_type& s) {
-			assign(s.begin(), s.end());
-			return *this;
-		}
-
-		template <bool C = should_act_like_string, class = std::enable_if_t<C>>
-		constant_size_vector& operator+=(const string_type& s) {
-			insert(end(), s.begin(), s.end());
-			return *this;
-		}
-
-		template <bool C = should_act_like_string, class = std::enable_if_t<C>>
-		operator string_type() const {
-			return{ begin(), end() };
-		}
 	};
 
 	template <class T, unsigned N>
@@ -363,12 +337,6 @@ namespace augs {
 			clear();
 		}
 	};
-
-	template <unsigned const_count>
-	using constant_size_string = constant_size_vector<zeroed_pod<char>, const_count>;
-
-	template <unsigned const_count>
-	using constant_size_wstring = constant_size_vector<zeroed_pod<wchar_t>, const_count>;
 
 	template <class T, unsigned C, class = std::enable_if_t<is_comparable_v<T, T>>>
 	bool operator==(

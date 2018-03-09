@@ -16,8 +16,8 @@ cosmos::cosmos(const cosmic_pool_size_type reserved_entities)
 
 const cosmos cosmos::zero = {};
 
-std::wstring cosmos::summary() const {
-	return typesafe_sprintf(L"Entities: %x\n", get_entities_count());
+std::string cosmos::summary() const {
+	return typesafe_sprintf("Entities: %x\n", get_entities_count());
 }
 
 rng_seed_type cosmos::get_rng_seed_for(const entity_id id) const {

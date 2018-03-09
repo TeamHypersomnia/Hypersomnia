@@ -33,7 +33,7 @@ struct creators_screen {
 				const auto p_bbox = get_text_bbox(p.get_total_target_text(), 0u);
 
 				result.x = std::max(p_bbox.x, result.x);
-				result.y += get_text_bbox({L"\n.", p.get_total_target_text()[0]), p_bbox.y).y;
+				result.y += get_text_bbox({"\n.", p.get_total_target_text()[0]), p_bbox.y).y;
 			}
 
 			return result;
@@ -60,7 +60,7 @@ struct creators_screen {
 			const auto p_bbox = get_text_bbox(p.get_total_target_text(), 0u);
 
 			personae_width = std::max(p_bbox.x, personae_width);
-			column_height += get_text_bbox({ L"\n.", p.get_total_target_text()[0] }, p_bbox.y).y / 2;
+			column_height += get_text_bbox({ "\n.", p.get_total_target_text()[0] }, p_bbox.y).y / 2;
 		}
 
 		column_height += 15;
@@ -90,8 +90,8 @@ struct creators_screen {
 		{
 			entry c;
 
-			c.set_task_title({ L"Founder & Programmer", task_style });
-			c.add_person({ L"Patryk B. Czachurski", person_style });
+			c.set_task_title({ "Founder & Programmer", task_style });
+			c.add_person({ "Patryk B. Czachurski", person_style });
 
 			add_entry(c);
 		}
@@ -99,8 +99,8 @@ struct creators_screen {
 		{
 			entry c;
 
-			c.set_task_title({ L"Linux port", task_style });
-			c.add_person({L"Adam Piekarczyk", person_style });
+			c.set_task_title({ "Linux port", task_style });
+			c.add_person({"Adam Piekarczyk", person_style });
 
 			add_entry(c);
 		}
@@ -108,9 +108,9 @@ struct creators_screen {
 		{
 			entry c;
 
-			c.set_task_title({L"Pixel art", task_style });
-			c.add_person({L"Michal Kawczynski", person_style });
-			c.add_person({L"Patryk B. Czachurski", person_style });
+			c.set_task_title({"Pixel art", task_style });
+			c.add_person({"Michal Kawczynski", person_style });
+			c.add_person({"Patryk B. Czachurski", person_style });
 
 			add_entry(c);
 		}
@@ -118,24 +118,24 @@ struct creators_screen {
 		{
 			entry c;
 
-			c.set_task_title({ L"Occasional helping hands", task_style });
-			c.add_person({L"DaTa-", person_style });
-			c.add_person({L"Bartosz P. Grzelak", person_style });
+			c.set_task_title({ "Occasional helping hands", task_style });
+			c.add_person({"DaTa-", person_style });
+			c.add_person({"Bartosz P. Grzelak", person_style });
 
 			add_entry(c);
 		}
 
-		afterword.target_text[0] = {L"\
+		afterword.target_text[0] = {"\
 What stands before your eyes is an outcome of a man's burning passion,\n\
 a digital inamorata, chef d'oeuvre of a single coder, masterful musicians and a champion at pixel art.\n\n", person_style };
 
-		afterword.target_text[1] = {L"\
+		afterword.target_text[1] = {"\
 Its history of making recounts profound hopes,\n\
 disillusions, crises and divine moments of joy.\n\
 Cherish your ambitions for the immaterial.\n\
 In the end you will either conquer that which you dreamed of,\n\
 or tell a beautiful story of a man devastated by struggle.\n", person_style }
-+ formatted_string {L"    ~Founder of the Hypersomnia Universe", task_style};
++ formatted_string {"    ~Founder of the Hypersomnia Universe", task_style};
 
 		afterword.should_disappear = false;
 		afterword.population_interval = 50.f;

@@ -84,7 +84,7 @@ augs::vertex_triangle_buffer draw_circular_bars_and_get_textual_info(const draw_
 
 			struct circle_info {
 				float angle;
-				std::wstring text;
+				std::string text;
 				rgba color;
 			};
 
@@ -125,7 +125,7 @@ augs::vertex_triangle_buffer draw_circular_bars_and_get_textual_info(const draw_
 								new_info.angle = lower_outside + empty_amount / 2;
 							}
 
-							new_info.text = to_wstring(ammo_info.total_charges);
+							new_info.text = to_string(ammo_info.total_charges);
 							new_info.color = ammo_color;
 
 							textual_infos.push_back(new_info);
@@ -142,7 +142,7 @@ augs::vertex_triangle_buffer draw_circular_bars_and_get_textual_info(const draw_
 
 			textual_infos.push_back({
 				starting_health_angle + 90 - empty_health_amount / 2,
-				to_wstring(int(health.value) == 0 ? 1 : int(health.value)),
+				to_string(int(health.value) == 0 ? 1 : int(health.value)),
 				health_col
 			});
 

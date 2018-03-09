@@ -285,12 +285,12 @@ int count_charges_inside(const const_inventory_slot_handle id) {
 	return charges;
 }
 
-std::wstring format_space_units(const unsigned u) {
+std::string format_space_units(const unsigned u) {
 	if (!u) {
-		return L"0";
+		return "0";
 	}
 
-	return to_wstring(u / double(SPACE_ATOMS_PER_UNIT), 2);
+	return to_string(u / double(SPACE_ATOMS_PER_UNIT), 2);
 }
 
 unsigned calc_space_occupied_with_children(const const_entity_handle item_entity) {

@@ -17,6 +17,8 @@
 #include "augs/window_framework/shell.h"
 #include "augs/window_framework/window.h"
 
+int ImTextCharFromUtf8(unsigned int* out_char, const char* in_text, const char* in_text_end);
+
 template <class T>
 auto freed_unique(T* const ptr) {
 	return std::unique_ptr<T, decltype(free)*>(ptr, free);
@@ -445,10 +447,13 @@ namespace augs {
 
 			if (XLookupString(&keyev, buf.data(), buf.size(), nullptr, nullptr)) {
 				if (get_current_settings().log_keystrokes) {
-					LOG("Ch press: %x", buf.data());
+					LOG("Ch press: %x, len: %x", buf.data(), strlen(buf.data()));
 				}
 				
-				ch.data.character.utf16 = buf[0];
+				unsigned int c = 0;
+				ImTextCharFromUtf8(&c, buf.begin(), buf.end());
+				ch.data.character.code_point = c;
+
 				output.push_back(ch);
 			}
 		};

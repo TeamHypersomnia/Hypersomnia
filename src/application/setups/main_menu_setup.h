@@ -37,7 +37,7 @@ namespace sol {
 }
 
 class main_menu_setup : public default_setup_settings {
-	std::shared_future<std::wstring> latest_news;
+	std::shared_future<std::string> latest_news;
 	vec2 latest_news_pos = { 0.f, 0.f };
 
 	intercosm intro;

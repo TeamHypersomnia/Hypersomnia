@@ -36,7 +36,7 @@ namespace augs {
 				focus_next_rect_by_arrows(e);
 			}
 
-			checklabel::checklabel(const checkbox& r, const std::wstring& label, const text::style& style_active, const text::style& style_inactive)
+			checklabel::checklabel(const checkbox& r, const std::string& label, const text::style& style_active, const text::style& style_inactive)
 				: checkbox(r) {
 				stretch_rc();
 				active_text.set_text(text::format(label, style_active));

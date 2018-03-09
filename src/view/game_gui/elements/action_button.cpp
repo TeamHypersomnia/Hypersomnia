@@ -152,7 +152,7 @@ void action_button::draw(
 						auto label_col = has_enough_mana ? border_col : white;
 						label_col.a = 255;
 
-						const auto label_text = formatted_string { key_to_wstring(bound_key), { gui_font, label_col } };
+						const auto label_text = formatted_string { key_to_string(bound_key), { gui_font, label_col } };
 						const auto label_bbox = get_text_bbox(label_text);
 
 						print_stroked(
@@ -185,7 +185,7 @@ void action_button::draw(
 			output.gui_box_center_tex(necessarys.at(border_tex), context, this_id, border_col);
 			
 			const auto label_text = formatted_string{
-				key_to_wstring(bound_key),
+				key_to_string(bound_key),
 				{ context.get_gui_font(), border_col }
 			};
 

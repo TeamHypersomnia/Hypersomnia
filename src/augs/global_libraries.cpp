@@ -37,7 +37,7 @@ namespace augs {
 		if(to_initialize.test(library::ENET)) {
 #if BUILD_ENET
 			const auto success = enet_initialize() == 0;
-			ensure(success && L"Failed to initialize enet");
+			ensure(success && "Failed to initialize enet");
 			initialized.set(library::ENET);
 #endif
 		}

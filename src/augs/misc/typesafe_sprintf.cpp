@@ -7,15 +7,11 @@
 
 TEST_CASE("Type-safe sprintf", "Several tests") {
 	REQUIRE("content/necessary/shaders/nice.vsh" == to_forward_slashes(typesafe_sprintf("%x/%x", augs::path_type("content/necessary/shaders"), "nice.vsh")));
-	REQUIRE(L"content/necessary/shaders/nice.vsh" == to_forward_slashes(typesafe_sprintf(L"%x/%x", augs::path_type(L"content/necessary/shaders"), L"nice.vsh")));
 
 	// corner cases
 	REQUIRE("%x%x%%%%f%c%ddasdfs" == typesafe_sprintf("%x%x%%%%f%c%ddasdfs"));
-	REQUIRE(L"%x%x%%%%f%c%ddasdfs" == typesafe_sprintf(L"%x%x%%%%f%c%ddasdfs"));
 	REQUIRE("2,3,%x" == typesafe_sprintf("%x,%x,%x", 2, 3));
-	REQUIRE(L"2,3,%x" == typesafe_sprintf(L"%x,%x,%x", 2, 3));
 	REQUIRE("2,3,5" == typesafe_sprintf("%x,%x,%x", 2, 3, 5, 7, 8, 6, 5, 435, 534, 324534, "nice"));
-	REQUIRE(L"2,3,5" == typesafe_sprintf(L"%x,%x,%x", 2, 3, 5, 7, 8, 6, 5, 435, 534, 324534, L"nice"));
 
 	REQUIRE("1,2,3:4" == typesafe_sprintf("%x,%x,%x:%x", 1, 2, 3, 4));
 	REQUIRE("abc,2,3:def" == typesafe_sprintf("%x,%x,%x:%x", "abc", 2, 3, "def"));

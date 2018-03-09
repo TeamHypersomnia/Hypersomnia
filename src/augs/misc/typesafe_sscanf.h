@@ -8,38 +8,36 @@
 #include "augs/ensure.h"
 #include "augs/templates/string_templates.h"
 
-template <typename CharType>
-bool typesafe_scanf_detail(
+inline bool typesafe_scanf_detail(
 	size_t source_pos,
 	size_t format_pos,
-	const std::basic_string<CharType>& source_string,
-	const std::basic_string<CharType>& format
+	const std::string& source_string,
+	const std::string& format
 ) {
 	return true;
 }
 
-template <typename CharType, typename T>
+template <typename T>
 void detail_typesafe_scanf_value(
-	std::basic_istringstream<CharType>& read_chunk,
+	std::istringstream& read_chunk,
 	T& into
 ) {
 	read_chunk >> into;
 }
 
-template <typename CharType>
-void detail_typesafe_scanf_value(
-	std::basic_istringstream<CharType>& read_chunk,
-	std::basic_string<CharType>& into
+inline void detail_typesafe_scanf_value(
+	std::istringstream& read_chunk,
+	std::string& into
 ) {
 	into = read_chunk.str();
 }
 
-template <typename CharType, typename T, typename... A>
+template <typename T, typename... A>
 bool typesafe_scanf_detail(
 	size_t source_pos,
 	size_t format_pos,
-	const std::basic_string<CharType>& source_string,
-	const std::basic_string<CharType>& format,
+	const std::string& source_string,
+	const std::string& format,
 	T& val,
 	A&... vals
 ) {
@@ -59,7 +57,7 @@ bool typesafe_scanf_detail(
 			{
 				/* if found_terminating is std::string::npos, we take the rest of the string */
 
-				std::basic_istringstream<CharType> read_chunk(
+				std::istringstream read_chunk(
 					source_string.substr(
 						value_beginning_at_source, 
 						found_terminating - value_beginning_at_source
@@ -82,7 +80,7 @@ bool typesafe_scanf_detail(
 		}
 		else {
 			{
-				std::basic_istringstream<CharType> read_chunk(
+				std::istringstream read_chunk(
 					source_string.substr(
 						value_beginning_at_source
 					)
@@ -104,32 +102,17 @@ bool typesafe_scanf_detail(
 	}
 }
 
-template<typename CharType, typename... A>
+template <typename... A>
 bool typesafe_sscanf(
-	const std::basic_string<CharType>& source_string,
-	const std::basic_string<CharType>& format,
-	A&... a
-) {
-	return typesafe_scanf_detail(
-		0,
-		0,
-		source_string, 
-		format, 
-		a...
-	);
-}
-
-template<typename C1, typename C2, typename... A>
-bool typesafe_sscanf(
-	const C1 source_string,
-	const C2 format,
+	const std::string& source_string,
+	const std::string& format,
 	A&... a
 ) {
 	return typesafe_scanf_detail(
 		0, 
 		0, 
-		std::basic_string<get_underlying_char_type_t<C1>>(source_string),
-		std::basic_string<get_underlying_char_type_t<C2>>(format),
+		source_string,
+		format,
 		a...
 	);
 }

@@ -89,7 +89,13 @@ namespace augs {
 					io.KeysDown[static_cast<int>(in.data.key.key)] = false;
 				}
 				else if (in.msg == message::character) {
-					io.AddInputCharacter(in.data.character.utf16);
+					const auto c = in.data.character.code_point;
+
+					// TODO:
+					// FIXME: Losing characters that don't fit in 2 bytes (imgui issue)
+					if (c < 0x10000) {
+						io.AddInputCharacter(c);
+					}
 				}
 
 				io.KeyCtrl = io.KeysDown[static_cast<int>(keys::key::LCTRL)] || io.KeysDown[static_cast<int>(keys::key::RCTRL)];
@@ -145,7 +151,7 @@ namespace augs {
 					io.KeysDown[static_cast<int>(in.data.key.key)] = false;
 				}
 				else if (in.msg == message::character) {
-					io.AddInputCharacter(in.data.character.utf16);
+					io.AddInputCharacter(in.data.character.code_point);
 				}
 			}
 

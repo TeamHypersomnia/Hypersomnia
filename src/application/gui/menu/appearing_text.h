@@ -15,11 +15,11 @@ using act = std::unique_ptr<augs::action>;
 struct appearing_text {
 	rgba_channel alpha = 0;
 
-	std::wstring text;
+	std::string text;
 
-	std::array<std::wstring, 2> target_text;
+	std::array<std::string, 2> target_text;
 
-	std::wstring get_total_target_text() const {
+	std::string get_total_target_text() const {
 		return target_text[0] + target_text[1];
 	}
 
@@ -46,14 +46,14 @@ struct appearing_text {
 		};
 
 		push(act(new augs::set_value_action<rgba_channel>(alpha, 255)));
-		push(act(new augs::set_value_action<std::wstring>(text, std::wstring())));
+		push(act(new augs::set_value_action<std::string>(text, std::string())));
 		push(act(new augs::set_value_action<bool>(caret_active, true)));
 
-		push(act(new augs::populate_with_delays<std::wstring>(text, target_text[0], population_interval * target_text[0].length(), population_variation, rng++)));
+		push(act(new augs::populate_with_delays<std::string>(text, target_text[0], population_interval * target_text[0].length(), population_variation, rng++)));
 
 		if (target_text[1].size() > 0) {
 			push(act(new augs::delay_action(1000.f)));
-			push(act(new augs::populate_with_delays<std::wstring>(text, target_text[1], population_interval * target_text[1].length(), population_variation, rng++)));
+			push(act(new augs::populate_with_delays<std::string>(text, target_text[1], population_interval * target_text[1].length(), population_variation, rng++)));
 		}
 
 		push(act(new augs::delay_action(1000.f)));

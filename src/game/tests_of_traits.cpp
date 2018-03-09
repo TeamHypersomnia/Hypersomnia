@@ -173,7 +173,6 @@ struct tests_of_traits {
 	static_assert(can_reserve_caches_v<physics_world_cache>);
 	static_assert(std::is_trivially_copyable_v<game_intent_type>);
 	static_assert(has_string_v<augs::path_type>);
-	static_assert(has_wstring_v<augs::path_type>);
 
 	static_assert(static_cast<int>(imguicol_helper::ImGuiCol_COUNT) == static_cast<int>(ImGuiCol_COUNT));
 
@@ -346,10 +345,7 @@ struct tests_of_traits {
 	static_assert(augs::has_custom_to_lua_value_v<augs::path_type>);
 	static_assert(augs::has_custom_to_lua_value_v<rgba>);
 	static_assert(augs::has_custom_to_lua_value_v<ImVec4>);
-	static_assert(augs::has_custom_to_lua_value_v<std::wstring>);
-	static_assert(augs::representable_as_lua_value_v<std::wstring>);
-	static_assert(augs::representable_as_lua_value_v<const std::wstring*>);
-	
+
 	static_assert(aligned_num_of_bytes_v<0, 4> == 0, "Trait is wrong");
 	static_assert(aligned_num_of_bytes_v<1, 4> == 4, "Trait is wrong");
 	static_assert(aligned_num_of_bytes_v<2, 4> == 4, "Trait is wrong");

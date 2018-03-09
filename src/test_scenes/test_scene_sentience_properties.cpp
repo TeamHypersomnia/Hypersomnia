@@ -23,11 +23,11 @@ void load_test_scene_sentience_properties(
 		d.common.associated_color = green_spell_color;
 		d.perk_duration_seconds = 33;
 
-		d.appearance.incantation = L"treximo";
+		d.appearance.incantation = "treximo";
 
-		d.appearance.name = L"[color=green]Haste[/color]";
+		d.appearance.name = "[color=green]Haste[/color]";
 		d.appearance.description = typesafe_sprintf(
-			L"[color=vsdarkgray]Increases movement speed for %x seconds.[/color]", 
+			"[color=vsdarkgray]Increases movement speed for %x seconds.[/color]", 
 			d.perk_duration_seconds
 		);
 
@@ -44,11 +44,11 @@ void load_test_scene_sentience_properties(
 		d.common.personal_electricity_required = 50;
 		d.common.associated_color = green;
 
-		d.appearance.incantation = L"efforia";
+		d.appearance.incantation = "efforia";
 
-		d.appearance.name = L"[color=green]Exaltation[/color]";
+		d.appearance.name = "[color=green]Exaltation[/color]";
 		d.appearance.description = typesafe_sprintf(
-			L"[color=vsdarkgray]Stabilizes functions of the physical body.[/color]"
+			"[color=vsdarkgray]Stabilizes functions of the physical body.[/color]"
 		);
 
 		d.appearance.icon = assets::game_image_id::SPELL_EXALTATION_ICON;
@@ -67,11 +67,11 @@ void load_test_scene_sentience_properties(
 		d.common.personal_electricity_required = 90;
 		d.common.associated_color = yellow;
 
-		d.appearance.incantation = L"armonia";
+		d.appearance.incantation = "armonia";
 
-		d.appearance.name = L"[color=yellow]Echoes of the higher realms[/color]";
+		d.appearance.name = "[color=yellow]Echoes of the higher realms[/color]";
 		d.appearance.description = typesafe_sprintf(
-			L"[color=vsdarkgray]Restores resonance of mind with the body.[/color]"
+			"[color=vsdarkgray]Restores resonance of mind with the body.[/color]"
 		);
 
 		d.appearance.icon = assets::game_image_id::SPELL_ECHOES_OF_THE_HIGHER_REALMS_ICON;
@@ -90,11 +90,11 @@ void load_test_scene_sentience_properties(
 		d.common.personal_electricity_required = 100;
 		d.common.associated_color = blue_spell_border;
 
-		d.appearance.incantation = L"mania aiones";
+		d.appearance.incantation = "mania aiones";
 
-		d.appearance.name = L"[color=cyan]Fury of the Aeons[/color]";
+		d.appearance.name = "[color=cyan]Fury of the Aeons[/color]";
 		d.appearance.description = typesafe_sprintf(
-			L"[color=vsdarkgray]Causes instant damage around the caster.[/color]"
+			"[color=vsdarkgray]Causes instant damage around the caster.[/color]"
 		);
 
 		d.appearance.icon = assets::game_image_id::SPELL_FURY_OF_THE_AEONS_ICON;
@@ -123,11 +123,11 @@ void load_test_scene_sentience_properties(
 		d.common.personal_electricity_required = 120;
 		d.common.associated_color = blue_spell_border;
 
-		d.appearance.incantation = L"energeia triada";
+		d.appearance.incantation = "energeia triada";
 
-		d.appearance.name = L"[color=cyan]Electric Triad[/color]";
+		d.appearance.name = "[color=cyan]Electric Triad[/color]";
 		d.appearance.description = typesafe_sprintf(
-			L"[color=vsdarkgray]Spawns three electric missiles\nhoming towards hostile entities.[/color]"
+			"[color=vsdarkgray]Spawns three electric missiles\nhoming towards hostile entities.[/color]"
 		);
 
 		d.appearance.icon = assets::game_image_id::SPELL_ELECTRIC_TRIAD_ICON;
@@ -143,11 +143,11 @@ void load_test_scene_sentience_properties(
 		d.common.personal_electricity_required = 260;
 		d.common.associated_color = blue_spell_border;
 
-		d.appearance.incantation = L"megalyteri aiones via";
+		d.appearance.incantation = "megalyteri aiones via";
 
-		d.appearance.name = L"[color=cyan]Ultimate Wrath of the Aeons[/color]";
+		d.appearance.name = "[color=cyan]Ultimate Wrath of the Aeons[/color]";
 		d.appearance.description = typesafe_sprintf(
-			L"[color=vsdarkgray]Causes massive damage around the caster.\nRequires delay to initiate.[/color]"
+			"[color=vsdarkgray]Causes massive damage around the caster.\nRequires delay to initiate.[/color]"
 		);
 
 		d.appearance.icon = assets::game_image_id::SPELL_ULTIMATE_WRATH_OF_THE_AEONS_ICON;
@@ -203,11 +203,11 @@ void load_test_scene_sentience_properties(
 		d.common.personal_electricity_required = 50;
 		d.common.associated_color = turqoise_spell_color;
 
-		d.appearance.incantation = L"energeia aspida";
+		d.appearance.incantation = "energeia aspida";
 
-		d.appearance.name = L"[color=turquoise]Electric Shield[/color]";
+		d.appearance.name = "[color=turquoise]Electric Shield[/color]";
 		d.appearance.description = typesafe_sprintf(
-			L"[color=vsdarkgray]For %x seconds, damage is absorbed\nby [/color][color=cyan]Personal Electricity[/color][color=vsdarkgray] instead of [/color][color=red]Health[/color][color=vsdarkgray].[/color]",
+			"[color=vsdarkgray]For %x seconds, damage is absorbed\nby [/color][color=cyan]Personal Electricity[/color][color=vsdarkgray] instead of [/color][color=red]Health[/color][color=vsdarkgray].[/color]",
 			d.perk_duration_seconds
 		);
 
@@ -220,14 +220,14 @@ void load_test_scene_sentience_properties(
 
 	{
 		auto& p = std::get<electric_shield_perk>(perks);
-		p.appearance.description = L"[color=turquoise]Electric shield[/color]\n[color=vsdarkgray]Damage is absorbed by [/color][color=cyan]Personal Electricity[/color][color=vsdarkgray] instead of [/color][color=red]Health[/color][color=vsdarkgray].[/color]";
+		p.appearance.description = "[color=turquoise]Electric shield[/color]\n[color=vsdarkgray]Damage is absorbed by [/color][color=cyan]Personal Electricity[/color][color=vsdarkgray] instead of [/color][color=red]Health[/color][color=vsdarkgray].[/color]";
 		p.appearance.icon = assets::game_image_id::PERK_ELECTRIC_SHIELD_ICON;
 		p.appearance.bar_color = turquoise - rgba(30, 30, 30, 0);
 	}
 
 	{
 		auto& p = std::get<haste_perk>(perks);
-		p.appearance.description = L"[color=green]Haste[/color]\n[color=vsdarkgray]You move faster.[/color]";
+		p.appearance.description = "[color=green]Haste[/color]\n[color=vsdarkgray]You move faster.[/color]";
 		p.appearance.icon = assets::game_image_id::PERK_HASTE_ICON;
 		p.appearance.bar_color = green - rgba(30, 30, 30, 0);
 	}
@@ -235,7 +235,7 @@ void load_test_scene_sentience_properties(
 	{
 		auto& m = std::get<health_meter>(meters);
 
-		m.appearance.description = L"[color=red]Health points:[/color] %x/%x\n[color=vsdarkgray]Stability of the physical body.[/color]";
+		m.appearance.description = "[color=red]Health points:[/color] %x/%x\n[color=vsdarkgray]Stability of the physical body.[/color]";
 		m.appearance.icon = assets::game_image_id::HEALTH_ICON;
 		m.appearance.bar_color = red - rgba(30, 30, 30, 0);
 	}
@@ -243,7 +243,7 @@ void load_test_scene_sentience_properties(
 	{
 		auto& m = std::get<personal_electricity_meter>(meters);
 
-		m.appearance.description = L"[color=cyan]Personal electricity:[/color] %x/%x\n[color=vsdarkgray]Mind-programmable matter.[/color]";
+		m.appearance.description = "[color=cyan]Personal electricity:[/color] %x/%x\n[color=vsdarkgray]Mind-programmable matter.[/color]";
 		m.appearance.icon = assets::game_image_id::PERSONAL_ELECTRICITY_ICON;
 		m.appearance.bar_color = cyan - rgba(30, 30, 30, 0);
 	}
@@ -251,7 +251,7 @@ void load_test_scene_sentience_properties(
 	{
 		auto& m = std::get<consciousness_meter>(meters);
 
-		m.appearance.description = L"[color=orange]Consciousness:[/color] %x/%x\n[color=vsdarkgray]Attunement of soul with the body.[/color]";
+		m.appearance.description = "[color=orange]Consciousness:[/color] %x/%x\n[color=vsdarkgray]Attunement of soul with the body.[/color]";
 		m.appearance.icon = assets::game_image_id::CONSCIOUSNESS_ICON;
 		m.appearance.bar_color = orange - rgba(30, 30, 30, 0);
 	}

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <clocale>
 
 #if PLATFORM_UNIX
 #include <csignal>
@@ -76,6 +77,7 @@ int main(const int argc, const char* const * const argv) {
 #else
 #error "Unsupported platform!"
 #endif
+	std::setlocale(LC_ALL, "");
 
 	if (cmd_line_params(argc, argv).help_only) {
 		std::cout << help_contents << std::endl;

@@ -2,10 +2,12 @@
 #include <unordered_map>
 #include "augs/math/vec2.h"
 #include "augs/templates/exception_templates.h"
+#include "augs/templates/container_templates.h"
 #include "augs/misc/simple_pair.h"
 #include "augs/filesystem/path.h"
 #include "augs/image/image.h"
 #include "augs/texture_atlas/texture_atlas_entry.h"
+#include "augs/utf32_point.h"
 
 #if BUILD_FREETYPE
 struct FT_Glyph_Metrics_;
@@ -24,7 +26,7 @@ namespace augs {
 		int bear_y = 0;
 		unsigned index = 0xdeadbeef;
 
-		std::vector<augs::simple_pair<wchar_t, short>> kerning;
+		std::vector<augs::simple_pair<unsigned, short>> kerning;
 		// END GEN INTROSPECTOR
 
 		font_glyph_metadata() = default;
@@ -56,7 +58,7 @@ namespace augs {
 		// GEN INTROSPECTOR struct augs::stored_font_metadata
 		font_metrics metrics;
 		font_settings settings;
-		std::unordered_map<wchar_t, font_glyph_metadata> glyphs_by_unicode;
+		std::unordered_map<utf32_point, font_glyph_metadata> glyphs_by_code_point;
 		// END GEN INTROSPECTOR
 	};
 
@@ -76,8 +78,7 @@ namespace augs {
 		font_metrics metrics;
 		font_settings settings;
 
-		static constexpr auto glyph_count = static_cast<std::size_t>(std::numeric_limits<unsigned short>::max()) + 1;
-		std::array<internal_glyph, glyph_count> glyphs;
+		std::unordered_map<utf32_point, internal_glyph> glyphs;
 
 		/* 
 			Enforce mindful lifetime management. 
@@ -92,7 +93,7 @@ namespace augs {
 			metrics = store.meta.metrics;
 			settings = store.meta.settings;
 
-			for (const auto& g : store.meta.glyphs_by_unicode) {
+			for (const auto& g : store.meta.glyphs_by_code_point) {
 				auto& out_g = glyphs[g.first];
 
 				out_g.meta = g.second;
@@ -100,14 +101,8 @@ namespace augs {
 			}
 		}
 
-		const internal_glyph* get_glyph(const wchar_t unicode_id) const {
-			auto& g = glyphs[unicode_id];
-
-			if (g.meta.index == 0xdeadbeef) {
-				return nullptr;
-			}
-
-			return &g;
+		const internal_glyph* find_glyph(const utf32_point code_point) const {
+			return mapped_or_nullptr(glyphs, code_point);
 		}
 	};
 

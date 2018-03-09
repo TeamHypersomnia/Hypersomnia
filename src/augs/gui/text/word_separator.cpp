@@ -3,11 +3,11 @@
 namespace augs {
 	namespace gui {
 		namespace text {
-			bool word_separator::default_is_newline(wchar_t i) {
+			bool word_separator::default_is_newline(char i) {
 				return (i == 0x000A || i == 0x000D);
 			}
 
-			int word_separator::default_word_type(wchar_t c) {
+			int word_separator::default_word_type(char c) {
 				if (iswspace(c)) return 0;
 				else if (iswalnum(c)) return 1;
 				else if (iswpunct(c)) return 2;
@@ -19,7 +19,7 @@ namespace augs {
 				is_character_newline = default_is_newline;
 			}
 
-			word_separator::word_separator(int(*word_type)(wchar_t)) : word_type(word_type) {
+			word_separator::word_separator(int(*word_type)(char)) : word_type(word_type) {
 				if (word_type == 0) set_default();
 			}
 
@@ -35,7 +35,7 @@ namespace augs {
 				if (max_left == -1) max_left = 0;
 				if (_str.empty() || at <= int(max_left)) return 0;
 
-				unsigned result = get_left_word(_str, at, max_left, word_type(_str[at ? at - 1 : 0].unicode));
+				unsigned result = get_left_word(_str, at, max_left, word_type(_str[at ? at - 1 : 0].utf8_unit));
 				return result == 0 ?
 					1 /* newline encountered */
 					: result;
@@ -45,7 +45,7 @@ namespace augs {
 				if (max_right == -1) max_right = static_cast<int>(_str.size());
 				if (_str.empty() || at >= int(max_right)) return 0;
 
-				unsigned result = get_right_word(_str, at, max_right, word_type(_str[at].unicode));
+				unsigned result = get_right_word(_str, at, max_right, word_type(_str[at].utf8_unit));
 				return result == 0 ?
 					1 /* newline encountered */
 					: result;
@@ -57,7 +57,7 @@ namespace augs {
 
 				unsigned offset = 0;
 				while (at > max_left) {
-					if (!is_character_newline(_str[at ? at - 1 : 0].unicode) && word_type(_str[at ? at - 1 : 0].unicode) == wordtype) {
+					if (!is_character_newline(_str[at ? at - 1 : 0].utf8_unit) && word_type(_str[at ? at - 1 : 0].utf8_unit) == wordtype) {
 						++offset;
 						--at;
 					}
@@ -73,7 +73,7 @@ namespace augs {
 
 				unsigned offset = 0;
 				while (at < max_right) {
-					if (!is_character_newline(_str[at].unicode) && word_type(_str[at].unicode) == wordtype) {
+					if (!is_character_newline(_str[at].utf8_unit) && word_type(_str[at].utf8_unit) == wordtype) {
 						++offset;
 						++at;
 					}

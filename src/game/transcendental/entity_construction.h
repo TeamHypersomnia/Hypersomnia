@@ -34,8 +34,6 @@ void construct_post_inference(const handle_type h) {
 	}
 }
 
-std::string to_string(const std::wstring& val);
-
 template <class handle_type>
 void emit_warnings(const handle_type h) {
 	if (const auto sprite = h.template find<invariants::sprite>()) {
