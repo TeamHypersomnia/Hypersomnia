@@ -9,8 +9,7 @@
 #include "game/transcendental/entity_flavour_id.h"
 #include "game/organization/all_component_includes.h"
 #include "game/organization/all_entity_types_declaration.h"
-
-using entity_description_type = entity_name_type;
+#include "game/common_state/entity_name_type.h"
 
 template <class entity_type>
 class entity_flavour {
