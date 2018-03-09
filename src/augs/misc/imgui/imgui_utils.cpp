@@ -2,7 +2,10 @@
 
 #include <imgui/imgui_internal.h>
 
+#include "augs/filesystem/file.h"
+
 #include "augs/image/image.h"
+#include "augs/image/font.h"
 #include "augs/graphics/texture.h"
 #include "augs/window_framework/window.h"
 
@@ -193,21 +196,55 @@ namespace augs {
 			}
 		}
 		
-		image create_atlas_image() {
+		image create_atlas_image(const font_loading_input& in) {
 			auto& io = GetIO();
 
 			unsigned char* pixels = nullptr;
 			int width = 0;
 			int height = 0;
 
+			std::vector<ImWchar> ranges;
+
+			{
+				auto unicode_ranges = in.unicode_ranges;
+
+				if (in.add_japanese_ranges) {
+					concat_ranges(unicode_ranges, ImGui::GetIO().Fonts->GetGlyphRangesJapanese());
+				}
+
+				for (const auto& r : unicode_ranges) {
+					ranges.push_back(r.first);
+					ranges.push_back(r.second);
+				}
+
+				ranges.push_back(0);
+			}
+
+#if TODO_MANY_FONTS
+			io.Fonts->AddFontDefault();
+
+			ImFontConfig config;
+			config.MergeMode = true;
+#endif
+
+			if (!augs::exists(in.source_font_path)) {
+				throw imgui_init_error("Failed to load %x for reading.", augs::to_display_path(in.source_font_path));
+			}
+
+			const auto str_path = in.source_font_path.string();
+
+			io.Fonts->AddFontFromFileTTF(str_path.c_str(), in.size_in_pixels, nullptr, ranges.data());
 			io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
+
+			LOG("IMGUI FONT ATLAS SIZE: %xx%x", width, height);
+
 			io.Fonts->TexID = reinterpret_cast<void*>(0);
 
 			return { pixels, 4, 0, vec2i{ width, height } };
 		}
 
-		graphics::texture create_atlas() {
-			return create_atlas_image();
+		graphics::texture create_atlas(const font_loading_input& in) {
+			return create_atlas_image(in);
 		}
 
 		bool is_hovered_with_hand_cursor() {

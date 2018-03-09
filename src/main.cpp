@@ -198,7 +198,7 @@ int work(const int argc, const char* const * const argv) try {
 		config.content_regeneration.regenerate_every_launch
 	);
 	
-	static const auto imgui_atlas = augs::imgui::create_atlas();
+	static const auto imgui_atlas = augs::imgui::create_atlas(config.gui_font);
 
 	static const configuration_subscribers configurables {
 		window,
@@ -251,6 +251,7 @@ int work(const int argc, const char* const * const argv) try {
 		return *gui_font;
 	};
 #endif
+	static augs::font_loading_input loaded_gui_font;
 	
 	static std::optional<augs::graphics::texture> game_world_atlas;
 
@@ -364,6 +365,10 @@ int work(const int argc, const char* const * const argv) try {
 				/* Otherwise it's already taken care of */
 			}
 
+			if (!(config.gui_font == loaded_gui_font)) {
+				new_atlas_required = true;
+			}
+
 			if (new_atlas_required) {
 				const auto settings = config.content_regeneration;
 
@@ -385,6 +390,8 @@ int work(const int argc, const char* const * const argv) try {
 					necessary_atlas_entries,
 					get_gui_font()
 				}));
+
+				loaded_gui_font = config.gui_font;
 			}
 		}
 
@@ -1726,6 +1733,10 @@ int work(const int argc, const char* const * const argv) try {
 }
 catch (const config_read_error err) {
 	LOG("Failed to read the initial config for the game!\n%x", err.what());
+	return EXIT_FAILURE;
+}
+catch (const augs::imgui_init_error err) {
+	LOG("Failed init imgui:\n%x", err.what());
 	return EXIT_FAILURE;
 }
 catch (const augs::audio_error& err) {

@@ -8,17 +8,17 @@
 
 #include "application/setups/editor/gui/editor_properties_gui.h"
 
+using namespace augs::imgui;
+
+static auto details_text = [](const auto& tx){
+	ImGui::NextColumn();
+	text(tx);
+	ImGui::NextColumn();
+};
+
 template <class T>
 void edit_properties_of(T& object, const editor_command_input in) {
-	using namespace augs::imgui;
-
 	auto& history = in.folder.history;
-
-	auto details_text = [](const auto& tx){
-		ImGui::NextColumn();
-		text(tx);
-		ImGui::NextColumn();
-	};
 
 	augs::introspect(
 		[&](const std::string& label, auto& member) {
@@ -29,12 +29,6 @@ void edit_properties_of(T& object, const editor_command_input in) {
 				return;	
 			}
 			else if constexpr(std::is_same_v<M, std::string>) {
-				input_text<256>(
-					label,
-					member
-				);
-
-				details_text(get_type_name<M>());
 			}
 			else if constexpr(is_container_v<M>) {
 
@@ -69,7 +63,12 @@ void edit_flavour(
 	entity_flavour<E>& object,
    	const editor_command_input in
 ) {
-
+	input_text<256>("Name", object.name);
+	ImGui::NextColumn();
+	ImGui::NextColumn();
+	input_multiline_text<256>("Description", object.description, 4);
+	ImGui::NextColumn();
+	ImGui::NextColumn();
 }
 
 void editor_all_entities_gui::open() {
@@ -135,7 +134,7 @@ void editor_all_entities_gui::perform(const editor_command_input in) {
 
 							if (f_node) {
 								ImGui::Separator();
-								edit_properties_of(flavour, in);
+								edit_flavour(flavour, in);
 								ImGui::Separator();
 
 								for (const auto& e : all_having_flavour) {

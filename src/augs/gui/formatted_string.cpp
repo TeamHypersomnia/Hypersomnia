@@ -5,9 +5,38 @@
 
 #include "augs/gui/formatted_string.h"
 
+int ImTextCharFromUtf8(unsigned int* out_char, const char* in_text, const char* in_text_end);
+
 namespace augs {
 	namespace gui {
 		namespace text {
+			formatted_utf32_string::formatted_utf32_string(const formatted_string& utf8) {
+				thread_local std::string s;
+			   	s = utf8.operator std::string();
+				reserve(s.size());
+
+				static_assert(sizeof(unsigned int) == sizeof(utf32_point));
+
+				auto in_text = s.data();
+				auto in_text_end = s.data() + s.size();
+
+				std::size_t color_idx = 0;
+
+				while ((!in_text_end || in_text < in_text_end) && *in_text)
+				{
+					utf32_point c = 0xdeadbeef;
+
+					const auto eaten = ImTextCharFromUtf8(&c, in_text, in_text_end);
+					in_text += eaten;
+
+					if (c == 0)
+					break;
+
+					push_back({ utf8[color_idx].format, c});
+					color_idx += eaten;
+				}
+			}
+
 			formatted_string format_recent_program_log(
 				const baked_font& f,
 				std::size_t lines_remaining
@@ -31,11 +60,13 @@ namespace augs {
 			formatted_string::operator std::string() const {
 				const auto l = size();
 				
-				std::string out;
+				thread_local std::string out;
+				out.clear();
+
 				out.reserve(l);
 
 				for (const auto& c : *this) {
-					out += c.utf8_unit;
+					out += c.utf_unit;
 				}
 
 				return out;
@@ -79,17 +110,17 @@ namespace augs {
 
 			formatted_char::formatted_char(
 				const style format,
-				const char utf8_unit
+				const char utf_unit
 			) : 
 				format(format), 
-				utf8_unit(utf8_unit) 
+				utf_unit(utf_unit) 
 			{}
 
 			void formatted_char::set(
 				const char code,
 				const style _format
 			) {
-				utf8_unit = code;
+				utf_unit = code;
 				set_format(_format);
 			}
 
@@ -106,7 +137,7 @@ namespace augs {
 			}
 
 			bool formatted_char::operator==(const formatted_char& second) const {
-				return utf8_unit == second.utf8_unit && format == second.format;
+				return utf_unit == second.utf_unit && format == second.format;
 			}
 
 			style::style(
@@ -118,6 +149,9 @@ namespace augs {
 			{}
 
 			style::style(const formatted_char& c) : style(c.format)
+			{}
+
+			style::style(const formatted_utf32_char& c) : style(c.format)
 			{}
 
 			style::operator formatted_char() {

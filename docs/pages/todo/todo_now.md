@@ -7,7 +7,8 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
-- fix std::array<internal_glyph, glyph_count> glyphs;
+- fix saving of the camera
+- implement unicode code points in printer/drafter
 
 - generalize editor_tab_gui to be also able to handle the entities/flavours windows
 - implement ctrl+tab for tabs, either in settings or anywhere. It should just handle the current window

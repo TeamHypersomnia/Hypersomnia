@@ -278,3 +278,5 @@ we consider whole type overrides too complex architeciturally:
 - text_color and relevant text_disabled
 - simple commands for filling
 
+- fix std::array<internal_glyph, glyph_count> glyphs;
+

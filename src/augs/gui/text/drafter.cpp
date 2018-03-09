@@ -9,12 +9,12 @@
 namespace augs {
 	namespace gui {
 		namespace text {
-			const baked_font& drafter::getf(const gui::text::formatted_string& source, const unsigned i) const {
+			const baked_font& drafter::getf(const gui::text::formatted_utf32_string& source, const unsigned i) const {
 				//return (i < source.length() && source[i].format.font) ? source[i].format.font : target_caret->default_style.f;
 				return *source[i].format.font;
 			}
 
-			int drafter::get_kern(const gui::text::formatted_string& source, const unsigned i, const unsigned l) const {
+			int drafter::get_kern(const gui::text::formatted_utf32_string& source, const unsigned i, const unsigned l) const {
 				if (kerning && i > lines[l].begin) {
 					auto* f1 = &getf(source, i);
 					auto* f2 = &getf(source, i - 1);
@@ -23,7 +23,7 @@ namespace augs {
 						auto& vk = get_cached(i).kerning;
 						
 						for (unsigned k = 0; k < vk.size(); ++k) {
-							if (vk[k].first == source[i - 1].utf8_unit) {
+							if (vk[k].first == source[i - 1].utf_unit) {
 								return vk[k].second;
 							}
 						}
@@ -37,7 +37,7 @@ namespace augs {
 				return (cached.at(i) == nullptr) ? default_glyph : cached[i]->meta;
 			}
 
-			void drafter::find_ascdesc(const gui::text::formatted_string& in, const int l, const int r, int& asc, int& desc) const {
+			void drafter::find_ascdesc(const gui::text::formatted_utf32_string& in, const int l, const int r, int& asc, int& desc) const {
 				if (l == r) {
 					if (l > 0) {
 						asc = getf(in, l - 1).metrics.ascender;
@@ -179,7 +179,10 @@ namespace augs {
 				max_x = 0;
 			}
 
-			void drafter::draw(const formatted_string& source) {
+			void drafter::draw(const formatted_string& source_utf8) {
+				cached_str = source_utf8;
+				const auto& source = cached_str;
+
 				clear();
 
 				/* we have nothing to draw */
@@ -194,7 +197,7 @@ namespace augs {
 				for (unsigned i = 0; i < source.size(); ++i) {
 					const auto& ff = getf(source, i);
 
-					const auto* const g = ff.find_glyph(password_mode ? password_character : source[i].utf8_unit);
+					const auto* const g = ff.find_glyph(password_mode ? password_character : source[i].utf_unit);
 
 					/* if we allowed a null glyph in string, it must be newline */
 					const auto* const final_ptr = g ? g : ff.find_glyph(' ');
@@ -219,7 +222,7 @@ namespace augs {
 
 					/* if we have just encountered a newline character or there is need to wrap, we have to break the current line and
 					create another */
-					if (augs::is_character_newline(source[i].utf8_unit) || wrap) {
+					if (augs::is_character_newline(source[i].utf_unit) || wrap) {
 						/* take care of the current line */
 						lines[l].wrapped = wrap;
 						/* this will be moved left if we're wrapping */

@@ -19,6 +19,18 @@
 #include "augs/readwrite/lua_readwrite_overload_traits.h"
 #include "augs/readwrite/lua_traits.h"
 
+template <typename T>
+struct is_pair : std::false_type {};
+
+template <typename T1, typename T2>
+struct is_pair<std::pair<T1, T2>> : std::true_type {};
+
+template <typename T1, typename T2>
+struct is_pair<augs::simple_pair<T1, T2>> : std::true_type {};
+
+template <typename T>
+static constexpr bool is_pair_v = is_pair<T>::value;
+
 namespace augs {
 	template <class... T>
 	inline const char* get_variant_type_label(T&&...) {
@@ -194,6 +206,15 @@ namespace augs {
 					}
 				}
 			}
+			else if constexpr(is_pair_v<Serialized>) {
+				sol::object maybe_first = input_table[1];
+				sol::object maybe_second = input_table[2];
+
+				if (maybe_first.valid() && maybe_second.valid()) {
+					read_lua(maybe_first, into.first);
+					read_lua(maybe_second, into.second);
+				}
+			}
 			else {
 				introspect(
 					[input_table](const auto label, auto& field) {
@@ -352,6 +373,10 @@ namespace augs {
 					++counter;
 				}
 			}
+		}
+		else if constexpr(is_pair_v<Serialized>) {
+			write_table_or_field(output_table, from.first, 1);
+			write_table_or_field(output_table, from.second, 2);
 		}
 		else {
 			introspect(

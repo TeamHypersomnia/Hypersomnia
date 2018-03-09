@@ -273,6 +273,12 @@ void settings_gui_state::perform(
 				break;
 			}
 			case settings_pane::GUI_STYLES: {
+				if (auto node = scoped_tree_node("GUI font")) {
+					auto scope = scoped_indent();
+
+					revertable_slider("Size in pixels", config.gui_font.size_in_pixels, 5.f, 30.f);
+				}
+
 				text(
 					"Note: this is the original ImGui style tweaker.\n"
 					"It is used because imgui is being continuously improved,\n"
@@ -289,6 +295,8 @@ void settings_gui_state::perform(
 				break;
 			}
 			case settings_pane::DEBUG: {
+				text(u8"Test: いい товарищ żółćńźś");
+
 				revertable_checkbox("Show developer console", config.session.show_developer_console);
 				revertable_checkbox("Log keystrokes", config.window.log_keystrokes);
 				revertable_slider("Camera query aabb mult", config.session.camera_query_aabb_mult, 0.10f, 5.f);

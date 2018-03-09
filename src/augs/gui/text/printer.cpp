@@ -25,10 +25,11 @@ namespace augs {
 				const drawer_with_default out,
 				const vec2i pos,
 				const drafter& d,
-				const formatted_string& colors,
 				const caret_info caret,
 				const ltrbi clipper
 			) const {
+				const auto& colors = d.cached_str;
+
 				auto& lines = d.lines;
 				auto& sectors = d.sectors;
 				const bool clip = clipper.good();
@@ -179,9 +180,9 @@ namespace augs {
 				const drawer out,
 				const vec2i pos,
 				const drafter& d,
-				const formatted_string& colors,
 				const ltrbi clipper
 			) const {
+				const auto& colors = d.cached_str;
 				auto& lines = d.lines;
 				auto& sectors = d.sectors;
 				const bool clip = clipper.good();
@@ -252,7 +253,7 @@ namespace augs {
 				draft.kerning = use_kerning;
 
 				draft.draw(str);
-				print.draw_text(out, pos, draft, str, clipper);
+				print.draw_text(out, pos, draft, clipper);
 				
 				return draft.get_bbox();
 			}
@@ -280,12 +281,19 @@ namespace augs {
 					c.set_color(stroke_color);
 				}
 
-				print.draw_text(out, pos + vec2i(-1, 0), draft, coloured_str, clipper);
-				print.draw_text(out, pos + vec2i(1, 0), draft, coloured_str, clipper);
-				print.draw_text(out, pos + vec2i(0, -1), draft, coloured_str, clipper);
-				print.draw_text(out, pos + vec2i(0, 1), draft, coloured_str, clipper);
+				thread_local formatted_utf32_string prev;
+				prev = draft.cached_str;
 
-				print.draw_text(out, pos, draft, str, clipper);
+				draft.cached_str = coloured_str;
+
+				print.draw_text(out, pos + vec2i(-1, 0), draft, clipper);
+				print.draw_text(out, pos + vec2i(1, 0), draft, clipper);
+				print.draw_text(out, pos + vec2i(0, -1), draft, clipper);
+				print.draw_text(out, pos + vec2i(0, 1), draft, clipper);
+
+				draft.cached_str = prev;
+
+				print.draw_text(out, pos, draft, clipper);
 
 				return draft.get_bbox() + vec2i(2, 2);
 			}
@@ -306,7 +314,7 @@ namespace augs {
 				draft.kerning = use_kerning;
 
 				draft.draw(str);
-				print.draw_text(out, pos, draft, str, caret, clipper);
+				print.draw_text(out, pos, draft, caret, clipper);
 
 				return draft.get_bbox();
 			}
@@ -335,12 +343,19 @@ namespace augs {
 					c.set_color(stroke_color);
 				}
 
-				print.draw_text(out, pos + vec2i(-1, 0), draft, coloured_str, caret, clipper);
-				print.draw_text(out, pos + vec2i(1, 0), draft, coloured_str, caret, clipper);
-				print.draw_text(out, pos + vec2i(0, -1), draft, coloured_str, caret, clipper);
-				print.draw_text(out, pos + vec2i(0, 1), draft, coloured_str, caret, clipper);
+				thread_local formatted_utf32_string prev;
+				prev = draft.cached_str;
 
-				print.draw_text(out, pos, draft, str, caret, clipper);
+				draft.cached_str = coloured_str;
+
+				print.draw_text(out, pos + vec2i(-1, 0), draft, caret, clipper);
+				print.draw_text(out, pos + vec2i(1, 0), draft, caret, clipper);
+				print.draw_text(out, pos + vec2i(0, -1), draft, caret, clipper);
+				print.draw_text(out, pos + vec2i(0, 1), draft, caret, clipper);
+
+				draft.cached_str = prev;
+
+				print.draw_text(out, pos, draft, caret, clipper);
 
 				return draft.get_bbox() + vec2i(2, 2);
 			}

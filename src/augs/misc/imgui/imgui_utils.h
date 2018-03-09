@@ -3,23 +3,36 @@
 
 #include "augs/templates/container_templates.h"
 #include "augs/misc/machine_entropy.h"
+#include "augs/templates/exception_templates.h"
 
 namespace augs {
 	class image;
+	struct font_loading_input;
+
+	struct imgui_init_error : error_with_typesafe_sprintf {
+		using error_with_typesafe_sprintf::error_with_typesafe_sprintf;
+	};
 
 	namespace graphics {
 		class texture;
 	}
 
 	namespace imgui {
+		template <class C, class R>
+		void concat_ranges(R& ranges, const C* const ranges_array) {
+			for (auto* p = ranges_array; *p; p += 2) {
+				ranges.push_back({ p[0], p[1] });
+			}
+		}
+
 		void init(
 			const char* const ini_filename,
 			const char* const log_filename,
 			const ImGuiStyle& initial_style
 		);
 
-		image create_atlas_image();
-		graphics::texture create_atlas();
+		image create_atlas_image(const font_loading_input&);
+		graphics::texture create_atlas(const font_loading_input&);
 
 		void setup_input(
 			local_entropy& window_inputs,

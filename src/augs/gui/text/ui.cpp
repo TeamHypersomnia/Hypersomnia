@@ -184,7 +184,7 @@ namespace augs {
 				formatted_string s;
 
 				for (size_t i = 0; i < ss.length(); ++i)
-					if (is_valid_glyph(ss[i]) && is_whitelisted(ss[i].utf8_unit) && !is_blacklisted(ss[i].utf8_unit)) s += ss[i];
+					if (is_valid_glyph(ss[i]) && is_whitelisted(ss[i].utf_unit) && !is_blacklisted(ss[i].utf_unit)) s += ss[i];
 
 				if (max_characters > 0) {
 					size_t newlen = get_str().size() + s.size() - std::abs(caret.selection_offset);
@@ -209,14 +209,14 @@ namespace augs {
 
 			void ui::character(const char& cc) {
 				formatted_char ch = get_current_style();
-				ch.utf8_unit = cc;
+				ch.utf_unit = cc;
 				character(ch);
 				unbind_styles();
 				set_needs_redraw();
 			}
 
 			void ui::character(const formatted_char& ch) {
-				if (!is_valid_glyph(ch) || !is_whitelisted(ch.utf8_unit) || is_blacklisted(ch.utf8_unit) || (max_characters > 0 && get_str().size() + 1 - std::abs(caret.selection_offset) > max_characters)) return;
+				if (!is_valid_glyph(ch) || !is_whitelisted(ch.utf_unit) || is_blacklisted(ch.utf_unit) || (max_characters > 0 && get_str().size() + 1 - std::abs(caret.selection_offset) > max_characters)) return;
 
 				if (caret.selection_offset) {
 					edit.action(action(*this, get_left_selection(), ch, get_str().substr(get_left_selection(), get_right_selection() - get_left_selection())));
@@ -289,7 +289,7 @@ namespace augs {
 				if (get_str().empty()) return;
 
 				int left = 0, right = 0;
-				auto chr = get_str()[std::min<unsigned long>(at, get_str().length() - 1)].utf8_unit;
+				auto chr = get_str()[std::min<unsigned long>(at, get_str().length() - 1)].utf_unit;
 
 				if (at >= get_str().length() || separator.is_character_newline(chr))
 					left = separator.get_left_word(get_str(), at);
@@ -439,7 +439,7 @@ namespace augs {
 			}
 
 			bool ui::action::include(const action& next) {
-				if ((flag == CHARACTERS || flag == REPLACE_CHARACTERS) && next.flag == CHARACTERS && !subject->separator.is_character_newline(next.character.utf8_unit)
+				if ((flag == CHARACTERS || flag == REPLACE_CHARACTERS) && next.flag == CHARACTERS && !subject->separator.is_character_newline(next.character.utf_unit)
 					&& next.where == where + _str.length() + 1 /* we don't want to merge characters at different positions */
 					) {
 					_str += next.character;
@@ -561,8 +561,8 @@ namespace augs {
 					/* if we want to have newlines, we need a whitespace glyph added to the end of every line
 						similiarly with tabs, we want to replace them with spaces
 					*/
-					(iswspace(c.utf8_unit) && get_all_assets()[c.format.font].meta_from_file.find_glyph(' ') != nullptr)
-					|| allow_unknown_characters_as_default || get_all_assets()[c.format.font].meta_from_file.find_glyph(c.utf8_unit) != nullptr;
+					(iswspace(c.utf_unit) && get_all_assets()[c.format.font].meta_from_file.find_glyph(' ') != nullptr)
+					|| allow_unknown_characters_as_default || get_all_assets()[c.format.font].meta_from_file.find_glyph(c.utf_unit) != nullptr;
 			}
 
 			bool ui::is_whitelisted(char c) const {

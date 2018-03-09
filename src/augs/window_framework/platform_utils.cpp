@@ -2,6 +2,7 @@
 #include "augs/templates/string_templates.h"
 
 #include "augs/filesystem/file.h"
+#include "augs/window_framework/shell.h"
 #include "augs/window_framework/exec.h"
 
 namespace augs {
@@ -72,7 +73,7 @@ namespace augs {
 	void set_clipboard_data(const std::string& abc) {
 		const auto p = augs::path_type("/tmp/augs_clipboard_data.txt"); 
 		augs::save_as_text(p, abc);
-		exec("xclip -selection CLIPBOARD -in " + p.string());
+		augs::shell("xclip -selection CLIPBOARD -in " + p.string());
 	}
 
 	std::string get_clipboard_data() {

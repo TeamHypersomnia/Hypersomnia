@@ -1,3 +1,3 @@
 #pragma once
 
-using utf32_point = unsigned long;
+using utf32_point = unsigned int;

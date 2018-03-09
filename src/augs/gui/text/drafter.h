@@ -33,6 +33,8 @@ namespace augs {
 				std::vector<line> lines;
 				std::vector<int> sectors;
 
+				formatted_utf32_string cached_str;
+
 				word_separator word_wrapper_separator;
 
 				unsigned wrap_width = 0;
@@ -65,10 +67,10 @@ namespace augs {
 				simple_pair<int, int> get_line_visibility(const ltrbi& clipper) const;
 			private:
 				unsigned max_x;
-				void find_ascdesc(const formatted_string& source, const int i, const int j, int&, int&) const;
-				int get_kern(const formatted_string& source, const unsigned code1, const unsigned code2) const;
+				void find_ascdesc(const formatted_utf32_string& source, const int i, const int j, int&, int&) const;
+				int get_kern(const formatted_utf32_string& source, const unsigned code1, const unsigned code2) const;
 				const augs::font_glyph_metadata& get_cached(const int i) const;
-				const augs::baked_font& getf(const formatted_string& source, const unsigned i) const;
+				const augs::baked_font& getf(const formatted_utf32_string& source, const unsigned i) const;
 			};
 		}
 	}

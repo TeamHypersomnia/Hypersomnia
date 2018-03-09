@@ -8,6 +8,7 @@
 #include "augs/image/image.h"
 #include "augs/texture_atlas/texture_atlas_entry.h"
 #include "augs/utf32_point.h"
+#include "augs/misc/minmax.h"
 
 #if BUILD_FREETYPE
 struct FT_Glyph_Metrics_;
@@ -15,6 +16,8 @@ typedef FT_Glyph_Metrics_ FT_Glyph_Metrics;
 #endif
 
 namespace augs {
+	using utf32_ranges = std::vector<augs::minmax<utf32_point>>;
+
 	struct font_loading_error : error_with_typesafe_sprintf {
 		using error_with_typesafe_sprintf::error_with_typesafe_sprintf;
 	};
@@ -45,8 +48,6 @@ namespace augs {
 		// GEN INTROSPECTOR struct augs::font_metrics
 		int ascender = 0;
 		int descender = 0;
-
-		unsigned pt = 0;
 		// END GEN INTROSPECTOR
 
 		unsigned get_height() const {
@@ -110,15 +111,17 @@ namespace augs {
 		// GEN INTROSPECTOR struct augs::font_loading_input
 		font_settings settings;
 		path_type source_font_path;
-		path_type charset_path;
-		unsigned pt = 0u;
+		utf32_ranges unicode_ranges;
+		float size_in_pixels = 0u;
+		bool add_japanese_ranges = false;
 		// END GEN INTROSPECTOR
 
 		bool operator==(const font_loading_input& b) const {
 			return 
 				source_font_path == b.source_font_path 
-				&& charset_path == b.charset_path 
-				&& pt == b.pt
+				&& unicode_ranges == b.unicode_ranges 
+				&& size_in_pixels == b.size_in_pixels
+				&& add_japanese_ranges == b.add_japanese_ranges
 			;
 		}
 	};
@@ -137,8 +140,10 @@ namespace std {
 		size_t operator()(const augs::font_loading_input& in) const {
 			return augs::hash_multiple(
 				in.source_font_path.string(), 
-				in.charset_path.string(), 
-				in.pt
+#if TODO
+				in.unicode_ranges.string(), 
+#endif
+				in.size_in_pixels
 			);
 		}
 	};

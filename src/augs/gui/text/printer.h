@@ -42,7 +42,6 @@ namespace augs {
 					const drawer out,
 					const vec2i pos,
 					const drafter&,
-					const formatted_string& colors,
 					const ltrbi clipper = ltrbi()
 				) const;
 
@@ -50,7 +49,6 @@ namespace augs {
 					const drawer_with_default out,
 					const vec2i pos,
 					const drafter&,
-					const formatted_string& colors,
 					const caret_info caret,
 					const ltrbi clipper = ltrbi()
 				) const;
