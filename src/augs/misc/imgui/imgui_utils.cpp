@@ -6,7 +6,19 @@
 #include "augs/graphics/texture.h"
 #include "augs/window_framework/window.h"
 
+#include "augs/window_framework/platform_utils.h"
+
 using namespace ImGui;
+
+static const char* augs_GetClipboardText(void*) {
+	thread_local std::string sss;
+	sss = augs::get_clipboard_data();
+	return sss.c_str();
+}
+
+static void augs_SetClipboardText(void*, const char* text) {
+	augs::set_clipboard_data(text);
+}
 
 namespace augs {
 	namespace imgui {
@@ -47,6 +59,10 @@ namespace augs {
 
 			io.IniFilename = ini_filename;
 			io.LogFilename = log_filename;
+
+			io.SetClipboardTextFn = augs_SetClipboardText;
+			io.GetClipboardTextFn = augs_GetClipboardText;
+
 			io.MouseDoubleClickMaxDist = 100.f;
 			GetStyle() = initial_style;
 		}

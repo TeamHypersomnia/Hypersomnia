@@ -1,6 +1,9 @@
 #include "augs/window_framework/platform_utils.h"
 #include "augs/templates/string_templates.h"
 
+#include "augs/filesystem/file.h"
+#include "augs/window_framework/exec.h"
+
 namespace augs {
 	bool is_character_newline(const unsigned i) {
 		return (i == 0x000A || i == 0x000D);
@@ -41,6 +44,14 @@ namespace augs {
 
 		return std::nullopt;
 	}
+
+	void set_clipboard_data(const std::string&) {
+
+	}
+
+	std::string get_clipboard_data() {
+		return {};
+	}
 }
 
 #elif PLATFORM_UNIX
@@ -56,6 +67,16 @@ namespace augs {
 
 	std::optional<vec2i> get_cursor_pos() {
 		return std::nullopt;
+	}
+
+	void set_clipboard_data(const std::string& abc) {
+		const auto p = augs::path_type("/tmp/augs_clipboard_data.txt"); 
+		augs::save_as_text(p, abc);
+		exec("xclip -selection CLIPBOARD -in " + p.string());
+	}
+
+	std::string get_clipboard_data() {
+		return exec("xclip -selection CLIPBOARD -out");
 	}
 }
 
@@ -75,6 +96,14 @@ namespace augs {
 
 	std::optional<vec2i> get_cursor_pos() {
 		return std::nullopt;
+	}
+
+	void set_clipboard_data(const std::string&) {
+
+	}
+
+	std::string get_clipboard_data() {
+		return {};
 	}
 }
 

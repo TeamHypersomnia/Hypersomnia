@@ -9,8 +9,9 @@ namespace augs {
 
 	std::optional<vec2i> get_cursor_pos();
 
-	void set_clipboard_data(std::string);
-	std::string get_data_from_clipboard();
+	void set_clipboard_data(const std::string&);
+	std::string get_clipboard_data();
+
 	std::string get_executable_path();
 
 	bool is_character_newline(unsigned i);
