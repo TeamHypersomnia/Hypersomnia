@@ -7,9 +7,9 @@
 #include "augs/templates/maybe_const.h"
 #include "augs/templates/component_traits.h"
 #include "game/transcendental/entity_flavour_id.h"
+
 #include "game/organization/all_component_includes.h"
 #include "game/organization/all_entity_types_declaration.h"
-#include "game/common_state/entity_name_str.h"
 
 template <class entity_type>
 class entity_flavour {
@@ -39,9 +39,6 @@ class entity_flavour {
 
 public:
 	// GEN INTROSPECTOR class entity_flavour class entity_type
-	entity_name_str name;
-	entity_name_str description;
-
 	invariants_type invariants;
 	initial_components_type initial_components;
 	// END GEN INTROSPECTOR
@@ -81,14 +78,6 @@ public:
 
 	bool operator==(const entity_flavour& b) const {
 		return augs::recursive_equal(*this, b);
-	}
-
-	bool is_set() const {
-		return name.size() > 0;
-	}
-
-	void unset() {
-		name.clear();
 	}
 };
 

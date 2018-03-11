@@ -129,10 +129,10 @@ public:
 		auto& cosm = self.get_cosmos();
 
 		if constexpr(has_specific_entity_type_v<E>) {
-			return get_flavour().name;
+			return get_flavour().template get<invariants::name>().name;
 		}
 		else {
-			return cosm.on_flavour(get_flavour_id(), [](const auto& f) -> const auto& { return f.name; });
+			return cosm.on_flavour(get_flavour_id(), [](const auto& f) -> const auto& { return f.template get<invariants::name>().name; });
 		}
 	}
 
@@ -142,10 +142,10 @@ public:
 		auto& cosm = self.get_cosmos();
 
 		if constexpr(has_specific_entity_type_v<E>) {
-			return get_flavour().description;
+			return get_flavour().template get<invariants::name>().description;
 		}
 		else {
-			return cosm.on_flavour(get_flavour_id(), [](const auto& f) -> const auto& { return f.description; });
+			return cosm.on_flavour(get_flavour_id(), [](const auto& f) -> const auto& { return f.template get<invariants::name>().description; });
 		}
 	}
 

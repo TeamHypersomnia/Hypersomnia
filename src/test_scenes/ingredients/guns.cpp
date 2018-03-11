@@ -389,7 +389,7 @@ namespace test_flavours {
 				meta.set(render_def);
 			}
 
-			meta.description =
+			meta.get<invariants::name>().description =
 				"Standard issue sample rifle."
 			;
 

@@ -5,6 +5,11 @@ permalink: brainstorm
 summary: Just a hidden scratchpad.
 ---
 
+## Random thoughts
+
+- I think, maybe that xlookupstring works out of the box if the locale is with the utf8 suffix? 
+	- given that it was sensitive to the locale in the first place
+
 ## Plans
 
 - components should be templatized by id

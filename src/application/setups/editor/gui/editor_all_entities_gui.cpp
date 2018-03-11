@@ -63,10 +63,10 @@ void edit_flavour(
 	entity_flavour<E>& object,
    	const editor_command_input in
 ) {
-	input_text<256>("Name", object.name);
+	input_text<256>("Name", object.template get<invariants::name>().name, ImGuiInputTextFlags_EnterReturnsTrue);
 	ImGui::NextColumn();
 	ImGui::NextColumn();
-	input_multiline_text<256>("Description", object.description, 4);
+	input_multiline_text<256>("Description", object.template get<invariants::name>().description, 4);
 	ImGui::NextColumn();
 	ImGui::NextColumn();
 }
@@ -113,6 +113,8 @@ void editor_all_entities_gui::perform(const editor_command_input in) {
 			const auto total_entities = p.size();
 			const auto total_flavours = cosm.get_common_significant().get_flavours<E>().count();
 
+			ImGui::SetNextTreeNodeOpen(true, ImGuiCond_FirstUseEver);
+
 			const auto node = scoped_tree_node_ex(entity_type_label.c_str());
 
 			ImGui::NextColumn();
@@ -123,7 +125,7 @@ void editor_all_entities_gui::perform(const editor_command_input in) {
 				cosm.change_common_significant([&](cosmos_common_significant& common_signi){
 					common_signi.get_flavours<E>().for_each(
 						[&](const auto flavour_id, auto& flavour){
-							const auto flavour_label = flavour.name;
+							const auto flavour_label = flavour.template get<invariants::name>().name;
 
 							const auto all_having_flavour = cosm.get_solvable_inferred().name.get_entities_by_flavour_id(flavour_id);
 

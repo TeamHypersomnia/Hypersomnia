@@ -7,6 +7,17 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
+- first design a command for the changed properties because 
+	- flavour changing should be a different command, perhaps because the rest will never trigger reinference
+	- and adding and removing flavours should really be different commands whatsoever
+
+- composite commands
+	- e.g. duplicate entity will consist of two commands
+		- duplicate + move to new position
+	- history implementation should remain the same.
+		- it is only the case of GUI that some entries would appear as scoped nodes...
+			- ...and that some entries would go with each other on just a single ctrl+z/y
+
 - save_as -> save_to lua table
 - fix saving of the camera
 - implement unicode code points in printer/drafter

@@ -18,6 +18,7 @@ namespace invariants {
 	struct trace;
 	struct interpolation;
 	struct flags;
+	struct name;
 	struct fixtures;
 	struct rigid_body;
 	struct container;
@@ -77,6 +78,7 @@ using assert_always_together = type_list<
 >;
 
 using always_present_invariants = type_list<
+	invariants::name,
 	invariants::flags
 >;
 
@@ -111,6 +113,7 @@ using component_list_t = List<
 
 template <template <class...> class List>
 using invariant_list_t = List<
+	invariants::name,
 	invariants::flags,
 	invariants::gun,
 	invariants::render,
