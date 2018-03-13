@@ -73,7 +73,7 @@ void edit_flavour(
 	entity_flavour<E>& object,
    	const editor_command_input in
 ) {
-	input_text<256>("Name", object.template get<invariants::name>().name, ImGuiInputTextFlags_EnterReturnsTrue);
+	input_text<256>("Name", object.template get<invariants::name>().name);
 	ImGui::NextColumn();
 	ImGui::NextColumn();
 	input_multiline_text<256>("Description", object.template get<invariants::name>().description, 4);
@@ -174,7 +174,9 @@ void editor_all_entities_gui::perform(const editor_command_input in) {
 
 							const auto all_having_flavour = cosm.get_solvable_inferred().name.get_entities_by_flavour_id(flavour_id);
 
-							const auto f_node = scoped_tree_node_ex(flavour_label.c_str());
+							const auto node_label = typesafe_sprintf("%x###%x", flavour_label, flavour_id.raw.pod);
+							const auto f_node = scoped_tree_node_ex(node_label.c_str());
+
 							ImGui::NextColumn();
 							text_disabled(typesafe_sprintf("%x Entities", all_having_flavour.size()));
 							ImGui::NextColumn();

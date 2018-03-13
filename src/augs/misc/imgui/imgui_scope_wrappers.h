@@ -1,6 +1,8 @@
 #pragma once
 #include <optional>
-#include <imgui/imgui.h>
+
+#include "3rdparty/imgui/imgui.h"
+#include "3rdparty/imgui/imgui_internal.h"
 
 #include "augs/misc/imgui/imgui_controls.h"
 
