@@ -83,10 +83,10 @@ void intercosm::load(const intercosm_path_op op) {
 	const auto effective_extension = op.path.extension();
 
 	if (effective_extension == ".int") {
-		load_as_int(op.path);
+		load_from_int(op.path);
 	}
 	else if (effective_extension == ".lua") {
-		load_as_lua(op);
+		load_from_lua(op);
 	}
 }
 
@@ -94,7 +94,7 @@ void intercosm::save_as_lua(const intercosm_path_op op) const {
 	augs::save_as_lua_table(op.lua, *this, op.path);
 }
 
-void intercosm::load_as_lua(const intercosm_path_op op) {
+void intercosm::load_from_lua(const intercosm_path_op op) {
 	const auto display_path = augs::to_display_path(op.path);
 
 	try {
@@ -149,7 +149,7 @@ void intercosm::save_as_int(const augs::path_type& path) const {
 	augs::save_as_bytes(*this, path);
 }
 
-void intercosm::load_as_int(const augs::path_type& path) {
+void intercosm::load_from_int(const augs::path_type& path) {
 	const auto display_path = augs::to_display_path(path);
 
 	try {

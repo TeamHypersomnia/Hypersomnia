@@ -880,8 +880,8 @@ bool editor_setup::handle_input_before_game(
 				case key::C: 
 					if (view().selected_entities.size() == 1) { 
 						set_locally_viewed(*view().selected_entities.begin()); 
-						return true;
 					}
+					return true;
 				case key::I: play(); return true;
 				case key::DEL: del(); return true;
 				default: break;

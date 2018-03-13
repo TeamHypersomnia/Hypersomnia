@@ -18,9 +18,7 @@ summary: Just a hidden scratchpad.
 		- it is only the case of GUI that some entries would appear as scoped nodes...
 			- ...and that some entries would go with each other on just a single ctrl+z/y
 
-- save_as -> save_to lua table
 - fix saving of the camera
-- implement unicode code points in printer/drafter
 
 - generalize editor_tab_gui to be also able to handle the entities/flavours windows
 - implement ctrl+tab for tabs, either in settings or anywhere. It should just handle the current window
@@ -30,8 +28,6 @@ summary: Just a hidden scratchpad.
 	- we could also add some choice for reference entity to be shown
 	- the owning entity by default
 
-- fix that build page warning
-	- revert back to that A record if it doesnt work by tomorrow
 - simple property editor
 
 - Also check that there are no guids in common state

@@ -26,3 +26,5 @@ summary: Just a hidden scratchpad.
 			- we could however provide our custom operators which will just do std::memcpy.
 		- so we ditch it
 
+- fix that build page warning
+	- revert back to that A record if it doesnt work by tomorrow

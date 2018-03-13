@@ -50,10 +50,10 @@ struct intercosm {
 	void load(const intercosm_path_op);
 	void save(const intercosm_path_op) const;
 
-	void load_as_int(const augs::path_type&);
+	void load_from_int(const augs::path_type&);
 	void save_as_int(const augs::path_type&) const;
 
-	void load_as_lua(const intercosm_path_op);
+	void load_from_lua(const intercosm_path_op);
 	void save_as_lua(const intercosm_path_op) const;
 
 	std::vector<std::byte> to_bytes() const;

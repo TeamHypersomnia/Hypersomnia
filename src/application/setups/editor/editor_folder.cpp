@@ -65,7 +65,7 @@ void editor_folder::load_folder(const augs::path_type& from, const augs::path_ty
 	const auto paths = editor_paths(from, name);
 
 	try {
-		work->load_as_int(paths.int_file);
+		work->load_from_int(paths.int_file);
 	}
 	catch (const intercosm_loading_error err) {
 		editor_popup p;

@@ -280,3 +280,4 @@ we consider whole type overrides too complex architeciturally:
 
 - fix std::array<internal_glyph, glyph_count> glyphs;
 
+- implement unicode code points in printer/drafter
