@@ -91,7 +91,7 @@ namespace augs {
 			return make_scope_guard([]() { ImGui::PopID(); });
 		}
 
-		inline auto scoped_id(void* const v) {
+		inline auto scoped_id(const void* const v) {
 			ImGui::PushID(v);
 
 			return make_scope_guard([]() { ImGui::PopID(); });

@@ -1,3 +1,4 @@
+#include "augs/templates/for_each_std_get.h"
 #include "augs/misc/imgui/imgui_utils.h"
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
@@ -21,14 +22,23 @@ void edit_properties_of(T& object, const editor_command_input in) {
 	auto& history = in.folder.history;
 
 	augs::introspect(
-		[&](const std::string& label, auto& member) {
+		[&](const std::string& original_label, auto& member) {
 			using M = std::decay_t<decltype(member)>;
+
+			const auto label = format_field_name(original_label);
 
 			auto id = scoped_id(std::addressof(member));
 			if constexpr(is_padding_field_v<M>) {
 				return;	
 			}
 			else if constexpr(std::is_same_v<M, std::string>) {
+			}
+			else if constexpr(std::is_same_v<M, flip_flags>) {
+				checkbox("Flip horizontally", member[0]);
+				checkbox("Flip vertically", member[1]);
+			}
+			else if constexpr(std::is_same_v<M, bool>) {
+				checkbox(label, member);
 			}
 			else if constexpr(is_container_v<M>) {
 
@@ -69,6 +79,37 @@ void edit_flavour(
 	input_multiline_text<256>("Description", object.template get<invariants::name>().description, 4);
 	ImGui::NextColumn();
 	ImGui::NextColumn();
+
+	for_each_through_std_get(
+		object.invariants,
+		[&](auto& invariant) {
+			using T = std::decay_t<decltype(invariant)>;
+
+			const auto invariant_label = [](){
+				auto result = format_field_name(get_type_name_strip_namespace<T>()) + " invariant";
+				result[0] = std::toupper(result[0]);
+
+				/* These two look ugly with automated names */
+
+				if constexpr(std::is_same_v<T, invariants::sprite>) {
+					result = "Sprite invariant";
+				}	
+
+				if constexpr(std::is_same_v<T, invariants::polygon>) {
+					result = "Polygon invariant";
+				}
+
+				return result;
+			}();
+
+			if (const auto node = scoped_tree_node_ex(invariant_label.c_str())) {
+				edit_properties_of(invariant, in);
+			}
+	
+			ImGui::NextColumn();
+			ImGui::NextColumn();
+		}
+   	);
 }
 
 void editor_all_entities_gui::open() {
@@ -127,6 +168,10 @@ void editor_all_entities_gui::perform(const editor_command_input in) {
 						[&](const auto flavour_id, auto& flavour){
 							const auto flavour_label = flavour.template get<invariants::name>().name;
 
+							if (!filter.PassFilter(flavour_label.c_str())) {
+								return;
+							}
+
 							const auto all_having_flavour = cosm.get_solvable_inferred().name.get_entities_by_flavour_id(flavour_id);
 
 							const auto f_node = scoped_tree_node_ex(flavour_label.c_str());
@@ -150,7 +195,7 @@ void editor_all_entities_gui::perform(const editor_command_input in) {
 						}
 					);
 
-					return changer_callback_result::REFRESH;
+					return changer_callback_result::DONT_REFRESH;
 				});
 			}
 		}	

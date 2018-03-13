@@ -40,7 +40,7 @@ void for_each_through_std_get(List&& t, F f) {
 		[f](auto num, auto&&... args) {
 			f(std::forward<decltype(args)>(args)...);
 		},
-		index_sequence_for_list_t<std::decay_t<List>>{},
+		templates_detail::index_sequence_for_list_t<std::decay_t<List>>{},
 		std::forward<List>(t)
 	);
 }
