@@ -228,7 +228,7 @@ void settings_gui_state::perform(
 						auto scope = scoped_indent();
 						text("Autosave once per");
 						ImGui::SameLine();
-						revertable_drag("minutes", config.editor.autosave.once_every_min, 0.002f, 0.05f, 2000.f);
+						revertable_drag("minutes", config.editor.autosave.once_every_min, 0.002, 0.05, 2000.0);
 
 						revertable_checkbox("Autosave when window loses focus", config.editor.autosave.on_lost_focus);
 					}

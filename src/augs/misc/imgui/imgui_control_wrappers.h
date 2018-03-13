@@ -65,27 +65,40 @@ namespace augs {
 		}
 
 		template <class T, class... Args>
-		decltype(auto) drag(const std::string& label, T& into, Args&&... args) {
+		decltype(auto) drag(
+			const std::string& label,
+			T& into,
+			const float speed = 1.f,
+			T v_min = static_cast<T>(0),
+			T v_max = static_cast<T>(0),
+			Args&&... args
+		) {
 			using namespace detail;
 
 			if constexpr(std::is_integral_v<T>) {
+				if (std::is_unsigned_v<T> && v_max == v_min) {
+					/* Prevent ImGui from setting negative values */
+					v_min = 0;
+					v_max = std::numeric_limits<int>::max();
+				}
+
 				return direct_or_convert(into, [&](int& input) {
-					return ImGui::DragInt(label.c_str(), &input, std::forward<Args>(args)...);
+					return ImGui::DragInt(label.c_str(), &input, speed, v_min, v_max, std::forward<Args>(args)...);
 				});
 			}
 			else if constexpr(std::is_floating_point_v<T>) {
 				return direct_or_convert(into, [&](float& input) {
-					return ImGui::DragFloat(label.c_str(), &input, std::forward<Args>(args)...);
+					return ImGui::DragFloat(label.c_str(), &input, speed, v_min, v_max, std::forward<Args>(args)...);
 				});
 			}
 			else if constexpr(std::is_same_v<T, vec2> || std::is_same_v<T, vec2d>) {
 				return direct_or_convert(into, [&](vec2& input) {
-					return ImGui::DragFloat2(label.c_str(), &input.x, std::forward<Args>(args)...);
+					return ImGui::DragFloat2(label.c_str(), &input.x, speed, v_min, v_max, std::forward<Args>(args)...);
 				});
 			}
 			else if constexpr(std::is_same_v<T, vec2i> || std::is_same_v<T, vec2u>) {
 				return direct_or_convert(into, [&](vec2i& input) {
-					return ImGui::DragInt2(label.c_str(), &input.x, std::forward<Args>(args)...);
+					return ImGui::DragInt2(label.c_str(), &input.x, speed, v_min, v_max, std::forward<Args>(args)...);
 				});
 			}
 		}
