@@ -7,7 +7,6 @@
 #include "augs/misc/enum/enum_map.h"
 #include "augs/misc/value_meter.h"
 
-#include "augs/zeroed_pod.h"
 #include "augs/templates/type_list.h"
 #include "augs/templates/constexpr_arithmetic.h"
 #include "augs/templates/always_false.h"
@@ -27,7 +26,7 @@
 #include "game/detail/view_input/particle_effect_input.h"
 
 using learned_spells_array_type = std::array<
-	zeroed_pod<bool>,
+	bool,
 	aligned_num_of_bytes_v<num_types_in_list_v<spell_instance_tuple>, 4>
 >;
 
@@ -41,7 +40,7 @@ namespace components {
 
 		meter_instance_tuple meters;
 
-		learned_spells_array_type learned_spells;
+		learned_spells_array_type learned_spells = {};
 
 		spell_instance_tuple spells;
 		perk_instance_tuple perks;

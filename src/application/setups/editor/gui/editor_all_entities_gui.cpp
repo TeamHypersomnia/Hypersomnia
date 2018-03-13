@@ -174,7 +174,7 @@ void editor_all_entities_gui::perform(const editor_command_input in) {
 
 							const auto all_having_flavour = cosm.get_solvable_inferred().name.get_entities_by_flavour_id(flavour_id);
 
-							const auto node_label = typesafe_sprintf("%x###%x", flavour_label, flavour_id.raw.pod);
+							const auto node_label = typesafe_sprintf("%x###%x", flavour_label, flavour_id.raw);
 							const auto f_node = scoped_tree_node_ex(node_label.c_str());
 
 							ImGui::NextColumn();

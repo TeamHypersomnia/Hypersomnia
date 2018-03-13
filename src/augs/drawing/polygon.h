@@ -1,7 +1,6 @@
 #pragma once
 #include "3rdparty/polypartition/src/polypartition.h"
 
-#include "augs/zeroed_pod.h"
 #include "augs/templates/algorithm_templates.h"
 #include "augs/math/vec2.h"
 #include "augs/misc/constant_size_vector.h"
@@ -75,7 +74,7 @@ namespace augs {
 
 		// GEN INTROSPECTOR struct augs::polygon std::size_t vertex_count std::size_t index_count
 		constant_size_vector<vertex, vertex_count> vertices;
-		constant_size_vector<zeroed_pod<unsigned>, index_count> triangulation_indices;
+		constant_size_vector<unsigned, index_count> triangulation_indices = {};
 		// END GEN INTROSPECTOR
 
 		size_t get_vertex_count() const {

@@ -1,7 +1,8 @@
 #pragma once
 #include <string>
-#include "augs/zeroed_pod.h"
+#include "augs/minus_oned_pod.h"
 #include "augs/templates/hash_templates.h"
+
 #include "game/transcendental/entity_type_traits.h"
 #include "game/organization/all_entity_types_declaration.h"
 

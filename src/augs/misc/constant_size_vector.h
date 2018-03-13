@@ -1,7 +1,6 @@
 #pragma once
 #include <array>
 #include "augs/ensure.h"
-#include "augs/zeroed_pod.h"
 
 #include "augs/misc/simple_pair.h"
 #include "augs/templates/type_matching_and_indexing.h"
@@ -270,7 +269,6 @@ namespace augs {
 	template <class T, unsigned N>
 	class constant_size_vector<T, N, std::enable_if_t<std::is_trivially_copyable_v<T>>>
 		: public constant_size_vector_base<T, N> {
-		using underlying_char_type = zeroed_pod_internal_type_t<T>;
 
 	public:
 		using base = constant_size_vector_base<T, N>;
