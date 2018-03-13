@@ -41,6 +41,8 @@ struct B_command {
 	}
 };
 
+using history_type = augs::history_with_marks<A_command, B_command>;
+
 #define test_mark_as_current() \
 REQUIRE(hist.at_unsaved_revision()); \
 hist.mark_current_revision_as_saved(); \
@@ -48,7 +50,7 @@ REQUIRE(!hist.at_unsaved_revision());
 
 TEST_CASE("Templates History") {
 	command_context context;
-	augs::history<A_command, B_command> hist;
+	history_type hist;
 
 	REQUIRE(!hist.at_unsaved_revision());
 
@@ -170,7 +172,7 @@ TEST_CASE("Templates History") {
 
 TEST_CASE("Templates HistoryUnsavedChangesTest") {
 	command_context context;
-	augs::history<A_command, B_command> hist;
+	history_type hist;
 
 	REQUIRE(!hist.at_unsaved_revision());
 

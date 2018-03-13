@@ -8,7 +8,7 @@
 namespace augs {
 	struct introspection_access;
 
-	template <class... CommandTypes>
+	template <class Derived, class... CommandTypes>
 	class history {
 	public:
 		using command_type = std::variant<CommandTypes...>;
@@ -17,12 +17,8 @@ namespace augs {
 	private:
 		friend augs::introspection_access;
 
-		// GEN INTROSPECTOR class augs::history class... CommandTypes 
-		bool modified_flag = false;
-
+		// GEN INTROSPECTOR class augs::history class Derived class... CommandTypes 
 		index_type current_revision = static_cast<index_type>(-1);
-		std::optional<index_type> saved_at_revision = static_cast<index_type>(-1);
-
 		std::vector<command_type> commands; 
 		// END GEN INTROSPECTOR
 
@@ -34,6 +30,11 @@ namespace augs {
 			return commands[current_revision + 1];
 		}
 
+		void derived_set_modified_flags() {
+			auto& self = *static_cast<Derived*>(this);
+			self.set_modified_flags();
+		}
+
 	public:
 
 		template <class T, class... RedoArgs>
@@ -43,15 +44,14 @@ namespace augs {
 				Later we might support branches. 
 			*/
 
-			modified_flag = true;
 
 			erase_from_to(commands, current_revision + 1);
 
-			if (saved_at_revision 
-				&& saved_at_revision.value() >= current_revision + 1
-			) {
-				/* The revision that has been saved has just been deleted */
-				saved_at_revision = std::nullopt;
+			derived_set_modified_flags();
+
+			{
+				auto& self = *static_cast<Derived*>(this);
+				self.invalidate_revisions_from(current_revision + 1);
 			}
 
 			commands.emplace_back(
@@ -62,38 +62,13 @@ namespace augs {
 			redo(std::forward<RedoArgs>(redo_args)...);
 		}
 
-		void mark_current_revision_as_saved() {
-			saved_at_revision = current_revision;
-		}
-
-		void mark_as_not_modified() {
-			modified_flag = false;
-		}
-
-		void mark_as_just_saved() {
-			mark_as_not_modified();
-			mark_current_revision_as_saved();
-		}
-
-		bool is_revision_saved(const index_type candidate) const {
-			return saved_at_revision == candidate;
-		}
-
-		bool at_unsaved_revision() const {
-			return !is_revision_saved(current_revision);
-		}
-
-		bool was_modified() const {
-			return modified_flag;
-		}
-
 		template <class... Args>
 		void redo(Args&&... args) {
 			if (is_revision_newest()) {
 				return;
 			}
 
-			modified_flag = true;
+			derived_set_modified_flags();
 
 			std::visit(
 				[&](auto& command) {
@@ -111,7 +86,7 @@ namespace augs {
 				return;
 			}
 
-			modified_flag = true;
+			derived_set_modified_flags();
 
 			std::visit(
 				[&](auto& command) {
@@ -148,6 +123,63 @@ namespace augs {
 
 		bool is_revision_oldest() const {
 			return current_revision == static_cast<index_type>(-1);
+		}
+	};
+
+	template <class... CommandTypes>
+	class history_with_marks : public augs::history<history_with_marks<CommandTypes...>, CommandTypes...> {
+		using base = augs::history<history_with_marks<CommandTypes...>, CommandTypes...>;
+		friend base;
+
+	public:
+		using index_type = typename base::index_type;
+
+	private:
+		friend augs::introspection_access;
+
+		// GEN INTROSPECTOR class history_with_marks class... CommandTypes
+		// INTROSPECT BASE augs::history<history_with_marks<CommandTypes...>, CommandTypes...>
+		std::optional<index_type> saved_at_revision = static_cast<index_type>(-1);
+		bool modified_since_save = false;
+		// END GEN INTROSPECTOR
+
+		void set_modified_flags() {
+			modified_since_save = true;
+		}
+
+		void invalidate_revisions_from(const index_type index) {
+			if (saved_at_revision && saved_at_revision.value() >= index) {
+				/* The revision that is currently saved to disk has just been deleted */
+				saved_at_revision = std::nullopt;
+			}
+		}
+
+	public:
+		using base::get_current_revision;
+
+		void mark_current_revision_as_saved() {
+			saved_at_revision = get_current_revision();
+		}
+
+		void mark_as_not_modified() {
+			modified_since_save = false;
+		}
+
+		void mark_as_just_saved() {
+			mark_as_not_modified();
+			mark_current_revision_as_saved();
+		}
+
+		bool is_revision_saved(const index_type candidate) const {
+			return saved_at_revision == candidate;
+		}
+
+		bool at_unsaved_revision() const {
+			return !is_revision_saved(get_current_revision());
+		}
+
+		bool was_modified() const {
+			return modified_since_save;
 		}
 	};
 }
