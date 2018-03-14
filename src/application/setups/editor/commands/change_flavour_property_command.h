@@ -8,14 +8,26 @@
 using invariant_id_type = type_in_list_id<invariant_list_t<type_list>>;
 using component_id_type = type_in_list_id<invariant_list_t<type_list>>;
 
-struct change_invariant_property_command {
-	friend augs::introspection_access;
-
-	// GEN INTROSPECTOR struct change_invariant_property_command
-	editor_command_common common;
+struct flavour_property_id {
 	entity_flavour_id flavour_id;
 	invariant_id_type invariant_id;
-	unsigned introspective_index = static_cast<unsigned>(-1);
+	edited_field_id field_id;
+
+	bool operator==(const flavour_property_id& b) {
+		return 
+			flavour_id == b.flavour_id 
+			&& invariant_id == b.invariant_id 
+			&& field_id == b.field_id
+		;
+	}
+};
+
+struct change_flavour_property_command {
+	friend augs::introspection_access;
+
+	// GEN INTROSPECTOR struct change_flavour_property_command
+	editor_command_common common;
+	flavour_property_id property_id;
 
 	std::vector<std::byte> value_before_change;
 	std::vector<std::byte> value_after_change;

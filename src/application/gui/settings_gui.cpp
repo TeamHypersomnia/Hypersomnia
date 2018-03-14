@@ -247,8 +247,8 @@ void settings_gui_state::perform(
 					}
 
 					if (auto node = scoped_tree_node("\"Go to\" dialogs")) {
-						revertable_slider("Width", config.editor.go_to.dialog_width, 30, screen_size.x);
-						revertable_slider("Number of lines to show", config.editor.go_to.num_lines, 1, 300);
+						revertable_slider("Width", config.editor.go_to.dialog_width, 30u, static_cast<unsigned>(screen_size.x));
+						revertable_slider("Number of lines to show", config.editor.go_to.num_lines, 1u, 300u);
 					}
 				}
 
@@ -322,7 +322,7 @@ void settings_gui_state::perform(
 					auto indent = scoped_indent();
 
 					revertable_checkbox("Create minimal", config.test_scene.create_minimal);
-					revertable_slider("Tickrate", config.test_scene.scene_tickrate, 10, 300);
+					revertable_slider("Tickrate", config.test_scene.scene_tickrate, 10.f, 300.f);
 				}
 
 				break;

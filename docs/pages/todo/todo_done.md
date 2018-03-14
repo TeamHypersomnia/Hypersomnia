@@ -281,3 +281,10 @@ we consider whole type overrides too complex architeciturally:
 - fix std::array<internal_glyph, glyph_count> glyphs;
 
 - implement unicode code points in printer/drafter
+
+- Address ids are irrelevant to us because we will compare against a well-formed property id.
+<!--
+- when in editor mode, the address will always stay the same during dragging
+	- because we will disallow any other action
+- in gameplay mode, the address may suddenly change
+-->

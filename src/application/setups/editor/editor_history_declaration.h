@@ -6,7 +6,7 @@ namespace augs {
 };
 
 struct delete_entities_command;
-struct change_invariant_property_command;
+struct change_flavour_property_command;
 struct fill_with_test_scene_command;
 
 using editor_history = augs::history_with_marks<

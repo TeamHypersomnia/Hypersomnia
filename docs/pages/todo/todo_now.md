@@ -7,6 +7,17 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
+- check imgui's id stack logic and see if the activity change logic can't be made simpler, without flavour prop id, thanks to the stacks
+
+- determine what to do with b2Filters
+	- it appears that filters aren't really given any special roles.
+		- thus it makes sense that they be completely customizable in editor.
+		- we will perhaps make amount of categories limited so as to fit b2Filter.
+			- max: 16
+		- a simple matrix of checkboxes like in unity.
+	- enums will just have combos for all values
+	- assets will need to have their proper names displayed, unavailable in normal editing (test scene enums are unapplicable obviously)
+
 - first design a command for the changed properties because 
 	- flavour changing should be a different command, perhaps because the rest will never trigger reinference
 	- and adding and removing flavours should really be different commands whatsoever

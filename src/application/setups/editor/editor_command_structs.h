@@ -1,4 +1,5 @@
 #pragma once
+#include <optional>
 #include "augs/misc/time_utils.h"
 
 class editor_folder;
@@ -21,3 +22,20 @@ struct editor_command_common {
 	augs::date_time timestamp;
 	// END GEN INTROSPECTOR
 };
+
+struct edited_field_id {
+	using index_type = unsigned;
+
+	// GEN INTROSPECTOR struct edited_field_id
+	unsigned introspective_index = static_cast<unsigned>(-1);
+	std::optional<unsigned> element_index;
+	// END GEN INTROSPECTOR
+
+	bool operator==(const edited_field_id& b) const {
+		return 
+			introspective_index == b.introspective_index
+			&& element_index == b.element_index	
+		;
+	}
+};
+

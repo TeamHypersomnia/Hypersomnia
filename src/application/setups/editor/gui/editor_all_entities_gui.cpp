@@ -17,19 +17,40 @@ static auto details_text = [](const auto& tx){
 	ImGui::NextColumn();
 };
 
-template <class T>
-void edit_properties_of(T& object, const editor_command_input in) {
+template <class E, class T>
+void edit_invariant(
+	const typed_entity_flavour_id<E> flavour_id,
+   	T& object,
+   	const editor_command_input in
+) {
+	/* thread_local std::optional<flavour_property_id> last_active; */
+	thread_local std::optional<ImGuiID> last_active;
+
 	auto& history = in.folder.history;
+	auto introspective_index = static_cast<unsigned>(-1);
+
+	auto make_property_id = [&](){
+		flavour_property_id result;
+		result.field_id.introspective_index = introspective_index;
+		result.invariant_id = invariant_id_type::of<T>();
+		result.flavour_id = flavour_id;
+
+		return result;
+	};
 
 	augs::introspect(
-		[&](const std::string& original_label, auto& member) {
+		augs::recursive([&](auto self, const std::string& original_label, auto& member) {
 			using M = std::decay_t<decltype(member)>;
+
+			++introspective_index;
 
 			const auto label = format_field_name(original_label);
 
-			auto id = scoped_id(std::addressof(member));
 			if constexpr(is_padding_field_v<M>) {
 				return;	
+			}
+			else if constexpr(std::is_same_v<M, b2Filter>) {
+				// TODO: this
 			}
 			else if constexpr(std::is_same_v<M, std::string>) {
 			}
@@ -44,7 +65,20 @@ void edit_properties_of(T& object, const editor_command_input in) {
 
 			}
 			else if constexpr(std::is_arithmetic_v<M>) {
-				drag(label, member);
+				auto& wnd = *ImGui::GetCurrentWindow();
+
+				if (drag(label, member)) {
+					last_active = ImGui::GetActiveID();
+
+					LOG("Dragging %x to %x", label, member);
+				}
+				else {
+					if (last_active == wnd.GetID(label.c_str()) && !ImGui::IsItemActive()) {
+						last_active.reset();
+						LOG("Released %x to %x", label, member);
+					}
+				}
+
 				details_text(get_type_name<M>());
 			}
 			else if constexpr(std::is_enum_v<M>) {
@@ -60,16 +94,17 @@ void edit_properties_of(T& object, const editor_command_input in) {
 				details_text(get_type_name<M>());
 
 				if (object_node) {
-					edit_properties_of(member, in);
+					augs::introspect(augs::recursive(self), member);
 				}
 			}
-		},
+		}),
 		object
 	);
 }
 
 template <class E>
 void edit_flavour(
+	const typed_entity_flavour_id<E> flavour_id,
 	entity_flavour<E>& object,
    	const editor_command_input in
 ) {
@@ -103,7 +138,7 @@ void edit_flavour(
 			}();
 
 			if (const auto node = scoped_tree_node_ex(invariant_label.c_str())) {
-				edit_properties_of(invariant, in);
+				edit_invariant(flavour_id, invariant, in);
 			}
 	
 			ImGui::NextColumn();
@@ -183,7 +218,7 @@ void editor_all_entities_gui::perform(const editor_command_input in) {
 
 							if (f_node) {
 								ImGui::Separator();
-								edit_flavour(flavour, in);
+								edit_flavour(flavour_id, flavour, in);
 								ImGui::Separator();
 
 								for (const auto& e : all_having_flavour) {
