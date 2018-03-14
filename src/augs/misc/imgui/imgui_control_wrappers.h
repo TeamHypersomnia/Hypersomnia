@@ -1,6 +1,7 @@
 #pragma once
 #include <imgui/imgui.h>
 
+#include "augs/templates/always_false.h"
 #include "augs/templates/container_templates.h"
 #include "augs/templates/function_traits.h"
 #include "augs/templates/corresponding_field.h"
@@ -64,6 +65,37 @@ namespace augs {
 			return ImGui::Checkbox(label.c_str(), &into);
 		}
 
+		template <class T>
+		void fix_integral_bounds(T& v_min, T& v_max) {
+			if constexpr(std::is_integral_v<T>) {
+				if (v_max == v_min) {
+					/* Fix default bounds */
+					if constexpr(std::is_same_v<T, unsigned>) {
+						/* Prevent ImGui from setting negative values */
+						v_min = 0;
+						v_max = static_cast<T>(std::numeric_limits<int>::max());
+					}
+					else if constexpr(
+						std::is_same_v<T, unsigned short>
+						|| std::is_same_v<T, unsigned char>
+					) {
+						v_min = 0;
+						v_max = std::numeric_limits<T>::max();
+					}
+					else if constexpr(
+						std::is_same_v<T, short>
+						|| std::is_same_v<T, char>
+					) {
+						v_min = std::numeric_limits<T>::min();
+						v_max = std::numeric_limits<T>::max();
+					}
+					else {
+						static_assert(always_false_v<T>, "Unsupported integer type.");
+					}
+				}
+			}
+		}
+
 		template <class T, class... Args>
 		decltype(auto) drag(
 			const std::string& label,
@@ -75,13 +107,9 @@ namespace augs {
 		) {
 			using namespace detail;
 
-			if constexpr(std::is_integral_v<T>) {
-				if (std::is_unsigned_v<T> && v_max == v_min) {
-					/* Prevent ImGui from setting negative values */
-					v_min = 0;
-					v_max = std::numeric_limits<int>::max();
-				}
+			fix_integral_bounds(v_min, v_max);
 
+			if constexpr(std::is_integral_v<T>) {
 				return direct_or_convert(into, [&](int& input) {
 					return ImGui::DragInt(label.c_str(), &input, speed, v_min, v_max, std::forward<Args>(args)...);
 				});
@@ -162,15 +190,17 @@ namespace augs {
 			text(typesafe_sprintf(format, std::forward<Args>(args)...));
 		}
 
-		template <class T, class B, class... Args>
+		template <class T, class... Args>
 		bool slider(
 			const std::string& label, 
 			T& into, 
-			const B lower_bound,
-			const B upper_bound,
+			T lower_bound,
+			T upper_bound,
 			Args&&... args
 		) {
 			using namespace detail;
+
+			fix_integral_bounds(lower_bound, upper_bound);
 
 			if constexpr(std::is_integral_v<T>) {
 				return direct_or_convert(into, [&](int& input) {
