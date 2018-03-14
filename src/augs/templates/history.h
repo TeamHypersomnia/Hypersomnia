@@ -22,14 +22,6 @@ namespace augs {
 		std::vector<command_type> commands; 
 		// END GEN INTROSPECTOR
 
-		auto& last_command() {
-			return commands[current_revision];
-		}
-
-		auto& next_command() {
-			return commands[current_revision + 1];
-		}
-
 		void derived_set_modified_flags() {
 			auto& self = *static_cast<Derived*>(this);
 			self.set_modified_flags();
@@ -123,6 +115,14 @@ namespace augs {
 
 		bool is_revision_oldest() const {
 			return current_revision == static_cast<index_type>(-1);
+		}
+
+		auto& last_command() {
+			return commands[current_revision];
+		}
+
+		auto& next_command() {
+			return commands[current_revision + 1];
 		}
 	};
 
