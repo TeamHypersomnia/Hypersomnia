@@ -27,6 +27,8 @@ namespace components {
 
 namespace invariants {
 	struct fixtures {
+		static constexpr bool reinfer_when_tweaking = true;
+
 		// GEN INTROSPECTOR struct invariants::fixtures
 		bool friction_ground = false;
 		bool disable_standard_collision_resolution = false;

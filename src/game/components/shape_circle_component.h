@@ -6,6 +6,8 @@
 
 namespace invariants {
 	struct shape_circle {
+		static constexpr bool reinfer_when_tweaking = true;
+
 		// GEN INTROSPECTOR struct invariants::shape_circle
 		real32 radius = 0.f;
 		// END GEN INTROSPECTOR

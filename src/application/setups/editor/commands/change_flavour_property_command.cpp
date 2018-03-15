@@ -30,7 +30,7 @@ void on_property(
 								const auto invariant_location = reinterpret_cast<std::byte*>(std::addressof(invariant));
 								const auto location = reinterpret_cast<T*>(invariant_location + property_id.field_offset);
 
-								callback(*location);
+								result = callback(*location, invariant);
 							}
 						);
 					}
@@ -40,6 +40,17 @@ void on_property(
 
 		return result;
 	});
+}
+
+
+template <class T>
+static constexpr bool should_reinfer(const T& invariant) {
+	return should_reinfer_when_tweaking_v<T>;
+}
+
+template <class T>
+static auto maybe_reinfer(const T& invariant) {
+	return should_reinfer(invariant) ? changer_callback_result::REFRESH : changer_callback_result::DONT_REFRESH;
 }
 
 std::string change_flavour_property_command::describe() const {
@@ -57,9 +68,9 @@ void change_flavour_property_command::rewrite_change(
 	on_property(
 		property_id,
 		cosm,
-		[&](auto& field) {
+		[&](auto& field, const auto& invariant) {
 			augs::from_bytes(std::move(new_value), field);
-			return changer_callback_result::DONT_REFRESH;
+			return maybe_reinfer(invariant);
 		}
 	);
 }
@@ -70,12 +81,12 @@ void change_flavour_property_command::redo(const editor_command_input in) {
 	on_property(
 		property_id,
 		cosm,
-		[&](auto& field) {
+		[&](auto& field, const auto& invariant) {
 			const auto bytes_count = value_after_change.size();
 			value_before_change = detail_field_to_bytes(field, bytes_count);
 
 			augs::from_bytes(std::move(value_after_change), field);
-			return changer_callback_result::DONT_REFRESH;
+			return maybe_reinfer(invariant);
 		}	
 	);
 }
@@ -86,12 +97,12 @@ void change_flavour_property_command::undo(const editor_command_input in) {
 	on_property(
 		property_id,
 		cosm,
-		[&](auto& field) {
+		[&](auto& field, const auto& invariant) {
 			const auto bytes_count = value_before_change.size();
 			value_after_change = detail_field_to_bytes(field, bytes_count);
 
 			augs::from_bytes(std::move(value_before_change), field);
-			return changer_callback_result::DONT_REFRESH;
+			return maybe_reinfer(invariant);
 		}	
 	);
 }

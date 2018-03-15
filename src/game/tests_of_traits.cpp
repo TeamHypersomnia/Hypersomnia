@@ -263,6 +263,12 @@ struct tests_of_traits {
 	static_assert(same<float, nth_type_in_t<1, unsigned, float, float>>, "Trait has failed");
 	static_assert(same<float, nth_type_in_t<2, unsigned, float, float>>, "Trait has failed");
 	static_assert(same<double, nth_type_in_t<3, unsigned, float, float, double, unsigned>>, "Trait has failed");
+
+
+	static_assert(should_reinfer_when_tweaking_v<invariants::fixtures>);
+	static_assert(should_reinfer_when_tweaking_v<invariants::rigid_body>);
+
+	static_assert(!should_reinfer_when_tweaking_v<invariants::trace>);
 	
 	static_assert(
 		same<

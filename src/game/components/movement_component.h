@@ -47,6 +47,8 @@ namespace invariants {
 	struct movement {
 		using implied_component = components::movement;
 
+		static constexpr bool reinfer_when_tweaking = true;
+
 		// GEN INTROSPECTOR struct invariants::movement
 		vec2 applied_force_offset;
 		vec2 input_acceleration_axes;

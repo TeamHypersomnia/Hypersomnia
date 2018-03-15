@@ -73,6 +73,8 @@ namespace invariants {
 	struct rigid_body {
 		using implied_component = components::rigid_body;
 
+		static constexpr bool reinfer_when_tweaking = true;
+
 		// GEN INTROSPECTOR struct invariants::rigid_body
 		bool bullet = false;
 		bool angled_damping = false;

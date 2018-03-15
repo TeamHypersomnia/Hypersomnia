@@ -6,6 +6,8 @@
 
 namespace invariants {
 	struct container {
+		static constexpr bool reinfer_when_tweaking = true;
+
 		// GEN INTROSPECTOR struct invariants::container
 		augs::enum_map<slot_function, inventory_slot> slots;
 		// END GEN INTROSPECTOR

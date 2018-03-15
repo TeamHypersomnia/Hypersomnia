@@ -29,6 +29,8 @@ struct convex_poly_destruction_data {
 
 namespace invariants {
 	struct shape_polygon {
+		static constexpr bool reinfer_when_tweaking = true;
+
 		// GEN INTROSPECTOR struct invariants::shape_polygon
 		convex_partitioned_shape shape;
 		// END GEN INTROSPECTOR
