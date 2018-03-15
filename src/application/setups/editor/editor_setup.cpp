@@ -858,6 +858,8 @@ bool editor_setup::handle_input_before_game(
 		if (e.was_any_key_pressed()) {
 			const auto k = e.data.key.key;
 
+			auto& history = folder().history;
+
 			if (has_ctrl) {
 				if (has_shift) {
 					switch (k) {
@@ -883,6 +885,7 @@ bool editor_setup::handle_input_before_game(
 					}
 					return true;
 				case key::I: play(); return true;
+				case key::G: history.seek_to_revision(has_shift ? history.get_commands().size() - 1 : 0, make_command_input()); return true;
 				case key::DEL: del(); return true;
 				default: break;
 			}

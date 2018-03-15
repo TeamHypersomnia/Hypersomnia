@@ -59,7 +59,7 @@ void edit_invariant(
    	const editor_command_input in
 ) {
 	thread_local std::optional<ImGuiID> last_active;
-	thread_local std::string cached_old_description;
+	thread_local std::string cached_old_description = "";
 
 	auto& history = in.folder.history;
 
@@ -137,17 +137,20 @@ void edit_invariant(
 		}
 	};
 
+	/* Linker error fix */
+	auto& old_description = cached_old_description;
+
 	auto post_new_change = [&](
 		const description_pair& description,
 	   	const auto& new_content
-	) {
-		cached_old_description = description.of_old;
+	) mutable {
+		old_description = description.of_old;
 
 		change_flavour_property_command cmd;
 		cmd.property_id = make_property_id();
 
 		cmd.value_after_change = augs::to_bytes(new_content);
-		cmd.built_description = cached_old_description + description.of_new;
+		cmd.built_description = old_description + description.of_new;
 		history.execute_new(cmd, in);
 	};
 
@@ -158,7 +161,7 @@ void edit_invariant(
 		auto& last = history.last_command();
 
 		if (auto* const cmd = std::get_if<change_flavour_property_command>(std::addressof(last))) {
-			cmd->built_description = cached_old_description + description;
+			cmd->built_description = old_description + description;
 			cmd->rewrite_change(augs::to_bytes(new_content), in);
 		}
 		else {
