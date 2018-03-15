@@ -313,6 +313,13 @@ void edit_invariant(
 
 				details_text(get_type_name<M>());
 			}
+			else if constexpr(is_one_of_v<M, vec2, vec2i>) {
+				do_continuous([&]() { 
+					return drag_vec2(label, altered_member); 
+				});
+
+				details_text();
+			}
 			else if constexpr(std::is_enum_v<M>) {
 
 			}

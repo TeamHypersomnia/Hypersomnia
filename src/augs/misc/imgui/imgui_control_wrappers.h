@@ -1,6 +1,7 @@
 #pragma once
 #include <imgui/imgui.h>
 
+#include "augs/templates/type_matching_and_indexing.h"
 #include "augs/templates/always_false.h"
 #include "augs/templates/container_templates.h"
 #include "augs/templates/function_traits.h"
@@ -97,6 +98,34 @@ namespace augs {
 		}
 
 		template <class T, class... Args>
+		decltype(auto) drag_vec2(
+			const std::string& label,
+			basic_vec2<T>& into,
+			const float speed = 1.f,
+			T v_min = static_cast<T>(0),
+			T v_max = static_cast<T>(0),
+			Args&&... args
+		) {
+			using namespace detail;
+
+			fix_integral_bounds(v_min, v_max);
+
+			if constexpr(std::is_integral_v<T>) {
+				return direct_or_convert(into, [&](vec2i& input) {
+					return ImGui::DragInt2(label.c_str(), &input.x, speed, v_min, v_max, std::forward<Args>(args)...);
+				});
+			}
+			else if constexpr(std::is_floating_point_v<T>) {
+				return direct_or_convert(into, [&](vec2& input) {
+					return ImGui::DragFloat2(label.c_str(), &input.x, speed, v_min, v_max, std::forward<Args>(args)...);
+				});
+			}
+			else {
+				static_assert(always_false_v<T>, "Unsupported type. Use a suitable wrapper.");
+			}
+		}
+
+		template <class T, class... Args>
 		decltype(auto) drag(
 			const std::string& label,
 			T& into,
@@ -119,15 +148,8 @@ namespace augs {
 					return ImGui::DragFloat(label.c_str(), &input, speed, v_min, v_max, std::forward<Args>(args)...);
 				});
 			}
-			else if constexpr(std::is_same_v<T, vec2> || std::is_same_v<T, vec2d>) {
-				return direct_or_convert(into, [&](vec2& input) {
-					return ImGui::DragFloat2(label.c_str(), &input.x, speed, v_min, v_max, std::forward<Args>(args)...);
-				});
-			}
-			else if constexpr(std::is_same_v<T, vec2i> || std::is_same_v<T, vec2u>) {
-				return direct_or_convert(into, [&](vec2i& input) {
-					return ImGui::DragInt2(label.c_str(), &input.x, speed, v_min, v_max, std::forward<Args>(args)...);
-				});
+			else {
+				static_assert(always_false_v<T>, "Unsupported type. Use a suitable wrapper.");
 			}
 		}
 
