@@ -120,9 +120,18 @@ namespace augs {
 		memory_stream s(std::move(bytes));
 		augs::read_bytes(s, object);
 	}
+
+	struct trivial_type_marker {};
+
+	void from_bytes(std::vector<std::byte>&& bytes, trivial_type_marker& object);
 	
 	template <class T>
 	T from_bytes(std::vector<std::byte>&& bytes) {
+		static_assert(
+			!std::is_same_v<T, trivial_type_marker>,
+			"Use the other overload that takes destination as argument."
+		);
+
 		T object;
 		memory_stream s(std::move(bytes));
 		augs::read_bytes(s, object);

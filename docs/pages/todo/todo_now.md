@@ -7,6 +7,16 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
+- remove that heresy which is flip_flags, oh boy
+- use range widgets for minmaxes, with proper min/max labels
+- watch out for newlines in history's description of multiline textbox changes
+
+- disallow moving through history when tweaking a value or during other sensitive operations
+	- e.g. setting a transform of an entity?
+	- optionally, id cache clearers can take into account the moved entities
+	- but really we should not be able to just ctrl+z/y arbitrarily
+	- how do we detect that a field is being dragged?
+
 - check imgui's id stack logic and see if the activity change logic can't be made simpler, without flavour prop id, thanks to the stacks
 
 - determine what to do with b2Filters

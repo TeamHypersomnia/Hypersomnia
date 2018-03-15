@@ -53,24 +53,6 @@ auto subscript_handle_getter(C& cosm, const entity_guid guid) {
 }
 
 class cosmos {
-	template <class C, class... Types, class F>
-	static decltype(auto) on_flavour_impl(
-		C& self,
-		const constrained_entity_flavour_id<Types...> flavour_id,
-		F callback	
-	) {
-		using candidate_types = typename decltype(flavour_id)::matching_types; 
-
-		return conditional_get_by_dynamic_id<candidate_types>(
-			all_entity_types(),
-			flavour_id.type_id,
-			[&](auto t) -> decltype(auto) {
-				using flavour_type = decltype(t);
-				return callback(self.template get_flavour<flavour_type>(flavour_id.raw));
-			}
-		);
-	}
-
 	template <class C, class F>
 	static void for_each_in_impl(C& self, const processing_subjects f, F callback) {
 		for (const auto subject : self.get_solvable_inferred().processing.get(f)) {
@@ -147,12 +129,9 @@ public:
 		return get_common_significant().get_flavours<entity_type>().get_flavour(id);
 	}
 
-	template <class... Types, class F>
-	decltype(auto) on_flavour(
-		const constrained_entity_flavour_id<Types...> flavour_id,
-	   	F&& callback
-	) const {
-		return on_flavour_impl(*this, flavour_id, std::forward<F>(callback));
+	template <class... Args>
+	decltype(auto) on_flavour(Args&&... args) const {
+		return get_common_significant().on_flavour(std::forward<Args>(args)...);
 	}
 
 	template <class... Constraints, class F>

@@ -3,6 +3,14 @@
 #include "augs/readwrite/memory_stream.h"
 
 namespace augs {
+	void from_bytes(std::vector<std::byte>&& bytes, trivial_type_marker& object) {
+		std::memcpy(
+			reinterpret_cast<std::byte*>(std::addressof(object)),
+		   	bytes.data(),
+		   	bytes.size()
+		);
+	}
+
 	memory_stream::memory_stream(std::vector<std::byte>&& new_buffer)
 		: buffer(std::move(new_buffer))
 	{

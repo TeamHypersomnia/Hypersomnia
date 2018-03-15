@@ -1,25 +1,23 @@
 #pragma once
-#include "augs/templates/type_in_list_id.h"
-
 #include "game/organization/all_components_declaration.h"
 #include "game/transcendental/entity_flavour_id.h"
 #include "application/setups/editor/editor_command_structs.h"
-
-using invariant_id_type = type_in_list_id<invariant_list_t<type_list>>;
-using component_id_type = type_in_list_id<invariant_list_t<type_list>>;
+#include "application/setups/editor/property_editor_structs.h"
 
 struct flavour_property_id {
 	entity_flavour_id flavour_id;
-	invariant_id_type invariant_id;
-	edited_field_id field_id;
+	unsigned invariant_id = static_cast<unsigned>(-1);
+	unsigned field_offset = static_cast<unsigned>(-1);
+	edited_field_type_id field_type;
 
-	bool operator==(const flavour_property_id& b) {
-		return 
-			flavour_id == b.flavour_id 
-			&& invariant_id == b.invariant_id 
-			&& field_id == b.field_id
-		;
-	}
+	/* bool operator==(const flavour_property_id& b) { */
+	/* 	return */ 
+	/* 		flavour_id == b.flavour_id */ 
+	/* 		&& invariant_id == b.invariant_id */ 
+	/* 		&& field_offset == b.field_offset */
+	/* 		&& field_type == b.field_type */
+	/* 	; */
+	/* } */
 };
 
 struct change_flavour_property_command {
@@ -31,8 +29,17 @@ struct change_flavour_property_command {
 
 	std::vector<std::byte> value_before_change;
 	std::vector<std::byte> value_after_change;
+
+	std::string built_description;
 	// END GEN INTROSPECTOR
 
-	void redo(editor_command_input) const;
-	void undo(editor_command_input) const;
+	void redo(editor_command_input);
+	void undo(editor_command_input);
+
+	void rewrite_change(
+		std::vector<std::byte>&& new_value,
+		editor_command_input
+	);
+
+	std::string describe() const;
 };

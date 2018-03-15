@@ -48,6 +48,35 @@ struct cosmos_common_significant {
 	const auto& get_flavours() const {
 		return std::get<make_entity_flavours<entity_type>>(flavours);	
 	}
+
+private:
+	template <class C, class... Types, class F>
+	static decltype(auto) on_flavour_impl(
+		C& self,
+		const constrained_entity_flavour_id<Types...> flavour_id,
+		F callback	
+	) {
+		using candidate_types = typename decltype(flavour_id)::matching_types; 
+
+		return conditional_get_by_dynamic_id<candidate_types>(
+			all_entity_types(),
+			flavour_id.type_id,
+			[&](auto t) -> decltype(auto) {
+				using flavour_type = decltype(t);
+				return callback(self.template get_flavours<flavour_type>().get_flavour(flavour_id.raw));
+			}
+		);
+	}
+public:
+	template <class T, class F>
+	decltype(auto) on_flavour(const T flavour_id, F&& callback) {
+		return on_flavour_impl(*this, flavour_id, std::forward<F>(callback));
+	}
+
+	template <class T, class F>
+	decltype(auto) on_flavour(const T flavour_id, F&& callback) const {
+		return on_flavour_impl(*this, flavour_id, std::forward<F>(callback));
+	}
 };
 
 namespace std {

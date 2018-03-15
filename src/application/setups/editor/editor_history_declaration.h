@@ -11,5 +11,6 @@ struct fill_with_test_scene_command;
 
 using editor_history = augs::history_with_marks<
 	delete_entities_command,
-	fill_with_test_scene_command
+	fill_with_test_scene_command,
+	change_flavour_property_command
 >;

@@ -163,7 +163,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 			if (const auto magic_missile_flavour_id = gun_def.magic_missile_flavour) {
 				const auto& missile = cosmos.on_flavour(
 					magic_missile_flavour_id,
-					[](auto& f) -> decltype(auto) {
+					[](const auto& f) -> decltype(auto) {
 						// using T = std::decay_t<decltype(f)>;
 						// static_assert(std::is_same_v<T, entity_flavour<plain_missile>> || std::is_same_v<T, entity_flavour<explosive_missile>>);
 						return f.template get<invariants::missile>();
