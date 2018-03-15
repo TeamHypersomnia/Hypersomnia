@@ -289,3 +289,6 @@ we consider whole type overrides too complex architeciturally:
 - in gameplay mode, the address may suddenly change
 -->
 - rename minmax to "bound"
+- use range widgets for minmaxes, with proper min/max labels
+- check imgui's id stack logic and see if the activity change logic can't be made simpler, without flavour prop id, thanks to the stacks
+

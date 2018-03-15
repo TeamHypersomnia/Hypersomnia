@@ -2,7 +2,7 @@
 #include "application/setups/editor/editor_folder.h"
 #include "application/setups/editor/commands/change_flavour_property_command.h"
 
-#include "application/setups/editor/gui/editor_properties_gui.h"
+#include "application/setups/editor/property_editor_structs.h"
 #include "augs/readwrite/byte_readwrite.h"
 
 template <class C, class F>
