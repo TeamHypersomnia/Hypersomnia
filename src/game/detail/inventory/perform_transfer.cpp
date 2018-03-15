@@ -14,8 +14,8 @@
 #include "augs/templates/container_templates.h"
 #include "game/transcendental/cosmos.h"
 
-void drop_from_all_slots(const invariants::container& container, const entity_handle handle, const logic_step step) {
-	drop_from_all_slots(container, handle, [step](const auto& result) { result.notify(step); });
+void drop_from_all_slots(const invariants::container& container, const entity_handle handle, const impulse_info impulse, const logic_step step) {
+	drop_from_all_slots(container, handle, impulse, [step](const auto& result) { result.notify(step); });
 }
 
 void perform_transfer_result::notify(const logic_step step) const {
@@ -198,6 +198,8 @@ perform_transfer_result perform_transfer(
 		ensure(previous_slot_container.alive());
 
 		const auto rigid_body = grabbed_item_part_handle.get<components::rigid_body>();
+		const auto capability_entity = previous_slot_container.get_owning_transfer_capability();
+		const auto& capability_def = capability_entity.get<invariants::item_slot_transfers>();
 
 		// LOG_NVPS(rigid_body.get_velocity());
 		// ensure(rigid_body.get_velocity().is_epsilon());
@@ -206,15 +208,24 @@ perform_transfer_result perform_transfer(
 		rigid_body.set_angular_velocity(0.f);
 		rigid_body.set_transform(initial_transform_of_transferred);
 
-		if (r.impulse_applied_on_drop > 0.f) {
-			const auto impulse = vec2::from_degrees(previous_container_transform.rotation) * r.impulse_applied_on_drop;
-			rigid_body.apply_impulse(impulse * rigid_body.get_mass());
-		}
+		const auto total_impulse = 
+			r.additional_drop_impulse + capability_def.standard_drop_impulse
+		;
 
-		rigid_body.apply_angular_impulse(1.5f * rigid_body.get_mass());
+		const auto impulse = 
+			total_impulse.linear * vec2::from_degrees(previous_container_transform.rotation)
+		;
+
+		rigid_body.apply_impulse(impulse * rigid_body.get_mass());
+		rigid_body.apply_angular_impulse(total_impulse.angular * rigid_body.get_mass());
 
 		auto& special_physics = grabbed_item_part_handle.get_special_physics();
-		special_physics.dropped_or_created_cooldown.set(300, cosmos.get_timestamp());
+
+		special_physics.dropped_or_created_cooldown.set(
+			capability_def.disable_collision_on_drop_for_ms,
+		   	cosmos.get_timestamp()
+		);
+
 		special_physics.during_cooldown_ignore_collision_with = previous_slot_container;
 
 		output.dropped.emplace();
@@ -224,7 +235,7 @@ perform_transfer_result perform_transfer(
 
 		dropped.sound_start = sound_effect_start_input::orbit_absolute(
 			grabbed_item_part_handle, initial_transform_of_transferred
-		).set_listener(previous_slot_container.get_owning_transfer_capability());
+		).set_listener(capability_entity);
 	}
 
 	return output;

@@ -1,6 +1,7 @@
 #pragma once
 #include "augs/misc/timing/stepped_timing.h"
 #include "game/detail/view_input/sound_effect_input.h"
+#include "game/detail/physics/impulse_info.h"
 
 namespace components {
 	struct hand_fuse {
@@ -16,6 +17,7 @@ namespace invariants {
 
 		// GEN INTROSPECTOR struct invariants::hand_fuse
 		float fuse_delay_ms = 1000.f;
+		impulse_info additional_release_impulse;
 
 		sound_effect_input unpin_sound;
 		sound_effect_input throw_sound;

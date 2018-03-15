@@ -141,6 +141,11 @@ namespace test_flavours {
 
 				meta.set(attitude);
 			}
+
+			{
+				invariants::item_slot_transfers transfers; 
+				meta.set(transfers);
+			}
 		}
 
 		{

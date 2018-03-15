@@ -19,6 +19,7 @@ struct controlled_character {
 		invariants::crosshair,
 		invariants::sentience,
 		invariants::container,
+		invariants::item_slot_transfers,
 
 		invariants::sprite,
 		invariants::render,

@@ -32,6 +32,7 @@ namespace invariants {
 	struct movement;
 	struct light;
 	struct crosshair;
+	struct item_slot_transfers;
 }
 
 namespace components {
@@ -135,7 +136,8 @@ using invariant_list_t = List<
 	invariants::explosive,
 	invariants::hand_fuse,
 	invariants::crosshair,
-	invariants::light
+	invariants::light,
+	invariants::item_slot_transfers
 >;
 
 template <class... Types>

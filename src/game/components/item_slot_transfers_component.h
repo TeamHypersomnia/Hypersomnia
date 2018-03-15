@@ -5,6 +5,7 @@
 #include "game/transcendental/entity_id.h"
 #include "game/detail/inventory/inventory_slot_id.h"
 
+#include "game/detail/physics/impulse_info.h"
 #include "game/transcendental/entity_handle_declaration.h"
 #include "augs/misc/timing/stepped_timing.h"
 #include "augs/pad_bytes.h"
@@ -33,5 +34,15 @@ namespace components {
 		static item_slot_mounting_operation find_suitable_montage_operation(const_entity_handle parent_container);
 		void interrupt_mounting();
 #endif
+	};
+}
+
+namespace invariants {
+	struct item_slot_transfers {
+		// GEN INTROSPECTOR struct invariants::item_slot_transfers
+		impulse_info standard_throw_impulse = { 7000.f, 0.f };
+		impulse_info standard_drop_impulse = { 2000.f, 1.5f };
+		float disable_collision_on_drop_for_ms = 300.f;
+		// END GEN INTROSPECTOR
 	};
 }

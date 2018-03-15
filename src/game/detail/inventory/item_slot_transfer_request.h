@@ -7,6 +7,7 @@
 
 #include "game/detail/inventory/item_slot_transfer_request_declaration.h"
 #include "game/detail/inventory/inventory_slot_handle.h"
+#include "game/detail/physics/impulse_info.h"
 
 template <class id_type>
 struct basic_item_slot_transfer_request {
@@ -15,7 +16,7 @@ struct basic_item_slot_transfer_request {
 	basic_inventory_slot_id<id_type> target_slot;
 
 	int specified_quantity = -1;
-	float impulse_applied_on_drop = 2000.f;
+	impulse_info additional_drop_impulse;
 	bool force_immediate_mount = false;
 	bool allow_unauthorized_transfers = false;
 	pad_bytes<2> pad;

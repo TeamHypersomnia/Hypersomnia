@@ -19,6 +19,7 @@
 #include "game/components/transform_component.h"
 
 #include "game/detail/all_sentience_meters.h"
+#include "game/detail/physics/impulse_info.h"
 #include "game/detail/spells/all_spells.h"
 #include "game/detail/perks/all_perks.h"
 
@@ -112,6 +113,7 @@ namespace invariants {
 
 		sound_effect_input death_sound;
 		sound_effect_input loss_of_consciousness_sound;
+		impulse_info drop_impulse_on_knockout = { 2000.0f, 1.5f };
 
 		particle_effect_input health_decrease_particles;
 		// END GEN INTROSPECTOR

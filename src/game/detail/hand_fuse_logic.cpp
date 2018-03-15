@@ -51,8 +51,18 @@ void release_or_throw_fused_object(
 			const auto& explosive = *maybe_explosive;
 #endif
 
+			const auto total_impulse = [&]() {
+				auto impulse = fuse_def.additional_release_impulse;
+
+				if (const auto capability = thrower.find<invariants::item_slot_transfers>()) {
+					impulse = impulse + capability->standard_throw_impulse;
+				}
+
+				return impulse;
+			}();
+
 			perform_transfer(
-				item_slot_transfer_request{ fused_entity, inventory_slot_id(), -1, 0.f, false }, 
+				item_slot_transfer_request{ fused_entity, inventory_slot_id(), -1, total_impulse, false }, 
 				step
 			);
 			
@@ -63,12 +73,12 @@ void release_or_throw_fused_object(
 
 			const auto rigid_body = fused_entity.get<components::rigid_body>();
 
-			//ensure(rigid_body.get_velocity().is_epsilon());
+/* 			//ensure(rigid_body.get_velocity().is_epsilon()); */
 
-			rigid_body.set_velocity({ 0.f, 0.f });
-			rigid_body.set_angular_velocity(0.f);
-			rigid_body.apply_angular_impulse(1.5f * rigid_body.get_mass());
-			rigid_body.apply_impulse(vec2::from_degrees(fused_entity.get_logic_transform().rotation) * 5000 * rigid_body.get_mass());
+/* 			rigid_body.set_velocity({ 0.f, 0.f }); */
+/* 			rigid_body.set_angular_velocity(0.f); */
+/* 			rigid_body.apply_angular_impulse(1.5f * rigid_body.get_mass()); */
+/* 			rigid_body.apply_impulse(vec2::from_degrees(fused_entity.get_logic_transform().rotation) * fuse_def.standard_release_impulse * rigid_body.get_mass()); */
 
 #if TODO
 			rigid_body.set_linear_damping(3.0f);

@@ -191,7 +191,8 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 	auto& cosmos = step.get_cosmos();
 	const auto subject = cosmos[h.subject];
 	const auto now = cosmos.get_timestamp();
-	components::sentience& sentience = subject.get<components::sentience>();
+	auto& sentience = subject.get<components::sentience>();
+	auto& sentience_def = subject.get<invariants::sentience>();
 	auto& health = sentience.get<health_meter_instance>();
 	auto& consciousness = sentience.get<consciousness_meter_instance>();
 	auto& personal_electricity = sentience.get<personal_electricity_meter_instance>();
@@ -279,7 +280,7 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 
 		if (container) {
 			const auto& container = subject.get<invariants::container>();
-			drop_from_all_slots(container, subject, step);
+			drop_from_all_slots(container, subject, sentience_def.drop_impulse_on_knockout, step);
 		}
 
 		auto& driver = subject.get<components::driver>();
