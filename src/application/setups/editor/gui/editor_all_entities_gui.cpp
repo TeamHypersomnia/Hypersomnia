@@ -83,25 +83,6 @@ void edit_invariant(
 		return typesafe_sprintf("(in %x of %x)", invariant_name, flavour_name);
 	};
 
-	/* 
-		Change description format: 
-
-		[address] = Muzzle velocity (in Gun of Amplifier arm)
-
-		Bools:
-
-		Set [address]
-		Unset [address]
-
-		Other fields:
-
-		Set [address] to [value]
-
-		Name:
-
-		Renamed [old name] to [new name]
-	*/
-
 	auto describe_changed_flag = [&](
 		const auto& field_name,
 		const auto& new_value
@@ -185,34 +166,31 @@ void edit_invariant(
 		}
 	};
 
+	if (last_active && last_active.value() != ImGui::GetActiveID()) {
+		/* LOG("Released"); */
+		last_active.reset();
+	}
+
 	auto handle_continuous_tweaker = [&](
 		const auto& field_name,
 	   	const auto& old_value, 
 		const auto& new_value,
 	   	auto callback
 	) {
-		auto& wnd = *ImGui::GetCurrentWindow();
-
 		if (callback()) {
 			const auto this_id = ImGui::GetActiveID();
 			const auto description = describe_changed(field_name, old_value, new_value);
 
 			if (last_active != this_id) {
-				/* LOG("Started dragging %x to %x", label, member); */
+				/* LOG("Started dragging %x to %x", field_name, new_value); */
 				post_new_change(description, new_value);
 			}
 			else {
-				/* LOG("Dragging %x to %x", label, member); */
+				/* LOG("Dragging %x to %x", field_name, new_value); */
 				rewrite_last_change(description.of_new, new_value);
 			}
 
 			last_active = this_id;
-		}
-		else {
-			if (last_active == wnd.GetID(field_name.c_str()) && !ImGui::IsItemActive()) {
-				/* LOG("Released %x to %x", label, member); */
-				last_active.reset();
-			}
 		}
 	};
 
