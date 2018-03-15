@@ -1,4 +1,5 @@
 #pragma once
+#include <ostream>
 #include "augs/templates/hash_templates.h"
 
 namespace augs {
@@ -12,6 +13,9 @@ namespace augs {
 	template <class A, class B>
 	class simple_pair {
 	public:
+		using first_type = A;
+		using second_type = B;
+
 		// GEN INTROSPECTOR class augs::simple_pair class A class B
 		A first;
 		B second;
@@ -45,6 +49,10 @@ namespace augs {
 	}
 }
 
+template <class A, class B>
+std::ostream& operator<<(std::ostream& out, const augs::simple_pair<A, B>& x) {
+	return out << '(' << x.first << " - " << x.second << ')';
+}
 
 namespace std {
 	template <class A, class B>

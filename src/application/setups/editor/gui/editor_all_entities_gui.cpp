@@ -1,3 +1,4 @@
+#include "augs/misc/simple_pair.h"
 #include "augs/templates/for_each_std_get.h"
 
 #include "augs/readwrite/memory_stream.h"
@@ -319,6 +320,13 @@ void edit_invariant(
 				});
 
 				details_text();
+			}
+			else if constexpr(is_minmax_v<M>) {
+				do_continuous([&]() { 
+					return drag_minmax(label, altered_member); 
+				});
+
+				details_text(get_type_name<typename M::first_type>() + " range");
 			}
 			else if constexpr(std::is_enum_v<M>) {
 

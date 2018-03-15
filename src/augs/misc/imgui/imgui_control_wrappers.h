@@ -9,6 +9,8 @@
 #include "augs/templates/string_templates.h"
 #include "augs/templates/format_enum.h"
 
+#include "augs/misc/minmax.h"
+
 #include "augs/math/vec2.h"
 #include "augs/graphics/rgba.h"
 
@@ -118,6 +120,34 @@ namespace augs {
 			else if constexpr(std::is_floating_point_v<T>) {
 				return direct_or_convert(into, [&](vec2& input) {
 					return ImGui::DragFloat2(label.c_str(), &input.x, speed, v_min, v_max, std::forward<Args>(args)...);
+				});
+			}
+			else {
+				static_assert(always_false_v<T>, "Unsupported type. Use a suitable wrapper.");
+			}
+		}
+
+		template <class T, class... Args>
+		decltype(auto) drag_minmax(
+			const std::string& label,
+			minmax<T>& into,
+			const float speed = 1.f,
+			T v_min = static_cast<T>(0),
+			T v_max = static_cast<T>(0),
+			Args&&... args
+		) {
+			using namespace detail;
+
+			fix_integral_bounds(v_min, v_max);
+
+			if constexpr(std::is_integral_v<T>) {
+				return direct_or_convert(into, [&](minmax<int>& input) {
+					return ImGui::DragIntRange2(label.c_str(), std::addressof(into.first), std::addressof(into.second), speed, v_min, v_max, std::forward<Args>(args)...);
+				});
+			}
+			else if constexpr(std::is_floating_point_v<T>) {
+				return direct_or_convert(into, [&](minmax<float>& input) {
+					return ImGui::DragFloatRange2(label.c_str(), std::addressof(into.first), std::addressof(into.second), speed, v_min, v_max, std::forward<Args>(args)...);
 				});
 			}
 			else {

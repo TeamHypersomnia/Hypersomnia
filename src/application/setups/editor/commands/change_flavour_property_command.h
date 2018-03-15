@@ -9,15 +9,6 @@ struct flavour_property_id {
 	unsigned invariant_id = static_cast<unsigned>(-1);
 	unsigned field_offset = static_cast<unsigned>(-1);
 	edited_field_type_id field_type;
-
-	/* bool operator==(const flavour_property_id& b) { */
-	/* 	return */ 
-	/* 		flavour_id == b.flavour_id */ 
-	/* 		&& invariant_id == b.invariant_id */ 
-	/* 		&& field_offset == b.field_offset */
-	/* 		&& field_type == b.field_type */
-	/* 	; */
-	/* } */
 };
 
 struct change_flavour_property_command {

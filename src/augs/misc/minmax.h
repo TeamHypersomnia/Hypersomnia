@@ -8,3 +8,12 @@ namespace augs {
 	template<class T>
 	using random_bound = simple_pair<minmax<T>, minmax<T>>;
 }
+
+template <class T>
+struct is_minmax : std::false_type {};
+
+template <class T>
+struct is_minmax<augs::minmax<T>> : std::true_type {};
+
+template <class T>
+constexpr bool is_minmax_v = is_minmax<T>::value;

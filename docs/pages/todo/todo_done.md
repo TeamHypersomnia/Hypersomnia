@@ -288,3 +288,4 @@ we consider whole type overrides too complex architeciturally:
 	- because we will disallow any other action
 - in gameplay mode, the address may suddenly change
 -->
+- rename minmax to "bound"
