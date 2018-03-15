@@ -97,6 +97,7 @@ namespace augs {
 		void reserve(const byte_counter_stream&);
 
 		operator std::vector<std::byte>&&() && {
+			buffer.resize(get_write_pos());
 			return std::move(buffer);
 		}
 	};

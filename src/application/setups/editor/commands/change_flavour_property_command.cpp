@@ -24,7 +24,7 @@ void on_property(
 						get_by_dynamic_id(
 							edited_field_type_id::list_type(),
 							property_id.field_type,
-							[&](const auto& t){
+							[&](const auto& t) {
 								using T = std::decay_t<decltype(t)>;
 
 								const auto invariant_location = reinterpret_cast<std::byte*>(std::addressof(invariant));
