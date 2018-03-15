@@ -58,6 +58,7 @@ void edit_invariant(
    	const editor_command_input in
 ) {
 	thread_local std::optional<ImGuiID> last_active;
+	thread_local std::string cached_old_description;
 
 	auto& history = in.folder.history;
 
@@ -124,41 +125,47 @@ void edit_invariant(
 		);
 	};
 
+	struct description_pair {
+		std::string of_old;
+		std::string of_new;
+	};
+
 	auto describe_changed = [&](
 		const auto& field_name,
 		const auto& old_value,
 	   	const auto& new_value
-	) {
+	) -> description_pair {
 		using F = std::decay_t<decltype(new_value)>;
 
 		if constexpr(std::is_same_v<F, bool>) {
-			return describe_changed_flag(field_name, new_value);
+			return { "", describe_changed_flag(field_name, new_value) };
 		}
 		else {
 			if (field_name == "Name") {
-				return typesafe_sprintf(
-					"Renamed %x to %x",
-					old_value,
-					new_value
-				);
+				return { 
+					typesafe_sprintf("Renamed %x ", old_value),
+					typesafe_sprintf("to %x ", new_value)
+				};
 			}
 
-			return describe_changed_generic(
+			return { "", describe_changed_generic(
 				field_name,
 				new_value
-			);
+			) };
 		}
 	};
 
 	auto post_new_change = [&](
-		const auto& description,
+		const description_pair& description,
 	   	const auto& new_content
 	) {
+		cached_old_description = description.of_old;
+
 		change_flavour_property_command cmd;
 		cmd.property_id = make_property_id();
 
 		cmd.value_after_change = augs::to_bytes(new_content);
-		cmd.built_description = description;
+		cmd.built_description = cached_old_description + description.of_new;
 		history.execute_new(cmd, in);
 	};
 
@@ -169,7 +176,7 @@ void edit_invariant(
 		auto& last = history.last_command();
 
 		if (auto* const cmd = std::get_if<change_flavour_property_command>(std::addressof(last))) {
-			cmd->built_description = description;
+			cmd->built_description = cached_old_description + description;
 			cmd->rewrite_change(augs::to_bytes(new_content), in);
 		}
 		else {
@@ -195,7 +202,7 @@ void edit_invariant(
 			}
 			else {
 				/* LOG("Dragging %x to %x", label, member); */
-				rewrite_last_change(description, new_value);
+				rewrite_last_change(description.of_new, new_value);
 			}
 
 			last_active = this_id;
@@ -278,7 +285,7 @@ void edit_invariant(
 				auto do_flag = [&](const auto& flag_name, auto& flag) {
 					if (checkbox(flag_name, flag)) {
 						post_new_change(
-							describe_changed_flag(flag_name, flag),
+							{ "", describe_changed_flag(flag_name, flag) },
 							altered_member
 						);
 					}
