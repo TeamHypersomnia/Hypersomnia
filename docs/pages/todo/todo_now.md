@@ -7,6 +7,11 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
+- determine what makes the atlas be regenerated when entering editor?
+	- perhaps zeroed cosmos is guilty?
+
+- we should use asynchronous texture transfers, especially when we'll be regenerating atlases
+
 - transform setting in editor
 	- transform setting should always preview the changes as if by applying set_logic_transform
 	- some entities don't have their own transforms

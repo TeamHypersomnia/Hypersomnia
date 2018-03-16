@@ -73,7 +73,11 @@ namespace augs {
 			if constexpr(std::is_integral_v<T>) {
 				if (v_max == v_min) {
 					/* Fix default bounds */
-					if constexpr(std::is_same_v<T, unsigned>) {
+
+					if constexpr(std::is_same_v<T, int>) {
+						/* Correct case, do nothing */
+					}
+					else if constexpr(std::is_same_v<T, unsigned>) {
 						/* Prevent ImGui from setting negative values */
 						v_min = 0;
 						v_max = static_cast<T>(std::numeric_limits<int>::max());

@@ -284,7 +284,6 @@ unsigned basic_inventory_slot_handle<E>::calc_local_space_available() const {
 
 	for (const auto e : get_items_inside()) {
 		const auto occupied = calc_space_occupied_with_children(get_cosmos()[e]);
-		ensure(occupied <= lsa);
 		lsa -= occupied;
 	}
 

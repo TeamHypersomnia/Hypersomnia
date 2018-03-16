@@ -11,7 +11,8 @@
 #include "application/setups/editor/editor_folder.h"
 #include "application/setups/editor/gui/editor_all_entities_gui.h"
 
-#include "application/setups/editor/property_editor/property_editor_gui.h"
+#include "application/setups/editor/property_editor/flavour_properties_editor.h"
+#include "application/setups/editor/property_editor/entity_properties_editor.h"
 
 #include "augs/readwrite/memory_stream.h"
 #include "augs/readwrite/byte_readwrite.h"
@@ -101,18 +102,24 @@ void editor_all_entities_gui::perform(const editor_command_input in) {
 								ImGui::Separator();
 
 								for (const auto& e : all_having_flavour) {
-									const auto guid = cosm[e].get_guid();
-									const auto entity_label = typesafe_sprintf("%x", guid);
+									const auto handle = cosm[e];
 
-									if (scoped_tree_node_ex(entity_label.c_str())) {
+									handle.dispatch([&](const auto typed_handle){
+										const auto guid = typed_handle.get_guid();
+										const auto entity_label = typesafe_sprintf("%x", guid);
 
-									}
+										const auto e_node = scoped_tree_node_ex(entity_label.c_str());
 
-									if (ImGui::IsItemHovered()) {
-										hovered_guid = guid; 
-									}
+										if (ImGui::IsItemHovered()) {
+											hovered_guid = guid; 
+										}
 
-									next_column_text();
+										next_column_text();
+
+										if (e_node) {
+											edit_entity(properties_gui, typed_handle, in);
+										}
+									});
 								}
 							}
 						}
