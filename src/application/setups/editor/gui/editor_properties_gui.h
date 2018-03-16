@@ -120,13 +120,15 @@ void general_edit_properties(
 		augs::recursive([&](auto self, const std::string& original_label, const auto& original_member) {
 			using M = std::decay_t<decltype(original_member)>;
 
-			const auto current_offset = static_cast<unsigned>(
-				reinterpret_cast<const std::byte*>(std::addressof(original_member))
-				- reinterpret_cast<const std::byte*>(std::addressof(object))
-			);
+			const auto field = [&](){
+				field_address result;
 
-			const auto current_type_id = [&](){
-				edited_field_type_id id;
+				result.offset = static_cast<unsigned>(
+					reinterpret_cast<const std::byte*>(std::addressof(original_member))
+					- reinterpret_cast<const std::byte*>(std::addressof(object))
+				);
+
+				auto& id = result.type_id;
 
 				if constexpr(std::is_trivially_copyable_v<M>) {
 					id.set<augs::trivial_type_marker>();
@@ -138,13 +140,10 @@ void general_edit_properties(
 					static_assert(has_introspect_v<M>);
 				}
 
-				return id;
+				return result;
 			}();
 
-			const auto property_id = make_property_id(
-				current_offset,
-				current_type_id
-			);
+			const auto property_id = make_property_id(field);
 
 			auto post_new = [&](
 				const description_pair& description,
@@ -289,17 +288,12 @@ void edit_invariant(
 ) {
 	using namespace augs::imgui;
 
-	auto make_property_id = [&](
-		const auto offset,
-		const auto type_id
-	) {
+	auto make_property_id = [&](const field_address field) {
 		flavour_property_id result;
 
 		result.flavour_id = flavour_id;
 		result.invariant_id = index_in_list_v<T, decltype(entity_flavour<E>::invariants)>;
-
-		result.field_offset = offset;
-		result.field_type = type_id;
+		result.field = field;
 
 		return result;
 	};
@@ -316,7 +310,7 @@ void edit_invariant(
 
 	auto post_new_change = [&](
 		const auto& description,
-		const auto property_id,
+		const flavour_property_id property_id,
 		const auto& new_content
 	) {
 		change_flavour_property_command cmd;

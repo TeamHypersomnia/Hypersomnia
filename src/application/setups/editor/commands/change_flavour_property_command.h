@@ -4,33 +4,55 @@
 #include "application/setups/editor/editor_command_structs.h"
 #include "application/setups/editor/property_editor_structs.h"
 
+#include "application/setups/editor/commands/change_property_command.h"
+
 struct flavour_property_id {
 	entity_flavour_id flavour_id;
 	unsigned invariant_id = static_cast<unsigned>(-1);
-	unsigned field_offset = static_cast<unsigned>(-1);
-	edited_field_type_id field_type;
+	field_address field;
 };
 
-struct change_flavour_property_command {
+struct change_flavour_property_command : change_property_command<change_flavour_property_command> {
 	friend augs::introspection_access;
 
 	// GEN INTROSPECTOR struct change_flavour_property_command
-	editor_command_common common;
+	// INTROSPECT BASE change_property_command<change_flavour_property_command>
 	flavour_property_id property_id;
-
-	std::vector<std::byte> value_before_change;
-	std::vector<std::byte> value_after_change;
-
-	std::string built_description;
 	// END GEN INTROSPECTOR
 
-	void redo(editor_command_input);
-	void undo(editor_command_input);
+	template <class C, class F>
+	void access_property(
+		C& cosm,
+		F callback
+	) {
+		cosm.change_common_significant([&](auto& common_signi) {
+			auto result = changer_callback_result::DONT_REFRESH;
 
-	void rewrite_change(
-		std::vector<std::byte>&& new_value,
-		editor_command_input
-	);
+			common_signi.on_flavour(
+				property_id.flavour_id,
+				[&](auto& flavour) {
+					get_by_dynamic_index(
+						flavour.invariants,
+						property_id.invariant_id,
+						[&](auto& invariant) {
+							get_by_dynamic_id(
+								edited_field_type_id::list_type(),
+								property_id.field.type_id,
+								[&](const auto& t) {
+									using T = std::decay_t<decltype(t)>;
 
-	std::string describe() const;
+									const auto invariant_location = reinterpret_cast<std::byte*>(std::addressof(invariant));
+									const auto location = reinterpret_cast<T*>(invariant_location + property_id.field.offset);
+
+									result = callback(*location, invariant);
+								}
+							);
+						}
+					);
+				}
+			);
+
+			return result;
+		});
+	}
 };

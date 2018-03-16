@@ -7,6 +7,13 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
+- transform setting in editor
+	- transform setting should always preview the changes as if by applying set_logic_transform
+	- some entities don't have their own transforms
+		- a warning should appear?
+		- actually, there's always a context by which a transform could be set
+			- e.g. if an item is held, it might just get its attachment offset moved	
+
 - determine what to do with b2Filters
 	- it appears that filters aren't really given any special roles.
 		- thus it makes sense that they be completely customizable in editor.

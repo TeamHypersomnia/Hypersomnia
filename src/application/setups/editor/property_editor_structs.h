@@ -23,14 +23,7 @@ struct editor_properties_gui {
 	std::string old_description = "";
 };
 
-template <class T>
-inline auto detail_field_to_bytes(const T& from, const std::size_t bytes_count) {
-	if constexpr(std::is_same_v<T, augs::trivial_type_marker>) {
-		const std::byte* location = reinterpret_cast<const std::byte*>(std::addressof(from));
-		return std::vector<std::byte>(location, location + bytes_count);
-	}
-	else {
-		return augs::to_bytes(from);
-	}
-}
-
+struct field_address {
+	unsigned offset = static_cast<unsigned>(-1);
+	edited_field_type_id type_id;
+};
