@@ -7,7 +7,7 @@
 #include "game/transcendental/entity_flavour_id.h"
 
 #include "application/setups/editor/editor_command_structs.h"
-#include "application/setups/editor/property_editor_structs.h"
+#include "application/setups/editor/property_editor/property_editor_structs.h"
 
 template <class derived>
 class change_property_command {

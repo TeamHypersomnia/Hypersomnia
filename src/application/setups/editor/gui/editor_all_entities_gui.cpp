@@ -11,7 +11,7 @@
 #include "application/setups/editor/editor_folder.h"
 #include "application/setups/editor/gui/editor_all_entities_gui.h"
 
-#include "application/setups/editor/gui/editor_properties_gui.h"
+#include "application/setups/editor/property_editor/editor_properties_gui.h"
 
 #include "augs/readwrite/memory_stream.h"
 #include "augs/readwrite/byte_readwrite.h"

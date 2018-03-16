@@ -3,7 +3,7 @@
 #include "augs/templates/type_matching_and_indexing.h"
 #include "augs/drawing/flip.h"
 #include "application/setups/editor/editor_command_structs.h"
-#include "application/setups/editor/property_editor_structs.h"
+#include "application/setups/editor/property_editor/property_editor_structs.h"
 
 template <class T>
 decltype(auto) get_name_of(const entity_flavour<T>& flavour) {
