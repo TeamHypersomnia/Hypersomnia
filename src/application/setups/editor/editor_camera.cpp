@@ -80,15 +80,16 @@ namespace editor_detail {
 
 		const bool has_ctrl{ common_input_state[key::LCTRL] || common_input_state[key::RCTRL] };
 		const bool has_shift{ common_input_state[key::LSHIFT] };
+		const bool has_alt{ common_input_state[key::LALT] };
 
 		const auto pan_mult = [&](){
 			float result = 1.f;
 
-			if (has_ctrl) {
+			if (has_shift) {
 				result *= 5;
 			}
 
-			if (has_shift) {
+			if (has_alt) {
 				result /= 5;
 			}
 
@@ -98,11 +99,11 @@ namespace editor_detail {
 		const auto zoom_mult = [&](){
 			float result = 1.f;
 
-			if (has_ctrl) {
+			if (has_shift) {
 				result *= 5;
 			}
 
-			if (has_shift) {
+			if (has_alt) {
 				result /= 5;
 			}
 

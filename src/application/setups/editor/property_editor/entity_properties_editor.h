@@ -39,7 +39,7 @@ void edit_component(
 		const auto entity_name = handle.get_name();
 		const auto component_name = get_component_stem(component);
 
-		return typesafe_sprintf(" (in %x of %x)", component_name, entity_name);
+		return typesafe_sprintf(" (in %x of %x#%x)", component_name, entity_name, handle.get_guid());
 	}();
 
 	/* Linker error fix */
