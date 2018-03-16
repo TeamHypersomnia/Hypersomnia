@@ -7,13 +7,6 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
-- disallow moving through history when tweaking a value or during other sensitive operations
-	- for tweaking, **simply clear last active id when undoing and nothing should go haywire**
-	- e.g. setting a transform of an entity?
-	- optionally, id cache clearers can take into account the moved entities
-	- but really we should not be able to just ctrl+z/y arbitrarily
-	- how do we detect that a field is being dragged?
-
 - remove that heresy which is flip_flags, oh boy
 - watch out for newlines in history's description of multiline textbox changes
 

@@ -9,6 +9,7 @@ struct editor_all_entities_gui {
 
 	void open();
 	void perform(editor_command_input);
+	void interrupt_tweakers();
 
 private:
 	editor_properties_gui properties_gui;

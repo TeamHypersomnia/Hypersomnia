@@ -705,7 +705,7 @@ void editor_setup::close_folder() {
 
 
 editor_command_input editor_setup::make_command_input() {
-	return { destructor_input.lua, folder(), selector };
+	return { destructor_input.lua, folder(), selector, all_entities_gui };
 }
 
 void editor_setup::select_all_entities() {

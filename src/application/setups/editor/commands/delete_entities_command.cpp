@@ -37,6 +37,8 @@ bool delete_entities_command::empty() const {
 
 void delete_entities_command::redo(const editor_command_input in) {
 	in.purge_selections();
+	in.interrupt_tweakers();
+
 	auto& cosm = in.folder.work->world;
 
 	for_each_through_std_get(deleted_entities, [&](auto& v) {

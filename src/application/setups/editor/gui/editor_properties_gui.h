@@ -78,26 +78,6 @@ description_pair describe_changed(
 	}
 };
 
-inline void next_column_text(const std::string& tx = "") {
-	ImGui::NextColumn();
-
-	if (tx.size() > 0) {
-		augs::imgui::text(tx);
-	}
-
-	ImGui::NextColumn();
-};
-
-inline void next_column_text_disabled(const std::string& tx = "") {
-	ImGui::NextColumn();
-
-	if (tx.size() > 0) {
-		augs::imgui::text_disabled(tx);
-	}
-
-	ImGui::NextColumn();
-};
-
 template <class T, class F, class G, class H>
 void general_edit_properties(
 	editor_properties_gui& state,

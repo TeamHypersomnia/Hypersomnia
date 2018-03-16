@@ -28,3 +28,11 @@ summary: Just a hidden scratchpad.
 
 - fix that build page warning
 	- revert back to that A record if it doesnt work by tomorrow
+
+- disallow moving through history when tweaking a value or during other sensitive operations
+	- for tweaking, **simply clear last active id when undoing and nothing should go haywire**
+	- e.g. setting a transform of an entity?
+	- optionally, id cache clearers can take into account the moved entities
+	- but really we should not be able to just ctrl+z/y arbitrarily
+	- how do we detect that a field is being dragged?
+

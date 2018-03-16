@@ -22,6 +22,11 @@ void editor_all_entities_gui::open() {
 	ImGui::SetWindowFocus("All entities");
 }
 
+void editor_all_entities_gui::interrupt_tweakers() {
+	properties_gui.last_active.reset();
+	properties_gui.old_description.clear();
+}
+
 void editor_all_entities_gui::perform(const editor_command_input in) {
 	if (!show) {
 		return;

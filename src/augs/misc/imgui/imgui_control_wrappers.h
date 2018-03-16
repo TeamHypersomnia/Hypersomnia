@@ -237,6 +237,26 @@ namespace augs {
 			text_color(t, ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]);
 		}
 
+		inline void next_column_text(const std::string& tx = "") {
+			ImGui::NextColumn();
+
+			if (tx.size() > 0) {
+				augs::imgui::text(tx);
+			}
+
+			ImGui::NextColumn();
+		};
+
+		inline void next_column_text_disabled(const std::string& tx = "") {
+			ImGui::NextColumn();
+
+			if (tx.size() > 0) {
+				augs::imgui::text_disabled(tx);
+			}
+
+			ImGui::NextColumn();
+		};
+
 		template <class... Args>
 		inline void text(const std::string& format, Args&&... args) {
 			text(typesafe_sprintf(format, std::forward<Args>(args)...));
