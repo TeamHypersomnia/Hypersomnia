@@ -12,6 +12,7 @@
 
 #include "augs/templates/type_in_list_id.h"
 #include "augs/templates/get_by_dynamic_id.h"
+#include "augs/templates/is_std_array.h"
 
 template <class T>
 std::string to_string(
@@ -179,6 +180,10 @@ constexpr bool has_custom_type_name_v = has_custom_type_name<T>::value;
 
 template <class T>
 std::string get_type_name() {
+	if constexpr(is_std_array_v<T>) {
+		return get_type_name<typename T::value_type>() + '[' + std::to_string(std::tuple_size_v<T>) + ']';
+	}
+
 	auto name = std::string(demangle(typeid(T).name()));
 	str_ops(name).multi_replace_all({ "struct ", "class ", "enum " }, "");
 	return name;

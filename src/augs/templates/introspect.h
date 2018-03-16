@@ -3,6 +3,7 @@
 
 #include "generated/introspectors.h"
 
+#include "augs/templates/is_std_array.h"
 #include "augs/templates/container_traits.h"
 #include "augs/templates/introspection_traits.h"
 #include "augs/templates/recursive.h"
