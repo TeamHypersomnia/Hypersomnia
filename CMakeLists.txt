@@ -541,6 +541,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/augs/templates/introspect.cpp"
 	"src/application/setups/editor/commands/change_flavour_property_command.cpp"
 	"src/application/setups/editor/property_editor/change_property_command.cpp"
+	"src/application/setups/editor/gui/editor_common_state_gui.cpp"
 )
 
 if(BUILD_WINDOW_FRAMEWORK)

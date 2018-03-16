@@ -350,6 +350,12 @@ void editor_setup::perform_custom_imgui(
 #endif
 				}
 				if (auto menu = scoped_menu("View")) {
+					if (item_if_tabs("History")) {
+						history_gui.open();
+					}
+
+					ImGui::Separator();
+
 					if (item_if_tabs("Summary")) {
 						show_summary = true;
 					}
@@ -361,15 +367,11 @@ void editor_setup::perform_custom_imgui(
 					ImGui::MenuItem("(State)", NULL, false, false);
 
 					if (item_if_tabs("Common")) {
-						show_common_state = true;
+						common_state_gui.open();
 					}
 
 					if (item_if_tabs("All entities")) {
 						all_entities_gui.open();
-					}
-
-					if (item_if_tabs("History")) {
-						history_gui.open();
 					}
 				}
 			}
@@ -436,10 +438,7 @@ void editor_setup::perform_custom_imgui(
 			}
 		}
 
-		if (show_common_state) {
-			auto common = scoped_window("Common", &show_common_state, ImGuiWindowFlags_AlwaysAutoResize);
-		}
-
+		common_state_gui.perform(make_command_input());
 		all_entities_gui.perform(make_command_input());
 
 		const auto go_to_dialog_pos = vec2 { static_cast<float>(screen_size.x / 2), menu_bar_size.y * 2 + 1 };

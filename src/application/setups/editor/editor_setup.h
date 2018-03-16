@@ -34,6 +34,7 @@
 #include "application/setups/editor/gui/editor_history_gui.h"
 #include "application/setups/editor/gui/editor_go_to_gui.h"
 #include "application/setups/editor/gui/editor_all_entities_gui.h"
+#include "application/setups/editor/gui/editor_common_state_gui.h"
 
 struct config_lua_table;
 
@@ -70,12 +71,12 @@ class editor_setup : private current_access_cache<editor_setup> {
 	// GEN INTROSPECTOR class editor_setup
 	editor_history_gui history_gui;
 	editor_all_entities_gui all_entities_gui;
+	editor_common_state_gui common_state_gui;
 	// END GEN INTROSPECTOR
 
 	std::optional<editor_popup> ok_only_popup;
 
 	bool show_summary = true;
-	bool show_common_state = false;
 
 	editor_destructor_input destructor_input;
 

@@ -54,6 +54,8 @@ generated-file-format:
 #include <array>
 
 #include "augs/drawing/flip.h"
+#include "augs/templates/string_templates.h"
+#include "augs/templates/nth_type_in.h"
 #include "augs/misc/trivially_copyable_tuple.h"
 #include "augs/misc/imgui/imguicol_helper.h"
 #include "augs/templates/for_each_std_get.h"
@@ -120,8 +122,9 @@ struct ImVec4;
 			Instances&... t
 		) {
 			templates_detail::for_each_through_std_get(
-				[f](auto num, auto&... args) {
-					f(std::to_string(num), args...);
+				[f](auto, auto&... args) {
+					using N = std::decay_t<nth_type_in_t<0, decltype(args)...>>;
+					f(get_type_name_strip_namespace<N>(), args...);
 				},
 				std::index_sequence_for<Types...>{},
 				t...
@@ -136,7 +139,8 @@ struct ImVec4;
 		) {
 			templates_detail::for_each_through_std_get(
 				[f](auto num, auto&... args) {
-					f(std::to_string(num), args...);
+					using N = std::decay_t<nth_type_in_t<0, decltype(args)...>>;
+					f(get_type_name_strip_namespace<N>(), args...);
 				},
 				std::index_sequence_for<Types...>{},
 				t...

@@ -8,5 +8,6 @@
 #include "application/setups/editor/commands/change_flavour_property_command.h"
 #include "application/setups/editor/commands/change_entity_property_command.h"
 #include "application/setups/editor/commands/delete_entities_command.h"
+#include "application/setups/editor/commands/change_common_state_command.h"
 
 #include "application/setups/editor/editor_history_declaration.h"

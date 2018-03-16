@@ -3,6 +3,7 @@
 
 #include "application/setups/editor/commands/change_entity_property_command.h"
 #include "application/setups/editor/commands/change_flavour_property_command.h"
+#include "application/setups/editor/commands/change_common_state_command.h"
 #include "application/setups/editor/property_editor/change_property_command.h"
 
 #include "augs/readwrite/byte_readwrite.h"
@@ -67,3 +68,4 @@ void change_property_command<D>::undo(const editor_command_input in) {
 
 template class change_property_command<change_flavour_property_command>;
 template class change_property_command<change_entity_property_command>;
+template class change_property_command<change_common_state_command>;
