@@ -47,10 +47,10 @@ void editor_all_entities_gui::perform(const editor_command_input in) {
 	filter.Draw();
 
 	ImGui::Columns(2); // 4-ways, with border
-	ImGui::NextColumn();
-	text_disabled("Details");
-	ImGui::NextColumn();
+	next_column_text_disabled("Details");
 	ImGui::Separator();
+
+	hovered_guid.unset();
 
 	cosm.get_solvable().for_each_pool(
 		[&](const auto& p){
@@ -67,9 +67,7 @@ void editor_all_entities_gui::perform(const editor_command_input in) {
 
 			const auto node = scoped_tree_node_ex(entity_type_label.c_str());
 
-			ImGui::NextColumn();
-			text_disabled(typesafe_sprintf("%x Flavours, %x Entities", total_flavours, total_entities));
-			ImGui::NextColumn();
+			next_column_text_disabled(typesafe_sprintf("%x Flavours, %x Entities", total_flavours, total_entities));
 
 			if (node) {
 				cosm.change_common_significant([&](cosmos_common_significant& common_signi){
@@ -83,7 +81,7 @@ void editor_all_entities_gui::perform(const editor_command_input in) {
 							   	Is the job of the change_flavour_property_command to actually alter flavour state.
 							*/
 						   	const auto& flavour
-						){
+						) {
 							const auto flavour_label = flavour.template get<invariants::name>().name;
 
 							if (!filter.PassFilter(flavour_label.c_str())) {
@@ -103,8 +101,16 @@ void editor_all_entities_gui::perform(const editor_command_input in) {
 								ImGui::Separator();
 
 								for (const auto& e : all_having_flavour) {
-									bool s = false;
-									ImGui::Selectable(typesafe_sprintf("%x", cosm[e].get_guid()).c_str(), &s);
+									const auto guid = cosm[e].get_guid();
+									const auto entity_label = typesafe_sprintf("%x", guid);
+
+									if (scoped_tree_node_ex(entity_label.c_str())) {
+
+									}
+
+									if (ImGui::IsItemHovered()) {
+										hovered_guid = guid; 
+									}
 
 									next_column_text();
 								}

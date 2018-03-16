@@ -7,6 +7,8 @@ struct editor_all_entities_gui {
 	bool show = false;
 	// END GEN INTROSPECTOR
 
+	entity_guid hovered_guid;
+
 	void open();
 	void perform(editor_command_input);
 	void interrupt_tweakers();

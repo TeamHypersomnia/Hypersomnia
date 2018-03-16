@@ -167,7 +167,7 @@ void illuminated_rendering(
 						const auto edge_offset = (to - from).set_length(edge_size.x);
 
 						output.line(laser_glow_edge, to, to + edge_offset, edge_size.y / 3.f, col);
-						output.line(laser_glow_edge, from - edge_offset, from, edge_size.y / 3.f, col, { flip::HORIZONTALLY });
+						output.line(laser_glow_edge, from - edge_offset, from, edge_size.y / 3.f, col, flip_flags::make_horizontally());
 					},
 					[](const vec2, const vec2) {},
 					interp,

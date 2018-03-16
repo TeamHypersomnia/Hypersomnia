@@ -7,9 +7,6 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
-- remove that heresy which is flip_flags, oh boy
-- watch out for newlines in history's description of multiline textbox changes
-
 - determine what to do with b2Filters
 	- it appears that filters aren't really given any special roles.
 		- thus it makes sense that they be completely customizable in editor.

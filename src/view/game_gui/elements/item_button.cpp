@@ -150,7 +150,7 @@ item_button::layout_with_attachments item_button::calc_button_layout(
 
 	const auto flip = defs.at(component_owner.get<invariants::sprite>().tex).usage_as_button.flip;
 
-	if (flip.horizontally()) {
+	if (flip.horizontally) {
 		for (auto& b : output.boxes) {
 			const auto old_b = b;
 			b.l = output.aabb.w() - old_b.r;
@@ -158,7 +158,7 @@ item_button::layout_with_attachments item_button::calc_button_layout(
 		}
 	}
 
-	if (flip.vertically()) {
+	if (flip.vertically) {
 		for (auto& b : output.boxes) {
 			const auto old_b = b;
 			b.t = output.aabb.h() - old_b.b;
@@ -288,11 +288,11 @@ void item_button::draw_proc(
 						attachment_state.renderable_transform.pos = rc_pos + layout.boxes[attachment_index].get_center() + expansion_offset;
 						attachment_state.renderable_transform.rotation = desc.calc_connection_until_container(item)->shape_offset.rotation;
 
-						if (flip.horizontally()) {
+						if (flip.horizontally) {
 							attachment_state.renderable_transform.flip_rotation();
 						}
 
-						if (flip.vertically()) {
+						if (flip.vertically) {
 							attachment_state.renderable_transform.flip_rotation();
 						}
 

@@ -19,13 +19,13 @@ bool is_button_side(const button_corner_type);
 template <class id_type>
 struct basic_button_corners_info {
 	id_type inside_texture = id_type::INVALID;
-	flip_flags flip = { flip::HORIZONTALLY };
+	flip_flags flip = flip_flags::make_horizontally();
 
 	id_type get_tex_for_type(button_corner_type t) const {
 		// TODO
-		ensure(!flip.vertically() && "Not implemented");
+		ensure(!flip.vertically && "Not implemented");
 
-		if (flip.horizontally()) {
+		if (flip.horizontally) {
 			if (t == button_corner_type::LT) {
 				t = button_corner_type::RT;
 			}
@@ -274,7 +274,7 @@ struct basic_button_corners_info {
 			else if (i == button_corner_type::LB_COMPLEMENT || i == button_corner_type::LB_COMPLEMENT_BORDER) {
 				target_rect.set_size(s);
 
-				if (flip.horizontally()) {
+				if (flip.horizontally) {
 					target_rect.set_position(origin.right_bottom());
 				}
 				else {

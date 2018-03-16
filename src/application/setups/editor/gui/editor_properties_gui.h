@@ -224,21 +224,6 @@ void general_edit_properties(
 
 				next_column_text();
 			}
-			else if constexpr(std::is_same_v<M, flip_flags>) {
-				auto do_flag = [&](const auto& flag_name, auto& flag) {
-					if (checkbox(flag_name, flag)) {
-						post_new(
-							{ "", describe_changed_flag(flag_name, flag) },
-							altered_member
-						);
-					}
-
-					next_column_text();
-				};
-
-				do_flag("Flip horizontally", altered_member[0]);
-				do_flag("Flip vertically", altered_member[1]);
-			}
 			else if constexpr(std::is_same_v<M, bool>) {
 				do_discrete([&]() { 
 					return checkbox(label, altered_member);
@@ -323,7 +308,7 @@ void edit_invariant(
 		const auto flavour_name = get_name_of(source_flavour);
 		const auto invariant_name = get_invariant_stem(invariant);
 
-		return typesafe_sprintf("(in %x of %x)", invariant_name, flavour_name);
+		return typesafe_sprintf(" (in %x of %x)", invariant_name, flavour_name);
 	}();
 
 	/* Linker error fix */

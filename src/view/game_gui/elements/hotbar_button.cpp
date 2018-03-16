@@ -52,7 +52,7 @@ entity_handle hotbar_button::get_assigned_entity(const entity_handle owner_trans
 button_corners_info hotbar_button::get_button_corners_info() const {
 	button_corners_info corners;
 	corners.inside_texture = assets::necessary_image_id::HOTBAR_BUTTON;
-	corners.flip = { flip::HORIZONTALLY };
+	corners.flip = flip_flags::make_horizontally();
 
 	return corners;
 }

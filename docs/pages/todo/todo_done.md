@@ -292,3 +292,7 @@ we consider whole type overrides too complex architeciturally:
 - use range widgets for minmaxes, with proper min/max labels
 - check imgui's id stack logic and see if the activity change logic can't be made simpler, without flavour prop id, thanks to the stacks
 
+- remove that heresy which is flip_flags, oh boy
+
+- watch out for newlines in history's description of multiline textbox changes
+	- appears to work out of the box

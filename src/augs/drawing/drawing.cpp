@@ -46,12 +46,12 @@ namespace augs {
 			vec2 { 0.f, 1.f }
 		};
 
-		if (flip.horizontally()) {
+		if (flip.horizontally) {
 			for (auto& v : texcoords) {
 				v.x = 1.f - v.x;
 			}
 		}
-		if (flip.vertically()) {
+		if (flip.vertically) {
 			for (auto& v : texcoords) {
 				v.y = 1.f - v.y;
 			}
@@ -111,12 +111,12 @@ namespace augs {
 		auto p1 = vec2(0.f, 0.f);
 		auto p2 = vec2(1.f, 1.f);
 
-		if (flip.horizontally()) {
+		if (flip.horizontally) {
 			p1.x = 1.f - p1.x;
 			p2.x = 1.f - p2.x;
 		}
 
-		if (flip.vertically()) {
+		if (flip.vertically) {
 			p1.y = 1.f - p1.y;
 			p2.y = 1.f - p2.y;
 		}
@@ -220,12 +220,12 @@ namespace augs {
 			((p[2].pos.y = p[3].pos.y = rc.b) - origin.b) * th + 1.0f
 		);
 
-		if (flip.horizontally()) {
+		if (flip.horizontally) {
 			p1.x = 1.f - p1.x;
 			p2.x = 1.f - p2.x;
 		}
 
-		if (flip.vertically()) {
+		if (flip.vertically) {
 			p1.y = 1.f - p1.y;
 			p2.y = 1.f - p2.y;
 		}

@@ -273,6 +273,8 @@ public:
 	template <class F>
 	void for_each_highlight(F callback) const {
 		if (anything_opened() && player.paused) {
+			const auto& world = work().world;
+
 			if (get_viewed_character().alive()) {
 				auto color = settings.controlled_entity_color;
 				color.a += static_cast<rgba_channel>(augs::zigzag(global_time_seconds, 1.0 / 2) * 25);
@@ -283,7 +285,7 @@ public:
 			selector.for_each_highlight(
 				callback,
 				settings.entity_selector,
-				work().world,
+				world,
 				view().selected_entities
 			);
 
@@ -292,6 +294,12 @@ public:
 				color.a += static_cast<rgba_channel>(augs::zigzag(global_time_seconds, 1.0 / 2) * 25);
 				
 				callback(match.get_id(), settings.matched_entity_color);
+			}
+
+			if (const auto hovered_guid = all_entities_gui.hovered_guid) {
+				if (const auto hovered = world[hovered_guid]) {
+					callback(hovered.get_id(), settings.entity_selector.held_color);
+				}
 			}
 		}
 	}

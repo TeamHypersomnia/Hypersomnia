@@ -1,24 +1,14 @@
 #pragma once
-#include "augs/misc/enum/enum_boolset.h"
 
-enum class flip {
-	HORIZONTALLY,
-	VERTICALLY,
+struct flip_flags {
+	static flip_flags make_horizontally() {
+		flip_flags f;
+		f.horizontally = true;
+		return f;
+	}
 
-	COUNT
-};
-
-struct flip_flags : augs::enum_boolset<flip, 1> {
 	// GEN INTROSPECTOR struct flip_flags
-	// INTROSPECT BASE augs::enum_boolset<flip, 1>
+	bool horizontally = false;
+	bool vertically = false;
 	// END GEN INTROSPECTOR
-	using augs::enum_boolset<flip, 1>::enum_boolset;
-
-	bool horizontally() const { 
-		return test(flip::HORIZONTALLY); 
-	}
-
-	bool vertically() const { 
-		return test(flip::VERTICALLY); 
-	}
 };
