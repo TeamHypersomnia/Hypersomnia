@@ -5,6 +5,7 @@
 
 #include "application/setups/editor/property_editor/property_editor_structs.h"
 #include "application/setups/editor/property_editor/change_property_command.h"
+#include "application/setups/editor/property_editor/on_field_address.h"
 
 struct flavour_property_id {
 	entity_flavour_id flavour_id;
@@ -35,16 +36,11 @@ struct change_flavour_property_command : change_property_command<change_flavour_
 						flavour.invariants,
 						property_id.invariant_id,
 						[&](auto& invariant) {
-							get_by_dynamic_id(
-								edited_field_type_id::list_type(),
-								property_id.field.type_id,
-								[&](const auto& t) {
-									using T = std::decay_t<decltype(t)>;
-
-									const auto invariant_location = reinterpret_cast<std::byte*>(std::addressof(invariant));
-									const auto location = reinterpret_cast<T*>(invariant_location + property_id.field.offset);
-
-									result = callback(*location, invariant);
+							result = on_field_address(
+								invariant,
+								property_id.field,
+								[&](auto& field) {
+									return callback(field, invariant);
 								}
 							);
 						}

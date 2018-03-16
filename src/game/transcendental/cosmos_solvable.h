@@ -57,7 +57,7 @@ class cosmos_solvable {
 	}
 
 	template <class E, class... Args>
-	auto undo_free_entity_detail(Args&&... args) {
+	auto detail_undo_free_entity(Args&&... args) {
 		auto& pool = significant.get_pool<E>();
 		const auto result = pool.undo_free(std::forward<Args>(args)...);
 
@@ -133,7 +133,7 @@ public:
 
 	template <class E, class... Args>
 	auto undo_free_entity(Args&&... undo_free_args) {
-		const auto result = undo_free_entity_detail<E>(std::forward<Args>(undo_free_args)...);
+		const auto result = detail_undo_free_entity<E>(std::forward<Args>(undo_free_args)...);
 		const auto it = guid_to_id.emplace(result.object.guid, result.key);
 		ensure(it.second);
 		return result;
