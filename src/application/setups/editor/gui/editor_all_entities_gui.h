@@ -14,6 +14,6 @@ struct editor_all_entities_gui {
 	void interrupt_tweakers();
 
 private:
-	editor_properties_gui properties_gui;
+	property_editor_gui properties_gui;
 	bool acquire_once = false;
 };

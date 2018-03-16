@@ -80,7 +80,7 @@ description_pair describe_changed(
 
 template <class T, class F, class G, class H>
 void general_edit_properties(
-	editor_properties_gui& state,
+	property_editor_gui& state,
 	const T& object,
 	F make_property_id,
 	G post_new_change_impl,
@@ -280,7 +280,7 @@ void general_edit_properties(
 
 template <class T, class E>
 void edit_invariant(
-	editor_properties_gui& state,
+	property_editor_gui& state,
 	const T& invariant,
 	const entity_flavour<E>& source_flavour,
 	const typed_entity_flavour_id<E> flavour_id,
@@ -348,7 +348,7 @@ void edit_invariant(
 
 template <class E>
 void edit_flavour(
-	editor_properties_gui& state,
+	property_editor_gui& state,
 	const typed_entity_flavour_id<E> flavour_id,
 	const entity_flavour<E>& flavour,
    	const editor_command_input in

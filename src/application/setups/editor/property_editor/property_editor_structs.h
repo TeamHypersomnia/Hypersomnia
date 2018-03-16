@@ -18,7 +18,7 @@ struct description_pair {
 	std::string of_new;
 };
 
-struct editor_properties_gui {
+struct property_editor_gui {
 	std::optional<ImGuiID> last_active;
 	std::string old_description = "";
 };
