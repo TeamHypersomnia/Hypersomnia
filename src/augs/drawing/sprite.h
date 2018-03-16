@@ -19,6 +19,8 @@
 namespace augs {
 	template <class id_type>
 	struct sprite {
+		static constexpr bool reinfer_when_tweaking = true;
+
 		struct drawing_input : drawing_input_base {
 			using drawing_input_base::drawing_input_base;
 			

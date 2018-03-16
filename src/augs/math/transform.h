@@ -9,6 +9,8 @@ struct basic_transform {
 	using transform = basic_transform<T>;
 	using vec2 = basic_vec2<T>;
 
+	static constexpr bool reinfer_when_tweaking = true;
+
 	// GEN INTROSPECTOR struct basic_transform class T
 	vec2 pos;
 	T rotation = static_cast<T>(0);

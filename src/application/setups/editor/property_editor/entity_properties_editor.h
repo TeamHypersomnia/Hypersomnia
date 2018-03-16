@@ -6,6 +6,13 @@ template <class T>
 auto get_component_stem(const T&) {
 	auto result = format_field_name(get_type_name_strip_namespace<T>());
 	result[0] = std::toupper(result[0]);
+
+	/* These look ugly with automated names */
+
+	if constexpr(std::is_same_v<T, components::transform>) {
+		result = "Transform";
+	}	
+
 	return result;
 }
 
