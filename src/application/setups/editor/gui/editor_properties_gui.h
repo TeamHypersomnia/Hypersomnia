@@ -3,11 +3,80 @@
 #include "augs/templates/type_matching_and_indexing.h"
 #include "augs/drawing/flip.h"
 #include "application/setups/editor/editor_command_structs.h"
+#include "application/setups/editor/property_editor_structs.h"
 
 template <class T>
 decltype(auto) get_name_of(const entity_flavour<T>& flavour) {
 	return flavour.template get<invariants::name>().name;
 }
+
+template <class T>
+auto get_invariant_stem(const T&) {
+	auto result = format_field_name(get_type_name_strip_namespace<T>());
+	result[0] = std::toupper(result[0]);
+
+	/* These two look ugly with automated names */
+
+	if constexpr(std::is_same_v<T, invariants::sprite>) {
+		result = "Sprite";
+	}	
+
+	if constexpr(std::is_same_v<T, invariants::polygon>) {
+		result = "Polygon";
+	}
+
+	return result;
+}
+
+template <class A, class B>
+auto describe_changed_flag(
+	const A& field_name,
+	const B& new_value
+) {
+	return typesafe_sprintf(
+		"%x %x", 
+		new_value ? "Set" : "Unset", 
+		field_name
+	);
+};
+
+template <class A, class B>
+auto describe_changed_generic(
+	const A& field_name,
+	const B& new_value
+) {
+	return typesafe_sprintf(
+		"Set %x to %x",
+		field_name,
+		new_value
+	);
+};
+
+template <class A, class B>
+description_pair describe_changed(
+	const A& field_name,
+	const B& old_value,
+   	const B& new_value
+) {
+	using F = std::decay_t<decltype(new_value)>;
+
+	if constexpr(std::is_same_v<F, bool>) {
+		return { "", describe_changed_flag(field_name, new_value) };
+	}
+	else {
+		if (field_name == "Name") {
+			return { 
+				typesafe_sprintf("Renamed %x ", old_value),
+				typesafe_sprintf("to %x ", new_value)
+			};
+		}
+
+		return { "", describe_changed_generic(
+			field_name,
+			new_value
+		) };
+	}
+};
 
 inline void next_column_text(const std::string& tx = "") {
 	ImGui::NextColumn();
@@ -29,122 +98,34 @@ inline void next_column_text_disabled(const std::string& tx = "") {
 	ImGui::NextColumn();
 };
 
-template <class T>
-auto get_invariant_stem(const T&) {
-	auto result = format_field_name(get_type_name_strip_namespace<T>());
-	result[0] = std::toupper(result[0]);
-
-	/* These two look ugly with automated names */
-
-	if constexpr(std::is_same_v<T, invariants::sprite>) {
-		result = "Sprite";
-	}	
-
-	if constexpr(std::is_same_v<T, invariants::polygon>) {
-		result = "Polygon";
-	}
-
-	return result;
-}
-
-template <class T, class E>
-void edit_invariant(
+template <class T, class F, class G, class H>
+void general_edit_properties(
 	editor_properties_gui& state,
-	const T& invariant,
-	const entity_flavour<E>& source_flavour,
-	const typed_entity_flavour_id<E> flavour_id,
-   	const editor_command_input in
+	const T& object,
+	F make_property_id,
+	G post_new_change_impl,
+	H rewrite_last_change_impl
 ) {
 	using namespace augs::imgui;
 
-	auto make_property_id = [&](
-		const auto offset,
-		const auto type_id
-	) {
-		flavour_property_id result;
-
-		result.flavour_id = flavour_id;
-		result.invariant_id = index_in_list_v<T, decltype(entity_flavour<E>::invariants)>;
-		result.field_offset = offset;
-		result.field_type = type_id;
-
-		return result;
-	};
-
-	const auto describe_property_location = [&](){
-		const auto flavour_name = get_name_of(source_flavour);
-		const auto invariant_name = get_invariant_stem(invariant);
-
-		return typesafe_sprintf("(in %x of %x)", invariant_name, flavour_name);
-	};
-
-	auto describe_changed_flag = [&](
-		const auto& field_name,
-		const auto& new_value
-	) {
-		return typesafe_sprintf(
-			"%x %x %x", 
-			new_value ? "Set" : "Unset", 
-			field_name,
-			describe_property_location()
-		);
-	};
-
-	auto describe_changed_generic = [&](
-		const auto& field_name,
-		const auto& new_value
-	) {
-		return typesafe_sprintf(
-			"Set %x to %x %x",
-			field_name,
-			new_value,
-			describe_property_location()
-		);
-	};
-
-	auto describe_changed = [&](
-		const auto& field_name,
-		const auto& old_value,
-	   	const auto& new_value
-	) -> description_pair {
-		using F = std::decay_t<decltype(new_value)>;
-
-		if constexpr(std::is_same_v<F, bool>) {
-			return { "", describe_changed_flag(field_name, new_value) };
-		}
-		else {
-			if (field_name == "Name") {
-				return { 
-					typesafe_sprintf("Renamed %x ", old_value),
-					typesafe_sprintf("to %x ", new_value)
-				};
-			}
-
-			return { "", describe_changed_generic(
-				field_name,
-				new_value
-			) };
-		}
-	};
-
-	/* Linker error fix */
 	auto& old_description = state.old_description;
 
-	auto& history = in.folder.history;
+	auto post_new_change = [&](
+		const description_pair& description,
+		const auto property_id,
+		const auto& new_content
+	) {
+		old_description = description.of_old;
+		const auto new_description = old_description + description.of_new;
 
-	auto rewrite_last_change = [&](
+		post_new_change_impl(new_description, property_id, new_content);
+	};
+
+	auto rewrite_last = [&](
 		const auto& description,
 		const auto& new_content
 	) {
-		auto& last = history.last_command();
-
-		if (auto* const cmd = std::get_if<change_flavour_property_command>(std::addressof(last))) {
-			cmd->built_description = old_description + description;
-			cmd->rewrite_change(augs::to_bytes(new_content), in);
-		}
-		else {
-			LOG("WARNING! There was some problem with tracking activity of editor controls.");
-		}
+		rewrite_last_change_impl(old_description + description, new_content);
 	};
 
 	{
@@ -161,7 +142,7 @@ void edit_invariant(
 
 			const auto current_offset = static_cast<unsigned>(
 				reinterpret_cast<const std::byte*>(std::addressof(original_member))
-				- reinterpret_cast<const std::byte*>(std::addressof(invariant))
+				- reinterpret_cast<const std::byte*>(std::addressof(object))
 			);
 
 			const auto current_type_id = [&](){
@@ -185,20 +166,13 @@ void edit_invariant(
 				current_type_id
 			);
 
-			auto post_new_change = [&](
+			auto post_new = [&](
 				const description_pair& description,
-	   			const auto& new_content
+				const auto& new_content
 			) {
-				old_description = description.of_old;
-		
-				change_flavour_property_command cmd;
-				cmd.property_id = property_id;
-		
-				cmd.value_after_change = augs::to_bytes(new_content);
-				cmd.built_description = old_description + description.of_new;
-				history.execute_new(cmd, in);
+				post_new_change(description, property_id, new_content);
 			};
-		
+
 			auto handle_continuous_tweaker = [&](
 				const auto& field_name,
 	   			const auto& old_value, 
@@ -213,11 +187,11 @@ void edit_invariant(
 
 					if (last_active != this_id) {
 						/* LOG("Started dragging %x to %x", field_name, new_value); */
-						post_new_change(description, new_value);
+						post_new(description, new_value);
 					}
 					else {
 						/* LOG("Dragging %x to %x", field_name, new_value); */
-						rewrite_last_change(description.of_new, new_value);
+						rewrite_last(description.of_new, new_value);
 					}
 		
 					last_active = this_id;
@@ -231,7 +205,7 @@ void edit_invariant(
 	   			auto callback
 			) {
 				if (callback()) {
-					post_new_change(
+					post_new(
 						describe_changed(field_name, old_value, new_value),
 						new_value
 					);
@@ -273,7 +247,7 @@ void edit_invariant(
 			else if constexpr(std::is_same_v<M, flip_flags>) {
 				auto do_flag = [&](const auto& flag_name, auto& flag) {
 					if (checkbox(flag_name, flag)) {
-						post_new_change(
+						post_new(
 							{ "", describe_changed_flag(flag_name, flag) },
 							altered_member
 						);
@@ -336,7 +310,80 @@ void edit_invariant(
 				}
 			}
 		}),
-		invariant
+		object
+	);
+}
+
+template <class T, class E>
+void edit_invariant(
+	editor_properties_gui& state,
+	const T& invariant,
+	const entity_flavour<E>& source_flavour,
+	const typed_entity_flavour_id<E> flavour_id,
+   	const editor_command_input in
+) {
+	using namespace augs::imgui;
+
+	auto make_property_id = [&](
+		const auto offset,
+		const auto type_id
+	) {
+		flavour_property_id result;
+
+		result.flavour_id = flavour_id;
+		result.invariant_id = index_in_list_v<T, decltype(entity_flavour<E>::invariants)>;
+
+		result.field_offset = offset;
+		result.field_type = type_id;
+
+		return result;
+	};
+
+	const auto property_location = [&]() {
+		const auto flavour_name = get_name_of(source_flavour);
+		const auto invariant_name = get_invariant_stem(invariant);
+
+		return typesafe_sprintf("(in %x of %x)", invariant_name, flavour_name);
+	}();
+
+	/* Linker error fix */
+	auto& history = in.folder.history;
+
+	auto post_new_change = [&](
+		const auto& description,
+		const auto property_id,
+		const auto& new_content
+	) {
+		change_flavour_property_command cmd;
+		cmd.property_id = property_id;
+
+		cmd.value_after_change = augs::to_bytes(new_content);
+		cmd.built_description = description + property_location;
+
+		history.execute_new(cmd, in);
+	};
+
+	auto rewrite_last_change = [&](
+		const auto& description,
+		const auto& new_content
+	) {
+		auto& last = history.last_command();
+
+		if (auto* const cmd = std::get_if<change_flavour_property_command>(std::addressof(last))) {
+			cmd->built_description = description + property_location;
+			cmd->rewrite_change(augs::to_bytes(new_content), in);
+		}
+		else {
+			LOG("WARNING! There was some problem with tracking activity of editor controls.");
+		}
+	};
+
+	general_edit_properties(
+		state, 
+		invariant,
+		make_property_id,
+		post_new_change,
+		rewrite_last_change
 	);
 }
 
