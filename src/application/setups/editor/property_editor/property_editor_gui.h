@@ -197,14 +197,29 @@ void general_edit_properties(
 				};
 
 				const auto label = format_field_name(original_label);
+				const auto identity_label = "##" + label;
+
 				auto altered_member = original_member;
 
-				auto do_continuous = [&](auto&& f) {
-					handle_continuous_tweaker(label, original_member, altered_member, std::forward<decltype(f)>(f));
+				auto do_tweaker = [&](auto f) {
+					ImGui::Bullet();
+					text(label);
+					ImGui::NextColumn();
+					auto scope = scoped_item_width(-1);
+					f();
+					ImGui::NextColumn();
 				};
 
-				auto do_discrete = [&](auto&& f) {
-					handle_discrete_tweaker(label, original_member, altered_member, std::forward<decltype(f)>(f));
+				auto do_continuous = [&](auto f) {
+					do_tweaker([&]() { 
+						handle_continuous_tweaker(label, original_member, altered_member, f); 
+					});
+				};
+
+				auto do_discrete = [&](auto f) {
+					do_tweaker([&]() { 
+						handle_discrete_tweaker(label, original_member, altered_member, f);
+					});
 				};
 
 				if constexpr(is_padding_field_v<M>) {
@@ -217,74 +232,75 @@ void general_edit_properties(
 				else if constexpr(std::is_same_v<M, std::string>) {
 					do_continuous([&]() { 
 						if (original_label == "description") {
-							return input_multiline_text<512>("Description", altered_member, 16);
+							return input_multiline_text<512>(identity_label, altered_member, 8);
 						}
 						else if (original_label == "name") {
-							return input_text<256>("Name", altered_member);
+							return input_text<256>(identity_label, altered_member);
 						}
 
-						return input_text<256>(label, altered_member);
+						return input_text<256>(identity_label, altered_member);
 					});
 
-					next_column_text();
+					/* next_column_text(); */
 				}
 				else if constexpr(std::is_same_v<M, bool>) {
 					do_discrete([&]() { 
-						return checkbox(label, altered_member);
+						return checkbox(identity_label, altered_member);
 					});
-
-					next_column_text();
 				}
 				else if constexpr(is_container_v<M>) {
 
 				}
 				else if constexpr(std::is_arithmetic_v<M>) {
 					do_continuous([&]() { 
-						return drag(label, altered_member); 
+						return drag(identity_label, altered_member); 
 					});
 
-					next_column_text(get_type_name<M>());
+					/* next_column_text(get_type_name<M>()); */
 				}
 				else if constexpr(is_one_of_v<M, vec2, vec2i>) {
 					do_continuous([&]() { 
-						return drag_vec2(label, altered_member); 
+						return drag_vec2(identity_label, altered_member); 
 					});
 
-					next_column_text();
+					/* next_column_text(); */
 				}
 				else if constexpr(is_minmax_v<M>) {
 					do_continuous([&]() { 
-						return drag_minmax(label, altered_member); 
+						return drag_minmax(identity_label, altered_member); 
 					});
 
-					next_column_text(get_type_name<typename M::first_type>() + " range");
+					/* next_column_text(get_type_name<typename M::first_type>() + " range"); */
 				}
 				else if constexpr(is_asset_id_v<M>) {
 
 				}
 				else if constexpr(std::is_enum_v<M>) {
 					do_discrete([&]() { 
-						return enum_combo(label, altered_member);
+						return enum_combo(identity_label, altered_member);
 					});
 
-					next_column_text();
+					/* next_column_text(); */
 				}
 				else if constexpr(std::is_same_v<M, rgba>) {
 					do_continuous([&]() { 
-						return color_edit(label, altered_member);
+						return color_edit(identity_label, altered_member);
 					});
 
-					next_column_text();
+					/* next_column_text(); */
 				}
 				else {
 					const auto object_node = scoped_tree_node_ex(label.c_str());
 
+#if 0
 					if constexpr(is_tuple_v<M>) {
 						next_column_text("Tuple");
 					}
 					else {
 						next_column_text(get_type_name<M>());
 					}
+#endif
+					next_column_text();
 
 					if (object_node) {
 						augs::introspect(augs::recursive(self), original_member);

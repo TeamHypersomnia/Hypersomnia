@@ -117,12 +117,12 @@ void edit_flavour(
 			}
 
 			const auto invariant_label = get_invariant_stem(invariant) + " invariant";
+			const auto node = scoped_tree_node_ex(invariant_label.c_str());
+			next_column_text();
 
-			if (const auto node = scoped_tree_node_ex(invariant_label.c_str())) {
+			if (node) {
 				edit_invariant(state, invariant, flavour, flavour_id, in);
 			}
-	
-			next_column_text();
 		}
    	);
 }
