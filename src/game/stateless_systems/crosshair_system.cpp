@@ -16,10 +16,10 @@
 #include "game/transcendental/data_living_one_step.h"
 
 vec2 components::crosshair::get_bounds_in_this_look() const {
-	if (orbit_mode == ANGLED) {
+	if (orbit_mode == crosshair_orbit_type::ANGLED) {
 		return base_offset_bound / 2.f;
 	}
-	else if (orbit_mode == LOOK) {
+	else if (orbit_mode == crosshair_orbit_type::LOOK) {
 		return base_offset_bound;
 	}
 
@@ -65,11 +65,11 @@ void crosshair_system::generate_crosshair_intents(const logic_step step) {
 			if (it.intent == game_intent_type::SWITCH_LOOK && it.was_pressed()) {
 				auto& mode = crosshair->orbit_mode;
 
-				if (mode == components::crosshair::LOOK) {
-					mode = components::crosshair::ANGLED;
+				if (mode == crosshair_orbit_type::LOOK) {
+					mode = crosshair_orbit_type::ANGLED;
 				}
 				else {
-					mode = components::crosshair::LOOK;
+					mode = crosshair_orbit_type::LOOK;
 				}
 			}
 		}

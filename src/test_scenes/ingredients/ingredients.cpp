@@ -127,7 +127,7 @@ namespace test_flavours {
 			test_flavours::add_sprite(meta, logicals,
 			assets::game_image_id::AWAKENING,
 			white,
-			invariants::sprite::special_effect::COLOR_WAVE
+			augs::sprite_special_effect::COLOR_WAVE
 		);
 		}
 		{

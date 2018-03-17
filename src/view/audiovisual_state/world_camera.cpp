@@ -142,14 +142,14 @@ vec2i world_camera::get_camera_offset_due_to_character_crosshair(
 	}
 
 	if (const auto crosshair = entity_to_chase.find_crosshair()) {
-		if (crosshair->orbit_mode != components::crosshair::NONE) {
+		if (crosshair->orbit_mode != crosshair_orbit_type::NONE) {
 			camera_crosshair_offset = entity_to_chase.calc_crosshair_displacement();
 
-			if (crosshair->orbit_mode == crosshair->ANGLED) {
+			if (crosshair->orbit_mode == crosshair_orbit_type::ANGLED) {
 				camera_crosshair_offset.set_length(settings.angled_look_length);
 			}
 
-			if (crosshair->orbit_mode == crosshair->LOOK) {
+			if (crosshair->orbit_mode == crosshair_orbit_type::LOOK) {
 				/* simple proportion */
 				camera_crosshair_offset /= crosshair->base_offset_bound;
 				camera_crosshair_offset *= current_cone.get_visible_world_area(screen_size) * settings.look_bound_expand;

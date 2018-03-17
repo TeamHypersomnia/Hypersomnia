@@ -5,16 +5,18 @@
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/components/sprite_component.h"
 
+enum class crosshair_orbit_type {
+	// GEN INTROSPECTOR enum class crosshair_orbit_type
+	NONE,
+	ANGLED,
+	LOOK
+	// END GEN INTROSPECTOR
+};
+
 namespace components {
 	struct crosshair {
-		enum orbit_type {
-			NONE,
-			ANGLED,
-			LOOK
-		};
-
 		// GEN INTROSPECTOR struct components::crosshair
-		orbit_type orbit_mode = LOOK;
+		crosshair_orbit_type orbit_mode = crosshair_orbit_type::LOOK;
 
 		child_entity_id recoil_entity;
 

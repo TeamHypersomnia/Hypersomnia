@@ -17,7 +17,7 @@ namespace test_flavours {
 		const loaded_game_image_caches& logicals,
 		const assets::game_image_id id, 
 		const rgba col = white,
-		const invariants::sprite::special_effect effect = invariants::sprite::special_effect::NONE
+		const augs::sprite_special_effect effect = augs::sprite_special_effect::NONE
 	) {
 		invariants::sprite sprite_def;
 		sprite_def.set(id, logicals, col);

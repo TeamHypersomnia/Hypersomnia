@@ -7,6 +7,9 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
+- handle bitsets properly, e.g. parties and hostile parties
+- handle slot categories properly, as well
+
 - Make change flavour/component commands support multiplicity out of the box, don't just have two different commands
 
 - Enter on selection opens relevant selection group in tabs
@@ -16,9 +19,6 @@ summary: Just a hidden scratchpad.
 - a generic "unmap_entity_vertices" and "map_entity_vertices that depend on the context
 	- e.g. setting reach for wandering pixels
 	- if fixture, change shape
-
-- determine what makes the atlas be regenerated when entering editor?
-	- perhaps zeroed cosmos is guilty?
 
 - we should use asynchronous texture transfers, especially when we'll be regenerating atlases
 

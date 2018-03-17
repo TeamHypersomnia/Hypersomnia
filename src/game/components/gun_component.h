@@ -60,10 +60,8 @@ namespace invariants {
 		// GEN INTROSPECTOR struct invariants::gun
 		float shot_cooldown_ms = 100.f;
 
-		unsigned short num_last_bullets_to_trigger_low_ammo_cue = 0;
 		gun_action_type action_mode = gun_action_type::INVALID;
-
-		pad_bytes<1> pad;
+		unsigned num_last_bullets_to_trigger_low_ammo_cue = 0;
 
 		augs::minmax<float> muzzle_velocity = { 2000.f, 2000.f };
 

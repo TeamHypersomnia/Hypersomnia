@@ -1,10 +1,14 @@
 #pragma once
 #include "augs/pad_bytes.h"
+#include "game/assets/ids/is_asset_id.h"
 #include "augs/templates/is_tuple.h"
 #include "augs/templates/type_matching_and_indexing.h"
 #include "augs/drawing/flip.h"
 #include "application/setups/editor/editor_command_structs.h"
 #include "application/setups/editor/property_editor/property_editor_structs.h"
+
+#include "augs/templates/format_enum.h"
+#include "augs/misc/imgui/imgui_enum_combo.h"
 
 template <class A, class B>
 auto describe_changed_flag(
@@ -23,11 +27,20 @@ auto describe_changed_generic(
 	const A& field_name,
 	const B& new_value
 ) {
-	return typesafe_sprintf(
-		"Set %x to %x",
-		field_name,
-		new_value
-	);
+	if constexpr(std::is_enum_v<B>) {
+		return typesafe_sprintf(
+			"Set %x to %x",
+			field_name,
+			format_enum(new_value)
+		);
+	}
+	else {
+		return typesafe_sprintf(
+			"Set %x to %x",
+			field_name,
+			new_value
+		);
+	}
 };
 
 template <class A, class B>
@@ -42,11 +55,13 @@ description_pair describe_changed(
 		return { "", describe_changed_flag(field_name, new_value) };
 	}
 	else {
-		if (field_name == "Name") {
-			return { 
-				typesafe_sprintf("Renamed %x ", old_value),
-				typesafe_sprintf("to %x ", new_value)
-			};
+		if constexpr(std::is_same_v<F, std::string>) {
+			if (field_name == "Name") {
+				return { 
+					typesafe_sprintf("Renamed %x ", old_value),
+					typesafe_sprintf("to %x ", new_value)
+				};
+			}
 		}
 
 		return { "", describe_changed_generic(
@@ -244,8 +259,15 @@ void general_edit_properties(
 
 					next_column_text(get_type_name<typename M::first_type>() + " range");
 				}
-				else if constexpr(std::is_enum_v<M>) {
+				else if constexpr(is_asset_id_v<M>) {
 
+				}
+				else if constexpr(std::is_enum_v<M>) {
+					do_discrete([&]() { 
+						return enum_combo(label, altered_member);
+					});
+
+					next_column_text();
 				}
 				else if constexpr(std::is_same_v<M, rgba>) {
 					do_continuous([&]() { 

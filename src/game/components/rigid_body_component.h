@@ -1,6 +1,7 @@
 #pragma once
 #include "3rdparty/Box2D/Common/b2Math.h"
 
+#include "augs/pad_bytes.h"
 #include "augs/misc/constant_size_vector.h"
 #include "augs/misc/timing/stepped_timing.h"
 #include "augs/templates/maybe_const.h"
@@ -76,11 +77,12 @@ namespace invariants {
 		static constexpr bool reinfer_when_tweaking = true;
 
 		// GEN INTROSPECTOR struct invariants::rigid_body
+		rigid_body_type body_type = rigid_body_type::DYNAMIC;
+
 		bool bullet = false;
 		bool angled_damping = false;
 		bool allow_sleep = true;
-
-		rigid_body_type body_type = rigid_body_type::DYNAMIC;
+		pad_bytes<1> pad;
 
 		damping_info damping;
 		// END GEN INTROSPECTOR

@@ -296,3 +296,7 @@ we consider whole type overrides too complex architeciturally:
 
 - watch out for newlines in history's description of multiline textbox changes
 	- appears to work out of the box
+
+- determine what makes the atlas be regenerated when entering editor?
+	- its just that zeroed cosmos has a different set of resources needed - zero
+	- perhaps zeroed cosmos is guilty?

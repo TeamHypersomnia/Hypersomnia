@@ -17,6 +17,13 @@
 #include "augs/build_settings/platform_defines.h"
 
 namespace augs {
+	enum class sprite_special_effect /* : unsigned char */ {
+		// GEN INTROSPECTOR enum class augs::sprite_special_effect
+		NONE = 0,
+		COLOR_WAVE
+		// END GEN INTROSPECTOR
+	};
+
 	template <class id_type>
 	struct sprite {
 		static constexpr bool reinfer_when_tweaking = true;
@@ -29,11 +36,6 @@ namespace augs {
 			void set_global_time_seconds(const double secs) {
 				global_time_seconds = secs;
 			}
-		};
-
-		enum class special_effect : unsigned char {
-			NONE = 0,
-			COLOR_WAVE
 		};
 
 		sprite(
@@ -98,9 +100,9 @@ namespace augs {
 		float rotation_offset = 0.f;
 
 		flip_flags flip;
+		pad_bytes<2> pad;
 		
-		special_effect effect = special_effect::NONE;
-		pad_bytes<1> pad;
+		sprite_special_effect effect = sprite_special_effect::NONE;
 		// END GEN INTROSPECTOR
 
 		bool operator==(const sprite& b) const {
@@ -193,7 +195,7 @@ namespace augs {
 				flip 
 			);
 
-			if (effect == special_effect::COLOR_WAVE) {
+			if (effect == sprite_special_effect::COLOR_WAVE) {
 				const auto left_col = rgba(hsv{ fmod(in.global_time_seconds / 2.f, 1.f), 1.0, 1.0 });
 				const auto right_col = rgba(hsv{ fmod(in.global_time_seconds / 2.f + 0.3f, 1.f), 1.0, 1.0 });
 

@@ -21,7 +21,7 @@ struct standard_explosion_input {
 	float sound_gain = 1.f;
 	adverse_element_type type = adverse_element_type::INVALID;
 	bool create_thunders_effect = false;
-	pad_bytes<2> pad;
+	pad_bytes<3> pad;
 	// END GEN INTROSPECTOR
 
 	void instantiate(

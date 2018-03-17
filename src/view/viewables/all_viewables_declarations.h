@@ -2,13 +2,8 @@
 #include "augs/math/declare_math.h"
 #include "augs/misc/declare_containers.h"
 
+#include "game/assets/ids/asset_id_declarations.h"
 #include "game/assets/asset_map.h"
-
-namespace assets {
-	enum class game_image_id;
-	enum class sound_buffer_id;
-	enum class particle_effect_id;
-}
 
 namespace augs {
 	class sound_buffer;
