@@ -44,120 +44,122 @@ void wandering_pixels_system::advance_for(
 }
 
 void wandering_pixels_system::advance_for(
-	const const_entity_handle it, 
+	const const_entity_handle handle, 
 	const augs::delta dt
 ) {
 	const auto dt_secs = dt.in_seconds();
 	const auto dt_ms = dt.in_milliseconds();
-	const auto& cosmos = it.get_cosmos();
-	auto& cache = get_cache(it);
-	const auto& wandering = it.get<components::wandering_pixels>();
-	const auto& wandering_def = it.get<invariants::wandering_pixels>();
 
-	if (/* refresh_cache */ 
-		cache.recorded_component.particles_count != wandering.particles_count
-	) {
-		cache.particles.resize(wandering.particles_count);
-		cache.recorded_component.particles_count = wandering.particles_count;
-	}
+	handle.dispatch_on_having<invariants::wandering_pixels>([&](const auto it) {
+		const auto& cosmos = it.get_cosmos();
+		auto& cache = get_cache(it);
 
-	const auto new_reach = wandering.get_reach();
+		const auto& wandering = it.template get<components::wandering_pixels>();
+		const auto& wandering_def = it.template get<invariants::wandering_pixels>();
 
-	if (cache.recorded_component.get_reach() != new_reach) {
-		/* refresh_cache */ 
-		cache.rng = { cosmos.get_rng_seed_for(it) };
+		if (cache.recorded_component.particles_count != wandering.particles_count) {
+			cache.particles.resize(wandering.particles_count);
+			cache.recorded_component.particles_count = wandering.particles_count;
+		}
+
+		const auto new_reach = wandering.get_reach();
+
+		if (cache.recorded_component.get_reach() != new_reach) {
+			/* refresh_cache */ 
+			cache.rng = { cosmos.get_rng_seed_for(it) };
+
+			for (auto& p : cache.particles) {
+				p.pos.set(
+					new_reach.x + cache.rng.randval(0u, static_cast<unsigned>(new_reach.w)), 
+					new_reach.y + cache.rng.randval(0u, static_cast<unsigned>(new_reach.h))
+				);
+
+				p.current_lifetime_ms = cache.rng.randval(0.f, wandering_def.frame_duration_ms);
+			}
+
+			cache.recorded_component.set_reach(new_reach);
+		}
+
+		constexpr unsigned max_direction_time = 4000u;
+		constexpr float interp_time = 700.f;
 
 		for (auto& p : cache.particles) {
-			p.pos.set(
-				new_reach.x + cache.rng.randval(0u, static_cast<unsigned>(new_reach.w)), 
-				new_reach.y + cache.rng.randval(0u, static_cast<unsigned>(new_reach.h))
-			);
+			p.current_lifetime_ms += dt_ms + dt_ms * (p.direction_ms_left / max_direction_time) + dt_ms * p.current_direction.radians();
 
-			p.current_lifetime_ms = cache.rng.randval(0.f, wandering_def.frame_duration_ms);
-		}
+			if (p.direction_ms_left <= 0.f) {
+				p.direction_ms_left = static_cast<float>(cache.rng.randval(max_direction_time, max_direction_time + 800u));
 
-		cache.recorded_component.set_reach(new_reach);
-	}
+				p.current_direction = p.current_direction.perpendicular_cw();
 
-	constexpr unsigned max_direction_time = 4000u;
-	constexpr float interp_time = 700.f;
+				const auto dir = p.current_direction;
+				const auto reach = new_reach;
 
-	for (auto& p : cache.particles) {
-		p.current_lifetime_ms += dt_ms + dt_ms * (p.direction_ms_left / max_direction_time) + dt_ms * p.current_direction.radians();
+				float chance_to_flip = 0.f;
 
-		if (p.direction_ms_left <= 0.f) {
-			p.direction_ms_left = static_cast<float>(cache.rng.randval(max_direction_time, max_direction_time + 800u));
+				p.current_velocity = static_cast<float>(cache.rng.randval(3, 3 + 35));
 
-			p.current_direction = p.current_direction.perpendicular_cw();
+				if (dir.x > 0) {
+					chance_to_flip = (p.pos.x - reach.x) / reach.w;
+				}
+				else if (dir.x < 0) {
+					chance_to_flip = 1.f - (p.pos.x - reach.x) / reach.w;
+				}
+				if (dir.y > 0) {
+					chance_to_flip = (p.pos.y - reach.y) / reach.h;
+				}
+				else if (dir.y < 0) {
+					chance_to_flip = 1.f - (p.pos.y - reach.y) / reach.h;
+				}
 
-			const auto dir = p.current_direction;
-			const auto reach = new_reach;
+				if (chance_to_flip < 0) {
+					chance_to_flip = 0;
+				}
 
-			float chance_to_flip = 0.f;
+				if (chance_to_flip > 1) {
+					chance_to_flip = 1;
+				}
 
-			p.current_velocity = static_cast<float>(cache.rng.randval(3, 3 + 35));
-
-			if (dir.x > 0) {
-				chance_to_flip = (p.pos.x - reach.x) / reach.w;
+				if (cache.rng.randval(0u, 100u) <= chance_to_flip * 100.f) {
+					p.current_direction = -p.current_direction;
+				}
 			}
-			else if (dir.x < 0) {
-				chance_to_flip = 1.f - (p.pos.x - reach.x) / reach.w;
-			}
-			if (dir.y > 0) {
-				chance_to_flip = (p.pos.y - reach.y) / reach.h;
-			}
-			else if (dir.y < 0) {
-				chance_to_flip = 1.f - (p.pos.y - reach.y) / reach.h;
-			}
-
-			if (chance_to_flip < 0) {
-				chance_to_flip = 0;
+			else {
+				p.direction_ms_left -= dt_ms;
 			}
 
-			if (chance_to_flip > 1) {
-				chance_to_flip = 1;
+			vec2 considered_direction;
+
+			if (p.direction_ms_left <= interp_time) {
+				considered_direction = augs::interp(vec2(), p.current_direction, p.direction_ms_left / interp_time);
+			}
+			else if (p.direction_ms_left >= max_direction_time - interp_time) {
+				considered_direction = augs::interp(vec2(), p.current_direction, (max_direction_time - p.direction_ms_left) / interp_time);
+			}
+			else {
+				considered_direction = p.current_direction;
 			}
 
-			if (cache.rng.randval(0u, 100u) <= chance_to_flip * 100.f) {
-				p.current_direction = -p.current_direction;
+			const auto vel = p.current_velocity;
+
+			p.pos += considered_direction * vel * dt_secs;
+
+			const auto sin_secs = static_cast<float>(sin(p.current_lifetime_ms / 1000));
+			const auto cos_secs = static_cast<float>(cos(p.current_lifetime_ms / 1000));
+
+			if (considered_direction.x > 0) {
+				p.pos.y += considered_direction.x * sin_secs * vel * dt_secs * 1.2f;
 			}
-		}
-		else {
-			p.direction_ms_left -= dt_ms;
-		}
+			else if (considered_direction.x < 0) {
+				p.pos.y -= -considered_direction.x * sin_secs * vel * dt_secs * 1.2f;
+			}
+			if (considered_direction.y > 0) {
+				p.pos.x += considered_direction.y * cos_secs * vel * dt_secs * 1.2f;
+			}
+			else if (considered_direction.y < 0) {
+				p.pos.x -= -considered_direction.y * cos_secs * vel * dt_secs * 1.2f;
+			}
 
-		vec2 considered_direction;
-
-		if (p.direction_ms_left <= interp_time) {
-			considered_direction = augs::interp(vec2(), p.current_direction, p.direction_ms_left / interp_time);
+			//p.pos.x += cos(global_time_seconds) * 20 * dt_secs * 1.2;
 		}
-		else if (p.direction_ms_left >= max_direction_time - interp_time) {
-			considered_direction = augs::interp(vec2(), p.current_direction, (max_direction_time - p.direction_ms_left) / interp_time);
-		}
-		else {
-			considered_direction = p.current_direction;
-		}
-
-		const auto vel = p.current_velocity;
-
-		p.pos += considered_direction * vel * dt_secs;
-
-		const auto sin_secs = static_cast<float>(sin(p.current_lifetime_ms / 1000));
-		const auto cos_secs = static_cast<float>(cos(p.current_lifetime_ms / 1000));
-
-		if (considered_direction.x > 0) {
-			p.pos.y += considered_direction.x * sin_secs * vel * dt_secs * 1.2f;
-		}
-		else if (considered_direction.x < 0) {
-			p.pos.y -= -considered_direction.x * sin_secs * vel * dt_secs * 1.2f;
-		}
-		if (considered_direction.y > 0) {
-			p.pos.x += considered_direction.y * cos_secs * vel * dt_secs * 1.2f;
-		}
-		else if (considered_direction.y < 0) {
-			p.pos.x -= -considered_direction.y * cos_secs * vel * dt_secs * 1.2f;
-		}
-
-		//p.pos.x += cos(global_time_seconds) * 20 * dt_secs * 1.2;
-	}
+	});
 }
