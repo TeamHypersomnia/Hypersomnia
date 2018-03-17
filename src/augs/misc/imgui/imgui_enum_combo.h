@@ -4,28 +4,27 @@ namespace augs {
 	namespace imgui {
 		template <class T, class... Args>
 		auto enum_combo(const std::string& label, T& into, Args&&... args) {
-			thread_local const auto combo_names = []() {
-				std::vector<char> names;
+			const auto current_str = format_enum(into);
+			const auto current = into;
 
-				for_each_enum_except_bounds([&names](const T e) {
-					concatenate(
-						names,
-						format_enum(e)
-					);
+			if (ImGui::BeginCombo(label.c_str(), current_str.c_str())) {
+				for_each_enum_except_bounds([&](const T e) {
+					const auto enum_label = format_enum(e);
+					bool is_selected = e == current;
 
-					names.push_back('\0');
+					if (ImGui::Selectable(enum_label.c_str(), is_selected)) {
+						into = e;
+					}
+
+					if (is_selected) {
+						ImGui::SetItemDefaultFocus();
+					}
 				});
-				
-				names.push_back('\0');
 
-				return names;
-			}();
+				ImGui::EndCombo();
+			}
 
-			auto current = static_cast<int>(into);
-			const auto result = ImGui::Combo(label.c_str(), &current, combo_names.data());
-			into = static_cast<T>(current);
-
-			return result;
+			return current != into;
 		}
 	}
 }
