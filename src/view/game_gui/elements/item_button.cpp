@@ -276,6 +276,11 @@ void item_button::draw_proc(
 				const auto iteration_lambda = [&](const const_entity_handle desc) {
 					const auto parent_slot = cosmos[desc.get<components::item>().get_current_slot()];
 
+					if (!attachment_index < layout.boxes.size()) {
+						// LOG("Excuse me, but something's gone haywire.");
+						return recursive_callback_result::ABORT;
+					}
+
 					if (parent_slot.is_physically_connected_until(item)) {
 						auto attachment_sprite = desc.get<invariants::sprite>();
 
