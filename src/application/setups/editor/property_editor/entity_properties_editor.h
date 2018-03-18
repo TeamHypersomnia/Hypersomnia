@@ -97,7 +97,7 @@ void edit_entity(
 			using T = std::decay_t<decltype(component)>;
 
 			const auto component_label = get_component_stem(component) + " component";
-			const auto node = scoped_tree_node_ex(component_label.c_str());
+			const auto node = scoped_tree_node_ex(component_label);
 
 			next_column_text();
 

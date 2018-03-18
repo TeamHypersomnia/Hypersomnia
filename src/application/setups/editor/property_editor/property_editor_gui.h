@@ -290,7 +290,7 @@ void general_edit_properties(
 					/* next_column_text(); */
 				}
 				else {
-					const auto object_node = scoped_tree_node_ex(label.c_str());
+					const auto object_node = scoped_tree_node_ex(label);
 
 #if 0
 					if constexpr(is_tuple_v<M>) {

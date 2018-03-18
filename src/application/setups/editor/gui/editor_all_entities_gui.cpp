@@ -64,7 +64,7 @@ void editor_all_entities_gui::perform(const editor_command_input in) {
 			const auto total_entities = p.size();
 			const auto total_flavours = cosm.get_common_significant().get_flavours<E>().count();
 
-			const auto node = scoped_tree_node_ex(entity_type_label.c_str());
+			const auto node = scoped_tree_node_ex(entity_type_label);
 
 			next_column_text_disabled(typesafe_sprintf("%x Flavours, %x Entities", total_flavours, total_entities));
 
@@ -90,7 +90,7 @@ void editor_all_entities_gui::perform(const editor_command_input in) {
 							const auto all_having_flavour = cosm.get_solvable_inferred().name.get_entities_by_flavour_id(flavour_id);
 
 							const auto node_label = typesafe_sprintf("%x###%x", flavour_label, flavour_id.raw);
-							const auto flavour_node = scoped_tree_node_ex(node_label.c_str());
+							const auto flavour_node = scoped_tree_node_ex(node_label);
 
 							const auto num_entities_label = typesafe_sprintf("%x Entities", all_having_flavour.size());
 							next_column_text_disabled(num_entities_label);
@@ -100,7 +100,15 @@ void editor_all_entities_gui::perform(const editor_command_input in) {
 								edit_flavour(properties_gui, flavour_id, flavour, in);
 								ImGui::Separator();
 
-								const auto entities_node = scoped_tree_node_ex(num_entities_label.c_str());
+								const auto unified_entities_node = scoped_tree_node_ex(num_entities_label + " (unified)");
+
+								next_column_text();
+
+								if (unified_entities_node) {
+
+								}
+
+								const auto entities_node = scoped_tree_node_ex(num_entities_label);
 
 								next_column_text();
 
@@ -112,7 +120,7 @@ void editor_all_entities_gui::perform(const editor_command_input in) {
 											const auto guid = typed_handle.get_guid();
 											const auto entity_label = typesafe_sprintf("%x", guid);
 
-											const auto entity_node = scoped_tree_node_ex(entity_label.c_str());
+											const auto entity_node = scoped_tree_node_ex(entity_label);
 
 											if (ImGui::IsItemHovered()) {
 												hovered_guid = guid; 

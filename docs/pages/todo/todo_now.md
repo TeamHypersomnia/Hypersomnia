@@ -7,10 +7,33 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
+- Command multiplicity
+	- Make change flavour/component commands support it out of the box, don't just have two different commands
+	- mark different values in orange
+
+- Selection window
+	- Proposition: have always the nodes for entity types
+		- flavours there could be unified already
+		- e.g.:
+			[ Save selection ]
+			[ ] Unified view - this actually is not much important because most of the time entity types won't be considered two at a time
+			-> Shootable weapon
+				Editing properties for Kek9 and Sample rifle
+				-> Name
+				-> Entities	
+					[ ] Unified view
+					-> 2 of Kek9
+					-> 9 of Sample rifle
+			-> Sprite decoration
+				Editing properties for Fish
+				-> Entities
+					[ ] Unified view
+		- Ctrl+Enter on selection adds to current selection
+		- In case of just one entity, always unify
+		- if we introduce just another node of "unified", we stay stateless
+
 - handle bitsets properly, e.g. parties and hostile parties
 - handle slot categories properly, as well
-
-- Make change flavour/component commands support multiplicity out of the box, don't just have two different commands
 
 - Enter on selection opens relevant selection group in tabs
 

@@ -57,8 +57,8 @@ namespace augs {
 		}
 
 		template <class... T>
-		auto scoped_tree_node_ex(T&&... args) {
-			const auto result = ImGui::TreeNodeEx(std::forward<T>(args)...);
+		auto scoped_tree_node_ex(const std::string& label, T&&... args) {
+			const auto result = ImGui::TreeNodeEx(label.c_str(), std::forward<T>(args)...);
 
 			auto opt = std::make_optional(make_scope_guard([result]() { if (result) { ImGui::TreePop(); }}));
 
