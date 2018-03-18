@@ -64,8 +64,6 @@ void editor_all_entities_gui::perform(const editor_command_input in) {
 			const auto total_entities = p.size();
 			const auto total_flavours = cosm.get_common_significant().get_flavours<E>().count();
 
-			ImGui::SetNextTreeNodeOpen(true, ImGuiCond_FirstUseEver);
-
 			const auto node = scoped_tree_node_ex(entity_type_label.c_str());
 
 			next_column_text_disabled(typesafe_sprintf("%x Flavours, %x Entities", total_flavours, total_entities));
@@ -92,35 +90,44 @@ void editor_all_entities_gui::perform(const editor_command_input in) {
 							const auto all_having_flavour = cosm.get_solvable_inferred().name.get_entities_by_flavour_id(flavour_id);
 
 							const auto node_label = typesafe_sprintf("%x###%x", flavour_label, flavour_id.raw);
-							const auto f_node = scoped_tree_node_ex(node_label.c_str());
+							const auto flavour_node = scoped_tree_node_ex(node_label.c_str());
 
-							next_column_text_disabled(typesafe_sprintf("%x Entities", all_having_flavour.size()));
+							const auto num_entities_label = typesafe_sprintf("%x Entities", all_having_flavour.size());
+							next_column_text_disabled(num_entities_label);
 
-							if (f_node) {
+							if (flavour_node) {
 								ImGui::Separator();
 								edit_flavour(properties_gui, flavour_id, flavour, in);
 								ImGui::Separator();
 
-								for (const auto& e : all_having_flavour) {
-									const auto handle = cosm[e];
+								const auto entities_node = scoped_tree_node_ex(num_entities_label.c_str());
 
-									handle.dispatch([&](const auto typed_handle){
-										const auto guid = typed_handle.get_guid();
-										const auto entity_label = typesafe_sprintf("%x", guid);
+								next_column_text();
 
-										const auto e_node = scoped_tree_node_ex(entity_label.c_str());
+								if (entities_node) {
+									for (const auto& e : all_having_flavour) {
+										const auto handle = cosm[e];
 
-										if (ImGui::IsItemHovered()) {
-											hovered_guid = guid; 
-										}
+										handle.dispatch([&](const auto typed_handle){
+											const auto guid = typed_handle.get_guid();
+											const auto entity_label = typesafe_sprintf("%x", guid);
 
-										next_column_text();
+											const auto entity_node = scoped_tree_node_ex(entity_label.c_str());
 
-										if (e_node) {
-											edit_entity(properties_gui, typed_handle, in);
-										}
-									});
+											if (ImGui::IsItemHovered()) {
+												hovered_guid = guid; 
+											}
+
+											next_column_text();
+
+											if (entity_node) {
+												edit_entity(properties_gui, typed_handle, in);
+											}
+										});
+									}
 								}
+
+								ImGui::Separator();
 							}
 						}
 					);
