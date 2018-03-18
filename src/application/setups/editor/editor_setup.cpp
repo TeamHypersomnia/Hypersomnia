@@ -401,7 +401,18 @@ void editor_setup::perform_custom_imgui(
 					const auto world_cursor_pos = current_cone->to_world_space(screen_size, mouse_pos);
 					text("Cursor: %x", world_cursor_pos);
 					text("View center: %x", current_cone->transform.pos);
-					text(typesafe_sprintf("Zoom: %x", current_cone->zoom * 100.f) + " %");
+
+					{
+						auto zoom = current_cone->zoom * 100.f;
+						
+						if (slider("Zoom: ", zoom, 1.f, 1000.f, "%.3f%%")) {
+							if (!view().panned_camera.has_value()) {
+								view().panned_camera = current_cone;
+							}
+
+							view().panned_camera->zoom = zoom / 100.f;
+						}
+					}
 				}
 
 				text("Total entities: %x",

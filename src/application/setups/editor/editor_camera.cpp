@@ -127,9 +127,12 @@ namespace editor_detail {
 
 			auto& camera = *panned_camera;
 
+			const auto min_zoom = 0.01f;
+			const auto max_zoom = 10.f;
+
 			const auto old_zoom = camera.zoom;
 			const auto zoom_offset = 0.09f * old_zoom * zoom_amount * zoom_mult;
-			const auto new_zoom = std::clamp(old_zoom + zoom_offset, 0.01f, 10.f);
+			const auto new_zoom = std::clamp(old_zoom + zoom_offset, min_zoom, max_zoom);
 
 			camera.zoom = new_zoom;	
 			camera.transform.pos += (1 - 1 / (new_zoom/old_zoom))*(zoom_point - camera.transform.pos);
