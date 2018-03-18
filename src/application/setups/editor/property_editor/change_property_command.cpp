@@ -23,13 +23,36 @@ void change_property_command<D>::rewrite_change(
 
 	common.timestamp = {};
 
-	self.access_property(
+	self.access_each_property(
 		cosm,
-		[&](auto& field, const auto& reinferrable_object) {
+		[&](auto& field) {
 			augs::from_bytes(std::move(new_value), field);
-			return maybe_reinfer(reinferrable_object);
 		}
 	);
+}
+
+using namespace augs;
+
+template <class T>
+static void detail_write_bytes(memory_stream& to, const T& from, const std::size_t bytes_count) {
+	if constexpr(std::is_same_v<T, augs::trivial_type_marker>) {
+		const std::byte* location = reinterpret_cast<const std::byte*>(std::addressof(from));
+		to.write(location, bytes_count);
+	}
+	else {
+		augs::write_bytes(to, from);
+	}
+}
+
+template <class T>
+static void detail_read_bytes(memory_stream& from, T& to, const std::size_t bytes_count) {
+	if constexpr(std::is_same_v<T, augs::trivial_type_marker>) {
+		std::byte* location = reinterpret_cast<std::byte*>(std::addressof(from));
+		from.read(location, bytes_count);
+	}
+	else {
+		augs::read_bytes(from, to);
+	}
 }
 
 template <class D>
@@ -37,16 +60,27 @@ void change_property_command<D>::redo(const editor_command_input in) {
 	auto& cosm = in.folder.work->world;
 	auto& self = *static_cast<D*>(this);
 
-	self.access_property(
-		cosm,
-		[&](auto& field, const auto& reinferrable_object) {
-			const auto bytes_count = value_after_change.size();
-			value_before_change = detail_field_to_bytes(field, bytes_count);
+	thread_local memory_stream before_change_data;
+	thread_local memory_stream after_change_data;
 
-			augs::from_bytes(std::move(value_after_change), field);
-			return maybe_reinfer(reinferrable_object);
+	// TODO: templatize memory stream to take cref
+
+	before_change_data.set_write_pos(0u);
+	after_change_data = value_after_change;
+
+	const auto trivial_element_size = value_after_change.size();
+
+	self.access_each_property(
+		cosm,
+		[&](auto& field) {
+			detail_write_bytes(before_change_data, field, trivial_element_size);
+
+			detail_read_bytes(after_change_data, field, trivial_element_size);
+			after_change_data.set_read_pos(0u);
 		}	
 	);
+
+	value_before_change = before_change_data;
 }
 
 template <class D>
@@ -54,16 +88,31 @@ void change_property_command<D>::undo(const editor_command_input in) {
 	auto& cosm = in.folder.work->world;
 	auto& self = *static_cast<D*>(this);
 
-	self.access_property(
-		cosm,
-		[&](auto& field, const auto& reinferrable_object) {
-			const auto bytes_count = value_before_change.size();
-			value_after_change = detail_field_to_bytes(field, bytes_count);
+	bool read_once = true;
 
-			augs::from_bytes(std::move(value_before_change), field);
-			return maybe_reinfer(reinferrable_object);
+	thread_local memory_stream before_change_data;
+	thread_local memory_stream after_change_data;
+
+	// TODO: templatize memory stream to take ref
+
+	after_change_data.set_write_pos(0u);
+	before_change_data = value_before_change;
+
+	const auto trivial_element_size = value_before_change.size() / self.count_affected();
+
+	self.access_each_property(
+		cosm,
+		[&](auto& field) {
+			if (read_once) {
+				detail_write_bytes(after_change_data, field, trivial_element_size); 
+				read_once = false;
+			}
+
+			detail_read_bytes(before_change_data, field, trivial_element_size);
 		}	
 	);
+
+	value_after_change = after_change_data;
 }
 
 template class change_property_command<change_flavour_property_command>;

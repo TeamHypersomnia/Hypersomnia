@@ -36,3 +36,7 @@ summary: Just a hidden scratchpad.
 	- but really we should not be able to just ctrl+z/y arbitrarily
 	- how do we detect that a field is being dragged?
 
+- What about a byte_vector struct that has a templated constructor?
+	- and a templated operator?
+	- not quite; the type's operator= could be less efficient
+

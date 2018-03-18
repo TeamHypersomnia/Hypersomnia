@@ -58,10 +58,10 @@ struct stored_id_provider {
 		return { stored_id, h.get_type_id() };
 	}
 
-protected:
 	template <class C>
-	auto* dereference(C& owner, cosmos_solvable_access key) const {
-		return owner.get_solvable(key).dereference_entity(stored_id);
+	auto& dereference(C& owner, cosmos_solvable_access key) const {
+		using E = typename derived_handle_type::used_entity_type;
+		return *owner.get_solvable(key).dereference_entity(typed_entity_id<E>{ stored_id });
 	}
 };
 

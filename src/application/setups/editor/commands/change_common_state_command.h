@@ -17,23 +17,25 @@ struct change_common_state_command : change_property_command<change_common_state
 	field_address field;
 	// END GEN INTROSPECTOR
 
+	auto count_affected() const {
+		return 1u;
+	}
+
 	template <class C, class F>
-	void access_property(
+	void access_each_property(
 		C& cosm,
 		F callback
-	) {
+	) const {
 		cosm.change_common_significant([&](auto& common_signi) {
-			auto result = changer_callback_result::DONT_REFRESH;
-
-			result = on_field_address(
+			on_field_address(
 				common_signi,
 				field,
-				[&](auto& f) {
-					return callback(f, common_signi);
+				[&](auto& resolved_field) {
+					callback(resolved_field);
 				}
 			);
 
-			return result;
+			return changer_callback_result::DONT_REFRESH;
 		});
 	}
 };

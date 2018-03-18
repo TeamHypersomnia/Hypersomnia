@@ -55,7 +55,9 @@ namespace augs {
 		memory_stream& operator=(const memory_stream&) = default;
 		memory_stream& operator=(memory_stream&&) = default;
 
+		memory_stream(const std::vector<std::byte>& new_buffer);
 		memory_stream(std::vector<std::byte>&& new_buffer);
+		memory_stream& operator=(const std::vector<std::byte>& new_buffer);
 		memory_stream& operator=(std::vector<std::byte>&& new_buffer);
 
 		std::size_t mismatch(const memory_stream&) const;
@@ -99,6 +101,12 @@ namespace augs {
 		operator std::vector<std::byte>&&() && {
 			buffer.resize(get_write_pos());
 			return std::move(buffer);
+		}
+
+		operator std::vector<std::byte>() const {
+			auto buf = buffer;
+			buf.resize(get_write_pos());
+			return buffer;
 		}
 	};
 

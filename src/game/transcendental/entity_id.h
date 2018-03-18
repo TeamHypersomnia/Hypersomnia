@@ -142,7 +142,8 @@ private:
 template <class E>
 struct typed_entity_id : entity_id_base {
 	using base = entity_id_base;
-	using base::base;
+
+	typed_entity_id(const entity_id_base b = {}) : entity_id_base(b) {}
 
 	auto basic() const {
 		return *static_cast<const base*>(this);

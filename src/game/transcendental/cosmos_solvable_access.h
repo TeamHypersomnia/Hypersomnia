@@ -4,7 +4,8 @@
 
 class cosmic_delta;
 class cosmic;
-struct change_entity_property_command;
+
+struct entity_property_id;
 
 class cosmos_solvable_access {
 	/*
@@ -15,7 +16,7 @@ class cosmos_solvable_access {
 	friend cosmic_delta;
 	friend cosmic;
 
-	friend change_entity_property_command;
+	friend entity_property_id;
 
 	template <bool>
 	friend class basic_entity_handle;

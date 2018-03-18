@@ -9,9 +9,11 @@ struct type_list {};
 
 namespace std {
 	template <std::size_t I, class... Types>
-	auto get(const type_list<Types...>& t) {
+	const auto& get(const type_list<Types...>& t) {
 		using type = nth_type_in_t<I, Types...>;
-		return type();
+
+		static const type instance;
+		return instance;
 	}
 }
 

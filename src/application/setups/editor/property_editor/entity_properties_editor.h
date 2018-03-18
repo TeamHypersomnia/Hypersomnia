@@ -16,19 +16,20 @@ auto get_component_stem(const T&) {
 	return result;
 }
 
-template <class T, class E>
+template <class T, class E, class C>
 void edit_component(
 	property_editor_gui& state,
 	const T& component,
 	const E handle,
+	C command_maker,
    	const editor_command_input in
 ) {
+	using command_type = decltype(command_maker());
 	using namespace augs::imgui;
 
 	auto make_property_id = [&](const field_address field) {
 		entity_property_id result;
 
-		result.subject_id = handle.get_id();
 		result.component_id = index_in_list_v<T, decltype(handle.get().components)>;
 		result.field = field;
 
@@ -50,9 +51,9 @@ void edit_component(
 		const entity_property_id property_id,
 		const auto& new_content
 	) {
-		change_entity_property_command cmd;
-		cmd.property_id = property_id;
+		auto cmd = command_maker();
 
+		cmd.property_id = property_id;
 		cmd.value_after_change = augs::to_bytes(new_content);
 		cmd.built_description = description + property_location;
 
@@ -65,7 +66,7 @@ void edit_component(
 	) {
 		auto& last = history.last_command();
 
-		if (auto* const cmd = std::get_if<change_entity_property_command>(std::addressof(last))) {
+		if (auto* const cmd = std::get_if<command_type>(std::addressof(last))) {
 			cmd->built_description = description + property_location;
 			cmd->rewrite_change(augs::to_bytes(new_content), in);
 		}
@@ -83,10 +84,11 @@ void edit_component(
 	);
 }
 
-template <class E>
+template <class E, class C>
 void edit_entity(
 	property_editor_gui& state,
 	const E handle,
+	C command_maker,
    	const editor_command_input in
 ) {
 	using namespace augs::imgui;
@@ -102,7 +104,7 @@ void edit_entity(
 			next_column_text();
 
 			if (node) {
-				edit_component(state, component, handle, in);
+				edit_component(state, component, handle, command_maker, in);
 			}
 		}
    	);

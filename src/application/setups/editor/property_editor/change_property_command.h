@@ -9,32 +9,16 @@
 #include "application/setups/editor/editor_command_structs.h"
 #include "application/setups/editor/property_editor/property_editor_structs.h"
 
+template <class T>
+static constexpr bool should_reinfer_after_change(const T& invariant) {
+	return 
+		should_reinfer_when_tweaking_v<T>
+		|| is_synchronized_v<T>
+	;
+}
+
 template <class derived>
 class change_property_command {
-	template <class T>
-	static constexpr bool should_reinfer(const T& invariant) {
-		return 
-			should_reinfer_when_tweaking_v<T>
-			|| is_synchronized_v<T>
-		;
-	}
-
-	template <class T>
-	static auto maybe_reinfer(const T& invariant) {
-		return should_reinfer(invariant) ? changer_callback_result::REFRESH : changer_callback_result::DONT_REFRESH;
-	}
-
-	template <class T>
-	static auto detail_field_to_bytes(const T& from, const std::size_t bytes_count) {
-		if constexpr(std::is_same_v<T, augs::trivial_type_marker>) {
-			const std::byte* location = reinterpret_cast<const std::byte*>(std::addressof(from));
-			return std::vector<std::byte>(location, location + bytes_count);
-		}
-		else {
-			return augs::to_bytes(from);
-		}
-	}
-
 public:
 	// GEN INTROSPECTOR class change_property_command class derived
 	editor_command_common common;

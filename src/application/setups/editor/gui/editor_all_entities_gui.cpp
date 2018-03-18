@@ -59,6 +59,7 @@ void editor_all_entities_gui::perform(const editor_command_input in) {
 			using pool_type = std::decay_t<P>;
 
 			using E = type_argument_t<typename pool_type::mapped_type>;
+			using specific_handle = const_typed_entity_handle<E>;
 
 			const auto entity_type_label = format_field_name(get_type_name<E>());
 			const auto total_entities = p.size();
@@ -97,15 +98,37 @@ void editor_all_entities_gui::perform(const editor_command_input in) {
 
 							if (flavour_node) {
 								ImGui::Separator();
-								edit_flavour(properties_gui, flavour_id, flavour, in);
+
+								{
+									auto command_maker = [&flavour_id]() {
+										change_flavour_property_command cmd;
+										cmd.affected_flavours = { flavour_id };
+										return cmd;
+									};
+
+									edit_flavour(properties_gui, flavour_id, flavour, command_maker, in);
+								}
+
 								ImGui::Separator();
 
-								const auto unified_entities_node = scoped_tree_node_ex(num_entities_label + " (unified)");
+								{
+									const auto unified_entities_node = scoped_tree_node_ex(num_entities_label + " (unified)");
 
-								next_column_text();
+									next_column_text();
 
-								if (unified_entities_node) {
+									if (unified_entities_node) {
+										if (all_having_flavour.size() > 0) {
+											const auto first_handle = specific_handle(cosm, (*all_having_flavour.begin()).basic());
 
+											auto command_maker = [&all_having_flavour]() {
+												change_entity_property_command cmd;
+												cmd.affected_entities.assign(all_having_flavour.begin(), all_having_flavour.end());
+												return cmd;
+											};
+
+											edit_entity(properties_gui, first_handle, command_maker, in);
+										}
+									}
 								}
 
 								const auto entities_node = scoped_tree_node_ex(num_entities_label);
@@ -114,24 +137,28 @@ void editor_all_entities_gui::perform(const editor_command_input in) {
 
 								if (entities_node) {
 									for (const auto& e : all_having_flavour) {
-										const auto handle = cosm[e];
+										auto command_maker = [e]() {
+											change_entity_property_command cmd;
+											cmd.affected_entities = { e };
+											return cmd;
+										};
 
-										handle.dispatch([&](const auto typed_handle){
-											const auto guid = typed_handle.get_guid();
-											const auto entity_label = typesafe_sprintf("%x", guid);
+										const auto typed_handle = specific_handle(cosm, e);
 
-											const auto entity_node = scoped_tree_node_ex(entity_label);
+										const auto guid = typed_handle.get_guid();
+										const auto entity_label = typesafe_sprintf("%x", guid);
 
-											if (ImGui::IsItemHovered()) {
-												hovered_guid = guid; 
-											}
+										const auto entity_node = scoped_tree_node_ex(entity_label);
 
-											next_column_text();
+										if (ImGui::IsItemHovered()) {
+											hovered_guid = guid; 
+										}
 
-											if (entity_node) {
-												edit_entity(properties_gui, typed_handle, in);
-											}
-										});
+										next_column_text();
+
+										if (entity_node) {
+											edit_entity(properties_gui, typed_handle, command_maker, in);
+										}
 									}
 								}
 

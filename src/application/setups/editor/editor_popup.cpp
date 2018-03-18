@@ -9,7 +9,7 @@ bool editor_popup::perform() {
 		ImGui::OpenPopup(title.c_str());
 	}
 
-	if (auto popup = scoped_modal_popup(title.c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+	if (auto popup = scoped_modal_popup(title, nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
 		text(message);
 
 		{

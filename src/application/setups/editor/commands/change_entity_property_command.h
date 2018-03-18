@@ -10,9 +10,35 @@
 #include "application/setups/editor/property_editor/on_field_address.h"
 
 struct entity_property_id {
-	entity_id subject_id;
 	unsigned component_id = static_cast<unsigned>(-1);
 	field_address field;
+
+	template <class C, class F>
+	bool access(
+		C& cosm,
+		const entity_id subject_id,
+		F callback
+	) const {
+		const auto handle = cosm[subject_id];
+
+		return handle.dispatch([&](const auto typed_handle) {
+			return get_by_dynamic_index(
+				typed_handle.get({}).components,
+				component_id,
+				[&](auto& component) {
+					on_field_address(
+						component,
+						field,
+						[&](auto& resolved_field) {
+							callback(resolved_field);
+						}
+					);
+
+					return should_reinfer_after_change(component);
+				}
+			);
+		});
+	}
 };
 
 struct change_entity_property_command : change_property_command<change_entity_property_command> {
@@ -20,35 +46,28 @@ struct change_entity_property_command : change_property_command<change_entity_pr
 
 	// GEN INTROSPECTOR struct change_entity_property_command
 	// INTROSPECT BASE change_property_command<change_entity_property_command>
+	std::vector<entity_id> affected_entities;
 	entity_property_id property_id;
 	// END GEN INTROSPECTOR
 
+	auto count_affected() const {
+		return affected_entities.size();
+	}
+
 	template <class C, class F>
-	void access_property(
+	void access_each_property(
 		C& cosm,
-		F callback
-	) {
-		auto result = changer_callback_result::DONT_REFRESH;
+		F&& callback
+	) const {
+		bool should_reinfer = false;
 
-		const auto handle = cosm[property_id.subject_id];
+		for (const auto& a : affected_entities) {
+			if (property_id.access(cosm, a, std::forward<F>(callback))) {
+				should_reinfer = true;
+			}
+		}
 
-		handle.dispatch([&](const auto typed_handle) {
-			get_by_dynamic_index(
-				typed_handle.get({}).components,
-				property_id.component_id,
-				[&](auto& component) {
-					result = on_field_address(
-						component,
-						property_id.field,
-						[&](auto& field) {
-							return callback(field, component);
-						}
-					);
-				}
-			);
-		});
-
-		if (result != changer_callback_result::DONT_REFRESH) {
+		if (should_reinfer) {
 			cosmic::reinfer_all_entities(cosm);
 		}
 	}
