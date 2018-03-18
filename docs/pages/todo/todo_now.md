@@ -7,6 +7,8 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
+- templatize some dangling memory stream arguments
+
 - Command multiplicity
 	- Make change flavour/component commands support it out of the box, don't just have two different commands
 	- Value changed will have the same format - there's always one value set

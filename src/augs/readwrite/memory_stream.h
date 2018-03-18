@@ -1,7 +1,9 @@
 #pragma once
 #include <vector>
 #include "augs/ensure.h"
+#include "augs/readwrite/memory_stream_declaration.h"
 #include "augs/readwrite/byte_readwrite_declaration.h"
+#include "augs/templates/maybe_const.h"
 #include "augs/templates/exception_templates.h"
 
 namespace augs {
@@ -43,12 +45,134 @@ namespace augs {
 		}
 	};
 
-	class memory_stream : public stream_position {
+	class memory_stream;
+
+	class byte_counter_stream : public stream_position {
+	public:
+		memory_stream create_reserved_stream();
+
+		void write(const std::byte* const data, const std::size_t bytes);
+	};
+
+	template <class derived>
+	class memory_stream_mixin : public stream_position {
+		auto& buffer() {
+			return static_cast<derived*>(this)->buffer;
+		}
+
+		const auto& buffer() const {
+			return static_cast<const derived*>(this)->buffer;
+		}
+
+	public:
+		using stream_position::size;
+
+		void read(std::byte* data, const std::size_t bytes) {
+			if (read_pos + bytes > size()) {
+				throw stream_read_error(
+					"Failed to read bytes: %x-%x (size: %x)", 
+					read_pos, 
+					read_pos + bytes, 
+					size()
+				);
+			}
+
+			std::memcpy(data, buffer().data() + read_pos, bytes);
+			read_pos += bytes;
+		}
+
+		std::size_t mismatch(const memory_stream_mixin& b) const {
+			return std::mismatch(data(), data() + size(), b.data()).first - data();
+		}
+
+		bool operator==(const memory_stream_mixin& b) const {
+			return std::equal(data(), data() + size(), b.data());
+		}
+
+		bool operator!=(const memory_stream_mixin& b) const {
+			return !operator==(b);
+		}
+
+		std::byte* data() {
+			return buffer().data();
+		}
+
+		const std::byte* data() const {
+			return buffer().data();
+		}
+
+		std::byte& operator[](const size_t idx) {
+			return data()[idx];
+		}
+
+		const std::byte& operator[](const size_t idx) const {
+			return data()[idx];
+		}
+
+		size_t capacity() const {
+			return buffer().size();
+		}
+
+		void write(const std::byte* const data, const size_t bytes) {
+#if 0
+			if (write_pos + bytes >= 2663) {
+				__debugbreak();
+			}
+#endif
+			if (write_pos + bytes > capacity()) {
+				reserve((write_pos + bytes) * 2);
+			}
+
+			std::memcpy(buffer().data() + write_pos, data, bytes);
+			write_pos += bytes;
+		}
+
+		void write(const memory_stream_mixin& s) {
+			write(s.data(), s.size());
+		}
+
+		void reserve(const std::size_t bytes) {
+			buffer().resize(bytes);
+		}
+
+		void reserve(const byte_counter_stream& r) {
+			reserve(r.size());
+		}
+
+		template<class T>
+		T peek() const {
+			return *reinterpret_cast<const T*>(buffer().data() + read_pos);
+		}
+
+		template <class Archive>
+		void write_with_properties(Archive& ar) const {
+			augs::write_bytes(ar, buffer());
+			augs::write_bytes(ar, write_pos);
+			augs::write_bytes(ar, read_pos);
+		}
+
+		template <class Archive>
+		void read_with_properties(Archive& ar) {
+			augs::read_bytes(ar, buffer());
+			augs::read_bytes(ar, write_pos);
+			augs::read_bytes(ar, read_pos);
+		}
+	};
+
+	class memory_stream : public memory_stream_mixin<memory_stream> {
+		using base = memory_stream_mixin<memory_stream>;
+		friend base;
+
 		std::vector<std::byte> buffer;
 
 	public:
 		memory_stream() = default;
-		
+
+		operator std::vector<std::byte>&&() && {
+			buffer.resize(get_write_pos());
+			return std::move(buffer);
+		}
+
 		memory_stream(memory_stream&&) = default;
 		memory_stream(const memory_stream&) = default;
 
@@ -59,93 +183,66 @@ namespace augs {
 		memory_stream(std::vector<std::byte>&& new_buffer);
 		memory_stream& operator=(const std::vector<std::byte>& new_buffer);
 		memory_stream& operator=(std::vector<std::byte>&& new_buffer);
-
-		std::size_t mismatch(const memory_stream&) const;
-
-		bool operator==(const memory_stream&) const;
-		bool operator!=(const memory_stream&) const;
-
-		std::byte* data();
-		const std::byte* data() const;
-
-		std::byte& operator[](const std::size_t);
-		const std::byte& operator[](const std::size_t) const;
-
-		std::size_t capacity() const;
-
-		template<class T>
-		T peek() const {
-			return *reinterpret_cast<const T*>(buffer.data() + read_pos);
-		}
-
-		template <class Archive>
-		void write_with_properties(Archive& ar) const {
-			augs::write_bytes(ar, buffer);
-			augs::write_bytes(ar, write_pos);
-			augs::write_bytes(ar, read_pos);
-		}
-
-		template <class Archive>
-		void read_with_properties(Archive& ar) {
-			augs::read_bytes(ar, buffer);
-			augs::read_bytes(ar, write_pos);
-			augs::read_bytes(ar, read_pos);
-		}
-
-		void read(std::byte* const data, const std::size_t bytes);
-		void write(const std::byte* const data, const std::size_t bytes);
-		void write(const augs::memory_stream&);
-		void reserve(const std::size_t);
-		void reserve(const byte_counter_stream&);
-
-		operator std::vector<std::byte>&&() && {
-			buffer.resize(get_write_pos());
-			return std::move(buffer);
-		}
-
-		operator std::vector<std::byte>() const {
-			auto buf = buffer;
-			buf.resize(get_write_pos());
-			return buffer;
-		}
 	};
 
-	class byte_counter_stream : public stream_position {
-	public:
-		memory_stream create_reserved_stream();
+	template <class B>
+	class basic_ref_memory_stream : public memory_stream_mixin<basic_ref_memory_stream<B>> {
+		using base = memory_stream_mixin<basic_ref_memory_stream<B>>;
+		friend base;
 
-		void write(const std::byte* const data, const std::size_t bytes);
+		B& buffer;
+	public:
+		using base::set_write_pos;
+		using base::get_write_pos;
+
+		basic_ref_memory_stream(B& b) : buffer(b) {
+			set_write_pos(b.size());
+		}
+
+		~basic_ref_memory_stream() {
+			if constexpr(!is_const_ref_v<B>) {
+				buffer.resize(get_write_pos());
+			}
+		}
+
+		basic_ref_memory_stream(basic_ref_memory_stream&&) = delete;
+		basic_ref_memory_stream& operator=(basic_ref_memory_stream&&) = delete;
 	};
 
 	template <class T>
-	std::vector<std::byte> to_bytes(const T& object) {
-		memory_stream s;
+	void to_bytes(std::vector<std::byte>& buffer, const T& object) {
+		auto s = ref_memory_stream(buffer);
 		augs::write_bytes(s, object);
-		return std::move(s);
 	}
 
 	template <class T>
-	void from_bytes(std::vector<std::byte>&& bytes, T& object) {
-		memory_stream s(std::move(bytes));
+	void from_bytes(const std::vector<std::byte>& bytes, T& object) {
+		auto s = cref_memory_stream(bytes);
 		augs::read_bytes(s, object);
+	}
+
+	template <class T>
+	auto to_bytes(const T& object) {
+		std::vector<std::byte> s;
+		to_bytes(s, object);
+		return s;
 	}
 
 	struct trivial_type_marker {};
 
-	void from_bytes(std::vector<std::byte>&& bytes, trivial_type_marker& object);
-	
 	template <class T>
-	T from_bytes(std::vector<std::byte>&& bytes) {
+	auto from_bytes(const std::vector<std::byte>& bytes) {
 		static_assert(
 			!std::is_same_v<T, trivial_type_marker>,
 			"Use the other overload that takes destination as argument."
 		);
 
 		T object;
-		memory_stream s(std::move(bytes));
-		augs::read_bytes(s, object);
+		from_bytes(bytes, object);
 		return object;
 	}
+
+	void from_bytes(const std::vector<std::byte>& bytes, trivial_type_marker& object);
 }
 
 namespace augs {

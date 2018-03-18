@@ -4,15 +4,17 @@
 
 #include "augs/templates/introspect.h"
 #include "augs/templates/type_matching_and_indexing.h"
+#include "augs/readwrite/memory_stream_declaration.h"
 
 namespace augs {
 	class byte_counter_stream;
-	class memory_stream;
 
 	template <class Archive>
 	constexpr bool is_byte_stream_v = is_one_of_v<
 		std::decay_t<Archive>,
 		memory_stream,
+		ref_memory_stream,
+		cref_memory_stream,
 		byte_counter_stream,
 		std::ifstream,
 		std::ofstream

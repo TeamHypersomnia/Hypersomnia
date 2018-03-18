@@ -1,11 +1,11 @@
 #pragma once
 #include <type_traits>
+#include "augs/readwrite/memory_stream_declaration.h"
 
 #define READWRITE_OVERLOAD_TRAITS_INCLUDED 1
 
 namespace augs {
 	class byte_counter_stream;
-	class memory_stream;
 	
 	template <class Archive, class Serialized, class = void>
 	struct has_byte_read_overload : std::false_type 
@@ -17,10 +17,7 @@ namespace augs {
 		Serialized,
 		decltype(
 			read_object_bytes(
-				std::declval<
-					/* If the queried archive is byte_counter_stream, map to memory_stream */
-					std::conditional_t<std::is_same_v<Archive, byte_counter_stream>, memory_stream&, Archive&>
-				>(),
+				std::declval<Archive&>(),
 				std::declval<Serialized&>()
 			),
 			void()
@@ -38,10 +35,7 @@ namespace augs {
 		Serialized,
 		decltype(
 			write_object_bytes(
-				std::declval<
-					/* If the queried archive is byte_counter_stream, map to memory_stream */
-					std::conditional_t<std::is_same_v<Archive, byte_counter_stream>, memory_stream&, Archive&>
-				>(),
+				std::declval<Archive&>(),
 				std::declval<const Serialized&>()
 			),
 			void()

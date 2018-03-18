@@ -32,7 +32,7 @@ public:
 	std::string describe() const;
 
 	void rewrite_change(
-		std::vector<std::byte>&& new_value,
+		const std::vector<std::byte>& new_value,
 		const editor_command_input in
 	);
 

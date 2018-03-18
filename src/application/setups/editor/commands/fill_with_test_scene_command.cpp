@@ -16,7 +16,7 @@ void fill_with_test_scene_command::redo(const editor_command_input in) {
 	in.purge_selections();
 
 	auto& work = in.folder.work;
-	intercosm_before_fill = work->to_bytes();
+	work->to_bytes(intercosm_before_fill);
 	work->make_test_scene(in.lua, { minimal, 144 } );
 }
 
@@ -24,5 +24,6 @@ void fill_with_test_scene_command::undo(const editor_command_input in) {
 	in.purge_selections();
 
 	auto& work = in.folder.work;
-	work->from_bytes(std::move(intercosm_before_fill));
+	work->from_bytes(intercosm_before_fill);
+	intercosm_before_fill.clear();
 }

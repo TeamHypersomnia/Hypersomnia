@@ -136,13 +136,13 @@ void intercosm::load_from_lua(const intercosm_path_op op) {
 	}
 }
 
-std::vector<std::byte> intercosm::to_bytes() const {
-	return augs::to_bytes(*this);
+void intercosm::to_bytes(std::vector<std::byte>& to) const {
+	return augs::to_bytes(to, *this);
 }
 
-void intercosm::from_bytes(std::vector<std::byte>&& bytes) {
+void intercosm::from_bytes(const std::vector<std::byte>& bytes) {
 	clear();
-	augs::from_bytes(std::move(bytes), *this);
+	augs::from_bytes(bytes, *this);
 }
 
 void intercosm::save_as_int(const augs::path_type& path) const {

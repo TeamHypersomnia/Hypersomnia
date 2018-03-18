@@ -188,6 +188,9 @@ namespace augs {
 template void augs::write_object_bytes(augs::memory_stream&, const cosmos&);
 template void augs::read_object_bytes(augs::memory_stream&, cosmos&);
 
+template void augs::write_object_bytes(augs::ref_memory_stream&, const cosmos&);
+template void augs::read_object_bytes(augs::cref_memory_stream&, cosmos&);
+
 template void augs::write_object_bytes(std::ofstream&, const cosmos&);
 template void augs::read_object_bytes(std::ifstream&, cosmos&);
 
