@@ -28,7 +28,10 @@ void editor_all_entities_gui::interrupt_tweakers() {
 	properties_gui.old_description.clear();
 }
 
-void editor_all_entities_gui::perform(const editor_command_input in) {
+void editor_all_entities_gui::perform(
+	const std::unordered_set<entity_id>& only_match_entities,
+	editor_command_input in
+) {
 	if (!show) {
 		return;
 	}
@@ -98,6 +101,16 @@ void editor_all_entities_gui::perform(const editor_command_input in) {
 
 		ImGui::Separator();
 	};
+
+	if (only_match_entities.size() == 1) {
+		const auto id = *only_match_entities.begin();
+
+		cosm[id].dispatch([&](const auto typed_handle){
+			do_edit_entities(typed_handle, id);
+		});
+
+		return;
+	}
 
 	cosm.get_solvable().for_each_pool(
 		[&](const auto& p){

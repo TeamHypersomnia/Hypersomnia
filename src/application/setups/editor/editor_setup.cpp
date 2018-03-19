@@ -373,6 +373,10 @@ void editor_setup::perform_custom_imgui(
 					if (item_if_tabs("All entities")) {
 						all_entities_gui.open();
 					}
+
+					if (item_if_tabs("Selected entities")) {
+						selected_entities_gui.open();
+					}
 				}
 			}
 		}
@@ -450,7 +454,14 @@ void editor_setup::perform_custom_imgui(
 		}
 
 		common_state_gui.perform(make_command_input());
-		all_entities_gui.perform(make_command_input());
+		all_entities_gui.perform({}, make_command_input());
+
+		if (const auto held = selector.get_held(); held && work().world[held]) {
+			selected_entities_gui.perform({ held }, make_command_input());
+		}
+		else {
+			selected_entities_gui.perform(get_all_selected_entities(), make_command_input());
+		}
 
 		const auto go_to_dialog_pos = vec2 { static_cast<float>(screen_size.x / 2), menu_bar_size.y * 2 + 1 };
 
@@ -589,6 +600,18 @@ void editor_setup::cut() {
 
 void editor_setup::paste() {
 
+}
+
+std::unordered_set<entity_id> editor_setup::get_all_selected_entities() const {
+	std::unordered_set<entity_id> all;
+
+	for_each_selected_entity(
+		[&](const auto e) {
+			all.insert(e);
+		}
+	);
+
+	return all;
 }
 
 void editor_setup::del() {

@@ -35,6 +35,10 @@ public:
 		target_selections_type&
 	);
 
+	auto get_held() const {
+		return held;
+	}
+
 	std::optional<ltrb> get_screen_space_rect_selection(
 		const camera_cone& in,
 		vec2i screen_size,
