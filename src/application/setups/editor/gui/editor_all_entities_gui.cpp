@@ -20,7 +20,7 @@
 void editor_all_entities_gui::open() {
 	show = true;
 	acquire_once = true;
-	ImGui::SetWindowFocus("All entities");
+	ImGui::SetWindowFocus(title.c_str());
 }
 
 void editor_all_entities_gui::interrupt_tweakers() {
@@ -35,7 +35,7 @@ void editor_all_entities_gui::perform(const editor_command_input in) {
 
 	using namespace augs::imgui;
 
-	auto entities = scoped_window("All entities", &show);
+	auto entities = scoped_window(title.c_str(), &show);
 	auto& work = *in.folder.work;
 	auto& cosm = work.world;
 
@@ -146,7 +146,7 @@ void editor_all_entities_gui::perform(const editor_command_input in) {
 							}
 
 							if (total_entities > 0) {
-								const auto unified_entities_node = scoped_tree_node_ex(typesafe_sprintf("%x Entities (unified)", total_entities));
+								const auto unified_entities_node = scoped_tree_node_ex(typesafe_sprintf("%x Entities of %x Flavours (unified)", total_entities, all_flavour_ids.size()));
 
 								next_column_text();
 
@@ -176,16 +176,7 @@ void editor_all_entities_gui::perform(const editor_command_input in) {
 					}
 
 					all_flavours.for_each(
-						[&](
-							const flavour_id_type flavour_id,
-							/* 
-								Note: we accept flavour as const, 
-								because ImGUI itself should only see the immutable reference.
-
-							   	Is the job of the change_flavour_property_command to actually alter flavour state.
-							*/
-						   	const flavour_type& flavour
-						) {
+						[&](const flavour_id_type flavour_id, const flavour_type& flavour) {
 							const auto flavour_label = flavour.template get<invariants::name>().name;
 
 							if (!filter.PassFilter(flavour_label.c_str())) {

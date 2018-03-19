@@ -5,7 +5,10 @@
 struct editor_all_entities_gui {
 	// GEN INTROSPECTOR struct editor_all_entities_gui
 	bool show = false;
+	std::unordered_set<entity_id> only_match_entities;
 	// END GEN INTROSPECTOR
+
+	editor_all_entities_gui(const std::string& title) : title(title) {}
 
 	entity_guid hovered_guid;
 
@@ -14,6 +17,7 @@ struct editor_all_entities_gui {
 	void interrupt_tweakers();
 
 private:
+	std::string title;
 	property_editor_gui properties_gui;
 	bool acquire_once = false;
 };

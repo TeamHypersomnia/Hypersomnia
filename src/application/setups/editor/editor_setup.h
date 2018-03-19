@@ -70,7 +70,8 @@ class editor_setup : private current_access_cache<editor_setup> {
 
 	// GEN INTROSPECTOR class editor_setup
 	editor_history_gui history_gui;
-	editor_all_entities_gui all_entities_gui;
+	editor_all_entities_gui all_entities_gui = std::string("All entities");
+	editor_all_entities_gui selected_entities_gui = std::string("Selected entities");
 	editor_common_state_gui common_state_gui;
 	// END GEN INTROSPECTOR
 

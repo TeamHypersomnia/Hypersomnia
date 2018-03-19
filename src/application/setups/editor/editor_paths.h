@@ -15,7 +15,7 @@ inline auto get_recent_paths_path() {
 }
 
 inline auto get_editor_gui_state_path() {
-	return EDITOR_DIR "editor_gui_state.lua";
+	return EDITOR_DIR "editor_gui_state.bin";
 }
 
 inline auto get_untitled_dir() {

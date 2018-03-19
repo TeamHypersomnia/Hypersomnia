@@ -135,7 +135,7 @@ editor_setup::editor_setup(
 
 void editor_setup::load_gui_state() {
 	try {
-		augs::load_from_lua_table(destructor_input.lua, *this, get_editor_gui_state_path());
+		augs::load_from_bytes(*this, get_editor_gui_state_path());
 	}
 	catch (const augs::file_open_error) {
 		// We don't care if it does not exist
@@ -143,7 +143,7 @@ void editor_setup::load_gui_state() {
 }
 
 void editor_setup::save_gui_state() {
-	augs::save_as_lua_table(destructor_input.lua, *this, get_editor_gui_state_path());
+	augs::save_as_bytes(*this, get_editor_gui_state_path());
 }
 
 editor_setup::~editor_setup() {
