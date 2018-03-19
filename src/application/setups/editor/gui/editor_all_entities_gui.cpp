@@ -76,29 +76,70 @@ void editor_all_entities_gui::perform(const editor_command_input in) {
 				cosm.change_common_significant([&](cosmos_common_significant& common_signi){
 					const auto& all_flavours = common_signi.get_flavours<E>();
 
-					if (all_flavours.count() > 0) {
+					if (all_flavours.count() > 1) {
 						const auto unified_flavours_node = scoped_tree_node_ex(typesafe_sprintf("%x Flavours (unified)", all_flavours.count()));
 
 						next_column_text();
 
 						if (unified_flavours_node) {
-							auto command_maker = [&]() {
-								change_flavour_property_command cmd;
+							thread_local std::vector<entity_flavour_id> all_flavour_ids;
+							all_flavour_ids.clear();
 
-								all_flavours.for_each([&](
-									const flavour_id_type flavour_id,
-									const flavour_type& flavour
-								) {
-									cmd.affected_flavours.push_back(flavour_id);
-								});
+							all_flavours.for_each([&](
+								const flavour_id_type flavour_id,
+								const flavour_type& flavour
+							) {
+								all_flavour_ids.push_back(flavour_id);
+							});
 
-								return cmd;
-							};
+							{ 
+								auto command_maker = [&]() {
+									change_flavour_property_command cmd;
+									cmd.affected_flavours = all_flavour_ids;
+									return cmd;
+								};
 
-							const auto first_flavour_id = raw_entity_flavour_id { 0 };
-							const auto& first_flavour = all_flavours.get_flavour(first_flavour_id);
+								const auto first_flavour_id = *all_flavour_ids.begin();
+								const auto& first_flavour = all_flavours.get_flavour(first_flavour_id.raw);
 
-							edit_flavour(properties_gui, first_flavour, command_maker, in);
+								edit_flavour(properties_gui, first_flavour, command_maker, in);
+							}
+
+							ImGui::Separator();
+
+							if (total_entities > 0) {
+								const auto unified_entities_node = scoped_tree_node_ex(typesafe_sprintf("%x Entities (unified)", total_entities));
+
+								next_column_text();
+
+								if (unified_entities_node) {
+									thread_local std::vector<entity_id> all_having_flavours;	
+									all_having_flavours.clear();
+
+									/*
+										This could be done by just iterating over the pool and gathering all ids.
+										This however will be better solution if we filter per flavours.
+									*/
+
+									for (const auto id : all_flavour_ids) {
+										concatenate(
+											all_having_flavours,
+											cosm.get_solvable_inferred().name.get_entities_by_flavour_id(id)
+										);
+									}
+
+									ensure(total_entities == all_having_flavours.size());
+
+									auto command_maker = [&]() {
+										change_entity_property_command cmd;
+										cmd.affected_entities = all_having_flavours;
+										return cmd;
+									};
+
+									const auto first_handle = specific_handle(cosm, (*all_having_flavours.begin()).basic());
+									edit_entity(properties_gui, first_handle, command_maker, in);
+								}
+							}
 
 							ImGui::Separator();
 						}
