@@ -53,6 +53,52 @@ void editor_all_entities_gui::perform(const editor_command_input in) {
 
 	hovered_guid.unset();
 
+	auto do_edit_entities = [&](const auto& entity, const auto& entities) {
+		using T = std::decay_t<decltype(entities)>;
+
+		{
+			auto command_maker = [&]() {
+				change_entity_property_command cmd;
+
+				if constexpr(is_container_v<T>) {
+					cmd.affected_entities.assign(entities.begin(), entities.end());
+				}
+				else {
+					cmd.affected_entities = { entities };
+				}
+
+				return cmd;
+			};
+
+			edit_entity(properties_gui, entity, command_maker, in);
+		}
+
+		ImGui::Separator();
+	};
+
+	auto do_edit_flavours = [&](const auto& flavour, const auto& ids) {
+		using T = std::decay_t<decltype(ids)>;
+
+		{
+			auto command_maker = [&]() {
+				change_flavour_property_command cmd;
+
+				if constexpr(is_container_v<T>) {
+					cmd.affected_flavours.assign(ids.begin(), ids.end());
+				}
+				else {
+					cmd.affected_flavours = { ids };
+				}
+
+				return cmd;
+			};
+
+			edit_flavour(properties_gui, flavour, command_maker, in);
+		}
+
+		ImGui::Separator();
+	};
+
 	cosm.get_solvable().for_each_pool(
 		[&](const auto& p){
 			using P = decltype(p);
@@ -93,19 +139,11 @@ void editor_all_entities_gui::perform(const editor_command_input in) {
 							});
 
 							{ 
-								auto command_maker = [&]() {
-									change_flavour_property_command cmd;
-									cmd.affected_flavours = all_flavour_ids;
-									return cmd;
-								};
-
 								const auto first_flavour_id = *all_flavour_ids.begin();
 								const auto& first_flavour = all_flavours.get_flavour(first_flavour_id.raw);
 
-								edit_flavour(properties_gui, first_flavour, command_maker, in);
+								do_edit_flavours(first_flavour, all_flavour_ids);
 							}
-
-							ImGui::Separator();
 
 							if (total_entities > 0) {
 								const auto unified_entities_node = scoped_tree_node_ex(typesafe_sprintf("%x Entities (unified)", total_entities));
@@ -130,18 +168,10 @@ void editor_all_entities_gui::perform(const editor_command_input in) {
 
 									ensure(total_entities == all_having_flavours.size());
 
-									auto command_maker = [&]() {
-										change_entity_property_command cmd;
-										cmd.affected_entities = all_having_flavours;
-										return cmd;
-									};
-
 									const auto first_handle = specific_handle(cosm, (*all_having_flavours.begin()).basic());
-									edit_entity(properties_gui, first_handle, command_maker, in);
+									do_edit_entities(first_handle, all_having_flavours);
 								}
 							}
-
-							ImGui::Separator();
 						}
 					}
 
@@ -173,17 +203,7 @@ void editor_all_entities_gui::perform(const editor_command_input in) {
 							if (flavour_node) {
 								ImGui::Separator();
 
-								{
-									auto command_maker = [&flavour_id]() {
-										change_flavour_property_command cmd;
-										cmd.affected_flavours = { flavour_id };
-										return cmd;
-									};
-
-									edit_flavour(properties_gui, flavour, command_maker, in);
-								}
-
-								ImGui::Separator();
+								do_edit_flavours(flavour, flavour_id);
 
 								{
 									const auto unified_entities_node = scoped_tree_node_ex(num_entities_label + " (unified)");
@@ -193,14 +213,7 @@ void editor_all_entities_gui::perform(const editor_command_input in) {
 									if (unified_entities_node) {
 										if (all_having_flavour.size() > 0) {
 											const auto first_handle = specific_handle(cosm, (*all_having_flavour.begin()).basic());
-
-											auto command_maker = [&all_having_flavour]() {
-												change_entity_property_command cmd;
-												cmd.affected_entities.assign(all_having_flavour.begin(), all_having_flavour.end());
-												return cmd;
-											};
-
-											edit_entity(properties_gui, first_handle, command_maker, in);
+											do_edit_entities(first_handle, all_having_flavour);
 										}
 									}
 								}
@@ -211,12 +224,6 @@ void editor_all_entities_gui::perform(const editor_command_input in) {
 
 								if (entities_node) {
 									for (const auto& e : all_having_flavour) {
-										auto command_maker = [e]() {
-											change_entity_property_command cmd;
-											cmd.affected_entities = { e };
-											return cmd;
-										};
-
 										const auto typed_handle = specific_handle(cosm, e);
 
 										const auto guid = typed_handle.get_guid();
@@ -231,7 +238,7 @@ void editor_all_entities_gui::perform(const editor_command_input in) {
 										next_column_text();
 
 										if (entity_node) {
-											edit_entity(properties_gui, typed_handle, command_maker, in);
+											do_edit_entities(typed_handle, e);
 										}
 									}
 								}
