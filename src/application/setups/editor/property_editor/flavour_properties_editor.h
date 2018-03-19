@@ -98,7 +98,6 @@ void edit_invariant(
 template <class E, class C>
 void edit_flavour(
 	property_editor_gui& state,
-	const typed_entity_flavour_id<E> flavour_id,
 	const entity_flavour<E>& flavour,
 	C&& command_maker,
    	const editor_command_input in

@@ -61,6 +61,9 @@ void editor_all_entities_gui::perform(const editor_command_input in) {
 			using E = type_argument_t<typename pool_type::mapped_type>;
 			using specific_handle = const_typed_entity_handle<E>;
 
+			using flavour_id_type = typed_entity_flavour_id<E>;
+			using flavour_type = entity_flavour<E>;
+
 			const auto entity_type_label = format_field_name(get_type_name<E>());
 			const auto total_entities = p.size();
 			const auto total_flavours = cosm.get_common_significant().get_flavours<E>().count();
@@ -71,16 +74,46 @@ void editor_all_entities_gui::perform(const editor_command_input in) {
 
 			if (node) {
 				cosm.change_common_significant([&](cosmos_common_significant& common_signi){
-					common_signi.get_flavours<E>().for_each(
+					const auto& all_flavours = common_signi.get_flavours<E>();
+
+					if (all_flavours.count() > 0) {
+						const auto unified_flavours_node = scoped_tree_node_ex(typesafe_sprintf("%x Flavours (unified)", all_flavours.count()));
+
+						next_column_text();
+
+						if (unified_flavours_node) {
+							auto command_maker = [&]() {
+								change_flavour_property_command cmd;
+
+								all_flavours.for_each([&](
+									const flavour_id_type flavour_id,
+									const flavour_type& flavour
+								) {
+									cmd.affected_flavours.push_back(flavour_id);
+								});
+
+								return cmd;
+							};
+
+							const auto first_flavour_id = raw_entity_flavour_id { 0 };
+							const auto& first_flavour = all_flavours.get_flavour(first_flavour_id);
+
+							edit_flavour(properties_gui, first_flavour, command_maker, in);
+
+							ImGui::Separator();
+						}
+					}
+
+					all_flavours.for_each(
 						[&](
-							const auto flavour_id,
+							const flavour_id_type flavour_id,
 							/* 
 								Note: we accept flavour as const, 
 								because ImGUI itself should only see the immutable reference.
 
 							   	Is the job of the change_flavour_property_command to actually alter flavour state.
 							*/
-						   	const auto& flavour
+						   	const flavour_type& flavour
 						) {
 							const auto flavour_label = flavour.template get<invariants::name>().name;
 
@@ -106,7 +139,7 @@ void editor_all_entities_gui::perform(const editor_command_input in) {
 										return cmd;
 									};
 
-									edit_flavour(properties_gui, flavour_id, flavour, command_maker, in);
+									edit_flavour(properties_gui, flavour, command_maker, in);
 								}
 
 								ImGui::Separator();
