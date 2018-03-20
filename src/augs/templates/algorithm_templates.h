@@ -23,8 +23,8 @@ decltype(auto) maximum_of(const Container& v) {
 }
 
 template<class Container, class T>
-auto& sort_range(Container& v, const T l) {
-	std::sort(v.begin(), v.end(), l);
+auto& sort_range(Container& v, T&& l) {
+	std::sort(v.begin(), v.end(), std::forward<T>(l));
 	return v;
 }
 
@@ -32,6 +32,43 @@ template<class Container>
 auto& sort_range(Container& v) {
 	std::sort(v.begin(), v.end());
 	return v;
+}
+
+template <class T, class F, class C>
+void sort_range_by(T& output, F value_callback, C&& comparator) {
+	using compared_type = decltype(value_callback(*output.begin()));
+
+	struct entry {
+		typename T::value_type actual;
+		compared_type compared;
+	};
+
+	thread_local std::vector<entry> sorted;
+	sorted.clear();
+	sorted.reserve(output.size());
+
+	for (auto& v : output) {
+		sorted.push_back({ std::move(v), value_callback(v) });
+	}
+
+	output.clear();
+
+	sort_range(sorted, std::forward<C>(comparator));
+
+	for (auto& s : sorted) {
+		output.emplace_back(std::move(s.actual));
+	}
+};
+
+template <class T, class F>
+void sort_range_by(T& output, F&& value_callback) {
+	sort_range_by(
+		output,
+	   	std::forward<F>(value_callback),
+	   	[](const auto& a, const auto& b) {
+			return a.compared < b.compared;
+	   	}
+	);
 }
 
 template<class Container>
