@@ -21,6 +21,19 @@ using resolved_array_type = std::array<
 	num_types_in_list_v<all_entity_types>
 >;
 
+template <class C>
+void sort_flavours_by_name(const cosmos& cosm, C& ids) {
+	sort_range_by(
+		ids,
+		[&](const auto id) -> const std::string* { 
+			return std::addressof(cosm.get_flavour(id).template get<invariants::name>().name);
+		},
+		[](const auto& a, const auto& b) {
+			return *a.compared < *b.compared;
+		}
+	);
+}
+
 class in_selection_provider {
 	const cosmos& cosm;
 	const resolved_array_type& per_native_type;
@@ -70,18 +83,35 @@ public:
 		return ids;
 	}
 
-	const auto& get_entities_by_flavour_id(const entity_flavour_id id) const {
-		return per_native_type[id.type_id.get_index()].at(id.raw);
+	auto get_entities_by_flavour_id(const entity_flavour_id id) const {
+		auto ids = per_native_type[id.type_id.get_index()].at(id.raw);
+
+		sort_range_by(
+			ids,
+			[&](const auto id) { 
+				return cosm[id].get_guid();
+			}
+		);
+
+		return ids;
 	}
 
 	template <class E, class F>
 	void for_each_flavour(F callback) const {
+		thread_local std::vector<typed_entity_flavour_id<E>> ids;
+		ids.clear();
+
 		const auto& all_flavours = get_map<E>();
 
 		for (const auto& f : all_flavours) {
 			const auto id = typed_entity_flavour_id<E>(f.first);
-			const auto& flavour = cosm.get_flavour(id);
+			ids.push_back(id);
+		}
 
+		sort_flavours_by_name(cosm, ids);
+
+		for (const auto& id : ids) {
+			const auto& flavour = cosm.get_flavour(id);
 			callback(id, flavour);
 		}
 	}
@@ -129,9 +159,22 @@ public:
 	}
 
 	template <class E, class F>
-	void for_each_flavour(F&& callback) const {
+	void for_each_flavour(F callback) const {
+		thread_local std::vector<typed_entity_flavour_id<E>> ids;
+		ids.clear();
+		ids.reserve(num_flavours_of_type<E>());
+
 		const auto& all_flavours = common().get_flavours<E>();
-		all_flavours.for_each(std::forward<F>(callback));
+
+		all_flavours.for_each([](const auto& id, const auto&){
+			ids.push_back(id);	
+		});
+
+		sort_flavours_by_name(cosm, ids);
+
+		for (const auto& id : ids) {
+			callback(id, cosm.get_flavour(id));
+		}
 	}
 };
 
