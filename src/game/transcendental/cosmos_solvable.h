@@ -175,7 +175,7 @@ public:
 	template <template <class> class Deguidized, class source_id_type>
 	Deguidized<entity_id> deguidize(const Deguidized<source_id_type>& guid_source) const;
 
-	std::unordered_set<entity_id> get_entities_by_flavour_id(const entity_flavour_id&) const;
+	const std::unordered_set<entity_id>& get_entities_by_flavour_id(const entity_flavour_id&) const;
 	
 	std::size_t get_entities_count() const;
 	
@@ -275,7 +275,7 @@ inline entity_id cosmos_solvable::get_entity_id_by(const entity_guid guid) const
 	return {};
 }
 
-inline std::unordered_set<entity_id> cosmos_solvable::get_entities_by_flavour_id(const entity_flavour_id& id) const {
+inline const std::unordered_set<entity_id>& cosmos_solvable::get_entities_by_flavour_id(const entity_flavour_id& id) const {
 	return inferred.name.get_entities_by_flavour_id(id);
 }
 

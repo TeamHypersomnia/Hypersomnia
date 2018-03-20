@@ -7,13 +7,8 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
-- templatize some dangling memory stream arguments
-
-- Command multiplicity
-	- Make change flavour/component commands support it out of the box, don't just have two different commands
-	- Value changed will have the same format - there's always one value set
-		- The old values will be a stream of old values actually
-	- mark different values in orange
+- Perhaps something to let us select and manipulate entities in gameplay mode?
+	- will it be useful?
 
 - Selection window
 	- Proposition: have always the nodes for entity types
@@ -206,3 +201,5 @@ summary: Just a hidden scratchpad.
 - check in editor if the saving/opening path is a valid folder?
 - make reveal in explorer work for both files and folders
 	- cause it also works for dirs
+- templatize some dangling memory stream arguments
+

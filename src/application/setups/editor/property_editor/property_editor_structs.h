@@ -2,6 +2,8 @@
 #include "3rdparty/imgui/imgui.h"
 #include "augs/readwrite/memory_stream.h"
 
+#include "game/transcendental/entity_id.h"
+
 #include "game/components/shape_polygon_component.h"
 #include "game/components/sentience_component.h"
 
@@ -19,6 +21,8 @@ struct description_pair {
 };
 
 struct property_editor_gui {
+	entity_guid hovered_guid;
+
 	std::optional<ImGuiID> last_active;
 	std::string old_description = "";
 };

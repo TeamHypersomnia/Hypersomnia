@@ -300,7 +300,7 @@ public:
 				callback(match.get_id(), settings.matched_entity_color);
 			}
 
-			if (const auto hovered_guid = all_entities_gui.hovered_guid) {
+			if (const auto hovered_guid = all_entities_gui.get_hovered_guid()) {
 				if (const auto hovered = world[hovered_guid]) {
 					callback(hovered.get_id(), settings.entity_selector.held_color);
 				}

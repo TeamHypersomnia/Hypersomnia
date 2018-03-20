@@ -129,6 +129,11 @@ public:
 		return get_common_significant().get_flavours<entity_type>().get_flavour(id);
 	}
 
+	template <class entity_type>
+	const auto& get_flavour(const typed_entity_flavour_id<entity_type> id) const {
+		return get_flavour<entity_type>(id.raw);
+	}
+
 	template <class... Args>
 	decltype(auto) on_flavour(Args&&... args) const {
 		return get_common_significant().on_flavour(std::forward<Args>(args)...);

@@ -300,3 +300,10 @@ we consider whole type overrides too complex architeciturally:
 - determine what makes the atlas be regenerated when entering editor?
 	- its just that zeroed cosmos has a different set of resources needed - zero
 	- perhaps zeroed cosmos is guilty?
+
+- Command multiplicity
+	- Make change flavour/component commands support it out of the box, don't just have two different commands
+	- Value changed will have the same format - there's always one value set
+		- The old values will be a stream of old values actually
+	- mark different values in orange
+

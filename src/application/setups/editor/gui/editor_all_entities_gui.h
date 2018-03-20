@@ -9,8 +9,6 @@ struct editor_all_entities_gui {
 
 	editor_all_entities_gui(const std::string& title) : title(title) {}
 
-	entity_guid hovered_guid;
-
 	void open();
 	void perform(
 		const std::unordered_set<entity_id>& only_match_entities,
@@ -18,6 +16,10 @@ struct editor_all_entities_gui {
 	);
 
 	void interrupt_tweakers();
+
+	auto get_hovered_guid() const {
+		return properties_gui.hovered_guid;
+	}
 
 private:
 	std::string title;
