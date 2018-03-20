@@ -191,7 +191,7 @@ void editor_all_entities_gui::interrupt_tweakers() {
 
 
 void editor_all_entities_gui::perform(
-	const std::unordered_set<entity_id>& only_match_entities,
+	const std::unordered_set<entity_id>* only_match_entities,
 	editor_command_input in
 ) {
 	if (!show) {
@@ -215,38 +215,42 @@ void editor_all_entities_gui::perform(
 
 	auto& cosm = in.folder.work->world;
 
-	const auto num_matches = only_match_entities.size();
+	if (only_match_entities) {
+		const auto& matches = *only_match_entities;
+		const auto num_matches = matches.size();
 
-	if (num_matches == 1) {
-		const auto id = *only_match_entities.begin();
-
-		if (const auto handle = cosm[id]) {
-			handle.dispatch([&](const auto typed_handle) {
-				do_edit_flavours_gui(properties_gui, in, typed_handle.get_flavour(), typed_handle.get_flavour_id());
-				do_edit_entities_gui(properties_gui, in, typed_handle, id);
-			});
-
+		if (num_matches == 0) {
 			return;
 		}
-	}
-	else if (num_matches > 1) {
-		thread_local resolved_array_type per_native_type;
+		if (num_matches == 1) {
+			const auto id = *matches.begin();
 
-		for (auto& p : per_native_type) {
-			p.clear();
-		}
-
-		for (const auto& e : only_match_entities) {
-			if (const auto handle = cosm[e]) {
-				per_native_type[e.type_id.get_index()][handle.get_flavour_id().raw].push_back(e);
+			if (const auto handle = cosm[id]) {
+				handle.dispatch([&](const auto typed_handle) {
+					do_edit_flavours_gui(properties_gui, in, typed_handle.get_flavour(), typed_handle.get_flavour_id());
+					do_edit_entities_gui(properties_gui, in, typed_handle, id);
+				});
 			}
 		}
+		else if (num_matches > 1) {
+			thread_local resolved_array_type per_native_type;
 
-		flavours_and_entities_tree(
-			properties_gui,
-			in,
-			in_selection_provider { cosm, per_native_type }
-		);
+			for (auto& p : per_native_type) {
+				p.clear();
+			}
+
+			for (const auto& e : matches) {
+				if (const auto handle = cosm[e]) {
+					per_native_type[e.type_id.get_index()][handle.get_flavour_id().raw].push_back(e);
+				}
+			}
+
+			flavours_and_entities_tree(
+				properties_gui,
+				in,
+				in_selection_provider { cosm, per_native_type }
+			);
+		}
 
 		return;
 	}

@@ -11,7 +11,7 @@ struct editor_all_entities_gui {
 
 	void open();
 	void perform(
-		const std::unordered_set<entity_id>& only_match_entities,
+		const std::unordered_set<entity_id>* only_match_entities,
 	   	editor_command_input
 	);
 
