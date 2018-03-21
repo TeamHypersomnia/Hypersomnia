@@ -16,6 +16,7 @@ void do_edit_entities_gui(
 ) {
 	auto command_maker = [&]() {
 		change_entity_property_command cmd;
+		cmd.type_id = entity_type_id::of<typename E::used_entity_type>();
 
 		if constexpr(is_container_v<C>) {
 			cmd.affected_entities.assign(ids.begin(), ids.end());
@@ -41,6 +42,7 @@ void do_edit_flavours_gui(
 ) {
 	auto command_maker = [&]() {
 		change_flavour_property_command cmd;
+		cmd.type_id = entity_type_id::of<typename E::used_entity_type>();
 
 		if constexpr(is_container_v<C>) {
 			cmd.affected_flavours.assign(ids.begin(), ids.end());
@@ -83,7 +85,8 @@ void flavours_and_entities_tree(
 			using P = decltype(p);
 			using pool_type = std::decay_t<P>;
 
-			using E = type_argument_t<typename pool_type::mapped_type>;
+			using Solvable = typename pool_type::mapped_type;
+			using E = typename Solvable::used_entity_type;
 			using specific_handle = const_typed_entity_handle<E>;
 
 			using flavour_id_type = typed_entity_flavour_id<E>;
@@ -120,7 +123,7 @@ void flavours_and_entities_tree(
 
 						{ 
 							const auto first_flavour_id = *all_flavour_ids.begin();
-							const auto& first_flavour = cosm.template get_flavour<E>(first_flavour_id.raw);
+							const auto& first_flavour = cosm.template get_flavour<E>(first_flavour_id);
 
 							do_edit_flavours(first_flavour, all_flavour_ids);
 						}
@@ -131,7 +134,7 @@ void flavours_and_entities_tree(
 							next_column_text();
 
 							if (unified_entities_node) {
-								thread_local std::vector<entity_id> all_having_flavours;	
+								thread_local std::vector<entity_id_base> all_having_flavours;	
 								all_having_flavours.clear();
 
 								/*
@@ -142,11 +145,11 @@ void flavours_and_entities_tree(
 								for (const auto id : all_flavour_ids) {
 									concatenate(
 										all_having_flavours,
-										provider.get_entities_by_flavour_id(id)
+										provider.template get_entities_by_flavour_id<E>(id)
 									);
 								}
 
-								const auto first_handle = specific_handle(cosm, (*all_having_flavours.begin()).basic());
+								const auto first_handle = specific_handle(cosm, *all_having_flavours.begin());
 								do_edit_entities(first_handle, all_having_flavours);
 							}
 						}
@@ -157,7 +160,7 @@ void flavours_and_entities_tree(
 					[&](const flavour_id_type flavour_id, const flavour_type& flavour) {
 						const auto flavour_label = flavour.template get<invariants::name>().name;
 
-						const auto all_having_flavour = provider.get_entities_by_flavour_id(flavour_id);
+						const auto all_having_flavour = provider.template get_entities_by_flavour_id<E>(flavour_id.raw);
 
 						const auto node_label = typesafe_sprintf("%x###%x", flavour_label, flavour_id.raw);
 						const auto flavour_node = scoped_tree_node_ex(node_label);
@@ -168,7 +171,7 @@ void flavours_and_entities_tree(
 						if (flavour_node) {
 							ImGui::Separator();
 
-							do_edit_flavours(flavour, flavour_id);
+							do_edit_flavours(flavour, flavour_id.raw);
 
 							{
 								const auto unified_entities_node = scoped_tree_node_ex(num_entities_label + " (unified)");
@@ -177,7 +180,7 @@ void flavours_and_entities_tree(
 
 								if (unified_entities_node) {
 									if (all_having_flavour.size() > 0) {
-										const auto first_handle = specific_handle(cosm, (*all_having_flavour.begin()).basic());
+										const auto first_handle = specific_handle(cosm, *all_having_flavour.begin());
 										do_edit_entities(first_handle, all_having_flavour);
 									}
 								}

@@ -13,31 +13,48 @@ struct entity_property_id {
 	unsigned component_id = static_cast<unsigned>(-1);
 	field_address field;
 
-	template <class C, class F>
+	template <class C, class Container, class F>
 	bool access(
 		C& cosm,
-		const entity_id subject_id,
+		const entity_type_id type_id,
+		const Container& entity_ids,
 		F callback
 	) const {
-		const auto handle = cosm[subject_id];
+		bool reinfer = false;
 
-		return handle.dispatch([&](const auto typed_handle) {
-			return get_by_dynamic_index(
-				typed_handle.get({}).components,
-				component_id,
-				[&](auto& component) {
-					on_field_address(
-						component,
-						field,
-						[&](auto& resolved_field) {
-							callback(resolved_field);
+		get_by_dynamic_id(
+			all_entity_types(),
+			type_id,
+			[&](auto e) {
+				using E = decltype(e);
+
+				get_by_dynamic_index(
+					typename E::components {},
+					component_id,
+					[&](const auto& c) {
+						using Component = std::decay_t<decltype(c)>;
+
+						for (const auto& e : entity_ids) {
+							auto specific_handle = cosm[typed_entity_id<E>(e)];
+
+							on_field_address(
+								std::get<Component>(specific_handle.get({}).components),
+								field,
+								[&](auto& resolved_field) {
+									callback(resolved_field);
+								}
+							);
 						}
-					);
 
-					return should_reinfer_after_change(component);
-				}
-			);
-		});
+						if (should_reinfer_after_change(c)) {
+							reinfer = true;
+						}
+					}
+				);
+			}
+		);
+
+		return reinfer;
 	}
 };
 
@@ -46,7 +63,8 @@ struct change_entity_property_command : change_property_command<change_entity_pr
 
 	// GEN INTROSPECTOR struct change_entity_property_command
 	// INTROSPECT BASE change_property_command<change_entity_property_command>
-	std::vector<entity_id> affected_entities;
+	entity_type_id type_id;
+	std::vector<entity_id_base> affected_entities;
 	entity_property_id property_id;
 	// END GEN INTROSPECTOR
 
@@ -59,15 +77,7 @@ struct change_entity_property_command : change_property_command<change_entity_pr
 		C& cosm,
 		F&& callback
 	) const {
-		bool should_reinfer = false;
-
-		for (const auto& a : affected_entities) {
-			if (property_id.access(cosm, a, std::forward<F>(callback))) {
-				should_reinfer = true;
-			}
-		}
-
-		if (should_reinfer) {
+		if (property_id.access(cosm, type_id, affected_entities, std::forward<F>(callback))) {
 			cosmic::reinfer_all_entities(cosm);
 		}
 	}

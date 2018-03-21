@@ -16,9 +16,8 @@
 #include "augs/readwrite/memory_stream.h"
 #include "augs/readwrite/byte_readwrite.h"
 
-using resolved_array_type = std::array<
-	std::unordered_map<raw_entity_flavour_id, std::vector<entity_id>>,
-	num_types_in_list_v<all_entity_types>
+using resolved_array_type = per_entity_type_array<
+	std::unordered_map<raw_entity_flavour_id, std::vector<entity_id_base>>
 >;
 
 template <class C>
@@ -70,26 +69,26 @@ public:
 
 	template <class E>
 	const auto& get_all_flavour_ids() const {
-		thread_local std::vector<entity_flavour_id> ids;
+		thread_local std::vector<raw_entity_flavour_id> ids;
 		ids.clear();
 
 		for (const auto& p : get_map<E>()) {
-			entity_flavour_id flavour_id;
-			flavour_id.type_id = entity_type_id::of<E>();
-			flavour_id.raw = p.first;
-			ids.push_back(flavour_id);
+			ids.push_back(p.first);
 		}
 
 		return ids;
 	}
 
-	auto get_entities_by_flavour_id(const entity_flavour_id id) const {
-		auto ids = per_native_type[id.type_id.get_index()].at(id.raw);
+	template <class E>
+	auto get_entities_by_flavour_id(const raw_entity_flavour_id raw) const {
+		thread_local std::vector<entity_id_base> ids;
+		ids.clear();
+		ids	= get_map<E>().at(raw);
 
 		sort_range_by(
 			ids,
 			[&](const auto id) { 
-				return cosm[id].get_guid();
+				return cosm[typed_entity_id<E>(id)].get_guid();
 			}
 		);
 
@@ -139,7 +138,7 @@ public:
 
 	template <class E>
 	const auto& get_all_flavour_ids() const {
-		thread_local std::vector<entity_flavour_id> all_flavour_ids;
+		thread_local std::vector<raw_entity_flavour_id> all_flavour_ids;
 		all_flavour_ids.clear();
 
 		const auto& all_flavours = common().get_flavours<E>();
@@ -148,14 +147,15 @@ public:
 			const auto flavour_id,
 			const auto& flavour
 		) {
-			all_flavour_ids.push_back(flavour_id);
+			all_flavour_ids.push_back(flavour_id.raw);
 		});
 
 		return all_flavour_ids;
 	}
 
-	const auto& get_entities_by_flavour_id(const entity_flavour_id id) const {
-		return cosm.get_solvable_inferred().name.get_entities_by_flavour_id(id);
+	template <class E>
+	const auto& get_entities_by_flavour_id(const raw_entity_flavour_id id) const {
+		return cosm.get_solvable_inferred().name.get_entities_by_flavour_id(typed_entity_flavour_id<E>(id));
 	}
 
 	template <class E, class F>
@@ -203,7 +203,6 @@ void editor_all_entities_gui::perform(
 	auto entities = scoped_window(title.c_str(), &show);
 
 	ImGui::Columns(2);
-	next_column_text_disabled("Details");
 	ImGui::Separator();
 
 	if (acquire_once) {
@@ -227,8 +226,8 @@ void editor_all_entities_gui::perform(
 
 			if (const auto handle = cosm[id]) {
 				handle.dispatch([&](const auto typed_handle) {
-					do_edit_flavours_gui(properties_gui, in, typed_handle.get_flavour(), typed_handle.get_flavour_id());
-					do_edit_entities_gui(properties_gui, in, typed_handle, id);
+					do_edit_flavours_gui(properties_gui, in, typed_handle.get_flavour(), typed_handle.get_flavour_id().raw);
+					do_edit_entities_gui(properties_gui, in, typed_handle, id.basic());
 				});
 			}
 		}

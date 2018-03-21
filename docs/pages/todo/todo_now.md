@@ -7,6 +7,11 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
+- Mnemonic bindings for windows
+	- Alt+S - selected
+	- Alt+A - all entities
+	- Alt+H - history
+	- Alt+C - common
 - Perhaps something to let us select and manipulate entities in gameplay mode?
 	- will it be useful?
 

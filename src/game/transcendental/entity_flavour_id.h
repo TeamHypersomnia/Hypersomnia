@@ -44,7 +44,7 @@ struct typed_entity_flavour_id {
 	raw_entity_flavour_id raw;
 
 	typed_entity_flavour_id() = default;
-	explicit typed_entity_flavour_id(raw_entity_flavour_id raw) : raw(raw) {};
+	explicit typed_entity_flavour_id(const raw_entity_flavour_id raw) : raw(raw) {};
 
 	operator bool() const {
 		return raw.operator bool();

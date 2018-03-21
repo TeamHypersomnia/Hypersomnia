@@ -11,31 +11,40 @@ struct flavour_property_id {
 	unsigned invariant_id = static_cast<unsigned>(-1);
 	field_address field;
 
-	template <class C, class F>
+	template <class C, class Container, class F>
 	bool access(
 		C& cosm,
-		const entity_flavour_id flavour_id,
+		const entity_type_id type_id,
+		const Container& flavour_ids,
 		F callback
 	) const {
 		bool result = false;
 
 		cosm.change_common_significant([&](auto& common_signi) {
-			common_signi.on_flavour(
-				flavour_id,
-				[&](auto& flavour) {
-					get_by_dynamic_index(
-						flavour.invariants,
-						invariant_id,
-						[&](auto& invariant) {
-							on_field_address(
-								invariant,
-								field,
-								[&](auto& resolved_field) {
-									callback(resolved_field);
-								}
-							);
+			get_by_dynamic_id(
+				all_entity_types(),
+				type_id,
+				[&](auto e) {
+					using E = decltype(e);
 
-							if (should_reinfer_after_change(invariant)) {
+					get_by_dynamic_index(
+						typename E::invariants {},
+						invariant_id,
+						[&](const auto& i) {
+							using Invariant = std::decay_t<decltype(i)>;
+
+							for (const auto& f : flavour_ids) {
+								on_field_address(
+									std::get<Invariant>(common_signi.template get_flavours<E>().get_flavour(f).invariants),
+									field,
+
+									[&](auto& resolved_field) {
+										callback(resolved_field);
+									}
+								);
+							}
+
+							if (should_reinfer_after_change(i)) {
 								result = true;
 							}
 						}
@@ -55,7 +64,8 @@ struct change_flavour_property_command : change_property_command<change_flavour_
 
 	// GEN INTROSPECTOR struct change_flavour_property_command
 	// INTROSPECT BASE change_property_command<change_flavour_property_command>
-	std::vector<entity_flavour_id> affected_flavours;
+	entity_type_id type_id;
+	std::vector<raw_entity_flavour_id> affected_flavours;
 	flavour_property_id property_id;
 	// END GEN INTROSPECTOR
 
@@ -68,15 +78,7 @@ struct change_flavour_property_command : change_property_command<change_flavour_
 		C& cosm,
 		F&& callback
 	) const {
-		bool should_reinfer = false;
-
-		for (const auto& a : affected_flavours) {
-			if (property_id.access(cosm, a, std::forward<F>(callback))) {
-				should_reinfer = true;
-			}
-		}
-
-		if (should_reinfer) {
+		if (property_id.access(cosm, type_id, affected_flavours, std::forward<F>(callback))) {
 			cosm.change_common_significant([&](auto& common_signi) { return changer_callback_result::REFRESH; });
 		}
 	}

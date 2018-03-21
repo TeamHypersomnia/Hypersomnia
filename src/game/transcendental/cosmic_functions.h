@@ -225,7 +225,7 @@ public:
 		self.get_solvable({}).template for_each_entity<Constraints...>(
 			[&](auto& object, const auto iteration_index) {
 				using O = decltype(object);
-				using E = type_argument_t<std::decay_t<O>>;
+				using E = typename std::decay_t<O>::used_entity_type;
 				using iterated_handle_type = basic_iterated_entity_handle<is_const_ref_v<O>, E>;
 				
 				callback(iterated_handle_type(object, self, iteration_index));

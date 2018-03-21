@@ -99,7 +99,8 @@ class cosmos_solvable {
 				using P = decltype(p);
 				using pool_type = std::decay_t<P>;
 
-				using E = type_argument_t<typename pool_type::mapped_type>;
+				using Solvable = typename pool_type::mapped_type;
+				using E = typename Solvable::used_entity_type;
 
 				if constexpr(has_all_of_v<E, Constraints...>) {
 					using index_type = typename pool_type::used_size_type;
@@ -175,7 +176,9 @@ public:
 	template <template <class> class Deguidized, class source_id_type>
 	Deguidized<entity_id> deguidize(const Deguidized<source_id_type>& guid_source) const;
 
-	const std::unordered_set<entity_id>& get_entities_by_flavour_id(const entity_flavour_id&) const;
+	const auto& get_entities_by_flavour_id(const entity_flavour_id& id) const {
+		return inferred.name.get_entities_by_flavour_id(id);
+	}
 	
 	std::size_t get_entities_count() const;
 	
@@ -273,10 +276,6 @@ inline entity_id cosmos_solvable::get_entity_id_by(const entity_guid guid) const
 	}
 
 	return {};
-}
-
-inline const std::unordered_set<entity_id>& cosmos_solvable::get_entities_by_flavour_id(const entity_flavour_id& id) const {
-	return inferred.name.get_entities_by_flavour_id(id);
 }
 
 inline entity_id cosmos_solvable::to_versioned(const unversioned_entity_id id) const {

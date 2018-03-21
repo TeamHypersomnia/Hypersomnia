@@ -38,6 +38,8 @@ class entity_flavour {
 	}
 
 public:
+	using used_entity_type = entity_type;
+
 	// GEN INTROSPECTOR class entity_flavour class entity_type
 	invariants_type invariants;
 	initial_components_type initial_components;

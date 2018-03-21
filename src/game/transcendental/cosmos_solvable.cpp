@@ -64,7 +64,7 @@ void cosmos_solvable::remap_guids() {
 	guids.clear();
 
 	for_each_entity([&](auto& subject, const auto iteration_index) {
-		using E = type_argument_t<std::decay_t<decltype(subject)>>;
+		using E = typename std::decay_t<decltype(subject)>::used_entity_type;
 
 		const auto id = entity_id(
 			significant.template get_pool<E>().to_id(iteration_index),

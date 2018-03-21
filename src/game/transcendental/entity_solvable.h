@@ -27,6 +27,7 @@ struct entity_solvable_meta {
 
 template <class E>
 struct entity_solvable : entity_solvable_meta {
+	using used_entity_type = E;
 	using components_type = make_components<E>;
 	using entity_solvable_meta::entity_solvable_meta;
 
