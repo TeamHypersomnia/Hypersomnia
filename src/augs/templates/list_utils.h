@@ -1,5 +1,6 @@
 #pragma once
 #include <utility>
+#include "augs/templates/always_false.h"
 
 template <class, class>
 struct prepend_to_list;
@@ -37,6 +38,11 @@ using add_to_sequence_t = typename add_to_sequence<I, T>::type;
 
 template <size_t I, class T>
 struct sequence_element;
+
+template <size_t I, class T>
+struct sequence_element<I, std::integer_sequence<T>> {
+	static_assert(always_false_v<T>, "Error: an empty integer sequence was passed.");
+};
 
 template <size_t I, class T, T Head, T... Tail>
 struct sequence_element<I, std::integer_sequence<T, Head, Tail...>>

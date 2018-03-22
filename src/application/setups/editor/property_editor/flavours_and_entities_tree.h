@@ -107,8 +107,6 @@ void flavours_and_entities_tree(
 			next_column_text_disabled(typesafe_sprintf("%x Flavours, %x Entities", total_flavours, total_entities));
 
 			if (node) {
-				const auto& common_signi = cosm.get_common_significant();
-
 				if (total_flavours > 1) {
 					/* Perform unified flavours view, with unified entities of all flavours */
 
