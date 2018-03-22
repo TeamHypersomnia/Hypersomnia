@@ -74,14 +74,12 @@ description_pair describe_changed(
 template <
 	template <class T> class SkipPredicate = always_false,
    	class T,
-   	class F,
    	class G,
    	class H
 >
 void general_edit_properties(
 	property_editor_gui& state,
 	const T& object,
-	F make_property_id,
 	G post_new_change_impl,
 	H rewrite_last_change_impl
 ) {
@@ -91,13 +89,13 @@ void general_edit_properties(
 
 	auto post_new_change = [&](
 		const description_pair& description,
-		const auto property_id,
+		const auto field_id,
 		const auto& new_content
 	) {
 		old_description = description.of_old;
 		const auto new_description = old_description + description.of_new;
 
-		post_new_change_impl(new_description, property_id, new_content);
+		post_new_change_impl(new_description, field_id, new_content);
 	};
 
 	auto rewrite_last = [&](
@@ -148,13 +146,11 @@ void general_edit_properties(
 					return result;
 				}();
 
-				const auto property_id = make_property_id(field);
-
 				auto post_new = [&](
 					const description_pair& description,
 					const auto& new_content
 				) {
-					post_new_change(description, property_id, new_content);
+					post_new_change(description, field, new_content);
 				};
 
 				auto handle_continuous_tweaker = [&](

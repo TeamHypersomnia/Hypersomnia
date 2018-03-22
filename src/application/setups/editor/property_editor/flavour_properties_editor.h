@@ -60,12 +60,12 @@ void edit_invariant(
 
 	auto post_new_change = [&](
 		const auto& description,
-		const flavour_property_id property_id,
+		const auto field_id,
 		const auto& new_content
 	) {
 		auto cmd = command;
 
-		cmd.property_id = property_id;
+		cmd.property_id = make_property_id(field_id);
 		cmd.value_after_change = augs::to_bytes(new_content);
 		cmd.built_description = description + property_location;
 
@@ -90,7 +90,6 @@ void edit_invariant(
 	general_edit_properties(
 		state, 
 		invariant,
-		make_property_id,
 		post_new_change,
 		rewrite_last_change
 	);
