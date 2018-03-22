@@ -52,5 +52,9 @@ struct editor_settings {
 
 	rgba rectangular_selection_color = { 65, 131, 196, 60 };
 	rgba rectangular_selection_border_color = { 65, 131, 196, 120 };
+
+	rgba different_values_frame_bg = { 115, 73, 0, 255 };
+	rgba different_values_frame_hovered_bg = { 158, 122, 0, 255 };
+	rgba different_values_frame_active_bg = { 168, 158, 0, 255 };
 	// END GEN INTROSPECTOR
 };

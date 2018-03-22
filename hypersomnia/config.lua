@@ -80,7 +80,11 @@ return {
     matched_entity_color = "0 255 0 80",
 
     rectangular_selection_color = "65 131 196 60",
-    rectangular_selection_border_color = "65 131 196 120"
+    rectangular_selection_border_color = "65 131 196 120",
+
+    different_values_frame_bg = "115 73 0 255",
+    different_values_frame_hovered_bg = "158 122 0 255",
+    different_values_frame_active_bg = "168 158 0 255"
   },
   game_controls = {
     A = "MOVE_LEFT",

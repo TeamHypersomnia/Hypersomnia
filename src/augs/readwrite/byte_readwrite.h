@@ -48,6 +48,7 @@ namespace augs {
 	template <class Archive, class Serialized>
 	void read_bytes(Archive& ar, Serialized& storage) {
 		static_assert(is_byte_stream_v<Archive>, "Trying to read from a non-byte stream.");
+		static_assert(!std::is_const_v<Serialized>, "Trying to read bytes to a const object.");
 
 		if constexpr(has_byte_read_overload_v<Archive, Serialized>) {
 			static_assert(has_byte_write_overload_v<Archive, Serialized>, "Has read_object_bytes overload, but no write_object_bytes overload.");

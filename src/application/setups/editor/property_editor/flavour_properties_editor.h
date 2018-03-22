@@ -1,6 +1,8 @@
 #pragma once
 #include "game/common_state/entity_flavours.h"
 
+#include "application/setups/editor/property_editor/make_field_comparator.h"
+
 #include "application/setups/editor/property_editor/property_editor_gui.h"
 #include "application/setups/editor/property_editor/property_editor_structs.h"
 
@@ -27,9 +29,37 @@ auto get_invariant_stem(const T&) {
 	return result;
 }
 
+struct invariant_field_eq_predicate {
+	const cosmos& cosm;
+	const unsigned invariant_id;
+	const entity_type_id type_id;
+	const affected_flavours_type& ids;
+	
+	template <class M>
+	bool compare(
+		const M& first,
+	   	const field_address field_id
+	) const {
+		if (ids.size() == 1) {
+			return true;
+		}
+
+		flavour_property_id id;
+
+		id.invariant_id = invariant_id;
+		id.field = field_id;
+
+		bool equal = true;
+
+		id.access(cosm, type_id, ids, make_field_comparator(equal, first));
+
+		return equal;
+	}
+};
+
 template <class T>
 void edit_invariant(
-	property_editor_gui& state,
+	const property_editor_input& prop_in,
 	const T& invariant,
 	const unsigned invariant_id,
 	const std::string& source_flavour_name,
@@ -87,17 +117,23 @@ void edit_invariant(
 		}
 	};
 
+	const auto& cosm = in.folder.work->world;
+	
 	general_edit_properties(
-		state, 
+		prop_in, 
 		invariant,
 		post_new_change,
-		rewrite_last_change
+		rewrite_last_change,
+		invariant_field_eq_predicate { 
+			cosm, invariant_id, command.type_id, command.affected_flavours 
+		}
 	);
 }
 
+
 template <class E>
 void edit_flavour(
-	property_editor_gui& state,
+	const property_editor_input& prop_in,
 	const entity_flavour<E>& flavour,
 	const change_flavour_property_command& command,
    	const editor_command_input in
@@ -112,7 +148,7 @@ void edit_flavour(
 	const auto source_flavour_name = name_invariant.name;
 
 	edit_invariant(
-		state,
+		prop_in,
 	   	name_invariant,
 	   	get_index(name_invariant),
 	   	source_flavour_name,
@@ -135,7 +171,7 @@ void edit_flavour(
 			next_column_text();
 
 			if (node) {
-				edit_invariant(state, invariant, get_index(invariant), source_flavour_name, command, in);
+				edit_invariant(prop_in, invariant, get_index(invariant), source_flavour_name, command, in);
 			}
 		}
    	);

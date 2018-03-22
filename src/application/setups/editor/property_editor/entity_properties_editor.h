@@ -1,4 +1,6 @@
 #pragma once
+#include "application/setups/editor/property_editor/make_field_comparator.h"
+
 #include "application/setups/editor/property_editor/property_editor_structs.h"
 #include "application/setups/editor/property_editor/property_editor_gui.h"
 
@@ -16,9 +18,37 @@ auto get_component_stem(const T&) {
 	return result;
 }
 
+struct component_field_eq_predicate {
+	const cosmos& cosm;
+	const unsigned component_id;
+	const entity_type_id type_id;
+	const affected_entities_type& ids;
+
+	template <class M>
+	bool compare(
+		const M& first,
+		const field_address field_id
+	) const {
+		if (ids.size() == 1) {
+			return true;
+		}
+
+		entity_property_id id;
+
+		id.component_id = component_id;
+		id.field = field_id;
+
+		bool equal = true;
+
+		id.access(cosm, type_id, ids, make_field_comparator(equal, first));
+
+		return equal;
+	}
+};
+
 template <class T>
 void edit_component(
-	property_editor_gui& state,
+	const property_editor_input prop_in,
 	const T& component,
 	const unsigned component_id, 
 	const std::string& entity_name,
@@ -74,17 +104,22 @@ void edit_component(
 		}
 	};
 
+	const auto& cosm = in.folder.work->world;
+
 	general_edit_properties(
-		state, 
+		prop_in, 
 		component,
 		post_new_change,
-		rewrite_last_change
+		rewrite_last_change,
+		component_field_eq_predicate { 
+			cosm, component_id, command.type_id, command.affected_entities 
+		}
 	);
 }
 
 template <class E>
 void edit_entity(
-	property_editor_gui& state,
+	const property_editor_input prop_in,
 	const const_typed_entity_handle<E> handle,
 	const change_entity_property_command& command,
    	const editor_command_input in
@@ -106,7 +141,7 @@ void edit_entity(
 			next_column_text();
 
 			if (node) {
-				edit_component(state, component, get_index(component), handle.get_name(), command, in);
+				edit_component(prop_in, component, get_index(component), handle.get_name(), command, in);
 			}
 		}
    	);

@@ -48,6 +48,7 @@ void configuration_subscribers::apply(const config_lua_table& new_config) const 
 }
 
 #define CONFIG_NVP(x) format_field_name(std::string(#x)) + "##" + std::to_string(field_id++), config.x
+#define SCOPE_CFG_NVP(x) format_field_name(std::string(#x)) + "##" + std::to_string(field_id++), scope_cfg.x
 
 void settings_gui_state::perform(
 	sol::state& lua,
@@ -259,16 +260,24 @@ void settings_gui_state::perform(
 					{
 						auto scope = scoped_indent();
 
-						revertable_color_edit("Hovered entity color", config.editor.entity_selector.hovered_color);
-						revertable_color_edit("Selected entity color", config.editor.entity_selector.selected_color);
-						revertable_color_edit("Held entity color", config.editor.entity_selector.held_color);
+						auto& scope_cfg = config.editor.entity_selector;
+
+						revertable_color_edit(SCOPE_CFG_NVP(hovered_color));
+						revertable_color_edit(SCOPE_CFG_NVP(selected_color));
+						revertable_color_edit(SCOPE_CFG_NVP(held_color));
 					}
 
-					revertable_color_edit("Controlled entity color", config.editor.controlled_entity_color);
-					revertable_color_edit("Matched (go to dialogs) entity color", config.editor.matched_entity_color);
+					auto& scope_cfg = config.editor;
 
-					revertable_color_edit("Rectangular selection color", config.editor.rectangular_selection_color);
-					revertable_color_edit("Rectangular selection border color", config.editor.rectangular_selection_border_color);
+					revertable_color_edit(SCOPE_CFG_NVP(controlled_entity_color));
+					revertable_color_edit(SCOPE_CFG_NVP(matched_entity_color));
+
+					revertable_color_edit(SCOPE_CFG_NVP(rectangular_selection_color));
+					revertable_color_edit(SCOPE_CFG_NVP(rectangular_selection_border_color));
+
+					revertable_color_edit(SCOPE_CFG_NVP(different_values_frame_bg));
+					revertable_color_edit(SCOPE_CFG_NVP(different_values_frame_hovered_bg));
+					revertable_color_edit(SCOPE_CFG_NVP(different_values_frame_active_bg));
 				}
 
 				break;

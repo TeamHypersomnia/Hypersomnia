@@ -29,6 +29,7 @@ void change_property_command<D>::rewrite_change(
 		cosm,
 		[&](auto& field) {
 			augs::from_bytes(new_value, field);
+			return callback_result::CONTINUE;
 		}
 	);
 }
@@ -76,6 +77,7 @@ void change_property_command<D>::redo(const editor_command_input in) {
 
 			detail_read_bytes(after_change_data, field, trivial_element_size);
 			after_change_data.set_read_pos(0u);
+			return callback_result::CONTINUE;
 		}	
 	);
 
@@ -105,6 +107,7 @@ void change_property_command<D>::undo(const editor_command_input in) {
 			}
 
 			detail_read_bytes(before_change_data, field, trivial_element_size);
+			return callback_result::CONTINUE;
 		}	
 	);
 

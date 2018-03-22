@@ -2,6 +2,8 @@
 #include "application/setups/editor/editor_command_structs.h"
 #include "application/setups/editor/property_editor/property_editor_structs.h"
 
+struct editor_settings;
+
 struct editor_all_entities_gui {
 	// GEN INTROSPECTOR struct editor_all_entities_gui
 	bool show = false;
@@ -10,7 +12,9 @@ struct editor_all_entities_gui {
 	editor_all_entities_gui(const std::string& title) : title(title) {}
 
 	void open();
+
 	void perform(
+		const editor_settings&,
 		const std::unordered_set<entity_id>* only_match_entities,
 	   	editor_command_input
 	);

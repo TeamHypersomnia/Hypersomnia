@@ -453,8 +453,8 @@ void editor_setup::perform_custom_imgui(
 			}
 		}
 
-		common_state_gui.perform(make_command_input());
-		all_entities_gui.perform(nullptr, make_command_input());
+		common_state_gui.perform(settings, make_command_input());
+		all_entities_gui.perform(settings, nullptr, make_command_input());
 
 		{
 			const auto all_selected = [&]() -> decltype(get_all_selected_entities()) {
@@ -465,7 +465,7 @@ void editor_setup::perform_custom_imgui(
 				return get_all_selected_entities();
 			}();
 
-			selected_entities_gui.perform(std::addressof(all_selected), make_command_input());
+			selected_entities_gui.perform(settings, std::addressof(all_selected), make_command_input());
 		}
 
 		const auto go_to_dialog_pos = vec2 { static_cast<float>(screen_size.x / 2), menu_bar_size.y * 2 + 1 };

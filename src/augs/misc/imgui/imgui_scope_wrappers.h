@@ -26,12 +26,25 @@ namespace augs {
 		}
 		
 		template <class... T>
-		auto scoped_style_color(T&&... args) {
-			ImGui::PushStyleColor(std::forward<T>(args)...);
-		
-			return make_scope_guard([]() { ImGui::PopStyleColor(); });
+		auto cond_scoped_style_color(const bool do_it, T&&... args) {
+			if (do_it) {
+				ImGui::PushStyleColor(std::forward<T>(args)...);
+			}
+
+			auto result = make_scope_guard([]() { ImGui::PopStyleColor(); });
+
+			if (!do_it) {
+				result.release();
+			}
+
+			return std::move(result);
 		}
-		
+
+		template <class... T>
+		auto scoped_style_color(T&&... args) {
+			return cond_scoped_style_color(true, std::forward<T>(args)...);
+		}
+
 		inline auto scoped_text_color(const rgba& col) {
 			return scoped_style_color(ImGuiCol_Text, col);
 		}

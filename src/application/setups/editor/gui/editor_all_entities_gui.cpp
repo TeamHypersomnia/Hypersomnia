@@ -191,6 +191,7 @@ void editor_all_entities_gui::interrupt_tweakers() {
 
 
 void editor_all_entities_gui::perform(
+	const editor_settings& settings,
 	const std::unordered_set<entity_id>* only_match_entities,
 	editor_command_input in
 ) {
@@ -212,6 +213,7 @@ void editor_all_entities_gui::perform(
 
 	properties_gui.hovered_guid.unset();
 
+	const auto prop_in = property_editor_input { settings, properties_gui };
 	const auto& cosm = in.folder.work->world;
 
 	if (only_match_entities) {
@@ -226,8 +228,8 @@ void editor_all_entities_gui::perform(
 
 			if (const auto handle = cosm[id]) {
 				handle.dispatch([&](const auto typed_handle) {
-					do_edit_flavours_gui(properties_gui, in, typed_handle.get_flavour(), { typed_handle.get_flavour_id().raw });
-					do_edit_entities_gui(properties_gui, in, typed_handle, { id.basic() });
+					do_edit_flavours_gui(prop_in, in, typed_handle.get_flavour(), { typed_handle.get_flavour_id().raw });
+					do_edit_entities_gui(prop_in, in, typed_handle, { id.basic() });
 				});
 			}
 		}
@@ -245,7 +247,7 @@ void editor_all_entities_gui::perform(
 			}
 
 			flavours_and_entities_tree(
-				properties_gui,
+				prop_in,
 				in,
 				in_selection_provider { cosm, per_native_type }
 			);
@@ -255,7 +257,7 @@ void editor_all_entities_gui::perform(
 	}
 
 	flavours_and_entities_tree(
-		properties_gui,
+		prop_in,
 		in,
 		all_provider { cosm }
 	);

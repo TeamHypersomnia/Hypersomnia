@@ -20,40 +20,40 @@ struct flavour_property_id {
 	) const {
 		bool result = false;
 
-		cosm.change_common_significant([&](auto& common_signi) {
-			get_by_dynamic_id(
-				all_entity_types(),
-				type_id,
-				[&](auto e) {
-					using E = decltype(e);
+		auto& common_signi = cosm.get_common_significant({});
 
-					get_by_dynamic_index(
-						invariants_of<E> {},
-						invariant_id,
-						[&](const auto& i) {
-							using Invariant = std::decay_t<decltype(i)>;
+		get_by_dynamic_id(
+			all_entity_types(),
+			type_id,
+			[&](auto e) {
+				using E = decltype(e);
 
-							for (const auto& f : flavour_ids) {
-								on_field_address(
-									std::get<Invariant>(common_signi.template get_flavours<E>().get_flavour(f).invariants),
-									field,
+				get_by_dynamic_index(
+					invariants_of<E> {},
+					invariant_id,
+					[&](const auto& i) {
+						using Invariant = std::decay_t<decltype(i)>;
 
-									[&](auto& resolved_field) {
-										callback(resolved_field);
-									}
-								);
-							}
+						for (const auto& f : flavour_ids) {
+							if (callback_result::ABORT == on_field_address(
+								std::get<Invariant>(common_signi.template get_flavours<E>().get_flavour(f).invariants),
+								field,
 
-							if (should_reinfer_after_change(i)) {
-								result = true;
+								[&](auto& resolved_field) {
+									return callback(resolved_field);
+								}
+							)) {
+								break;
 							}
 						}
-					);
-				}
-			);
 
-			return changer_callback_result::DONT_REFRESH;
-		});
+						if (should_reinfer_after_change(i)) {
+							result = true;
+						}
+					}
+				);
+			}
+		);
 
 		return result;
 	}

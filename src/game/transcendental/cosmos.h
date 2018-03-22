@@ -13,6 +13,8 @@
 #include "game/organization/all_entity_types_declaration.h"
 
 #include "game/transcendental/cosmos_common.h"
+#include "game/transcendental/cosmos_common_significant_access.h"
+
 #include "game/transcendental/private_cosmos_solvable.h"
 #include "game/transcendental/specific_entity_handle.h"
 
@@ -122,6 +124,15 @@ public:
 	std::string summary() const;
 
 	const cosmos_common_significant& get_common_significant() const;
+
+	auto& get_common_significant(cosmos_common_significant_access) {
+		return common.significant;
+	}
+
+	const auto& get_common_significant(cosmos_common_significant_access) const {
+		return common.significant;
+	}
+
 	const common_assets& get_common_assets() const;
 
 	template <class entity_type>

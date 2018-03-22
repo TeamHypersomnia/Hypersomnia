@@ -22,16 +22,19 @@ struct should_skip_in_common : std::bool_constant<
 	is_one_of_v<T, all_logical_assets, all_entity_flavours>
 > {};
 
+struct common_field_eq_predicate {
+	template <class... Args>
+	bool compare(Args&&...) const {
+		return true;
+	}
+};
+
 static void edit_common(
-	property_editor_gui& state,
+	const property_editor_input& prop_in,
 	const cosmos_common_significant& signi,
 	const editor_command_input in
 ) {
 	using namespace augs::imgui;
-
-	auto make_property_id = [&](const field_address field) {
-		return field;
-	};
 
 	const auto property_location = [&]() {
 		return typesafe_sprintf(" (Common state)");
@@ -70,11 +73,11 @@ static void edit_common(
 	};
 
 	general_edit_properties<should_skip_in_common>(
-		state, 
+		prop_in, 
 		signi,
-		make_property_id,
 		post_new_change,
-		rewrite_last_change
+		rewrite_last_change,
+		common_field_eq_predicate()
 	);
 }
 
@@ -84,7 +87,7 @@ void editor_common_state_gui::open() {
 	ImGui::SetWindowFocus("Common state");
 }
 
-void editor_common_state_gui::perform(const editor_command_input in) {
+void editor_common_state_gui::perform(const editor_settings& settings, const editor_command_input in) {
 	if (!show) {
 		return;
 	}
@@ -105,7 +108,7 @@ void editor_common_state_gui::perform(const editor_command_input in) {
 	ImGui::Separator();
 
 	edit_common(
-		properties_gui,
+		{ settings, properties_gui },
 		cosm.get_common_significant(),
 		in
 	);

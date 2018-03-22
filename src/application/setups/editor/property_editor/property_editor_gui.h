@@ -4,11 +4,18 @@
 #include "augs/templates/is_tuple.h"
 #include "augs/templates/type_matching_and_indexing.h"
 #include "augs/drawing/flip.h"
+
+#include "application/setups/editor/editor_settings.h"
 #include "application/setups/editor/editor_command_structs.h"
 #include "application/setups/editor/property_editor/property_editor_structs.h"
 
 #include "augs/templates/format_enum.h"
 #include "augs/misc/imgui/imgui_enum_combo.h"
+
+struct property_editor_input {
+	const editor_settings& settings;
+	property_editor_gui& state;
+};
 
 template <class A, class B>
 auto describe_changed_flag(
@@ -75,17 +82,19 @@ template <
 	template <class T> class SkipPredicate = always_false,
    	class T,
    	class G,
-   	class H
+   	class H,
+	class Eq
 >
 void general_edit_properties(
-	property_editor_gui& state,
+	const property_editor_input in,
 	const T& object,
 	G post_new_change_impl,
-	H rewrite_last_change_impl
+	H rewrite_last_change_impl,
+	Eq field_equality_predicate
 ) {
 	using namespace augs::imgui;
 
-	auto& old_description = state.old_description;
+	auto& old_description = in.state.old_description;
 
 	auto post_new_change = [&](
 		const description_pair& description,
@@ -106,7 +115,7 @@ void general_edit_properties(
 	};
 
 	{
-		auto& last_active = state.last_active;
+		auto& last_active = in.state.last_active;
 
 		if (last_active && last_active.value() != ImGui::GetActiveID()) {
 			last_active.reset();
@@ -146,6 +155,16 @@ void general_edit_properties(
 					return result;
 				}();
 
+				auto push_colors = [&](auto...) {
+					const bool values_different = !field_equality_predicate.compare(original_member, field);
+
+					return std::make_tuple(
+						cond_scoped_style_color(values_different, ImGuiCol_FrameBg, in.settings.different_values_frame_bg),
+						cond_scoped_style_color(values_different, ImGuiCol_FrameBgHovered, in.settings.different_values_frame_hovered_bg),
+						cond_scoped_style_color(values_different, ImGuiCol_FrameBgActive, in.settings.different_values_frame_active_bg)
+					);
+				};
+
 				auto post_new = [&](
 					const description_pair& description,
 					const auto& new_content
@@ -163,7 +182,7 @@ void general_edit_properties(
 						const auto this_id = ImGui::GetActiveID();
 						const auto description = describe_changed(field_name, old_value, new_value);
 
-						auto& last_active = state.last_active;
+						auto& last_active = in.state.last_active;
 
 						if (last_active != this_id) {
 							/* LOG("Started dragging %x to %x", field_name, new_value); */
@@ -226,6 +245,8 @@ void general_edit_properties(
 					return;
 				}
 				else if constexpr(std::is_same_v<M, std::string>) {
+					const auto colors = push_colors();
+
 					do_continuous([&]() { 
 						if (original_label == "description") {
 							return input_multiline_text<512>(identity_label, altered_member, 8);
@@ -240,6 +261,8 @@ void general_edit_properties(
 					/* next_column_text(); */
 				}
 				else if constexpr(std::is_same_v<M, bool>) {
+					const auto colors = push_colors();
+
 					do_discrete([&]() { 
 						return checkbox(identity_label, altered_member);
 					});
@@ -248,6 +271,8 @@ void general_edit_properties(
 
 				}
 				else if constexpr(std::is_arithmetic_v<M>) {
+					const auto colors = push_colors();
+
 					do_continuous([&]() { 
 						return drag(identity_label, altered_member); 
 					});
@@ -255,6 +280,8 @@ void general_edit_properties(
 					/* next_column_text(get_type_name<M>()); */
 				}
 				else if constexpr(is_one_of_v<M, vec2, vec2i>) {
+					const auto colors = push_colors();
+
 					do_continuous([&]() { 
 						return drag_vec2(identity_label, altered_member); 
 					});
@@ -262,6 +289,8 @@ void general_edit_properties(
 					/* next_column_text(); */
 				}
 				else if constexpr(is_minmax_v<M>) {
+					const auto colors = push_colors();
+
 					do_continuous([&]() { 
 						return drag_minmax(identity_label, altered_member); 
 					});
@@ -272,6 +301,8 @@ void general_edit_properties(
 
 				}
 				else if constexpr(std::is_enum_v<M>) {
+					const auto colors = push_colors();
+
 					do_discrete([&]() { 
 						return enum_combo(identity_label, altered_member);
 					});
@@ -279,6 +310,8 @@ void general_edit_properties(
 					/* next_column_text(); */
 				}
 				else if constexpr(std::is_same_v<M, rgba>) {
+					const auto colors = push_colors();
+
 					do_continuous([&]() { 
 						return color_edit(identity_label, altered_member);
 					});

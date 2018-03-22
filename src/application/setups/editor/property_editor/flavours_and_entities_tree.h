@@ -9,7 +9,7 @@
 
 template <class E>
 void do_edit_entities_gui(
-	property_editor_gui& properties_gui,
+	const property_editor_input& prop_in,
 	editor_command_input in,
 	const const_typed_entity_handle<E>& entity,
 	const affected_entities_type& ids
@@ -18,14 +18,14 @@ void do_edit_entities_gui(
 	cmd.type_id.set<E>();
 	cmd.affected_entities = ids;
 
-	edit_entity(properties_gui, entity, cmd, in);
+	edit_entity(prop_in, entity, cmd, in);
 
 	ImGui::Separator();
 }
 
 template <class E>
 void do_edit_flavours_gui(
-	property_editor_gui& properties_gui,
+	const property_editor_input& prop_in,
 	editor_command_input in,
 	const entity_flavour<E>& flavour,
 	const affected_flavours_type& ids
@@ -34,14 +34,14 @@ void do_edit_flavours_gui(
 	cmd.type_id.set<E>();
 	cmd.affected_flavours = ids;
 
-	edit_flavour(properties_gui, flavour, cmd, in);
+	edit_flavour(prop_in, flavour, cmd, in);
 
 	ImGui::Separator();
 }
 
 template <class F>
 void flavours_and_entities_tree(
-	property_editor_gui& properties_gui,
+	const property_editor_input& prop_in,
 	editor_command_input in,
 	F&& flavours_and_entities_provider
 ) {
@@ -60,7 +60,7 @@ void flavours_and_entities_tree(
 			input = { ids };
 		}
 
-		do_edit_entities_gui(properties_gui, in, entity, input);	
+		do_edit_entities_gui(prop_in, in, entity, input);	
 	};
 
 	auto do_edit_flavours = [&](const auto& flavour, const auto& ids) {
@@ -73,7 +73,7 @@ void flavours_and_entities_tree(
 			input = { ids };
 		}
 
-		do_edit_flavours_gui(properties_gui, in, flavour, input);	
+		do_edit_flavours_gui(prop_in, in, flavour, input);	
 	};
 
 	auto& provider = flavours_and_entities_provider;
@@ -198,7 +198,7 @@ void flavours_and_entities_tree(
 									const auto entity_node = scoped_tree_node_ex(entity_label);
 
 									if (ImGui::IsItemHovered()) {
-										properties_gui.hovered_guid = guid; 
+										prop_in.state.hovered_guid = guid; 
 									}
 
 									next_column_text();
