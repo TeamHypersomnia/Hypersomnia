@@ -9,6 +9,11 @@ namespace augs {
 		// END GEN INTROSPECTOR
 
 		date_time();
+		date_time(const std::time_t& t) : t(t) {}
+
+		operator std::time_t() const {
+			return t;
+		}
 
 		std::string get_stamp() const;
 		std::string get_readable() const;

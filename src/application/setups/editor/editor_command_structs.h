@@ -23,8 +23,12 @@ struct editor_command_input {
 
 struct editor_command_common {
 	// GEN INTROSPECTOR struct editor_command_common
-	augs::date_time timestamp;
+	std::time_t timestamp = {};
 	// END GEN INTROSPECTOR
+
+	void reset_timestamp() {
+		timestamp = augs::date_time();
+	}
 };
 
 struct edited_field_id {

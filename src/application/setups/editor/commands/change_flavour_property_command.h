@@ -28,7 +28,7 @@ struct flavour_property_id {
 					using E = decltype(e);
 
 					get_by_dynamic_index(
-						typename E::invariants {},
+						invariants_of<E> {},
 						invariant_id,
 						[&](const auto& i) {
 							using Invariant = std::decay_t<decltype(i)>;

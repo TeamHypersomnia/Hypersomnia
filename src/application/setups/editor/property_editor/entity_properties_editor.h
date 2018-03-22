@@ -16,31 +16,30 @@ auto get_component_stem(const T&) {
 	return result;
 }
 
-template <class T, class E, class C>
+template <class T>
 void edit_component(
 	property_editor_gui& state,
 	const T& component,
-	const E handle,
-	C command_maker,
+	const unsigned component_id, 
+	const std::string& entity_name,
+	const change_entity_property_command& command,
    	const editor_command_input in
 ) {
-	using command_type = decltype(command_maker());
+	using command_type = std::decay_t<decltype(command)>;
 	using namespace augs::imgui;
 
 	auto make_property_id = [&](const field_address field) {
 		entity_property_id result;
 
-		result.component_id = index_in_list_v<T, decltype(handle.get().components)>;
+		result.component_id = component_id; 
 		result.field = field;
 
 		return result;
 	};
 
 	const auto property_location = [&]() {
-		const auto entity_name = handle.get_name();
 		const auto component_name = get_component_stem(component);
-
-		return typesafe_sprintf(" (in %x of %x#%x)", component_name, entity_name, handle.get_guid());
+		return typesafe_sprintf(" (in %x of %x#%x)", component_name, entity_name);
 	}();
 
 	/* Linker error fix */
@@ -51,7 +50,7 @@ void edit_component(
 		const entity_property_id property_id,
 		const auto& new_content
 	) {
-		auto cmd = command_maker();
+		auto cmd = command;
 
 		cmd.property_id = property_id;
 		cmd.value_after_change = augs::to_bytes(new_content);
@@ -84,14 +83,18 @@ void edit_component(
 	);
 }
 
-template <class E, class C>
+template <class E>
 void edit_entity(
 	property_editor_gui& state,
-	const E handle,
-	C command_maker,
+	const const_typed_entity_handle<E> handle,
+	const change_entity_property_command& command,
    	const editor_command_input in
 ) {
 	using namespace augs::imgui;
+
+	auto get_index = [](const auto& comp) {
+		return index_in_list_v<std::decay_t<decltype(comp)>, components_of<E>>;
+	};
 
 	for_each_through_std_get(
 		handle.get().components,
@@ -104,7 +107,7 @@ void edit_entity(
 			next_column_text();
 
 			if (node) {
-				edit_component(state, component, handle, command_maker, in);
+				edit_component(state, component, get_index(component), handle.get_name(), command, in);
 			}
 		}
    	);

@@ -27,28 +27,29 @@ auto get_invariant_stem(const T&) {
 	return result;
 }
 
-template <class T, class E, class C>
+template <class T>
 void edit_invariant(
 	property_editor_gui& state,
 	const T& invariant,
-	const entity_flavour<E>& source_flavour,
-	C command_maker,
+	const unsigned invariant_id,
+	const std::string& source_flavour_name,
+	const change_flavour_property_command& command,
    	const editor_command_input in
 ) {
-	using command_type = decltype(command_maker());
+	using command_type = std::decay_t<decltype(command)>;
 	using namespace augs::imgui;
 
 	auto make_property_id = [&](const field_address field) {
 		flavour_property_id result;
 
-		result.invariant_id = index_in_list_v<T, decltype(entity_flavour<E>::invariants)>;
+		result.invariant_id = invariant_id;
 		result.field = field;
 
 		return result;
 	};
 
 	const auto property_location = [&]() {
-		const auto flavour_name = get_name_of(source_flavour);
+		const auto flavour_name = source_flavour_name;
 		const auto invariant_name = get_invariant_stem(invariant);
 
 		return typesafe_sprintf(" (in %x of %x)", invariant_name, flavour_name);
@@ -62,7 +63,7 @@ void edit_invariant(
 		const flavour_property_id property_id,
 		const auto& new_content
 	) {
-		auto cmd = command_maker();
+		auto cmd = command;
 
 		cmd.property_id = property_id;
 		cmd.value_after_change = augs::to_bytes(new_content);
@@ -95,16 +96,30 @@ void edit_invariant(
 	);
 }
 
-template <class E, class C>
+template <class E>
 void edit_flavour(
 	property_editor_gui& state,
 	const entity_flavour<E>& flavour,
-	C&& command_maker,
+	const change_flavour_property_command& command,
    	const editor_command_input in
 ) {
 	using namespace augs::imgui;
 
-	edit_invariant(state, flavour.template get<invariants::name>(), flavour, std::forward<C>(command_maker), in);
+	auto get_index = [](const auto& inv) {
+		return index_in_list_v<std::decay_t<decltype(inv)>, invariants_of<E>>;
+	};
+
+	const auto& name_invariant = flavour.template get<invariants::name>();
+	const auto source_flavour_name = name_invariant.name;
+
+	edit_invariant(
+		state,
+	   	name_invariant,
+	   	get_index(name_invariant),
+	   	source_flavour_name,
+	   	command,
+	   	in
+	);
 
 	for_each_through_std_get(
 		flavour.invariants,
@@ -121,7 +136,7 @@ void edit_flavour(
 			next_column_text();
 
 			if (node) {
-				edit_invariant(state, invariant, flavour, std::forward<C>(command_maker), in);
+				edit_invariant(state, invariant, get_index(invariant), source_flavour_name, command, in);
 			}
 		}
    	);

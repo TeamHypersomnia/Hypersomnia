@@ -21,7 +21,7 @@ void change_property_command<D>::rewrite_change(
 	auto& self = *static_cast<D*>(this);
 	auto& cosm = in.folder.work->world;
 
-	common.timestamp = {};
+	common.reset_timestamp();
 
 	ensure(value_after_change.empty());
 

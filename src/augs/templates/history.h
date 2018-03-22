@@ -36,7 +36,6 @@ namespace augs {
 				Later we might support branches. 
 			*/
 
-
 			erase_from_to(commands, current_revision + 1);
 
 			derived_set_modified_flags();

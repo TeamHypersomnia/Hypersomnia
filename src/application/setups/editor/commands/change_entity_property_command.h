@@ -29,7 +29,7 @@ struct entity_property_id {
 				using E = decltype(e);
 
 				get_by_dynamic_index(
-					typename E::components {},
+					components_of<E> {},
 					component_id,
 					[&](const auto& c) {
 						using Component = std::decay_t<decltype(c)>;

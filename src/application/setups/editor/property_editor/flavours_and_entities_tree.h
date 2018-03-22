@@ -14,15 +14,11 @@ void do_edit_entities_gui(
 	const const_typed_entity_handle<E>& entity,
 	const affected_entities_type& ids
 ) {
-	auto command_maker = [&]() {
-		change_entity_property_command cmd;
-		cmd.type_id = entity_type_id::of<E>();
-		cmd.affected_entities = ids;
+	change_entity_property_command cmd;
+	cmd.type_id.set<E>();
+	cmd.affected_entities = ids;
 
-		return cmd;
-	};
-
-	edit_entity(properties_gui, entity, command_maker, in);
+	edit_entity(properties_gui, entity, cmd, in);
 
 	ImGui::Separator();
 }
@@ -34,15 +30,11 @@ void do_edit_flavours_gui(
 	const entity_flavour<E>& flavour,
 	const affected_flavours_type& ids
 ) {
-	auto command_maker = [&]() {
-		change_flavour_property_command cmd;
-		cmd.type_id = entity_type_id::of<E>();
-		cmd.affected_flavours = ids;
+	change_flavour_property_command cmd;
+	cmd.type_id.set<E>();
+	cmd.affected_flavours = ids;
 
-		return cmd;
-	};
-
-	edit_flavour(properties_gui, flavour, command_maker, in);
+	edit_flavour(properties_gui, flavour, cmd, in);
 
 	ImGui::Separator();
 }
