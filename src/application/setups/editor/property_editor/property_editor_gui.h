@@ -78,6 +78,25 @@ description_pair describe_changed(
 	}
 };
 
+
+template <class F, class Eq>
+auto maybe_different_value_cols(
+	const editor_settings& settings,
+	const F& first,
+   	const field_address field_id,
+   	Eq& pred
+) {
+	using namespace augs::imgui;
+
+	const bool values_different = !pred.compare(first, field_id);
+
+	return std::make_tuple(
+		cond_scoped_style_color(values_different, ImGuiCol_FrameBg, settings.different_values_frame_bg),
+		cond_scoped_style_color(values_different, ImGuiCol_FrameBgHovered, settings.different_values_frame_hovered_bg),
+		cond_scoped_style_color(values_different, ImGuiCol_FrameBgActive, settings.different_values_frame_active_bg)
+	);
+};
+
 template <
 	template <class T> class SkipPredicate = always_false,
    	class T,
@@ -155,16 +174,6 @@ void general_edit_properties(
 					return result;
 				}();
 
-				auto push_colors = [&](auto...) {
-					const bool values_different = !field_equality_predicate.compare(original_member, field);
-
-					return std::make_tuple(
-						cond_scoped_style_color(values_different, ImGuiCol_FrameBg, in.settings.different_values_frame_bg),
-						cond_scoped_style_color(values_different, ImGuiCol_FrameBgHovered, in.settings.different_values_frame_hovered_bg),
-						cond_scoped_style_color(values_different, ImGuiCol_FrameBgActive, in.settings.different_values_frame_active_bg)
-					);
-				};
-
 				auto post_new = [&](
 					const description_pair& description,
 					const auto& new_content
@@ -172,12 +181,19 @@ void general_edit_properties(
 					post_new_change(description, field, new_content);
 				};
 
+				auto do_maybe_different_value_cols = [&](auto... args) {
+					return maybe_different_value_cols(in.settings, original_member, field, field_equality_predicate, args...);
+				};
+
 				auto handle_continuous_tweaker = [&](
 					const auto& field_name,
 					const auto& old_value, 
 					const auto& new_value,
-					auto callback
+					auto callback,
+					auto... args
 				) {
+					const auto colors = do_maybe_different_value_cols(args...);
+
 					if (callback()) {
 						const auto this_id = ImGui::GetActiveID();
 						const auto description = describe_changed(field_name, old_value, new_value);
@@ -201,8 +217,11 @@ void general_edit_properties(
 					const auto& field_name,
 					const auto& old_value, 
 					const auto& new_value,
-					auto callback
+					auto callback,
+				   	auto... args
 				) {
+					const auto colors = do_maybe_different_value_cols(args...);
+
 					if (callback()) {
 						post_new(
 							describe_changed(field_name, old_value, new_value),
@@ -225,15 +244,15 @@ void general_edit_properties(
 					ImGui::NextColumn();
 				};
 
-				auto do_continuous = [&](auto f) {
+				auto do_continuous = [&](auto f, auto... args) {
 					do_tweaker([&]() { 
-						handle_continuous_tweaker(label, original_member, altered_member, f); 
+						handle_continuous_tweaker(label, original_member, altered_member, f, args...); 
 					});
 				};
 
-				auto do_discrete = [&](auto f) {
+				auto do_discrete = [&](auto f, auto... args) {
 					do_tweaker([&]() { 
-						handle_discrete_tweaker(label, original_member, altered_member, f);
+						handle_discrete_tweaker(label, original_member, altered_member, f, args...);
 					});
 				};
 
@@ -245,8 +264,6 @@ void general_edit_properties(
 					return;
 				}
 				else if constexpr(std::is_same_v<M, std::string>) {
-					const auto colors = push_colors();
-
 					do_continuous([&]() { 
 						if (original_label == "description") {
 							return input_multiline_text<512>(identity_label, altered_member, 8);
@@ -261,8 +278,6 @@ void general_edit_properties(
 					/* next_column_text(); */
 				}
 				else if constexpr(std::is_same_v<M, bool>) {
-					const auto colors = push_colors();
-
 					do_discrete([&]() { 
 						return checkbox(identity_label, altered_member);
 					});
@@ -271,8 +286,6 @@ void general_edit_properties(
 
 				}
 				else if constexpr(std::is_arithmetic_v<M>) {
-					const auto colors = push_colors();
-
 					do_continuous([&]() { 
 						return drag(identity_label, altered_member); 
 					});
@@ -280,8 +293,6 @@ void general_edit_properties(
 					/* next_column_text(get_type_name<M>()); */
 				}
 				else if constexpr(is_one_of_v<M, vec2, vec2i>) {
-					const auto colors = push_colors();
-
 					do_continuous([&]() { 
 						return drag_vec2(identity_label, altered_member); 
 					});
@@ -289,8 +300,6 @@ void general_edit_properties(
 					/* next_column_text(); */
 				}
 				else if constexpr(is_minmax_v<M>) {
-					const auto colors = push_colors();
-
 					do_continuous([&]() { 
 						return drag_minmax(identity_label, altered_member); 
 					});
@@ -301,8 +310,6 @@ void general_edit_properties(
 
 				}
 				else if constexpr(std::is_enum_v<M>) {
-					const auto colors = push_colors();
-
 					do_discrete([&]() { 
 						return enum_combo(identity_label, altered_member);
 					});
@@ -310,8 +317,6 @@ void general_edit_properties(
 					/* next_column_text(); */
 				}
 				else if constexpr(std::is_same_v<M, rgba>) {
-					const auto colors = push_colors();
-
 					do_continuous([&]() { 
 						return color_edit(identity_label, altered_member);
 					});
