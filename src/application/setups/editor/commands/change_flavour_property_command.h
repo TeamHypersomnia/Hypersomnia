@@ -59,13 +59,15 @@ struct flavour_property_id {
 	}
 };
 
+using affected_flavours_type = std::vector<raw_entity_flavour_id>;
+
 struct change_flavour_property_command : change_property_command<change_flavour_property_command> {
 	friend augs::introspection_access;
 
 	// GEN INTROSPECTOR struct change_flavour_property_command
 	// INTROSPECT BASE change_property_command<change_flavour_property_command>
 	entity_type_id type_id;
-	std::vector<raw_entity_flavour_id> affected_flavours;
+	affected_flavours_type affected_flavours;
 	flavour_property_id property_id;
 	// END GEN INTROSPECTOR
 

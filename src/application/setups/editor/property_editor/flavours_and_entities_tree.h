@@ -7,23 +7,17 @@
 #include "application/setups/editor/property_editor/flavour_properties_editor.h"
 #include "application/setups/editor/property_editor/entity_properties_editor.h"
 
-template <class E, class C>
+template <class E>
 void do_edit_entities_gui(
 	property_editor_gui& properties_gui,
 	editor_command_input in,
-	const E& entity,
-	const C& ids
+	const const_typed_entity_handle<E>& entity,
+	const affected_entities_type& ids
 ) {
 	auto command_maker = [&]() {
 		change_entity_property_command cmd;
-		cmd.type_id = entity_type_id::of<typename E::used_entity_type>();
-
-		if constexpr(is_container_v<C>) {
-			cmd.affected_entities.assign(ids.begin(), ids.end());
-		}
-		else {
-			cmd.affected_entities = { ids };
-		}
+		cmd.type_id = entity_type_id::of<E>();
+		cmd.affected_entities = ids;
 
 		return cmd;
 	};
@@ -33,23 +27,17 @@ void do_edit_entities_gui(
 	ImGui::Separator();
 }
 
-template <class E, class C>
+template <class E>
 void do_edit_flavours_gui(
 	property_editor_gui& properties_gui,
 	editor_command_input in,
-	const E& flavour,
-	const C& ids
+	const entity_flavour<E>& flavour,
+	const affected_flavours_type& ids
 ) {
 	auto command_maker = [&]() {
 		change_flavour_property_command cmd;
-		cmd.type_id = entity_type_id::of<typename E::used_entity_type>();
-
-		if constexpr(is_container_v<C>) {
-			cmd.affected_flavours.assign(ids.begin(), ids.end());
-		}
-		else {
-			cmd.affected_flavours = { ids };
-		}
+		cmd.type_id = entity_type_id::of<E>();
+		cmd.affected_flavours = ids;
 
 		return cmd;
 	};
@@ -71,11 +59,29 @@ void flavours_and_entities_tree(
 	auto& cosm = work.world;
 
 	auto do_edit_entities = [&](const auto& entity, const auto& ids) {
-		do_edit_entities_gui(properties_gui, in, entity, ids);	
+		thread_local affected_entities_type input;
+
+		if constexpr(is_container_v<std::decay_t<decltype(ids)>>) {
+			input.assign(ids.begin(), ids.end());
+		}
+		else {
+			input = { ids };
+		}
+
+		do_edit_entities_gui(properties_gui, in, entity, input);	
 	};
 
 	auto do_edit_flavours = [&](const auto& flavour, const auto& ids) {
-		do_edit_flavours_gui(properties_gui, in, flavour, ids);	
+		thread_local affected_flavours_type input;
+
+		if constexpr(is_container_v<std::decay_t<decltype(ids)>>) {
+			input.assign(ids.begin(), ids.end());
+		}
+		else {
+			input = { ids };
+		}
+
+		do_edit_flavours_gui(properties_gui, in, flavour, input);	
 	};
 
 	auto& provider = flavours_and_entities_provider;

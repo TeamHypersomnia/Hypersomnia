@@ -212,7 +212,7 @@ void editor_all_entities_gui::perform(
 
 	properties_gui.hovered_guid.unset();
 
-	auto& cosm = in.folder.work->world;
+	const auto& cosm = in.folder.work->world;
 
 	if (only_match_entities) {
 		const auto& matches = *only_match_entities;
@@ -226,8 +226,8 @@ void editor_all_entities_gui::perform(
 
 			if (const auto handle = cosm[id]) {
 				handle.dispatch([&](const auto typed_handle) {
-					do_edit_flavours_gui(properties_gui, in, typed_handle.get_flavour(), typed_handle.get_flavour_id().raw);
-					do_edit_entities_gui(properties_gui, in, typed_handle, id.basic());
+					do_edit_flavours_gui(properties_gui, in, typed_handle.get_flavour(), { typed_handle.get_flavour_id().raw });
+					do_edit_entities_gui(properties_gui, in, typed_handle, { id.basic() });
 				});
 			}
 		}
