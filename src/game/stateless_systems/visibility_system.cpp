@@ -168,12 +168,22 @@ void visibility_system::respond_to_visibility_information_requests(
 	std::vector<messages::line_of_sight_response>& los_responses,
 	std::vector<messages::visibility_information_response>& vis_responses
 ) const {
-	const auto& settings = cosmos.get_common_significant().visibility;
 	const auto si = cosmos.get_si();
 
-	ensure(settings.epsilon_distance_vertex_hit > 0.f);
-	ensure(settings.epsilon_ray_distance_variation > 0.f);
-	ensure(settings.epsilon_threshold_obstacle_hit > 0.f);
+	const auto settings = [&cosmos](){ 
+		auto absolutize = [](float& f) {
+			f = std::fabs(f);
+		};
+
+		auto s = cosmos.get_common_significant().visibility;
+
+		absolutize(s.epsilon_distance_vertex_hit);
+		absolutize(s.epsilon_ray_distance_variation);
+		absolutize(s.epsilon_threshold_obstacle_hit);
+
+		return s;
+	}();
+
 
 	auto& lines = DEBUG_LINES_TARGET;
 
