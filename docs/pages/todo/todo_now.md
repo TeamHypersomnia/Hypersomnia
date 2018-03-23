@@ -10,6 +10,8 @@ summary: Just a hidden scratchpad.
 - moving objects with mouse
 	- if only one is selected on pressing "t", optionally move in a special context
 		- like move an entry in attachment matrix
+	- command format
+		- how about re-using change property command?
 
 - fix characters getting typed when alt+something combos are pressed
 	- once we have combo maps, there will be a separate function to determine whether the input is to be fetched

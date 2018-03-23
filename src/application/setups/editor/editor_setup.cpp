@@ -200,7 +200,7 @@ void editor_setup::open_folder_in_new_tab(const path_operation op) {
 		[this, op](editor_folder& f) {
 			f.set_folder_path(op.lua, op.path, recent);
 			f.load_folder();
-			f.history.mark_as_just_saved();
+			/* f.history.mark_as_just_saved(); */
 		}
 	);
 }
@@ -690,13 +690,6 @@ void editor_setup::new_tab() {
 		const auto new_path = get_first_free_untitled_path("Project%x");
 		augs::create_directories(augs::path_type(new_path) += "/");
 		t.current_path = new_path;
-
-		/* 
-			Initial write-out so that we have some empty intercosms
-			in the folder to be loaded later on restart
-		*/
-
-		t.save_folder();
 	});
 }
 

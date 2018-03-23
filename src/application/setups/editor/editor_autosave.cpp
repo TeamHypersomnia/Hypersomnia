@@ -29,16 +29,9 @@ void editor_autosave::save(
 		if (const auto& h = f.history;
 			h.at_unsaved_revision() || h.was_modified()
 		) {
-			/* A write is required */
-			if (f.is_untitled()) {
-				/* The work is untitled anyway, so we save it in place. */ 
-				f.save_folder();
-			}
-			else {
-				auto autosave_path = f.get_autosave_path();
-				augs::create_directories(autosave_path += "/");
-				f.save_folder(autosave_path, ::get_project_name(f.current_path));
-			}
+			auto autosave_path = f.get_autosave_path();
+			augs::create_directories(autosave_path += "/");
+			f.save_folder(autosave_path, ::get_project_name(f.current_path));
 		}
 	}
 }
@@ -57,6 +50,8 @@ void open_last_folders(
 		for (const auto& real_path : opened_folders.paths) {
 			try {
 				try {
+					/* First try to load from the neighbouring autosave folder. */
+
 					auto new_folder = editor_folder(real_path);
 					const auto autosave_path = new_folder.get_autosave_path();
 					new_folder.load_folder(autosave_path, ::get_project_name(real_path));
@@ -76,6 +71,8 @@ void open_last_folders(
 					}
 				}
 				catch (editor_popup p) {
+					/* If no autosave folder was found, try the real path. */
+
 					auto new_folder = editor_folder(real_path);
 					new_folder.load_folder();
 					new_folder.history.mark_as_just_saved();
@@ -83,6 +80,8 @@ void open_last_folders(
 				}
 			}
 			catch (editor_popup p) {
+				/* Could load neither from autosave nor the real path. Utter failure. */
+
 				failures.push_back(p);
 			}
 		}

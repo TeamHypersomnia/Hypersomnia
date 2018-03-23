@@ -123,6 +123,10 @@ namespace augs {
 		auto& next_command() {
 			return commands[current_revision + 1];
 		}
+
+		bool empty() const {
+			return commands.empty();
+		}
 	};
 
 	template <class... CommandTypes>
@@ -138,7 +142,7 @@ namespace augs {
 
 		// GEN INTROSPECTOR class history_with_marks class... CommandTypes
 		// INTROSPECT BASE augs::history<history_with_marks<CommandTypes...>, CommandTypes...>
-		std::optional<index_type> saved_at_revision = static_cast<index_type>(-1);
+		std::optional<index_type> saved_at_revision;
 		bool modified_since_save = false;
 		// END GEN INTROSPECTOR
 
@@ -155,6 +159,7 @@ namespace augs {
 
 	public:
 		using base::get_current_revision;
+		using base::empty;
 
 		void mark_current_revision_as_saved() {
 			saved_at_revision = get_current_revision();
@@ -174,7 +179,7 @@ namespace augs {
 		}
 
 		bool at_unsaved_revision() const {
-			return !is_revision_saved(get_current_revision());
+			return !empty() && !is_revision_saved(get_current_revision());
 		}
 
 		bool was_modified() const {

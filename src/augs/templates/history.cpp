@@ -53,6 +53,7 @@ TEST_CASE("Templates History") {
 	history_type hist;
 
 	REQUIRE(!hist.at_unsaved_revision());
+	REQUIRE(hist.empty());
 
 	REQUIRE(context.a_value == 0);
 	REQUIRE(context.b_value == 0);
@@ -175,6 +176,7 @@ TEST_CASE("Templates HistoryUnsavedChangesTest") {
 	history_type hist;
 
 	REQUIRE(!hist.at_unsaved_revision());
+	REQUIRE(hist.empty());
 
 	REQUIRE(context.a_value == 0);
 	REQUIRE(context.b_value == 0);
