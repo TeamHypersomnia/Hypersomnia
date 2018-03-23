@@ -37,10 +37,6 @@ void light_system::clear() {
 	per_entity_cache.clear();
 }
 
-light_system::cache::cache() {
-	std::fill(all_variation_values.begin(), all_variation_values.end(), 0.f);
-}
-
 void light_system::advance_attenuation_variations(
 	const cosmos& cosmos,
 	const augs::delta dt

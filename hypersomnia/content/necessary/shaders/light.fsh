@@ -17,7 +17,12 @@ void main()
 	if(light_distance > max_distance) discard;
 	vec4 final_color = theColor;
 	final_color.rgb *= multiply_color;
-	final_color.a *= 1.0/(light_attenuation.x+light_attenuation.y*light_distance+light_attenuation.z*light_distance*light_distance); 
+
+	final_color.a *= 1.0 / (
+		light_attenuation.x
+		+ light_attenuation.y * light_distance
+		+ light_attenuation.z * light_distance * light_distance
+	); 
 
 	outputColor = final_color;
 }

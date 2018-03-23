@@ -48,8 +48,7 @@ class light_system {
 
 public:
 	struct cache {
-		std::array<float, 10> all_variation_values;
-		cache();
+		std::array<float, 10> all_variation_values = {};
 	};
 
 	audiovisual_cache_map<cache> per_entity_cache;
