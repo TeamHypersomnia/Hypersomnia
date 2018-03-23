@@ -831,6 +831,8 @@ bool editor_setup::handle_input_before_imgui(
 
 
 bool editor_setup::handle_input_before_game(
+	const necessary_images_in_atlas& sizes_for_icons,
+
 	const augs::event::state& common_input_state,
 	const augs::event::change e,
 
@@ -868,8 +870,11 @@ bool editor_setup::handle_input_before_game(
 
 		if (e.msg == message::mousemotion) {
 			selector.do_mousemotion(
+				sizes_for_icons,
+
 				work().world,
 				world_cursor_pos,
+				current_cone,
 				common_input_state[key::LMOUSE]
 			);
 

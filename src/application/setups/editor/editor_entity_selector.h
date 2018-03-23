@@ -8,7 +8,30 @@
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 
+#include "view/necessary_image_id.h"
+#include "view/necessary_resources.h"
 #include "application/setups/editor/editor_settings.h"
+
+template <class F>
+void for_each_iconed_entity(const cosmos& cosm, F callback) {
+	cosm.for_each_having<components::light>([&](const auto typed_handle) {
+		callback(
+			typed_handle,
+			assets::necessary_image_id::EDITOR_ICON_LIGHT, 
+			typed_handle.get_logic_transform(),
+			typed_handle.template get<components::light>().color
+		);
+	});
+
+	cosm.for_each_having<components::wandering_pixels>([&](const auto typed_handle) {
+		callback(
+			typed_handle,
+			assets::necessary_image_id::EDITOR_ICON_WANDERING_PIXELS, 
+			typed_handle.get_logic_transform(),
+			typed_handle.template get<components::wandering_pixels>().colorize
+		);
+	});
+}
 
 class editor_entity_selector {
 	using target_selections_type = std::unordered_set<entity_id>;
@@ -46,8 +69,11 @@ public:
 	) const;
 
 	void do_mousemotion(
+		const necessary_images_in_atlas& sizes_for_icons,
+
 		const cosmos& cosm,
 		vec2 world_cursor_pos,
+		camera_cone current_cone,
 		bool left_button_pressed
 	);
 
@@ -67,6 +93,29 @@ public:
 				callback(e);
 			}
 		}
+	}
+
+	std::optional<rgba> get_active_color(
+		const editor_entity_selector_settings& settings,
+		const entity_id id, 
+		const target_selections_type& signi_selections
+	) const {
+		if (held == id) {
+			return settings.held_color;
+		}
+
+		if (hovered == id) {
+			return settings.hovered_color;
+		}
+
+		const bool in_signi = found_in(signi_selections, id);
+		const bool in_rectangular = found_in(in_rectangular_selection.all, id);
+
+		if (in_signi != in_rectangular) {
+			return settings.selected_color;
+		}
+
+		return std::nullopt;
 	}
 
 	template <class F>

@@ -382,15 +382,6 @@ struct basic_xywh {
 		this->h = bottom - y;
 	}
 
-	basic_xywh& expand_from_center(const basic_vec2<T> amount) {
-		x -= amount.x;
-		y -= amount.y;
-		w += amount.x;
-		h += amount.y;
-
-		return *this;
-	}
-
 	T r() const {
 		return x + this->w;
 	};
@@ -404,6 +395,17 @@ struct basic_xywh {
 		h = v.y;
 
 		return *this;
+	}
+
+	auto expand_from_center(const basic_vec2<T> amount) const {
+		basic_xywh result = *this;
+
+		result.x -= amount.x;
+		result.y -= amount.y;
+		result.w += amount.x * 2;
+		result.h += amount.y * 2;
+
+		return result;
 	}
 
 	auto expand_to_square() const {

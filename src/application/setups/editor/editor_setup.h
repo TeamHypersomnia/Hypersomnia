@@ -12,6 +12,8 @@
 #include "game/detail/visible_entities.h"
 
 #include "view/necessary_image_id.h"
+#include "view/necessary_resources.h"
+
 #include "view/viewables/all_viewables_defs.h"
 #include "view/viewables/viewables_loading_type.h"
 
@@ -216,6 +218,8 @@ public:
 	);
 
 	bool handle_input_before_game(
+		const necessary_images_in_atlas& sizes_for_icons,
+
 		const augs::event::state& common_input_state,
 		const augs::event::change change,
 
@@ -280,22 +284,18 @@ public:
 		if (anything_opened() && player.paused) {
 			const auto& world = work().world;
 
-			world.for_each_having<components::light>([&](const auto typed_handle) {
-				callback(
-					assets::necessary_image_id::EDITOR_ICON_LIGHT, 
-					typed_handle.get_logic_transform(),
-					typed_handle.template get<components::light>().color
-				);
-			});
-
-			world.for_each_having<components::wandering_pixels>([&](const auto typed_handle) {
-				callback(
-					assets::necessary_image_id::EDITOR_ICON_WANDERING_PIXELS, 
-					typed_handle.get_logic_transform(),
-					typed_handle.template get<components::wandering_pixels>().colorize
-				);
+			::for_each_iconed_entity(world, [&](auto&&... args) {
+				callback(std::forward<decltype(args)>(args)...);
 			});
 		}
+	}
+
+	std::optional<rgba> get_active_color(const entity_id id) const {
+		if (anything_opened() && player.paused) {
+			return selector.get_active_color(settings.entity_selector, id, view().selected_entities);
+		}
+
+		return std::nullopt;
 	}
 
 	template <class F>

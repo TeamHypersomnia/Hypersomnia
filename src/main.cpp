@@ -312,6 +312,10 @@ int work(const int argc, const char* const * const argv) try {
 		{
 			bool new_atlas_required = false;
 			
+			if (necessary_atlas_entries.empty()) {
+				new_atlas_required = true;
+			}
+
 			if (!game_world_atlas.has_value()) {
 				new_atlas_required = true;
 			}
@@ -1321,7 +1325,7 @@ int work(const int argc, const char* const * const argv) try {
 
 						if constexpr(T::handles_window_input) {
 							return setup.handle_input_before_game(
-								_common_input_state, e, _window, _lua
+								necessary_atlas_entries, _common_input_state, e, _window, _lua
 							);
 						}
 
@@ -1610,8 +1614,30 @@ int work(const int argc, const char* const * const argv) try {
 			if (current_setup) {
 				on_specific_setup([&](editor_setup& editor) {
 					editor.for_each_icon(
-						[&](const auto image_id, const components::transform world_transform, const rgba color){
+						[&](const auto typed_handle, const auto image_id, const components::transform world_transform, const rgba color){
 							const auto screen_space_pos = get_camera().to_screen_space(screen_size, world_transform.pos);
+
+							const auto aabb = xywh::center_and_size(screen_space_pos, necessary_atlas_entries[image_id].get_size());
+							const auto expanded_square = aabb.expand_to_square();
+
+							if (auto active_color = editor.get_active_color(typed_handle.get_id())) {
+								active_color->a = static_cast<rgba_channel>(std::min(1.8 * active_color->a, 255.0));
+
+								const auto selection_indicator_aabb = expanded_square.expand_from_center(vec2(5, 5));
+
+								get_drawer().aabb(
+									selection_indicator_aabb,
+									*active_color
+								);
+
+								active_color->a = static_cast<rgba_channel>(std::min(2.2 * active_color->a, 255.0));
+
+								get_drawer().border(
+									selection_indicator_aabb,
+									*active_color,
+									border_input { 1, 0 }
+								);
+							}
 
 							get_drawer().base::aabb_centered(
 								necessary_atlas_entries[image_id],
@@ -1619,10 +1645,8 @@ int work(const int argc, const char* const * const argv) try {
 								color
 							);
 
-							const auto aabb = xywh::center_and_size(screen_space_pos, necessary_atlas_entries[image_id].get_size());
-
 							get_drawer().border(
-								aabb.expand_to_square(),
+								expanded_square,
 								color,
 								border_input { 1, 2 }
 							);

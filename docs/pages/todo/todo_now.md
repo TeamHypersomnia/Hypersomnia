@@ -7,6 +7,8 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
+- visible_entities should be templated by all_type
+
 - Add a flag to build editor or not
 	- Because it builds really long
 

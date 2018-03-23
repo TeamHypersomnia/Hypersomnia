@@ -92,11 +92,18 @@ bool should_hover_standard_aabb(const cosmos& cosm, const entity_id id) {
 };
 
 void editor_entity_selector::do_mousemotion(
+	const necessary_images_in_atlas& sizes_for_icons,
+
 	const cosmos& cosm,
 	const vec2 world_cursor_pos,
+	const camera_cone current_cone,
 	const bool left_button_pressed
 ) {
 	hovered = {};
+
+	auto get_world_xywh = [&](const auto icon_id, const components::transform where) {
+		return xywh::center_and_size(where.pos, vec2(sizes_for_icons.at(icon_id).get_size()) / current_cone.zoom).expand_to_square();
+	};
 
 	{
 		const auto drag_dead_area = 3.f;
@@ -125,14 +132,42 @@ void editor_entity_selector::do_mousemotion(
 		erase_if(in_rectangular_selection.all, [&](const entity_id id) {
 			return !should_hover_standard_aabb(cosm, id);
 	   	});
-	}
-	else {
-		hovered = get_hovered_world_entity(
-			cosm, 
-			world_cursor_pos, 
-			[&](const entity_id id) { 
-				return should_hover_standard_aabb(cosm, id);
+
+		for_each_iconed_entity(cosm, 
+			[&](const auto handle, 
+				const auto tex_id,
+			   	const auto where,
+				const auto color
+			) {
+				if (get_world_xywh(tex_id, where).hover(world_range)) {
+					in_rectangular_selection.all.push_back(handle.get_id());
+				}
 			}
 		);
+	}
+	else {
+		hovered.unset();
+
+		for_each_iconed_entity(cosm, 
+			[&](const auto handle, 
+				const auto tex_id,
+			   	const auto where,
+				const auto color
+			) {
+				if (get_world_xywh(tex_id, where).hover(world_cursor_pos)) {
+					hovered = handle.get_id();
+				}
+			}
+		);
+
+		if (!hovered) {
+			hovered = get_hovered_world_entity(
+				cosm, 
+				world_cursor_pos, 
+				[&](const entity_id id) { 
+					return should_hover_standard_aabb(cosm, id);
+				}
+			);
+		}
 	}
 }
