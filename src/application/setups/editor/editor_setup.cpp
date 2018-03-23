@@ -384,7 +384,7 @@ void editor_setup::perform_custom_imgui(
 		if (anything_opened()) {
 			perform_editor_tab_gui(
 				[&](const auto index_to_close){ close_folder(index_to_close); },
-				[&](const auto index_to_set){ set_current(index_to_set); },
+				[&](const auto index_to_set){ LOG_NVPS(index_to_set); set_current(index_to_set); },
 				signi,
 				menu_bar_size.y
 			);
@@ -706,7 +706,7 @@ void editor_setup::prev_tab() {
 }
 
 void editor_setup::close_folder(const folder_index i) {
-	auto& folder_to_close = signi.folders[i];
+   	auto& folder_to_close = signi.folders[i];
 
 	if (folder_to_close.at_unsaved_revision()) {
 		set_popup({ "Error", "Nie", "Nie" });
@@ -726,6 +726,8 @@ void editor_setup::close_folder(const folder_index i) {
 	else {
 		signi.current_index = std::min(signi.current_index, static_cast<folder_index>(signi.folders.size() - 1));
 	}
+
+	base::refresh();
 }
 
 void editor_setup::close_folder() {

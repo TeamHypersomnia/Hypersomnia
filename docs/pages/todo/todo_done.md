@@ -341,3 +341,7 @@ we consider whole type overrides too complex architeciturally:
 	- Alt+A - all entities
 	- Alt+H - history
 	- Alt+C - common
+
+- add docking so we'll be able to get rid of that tab api
+	- we have a bug when closing a tab with mouse
+
