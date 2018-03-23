@@ -784,22 +784,23 @@ bool editor_setup::handle_input_before_imgui(
 			default: break;
 		}
 
+		const bool has_alt{ common_input_state[key::LALT] };
+
+		if (has_alt) {
+			switch (k) {
+				case key::A: all_entities_gui.open(); return true;
+				case key::H: history_gui.open(); return true;
+				case key::S: selected_entities_gui.open(); return true;
+				case key::C: common_state_gui.open(); return true;
+				case key::P: player.show = true; return true;
+				case key::U: show_summary = true; return true;
+				default: break;
+			}
+		}
+
 		if (player.paused) {
-			const bool has_alt{ common_input_state[key::LALT] };
 			const bool has_ctrl{ common_input_state[key::LCTRL] };
 			const bool has_shift{ common_input_state[key::LSHIFT] };
-
-			if (has_alt) {
-				switch (k) {
-					case key::A: all_entities_gui.open(); return true;
-					case key::H: history_gui.open(); return true;
-					case key::S: selected_entities_gui.open(); return true;
-					case key::C: common_state_gui.open(); return true;
-					case key::P: player.show = true; return true;
-					case key::U: show_summary = true; return true;
-					default: break;
-				}
-			}
 
 			if (has_ctrl) {
 				if (has_shift) {

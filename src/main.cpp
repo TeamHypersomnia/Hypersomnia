@@ -1324,9 +1324,13 @@ int work(const int argc, const char* const * const argv) try {
 						using T = std::decay_t<decltype(setup)>;
 
 						if constexpr(T::handles_window_input) {
-							return setup.handle_input_before_game(
-								necessary_atlas_entries, _common_input_state, e, _window, _lua
-							);
+							if (!necessary_atlas_entries.empty()) {
+								/* Viewables reloading happens later so it might not be ready yet */
+
+								return setup.handle_input_before_game(
+									necessary_atlas_entries, _common_input_state, e, _window, _lua
+								);
+							}
 						}
 
 						return false;

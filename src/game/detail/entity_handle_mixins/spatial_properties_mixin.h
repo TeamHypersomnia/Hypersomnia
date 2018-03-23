@@ -213,12 +213,12 @@ void spatial_properties_mixin<E>::set_logic_transform(const components::transfor
 	const auto handle = *static_cast<const E*>(this);
 	const auto owner_body = handle.get_owner_of_colliders();
 
-	const bool this_entity_does_not_have_its_own_transform = 
+	if (const bool this_entity_does_not_have_its_own_transform = 
 		owner_body.alive() 
 		&& owner_body != handle
-	;
-
-	ensure(!this_entity_does_not_have_its_own_transform);
+	) {
+		return;
+	}
 	
 	if (const auto rigid_body = handle.template find<components::rigid_body>()) {
 		rigid_body.set_transform(t);
