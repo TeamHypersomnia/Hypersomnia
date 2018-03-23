@@ -785,8 +785,21 @@ bool editor_setup::handle_input_before_imgui(
 		}
 
 		if (player.paused) {
+			const bool has_alt{ common_input_state[key::LALT] };
 			const bool has_ctrl{ common_input_state[key::LCTRL] };
 			const bool has_shift{ common_input_state[key::LSHIFT] };
+
+			if (has_alt) {
+				switch (k) {
+					case key::A: all_entities_gui.open(); return true;
+					case key::H: history_gui.open(); return true;
+					case key::S: selected_entities_gui.open(); return true;
+					case key::C: common_state_gui.open(); return true;
+					case key::P: player.show = true; return true;
+					case key::U: show_summary = true; return true;
+					default: break;
+				}
+			}
 
 			if (has_ctrl) {
 				if (has_shift) {
@@ -800,8 +813,6 @@ bool editor_setup::handle_input_before_imgui(
 
 				switch (k) {
 					case key::S: save(lua, window); return true;
-					case key::F: all_entities_gui.open(); return true;
-					case key::H: history_gui.open(); return true;
 					case key::O: open(window); return true;
 					case key::COMMA: go_to_all(); return true;
 					case key::N: new_tab(); return true;

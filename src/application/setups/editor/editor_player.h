@@ -1,7 +1,7 @@
 #pragma once
 
 struct editor_player {
-	bool show = true;
+	bool show = false;
 	bool paused = true;
 	double speed = 1.0;
 

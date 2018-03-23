@@ -328,3 +328,16 @@ we consider whole type overrides too complex architeciturally:
 		- Ctrl+Enter on selection adds to current selection
 		- In case of just one entity, always unify
 		- if we introduce just another node of "unified", we stay stateless
+
+- change the scale of attenuation variables. we might later even pass doubles in the light system?
+
+- light should have an option to rescale the distance
+	- done: we can now just tweak quadratic quite easily
+	- so that it just becomes bigger, without altering the attenuations
+- we have a problem with too small values for light
+
+- Mnemonic bindings for windows
+	- Alt+S - selected
+	- Alt+A - all entities
+	- Alt+H - history
+	- Alt+C - common

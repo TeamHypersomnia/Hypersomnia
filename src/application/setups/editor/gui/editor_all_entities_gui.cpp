@@ -201,6 +201,8 @@ void editor_all_entities_gui::perform(
 
 	using namespace augs::imgui;
 
+	ImGui::SetNextWindowSize(ImVec2(350,560), ImGuiCond_FirstUseEver);
+
 	auto entities = scoped_window(title.c_str(), &show);
 
 	ImGui::Columns(2);

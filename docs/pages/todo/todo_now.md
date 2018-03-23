@@ -7,21 +7,11 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
-- change the scale of attenuation variables. we might later even pass doubles in the light system?
-
-- light should have an option to rescale the distance
-	- so that it just becomes bigger, without altering the attenuations
-- we have a problem with too small values for light
 - visible_entities should be templated by all_type
 
 - Add a flag to build editor or not
 	- Because it builds really long
 
-- Mnemonic bindings for windows
-	- Alt+S - selected
-	- Alt+A - all entities
-	- Alt+H - history
-	- Alt+C - common
 - Perhaps something to let us select and manipulate entities in gameplay mode?
 	- will it be useful?
 

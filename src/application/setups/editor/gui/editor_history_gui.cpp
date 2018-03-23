@@ -21,6 +21,8 @@ void editor_history_gui::perform(const editor_command_input in) {
 
 	auto& history = in.folder.history;
 
+	ImGui::SetNextWindowSize(ImVec2(350,560), ImGuiCond_FirstUseEver);
+
 	auto window = scoped_window("History", &show);
 
 	const auto& style = GetStyle();
