@@ -11,6 +11,7 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/detail/visible_entities.h"
 
+#include "view/necessary_image_id.h"
 #include "view/viewables/all_viewables_defs.h"
 #include "view/viewables/viewables_loading_type.h"
 
@@ -272,6 +273,29 @@ public:
 	template <class F>
 	void for_each_line(F callback) const {
 
+	}
+
+	template <class F>
+	void for_each_icon(F callback) const {
+		if (anything_opened() && player.paused) {
+			const auto& world = work().world;
+
+			world.for_each_having<components::light>([&](const auto typed_handle) {
+				callback(
+					assets::necessary_image_id::EDITOR_ICON_LIGHT, 
+					typed_handle.get_logic_transform(),
+					typed_handle.template get<components::light>().color
+				);
+			});
+
+			world.for_each_having<components::wandering_pixels>([&](const auto typed_handle) {
+				callback(
+					assets::necessary_image_id::EDITOR_ICON_WANDERING_PIXELS, 
+					typed_handle.get_logic_transform(),
+					typed_handle.template get<components::wandering_pixels>().colorize
+				);
+			});
+		}
 	}
 
 	template <class F>

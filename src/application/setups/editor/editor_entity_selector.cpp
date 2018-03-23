@@ -75,6 +75,22 @@ void editor_entity_selector::unhover() {
 	hovered = {};
 }
 
+bool should_hover_standard_aabb(const cosmos& cosm, const entity_id id) {
+	return cosm[id].dispatch([](const auto typed_handle){
+		using T = std::decay_t<decltype(typed_handle)>;
+		using E = typename T::used_entity_type;
+
+		if (std::is_same_v<E, wandering_pixels_decoration>) {
+			return false;
+		}
+		else if (std::is_same_v<E, static_light>) {
+			return false;
+		}
+
+		return true;
+	});
+};
+
 void editor_entity_selector::do_mousemotion(
 	const cosmos& cosm,
 	const vec2 world_cursor_pos,
@@ -105,17 +121,17 @@ void editor_entity_selector::do_mousemotion(
 
 		in_rectangular_selection.acquire_non_physical(query);
 		in_rectangular_selection.acquire_physical(query);
+
+		erase_if(in_rectangular_selection.all, [&](const entity_id id) {
+			return !should_hover_standard_aabb(cosm, id);
+	   	});
 	}
 	else {
 		hovered = get_hovered_world_entity(
 			cosm, 
 			world_cursor_pos, 
 			[&](const entity_id id) { 
-				if (cosm[id].has<components::wandering_pixels>()) {
-					return false;
-				}
-
-				return true; 
+				return should_hover_standard_aabb(cosm, id);
 			}
 		);
 	}

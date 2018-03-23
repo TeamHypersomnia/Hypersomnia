@@ -406,6 +406,17 @@ struct basic_xywh {
 		return *this;
 	}
 
+	auto expand_to_square() const {
+		basic_xywh result;
+		result.w = std::max(w, h);
+		result.h = result.w;
+
+		result.x = x - (result.w - w) / 2;
+		result.y = y - (result.h - h) / 2;
+
+		return result;
+	}
+
 	basic_vec2<T> get_size() const {
 		return{ w, h };
 	}

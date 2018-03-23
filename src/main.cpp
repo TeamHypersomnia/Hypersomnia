@@ -1609,6 +1609,26 @@ int work(const int argc, const char* const * const argv) try {
 
 			if (current_setup) {
 				on_specific_setup([&](editor_setup& editor) {
+					editor.for_each_icon(
+						[&](const auto image_id, const components::transform world_transform, const rgba color){
+							const auto screen_space_pos = get_camera().to_screen_space(screen_size, world_transform.pos);
+
+							get_drawer().base::aabb_centered(
+								necessary_atlas_entries[image_id],
+								screen_space_pos,
+								color
+							);
+
+							const auto aabb = xywh::center_and_size(screen_space_pos, necessary_atlas_entries[image_id].get_size());
+
+							get_drawer().border(
+								aabb.expand_to_square(),
+								color,
+								border_input { 1, 2 }
+							);
+						}	
+					);
+
 					const auto mouse = common_input_state.mouse.pos;
 
 					if (const auto r = editor.get_screen_space_rect_selection(screen_size, mouse)) {

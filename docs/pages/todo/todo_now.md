@@ -7,6 +7,9 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
+- Add a flag to build editor or not
+	- Because it builds really long
+
 - Mnemonic bindings for windows
 	- Alt+S - selected
 	- Alt+A - all entities
@@ -14,27 +17,6 @@ summary: Just a hidden scratchpad.
 	- Alt+C - common
 - Perhaps something to let us select and manipulate entities in gameplay mode?
 	- will it be useful?
-
-- Selection window
-	- Proposition: have always the nodes for entity types
-		- flavours there could be unified already
-		- e.g.:
-			[ Save selection ]
-			[ ] Unified view - this actually is not much important because most of the time entity types won't be considered two at a time
-			-> Shootable weapon
-				Editing properties for Kek9 and Sample rifle
-				-> Name
-				-> Entities	
-					[ ] Unified view
-					-> 2 of Kek9
-					-> 9 of Sample rifle
-			-> Sprite decoration
-				Editing properties for Fish
-				-> Entities
-					[ ] Unified view
-		- Ctrl+Enter on selection adds to current selection
-		- In case of just one entity, always unify
-		- if we introduce just another node of "unified", we stay stateless
 
 - handle bitsets properly, e.g. parties and hostile parties
 - handle slot categories properly, as well

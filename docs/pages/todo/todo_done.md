@@ -307,3 +307,24 @@ we consider whole type overrides too complex architeciturally:
 		- The old values will be a stream of old values actually
 	- mark different values in orange
 
+
+- Selection window
+	- Proposition: have always the nodes for entity types
+		- flavours there could be unified already
+		- e.g.:
+			[ Save selection ]
+			[ ] Unified view - this actually is not much important because most of the time entity types won't be considered two at a time
+			-> Shootable weapon
+				Editing properties for Kek9 and Sample rifle
+				-> Name
+				-> Entities	
+					[ ] Unified view
+					-> 2 of Kek9
+					-> 9 of Sample rifle
+			-> Sprite decoration
+				Editing properties for Fish
+				-> Entities
+					[ ] Unified view
+		- Ctrl+Enter on selection adds to current selection
+		- In case of just one entity, always unify
+		- if we introduce just another node of "unified", we stay stateless
