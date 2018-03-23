@@ -27,6 +27,10 @@
 #include "view/audiovisual_state/systems/interpolation_system.h"
 #include "view/audiovisual_state/systems/particles_simulation_system.h"
 
+#define CONST_MULT 100
+#define LINEAR_MULT 10000
+#define QUADRATIC_MULT 10000000
+
 thread_local randomization rng;
 
 void light_system::reserve_caches_for_entities(const std::size_t n) {
@@ -211,9 +215,9 @@ void light_system::render_all_lights(const light_system_input in) const {
 		light_shader.set_uniform(
 			light_attenuation_uniform,
 			vec3 {
-				cache.all_variation_values[0] + light_def.constant.base_value,
-				cache.all_variation_values[1] + light_def.linear.base_value,
-				cache.all_variation_values[2] + light_def.quadratic.base_value
+				(cache.all_variation_values[0] + light_def.constant.base_value) / CONST_MULT,
+				(cache.all_variation_values[1] + light_def.linear.base_value) / LINEAR_MULT,
+				(cache.all_variation_values[2] + light_def.quadratic.base_value) / QUADRATIC_MULT
 			}
 		);
 		
@@ -231,9 +235,9 @@ void light_system::render_all_lights(const light_system_input in) const {
 		
 		light_shader.set_uniform(light_attenuation_uniform,
 			vec3 {
-				cache.all_variation_values[3] + light_def.wall_constant.base_value,
-				cache.all_variation_values[4] + light_def.wall_linear.base_value,
-				cache.all_variation_values[5] + light_def.wall_quadratic.base_value
+				(cache.all_variation_values[3] + light_def.wall_constant.base_value) / CONST_MULT,
+				(cache.all_variation_values[4] + light_def.wall_linear.base_value) / LINEAR_MULT,
+				(cache.all_variation_values[5] + light_def.wall_quadratic.base_value) / QUADRATIC_MULT
 			}
 		);
 		

@@ -12,12 +12,6 @@ namespace test_flavours {
 			auto& meta = get_test_flavour(flavours, test_static_lights::STRONG_LAMP);
 
 			invariants::light light; 
-
-			light.max_distance.base_value = 4500.f;
-			light.constant.base_value = 0.15f;
-			light.linear.base_value = 0.000005f;
-			light.wall_max_distance.base_value = 4000.f;
-
 			meta.set(light);
 		}
 

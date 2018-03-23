@@ -6,8 +6,8 @@ struct randomization;
 
 struct light_value_variation {
 	// GEN INTROSPECTOR struct light_value_variation
-	float min_value = 0.f;
-	float max_value = 0.f;
+	float min_variation = 0.f;
+	float max_variation = 0.f;
 	float change_speed = 0.f;
 	// END GEN INTROSPECTOR
 
