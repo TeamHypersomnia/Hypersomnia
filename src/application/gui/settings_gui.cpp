@@ -114,8 +114,8 @@ void settings_gui_state::perform(
 			revert(f);
 		};
 
-		auto revertable_drag_rect_bounded_vec2 = [&](auto l, auto& f, auto&&... args) {
-			drag_rect_bounded_vec2(l, f, std::forward<decltype(args)>(args)...);
+		auto revertable_drag_rect_bounded_vec2i = [&](auto l, auto& f, auto&&... args) {
+			drag_rect_bounded_vec2i(l, f, std::forward<decltype(args)>(args)...);
 			revert(f);
 		};
 
@@ -140,8 +140,8 @@ void settings_gui_state::perform(
 					{
 						const auto disp = augs::get_display();
 
-						revertable_drag_rect_bounded_vec2("Window position", config.window.position, 0.3f, vec2i{ 0, 0 }, disp.get_size(), "%.0f");
-						revertable_drag_rect_bounded_vec2("Windowed size", config.window.size, 0.3f, vec2i{ 0, 0 }, disp.get_size(), "%.0f");
+						revertable_drag_rect_bounded_vec2i("Window position", config.window.position, 0.3f, vec2i{ 0, 0 }, disp.get_size());
+						revertable_drag_rect_bounded_vec2i("Windowed size", config.window.size, 0.3f, vec2i{ 0, 0 }, disp.get_size());
 					}
 
 					revertable_checkbox(CONFIG_NVP(window.border));

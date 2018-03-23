@@ -187,13 +187,13 @@ namespace augs {
 			}
 		}
 
-		inline bool drag_rect_bounded_vec2(
+		inline bool drag_rect_bounded_vec2i(
 			const std::string& label, 
 			vec2i& into, 
 			const float speed, 
 			vec2i lower_bound, 
 			vec2i upper_bound, 
-			const std::string& display_format
+			const std::string& display_format = "%.0f"
 		) {
 			return 
 				ImGui::DragIntN(
