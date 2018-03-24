@@ -43,6 +43,13 @@ struct special_physics {
 	//float measured_carried_mass = 0.f;
 };
 
+struct physics_engine_transforms {
+	// GEN INTROSPECTOR struct physics_engine_transforms
+	b2Transform m_xf;
+	b2Sweep m_sweep;
+	// END GEN INTROSPECTOR
+};
+
 namespace components {
 	struct rigid_body {
 		static constexpr bool is_synchronized = true;
@@ -53,8 +60,7 @@ namespace components {
 		);
 
 		// GEN INTROSPECTOR struct components::rigid_body
-		b2Transform transform;
-		b2Sweep sweep;
+		physics_engine_transforms physics_transforms;
 
 		vec2 velocity;
 		float angular_velocity = 0.f;
@@ -158,8 +164,9 @@ public:
 	void update_after_step(const body_type& b) const {
 		auto& body = get_raw_component({});
 
-		body.transform = b.m_xf;
-		body.sweep = b.m_sweep;
+		body.physics_transforms.m_xf = b.m_xf;
+		body.physics_transforms.m_sweep = b.m_sweep;
+
 		body.velocity = vec2(b.GetLinearVelocity());
 		body.angular_velocity = b.GetAngularVelocity();
 	}
@@ -415,9 +422,9 @@ void component_synchronizer<E, components::rigid_body>::set_transform(const comp
 	);
 
 	if (const auto body = find_body()) {
-		if (!(body->m_xf == data.transform)) {
-			body->m_xf = data.transform;
-			body->m_sweep = data.sweep;
+		if (!(body->m_xf == data.physics_transforms.m_xf)) {
+			body->m_xf = data.physics_transforms.m_xf;
+			body->m_sweep = data.physics_transforms.m_sweep;
 
 			auto* broadPhase = &body->m_world->m_contactManager.m_broadPhase;
 

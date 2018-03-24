@@ -20,5 +20,5 @@ void components::rigid_body::set_transform(
 	const si_scaling si,
 	const components::transform& t
 ) {
-	t.to_si_space(si).to_box2d_transforms(transform, sweep);
+	t.to_si_space(si).to_physics_engine_transforms(physics_transforms);
 }

@@ -65,15 +65,14 @@ struct basic_transform {
 	}
 
 	template <
-		class b2_transform_type, 
-		class b2_sweep_type, 
+		class P, 
 		class K = T,
 		class = std::enable_if_t<std::is_same_v<K, real32>>
 	>
-	void to_box2d_transforms(
-		b2_transform_type& m_xf,
-		b2_sweep_type& m_sweep
-	) const {
+	void to_physics_engine_transforms(P& output) const {
+		auto& m_xf = output.m_xf;
+		auto& m_sweep = output.m_sweep;
+
 		m_xf.p.x = pos.x;
 		m_xf.p.y = pos.y;
 		m_xf.q.Set(rotation);

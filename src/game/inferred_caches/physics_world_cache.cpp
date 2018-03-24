@@ -147,9 +147,9 @@ void physics_world_cache::infer_cache_for_rigid_body(const const_entity_handle h
 				body.SetAngularVelocity(data.angular_velocity);
 			}
 	
-			if (!(body.m_xf == data.transform)) {
-				body.m_xf = data.transform;
-				body.m_sweep = data.sweep;
+			if (!(body.m_xf == data.physics_transforms.m_xf)) {
+				body.m_xf = data.physics_transforms.m_xf;
+				body.m_sweep = data.physics_transforms.m_sweep;
 	
 				b2BroadPhase* broadPhase = &body.m_world->m_contactManager.m_broadPhase;
 	
@@ -189,8 +189,8 @@ void physics_world_cache::infer_cache_for_rigid_body(const const_entity_handle h
 		def.angularDamping = damping.angular;
 		def.linearDamping = damping.linear;
 
-		def.transform = physics_data.transform;
-		def.sweep = physics_data.sweep;
+		def.transform = physics_data.physics_transforms.m_xf;
+		def.sweep = physics_data.physics_transforms.m_sweep;
 
 		def.linearVelocity = b2Vec2(physics_data.velocity);
 		def.angularVelocity = physics_data.angular_velocity;
