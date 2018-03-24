@@ -533,7 +533,6 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/application/setups/editor/gui/editor_go_to_gui.cpp"
 	"src/application/setups/editor/editor_camera.cpp"
 	"src/application/setups/editor/editor_popup.cpp"
-	"src/application/setups/editor/editor_entity_selector.cpp"
 	"src/application/setups/editor/editor_command_input.cpp"
 	"src/application/setups/editor/commands/fill_with_test_scene_command.cpp"
 	"src/application/setups/editor/commands/delete_entities_command.cpp"
@@ -542,6 +541,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/augs/templates/introspect.cpp"
 	"src/application/setups/editor/gui/editor_common_state_gui.cpp"
 	"src/application/setups/editor/commands/move_entities_command.cpp"
+	"src/application/setups/editor/gui/editor_entity_selector.cpp"
 )
 
 if(BUILD_WINDOW_FRAMEWORK)

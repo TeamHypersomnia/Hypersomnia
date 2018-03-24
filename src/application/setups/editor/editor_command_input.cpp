@@ -1,8 +1,11 @@
 #include "application/intercosm.h"
 
 #include "application/setups/editor/editor_command_input.h"
-#include "application/setups/editor/editor_entity_selector.h"
 #include "application/setups/editor/editor_folder.h"
+
+#include "application/setups/editor/gui/editor_entity_selector.h"
+#include "application/setups/editor/gui/editor_entity_mover.h"
+
 #include "application/setups/editor/gui/editor_all_entities_gui.h"
 
 cosmos& editor_command_input::get_cosmos() const {

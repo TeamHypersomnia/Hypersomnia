@@ -10,9 +10,7 @@ namespace sol {
 struct editor_entity_mover;
 struct editor_all_entities_gui;
 
-struct editor_entity_mover {
-	bool active = false;
-};
+struct editor_entity_mover;
 
 class cosmos;
 
