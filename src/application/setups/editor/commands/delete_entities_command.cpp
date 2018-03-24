@@ -18,34 +18,22 @@ void delete_entities_command::push_entry(const const_entity_handle handle) {
 
 		const auto id = typed_handle.get_id();
 
-		std::get<vector_type>(deleted_entities).push_back({ typed_handle.get() });
+		deleted_entities.get<vector_type>().push_back({ typed_handle.get() });
 	});
-}
-
-std::size_t delete_entities_command::count_deleted() const {
-	std::size_t total = 0;
-
-	for_each_through_std_get(deleted_entities, [&](const auto& v) {
-		total += v.size();
-	});
-
-	return total;
 }
 
 bool delete_entities_command::empty() const {
-	return count_deleted() == 0;
+	return size() == 0;
 }
 
 void delete_entities_command::redo(const editor_command_input in) {
 	in.purge_selections();
 	in.interrupt_tweakers();
 
-	auto& cosm = in.folder.work->world;
+	auto& cosm = in.get_cosmos();
 
-	for_each_through_std_get(deleted_entities, [&](auto& v) {
-		for (auto& e : v) {
-			e.undo_delete_input = *cosmic::delete_entity(cosm[e.content.guid]);
-		}	
+	deleted_entities.for_each([&](auto& e) {
+		e.undo_delete_input = *cosmic::delete_entity(cosm[e.content.guid]);
 	});
 }
 
@@ -53,20 +41,18 @@ void delete_entities_command::undo(const editor_command_input in) const {
 	auto& f = in.folder;
 	auto& cosm = f.work->world;
 
-	/* 
-		NOTE: Pools should be independent, but to be theoretically pure,
-		we should implement reverse_for_each_through_std_get.
-	*/
-
 	{
 		auto& selections = f.view.selected_entities;
 		selections.clear();
 
-		for_each_through_std_get(deleted_entities, [&](const auto& v) {
-			for (const auto& e : reverse(v)) {
-				const auto undeleted = cosmic::undo_delete_entity(cosm, e.undo_delete_input, e.content, reinference_type::NONE);
-				selections.emplace(undeleted.get_id());
-			}	
+		/* 
+			NOTE: Pools should be independent, but to be theoretically pure,
+			we should implement reverse_for_each_through_std_get inside for_each_reverse.
+		*/
+
+		deleted_entities.for_each_reverse([&](const auto& e) {
+			const auto undeleted = cosmic::undo_delete_entity(cosm, e.undo_delete_input, e.content, reinference_type::NONE);
+			selections.emplace(undeleted.get_id());
 		});
 	}
 

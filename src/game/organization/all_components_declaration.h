@@ -79,7 +79,9 @@ using assert_always_together = type_list<
 >;
 
 using assert_never_together = type_list<
-	type_pair<components::rigid_body, components::transform>
+	type_pair<components::rigid_body, components::transform>,
+	type_pair<components::wandering_pixels, components::transform>,
+	type_pair<components::rigid_body, components::wandering_pixels>
 >;
 
 using always_present_invariants = type_list<

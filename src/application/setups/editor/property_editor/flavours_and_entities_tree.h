@@ -1,9 +1,7 @@
 #pragma once
 #include "augs/misc/imgui/imgui_control_wrappers.h"
-#include "application/setups/editor/commands/editor_command_structs.h"
 
 #include "application/setups/editor/property_editor/property_editor_structs.h"
-
 #include "application/setups/editor/property_editor/flavour_properties_editor.h"
 #include "application/setups/editor/property_editor/entity_properties_editor.h"
 

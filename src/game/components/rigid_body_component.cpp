@@ -16,9 +16,33 @@ components::rigid_body::rigid_body(
 	physics_transforms.set(si, t);
 }
 
+components::transform physics_engine_transforms::get(const si_scaling si) const {
+	return get().to_user_space(si);
+}
+
+components::transform physics_engine_transforms::get() const {
+	return { m_xf.p, m_sweep.a };
+}
+
 void physics_engine_transforms::set(
 	const si_scaling si,
 	const components::transform& t
 ) {
-	t.to_si_space(si).to_physics_engine_transforms(*this);
+	set(t.to_si_space(si));
+}
+
+void physics_engine_transforms::set(const components::transform& t) {
+	const auto pos = t.pos;
+	const auto rotation = t.rotation;
+
+	m_xf.p.x = pos.x;
+	m_xf.p.y = pos.y;
+	m_xf.q.Set(rotation);
+
+	m_sweep.localCenter.SetZero();
+	m_sweep.c0 = m_xf.p;
+	m_sweep.c = m_xf.p;
+	m_sweep.a0 = rotation;
+	m_sweep.a = rotation;
+	m_sweep.alpha0 = 0.0f;
 }

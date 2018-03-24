@@ -13,7 +13,38 @@
 template <class entity_handle_type>
 class spatial_properties_mixin {
 public:
+	bool has_independent_transform() const;
 	void set_logic_transform(const components::transform t) const;
+
+	template <class F, class... K>
+	void access_independent_transform(
+		F callback,
+		K... keys	
+	) const {
+		using E = entity_handle_type;
+
+		if constexpr(has_specific_entity_type_v<E>) {
+			const auto handle = *static_cast<const entity_handle_type*>(this);
+			auto& components = handle.get(keys...).components;
+
+			if constexpr(E::template has<components::rigid_body>()) {
+				if (!has_independent_transform()) {
+					return;
+				}
+
+				callback(std::get<components::rigid_body>(components).physics_transforms);
+			}
+			else if constexpr(E::template has<components::transform>()) {
+				callback(std::get<components::transform>(components));
+			}
+			else if constexpr(E::template has<components::wandering_pixels>()) {
+				callback(std::get<components::wandering_pixels>(components).center);
+			}
+		}
+		else {
+			static_assert(always_false_v<E>, "Not implemented for non-specific handles.");
+		}
+	}
 
 	components::transform get_logic_transform() const;
 	std::optional<components::transform> find_logic_transform() const;
@@ -209,22 +240,38 @@ vec2 spatial_properties_mixin<E>::get_effective_velocity() const {
 }
 
 template <class E>
-void spatial_properties_mixin<E>::set_logic_transform(const components::transform t) const {
+bool spatial_properties_mixin<E>::has_independent_transform() const {
 	const auto handle = *static_cast<const E*>(this);
 	const auto owner_body = handle.get_owner_of_colliders();
 
-	if (const bool this_entity_does_not_have_its_own_transform = 
-		owner_body.alive() 
-		&& owner_body != handle
-	) {
+	if (owner_body.alive() && owner_body != handle) {
+		/* 
+			This body is connected to a different body, 
+			therefore it has no independent transform. 
+		*/
+		return false;
+	}
+
+	return true;
+}
+
+template <class E>
+void spatial_properties_mixin<E>::set_logic_transform(const components::transform t) const {
+	const auto handle = *static_cast<const E*>(this);
+
+	if (!has_independent_transform()) {
 		return;
 	}
 	
 	if (const auto rigid_body = handle.template find<components::rigid_body>()) {
 		rigid_body.set_transform(t);
 	}
-	else if (auto tr = handle.template find<components::transform>()) {
+	else if (const auto tr = handle.template find<components::transform>()) {
 		*tr = t;
+		// TODO: reinfer the npo cache where necessary
+	}
+	else if (const auto wp = handle.template find<components::wandering_pixels>()) {
+		wp->center = t.pos;
 		// TODO: reinfer the npo cache where necessary
 	}
 }

@@ -64,27 +64,6 @@ struct basic_transform {
 		return pos == b.pos && rotation == b.rotation;
 	}
 
-	template <
-		class P, 
-		class K = T,
-		class = std::enable_if_t<std::is_same_v<K, real32>>
-	>
-	void to_physics_engine_transforms(P& output) const {
-		auto& m_xf = output.m_xf;
-		auto& m_sweep = output.m_sweep;
-
-		m_xf.p.x = pos.x;
-		m_xf.p.y = pos.y;
-		m_xf.q.Set(rotation);
-
-		m_sweep.localCenter.SetZero();
-		m_sweep.c0 = m_xf.p;
-		m_sweep.c = m_xf.p;
-		m_sweep.a0 = rotation;
-		m_sweep.a = rotation;
-		m_sweep.alpha0 = 0.0f;
-	}
-
 	auto interp(
 		const transform next,
 		const T alpha
@@ -167,6 +146,11 @@ struct basic_transform {
 		return compare({});
 	}
 };
+
+template<class T>
+std::ostream& operator<<(std::ostream& out, const basic_transform<T>& x) {
+	return out << typesafe_sprintf("(%x;%x;%x*)", x.pos.x, x.pos.y, x.rotation);
+}
 
 namespace augs {
 	template <class T>

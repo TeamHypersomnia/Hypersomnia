@@ -1,13 +1,8 @@
 #pragma once
-#include "augs/callback_result.h"
 #include "augs/templates/component_traits.h"
-#include "augs/readwrite/byte_readwrite_declaration.h"
 
 #include "game/organization/all_components_declaration.h"
-#include "game/transcendental/entity_flavour_id.h"
-
 #include "application/setups/editor/commands/editor_command_structs.h"
-#include "application/setups/editor/property_editor/property_editor_structs.h"
 
 template <class T>
 static constexpr bool should_reinfer_after_change(const T& invariant) {
@@ -23,7 +18,7 @@ public:
 	// GEN INTROSPECTOR class change_property_command class derived
 	editor_command_common common;
 
-	std::vector<std::byte> value_before_change;
+	std::vector<std::byte> values_before_change;
 	std::vector<std::byte> value_after_change;
 
 	std::string built_description;

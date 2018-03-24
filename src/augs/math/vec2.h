@@ -583,8 +583,7 @@ namespace augs {
 
 template<class T>
 std::ostream& operator<<(std::ostream& out, const basic_vec2<T>& x) {
-	out << typesafe_sprintf("(%x;%x)", x.x, x.y);
-	return out;
+	return out << typesafe_sprintf("(%x;%x)", x.x, x.y);
 }
 
 template<class T>

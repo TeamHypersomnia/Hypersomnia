@@ -49,10 +49,14 @@ struct physics_engine_transforms {
 	b2Sweep m_sweep;
 	// END GEN INTROSPECTOR
 
+	void set(const components::transform&);
 	void set(
 		const si_scaling,
 		const components::transform&
 	);
+
+	components::transform get(const si_scaling) const;
+	components::transform get() const;
 };
 
 namespace components {

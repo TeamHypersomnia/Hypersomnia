@@ -1,3 +1,5 @@
+#include "augs/callback_result.h"
+
 #include "application/intercosm.h"
 #include "application/setups/editor/editor_folder.h"
 
@@ -20,9 +22,14 @@ void change_property_command<D>::rewrite_change(
 	const editor_command_input in
 ) {
 	auto& self = *static_cast<D*>(this);
-	auto& cosm = in.folder.work->world;
+	auto& cosm = in.get_cosmos();
 
 	common.reset_timestamp();
+
+	/* 
+		At this point, the command can only be undone or rewritten,  
+		so it makes sense that the storage for value after change is empty.
+	*/
 
 	ensure(value_after_change.empty());
 
@@ -34,8 +41,6 @@ void change_property_command<D>::rewrite_change(
 		}
 	);
 }
-
-using namespace augs;
 
 template <class M, class T>
 static void write_object_or_trivial_marker(M& to, const T& from, const std::size_t bytes_count) {
@@ -61,15 +66,15 @@ static void read_object_or_trivial_marker(M& from, T& to, const std::size_t byte
 
 template <class D>
 void change_property_command<D>::redo(const editor_command_input in) {
-	auto& cosm = in.folder.work->world;
+	auto& cosm = in.get_cosmos();
 	auto& self = *static_cast<D*>(this);
 
-	ensure(value_before_change.empty());
+	ensure(values_before_change.empty());
 
 	const auto trivial_element_size = value_after_change.size();
 
-	auto before_change_data = ref_memory_stream(value_before_change);
-	auto after_change_data = cref_memory_stream(value_after_change);
+	auto before_change_data = augs::ref_memory_stream(values_before_change);
+	auto after_change_data = augs::cref_memory_stream(value_after_change);
 
 	self.access_each_property(
 		cosm,
@@ -87,17 +92,17 @@ void change_property_command<D>::redo(const editor_command_input in) {
 
 template <class D>
 void change_property_command<D>::undo(const editor_command_input in) {
-	auto& cosm = in.folder.work->world;
+	auto& cosm = in.get_cosmos();
 	auto& self = *static_cast<D*>(this);
 
 	bool read_once = true;
 
 	ensure(value_after_change.empty());
 
-	const auto trivial_element_size = value_before_change.size() / self.count_affected();
+	const auto trivial_element_size = values_before_change.size() / self.count_affected();
 
-	auto before_change_data = cref_memory_stream(value_before_change);
-	auto after_change_data = ref_memory_stream(value_after_change);
+	auto before_change_data = augs::cref_memory_stream(values_before_change);
+	auto after_change_data = augs::ref_memory_stream(value_after_change);
 
 	self.access_each_property(
 		cosm,
@@ -112,7 +117,7 @@ void change_property_command<D>::undo(const editor_command_input in) {
 		}	
 	);
 
-	value_before_change.clear();
+	values_before_change.clear();
 }
 
 template class change_property_command<change_flavour_property_command>;

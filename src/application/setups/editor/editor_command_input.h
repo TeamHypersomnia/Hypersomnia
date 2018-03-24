@@ -6,7 +6,15 @@ class editor_entity_selector;
 namespace sol {
 	class state;
 }
+
+struct editor_entity_mover;
 struct editor_all_entities_gui;
+
+struct editor_entity_mover {
+	bool active = false;
+};
+
+class cosmos;
 
 struct editor_command_input {
 	sol::state& lua;
@@ -14,6 +22,9 @@ struct editor_command_input {
 	editor_entity_selector& selector;
 
 	editor_all_entities_gui& all_entities_gui;
+	editor_entity_mover& mover;
+
+	cosmos& get_cosmos() const; 
 
 	void purge_selections() const;
 	void interrupt_tweakers() const;

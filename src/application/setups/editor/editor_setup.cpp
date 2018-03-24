@@ -10,7 +10,6 @@
 #include "augs/window_framework/shell.h"
 
 #include "game/detail/visible_entities.h"
-#include "game/detail/describers.h"
 
 #include "application/config_lua_table.h"
 #include "application/setups/editor/editor_setup.h"
@@ -621,25 +620,7 @@ std::unordered_set<entity_id> editor_setup::get_all_selected_entities() const {
 
 void editor_setup::del() {
 	if (anything_opened()) {
-		thread_local std::vector<entity_id> all_deleted;
-		all_deleted.clear();
-
-		const auto& cosm = work().world;
-		delete_entities_command command;
-
-		for_each_selected_entity(
-			[&](const auto e) {
-				command.push_entry(cosm[e]);
-				all_deleted.push_back(e);
-			}
-		);
-
-		if (all_deleted.size() == cosm.get_entities_count()) {
-			command.built_description = "Deleted all entities";
-		}
-		else {
-			command.built_description = "Deleted " + ::describe_names_of(all_deleted, cosm);
-		}
+		auto command = make_command_from_selections<delete_entities_command>("Deleted ");
 
 		if (!command.empty()) {
 			folder().history.execute_new(std::move(command), make_command_input());
@@ -738,7 +719,7 @@ void editor_setup::close_folder() {
 
 
 editor_command_input editor_setup::make_command_input() {
-	return { destructor_input.lua, folder(), selector, all_entities_gui };
+	return { destructor_input.lua, folder(), selector, all_entities_gui, mover };
 }
 
 void editor_setup::select_all_entities() {
@@ -849,20 +830,21 @@ bool editor_setup::handle_input_before_game(
 	using namespace augs::event;
 	using namespace augs::event::keys;
 
-	const auto mouse_pos = vec2i(ImGui::GetIO().MousePos);
-	const auto screen_size = vec2i(ImGui::GetIO().DisplaySize);
+	const auto maybe_cone = get_current_camera();
 
-	if (!anything_opened()) {
+	if (!maybe_cone || !anything_opened()) {
 		return false;
 	}
 
-	const auto current_cone = *get_current_camera();
-	const auto world_cursor_pos = current_cone.to_world_space(screen_size, mouse_pos);
+	const auto current_cone = *maybe_cone;
+	const auto world_cursor_pos = get_world_cursor_pos(current_cone);
 
 	const bool has_ctrl{ common_input_state[key::LCTRL] };
 	const bool has_shift{ common_input_state[key::LSHIFT] };
 
 	if (is_editing_mode()) {
+		const auto screen_size = vec2i(ImGui::GetIO().DisplaySize);
+
 		if (editor_detail::handle_camera_input(
 			settings.camera,
 			current_cone,
@@ -937,10 +919,57 @@ bool editor_setup::handle_input_before_game(
 				case key::I: play(); return true;
 				case key::G: history.seek_to_revision(has_shift ? history.get_commands().size() - 1 : 0, make_command_input()); return true;
 				case key::DEL: del(); return true;
+				case key::T: start_moving_selection(); return true;
 				default: break;
 			}
 		}
 	}
 
 	return false;
+}
+
+vec2 editor_setup::get_world_cursor_pos() const {
+	return get_world_cursor_pos(get_current_camera().value());
+}
+
+vec2 editor_setup::get_world_cursor_pos(const camera_cone cone) const {
+	const auto mouse_pos = vec2i(ImGui::GetIO().MousePos);
+	const auto screen_size = vec2i(ImGui::GetIO().DisplaySize);
+
+	const auto world_cursor_pos = cone.to_world_space(screen_size, mouse_pos);
+	return world_cursor_pos;
+}
+
+void editor_setup::start_moving_selection() {
+	if (anything_opened()) {
+		auto command = make_command_from_selections<move_entities_command>(
+			"Moved ",
+			[](const auto typed_handle) {
+				return typed_handle.has_independent_transform();
+			}	
+		);
+
+		if (!command.empty()) {
+			mover.active = true;
+
+			if (command.size() == 1) {
+				const auto& cosm = work().world;
+				const auto world_cursor_pos = get_world_cursor_pos();
+
+				components::transform initial;
+
+				command.moved_entities.for_each([&](const auto& id){
+					initial = cosm[id].get_logic_transform();
+				});
+
+				command.delta = components::transform(world_cursor_pos - initial.pos, 0);
+
+				folder().history.execute_new(std::move(command), make_command_input());
+				clear_id_caches();
+			}
+			else {
+
+			}
+		}
+	}
 }

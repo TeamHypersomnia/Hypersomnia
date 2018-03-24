@@ -55,47 +55,18 @@ entity_name_str get_bbcoded_spell_description(
 	return spell.appearance.name + "\n" + properties + "\n" + spell.appearance.description;
 }
 
-template <class C, class Container>
-entity_name_str describe_names_of(const Container& all_entities, const C& cosm) {
-	if (all_entities.empty()) {
-		return "";
-	}
+using name_accumulator = std::map<entity_name_str, std::size_t>;
 
-	auto quoted = [](const auto& s) {
-#if 0
-		return '"' + s + '"';
-#endif
-		return s;
-	};
+entity_name_str describe_names_of(const name_accumulator& counts);
 
-	if (all_entities.size() == 1) {
-		return quoted(cosm[(*all_entities.begin())].get_name());
-	}
-
-	/* More than one. */
-
-	thread_local std::map<entity_name_str, std::size_t> counts;
+template <class F>
+entity_name_str describe_names_of(F for_each_name) {
+	thread_local name_accumulator counts;
 	counts.clear();
 
-	for (const auto& e : all_entities) {
-		++counts[cosm[e].get_name()];
-	}
+	for_each_name([&](const auto& name){
+		++counts[name];
+	});
 
-	entity_name_str result;
-
-	std::size_t total = 0;
-
-	for (const auto& c : counts) {
-		result += typesafe_sprintf("%x of %x, ", c.second, quoted(c.first));
-		total += c.second;
-	}
-
-	if (counts.size() > 1) {
-		result = typesafe_sprintf("%x: ", total) + result;
-	}
-
-	result.pop_back();
-	result.pop_back();
-
-	return result;
+	describe_names_of(counts);
 }

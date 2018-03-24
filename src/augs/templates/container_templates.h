@@ -129,6 +129,18 @@ auto mapped_or_nullptr(
 	return nullptr;
 }
 
+template <class Container>
+auto accumulate_mapped_values(Container& container) {
+	using M = typename std::decay_t<Container>::mapped_type;
+	M m {};
+
+	for (const auto& it : container) {
+		m = m + it.second;
+	}
+
+	return m;
+}
+
 template <class Container, class Value>
 auto key_or_default(
 	const Container& container, 

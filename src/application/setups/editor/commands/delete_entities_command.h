@@ -32,7 +32,7 @@ struct delete_entities_command {
 	// GEN INTROSPECTOR struct delete_entities_command
 	editor_command_common common;
 private:
-	per_entity_type<make_data_vector> deleted_entities;
+	per_entity_type_container<make_data_vector> deleted_entities;
 public:
 	std::string built_description;
 	// END GEN INTROSPECTOR
@@ -42,7 +42,10 @@ public:
 	void redo(editor_command_input);
 	void undo(editor_command_input) const;
 
+	auto size() const {
+		return deleted_entities.size();
+	}
+
 	bool empty() const;
-	std::size_t count_deleted() const;
 	std::string describe() const;
 };

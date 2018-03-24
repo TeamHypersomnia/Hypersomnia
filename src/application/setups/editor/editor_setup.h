@@ -10,6 +10,7 @@
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/detail/visible_entities.h"
+#include "game/detail/describers.h"
 
 #include "view/necessary_image_id.h"
 #include "view/necessary_resources.h"
@@ -69,6 +70,7 @@ class editor_setup : private current_access_cache<editor_setup> {
 	editor_settings settings;
 	editor_player player;
 	editor_entity_selector selector;
+	editor_entity_mover mover;
 
 	editor_go_to_entity_gui go_to_entity_gui;
 
@@ -154,6 +156,46 @@ class editor_setup : private current_access_cache<editor_setup> {
 
 	void load_gui_state();
 	void save_gui_state();
+
+	void start_moving_selection();
+
+	vec2 get_world_cursor_pos() const;
+	vec2 get_world_cursor_pos(const camera_cone) const;
+
+	template <class T, class P>
+	T make_command_from_selections(const std::string& preffix, P inclusion_predicate) {
+		thread_local name_accumulator counts;
+		counts.clear();
+
+		T command;
+
+		const auto& cosm = work().world;
+
+		for_each_selected_entity(
+			[&](const auto e) {
+				const auto handle = cosm[e];
+
+				if (inclusion_predicate(handle)) {
+					command.push_entry(handle);
+					++counts[handle.get_name()];
+				}
+			}
+		);
+
+		if (command.size() == cosm.get_entities_count()) {
+			command.built_description = preffix + "all entities";
+		}
+		else {
+			command.built_description = preffix + ::describe_names_of(counts);
+		}
+
+		return command;
+	}
+
+	template <class T>
+	T make_command_from_selections(const std::string& preffix) {
+		return make_command_from_selections<T>(preffix, [](const auto&) { return true; });
+	}
 
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;

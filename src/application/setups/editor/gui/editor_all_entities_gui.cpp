@@ -216,7 +216,7 @@ void editor_all_entities_gui::perform(
 	properties_gui.hovered_guid.unset();
 
 	const auto prop_in = property_editor_input { settings, properties_gui };
-	const auto& cosm = in.folder.work->world;
+	const auto& cosm = in.get_cosmos();
 
 	if (only_match_entities) {
 		const auto& matches = *only_match_entities;

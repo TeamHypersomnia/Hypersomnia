@@ -7,6 +7,8 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
+- use per_entity_type_container widely
+
 - sometimes floor is not selectable but it's because it has the same layer as road
 	- some warning perhaps could be in order?
 		
@@ -30,8 +32,22 @@ summary: Just a hidden scratchpad.
 			- readwrite of before_change data could be used
 				- because we will always store all old values for determinism
 		- really watch out for the changes in "si", they can later affect how the box2d detail structs are redone
+			- SI WILL BE PRESERVED CORRECTLY, because changes to it will also be tracked in history.
+		- now that we have box2d transforms in a struct, we can have a lambda accessor for a single transform object
+			- can set it with a constexpr
 		- task at hand, data-wise:
-			- copy b2sweeps and b2transforms
+			- write b2sweeps and b2transforms to old value vector
+				- pack them into a box2d detail
+			- set new transform
+				- what format?
+				- new transform of the reference entity?
+					- then calculate delta and apply to other entities
+				- the delta components::transform itself?
+					- no referential entity to look up to
+					- always calculate pixel-wise delta during mousemotion
+						- SI-independent
+			- rewriting values when moving mouse
+				- 
 			
 
 - status bar

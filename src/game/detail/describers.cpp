@@ -2,6 +2,7 @@
 
 #include "describers.h"
 
+#include "augs/templates/container_templates.h"
 #include "game/transcendental/entity_handle.h"
 
 #include "game/detail/inventory/inventory_slot_handle.h"
@@ -16,6 +17,48 @@
 #include "game/detail/inventory/inventory_slot.h"
 #include "game/detail/inventory/inventory_slot_id.h"
 #include "game/transcendental/cosmos.h"
+
+entity_name_str describe_names_of(const name_accumulator& counts) {
+	if (counts.empty()) {
+		return "";
+	}
+
+	auto quoted = [](const auto& s) {
+#if 0
+		return '"' + s + '"';
+#endif
+		return s;
+	};
+
+	const auto total = accumulate_mapped_values(counts);
+
+	if (total == 1) {
+		entity_name_str result;
+
+		for (const auto& c : counts) {
+			result = quoted(c.first);
+		}
+
+		return result;
+	}
+
+	entity_name_str result;
+
+	for (const auto& c : counts) {
+		result += typesafe_sprintf("%x of %x, ", c.second, quoted(c.first));
+	}
+
+	if (counts.size() > 1) {
+		/* Add total count at the beginning if there are two or more distinct names */
+		result = typesafe_sprintf("%x: ", total) + result;
+	}
+
+	/* Trim the trailing comma and space */
+	result.pop_back();
+	result.pop_back();
+
+	return result;
+}
 
 entity_name_str get_bbcoded_entity_name(const const_entity_handle maybe_overridden_by_nickname) {
 	return maybe_overridden_by_nickname.get_name();

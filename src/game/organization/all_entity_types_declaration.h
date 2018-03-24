@@ -1,6 +1,4 @@
 #pragma once
-#include <array>
-
 #include "augs/templates/type_in_list_id.h"
 #include "augs/templates/type_matching_and_indexing.h"
 
@@ -40,6 +38,3 @@ constexpr std::size_t ENTITY_TYPES_COUNT = num_types_in_list_v<all_entity_types>
 
 template <class T>
 constexpr std::size_t ENTITY_TYPE_IDX = index_in_list_v<T, all_entity_types>;
-
-template <class T>
-using per_entity_type_array = std::array<T, num_types_in_list_v<all_entity_types>>;

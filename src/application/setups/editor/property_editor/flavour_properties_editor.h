@@ -117,7 +117,7 @@ void edit_invariant(
 		}
 	};
 
-	const auto& cosm = in.folder.work->world;
+	const auto& cosm = in.get_cosmos();
 	
 	general_edit_properties(
 		prop_in, 
