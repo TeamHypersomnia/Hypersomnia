@@ -37,7 +37,7 @@ void change_property_command<D>::rewrite_change(
 using namespace augs;
 
 template <class M, class T>
-static void detail_write_bytes(M& to, const T& from, const std::size_t bytes_count) {
+static void write_object_or_trivial_marker(M& to, const T& from, const std::size_t bytes_count) {
 	if constexpr(std::is_same_v<T, augs::trivial_type_marker>) {
 		const std::byte* location = reinterpret_cast<const std::byte*>(std::addressof(from));
 		to.write(location, bytes_count);
@@ -48,7 +48,7 @@ static void detail_write_bytes(M& to, const T& from, const std::size_t bytes_cou
 }
 
 template <class M, class T>
-static void detail_read_bytes(M& from, T& to, const std::size_t bytes_count) {
+static void read_object_or_trivial_marker(M& from, T& to, const std::size_t bytes_count) {
 	if constexpr(std::is_same_v<T, augs::trivial_type_marker>) {
 		std::byte* location = reinterpret_cast<std::byte*>(std::addressof(to));
 		from.read(location, bytes_count);
@@ -73,9 +73,9 @@ void change_property_command<D>::redo(const editor_command_input in) {
 	self.access_each_property(
 		cosm,
 		[&](auto& field) {
-			detail_write_bytes(before_change_data, field, trivial_element_size);
+			write_object_or_trivial_marker(before_change_data, field, trivial_element_size);
 
-			detail_read_bytes(after_change_data, field, trivial_element_size);
+			read_object_or_trivial_marker(after_change_data, field, trivial_element_size);
 			after_change_data.set_read_pos(0u);
 			return callback_result::CONTINUE;
 		}	
@@ -102,11 +102,11 @@ void change_property_command<D>::undo(const editor_command_input in) {
 		cosm,
 		[&](auto& field) {
 			if (read_once) {
-				detail_write_bytes(after_change_data, field, trivial_element_size); 
+				write_object_or_trivial_marker(after_change_data, field, trivial_element_size); 
 				read_once = false;
 			}
 
-			detail_read_bytes(before_change_data, field, trivial_element_size);
+			read_object_or_trivial_marker(before_change_data, field, trivial_element_size);
 			return callback_result::CONTINUE;
 		}	
 	);
