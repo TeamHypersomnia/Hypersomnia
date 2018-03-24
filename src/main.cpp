@@ -1231,6 +1231,7 @@ int work(const int argc, const char* const * const argv) try {
 								switch (*result) {
 									case setup_escape_result::LAUNCH_INGAME_MENU: ingame_menu.show = true; break;
 									case setup_escape_result::SWITCH_TO_GAME_GUI: game_gui_mode = true; break;
+									case setup_escape_result::JUST_FETCH: break;
 									default: break;
 								}
 

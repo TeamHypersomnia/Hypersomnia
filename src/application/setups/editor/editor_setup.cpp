@@ -524,11 +524,15 @@ void editor_setup::finish_rectangular_selection() {
 std::optional<setup_escape_result> editor_setup::escape() {
 	if (ok_only_popup) {
 		ok_only_popup = std::nullopt;
-		return std::nullopt;
+		return setup_escape_result::JUST_FETCH;
 	}
 	else if (!player.paused) {
 		player.paused = true;
 		return setup_escape_result::SWITCH_TO_GAME_GUI;
+	}
+	else if (mover.active) {
+		mover.active = false;
+		return setup_escape_result::JUST_FETCH;
 	}
 
 	return setup_escape_result::LAUNCH_INGAME_MENU;
@@ -858,6 +862,21 @@ bool editor_setup::handle_input_before_game(
 		}
 
 		if (e.msg == message::mousemotion) {
+			if (mover.active) {
+				auto& history = folder().history;
+				auto& last = history.last_command();
+
+				if (auto* const cmd = std::get_if<move_entities_command>(std::addressof(last))) {
+					const auto new_delta = world_cursor_pos - mover.initial_world_cursor_pos;
+					cmd->rewrite_change(new_delta, make_command_input());
+				}
+				else {
+					mover.active = false;
+				}
+
+				return true;
+			}
+
 			selector.do_mousemotion(
 				sizes_for_icons,
 
@@ -875,6 +894,12 @@ bool editor_setup::handle_input_before_game(
 			return true;
 		}
 
+		if (mover.active && e.was_pressed(key::LMOUSE)) {
+			mover.active = false;
+			cosmic::reinfer_all_entities(work().world);
+			return true;
+		}
+
 		{
 			auto& selections = view().selected_entities;
 
@@ -882,7 +907,7 @@ bool editor_setup::handle_input_before_game(
 				selector.do_left_press(has_ctrl, world_cursor_pos, selections);
 				return true;
 			}
-			if (e.was_released(key::LMOUSE)) {
+			else if (e.was_released(key::LMOUSE)) {
 				selector.do_left_release(has_ctrl, selections);
 			}
 		}
@@ -942,6 +967,8 @@ vec2 editor_setup::get_world_cursor_pos(const camera_cone cone) const {
 
 void editor_setup::start_moving_selection() {
 	if (anything_opened()) {
+		finish_rectangular_selection();
+
 		auto command = make_command_from_selections<move_entities_command>(
 			"Moved ",
 			[](const auto typed_handle) {
@@ -952,24 +979,24 @@ void editor_setup::start_moving_selection() {
 		if (!command.empty()) {
 			mover.active = true;
 
-			if (command.size() == 1) {
-				const auto& cosm = work().world;
-				const auto world_cursor_pos = get_world_cursor_pos();
+			const auto world_cursor_pos = get_world_cursor_pos();
 
-				components::transform initial;
+			if (command.size() == 1) {
+				/* If it's just one entity, let its center follow the mouse */
+				const auto& cosm = work().world;
 
 				command.moved_entities.for_each([&](const auto& id){
-					initial = cosm[id].get_logic_transform();
+					mover.initial_world_cursor_pos = cosm[id].get_logic_transform().pos;
 				});
-
-				command.delta = components::transform(world_cursor_pos - initial.pos, 0);
-
-				folder().history.execute_new(std::move(command), make_command_input());
-				clear_id_caches();
 			}
 			else {
-
+				/* If it's more than one entity, let all objects be moved by further relative motion */
+				mover.initial_world_cursor_pos = world_cursor_pos;
 			}
+
+			command.delta = components::transform(world_cursor_pos - mover.initial_world_cursor_pos, 0);
+
+			folder().history.execute_new(std::move(command), make_command_input());
 		}
 	}
 }

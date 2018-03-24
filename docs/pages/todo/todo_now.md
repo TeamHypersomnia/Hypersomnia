@@ -7,6 +7,7 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
+- add dialog asking if we want to leave changes?
 - use per_entity_type_container widely
 
 - sometimes floor is not selectable but it's because it has the same layer as road

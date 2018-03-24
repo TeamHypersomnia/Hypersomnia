@@ -78,7 +78,6 @@ namespace editor_detail {
 
 		const auto world_screen_center = current_cone.to_world_space(screen_size, screen_size/2);
 
-		/* const bool has_ctrl{ common_input_state[key::LCTRL] || common_input_state[key::RCTRL] }; */
 		const bool has_shift{ common_input_state[key::LSHIFT] };
 		const bool has_alt{ common_input_state[key::LALT] };
 

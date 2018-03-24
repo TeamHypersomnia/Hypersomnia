@@ -1,6 +1,7 @@
 #include "game/transcendental/cosmos_solvable_access.h"
 
 #include "application/intercosm.h"
+#include "application/setups/editor/editor_folder.h"
 #include "application/setups/editor/editor_command_input.h"
 #include "application/setups/editor/commands/move_entities_command.h"
 
@@ -127,7 +128,12 @@ void move_entities_command::rewrite_change(
 	/* ...and only now move by the new delta, exactly as if we were moving the entities for the first time. */
 	move_entities({}, cosm, moved_entities, new_value);
 
-	cosmic::reinfer_all_entities(cosm);
+
+	moved_entities.for_each([&](const auto id){
+		const auto h = cosm[id];	
+
+		cosmic::infer_caches_for(h);
+	});
 }
 
 void move_entities_command::redo(const editor_command_input in) {
@@ -140,6 +146,13 @@ void move_entities_command::redo(const editor_command_input in) {
 	move_entities({}, cosm, moved_entities, delta);
 
 	cosmic::reinfer_all_entities(cosm);
+
+	auto& selections = in.folder.view.selected_entities;
+	selections.clear();
+
+	moved_entities.for_each([&](const auto id) {
+		selections.emplace(id);
+	});
 }
 
 void move_entities_command::undo(const editor_command_input in) {
@@ -150,4 +163,11 @@ void move_entities_command::undo(const editor_command_input in) {
 	values_before_change.clear();
 
 	cosmic::reinfer_all_entities(cosm);
+
+	auto& selections = in.folder.view.selected_entities;
+	selections.clear();
+
+	moved_entities.for_each([&](const auto id) {
+		selections.emplace(id);
+	});
 }
