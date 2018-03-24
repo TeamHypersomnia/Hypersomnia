@@ -48,6 +48,11 @@ struct physics_engine_transforms {
 	b2Transform m_xf;
 	b2Sweep m_sweep;
 	// END GEN INTROSPECTOR
+
+	void set(
+		const si_scaling,
+		const components::transform&
+	);
 };
 
 namespace components {
@@ -68,11 +73,6 @@ namespace components {
 		special_physics special;
 
 		// END GEN INTROSPECTOR
-
-		void set_transform(
-			const si_scaling,
-			const components::transform&
-		);
 	};
 }
 
@@ -416,7 +416,7 @@ template <class E>
 void component_synchronizer<E, components::rigid_body>::set_transform(const components::transform& transform) const {
 	auto& data = get_raw_component({});
 
-	data.set_transform(
+	data.physics_transforms.set(
 		handle.get_cosmos().get_common_significant().si,
 		transform
 	);

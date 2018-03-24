@@ -13,12 +13,12 @@ components::rigid_body::rigid_body(
 	const si_scaling si,
 	const components::transform t
 ) {
-	set_transform(si, t);
+	physics_transforms.set(si, t);
 }
 
-void components::rigid_body::set_transform(
+void physics_engine_transforms::set(
 	const si_scaling si,
 	const components::transform& t
 ) {
-	t.to_si_space(si).to_physics_engine_transforms(physics_transforms);
+	t.to_si_space(si).to_physics_engine_transforms(*this);
 }
