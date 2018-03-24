@@ -38,13 +38,24 @@ void validate_entity_types() {
 					using F = typename C::First;
 					using S = typename C::Second;
 
-					if constexpr(is_one_of_list_v<F, List>) {
-						static_assert(is_one_of_list_v<S, List>, "An entity type lacks a component/invariant to function properly.");
-					}
+					static_assert(
+						is_one_of_list_v<F, List> == is_one_of_list_v<S, List>,
+						"An entity type lacks a component/invariant to function properly."
+					);
+				}
+			);
 
-					if constexpr(is_one_of_list_v<F, List>) {
-						static_assert(is_one_of_list_v<F, List>, "An entity type lacks a component/invariant to function properly.");
-					}
+			for_each_through_std_get(
+				assert_never_together(),
+				[](auto constraint) {
+					using C = decltype(constraint);
+					using F = typename C::First;
+					using S = typename C::Second;
+
+					static_assert(
+						!is_one_of_list_v<F, List> || !is_one_of_list_v<S, List>,
+						"An entity type defines a redundant component/invariant."
+					);
 				}
 			);
 		}

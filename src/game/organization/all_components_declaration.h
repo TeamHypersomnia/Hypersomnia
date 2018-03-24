@@ -78,6 +78,10 @@ using assert_always_together = type_list<
 	type_pair<invariants::crosshair, components::crosshair>
 >;
 
+using assert_never_together = type_list<
+	type_pair<components::rigid_body, components::transform>
+>;
+
 using always_present_invariants = type_list<
 	invariants::name,
 	invariants::flags

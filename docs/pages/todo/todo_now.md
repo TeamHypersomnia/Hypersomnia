@@ -7,11 +7,36 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
+- sometimes floor is not selectable but it's because it has the same layer as road
+	- some warning perhaps could be in order?
+		
 - moving objects with mouse
 	- if only one is selected on pressing "t", optionally move in a special context
 		- like move an entry in attachment matrix
 	- command format
 		- how about re-using change property command?
+			- no.
+		- just move the requisite stuff from change property command mixin to a separate header
+			- it's the art to have structures with diverse data types, each only to do their own business,
+				- but have a templated logic that generalizes them all
+			- entity_translator struct
+				- it can hold the currently processed command
+			- separate header:
+				- detail_*_bytes -> write_maybe_trivial_marker
+					- actually, not...
+					- consider removing trivial marker completely
+						- no: too much pain in the ass with various type ids and various trivial types overall
+					- then we'll have a type id with just max 2 options (b2Transform, components::transform)
+			- readwrite of before_change data could be used
+				- because we will always store all old values for determinism
+		- really watch out for the changes in "si", they can later affect how the box2d detail structs are redone
+		- task at hand, data-wise:
+			- copy b2sweeps and b2transforms
+			
+
+- status bar
+	- check how it works in vim
+		- changing a mode to normal clears the last message
 
 - fix characters getting typed when alt+something combos are pressed
 	- once we have combo maps, there will be a separate function to determine whether the input is to be fetched

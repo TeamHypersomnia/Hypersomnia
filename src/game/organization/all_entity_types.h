@@ -301,6 +301,7 @@ struct explosive_missile {
 
 		invariants::trace,
 
+		invariants::item,
 		invariants::hand_fuse,
 		invariants::missile,
 		invariants::explosive,

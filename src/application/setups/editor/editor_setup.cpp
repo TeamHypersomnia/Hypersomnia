@@ -384,7 +384,7 @@ void editor_setup::perform_custom_imgui(
 		if (anything_opened()) {
 			perform_editor_tab_gui(
 				[&](const auto index_to_close){ close_folder(index_to_close); },
-				[&](const auto index_to_set){ LOG_NVPS(index_to_set); set_current(index_to_set); },
+				[&](const auto index_to_set){ set_current(index_to_set); },
 				signi,
 				menu_bar_size.y
 			);
