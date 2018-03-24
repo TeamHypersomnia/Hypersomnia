@@ -1,10 +1,11 @@
 #include "application/intercosm.h"
 #include "application/setups/editor/editor_folder.h"
 
+#include "application/setups/editor/editor_command_input.h"
 #include "application/setups/editor/commands/change_entity_property_command.h"
 #include "application/setups/editor/commands/change_flavour_property_command.h"
 #include "application/setups/editor/commands/change_common_state_command.h"
-#include "application/setups/editor/property_editor/change_property_command.h"
+#include "application/setups/editor/commands/change_property_command.h"
 
 #include "augs/readwrite/byte_readwrite.h"
 

@@ -1,6 +1,7 @@
 #include "game/transcendental/entity_handle.h"
 
 #include "application/intercosm.h"
+#include "application/setups/editor/editor_command_input.h"
 #include "application/setups/editor/editor_folder.h"
 #include "application/setups/editor/editor_entity_selector.h"
 

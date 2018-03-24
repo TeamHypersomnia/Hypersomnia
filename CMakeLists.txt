@@ -534,12 +534,12 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/application/setups/editor/editor_camera.cpp"
 	"src/application/setups/editor/editor_popup.cpp"
 	"src/application/setups/editor/editor_entity_selector.cpp"
+	"src/application/setups/editor/editor_command_input.cpp"
 	"src/application/setups/editor/commands/fill_with_test_scene_command.cpp"
 	"src/application/setups/editor/commands/delete_entities_command.cpp"
-	"src/application/setups/editor/editor_command_structs.cpp"
+	"src/application/setups/editor/commands/change_property_command.cpp"
 	"src/application/setups/editor/gui/editor_all_entities_gui.cpp"
 	"src/augs/templates/introspect.cpp"
-	"src/application/setups/editor/property_editor/change_property_command.cpp"
 	"src/application/setups/editor/gui/editor_common_state_gui.cpp"
 )
 

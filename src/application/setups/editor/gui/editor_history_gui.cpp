@@ -1,6 +1,7 @@
 #include "augs/misc/imgui/imgui_utils.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 
+#include "application/setups/editor/editor_command_input.h"
 #include "application/setups/editor/editor_folder.h"
 #include "application/setups/editor/gui/editor_history_gui.h"
 

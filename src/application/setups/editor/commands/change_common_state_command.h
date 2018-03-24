@@ -3,10 +3,10 @@
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/cosmic_functions.h"
 
-#include "application/setups/editor/editor_command_structs.h"
+#include "application/setups/editor/commands/editor_command_structs.h"
+#include "application/setups/editor/commands/change_property_command.h"
 
 #include "application/setups/editor/property_editor/property_editor_structs.h"
-#include "application/setups/editor/property_editor/change_property_command.h"
 #include "application/setups/editor/property_editor/on_field_address.h"
 
 struct change_common_state_command : change_property_command<change_common_state_command> {

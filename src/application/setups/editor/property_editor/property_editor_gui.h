@@ -6,7 +6,7 @@
 #include "augs/drawing/flip.h"
 
 #include "application/setups/editor/editor_settings.h"
-#include "application/setups/editor/editor_command_structs.h"
+#include "application/setups/editor/editor_command_input.h"
 #include "application/setups/editor/property_editor/property_editor_structs.h"
 
 #include "augs/templates/format_enum.h"

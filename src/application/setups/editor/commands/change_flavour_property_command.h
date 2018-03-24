@@ -1,10 +1,11 @@
 #pragma once
 #include "game/organization/all_components_declaration.h"
 #include "game/transcendental/entity_flavour_id.h"
-#include "application/setups/editor/editor_command_structs.h"
+
+#include "application/setups/editor/commands/editor_command_structs.h"
+#include "application/setups/editor/commands/change_property_command.h"
 
 #include "application/setups/editor/property_editor/property_editor_structs.h"
-#include "application/setups/editor/property_editor/change_property_command.h"
 #include "application/setups/editor/property_editor/on_field_address.h"
 
 struct flavour_property_id {
