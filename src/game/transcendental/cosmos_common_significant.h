@@ -37,6 +37,8 @@ struct cosmos_common_significant {
 	meter_tuple meters;
 	spell_tuple spells;
 	perk_tuple perks;
+
+	rgba ambient_light_color = { 25, 51, 51, 255 };
 	// END GEN INTROSPECTOR
 
 	template <class entity_type>
