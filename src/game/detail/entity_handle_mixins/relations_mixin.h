@@ -24,16 +24,15 @@ protected:
 	using generic_handle_type = basic_entity_handle<is_const>;
 	using inventory_slot_handle_type = basic_inventory_slot_handle<generic_handle_type>;
 
-	auto* get_id_ptr(const child_entity_name n) const {
+	template <class F>
+	void on_id(const child_entity_name n, F callback) const {
 		const auto& self = *static_cast<const entity_handle_type*>(this);
-
-		maybe_const_ptr_t<is_const, child_entity_id> result = nullptr;
 
 		if (self.alive()) {
 			switch (n) {
 				case child_entity_name::CROSSHAIR_RECOIL_BODY:
 				if (const auto crosshair = self.find_crosshair()) {
-					result = std::addressof(crosshair->recoil_entity);
+					callback(crosshair->recoil_entity);
 				}
 				break;
 
@@ -43,8 +42,6 @@ protected:
 				break;
 			}
 		}
-
-		return result;
 	}
 
 public:
@@ -82,9 +79,7 @@ void relations_mixin<E>::map_child_entity(
 	const child_entity_name n, 
 	const entity_id p
 ) const {
-	if (const auto maybe_id = get_id_ptr(n)) {
-		*maybe_id = p;
-	}
+	on_id(n, [p](auto& id){ id = p; });
 }
 
 template <class E>
@@ -97,11 +92,9 @@ template <class E>
 typename relations_mixin<E>::generic_handle_type relations_mixin<E>::operator[](const child_entity_name child) const {
 	auto& self = *static_cast<const E*>(this);
 
-	entity_id id;
+	entity_id result;
 
-	if (const auto maybe_id = get_id_ptr(child)) {
-		id = *maybe_id;
-	}
+	on_id(child, [&result](const auto& id){ result = id; });
 
-	return self.get_cosmos()[id];
+	return self.get_cosmos()[result];
 }
