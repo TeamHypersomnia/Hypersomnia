@@ -71,9 +71,9 @@ It serves as a guide for first-time users. It has unique content every time:
 
 The textual content used in the context menus is found in ``editor/help/*.txt`` files.
 
-### Layers
+### Visibility filters
 
-- Contains a checkbox to toggle visibility of any [render layer](render_layer). 
+- Contains a checkbox to toggle visibility of any [render layer](render_layer), [type](entity_type) or [flavour](entity_flavour). 
 
 ### Entities
 - Has a single tab for each entity.

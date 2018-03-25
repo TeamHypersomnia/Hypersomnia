@@ -22,7 +22,7 @@ An intercosm can currently be read or written to disk in two different ways:
 
 - As an ``.int`` file, which contains a binary representation of the content, native to the machine that the intercosm was created on.
 	- **Purpose:** to have a lightning-fast format for manipulation of files while they are still being worked on.
-	- **Drawbacks:** having just the ``.int`` file, without having the copy of the game whose version it was originally created with, makes it impossible to port an intercosm to newer versions of Hypersomnia.
+	- **Drawbacks:** having just the ``.int`` file, without having a copy of the game whose version it was originally created with, makes it impossible to port an intercosm to newer versions of Hypersomnia.
 		- In practice, the game is continuously versioned, so there will always be a way to do this, unless the Hypersomnia repositories themselves are wiped out of the face of the universe.
 		- Additionally, ``.int`` files are always stamped with the version they were created with (which in turn can always be read by any version of Hypersomnia), so it will be possible to know which version of the game is required to export it to a more portable format.
 

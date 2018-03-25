@@ -21,11 +21,7 @@ So that working with content is easier, and so that less memory is wasted, each 
 The first is more like "input" to the processing, in which [authors](author) in particular are interested.  
 Most of the time, only the programmers are concerned with the second type of data.
 
-- An *entity flavour* contains a tuple of [invariants](invariant) and a tuple of initial [component](component) values, as specified in the [entity's type](entity_type).
-	- An existent invariant implies that the entity needs a component of type ``invariant_type::implied_component`` (if specified) for the invariant to be ever used by the logic.  
-		- Thus if implied_component type is specified, it additionally stores an **initial value** for the component.
-- A flavour with a blank name is treated as being 'not set' (a null flavour).
-	- We will always require the author to set a non-empty name for a flavour.  
+- An *entity flavour* contains a tuple of [invariants](invariant) and a tuple of initial values for each of the [components](component), exactly as specified in the [entity's type](entity_type).
 - flavours can be created, copied and then modified, or destroyed.  
 	- It is a separate stage that never occurs in logic itself.
 		- In fact, the [logic step](logic_step) simply provides only const getters for the type information.
@@ -40,87 +36,28 @@ Most of the time, only the programmers are concerned with the second type of dat
 	- If a field of a invariant changes, (during content creation), reinfer all objects of this flavour with help of the [flavour id cache](flavour_id_cache); currently we'll just reinfer the whole cosmos.
 - There won't be many flavours, but access is **frequent** during [solve](solver#the-solve). 
 	- All possible configurations of invariants will be determined by types at compilation time.
-- The logic should always first check for the existence of component, only later the invariant that the component is implied by.
+- The logic should always first check for the existence of component, only later it should check if the corresponding invariant exists.
 	- One less indirection because checking for the id being unset is just a single arithmetic operation when the id is cached.
 - On creating an entity, the chosen flavour's id is passed.  
-	- The [``cosmos::create_entity``](cosmos#create_entity) automatically adds all components implied by the enabled invariants.
-- Some components do not need any invariant data.
-	- examples: child, flags, **sender**, transform, ~~tree of npo~~ (will be a cache), ~~special physics~~ (will be merged with rigid body)
-		- Their existence is implied by:
-			- Being always present: child and flags.
-				- Always specifiable initial values.
-			- Circumstance in the logic or mere thereof possibility, which is implied by...
-				- sender
-			- **...configuration of components at the entity construction time.**
-				- sender by missiles or other kinds of launched objects
-				- **Always specifiable initial values when the required configuration of components holds**.
-		- The real question is whether they should be visible to the author, as lack of invariant data implies that it is some kind of detail.
-			- Otherwise we might simulate empty invariant struct just as well
-		- **Chosen solutions**:
-			- child, flags - for author, always specifiable in initial values
-			- transform - for author, appears specifiable when the entity has no physical components
-			- sender - for author, appears specifiable in initial values when it has either missile or explosive
-			- Currently no components exist whose existence upon construction would depend on **value** of other components.
-			- Currently no components exist whose actual **initial value** upon construction would depend on value/existence of other components.
-				- because tree of npo will not be a component soon.
-			- rotation_copying
-				- instead of rotation_copying_system::update_rotations, implement sentience_system::rotate_towards_crosshairs
-					- effectively removes the need for "entity_id stashed_target"
-				- instead of rotation_copying_system::update_rotations, implement driver_system::rotate_towards_vehicles
-					- even less setup in driver system
-				- we have no more cases of rotation copying
-			- position_copying
-- ~~Some invariants imply more than one component.~~
-	- **Disproved**.
-		- A component's existence may only be implied by:
-			- Being required by a circumstance.
-				- We will for now make them always_present as no circumstantial components exist that would be too big.
-			- Being required by a invariant.
-		- If two components existed such that both are implied by the same invariant, it would not make sense to separate those components in the first place.
-			- Because one would never be needed without the other.
-			- Thus wasting space for additional pool id.
-		- Additionally if a component would be necessary dependence of two other components (in which case it would make sense that a invariant can imply more than one component) that would make architecture **too complex**.
-			- It would require us to prioritize initial values for invariants that share an implied component. Ugh.
-	- Which ones would need it by the way?
-		- If we're talking missile component, sender will anyways be "always_present" because the circumstance might or might not otherwise need to add it.
-- Observation: there is a bijection between invariants that imply and impliable components.
-	- Therefore, the code can assume that, if a component exists, so shall the invariant (if it exists) which implies this component.
-	- Theoretically there will be no crash if we get a invariant that is not enabled.
-		- That is because we do not hold optionals but actual, properly constructed objects.
-	- If a invariant does not imply any component, its existence can only be queried by actually checking whether it is enabled.
-- **Editor**: Recommended invariants
-	- Instead of a invariant strictly implying another invariant or more than one component, we can make a notion of "recommended" invariants in the editor. 
-	- Thus, the actual logic code should never assume that a invariant exists if one other exists, the same about components.
-	- But in the editor, depending on the current invariants configuration, the flavour editor dialog may recommend:
-		- to add a specific component (e.g. interpolation if there exists a render and dynamic body)
-		- to remove a specific component that is considered redundant (e.g. interpolation if the flavour only has a static body)
-		- the reason it will not be done automatically is because the author might want to experiment while having full control, and maybe persist some values between various attempts.
-	- Currently no case of recommended invariants exist apart from interpolation.
-		- if it ever so happens that a circumstantial component like a "sender" would be too costly to be always present, we might also make it a recommended invariant.
-			- then the code will obviously have to be modified so that it does not always assume that the component is always present			
-		- or we might make it a component added upon construction?
+	- Components might need some special construction.
+		- interpolation might need to save the place of birth.
+		- trace might want to roll the dice for its first values.
+		- responsibility of entity constructors.
 - **Editor**: Initial values
 	- in a separate tree node.
 	- modifiable are all that are implied by the invariants
 	- and those that will be added on construction based on existence of other components. 
 		- e.g. sender.
-- Components might need some special construction.
-	- interpolation might need to save the place of birth.
-	- trace might want to roll the dice for its first values.
-- Some invariants do not need any instance data.
-	- Example: render component.
-		- That does not change anything at all, except for the way of getting that data.
+- We specify no clear bijection between invariant and component existence.
+	- We will however make efforts to sensibly populate the ``assert_always_together`` and ``assert_never_together`` guards.
+		- Simply because it is intuitive that if a rigid body component exists, so should the invariant.
+	- E.g. some invariants do not need any instance data.
+		- Example: render component.
+			- That does not change anything at all, except for the way of getting that data.
 - Some invariants might be so heavily used that an immutable copy in the entity itself would be beneficial.
 	- Example: render component.
 		- Perfectly viable; just declare it with a ``static constexpr bool`` inside the invariant and make the field constant.
 		- Care: if the flavour information changes, so must the copied invariant. **So let's save it for later**.
-- Scope of initial values
-	- Generally it should be always safe to expose any field to the author as sensitive state will be protected by exception throws
-	- Though customizing some of them just does not make sense.
-		- E.g. ids for some of the always_present components
-			- Components will be templatized for the ids so in this case they will hold group identificators
-				- Which may actually turn out handy regardless of what we think now
-- Do we want to store initial values for always_present components?
 - There is a case that it would be best if data existed both as a invariant and a component.
 	- Example: shape polygon component.
 	- See: [overrides](#overrides).

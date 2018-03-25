@@ -55,8 +55,6 @@ namespace components {
 
 namespace invariants {
 	struct gun {
-		using implied_component = components::gun;
-
 		// GEN INTROSPECTOR struct invariants::gun
 		float shot_cooldown_ms = 100.f;
 

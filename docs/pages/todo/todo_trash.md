@@ -542,3 +542,65 @@ Memory is somewhat safe because it can only grow as far as the children grow.
 			- We could just have an entity_id locally viewed in the intercosm but it will be nice to start testing rulesets from such a simple example.
 			- Editor will ask if a test ruleset should be created for viewing or always do so automatically when selecting a controlled entity.
 				- It might automatically adjust other rulesets, or just the one currently selected.
+<!--
+- A flavour with a blank name is treated as being 'not set' (a null flavour).
+	- We will always require the author to set a non-empty name for a flavour.  
+-->
+
+- **Editor**: Recommended invariants
+	- Instead of a invariant strictly implying another invariant or more than one component, we can make a notion of "recommended" invariants in the editor. 
+	- Thus, the actual logic code should never assume that a invariant exists if one other exists, the same about components.
+	- But in the editor, depending on the current invariants configuration, the flavour editor dialog may recommend:
+		- to add a specific component (e.g. interpolation if there exists a render and dynamic body)
+		- to remove a specific component that is considered redundant (e.g. interpolation if the flavour only has a static body)
+		- the reason it will not be done automatically is because the author might want to experiment while having full control, and maybe persist some values between various attempts.
+	- Currently no case of recommended invariants exist apart from interpolation.
+		- if it ever so happens that a circumstantial component like a "sender" would be too costly to be always present, we might also make it a recommended invariant.
+			- then the code will obviously have to be modified so that it does not always assume that the component is always present			
+		- or we might make it a component added upon construction?
+
+- Some components do not need any invariant data.
+	- examples: child, flags, **sender**, transform, ~~tree of npo~~ (will be a cache), ~~special physics~~ (will be merged with rigid body)
+		- Their existence is implied by:
+			- Being always present: child and flags.
+				- Always specifiable initial values.
+			- Circumstance in the logic or mere thereof possibility, which is implied by...
+				- sender
+			- **...configuration of components at the entity construction time.**
+				- sender by missiles or other kinds of launched objects
+				- **Always specifiable initial values when the required configuration of components holds**.
+		- The real question is whether they should be visible to the author, as lack of invariant data implies that it is some kind of detail.
+			- Otherwise we might simulate empty invariant struct just as well
+		- **Chosen solutions**:
+			- child, flags - for author, always specifiable in initial values
+			- transform - for author, appears specifiable when the entity has no physical components
+			- sender - for author, appears specifiable in initial values when it has either missile or explosive
+			- Currently no components exist whose existence upon construction would depend on **value** of other components.
+			- Currently no components exist whose actual **initial value** upon construction would depend on value/existence of other components.
+				- because tree of npo will not be a component soon.
+			- rotation_copying
+				- instead of rotation_copying_system::update_rotations, implement sentience_system::rotate_towards_crosshairs
+					- effectively removes the need for "entity_id stashed_target"
+				- instead of rotation_copying_system::update_rotations, implement driver_system::rotate_towards_vehicles
+					- even less setup in driver system
+				- we have no more cases of rotation copying
+			- position_copying
+- ~~Some invariants imply more than one component.~~
+	- **Disproved**.
+		- A component's existence may only be implied by:
+			- Being required by a circumstance.
+				- We will for now make them always_present as no circumstantial components exist that would be too big.
+			- Being required by a invariant.
+		- If two components existed such that both are implied by the same invariant, it would not make sense to separate those components in the first place.
+			- Because one would never be needed without the other.
+			- Thus wasting space for additional pool id.
+		- Additionally if a component would be necessary dependence of two other components (in which case it would make sense that a invariant can imply more than one component) that would make architecture **too complex**.
+			- It would require us to prioritize initial values for invariants that share an implied component. Ugh.
+	- Which ones would need it by the way?
+		- If we're talking missile component, sender will anyways be "always_present" because the circumstance might or might not otherwise need to add it.
+- Observation: there is a bijection between invariants that imply and impliable components.
+	- Therefore, the code can assume that, if a component exists, so shall the invariant (if it exists) which implies this component.
+	- Theoretically there will be no crash if we get a invariant that is not enabled.
+		- That is because we do not hold optionals but actual, properly constructed objects.
+	- If a invariant does not imply any component, its existence can only be queried by actually checking whether it is enabled.
+	- The [``cosmos::create_entity``](cosmos#create_entity) automatically adds all components implied by the enabled invariants.

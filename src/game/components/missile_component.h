@@ -34,8 +34,6 @@ namespace components {
 
 namespace invariants {
 	struct missile {
-		using implied_component = components::missile;
-
 		// GEN INTROSPECTOR struct invariants::missile
 		meter_value_type damage_amount = 12;
 

@@ -45,8 +45,6 @@ namespace components {
 
 namespace invariants {
 	struct movement {
-		using implied_component = components::movement;
-
 		static constexpr bool reinfer_when_tweaking = true;
 
 		// GEN INTROSPECTOR struct invariants::movement

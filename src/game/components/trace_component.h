@@ -35,7 +35,6 @@ namespace components {
 
 namespace invariants {
 	struct trace {
-		using implied_component = components::trace;
 		using minmax = augs::minmax<float>;
 		using finishing_trace_flavour_type = constrained_entity_flavour_id<
 			components::trace,

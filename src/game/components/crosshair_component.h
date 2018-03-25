@@ -33,8 +33,6 @@ namespace components {
 
 namespace invariants {
 	struct crosshair {
-		using implied_component = components::crosshair;
-
 		// GEN INTROSPECTOR struct invariants::crosshair
 		invariants::sprite appearance;
 		// END GEN INTROSPECTOR

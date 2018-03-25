@@ -31,8 +31,6 @@ namespace components {
 
 namespace invariants {
 	struct light {
-		using implied_component = components::light;
-
 		// GEN INTROSPECTOR struct invariants::light
 		light_attenuation constant;
 		light_attenuation linear;

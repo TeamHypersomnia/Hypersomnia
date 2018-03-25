@@ -11,8 +11,6 @@ namespace components {
 
 namespace invariants {
 	struct interpolation {
-		using implied_component = components::interpolation;
-
 		// GEN INTROSPECTOR struct invariants::interpolation
 		float base_exponent = 0.9f;
 		// END GEN INTROSPECTOR

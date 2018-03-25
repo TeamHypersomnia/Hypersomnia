@@ -101,8 +101,6 @@ namespace components {
 
 namespace invariants {
 	struct sentience {
-		using implied_component = components::sentience;
-
 		// GEN INTROSPECTOR struct invariants::sentience
 		float comfort_zone = 500.f;
 		float minimum_danger_amount_to_evade = 20.f;

@@ -112,8 +112,6 @@ public:
 namespace invariants {
 	struct item {
 		static constexpr bool reinfer_when_tweaking = true;
-		using implied_component = components::item;
-
 		// GEN INTROSPECTOR struct invariants::item
 		bool stackable = false;
 		pad_bytes<3> pad;
