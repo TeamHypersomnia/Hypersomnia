@@ -9,32 +9,43 @@ summary: |
     It can read intercosms from files on the disk and perform various operations on them, like create new entities or record and replay simulations.  
 ---
 
-## Saving and loading your work
+## Project structure
 
-The editor supports read and write operations on both ``.int`` and ``.lua`` [intercosm file formats](intercosm#file-formats).  
+The editor considers a **folder to be a project**.  
+The project name is equivalent to the folder name.  
+
+Among other meta file formats, the editor supports read and write operations on both ``.int`` and ``.lua`` [intercosm file formats](intercosm#file-formats).  
 The "File" menu button provides all supported operations, most with keyboard shortcuts.
 
-### ``.unsaved`` file format
+### ``autosave`` subdirectory 
 
-The ``.unsaved`` files always contain the most recent state of the work, even if it hasn't been saved yet to the file originally specified while saving.  
-They always reside next to the original file, e.g. having ``D:/works/my_work.int``, there might at some point appear ``D:/my_works/my_work.int.unsaved``.  
+You might notice that, next to your project files, there appears a folder named ``autosave``.  
+This folder should replicate exactly the rest of the project's directory tree.  
+It always contains the most recent state of your work, even if it hasn't been saved yet to the original files.  
 
-These files are created automatically when:
-- The editor exits with unsaved changes - either gracefully through the ESC menu or a shortcut like Alt+F4...
-- ...and additionally every single minute - this is the default *autosave* behaviour. The interval is configurable.
+This folder is created automatically when:
+- The editor loses focus (can be turned off in settings).
+- The editor exits with unsaved changes - either gracefully through the menu accessible via ESC button, or a forceful shortcut like Alt+F4.
+- Additionally, every single minute. The interval is configurable.
 	- This means that if you've forgotten to save your work for an hour, and your computer suddenly BSODs, you will lose a minute of your work at most!
 
-#### Behaviour
+### Opening a project
 
-- When trying to open any ``*.int`` or ``*.lua`` file, the editor first checks if there exists a file next to it, named ``*.int.unsaved`` or ``*.lua.unsaved``.  
-If it is found, the opened tab is populated with the work from the ``.unsaved`` file, but the tab itself still carries the name of the original file, so saving the work with Ctrl+S will still properly update the real file. 
+- When trying to open a folder named ``Project``, the editor first checks if a folder named ``Project/autosave`` exists.  
+	- If it is found, the opened tab is populated only with the work from the ``Project/autosave`` folder. The tab itself still carries the path of the original folder, so saving the work with a quick ``Ctrl + S`` will still properly update the real project folder. 
+	- If it is not found, it reads the files inside the ``Project`` directory instead. This will usually happen if, for example, you download work of some other person - they'd have no reason to also send you the autosave files.
 
-- **Caution:** suppose you have some old and forgotten ``some_work.int`` and ``some_work.int.unsaved`` next to each other.  
-Now you decide to save some other work as ``some_work.int``.  
-At this point, the backup file - ``some_work.int.unsaved`` will be considered unnecessary **and will be deleted**.  
-If we'd allow the unsaved file - now completely unrelated - to still exist, then if the application would crash several seconds from now,  
+- Given a folder named ``Project`` or ``Project/autosave``, the project looks for the following files inside:
+	- ``Project.int`` - (**required**) the binary [intercosm file format](intercosm#file-formats). If not found, an error will occur.
+	- ``Project.hist`` - (optional) the history file. If not found, the history will appear empty.
+	- ``Project.view`` - (optional) state of editor camera (panning + zoom), entity selections and other stuff like last grid density setting. If not found, these will be reset.
+
+### Saving a project
+
+- **Caution:** Every time you save to a ``Project`` folder, the ``Project/autosave`` folder is considered unnecessary **and is deleted** (if it exists).  
+If we'd allow the autosave folder - now completely unrelated - to still exist, then if the application would crash several seconds from now,  
 the editor would later load that unrelated file instead of your save.
-	- Thus you are completely safe if you do not play around files with ``.unsaved`` format. This is an autosave file, meant for use only by the editor.
+	- Thus you are completely safe if you do not manually tinker around ther files from ``Project/autosave``. This is an autosave folder, meant for use only by the editor.
 
 ## Modes
 

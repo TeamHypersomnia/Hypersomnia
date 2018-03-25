@@ -54,3 +54,6 @@ summary: Just a hidden scratchpad.
 - for now do an undo_delete_entity test with a floor and some walls perhaps
 - storage format for deleted entities
 
+- ensure should throw so that the editor destructor can perform autosave
+	- for cores, just emit them programatically on unix
+	- and on windows it makes little sense to abort there, just debugbreak and throw.

@@ -234,14 +234,11 @@ summary: Just a hidden scratchpad.
 
 - switching tabs with entities should always refocus on the same kind of property
 
-- ensure should throw so that the editor destructor can perform autosave
-	- for cores, just emit them programatically on unix
-	- and on windows it makes little sense to abort there, just debugbreak and throw.
-
-- "unique" naming for unique sprite decorations et cetera
-
 - check in editor if the saving/opening path is a valid folder?
 - make reveal in explorer work for both files and folders
 	- cause it also works for dirs
+
+- "unique" naming for unique sprite decorations et cetera
+
 - templatize some dangling memory stream arguments
 
