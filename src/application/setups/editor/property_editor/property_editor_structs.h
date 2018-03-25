@@ -1,4 +1,6 @@
 #pragma once
+#include <unordered_set>
+
 #include "3rdparty/imgui/imgui.h"
 #include "augs/readwrite/memory_stream.h"
 
@@ -22,9 +24,12 @@ struct flavours_and_entities_tree_filter {
 	std::optional<entity_type_id> only_type_id;
 	std::optional<entity_flavour_id> only_flavour_id;
 
-	bool any() const {
-		return close_type_id || close_flavour_id || only_type_id || only_flavour_id;
-	}
+	void perform(
+		const cosmos&,
+		std::unordered_set<entity_id>& selections
+	) const;
+
+	bool any() const;
 };
 
 struct description_pair {

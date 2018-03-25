@@ -7,6 +7,10 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
+- move the filtering logic to filter struct
+- refactor mover
+- add rotations
+
 - add dialog asking if we want to leave changes?
 
 - use per_entity_type_container widely

@@ -542,6 +542,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/application/setups/editor/gui/editor_common_state_gui.cpp"
 	"src/application/setups/editor/commands/move_entities_command.cpp"
 	"src/application/setups/editor/gui/editor_entity_selector.cpp"
+	"src/application/setups/editor/property_editor/property_editor_structs.cpp"
 )
 
 if(BUILD_WINDOW_FRAMEWORK)
