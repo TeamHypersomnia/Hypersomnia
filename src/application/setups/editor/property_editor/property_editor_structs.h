@@ -15,6 +15,18 @@ using edited_field_type_id = type_in_list_id<
 	>
 >;
 
+struct flavours_and_entities_tree_filter {
+	std::optional<entity_type_id> close_type_id;
+	std::optional<entity_flavour_id> close_flavour_id;
+
+	std::optional<entity_type_id> only_type_id;
+	std::optional<entity_flavour_id> only_flavour_id;
+
+	bool any() const {
+		return close_type_id || close_flavour_id || only_type_id || only_flavour_id;
+	}
+};
+
 struct description_pair {
 	std::string of_old;
 	std::string of_new;

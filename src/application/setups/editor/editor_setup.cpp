@@ -464,7 +464,34 @@ void editor_setup::perform_custom_imgui(
 				return get_all_selected_entities();
 			}();
 
-			selected_entities_gui.perform(settings, std::addressof(all_selected), make_command_input());
+			const auto filters = selected_entities_gui.perform(settings, std::addressof(all_selected), make_command_input());
+
+			if (filters.any()) {
+				const auto& cosm = work().world;
+
+				erase_if(
+					view().selected_entities,
+					[&](const entity_id id) {
+						if (filters.close_type_id) {
+							return id.type_id == *filters.close_type_id;
+						}
+
+						if (filters.close_flavour_id) {
+							return cosm[id].get_flavour_id() == *filters.close_flavour_id;
+						}
+
+						if (filters.only_type_id) {
+							return id.type_id != *filters.only_type_id;
+						}
+
+						if (filters.only_flavour_id) {
+							return cosm[id].get_flavour_id() != *filters.only_flavour_id;
+						}
+
+						return true;
+					}
+				);
+			}
 		}
 
 		const auto go_to_dialog_pos = vec2 { static_cast<float>(screen_size.x / 2), menu_bar_size.y * 2 + 1 };

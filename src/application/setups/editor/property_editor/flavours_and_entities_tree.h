@@ -1,6 +1,8 @@
 #pragma once
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 
+#include "game/organization/for_each_entity_type.h"
+
 #include "application/setups/editor/property_editor/property_editor_structs.h"
 #include "application/setups/editor/property_editor/flavour_properties_editor.h"
 #include "application/setups/editor/property_editor/entity_properties_editor.h"
@@ -38,12 +40,14 @@ void do_edit_flavours_gui(
 }
 
 template <class F>
-void flavours_and_entities_tree(
+auto flavours_and_entities_tree(
 	const property_editor_input& prop_in,
 	editor_command_input in,
 	F&& flavours_and_entities_provider
 ) {
 	using namespace augs::imgui;
+
+	flavours_and_entities_tree_filter filter;
 
 	auto& work = *in.folder.work;
 	auto& cosm = work.world;
@@ -76,6 +80,16 @@ void flavours_and_entities_tree(
 
 	auto& provider = flavours_and_entities_provider;
 
+	std::size_t total_types = 0;
+
+	for_each_entity_type([&](auto e){
+		using E = decltype(e);
+
+		if (provider.template num_entities_of_type<E>() > 0) {
+			++total_types;
+		}
+	});
+
 	cosm.get_solvable().for_each_pool(
 		[&](const auto& p){
 			using P = decltype(p);
@@ -102,7 +116,31 @@ void flavours_and_entities_tree(
 
 			const auto node = scoped_tree_node_ex(entity_type_label);
 
-			next_column_text_disabled(typesafe_sprintf("%x Flavours, %x Entities", total_flavours, total_entities));
+			ImGui::NextColumn();
+
+			if (prop_in.show_filter_buttons) {
+				const auto scoped_style = scoped_style_var(ImGuiStyleVar_FramePadding, ImVec2(1, 1));
+				const auto this_type_id = entity_type_id::of<E>();
+
+				const auto id = scoped_id(this_type_id.get_index());
+
+				if (ImGui::Button("Ex")) {
+					filter.close_type_id = this_type_id;
+				}
+
+				if (total_types > 1) {
+					ImGui::SameLine();
+
+					if (ImGui::Button("On")) {
+						filter.only_type_id = this_type_id;
+					}
+				}
+
+				ImGui::SameLine();
+			}
+
+			text_disabled(typesafe_sprintf("%x Flavours, %x Entities", total_flavours, total_entities));
+			ImGui::NextColumn();
 
 			if (node) {
 				if (total_flavours > 1) {
@@ -160,7 +198,34 @@ void flavours_and_entities_tree(
 						const auto flavour_node = scoped_tree_node_ex(node_label);
 
 						const auto num_entities_label = typesafe_sprintf("%x Entities", all_having_flavour.size());
-						next_column_text_disabled(num_entities_label);
+
+						ImGui::NextColumn();
+
+						if (prop_in.show_filter_buttons) {
+							const auto scoped_style = scoped_style_var(ImGuiStyleVar_FramePadding, ImVec2(1, 1));
+							const auto this_type_id = entity_type_id::of<E>().get_index();
+
+							const auto ex_label = typesafe_sprintf("Ex##%x.%x", this_type_id, flavour_id.raw);
+							const auto on_label = typesafe_sprintf("On##%x.%x", this_type_id, flavour_id.raw);
+
+							if (ImGui::Button(ex_label.c_str())) {
+								filter.close_flavour_id = flavour_id;
+							}
+
+							ImGui::SameLine();
+
+							if (!(total_flavours == 1 && total_types == 1)) {
+								if (ImGui::Button(on_label.c_str())) {
+									filter.only_flavour_id = flavour_id;
+								}
+
+								ImGui::SameLine();
+							}
+						}
+
+						text_disabled(num_entities_label);
+
+						ImGui::NextColumn();
 
 						if (flavour_node) {
 							ImGui::Separator();
@@ -212,4 +277,6 @@ void flavours_and_entities_tree(
 			}
 		}	
 	);
+
+	return filter;
 }

@@ -190,13 +190,13 @@ void editor_all_entities_gui::interrupt_tweakers() {
 }
 
 
-void editor_all_entities_gui::perform(
+flavours_and_entities_tree_filter editor_all_entities_gui::perform(
 	const editor_settings& settings,
 	const std::unordered_set<entity_id>* only_match_entities,
 	editor_command_input in
 ) {
 	if (!show) {
-		return;
+		return {};
 	}
 
 	using namespace augs::imgui;
@@ -215,7 +215,8 @@ void editor_all_entities_gui::perform(
 
 	properties_gui.hovered_guid.unset();
 
-	const auto prop_in = property_editor_input { settings, properties_gui };
+	const bool show_filter_buttons = only_match_entities != nullptr;
+	const auto prop_in = property_editor_input { settings, properties_gui, show_filter_buttons };
 	const auto& cosm = in.get_cosmos();
 
 	if (only_match_entities) {
@@ -223,9 +224,9 @@ void editor_all_entities_gui::perform(
 		const auto num_matches = matches.size();
 
 		if (num_matches == 0) {
-			return;
+			return {};
 		}
-		if (num_matches == 1) {
+		else if (num_matches == 1) {
 			const auto id = *matches.begin();
 
 			if (const auto handle = cosm[id]) {
@@ -234,31 +235,30 @@ void editor_all_entities_gui::perform(
 					do_edit_entities_gui(prop_in, in, typed_handle, { id.basic() });
 				});
 			}
-		}
-		else if (num_matches > 1) {
-			thread_local resolved_array_type per_native_type;
 
-			for (auto& p : per_native_type) {
-				p.clear();
-			}
-
-			for (const auto& e : matches) {
-				if (const auto handle = cosm[e]) {
-					per_native_type[e.type_id.get_index()][handle.get_flavour_id().raw].push_back(e);
-				}
-			}
-
-			flavours_and_entities_tree(
-				prop_in,
-				in,
-				in_selection_provider { cosm, per_native_type }
-			);
+			return {};
 		}
 
-		return;
+		thread_local resolved_array_type per_native_type;
+
+		for (auto& p : per_native_type) {
+			p.clear();
+		}
+
+		for (const auto& e : matches) {
+			if (const auto handle = cosm[e]) {
+				per_native_type[e.type_id.get_index()][handle.get_flavour_id().raw].push_back(e);
+			}
+		}
+
+		return flavours_and_entities_tree(
+			prop_in,
+			in,
+			in_selection_provider { cosm, per_native_type }
+		);
 	}
 
-	flavours_and_entities_tree(
+	return flavours_and_entities_tree(
 		prop_in,
 		in,
 		all_provider { cosm }

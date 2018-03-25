@@ -13,7 +13,7 @@ struct editor_all_entities_gui {
 
 	void open();
 
-	void perform(
+	flavours_and_entities_tree_filter perform(
 		const editor_settings&,
 		const std::unordered_set<entity_id>* only_match_entities,
 	   	editor_command_input

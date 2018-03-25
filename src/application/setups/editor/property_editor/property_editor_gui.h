@@ -15,6 +15,7 @@
 struct property_editor_input {
 	const editor_settings& settings;
 	property_editor_gui& state;
+	const bool show_filter_buttons = false;
 };
 
 template <class A, class B>
