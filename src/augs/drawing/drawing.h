@@ -4,10 +4,14 @@
 
 #include "augs/math/vec2.h"
 #include "augs/math/transform.h"
+#include "augs/math/snapping_grid.h"
+#include "augs/math/camera_cone.h"
 
 #include "augs/texture_atlas/texture_atlas_entry.h"
 #include "augs/drawing/flip.h"
 #include "augs/drawing/border.h"
+
+struct grid_render_settings;
 
 namespace augs {
 	std::array<vec2, 4> make_sprite_points(
@@ -157,6 +161,14 @@ namespace augs {
 			const flip_flags flip = {}
 		) const;
 
+		self grid(
+			texture_atlas_entry,
+			vec2i screen_size,
+			unsigned unit,
+			camera_cone,
+			const grid_render_settings&
+		) const;
+
 		template <class... Args>
 		self push(Args&&... args) const {
 			output_buffer.emplace_back(std::forward<Args>(args)...);
@@ -188,6 +200,7 @@ namespace augs {
 		using drawer::rect;
 		using drawer::rectangular_clock;
 		using drawer::line;
+		using drawer::grid;
 
 		template <class... Args>
 		self color_overlay(Args&&... args) const {
@@ -254,6 +267,12 @@ namespace augs {
 			base::line(default_texture, std::forward<Args>(args)...);
 			return *this;
 		}
+
+		template <class... Args>
+		self grid(Args&&... args) const {
+			base::grid(default_texture, std::forward<Args>(args)...);
+			return *this;
+		}
 	};
 
 	struct line_drawer {
@@ -262,20 +281,20 @@ namespace augs {
 		vertex_line_buffer& output_buffer;
 
 		self line(
-			const texture_atlas_entry,
-			const vec2 from,
-			const vec2 to,
-			const rgba color
+			texture_atlas_entry,
+			vec2 from,
+			vec2 to,
+			rgba color
 		) const;
 
 		self dashed_line(
-			const texture_atlas_entry,
-			const vec2 from,
-			const vec2 to,
-			const rgba color,
-			const float dash_length,
-			const float dash_velocity,
-			const double global_time_seconds
+			texture_atlas_entry,
+			vec2 from,
+			vec2 to,
+			rgba color,
+			float dash_length,
+			float dash_velocity,
+			double global_time_seconds
 		) const;
 	};
 

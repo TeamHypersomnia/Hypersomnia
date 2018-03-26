@@ -95,7 +95,7 @@ public:
 		}
 	}
 
-	std::optional<rgba> get_active_color(
+	std::optional<rgba> get_highlight_color_of(
 		const editor_entity_selector_settings& settings,
 		const entity_id id, 
 		const target_selections_type& signi_selections

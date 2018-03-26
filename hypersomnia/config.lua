@@ -60,6 +60,25 @@ return {
     draw_weapon_laser = true
   },
   editor = {
+    grid = {
+      render = {
+        alpha_multiplier = 0.5,
+        hide_grids_smaller_than = 16,
+        line_colors = {
+          ["0"] = "255 0 0 255",
+          ["1"] = "255 0 255 255",
+          ["2"] = "255 165 0 255",
+          ["3"] = "255 255 0 100",
+          ["4"] = "0 255 0 100",
+          ["5"] = "0 255 255 100",
+          ["6"] = "255 255 255 100",
+          ["7"] = "177 177 177 100",
+          ["8"] = "75 74 74 100",
+          ["9"] = "54 54 54 100"
+        },
+        maximum_power_of_two = 12
+      }
+    },
     autosave = {
       enabled = true,
       once_every_min = 1

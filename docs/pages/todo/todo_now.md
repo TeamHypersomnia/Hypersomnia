@@ -7,13 +7,29 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
-- move the filtering logic to filter struct
-- refactor mover
-- add rotations
+- fix saving of the camera
 
-- add dialog asking if we want to leave changes?
+- transforms in editor
+	- grid
+		- perhaps use a shader for grid that takes % 2?
+		- always draw aabb of the selection, with same logic as debug lines?
+		- tips: https://developer.valvesoftware.com/wiki/Hammer_Tools_Menu
+		- hotkeys for:
+			- increasing grid size: ]
+			- decreasing grid size: [
+			- toggle viewing grid: Ctrl+G
+			- toggle ctrl does snap: s
+		- valve aligns to selection's bounding box, looks like a neat idea
+			- research about corners other than left-bottom
 
-- use per_entity_type_container widely
+	- add rotations
+	- in property editor, make transforms always show some special imgui control?
+		- **Prefer contextual moving with t on selection**
+	- transform setting should always preview the changes as if by applying set_logic_transform
+	- some entities don't have their own transforms
+		- a warning should appear?
+		- actually, there's always a context by which a transform could be set
+			- e.g. if an item is held, it might just get its attachment offset moved	
 
 - sometimes floor is not selectable but it's because it has the same layer as road
 	- some warning perhaps could be in order?
@@ -55,7 +71,6 @@ summary: Just a hidden scratchpad.
 			- rewriting values when moving mouse
 				- 
 			
-
 - status bar
 	- check how it works in vim
 		- changing a mode to normal clears the last message
@@ -67,31 +82,22 @@ summary: Just a hidden scratchpad.
 
 - visible_entities should be templated by all_type
 
-- Add a flag to build editor or not
-	- Because it builds really long
-
 - Perhaps something to let us select and manipulate entities in gameplay mode?
 	- will it be useful?
 
 - handle bitsets properly, e.g. parties and hostile parties
 - handle slot categories properly, as well
 
-- Enter on selection opens relevant selection group in tabs
+- Selection tabs
+	- Enter on selection opens relevant selection group in tabs
+	- switching tabs with entities should always refocus on the same kind of property
 
 - Ctrl+Home should center on the whole scene
 
-- a generic "unmap_entity_vertices" and "map_entity_vertices that depend on the context
-	- e.g. setting reach for wandering pixels
-	- if fixture, change shape
-
-- we should use asynchronous texture transfers, especially when we'll be regenerating atlases
-
-- transform setting in editor
-	- transform setting should always preview the changes as if by applying set_logic_transform
-	- some entities don't have their own transforms
-		- a warning should appear?
-		- actually, there's always a context by which a transform could be set
-			- e.g. if an item is held, it might just get its attachment offset moved	
+- Editing vertices in editor
+	- a generic "unmap_entity_vertices" and "map_entity_vertices that depend on the context
+		- e.g. setting reach for wandering pixels
+		- if fixture, change shape
 
 - determine what to do with b2Filters
 	- it appears that filters aren't really given any special roles.
@@ -102,10 +108,6 @@ summary: Just a hidden scratchpad.
 	- enums will just have combos for all values
 	- assets will need to have their proper names displayed, unavailable in normal editing (test scene enums are unapplicable obviously)
 
-- first design a command for the changed properties because 
-	- flavour changing should be a different command, perhaps because the rest will never trigger reinference
-	- and adding and removing flavours should really be different commands whatsoever
-
 - composite commands
 	- e.g. duplicate entity will consist of two commands
 		- duplicate + move to new position
@@ -113,17 +115,9 @@ summary: Just a hidden scratchpad.
 		- it is only the case of GUI that some entries would appear as scoped nodes...
 			- ...and that some entries would go with each other on just a single ctrl+z/y
 
-- fix saving of the camera
-
 - generalize editor_tab_gui to be also able to handle the entities/flavours windows
 - implement ctrl+tab for tabs, either in settings or anywhere. It should just handle the current window
 	- shortcuts shall always focus relevant window
-
-- make transforms always show some special imgui control
-	- we could also add some choice for reference entity to be shown
-	- the owning entity by default
-
-- simple property editor
 
 - Also check that there are no guids in common state
 
@@ -232,8 +226,6 @@ summary: Just a hidden scratchpad.
 		- e.g. "gfx/my_rifle.png"
 	- makes work testbed out of the box
 
-- switching tabs with entities should always refocus on the same kind of property
-
 - check in editor if the saving/opening path is a valid folder?
 - make reveal in explorer work for both files and folders
 	- cause it also works for dirs
@@ -241,4 +233,5 @@ summary: Just a hidden scratchpad.
 - "unique" naming for unique sprite decorations et cetera
 
 - templatize some dangling memory stream arguments
+- we should use asynchronous texture transfers, especially when we'll be regenerating atlases
 

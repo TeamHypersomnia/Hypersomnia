@@ -402,6 +402,9 @@ void editor_setup::perform_custom_imgui(
 
 				if (const auto current_cone = get_current_camera()) {
 					const auto world_cursor_pos = current_cone->to_world_space(screen_size, mouse_pos);
+
+					text("Grid size: %x/%x", view().grid.unit_pixels, settings.grid.render.get_maximum_unit());
+
 					text("Cursor: %x", world_cursor_pos);
 					text("View center: %x", current_cone->transform.pos);
 
@@ -824,7 +827,6 @@ bool editor_setup::handle_input_before_imgui(
 	return false;
 }
 
-
 bool editor_setup::handle_input_before_game(
 	const necessary_images_in_atlas& sizes_for_icons,
 
@@ -870,7 +872,12 @@ bool editor_setup::handle_input_before_game(
 				auto& last = history.last_command();
 
 				if (auto* const cmd = std::get_if<move_entities_command>(std::addressof(last))) {
-					const auto new_delta = world_cursor_pos - mover.initial_world_cursor_pos;
+					auto new_delta = world_cursor_pos - mover.initial_world_cursor_pos;
+
+					if (has_ctrl) {
+						new_delta = view().grid.snap(new_delta);
+					}
+
 					cmd->rewrite_change(new_delta, make_command_input());
 				}
 				else {
@@ -938,6 +945,8 @@ bool editor_setup::handle_input_before_game(
 				}
 			}
 
+			auto clamp_units = [&]() { view().grid.clamp_units(8, settings.grid.render.get_maximum_unit()); };
+
 			switch (k) {
 				case key::C: 
 					if (view().selected_entities.size() == 1) { 
@@ -945,11 +954,15 @@ bool editor_setup::handle_input_before_game(
 					}
 					return true;
 				case key::I: play(); return true;
-				case key::G: history.seek_to_revision(has_shift ? history.get_commands().size() - 1 : 0, make_command_input()); return true;
+				case key::G: view().toggle_grid(); return true;
+				case key::OPEN_SQUARE_BRACKET: view().grid.decrease_grid_size(); clamp_units(); return true;
+				case key::CLOSE_SQUARE_BRACKET: view().grid.increase_grid_size(); clamp_units(); return true;
 				case key::DEL: del(); return true;
 				case key::T: start_moving_selection(); return true;
 				default: break;
 			}
+
+			// history.seek_to_revision(has_shift ? history.get_commands().size() - 1 : 0, make_command_input()); 
 		}
 	}
 
@@ -966,6 +979,22 @@ vec2 editor_setup::get_world_cursor_pos(const camera_cone cone) const {
 
 	const auto world_cursor_pos = cone.to_world_space(screen_size, mouse_pos);
 	return world_cursor_pos;
+}
+
+const editor_view* editor_setup::find_view() const {
+	if (anything_opened()) {
+		return std::addressof(view());
+	}
+
+	return nullptr;
+}
+
+std::optional<rgba> editor_setup::get_highlight_color_of(const entity_id id) const {
+	if (anything_opened() && player.paused) {
+		return selector.get_highlight_color_of(settings.entity_selector, id, view().selected_entities);
+	}
+
+	return std::nullopt;
 }
 
 void editor_setup::start_moving_selection() {

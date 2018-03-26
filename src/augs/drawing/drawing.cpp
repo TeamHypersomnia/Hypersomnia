@@ -2,6 +2,7 @@
 
 #include "augs/math/math.h"
 #include "augs/drawing/drawing.h"
+#include "augs/drawing/grid_render_settings.h"
 #include "augs/texture_atlas/texture_atlas_entry.h"
 #include "augs/drawing/polygon.h"
 #include "augs/misc/constant_size_vector.h"
@@ -417,6 +418,130 @@ namespace augs {
 		return *this;
 	}
 	
+	const drawer& drawer::grid(
+		const texture_atlas_entry tex,
+		const vec2i screen_size,
+		const unsigned minimum_unit,
+		const camera_cone cone,
+		const grid_render_settings& settings
+	) const {
+		const auto cols = [&settings]() {
+			auto result = settings.line_colors;
+
+			for (auto& c : result) {
+				c.multiply_alpha(settings.alpha_multiplier);
+			}
+
+			return result;
+		}();
+
+		const auto origin = screen_size / 2;
+		const auto maximum_unit = 1 << settings.maximum_power_of_two;
+
+		for (unsigned unit = maximum_unit, color_index = 0;
+		   	unit >= minimum_unit;
+			unit /= 2, ++color_index
+		) {
+			const auto screen_pixels_distance = unit * cone.zoom;
+
+			if (screen_pixels_distance < settings.hide_grids_smaller_than) {
+				continue;
+			}
+
+			const auto offset = -1 * (cone.transform.pos * cone.zoom);
+
+			auto skip = [&](const int i){
+				if (unit < maximum_unit) {
+					const auto logical_coordinate = i * unit;
+
+					if (logical_coordinate % (unit * 2) == 0) {
+						return true;
+					}
+				}
+
+				return false;
+			};
+
+			{
+				const auto closest_i = static_cast<int>(offset.x / screen_pixels_distance);
+
+				for (int i = closest_i + 1;; ++i) {
+					if (skip(i)) {
+						continue;
+					}
+
+					const auto x = offset.x + origin.x + screen_pixels_distance * i;
+
+					if (x > screen_size.x) {
+						break;
+					}
+
+					const auto top = vec2i(x, 0);
+					const auto bottom = vec2i(x, screen_size.y);
+
+					line(tex, top, bottom, 1, cols[color_index % cols.size()], {});
+				}
+
+				for (int i = closest_i;; --i) {
+					if (skip(i)) {
+						continue;
+					}
+
+					const auto x = offset.x + origin.x + screen_pixels_distance * i;
+
+					if (x < 0) {
+						break;
+					}
+
+					const auto top = vec2i(x, 0);
+					const auto bottom = vec2i(x, screen_size.y);
+
+					line(tex, top, bottom, 1, cols[color_index % cols.size()], {});
+				}
+			}
+
+			{
+				const auto closest_i = static_cast<int>(offset.y / screen_pixels_distance);
+
+				for (int i = closest_i + 1;; ++i) {
+					if (skip(i)) {
+						continue;
+					}
+
+					const auto y = offset.y + origin.y + screen_pixels_distance * i;
+
+					if (y > screen_size.y) {
+						break;
+					}
+
+					const auto top = vec2i(0, y);
+					const auto bottom = vec2i(screen_size.x, y);
+
+					line(tex, top, bottom, 1, cols[color_index % cols.size()], {});
+				}
+
+				for (int i = closest_i;; --i) {
+					if (skip(i)) {
+						continue;
+					}
+
+					const auto y = offset.y + origin.y + screen_pixels_distance * i;
+
+					if (y < 0) {
+						break;
+					}
+
+					const auto top = vec2i(0, y);
+					const auto bottom = vec2i(screen_size.x, y);
+
+					line(tex, top, bottom, 1, cols[color_index % cols.size()], {});
+				}
+			}
+		}
+
+		return *this;
+	}
+
 	const line_drawer& line_drawer::line(
 		const texture_atlas_entry tex, 
 		const vec2 from, 

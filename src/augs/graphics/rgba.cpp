@@ -243,6 +243,12 @@ void rgba::set(const rgba col) {
 	*this = col;
 }
 
+rgba& rgba::multiply_alpha(const float mult) {
+	const auto fa = static_cast<float>(a);
+	a = static_cast<rgba_channel>(fa * mult);
+	return *this;
+}
+
 rgba rgba::operator*(const rgba s) const {
 	return rgba(
 		static_cast<rgba_channel>(to_0_1(s.r) * r),

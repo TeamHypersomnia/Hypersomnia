@@ -1625,7 +1625,7 @@ int work(const int argc, const char* const * const argv) try {
 							const auto aabb = xywh::center_and_size(screen_space_pos, necessary_atlas_entries[image_id].get_size());
 							const auto expanded_square = aabb.expand_to_square();
 
-							if (auto active_color = editor.get_active_color(typed_handle.get_id())) {
+							if (auto active_color = editor.get_highlight_color_of(typed_handle.get_id())) {
 								active_color->a = static_cast<rgba_channel>(std::min(1.8 * active_color->a, 255.0));
 
 								const auto selection_indicator_aabb = expanded_square.expand_from_center(vec2(5, 5));
@@ -1658,13 +1658,31 @@ int work(const int argc, const char* const * const argv) try {
 						}	
 					);
 
+					const auto& editor_cfg = new_viewing_config.editor;
+
+					if (const auto view = editor.find_view()) {
+						if (view->show_grid) {
+							if (auto cone = editor.get_current_camera()) {
+								const auto lines = get_drawer();
+								const auto& g = view->grid;
+
+								lines.grid(
+									screen_size,
+									g.unit_pixels,
+									*cone,
+									editor_cfg.grid.render
+								);
+							}
+						}
+					}
+
 					const auto mouse = common_input_state.mouse.pos;
 
 					if (const auto r = editor.get_screen_space_rect_selection(screen_size, mouse)) {
 						get_drawer().aabb_with_border(
 							*r,
-							new_viewing_config.editor.rectangular_selection_color,
-							new_viewing_config.editor.rectangular_selection_border_color
+							editor_cfg.rectangular_selection_color,
+							editor_cfg.rectangular_selection_border_color
 						);
 					}
 				});

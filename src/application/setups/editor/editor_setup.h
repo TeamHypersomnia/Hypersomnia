@@ -310,6 +310,8 @@ public:
 
 	std::optional<ltrb> get_screen_space_rect_selection(vec2i screen_size, vec2i mouse_pos) const;
 
+	const editor_view* find_view() const;
+
 	template <class F>
 	void for_each_selected_entity(F&& callback) const {
 		if (anything_opened()) {
@@ -335,13 +337,7 @@ public:
 		}
 	}
 
-	std::optional<rgba> get_active_color(const entity_id id) const {
-		if (anything_opened() && player.paused) {
-			return selector.get_active_color(settings.entity_selector, id, view().selected_entities);
-		}
-
-		return std::nullopt;
-	}
+	std::optional<rgba> get_highlight_color_of(const entity_id id) const;
 
 	template <class F>
 	void for_each_highlight(F callback) const {

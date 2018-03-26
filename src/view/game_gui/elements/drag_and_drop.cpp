@@ -3,7 +3,7 @@
 #include "item_button.h"
 #include "augs/templates/always_false.h"
 #include "game/detail/inventory/item_slot_transfer_request.h"
-#include "view/game_gui/elements/grid.h"
+#include "view/game_gui/elements/gui_grid.h"
 #include "view/game_gui/elements/character_gui.h"
 #include "game/components/item_component.h"
 #include "game/detail/inventory/perform_transfer.h"

@@ -2,6 +2,8 @@
 #include "augs/filesystem/path.h"
 #include "augs/graphics/rgba.h"
 
+#include "augs/drawing/grid_render_settings.h"
+
 struct editor_autosave_settings {
 	// GEN INTROSPECTOR struct editor_autosave_settings
 	bool enabled = true;
@@ -35,6 +37,12 @@ struct editor_camera_settings {
 	// END GEN INTROSPECTOR
 };
 
+struct editor_grid_settings {
+	// GEN INTROSPECTOR struct editor_grid_settings
+	grid_render_settings render;
+	// END GEN INTROSPECTOR
+};
+
 struct editor_settings {
 	// GEN INTROSPECTOR struct editor_settings
 	editor_autosave_settings autosave;
@@ -43,6 +51,7 @@ struct editor_settings {
 	unsigned remember_last_n_commands = 200;
 #endif
 
+	editor_grid_settings grid;
 	editor_camera_settings camera;
 	editor_go_to_settings go_to;
 	editor_entity_selector_settings entity_selector;

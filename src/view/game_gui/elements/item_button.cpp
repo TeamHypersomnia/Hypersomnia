@@ -21,7 +21,7 @@
 #include "view/game_gui/game_gui_system.h"
 #include "view/game_gui/elements/item_button.h"
 #include "view/game_gui/elements/pixel_line_connector.h"
-#include "view/game_gui/elements/grid.h"
+#include "view/game_gui/elements/gui_grid.h"
 #include "view/game_gui/elements/drag_and_drop.h"
 #include "view/game_gui/elements/game_gui_root.h"
 #include "view/game_gui/elements/character_gui.h"

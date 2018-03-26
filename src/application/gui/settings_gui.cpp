@@ -244,6 +244,27 @@ void settings_gui_state::perform(
 				}	
 				
 				if (auto node = scoped_tree_node("Interface")) {
+					if (auto node = scoped_tree_node("Grid rendering")) {
+						auto& scope_cfg = config.editor.grid.render;
+
+						if (auto lines = scoped_tree_node("Line colors")) {
+							for (std::size_t i = 0; i < scope_cfg.line_colors.size(); ++i) {
+								revertable_color_edit(std::to_string(i), scope_cfg.line_colors[i]);
+							}
+						}
+
+						revertable_slider("Alpha", scope_cfg.alpha_multiplier, 0.f, 1.f);
+						{
+							auto& po2 = scope_cfg.maximum_power_of_two;
+
+							revertable_slider("Maximum power of 2", po2, 3u, 20u);
+							ImGui::SameLine();
+							text(typesafe_sprintf("(Max grid size: %x)", 1 << po2));
+						}
+
+						revertable_slider(SCOPE_CFG_NVP(hide_grids_smaller_than), 0u, 128u);
+					}
+
 					if (auto node = scoped_tree_node("Camera")) {
 						revertable_drag("Panning speed", config.editor.camera.panning_speed, 0.001f, -10.f, 10.f);
 					}

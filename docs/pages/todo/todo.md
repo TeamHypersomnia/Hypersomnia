@@ -57,3 +57,5 @@ summary: Just a hidden scratchpad.
 - ensure should throw so that the editor destructor can perform autosave
 	- for cores, just emit them programatically on unix
 	- and on windows it makes little sense to abort there, just debugbreak and throw.
+
+- some hint for windows unicode in imgui: https://github.com/ocornut/imgui/issues/1060

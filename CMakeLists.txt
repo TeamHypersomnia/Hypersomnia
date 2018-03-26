@@ -342,7 +342,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/view/game_gui/elements/action_button.cpp"
 	"src/view/game_gui/elements/character_gui.cpp"
 	"src/view/game_gui/elements/drag_and_drop.cpp"
-	"src/view/game_gui/elements/grid.cpp"
+	"src/view/game_gui/elements/gui_grid.cpp"
 	"src/view/game_gui/elements/gui_positioning.cpp"
 	"src/view/game_gui/elements/hotbar_button.cpp"
 	"src/view/game_gui/elements/item_button.cpp"
@@ -543,6 +543,8 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/application/setups/editor/commands/move_entities_command.cpp"
 	"src/application/setups/editor/gui/editor_entity_selector.cpp"
 	"src/application/setups/editor/property_editor/property_editor_structs.cpp"
+	"src/augs/math/snapping_grid.cpp"
+	"src/application/setups/editor/editor_view.cpp"
 )
 
 if(BUILD_WINDOW_FRAMEWORK)

@@ -1,4 +1,4 @@
-#include "grid.h"
+#include "view/game_gui/elements/gui_grid.h"
 
 #define GRID_WIDTH 11
 
