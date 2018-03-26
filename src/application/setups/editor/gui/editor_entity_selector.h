@@ -95,28 +95,16 @@ public:
 		}
 	}
 
+	std::optional<ltrb> get_selection_aabb(
+		const cosmos& cosm,
+		const target_selections_type& signi_selections
+	) const;
+
 	std::optional<rgba> get_highlight_color_of(
 		const editor_entity_selector_settings& settings,
-		const entity_id id, 
+		entity_id id, 
 		const target_selections_type& signi_selections
-	) const {
-		if (held == id) {
-			return settings.held_color;
-		}
-
-		if (hovered == id) {
-			return settings.hovered_color;
-		}
-
-		const bool in_signi = found_in(signi_selections, id);
-		const bool in_rectangular = found_in(in_rectangular_selection.all, id);
-
-		if (in_signi != in_rectangular) {
-			return settings.selected_color;
-		}
-
-		return std::nullopt;
-	}
+	) const;
 
 	template <class F>
 	void for_each_highlight(

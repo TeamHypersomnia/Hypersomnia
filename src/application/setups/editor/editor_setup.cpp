@@ -999,6 +999,14 @@ const editor_view* editor_setup::find_view() const {
 	return nullptr;
 }
 
+std::optional<ltrb> editor_setup::get_selection_aabb() const {
+	if (anything_opened() && player.paused) {
+		return selector.get_selection_aabb(work().world, view().selected_entities);
+	}
+
+	return std::nullopt;
+}
+
 std::optional<rgba> editor_setup::get_highlight_color_of(const entity_id id) const {
 	if (anything_opened() && player.paused) {
 		return selector.get_highlight_color_of(settings.entity_selector, id, view().selected_entities);

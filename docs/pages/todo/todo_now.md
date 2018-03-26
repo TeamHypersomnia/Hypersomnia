@@ -7,7 +7,13 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
+- differentiate between find_aabb for rendering/hovering and find_aabb for physical shapes?
+	- currently, sprite is prioritized over the physical components
+
 - fix saving of the camera
+	- always write the camera to disk?
+	- it's bad though as it incurs disk activity every time
+	- we could either set an "is_modified" flag or track it in history
 
 - transforms in editor
 	- grid

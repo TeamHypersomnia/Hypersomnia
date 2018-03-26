@@ -1,4 +1,6 @@
 #pragma once
+#include <optional>
+
 #include "3rdparty/Box2D/Common/b2Math.h"
 
 #include "augs/pad_bytes.h"
@@ -193,6 +195,8 @@ public:
 	vec2 get_mass_position() const;
 	vec2 get_world_center() const;
 	bool test_point(const vec2) const;
+
+	std::optional<ltrb> find_aabb() const;
 };
 
 template <class E>
@@ -436,4 +440,26 @@ void component_synchronizer<E, components::rigid_body>::set_transform(const comp
 			}
 		}
 	}	
+}
+
+class b2Body;
+struct b2AABB;
+
+std::optional<b2AABB> find_aabb(const b2Body& body);
+
+template <class E>
+std::optional<ltrb> component_synchronizer<E, components::rigid_body>::find_aabb() const {
+	if (const auto body = find_body()) {
+		if (const auto aabb = ::find_aabb(*body)) {
+			const auto si = handle.get_cosmos().get_si();
+			return ltrb(
+				aabb->lowerBound.x,		
+				aabb->lowerBound.y,		
+				aabb->upperBound.x,		
+				aabb->upperBound.x
+			).to_user_space(si);
+		}
+	}
+
+	return std::nullopt;
 }

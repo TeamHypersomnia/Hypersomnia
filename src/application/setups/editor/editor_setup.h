@@ -338,6 +338,7 @@ public:
 	}
 
 	std::optional<rgba> get_highlight_color_of(const entity_id id) const;
+	std::optional<ltrb> get_selection_aabb() const;
 
 	template <class F>
 	void for_each_highlight(F callback) const {

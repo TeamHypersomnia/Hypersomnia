@@ -21,7 +21,7 @@ struct basic_camera_cone {
 
 	ltrb to_screen_space(const vec2_type screen_size, const ltrb r) const {
 		// TODO: support rotation
-		return { to_screen_space(r.get_position()), r.get_size() };
+		return { to_screen_space(screen_size, r.get_position()), r.get_size() * zoom };
 	}
 
 	auto get_visible_world_area(const vec2_type screen_size) const {

@@ -75,7 +75,7 @@ void editor_entity_selector::unhover() {
 	hovered = {};
 }
 
-bool should_hover_standard_aabb(const cosmos& cosm, const entity_id id) {
+static bool should_hover_standard_aabb(const cosmos& cosm, const entity_id id) {
 	return cosm[id].dispatch([](const auto typed_handle){
 		using T = std::decay_t<decltype(typed_handle)>;
 		using E = typename T::used_entity_type;
@@ -170,4 +170,51 @@ void editor_entity_selector::do_mousemotion(
 			);
 		}
 	}
+}
+
+std::optional<ltrb> editor_entity_selector::get_selection_aabb(
+	const cosmos& cosm,
+	const target_selections_type& signi_selections
+) const {
+	ltrb total;
+
+	for_each_selected_entity(
+		[&](const auto id) {
+			const auto handle = cosm[id];
+
+			if (const auto aabb = handle.find_aabb()) {
+				total.contain(*aabb);	
+			}
+		},
+		signi_selections
+	);
+
+	if (total.good()) {
+		return total;
+	}
+
+	return std::nullopt;
+}
+
+std::optional<rgba> editor_entity_selector::get_highlight_color_of(
+	const editor_entity_selector_settings& settings,
+	const entity_id id, 
+	const target_selections_type& signi_selections
+) const {
+	if (held == id) {
+		return settings.held_color;
+	}
+
+	if (hovered == id) {
+		return settings.hovered_color;
+	}
+
+	const bool in_signi = found_in(signi_selections, id);
+	const bool in_rectangular = found_in(in_rectangular_selection.all, id);
+
+	if (in_signi != in_rectangular) {
+		return settings.selected_color;
+	}
+
+	return std::nullopt;
 }

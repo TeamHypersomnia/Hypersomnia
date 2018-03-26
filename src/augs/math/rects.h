@@ -4,6 +4,7 @@
 #include <iosfwd>
 #include <algorithm>
 #include "declare_math.h"
+#include "augs/math/si_scaling.h"
 
 enum rectangle_sticking {
 	LEFT,
@@ -101,14 +102,13 @@ struct basic_ltrb {
 	}
 
 	auto& contain(const basic_ltrb rc) {
+		if (!good()) {
+			*this = rc;
+			return *this;
+		}
+
 		l = std::min(l, rc.l);
 		t = std::min(t, rc.t);
-		contain_positive(rc);
-
-		return *this;
-	}
-
-	auto& contain_positive(const basic_ltrb rc) {
 		r = std::max(r, rc.r);
 		b = std::max(b, rc.b);
 
@@ -157,6 +157,24 @@ struct basic_ltrb {
 
 		*this = bigger;
 		return *this;
+	}
+
+	auto to_si_space(const si_scaling si) const {
+		basic_ltrb result;
+		result.l = si.get_meters(l);
+		result.t = si.get_meters(t);
+		result.r = si.get_meters(r);
+		result.b = si.get_meters(b);
+		return result;
+	}
+
+	auto to_user_space(const si_scaling si) const {
+		basic_ltrb result;
+		result.l = si.get_pixels(l);
+		result.t = si.get_pixels(t);
+		result.r = si.get_pixels(r);
+		result.b = si.get_pixels(b);
+		return result;
 	}
 
 	basic_ltrb& center_x(const T c) {

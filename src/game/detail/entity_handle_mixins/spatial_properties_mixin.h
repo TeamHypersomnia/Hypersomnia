@@ -105,30 +105,26 @@ public:
 	std::optional<ltrb> find_aabb(const components::transform transform) const {
 		const auto handle = *static_cast<const entity_handle_type*>(this);
 
-		if (const auto* const sprite = handle.template find<invariants::sprite>();
-			sprite != nullptr
-		) {
+		if (const auto* const sprite = handle.template find<invariants::sprite>()) {
 			return sprite->get_aabb(transform);
 		}
 
-		if (const auto* const polygon = handle.template find<invariants::polygon>();
-			polygon != nullptr
-		) {
+		if (const auto* const polygon = handle.template find<invariants::polygon>()) {
 			return polygon->get_aabb(transform);
 		}
 
-		if (const auto* const wandering_pixels = handle.template find<components::wandering_pixels>();
-			wandering_pixels != nullptr
-		) {
+		if (const auto* const wandering_pixels = handle.template find<components::wandering_pixels>()) {
 			return xywh::center_and_size(
 				transform.pos, 
 				wandering_pixels->size
 			);
 		}
 
-		/* TODO: Implement get_aabb for physical entities */
-		ensure(!handle.template has<components::rigid_body>());
-		ensure(nullptr == handle.template find<invariants::fixtures>());
+		if (const auto rigid_body = handle.template find<components::rigid_body>()) {
+			return rigid_body.find_aabb();
+		}
+
+		// ensure(nullptr == handle.template find<invariants::fixtures>());
 
 		return std::nullopt;
 	}

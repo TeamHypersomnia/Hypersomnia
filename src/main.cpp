@@ -1618,6 +1618,8 @@ int work(const int argc, const char* const * const argv) try {
 
 			if (current_setup) {
 				on_specific_setup([&](editor_setup& editor) {
+					const auto drawer = get_drawer();
+
 					editor.for_each_icon(
 						[&](const auto typed_handle, const auto image_id, const components::transform world_transform, const rgba color){
 							const auto screen_space_pos = get_camera().to_screen_space(screen_size, world_transform.pos);
@@ -1630,27 +1632,27 @@ int work(const int argc, const char* const * const argv) try {
 
 								const auto selection_indicator_aabb = expanded_square.expand_from_center(vec2(5, 5));
 
-								get_drawer().aabb(
+								drawer.aabb(
 									selection_indicator_aabb,
 									*active_color
 								);
 
 								active_color->a = static_cast<rgba_channel>(std::min(2.2 * active_color->a, 255.0));
 
-								get_drawer().border(
+								drawer.border(
 									selection_indicator_aabb,
 									*active_color,
 									border_input { 1, 0 }
 								);
 							}
 
-							get_drawer().base::aabb_centered(
+							drawer.base::aabb_centered(
 								necessary_atlas_entries[image_id],
 								screen_space_pos,
 								color
 							);
 
-							get_drawer().border(
+							drawer.border(
 								expanded_square,
 								color,
 								border_input { 1, 2 }
@@ -1660,26 +1662,36 @@ int work(const int argc, const char* const * const argv) try {
 
 					const auto& editor_cfg = new_viewing_config.editor;
 
-					if (const auto view = editor.find_view()) {
-						if (view->show_grid) {
-							if (auto cone = editor.get_current_camera()) {
-								const auto lines = get_drawer();
-								const auto& g = view->grid;
-
-								lines.grid(
+					if (auto cone = editor.get_current_camera()) {
+						if (const auto view = editor.find_view()) {
+							if (view->show_grid) {
+								drawer.grid(
 									screen_size,
-									g.unit_pixels,
+									view->grid.unit_pixels,
 									*cone,
 									editor_cfg.grid.render
 								);
 							}
+						}
+
+						if (const auto selection_aabb = editor.get_selection_aabb()) {
+							xywh ab;
+							ab.set_position(cone->to_screen_space(screen_size, selection_aabb->get_position()));
+							//ab.set_position(selection_aabb->get_position());
+							ab.set_size(selection_aabb->get_size() * cone->zoom);
+
+							drawer.border(
+								cone->to_screen_space(screen_size, *selection_aabb),
+								white,
+								border_input { 1, 0 }
+							);
 						}
 					}
 
 					const auto mouse = common_input_state.mouse.pos;
 
 					if (const auto r = editor.get_screen_space_rect_selection(screen_size, mouse)) {
-						get_drawer().aabb_with_border(
+						drawer.aabb_with_border(
 							*r,
 							editor_cfg.rectangular_selection_color,
 							editor_cfg.rectangular_selection_border_color

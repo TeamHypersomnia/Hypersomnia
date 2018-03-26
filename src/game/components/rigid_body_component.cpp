@@ -46,3 +46,25 @@ void physics_engine_transforms::set(const components::transform& t) {
 	m_sweep.a = rotation;
 	m_sweep.alpha0 = 0.0f;
 }
+
+std::optional<b2AABB> find_aabb(const b2Body& body) {
+	b2AABB aabb;
+
+	aabb.lowerBound = b2Vec2(FLT_MAX,FLT_MAX);
+	aabb.upperBound = b2Vec2(-FLT_MAX,-FLT_MAX); 
+
+	const auto* fixture = body.GetFixtureList();
+	
+	if (!fixture) {
+		return std::nullopt;
+	}
+
+	while (fixture != nullptr) {
+		// TODO: handle child indices?
+
+		aabb.Combine(aabb, fixture->GetAABB(0));
+		fixture = fixture->GetNext();
+	}
+
+	return aabb;
+}
