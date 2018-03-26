@@ -408,6 +408,14 @@ void editor_setup::perform_custom_imgui(
 					text("Cursor: %x", world_cursor_pos);
 					text("View center: %x", current_cone->transform.pos);
 
+					if (auto& panning = view().panned_camera; panning->transform.pos.has_fract()) {
+						ImGui::SameLine();
+
+						if (ImGui::Button("Round")) {
+							panning->transform.pos.discard_fract();
+						}
+					}
+
 					{
 						auto zoom = current_cone->zoom * 100.f;
 						
@@ -416,6 +424,7 @@ void editor_setup::perform_custom_imgui(
 								view().panned_camera = current_cone;
 							}
 
+							zoom = std::clamp(zoom, 1.f, 1000.f);
 							view().panned_camera->zoom = zoom / 100.f;
 						}
 					}
@@ -937,6 +946,7 @@ bool editor_setup::handle_input_before_game(
 
 				switch (k) {
 					case key::A: select_all_entities(); return true;
+					case key::_0: view().reset_zoom_at(world_cursor_pos); return true;
 					case key::Z: undo(); return true;
 					case key::C: copy(); return true;
 					case key::X: cut(); return true;

@@ -368,6 +368,16 @@ struct basic_vec2 {
 		return *this;
 	}
 
+	template <class A = type, class = std::enable_if_t<std::is_same_v<float, A>>>
+	bool has_fract() const {
+		float intpart;
+
+		auto x_fract = modff(x, &intpart);
+		auto y_fract = modff(y, &intpart);
+
+		return !(x_fract == 0 && y_fract == 0);
+	}
+
 	basic_vec2 perpendicular_cw() const {
 		return basic_vec2(-y, x);
 	}

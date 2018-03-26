@@ -119,7 +119,7 @@ namespace editor_detail {
 			camera.transform.pos -= pan_mult * amount / camera.zoom;
 		};
 
-		auto zoom_scene = [&](const auto zoom_amount, const auto zoom_point) {
+		auto zoom_scene = [&panned_camera, &current_cone, zoom_mult](const auto zoom_amount, const auto zoom_point) {
 			if (!panned_camera.has_value()) {
 				panned_camera = current_cone;
 			}
@@ -135,12 +135,21 @@ namespace editor_detail {
 
 			camera.zoom = new_zoom;	
 			camera.transform.pos += (1 - 1 / (new_zoom/old_zoom))*(zoom_point - camera.transform.pos);
+			camera.transform.pos.discard_fract();
 		};
 
 		if (e.msg == message::wheel) {
 			zoom_scene(e.data.scroll.amount, world_cursor_pos);
 			return true;
 		}
+
+#if 0
+		if (e.was_released(key::RMOUSE)) {
+			if (panned_camera.has_value()) {
+				panned_camera->transform.pos = vec2i(panned_camera->transform.pos);
+			}
+		}
+#endif
 
 		if (e.msg == message::mousemotion && common_input_state[key::RMOUSE]) {
 			pan_scene(vec2(e.data.mouse.rel) * settings.panning_speed);

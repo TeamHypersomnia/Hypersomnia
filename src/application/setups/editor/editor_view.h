@@ -25,5 +25,6 @@ struct editor_view {
 	std::optional<camera_cone> panned_camera;
 	// END GEN INTROSPECTOR
 
+	void reset_zoom_at(vec2);
 	void toggle_grid();
 };
