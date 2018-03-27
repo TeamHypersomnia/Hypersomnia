@@ -45,8 +45,12 @@ public:
 
 	void rewrite_change(
 		const delta_type& new_value,
+		std::optional<snapping_grid>,
 		const editor_command_input in
 	);
+	
+	void unmove_entities(cosmos& cosm);
+	void reinfer_moved(cosmos& cosm);
 
 	void redo(const editor_command_input in);
 	void undo(const editor_command_input in);

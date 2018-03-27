@@ -882,13 +882,29 @@ bool editor_setup::handle_input_before_game(
 				auto& last = history.last_command();
 
 				if (auto* const cmd = std::get_if<move_entities_command>(std::addressof(last))) {
-					auto new_delta = world_cursor_pos - mover.initial_world_cursor_pos;
+					auto new_delta = vec2(world_cursor_pos).discard_fract() - mover.initial_world_cursor_pos;
+
+					cmd->unmove_entities(cosm);
 
 					if (has_ctrl) {
-						new_delta = view().grid.snap(new_delta);
+						cmd->reinfer_moved(cosm);
+
+						if (const auto aabb_before_move = get_selection_aabb()) {
+							const auto current_aabb = *aabb_before_move + vec2(new_delta);
+
+							const auto tl = current_aabb.get_position();
+							const auto snapped_tl = view().grid.snap(tl);
+							const auto snapping_delta = snapped_tl - tl;
+
+							new_delta += snapping_delta;
+						}
 					}
 
-					cmd->rewrite_change(new_delta, make_command_input());
+					cmd->rewrite_change(
+						new_delta, 
+						std::nullopt,
+						make_command_input()
+					);
 				}
 				else {
 					mover.active = false;
@@ -989,8 +1005,7 @@ vec2 editor_setup::get_world_cursor_pos(const camera_cone cone) const {
 	const auto mouse_pos = vec2i(ImGui::GetIO().MousePos);
 	const auto screen_size = vec2i(ImGui::GetIO().DisplaySize);
 
-	const auto world_cursor_pos = cone.to_world_space(screen_size, mouse_pos);
-	return world_cursor_pos;
+	return cone.to_world_space(screen_size, mouse_pos);
 }
 
 const editor_view* editor_setup::find_view() const {
@@ -1031,21 +1046,8 @@ void editor_setup::start_moving_selection() {
 		if (!command.empty()) {
 			mover.active = true;
 
-			const auto world_cursor_pos = get_world_cursor_pos();
-
-			if (command.size() == 1) {
-				/* If it's just one entity, let its center follow the mouse */
-				const auto& cosm = work().world;
-
-				command.moved_entities.for_each([&](const auto& id){
-					mover.initial_world_cursor_pos = cosm[id].get_logic_transform().pos;
-				});
-			}
-			else {
-				/* If it's more than one entity, let all objects be moved by further relative motion */
-				mover.initial_world_cursor_pos = world_cursor_pos;
-			}
-
+			const auto world_cursor_pos = get_world_cursor_pos().discard_fract();
+			mover.initial_world_cursor_pos = world_cursor_pos;
 			command.delta = components::transform(world_cursor_pos - mover.initial_world_cursor_pos, 0);
 
 			folder().history.execute_new(std::move(command), make_command_input());

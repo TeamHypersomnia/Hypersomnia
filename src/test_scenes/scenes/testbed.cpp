@@ -296,17 +296,17 @@ namespace test_scenes {
 				const auto e = create_test_scene_entity(world, test_sprite_decorations::HAVE_A_PLEASANT, components::transform(vec2(164.f - 8.f, -60.f - 20.f)));
 
 				prefabs::create_brick_wall(step, vec2(3 + 1 + 1100, -32 - 96));
-				prefabs::create_brick_wall(step, vec2(3 + 1 + 1100 + 160, -32 - 96));
-				prefabs::create_brick_wall(step, vec2(3 + 1 + 1100 + 160, -32 - 96 + 160));
-				prefabs::create_brick_wall(step, vec2(3 + 1 + 1100, -32 - 96 + 160));
+				prefabs::create_brick_wall(step, vec2(3 + 1 + 1100 + 128, -32 - 96));
+				prefabs::create_brick_wall(step, vec2(3 + 1 + 1100 + 128, -32 - 96 + 128));
+				prefabs::create_brick_wall(step, vec2(3 + 1 + 1100, -32 - 96 + 128));
 				prefabs::create_brick_wall(step, vec2(-3 -16 + 100, -32 - 96));
-				prefabs::create_brick_wall(step, vec2(-3 -16 + 100 + 160, -32 - 96));
-				prefabs::create_brick_wall(step, vec2(-3 -16 + 100 + 160, -32 - 96 + 160));
-				prefabs::create_brick_wall(step, vec2(-3 -16 + 100, -32 - 96 + 160));
+				prefabs::create_brick_wall(step, vec2(-3 -16 + 100 + 128, -32 - 96));
+				prefabs::create_brick_wall(step, vec2(-3 -16 + 100 + 128, -32 - 96 + 128));
+				prefabs::create_brick_wall(step, vec2(-3 -16 + 100, -32 - 96 + 128));
 
 				for (int b = 0; b < 8; ++b) {
-					prefabs::create_brick_wall(step, components::transform({ 3.f + 1 + 1100 + 160 + 160, -32 - 96 + 160 - 160.f * b }, 90));
-					prefabs::create_brick_wall(step, components::transform({ -3.f - 16 + 100 - 160, -32.f - 96 + 160 - 160*b }, 90));
+					prefabs::create_brick_wall(step, components::transform(vec2( 3 + 1 + 1100 + 128 + 128, -32 - 96 + 128 - 128 * b ), 90));
+					prefabs::create_brick_wall(step, components::transform(vec2( -3 - 16 + 100 - 128, -32 - 96 + 128 - 128*b ), 90));
 				}
 
 				{
@@ -325,7 +325,7 @@ namespace test_scenes {
 				{
 					const vec2 size = metas.at(assets::game_image_id::ROAD_FRONT_DIRT).get_size();
 
-					create_test_scene_entity(world, test_sprite_decorations::ROAD_DIRT, components::transform{ vec2(-3 - 16 + 100 + 160 + 80 + size.x / 2, -32 - 96 + 160 + 80 - size.y / 2) });
+					create_test_scene_entity(world, test_sprite_decorations::ROAD_DIRT, components::transform{ vec2(-3 - 16 + 100 + 128 + 80 + size.x / 2, -32 - 96 + 128 + 80 - size.y / 2) });
 				}
 
 				{
@@ -344,7 +344,7 @@ namespace test_scenes {
 				for (int r = 0; r < 38; ++r) {
 					const vec2 size = metas.at(assets::game_image_id::ROAD).get_size();
 
-					auto road = create_test_scene_entity(world, test_sprite_decorations::ROAD, components::transform{ vec2(-3 - 16 + 100 + 160 + 80 + size.x / 2, -32 - 96 + 160 + 80 + size.y / 2 + size.y*r) });
+					auto road = create_test_scene_entity(world, test_sprite_decorations::ROAD, components::transform{ vec2(-3 - 16 + 100 + 128 + 80 + size.x / 2, -32 - 96 + 128 + 80 + size.y / 2 + size.y*r) });
 				}
 			}
 

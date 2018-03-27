@@ -4,6 +4,7 @@
 #include "application/setups/editor/editor_folder.h"
 #include "application/setups/editor/editor_command_input.h"
 #include "application/setups/editor/commands/move_entities_command.h"
+#include "application/setups/editor/gui/editor_entity_selector.h"
 
 #include "augs/readwrite/memory_stream.h"
 #include "augs/readwrite/byte_readwrite.h"
@@ -107,8 +108,24 @@ void move_entities_command::push_entry(const const_entity_handle handle) {
 	});
 }
 
+void move_entities_command::unmove_entities(cosmos& cosm) {
+	auto before_change_data = augs::cref_memory_stream(values_before_change);
+
+	/* For improved determinism, unmove the entities first... */
+	::unmove_entities({}, cosm, moved_entities, before_change_data);
+}
+
+void move_entities_command::reinfer_moved(cosmos& cosm) {
+	moved_entities.for_each([&](const auto id){
+		const auto h = cosm[id];	
+
+		cosmic::infer_caches_for(h);
+	});
+}
+
 void move_entities_command::rewrite_change(
 	const delta_type& new_value,
+	const std::optional<snapping_grid> grid,
 	const editor_command_input in
 ) {
 	/* 
@@ -118,22 +135,13 @@ void move_entities_command::rewrite_change(
 
 	delta = new_value;
 
-	auto before_change_data = augs::cref_memory_stream(values_before_change);
-
 	auto& cosm = in.get_cosmos();
 
-	/* For improved determinism, unmove the entities first... */
-	unmove_entities({}, cosm, moved_entities, before_change_data);
-
+	/* For improved determinism, client of this function should unmove the entities first... */
 	/* ...and only now move by the new delta, exactly as if we were moving the entities for the first time. */
+
 	move_entities({}, cosm, moved_entities, new_value);
-
-
-	moved_entities.for_each([&](const auto id){
-		const auto h = cosm[id];	
-
-		cosmic::infer_caches_for(h);
-	});
+	reinfer_moved(cosm);
 }
 
 void move_entities_command::redo(const editor_command_input in) {
@@ -159,7 +167,7 @@ void move_entities_command::undo(const editor_command_input in) {
 	auto& cosm = in.get_cosmos();
 
 	auto before_change_data = augs::cref_memory_stream(values_before_change);
-	unmove_entities({}, cosm, moved_entities, before_change_data);
+	::unmove_entities({}, cosm, moved_entities, before_change_data);
 	values_before_change.clear();
 
 	cosmic::reinfer_all_entities(cosm);

@@ -34,7 +34,7 @@ namespace test_flavours {
 			meta.set(render_def);
 
 			test_flavours::add_sprite(meta, logicals, assets::game_image_id::BRICK_WALL, white);
-			meta.get<invariants::sprite>().size = vec2(160, 160);
+			meta.get<invariants::sprite>().size = vec2(128, 128);
 			add_shape_invariant_from_renderable(meta, logicals);
 
 			test_flavours::add_standard_static_body(meta);
