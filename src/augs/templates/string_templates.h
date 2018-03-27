@@ -14,6 +14,8 @@
 #include "augs/templates/get_by_dynamic_id.h"
 #include "augs/templates/is_std_array.h"
 
+#include "augs/templates/string_templates_declaration.h"
+
 template <class T>
 std::string to_string(
 	const T& val, 
@@ -132,12 +134,6 @@ auto to_lowercase(S s) {
 template <class S>
 auto to_uppercase(S s) {
 	return str_ops(s).to_uppercase().subject;
-}
-
-template <class S>
-auto format_field_name(S s) {
-	s[0] = ::toupper(s[0]);
-	return str_ops(s).multi_replace_all({ "_", "." }, " ").subject;
 }
 
 inline bool ends_with(const std::string& value, const std::string& ending) {

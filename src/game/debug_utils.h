@@ -1,6 +1,5 @@
 #pragma once
 #include "augs/log.h"
-#include "augs/templates/string_templates.h"
 #include "augs/misc/typesafe_sprintf.h"
 
 template <class E>

@@ -1,5 +1,10 @@
 #include "string_templates.h"
 
+std::string format_field_name(std::string s) {
+	s[0] = ::toupper(s[0]);
+	return str_ops(s).multi_replace_all({ "_", "." }, " ").subject;
+}
+
 std::string to_forward_slashes(std::string in_str) {
 	for (auto& s : in_str) {
 		if (s == '\\') {

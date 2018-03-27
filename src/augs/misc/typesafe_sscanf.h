@@ -6,7 +6,6 @@
 #include <limits>
 
 #include "augs/ensure.h"
-#include "augs/templates/string_templates.h"
 
 inline bool typesafe_scanf_detail(
 	size_t source_pos,

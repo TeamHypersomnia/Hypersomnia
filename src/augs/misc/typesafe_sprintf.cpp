@@ -3,6 +3,7 @@
 
 #include "augs/math/vec2.h"
 #include "augs/misc/typesafe_sprintf.h"
+#include "augs/templates/string_templates.h"
 #include "augs/filesystem/path.h"
 
 TEST_CASE("Type-safe sprintf", "Several tests") {

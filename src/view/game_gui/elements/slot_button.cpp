@@ -15,7 +15,6 @@
 #include "view/game_gui/game_gui_system.h"
 
 #include "pixel_line_connector.h"
-#include "augs/templates/string_templates.h"
 
 #include "view/game_gui/elements/gui_grid.h"
 

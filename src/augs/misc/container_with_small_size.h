@@ -5,6 +5,7 @@
 #include "augs/ensure.h"
 #include "augs/readwrite/byte_readwrite_declaration.h"
 #include "augs/templates/container_traits.h"
+#include "augs/templates/string_templates.h"
 
 namespace augs {
 	template <class T, class size_type>

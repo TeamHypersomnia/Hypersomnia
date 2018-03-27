@@ -1,5 +1,7 @@
 #pragma once
 
+std::string format_field_name(std::string s);
+
 template <class List>
 class type_in_list_id;
 
