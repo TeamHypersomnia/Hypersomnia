@@ -15,6 +15,11 @@ summary: Just a hidden scratchpad.
 			- snap bboxes independently: ctrl+shift+b
 		- valve aligns to selection's bounding box, looks like a neat idea
 			- research about corners other than left-bottom
+			- we'll just snap each AABB corner
+				- algorithm:
+					- for each aabb corner, determine which grid vertex is the closest
+					- for each determined closest grid vertex, choose the one with the least distance,
+						- and align the respective vertex 
 
 - Dichotomy of physical AABBs and sprite AABBs, and their roles in editor
 	- It makes sense that, at some point, they might be different.
