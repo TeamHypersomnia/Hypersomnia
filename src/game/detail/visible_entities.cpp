@@ -105,18 +105,18 @@ void visible_entities::acquire_non_physical(const visible_entities_query input) 
 	const auto& tree_of_npo = cosmos.get_solvable_inferred().tree_of_npo;
 	
 	tree_of_npo.for_each_in_camera(
-		[&](const unversioned_entity_id id) {
-			const auto versioned_id = cosmos.to_versioned(id);
+		[&](const unversioned_entity_id unversioned_id) {
+			const auto id = cosmos.to_versioned(unversioned_id);
 			
 			if (input.exact) {
-				if (const auto aabb = cosmos[versioned_id].find_aabb(); 
+				if (const auto aabb = cosmos[id].find_aabb(); 
 					!aabb || !camera_aabb.hover(*aabb)
 				) {
 					return;
 				}
 			}
 
-			all.push_back(cosmos.to_versioned(id));
+			all.push_back(id);
 		},
 		camera,
 		input.screen_size,
