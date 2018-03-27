@@ -31,16 +31,18 @@ Wtedy mamy dwie różniące się dane.
 		- To na razie nie będzie tragedią (nie będzie często się zdarzać), a poprawienie tego teraz będzie dla mnie ogromnym bólem w dupie
 		- Przyszłe rozwiązanie: **jeśli ciało fizyczne nie pokrywa się z obrazkiem**, to dodatkowo nad obrazkiem rysujemy przerywaną linię tam gdzie jest ciało fizyczne, aby było widać gdzie trzeba najechać myszą
 
-### Problem: edycja jednego lub drugiego kształtu.
+### Problem: edycja jednego lub drugiego kształtu
 
-- ``v`` - tryb ogólnej edycji kształtu.
-	- Dla niefizycznej dekoracji nie robimy nic.
+- ``v`` - tryb ogólnej edycji kształtu:
+	- Dla niefizycznej dekoracji która jest obrazkiem - nie robimy nic.
 		- Nie będziemy zmieniać rozmiaru obrazka bo to nie ma sensu z pixelartami.
+	- Dla niefizycznej dekoracji która jest wielokątem - modyfikujemy ten wielokąt.
+		- Nawet jeśli to będzie pixel-art, można ustawić takie koordynaty uv dla tesktury, aby obrazek nie był rozciągnięty, tylko po prostu pocięty wierzchołkami obiektu.
 	- Dla fizycznego obiektu którego obrazkową reprezentacją jest sprite, a więc zwykły obrazek, **edytuje kształt jego fizycznej reprezentacji**.
 		- Nadal nie pozwala na modyfikację obrazka!
 	- Dla fizycznego obiektu którego obrazkową reprezentacją jest wielokąt (np. nieregularna ściana jaskinii), **edytuje kształt jego obrazkowej reprezentacji**, ale...
 		- ...każde przeciągnięcie wierzchołka albo rozciągnięcie rozmiaru - **automatycznie uaktualnia kształt fizyczny**, aby się zgadzał z nowym kształtem obrazkowej reprezentacji.
-		- Nawet jeśli to będzie pixel-art, można ustawić takie koordynaty uv dla tesktury, aby obrazek nie był rozciągnięty, tylko po prostu pocięty wierzchołkami obiektu.
+		- Podobnie jak z niefizycznymi dekoracjami, możemy na to nałożyć pixel-art w rozmiarze 1:1.
 
 #### Przykładowy workflow, 1
 
