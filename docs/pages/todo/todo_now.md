@@ -7,26 +7,59 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
-- differentiate between find_aabb for rendering/hovering and find_aabb for physical shapes?
-	- currently, sprite is prioritized over the physical components
-
-- fix saving of the camera
-	- always write the camera to disk?
-	- it's bad though as it incurs disk activity every time
-	- we could either set an "is_modified" flag or track it in history
-
 - transforms in editor
 	- grid
-		- perhaps use a shader for grid that takes % 2?
-		- always draw aabb of the selection, with same logic as debug lines?
 		- tips: https://developer.valvesoftware.com/wiki/Hammer_Tools_Menu
 		- hotkeys for:
-			- increasing grid size: ]
-			- decreasing grid size: [
-			- toggle viewing grid: Ctrl+G
-			- toggle ctrl does snap: s
+			- toggle ctrl does snap?
+			- snap bboxes independently: ctrl+shift+b
 		- valve aligns to selection's bounding box, looks like a neat idea
 			- research about corners other than left-bottom
+
+- Dichotomy of physical AABBs and sprite AABBs, and their roles in editor
+	- It makes sense that, at some point, they might be different.
+		- E.g. we might want to have a little smaller physical aabb than the character's sprite, so that it better touches things
+	- All AABB cases
+		- Editor
+			- Selecting entities
+				- Currently, physical body is preferred
+			- Selection's AABB highlighting
+				- Always prefer the physical AABB
+			- When in shape editing mode:
+				- v switches to physical shape editing
+				- V switches to exclusively renderable shape editing
+			- Problem: mouseover an object might not work
+				- draw a dashed line if aabb and sprite's size diverges
+		- Tree of NPO
+			- By very definition, only renderable AABBs
+		- AABB highlighter in-game
+			- Should really care only about physical representation, as it is for the gameplay
+	- find_aabb
+		- determine where it is used
+		- differentiate between find_aabb for rendering/hovering and find_aabb for physical shapes?
+	- synchronization buttons under sprite & polygon invariants
+		- Read from asset
+		- Write to physics
+	- for now, we ditch the polygons until we make an arena
+		- the soonest they'll be needed is for the truck
+	- what do we snap, for example?
+	- currently, sprite is prioritized over the physical components
+	- what if we stored sprite id for fixtures, so that we don't have to specify size separately?
+		- pain in the ass when calculating rendering rect
+			- perf might take a hit even
+		- let's just have a button under sprite and later polygon invariant to "sync" with physics
+
+- flipping a selection
+	- useful for creating symmetrical levels
+
+- about grenades and changing of their shape
+	- let hand fuse invariant have an optional radius for the thrown grenade
+		- reinfer when tweaking also?
+	- the physics world cache will simply take into consideration if the hand fuse was released, when calculating shape
+		- so hand fuse component might want to become a synchronizable
+
+- separate component/invariant: sentience_animation
+	- Animations for the character will be complicated enough to warrant a separate component
 
 	- add rotations
 	- in property editor, make transforms always show some special imgui control?

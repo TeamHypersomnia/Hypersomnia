@@ -5,6 +5,20 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- fix saving of the editor view state when the work is saved to some non-untitled location
+	- notice that, we might later introduce some caches for selections to improve performance
+		- e.g. only always calculate the selection's aabb and rotation centers once
+	- we might also want to encapsulate setting panning cameras and selections to have stacks
+		- where we'll able to set modification flags easily
+	- **therefore let's do it when we get to these stacks.**
+		- because camera & selection state isn't all that critical
+			- and untitled work for testing is always saved anyway
+	- we can just always write the camera to disk?
+		- it's bad though as it incurs disk activity every time
+		- and selection state isn't that small
+	- we could either set an "is_modified" flag or track it in history
+		- not much modification points for selections, so quite viable
+
 - implement some stupid simple physical logic for crosshair recoil entity
 	- so that a separate child entity is not needed
 	- maybe even copy some from b2Body
