@@ -5,7 +5,6 @@
 void editor_entity_selector::clear() {
 	in_rectangular_selection.clear();
 	hovered.unset();
-	held.unset();
 };
 
 std::optional<ltrb> editor_entity_selector::get_screen_space_rect_selection(
@@ -57,12 +56,17 @@ void editor_entity_selector::do_left_release(
 	const bool has_ctrl,
 	target_selections_type& selections
 ) {
-	if (held.is_set()) {
-		if (has_ctrl && found_in(selections, held)) {
-			selections.erase(held);
+	if (const auto clicked = held) {
+		if (has_ctrl) {
+			if (found_in(selections, clicked)) {
+				selections.erase(clicked);
+			}
+			else {
+				selections.emplace(clicked);
+			}
 		}
 		else {
-			selections.emplace(hovered);
+			selections = { clicked };
 		}
 	}
 
@@ -106,10 +110,14 @@ void editor_entity_selector::do_mousemotion(
 	};
 
 	{
-		const auto drag_dead_area = 3.f;
-		const auto drag_offset = world_cursor_pos - last_ldown_position;
+		const bool drag_just_left_dead_area = [&]() {
+			const auto drag_dead_area = 3.f;
+			const auto drag_offset = world_cursor_pos - last_ldown_position;
 
-		if (left_button_pressed && !drag_offset.is_epsilon(drag_dead_area)) {
+			return !drag_offset.is_epsilon(drag_dead_area);
+		}();
+
+		if (left_button_pressed && drag_just_left_dead_area) {
 			rectangular_drag_origin = last_ldown_position;
 			held = {};
 		}
@@ -178,14 +186,16 @@ std::optional<ltrb> editor_entity_selector::get_selection_aabb(
 ) const {
 	ltrb total;
 
-	for_each_selected_entity(
-		[&](const auto id) {
-			const auto handle = cosm[id];
+	auto combine_aabb_of = [&total, &cosm](const entity_id id) {
+		const auto handle = cosm[id];
 
-			if (const auto aabb = handle.find_aabb()) {
-				total.contain(*aabb);	
-			}
-		},
+		if (const auto aabb = handle.find_aabb()) {
+			total.contain(*aabb);	
+		}
+	};
+
+	for_each_selected_entity(
+		combine_aabb_of,
 		signi_selections
 	);
 

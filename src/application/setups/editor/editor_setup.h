@@ -368,6 +368,7 @@ public:
 
 			if (const auto hovered_guid = all_entities_gui.get_hovered_guid()) {
 				if (const auto hovered = world[hovered_guid]) {
+					/* Hovering from GUI, so choose the stronger, held color for it */
 					callback(hovered.get_id(), settings.entity_selector.held_color);
 				}
 			}
