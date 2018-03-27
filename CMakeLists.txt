@@ -73,6 +73,8 @@ option(BUILD_WINDOW_FRAMEWORK "Build code specific to a given platfom, e.g. wind
 option(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE "Add command to archive builds in Release." ${DEFAULT_OPT})
 option(ADD_APPLICATION_ICON "Add application icon." ${DEFAULT_OPT})
 
+option(ENABLE_LINK_TIME_OPTIMIZATION "Some ultra extra optimizations for Release builds. Takes a lot longer to build." OFF)
+
 # Other variables.
 
 # Where the game will save logs.
@@ -826,7 +828,9 @@ if(MSVC)
 endif()
 
 if(CLANG)
-	set(HYPERSOMNIA_CXX_RELEASE_FLAGS "-flto -fwhole-program-vtables")
+	if(ENABLE_LINK_TIME_OPTIMIZATION)
+		set(HYPERSOMNIA_CXX_RELEASE_FLAGS "-flto -fwhole-program-vtables")
+	endif()
 endif()
 
 if(ADD_MCMODEL_LARGE_FLAG)
@@ -848,7 +852,9 @@ set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
 set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
 
 if(CLANG)
-	set(HYPERSOMNIA_LINKER_RELEASE_FLAGS "-flto -fwhole-program-vtables")
+	if(ENABLE_LINK_TIME_OPTIMIZATION)
+		set(HYPERSOMNIA_LINKER_RELEASE_FLAGS "-flto -fwhole-program-vtables")
+	endif()
 elseif(MSVC)
 	set(HYPERSOMNIA_LINKER_RELEASE_FLAGS "/LTCG /INCREMENTAL:NO /OPT:REF")
 
