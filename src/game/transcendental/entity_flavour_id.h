@@ -2,6 +2,7 @@
 #include <string>
 #include "augs/minus_oned_pod.h"
 #include "augs/templates/hash_templates.h"
+#include "augs/templates/string_templates_declaration.h"
 
 #include "game/transcendental/entity_type_traits.h"
 #include "game/organization/all_entity_types_declaration.h"
@@ -39,6 +40,11 @@ struct constrained_entity_flavour_id {
 	}
 };
 
+template <class... C>
+std::ostream& operator<<(std::ostream& out, const constrained_entity_flavour_id<C...> x) {
+	return out << "(" << get_type_name(x.type_id) << ": " << x.raw << ")";
+}
+
 template <class E>
 struct typed_entity_flavour_id {
 	raw_entity_flavour_id raw;
@@ -66,6 +72,11 @@ struct typed_entity_flavour_id {
 		return { raw, entity_type_id::of<E>() };
 	}
 };
+
+template <class T>
+std::ostream& operator<<(std::ostream& out, const typed_entity_flavour_id<T> x) {
+	return out << "(" << get_type_name<T>() << ": " << x.raw << ")";
+}
 
 namespace std {
 	template <>

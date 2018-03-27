@@ -23,12 +23,18 @@ std::optional<ltrb> editor_entity_selector::get_screen_space_rect_selection(
 }
 
 void editor_entity_selector::do_left_press(
+	const cosmos& cosm,
 	bool has_ctrl,
 	const vec2i world_cursor_pos,
 	target_selections_type& selections
 ) {
 	last_ldown_position = world_cursor_pos;
 	held = hovered;
+
+	if (const auto held_entity = cosm[held]) {
+		flavour_of_held = held_entity.get_flavour_id();
+		LOG_NVPS(flavour_of_held);
+	}
 
 	if (!has_ctrl) {
 		/* Make a new selection */
@@ -50,6 +56,7 @@ void editor_entity_selector::finish_rectangular(target_selections_type& into) {
 
 	rectangular_drag_origin = std::nullopt;
 	in_rectangular_selection.clear();
+	flavour_of_held = {};
 }
 
 void editor_entity_selector::do_left_release(
@@ -99,6 +106,7 @@ void editor_entity_selector::do_mousemotion(
 	const necessary_images_in_atlas& sizes_for_icons,
 
 	const cosmos& cosm,
+	const editor_rect_select_type rect_select_mode,
 	const vec2 world_cursor_pos,
 	const camera_cone current_cone,
 	const bool left_button_pressed
@@ -152,6 +160,12 @@ void editor_entity_selector::do_mousemotion(
 				}
 			}
 		);
+
+		if (rect_select_mode == editor_rect_select_type::SAME_FLAVOUR) {
+			erase_if(in_rectangular_selection.all, [&](const entity_id id) {
+				return !(cosm[id].get_flavour_id() == flavour_of_held);
+			});
+		}
 	}
 	else {
 		hovered.unset();

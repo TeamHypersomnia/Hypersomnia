@@ -11,3 +11,15 @@ void editor_view::reset_zoom_at(vec2 pos) {
 		panned_camera->transform.pos = pos.discard_fract();
 	}
 }
+
+void editor_view::toggle_flavour_rect_selection() {
+	switch (rect_select_mode) {
+		case editor_rect_select_type::SAME_FLAVOUR: 
+			rect_select_mode = editor_rect_select_type::EVERYTHING; 
+		break;
+
+		default: 
+			rect_select_mode = editor_rect_select_type::SAME_FLAVOUR;
+		break;
+	}
+}

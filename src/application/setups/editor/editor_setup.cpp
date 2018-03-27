@@ -861,6 +861,7 @@ bool editor_setup::handle_input_before_game(
 	const bool has_shift{ common_input_state[key::LSHIFT] };
 
 	if (is_editing_mode()) {
+		auto& cosm = work().world;
 		const auto screen_size = vec2i(ImGui::GetIO().DisplaySize);
 
 		if (editor_detail::handle_camera_input(
@@ -898,8 +899,8 @@ bool editor_setup::handle_input_before_game(
 
 			selector.do_mousemotion(
 				sizes_for_icons,
-
-				work().world,
+				cosm,
+				view().rect_select_mode,
 				world_cursor_pos,
 				current_cone,
 				common_input_state[key::LMOUSE]
@@ -915,7 +916,7 @@ bool editor_setup::handle_input_before_game(
 
 		if (mover.active && e.was_pressed(key::LMOUSE)) {
 			mover.active = false;
-			cosmic::reinfer_all_entities(work().world);
+			cosmic::reinfer_all_entities(cosm);
 			return true;
 		}
 
@@ -923,7 +924,7 @@ bool editor_setup::handle_input_before_game(
 			auto& selections = view().selected_entities;
 
 			if (e.was_pressed(key::LMOUSE)) {
-				selector.do_left_press(has_ctrl, world_cursor_pos, selections);
+				selector.do_left_press(cosm, has_ctrl, world_cursor_pos, selections);
 				return true;
 			}
 			else if (e.was_released(key::LMOUSE)) {
@@ -964,6 +965,7 @@ bool editor_setup::handle_input_before_game(
 					}
 					return true;
 				case key::I: play(); return true;
+				case key::F: view().toggle_flavour_rect_selection(); return true;
 				case key::G: view().toggle_grid(); return true;
 				case key::OPEN_SQUARE_BRACKET: view().grid.decrease_grid_size(); clamp_units(); return true;
 				case key::CLOSE_SQUARE_BRACKET: view().grid.increase_grid_size(); clamp_units(); return true;

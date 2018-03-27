@@ -10,7 +10,9 @@
 
 #include "view/necessary_image_id.h"
 #include "view/necessary_resources.h"
+
 #include "application/setups/editor/editor_settings.h"
+#include "application/setups/editor/editor_rect_select_type.h"
 
 template <class F>
 void for_each_iconed_entity(const cosmos& cosm, F callback) {
@@ -42,12 +44,15 @@ class editor_entity_selector {
 	visible_entities in_rectangular_selection;
 	std::optional<vec2> rectangular_drag_origin;
 
+	entity_flavour_id flavour_of_held;
+
 public:
 	void clear();
 	void unhover();
 	void finish_rectangular(target_selections_type& into);
 
 	void do_left_press(
+		const cosmos& cosm,
 		bool has_ctrl,
 		vec2i world_cursor_pos,
 		target_selections_type&
@@ -72,6 +77,7 @@ public:
 		const necessary_images_in_atlas& sizes_for_icons,
 
 		const cosmos& cosm,
+		const editor_rect_select_type rect_select_mode,
 		vec2 world_cursor_pos,
 		camera_cone current_cone,
 		bool left_button_pressed
