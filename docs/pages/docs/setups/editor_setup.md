@@ -24,7 +24,7 @@ This folder should replicate exactly the rest of the project's directory tree.
 It always contains the most recent state of your work, even if it hasn't been saved yet to the original files.  
 
 This folder is created automatically when:
-- The editor loses focus (can be turned off in settings).
+- The editor's window loses focus (can be turned off in settings).
 - The editor exits with unsaved changes - either gracefully through the menu accessible via ESC button, or a forceful shortcut like Alt+F4.
 - Additionally, every single minute. The interval is configurable.
 	- This means that if you've forgotten to save your work for an hour, and your computer suddenly BSODs, you will lose a minute of your work at most!
@@ -44,7 +44,7 @@ This folder is created automatically when:
 
 - **Caution:** Every time you save to a ``Project`` folder, the ``Project/autosave`` folder is considered unnecessary **and is deleted** (if it exists).  
 If we'd allow the autosave folder - now completely unrelated - to still exist, then if the application would crash several seconds from now,  
-the editor would later load that unrelated file instead of your save.
+the editor would later load that folder instead of your manually saved files.
 	- Thus you are completely safe if you do not manually tinker around ther files from ``Project/autosave``. This is an autosave folder, meant for use only by the editor.
 
 ## Modes
