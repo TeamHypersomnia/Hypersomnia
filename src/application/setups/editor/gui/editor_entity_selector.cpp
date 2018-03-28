@@ -208,6 +208,10 @@ std::optional<ltrb> editor_entity_selector::get_selection_aabb(
 		}
 	};
 
+	if (held && cosm[held]) {
+		combine_aabb_of(held);
+	}
+
 	for_each_selected_entity(
 		combine_aabb_of,
 		signi_selections

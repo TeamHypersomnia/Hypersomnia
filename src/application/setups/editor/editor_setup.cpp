@@ -393,56 +393,88 @@ void editor_setup::perform_custom_imgui(
 	if (anything_opened()) {
 		history_gui.perform(make_command_input());
 
+		common_state_gui.perform(settings, make_command_input());
+		all_entities_gui.perform(settings, nullptr, make_command_input());
+
+		const auto all_selected = [&]() -> decltype(get_all_selected_entities()) {
+			if (const auto held = selector.get_held(); held && work().world[held]) {
+				return { held };
+			}
+
+			return get_all_selected_entities();
+		}();
+
+		{
+			const auto filters = selected_entities_gui.perform(settings, std::addressof(all_selected), make_command_input());
+
+			const auto& cosm = work().world;
+			filters.perform(cosm, view().selected_entities);
+		}
+
 		if (show_summary) {
 			auto summary = scoped_window("Summary", &show_summary, ImGuiWindowFlags_AlwaysAutoResize);
 
-			if (anything_opened()) {
-				text(typesafe_sprintf("Folder path: %x", folder().current_path));
-				//text("Tick rate: %x/s", get_viewed_cosmos().get_solvable().get_steps_per_second()));
+			text(typesafe_sprintf("Folder path: %x", folder().current_path));
+			//text("Tick rate: %x/s", get_viewed_cosmos().get_solvable().get_steps_per_second()));
 
-				if (const auto current_cone = get_current_camera()) {
-					const auto world_cursor_pos = current_cone->to_world_space(screen_size, mouse_pos);
+			if (const auto current_cone = get_current_camera()) {
+				const auto world_cursor_pos = current_cone->to_world_space(screen_size, mouse_pos);
 
-					text("Grid size: %x/%x", view().grid.unit_pixels, settings.grid.render.get_maximum_unit());
+				text("Grid size: %x/%x", view().grid.unit_pixels, settings.grid.render.get_maximum_unit());
 
-					text("Cursor: %x", world_cursor_pos);
-					text("View center: %x", current_cone->transform.pos);
+				text("Cursor: %x", world_cursor_pos);
+				text("View center: %x", vec2(current_cone->transform.pos).discard_fract());
 
-					if (auto& panning = view().panned_camera; panning->transform.pos.has_fract()) {
-						ImGui::SameLine();
+				if (auto& panning = view().panned_camera; panning->transform.pos.has_fract()) {
+					ImGui::SameLine();
 
-						if (ImGui::Button("Round")) {
-							panning->transform.pos.discard_fract();
-						}
-					}
-
-					{
-						auto zoom = current_cone->zoom * 100.f;
-						
-						if (slider("Zoom: ", zoom, 1.f, 1000.f, "%.3f%%")) {
-							if (!view().panned_camera.has_value()) {
-								view().panned_camera = current_cone;
-							}
-
-							zoom = std::clamp(zoom, 1.f, 1000.f);
-							view().panned_camera->zoom = zoom / 100.f;
-						}
+					if (ImGui::Button("Round")) {
+						panning->transform.pos.discard_fract();
 					}
 				}
 
-				text("Total entities: %x",
-					get_viewed_cosmos().get_entities_count()
-				);
+				{
+					auto zoom = current_cone->zoom * 100.f;
+					
+					if (slider("Zoom: ", zoom, 1.f, 1000.f, "%.3f%%")) {
+						if (!view().panned_camera.has_value()) {
+							view().panned_camera = current_cone;
+						}
 
-				text("World time: %x (%x steps at %x Hz)",
-					standard_format_seconds(get_viewed_cosmos().get_total_seconds_passed()),
-					get_viewed_cosmos().get_total_steps_passed(),
-					1.0f / get_viewed_cosmos().get_fixed_delta().in_seconds()
-				);
+						zoom = std::clamp(zoom, 1.f, 1000.f);
+						view().panned_camera->zoom = zoom / 100.f;
+					}
+				}
+			}
 
-				text("Currently controlling: %x",
-					get_viewed_character().alive() ? get_viewed_character().get_name() : "no entity"
-				);
+			text("Total entities: %x",
+				get_viewed_cosmos().get_entities_count()
+			);
+
+			text("World time: %x (%x steps at %x Hz)",
+				standard_format_seconds(get_viewed_cosmos().get_total_seconds_passed()),
+				get_viewed_cosmos().get_total_steps_passed(),
+				1.0f / get_viewed_cosmos().get_fixed_delta().in_seconds()
+			);
+
+			text("Currently controlling: %x",
+				get_viewed_character().alive() ? get_viewed_character().get_name() : "no entity"
+			);
+
+			text("Rect select mode: %x", format_enum(view().rect_select_mode));
+
+			ImGui::Separator();
+
+			if (!all_selected.empty()) {
+				text("Selected %x entities", all_selected.size());
+
+				if (const auto aabb = get_selection_aabb()) {
+					const auto size = aabb->get_size();
+					text("AABB:   %x x %x pixels\ncenter: %x\nlt:     %x", size.x, size.y, aabb->get_center(), aabb->left_top());
+				}
+			}
+			else {
+				text("No entity selected");
 			}
 		}
 
@@ -462,24 +494,6 @@ void editor_setup::perform_custom_imgui(
 			if (ImGui::Button("Stop")) {
 				stop();
 			}
-		}
-
-		common_state_gui.perform(settings, make_command_input());
-		all_entities_gui.perform(settings, nullptr, make_command_input());
-
-		{
-			const auto all_selected = [&]() -> decltype(get_all_selected_entities()) {
-				if (const auto held = selector.get_held(); held && work().world[held]) {
-					return { held };
-				}
-
-				return get_all_selected_entities();
-			}();
-
-			const auto filters = selected_entities_gui.perform(settings, std::addressof(all_selected), make_command_input());
-
-			const auto& cosm = work().world;
-			filters.perform(cosm, view().selected_entities);
 		}
 
 		const auto go_to_dialog_pos = vec2 { static_cast<float>(screen_size.x / 2), menu_bar_size.y * 2 + 1 };

@@ -345,3 +345,51 @@ we consider whole type overrides too complex architeciturally:
 - add docking so we'll be able to get rid of that tab api
 	- we have a bug when closing a tab with mouse
 
+
+- Editor slight fixes
+	- show comfortably transform of the selected
+	- show comfortably number of the selected
+	- show comfortably aabb of ...
+	- show comfortably rect select mode
+
+
+- Plan of pixel-perfect rendering
+	- Let camera always render at integer positions;
+		- Except when zoom is bigger than one - useful at editor, and otherwise we do not care.
+		- The discarding may happen at rendering stage.
+	- Let renderers not be concerned with integerization at all.
+		- If something is rendered without rotation at integral positions, it will still render well.
+			- If something is a dynamic body, then it might make sense for its movement to appear smoother anyway.
+				- Even the player.
+	- aabb drawers should always trim to pixel coordinates because they anyway draw in screen space.
+		- don't make movement smooth at bigger zoom. let the grid also be rendered in accordance to where the integerized camera is
+	- the character is not shaky with camera smoothing if its transform discards fracts both at rendering stage and at camera's chasing stage
+	- let's just discard the fracts manually in interpolation system per each frame, for the viewed character.
+		- we don't care for now what happens without interpolation. Screw it.
+
+- Shaky/inaccurate positioning of sprites
+	- Some are caused by interpolation
+		- Why not just stop interpolating after some epsilon?
+	- looks like tearing is solved by just integerizing camera
+		- we had a case where having put view at 0.5 of pixel horizontally, we had tears in tiles 
+	- old implementation appears to successfully stabilize the character
+		- we need to stabilize both though
+		- we'll specify an entity whose visual transform is to be snapped to the camera position
+			- could be done in interpolation system?
+	- problem is, if you center the camera exactly on where the player is physically, you'll get funny values
+		- because physics floats aren't really accurate
+	- so we have a conflict: we want camera coordinates to be integers, but at the same time want to render exactly at the player 
+		- what if we only discard fract for the player characters?
+			- truck though...
+	- some tips? https://www.gamedev.net/forums/topic/670059-texturing-occasionally-off-by-a-pixel/
+		- GL_LINEAR indeed appears to be a perfect test
+	- it appears that the gaps in physical bodies are caused by calling discard_fract in drawing.cpp.
+		- however, this should not be the case, because they are initially positioned at integer positions.
+		- and the editor shows them correctly once their values ale slightly altered by the tweaker, clearly indicating a numerical issue.
+		- try integer si?
+			- if all else fails, remember we still will have to switch to a fixed-point arithmetic in box2d for networking
+				- so it might be saved for later
+		- the reason that the player doesnt look beautiful after centering camera on it directly and smoothing, is that the algorithm with value fields or something itself is very smooth
+			- also, just discarding both at camera and drawing.cpp is not enough because th camera must properly chase the integer, so still it might be sometimes off by 1-2
+				- notice that after discarding both, the "ugly transitions" are gone but there are still off by one errors, just like with the brick walls
+				- might also be because of the brick wall sprite not being 128x128 exactly
