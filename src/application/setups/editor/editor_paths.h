@@ -51,6 +51,7 @@ struct editor_paths {
 	augs::path_type int_file;
 	augs::path_type view_file;
 	augs::path_type hist_file;
+	augs::path_type autosave_path;
 
 	editor_paths(
 		const augs::path_type& target_folder,
