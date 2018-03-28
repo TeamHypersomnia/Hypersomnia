@@ -27,7 +27,7 @@ This folder is created automatically when:
 - The editor's window loses focus (can be turned off in settings).
 - The editor exits with unsaved changes - either gracefully through the menu accessible via ESC button, or a forceful shortcut like Alt+F4.
 - Additionally, every single minute. The interval is configurable.
-	- This means that if you've forgotten to save your work for an hour, and your computer suddenly BSODs, you will lose a minute of your work at most!
+	- This means that if you forget to save your work for a whole hour, and your computer suddenly BSODs, you lose a minute of your work at most!
 
 ### Opening a project
 

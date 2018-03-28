@@ -250,8 +250,10 @@ void item_button::draw_proc(
 			vec2 expansion_offset;
 
 			if (f.expand_size_to_grid) {
-				const auto rounded_size = griddify_size(layout.aabb.get_size(), gui_def.bbox_expander);
-				expansion_offset = (rounded_size - layout.aabb.get_size()) / 2;
+				const auto size = vec2i(layout.aabb.get_size());
+				const auto rounded_size = griddify_size(size, gui_def.bbox_expander);
+
+				expansion_offset = (rounded_size - size) / 2;
 			}
 
 			const auto flip = gui_def.flip;
@@ -267,7 +269,7 @@ void item_button::draw_proc(
 			auto state = invariants::sprite::drawing_input{ augs::drawer (output) };
 
 			const auto rc_pos = this_absolute_rect.get_position();
-			state.renderable_transform.pos = layout.get_base_item_pos().get_center() + rc_pos + expansion_offset;
+			state.renderable_transform.pos = vec2i(layout.get_base_item_pos().get_center()) + rc_pos + expansion_offset;
 
 			if (draw_attachments) {
 				size_t attachment_index = 1;
