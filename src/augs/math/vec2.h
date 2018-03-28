@@ -368,6 +368,13 @@ struct basic_vec2 {
 		return *this;
 	}
 
+	template <class A = type, class = std::enable_if_t<std::is_floating_point_v<A>>>
+	basic_vec2& round_fract() {
+		x = std::round(x);
+		y = std::round(y);
+		return *this;
+	}
+
 	template <class A = type, class = std::enable_if_t<std::is_same_v<float, A>>>
 	bool has_fract() const {
 		float intpart;
