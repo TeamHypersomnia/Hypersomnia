@@ -157,10 +157,10 @@ namespace augs {
 	const drawer& drawer::aabb_centered(
 		const texture_atlas_entry tex,
 		const vec2 center,
-		const vec2 size,
+		const vec2i size,
 		const rgba color
 	) const {
-		return aabb(tex, ltrb(center - size / 2, size), color);
+		return aabb(tex, ltrb(center - (size / 2), size), color);
 	}
 
 	const drawer& drawer::aabb_centered(
@@ -168,7 +168,7 @@ namespace augs {
 		const vec2 center,
 		const rgba color
 	) const {
-		return aabb_centered(tex, center, vec2(tex.get_original_size()), color);
+		return aabb_centered(tex, center, tex.get_original_size(), color);
 	}
 
 	const drawer& drawer::aabb_lt_clipped(

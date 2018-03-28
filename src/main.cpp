@@ -1622,7 +1622,7 @@ int work(const int argc, const char* const * const argv) try {
 
 					editor.for_each_icon(
 						[&](const auto typed_handle, const auto image_id, const components::transform world_transform, const rgba color){
-							const auto screen_space_pos = get_camera().to_screen_space(screen_size, world_transform.pos);
+							const auto screen_space_pos = vec2i(get_camera().to_screen_space(screen_size, world_transform.pos));
 
 							const auto aabb = xywh::center_and_size(screen_space_pos, necessary_atlas_entries[image_id].get_size());
 							const auto expanded_square = aabb.expand_to_square();

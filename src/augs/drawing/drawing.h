@@ -64,7 +64,7 @@ namespace augs {
 		self aabb_centered(
 			const texture_atlas_entry,
 			const vec2 center,
-			const vec2 size,
+			const vec2i size,
 			const rgba color
 		) const;
 
