@@ -248,16 +248,23 @@ namespace test_scenes {
 		{
 			{
 				const auto l = create_test_scene_entity(world, test_static_lights::STRONG_LAMP);
-				l.set_logic_transform(components::transform(vec2(164.f - 8.f + 90.f, 220)));
+				l.set_logic_transform(components::transform(vec2(-44, 270)));
 				auto& light = l.get<components::light>();
 				light.color = cyan;
 			}
 			{
 				const auto l = create_test_scene_entity(world, test_static_lights::STRONG_LAMP);
-				l.set_logic_transform(components::transform(vec2(1164.f + 24.f - 90.f, 220)));
+				l.set_logic_transform(components::transform(vec2(1098, 220)));
 				auto& light = l.get<components::light>();
 				light.color = orange;
 			}
+			{
+				const auto l = create_test_scene_entity(world, test_static_lights::STRONG_LAMP);
+				l.set_logic_transform(components::transform(vec2(223, -47)));
+				auto& light = l.get<components::light>();
+				light.color = cyan;
+			}
+
 			{
 				const auto left_reach = xywh(164.f - 8.f + 90.f - 550, 220 - 250, 1000, 600);
 				const auto right_reach = xywh(1164.f - 8.f + 90.f - 600, 220 - 250, 1000, 600);
@@ -285,28 +292,28 @@ namespace test_scenes {
 				}
 			}
 
-			{
-				const auto l = create_test_scene_entity(world, test_static_lights::STRONG_LAMP);
-				l.set_logic_transform(components::transform(vec2(664.f + 24.f, -1100)));
-				auto& light = l.get<components::light>();
-				light.color = cyan;
-			}
 
 			{
-				const auto e = create_test_scene_entity(world, test_sprite_decorations::HAVE_A_PLEASANT, components::transform(vec2(164.f - 8.f, -60.f - 20.f)));
+				create_test_scene_entity(world, test_sprite_decorations::HAVE_A_PLEASANT, components::transform(vec2(-42, -32)));
+				create_test_scene_entity(world, test_sprite_decorations::AWAKENING, components::transform(vec2(-42, 8)));
+				create_test_scene_entity(world, test_sprite_decorations::METROPOLIS, components::transform(vec2(1106, 3)));
 
-				prefabs::create_brick_wall(step, vec2(3 + 1 + 1100, -32 - 96));
-				prefabs::create_brick_wall(step, vec2(3 + 1 + 1100 + 128, -32 - 96));
-				prefabs::create_brick_wall(step, vec2(3 + 1 + 1100 + 128, -32 - 96 + 128));
-				prefabs::create_brick_wall(step, vec2(3 + 1 + 1100, -32 - 96 + 128));
-				prefabs::create_brick_wall(step, vec2(-3 -16 + 100, -32 - 96));
-				prefabs::create_brick_wall(step, vec2(-3 -16 + 100 + 128, -32 - 96));
-				prefabs::create_brick_wall(step, vec2(-3 -16 + 100 + 128, -32 - 96 + 128));
-				prefabs::create_brick_wall(step, vec2(-3 -16 + 100, -32 - 96 + 128));
+				auto half = vec2(-64, -64);
+				prefabs::create_brick_wall(step, half + vec2(0, 0));
+				prefabs::create_brick_wall(step, half +vec2(128, 128));
+				prefabs::create_brick_wall(step, half +vec2(128, 0));
+				prefabs::create_brick_wall(step, half +vec2(0, 128));
 
-				for (int b = 0; b < 8; ++b) {
-					prefabs::create_brick_wall(step, components::transform(vec2( 3 + 1 + 1100 + 128 + 128, -32 - 96 + 128 - 128 * b ), 90));
-					prefabs::create_brick_wall(step, components::transform(vec2( -3 - 16 + 100 - 128, -32 - 96 + 128 - 128*b ), 90));
+				const auto horioff = 8 * 128;
+
+				prefabs::create_brick_wall(step, half +vec2(horioff, 0) + vec2(0, 0));
+				prefabs::create_brick_wall(step, half +vec2(horioff, 0) + vec2(128, 128));
+				prefabs::create_brick_wall(step, half +vec2(horioff, 0) + vec2(128, 0));
+				prefabs::create_brick_wall(step, half +vec2(horioff, 0) + vec2(0, 128));
+
+				for (int b = 0; b < 10; ++b) {
+					prefabs::create_brick_wall(step, components::transform(half +vec2(-128, -128 - b*128) + vec2(0, 256), 90));
+					prefabs::create_brick_wall(step, components::transform(half +vec2(horioff + 256, -128 - b*128) + vec2(0, 256), 90));
 				}
 
 				{
@@ -325,31 +332,26 @@ namespace test_scenes {
 				{
 					const vec2 size = metas.at(assets::game_image_id::ROAD_FRONT_DIRT).get_size();
 
-					create_test_scene_entity(world, test_sprite_decorations::ROAD_DIRT, components::transform{ vec2(-3 - 16 + 100 + 128 + 80 + size.x / 2, -32 - 96 + 128 + 80 - size.y / 2) });
-				}
-
-				{
-					const vec2 size = metas.at(assets::game_image_id::FLOOR).get_size();
-
-					const auto num_floors = 10 * 10;
-					const auto side = static_cast<int>(sqrt(num_floors) / 2);
-
-					for (int x = -side; x < side + 1; ++x) {
-						for (int y = -side; y < side + 1; ++y) {
-							create_test_scene_entity(world, test_sprite_decorations::FLOOR, components::transform(vec2(700, -1000 + 320)) + components::transform{ size * vec2i(x, y) });
-						}
-					}
+					create_test_scene_entity(world, test_sprite_decorations::ROAD_DIRT, components::transform(vec2(468, 112)));
 				}
 
 				for (int r = 0; r < 38; ++r) {
 					const vec2 size = metas.at(assets::game_image_id::ROAD).get_size();
 
-					auto road = create_test_scene_entity(world, test_sprite_decorations::ROAD, components::transform{ vec2(-3 - 16 + 100 + 128 + 80 + size.x / 2, -32 - 96 + 128 + 80 + size.y / 2 + size.y*r) });
+					auto road = create_test_scene_entity(world, test_sprite_decorations::ROAD, components::transform{ vec2(468, 832+ size.y * r ) });
 				}
-			}
 
-			create_test_scene_entity(world, test_sprite_decorations::AWAKENING, components::transform(vec2(164.f - 8.f, -60.f - 20.f + 40.f)));
-			create_test_scene_entity(world, test_sprite_decorations::METROPOLIS, components::transform(vec2(1164.f + 24.f, -60.f)));
+				{
+					const vec2 size = metas.at(assets::game_image_id::FLOOR).get_size();
+
+					for (int x = 0; x < 10; ++x) {
+						for (int y = 0; y < 10; ++y) {
+							create_test_scene_entity(world, test_sprite_decorations::FLOOR, components::transform(vec2(-64, -192) + size * vec2i(x, -y)));
+						}
+					}
+				}
+
+			}
 		}
 
 		prefabs::create_kek9(step, vec2(-800, -200),

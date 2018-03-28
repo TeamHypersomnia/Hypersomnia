@@ -47,6 +47,8 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 	auto& interp = get<interpolation_system>();
 	auto& particles = get<particles_simulation_system>();
 
+	interp.id_to_integerize = viewed_character;
+
 	thunders.advance(cosm, input.particle_effects, dt, particles);
 	exploding_rings.advance(cosm, input.particle_effects, dt, particles);
 	flying_numbers.advance(dt);

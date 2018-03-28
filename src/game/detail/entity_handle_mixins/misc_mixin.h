@@ -74,9 +74,9 @@ public:
 	}
 
 	template <class I>
-	auto get_world_crosshair_transform(I& interp, const bool integerize = false) const {
+	auto get_world_crosshair_transform(I& interp) const {
 		const auto self = *static_cast<const E*>(this);
-		return self.get_viewing_transform(interp, integerize) + self.calc_crosshair_displacement();
+		return self.get_viewing_transform(interp) + self.calc_crosshair_displacement();
 	};
 
 	auto get_world_crosshair_transform() const {

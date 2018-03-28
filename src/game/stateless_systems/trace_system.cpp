@@ -72,10 +72,8 @@ void trace_system::spawn_finishing_traces_for_deleted_entities(const logic_step 
 	for (const auto& it : events) {
 		const auto deleted_entity = cosmos[it.subject];
 
-		const auto* const trace = deleted_entity.find<components::trace>();
-
-		if (trace != nullptr
-			&& !trace->is_it_a_finishing_trace
+		if (const auto* const trace = deleted_entity.find<components::trace>();
+	   		trace && !trace->is_it_a_finishing_trace
 		) {
 			const auto& trace_def = deleted_entity.get<invariants::trace>();
 
@@ -89,8 +87,8 @@ void trace_system::spawn_finishing_traces_for_deleted_entities(const logic_step 
 			if (const auto missile = deleted_entity.find<components::missile>()) {
 				transform_of_finishing.pos = 
 					missile->saved_point_of_impact_before_death
-					- (deleted_entity.get<invariants::sprite>().get_size() / 2)
-					.rotate(transform_of_finishing.rotation, vec2(0, 0))
+					- vec2(deleted_entity.get<invariants::sprite>().get_size() / 2)
+					.rotate(transform_of_finishing.rotation, vec2i(0, 0))
 				;
 			}
 

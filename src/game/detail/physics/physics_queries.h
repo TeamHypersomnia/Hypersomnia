@@ -183,18 +183,18 @@ void for_each_intersection_with_polygon(
 
 	average /= count;
 
-	const auto average_meters = si.get_meters(b2Vec2(average.x, average.y));
+	const auto average_meters = si.get_meters(average);
 
 	decltype(poly_shape.m_vertices) verts;
 
 	for (std::size_t i = 0; i < count; ++i) {
 		const auto v = vertices[i];
+		const auto meters = si.get_meters(v);
 
-		const auto meters = si.get_meters(b2Vec2(v.x, v.y));
-		verts[i] = meters - average_meters;
+		verts[i] = b2Vec2(meters - average_meters);
 	}
 	
-	const auto queried_transform = b2Transform(average_meters, b2Rot(0.f));
+	const auto queried_transform = b2Transform(b2Vec2(average_meters), b2Rot(0.f));
 
 	poly_shape.Set(verts, count);
 	

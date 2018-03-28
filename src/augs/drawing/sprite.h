@@ -27,6 +27,7 @@ namespace augs {
 	template <class id_type>
 	struct sprite {
 		static constexpr bool reinfer_when_tweaking = true;
+		using size_type = vec2i;
 
 		struct drawing_input : drawing_input_base {
 			using drawing_input_base::drawing_input_base;
@@ -40,7 +41,7 @@ namespace augs {
 
 		sprite(
 			const id_type tex = id_type::INVALID,
-			const vec2 size = vec2(),
+			const size_type size = vec2(),
 			const rgba color = white
 		) :
 			tex(tex),
@@ -55,15 +56,6 @@ namespace augs {
 			const rgba color = rgba()
 		) {
 			set(tex, manager, color);
-		}
-
-		template <class T>
-		sprite(
-			const id_type tex,
-			const basic_vec2<T> size,
-			const rgba color = rgba()
-		) {
-			set(tex, size, color);
 		}
 
 		template <class M>
@@ -84,7 +76,7 @@ namespace augs {
 			const rgba color = rgba()
 		) {
 			this->tex = tex;
-			this->size = static_cast<vec2>(size);
+			this->size = size;
 			this->color = color;
 		}
 		
@@ -95,7 +87,7 @@ namespace augs {
 		// GEN INTROSPECTOR struct augs::sprite class id_type
 		id_type tex = id_type::INVALID;
 		rgba color;
-		vec2 size;
+		vec2i size;
 		vec2 center_offset;
 		float rotation_offset = 0.f;
 
@@ -109,7 +101,7 @@ namespace augs {
 			return recursive_equal(*this, b);
 		}
 
-		vec2 get_size() const {
+		vec2i get_size() const {
 			return size;
 		}
 
@@ -130,7 +122,7 @@ namespace augs {
 		) const {
 			ensure(tex != id_type::INVALID);
 
-			vec2i transform_pos = in.renderable_transform.pos;
+			vec2 transform_pos = in.renderable_transform.pos;
 			const float final_rotation = in.renderable_transform.rotation + rotation_offset;
 
 			const auto drawn_size = get_size();
@@ -167,7 +159,7 @@ namespace augs {
 		FORCE_INLINE void draw(
 			const drawing_input in,
 			const texture_atlas_entry considered_texture,
-			const vec2i target_position,
+			const vec2 target_position,
 			const float target_rotation,
 			const vec2 considered_size
 		) const {

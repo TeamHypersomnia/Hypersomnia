@@ -540,8 +540,8 @@ void visibility_system::respond_to_visibility_information_requests(
 			};
 
 			vec2 targets[2] = {
-				position_meters + directions[0] * vision_side_meters / 2 * 1.5,
-				position_meters + directions[1] * vision_side_meters / 2 * 1.5
+				position_meters + directions[0] * vision_side_meters / 2 * 1.5f,
+				position_meters + directions[1] * vision_side_meters / 2 * 1.5f
 			};
 
 			/* clamp the ray to the bound */

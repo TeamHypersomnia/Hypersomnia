@@ -54,7 +54,7 @@ namespace prefabs {
 		return crate;
 	}
 
-	entity_handle create_brick_wall(const logic_step step, const components::transform pos) {
+	entity_handle create_brick_wall(const logic_step step, components::transform pos) {
 		const auto crate = create_test_scene_entity(step.get_cosmos(), test_plain_sprited_bodys::BRICK_WALL, pos);
 		return crate;
 	}

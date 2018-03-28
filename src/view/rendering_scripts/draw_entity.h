@@ -123,7 +123,7 @@ FORCE_INLINE void draw_entity(
 ) {
 	e.template conditional_dispatch<entities_with_renderables>([&in, &interp](const auto typed_handle){
 		on_renderable_component(typed_handle, [&](const auto& r) {
-			draw_renderable(r, in, typed_handle.get_viewing_transform(interp, true));
+			draw_renderable(r, in, typed_handle.get_viewing_transform(interp));
 		});
 	});
 }
@@ -142,7 +142,7 @@ FORCE_INLINE void draw_color_highlight(
 			draw_renderable(
 				copy,
 				in,
-				typed_handle.get_viewing_transform(interp, true)
+				typed_handle.get_viewing_transform(interp)
 			);
 		});
 	});
@@ -156,7 +156,7 @@ FORCE_INLINE void draw_neon_map(
 ) {
 	e.template conditional_dispatch<entities_with_renderables>([&in, &interp](const auto typed_handle){
 		on_renderable_component(typed_handle, [&](const auto& r) {
-			draw_neon_map(r, in, typed_handle.get_viewing_transform(interp, true));
+			draw_neon_map(r, in, typed_handle.get_viewing_transform(interp));
 		});
 	});
 }
@@ -173,7 +173,7 @@ FORCE_INLINE void draw_border(
 
 		if (border_info) {
 			on_renderable_component(typed_handle, [&](const auto& r) {
-				draw_border(r, in, typed_handle.get_viewing_transform(interp, true), *border_info);
+				draw_border(r, in, typed_handle.get_viewing_transform(interp), *border_info);
 			});
 		}
 	});

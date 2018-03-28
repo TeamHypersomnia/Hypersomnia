@@ -1,27 +1,39 @@
 #pragma once
 
+struct b2Vec2;
+
 struct si_scaling {
 	// GEN INTROSPECTOR struct si_scaling
-	float to_meters_multiplier = 0.f;
-	float to_pixels_multiplier = 0.f;
+	int to_pixels_multiplier = 100;
 	// END GEN INTROSPECTOR
 
-	si_scaling() {
-		set_pixels_per_meter(100.f);
-	}
-
-	void set_pixels_per_meter(const float pixels) {
-		to_meters_multiplier = 1.f / pixels;
+	void set_pixels_per_meter(const int pixels) {
 		to_pixels_multiplier = pixels;
 	}
 
 	template <class T>
 	auto get_meters(const T pixels) const {
-		return to_meters_multiplier * pixels;
+		if constexpr(std::is_same_v<T, b2Vec2>) {
+			auto r = pixels;
+			r.x /= to_pixels_multiplier;
+			r.y /= to_pixels_multiplier;
+			return r;
+		}
+		else {
+			return pixels / to_pixels_multiplier;
+		}
 	}
 
 	template <class T>
 	auto get_pixels(const T meters) const {
-		return to_pixels_multiplier * meters;
+		if constexpr(std::is_same_v<T, b2Vec2>) {
+			auto r = meters;
+			r.x *= to_pixels_multiplier;
+			r.y *= to_pixels_multiplier;
+			return r;
+		}
+		else {
+			return meters * to_pixels_multiplier;
+		}
 	}
 };

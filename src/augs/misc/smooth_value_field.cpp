@@ -11,7 +11,7 @@ namespace augs {
 
 		auto calculated_smoothed_value = value * averaging_constant + target_value * (1.0 - averaging_constant);
 
-		if (calculated_smoothed_value.compare_abs(target_value, 1.f)) {
+		if (calculated_smoothed_value.compare_abs(target_value, 1.0)) {
 			calculated_smoothed_value = target_value;
 		}
 

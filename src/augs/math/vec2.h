@@ -315,14 +315,14 @@ struct basic_vec2 {
 		return *this;
 	}
 
-	template <typename v>
-	basic_vec2& rotate(const real angle, const v origin) {
+	template <class A = type, class = std::enable_if_t<std::is_floating_point_v<A>>>
+	basic_vec2& rotate(const A angle, const basic_vec2 origin) {
 		augs::rotate(*this, origin, angle);
 		return *this;
 	}
 
-	template <typename v>
-	basic_vec2& rotate_radians(const real angle, const v origin) {
+	template <class A = type, class = std::enable_if_t<std::is_floating_point_v<A>>>
+	basic_vec2& rotate_radians(const A angle, const basic_vec2 origin) {
 		augs::rotate_radians(*this, origin, angle);
 		return *this;
 	}
@@ -514,70 +514,70 @@ struct basic_vec2 {
 	template <class v> bool operator==(const v& p) const { return x == p.x && y == p.y; }
 	template <class v> bool operator!=(const v& p) const { return x != p.x || y != p.y; }
 
-	basic_vec2 operator-(const basic_vec2& p) const { return basic_vec2(x - static_cast<type>(p.x), y - static_cast<type>(p.y)); }
-	basic_vec2 operator+(const basic_vec2& p) const { return basic_vec2(x + static_cast<type>(p.x), y + static_cast<type>(p.y)); }
-	basic_vec2 operator*(const basic_vec2& p) const { return basic_vec2(x * static_cast<type>(p.x), y * static_cast<type>(p.y)); }
-	basic_vec2 operator/(const basic_vec2& p) const { return basic_vec2(x / static_cast<type>(p.x), y / static_cast<type>(p.y)); }
+	basic_vec2 operator-(const basic_vec2& p) const { return basic_vec2(x - p.x, y - p.y); }
+	basic_vec2 operator+(const basic_vec2& p) const { return basic_vec2(x + p.x, y + p.y); }
+	basic_vec2 operator*(const basic_vec2& p) const { return basic_vec2(x * p.x, y * p.y); }
+	basic_vec2 operator/(const basic_vec2& p) const { return basic_vec2(x / p.x, y / p.y); }
 
-	basic_vec2& operator-=(const basic_vec2& p) { x -= static_cast<type>(p.x); y -= static_cast<type>(p.y); return *this; }
-	basic_vec2& operator+=(const basic_vec2& p) { x += static_cast<type>(p.x); y += static_cast<type>(p.y); return *this; }
-	basic_vec2& operator*=(const basic_vec2& p) { x *= static_cast<type>(p.x); y *= static_cast<type>(p.y); return *this; }
-	basic_vec2& operator/=(const basic_vec2& p) { x /= static_cast<type>(p.x); y /= static_cast<type>(p.y); return *this; }
+	basic_vec2& operator-=(const basic_vec2& p) { x -= p.x; y -= p.y; return *this; }
+	basic_vec2& operator+=(const basic_vec2& p) { x += p.x; y += p.y; return *this; }
+	basic_vec2& operator*=(const basic_vec2& p) { x *= p.x; y *= p.y; return *this; }
+	basic_vec2& operator/=(const basic_vec2& p) { x /= p.x; y /= p.y; return *this; }
 
-	basic_vec2& operator-=(const real64 d) { x -= static_cast<type>(d); y -= static_cast<type>(d); return *this; }
-	basic_vec2& operator+=(const real64 d) { x += static_cast<type>(d); y += static_cast<type>(d); return *this; }
-	basic_vec2& operator*=(const real64 d) { x *= static_cast<type>(d); y *= static_cast<type>(d); return *this; }
-	basic_vec2& operator/=(const real64 d) { x /= static_cast<type>(d); y /= static_cast<type>(d); return *this; }
+	basic_vec2& operator-=(const real64 d) { x -= d; y -= d; return *this; }
+	basic_vec2& operator+=(const real64 d) { x += d; y += d; return *this; }
+	basic_vec2& operator*=(const real64 d) { x *= d; y *= d; return *this; }
+	basic_vec2& operator/=(const real64 d) { x /= d; y /= d; return *this; }
 
-	basic_vec2& operator-=(const real32 d) { x -= static_cast<type>(d); y -= static_cast<type>(d); return *this; }
-	basic_vec2& operator+=(const real32 d) { x += static_cast<type>(d); y += static_cast<type>(d); return *this; }
-	basic_vec2& operator*=(const real32 d) { x *= static_cast<type>(d); y *= static_cast<type>(d); return *this; }
-	basic_vec2& operator/=(const real32 d) { x /= static_cast<type>(d); y /= static_cast<type>(d); return *this; }
+	basic_vec2& operator-=(const real32 d) { x -= d; y -= d; return *this; }
+	basic_vec2& operator+=(const real32 d) { x += d; y += d; return *this; }
+	basic_vec2& operator*=(const real32 d) { x *= d; y *= d; return *this; }
+	basic_vec2& operator/=(const real32 d) { x /= d; y /= d; return *this; }
 
-	basic_vec2& operator-=(const int d) { x -= static_cast<type>(d); y -= static_cast<type>(d); return *this; }
-	basic_vec2& operator+=(const int d) { x += static_cast<type>(d); y += static_cast<type>(d); return *this; }
-	basic_vec2& operator*=(const int d) { x *= static_cast<type>(d); y *= static_cast<type>(d); return *this; }
-	basic_vec2& operator/=(const int d) { x /= static_cast<type>(d); y /= static_cast<type>(d); return *this; }
+	basic_vec2& operator-=(const int d) { x -= d; y -= d; return *this; }
+	basic_vec2& operator+=(const int d) { x += d; y += d; return *this; }
+	basic_vec2& operator*=(const int d) { x *= d; y *= d; return *this; }
+	basic_vec2& operator/=(const int d) { x /= d; y /= d; return *this; }
 
-	basic_vec2& operator-=(const unsigned d) { x -= static_cast<type>(d); y -= static_cast<type>(d); return *this; }
-	basic_vec2& operator+=(const unsigned d) { x += static_cast<type>(d); y += static_cast<type>(d); return *this; }
-	basic_vec2& operator*=(const unsigned d) { x *= static_cast<type>(d); y *= static_cast<type>(d); return *this; }
-	basic_vec2& operator/=(const unsigned d) { x /= static_cast<type>(d); y /= static_cast<type>(d); return *this; }
+	basic_vec2& operator-=(const unsigned d) { x -= d; y -= d; return *this; }
+	basic_vec2& operator+=(const unsigned d) { x += d; y += d; return *this; }
+	basic_vec2& operator*=(const unsigned d) { x *= d; y *= d; return *this; }
+	basic_vec2& operator/=(const unsigned d) { x /= d; y /= d; return *this; }
 };
 
-template <class type> inline basic_vec2<type> operator-(const basic_vec2<type> t, const real64 d) { return { t.x - static_cast<type>(d), t.y - static_cast<type>(d) }; }
-template <class type> inline basic_vec2<type> operator+(const basic_vec2<type> t, const real64 d) { return { t.x + static_cast<type>(d), t.y + static_cast<type>(d) }; }
-template <class type> inline basic_vec2<type> operator*(const basic_vec2<type> t, const real64 d) { return { t.x * static_cast<type>(d), t.y * static_cast<type>(d) }; }
-template <class type> inline basic_vec2<type> operator/(const basic_vec2<type> t, const real64 d) { return { t.x / static_cast<type>(d), t.y / static_cast<type>(d) }; }
-template <class type> inline basic_vec2<type> operator-(const basic_vec2<type> t, const real32 d) { return { t.x - static_cast<type>(d), t.y - static_cast<type>(d) }; }
-template <class type> inline basic_vec2<type> operator+(const basic_vec2<type> t, const real32 d) { return { t.x + static_cast<type>(d), t.y + static_cast<type>(d) }; }
-template <class type> inline basic_vec2<type> operator*(const basic_vec2<type> t, const real32 d) { return { t.x * static_cast<type>(d), t.y * static_cast<type>(d) }; }
-template <class type> inline basic_vec2<type> operator/(const basic_vec2<type> t, const real32 d) { return { t.x / static_cast<type>(d), t.y / static_cast<type>(d) }; }
-template <class type> inline basic_vec2<type> operator-(const basic_vec2<type> t, const int d) { return { t.x - static_cast<type>(d), t.y - static_cast<type>(d) }; }
-template <class type> inline basic_vec2<type> operator+(const basic_vec2<type> t, const int d) { return { t.x + static_cast<type>(d), t.y + static_cast<type>(d) }; }
-template <class type> inline basic_vec2<type> operator*(const basic_vec2<type> t, const int d) { return { t.x * static_cast<type>(d), t.y * static_cast<type>(d) }; }
-template <class type> inline basic_vec2<type> operator/(const basic_vec2<type> t, const int d) { return { t.x / static_cast<type>(d), t.y / static_cast<type>(d) }; }
-template <class type> inline basic_vec2<type> operator-(const basic_vec2<type> t, const unsigned d) { return { t.x - static_cast<type>(d), t.y - static_cast<type>(d) }; }
-template <class type> inline basic_vec2<type> operator+(const basic_vec2<type> t, const unsigned d) { return { t.x + static_cast<type>(d), t.y + static_cast<type>(d) }; }
-template <class type> inline basic_vec2<type> operator*(const basic_vec2<type> t, const unsigned d) { return { t.x * static_cast<type>(d), t.y * static_cast<type>(d) }; }
-template <class type> inline basic_vec2<type> operator/(const basic_vec2<type> t, const unsigned d) { return { t.x / static_cast<type>(d), t.y / static_cast<type>(d)}; }
+template <class type> inline basic_vec2<type> operator-(const basic_vec2<type> t, const real64 d) { return { t.x - d, t.y - d }; }
+template <class type> inline basic_vec2<type> operator+(const basic_vec2<type> t, const real64 d) { return { t.x + d, t.y + d }; }
+template <class type> inline basic_vec2<type> operator*(const basic_vec2<type> t, const real64 d) { return { t.x * d, t.y * d }; }
+template <class type> inline basic_vec2<type> operator/(const basic_vec2<type> t, const real64 d) { return { t.x / d, t.y / d }; }
+template <class type> inline basic_vec2<type> operator-(const basic_vec2<type> t, const real32 d) { return { t.x - d, t.y - d }; }
+template <class type> inline basic_vec2<type> operator+(const basic_vec2<type> t, const real32 d) { return { t.x + d, t.y + d }; }
+template <class type> inline basic_vec2<type> operator*(const basic_vec2<type> t, const real32 d) { return { t.x * d, t.y * d }; }
+template <class type> inline basic_vec2<type> operator/(const basic_vec2<type> t, const real32 d) { return { t.x / d, t.y / d }; }
+template <class type> inline basic_vec2<type> operator-(const basic_vec2<type> t, const int d) { return { t.x - d, t.y - d }; }
+template <class type> inline basic_vec2<type> operator+(const basic_vec2<type> t, const int d) { return { t.x + d, t.y + d }; }
+template <class type> inline basic_vec2<type> operator*(const basic_vec2<type> t, const int d) { return { t.x * d, t.y * d }; }
+template <class type> inline basic_vec2<type> operator/(const basic_vec2<type> t, const int d) { return { t.x / d, t.y / d }; }
+template <class type> inline basic_vec2<type> operator-(const basic_vec2<type> t, const unsigned d) { return { t.x - d, t.y - d }; }
+template <class type> inline basic_vec2<type> operator+(const basic_vec2<type> t, const unsigned d) { return { t.x + d, t.y + d }; }
+template <class type> inline basic_vec2<type> operator*(const basic_vec2<type> t, const unsigned d) { return { t.x * d, t.y * d }; }
+template <class type> inline basic_vec2<type> operator/(const basic_vec2<type> t, const unsigned d) { return { t.x / d, t.y / d}; }
 
-template <class type> inline basic_vec2<type> operator-(const real64 d, const basic_vec2<type> t) { return { t.x - static_cast<type>(d), t.y - static_cast<type>(d) }; }
-template <class type> inline basic_vec2<type> operator+(const real64 d, const basic_vec2<type> t) { return { t.x + static_cast<type>(d), t.y + static_cast<type>(d) }; }
-template <class type> inline basic_vec2<type> operator*(const real64 d, const basic_vec2<type> t) { return { t.x * static_cast<type>(d), t.y * static_cast<type>(d) }; }
-template <class type> inline basic_vec2<type> operator/(const real64 d, const basic_vec2<type> t) { return { t.x / static_cast<type>(d), t.y / static_cast<type>(d) }; }
-template <class type> inline basic_vec2<type> operator-(const real32 d, const basic_vec2<type> t) { return { t.x - static_cast<type>(d), t.y - static_cast<type>(d) }; }
-template <class type> inline basic_vec2<type> operator+(const real32 d, const basic_vec2<type> t) { return { t.x + static_cast<type>(d), t.y + static_cast<type>(d) }; }
-template <class type> inline basic_vec2<type> operator*(const real32 d, const basic_vec2<type> t) { return { t.x * static_cast<type>(d), t.y * static_cast<type>(d) }; }
-template <class type> inline basic_vec2<type> operator/(const real32 d, const basic_vec2<type> t) { return { t.x / static_cast<type>(d), t.y / static_cast<type>(d) }; }
-template <class type> inline basic_vec2<type> operator-(const int d, const basic_vec2<type> t) { return { t.x - static_cast<type>(d), t.y - static_cast<type>(d) }; }
-template <class type> inline basic_vec2<type> operator+(const int d, const basic_vec2<type> t) { return { t.x + static_cast<type>(d), t.y + static_cast<type>(d) }; }
-template <class type> inline basic_vec2<type> operator*(const int d, const basic_vec2<type> t) { return { t.x * static_cast<type>(d), t.y * static_cast<type>(d) }; }
-template <class type> inline basic_vec2<type> operator/(const int d, const basic_vec2<type> t) { return { t.x / static_cast<type>(d), t.y / static_cast<type>(d) }; }
-template <class type> inline basic_vec2<type> operator-(const unsigned d, const basic_vec2<type> t) { return { t.x - static_cast<type>(d), t.y - static_cast<type>(d) }; }
-template <class type> inline basic_vec2<type> operator+(const unsigned d, const basic_vec2<type> t) { return { t.x + static_cast<type>(d), t.y + static_cast<type>(d) }; }
-template <class type> inline basic_vec2<type> operator*(const unsigned d, const basic_vec2<type> t) { return { t.x * static_cast<type>(d), t.y * static_cast<type>(d) }; }
-template <class type> inline basic_vec2<type> operator/(const unsigned d, const basic_vec2<type> t) { return { t.x / static_cast<type>(d), t.y / static_cast<type>(d) }; }
+template <class type> inline basic_vec2<type> operator-(const real64 d, const basic_vec2<type> t) { return { t.x - d, t.y - d }; }
+template <class type> inline basic_vec2<type> operator+(const real64 d, const basic_vec2<type> t) { return { t.x + d, t.y + d }; }
+template <class type> inline basic_vec2<type> operator*(const real64 d, const basic_vec2<type> t) { return { t.x * d, t.y * d }; }
+template <class type> inline basic_vec2<type> operator/(const real64 d, const basic_vec2<type> t) { return { t.x / d, t.y / d }; }
+template <class type> inline basic_vec2<type> operator-(const real32 d, const basic_vec2<type> t) { return { t.x - d, t.y - d }; }
+template <class type> inline basic_vec2<type> operator+(const real32 d, const basic_vec2<type> t) { return { t.x + d, t.y + d }; }
+template <class type> inline basic_vec2<type> operator*(const real32 d, const basic_vec2<type> t) { return { t.x * d, t.y * d }; }
+template <class type> inline basic_vec2<type> operator/(const real32 d, const basic_vec2<type> t) { return { t.x / d, t.y / d }; }
+template <class type> inline basic_vec2<type> operator-(const int d, const basic_vec2<type> t) { return { t.x - d, t.y - d }; }
+template <class type> inline basic_vec2<type> operator+(const int d, const basic_vec2<type> t) { return { t.x + d, t.y + d }; }
+template <class type> inline basic_vec2<type> operator*(const int d, const basic_vec2<type> t) { return { t.x * d, t.y * d }; }
+template <class type> inline basic_vec2<type> operator/(const int d, const basic_vec2<type> t) { return { t.x / d, t.y / d }; }
+template <class type> inline basic_vec2<type> operator-(const unsigned d, const basic_vec2<type> t) { return { t.x - d, t.y - d }; }
+template <class type> inline basic_vec2<type> operator+(const unsigned d, const basic_vec2<type> t) { return { t.x + d, t.y + d }; }
+template <class type> inline basic_vec2<type> operator*(const unsigned d, const basic_vec2<type> t) { return { t.x * d, t.y * d }; }
+template <class type> inline basic_vec2<type> operator/(const unsigned d, const basic_vec2<type> t) { return { t.x / d, t.y / d }; }
 
 template <class type>
 basic_vec2<type> basic_vec2<type>::zero = { static_cast<type>(0), static_cast<type>(0) };

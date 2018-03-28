@@ -1663,6 +1663,8 @@ int work(const int argc, const char* const * const argv) try {
 					const auto& editor_cfg = new_viewing_config.editor;
 
 					if (auto cone = editor.get_current_camera()) {
+						cone->transform.pos.discard_fract();
+
 						if (const auto view = editor.find_view()) {
 							if (view->show_grid) {
 								drawer.grid(
@@ -1683,7 +1685,7 @@ int work(const int argc, const char* const * const argv) try {
 							drawer.border(
 								cone->to_screen_space(screen_size, *selection_aabb),
 								white,
-								border_input { 1, 0 }
+								border_input { 1, -1 }
 							);
 						}
 					}

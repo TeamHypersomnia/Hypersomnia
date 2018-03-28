@@ -16,7 +16,7 @@ struct grid_render_settings;
 namespace augs {
 	std::array<vec2, 4> make_sprite_points(
 		const vec2 pos,
-		const vec2 size,
+		const vec2i size,
 		const float rotation_degrees
 	);
 

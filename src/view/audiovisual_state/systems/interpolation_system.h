@@ -31,6 +31,8 @@ public:
 		}
 	};
 
+	entity_id id_to_integerize;
+
 	audiovisual_cache_map<cache> per_entity_cache;
 
 	void integrate_interpolated_transforms(

@@ -30,7 +30,7 @@ void world_camera::tick(
 		if (entity_to_chase.alive()) {
 			auto cone = camera_cone();
 
-			cone.transform = entity_to_chase.get_viewing_transform(interp, true);
+			cone.transform = entity_to_chase.get_viewing_transform(interp);
 			cone.transform.rotation = 0;
 
 			return cone;
@@ -39,7 +39,7 @@ void world_camera::tick(
 		return current_cone;
 	}();
 
-	const vec2i camera_crosshair_offset = get_camera_offset_due_to_character_crosshair(entity_to_chase, settings, screen_size);
+	const vec2 camera_crosshair_offset = get_camera_offset_due_to_character_crosshair(entity_to_chase, settings, screen_size);
 
 	current_cone = target_cone;
 	current_cone.transform.pos += camera_crosshair_offset;
@@ -54,8 +54,8 @@ void world_camera::tick(
 		//if ((transform.pos - last_interpolant).length() < 2.0) last_interpolant = transform.pos;
 		//else
 
-		const vec2i target_pos = target_cone.transform.pos + camera_crosshair_offset;
-		const vec2i smoothed_part = camera_crosshair_offset;
+		const vec2 target_pos = target_cone.transform.pos + camera_crosshair_offset;
+		const vec2 smoothed_part = camera_crosshair_offset;
 
 		last_interpolant.pos = augs::interp(vec2d(last_interpolant.pos), vec2d(smoothed_part), averaging_constant);
 		last_interpolant.rotation = augs::interp(last_interpolant.rotation, target_cone.transform.rotation, averaging_constant);
@@ -64,7 +64,7 @@ void world_camera::tick(
 		const vec2 calculated_smoothed_pos = static_cast<vec2>(target_pos - smoothed_part) + last_interpolant.pos;
 		const int calculated_smoothed_rotation = static_cast<int>(last_interpolant.rotation);
 
-		//if (vec2i(calculated_smoothed_pos) == vec2i(smoothed_camera_transform.pos))
+		//if (vec2(calculated_smoothed_pos) == vec2(smoothed_camera_transform.pos))
 		//	last_interpolant.pos = smoothed_part;
 		//if (int(calculated_smoothed_rotation) == int(smoothed_camera_transform.rotation))
 		//	last_interpolant.rotation = smoothed_camera_transform.rotation;
@@ -108,7 +108,7 @@ void world_camera::tick(
 				target_value.set_length(50);
 			}
 
-			// LOG("%x, %x, %x", *(vec2i*)&player_pos, *(vec2i*)&player_position_at_previous_step, *(vec2i*)&target_value);
+			// LOG("%x, %x, %x", *(vec2*)&player_pos, *(vec2*)&player_position_at_previous_step, *(vec2*)&target_value);
 		}
 		//else {
 		//	target_value = chased_transform.interpolation_direction(previous);
@@ -121,16 +121,16 @@ void world_camera::tick(
 	}
 
 	if (enable_smoothing) {
-		current_cone.transform.pos = vec2i(current_cone.transform.pos + additional_position_smoothing.value);
+		current_cone.transform.pos = vec2(current_cone.transform.pos + additional_position_smoothing.value);
 	}
 	else {
-		current_cone.transform.pos = vec2i(current_cone.transform.pos);
+		current_cone.transform.pos = vec2(current_cone.transform.pos);
 	}
 
 	dont_smooth_once = false;
 }
 
-vec2i world_camera::get_camera_offset_due_to_character_crosshair(
+vec2 world_camera::get_camera_offset_due_to_character_crosshair(
 	const const_entity_handle entity_to_chase,
 	const world_camera_settings settings,
 	const vec2 screen_size

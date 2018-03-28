@@ -50,7 +50,7 @@ public:
 	std::optional<components::transform> find_logic_transform() const;
 
 	template <class interpolation_system_type>
-	std::optional<components::transform> find_viewing_transform(const interpolation_system_type& sys, const bool integerize = false) const {
+	std::optional<components::transform> find_viewing_transform(const interpolation_system_type& sys) const {
 		const auto handle = *static_cast<const entity_handle_type*>(this);
 		const auto& cosmos = handle.get_cosmos();
 
@@ -59,10 +59,6 @@ public:
 		) {
 			if (auto body_transform = sys.find_interpolated(cosmos[connection->owner])) {
 				auto bt = *body_transform;
-
-				if (integerize) {
-					bt.pos.discard_fract();
-				}
 
 				auto displacement = connection->shape_offset;
 
@@ -95,7 +91,7 @@ public:
 	std::optional<ltrb> find_aabb(const interpolation_system_type& interp) const {
 		const auto handle = *static_cast<const entity_handle_type*>(this);
 
-		if (const auto t = handle.find_viewing_transform(interp, true)) {
+		if (const auto t = handle.find_viewing_transform(interp)) {
 			return find_aabb(*t);
 		}
 

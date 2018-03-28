@@ -10,23 +10,25 @@
 namespace augs {
 	std::array<vec2, 4> make_sprite_points(
 		const vec2 pos, 
-		const vec2 size, 
+		const vec2i size, 
 		const float rotation_degrees
 	) {
 		std::array<vec2, 4> v;
 
-		const vec2 origin = pos;
-		const vec2 half_size = size / 2.f;
+		v[0] = v[1] = v[2] = v[3] = pos - (size / 2);
 
-		v[0] = pos - half_size;
-		v[1] = pos + vec2(size.x, 0.f) - half_size;
-		v[2] = pos + size - half_size;
-		v[3] = pos + vec2(0.f, size.y) - half_size;
+		// v[0];
+		v[1].x += size.x;
 
-		v[0].rotate(rotation_degrees, origin);
-		v[1].rotate(rotation_degrees, origin);
-		v[2].rotate(rotation_degrees, origin);
-		v[3].rotate(rotation_degrees, origin);
+		v[2].x += size.x;
+		v[2].y += size.y;
+
+		v[3].y += size.y;
+
+		v[0].rotate(rotation_degrees, pos);
+		v[1].rotate(rotation_degrees, pos);
+		v[2].rotate(rotation_degrees, pos);
+		v[3].rotate(rotation_degrees, pos);
 
 		return v;
 	}
@@ -72,14 +74,6 @@ namespace augs {
 		t2.vertices[1].pos = v[1];
 		t1.vertices[1].pos = t2.vertices[2].pos = v[2];
 		t1.vertices[2].pos = v[3];
-
-		t1.vertices[0].pos.discard_fract();
-		t1.vertices[1].pos.discard_fract();
-		t1.vertices[2].pos.discard_fract();
-
-		t2.vertices[0].pos.discard_fract();
-		t2.vertices[1].pos.discard_fract();
-		t2.vertices[2].pos.discard_fract();
 
 		t1.vertices[0].color = t2.vertices[0].color = col;
 		t1.vertices[1].color = t2.vertices[1].color = col;

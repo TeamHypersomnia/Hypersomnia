@@ -16,14 +16,38 @@ components::transform& interpolation_system::get_interpolated(const const_entity
 	return per_entity_cache[id].interpolated_transform;
 }
 
-std::optional<components::transform> interpolation_system::find_interpolated(const const_entity_handle id) const {
-	if (enabled) {
-		if (const auto cache = mapped_or_nullptr(per_entity_cache, id)) {
-			return cache->interpolated_transform;
+std::optional<components::transform> interpolation_system::find_interpolated(const const_entity_handle handle) const {
+	const auto id = handle.get_id();
+
+	auto result = [&]() -> std::optional<components::transform> {
+		if (enabled) {
+			if (const auto cache = mapped_or_nullptr(per_entity_cache, id)) {
+				return cache->interpolated_transform;
+			}
+		}
+
+		return handle.find_logic_transform();
+	}();
+
+	/*
+		Here, we integerize the transform of the viewed entity, (and later possibly of the vehicle that it drives)
+		so that the rendered player does not shake when exactly followed by the camera,
+		which is also integerized for pixel-perfect rendering.
+
+		Ideally we shouldn't do it here because it introduces more state, but that's about the simplest solution
+		that doesn't make a mess out of rendering scripts for this special case.	
+
+		Additionally, if someone does not use interpolation (there should be no need to disable it, really)
+		they will still suffer from the problem of shaky controlled player. We don't have time for now to handle it better.
+	*/
+
+	if (id == id_to_integerize) {
+		if (result) {
+			result->pos.discard_fract();
 		}
 	}
-	
-	return id.find_logic_transform();
+
+	return result;
 }
 
 interpolation_system::cache& interpolation_system::get_cache_of(const entity_id id) {

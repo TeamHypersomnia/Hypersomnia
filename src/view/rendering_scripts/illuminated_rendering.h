@@ -71,7 +71,12 @@ void illuminated_rendering(
 	
 	const auto viewed_character = in.eye.viewed_character;
 	const auto screen_size = in.eye.screen_size;
-	const auto camera = in.eye.cone;
+
+	const auto camera = [&in](){ 
+		auto result = in.eye.cone;
+		result.transform.pos.discard_fract();
+		return result;
+	}();
 
 	const auto& cosmos = viewed_character.get_cosmos();
 	auto& profiler = in.frame_performance;

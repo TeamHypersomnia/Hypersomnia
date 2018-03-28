@@ -13,8 +13,8 @@ namespace augs {
 
 	struct smooth_value_field {
 		vec2i discrete_value;
-		vec2 value;
-		vec2 target_value;
+		vec2d value;
+		vec2d target_value;
 
 		void tick(const delta dt, const smoothing_settings<double>);
 	};

@@ -44,7 +44,7 @@ struct world_camera {
 		const_entity_handle entity_to_chase
 	);
 
-	vec2i get_camera_offset_due_to_character_crosshair(
+	vec2 get_camera_offset_due_to_character_crosshair(
 		const const_entity_handle,
 		const world_camera_settings,
 		const vec2 screen_size
