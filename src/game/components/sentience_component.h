@@ -67,7 +67,7 @@ namespace components {
 		}
 
 		rgba calc_health_color(const float time_pulse_multiplier) const;
-		std::optional<rgba> get_low_health_border(const unsigned timestamp_ms) const;
+		std::optional<rgba> find_low_health_border(const unsigned timestamp_ms) const;
 
 		bool is_conscious() const;
 

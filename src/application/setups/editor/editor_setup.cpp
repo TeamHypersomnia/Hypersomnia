@@ -24,12 +24,12 @@
 #include "augs/readwrite/byte_file.h"
 #include "augs/readwrite/lua_file.h"
 
-std::optional<ltrb> editor_setup::get_screen_space_rect_selection(
+std::optional<ltrb> editor_setup::find_screen_space_rect_selection(
 	const vec2i screen_size,
 	const vec2i mouse_pos
 ) const {
-	if (const auto cam = get_current_camera()) {
-		return selector.get_screen_space_rect_selection(*cam, screen_size, mouse_pos);
+	if (const auto cam = find_current_camera()) {
+		return selector.find_screen_space_rect_selection(*cam, screen_size, mouse_pos);
 	}
 
 	return std::nullopt;
@@ -72,7 +72,7 @@ bool editor_setup::is_editing_mode() const {
 	return player.is_editing_mode();
 }
 
-std::optional<camera_cone> editor_setup::get_current_camera() const {
+std::optional<camera_cone> editor_setup::find_current_camera() const {
 	if (anything_opened()) {
 		return editor_detail::calculate_camera(player, view(), get_matching_go_to_entity(), work());
 	}
@@ -418,7 +418,7 @@ void editor_setup::perform_custom_imgui(
 			text(typesafe_sprintf("Folder path: %x", folder().current_path));
 			//text("Tick rate: %x/s", get_viewed_cosmos().get_solvable().get_steps_per_second()));
 
-			if (const auto current_cone = get_current_camera()) {
+			if (const auto current_cone = find_current_camera()) {
 				const auto world_cursor_pos = current_cone->to_world_space(screen_size, mouse_pos);
 
 				text("Grid size: %x/%x", view().grid.unit_pixels, settings.grid.render.get_maximum_unit());
@@ -469,7 +469,7 @@ void editor_setup::perform_custom_imgui(
 			if (!all_selected.empty()) {
 				text("Selected %x entities", all_selected.size());
 
-				if (const auto aabb = get_selection_aabb()) {
+				if (const auto aabb = find_selection_aabb()) {
 					const auto size = aabb->get_size();
 					text("AABB:   %x x %x pixels\ncenter: %x\nlt:     %x", size.x, size.y, aabb->get_center(), aabb->left_top());
 				}
@@ -863,7 +863,7 @@ bool editor_setup::handle_input_before_game(
 	using namespace augs::event;
 	using namespace augs::event::keys;
 
-	const auto maybe_cone = get_current_camera();
+	const auto maybe_cone = find_current_camera();
 
 	if (!maybe_cone || !anything_opened()) {
 		return false;
@@ -904,7 +904,7 @@ bool editor_setup::handle_input_before_game(
 					if (view().snapping_enabled) {
 						cmd->reinfer_moved(cosm);
 
-						if (const auto aabb_before_move = get_selection_aabb()) {
+						if (const auto aabb_before_move = find_selection_aabb()) {
 							const auto current_aabb = *aabb_before_move + vec2(new_delta);
 							new_delta += view().grid.get_snapping_delta(current_aabb);
 						}
@@ -1009,7 +1009,7 @@ bool editor_setup::handle_input_before_game(
 }
 
 vec2 editor_setup::get_world_cursor_pos() const {
-	return get_world_cursor_pos(get_current_camera().value());
+	return get_world_cursor_pos(find_current_camera().value());
 }
 
 vec2 editor_setup::get_world_cursor_pos(const camera_cone cone) const {
@@ -1027,17 +1027,17 @@ const editor_view* editor_setup::find_view() const {
 	return nullptr;
 }
 
-std::optional<ltrb> editor_setup::get_selection_aabb() const {
+std::optional<ltrb> editor_setup::find_selection_aabb() const {
 	if (anything_opened() && player.paused) {
-		return selector.get_selection_aabb(work().world, view().selected_entities);
+		return selector.find_selection_aabb(work().world, view().selected_entities);
 	}
 
 	return std::nullopt;
 }
 
-std::optional<rgba> editor_setup::get_highlight_color_of(const entity_id id) const {
+std::optional<rgba> editor_setup::find_highlight_color_of(const entity_id id) const {
 	if (anything_opened() && player.paused) {
-		return selector.get_highlight_color_of(settings.entity_selector, id, view().selected_entities);
+		return selector.find_highlight_color_of(settings.entity_selector, id, view().selected_entities);
 	}
 
 	return std::nullopt;

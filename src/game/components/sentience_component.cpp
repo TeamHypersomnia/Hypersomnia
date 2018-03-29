@@ -26,7 +26,7 @@ namespace components {
 		return augs::interp(health_col, pulse_target, pulse_redness_multiplier);
 	}
 	
-	std::optional<rgba> sentience::get_low_health_border(const unsigned timestamp_ms) const {
+	std::optional<rgba> sentience::find_low_health_border(const unsigned timestamp_ms) const {
 		if (is_conscious()) {
 			const auto& health = get<health_meter_instance>();
 			auto hr = health.get_ratio();

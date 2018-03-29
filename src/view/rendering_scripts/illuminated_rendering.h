@@ -250,7 +250,7 @@ void illuminated_rendering(
 	
 	auto standard_border_provider = [timestamp_ms](const const_entity_handle sentience) -> std::optional<rgba> {
 		if (const auto s = sentience.find<components::sentience>()) {
-			return s->get_low_health_border(timestamp_ms);
+			return s->find_low_health_border(timestamp_ms);
 		}
 
 		return std::nullopt;

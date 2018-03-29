@@ -67,7 +67,7 @@ public:
 		return held;
 	}
 
-	std::optional<ltrb> get_screen_space_rect_selection(
+	std::optional<ltrb> find_screen_space_rect_selection(
 		const camera_cone& in,
 		vec2i screen_size,
 		vec2i mouse_pos
@@ -101,12 +101,12 @@ public:
 		}
 	}
 
-	std::optional<ltrb> get_selection_aabb(
+	std::optional<ltrb> find_selection_aabb(
 		const cosmos& cosm,
 		const target_selections_type& signi_selections
 	) const;
 
-	std::optional<rgba> get_highlight_color_of(
+	std::optional<rgba> find_highlight_color_of(
 		const editor_entity_selector_settings& settings,
 		entity_id id, 
 		const target_selections_type& signi_selections

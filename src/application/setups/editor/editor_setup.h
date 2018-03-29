@@ -306,9 +306,9 @@ public:
 
 	void unhover();
 	bool is_editing_mode() const;
-	std::optional<camera_cone> get_current_camera() const; 
+	std::optional<camera_cone> find_current_camera() const; 
 
-	std::optional<ltrb> get_screen_space_rect_selection(vec2i screen_size, vec2i mouse_pos) const;
+	std::optional<ltrb> find_screen_space_rect_selection(vec2i screen_size, vec2i mouse_pos) const;
 
 	const editor_view* find_view() const;
 
@@ -337,8 +337,8 @@ public:
 		}
 	}
 
-	std::optional<rgba> get_highlight_color_of(const entity_id id) const;
-	std::optional<ltrb> get_selection_aabb() const;
+	std::optional<rgba> find_highlight_color_of(const entity_id id) const;
+	std::optional<ltrb> find_selection_aabb() const;
 
 	template <class F>
 	void for_each_highlight(F callback) const {

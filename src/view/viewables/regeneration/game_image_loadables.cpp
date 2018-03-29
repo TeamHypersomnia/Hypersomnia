@@ -4,8 +4,6 @@
 #include "view/viewables/regeneration/game_image_loadables.h"
 #include "view/viewables/regeneration/desaturations.h"
 
-
-
 augs::path_type get_neon_map_path(augs::path_type from_source_path) {
 	return augs::path_type(GENERATED_FILES_DIR) += from_source_path.replace_extension(".neon_map.png");
 }
@@ -18,7 +16,7 @@ augs::path_type game_image_loadables::get_source_image_path() const {
 	return source_image_path;
 }
 
-std::optional<augs::path_type> game_image_loadables::get_neon_map_path() const {
+std::optional<augs::path_type> game_image_loadables::find_neon_map_path() const {
 	if (extras.custom_neon_map_path) {
 		return get_source_image_path().replace_filename(*extras.custom_neon_map_path);
 	}
@@ -29,7 +27,7 @@ std::optional<augs::path_type> game_image_loadables::get_neon_map_path() const {
 	return std::nullopt;
 }
 
-std::optional<augs::path_type> game_image_loadables::get_desaturation_path() const {
+std::optional<augs::path_type> game_image_loadables::find_desaturation_path() const {
 	if (should_generate_desaturation()) {
 		return ::get_desaturation_path(source_image_path);
 	}
@@ -51,7 +49,7 @@ void game_image_loadables::regenerate_all_needed(
 		
 		regenerate_neon_map(
 			diffuse_path,
-			get_neon_map_path().value(),
+			find_neon_map_path().value(),
 			extras.neon_map.value(),
 			force_regenerate
 		);
@@ -60,7 +58,7 @@ void game_image_loadables::regenerate_all_needed(
 	if (should_generate_desaturation()) {
 		regenerate_desaturation(
 			diffuse_path,
-			get_desaturation_path().value(),
+			find_desaturation_path().value(),
 			force_regenerate
 		);
 	}

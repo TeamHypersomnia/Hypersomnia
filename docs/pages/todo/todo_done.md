@@ -393,3 +393,18 @@ we consider whole type overrides too complex architeciturally:
 			- also, just discarding both at camera and drawing.cpp is not enough because th camera must properly chase the integer, so still it might be sometimes off by 1-2
 				- notice that after discarding both, the "ugly transitions" are gone but there are still off by one errors, just like with the brick walls
 				- might also be because of the brick wall sprite not being 128x128 exactly
+
+- transforms in editor
+	- grid
+		- tips: https://developer.valvesoftware.com/wiki/Hammer_Tools_Menu
+		- hotkeys for:
+			- toggle ctrl does snap?
+			- snap bboxes independently: ctrl+shift+b
+		- valve aligns to selection's bounding box, looks like a neat idea
+			- research about corners other than left-bottom
+			- we'll just snap each AABB corner
+				- algorithm:
+					- for each aabb corner, determine which grid vertex is the closest
+					- for each determined closest grid vertex, choose the one with the least distance,
+						- and align the respective vertex 
+

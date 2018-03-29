@@ -24,8 +24,8 @@ augs::graphics::texture standard_atlas_distribution(const standard_atlas_distrib
 			}
 		};
 
-		add_if_exists(def.get_neon_map_path());
-		add_if_exists(def.get_desaturation_path());
+		add_if_exists(def.find_neon_map_path());
+		add_if_exists(def.find_desaturation_path());
 	}
 
 	atlas_input.fonts.emplace_back(in.gui_font_input);
@@ -61,8 +61,8 @@ augs::graphics::texture standard_atlas_distribution(const standard_atlas_distrib
 				}
 			};
 
-			set_if_exists(maps.neon_map, def.get_neon_map_path());
-			set_if_exists(maps.desaturated, def.get_desaturation_path());
+			set_if_exists(maps.neon_map, def.find_neon_map_path());
+			set_if_exists(maps.desaturated, def.find_desaturation_path());
 		}
 	}
 

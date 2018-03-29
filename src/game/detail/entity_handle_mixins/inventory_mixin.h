@@ -39,7 +39,7 @@ public:
 		});
 	}
 
-	std::optional<unsigned> get_space_occupied() const;	
+	std::optional<unsigned> find_space_occupied() const;	
 
 	generic_handle_type get_owning_transfer_capability() const;
 	bool owning_transfer_capability_alive_and_same_as_of(const entity_id) const;
@@ -281,7 +281,7 @@ public:
 };
 
 template <class E>
-std::optional<unsigned> inventory_mixin<E>::get_space_occupied() const {
+std::optional<unsigned> inventory_mixin<E>::find_space_occupied() const {
 	const auto& self = *static_cast<const E*>(this);
 
 	if (const auto item = self.template find<components::item>()) {

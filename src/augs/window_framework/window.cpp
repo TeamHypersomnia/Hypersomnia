@@ -33,7 +33,7 @@ namespace augs {
 		if (/* should_sync_mouse */ new_change.msg == event::message::click_activate
 			&& get_current_settings().raw_mouse_input
 		) {
-			if (const auto screen_space = get_cursor_pos()) {
+			if (const auto screen_space = find_cursor_pos()) {
 				const auto window_pos = get_window_rect().get_position();
 				const auto rel_v = basic_vec2<short>((*screen_space - window_pos) - last_mouse_pos);
 				return do_raw_motion(rel_v);

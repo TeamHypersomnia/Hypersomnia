@@ -36,7 +36,7 @@ namespace augs {
 		return xywhi(rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top);
 	}
 
-	std::optional<vec2i> get_cursor_pos() {
+	std::optional<vec2i> find_cursor_pos() {
 		POINT p;
 
 		if (GetCursorPos(&p)) {
@@ -66,7 +66,7 @@ namespace augs {
 		return {};
 	}
 
-	std::optional<vec2i> get_cursor_pos() {
+	std::optional<vec2i> find_cursor_pos() {
 		return std::nullopt;
 	}
 
@@ -95,7 +95,7 @@ namespace augs {
 		return {};
 	}
 
-	std::optional<vec2i> get_cursor_pos() {
+	std::optional<vec2i> find_cursor_pos() {
 		return std::nullopt;
 	}
 

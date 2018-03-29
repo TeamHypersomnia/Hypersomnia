@@ -294,7 +294,7 @@ std::string format_space_units(const unsigned u) {
 }
 
 unsigned calc_space_occupied_with_children(const const_entity_handle item_entity) {
-	auto space_occupied = *item_entity.get_space_occupied();
+	auto space_occupied = *item_entity.find_space_occupied();
 
 	if (auto* const container = item_entity.find<invariants::container>()) {
 		ensure(item_entity.get<components::item>().get_charges() == 1);

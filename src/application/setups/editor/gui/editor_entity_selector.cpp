@@ -7,7 +7,7 @@ void editor_entity_selector::clear() {
 	hovered.unset();
 };
 
-std::optional<ltrb> editor_entity_selector::get_screen_space_rect_selection(
+std::optional<ltrb> editor_entity_selector::find_screen_space_rect_selection(
 	const camera_cone& camera,
 	vec2i screen_size,
 	vec2i mouse_pos
@@ -194,7 +194,7 @@ void editor_entity_selector::do_mousemotion(
 	}
 }
 
-std::optional<ltrb> editor_entity_selector::get_selection_aabb(
+std::optional<ltrb> editor_entity_selector::find_selection_aabb(
 	const cosmos& cosm,
 	const target_selections_type& signi_selections
 ) const {
@@ -224,7 +224,7 @@ std::optional<ltrb> editor_entity_selector::get_selection_aabb(
 	return std::nullopt;
 }
 
-std::optional<rgba> editor_entity_selector::get_highlight_color_of(
+std::optional<rgba> editor_entity_selector::find_highlight_color_of(
 	const editor_entity_selector_settings& settings,
 	const entity_id id, 
 	const target_selections_type& signi_selections

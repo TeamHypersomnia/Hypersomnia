@@ -7,7 +7,7 @@
 namespace augs {
 	xywhi get_display();
 
-	std::optional<vec2i> get_cursor_pos();
+	std::optional<vec2i> find_cursor_pos();
 
 	void set_clipboard_data(const std::string&);
 	std::string get_clipboard_data();

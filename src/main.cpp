@@ -583,7 +583,7 @@ int work(const int argc, const char* const * const argv) try {
 	static auto get_camera = []() {		
 		if(const auto custom = visit_current_setup(
 			[](const auto& setup) { 
-				return setup.get_current_camera(); 
+				return setup.find_current_camera(); 
 			}
 		)) {
 			return *custom;
@@ -1627,7 +1627,7 @@ int work(const int argc, const char* const * const argv) try {
 							const auto aabb = xywh::center_and_size(screen_space_pos, necessary_atlas_entries[image_id].get_size());
 							const auto expanded_square = aabb.expand_to_square();
 
-							if (auto active_color = editor.get_highlight_color_of(typed_handle.get_id())) {
+							if (auto active_color = editor.find_highlight_color_of(typed_handle.get_id())) {
 								active_color->a = static_cast<rgba_channel>(std::min(1.8 * active_color->a, 255.0));
 
 								const auto selection_indicator_aabb = expanded_square.expand_from_center(vec2(5, 5));
@@ -1662,7 +1662,7 @@ int work(const int argc, const char* const * const argv) try {
 
 					const auto& editor_cfg = new_viewing_config.editor;
 
-					if (auto cone = editor.get_current_camera()) {
+					if (auto cone = editor.find_current_camera()) {
 						cone->transform.pos.discard_fract();
 
 						if (const auto view = editor.find_view()) {
@@ -1676,7 +1676,7 @@ int work(const int argc, const char* const * const argv) try {
 							}
 						}
 
-						if (const auto selection_aabb = editor.get_selection_aabb()) {
+						if (const auto selection_aabb = editor.find_selection_aabb()) {
 							xywh ab;
 							ab.set_position(cone->to_screen_space(screen_size, selection_aabb->get_position()));
 							//ab.set_position(selection_aabb->get_position());
@@ -1692,7 +1692,7 @@ int work(const int argc, const char* const * const argv) try {
 
 					const auto mouse = common_input_state.mouse.pos;
 
-					if (const auto r = editor.get_screen_space_rect_selection(screen_size, mouse)) {
+					if (const auto r = editor.find_screen_space_rect_selection(screen_size, mouse)) {
 						drawer.aabb_with_border(
 							*r,
 							editor_cfg.rectangular_selection_color,

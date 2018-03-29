@@ -42,8 +42,8 @@ struct game_image_loadables {
 	void regenerate_all_needed(const bool force_regenerate) const;
 
 	augs::path_type get_source_image_path() const;
-	std::optional<augs::path_type> get_neon_map_path() const;
-	std::optional<augs::path_type> get_desaturation_path() const;
+	std::optional<augs::path_type> find_neon_map_path() const;
+	std::optional<augs::path_type> find_desaturation_path() const;
 
 	vec2u read_source_image_size() const;
 };
