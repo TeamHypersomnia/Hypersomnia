@@ -5,6 +5,7 @@
 #include "augs/filesystem/directory.h"
 #include "augs/templates/thread_templates.h"
 #include "augs/templates/chrono_templates.h"
+#include "augs/templates/algorithm_templates.h"
 #include "augs/window_framework/window.h"
 #include "augs/window_framework/platform_utils.h"
 #include "augs/window_framework/shell.h"
@@ -900,17 +901,12 @@ bool editor_setup::handle_input_before_game(
 
 					cmd->unmove_entities(cosm);
 
-					if (has_ctrl) {
+					if (view().snapping_enabled) {
 						cmd->reinfer_moved(cosm);
 
 						if (const auto aabb_before_move = get_selection_aabb()) {
 							const auto current_aabb = *aabb_before_move + vec2(new_delta);
-
-							const auto tl = current_aabb.get_position();
-							const auto snapped_tl = view().grid.snap(tl);
-							const auto snapping_delta = snapped_tl - tl;
-
-							new_delta += snapping_delta;
+							new_delta += view().grid.get_snapping_delta(current_aabb);
 						}
 					}
 
@@ -997,6 +993,7 @@ bool editor_setup::handle_input_before_game(
 				case key::I: play(); return true;
 				case key::F: view().toggle_flavour_rect_selection(); return true;
 				case key::G: view().toggle_grid(); return true;
+				case key::S: view().toggle_snapping(); return true;
 				case key::OPEN_SQUARE_BRACKET: view().grid.decrease_grid_size(); clamp_units(); return true;
 				case key::CLOSE_SQUARE_BRACKET: view().grid.increase_grid_size(); clamp_units(); return true;
 				case key::DEL: del(); return true;

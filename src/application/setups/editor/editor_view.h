@@ -21,6 +21,7 @@ struct editor_view {
 	editor_folder_meta meta;
 	snapping_grid grid;
 	bool show_grid = true;
+	bool snapping_enabled = true;
 	editor_rect_select_type rect_select_mode = editor_rect_select_type::EVERYTHING;
 
 	std::unordered_set<entity_id> selected_entities;
@@ -29,6 +30,7 @@ struct editor_view {
 
 	void reset_zoom_at(vec2);
 
+	void toggle_snapping();
 	void toggle_grid();
 	void toggle_flavour_rect_selection();
 };

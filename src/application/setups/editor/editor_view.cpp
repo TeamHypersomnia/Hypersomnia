@@ -5,6 +5,11 @@ void editor_view::toggle_grid() {
 	f = !f;
 }
 
+void editor_view::toggle_snapping() {
+	auto& f = snapping_enabled;
+	f = !f;
+}
+
 void editor_view::reset_zoom_at(vec2 pos) {
 	if (panned_camera) {
 		panned_camera->zoom = 1.f;

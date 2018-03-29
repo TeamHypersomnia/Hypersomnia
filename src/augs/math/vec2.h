@@ -511,6 +511,10 @@ struct basic_vec2 {
 		return false;
 	}
 
+	bool operator<(const basic_vec2& b) const {
+		return length_sq() < b.length_sq();
+	}
+
 	template <class v> bool operator==(const v& p) const { return x == p.x && y == p.y; }
 	template <class v> bool operator!=(const v& p) const { return x != p.x || y != p.y; }
 

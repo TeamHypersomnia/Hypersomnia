@@ -29,7 +29,10 @@ struct snapping_grid {
 		unit_pixels /= 2;
 	}
 
-	transform snap(transform position) const;
-	vec2 snap(vec2 position) const;
+	/* transform snap(transform position) const; */
+
+	vec2i get_snapped(vec2 position) const;
+	vec2 get_snapping_delta(ltrb position) const;
+
 	float snap(float rotation) const;
 };
