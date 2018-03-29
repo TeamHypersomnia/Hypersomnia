@@ -402,6 +402,10 @@ void editor_setup::perform_custom_imgui(
 				return { held };
 			}
 
+			if (const auto matching = get_matching_go_to_entity()) {
+				return { matching };
+			}
+
 			return get_all_selected_entities();
 		}();
 
