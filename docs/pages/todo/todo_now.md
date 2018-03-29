@@ -7,6 +7,7 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
+- let "in rectangular selection" just have "eaten" vector so we don't have to recalculate for each selected entities
 - rotations in the grid
 
 - copying, cutting, pasting, duplication

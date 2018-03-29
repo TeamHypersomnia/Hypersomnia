@@ -20,14 +20,14 @@ void erase_if(Container& v, F f) {
 }
 
 template <class Container, class T>
-void erase_element(Container& v, const T& l) {
+auto erase_element(Container& v, const T& l) {
 	static_assert(!std::is_same_v<decltype(v.begin()), T>, "erase_element serves to erase keys or values, not iterators!");
 
 	if constexpr(can_access_data_v<Container>) {
 		v.erase(std::remove(v.begin(), v.end(), l), v.end());
 	}
 	else {
-		v.erase(l);
+		return v.erase(l) != 0;
 	}
 }
 

@@ -10,7 +10,6 @@
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/detail/visible_entities.h"
-#include "game/detail/describers.h"
 
 #include "view/necessary_image_id.h"
 #include "view/necessary_resources.h"
@@ -35,13 +34,15 @@
 #include "application/setups/editor/gui/editor_entity_selector.h"
 #include "application/setups/editor/gui/editor_entity_mover.h"
 
-#include "application/setups/editor/detail/current_access_cache.h"
 #include "application/setups/editor/editor_command_input.h"
 
 #include "application/setups/editor/gui/editor_history_gui.h"
 #include "application/setups/editor/gui/editor_go_to_gui.h"
 #include "application/setups/editor/gui/editor_all_entities_gui.h"
 #include "application/setups/editor/gui/editor_common_state_gui.h"
+
+#include "application/setups/editor/detail/current_access_cache.h"
+#include "application/setups/editor/detail/make_command_from_selections.h"
 
 struct config_lua_table;
 
@@ -164,41 +165,20 @@ class editor_setup : private current_access_cache<editor_setup> {
 	vec2 get_world_cursor_pos() const;
 	vec2 get_world_cursor_pos(const camera_cone) const;
 
-	template <class T, class P>
-	T make_command_from_selections(const std::string& preffix, P inclusion_predicate) {
-		thread_local name_accumulator counts;
-		counts.clear();
+	auto make_for_each_selected_entity() const {
+		return [this](auto callback) {
+			for_each_selected_entity(callback);	
+		};
+	}
 
-		T command;
-
-		const auto& cosm = work().world;
-
-		for_each_selected_entity(
-			[&](const auto e) {
-				const auto handle = cosm[e];
-
-				if (inclusion_predicate(handle)) {
-					command.push_entry(handle);
-					++counts[handle.get_name()];
-				}
-			}
+	template <class T, class... Args>
+	auto make_command_from_selections(Args&&... args) const {
+		return ::make_command_from_selections<T>(
+			make_for_each_selected_entity(),
+			work().world,
+			std::forward<Args>(args)...
 		);
-
-		if (command.size() == cosm.get_entities_count()) {
-			command.built_description = preffix + "all entities";
-		}
-		else {
-			command.built_description = preffix + ::describe_names_of(counts);
-		}
-
-		return command;
 	}
-
-	template <class T>
-	T make_command_from_selections(const std::string& preffix) {
-		return make_command_from_selections<T>(preffix, [](const auto&) { return true; });
-	}
-
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
 	static constexpr bool handles_window_input = true;

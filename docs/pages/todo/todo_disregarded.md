@@ -5,6 +5,9 @@ permalink: todo_disregarded
 summary: Just a hidden scratchpad.
 ---
 
+- let "in rectangular selection" just have "eaten" vector so we don't have to recalculate for each selected entities
+	- the state would be ugly, we'd have to save on beginning of drag the state of signi
+
 - rename "significant" to "persistent" and remove the mention of "transferred through the network"editor_tab_signi
 	- because "replicated" implies being transferred
 	- too much pain in the ass though. We've changed the definition, though.
