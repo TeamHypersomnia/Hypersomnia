@@ -9,38 +9,9 @@ summary: Just a hidden scratchpad.
 
 - rotations in the grid
 
-- Dichotomy of physical AABBs and sprite AABBs, and their roles in editor
-	- It makes sense that, at some point, they might be different.
-		- E.g. we might want to have a little smaller physical aabb than the character's sprite, so that it better touches things
-	- All AABB cases
-		- Editor
-			- Selecting entities
-				- Currently, physical body is preferred
-			- Selection's AABB highlighting
-				- Always prefer the physical AABB
-			- When in shape editing mode:
-				- v switches to physical shape editing
-				- V switches to exclusively renderable shape editing
-			- Problem: mouseover an object might not work
-				- draw a dashed line if aabb and sprite's size diverges
-		- Tree of NPO
-			- By very definition, only renderable AABBs
-		- AABB highlighter in-game
-			- Should really care only about physical representation, as it is for the gameplay
-	- find_aabb
-		- determine where it is used
-		- differentiate between find_aabb for rendering/hovering and find_aabb for physical shapes?
-	- synchronization buttons under sprite & polygon invariants
-		- Read from asset
-		- Write to physics
-	- for now, we ditch the polygons until we make an arena
-		- the soonest they'll be needed is for the truck
-	- what do we snap, for example?
-	- currently, sprite is prioritized over the physical components
-	- what if we stored sprite id for fixtures, so that we don't have to specify size separately?
-		- pain in the ass when calculating rendering rect
-			- perf might take a hit even
-		- let's just have a button under sprite and later polygon invariant to "sync" with physics
+- copying, cutting, pasting, duplication
+	- high time for composite commands?
+	- cut = copy + delete
 
 - flipping a selection
 	- useful for creating symmetrical levels
@@ -65,43 +36,6 @@ summary: Just a hidden scratchpad.
 
 - sometimes floor is not selectable but it's because it has the same layer as road
 	- some warning perhaps could be in order?
-		
-- moving objects with mouse
-	- if only one is selected on pressing "t", optionally move in a special context
-		- like move an entry in attachment matrix
-	- command format
-		- how about re-using change property command?
-			- no.
-		- just move the requisite stuff from change property command mixin to a separate header
-			- it's the art to have structures with diverse data types, each only to do their own business,
-				- but have a templated logic that generalizes them all
-			- entity_translator struct
-				- it can hold the currently processed command
-			- separate header:
-				- detail_*_bytes -> write_maybe_trivial_marker
-					- actually, not...
-					- consider removing trivial marker completely
-						- no: too much pain in the ass with various type ids and various trivial types overall
-					- then we'll have a type id with just max 2 options (b2Transform, components::transform)
-			- readwrite of before_change data could be used
-				- because we will always store all old values for determinism
-		- really watch out for the changes in "si", they can later affect how the box2d detail structs are redone
-			- SI WILL BE PRESERVED CORRECTLY, because changes to it will also be tracked in history.
-		- now that we have box2d transforms in a struct, we can have a lambda accessor for a single transform object
-			- can set it with a constexpr
-		- task at hand, data-wise:
-			- write b2sweeps and b2transforms to old value vector
-				- pack them into a box2d detail
-			- set new transform
-				- what format?
-				- new transform of the reference entity?
-					- then calculate delta and apply to other entities
-				- the delta components::transform itself?
-					- no referential entity to look up to
-					- always calculate pixel-wise delta during mousemotion
-						- SI-independent
-			- rewriting values when moving mouse
-				- 
 			
 - status bar
 	- check how it works in vim
@@ -111,8 +45,6 @@ summary: Just a hidden scratchpad.
 	- once we have combo maps, there will be a separate function to determine whether the input is to be fetched
 		- it will also return true on "character" input
 	- a separate function will actually respond to combos
-
-- visible_entities should be templated by all_type
 
 - Perhaps something to let us select and manipulate entities in gameplay mode?
 	- will it be useful?
@@ -132,6 +64,9 @@ summary: Just a hidden scratchpad.
 		- if fixture, change shape
 
 - determine what to do with b2Filters
+	- for now sensible filters will be provided by the testbed
+		- we can add a combo for now?
+		- matrix could be cool though, even for debugging
 	- it appears that filters aren't really given any special roles.
 		- thus it makes sense that they be completely customizable in editor.
 		- we will perhaps make amount of categories limited so as to fit b2Filter.

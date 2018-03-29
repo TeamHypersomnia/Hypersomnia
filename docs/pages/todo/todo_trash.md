@@ -604,3 +604,36 @@ Memory is somewhat safe because it can only grow as far as the children grow.
 		- That is because we do not hold optionals but actual, properly constructed objects.
 	- If a invariant does not imply any component, its existence can only be queried by actually checking whether it is enabled.
 	- The [``cosmos::create_entity``](cosmos#create_entity) automatically adds all components implied by the enabled invariants.
+
+- Dichotomy of physical AABBs and sprite AABBs, and their roles in editor
+	- It makes sense that, at some point, they might be different.
+		- E.g. we might want to have a little smaller physical aabb than the character's sprite, so that it better touches things
+	- All AABB cases
+		- Editor
+			- Selecting entities
+				- Currently, physical body is preferred
+			- Selection's AABB highlighting
+				- Always prefer the physical AABB
+			- When in shape editing mode:
+				- v switches to physical shape editing
+				- V switches to exclusively renderable shape editing
+			- Problem: mouseover an object might not work
+				- draw a dashed line if aabb and sprite's size diverges
+		- Tree of NPO
+			- By very definition, only renderable AABBs
+		- AABB highlighter in-game
+			- Should really care only about physical representation, as it is for the gameplay
+	- find_aabb
+		- determine where it is used
+		- differentiate between find_aabb for rendering/hovering and find_aabb for physical shapes?
+	- synchronization buttons under sprite & polygon invariants
+		- Read from asset
+		- Write to physics
+	- for now, we ditch the polygons until we make an arena
+		- the soonest they'll be needed is for the truck
+	- what do we snap, for example?
+	- currently, sprite is prioritized over the physical components
+	- what if we stored sprite id for fixtures, so that we don't have to specify size separately?
+		- pain in the ass when calculating rendering rect
+			- perf might take a hit even
+		- let's just have a button under sprite and later polygon invariant to "sync" with physics

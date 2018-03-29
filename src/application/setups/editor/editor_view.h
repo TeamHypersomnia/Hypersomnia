@@ -8,7 +8,7 @@
 
 #include "game/transcendental/entity_id.h"
 
-#include "application/setups/editor/editor_rect_select_type.h"
+#include "application/setups/editor/gui/editor_rect_select_type.h"
 
 struct editor_folder_meta {
 	// GEN INTROSPECTOR struct editor_folder_meta

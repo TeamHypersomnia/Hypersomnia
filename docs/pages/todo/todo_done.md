@@ -408,3 +408,38 @@ we consider whole type overrides too complex architeciturally:
 					- for each determined closest grid vertex, choose the one with the least distance,
 						- and align the respective vertex 
 
+- moving objects with mouse
+	- if only one is selected on pressing "t", optionally move in a special context
+		- like move an entry in attachment matrix
+	- command format
+		- how about re-using change property command?
+			- no.
+		- just move the requisite stuff from change property command mixin to a separate header
+			- it's the art to have structures with diverse data types, each only to do their own business,
+				- but have a templated logic that generalizes them all
+			- entity_translator struct
+				- it can hold the currently processed command
+			- separate header:
+				- detail_*_bytes -> write_maybe_trivial_marker
+					- actually, not...
+					- consider removing trivial marker completely
+						- no: too much pain in the ass with various type ids and various trivial types overall
+					- then we'll have a type id with just max 2 options (b2Transform, components::transform)
+			- readwrite of before_change data could be used
+				- because we will always store all old values for determinism
+		- really watch out for the changes in "si", they can later affect how the box2d detail structs are redone
+			- SI WILL BE PRESERVED CORRECTLY, because changes to it will also be tracked in history.
+		- now that we have box2d transforms in a struct, we can have a lambda accessor for a single transform object
+			- can set it with a constexpr
+		- task at hand, data-wise:
+			- write b2sweeps and b2transforms to old value vector
+				- pack them into a box2d detail
+			- set new transform
+				- what format?
+				- new transform of the reference entity?
+					- then calculate delta and apply to other entities
+				- the delta components::transform itself?
+					- no referential entity to look up to
+					- always calculate pixel-wise delta during mousemotion
+						- SI-independent
+			- rewriting values when moving mouse

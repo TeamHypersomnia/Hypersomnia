@@ -12,7 +12,7 @@
 #include "view/necessary_resources.h"
 
 #include "application/setups/editor/editor_settings.h"
-#include "application/setups/editor/editor_rect_select_type.h"
+#include "application/setups/editor/gui/editor_rect_select_type.h"
 
 template <class F>
 void for_each_iconed_entity(const cosmos& cosm, F callback) {

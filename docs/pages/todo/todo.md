@@ -5,6 +5,10 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- visible_entities should be templated by all_type
+	- could be instantiated
+	- is it necessary though?
+
 - fix saving of the editor view state when the work is saved to some non-untitled location
 	- notice that, we might later introduce some caches for selections to improve performance
 		- e.g. only always calculate the selection's aabb and rotation centers once
