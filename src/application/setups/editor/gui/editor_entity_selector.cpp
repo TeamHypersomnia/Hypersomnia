@@ -82,6 +82,42 @@ void editor_entity_selector::do_left_release(
 	finish_rectangular(selections);
 }
 
+void editor_entity_selector::select_all(
+	const cosmos& cosm,
+	const editor_rect_select_type rect_select_mode,
+	std::unordered_set<entity_id>& current_selections
+) {
+	const auto compared_flavour = [&](){
+		if (flavour_of_held) {
+			return flavour_of_held;
+		}
+
+		if (current_selections.size() == 1) {
+			return cosm[(*current_selections.begin())].get_flavour_id();
+		}
+
+		return entity_flavour_id();
+	}();
+
+	finish_rectangular(current_selections);
+
+	current_selections.clear();
+	current_selections.reserve(cosm.get_entities_count());
+
+	cosmic::for_each_entity(cosm, [&](const auto handle) {
+		const auto id = handle.get_id();
+
+		if (compared_flavour && rect_select_mode == editor_rect_select_type::SAME_FLAVOUR) {
+			if (handle.get_flavour_id() == compared_flavour) {
+				current_selections.emplace(id);
+			}
+		}
+		else {
+			current_selections.emplace(id);
+		}
+	});
+}
+
 void editor_entity_selector::unhover() {
 	hovered = {};
 }

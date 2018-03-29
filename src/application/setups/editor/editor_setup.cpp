@@ -667,6 +667,29 @@ void editor_setup::del() {
 	}
 }
 
+void editor_setup::start_moving_selection() {
+	if (anything_opened()) {
+		finish_rectangular_selection();
+
+		auto command = make_command_from_selections<move_entities_command>(
+			"Moved ",
+			[](const auto typed_handle) {
+				return typed_handle.has_independent_transform();
+			}	
+		);
+
+		if (!command.empty()) {
+			mover.active = true;
+
+			const auto world_cursor_pos = get_world_cursor_pos().discard_fract();
+			mover.initial_world_cursor_pos = world_cursor_pos;
+			command.delta = components::transform(world_cursor_pos - mover.initial_world_cursor_pos, 0);
+
+			folder().history.execute_new(std::move(command), make_command_input());
+		}
+	}
+}
+
 void editor_setup::go_to_all() {
 
 }
@@ -761,14 +784,9 @@ editor_command_input editor_setup::make_command_input() {
 }
 
 void editor_setup::select_all_entities() {
-	const auto& cosm = work().world;
-
-	auto& selections = view().selected_entities;
-	selections.reserve(cosm.get_entities_count());
-
-	cosmic::for_each_entity(cosm, [&](const auto handle) {
-		selections.emplace(handle.get_id());
-	});
+	if (anything_opened()) {
+		selector.select_all(work().world, view().rect_select_mode, view().selected_entities);
+	}
 }
 
 bool editor_setup::handle_input_before_imgui(
@@ -1045,27 +1063,4 @@ std::optional<rgba> editor_setup::find_highlight_color_of(const entity_id id) co
 	}
 
 	return std::nullopt;
-}
-
-void editor_setup::start_moving_selection() {
-	if (anything_opened()) {
-		finish_rectangular_selection();
-
-		auto command = make_command_from_selections<move_entities_command>(
-			"Moved ",
-			[](const auto typed_handle) {
-				return typed_handle.has_independent_transform();
-			}	
-		);
-
-		if (!command.empty()) {
-			mover.active = true;
-
-			const auto world_cursor_pos = get_world_cursor_pos().discard_fract();
-			mover.initial_world_cursor_pos = world_cursor_pos;
-			command.delta = components::transform(world_cursor_pos - mover.initial_world_cursor_pos, 0);
-
-			folder().history.execute_new(std::move(command), make_command_input());
-		}
-	}
 }

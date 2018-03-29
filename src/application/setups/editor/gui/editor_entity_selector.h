@@ -83,6 +83,12 @@ public:
 		bool left_button_pressed
 	);
 
+	void select_all(
+		const cosmos& cosm,
+		const editor_rect_select_type rect_select_mode,
+		std::unordered_set<entity_id>& current_selections
+	);
+
 	template <class F>
 	void for_each_selected_entity(
 		F callback,
