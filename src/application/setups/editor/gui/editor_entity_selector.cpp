@@ -84,13 +84,17 @@ void editor_entity_selector::do_left_release(
 void editor_entity_selector::select_all(
 	const cosmos& cosm,
 	const editor_rect_select_type rect_select_mode,
+	const bool has_ctrl,
 	std::unordered_set<entity_id>& current_selections
 ) {
 	const auto compared_flavour = flavour_of_held;
 	finish_rectangular(current_selections);
 
-	current_selections.clear();
-	current_selections.reserve(cosm.get_entities_count());
+	if (!has_ctrl) {
+		current_selections.clear();
+	}
+
+	current_selections.reserve(current_selections.size() + cosm.get_entities_count());
 
 	cosmic::for_each_entity(cosm, [&](const auto handle) {
 		const auto id = handle.get_id();

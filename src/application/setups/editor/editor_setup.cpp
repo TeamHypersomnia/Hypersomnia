@@ -806,9 +806,9 @@ editor_command_input editor_setup::make_command_input() {
 	return { destructor_input.lua, folder(), selector, all_entities_gui, mover };
 }
 
-void editor_setup::select_all_entities() {
+void editor_setup::select_all_entities(const bool has_ctrl) {
 	if (anything_opened()) {
-		selector.select_all(work().world, view().rect_select_mode, view().selected_entities);
+		selector.select_all(work().world, view().rect_select_mode, has_ctrl, view().selected_entities);
 	}
 }
 
@@ -1036,7 +1036,7 @@ bool editor_setup::handle_input_before_game(
 				}
 
 				switch (k) {
-					case key::A: select_all_entities(); return true;
+					case key::A: select_all_entities(has_ctrl); return true;
 					case key::_0: view().reset_zoom_at(world_cursor_pos); return true;
 					case key::Z: undo(); return true;
 					case key::C: copy(); return true;

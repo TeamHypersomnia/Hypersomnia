@@ -284,7 +284,7 @@ public:
 
 	void go_to_all();
 	void go_to_entity();
-	void select_all_entities();
+	void select_all_entities(bool has_ctrl);
 	void reveal_in_explorer(const augs::window& owner);
 
 	void unhover();

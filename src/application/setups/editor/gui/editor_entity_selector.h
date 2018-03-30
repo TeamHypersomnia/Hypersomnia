@@ -85,7 +85,8 @@ public:
 
 	void select_all(
 		const cosmos& cosm,
-		const editor_rect_select_type rect_select_mode,
+		editor_rect_select_type rect_select_mode,
+		bool has_ctrl,
 		std::unordered_set<entity_id>& current_selections
 	);
 

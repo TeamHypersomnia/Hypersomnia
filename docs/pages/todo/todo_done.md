@@ -446,3 +446,5 @@ we consider whole type overrides too complex architeciturally:
 
 - add a cmake flag to disable building property editor
 
+- add has_ctrl to select_all_entities
+
