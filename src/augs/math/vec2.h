@@ -35,6 +35,11 @@ constexpr T PI = static_cast<T>(3.1415926535897932384626433832795);
 
 namespace augs {
 	template <class T>
+	bool is_epsilon(const T& t) {
+		return std::abs(t) <= AUGS_EPSILON<T>;
+	}
+
+	template <class T>
 	auto zigzag(const T current_time, const T cycle) {
 		const auto m = current_time / cycle;
 		const auto i = int(m);
@@ -297,6 +302,14 @@ struct basic_vec2 {
 		auto result = std::acos(dotted);
 
 		return static_cast<real>(result);
+	}
+
+	auto full_radians_between(const basic_vec2& v) const {
+		return std::atan2(cross(v), dot(v));
+	}
+
+	auto full_degrees_between(const basic_vec2& v) const {
+		return full_radians_between(v) * RAD_TO_DEG<real>;
 	}
 
 	real degrees_between(const basic_vec2& v) const {

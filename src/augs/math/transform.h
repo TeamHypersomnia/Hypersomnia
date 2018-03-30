@@ -145,6 +145,18 @@ struct basic_transform {
 	bool negliglible() const {
 		return compare({});
 	}
+
+	auto& rotate(const T degrees, const vec2 origin) {
+		pos.rotate(degrees, origin);
+		rotation += degrees;
+		return *this;
+	}
+
+	auto& rotate_radians(const T radians, const vec2 origin) {
+		pos.rotate_radians(radians, origin);
+		rotation += radians;
+		return *this;
+	}
 };
 
 template<class T>
