@@ -56,7 +56,6 @@ void editor_entity_selector::finish_rectangular(target_selections_type& into) {
 
 	rectangular_drag_origin = std::nullopt;
 	in_rectangular_selection.clear();
-	flavour_of_held = {};
 }
 
 void editor_entity_selector::do_left_release(
@@ -87,18 +86,7 @@ void editor_entity_selector::select_all(
 	const editor_rect_select_type rect_select_mode,
 	std::unordered_set<entity_id>& current_selections
 ) {
-	const auto compared_flavour = [&](){
-		if (flavour_of_held) {
-			return flavour_of_held;
-		}
-
-		if (current_selections.size() == 1) {
-			return cosm[(*current_selections.begin())].get_flavour_id();
-		}
-
-		return entity_flavour_id();
-	}();
-
+	const auto compared_flavour = flavour_of_held;
 	finish_rectangular(current_selections);
 
 	current_selections.clear();
