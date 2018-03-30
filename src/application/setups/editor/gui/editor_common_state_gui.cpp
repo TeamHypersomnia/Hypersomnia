@@ -1,3 +1,14 @@
+#include "application/setups/editor/gui/editor_common_state_gui.h"
+#include "application/setups/editor/editor_command_input.h"
+
+void editor_common_state_gui::open() {
+	show = true;
+	acquire_once = true;
+	ImGui::SetWindowFocus("Common state");
+}
+
+#if BUILD_PROPERTY_EDITORS
+
 #include "augs/misc/simple_pair.h"
 #include "augs/templates/for_each_std_get.h"
 
@@ -9,7 +20,6 @@
 
 #include "application/intercosm.h"
 #include "application/setups/editor/editor_folder.h"
-#include "application/setups/editor/gui/editor_common_state_gui.h"
 
 #include "application/setups/editor/property_editor/property_editor_gui.h"
 #include "application/setups/editor/property_editor/property_editor_structs.h"
@@ -81,12 +91,6 @@ static void edit_common(
 	);
 }
 
-void editor_common_state_gui::open() {
-	show = true;
-	acquire_once = true;
-	ImGui::SetWindowFocus("Common state");
-}
-
 void editor_common_state_gui::perform(const editor_settings& settings, const editor_command_input in) {
 	if (!show) {
 		return;
@@ -115,3 +119,8 @@ void editor_common_state_gui::perform(const editor_settings& settings, const edi
 		in
 	);
 }
+#else
+void editor_common_state_gui::perform(const editor_settings& settings, const editor_command_input in) {
+
+}
+#endif

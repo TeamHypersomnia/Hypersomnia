@@ -22,6 +22,13 @@ then
 fi
 
 TARGET_DIR="build/${CONFIGURATION}-${ARCHITECTURE}-${C_COMPILER}"
+
+if [[ ! -z "$BUILD_FOLDER_SUFFIX" ]]
+then
+	TARGET_DIR="${TARGET_DIR}-${BUILD_FOLDER_SUFFIX}"
+	ARCHITECTURE="x64"
+fi
+
 echo "Building into $TARGET_DIR"
 
 mkdir --parents $TARGET_DIR
