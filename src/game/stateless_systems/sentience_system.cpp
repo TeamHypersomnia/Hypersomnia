@@ -150,13 +150,10 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 			const auto shake_mult = (sentience.shake_for_ms - (now - sentience.time_of_last_shake).in_milliseconds(delta)) / 400.f;
 
 			if (shake_mult > 0.f) {
-				if (const auto owning_crosshair_recoil = subject.find_crosshair_recoil()) {
-					auto rng = cosmos.get_rng_for(subject);
-
-					owning_crosshair_recoil.template get<components::rigid_body>().apply_impulse(
-						shake_mult *shake_mult * 100 * vec2{ rng.randval(-1.f, 1.f), rng.randval(-1.f, 1.f) }
-					);
-				}
+				auto rng = cosmos.get_rng_for(subject);
+				impulse_input in;
+				in.linear = shake_mult * shake_mult * 100 * vec2 { rng.randval(-1.f, 1.f), rng.randval(-1.f, 1.f) };
+				subject.apply_crosshair_recoil(in);
 			}
 
 			if (sentience.is_spell_being_cast()) {
@@ -242,11 +239,9 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 	{
 		const auto punched = subject;
 
-		if (const auto owning_crosshair_recoil = punched.find_crosshair_recoil()) {
-			const auto recoil_physics = owning_crosshair_recoil.get<components::rigid_body>();
-
-			recoil_physics.apply_angular_impulse((h.point_of_impact - punched.get_logic_transform().pos).cross(h.impact_velocity) / 10000000.f * 3.f / 25.f);
-		}
+		impulse_input in;
+		in.angular = (h.point_of_impact - punched.get_logic_transform().pos).cross(h.impact_velocity) / 10000000.f * 3.f / 25.f;
+		punched.apply_crosshair_recoil(in);
 
 		break;
 	}

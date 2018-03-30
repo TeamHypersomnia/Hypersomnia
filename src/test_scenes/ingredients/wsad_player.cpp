@@ -191,8 +191,6 @@ namespace prefabs {
 		auto recoil = create_test_scene_entity(world, test_plain_invisible_bodys::CROSSHAIR_RECOIL_BODY);
 
 		character.map_child_entity(child_entity_name::CROSSHAIR_RECOIL_BODY, recoil);
-		ensure(character.find_crosshair_recoil());
-		// LOG("Character mass: %x", character.get<components::rigid_body>().get_mass());
 		return character;
 	}
 }

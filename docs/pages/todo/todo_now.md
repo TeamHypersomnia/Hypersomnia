@@ -7,10 +7,10 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
-- let "in rectangular selection" just have "eaten" vector so we don't have to recalculate for each selected entities
-- rotations in the grid
-
 - copying, cutting, pasting, duplication
+	- The editor shall contain its own clipboard, which shouldn't really be persistent
+	- format
+		- can we re-use clone entity really?
 	- high time for composite commands?
 	- cut = copy + delete
 

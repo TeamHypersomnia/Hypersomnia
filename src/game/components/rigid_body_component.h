@@ -18,6 +18,7 @@
 #include "game/enums/rigid_body_type.h"
 
 #include "game/detail/physics/damping_info.h"
+#include "game/detail/physics/impulse_info.h"
 #include "game/components/transform_component.h"
 
 class relational_cache;
@@ -162,7 +163,10 @@ public:
 	void apply_force(const vec2, const vec2 center_offset, const bool wake = true) const;
 	void apply_impulse(const vec2) const;
 	void apply_impulse(const vec2, const vec2 center_offset, const bool wake = true) const;
+
 	void apply_angular_impulse(const float) const;
+
+	void apply(impulse_input) const;
 
 	template <class body_type>
 	void update_after_step(const body_type& b) const {
@@ -370,6 +374,12 @@ void component_synchronizer<E, components::rigid_body>::apply_force(
 			lines.emplace_back(green, to_pixels(location) + to_pixels(force), to_pixels(location));
 		}
 	}
+}
+
+template <class E>
+void component_synchronizer<E, components::rigid_body>::apply(const impulse_input impulse) const {
+	apply_impulse(impulse.linear, vec2(0, 0), true);
+	apply_angular_impulse(impulse.angular);
 }
 
 template <class E>

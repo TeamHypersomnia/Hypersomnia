@@ -10,6 +10,7 @@
 #include "game/components/crosshair_component.h"
 
 #include "game/transcendental/specific_entity_handle_declaration.h"
+#include "game/detail/physics/impulse_info.h"
 
 template <class A, class = void>
 struct has_specific_entity_type : std::false_type {};
@@ -47,6 +48,12 @@ public:
 
 		return self.get_cosmos()[entity_id()];
 	};
+
+	auto apply_crosshair_recoil(const impulse_input impulse) const {
+		if (auto r = find_crosshair_recoil()) {
+			r.template get<components::rigid_body>().apply(impulse);
+		}
+	}
 
 	auto calc_crosshair_displacement(
 		const bool snap_epsilon_base_offset = false

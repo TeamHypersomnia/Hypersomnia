@@ -335,15 +335,11 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 			if (total_recoil != 0.f) {
 				if (const auto* recoil_player = step.get_logical_assets().find(gun_def.recoil.id)) {
 					if (sentience) {
-						if (const auto recoil_entity = owning_capability.find_crosshair_recoil()) {
-							if (const auto recoil_body = recoil_entity.template find<components::rigid_body>()) {
-								const auto recoil_value = gun.recoil.shoot_and_get_impulse(gun_def.recoil, *recoil_player);
+						const auto recoil_value = gun.recoil.shoot_and_get_impulse(gun_def.recoil, *recoil_player);
 
-								recoil_body.apply_angular_impulse(
-									total_recoil * recoil_value * recoil_body.get_inertia()
-								);
-							}
-						}
+						impulse_input in;
+						in.angular = total_recoil * recoil_value / 1000.f;
+						owning_capability.apply_crosshair_recoil(in);
 					}
 				}
 

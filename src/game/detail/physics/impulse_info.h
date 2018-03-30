@@ -10,3 +10,8 @@ struct impulse_info {
 		return impulse_info { linear + b.linear, angular + b.angular };
 	}
 };
+
+struct impulse_input {
+	vec2 linear;
+	float angular = 0.f;
+};
