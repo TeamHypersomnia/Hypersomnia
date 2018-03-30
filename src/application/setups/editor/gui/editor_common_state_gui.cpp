@@ -7,7 +7,7 @@ void editor_common_state_gui::open() {
 	ImGui::SetWindowFocus("Common state");
 }
 
-#if BUILD_PROPERTY_EDITORS
+#if BUILD_PROPERTY_EDITOR
 
 #include "augs/misc/simple_pair.h"
 #include "augs/templates/for_each_std_get.h"

@@ -92,8 +92,13 @@ namespace augs {
 		return get_aabb(verts);
 	}
 
+	template <class T>
+	auto damp(const T val, const T delta, const T multiplier) {
+		return val * (1.0f / (1.0f + delta * multiplier));
+	}
+
 	template <class type_val>
-	void damp(type_val& val, const type_val len) {
+	void shrink(type_val& val, const type_val len) {
 		type_val zero = static_cast<type_val>(0);
 		if (val > zero) {
 			val -= len;
@@ -403,7 +408,7 @@ struct basic_vec2 {
 	}
 
 	template<class t>
-	basic_vec2& damp(const t len) {
+	basic_vec2& shrink(const t len) {
 		if (len == static_cast<t>(0)) return *this;
 
 		t current_length = length();
@@ -414,6 +419,13 @@ struct basic_vec2 {
 
 		normalize();
 		return (*this) *= (current_length - len);
+	}
+
+	basic_vec2& damp(const real delta, const vec2 multipliers) {
+		x = augs::damp(x, delta, multipliers.x); 
+		y = augs::damp(y, delta, multipliers.y); 
+
+		return *this;
 	}
 
 	template<class t>

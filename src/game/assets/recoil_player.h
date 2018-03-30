@@ -7,7 +7,6 @@
 struct recoil_player {
 	// GEN INTROSPECTOR struct recoil_player
 	augs::constant_size_vector<real32, RECOIL_OFFSET_COUNT> offsets;
-	float fallback_random_magnitude = 90;
 	// END GEN INTROSPECTOR
 };
 

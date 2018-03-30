@@ -133,7 +133,8 @@ void standard_explosion_input::instantiate(
 
 						switch (type) {
 							case adverse_element_type::FORCE: {
-								damage_msg.request_shake_for_ms = 400.f;
+								damage_msg.request_shake_for_ms = 500.f;
+								damage_msg.request_shake_mult = 1.2f;
 								damage_msg.impact_velocity = impact;
 
 								affected_physics.apply_impulse(
@@ -158,6 +159,8 @@ void standard_explosion_input::instantiate(
 
 							case adverse_element_type::INTERFERENCE: {
 								damage_msg.request_shake_for_ms = 800.f;
+								damage_msg.request_shake_mult = 1.5f;
+
 								damage_msg.impact_velocity = impact * 300.f;
 							}
 							break;

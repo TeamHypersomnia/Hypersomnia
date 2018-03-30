@@ -43,8 +43,6 @@ struct controlled_character {
 	>;
 };
 
-/* Crosshair's recoil body */
-
 struct plain_invisible_body {
 	static constexpr std::size_t statically_allocated_entities = 300;
 	static constexpr std::size_t statically_allocated_flavours = 20;

@@ -84,3 +84,23 @@ void crosshair_system::apply_crosshair_intents_to_base_offsets(const logic_step 
 		cosmos[it.subject].find_crosshair()->base_offset = it.crosshair_base_offset;
 	}
 }
+
+void crosshair_system::integrate_crosshair_recoils(const logic_step step) {
+	const auto delta = step.get_delta();
+	const auto secs = delta.in_seconds();
+	auto& cosmos = step.get_cosmos();
+
+	cosmos.for_each_having<components::crosshair>(
+		[&](const auto subject) {
+			auto& crosshair = subject.template get<components::crosshair>();
+			auto& crosshair_def = subject.template get<invariants::crosshair>();
+			auto& recoil = crosshair.recoil;
+
+			recoil.integrate(secs);
+			recoil.damp(secs, crosshair_def.recoil_damping);
+
+			recoil.position.damp(secs, vec2(60.f, 60.f));
+			recoil.rotation = augs::damp(recoil.rotation, secs, 60.f);
+		}
+	);
+}

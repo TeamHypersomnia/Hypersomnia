@@ -147,13 +147,20 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 				}
 			}
 
-			const auto shake_mult = (sentience.shake_for_ms - (now - sentience.time_of_last_shake).in_milliseconds(delta)) / 400.f;
+			const auto since_last_shake = (now - sentience.time_of_last_shake);
+			const auto shake_amount = (sentience.shake_for_ms - since_last_shake.in_milliseconds(delta)) / sentience.shake_for_ms;
 
-			if (shake_mult > 0.f) {
+			if (shake_amount > 0.f) {
+				const auto shake_mult = shake_amount * shake_amount * sentience.shake_mult;
+
 				auto rng = cosmos.get_rng_for(subject);
 				impulse_input in;
-				in.linear = shake_mult * shake_mult * 100 * vec2 { rng.randval(-1.f, 1.f), rng.randval(-1.f, 1.f) };
+
+				in.linear = shake_mult * rng.template random_point_on_unit_circle<real32>();
 				subject.apply_crosshair_recoil(in);
+			}
+			else {
+				sentience.shake_mult = 1.f;
 			}
 
 			if (sentience.is_spell_being_cast()) {
@@ -240,8 +247,8 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 		const auto punched = subject;
 
 		impulse_input in;
-		in.angular = (h.point_of_impact - punched.get_logic_transform().pos).cross(h.impact_velocity) / 10000000.f * 3.f / 25.f;
-		punched.apply_crosshair_recoil(in);
+		//in.angular = (h.point_of_impact - punched.get_logic_transform().pos).cross(h.impact_velocity) * sentience_def.aimpunch_impact_mult;
+		//punched.apply_crosshair_recoil(in);
 
 		break;
 	}
@@ -411,7 +418,10 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 			if (apply_aimpunch) {
 				consume_health_event(aimpunch_event, step);
 
-				sentience->shake_for_ms = d.request_shake_for_ms + std::max(0.f, (sentience->shake_for_ms - (now - sentience->time_of_last_shake).in_milliseconds(delta)));
+				//const auto current_shake_amount = std::max(0.f, sentience->shake_for_ms - (now - sentience->time_of_last_shake).in_milliseconds(delta));
+
+				sentience->shake_for_ms = std::max(400.f, std::max(d.request_shake_for_ms, sentience->shake_for_ms));
+				sentience->shake_mult = std::max(1.f, std::max(d.request_shake_mult, sentience->shake_mult));
 				sentience->time_of_last_shake = now;
 			}
 		}

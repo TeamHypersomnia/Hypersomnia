@@ -23,6 +23,8 @@ struct has_specific_entity_type<A, decltype(typename A::used_entity_type(), void
 template <class A>
 constexpr bool has_specific_entity_type_v = has_specific_entity_type<A>::value;
 
+struct simple_body;
+
 template <class E>
 class misc_mixin {
 public:
@@ -38,20 +40,11 @@ public:
 		return self.template find<invariants::crosshair>();
 	};
 
-	auto find_crosshair_recoil() const {
-		/* If it were other entity for some reason */
+	auto apply_crosshair_recoil(const impulse_input impulse) const {
 		const auto self = *static_cast<const E*>(this);
 
-		if (const auto c = self.find_crosshair()) {
-			return self.get_cosmos()[c->recoil_entity];
-		}
-
-		return self.get_cosmos()[entity_id()];
-	};
-
-	auto apply_crosshair_recoil(const impulse_input impulse) const {
-		if (auto r = find_crosshair_recoil()) {
-			r.template get<components::rigid_body>().apply(impulse);
+		if (const auto crosshair = self.find_crosshair()) {
+			crosshair->recoil.apply(impulse * self.find_crosshair_def()->recoil_impulse_mult);
 		}
 	}
 
@@ -60,21 +53,18 @@ public:
 	) const {
 		const auto self = *static_cast<const E*>(this);
 
-		if (const auto recoil_body = self.find_crosshair_recoil()) {
-			if (const auto recoil_body_transform = recoil_body.find_logic_transform()) {
-				if (const auto crosshair = self.find_crosshair()) {
-					auto considered_base_offset = crosshair->base_offset;
+		if (const auto crosshair = self.find_crosshair()) {
+			auto considered_base_offset = crosshair->base_offset;
+			const auto& recoil = crosshair->recoil;
 
-					if (snap_epsilon_base_offset && considered_base_offset.is_epsilon(4)) {
-						considered_base_offset.set(4, 0);
-					}
-
-					considered_base_offset += recoil_body_transform->pos;
-					considered_base_offset.rotate(recoil_body_transform->rotation, vec2());
-
-					return considered_base_offset;
-				}
+			if (snap_epsilon_base_offset && considered_base_offset.is_epsilon(4)) {
+				considered_base_offset.set(4, 0);
 			}
+
+			considered_base_offset += recoil.position;
+			considered_base_offset.rotate(recoil.rotation, vec2());
+
+			return considered_base_offset;
 		}
 
 		return vec2(0, 0);

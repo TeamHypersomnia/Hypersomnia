@@ -5,7 +5,7 @@ inline void integrate_pos_vel_acc_damp_life(T& p, const float dt) {
 	p.vel += p.acc * dt;
 	p.pos += p.vel * dt;
 	
-	p.vel.damp(p.linear_damping * dt);
+	p.vel.shrink(p.linear_damping * dt);
 
 	p.current_lifetime_ms += dt * 1000.f;
 }
@@ -14,7 +14,7 @@ void general_particle::integrate(const float dt) {
 	integrate_pos_vel_acc_damp_life(*this, dt);
 	rotation += rotation_speed * dt;
 
-	augs::damp(rotation_speed, angular_damping * dt);
+	augs::shrink(rotation_speed, angular_damping * dt);
 }
 
 bool general_particle::is_dead() const {

@@ -81,6 +81,7 @@ void standard_solve(const logic_step step) {
 	trace_system().lengthen_sprites_of_traces(step);
 
 	crosshair_system().generate_crosshair_intents(step);
+	crosshair_system().integrate_crosshair_recoils(step);
 	crosshair_system().apply_crosshair_intents_to_base_offsets(step);
 
 	//	item_system().translate_gui_intents_to_transfer_requests(step);

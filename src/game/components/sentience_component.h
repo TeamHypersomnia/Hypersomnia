@@ -54,6 +54,7 @@ namespace components {
 
 		augs::stepped_timestamp time_of_last_shake;
 		float shake_for_ms = 0.f;
+		float shake_mult = 1.f;
 
 		// END GEN INTROSPECTOR
 
@@ -105,6 +106,8 @@ namespace invariants {
 		float comfort_zone = 500.f;
 		float minimum_danger_amount_to_evade = 20.f;
 		float danger_amount_from_hostile_attitude = 100.f;
+
+		float aimpunch_impact_mult = 0.001f;
 
 		sound_effect_input health_decrease_sound;
 		sound_effect_input consciousness_decrease_sound;

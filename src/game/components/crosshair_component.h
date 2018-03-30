@@ -1,6 +1,8 @@
 #pragma once
 #include "augs/math/vec2.h"
 #include "augs/math/rects.h"
+#include "augs/math/simple_physics.h"
+
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/components/sprite_component.h"
@@ -18,7 +20,7 @@ namespace components {
 		// GEN INTROSPECTOR struct components::crosshair
 		crosshair_orbit_type orbit_mode = crosshair_orbit_type::LOOK;
 
-		child_entity_id recoil_entity;
+		simple_body recoil;
 
 		vec2 base_offset;
 		vec2 base_offset_bound;
@@ -35,6 +37,9 @@ namespace invariants {
 	struct crosshair {
 		// GEN INTROSPECTOR struct invariants::crosshair
 		invariants::sprite appearance;
+		damping_input recoil_damping;
+
+		impulse_info recoil_impulse_mult = { 10000.f, 500.f };
 		// END GEN INTROSPECTOR
 	};
 }

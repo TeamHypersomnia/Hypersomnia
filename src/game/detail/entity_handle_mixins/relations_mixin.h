@@ -30,12 +30,6 @@ protected:
 
 		if (self.alive()) {
 			switch (n) {
-				case child_entity_name::CROSSHAIR_RECOIL_BODY:
-				if (const auto crosshair = self.find_crosshair()) {
-					callback(crosshair->recoil_entity);
-				}
-				break;
-
 				default:
 				LOG("Random access abstraction for this child_entity_name is not implemented!");
 				ensure(false);

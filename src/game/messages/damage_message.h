@@ -10,6 +10,7 @@ namespace messages {
 		bool inflictor_destructed = false;
 		meter_value_type amount = 0;
 		float request_shake_for_ms = 0.f;
+		float request_shake_mult = 1.f;
 		entity_id inflictor;
 		vec2 impact_velocity;
 		vec2 point_of_impact;

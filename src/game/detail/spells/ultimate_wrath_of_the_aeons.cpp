@@ -36,18 +36,21 @@ void ultimate_wrath_of_the_aeons_instance::perform_logic(const spell_logic_input
 	}
 	else if (now == first_at) {
 		sentience.shake_for_ms = 400.f;
+		sentience.shake_mult = 1.f;
 		sentience.time_of_last_shake = now;
 
 		spell_data.explosions[0].instantiate(step, caster_transform, caster);
 	}
 	else if (now == second_at) {
 		sentience.shake_for_ms = 500.f;
+		sentience.shake_mult = 1.25f;
 		sentience.time_of_last_shake = now;
 
 		spell_data.explosions[1].instantiate(step, caster_transform, caster);
 	}
 	else if (now == third_at) {
 		sentience.shake_for_ms = 600.f;
+		sentience.shake_mult = 1.35f;
 		sentience.time_of_last_shake = now;
 
 		spell_data.explosions[2].instantiate(step, caster_transform, caster);

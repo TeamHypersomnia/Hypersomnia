@@ -7,6 +7,15 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
+- maybe parametrize shakes for explosions?
+	- parametrize the shit out of shakes, maybe even shaking methods
+		- and leave tweaking for later or for others
+
+- fix concatenation of shakes
+
+- research why fast randomization doesnt work with single call?
+- impulse/damping info -> multipliers
+
 - copying, cutting, pasting, duplication
 	- The editor shall contain its own clipboard, which shouldn't really be persistent
 	- format

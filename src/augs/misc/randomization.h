@@ -51,16 +51,18 @@ struct basic_randomization {
 		return augs::minmax<T>(randval(r.first), randval(r.second));
 	}
 
+	template <class T>
+	basic_vec2<T> random_point_on_unit_circle() {
+		const auto random_angle = randval(static_cast<T>(0), static_cast<T>(360));
+		return basic_vec2<T>::from_degrees(random_angle);
+	}
+
 	template<class T>
 	basic_vec2<T> random_point_in_ring(
 		const T min_radius,
 		const T max_radius
 	) {
-		return randval(min_radius, max_radius) * vec2::from_degrees(
-			randval(
-				static_cast<T>(0), 
-				static_cast<T>(360)
-			));
+		return randval(min_radius, max_radius) * random_point_on_unit_circle<T>();
 	}
 
 	template<class T>

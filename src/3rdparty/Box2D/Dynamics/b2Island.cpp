@@ -214,12 +214,8 @@ void b2Island::Solve(b2Profile* profile, const b2TimeStep& step, const b2Vec2& g
 			v *= 1.0f / (1.0f + h * (b->m_linearDamping));
 			
 			if (b->enable_angled_damping) {
-				vec2 temp_vel = v;
-
-				temp_vel.x *= 1.0f / (1.0f + h * std::abs(b->m_linearDampingVec.x));
-				temp_vel.y *= 1.0f / (1.0f + h * std::abs(b->m_linearDampingVec.y));
-
-				v = b2Vec2(temp_vel.x, temp_vel.y);
+				v.x *= 1.0f / (1.0f + h * b->m_linearDampingVec.x);
+				v.y *= 1.0f / (1.0f + h * b->m_linearDampingVec.y);
 			}
 
 			w *= 1.0f / (1.0f + h * (b->m_angularDamping));

@@ -1,3 +1,4 @@
+#include "augs/misc/simple_pair.h"
 #include "application/setups/editor/gui/editor_all_entities_gui.h"
 #include "application/setups/editor/editor_command_input.h"
 
@@ -12,9 +13,8 @@ void editor_all_entities_gui::interrupt_tweakers() {
 	properties_gui.old_description.clear();
 }
 
-#if BUILD_PROPERTY_EDITORS
+#if BUILD_PROPERTY_EDITOR
 
-#include "augs/misc/simple_pair.h"
 #include "augs/templates/for_each_std_get.h"
 
 #include "augs/readwrite/memory_stream.h"

@@ -36,7 +36,7 @@ enum class test_controlled_characters {
 
 enum class test_plain_invisible_bodys {
 	// GEN INTROSPECTOR enum class test_plain_invisible_bodys
-	CROSSHAIR_RECOIL_BODY
+	INVALID
 	// END GEN INTROSPECTOR
 };
 

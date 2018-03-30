@@ -122,6 +122,9 @@ namespace test_flavours {
 				invariants::crosshair crosshair; 
 				crosshair.appearance.set(assets::game_image_id::TEST_CROSSHAIR, logicals);
 
+				crosshair.recoil_damping.linear = { 5, 5 };
+				crosshair.recoil_damping.angular = 5;
+
 				meta.set(crosshair);
 			}
 
@@ -147,33 +150,6 @@ namespace test_flavours {
 				meta.set(transfers);
 			}
 		}
-
-		{
-			auto& meta = get_test_flavour(flavours, test_plain_invisible_bodys::CROSSHAIR_RECOIL_BODY);
-
-			invariants::shape_polygon shape_polygon_def;
-			shape_polygon_def.shape.make_box({ 33, 33 });
-
-			invariants::rigid_body body;
-			invariants::fixtures fixtures_invariant;
-
-			body.damping.linear = 5;
-			body.damping.angular = 5;
-
-			fixtures_invariant.filter = filters::none();
-			//fixtures_invariant.filter.categoryBits = 0;
-			fixtures_invariant.density = 0.1f;
-			fixtures_invariant.sensor = true;
-			fixtures_invariant.material = assets::physical_material_id::METAL;
-
-			meta.set(body);
-			meta.set(fixtures_invariant);
-			meta.set(shape_polygon_def);
-
-			components::force_joint force_joint;
-			force_joint.divide_transform_mode = true;
-			meta.set(force_joint);
-		}
 	}
 }
 
@@ -185,12 +161,6 @@ namespace prefabs {
 		const int create_arm_count
 	) {
 		auto& world = step.get_cosmos();
-
-		const auto character = create_test_scene_entity(world, test_controlled_characters::PLAYER, spawn_transform);
-
-		auto recoil = create_test_scene_entity(world, test_plain_invisible_bodys::CROSSHAIR_RECOIL_BODY);
-
-		character.map_child_entity(child_entity_name::CROSSHAIR_RECOIL_BODY, recoil);
-		return character;
+		return create_test_scene_entity(world, test_controlled_characters::PLAYER, spawn_transform);
 	}
 }

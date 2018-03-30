@@ -338,7 +338,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 						const auto recoil_value = gun.recoil.shoot_and_get_impulse(gun_def.recoil, *recoil_player);
 
 						impulse_input in;
-						in.angular = total_recoil * recoil_value / 1000.f;
+						in.angular = total_recoil * recoil_value;
 						owning_capability.apply_crosshair_recoil(in);
 					}
 				}
