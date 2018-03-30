@@ -443,3 +443,6 @@ we consider whole type overrides too complex architeciturally:
 					- always calculate pixel-wise delta during mousemotion
 						- SI-independent
 			- rewriting values when moving mouse
+
+- add a cmake flag to disable building property editor
+

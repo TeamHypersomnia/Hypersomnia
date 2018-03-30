@@ -1,3 +1,19 @@
+#include "application/setups/editor/gui/editor_all_entities_gui.h"
+#include "application/setups/editor/editor_command_input.h"
+
+void editor_all_entities_gui::open() {
+	show = true;
+	acquire_once = true;
+	ImGui::SetWindowFocus(title.c_str());
+}
+
+void editor_all_entities_gui::interrupt_tweakers() {
+	properties_gui.last_active.reset();
+	properties_gui.old_description.clear();
+}
+
+#if BUILD_PROPERTY_EDITORS
+
 #include "augs/misc/simple_pair.h"
 #include "augs/templates/for_each_std_get.h"
 
@@ -9,7 +25,6 @@
 
 #include "application/intercosm.h"
 #include "application/setups/editor/editor_folder.h"
-#include "application/setups/editor/gui/editor_all_entities_gui.h"
 
 #include "application/setups/editor/property_editor/flavours_and_entities_tree.h"
 
@@ -178,18 +193,6 @@ public:
 	}
 };
 
-void editor_all_entities_gui::open() {
-	show = true;
-	acquire_once = true;
-	ImGui::SetWindowFocus(title.c_str());
-}
-
-void editor_all_entities_gui::interrupt_tweakers() {
-	properties_gui.last_active.reset();
-	properties_gui.old_description.clear();
-}
-
-
 flavours_and_entities_tree_filter editor_all_entities_gui::perform(
 	const editor_settings& settings,
 	const std::unordered_set<entity_id>* only_match_entities,
@@ -264,3 +267,13 @@ flavours_and_entities_tree_filter editor_all_entities_gui::perform(
 		all_provider { cosm }
 	);
 }
+
+#else
+flavours_and_entities_tree_filter editor_all_entities_gui::perform(
+	const editor_settings& settings,
+	const std::unordered_set<entity_id>* only_match_entities,
+	editor_command_input in
+) {
+	return {};
+}
+#endif

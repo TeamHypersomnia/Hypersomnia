@@ -3,6 +3,7 @@
 #include "application/setups/editor/property_editor/property_editor_structs.h"
 
 struct editor_settings;
+struct editor_command_input;
 
 struct editor_all_entities_gui {
 	// GEN INTROSPECTOR struct editor_all_entities_gui

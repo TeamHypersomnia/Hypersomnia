@@ -5,8 +5,16 @@ project(Hypersomnia)
 message("C: ${CMAKE_C_COMPILER}")
 message("CXX: ${CMAKE_CXX_COMPILER}")
 
+message("Hypersomnia project source dir: ${PROJECT_SOURCE_DIR}")
+message("Hypersomnia project binary dir: ${PROJECT_BINARY_DIR}")
+message("Hypersomnia current binary dir: ${CMAKE_CURRENT_BINARY_DIR}")
+
 # Determine the used compiler.
 # In case of MSVC, CMake sets it to ON on its own.
+
+# Important note:
+# UNIX build is currently hardcoded to be dynamically linked.
+# MSVC build is currently hardcoded to be statically linked.
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	message("Building with Clang.")
@@ -38,15 +46,12 @@ else()
 	message(FATAL_ERROR "Unknown system.")
 endif()
 
-# Important note:
-# UNIX build is currently hardcoded to be dynamically linked.
-# MSVC build is currently hardcoded to be statically linked.
-
 # Various feature switches.
 # If it is your first time building Hypersomnia and you get some errors,
 # try turning all of these off to build the minimal possible working Hypersomnia runtime. Then, try to work from there.
-# The game should still run, even not having these features, although obviously, you won't see/hear anything.
+# The game should still run, even not having these features, although obviously, you won't see or hear anything.
 # In the future, the switches will also differ depending on whether the target application is a client or a server.
+# If you're a developer, you might also want to disable some of these to have faster builds for quicker iteration.
 
 if(HYPERSOMNIA_BARE)
 	message("Building Hypersomnia without... anything")
@@ -56,23 +61,27 @@ else()
 	set(DEFAULT_OPT ON)
 endif()
 
-message("Hypersomnia project source dir: ${PROJECT_SOURCE_DIR}")
-message("Hypersomnia project binary dir: ${PROJECT_BINARY_DIR}")
-message("Hypersomnia current binary dir: ${CMAKE_CURRENT_BINARY_DIR}")
+# Building switches for functionality using 3rdparty libraries.
 
-option(BUILD_SOUND_FORMAT_DECODERS "Build ogg and vorbis. If this is off, there is also no point in enabling OpenAL." ${DEFAULT_OPT})
 option(BUILD_OPENAL "Build OpenAL Soft." ${DEFAULT_OPT})
 option(BUILD_OPENGL "Build OpenGL-related code." ${DEFAULT_OPT})
-option(BUILD_UNIT_TESTS "Build unit tests that are run on game startup." ${DEFAULT_OPT})
-option(BUILD_VERSION_FILE_GENERATOR "Build version file generator to generate commit information." ${DEFAULT_OPT})
 option(BUILD_ENET "Build ENet networking library." ${DEFAULT_OPT})
 option(BUILD_FREETYPE "Build FreeType library responsible for loading fonts." ${DEFAULT_OPT})
-option(BUILD_HTTP_REQUESTS "Build simple http requests, e.g. for latest news bar in the main menu." ${DEFAULT_OPT})
-option(BUILD_TEST_SCENES "Build unscripted test scenes hardcoded in C++." ${DEFAULT_OPT})
 option(BUILD_WINDOW_FRAMEWORK "Build code specific to a given platfom, e.g. window management done by WinAPI." ${DEFAULT_OPT})
+option(BUILD_HTTP_REQUESTS "Build simple http requests, e.g. for latest news bar in the main menu." ${DEFAULT_OPT})
+option(BUILD_UNIT_TESTS "Build unit tests that are run on game startup." ${DEFAULT_OPT})
+option(BUILD_SOUND_FORMAT_DECODERS "Build ogg and vorbis. If this is off, there is also no point in enabling OpenAL." ${DEFAULT_OPT})
+
+# Switches for functionality originating from the Hypersomnia codebase.
+option(BUILD_VERSION_FILE_GENERATOR "Build version file generator to generate commit information." ${DEFAULT_OPT})
+option(BUILD_TEST_SCENES "Build unscripted test scenes hardcoded in C++." ${DEFAULT_OPT})
+option(BUILD_PROPERTY_EDITOR "Build property editor code for the editor setup. Due to hardcore templates, this takes amazingly long time to build, so it makes sense to turn it off sometimes." ${DEFAULT_OPT})
+
+# Various other switches.
 option(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE "Add command to archive builds in Release." ${DEFAULT_OPT})
 option(ADD_APPLICATION_ICON "Add application icon." ${DEFAULT_OPT})
 
+# Optimization switches.
 option(ENABLE_LINK_TIME_OPTIMIZATION "Some ultra extra optimizations for Release builds. Takes a lot longer to build." OFF)
 
 # Other variables.
@@ -1086,6 +1095,10 @@ endif()
 
 if(ADD_APPLICATION_ICON)
 	add_definitions(-DADD_APPLICATION_ICON)
+endif()
+
+if(BUILD_PROPERTY_EDITOR)
+	add_definitions(-DBUILD_PROPERTY_EDITOR)
 endif()
 
 # We configure additional user options for building the game.
