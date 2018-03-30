@@ -5,7 +5,7 @@
 #include "game/transcendental/entity_id.h"
 #include "game/detail/inventory/inventory_slot_id.h"
 
-#include "game/detail/physics/impulse_info.h"
+#include "augs/math/physics_structs.h"
 #include "game/transcendental/entity_handle_declaration.h"
 #include "augs/misc/timing/stepped_timing.h"
 #include "augs/pad_bytes.h"

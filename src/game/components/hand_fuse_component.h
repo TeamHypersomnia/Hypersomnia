@@ -1,7 +1,7 @@
 #pragma once
 #include "augs/misc/timing/stepped_timing.h"
 #include "game/detail/view_input/sound_effect_input.h"
-#include "game/detail/physics/impulse_info.h"
+#include "augs/math/physics_structs.h"
 
 namespace components {
 	struct hand_fuse {

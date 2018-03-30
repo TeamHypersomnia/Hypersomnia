@@ -7,7 +7,7 @@
 
 #include "game/detail/inventory/item_slot_transfer_request_declaration.h"
 #include "game/detail/inventory/inventory_slot_handle.h"
-#include "game/detail/physics/impulse_info.h"
+#include "augs/math/physics_structs.h"
 
 template <class id_type>
 struct basic_item_slot_transfer_request {

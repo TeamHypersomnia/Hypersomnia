@@ -17,8 +17,7 @@
 #include "augs/math/si_scaling.h"
 #include "game/enums/rigid_body_type.h"
 
-#include "game/detail/physics/damping_info.h"
-#include "game/detail/physics/impulse_info.h"
+#include "augs/math/physics_structs.h"
 #include "game/components/transform_component.h"
 
 class relational_cache;

@@ -19,7 +19,7 @@
 #include "game/components/transform_component.h"
 
 #include "game/detail/all_sentience_meters.h"
-#include "game/detail/physics/impulse_info.h"
+#include "augs/math/physics_structs.h"
 #include "game/detail/spells/all_spells.h"
 #include "game/detail/perks/all_perks.h"
 

@@ -10,7 +10,7 @@
 #include "game/components/crosshair_component.h"
 
 #include "game/transcendental/specific_entity_handle_declaration.h"
-#include "game/detail/physics/impulse_info.h"
+#include "augs/math/physics_structs.h"
 
 template <class A, class = void>
 struct has_specific_entity_type : std::false_type {};
