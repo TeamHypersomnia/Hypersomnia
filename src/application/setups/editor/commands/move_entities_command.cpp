@@ -65,32 +65,61 @@ static void move_entities(
 	const cosmos_solvable_access key,
 	cosmos& cosm,
 	const moved_entities_type& subjects,
-	const delta_type& dt
+	const delta_type& dt,
+	const std::optional<vec2> rotation_center
 ) {
 	const auto si = cosm.get_si();
-	const auto si_delta = dt.to_si_space(si);
+	const auto dt_si = dt.to_si_space(si);
 
-	on_each_independent_transform(
-		cosm,
-		subjects,
-		[si, si_delta, dt](auto& tr) {
-			using T = std::decay_t<decltype(tr)>;
+	if (rotation_center) {
+		const auto center = *rotation_center;
+		const auto center_meters = si.get_meters(center);
 
-			if constexpr(std::is_same_v<T, physics_engine_transforms>) {
-				tr.set(tr.get() + si_delta);
+		auto rotator = 
+			[&](auto& tr) {
+				using T = std::decay_t<decltype(tr)>;
+
+				if constexpr(std::is_same_v<T, physics_engine_transforms>) {
+					auto new_transform = tr.get();
+					new_transform.rotate_radians(dt_si.rotation, center_meters);
+					tr.set(new_transform);
+				}
+				else if constexpr(std::is_same_v<T, components::transform>) {
+					tr.rotate(dt.rotation, center);
+				}
+				else if constexpr(std::is_same_v<T, vec2>) {
+					tr.rotate(dt.rotation, center);
+				}
+				else {
+					static_assert(always_false_v<T>, "Unknown transform type.");
+				}
 			}
-			else if constexpr(std::is_same_v<T, components::transform>) {
-				tr += dt;
+		;
+
+		on_each_independent_transform(cosm, subjects, rotator, key);
+	}
+	else {
+		auto mover = 
+			[&](auto& tr) {
+				using T = std::decay_t<decltype(tr)>;
+
+				if constexpr(std::is_same_v<T, physics_engine_transforms>) {
+					tr.set(tr.get() + dt_si);
+				}
+				else if constexpr(std::is_same_v<T, components::transform>) {
+					tr += dt;
+				}
+				else if constexpr(std::is_same_v<T, vec2>) {
+					tr += dt.pos;
+				}
+				else {
+					static_assert(always_false_v<T>, "Unknown transform type.");
+				}
 			}
-			else if constexpr(std::is_same_v<T, vec2>) {
-				tr += dt.pos;
-			}
-			else {
-				static_assert(always_false_v<T>, "Unknown transform type.");
-			}
-		},
-		key
-	);
+		;
+
+		on_each_independent_transform(cosm, subjects, mover, key);
+	}
 }
 
 std::string move_entities_command::describe() const {
@@ -140,7 +169,7 @@ void move_entities_command::rewrite_change(
 	/* For improved determinism, client of this function should unmove the entities first... */
 	/* ...and only now move by the new delta, exactly as if we were moving the entities for the first time. */
 
-	move_entities({}, cosm, moved_entities, new_value);
+	move_entities({}, cosm, moved_entities, new_value, rotation_center);
 	reinfer_moved(cosm);
 }
 
@@ -151,7 +180,7 @@ void move_entities_command::redo(const editor_command_input in) {
 	ensure(values_before_change.empty());
 
 	save_old_values(cosm, moved_entities, before_change_data);
-	move_entities({}, cosm, moved_entities, delta);
+	move_entities({}, cosm, moved_entities, delta, rotation_center);
 
 	cosmic::reinfer_all_entities(cosm);
 

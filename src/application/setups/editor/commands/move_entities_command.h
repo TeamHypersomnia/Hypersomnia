@@ -26,7 +26,9 @@ public:
 	moved_entities_type moved_entities;
 
 	std::vector<std::byte> values_before_change;
+
 	delta_type delta;
+	std::optional<vec2> rotation_center;
 
 	std::string built_description;
 	// END GEN INTROSPECTOR

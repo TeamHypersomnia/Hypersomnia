@@ -667,26 +667,35 @@ void editor_setup::del() {
 	}
 }
 
-void editor_setup::start_moving_selection() {
+void editor_setup::start_transforming_selection(const std::optional<vec2> rotation_center) {
 	if (anything_opened()) {
 		finish_rectangular_selection();
 
 		auto command = make_command_from_selections<move_entities_command>(
-			"Moved ",
+			rotation_center ? "Rotated " : "Moved ",
 			[](const auto typed_handle) {
 				return typed_handle.has_independent_transform();
 			}	
 		);
 
 		if (!command.empty()) {
-			mover.active = true;
+			command.rotation_center = rotation_center;
 
-			const auto world_cursor_pos = get_world_cursor_pos().discard_fract();
-			mover.initial_world_cursor_pos = world_cursor_pos;
-			command.delta = components::transform(world_cursor_pos - mover.initial_world_cursor_pos, 0);
+			mover.active = true;
+			mover.initial_world_cursor_pos = get_world_cursor_pos().discard_fract();
 
 			folder().history.execute_new(std::move(command), make_command_input());
 		}
+	}
+}
+
+void editor_setup::start_moving_selection() {
+	start_transforming_selection(std::nullopt);
+}
+
+void editor_setup::start_rotating_selection() {
+	if (const auto aabb = find_selection_aabb()) {
+		start_transforming_selection(aabb->get_center());
 	}
 }
 
@@ -919,24 +928,43 @@ bool editor_setup::handle_input_before_game(
 				auto& last = history.last_command();
 
 				if (auto* const cmd = std::get_if<move_entities_command>(std::addressof(last))) {
-					auto new_delta = vec2(world_cursor_pos).discard_fract() - mover.initial_world_cursor_pos;
+					const auto new_cursor_pos = vec2(world_cursor_pos).discard_fract();
 
-					cmd->unmove_entities(cosm);
+					if (cmd->rotation_center) {
+						const auto center = *cmd->rotation_center;
 
-					if (view().snapping_enabled) {
-						cmd->reinfer_moved(cosm);
+						const auto old_vector = mover.initial_world_cursor_pos - center;
+						const auto new_vector = new_cursor_pos - center;
 
-						if (const auto aabb_before_move = find_selection_aabb()) {
-							const auto current_aabb = *aabb_before_move + vec2(new_delta);
-							new_delta += view().grid.get_snapping_delta(current_aabb);
+						if (old_vector.non_zero() && new_vector.non_zero()) {
+							const auto degrees = old_vector.full_degrees_between(new_vector);
+							auto new_delta = components::transform(vec2::zero, degrees);
+
+							if (view().snapping_enabled) {
+								auto& r = new_delta.rotation;
+								r = view().grid.get_snapped(r);
+							}
+
+							cmd->unmove_entities(cosm);
+							cmd->rewrite_change(new_delta, std::nullopt, make_command_input());
 						}
 					}
+					else {
+						auto new_delta = new_cursor_pos - mover.initial_world_cursor_pos;
 
-					cmd->rewrite_change(
-						new_delta, 
-						std::nullopt,
-						make_command_input()
-					);
+						cmd->unmove_entities(cosm);
+
+						if (view().snapping_enabled) {
+							cmd->reinfer_moved(cosm);
+
+							if (const auto aabb_before_move = find_selection_aabb()) {
+								const auto current_aabb = *aabb_before_move + vec2(new_delta);
+								new_delta += view().grid.get_snapping_delta(current_aabb);
+							}
+						}
+
+						cmd->rewrite_change(new_delta, std::nullopt, make_command_input());
+					}
 				}
 				else {
 					mover.active = false;
@@ -1020,6 +1048,7 @@ bool editor_setup::handle_input_before_game(
 				case key::CLOSE_SQUARE_BRACKET: view().grid.increase_grid_size(); clamp_units(); return true;
 				case key::DEL: del(); return true;
 				case key::T: start_moving_selection(); return true;
+				case key::R: start_rotating_selection(); return true;
 				default: break;
 			}
 

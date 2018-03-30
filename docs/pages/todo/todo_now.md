@@ -7,6 +7,10 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
+- maybe there's not much need for those rotations to work perfectly?
+	- also it will deepen the need for individual snaps
+- add has_ctrl to select_all_entities
+
 - let "in rectangular selection" just have "eaten" vector so we don't have to recalculate for each selected entities
 - rotations in the grid
 

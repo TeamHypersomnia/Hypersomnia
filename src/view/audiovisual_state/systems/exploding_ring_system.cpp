@@ -68,6 +68,11 @@ void exploding_ring_system::advance(
 						const auto along_edge_length = (tri[2] - tri[1]).length();
 						const auto along_edge = (tri[2] - tri[1]) / along_edge_length;
 
+						/* 
+							Since these are edges of a triangle,
+						   	the angle must be less than 180, so we use simple "degrees between" 
+						*/
+
 						const auto angular_translation = edge_v1.degrees_between(edge_v2);
 						const auto particles_amount_ratio = angular_translation / 360.f;
 
