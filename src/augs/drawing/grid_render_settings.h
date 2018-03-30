@@ -9,7 +9,7 @@ struct grid_render_settings {
 	unsigned hide_grids_smaller_than = 16;
 	// END GEN INTROSPECTOR
 
-	auto get_maximum_unit() const {
+	int get_maximum_unit() const {
 		return 1 << maximum_power_of_two;
 	}
 };

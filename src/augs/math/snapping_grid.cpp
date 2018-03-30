@@ -61,11 +61,13 @@ vec2i snapping_grid::get_snapped(const vec2 position) const {
 	return minimum_of(corners, predicate);
 }
 
-float snapping_grid::get_snapped(const float degrees) const {
+int snapping_grid::get_snapped(const float degrees) const {
 	auto rounded_degrees = static_cast<int>(degrees);
+	const auto unit = static_cast<int>(unit_degrees);
 
-	rounded_degrees /= unit_degrees;
-	rounded_degrees *= unit_degrees;
+	rounded_degrees /= unit;
+	rounded_degrees *= unit;
 
-	return static_cast<float>(rounded_degrees);
+	LOG_NVPS(rounded_degrees);
+	return rounded_degrees;
 }

@@ -508,6 +508,20 @@ void editor_setup::perform_custom_imgui(
 		) {
 			::standard_confirm_go_to(*confirmation, view());
 		}
+
+		if (mover.active) {
+			auto& history = folder().history;
+			auto& last = history.last_command();
+
+			if (auto* const cmd = std::get_if<move_entities_command>(std::addressof(last))) {
+				if (cmd->rotation_center) {
+					text_tooltip("%x*", cmd->delta.rotation);
+				}
+				else {
+					text_tooltip("x: %x\ny: %x", cmd->delta.pos.x, cmd->delta.pos.y);
+				}
+			}
+		}
 	}
 
 	if (open_folder_dialog.valid() && is_ready(open_folder_dialog)) {

@@ -13,11 +13,11 @@ struct snapping_grid {
 	}
 
 	// GEN INTROSPECTOR struct grid
-	unsigned unit_pixels = 16;
-	unsigned unit_degrees = 15;
+	int unit_pixels = 16;
+	int unit_degrees = 15;
 	// END GEN INTROSPECTOR
 
-	void clamp_units(const unsigned lower, const unsigned upper) {
+	void clamp_units(const int lower, const int upper) {
 		unit_pixels = std::clamp(unit_pixels, lower, upper);
 	}
 
@@ -34,5 +34,5 @@ struct snapping_grid {
 	vec2i get_snapped(vec2 position) const;
 	vec2 get_snapping_delta(ltrb position) const;
 
-	float get_snapped(float degrees) const;
+	int get_snapped(float degrees) const;
 };

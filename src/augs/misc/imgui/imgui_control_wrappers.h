@@ -219,8 +219,18 @@ namespace augs {
 			return result;
 		}
 
-		inline void text(const std::string& t) {
-			ImGui::TextUnformatted(t.c_str());
+		template <class... Args>
+		void text(const std::string& format, Args&&... args) {
+			if constexpr(sizeof...(Args) == 0) {
+				ImGui::TextUnformatted(format.c_str());
+			}
+			else {
+				text(typesafe_sprintf(format, std::forward<Args>(args)...));
+			}
+		}
+
+		inline void text(const char* const t) {
+			ImGui::TextUnformatted(t);
 		}
 
 		inline void text_color(const std::string& t, const rgba& r) {
@@ -228,13 +238,10 @@ namespace augs {
 			text(t);
 		}
 
-		inline void text(const char* const t) {
-			ImGui::TextUnformatted(t);
-		}
-
-		inline void text_tooltip(const std::string& t) {
+		template <class... T>
+		void text_tooltip(T&&... args) {
 			auto scope = scoped_tooltip();
-			text(t);
+			text(std::forward<T>(args)...);
 		}
 
 		inline void text_disabled(const std::string& t) {
@@ -260,11 +267,6 @@ namespace augs {
 
 			ImGui::NextColumn();
 		};
-
-		template <class... Args>
-		inline void text(const std::string& format, Args&&... args) {
-			text(typesafe_sprintf(format, std::forward<Args>(args)...));
-		}
 
 		template <class T, class... Args>
 		bool slider(
