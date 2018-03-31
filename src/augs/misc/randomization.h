@@ -65,6 +65,11 @@ struct basic_randomization {
 		return randval(min_radius, max_radius) * random_point_on_unit_circle<T>();
 	}
 
+	template <class T>
+	basic_vec2<T> random_point_in_unit_circle() {
+		return random_point_in_ring(static_cast<T>(0), static_cast<T>(1));
+	}
+
 	template<class T>
 	basic_vec2<T> random_point_in_circle(
 		const T max_radius

@@ -79,7 +79,7 @@ namespace test_scenes {
 		const auto rifle2 = 
 			prefabs::create_sample_rifle(step, vec2(100, -500 + 50),
 			prefabs::create_sample_magazine(step, vec2(100, -650),
-			prefabs::create_cyan_charge(step, vec2(0, 0), true ? 1000 : 5)))
+			prefabs::create_cyan_charge(step, vec2(0, 0))))
 		;
 
 		prefabs::create_force_grenade(step, { 100, 100 });
@@ -87,7 +87,7 @@ namespace test_scenes {
 		prefabs::create_force_grenade(step, { 300, 100});
 
 		/* Test: create cyan charges first, only then magazine, and reinfer. */
-		const auto charge = prefabs::create_cyan_charge(step, vec2(0, 0), true ? 1000 : 5);
+		const auto charge = prefabs::create_cyan_charge(step, vec2(0, 0));
 		prefabs::create_sample_magazine(step, vec2(100, -650), charge);
 
 		cosmic::reinfer_all_entities(step.get_cosmos());

@@ -104,6 +104,12 @@ public:
 		return get_raw_component().charges;
 	}
 
+	void set_charges(const int charges) const {
+		// TODO: synchronize it somehow? For now this function is only used by the test scenes,
+		// but might later be needed by some spells - or maybe these should just do a perform_transfer?
+		this->component->charges = charges;
+	}
+
 	auto* operator->() const {
 		return this;
 	}

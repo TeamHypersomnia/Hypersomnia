@@ -156,7 +156,7 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 				auto rng = cosmos.get_rng_for(subject);
 				impulse_input in;
 
-				in.linear = shake_mult * rng.template random_point_on_unit_circle<real32>();
+				in.linear = shake_mult * rng.template random_point_in_unit_circle<real32>();
 				subject.apply_crosshair_recoil(in);
 			}
 			else {

@@ -550,7 +550,7 @@ namespace prefabs {
 }
 
 namespace prefabs {
-	entity_handle create_sample_magazine(const logic_step step, components::transform pos, entity_id charge_inside_id) {
+	entity_handle create_sample_magazine(const logic_step step, const components::transform pos, const entity_id charge_inside_id, const int force_num_charges) {
 		auto& cosmos = step.get_cosmos();
 		auto charge_inside = cosmos[charge_inside_id];
 
@@ -559,12 +559,16 @@ namespace prefabs {
 		if (charge_inside.alive()) {
 			item_slot_transfer_request load_charge{ charge_inside, sample_magazine[slot_function::ITEM_DEPOSIT] };
 			perform_transfer(load_charge, step);
+
+			if (force_num_charges != -1) {
+				charge_inside.get<components::item>().set_charges(force_num_charges);
+			}
 		}
 
 		return sample_magazine;
 	}
 
-	entity_handle create_cyan_charge(const logic_step step, vec2 pos, int charges) {
+	entity_handle create_cyan_charge(const logic_step step, const vec2 pos) {
 		auto& cosmos = step.get_cosmos();
 		const auto cyan_charge = create_test_scene_entity(cosmos, test_shootable_charges::CYAN_CHARGE, pos);
 		return cyan_charge;

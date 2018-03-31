@@ -80,6 +80,19 @@ namespace test_scenes {
 			prefabs::create_interference_grenade(step, { 554, -811 + i * 100.f });
 		}
 
+		std::vector<components::transform> character_transforms = {
+			{ { 0, 300 }, 0 },
+			{ { 254, 211 }, 68 },
+			{ { 1102, 213 }, 110 },
+			{ { 1102, 413 }, 110 },
+			{ { -100, 20000 }, 0 },
+			{ { 1200, 15000 }, 0 },
+			{ { -300, 20000 }, 0 },
+			{ { -300, -2000 }, 0 },
+			{ { -400, -2000 }, 0 },
+			{ { -500, -2000 }, 0 }
+		};
+
 		std::vector<entity_id> new_characters;
 		new_characters.resize(num_characters);
 
@@ -88,105 +101,11 @@ namespace test_scenes {
 		};
 
 		for (int i = 0; i < num_characters; ++i) {
-			components::transform transform;
-
-			if (i == 0) {
-				transform = { { 0, 300 }, 0 };
-				//torso_set = assets::animation_response_id::TORSO_SET;
-			}
-			else if (i == 1 || i == 2) {
-				if (i == 1) {
-					transform = { { 254, 211 }, 68 };
-				}
-				if (i == 2) {
-					transform = { { 1102, 213 }, 110 };
-				}
-
-			}
-			else if (i == 3) {
-				transform = { { 1102, 413 }, 110 };
-			}
-
-			else if (i == 4) {
-				transform = { { -100, 20000 }, 0 };
-			}
-			else if (i == 5) {
-				transform = { { 1200, 15000 }, 0 };
-			}
-			else if (i == 6) {
-				transform = { { -300, 20000 }, 0 };
-			}
-
-			// three metropolitan soldiers
-			else if (i == 7) {
-				transform = { { -300, -2000 }, 0 };
-			}
-			else if (i == 8) {
-				transform = { { -400, -2000 }, 0 };
-			}
-			else if (i == 9) {
-				transform = { { -500, -2000 }, 0 };
-			}
+			auto transform = character_transforms[i];
 
 			const auto new_character = prefabs::create_sample_complete_character(step, transform, typesafe_sprintf("player%x", i), i ? 2 : 0);
 
 			new_characters[i] = new_character;
-
-			if (i == 0) {
-				new_character.get<components::sentience>().get<health_meter_instance>().set_value(100);
-				new_character.get<components::sentience>().get<health_meter_instance>().set_maximum_value(100);
-				new_character.get<components::attitude>().parties = party_category::RESISTANCE_CITIZEN;
-				new_character.get<components::attitude>().hostile_parties = party_category::METROPOLIS_CITIZEN;
-			}
-			if (i == 1) {
-				new_character.get<components::attitude>().maximum_divergence_angle_before_shooting = 25;
-				new_character.get<components::sentience>().get<health_meter_instance>().set_value(300);
-				new_character.get<components::sentience>().get<health_meter_instance>().set_maximum_value(300);
-			}
-			if (i == 2) {
-				new_character.get<components::sentience>().get<health_meter_instance>().set_value(100);
-			}
-			if (i == 5) {
-				new_character.get<components::attitude>().maximum_divergence_angle_before_shooting = 25;
-				new_character.get<components::sentience>().get<health_meter_instance>().set_value(300);
-				new_character.get<components::sentience>().get<health_meter_instance>().set_maximum_value(300);
-			}
-
-			if (
-				i == 4 || i == 5 || i == 6
-				) {
-				const auto rifle = prefabs::create_sample_rifle(step, vec2(100, -500),
-					prefabs::create_sample_magazine(step, vec2(100, -650),
-						(i == 5 ? prefabs::create_cyan_charge : prefabs::create_cyan_charge)(step, vec2(0, 0), 30)));
-
-				
-				perform_transfer({ rifle, new_character.get_primary_hand() }, step);
-
-				new_character.get<components::attitude>().parties = party_category::RESISTANCE_CITIZEN;
-				new_character.get<components::attitude>().hostile_parties = party_category::METROPOLIS_CITIZEN;
-			}
-
-			if (
-				i == 7 || i == 8 || i == 9
-				) {
-				if (i == 9) {
-					const auto rifle = prefabs::create_sample_rifle(step, vec2(100, -500),
-						prefabs::create_sample_magazine(step, vec2(100, -650),
-							prefabs::create_cyan_charge(step, vec2(0, 0), 300)));
-
-					perform_transfer({ rifle, new_character.get_primary_hand() }, step);
-				}
-				else {
-					const auto rifle = (i == 7 ? prefabs::create_sample_rifle : prefabs::create_sample_rifle)(step, vec2(100, -500),
-						prefabs::create_sample_magazine(step, vec2(100, -650),
-							prefabs::create_cyan_charge(step, vec2(0, 0), 300)));
-
-					perform_transfer({ rifle, new_character.get_primary_hand() }, step);
-				}
-
-				const auto backpack = prefabs::create_sample_backpack(step, vec2(200, -650));
-				perform_transfer({ backpack, new_character[slot_function::SHOULDER] }, step);
-			}
 
 			auto& sentience = new_character.get<components::sentience>();
 
@@ -196,9 +115,46 @@ namespace test_scenes {
 			sentience.get<personal_electricity_meter_instance>().set_maximum_value(400);
 			sentience.get<personal_electricity_meter_instance>().set_value(400);
 
-			if (i == 0) {
-				sentience.get<personal_electricity_meter_instance>().set_maximum_value(800);
-				sentience.get<personal_electricity_meter_instance>().set_value(800);
+			new_character.get<components::attitude>().maximum_divergence_angle_before_shooting = 25;
+
+			if (i == 0 || i == 1) {
+				/* Let's have two OP characters */
+				sentience.get<health_meter_instance>().set_value(10000);
+				sentience.get<health_meter_instance>().set_maximum_value(10000);
+
+				sentience.get<personal_electricity_meter_instance>().set_value(10000);
+				sentience.get<personal_electricity_meter_instance>().set_maximum_value(10000);
+
+				new_character.get<components::attitude>().parties = party_category::RESISTANCE_CITIZEN;
+				new_character.get<components::attitude>().hostile_parties = party_category::METROPOLIS_CITIZEN;
+
+				const auto rifle = prefabs::create_sample_rifle(step, vec2(100, -500),
+				prefabs::create_sample_magazine(step, vec2(100, -650),
+				prefabs::create_cyan_charge(step, vec2(0, 0)), 3000
+			));
+
+				perform_transfer({ rifle, new_character.get_primary_hand() }, step);
+			}
+
+			if (i == 7 || i == 8 || i == 9) {
+				/* Give some stuff to three test characters */
+				if (i == 9) {
+					const auto rifle = prefabs::create_sample_rifle(step, vec2(100, -500),
+						prefabs::create_sample_magazine(step, vec2(100, -650),
+							prefabs::create_cyan_charge(step, vec2(0, 0))));
+
+					perform_transfer({ rifle, new_character.get_primary_hand() }, step);
+				}
+				else {
+					const auto rifle = (i == 7 ? prefabs::create_sample_rifle : prefabs::create_sample_rifle)(step, vec2(100, -500),
+						prefabs::create_sample_magazine(step, vec2(100, -650),
+							prefabs::create_cyan_charge(step, vec2(0, 0))));
+
+					perform_transfer({ rifle, new_character.get_primary_hand() }, step);
+				}
+
+				const auto backpack = prefabs::create_sample_backpack(step, vec2(200, -650));
+				perform_transfer({ backpack, new_character[slot_function::SHOULDER] }, step);
 			}
 
 			fill_range(sentience.learned_spells, true);
@@ -230,7 +186,6 @@ namespace test_scenes {
 
 					light.color = light_cyan;
 				}
-
 
 				{
 					const auto e = create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS, [&](const auto e){
@@ -356,47 +311,15 @@ namespace test_scenes {
 
 		prefabs::create_kek9(step, vec2(-800, -200),
 			prefabs::create_sample_magazine(step, vec2(100, -650),
-				prefabs::create_cyan_charge(step, vec2(0, 0),  30)));
+				prefabs::create_cyan_charge(step, vec2(0, 0))));
 
-		const auto rifle = prefabs::create_sample_rifle(step, vec2(100, -500),
-			prefabs::create_sample_magazine(step, vec2(100, -650),
-				prefabs::create_cyan_charge(step, vec2(0, 0),  30)));
-
-		const auto rifle2 = prefabs::create_sample_rifle(step, vec2(100, -500 + 50),
-			prefabs::create_sample_magazine(step, vec2(100, -650),
-				prefabs::create_cyan_charge(step, vec2(0, 0), true ? 1000 : 30)));
-
-		const auto amplifier = prefabs::create_amplifier_arm(step, vec2(-300, -500 + 50));
-
-		prefabs::create_sample_rifle(step, vec2(100, -500 + 100), prefabs::create_sample_magazine(step, vec2(100, -650),
-			prefabs::create_cyan_charge(step, vec2(0, 0),  30)));
-
-		prefabs::create_sample_rifle(step, vec2(300, -500 + 50));
-
-		const auto pis2 = prefabs::create_sample_rifle(step, vec2(300, 50),
-			prefabs::create_sample_magazine(step, vec2(100, -650),
-				prefabs::create_cyan_charge(step, vec2(0, 0), 40)));
-
-		const auto submachine = prefabs::create_sample_rifle(step, vec2(500, -500 + 50),
-			prefabs::create_sample_magazine(step, vec2(100 - 50, -650),
-				prefabs::create_cyan_charge(step, vec2(0, 0),  50)));
-
+		prefabs::create_amplifier_arm(step, vec2(-300, -500 + 50));
 		prefabs::create_cyan_urban_machete(step, vec2(100, 100));
-		const auto second_machete = prefabs::create_cyan_urban_machete(step, vec2(0, 300));
-
-		const auto backpack = prefabs::create_sample_backpack(step, vec2(200, -650));
 		prefabs::create_sample_backpack(step, vec2(200, -750));
 
-		if (character(1).alive()) {
-			perform_transfer({ rifle2, character(1).get_primary_hand() }, step);
-		}
-
 		if (character(2).alive()) {
+			const auto second_machete = prefabs::create_cyan_urban_machete(step, vec2(0, 300));
 			perform_transfer({ second_machete, character(2).get_primary_hand() }, step);
-		}
-
-		if (character(3).alive()) {
-			perform_transfer({ pis2, character(3).get_primary_hand() }, step);
 		}
 
 		return character(0);

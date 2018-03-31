@@ -7,11 +7,14 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
+- fix concatenation of shakes
+	- shake for ms
+	- shake mult
+	- impact velocity mult
+
 - maybe parametrize shakes for explosions?
 	- parametrize the shit out of shakes, maybe even shaking methods
 		- and leave tweaking for later or for others
-
-- fix concatenation of shakes
 
 - research why fast randomization doesnt work with single call?
 - impulse/damping info -> multipliers
