@@ -22,6 +22,7 @@
 #include "augs/math/physics_structs.h"
 #include "game/detail/spells/all_spells.h"
 #include "game/detail/perks/all_perks.h"
+#include "game/detail/sentience_shake.h"
 
 #include "game/detail/view_input/sound_effect_input.h"
 #include "game/detail/view_input/particle_effect_input.h"
@@ -53,8 +54,7 @@ namespace components {
 		augs::stepped_timestamp time_of_last_exhausted_cast;
 
 		augs::stepped_timestamp time_of_last_shake;
-		float shake_for_ms = 0.f;
-		float shake_mult = 1.f;
+		sentience_shake shake;
 
 		// END GEN INTROSPECTOR
 

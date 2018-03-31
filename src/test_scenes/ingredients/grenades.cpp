@@ -59,8 +59,8 @@ namespace test_flavours {
 			in.sound_gain = 1.8f;
 			in.sound_effect = assets::sound_buffer_id::GREAT_EXPLOSION;
 
-			in.request_shake_for_ms = 500.f;
-			in.request_shake_mult = 1.2f;
+			in.victim_shake.duration_ms = 500.f;
+			in.victim_shake.mult = 1.2f;
 
 			explosive.released_image_id = assets::game_image_id::FORCE_GRENADE_RELEASED;
 			explosive.released_physical_material = assets::physical_material_id::GRENADE;
@@ -107,8 +107,8 @@ namespace test_flavours {
 			in.sound_effect = assets::sound_buffer_id::INTERFERENCE_EXPLOSION;
 			in.type = adverse_element_type::INTERFERENCE;
 
-			in.request_shake_for_ms = 800.f;
-			in.request_shake_mult = 1.5f;
+			in.victim_shake.duration_ms = 800.f;
+			in.victim_shake.mult = 1.5f;
 
 			explosive.released_image_id = assets::game_image_id::INTERFERENCE_GRENADE_RELEASED;
 			explosive.released_physical_material = assets::physical_material_id::GRENADE;

@@ -19,8 +19,8 @@ void fury_of_the_aeons_instance::perform_logic(const spell_logic_input in) {
 	ignite_cast_sparkles(spell_data, in.step, caster_transform, subject);
 	play_cast_successful_sound(spell_data, in.step, caster_transform, subject);
 
-	in.sentience.shake_for_ms = 600.f;
-	in.sentience.shake_mult = 1.f;
+	in.sentience.shake.duration_ms = 600.f;
+	in.sentience.shake.mult = 1.f;
 
 	in.sentience.time_of_last_shake = in.now;
 

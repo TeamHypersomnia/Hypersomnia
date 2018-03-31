@@ -148,10 +148,10 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 			}
 
 			const auto since_last_shake = (now - sentience.time_of_last_shake);
-			const auto shake_amount = (sentience.shake_for_ms - since_last_shake.in_milliseconds(delta)) / sentience.shake_for_ms;
+			const auto shake_amount = (sentience.shake.duration_ms - since_last_shake.in_milliseconds(delta)) / sentience.shake.duration_ms;
 
 			if (shake_amount > 0.f) {
-				const auto shake_mult = shake_amount * shake_amount * sentience.shake_mult;
+				const auto shake_mult = shake_amount * shake_amount * sentience.shake.mult;
 
 				auto rng = cosmos.get_rng_for(subject);
 				impulse_input in;
@@ -160,7 +160,7 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 				subject.apply_crosshair_recoil(in);
 			}
 			else {
-				sentience.shake_mult = 1.f;
+				sentience.shake.mult = 1.f;
 			}
 
 			if (sentience.is_spell_being_cast()) {
@@ -393,8 +393,8 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 		}
 
 		auto aimpunch = [&](components::sentience& sentience) {
-			sentience.shake_for_ms = std::max(400.f, std::max(d.request_shake_for_ms, sentience.shake_for_ms));
-			sentience.shake_mult = std::max(1.f, std::max(d.request_shake_mult, sentience.shake_mult));
+			sentience.shake.duration_ms = std::max(400.f, std::max(d.victim_shake.duration_ms, sentience.shake.duration_ms));
+			sentience.shake.mult = std::max(1.f, std::max(d.victim_shake.mult, sentience.shake.mult));
 			sentience.time_of_last_shake = now;
 		};
 

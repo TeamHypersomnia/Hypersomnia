@@ -130,9 +130,7 @@ void standard_explosion_input::instantiate(
 						damage_msg.amount = damage;
 						damage_msg.impact_velocity = (point_b - explosion_location.pos).normalize();
 						damage_msg.point_of_impact = point_b;
-
-						damage_msg.request_shake_for_ms = request_shake_for_ms;
-						damage_msg.request_shake_mult = request_shake_mult;
+						damage_msg.victim_shake = victim_shake;
 
 						if (type == adverse_element_type::INTERFERENCE) {
 							// TODO: move this calculation after refactoring sentience system to not use messages?

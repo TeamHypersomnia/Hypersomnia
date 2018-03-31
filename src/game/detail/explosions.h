@@ -9,14 +9,17 @@
 #include "game/transcendental/step_declaration.h"
 #include "game/transcendental/entity_id_declaration.h"
 #include "game/enums/adverse_element_type.h"
+#include "game/detail/sentience_shake.h"
 
 struct standard_explosion_input {
 	// GEN INTROSPECTOR struct standard_explosion_input
 	float effective_radius = 250.f;
 	meter_value_type damage = 88;
 	float impact_impulse = 150.f;
-	float request_shake_for_ms = 0.f;
-	float request_shake_mult = 1.f;
+
+	sentience_shake victim_shake;
+	sentience_shake sender_shake;
+
 	rgba inner_ring_color = cyan;
 	rgba outer_ring_color = white;
 	assets::sound_buffer_id sound_effect = assets::sound_buffer_id::INVALID;
