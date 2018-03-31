@@ -39,7 +39,7 @@ namespace invariants {
 		invariants::sprite appearance;
 		damping_input recoil_damping;
 
-		impulse_info recoil_impulse_mult = { 10000.f, 500.f };
+		impulse_mults recoil_impulse_mult = { 10000.f, 500.f };
 		// END GEN INTROSPECTOR
 	};
 }

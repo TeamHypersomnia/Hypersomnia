@@ -15,7 +15,7 @@ namespace invariants {
 	struct hand_fuse {
 		// GEN INTROSPECTOR struct invariants::hand_fuse
 		float fuse_delay_ms = 1000.f;
-		impulse_info additional_release_impulse;
+		impulse_mults additional_release_impulse;
 
 		sound_effect_input unpin_sound;
 		sound_effect_input throw_sound;

@@ -14,8 +14,6 @@ summary: Just a hidden scratchpad.
 	- shake mult
 	- impact velocity mult
 
-- impulse/damping info -> multipliers
-
 - copying, cutting, pasting, duplication
 	- The editor shall contain its own clipboard, which shouldn't really be persistent
 	- format

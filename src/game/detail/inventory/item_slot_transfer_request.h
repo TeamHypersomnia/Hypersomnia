@@ -16,7 +16,7 @@ struct basic_item_slot_transfer_request {
 	basic_inventory_slot_id<id_type> target_slot;
 
 	int specified_quantity = -1;
-	impulse_info additional_drop_impulse;
+	impulse_mults additional_drop_impulse;
 	bool force_immediate_mount = false;
 	bool allow_unauthorized_transfers = false;
 	pad_bytes<2> pad;

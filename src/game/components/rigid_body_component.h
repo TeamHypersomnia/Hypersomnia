@@ -94,7 +94,7 @@ namespace invariants {
 		bool allow_sleep = true;
 		pad_bytes<1> pad;
 
-		damping_info damping;
+		damping_mults damping;
 		// END GEN INTROSPECTOR
 	};
 };
@@ -184,7 +184,7 @@ public:
 		return get_raw_component({}).special;
 	}
 
-	damping_info calc_damping_info(const invariants::rigid_body&) const;
+	damping_mults calc_damping_info(const invariants::rigid_body&) const;
 
 	vec2 get_velocity() const;
 	float get_mass() const;
@@ -268,8 +268,8 @@ bool component_synchronizer<E, components::rigid_body>::is_constructed() const {
 }
 
 template <class E>
-damping_info component_synchronizer<E, components::rigid_body>::calc_damping_info(const invariants::rigid_body& def) const {
-	damping_info damping = def.damping;
+damping_mults component_synchronizer<E, components::rigid_body>::calc_damping_info(const invariants::rigid_body& def) const {
+	damping_mults damping = def.damping;
 
 	handle.template dispatch_on_having<components::movement>([&damping](const auto typed_handle) {
 		const auto& movement = typed_handle.template get<components::movement>();

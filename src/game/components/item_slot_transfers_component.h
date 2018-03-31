@@ -40,8 +40,8 @@ namespace components {
 namespace invariants {
 	struct item_slot_transfers {
 		// GEN INTROSPECTOR struct invariants::item_slot_transfers
-		impulse_info standard_throw_impulse = { 7000.f, 0.f };
-		impulse_info standard_drop_impulse = { 2000.f, 1.5f };
+		impulse_mults standard_throw_impulse = { 7000.f, 0.f };
+		impulse_mults standard_drop_impulse = { 2000.f, 1.5f };
 		float disable_collision_on_drop_for_ms = 300.f;
 		// END GEN INTROSPECTOR
 	};

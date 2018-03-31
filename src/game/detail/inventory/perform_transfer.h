@@ -25,7 +25,7 @@ void perform_transfers(const C requests, const step_type step) {
 }
 
 template <class F, class E>
-void drop_from_all_slots(const invariants::container& container, const E handle, const impulse_info impulse, F result_callback) {
+void drop_from_all_slots(const invariants::container& container, const E handle, const impulse_mults impulse, F result_callback) {
 	for (const auto& s : container.slots) {
 		for (const auto item : get_items_inside(handle, s.first)) {
 			result_callback(perform_transfer( item_slot_transfer_request{ item, inventory_slot_id(), -1, impulse }, handle.get_cosmos()));
@@ -33,4 +33,4 @@ void drop_from_all_slots(const invariants::container& container, const E handle,
 	}
 }
 
-void drop_from_all_slots(const invariants::container& container, const entity_handle handle, const impulse_info impulse, const logic_step step);
+void drop_from_all_slots(const invariants::container& container, const entity_handle handle, const impulse_mults impulse, const logic_step step);

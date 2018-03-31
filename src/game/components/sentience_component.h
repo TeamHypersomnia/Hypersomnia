@@ -108,14 +108,14 @@ namespace invariants {
 		float danger_amount_from_hostile_attitude = 100.f;
 
 		float aimpunch_impact_mult = 0.001f;
-		impulse_info knockout_impulse = { 1000.f, 80.f };
+		impulse_mults knockout_impulse = { 1000.f, 80.f };
 
 		sound_effect_input health_decrease_sound;
 		sound_effect_input consciousness_decrease_sound;
 
 		sound_effect_input death_sound;
 		sound_effect_input loss_of_consciousness_sound;
-		impulse_info drop_impulse_on_knockout = { 2000.0f, 1.5f };
+		impulse_mults drop_impulse_on_knockout = { 2000.0f, 1.5f };
 
 		particle_effect_input health_decrease_particles;
 		// END GEN INTROSPECTOR
