@@ -152,14 +152,13 @@ After which, the resultant Makefile should appear in the build/Debug-x64-gcc dir
 
 #### Invoking make
 
-If you are building with clang, make sure to call these exports before invoking make:
+If you are building with ``clang``, make sure to call these exports before invoking ``make``:
 
 ```
-export CXX=clang++
-export CC=clang
+export CXX=clang++; export CC=clang;
 ```
 
-This is because some third-party libraries - freetype, for example - generate their Makefiles only after calling make on the Hypersomnia's Makefile itself.
+This is because some third-party libraries - freetype, for example - generate their Makefiles only after calling ``make`` on the Hypersomnia's Makefile itself.
 (if GCC build fails for some reason, add respective exports as well.)
 
 There are several additional make targets defined:
