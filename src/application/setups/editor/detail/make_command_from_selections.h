@@ -13,13 +13,15 @@ T make_command_from_selections(
 
 	T command;
 
+	auto& _counts = counts;
+
 	for_each_selected(
 		[&](const auto e) {
 			const auto handle = cosm[e];
 
 			if (inclusion_predicate(handle)) {
 				command.push_entry(handle);
-				++counts[handle.get_name()];
+				++_counts[handle.get_name()];
 			}
 		}
 	);

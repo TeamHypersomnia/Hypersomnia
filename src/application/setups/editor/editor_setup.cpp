@@ -1025,8 +1025,6 @@ bool editor_setup::handle_input_before_game(
 		if (e.was_any_key_pressed()) {
 			const auto k = e.data.key.key;
 
-			auto& history = folder().history;
-
 			if (has_ctrl) {
 				if (has_shift) {
 					switch (k) {

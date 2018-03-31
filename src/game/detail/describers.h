@@ -68,5 +68,5 @@ entity_name_str describe_names_of(F for_each_name) {
 		++counts[name];
 	});
 
-	describe_names_of(counts);
+	return describe_names_of(counts);
 }
