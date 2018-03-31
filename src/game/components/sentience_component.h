@@ -108,6 +108,7 @@ namespace invariants {
 		float danger_amount_from_hostile_attitude = 100.f;
 
 		float aimpunch_impact_mult = 0.001f;
+		impulse_info knockout_impulse = { 1000.f, 80.f };
 
 		sound_effect_input health_decrease_sound;
 		sound_effect_input consciousness_decrease_sound;

@@ -128,10 +128,13 @@ namespace test_scenes {
 				new_character.get<components::attitude>().parties = party_category::RESISTANCE_CITIZEN;
 				new_character.get<components::attitude>().hostile_parties = party_category::METROPOLIS_CITIZEN;
 
-				const auto rifle = prefabs::create_sample_rifle(step, vec2(100, -500),
-				prefabs::create_sample_magazine(step, vec2(100, -650),
-				prefabs::create_cyan_charge(step, vec2(0, 0)), 3000
-			));
+				const auto rifle = prefabs::create_sample_rifle(
+					step, vec2(100, -500), prefabs::create_sample_magazine(step, vec2(100, -650), prefabs::create_cyan_charge(step, vec2(0, 0)), 3000)
+				);
+
+				if (i == 1) {
+					new_character.get<components::crosshair>().base_offset.x = -500;
+				}
 
 				perform_transfer({ rifle, new_character.get_primary_hand() }, step);
 			}

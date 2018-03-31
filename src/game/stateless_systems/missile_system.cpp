@@ -71,21 +71,25 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 			;
 
 			if (should_send_damage) {
-				const auto subject_of_impact = subject_handle.get_owner_of_colliders().get<components::rigid_body>();
-				const auto subject_of_impact_mass_pos = subject_of_impact.get_mass_position(); 
-
-				auto impact_velocity = missile_handle.get_effective_velocity();
+				const auto impact_velocity = missile_handle.get_effective_velocity();
 
 				if (missile_def.impulse_upon_hit > 0.f) {
 					auto considered_impulse = missile_def.impulse_upon_hit * missile->power_multiplier_of_sender;
 
-					if (subject_handle.has<components::sentience>()) {
-						if (!subject_handle.get<components::sentience>().get<electric_shield_perk_instance>().timing.is_enabled(now, delta)) {
+					if (const auto sentience = subject_handle.find<components::sentience>()) {
+						const auto& shield_of_victim = sentience->get<electric_shield_perk_instance>();
+
+						if (!shield_of_victim.timing.is_enabled(now, delta)) {
 							considered_impulse *= missile_def.impulse_multiplier_against_sentience;
 						}
 					}
 
-					subject_of_impact.apply_force(vec2(impact_velocity).set_length(considered_impulse), it.point - subject_of_impact_mass_pos);
+					const auto subject_of_impact = subject_handle.get_owner_of_colliders().get<components::rigid_body>();
+					const auto subject_of_impact_mass_pos = subject_of_impact.get_mass_position(); 
+
+					const auto impact = vec2(impact_velocity).set_length(considered_impulse);
+
+					subject_of_impact.apply_impulse(impact, it.point - subject_of_impact_mass_pos);
 				}
 
 				missile->saved_point_of_impact_before_death = it.point;

@@ -66,6 +66,10 @@ public:
 		per_native_type(per_native_type)
 	{}
 
+	bool skip_empty_nodes() const {
+		return true;
+	}
+
 	template <class E>
 	auto num_flavours_of_type() const {
 		return get_map<E>().size();
@@ -140,6 +144,10 @@ class all_provider {
 
 public:
 	all_provider(const cosmos& cosm) : cosm(cosm) {}
+
+	bool skip_empty_nodes() const {
+		return false;
+	}
 
 	template <class E>
 	auto num_flavours_of_type() const {

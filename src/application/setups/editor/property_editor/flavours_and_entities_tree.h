@@ -107,10 +107,7 @@ auto flavours_and_entities_tree(
 			const auto total_entities = provider.template num_entities_of_type<E>();
 			const auto total_flavours = provider.template num_flavours_of_type<E>();
 
-			/* Don't allow one to be zero while the other is non-zero */
-			ensure((total_flavours == 0) == (total_flavours == 0));
-
-			if (total_entities == 0) {
+			if (provider.skip_empty_nodes() && total_entities == 0) {
 				return;
 			}
 

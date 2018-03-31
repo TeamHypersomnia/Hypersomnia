@@ -14,7 +14,9 @@ struct standard_explosion_input {
 	// GEN INTROSPECTOR struct standard_explosion_input
 	float effective_radius = 250.f;
 	meter_value_type damage = 88;
-	float impact_force = 150.f;
+	float impact_impulse = 150.f;
+	float request_shake_for_ms = 0.f;
+	float request_shake_mult = 1.f;
 	rgba inner_ring_color = cyan;
 	rgba outer_ring_color = white;
 	assets::sound_buffer_id sound_effect = assets::sound_buffer_id::INVALID;

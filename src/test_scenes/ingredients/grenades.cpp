@@ -55,9 +55,12 @@ namespace test_flavours {
 			in.inner_ring_color = red;
 			in.outer_ring_color = orange;
 			in.effective_radius = 300.f;
-			in.impact_force = 550.f;
+			in.impact_impulse = 550.f;
 			in.sound_gain = 1.8f;
 			in.sound_effect = assets::sound_buffer_id::GREAT_EXPLOSION;
+
+			in.request_shake_for_ms = 500.f;
+			in.request_shake_mult = 1.2f;
 
 			explosive.released_image_id = assets::game_image_id::FORCE_GRENADE_RELEASED;
 			explosive.released_physical_material = assets::physical_material_id::GRENADE;
@@ -99,10 +102,13 @@ namespace test_flavours {
 			in.inner_ring_color = yellow;
 			in.outer_ring_color = orange;
 			in.effective_radius = 450.f;
-			in.impact_force = 20.f;
+			in.impact_impulse = 550.f;
 			in.sound_gain = 2.2f;
 			in.sound_effect = assets::sound_buffer_id::INTERFERENCE_EXPLOSION;
 			in.type = adverse_element_type::INTERFERENCE;
+
+			in.request_shake_for_ms = 800.f;
+			in.request_shake_mult = 1.5f;
 
 			explosive.released_image_id = assets::game_image_id::INTERFERENCE_GRENADE_RELEASED;
 			explosive.released_physical_material = assets::physical_material_id::GRENADE;
@@ -143,7 +149,7 @@ namespace test_flavours {
 			in.inner_ring_color = cyan;
 			in.outer_ring_color = turquoise;
 			in.effective_radius = 350.f;
-			in.impact_force = 20.f;
+			in.impact_impulse = 20.f;
 			in.sound_gain = 2.2f;
 			in.sound_effect = assets::sound_buffer_id::PED_EXPLOSION;
 			in.type = adverse_element_type::PED;

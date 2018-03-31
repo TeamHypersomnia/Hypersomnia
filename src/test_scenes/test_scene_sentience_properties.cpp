@@ -108,7 +108,7 @@ void load_test_scene_sentience_properties(
 
 			in.effective_radius = 250.f;
 			in.damage = 88.f;
-			in.impact_force = 150.f;
+			in.impact_impulse = 150.f;
 			in.inner_ring_color = cyan;
 			in.outer_ring_color = white;
 			in.sound_effect = assets::sound_buffer_id::EXPLOSION;
@@ -169,7 +169,7 @@ void load_test_scene_sentience_properties(
 
 			{
 				in.effective_radius = 200.f;
-				in.impact_force = 150.f;
+				in.impact_impulse = 150.f;
 				in.sound_gain = 1.2f;
 				in.sound_effect = assets::sound_buffer_id::EXPLOSION;
 
@@ -178,7 +178,7 @@ void load_test_scene_sentience_properties(
 			
 			{
 				in.effective_radius = 400.f;
-				in.impact_force = 200.f;
+				in.impact_impulse = 200.f;
 				in.sound_gain = 1.0f;
 				in.sound_effect = assets::sound_buffer_id::GREAT_EXPLOSION;
 
@@ -187,7 +187,7 @@ void load_test_scene_sentience_properties(
 			
 			{
 				in.effective_radius = 600.f;
-				in.impact_force = 250.f;
+				in.impact_impulse = 250.f;
 				in.sound_gain = 1.2f;
 				in.sound_effect = assets::sound_buffer_id::GREAT_EXPLOSION;
 

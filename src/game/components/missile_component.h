@@ -39,8 +39,8 @@ namespace invariants {
 
 		float muzzle_velocity_mult = 1.f;
 
-		float impulse_upon_hit = 100.f;
-		float impulse_multiplier_against_sentience = 1.f;
+		float impulse_upon_hit = 10.f;
+		float impulse_multiplier_against_sentience = 10.f;
 
 		bool damage_upon_collision = true;
 		bool destroy_upon_damage = true;

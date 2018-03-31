@@ -212,9 +212,6 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 		auto& movement = subject.get<components::movement>();
 		movement.make_inert_for_ms += h.effective_amount*2;
 
-		subject.get<components::rigid_body>()
-			.apply_impulse(vec2(h.impact_velocity).set_length(static_cast<float>(h.effective_amount * 5)));
-
 		const auto consciousness_ratio = consciousness.get_ratio();
 		const auto health_ratio = health.get_ratio();
 
@@ -241,17 +238,6 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 			h.special_result = messages::health_event::result_type::PERSONAL_ELECTRICITY_DESTRUCTION;
 		}
 		break;
-
-	case messages::health_event::target_type::AIM:
-	{
-		const auto punched = subject;
-
-		impulse_input in;
-		//in.angular = (h.point_of_impact - punched.get_logic_transform().pos).cross(h.impact_velocity) * sentience_def.aimpunch_impact_mult;
-		//punched.apply_crosshair_recoil(in);
-
-		break;
-	}
 
 	case messages::health_event::target_type::INVALID:
 		break;
@@ -293,15 +279,12 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 		
 		const auto subject_transform = subject.get_logic_transform();
 
-		subject.get<components::rigid_body>().apply_impulse(
-			h.impact_velocity.set_length(850) 
-			//vec2::from_degrees(subject_transform.rotation) * 70
-		);
+		impulse_input knockout_impulse;
+		knockout_impulse.linear = h.impact_velocity.normalize();
+		knockout_impulse.angular = 1.f;
 
-
-		subject.get<components::rigid_body>().apply_angular_impulse(
-			80.f
-		);
+		const auto knocked_out_body = subject.get<components::rigid_body>();
+		knocked_out_body.apply(knockout_impulse * sentience_def.knockout_impulse);
 	}
 
 	step.post_message(h);
@@ -378,7 +361,7 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 			else if (d.type == adverse_element_type::INTERFERENCE && consciousness.is_enabled()) {
 				auto event = event_template;
 
-				auto after_shield_damage = d.amount + static_cast<meter_value_type>(d.amount * subject.get_effective_velocity().length() / 400.f);
+				auto after_shield_damage = d.amount;
 
 				if (is_shield_enabled) {
 					constexpr meter_value_type absorption_by_shield_mult = 2;
@@ -409,30 +392,19 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 			}
 		}
 
-		auto aimpunch_event = event_template;
-		aimpunch_event.target = messages::health_event::target_type::AIM;
+		auto aimpunch = [&](components::sentience& sentience) {
+			sentience.shake_for_ms = std::max(400.f, std::max(d.request_shake_for_ms, sentience.shake_for_ms));
+			sentience.shake_mult = std::max(1.f, std::max(d.request_shake_mult, sentience.shake_mult));
+			sentience.time_of_last_shake = now;
+		};
 
-		if (sentience) {
-			aimpunch_event.subject = subject;
-			
-			if (apply_aimpunch) {
-				consume_health_event(aimpunch_event, step);
-
-				//const auto current_shake_amount = std::max(0.f, sentience->shake_for_ms - (now - sentience->time_of_last_shake).in_milliseconds(delta));
-
-				sentience->shake_for_ms = std::max(400.f, std::max(d.request_shake_for_ms, sentience->shake_for_ms));
-				sentience->shake_mult = std::max(1.f, std::max(d.request_shake_mult, sentience->shake_mult));
-				sentience->time_of_last_shake = now;
+		if (apply_aimpunch) {
+			if (sentience) {
+				aimpunch(*sentience);
 			}
-		}
-		else {
-			const auto owning_capability = subject.get_owning_transfer_capability();
-			
-			if (owning_capability.alive()) {
-				aimpunch_event.subject = owning_capability;
-
-				if (d.amount > 0.f) {
-					consume_health_event(aimpunch_event, step);
+			else if (const auto owning_capability = subject.get_owning_transfer_capability()) {
+				if (const auto s = owning_capability.find<components::sentience>()) {
+					aimpunch(*s);
 				}
 			}
 		}

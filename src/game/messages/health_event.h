@@ -14,7 +14,6 @@ namespace messages {
 
 		enum class target_type {
 			INVALID,
-			AIM,
 			PERSONAL_ELECTRICITY,
 			CONSCIOUSNESS,
 			HEALTH

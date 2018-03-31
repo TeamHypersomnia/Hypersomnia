@@ -121,7 +121,6 @@ void standard_explosion_input::instantiate(
 						const auto& affected_physics = body_entity.get<components::rigid_body>();
 						const auto affected_physics_mass_pos = affected_physics.get_mass_position();
 
-						auto impact = (point_b - explosion_location.pos).set_length(impact_force);
 						const auto center_offset = (point_b - affected_physics_mass_pos) * 0.8f;
 
 						messages::damage_message damage_msg;
@@ -129,46 +128,30 @@ void standard_explosion_input::instantiate(
 						damage_msg.inflictor = subject;
 						damage_msg.subject = body_entity;
 						damage_msg.amount = damage;
+						damage_msg.impact_velocity = (point_b - explosion_location.pos).normalize();
 						damage_msg.point_of_impact = point_b;
 
-						switch (type) {
-							case adverse_element_type::FORCE: {
-								damage_msg.request_shake_for_ms = 500.f;
-								damage_msg.request_shake_mult = 1.2f;
-								damage_msg.impact_velocity = impact;
+						damage_msg.request_shake_for_ms = request_shake_for_ms;
+						damage_msg.request_shake_mult = request_shake_mult;
 
-								affected_physics.apply_impulse(
-									impact, center_offset
+						if (type == adverse_element_type::INTERFERENCE) {
+							// TODO: move this calculation after refactoring sentience system to not use messages?
+							damage_msg.amount += damage_msg.amount * body_entity.get_effective_velocity().length() / 400.f;
+						}
+
+						if (!augs::is_epsilon(impact_impulse)) {
+							const auto impulse = damage_msg.impact_velocity * impact_impulse;
+							damage_msg.impact_velocity = impulse;
+
+							affected_physics.apply_impulse(impulse, center_offset);
+
+							if (DEBUG_DRAWING.draw_explosion_forces) {
+								DEBUG_PERSISTENT_LINES.emplace_back(
+									cyan,
+									affected_physics_mass_pos + center_offset,
+									affected_physics_mass_pos + center_offset + impulse
 								);
-
-								if (DEBUG_DRAWING.draw_explosion_forces) {
-									DEBUG_PERSISTENT_LINES.emplace_back(cyan,
-										affected_physics_mass_pos + center_offset,
-										affected_physics_mass_pos + center_offset + impact
-									);
-								}
-
-								// LOG("Impact %x dealt to: %x. Resultant angular: %x", impact, body_entity.get_name(), affected_physics.get_degree_velocity());
 							}
-							break;
-
-							case adverse_element_type::PED: {
-
-							}
-							break;
-
-							case adverse_element_type::INTERFERENCE: {
-								damage_msg.request_shake_for_ms = 800.f;
-								damage_msg.request_shake_mult = 1.5f;
-
-								damage_msg.impact_velocity = impact * 300.f;
-							}
-							break;
-
-							default: {
-								ensure(false && "Unknown adverse element type");
-							}
-							break;
 						}
 
 						step.post_message(damage_msg);
