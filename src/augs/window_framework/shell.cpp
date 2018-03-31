@@ -43,26 +43,21 @@ namespace augs {
 #error "Unsupported platform!"
 #endif
 
+#if PLATFORM_WINDOWS
 namespace augs {
 	void open_text_editor(const std::string& on_file) {
-		std::string command;
-
-#if PLATFORM_WINDOWS
-		command = on_file;
+		augs::shell(on_file);
+	}
+}
 #elif PLATFORM_UNIX
-		{
-			auto command_with_path = augs::path_type("$VISUAL ");
+namespace augs {
+	void open_text_editor(const std::string& on_file) {
+		const auto full_path = std::experimental::filesystem::system_complete(augs::path_type(on_file));
+		const auto command = augs::path_type("$VISUAL ") += full_path;
 
-			{
-				const auto full_path = std::experimental::filesystem::system_complete(augs::path_type(on_file));
-				command_with_path += full_path;
-			}
-
-			command = command_with_path;
-		}
+		augs::shell(command.string());
+	}
+}
 #else
 #error "Unsupported platform!"
 #endif
-		augs::shell(command);
-	}
-}
