@@ -14,6 +14,7 @@
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
 
+#include "game/detail/sentience_shake.h"
 #include "game/detail/view_input/sound_effect_input.h"
 #include "game/detail/view_input/particle_effect_input.h"
 
@@ -41,6 +42,7 @@ namespace invariants {
 
 		float impulse_upon_hit = 10.f;
 		float impulse_multiplier_against_sentience = 10.f;
+		sentience_shake victim_shake = { 400.f, 1.f };
 
 		bool damage_upon_collision = true;
 		bool destroy_upon_damage = true;

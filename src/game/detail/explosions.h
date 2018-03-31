@@ -18,7 +18,7 @@ struct standard_explosion_input {
 	float impact_impulse = 150.f;
 
 	sentience_shake victim_shake;
-	sentience_shake sender_shake;
+	sentience_shake subject_shake;
 
 	rgba inner_ring_color = cyan;
 	rgba outer_ring_color = white;

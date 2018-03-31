@@ -392,19 +392,13 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 			}
 		}
 
-		auto aimpunch = [&](components::sentience& sentience) {
-			sentience.shake.duration_ms = std::max(400.f, std::max(d.victim_shake.duration_ms, sentience.shake.duration_ms));
-			sentience.shake.mult = std::max(1.f, std::max(d.victim_shake.mult, sentience.shake.mult));
-			sentience.time_of_last_shake = now;
-		};
-
 		if (apply_aimpunch) {
 			if (sentience) {
-				aimpunch(*sentience);
+				d.victim_shake.apply(now, *sentience);
 			}
 			else if (const auto owning_capability = subject.get_owning_transfer_capability()) {
 				if (const auto s = owning_capability.find<components::sentience>()) {
-					aimpunch(*s);
+					d.victim_shake.apply(now, *s);
 				}
 			}
 		}

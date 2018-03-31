@@ -556,6 +556,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/application/setups/editor/property_editor/property_editor_structs.cpp"
 	"src/augs/math/snapping_grid.cpp"
 	"src/application/setups/editor/editor_view.cpp"
+	"src/game/detail/sentience_shake.cpp"
 )
 
 if(BUILD_WINDOW_FRAMEWORK)

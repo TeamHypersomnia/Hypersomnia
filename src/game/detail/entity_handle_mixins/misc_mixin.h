@@ -10,6 +10,7 @@
 #include "game/components/crosshair_component.h"
 
 #include "game/transcendental/specific_entity_handle_declaration.h"
+#include "game/detail/sentience_shake.h"
 #include "augs/math/physics_structs.h"
 
 template <class A, class = void>
@@ -68,6 +69,14 @@ public:
 		}
 
 		return vec2(0, 0);
+	}
+
+	void apply_shake(const sentience_shake shake) const {
+		const auto self = *static_cast<const E*>(this);
+
+		if (const auto s = self.template find<components::sentience>()) {
+			shake.apply(self.get_cosmos().get_timestamp(), *s);
+		}
 	}
 
 	template <class I>

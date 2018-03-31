@@ -114,6 +114,9 @@ void load_test_scene_sentience_properties(
 			in.sound_effect = assets::sound_buffer_id::EXPLOSION;
 			in.sound_gain = 1.2f;
 			in.type = adverse_element_type::FORCE;
+
+			in.subject_shake.duration_ms = 600.f;
+			in.subject_shake.mult = 1.f;
 		}
 	}
 
@@ -173,6 +176,9 @@ void load_test_scene_sentience_properties(
 				in.sound_gain = 1.2f;
 				in.sound_effect = assets::sound_buffer_id::EXPLOSION;
 
+				in.subject_shake.duration_ms = 400.f;
+				in.subject_shake.mult = 1.f;
+
 				d.explosions[0] = in;
 			}
 			
@@ -182,6 +188,9 @@ void load_test_scene_sentience_properties(
 				in.sound_gain = 1.0f;
 				in.sound_effect = assets::sound_buffer_id::GREAT_EXPLOSION;
 
+				in.subject_shake.duration_ms = 500.f;
+				in.subject_shake.mult = 1.25f;
+
 				d.explosions[1] = in;
 			}
 			
@@ -190,6 +199,9 @@ void load_test_scene_sentience_properties(
 				in.impact_impulse = 250.f;
 				in.sound_gain = 1.2f;
 				in.sound_effect = assets::sound_buffer_id::GREAT_EXPLOSION;
+
+				in.subject_shake.duration_ms = 600.f;
+				in.subject_shake.mult = 1.35f;
 
 				d.explosions[2] = in;
 			}

@@ -62,6 +62,12 @@ void standard_explosion_input::instantiate(
 	const auto subject = cosmos[subject_if_any];
 	const auto subject_alive = subject.alive();
 
+	if (subject_alive) {
+		if (const auto sentience = subject.find<components::sentience>()) {
+			subject_shake.apply(now, *sentience);
+		}
+	}
+
 	messages::visibility_information_request request;
 	request.eye_transform = explosion_location;
 	request.filter = filters::line_of_sight_query();
