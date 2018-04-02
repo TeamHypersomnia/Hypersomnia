@@ -21,7 +21,7 @@ namespace augs {
 			void checkbox::on_change(bool) {
 			}
 
-			checkbox::operator bool() const {
+			checkbox::explicit operator bool() const {
 				return get_state();
 			}
 

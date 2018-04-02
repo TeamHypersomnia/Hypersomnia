@@ -23,15 +23,15 @@ struct constrained_entity_flavour_id {
 	entity_type_id type_id;
 	// END GEN INTROSPECTOR
 
-	operator bool() const {
+	explicit operator bool() const {
 		return raw.operator bool();
 	}
 
-	bool operator==(const constrained_entity_flavour_id b) const {
+	bool operator==(const constrained_entity_flavour_id<C...> b) const {
 		return raw == b.raw && type_id == b.type_id; 
 	}
 
-	bool operator!=(const constrained_entity_flavour_id b) const {
+	bool operator!=(const constrained_entity_flavour_id<C...> b) const {
 		return !operator==(b);
 	}
 
@@ -52,7 +52,7 @@ struct typed_entity_flavour_id {
 	typed_entity_flavour_id() = default;
 	explicit typed_entity_flavour_id(const raw_entity_flavour_id raw) : raw(raw) {};
 
-	operator bool() const {
+	explicit operator bool() const {
 		return raw.operator bool();
 	}
 

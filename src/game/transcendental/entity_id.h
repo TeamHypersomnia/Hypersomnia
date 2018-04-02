@@ -124,7 +124,7 @@ struct entity_id : entity_id_base {
 		return base::is_set() && type_id.is_set();
 	}
 
-	operator bool() const {
+	explicit operator bool() const {
 		return is_set();
 	}
 

@@ -100,7 +100,7 @@ void editor_entity_selector::select_all(
 		const auto id = handle.get_id();
 
 		if (compared_flavour && rect_select_mode == editor_rect_select_type::SAME_FLAVOUR) {
-			if (handle.get_flavour_id() == compared_flavour) {
+			if (entity_flavour_id(handle.get_flavour_id()) == compared_flavour) {
 				current_selections.emplace(id);
 			}
 		}

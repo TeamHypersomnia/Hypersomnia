@@ -32,7 +32,7 @@ struct minus_oned_pod {
 		return value;
 	}
 
-	operator bool() const {
+	explicit operator bool() const {
 		return value != -1;
 	}
 };

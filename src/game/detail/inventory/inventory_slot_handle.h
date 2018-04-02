@@ -77,7 +77,7 @@ public:
 		return { owner, raw_id };
 	}
 
-	operator bool() const {
+	explicit operator bool() const {
 		return alive();
 	}
 };

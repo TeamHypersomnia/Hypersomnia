@@ -247,7 +247,7 @@ public:
 		return !alive();
 	}
 
-	constexpr operator bool() const {
+	constexpr explicit operator bool() const {
 		return alive();
 	}
 
