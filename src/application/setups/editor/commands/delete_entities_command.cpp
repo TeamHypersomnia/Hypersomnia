@@ -38,7 +38,7 @@ void delete_entities_command::redo(const editor_command_input in) {
 
 void delete_entities_command::undo(const editor_command_input in) const {
 	auto& f = in.folder;
-	auto& cosm = f.work->world;
+	auto& cosm = in.get_cosmos();
 
 	{
 		auto& selections = f.view.selected_entities;

@@ -670,7 +670,7 @@ std::unordered_set<entity_id> editor_setup::get_all_selected_entities() const {
 	return all;
 }
 
-void editor_setup::del() {
+void editor_setup::delete_selection() {
 	if (anything_opened()) {
 		auto command = make_command_from_selections<delete_entities_command>("Deleted ");
 
@@ -678,6 +678,21 @@ void editor_setup::del() {
 			folder().history.execute_new(std::move(command), make_command_input());
 			clear_id_caches();
 		}
+	}
+}
+
+void editor_setup::duplicate_selection() {
+	if (anything_opened()) {
+		finish_rectangular_selection();
+
+		auto command = make_command_from_selections<paste_entities_command>("Duplicated ");
+
+		if (!command.empty()) {
+			folder().history.execute_new(std::move(command), make_command_input());
+		}
+
+		start_moving_selection();
+		make_last_command_a_child();
 	}
 }
 
@@ -710,6 +725,12 @@ void editor_setup::start_moving_selection() {
 void editor_setup::start_rotating_selection() {
 	if (const auto aabb = find_selection_aabb()) {
 		start_transforming_selection(aabb->get_center());
+	}
+}
+
+void editor_setup::make_last_command_a_child() {
+	if (anything_opened()) {
+		std::visit([](auto& command) { command.common.has_parent = true; }, folder().history.last_command());
 	}
 }
 
@@ -1047,7 +1068,7 @@ bool editor_setup::handle_input_before_game(
 			auto clamp_units = [&]() { view().grid.clamp_units(8, settings.grid.render.get_maximum_unit()); };
 
 			switch (k) {
-				case key::C: 
+				case key::O: 
 					if (view().selected_entities.size() == 1) { 
 						set_locally_viewed(*view().selected_entities.begin()); 
 					}
@@ -1058,7 +1079,8 @@ bool editor_setup::handle_input_before_game(
 				case key::S: view().toggle_snapping(); return true;
 				case key::OPEN_SQUARE_BRACKET: view().grid.decrease_grid_size(); clamp_units(); return true;
 				case key::CLOSE_SQUARE_BRACKET: view().grid.increase_grid_size(); clamp_units(); return true;
-				case key::DEL: del(); return true;
+				case key::C: duplicate_selection(); return true;
+				case key::DEL: delete_selection(); return true;
 				case key::T: start_moving_selection(); return true;
 				case key::R: start_rotating_selection(); return true;
 				default: break;

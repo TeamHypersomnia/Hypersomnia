@@ -113,11 +113,23 @@ std::optional<cosmic_pool_undo_free_input> cosmos_solvable::free_entity(const en
 	return significant.on_pool(id.type_id, [id](auto& p){ return p.free(id); });
 }
 
-void cosmos_solvable::clear_guid(const entity_id cleared) {
+void cosmos_solvable::undo_last_allocate_entity(const entity_id id) {
+	const auto erased_guid = clear_guid(id);
+
+	auto& next_entity_guid = significant.clock.next_entity_guid.value;
+	--next_entity_guid;
+
+	ensure_eq(next_entity_guid, erased_guid);
+
+	return significant.on_pool(id.type_id, [id](auto& p){ return p.undo_last_allocate(id); });
+}
+
+entity_guid cosmos_solvable::clear_guid(const entity_id cleared) {
 	const auto guid = get_guid(cleared);
 	const auto erased_num = guid_to_id.erase(guid);
 
 	ensure(erased_num == 1);
+	return guid;
 }
 
 template <template <class> class Guidized, class source_id_type>

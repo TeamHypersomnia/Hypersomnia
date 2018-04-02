@@ -28,7 +28,6 @@ namespace augs {
 		}
 
 	public:
-
 		template <class T, class... RedoArgs>
 		void execute_new(T&& command, RedoArgs&&... redo_args) {
 			/* 
@@ -54,9 +53,9 @@ namespace augs {
 		}
 
 		template <class... Args>
-		void redo(Args&&... args) {
+		bool redo(Args&&... args) {
 			if (is_revision_newest()) {
-				return;
+				return false;
 			}
 
 			derived_set_modified_flags();
@@ -69,12 +68,13 @@ namespace augs {
 			);
 
 			++current_revision;
+			return true;
 		}
 
 		template <class... Args>
-		void undo(Args&&... args) {
+		bool undo(Args&&... args) {
 			if (is_revision_oldest()) {
-				return;
+				return false;
 			}
 
 			derived_set_modified_flags();
@@ -87,6 +87,7 @@ namespace augs {
 			);
 
 			--current_revision;
+			return true;
 		}
 
 		template <class... Args>
@@ -115,12 +116,24 @@ namespace augs {
 		bool is_revision_oldest() const {
 			return current_revision == static_cast<index_type>(-1);
 		}
+		
+		bool has_last_command() const {
+			return !is_revision_oldest();
+		}
 
 		auto& last_command() {
 			return commands[current_revision];
 		}
 
 		auto& next_command() {
+			return commands[current_revision + 1];
+		}
+
+		const auto& last_command() const {
+			return commands[current_revision];
+		}
+
+		const auto& next_command() const {
 			return commands[current_revision + 1];
 		}
 

@@ -557,6 +557,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/augs/math/snapping_grid.cpp"
 	"src/application/setups/editor/editor_view.cpp"
 	"src/game/detail/sentience_shake.cpp"
+	"src/application/setups/editor/commands/paste_entities_command.cpp"
 )
 
 if(BUILD_WINDOW_FRAMEWORK)

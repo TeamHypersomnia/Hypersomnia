@@ -38,6 +38,44 @@ TEST_CASE("Pools SimpleBackAndForth") {
 	}
 }
 
+TEST_CASE("Pools UndoAllocations") {
+	p_t p = 6;
+	kv_t keys;
+	keys.resize(6);
+	kv_t keys_after;
+	keys_after.resize(6);
+
+	for (int i = 0; i < 3; ++i) {
+		REQUIRE(p.empty());
+
+		for (unsigned i = 0; i < keys.size(); ++i) {
+			keys[i] = p.allocate(i).key;
+		}
+
+		for (int idx = static_cast<int>(keys.size()) - 1; idx >= 0; --idx) {
+			auto i = static_cast<unsigned>(idx);
+
+			REQUIRE(p.get(keys[i]) == i);
+			p.undo_last_allocate(keys[i]);
+		}
+
+		for (unsigned i = 0; i < keys.size(); ++i) {
+			keys_after[i] = p.allocate(i).key;
+		}
+
+		REQUIRE(keys == keys_after);
+		REQUIRE(p.full());
+
+		/* Cleanup */
+		for (int idx = static_cast<int>(keys.size()) - 1; idx >= 0; --idx) {
+			auto i = static_cast<unsigned>(idx);
+
+			REQUIRE(p.get(keys[i]) == i);
+			p.undo_last_allocate(keys[i]);
+		}
+	}
+}
+
 TEST_CASE("Pools UndoDeletes") {
 	p_t p = 6;
 	kv_t keys;

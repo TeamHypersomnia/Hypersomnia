@@ -80,12 +80,15 @@ entity_handle cosmic::create_entity_with_specific_guid(
 }
 #endif
 
-
-std::optional<cosmic_pool_undo_free_input> cosmic::delete_entity(const entity_handle handle) {
+template <class F>
+void entity_deleter(
+	const entity_handle handle,
+	F actual_deleter
+) {
 	auto& cosmos = handle.get_cosmos();
 
 	if (handle.dead()) {
-		return std::nullopt;
+		return;
 	}
 
 	/* Collect dependent entities so that we might reinfer them */
@@ -110,12 +113,32 @@ std::optional<cosmic_pool_undo_free_input> cosmic::delete_entity(const entity_ha
 	cosmic::destroy_caches_of(handle);
 
 	/* #3: finally, deallocate */
-	const auto result = cosmos.get_solvable({}).free_entity(handle);
+	actual_deleter();
 
 	/* After identity is destroyed, reinfer entities dependent on the identity */
 	for (const auto& d : dependent_items) {
 		cosmos[d].infer_changed_slot();
 	}
+}
+
+void cosmic::undo_last_create_entity(const entity_handle handle) {
+	entity_deleter(
+		handle,
+		[&]() {
+			handle.get_cosmos().get_solvable({}).undo_last_allocate_entity(handle.get_id());
+		}
+	);
+}
+
+std::optional<cosmic_pool_undo_free_input> cosmic::delete_entity(const entity_handle handle) {
+	std::optional<cosmic_pool_undo_free_input> result;
+   
+	entity_deleter(
+		handle,
+		[&]() {
+			result = handle.get_cosmos().get_solvable({}).free_entity(handle.get_id());
+		}
+	);
 
 	return result;
 }

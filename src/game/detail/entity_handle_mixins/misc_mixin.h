@@ -108,13 +108,18 @@ public:
 
 	auto get_flavour_id() const {
 		const auto self = *static_cast<const E*>(this);
-		
-		entity_flavour_id id;
 
-		id.raw = get_raw_flavour_id();
-		id.type_id = self.get_type_id();
+		if constexpr(has_specific_entity_type_v<E>) {
+			return typed_entity_flavour_id<entity_type_of<E>>(self.get_raw_flavour_id());
+		}
+		else {
+			entity_flavour_id id;
 
-		return id;
+			id.raw = get_raw_flavour_id();
+			id.type_id = self.get_type_id();
+
+			return id;
+		}
 	}
 
 	auto& get_flavour() const {

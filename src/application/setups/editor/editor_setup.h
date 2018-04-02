@@ -160,10 +160,15 @@ class editor_setup : private current_access_cache<editor_setup> {
 	void load_gui_state();
 	void save_gui_state();
 
+	void delete_selection();
+	void duplicate_selection();
+
 	void start_transforming_selection(std::optional<vec2> rotation_center);
 
 	void start_moving_selection();
 	void start_rotating_selection();
+
+	void make_last_command_a_child();
 
 	vec2 get_world_cursor_pos() const;
 	vec2 get_world_cursor_pos(const camera_cone) const;
@@ -267,8 +272,6 @@ public:
 	void copy();
 	void cut();
 	void paste();
-
-	void del();
 
 	void play_pause();
 	void stop();

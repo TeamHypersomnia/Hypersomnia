@@ -144,6 +144,36 @@ namespace augs {
 			return free(to_versioned(key));
 		}
 
+		void undo_last_allocate(const key_type key) {
+			if (!correct_range(key)) {
+				return;
+			}
+
+			auto& indirector = get_indirector(key);
+
+			if (!versions_match(indirector, key)) {
+				return;
+			}
+
+			if (const auto removed_at_index = indirector.real_index;
+				removed_at_index != size() - 1
+			) {
+				throw std::runtime_error("Undoing allocations in bad order.");
+			}
+			else {
+				/* add dead key's indirector to the list of free indirectors */
+				free_indirectors.push_back(key.indirection_index);
+
+				/* we do not increase version of the dead indirector, as we are undoing. */
+
+				/* ...and mark it as unused. */
+				indirector.real_index = static_cast<size_type>(-1);
+
+				slots.pop_back();
+				objects.pop_back();
+			}
+		}
+
 		std::optional<undo_free_input_type> free(const key_type key) {
 			if (!correct_range(key)) {
 				return std::nullopt;
@@ -176,7 +206,7 @@ namespace augs {
 			/* ...and mark it as unused. */
 			indirector.real_index = static_cast<size_type>(-1);
 
-			if (/* need_to_move_last */ removed_at_index != size() - 1) {
+			if (removed_at_index != size() - 1) {
 				{
 					const auto indirector_of_last_element = slots.back().pointing_indirector;
 

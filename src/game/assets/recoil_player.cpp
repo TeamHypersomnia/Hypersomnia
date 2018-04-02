@@ -13,7 +13,7 @@ real32 recoil_player_instance::shoot_and_get_impulse(
 	const auto index = static_cast<std::size_t>(heat);
 
 	if (index >= meta.offsets.size()) {
-		auto rng = randomization( static_cast<rng_seed_type>(index) );
+		auto rng = randomization(static_cast<rng_seed_type>(index));
 		return rng.randval(-1.f, 1.f);
 	}
 

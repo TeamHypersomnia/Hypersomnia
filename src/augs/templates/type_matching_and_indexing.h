@@ -5,6 +5,7 @@
 #include "augs/templates/predicate_templates.h"
 #include "augs/templates/nth_type_in.h"
 #include "augs/templates/list_utils.h"
+#include "augs/templates/sequence_utils.h"
 #include "augs/templates/type_list.h"
 
 template <
@@ -51,7 +52,7 @@ struct filter_types_detail<
 
 	using indices = std::conditional_t<
 		Criterion<Head>::value,
-		add_to_sequence_t<
+		prepend_to_sequence_t<
 			Index,
 			typename filter_types_detail<Index + 1, Criterion, List<Tail...>>::indices
 		>,

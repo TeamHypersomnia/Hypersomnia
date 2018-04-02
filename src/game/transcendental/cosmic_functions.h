@@ -37,18 +37,31 @@ class cosmic {
 
 	static void reinfer_solvable(cosmos&);
 
-	template <class E, class C>
-	static auto instantiate_flavour(
+	template <class F>
+	friend void entity_deleter(const entity_handle, F);
+
+	template <class E, class C, class P>
+	static auto specific_create_entity_detail(
 		C& cosm, 
-		const raw_entity_flavour_id flavour_id
+		const typed_entity_flavour_id<E> flavour_id,
+		const typename entity_flavour<E>::initial_components_type& initial_components,
+		P pre_construction
 	) {
-		ensure(flavour_id);
+		const auto new_allocation = cosm.get_solvable({}).template allocate_next_entity<E>(flavour_id.raw);
+		const auto handle = typed_entity_handle<E> { new_allocation.object, cosm, new_allocation.key };
 
-		const auto new_allocation = cosm.get_solvable({}).template allocate_next_entity<E>(flavour_id);
+		{
+			auto& object = new_allocation.object;
+			object.components = initial_components;
+		}
 
-		const auto result = typed_entity_handle<E> { new_allocation.object, cosm, new_allocation.key };
-		new_allocation.object.components = result.get_flavour().initial_components;
-		return result;
+		pre_construction(handle);
+		construct_pre_inference(handle);
+		infer_caches_for(handle);
+		construct_post_inference(handle);
+		emit_warnings(handle);
+
+		return handle;
 	}
 
 public:
@@ -60,32 +73,32 @@ public:
 
 	static void clear(cosmos& cosm);
 
+	template <class E, class C>
+	static auto specific_paste_entity(
+		C& cosm, 
+		const typed_entity_flavour_id<E> flavour_id,
+		const typename entity_flavour<E>::initial_components_type& initial_components
+	) {
+		return specific_create_entity_detail(
+			cosm,
+		   	flavour_id,
+		   	initial_components,
+		   	[](auto&&...){}
+		);
+	}
+
 	template <class E, class C, class P>
 	static auto specific_create_entity(
 		C& cosm, 
-		const raw_entity_flavour_id id,
-		P pre_construction
-	) {
-		ensure(id);
-		const auto handle = instantiate_flavour<E>(cosm, id);
-
-		pre_construction(handle);
-		construct_pre_inference(handle);
-		infer_caches_for(handle);
-		construct_post_inference(handle);
-		emit_warnings(handle);
-
-		return handle;
-	}
-
-	template <class C, class E, class P>
-	static typed_entity_handle<E> create_entity(
-		C& cosm,
 		const typed_entity_flavour_id<E> flavour_id,
 		P&& pre_construction
 	) {
-		ensure(flavour_id);
-		return specific_create_entity<E>(cosm, flavour_id.raw, std::forward<P>(pre_construction));
+		return specific_create_entity_detail(
+			cosm,
+		   	flavour_id,
+		   	cosm.get_flavour(flavour_id).initial_components,
+		   	std::forward<P>(pre_construction)
+		);
 	}
 
 	template <class C, class... Types, class Pre, class Post>
@@ -104,9 +117,9 @@ public:
 			[&](auto e) {
 				using E = decltype(e);
 
-				const auto typed_handle = specific_create_entity<E>(
+				const auto typed_handle = specific_create_entity(
 					cosm, 
-					flavour_id.raw, 
+					typed_entity_flavour_id<E>(flavour_id.raw), 
 					std::forward<Pre>(pre_construction)
 				);
 
@@ -123,9 +136,6 @@ public:
 		const entity_solvable<E>& deleted_content,
 		const reinference_type reinference
 	) {
-		const auto desired_guid = deleted_content.guid;
-		const auto desired_flavour_id = deleted_content.flavour_id;
-
 		auto& s = cosm.get_solvable({});
 
 		const auto new_allocation = s.template undo_free_entity<E>(undo_delete_input, deleted_content);
@@ -144,54 +154,27 @@ public:
 	}
 
 	template <class E>
+	static auto make_suitable_for_cloning(entity_solvable<E>& solvable) {
+		auto& new_components = solvable.components;
+
+		if constexpr(entity_solvable<E>::template has<components::item>()) {
+			std::get<components::item>(new_components).current_slot.unset();
+		}
+	}
+
+	template <class E>
 	static auto specific_clone_entity(const typed_entity_handle<E> source_entity) {
 		auto& cosmos = source_entity.get_cosmos();
 
-		return specific_create_entity<E>(cosmos, source_entity.get_raw_flavour_id(), [&](const auto new_entity) {
+		return cosmic::specific_create_entity<E>(cosmos, source_entity.get_flavour_id(), [&](const auto new_entity) {
 			const auto& source_components = source_entity.get({}).components;
-			auto& new_components = new_entity.get({}).components;
+			auto& new_solvable = new_entity.get({});
+			auto& new_components = new_solvable.components;
 
 			/* Initial copy-assignment */
 			new_components = source_components; 
 
-			/* Corrections */
-			if constexpr(new_entity.template has<components::item>()) {
-				std::get<components::item>(new_components).current_slot.unset();
-			}
-
-			/* Cloning the children recursively */
-#if TODO
-			/* TODO: remove child_entity_id from code and introduce groups */
-			{
-				for_each_through_std_get(new_components, [&](auto& cloned_to_component) {
-					using component_type = std::decay_t<decltype(cloned_to_component)>;
-
-					const auto& cloned_from_component = std::get<component_type>(source_components);
-
-					if constexpr(allows_nontriviality_v<component_type>) {
-						component_type::clone_children(
-							cosmos,
-							cloned_to_component, 
-							cloned_from_component
-						);
-					}
-					else {
-						augs::introspect(
-							augs::recursive([&](auto&& self, auto, auto& into, const auto& from) {
-								if constexpr(std::is_same_v<decltype(into), child_entity_id&>) {
-									into = clone_entity(cosmos[from]);
-								}
-								else {
-									augs::introspect_if_not_leaf(augs::recursive(self), into, from);
-								}
-							}),
-							cloned_to_component,
-							cloned_from_component
-						);
-					}
-				});
-			}
-#endif
+			cosmic::make_suitable_for_cloning(new_solvable);
 
 			return new_entity;
 		});
@@ -199,6 +182,7 @@ public:
 
 	static entity_handle clone_entity(const entity_handle source_entity);
 
+	static void undo_last_create_entity(const entity_handle);
 	static std::optional<cosmic_pool_undo_free_input> delete_entity(const entity_handle);
 
 	static void reserve_storage_for_entities(cosmos&, const cosmic_pool_size_type s);

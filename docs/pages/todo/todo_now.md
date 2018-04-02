@@ -7,7 +7,27 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
-- research why fast randomization doesnt work with single call?
+- fix 180 snapping?
+
+- composite commands
+	- some commands make sense to be redone and undone in bulk
+		- e.g. paste + move
+	- history implementation should remain the same.
+		- it is only the case of GUI that some entries would appear as scoped nodes...
+			- ...and that some entries would go with each other on just a single ctrl+z/y
+
+- pasting/duplicating entities
+	- duplication can happen during either moving or rotation, or just selection
+		- actually there's no purpose in facilitating duplication when moving
+		- always launch translation on duplication, and connect them in GUI
+	- duplication can be implemented in terms of "paste entities" command
+		- we'd just gather the content instantly, not from an earlier Ctrl+C
+	- if we get to arbitrary pastes, the editor itself will have to construct the command tree, like
+		- paste_flavours + paste_entities, if no requisite flavours are found inside the project at the time of pasting
+			- the clipboard will have both the entity and flavour
+		- the editor's clipboard can actually become...
+			- paste entity flavour + paste entity command, stored, waiting to be executed!
+				- the move itself won't need to be stored
 
 - fix concatenation of shakes
 	- shake for ms
@@ -82,13 +102,6 @@ summary: Just a hidden scratchpad.
 		- a simple matrix of checkboxes like in unity.
 	- enums will just have combos for all values
 	- assets will need to have their proper names displayed, unavailable in normal editing (test scene enums are unapplicable obviously)
-
-- composite commands
-	- e.g. duplicate entity will consist of two commands
-		- duplicate + move to new position
-	- history implementation should remain the same.
-		- it is only the case of GUI that some entries would appear as scoped nodes...
-			- ...and that some entries would go with each other on just a single ctrl+z/y
 
 - generalize editor_tab_gui to be also able to handle the entities/flavours windows
 - implement ctrl+tab for tabs, either in settings or anywhere. It should just handle the current window

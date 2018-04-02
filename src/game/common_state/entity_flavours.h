@@ -14,7 +14,6 @@
 template <class entity_type>
 class entity_flavour {
 	using invariants_type = make_invariants<entity_type>;
-	using initial_components_type = make_components<entity_type>;
 
 	template <class D, class E>
 	static auto& get_impl(E& self) {
@@ -38,6 +37,7 @@ class entity_flavour {
 	}
 
 public:
+	using initial_components_type = make_components<entity_type>;
 	using used_entity_type = entity_type;
 
 	// GEN INTROSPECTOR class entity_flavour class entity_type

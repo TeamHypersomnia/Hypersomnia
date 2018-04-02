@@ -49,8 +49,7 @@ class per_entity_type_container {
 
 	template <class S, class F>
 	static void for_each_reverse_impl(S& self, F callback) {
-		// TODO: reverse also for_each_through_std_get
-		for_each_through_std_get(
+		reverse_for_each_through_std_get(
 			self.all,
 			[callback](auto& v) {
 				for (auto& elem : reverse(v)) {

@@ -68,7 +68,7 @@ class cosmos_solvable {
 		return output;
 	}
 
-	void clear_guid(const entity_id);
+	entity_guid clear_guid(const entity_id);
 
 	template <class C, class F>
 	static decltype(auto) on_entity_meta_impl(
@@ -148,6 +148,7 @@ public:
 	}
 
 	std::optional<cosmic_pool_undo_free_input> free_entity(entity_id);
+	void undo_last_allocate_entity(entity_id);
 
 	void destroy_all_caches();
 

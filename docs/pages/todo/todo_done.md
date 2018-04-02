@@ -448,3 +448,6 @@ we consider whole type overrides too complex architeciturally:
 
 - add has_ctrl to select_all_entities
 
+
+- research why fast randomization doesnt work with single call?
+	- indeed the quality is bad, we've tested
