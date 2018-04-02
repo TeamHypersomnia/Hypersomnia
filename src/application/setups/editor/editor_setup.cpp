@@ -685,7 +685,7 @@ void editor_setup::duplicate_selection() {
 	if (anything_opened()) {
 		finish_rectangular_selection();
 
-		auto command = make_command_from_selections<paste_entities_command>("Duplicated ");
+		auto command = make_command_from_selections<duplicate_entities_command>("Duplicated ");
 
 		if (!command.empty()) {
 			folder().history.execute_new(std::move(command), make_command_input());

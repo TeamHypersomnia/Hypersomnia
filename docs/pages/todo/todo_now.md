@@ -7,15 +7,7 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
-- fix 180 snapping?
-
-- composite commands
-	- some commands make sense to be redone and undone in bulk
-		- e.g. paste + move
-	- history implementation should remain the same.
-		- it is only the case of GUI that some entries would appear as scoped nodes...
-			- ...and that some entries would go with each other on just a single ctrl+z/y
-
+- duplicate might just take ids, I guess?
 - pasting/duplicating entities
 	- duplication can happen during either moving or rotation, or just selection
 		- actually there's no purpose in facilitating duplication when moving
@@ -28,11 +20,6 @@ summary: Just a hidden scratchpad.
 		- the editor's clipboard can actually become...
 			- paste entity flavour + paste entity command, stored, waiting to be executed!
 				- the move itself won't need to be stored
-
-- fix concatenation of shakes
-	- shake for ms
-	- shake mult
-	- impact velocity mult
 
 - copying, cutting, pasting, duplication
 	- The editor shall contain its own clipboard, which shouldn't really be persistent

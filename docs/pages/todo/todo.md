@@ -5,6 +5,11 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- fix concatenation of shakes
+	- shake for ms
+	- shake mult
+	- impact velocity mult
+
 - visible_entities should be templated by all_type
 	- could be instantiated
 	- is it necessary though?

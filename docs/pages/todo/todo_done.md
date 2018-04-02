@@ -451,3 +451,12 @@ we consider whole type overrides too complex architeciturally:
 
 - research why fast randomization doesnt work with single call?
 	- indeed the quality is bad, we've tested
+
+- fix 180 snapping?
+
+- composite commands
+	- some commands make sense to be redone and undone in bulk
+		- e.g. paste + move
+	- history implementation should remain the same.
+		- it is only the case of GUI that some entries would appear as scoped nodes...
+			- ...and that some entries would go with each other on just a single ctrl+z/y
