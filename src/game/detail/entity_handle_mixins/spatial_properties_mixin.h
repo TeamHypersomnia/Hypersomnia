@@ -116,6 +116,17 @@ public:
 			);
 		}
 
+		if (const auto* const light = handle.template find<components::light>()) {
+			if (const auto* const def = handle.template find<invariants::light>()) {
+				const auto range = def->get_max_distance();
+
+				return xywh::center_and_size(
+					transform.pos, 
+					vec2(range, range) * 2
+				);
+			}
+		}
+
 		if (const auto rigid_body = handle.template find<components::rigid_body>()) {
 			return rigid_body.find_aabb();
 		}

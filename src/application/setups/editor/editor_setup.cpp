@@ -734,6 +734,14 @@ void editor_setup::make_last_command_a_child() {
 	}
 }
 
+void editor_setup::center_view_at_selection() {
+	if (anything_opened()) {
+		if (const auto aabb = find_selection_aabb()) {
+			view().center_at(aabb->get_center());
+		}
+	}
+}
+
 void editor_setup::go_to_all() {
 
 }
@@ -1056,7 +1064,7 @@ bool editor_setup::handle_input_before_game(
 
 				switch (k) {
 					case key::A: select_all_entities(has_ctrl); return true;
-					case key::_0: view().reset_zoom_at(world_cursor_pos); return true;
+					case key::_0: view().reset_zoom(); return true;
 					case key::Z: undo(); return true;
 					case key::C: copy(); return true;
 					case key::X: cut(); return true;
@@ -1073,6 +1081,7 @@ bool editor_setup::handle_input_before_game(
 						set_locally_viewed(*view().selected_entities.begin()); 
 					}
 					return true;
+				case key::Z: center_view_at_selection(); if (has_shift) { view().reset_zoom(); } return true;
 				case key::I: play(); return true;
 				case key::F: view().toggle_flavour_rect_selection(); return true;
 				case key::G: view().toggle_grid(); return true;

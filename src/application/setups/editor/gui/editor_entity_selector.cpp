@@ -232,7 +232,13 @@ std::optional<ltrb> editor_entity_selector::find_selection_aabb(
 		const auto handle = cosm[id];
 
 		if (const auto aabb = handle.find_aabb()) {
-			total.contain(*aabb);	
+			if (handle.find<components::light>() && handle.find<invariants::light>()) {
+				/* Light-like */
+				total.contain(xywh::center_and_size(handle.get_logic_transform().pos, vec2(2, 2)));	
+			}
+			else {
+				total.contain(*aabb);	
+			}
 		}
 	};
 

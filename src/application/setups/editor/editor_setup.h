@@ -170,6 +170,9 @@ class editor_setup : private current_access_cache<editor_setup> {
 
 	void make_last_command_a_child();
 
+	void center_view_at_selection();
+	void reset_zoom();
+
 	vec2 get_world_cursor_pos() const;
 	vec2 get_world_cursor_pos(const camera_cone) const;
 

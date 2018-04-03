@@ -10,11 +10,25 @@ void editor_view::toggle_snapping() {
 	f = !f;
 }
 
+void editor_view::reset_zoom() {
+	if (panned_camera) {
+		panned_camera->zoom = 1.f;
+	}
+}
+
 void editor_view::reset_zoom_at(vec2 pos) {
 	if (panned_camera) {
 		panned_camera->zoom = 1.f;
 		panned_camera->transform.pos = pos.discard_fract();
 	}
+}
+
+void editor_view::center_at(vec2 pos) {
+	if (!panned_camera) {
+		panned_camera = camera_cone();
+	}
+
+	panned_camera->transform.pos = pos.discard_fract();
 }
 
 void editor_view::toggle_flavour_rect_selection() {

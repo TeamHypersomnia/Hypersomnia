@@ -54,6 +54,10 @@ namespace invariants {
 		wall_max_distance.base_value = 2000.f;
 		*/
 	}
+
+	float light::get_max_distance() const {
+		return std::max(max_distance.get_max(), wall_max_distance.get_max());
+	}
 }
 
 void light_value_variation::update_value(randomization& rng, float& val, const float dt_seconds) const {

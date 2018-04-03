@@ -19,6 +19,10 @@ struct light_attenuation {
 	float base_value = 0.f;
 	light_value_variation variation;
 	// END GEN INTROSPECTOR
+
+	auto get_max() const {
+		return base_value + variation.max_variation;
+	}
 };
 
 namespace components {
@@ -46,5 +50,7 @@ namespace invariants {
 		// END GEN INTROSPECTOR
 
 		light();
+
+		float get_max_distance() const;
 	};
 }
