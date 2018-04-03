@@ -11,6 +11,15 @@
 
 namespace augs {
 	namespace imgui {
+		template <class Pre, class Post>
+		decltype(auto) cond_scoped_op(const bool cond, Pre pre, Post post) {
+			if (cond) {
+				pre();
+			}
+
+			return make_scope_guard([&post, cond]() { if (cond) { post(); } });
+		}
+
 		template <class... T>
 		auto scoped_child(T&&... args) {
 			ImGui::BeginChild(std::forward<T>(args)...);
@@ -27,17 +36,11 @@ namespace augs {
 		
 		template <class... T>
 		auto cond_scoped_style_color(const bool do_it, T&&... args) {
-			if (do_it) {
-				ImGui::PushStyleColor(std::forward<T>(args)...);
-			}
-
-			auto result = make_scope_guard([]() { ImGui::PopStyleColor(); });
-
-			if (!do_it) {
-				result.release();
-			}
-
-			return std::move(result);
+			return cond_scoped_op(
+				do_it,
+			  	[&](){ ImGui::PushStyleColor(std::forward<T>(args)...); },
+				[]() { ImGui::PopStyleColor(); }
+			);
 		}
 
 		template <class... T>
@@ -82,10 +85,16 @@ namespace augs {
 			return opt;
 		}
 
+		inline auto cond_scoped_indent(const bool do_it) {
+			return cond_scoped_op(
+				do_it,
+				[&](){ ImGui::Indent(); },
+				[]() { ImGui::Unindent(); }
+			);
+		}
+
 		inline auto scoped_indent() {
-			ImGui::Indent();
-		
-			return make_scope_guard([]() { ImGui::Unindent(); });
+			return cond_scoped_indent(true);
 		}
 		
 		inline auto scoped_tooltip() {

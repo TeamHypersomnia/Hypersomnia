@@ -46,7 +46,8 @@ void editor_history_gui::perform(const editor_command_input in) {
 	auto do_history_node = [&](
 		const index_type command_index,
 		const std::string& description,
-		const augs::date_time& when	
+		const augs::date_time& when,
+		const bool has_parent
 	){
 		const auto how_long_ago = when.how_long_ago();
 		const bool passes_filter = filter.PassFilter(description.c_str()) || filter.PassFilter(how_long_ago.c_str());
@@ -85,6 +86,8 @@ void editor_history_gui::perform(const editor_command_input in) {
 			ImGui::PushStyleColor(ImGuiCol_Text, disabled_color);
 		}
 
+		auto indent = cond_scoped_indent(has_parent);
+
 		ImGui::Selectable(description.c_str(), is_selected);
 
 		ImGui::PopStyleColor(colors);
@@ -104,7 +107,7 @@ void editor_history_gui::perform(const editor_command_input in) {
 		ImGui::NextColumn();
 	};
 
-	do_history_node(-1, "Created project files", in.folder.view.meta.timestamp);
+	do_history_node(-1, "Created project files", in.folder.view.meta.timestamp, false);
 
 	const auto& commands = history.get_commands();
 
@@ -113,7 +116,7 @@ void editor_history_gui::perform(const editor_command_input in) {
 
 		std::visit(
 			[&](const auto& command) {
-				do_history_node(i, command.describe(), command.common.timestamp);
+				do_history_node(i, command.describe(), command.common.timestamp, command.common.has_parent);
 			},
 			c
 		);

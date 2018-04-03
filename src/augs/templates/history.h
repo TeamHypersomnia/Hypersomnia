@@ -121,6 +121,10 @@ namespace augs {
 			return !is_revision_oldest();
 		}
 
+		bool has_next_command() const {
+			return !is_revision_newest();
+		}
+
 		auto& last_command() {
 			return commands[current_revision];
 		}
