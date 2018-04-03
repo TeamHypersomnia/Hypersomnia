@@ -101,7 +101,7 @@ void duplicate_entities_command::redo(const editor_command_input in) {
 
 						return result;
 					},
-					false,
+					true,
 					false
 				);
 			}
@@ -112,7 +112,7 @@ void duplicate_entities_command::redo(const editor_command_input in) {
 				duplicate_with_flip(
 					[&](const components::transform source) {
 						auto dir = vec2::from_degrees(source.rotation);
-						dir.x = -dir.x;
+						dir.y = -dir.y;
 						const auto new_rotation = dir.degrees();
 
 						const auto dist_to_axis = horizontal_axis_y - source.pos.y;
@@ -124,7 +124,29 @@ void duplicate_entities_command::redo(const editor_command_input in) {
 						return result;
 					},
 					false,
-					false
+					true
+				);
+			}
+
+			if (mirror_direction == vec2i(0, -1)) {
+				const auto horizontal_axis_y = source_aabb->t;
+
+				duplicate_with_flip(
+					[&](const components::transform source) {
+						auto dir = vec2::from_degrees(source.rotation);
+						dir.y = -dir.y;
+						const auto new_rotation = dir.degrees();
+
+						const auto dist_to_axis = source.pos.y - horizontal_axis_y;
+						const auto new_pos = source.pos - vec2(0.f, dist_to_axis) * 2;
+						const auto result = components::transform(new_pos, new_rotation);
+
+						LOG_NVPS(source, result);
+
+						return result;
+					},
+					false,
+					true
 				);
 			}
 		}

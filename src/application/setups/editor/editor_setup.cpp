@@ -968,7 +968,9 @@ bool editor_setup::handle_input_before_game(
 
 			if (has_ctrl) {
 				switch(k) {
+					case key::LEFT: mirror_selection(vec2i(-1, 0)); return true;
 					case key::RIGHT: mirror_selection(vec2i(1, 0)); return true;
+					case key::UP: mirror_selection(vec2i(0, -1)); return true;
 					case key::DOWN: mirror_selection(vec2i(0, 1)); return true;
 					default: break;
 				}

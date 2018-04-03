@@ -5,6 +5,7 @@
 #include "application/setups/editor/editor_command_input.h"
 #include "application/setups/editor/commands/move_entities_command.h"
 #include "application/setups/editor/gui/editor_entity_selector.h"
+#include "application/setups/editor/gui/find_aabb_of.h"
 
 #include "augs/readwrite/memory_stream.h"
 #include "augs/readwrite/byte_readwrite.h"
@@ -24,7 +25,7 @@ static void on_each_independent_transform(
 			const auto typed_handle = cosm[i];
 
 			typed_handle.access_independent_transform(
-				std::forward<F>(callback),
+				[&](auto& tr) { callback(tr, typed_handle); },
 				keys...
 			);
 		}
@@ -39,7 +40,7 @@ static void save_old_values(
 	on_each_independent_transform(
 		cosm,
 		subjects,
-		[&into](const auto& tr) {
+		[&into](const auto& tr, auto&) {
 			augs::write_bytes(into, tr);
 		}
 	);
@@ -54,7 +55,7 @@ static void unmove_entities(
 	on_each_independent_transform(
 		cosm,
 		subjects,
-		[&from](auto& tr) {
+		[&from](auto& tr, auto&) {
 			augs::read_bytes(from, tr);
 		},
 		key
@@ -76,19 +77,19 @@ static void move_entities(
 		const auto center_meters = si.get_meters(center);
 
 		auto rotator = 
-			[&](auto& tr) {
+			[&](auto& tr, auto&) {
 				using T = std::decay_t<decltype(tr)>;
 
 				if constexpr(std::is_same_v<T, physics_engine_transforms>) {
 					auto new_transform = tr.get();
-					new_transform.rotate_radians(dt_si.rotation, center_meters);
+					new_transform.rotate_radians_with_90_multiples(dt_si.rotation, center_meters);
 					tr.set(new_transform);
 				}
 				else if constexpr(std::is_same_v<T, components::transform>) {
-					tr.rotate(dt.rotation, center);
+					tr.rotate_degrees_with_90_multiples(dt.rotation, center);
 				}
 				else if constexpr(std::is_same_v<T, vec2>) {
-					tr.rotate(dt.rotation, center);
+					augs::rotate_degrees_with_90_multiples(tr, center, dt.rotation);
 				}
 				else {
 					static_assert(always_false_v<T>, "Unknown transform type.");
@@ -100,7 +101,7 @@ static void move_entities(
 	}
 	else {
 		auto mover = 
-			[&](auto& tr) {
+			[&](auto& tr, auto&) {
 				using T = std::decay_t<decltype(tr)>;
 
 				if constexpr(std::is_same_v<T, physics_engine_transforms>) {

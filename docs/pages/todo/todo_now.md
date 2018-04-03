@@ -7,6 +7,7 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
+- wandering pixels disappeared?
 - fix epsilon deviations individually after moving a selection
 
 - handle mouse glitches when letting go of moved entities or duplicated ones

@@ -117,17 +117,74 @@ namespace augs {
 	}
 
 	template <class T, class d>
-	basic_vec2<T>& rotate_radians(basic_vec2<T>& v, const basic_vec2<T>& origin, const d angle) {
-		const auto s = static_cast<typename basic_vec2<T>::real>(sin(angle));
-		const auto c = static_cast<typename basic_vec2<T>::real>(cos(angle));
+	basic_vec2<T>& rotate_radians(basic_vec2<T>& v, const basic_vec2<T>& origin, const d radians) {
+		v -= origin;
 		basic_vec2<T> rotated;
 
-		v -= origin;
+		{
+			const auto s = static_cast<typename basic_vec2<T>::real>(sin(radians));
+			const auto c = static_cast<typename basic_vec2<T>::real>(cos(radians));
 
-		rotated.x = static_cast<T>(v.x * c - v.y * s);
-		rotated.y = static_cast<T>(v.x * s + v.y * c);
+			rotated.x = static_cast<T>(v.x * c - v.y * s);
+			rotated.y = static_cast<T>(v.x * s + v.y * c);
+		}
 
-		return v = (rotated + origin);
+		v = rotated + origin;
+
+		return v;
+	}
+
+	template <class T, class d>
+	auto rotate_by_90_multiples(basic_vec2<T>& v, const basic_vec2<T>& origin, const d degrees) {
+		if (augs::compare(degrees, -90.f)) {
+			v -= origin;
+			v = v.perpendicular_ccw();
+			v += origin;
+			return -90.f;
+		}
+		if (augs::compare(degrees, 90.f)) {
+			v -= origin;
+			v = v.perpendicular_cw();
+			v += origin;
+			return 90.f;
+		}
+		if (augs::compare(degrees, 180.f)) {
+			v -= origin;
+			v = v.opposite();
+			v += origin;
+			return 180.f;
+		}
+		if (augs::compare(degrees, -180.f)) {
+			v -= origin;
+			v = v.opposite();
+			v += origin;
+			return -180.f;
+		}
+
+		return 0.f;
+	}
+
+	template <class T, class d>
+	auto rotate_degrees_with_90_multiples(basic_vec2<T>& v, const basic_vec2<T>& origin, const d degrees) {
+		if (const auto result = rotate_by_90_multiples(v, origin, degrees); result != 0.f) {
+			return result;
+		}
+
+		const auto radians = DEG_TO_RAD<d> * degrees;
+		augs::rotate_radians(v, origin, radians);
+		return degrees;
+	}
+
+	template <class T, class d>
+	auto rotate_radians_with_90_multiples(basic_vec2<T>& v, const basic_vec2<T>& origin, const d radians) {
+		const auto degrees = RAD_TO_DEG<d> * radians;
+
+		if (const auto result = rotate_by_90_multiples(v, origin, degrees); result != 0.f) {
+			return result * DEG_TO_RAD<d>;
+		}
+
+		augs::rotate_radians(v, origin, radians);
+		return radians;
 	}
 
 	template <class vec, class d>
@@ -403,8 +460,16 @@ struct basic_vec2 {
 		return !(x_fract == 0 && y_fract == 0);
 	}
 
+	basic_vec2 perpendicular_ccw() const {
+		return basic_vec2(y, -x);
+	}
+
 	basic_vec2 perpendicular_cw() const {
 		return basic_vec2(-y, x);
+	}
+
+	basic_vec2 opposite() const {
+		return basic_vec2(-x, -y);
 	}
 
 	template<class t>

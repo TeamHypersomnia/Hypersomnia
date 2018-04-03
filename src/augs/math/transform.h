@@ -157,6 +157,16 @@ struct basic_transform {
 		rotation += radians;
 		return *this;
 	}
+
+	auto& rotate_degrees_with_90_multiples(const T degrees, const vec2 origin) {
+		rotation += augs::rotate_degrees_with_90_multiples(pos, origin, degrees);
+		return *this;
+	}
+
+	auto& rotate_radians_with_90_multiples(const T radians, const vec2 origin) {
+		rotation += augs::rotate_radians_with_90_multiples(pos, origin, radians);
+		return *this;
+	}
 };
 
 template<class T>
