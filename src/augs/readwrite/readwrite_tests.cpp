@@ -35,6 +35,7 @@ TEST_CASE("Byte readwrite Sanity check") {
 	b = 2.0;
 
 	REQUIRE(a == b);
+	REQUIRE(static_cast<float>(0) == 0.f);
 	
 	REQUIRE(std::optional<std::string>() == std::optional<std::string>());
 

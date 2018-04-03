@@ -711,7 +711,7 @@ void editor_setup::start_transforming_selection(const std::optional<vec2> rotati
 		finish_rectangular_selection();
 
 		auto command = make_command_from_selections<move_entities_command>(
-			rotation_center ? "Rotated " : "Moved ",
+			"",
 			[](const auto typed_handle) {
 				return typed_handle.has_independent_transform();
 			}	

@@ -6,6 +6,7 @@
 #include "application/setups/editor/commands/move_entities_command.h"
 #include "application/setups/editor/gui/editor_entity_selector.h"
 #include "application/setups/editor/gui/find_aabb_of.h"
+#include "application/setups/editor/detail/editor_transform_utils.h"
 
 #include "augs/readwrite/memory_stream.h"
 #include "augs/readwrite/byte_readwrite.h"
@@ -13,23 +14,23 @@
 using delta_type = move_entities_command::delta_type;
 using moved_entities_type = move_entities_command::moved_entities_type;
 
-template <class F, class... K>
-static void on_each_independent_transform(
+static void snap_individually(
+	const cosmos_solvable_access key,
 	cosmos& cosm,
 	const moved_entities_type& subjects,
-	F&& callback,
-	K... keys	
+	const snapping_grid grid
 ) {
-	subjects.for_each(
-		[&](const auto& i) {
-			const auto typed_handle = cosm[i];
+	auto snapper = 
+		[&](auto& tr, const auto typed_handle) {
+			using T = std::decay_t<decltype(tr)>;
 
-			typed_handle.access_independent_transform(
-				[&](auto& tr) { callback(tr, typed_handle); },
-				keys...
-			);
+			if (const auto aabb = typed_handle.find_aabb()) {
+				snap_individual_transform(tr, *aabb, grid);
+			}
 		}
-	);
+	;
+
+	on_each_independent_transform(cosm, subjects, snapper, key);
 }
 
 static void save_old_values(
@@ -62,6 +63,27 @@ static void unmove_entities(
 	);
 }
 
+template <class T>
+void fix_pixel_imperfections(T& in) {
+	if constexpr(std::is_same_v<T, components::transform>) {
+		if (augs::to_near_90_multiple(in.rotation)) {
+			in.pos.round_fract();
+		}
+	}
+	else if constexpr(std::is_same_v<T, vec2>) {
+		in.round_fract();
+	}
+}
+
+void fix_pixel_imperfections(components::transform& in, const si_scaling si) {
+	auto degrees = RAD_TO_DEG<real32> * in.rotation;
+
+	if (augs::to_near_90_multiple(degrees)) {
+		in.pos = si.get_meters(si.get_pixels(in.pos).round_fract());
+		in.rotation = degrees * DEG_TO_RAD<real32>;
+	}
+}
+
 static void move_entities(
 	const cosmos_solvable_access key,
 	cosmos& cosm,
@@ -83,13 +105,18 @@ static void move_entities(
 				if constexpr(std::is_same_v<T, physics_engine_transforms>) {
 					auto new_transform = tr.get();
 					new_transform.rotate_radians_with_90_multiples(dt_si.rotation, center_meters);
+
+					fix_pixel_imperfections(new_transform, si);
+
 					tr.set(new_transform);
 				}
 				else if constexpr(std::is_same_v<T, components::transform>) {
 					tr.rotate_degrees_with_90_multiples(dt.rotation, center);
+					fix_pixel_imperfections(tr);
 				}
 				else if constexpr(std::is_same_v<T, vec2>) {
 					augs::rotate_degrees_with_90_multiples(tr, center, dt.rotation);
+					fix_pixel_imperfections(tr);
 				}
 				else {
 					static_assert(always_false_v<T>, "Unknown transform type.");
@@ -124,7 +151,11 @@ static void move_entities(
 }
 
 std::string move_entities_command::describe() const {
-	return built_description;
+	if (rotation_center) {
+		return "Rotated by " + std::to_string(delta.rotation) + "*: " + built_description;
+	}
+
+	return typesafe_sprintf("Moved by %x: ", delta.pos) + built_description;
 }
 
 void move_entities_command::push_entry(const const_entity_handle handle) {

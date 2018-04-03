@@ -28,9 +28,10 @@ summary: Just a hidden scratchpad.
 
 - flipping a selection
 	- useful for creating symmetrical levels
-	- M or m would make a square from one corner
+	- ~~M or m would make a square from one corner~~
+		- Just use ctrl+arrows. More intuitive
 	- always aligns to aabbs
-	- ctrl+arrows mirror the aabb in the specified direction?
+	- 
 
 - about grenades and changing of their shape
 	- let hand fuse invariant have an optional radius for the thrown grenade

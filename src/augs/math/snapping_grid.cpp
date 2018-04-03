@@ -39,7 +39,7 @@ vec2i snapping_grid::get_snapped(const vec2 position) const {
 	std::array<vec2i, 4> corners;
 
 	corners[0] = [this, position](){
-		auto v = vec2i(position);
+		auto v = vec2i(vec2(position).round_fract());
 
 		v /= unit_pixels;
 		v *= unit_pixels;

@@ -134,34 +134,58 @@ namespace augs {
 		return v;
 	}
 
+	template <class T>
+	bool to_near_90_multiple(T& degrees) {
+		const std::array<T, 5> angles = {
+			static_cast<T>(0),
+			static_cast<T>(90),
+			static_cast<T>(-90),
+			static_cast<T>(-180),
+			static_cast<T>(180)
+		};
+
+		for (const auto a : angles) {
+			if (augs::compare(degrees, a)) {
+				degrees = a;
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	template <class T, class d>
 	auto rotate_by_90_multiples(basic_vec2<T>& v, const basic_vec2<T>& origin, const d degrees) {
-		if (augs::compare(degrees, -90.f)) {
+		if (augs::compare(degrees, static_cast<d>(0))) {
+			return static_cast<d>(0);
+		}
+
+		if (augs::compare(degrees, static_cast<d>(-90))) {
 			v -= origin;
 			v = v.perpendicular_ccw();
 			v += origin;
-			return -90.f;
+			return static_cast<d>(-90);
 		}
-		if (augs::compare(degrees, 90.f)) {
+		if (augs::compare(degrees, static_cast<d>(90))) {
 			v -= origin;
 			v = v.perpendicular_cw();
 			v += origin;
-			return 90.f;
+			return static_cast<d>(90);
 		}
-		if (augs::compare(degrees, 180.f)) {
+		if (augs::compare(degrees, static_cast<d>(180))) {
 			v -= origin;
 			v = v.opposite();
 			v += origin;
-			return 180.f;
+			return static_cast<d>(180);
 		}
-		if (augs::compare(degrees, -180.f)) {
+		if (augs::compare(degrees, static_cast<d>(-180))) {
 			v -= origin;
 			v = v.opposite();
 			v += origin;
-			return -180.f;
+			return static_cast<d>(-180);
 		}
 
-		return 0.f;
+		return static_cast<d>(0);
 	}
 
 	template <class T, class d>
