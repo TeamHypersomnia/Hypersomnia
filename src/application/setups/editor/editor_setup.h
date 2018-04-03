@@ -161,6 +161,8 @@ class editor_setup : private current_access_cache<editor_setup> {
 	void save_gui_state();
 
 	void delete_selection();
+
+	void mirror_selection(vec2i direction);
 	void duplicate_selection();
 
 	void start_transforming_selection(std::optional<vec2> rotation_center);

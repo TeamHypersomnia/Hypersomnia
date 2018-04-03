@@ -162,8 +162,11 @@ public:
 		}
 	}
 
-	template <class E>
-	static auto specific_clone_entity(const typed_entity_handle<E> source_entity) {
+	template <class E, class P>
+	static auto specific_clone_entity(
+		const typed_entity_handle<E> source_entity,
+		P&& pre_construction
+	) {
 		auto& cosmos = source_entity.get_cosmos();
 
 		return cosmic::specific_create_entity<E>(cosmos, source_entity.get_flavour_id(), [&](const auto new_entity) {
@@ -176,8 +179,15 @@ public:
 
 			cosmic::make_suitable_for_cloning(new_solvable);
 
+			pre_construction(new_entity);
+
 			return new_entity;
 		});
+	}
+
+	template <class E>
+	static auto specific_clone_entity(const typed_entity_handle<E> source_entity) {
+		return specific_clone_entity(source_entity, [](auto&&...) {});
 	}
 
 	static entity_handle clone_entity(const entity_handle source_entity);

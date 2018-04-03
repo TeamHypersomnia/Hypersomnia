@@ -7,8 +7,11 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
-- duplicate might just take ids, I guess?
-- pasting/duplicating entities
+- fix epsilon deviations individually after moving a selection
+
+- handle mouse glitches when letting go of moved entities or duplicated ones
+
+- cutting/copying/pasting/duplicating entities
 	- duplication can happen during either moving or rotation, or just selection
 		- actually there's no purpose in facilitating duplication when moving
 		- always launch translation on duplication, and connect them in GUI
@@ -20,16 +23,13 @@ summary: Just a hidden scratchpad.
 		- the editor's clipboard can actually become...
 			- paste entity flavour + paste entity command, stored, waiting to be executed!
 				- the move itself won't need to be stored
-
-- copying, cutting, pasting, duplication
-	- The editor shall contain its own clipboard, which shouldn't really be persistent
-	- format
-		- can we re-use clone entity really?
-	- high time for composite commands?
 	- cut = copy + delete
 
 - flipping a selection
 	- useful for creating symmetrical levels
+	- M or m would make a square from one corner
+	- always aligns to aabbs
+	- ctrl+arrows mirror the aabb in the specified direction?
 
 - about grenades and changing of their shape
 	- let hand fuse invariant have an optional radius for the thrown grenade

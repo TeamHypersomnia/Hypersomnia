@@ -460,3 +460,4 @@ we consider whole type overrides too complex architeciturally:
 	- history implementation should remain the same.
 		- it is only the case of GUI that some entries would appear as scoped nodes...
 			- ...and that some entries would go with each other on just a single ctrl+z/y
+- duplicate might just take ids, I guess?

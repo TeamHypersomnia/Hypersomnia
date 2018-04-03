@@ -1,5 +1,6 @@
 #include "application/setups/editor/gui/editor_entity_selector.h"
 
+#include "application/setups/editor/gui/find_aabb_of.h"
 #include "game/transcendental/cosmos.h"
 
 void editor_entity_selector::clear() {
@@ -226,36 +227,21 @@ std::optional<ltrb> editor_entity_selector::find_selection_aabb(
 	const cosmos& cosm,
 	const target_selections_type& signi_selections
 ) const {
-	ltrb total;
+	const auto result = ::find_aabb_of(
+		cosm,
+		[&](auto combiner) {
+			for_each_selected_entity(
+				combiner,
+				signi_selections
+			);
 
-	auto combine_aabb_of = [&total, &cosm](const entity_id id) {
-		const auto handle = cosm[id];
-
-		if (const auto aabb = handle.find_aabb()) {
-			if (handle.find<components::light>() && handle.find<invariants::light>()) {
-				/* Light-like */
-				total.contain(xywh::center_and_size(handle.get_logic_transform().pos, vec2(2, 2)));	
-			}
-			else {
-				total.contain(*aabb);	
+			if (held && cosm[held]) {
+				combiner(held);
 			}
 		}
-	};
-
-	if (held && cosm[held]) {
-		combine_aabb_of(held);
-	}
-
-	for_each_selected_entity(
-		combine_aabb_of,
-		signi_selections
 	);
 
-	if (total.good()) {
-		return total;
-	}
-
-	return std::nullopt;
+	return result;
 }
 
 std::optional<rgba> editor_entity_selector::find_highlight_color_of(

@@ -681,19 +681,29 @@ void editor_setup::delete_selection() {
 	}
 }
 
-void editor_setup::duplicate_selection() {
+void editor_setup::mirror_selection(const vec2i direction) {
 	if (anything_opened()) {
 		finish_rectangular_selection();
 
-		auto command = make_command_from_selections<duplicate_entities_command>("Duplicated ");
+		const bool only_duplicating = direction.is_zero();
+
+		auto command = make_command_from_selections<duplicate_entities_command>(only_duplicating ? "Duplicated " : "Mirrored ");
 
 		if (!command.empty()) {
+			LOG_NVPS(direction);
+			command.mirror_direction = direction;
 			folder().history.execute_new(std::move(command), make_command_input());
 		}
 
-		start_moving_selection();
-		make_last_command_a_child();
+		if (only_duplicating) {
+			start_moving_selection();
+			make_last_command_a_child();
+		}
 	}
+}
+
+void editor_setup::duplicate_selection() {
+	mirror_selection(vec2i(0, 0));
 }
 
 void editor_setup::start_transforming_selection(const std::optional<vec2> rotation_center) {
@@ -952,6 +962,18 @@ bool editor_setup::handle_input_before_game(
 	if (is_editing_mode()) {
 		auto& cosm = work().world;
 		const auto screen_size = vec2i(ImGui::GetIO().DisplaySize);
+
+		if (e.was_any_key_pressed()) {
+			const auto k = e.data.key.key;
+
+			if (has_ctrl) {
+				switch(k) {
+					case key::RIGHT: mirror_selection(vec2i(1, 0)); return true;
+					case key::DOWN: mirror_selection(vec2i(0, 1)); return true;
+					default: break;
+				}
+			}
+		}
 
 		if (editor_detail::handle_camera_input(
 			settings.camera,

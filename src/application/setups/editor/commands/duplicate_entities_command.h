@@ -35,6 +35,7 @@ private:
 	per_entity_type_container<make_data_vector> duplicated_entities;
 public:
 	std::string built_description;
+	vec2i mirror_direction;
 	// END GEN INTROSPECTOR
 
 	void push_entry(const_entity_handle);
