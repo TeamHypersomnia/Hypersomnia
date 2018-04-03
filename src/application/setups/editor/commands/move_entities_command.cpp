@@ -14,25 +14,6 @@
 using delta_type = move_entities_command::delta_type;
 using moved_entities_type = move_entities_command::moved_entities_type;
 
-static void snap_individually(
-	const cosmos_solvable_access key,
-	cosmos& cosm,
-	const moved_entities_type& subjects,
-	const snapping_grid grid
-) {
-	auto snapper = 
-		[&](auto& tr, const auto typed_handle) {
-			using T = std::decay_t<decltype(tr)>;
-
-			if (const auto aabb = typed_handle.find_aabb()) {
-				snap_individual_transform(tr, *aabb, grid);
-			}
-		}
-	;
-
-	on_each_independent_transform(cosm, subjects, snapper, key);
-}
-
 static void save_old_values(
 	cosmos& cosm,
 	const moved_entities_type& subjects,
@@ -61,27 +42,6 @@ static void unmove_entities(
 		},
 		key
 	);
-}
-
-template <class T>
-void fix_pixel_imperfections(T& in) {
-	if constexpr(std::is_same_v<T, components::transform>) {
-		if (augs::to_near_90_multiple(in.rotation)) {
-			in.pos.round_fract();
-		}
-	}
-	else if constexpr(std::is_same_v<T, vec2>) {
-		in.round_fract();
-	}
-}
-
-void fix_pixel_imperfections(components::transform& in, const si_scaling si) {
-	auto degrees = RAD_TO_DEG<real32> * in.rotation;
-
-	if (augs::to_near_90_multiple(degrees)) {
-		in.pos = si.get_meters(si.get_pixels(in.pos).round_fract());
-		in.rotation = degrees * DEG_TO_RAD<real32>;
-	}
 }
 
 static void move_entities(

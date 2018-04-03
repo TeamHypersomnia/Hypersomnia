@@ -1,9 +1,10 @@
 #pragma once
+#include "augs/math/vec2.h"
 #include "augs/math/snapping_grid.h"
 #include "augs/templates/always_false.h"
 
 template <class C, class F, class M, class... K>
-static void on_each_independent_transform(
+void on_each_independent_transform(
 	C& cosm,
 	const M& subjects,
 	F&& callback,
@@ -21,16 +22,24 @@ static void on_each_independent_transform(
 	);
 }
 
-template <class T, class A>
-void snap_individual_transform(T& tr, const A aabb, snapping_grid grid) {
-	if constexpr(std::is_same_v<T, physics_engine_transforms>) {
-		//	auto new_transform = tr.get();
-	}
-	else if constexpr(std::is_same_v<T, components::transform>) {
+template <class T>
+void fix_pixel_imperfections(T& in) {
+	if constexpr(std::is_same_v<T, components::transform>) {
+		if (augs::to_near_90_multiple(in.rotation)) {
+			in.pos.round_fract();
+		}
 	}
 	else if constexpr(std::is_same_v<T, vec2>) {
-	}
-	else {
-		static_assert(always_false_v<T>, "Unknown transform type.");
+		in.round_fract();
 	}
 }
+
+inline void fix_pixel_imperfections(components::transform& in, const si_scaling si) {
+	auto degrees = RAD_TO_DEG<real32> * in.rotation;
+
+	if (augs::to_near_90_multiple(degrees)) {
+		in.pos = si.get_meters(si.get_pixels(in.pos).round_fract());
+		in.rotation = degrees * DEG_TO_RAD<real32>;
+	}
+}
+
