@@ -34,7 +34,6 @@ void editor_entity_selector::do_left_press(
 
 	if (const auto held_entity = cosm[held]) {
 		flavour_of_held = held_entity.get_flavour_id();
-		LOG_NVPS(flavour_of_held);
 	}
 
 	if (!has_ctrl) {

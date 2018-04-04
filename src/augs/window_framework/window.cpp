@@ -159,7 +159,8 @@ namespace augs {
 	}
 
 	void window::set_mouse_pos_paused(const bool flag) {
-		if (/* unpause */ mouse_pos_paused && !flag) {
+		if (mouse_pos_paused && !flag) {
+			/* Unpause */
 			set_cursor_pos(last_mouse_pos);
 		}
 

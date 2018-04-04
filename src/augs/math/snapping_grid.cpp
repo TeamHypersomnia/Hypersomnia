@@ -2,40 +2,40 @@
 #include "augs/math/snapping_grid.h"
 
 vec2 snapping_grid::get_snapping_delta(const ltrb aabb) const {
-	std::array<vec2, 4> candidate_corners;
+	std::array<vec2, 4> corner_deltas;
 
 	{
-		const auto current = aabb.left_top();
-		const auto snapped = get_snapped(current);
+		const auto current = vec2i(aabb.left_top().round_fract());
+		const auto corner = get_snapping_corner(current);
 
-		candidate_corners[0] = snapped - current;
+		corner_deltas[0] = corner - current;
 	}
 
 	{
-		const auto current = aabb.right_top();
-		const auto snapped = get_snapped(current);
+		const auto current = vec2i(aabb.right_top().round_fract());
+		const auto corner = get_snapping_corner(current);
 
-		candidate_corners[1] = snapped - current;
+		corner_deltas[1] = corner - current;
 	}
 
 	{
-		const auto current = aabb.right_bottom();
-		const auto snapped = get_snapped(current);
+		const auto current = vec2i(aabb.right_bottom().round_fract());
+		const auto corner = get_snapping_corner(current);
 
-		candidate_corners[2] = snapped - current;
+		corner_deltas[2] = corner - current;
 	}
 
 	{
-		const auto current = aabb.left_bottom();
-		const auto snapped = get_snapped(current);
+		const auto current = vec2i(aabb.left_bottom().round_fract());
+		const auto corner = get_snapping_corner(current);
 
-		candidate_corners[3] = snapped - current;
+		corner_deltas[3] = corner - current;
 	}
 
-	return minimum_of(candidate_corners);
+	return minimum_of(corner_deltas);
 }
 
-vec2i snapping_grid::get_snapped(const vec2 position) const {
+vec2i snapping_grid::get_snapping_corner(const vec2 position) const {
 	std::array<vec2i, 4> corners;
 
 	corners[0] = [this, position](){
@@ -51,14 +51,17 @@ vec2i snapping_grid::get_snapped(const vec2 position) const {
 	corners[2] = corners[0] + vec2i(unit_pixels, unit_pixels);
 	corners[3] = corners[0] + vec2i(0, unit_pixels);
 
-	const auto predicate = [position](
+	const auto rounded_position = vec2i(vec2(position).round_fract());
+
+	const auto predicate = [rounded_position](
 		const vec2i a,
 	   	const vec2i b
 	) {
-		return (vec2(a) - position) < (vec2(b) - position);
+		return (a - rounded_position) < (b - rounded_position);
 	};
 
-	return minimum_of(corners, predicate);
+	const auto closest_corner = minimum_of(corners, predicate);
+	return closest_corner;
 }
 
 int snapping_grid::get_snapped(const float degrees) const {

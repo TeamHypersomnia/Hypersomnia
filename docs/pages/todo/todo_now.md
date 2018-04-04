@@ -7,6 +7,13 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
+- Grouping & ungrouping
+	- Shift + click could always highlight&select a group
+- Editing vertices in editor
+	- a generic "unmap_entity_vertices" and "map_entity_vertices that depend on the context
+		- e.g. setting reach for wandering pixels
+		- if fixture, change shape
+
 - handle mouse glitches when letting go of moved entities or duplicated ones
 	- reset some drag/press state etc.
 
@@ -65,11 +72,6 @@ summary: Just a hidden scratchpad.
 	- switching tabs with entities should always refocus on the same kind of property
 
 - Ctrl+Home should center on the whole scene
-
-- Editing vertices in editor
-	- a generic "unmap_entity_vertices" and "map_entity_vertices that depend on the context
-		- e.g. setting reach for wandering pixels
-		- if fixture, change shape
 
 - determine what to do with b2Filters
 	- for now sensible filters will be provided by the testbed

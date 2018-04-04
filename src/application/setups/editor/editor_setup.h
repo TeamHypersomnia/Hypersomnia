@@ -161,6 +161,7 @@ class editor_setup : private current_access_cache<editor_setup> {
 	void load_gui_state();
 	void save_gui_state();
 
+	void cut_selection();
 	void delete_selection();
 
 	void mirror_selection(vec2i direction);

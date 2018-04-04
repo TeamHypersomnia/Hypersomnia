@@ -264,7 +264,7 @@ return {
     secondary_selected_color = "86 156 214 255"
   },
   interpolation = {
-    enabled = false,
+    enabled = true,
     speed = 525
   },
   launch_mode = "MAIN_MENU",

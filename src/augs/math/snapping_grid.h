@@ -31,7 +31,7 @@ struct snapping_grid {
 
 	/* transform snap(transform position) const; */
 
-	vec2i get_snapped(vec2 position) const;
+	vec2i get_snapping_corner(vec2 position) const;
 	vec2 get_snapping_delta(ltrb position) const;
 
 	int get_snapped(float degrees) const;

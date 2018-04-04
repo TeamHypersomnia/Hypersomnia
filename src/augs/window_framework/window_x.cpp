@@ -242,7 +242,7 @@ namespace augs {
 		xcb_timestamp_t& last_ldown_time_ms,
 		F mousemotion_handler,
 		G keysym_getter,
-		H character_event_from,
+		H character_event_emitter,
 		decltype(xcb_intern_atom_reply_t::atom) wm_delete_window_atom,
 		const bool log_keystrokes
 	) {
@@ -285,7 +285,7 @@ namespace augs {
 				ch.msg = message::keydown;
 				ch.data.key.key = translate_keysym({ keysym });
 
-				character_event_from(press);	
+				character_event_emitter(press);	
 				return ch;
             }
             case XCB_KEY_RELEASE: {
@@ -412,20 +412,22 @@ namespace augs {
 	}
 
 	void window::collect_entropy(local_entropy& output) {
+		{
 			// handle raw mouse input separately
-    		
-		unsigned char data[3];
 
-		while (read(raw_mouse_input_fd, data, sizeof(data)) > 0) {
-			const signed char x = data[1];
-			const signed char y = data[2];
+			unsigned char data[3];
 
-			if (is_active() && (current_settings.raw_mouse_input || mouse_pos_paused)) {
-				output.push_back(do_raw_motion({
-					static_cast<short>(x),
-					static_cast<short>(y * (-1)) 
-				}));
-			}	
+			while (read(raw_mouse_input_fd, data, sizeof(data)) > 0) {
+				const signed char x = data[1];
+				const signed char y = data[2];
+
+				if (is_active() && (current_settings.raw_mouse_input || mouse_pos_paused)) {
+					output.push_back(do_raw_motion({
+						static_cast<short>(x),
+						static_cast<short>(y * (-1)) 
+					}));
+				}	
+			}
 		}
 
 		auto keysym_getter = [this](const xcb_keycode_t keycode){
@@ -459,10 +461,14 @@ namespace augs {
 		};
 		
 		while (const auto event = freed_unique(xcb_poll_for_event(connection))) {
+			auto mousemotion_handler = [this](const basic_vec2<short> p) {
+				return handle_mousemove(p); 
+			};
+
 			if (const auto ch = handle_event(
 				event.get(), 
 				last_ldown_time_ms,
-				[this](const basic_vec2<short> p) { return handle_mousemove(p); },
+				mousemotion_handler,
 				keysym_getter,
 				character_event_emitter,
 				wm_delete_window_atom,

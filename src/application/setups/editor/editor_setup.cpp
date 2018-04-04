@@ -670,6 +670,10 @@ std::unordered_set<entity_id> editor_setup::get_all_selected_entities() const {
 	return all;
 }
 
+void editor_setup::cut_selection() {
+	delete_selection();
+}
+
 void editor_setup::delete_selection() {
 	if (anything_opened()) {
 		auto command = make_command_from_selections<delete_entities_command>("Deleted ");
@@ -1026,7 +1030,8 @@ bool editor_setup::handle_input_before_game(
 
 							if (const auto aabb_before_move = find_selection_aabb()) {
 								const auto current_aabb = *aabb_before_move + vec2(new_delta);
-								new_delta += view().grid.get_snapping_delta(current_aabb);
+								const auto snapping_delta = view().grid.get_snapping_delta(current_aabb);
+								new_delta += snapping_delta;
 							}
 						}
 
@@ -1113,6 +1118,7 @@ bool editor_setup::handle_input_before_game(
 				case key::OPEN_SQUARE_BRACKET: view().grid.decrease_grid_size(); clamp_units(); return true;
 				case key::CLOSE_SQUARE_BRACKET: view().grid.increase_grid_size(); clamp_units(); return true;
 				case key::C: duplicate_selection(); return true;
+				case key::D: cut_selection(); return true;
 				case key::DEL: delete_selection(); return true;
 				case key::T: start_moving_selection(); return true;
 				case key::R: start_rotating_selection(); return true;
