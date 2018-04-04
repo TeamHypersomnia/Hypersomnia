@@ -181,6 +181,12 @@ public:
 
 			pre_construction(new_entity);
 
+			if (const auto slot = source_entity.get_current_slot()) {
+				if (const auto source_transform = source_entity.find_logic_transform()) {
+					new_entity.set_logic_transform(*source_transform);
+				}
+			}
+
 			return new_entity;
 		});
 	}

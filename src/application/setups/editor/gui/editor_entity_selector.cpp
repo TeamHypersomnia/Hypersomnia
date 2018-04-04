@@ -4,8 +4,10 @@
 #include "game/transcendental/cosmos.h"
 
 void editor_entity_selector::clear() {
+	rectangular_drag_origin = std::nullopt;
 	in_rectangular_selection.clear();
 	hovered.unset();
+	held.unset();
 };
 
 std::optional<ltrb> editor_entity_selector::find_screen_space_rect_selection(
