@@ -8,7 +8,7 @@ namespace components {
 		vec2 center;
 		vec2 size;
 		rgba colorize = white;
-		unsigned particles_count = 20u;
+		unsigned particles_count = 0u;
 		// END GEN INTROSPECTOR
 
 		void set_reach(const xywh a) {

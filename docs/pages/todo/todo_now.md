@@ -7,11 +7,6 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
-- add lights to tree of npo
-	- just compare each against the camera, we won't have so many lights to warrant npo nodes
-
-- wandering pixels disappeared?
-
 - handle mouse glitches when letting go of moved entities or duplicated ones
 	- reset some drag/press state etc.
 

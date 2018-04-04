@@ -7,14 +7,12 @@ out vec4 outputColor;
 uniform vec2 light_pos;
 uniform vec3 light_attenuation;
 uniform vec3 multiply_color;
-uniform float max_distance;
 uniform float distance_mult;
 layout(origin_upper_left) in vec4 gl_FragCoord;
 
 void main() 
 {	
 	float light_distance = length(gl_FragCoord.xy - light_pos) * distance_mult;
-	if(light_distance > max_distance) discard;
 	vec4 final_color = theColor;
 	final_color.rgb *= multiply_color;
 

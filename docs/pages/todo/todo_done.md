@@ -472,3 +472,8 @@ we consider whole type overrides too complex architeciturally:
 	- ~~M or m would make a square from one corner~~
 		- Just use ctrl+arrows. More intuitive
 	- always aligns to aabbs
+- add lights to tree of npo
+	- just compare each against the camera, we won't have so many lights to warrant npo nodes
+
+- wandering pixels disappeared?
+

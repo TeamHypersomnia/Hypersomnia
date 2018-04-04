@@ -39,12 +39,12 @@ namespace invariants {
 		light_attenuation constant;
 		light_attenuation linear;
 		light_attenuation quadratic;
-		light_attenuation max_distance;
+		float max_distance = -1.f;
 
 		light_attenuation wall_constant;
 		light_attenuation wall_linear;
 		light_attenuation wall_quadratic;
-		light_attenuation wall_max_distance;
+		float wall_max_distance = -1.f;
 
 		std::array<light_value_variation, 2> position_variations;
 		// END GEN INTROSPECTOR
@@ -52,5 +52,10 @@ namespace invariants {
 		light();
 
 		float get_max_distance() const;
+
+		float calc_pixel_distance() const;
+		float calc_pixel_wall_distance() const;
+
+		float calc_max_pixel_distance() const;
 	};
 }

@@ -196,7 +196,7 @@ namespace test_scenes {
 						auto& w = e.template get<components::wandering_pixels>();
 
 						w.colorize = light_cyan;
-						w.particles_count = 50;
+						w.particles_count = 150;
 						w.set_reach(xywh(light_pos.x- 350, light_pos.y-350, 500, 500));
 					});
 				}
@@ -233,7 +233,7 @@ namespace test_scenes {
 						auto& w = e.template get<components::wandering_pixels>();
 
 						w.colorize = cyan;
-						w.particles_count = 20;
+						w.particles_count = 50;
 						w.set_reach(left_reach);
 					});
 				}
@@ -244,7 +244,7 @@ namespace test_scenes {
 						auto& w = e.template get<components::wandering_pixels>();
 
 						w.colorize = orange;
-						w.particles_count = 20;
+						w.particles_count = 50;
 						w.set_reach(right_reach);
 					});
 				}

@@ -90,7 +90,6 @@ void light_system::render_all_lights(const light_system_input in) const {
 	light_shader.set_as_current();
 
 	const auto light_pos_uniform = light_shader.get_uniform_location("light_pos");
-	const auto light_max_distance_uniform = light_shader.get_uniform_location("max_distance");
 	const auto light_distance_mult_uniform = light_shader.get_uniform_location("distance_mult");
 	const auto light_attenuation_uniform = light_shader.get_uniform_location("light_attenuation");
 	const auto light_multiply_color_uniform = light_shader.get_uniform_location("multiply_color");
@@ -135,7 +134,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 					request.eye_transform = light_entity.get_viewing_transform(interp);
 					request.eye_transform.pos += light_displacement;
 					request.filter = filters::line_of_sight_query();
-					request.square_side = light_entity.template get<invariants::light>().max_distance.base_value;
+					request.square_side = light_entity.template get<invariants::light>().get_max_distance();
 					request.subject = light_entity;
 
 					requests.push_back(request);
@@ -216,7 +215,6 @@ void light_system::render_all_lights(const light_system_input in) const {
 		const auto light_frag_pos = in.camera.to_screen_space(in.screen_size, world_light_pos);
 
 		light_shader.set_uniform(light_pos_uniform, light_frag_pos);
-		light_shader.set_uniform(light_max_distance_uniform, light_def.max_distance.base_value);
 		
 		light_shader.set_uniform(
 			light_attenuation_uniform,
@@ -237,8 +235,6 @@ void light_system::render_all_lights(const light_system_input in) const {
 		
 		light_shader.set_as_current();
 
-		light_shader.set_uniform(light_max_distance_uniform, light_def.wall_max_distance.base_value);
-		
 		light_shader.set_uniform(light_attenuation_uniform,
 			vec3 {
 				(cache.all_variation_values[3] + light_def.wall_constant.base_value) / CONST_MULT,
