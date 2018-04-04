@@ -461,3 +461,8 @@ we consider whole type overrides too complex architeciturally:
 		- it is only the case of GUI that some entries would appear as scoped nodes...
 			- ...and that some entries would go with each other on just a single ctrl+z/y
 - duplicate might just take ids, I guess?
+- fix epsilon deviations individually after moving a selection
+
+- move flip flags to component state and let it be drawing input?
+	- generally refactor draw entity scripts
+

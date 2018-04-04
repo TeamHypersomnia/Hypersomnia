@@ -257,7 +257,6 @@ void item_button::draw_proc(
 			}
 
 			const auto flip = gui_def.flip;
-			item_sprite.flip = flip;
 
 			item_sprite.color.a = 255;
 			//item_sprite.color.a = border_col.a;
@@ -285,8 +284,6 @@ void item_button::draw_proc(
 					if (parent_slot.is_physically_connected_until(item)) {
 						auto attachment_sprite = desc.get<invariants::sprite>();
 
-						attachment_sprite.flip = flip;
-
 						attachment_sprite.color.a = item_sprite.color.a;
 
 						auto attachment_state = invariants::sprite::drawing_input(output);
@@ -294,6 +291,7 @@ void item_button::draw_proc(
 						attachment_state.renderable_transform.pos = rc_pos + layout.boxes[attachment_index].get_center() + expansion_offset;
 						attachment_state.renderable_transform.rotation = desc.calc_connection_until_container(item)->shape_offset.rotation;
 
+						// TODO: what the hell is this flip_rotation?
 						if (flip.horizontally) {
 							attachment_state.renderable_transform.flip_rotation();
 						}
@@ -301,6 +299,8 @@ void item_button::draw_proc(
 						if (flip.vertically) {
 							attachment_state.renderable_transform.flip_rotation();
 						}
+
+						attachment_state.flip = flip;
 
 						attachment_sprite.draw(context.get_game_images(), attachment_state);
 

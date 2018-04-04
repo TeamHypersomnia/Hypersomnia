@@ -33,15 +33,12 @@ namespace augs {
 			using drawing_input_base::drawing_input_base;
 			
 			double global_time_seconds = 0.0;
-			
-			void set_global_time_seconds(const double secs) {
-				global_time_seconds = secs;
-			}
+			flip_flags flip;
 		};
 
 		sprite(
 			const id_type tex = id_type::INVALID,
-			const size_type size = vec2(),
+			const size_type size = size_type(),
 			const rgba color = white
 		) :
 			tex(tex),
@@ -87,13 +84,7 @@ namespace augs {
 		// GEN INTROSPECTOR struct augs::sprite class id_type
 		id_type tex = id_type::INVALID;
 		rgba color;
-		vec2i size;
-		vec2 center_offset;
-		float rotation_offset = 0.f;
-
-		flip_flags flip;
-		pad_bytes<2> pad;
-		
+		size_type size;
 		sprite_special_effect effect = sprite_special_effect::NONE;
 		// END GEN INTROSPECTOR
 
@@ -110,7 +101,7 @@ namespace augs {
 				make_sprite_points(
 					transform.pos, 
 					get_size(),
-					transform.rotation + rotation_offset
+					transform.rotation //+ rotation_offset
 				)
 			);
 		}
@@ -122,14 +113,9 @@ namespace augs {
 		) const {
 			ensure(tex != id_type::INVALID);
 
-			vec2 transform_pos = in.renderable_transform.pos;
-			const float final_rotation = in.renderable_transform.rotation + rotation_offset;
-
+			const auto transform_pos = in.renderable_transform.pos;
+			const auto final_rotation = in.renderable_transform.rotation; //+ rotation_offset;
 			const auto drawn_size = get_size();
-
-			if (center_offset.non_zero()) {
-				transform_pos -= vec2(center_offset).rotate(final_rotation, vec2(0, 0));
-			}
 
 			if (in.use_neon_map) {
 				const auto& maybe_neon_map = manager.at(tex).neon_map;
@@ -184,7 +170,7 @@ namespace augs {
 				considered_texture,
 				points,
 				target_color, 
-				flip 
+				in.flip 
 			);
 
 			if (effect == sprite_special_effect::COLOR_WAVE) {

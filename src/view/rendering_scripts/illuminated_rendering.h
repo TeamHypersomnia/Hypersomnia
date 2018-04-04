@@ -298,11 +298,11 @@ void illuminated_rendering(
 		cosmos.template for_each_having<components::sentience>(
 			[&](const auto it) {
 				if (const auto s = it.find_crosshair_def()) {
-					draw_renderable(
-						s->appearance,
-						{ output, game_images, global_time_seconds },
-						it.get_world_crosshair_transform(interp)
-					);
+					invariants::sprite::drawing_input in = output;
+					in.global_time_seconds = global_time_seconds;
+					in.renderable_transform = it.get_world_crosshair_transform(interp);
+
+					s->appearance.draw(game_images, in);
 				}
 			}
 		);

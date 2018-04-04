@@ -29,6 +29,17 @@ struct simple_body;
 template <class E>
 class misc_mixin {
 public:
+
+	std::optional<flip_flags> calculate_flip_flags() const {
+		const auto self = *static_cast<const E*>(this);
+
+		if (const auto sprite = self.template find<components::sprite>()) {
+			return sprite->flip;	
+		}
+
+		return std::nullopt;
+	}
+
 	auto* find_crosshair() const {
 		/* If it were other entity for some reason */
 		const auto self = *static_cast<const E*>(this);

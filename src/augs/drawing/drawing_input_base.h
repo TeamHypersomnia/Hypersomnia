@@ -14,8 +14,6 @@ struct basic_drawing_input_base {
 	basic_transform<T> renderable_transform;
 	rgba colorize = white;
 	bool use_neon_map = false;
-
-	void set_global_time_seconds(const double) {}
 };
 
 using drawing_input_base = basic_drawing_input_base<real32>;

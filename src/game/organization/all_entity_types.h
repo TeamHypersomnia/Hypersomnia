@@ -76,6 +76,7 @@ struct plain_sprited_body {
 	>;
 
 	using components = type_list<
+		components::sprite,
 		components::rigid_body,
 
 		components::interpolation
@@ -153,6 +154,7 @@ struct sprite_decoration {
 	>;
 
 	using components = type_list<
+		components::sprite,
 		components::transform
 	>;
 };

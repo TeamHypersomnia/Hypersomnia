@@ -9,3 +9,7 @@ namespace augs {
 namespace invariants {
 	using sprite = augs::sprite<assets::game_image_id>;
 }
+
+namespace components {
+	struct sprite;
+}

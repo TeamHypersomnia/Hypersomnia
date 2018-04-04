@@ -62,10 +62,6 @@ namespace augs {
 			using drawing_input_base::drawing_input_base;
 
 			double global_time_seconds = 0.0;
-
-			void set_global_time_seconds(const double secs) {
-				global_time_seconds = secs;
-			}
 		};
 
 		// The texture coordinates in vertices are in the local 0.0 - 1.0 space of the texture,
