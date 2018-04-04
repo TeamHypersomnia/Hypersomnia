@@ -105,6 +105,8 @@ void light_system::render_all_lights(const light_system_input in) const {
 	light_shader.set_projection(in.camera.get_projection_matrix(in.screen_size));
 	light_shader.set_uniform(light_distance_mult_uniform, 1.f / in.camera.zoom);
 
+	const auto camera_aabb = in.camera.get_visible_world_rect_aabb(in.screen_size);
+
 	auto draw_layer = [&](const render_layer r) {
 		for (const auto e : visible_per_layer[r]) {
 			draw_entity(cosmos[e], { output, in.game_images, global_time_seconds }, in.interpolation);
@@ -122,6 +124,10 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 		cosmos.for_each_having<components::light>(
 			[&](const auto light_entity) {
+				if (!camera_aabb.hover(*light_entity.find_aabb())) {
+					return;
+				}
+
 				if (const auto cache = mapped_or_nullptr(per_entity_cache, light_entity.get_id())) {
 					const auto light_displacement = vec2(cache->all_variation_values[6], cache->all_variation_values[7]);
 
