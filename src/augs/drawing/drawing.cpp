@@ -5,6 +5,7 @@
 #include "augs/drawing/grid_render_settings.h"
 #include "augs/texture_atlas/texture_atlas_entry.h"
 #include "augs/drawing/polygon.h"
+#include "augs/drawing/general_border.h"
 #include "augs/misc/constant_size_vector.h"
 
 namespace augs {
@@ -253,53 +254,21 @@ namespace augs {
 		return *this;
 	}
 
+
 	const drawer& drawer::border(
 		const texture_atlas_entry tex,
 		ltrb bordered,
 		const rgba color,
 		border_input in
 	) const {
-		{
-			const auto total = in.get_total_expansion();
-
-			bordered.l -= total;
-			bordered.t -= total;
-			bordered.r += total;
-			bordered.b += total;
-		}
-
-		ltrb lines[4] = {
+		augs::general_border(
 			bordered,
-			bordered,
-			bordered,
-			bordered
-		};
-
-		/*
-			Side borders reach the corners,
-			the bottom and the top borders are in-between them.
-		*/
-
-		/* Left border */
-		lines[0].r = bordered.l + in.width;
-
-		/* Top border */
-		lines[1].b = bordered.t + in.width;
-		lines[1].r -= in.width;
-		lines[1].l += in.width;
-
-		/* Right border */
-		lines[2].l = bordered.r - in.width;
-		
-		/* Bottom border */
-		lines[3].t = bordered.b - in.width;
-		lines[3].r -= in.width;
-		lines[3].l += in.width;
-
-		aabb(tex, lines[0], color);
-		aabb(tex, lines[1], color);
-		aabb(tex, lines[2], color);
-		aabb(tex, lines[3], color);
+			in.get_total_expansion(),
+			in.width,
+			[this, tex, color](const ltrb line) {
+				aabb(tex, line, color);
+			}
+		);
 
 		return *this;
 	}

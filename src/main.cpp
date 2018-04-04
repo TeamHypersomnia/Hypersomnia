@@ -1493,6 +1493,13 @@ int work(const int argc, const char* const * const argv) try {
 			};
 		};
 
+		auto get_line_drawer = [&]() { 
+			return augs::line_drawer_with_default {
+				renderer.get_line_buffer(),
+				necessary_atlas_entries[assets::necessary_image_id::BLANK]
+			};
+		};
+
 		auto get_gui_text_style = [&]() {
 			return augs::gui::text::style { get_gui_font(), cyan };
 		};
@@ -1618,11 +1625,26 @@ int work(const int argc, const char* const * const argv) try {
 
 			if (current_setup) {
 				on_specific_setup([&](editor_setup& editor) {
+					const auto cam = get_camera();
+
+					auto on_screen = [screen_size, cam](const auto p) {
+						return cam.to_screen_space(screen_size, p);
+					};
+
 					const auto drawer = get_drawer();
+					const auto line_drawer = get_line_drawer();
+
+					editor.for_each_dashed_line(
+						[&](vec2 from, vec2 to, const rgba color) {
+							line_drawer.dashed_line(on_screen(from.round_fract()), on_screen(to.round_fract()), color, 5.f, 0.f, 0.0);
+						}	
+					);
+
+					renderer.call_and_clear_lines();
 
 					editor.for_each_icon(
 						[&](const auto typed_handle, const auto image_id, const components::transform world_transform, const rgba color){
-							const auto screen_space_pos = vec2i(get_camera().to_screen_space(screen_size, world_transform.pos));
+							const auto screen_space_pos = vec2i(on_screen(world_transform.pos));
 
 							const auto aabb = xywh::center_and_size(screen_space_pos, necessary_atlas_entries[image_id].get_size());
 							const auto expanded_square = aabb.expand_to_square();

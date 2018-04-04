@@ -466,3 +466,9 @@ we consider whole type overrides too complex architeciturally:
 - move flip flags to component state and let it be drawing input?
 	- generally refactor draw entity scripts
 
+
+- flipping a selection
+	- useful for creating symmetrical levels
+	- ~~M or m would make a square from one corner~~
+		- Just use ctrl+arrows. More intuitive
+	- always aligns to aabbs

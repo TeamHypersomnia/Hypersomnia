@@ -323,7 +323,7 @@ namespace augs {
 
 		template <class... Args>
 		self dashed_line(Args&&... args) const {
-			base::line(default_texture, std::forward<Args>(args)...);
+			base::dashed_line(default_texture, std::forward<Args>(args)...);
 			return *this;
 		}
 	};

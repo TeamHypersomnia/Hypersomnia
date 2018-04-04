@@ -7,6 +7,9 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
+- add lights to tree of npo
+	- just compare each against the camera, we won't have so many lights to warrant npo nodes
+
 - wandering pixels disappeared?
 
 - handle mouse glitches when letting go of moved entities or duplicated ones
@@ -25,13 +28,6 @@ summary: Just a hidden scratchpad.
 			- paste entity flavour + paste entity command, stored, waiting to be executed!
 				- the move itself won't need to be stored
 	- cut = copy + delete
-
-- flipping a selection
-	- useful for creating symmetrical levels
-	- ~~M or m would make a square from one corner~~
-		- Just use ctrl+arrows. More intuitive
-	- always aligns to aabbs
-	- 
 
 - about grenades and changing of their shape
 	- let hand fuse invariant have an optional radius for the thrown grenade

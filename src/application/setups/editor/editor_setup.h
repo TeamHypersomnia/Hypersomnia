@@ -3,6 +3,7 @@
 #include <map>
 
 #include "augs/misc/timing/fixed_delta_timer.h"
+#include "augs/drawing/general_border.h"
 
 #include "game/assets/all_logical_assets.h"
 
@@ -315,6 +316,37 @@ public:
 	template <class F>
 	void for_each_line(F callback) const {
 
+	}
+
+	template <class F>
+	void for_each_dashed_line(F callback) const {
+		if (anything_opened()) {
+			const auto& world = work().world;
+
+			for_each_selected_entity(
+				[&](const entity_id id) {
+					const auto handle = world[id];
+
+					handle.dispatch_on_having<invariants::light>([&](const auto typed_handle) {
+						const auto max_distance = typed_handle.template get<invariants::light>().get_max_distance();
+						const auto center = typed_handle.get_logic_transform().pos;
+
+						const auto light_color = typed_handle.template get<components::light>().color;
+
+						const auto reach = vec2(max_distance, max_distance);
+						callback(center, center + reach, light_color);
+
+						augs::general_border_from_to(
+							ltrb(xywh::center_and_size(center, reach * 2)),
+							0,
+							[&](const vec2 from, const vec2 to) {
+								callback(from, to, light_color);
+							}
+						);
+					});
+				}
+			);
+		}
 	}
 
 	template <class F>
