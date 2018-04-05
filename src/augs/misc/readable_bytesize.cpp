@@ -11,5 +11,5 @@ std::string readable_bytesize(unsigned _size) {
 		i++;
 	}
 
-	return typesafe_sprintf("%x.%x %x", i, size, units[i]);
+	return typesafe_sprintf("%x %x", size, units[i]);
 }

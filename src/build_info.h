@@ -8,6 +8,8 @@
 
 #include "game/organization/for_each_entity_type.h"
 #include "game/transcendental/entity_id.h"
+#include "game/transcendental/cosmos.h"
+#include "augs/misc/readable_bytesize.h"
 
 inline auto static_allocations_info() {
 	return typesafe_sprintf(
@@ -22,8 +24,8 @@ inline auto static_allocations_info() {
 
 inline auto sizeofs_info() {
 	return typesafe_sprintf(
-		"entity_id=%x, unversioned=%x\n",
-		sizeof(entity_id), sizeof(unversioned_entity_id)
+		"cosmos=%x, entity_id=%x, unversioned=%x\n",
+		readable_bytesize(sizeof(cosmos)), sizeof(entity_id), sizeof(unversioned_entity_id)
 	);
 }
 
@@ -46,7 +48,6 @@ inline auto complete_build_info() {
 		+ sizeofs_info()
 		+ "\nAll entity types:\n"
 		+ entity_types_info()
-		+ "\n"
 	;
 }
 

@@ -7,15 +7,36 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
+- Fix what happens when too many entities are created
+	- for now let's just have many more, and throw when shit hits the fan
+		- just ensure that the author's work is saved and undoable
+			- actually it gets corrupt
+			- prevent creation of new entities?
+				- funny thing could arise, but that's perhaps the best solution that doesn't break the game fatally
+				- and the work is safe
+				- some dire consequences include no bullets possible to be shot
+				- but otherwise it should be fine
+		- now that we can have shapes in flavours let's increase the amount of components by lots
+
+- Persistence of entity ids in editor and clearing them
+	- Cases of storage:
+		- Selection
+			- Rectangular
+			- Significant
+		- Groups
+	- Cases of invalidation:
+		- **Undoing a command that introduces new entities**
+			- E.g. one that creates an entity from nothing
+			- Look for both undo_last_create and "delete_entity"
+		- Delete command
+		- Gameplay mode
+
 - Grouping & ungrouping
 	- Shift + click could always highlight&select a group
 - Editing vertices in editor
 	- a generic "unmap_entity_vertices" and "map_entity_vertices that depend on the context
 		- e.g. setting reach for wandering pixels
 		- if fixture, change shape
-
-- handle mouse glitches when letting go of moved entities or duplicated ones
-	- reset some drag/press state etc.
 
 - cutting/copying/pasting/duplicating entities
 	- duplication can happen during either moving or rotation, or just selection
@@ -55,11 +76,6 @@ summary: Just a hidden scratchpad.
 - status bar
 	- check how it works in vim
 		- changing a mode to normal clears the last message
-
-- fix characters getting typed when alt+something combos are pressed
-	- once we have combo maps, there will be a separate function to determine whether the input is to be fetched
-		- it will also return true on "character" input
-	- a separate function will actually respond to combos
 
 - Perhaps something to let us select and manipulate entities in gameplay mode?
 	- will it be useful?

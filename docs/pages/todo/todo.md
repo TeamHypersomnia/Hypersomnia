@@ -5,6 +5,14 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- handle mouse glitches when letting go of moved entities or duplicated ones
+	- reset some drag/press state etc.
+
+- fix characters getting typed when alt+something combos are pressed
+	- once we have combo maps, there will be a separate function to determine whether the input is to be fetched
+		- it will also return true on "character" input
+	- a separate function will actually respond to combos
+
 - fix concatenation of shakes
 	- shake for ms
 	- shake mult
@@ -28,10 +36,6 @@ summary: Just a hidden scratchpad.
 	- we could either set an "is_modified" flag or track it in history
 		- not much modification points for selections, so quite viable
 
-- implement some stupid simple physical logic for crosshair recoil entity
-	- so that a separate child entity is not needed
-	- maybe even copy some from b2Body
-
 - implement constrained handles and entity ids
 	- because inventory slot handle item getters should return handles that guarantee presence of an item
 	- thanks to that we can avoid problems with having many entity types and enlarging the dispatch code
@@ -54,9 +58,6 @@ summary: Just a hidden scratchpad.
 - pass display size and implement augs::get_display
 
 - editor should print "types of selected entities" and their common properties, identically as with entities/components
-
-- editor bindings:
-	- v - begin selection with arrows
 
 - cars could just hold several particle effect inputs and we would iterate cars to also perform
 	- handle cars later please

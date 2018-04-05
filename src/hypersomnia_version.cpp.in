@@ -43,7 +43,7 @@ hypersomnia_version::hypersomnia_version() :
 }
 
 std::string hypersomnia_version::get_summary() const {
-	return "Unknown revision.\nVersion file generator was excluded from build.";
+	return "Unknown revision.\nVersion file generator was excluded from build.\n";
 }
 
 #endif

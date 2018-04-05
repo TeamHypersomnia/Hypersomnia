@@ -477,3 +477,8 @@ we consider whole type overrides too complex architeciturally:
 
 - wandering pixels disappeared?
 
+- implement some stupid simple physical logic for crosshair recoil entity
+	- so that a separate child entity is not needed
+	- maybe even copy some from b2Body
+
+- fix readable bytesize, test it
