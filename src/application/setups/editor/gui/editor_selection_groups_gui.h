@@ -11,7 +11,7 @@ struct editor_selection_groups_gui {
 	// END GEN INTROSPECTOR
 
 	void open();
-	void perform(editor_command_input);
+	void perform(bool has_ctrl, editor_command_input);
 
 private:
 	unsigned currently_renaming = -1;

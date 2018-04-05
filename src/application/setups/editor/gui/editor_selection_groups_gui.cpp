@@ -26,7 +26,7 @@ bool all_found(const C1& from, const C2& in) {
 	return true;
 }
 
-void editor_selection_groups_gui::perform(editor_command_input in) {
+void editor_selection_groups_gui::perform(const bool has_ctrl, editor_command_input in) {
 	if (!show) {
 		return;
 	}
@@ -58,14 +58,28 @@ void editor_selection_groups_gui::perform(editor_command_input in) {
 
 			auto flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
 
-			if (all_found(g.entries, selected)) {
+			const bool whole_group_selected = all_found(g.entries, selected);
+
+			if (whole_group_selected) {
 				flags = flags | ImGuiTreeNodeFlags_Selected;
 			}
 
 			auto node = scoped_tree_node_ex(name.c_str(), flags);
 
 			if (ImGui::IsItemClicked()) {
-				assign_begin_end(selected, g.entries);
+				if (has_ctrl) {
+					for (const auto& e : g.entries) {
+						if (whole_group_selected) {
+							selected.erase(e);
+						}
+						else {
+							selected.emplace(e);
+						}
+					}
+				}
+				else {
+					assign_begin_end(selected, g.entries);
+				}
 			}
 
 			ImGui::NextColumn();

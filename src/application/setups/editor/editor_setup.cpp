@@ -401,7 +401,7 @@ void editor_setup::perform_custom_imgui(
 
 		common_state_gui.perform(settings, make_command_input());
 		all_entities_gui.perform(settings, nullptr, make_command_input());
-		selection_groups_gui.perform(make_command_input());
+		selection_groups_gui.perform(ImGui::GetIO().KeyCtrl, make_command_input());
 
 		const auto all_selected = [&]() -> decltype(get_all_selected_entities()) {
 			if (const auto held = selector.get_held(); held && work().world[held]) {
