@@ -12,6 +12,7 @@
 #include "game/transcendental/entity_solvable.h"
 
 #include "application/setups/editor/commands/editor_command_structs.h"
+#include "application/setups/editor/commands/change_grouping_command.h"
 
 namespace augs {
 	struct introspection_access;
@@ -33,6 +34,7 @@ struct delete_entities_command {
 	editor_command_common common;
 private:
 	per_entity_type_container<make_data_vector> deleted_entities;
+	change_grouping_command deleted_grouping;
 public:
 	std::string built_description;
 	// END GEN INTROSPECTOR
@@ -40,7 +42,7 @@ public:
 	void push_entry(const_entity_handle);
 
 	void redo(editor_command_input);
-	void undo(editor_command_input) const;
+	void undo(editor_command_input);
 
 	auto size() const {
 		return deleted_entities.size();

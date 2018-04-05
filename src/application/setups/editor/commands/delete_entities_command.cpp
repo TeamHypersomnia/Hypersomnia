@@ -19,6 +19,8 @@ void delete_entities_command::push_entry(const const_entity_handle handle) {
 
 		deleted_entities.get<vector_type>().push_back({ typed_handle.get() });
 	});
+
+	deleted_grouping.push_entry(handle.get_id());
 }
 
 bool delete_entities_command::empty() const {
@@ -26,6 +28,8 @@ bool delete_entities_command::empty() const {
 }
 
 void delete_entities_command::redo(const editor_command_input in) {
+	deleted_grouping.redo(in);
+
 	in.interrupt_tweakers();
 
 	auto& cosm = in.get_cosmos();
@@ -37,7 +41,9 @@ void delete_entities_command::redo(const editor_command_input in) {
 	});
 }
 
-void delete_entities_command::undo(const editor_command_input in) const {
+void delete_entities_command::undo(const editor_command_input in) {
+	deleted_grouping.undo(in);
+
 	auto& f = in.folder;
 	auto& cosm = in.get_cosmos();
 

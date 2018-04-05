@@ -90,7 +90,7 @@ void fill_range(Container& c, T&& val) {
 
 template <class Container, class Container2, class count_type>
 bool ranges_equal(const Container& c1, const Container2& c2, const count_type count) {
-	return std::equal(c1.begin(), c1.begin() + count, c2.begin());
+	return c1.size() >= count && c2.size() >= count && std::equal(c1.begin(), c1.begin() + count, c2.begin());
 }
 
 template <class Container, class Container2>
