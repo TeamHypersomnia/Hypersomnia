@@ -3,6 +3,10 @@
 #include "application/setups/editor/gui/find_aabb_of.h"
 #include "game/transcendental/cosmos.h"
 
+void editor_entity_selector::clear_selection_of(const entity_id id) {
+	erase_element(in_rectangular_selection.all, id);
+}
+
 void editor_entity_selector::clear() {
 	rectangular_drag_origin = std::nullopt;
 	in_rectangular_selection.clear();

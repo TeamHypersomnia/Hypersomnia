@@ -14,6 +14,8 @@ struct editor_entity_mover;
 
 class cosmos;
 
+struct entity_id;
+
 struct editor_command_input {
 	sol::state& lua;
 	editor_folder& folder;
@@ -26,4 +28,5 @@ struct editor_command_input {
 
 	void purge_selections() const;
 	void interrupt_tweakers() const;
+	void clear_selection_of(entity_id) const;
 };

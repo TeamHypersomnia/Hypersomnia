@@ -26,13 +26,14 @@ bool delete_entities_command::empty() const {
 }
 
 void delete_entities_command::redo(const editor_command_input in) {
-	in.purge_selections();
 	in.interrupt_tweakers();
 
 	auto& cosm = in.get_cosmos();
 
 	deleted_entities.for_each([&](auto& e) {
-		e.undo_delete_input = *cosmic::delete_entity(cosm[e.content.guid]);
+		const auto handle = cosm[e.content.guid];
+		in.clear_selection_of(handle.get_id());
+		e.undo_delete_input = *cosmic::delete_entity(handle);
 	});
 }
 
@@ -40,9 +41,10 @@ void delete_entities_command::undo(const editor_command_input in) const {
 	auto& f = in.folder;
 	auto& cosm = in.get_cosmos();
 
+	in.purge_selections();
+
 	{
 		auto& selections = f.view.selected_entities;
-		selections.clear();
 
 		/* 
 			NOTE: Pools should be independent, but to be theoretically pure,

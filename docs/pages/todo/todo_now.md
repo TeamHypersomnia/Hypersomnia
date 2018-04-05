@@ -33,6 +33,9 @@ summary: Just a hidden scratchpad.
 			- shouldn't this be pretty much all commands that affect entity existence?
 				- No. Redoing delete has no reason to purge selections of some other entities.
 					- Clear individually, also for the groups.
+			- problem: if, on delete, we remove an entity from the group it belongs to, the undoing of delete doesn't know what to do
+				- grouping will be tracked by history
+				- thus let the delete command just store its own "ungroup entities" command and invoke it beforehand on all entries
 		- Delete command
 		- Gameplay mode
 	- mover should be deactivated when?

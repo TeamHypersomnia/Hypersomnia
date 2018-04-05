@@ -51,6 +51,8 @@ public:
 	void unhover();
 	void finish_rectangular(target_selections_type& into);
 
+	void clear_selection_of(entity_id);
+
 	void do_left_press(
 		const cosmos& cosm,
 		bool has_ctrl,
