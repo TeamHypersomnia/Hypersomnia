@@ -17,6 +17,7 @@ struct fill_with_test_scene_command {
 	editor_command_common common;
 private:
 	std::vector<std::byte> intercosm_before_fill;
+	std::vector<std::byte> view_before_fill;
 	bool minimal = false;
 public:
 	// END GEN INTROSPECTOR
