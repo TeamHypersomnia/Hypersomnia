@@ -37,12 +37,13 @@ void editor_selection_groups_gui::perform(const bool has_ctrl, editor_command_in
 
 	auto window = scoped_window("Selection groups", &show);
 
+	thread_local ImGuiTextFilter filter;
+	filter.Draw();
+
 	ImGui::Columns(2);
 	ImGui::NextColumn();
 	ImGui::NextColumn();
 	ImGui::Separator();
-
-	auto& work = *in.folder.work;
 
 	const auto& groups = in.folder.view.selection_groups.get_groups();
 
@@ -51,9 +52,12 @@ void editor_selection_groups_gui::perform(const bool has_ctrl, editor_command_in
 
 	for (std::size_t i = 0; i < groups.size(); ++i) {
 		const auto& g = groups[i];
-		const auto& name = g.name;
 
 		if (g.entries.size() > 0) {
+			if (!filter.PassFilter(g.name.c_str())) {
+				continue;
+			}
+
 			auto name = g.name;
 
 			auto flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;

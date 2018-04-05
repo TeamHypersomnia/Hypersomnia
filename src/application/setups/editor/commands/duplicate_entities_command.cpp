@@ -76,8 +76,6 @@ void duplicate_entities_command::redo(const editor_command_input in) {
 			});
 		};
 
-		const auto& selected_entities = in.folder.view.selected_entities;
-
 		auto for_each_source_subject = [this](auto callback){ 
 			duplicated_entities.for_each([&](auto& e) {
 				callback(e.source_id);
