@@ -18,7 +18,7 @@ struct animation {
 	};
 
 	// GEN INTROSPECTOR struct animation
-	augs::constant_size_vector<animation_frame, ANIMATION_FRAME_COUNT> frames;
+	augs::constant_size_vector<animation_frame, ANIMATION_FRAME_COUNT> frames = {};
 
 	loop_type loop_mode = loop_type::REPEAT;
 	// END GEN INTROSPECTOR

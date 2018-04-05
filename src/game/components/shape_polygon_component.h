@@ -23,7 +23,7 @@ struct convex_poly_destruction_scar {
 
 struct convex_poly_destruction_data {
 	// GEN INTROSPECTOR struct convex_poly_destruction_data
-	augs::constant_size_vector<convex_poly_destruction_scar, DESTRUCTION_SCARS_COUNT> scars;
+	augs::constant_size_vector<convex_poly_destruction_scar, DESTRUCTION_SCARS_COUNT> scars = {};
 	// END GEN INTROSPECTOR
 };
 

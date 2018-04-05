@@ -39,7 +39,7 @@ struct special_physics {
 	augs::stepped_cooldown dropped_or_created_cooldown;
 	signi_entity_id during_cooldown_ignore_collision_with;
 	signi_entity_id owner_friction_ground;
-	augs::constant_size_vector<friction_connection, OWNER_FRICTION_GROUNDS_COUNT> owner_friction_grounds;
+	augs::constant_size_vector<friction_connection, OWNER_FRICTION_GROUNDS_COUNT> owner_friction_grounds = {};
 	// END GEN INTROSPECTOR
 
 	//float measured_carried_mass = 0.f;

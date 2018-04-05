@@ -28,8 +28,16 @@ summary: Just a hidden scratchpad.
 		- **Undoing a command that introduces new entities**
 			- E.g. one that creates an entity from nothing
 			- Look for both undo_last_create and "delete_entity"
+		- Commands whose undoing or redoing should automatically select affected entities
+			- Purge is justified in this case
+			- shouldn't this be pretty much all commands that affect entity existence?
+				- No. Redoing delete has no reason to purge selections of some other entities.
+					- Clear individually, also for the groups.
 		- Delete command
 		- Gameplay mode
+	- mover should be deactivated when?
+		- corner case: delete while move?
+		- should work anyway and yeah, deactivate it then
 
 - Grouping & ungrouping
 	- Shift + click could always highlight&select a group

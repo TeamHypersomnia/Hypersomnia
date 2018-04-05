@@ -78,7 +78,7 @@ namespace augs {
 						using T = std::decay_t<decltype(dummy)>;
 
 						if (type_id == index_in_list_v<T, Serialized>) {
-							T object {};
+							T object;
 							read_bytes(ar, object);
 							storage.template emplace<T>(std::move(object));
 						}
@@ -223,8 +223,8 @@ namespace augs {
 
 			if constexpr(is_associative_v<Container>) {
 				while (s--) {
-					typename Container::key_type key{};
-					typename Container::mapped_type mapped{};
+					typename Container::key_type key;
+					typename Container::mapped_type mapped;
 
 					read_bytes(ar, key);
 					read_bytes(ar, mapped);

@@ -62,8 +62,8 @@ struct plain_invisible_body {
 /* E.g. a crate, a wall, a bullet shell */
 
 struct plain_sprited_body {
-	static constexpr std::size_t statically_allocated_entities = 1500;
-	static constexpr std::size_t statically_allocated_flavours = 150;
+	static constexpr std::size_t statically_allocated_entities = 3000;
+	static constexpr std::size_t statically_allocated_flavours = 300;
 
 	using invariants = type_list<
 		invariants::rigid_body,
@@ -145,7 +145,7 @@ struct shootable_charge {
 /* E.g. neon captions like "Welcome to metropolis" */
 
 struct sprite_decoration {
-	static constexpr std::size_t statically_allocated_entities = 2000;
+	static constexpr std::size_t statically_allocated_entities = 20000;
 	static constexpr std::size_t statically_allocated_flavours = 300;
 
 	using invariants = type_list<
@@ -160,7 +160,7 @@ struct sprite_decoration {
 };
 
 struct wandering_pixels_decoration {
-	static constexpr std::size_t statically_allocated_entities = 100;
+	static constexpr std::size_t statically_allocated_entities = 2000;
 	static constexpr std::size_t statically_allocated_flavours = 20;
 
 	using invariants = type_list<
@@ -174,7 +174,7 @@ struct wandering_pixels_decoration {
 };
 
 struct static_light {
-	static constexpr std::size_t statically_allocated_entities = 200;
+	static constexpr std::size_t statically_allocated_entities = 2000;
 	static constexpr std::size_t statically_allocated_flavours = 50;
 
 	using invariants = type_list<
@@ -244,7 +244,7 @@ struct plain_missile {
 };
 
 struct finishing_trace {
-	static constexpr std::size_t statically_allocated_entities = 1500;
+	static constexpr std::size_t statically_allocated_entities = 3000;
 	static constexpr std::size_t statically_allocated_flavours = 150;
 
 	using invariants = type_list<

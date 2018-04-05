@@ -12,7 +12,7 @@ namespace std {
 	const auto& get(const type_list<Types...>& t) {
 		using type = nth_type_in_t<I, Types...>;
 
-		static const type instance;
+		static const type instance = {};
 		return instance;
 	}
 }

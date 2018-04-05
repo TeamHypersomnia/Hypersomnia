@@ -1,5 +1,4 @@
 #pragma once
-#include "augs/misc/constant_size_vector.h"
 #include "augs/misc/enum/enum_array.h"
 
 #include "game/container_sizes.h"

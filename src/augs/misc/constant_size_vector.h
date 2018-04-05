@@ -38,7 +38,7 @@ namespace augs {
 		>;
 		
 		size_type count = 0;
-		storage_type raw = storage_type();
+		storage_type raw;
 
 		auto& as_value_array() {
 			return reinterpret_cast<value_array&>(raw);
@@ -223,7 +223,7 @@ namespace augs {
 			return static_cast<std::size_t>(count);
 		}
 
-		constexpr std::size_t max_size() const {
+		static constexpr std::size_t max_size() {
 			return const_count;
 		}
 
@@ -231,7 +231,7 @@ namespace augs {
 			return size() == 0;
 		}
 
-		static constexpr std::size_t capacity() {
+		static constexpr auto capacity() {
 			return const_count;
 		}
 

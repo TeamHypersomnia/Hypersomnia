@@ -97,6 +97,6 @@ constexpr std::size_t PARTICLE_EMISSIONS_IN_EFFECT_COUNT = 4;
 
 struct particle_effect {
 	// GEN INTROSPECTOR struct particle_effect
-	augs::constant_size_vector<particles_emission, PARTICLE_EMISSIONS_IN_EFFECT_COUNT> emissions;
+	augs::constant_size_vector<particles_emission, PARTICLE_EMISSIONS_IN_EFFECT_COUNT> emissions = {};
 	// END GEN INTROSPECTOR
 };

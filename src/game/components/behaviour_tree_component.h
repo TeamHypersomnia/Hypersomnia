@@ -15,7 +15,7 @@ struct behaviour_tree_instance {
 namespace components {
 	struct behaviour_tree {
 		// GEN INTROSPECTOR struct components::behaviour_tree
-		augs::constant_size_vector<behaviour_tree_instance, CONCURRENT_TREES_COUNT> concurrent_trees;
+		augs::constant_size_vector<behaviour_tree_instance, CONCURRENT_TREES_COUNT> concurrent_trees = {};
 		// END GEN INTROSPECTOR
 	};
 }

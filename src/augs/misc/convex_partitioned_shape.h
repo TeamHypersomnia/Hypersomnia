@@ -19,7 +19,7 @@ struct basic_convex_partitioned_shape {
 	using poly_vector_type = augs::constant_size_vector<convex_poly, convex_polys_count>;
 
 	// GEN INTROSPECTOR struct basic_convex_partitioned_shape class T std::size_t convex_polys_count std::size_t convex_poly_vertex_count
-	poly_vector_type convex_polys;
+	poly_vector_type convex_polys = {};
 	// END GEN INTROSPECTOR
 
 	void make_box(const vec2 size) {

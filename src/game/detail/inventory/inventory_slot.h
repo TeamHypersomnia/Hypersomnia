@@ -4,7 +4,6 @@
 #include "game/components/transform_component.h"
 #include "augs/math/rects.h"
 
-#include "augs/misc/constant_size_vector.h"
 #include "game/container_sizes.h"
 #include "augs/pad_bytes.h"
 

@@ -4,21 +4,17 @@
 #include <utility>
 #include "augs/templates/is_std_array.h"
 
-template <typename Trait>
-struct capacity_test_detail {
-	template<int Value = Trait().capacity()>
-	static std::true_type do_call(int) { return std::true_type(); }
+template <int t>
+struct constexpr_tester {};
 
-	static std::false_type do_call(...) { return std::false_type(); }
-
-	static auto call() { return do_call(0); }
-};
-
-template <typename Trait>
-struct capacity_test : decltype(capacity_test_detail<Trait>::call()) {};
+template <class T, class = void>
+struct has_constexpr_capacity : std::false_type {};
 
 template <class T>
-constexpr bool is_constexpr_capacity_v = capacity_test<T>::value;
+struct has_constexpr_capacity<T, decltype(constexpr_tester<T::capacity()>(), void())> : std::true_type {};
+
+template <class T>
+constexpr bool has_constexpr_capacity_v = has_constexpr_capacity<T>::value;
 
 
 template <class T, class = void>

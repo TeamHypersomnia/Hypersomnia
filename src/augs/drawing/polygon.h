@@ -69,7 +69,7 @@ namespace augs {
 		// so there is no need to exclude them from the significant state.
 
 		// GEN INTROSPECTOR struct augs::polygon std::size_t vertex_count std::size_t index_count
-		constant_size_vector<vertex, vertex_count> vertices;
+		constant_size_vector<vertex, vertex_count> vertices = {};
 		constant_size_vector<unsigned, index_count> triangulation_indices = {};
 		// END GEN INTROSPECTOR
 

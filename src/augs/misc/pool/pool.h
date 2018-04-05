@@ -29,7 +29,7 @@ namespace augs {
 		friend struct introspection_access;
 
 		using object_pool_type = make_container_type<mapped_type>;
-		static constexpr bool constexpr_capacity = is_constexpr_capacity_v<object_pool_type>;
+		static constexpr bool constexpr_capacity = has_constexpr_capacity_v<object_pool_type>;
 
 		// GEN INTROSPECTOR class augs::pool class mapped_type template<class>class C class size_type
 		make_container_type<pool_slot_type> slots;
@@ -61,7 +61,7 @@ namespace augs {
 	public:
 		pool(const size_type slot_count = 0u) {
 			if constexpr(constexpr_capacity) {
-				reserve(object_pool_type::capacity());
+				reserve(objects.capacity());
 			}
 			else {
 				reserve(slot_count);

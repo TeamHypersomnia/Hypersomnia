@@ -25,7 +25,7 @@ namespace components {
 namespace invariants {
 	struct wandering_pixels {
 		// GEN INTROSPECTOR struct invariants::wandering_pixels
-		augs::constant_size_vector<invariants::sprite, 10> frames;
+		augs::constant_size_vector<invariants::sprite, 10> frames = {};
 		float frame_duration_ms = 300.f;
 		// END GEN INTROSPECTOR
 

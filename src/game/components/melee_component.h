@@ -4,7 +4,6 @@
 #include "game/enums/melee_state.h"
 
 #include "game/container_sizes.h"
-#include "augs/misc/constant_size_vector.h"
 #include "augs/pad_bytes.h"
 
 namespace components {

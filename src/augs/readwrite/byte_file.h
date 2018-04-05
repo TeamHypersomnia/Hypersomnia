@@ -47,8 +47,8 @@ namespace augs {
 		auto source = open_binary_input_stream(path);
 
 		while (source.peek() != EOF) {
-			typename ContainerType::key_type key{};
-			typename ContainerType::mapped_type value{};
+			typename ContainerType::key_type key;
+			typename ContainerType::mapped_type value;
 
 			augs::read_bytes(source, key);
 			augs::read_bytes(source, value);

@@ -24,6 +24,8 @@
 
 #include "3rdparty/imgui/imgui.h"
 
+static_assert(augs::constant_size_vector_base<int, 20>::capacity(), "Trait has failed");
+
 void validate_entity_types() {
 	for_each_through_std_get(
 		all_entity_types(), 
@@ -65,21 +67,14 @@ void validate_entity_types() {
 template <class A, class B>
 constexpr bool same = std::is_same_v<A, B>;
 
-template <typename Trait>
-struct size_test_detail {
-	template<int Value = Trait().size()>
-	static std::true_type do_call(int) { return std::true_type(); }
-
-	static std::false_type do_call(...) { return std::false_type(); }
-
-	static auto call() { return do_call(0); }
-};
-
-template <typename Trait>
-struct size_test : decltype(size_test_detail<Trait>::call()) {};
+template <class T, class = void>
+struct has_constexpr_size : std::false_type {};
 
 template <class T>
-constexpr bool is_constexpr_size_v = size_test<T>::value;
+struct has_constexpr_size<T, decltype(constexpr_tester<T().size()>(), void())> : std::true_type {};
+
+template <class T>
+constexpr bool has_constexpr_size_v = has_constexpr_size<T>::value;
 
 namespace templates_detail {
 	template <class T>
@@ -226,13 +221,13 @@ struct tests_of_traits {
 	static_assert(count_occurences_in_list_v<int, std::tuple<int, double, float>> == 1, "Trait has failed");
 	static_assert(count_occurences_in_list_v<int, std::tuple<int, double, float, int>> == 2, "Trait has failed");
 
-	static_assert(!is_constexpr_size_v<std::vector<int>>, "Trait has failed");
-	static_assert(is_constexpr_size_v<std::array<int, 3>>, "Trait has failed");
-	static_assert(is_constexpr_size_v<std::array<vec2, 3>>, "Trait has failed");
-	static_assert(is_constexpr_size_v<decltype(pad_bytes<3>::pad)>, "Trait has failed");
+	static_assert(!has_constexpr_size_v<std::vector<int>>, "Trait has failed");
+	static_assert(has_constexpr_size_v<std::array<int, 3>>, "Trait has failed");
+	static_assert(has_constexpr_size_v<std::array<vec2, 3>>, "Trait has failed");
+	static_assert(has_constexpr_size_v<decltype(pad_bytes<3>::pad)>, "Trait has failed");
 
-	static_assert(is_constexpr_capacity_v<augs::constant_size_vector<int, 20>>, "Trait has failed");
-	static_assert(!is_constexpr_capacity_v<std::vector<int>>, "Trait has failed");
+	static_assert(has_constexpr_capacity_v<augs::constant_size_vector<int, 20>>, "Trait has failed");
+	static_assert(!has_constexpr_capacity_v<std::vector<int>>, "Trait has failed");
 
 	static_assert(!is_container_v<decltype(pad_bytes<3>::pad)>, "Trait has failed");
 	static_assert(is_container_v<augs::enum_map<game_intent_type, vec2>>, "Trait has failed");

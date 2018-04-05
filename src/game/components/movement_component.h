@@ -1,6 +1,5 @@
 #pragma once
 #include "game/container_sizes.h"
-#include "augs/misc/constant_size_vector.h"
 
 #include "augs/math/vec2.h"
 #include "game/transcendental/entity_id.h"
