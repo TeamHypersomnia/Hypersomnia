@@ -12,7 +12,7 @@ class cosmos;
 struct editor_go_to_settings;
 struct editor_view;
 
-struct editor_go_to_entity_gui {
+class editor_go_to_entity_gui {
 	bool show = false;
 	std::string textbox_data;
 
@@ -20,7 +20,8 @@ struct editor_go_to_entity_gui {
 	unsigned selected_index = 0;
 	std::vector<entity_guid> matches;
 
-	void init();
+public:
+	void open();
 
 	std::optional<const_entity_handle> perform(
 		const editor_go_to_settings& settings,

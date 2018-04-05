@@ -76,11 +76,13 @@ struct change_entity_property_command : change_property_command<change_entity_pr
 		return affected_entities.size();
 	}
 
-	template <class C, class F>
+	template <class T, class F>
 	void access_each_property(
-		C& cosm,
+		T in,
 		F&& callback
 	) const {
+		auto& cosm = in.get_cosmos();
+
 		if (property_id.access(cosm, type_id, affected_entities, std::forward<F>(callback))) {
 			cosmic::reinfer_all_entities(cosm);
 		}

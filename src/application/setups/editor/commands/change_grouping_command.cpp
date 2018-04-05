@@ -33,7 +33,7 @@ void change_grouping_command::redo(const editor_command_input in) {
 	ensure_eq(group_indices_before.size(), affected_entities.size());
 
 	if (create_new_group) {
-		assign_begin_end(groups.new_group(), affected_entities);
+		assign_begin_end(groups.new_group().entries, affected_entities);
 	}
 }
 

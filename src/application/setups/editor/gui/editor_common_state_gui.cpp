@@ -100,7 +100,7 @@ void editor_common_state_gui::perform(const editor_settings& settings, const edi
 
 	ImGui::SetNextWindowSize(ImVec2(350,560), ImGuiCond_FirstUseEver);
 
-	auto entities = scoped_window("Common state", &show);
+	auto window = scoped_window("Common state", &show);
 	auto& work = *in.folder.work;
 	auto& cosm = work.world;
 

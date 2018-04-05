@@ -95,5 +95,5 @@ bool ranges_equal(const Container& c1, const Container2& c2, const count_type co
 
 template <class Container, class Container2>
 bool ranges_equal(const Container& c1, const Container2& c2) {
-	return std::equal(c1.begin(), c1.end(), c2.begin());
+	return c1.size() == c2.size() && std::equal(c1.begin(), c1.end(), c2.begin());
 }

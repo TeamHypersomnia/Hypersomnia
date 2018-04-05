@@ -21,11 +21,13 @@ struct change_common_state_command : change_property_command<change_common_state
 		return 1u;
 	}
 
-	template <class C, class F>
+	template <class T, class F>
 	void access_each_property(
-		C& cosm,
+		T in,
 		F callback
 	) const {
+		auto& cosm = in.get_cosmos();
+
 		cosm.change_common_significant([&](auto& common_signi) {
 			on_field_address(
 				common_signi,

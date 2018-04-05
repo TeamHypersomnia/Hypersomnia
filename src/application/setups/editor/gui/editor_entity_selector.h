@@ -62,7 +62,8 @@ public:
 	void do_left_release(
 		bool has_ctrl,
 		current_selections_type&,
-		const editor_selection_groups& groups
+		const editor_selection_groups& groups,
+		bool ignore_groups
 	);
 
 	auto get_held() const {
@@ -119,7 +120,8 @@ public:
 		const editor_entity_selector_settings& settings,
 		entity_id id, 
 		const current_selections_type& signi_selections,
-		const editor_selection_groups& groups
+		const editor_selection_groups& groups,
+		bool ignore_groups
 	) const;
 
 	template <class F>
@@ -128,7 +130,8 @@ public:
 		const editor_entity_selector_settings& settings,
 		const cosmos& cosm,
 		const current_selections_type& signi_selections,
-		const editor_selection_groups& groups
+		const editor_selection_groups& groups,
+		const bool ignore_groups
 	) const {
 		for_each_selected_entity(
 			[&](const auto e) {
@@ -140,21 +143,25 @@ public:
 		if (cosm[held]) {
 			callback(held, settings.held_color);
 
-			groups.on_group_entry_of(held, [&](auto, const auto& group, auto) {
-				for (const auto& sibling : group) {
-					callback(sibling, settings.held_color);
-				}
-			});
+			if (!ignore_groups) {
+				groups.on_group_entry_of(held, [&](auto, const auto& group, auto) {
+					for (const auto& sibling : group) {
+						callback(sibling, settings.held_color);
+					}
+				});
+			}
 		}
 
 		if (cosm[hovered]) {
 			callback(hovered, settings.hovered_color);
 
-			groups.on_group_entry_of(hovered, [&](auto, const auto& group, auto) {
-				for (const auto& sibling : group) {
-					callback(sibling, settings.hovered_color);
-				}
-			});
+			if (!ignore_groups) {
+				groups.on_group_entry_of(hovered, [&](auto, const auto& group, auto) {
+					for (const auto& sibling : group) {
+						callback(sibling, settings.hovered_color);
+					}
+				});
+			}
 		}
 	}
 };

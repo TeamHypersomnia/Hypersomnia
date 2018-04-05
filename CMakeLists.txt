@@ -561,6 +561,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/application/setups/editor/commands/duplicate_entities_command.cpp"
 	"src/application/setups/editor/commands/change_grouping_command.cpp"
 	"src/application/setups/editor/editor_selection_groups.cpp"
+	"src/application/setups/editor/gui/editor_selection_groups_gui.cpp"
 )
 
 if(BUILD_WINDOW_FRAMEWORK)

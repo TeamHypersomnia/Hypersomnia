@@ -67,17 +67,23 @@ void editor_entity_selector::finish_rectangular(current_selections_type& into) {
 void editor_entity_selector::do_left_release(
 	const bool has_ctrl,
 	current_selections_type& selections,
-	const editor_selection_groups& groups
+	const editor_selection_groups& groups,
+	const bool ignore_groups
 ) {
 	if (const auto clicked = held) {
-		selection_group_type clicked_subjects;
+		selection_group_entries clicked_subjects;
 
-		auto find_belonging_group = [&](auto, const auto& group, auto) {
-			clicked_subjects = group;	
-		};
-
-		if (!groups.on_group_entry_of(held, find_belonging_group)) {
+		if (ignore_groups) {
 			clicked_subjects = { clicked };
+		}
+		else {
+			auto find_belonging_group = [&](auto, const auto& group, auto) {
+				clicked_subjects = group;	
+			};
+
+			if (!groups.on_group_entry_of(held, find_belonging_group)) {
+				clicked_subjects = { clicked };
+			}
 		}
 
 		if (has_ctrl) {
@@ -266,24 +272,27 @@ std::optional<rgba> editor_entity_selector::find_highlight_color_of(
 	const editor_entity_selector_settings& settings,
 	const entity_id id, 
 	const current_selections_type& signi_selections,
-	const editor_selection_groups& groups
+	const editor_selection_groups& groups,
+	const bool ignore_groups
 ) const {
-	auto held_or_hovered = [&groups, id](auto& checked, const auto result_col) -> std::optional<rgba> {
+	auto held_or_hovered = [ignore_groups, &groups, id](auto& checked, const auto result_col) -> std::optional<rgba> {
 		if (checked) {
 			if (checked == id) {
 				return result_col;
 			}
 
-			bool found = false;
+			if (!ignore_groups) {
+				bool found = false;
 
-			groups.on_group_entry_of(checked, [id, &found](auto, const auto& group, auto) {	
-				if (found_in(group, id)) {
-					found = true;
+				groups.on_group_entry_of(checked, [id, &found](auto, const auto& group, auto) {	
+					if (found_in(group, id)) {
+						found = true;
+					}
+				});
+
+				if (found) {
+					return result_col;
 				}
-			});
-
-			if (found) {
-				return result_col;
 			}
 		}
 

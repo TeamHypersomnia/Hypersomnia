@@ -5,6 +5,11 @@ void editor_view::toggle_grid() {
 	f = !f;
 }
 
+void editor_view::toggle_ignore_groups() {
+	auto& f = ignore_groups;
+	f = !f;
+}
+
 void editor_view::toggle_snapping() {
 	auto& f = snapping_enabled;
 	f = !f;

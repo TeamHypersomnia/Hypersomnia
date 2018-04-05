@@ -18,7 +18,7 @@ const_entity_handle editor_go_to_entity_gui::get_matching_go_to_entity(const cos
 	return cosm[entity_id()];
 }
 
-void editor_go_to_entity_gui::init() {
+void editor_go_to_entity_gui::open() {
 	show = true;
 	textbox_data.clear();
 	matches.clear();

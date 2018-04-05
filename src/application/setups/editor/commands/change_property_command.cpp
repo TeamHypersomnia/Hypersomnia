@@ -7,6 +7,7 @@
 #include "application/setups/editor/commands/change_entity_property_command.h"
 #include "application/setups/editor/commands/change_flavour_property_command.h"
 #include "application/setups/editor/commands/change_common_state_command.h"
+#include "application/setups/editor/commands/change_grouping_command.h"
 #include "application/setups/editor/commands/change_property_command.h"
 
 #include "augs/readwrite/byte_readwrite.h"
@@ -22,7 +23,6 @@ void change_property_command<D>::rewrite_change(
 	const editor_command_input in
 ) {
 	auto& self = *static_cast<D*>(this);
-	auto& cosm = in.get_cosmos();
 
 	common.reset_timestamp();
 
@@ -34,7 +34,7 @@ void change_property_command<D>::rewrite_change(
 	ensure(value_after_change.empty());
 
 	self.access_each_property(
-		cosm,
+		in,
 		[&](auto& field) {
 			augs::from_bytes(new_value, field);
 			return callback_result::CONTINUE;
@@ -66,7 +66,6 @@ static void read_object_or_trivial_marker(M& from, T& to, const std::size_t byte
 
 template <class D>
 void change_property_command<D>::redo(const editor_command_input in) {
-	auto& cosm = in.get_cosmos();
 	auto& self = *static_cast<D*>(this);
 
 	ensure(values_before_change.empty());
@@ -77,7 +76,7 @@ void change_property_command<D>::redo(const editor_command_input in) {
 	auto after_change_data = augs::cref_memory_stream(value_after_change);
 
 	self.access_each_property(
-		cosm,
+		in,
 		[&](auto& field) {
 			write_object_or_trivial_marker(before_change_data, field, trivial_element_size);
 
@@ -92,7 +91,6 @@ void change_property_command<D>::redo(const editor_command_input in) {
 
 template <class D>
 void change_property_command<D>::undo(const editor_command_input in) {
-	auto& cosm = in.get_cosmos();
 	auto& self = *static_cast<D*>(this);
 
 	bool read_once = true;
@@ -105,7 +103,7 @@ void change_property_command<D>::undo(const editor_command_input in) {
 	auto after_change_data = augs::ref_memory_stream(value_after_change);
 
 	self.access_each_property(
-		cosm,
+		in,
 		[&](auto& field) {
 			if (read_once) {
 				write_object_or_trivial_marker(after_change_data, field, trivial_element_size); 
@@ -123,3 +121,4 @@ void change_property_command<D>::undo(const editor_command_input in) {
 template class change_property_command<change_flavour_property_command>;
 template class change_property_command<change_entity_property_command>;
 template class change_property_command<change_common_state_command>;
+template class change_property_command<change_group_property_command>;

@@ -27,6 +27,7 @@ struct editor_view {
 	snapping_grid grid;
 	bool show_grid = true;
 	bool snapping_enabled = true;
+	bool ignore_groups = false;
 	editor_rect_select_type rect_select_mode = editor_rect_select_type::EVERYTHING;
 
 	editor_selection_groups selection_groups;
@@ -40,6 +41,7 @@ struct editor_view {
 	void center_at(vec2);
 
 	void toggle_snapping();
+	void toggle_ignore_groups();
 	void toggle_grid();
 	void toggle_flavour_rect_selection();
 };

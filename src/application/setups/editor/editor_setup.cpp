@@ -359,8 +359,13 @@ void editor_setup::perform_custom_imgui(
 					if (item_if_tabs("Summary")) {
 						show_summary = true;
 					}
+
 					if (item_if_tabs("Player")) {
 						player.show = true;
+					}
+
+					if (item_if_tabs("Selection groups")) {
+						selection_groups_gui.open();
 					}
 
 					ImGui::Separator();
@@ -396,6 +401,7 @@ void editor_setup::perform_custom_imgui(
 
 		common_state_gui.perform(settings, make_command_input());
 		all_entities_gui.perform(settings, nullptr, make_command_input());
+		selection_groups_gui.perform(make_command_input());
 
 		const auto all_selected = [&]() -> decltype(get_all_selected_entities()) {
 			if (const auto held = selector.get_held(); held && work().world[held]) {
@@ -467,6 +473,13 @@ void editor_setup::perform_custom_imgui(
 			);
 
 			text("Rect select mode: %x", format_enum(view().rect_select_mode));
+
+			if (view().ignore_groups) {
+				text("Groups disabled");
+			}
+			else {
+				text("Groups enabled");
+			}
 
 			ImGui::Separator();
 
@@ -782,7 +795,7 @@ void editor_setup::go_to_all() {
 }
 
 void editor_setup::go_to_entity() {
-	go_to_entity_gui.init();
+	go_to_entity_gui.open();
 }
 
 void editor_setup::reveal_in_explorer(const augs::window& owner) {
@@ -911,6 +924,7 @@ bool editor_setup::handle_input_before_imgui(
 				case key::H: history_gui.open(); return true;
 				case key::S: selected_entities_gui.open(); return true;
 				case key::C: common_state_gui.open(); return true;
+				case key::G: selection_groups_gui.open(); return true;
 				case key::P: player.show = true; return true;
 				case key::U: show_summary = true; return true;
 				default: break;
@@ -1097,7 +1111,7 @@ bool editor_setup::handle_input_before_game(
 				return true;
 			}
 			else if (e.was_released(key::LMOUSE)) {
-				selector.do_left_release(has_ctrl, selections, view().selection_groups);
+				selector.do_left_release(has_ctrl, selections, view().selection_groups, view().ignore_groups);
 			}
 		}
 
@@ -1134,6 +1148,7 @@ bool editor_setup::handle_input_before_game(
 						set_locally_viewed(*view().selected_entities.begin()); 
 					}
 					return true;
+				case key::A: view().toggle_ignore_groups(); return true;
 				case key::Z: center_view_at_selection(); if (has_shift) { view().reset_zoom(); } return true;
 				case key::I: play(); return true;
 				case key::F: view().toggle_flavour_rect_selection(); return true;
@@ -1185,7 +1200,13 @@ std::optional<ltrb> editor_setup::find_selection_aabb() const {
 
 std::optional<rgba> editor_setup::find_highlight_color_of(const entity_id id) const {
 	if (anything_opened() && player.paused) {
-		return selector.find_highlight_color_of(settings.entity_selector, id, view().selected_entities, view().selection_groups);
+		return selector.find_highlight_color_of(
+			settings.entity_selector,
+			id,
+			view().selected_entities,
+			view().selection_groups,
+			view().ignore_groups
+		);
 	}
 
 	return std::nullopt;

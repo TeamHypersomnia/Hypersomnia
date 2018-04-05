@@ -77,11 +77,13 @@ struct change_flavour_property_command : change_property_command<change_flavour_
 		return affected_flavours.size();
 	}
 
-	template <class C, class F>
+	template <class T, class F>
 	void access_each_property(
-		C& cosm,
+		T in,
 		F&& callback
 	) const {
+		auto& cosm = in.get_cosmos();
+
 		if (property_id.access(cosm, type_id, affected_flavours, std::forward<F>(callback))) {
 			cosm.change_common_significant([&](auto& common_signi) { return changer_callback_result::REFRESH; });
 		}

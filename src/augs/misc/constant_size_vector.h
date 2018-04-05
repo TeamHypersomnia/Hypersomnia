@@ -341,6 +341,6 @@ namespace augs {
 		const constant_size_vector<T, C>& a,
 		const constant_size_vector<T, C>& b
 	) {
-		return a.size() == b.size() && ranges_equal(a, b, a.size());
+		return ranges_equal(a, b);
 	}
 }

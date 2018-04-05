@@ -41,6 +41,7 @@
 #include "application/setups/editor/gui/editor_go_to_gui.h"
 #include "application/setups/editor/gui/editor_all_entities_gui.h"
 #include "application/setups/editor/gui/editor_common_state_gui.h"
+#include "application/setups/editor/gui/editor_selection_groups_gui.h"
 
 #include "application/setups/editor/detail/current_access_cache.h"
 #include "application/setups/editor/detail/make_command_from_selections.h"
@@ -83,6 +84,7 @@ class editor_setup : private current_access_cache<editor_setup> {
 	editor_all_entities_gui all_entities_gui = std::string("All entities");
 	editor_all_entities_gui selected_entities_gui = std::string("Selected entities");
 	editor_common_state_gui common_state_gui;
+	editor_selection_groups_gui selection_groups_gui;
 	// END GEN INTROSPECTOR
 
 	std::optional<editor_popup> ok_only_popup;
@@ -386,7 +388,8 @@ public:
 				settings.entity_selector,
 				world,
 				view().selected_entities,
-				view().selection_groups
+				view().selection_groups,
+				view().ignore_groups
 			);
 
 			if (const auto match = get_matching_go_to_entity()) {
