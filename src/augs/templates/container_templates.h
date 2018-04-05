@@ -2,6 +2,19 @@
 #include <algorithm>
 #include "augs/templates/container_traits.h"
 
+template <class C1, class C2>
+void assign_begin_end(C1& to, const C2& from) {
+	if constexpr(std::is_same_v<C1, C2>) {
+		to = from;
+	}
+	else if constexpr(has_suitable_member_assign_v<C1, C2>) {
+		to.assign(from.begin(), from.end());
+	}
+	else {
+		to = { from.begin(), from.end() };
+	}
+}
+
 template <class Container, class F>
 void erase_if(Container& v, F f) {
 	if constexpr(can_access_data_v<Container>) {

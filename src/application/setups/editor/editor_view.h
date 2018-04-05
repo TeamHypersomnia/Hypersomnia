@@ -6,8 +6,11 @@
 #include "augs/math/camera_cone.h"
 #include "augs/math/snapping_grid.h"
 
+#include "augs/templates/container_templates.h"
+
 #include "game/transcendental/entity_id.h"
 
+#include "application/setups/editor/editor_selection_groups.h"
 #include "application/setups/editor/gui/editor_rect_select_type.h"
 
 struct editor_folder_meta {
@@ -15,6 +18,8 @@ struct editor_folder_meta {
 	augs::date_time timestamp;
 	// END GEN INTROSPECTOR
 };
+
+using current_selections_type = std::unordered_set<entity_id>;
 
 struct editor_view {
 	// GEN INTROSPECTOR struct editor_view
@@ -24,7 +29,9 @@ struct editor_view {
 	bool snapping_enabled = true;
 	editor_rect_select_type rect_select_mode = editor_rect_select_type::EVERYTHING;
 
-	std::unordered_set<entity_id> selected_entities;
+	editor_selection_groups selection_groups;
+	current_selections_type selected_entities;
+
 	std::optional<camera_cone> panned_camera;
 	// END GEN INTROSPECTOR
 

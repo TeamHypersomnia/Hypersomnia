@@ -13,6 +13,7 @@ struct change_common_state_command;
 struct move_entities_command;
 struct paste_entities_command;
 struct duplicate_entities_command;
+struct change_grouping_command;
 
 using editor_history_base = augs::history_with_marks<
 	delete_entities_command,
@@ -22,5 +23,6 @@ using editor_history_base = augs::history_with_marks<
 	change_common_state_command,
 	move_entities_command,
 	paste_entities_command,
-	duplicate_entities_command
+	duplicate_entities_command,
+	change_grouping_command
 >;

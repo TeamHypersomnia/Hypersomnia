@@ -4,8 +4,6 @@
 
 #include "augs/templates/type_mod_templates.h"
 
-#include "augs/misc/pool/pool_structs.h"
-
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/transcendental/entity_id_declaration.h"
 #include "game/transcendental/entity_type_templates.h"

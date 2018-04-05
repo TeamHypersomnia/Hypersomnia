@@ -65,6 +65,14 @@ struct has_begin_and_end : std::false_type {};
 template <class T>
 struct has_begin_and_end<T, decltype(std::declval<T&>().begin(), std::declval<T&>().end(), void())> : std::true_type {};
 
+
+template <class A, class B, class = void>
+struct has_suitable_member_assign : std::false_type {};
+
+template <class A, class B>
+struct has_suitable_member_assign<A, B, decltype(std::declval<A&>().assign(std::declval<B&>().begin(), std::declval<B&>().end()), void())> : std::true_type {};
+
+
 template <class T>
 constexpr bool can_access_data_v = can_access_data<T>::value;
 
@@ -85,3 +93,6 @@ constexpr bool is_associative_v = is_associative<T>::value;
 
 template <class T>
 constexpr bool is_container_v = has_begin_and_end<T>::value && !is_std_array_v<T>;
+
+template <class A, class B>
+constexpr bool has_suitable_member_assign_v = has_suitable_member_assign<A, B>::value;

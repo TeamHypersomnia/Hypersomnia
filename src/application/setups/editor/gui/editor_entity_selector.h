@@ -11,8 +11,9 @@
 #include "view/necessary_image_id.h"
 #include "view/necessary_resources.h"
 
+#include "application/setups/editor/editor_selection_groups.h"
 #include "application/setups/editor/editor_settings.h"
-#include "application/setups/editor/gui/editor_rect_select_type.h"
+#include "application/setups/editor/editor_view.h"
 
 template <class F>
 void for_each_iconed_entity(const cosmos& cosm, F callback) {
@@ -36,8 +37,6 @@ void for_each_iconed_entity(const cosmos& cosm, F callback) {
 }
 
 class editor_entity_selector {
-	using target_selections_type = std::unordered_set<entity_id>;
-
 	entity_id hovered;
 	entity_id held;
 	vec2 last_ldown_position;
@@ -49,7 +48,7 @@ class editor_entity_selector {
 public:
 	void clear();
 	void unhover();
-	void finish_rectangular(target_selections_type& into);
+	void finish_rectangular(current_selections_type& into);
 
 	void clear_selection_of(entity_id);
 
@@ -57,12 +56,13 @@ public:
 		const cosmos& cosm,
 		bool has_ctrl,
 		vec2i world_cursor_pos,
-		target_selections_type&
+		current_selections_type&
 	);
 
 	void do_left_release(
 		bool has_ctrl,
-		target_selections_type&
+		current_selections_type&,
+		const editor_selection_groups& groups
 	);
 
 	auto get_held() const {
@@ -95,7 +95,7 @@ public:
 	template <class F>
 	void for_each_selected_entity(
 		F callback,
-	   	const target_selections_type& signi_selections
+	   	const current_selections_type& signi_selections
 	) const {
 		for (const auto e : signi_selections) {
 			if (!found_in(in_rectangular_selection.all, e)) {
@@ -112,13 +112,14 @@ public:
 
 	std::optional<ltrb> find_selection_aabb(
 		const cosmos& cosm,
-		const target_selections_type& signi_selections
+		const current_selections_type& signi_selections
 	) const;
 
 	std::optional<rgba> find_highlight_color_of(
 		const editor_entity_selector_settings& settings,
 		entity_id id, 
-		const target_selections_type& signi_selections
+		const current_selections_type& signi_selections,
+		const editor_selection_groups& groups
 	) const;
 
 	template <class F>
@@ -126,7 +127,8 @@ public:
 		F callback,
 		const editor_entity_selector_settings& settings,
 		const cosmos& cosm,
-		const target_selections_type& signi_selections
+		const current_selections_type& signi_selections,
+		const editor_selection_groups& groups
 	) const {
 		for_each_selected_entity(
 			[&](const auto e) {
@@ -137,10 +139,22 @@ public:
 
 		if (cosm[held]) {
 			callback(held, settings.held_color);
+
+			groups.on_group_entry_of(held, [&](auto, const auto& group, auto) {
+				for (const auto& sibling : group) {
+					callback(sibling, settings.held_color);
+				}
+			});
 		}
 
 		if (cosm[hovered]) {
 			callback(hovered, settings.hovered_color);
+
+			groups.on_group_entry_of(hovered, [&](auto, const auto& group, auto) {
+				for (const auto& sibling : group) {
+					callback(sibling, settings.hovered_color);
+				}
+			});
 		}
 	}
 };

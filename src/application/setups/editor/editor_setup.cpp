@@ -742,6 +742,27 @@ void editor_setup::start_rotating_selection() {
 	}
 }
 
+void editor_setup::group_selection() {
+	if (anything_opened()) {
+		auto command = make_command_from_selections<change_grouping_command>("Grouped ");
+
+		if (!command.empty()) {
+			command.create_new_group = true;
+			folder().history.execute_new(std::move(command), make_command_input());
+		}
+	}
+}
+
+void editor_setup::ungroup_selection() {
+	if (anything_opened()) {
+		auto command = make_command_from_selections<change_grouping_command>("Ungrouped ");
+
+		if (!command.empty()) {
+			folder().history.execute_new(std::move(command), make_command_input());
+		}
+	}
+}
+
 void editor_setup::make_last_command_a_child() {
 	if (anything_opened()) {
 		std::visit([](auto& command) { command.common.has_parent = true; }, folder().history.last_command());
@@ -1076,7 +1097,7 @@ bool editor_setup::handle_input_before_game(
 				return true;
 			}
 			else if (e.was_released(key::LMOUSE)) {
-				selector.do_left_release(has_ctrl, selections);
+				selector.do_left_release(has_ctrl, selections, view().selection_groups);
 			}
 		}
 
@@ -1098,6 +1119,9 @@ bool editor_setup::handle_input_before_game(
 					case key::C: copy(); return true;
 					case key::X: cut(); return true;
 					case key::V: paste(); return true;
+
+					case key::G: group_selection(); return true;
+					case key::U: ungroup_selection(); return true;
 					default: break;
 				}
 			}
@@ -1161,7 +1185,7 @@ std::optional<ltrb> editor_setup::find_selection_aabb() const {
 
 std::optional<rgba> editor_setup::find_highlight_color_of(const entity_id id) const {
 	if (anything_opened() && player.paused) {
-		return selector.find_highlight_color_of(settings.entity_selector, id, view().selected_entities);
+		return selector.find_highlight_color_of(settings.entity_selector, id, view().selected_entities, view().selection_groups);
 	}
 
 	return std::nullopt;

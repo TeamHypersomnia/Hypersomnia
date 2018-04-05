@@ -173,7 +173,6 @@ void duplicate_entities_command::undo(const editor_command_input in) const {
 
 	auto& f = in.folder;
 	auto& selections = f.view.selected_entities;
-	selections.clear();
 
 	duplicated_entities.for_each_reverse([&](const auto& e) {
 		cosmic::undo_last_create_entity(cosm[e.duplicated_id]);

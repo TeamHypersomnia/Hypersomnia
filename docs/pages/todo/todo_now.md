@@ -38,6 +38,10 @@ summary: Just a hidden scratchpad.
 				- thus let the delete command just store its own "ungroup entities" command and invoke it beforehand on all entries
 		- Delete command
 		- Gameplay mode
+			- For now we won't support editor operations inside gameplay mode?
+				- Should be easy enough though, we can always just read the deletion commands
+			- To ensure space efficiency even with static allocations, we'll just serialize the cosmos to bytes instead of making a full clone
+				- Should even be faster considering that recreating some associative containers' structure might be already costly
 	- mover should be deactivated when?
 		- corner case: delete while move?
 		- should work anyway and yeah, deactivate it then

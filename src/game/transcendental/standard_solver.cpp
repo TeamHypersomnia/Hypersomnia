@@ -123,12 +123,14 @@ void standard_solve(const logic_step step) {
 		pathfinding_system().advance_pathfinding_sessions(step);
 	}
 
-	auto& transfers = step.get_queue<item_slot_transfer_request>();
-	perform_transfers(transfers, step);
+	{
+		auto& transfers = step.get_queue<item_slot_transfer_request>();
+		perform_transfers(transfers, step);
+	}
 
 	trace_system().destroy_outdated_traces(step);
 
-	const size_t queued_before_marking_num = step.get_queue<messages::queue_destruction>().size();
+	const auto queued_before_marking_num = step.get_queue<messages::queue_destruction>().size();
 
 	destroy_system().mark_queued_entities_and_their_children_for_deletion(step);
 
@@ -145,7 +147,7 @@ void standard_solve(const logic_step step) {
 
 	cosmic::increment_step(cosmos);
 
-	const size_t queued_at_end_num = step.get_queue<messages::queue_destruction>().size();
+	const auto queued_at_end_num = step.get_queue<messages::queue_destruction>().size();
 
 	ensure_eq(queued_at_end_num, queued_before_marking_num);
 }

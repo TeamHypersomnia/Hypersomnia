@@ -33,7 +33,7 @@ void editor_entity_selector::do_left_press(
 	const cosmos& cosm,
 	bool has_ctrl,
 	const vec2i world_cursor_pos,
-	target_selections_type& selections
+	current_selections_type& selections
 ) {
 	last_ldown_position = world_cursor_pos;
 	held = hovered;
@@ -48,8 +48,8 @@ void editor_entity_selector::do_left_press(
 	}
 }
 
-void editor_entity_selector::finish_rectangular(target_selections_type& into) {
-	target_selections_type new_selections;
+void editor_entity_selector::finish_rectangular(current_selections_type& into) {
+	current_selections_type new_selections;
 
 	for_each_selected_entity(
 		[&](const auto e) {
@@ -66,19 +66,32 @@ void editor_entity_selector::finish_rectangular(target_selections_type& into) {
 
 void editor_entity_selector::do_left_release(
 	const bool has_ctrl,
-	target_selections_type& selections
+	current_selections_type& selections,
+	const editor_selection_groups& groups
 ) {
 	if (const auto clicked = held) {
+		selection_group_type clicked_subjects;
+
+		auto find_belonging_group = [&](auto, const auto& group, auto) {
+			clicked_subjects = group;	
+		};
+
+		if (!groups.on_group_entry_of(held, find_belonging_group)) {
+			clicked_subjects = { clicked };
+		}
+
 		if (has_ctrl) {
-			if (found_in(selections, clicked)) {
-				selections.erase(clicked);
-			}
-			else {
-				selections.emplace(clicked);
+			for (const auto& c : clicked_subjects) {
+				if (found_in(selections, c)) {
+					selections.erase(c);
+				}
+				else {
+					selections.emplace(c);
+				}
 			}
 		}
 		else {
-			selections = { clicked };
+			assign_begin_end(selections, clicked_subjects);
 		}
 	}
 
@@ -230,7 +243,7 @@ void editor_entity_selector::do_mousemotion(
 
 std::optional<ltrb> editor_entity_selector::find_selection_aabb(
 	const cosmos& cosm,
-	const target_selections_type& signi_selections
+	const current_selections_type& signi_selections
 ) const {
 	const auto result = ::find_aabb_of(
 		cosm,
@@ -252,14 +265,37 @@ std::optional<ltrb> editor_entity_selector::find_selection_aabb(
 std::optional<rgba> editor_entity_selector::find_highlight_color_of(
 	const editor_entity_selector_settings& settings,
 	const entity_id id, 
-	const target_selections_type& signi_selections
+	const current_selections_type& signi_selections,
+	const editor_selection_groups& groups
 ) const {
-	if (held == id) {
-		return settings.held_color;
+	auto held_or_hovered = [&groups, id](auto& checked, const auto result_col) -> std::optional<rgba> {
+		if (checked) {
+			if (checked == id) {
+				return result_col;
+			}
+
+			bool found = false;
+
+			groups.on_group_entry_of(checked, [id, &found](auto, const auto& group, auto) {	
+				if (found_in(group, id)) {
+					found = true;
+				}
+			});
+
+			if (found) {
+				return result_col;
+			}
+		}
+
+		return std::nullopt;
+	};
+
+	if (const auto r = held_or_hovered(held, settings.held_color)) {
+		return r;
 	}
 
-	if (hovered == id) {
-		return settings.hovered_color;
+	if (const auto r = held_or_hovered(hovered, settings.hovered_color)) {
+		return r;
 	}
 
 	const bool in_signi = found_in(signi_selections, id);

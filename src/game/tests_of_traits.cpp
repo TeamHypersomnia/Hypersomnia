@@ -370,6 +370,10 @@ struct tests_of_traits {
 	static_assert(aligned_num_of_bytes_v<9, 4> == 12, "Trait is wrong");
 
 	static_assert(same<reverse_sequence_t<std::index_sequence<1, 2, 3>>, std::index_sequence<3, 2, 1>>);
+
+	static_assert(has_suitable_member_assign_v<std::vector<int>, std::unordered_set<double>>);
+	static_assert(has_suitable_member_assign_v<std::vector<double>, std::unordered_set<int>>);
+	static_assert(!has_suitable_member_assign_v<std::unordered_set<int>, std::vector<double>>);
 };
 
 template <class F, class T>

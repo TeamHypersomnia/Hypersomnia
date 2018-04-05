@@ -172,6 +172,9 @@ class editor_setup : private current_access_cache<editor_setup> {
 	void start_moving_selection();
 	void start_rotating_selection();
 
+	void group_selection();
+	void ungroup_selection();
+
 	void make_last_command_a_child();
 
 	void center_view_at_selection();
@@ -382,7 +385,8 @@ public:
 				callback,
 				settings.entity_selector,
 				world,
-				view().selected_entities
+				view().selected_entities,
+				view().selection_groups
 			);
 
 			if (const auto match = get_matching_go_to_entity()) {

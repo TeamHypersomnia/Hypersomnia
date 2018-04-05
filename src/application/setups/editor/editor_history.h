@@ -12,6 +12,7 @@
 #include "application/setups/editor/commands/move_entities_command.h"
 #include "application/setups/editor/commands/paste_entities_command.h"
 #include "application/setups/editor/commands/duplicate_entities_command.h"
+#include "application/setups/editor/commands/change_grouping_command.h"
 
 #include "application/setups/editor/editor_history_declaration.h"
 

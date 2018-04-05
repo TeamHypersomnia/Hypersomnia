@@ -559,6 +559,8 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/detail/sentience_shake.cpp"
 	"src/application/setups/editor/commands/paste_entities_command.cpp"
 	"src/application/setups/editor/commands/duplicate_entities_command.cpp"
+	"src/application/setups/editor/commands/change_grouping_command.cpp"
+	"src/application/setups/editor/editor_selection_groups.cpp"
 )
 
 if(BUILD_WINDOW_FRAMEWORK)
