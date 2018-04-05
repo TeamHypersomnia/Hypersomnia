@@ -5,6 +5,9 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- in go to dialog, make selection groups appear as the first
+	- later we might just make a variant of several types instead of entity_guid in match vector
+
 - handle mouse glitches when letting go of moved entities or duplicated ones
 	- reset some drag/press state etc.
 
