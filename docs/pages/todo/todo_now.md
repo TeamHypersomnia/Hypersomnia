@@ -7,9 +7,6 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
-- Move summary to somewhere else, even if we pass it the editor setup reference
-	- what would be wrong with it?
-
 - Fix what happens when too many entities are created
 	- for now let's just have many more, and throw when shit hits the fan
 		- just ensure that the author's work is saved and undoable
@@ -49,8 +46,6 @@ summary: Just a hidden scratchpad.
 		- corner case: delete while move?
 		- should work anyway and yeah, deactivate it then
 
-- Grouping & ungrouping
-	- Shift + click could always highlight&select a group
 - Editing vertices in editor
 	- a generic "unmap_entity_vertices" and "map_entity_vertices that depend on the context
 		- e.g. setting reach for wandering pixels

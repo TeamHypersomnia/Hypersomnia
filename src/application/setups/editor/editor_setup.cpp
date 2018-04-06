@@ -4,7 +4,6 @@
 #include "augs/misc/imgui/imgui_utils.h"
 #include "augs/filesystem/directory.h"
 #include "augs/templates/thread_templates.h"
-#include "augs/templates/chrono_templates.h"
 #include "augs/templates/algorithm_templates.h"
 #include "augs/window_framework/window.h"
 #include "augs/window_framework/platform_utils.h"
@@ -18,8 +17,6 @@
 #include "application/setups/editor/editor_camera.h"
 
 #include "application/setups/editor/gui/editor_tab_gui.h"
-
-#include "3rdparty/imgui/imgui_internal.h"
 
 #include "augs/readwrite/byte_file.h"
 #include "augs/readwrite/lua_file.h"
@@ -357,7 +354,11 @@ void editor_setup::perform_custom_imgui(
 					ImGui::Separator();
 
 					if (item_if_tabs("Summary")) {
-						show_summary = true;
+						summary_gui.open();
+					}
+
+					if (item_if_tabs("Coordinates")) {
+						coordinates_gui.open();
 					}
 
 					if (item_if_tabs("Player")) {
@@ -403,6 +404,8 @@ void editor_setup::perform_custom_imgui(
 		all_entities_gui.perform(settings, nullptr, make_command_input());
 		selection_groups_gui.perform(ImGui::GetIO().KeyCtrl, make_command_input());
 
+		summary_gui.perform(*this);
+
 		const auto all_selected = [&]() -> decltype(get_all_selected_entities()) {
 			if (const auto held = selector.get_held(); held && work().world[held]) {
 				return { held };
@@ -422,118 +425,7 @@ void editor_setup::perform_custom_imgui(
 			filters.perform(cosm, view().selected_entities);
 		}
 
-		if (show_summary) {
-			auto summary = scoped_window("Summary", &show_summary, ImGuiWindowFlags_AlwaysAutoResize);
-
-			text(typesafe_sprintf("Folder path: %x", folder().current_path));
-			//text("Tick rate: %x/s", get_viewed_cosmos().get_solvable().get_steps_per_second()));
-
-			if (const auto current_cone = find_current_camera()) {
-				const auto world_cursor_pos = current_cone->to_world_space(screen_size, mouse_pos);
-
-				text("Grid size: %x/%x", view().grid.unit_pixels, settings.grid.render.get_maximum_unit());
-
-				text("Cursor: %x", world_cursor_pos);
-				text("View center: %x", vec2(current_cone->transform.pos).discard_fract());
-
-				if (auto& panning = view().panned_camera; panning->transform.pos.has_fract()) {
-					ImGui::SameLine();
-
-					if (ImGui::Button("Round")) {
-						panning->transform.pos.discard_fract();
-					}
-				}
-
-				{
-					auto zoom = current_cone->zoom * 100.f;
-					
-					if (slider("Zoom: ", zoom, 1.f, 1000.f, "%.3f%%")) {
-						if (!view().panned_camera.has_value()) {
-							view().panned_camera = current_cone;
-						}
-
-						zoom = std::clamp(zoom, 1.f, 1000.f);
-						view().panned_camera->zoom = zoom / 100.f;
-					}
-				}
-			}
-
-			const auto total_text = 
-				typesafe_sprintf("Total entities: %x###totalentities", get_viewed_cosmos().get_entities_count())
-			;
-
-			if (auto total = scoped_tree_node(total_text.c_str())) {
-				text("Usage of maximum pool space: ");
-
-				std::vector<std::string> lines;
-
-				std::string content;
-
-				auto add_sorted_lines = [&]() {
-					stable_sort_range(
-						lines,
-						[](const auto& l1, const auto& l2) {
-							return stof(l1) > stof(l2);
-						}
-					);	
-
-					for (const auto& l : lines) {
-						content += l;
-					}
-				};
-
-				const auto& s = work().world.get_solvable();
-
-				s.for_each_pool([&](const auto& p){
-					using T = entity_type_of<typename std::decay_t<decltype(p)>::mapped_type>;
-
-					const auto si = p.size();
-					const auto ca = p.capacity();
-					const auto percent = static_cast<float>(si) / static_cast<float>(ca) * 100;
-
-					lines.push_back(
-						typesafe_sprintf("%1f", percent) + "% " 
-						+ typesafe_sprintf("(%x/%x) - %x\n", p.size(), p.capacity(), format_field_name(get_type_name<T>()))
-					);
-				});
-
-				add_sorted_lines();
-				text(content);
-			}
-
-			text("World time: %x (%x steps at %x Hz)",
-				standard_format_seconds(get_viewed_cosmos().get_total_seconds_passed()),
-				get_viewed_cosmos().get_total_steps_passed(),
-				1.0f / get_viewed_cosmos().get_fixed_delta().in_seconds()
-			);
-
-			text("Currently controlling: %x",
-				get_viewed_character().alive() ? get_viewed_character().get_name() : "no entity"
-			);
-
-			text("Rect select mode: %x", format_enum(view().rect_select_mode));
-
-			if (view().ignore_groups) {
-				text("Groups disabled");
-			}
-			else {
-				text("Groups enabled");
-			}
-
-			ImGui::Separator();
-
-			if (!all_selected.empty()) {
-				text("Selected %x entities", all_selected.size());
-
-				if (const auto aabb = find_selection_aabb()) {
-					const auto size = aabb->get_size();
-					text("AABB:   %x x %x pixels\ncenter: %x\nlt:     %x", size.x, size.y, aabb->get_center(), aabb->left_top());
-				}
-			}
-			else {
-				text("No entity selected");
-			}
-		}
+		coordinates_gui.perform(*this, screen_size, mouse_pos, all_selected);
 
 		if (player.show) {
 			auto player_window = scoped_window("Player", &player.show, ImGuiWindowFlags_AlwaysAutoResize);
@@ -965,7 +857,8 @@ bool editor_setup::handle_input_before_imgui(
 				case key::C: common_state_gui.open(); return true;
 				case key::G: selection_groups_gui.open(); return true;
 				case key::P: player.show = true; return true;
-				case key::U: show_summary = true; return true;
+				case key::U: summary_gui.open(); return true;
+				case key::O: coordinates_gui.open(); return true;
 				default: break;
 			}
 		}

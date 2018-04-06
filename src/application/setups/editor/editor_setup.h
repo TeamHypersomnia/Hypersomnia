@@ -42,6 +42,7 @@
 #include "application/setups/editor/gui/editor_all_entities_gui.h"
 #include "application/setups/editor/gui/editor_common_state_gui.h"
 #include "application/setups/editor/gui/editor_selection_groups_gui.h"
+#include "application/setups/editor/gui/editor_summary_gui.h"
 
 #include "application/setups/editor/detail/current_access_cache.h"
 #include "application/setups/editor/detail/make_command_from_selections.h"
@@ -67,6 +68,10 @@ class editor_setup : private current_access_cache<editor_setup> {
 	friend base;
 	friend augs::introspection_access;
 
+	/* These two friends for handy printing of internal state */
+	friend editor_summary_gui;
+	friend editor_coordinates_gui;
+
 	double global_time_seconds = 0.0;
 
 	editor_significant signi;
@@ -85,11 +90,11 @@ class editor_setup : private current_access_cache<editor_setup> {
 	editor_all_entities_gui selected_entities_gui = std::string("Selected entities");
 	editor_common_state_gui common_state_gui;
 	editor_selection_groups_gui selection_groups_gui;
+	editor_summary_gui summary_gui;
+	editor_coordinates_gui coordinates_gui;
 	// END GEN INTROSPECTOR
 
 	std::optional<editor_popup> ok_only_popup;
-
-	bool show_summary = true;
 
 	editor_destructor_input destructor_input;
 

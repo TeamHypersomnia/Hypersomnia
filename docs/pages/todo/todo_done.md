@@ -482,3 +482,10 @@ we consider whole type overrides too complex architeciturally:
 	- maybe even copy some from b2Body
 
 - fix readable bytesize, test it
+
+- Grouping & ungrouping
+	- Shift + click could always highlight&select a group
+
+- Move summary to somewhere else, even if we pass it the editor setup reference
+	- what would be wrong with it?
+
