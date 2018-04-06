@@ -1,3 +1,4 @@
+#pragma once
 #include "augs/templates/enum_introspect.h"
 
 namespace augs {

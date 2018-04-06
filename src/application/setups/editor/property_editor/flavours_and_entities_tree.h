@@ -7,6 +7,8 @@
 #include "application/setups/editor/property_editor/flavour_properties_editor.h"
 #include "application/setups/editor/property_editor/entity_properties_editor.h"
 
+#include "application/setups/editor/property_editor/flavours_and_entities_tree_structs.h"
+
 template <class E>
 void do_edit_entities_gui(
 	const property_editor_input& prop_in,
@@ -41,11 +43,13 @@ void do_edit_flavours_gui(
 
 template <class F>
 auto flavours_and_entities_tree(
-	const property_editor_input& prop_in,
+	const flavours_and_entities_tree_input& fae_in,
 	editor_command_input in,
 	F&& flavours_and_entities_provider
 ) {
 	using namespace augs::imgui;
+
+	auto prop_in = fae_in.prop_in;
 
 	flavours_and_entities_tree_filter filter;
 
@@ -115,7 +119,7 @@ auto flavours_and_entities_tree(
 
 			ImGui::NextColumn();
 
-			if (prop_in.show_filter_buttons) {
+			if (fae_in.show_filter_buttons) {
 				const auto scoped_style = scoped_style_var(ImGuiStyleVar_FramePadding, ImVec2(1, 1));
 				const auto this_type_id = entity_type_id::of<E>();
 
@@ -198,7 +202,7 @@ auto flavours_and_entities_tree(
 
 						ImGui::NextColumn();
 
-						if (prop_in.show_filter_buttons) {
+						if (fae_in.show_filter_buttons) {
 							const auto scoped_style = scoped_style_var(ImGuiStyleVar_FramePadding, ImVec2(1, 1));
 							const auto this_type_id = entity_type_id::of<E>().get_index();
 

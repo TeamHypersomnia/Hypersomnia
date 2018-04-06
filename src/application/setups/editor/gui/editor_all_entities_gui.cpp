@@ -227,7 +227,13 @@ flavours_and_entities_tree_filter editor_all_entities_gui::perform(
 	properties_gui.hovered_guid.unset();
 
 	const bool show_filter_buttons = only_match_entities != nullptr;
-	const auto prop_in = property_editor_input { settings.property_editor, properties_gui, show_filter_buttons };
+
+	const auto prop_in = property_editor_input { settings.property_editor, properties_gui };
+
+	const auto fae_in = flavours_and_entities_tree_input { 
+		prop_in, show_filter_buttons
+	};
+
 	const auto& cosm = in.get_cosmos();
 
 	if (only_match_entities) {
@@ -263,14 +269,14 @@ flavours_and_entities_tree_filter editor_all_entities_gui::perform(
 		}
 
 		return flavours_and_entities_tree(
-			prop_in,
+			fae_in,
 			in,
 			in_selection_provider { cosm, per_native_type }
 		);
 	}
 
 	return flavours_and_entities_tree(
-		prop_in,
+		fae_in,
 		in,
 		all_provider { cosm }
 	);

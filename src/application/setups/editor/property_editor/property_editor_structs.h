@@ -1,5 +1,5 @@
 #pragma once
-#include <unordered_set>
+#include <optional>
 
 #include "3rdparty/imgui/imgui.h"
 #include "augs/readwrite/memory_stream.h"
@@ -17,20 +17,7 @@ using edited_field_type_id = type_in_list_id<
 	>
 >;
 
-struct flavours_and_entities_tree_filter {
-	std::optional<entity_type_id> close_type_id;
-	std::optional<entity_flavour_id> close_flavour_id;
-
-	std::optional<entity_type_id> only_type_id;
-	std::optional<entity_flavour_id> only_flavour_id;
-
-	void perform(
-		const cosmos&,
-		std::unordered_set<entity_id>& selections
-	) const;
-
-	bool any() const;
-};
+struct property_editor_settings;
 
 struct description_pair {
 	std::string of_old;
@@ -48,3 +35,9 @@ struct field_address {
 	unsigned offset = static_cast<unsigned>(-1);
 	edited_field_type_id type_id;
 };
+
+struct property_editor_input {
+	const property_editor_settings& settings;
+	property_editor_gui& state;
+};
+

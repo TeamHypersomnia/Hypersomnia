@@ -8,15 +8,10 @@
 
 #include "application/setups/editor/editor_settings.h"
 #include "application/setups/editor/property_editor/property_editor_structs.h"
+#include "application/setups/editor/property_editor/property_editor_settings.h"
 
 #include "augs/templates/format_enum.h"
 #include "augs/misc/imgui/imgui_enum_combo.h"
-
-struct property_editor_input {
-	const property_editor_settings& settings;
-	property_editor_gui& state;
-	const bool show_filter_buttons = false;
-};
 
 template <class A, class B>
 auto describe_changed_flag(

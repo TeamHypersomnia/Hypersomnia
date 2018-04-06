@@ -1,6 +1,6 @@
 #include "game/transcendental/cosmos.h"
 
-#include "application/setups/editor/property_editor/property_editor_structs.h"
+#include "application/setups/editor/property_editor/flavours_and_entities_tree_structs.h"
 
 bool flavours_and_entities_tree_filter::any() const {
 	return close_type_id || close_flavour_id || only_type_id || only_flavour_id;
