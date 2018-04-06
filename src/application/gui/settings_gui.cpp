@@ -276,29 +276,35 @@ void settings_gui_state::perform(
 				}
 
 				if (auto node = scoped_tree_node("Appearance")) {
-					text("Entity selections");
+					if (auto node = scoped_tree_node("Property editor")) {
+						auto& scope_cfg = config.editor.property_editor;
 
-					{
-						auto scope = scoped_indent();
+						revertable_color_edit(SCOPE_CFG_NVP(different_values_frame_bg));
+						revertable_color_edit(SCOPE_CFG_NVP(different_values_frame_hovered_bg));
+						revertable_color_edit(SCOPE_CFG_NVP(different_values_frame_active_bg));
+					}
 
-						auto& scope_cfg = config.editor.entity_selector;
+					if (auto node = scoped_tree_node("Entity highlights")) {
+						{
+							auto& scope_cfg = config.editor.entity_selector;
 
-						revertable_color_edit(SCOPE_CFG_NVP(hovered_color));
-						revertable_color_edit(SCOPE_CFG_NVP(selected_color));
-						revertable_color_edit(SCOPE_CFG_NVP(held_color));
+							revertable_color_edit(SCOPE_CFG_NVP(hovered_color));
+							revertable_color_edit(SCOPE_CFG_NVP(selected_color));
+							revertable_color_edit(SCOPE_CFG_NVP(held_color));
+						}
+
+						{
+							auto& scope_cfg = config.editor;
+
+							revertable_color_edit(SCOPE_CFG_NVP(controlled_entity_color));
+							revertable_color_edit(SCOPE_CFG_NVP(matched_entity_color));
+						}
 					}
 
 					auto& scope_cfg = config.editor;
 
-					revertable_color_edit(SCOPE_CFG_NVP(controlled_entity_color));
-					revertable_color_edit(SCOPE_CFG_NVP(matched_entity_color));
-
 					revertable_color_edit(SCOPE_CFG_NVP(rectangular_selection_color));
 					revertable_color_edit(SCOPE_CFG_NVP(rectangular_selection_border_color));
-
-					revertable_color_edit(SCOPE_CFG_NVP(different_values_frame_bg));
-					revertable_color_edit(SCOPE_CFG_NVP(different_values_frame_hovered_bg));
-					revertable_color_edit(SCOPE_CFG_NVP(different_values_frame_active_bg));
 				}
 
 				break;

@@ -7,14 +7,13 @@
 #include "augs/drawing/flip.h"
 
 #include "application/setups/editor/editor_settings.h"
-#include "application/setups/editor/editor_command_input.h"
 #include "application/setups/editor/property_editor/property_editor_structs.h"
 
 #include "augs/templates/format_enum.h"
 #include "augs/misc/imgui/imgui_enum_combo.h"
 
 struct property_editor_input {
-	const editor_settings& settings;
+	const property_editor_settings& settings;
 	property_editor_gui& state;
 	const bool show_filter_buttons = false;
 };
@@ -83,7 +82,7 @@ description_pair describe_changed(
 
 template <class F, class Eq>
 auto maybe_different_value_cols(
-	const editor_settings& settings,
+	const property_editor_settings& settings,
 	const F& first,
    	const field_address field_id,
    	Eq& pred

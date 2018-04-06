@@ -7,6 +7,8 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
+- Measure build times of debug and release builds to know which one to test
+
 - Fix what happens when too many entities are created
 	- for now let's just have many more, and throw when shit hits the fan
 		- just ensure that the author's work is saved and undoable
@@ -17,6 +19,8 @@ summary: Just a hidden scratchpad.
 				- some dire consequences include no bullets possible to be shot
 				- but otherwise it should be fine
 		- now that we can have shapes in flavours let's increase the amount of components by lots
+
+- Probably somehow disallow arbitrary inferring of relational cache?
 
 - Persistence of entity ids in editor and clearing them
 	- Cases of storage:

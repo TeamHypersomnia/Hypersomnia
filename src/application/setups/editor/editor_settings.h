@@ -43,6 +43,14 @@ struct editor_grid_settings {
 	// END GEN INTROSPECTOR
 };
 
+struct property_editor_settings {
+	// GEN INTROSPECTOR struct property_editor_settings
+	rgba different_values_frame_bg = { 115, 73, 0, 255 };
+	rgba different_values_frame_hovered_bg = { 158, 122, 0, 255 };
+	rgba different_values_frame_active_bg = { 168, 158, 0, 255 };
+	// END GEN INTROSPECTOR
+};
+
 struct editor_settings {
 	// GEN INTROSPECTOR struct editor_settings
 	editor_autosave_settings autosave;
@@ -55,15 +63,12 @@ struct editor_settings {
 	editor_camera_settings camera;
 	editor_go_to_settings go_to;
 	editor_entity_selector_settings entity_selector;
+	property_editor_settings property_editor;
 
 	rgba controlled_entity_color = { 255, 255, 0, 120 };
 	rgba matched_entity_color = { 0, 255, 0, 80 };
 
 	rgba rectangular_selection_color = { 65, 131, 196, 60 };
 	rgba rectangular_selection_border_color = { 65, 131, 196, 120 };
-
-	rgba different_values_frame_bg = { 115, 73, 0, 255 };
-	rgba different_values_frame_hovered_bg = { 158, 122, 0, 255 };
-	rgba different_values_frame_active_bg = { 168, 158, 0, 255 };
 	// END GEN INTROSPECTOR
 };
