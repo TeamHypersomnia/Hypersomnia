@@ -7,6 +7,9 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
+- Move summary to somewhere else, even if we pass it the editor setup reference
+	- what would be wrong with it?
+
 - Fix what happens when too many entities are created
 	- for now let's just have many more, and throw when shit hits the fan
 		- just ensure that the author's work is saved and undoable

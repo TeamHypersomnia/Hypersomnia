@@ -24,6 +24,18 @@ decltype(auto) maximum_of(const Container& v) {
 }
 
 template<class Container, class T>
+auto& stable_sort_range(Container& v, T&& l) {
+	std::stable_sort(v.begin(), v.end(), std::forward<T>(l));
+	return v;
+}
+
+template<class Container>
+auto& stable_sort_range(Container& v) {
+	std::stable_sort(v.begin(), v.end());
+	return v;
+}
+
+template<class Container, class T>
 auto& sort_range(Container& v, T&& l) {
 	std::sort(v.begin(), v.end(), std::forward<T>(l));
 	return v;

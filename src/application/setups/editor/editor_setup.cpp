@@ -458,9 +458,48 @@ void editor_setup::perform_custom_imgui(
 				}
 			}
 
-			text("Total entities: %x",
-				get_viewed_cosmos().get_entities_count()
-			);
+			const auto total_text = 
+				typesafe_sprintf("Total entities: %x###totalentities", get_viewed_cosmos().get_entities_count())
+			;
+
+			if (auto total = scoped_tree_node(total_text.c_str())) {
+				text("Usage of maximum pool space: ");
+
+				std::vector<std::string> lines;
+
+				std::string content;
+
+				auto add_sorted_lines = [&]() {
+					stable_sort_range(
+						lines,
+						[](const auto& l1, const auto& l2) {
+							return stof(l1) > stof(l2);
+						}
+					);	
+
+					for (const auto& l : lines) {
+						content += l;
+					}
+				};
+
+				const auto& s = work().world.get_solvable();
+
+				s.for_each_pool([&](const auto& p){
+					using T = entity_type_of<typename std::decay_t<decltype(p)>::mapped_type>;
+
+					const auto si = p.size();
+					const auto ca = p.capacity();
+					const auto percent = static_cast<float>(si) / static_cast<float>(ca) * 100;
+
+					lines.push_back(
+						typesafe_sprintf("%1f", percent) + "% " 
+						+ typesafe_sprintf("(%x/%x) - %x\n", p.size(), p.capacity(), format_field_name(get_type_name<T>()))
+					);
+				});
+
+				add_sorted_lines();
+				text(content);
+			}
 
 			text("World time: %x (%x steps at %x Hz)",
 				standard_format_seconds(get_viewed_cosmos().get_total_seconds_passed()),
