@@ -453,18 +453,11 @@ void editor_setup::perform_custom_imgui(
 			::standard_confirm_go_to(*confirmation, view());
 		}
 
-		if (mover.active) {
-			auto& history = folder().history;
-			auto& last = history.last_command();
-
-			if (auto* const cmd = std::get_if<move_entities_command>(std::addressof(last))) {
-				if (cmd->rotation_center) {
-					text_tooltip("%x*", cmd->move_by.rotation);
-				}
-				else {
-					text_tooltip("x: %x\ny: %x", cmd->move_by.pos.x, cmd->move_by.pos.y);
-				}
-			}
+		if (const auto rot = mover.current_mover_rot_delta(make_mover_input())) {
+			text_tooltip("%x*", *rot);
+		}
+		else if (const auto pos = mover.current_mover_pos_delta(make_mover_input())) {
+			text_tooltip("x: %x\ny: %x", pos->x, pos->y);
 		}
 	}
 
@@ -522,8 +515,7 @@ std::optional<setup_escape_result> editor_setup::escape() {
 		player.paused = true;
 		return setup_escape_result::SWITCH_TO_GAME_GUI;
 	}
-	else if (mover.active) {
-		mover.active = false;
+	else if (mover.escape()) {
 		return setup_escape_result::JUST_FETCH;
 	}
 
@@ -644,7 +636,7 @@ void editor_setup::mirror_selection(const vec2i direction) {
 		}
 
 		if (only_duplicating) {
-			start_moving_selection();
+			mover.start_moving_selection(make_mover_input());
 			make_last_command_a_child();
 		}
 	}
@@ -652,52 +644,6 @@ void editor_setup::mirror_selection(const vec2i direction) {
 
 void editor_setup::duplicate_selection() {
 	mirror_selection(vec2i(0, 0));
-}
-
-void editor_setup::transform_selection(
-	const std::optional<vec2> rotation_center,
-	const std::optional<components::transform> one_shot_delta
-) {
-	if (anything_opened()) {
-		finish_rectangular_selection();
-
-		auto command = make_command_from_selections<move_entities_command>(
-			"",
-			[](const auto typed_handle) {
-				return typed_handle.has_independent_transform();
-			}	
-		);
-
-		if (!command.empty()) {
-			command.rotation_center = rotation_center;
-
-			if (one_shot_delta) {
-				command.move_by = *one_shot_delta;
-			}
-			else {
-				mover.active = true;
-				mover.initial_world_cursor_pos = get_world_cursor_pos().discard_fract();
-			}
-
-			folder().history.execute_new(std::move(command), make_command_input());
-		}
-	}
-}
-
-void editor_setup::start_moving_selection() {
-	transform_selection(std::nullopt);
-}
-
-void editor_setup::start_rotating_selection() {
-	if (const auto aabb = find_selection_aabb()) {
-		transform_selection(aabb->get_center());
-	}
-}
-
-void editor_setup::rotate_selection_once_by(const int degrees) {
-	if (const auto aabb = find_selection_aabb()) {
-		transform_selection(aabb->get_center(), components::transform(vec2::zero, degrees));
-	}
 }
 
 void editor_setup::group_selection() {
@@ -723,7 +669,11 @@ void editor_setup::ungroup_selection() {
 
 void editor_setup::make_last_command_a_child() {
 	if (anything_opened()) {
-		std::visit([](auto& command) { command.common.has_parent = true; }, folder().history.last_command());
+		auto set_has_parent = [](auto& command) { 
+			command.common.has_parent = true; 
+		};
+
+		std::visit(set_has_parent, folder().history.last_command());
 	}
 }
 
@@ -826,6 +776,10 @@ void editor_setup::close_folder() {
 
 editor_command_input editor_setup::make_command_input() {
 	return { destructor_input.lua, folder(), selector, all_entities_gui, mover };
+}
+
+entity_mover_input editor_setup::make_mover_input() {
+	return { *this };
 }
 
 void editor_setup::select_all_entities(const bool has_ctrl) {
@@ -975,54 +929,7 @@ bool editor_setup::handle_input_before_game(
 		}
 
 		if (e.msg == message::mousemotion) {
-			if (mover.active) {
-				auto& history = folder().history;
-				auto& last = history.last_command();
-
-				if (auto* const cmd = std::get_if<move_entities_command>(std::addressof(last))) {
-					const auto new_cursor_pos = vec2(world_cursor_pos).discard_fract();
-
-					if (cmd->rotation_center) {
-						const auto center = *cmd->rotation_center;
-
-						const auto old_vector = mover.initial_world_cursor_pos - center;
-						const auto new_vector = new_cursor_pos - center;
-
-						if (old_vector.non_zero() && new_vector.non_zero()) {
-							const auto degrees = old_vector.full_degrees_between(new_vector);
-							auto new_delta = components::transform(vec2::zero, degrees);
-
-							if (view().snapping_enabled) {
-								auto& r = new_delta.rotation;
-								r = view().grid.get_snapped(r);
-							}
-
-							cmd->unmove_entities(cosm);
-							cmd->rewrite_change(new_delta, std::nullopt, make_command_input());
-						}
-					}
-					else {
-						auto new_delta = new_cursor_pos - mover.initial_world_cursor_pos;
-
-						cmd->unmove_entities(cosm);
-
-						if (view().snapping_enabled) {
-							cmd->reinfer_moved(cosm);
-
-							if (const auto aabb_before_move = find_selection_aabb()) {
-								const auto current_aabb = *aabb_before_move + vec2(new_delta);
-								const auto snapping_delta = view().grid.get_snapping_delta(current_aabb);
-								new_delta += snapping_delta;
-							}
-						}
-
-						cmd->rewrite_change(new_delta, std::nullopt, make_command_input());
-					}
-				}
-				else {
-					mover.active = false;
-				}
-
+			if (mover.do_mousemotion(make_mover_input(), world_cursor_pos)) {
 				return true;
 			}
 
@@ -1043,10 +950,10 @@ bool editor_setup::handle_input_before_game(
 			return true;
 		}
 
-		if (mover.active && e.was_pressed(key::LMOUSE)) {
-			mover.active = false;
-			cosmic::reinfer_all_entities(cosm);
-			return true;
+		if (e.was_pressed(key::LMOUSE)) {
+			if (mover.do_left_press(make_mover_input())) {
+				return true;	
+			}
 		}
 
 		{
@@ -1068,7 +975,6 @@ bool editor_setup::handle_input_before_game(
 				if (has_shift) {
 					switch (k) {
 						case key::Z: redo(); return true;
-						case key::R: rotate_selection_once_by(-90); return true;
 						default: break;
 					}
 				}
@@ -1083,7 +989,14 @@ bool editor_setup::handle_input_before_game(
 
 					case key::G: group_selection(); return true;
 					case key::U: ungroup_selection(); return true;
-					case key::R: rotate_selection_once_by(90); return true;
+					case key::R: mover.rotate_selection_once_by(make_mover_input(), 90); return true;
+					default: break;
+				}
+			}
+
+			if (has_shift) {
+				switch (k) {
+					case key::R: mover.rotate_selection_once_by(make_mover_input(), -90); return true;
 					default: break;
 				}
 			}
@@ -1107,8 +1020,8 @@ bool editor_setup::handle_input_before_game(
 				case key::C: duplicate_selection(); return true;
 				case key::D: cut_selection(); return true;
 				case key::DEL: delete_selection(); return true;
-				case key::T: start_moving_selection(); return true;
-				case key::R: start_rotating_selection(); return true;
+				case key::T: mover.start_moving_selection(make_mover_input()); return true;
+				case key::R: mover.start_rotating_selection(make_mover_input()); return true;
 				default: break;
 			}
 

@@ -563,6 +563,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/application/setups/editor/editor_selection_groups.cpp"
 	"src/application/setups/editor/gui/editor_selection_groups_gui.cpp"
 	"src/application/setups/editor/gui/editor_summary_gui.cpp"
+	"src/application/setups/editor/gui/editor_entity_mover.cpp"
 )
 
 if(BUILD_WINDOW_FRAMEWORK)

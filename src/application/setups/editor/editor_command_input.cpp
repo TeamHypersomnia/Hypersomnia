@@ -19,7 +19,7 @@ void editor_command_input::interrupt_tweakers() const {
 void editor_command_input::purge_selections() const {
 	folder.view.selected_entities.clear();
 	selector.clear();
-	mover.active = false;
+	mover.escape();
 }
 
 void editor_command_input::clear_selection_of(const entity_id id) const {

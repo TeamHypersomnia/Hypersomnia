@@ -102,7 +102,6 @@ class editor_setup : private current_access_cache<editor_setup> {
 
 	void on_folder_changed();
 	void set_locally_viewed(const entity_id);
-	void finish_rectangular_selection();
 
 	void clear_id_caches();
 
@@ -163,7 +162,6 @@ class editor_setup : private current_access_cache<editor_setup> {
 	void open_last_folders(sol::state& lua);
 
 	void force_autosave_now() const;
-	editor_command_input make_command_input();
 
 	void load_gui_state();
 	void save_gui_state();
@@ -174,16 +172,6 @@ class editor_setup : private current_access_cache<editor_setup> {
 	void mirror_selection(vec2i direction);
 	void duplicate_selection();
 
-	void transform_selection(
-		std::optional<vec2> rotation_center,
-		std::optional<components::transform> one_shot_delta = std::nullopt
-	);
-
-	void rotate_selection_once_by(int degrees);
-
-	void start_moving_selection();
-	void start_rotating_selection();
-
 	void group_selection();
 	void ungroup_selection();
 
@@ -192,24 +180,18 @@ class editor_setup : private current_access_cache<editor_setup> {
 	void center_view_at_selection();
 	void reset_zoom();
 
-	vec2 get_world_cursor_pos() const;
-	vec2 get_world_cursor_pos(const camera_cone) const;
-
 	auto make_for_each_selected_entity() const {
 		return [this](auto callback) {
 			for_each_selected_entity(callback);	
 		};
 	}
 
-	template <class T, class... Args>
-	auto make_command_from_selections(Args&&... args) const {
-		return ::make_command_from_selections<T>(
-			make_for_each_selected_entity(),
-			work().world,
-			std::forward<Args>(args)...
-		);
-	}
 public:
+	using base::anything_opened;
+	using base::folder;
+	using base::view;
+	using base::work;
+
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
 	static constexpr bool handles_window_input = true;
 	static constexpr bool handles_escape = true;
@@ -312,6 +294,7 @@ public:
 	void select_all_entities(bool has_ctrl);
 	void reveal_in_explorer(const augs::window& owner);
 
+	void finish_rectangular_selection();
 	void unhover();
 	bool is_editing_mode() const;
 	std::optional<camera_cone> find_current_camera() const; 
@@ -325,6 +308,18 @@ public:
 		if (anything_opened()) {
 			selector.for_each_selected_entity(std::forward<F>(callback), view().selected_entities);
 		}
+	}
+
+	editor_command_input make_command_input();
+	entity_mover_input make_mover_input();
+
+	template <class T, class... Args>
+	auto make_command_from_selections(Args&&... args) const {
+		return ::make_command_from_selections<T>(
+			make_for_each_selected_entity(),
+			work().world,
+			std::forward<Args>(args)...
+		);
 	}
 
 	std::unordered_set<entity_id> get_all_selected_entities() const;
@@ -417,4 +412,7 @@ public:
 			}
 		}
 	}
+
+	vec2 get_world_cursor_pos() const;
+	vec2 get_world_cursor_pos(const camera_cone) const;
 };

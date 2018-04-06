@@ -25,8 +25,31 @@ void editor_summary_gui::perform(editor_setup& setup) {
 
 	auto summary = scoped_window("Summary", &show, ImGuiWindowFlags_AlwaysAutoResize);
 
-	text(typesafe_sprintf("Folder path: %x", f.current_path));
+	static std::string hja = "main_left.png";
+	thread_local ImGuiTextFilter filter;
 
+	if (ImGui::BeginCombo("Image on disk", hja.c_str())) {
+		filter.Draw();
+		if (auto fx = scoped_tree_node("Official")) {
+			ImGui::Selectable("amplifier_arm.png", false);
+		}
+		if (auto fx = scoped_tree_node("Project files")) {
+			if (auto fx = scoped_tree_node("walls")) {
+				if (filter.PassFilter("main_left.png")) {
+					ImGui::Selectable("main_left.png", true);
+
+					if (ImGui::IsItemClicked()) {
+						hja = "main_left.png";	
+					}
+				}
+			}
+
+		}
+
+		ImGui::EndCombo();
+	}
+
+	text(typesafe_sprintf("Folder path: %x", f.current_path));
 
 	const auto total_text = 
 		typesafe_sprintf("Total entities: %x###totalentities", cosm.get_entities_count())
