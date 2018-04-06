@@ -31,6 +31,7 @@ struct duplicate_entities_command {
 	editor_command_common common;
 private:
 	per_entity_type_container<make_data_vector> duplicated_entities;
+	change_grouping_command created_grouping;
 public:
 	std::string built_description;
 	vec2i mirror_direction;
@@ -39,7 +40,7 @@ public:
 	void push_entry(const_entity_handle);
 
 	void redo(editor_command_input);
-	void undo(editor_command_input) const;
+	void undo(editor_command_input);
 
 	auto size() const {
 		return duplicated_entities.size();

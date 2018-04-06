@@ -691,7 +691,7 @@ void editor_setup::group_selection() {
 		auto command = make_command_from_selections<change_grouping_command>("Grouped ");
 
 		if (!command.empty()) {
-			command.create_new_group = true;
+			command.all_to_new_group = true;
 			folder().history.execute_new(std::move(command), make_command_input());
 		}
 	}

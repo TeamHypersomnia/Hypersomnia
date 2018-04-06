@@ -32,7 +32,7 @@ class editor_selection_groups {
 			auto& entries = g.entries;
 
 			if (auto it = entries.find(id); it != entries.end()) {
-				callback(i, entries, it);
+				callback(i, g, it);
 				return true;
 			}
 		}
@@ -61,4 +61,9 @@ public:
 
 	void set_group(unsigned, entity_id);
 	editor_selection_group& new_group();
+
+	std::string get_free_group_name(const std::string& pattern) const;
+
+	std::size_t find_group_by(const std::string& name) const;
+	std::size_t get_group_by(const std::string& name);
 };

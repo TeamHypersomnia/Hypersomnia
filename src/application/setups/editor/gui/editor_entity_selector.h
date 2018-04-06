@@ -140,28 +140,21 @@ public:
 			signi_selections
 		);
 
-		if (cosm[held]) {
-			callback(held, settings.held_color);
+		auto propagate_to_group_of = [&](const entity_id id, const rgba color) {
+			if (cosm[id]) {
+				callback(id, color);
 
-			if (!ignore_groups) {
-				groups.on_group_entry_of(held, [&](auto, const auto& group, auto) {
-					for (const auto& sibling : group) {
-						callback(sibling, settings.held_color);
-					}
-				});
+				if (!ignore_groups) {
+					groups.on_group_entry_of(id, [&](auto, const auto& group, auto) {
+						for (const auto& sibling : group.entries) {
+							callback(sibling, color);
+						}
+					});
+				}
 			}
-		}
+		};
 
-		if (cosm[hovered]) {
-			callback(hovered, settings.hovered_color);
-
-			if (!ignore_groups) {
-				groups.on_group_entry_of(hovered, [&](auto, const auto& group, auto) {
-					for (const auto& sibling : group) {
-						callback(sibling, settings.hovered_color);
-					}
-				});
-			}
-		}
+		propagate_to_group_of(held, settings.held_color);
+		propagate_to_group_of(hovered, settings.hovered_color);
 	}
 };

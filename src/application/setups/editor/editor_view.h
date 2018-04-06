@@ -28,7 +28,7 @@ struct editor_view {
 	bool show_grid = true;
 	bool snapping_enabled = true;
 	bool ignore_groups = false;
-	editor_rect_select_type rect_select_mode = editor_rect_select_type::EVERYTHING;
+	editor_rect_select_type rect_select_mode = editor_rect_select_type::SAME_FLAVOUR;
 
 	editor_selection_groups selection_groups;
 	current_selections_type selected_entities;

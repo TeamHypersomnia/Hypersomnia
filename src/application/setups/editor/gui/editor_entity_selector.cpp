@@ -78,7 +78,7 @@ void editor_entity_selector::do_left_release(
 		}
 		else {
 			auto find_belonging_group = [&](auto, const auto& group, auto) {
-				clicked_subjects = group;	
+				clicked_subjects = group.entries;	
 			};
 
 			if (!groups.on_group_entry_of(held, find_belonging_group)) {
@@ -285,7 +285,7 @@ std::optional<rgba> editor_entity_selector::find_highlight_color_of(
 				bool found = false;
 
 				groups.on_group_entry_of(checked, [id, &found](auto, const auto& group, auto) {	
-					if (found_in(group, id)) {
+					if (found_in(group.entries, id)) {
 						found = true;
 					}
 				});

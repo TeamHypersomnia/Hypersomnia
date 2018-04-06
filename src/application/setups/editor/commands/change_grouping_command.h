@@ -12,8 +12,9 @@ struct change_grouping_command {
 	editor_command_common common;
 	std::vector<entity_id> affected_entities;
 	std::vector<unsigned> group_indices_before;
+	std::vector<unsigned> group_indices_after;
 	std::string built_description;
-	bool create_new_group = false;
+	bool all_to_new_group = false;
 	// END GEN INTROSPECTOR
 
 	void push_entry(entity_id);
