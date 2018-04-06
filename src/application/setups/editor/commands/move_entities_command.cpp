@@ -112,10 +112,10 @@ static void move_entities(
 
 std::string move_entities_command::describe() const {
 	if (rotation_center) {
-		return "Rotated by " + std::to_string(delta.rotation) + "*: " + built_description;
+		return "Rotated by " + std::to_string(move_by.rotation) + "*: " + built_description;
 	}
 
-	return typesafe_sprintf("Moved by %x: ", delta.pos) + built_description;
+	return typesafe_sprintf("Moved by %x: ", move_by.pos) + built_description;
 }
 
 void move_entities_command::push_entry(const const_entity_handle handle) {
@@ -154,7 +154,7 @@ void move_entities_command::rewrite_change(
 		so let's just store the delta. 
 	*/
 
-	delta = new_value;
+	move_by = new_value;
 
 	auto& cosm = in.get_cosmos();
 
@@ -172,7 +172,7 @@ void move_entities_command::redo(const editor_command_input in) {
 	ensure(values_before_change.empty());
 
 	save_old_values(cosm, moved_entities, before_change_data);
-	move_entities({}, cosm, moved_entities, delta, rotation_center);
+	move_entities({}, cosm, moved_entities, move_by, rotation_center);
 
 	cosmic::reinfer_all_entities(cosm);
 

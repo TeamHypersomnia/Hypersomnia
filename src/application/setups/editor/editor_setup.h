@@ -174,7 +174,12 @@ class editor_setup : private current_access_cache<editor_setup> {
 	void mirror_selection(vec2i direction);
 	void duplicate_selection();
 
-	void start_transforming_selection(std::optional<vec2> rotation_center);
+	void transform_selection(
+		std::optional<vec2> rotation_center,
+		std::optional<components::transform> one_shot_delta = std::nullopt
+	);
+
+	void rotate_selection_once_by(int degrees);
 
 	void start_moving_selection();
 	void start_rotating_selection();

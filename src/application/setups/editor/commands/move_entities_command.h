@@ -27,7 +27,7 @@ public:
 
 	std::vector<std::byte> values_before_change;
 
-	delta_type delta;
+	delta_type move_by;
 	std::optional<vec2> rotation_center;
 
 	std::string built_description;

@@ -459,10 +459,10 @@ void editor_setup::perform_custom_imgui(
 
 			if (auto* const cmd = std::get_if<move_entities_command>(std::addressof(last))) {
 				if (cmd->rotation_center) {
-					text_tooltip("%x*", cmd->delta.rotation);
+					text_tooltip("%x*", cmd->move_by.rotation);
 				}
 				else {
-					text_tooltip("x: %x\ny: %x", cmd->delta.pos.x, cmd->delta.pos.y);
+					text_tooltip("x: %x\ny: %x", cmd->move_by.pos.x, cmd->move_by.pos.y);
 				}
 			}
 		}
@@ -654,7 +654,10 @@ void editor_setup::duplicate_selection() {
 	mirror_selection(vec2i(0, 0));
 }
 
-void editor_setup::start_transforming_selection(const std::optional<vec2> rotation_center) {
+void editor_setup::transform_selection(
+	const std::optional<vec2> rotation_center,
+	const std::optional<components::transform> one_shot_delta
+) {
 	if (anything_opened()) {
 		finish_rectangular_selection();
 
@@ -668,8 +671,13 @@ void editor_setup::start_transforming_selection(const std::optional<vec2> rotati
 		if (!command.empty()) {
 			command.rotation_center = rotation_center;
 
-			mover.active = true;
-			mover.initial_world_cursor_pos = get_world_cursor_pos().discard_fract();
+			if (one_shot_delta) {
+				command.move_by = *one_shot_delta;
+			}
+			else {
+				mover.active = true;
+				mover.initial_world_cursor_pos = get_world_cursor_pos().discard_fract();
+			}
 
 			folder().history.execute_new(std::move(command), make_command_input());
 		}
@@ -677,12 +685,18 @@ void editor_setup::start_transforming_selection(const std::optional<vec2> rotati
 }
 
 void editor_setup::start_moving_selection() {
-	start_transforming_selection(std::nullopt);
+	transform_selection(std::nullopt);
 }
 
 void editor_setup::start_rotating_selection() {
 	if (const auto aabb = find_selection_aabb()) {
-		start_transforming_selection(aabb->get_center());
+		transform_selection(aabb->get_center());
+	}
+}
+
+void editor_setup::rotate_selection_once_by(const int degrees) {
+	if (const auto aabb = find_selection_aabb()) {
+		transform_selection(aabb->get_center(), components::transform(vec2::zero, degrees));
 	}
 }
 
@@ -1054,6 +1068,7 @@ bool editor_setup::handle_input_before_game(
 				if (has_shift) {
 					switch (k) {
 						case key::Z: redo(); return true;
+						case key::R: rotate_selection_once_by(-90); return true;
 						default: break;
 					}
 				}
@@ -1068,6 +1083,7 @@ bool editor_setup::handle_input_before_game(
 
 					case key::G: group_selection(); return true;
 					case key::U: ungroup_selection(); return true;
+					case key::R: rotate_selection_once_by(90); return true;
 					default: break;
 				}
 			}

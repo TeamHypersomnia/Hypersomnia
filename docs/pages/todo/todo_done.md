@@ -489,3 +489,5 @@ we consider whole type overrides too complex architeciturally:
 - Move summary to somewhere else, even if we pass it the editor setup reference
 	- what would be wrong with it?
 
+- Automatic group generation for duplications and mirrors
+
