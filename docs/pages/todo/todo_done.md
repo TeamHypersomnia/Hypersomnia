@@ -491,3 +491,5 @@ we consider whole type overrides too complex architeciturally:
 
 - Automatic group generation for duplications and mirrors
 
+- Get rid of that hrtf folder?
+	- will everybody have it though?

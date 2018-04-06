@@ -3,6 +3,7 @@
 #include <vector>
 #include <iosfwd>
 #include <algorithm>
+#include <cmath>
 #include "declare_math.h"
 #include "augs/math/si_scaling.h"
 
@@ -69,6 +70,16 @@ struct basic_ltrb {
 
 	void h(const T hh) {
 		b = t + hh;
+	}
+
+	template <class A = T, class = std::enable_if_t<std::is_floating_point_v<A>>>
+	auto& round_fract() {
+		l = std::round(l);
+		t = std::round(t);
+		r = std::round(r);
+		b = std::round(b);
+
+		return *this;
 	}
 
 	void set(const T _l, const T _t, const T _r, const T _b) {
@@ -406,6 +417,16 @@ struct basic_xywh {
 
 	T b() const {
 		return y + this->h;
+	}
+
+	template <class A = T, class = std::enable_if_t<std::is_floating_point_v<A>>>
+	auto& round_fract() {
+		x = std::round(x);
+		y = std::round(y);
+		w = std::round(w);
+		h = std::round(h);
+
+		return *this;
 	}
 
 	auto& set_size(const basic_vec2<T> v) {

@@ -1699,11 +1699,6 @@ int work(const int argc, const char* const * const argv) try {
 						}
 
 						if (const auto selection_aabb = editor.find_selection_aabb()) {
-							xywh ab;
-							ab.set_position(cone->to_screen_space(screen_size, selection_aabb->get_position()));
-							//ab.set_position(selection_aabb->get_position());
-							ab.set_size(selection_aabb->get_size() * cone->zoom);
-
 							drawer.border(
 								cone->to_screen_space(screen_size, *selection_aabb),
 								white,
