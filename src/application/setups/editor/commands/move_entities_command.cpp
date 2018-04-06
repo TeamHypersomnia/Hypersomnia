@@ -138,9 +138,8 @@ void move_entities_command::unmove_entities(cosmos& cosm) {
 
 void move_entities_command::reinfer_moved(cosmos& cosm) {
 	moved_entities.for_each([&](const auto id){
-		const auto h = cosm[id];	
-
-		cosmic::infer_caches_for(h);
+		const auto handle = cosm[id];	
+		handle.infer_transform();
 	});
 }
 
