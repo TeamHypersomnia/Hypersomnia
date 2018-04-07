@@ -12,5 +12,9 @@ struct sentience_shake {
 	real32 mult = 1.f;
 	// END GEN INTROSPECTOR
 
+	bool any() const {
+		return duration_ms > 0.f;
+	}
+
 	void apply(const augs::stepped_timestamp now, components::sentience& sentience) const;
 };

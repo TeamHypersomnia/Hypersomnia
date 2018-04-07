@@ -308,8 +308,6 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 		event_template.effective_amount = 0;
 		event_template.special_result = messages::health_event::result_type::NONE;
 		
-		bool apply_aimpunch = false;
-
 		if (sentience) {
 			const auto& s = *sentience;
 
@@ -353,7 +351,6 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 
 					if (event.effective_amount != 0) {
 						consume_health_event(event, step);
-						apply_aimpunch = true;
 					}
 				}
 			}
@@ -377,7 +374,6 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 
 					if (event.effective_amount != 0) {
 						consume_health_event(event, step);
-						apply_aimpunch = true;
 					}
 				}
 			}
@@ -392,7 +388,7 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 			}
 		}
 
-		if (apply_aimpunch) {
+		if (d.victim_shake.any()) {
 			if (sentience) {
 				d.victim_shake.apply(now, *sentience);
 			}
