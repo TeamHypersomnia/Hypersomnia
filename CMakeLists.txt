@@ -504,7 +504,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/augs/unit_tests.cpp"
 	"src/game/transcendental/cosmic_profiler.cpp"
 	"src/view/audiovisual_state/audiovisual_state.cpp"
-	"src/view/viewables/loaded_sounds.cpp"
+	"src/view/viewables/loaded_sounds_map.cpp"
 	"src/view/viewables/atlas_distributions.cpp"
 	"src/application/main/draw_debug_details.cpp"
 	"src/application/main/imgui_pass.cpp"

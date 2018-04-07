@@ -34,7 +34,7 @@
 #include "game/transcendental/data_living_one_step.h"
 #include "game/transcendental/cosmos.h"
 
-#include "view/viewables/loaded_sounds.h"
+#include "view/viewables/loaded_sounds_map.h"
 #include "view/viewables/atlas_distributions.h"
 
 #include "view/game_gui/game_gui_system.h"
@@ -200,7 +200,7 @@ int work(const int argc, const char* const * const argv) try {
 	
 	static const auto imgui_atlas = augs::imgui::create_atlas(config.gui_font);
 
-	static const configuration_subscribers configurables {
+	static const auto configurables = configuration_subscribers {
 		window,
 		fbos,
 		audio
@@ -231,7 +231,7 @@ int work(const int argc, const char* const * const argv) try {
 		loaded just once or if they are for example continuously streamed.
 	*/
 
-	static loaded_sounds game_sounds;
+	static loaded_sounds_map loaded_sounds;
 	static game_images_in_atlas_map game_atlas_entries;
 #if LOADED_CACHES
 	static loaded_game_image_caches game_image_caches;
@@ -408,14 +408,14 @@ int work(const int argc, const char* const * const argv) try {
 
 				auto unload = [&](){
 					audiovisuals.get<sound_system>().clear_sources_playing(key);
-					game_sounds.erase(key);
+					loaded_sounds.erase(key);
 				};
 
 				if (const auto fresh = mapped_or_nullptr(new_defs.sounds, key)) {
 					if (!equal(*fresh, old.second)) {
 						/* Different from the fresh one, reload */
 						unload();
-						game_sounds.try_emplace(key, *fresh);
+						loaded_sounds.try_emplace(key, *fresh);
 					}
 				}
 				else {
@@ -427,7 +427,7 @@ int work(const int argc, const char* const * const argv) try {
 			/* Check for new resources */
 			for (const auto& fresh : new_defs.sounds) {
 				if (nullptr == mapped_or_nullptr(currently_loaded_defs.sounds, fresh.first)) {
-					game_sounds.try_emplace(fresh.first, fresh.second);
+					loaded_sounds.try_emplace(fresh.first, fresh.second);
 				}
 				/* Otherwise it's already taken care of */
 			}
@@ -772,7 +772,7 @@ int work(const int argc, const char* const * const argv) try {
 			all_visible,
 
 			get_viewable_defs().particle_effects,
-			game_sounds,
+			loaded_sounds,
 
 			viewing_config.audio_volume
 		);
@@ -786,7 +786,7 @@ int work(const int argc, const char* const * const argv) try {
 
 			audiovisuals.standard_post_solve(step, { 
 				defs.particle_effects, 
-				game_sounds,
+				loaded_sounds,
 				get_viewer_eye() 
 			});
 		}

@@ -21,7 +21,7 @@ using sound_buffer_inputs_map = asset_map<
 	augs::sound_buffer_loading_input
 >;
 
-struct loaded_sounds;
+struct loaded_sounds_map;
 
 using particle_effects_map = asset_map<
 	assets::particle_effect_id,

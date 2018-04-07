@@ -12,7 +12,7 @@
 #include "view/audiovisual_state/systems/interpolation_system.h"
 #include "view/audiovisual_state/systems/sound_system.h"
 
-#include "view/viewables/loaded_sounds.h"
+#include "view/viewables/loaded_sounds_map.h"
 
 #include "augs/audio/audio_settings.h"
 
@@ -64,7 +64,7 @@ void sound_system::update_listener(
 
 void sound_system::update_effects_from_messages(
 	const_logic_step step,
-	const loaded_sounds& manager,
+	const loaded_sounds_map& manager,
 	const interpolation_system& interp,
 	const viewer_eye ear
 ) {
@@ -152,7 +152,7 @@ void sound_system::update_effects_from_messages(
 
 void sound_system::update_sound_properties(
 	const augs::audio_volume_settings& settings,
-	const loaded_sounds& manager,
+	const loaded_sounds_map& manager,
 	const interpolation_system& interp,
 	const viewer_eye ear,
 	const augs::delta dt

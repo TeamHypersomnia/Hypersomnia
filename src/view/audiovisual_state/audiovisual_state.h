@@ -28,7 +28,7 @@ class session_profiler;
 
 struct audiovisual_post_solve_input {
 	const particle_effects_map& particle_effects;
-	const loaded_sounds& sounds;
+	const loaded_sounds_map& sounds;
 
 	const viewer_eye eye;
 };
@@ -42,7 +42,7 @@ struct audiovisual_advance_input {
 	const visible_entities& all_visible;
 	const particle_effects_map& particle_effects;
 
-	const loaded_sounds& sounds;
+	const loaded_sounds_map& sounds;
 	const augs::audio_volume_settings audio_volume;
 
 	// for now just to know whats going on
@@ -55,7 +55,7 @@ struct audiovisual_advance_input {
 
 		const particle_effects_map& particle_effects,
 
-		const loaded_sounds& sounds,
+		const loaded_sounds_map& sounds,
 		const augs::audio_volume_settings audio_volume
 	) :
 		frame_delta(frame_delta),

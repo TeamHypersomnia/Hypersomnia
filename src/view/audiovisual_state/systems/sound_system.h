@@ -52,14 +52,14 @@ public:
 
 	void update_effects_from_messages(
 		const_logic_step step,
-		const loaded_sounds& manager,
+		const loaded_sounds_map& manager,
 		const interpolation_system& interp,
 		viewer_eye ear
 	);
 
 	void update_sound_properties(
 		const augs::audio_volume_settings&,
-		const loaded_sounds&,
+		const loaded_sounds_map&,
 		const interpolation_system& sys,
 		viewer_eye ear,
 		augs::delta dt

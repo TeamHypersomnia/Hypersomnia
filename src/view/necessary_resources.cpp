@@ -134,11 +134,6 @@ necessary_image_loadables_map::necessary_image_loadables_map(
 ) {
 	using id_type = assets::necessary_image_id;
 
-	/* 
-		This additional reference is only to mitigate MSVC bug 
-		whereby there is some(?) problem capturing "this" contents in lambdas.
-	*/
-
 	augs::for_each_enum_except_bounds([&](const id_type id) {
 		if (found_in(*this, id)) {
 			return;
