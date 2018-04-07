@@ -2,8 +2,8 @@
 #include "game/container_sizes.h"
 
 namespace assets {
-	enum class game_image_id {
-		// GEN INTROSPECTOR enum class assets::game_image_id
+	enum class image_id {
+		// GEN INTROSPECTOR enum class assets::image_id
 		INVALID,
 
 #if BUILD_TEST_SCENES

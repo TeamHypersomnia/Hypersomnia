@@ -4,7 +4,7 @@
 #include "augs/misc/enum/enum_array.h"
 #include "augs/drawing/flip.h"
 #include "augs/texture_atlas/texture_atlas_entry.h"
-#include "game/assets/ids/game_image_id.h"
+#include "game/assets/ids/image_id.h"
 #include "view/viewables/all_viewables_declarations.h"
 #include "game/components/shape_polygon_component.h"
 #include "game/components/sprite_component.h"
@@ -52,7 +52,7 @@ struct game_image_in_atlas {
 };
 
 struct loaded_game_image_caches_map : public asset_map<
-	assets::game_image_id,
+	assets::image_id,
 	game_image_cache
 > {
 	loaded_game_image_caches_map() = default;

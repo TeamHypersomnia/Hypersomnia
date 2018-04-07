@@ -18,8 +18,6 @@
 
 #include "view/game_gui/elements/gui_grid.h"
 
-using namespace assets;
-
 slot_button::slot_button() {
 	unset_flag(augs::gui::flag::CLIP);
 }
@@ -57,6 +55,8 @@ void slot_button::draw(
 		inside_col.a = 12 * 5;
 		border_col.a = 255;
 	}
+
+	using namespace assets;
 
 	const auto inside_tex = necessarys.at(necessary_image_id::ATTACHMENT_CIRCLE_FILLED);
 	const auto border_tex = necessarys.at(necessary_image_id::ATTACHMENT_CIRCLE_BORDER);

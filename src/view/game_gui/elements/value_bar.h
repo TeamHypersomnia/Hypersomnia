@@ -26,7 +26,7 @@ struct value_bar : game_gui_rect_node {
 
 	value_bar();
 
-	static assets::game_image_id get_bar_icon(
+	static assets::image_id get_bar_icon(
 		const const_game_gui_context context, 
 		const const_this_pointer this_id
 	);

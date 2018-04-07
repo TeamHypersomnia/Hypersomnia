@@ -12,7 +12,7 @@ void load_test_scene_images(
 	game_image_loadables_map& all_loadables,
 	game_image_metas_map& all_metas
 ) {
-	using id_type = assets::game_image_id;
+	using id_type = assets::image_id;
 
 	const auto directory = augs::path_type("content/official/gfx/");
 

@@ -4,7 +4,7 @@
 
 #include "view/viewables/particle_types.h"
 
-#include "game/assets/ids/game_image_id.h"
+#include "game/assets/ids/image_id.h"
 #include "game/assets/ids/animation_id.h"
 #include "game/assets/ids/sound_buffer_id.h"
 #include "game/assets/ids/particle_effect_id.h"

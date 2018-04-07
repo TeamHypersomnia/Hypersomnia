@@ -1,5 +1,5 @@
 #pragma once
-#include "game/assets/ids/game_image_id.h"
+#include "game/assets/ids/image_id.h"
 
 namespace augs {
 	template <class id_type>
@@ -7,7 +7,7 @@ namespace augs {
 }
 
 namespace invariants {
-	using sprite = augs::sprite<assets::game_image_id>;
+	using sprite = augs::sprite<assets::image_id>;
 }
 
 namespace components {

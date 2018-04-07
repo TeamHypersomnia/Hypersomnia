@@ -29,16 +29,16 @@ using particle_effects_map = asset_map<
 >;
 
 using game_image_loadables_map = asset_map<
-	assets::game_image_id,
+	assets::image_id,
 	image_loadables
 >;
 
 using game_image_metas_map = asset_map<
-	assets::game_image_id,
+	assets::image_id,
 	game_image_meta
 >;
 
 using game_images_in_atlas_map = asset_map<
-	assets::game_image_id,
+	assets::image_id,
 	game_image_in_atlas
 >;

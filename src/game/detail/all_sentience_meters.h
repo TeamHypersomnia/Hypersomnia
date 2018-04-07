@@ -10,12 +10,12 @@
 
 #include "augs/graphics/rgba.h"
 
-#include "game/assets/ids/game_image_id.h"
+#include "game/assets/ids/image_id.h"
 #include "game/common_state/entity_name_str.h"
 
 struct sentience_meter_appearance {
 	// GEN INTROSPECTOR struct sentience_meter_appearance
-	assets::game_image_id icon = assets::game_image_id::INVALID;
+	assets::image_id icon = assets::image_id::INVALID;
 	rgba bar_color;
 	entity_name_str description;
 	// END GEN INTROSPECTOR

@@ -94,7 +94,7 @@ namespace test_flavours {
 				meta.set(flags_def);
 			}
 
-			test_flavours::add_sprite(meta, logicals, assets::game_image_id::ROUND_TRACE, cyan);
+			test_flavours::add_sprite(meta, logicals, assets::image_id::ROUND_TRACE, cyan);
 			add_shape_invariant_from_renderable(meta, logicals);
 
 			{
@@ -148,7 +148,7 @@ namespace test_flavours {
 				meta.set(render_def);
 			}
 
-			test_flavours::add_sprite(meta, logicals, assets::game_image_id::CYAN_SHELL, white);
+			test_flavours::add_sprite(meta, logicals, assets::image_id::CYAN_SHELL, white);
 			add_shape_invariant_from_renderable(meta, logicals);
 			test_flavours::add_shell_dynamic_body(meta);
 		}
@@ -163,7 +163,7 @@ namespace test_flavours {
 				meta.set(render_def);
 			}
 
-			test_flavours::add_sprite(meta, logicals, assets::game_image_id::CYAN_CHARGE, white);
+			test_flavours::add_sprite(meta, logicals, assets::image_id::CYAN_CHARGE, white);
 			add_shape_invariant_from_renderable(meta, logicals);
 			test_flavours::add_see_through_dynamic_body(meta);
 
@@ -201,7 +201,7 @@ namespace test_flavours {
 				meta.set(render_def);
 			}
 
-			test_flavours::add_sprite(meta, logicals, assets::game_image_id::SAMPLE_MAGAZINE, white);
+			test_flavours::add_sprite(meta, logicals, assets::image_id::SAMPLE_MAGAZINE, white);
 			add_shape_invariant_from_renderable(meta, logicals);
 			test_flavours::add_see_through_dynamic_body(meta);
 
@@ -231,7 +231,7 @@ namespace test_flavours {
 				render_def.layer = render_layer::FLYING_BULLETS;
 
 				meta.set(render_def);
-				test_flavours::add_sprite(meta, logicals, assets::game_image_id::ROUND_TRACE, cyan);
+				test_flavours::add_sprite(meta, logicals, assets::image_id::ROUND_TRACE, cyan);
 			}
 
 			{
@@ -254,7 +254,7 @@ namespace test_flavours {
 				render_def.layer = render_layer::FLYING_BULLETS;
 
 				meta.set(render_def);
-				test_flavours::add_sprite(meta, logicals, assets::game_image_id::ENERGY_BALL, cyan);
+				test_flavours::add_sprite(meta, logicals, assets::image_id::ENERGY_BALL, cyan);
 			}
 
 			{
@@ -280,7 +280,7 @@ namespace test_flavours {
 			}
 
 
-			test_flavours::add_sprite(meta, logicals, assets::game_image_id::ENERGY_BALL, cyan);
+			test_flavours::add_sprite(meta, logicals, assets::image_id::ENERGY_BALL, cyan);
 			add_shape_invariant_from_renderable(meta, logicals);
 			{
 				invariants::trace trace_def;
@@ -335,7 +335,7 @@ namespace test_flavours {
 			}
 
 
-			test_flavours::add_sprite(meta, logicals, assets::game_image_id::ENERGY_BALL, cyan);
+			test_flavours::add_sprite(meta, logicals, assets::image_id::ENERGY_BALL, cyan);
 			add_shape_invariant_from_renderable(meta, logicals);
 			{
 				invariants::trace trace_def;
@@ -400,7 +400,7 @@ namespace test_flavours {
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
 			gun_def.muzzle_velocity = {4000.f, 4000.f};
 			gun_def.shot_cooldown_ms = 100.f;
-			gun_def.bullet_spawn_offset.set(logicals.at(assets::game_image_id::ASSAULT_RIFLE).get_size().x / 2, 0);
+			gun_def.bullet_spawn_offset.set(logicals.at(assets::image_id::ASSAULT_RIFLE).get_size().x / 2, 0);
 
 			gun_def.shell_spawn_offset.pos.set(0, 10);
 			gun_def.shell_spawn_offset.rotation = 45;
@@ -420,7 +420,7 @@ namespace test_flavours {
 
 			meta.set(gun_def);
 
-			test_flavours::add_sprite(meta, logicals, assets::game_image_id::ASSAULT_RIFLE, white);
+			test_flavours::add_sprite(meta, logicals, assets::image_id::ASSAULT_RIFLE, white);
 			add_shape_invariant_from_renderable(meta, logicals);
 			test_flavours::add_see_through_dynamic_body(meta);
 			make_default_gun_container(meta);
@@ -443,7 +443,7 @@ namespace test_flavours {
 			gun_def.action_mode = gun_action_type::SEMI_AUTOMATIC;
 			gun_def.muzzle_velocity = {3000.f, 3000.f};
 			gun_def.shot_cooldown_ms = 100.f;
-			gun_def.bullet_spawn_offset.set(logicals.at(assets::game_image_id::KEK9).get_size().x / 2, -7);
+			gun_def.bullet_spawn_offset.set(logicals.at(assets::image_id::KEK9).get_size().x / 2, -7);
 
 			gun_def.shell_spawn_offset.pos.set(0, 10);
 			gun_def.shell_spawn_offset.rotation = 45;
@@ -463,7 +463,7 @@ namespace test_flavours {
 
 			meta.set(gun_def);
 
-			test_flavours::add_sprite(meta, logicals, assets::game_image_id::KEK9, white);
+			test_flavours::add_sprite(meta, logicals, assets::image_id::KEK9, white);
 			add_shape_invariant_from_renderable(meta, logicals);
 			test_flavours::add_see_through_dynamic_body(meta);
 			make_default_gun_container(meta, 0.f, true);
@@ -486,7 +486,7 @@ namespace test_flavours {
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
 			gun_def.muzzle_velocity = {2000.f, 2000.f};
 			gun_def.shot_cooldown_ms = 300.f;
-			gun_def.bullet_spawn_offset.set(logicals.at(assets::game_image_id::AMPLIFIER_ARM).get_size().x / 2, 0);
+			gun_def.bullet_spawn_offset.set(logicals.at(assets::image_id::AMPLIFIER_ARM).get_size().x / 2, 0);
 
 			gun_def.damage_multiplier = 1.f;
 
@@ -495,7 +495,7 @@ namespace test_flavours {
 
 			meta.set(gun_def);
 
-			test_flavours::add_sprite(meta, logicals, assets::game_image_id::AMPLIFIER_ARM, white);
+			test_flavours::add_sprite(meta, logicals, assets::image_id::AMPLIFIER_ARM, white);
 			add_shape_invariant_from_renderable(meta, logicals);
 			test_flavours::add_see_through_dynamic_body(meta);
 

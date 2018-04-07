@@ -10,7 +10,7 @@ struct general_particle {
 	vec2 pos;
 	vec2 vel;
 	vec2 acc;
-	assets::game_image_id image_id = assets::game_image_id::INVALID;
+	assets::image_id image_id = assets::image_id::INVALID;
 	rgba color;
 	vec2 size;
 	float rotation = 0.f;
@@ -74,7 +74,7 @@ struct general_particle {
 	void colorize(const rgba);
 
 	void set_image(
-		const assets::game_image_id,
+		const assets::image_id,
 		vec2 size,
 		const rgba
 	);
@@ -89,7 +89,7 @@ struct animated_particle {
 	float linear_damping = 0.f;
 	float current_lifetime_ms = 0.f;
 
-	assets::game_image_id first_face = assets::game_image_id::INVALID;
+	assets::image_id first_face = assets::image_id::INVALID;
 	rgba color;
 	float frame_duration_ms = 0.f;
 	unsigned frame_count = 0;
@@ -105,7 +105,7 @@ struct animated_particle {
 		thread_local invariants::sprite face;
 		const auto frame_num = std::min(static_cast<unsigned>(current_lifetime_ms / frame_duration_ms), frame_count - 1);
 
-		const auto target_id = static_cast<assets::game_image_id>(static_cast<int>(first_face) + frame_num);
+		const auto target_id = static_cast<assets::image_id>(static_cast<int>(first_face) + frame_num);
 
 		face.set(target_id, manager.at(target_id).get_size(), white);
 
@@ -137,7 +137,7 @@ struct homing_animated_particle {
 
 	float homing_force = 3000.f;
 
-	assets::game_image_id first_face = assets::game_image_id::INVALID;
+	assets::image_id first_face = assets::image_id::INVALID;
 	rgba color;
 	float frame_duration_ms = 0.f;
 	unsigned frame_count = 0;
@@ -156,8 +156,8 @@ struct homing_animated_particle {
 		thread_local invariants::sprite face;
 		const auto frame_num = std::min(static_cast<unsigned>(current_lifetime_ms / frame_duration_ms), frame_count - 1);
 
-		//face.set(static_cast<assets::game_image_id>(static_cast<int>(first_face) + frame_count - frame_num - 1));
-		const auto target_id = static_cast<assets::game_image_id>(static_cast<int>(first_face) + frame_num);
+		//face.set(static_cast<assets::image_id>(static_cast<int>(first_face) + frame_count - frame_num - 1));
+		const auto target_id = static_cast<assets::image_id>(static_cast<int>(first_face) + frame_num);
 
 		face.set(
 			target_id,

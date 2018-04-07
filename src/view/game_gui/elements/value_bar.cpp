@@ -287,7 +287,7 @@ void value_bar::respond_to_events(
 	}
 }
 
-assets::game_image_id value_bar::get_bar_icon(
+assets::image_id value_bar::get_bar_icon(
 	const const_game_gui_context context, 
 	const const_this_pointer this_id
 ) {

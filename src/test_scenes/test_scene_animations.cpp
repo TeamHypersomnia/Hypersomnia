@@ -9,8 +9,8 @@ void load_test_scene_animations(all_logical_assets& anims) {
 		anim.loop_mode = animation::loop_type::NONE;
 
 		anim.create_frames(
-			assets::game_image_id::CAST_BLINK_1,
-			assets::game_image_id::CAST_BLINK_19,
+			assets::image_id::CAST_BLINK_1,
+			assets::image_id::CAST_BLINK_19,
 			50.0f
 		);
 	} 

@@ -3,7 +3,7 @@
 
 struct perk_appearance {
 	// GEN INTROSPECTOR struct perk_appearance
-	assets::game_image_id icon = assets::game_image_id::INVALID;
+	assets::image_id icon = assets::image_id::INVALID;
 	entity_name_str description;
 	rgba bar_color;
 	// END GEN INTROSPECTOR

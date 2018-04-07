@@ -2,7 +2,7 @@
 #include <string>
 #include "augs/graphics/rgba.h"
 
-#include "game/assets/ids/game_image_id.h"
+#include "game/assets/ids/image_id.h"
 #include "game/assets/ids/particle_effect_id.h"
 #include "game/assets/ids/sound_buffer_id.h"
 
@@ -24,7 +24,7 @@ struct spell_common_data {
 
 struct spell_appearance {
 	// GEN INTROSPECTOR struct spell_appearance
-	assets::game_image_id icon = assets::game_image_id::INVALID;
+	assets::image_id icon = assets::image_id::INVALID;
 	entity_name_str incantation;
 	entity_name_str name;
 	entity_name_str description;

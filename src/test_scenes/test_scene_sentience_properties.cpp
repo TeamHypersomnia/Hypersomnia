@@ -31,7 +31,7 @@ void load_test_scene_sentience_properties(
 			d.perk_duration_seconds
 		);
 
-		d.appearance.icon = assets::game_image_id::SPELL_HASTE_ICON;
+		d.appearance.icon = assets::image_id::SPELL_HASTE_ICON;
 
 		d.common.cast_successful_sound.id = assets::sound_buffer_id::CAST_SUCCESSFUL;
 		d.common.cast_sparkles.id = assets::particle_effect_id::CAST_SPARKLES;
@@ -51,7 +51,7 @@ void load_test_scene_sentience_properties(
 			"[color=vsdarkgray]Stabilizes functions of the physical body.[/color]"
 		);
 
-		d.appearance.icon = assets::game_image_id::SPELL_EXALTATION_ICON;
+		d.appearance.icon = assets::image_id::SPELL_EXALTATION_ICON;
 		d.basic_healing_amount = 34;
 
 		d.common.cast_successful_sound.id = assets::sound_buffer_id::CAST_SUCCESSFUL;
@@ -74,7 +74,7 @@ void load_test_scene_sentience_properties(
 			"[color=vsdarkgray]Restores resonance of mind with the body.[/color]"
 		);
 
-		d.appearance.icon = assets::game_image_id::SPELL_ECHOES_OF_THE_HIGHER_REALMS_ICON;
+		d.appearance.icon = assets::image_id::SPELL_ECHOES_OF_THE_HIGHER_REALMS_ICON;
 		d.basic_healing_amount = 132;
 
 		d.common.cast_successful_sound.id = assets::sound_buffer_id::CAST_SUCCESSFUL;
@@ -97,7 +97,7 @@ void load_test_scene_sentience_properties(
 			"[color=vsdarkgray]Causes instant damage around the caster.[/color]"
 		);
 
-		d.appearance.icon = assets::game_image_id::SPELL_FURY_OF_THE_AEONS_ICON;
+		d.appearance.icon = assets::image_id::SPELL_FURY_OF_THE_AEONS_ICON;
 
 		d.common.cast_successful_sound.id = assets::sound_buffer_id::CAST_SUCCESSFUL;
 		d.common.cast_sparkles.id = assets::particle_effect_id::CAST_SPARKLES;
@@ -134,7 +134,7 @@ void load_test_scene_sentience_properties(
 			"[color=vsdarkgray]Spawns three electric missiles\nhoming towards hostile entities.[/color]"
 		);
 
-		d.appearance.icon = assets::game_image_id::SPELL_ELECTRIC_TRIAD_ICON;
+		d.appearance.icon = assets::image_id::SPELL_ELECTRIC_TRIAD_ICON;
 
 		d.common.cast_successful_sound.id = assets::sound_buffer_id::CAST_SUCCESSFUL;
 		d.common.cast_sparkles.id = assets::particle_effect_id::CAST_SPARKLES;
@@ -154,7 +154,7 @@ void load_test_scene_sentience_properties(
 			"[color=vsdarkgray]Causes massive damage around the caster.\nRequires delay to initiate.[/color]"
 		);
 
-		d.appearance.icon = assets::game_image_id::SPELL_ULTIMATE_WRATH_OF_THE_AEONS_ICON;
+		d.appearance.icon = assets::image_id::SPELL_ULTIMATE_WRATH_OF_THE_AEONS_ICON;
 
 		d.common.cast_successful_sound.id = assets::sound_buffer_id::CAST_SUCCESSFUL;
 		d.common.cast_sparkles.id = assets::particle_effect_id::CAST_SPARKLES;
@@ -227,7 +227,7 @@ void load_test_scene_sentience_properties(
 			d.perk_duration_seconds
 		);
 
-		d.appearance.icon = assets::game_image_id::SPELL_ELECTRIC_SHIELD_ICON;
+		d.appearance.icon = assets::image_id::SPELL_ELECTRIC_SHIELD_ICON;
 
 		d.common.cast_successful_sound.id = assets::sound_buffer_id::CAST_SUCCESSFUL;
 		d.common.cast_sparkles.id = assets::particle_effect_id::CAST_SPARKLES;
@@ -237,14 +237,14 @@ void load_test_scene_sentience_properties(
 	{
 		auto& p = std::get<electric_shield_perk>(perks);
 		p.appearance.description = "[color=turquoise]Electric shield[/color]\n[color=vsdarkgray]Damage is absorbed by [/color][color=cyan]Personal Electricity[/color][color=vsdarkgray] instead of [/color][color=red]Health[/color][color=vsdarkgray].[/color]";
-		p.appearance.icon = assets::game_image_id::PERK_ELECTRIC_SHIELD_ICON;
+		p.appearance.icon = assets::image_id::PERK_ELECTRIC_SHIELD_ICON;
 		p.appearance.bar_color = turquoise - rgba(30, 30, 30, 0);
 	}
 
 	{
 		auto& p = std::get<haste_perk>(perks);
 		p.appearance.description = "[color=green]Haste[/color]\n[color=vsdarkgray]You move faster.[/color]";
-		p.appearance.icon = assets::game_image_id::PERK_HASTE_ICON;
+		p.appearance.icon = assets::image_id::PERK_HASTE_ICON;
 		p.appearance.bar_color = green - rgba(30, 30, 30, 0);
 	}
 
@@ -252,7 +252,7 @@ void load_test_scene_sentience_properties(
 		auto& m = std::get<health_meter>(meters);
 
 		m.appearance.description = "[color=red]Health points:[/color] %x/%x\n[color=vsdarkgray]Stability of the physical body.[/color]";
-		m.appearance.icon = assets::game_image_id::HEALTH_ICON;
+		m.appearance.icon = assets::image_id::HEALTH_ICON;
 		m.appearance.bar_color = red - rgba(30, 30, 30, 0);
 	}
 
@@ -260,7 +260,7 @@ void load_test_scene_sentience_properties(
 		auto& m = std::get<personal_electricity_meter>(meters);
 
 		m.appearance.description = "[color=cyan]Personal electricity:[/color] %x/%x\n[color=vsdarkgray]Mind-programmable matter.[/color]";
-		m.appearance.icon = assets::game_image_id::PERSONAL_ELECTRICITY_ICON;
+		m.appearance.icon = assets::image_id::PERSONAL_ELECTRICITY_ICON;
 		m.appearance.bar_color = cyan - rgba(30, 30, 30, 0);
 	}
 
@@ -268,7 +268,7 @@ void load_test_scene_sentience_properties(
 		auto& m = std::get<consciousness_meter>(meters);
 
 		m.appearance.description = "[color=orange]Consciousness:[/color] %x/%x\n[color=vsdarkgray]Attunement of soul with the body.[/color]";
-		m.appearance.icon = assets::game_image_id::CONSCIOUSNESS_ICON;
+		m.appearance.icon = assets::image_id::CONSCIOUSNESS_ICON;
 		m.appearance.bar_color = orange - rgba(30, 30, 30, 0);
 	}
 }

@@ -1,11 +1,11 @@
 #pragma once
 #include "augs/misc/constant_size_vector.h"
-#include "game/assets/ids/game_image_id.h"
+#include "game/assets/ids/image_id.h"
 #include "game/container_sizes.h"
 
 struct animation_frame {
 	// GEN INTROSPECTOR struct animation_frame
-	assets::game_image_id image_id = assets::game_image_id::INVALID;
+	assets::image_id image_id = assets::image_id::INVALID;
 	float duration_milliseconds = 0.f;
 	// END GEN INTROSPECTOR
 };
@@ -24,8 +24,8 @@ struct animation {
 	// END GEN INTROSPECTOR
 
 	void create_frames(
-		const assets::game_image_id first_frame,
-		const assets::game_image_id last_frame,
+		const assets::image_id first_frame,
+		const assets::image_id last_frame,
 		const float frame_duration_ms
 	);
 };

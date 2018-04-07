@@ -12,7 +12,7 @@ constexpr bool is_asset_id_v = is_one_of_v<
 	assets::physical_material_id,
 
 	/* Viewables */
-	assets::game_image_id,
+	assets::image_id,
 	assets::particle_effect_id,
 	assets::sound_buffer_id
 >;

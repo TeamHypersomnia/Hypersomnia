@@ -21,7 +21,7 @@ namespace test_flavours {
 			render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
 
 			meta.set(render_def);
-			test_flavours::add_sprite(meta, logicals, assets::game_image_id::URBAN_CYAN_MACHETE, white);
+			test_flavours::add_sprite(meta, logicals, assets::image_id::URBAN_CYAN_MACHETE, white);
 			add_shape_invariant_from_renderable(meta, logicals);
 
 			test_flavours::add_see_through_dynamic_body(meta);

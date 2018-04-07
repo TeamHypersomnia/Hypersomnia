@@ -6,7 +6,7 @@
 #include "augs/gui/appearance_detector.h"
 #include "augs/gui/button_corners.h"
 
-#include "game/assets/ids/game_image_id.h"
+#include "game/assets/ids/image_id.h"
 
 #include "application/gui/menu/appearing_text.h"
 

@@ -54,7 +54,7 @@ void general_particle::colorize(const rgba mult) {
 }
 
 void general_particle::set_image(
-	const assets::game_image_id id,
+	const assets::image_id id,
 	vec2 s,
 	const rgba col
 ) {

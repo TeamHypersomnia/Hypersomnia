@@ -15,7 +15,7 @@ namespace test_flavours {
 	void add_sprite(
 		E& t, 
 		const loaded_game_image_caches_map& logicals,
-		const assets::game_image_id id, 
+		const assets::image_id id, 
 		const rgba col = white,
 		const augs::sprite_special_effect effect = augs::sprite_special_effect::NONE
 	) {
