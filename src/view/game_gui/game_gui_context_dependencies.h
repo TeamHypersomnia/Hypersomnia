@@ -7,7 +7,7 @@ namespace augs {
 }
 
 struct game_gui_context_dependencies {
-	const game_image_metas_map& image_metas;
+	const image_metas_map& image_metas;
 	const game_images_in_atlas_map& game_images;
 	const necessary_images_in_atlas_map& necessary_images;
 	const augs::baked_font& gui_font;

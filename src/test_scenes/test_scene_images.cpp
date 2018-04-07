@@ -9,8 +9,8 @@
 
 void load_test_scene_images(
 	sol::state& lua,
-	game_image_loadables_map& all_loadables,
-	game_image_metas_map& all_metas
+	image_loadables_map& all_loadables,
+	image_metas_map& all_metas
 ) {
 	using id_type = assets::image_id;
 

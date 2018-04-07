@@ -28,8 +28,8 @@ namespace sol {
 
 void load_test_scene_images(
 	sol::state& lua,
-	game_image_loadables_map&,
-	game_image_metas_map&
+	image_loadables_map&,
+	image_metas_map&
 );
 
 void load_test_scene_animations(all_logical_assets&);

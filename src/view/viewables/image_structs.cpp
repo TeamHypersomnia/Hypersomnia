@@ -10,8 +10,8 @@ game_image_cache::game_image_cache(
 }
 
 loaded_game_image_caches_map::loaded_game_image_caches_map(
-	const game_image_loadables_map& loadables,
-	const game_image_metas_map& metas
+	const image_loadables_map& loadables,
+	const image_metas_map& metas
 ) { 
 	for (const auto& l : loadables) {
 		game_image_cache ch(l.second, metas.at(l.first));

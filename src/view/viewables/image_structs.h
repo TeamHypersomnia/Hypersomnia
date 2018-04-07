@@ -58,8 +58,8 @@ struct loaded_game_image_caches_map : public asset_map<
 	loaded_game_image_caches_map() = default;
 
 	explicit loaded_game_image_caches_map(
-		const game_image_loadables_map&,
-		const game_image_metas_map&
+		const image_loadables_map&,
+		const image_metas_map&
 	);
 };
 

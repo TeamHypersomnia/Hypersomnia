@@ -123,7 +123,7 @@ void item_button::draw_complete_dragged_ghost(
 
 item_button::layout_with_attachments item_button::calc_button_layout(
 	const const_entity_handle component_owner,
-	const game_image_metas_map& defs,
+	const image_metas_map& defs,
 	const bool include_attachments
 ) {
 	layout_with_attachments output;
