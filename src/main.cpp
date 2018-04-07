@@ -232,11 +232,11 @@ int work(const int argc, const char* const * const argv) try {
 	*/
 
 	static loaded_sounds_map loaded_sounds;
-	static game_images_in_atlas_map game_atlas_entries;
+	static game_images_in_atlas_map images_in_atlas;
 #if LOADED_CACHES
-	static loaded_game_image_caches game_image_caches;
+	static loaded_game_image_caches_map loaded_image_caches;
 #endif
-	static necessary_images_in_atlas_map necessary_atlas_entries;
+	static necessary_images_in_atlas_map necessary_images_in_atlas;
 	
 #if STATICALLY_ALLOCATE_BAKED_FONTS
 	static augs::baked_font gui_font;
@@ -312,7 +312,7 @@ int work(const int argc, const char* const * const argv) try {
 		{
 			bool new_atlas_required = false;
 			
-			if (necessary_atlas_entries.empty()) {
+			if (necessary_images_in_atlas.empty()) {
 				new_atlas_required = true;
 			}
 
@@ -341,7 +341,7 @@ int work(const int argc, const char* const * const argv) try {
 					const bool meta_changed = !equal(old_meta, new_meta);
 
 					if (loadables_changed || meta_changed) {
-						game_image_caches.at(key) = { *new_loadables, new_meta };
+						loaded_image_caches.at(key) = { *new_loadables, new_meta };
 					}
 #endif
 				}
@@ -349,7 +349,7 @@ int work(const int argc, const char* const * const argv) try {
 					/* Missing, unload */
 					new_atlas_required = true;
 #if LOADED_CACHES
-					game_image_caches.erase(key);
+					loaded_image_caches.erase(key);
 #endif
 				}
 			}
@@ -363,7 +363,7 @@ int work(const int argc, const char* const * const argv) try {
 
 #if LOADED_CACHES
 					const auto& new_meta = new_defs.image_metas.at(key);
-					game_image_caches.emplace(fresh.second, new_meta);
+					loaded_image_caches.emplace(fresh.second, new_meta);
 #endif
 				}
 				/* Otherwise it's already taken care of */
@@ -376,8 +376,8 @@ int work(const int argc, const char* const * const argv) try {
 			if (new_atlas_required) {
 				const auto settings = config.content_regeneration;
 
-				game_atlas_entries.clear();
-				necessary_atlas_entries.clear();
+				images_in_atlas.clear();
+				necessary_images_in_atlas.clear();
 
 				game_world_atlas.emplace(standard_atlas_distribution({
 					new_defs.image_loadables,
@@ -390,8 +390,8 @@ int work(const int argc, const char* const * const argv) try {
 						settings.regenerate_every_launch,
 						settings.check_integrity_every_launch
 					},
-					game_atlas_entries,
-					necessary_atlas_entries,
+					images_in_atlas,
+					necessary_images_in_atlas,
 					get_gui_font()
 				}));
 
@@ -515,15 +515,15 @@ int work(const int argc, const char* const * const argv) try {
 	static auto create_game_gui_deps = []() {
 		return game_gui_context_dependencies{
 			get_viewable_defs().image_metas,
-			game_atlas_entries,
-			necessary_atlas_entries,
+			images_in_atlas,
+			necessary_images_in_atlas,
 			get_gui_font()
 		};
 	};
 
 	static auto create_menu_context_deps = [](const auto& viewing_config) {
 		return menu_context_dependencies{
-			necessary_atlas_entries,
+			necessary_images_in_atlas,
 			get_gui_font(),
 			sounds,
 			viewing_config.audio_volume
@@ -1325,11 +1325,11 @@ int work(const int argc, const char* const * const argv) try {
 						using T = std::decay_t<decltype(setup)>;
 
 						if constexpr(T::handles_window_input) {
-							if (!necessary_atlas_entries.empty()) {
+							if (!necessary_images_in_atlas.empty()) {
 								/* Viewables reloading happens later so it might not be ready yet */
 
 								return setup.handle_input_before_game(
-									necessary_atlas_entries, _common_input_state, e, _window, _lua
+									necessary_images_in_atlas, _common_input_state, e, _window, _lua
 								);
 							}
 						}
@@ -1489,14 +1489,14 @@ int work(const int argc, const char* const * const argv) try {
 		auto get_drawer = [&]() { 
 			return augs::drawer_with_default {
 				renderer.get_triangle_buffer(),
-				necessary_atlas_entries[assets::necessary_image_id::BLANK]
+				necessary_images_in_atlas[assets::necessary_image_id::BLANK]
 			};
 		};
 
 		auto get_line_drawer = [&]() { 
 			return augs::line_drawer_with_default {
 				renderer.get_line_buffer(),
-				necessary_atlas_entries[assets::necessary_image_id::BLANK]
+				necessary_images_in_atlas[assets::necessary_image_id::BLANK]
 			};
 		};
 
@@ -1563,9 +1563,9 @@ int work(const int argc, const char* const * const argv) try {
 					{ viewed_character, get_camera(), screen_size },
 					audiovisuals,
 					new_viewing_config.drawing,
-					necessary_atlas_entries,
+					necessary_images_in_atlas,
 					get_gui_font(),
-					game_atlas_entries,
+					images_in_atlas,
 					interpolation_ratio,
 					renderer,
 					frame_performance,
@@ -1646,7 +1646,7 @@ int work(const int argc, const char* const * const argv) try {
 						[&](const auto typed_handle, const auto image_id, const components::transform world_transform, const rgba color){
 							const auto screen_space_pos = vec2i(on_screen(world_transform.pos));
 
-							const auto aabb = xywh::center_and_size(screen_space_pos, necessary_atlas_entries[image_id].get_size());
+							const auto aabb = xywh::center_and_size(screen_space_pos, necessary_images_in_atlas[image_id].get_size());
 							const auto expanded_square = aabb.expand_to_square();
 
 							if (auto active_color = editor.find_highlight_color_of(typed_handle.get_id())) {
@@ -1669,7 +1669,7 @@ int work(const int argc, const char* const * const argv) try {
 							}
 
 							drawer.base::aabb_centered(
-								necessary_atlas_entries[image_id],
+								necessary_images_in_atlas[image_id],
 								screen_space_pos,
 								color
 							);
@@ -1754,7 +1754,7 @@ int work(const int argc, const char* const * const argv) try {
 
 				main_menu.value().draw_overlays(
 					get_drawer(),
-					necessary_atlas_entries,
+					necessary_images_in_atlas,
 					get_gui_font(),
 					screen_size
 				);
@@ -1779,14 +1779,14 @@ int work(const int argc, const char* const * const argv) try {
 
 			if (ImGui::GetIO().WantCaptureMouse) {
 				if (should_draw_our_cursor) {
-					get_drawer().cursor(necessary_atlas_entries, augs::imgui::get_cursor<assets::necessary_image_id>(), cursor_drawing_pos, white);
+					get_drawer().cursor(necessary_images_in_atlas, augs::imgui::get_cursor<assets::necessary_image_id>(), cursor_drawing_pos, white);
 				}
 			}
 			else if (menu_chosen_cursor != assets::necessary_image_id::INVALID) {
 				/* We must have drawn some menu */
 
 				if (should_draw_our_cursor) {
-					get_drawer().cursor(necessary_atlas_entries, menu_chosen_cursor, cursor_drawing_pos, white);
+					get_drawer().cursor(necessary_images_in_atlas, menu_chosen_cursor, cursor_drawing_pos, white);
 				}
 			}
 			else if (game_gui_mode && should_draw_game_gui()) {
@@ -1800,7 +1800,7 @@ int work(const int argc, const char* const * const argv) try {
 				if (should_draw_our_cursor) {
 					on_specific_setup([&](editor_setup& setup) {
 						if (setup.is_editing_mode()) {
-							get_drawer().cursor(necessary_atlas_entries, assets::necessary_image_id::GUI_CURSOR, cursor_drawing_pos, white);
+							get_drawer().cursor(necessary_images_in_atlas, assets::necessary_image_id::GUI_CURSOR, cursor_drawing_pos, white);
 						}
 					});
 				}

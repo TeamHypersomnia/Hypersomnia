@@ -14,11 +14,11 @@ struct test_scene_asset_loading_error : error_with_typesafe_sprintf {
 	using error_with_typesafe_sprintf::error_with_typesafe_sprintf;
 };
 
-struct loaded_game_image_caches;
+struct loaded_game_image_caches_map;
 
 void load_test_scene_sound_buffers(sound_buffer_inputs_map&);
 void load_test_scene_particle_effects(
-	const loaded_game_image_caches&,
+	const loaded_game_image_caches_map&,
 	particle_effects_map&
 );
 
@@ -40,7 +40,7 @@ void load_test_scene_sentience_properties(cosmos_common_significant&);
 
 /* Top-level populators */
 
-loaded_game_image_caches populate_test_scene_images_and_sounds(
+loaded_game_image_caches_map populate_test_scene_images_and_sounds(
 	sol::state& lua,
 	all_viewables_defs& output_sources
 ); 
@@ -51,7 +51,7 @@ void populate_test_scene_logical_assets(
 
 void populate_test_scene_viewables(
 	sol::state& lua,
-	const loaded_game_image_caches& caches,
+	const loaded_game_image_caches_map& caches,
 	all_viewables_defs& output_sources
 );
 

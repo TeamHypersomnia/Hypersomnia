@@ -4,7 +4,7 @@
 #include "game/components/fixtures_component.h"
 
 namespace test_flavours {
-	void populate_crate_flavours(const loaded_game_image_caches& logicals, all_entity_flavours& flavours) {
+	void populate_crate_flavours(const loaded_game_image_caches_map& logicals, all_entity_flavours& flavours) {
 		{
 			auto& meta = get_test_flavour(flavours, test_plain_sprited_bodys::CRATE);
 

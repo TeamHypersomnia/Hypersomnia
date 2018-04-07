@@ -51,13 +51,13 @@ struct game_image_in_atlas {
 	}
 };
 
-struct loaded_game_image_caches : public asset_map<
+struct loaded_game_image_caches_map : public asset_map<
 	assets::game_image_id,
 	game_image_cache
 > {
-	loaded_game_image_caches() = default;
+	loaded_game_image_caches_map() = default;
 
-	explicit loaded_game_image_caches(
+	explicit loaded_game_image_caches_map(
 		const game_image_loadables_map&,
 		const game_image_metas_map&
 	);
@@ -66,7 +66,7 @@ struct loaded_game_image_caches : public asset_map<
 template <class E>
 void add_shape_invariant_from_renderable(
 	E& into,
-	const loaded_game_image_caches& caches
+	const loaded_game_image_caches_map& caches
 ) {
 	static_assert(E::template has<invariants::shape_polygon>());
 

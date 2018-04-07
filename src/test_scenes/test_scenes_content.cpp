@@ -4,7 +4,7 @@
 #include "view/viewables/game_image.h"
 
 #if BUILD_TEST_SCENES
-loaded_game_image_caches populate_test_scene_images_and_sounds(
+loaded_game_image_caches_map populate_test_scene_images_and_sounds(
 	sol::state& lua,
 	all_viewables_defs& output_sources
 ) {
@@ -19,7 +19,7 @@ loaded_game_image_caches populate_test_scene_images_and_sounds(
 		LOG(err.what());
 	}
 
-	return loaded_game_image_caches(loadables, metas);
+	return loaded_game_image_caches_map(loadables, metas);
 }
 
 void populate_test_scene_logical_assets(
@@ -32,7 +32,7 @@ void populate_test_scene_logical_assets(
 
 void populate_test_scene_viewables(
 	sol::state& lua,
-	const loaded_game_image_caches& caches,
+	const loaded_game_image_caches_map& caches,
 	all_viewables_defs& output_sources
 ) {
 	try {

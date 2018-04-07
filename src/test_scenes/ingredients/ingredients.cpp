@@ -7,7 +7,7 @@
 #include "game/components/container_component.h"
 
 namespace test_flavours {
-	void populate_other_flavours(const loaded_game_image_caches& logicals, all_entity_flavours& flavours) {
+	void populate_other_flavours(const loaded_game_image_caches_map& logicals, all_entity_flavours& flavours) {
 		{
 			auto& meta = get_test_flavour(flavours, test_static_lights::STRONG_LAMP);
 

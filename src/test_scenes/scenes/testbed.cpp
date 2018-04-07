@@ -30,7 +30,7 @@
 #include "game/transcendental/cosmic_delta.h"
 
 namespace test_scenes {
-	void testbed::populate(const loaded_game_image_caches& caches, cosmos_common_significant& common) const {
+	void testbed::populate(const loaded_game_image_caches_map& caches, cosmos_common_significant& common) const {
 		populate_test_scene_flavours(caches, common.flavours);
 
 		auto& common_assets = common.assets;
@@ -53,7 +53,7 @@ namespace test_scenes {
 		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
 	}
 
-	entity_id testbed::populate(const loaded_game_image_caches& metas, const logic_step step) const {
+	entity_id testbed::populate(const loaded_game_image_caches_map& metas, const logic_step step) const {
 		auto& world = step.get_cosmos();
 		
 #if TODO

@@ -28,7 +28,7 @@ auto float_range(const A a, const B b) {
 }
 
 void load_test_scene_particle_effects(
-	const loaded_game_image_caches& images,
+	const loaded_game_image_caches_map& images,
 	particle_effects_map& manager
 ) {
 	auto set = [&images](auto& target, auto id, auto col) {
