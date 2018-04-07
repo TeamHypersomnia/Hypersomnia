@@ -13,14 +13,14 @@
 
 #include "augs/readwrite/lua_file.h"
 
-necessary_fbos::necessary_fbos(
+all_necessary_fbos::all_necessary_fbos(
 	const vec2i screen_size,
 	const game_drawing_settings settings
 ) {
 	apply(screen_size, settings);
 }
 
-void necessary_fbos::apply(
+void all_necessary_fbos::apply(
 	const vec2i screen_size,
 	const game_drawing_settings settings
 ) {
@@ -39,7 +39,7 @@ void necessary_fbos::apply(
 	reset(light);
 }
 
-necessary_shaders::necessary_shaders(
+all_necessary_shaders::all_necessary_shaders(
 	const augs::path_type& canon_directory,
 	const augs::path_type& local_directory,
 	const game_drawing_settings settings
@@ -113,7 +113,7 @@ necessary_shaders::necessary_shaders(
 	}
 }
 
-necessary_sound_buffers::necessary_sound_buffers(
+all_necessary_sounds::all_necessary_sounds(
 	const augs::path_type& directory
 ) try :
 	button_click(augs::sound_data(typesafe_sprintf("%x/button_click.wav", directory))),

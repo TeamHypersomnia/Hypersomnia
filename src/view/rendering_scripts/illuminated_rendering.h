@@ -36,13 +36,13 @@ namespace augs {
 	struct renderer;
 }
 
-struct necessary_shaders;
-struct necessary_fbos;
+struct all_necessary_shaders;
+struct all_necessary_fbos;
 
 /* Require all */
 
-using illuminated_rendering_fbos = necessary_fbos;
-using illuminated_rendering_shaders = necessary_shaders;
+using illuminated_rendering_fbos = all_necessary_fbos;
+using illuminated_rendering_shaders = all_necessary_shaders;
 
 struct illuminated_rendering_input {
 	const viewer_eye eye;

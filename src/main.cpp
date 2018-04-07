@@ -177,18 +177,18 @@ int work(const int argc, const char* const * const argv) try {
 
 	static augs::renderer renderer;
 
-	static necessary_fbos fbos(
+	static all_necessary_fbos necessary_fbos(
 		window.get_screen_size(),
 		config.drawing
 	);
 
-	static necessary_shaders shaders(
+	static all_necessary_shaders necessary_shaders(
 		"content/necessary/shaders",
 		"content/necessary/shaders",
 		config.drawing
 	);
 
-	static necessary_sound_buffers sounds(
+	static all_necessary_sounds necessary_sounds(
 		"content/necessary/sfx"
 	);
 
@@ -202,7 +202,7 @@ int work(const int argc, const char* const * const argv) try {
 
 	static const auto configurables = configuration_subscribers {
 		window,
-		fbos,
+		necessary_fbos,
 		audio
 	};
 
@@ -525,7 +525,7 @@ int work(const int argc, const char* const * const argv) try {
 		return menu_context_dependencies{
 			necessary_images_in_atlas,
 			get_gui_font(),
-			sounds,
+			necessary_sounds,
 			viewing_config.audio_volume
 		};
 	};
@@ -1570,8 +1570,8 @@ int work(const int argc, const char* const * const argv) try {
 					renderer,
 					frame_performance,
 					*game_world_atlas,
-					fbos,
-					shaders,
+					necessary_fbos,
+					necessary_shaders,
 					all_visible
 				},
 				false,
@@ -1614,7 +1614,7 @@ int work(const int argc, const char* const * const argv) try {
 				DEBUG_FRAME_LINES.clear();
 			}
 
-			shaders.standard->set_projection(augs::orthographic_projection(vec2(screen_size)));
+			necessary_shaders.standard->set_projection(augs::orthographic_projection(vec2(screen_size)));
 
 			/*
 				Illuminated rendering leaves the renderer in a state
@@ -1726,8 +1726,8 @@ int work(const int argc, const char* const * const argv) try {
 		}
 		else {
 			game_world_atlas->bind();
-			shaders.standard->set_as_current();
-			shaders.standard->set_projection(augs::orthographic_projection(vec2(screen_size)));
+			necessary_shaders.standard->set_as_current();
+			necessary_shaders.standard->set_projection(augs::orthographic_projection(vec2(screen_size)));
 
 			get_drawer().color_overlay(screen_size, darkgray);
 		}

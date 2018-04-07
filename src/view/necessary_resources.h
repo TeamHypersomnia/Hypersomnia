@@ -35,12 +35,12 @@ struct game_drawing_settings;
 using optional_fbo = std::optional<augs::graphics::fbo>;
 using optional_shader = std::optional<augs::graphics::shader_program>;
  
-struct necessary_fbos {
+struct all_necessary_fbos {
 	optional_fbo illuminating_smoke;
 	optional_fbo smoke;
 	optional_fbo light;
 
-	necessary_fbos(
+	all_necessary_fbos(
 		const vec2i screen_size, 
 		const game_drawing_settings
 	);
@@ -51,8 +51,8 @@ struct necessary_fbos {
 	);
 };
 
-struct necessary_shaders {
-	// GEN INTROSPECTOR struct necessary_shaders
+struct all_necessary_shaders {
+	// GEN INTROSPECTOR struct all_necessary_shaders
 	optional_shader standard;
 	optional_shader illuminated;
 	optional_shader specular_highlights;
@@ -64,18 +64,18 @@ struct necessary_shaders {
 	optional_shader light;
 	// END GEN INTROSPECTOR
 
-	necessary_shaders(
+	all_necessary_shaders(
 		const augs::path_type& canon_directory,
 		const augs::path_type& local_directory,
 		const game_drawing_settings
 	);
 };
 
-struct necessary_sound_buffers {
+struct all_necessary_sounds {
 	augs::single_sound_buffer button_click;
 	augs::single_sound_buffer button_hover;
 
-	necessary_sound_buffers(const augs::path_type& directory);
+	all_necessary_sounds(const augs::path_type& directory);
 };
 
 namespace sol {
