@@ -21,7 +21,13 @@ std::string cosmos::summary() const {
 }
 
 rng_seed_type cosmos::get_rng_seed_for(const entity_id id) const {
-	return augs::simple_two_hash(operator[](id).get_guid(), get_total_steps_passed());
+	const auto passed = get_total_steps_passed();
+
+	if (const auto handle = operator[](id)) {
+		return augs::simple_two_hash(handle.get_guid(), passed);
+	}
+
+	return std::hash<std::remove_const_t<decltype(passed)>>()(passed);
 }
 
 randomization cosmos::get_rng_for(const entity_id id) const {

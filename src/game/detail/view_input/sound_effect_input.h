@@ -52,11 +52,6 @@ struct sound_effect_start_input {
 	static sound_effect_start_input at_listener(const entity_id id) {
 		return at_entity(id).set_listener(id);
 	}
-
-	auto& set_variation_from(const components::transform t) {
-		variation_number = std::hash<components::transform>()(t);
-		return *this;
-	}
 };
 
 struct sound_effect_input {

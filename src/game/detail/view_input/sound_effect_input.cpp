@@ -14,7 +14,7 @@ void sound_effect_input::start(
 	msg.start = start;
 
 	if (msg.start.variation_number == static_cast<std::size_t>(-1)) {
-		msg.start.set_variation_from(start.positioning.offset);
+		msg.start.variation_number = step.get_cosmos().get_rng_seed_for(start.positioning.target);
 	}
 
 	step.post_message(msg);
