@@ -10,23 +10,23 @@
 #include "game/components/sprite_component.h"
 #include "game/components/polygon_component.h"
 
-struct game_image_usage_as_button {
-	// GEN INTROSPECTOR struct game_image_usage_as_button
+struct image_usage_as_button {
+	// GEN INTROSPECTOR struct image_usage_as_button
 	flip_flags flip;
 	vec2 bbox_expander;
 	// END GEN INTROSPECTOR
 };
 
-struct game_image_meta {
-	// GEN INTROSPECTOR struct game_image_meta
-	game_image_usage_as_button usage_as_button;
+struct image_meta {
+	// GEN INTROSPECTOR struct image_meta
+	image_usage_as_button usage_as_button;
 	// END GEN INTROSPECTOR
 };
 
-struct game_image_cache {
-	game_image_cache(
+struct image_cache {
+	image_cache(
 		const image_loadables_def&,
-		const game_image_meta&
+		const image_meta&
 	);
 
 	vec2u original_image_size;
@@ -37,7 +37,7 @@ struct game_image_cache {
 	}
 };
 
-struct game_image_in_atlas {
+struct image_in_atlas {
 	augs::texture_atlas_entry diffuse;
 	augs::texture_atlas_entry neon_map;
 	augs::texture_atlas_entry desaturated;
@@ -51,13 +51,13 @@ struct game_image_in_atlas {
 	}
 };
 
-struct loaded_game_image_caches_map : public asset_map<
+struct loaded_image_caches_map : public asset_map<
 	assets::image_id,
-	game_image_cache
+	image_cache
 > {
-	loaded_game_image_caches_map() = default;
+	loaded_image_caches_map() = default;
 
-	explicit loaded_game_image_caches_map(
+	explicit loaded_image_caches_map(
 		const image_loadables_map&,
 		const image_metas_map&
 	);
@@ -66,7 +66,7 @@ struct loaded_game_image_caches_map : public asset_map<
 template <class E>
 void add_shape_invariant_from_renderable(
 	E& into,
-	const loaded_game_image_caches_map& caches
+	const loaded_image_caches_map& caches
 ) {
 	static_assert(E::template has<invariants::shape_polygon>());
 

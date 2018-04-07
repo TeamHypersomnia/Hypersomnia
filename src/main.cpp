@@ -234,7 +234,7 @@ int work(const int argc, const char* const * const argv) try {
 	static loaded_sounds_map loaded_sounds;
 	static game_images_in_atlas_map images_in_atlas;
 #if LOADED_CACHES
-	static loaded_game_image_caches_map loaded_image_caches;
+	static loaded_image_caches_map loaded_image_caches;
 #endif
 	static necessary_images_in_atlas_map necessary_images_in_atlas;
 	

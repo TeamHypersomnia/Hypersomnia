@@ -19,7 +19,7 @@
 #include "game/detail/inventory/perform_transfer.h"
 
 namespace test_flavours {
-	void populate_grenade_flavours(const loaded_game_image_caches_map& logicals, all_entity_flavours& flavours) {
+	void populate_grenade_flavours(const loaded_image_caches_map& logicals, all_entity_flavours& flavours) {
 		{
 			auto& meta = get_test_flavour(flavours, test_throwable_explosives::FORCE_GRENADE);
 

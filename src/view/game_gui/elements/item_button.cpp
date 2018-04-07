@@ -243,9 +243,9 @@ void item_button::draw_proc(
 		{
 			const bool draw_attachments = !this_id->is_container_open || f.draw_attachments_even_if_open;
 			auto item_sprite = item.get<invariants::sprite>();
-			const auto gui_def = context.get_game_image_metas().at(item_sprite.tex).usage_as_button;
+			const auto gui_def = context.get_image_metas().at(item_sprite.tex).usage_as_button;
 
-			const auto layout = calc_button_layout(item, context.get_game_image_metas(), draw_attachments);
+			const auto layout = calc_button_layout(item, context.get_image_metas(), draw_attachments);
 			
 			vec2 expansion_offset;
 
@@ -449,7 +449,7 @@ void item_button::rebuild_layouts(const game_gui_context context, const this_in_
 
 	const auto* const sprite = item.find<invariants::sprite>();
 
-	const auto& manager = context.get_game_image_metas();
+	const auto& manager = context.get_image_metas();
 
 	if (sprite) {
 		vec2i rounded_size = calc_button_layout(item, manager, !this_id->is_container_open).aabb.get_size();

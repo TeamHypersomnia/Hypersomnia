@@ -85,7 +85,7 @@ void hotbar_button::draw(
 	const auto& this_tree_entry = context.get_tree_entry(this_id);
 	const auto owner_transfer_capability = context.get_subject_entity();
 	const auto settings = context.get_hotbar_settings();
-	const auto& game_image_defs = context.get_game_image_metas();
+	const auto& image_defs = context.get_image_metas();
 	const auto& necessarys = context.get_necessary_images();
 	const auto& gui_font = context.get_gui_font();
 	const auto output = context.get_output();
@@ -329,7 +329,7 @@ void hotbar_button::draw(
 		f.expand_size_to_grid = false;
 		f.always_full_item_alpha = true;
 
-		const auto height_excess = absolute_rc.h() - this_id->get_bbox(necessarys, game_image_defs, owner_transfer_capability).y;
+		const auto height_excess = absolute_rc.h() - this_id->get_bbox(necessarys, image_defs, owner_transfer_capability).y;
 		
 		f.absolute_xy_offset = internal_rc.get_position() - context.get_tree_entry(location).get_absolute_pos();
 		f.absolute_xy_offset.y += height_excess / 2;

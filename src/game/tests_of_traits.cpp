@@ -442,7 +442,7 @@ constexpr auto tuple_of_assets_size = sizeof(tuple_of_all_assets);
 constexpr auto tuple_of_logical_assets_size = sizeof(tuple_of_all_logical_assets);
 
 sizeof(augs::enum_map<assets::animation_id, animation>);
-sizeof(augs::enum_map<assets::image_id, game_image_baked>);
+sizeof(augs::enum_map<assets::image_id, image_baked>);
 sizeof(augs::enum_map<assets::font_id, game_font_baked>);
 sizeof(augs::enum_map<assets::particle_effect_id, particle_effect>);
 sizeof(augs::enum_map<assets::physical_material_id, physical_material>);

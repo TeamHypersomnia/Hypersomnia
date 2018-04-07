@@ -5,7 +5,7 @@
 #include "augs/templates/enum_introspect.h"
 #include "augs/templates/format_enum.h"
 
-void populate_test_scene_flavours(const loaded_game_image_caches_map& logicals, all_entity_flavours& into) {
+void populate_test_scene_flavours(const loaded_image_caches_map& logicals, all_entity_flavours& into) {
 	test_flavours::populate_grenade_flavours(logicals, into);
 	test_flavours::populate_character_flavours(logicals, into);
 	test_flavours::populate_gun_flavours(logicals, into);

@@ -108,7 +108,7 @@ public:
 		return dependencies.game_images;
 	}
 
-	const auto& get_game_image_metas() const {
+	const auto& get_image_metas() const {
 		return dependencies.image_metas;
 	}
 };

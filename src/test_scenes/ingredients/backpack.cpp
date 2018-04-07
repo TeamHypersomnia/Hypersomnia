@@ -12,7 +12,7 @@
 #include "game/transcendental/entity_handle.h"
 
 namespace test_flavours {
-	void populate_backpack_flavours(const loaded_game_image_caches_map& logicals, all_entity_flavours& flavours) {
+	void populate_backpack_flavours(const loaded_image_caches_map& logicals, all_entity_flavours& flavours) {
 		{
 			auto& meta = get_test_flavour(flavours, test_container_items::SAMPLE_BACKPACK);
 

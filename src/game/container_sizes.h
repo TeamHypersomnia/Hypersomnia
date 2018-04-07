@@ -18,7 +18,7 @@ constexpr std::size_t OWNER_FRICTION_GROUNDS_COUNT = 10;
 constexpr std::size_t RECOIL_OFFSET_COUNT = 50;
 
 constexpr std::size_t MAX_ANIMATION_COUNT = 20;
-constexpr std::size_t MAX_GAME_IMAGE_COUNT = 500;
+constexpr std::size_t MAX_IMAGE_COUNT = 500;
 constexpr std::size_t MAX_PARTICLE_EFFECT_COUNT = 100;
 constexpr std::size_t MAX_PHYSICAL_MATERIAL_COUNT = 15;
 constexpr std::size_t MAX_SOUND_BUFFER_COUNT = 1000;

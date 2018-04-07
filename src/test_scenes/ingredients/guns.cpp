@@ -26,7 +26,7 @@
 #include "game/detail/inventory/perform_transfer.h"
 
 namespace test_flavours {
-	void populate_gun_flavours(const loaded_game_image_caches_map& logicals, all_entity_flavours& flavours) {
+	void populate_gun_flavours(const loaded_image_caches_map& logicals, all_entity_flavours& flavours) {
 		/* Types for bullets etc. */
 
 		auto make_default_gun_container = [](auto& meta, const float mag_rotation = -90.f, const bool magazine_hidden = false){

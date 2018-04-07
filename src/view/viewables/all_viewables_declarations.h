@@ -10,10 +10,10 @@ namespace augs {
 	struct sound_buffer_loading_input;
 }
 
-struct game_image_in_atlas;
+struct image_in_atlas;
 struct image_loadables_def;
-struct game_image_meta;
-struct game_image_cache;
+struct image_meta;
+struct image_cache;
 struct particle_effect;
 
 using sound_buffer_inputs_map = asset_map<
@@ -35,10 +35,10 @@ using image_loadables_map = asset_map<
 
 using image_metas_map = asset_map<
 	assets::image_id,
-	game_image_meta
+	image_meta
 >;
 
 using game_images_in_atlas_map = asset_map<
 	assets::image_id,
-	game_image_in_atlas
+	image_in_atlas
 >;

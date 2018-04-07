@@ -24,7 +24,7 @@ void load_test_scene_images(
 		const auto stem = to_lowercase(augs::enum_to_string(id));
 
 		image_loadables_def loadables_def;
-		game_image_meta meta;
+		image_meta meta;
 
 		loadables_def.source_image_path = augs::path_type(directory) += stem + ".png";
 
