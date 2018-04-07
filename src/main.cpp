@@ -192,7 +192,7 @@ int work(const int argc, const char* const * const argv) try {
 		"content/necessary/sfx"
 	);
 
-	static necessary_image_loadables_map images(
+	static necessary_image_loadables_map necessary_image_loadables(
 		lua,
 		"content/necessary/gfx",
 		config.content_regeneration.regenerate_every_launch
@@ -381,7 +381,7 @@ int work(const int argc, const char* const * const argv) try {
 
 				game_world_atlas.emplace(standard_atlas_distribution({
 					new_defs.image_loadables,
-					images,
+					necessary_image_loadables,
 					config.gui_font,
 					{
 						static_cast<unsigned>(renderer.get_max_texture_size()),

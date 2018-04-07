@@ -1,7 +1,7 @@
 #include "augs/filesystem/file.h"
 
 #include "view/viewables/image_structs.h"
-#include "view/viewables/regeneration/game_image_loadables.h"
+#include "view/viewables/regeneration/image_loadables.h"
 
 #include "test_scenes/test_scenes_content.h"
 
@@ -23,7 +23,7 @@ void load_test_scene_images(
 
 		const auto stem = to_lowercase(augs::enum_to_string(id));
 
-		game_image_loadables loadables;
+		image_loadables loadables;
 		game_image_meta meta;
 
 		loadables.source_image_path = augs::path_type(directory) += stem + ".png";

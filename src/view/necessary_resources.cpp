@@ -141,7 +141,7 @@ necessary_image_loadables_map::necessary_image_loadables_map(
 
 		const auto stem = to_lowercase(augs::enum_to_string(id));
 
-		game_image_loadables definition_template;
+		image_loadables definition_template;
 
 		if (
 			const auto additional_properties_path = typesafe_sprintf("%x/%x.lua", directory, stem);

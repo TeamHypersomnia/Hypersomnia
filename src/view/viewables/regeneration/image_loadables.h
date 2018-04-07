@@ -14,18 +14,18 @@
 augs::path_type get_neon_map_path(augs::path_type from_source_image_path);
 augs::path_type get_desaturation_path(augs::path_type from_source_image_path);
 
-struct game_image_extra_loadables {
-	// GEN INTROSPECTOR struct game_image_extra_loadables
+struct image_extra_loadables {
+	// GEN INTROSPECTOR struct image_extra_loadables
 	std::optional<augs::path_type> custom_neon_map_path;
 	std::optional<neon_map_input> neon_map;
 	bool generate_desaturation = false;
 	// END GEN INTROSPECTOR
 };
 
-struct game_image_loadables {
-	// GEN INTROSPECTOR struct game_image_loadables
+struct image_loadables {
+	// GEN INTROSPECTOR struct image_loadables
 	augs::path_type source_image_path;
-	game_image_extra_loadables extras;
+	image_extra_loadables extras;
 	// END GEN INTROSPECTOR
 
 	bool should_generate_desaturation() const {

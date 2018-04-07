@@ -11,7 +11,7 @@ namespace augs {
 }
 
 struct game_image_in_atlas;
-struct game_image_loadables;
+struct image_loadables;
 struct game_image_meta;
 struct game_image_cache;
 struct particle_effect;
@@ -30,7 +30,7 @@ using particle_effects_map = asset_map<
 
 using game_image_loadables_map = asset_map<
 	assets::game_image_id,
-	game_image_loadables
+	image_loadables
 >;
 
 using game_image_metas_map = asset_map<

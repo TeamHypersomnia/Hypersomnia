@@ -9,7 +9,7 @@
 
 #include "augs/templates/exception_templates.h"
 
-#include "view/viewables/regeneration/game_image_loadables.h"
+#include "view/viewables/regeneration/image_loadables.h"
 #include "view/necessary_image_id.h"
 
 /*
@@ -83,7 +83,7 @@ namespace sol {
 }
 
 struct necessary_image_loadables_map :
-	public augs::enum_map<assets::necessary_image_id, game_image_loadables>
+	public augs::enum_map<assets::necessary_image_id, image_loadables>
 {
 	necessary_image_loadables_map(
 		sol::state& lua,
