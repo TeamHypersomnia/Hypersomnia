@@ -10,7 +10,7 @@
 #include "game/detail/inventory/inventory_slot.h"
 #include "game/detail/inventory/inventory_slot_handle.h"
 
-#include "view/viewables/game_image.h"
+#include "view/viewables/image_structs.h"
 
 #include "view/game_gui/elements/drag_and_drop_target_drop_item.h"
 #include "view/game_gui/elements/character_gui.h"

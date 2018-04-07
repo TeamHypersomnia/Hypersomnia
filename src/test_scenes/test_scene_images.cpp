@@ -1,6 +1,6 @@
 #include "augs/filesystem/file.h"
 
-#include "view/viewables/game_image.h"
+#include "view/viewables/image_structs.h"
 #include "view/viewables/regeneration/game_image_loadables.h"
 
 #include "test_scenes/test_scenes_content.h"

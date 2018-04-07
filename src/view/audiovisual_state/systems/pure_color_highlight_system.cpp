@@ -7,7 +7,7 @@
 #include "game/components/interpolation_component.h"
 #include "game/components/fixtures_component.h"
 
-#include "view/viewables/game_image.h"
+#include "view/viewables/image_structs.h"
 
 #include "view/rendering_scripts/draw_entity.h"
 

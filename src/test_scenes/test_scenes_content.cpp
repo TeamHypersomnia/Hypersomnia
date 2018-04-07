@@ -1,7 +1,7 @@
 #include "game/assets/all_logical_assets.h"
 #include "view/viewables/all_viewables_defs.h"
 #include "test_scenes/test_scenes_content.h"
-#include "view/viewables/game_image.h"
+#include "view/viewables/image_structs.h"
 
 #if BUILD_TEST_SCENES
 loaded_game_image_caches_map populate_test_scene_images_and_sounds(

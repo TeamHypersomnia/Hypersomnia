@@ -6,7 +6,7 @@
 
 #include "game/common_state/entity_flavours.h"
 
-#include "view/viewables/game_image.h"
+#include "view/viewables/image_structs.h"
 
 #include "augs/templates/format_enum.h"
 

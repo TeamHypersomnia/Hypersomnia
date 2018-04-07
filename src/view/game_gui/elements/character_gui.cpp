@@ -26,7 +26,7 @@
 #include "view/game_gui/elements/drag_and_drop.h"
 #include "view/audiovisual_state/aabb_highlighter.h"
 #include "view/audiovisual_state/systems/interpolation_system.h"
-#include "view/viewables/game_image.h"
+#include "view/viewables/image_structs.h"
 #include "game/enums/filters.h"
 
 #include "game/detail/describers.h"

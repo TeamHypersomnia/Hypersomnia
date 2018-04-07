@@ -16,7 +16,7 @@
 
 #include "view/viewables/regeneration/game_image_loadables.h"
 #include "view/viewables/particle_effect.h"
-#include "view/viewables/game_image.h"
+#include "view/viewables/image_structs.h"
 
 #include "view/viewables/all_viewables_declarations.h"
 

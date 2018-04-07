@@ -28,7 +28,7 @@
 #include "view/necessary_resources.h"
 #include "view/game_drawing_settings.h"
 #include "view/viewables/all_viewables_declarations.h"
-#include "view/viewables/game_image.h"
+#include "view/viewables/image_structs.h"
 
 #include "view/audiovisual_state/audiovisual_state.h"
 

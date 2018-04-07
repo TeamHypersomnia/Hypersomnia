@@ -526,7 +526,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/transcendental/cosmic_functions.cpp"
 	"src/game/detail/view_input/particle_effect_input.cpp"
 	"src/game/detail/view_input/sound_effect_input.cpp"
-	"src/view/viewables/game_image.cpp"
+	"src/view/viewables/image_structs.cpp"
 	"src/game/detail/spells/spell_logic_input.cpp"
 	"src/game/inferred_caches/processing_lists_cache.cpp"
 	"src/game/transcendental/entity_id.cpp"

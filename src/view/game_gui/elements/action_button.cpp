@@ -11,7 +11,7 @@
 #include "view/game_gui/game_gui_system.h"
 
 #include "view/viewables/all_viewables_declarations.h"
-#include "view/viewables/game_image.h"
+#include "view/viewables/image_structs.h"
 
 using namespace augs::gui::text;
 
