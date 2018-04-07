@@ -1,7 +1,7 @@
 #include "view/viewables/atlas_distributions.h"
 #include "view/viewables/image_structs.h"
 
-#include "view/viewables/regeneration/image_loadables.h"
+#include "view/viewables/regeneration/image_loadables_def.h"
 
 augs::graphics::texture standard_atlas_distribution(const standard_atlas_distribution_input in) {
 	thread_local auto atlas_input = atlas_regeneration_input();

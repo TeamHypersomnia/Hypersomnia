@@ -340,7 +340,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/augs/texture_atlas/texture_atlas.cpp"
 	"src/game/assets/animation.cpp"
 	"src/game/assets/behaviour_tree.cpp"
-	"src/view/viewables/regeneration/image_loadables.cpp"
+	"src/view/viewables/regeneration/image_loadables_def.cpp"
 	"src/view/viewables/particle_effect.cpp"
 	"src/game/assets/physical_material.cpp"
 	"src/game/components/flags_component.cpp"

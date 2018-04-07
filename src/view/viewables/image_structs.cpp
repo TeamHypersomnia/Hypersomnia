@@ -1,8 +1,8 @@
 #include "view/viewables/image_structs.h"
-#include "view/viewables/regeneration/image_loadables.h"
+#include "view/viewables/regeneration/image_loadables_def.h"
 
 game_image_cache::game_image_cache(
-	const image_loadables& loadables,
+	const image_loadables_def& loadables,
 	const game_image_meta& meta
 ) { 
 	original_image_size = loadables.read_source_image_size();

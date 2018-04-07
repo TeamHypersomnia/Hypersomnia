@@ -1,7 +1,7 @@
 #include "augs/filesystem/file.h"
 
 #include "view/viewables/image_structs.h"
-#include "view/viewables/regeneration/image_loadables.h"
+#include "view/viewables/regeneration/image_loadables_def.h"
 
 #include "test_scenes/test_scenes_content.h"
 
@@ -23,16 +23,16 @@ void load_test_scene_images(
 
 		const auto stem = to_lowercase(augs::enum_to_string(id));
 
-		image_loadables loadables;
+		image_loadables_def loadables_def;
 		game_image_meta meta;
 
-		loadables.source_image_path = augs::path_type(directory) += stem + ".png";
+		loadables_def.source_image_path = augs::path_type(directory) += stem + ".png";
 
 		try {
 			if (const auto extra_loadables_path = augs::path_type(directory) += stem + ".extras.lua";
 				augs::exists(extra_loadables_path)
 			) {
-				augs::load_from_lua_table(lua, loadables.extras, extra_loadables_path);
+				augs::load_from_lua_table(lua, loadables_def.extras, extra_loadables_path);
 			}
 
 			if (const auto meta_path = augs::path_type(directory) += stem + ".meta.lua";
@@ -56,7 +56,7 @@ void load_test_scene_images(
 			);
 		}
 
-		all_loadables[id] = loadables;
+		all_loadables[id] = loadables_def;
 		all_metas[id] = meta;
 	});
 }

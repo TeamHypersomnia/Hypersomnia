@@ -25,7 +25,7 @@ struct game_image_meta {
 
 struct game_image_cache {
 	game_image_cache(
-		const image_loadables&,
+		const image_loadables_def&,
 		const game_image_meta&
 	);
 

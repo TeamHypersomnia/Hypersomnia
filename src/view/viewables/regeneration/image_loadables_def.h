@@ -22,8 +22,8 @@ struct image_extra_loadables {
 	// END GEN INTROSPECTOR
 };
 
-struct image_loadables {
-	// GEN INTROSPECTOR struct image_loadables
+struct image_loadables_def {
+	// GEN INTROSPECTOR struct image_loadables_def
 	augs::path_type source_image_path;
 	image_extra_loadables extras;
 	// END GEN INTROSPECTOR
