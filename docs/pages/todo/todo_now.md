@@ -20,6 +20,8 @@ summary: Just a hidden scratchpad.
 				- Should be displayed as simplified, instead of some mnemonic id?
 					- e.g. "corner (walls/1)"
 			- Is more than just an image path!
+				- We don't have a singular "game image" structure, though. It's divided into loadables and meta.
+				- So we'll need a special purpose GUI code that connects them all
 			- 
 	- Viewables
 		- 

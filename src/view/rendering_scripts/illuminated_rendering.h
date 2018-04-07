@@ -48,7 +48,7 @@ struct illuminated_rendering_input {
 	const viewer_eye eye;
 	const audiovisual_state& audiovisuals;
 	const game_drawing_settings drawing;
-	const necessary_images_in_atlas& necessary_images;
+	const necessary_images_in_atlas_map& necessary_images;
 	const augs::baked_font& gui_font;
 	const game_images_in_atlas_map& game_images;
 	const double interpolation_ratio = 0.0;

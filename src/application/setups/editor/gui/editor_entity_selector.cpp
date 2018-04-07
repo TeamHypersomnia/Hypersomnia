@@ -156,7 +156,7 @@ static bool should_hover_standard_aabb(const cosmos& cosm, const entity_id id) {
 };
 
 void editor_entity_selector::do_mousemotion(
-	const necessary_images_in_atlas& sizes_for_icons,
+	const necessary_images_in_atlas_map& sizes_for_icons,
 
 	const cosmos& cosm,
 	const editor_rect_select_type rect_select_mode,

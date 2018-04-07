@@ -109,7 +109,7 @@ public:
 	}
 
 	const auto& get_game_image_metas() const {
-		return dependencies.game_image_metas;
+		return dependencies.image_metas;
 	}
 };
 

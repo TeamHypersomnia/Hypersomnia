@@ -92,7 +92,7 @@ struct necessary_image_loadables_map :
 	);
 };
 
-using necessary_images_in_atlas = augs::enum_map<
+using necessary_images_in_atlas_map = augs::enum_map<
 	assets::necessary_image_id,
 	/* necessary images have only diffuse maps, thus no need for neon/desaturation entries */
 	augs::texture_atlas_entry

@@ -10,7 +10,7 @@
 #include "application/gui/menu/menu_root.h"
 
 struct menu_context_dependencies {
-	const necessary_images_in_atlas& necessarys;
+	const necessary_images_in_atlas_map& necessarys;
 	const augs::baked_font& gui_font;
 	const necessary_sound_buffers& sounds;
 	const augs::audio_volume_settings& audio_volume;

@@ -255,7 +255,7 @@ public:
 	);
 
 	bool handle_input_before_game(
-		const necessary_images_in_atlas& sizes_for_icons,
+		const necessary_images_in_atlas_map& sizes_for_icons,
 
 		const augs::event::state& common_input_state,
 		const augs::event::change change,

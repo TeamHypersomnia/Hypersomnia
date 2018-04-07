@@ -236,7 +236,7 @@ int work(const int argc, const char* const * const argv) try {
 #if LOADED_CACHES
 	static loaded_game_image_caches game_image_caches;
 #endif
-	static necessary_images_in_atlas necessary_atlas_entries;
+	static necessary_images_in_atlas_map necessary_atlas_entries;
 	
 #if STATICALLY_ALLOCATE_BAKED_FONTS
 	static augs::baked_font gui_font;
@@ -321,12 +321,12 @@ int work(const int argc, const char* const * const argv) try {
 			}
 
 			/* Check for unloaded and changed resources */
-			for (const auto& old : currently_loaded_defs.game_image_loadables) {
+			for (const auto& old : currently_loaded_defs.image_loadables) {
 				const auto key = old.first;
 
 				const auto& old_loadables = old.second;
 
-				if (const auto new_loadables = mapped_or_nullptr(new_defs.game_image_loadables, key)) {
+				if (const auto new_loadables = mapped_or_nullptr(new_defs.image_loadables, key)) {
 					const bool loadables_changed = !equal(*new_loadables, old_loadables);
 
 					if (loadables_changed) {
@@ -335,8 +335,8 @@ int work(const int argc, const char* const * const argv) try {
 					}
 
 #if LOADED_CACHES
-					const auto& new_meta = new_defs.game_image_metas.at(key);
-					const auto& old_meta = currently_loaded_defs.game_image_metas.at(key);
+					const auto& new_meta = new_defs.image_metas.at(key);
+					const auto& old_meta = currently_loaded_defs.image_metas.at(key);
 
 					const bool meta_changed = !equal(old_meta, new_meta);
 
@@ -355,14 +355,14 @@ int work(const int argc, const char* const * const argv) try {
 			}
 			
 			/* Check for new resources */
-			for (const auto& fresh : new_defs.game_image_loadables) {
+			for (const auto& fresh : new_defs.image_loadables) {
 				const auto key = fresh.first;
 
-				if (nullptr == mapped_or_nullptr(currently_loaded_defs.game_image_loadables, key)) {
+				if (nullptr == mapped_or_nullptr(currently_loaded_defs.image_loadables, key)) {
 					new_atlas_required = true;
 
 #if LOADED_CACHES
-					const auto& new_meta = new_defs.game_image_metas.at(key);
+					const auto& new_meta = new_defs.image_metas.at(key);
 					game_image_caches.emplace(fresh.second, new_meta);
 #endif
 				}
@@ -380,7 +380,7 @@ int work(const int argc, const char* const * const argv) try {
 				necessary_atlas_entries.clear();
 
 				game_world_atlas.emplace(standard_atlas_distribution({
-					new_defs.game_image_loadables,
+					new_defs.image_loadables,
 					images,
 					config.gui_font,
 					{
@@ -514,7 +514,7 @@ int work(const int argc, const char* const * const argv) try {
 
 	static auto create_game_gui_deps = []() {
 		return game_gui_context_dependencies{
-			get_viewable_defs().game_image_metas,
+			get_viewable_defs().image_metas,
 			game_atlas_entries,
 			necessary_atlas_entries,
 			get_gui_font()

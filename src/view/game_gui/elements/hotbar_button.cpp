@@ -58,7 +58,7 @@ button_corners_info hotbar_button::get_button_corners_info() const {
 }
 
 vec2i hotbar_button::get_bbox(
-	const necessary_images_in_atlas& necessarys,
+	const necessary_images_in_atlas_map& necessarys,
 	const game_image_metas_map& defs,
 	const const_entity_handle owner_transfer_capability
 ) const {

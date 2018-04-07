@@ -14,11 +14,6 @@ void load_test_scene_images(
 ) {
 	using id_type = assets::game_image_id;
 
-	/* 
-		This additional reference is only to mitigate MSVC bug 
-		whereby there is some(?) problem capturing "this" contents in lambdas.
-	*/
-
 	const auto directory = augs::path_type("content/official/gfx/");
 
 	augs::for_each_enum_except_bounds([&](const id_type id) {
@@ -34,15 +29,13 @@ void load_test_scene_images(
 		loadables.source_image_path = augs::path_type(directory) += stem + ".png";
 
 		try {
-			if (
-				const auto extra_loadables_path = augs::path_type(directory) += stem + ".extras.lua";
+			if (const auto extra_loadables_path = augs::path_type(directory) += stem + ".extras.lua";
 				augs::exists(extra_loadables_path)
 			) {
 				augs::load_from_lua_table(lua, loadables.extras, extra_loadables_path);
 			}
 
-			if (
-				const auto meta_path = augs::path_type(directory) += stem + ".meta.lua";
+			if (const auto meta_path = augs::path_type(directory) += stem + ".meta.lua";
 				augs::exists(meta_path)
 			) {
 				augs::load_from_lua_table(lua, meta, meta_path);

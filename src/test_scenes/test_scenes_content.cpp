@@ -8,8 +8,8 @@ loaded_game_image_caches populate_test_scene_images_and_sounds(
 	sol::state& lua,
 	all_viewables_defs& output_sources
 ) {
-	auto& loadables = output_sources.game_image_loadables;
-	auto& metas = output_sources.game_image_metas;
+	auto& loadables = output_sources.image_loadables;
+	auto& metas = output_sources.image_metas;
 
 	try {
 		load_test_scene_images(lua, loadables, metas);

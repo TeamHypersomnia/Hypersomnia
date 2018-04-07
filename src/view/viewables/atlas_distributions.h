@@ -15,13 +15,13 @@
 */
 
 struct standard_atlas_distribution_input {
-	const game_image_loadables_map& game_image_loadables;
+	const game_image_loadables_map& image_loadables;
 	const necessary_image_loadables_map& necessary_image_loadables;
 	const augs::font_loading_input& gui_font_input;
 	const atlas_regeneration_settings settings;
 
 	game_images_in_atlas_map& output_game_images;
-	necessary_images_in_atlas& output_necessary_images;
+	necessary_images_in_atlas_map& output_necessary_images;
 	augs::baked_font& output_gui_font;
 };
 

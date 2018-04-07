@@ -28,8 +28,8 @@ struct all_viewables_defs {
 	// GEN INTROSPECTOR struct all_viewables_defs
 	sound_buffer_inputs_map sounds;
 	particle_effects_map particle_effects;
-	game_image_loadables_map game_image_loadables;
-	game_image_metas_map game_image_metas;
+	game_image_loadables_map image_loadables;
+	game_image_metas_map image_metas;
 	// END GEN INTROSPECTOR
 
 	void clear();

@@ -12,7 +12,7 @@ augs::graphics::texture standard_atlas_distribution(const standard_atlas_distrib
 		atlas_input.images.emplace_back(r.second.get_source_image_path());
 	}
 
-	for (const auto& r : in.game_image_loadables) {
+	for (const auto& r : in.image_loadables) {
 		const auto& def = r.second;
 		def.regenerate_all_needed(in.settings.force_regenerate);
 
@@ -47,7 +47,7 @@ augs::graphics::texture standard_atlas_distribution(const standard_atlas_distrib
 			in.output_necessary_images[r.first] = baked.at(r.second.get_source_image_path());
 		}
 
-		for (const auto& d : in.game_image_loadables) {
+		for (const auto& d : in.image_loadables) {
 			auto& output_viewable = in.output_game_images[d.first];
 			auto& maps = output_viewable;
 			

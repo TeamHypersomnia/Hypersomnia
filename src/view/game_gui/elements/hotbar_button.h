@@ -25,7 +25,7 @@ public:
 	float hover_highlight_duration_ms = 400.f;
 
 	vec2i get_bbox(
-		const necessary_images_in_atlas& necessarys,
+		const necessary_images_in_atlas_map& necessarys,
 		const game_image_metas_map& defs,
 		const const_entity_handle owner_transfer_capability
 	) const;
