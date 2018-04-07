@@ -7,7 +7,11 @@
 #include "application/setups/editor/property_editor/flavour_properties_editor.h"
 #include "application/setups/editor/property_editor/entity_properties_editor.h"
 
-#include "application/setups/editor/property_editor/flavours_and_entities_tree_structs.h"
+#include "application/setups/editor/property_editor/fae_tree_structs.h"
+
+/*
+	"fae tree" is a shorthand for "flavours and entities tree".
+*/
 
 template <class E>
 void do_edit_entities_gui(
@@ -42,8 +46,8 @@ void do_edit_flavours_gui(
 }
 
 template <class F>
-auto flavours_and_entities_tree(
-	const flavours_and_entities_tree_input& fae_in,
+auto fae_tree(
+	const fae_tree_input& fae_in,
 	editor_command_input in,
 	F&& flavours_and_entities_provider
 ) {
@@ -51,7 +55,7 @@ auto flavours_and_entities_tree(
 
 	auto prop_in = fae_in.prop_in;
 
-	flavours_and_entities_tree_filter filter;
+	fae_tree_filter filter;
 
 	auto& work = *in.folder.work;
 	auto& cosm = work.world;

@@ -26,7 +26,7 @@ void editor_all_entities_gui::interrupt_tweakers() {
 #include "application/intercosm.h"
 #include "application/setups/editor/editor_folder.h"
 
-#include "application/setups/editor/property_editor/flavours_and_entities_tree.h"
+#include "application/setups/editor/property_editor/fae_tree.h"
 
 #include "augs/readwrite/memory_stream.h"
 #include "augs/readwrite/byte_readwrite.h"
@@ -201,7 +201,7 @@ public:
 	}
 };
 
-flavours_and_entities_tree_filter editor_all_entities_gui::perform(
+fae_tree_filter editor_all_entities_gui::perform(
 	const editor_settings& settings,
 	const std::unordered_set<entity_id>* only_match_entities,
 	editor_command_input in
@@ -230,7 +230,7 @@ flavours_and_entities_tree_filter editor_all_entities_gui::perform(
 
 	const auto prop_in = property_editor_input { settings.property_editor, properties_gui };
 
-	const auto fae_in = flavours_and_entities_tree_input { 
+	const auto fae_in = fae_tree_input { 
 		prop_in, show_filter_buttons
 	};
 
@@ -268,14 +268,14 @@ flavours_and_entities_tree_filter editor_all_entities_gui::perform(
 			}
 		}
 
-		return flavours_and_entities_tree(
+		return fae_tree(
 			fae_in,
 			in,
 			in_selection_provider { cosm, per_native_type }
 		);
 	}
 
-	return flavours_and_entities_tree(
+	return fae_tree(
 		fae_in,
 		in,
 		all_provider { cosm }
@@ -283,7 +283,7 @@ flavours_and_entities_tree_filter editor_all_entities_gui::perform(
 }
 
 #else
-flavours_and_entities_tree_filter editor_all_entities_gui::perform(
+fae_tree_filter editor_all_entities_gui::perform(
 	const editor_settings& settings,
 	const std::unordered_set<entity_id>* only_match_entities,
 	editor_command_input in

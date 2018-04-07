@@ -7,7 +7,22 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
-- Measure build times of debug and release builds to know which one to test
+- Complex selectors in general property editor
+	- In fae tree:
+		- Flavours
+		- Entities
+		- Recoil players
+			- Name-able, linear combo box
+		- Physical materials
+			- Name-able, linear combo box
+		- Game image
+			- In sprite invariant
+				- Should be displayed as simplified, instead of some mnemonic id?
+					- e.g. "corner (walls/1)"
+			- Is more than just an image path!
+			- 
+	- Viewables
+		- 
 
 - Fix what happens when too many entities are created
 	- for now let's just have many more, and throw when shit hits the fan

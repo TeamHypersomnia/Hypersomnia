@@ -1,12 +1,12 @@
 #include "game/transcendental/cosmos.h"
 
-#include "application/setups/editor/property_editor/flavours_and_entities_tree_structs.h"
+#include "application/setups/editor/property_editor/fae_tree_structs.h"
 
-bool flavours_and_entities_tree_filter::any() const {
+bool fae_tree_filter::any() const {
 	return close_type_id || close_flavour_id || only_type_id || only_flavour_id;
 }
 
-void flavours_and_entities_tree_filter::perform(
+void fae_tree_filter::perform(
 	const cosmos& cosm,
 	std::unordered_set<entity_id>& selections
 ) const {

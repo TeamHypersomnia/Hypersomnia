@@ -1,6 +1,6 @@
 #pragma once
 #include "application/setups/editor/commands/editor_command_structs.h"
-#include "application/setups/editor/property_editor/flavours_and_entities_tree_structs.h"
+#include "application/setups/editor/property_editor/fae_tree_structs.h"
 
 struct editor_settings;
 struct editor_command_input;
@@ -14,7 +14,7 @@ struct editor_all_entities_gui {
 
 	void open();
 
-	flavours_and_entities_tree_filter perform(
+	fae_tree_filter perform(
 		const editor_settings&,
 		const std::unordered_set<entity_id>* only_match_entities,
 	   	editor_command_input
