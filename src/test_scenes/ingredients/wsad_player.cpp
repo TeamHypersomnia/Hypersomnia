@@ -36,7 +36,7 @@ namespace test_flavours {
 				meta.set(render_def);
 			}
 
-			add_sprite(meta, logicals, assets::image_id::STANDARD_HEAD);
+			add_sprite(meta, logicals, test_scene_image_id::STANDARD_HEAD);
 			add_shape_invariant_from_renderable(meta, logicals);
 
 			{
@@ -120,7 +120,7 @@ namespace test_flavours {
 
 			{
 				invariants::crosshair crosshair; 
-				crosshair.appearance.set(assets::image_id::TEST_CROSSHAIR, logicals);
+				crosshair.appearance.set(to_image_id(test_scene_image_id::TEST_CROSSHAIR), logicals);
 
 				crosshair.recoil_damping.linear = { 5, 5 };
 				crosshair.recoil_damping.angular = 5;

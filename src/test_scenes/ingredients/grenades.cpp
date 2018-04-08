@@ -34,7 +34,7 @@ namespace test_flavours {
 				meta.set(render_def);
 
 			}
-			test_flavours::add_sprite(meta, logicals, assets::image_id::FORCE_GRENADE, white);
+			test_flavours::add_sprite(meta, logicals, test_scene_image_id::FORCE_GRENADE, white);
 			add_shape_invariant_from_renderable(meta, logicals);
 			test_flavours::add_see_through_dynamic_body(meta);
 
@@ -62,7 +62,7 @@ namespace test_flavours {
 			in.victim_shake.duration_ms = 500.f;
 			in.victim_shake.mult = 1.2f;
 
-			explosive.released_image_id = assets::image_id::FORCE_GRENADE_RELEASED;
+			explosive.released_image_id = to_image_id(test_scene_image_id::FORCE_GRENADE_RELEASED);
 			explosive.released_physical_material = assets::physical_material_id::GRENADE;
 
 			meta.set(explosive);
@@ -81,7 +81,7 @@ namespace test_flavours {
 
 				meta.set(render_def);
 			}
-			test_flavours::add_sprite(meta, logicals, assets::image_id::INTERFERENCE_GRENADE, white);
+			test_flavours::add_sprite(meta, logicals, test_scene_image_id::INTERFERENCE_GRENADE, white);
 			add_shape_invariant_from_renderable(meta, logicals);
 			test_flavours::add_see_through_dynamic_body(meta);
 
@@ -110,7 +110,7 @@ namespace test_flavours {
 			in.victim_shake.duration_ms = 800.f;
 			in.victim_shake.mult = 1.5f;
 
-			explosive.released_image_id = assets::image_id::INTERFERENCE_GRENADE_RELEASED;
+			explosive.released_image_id = to_image_id(test_scene_image_id::INTERFERENCE_GRENADE_RELEASED);
 			explosive.released_physical_material = assets::physical_material_id::GRENADE;
 
 			meta.set(explosive);
@@ -129,7 +129,7 @@ namespace test_flavours {
 
 				meta.set(render_def);
 			}
-			test_flavours::add_sprite(meta, logicals, assets::image_id::PED_GRENADE, white);
+			test_flavours::add_sprite(meta, logicals, test_scene_image_id::PED_GRENADE, white);
 			add_shape_invariant_from_renderable(meta, logicals);
 			test_flavours::add_see_through_dynamic_body(meta);
 
@@ -155,7 +155,7 @@ namespace test_flavours {
 			in.type = adverse_element_type::PED;
 			in.create_thunders_effect = true;
 
-			explosive.released_image_id = assets::image_id::PED_GRENADE_RELEASED;
+			explosive.released_image_id = to_image_id(test_scene_image_id::PED_GRENADE_RELEASED);
 			explosive.released_physical_material = assets::physical_material_id::GRENADE;
 
 			meta.set(explosive);

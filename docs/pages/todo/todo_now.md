@@ -7,6 +7,20 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
+- asset_map -> asset_pool
+
+- Allocation and deallocation of flavour, image ids et cetera
+	- make a separate template and test it
+		- id_relinking_pool 
+
+template <class F>
+void erase_and_relink(F for_each_id) {
+}
+
+	- Consider undos and redos
+		- Could perhaps be useful to use something from the pool for this as we have relevant calls there?
+	- asset_map is for now implemented to act like an unordered_map
+
 - Complex selectors in general property editor
 	- In fae tree:
 		- Flavours
@@ -15,14 +29,25 @@ summary: Just a hidden scratchpad.
 			- Name-able, linear combo box
 		- Physical materials
 			- Name-able, linear combo box
-		- Game image
-			- In sprite invariant
+		- Images
+			- Is there a point in making separation of image ids and paths visible to the author?
+				- The question becomes if more than a single flavour is going to use the same image
+				- Flavours will very often share logical assets though, by their definition, so it makes sense to have them identified
+			- Architecturally, the flavours will store only identificators anyway.
+				- So in case if shit hits the fan, we can provide the user with a textbox to change the broken paths
+			- Proposition: the editor shall perform i/o upon the extras.lua and meta.lua
+				- Because if we consider the game image's path to be an identificator, what happens if it gets moved?
+				- It's a pain though because we will have duplicate state
+			- Behaviour in sprite invariant
 				- Should be displayed as simplified, instead of some mnemonic id?
 					- e.g. "corner (walls/1)"
+			- Automagic regeneration of shapes
 			- Is more than just an image path!
 				- We don't have a singular "game image" structure, though. It's divided into loadables and meta.
 				- So we'll need a special purpose GUI code that connects them all
-			- 
+		- Sounds
+			- Same problem with paths as in the editor
+				- Sounds are more likely to be reused
 	- Viewables
 		- 
 

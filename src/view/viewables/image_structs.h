@@ -51,10 +51,7 @@ struct image_in_atlas {
 	}
 };
 
-struct loaded_image_caches_map : public asset_map<
-	assets::image_id,
-	image_cache
-> {
+struct loaded_image_caches_map : public image_id_map<image_cache> {
 	loaded_image_caches_map() = default;
 
 	explicit loaded_image_caches_map(

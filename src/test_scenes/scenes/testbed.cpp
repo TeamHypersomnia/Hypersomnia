@@ -275,7 +275,7 @@ namespace test_scenes {
 				}
 
 				{
-					const vec2 bg_size = metas.at(assets::image_id::TEST_BACKGROUND).get_size();
+					const vec2 bg_size = metas.at(to_image_id(test_scene_image_id::TEST_BACKGROUND)).get_size();
 
 					const auto num_roads = 10 * 10;
 					const auto side = static_cast<int>(sqrt(num_roads) / 2);
@@ -288,19 +288,19 @@ namespace test_scenes {
 				}
 
 				{
-					const vec2 size = metas.at(assets::image_id::ROAD_FRONT_DIRT).get_size();
+					const vec2 size = metas.at(to_image_id(test_scene_image_id::ROAD_FRONT_DIRT)).get_size();
 
 					create_test_scene_entity(world, test_sprite_decorations::ROAD_DIRT, components::transform(vec2(468, 112)));
 				}
 
 				for (int r = 0; r < 38; ++r) {
-					const vec2 size = metas.at(assets::image_id::ROAD).get_size();
+					const vec2 size = metas.at(to_image_id(test_scene_image_id::ROAD)).get_size();
 
 					auto road = create_test_scene_entity(world, test_sprite_decorations::ROAD, components::transform{ vec2(468, 832+ size.y * r ) });
 				}
 
 				{
-					const vec2 size = metas.at(assets::image_id::FLOOR).get_size();
+					const vec2 size = metas.at(to_image_id(test_scene_image_id::FLOOR)).get_size();
 
 					for (int x = 0; x < 10; ++x) {
 						for (int y = 0; y < 10; ++y) {

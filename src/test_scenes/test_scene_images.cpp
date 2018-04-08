@@ -4,8 +4,10 @@
 #include "view/viewables/regeneration/image_loadables_def.h"
 
 #include "test_scenes/test_scenes_content.h"
+#include "test_scenes/test_scene_images.h"
 
 #include "augs/readwrite/lua_file.h"
+#include "augs/templates/enum_introspect.h"
 
 void load_test_scene_images(
 	sol::state& lua,
@@ -16,12 +18,14 @@ void load_test_scene_images(
 
 	const auto directory = augs::path_type("content/official/gfx/");
 
-	augs::for_each_enum_except_bounds([&](const id_type id) {
+	augs::for_each_enum_except_bounds([&](const test_scene_image_id enum_id) {
+		const auto id = to_image_id(enum_id);
+
 		if (found_in(all_loadables, id) || found_in(all_metas, id)) {
 			return;
 		}
 
-		const auto stem = to_lowercase(augs::enum_to_string(id));
+		const auto stem = to_lowercase(augs::enum_to_string(enum_id));
 
 		image_loadables_def loadables_def;
 		image_meta meta;

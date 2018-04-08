@@ -21,7 +21,7 @@ namespace test_flavours {
 
 			meta.set(render_def);
 
-			test_flavours::add_sprite(meta, logicals, assets::image_id::BACKPACK, white);
+			test_flavours::add_sprite(meta, logicals, test_scene_image_id::BACKPACK, white);
 			add_shape_invariant_from_renderable(meta, logicals);
 			test_flavours::add_see_through_dynamic_body(meta);
 

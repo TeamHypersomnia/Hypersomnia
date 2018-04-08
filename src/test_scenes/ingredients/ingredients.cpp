@@ -30,11 +30,11 @@ namespace test_flavours {
 			auto& frames = wandering.frames;
 			frames.resize(5);
 
-			frames[0] = { assets::image_id::BLANK, vec2(1, 1), white };
-			frames[1] = { assets::image_id::BLANK, vec2(2, 2), white };
-			frames[2] = { assets::image_id(int(assets::image_id::CAST_BLINK_1) + 1), logicals, white };
-			frames[3] = { assets::image_id(int(assets::image_id::CAST_BLINK_1) + 2), logicals, white };
-			frames[4] = { assets::image_id::BLANK, vec2(2, 2), white };
+			frames[0] = { to_image_id(test_scene_image_id::BLANK), vec2(1, 1), white };
+			frames[1] = { to_image_id(test_scene_image_id::BLANK), vec2(2, 2), white };
+			frames[2] = { assets::image_id(int(test_scene_image_id::CAST_BLINK_1) + 1), logicals, white };
+			frames[3] = { assets::image_id(int(test_scene_image_id::CAST_BLINK_1) + 2), logicals, white };
+			frames[4] = { to_image_id(test_scene_image_id::BLANK), vec2(2, 2), white };
 
 			wandering.frame_duration_ms = 6000.f;
 			meta.set(wandering);
@@ -53,7 +53,7 @@ namespace test_flavours {
 			test_flavours::add_sprite(
 				meta, 
 				logicals,
-				assets::image_id::HAVE_A_PLEASANT,
+				test_scene_image_id::HAVE_A_PLEASANT,
 				white
 			);
 		}
@@ -69,7 +69,7 @@ namespace test_flavours {
 			}
 
 			test_flavours::add_sprite(meta, logicals,
-			assets::image_id::TEST_BACKGROUND, gray1);
+			test_scene_image_id::TEST_BACKGROUND, gray1);
 		}
 		{
 			auto& meta = get_test_flavour(flavours, test_sprite_decorations::ROAD_DIRT);
@@ -82,7 +82,7 @@ namespace test_flavours {
 			}
 
 			test_flavours::add_sprite(meta, logicals,
-			assets::image_id::ROAD_FRONT_DIRT, white);
+			test_scene_image_id::ROAD_FRONT_DIRT, white);
 		}
 		{
 			auto& meta = get_test_flavour(flavours, test_sprite_decorations::FLOOR);
@@ -95,7 +95,7 @@ namespace test_flavours {
 			}
 
 			test_flavours::add_sprite(meta, logicals,
-			assets::image_id::FLOOR, white);
+			test_scene_image_id::FLOOR, white);
 		}
 		{
 			auto& meta = get_test_flavour(flavours, test_sprite_decorations::ROAD);
@@ -107,7 +107,7 @@ namespace test_flavours {
 				meta.set(render_def);
 			}
 			test_flavours::add_sprite(meta, logicals,
-						assets::image_id::ROAD, white);
+						test_scene_image_id::ROAD, white);
 		}
 		{
 			auto& meta = get_test_flavour(flavours, test_sprite_decorations::AWAKENING);
@@ -119,7 +119,7 @@ namespace test_flavours {
 				meta.set(render_def);
 			}
 			test_flavours::add_sprite(meta, logicals,
-			assets::image_id::AWAKENING,
+			test_scene_image_id::AWAKENING,
 			white,
 			augs::sprite_special_effect::COLOR_WAVE
 		);
@@ -134,7 +134,7 @@ namespace test_flavours {
 				meta.set(render_def);
 			}
 			test_flavours::add_sprite(meta, logicals,
-					assets::image_id::METROPOLIS,
+					test_scene_image_id::METROPOLIS,
 					white);
 		}
 	}

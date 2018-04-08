@@ -24,4 +24,15 @@ namespace test_flavours {
 		sprite_def.effect = effect;
 		t.set(sprite_def);
 	}
+
+	template <class E>
+	void add_sprite(
+		E& t, 
+		const loaded_image_caches_map& logicals,
+		const test_scene_image_id id, 
+		const rgba col = white,
+		const augs::sprite_special_effect effect = augs::sprite_special_effect::NONE
+	) {
+		add_sprite(t, logicals, to_image_id(id), col, effect); 
+	}
 }

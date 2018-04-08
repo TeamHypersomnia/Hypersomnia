@@ -34,8 +34,8 @@ namespace test_flavours {
 			meta.set(render_def);
 
 			invariants::polygon poly;
-			poly.add_convex_polygons(logicals.at(assets::image_id::TRUCK_FRONT).partitioned_shape.convex_polys);
-			poly.texture_map_id = assets::image_id::TRUCK_FRONT;
+			poly.add_convex_polygons(logicals.at(to_image_id(test_scene_image_id::TRUCK_FRONT)).partitioned_shape.convex_polys);
+			poly.texture_map_id = to_image_id(test_scene_image_id::TRUCK_FRONT);
 
 			meta.set(poly);
 
@@ -49,7 +49,7 @@ namespace test_flavours {
 
 			meta.set(render_def);
 
-			add_sprite(meta, logicals, assets::image_id::TRUCK_INSIDE);
+			add_sprite(meta, logicals, test_scene_image_id::TRUCK_INSIDE);
 						add_shape_invariant_from_renderable(meta, logicals);
 
 		}
@@ -62,7 +62,7 @@ namespace test_flavours {
 
 			meta.set(render_def);
 			invariants::sprite sprite_def;
-			sprite_def.set(assets::image_id::BLANK, vec2 ( 40, 20 ), rgba(255, 255, 255, 0));
+			sprite_def.set(to_image_id(test_scene_image_id::BLANK), vec2 ( 40, 20 ), rgba(255, 255, 255, 0));
 			meta.set(sprite_def);
 			add_shape_invariant_from_renderable(meta, logicals);
 		}
@@ -75,7 +75,7 @@ namespace test_flavours {
 
 			meta.set(render_def);
 
-			add_sprite(meta, logicals, assets::image_id::TRUCK_ENGINE);
+			add_sprite(meta, logicals, test_scene_image_id::TRUCK_ENGINE);
 			add_shape_invariant_from_renderable(meta, logicals);
 		}
 #endif
@@ -94,8 +94,8 @@ namespace prefabs {
 
 		const auto si = world.get_si();
 
-		const vec2 front_size = metas.at(assets::image_id::TRUCK_FRONT).get_size();
-		const vec2 interior_size = metas.at(assets::image_id::TRUCK_INSIDE).get_size();
+		const vec2 front_size = metas.at(to_image_id(test_scene_image_id::TRUCK_FRONT)).get_size();
+		const vec2 interior_size = metas.at(to_image_id(test_scene_image_id::TRUCK_INSIDE)).get_size();
 
 		{
 			auto& car = front += components::car();
@@ -201,7 +201,7 @@ namespace prefabs {
 					this_engine_transform = engine_physical.get_logic_transform();
 				}
 
-				const vec2 engine_size = metas.at(assets::image_id::TRUCK_ENGINE).get_size();
+				const vec2 engine_size = metas.at(to_image_id(test_scene_image_id::TRUCK_ENGINE)).get_size();
 
 				{
 					particles_existence_input input;

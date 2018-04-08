@@ -11,23 +11,11 @@
 #include "game/assets/animation.h"
 #include "game/assets/physical_material.h"
 
-#if STATICALLY_ALLOCATE_ASSETS
-#include "augs/misc/trivially_copyable_tuple.h"
-
-using tuple_of_logical_assets = augs::trivially_copyable_tuple<
-	/* Standalone logical assets */
-	asset_map<assets::animation_id, animation>,
-	asset_map<assets::recoil_player_id, recoil_player>,
-	asset_map<assets::physical_material_id, physical_material>
->;
-#else
-#include <tuple>
 using tuple_of_logical_assets = std::tuple<
 	asset_map<assets::animation_id, animation>,
 	asset_map<assets::recoil_player_id, recoil_player>,
 	asset_map<assets::physical_material_id, physical_material>
 >;
-#endif
 
 template <class T, class Candidate>
 struct is_key_type_equal_to : std::bool_constant<std::is_same_v<T, typename Candidate::key_type>> {
