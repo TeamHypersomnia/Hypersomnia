@@ -16,7 +16,7 @@ TEST_CASE("Pool SimpleBackAndForth") {
 	kv_t keys;
 	keys.resize(6);
 
-	for (int i = 0; i < 3; ++i) {
+	for (int trial = 0; trial < 3; ++trial) {
 		REQUIRE(p.empty());
 
 		for (unsigned i = 0; i < keys.size(); ++i) {
@@ -45,7 +45,7 @@ TEST_CASE("Pool UndoAllocations") {
 	kv_t keys_after;
 	keys_after.resize(6);
 
-	for (int i = 0; i < 3; ++i) {
+	for (int trial = 0; trial < 3; ++trial) {
 		REQUIRE(p.empty());
 
 		for (unsigned i = 0; i < keys.size(); ++i) {
@@ -84,7 +84,7 @@ TEST_CASE("Pool UndoDeletes") {
 	keys.resize(6);
 	undos.resize(6);
 
-	for (int i = 0; i < 3; ++i) {
+	for (int trial = 0; trial < 3; ++trial) {
 		REQUIRE(p.empty());
 
 		for (unsigned i = 0; i < keys.size(); ++i) {

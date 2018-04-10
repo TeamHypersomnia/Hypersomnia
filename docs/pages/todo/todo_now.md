@@ -9,17 +9,13 @@ summary: Just a hidden scratchpad.
 
 - asset_map -> asset_pool
 
-- Allocation and deallocation of flavour, image ids et cetera
-	- make a separate template and test it
-		- id_relinking_pool 
-
-template <class F>
-void erase_and_relink(F for_each_id) {
-}
-
-	- Consider undos and redos
-		- Could perhaps be useful to use something from the pool for this as we have relevant calls there?
-	- asset_map is for now implemented to act like an unordered_map
+- the only performance-critical assets really are image ids for sprites
+	- images_in_atlas_map can just be a vector of constant size vector, even if ids are the two-integer pool ids
+		- because it will always be regenerated for the existent ones whenever the content changes
+	- if animation id performance takes a hit, we can always make a cache for them
+		- but it is unlikely
+	- so, let's use augs::pool that has undos working already
+		- in case that we'll want to switch for id relinking pool, 
 
 - Complex selectors in general property editor
 	- In fae tree:

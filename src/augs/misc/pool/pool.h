@@ -105,7 +105,7 @@ namespace augs {
 			class... Args
 		>
 		allocation_result allocate(Args&&... args) {
-			if (full()) {
+			if (full_capacity()) {
 				if constexpr(constexpr_capacity) {
 					throw std::runtime_error("This static pool cannot be further expanded.");
 				}
@@ -229,6 +229,8 @@ namespace augs {
 			const undo_free_input_type in,
 			Args&&... removed_content
 		) {
+			static_assert(sizeof...(Args) > 0, "Specify what to construct.");
+
 			const auto indirection_index = in.indirection_index;
 			const auto real_index = in.real_index;
 
@@ -395,6 +397,10 @@ namespace augs {
 			return static_cast<size_type>(slots.size());
 		}
 
+		auto max_size() const {
+			return static_cast<size_type>(objects.max_size());
+		}
+
 		auto capacity() const {
 			return static_cast<size_type>(indirectors.size());
 		}
@@ -403,8 +409,12 @@ namespace augs {
 			return size() == 0;
 		}
 
-		bool full() const {
+		bool full_capacity() const {
 			return size() == capacity();
+		}
+
+		bool full() const {
+			return size() == max_size();
 		}
 
 		template <class F>

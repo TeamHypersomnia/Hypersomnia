@@ -43,7 +43,7 @@ class cosmos_solvable {
 	auto allocate_new_entity(const entity_guid new_guid, Args&&... args) {
 		auto& pool = significant.get_pool<E>();
 
-		if (pool.full()) {
+		if (pool.full_capacity()) {
 			throw std::runtime_error("Entities should be controllably reserved to avoid invalidation of entity_handles.");
 		}
 
