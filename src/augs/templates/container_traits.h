@@ -46,6 +46,13 @@ struct can_reserve<T, decltype(std::declval<T&>().reserve(0u), void())> : std::t
 
 
 template <class T, class = void>
+struct can_resize : std::false_type {};
+
+template <class T>
+struct can_resize<T, decltype(std::declval<T&>().resize(0u), void())> : std::true_type {};
+
+
+template <class T, class = void>
 struct can_clear : std::false_type {};
 
 template <class T>
@@ -81,6 +88,9 @@ constexpr bool has_member_find_v = has_member_find<T, K>::value;
 
 template <class T>
 constexpr bool can_reserve_v = can_reserve<T>::value;
+
+template <class T>
+constexpr bool can_resize_v = can_resize<T>::value;
 
 template <class T>
 constexpr bool can_clear_v = can_clear<T>::value;

@@ -30,4 +30,9 @@ using particle_effects_map = asset_map<
 
 using image_loadables_map = image_id_map<image_loadables_def>;
 using image_metas_map = image_id_map<image_meta>;
-using images_in_atlas_map = image_id_map<image_in_atlas>;
+
+#if STATICALLY_ALLOCATE_ASSETS
+using images_in_atlas_map = augs::constant_size_vector<image_in_atlas, MAX_IMAGE_COUNT>;
+#else
+using images_in_atlas_map = std::vector<image_in_atlas>;
+#endif

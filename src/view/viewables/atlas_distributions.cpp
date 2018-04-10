@@ -48,7 +48,7 @@ augs::graphics::texture standard_atlas_distribution(const standard_atlas_distrib
 		}
 
 		for (const auto& d : in.image_loadables) {
-			auto& output_viewable = in.output_game_images[d.first];
+			auto& output_viewable = sub_with_resize(in.output_game_images, d.first);
 			auto& maps = output_viewable;
 			
 			const auto& def = d.second;

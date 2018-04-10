@@ -2,6 +2,17 @@
 #include <algorithm>
 #include "augs/templates/container_traits.h"
 
+template <class C1, class I>
+decltype(auto) sub_with_resize(C1& c, const I index) {
+	if constexpr(can_resize_v<C1>) {
+		if (c.size() < index + 1) {
+			c.resize(index + 1);
+		}
+	}
+
+	return c[index];
+}
+
 template <class C1, class C2>
 void assign_begin_end(C1& to, const C2& from) {
 	if constexpr(std::is_same_v<C1, C2>) {
