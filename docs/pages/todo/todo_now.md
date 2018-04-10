@@ -17,6 +17,11 @@ summary: Just a hidden scratchpad.
 	- so, let's use augs::pool that has undos working already
 		- in case that we'll want to switch for id relinking pool, 
 
+- what do we do with invalid sprite ids?
+	- makes practically no sense to have an invalid image id
+		- invalid sound id could still signify a no-sound which may make sense
+	- if we disallow them, 	
+
 - Complex selectors in general property editor
 	- In fae tree:
 		- Flavours

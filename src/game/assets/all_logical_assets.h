@@ -1,7 +1,7 @@
 #pragma once
 #include "augs/templates/container_templates.h"
 
-#include "game/assets/asset_map.h"
+#include "game/assets/asset_containers.h"
 
 #include "game/assets/ids/animation_id.h"
 #include "game/assets/ids/physical_material_id.h"
