@@ -51,7 +51,7 @@ void pure_color_highlight_system::draw_highlights(
 	const augs::drawer output,
 	const cosmos& cosmos,
 	const interpolation_system& interp,
-	const game_images_in_atlas_map& game_images
+	const images_in_atlas_map& game_images
 ) const {
 	for (const auto& r : highlights) {
 		const auto subject = cosmos[r.in.target];

@@ -40,7 +40,7 @@ struct light_system_input {
 	const interpolation_system& interpolation;
 	const particles_simulation_system& particles;
 	const visible_entities::per_layer_type& visible_per_layer;
-	const game_images_in_atlas_map& game_images;
+	const images_in_atlas_map& game_images;
 };
 
 class light_system {

@@ -41,7 +41,7 @@ public:
 		const augs::drawer output,
 		const cosmos& cosmos,
 		const interpolation_system& interp,
-		const game_images_in_atlas_map& game_images
+		const images_in_atlas_map& game_images
 	) const;
 
 	void reserve_caches_for_entities(const size_t) const {}

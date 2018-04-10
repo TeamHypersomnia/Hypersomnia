@@ -30,4 +30,4 @@ using particle_effects_map = asset_map<
 
 using image_loadables_map = image_id_map<image_loadables_def>;
 using image_metas_map = image_id_map<image_meta>;
-using game_images_in_atlas_map = image_id_map<image_in_atlas>;
+using images_in_atlas_map = image_id_map<image_in_atlas>;

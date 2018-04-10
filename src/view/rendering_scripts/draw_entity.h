@@ -21,7 +21,7 @@ class interpolation_system;
 
 struct draw_renderable_input {
 	const augs::drawer drawer;
-	const game_images_in_atlas_map& manager;
+	const images_in_atlas_map& manager;
 	const double global_time_seconds;
 	const flip_flags flip;
 };

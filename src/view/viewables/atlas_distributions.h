@@ -20,7 +20,7 @@ struct standard_atlas_distribution_input {
 	const augs::font_loading_input& gui_font_input;
 	const atlas_regeneration_settings settings;
 
-	game_images_in_atlas_map& output_game_images;
+	images_in_atlas_map& output_game_images;
 	necessary_images_in_atlas_map& output_necessary_images;
 	augs::baked_font& output_gui_font;
 };

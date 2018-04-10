@@ -7,8 +7,6 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
-- asset_map -> asset_pool
-
 - the only performance-critical assets really are image ids for sprites
 	- images_in_atlas_map can just be a vector of constant size vector, even if ids are the two-integer pool ids
 		- because it will always be regenerated for the existent ones whenever the content changes
