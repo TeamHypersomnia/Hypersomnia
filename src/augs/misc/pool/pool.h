@@ -253,7 +253,7 @@ namespace augs {
 				return new_key;
 			};
 
-			if (real_index < objects.size()) {
+			if (real_index < size()) {
 				auto& new_slot_space = slots[real_index];
 				auto& new_object_space = objects[real_index];
 
@@ -261,7 +261,7 @@ namespace augs {
 					const auto indirector_of_moved_element = new_slot_space.pointing_indirector;
 
 					/* change moved element's indirector - set it back to the last index */
-					indirectors[indirector_of_moved_element].real_index = objects.size();
+					indirectors[indirector_of_moved_element].real_index = size();
 				}
 
 				slots.emplace_back(std::move(new_slot_space));

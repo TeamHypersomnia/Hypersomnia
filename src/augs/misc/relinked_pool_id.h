@@ -1,19 +1,21 @@
 #pragma once
 #include <ostream>
 #include <type_traits>
+#include <limits>
+
 #include "augs/templates/hash_fwd.h"
 
 template <class T>
-struct minus_oned_pod {
-	// GEN INTROSPECTOR struct minus_oned_pod class T
+struct relinked_pool_id {
+	// GEN INTROSPECTOR struct relinked_pool_id class T
 	T value;
 	// END GEN INTROSPECTOR
 
 	static_assert(std::is_pod_v<T>, "The type is not POD!");
 
-	static minus_oned_pod INVALID;
+	static relinked_pool_id INVALID;
 
-	minus_oned_pod(const T p = static_cast<T>(-1)) : value(p) {}
+	relinked_pool_id(const T p = static_cast<T>(-1)) : value(p) {}
 
 	bool operator==(const T b) const {
 		return value == b;
@@ -23,11 +25,11 @@ struct minus_oned_pod {
 		return value != b;
 	}
 
-	bool operator==(const minus_oned_pod<T> b) const {
+	bool operator==(const relinked_pool_id<T> b) const {
 		return value == b.value;
 	}
 
-	bool operator!=(const minus_oned_pod<T> b) const {
+	bool operator!=(const relinked_pool_id<T> b) const {
 		return value != b.value;
 	}
 
@@ -36,22 +38,22 @@ struct minus_oned_pod {
 	}
 
 	explicit operator bool() const {
-		return value != -1;
+		return value < std::numeric_limits<T>::max() / 2;
 	}
 };
 
 template <class T>
-minus_oned_pod<T> minus_oned_pod<T>::INVALID = {};
+relinked_pool_id<T> relinked_pool_id<T>::INVALID = {};
 
 template <class T>
-std::ostream& operator<<(std::ostream& out, const minus_oned_pod<T>& x) {
+std::ostream& operator<<(std::ostream& out, const relinked_pool_id<T>& x) {
 	return out << x.value;
 }
 
 namespace std {
 	template <class T>
-	struct hash<minus_oned_pod<T>> {
-		std::size_t operator()(const minus_oned_pod<T>& z) const {
+	struct hash<relinked_pool_id<T>> {
+		std::size_t operator()(const relinked_pool_id<T>& z) const {
 			return std::hash<T>()(z.value);
 		}
 	};

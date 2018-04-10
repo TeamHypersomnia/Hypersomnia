@@ -108,7 +108,6 @@ public:
 		Pre&& pre_construction,
 		Post post_construction
 	) {
-		ensure(flavour_id);
 		using candidate_types = typename decltype(flavour_id)::matching_types; 
 
 		return conditional_get_by_dynamic_id<candidate_types>(

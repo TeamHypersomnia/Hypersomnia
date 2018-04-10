@@ -4,14 +4,14 @@
 #include <unordered_map>
 
 #include "augs/templates/introspect.h"
-#include "augs/minus_oned_pod.h"
+#include "augs/misc/relinked_pool_id.h"
 
 struct intro_test2 {
 	// GEN INTROSPECTOR struct intro_test2
 	std::unordered_map<int, float> it = { {1, 1.4f}, {2, 458.f} };
 	bool blabla = true;
 	char okay = 'A';
-	minus_oned_pod<char> nice;
+	relinked_pool_id<char> nice;
 	// END GEN INTROSPECTOR
 };
 

@@ -1,13 +1,13 @@
 #pragma once
 #include <string>
-#include "augs/minus_oned_pod.h"
+#include "augs/misc/relinked_pool_id.h"
 #include "augs/templates/hash_templates.h"
 #include "augs/templates/string_templates_declaration.h"
 
 #include "game/transcendental/entity_type_traits.h"
 #include "game/organization/all_entity_types_declaration.h"
 
-using raw_entity_flavour_id = minus_oned_pod<unsigned>;
+using raw_entity_flavour_id = relinked_pool_id<unsigned>;
 
 template <class...>
 struct constrained_entity_flavour_id; 

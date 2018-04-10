@@ -11,7 +11,7 @@ using u_t = p_t::undo_free_input_type;
 using uv_t = std::vector<u_t>;
 using kv_t = std::vector<k_t>;
 
-TEST_CASE("Pools SimpleBackAndForth") {
+TEST_CASE("Pool SimpleBackAndForth") {
 	p_t p = 6;
 	kv_t keys;
 	keys.resize(6);
@@ -38,7 +38,7 @@ TEST_CASE("Pools SimpleBackAndForth") {
 	}
 }
 
-TEST_CASE("Pools UndoAllocations") {
+TEST_CASE("Pool UndoAllocations") {
 	p_t p = 6;
 	kv_t keys;
 	keys.resize(6);
@@ -76,7 +76,7 @@ TEST_CASE("Pools UndoAllocations") {
 	}
 }
 
-TEST_CASE("Pools UndoDeletes") {
+TEST_CASE("Pool UndoDeletes") {
 	p_t p = 6;
 	kv_t keys;
 	uv_t undos;
@@ -168,7 +168,7 @@ void test_pool() {
 	REQUIRE(5 == p.size());
 }
 
-TEST_CASE("Pools Readwrite") {
+TEST_CASE("Pool Readwrite") {
 	test_pool<augs::pool<float, of_size<100>::make_constant_vector, unsigned short>>();
 	test_pool<augs::pool<float, make_vector, unsigned char>>();
 }
