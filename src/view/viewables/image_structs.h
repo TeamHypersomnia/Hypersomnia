@@ -4,7 +4,7 @@
 #include "augs/misc/enum/enum_array.h"
 #include "augs/drawing/flip.h"
 #include "augs/texture_atlas/texture_atlas_entry.h"
-#include "game/assets/ids/image_id.h"
+#include "game/assets/ids/asset_ids.h"
 #include "view/viewables/all_viewables_declarations.h"
 #include "game/components/shape_polygon_component.h"
 #include "game/components/sprite_component.h"

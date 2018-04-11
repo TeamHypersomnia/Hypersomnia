@@ -10,7 +10,7 @@
 
 #include "augs/graphics/rgba.h"
 
-#include "game/assets/ids/image_id.h"
+#include "game/assets/ids/asset_ids.h"
 #include "game/common_state/entity_name_str.h"
 
 struct sentience_meter_appearance {

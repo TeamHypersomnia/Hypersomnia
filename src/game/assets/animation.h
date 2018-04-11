@@ -1,7 +1,7 @@
 #pragma once
 #include "augs/math/declare_math.h"
 #include "augs/misc/constant_size_vector.h"
-#include "game/assets/ids/image_id.h"
+#include "game/assets/ids/asset_ids.h"
 #include "game/container_sizes.h"
 
 struct animation_frame {

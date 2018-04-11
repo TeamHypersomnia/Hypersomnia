@@ -1,9 +1,7 @@
 #pragma once
-#include "game/assets/ids/image_id.h"
+#include "game/assets/ids/asset_ids.h"
 
 enum class test_scene_image_id {
-	INVALID = -1,
-
 	// GEN INTROSPECTOR enum class test_scene_image_id
 	BLANK = 0,
 

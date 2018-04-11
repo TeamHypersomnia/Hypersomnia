@@ -1,6 +1,6 @@
 #pragma once
 #include "augs/templates/container_templates.h"
-#include "game/assets/ids/image_id.h"
+#include "game/assets/ids/asset_ids.h"
 #include "view/viewables/image_structs.h"
 
 #if STATICALLY_ALLOCATE_ASSETS

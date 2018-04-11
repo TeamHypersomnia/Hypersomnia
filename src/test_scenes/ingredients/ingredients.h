@@ -3,7 +3,7 @@
 #include "augs/math/vec2.h"
 #include "augs/graphics/rgba.h"
 
-#include "game/assets/ids/image_id.h"
+#include "game/assets/ids/asset_ids.h"
 
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/step_declaration.h"

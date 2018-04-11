@@ -1,7 +1,7 @@
 #include "test_scenes/test_scenes_content.h"
 #include "test_scenes/test_scene_animations.h"
 
-#include "game/assets/ids/animation_id.h"
+#include "game/assets/ids/asset_ids.h"
 #include "game/assets/all_logical_assets.h"
 
 #include "test_scenes/test_scene_images.h"

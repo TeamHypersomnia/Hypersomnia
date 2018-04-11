@@ -3,7 +3,7 @@
 */
 #pragma warning(disable : 4244)
 #include "augs/templates/algorithm_templates.h"
-#include "game/assets/ids/image_id.h"
+#include "game/assets/ids/asset_ids.h"
 #include "game/assets/all_logical_assets.h"
 
 #include "test_scenes/test_scene_flavours.h"

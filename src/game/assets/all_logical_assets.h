@@ -3,7 +3,7 @@
 
 #include "game/assets/asset_containers.h"
 
-#include "game/assets/ids/animation_id.h"
+#include "game/assets/ids/asset_ids.h"
 #include "game/assets/ids/physical_material_id.h"
 #include "game/assets/ids/recoil_player_id.h"
 

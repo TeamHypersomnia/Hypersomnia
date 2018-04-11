@@ -1,5 +1,5 @@
 #pragma once
-#include "game/assets/ids/animation_id.h"
+#include "game/assets/ids/asset_ids.h"
 
 enum class animation_playing_state {
 	// GEN INTROSPECTOR enum class animation_playing_state

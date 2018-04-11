@@ -1,7 +1,7 @@
 #pragma once
 #include "game/assets/ids/particle_effect_id.h"
 #include "game/assets/ids/sound_buffer_id.h"
-#include "game/assets/ids/image_id.h"
+#include "game/assets/ids/asset_ids.h"
 
 #include "game/detail/view_input/sound_effect_input.h"
 #include "game/detail/view_input/particle_effect_input.h"

@@ -1,5 +1,5 @@
 #pragma once
-#include "game/assets/ids/image_id.h"
+#include "game/assets/ids/asset_ids.h"
 
 namespace augs {
 	template <class id_type>
