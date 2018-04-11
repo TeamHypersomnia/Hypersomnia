@@ -1,8 +1,8 @@
 ---
-title: ToDo now
+title: Brainstorm
 hide_sidebar: true
 permalink: brainstorm
-summary: Just a hidden scratchpad.
+summary: That which we are brainstorming.
 ---
 
 ## Random thoughts
