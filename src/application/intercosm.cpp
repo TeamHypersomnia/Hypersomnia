@@ -34,14 +34,14 @@ void intercosm::make_test_scene(
 #endif
 
 	const auto caches = populate_test_scene_images_and_sounds(lua, viewables);
-	populate_test_scene_viewables(lua, caches, viewables);
+
+	all_logical_assets logicals;
+	populate_test_scene_logical_assets(logicals);
+	populate_test_scene_viewables(lua, caches, logicals.get_store_by<assets::animation_id>(), viewables);
 
 	auto reloader = [&](auto populator){
 		world.change_common_significant([&](cosmos_common_significant& common){
-			auto& logicals = common.logical_assets;
-			logicals = {};
-			populate_test_scene_logical_assets(logicals);
-
+			common.logical_assets = logicals;
 			populator.populate(caches, common);
 
 			return changer_callback_result::DONT_REFRESH;

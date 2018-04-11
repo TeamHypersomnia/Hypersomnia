@@ -82,3 +82,5 @@ struct animation {
 		return get_image_id(std::min(frames.size() - 1, state.frame_num + frame_offset));
 	}
 };
+
+using animations_pool = make_asset_pool<animation, MAX_ANIMATION_COUNT>;
