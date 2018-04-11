@@ -10,7 +10,7 @@
 #include <Box2D/Collision/b2Collision.h>
 
 #include "game/enums/filters.h"
-#include "augs/callback_result.h"
+#include "augs/enums/callback_result.h"
 
 #include "game/detail/physics/physics_queries_declaration.h"
 

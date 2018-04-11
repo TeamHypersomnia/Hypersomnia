@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/callback_result.h"
+#include "augs/enums/callback_result.h"
 #include "augs/templates/component_traits.h"
 
 #include "augs/math/transform.h"

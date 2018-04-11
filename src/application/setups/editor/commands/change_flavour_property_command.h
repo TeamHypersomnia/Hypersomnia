@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/callback_result.h"
+#include "augs/enums/callback_result.h"
 #include "game/organization/all_components_declaration.h"
 #include "game/transcendental/entity_flavour_id.h"
 

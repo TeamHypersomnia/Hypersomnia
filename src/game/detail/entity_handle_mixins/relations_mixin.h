@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 
-#include "augs/callback_result.h"
+#include "augs/enums/callback_result.h"
 #include "augs/build_settings/platform_defines.h"
 
 #include "augs/templates/introspect_declaration.h"

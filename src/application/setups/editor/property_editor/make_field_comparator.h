@@ -2,7 +2,7 @@
 #include <memory>
 #include <type_traits>
 
-#include "augs/callback_result.h"
+#include "augs/enums/callback_result.h"
 
 namespace augs {
 	struct trivial_type_marker;

@@ -9,7 +9,7 @@
 #include "game/transcendental/entity_id.h"
 #include "augs/build_settings/platform_defines.h"
 #include "game/detail/inventory/wielding_result.h"
-#include "augs/callback_result.h"
+#include "augs/enums/callback_result.h"
 
 template <class derived_handle_type>
 class inventory_mixin {
