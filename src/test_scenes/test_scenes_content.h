@@ -34,7 +34,7 @@ void load_test_scene_images(
 	image_metas_map&
 );
 
-void load_test_scene_animations(all_logical_assets&);
+void load_test_scene_animations(animations_map&);
 void load_test_scene_physical_materials(all_logical_assets&);
 void load_test_scene_recoil_players(all_logical_assets&);
 

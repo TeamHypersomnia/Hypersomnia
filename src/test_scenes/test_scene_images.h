@@ -1,5 +1,5 @@
 #pragma once
-#include "game/assets/ids/asset_ids.h"
+#include "test_scenes/test_id_to_pool_id.h"
 
 enum class test_scene_image_id {
 	// GEN INTROSPECTOR enum class test_scene_image_id
@@ -112,13 +112,3 @@ enum class test_scene_image_id {
 	// END GEN INTROSPECTOR
 };
 
-inline auto to_image_id(const test_scene_image_id id) {
-	/* 
-		This is a massive sleight of hand. 
-		We predict here what identificators will the pool return.
-	*/
-
-	assets::image_id result;
-	result.indirection_index = static_cast<unsigned>(id);
-	return result;
-}

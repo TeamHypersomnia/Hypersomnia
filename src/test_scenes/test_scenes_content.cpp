@@ -25,7 +25,7 @@ loaded_image_caches_map populate_test_scene_images_and_sounds(
 void populate_test_scene_logical_assets(
 	all_logical_assets& output_logicals
 ) {
-	load_test_scene_animations(output_logicals);
+	load_test_scene_animations(output_logicals.get_store_by<assets::animation_id>());
 	load_test_scene_physical_materials(output_logicals);
 	load_test_scene_recoil_players(output_logicals);
 }

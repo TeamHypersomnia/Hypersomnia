@@ -21,11 +21,9 @@ void create_frames(
 	}
 }
 
-void load_test_scene_animations(all_logical_assets& anims) {
+void load_test_scene_animations(animations_pool& anims) {
 	{
-		const auto id = to_animation_id(assets::animation_id::CAST_BLINK_ANIMATION);
-
-		auto& anim = anims[id];
+		animation anim;
 		anim.loop_mode = animation::loop_type::NONE;
 
 		create_frames(
@@ -34,5 +32,10 @@ void load_test_scene_animations(all_logical_assets& anims) {
 			test_scene_image_id::CAST_BLINK_19,
 			50.0f
 		);
+
+		const auto id = to_animation_id(assets::animation_id::CAST_BLINK_ANIMATION);
+		const auto new_allocation = anims.allocate(std::move(anim));
+
+		ensure(new_allocation.key == id);
 	} 
 }

@@ -5,6 +5,8 @@
 #include "augs/graphics/rgba.h"
 #include "game/transcendental/entity_id.h"
 
+#include "game/assets/asset_containers.h"
+
 struct general_particle {
 	// GEN INTROSPECTOR struct general_particle
 	vec2 pos;
@@ -93,7 +95,7 @@ struct animation_in_particle {
 	}
 
 	void advance(const real32 dt, const animations_pool& anims) {
-		if (state.advance(dt, anims[id], starting_frame_num)) {
+		if (state.advance(dt, anims[id].frames, starting_frame_num)) {
 			starting_frame_num = -1;
 		}
 	}

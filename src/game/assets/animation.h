@@ -4,6 +4,8 @@
 #include "game/assets/ids/asset_ids.h"
 #include "game/container_sizes.h"
 
+using animation_frames_type = augs::constant_size_vector<animation_frame, ANIMATION_FRAME_COUNT>;
+
 struct animation_frame {
 	// GEN INTROSPECTOR struct animation_frame
 	assets::image_id image_id;
@@ -54,7 +56,7 @@ struct simple_animation_state {
 
 	bool advance(
 		const real32 dt,
-		const animation& source,
+		const animation_frames_type& source,
 		const unsigned frame_offset = 0
 	);
 };
@@ -67,7 +69,7 @@ struct animation {
 	};
 
 	// GEN INTROSPECTOR struct animation
-	augs::constant_size_vector<animation_frame, ANIMATION_FRAME_COUNT> frames = {};
+	animation_frames_type frames = {};
 	loop_type loop_mode = loop_type::REPEAT;
 	// END GEN INTROSPECTOR
 
@@ -82,5 +84,3 @@ struct animation {
 		return get_image_id(std::min(frames.size() - 1, state.frame_num + frame_offset));
 	}
 };
-
-using animations_pool = make_asset_pool<animation, MAX_ANIMATION_COUNT>;
