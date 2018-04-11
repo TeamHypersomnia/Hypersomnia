@@ -269,7 +269,7 @@ void editor_setup::perform_custom_imgui(
 						open(owner);
 					}
 
-					if (auto menu = scoped_menu("Recent files", !recent.empty())) {
+					if (auto menu = scoped_menu("Recent projects", !recent.empty())) {
 						/*	
 							IMPORTANT! recent.paths can be altered in the loop by loading a intercosm,
 							thus we need to copy its contents.
@@ -324,8 +324,13 @@ void editor_setup::perform_custom_imgui(
 				}
 
 				if (auto menu = scoped_menu("Edit")) {
-					if (item_if_tabs_and(!folder().history.is_revision_oldest(), "Undo", "CTRL+Z")) { undo(); }
-					if (item_if_tabs_and(!folder().history.is_revision_newest(), "Redo", "CTRL+SHIFT+Z")) { redo(); }
+					{
+						const bool enable_undo = anything_opened() && !folder().history.is_revision_oldest();
+						const bool enable_redo = anything_opened() && !folder().history.is_revision_newest();
+
+						if (item_if_tabs_and(enable_redo, "Undo", "CTRL+Z")) { undo(); }
+						if (item_if_tabs_and(enable_undo, "Redo", "CTRL+SHIFT+Z")) { redo(); }
+					}
 
 					ImGui::Separator();
 					if (item_if_tabs("Cut", "CTRL+X")) {}
