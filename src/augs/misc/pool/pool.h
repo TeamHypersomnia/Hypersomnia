@@ -368,7 +368,7 @@ namespace augs {
 		const mapped_type& get(const key_type key) const {
 			return get_impl(*this, key);
 		}
-
+		
 		mapped_type* find(const key_type key) {
 			return find_impl(*this, key);
 		}
@@ -507,6 +507,28 @@ namespace augs {
 			r(slots);
 			r(indirectors);
 			r(free_indirectors);
+		}
+
+		/* Synonyms for compatibility with other containers */
+
+		template <class... Args>
+		decltype(auto) at(Args&&... args) {
+			return get(std::forward<Args>(args)...);
+		}
+
+		template <class... Args>
+		decltype(auto) at(Args&&... args) const {
+			return get(std::forward<Args>(args)...);
+		}
+
+		template <class... Args>
+		decltype(auto) operator[](Args&&... args) {
+			return get(std::forward<Args>(args)...);
+		}
+
+		template <class... Args>
+		decltype(auto) operator[](Args&&... args) const {
+			return get(std::forward<Args>(args)...);
 		}
 	};
 }

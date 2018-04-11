@@ -114,6 +114,13 @@ enum class test_scene_image_id {
 	// END GEN INTROSPECTOR
 };
 
-inline assets::image_id to_image_id(const test_scene_image_id id) {
-	return static_cast<unsigned>(id);
+inline auto to_image_id(const test_scene_image_id id) {
+	/* 
+		This is a massive sleight of hand. 
+		We predict here what identificators will the pool return.
+	*/
+
+	assets::image_id result;
+	result.indirection_index = static_cast<unsigned>(id);
+	return result;
 }

@@ -42,6 +42,7 @@
 #include "view/audiovisual_state/world_camera.h"
 #include "view/audiovisual_state/audiovisual_state.h"
 #include "view/rendering_scripts/illuminated_rendering.h"
+#include "view/viewables/images_in_atlas_map.h"
 
 #include "application/session_profiler.h"
 #include "application/config_lua_table.h"

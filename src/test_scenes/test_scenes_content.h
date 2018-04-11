@@ -2,6 +2,7 @@
 #include "augs/texture_atlas/texture_atlas.h"
 #include "augs/templates/exception_templates.h"
 
+#include "game/assets/all_logical_assets.h"
 #include "view/viewables/all_viewables_declarations.h"
 
 struct all_logical_assets;
@@ -19,6 +20,7 @@ struct loaded_image_caches_map;
 void load_test_scene_sound_buffers(sound_buffer_inputs_map&);
 void load_test_scene_particle_effects(
 	const loaded_image_caches_map&,
+	const animations_map& anims,
 	particle_effects_map&
 );
 
@@ -52,6 +54,7 @@ void populate_test_scene_logical_assets(
 void populate_test_scene_viewables(
 	sol::state& lua,
 	const loaded_image_caches_map& caches,
+	const animations_map& anims,
 	all_viewables_defs& output_sources
 );
 

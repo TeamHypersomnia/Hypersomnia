@@ -15,7 +15,7 @@
 
 struct sentience_meter_appearance {
 	// GEN INTROSPECTOR struct sentience_meter_appearance
-	assets::image_id icon = assets::image_id::INVALID;
+	assets::image_id icon;
 	rgba bar_color;
 	entity_name_str description;
 	// END GEN INTROSPECTOR

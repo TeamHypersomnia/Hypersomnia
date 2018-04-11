@@ -1,4 +1,5 @@
 #include "augs/filesystem/file.h"
+#include "augs/misc/pool/pool.h"
 
 #include "view/viewables/image_structs.h"
 #include "view/viewables/regeneration/image_loadables_def.h"
@@ -60,7 +61,14 @@ void load_test_scene_images(
 			);
 		}
 
-		all_loadables[id] = loadables_def;
-		all_metas[id] = meta;
+		{
+			const auto new_allocation = all_loadables.allocate(loadables_def);
+			ensure(new_allocation.key == id);
+		}
+
+		{
+			const auto new_allocation = all_metas.allocate(meta);
+			ensure(new_allocation.key == id);
+		}
 	});
 }

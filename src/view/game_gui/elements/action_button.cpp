@@ -66,7 +66,7 @@ void action_button::draw(
 						inside_col.a = 255;
 					}
 
-					assets::image_id inside_tex = assets::image_id::INVALID;
+					assets::image_id inside_tex;
 					const assets::necessary_image_id border_tex = assets::necessary_image_id::SPELL_BORDER;
 
 					rgba border_col;
@@ -78,7 +78,7 @@ void action_button::draw(
 						border_col = border_col.get_desaturated();
 					}
 
-					if (inside_tex != assets::image_id::INVALID) {
+					if (inside_tex) {
 						ensure(border_tex != assets::necessary_image_id::INVALID);
 
 						const auto absolute_icon_rect = ltrb(ltrbi(ltrb(vec2(0, 0), vec2(game_images.at(inside_tex).get_size())).place_in_center_of(absolute_rect)));

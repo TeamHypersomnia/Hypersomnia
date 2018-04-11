@@ -38,7 +38,7 @@ namespace augs {
 		};
 
 		sprite(
-			const id_type tex = id_type::INVALID,
+			const id_type tex = {},
 			const size_type size = size_type(),
 			const rgba color = white
 		) :

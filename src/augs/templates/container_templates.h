@@ -3,11 +3,16 @@
 #include "augs/templates/container_traits.h"
 
 template <class C1, class I>
+void resize_for_index(C1& c, const I index) {
+	if (c.size() < index + 1) {
+		c.resize(index + 1);
+	}
+}
+
+template <class C1, class I>
 decltype(auto) sub_with_resize(C1& c, const I index) {
 	if constexpr(can_resize_v<C1>) {
-		if (c.size() < index + 1) {
-			c.resize(index + 1);
-		}
+		resize_for_index(c, index);
 	}
 
 	return c[index];

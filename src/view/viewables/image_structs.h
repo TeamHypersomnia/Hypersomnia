@@ -51,13 +51,24 @@ struct image_in_atlas {
 	}
 };
 
-struct loaded_image_caches_map : public image_id_map<image_cache> {
+struct loaded_image_caches_map : public std::vector<image_cache> {
+	using base = std::vector<image_cache>;
+	using base::base;
+
 	loaded_image_caches_map() = default;
 
 	explicit loaded_image_caches_map(
 		const image_loadables_map&,
 		const image_metas_map&
 	);
+
+	decltype(auto) operator[](const assets::image_id id) {
+		return base::operator[](id.indirection_index);
+	}
+
+	decltype(auto) operator[](const assets::image_id id) const {
+		return base::operator[](id.indirection_index);
+	}
 };
 
 template <class E>

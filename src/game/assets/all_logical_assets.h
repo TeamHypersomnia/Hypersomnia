@@ -11,8 +11,10 @@
 #include "game/assets/animation.h"
 #include "game/assets/physical_material.h"
 
+using animations_map = asset_map<assets::animation_id, animation>;
+
 using tuple_of_logical_assets = std::tuple<
-	asset_map<assets::animation_id, animation>,
+	animations_map,
 	asset_map<assets::recoil_player_id, recoil_player>,
 	asset_map<assets::physical_material_id, physical_material>
 >;

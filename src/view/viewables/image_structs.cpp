@@ -16,6 +16,6 @@ loaded_image_caches_map::loaded_image_caches_map(
 	for (const auto& l : loadables) {
 		image_cache ch(l.second, metas.at(l.first));
 
-		emplace(l.first, ch);
+		sub_with_resize(l.first, ch);
 	}
 }

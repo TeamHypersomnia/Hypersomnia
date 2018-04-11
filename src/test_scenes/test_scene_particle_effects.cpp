@@ -16,6 +16,7 @@
 #include "view/viewables/image_structs.h"
 
 #include "test_scenes/test_scenes_content.h"
+#include "test_scenes/test_scene_animations.h"
 #include "test_scenes/test_scene_images.h"
 
 /* 
@@ -31,6 +32,7 @@ auto float_range(const A a, const B b) {
 
 void load_test_scene_particle_effects(
 	const loaded_image_caches_map& images,
+	const animations_map& anims,
 	particle_effects_map& manager
 ) {
 	auto set = [&images](auto& target, auto id, auto col) {
@@ -41,12 +43,13 @@ void load_test_scene_particle_effects(
 		target.set_image(id, sz, col);
 	};
 
-	auto anim = animation();
+	auto anim = anims[to_animation_id(assets::animation_id::CAST_BLINK_ANIMATION)]; animation();
 	anim.loop_mode = animation::loop_type::NONE;
 
-	anim.create_frames(
-		to_image_id(test_scene_image_id::CAST_BLINK_1),
-		to_image_id(test_scene_image_id::CAST_BLINK_19),
+	create_frames(
+		anim,
+		test_scene_image_id::CAST_BLINK_1,
+		test_scene_image_id::CAST_BLINK_19,
 		50.0f
 	);
 
@@ -80,7 +83,7 @@ void load_test_scene_particle_effects(
 
 			particle_definition.angular_damping = 0;
 			particle_definition.linear_damping = 10;
-			set(particle_definition, assets::image_id(int(test_scene_image_id::SMOKE_1) + i), rgba(255, 255, 255, 30));
+			set(particle_definition, to_image_id(test_scene_image_id(int(test_scene_image_id::SMOKE_1) + i)), rgba(255, 255, 255, 30));
 			particle_definition.unshrinking_time_ms = 2000.f;
 			particle_definition.shrink_when_ms_remaining = 1500.f;
 
@@ -123,7 +126,7 @@ void load_test_scene_particle_effects(
 
 				particle_definition.angular_damping = 0;
 				particle_definition.linear_damping = 10;
-				set(particle_definition, assets::image_id(int(test_scene_image_id::SMOKE_1) + i), rgba(255, 255, 255, 60));
+				set(particle_definition, to_image_id(test_scene_image_id(int(test_scene_image_id::SMOKE_1) + i)), rgba(255, 255, 255, 60));
 				particle_definition.unshrinking_time_ms = 250.f;
 				particle_definition.shrink_when_ms_remaining = 1000.f;
 
@@ -139,39 +142,21 @@ void load_test_scene_particle_effects(
 
 		{
 			particles_emission em;
-			//em.min_swing_spread.set(0.5, 1);
-			//em.min_swings_per_sec.set(0.3 / 2, 0.5 / 2);
-			//em.max_swing_spread.set(10 / 2, 10 / 2);
-			//em.max_swings_per_sec.set(0.3 / 2, 0.5 / 2);
-			//
-			//em.swing_spread.set(0, 0);
-			//em.swings_per_sec.set(0.3 / 2, 0.5 / 2);
-			//em.swing_spread_change_rate.set(0.3 / 2, 0.5 / 2);
-			//
-			//em.spread_degrees = float_range(6, 6);
 			em.particles_per_sec = float_range(500, 500);
 			em.stream_lifetime_ms = float_range(3000000, 3000000);
 			em.base_speed = float_range(10, 100);
 			em.rotation_speed = float_range(0, 0);
 			em.particle_lifetime_ms = float_range(40, 100);
 
-			//for (int i = 0; i < 6; ++i) {
 			general_particle particle_definition;
 
 			particle_definition.angular_damping = 0;
-			//if (i == 5) {
-			//	set(particle_definition, assets::image_id(int(test_scene_image_id::CAST_BLINK_1) + 3), rgba(255, 255, 255, 255));
-			//}
-			//else {
 			set(particle_definition, assets::image_id(int(test_scene_image_id::ROUND_TRACE)), rgba(255, 255, 255, 255));
-			//}
-			//particle_definition.face.size_multiplier.set(1, 0.5);					
 			particle_definition.unshrinking_time_ms = 30.f;
 			particle_definition.shrink_when_ms_remaining = 30.f;
 			particle_definition.alpha_levels = 1;
 
 			em.add_particle_definition(particle_definition);
-			//}
 
 			em.size_multiplier = float_range(1.0, 1.0);
 			em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
@@ -206,7 +191,7 @@ void load_test_scene_particle_effects(
 
 				particle_definition.angular_damping = 0;
 				particle_definition.linear_damping = 10;
-				set(particle_definition, assets::image_id(int(test_scene_image_id::SMOKE_1) + i), rgba(255, 255, 255, 15));
+				set(particle_definition, to_image_id(test_scene_image_id(int(test_scene_image_id::SMOKE_1) + i)), rgba(255, 255, 255, 15));
 				particle_definition.unshrinking_time_ms = 0.f;
 				particle_definition.shrink_when_ms_remaining = 100.f;
 
@@ -247,7 +232,7 @@ void load_test_scene_particle_effects(
 
 				particle_definition.angular_damping = 0;
 				particle_definition.linear_damping = 400;
-				set(particle_definition, assets::image_id(int(test_scene_image_id::SMOKE_1) + i), rgba(255, 255, 255, 15));
+				set(particle_definition, to_image_id(test_scene_image_id(int(test_scene_image_id::SMOKE_1) + i)), rgba(255, 255, 255, 15));
 				particle_definition.unshrinking_time_ms = 100.f;
 				particle_definition.shrink_when_ms_remaining = 200.f;
 
@@ -300,7 +285,7 @@ void load_test_scene_particle_effects(
 			homing_animated_particle particle_definition;
 
 			particle_definition.linear_damping = 0;
-			particle_definition.first_face = static_cast<assets::image_id>(static_cast<int>(anim.frames[0].image_id) + i);
+			particle_definition.starting_frame_num = static_cast<assets::image_id>(static_cast<int>(anim.frames[0].image_id) + i);
 			particle_definition.frame_count = anim.frames.size() - i;
 			particle_definition.frame_duration_ms = frame_duration;
 			particle_definition.color = white;
@@ -313,7 +298,7 @@ void load_test_scene_particle_effects(
 			homing_animated_particle particle_definition;
 
 			particle_definition.linear_damping = 0;
-			particle_definition.first_face = static_cast<assets::image_id>(static_cast<int>(test_scene_image_id::CAST_BLINK_1) + i);
+			particle_definition.starting_frame_num = static_cast<assets::image_id>(static_cast<int>(test_scene_image_id::CAST_BLINK_1) + i);
 			particle_definition.frame_count = 7 - i;
 			particle_definition.frame_duration_ms = frame_duration;
 			particle_definition.color = white;
@@ -326,27 +311,13 @@ void load_test_scene_particle_effects(
 			homing_animated_particle particle_definition;
 
 			particle_definition.linear_damping = 0;
-			particle_definition.first_face = static_cast<assets::image_id>(static_cast<int>(test_scene_image_id::CAST_BLINK_1) + 2);
+			particle_definition.starting_frame_num = static_cast<assets::image_id>(static_cast<int>(test_scene_image_id::CAST_BLINK_1) + 2);
 			particle_definition.frame_count = 1;
 			particle_definition.frame_duration_ms = 700.f;
 			particle_definition.color = white;
 
 			em.add_particle_definition(particle_definition);
 		}
-
-		//for (size_t i = 0; i < anim.frames.size() - 1; ++i)
-		//{
-		//	animated_particle particle_definition;
-		//
-		//	particle_definition.linear_damping = 1000;
-		//	particle_definition.first_face = static_cast<assets::image_id>(static_cast<int>(anim.frames[0].sprite.tex) + i);
-		//	particle_definition.frame_count = anim.frames.size() - i;
-		//	particle_definition.frame_duration_ms = frame_duration;
-		//	particle_definition.acc.set(900, -900);
-		//	particle_definition.color = white;
-		//
-		//	em.add_particle_definition(particle_definition);
-		//}
 
 		em.size_multiplier = float_range(1, 1);
 		em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
@@ -392,7 +363,7 @@ void load_test_scene_particle_effects(
 					homing_animated_particle particle_definition;
 
 					particle_definition.linear_damping = 300;
-					particle_definition.first_face = static_cast<assets::image_id>(static_cast<int>(anim.frames[0].image_id) + i);
+					particle_definition.starting_frame_num = static_cast<assets::image_id>(static_cast<int>(anim.frames[0].image_id) + i);
 					particle_definition.frame_count = anim.frames.size() - i;
 					particle_definition.frame_duration_ms = frame_duration;
 					particle_definition.color = white;
@@ -409,7 +380,7 @@ void load_test_scene_particle_effects(
 					homing_animated_particle particle_definition;
 
 					particle_definition.linear_damping = 300;
-					particle_definition.first_face = static_cast<assets::image_id>(static_cast<int>(anim.frames[0].image_id) + i);
+					particle_definition.starting_frame_num = static_cast<assets::image_id>(static_cast<int>(anim.frames[0].image_id) + i);
 					particle_definition.frame_count = anim.frames.size() - i;
 					particle_definition.frame_duration_ms = frame_duration;
 					particle_definition.color = white;
@@ -452,7 +423,7 @@ void load_test_scene_particle_effects(
 			particle_definition.angular_damping = 0;
 			particle_definition.linear_damping = 200;
 			particle_definition.acc.set(700, -700);
-			set(particle_definition, assets::image_id(int(test_scene_image_id::SMOKE_1) + i), rgba(255, 255, 255, 30));
+			set(particle_definition, to_image_id(test_scene_image_id(int(test_scene_image_id::SMOKE_1) + i)), rgba(255, 255, 255, 30));
 			particle_definition.unshrinking_time_ms = 100.f;
 			particle_definition.shrink_when_ms_remaining = 200.f;
 
@@ -493,7 +464,7 @@ void load_test_scene_particle_effects(
 				particle_definition.angular_damping = 0;
 				particle_definition.linear_damping = 400;
 				particle_definition.acc.set(900, -900);
-				set(particle_definition, assets::image_id(int(test_scene_image_id::SMOKE_1) + i), rgba(255, 255, 255, 30));
+				set(particle_definition, to_image_id(test_scene_image_id(int(test_scene_image_id::SMOKE_1) + i)), rgba(255, 255, 255, 30));
 				particle_definition.unshrinking_time_ms = 100.f;
 				particle_definition.shrink_when_ms_remaining = 200.f;
 
@@ -532,7 +503,7 @@ void load_test_scene_particle_effects(
 				animated_particle particle_definition;
 
 				particle_definition.linear_damping = 1000;
-				particle_definition.first_face = static_cast<assets::image_id>(static_cast<int>(anim.frames[0].image_id) + i);
+				particle_definition.starting_frame_num = static_cast<assets::image_id>(static_cast<int>(anim.frames[0].image_id) + i);
 				particle_definition.frame_count = anim.frames.size() - i;
 				particle_definition.frame_duration_ms = frame_duration;
 				particle_definition.acc.set(900, -900);
@@ -552,18 +523,6 @@ void load_test_scene_particle_effects(
 
 				em.add_particle_definition(particle_definition);
 			}
-
-			//{
-			//	resources::particle particle_definition;
-			//
-			//	particle_definition.angular_damping = 0;
-			//	particle_definition.linear_damping = 1000;
-			//	set(particle_definition, assets::image_id(int(test_scene_image_id::CAST_BLINK_1) + 3), white);
-			//	particle_definition.acc.set(400, -400);
-			//	particle_definition.alpha_levels = 1;
-			//
-			//	em.particle_definitions.push_back(particle_definition);
-			//}
 
 			{
 				general_particle particle_definition;
@@ -617,7 +576,7 @@ void load_test_scene_particle_effects(
 				particle_definition.angular_damping = 0;
 				particle_definition.linear_damping = 400;
 				particle_definition.acc.set(900, -900);
-				set(particle_definition, assets::image_id(int(test_scene_image_id::SMOKE_1) + i), rgba(255, 255, 255, 30));
+				set(particle_definition, to_image_id(test_scene_image_id(int(test_scene_image_id::SMOKE_1) + i)), rgba(255, 255, 255, 30));
 				particle_definition.unshrinking_time_ms = 100.f;
 				particle_definition.shrink_when_ms_remaining = 200.f;
 
@@ -660,7 +619,7 @@ void load_test_scene_particle_effects(
 				animated_particle particle_definition;
 
 				particle_definition.linear_damping = 1000;
-				particle_definition.first_face = static_cast<assets::image_id>(static_cast<int>(anim.frames[0].image_id) + i);
+				particle_definition.starting_frame_num = static_cast<assets::image_id>(static_cast<int>(anim.frames[0].image_id) + i);
 				particle_definition.frame_count = anim.frames.size() - i;
 				particle_definition.frame_duration_ms = frame_duration;
 				particle_definition.acc.set(900, -900);
@@ -680,18 +639,6 @@ void load_test_scene_particle_effects(
 
 				em.add_particle_definition(particle_definition);
 			}
-
-			//{
-			//	resources::particle particle_definition;
-			//
-			//	particle_definition.angular_damping = 0;
-			//	particle_definition.linear_damping = 1000;
-			//	set(particle_definition, assets::image_id(int(test_scene_image_id::CAST_BLINK_1) + 3), white);
-			//	particle_definition.acc.set(400, -400);
-			//	particle_definition.alpha_levels = 1;
-			//
-			//	em.particle_definitions.push_back(particle_definition);
-			//}
 
 			{
 				general_particle particle_definition;
@@ -748,7 +695,7 @@ void load_test_scene_particle_effects(
 				particle_definition.angular_damping = 0;
 				particle_definition.linear_damping = 20;
 				particle_definition.acc.set(300, -300);
-				set(particle_definition, assets::image_id(int(test_scene_image_id::SMOKE_1) + i), rgba(255, 255, 255, 15));
+				set(particle_definition, to_image_id(test_scene_image_id(int(test_scene_image_id::SMOKE_1) + i)), rgba(255, 255, 255, 15));
 				particle_definition.unshrinking_time_ms = 100.f;
 				particle_definition.shrink_when_ms_remaining = 150.f;
 
@@ -775,7 +722,7 @@ void load_test_scene_particle_effects(
 
 				particle_definition.angular_damping = 0;
 				particle_definition.linear_damping = 5000;
-				set(particle_definition, assets::image_id(int(test_scene_image_id::PIXEL_THUNDER_1) + i), rgba(255, 255, 255, 255));
+				set(particle_definition, to_image_id(test_scene_image_id(int(test_scene_image_id::PIXEL_THUNDER_1) + i)), rgba(255, 255, 255, 255));
 				particle_definition.alpha_levels = 1;
 
 				em.add_particle_definition(particle_definition);
@@ -804,7 +751,7 @@ void load_test_scene_particle_effects(
 
 			particle_definition.angular_damping = 0;
 			particle_definition.linear_damping = 5000;
-			set(particle_definition, assets::image_id(int(test_scene_image_id::PIXEL_THUNDER_1) + i), rgba(255, 255, 255, 255));
+			set(particle_definition, to_image_id(test_scene_image_id(int(test_scene_image_id::PIXEL_THUNDER_1) + i)), rgba(255, 255, 255, 255));
 			particle_definition.size.x *= 1.3f;
 			particle_definition.alpha_levels = 1;
 
@@ -841,7 +788,7 @@ void load_test_scene_particle_effects(
 				particle_definition.angular_damping = 0;
 				particle_definition.linear_damping = 20;
 				particle_definition.acc.set(600, -600);
-				set(particle_definition, assets::image_id(int(test_scene_image_id::SMOKE_1) + i), rgba(255, 255, 255, 15));
+				set(particle_definition, to_image_id(test_scene_image_id(int(test_scene_image_id::SMOKE_1) + i)), rgba(255, 255, 255, 15));
 				particle_definition.unshrinking_time_ms = 30.f;
 				particle_definition.shrink_when_ms_remaining = 50.f;
 
@@ -896,7 +843,7 @@ void load_test_scene_particle_effects(
 			animated_particle particle_definition;
 
 			particle_definition.linear_damping = 0;
-			particle_definition.first_face = static_cast<assets::image_id>(static_cast<int>(anim.frames[0].image_id) + i);
+			particle_definition.starting_frame_num = static_cast<assets::image_id>(static_cast<int>(anim.frames[0].image_id) + i);
 			particle_definition.frame_count = anim.frames.size() - i;
 			particle_definition.frame_duration_ms = frame_duration;
 			particle_definition.color = white;
@@ -1006,7 +953,7 @@ void load_test_scene_particle_effects(
 
 			particle_definition.angular_damping = 0;
 			particle_definition.linear_damping = 10;
-			set(particle_definition, assets::image_id(int(test_scene_image_id::SMOKE_1) + i), rgba(255, 255, 255, 220));
+			set(particle_definition, to_image_id(test_scene_image_id(int(test_scene_image_id::SMOKE_1) + i)), rgba(255, 255, 255, 220));
 			particle_definition.size *= 0.4;
 
 			em.add_particle_definition(particle_definition);
@@ -1069,7 +1016,7 @@ void load_test_scene_particle_effects(
 
 			particle_definition.angular_damping = 0;
 			particle_definition.linear_damping = 10;
-			set(particle_definition, assets::image_id(int(test_scene_image_id::SMOKE_1) + i), rgba(255, 255, 255, 30));
+			set(particle_definition, to_image_id(test_scene_image_id(int(test_scene_image_id::SMOKE_1) + i)), rgba(255, 255, 255, 30));
 			particle_definition.unshrinking_time_ms = 10;
 			particle_definition.shrink_when_ms_remaining = 50;
 

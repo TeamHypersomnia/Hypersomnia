@@ -499,3 +499,7 @@ we consider whole type overrides too complex architeciturally:
 	- make all -j8 -C build/current  1327.45s user 36.61s system 665% cpu 3:24.87 total
 	- Debug:
 	- make all -j8 -C build/current  998.23s user 42.75s system 750% cpu 2:18.70 total
+
+- add "reset" to pool that repopulates the free indirectors in descending order
+	- so that refilling test scene works
+	- actually "clear" does this already

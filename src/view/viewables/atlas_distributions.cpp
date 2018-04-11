@@ -1,6 +1,7 @@
 #include "view/viewables/atlas_distributions.h"
 #include "view/viewables/image_structs.h"
 
+#include "view/viewables/images_in_atlas_map.h"
 #include "view/viewables/regeneration/image_loadables_def.h"
 
 augs::graphics::texture standard_atlas_distribution(const standard_atlas_distribution_input in) {
@@ -12,8 +13,7 @@ augs::graphics::texture standard_atlas_distribution(const standard_atlas_distrib
 		atlas_input.images.emplace_back(r.second.get_source_image_path());
 	}
 
-	for (const auto& r : in.image_loadables) {
-		const auto& def = r.second;
+	for (const auto& def : in.image_loadables) {
 		def.regenerate_all_needed(in.settings.force_regenerate);
 
 		atlas_input.images.emplace_back(def.get_source_image_path());
@@ -44,14 +44,12 @@ augs::graphics::texture standard_atlas_distribution(const standard_atlas_distrib
 		const auto& baked = atlas.baked_images;
 
 		for (const auto& r : in.necessary_image_loadables) {
-			in.output_necessary_images[r.first] = baked.at(r.second.get_source_image_path());
+			in.output_necessary_atlas_entries[r.first] = baked.at(r.second.get_source_image_path());
 		}
 
-		for (const auto& d : in.image_loadables) {
-			auto& output_viewable = sub_with_resize(in.output_game_images, d.first);
+		in.image_loadables.for_each_object_and_id([&](const auto& def, const auto id) {
+			auto& output_viewable = in.output_atlas_entries[id];
 			auto& maps = output_viewable;
-			
-			const auto& def = d.second;
 
 			maps.diffuse = baked.at(def.get_source_image_path());
 
@@ -63,7 +61,7 @@ augs::graphics::texture standard_atlas_distribution(const standard_atlas_distrib
 
 			set_if_exists(maps.neon_map, def.find_neon_map_path());
 			set_if_exists(maps.desaturated, def.find_desaturation_path());
-		}
+		});
 	}
 
 	return atlas_image;

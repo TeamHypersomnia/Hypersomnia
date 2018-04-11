@@ -7,6 +7,88 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
+- sparse_pool implementation that avoids indirection?
+	- can have IDENTICAL interface as the pool
+		- even the pooled object ids can stay the same really
+	- existence of versioning determines whether we need to perform for_eaches
+	- versioning could still be there so we can easily undo/redo without for eaches
+		- we can let those several bytes slide
+	- we should always be wary of pessimistic cases of memory usage, anyway
+	- for now we can use pools for everything and incrementally introduce sparse_pool
+
+- flavour ids & allocation
+	- they are actually quite performance critical
+	- would id relinking pool actually be useful here?
+		- the for each id structure should be quite easy here
+			- literally just common and common/solvable signis
+	- they can be sparse though
+		- allocation/deallocation speed won't be that important here
+		- we can always easily check if the flavour exists, so no relinking needed?
+		- actually relinking still needed if after removing a flavour we allocate a new one
+	- could pool be rebuilt so that indirection indices are actually real indices?
+
+- animations in particles
+	- just hold animation id?
+	- what about recalculating the frame number?
+		- could be slow
+		- unless we calc time elapsed and current frame in the particles
+			- in this case it will be O(1)
+			- just keep animation time
+
+- always will new workspace with soem test scene essentials?
+	- so that e.g. no image ids in common state stay invalid
+	- can make those the first in test scene images
+
+- tests of traits: check no ids in invariants, at least
+	- screw initial components really
+
+- importing & using images in editor
+	- Makes no sense to always automatically import all loadables recursively from the folder
+		- E.g. because we don't always want all official images imported
+	- Or does it?
+		- if we do, though, merely adding and removing an image may result in an error in editor
+	- Importer window
+		- Unimported on filesystem
+			- Import next to each folder and file
+		- Imported
+			- shows how many flavours use an image
+			- Un-importing requires to delete all using flavours
+				- Which in turn requires deletion of entities with that flavour
+
+- let invalid map to zero so that we might call "at" on images in atlas vector and always get a sane default
+
+- let particle definitions have animation ids
+
+- let particle definitions be split into the invariant and variant parts, like components
+	- pro: better cache coherency
+
+- what do we do with invalid sprite ids?
+	- makes practically no sense to have an invalid image id
+		- invalid sound id could still signify a no-sound which may make sense
+	- if we disallow them, we need to somehow handle this in editor
+		- e.g. flavour could always choose the latest image id
+		- a popup saying "before you create this flavour, import at least one image"
+	- still, is there really no way that no invalid ids will take place in sprites?
+		- what if we want to un-import an image from the editor?
+			- do we have to delete the flavours that use it as well?
+			- or do we make a popup forbidding this?
+		- what if an image on disk gets deleted and an atlas is required to be regenerated?
+			- then stop displaying the cosmos and just be left with imgui
+			- we can check in main if the game world atlas exists
+	- for things that we guarantee validity of image ids (in sprites), just do always the call to at
+	- in stuff like gui however, we'll seriously need to check with mapped or nullptr
+
+- Creating new flavours
+	- Might want to specify the flavour right away or not?
+	- What do we do about writing image size to sprite?
+		- add_shape_invariant_from_renderable can assume always found
+			- cause it will be called from editor only on existent ids 
+		- when switching from invalid to non-invalid, automatically write size information to both sprite and physics
+			- otherwise provide a button to update sizes
+			- Buttons:
+				- Make 1:1
+				- Write to physics
+	
 - the only performance-critical assets really are image ids for sprites
 	- images_in_atlas_map can just be a vector of constant size vector, even if ids are the two-integer pool ids
 		- because it will always be regenerated for the existent ones whenever the content changes
@@ -14,11 +96,6 @@ summary: Just a hidden scratchpad.
 		- but it is unlikely
 	- so, let's use augs::pool that has undos working already
 		- in case that we'll want to switch for id relinking pool, 
-
-- what do we do with invalid sprite ids?
-	- makes practically no sense to have an invalid image id
-		- invalid sound id could still signify a no-sound which may make sense
-	- if we disallow them, 	
 
 - Complex selectors in general property editor
 	- In fae tree:

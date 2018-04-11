@@ -12,3 +12,7 @@ namespace assets {
 		COUNT = MAX_ANIMATION_COUNT + 1
 	};
 }
+
+auto to_animation_id(const assets::animation_id id) {
+	return id;
+}

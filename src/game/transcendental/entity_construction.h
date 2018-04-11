@@ -37,7 +37,7 @@ void construct_post_inference(const handle_type h) {
 template <class handle_type>
 void emit_warnings(const handle_type h) {
 	if (const auto sprite = h.template find<invariants::sprite>()) {
-		if (sprite->tex == assets::image_id::INVALID) {
+		if (!sprite->tex.is_set()) {
 			warning_unset_field(h, "invariants::sprite::tex");
 		}
 

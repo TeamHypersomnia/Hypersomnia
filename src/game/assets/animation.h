@@ -5,7 +5,7 @@
 
 struct animation_frame {
 	// GEN INTROSPECTOR struct animation_frame
-	assets::image_id image_id = assets::image_id::INVALID;
+	assets::image_id image_id;
 	float duration_milliseconds = 0.f;
 	// END GEN INTROSPECTOR
 };
@@ -23,9 +23,4 @@ struct animation {
 	loop_type loop_mode = loop_type::REPEAT;
 	// END GEN INTROSPECTOR
 
-	void create_frames(
-		const assets::image_id first_frame,
-		const assets::image_id last_frame,
-		const float frame_duration_ms
-	);
 };
