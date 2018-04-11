@@ -12,4 +12,10 @@ summary: Just a hidden scratchpad.
 	- Updating a map just involves pulling
 
 - window should not be concerned with mouse pos pausing and last mouse pos.
-- let there be some separate mouse wrangler class or sth
+	- why lol?
+
+- Instead of having "force joint" at all, make it so that while processing the cars, they additionally apply forces to drivers to keep them
+- Let car calculate its flags statelessly from movement flags in the movement component of the driver?
+	- less noise in the cosmos indeed
+
+- introduce cosmos::retick function that can change delta while preserving timings by updating all stepped timestamps according to lifetimes found in other places

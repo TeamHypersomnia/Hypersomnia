@@ -33,12 +33,9 @@ summary: That which we are brainstorming at the moment.
 			- in this case it will be O(1)
 			- just keep animation time
 
-- always will new workspace with some test scene essentials?
+- always fill new workspace with some test scene essentials?
 	- so that e.g. no image ids in common state stay invalid
-	- can make those the first in test scene images
-
-- tests of traits: check no ids in invariants, at least
-	- screw initial components really
+	- can make those the first in test scene images so that we can stop importing images after some point
 
 - importing & using images in editor
 	- Makes no sense to always automatically import all loadables recursively from the folder
@@ -52,10 +49,6 @@ summary: That which we are brainstorming at the moment.
 			- shows how many flavours use an image
 			- Un-importing requires to delete all using flavours
 				- Which in turn requires deletion of entities with that flavour
-
-- let invalid map to zero so that we might call "at" on images in atlas vector and always get a sane default
-
-- let particle definitions have animation ids
 
 - let particle definitions be split into the invariant and variant parts, like components
 	- pro: better cache coherency
@@ -86,14 +79,6 @@ summary: That which we are brainstorming at the moment.
 			- Buttons:
 				- Make 1:1
 				- Write to physics
-	
-- the only performance-critical assets really are image ids for sprites
-	- images_in_atlas_map can just be a vector of constant size vector, even if ids are the two-integer pool ids
-		- because it will always be regenerated for the existent ones whenever the content changes
-	- if animation id performance takes a hit, we can always make a cache for them
-		- but it is unlikely
-	- so, let's use augs::pool that has undos working already
-		- in case that we'll want to switch for id relinking pool, 
 
 - Complex selectors in general property editor
 	- In fae tree:
@@ -126,6 +111,9 @@ summary: That which we are brainstorming at the moment.
 		- 
 
 - Fix what happens when too many entities are created
+	- **Let the game work when a new entity cannot be created.**
+		- just return a dead handle.
+<!--
 	- for now let's just have many more, and throw when shit hits the fan
 		- just ensure that the author's work is saved and undoable
 			- actually it gets corrupt
@@ -135,6 +123,7 @@ summary: That which we are brainstorming at the moment.
 				- some dire consequences include no bullets possible to be shot
 				- but otherwise it should be fine
 		- now that we can have shapes in flavours let's increase the amount of components by lots
+-->
 
 - Probably somehow disallow arbitrary inferring of relational cache?
 
@@ -291,21 +280,6 @@ summary: That which we are brainstorming at the moment.
 - Interoperation of cosmos logic and data defined in game mode properties
 - Construction scripts are a different thing and we'll save scripting topics and their determinism for later
 
-- **Chosen solution:** A folder designates a project.
-	- **For now we ditch lua exports.**
-	- **Project folder structure:**
-	- ``ProjectName.tab`` file - the editor tab metadata. History, current camera panning, all selected entities. Designed to let you start where you left off after restarting the editor.
-		- **It does not store paths.** 
-	- ``ProjectName.int`` file - the meat of the map - all entity flavours (e.g. ak, pistol, sword,  confetti grenade) , floors, obstacles, decorations, also relative paths to used images, sounds etc.
-	- ``autosave/`` - a directory with all unsaved files.
-		- most intuitive solution
-		- it's a little like git index
-		- we won't have to create templates and will be able to reuse the logic easily
-			- cause it's just like a different project
-	- ``game_modes/`` - directory for all game modes. Editor iterates recursively through this directory and loads them into std::vector<std::pair<std::string, team_deathmatch>>.
-- on saving an untitled work, we will have to move the folder.
-	- And possibly rename all of (tab, int, autosave will be absent though) that is inside to match the folder's name.
-	- We'd anyway need this as "save as"
 - file operations:
 	- new project
 		- opens new tab and spawns a folder in untitleds directory
@@ -349,8 +323,4 @@ summary: That which we are brainstorming at the moment.
 - make reveal in explorer work for both files and folders
 	- cause it also works for dirs
 
-- "unique" naming for unique sprite decorations et cetera
-
-- templatize some dangling memory stream arguments
-- we should use asynchronous texture transfers, especially when we'll be regenerating atlases
-
+- asynchronous texture transfers, especially when regenerating atlases

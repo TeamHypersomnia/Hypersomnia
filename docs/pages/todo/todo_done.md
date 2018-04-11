@@ -503,3 +503,20 @@ we consider whole type overrides too complex architeciturally:
 - add "reset" to pool that repopulates the free indirectors in descending order
 	- so that refilling test scene works
 	- actually "clear" does this already
+- remove "implied components"
+- remove build info printing from hypersomnia version
+- **Chosen solution:** A folder designates a project.
+	- **For now we ditch lua exports.**
+	- **Project folder structure:**
+	- ``ProjectName.tab`` file - the editor tab metadata. History, current camera panning, all selected entities. Designed to let you start where you left off after restarting the editor.
+		- **It does not store paths.** 
+	- ``ProjectName.int`` file - the meat of the map - all entity flavours (e.g. ak, pistol, sword,  confetti grenade) , floors, obstacles, decorations, also relative paths to used images, sounds etc.
+	- ``autosave/`` - a directory with all unsaved files.
+		- most intuitive solution
+		- it's a little like git index
+		- we won't have to create templates and will be able to reuse the logic easily
+			- cause it's just like a different project
+	- ``game_modes/`` - directory for all game modes. Editor iterates recursively through this directory and loads them into std::vector<std::pair<std::string, team_deathmatch>>.
+- on saving an untitled work, we will have to move the folder.
+	- And possibly rename all of (tab, int, autosave will be absent though) that is inside to match the folder's name.
+	- We'd anyway need this as "save as"

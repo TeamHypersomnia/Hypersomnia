@@ -5,6 +5,11 @@ permalink: todo_perf
 summary: Just a hidden scratchpad.
 ---
 
+- audiovisual/inferred caches and reservation
+	- if it so happens that std::unordered_map is too slow, we can always introduce constant-sized vectors/maps under STATICALLY_ALLOCATE_ENTITIES
+		- each type will specify how many to statically allocate 
+		- we can also make caches only for the types that fulfill given conditions of invariants/components existence
+
 - destroy_all_caches -> clear_all_caches and use clears
 
 - arrange components in such an order that the fundamentals go first, and frequently used go next to each other
@@ -25,11 +30,8 @@ summary: Just a hidden scratchpad.
 			- then complete reinference
 		- destroy cache wants to update sweep transform and velocities for consistency 
 	- otherwise settransform and others will be called directly
-- for better cache coherency, we might be inclined to store "has_component" array of bools alongside processing ids so that they land in cache and "find" queries are faster. 
-	- possibly only optimization for bottlenecks.
 - for better cache coherency, we might, inside systematic functions, iterate components and keep track in some cache to which entities they belong
 	- so that we always have a perfect coherency at least along a single component 
-- statically allocated constexpr flag for entities
 - describe concept: quick caches
 	- stored directly in the aggregate
 	- will be used to store copies of invariants for super quick access

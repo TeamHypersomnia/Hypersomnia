@@ -5,6 +5,14 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- templatize some dangling memory stream arguments
+- add unique sprite decoration type
+
+- normalize the names of getters in xywh/ltrb
+
+- consider having entity guids in components instead of ids for simplicity of network transfers
+	- there ain't really that many and it will be greatly useful
+
 - in go to dialog, make selection groups appear as the first
 	- later we might just make a variant of several types instead of entity_guid in match vector
 

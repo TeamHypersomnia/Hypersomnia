@@ -14,9 +14,6 @@ permalink: todo_low
 - Later, bullet trace sounds should be calculated statelessly
 - Resurrect the unit tests for padding that were deleted along with cosmic delta
 
-- Instead of having "force joint" at all, make it so that while processing the cars, they additionally apply forces to drivers to keep them
-- Let car calculate statelessly from movement flags in the movement component?
-
 - replace "alive"/"dead" checks with optionals of handles
 	- and assume that an existing handle always points to an entity
 	- a lot of work but it will be worth it
@@ -32,11 +29,8 @@ permalink: todo_low
 	- consider running static analyzer
 
 - remove redundant logic for componnt/inv lists once all is done and works
-- remove "implied components"
-- remove build info printing from hypersomnia version
+
 - it probably makes no sense to use GUIDs for now if we are anyway going to transfer whole pools for determinism
-- consider having entity guids in components instead of ids for simplicity of network transfers
-	- there ain't really that many and it will be greatly useful
 
 - thoughts about groups, templatized components, guids and network transfers 
 	- **we will anyway templatize the components by the type of ids they store to have groups for example**
@@ -55,15 +49,13 @@ permalink: todo_low
 		- we must ensure the order of entities stays the same for determinism
 		- we don't care that much this little space overhead 
 
-- normalize the names of getters in xywh/ltrb
+
 - if a constant size vector needs to be introspected for example for description of fields in a component,
 	add some special case code that checks if it is a container or something else
 	- padding checker should just check the value type?
 		- maybe we should ditch padding checks whatsoever
 			- at least for the interior of the container, useless totally
 				- maybe just verify the value type
-
-- add "direct_construction_access" for entity handles
 
 - fix errors at unit tests when not statically allocating 
 - Groups can be defined separately from flavours, e.g. many groups can share the same flavours.
@@ -81,13 +73,7 @@ permalink: todo_low
 	- otherwise make it a super quick cache?
 	- chosen_lengthening_duration_ms should be randomized statelessly with help of guid
 	- store just stepped timestamp of when the trace was fired instead of incrementing the passed time 
-- let meta.lua have convex partitions and let author just define those convex partitions for simplicity
-	- let invariants::polygon have vector to not make things overly complicated
-	- polygon component makes triangulation anyway
-- audiovisual/inferred caches and reservation
-	- if it so happens that std::unordered_map is too slow, we can always introduce constant-sized vectors/maps under STATICALLY_ALLOCATE_ENTITIES
-		- each type will specify how many to statically allocate 
-		- we can also make caches only for the types that fulfill given conditions of invariants/components existence
+
 
 - fix mess with sound sources
 	- currently the app might crash if the sound system exceeds maximum sound sources and main menu suddenly is set
@@ -98,15 +84,8 @@ permalink: todo_low
 
 - implement instances of cooldowns for casts statelessly when there is such a need
 
-- separate guids from the cosmos, they are rarely needed
-	- consider if entities without guids are at all addressed by guids;
-	- in any case, we can always iterate if we do not find an entry within the map,
-	- and the guids will nicely fit into the inferred cache scheme. 
-
 - rename world, cosmos to csm
 
 - Describe two kinds of state: constant-divergent and exponentially-divergent
-	- tree of NPO, sprites, polygons, renders: constant divergence
+	- tree of NPO, sprites, polygons, renders: constant divergence - they do not propagate further
 	- sentience, fixtures, rigid body: exponential divergence
-
-- introduce cosmos::retick function that can change delta while preserving timings by updating all stepped timestamps according to lifetimes found in other places
