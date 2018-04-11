@@ -14,7 +14,7 @@ namespace messages {
 
 		action_type action = INVALID;
 
-		assets::animation_id set_animation = assets::animation_id::INVALID;
+		assets::animation_id set_animation;
 		bool preserve_state_if_animation_changes = false;
 		bool change_animation = false;
 		bool change_speed = false;

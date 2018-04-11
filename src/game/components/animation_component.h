@@ -12,7 +12,7 @@ enum class animation_playing_state {
 namespace components {
 	struct animation {
 		// GEN INTROSPECTOR struct components::animation
-		assets::animation_id current_animation = assets::animation_id::INVALID;
+		assets::animation_id current_animation;
 
 		int priority = 0;
 		unsigned frame_num = 0;
