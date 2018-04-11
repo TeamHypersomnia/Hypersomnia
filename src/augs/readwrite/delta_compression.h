@@ -90,8 +90,8 @@ namespace augs {
 			}
 
 			if (changed) {
-				augs::write_container(out, changed_bytes, offset_type());
-				augs::write_container(out, changed_offsets, offset_type());
+				augs::write_container_bytes(out, changed_bytes, offset_type());
+				augs::write_container_bytes(out, changed_offsets, offset_type());
 			}
 
 			return changed;
@@ -108,8 +108,8 @@ namespace augs {
 			}
 
 			if (changed) {
-				augs::read_container(in, changed_bytes, offset_type());
-				augs::read_container(in, changed_offsets, offset_type());
+				augs::read_container_bytes(in, changed_bytes, offset_type());
+				augs::read_container_bytes(in, changed_offsets, offset_type());
 			}
 		}
 

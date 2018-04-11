@@ -17,26 +17,26 @@ namespace augs {
 	void write_bytes(Archive&, const Serialized&);
 
 	template <class Archive, class Container, class container_size_type = unsigned>
-	void read_container(
+	void read_container_bytes(
 		Archive& ar,
 		Container& storage,
 		container_size_type = container_size_type()
 	);
 
 	template <class Archive, class Container, class container_size_type = unsigned>
-	void write_container(
+	void write_container_bytes(
 		Archive& ar,
 		const Container& storage,
 		container_size_type = {}
 	);
 
 	template <class Archive, class Container, class container_size_type = unsigned>
-	void read_capacity(
+	void read_capacity_bytes(
 		Archive& ar,
 		Container& storage,
 		container_size_type = {}
 	);
 
 	template<class Archive, class Container, class container_size_type = unsigned>
-	void write_capacity(Archive& ar, const Container& storage);
+	void write_capacity_bytes(Archive& ar, const Container& storage);
 }

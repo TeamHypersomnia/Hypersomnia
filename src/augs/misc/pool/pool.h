@@ -8,11 +8,11 @@
 #include "augs/templates/maybe_const.h"
 #include "augs/templates/container_traits.h"
 #include "augs/templates/container_templates.h"
+
 #include "augs/readwrite/byte_readwrite_declaration.h"
+#include "augs/readwrite/lua_readwrite_declaration.h"
 
 namespace augs {
-	struct introspection_access;
-
 	template <class T, template <class> class make_container_type, class size_type>
 	class pool {
 	public:
@@ -26,17 +26,13 @@ namespace augs {
 		using pool_slot_type = pool_slot<size_type>;
 		using pool_indirector_type = pool_indirector<size_type>;
 
-		friend struct introspection_access;
-
 		using object_pool_type = make_container_type<mapped_type>;
 		static constexpr bool constexpr_capacity = has_constexpr_capacity_v<object_pool_type>;
 
-		// GEN INTROSPECTOR class augs::pool class mapped_type template<class>class C class size_type
 		make_container_type<pool_slot_type> slots;
 		object_pool_type objects;
 		make_container_type<pool_indirector_type> indirectors;
 		make_container_type<size_type> free_indirectors;
-		// END GEN INTROSPECTOR
 
 		auto& get_indirector(const key_type key) {
 			return indirectors[key.indirection_index];
@@ -486,8 +482,8 @@ namespace augs {
 		template <class Archive>
 		void write_object_bytes(Archive& ar) const {
 			auto w = [&ar](const auto& object) {
-				augs::write_capacity(ar, object);
-				augs::write_container(ar, object);
+				augs::write_capacity_bytes(ar, object);
+				augs::write_container_bytes(ar, object);
 			};
 
 			w(objects);
@@ -499,14 +495,30 @@ namespace augs {
 		template <class Archive>
 		void read_object_bytes(Archive& ar) {
 			auto r = [&ar](auto& object) {
-				augs::read_capacity(ar, object);
-				augs::read_container(ar, object);
+				augs::read_capacity_bytes(ar, object);
+				augs::read_container_bytes(ar, object);
 			};
 
 			r(objects);
 			r(slots);
 			r(indirectors);
 			r(free_indirectors);
+		}
+
+		template <class Archive>
+		void write_object_lua(Archive& ar) const {
+			write_lua(ar, objects);
+			write_lua(ar, slots);
+			write_lua(ar, indirectors);
+			write_lua(ar, free_indirectors);
+		}
+
+		template <class Archive>
+		void read_object_lua(Archive& ar) {
+			read_lua(ar, objects);
+			read_lua(ar, slots);
+			read_lua(ar, indirectors);
+			read_lua(ar, free_indirectors);
 		}
 
 		/* Synonyms for compatibility with other containers */
@@ -533,7 +545,7 @@ namespace augs {
 	};
 }
 
-#if READWRITE_OVERLOAD_TRAITS_INCLUDED
+#if READWRITE_OVERLOAD_TRAITS_INCLUDED || LUA_READWRITE_OVERLOAD_TRAITS_INCLUDED
 #error "I/O traits were included BEFORE I/O overloads, which may cause them to be omitted under some compilers."
 #endif
 
@@ -546,5 +558,15 @@ namespace augs {
 	template <class A, class mapped_type, template <class> class C, class S>
 	void write_object_bytes(A& ar, const pool<mapped_type, C, S>& storage) {
 		storage.write_object_bytes(ar);
+	}
+
+	template <class A, class mapped_type, template <class> class C, class S>
+	void read_object_lua(A ar, pool<mapped_type, C, S>& storage) {
+		storage.read_object_lua(ar);
+	}
+
+	template <class A, class mapped_type, template <class> class C, class S>
+	void write_object_lua(A ar, const pool<mapped_type, C, S>& storage) {
+		storage.write_object_lua(ar);
 	}
 }

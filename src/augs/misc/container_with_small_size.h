@@ -125,7 +125,7 @@ namespace augs {
 		A& ar,
 		container_with_small_size<T, size_type>& storage
 	) {
-		read_container(ar, *storage, size_type());
+		read_container_bytes(ar, *storage, size_type());
 	}
 
 	template<class A, class T, class size_type>
@@ -133,7 +133,7 @@ namespace augs {
 		A& ar,
 		const container_with_small_size<T, size_type>& storage
 	) {
-		write_container(ar, *storage, size_type());
+		write_container_bytes(ar, *storage, size_type());
 	}
 }
 

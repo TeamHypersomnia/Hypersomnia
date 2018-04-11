@@ -90,7 +90,7 @@ namespace augs {
 			}
 		}
 		else if constexpr(is_container_v<Serialized>) {
-			read_container(ar, storage);
+			read_container_bytes(ar, storage);
 		}
 		else {
 			verify_has_introspect(storage);
@@ -145,7 +145,7 @@ namespace augs {
 			}
 		}
 		else if constexpr(is_container_v<Serialized>) {
-			write_container(ar, storage);
+			write_container_bytes(ar, storage);
 		}
 		else {
 			verify_has_introspect(storage);
@@ -198,7 +198,7 @@ namespace augs {
 	}
 
 	template <class Archive, class Container, class container_size_type>
-	void read_container(
+	void read_container_bytes(
 		Archive& ar, 
 		Container& storage, 
 		container_size_type
@@ -245,7 +245,7 @@ namespace augs {
 	}
 
 	template <class Archive, class Container, class container_size_type>
-	void write_container(
+	void write_container_bytes(
 		Archive& ar, 
 		const Container& storage, 
 		container_size_type
@@ -273,7 +273,7 @@ namespace augs {
 	}
 
 	template <class Archive, class Container, class container_size_type>
-	void read_capacity(
+	void read_capacity_bytes(
 		Archive& ar, 
 		Container& storage,
 		container_size_type
@@ -284,7 +284,7 @@ namespace augs {
 	}
 
 	template<class Archive, class Container, class container_size_type>
-	void write_capacity(Archive& ar, const Container& storage) {
+	void write_capacity_bytes(Archive& ar, const Container& storage) {
 		const auto c = static_cast<container_size_type>(storage.capacity());
 		ensure(c <= std::numeric_limits<container_size_type>::max());
 		write_bytes(ar, c);
