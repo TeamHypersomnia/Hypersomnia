@@ -2,7 +2,7 @@
 #if STATICALLY_ALLOCATE_ASSETS
 
 #include "augs/misc/enum/enum_map.h"
-#include "game/assets/ids/asset_id_declarations.h"
+#include "game/assets/ids/asset_ids.h"
 #include "game/container_sizes.h"
 #include "augs/misc/pool/pool.h"
 #include "augs/misc/declare_containers.h"

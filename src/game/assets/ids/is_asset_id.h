@@ -1,6 +1,6 @@
 #pragma once
 #include "augs/templates/type_matching_and_indexing.h"
-#include "game/assets/ids/asset_id_declarations.h"
+#include "game/assets/ids/asset_ids.h"
 
 template <class T>
 constexpr bool is_asset_id_v = is_one_of_v<

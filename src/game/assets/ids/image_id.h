@@ -1,2 +1,2 @@
 #pragma once
-#include "game/assets/ids/asset_id_declarations.h"
+#include "game/assets/ids/asset_ids.h"
