@@ -55,6 +55,7 @@
 
 #include "application/main/imgui_pass.h"
 #include "application/main/draw_debug_details.h"
+#include "application/main/draw_debug_lines.h"
 #include "application/main/release_flags.h"
 
 #include "cmd_line_params.h"
@@ -1431,7 +1432,7 @@ int work(const int argc, const char* const * const argv) try {
 				if constexpr(s == S::LOAD_ALL) {
 					_load_all(setup.get_viewable_defs());
 				}
-				else if constexpr(s == S::LOAD_ONLY_NEAR_CAMERA){
+				else if constexpr(s == S::LOAD_ONLY_NEAR_CAMERA) {
 					static_assert(always_false_v<T>, "Unimplemented");
 				}
 				else if constexpr(T::loading_strategy == S::LOAD_ALL_ONLY_ONCE) {
@@ -1452,6 +1453,8 @@ int work(const int argc, const char* const * const argv) try {
 			Advance the current setup's logic,
 			and let the audiovisual_state sample the game world 
 			that it chooses via get_viewed_cosmos.
+
+			This also advances the audiovisual state, based on the cosmos returned by the setup.
 		*/
 
 		advance_current_setup(frame_delta, result.game_entropy, new_viewing_config);
@@ -1461,8 +1464,6 @@ int work(const int argc, const char* const * const argv) try {
 			therefore we need to rebuild its layouts (and from them, the tree data)
 			for immediate visual response.
 		*/
-
-		const auto viewed_character = get_viewed_character();
 
 		if (should_draw_game_gui()) {
 			const auto context = create_game_gui_context();
@@ -1554,6 +1555,8 @@ int work(const int argc, const char* const * const argv) try {
 
 		renderer.clear_current_fbo();
 
+		const auto viewed_character = get_viewed_character();
+
 		if (const auto& viewed_cosmos = viewed_character.get_cosmos();
 			std::addressof(viewed_cosmos) != std::addressof(cosmos::zero)
 		) {
@@ -1587,32 +1590,14 @@ int work(const int argc, const char* const * const argv) try {
 				}
 			);
 
-			if (DEBUG_DRAWING.enabled) {
-				/* #2 */
-				if (DEBUG_DRAWING.draw_npo_tree_nodes) {
-					viewed_cosmos.get_solvable_inferred().tree_of_npo.for_each_aabb([](const ltrb aabb){
-						auto& lines = DEBUG_FRAME_LINES;
+			/* #2 */
 
-						lines.emplace_back(red, aabb.left_top(), aabb.right_top());
-						lines.emplace_back(red, aabb.right_top(), aabb.right_bottom());
-						lines.emplace_back(red, aabb.right_bottom(), aabb.left_bottom());
-						lines.emplace_back(red, aabb.left_bottom(), aabb.left_top());
-					});
-				}
-
-				renderer.draw_debug_lines(
-					DEBUG_LOGIC_STEP_LINES,
-					DEBUG_PERSISTENT_LINES,
-					DEBUG_FRAME_LINES,
-
-					get_drawer().default_texture,
-					interpolation_ratio
-				);
-				
-				renderer.call_and_clear_lines();
-
-				DEBUG_FRAME_LINES.clear();
-			}
+			draw_debug_lines(
+				viewed_cosmos,
+			   	renderer,
+			   	interpolation_ratio,
+				get_drawer().default_texture
+			);
 
 			necessary_shaders.standard->set_projection(augs::orthographic_projection(vec2(screen_size)));
 
