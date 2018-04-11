@@ -32,9 +32,10 @@ return {
     }
   },
   content_regeneration = {
-    check_integrity_every_launch = true,
-    packer_detail_max_atlas_size = 8192,
     regenerate_every_launch = false,
+    skip_source_image_integrity_check = false,
+
+    packer_detail_max_atlas_size = 8192,
     save_regenerated_atlases_as_binary = true
   },
   debug = {

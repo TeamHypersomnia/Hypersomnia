@@ -25,9 +25,12 @@ regenerated_atlas::regenerated_atlas(
 
 	texture_atlas_stamp new_stamp;
 
-	/* This check is optional to improve launch times */
+	/* 
+		If for some reason the integrity checking for atlas takes a long time, 
+		we might disable it to improve performance. Unlikely, though.
+	*/
 
-	if (settings.always_check_source_images_integrity) {
+	if (settings.skip_source_image_integrity_check) {
 		for (const auto& img_id : in.images) {
 			new_stamp.image_stamps[img_id] = augs::last_write_time(img_id);
 		}
@@ -45,15 +48,12 @@ regenerated_atlas::regenerated_atlas(
 			}
 			else {
 				const auto existent_stamp = augs::load_from_bytes<texture_atlas_stamp>(atlas_stamp_path);
+				const bool stamps_match =
+					existent_stamp.image_stamps == new_stamp.image_stamps
+					&& existent_stamp.font_stamps == new_stamp.font_stamps
+				;
 
-				if (
-					const bool stamps_match =
-						existent_stamp.image_stamps == new_stamp.image_stamps
-						&& existent_stamp.font_stamps == new_stamp.font_stamps
-					;
-
-					!stamps_match
-				) {
+				if (!stamps_match) {
 					should_regenerate = true;
 				}
 			}

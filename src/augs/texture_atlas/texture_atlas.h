@@ -21,8 +21,9 @@ struct atlas_regeneration_input {
 struct atlas_regeneration_settings {
 	const unsigned packer_detail_max_atlas_size;
 	const augs::path_type regeneration_path;
+
 	const bool force_regenerate;
-	const bool always_check_source_images_integrity;
+	const bool skip_source_image_integrity_check;
 };
 
 using texture_atlas_image_stamp = std::chrono::system_clock::time_point;

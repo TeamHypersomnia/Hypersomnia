@@ -112,9 +112,10 @@ namespace augs {
 			const M& manager,
 			const drawing_input in
 		) const {
-			static_assert(!has_member_find_v<M, id_type>, "Here we assume it is always found.");
-
-			ensure(tex != id_type::INVALID);
+			static_assert(
+				!has_member_find_v<M, id_type>,
+			   	"Here we assume it is always found, or a harmless default returned."
+			);
 
 			const auto transform_pos = in.renderable_transform.pos;
 			const auto final_rotation = in.renderable_transform.rotation; //+ rotation_offset;

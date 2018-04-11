@@ -388,7 +388,7 @@ int work(const int argc, const char* const * const argv) try {
 						augs::path_type(GENERATED_FILES_DIR "atlases/game_world_atlas") 
 							+= (settings.save_regenerated_atlases_as_binary ? ".bin" : ".png"),
 						settings.regenerate_every_launch,
-						settings.check_integrity_every_launch
+						settings.skip_source_image_integrity_check
 					},
 					images_in_atlas,
 					necessary_images_in_atlas,
