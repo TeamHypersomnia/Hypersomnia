@@ -1,7 +1,8 @@
 #pragma once
 #include "test_scenes/test_id_to_pool_id.h"
+#include "test_scenes/test_scene_images.h"
 
-enum class animation_id {
+enum class test_scene_animation_id {
 	CAST_BLINK_ANIMATION
 };
 
@@ -13,3 +14,7 @@ void create_frames(
 	const test_scene_image_id last_frame,
 	const float frame_duration_ms
 );
+
+inline auto to_animation_id(const test_scene_animation_id id) {
+	return to_pool_id<assets::animation_id>(id);
+}

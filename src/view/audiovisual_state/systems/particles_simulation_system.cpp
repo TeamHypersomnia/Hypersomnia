@@ -168,7 +168,7 @@ void particles_simulation_system::update_effects_from_messages(
 void particles_simulation_system::integrate_all_particles(
 	const cosmos& cosmos,
 	const augs::delta delta,
-	const animations_map& anims,
+	const animations_pool& anims,
 	const interpolation_system& interp
 ) {
 	const auto dead_particles_remover = [](auto& container) {

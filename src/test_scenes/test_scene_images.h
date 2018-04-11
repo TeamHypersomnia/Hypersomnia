@@ -112,3 +112,6 @@ enum class test_scene_image_id {
 	// END GEN INTROSPECTOR
 };
 
+inline auto to_image_id(const test_scene_image_id id) {
+	return to_pool_id<assets::image_id>(id);
+}

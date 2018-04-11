@@ -33,7 +33,7 @@ void load_test_scene_animations(animations_pool& anims) {
 			50.0f
 		);
 
-		const auto id = to_animation_id(assets::animation_id::CAST_BLINK_ANIMATION);
+		const auto id = to_animation_id(test_scene_animation_id::CAST_BLINK_ANIMATION);
 		const auto new_allocation = anims.allocate(std::move(anim));
 
 		ensure(new_allocation.key == id);
