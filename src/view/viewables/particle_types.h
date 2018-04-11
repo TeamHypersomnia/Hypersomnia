@@ -6,6 +6,7 @@
 #include "game/transcendental/entity_id.h"
 
 #include "game/assets/asset_containers.h"
+#include "game/assets/animation.h"
 
 struct general_particle {
 	// GEN INTROSPECTOR struct general_particle
@@ -90,17 +91,17 @@ struct animation_in_particle {
 	simple_animation_state state;
 	// END GEN INTROSPECTOR
 
-	auto get_image_id(const animations_pool& anims) {
-		return anims[id].get_image_id(state, starting_frame_num);
-	}
-
 	void advance(const real32 dt, const animations_pool& anims) {
 		if (state.advance(dt, anims[id].frames, starting_frame_num)) {
 			starting_frame_num = -1;
 		}
 	}
 
-	bool is_dead(const animations_pool& anims) const {
+	auto get_image_id(const animations_pool& anims) const {
+		return anims[id].get_image_id(state, starting_frame_num);
+	}
+
+	bool is_dead() const {
 		return starting_frame_num == -1;
 	}
 };

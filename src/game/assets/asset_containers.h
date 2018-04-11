@@ -13,7 +13,7 @@ using make_asset_pool = augs::pool<
 	pooled_type,
 	of_size<MAX_IMAGE_COUNT>::make_constant_vector,
 	asset_pool_id_size_type
->
+>;
 
 template <class enum_key, class mapped>
 using asset_map = augs::enum_map<enum_key, mapped>;
@@ -35,4 +35,5 @@ using make_asset_pool = augs::pool<
 template <class pooled_type>
 using image_id_pool = make_asset_pool<pooled_type, MAX_IMAGE_COUNT>;
 
+struct animation;
 using animations_pool = make_asset_pool<animation, MAX_ANIMATION_COUNT>;

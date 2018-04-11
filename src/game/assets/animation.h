@@ -4,14 +4,14 @@
 #include "game/assets/ids/asset_ids.h"
 #include "game/container_sizes.h"
 
-using animation_frames_type = augs::constant_size_vector<animation_frame, ANIMATION_FRAME_COUNT>;
-
 struct animation_frame {
 	// GEN INTROSPECTOR struct animation_frame
 	assets::image_id image_id;
 	float duration_milliseconds = 0.f;
 	// END GEN INTROSPECTOR
 };
+
+using animation_frames_type = augs::constant_size_vector<animation_frame, ANIMATION_FRAME_COUNT>;
 
 struct simple_animation_advance {
 	const real32 delta_ms;
@@ -30,7 +30,7 @@ struct simple_animation_state {
 		F nth_frame_duration_ms,
 		C exit_frame_callback
 	) {
-		frame_elapsed_ms += delta_ms;
+		frame_elapsed_ms += in.delta_ms;
 
 		while (frame_num < in.frame_count) {
 			const auto current_frame_duration = nth_frame_duration_ms(frame_num);
@@ -81,6 +81,6 @@ struct animation {
 		const simple_animation_state& state,
 	   	const unsigned frame_offset
 	) const {
-		return get_image_id(std::min(frames.size() - 1, state.frame_num + frame_offset));
+		return get_image_id(std::min(static_cast<unsigned>(frames.size() - 1), state.frame_num + frame_offset));
 	}
 };

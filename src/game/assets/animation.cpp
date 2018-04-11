@@ -3,9 +3,9 @@
 bool simple_animation_state::advance(
 	const real32 dt,
 	const animation_frames_type& source,
-	const unsigned frame_offset = 0
+	const unsigned frame_offset
 ) {
-	advance(in, [&](const auto i) { 
+	advance({ dt, static_cast<unsigned>(source.size()) - frame_offset }, [&](const auto i) { 
 		return source[i].duration_milliseconds; 
 	});
 

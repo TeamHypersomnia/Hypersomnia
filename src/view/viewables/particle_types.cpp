@@ -24,8 +24,8 @@ inline void generic_integrate_particle(T& p, const float dt) {
 	}
 
 	if constexpr(has_rotation<T>::value) {
-		p.rotation += rotation_speed * dt;
-		augs::shrink(rotation_speed, angular_damping * dt);
+		p.rotation += p.rotation_speed * dt;
+		augs::shrink(p.rotation_speed, p.angular_damping * dt);
 	}
 }
 
@@ -119,7 +119,8 @@ void animated_particle::colorize(const rgba mult) {
 
 void homing_animated_particle::integrate(
 	const float dt, 
-	const vec2 homing_target
+	const vec2 homing_target,
+	const animations_pool& anims
 ) {
 	vel += (homing_target - pos) * 10 * dt;
 	
