@@ -179,7 +179,7 @@ void particles_simulation_system::integrate_all_particles(
 		dead_particles_remover(particle_layer);
 
 		for (auto& p : particle_layer) {
-			p.integrate(delta.in_seconds(), anims);
+			p.integrate(delta.in_seconds());
 		}
 	}
 
@@ -201,7 +201,7 @@ void particles_simulation_system::integrate_all_particles(
 				const auto homing_transform = cosmos[cluster.first].get_viewing_transform(interp);
 
 				for (auto& p : cluster.second) {
-					p.integrate(delta.in_seconds(), homing_transform.pos);
+					p.integrate(delta.in_seconds(), homing_transform.pos, anims);
 				}
 
 				return cluster.second.empty();
@@ -217,6 +217,7 @@ void particles_simulation_system::advance_visible_streams(
 	const vec2 screen_size,
 	const cosmos& cosmos,
 	const particle_effects_map& manager,
+	const animations_pool& anims,
 	const augs::delta delta,
 	const interpolation_system& interp
 ) {
@@ -314,7 +315,7 @@ void particles_simulation_system::advance_visible_streams(
 				if (emission.get_definitions<animated_particle>().size() > 0)
 				{
 					auto new_animated = spawner(animated_particle());
-					new_animated.integrate(time_elapsed);
+					new_animated.integrate(time_elapsed, anims);
 					add_particle(emission.target_render_layer, new_animated);
 				}
 
@@ -328,7 +329,7 @@ void particles_simulation_system::advance_visible_streams(
 						stream_alivity_mult
 					);
 
-					new_homing_animated.integrate(time_elapsed, homing_target_pos);
+					new_homing_animated.integrate(time_elapsed, homing_target_pos, anims);
 					add_particle(emission.target_render_layer, instance.homing_target, new_homing_animated);
 				}
 

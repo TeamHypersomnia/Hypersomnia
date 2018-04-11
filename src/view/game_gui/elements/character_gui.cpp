@@ -27,6 +27,7 @@
 #include "view/audiovisual_state/aabb_highlighter.h"
 #include "view/audiovisual_state/systems/interpolation_system.h"
 #include "view/viewables/image_structs.h"
+#include "view/viewables/images_in_atlas_map.h"
 #include "game/enums/filters.h"
 
 #include "game/detail/describers.h"

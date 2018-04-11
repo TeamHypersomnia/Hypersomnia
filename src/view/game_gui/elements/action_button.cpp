@@ -9,6 +9,7 @@
 #include "view/game_gui/elements/action_button.h"
 #include "view/game_gui/game_gui_context.h"
 #include "view/game_gui/game_gui_system.h"
+#include "view/viewables/images_in_atlas_map.h"
 
 #include "view/viewables/all_viewables_declarations.h"
 #include "view/viewables/image_structs.h"
@@ -78,22 +79,22 @@ void action_button::draw(
 						border_col = border_col.get_desaturated();
 					}
 
-					if (inside_tex) {
+					if (const auto inside_tex_entry = game_images.at(inside_tex); inside_tex_entry.diffuse.exists()) {
 						ensure(border_tex != assets::necessary_image_id::INVALID);
 
-						const auto absolute_icon_rect = ltrb(ltrbi(ltrb(vec2(0, 0), vec2(game_images.at(inside_tex).get_size())).place_in_center_of(absolute_rect)));
+						const auto absolute_icon_rect = ltrb(ltrbi(ltrb(vec2(0, 0), vec2(inside_tex_entry.get_size())).place_in_center_of(absolute_rect)));
 						const bool draw_partial_colorful_rect = false;
 
 						if (has_enough_mana) {
 							output.aabb(
-								game_images.at(inside_tex).diffuse,
+								inside_tex_entry.diffuse,
 								absolute_icon_rect,
 								inside_col
 							);
 						}
 						else {
 							output.aabb(
-								game_images.at(inside_tex).desaturated,
+								inside_tex_entry.desaturated,
 								absolute_icon_rect,
 								inside_col
 							);
@@ -105,7 +106,7 @@ void action_button::draw(
 								colorful_rect.b = colorful_rect.t + colorful_height;
 
 								output.aabb_clipped(
-									game_images.at(inside_tex).diffuse,
+									inside_tex_entry.diffuse,
 									ltrb(absolute_icon_rect),
 									ltrb(colorful_rect),
 									inside_col

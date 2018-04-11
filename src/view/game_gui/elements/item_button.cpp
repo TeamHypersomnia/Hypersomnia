@@ -26,6 +26,8 @@
 #include "view/game_gui/elements/character_gui.h"
 #include "view/game_gui/elements/slot_button.h"
 
+#include "view/viewables/images_in_atlas_map.h"
+
 using namespace augs::gui::text;
 
 bool item_button::is_being_wholely_dragged_or_pending_finish(

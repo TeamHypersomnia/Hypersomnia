@@ -70,6 +70,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 			screen_size,
 			cosm,
 			input.particle_effects,
+			anims,
 			dt,
 			interp
 		);

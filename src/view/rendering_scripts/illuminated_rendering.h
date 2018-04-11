@@ -29,6 +29,7 @@
 #include "view/game_drawing_settings.h"
 #include "view/viewables/all_viewables_declarations.h"
 #include "view/viewables/image_structs.h"
+#include "view/viewables/images_in_atlas_map.h"
 
 #include "view/audiovisual_state/audiovisual_state.h"
 

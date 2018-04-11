@@ -11,6 +11,7 @@
 #include "game/detail/inventory/inventory_slot_handle.h"
 
 #include "view/viewables/image_structs.h"
+#include "view/viewables/images_in_atlas_map.h"
 
 #include "view/game_gui/elements/drag_and_drop_target_drop_item.h"
 #include "view/game_gui/elements/character_gui.h"

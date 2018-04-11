@@ -154,6 +154,7 @@ public:
 	void integrate_all_particles(
 		const cosmos&,
 		augs::delta dt,
+		const animations_pool& anims,
 		const interpolation_system&
 	);
 
@@ -162,6 +163,7 @@ public:
 		vec2 screen_size,
 		const cosmos&,
 		const particle_effects_map&,
+		const animations_pool&,
 		augs::delta dt,
 		const interpolation_system&
 	);

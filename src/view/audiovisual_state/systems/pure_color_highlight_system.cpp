@@ -8,6 +8,7 @@
 #include "game/components/fixtures_component.h"
 
 #include "view/viewables/image_structs.h"
+#include "view/viewables/images_in_atlas_map.h"
 
 #include "view/rendering_scripts/draw_entity.h"
 
