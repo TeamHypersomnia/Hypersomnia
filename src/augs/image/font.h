@@ -90,7 +90,7 @@ namespace augs {
 		baked_font(const baked_font&) = delete;
 		baked_font& operator=(const baked_font&) = delete;
 
-		void unpack(const stored_baked_font& store) {
+		void unpack_from(const stored_baked_font& store) {
 			metrics = store.meta.metrics;
 			settings = store.meta.settings;
 

@@ -38,7 +38,7 @@ augs::graphics::texture standard_atlas_distribution(const standard_atlas_distrib
 		atlas_image
 	);
 
-	in.output_gui_font.unpack(atlas.stored_baked_fonts.at(in.gui_font_input));
+	in.output_gui_font.unpack_from(atlas.stored_baked_fonts.at(in.gui_font_input));
 
 	{
 		const auto& baked = atlas.baked_images;
