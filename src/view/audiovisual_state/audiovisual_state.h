@@ -41,6 +41,7 @@ struct audiovisual_advance_input {
 
 	const visible_entities& all_visible;
 	const particle_effects_map& particle_effects;
+	const animations_pool& animations;
 
 	const loaded_sounds_map& sounds;
 	const augs::audio_volume_settings audio_volume;
@@ -54,6 +55,7 @@ struct audiovisual_advance_input {
 		const visible_entities& all_visible,
 
 		const particle_effects_map& particle_effects,
+		const animations_pool& animations,
 
 		const loaded_sounds_map& sounds,
 		const augs::audio_volume_settings audio_volume
@@ -64,6 +66,7 @@ struct audiovisual_advance_input {
 		eye(eye),
 		all_visible(all_visible),
 		particle_effects(particle_effects),
+		animations(animations),
 
 		sounds(sounds),
 		audio_volume(audio_volume)

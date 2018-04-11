@@ -80,7 +80,7 @@ summary: That which we are brainstorming at the moment.
 				- Make 1:1
 				- Write to physics
 
-- Complex selectors in general property editor
+- Complex ImGui controls in general property editor
 	- In fae tree:
 		- Flavours
 		- Entities

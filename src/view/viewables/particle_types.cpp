@@ -1,20 +1,36 @@
 #include "particle_types.h"
 
+template <class T, class = void>
+struct has_rotation : std::false_type {};
+
 template <class T>
-inline void integrate_pos_vel_acc_damp_life(T& p, const float dt) {
+struct has_rotation<T, decltype(std::declval<T&>().rotation, void())> : std::true_type {};
+
+template <class T, class = void>
+struct has_lifetime : std::false_type {};
+
+template <class T>
+struct has_lifetime<T, decltype(std::declval<T&>().current_lifetime_ms, void())> : std::true_type {};
+
+template <class T>
+inline void generic_integrate_particle(T& p, const float dt) {
 	p.vel += p.acc * dt;
 	p.pos += p.vel * dt;
 	
 	p.vel.shrink(p.linear_damping * dt);
 
-	p.current_lifetime_ms += dt * 1000.f;
+	if constexpr(has_lifetime<T>::value) {
+		p.current_lifetime_ms += dt * 1000.f;
+	}
+
+	if constexpr(has_rotation<T>::value) {
+		p.rotation += rotation_speed * dt;
+		augs::shrink(rotation_speed, angular_damping * dt);
+	}
 }
 
 void general_particle::integrate(const float dt) {
-	integrate_pos_vel_acc_damp_life(*this, dt);
-	rotation += rotation_speed * dt;
-
-	augs::shrink(rotation_speed, angular_damping * dt);
+	generic_integrate_particle(*this, dt);
 }
 
 bool general_particle::is_dead() const {
@@ -63,12 +79,10 @@ void general_particle::set_image(
 	color = col;
 }
 
-void animated_particle::integrate(const float dt) {
-	integrate_pos_vel_acc_damp_life(*this, dt);
-}
+void animated_particle::integrate(const float dt, const animations_pool& anims) {
+	generic_integrate_particle(*this, dt);
 
-bool animated_particle::is_dead() const {
-	return current_lifetime_ms >= frame_duration_ms * frame_count;
+	animation.advance(dt, anims);
 }
 
 void animated_particle::set_position(const vec2 new_pos) {
@@ -119,11 +133,8 @@ void homing_animated_particle::integrate(
 
 	vel += dirs[0].set_length(sqrt(sqrt(homing_vector.length()))) * homing_force * dt;
 
-	integrate_pos_vel_acc_damp_life(*this, dt);
-}
-
-bool homing_animated_particle::is_dead() const {
-	return current_lifetime_ms >= frame_duration_ms * frame_count;
+	generic_integrate_particle(*this, dt);
+	animation.advance(dt, anims);
 }
 
 void homing_animated_particle::set_position(const vec2 new_pos) {

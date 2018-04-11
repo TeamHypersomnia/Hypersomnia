@@ -17,3 +17,10 @@ summary: Just a hidden scratchpad.
 
 - tests of traits: check no ids in invariants, at least
 	- screw initial components really
+
+- fix all logical assets to not use those crazy tuples and getters, wow
+
+- nth_frame_duration_ms can account for 
+
+- disallow removing last frame from the animation and always require to create an animation from an existing set of frames
+	- simplifies calculations

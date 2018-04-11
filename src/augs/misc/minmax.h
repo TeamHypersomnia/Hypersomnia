@@ -2,7 +2,7 @@
 #include "augs/misc/simple_pair.h"
 
 namespace augs {
-	template<class T>
+	template <class T>
 	using minmax = simple_pair<T, T>;
 
 	template<class T>

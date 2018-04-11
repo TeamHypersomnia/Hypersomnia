@@ -80,32 +80,51 @@ struct general_particle {
 	);
 };
 
+struct animation_in_particle {
+	// GEN INTROSPECTOR struct animation_in_particle
+	unsigned starting_frame_num = 0;
+
+	assets::animation_id id;
+	simple_animation_state state;
+	// END GEN INTROSPECTOR
+
+	auto get_image_id(const animations_pool& anims) {
+		return anims[id].get_image_id(state, starting_frame_num);
+	}
+
+	void advance(const real32 dt, const animations_pool& anims) {
+		if (state.advance(dt, anims[id], starting_frame_num)) {
+			starting_frame_num = -1;
+		}
+	}
+
+	bool is_dead(const animations_pool& anims) const {
+		return starting_frame_num == -1;
+	}
+};
+
 struct animated_particle {
 	// GEN INTROSPECTOR struct animated_particle
 	vec2 pos;
 	vec2 vel;
 	vec2 acc;
-	
+	animation_in_particle animation;
 	float linear_damping = 0.f;
-	float current_lifetime_ms = 0.f;
 
-	int starting_frame_num = 0;
 	rgba color;
-	float frame_duration_ms = 0.f;
-	unsigned frame_count = 0;
 	// END GEN INTROSPECTOR
 
-	void integrate(const float dt);
+	void integrate(const float dt, const animations_pool& anims);
 
 	template <class M>
 	void draw_as_sprite(
 		const M& manager,
+		const animations_pool& anims,
 		invariants::sprite::drawing_input basic_input
 	) const {
 		thread_local invariants::sprite face;
-		const auto frame_num = std::min(static_cast<unsigned>(current_lifetime_ms / frame_duration_ms), frame_count - 1);
 
-		const auto target_id = starting_frame_num + frame_num;
+		const auto target_id = animation.get_image_id(anims);
 
 		face.set(target_id, manager.at(target_id).get_size(), white);
 
@@ -114,7 +133,9 @@ struct animated_particle {
 		face.draw(manager, basic_input);
 	}
 
-	bool is_dead() const;
+	bool is_dead() const {
+		return animation.is_dead();
+	}
 
 	void set_position(const vec2);
 	void set_velocity(const vec2);
@@ -133,30 +154,29 @@ struct homing_animated_particle {
 	vec2 acc;
 
 	float linear_damping = 0.f;
-	float current_lifetime_ms = 0.f;
-
 	float homing_force = 3000.f;
 
-	assets::image_id starting_frame_num;
+	animation_in_particle animation;
 	rgba color;
-	float frame_duration_ms = 0.f;
-	unsigned frame_count = 0;
+
+	simple_animation_state animation_state;
 	// END GEN INTROSPECTOR
 
 	void integrate(
 		const float dt, 
-		const vec2 homing_target
+		const vec2 homing_target,
+		const animations_pool& anims
 	);
 
 	template <class M>
 	void draw_as_sprite(
 		const M& manager,
+		const animations_pool& anims,
 		invariants::sprite::drawing_input basic_input
 	) const {
 		thread_local invariants::sprite face;
-		const auto frame_num = std::min(static_cast<unsigned>(current_lifetime_ms / frame_duration_ms), frame_count - 1);
 
-		const auto target_id = starting_frame_num + frame_num;
+		const auto target_id = animation.get_image_id(anims);
 
 		face.set(
 			target_id,
@@ -168,7 +188,9 @@ struct homing_animated_particle {
 		face.draw(manager, basic_input);
 	}
 
-	bool is_dead() const;
+	bool is_dead() const {
+		return animation.is_dead();
+	}
 
 	void set_position(const vec2);
 	void set_velocity(const vec2);

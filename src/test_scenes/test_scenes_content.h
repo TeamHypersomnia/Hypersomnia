@@ -20,7 +20,7 @@ struct loaded_image_caches_map;
 void load_test_scene_sound_buffers(sound_buffer_inputs_map&);
 void load_test_scene_particle_effects(
 	const loaded_image_caches_map&,
-	const animations_map& anims,
+	const animations_pool& anims,
 	particle_effects_map&
 );
 
@@ -54,7 +54,7 @@ void populate_test_scene_logical_assets(
 void populate_test_scene_viewables(
 	sol::state& lua,
 	const loaded_image_caches_map& caches,
-	const animations_map& anims,
+	const animations_pool& anims,
 	all_viewables_defs& output_sources
 );
 
