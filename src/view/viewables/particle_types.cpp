@@ -20,7 +20,7 @@ inline void generic_integrate_particle(T& p, const float dt) {
 	p.vel.shrink(p.linear_damping * dt);
 
 	if constexpr(has_lifetime<T>::value) {
-		p.current_lifetime_ms += dt * 1000.f;
+		p.current_lifetime_ms += dt * 1000;
 	}
 
 	if constexpr(has_rotation<T>::value) {
@@ -82,7 +82,7 @@ void general_particle::set_image(
 void animated_particle::integrate(const float dt, const animations_pool& anims) {
 	generic_integrate_particle(*this, dt);
 
-	animation.advance(dt, anims);
+	animation.advance(dt * 1000, anims);
 }
 
 void animated_particle::set_position(const vec2 new_pos) {
@@ -134,7 +134,7 @@ void homing_animated_particle::integrate(
 	vel += dirs[0].set_length(sqrt(sqrt(homing_vector.length()))) * homing_force * dt;
 
 	generic_integrate_particle(*this, dt);
-	animation.advance(dt, anims);
+	animation.advance(dt * 1000, anims);
 }
 
 void homing_animated_particle::set_position(const vec2 new_pos) {

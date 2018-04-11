@@ -247,6 +247,10 @@ public:
 	auto to_versioned(const unversioned_entity_id id) const {
 		return get_solvable().to_versioned(id);
 	}
+	
+	const auto& get_logical_assets() const {
+		return get_common_significant().logical_assets;
+	}
 };
 
 inline si_scaling cosmos::get_si() const {

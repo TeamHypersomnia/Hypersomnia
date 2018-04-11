@@ -45,7 +45,7 @@ public:
 	}
 
 	const auto& get_logical_assets() const {
-		return input.cosm.get_common_significant().logical_assets;
+		return input.cosm.get_logical_assets();
 	}
 
 	auto get_delta() const {

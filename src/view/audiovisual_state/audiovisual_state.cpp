@@ -39,6 +39,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 	const auto cone = input.eye.cone;
 	const auto& cosm = viewed_character.get_cosmos();
 	const auto dt = augs::delta(input.frame_delta) *= input.speed_multiplier;
+	const auto& anims = input.animations;
 
 	auto& thunders = get<thunder_system>();
 	auto& exploding_rings = get<exploding_ring_system>();
@@ -60,6 +61,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 		particles.integrate_all_particles(
 			cosm,
 			dt,
+			anims,
 			interp
 		);
 

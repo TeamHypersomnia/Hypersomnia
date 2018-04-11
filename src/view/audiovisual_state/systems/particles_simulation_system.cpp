@@ -168,6 +168,7 @@ void particles_simulation_system::update_effects_from_messages(
 void particles_simulation_system::integrate_all_particles(
 	const cosmos& cosmos,
 	const augs::delta delta,
+	const animations_map& anims,
 	const interpolation_system& interp
 ) {
 	const auto dead_particles_remover = [](auto& container) {
@@ -175,19 +176,19 @@ void particles_simulation_system::integrate_all_particles(
 	};
 
 	for (auto& particle_layer : general_particles) {
-		for (auto& p : particle_layer) {
-			p.integrate(delta.in_seconds());
-		}
-
 		dead_particles_remover(particle_layer);
+
+		for (auto& p : particle_layer) {
+			p.integrate(delta.in_seconds(), anims);
+		}
 	}
 
 	for (auto& particle_layer : animated_particles) {
-		for (auto& p : particle_layer) {
-			p.integrate(delta.in_seconds());
-		}
-
 		dead_particles_remover(particle_layer);
+
+		for (auto& p : particle_layer) {
+			p.integrate(delta.in_seconds(), anims);
+		}
 	}
 
 	for (auto& particle_layer : homing_animated_particles) {
@@ -195,13 +196,13 @@ void particles_simulation_system::integrate_all_particles(
 			const auto homing_target = cosmos[cluster.first];
 
 			if (homing_target.alive()) {
+				dead_particles_remover(cluster.second);
+
 				const auto homing_transform = cosmos[cluster.first].get_viewing_transform(interp);
 
 				for (auto& p : cluster.second) {
 					p.integrate(delta.in_seconds(), homing_transform.pos);
 				}
-
-				dead_particles_remover(cluster.second);
 
 				return cluster.second.empty();
 			}
