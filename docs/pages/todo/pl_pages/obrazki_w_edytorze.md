@@ -9,12 +9,12 @@ Edytor obsługuje jeden format obrazka: ``.png``.
 
 Obrazki na dysku będą używane do:
 
-- Ustawiania wyglądu dla invariantu sprite'a (po prostu spritom na scenie).
-- Ustawiania wyglądu dla invariantu polygon'a (nieregularnym obiektom scenie).
-- Ustawiania wyglądu dla elementów GUI, np. ikonek spelli, perków, pasków życia, many i świadomości
+- Ustawiania wyglądu dla invariantu sprite'a (czyli po prostu sprite'om na scenie).
+- Ustawiania wyglądu dla invariantu polygon'a (czyli po prostu nieregularnym obiektom na scenie).
+- Ustawiania wyglądu dla elementów GUI, np. ikonek spelli, perków, pasków życia, many i świadomości.
 - Składania klatek animacji. Animacje zaś będą używane do:
 	- Stawiania animacji na scenie  - a jakże!
-	- Przypisywaniu ich bardziej skomplikowanym obiektom w różnych miejscach, jak np. gracz
+	- Przypisywaniu ich bardziej skomplikowanym obiektom w różnych miejscach, jak np. gracz.
 	- Definiowaniu efektów cząsteczkowych - cząsteczki też mogą być (i niektóre testowe już są) animacjami.
 
 ## Lokacja plików
