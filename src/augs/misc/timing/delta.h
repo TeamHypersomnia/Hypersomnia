@@ -1,4 +1,6 @@
 #pragma once
+#include <type_traits>
+
 #include "augs/math/declare_math.h"
 #include "augs/templates/always_false.h"
 

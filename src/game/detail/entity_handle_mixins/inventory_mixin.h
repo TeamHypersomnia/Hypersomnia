@@ -26,7 +26,7 @@ public:
 	using inventory_slot_handle_type = basic_inventory_slot_handle<generic_handle_type>;
 
 	static constexpr size_t hand_count = 2;
-	typedef std::array<entity_id, hand_count> hand_selections_array;
+	using hand_selections_array = std::array<entity_id, hand_count>;
 
 	void infer_changed_slot() const {
 		const auto& self = *static_cast<const derived_handle_type*>(this);
@@ -65,7 +65,7 @@ public:
 				return std::nullopt;
 			}
 
-			ensure(slot->physical_behaviour == slot_physical_behaviour::CONNECT_AS_FIXTURE_OF_BODY); 
+			ensure_eq(slot->physical_behaviour, slot_physical_behaviour::CONNECT_AS_FIXTURE_OF_BODY); 
 
 			sum(result, { it.container_entity });
 
@@ -104,7 +104,7 @@ public:
 				return std::nullopt;
 			}
 
-			ensure(slot->physical_behaviour == slot_physical_behaviour::CONNECT_AS_FIXTURE_OF_BODY); 
+			ensure_eq(slot->physical_behaviour, slot_physical_behaviour::CONNECT_AS_FIXTURE_OF_BODY); 
 
 			sum(result, { it.container_entity });
 

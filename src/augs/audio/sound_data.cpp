@@ -106,7 +106,7 @@ namespace augs {
 			else {
 				throw sound_decoding_error("Failed to decode %x as WAV file.", path);
 			}
-			//ensure(wav_header.SamplesPerSec == 44100);
+			//ensure_eq(wav_header.SamplesPerSec, 44100);
 		}
 
 #if LOG_AUDIO_BUFFERS
@@ -126,7 +126,7 @@ namespace augs {
 	}
 
 	sound_data& sound_data::to_mono() {
-		ensure(samples.size() % 2 == 0);
+		ensure_eq(samples.size() % 2, 0);
 
 		std::vector<sound_sample_type> output;
 		output.resize(samples.size() / 2);

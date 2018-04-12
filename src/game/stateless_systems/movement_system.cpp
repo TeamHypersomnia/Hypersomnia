@@ -2,7 +2,6 @@
 #include "movement_system.h"
 #include "game/transcendental/cosmos.h"
 #include "game/messages/intent_message.h"
-#include "augs/log.h"
 
 #include "game/components/gun_component.h"
 

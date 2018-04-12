@@ -1,7 +1,5 @@
 #include <algorithm>
 
-#include "augs/log.h"
-
 #include "augs/templates/string_templates.h"
 #include "augs/templates/corresponding_field.h"
 #include "augs/templates/algorithm_templates.h"

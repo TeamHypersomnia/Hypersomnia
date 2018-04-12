@@ -3,6 +3,7 @@
 #include "augs/misc/pool/pool_declaration.h"
 #include "augs/readwrite/memory_stream.h"
 #include "augs/readwrite/byte_file.h"
+#include "augs/templates/can_stream.h"
 
 const auto test_file_path = GENERATED_FILES_DIR "test_byte_readwrite.bin";
 

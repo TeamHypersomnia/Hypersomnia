@@ -29,6 +29,10 @@ struct character_gui {
 		}
 
 		hotbar_selection_setup get_available_entities(const const_entity_handle h) const;
+
+		friend std::ostream& operator<<(std::ostream& o, const hotbar_selection_setup& s) {
+			return pretty_print(o, s.hand_selections);
+		}
 	};
 	
 	std::array<hotbar_button, 10> hotbar_buttons;

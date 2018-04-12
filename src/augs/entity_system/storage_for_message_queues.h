@@ -2,7 +2,6 @@
 #include <tuple>
 #include <vector>
 
-#include "augs/ensure.h"
 #include "augs/templates/for_each_std_get.h"
 #include "augs/templates/type_matching_and_indexing.h"
 #include "augs/templates/container_templates.h"
@@ -47,10 +46,6 @@ namespace augs {
 		void clear_queue() {
 			check_valid<T>();
 			return get_queue<T>().clear();
-		}
-
-		void ensure_all_empty() {
-			for_each_through_std_get(queues, [this](auto& q) { ensure(q.empty()); });
 		}
 
 		void flush_queues() {

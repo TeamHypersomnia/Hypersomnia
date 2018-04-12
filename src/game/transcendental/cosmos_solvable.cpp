@@ -18,7 +18,7 @@ std::size_t cosmos_solvable::get_entities_count() const {
 	std::size_t total = 0u;
 
 	for_each_pool([&total](const auto& p) { total += p.size(); } );
-	ensure(guid_to_id.size() == total);
+	ensure_eq(guid_to_id.size(), total);
 	return total;
 }
 
@@ -128,7 +128,7 @@ entity_guid cosmos_solvable::clear_guid(const entity_id cleared) {
 	const auto guid = get_guid(cleared);
 	const auto erased_num = guid_to_id.erase(guid);
 
-	ensure(erased_num == 1);
+	ensure_eq(erased_num, 1);
 	return guid;
 }
 

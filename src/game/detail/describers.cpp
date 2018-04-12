@@ -1,6 +1,4 @@
-#include "augs/log.h"
-
-#include "describers.h"
+#include "game/detail/describers.h"
 
 #include "augs/templates/container_templates.h"
 #include "game/transcendental/entity_handle.h"

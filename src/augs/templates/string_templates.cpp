@@ -1,5 +1,13 @@
 #include "string_templates.h"
 
+std::string to_lowercase(std::string s) {
+	return str_ops(s).to_lowercase().subject;
+}
+
+std::string to_uppercase(std::string s) {
+	return str_ops(s).to_uppercase().subject;
+}
+
 std::string format_field_name(std::string s) {
 	s[0] = ::toupper(s[0]);
 	return str_ops(s).multi_replace_all({ "_", "." }, " ").subject;

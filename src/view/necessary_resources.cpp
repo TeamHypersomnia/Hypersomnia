@@ -1,3 +1,4 @@
+#include "augs/templates/string_templates.h"
 #include "augs/templates/container_templates.h"
 #include "augs/templates/introspect.h"
 #include "augs/filesystem/file.h"

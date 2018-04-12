@@ -297,7 +297,7 @@ unsigned calc_space_occupied_with_children(const const_entity_handle item_entity
 	auto space_occupied = *item_entity.find_space_occupied();
 
 	if (auto* const container = item_entity.find<invariants::container>()) {
-		ensure(item_entity.get<components::item>().get_charges() == 1);
+		ensure_eq(item_entity.get<components::item>().get_charges(), 1);
 
 		for (const auto& slot : container->slots) {
 			for (const auto entity_in_slot : get_items_inside(item_entity, slot.first)) {

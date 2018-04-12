@@ -63,12 +63,12 @@ void load_test_scene_images(
 
 		{
 			const auto new_allocation = all_loadables.allocate(std::move(loadables_def));
-			ensure(new_allocation.key == id);
+			ensure_eq(new_allocation.key, id);
 		}
 
 		{
 			const auto new_allocation = all_metas.allocate(std::move(meta));
-			ensure(new_allocation.key == id);
+			ensure_eq(new_allocation.key, id);
 		}
 	});
 }

@@ -45,7 +45,7 @@ namespace augs {
 				erase_element(tracked_children, child_id);
 
 				/* Ensure that erasure happened */
-				ensure(tracked_children.size() == previous_size - 1); 
+				ensure_eq(tracked_children.size(), previous_size - 1); 
 
 				if (parent_cache->empty()) {
 					erase_element(parent_caches, parent_id);

@@ -1,4 +1,3 @@
-#include "augs/log.h"
 #include "augs/templates/introspect.h"
 #include "augs/templates/corresponding_field.h"
 

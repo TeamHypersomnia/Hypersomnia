@@ -2,7 +2,9 @@
 #include <type_traits>
 #include <cstddef>
 #include <utility>
+
 #include "augs/templates/is_std_array.h"
+#include "augs/templates/has_begin_and_end.h"
 
 template <int t>
 struct constexpr_tester {};
@@ -66,13 +68,6 @@ template <class T>
 struct can_emplace_back<T, decltype(std::declval<T>().emplace_back(), void())> : std::true_type {};
 
 
-template <class T, class = void>
-struct has_begin_and_end : std::false_type {};
-
-template <class T>
-struct has_begin_and_end<T, decltype(std::declval<T&>().begin(), std::declval<T&>().end(), void())> : std::true_type {};
-
-
 template <class A, class B, class = void>
 struct has_suitable_member_assign : std::false_type {};
 
@@ -102,7 +97,7 @@ template <class T>
 constexpr bool is_associative_v = is_associative<T>::value;
 
 template <class T>
-constexpr bool is_container_v = has_begin_and_end<T>::value && !is_std_array_v<T>;
+constexpr bool is_container_v = has_begin_and_end_v<T> && !is_std_array_v<T>;
 
 template <class A, class B>
 constexpr bool has_suitable_member_assign_v = has_suitable_member_assign<A, B>::value;

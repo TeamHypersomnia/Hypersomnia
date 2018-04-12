@@ -131,7 +131,7 @@ public:
 			return rigid_body.find_aabb();
 		}
 
-		// ensure(nullptr == handle.template find<invariants::fixtures>());
+		// ensure_eq(nullptr, handle.template find<invariants::fixtures>());
 
 		return std::nullopt;
 	}

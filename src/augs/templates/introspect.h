@@ -6,6 +6,7 @@
 #include "augs/templates/is_std_array.h"
 #include "augs/templates/container_traits.h"
 #include "augs/templates/introspection_traits.h"
+#include "augs/templates/enum_introspection_traits.h"
 #include "augs/templates/recursive.h"
 #include "augs/templates/is_optional.h"
 #include "augs/templates/is_comparable.h"

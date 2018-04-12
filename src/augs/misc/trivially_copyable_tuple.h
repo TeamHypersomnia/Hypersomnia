@@ -1,6 +1,4 @@
 #pragma once
-#include "augs/ensure.h"
-
 #include "augs/templates/type_list.h"
 #include "augs/templates/constexpr_arithmetic.h"
 #include "augs/templates/type_matching_and_indexing.h"
@@ -18,8 +16,6 @@ namespace augs {
 			static constexpr std::size_t offset = sum_sizes_until_nth_v<index_in_v<type, Types...>, type_list<Types...>>;
 			
 			auto* const p = data() + offset;
-
-			ensure(p + sizeof(type) <= data() + sum_sizes_of_types_in_list_v<type_list<Types...>>);
 
 			new (p) type;
 		}

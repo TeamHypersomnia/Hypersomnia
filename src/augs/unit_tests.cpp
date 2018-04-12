@@ -7,7 +7,6 @@
 #include <sstream>
 
 #include "augs/unit_tests.h"
-#include "augs/log.h"
 #include "augs/misc/scope_guard.h"
 
 namespace Catch {

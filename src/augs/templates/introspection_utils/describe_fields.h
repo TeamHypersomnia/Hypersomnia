@@ -4,6 +4,7 @@
 #include "augs/templates/string_templates.h"
 #include "augs/templates/introspect.h"
 #include "augs/templates/recursive.h"
+#include "augs/templates/can_stream.h"
 #include "augs/misc/typesafe_sprintf.h"
 
 template <class T>

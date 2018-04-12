@@ -1,7 +1,11 @@
 #pragma once
+#ifndef ENUM_INTROSPECT_INCLUDED
+#define ENUM_INTROSPECT_INCLUDED 1
+#endif
+
 #include <type_traits>
 #include "generated/introspectors.h"
-#include "augs/templates/introspection_traits.h"
+#include "augs/templates/enum_introspection_traits.h"
 #include "augs/templates/function_traits.h"
 
 template <class T, class = void>

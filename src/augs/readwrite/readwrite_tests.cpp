@@ -3,6 +3,7 @@
 #include "augs/misc/pool/pool.h"
 #include "augs/misc/constant_size_vector.h"
 
+#include "augs/templates/string_templates.h"
 #include "augs/readwrite/readwrite_test_cycle.h"
 
 #include "augs/math/vec2.h"

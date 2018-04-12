@@ -5,14 +5,7 @@
 #include <type_traits>
 #include <limits>
 
-template <class T, class = void>
-struct has_string : std::false_type {};
-
-template <class T>
-struct has_string<T, decltype(std::declval<T&>().string(), void())> : std::true_type {};
-
-template <class T>
-constexpr bool has_string_v = has_string<T>::value;
+#include "augs/misc/pretty_print.h"
 
 inline void typesafe_sprintf_detail(std::size_t, std::string&) {}
 
@@ -62,13 +55,8 @@ void typesafe_sprintf_detail(std::size_t starting_pos, std::string& target_str, 
 
 		if (num_special_letters > 0) {
 			const auto num_chars_to_replace = num_special_letters + 1;
-			
-			if constexpr(has_string_v<T>) {
-				replacement << val.string();
-			}	
-			else {
-				replacement << val;
-			}
+
+			pretty_print(replacement, val);
 
 			target_str.replace(
 				starting_pos,

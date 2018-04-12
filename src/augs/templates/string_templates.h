@@ -126,16 +126,6 @@ inline auto str_ops(const char* const s) {
 	return str_ops(std::string(s));
 }
 
-template <class S>
-auto to_lowercase(S s) {
-	return str_ops(s).to_lowercase().subject;
-}
-
-template <class S>
-auto to_uppercase(S s) {
-	return str_ops(s).to_uppercase().subject;
-}
-
 inline bool ends_with(const std::string& value, const std::string& ending) {
     if (ending.size() > value.size()) {
     	return false;
@@ -225,5 +215,3 @@ std::string get_type_name_strip_namespace(const T& t) {
 	return get_type_name_strip_namespace<std::decay_t<T>>();
 }
 
-std::string to_forward_slashes(std::string);
-std::string to_forward_slashes(std::string);

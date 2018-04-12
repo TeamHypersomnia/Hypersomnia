@@ -184,7 +184,7 @@ namespace augs {
 								}
 							}
 							else {
-								// ensure(msg == message::mousemotion);
+								// ensure_eq(msg, message::mousemotion);
 								gui_event_lambda(gui_event::hoverlost);
 								unhover(context, this_id, inf, entropies);
 							}

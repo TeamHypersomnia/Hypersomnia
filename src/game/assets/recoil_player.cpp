@@ -1,6 +1,4 @@
-#include "augs/log.h"
 #include "augs/misc/randomization.h"
-
 #include "game/assets/recoil_player.h"
 
 real32 recoil_player_instance::shoot_and_get_impulse(

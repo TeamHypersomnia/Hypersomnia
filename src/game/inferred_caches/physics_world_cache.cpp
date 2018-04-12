@@ -409,7 +409,7 @@ void physics_world_cache::infer_cache_for_joint(const const_entity_handle handle
 		const auto si = handle.get_cosmos().get_si();
 		auto cache = find_joint_cache(handle);
 		
-		ensure(nullptr == cache->joint);
+		ensure_eq(nullptr, cache->joint);
 
 		b2MotorJointDef def;
 		def.userData = handle.get_id();
@@ -508,7 +508,7 @@ physics_world_cache& physics_world_cache::operator=(const physics_world_cache& b
 		const unsigned count = 1
 	) {
 #if DEBUG_PHYSICS_SYSTEM_COPY
-		ensure(already_migrated_pointers.find(reinterpret_cast<void**>(&pointer_to_be_migrated)) == already_migrated_pointers.end());
+		ensure_eq(already_migrated_pointers.find(reinterpret_cast<void**>(&pointer_to_be_migrated)), already_migrated_pointers.end());
 		already_migrated_pointers.insert(reinterpret_cast<void**>(&pointer_to_be_migrated));
 #endif
 
@@ -556,7 +556,7 @@ physics_world_cache& physics_world_cache::operator=(const physics_world_cache& b
 		contact_edge_b_offset
 	](b2ContactEdge*& edge_ptr) {
 #if DEBUG_PHYSICS_SYSTEM_COPY
-		ensure(already_migrated_pointers.find((void**)&edge_ptr) == already_migrated_pointers.end());
+		ensure_eq(already_migrated_pointers.find((void**)&edge_ptr), already_migrated_pointers.end());
 		already_migrated_pointers.insert((void**)&edge_ptr);
 #endif
 		if (edge_ptr == nullptr) {
@@ -621,7 +621,7 @@ physics_world_cache& physics_world_cache::operator=(const physics_world_cache& b
 		joint_edge_b_offset
 	](b2JointEdge*& edge_ptr) {
 #if DEBUG_PHYSICS_SYSTEM_COPY
-		ensure(already_migrated_pointers.find((void**)&edge_ptr) == already_migrated_pointers.end());
+		ensure_eq(already_migrated_pointers.find((void**)&edge_ptr), already_migrated_pointers.end());
 		already_migrated_pointers.insert((void**)&edge_ptr);
 #endif
 		if (edge_ptr == nullptr) {

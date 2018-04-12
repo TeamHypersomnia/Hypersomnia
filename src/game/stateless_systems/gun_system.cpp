@@ -1,4 +1,3 @@
-#include "augs/log.h"
 #include "augs/misc/randomization.h"
 
 #include "game/transcendental/cosmos.h"

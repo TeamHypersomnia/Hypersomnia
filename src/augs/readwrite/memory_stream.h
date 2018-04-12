@@ -258,7 +258,7 @@ namespace augs {
 
 	template <class A>
 	void write_stream_with_size(A& ar, const augs::memory_stream& storage) {
-		ensure(storage.get_read_pos() == 0);
+		ensure_eq(storage.get_read_pos(), 0);
 		augs::write_bytes(ar, storage.size());
 		
 		detail::write_raw_bytes(ar, storage.data(), storage.size());

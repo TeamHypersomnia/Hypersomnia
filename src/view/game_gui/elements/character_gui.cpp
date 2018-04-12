@@ -179,7 +179,7 @@ wielding_result character_gui::make_wielding_transfers_for(
 	const const_entity_handle gui_entity
 ) {
 	const auto actually_available_setup = new_setup.get_available_entities(gui_entity);
-	ensure(new_setup == actually_available_setup);
+	ensure_eq(new_setup, actually_available_setup);
 
 	return gui_entity.make_wielding_transfers_for(new_setup.hand_selections);
 }

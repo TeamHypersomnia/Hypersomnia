@@ -136,6 +136,10 @@ static void gg() {
 	(void)(typed_entity_id<controlled_character>() == typed_entity_id<controlled_character>());
 }
 struct tests_of_traits {
+	static_assert(has_string_v<augs::path_type>);
+	static_assert(has_string_v<const augs::path_type&>);
+	static_assert(has_string_v<augs::path_type&>);
+
 	static_assert(!value_conjunction<true, false, true, false>::value);
 	static_assert(value_disjunction<true, false, true, false>::value);
 

@@ -1,7 +1,5 @@
 #include <Box2D/Box2D.h>
 
-#include "augs/log.h"
-
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/logic_step.h"

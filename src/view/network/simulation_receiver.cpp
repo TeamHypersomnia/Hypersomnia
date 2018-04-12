@@ -82,7 +82,7 @@ steps_unpacking_result simulation_receiver::unpack_deterministic_steps(
 		//	reconciliate_predicted = true;
 		//}
 		//else
-			ensure(new_command.step_type == step_packaged_for_network::type::NEW_ENTROPY);
+			ensure_eq(new_command.step_type, step_packaged_for_network::type::NEW_ENTROPY);
 
 		step_to_simulate sim;
 		sim.reinfer = new_command.shall_reinfer;

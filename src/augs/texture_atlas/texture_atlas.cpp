@@ -149,7 +149,7 @@ regenerated_atlas::regenerated_atlas(
 		const bool textures_dont_fit_into_atlas = !result || packing_output.size() > 1;
 
 		ensure(!textures_dont_fit_into_atlas);
-		ensure(packing_output[0].rects.size() == input_for_packing_algorithm.size());
+		ensure_eq(packing_output[0].rects.size(), input_for_packing_algorithm.size());
 
 		atlas_image_size = {
 			static_cast<unsigned>(packing_output[0].size.w),
