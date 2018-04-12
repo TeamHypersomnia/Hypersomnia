@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/templates/always_false.h"
+#include "augs/templates/identity_templates.h"
 
 #include "game/transcendental/entity_id.h"
 

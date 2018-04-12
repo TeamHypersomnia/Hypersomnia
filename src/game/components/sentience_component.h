@@ -9,7 +9,7 @@
 
 #include "augs/templates/type_list.h"
 #include "augs/templates/constexpr_arithmetic.h"
-#include "augs/templates/always_false.h"
+#include "augs/templates/identity_templates.h"
 
 #include "game/assets/ids/sound_buffer_id.h"
 #include "game/assets/ids/particle_effect_id.h"

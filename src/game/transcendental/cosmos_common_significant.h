@@ -4,7 +4,7 @@
 #include "augs/math/si_scaling.h"
 
 #include "augs/templates/type_in_list_id.h"
-#include "augs/templates/always_false.h"
+#include "augs/templates/identity_templates.h"
 #include "augs/templates/get_by_dynamic_id.h"
 
 #include "game/common_state/visibility_settings.h"

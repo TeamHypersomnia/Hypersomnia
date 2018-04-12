@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/templates/always_false.h"
+#include "augs/templates/identity_templates.h"
 
 template <class T, class = void>
 struct has_enum_to_string : std::false_type {};

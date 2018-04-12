@@ -1,7 +1,7 @@
 #pragma once
 #include "augs/templates/can_stream.h"
 #include "augs/templates/has_begin_and_end.h"
-#include "augs/templates/always_false.h"
+#include "augs/templates/identity_templates.h"
 
 template <class T, class = void>
 struct has_string : std::false_type {};

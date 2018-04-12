@@ -1,7 +1,7 @@
 #include "drag_and_drop.h"
 #include "slot_button.h"
 #include "item_button.h"
-#include "augs/templates/always_false.h"
+#include "augs/templates/identity_templates.h"
 #include "game/detail/inventory/item_slot_transfer_request.h"
 #include "view/game_gui/elements/gui_grid.h"
 #include "view/game_gui/elements/character_gui.h"
