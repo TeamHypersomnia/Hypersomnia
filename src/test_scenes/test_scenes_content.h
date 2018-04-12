@@ -35,8 +35,8 @@ void load_test_scene_images(
 );
 
 void load_test_scene_animations(animations_pool&);
-void load_test_scene_physical_materials(all_logical_assets&);
-void load_test_scene_recoil_players(all_logical_assets&);
+void load_test_scene_physical_materials(physical_materials_pool&);
+void load_test_scene_recoil_players(recoil_players_pool&);
 
 void load_test_scene_sentience_properties(cosmos_common_significant&);
 

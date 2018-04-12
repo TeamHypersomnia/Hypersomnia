@@ -734,7 +734,7 @@ int work(const int argc, const char* const * const argv) try {
 			all_visible,
 
 			get_viewable_defs().particle_effects,
-			cosmos.get_logical_assets().get_store_by<assets::animation_id>(),
+			cosmos.get_logical_assets().animations,
 
 			loaded_sounds,
 

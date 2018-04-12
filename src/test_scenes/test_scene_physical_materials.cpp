@@ -3,7 +3,7 @@
 #include "game/assets/physical_material.h"
 #include "game/assets/all_logical_assets.h"
 
-void load_test_scene_physical_materials(all_logical_assets& assets) {
+void load_test_scene_physical_materials(physical_materials_pool& assets) {
 	const auto set_pair = [&](
 		const assets::physical_material_id a,
 		const assets::physical_material_id b,

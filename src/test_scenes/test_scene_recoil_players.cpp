@@ -20,7 +20,7 @@ static void populate_with_uniform_offsets(
 	}
 }
 
-void load_test_scene_recoil_players(all_logical_assets& assets) {
+void load_test_scene_recoil_players(recoil_players_pool& assets) {
 	{
 		auto& generic_recoil = assets[assets::recoil_player_id::GENERIC];
 		populate_with_uniform_offsets(generic_recoil, 20);
