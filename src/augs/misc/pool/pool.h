@@ -334,7 +334,7 @@ namespace augs {
 		template <class S>
 		static auto find_no_check_impl(S& self, const unversioned_id_type key) -> maybe_const_ptr_t<std::is_const_v<S>, mapped_type> {
 			if (key.is_set()) {
-				return &get_no_check_impl(self, key); 
+				return &self.objects[self.indirectors[key.indirection_index].real_index];
 			}
 
 			return nullptr;

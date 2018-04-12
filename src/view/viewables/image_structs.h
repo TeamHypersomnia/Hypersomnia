@@ -70,6 +70,10 @@ public:
 		return caches.at(id.indirection_index);
 	}
 
+	auto size() const {
+		return caches.size();
+	}
+
 	void clear() {
 		caches.clear();
 	}

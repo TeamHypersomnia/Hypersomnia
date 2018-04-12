@@ -12,6 +12,8 @@
 #include "augs/templates/is_comparable.h"
 #include "augs/templates/is_tuple.h"
 
+#include "augs/templates/introspect_declaration.h"
+
 namespace augs {
 	/*
 		Simple introspection with just one level of depth.
@@ -64,10 +66,7 @@ namespace augs {
 	}
 
 	template <class A, class B>
-	bool introspective_equal(A& a, B& b);
-
-	template <class A, class B>
-	bool recursive_equal(
+	bool introspective_equal_detail(
 		const A& a,
 		const B& b
 	) {
@@ -78,7 +77,7 @@ namespace augs {
 				return false;
 			}
 			else if (a && b) {
-				return recursive_equal(*a, *b);
+				return introspective_equal_detail(*a, *b);
 			}
 			else {
 				ensure(!a && !b);
@@ -100,14 +99,14 @@ namespace augs {
 	}
 
 	template <class A, class B>
-	bool introspective_equal(A& a, B& b) {
+	bool introspective_equal(const A& a, const B& b) {
 		static_assert(has_introspect_v<A> && has_introspect_v<B>, "Comparison requested on type(s) without introspectors!");
 
 		bool are_equal = true;
 
 		introspect(
 			[&are_equal](const auto label, const auto& aa, const auto& bb) {
-				are_equal = are_equal && recursive_equal(aa, bb);
+				are_equal = are_equal && introspective_equal_detail(aa, bb);
 			}, a, b
 		);
 

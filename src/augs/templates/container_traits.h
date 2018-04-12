@@ -81,6 +81,9 @@ constexpr bool can_access_data_v = can_access_data<T>::value;
 template <class T, class K>
 constexpr bool has_member_find_v = has_member_find<T, K>::value;
 
+template <class T, class K>
+constexpr bool member_find_returns_ptr_v = std::is_pointer_v<decltype(std::declval<T&>().find(std::declval<const K&>()))>;
+
 template <class T>
 constexpr bool can_reserve_v = can_reserve<T>::value;
 

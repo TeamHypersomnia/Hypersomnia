@@ -79,7 +79,7 @@ public:
 	}
 
 	bool operator==(const entity_flavour& b) const {
-		return augs::recursive_equal(*this, b);
+		return augs::introspective_equal(*this, b);
 	}
 };
 

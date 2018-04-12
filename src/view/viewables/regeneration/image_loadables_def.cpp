@@ -67,5 +67,5 @@ void image_loadables_def::regenerate_all_needed(
 }
 
 bool image_loadables_def::operator==(const image_loadables_def& b) const {
-	return augs::recursive_equal(*this, b);
+	return augs::introspective_equal(*this, b);
 }

@@ -25,5 +25,5 @@ loaded_image_caches_map::loaded_image_caches_map(
 }
 
 bool image_meta::operator==(const image_meta& b) const {
-	return augs::recursive_equal(*this, b);
+	return augs::introspective_equal(*this, b);
 }

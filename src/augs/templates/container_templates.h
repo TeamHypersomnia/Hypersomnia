@@ -1,6 +1,7 @@
 #pragma once
 #include <algorithm>
 #include "augs/templates/container_traits.h"
+#include "augs/templates/maybe_const.h"
 
 template <class C1, class I>
 void resize_for_index(C1& c, const I index) {
@@ -105,7 +106,12 @@ auto find_in_if(Container& v, C callback) {
 template<class Container, class K>
 bool found_in(Container& v, const K& l) {
 	if constexpr(has_member_find_v<Container, K>) {
-		return v.find(l) != v.end();
+		if constexpr (member_find_returns_ptr_v<Container, K>) {
+			return v.find(l) != nullptr;
+		}
+		else {
+			return v.find(l) != v.end();
+		}
 	}
 	else {
 		return find_in(v, l) != v.end();
@@ -127,35 +133,26 @@ T default_or_invalid_enum(Args&&... args) {
 	}
 }
 
-template <class Container, class Key, class... Args>
-auto mapped_or_default(
-	const Container& container, 
-	const Key& key,
-	Args&&... args
-) {
-	using M = typename std::decay_t<Container>::mapped_type;
-
-	if (const auto it = container.find(key);
-		it != container.end()
-	) {
-		return (*it).second;
-	}
-
-	return default_or_invalid_enum<M>(std::forward<Args>(args)...);
-}
+template <class T>
+using ptr_to_mapped_type = maybe_const_ptr_t<std::is_const_v<T>, typename T::mapped_type>;
 
 template <class Container, class Key>
 auto mapped_or_nullptr(
 	Container& container,
-	const Key& key
-) -> decltype(std::addressof((*container.begin()).second)) {
-	if (const auto it = container.find(key);
-		it != container.end()
-	) {
-		return std::addressof((*it).second);
+	Key&& key
+) -> ptr_to_mapped_type<Container> {
+	if constexpr (member_find_returns_ptr_v<Container, Key>) {
+		return container.find(std::forward<Key>(key));
 	}
+	else {
+		if (const auto it = container.find(std::forward<Key>(key));
+			it != container.end()
+		) {
+			return std::addressof((*it).second);
+		}
 
-	return nullptr;
+		return nullptr;
+	}
 }
 
 template <class Container>

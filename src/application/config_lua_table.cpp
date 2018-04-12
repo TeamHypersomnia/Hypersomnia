@@ -30,3 +30,11 @@ launch_type config_lua_table::get_launch_mode() const {
 input_recording_type config_lua_table::get_input_recording_mode() const {
 	return debug.input_recording_mode;
 }
+
+bool config_lua_table::operator==(const config_lua_table& b) const {
+	return augs::introspective_equal(*this, b);
+}
+
+bool config_lua_table::operator!=(const config_lua_table& b) const {
+	return !operator==(b);
+}

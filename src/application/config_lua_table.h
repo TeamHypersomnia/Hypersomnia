@@ -125,6 +125,9 @@ struct config_lua_table {
 
 	// END GEN INTROSPECTOR
 
+	bool operator==(const config_lua_table& b) const;
+	bool operator!=(const config_lua_table& b) const;
+
 	launch_type get_launch_mode() const;
 	input_recording_type get_input_recording_mode() const;
 

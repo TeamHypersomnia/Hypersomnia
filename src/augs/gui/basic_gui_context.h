@@ -57,7 +57,11 @@ namespace augs {
 			rect_tree_entry_type get_tree_entry(const gui_element_variant_id& id) const {
 				const auto& self = *static_cast<const derived*>(this);
 
-				return mapped_or_default(tree, id, ltrb {}, self.get_root_id());
+				if (const auto found = mapped_or_nullptr(tree, id)) {
+					return *found;
+				}
+
+				return { ltrb {}, self.get_root_id() };
 			}
 
 			auto get_screen_size() const {

@@ -33,19 +33,19 @@ TEST_CASE("IntrospectionTest EqualityTest") {
 		intro_test2 t1;
 		intro_test2 t2;
 
-		REQUIRE(augs::recursive_equal(t1, t2));
+		REQUIRE(augs::introspective_equal(t1, t2));
 		t1.it[4] = 6;
-		REQUIRE(!augs::recursive_equal(t1, t2));
+		REQUIRE(!augs::introspective_equal(t1, t2));
 	}
 
 	{
 		intro_test1 t1;
 		intro_test1 t2;
 
-		REQUIRE(augs::recursive_equal(t1, t2));
+		REQUIRE(augs::introspective_equal(t1, t2));
 
 		std::get<int>(t2.tp) = 5891;
-		REQUIRE(!augs::recursive_equal(t1, t2));
+		REQUIRE(!augs::introspective_equal(t1, t2));
 	}
 }
 

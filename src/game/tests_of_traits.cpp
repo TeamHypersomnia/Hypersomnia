@@ -136,6 +136,13 @@ static void gg() {
 	(void)(typed_entity_id<controlled_character>() == typed_entity_id<controlled_character>());
 }
 struct tests_of_traits {
+	static_assert(has_member_find_v<std::unordered_map<int*, int*>, int*>);
+	static_assert(!has_member_find_v<std::vector<int>, int>);
+
+	static_assert(member_find_returns_ptr_v<augs::pool<int, make_vector, unsigned>, augs::pooled_object_id<unsigned>>);
+	static_assert(!member_find_returns_ptr_v<std::unordered_map<int, int*>, int>);
+	static_assert(!member_find_returns_ptr_v<std::unordered_map<int*, int*>, int*>);
+
 	static_assert(has_string_v<augs::path_type>);
 	static_assert(has_string_v<const augs::path_type&>);
 	static_assert(has_string_v<augs::path_type&>);

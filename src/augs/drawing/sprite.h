@@ -88,7 +88,7 @@ namespace augs {
 		// END GEN INTROSPECTOR
 
 		bool operator==(const sprite& b) const {
-			return recursive_equal(*this, b);
+			return introspective_equal(*this, b);
 		}
 
 		vec2i get_size() const {

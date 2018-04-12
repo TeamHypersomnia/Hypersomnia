@@ -208,7 +208,7 @@ namespace augs {
 			const T& base_object,
 			const T& encoded_object
 		) {
-			if (!recursive_equal(base_object, encoded_object)) {
+			if (!introspective_equal(base_object, encoded_object)) {
 				new_content = to_bytes(encoded_object);
 			}
 		}

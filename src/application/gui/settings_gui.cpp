@@ -372,18 +372,11 @@ void settings_gui_state::perform(
 	}
 
 	{
-		const bool has_config_changed =
-			!augs::recursive_equal(
-				config,
-				last_saved_config
-			)
-		;
-
 		auto scope = scoped_child("save revert");
 
 		ImGui::Separator();
 
-		if (has_config_changed) {
+		if (config != last_saved_config) {
 			if (ImGui::Button("Save settings")) {
 				augs::timer save_timer;
 				last_saved_config = config;

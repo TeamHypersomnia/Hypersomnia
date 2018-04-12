@@ -11,6 +11,7 @@
 #include "augs/texture_atlas/texture_atlas.h"
 
 #include "augs/readwrite/byte_file.h"
+#include "augs/filesystem/directory.h"
 
 regenerated_atlas::regenerated_atlas(
 	const atlas_regeneration_input& in,
@@ -30,7 +31,7 @@ regenerated_atlas::regenerated_atlas(
 		we might disable it to improve performance. Unlikely, though.
 	*/
 
-	if (settings.skip_source_image_integrity_check) {
+	if (!settings.skip_source_image_integrity_check) {
 		for (const auto& img_id : in.images) {
 			new_stamp.image_stamps[img_id] = augs::last_write_time(img_id);
 		}

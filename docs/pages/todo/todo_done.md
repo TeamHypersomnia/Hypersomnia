@@ -520,3 +520,6 @@ we consider whole type overrides too complex architeciturally:
 - on saving an untitled work, we will have to move the folder.
 	- And possibly rename all of (tab, int, autosave will be absent though) that is inside to match the folder's name.
 	- We'd anyway need this as "save as"
+
+- fix all logical assets to not use those crazy tuples and getters, wow
+
