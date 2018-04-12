@@ -5,8 +5,8 @@
 
 #include <type_traits>
 #include "generated/introspectors.h"
-#include "augs/templates/enum_introspection_traits.h"
-#include "augs/templates/function_traits.h"
+#include "augs/templates/traits/enum_introspection_traits.h"
+#include "augs/templates/traits/function_traits.h"
 
 template <class T, class = void>
 struct has_COUNT : std::false_type {};

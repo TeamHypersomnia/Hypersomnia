@@ -4,9 +4,9 @@
 #include "generated/introspectors.h"
 
 #include "augs/templates/traits/is_std_array.h"
-#include "augs/templates/container_traits.h"
-#include "augs/templates/introspection_traits.h"
-#include "augs/templates/enum_introspection_traits.h"
+#include "augs/templates/traits/container_traits.h"
+#include "augs/templates/traits/introspection_traits.h"
+#include "augs/templates/traits/enum_introspection_traits.h"
 #include "augs/templates/recursive.h"
 #include "augs/templates/traits/is_optional.h"
 #include "augs/templates/traits/is_comparable.h"

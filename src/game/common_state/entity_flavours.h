@@ -5,7 +5,7 @@
 #include "augs/templates/introspect_declaration.h"
 #include "augs/templates/type_matching_and_indexing.h"
 #include "augs/templates/maybe_const.h"
-#include "augs/templates/component_traits.h"
+#include "augs/templates/traits/component_traits.h"
 #include "game/transcendental/entity_flavour_id.h"
 
 #include "game/organization/all_component_includes.h"

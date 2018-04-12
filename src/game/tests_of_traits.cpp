@@ -14,7 +14,7 @@
 
 #include "game/assets/all_logical_assets.h"
 
-#include "augs/templates/container_traits.h"
+#include "augs/templates/traits/container_traits.h"
 #include "game/components/pathfinding_component.h"
 
 #include "augs/pad_bytes.h"

@@ -5,7 +5,7 @@
 #include "augs/ensure.h"
 #include "augs/pad_bytes.h"
 
-#include "augs/templates/container_traits.h"
+#include "augs/templates/traits/container_traits.h"
 #include "augs/templates/byte_type_for.h"
 #include "augs/templates/traits/is_variant.h"
 #include "augs/templates/for_each_type.h"

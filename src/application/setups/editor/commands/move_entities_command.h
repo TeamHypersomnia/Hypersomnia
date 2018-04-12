@@ -1,6 +1,6 @@
 #pragma once
 #include "augs/enums/callback_result.h"
-#include "augs/templates/component_traits.h"
+#include "augs/templates/traits/component_traits.h"
 
 #include "augs/math/transform.h"
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/templates/component_traits.h"
+#include "augs/templates/traits/component_traits.h"
 
 #include "game/organization/all_components_declaration.h"
 #include "application/setups/editor/commands/editor_command_structs.h"

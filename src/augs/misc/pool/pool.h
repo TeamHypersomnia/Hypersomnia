@@ -6,7 +6,7 @@
 #include "augs/misc/pool/pooled_object_id.h"
 
 #include "augs/templates/maybe_const.h"
-#include "augs/templates/container_traits.h"
+#include "augs/templates/traits/container_traits.h"
 #include "augs/templates/container_templates.h"
 
 #include "augs/readwrite/byte_readwrite_declaration.h"

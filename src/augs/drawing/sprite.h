@@ -5,7 +5,7 @@
 #include "augs/math/rects.h"
 
 #include "augs/templates/introspect_declaration.h"
-#include "augs/templates/container_traits.h"
+#include "augs/templates/traits/container_traits.h"
 
 #include "augs/graphics/vertex.h"
 

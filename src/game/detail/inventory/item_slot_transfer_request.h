@@ -1,7 +1,7 @@
 #pragma once
 #include "augs/pad_bytes.h"
 #include "augs/templates/maybe_const.h"
-#include "augs/templates/triviality_traits.h"
+#include "augs/templates/traits/triviality_traits.h"
 
 #include "game/transcendental/entity_handle_declaration.h"
 

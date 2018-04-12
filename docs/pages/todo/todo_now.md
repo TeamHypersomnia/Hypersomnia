@@ -8,7 +8,6 @@ summary: Just a hidden scratchpad.
 ## Microplanned implementation order
 
 - always_false -> identity_templates
-- create templates/traits folder
 
 - use pools and pool ids for:
 	- all logical assets

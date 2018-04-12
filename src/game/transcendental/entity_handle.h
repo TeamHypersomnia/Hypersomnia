@@ -6,7 +6,7 @@
 #include "augs/templates/get_by_dynamic_id.h"
 
 #include "augs/templates/maybe_const.h"
-#include "augs/templates/component_traits.h"
+#include "augs/templates/traits/component_traits.h"
 #include "augs/templates/type_matching_and_indexing.h"
 
 #include "game/detail/inventory/inventory_slot_handle_declaration.h"

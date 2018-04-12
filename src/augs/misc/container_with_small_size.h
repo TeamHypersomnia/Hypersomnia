@@ -3,7 +3,7 @@
 #include <type_traits>
 
 #include "augs/readwrite/byte_readwrite_declaration.h"
-#include "augs/templates/container_traits.h"
+#include "augs/templates/traits/container_traits.h"
 
 namespace augs {
 	template <class T, class size_type>

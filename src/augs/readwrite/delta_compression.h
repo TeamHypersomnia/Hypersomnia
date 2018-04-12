@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "augs/templates/triviality_traits.h"
+#include "augs/templates/traits/triviality_traits.h"
 #include "augs/templates/get_index_type_for_size_of.h"
 #include "augs/templates/introspect_declaration.h"
 

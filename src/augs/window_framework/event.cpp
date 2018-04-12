@@ -1,6 +1,6 @@
 #include "event.h"
 #include "augs/ensure.h"
-#include "augs/templates/triviality_traits.h"
+#include "augs/templates/traits/triviality_traits.h"
 #include "augs/templates/container_templates.h"
 
 namespace augs {

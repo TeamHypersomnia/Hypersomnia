@@ -1,6 +1,6 @@
 #pragma once
 #include <algorithm>
-#include "augs/templates/container_traits.h"
+#include "augs/templates/traits/container_traits.h"
 #include "augs/templates/maybe_const.h"
 
 template <class C1, class I>
