@@ -63,6 +63,26 @@ Znajdzie się tam to samo co w combo boxie z wyborem obrazka, z dwiema różnic
 	- Zmiany będą natychmiast miały efekt.
 		- Prawdopodobnie trzeba będzie sklepać asynchroniczną generację atlasu żeby się dało po ludzku manipulować parametry neon map.
 
+
+- Uwaga: Jeśli w dowolnym momencie zniknie na dysku obrazek który jest wyświetlony pod "Images" - czyli zniknie obrazek gdzieś użyty w edytorze - to edytor natychmiast wypluje error.
+	- Pojawi się error z textboxem:
+
+            
+            Please modify the contents of this textbox so that the paths point to existing files.
+
+            [tu zaczyna się textbox]
+            walls/1/corner.png
+            walls/1/edge.png
+            walls/1/corner_fancy.png
+            
+            [OK]
+            
+
+		który prosi abyś skopiował to, zmienił manualnie ścieżki do plików których edytor nie odnalazł (z jakiegokolwiek powodu) i przekleił z powrotem do textboxa po czym wcisnął OK.
+
+
+	- Jeśli zniknie obrazek który nigdzie nie był użyty, to nic się nie stanie.
+
 ## Animacje
 
 Dla pojedynczej animacji, widoczne w edytorze będą następujące informacje:
