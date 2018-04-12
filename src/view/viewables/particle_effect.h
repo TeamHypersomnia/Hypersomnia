@@ -4,19 +4,8 @@
 #include "augs/templates/transform_types.h"
 
 #include "augs/misc/minmax.h"
-#include "augs/misc/constant_size_vector.h"
-#include "augs/misc/trivially_copyable_tuple.h"
-
-#include "game/container_sizes.h"
-
 #include "game/enums/render_layer.h"
-
-#include "game/transcendental/entity_id.h"
-
-#include "game/components/sprite_component.h"
-
 #include "view/viewables/particle_types.h"
-#include "view/viewables/particle_types_declaration.h"
 
 struct particle_effect_modifier;
 
@@ -93,10 +82,8 @@ struct particles_emission {
 	void apply_modifier(const particle_effect_modifier m);
 };
 
-constexpr std::size_t PARTICLE_EMISSIONS_IN_EFFECT_COUNT = 4;
-
 struct particle_effect {
 	// GEN INTROSPECTOR struct particle_effect
-	augs::constant_size_vector<particles_emission, PARTICLE_EMISSIONS_IN_EFFECT_COUNT> emissions = {};
+	std::vector<particles_emission> emissions;
 	// END GEN INTROSPECTOR
 };
