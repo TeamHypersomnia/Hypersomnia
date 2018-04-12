@@ -74,7 +74,8 @@ Pojedyncza animacja składa się z następujących informacji:
 		- Np. efekt dźwiękowy i cząsteczkowy.
 			- Możliwe że z offsetem, np. ``(x, y)`` o które należy przesunąć start cząsteczek żeby zgadzały się z tym gdzie pada but.
 - Nazwa własna animacji. Do zmiany w edytorze.
-	- Domyślnie nazwa pierwszej klatki.
+	- Domyślnie nazwa pierwszej klatki + dopisek "animation".
+		- Np. zbiór plików zaczynających się od ``ustrojstwo_1_20ms.png``, dostajemy "Ustrojstwo animation".
 
 ### Okno "Animations"
 
@@ -96,3 +97,7 @@ ustrojstwo_3_20ms.png
 
 można było go automatycznie zaimportować do edytora jako animacja.
 Będzie to możliwe z tego samego okna.
+
+- Rozwijalne drzewo nazwane "Import" pod którym znowu jest cała hierarchia wszystkich obrazków na dysku.
+	- Edytor wykryje, że kilka nazw ma ten sam pattern z numerami klatek i długościami w milisekundach.
+		- Wtedy zwinie taką listę w jeden element obok którego pojawi się przycisk "Import"
