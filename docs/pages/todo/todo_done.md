@@ -526,3 +526,18 @@ we consider whole type overrides too complex architeciturally:
 - create templates/traits folder
 - always_false -> identity_templates
 
+- make particles hold animation ids, current time and current frame number
+
+- animations in particles
+	- just hold animation id?
+	- what about recalculating the frame number?
+		- could be slow
+		- unless we calc time elapsed and current frame in the particles
+			- in this case it will be O(1)
+			- just keep animation time
+
+- assigning names to all logical assets in editor
+	- simplest would probably to store a string name in each
+		- it won't hinder cache much as it's just pointer + size
+	- just stick to names in the assets themselves for now
+

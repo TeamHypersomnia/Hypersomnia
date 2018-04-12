@@ -5,6 +5,9 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- let particle definitions be split into the invariant and variant parts, like components
+	- pro: better cache coherency
+
 - templatize some dangling memory stream arguments
 - add unique sprite decoration type
 

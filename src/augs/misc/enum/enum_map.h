@@ -257,7 +257,7 @@ namespace augs {
 		enum_map() = default;
 		
 		enum_map(const enum_map& b) {
-			for (auto& v : b) {
+			for (auto&& v : b) {
 				emplace(v.first, v.second);
 			}
 		}
@@ -265,7 +265,7 @@ namespace augs {
 		enum_map& operator=(const enum_map& b) {
 			clear();
 
-			for (const auto& v : b) {
+			for (const auto&& v : b) {
 				emplace(v.first, v.second);
 			}
 

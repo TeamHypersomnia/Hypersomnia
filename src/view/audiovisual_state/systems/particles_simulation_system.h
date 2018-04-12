@@ -59,7 +59,7 @@ public:
 		entity_id homing_target;
 
 		bool is_over() const {
-			return stream_lifetime_ms > stream_max_lifetime_ms;
+			return stream_lifetime_ms >= stream_max_lifetime_ms;
 		}
 	};
 

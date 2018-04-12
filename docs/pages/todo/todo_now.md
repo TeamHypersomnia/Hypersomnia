@@ -13,8 +13,6 @@ summary: Just a hidden scratchpad.
 	- flavours
 		- later will be sparse pools where performance requires it
 
-- make particles hold animation ids, current time and current frame number
-
 - tests of traits: check no ids in invariants, at least
 	- screw initial components really
 

@@ -56,24 +56,30 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 	highlights.advance(dt);
 
 	{
-		auto scope = measure_scope(profiler.particle_logic);
+		{
+			auto scope = measure_scope(profiler.integrate_particles);
 
-		particles.integrate_all_particles(
-			cosm,
-			dt,
-			anims,
-			interp
-		);
+			particles.integrate_all_particles(
+				cosm,
+				dt,
+				anims,
+				interp
+			);
+		}
 
-		particles.advance_visible_streams(
-			cone,
-			screen_size,
-			cosm,
-			input.particle_effects,
-			anims,
-			dt,
-			interp
-		);
+		{
+			auto scope = measure_scope(profiler.advance_particle_streams);
+
+			particles.advance_visible_streams(
+				cone,
+				screen_size,
+				cosm,
+				input.particle_effects,
+				anims,
+				dt,
+				interp
+			);
+		}
 	}
 
 	get<light_system>().advance_attenuation_variations(cosm, dt);

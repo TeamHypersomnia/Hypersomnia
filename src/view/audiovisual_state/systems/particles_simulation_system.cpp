@@ -225,17 +225,31 @@ void particles_simulation_system::advance_visible_streams(
 
 	auto advance_emissions = [&](
 		emission_instances& instances, 
-		const components::transform current_transform
+		const components::transform current_transform,
+		const bool visible_in_camera
 	) {
 		for (auto& instance : instances) {
 			const auto stream_alivity_mult = 
 				instance.stream_max_lifetime_ms == 0.f ? 1.f : instance.stream_lifetime_ms / instance.stream_max_lifetime_ms
 			;
 
-			const float stream_delta = std::min(delta.in_milliseconds(), instance.stream_max_lifetime_ms - instance.stream_lifetime_ms);
-			const auto& emission = instance.source_emission;
+			const auto stream_delta = [&]() mutable {
+				const auto dt = delta.in_milliseconds();
+				const auto remaining = instance.stream_max_lifetime_ms - instance.stream_lifetime_ms;
 
-			instance.stream_lifetime_ms += stream_delta;
+				if (dt >= remaining) {
+					instance.stream_lifetime_ms = instance.stream_max_lifetime_ms;
+					return remaining;
+				}
+				else {
+					instance.stream_lifetime_ms += dt;
+					return dt;
+				}
+			}();
+
+			if (!visible_in_camera) {
+				continue;
+			}
 
 			auto new_particles_to_spawn_by_time = instance.particles_per_sec * (stream_delta / 1000.f);
 
@@ -288,6 +302,8 @@ void particles_simulation_system::advance_visible_streams(
 						size_mult * instance.randomize_spawn_point_within_circle_of_outer_radius
 					);
 				}
+
+				const auto& emission = instance.source_emission;
 
 				/* MSVC ICE workaround */
 				auto& _rng = rng;
@@ -344,27 +360,17 @@ void particles_simulation_system::advance_visible_streams(
 
 		for (auto& c : fire_and_forget_emissions) { 
 			const auto where = c.transform;
+			const bool visible_in_camera = checked_cone.get_visible_world_rect_aabb(screen_size).hover(where.pos);
 
-			if (!checked_cone.get_visible_world_rect_aabb(screen_size).hover(where.pos)) {
-				continue;
-			}
-
-			advance_emissions(c.emission_instances, where);
+			advance_emissions(c.emission_instances, where, visible_in_camera);
 		}
 
 		for (auto& c : orbital_emissions) { 
 			const auto chase = c.chasing;
 			const auto where = find_transform(chase, cosmos, interp);
+			const bool visible_in_camera = where && checked_cone.get_visible_world_rect_aabb(screen_size).hover(where->pos);
 
-			if (!where) {
-				continue;
-			}
-
-			if (!checked_cone.get_visible_world_rect_aabb(screen_size).hover(where->pos)) {
-				continue;
-			}
-
-			advance_emissions(c.emission_instances, *where);
+			advance_emissions(c.emission_instances, *where, visible_in_camera);
 		}
 	}
 

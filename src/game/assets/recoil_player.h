@@ -7,6 +7,7 @@
 struct recoil_player {
 	// GEN INTROSPECTOR struct recoil_player
 	augs::constant_size_vector<real32, RECOIL_OFFSET_COUNT> offsets = {};
+	std::string name;
 	// END GEN INTROSPECTOR
 };
 

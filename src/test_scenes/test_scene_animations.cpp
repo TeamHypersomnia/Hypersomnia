@@ -5,6 +5,7 @@
 #include "game/assets/all_logical_assets.h"
 
 #include "test_scenes/test_scene_images.h"
+#include "augs/string/format_enum.h"
 
 void create_frames(
 	animation& anim,
@@ -33,7 +34,10 @@ void load_test_scene_animations(animations_pool& anims) {
 			50.0f
 		);
 
-		const auto id = to_animation_id(test_scene_animation_id::CAST_BLINK_ANIMATION);
+		const auto test_id = test_scene_animation_id::CAST_BLINK_ANIMATION;
+		anim.name = format_enum(test_id);
+
+		const auto id = to_animation_id(test_id);
 		const auto new_allocation = anims.allocate(std::move(anim));
 
 		ensure_eq(new_allocation.key, id);

@@ -5,6 +5,19 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- importing & using images in editor
+	- Makes no sense to always automatically import all loadables recursively from the folder
+		- E.g. because we don't always want all official images imported
+	- Or does it?
+		- if we do, though, merely adding and removing an image may result in an error in editor
+	- Importer window
+		- Unimported on filesystem
+			- Import next to each folder and file
+		- Imported
+			- shows how many flavours use an image
+			- Un-importing requires to delete all using flavours
+				- Which in turn requires deletion of entities with that flavour
+
 - how do we reload viewables that will be stored in pool?
 	- do we simply compare object vectors?
 		- if order changes, that accounts for a change as well because ids must point to correct things
@@ -36,33 +49,9 @@ summary: That which we are brainstorming at the moment.
 		- actually relinking still needed if after removing a flavour we allocate a new one
 	- could pool be rebuilt so that indirection indices are actually real indices?
 
-- animations in particles
-	- just hold animation id?
-	- what about recalculating the frame number?
-		- could be slow
-		- unless we calc time elapsed and current frame in the particles
-			- in this case it will be O(1)
-			- just keep animation time
-
 - always fill new workspace with some test scene essentials?
 	- so that e.g. no image ids in common state stay invalid
 	- can make those the first in test scene images so that we can stop importing images after some point
-
-- importing & using images in editor
-	- Makes no sense to always automatically import all loadables recursively from the folder
-		- E.g. because we don't always want all official images imported
-	- Or does it?
-		- if we do, though, merely adding and removing an image may result in an error in editor
-	- Importer window
-		- Unimported on filesystem
-			- Import next to each folder and file
-		- Imported
-			- shows how many flavours use an image
-			- Un-importing requires to delete all using flavours
-				- Which in turn requires deletion of entities with that flavour
-
-- let particle definitions be split into the invariant and variant parts, like components
-	- pro: better cache coherency
 
 - what do we do with invalid sprite ids?
 	- makes practically no sense to have an invalid image id

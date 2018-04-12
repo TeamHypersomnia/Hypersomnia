@@ -3,7 +3,9 @@
 #include "test_scenes/test_scene_images.h"
 
 enum class test_scene_animation_id {
+	// GEN INTROSPECTOR enum class test_scene_animation_id
 	CAST_BLINK_ANIMATION = 0
+	// END GEN INTROSPECTOR
 };
 
 struct animation;

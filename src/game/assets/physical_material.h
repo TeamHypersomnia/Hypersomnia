@@ -12,5 +12,6 @@ struct physical_material {
 
 	// GEN INTROSPECTOR struct physical_material
 	collision_sound_matrix_type collision_sound_matrix;
+	std::string name;
 	// END GEN INTROSPECTOR
 };
