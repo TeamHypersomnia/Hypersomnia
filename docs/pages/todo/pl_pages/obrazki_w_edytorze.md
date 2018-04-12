@@ -41,10 +41,12 @@ Gdziekolwiek w edytorze będziemy mieli do wyboru obrazek, będziemy mieli takie
 {% include image.html file="pages/todo/pl_pages/przykladowy_combo.png" %}
 
 Będzie to miniaturkowy hierarchiczny widok na strukturę obu folderów: oficjalnego i specyficznego dla projektu.  
-To combo zawsze będzie aktualne z tym co obecnie jest na dysku.
 
-Podświetlony na niebiesko zawsze będzie obecny obrazek, a zamknięte combo zawsze będzie miało napis formatu ``nazwa_pliku.png (sciezka/do/pliku)``
-Otwarte elementy drzewa będą zapamiętane (ImGui to ogarnia z buta) i dodatkowo zawsze po otwarciu comba będziemy rozwijać te foldery w których jest obecnie wybrany plik - aby natychmiast był widoczny.
+- To combo zawsze będzie aktualne z tym co obecnie jest na dysku.
+- Podświetlony na niebiesko zawsze będzie obecny obrazek.
+- Zamknięte combo zawsze będzie miało napis formatu ``nazwa_pliku.png (sciezka/do/pliku)``.
+- Otwarte elementy drzewa będą zapamiętane (ImGui to ogarnia z buta)
+	- Dodatkowo zawsze po otwarciu comba będziemy rozwijać te foldery w których jest obecnie wybrany plik - aby natychmiast był widoczny.
 
 ### Okno "Images"
 
