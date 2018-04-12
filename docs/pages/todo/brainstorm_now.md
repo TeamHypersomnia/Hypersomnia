@@ -6,6 +6,10 @@ summary: That which we are brainstorming at the moment.
 ---
 
 - importing & using images in editor
+	- Simply... keep track of whatever we actually use
+		- Images dialog would simply show all used images
+		- We will anyway need this logic of traversing all ids
+	- Invariants will look like they are picking file paths really
 	- Makes no sense to always automatically import all loadables recursively from the folder
 		- E.g. because we don't always want all official images imported
 	- Or does it?

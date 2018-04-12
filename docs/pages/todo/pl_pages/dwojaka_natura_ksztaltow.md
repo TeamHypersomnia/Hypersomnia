@@ -1,11 +1,9 @@
 ---
-title: Kontemplacje
+title: Dwojaka natura kształtów
 hide_sidebar: true
-permalink: considerations_pl
+permalink: dwojaka_natura_ksztaltow
 summary: Takie tam.
 ---
-
-## Dwojaka natura kształtów
 
 Zastanawiam się...  
 Obiekt który ma ciało fizyczne + sprite (skrzynka, gracz, ściana), ma **dwa** dane kształty:
@@ -20,7 +18,7 @@ W większości przypadków powyższe dwa będą się pokrywały, np. prosta kwad
 Jeśli jednak obiekt będzie nieregularny, powiedzmy skrzynka z uchwytami na brzegach, to chcemy dać jej odrobinę mniejsze ciało fizyczne by gracz lepiej "dotykał" ten obiekt.  
 Wtedy mamy dwie różniące się dane.
 
-### Problem: najeżdżanie myszką, zaznaczanie obiektów i snapowanie do grida.
+## Problem: najeżdżanie myszką, zaznaczanie obiektów i snapowanie do grida.
 
 - Jeśli obiekt jest tylko niefizyczną dekoracją, to nie ma problemu, zawsze zaznaczamy/snapujemy tylko kształt obrazkowej reprezentacji tej dekoracji.
 	- Np. podłoga, napis.
@@ -31,7 +29,7 @@ Wtedy mamy dwie różniące się dane.
 		- To na razie nie będzie tragedią (nie będzie często się zdarzać), a poprawienie tego teraz będzie dla mnie ogromnym bólem w dupie
 		- Przyszłe rozwiązanie: **jeśli ciało fizyczne nie pokrywa się z obrazkiem**, to dodatkowo nad obrazkiem rysujemy przerywaną linię tam gdzie jest ciało fizyczne, aby było widać gdzie trzeba najechać myszą
 
-### Problem: edycja jednego lub drugiego kształtu
+## Problem: edycja jednego lub drugiego kształtu
 
 - ``v`` - tryb ogólnej edycji kształtu:
 	- Dla niefizycznej dekoracji która jest obrazkiem - nie robimy nic.
@@ -44,7 +42,7 @@ Wtedy mamy dwie różniące się dane.
 		- ...każde przeciągnięcie wierzchołka albo rozciągnięcie rozmiaru - **automatycznie uaktualnia kształt fizyczny**, aby się zgadzał z nowym kształtem obrazkowej reprezentacji.
 		- Podobnie jak z niefizycznymi dekoracjami, możemy na to nałożyć pixel-art w rozmiarze 1:1.
 
-#### Przykładowy workflow, 1
+### Przykładowy workflow, 1
 
 - Wrzucamy nowego entita który jest trójkątną paką ze spritem 32x32.
 	- Generowane jest domyślne ciało fizyczne - prostokąt 32x32.
@@ -53,7 +51,7 @@ Wtedy mamy dwie różniące się dane.
 	- Obrazek pozostał nietknięty.
 		- Nie ma sensu powiększać albo pomniejszać zwykłego obrazka - będą to pixel-arty.
 
-#### Przykładowy workflow, 2
+### Przykładowy workflow, 2
 
 - Wrzucamy nowego entita który jest interaktywnym obiektem ze spritem 32x32.
 	- Generowane jest domyślne ciało fizyczne - prostokąt 32x32.
@@ -63,7 +61,7 @@ Wtedy mamy dwie różniące się dane.
 	- Obrazek pozostał nietknięty.
 		- Nie ma sensu powiększać albo pomniejszać zwykłego obrazka - będą to pixel-arty.
 
-#### Przykładowy workflow, 3
+### Przykładowy workflow, 3
 
 - Wrzucamy nowego entita o typie "wielokątne ciało" które ma teksturę ściany nieregularnej jaskinii, 256x256.
 	- Chcemy zrobić coś takiego:
