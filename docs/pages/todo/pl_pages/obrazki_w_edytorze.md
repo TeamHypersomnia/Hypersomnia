@@ -62,3 +62,37 @@ Znajdzie się tam to samo co w combo boxie z wyborem obrazka, z dwiema różnic
 		- Czy wygenerować desaturację (np. dla spelli do których nie ma wystarczająco many).
 	- Zmiany będą natychmiast miały efekt.
 		- Prawdopodobnie trzeba będzie sklepać asynchroniczną generację atlasu żeby się dało po ludzku manipulować parametry neon map.
+
+## Animacje
+
+Pojedyncza animacja składa się z następujących informacji:
+
+- Lista klatek. Klatka zawiera:
+	- Obrazek do wyświetlenia.
+	- Czas trwania klatki w milisekundach.
+	- (Opcjonalnie) efekt który ma zostać odegrany gdy nastąpi kolej tej klatki.
+		- Np. efekt dźwiękowy i cząsteczkowy.
+			- Możliwe że z offsetem, np. ``(x, y)`` o które należy przesunąć start cząsteczek żeby zgadzały się z tym gdzie pada but.
+- Nazwa własna animacji. Do zmiany w edytorze.
+	- Domyślnie nazwa pierwszej klatki.
+
+### Okno "Animations"
+
+Proste okno z liniowym widokiem na wszystkie animacje w projekcie.
+
+- Można stąd importować i edytować animacje.
+- Można je usuwać, ale tylko jeśli **nigdzie w grze nie jest używana ta animacja**.
+	- Najpierw trzeba będzie usunąć manualnie wszystkie byty (lub flavoury) które z niej korzystają, żeby nie było zaskoczenia.
+
+#### Automatyczny import
+
+Doszliśmy do wniosku że warto byłoby aby, mając zbiór plików rodzaju:
+
+```
+ustrojstwo_1_20ms.png
+ustrojstwo_2_20ms.png
+ustrojstwo_3_20ms.png
+```
+
+można było go automatycznie zaimportować do edytora jako animacja.
+Będzie to możliwe z tego samego okna.
