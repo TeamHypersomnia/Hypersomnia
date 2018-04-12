@@ -65,7 +65,7 @@ Znajdzie się tam to samo co w combo boxie z wyborem obrazka, z dwiema różnic
 
 ## Animacje
 
-Pojedyncza animacja składa się z następujących informacji:
+Dla pojedynczej animacji, widoczne w edytorze będą następujące informacje:
 
 - Lista klatek. Klatka zawiera:
 	- Obrazek do wyświetlenia.
