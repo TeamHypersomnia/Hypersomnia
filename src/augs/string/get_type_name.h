@@ -1,6 +1,5 @@
 #pragma once
 #include <string>
-#include <utility>
 
 #include "augs/templates/traits/is_std_array.h"
 
@@ -18,7 +17,7 @@ constexpr bool has_custom_type_name_v = has_custom_type_name<T>::value;
 template <class T>
 std::string get_type_name() {
 	if constexpr(is_std_array_v<T>) {
-		return get_type_name<typename T::value_type>() + '[' + std::to_string(std::tuple_size_v<T>) + ']';
+		return get_type_name<typename T::value_type>() + '[' + std::to_string(is_std_array<T>::size) + ']';
 	}
 
 	return demangle(typeid(T).name());
