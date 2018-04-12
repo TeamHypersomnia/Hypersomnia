@@ -24,7 +24,7 @@ struct description_pair {
 	std::string of_new;
 };
 
-struct property_editor_gui {
+struct property_editor_state {
 	entity_guid hovered_guid;
 
 	std::optional<ImGuiID> last_active;
@@ -38,6 +38,6 @@ struct field_address {
 
 struct property_editor_input {
 	const property_editor_settings& settings;
-	property_editor_gui& state;
+	property_editor_state& state;
 };
 

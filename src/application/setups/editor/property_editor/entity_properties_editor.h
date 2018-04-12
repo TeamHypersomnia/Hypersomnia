@@ -2,7 +2,7 @@
 #include "application/setups/editor/property_editor/make_field_comparator.h"
 
 #include "application/setups/editor/property_editor/property_editor_structs.h"
-#include "application/setups/editor/property_editor/property_editor_gui.h"
+#include "application/setups/editor/property_editor/general_edit_properties.h"
 
 template <class T>
 auto get_component_stem(const T&) {

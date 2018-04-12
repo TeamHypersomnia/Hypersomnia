@@ -14,6 +14,6 @@ struct editor_common_state_gui {
 	void perform(const editor_settings&, editor_command_input);
 
 private:
-	property_editor_gui properties_gui;
+	property_editor_state properties_gui;
 	bool acquire_once = false;
 };

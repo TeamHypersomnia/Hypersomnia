@@ -21,7 +21,7 @@ void editor_common_state_gui::open() {
 #include "application/intercosm.h"
 #include "application/setups/editor/editor_folder.h"
 
-#include "application/setups/editor/property_editor/property_editor_gui.h"
+#include "application/setups/editor/property_editor/general_edit_properties.h"
 #include "application/setups/editor/property_editor/property_editor_structs.h"
 
 #include "augs/readwrite/memory_stream.h"

@@ -28,6 +28,6 @@ struct editor_all_entities_gui {
 
 private:
 	std::string title;
-	property_editor_gui properties_gui;
+	property_editor_state properties_gui;
 	bool acquire_once = false;
 };

@@ -5,6 +5,8 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- research building with clang on windows?
+
 - let particle definitions be split into the invariant and variant parts, like components
 	- pro: better cache coherency
 

@@ -4,7 +4,7 @@
 
 #include "application/setups/editor/property_editor/make_field_comparator.h"
 
-#include "application/setups/editor/property_editor/property_editor_gui.h"
+#include "application/setups/editor/property_editor/general_edit_properties.h"
 #include "application/setups/editor/property_editor/property_editor_structs.h"
 
 template <class T>
