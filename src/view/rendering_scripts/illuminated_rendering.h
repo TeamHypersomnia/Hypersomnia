@@ -82,6 +82,8 @@ void illuminated_rendering(
 	const auto& cosmos = viewed_character.get_cosmos();
 	auto& profiler = in.frame_performance;
 	
+	const auto& anims = cosmos.get_logical_assets().get_store_by<assets::animation_id>();
+
 	const auto& interp = in.audiovisuals.get<interpolation_system>();
 	const auto& particles = in.audiovisuals.get<particles_simulation_system>();
 	const auto& wandering_pixels = in.audiovisuals.get<wandering_pixels_system>();
@@ -122,6 +124,7 @@ void illuminated_rendering(
 	auto draw_particles = [&](const render_layer layer) {
 		particles.draw_particles_as_sprites(
 			game_images,
+			anims,
 			basic_sprite_input,
 			layer
 		);
@@ -210,6 +213,7 @@ void illuminated_rendering(
 		screen_size,
 		interp,
 		particles,
+		anims,
 		visible.per_layer,
 		game_images
 	});

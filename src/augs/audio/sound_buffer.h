@@ -41,6 +41,13 @@ namespace augs {
 		augs::path_type path_template;
 		bool generate_mono = true;
 		// END GEN INTROSPECTOR
+
+		bool operator==(const sound_buffer_loading_input& b) const {
+			return 
+				path_template == b.path_template 
+				&& generate_mono == b.generate_mono
+			;
+		}
 	};
 
 	class sound_buffer {

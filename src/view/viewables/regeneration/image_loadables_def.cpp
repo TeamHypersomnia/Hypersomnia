@@ -4,6 +4,8 @@
 #include "view/viewables/regeneration/image_loadables_def.h"
 #include "view/viewables/regeneration/desaturations.h"
 
+#include "augs/templates/introspect.h"
+
 augs::path_type get_neon_map_path(augs::path_type from_source_path) {
 	return augs::path_type(GENERATED_FILES_DIR) += from_source_path.replace_extension(".neon_map.png");
 }
@@ -62,4 +64,8 @@ void image_loadables_def::regenerate_all_needed(
 			force_regenerate
 		);
 	}
+}
+
+bool image_loadables_def::operator==(const image_loadables_def& b) const {
+	return augs::recursive_equal(*this, b);
 }

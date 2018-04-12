@@ -20,7 +20,5 @@ summary: Just a hidden scratchpad.
 
 - fix all logical assets to not use those crazy tuples and getters, wow
 
-- nth_frame_duration_ms can account for 
-
 - disallow removing last frame from the animation and always require to create an animation from an existing set of frames
 	- simplifies calculations

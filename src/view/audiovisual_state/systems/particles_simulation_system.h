@@ -177,6 +177,7 @@ public:
 	template <class M>
 	void draw_particles_as_sprites(
 		const M& manager,
+		const animations_pool& anims,
 		const invariants::sprite::drawing_input basic_input,
 		const render_layer layer
 	) const {
@@ -185,12 +186,12 @@ public:
 		}
 
 		for (const auto& it : animated_particles[layer]) {
-			it.draw_as_sprite(manager, basic_input);
+			it.draw_as_sprite(manager, anims, basic_input);
 		}
 
 		for (const auto& cluster : homing_animated_particles[layer]) {
 			for (const auto& it : cluster.second) {
-				it.draw_as_sprite(manager, basic_input);
+				it.draw_as_sprite(manager, anims, basic_input);
 			}
 		}
 	}

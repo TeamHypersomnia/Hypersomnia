@@ -276,6 +276,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 		particles.draw_particles_as_sprites(
 			in.game_images,
+			in.animations,
 			basic,
 			render_layer::ILLUMINATING_PARTICLES
 		);

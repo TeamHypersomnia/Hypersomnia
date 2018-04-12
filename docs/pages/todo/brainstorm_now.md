@@ -5,6 +5,14 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- how do we reload viewables that will be stored in pool?
+	- do we simply compare object vectors?
+		- if order changes, that accounts for a change as well because ids must point to correct things
+		- do we need to compare whole pools or just objects?
+			- I guess pools because identity might've changed
+	- what about sparse pools?
+		- it won't have indirectors, so object vector check will be enough
+
 - sparse_pool implementation that avoids indirection?
 	- can have IDENTICAL interface as the pool
 		- even the pooled object ids can stay the same really
@@ -13,6 +21,9 @@ summary: That which we are brainstorming at the moment.
 		- we can let those several bytes slide
 	- we should always be wary of pessimistic cases of memory usage, anyway
 	- for now we can use pools for everything and incrementally introduce sparse_pool
+
+- once we have sparse_pool, the loaded caches and images in atlas can just be sparse pools as well?
+	- though the effect is ultimately the same and it's more container agnostic
 
 - flavour ids & allocation
 	- they are actually quite performance critical

@@ -43,15 +43,8 @@ void load_test_scene_particle_effects(
 		target.set_image(id, sz, col);
 	};
 
-	auto anim = anims[to_animation_id(assets::animation_id::CAST_BLINK_ANIMATION)]; animation();
-	anim.loop_mode = animation::loop_type::NONE;
-
-	create_frames(
-		anim,
-		test_scene_image_id::CAST_BLINK_1,
-		test_scene_image_id::CAST_BLINK_19,
-		50.0f
-	);
+	const auto animation_id = to_animation_id(test_scene_animation_id::CAST_BLINK_ANIMATION);
+	const auto& anim = anims[animation_id];
 
 	auto default_bounds = [](particles_emission& em) {
 		em.swings_per_sec_bound = { { 0.15f, 0.25f },{ 0.30f, 0.50f } };
@@ -151,7 +144,7 @@ void load_test_scene_particle_effects(
 			general_particle particle_definition;
 
 			particle_definition.angular_damping = 0;
-			set(particle_definition, assets::image_id(int(test_scene_image_id::ROUND_TRACE)), rgba(255, 255, 255, 255));
+			set(particle_definition, to_image_id(test_scene_image_id::ROUND_TRACE), rgba(255, 255, 255, 255));
 			particle_definition.unshrinking_time_ms = 30.f;
 			particle_definition.shrink_when_ms_remaining = 30.f;
 			particle_definition.alpha_levels = 1;
@@ -278,16 +271,14 @@ void load_test_scene_particle_effects(
 		em.starting_homing_force = float_range(100.f, 100.f);
 		em.ending_homing_force = float_range(10000.f, 10000.f);
 
-		const auto frame_duration = anim.frames[0].duration_milliseconds / 4.f;
-
 		for (size_t i = 0; i < anim.frames.size() - 1; ++i)
 		{
 			homing_animated_particle particle_definition;
 
 			particle_definition.linear_damping = 0;
-			particle_definition.starting_frame_num = static_cast<assets::image_id>(static_cast<int>(anim.frames[0].image_id) + i);
-			particle_definition.frame_count = anim.frames.size() - i;
-			particle_definition.frame_duration_ms = frame_duration;
+			particle_definition.animation.starting_frame_num = i;
+			particle_definition.animation.id = animation_id;
+			particle_definition.animation.speed_factor = 4.f;
 			particle_definition.color = white;
 
 			em.add_particle_definition(particle_definition);
@@ -298,9 +289,9 @@ void load_test_scene_particle_effects(
 			homing_animated_particle particle_definition;
 
 			particle_definition.linear_damping = 0;
-			particle_definition.starting_frame_num = static_cast<assets::image_id>(static_cast<int>(test_scene_image_id::CAST_BLINK_1) + i);
-			particle_definition.frame_count = 7 - i;
-			particle_definition.frame_duration_ms = frame_duration;
+			particle_definition.animation.starting_frame_num = i;
+			particle_definition.animation.speed_factor = 4.f;
+			particle_definition.animation.id = animation_id;
 			particle_definition.color = white;
 
 			em.add_particle_definition(particle_definition);
@@ -311,9 +302,9 @@ void load_test_scene_particle_effects(
 			homing_animated_particle particle_definition;
 
 			particle_definition.linear_damping = 0;
-			particle_definition.starting_frame_num = static_cast<assets::image_id>(static_cast<int>(test_scene_image_id::CAST_BLINK_1) + 2);
-			particle_definition.frame_count = 1;
-			particle_definition.frame_duration_ms = 700.f;
+			particle_definition.animation.starting_frame_num = 2;
+			particle_definition.animation.speed_factor = 4.f;
+			particle_definition.animation.id = animation_id;
 			particle_definition.color = white;
 
 			em.add_particle_definition(particle_definition);
@@ -356,16 +347,14 @@ void load_test_scene_particle_effects(
 			em.particle_lifetime_ms = float_range(100, 200);
 
 			{
-				const auto frame_duration = anim.frames[0].duration_milliseconds / 2.f;
-
 				for (size_t i = 0; i < anim.frames.size() - 1; ++i)
 				{
 					homing_animated_particle particle_definition;
 
 					particle_definition.linear_damping = 300;
-					particle_definition.starting_frame_num = static_cast<assets::image_id>(static_cast<int>(anim.frames[0].image_id) + i);
-					particle_definition.frame_count = anim.frames.size() - i;
-					particle_definition.frame_duration_ms = frame_duration;
+					particle_definition.animation.starting_frame_num = i;
+					particle_definition.animation.speed_factor = 2.f;
+					particle_definition.animation.id = animation_id;
 					particle_definition.color = white;
 
 					em.add_particle_definition(particle_definition);
@@ -373,16 +362,14 @@ void load_test_scene_particle_effects(
 			}
 
 			{
-				const auto frame_duration = anim.frames[0].duration_milliseconds / 2.f;
-
 				for (size_t i = 0; i < anim.frames.size() - 1; ++i)
 				{
 					homing_animated_particle particle_definition;
 
 					particle_definition.linear_damping = 300;
-					particle_definition.starting_frame_num = static_cast<assets::image_id>(static_cast<int>(anim.frames[0].image_id) + i);
-					particle_definition.frame_count = anim.frames.size() - i;
-					particle_definition.frame_duration_ms = frame_duration;
+					particle_definition.animation.starting_frame_num = i;
+					particle_definition.animation.speed_factor = 2.f;
+					particle_definition.animation.id = animation_id;
 					particle_definition.color = white;
 
 					em.add_particle_definition(particle_definition);
@@ -496,16 +483,14 @@ void load_test_scene_particle_effects(
 			em.rotation_speed = float_range(0, 0);
 			em.particle_lifetime_ms = float_range(200, 600);
 
-			const auto frame_duration = anim.frames[0].duration_milliseconds / 2.f;
-
 			for (size_t i = 0; i < anim.frames.size() - 1; ++i)
 			{
 				animated_particle particle_definition;
 
 				particle_definition.linear_damping = 1000;
-				particle_definition.starting_frame_num = static_cast<assets::image_id>(static_cast<int>(anim.frames[0].image_id) + i);
-				particle_definition.frame_count = anim.frames.size() - i;
-				particle_definition.frame_duration_ms = frame_duration;
+				particle_definition.animation.starting_frame_num = i;
+				particle_definition.animation.speed_factor = 2.f;
+				particle_definition.animation.id = animation_id;
 				particle_definition.acc.set(900, -900);
 				particle_definition.color = white;
 
@@ -517,7 +502,7 @@ void load_test_scene_particle_effects(
 
 				particle_definition.angular_damping = 0;
 				particle_definition.linear_damping = 1000;
-				set(particle_definition, assets::image_id(int(test_scene_image_id::CAST_BLINK_1) + 2), white);
+				set(particle_definition, to_image_id(test_scene_image_id::CAST_BLINK_3), white);
 				particle_definition.acc.set(900, -900);
 				particle_definition.alpha_levels = 1;
 
@@ -532,7 +517,7 @@ void load_test_scene_particle_effects(
 				particle_definition.acc.set(1200, -1200);
 				
 				sets(particle_definition,
-					assets::image_id(int(test_scene_image_id::BLANK)), 
+					to_image_id(test_scene_image_id::BLANK), 
 					vec2(1, 1),
 					white
 				);
@@ -612,16 +597,14 @@ void load_test_scene_particle_effects(
 			em.rotation_speed = float_range(0, 0);
 			em.particle_lifetime_ms = float_range(200, 600);
 
-			const auto frame_duration = anim.frames[0].duration_milliseconds / 2.f;
-
 			for (size_t i = 0; i < anim.frames.size() - 1; ++i)
 			{
 				animated_particle particle_definition;
 
 				particle_definition.linear_damping = 1000;
-				particle_definition.starting_frame_num = static_cast<assets::image_id>(static_cast<int>(anim.frames[0].image_id) + i);
-				particle_definition.frame_count = anim.frames.size() - i;
-				particle_definition.frame_duration_ms = frame_duration;
+				particle_definition.animation.starting_frame_num = i;
+				particle_definition.animation.speed_factor = 2.f;
+				particle_definition.animation.id = animation_id;
 				particle_definition.acc.set(900, -900);
 				particle_definition.color = white;
 
@@ -633,7 +616,7 @@ void load_test_scene_particle_effects(
 
 				particle_definition.angular_damping = 0;
 				particle_definition.linear_damping = 1000;
-				set(particle_definition, assets::image_id(int(test_scene_image_id::CAST_BLINK_1) + 2), white);
+				set(particle_definition, to_image_id(test_scene_image_id::CAST_BLINK_3), white);
 				particle_definition.acc.set(900, -900);
 				particle_definition.alpha_levels = 1;
 
@@ -648,7 +631,7 @@ void load_test_scene_particle_effects(
 				particle_definition.acc.set(1200, -1200);
 				
 				sets(particle_definition,
-					assets::image_id(int(test_scene_image_id::BLANK)), 
+					to_image_id(test_scene_image_id::BLANK), 
 					vec2(1, 1),
 					white
 				);
@@ -837,15 +820,13 @@ void load_test_scene_particle_effects(
 			em.add_particle_definition(particle_definition);
 		}
 
-		const auto frame_duration = anim.frames[0].duration_milliseconds / 3.f;
-
 		for (size_t i = 0; i < anim.frames.size() - 1; ++i) {
 			animated_particle particle_definition;
 
 			particle_definition.linear_damping = 0;
-			particle_definition.starting_frame_num = static_cast<assets::image_id>(static_cast<int>(anim.frames[0].image_id) + i);
-			particle_definition.frame_count = anim.frames.size() - i;
-			particle_definition.frame_duration_ms = frame_duration;
+			particle_definition.animation.starting_frame_num = i;
+			particle_definition.animation.speed_factor = 3.f;
+			particle_definition.animation.id = animation_id;
 			particle_definition.color = white;
 
 			em.add_particle_definition(particle_definition);

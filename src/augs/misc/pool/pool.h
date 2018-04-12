@@ -413,6 +413,19 @@ namespace augs {
 			return size() == max_size();
 		}
 
+		bool indirectors_equal(const pool& b) const {
+			static_assert(std::is_trivially_copyable_v<pool_indirector_type>);
+
+			return 
+				indirectors.size() == b.indirectors.size()
+				&& !std::memcmp(
+					indirectors.data(),
+				   	b.indirectors.data(),
+				   	indirectors.size() * sizeof(pool_indirector_type)
+				)
+			;
+		}
+
 		template <class F>
 		void for_each_object_and_id(F f) {
 			key_type id;

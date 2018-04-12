@@ -46,4 +46,6 @@ struct image_loadables_def {
 	std::optional<augs::path_type> find_desaturation_path() const;
 
 	vec2u read_source_image_size() const;
+
+	bool operator==(const image_loadables_def&) const;
 };

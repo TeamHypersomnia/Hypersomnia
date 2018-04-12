@@ -21,9 +21,13 @@ struct image_meta {
 	// GEN INTROSPECTOR struct image_meta
 	image_usage_as_button usage_as_button;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const image_meta& b) const;
 };
 
 struct image_cache {
+	image_cache() = default;
+
 	image_cache(
 		const image_loadables_def&,
 		const image_meta&
@@ -51,10 +55,10 @@ struct image_in_atlas {
 	}
 };
 
-struct loaded_image_caches_map : public std::vector<image_cache> {
-	using base = std::vector<image_cache>;
-	using base::base;
+class loaded_image_caches_map {
+	std::vector<image_cache> caches;
 
+public:
 	loaded_image_caches_map() = default;
 
 	explicit loaded_image_caches_map(
@@ -62,12 +66,12 @@ struct loaded_image_caches_map : public std::vector<image_cache> {
 		const image_metas_map&
 	);
 
-	decltype(auto) operator[](const assets::image_id id) {
-		return base::operator[](id.indirection_index);
+	decltype(auto) at(const assets::image_id id) const {
+		return caches.at(id.indirection_index);
 	}
 
-	decltype(auto) operator[](const assets::image_id id) const {
-		return base::operator[](id.indirection_index);
+	void clear() {
+		caches.clear();
 	}
 };
 

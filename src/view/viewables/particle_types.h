@@ -86,13 +86,14 @@ struct general_particle {
 struct animation_in_particle {
 	// GEN INTROSPECTOR struct animation_in_particle
 	unsigned starting_frame_num = 0;
+	float speed_factor = 1.f;
 
 	assets::animation_id id;
 	simple_animation_state state;
 	// END GEN INTROSPECTOR
 
 	void advance(const real32 dt, const animations_pool& anims) {
-		if (state.advance(dt, anims[id].frames, starting_frame_num)) {
+		if (state.advance(dt * speed_factor, anims[id].frames, starting_frame_num)) {
 			starting_frame_num = -1;
 		}
 	}

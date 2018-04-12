@@ -305,10 +305,10 @@ int work(const int argc, const char* const * const argv) try {
 	static auto load_all = [](const all_viewables_defs& new_defs) {
 		auto scope = measure_scope(profiler.reloading_viewables);
 
-		auto equal = [](const auto& a, const auto& b) {
-			return augs::recursive_equal(a, b);
+		auto pools_equal = [](const auto& a, const auto& b) {
+			return ranges_equal(a, b) && a.indirectors_equal(b);
 		};
-		
+
 		/* Atlas/meta cache pass */
 
 		{
@@ -322,53 +322,13 @@ int work(const int argc, const char* const * const argv) try {
 				new_atlas_required = true;
 			}
 
-			/* Check for unloaded and changed resources */
-			for (const auto& old : currently_loaded_defs.image_loadables) {
-				const auto key = old.first;
+			{
+				const auto& new_loadables = new_defs.image_loadables;
+				const auto& old_loadables = currently_loaded_defs.image_loadables;
 
-				const auto& old_loadables = old.second;
-
-				if (const auto new_loadables = mapped_or_nullptr(new_defs.image_loadables, key)) {
-					const bool loadables_changed = !equal(*new_loadables, old_loadables);
-
-					if (loadables_changed) {
-						/* Changed, reload */
-						new_atlas_required = true;
-					}
-
-#if LOADED_CACHES
-					const auto& new_meta = new_defs.image_metas.at(key);
-					const auto& old_meta = currently_loaded_defs.image_metas.at(key);
-
-					const bool meta_changed = !equal(old_meta, new_meta);
-
-					if (loadables_changed || meta_changed) {
-						loaded_image_caches.at(key) = { *new_loadables, new_meta };
-					}
-#endif
-				}
-				else {
-					/* Missing, unload */
+				if (!pools_equal(new_loadables, old_loadables)) {
 					new_atlas_required = true;
-#if LOADED_CACHES
-					loaded_image_caches.erase(key);
-#endif
 				}
-			}
-			
-			/* Check for new resources */
-			for (const auto& fresh : new_defs.image_loadables) {
-				const auto key = fresh.first;
-
-				if (nullptr == mapped_or_nullptr(currently_loaded_defs.image_loadables, key)) {
-					new_atlas_required = true;
-
-#if LOADED_CACHES
-					const auto& new_meta = new_defs.image_metas.at(key);
-					loaded_image_caches.emplace(fresh.second, new_meta);
-#endif
-				}
-				/* Otherwise it's already taken care of */
 			}
 
 			if (!(config.gui_font == loaded_gui_font)) {
@@ -414,7 +374,7 @@ int work(const int argc, const char* const * const argv) try {
 				};
 
 				if (const auto fresh = mapped_or_nullptr(new_defs.sounds, key)) {
-					if (!equal(*fresh, old.second)) {
+					if (!(*fresh == old.second)) {
 						/* Different from the fresh one, reload */
 						unload();
 						loaded_sounds.try_emplace(key, *fresh);

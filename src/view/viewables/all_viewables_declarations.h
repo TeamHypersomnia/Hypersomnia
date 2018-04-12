@@ -31,4 +31,4 @@ using particle_effects_map = asset_map<
 using image_loadables_map = image_id_pool<image_loadables_def>;
 using image_metas_map = image_id_pool<image_meta>;
 
-struct images_in_atlas_map;
+class images_in_atlas_map;

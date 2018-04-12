@@ -83,7 +83,7 @@ namespace augs {
 		}
 
 		// GEN INTROSPECTOR struct augs::sprite class id_type
-		id_type tex = id_type::INVALID;
+		id_type tex;
 		rgba color;
 		size_type size;
 		sprite_special_effect effect = sprite_special_effect::NONE;

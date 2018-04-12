@@ -32,8 +32,8 @@ namespace test_flavours {
 
 			frames[0] = { to_image_id(test_scene_image_id::BLANK), vec2(1, 1), white };
 			frames[1] = { to_image_id(test_scene_image_id::BLANK), vec2(2, 2), white };
-			frames[2] = { to_image_id(int(test_scene_image_id::CAST_BLINK_1) + 1), logicals, white };
-			frames[3] = { to_image_id(int(test_scene_image_id::CAST_BLINK_1) + 2), logicals, white };
+			frames[2] = { to_image_id(test_scene_image_id::CAST_BLINK_2), logicals, white };
+			frames[3] = { to_image_id(test_scene_image_id::CAST_BLINK_3), logicals, white };
 			frames[4] = { to_image_id(test_scene_image_id::BLANK), vec2(2, 2), white };
 
 			wandering.frame_duration_ms = 6000.f;
