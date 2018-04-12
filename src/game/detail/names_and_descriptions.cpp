@@ -1,7 +1,6 @@
 #include "game/enums/slot_function.h"
 #include "game/enums/item_category.h"
 #include "game/common_state/entity_name_str.h"
-#include "augs/ensure.h"
 
 entity_name_str get_bbcoded_item_categories(const item_category_flagset& flags) {
 	entity_name_str result;

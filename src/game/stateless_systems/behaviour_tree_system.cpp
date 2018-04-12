@@ -2,8 +2,6 @@
 
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_id.h"
-#include "augs/ensure.h"
-
 #include "game/components/behaviour_tree_component.h"
 
 #include "game/transcendental/entity_handle.h"

@@ -3,6 +3,7 @@
 #include "augs/misc/relinked_pool_id.h"
 #include "augs/templates/hash_templates.h"
 #include "augs/templates/string_templates_declaration.h"
+#include "augs/templates/get_current_type_name.h"
 
 #include "game/transcendental/entity_type_traits.h"
 #include "game/organization/all_entity_types_declaration.h"
@@ -42,7 +43,7 @@ struct constrained_entity_flavour_id {
 
 template <class... C>
 std::ostream& operator<<(std::ostream& out, const constrained_entity_flavour_id<C...> x) {
-	return out << "(" << get_type_name(x.type_id) << ": " << x.raw << ")";
+	return out << "(" << get_current_type_name(x.type_id) << ": " << x.raw << ")";
 }
 
 template <class E>

@@ -5,8 +5,6 @@
 #include <type_traits>
 #include <limits>
 
-#include "augs/ensure.h"
-
 inline bool typesafe_scanf_detail(
 	size_t source_pos,
 	size_t format_pos,

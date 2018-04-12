@@ -1,3 +1,4 @@
+#include "augs/misc/typesafe_sprintf.h"
 #include "application/setups/editor/editor_selection_groups.h"
 
 void editor_selection_groups::set_group(const unsigned index, const entity_id id) {

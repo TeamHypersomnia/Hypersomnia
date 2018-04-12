@@ -1,7 +1,7 @@
 #pragma once
 #include <cstddef>
 
-#include "augs/templates/string_templates.h"
+#include "augs/templates/get_type_name.h"
 #include "augs/templates/introspect.h"
 #include "augs/templates/recursive.h"
 #include "augs/templates/can_stream.h"

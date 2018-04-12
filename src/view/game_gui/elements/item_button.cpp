@@ -1,6 +1,7 @@
 #include "augs/ensure.h"
 #include "augs/drawing/drawing.h"
 #include "augs/gui/text/printer.h"
+#include "augs/templates/string_templates.h"
 
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
@@ -369,10 +370,10 @@ void item_button::draw_proc(
 				if (printing_charge_count) {
 					//label_str = 'x';
 					label_color.rgb() = white.rgb();
-					label_str += to_string(bottom_number_val);
+					label_str += to_string_ex(bottom_number_val);
 				}
 				else
-					label_str = to_string(bottom_number_val, 2);
+					label_str = to_string_ex(bottom_number_val, 2);
 
 				if (trim_zero && label_str[0] == '0') {
 					label_str.erase(label_str.begin());

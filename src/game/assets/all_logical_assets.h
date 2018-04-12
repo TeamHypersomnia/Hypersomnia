@@ -1,4 +1,6 @@
 #pragma once
+#include <tuple>
+
 #include "augs/templates/container_templates.h"
 
 #include "game/assets/asset_containers.h"

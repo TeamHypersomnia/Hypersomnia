@@ -218,7 +218,7 @@ std::optional<drag_and_drop_result> prepare_drag_and_drop_result(
 							charges_text = " all";
 						}
 						else {
-							charges_text = " " + to_string(drop.result.transferred_charges);
+							charges_text = " " + std::to_string(drop.result.transferred_charges);
 						}
 					}
 

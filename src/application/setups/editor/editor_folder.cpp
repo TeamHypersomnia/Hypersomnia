@@ -1,3 +1,5 @@
+#include "augs/templates/string_templates.h"
+
 #include "application/intercosm.h"
 #include "application/setups/editor/editor_folder.h"
 #include "application/setups/editor/editor_paths.h"

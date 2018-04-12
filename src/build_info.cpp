@@ -1,4 +1,4 @@
-#include "augs/templates/string_templates.h"
+#include "augs/templates/get_type_name.h"
 
 #include "augs/templates/algorithm_templates.h"
 #include "augs/filesystem/file.h"

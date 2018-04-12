@@ -3,6 +3,7 @@
 #include "augs/filesystem/path.h"
 #include "augs/templates/for_each_std_get.h"
 #include "augs/templates/string_templates.h"
+#include "augs/templates/get_type_name.h"
 
 #include "augs/misc/typesafe_sprintf.h"
 

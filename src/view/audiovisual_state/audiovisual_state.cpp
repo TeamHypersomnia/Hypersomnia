@@ -387,7 +387,7 @@ void audiovisual_state::standard_post_solve(const const_logic_step step, const a
 
 		const auto number_value = static_cast<int>(h.effective_amount);
 
-		vn.text = to_string(std::abs(number_value ? number_value : 1));
+		vn.text = std::to_string(std::abs(number_value ? number_value : 1));
 		vn.color = number_col;
 		
 		vn.pos = h.point_of_impact;

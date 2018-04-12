@@ -9,7 +9,7 @@
 #include <fstream>
 #include <experimental/filesystem>
 
-#include "augs/ensure.h"
+#include "augs/misc/typesafe_sprintf.h"
 #include "augs/filesystem/path.h"
 
 namespace augs {

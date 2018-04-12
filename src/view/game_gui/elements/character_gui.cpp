@@ -1,5 +1,6 @@
+#include "augs/ensure.h"
 #include "view/game_gui/game_gui_element_location.h"
-#include "character_gui.h"
+#include "view/game_gui/elements/character_gui.h"
 
 #include "augs/gui/text/printer.h"
 #include "augs/templates/always_false.h"
@@ -373,7 +374,7 @@ void character_gui::draw_cursor_with_tooltip(
 					if (item.get_charges() > 1) {
 						const auto gui_cursor_size = manager.at(gui_cursor).get_size();
 
-						const auto charges_text = to_string(dragged_charges);
+						const auto charges_text = std::to_string(dragged_charges);
 
 						augs::gui::text::print_stroked(
 							output,

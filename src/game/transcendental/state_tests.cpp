@@ -5,6 +5,7 @@
 
 #include "augs/filesystem/file.h"
 #include "augs/templates/introspection_utils/describe_fields.h"
+#include "augs/templates/get_type_name.h"
 #include "augs/readwrite/delta_compression.h"
 
 #include "game/transcendental/cosmos.h"

@@ -290,7 +290,7 @@ std::string format_space_units(const unsigned u) {
 		return "0";
 	}
 
-	return to_string(u / double(SPACE_ATOMS_PER_UNIT), 2);
+	return to_string_ex(u / double(SPACE_ATOMS_PER_UNIT), 2);
 }
 
 unsigned calc_space_occupied_with_children(const const_entity_handle item_entity) {

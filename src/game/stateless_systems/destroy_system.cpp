@@ -10,8 +10,6 @@
 #include "game/transcendental/logic_step.h"
 #include "game/transcendental/data_living_one_step.h"
 
-#include "augs/ensure.h"
-
 #include "game/organization/all_component_includes.h"
 
 #include "game/detail/inventory/perform_transfer.h"

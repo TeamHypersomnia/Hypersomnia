@@ -297,5 +297,5 @@ std::ostream& operator<<(
 	std::ostream& out,
    	const specific_entity_handle<is_const, entity_type, identifier_provider> x
 ) {
-	return out << typesafe_sprintf("%x-%x", to_string(x.get_name()), x.get_id());
+	return out << typesafe_sprintf("%x-%x", x.get_name(), x.get_id());
 }

@@ -1,8 +1,6 @@
 #pragma once
 #include "augs/pad_bytes.h"
 
-#include "augs/ensure.h"
-
 #include "augs/math/vec2.h"
 #include "augs/math/rects.h"
 

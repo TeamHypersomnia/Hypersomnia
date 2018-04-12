@@ -2,10 +2,8 @@
 #include <limits>
 #include <type_traits>
 
-#include "augs/ensure.h"
 #include "augs/readwrite/byte_readwrite_declaration.h"
 #include "augs/templates/container_traits.h"
-#include "augs/templates/string_templates.h"
 
 namespace augs {
 	template <class T, class size_type>
@@ -14,7 +12,6 @@ namespace augs {
 	public:
 		void overflow_check() {
 			if (overflowed()) {
-				LOG("Warning! %x has overflowed - clearing the container.", get_type_name<T>());
 				clear();
 			}
 		}

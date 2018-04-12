@@ -1,5 +1,6 @@
 #include "augs/misc/enum/enum_map.h"
 #include "augs/templates/enum_introspect.h"
+#include "augs/templates/string_templates_declaration.h"
 #include "augs/filesystem/file.h"
 #include "augs/audio/sound_buffer.h"
 

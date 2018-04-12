@@ -1,4 +1,5 @@
 #include "clipboard.h"
+#include "augs/ensure.h"
 #include "augs/window_framework/platform_utils.h"
 
 namespace augs {

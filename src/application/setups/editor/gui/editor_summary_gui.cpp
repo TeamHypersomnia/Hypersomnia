@@ -1,3 +1,5 @@
+#include "augs/templates/string_templates.h"
+
 #include "application/setups/editor/editor_setup.h"
 #include "application/setups/editor/gui/editor_summary_gui.h"
 

@@ -9,6 +9,7 @@
 #include <AL/alext.h>
 #endif
 
+#include "augs/log.h"
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
 #include "augs/audio/audio_settings.h"

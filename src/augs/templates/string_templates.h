@@ -9,15 +9,11 @@
 #include "augs/ensure.h"
 
 #include "augs/templates/maybe_const.h"
-
-#include "augs/templates/type_in_list_id.h"
-#include "augs/templates/get_by_dynamic_id.h"
 #include "augs/templates/is_std_array.h"
-
 #include "augs/templates/string_templates_declaration.h"
 
 template <class T>
-std::string to_string(
+std::string to_string_ex(
 	const T& val, 
 	const int decimal_precision = -1, 
 	bool fixed_precision = false
@@ -151,67 +147,5 @@ auto format_as_bytes(const T& t) {
 	}
 
 	return output;
-}
-
-std::string demangle(const char*);
-
-template <class T, class = void>
-struct has_custom_type_name : std::false_type {};
-
-template <class T>
-struct has_custom_type_name<T, decltype(T::get_custom_type_name(), void())> : std::true_type {};
-
-template <class T>
-constexpr bool has_custom_type_name_v = has_custom_type_name<T>::value;
-
-template <class T>
-std::string get_type_name() {
-	if constexpr(is_std_array_v<T>) {
-		return get_type_name<typename T::value_type>() + '[' + std::to_string(std::tuple_size_v<T>) + ']';
-	}
-
-	auto name = std::string(demangle(typeid(T).name()));
-	str_ops(name).multi_replace_all({ "struct ", "class ", "enum " }, "");
-	return name;
-}
-
-template <class T>
-std::string get_type_name(const T&) {
-	return get_type_name<T>();
-}
-
-
-template <class T>
-std::string get_type_name(const type_in_list_id<T>& id) {
-	return get_by_dynamic_id(
-		typename type_in_list_id<T>::list_type(),
-		id,
-		[](auto e){
-			return get_type_name(e);
-		}
-	);
-}
-
-template <class T>
-std::string get_type_name_strip_namespace() {
-	if constexpr(has_custom_type_name_v<T>) {
-		return T::get_custom_type_name();
-	}
-	else {
-		auto name = get_type_name<T>();
-
-		if (const auto it = name.rfind("::");
-			it != std::string::npos
-		) {
-			name = name.substr(it + 2);
-		}
-
-		return name;
-	}
-}
-
-template <class T>
-std::string get_type_name_strip_namespace(const T& t) {
-	return get_type_name_strip_namespace<std::decay_t<T>>();
 }
 
