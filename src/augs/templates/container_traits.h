@@ -3,7 +3,7 @@
 #include <cstddef>
 #include <utility>
 
-#include "augs/templates/is_std_array.h"
+#include "augs/templates/traits/is_std_array.h"
 #include "augs/templates/has_begin_and_end.h"
 
 template <int t>

@@ -6,8 +6,8 @@
 
 #include "augs/templates/get_type_name.h"
 #include "augs/templates/string_to_enum.h"
-#include "augs/templates/is_variant.h"
-#include "augs/templates/is_optional.h"
+#include "augs/templates/traits/is_variant.h"
+#include "augs/templates/traits/is_optional.h"
 #include "augs/templates/exception_templates.h"
 #include "augs/templates/container_templates.h"
 #include "augs/templates/introspect.h"

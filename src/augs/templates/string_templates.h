@@ -9,7 +9,7 @@
 #include "augs/ensure.h"
 
 #include "augs/templates/maybe_const.h"
-#include "augs/templates/is_std_array.h"
+#include "augs/templates/traits/is_std_array.h"
 #include "augs/templates/string_templates_declaration.h"
 
 template <class T>

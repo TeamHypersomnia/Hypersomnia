@@ -1,7 +1,7 @@
 #pragma once
 #include "augs/ensure.h"
 #include "augs/templates/maybe_const.h"
-#include "augs/templates/is_comparable.h"
+#include "augs/templates/traits/is_comparable.h"
 #include "augs/templates/container_templates.h"
 #include "augs/misc/enum/enum_boolset.h"
 #include "augs/misc/simple_pair.h"

@@ -1,7 +1,7 @@
 #pragma once
 #include "augs/pad_bytes.h"
 #include "game/assets/ids/is_asset_id.h"
-#include "augs/templates/is_tuple.h"
+#include "augs/templates/traits/is_tuple.h"
 #include "augs/templates/type_matching_and_indexing.h"
 #include "augs/templates/string_templates_declaration.h"
 #include "augs/drawing/flip.h"

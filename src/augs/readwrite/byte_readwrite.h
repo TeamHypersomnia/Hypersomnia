@@ -7,7 +7,7 @@
 
 #include "augs/templates/container_traits.h"
 #include "augs/templates/byte_type_for.h"
-#include "augs/templates/is_variant.h"
+#include "augs/templates/traits/is_variant.h"
 #include "augs/templates/for_each_type.h"
 
 #include "augs/readwrite/byte_readwrite_declaration.h"

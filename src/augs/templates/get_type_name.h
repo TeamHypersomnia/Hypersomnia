@@ -2,7 +2,7 @@
 #include <string>
 #include <utility>
 
-#include "augs/templates/is_std_array.h"
+#include "augs/templates/traits/is_std_array.h"
 
 std::string demangle(const char*);
 

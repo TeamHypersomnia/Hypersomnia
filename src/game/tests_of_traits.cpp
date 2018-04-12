@@ -1,6 +1,6 @@
 #include "augs/filesystem/path.h"
 
-#include "augs/templates/is_comparable.h"
+#include "augs/templates/traits/is_comparable.h"
 #include "augs/templates/type_map.h"
 #include "augs/readwrite/custom_lua_representations.h"
 
