@@ -524,3 +524,5 @@ we consider whole type overrides too complex architeciturally:
 - fix all logical assets to not use those crazy tuples and getters, wow
 
 - create templates/traits folder
+- always_false -> identity_templates
+

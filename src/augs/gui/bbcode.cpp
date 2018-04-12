@@ -11,7 +11,7 @@
 #include <utility>
 #include <variant>
 
-#include "augs/templates/string_templates.h"
+#include "augs/string/string_templates.h"
 #include "augs/misc/scope_guard.h"
 #include "augs/ensure.h"
 

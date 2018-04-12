@@ -1,5 +1,5 @@
-#include "augs/templates/string_templates.h"
-#include "augs/templates/get_type_name.h"
+#include "augs/string/string_templates.h"
+#include "augs/string/get_type_name.h"
 
 std::string to_lowercase(std::string s) {
 	return str_ops(s).to_lowercase().subject;

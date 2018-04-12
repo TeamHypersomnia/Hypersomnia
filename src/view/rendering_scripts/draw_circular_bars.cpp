@@ -4,7 +4,7 @@
 #include "view/audiovisual_state/systems/interpolation_system.h"
 #include "game/components/sentience_component.h"
 #include "game/components/container_component.h"
-#include "augs/templates/string_templates.h"
+#include "augs/string/string_templates.h"
 #include "game/detail/describers.h"
 #include "augs/graphics/vertex.h"
 #include "augs/gui/text/printer.h"

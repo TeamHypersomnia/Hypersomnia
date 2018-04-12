@@ -5,7 +5,7 @@
 #include <type_traits>
 #include <limits>
 
-#include "augs/misc/pretty_print.h"
+#include "augs/string/pretty_print.h"
 
 inline void typesafe_sprintf_detail(std::size_t, std::string&) {}
 

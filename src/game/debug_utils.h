@@ -1,6 +1,6 @@
 #pragma once
 #include "augs/log.h"
-#include "augs/misc/typesafe_sprintf.h"
+#include "augs/string/typesafe_sprintf.h"
 
 template <class E>
 void warning_other(const E handle, const std::string& content) {

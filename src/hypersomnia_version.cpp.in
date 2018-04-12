@@ -6,7 +6,7 @@
 #include "hypersomnia_version.h"
 
 #if WAS_VERSION_GENERATOR_BUILT
-#include "augs/misc/typesafe_sprintf.h"
+#include "augs/string/typesafe_sprintf.h"
 #include "game/transcendental/entity_id.h"
 
 hypersomnia_version::hypersomnia_version() :

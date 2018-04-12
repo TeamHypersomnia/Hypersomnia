@@ -12,7 +12,7 @@
 #include "augs/ensure.h"
 #include "augs/filesystem/file.h"
 
-#include "augs/templates/string_templates.h"
+#include "augs/string/string_templates.h"
 #include <fstream>
 
 #include "application/config_lua_table.h"

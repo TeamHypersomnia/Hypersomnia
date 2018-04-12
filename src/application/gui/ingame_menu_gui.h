@@ -2,7 +2,7 @@
 #include "augs/misc/machine_entropy.h"
 #include "augs/gui/formatted_string.h"
 #include "augs/templates/enum_introspect.h"
-#include "augs/templates/format_enum.h"
+#include "augs/string/format_enum.h"
 
 #include "view/necessary_resources.h"
 

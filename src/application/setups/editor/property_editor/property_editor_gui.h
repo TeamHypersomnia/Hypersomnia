@@ -3,14 +3,14 @@
 #include "game/assets/ids/is_asset_id.h"
 #include "augs/templates/traits/is_tuple.h"
 #include "augs/templates/type_matching_and_indexing.h"
-#include "augs/templates/string_templates_declaration.h"
+#include "augs/string/string_templates_declaration.h"
 #include "augs/drawing/flip.h"
 
 #include "application/setups/editor/editor_settings.h"
 #include "application/setups/editor/property_editor/property_editor_structs.h"
 #include "application/setups/editor/property_editor/property_editor_settings.h"
 
-#include "augs/templates/format_enum.h"
+#include "augs/string/format_enum.h"
 #include "augs/misc/imgui/imgui_enum_combo.h"
 
 template <class A, class B>

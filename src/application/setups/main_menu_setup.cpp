@@ -2,7 +2,7 @@
 #include "augs/misc/action_list/standard_actions.h"
 
 #include "augs/filesystem/file.h"
-#include "augs/templates/string_templates.h"
+#include "augs/string/string_templates.h"
 
 #include "augs/audio/sound_data.h"
 #include "augs/audio/sound_buffer.h"

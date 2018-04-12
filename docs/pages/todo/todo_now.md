@@ -7,8 +7,6 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
-- always_false -> identity_templates
-
 - use pools and pool ids for:
 	- all logical assets
 	- viewables

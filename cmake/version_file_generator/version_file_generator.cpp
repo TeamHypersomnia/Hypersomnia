@@ -8,9 +8,9 @@ using namespace std::chrono;
 #include "augs/misc/scope_guard.h"
 #include "augs/window_framework/exec.h"
 #include "augs/filesystem/file.h"
-#include "augs/misc/typesafe_sprintf.h"
+#include "augs/string/typesafe_sprintf.h"
 #include "augs/misc/time_utils.h"
-#include "augs/templates/string_templates.h"
+#include "augs/string/string_templates.h"
 
 int main(int argc, char** argv) {
 	auto start = high_resolution_clock::now();

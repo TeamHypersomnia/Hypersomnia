@@ -1,5 +1,5 @@
 #include "augs/window_framework/platform_utils.h"
-#include "augs/templates/string_templates.h"
+#include "augs/string/string_templates.h"
 
 #include "augs/filesystem/file.h"
 #include "augs/window_framework/shell.h"

@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/templates/get_type_name.h"
+#include "augs/string/get_type_name.h"
 #include "game/common_state/entity_flavours.h"
 
 #include "application/setups/editor/property_editor/make_field_comparator.h"

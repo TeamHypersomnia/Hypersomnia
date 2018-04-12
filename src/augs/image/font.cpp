@@ -10,7 +10,7 @@
 
 #include "augs/global_libraries.h"
 #include "augs/filesystem/file.h"
-#include "augs/templates/string_templates.h"
+#include "augs/string/string_templates.h"
 #include "augs/misc/scope_guard.h"
 #include "augs/misc/minmax.h"
 

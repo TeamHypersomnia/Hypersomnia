@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/misc/typesafe_sprintf.h"
+#include "augs/string/typesafe_sprintf.h"
 
 struct error_with_typesafe_sprintf : public std::runtime_error {
 	using std::runtime_error::what;

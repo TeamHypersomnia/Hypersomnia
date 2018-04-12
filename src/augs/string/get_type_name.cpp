@@ -1,5 +1,5 @@
-#include "augs/templates/get_type_name.h"
-#include "augs/templates/string_templates.h"
+#include "augs/string/get_type_name.h"
+#include "augs/string/string_templates.h"
 
 #if PLATFORM_UNIX
 #include <cstdlib>

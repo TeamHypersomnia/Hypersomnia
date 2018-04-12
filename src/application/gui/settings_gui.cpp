@@ -2,7 +2,7 @@
 
 #include "augs/templates/introspect.h"
 #include "augs/templates/enum_introspect.h"
-#include "augs/templates/format_enum.h"
+#include "augs/string/format_enum.h"
 
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/misc/imgui/imgui_enum_combo.h"

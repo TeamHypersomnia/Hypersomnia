@@ -6,7 +6,7 @@
 #include "game/detail/entity_scripts.h"
 #include "game/transcendental/entity_handle.h"
 
-#include "augs/templates/string_templates.h"
+#include "augs/string/string_templates.h"
 
 bool capability_comparison::is_legal() const {
 	return

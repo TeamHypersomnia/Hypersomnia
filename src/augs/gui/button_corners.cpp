@@ -1,5 +1,5 @@
 #include "augs/templates/introspect.h"
-#include "augs/templates/string_templates.h"
+#include "augs/string/string_templates.h"
 
 #include "augs/gui/button_corners.h"
 

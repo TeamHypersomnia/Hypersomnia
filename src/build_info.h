@@ -2,10 +2,10 @@
 #include "hypersomnia_version.h"
 #include "augs/filesystem/path.h"
 #include "augs/templates/for_each_std_get.h"
-#include "augs/templates/string_templates.h"
-#include "augs/templates/get_type_name.h"
+#include "augs/string/string_templates.h"
+#include "augs/string/get_type_name.h"
 
-#include "augs/misc/typesafe_sprintf.h"
+#include "augs/string/typesafe_sprintf.h"
 
 #include "game/organization/for_each_entity_type.h"
 #include "game/transcendental/entity_id.h"

@@ -1,7 +1,7 @@
 #pragma once
 #include "augs/templates/introspect_declaration.h"
 #include "augs/templates/algorithm_templates.h"
-#include "augs/templates/string_templates_declaration.h"
+#include "augs/string/string_templates_declaration.h"
 #include "augs/misc/measurements.h"
 #include "augs/misc/scope_guard.h"
 

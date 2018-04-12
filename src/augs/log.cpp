@@ -6,7 +6,7 @@
 #include "augs/math/vec2.h"
 
 #include "augs/filesystem/file.h"
-#include "augs/templates/string_templates.h"
+#include "augs/string/string_templates.h"
 
 #define ENABLE_LOG 1
 

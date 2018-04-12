@@ -1,11 +1,11 @@
 #pragma once
 #include <cstddef>
 
-#include "augs/templates/get_type_name.h"
+#include "augs/string/get_type_name.h"
 #include "augs/templates/introspect.h"
 #include "augs/templates/recursive.h"
 #include "augs/templates/can_stream.h"
-#include "augs/misc/typesafe_sprintf.h"
+#include "augs/string/typesafe_sprintf.h"
 
 template <class T>
 std::string conditional_to_string(const T& t) {

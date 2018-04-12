@@ -2,7 +2,7 @@
 #include <string>
 #include "3rdparty/imgui/imgui.h"
 #include "augs/graphics/rgba.h"
-#include "augs/templates/string_templates_declaration.h"
+#include "augs/string/string_templates_declaration.h"
 #include "augs/filesystem/path.h"
 
 #if LUA_TRAITS_INCLUDED

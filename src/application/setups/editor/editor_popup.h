@@ -1,6 +1,6 @@
 #pragma once
 #include <map>
-#include "augs/misc/typesafe_sprintf.h"
+#include "augs/string/typesafe_sprintf.h"
 
 struct editor_popup {
 	template <class C>

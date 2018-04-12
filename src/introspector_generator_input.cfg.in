@@ -55,7 +55,7 @@ generated-file-format:
 #include <string>
 
 #include "augs/drawing/flip.h"
-#include "augs/templates/get_type_name.h"
+#include "augs/string/get_type_name.h"
 #include "augs/templates/nth_type_in.h"
 #include "augs/misc/trivially_copyable_tuple.h"
 #include "augs/misc/imgui/imguicol_helper.h"

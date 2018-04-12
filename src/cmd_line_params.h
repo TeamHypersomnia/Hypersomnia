@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/misc/typesafe_sscanf.h"
+#include "augs/string/typesafe_sscanf.h"
 #include "augs/filesystem/path.h"
 
 struct cmd_line_params {

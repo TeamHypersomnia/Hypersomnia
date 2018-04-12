@@ -1,4 +1,4 @@
-#include "augs/templates/string_templates.h"
+#include "augs/string/string_templates.h"
 #include "game/components/interpolation_component.h"
 #include "game/components/flags_component.h"
 #include "game/components/fixtures_component.h"

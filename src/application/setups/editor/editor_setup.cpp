@@ -1,4 +1,4 @@
-#include "augs/templates/string_templates.h"
+#include "augs/string/string_templates.h"
 #include "augs/templates/algorithm_templates.h"
 #include "augs/misc/time_utils.h"
 #include "augs/misc/imgui/imgui_utils.h"

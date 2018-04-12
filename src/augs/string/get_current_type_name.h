@@ -1,6 +1,6 @@
 #pragma once
 #include "augs/templates/get_by_dynamic_id.h"
-#include "augs/templates/get_type_name.h"
+#include "augs/string/get_type_name.h"
 
 template <class T>
 std::string get_current_type_name(const type_in_list_id<T>& id) {

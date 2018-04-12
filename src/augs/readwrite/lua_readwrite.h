@@ -4,8 +4,7 @@
 #include "augs/ensure.h"
 #include "augs/pad_bytes.h"
 
-#include "augs/templates/get_type_name.h"
-#include "augs/templates/string_to_enum.h"
+#include "augs/string/get_type_name.h"
 #include "augs/templates/traits/is_variant.h"
 #include "augs/templates/traits/is_optional.h"
 #include "augs/templates/exception_templates.h"
@@ -13,6 +12,8 @@
 #include "augs/templates/introspect.h"
 #include "augs/templates/for_each_type.h"
 #include "augs/templates/identity_templates.h"
+
+#include "augs/string/string_to_enum.h"
 
 #include "augs/readwrite/custom_lua_representations.h"
 #include "augs/misc/lua/lua_utils.h"

@@ -2,7 +2,7 @@
 #include <vector>
 #include <cstring>
 
-#include "augs/misc/typesafe_sprintf.h"
+#include "augs/string/typesafe_sprintf.h"
 #include "augs/build_settings/setting_enable_debug_log.h"
 
 struct log_entry {

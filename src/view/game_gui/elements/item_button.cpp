@@ -1,7 +1,7 @@
 #include "augs/ensure.h"
 #include "augs/drawing/drawing.h"
 #include "augs/gui/text/printer.h"
-#include "augs/templates/string_templates.h"
+#include "augs/string/string_templates.h"
 
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"

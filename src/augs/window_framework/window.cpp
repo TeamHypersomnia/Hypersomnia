@@ -1,6 +1,6 @@
 #include <algorithm>
 
-#include "augs/templates/string_templates.h"
+#include "augs/string/string_templates.h"
 #include "augs/templates/corresponding_field.h"
 #include "augs/templates/algorithm_templates.h"
 

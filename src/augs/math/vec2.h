@@ -9,8 +9,8 @@
 #include "augs/templates/algorithm_templates.h"
 #include "augs/templates/hash_templates.h"
 
-#include "augs/misc/typesafe_sprintf.h"
-#include "augs/misc/typesafe_sscanf.h"
+#include "augs/string/typesafe_sprintf.h"
+#include "augs/string/typesafe_sscanf.h"
 
 template <class T, class = void>
 struct has_x_and_y : std::false_type {};

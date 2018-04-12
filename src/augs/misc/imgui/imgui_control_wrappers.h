@@ -6,8 +6,8 @@
 #include "augs/templates/container_templates.h"
 #include "augs/templates/traits/function_traits.h"
 #include "augs/templates/corresponding_field.h"
-#include "augs/templates/string_templates.h"
-#include "augs/templates/format_enum.h"
+#include "augs/string/string_templates.h"
+#include "augs/string/format_enum.h"
 
 #include "augs/misc/minmax.h"
 

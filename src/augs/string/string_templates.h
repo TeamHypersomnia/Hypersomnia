@@ -10,7 +10,7 @@
 
 #include "augs/templates/maybe_const.h"
 #include "augs/templates/traits/is_std_array.h"
-#include "augs/templates/string_templates_declaration.h"
+#include "augs/string/string_templates_declaration.h"
 
 template <class T>
 std::string to_string_ex(

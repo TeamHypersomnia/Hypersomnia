@@ -2,8 +2,8 @@
 #include <string>
 #include "augs/misc/relinked_pool_id.h"
 #include "augs/templates/hash_templates.h"
-#include "augs/templates/string_templates_declaration.h"
-#include "augs/templates/get_current_type_name.h"
+#include "augs/string/string_templates_declaration.h"
+#include "augs/string/get_current_type_name.h"
 
 #include "game/transcendental/entity_type_traits.h"
 #include "game/organization/all_entity_types_declaration.h"

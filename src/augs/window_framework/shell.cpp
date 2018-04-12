@@ -1,7 +1,7 @@
 #include "augs/filesystem/file.h"
 
 #include "augs/window_framework/shell.h"
-#include "augs/templates/string_templates.h"
+#include "augs/string/string_templates.h"
 
 #if PLATFORM_WINDOWS
 #include <Windows.h>

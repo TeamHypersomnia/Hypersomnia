@@ -329,8 +329,8 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/augs/misc/action_list/standard_actions.cpp"
 	"src/augs/readwrite/memory_stream.cpp"
 	"src/augs/misc/time_utils.cpp"
-	"src/augs/misc/typesafe_sprintf.cpp"
-	"src/augs/misc/typesafe_sscanf.cpp"
+	"src/augs/string/typesafe_sprintf.cpp"
+	"src/augs/string/typesafe_sscanf.cpp"
 	"src/augs/network/network_client.cpp"
 	"src/augs/network/network_types.cpp"
 	"src/augs/network/network_server.cpp"
@@ -483,7 +483,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/inferred_caches/relational_cache.cpp"
 	"src/game/components/motor_joint_component.cpp"
 	"src/augs/misc/enum/enum_boolset.cpp"
-	"src/augs/templates/string_templates.cpp"
+	"src/augs/string/string_templates.cpp"
 	"src/game/components/sender_component.cpp"
 	"src/game/inferred_caches/flavour_id_cache.cpp"
 	"src/game/detail/spells/electric_shield.cpp"
@@ -564,7 +564,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/application/setups/editor/gui/editor_selection_groups_gui.cpp"
 	"src/application/setups/editor/gui/editor_summary_gui.cpp"
 	"src/application/setups/editor/gui/editor_entity_mover.cpp"
-	"src/augs/templates/get_type_name.cpp"
+	"src/augs/string/get_type_name.cpp"
 )
 
 if(BUILD_WINDOW_FRAMEWORK)

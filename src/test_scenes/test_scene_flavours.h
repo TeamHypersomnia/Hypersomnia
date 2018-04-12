@@ -8,7 +8,7 @@
 
 #include "view/viewables/image_structs.h"
 
-#include "augs/templates/format_enum.h"
+#include "augs/string/format_enum.h"
 
 enum class test_static_lights {
 	// GEN INTROSPECTOR enum class test_static_lights

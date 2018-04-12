@@ -9,7 +9,7 @@
 #include <fstream>
 #include <experimental/filesystem>
 
-#include "augs/misc/typesafe_sprintf.h"
+#include "augs/string/typesafe_sprintf.h"
 #include "augs/filesystem/path.h"
 
 namespace augs {

@@ -2,7 +2,7 @@
 #include <iomanip>
 #include <sstream>
 
-#include "augs/misc/typesafe_sprintf.h"
+#include "augs/string/typesafe_sprintf.h"
 #include "augs/misc/time_utils.h"
 
 template<class t>

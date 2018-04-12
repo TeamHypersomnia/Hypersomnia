@@ -3,7 +3,7 @@
 #include <catch.hpp>
 
 #include "augs/math/vec2.h"
-#include "augs/misc/typesafe_sscanf.h"
+#include "augs/string/typesafe_sscanf.h"
 
 TEST_CASE("TypesafeSscanf", "TypesafeSscanfSeveralTests") {
 	{
