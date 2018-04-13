@@ -67,7 +67,7 @@ public:
 	);
 
 	decltype(auto) at(const assets::image_id id) const {
-		return caches.at(id.indirection_index);
+		return caches.at(id.get_cache_index());
 	}
 
 	auto size() const {

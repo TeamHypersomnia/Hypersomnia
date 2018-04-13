@@ -22,7 +22,7 @@ namespace augs {
 		// END GEN INTROSPECTOR
 	};
 
-	template <class size_type>
+	template <class size_type, class... keys>
 	struct pool_undo_free_input {
 		size_type real_index = static_cast<size_type>(-1);
 		size_type indirection_index = static_cast<size_type>(-1);

@@ -3,7 +3,7 @@
 #include "augs/templates/hash_templates.h"
 
 namespace augs {
-	template <class size_type>
+	template <class size_type, class... keys>
 	struct unversioned_id {
 		size_type indirection_index = static_cast<size_type>(-1);
 
@@ -20,9 +20,9 @@ namespace augs {
 		}
 	};
 
-	template <class size_type>
+	template <class size_type, class... keys>
 	struct pooled_object_id {
-		// GEN INTROSPECTOR struct augs::pooled_object_id class size_type
+		// GEN INTROSPECTOR struct augs::pooled_object_id class size_type class... keys
 		size_type version = 0;
 		size_type indirection_index = static_cast<size_type>(-1);
 		// END GEN INTROSPECTOR
@@ -45,6 +45,10 @@ namespace augs {
 
 		bool operator!=(const pooled_object_id& b) const {
 			return !operator==(b);
+		}
+
+		auto get_cache_index() const {
+			return indirection_index;
 		}
 
 		operator unversioned_id<size_type>() const {

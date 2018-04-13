@@ -34,3 +34,8 @@ struct all_viewables_defs {
 
 	void clear();
 };
+
+std::optional<assets::image_id> find_asset_id_by_path(
+	const std::string& p,
+	const image_loadables_map&
+);

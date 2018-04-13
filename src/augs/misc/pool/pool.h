@@ -13,14 +13,15 @@
 #include "augs/readwrite/lua_readwrite_declaration.h"
 
 namespace augs {
-	template <class T, template <class> class make_container_type, class size_type>
+	template <class T, template <class> class make_container_type, class size_type, class... id_keys>
 	class pool {
 	public:
 		using mapped_type = T;
-		using key_type = pooled_object_id<size_type>;
-		using unversioned_id_type = unversioned_id<size_type>;
+		using key_type = pooled_object_id<size_type, id_keys...>;
+		using unversioned_id_type = unversioned_id<size_type, id_keys...>;
+		using undo_free_input_type = pool_undo_free_input<size_type, id_keys...>;
+
 		using used_size_type = size_type;
-		using undo_free_input_type = pool_undo_free_input<size_type>;
 
 	protected:
 		using pool_slot_type = pool_slot<size_type>;
@@ -563,23 +564,23 @@ namespace augs {
 #endif
 
 namespace augs {
-	template <class A, class mapped_type, template <class> class C, class S>
-	void read_object_bytes(A& ar, pool<mapped_type, C, S>& storage) {
+	template <class A, class M, template <class> class C, class S, class... K>
+	void read_object_bytes(A& ar, pool<M, C, S, K...>& storage) {
 		storage.read_object_bytes(ar);
 	}
 	
-	template <class A, class mapped_type, template <class> class C, class S>
-	void write_object_bytes(A& ar, const pool<mapped_type, C, S>& storage) {
+	template <class A, class M, template <class> class C, class S, class... K>
+	void write_object_bytes(A& ar, const pool<M, C, S, K...>& storage) {
 		storage.write_object_bytes(ar);
 	}
 
-	template <class A, class mapped_type, template <class> class C, class S>
-	void read_object_lua(A ar, pool<mapped_type, C, S>& storage) {
+	template <class A, class M, template <class> class C, class S, class... K>
+	void read_object_lua(A ar, pool<M, C, S, K...>& storage) {
 		storage.read_object_lua(ar);
 	}
 
-	template <class A, class mapped_type, template <class> class C, class S>
-	void write_object_lua(A ar, const pool<mapped_type, C, S>& storage) {
+	template <class A, class M, template <class> class C, class S, class... K>
+	void write_object_lua(A ar, const pool<M, C, S, K...>& storage) {
 		storage.write_object_lua(ar);
 	}
 }
