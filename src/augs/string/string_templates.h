@@ -122,13 +122,10 @@ inline auto str_ops(const char* const s) {
 	return str_ops(std::string(s));
 }
 
-inline bool ends_with(const std::string& value, const std::string& ending) {
-    if (ending.size() > value.size()) {
-    	return false;
-    }
+void cut_preffix(std::string& value, const std::string& preffix);
 
-    return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
-}
+bool begins_with(const std::string& value, const std::string& beginning);
+bool ends_with(const std::string& value, const std::string& ending);
 
 template <class T>
 auto format_as_bytes(const T& t) {

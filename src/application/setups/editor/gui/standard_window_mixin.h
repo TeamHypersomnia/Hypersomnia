@@ -38,6 +38,10 @@ struct standard_window_mixin {
 		}
 	};
 
+	const auto& get_title() const {
+		return title;
+	}
+
 protected:
 	std::string title;
 	bool acquire_once = false;

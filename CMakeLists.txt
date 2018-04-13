@@ -582,6 +582,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/detail/sentience_shake.cpp"
 	"src/augs/templates/introspect.cpp"
 	"src/augs/string/get_type_name.cpp"
+	"src/application/setups/editor/gui/editor_assets_gui.cpp"
 )
 
 # These cpps will be included as the first to speed up multithreaded build times.

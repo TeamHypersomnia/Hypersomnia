@@ -24,6 +24,28 @@ std::string to_forward_slashes(std::string in_str) {
 	return in_str;
 }
 
+bool begins_with(const std::string& value, const std::string& beginning) {
+	if (beginning.size() > value.size()) {
+		return false;
+	}
+
+	return std::equal(beginning.begin(), beginning.end(), value.begin());
+}
+
+bool ends_with(const std::string& value, const std::string& ending) {
+	if (ending.size() > value.size()) {
+		return false;
+	}
+
+	return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
+}
+
+void cut_preffix(std::string& value, const std::string& preffix) {
+	if (begins_with(value, preffix)) {
+		value.erase(value.begin(), value.begin() + preffix.size());
+	}
+}
+
 #if BUILD_UNIT_TESTS
 #include <catch.hpp>
 

@@ -95,7 +95,7 @@ class editor_setup : private current_access_cache<editor_setup> {
 	editor_summary_gui summary_gui = std::string("Summary");
 	editor_coordinates_gui coordinates_gui = std::string("Coordinates");
 
-	editor_images_gui images_gui;
+	editor_images_gui images_gui = std::string("Images");
 	// END GEN INTROSPECTOR
 
 	std::optional<editor_popup> ok_only_popup;

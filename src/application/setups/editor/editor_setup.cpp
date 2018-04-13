@@ -352,42 +352,36 @@ void editor_setup::perform_custom_imgui(
 #endif
 				}
 				if (auto menu = scoped_menu("View")) {
-					if (item_if_tabs("History")) {
-						history_gui.open();
-					}
+					auto do_window_entry = [&](auto& win) {
+						if (item_if_tabs(win.get_title().c_str())) {
+							win.open();
+						}
+					};
+
+					do_window_entry(history_gui);
 
 					ImGui::Separator();
 
-					if (item_if_tabs("Summary")) {
-						summary_gui.open();
-					}
-
-					if (item_if_tabs("Coordinates")) {
-						coordinates_gui.open();
-					}
+					do_window_entry(summary_gui);
+					do_window_entry(coordinates_gui);
 
 					if (item_if_tabs("Player")) {
 						player.show = true;
 					}
 
-					if (item_if_tabs("Selection groups")) {
-						selection_groups_gui.open();
-					}
+					do_window_entry(selection_groups_gui);
 
 					ImGui::Separator();
 					ImGui::MenuItem("(State)", NULL, false, false);
 
-					if (item_if_tabs("Common")) {
-						common_state_gui.open();
-					}
+					do_window_entry(common_state_gui);
+					do_window_entry(all_entities_gui);
+					do_window_entry(selected_entities_gui);
 
-					if (item_if_tabs("All entities")) {
-						all_entities_gui.open();
-					}
+					ImGui::Separator();
+					ImGui::MenuItem("(Assets)", NULL, false, false);
 
-					if (item_if_tabs("Selected entities")) {
-						selected_entities_gui.open();
-					}
+					do_window_entry(images_gui);
 				}
 			}
 		}
@@ -410,6 +404,8 @@ void editor_setup::perform_custom_imgui(
 		selection_groups_gui.perform(ImGui::GetIO().KeyCtrl, make_command_input());
 
 		summary_gui.perform(*this);
+
+		images_gui.perform(make_command_input());
 
 		const auto all_selected = [&]() -> decltype(get_all_selected_entities()) {
 			if (const auto held = selector.get_held(); held && work().world[held]) {
@@ -832,6 +828,7 @@ bool editor_setup::handle_input_before_imgui(
 				case key::P: player.show = true; return true;
 				case key::U: summary_gui.open(); return true;
 				case key::O: coordinates_gui.open(); return true;
+				case key::I: images_gui.open(); return true;
 				default: break;
 			}
 		}
