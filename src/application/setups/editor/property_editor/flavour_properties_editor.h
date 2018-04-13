@@ -7,6 +7,8 @@
 #include "application/setups/editor/property_editor/general_edit_properties.h"
 #include "application/setups/editor/property_editor/property_editor_structs.h"
 
+#include "application/setups/editor/property_editor/asset_control_provider.h"
+
 template <class T>
 decltype(auto) get_name_of(const entity_flavour<T>& flavour) {
 	return flavour.template get<invariants::name>().name;
@@ -120,6 +122,9 @@ void edit_invariant(
 
 	const auto& cosm = in.get_cosmos();
 	
+	auto& defs = in.folder.work->viewables;
+	const auto project_path = in.folder.current_path;
+
 	general_edit_properties(
 		prop_in, 
 		invariant,
@@ -127,7 +132,8 @@ void edit_invariant(
 		rewrite_last_change,
 		invariant_field_eq_predicate { 
 			cosm, invariant_id, command.type_id, command.affected_flavours 
-		}
+		},
+		asset_control_provider { defs, project_path }
 	);
 }
 

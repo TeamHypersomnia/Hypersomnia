@@ -5,6 +5,9 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- add this maybe? https://github.com/jpakkane/naturalsort
+- properly templatize entity_id_base, add entity type's key to it
+
 - research building with clang on windows?
 
 - let particle definitions be split into the invariant and variant parts, like components

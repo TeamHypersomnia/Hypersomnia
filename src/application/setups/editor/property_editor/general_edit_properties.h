@@ -93,19 +93,32 @@ auto maybe_different_value_cols(
 	);
 };
 
+struct default_control_provider {
+	template <class T>
+	static constexpr bool handles = always_false_v<T>;
+
+	template <class T>
+	bool handle(const std::string& label, const T& object) {
+		static_assert(handles<T>());
+		return false;
+	}
+};
+
 template <
-	template <class T> class SkipPredicate = always_false,
+	template <class> class SkipPredicate = always_false,
    	class T,
    	class G,
    	class H,
-	class Eq
+	class Eq,
+	class S = default_control_provider
 >
 void general_edit_properties(
 	const property_editor_input in,
 	const T& object,
 	G post_new_change_impl,
 	H rewrite_last_change_impl,
-	Eq field_equality_predicate
+	Eq field_equality_predicate,
+	S special_control_provider = {}
 ) {
 	using namespace augs::imgui;
 
@@ -252,10 +265,15 @@ void general_edit_properties(
 					});
 				};
 
-				if constexpr(is_padding_field_v<M>) {
-					return;	
+				if constexpr(S::template handles<M>) {
+					do_discrete([&]() { 
+						return special_control_provider.handle(
+							identity_label, 
+							altered_member
+						);
+					});
 				}
-				else if constexpr(std::is_same_v<M, b2Filter>) {
+				if constexpr(std::is_same_v<M, b2Filter>) {
 					// TODO: checkbox matrix
 					return;
 				}

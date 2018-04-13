@@ -1,5 +1,6 @@
 #pragma once
 #include "augs/templates/enum_introspect.h"
+#include "augs/misc/imgui/imgui_scope_wrappers.h"
 
 namespace augs {
 	namespace imgui {
@@ -8,7 +9,7 @@ namespace augs {
 			const auto current_str = format_enum(into);
 			const auto current = into;
 
-			if (ImGui::BeginCombo(label.c_str(), current_str.c_str())) {
+			if (auto combo = scoped_combo(label.c_str(), current_str.c_str())) {
 				for_each_enum_except_bounds([&](const T e) {
 					const auto enum_label = format_enum(e);
 					bool is_selected = e == current;
@@ -21,8 +22,6 @@ namespace augs {
 						ImGui::SetItemDefaultFocus();
 					}
 				});
-
-				ImGui::EndCombo();
 			}
 
 			return current != into;

@@ -2,20 +2,31 @@
 
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
+#include "augs/misc/imgui/browse_path_tree.h"
 
 #include "application/setups/editor/gui/editor_assets_gui.h"
 #include "application/setups/editor/editor_folder.h"
 #include "application/intercosm.h"
 
+struct gfx_browser_client {
+
+};
+
+template <class id_type>
 struct sorted_path_entry {
 	std::string filename;
 	std::string directory;
+	id_type id;
 
 	sorted_path_entry() = default;
-	sorted_path_entry(augs::path_type from) {
-		filename = from.filename();
-		directory = from.replace_filename("");
-	}
+	sorted_path_entry(
+		augs::path_type from,
+	   	const id_type id
+	) :
+		id(id),
+		filename(from.filename()),
+		directory(from.replace_filename(""))
+	{}
 
 	bool operator<(const sorted_path_entry& b) const {
 		const auto& f1 = filename;
@@ -23,69 +34,18 @@ struct sorted_path_entry {
 
 		return std::tie(directory, f1) < std::tie(b.directory, f2);
 	}
-};
 
-auto prettify(const std::string& filename) {
-	return format_field_name(augs::path_type(filename).stem());
-}
-
-template <class F>
-void browse_project_files(
-	const char* const folder_name,
-	const files_browser_settings& settings,
-	const std::vector<sorted_path_entry>& entries,
-	F client
-) {
-	using namespace augs::imgui;
-
-	const auto official_directory = typesafe_sprintf("content/official/%x", folder_name);
-	const auto prettify_filenames = settings.prettify_filenames;
-
-	if (settings.linear_view) {
-		ImGui::Columns(3);
-
-		text_disabled(prettify_filenames ? "Name" : "Filename");
-		ImGui::NextColumn();
-		text_disabled("Location");
-		ImGui::NextColumn();
-		text_disabled("Details");
-		ImGui::NextColumn();
-
-		ImGui::Separator();
-
-		for (const auto& l : entries) {
-			if (prettify_filenames) {
-				ImGui::Selectable(prettify(l.filename).c_str());
-			}
-			else {
-				ImGui::Selectable(l.filename.c_str());
-			}
-
-			ImGui::NextColumn();
-
-			auto displayed_dir = l.directory;
-			cut_preffix(displayed_dir, "content/");
-			text_disabled(displayed_dir);
-
-			ImGui::NextColumn();
-			ImGui::NextColumn();
-		}
+	const auto& get_filename() const {
+		return filename;
 	}
-	else {
 
+	const auto& get_directory() const {
+		return directory;
 	}
-}
 
-void files_browser_settings::do_tweakers() {
-	using namespace augs::imgui;
-
-	checkbox("Linear view", linear_view);
-	ImGui::SameLine();
-	checkbox("Prettify filenames", prettify_filenames);
-}
-
-struct gfx_browser_client {
-
+	auto get_full_path() const {
+		return directory + filename;
+	}
 };
 
 void editor_images_gui::perform(editor_command_input in) {
@@ -97,27 +57,31 @@ void editor_images_gui::perform(editor_command_input in) {
 		return;
 	}
 
-	browser_settings.do_tweakers();
-	ImGui::Separator();
-
 	auto& work = *in.folder.work;
 	auto& cosm = work.world;
 
 	const auto& viewables = work.viewables;
 
-	thread_local std::vector<sorted_path_entry> all_paths;
+	thread_local std::vector<sorted_path_entry<assets::image_id>> all_paths;
 	all_paths.clear();
 
-	for (const auto& l : viewables.image_loadables) {
-		all_paths.emplace_back(l.source_image_path);
-	}
+	viewables.image_loadables.for_each_object_and_id(
+		[](const auto& object, const auto id) mutable {
+			all_paths.emplace_back(object.source_image_path, id);
+		}
+	);
 
 	sort_range(all_paths);
 
-	browse_project_files(
-		"gfx",
+	browse_path_tree(
 		browser_settings,
 		all_paths,
-		gfx_browser_client()
+		[&](const auto& path_entry, const auto displayed_name) {
+			const auto node_label = typesafe_sprintf("%x###%x", displayed_name, path_entry.get_full_path());
+
+			if (auto node = scoped_tree_node(node_label.c_str())) {
+
+			}
+		}
 	);
 }

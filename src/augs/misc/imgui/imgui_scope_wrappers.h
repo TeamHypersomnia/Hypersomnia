@@ -1,6 +1,4 @@
 #pragma once
-#include <optional>
-
 #include "3rdparty/imgui/imgui.h"
 #include "3rdparty/imgui/imgui_internal.h"
 
@@ -12,9 +10,16 @@
 namespace augs {
 	namespace imgui {
 		template <class Pre, class Post>
-		decltype(auto) cond_scoped_op(const bool cond, Pre pre, Post post) {
+		decltype(auto) cond_scoped_op(bool cond, Pre pre, Post post) {
 			if (cond) {
-				pre();
+				if constexpr(std::is_same_v<bool, decltype(pre())>) {
+					if (!pre()) {
+						cond = false;
+					}
+				}
+				else {
+					pre();
+				}
 			}
 
 			return make_scope_guard([&post, cond]() { if (cond) { post(); } });
@@ -55,6 +60,19 @@ namespace augs {
 			return cond_scoped_style_color(true, std::forward<T>(args)...);
 		}
 
+		template <class... T>
+		auto scoped_combo(T&&... args) {
+			const auto result = ImGui::BeginCombo(std::forward<T>(args)...);
+
+			auto opt = make_scope_guard([]() { ImGui::EndCombo(); });
+
+			if (!result) {
+				opt.release();
+			}
+
+			return opt;
+		}
+
 		inline auto scoped_text_color(const rgba& col) {
 			return scoped_style_color(ImGuiCol_Text, col);
 		}
@@ -70,10 +88,10 @@ namespace augs {
 		auto scoped_modal_popup(const std::string& label, T&&... args) {
 			const auto result = ImGui::BeginPopupModal(label.c_str(), std::forward<T>(args)...);
 
-			auto opt = std::make_optional(make_scope_guard([result]() { if (result) { ImGui::EndPopup(); }}));
+			auto opt = make_scope_guard([]() { { ImGui::EndPopup(); }});
 
 			if (!result) {
-				opt = std::nullopt;
+				opt.release();
 			}
 
 			return opt;
@@ -83,10 +101,10 @@ namespace augs {
 		auto scoped_tree_node_ex(const std::string& label, T&&... args) {
 			const auto result = ImGui::TreeNodeEx(label.c_str(), std::forward<T>(args)...);
 
-			auto opt = std::make_optional(make_scope_guard([result]() { if (result) { ImGui::TreePop(); }}));
+			auto opt = make_scope_guard([]() { ImGui::TreePop(); });
 
 			if (!result) {
-				opt = std::nullopt;
+				opt.release();
 			}
 
 			return opt;
@@ -131,10 +149,10 @@ namespace augs {
 		inline auto scoped_tree_node(const char* label) {
 			const auto result = ImGui::TreeNode(label);
 		
-			auto opt = std::make_optional(make_scope_guard([result]() { if (result) { ImGui::TreePop(); }}));
+			auto opt = make_scope_guard([]() { { ImGui::TreePop(); }});
 		
 			if (!result) {
-				opt = std::nullopt;
+				opt.release();
 			}
 		
 			return opt;
@@ -143,10 +161,10 @@ namespace augs {
 		inline auto scoped_menu(const char* label, const bool enabled = true) {
 			const auto result = ImGui::BeginMenu(label, enabled);
 
-			auto opt = std::make_optional(make_scope_guard([result]() { if (result) { ImGui::EndMenu(); }}));
+			auto opt = make_scope_guard([]() { { ImGui::EndMenu(); }});
 
 			if (!result) {
-				opt = std::nullopt;
+				opt.release();
 			}
 
 			return opt;
@@ -155,10 +173,10 @@ namespace augs {
 		inline auto scoped_main_menu_bar() {
 			const auto result = ImGui::BeginMainMenuBar();
 
-			auto opt = std::make_optional(make_scope_guard([result]() { if (result) { ImGui::EndMainMenuBar(); }}));
+			auto opt = make_scope_guard([]() { { ImGui::EndMainMenuBar(); }});
 
 			if (!result) {
-				opt = std::nullopt;
+				opt.release();
 			}
 
 			return opt;
@@ -167,10 +185,10 @@ namespace augs {
 		inline auto scoped_tab_menu_bar(const float y) {
 			const auto result = ImGui::BeginTabMenuBar(y);
 
-			auto opt = std::make_optional(make_scope_guard([result]() { if (result) { ImGui::EndTabMenuBar(); }}));
+			auto opt = make_scope_guard([]() { { ImGui::EndTabMenuBar(); }});
 
 			if (!result) {
-				opt = std::nullopt;
+				opt.release();
 			}
 
 			return opt;
