@@ -10,11 +10,6 @@
 #include "augs/readwrite/byte_readwrite.h"
 #include "augs/readwrite/memory_stream.h"
 
-void editor_selection_groups_gui::open() {
-	show = true;
-	ImGui::SetWindowFocus("Selection groups");
-}
-
 template <class C1, class C2>
 bool all_found(const C1& from, const C2& in) {
 	for (const auto& elem : from) {
@@ -27,15 +22,15 @@ bool all_found(const C1& from, const C2& in) {
 }
 
 void editor_selection_groups_gui::perform(const bool has_ctrl, editor_command_input in) {
-	if (!show) {
+	using namespace augs::imgui;
+
+	auto window = make_scoped_window();
+
+	if (!window) {
 		return;
 	}
 
-	using namespace augs::imgui;
-
-	ImGui::SetNextWindowSize(ImVec2(350,560), ImGuiCond_FirstUseEver);
-
-	auto window = scoped_window("Selection groups", &show);
+	acquire_keyboard_once();
 
 	thread_local ImGuiTextFilter filter;
 	filter.Draw();

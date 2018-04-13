@@ -29,7 +29,7 @@ Każdy projekt będzie czerpał pliki obrazków z dokładnie dwóch folderów (i
 		- Będą na tyle dobre że ludzie chętnie będą je brali!
 - ``Sciezka/Do/Projektu/NazwaProjektu/gfx`` - zbiór grafik specyficznych dla tego projektu.
 
-Podfoldery do powyższych dwu mogą być zorganizowane już dowolnie.
+Podfoldery znajdujące się w powyższych dwóch folderach mogą być zorganizowane już dowolnie.
 
 Z dźwiękami będziemy mieli ten sam schemat, tylko że zamiast folderu ``gfx`` będziemy mieli folder ``sfx``.
 
@@ -43,9 +43,9 @@ Gdziekolwiek w edytorze będziemy mieli do wyboru obrazek, będziemy mieli takie
 Będzie to miniaturkowy hierarchiczny widok na strukturę obu folderów: oficjalnego i specyficznego dla projektu.  
 
 - To combo zawsze będzie aktualne z tym co obecnie jest na dysku.
-- Podświetlony na niebiesko zawsze będzie obecny obrazek.
+- Obecny obrazek zawsze będzie podświetlony na niebiesko.
 - Zamknięte combo zawsze będzie miało napis formatu ``nazwa_pliku.png (sciezka/do/pliku)``.
-- Otwarte elementy drzewa będą zapamiętane (ImGui to ogarnia z buta)
+- Otwarte elementy drzewa będą zapamiętane (ImGui to ogarnia z buta).
 	- Dodatkowo zawsze po otwarciu comba będziemy rozwijać te foldery w których jest obecnie wybrany plik - aby natychmiast był widoczny.
 
 ### Okno "Images"
@@ -85,6 +85,16 @@ Znajdzie się tam to samo co w combo boxie z wyborem obrazka, z dwiema różnic
 
 ## Animacje
 
+<!--
+	Czy nie chcemy może mieć okna w którym mamy tylko używane animacje?
+	Każde miejsce na wybór animacji prosiłoby o wybór zbioru plików z animacją.
+
+	Potem dialog "Images" pokazywałby również wszystkie klatki tej animacji do dowolnego użytku później.
+	Problem może powstać jedynie jeśli chcielibyśmy mieć więcej animacji z tego samego zbioru plików.
+		Raczej nie będziemy potrzebowali wielu animacji z tego samego zbioru plików.
+			Mnożniki prędkości będą ustawiane w obiektach które korzystają z animacji.
+-->
+
 Dla pojedynczej animacji, widoczne w edytorze będą następujące informacje:
 
 - Lista klatek. Klatka zawiera:
@@ -93,15 +103,16 @@ Dla pojedynczej animacji, widoczne w edytorze będą następujące informacje:
 	- (Opcjonalnie) efekt który ma zostać odegrany gdy nastąpi kolej tej klatki.
 		- Np. efekt dźwiękowy i cząsteczkowy.
 			- Możliwe że z offsetem, np. ``(x, y)`` o które należy przesunąć start cząsteczek żeby zgadzały się z tym gdzie pada but.
-- Nazwa własna animacji. Do zmiany w edytorze.
-	- Domyślnie nazwa pierwszej klatki + dopisek "animation".
-		- Np. zbiór plików zaczynających się od ``ustrojstwo_1_20ms.png``, dostajemy "Ustrojstwo animation".
+- Nazwa animacji. ZAWSZE będzie tworzona z nazwy plików z klatkami.
+- ~~Nazwa własna animacji. Do zmiany w edytorze.~~
+	- ~~Domyślnie nazwa pierwszej klatki + dopisek "animation".~~
+		- ~~Np. zbiór plików zaczynających się od ``ustrojstwo_1_20ms.png``, dostajemy "Ustrojstwo animation".~~
 
 ### Okno "Animations"
 
-Proste okno z liniowym widokiem na wszystkie animacje w projekcie.
+Okno z widokiem na wszystkie animacje używane w projekcie.
 
-- Można stąd importować i edytować animacje.
+- Można stąd edytować właściwości animacji.
 - Można je usuwać, ale tylko jeśli **nigdzie w grze nie jest używana ta animacja**.
 	- Najpierw trzeba będzie usunąć manualnie wszystkie byty (lub flavoury) które z niej korzystają, żeby nie było zaskoczenia.
 

@@ -135,7 +135,14 @@ static void gg() {
 	
 	(void)(typed_entity_id<controlled_character>() == typed_entity_id<controlled_character>());
 }
+
+struct derivedintrotest : basic_ltrb<float> {
+
+};
+
 struct tests_of_traits {
+	static_assert(has_introspect_v<derivedintrotest>, "Trait has failed");
+
 	static_assert(has_member_find_v<std::unordered_map<int*, int*>, int*>);
 	static_assert(!has_member_find_v<std::vector<int>, int>);
 

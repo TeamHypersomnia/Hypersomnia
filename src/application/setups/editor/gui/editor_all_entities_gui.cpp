@@ -2,12 +2,6 @@
 #include "application/setups/editor/gui/editor_all_entities_gui.h"
 #include "application/setups/editor/editor_command_input.h"
 
-void editor_all_entities_gui::open() {
-	show = true;
-	acquire_once = true;
-	ImGui::SetWindowFocus(title.c_str());
-}
-
 void editor_all_entities_gui::interrupt_tweakers() {
 	properties_gui.last_active.reset();
 	properties_gui.old_description.clear();
@@ -206,23 +200,16 @@ fae_tree_filter editor_all_entities_gui::perform(
 	const std::unordered_set<entity_id>* only_match_entities,
 	editor_command_input in
 ) {
-	if (!show) {
+	using namespace augs::imgui;
+
+	auto entities = make_scoped_window();
+
+	if (!entities) {
 		return {};
 	}
 
-	using namespace augs::imgui;
-
-	ImGui::SetNextWindowSize(ImVec2(350,560), ImGuiCond_FirstUseEver);
-
-	auto entities = scoped_window(title.c_str(), &show);
-
 	ImGui::Columns(2);
 	ImGui::Separator();
-
-	if (acquire_once) {
-		ImGui::SetKeyboardFocusHere();
-		acquire_once = false;
-	}
 
 	properties_gui.hovered_guid.unset();
 

@@ -1,15 +1,11 @@
 #pragma once
+#include "application/setups/editor/gui/standard_window_mixin.h"
 
 struct editor_command_input;
 
-struct editor_history_gui {
-	// GEN INTROSPECTOR struct editor_history_gui
-	bool show = false;
-	// END GEN INTROSPECTOR
+struct editor_history_gui : standard_window_mixin<editor_history_gui> {
+	using base = standard_window_mixin<editor_history_gui>;
+	using base::base;
 
-	void open();
 	void perform(editor_command_input);
-
-private:
-	bool acquire_once = false;
 };

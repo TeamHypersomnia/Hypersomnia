@@ -71,8 +71,6 @@ struct animation {
 	// GEN INTROSPECTOR struct animation
 	animation_frames_type frames = {};
 	loop_type loop_mode = loop_type::REPEAT;
-
-	std::string name;
 	// END GEN INTROSPECTOR
 
 	auto get_image_id(const unsigned index) const {

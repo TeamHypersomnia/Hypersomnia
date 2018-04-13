@@ -5,26 +5,20 @@
 #include "application/setups/editor/editor_folder.h"
 #include "application/setups/editor/gui/editor_history_gui.h"
 
-void editor_history_gui::open() {
-	show = true;
-	acquire_once = true;
-	ImGui::SetWindowFocus("History");
-}
-
 void editor_history_gui::perform(const editor_command_input in) {
-	if (!show) {
-		return;
-	}
-
 	using namespace ImGui;
 	using namespace augs::imgui;
 	using index_type = editor_history::index_type;
 
 	auto& history = in.folder.history;
 
-	ImGui::SetNextWindowSize(ImVec2(350,560), ImGuiCond_FirstUseEver);
+	auto window = make_scoped_window();
 
-	auto window = scoped_window("History", &show);
+	if (!window) {
+		return;
+	}
+
+	acquire_keyboard_once();
 
 	const auto& style = GetStyle();
 

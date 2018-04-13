@@ -21,6 +21,8 @@ summary: That which we are brainstorming at the moment.
 			- shows how many flavours use an image
 			- Un-importing requires to delete all using flavours
 				- Which in turn requires deletion of entities with that flavour
+	- What if an image for which we've set some neon map values becomes unused?
+		- We don't remove it from loadables list. We simply add a "Remove" button next to it.
 
 - how do we reload viewables that will be stored in pool?
 	- do we simply compare object vectors?

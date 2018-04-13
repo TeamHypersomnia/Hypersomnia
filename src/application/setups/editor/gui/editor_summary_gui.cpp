@@ -9,23 +9,19 @@
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 
-void editor_summary_gui::open() {
-	show = true;
-}
-
 void editor_summary_gui::perform(editor_setup& setup) {
-	if (!show || !setup.anything_opened()) {
+	using namespace augs::imgui;
+
+	auto summary = make_scoped_window(ImGuiWindowFlags_AlwaysAutoResize);
+
+	if (!summary || !setup.anything_opened()) {
 		return;
 	}
-
-	using namespace augs::imgui;
 
 	auto& v = setup.view();
 	auto& f = setup.folder();
 	auto& cosm = setup.work().world;
 	const auto settings = setup.settings;
-
-	auto summary = scoped_window("Summary", &show, ImGuiWindowFlags_AlwaysAutoResize);
 
 	text(typesafe_sprintf("Folder path: %x", f.current_path));
 
@@ -92,25 +88,22 @@ void editor_summary_gui::perform(editor_setup& setup) {
 	}
 }
 
-void editor_coordinates_gui::open() {
-	show = true;
-}
-
 void editor_coordinates_gui::perform(
 	editor_setup& setup,
 	const vec2i screen_size,
 	const vec2i mouse_pos,
    	const std::unordered_set<entity_id>& all_selected
 ) {
-	if (!show) {
+	using namespace augs::imgui;
+
+	auto coordinates = make_scoped_window(ImGuiWindowFlags_AlwaysAutoResize);
+
+	if (!coordinates) {
 		return;
 	}
 
-	using namespace augs::imgui;
-
 	const auto settings = setup.settings;
 	auto& v = setup.view();
-	auto coordinates = scoped_window("Coordinates", &show, ImGuiWindowFlags_AlwaysAutoResize);
 
 	if (const auto current_cone = setup.find_current_camera()) {
 		const auto world_cursor_pos = current_cone->to_world_space(screen_size, mouse_pos);

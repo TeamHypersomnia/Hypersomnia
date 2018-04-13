@@ -2,17 +2,14 @@
 #include "application/setups/editor/commands/editor_command_structs.h"
 #include "application/setups/editor/property_editor/fae_tree_structs.h"
 
+#include "application/setups/editor/gui/standard_window_mixin.h"
+
 struct editor_settings;
 struct editor_command_input;
 
-struct editor_all_entities_gui {
-	// GEN INTROSPECTOR struct editor_all_entities_gui
-	bool show = false;
-	// END GEN INTROSPECTOR
-
-	editor_all_entities_gui(const std::string& title) : title(title) {}
-
-	void open();
+struct editor_all_entities_gui : standard_window_mixin<editor_all_entities_gui> {
+	using base = standard_window_mixin<editor_all_entities_gui>;
+	using base::base;
 
 	fae_tree_filter perform(
 		const editor_settings&,
@@ -27,7 +24,5 @@ struct editor_all_entities_gui {
 	}
 
 private:
-	std::string title;
 	property_editor_state properties_gui;
-	bool acquire_once = false;
 };

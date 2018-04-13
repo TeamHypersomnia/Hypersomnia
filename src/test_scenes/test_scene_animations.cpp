@@ -35,7 +35,6 @@ void load_test_scene_animations(animations_pool& anims) {
 		);
 
 		const auto test_id = test_scene_animation_id::CAST_BLINK_ANIMATION;
-		anim.name = format_enum(test_id);
 
 		const auto id = to_animation_id(test_id);
 		const auto new_allocation = anims.allocate(std::move(anim));

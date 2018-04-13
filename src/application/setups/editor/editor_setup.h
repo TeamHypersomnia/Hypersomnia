@@ -44,6 +44,8 @@
 #include "application/setups/editor/gui/editor_selection_groups_gui.h"
 #include "application/setups/editor/gui/editor_summary_gui.h"
 
+#include "application/setups/editor/gui/editor_assets_gui.h"
+
 #include "application/setups/editor/detail/current_access_cache.h"
 #include "application/setups/editor/detail/make_command_from_selections.h"
 
@@ -85,13 +87,15 @@ class editor_setup : private current_access_cache<editor_setup> {
 	editor_go_to_entity_gui go_to_entity_gui;
 
 	// GEN INTROSPECTOR class editor_setup
-	editor_history_gui history_gui;
+	editor_history_gui history_gui = std::string("History");
 	editor_all_entities_gui all_entities_gui = std::string("All entities");
 	editor_all_entities_gui selected_entities_gui = std::string("Selected entities");
-	editor_common_state_gui common_state_gui;
-	editor_selection_groups_gui selection_groups_gui;
-	editor_summary_gui summary_gui;
-	editor_coordinates_gui coordinates_gui;
+	editor_common_state_gui common_state_gui = std::string("Common state");
+	editor_selection_groups_gui selection_groups_gui = std::string("Selection groups");
+	editor_summary_gui summary_gui = std::string("Summary");
+	editor_coordinates_gui coordinates_gui = std::string("Coordinates");
+
+	editor_images_gui images_gui;
 	// END GEN INTROSPECTOR
 
 	std::optional<editor_popup> ok_only_popup;

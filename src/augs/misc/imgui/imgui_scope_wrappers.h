@@ -28,12 +28,19 @@ namespace augs {
 		}
 		
 		template <class... T>
-		auto scoped_window(T&&... args) {
-			ImGui::Begin(std::forward<T>(args)...);
-		
-			return make_scope_guard([]() { ImGui::End(); });
+		auto cond_scoped_window(const bool do_it, T&&... args) {
+			return cond_scoped_op(
+				do_it,
+				[&](){ ImGui::Begin(std::forward<T>(args)...); },
+				[]() { ImGui::End(); }
+			);
 		}
-		
+
+		template <class... T>
+		auto scoped_window(T&&... args) {
+			return cond_scoped_window(true, std::forward<T>(args)...);
+		}
+
 		template <class... T>
 		auto cond_scoped_style_color(const bool do_it, T&&... args) {
 			return cond_scoped_op(

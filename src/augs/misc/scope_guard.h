@@ -27,6 +27,10 @@ namespace augs {
 			exit_function.reset();
 		}
 
+		explicit operator bool() const {
+			return exit_function.has_value();
+		}
+
 		scope_guard(const scope_guard&) = delete;
 		scope_guard& operator=(const scope_guard&) = delete;
 		scope_guard& operator=(scope_guard&&) = delete;
