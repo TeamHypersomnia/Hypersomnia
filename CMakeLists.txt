@@ -2,18 +2,18 @@ cmake_minimum_required(VERSION 3.2)
 
 project(Hypersomnia)
 
-message("C: ${CMAKE_C_COMPILER}")
-message("CXX: ${CMAKE_CXX_COMPILER}")
+# Sanity logs.
+message("CMAKE_C_COMPILER: ${CMAKE_C_COMPILER}")
+message("CMAKE_CXX_COMPILER: ${CMAKE_CXX_COMPILER}")
 
 message("Hypersomnia project source dir: ${PROJECT_SOURCE_DIR}")
 message("Hypersomnia project binary dir: ${PROJECT_BINARY_DIR}")
 message("Hypersomnia current binary dir: ${CMAKE_CURRENT_BINARY_DIR}")
 
 # Determine the used compiler.
-# In case of MSVC, CMake sets it to ON on its own.
+# In case of MSVC, CMake sets the MSVC variable to ON on its own.
 
 # Important note:
-# UNIX build is currently hardcoded to be dynamically linked.
 # MSVC build is currently hardcoded to be statically linked.
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
@@ -46,12 +46,13 @@ else()
 	message(FATAL_ERROR "Unknown system.")
 endif()
 
-# Various feature switches.
+##################################################
+### ALL CUSTOMIZABLE BUILD SWITCHES BEGIN HERE ###
+
 # If it is your first time building Hypersomnia and you get some errors,
-# try turning all of these off to build the minimal possible working Hypersomnia runtime. Then, try to work from there.
+# you might want to try turning HYPERSOMNIA_BARE on to build the minimal possible working Hypersomnia runtime.
+# Then, try to work from there.
 # The game should still run, even not having these features, although obviously, you won't see or hear anything.
-# In the future, the switches will also differ depending on whether the target application is a client or a server.
-# If you're a developer, you might also want to disable some of these to have faster builds for quicker iteration.
 
 if(HYPERSOMNIA_BARE)
 	message("Building Hypersomnia without... anything")
@@ -61,30 +62,20 @@ else()
 	set(DEFAULT_OPT ON)
 endif()
 
-# Building switches for functionality using 3rdparty libraries.
+# In the future, the switches will also differ depending on whether the target application is a client or a server.
+# If you're a developer, you might also want to disable some functionality to have faster builds for quicker iteration.
 
-option(BUILD_OPENAL "Build OpenAL Soft." ${DEFAULT_OPT})
-option(BUILD_OPENGL "Build OpenGL-related code." ${DEFAULT_OPT})
-option(BUILD_ENET "Build ENet networking library." ${DEFAULT_OPT})
-option(BUILD_FREETYPE "Build FreeType library responsible for loading fonts." ${DEFAULT_OPT})
-option(BUILD_WINDOW_FRAMEWORK "Build code specific to a given platfom, e.g. window management done by WinAPI." ${DEFAULT_OPT})
-option(BUILD_HTTP_REQUESTS "Build simple http requests, e.g. for latest news bar in the main menu." ${DEFAULT_OPT})
-option(BUILD_UNIT_TESTS "Build unit tests that are run on game startup." ${DEFAULT_OPT})
-option(BUILD_SOUND_FORMAT_DECODERS "Build ogg and vorbis. If this is off, there is also no point in enabling OpenAL." ${DEFAULT_OPT})
+## These variables are used by the archiver to know which files are to be included with the executable,
+## and also for Visual Studio to properly set the working directory.
 
-# Switches for functionality originating from the Hypersomnia codebase.
-option(BUILD_VERSION_FILE_GENERATOR "Build version file generator to generate commit information." ${DEFAULT_OPT})
-option(BUILD_TEST_SCENES "Build unscripted test scenes hardcoded in C++." ${DEFAULT_OPT})
-option(BUILD_PROPERTY_EDITOR "Build property editor code for the editor setup. Due to hardcore templates, this takes amazingly long time to build, so it makes sense to turn it off sometimes." ${DEFAULT_OPT})
+set(HYPERSOMNIA_RESOURCES_FOLDER_NAME "hypersomnia")
+set(HYPERSOMNIA_EXE_RESOURCES_DIR "${PROJECT_SOURCE_DIR}/${HYPERSOMNIA_RESOURCES_FOLDER_NAME}")
 
-# Various other switches.
+## Application packaging switches.
 option(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE "Add command to archive builds in Release." ${DEFAULT_OPT})
 option(ADD_APPLICATION_ICON "Add application icon." ${DEFAULT_OPT})
 
-# Optimization switches.
-option(ENABLE_LINK_TIME_OPTIMIZATION "Some ultra extra optimizations for Release builds. Takes a lot longer to build." OFF)
-
-# Other variables.
+## Hardcoded, relative paths for directories that the executable might write some files to.
 
 # Where the game will save logs.
 # Deleting this folder will have no effect on the game.
@@ -101,6 +92,37 @@ set(HYPERSOMNIA_GENERATED_FILES_DIR "cache/gen/")
 
 set(HYPERSOMNIA_LOCAL_FILES_DIR "cache/usr/")
 
+## Building switches for functionality using 3rdparty libraries.
+
+option(BUILD_OPENAL "Build OpenAL Soft." ${DEFAULT_OPT})
+option(BUILD_OPENGL "Build OpenGL-related code." ${DEFAULT_OPT})
+option(BUILD_ENET "Build ENet networking library." ${DEFAULT_OPT})
+option(BUILD_FREETYPE "Build FreeType library responsible for loading fonts." ${DEFAULT_OPT})
+option(BUILD_WINDOW_FRAMEWORK "Build code specific to a given platfom, e.g. window management done by WinAPI." ${DEFAULT_OPT})
+option(BUILD_HTTP_REQUESTS "Build simple http requests, e.g. for latest news bar in the main menu." ${DEFAULT_OPT})
+option(BUILD_UNIT_TESTS "Build unit tests that are run on game startup." ${DEFAULT_OPT})
+option(BUILD_SOUND_FORMAT_DECODERS "Build ogg and vorbis. If this is off, there is also no point in enabling OpenAL." ${DEFAULT_OPT})
+
+## Switches for functionality originating from the Hypersomnia codebase.
+
+option(BUILD_VERSION_FILE_GENERATOR "Build version file generator to generate commit information." ${DEFAULT_OPT})
+option(BUILD_TEST_SCENES "Build unscripted test scenes hardcoded in C++." ${DEFAULT_OPT})
+option(BUILD_PROPERTY_EDITOR "Build property editor code for the editor setup. Due to hardcore templates, this takes amazingly long time to build, so it makes sense to turn it off sometimes." ${DEFAULT_OPT})
+
+set(BUILD_IN_CONSOLE_MODE OFF CACHE STRING "0")
+
+## Build optimization switches.
+## These may speed up build times.
+
+option(GENERATE_DEBUG_INFORMATION "Generate source-level debug information. If 0, -g flag will be removed to speed up the build." ${DEFAULT_OPT})
+
+## Runtime optimization switches.
+
+# Don't happily turn everything ON because optimizations take a lot of build time,
+# and you probably don't need the runtime to be as fast as light, at least for now.
+
+option(ENABLE_LINK_TIME_OPTIMIZATION "Some ultra extra optimizations for Release builds. Takes a lot longer to build." OFF)
+
 # If this variable is nonzero, the cosmos will use a statically allocated number
 # of entities, drastically improving access performance. Might be very useful for a sever application.
 # Pros: 
@@ -109,6 +131,7 @@ set(HYPERSOMNIA_LOCAL_FILES_DIR "cache/usr/")
 #	- Compilation might be longer due to component includes needed everywhere
 #	- Can't tweak maximum number of entities at runtime
 #	- Even empty game worlds occupy as much space as those filled to the maximum
+
 set(STATICALLY_ALLOCATE_ENTITIES "1" CACHE STRING "Statically allocate entities in the cosmos")
 
 # If this variable is nonzero, the cosmos common will use a statically allocated number
@@ -119,12 +142,36 @@ set(STATICALLY_ALLOCATE_ENTITIES "1" CACHE STRING "Statically allocate entities 
 #	- Compilation might be longer due to component includes needed everywhere
 #	- Can't tweak maximum number of entity flavours at runtime
 #	- Even empty game worlds occupy as much space as those filled to the maximum
+
 set(STATICALLY_ALLOCATE_ENTITY_FLAVOURS "1" CACHE STRING "Statically allocate entity flavours in the cosmos common")
+
+# Other self-explanatory static allocation switches. Possible values are one or zero.
 
 set(STATICALLY_ALLOCATE_ASSETS "1" CACHE STRING "Statically allocate assets using container_sizes.h")
 set(STATICALLY_ALLOCATE_BAKED_FONTS "1" CACHE STRING "Statically allocate fonts for faster rendering. One font weights 3 MB.")
 
-set(BUILD_IN_CONSOLE_MODE OFF CACHE STRING "0")
+## Internal build flags for programmers' use. 
+## Don't set them manually without a good reason.
+
+set (BUILD_LUA_AS_CPP OFF)
+
+### ALL CUSTOMIZABLE BUILD SWITCHES END HERE ###
+################################################
+
+# Here we automatically adjust some of the switches,
+# based on what was set by the user.
+
+set(BUILD_GLAD ${BUILD_OPENGL})
+
+if (MSVC OR CLANG) 
+	set(ADD_MCMODEL_LARGE_FLAG OFF CACHE STRING "Needed to suppress some crazy linker errors")
+elseif (GCC)
+	set(ADD_MCMODEL_LARGE_FLAG ON CACHE STRING "Needed to suppress some crazy linker errors")
+endif()
+
+if(NOT BUILD_WINDOW_FRAMEWORK)
+	set(BUILD_IN_CONSOLE_MODE "1")
+endif()
 
 if(UNIX)
 	# Set different default options for UNIX:
@@ -135,24 +182,6 @@ if(UNIX)
 	set(BUILD_HTTP_REQUESTS OFF)
 	set(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE OFF)
 endif()
-
-# Here we set some internal flags for programmers' use. 
-# Don't set them manually without a good reason.
-
-if (MSVC OR CLANG) 
-	set(ADD_MCMODEL_LARGE_FLAG OFF CACHE STRING "Needed to suppress some crazy linker errors")
-elseif (GCC)
-	set(ADD_MCMODEL_LARGE_FLAG ON CACHE STRING "Needed to suppress some crazy linker errors")
-endif()
-
-set (BUILD_LUA_AS_CPP OFF)
-# End of internal flags
-
-if(NOT BUILD_WINDOW_FRAMEWORK)
-	set(BUILD_IN_CONSOLE_MODE "1")
-endif()
-
-set(BUILD_GLAD ${BUILD_OPENGL})
 
 if(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE)
 	if (NOT HYPERSOMNIA_RUNTIME_ARCHIVE_DIR)
@@ -169,12 +198,10 @@ if(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE)
 	endif()
 endif()
 
-# Used by archiver and to set the working directory under VS.
-
-set(RESOURCES_FOLDER_NAME "hypersomnia")
-set(HYPERSOMNIA_EXE_RESOURCES_DIR "${PROJECT_SOURCE_DIR}/${RESOURCES_FOLDER_NAME}")
-
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
+#####################################################
+### SPECIFICATION OF ALL SOURCE FILES BEGINS HERE ###
 
 # We will be building Lua manually as there is no up-to-date CMakeLists for Lua.
 
@@ -213,10 +240,6 @@ set(LUA_CPPS
 	"src/3rdparty/lua/lvm.c"
 	"src/3rdparty/lua/lzio.c"
 )
-
-if(BUILD_LUA_AS_CPP)
-	set_source_files_properties(${LUA_CPPS} PROPERTIES LANGUAGE CXX)
-endif()
 
 # We will be building Box2D manually, as it is hacked to the utmost.
 
@@ -297,13 +320,93 @@ set(HYPERSOMNIA_TEST_SCENES_CPPS
 	"src/test_scenes/scenes/testbed.cpp"
 )
 
-# We don't care about alphabetical order. Put new files to the very bottom.
+# Order is important inasmuch as multi-threaded builds are concerned.
+# Put intensive cpps to the very beginning.
 
 set(HYPERSOMNIA_CODEBASE_CPPS
-	# This should be the first one to build to catch errors early
-	"src/game/tests_of_traits.cpp"
-
+	"src/application/setups/editor/gui/editor_history_gui.cpp"
+	"src/application/setups/editor/gui/editor_go_to_gui.cpp"
+	"src/application/setups/editor/editor_camera.cpp"
+	"src/application/setups/editor/editor_popup.cpp"
+	"src/application/setups/editor/editor_command_input.cpp"
+	"src/application/setups/editor/commands/fill_with_test_scene_command.cpp"
+	"src/application/setups/editor/commands/delete_entities_command.cpp"
+	"src/application/setups/editor/commands/move_entities_command.cpp"
+	"src/application/setups/editor/gui/editor_entity_selector.cpp"
+	"src/application/setups/editor/property_editor/fae_tree_structs.cpp"
+	"src/application/setups/editor/commands/paste_entities_command.cpp"
+	"src/application/setups/editor/commands/duplicate_entities_command.cpp"
+	"src/application/setups/editor/commands/change_grouping_command.cpp"
+	"src/application/setups/editor/editor_selection_groups.cpp"
+	"src/application/setups/editor/gui/editor_selection_groups_gui.cpp"
+	"src/application/setups/editor/gui/editor_summary_gui.cpp"
+	"src/application/setups/editor/gui/editor_entity_mover.cpp"
 	"src/application/config_lua_table.cpp"
+	"src/view/audiovisual_state/systems/interpolation_system.cpp"
+	"src/view/audiovisual_state/systems/particles_simulation_system.cpp"
+	"src/view/audiovisual_state/systems/past_infection_system.cpp"
+	"src/view/audiovisual_state/systems/pure_color_highlight_system.cpp"
+	"src/view/audiovisual_state/systems/sound_system.cpp"
+	"src/view/audiovisual_state/systems/thunder_system.cpp"
+	"src/view/audiovisual_state/systems/flying_number_indicator_system.cpp"
+	"src/view/audiovisual_state/systems/wandering_pixels_system.cpp"
+	"src/game/stateless_systems/destruction_system.cpp"
+	"src/game/stateless_systems/hand_fuse_system.cpp"
+	"src/game/stateless_systems/melee_system.cpp"
+	"src/game/stateless_systems/particles_existence_system.cpp"
+	"src/game/stateless_systems/sound_existence_system.cpp"
+	"src/game/stateless_systems/animation_system.cpp"
+	"src/game/stateless_systems/behaviour_tree_system.cpp"
+	"src/game/stateless_systems/car_system.cpp"
+	"src/game/stateless_systems/crosshair_system.cpp"
+	"src/game/stateless_systems/missile_system.cpp"
+	"src/game/stateless_systems/destroy_system.cpp"
+	"src/game/stateless_systems/driver_system.cpp"
+	"src/game/stateless_systems/force_joint_system.cpp"
+	"src/game/stateless_systems/gun_system.cpp"
+	"src/game/stateless_systems/input_system.cpp"
+	"src/game/stateless_systems/intent_contextualization_system.cpp"
+	"src/game/stateless_systems/item_system.cpp"
+	"src/game/stateless_systems/movement_system.cpp"
+	"src/game/stateless_systems/pathfinding_system.cpp"
+	"src/game/stateless_systems/sentience_system.cpp"
+	"src/game/stateless_systems/trace_system.cpp"
+	"src/game/stateless_systems/visibility_system.cpp"
+	"src/game/stateless_systems/physics_system.cpp"
+	"src/view/viewables/regeneration/image_loadables_def.cpp"
+	"src/view/viewables/particle_effect.cpp"
+	"src/view/audiovisual_state/aabb_highlighter.cpp"
+	"src/view/game_gui/elements/action_button.cpp"
+	"src/view/game_gui/elements/character_gui.cpp"
+	"src/view/game_gui/elements/drag_and_drop.cpp"
+	"src/view/game_gui/elements/gui_grid.cpp"
+	"src/view/game_gui/elements/gui_positioning.cpp"
+	"src/view/game_gui/elements/hotbar_button.cpp"
+	"src/view/game_gui/elements/item_button.cpp"
+	"src/view/game_gui/elements/pixel_line_connector.cpp"
+	"src/view/game_gui/elements/drag_and_drop_target_drop_item.cpp"
+	"src/view/game_gui/elements/game_gui_root.cpp"
+	"src/view/game_gui/elements/value_bar.cpp"
+	"src/view/game_gui/elements/slot_button.cpp"
+	"src/view/viewables/particle_types.cpp"
+	"src/view/audiovisual_state/systems/exploding_ring_system.cpp"
+	"src/view/game_gui/game_gui_system.cpp"
+	"src/view/audiovisual_state/systems/light_system.cpp"
+	"src/view/network/simulation_broadcast.cpp"
+	# "src/view/network/simulation_receiver.cpp"
+	"src/view/rendering_scripts/draw_circular_bars.cpp"
+	"src/view/rendering_scripts/draw_cast_spells_highlights.cpp"
+	"src/view/rendering_scripts/draw_crosshair_lasers.cpp"
+	"src/view/rendering_scripts/draw_hud_for_unpinned_explosives.cpp"
+	"src/view/audiovisual_state/world_camera.cpp"
+	"src/view/necessary_resources.cpp"
+	"src/view/audiovisual_state/audiovisual_state.cpp"
+	"src/view/viewables/loaded_sounds_map.cpp"
+	"src/view/viewables/atlas_distributions.cpp"
+	"src/view/viewables/all_viewables_defs.cpp"
+	"src/view/audiovisual_state/audiovisual_profiler.cpp"
+	"src/view/viewables/image_structs.cpp"
+	"src/view/frame_profiler.cpp"
 	"src/view/viewables/regeneration/desaturations.cpp"
 	"src/view/viewables/regeneration/buttons_with_corners.cpp"
 	"src/view/viewables/regeneration/images_from_commands.cpp"
@@ -340,8 +443,6 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/augs/texture_atlas/texture_atlas.cpp"
 	"src/game/assets/animation.cpp"
 	"src/game/assets/behaviour_tree.cpp"
-	"src/view/viewables/regeneration/image_loadables_def.cpp"
-	"src/view/viewables/particle_effect.cpp"
 	"src/game/assets/physical_material.cpp"
 	"src/game/components/flags_component.cpp"
 	"src/game/components/light_component.cpp"
@@ -349,23 +450,9 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/components/sentience_component.cpp"
 	"src/game/detail/explosions.cpp"
 	"src/game/detail/hand_fuse_logic.cpp"
-	"src/view/audiovisual_state/aabb_highlighter.cpp"
-	"src/view/game_gui/elements/action_button.cpp"
-	"src/view/game_gui/elements/character_gui.cpp"
-	"src/view/game_gui/elements/drag_and_drop.cpp"
-	"src/view/game_gui/elements/gui_grid.cpp"
-	"src/view/game_gui/elements/gui_positioning.cpp"
-	"src/view/game_gui/elements/hotbar_button.cpp"
-	"src/view/game_gui/elements/item_button.cpp"
-	"src/view/game_gui/elements/pixel_line_connector.cpp"
-	"src/view/game_gui/elements/drag_and_drop_target_drop_item.cpp"
-	"src/view/game_gui/elements/game_gui_root.cpp"
-	"src/view/game_gui/elements/value_bar.cpp"
-	"src/view/game_gui/elements/slot_button.cpp"
 	"src/game/detail/inventory/inventory_slot.cpp"
 	"src/game/detail/inventory/inventory_slot_id.cpp"
 	"src/game/detail/inventory/inventory_utils.cpp"
-	"src/view/viewables/particle_types.cpp"
 	"src/game/detail/physics/contact_listener.cpp"
 	"src/game/detail/physics/physics_friction_fields.cpp"
 	"src/game/detail/physics/ray_casts.cpp"
@@ -378,24 +465,8 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/enums/item_transfer_result_type.cpp"
 	"src/game/enums/slot_physical_behaviour.cpp"
 	"src/game/detail/ai/create_standard_behaviour_trees.cpp"
-	"src/view/audiovisual_state/systems/exploding_ring_system.cpp"
-	"src/view/game_gui/game_gui_system.cpp"
-	"src/view/audiovisual_state/systems/interpolation_system.cpp"
-	"src/view/audiovisual_state/systems/particles_simulation_system.cpp"
-	"src/view/audiovisual_state/systems/past_infection_system.cpp"
-	"src/view/audiovisual_state/systems/pure_color_highlight_system.cpp"
-	"src/view/audiovisual_state/systems/sound_system.cpp"
-	"src/view/audiovisual_state/systems/thunder_system.cpp"
-	"src/view/audiovisual_state/systems/flying_number_indicator_system.cpp"
-	"src/view/audiovisual_state/systems/wandering_pixels_system.cpp"
 	"src/game/inferred_caches/physics_world_cache.cpp"
 	"src/game/inferred_caches/tree_of_npo_cache.cpp"
-	"src/game/stateless_systems/destruction_system.cpp"
-	"src/game/stateless_systems/hand_fuse_system.cpp"
-	"src/view/audiovisual_state/systems/light_system.cpp"
-	"src/game/stateless_systems/melee_system.cpp"
-	"src/game/stateless_systems/particles_existence_system.cpp"
-	"src/game/stateless_systems/sound_existence_system.cpp"
 	"src/game/other_unit_tests.cpp"
 	"src/game/transcendental/cosmic_entropy.cpp"
 	"src/game/transcendental/cosmic_movie_director.cpp"
@@ -427,32 +498,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/detail/describers.cpp"
 	"src/game/detail/names_and_descriptions.cpp"
 	"src/game/transcendental/cosmos_solvable_significant.cpp"
-	"src/view/network/simulation_broadcast.cpp"
-	# "src/view/network/simulation_receiver.cpp"
-	"src/game/stateless_systems/animation_system.cpp"
-	"src/game/stateless_systems/behaviour_tree_system.cpp"
-	"src/game/stateless_systems/car_system.cpp"
-	"src/game/stateless_systems/crosshair_system.cpp"
-	"src/game/stateless_systems/missile_system.cpp"
-	"src/game/stateless_systems/destroy_system.cpp"
-	"src/game/stateless_systems/driver_system.cpp"
-	"src/game/stateless_systems/force_joint_system.cpp"
-	"src/game/stateless_systems/gun_system.cpp"
-	"src/game/stateless_systems/input_system.cpp"
-	"src/game/stateless_systems/intent_contextualization_system.cpp"
-	"src/game/stateless_systems/item_system.cpp"
-	"src/game/stateless_systems/movement_system.cpp"
-	"src/game/stateless_systems/pathfinding_system.cpp"
-	"src/game/stateless_systems/sentience_system.cpp"
-	"src/game/stateless_systems/trace_system.cpp"
-	"src/game/stateless_systems/visibility_system.cpp"
-	"src/view/rendering_scripts/draw_circular_bars.cpp"
-	"src/view/rendering_scripts/draw_cast_spells_highlights.cpp"
-	"src/view/rendering_scripts/draw_crosshair_lasers.cpp"
-	"src/view/rendering_scripts/draw_hud_for_unpinned_explosives.cpp"
-	"src/view/audiovisual_state/world_camera.cpp"
 	"src/application/setups/test_scene_setup.cpp"
-	"src/application/setups/editor/editor_setup.cpp"
 	"src/application/setups/editor/editor_folder.cpp"
 	"src/application/setups/editor/editor_recent_paths.cpp"
 	"src/application/setups/main_menu_setup.cpp"
@@ -495,7 +541,6 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/detail/spells/echoes_of_the_higher_realms.cpp"
 	"src/augs/misc/lua/lua_utils.cpp"
 	"src/test_scenes/test_scenes_content.cpp"
-	"src/view/necessary_resources.cpp"
 	"src/augs/misc/imgui/imgui_utils.cpp"
 	"src/augs/misc/imgui/imgui_control_wrappers.cpp"
 	"src/application/gui/settings_gui.cpp"
@@ -503,22 +548,16 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/augs/gui/bbcode.cpp"
 	"src/augs/unit_tests.cpp"
 	"src/game/transcendental/cosmic_profiler.cpp"
-	"src/view/audiovisual_state/audiovisual_state.cpp"
-	"src/view/viewables/loaded_sounds_map.cpp"
-	"src/view/viewables/atlas_distributions.cpp"
 	"src/application/main/draw_debug_details.cpp"
 	"src/application/main/imgui_pass.cpp"
 	"src/application/main/release_flags.cpp"
 	"src/game/debug_drawing_settings.cpp"
 	"src/application/session_profiler.cpp"
-	"src/view/viewables/all_viewables_defs.cpp"
-	"src/view/audiovisual_state/audiovisual_profiler.cpp"
 	"src/application/intercosm.cpp"
 	"src/augs/misc/imgui/addons/imguitabwindow/imguitabwindow.cpp"
 	"src/augs/misc/imgui/imgui_controls.cpp"
 	"src/augs/readwrite/readwrite_tests.cpp"
 	"src/game/components/trace_component.cpp"
-	"src/game/stateless_systems/physics_system.cpp"
 	"src/game/transcendental/standard_solver.cpp"
 	"src/game/transcendental/cosmos_solvable.cpp"
 	"src/game/transcendental/cosmos_common.cpp"
@@ -526,12 +565,10 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/transcendental/cosmic_functions.cpp"
 	"src/game/detail/view_input/particle_effect_input.cpp"
 	"src/game/detail/view_input/sound_effect_input.cpp"
-	"src/view/viewables/image_structs.cpp"
 	"src/game/detail/spells/spell_logic_input.cpp"
 	"src/game/inferred_caches/processing_lists_cache.cpp"
 	"src/game/transcendental/entity_id.cpp"
 	"src/augs/misc/children_vector_tracker.cpp"
-	"src/view/frame_profiler.cpp"
 	"src/application/setups/editor/editor_autosave.cpp"
 	"src/application/setups/editor/editor_paths.cpp"
 	"src/augs/templates/container_templates.cpp"
@@ -540,32 +577,58 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/transcendental/state_tests.cpp"
 	"src/build_info.cpp"
 	"src/augs/misc/pool/pool.cpp"
-	"src/application/setups/editor/gui/editor_history_gui.cpp"
-	"src/application/setups/editor/gui/editor_go_to_gui.cpp"
-	"src/application/setups/editor/editor_camera.cpp"
-	"src/application/setups/editor/editor_popup.cpp"
-	"src/application/setups/editor/editor_command_input.cpp"
-	"src/application/setups/editor/commands/fill_with_test_scene_command.cpp"
-	"src/application/setups/editor/commands/delete_entities_command.cpp"
-	"src/application/setups/editor/commands/change_property_command.cpp"
-	"src/application/setups/editor/gui/editor_all_entities_gui.cpp"
-	"src/augs/templates/introspect.cpp"
-	"src/application/setups/editor/gui/editor_common_state_gui.cpp"
-	"src/application/setups/editor/commands/move_entities_command.cpp"
-	"src/application/setups/editor/gui/editor_entity_selector.cpp"
-	"src/application/setups/editor/property_editor/fae_tree_structs.cpp"
 	"src/augs/math/snapping_grid.cpp"
 	"src/application/setups/editor/editor_view.cpp"
 	"src/game/detail/sentience_shake.cpp"
-	"src/application/setups/editor/commands/paste_entities_command.cpp"
-	"src/application/setups/editor/commands/duplicate_entities_command.cpp"
-	"src/application/setups/editor/commands/change_grouping_command.cpp"
-	"src/application/setups/editor/editor_selection_groups.cpp"
-	"src/application/setups/editor/gui/editor_selection_groups_gui.cpp"
-	"src/application/setups/editor/gui/editor_summary_gui.cpp"
-	"src/application/setups/editor/gui/editor_entity_mover.cpp"
+	"src/augs/templates/introspect.cpp"
 	"src/augs/string/get_type_name.cpp"
 )
+
+# These cpps will be included as the first to speed up multithreaded build times.
+
+set(HYPERSOMNIA_CPU_INTENSIVE_CPPS
+	# This should be the first one to build to catch errors early
+	"src/game/tests_of_traits.cpp"
+
+	"src/application/setups/editor/gui/editor_all_entities_gui.cpp"
+	"src/application/setups/editor/editor_setup.cpp"
+	"src/application/setups/editor/gui/editor_common_state_gui.cpp"
+	"src/application/setups/editor/commands/change_property_command.cpp"
+)
+
+# The rest of 3rdparty libraries with minimal amount of source files.
+
+set(HYPERSOMNIA_TRIVIAL_3RDPARTY_CPPS
+	"src/3rdparty/lodepng/lodepng.cpp"
+	"src/3rdparty/polypartition/src/polypartition.cpp"
+	"src/3rdparty/rectpack2D/src/pack.cpp"
+	"src/3rdparty/imgui/imgui.cpp"
+	"src/3rdparty/imgui/imgui_draw.cpp"
+	"src/3rdparty/imgui/imgui_demo.cpp"
+)
+
+# These headers will be input to the Introspector-generator.
+
+file(GLOB_RECURSE HYPERSOMNIA_HEADERS_WITH_INTROSPECTED_CLASSES
+    "src/hypersomnia_version.h"
+	"src/augs/*.h"
+	"src/game/*.h"
+	"src/view/*.h"
+	"src/application/*.h"
+	"src/3rdparty/Box2D/Common/*.h"
+	"src/3rdparty/Box2D/Dynamics/*.h"
+	"src/test_scenes/test_scene_flavours.h"
+	"src/test_scenes/test_scene_settings.h"
+
+	"src/test_scenes/test_scene_images.h"
+	"src/test_scenes/test_scene_animations.h"
+
+	"src/game/tests_of_traits.cpp"
+	"src/augs/templates/introspect.cpp"
+)
+
+# Source files that are included conditionally.
+# Conditional inclusion of source files happens here.
 
 if(BUILD_WINDOW_FRAMEWORK)
 	if(MSVC)
@@ -582,16 +645,6 @@ if(BUILD_WINDOW_FRAMEWORK)
 else()
 	list(APPEND HYPERSOMNIA_CODEBASE_CPPS
 		"src/augs/window_framework/window_stubs.cpp"
-	)
-endif()
-
-# natvis files for easier debugging in Visual Studio.
-
-if(MSVC)
-	set(HYPERSOMNIA_NATVIS_FILES
-		"src/game/transcendental/entity_handle.natvis"
-		"src/game/detail/inventory/inventory_slot_handle.natvis"
-		"src/augs/misc/pool/pooled_object_id.natvis"
 	)
 endif()
 
@@ -615,16 +668,15 @@ if(BUILD_TEST_SCENES)
 	message("Building of test scenes is enabled.")
 endif()
 
-# The rest of 3rdparty libraries with minimal amount of source files.
+# natvis files for easier debugging in Visual Studio.
 
-set(HYPERSOMNIA_TRIVIAL_3RDPARTY_CPPS
-	"src/3rdparty/lodepng/lodepng.cpp"
-	"src/3rdparty/polypartition/src/polypartition.cpp"
-	"src/3rdparty/rectpack2D/src/pack.cpp"
-	"src/3rdparty/imgui/imgui.cpp"
-	"src/3rdparty/imgui/imgui_draw.cpp"
-	"src/3rdparty/imgui/imgui_demo.cpp"
-)
+if(MSVC)
+	set(HYPERSOMNIA_NATVIS_FILES
+		"src/game/transcendental/entity_handle.natvis"
+		"src/game/detail/inventory/inventory_slot_handle.natvis"
+		"src/augs/misc/pool/pooled_object_id.natvis"
+	)
+endif()
 
 if(BUILD_GLAD)
 	list(APPEND HYPERSOMNIA_TRIVIAL_3RDPARTY_CPPS
@@ -642,7 +694,14 @@ if(ADD_APPLICATION_ICON)
 	endif()
 endif()
 
-# We arrange the generated sources paths.
+### SPECIFICATION OF ALL SOURCE FILES END HERE ###
+##################################################
+
+if(BUILD_LUA_AS_CPP)
+	set_source_files_properties(${LUA_CPPS} PROPERTIES LANGUAGE CXX)
+endif()
+
+# We arrange the directories for the generated sources paths.
 
 set(GENERATORS_OUTPUT_PATH "${PROJECT_BINARY_DIR}/generators_output")
 set(GENERATED_SOURCES_PATH "${GENERATORS_OUTPUT_PATH}/generated")
@@ -671,24 +730,6 @@ set(INTROSPECTOR_GENERATOR_INPUT_CONFIG_PATH_TEMPLATE
 
 set(INTROSPECTOR_GENERATOR_INPUT_CONFIG_PATH
 	"${PROJECT_BINARY_DIR}/introspector_generator_input.cfg"
-)
-
-file(GLOB_RECURSE HYPERSOMNIA_HEADERS_WITH_INTROSPECTED_CLASSES
-    "src/hypersomnia_version.h"
-	"src/augs/*.h"
-	"src/game/*.h"
-	"src/view/*.h"
-	"src/application/*.h"
-	"src/3rdparty/Box2D/Common/*.h"
-	"src/3rdparty/Box2D/Dynamics/*.h"
-	"src/test_scenes/test_scene_flavours.h"
-	"src/test_scenes/test_scene_settings.h"
-
-	"src/test_scenes/test_scene_images.h"
-	"src/test_scenes/test_scene_animations.h"
-
-	"src/game/tests_of_traits.cpp"
-	"src/augs/templates/introspect.cpp"
 )
 
 # The correct input configuration file shall contain paths to all headers for whom the generator should create introspectors,
@@ -958,6 +999,18 @@ set(CMAKE_CXX_FLAGS_RELWITHDEBINFO
  "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} ${HYPERSOMNIA_CXX_RELWITHDEBINFO_FLAGS}"
 )
 
+message("GENERATE_DEBUG_INFORMATION: ${GENERATE_DEBUG_INFORMATION}")
+
+if(GENERATE_DEBUG_INFORMATION)
+else()
+	message("Removing -g flag.")
+	string(REPLACE "-g" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
+	string(REPLACE "-g" "" CMAKE_C_FLAGS ${CMAKE_C_FLAGS})
+
+	string(REPLACE "-g" "" CMAKE_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
+	string(REPLACE "-g" "" CMAKE_C_FLAGS_DEBUG ${CMAKE_C_FLAGS_DEBUG})
+endif()
+
 message("All CXX flags: ${CMAKE_CXX_FLAGS}")
 message("Debug CXX flags: ${CMAKE_CXX_FLAGS_DEBUG}")
 message("Release CXX flags: ${CMAKE_CXX_FLAGS_RELEASE}")
@@ -1129,13 +1182,15 @@ add_definitions(-DLOG_FILES_DIR="${HYPERSOMNIA_LOG_FILES_DIR}")
 
 
 set(HYPERSOMNIA_CPPS
+	${HYPERSOMNIA_CPU_INTENSIVE_CPPS}
 	"src/main.cpp"
 	"src/help_section.cpp"
 	
-	${HYPERSOMNIA_TRIVIAL_3RDPARTY_CPPS}
-	${HYPERSOMNIA_BOX2D_CPPS}
 	${HYPERSOMNIA_CODEBASE_CPPS}
 	${HYPERSOMNIA_VERSION_FILE_CPP}
+	${HYPERSOMNIA_TRIVIAL_3RDPARTY_CPPS}
+	# Box2d sources go to the very end because they build with speed of light
+	${HYPERSOMNIA_BOX2D_CPPS}
 )
 
 set(HYPERSOMNIA_SRCS
@@ -1252,7 +1307,7 @@ if(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE)
 			-DPYTHON_EXE=${PYTHON_EXECUTABLE}
 			-DGIT_EXE=${GIT_EXECUTABLE}
 			-DCREATE_ARCHIVE_PY_PATH=${CMAKE_MODULE_PATH}/create_archive.py.in
-			-DRESOURCES_FOLDER_NAME=${RESOURCES_FOLDER_NAME}
+			-DRESOURCES_FOLDER_NAME=${HYPERSOMNIA_RESOURCES_FOLDER_NAME}
 			-P ${CMAKE_MODULE_PATH}/create_build_archive.cmake
 		DEPENDS ${CMAKE_MODULE_PATH}/create_build_archive.cmake
 		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
