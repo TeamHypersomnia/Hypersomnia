@@ -20,13 +20,7 @@ struct standard_window_mixin {
 			ImGui::SetNextWindowSize(ImVec2(350,560), ImGuiCond_FirstUseEver);
 		}
 
-		auto result = augs::imgui::cond_scoped_window(show, title.c_str(), &show, std::forward<Args>(args)...);
-
-		if (!show) {
-			result.release();
-		}
-
-		return result;
+		return augs::imgui::cond_scoped_window(show, title.c_str(), &show, std::forward<Args>(args)...);
 	}
 
 	standard_window_mixin(const std::string& title) : title(title) {}

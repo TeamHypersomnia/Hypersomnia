@@ -9,6 +9,21 @@
 
 namespace augs {
 	namespace imgui {
+		template <class T>
+		struct window_scope {
+			T guard;
+			bool is_open = false;
+
+			explicit operator bool() {
+				return is_open;
+			}
+		};
+
+		template <class F>
+		auto make_window_scope(F callback, bool is_open) {
+			return window_scope<F>{ std::move(callback), is_open };
+		}
+
 		template <class Pre, class Post>
 		decltype(auto) cond_scoped_op(bool cond, Pre pre, Post post) {
 			if (cond) {
@@ -33,17 +48,23 @@ namespace augs {
 		}
 		
 		template <class... T>
-		auto cond_scoped_window(const bool do_it, T&&... args) {
-			return cond_scoped_op(
-				do_it,
-				[&](){ ImGui::Begin(std::forward<T>(args)...); },
-				[]() { ImGui::End(); }
-			);
+		auto scoped_window(T&&... args) {
+			const bool is_open = ImGui::Begin(std::forward<T>(args)...);
+			return make_window_scope(make_scope_guard([](){ ImGui::End(); }), is_open);
 		}
 
 		template <class... T>
-		auto scoped_window(T&&... args) {
-			return cond_scoped_window(true, std::forward<T>(args)...);
+		auto cond_scoped_window(const bool do_it, T&&... args) {
+			auto guard = make_scope_guard([](){ ImGui::End(); });
+
+			if (!do_it) {
+				guard.release();
+				return make_window_scope(std::move(guard), false);
+			}
+			else {
+				const bool is_open = ImGui::Begin(std::forward<T>(args)...);
+				return make_window_scope(std::move(guard), is_open);
+			}
 		}
 
 		template <class... T>
