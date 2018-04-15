@@ -58,7 +58,7 @@ void editor_history_gui::perform(const editor_command_input in) {
 		if (command_index > current_revision) {
 			++colors;
 
-			auto header_hover_color = style.Colors[ImGuiCol_CloseButton];
+			auto header_hover_color = style.Colors[ImGuiCol_Button];
 
 			header_hover_color.x /= 1.3;
 			header_hover_color.y /= 1.3;
@@ -76,7 +76,7 @@ void editor_history_gui::perform(const editor_command_input in) {
 		else if (command_index > current_revision) {
 			++colors;
 
-			auto disabled_color = style.Colors[ImGuiCol_CloseButton];
+			auto disabled_color = style.Colors[ImGuiCol_Button];
 			ImGui::PushStyleColor(ImGuiCol_Text, disabled_color);
 		}
 

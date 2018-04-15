@@ -248,7 +248,8 @@ namespace augs {
 		}
 
 		bool is_hovered_with_hand_cursor() {
-			return IsAnyItemHovered() && GetCurrentContext()->HoveredIdHandCursor;
+			// TODO: when all else is done, we may want to do this.
+			return false;// IsAnyItemHovered() && GetCurrentContext()->HoveredIdHandCursor;
 		}
 
 		void center_next_window(const float size_multiplier, const ImGuiCond cond) {

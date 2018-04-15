@@ -28,4 +28,30 @@ namespace ImGui {
 		End();
 		PopStyleVar(4);
 	}
+
+	bool DragIntN(const char* label, int* v, int components, float v_speed, int* v_min, int* v_max, const char* display_format) {
+		ImGuiWindow* window = GetCurrentWindow();
+		if (window->SkipItems)
+		return false;
+
+		ImGuiContext& g = *GImGui;
+		bool value_changed = false;
+		BeginGroup();
+		PushID(label);
+		PushMultiItemsWidths(components);
+		for (int i = 0; i < components; i++)
+		{
+			PushID(i);
+			value_changed |= DragInt("##v", &v[i], v_speed, v_min[i], v_max[i], display_format);
+			SameLine(0, g.Style.ItemInnerSpacing.x);
+			PopID();
+			PopItemWidth();
+		}
+		PopID();
+
+		TextUnformatted(label, FindRenderedTextEnd(label));
+		EndGroup();
+
+		return value_changed;
+	}
 }

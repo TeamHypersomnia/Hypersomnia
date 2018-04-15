@@ -17,6 +17,7 @@
 
 #include "application/setups/editor/property_editor/general_edit_properties.h"
 #include "application/setups/editor/property_editor/property_editor_structs.h"
+#include "application/setups/editor/property_editor/asset_control_provider.h"
 
 #include "augs/readwrite/memory_stream.h"
 #include "augs/readwrite/byte_readwrite.h"
@@ -76,12 +77,16 @@ static void edit_common(
 		}
 	};
 
+	auto& defs = in.folder.work->viewables;
+	const auto project_path = in.folder.current_path;
+
 	general_edit_properties<should_skip_in_common>(
 		prop_in, 
 		signi,
 		post_new_change,
 		rewrite_last_change,
-		common_field_eq_predicate()
+		common_field_eq_predicate(),
+		asset_control_provider { defs, project_path }
 	);
 }
 

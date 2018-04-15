@@ -33,8 +33,6 @@ void perform_editor_tab_gui(
 			out_style.colors[col::Col_TabLabelSelectedHovered] = GetColorU32(in_style.Colors[ImGuiCol_ButtonActive]);
 			out_style.colors[col::Col_TabLabelSelectedActive] = GetColorU32(in_style.Colors[ImGuiCol_ButtonActive]);
 			out_style.colors[col::Col_TabLabelSelectedText] = GetColorU32(in_style.Colors[ImGuiCol_Text]);
-			out_style.colors[col::Col_TabLabelCloseButtonHovered] = GetColorU32(in_style.Colors[ImGuiCol_CloseButtonHovered]);
-			out_style.colors[col::Col_TabLabelCloseButtonActive] = GetColorU32(in_style.Colors[ImGuiCol_CloseButtonActive]);
 		}
 
 		// Tab algorithm i/o
