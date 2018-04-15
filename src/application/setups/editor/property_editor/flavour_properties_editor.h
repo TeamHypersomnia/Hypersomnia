@@ -133,7 +133,7 @@ void edit_invariant(
 		invariant_field_eq_predicate { 
 			cosm, invariant_id, command.type_id, command.affected_flavours 
 		},
-		asset_control_provider { defs, project_path }
+		asset_control_provider { defs, project_path, in }
 	);
 }
 

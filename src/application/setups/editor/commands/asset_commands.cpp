@@ -5,7 +5,7 @@
 
 template <class I>
 std::string create_asset_id_command<I>::describe() const {
-	return typesafe_sprintf("Started tracking image: %x", allocated_id);
+	return typesafe_sprintf("Started tracking image: %x", augs::to_display_path(use_path));
 }
 
 template <class I>
@@ -24,7 +24,10 @@ void create_asset_id_command<I>::redo(const editor_command_input in) {
 		{
 			auto& loadables = work.viewables.image_loadables;
 
-			const auto new_id = loadables.allocate().key;
+			const auto allocation = loadables.allocate();
+			const auto new_id = allocation.key;
+			allocation.object.source_image_path = use_path;
+
 			validate(new_id);
 
 			allocated_id = assets::image_id(new_id);

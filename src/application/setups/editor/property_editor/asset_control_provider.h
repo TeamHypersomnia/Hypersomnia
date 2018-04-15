@@ -11,6 +11,7 @@
 struct asset_control_provider {
 	all_viewables_defs& defs;
 	const augs::path_type& project_path;
+	editor_command_input in;
 
 	struct sorted_path_entry {
 		augs::path_type p;
@@ -44,8 +45,19 @@ struct asset_control_provider {
 		is_one_of_v<T, assets::image_id>
 	;
 
+	auto describe_changed(
+		const std::string& label,
+		const assets::image_id from,
+		const assets::image_id to
+	) const {
+		return description_pair {
+			"",
+			typesafe_sprintf("Set %x to %x", label, augs::to_display_path(defs.image_loadables[to].source_image_path))
+		};
+	}
+
 	template <class T>
-	bool handle(const std::string& label, const T& object) {
+	bool handle(const std::string& label, T& object) const {
 		using namespace augs::imgui;
 
 		bool changed = false;
@@ -111,18 +123,40 @@ struct asset_control_provider {
 					acquire_keyboard_times--;
 				}
 
+				auto& loadables = defs.image_loadables;
+
 				browse_path_tree(
 					browser_settings,
 					all_paths,
 					[&](const auto& path_entry, const auto displayed_name) {
-						const bool is_current = path_entry.get_full_path() == current_source_path;
-
-						if (ImGui::Selectable(displayed_name.c_str(), is_current)) {
-							changed = true;
-						}
+						const auto button_path = path_entry.get_full_path();
+						const bool is_current = button_path == current_source_path;
 
 						if (is_current && detail.acquire_keyboard) {
 							ImGui::SetScrollHere();
+						}
+
+						if (ImGui::Selectable(displayed_name.c_str(), is_current)) {
+							changed = true;
+							ImGui::CloseCurrentPopup();
+
+							if (const auto asset_id = ::find_asset_id_by_path(button_path, loadables)) {
+								object = *asset_id;
+							}
+							else {
+								auto& history = in.folder.history;
+
+								{
+									create_asset_id_command<assets::image_id> cmd;
+									cmd.use_path = button_path.string();
+									history.execute_new(std::move(cmd), in);
+								}
+
+								const auto* const last_addr = std::addressof(history.last_command());
+								const auto* const cmd = std::get_if<create_asset_id_command<assets::image_id>>(last_addr);
+
+								object = cmd->get_allocated_id();
+							}
 						}
 					},
 					detail

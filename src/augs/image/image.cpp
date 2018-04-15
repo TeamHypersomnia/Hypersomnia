@@ -408,16 +408,14 @@ namespace augs {
 		return size.x;
 	}
 
-	image image::get_desaturated() const {
-		auto desaturated = image(size);
-
+	image& image::desaturate() {
 		for (unsigned y = 0; y < size.y; ++y) {
 			for (unsigned x = 0; x < size.x; ++x) {
-				desaturated.pixel({ x, y }) = pixel({ x, y }).get_desaturated();
+				pixel({ x, y }).desaturate();
 			}
 		}
 
-		return desaturated;
+		return *this;
 	}
 }
 

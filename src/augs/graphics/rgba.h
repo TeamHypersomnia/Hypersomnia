@@ -76,7 +76,7 @@ struct rgba {
 	bool operator==(const rgba b) const;
 	bool operator!=(const rgba b) const;
 	hsv get_hsv() const;
-	rgba get_desaturated() const;
+	rgba& desaturate();
 
 	rgba_channel& operator[](const size_t index);
 	const rgba_channel& operator[](const size_t index) const;

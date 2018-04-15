@@ -76,7 +76,7 @@ void action_button::draw(
 					border_col = spell_data.common.associated_color;
 
 					if (!has_enough_mana) {
-						border_col = border_col.get_desaturated();
+						border_col.desaturate();
 					}
 
 					if (const auto inside_tex_entry = game_images.at(inside_tex); inside_tex_entry.diffuse.exists()) {

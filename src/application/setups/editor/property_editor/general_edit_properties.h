@@ -46,16 +46,20 @@ auto describe_changed_generic(
 	}
 };
 
-template <class A, class B>
+template <class A, class B, class S>
 description_pair describe_changed(
 	const A& field_name,
 	const B& old_value,
-   	const B& new_value
+   	const B& new_value,
+	const S& special_provider
 ) {
 	using F = std::decay_t<decltype(new_value)>;
 
 	if constexpr(std::is_same_v<F, bool>) {
 		return { "", describe_changed_flag(field_name, new_value) };
+	}
+	else if constexpr(S::template handles<B>) {
+		return special_provider.describe_changed(field_name, old_value, new_value);
 	}
 	else {
 		if constexpr(std::is_same_v<F, std::string>) {
@@ -118,7 +122,7 @@ void general_edit_properties(
 	G post_new_change_impl,
 	H rewrite_last_change_impl,
 	Eq field_equality_predicate,
-	S special_control_provider = {}
+	const S& special_control_provider = {}
 ) {
 	using namespace augs::imgui;
 
@@ -205,7 +209,7 @@ void general_edit_properties(
 
 					if (callback()) {
 						const auto this_id = ImGui::GetActiveID();
-						const auto description = describe_changed(field_name, old_value, new_value);
+						const auto description = describe_changed(field_name, old_value, new_value, special_control_provider);
 
 						auto& last_active = in.state.last_active;
 
@@ -233,7 +237,7 @@ void general_edit_properties(
 
 					if (callback()) {
 						post_new(
-							describe_changed(field_name, old_value, new_value),
+							describe_changed(field_name, old_value, new_value, special_control_provider),
 							new_value
 						);
 					}

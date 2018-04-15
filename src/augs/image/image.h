@@ -117,6 +117,6 @@ namespace augs {
 		const rgba_channel* get_data() const;
 		const rgba& pixel(const vec2u at_coordinates) const;
 
-		image get_desaturated() const;
+		image& desaturate();
 	};
 }

@@ -5,13 +5,19 @@
 #include "application/setups/editor/commands/editor_command_structs.h"
 #include "view/viewables/all_viewables_declarations.h"
 
+namespace augs {
+	struct introspection_access;
+}
+
 template <class id_type>
 struct create_asset_id_command {
 	// GEN INTROSPECTOR struct create_asset_id_command class id_type
 	editor_command_common common;
 private:
+	friend augs::introspection_access;
 	id_type allocated_id;
 public:
+	std::string use_path;
 	// END GEN INTROSPECTOR
 
 	auto get_allocated_id() const {

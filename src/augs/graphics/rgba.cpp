@@ -306,10 +306,12 @@ hsv rgba::get_hsv() const {
 	return{ res.h / 360.0, res.s, res.v };
 }
 
-rgba rgba::get_desaturated() const {
+rgba& rgba::desaturate() {
 	const auto avg = static_cast<rgba_channel>((static_cast<unsigned>(r) + g + b) / 3u);
-
-	return { avg, avg, avg, a };
+	r = avg;
+	g = avg;
+	b = avg;
+	return *this;
 }
 
 rgba_channel& rgba::operator[](const size_t index) {

@@ -86,7 +86,7 @@ static void edit_common(
 		post_new_change,
 		rewrite_last_change,
 		common_field_eq_predicate(),
-		asset_control_provider { defs, project_path }
+		asset_control_provider { defs, project_path, in }
 	);
 }
 

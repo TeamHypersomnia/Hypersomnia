@@ -1817,6 +1817,12 @@ catch (const augs::too_many_sound_sources_error err) {
 
 	return EXIT_FAILURE;
 }
+catch (augs::filesystem_error err) {
+	LOG("std::filesystem_error thrown: %x\npath1: %x\npath2: %x", err.what(), err.path1(), err.path2());
+
+	return EXIT_FAILURE;
+}
+
 catch (const std::runtime_error err) {
 	LOG("std::runtime_error thrown: %x", err.what());
 

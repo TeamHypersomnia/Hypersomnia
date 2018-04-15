@@ -76,8 +76,8 @@ void editor_history_gui::perform(const editor_command_input in) {
 		else if (command_index > current_revision) {
 			++colors;
 
-			auto disabled_color = style.Colors[ImGuiCol_Button];
-			ImGui::PushStyleColor(ImGuiCol_Text, disabled_color);
+			auto disabled_color = rgba(style.Colors[ImGuiCol_Button]).desaturate();
+			ImGui::PushStyleColor(ImGuiCol_Text, disabled_color.operator ImVec4());
 		}
 
 		auto indent = cond_scoped_indent(has_parent);
