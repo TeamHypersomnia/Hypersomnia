@@ -124,7 +124,7 @@ The generated binary is also more performant (e.g. a simple benchmark yielded ``
 git clone https://github.com/TeamHypersomnia/Hypersomnia --recursive
 cd Hypersomnia
 cmake/build.sh Release x64
-make run -j4 -C build/Release-x64
+ninja run -C build/Release-x64
 ```
 
 ### Detailed instructions
@@ -150,31 +150,30 @@ cmake/build.sh Debug x64 gcc g++
 
 After which, the resultant Makefile should appear in the build/Debug-x64-gcc directory.
 
-#### Invoking make
+#### Invoking ninja
 
-If you are building with ``clang``, make sure to call these exports before invoking ``make``:
+If you are building with ``clang``, make sure to call these exports before invoking ``ninja``:
 
 ```
 export CXX=clang++; export CC=clang;
 ```
 
-This is because some third-party libraries - freetype, for example - generate their Makefiles only after calling ``make`` on the Hypersomnia's Makefile itself.
+This is because some third-party libraries - freetype, for example - generate their Makefiles only after calling ``ninja`` on the Hypersomnia's ``build.ninja`` itself.
 (if GCC build fails for some reason, add respective exports as well.)
 
-There are several additional make targets defined:
+There are several additional ninja targets defined:
 
 ```
-make run
+ninja run
 ```
 Launches the game normally.
 
 ```
-make tests
+ninja tests
 ```
 Launches unit tests only and exits cleanly.
 
-All the above targets set the working directory automatically to ```${PROJECT_SOURCE_DIR}/hypersomnia```.
-Remember to pass ``-j4`` or so to speed up the build.
+The above targets set the working directory automatically to ```${PROJECT_SOURCE_DIR}/hypersomnia```.
 
 If, for some reason, some step fails, refer to the latest working Travis build and the relevant ```travis.yml``` file.
 

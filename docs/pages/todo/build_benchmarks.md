@@ -14,3 +14,7 @@
 	- with -g:
 		make all -j8 -C build/current  1049.32s user 46.56s system 684% cpu 2:40.08 total
 		make src/application/setups/editor/gui/editor_all_entities_gui.cpp.o -j8 -C   35.65s user 1.02s system 99% cpu 36.914 total
+
+- ninja vs make:
+ninja all -C build/current  1051.75s user 40.63s system 784% cpu 2:19.30 total
+make all -j10 -C build/current  1053.82s user 42.51s system 778% cpu 2:20.90 total

@@ -210,3 +210,5 @@ tags
 core
 bt.txt
 Gemfile.lock
+.ninja_deps
+.ninja_log
