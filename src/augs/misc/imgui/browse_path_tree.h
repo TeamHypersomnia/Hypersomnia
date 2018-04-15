@@ -4,11 +4,17 @@
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/misc/imgui/path_tree_settings.h"
 
+struct path_tree_detail {
+	bool acquire_keyboard = false;
+	ImVec2 files_view_size = ImVec2(0, 0);
+};
+
 template <class F, class C>
 void browse_path_tree(
 	path_tree_settings& settings,
 	const C& all_paths,
-	F path_callback
+	F path_callback,
+	const path_tree_detail detail = {}
 ) {
 	using namespace augs::imgui;
 
@@ -20,9 +26,15 @@ void browse_path_tree(
 	thread_local ImGuiTextFilter filter;
 	filter.Draw();
 
+	if (detail.acquire_keyboard) {
+		ImGui::SetKeyboardFocusHere();
+	}
+
 	auto prettify = [prettify_filenames](const std::string& filename) {
 		return prettify_filenames ? format_field_name(augs::path_type(filename).stem()) : filename;
 	};
+
+	auto files_view = scoped_child("Files view", detail.files_view_size);
 
 	if (settings.linear_view) {
 		ImGui::Columns(3);

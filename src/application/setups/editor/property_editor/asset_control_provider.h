@@ -62,6 +62,7 @@ struct asset_control_provider {
 			;
 
 			thread_local bool acquire_once = true;
+			thread_local int acquire_keyboard_times = 2;
 			thread_local std::vector<sorted_path_entry> all_paths;
 			thread_local path_tree_settings browser_settings;
 
@@ -99,6 +100,15 @@ struct asset_control_provider {
 					sort_range(all_paths);
 
 					acquire_once = false;
+					acquire_keyboard_times = 2;
+				}
+
+				path_tree_detail detail;
+				detail.files_view_size = ImVec2(0, 20 * ImGui::GetTextLineHeightWithSpacing());
+
+				if (acquire_keyboard_times > 0) {
+					detail.acquire_keyboard = true;
+					acquire_keyboard_times--;
 				}
 
 				browse_path_tree(
@@ -110,7 +120,12 @@ struct asset_control_provider {
 						if (ImGui::Selectable(displayed_name.c_str(), is_current)) {
 							changed = true;
 						}
-					}
+
+						if (is_current && detail.acquire_keyboard) {
+							ImGui::SetScrollHere();
+						}
+					},
+					detail
 				);
 			}
 			else {

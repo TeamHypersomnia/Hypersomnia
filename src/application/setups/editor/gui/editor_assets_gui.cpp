@@ -57,6 +57,8 @@ void editor_images_gui::perform(editor_command_input in) {
 		return;
 	}
 
+	acquire_keyboard_once();
+
 	auto& work = *in.folder.work;
 	auto& cosm = work.world;
 
