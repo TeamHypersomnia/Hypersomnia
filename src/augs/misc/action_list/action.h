@@ -13,5 +13,7 @@ namespace augs {
 		virtual bool is_complete() const = 0;
 		virtual void on_update(const delta) = 0;
 		virtual void on_enter() = 0;
+
+		virtual ~action() {}
 	};
 }

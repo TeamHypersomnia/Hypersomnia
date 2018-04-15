@@ -40,7 +40,7 @@ script:
       DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
       mkdir -p ${DEPS_DIR} && cd ${DEPS_DIR}
 
-      LLVM_VERSION="5.0.1"
+      LLVM_VERSION="6.0.0"
       LLVM_DIR=${DEPS_DIR}/llvm-${LLVM_VERSION}
 
       LLVM_URL="http://llvm.org/releases/${LLVM_VERSION}/llvm-${LLVM_VERSION}.src.tar.xz"
