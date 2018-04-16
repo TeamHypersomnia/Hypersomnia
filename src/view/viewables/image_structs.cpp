@@ -17,9 +17,7 @@ loaded_image_caches_map::loaded_image_caches_map(
 ) { 
 	loadables.for_each_object_and_id(
 		[this, &metas](const auto& object, const auto id) {
-			image_cache ch(object, metas.at(id));
-
-			sub_with_resize(caches, id.indirection_index) = ch;
+			try_emplace(id, object, metas.at(id));
 		}
 	);
 }

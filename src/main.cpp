@@ -235,9 +235,7 @@ int work(const int argc, const char* const * const argv) try {
 
 	static loaded_sounds_map loaded_sounds;
 	static images_in_atlas_map images_in_atlas;
-#if LOADED_CACHES
 	static loaded_image_caches_map loaded_image_caches;
-#endif
 	static necessary_images_in_atlas_map necessary_images_in_atlas;
 	
 #if STATICALLY_ALLOCATE_BAKED_FONTS
@@ -305,10 +303,6 @@ int work(const int argc, const char* const * const argv) try {
 	static auto load_all = [](const all_viewables_defs& new_defs) {
 		auto scope = measure_scope(profiler.reloading_viewables);
 
-		auto pools_equal = [](const auto& a, const auto& b) {
-			return ranges_equal(a, b) && a.indirectors_equal(b);
-		};
-
 		/* Atlas/meta cache pass */
 
 		{
@@ -323,12 +317,42 @@ int work(const int argc, const char* const * const argv) try {
 			}
 
 			{
-				const auto& new_loadables = new_defs.image_loadables;
-				const auto& old_loadables = currently_loaded_defs.image_loadables;
+				/* Check for unloaded and changed resources */
+				currently_loaded_defs.image_loadables.for_each_object_and_id([&](const auto& old_loadables, const auto key) {
+					if (const auto new_loadables = mapped_or_nullptr(new_defs.image_loadables, key)) {
+						const bool loadables_changed = !(*new_loadables == old_loadables);
 
-				if (!pools_equal(new_loadables, old_loadables)) {
-					new_atlas_required = true;
-				}
+						if (loadables_changed) {
+							/* Changed, reload */
+							new_atlas_required = true;
+						}
+
+						const auto& new_meta = new_defs.image_metas.at(key);
+						const auto& old_meta = currently_loaded_defs.image_metas.at(key);
+
+						const bool meta_changed = !(old_meta == new_meta);
+
+						if (loadables_changed || meta_changed) {
+							loaded_image_caches.at(key) = { *new_loadables, new_meta };
+						}
+					}
+					else {
+						/* Missing, unload */
+						new_atlas_required = true;
+						loaded_image_caches.erase(key);
+					}
+				});
+
+				/* Check for new resources */
+				new_defs.image_loadables.for_each_object_and_id([&](const auto& fresh, const auto key) {
+					if (nullptr == mapped_or_nullptr(currently_loaded_defs.image_loadables, key)) {
+						new_atlas_required = true;
+
+						const auto& new_meta = new_defs.image_metas.at(key);
+						loaded_image_caches.try_emplace(key, fresh, new_meta);
+					}
+					/* Otherwise it's already taken care of */
+				});
 			}
 
 			if (!(config.gui_font == loaded_gui_font)) {
@@ -1054,7 +1078,7 @@ int work(const int argc, const char* const * const argv) try {
 						if constexpr(std::is_same_v<T, editor_setup>) {
 							/* Editor needs more goods */
 							setup.perform_custom_imgui(
-								_lua, _window, in_direct_gameplay
+								_lua, _window, in_direct_gameplay, loaded_image_caches
 							);
 						}
 						else {

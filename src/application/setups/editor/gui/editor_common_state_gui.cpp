@@ -18,6 +18,7 @@
 #include "application/setups/editor/property_editor/general_edit_properties.h"
 #include "application/setups/editor/property_editor/property_editor_structs.h"
 #include "application/setups/editor/property_editor/asset_control_provider.h"
+#include "application/setups/editor/property_editor/commanding_property_editor_input.h"
 
 #include "augs/readwrite/memory_stream.h"
 #include "augs/readwrite/byte_readwrite.h"
@@ -35,9 +36,8 @@ struct common_field_eq_predicate {
 };
 
 static void edit_common(
-	const property_editor_input& prop_in,
-	const cosmos_common_significant& signi,
-	const editor_command_input in
+	const commanding_property_editor_input& in,
+	const cosmos_common_significant& signi
 ) {
 	using namespace augs::imgui;
 
@@ -45,8 +45,9 @@ static void edit_common(
 		return typesafe_sprintf(" (Common state)");
 	}();
 
+	auto& cmd_in = in.command_in;
 	/* Linker error fix */
-	auto& history = in.folder.history;
+	auto& history = cmd_in.folder.history;
 
 	auto post_new_change = [&](
 		const auto& description,
@@ -59,7 +60,7 @@ static void edit_common(
 		cmd.value_after_change = augs::to_bytes(new_content);
 		cmd.built_description = description + property_location;
 
-		history.execute_new(cmd, in);
+		history.execute_new(cmd, cmd_in);
 	};
 
 	auto rewrite_last_change = [&](
@@ -70,23 +71,23 @@ static void edit_common(
 
 		if (auto* const cmd = std::get_if<change_common_state_command>(std::addressof(last))) {
 			cmd->built_description = description + property_location;
-			cmd->rewrite_change(augs::to_bytes(new_content), in);
+			cmd->rewrite_change(augs::to_bytes(new_content), cmd_in);
 		}
 		else {
 			LOG("WARNING! There was some problem with tracking activity of editor controls.");
 		}
 	};
 
-	auto& defs = in.folder.work->viewables;
-	const auto project_path = in.folder.current_path;
+	auto& defs = cmd_in.folder.work->viewables;
+	const auto project_path = cmd_in.folder.current_path;
 
 	general_edit_properties<should_skip_in_common>(
-		prop_in, 
+		in.prop_in, 
 		signi,
 		post_new_change,
 		rewrite_last_change,
 		common_field_eq_predicate(),
-		asset_control_provider { defs, project_path, in }
+		asset_control_provider { defs, project_path, cmd_in }
 	);
 }
 
@@ -107,9 +108,8 @@ void editor_common_state_gui::perform(const editor_settings& settings, const edi
 	ImGui::Separator();
 
 	edit_common(
-		{ settings.property_editor, property_editor_data },
-		cosm.get_common_significant(),
-		in
+		{ { settings.property_editor, property_editor_data }, in },
+		cosm.get_common_significant()
 	);
 }
 #else

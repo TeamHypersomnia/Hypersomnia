@@ -140,7 +140,7 @@ template <class Container, class Key>
 auto mapped_or_nullptr(
 	Container& container,
 	Key&& key
-) -> ptr_to_mapped_type<Container> {
+) {
 	if constexpr (member_find_returns_ptr_v<Container, Key>) {
 		return container.find(std::forward<Key>(key));
 	}
@@ -151,7 +151,7 @@ auto mapped_or_nullptr(
 			return std::addressof((*it).second);
 		}
 
-		return nullptr;
+		return ptr_to_mapped_type<Container>(nullptr);
 	}
 }
 

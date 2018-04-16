@@ -229,7 +229,8 @@ void editor_setup::fill_with_test_scene(sol::state& lua) {
 void editor_setup::perform_custom_imgui(
 	sol::state& lua,
 	augs::window& owner,
-	const bool in_direct_gameplay
+	const bool in_direct_gameplay,
+	const loaded_image_caches_map& image_caches
 ) {
 	using namespace augs::imgui;
 
@@ -400,7 +401,7 @@ void editor_setup::perform_custom_imgui(
 		history_gui.perform(make_command_input());
 
 		common_state_gui.perform(settings, make_command_input());
-		all_entities_gui.perform(settings, nullptr, make_command_input());
+		all_entities_gui.perform(make_all_entities_gui_input(nullptr, image_caches));
 		selection_groups_gui.perform(ImGui::GetIO().KeyCtrl, make_command_input());
 
 		summary_gui.perform(*this);
@@ -422,7 +423,8 @@ void editor_setup::perform_custom_imgui(
 		}();
 
 		{
-			const auto filters = selected_entities_gui.perform(settings, std::addressof(all_selected), make_command_input());
+			const auto in = make_all_entities_gui_input(std::addressof(all_selected), image_caches);
+			const auto filters = selected_entities_gui.perform(in);
 
 			const auto& cosm = work().world;
 			filters.perform(cosm, view().selected_entities);
@@ -779,6 +781,14 @@ void editor_setup::close_folder() {
 
 editor_command_input editor_setup::make_command_input() {
 	return { destructor_input.lua, folder(), selector, all_entities_gui, mover };
+}
+
+
+editor_all_entities_gui_input editor_setup::make_all_entities_gui_input(
+	const std::unordered_set<entity_id>* selections,
+	const loaded_image_caches_map& image_caches
+) {
+	return { settings.property_editor, selections, make_command_input(), image_caches };
 }
 
 entity_mover_input editor_setup::make_mover_input() {

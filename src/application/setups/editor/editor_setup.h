@@ -216,7 +216,8 @@ public:
 	void perform_custom_imgui(
 		sol::state& lua,
 		augs::window& owner,
-		const bool in_direct_gameplay
+		const bool in_direct_gameplay,
+		const loaded_image_caches_map& image_caches
 	);
 
 	void customize_for_viewing(config_lua_table& cfg) const;
@@ -315,6 +316,12 @@ public:
 	}
 
 	editor_command_input make_command_input();
+
+	editor_all_entities_gui_input make_all_entities_gui_input(
+		const std::unordered_set<entity_id>*,
+		const loaded_image_caches_map& image_caches
+	);
+
 	entity_mover_input make_mover_input();
 
 	template <class T, class... Args>

@@ -21,6 +21,7 @@ void editor_all_entities_gui::interrupt_tweakers() {
 #include "application/setups/editor/editor_folder.h"
 
 #include "application/setups/editor/property_editor/fae_tree.h"
+#include "application/setups/editor/property_editor/commanding_property_editor_input.h"
 
 #include "augs/readwrite/memory_stream.h"
 #include "augs/readwrite/byte_readwrite.h"
@@ -196,9 +197,7 @@ public:
 };
 
 fae_tree_filter editor_all_entities_gui::perform(
-	const editor_settings& settings,
-	const std::unordered_set<entity_id>* only_match_entities,
-	editor_command_input in
+	const editor_all_entities_gui_input in
 ) {
 	using namespace augs::imgui;
 
@@ -213,18 +212,27 @@ fae_tree_filter editor_all_entities_gui::perform(
 
 	fae_tree_data.hovered_guid.unset();
 
-	const bool show_filter_buttons = only_match_entities != nullptr;
+	const bool show_filter_buttons = in.only_match_entities != nullptr;
 
-	const auto prop_in = property_editor_input { settings.property_editor, property_editor_data };
-
-	const auto fae_in = fae_tree_input { 
-		fae_tree_data, prop_in, show_filter_buttons
+	const auto prop_in = property_editor_input { 
+		in.settings,
+		property_editor_data 
 	};
 
-	const auto& cosm = in.get_cosmos();
+	const auto command_in = in.command_in;
 
-	if (only_match_entities) {
-		const auto& matches = *only_match_entities;
+	const auto cpe_in = commanding_property_editor_input {
+		prop_in, command_in
+	};
+
+	const auto fae_in = fae_tree_input { 
+		fae_tree_data, cpe_in, show_filter_buttons, in.image_caches
+	};
+
+	const auto& cosm = command_in.get_cosmos();
+
+	if (in.only_match_entities != nullptr) {
+		const auto& matches = *in.only_match_entities;
 		const auto num_matches = matches.size();
 
 		if (num_matches == 0) {
@@ -235,8 +243,8 @@ fae_tree_filter editor_all_entities_gui::perform(
 
 			if (const auto handle = cosm[id]) {
 				handle.dispatch([&](const auto typed_handle) {
-					do_edit_flavours_gui(prop_in, in, typed_handle.get_flavour(), { typed_handle.get_flavour_id().raw });
-					do_edit_entities_gui(prop_in, in, typed_handle, { id.basic() });
+					do_edit_flavours_gui(fae_in, typed_handle.get_flavour(), { typed_handle.get_flavour_id().raw });
+					do_edit_entities_gui(fae_in, typed_handle, { id.basic() });
 				});
 			}
 
@@ -257,14 +265,12 @@ fae_tree_filter editor_all_entities_gui::perform(
 
 		return fae_tree(
 			fae_in,
-			in,
 			in_selection_provider { cosm, per_native_type }
 		);
 	}
 
 	return fae_tree(
 		fae_in,
-		in,
 		all_provider { cosm }
 	);
 }
@@ -273,7 +279,7 @@ fae_tree_filter editor_all_entities_gui::perform(
 fae_tree_filter editor_all_entities_gui::perform(
 	const editor_settings& settings,
 	const std::unordered_set<entity_id>* only_match_entities,
-	editor_command_input in
+	editor_command_input command_in
 ) {
 	return {};
 }

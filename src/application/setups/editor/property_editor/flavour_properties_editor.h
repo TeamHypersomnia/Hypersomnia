@@ -8,6 +8,8 @@
 #include "application/setups/editor/property_editor/property_editor_structs.h"
 
 #include "application/setups/editor/property_editor/asset_control_provider.h"
+#include "application/setups/editor/property_editor/invariant_field_eq_predicate.h"
+#include "application/setups/editor/property_editor/update_size_if_tex_changed.h"
 
 template <class T>
 decltype(auto) get_name_of(const entity_flavour<T>& flavour) {
@@ -32,49 +34,19 @@ auto get_invariant_stem(const T&) {
 	return result;
 }
 
-struct invariant_field_eq_predicate {
-	const cosmos& cosm;
-	const unsigned invariant_id;
-	const entity_type_id type_id;
-	const affected_flavours_type& ids;
-	
-	template <class M>
-	bool compare(
-		const M& first,
-	   	const field_address field_id
-	) const {
-		if (ids.size() == 1) {
-			return true;
-		}
-
-		flavour_property_id property_id;
-		property_id.invariant_id = invariant_id;
-		property_id.field = field_id;
-
-		return compare_all_fields_to(first, property_id, type_id, cosm, ids);
-	}
-};
-
 template <class T>
 void edit_invariant(
-	const property_editor_input& prop_in,
+	const fae_property_editor_input in,
 	const T& invariant,
 	const unsigned invariant_id,
 	const std::string& source_flavour_name,
-	const change_flavour_property_command& command,
-   	const editor_command_input in
+	const change_flavour_property_command& command
 ) {
 	using command_type = std::decay_t<decltype(command)>;
 	using namespace augs::imgui;
 
-	auto make_property_id = [&](const field_address field) {
-		flavour_property_id result;
-
-		result.invariant_id = invariant_id;
-		result.field = field;
-
-		return result;
-	};
+	auto& cpe_in = in.cpe_in;
+	auto& cmd_in = cpe_in.command_in;
 
 	const auto property_location = [&]() {
 		const auto flavour_name = source_flavour_name;
@@ -84,20 +56,26 @@ void edit_invariant(
 	}();
 
 	/* Linker error fix */
-	auto& history = in.folder.history;
+	auto& history = cmd_in.folder.history;
+
+	auto& defs = cmd_in.folder.work->viewables;
 
 	auto post_new_change = [&](
 		const auto& description,
 		const auto field_id,
 		const auto& new_content
 	) {
-		auto cmd = command;
+		{
+			auto cmd = command;
 
-		cmd.property_id = make_property_id(field_id);
-		cmd.value_after_change = augs::to_bytes(new_content);
-		cmd.built_description = description + property_location;
+			cmd.property_id = flavour_property_id { invariant_id, field_id };
+			cmd.value_after_change = augs::to_bytes(new_content);
+			cmd.built_description = description + property_location;
 
-		history.execute_new(cmd, in);
+			history.execute_new(std::move(cmd), cmd_in);
+		}
+
+		update_size_if_tex_changed(invariant, in, invariant_id, command, new_content);
 	};
 
 	auto rewrite_last_change = [&](
@@ -108,37 +86,35 @@ void edit_invariant(
 
 		if (auto* const cmd = std::get_if<command_type>(std::addressof(last))) {
 			cmd->built_description = description + property_location;
-			cmd->rewrite_change(augs::to_bytes(new_content), in);
+			cmd->rewrite_change(augs::to_bytes(new_content), cmd_in);
 		}
 		else {
 			LOG("WARNING! There was some problem with tracking activity of editor controls.");
 		}
 	};
 
-	const auto& cosm = in.get_cosmos();
+	const auto& cosm = cmd_in.get_cosmos();
 	
-	auto& defs = in.folder.work->viewables;
-	const auto project_path = in.folder.current_path;
+	const auto project_path = cmd_in.folder.current_path;
 
 	general_edit_properties(
-		prop_in, 
+		cpe_in.prop_in, 
 		invariant,
 		post_new_change,
 		rewrite_last_change,
 		invariant_field_eq_predicate { 
 			cosm, invariant_id, command.type_id, command.affected_flavours 
 		},
-		asset_control_provider { defs, project_path, in }
+		asset_control_provider { defs, project_path, cmd_in }
 	);
 }
 
 
 template <class E>
 void edit_flavour(
-	const property_editor_input& prop_in,
+	const fae_property_editor_input in,
 	const entity_flavour<E>& flavour,
-	const change_flavour_property_command& command,
-   	const editor_command_input in
+	const change_flavour_property_command& command
 ) {
 	using namespace augs::imgui;
 
@@ -155,12 +131,11 @@ void edit_flavour(
 	*/
 
 	edit_invariant(
-		prop_in,
+		in,
 	   	name_invariant,
 	   	get_index(name_invariant),
 	   	source_flavour_name,
-	   	command,
-	   	in
+	   	command
 	);
 
 	for_each_through_std_get(
@@ -178,7 +153,7 @@ void edit_flavour(
 			next_column_text();
 
 			if (node) {
-				edit_invariant(prop_in, invariant, get_index(invariant), source_flavour_name, command, in);
+				edit_invariant(in, invariant, get_index(invariant), source_flavour_name, command);
 			}
 		}
    	);

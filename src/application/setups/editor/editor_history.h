@@ -25,6 +25,24 @@ struct editor_history : public editor_history_base {
 
 	using editor_history_base::editor_history_base;
 
+	bool next_command_has_parent() const {
+		return std::visit(
+			[](const auto& command) {
+				return command.common.has_parent;
+			},
+			next_command()
+		);
+	}
+
+	bool last_command_has_parent() const {
+		return std::visit(
+			[](const auto& command) {
+				return command.common.has_parent;
+			},
+			last_command()
+		);
+	}
+
 	template <class T, class... RedoArgs>
 	void execute_new(T&& command, RedoArgs&&... redo_args) {
 		command.common.reset_timestamp();
@@ -48,17 +66,6 @@ struct editor_history : public editor_history_base {
 		);
 	}
 
-private:
-	bool next_command_has_parent() const {
-		return std::visit(
-			[](const auto& command) {
-				return command.common.has_parent;
-			},
-			next_command()
-		);
-	}
-
-public:
 	template <class... Args>
 	void redo(Args&&... args) {
 		while (editor_history_base::redo(std::forward<Args>(args)...)) {

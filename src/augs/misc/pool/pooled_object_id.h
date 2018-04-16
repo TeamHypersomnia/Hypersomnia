@@ -60,16 +60,16 @@ namespace augs {
 }
 
 namespace std {
-	template <class S>
-	struct hash<augs::pooled_object_id<S>> {
-		std::size_t operator()(const augs::pooled_object_id<S> k) const {
+	template <class S, class... K>
+	struct hash<augs::pooled_object_id<S, K...>> {
+		std::size_t operator()(const augs::pooled_object_id<S, K...> k) const {
 			return augs::simple_two_hash(k.indirection_index, k.version);
 		}
 	};
 
-	template <class S>
-	struct hash<augs::unversioned_id<S>> {
-		std::size_t operator()(const augs::unversioned_id<S> k) const {
+	template <class S, class... K>
+	struct hash<augs::unversioned_id<S, K...>> {
+		std::size_t operator()(const augs::unversioned_id<S, K...> k) const {
 			return std::hash<int>()(k.indirection_index);
 		}
 	};

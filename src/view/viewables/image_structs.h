@@ -1,5 +1,6 @@
 #pragma once
 #include <optional>
+#include <unordered_map>
 
 #include "augs/misc/enum/enum_array.h"
 #include "augs/drawing/flip.h"
@@ -56,7 +57,8 @@ struct image_in_atlas {
 };
 
 class loaded_image_caches_map {
-	std::vector<image_cache> caches;
+	using map_type = std::unordered_map<assets::image_id, image_cache>;
+	map_type caches;
 
 public:
 	loaded_image_caches_map() = default;
@@ -66,8 +68,16 @@ public:
 		const image_metas_map&
 	);
 
+	const image_cache* find(const assets::image_id id) const {
+		return mapped_or_nullptr(caches, id);
+	}
+
+	decltype(auto) at(const assets::image_id id) {
+		return caches.at(id);
+	}
+
 	decltype(auto) at(const assets::image_id id) const {
-		return caches.at(id.get_cache_index());
+		return caches.at(id);
 	}
 
 	auto size() const {
@@ -76,6 +86,15 @@ public:
 
 	void clear() {
 		caches.clear();
+	}
+
+	void erase(const assets::image_id id) {
+		caches.erase(id);
+	}
+
+	template <class... Args>
+	auto try_emplace(const assets::image_id id, Args&&... args) {
+		caches.try_emplace(id, std::forward<Args>(args)...);
 	}
 };
 

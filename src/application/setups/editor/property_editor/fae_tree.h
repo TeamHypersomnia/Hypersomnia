@@ -15,8 +15,7 @@
 
 template <class E>
 void do_edit_entities_gui(
-	const property_editor_input& prop_in,
-	editor_command_input in,
+	const fae_property_editor_input in,
 	const const_typed_entity_handle<E>& entity,
 	const affected_entities_type& ids
 ) {
@@ -24,15 +23,14 @@ void do_edit_entities_gui(
 	cmd.type_id.set<E>();
 	cmd.affected_entities = ids;
 
-	edit_entity(prop_in, entity, cmd, in);
+	edit_entity(in, entity, cmd);
 
 	ImGui::Separator();
 }
 
 template <class E>
 void do_edit_flavours_gui(
-	const property_editor_input& prop_in,
-	editor_command_input in,
+	const fae_property_editor_input in,
 	const entity_flavour<E>& flavour,
 	const affected_flavours_type& ids
 ) {
@@ -40,25 +38,22 @@ void do_edit_flavours_gui(
 	cmd.type_id.set<E>();
 	cmd.affected_flavours = ids;
 
-	edit_flavour(prop_in, flavour, cmd, in);
+	edit_flavour(in, flavour, cmd);
 
 	ImGui::Separator();
 }
 
 template <class F>
 auto fae_tree(
-	const fae_tree_input& fae_in,
-	editor_command_input in,
+	const fae_tree_input fae_in,
 	F&& flavours_and_entities_provider
 ) {
 	using namespace augs::imgui;
 
-	auto prop_in = fae_in.prop_in;
+	const auto cpe_in = fae_in.cpe_in;
+	const auto prop_in = cpe_in.prop_in;
 
 	fae_tree_filter filter;
-
-	auto& work = *in.folder.work;
-	auto& cosm = work.world;
 
 	auto do_edit_entities = [&](const auto& entity, const auto& ids) {
 		thread_local affected_entities_type input;
@@ -70,7 +65,7 @@ auto fae_tree(
 			input = { ids };
 		}
 
-		do_edit_entities_gui(prop_in, in, entity, input);	
+		do_edit_entities_gui(fae_in, entity, input);	
 	};
 
 	auto do_edit_flavours = [&](const auto& flavour, const auto& ids) {
@@ -83,7 +78,7 @@ auto fae_tree(
 			input = { ids };
 		}
 
-		do_edit_flavours_gui(prop_in, in, flavour, input);	
+		do_edit_flavours_gui(fae_in, flavour, input);	
 	};
 
 	auto& provider = flavours_and_entities_provider;
@@ -97,6 +92,8 @@ auto fae_tree(
 			++total_types;
 		}
 	});
+
+	auto& cosm = cpe_in.command_in.get_cosmos();
 
 	cosm.get_solvable().for_each_pool(
 		[&](const auto& p){
