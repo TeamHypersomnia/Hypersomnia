@@ -36,6 +36,13 @@ void for_each_iconed_entity(const cosmos& cosm, F callback) {
 	});
 }
 
+
+struct grouped_selector_op_input {
+	const current_selections_type& signi_selections;
+	const editor_selection_groups& groups;
+	bool ignore_groups;
+};
+
 class editor_entity_selector {
 	entity_id hovered;
 	entity_id held;
@@ -59,11 +66,9 @@ public:
 		current_selections_type&
 	);
 
-	void do_left_release(
+	current_selections_type do_left_release(
 		bool has_ctrl,
-		current_selections_type&,
-		const editor_selection_groups& groups,
-		bool ignore_groups
+		grouped_selector_op_input
 	);
 
 	auto get_held() const {
@@ -113,15 +118,13 @@ public:
 
 	std::optional<ltrb> find_selection_aabb(
 		const cosmos& cosm,
-		const current_selections_type& signi_selections
+		grouped_selector_op_input in
 	) const;
 
 	std::optional<rgba> find_highlight_color_of(
 		const editor_entity_selector_settings& settings,
 		entity_id id, 
-		const current_selections_type& signi_selections,
-		const editor_selection_groups& groups,
-		bool ignore_groups
+		grouped_selector_op_input in
 	) const;
 
 	template <class F>
@@ -129,26 +132,22 @@ public:
 		F callback,
 		const editor_entity_selector_settings& settings,
 		const cosmos& cosm,
-		const current_selections_type& signi_selections,
-		const editor_selection_groups& groups,
-		const bool ignore_groups
+		const grouped_selector_op_input in
 	) const {
 		for_each_selected_entity(
 			[&](const auto e) {
 				callback(e, settings.selected_color);
 			},
-			signi_selections
+			in.signi_selections
 		);
 
 		auto propagate_to_group_of = [&](const entity_id id, const rgba color) {
 			if (cosm[id]) {
 				callback(id, color);
 
-				if (!ignore_groups) {
-					groups.on_group_entry_of(id, [&](auto, const auto& group, auto) {
-						for (const auto& sibling : group.entries) {
-							callback(sibling, color);
-						}
+				if (!in.ignore_groups) {
+					in.groups.for_each_sibling(id, [&](const auto sibling) {
+						callback(sibling, color);
 					});
 				}
 			}

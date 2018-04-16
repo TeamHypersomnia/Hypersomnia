@@ -316,6 +316,7 @@ public:
 	}
 
 	editor_command_input make_command_input();
+	grouped_selector_op_input make_grouped_selector_op_input() const;
 
 	editor_all_entities_gui_input make_all_entities_gui_input(
 		const std::unordered_set<entity_id>*,
@@ -403,9 +404,7 @@ public:
 				callback,
 				settings.entity_selector,
 				world,
-				view().selected_entities,
-				view().selection_groups,
-				view().ignore_groups
+				make_grouped_selector_op_input()
 			);
 
 			if (const auto match = get_matching_go_to_entity()) {

@@ -1,7 +1,7 @@
 #include "augs/string/typesafe_sprintf.h"
 #include "application/setups/editor/editor_selection_groups.h"
 
-void editor_selection_groups::set_group(const unsigned index, const entity_id id) {
+void editor_selection_groups::set_group(const unsigned index, const selection_group_unit id) {
 	groups[index].entries.emplace(id);
 }
 

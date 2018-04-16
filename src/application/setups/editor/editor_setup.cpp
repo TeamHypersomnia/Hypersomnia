@@ -413,6 +413,10 @@ void editor_setup::perform_custom_imgui(
 
 			if (const auto held = selector.get_held(); held && work().world[held]) {
 				selections.emplace(held);
+
+				if (!view().ignore_groups) {
+					view().selection_groups.for_each_sibling(held, [&](const auto id){ selections.emplace(id); });
+				}
 			}
 
 			if (const auto matching = get_matching_go_to_entity()) {
@@ -783,6 +787,9 @@ editor_command_input editor_setup::make_command_input() {
 	return { destructor_input.lua, folder(), selector, all_entities_gui, mover };
 }
 
+grouped_selector_op_input editor_setup::make_grouped_selector_op_input() const {
+	return { view().selected_entities, view().selection_groups, view().ignore_groups };
+}
 
 editor_all_entities_gui_input editor_setup::make_all_entities_gui_input(
 	const std::unordered_set<entity_id>* selections,
@@ -978,7 +985,7 @@ bool editor_setup::handle_input_before_game(
 				return true;
 			}
 			else if (e.was_released(key::LMOUSE)) {
-				selector.do_left_release(has_ctrl, selections, view().selection_groups, view().ignore_groups);
+				selections = selector.do_left_release(has_ctrl, make_grouped_selector_op_input());
 			}
 		}
 
@@ -1067,7 +1074,7 @@ const editor_view* editor_setup::find_view() const {
 
 std::optional<ltrb> editor_setup::find_selection_aabb() const {
 	if (anything_opened() && player.paused) {
-		return selector.find_selection_aabb(work().world, view().selected_entities);
+		return selector.find_selection_aabb(work().world, make_grouped_selector_op_input());
 	}
 
 	return std::nullopt;
@@ -1076,11 +1083,7 @@ std::optional<ltrb> editor_setup::find_selection_aabb() const {
 std::optional<rgba> editor_setup::find_highlight_color_of(const entity_id id) const {
 	if (anything_opened() && player.paused) {
 		return selector.find_highlight_color_of(
-			settings.entity_selector,
-			id,
-			view().selected_entities,
-			view().selection_groups,
-			view().ignore_groups
+			settings.entity_selector, id, make_grouped_selector_op_input()
 		);
 	}
 

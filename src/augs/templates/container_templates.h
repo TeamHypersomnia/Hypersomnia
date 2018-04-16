@@ -196,13 +196,6 @@ auto first_free_key(const Container& in) {
 	}
 }
 
-template <class Container, class F>
-void for_each_in(const Container& in, F callback) {
-	for (auto& element : in) {
-		callback(element);
-	}
-}
-
 /* Thanks to https://stackoverflow.com/a/28139075/503776 */
 
 template <typename T>

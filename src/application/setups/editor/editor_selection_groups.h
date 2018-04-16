@@ -10,7 +10,8 @@ namespace augs {
 
 struct change_group_property_command;
 
-using selection_group_entries = std::unordered_set<entity_id>;
+using selection_group_unit = entity_id;
+using selection_group_entries = std::unordered_set<selection_group_unit>;
 
 struct editor_selection_group {
 	// GEN INTROSPECTOR struct editor_selection_group
@@ -26,7 +27,7 @@ class editor_selection_groups {
 	friend change_group_property_command;
 
 	template <class C, class F>
-	static bool on_group_entry_of_impl(C& self, const entity_id id, F callback) {
+	static bool on_group_entry_of_impl(C& self, const selection_group_unit id, F callback) {
 		for (std::size_t i = 0; i < self.groups.size(); ++i) {
 			auto& g = self.groups[i];
 			auto& entries = g.entries;
@@ -59,7 +60,17 @@ public:
 		return on_group_entry_of_impl(*this, std::forward<Args>(args)...);
 	}
 
-	void set_group(unsigned, entity_id);
+	template <class F>
+	bool for_each_sibling(const selection_group_unit id, F callback) const {
+		return on_group_entry_of(
+			id, 
+			[&callback](auto, const auto& group, auto) {
+				for_each_in(group.entries, callback);
+			}
+		);
+	}
+
+	void set_group(unsigned, selection_group_unit);
 	editor_selection_group& new_group();
 
 	std::string get_free_group_name(const std::string& pattern) const;

@@ -64,16 +64,16 @@ void editor_entity_selector::finish_rectangular(current_selections_type& into) {
 	in_rectangular_selection.clear();
 }
 
-void editor_entity_selector::do_left_release(
+current_selections_type editor_entity_selector::do_left_release(
 	const bool has_ctrl,
-	current_selections_type& selections,
-	const editor_selection_groups& groups,
-	const bool ignore_groups
+	const grouped_selector_op_input in
 ) {
+	auto selections = in.signi_selections;
+
 	if (const auto clicked = held) {
 		selection_group_entries clicked_subjects;
 
-		if (ignore_groups) {
+		if (in.ignore_groups) {
 			clicked_subjects = { clicked };
 		}
 		else {
@@ -81,7 +81,7 @@ void editor_entity_selector::do_left_release(
 				clicked_subjects = group.entries;	
 			};
 
-			if (!groups.on_group_entry_of(held, find_belonging_group)) {
+			if (!in.groups.on_group_entry_of(held, find_belonging_group)) {
 				clicked_subjects = { clicked };
 			}
 		}
@@ -104,6 +104,7 @@ void editor_entity_selector::do_left_release(
 	held = {};
 
 	finish_rectangular(selections);
+	return selections;
 }
 
 void editor_entity_selector::select_all(
@@ -249,18 +250,22 @@ void editor_entity_selector::do_mousemotion(
 
 std::optional<ltrb> editor_entity_selector::find_selection_aabb(
 	const cosmos& cosm,
-	const current_selections_type& signi_selections
+	const grouped_selector_op_input in
 ) const {
 	const auto result = ::find_aabb_of(
 		cosm,
 		[&](auto combiner) {
 			for_each_selected_entity(
 				combiner,
-				signi_selections
+				in.signi_selections
 			);
 
 			if (held && cosm[held]) {
 				combiner(held);
+
+				if (!in.ignore_groups) {
+					in.groups.for_each_sibling(held, combiner);
+				}
 			}
 		}
 	);
@@ -271,20 +276,18 @@ std::optional<ltrb> editor_entity_selector::find_selection_aabb(
 std::optional<rgba> editor_entity_selector::find_highlight_color_of(
 	const editor_entity_selector_settings& settings,
 	const entity_id id, 
-	const current_selections_type& signi_selections,
-	const editor_selection_groups& groups,
-	const bool ignore_groups
+	const grouped_selector_op_input in
 ) const {
-	auto held_or_hovered = [ignore_groups, &groups, id](auto& checked, const auto result_col) -> std::optional<rgba> {
+	auto held_or_hovered = [in, id](auto& checked, const auto result_col) -> std::optional<rgba> {
 		if (checked) {
 			if (checked == id) {
 				return result_col;
 			}
 
-			if (!ignore_groups) {
+			if (!in.ignore_groups) {
 				bool found = false;
 
-				groups.on_group_entry_of(checked, [id, &found](auto, const auto& group, auto) {	
+				in.groups.on_group_entry_of(checked, [id, &found](auto, const auto& group, auto) {	
 					if (found_in(group.entries, id)) {
 						found = true;
 					}
@@ -307,7 +310,7 @@ std::optional<rgba> editor_entity_selector::find_highlight_color_of(
 		return r;
 	}
 
-	const bool in_signi = found_in(signi_selections, id);
+	const bool in_signi = found_in(in.signi_selections, id);
 	const bool in_rectangular = found_in(in_rectangular_selection.all, id);
 
 	if (in_signi != in_rectangular) {
