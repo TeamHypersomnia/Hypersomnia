@@ -264,7 +264,7 @@ auto fae_tree(
 									const auto entity_node = scoped_tree_node_ex(entity_label);
 
 									if (ImGui::IsItemHovered()) {
-										prop_in.state.hovered_guid = guid; 
+										fae_in.state.hovered_guid = guid; 
 									}
 
 									next_column_text();

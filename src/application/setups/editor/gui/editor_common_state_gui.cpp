@@ -107,7 +107,7 @@ void editor_common_state_gui::perform(const editor_settings& settings, const edi
 	ImGui::Separator();
 
 	edit_common(
-		{ settings.property_editor, properties_gui },
+		{ settings.property_editor, property_editor_data },
 		cosm.get_common_significant(),
 		in
 	);

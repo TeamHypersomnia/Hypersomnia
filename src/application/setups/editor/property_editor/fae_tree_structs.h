@@ -4,7 +4,12 @@
 
 #include "application/setups/editor/property_editor/property_editor_structs.h"
 
+struct fae_tree_state {
+	entity_guid hovered_guid;
+};
+
 struct fae_tree_input {
+	fae_tree_state& state;
 	property_editor_input prop_in;
 	const bool show_filter_buttons = false;
 };

@@ -20,9 +20,10 @@ struct editor_all_entities_gui : standard_window_mixin<editor_all_entities_gui> 
 	void interrupt_tweakers();
 
 	auto get_hovered_guid() const {
-		return properties_gui.hovered_guid;
+		return fae_tree_data.hovered_guid;
 	}
 
 private:
-	property_editor_state properties_gui;
+	fae_tree_state fae_tree_data;
+	property_editor_state property_editor_data;
 };

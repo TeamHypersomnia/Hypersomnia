@@ -25,8 +25,6 @@ struct description_pair {
 };
 
 struct property_editor_state {
-	entity_guid hovered_guid;
-
 	std::optional<ImGuiID> last_active;
 	std::string old_description = "";
 };

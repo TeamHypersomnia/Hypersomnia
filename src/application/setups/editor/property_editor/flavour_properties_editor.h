@@ -154,6 +154,11 @@ void edit_flavour(
 	const auto& name_invariant = flavour.template get<invariants::name>();
 	const auto source_flavour_name = name_invariant.name;
 
+	/*
+		Show the name invariant as the first one,
+		because renaming might be a common operation.
+	*/
+
 	edit_invariant(
 		prop_in,
 	   	name_invariant,

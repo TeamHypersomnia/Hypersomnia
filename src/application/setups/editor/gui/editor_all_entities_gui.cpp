@@ -3,8 +3,8 @@
 #include "application/setups/editor/editor_command_input.h"
 
 void editor_all_entities_gui::interrupt_tweakers() {
-	properties_gui.last_active.reset();
-	properties_gui.old_description.clear();
+	property_editor_data.last_active.reset();
+	property_editor_data.old_description.clear();
 }
 
 #if BUILD_PROPERTY_EDITOR
@@ -211,14 +211,14 @@ fae_tree_filter editor_all_entities_gui::perform(
 	ImGui::Columns(2);
 	ImGui::Separator();
 
-	properties_gui.hovered_guid.unset();
+	fae_tree_data.hovered_guid.unset();
 
 	const bool show_filter_buttons = only_match_entities != nullptr;
 
-	const auto prop_in = property_editor_input { settings.property_editor, properties_gui };
+	const auto prop_in = property_editor_input { settings.property_editor, property_editor_data };
 
 	const auto fae_in = fae_tree_input { 
-		prop_in, show_filter_buttons
+		fae_tree_data, prop_in, show_filter_buttons
 	};
 
 	const auto& cosm = in.get_cosmos();

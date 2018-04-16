@@ -13,5 +13,5 @@ struct editor_common_state_gui : standard_window_mixin<editor_common_state_gui> 
 	void perform(const editor_settings&, editor_command_input);
 
 private:
-	property_editor_state properties_gui;
+	property_editor_state property_editor_data;
 };
