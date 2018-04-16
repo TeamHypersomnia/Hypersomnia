@@ -248,7 +248,7 @@ void general_edit_properties(
 	};
 
 	augs::introspect(
-		augs::recursive([&](auto self, const std::string& original_label, const auto& original_member) {
+		augs::recursive([&](auto self, const std::string& label, const auto& original_member) {
 			using M = std::decay_t<decltype(original_member)>;
 
 			static constexpr bool should_skip = 
@@ -257,34 +257,35 @@ void general_edit_properties(
 			;
 
 			if constexpr(!should_skip) {
-				const auto label = format_field_name(original_label);
+				const auto formatted_label = format_field_name(label);
 
-				auto altered_member = original_member;
-
-				auto make_input = [&label, &object](const tweaker_type type, auto& original, auto& altered) {
+				auto make_input = [&formatted_label, &object](const tweaker_type type, auto& original, auto& altered) {
 					return tweaker_input<M> {
 						type,
-						label,
+						formatted_label,
 						::make_field_address(original, object),
 						original,
 						altered
 					};
 				};
 
-				const auto identity_label = "##" + original_label;
+				const auto identity_label = "##" + label;
+
+				const auto& original = original_member;
+				auto altered = original;
 
 				if constexpr(S::template handles<M>) {
-					auto in = make_input(tweaker_type::DISCRETE, original_member, altered_member);
+					auto in = make_input(tweaker_type::DISCRETE, original, altered);
 
 					do_tweaker(in, [&]() { 
 						const bool result = special_control_provider.handle(
 							identity_label, 
-							altered_member
+							altered
 						);
 
 						if (result) {
-							const auto description = special_control_provider.describe_changed(label, original_member, altered_member);
-							post_new_change(description, ::make_field_address(original_member, object), altered_member);
+							const auto description = special_control_provider.describe_changed(formatted_label, original, altered);
+							post_new_change(description, ::make_field_address(original, object), altered);
 						}
 
 						return result;
@@ -295,54 +296,54 @@ void general_edit_properties(
 					return;
 				}
 				else if constexpr(std::is_same_v<M, std::string>) {
-					auto in = make_input(tweaker_type::CONTINUOUS, original_member, altered_member);
+					auto in = make_input(tweaker_type::CONTINUOUS, original, altered);
 
 					do_tweaker(in, [&]() { 
-						if (original_label == "description") {
-							return input_multiline_text<512>(identity_label, altered_member, 8);
+						if (label == "description") {
+							return input_multiline_text<512>(identity_label, altered, 8);
 						}
-						else if (original_label == "name") {
-							return input_text<256>(identity_label, altered_member);
+						else if (label == "name") {
+							return input_text<256>(identity_label, altered);
 						}
 
-						return input_text<256>(identity_label, altered_member);
+						return input_text<256>(identity_label, altered);
 					});
 
 					/* next_column_text(); */
 				}
 				else if constexpr(std::is_same_v<M, bool>) {
-					auto in = make_input(tweaker_type::DISCRETE, original_member, altered_member);
+					auto in = make_input(tweaker_type::DISCRETE, original, altered);
 
 					do_tweaker(in, [&]() { 
-						return checkbox(identity_label, altered_member);
+						return checkbox(identity_label, altered);
 					});
 				}
 				else if constexpr(is_container_v<M>) {
 
 				}
 				else if constexpr(std::is_arithmetic_v<M>) {
-					auto in = make_input(tweaker_type::CONTINUOUS, original_member, altered_member);
+					auto in = make_input(tweaker_type::CONTINUOUS, original, altered);
 
 					do_tweaker(in, [&]() { 
-						return drag(identity_label, altered_member); 
+						return drag(identity_label, altered); 
 					});
 
 					/* next_column_text(get_type_name<M>()); */
 				}
 				else if constexpr(is_one_of_v<M, vec2, vec2i>) {
-					auto in = make_input(tweaker_type::CONTINUOUS, original_member, altered_member);
+					auto in = make_input(tweaker_type::CONTINUOUS, original, altered);
 
 					do_tweaker(in, [&]() { 
-						return drag_vec2(identity_label, altered_member); 
+						return drag_vec2(identity_label, altered); 
 					});
 
 					/* next_column_text(); */
 				}
 				else if constexpr(is_minmax_v<M>) {
-					auto in = make_input(tweaker_type::CONTINUOUS, original_member, altered_member);
+					auto in = make_input(tweaker_type::CONTINUOUS, original, altered);
 
 					do_tweaker(in, [&]() { 
-						return drag_minmax(identity_label, altered_member); 
+						return drag_minmax(identity_label, altered); 
 					});
 
 					/* next_column_text(get_type_name<typename M::first_type>() + " range"); */
@@ -351,25 +352,25 @@ void general_edit_properties(
 
 				}
 				else if constexpr(std::is_enum_v<M>) {
-					auto in = make_input(tweaker_type::DISCRETE, original_member, altered_member);
+					auto in = make_input(tweaker_type::DISCRETE, original, altered);
 
 					do_tweaker(in, [&]() { 
-						return enum_combo(identity_label, altered_member);
+						return enum_combo(identity_label, altered);
 					});
 
 					/* next_column_text(); */
 				}
 				else if constexpr(std::is_same_v<M, rgba>) {
-					auto in = make_input(tweaker_type::CONTINUOUS, original_member, altered_member);
+					auto in = make_input(tweaker_type::CONTINUOUS, original, altered);
 
 					do_tweaker(in, [&]() { 
-						return color_edit(identity_label, altered_member);
+						return color_edit(identity_label, altered);
 					});
 
 					/* next_column_text(); */
 				}
 				else {
-					const auto object_node = scoped_tree_node_ex(label);
+					const auto object_node = scoped_tree_node_ex(formatted_label);
 
 #if 0
 					if constexpr(is_tuple_v<M>) {
@@ -382,7 +383,7 @@ void general_edit_properties(
 					next_column_text();
 
 					if (object_node) {
-						augs::introspect(augs::recursive(self), original_member);
+						augs::introspect(augs::recursive(self), original);
 					}
 				}
 			}
