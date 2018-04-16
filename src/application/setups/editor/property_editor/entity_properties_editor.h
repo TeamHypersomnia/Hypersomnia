@@ -1,5 +1,5 @@
 #pragma once
-#include "application/setups/editor/property_editor/make_field_comparator.h"
+#include "application/setups/editor/property_editor/compare_all_fields_to.h"
 
 #include "application/setups/editor/property_editor/property_editor_structs.h"
 #include "application/setups/editor/property_editor/general_edit_properties.h"
@@ -33,16 +33,11 @@ struct component_field_eq_predicate {
 			return true;
 		}
 
-		entity_property_id id;
+		entity_property_id property_id;
+		property_id.component_id = component_id;
+		property_id.field = field_id;
 
-		id.component_id = component_id;
-		id.field = field_id;
-
-		bool equal = true;
-
-		id.access(cosm, type_id, ids, make_field_comparator(equal, first));
-
-		return equal;
+		return compare_all_fields_to(first, property_id, type_id, cosm, ids);
 	}
 };
 

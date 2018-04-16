@@ -110,6 +110,44 @@ struct default_control_provider {
 	}
 };
 
+template <class M, class T>
+auto make_field_address(const M& original_member, const T& object) {
+	field_address result;
+
+	result.offset = static_cast<unsigned>(
+		reinterpret_cast<const std::byte*>(std::addressof(original_member))
+		- reinterpret_cast<const std::byte*>(std::addressof(object))
+	);
+
+	auto& id = result.type_id;
+
+	if constexpr(std::is_trivially_copyable_v<M>) {
+		id.set<augs::trivial_type_marker>();
+	}
+	else if constexpr(is_container_v<M>) {
+		id.set<M>();
+	}
+	else {
+		static_assert(has_introspect_v<M>);
+	}
+
+	return result;
+}
+
+enum class tweaker_type {
+	CONTINUOUS,
+	DISCRETE
+};
+
+template <class M>
+struct tweaker_input {
+	const tweaker_type type;
+	const std::string& field_name;
+	const field_address field_location;
+	const M& old_value;
+	const M& new_value;
+};
+
 template <
 	template <class> class SkipPredicate = always_false,
    	class T,
@@ -119,7 +157,7 @@ template <
 	class S = default_control_provider
 >
 void general_edit_properties(
-	const property_editor_input in,
+	const property_editor_input prop_in,
 	const T& object,
 	G post_new_change_impl,
 	H rewrite_last_change_impl,
@@ -128,7 +166,15 @@ void general_edit_properties(
 ) {
 	using namespace augs::imgui;
 
-	auto& old_description = in.state.old_description;
+	{
+		auto& last_active = prop_in.state.last_active;
+
+		if (last_active && last_active.value() != ImGui::GetActiveID()) {
+			last_active.reset();
+		}
+	}
+
+	auto& old_description = prop_in.state.old_description;
 
 	auto post_new_change = [&](
 		const description_pair& description,
@@ -148,13 +194,58 @@ void general_edit_properties(
 		rewrite_last_change_impl(old_description + description, new_content);
 	};
 
-	{
-		auto& last_active = in.state.last_active;
+	auto do_tweaker = [&](
+		const auto tw_in,
+		auto control_callback
+	) {
+		const auto type = tw_in.type;
+		const auto& field_name = tw_in.field_name;
+		const auto& field_location = tw_in.field_location;
+		const auto& old_value = tw_in.old_value;
+		const auto& new_value = tw_in.new_value;
 
-		if (last_active && last_active.value() != ImGui::GetActiveID()) {
-			last_active.reset();
+		ImGui::Bullet();
+		text(field_name);
+		ImGui::NextColumn();
+		auto scope = scoped_item_width(-1);
+
+		const auto colors = ::maybe_different_value_cols(
+			prop_in.settings,
+			old_value, 
+			field_location, 
+			field_equality_predicate
+		);
+
+		if (control_callback()) {
+			if (type == tweaker_type::DISCRETE) {
+				post_new_change(
+					::describe_changed(field_name, old_value, new_value),
+					field_location,
+					new_value
+				);
+			}
+			else if (type == tweaker_type::CONTINUOUS) {
+				const auto this_id = ImGui::GetActiveID();
+				const auto description = ::describe_changed(field_name, old_value, new_value);
+
+				auto& last_active = prop_in.state.last_active;
+
+				if (last_active != this_id) {
+					post_new_change(description, field_location, new_value);
+				}
+				else {
+					rewrite_last(description.of_new, new_value);
+				}
+
+				last_active = this_id;
+			}
+			else {
+
+			}
 		}
-	}
+
+		ImGui::NextColumn();
+	};
 
 	augs::introspect(
 		augs::recursive([&](auto self, const std::string& original_label, const auto& original_member) {
@@ -166,115 +257,26 @@ void general_edit_properties(
 			;
 
 			if constexpr(!should_skip) {
-				const auto field = [&](){
-					field_address result;
-
-					result.offset = static_cast<unsigned>(
-						reinterpret_cast<const std::byte*>(std::addressof(original_member))
-						- reinterpret_cast<const std::byte*>(std::addressof(object))
-					);
-
-					auto& id = result.type_id;
-
-					if constexpr(std::is_trivially_copyable_v<M>) {
-						id.set<augs::trivial_type_marker>();
-					}
-					else if constexpr(is_container_v<M>) {
-						id.set<M>();
-					}
-					else {
-						static_assert(has_introspect_v<M>);
-					}
-
-					return result;
-				}();
-
-				auto post_new = [&](
-					const description_pair& description,
-					const auto& new_content
-				) {
-					post_new_change(description, field, new_content);
-				};
-
-				auto do_maybe_different_value_cols = [&](auto... args) {
-					return maybe_different_value_cols(in.settings, original_member, field, field_equality_predicate, args...);
-				};
-
-				auto handle_continuous_tweaker = [&](
-					const auto& field_name,
-					const auto& old_value, 
-					const auto& new_value,
-					auto callback,
-					auto... args
-				) {
-					const auto colors = do_maybe_different_value_cols(args...);
-
-					if (callback()) {
-						const auto this_id = ImGui::GetActiveID();
-						const auto description = describe_changed(field_name, old_value, new_value);
-
-						auto& last_active = in.state.last_active;
-
-						if (last_active != this_id) {
-							/* LOG("Started dragging %x to %x", field_name, new_value); */
-							post_new(description, new_value);
-						}
-						else {
-							/* LOG("Dragging %x to %x", field_name, new_value); */
-							rewrite_last(description.of_new, new_value);
-						}
-
-						last_active = this_id;
-					}
-				};
-
-				auto handle_discrete_tweaker = [&](
-					const auto& field_name,
-					const auto& old_value, 
-					const auto& new_value,
-					auto callback,
-				   	auto... args
-				) {
-					const auto colors = do_maybe_different_value_cols(args...);
-
-					if (callback()) {
-						post_new(
-							describe_changed(field_name, old_value, new_value),
-							new_value
-						);
-					}
-				};
-
 				const auto label = format_field_name(original_label);
-				const auto identity_label = "##" + label;
 
 				auto altered_member = original_member;
 
-				auto do_tweaker = [&](auto f) {
-					ImGui::Bullet();
-					text(label);
-					ImGui::NextColumn();
-					auto scope = scoped_item_width(-1);
-					f();
-					ImGui::NextColumn();
+				auto make_input = [&label, &object](const tweaker_type type, auto& original, auto& altered) {
+					return tweaker_input<M> {
+						type,
+						label,
+						::make_field_address(original, object),
+						original,
+						altered
+					};
 				};
 
-				auto do_continuous = [&](auto f, auto... args) {
-					do_tweaker([&]() { 
-						handle_continuous_tweaker(label, original_member, altered_member, f, args...); 
-					});
-				};
-
-				auto do_discrete = [&](auto f, auto... args) {
-					do_tweaker([&]() { 
-						handle_discrete_tweaker(label, original_member, altered_member, f, args...);
-					});
-				};
+				const auto identity_label = "##" + original_label;
 
 				if constexpr(S::template handles<M>) {
-					do_tweaker([&]() { 
-						const auto colors = do_maybe_different_value_cols();
+					auto in = make_input(tweaker_type::DISCRETE, original_member, altered_member);
 
+					do_tweaker(in, [&]() { 
 						const bool result = special_control_provider.handle(
 							identity_label, 
 							altered_member
@@ -282,16 +284,20 @@ void general_edit_properties(
 
 						if (result) {
 							const auto description = special_control_provider.describe_changed(label, original_member, altered_member);
-							post_new(description, altered_member);
+							post_new_change(description, ::make_field_address(original_member, object), altered_member);
 						}
+
+						return result;
 					});
 				}
-				if constexpr(std::is_same_v<M, b2Filter>) {
+				else if constexpr(std::is_same_v<M, b2Filter>) {
 					// TODO: checkbox matrix
 					return;
 				}
 				else if constexpr(std::is_same_v<M, std::string>) {
-					do_continuous([&]() { 
+					auto in = make_input(tweaker_type::CONTINUOUS, original_member, altered_member);
+
+					do_tweaker(in, [&]() { 
 						if (original_label == "description") {
 							return input_multiline_text<512>(identity_label, altered_member, 8);
 						}
@@ -305,7 +311,9 @@ void general_edit_properties(
 					/* next_column_text(); */
 				}
 				else if constexpr(std::is_same_v<M, bool>) {
-					do_discrete([&]() { 
+					auto in = make_input(tweaker_type::DISCRETE, original_member, altered_member);
+
+					do_tweaker(in, [&]() { 
 						return checkbox(identity_label, altered_member);
 					});
 				}
@@ -313,21 +321,27 @@ void general_edit_properties(
 
 				}
 				else if constexpr(std::is_arithmetic_v<M>) {
-					do_continuous([&]() { 
+					auto in = make_input(tweaker_type::CONTINUOUS, original_member, altered_member);
+
+					do_tweaker(in, [&]() { 
 						return drag(identity_label, altered_member); 
 					});
 
 					/* next_column_text(get_type_name<M>()); */
 				}
 				else if constexpr(is_one_of_v<M, vec2, vec2i>) {
-					do_continuous([&]() { 
+					auto in = make_input(tweaker_type::CONTINUOUS, original_member, altered_member);
+
+					do_tweaker(in, [&]() { 
 						return drag_vec2(identity_label, altered_member); 
 					});
 
 					/* next_column_text(); */
 				}
 				else if constexpr(is_minmax_v<M>) {
-					do_continuous([&]() { 
+					auto in = make_input(tweaker_type::CONTINUOUS, original_member, altered_member);
+
+					do_tweaker(in, [&]() { 
 						return drag_minmax(identity_label, altered_member); 
 					});
 
@@ -337,14 +351,18 @@ void general_edit_properties(
 
 				}
 				else if constexpr(std::is_enum_v<M>) {
-					do_discrete([&]() { 
+					auto in = make_input(tweaker_type::DISCRETE, original_member, altered_member);
+
+					do_tweaker(in, [&]() { 
 						return enum_combo(identity_label, altered_member);
 					});
 
 					/* next_column_text(); */
 				}
 				else if constexpr(std::is_same_v<M, rgba>) {
-					do_continuous([&]() { 
+					auto in = make_input(tweaker_type::CONTINUOUS, original_member, altered_member);
+
+					do_tweaker(in, [&]() { 
 						return color_edit(identity_label, altered_member);
 					});
 

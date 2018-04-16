@@ -25,5 +25,8 @@ namespace augs {
 	);
 
 	template <class A, class B>
+	bool equal_or_introspective_equal(const A& a, const B& b);
+
+	template <class A, class B>
 	bool introspective_equal(const A& a, const B& b);
 }

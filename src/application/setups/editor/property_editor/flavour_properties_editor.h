@@ -2,7 +2,7 @@
 #include "augs/string/get_type_name.h"
 #include "game/common_state/entity_flavours.h"
 
-#include "application/setups/editor/property_editor/make_field_comparator.h"
+#include "application/setups/editor/property_editor/compare_all_fields_to.h"
 
 #include "application/setups/editor/property_editor/general_edit_properties.h"
 #include "application/setups/editor/property_editor/property_editor_structs.h"
@@ -47,16 +47,11 @@ struct invariant_field_eq_predicate {
 			return true;
 		}
 
-		flavour_property_id id;
+		flavour_property_id property_id;
+		property_id.invariant_id = invariant_id;
+		property_id.field = field_id;
 
-		id.invariant_id = invariant_id;
-		id.field = field_id;
-
-		bool equal = true;
-
-		id.access(cosm, type_id, ids, make_field_comparator(equal, first));
-
-		return equal;
+		return compare_all_fields_to(first, property_id, type_id, cosm, ids);
 	}
 };
 

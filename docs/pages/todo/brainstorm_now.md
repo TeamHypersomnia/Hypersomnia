@@ -5,6 +5,11 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- preview could be done by a thread_local image & texture
+	- NO! Just store it inside editor so that it may be properly cleaned up
+	- a good test case for a pbo
+	- then send just image id to the imgui renderering routine
+
 - error: could not redo "create_asset_id" because "some.png" could not be found.
 	- we should just allow non-existing paths. **Ids should always be there.**
 		- if an image does not exist, we just load a fallback blank texture!

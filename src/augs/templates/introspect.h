@@ -66,7 +66,7 @@ namespace augs {
 	}
 
 	template <class A, class B>
-	bool introspective_equal_detail(
+	bool equal_or_introspective_equal(
 		const A& a,
 		const B& b
 	) {
@@ -77,7 +77,7 @@ namespace augs {
 				return false;
 			}
 			else if (a && b) {
-				return introspective_equal_detail(*a, *b);
+				return equal_or_introspective_equal(*a, *b);
 			}
 			else {
 				ensure(!a && !b);
@@ -106,7 +106,7 @@ namespace augs {
 
 		introspect(
 			[&are_equal](const auto label, const auto& aa, const auto& bb) {
-				are_equal = are_equal && introspective_equal_detail(aa, bb);
+				are_equal = are_equal && equal_or_introspective_equal(aa, bb);
 			}, a, b
 		);
 
