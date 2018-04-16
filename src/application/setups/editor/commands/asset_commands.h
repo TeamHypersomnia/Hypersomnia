@@ -39,3 +39,13 @@ struct forget_asset_id_command {
 	void redo(const editor_command_input in);
 	void undo(const editor_command_input in);
 };
+
+template <class T>
+struct is_create_asset_id_command : std::false_type {};
+
+template <class T>
+struct is_create_asset_id_command<create_asset_id_command<T>> : std::true_type {};
+
+template <class T>
+constexpr bool is_create_asset_id_command_v = is_create_asset_id_command<T>::value;
+

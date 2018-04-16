@@ -29,6 +29,19 @@ struct editor_history : public editor_history_base {
 	void execute_new(T&& command, RedoArgs&&... redo_args) {
 		command.common.reset_timestamp();
 
+		if (has_last_command()) {
+			const auto should_make_child = std::visit(
+				[](auto& cmd) -> bool {
+					return is_create_asset_id_command_v<std::decay_t<decltype(cmd)>>;
+				},
+				last_command()
+			);
+
+			if (should_make_child) {
+				command.common.has_parent = true;
+			}
+		}
+
 		editor_history_base::execute_new(
 			std::forward<T>(command),
 			std::forward<RedoArgs>(redo_args)...
