@@ -40,10 +40,12 @@ bool ends_with(const std::string& value, const std::string& ending) {
 	return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
 }
 
-void cut_preffix(std::string& value, const std::string& preffix) {
+std::string& cut_preffix(std::string& value, const std::string& preffix) {
 	if (begins_with(value, preffix)) {
 		value.erase(value.begin(), value.begin() + preffix.size());
 	}
+
+	return value;
 }
 
 #if BUILD_UNIT_TESTS

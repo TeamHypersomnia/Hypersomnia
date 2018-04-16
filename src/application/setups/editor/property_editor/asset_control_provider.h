@@ -13,32 +13,6 @@ struct asset_control_provider {
 	const augs::path_type& project_path;
 	editor_command_input in;
 
-	struct sorted_path_entry {
-		augs::path_type p;
-
-		sorted_path_entry() = default;
-		sorted_path_entry(
-			const augs::path_type& p
-		) : p(p)
-		{}
-
-		bool operator<(const sorted_path_entry& b) const {
-			return p < b.p;
-		}
-
-		auto get_filename() const {
-			return p.filename();
-		}
-
-		auto get_directory() const {
-			return augs::path_type(p).replace_filename("").string();
-		}
-
-		const auto& get_full_path() const {
-			return p;
-		}
-	};
-
 	template <class T>
 	static constexpr bool handles = 
 		//is_asset_id_v<T>
@@ -59,6 +33,7 @@ struct asset_control_provider {
 	template <class T>
 	bool handle(const std::string& label, T& object) const {
 		using namespace augs::imgui;
+		using asset_control_path_entry = browsed_path_entry_base;
 
 		bool changed = false;
 
@@ -75,7 +50,7 @@ struct asset_control_provider {
 
 			thread_local bool acquire_once = true;
 			thread_local int acquire_keyboard_times = 2;
-			thread_local std::vector<sorted_path_entry> all_paths;
+			thread_local std::vector<asset_control_path_entry> all_paths;
 			thread_local path_tree_settings browser_settings;
 
 			if (auto combo = scoped_combo(label.c_str(), displayed_str.c_str(), ImGuiComboFlags_HeightLargest)) {

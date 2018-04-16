@@ -13,39 +13,19 @@ struct gfx_browser_client {
 };
 
 template <class id_type>
-struct sorted_path_entry {
-	std::string filename;
-	std::string directory;
+struct asset_gui_path_entry : public browsed_path_entry_base {
+	using base = browsed_path_entry_base;
+
 	id_type id;
 
-	sorted_path_entry() = default;
-	sorted_path_entry(
+	asset_gui_path_entry() = default;
+	asset_gui_path_entry(
 		augs::path_type from,
 	   	const id_type id
 	) :
 		id(id),
-		filename(from.filename()),
-		directory(from.replace_filename(""))
+		base(from)
 	{}
-
-	bool operator<(const sorted_path_entry& b) const {
-		const auto& f1 = filename;
-		const auto& f2 = b.filename;
-
-		return std::tie(directory, f1) < std::tie(b.directory, f2);
-	}
-
-	const auto& get_filename() const {
-		return filename;
-	}
-
-	const auto& get_directory() const {
-		return directory;
-	}
-
-	auto get_full_path() const {
-		return directory + filename;
-	}
 };
 
 void editor_images_gui::perform(editor_command_input in) {
@@ -64,7 +44,7 @@ void editor_images_gui::perform(editor_command_input in) {
 
 	const auto& viewables = work.viewables;
 
-	thread_local std::vector<sorted_path_entry<assets::image_id>> all_paths;
+	thread_local std::vector<asset_gui_path_entry<assets::image_id>> all_paths;
 	all_paths.clear();
 
 	viewables.image_loadables.for_each_object_and_id(

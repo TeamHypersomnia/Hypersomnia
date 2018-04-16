@@ -122,7 +122,7 @@ inline auto str_ops(const char* const s) {
 	return str_ops(std::string(s));
 }
 
-void cut_preffix(std::string& value, const std::string& preffix);
+std::string& cut_preffix(std::string& value, const std::string& preffix);
 
 bool begins_with(const std::string& value, const std::string& beginning);
 bool ends_with(const std::string& value, const std::string& ending);
