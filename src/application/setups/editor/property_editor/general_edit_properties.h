@@ -9,71 +9,11 @@
 #include "application/setups/editor/editor_settings.h"
 #include "application/setups/editor/property_editor/property_editor_structs.h"
 #include "application/setups/editor/property_editor/property_editor_settings.h"
+#include "application/setups/editor/property_editor/default_control_provider.h"
+#include "application/setups/editor/property_editor/changes_describers.h"
 
 #include "augs/string/format_enum.h"
 #include "augs/misc/imgui/imgui_enum_combo.h"
-
-template <class A, class B>
-auto describe_changed_flag(
-	const A& field_name,
-	const B& new_value
-) {
-	return typesafe_sprintf(
-		"%x %x", 
-		new_value ? "Set" : "Unset", 
-		field_name
-	);
-};
-
-template <class A, class B>
-auto describe_changed_generic(
-	const A& field_name,
-	const B& new_value
-) {
-	if constexpr(std::is_enum_v<B>) {
-		return typesafe_sprintf(
-			"Set %x to %x",
-			field_name,
-			format_enum(new_value)
-		);
-	}
-	else {
-		return typesafe_sprintf(
-			"Set %x to %x",
-			field_name,
-			new_value
-		);
-	}
-};
-
-template <class A, class B>
-description_pair describe_changed(
-	const A& field_name,
-	const B& old_value,
-   	const B& new_value
-) {
-	using F = std::decay_t<decltype(new_value)>;
-
-	if constexpr(std::is_same_v<F, bool>) {
-		return { "", describe_changed_flag(field_name, new_value) };
-	}
-	else {
-		if constexpr(std::is_same_v<F, std::string>) {
-			if (field_name == "Name") {
-				return { 
-					typesafe_sprintf("Renamed %x ", old_value),
-					typesafe_sprintf("to %x ", new_value)
-				};
-			}
-		}
-
-		return { "", describe_changed_generic(
-			field_name,
-			new_value
-		) };
-	}
-};
-
 
 template <class F, class Eq>
 auto maybe_different_value_cols(
@@ -91,23 +31,6 @@ auto maybe_different_value_cols(
 		cond_scoped_style_color(values_different, ImGuiCol_FrameBgHovered, settings.different_values_frame_hovered_bg),
 		cond_scoped_style_color(values_different, ImGuiCol_FrameBgActive, settings.different_values_frame_active_bg)
 	);
-};
-
-struct default_control_provider {
-	template <class T>
-	static constexpr bool handles = always_false_v<T>;
-
-	template <class T>
-	bool handle(const std::string& label, const T& object) {
-		static_assert(handles<T>());
-		return false;
-	}
-
-	template <class T>
-	std::string describe_changed(const std::string& label, const T& from, const T& to) {
-		static_assert(always_false_v<T>);
-		return "";
-	}
 };
 
 template <class M, class T>
@@ -219,14 +142,14 @@ void general_edit_properties(
 		if (control_callback()) {
 			if (type == tweaker_type::DISCRETE) {
 				post_new_change(
-					::describe_changed(field_name, old_value, new_value),
+					::describe_changed(field_name, old_value, new_value, special_control_provider),
 					field_location,
 					new_value
 				);
 			}
 			else if (type == tweaker_type::CONTINUOUS) {
 				const auto this_id = ImGui::GetActiveID();
-				const auto description = ::describe_changed(field_name, old_value, new_value);
+				const auto description = ::describe_changed(field_name, old_value, new_value, special_control_provider);
 
 				auto& last_active = prop_in.state.last_active;
 
@@ -278,17 +201,10 @@ void general_edit_properties(
 					auto in = make_input(tweaker_type::DISCRETE, original, altered);
 
 					do_tweaker(in, [&]() { 
-						const bool result = special_control_provider.handle(
+						return special_control_provider.handle(
 							identity_label, 
 							altered
 						);
-
-						if (result) {
-							const auto description = special_control_provider.describe_changed(formatted_label, original, altered);
-							post_new_change(description, ::make_field_address(original, object), altered);
-						}
-
-						return result;
 					});
 				}
 				else if constexpr(std::is_same_v<M, b2Filter>) {
