@@ -9,7 +9,6 @@ struct path_tree_detail {
 	ImVec2 files_view_size = ImVec2(0, 0);
 };
 
-
 struct browsed_path_entry_base {
 protected:
 	augs::path_type p;
@@ -77,8 +76,7 @@ void browse_path_tree(
 
 		for (const auto& l : all_paths) {
 			const auto prettified = prettify(l.get_filename());
-
-			auto displayed_dir = l.get_displayed_directory();
+			const auto displayed_dir = l.get_displayed_directory();
 
 			if (!filter.PassFilter(prettified.c_str()) && !filter.PassFilter(displayed_dir.c_str())) {
 				continue;

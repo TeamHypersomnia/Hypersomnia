@@ -46,20 +46,16 @@ auto describe_changed_generic(
 	}
 };
 
-template <class A, class B, class S>
+template <class A, class B>
 description_pair describe_changed(
 	const A& field_name,
 	const B& old_value,
-   	const B& new_value,
-	const S& special_provider
+   	const B& new_value
 ) {
 	using F = std::decay_t<decltype(new_value)>;
 
 	if constexpr(std::is_same_v<F, bool>) {
 		return { "", describe_changed_flag(field_name, new_value) };
-	}
-	else if constexpr(S::template handles<B>) {
-		return special_provider.describe_changed(field_name, old_value, new_value);
 	}
 	else {
 		if constexpr(std::is_same_v<F, std::string>) {
@@ -105,6 +101,12 @@ struct default_control_provider {
 	bool handle(const std::string& label, const T& object) {
 		static_assert(handles<T>());
 		return false;
+	}
+
+	template <class T>
+	std::string describe_changed(const std::string& label, const T& from, const T& to) {
+		static_assert(always_false_v<T>);
+		return "";
 	}
 };
 
@@ -209,7 +211,7 @@ void general_edit_properties(
 
 					if (callback()) {
 						const auto this_id = ImGui::GetActiveID();
-						const auto description = describe_changed(field_name, old_value, new_value, special_control_provider);
+						const auto description = describe_changed(field_name, old_value, new_value);
 
 						auto& last_active = in.state.last_active;
 
@@ -237,7 +239,7 @@ void general_edit_properties(
 
 					if (callback()) {
 						post_new(
-							describe_changed(field_name, old_value, new_value, special_control_provider),
+							describe_changed(field_name, old_value, new_value),
 							new_value
 						);
 					}
@@ -270,11 +272,18 @@ void general_edit_properties(
 				};
 
 				if constexpr(S::template handles<M>) {
-					do_discrete([&]() { 
-						return special_control_provider.handle(
+					do_tweaker([&]() { 
+						const auto colors = do_maybe_different_value_cols();
+
+						const bool result = special_control_provider.handle(
 							identity_label, 
 							altered_member
 						);
+
+						if (result) {
+							const auto description = special_control_provider.describe_changed(label, original_member, altered_member);
+							post_new(description, altered_member);
+						}
 					});
 				}
 				if constexpr(std::is_same_v<M, b2Filter>) {
