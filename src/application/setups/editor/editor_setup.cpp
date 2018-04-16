@@ -408,15 +408,17 @@ void editor_setup::perform_custom_imgui(
 		images_gui.perform(make_command_input());
 
 		const auto all_selected = [&]() -> decltype(get_all_selected_entities()) {
+			auto selections = get_all_selected_entities();
+
 			if (const auto held = selector.get_held(); held && work().world[held]) {
-				return { held };
+				selections.emplace(held);
 			}
 
 			if (const auto matching = get_matching_go_to_entity()) {
-				return { matching };
+				selections.emplace(matching);
 			}
 
-			return get_all_selected_entities();
+			return selections;
 		}();
 
 		{
