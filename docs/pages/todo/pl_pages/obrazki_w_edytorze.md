@@ -50,20 +50,47 @@ Będzie to miniaturkowy hierarchiczny widok na strukturę obu folderów: oficjal
 
 ### Okno "Images"
 
-Dodatkowo wprowadzone zostanie okno nazwane "Images".  
-Znajdzie się tam to samo co w combo boxie z wyborem obrazka, z dwiema różnicami:  
+Dodatkowo wprowadzone zostanie okno nazwane "Images":
 
-1. **Pojawią się tam wyłącznie te obrazki które są gdzieś używane w edytorze.**
-	- (Opcjonalnie) można sprawić aby edytor pokazywał szczegóły gdzie te obrazki są wykorzystywane (np. przez jakie sprity albo efekty cząsteczkowe).
-2. **W tym oknie będą dodatkowe opcje customizacji:**
+- Domyślnie, **pojawią się tam wyłącznie te obrazki które są gdzieś używane w edytorze.**  
+**Śledzony obrazek** to taki obrazek który był kiedyś wybrany przez użytkownika dla jakiejś własności w edytorze i nie został manualnie "zapomniany" z projektu.  
+**Nieużywany obrazek** to taki **śledzony obrazek**, który już nie jest kompletnie nigdzie ustawiony, i nigdy nie zostanie użyty przez grę.
+	- Będzie checkbox do pokazania nieużywanych obrazków.
+		- Po zaznaczeniu go, nieużywane obrazki **pojawią się w osobnej rubryce**.
+		- Nieużywane obrazki będzie można "Zapomnieć".
+			- Oznacza to **tylko tyle**:
+				- Wcześniej ustawione parametry neon map dla tego obrazka zostaną zresetowane.
+				- Ten obrazek nie będzie już się pokazywał w rubryce z nieużywanymi obrazkami.
+<!--
+		- Uwaga: gdy będziemy robili to samo dla dźwięków, **nieużywane dźwięki będą zapominane automatycznie**.
+			No a właśnie że nie bo będziemy mieli ticka czy wygenerować mono...
+			- To jest dlatego, że oprócz samej ścieżki 
+-->
+		- Mimo że ścieżki i parametry nieużywanych obrazków są zapisane w plikach projektu...
+			- ...gra będzie wrzucała do atlasu tylko te obrazki które są na scenie!
+	- (Opcjonalnie) można sprawić aby edytor pokazywał szczegóły gdzie obrazki są używane - bo i tak musimy sprawdzić gdzie jest, żeby zdecydować że nie jest używany nigdzie!
+		-  Np. przez jakie sprity albo efekty cząsteczkowe używany jest obrazek.
+- Jeśli obrazek zacznie być używany, użytkownik ustawi mu jakieś parametry, a potem przestanie być używany...
+	- ...to zniknie z domyślnego widoku w Images,
+		- ale jak się go jeszcze raz zacznie używać to wcześniej ustawione parametry (np. neon map) powrócą na miejsce!
+- Jeśli z dysku zniknie obrazek który **jest śledzony przez projekt**, to:
+	- Jeśli jest gdzieś używany...
+		- Po następnym otworzeniu okienka "Images" pojawi się on w rubryce "Missing", która będzie wyświetlona oddzielnie nad resztą obrazków.
+		- W grze w miejscu tekstury pojawi się glitch, ale wszystko będzie się dało dalej normalnie robić.
+	- Jeśli nie jest nigdzie używany...
+		- Tak samo pojawi się w "Images", ale w rubryce "Missing (unused)", i tylko jeśli checkbox na pokazywanie nieużywanych obrazków jest zaznaczony.
+	- W obu przypadkach będzie można przekierować ścieżkę na istniejącą, normalnie wybierając obrazek z dysku tak samo jakbyśmy normalnie wybierali obrazek dla jakiejś właściwości.
+- **W tym oknie będą dodatkowe opcje customizacji:**
 	- Np. tutaj będzie można ustawiać różne parametry obrazkom które będą zapisane w mapie.
 		- Parametry dla generacji neon mapy.
 		- Customowa ścieżka dla własnoręcznie namalowanej neon mapy (gdyby algorytm nie dawał satysfakcjonującego efektu).
 		- Czy wygenerować desaturację (np. dla spelli do których nie ma wystarczająco many).
 	- Zmiany będą natychmiast miały efekt.
 		- Prawdopodobnie trzeba będzie sklepać asynchroniczną generację atlasu żeby się dało po ludzku manipulować parametry neon map.
+	- (Opcjonalnie) można zaimplementować drag&drop który pozwoli na skopiowanie całych własności neon map obrazka do drugiego (sporo może obrazków może mieć takie same parametry)
 
-
+	
+<!--
 - Uwaga: Jeśli w dowolnym momencie zniknie na dysku obrazek który jest wyświetlony pod "Images" - czyli zniknie obrazek gdzieś użyty w edytorze - to edytor natychmiast wypluje error.
 	- Pojawi się error z textboxem:
 
@@ -82,6 +109,7 @@ Znajdzie się tam to samo co w combo boxie z wyborem obrazka, z dwiema różnic
 
 
 	- Jeśli zniknie obrazek który nigdzie nie był użyty, to nic się nie stanie.
+-->
 
 ## Animacje
 

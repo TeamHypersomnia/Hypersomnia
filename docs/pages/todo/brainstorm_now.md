@@ -5,6 +5,22 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- the problem of tracking images
+	- By default, don't show unused images
+	- on missing, we have to relink manually anyway
+	- simplest case: what if the image data consisted of just paths?
+		- Just like with sounds
+		- Then it would not make sense to have forget buttons, right?
+			- because it would only be about the path
+		- so it is only the case of what do we do with neon parameters
+			- it might be good to save a meta file so that on re-importing, we have that data again
+				- though we'll still to have to relink due to ids
+	- Images window
+		- It's fast enough so always recalculate missing files on opening Images
+		- First should show Missing files with red caption so that it catches attention
+			- Option to relink each path in particular
+		- Even earlier should go Missing custom neon maps
+
 - preview could be done by a thread_local image & texture
 	- NO! Just store it inside editor so that it may be properly cleaned up
 	- a good test case for a pbo
