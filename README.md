@@ -124,7 +124,7 @@ The generated binary is also more performant (e.g. a simple benchmark yielded ``
 git clone https://github.com/TeamHypersomnia/Hypersomnia --recursive
 cd Hypersomnia
 cmake/build.sh Release x64
-ninja run -C build/Release-x64
+ninja run -C build/last
 ```
 
 ### Detailed instructions
