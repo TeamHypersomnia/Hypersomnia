@@ -193,6 +193,7 @@ Choose one for opening and one for saving, then ``cd`` to ``hypersomnia/scripts/
 
 - ``ln -s managers/save_file_ranger.zsh save_file.local``
 - ``ln -s managers/open_file_ranger.zsh open_file.local``
+- ``ln -s managers/choose_directory_ranger.zsh choose_directory.local``
 - ``ln -s managers/select_file_ranger.zsh select_file.local`` (e.g. for when there is a need to reveal the file in explorer)
 
 The symlinks will not be tracked by git.  
