@@ -52,10 +52,11 @@ Będzie to miniaturkowy hierarchiczny widok na strukturę obu folderów: oficjal
 
 Dodatkowo wprowadzone zostanie okno nazwane "Images":
 
-- Domyślnie, **pojawią się tam wyłącznie te obrazki które są gdzieś używane w edytorze.**  
+- Będzie można tam przeglądać wszystkie **śledzone obrazki**.  
+Domyślnie, pojawią się tam wyłącznie te obrazki które są gdzieś **używane w edytorze.**  
 **Śledzony obrazek** to taki obrazek który był kiedyś wybrany przez użytkownika dla jakiejś własności w edytorze i nie został manualnie "zapomniany" z projektu.  
 **Nieużywany obrazek** to taki **śledzony obrazek**, który już nie jest kompletnie nigdzie ustawiony, i nigdy nie zostanie użyty przez grę.
-	- Będzie checkbox do pokazania nieużywanych obrazków.
+	- Będzie checkbox do pokazania nieużywanych obrazków (domyślnie off).
 		- Po zaznaczeniu go, nieużywane obrazki **pojawią się w osobnej rubryce**.
 		- Nieużywane obrazki, w przeciwieństwie do gdzieś używanych, będzie można "Zapomnieć".
 			- Oznacza to **tylko tyle**:
