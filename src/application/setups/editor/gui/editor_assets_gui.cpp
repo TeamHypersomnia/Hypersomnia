@@ -55,8 +55,10 @@ void editor_images_gui::perform(editor_command_input in) {
 
 	sort_range(all_paths);
 
+	browser_settings.do_tweakers();
+
 	browse_path_tree(
-		browser_settings,
+		browser_settings.tree_settings,
 		all_paths,
 		[&](const auto& path_entry, const auto displayed_name) {
 			const auto node_label = typesafe_sprintf("%x###%x", displayed_name, path_entry.get_full_path());

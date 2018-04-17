@@ -7,6 +7,7 @@
 #include "view/viewables/all_viewables_defs.h"
 
 #include "augs/misc/imgui/browse_path_tree.h"
+#include "application/setups/editor/gui/asset_browser_settings.h"
 
 struct asset_control_provider {
 	all_viewables_defs& defs;
@@ -51,7 +52,7 @@ struct asset_control_provider {
 			thread_local bool acquire_once = true;
 			thread_local int acquire_keyboard_times = 2;
 			thread_local std::vector<asset_control_path_entry> all_paths;
-			thread_local path_tree_settings browser_settings;
+			thread_local asset_browser_settings browser_settings;
 
 			if (auto combo = scoped_combo(label.c_str(), displayed_str.c_str(), ImGuiComboFlags_HeightLargest)) {
 				if (acquire_once) {
@@ -100,8 +101,10 @@ struct asset_control_provider {
 
 				auto& loadables = defs.image_loadables;
 
+				browser_settings.do_tweakers();
+
 				browse_path_tree(
-					browser_settings,
+					browser_settings.tree_settings,
 					all_paths,
 					[&](const auto& path_entry, const auto displayed_name) {
 						const auto button_path = path_entry.get_full_path();

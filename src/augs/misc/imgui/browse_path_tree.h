@@ -44,9 +44,6 @@ void browse_path_tree(
 ) {
 	using namespace augs::imgui;
 
-	settings.do_tweakers();
-	ImGui::Separator();
-
 	const auto prettify_filenames = settings.prettify_filenames;
 
 	thread_local ImGuiTextFilter filter;

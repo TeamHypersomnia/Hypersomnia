@@ -21,6 +21,10 @@ summary: That which we are brainstorming at the moment.
 			- Option to relink each path in particular
 		- Even earlier should go Missing custom neon maps
 
+- Notice: the set of all assets used by all existent entities in the scene...
+	- ...does NOT equal the set of all USED images
+		- because flavours might have some set
+
 - preview could be done by a thread_local image & texture
 	- NO! Just store it inside editor so that it may be properly cleaned up
 	- a good test case for a pbo
