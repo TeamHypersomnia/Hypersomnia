@@ -80,6 +80,20 @@ Dodatkowo wprowadzone zostanie okno nazwane "Images":
 	- Jeśli nie jest nigdzie używany...
 		- Tak samo pojawi się w "Images", ale w rubryce "Missing (unused)", i tylko jeśli checkbox na pokazywanie nieużywanych obrazków jest zaznaczony.
 	- W obu przypadkach będzie można przekierować ścieżkę na istniejącą, normalnie wybierając obrazek z dysku tak samo jakbyśmy normalnie wybierali obrazek dla jakiejś właściwości.
+	- W przypadku masowych przenosin, przyda się przycisk "Fix paths manually". Po wciśnięciu pojawi się popup z textboxem:
+
+            
+            Please modify the contents of this textbox so that the paths point to existing files.
+
+            [tu zaczyna się textbox]
+            walls/1/corner.png
+            walls/1/edge.png
+            walls/1/corner_fancy.png
+            
+            [OK]
+            
+
+		który prosi abyś skopiował to, zmienił manualnie ścieżki do plików których edytor nie odnalazł na dysku i przekleił z powrotem do textboxa po czym wcisnął OK.
 - **W tym oknie będą dodatkowe opcje customizacji:**
 	- Np. tutaj będzie można ustawiać różne parametry obrazkom które będą zapisane w mapie.
 		- Parametry dla generacji neon mapy.
