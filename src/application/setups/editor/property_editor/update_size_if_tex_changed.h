@@ -9,45 +9,75 @@
 
 template <class T, class C>
 void update_size_if_tex_changed(
-	const T&, const fae_property_editor_input, unsigned, const change_flavour_property_command&, const C&
+	const edit_invariant_input in,
+	const T& invariant,
+	const C& new_content
 ) {}
 
 inline void update_size_if_tex_changed(
+	const edit_invariant_input in,
 	const invariants::sprite& invariant,
-	const fae_property_editor_input in,
-	const unsigned invariant_id,
-	const change_flavour_property_command& command,
 	const assets::image_id& new_content
 ) {
-	auto cmd = command;
+	const auto id = new_content;
 
-	{
-		const auto& size = invariant.size;
-		cmd.property_id = flavour_property_id { invariant_id, make_field_address(size, invariant) };
+	const auto fae_in = in.fae_in;
+	const auto cpe_in = fae_in.cpe_in;
+	const auto& image_caches = fae_in.image_caches;
+	const auto& viewables = cpe_in.command_in.folder.work->viewables;
+
+	image_cache cache;
+
+	if (const auto c = mapped_or_nullptr(image_caches, id)) {
+		cache = *c;
+	}
+	else {
+		cache = { viewables.image_loadables[id], viewables.image_metas[id] };
 	}
 
+	auto& history = cpe_in.command_in.folder.history;
+
 	{
-		const auto id = new_content;
+		auto cmd = in.command;
 
-		vec2u original_size;
-
-		if (const auto cache = mapped_or_nullptr(in.image_caches, id)) {
-			original_size = cache->original_image_size;
-		}
-		else {
-			original_size = in.cpe_in.command_in.folder.work->viewables.image_loadables[id].read_source_image_size();
+		{
+			const auto& size = invariant.size;
+			cmd.property_id = flavour_property_id { in.invariant_id, make_field_address(size, invariant) };
 		}
 
-		const auto original_size_casted = decltype(invariants::sprite::size)(original_size);
+		{
+			using T = decltype(invariants::sprite::size);
+			const auto original_size = T(cache.original_image_size);
 
-		cmd.value_after_change = augs::to_bytes(original_size_casted);
+			cmd.value_after_change = augs::to_bytes(original_size);
+		}
+
+		cmd.built_description = "Set sprite size to image dimensions";
+		cmd.common.has_parent = true;
+
+		history.execute_new(std::move(cmd), cpe_in.command_in);
 	}
 
-	cmd.built_description = "Set sprite size to image dimensions";
+	if (const auto invariant_id = in.shape_polygon_invariant_id) {
+		auto cmd = in.command;
 
-	auto& history = in.cpe_in.command_in.folder.history;
+		{
+			invariants::shape_polygon shape_invariant;
+			const auto& shape = shape_invariant.shape;
 
-	cmd.common.has_parent = true;
+			cmd.property_id = flavour_property_id { *invariant_id, make_field_address(shape, shape_invariant) };
+		}
 
-	history.execute_new(std::move(cmd), in.cpe_in.command_in);
+		{
+			using T = decltype(invariants::shape_polygon::shape);
+
+			const auto original_shape = T(cache.partitioned_shape);
+			cmd.value_after_change = augs::to_bytes(original_shape);
+		}
+
+		cmd.built_description = "Update physics shape to match sprite size";
+		cmd.common.has_parent = true;
+
+		history.execute_new(std::move(cmd), cpe_in.command_in);
+	}
 }

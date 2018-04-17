@@ -36,20 +36,19 @@ auto get_invariant_stem(const T&) {
 
 template <class T>
 void edit_invariant(
-	const fae_property_editor_input in,
 	const T& invariant,
-	const unsigned invariant_id,
-	const std::string& source_flavour_name,
-	const change_flavour_property_command& command
+	edit_invariant_input in
 ) {
-	using command_type = std::decay_t<decltype(command)>;
+	using command_type = std::decay_t<decltype(in.command)>;
 	using namespace augs::imgui;
 
-	auto& cpe_in = in.cpe_in;
+	const auto fae_in = in.fae_in;
+
+	auto& cpe_in = fae_in.cpe_in;
 	auto& cmd_in = cpe_in.command_in;
 
 	const auto property_location = [&]() {
-		const auto flavour_name = source_flavour_name;
+		const auto flavour_name = in.source_flavour_name;
 		const auto invariant_name = get_invariant_stem(invariant);
 
 		return typesafe_sprintf(" (in %x of %x)", invariant_name, flavour_name);
@@ -66,16 +65,16 @@ void edit_invariant(
 		const auto& new_content
 	) {
 		{
-			auto cmd = command;
+			auto cmd = in.command;
 
-			cmd.property_id = flavour_property_id { invariant_id, field_id };
+			cmd.property_id = flavour_property_id { in.invariant_id, field_id };
 			cmd.value_after_change = augs::to_bytes(new_content);
 			cmd.built_description = description + property_location;
 
 			history.execute_new(std::move(cmd), cmd_in);
 		}
 
-		update_size_if_tex_changed(invariant, in, invariant_id, command, new_content);
+		update_size_if_tex_changed(in, invariant, new_content);
 	};
 
 	auto rewrite_last_change = [&](
@@ -103,7 +102,7 @@ void edit_invariant(
 		post_new_change,
 		rewrite_last_change,
 		invariant_field_eq_predicate { 
-			cosm, invariant_id, command.type_id, command.affected_flavours 
+			cosm, in.invariant_id, in.command.type_id, in.command.affected_flavours 
 		},
 		asset_control_provider { defs, project_path, cmd_in }
 	);
@@ -130,17 +129,27 @@ void edit_flavour(
 		because renaming might be a common operation.
 	*/
 
-	edit_invariant(
-		in,
-	   	name_invariant,
-	   	get_index(name_invariant),
-	   	source_flavour_name,
-	   	command
-	);
+	std::optional<unsigned> shape_polygon_invariant_id;
+	
+	if constexpr(entity_flavour<E>::template has<invariants::shape_polygon>()) {
+		shape_polygon_invariant_id = static_cast<unsigned>(get_index(invariants::shape_polygon()));
+	}
+
+	auto do_edit_invariant = [&](const auto& invariant) {
+		edit_invariant(invariant, edit_invariant_input {
+			in,
+			static_cast<unsigned>(get_index(invariant)),
+			shape_polygon_invariant_id,
+			source_flavour_name,
+			command
+		});
+	};
+
+	do_edit_invariant(name_invariant);
 
 	for_each_through_std_get(
 		flavour.invariants,
-		[&](auto& invariant) {
+		[&do_edit_invariant](auto& invariant) {
 			using T = std::decay_t<decltype(invariant)>;
 
 			if constexpr(std::is_same_v<T, invariants::name>) {
@@ -153,7 +162,7 @@ void edit_flavour(
 			next_column_text();
 
 			if (node) {
-				edit_invariant(in, invariant, get_index(invariant), source_flavour_name, command);
+				do_edit_invariant(invariant);
 			}
 		}
    	);

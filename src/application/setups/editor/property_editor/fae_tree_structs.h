@@ -41,3 +41,12 @@ struct fae_tree_filter {
 	bool any() const;
 };
 
+struct change_flavour_property_command;
+
+struct edit_invariant_input {
+	const fae_property_editor_input fae_in;
+	const unsigned invariant_id;
+	const std::optional<unsigned> shape_polygon_invariant_id;
+	const std::string& source_flavour_name;
+	const change_flavour_property_command& command;
+};
