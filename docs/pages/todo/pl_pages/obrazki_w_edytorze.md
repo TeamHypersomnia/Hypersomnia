@@ -57,15 +57,10 @@ Dodatkowo wprowadzone zostanie okno nazwane "Images":
 **Nieużywany obrazek** to taki **śledzony obrazek**, który już nie jest kompletnie nigdzie ustawiony, i nigdy nie zostanie użyty przez grę.
 	- Będzie checkbox do pokazania nieużywanych obrazków.
 		- Po zaznaczeniu go, nieużywane obrazki **pojawią się w osobnej rubryce**.
-		- Nieużywane obrazki będzie można "Zapomnieć".
+		- Nieużywane obrazki, w przeciwieństwie do gdzieś używanych, będzie można "Zapomnieć".
 			- Oznacza to **tylko tyle**:
 				- Wcześniej ustawione parametry neon map dla tego obrazka zostaną zresetowane.
 				- Ten obrazek nie będzie już się pokazywał w rubryce z nieużywanymi obrazkami.
-<!--
-		- Uwaga: gdy będziemy robili to samo dla dźwięków, **nieużywane dźwięki będą zapominane automatycznie**.
-			No a właśnie że nie bo będziemy mieli ticka czy wygenerować mono...
-			- To jest dlatego, że oprócz samej ścieżki 
--->
 		- Mimo że ścieżki i parametry nieużywanych obrazków są zapisane w plikach projektu...
 			- ...gra będzie wrzucała do atlasu tylko te obrazki które są na scenie!
 	- (Opcjonalnie) można sprawić aby edytor pokazywał szczegóły gdzie obrazki są używane - bo i tak musimy sprawdzić gdzie jest, żeby zdecydować że nie jest używany nigdzie!
