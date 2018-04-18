@@ -58,8 +58,6 @@ void find_object_in_object(
 		[&searched_object, &location_callback](auto&& self, auto label, auto& field) {
 			using T = std::decay_t<decltype(field)>;
 
-			LOG_NVPS(fields.get_full_name(label));
-
 			if constexpr(
 				is_one_of_v<T, all_logical_assets, all_entity_flavours>
 			) {
@@ -118,7 +116,6 @@ void find_locations_that_use(
 
 	traverse("Common: ", common);
 
-	LOG("START");
 	for_each_entity_type([&](auto e){ 
 		using E = decltype(e);
 

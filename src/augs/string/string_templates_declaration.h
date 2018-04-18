@@ -7,16 +7,16 @@ template <class List>
 class type_in_list_id;
 
 template <class T>
-std::string get_type_name();
+const std::string& get_type_name();
 
 template <class T>
-std::string get_type_name(const T&);
+const std::string& get_type_name(const T&);
 
 template <class T>
-std::string get_type_name_strip_namespace();
+const std::string& get_type_name_strip_namespace();
 
 template <class T>
-std::string get_type_name_strip_namespace(const T&);
+const std::string& get_type_name_strip_namespace(const T&);
 
 std::string to_forward_slashes(std::string);
 std::string to_forward_slashes(std::string);
