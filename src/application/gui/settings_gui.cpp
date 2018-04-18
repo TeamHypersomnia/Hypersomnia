@@ -344,7 +344,7 @@ void settings_gui_state::perform(
 					auto indent = scoped_indent();
 
 					augs::introspect(
-						[&](const std::string& label, auto& field){
+						[&](const auto& label, auto& field){
 							if (label != "enabled") {
 								revertable_checkbox(format_field_name(label), field);
 							}

@@ -55,7 +55,7 @@ void find_object_in_object(
 	fields.clear();
 
 	auto callback = augs::recursive(
-		[&searched_object, &location_callback](auto&& self, auto label, auto& field) {
+		[&searched_object, &location_callback](auto&& self, const auto& label, auto& field) {
 			using T = std::decay_t<decltype(field)>;
 
 			if constexpr(

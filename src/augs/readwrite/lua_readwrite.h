@@ -220,7 +220,7 @@ namespace augs {
 			}
 			else {
 				introspect(
-					[input_table](const auto label, auto& field) {
+					[input_table](const auto& label, auto& field) {
 						using T = std::decay_t<decltype(field)>;
 
 						if constexpr(is_optional_v<T>) {
@@ -383,7 +383,7 @@ namespace augs {
 		}
 		else {
 			introspect(
-				[output_table](const auto label, const auto& field) {
+				[output_table](const auto& label, const auto& field) {
 					using T = std::decay_t<decltype(field)>;
 
 					if constexpr(is_optional_v<T>) {

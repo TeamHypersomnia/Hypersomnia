@@ -13,8 +13,8 @@ namespace augs {
 			auto& self = *static_cast<derived*>(this);
 	
 			introspect(
-				[](const auto label, auto& m){
-					m.title = format_field_name(std::string(label));
+				[](const auto& label, auto& m){
+					m.title = format_field_name(label);
 				}, 
 				self
 			);

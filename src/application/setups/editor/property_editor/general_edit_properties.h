@@ -171,7 +171,7 @@ void general_edit_properties(
 	};
 
 	augs::introspect(
-		augs::recursive([&](auto self, const std::string& label, const auto& original_member) {
+		augs::recursive([&](auto self, const auto& label, const auto& original_member) {
 			using M = std::decay_t<decltype(original_member)>;
 
 			static constexpr bool should_skip = 
@@ -192,7 +192,7 @@ void general_edit_properties(
 					};
 				};
 
-				const auto identity_label = "##" + label;
+				const auto identity_label = std::string("##") + label;
 
 				const auto& original = original_member;
 				auto altered = original;

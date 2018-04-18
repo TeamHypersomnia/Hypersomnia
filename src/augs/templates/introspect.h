@@ -106,7 +106,7 @@ namespace augs {
 		bool are_equal = true;
 
 		introspect(
-			[&are_equal](const auto label, const auto& aa, const auto& bb) {
+			[&are_equal](auto, const auto& aa, const auto& bb) {
 				are_equal = are_equal && equal_or_introspective_equal(aa, bb);
 			}, a, b
 		);

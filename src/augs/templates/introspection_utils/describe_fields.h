@@ -27,7 +27,7 @@ auto describe_fields(const T& object) {
 	fields.clear();
 
 	augs::introspect(
-		augs::recursive([&](auto&& self, const std::string& label, auto& field) {
+		augs::recursive([&](auto&& self, const auto& label, auto& field) {
 			const auto this_offset = static_cast<std::size_t>(
 				reinterpret_cast<const std::byte*>(&field) 
 				- reinterpret_cast<const std::byte*>(&object)
@@ -78,7 +78,7 @@ auto determine_breaks_in_fields_continuity_by_introspection(const T& object) {
 
 	augs::introspect(
 		augs::recursive(
-			[&](auto&& self, const std::string& label, auto& field) {
+			[&](auto&& self, const auto& label, auto& field) {
 				using F = std::decay_t<decltype(field)>;
 
 				if constexpr(is_container_v<F> || is_introspective_leaf_v<F>) {

@@ -46,7 +46,7 @@ all_necessary_shaders::all_necessary_shaders(
 	const game_drawing_settings settings
 ) {
 	augs::introspect(
-		[&](const std::string label, auto& shader) {
+		[&](const auto& label, auto& shader) {
 			const auto canon_vsh_path = typesafe_sprintf("%x/%x.vsh", canon_directory, label);
 			const auto local_vsh_path = typesafe_sprintf("%x/%x.vsh", local_directory, label);
 
