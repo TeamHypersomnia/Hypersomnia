@@ -129,6 +129,8 @@ void forget_asset_id_command<I>::undo(const editor_command_input in) {
 	else {
 		static_assert(always_false_v<I>, "Unsupported id type.");
 	}
+
+	forgotten_content.clear();
 }
 
 template struct create_asset_id_command<assets::image_id>;

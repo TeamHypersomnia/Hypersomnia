@@ -16,10 +16,6 @@
 #include "application/setups/editor/detail/format_struct_name.h"
 #include "augs/templates/introspection_utils/validate_fields_in.h"
 
-struct gfx_browser_client {
-
-};
-
 template <class id_type>
 struct asset_gui_path_entry : public browsed_path_entry_base {
 	using base = browsed_path_entry_base;
