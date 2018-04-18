@@ -139,7 +139,7 @@ namespace augs {
 #if TODO
 		/* TODO: Fix it to use tuples of initial values when creating entities */
 		/* TODO: Fix it to read guids properly instead of entity ids */
-		auto refresh_when_done = augs::make_scope_guard([&cosm]() {
+		auto refresh_when_done = augs::scope_guard([&cosm]() {
 			cosm.reinfer_solvable();
 		});
 

@@ -43,7 +43,7 @@ namespace augs {
 			OggVorbis_File oggFile;
 			ov_fopen(path_str.c_str(), &oggFile);
 			
-			auto scope = make_scope_guard([&oggFile](){
+			auto scope = scope_guard([&oggFile](){
 				ov_clear(&oggFile);
 			});
 

@@ -17,7 +17,7 @@ int main(int argc, char** argv) {
 
 	std::cout << "------------\nversion_file_generator run" << std::endl;
 
-	auto end_message = augs::make_scope_guard([&]() {
+	auto end_message = augs::scope_guard([&]() {
 		std::cout << "Run time: " << duration_cast<duration<double, milliseconds::period>>(high_resolution_clock::now() - start).count() << " ms" << std::endl << "------------\n";
 	});
 

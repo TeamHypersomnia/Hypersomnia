@@ -33,7 +33,7 @@ namespace augs {
 			return;
 		}
 
-		auto clear_logs = make_scope_guard([]() {
+		auto clear_logs = scope_guard([]() {
 			Catch::cout().clear();
 			Catch::cerr().clear();
 			Catch::clog().clear();

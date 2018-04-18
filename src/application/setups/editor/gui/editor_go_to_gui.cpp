@@ -202,7 +202,7 @@ std::optional<const_entity_handle> editor_go_to_entity_gui::perform(
 		*this
 	};
 
-	auto scope = augs::make_scope_guard([&](){
+	auto scope = augs::scope_guard([&](){
 		if (!was_acquired && ImGui::GetCurrentWindow()->GetID("##GoToEntityInput") != GImGui->ActiveId) {
 			show = false;
 		}

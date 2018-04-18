@@ -39,7 +39,7 @@ namespace augs {
 
 		const auto error = FT_New_Face(*global_libraries::freetype_library.get(), in.source_font_path.string().c_str(), 0, &face);
 
-		auto scope = make_scope_guard([&face]() {
+		auto scope = scope_guard([&face]() {
 			FT_Done_Face(face);
 		});
 

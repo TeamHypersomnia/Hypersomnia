@@ -42,11 +42,6 @@ namespace augs {
 			return first != b.first || second != b.second;
 		}
 	};
-
-	template <class A, class B>
-	simple_pair<A, B> make_simple_pair(const A& a, const B& b) {
-		return { a, b };
-	}
 }
 
 template <class A, class B>

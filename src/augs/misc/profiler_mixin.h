@@ -59,5 +59,5 @@ namespace augs {
 
 inline auto measure_scope(augs::time_measurements& m) {
 	m.start();
-	return augs::make_scope_guard([&m]() { m.stop(); });
+	return augs::scope_guard([&m]() { m.stop(); });
 }

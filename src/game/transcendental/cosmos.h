@@ -90,7 +90,7 @@ public:
 		auto status = changer_callback_result::INVALID;
 		auto& self = *this;
 
-		auto refresh_when_done = augs::make_scope_guard([&]() {
+		auto refresh_when_done = augs::scope_guard([&]() {
 			if (status != changer_callback_result::DONT_REFRESH) {
 				/*	
 					Always first reinfer the common,

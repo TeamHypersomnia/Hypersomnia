@@ -16,7 +16,7 @@ void standard_solver(
 	thread_local data_living_one_step queues;
 	const logic_step step(input, queues);
 
-	auto scope = augs::make_scope_guard([](){
+	auto scope = augs::scope_guard([](){
 		queues.clear();
 	});
 

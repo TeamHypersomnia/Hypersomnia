@@ -210,7 +210,7 @@ public:
 	static void change_solvable_significant(C& cosm, F&& callback) {
 		auto status = changer_callback_result::INVALID;
 
-		auto refresh_when_done = augs::make_scope_guard([&]() {
+		auto refresh_when_done = augs::scope_guard([&]() {
 			if (status != changer_callback_result::DONT_REFRESH) {
 				reinfer_solvable(cosm);
 			}

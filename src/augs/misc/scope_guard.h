@@ -38,9 +38,4 @@ namespace augs {
 	private:
 		std::optional<F> exit_function;
 	};
-
-	template <class F>
-	scope_guard<F> make_scope_guard(F&& exit_function) {
-		return scope_guard<F>{std::forward<F>(exit_function)};
-	}
 }

@@ -12,7 +12,7 @@ namespace augs {
 	public:
 		auto track(const std::string& name) {
 			fields.push_back(name);
-			return augs::make_scope_guard([this](){ pop(); });
+			return augs::scope_guard([this](){ pop(); });
 		}
 
 		auto get_full_name(const std::string& current_name) const {

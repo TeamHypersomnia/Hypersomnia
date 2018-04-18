@@ -286,7 +286,7 @@ namespace augs {
 
 					// parse whole tag
 
-					auto rollback_to_raw_parse_guard = augs::make_scope_guard([&, saved_token = current_token]() {
+					auto rollback_to_raw_parse_guard = augs::scope_guard([&, saved_token = current_token]() {
 						current_token = saved_token;
 						const auto brace_token_end = std::next(current_token);
 						append_with_current_style(current_token, brace_token_end);
