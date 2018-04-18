@@ -4,20 +4,7 @@
 #include "application/setups/editor/property_editor/property_editor_structs.h"
 #include "application/setups/editor/property_editor/general_edit_properties.h"
 #include "application/setups/editor/property_editor/component_field_eq_predicate.h"
-
-template <class T>
-auto get_component_stem(const T&) {
-	auto result = format_field_name(get_type_name_strip_namespace<T>());
-	result[0] = std::toupper(result[0]);
-
-	/* These look ugly with automated names */
-
-	if constexpr(std::is_same_v<T, components::transform>) {
-		result = "Transform";
-	}	
-
-	return result;
-}
+#include "application/setups/editor/detail/format_struct_name.h"
 
 template <class T>
 void edit_component(
@@ -31,7 +18,7 @@ void edit_component(
 	using namespace augs::imgui;
 
 	const auto property_location = [&]() {
-		const auto component_name = get_component_stem(component);
+		const auto component_name = format_struct_name(component);
 		return typesafe_sprintf(" (in %x of %x#%x)", component_name, entity_name);
 	}();
 
@@ -100,7 +87,7 @@ void edit_entity(
 		[&](const auto& component) {
 			using T = std::decay_t<decltype(component)>;
 
-			const auto component_label = get_component_stem(component) + " component";
+			const auto component_label = format_struct_name(component) + " component";
 			const auto node = scoped_tree_node_ex(component_label);
 
 			next_column_text();

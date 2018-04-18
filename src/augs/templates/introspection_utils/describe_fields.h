@@ -22,7 +22,9 @@ std::string conditional_to_string(const T& t) {
 template <class T>
 auto describe_fields(const T& object) {
 	std::string result;
-	augs::field_name_tracker fields;
+
+	thread_local augs::field_name_tracker fields;
+	fields.clear();
 
 	augs::introspect(
 		augs::recursive([&](auto&& self, const std::string& label, auto& field) {
@@ -67,7 +69,9 @@ auto describe_fields(const T& object) {
 template <class T>
 auto determine_breaks_in_fields_continuity_by_introspection(const T& object) {
 	std::string result;
-	augs::field_name_tracker fields;
+
+	thread_local augs::field_name_tracker fields;
+	fields.clear();
 
 	std::size_t next_expected_offset = 0;
 	std::size_t total_size_of_leaves = 0;

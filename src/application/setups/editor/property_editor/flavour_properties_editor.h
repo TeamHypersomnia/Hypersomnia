@@ -11,27 +11,11 @@
 #include "application/setups/editor/property_editor/invariant_field_eq_predicate.h"
 #include "application/setups/editor/property_editor/update_size_if_tex_changed.h"
 
+#include "application/setups/editor/detail/format_struct_name.h"
+
 template <class T>
 decltype(auto) get_name_of(const entity_flavour<T>& flavour) {
 	return flavour.template get<invariants::name>().name;
-}
-
-template <class T>
-auto get_invariant_stem(const T&) {
-	auto result = format_field_name(get_type_name_strip_namespace<T>());
-	result[0] = std::toupper(result[0]);
-
-	/* These look ugly with automated names */
-
-	if constexpr(std::is_same_v<T, invariants::sprite>) {
-		result = "Sprite";
-	}	
-
-	if constexpr(std::is_same_v<T, invariants::polygon>) {
-		result = "Polygon";
-	}
-
-	return result;
 }
 
 template <class T>
@@ -49,7 +33,7 @@ void edit_invariant(
 
 	const auto property_location = [&]() {
 		const auto flavour_name = in.source_flavour_name;
-		const auto invariant_name = get_invariant_stem(invariant);
+		const auto invariant_name = format_struct_name(invariant);
 
 		return typesafe_sprintf(" (in %x of %x)", invariant_name, flavour_name);
 	}();
@@ -157,7 +141,7 @@ void edit_flavour(
 				return;
 			}
 
-			const auto invariant_label = get_invariant_stem(invariant) + " invariant";
+			const auto invariant_label = format_struct_name(invariant) + " invariant";
 			const auto node = scoped_tree_node_ex(invariant_label);
 			next_column_text();
 

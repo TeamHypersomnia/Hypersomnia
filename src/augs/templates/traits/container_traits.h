@@ -26,6 +26,13 @@ template <class T>
 struct is_associative<T, decltype(typename T::key_type(), typename T::mapped_type(), void())> : std::true_type {};
 
 
+template <class T, class = void>
+struct has_value_type : std::false_type {};
+
+template <class T>
+struct has_value_type<T, decltype(typename T::value_type(), void())> : std::true_type {};
+
+
 template <class T, class K, class = void>
 struct has_member_find : std::false_type {};
 
@@ -98,6 +105,9 @@ constexpr bool can_emplace_back_v = can_emplace_back<T>::value;
 
 template <class T>
 constexpr bool is_associative_v = is_associative<T>::value;
+
+template <class T>
+constexpr bool has_value_type_v = has_value_type<T>::value;
 
 template <class T>
 constexpr bool is_container_v = has_begin_and_end_v<T> && !is_std_array_v<T>;

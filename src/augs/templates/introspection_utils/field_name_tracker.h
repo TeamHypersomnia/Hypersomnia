@@ -19,6 +19,10 @@ namespace augs {
 			std::string name;
 
 			for (const auto& d : fields) {
+				if (d.empty()) {
+					continue;
+				}
+
 				name += d + ".";
 			}
 
@@ -27,6 +31,10 @@ namespace augs {
 
 		auto get_indent() const {
 			return std::string(fields.size() * 4, ' ');
+		}
+
+		void clear() {
+			fields.clear();
 		}
 	};
 }

@@ -6,38 +6,37 @@
 #include "augs/templates/traits/container_traits.h"
 
 namespace augs {
+	template <class T>
+	constexpr bool has_dynamic_content_v =
+		is_optional_v<T>
+		|| is_variant_v<T>
+		|| is_container_v<T>
+	;
+
 	template <class F, class O>
-	void introspect_with_containers(F callback, O& object) {
-		augs::introspect(
-			[&callback](const auto& label, auto& field) {
-				using T = std::decay_t<decltype(field)>;
+	void on_dynamic_content(F callback, O& object) {
+		using T = std::decay_t<O>;
 
-				if constexpr(is_introspective_leaf_v<T>) {
-					callback(label, field);
-				}
-				else if constexpr(is_optional_v<T>) {
-					if (field) {
-						callback(label, *field);
-					}
-				}
-				else if constexpr(is_variant_v<T>) {
-					std::visit(
-						[&](auto& resolved){ callback(label, resolved); }, 
-						field
-					);
-				}
-				else if constexpr(is_container_v<T>) {
-					int i = 0;
+		if constexpr(is_optional_v<T>) {
+			if (object) {
+				callback(*object);
+			}
+		}
+		else if constexpr(is_variant_v<T>) {
+			std::visit(
+				[&](auto& resolved){ callback(resolved); }, 
+				object
+			);
+		}
+		else if constexpr(is_container_v<T>) {
+			int i = 0;
 
-					for (auto&& elem : field) {
-						callback(typesafe_sprintf("%x.%x", label, i++), field);
-					}
-				}
-				else {
-					callback(label, field);
-				}
-			}, 
-			object
-		);
+			for (auto&& elem : object) {
+				callback(elem, i++);
+			}
+		}
+		else {
+			static_assert(!has_dynamic_content_v<T>);
+		}
 	}
 }

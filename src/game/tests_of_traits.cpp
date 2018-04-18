@@ -19,6 +19,8 @@
 
 #include "augs/pad_bytes.h"
 
+#include "augs/templates/introspection_utils/validate_fields_in.h"
+
 #include "augs/readwrite/lua_readwrite.h"
 #include "augs/readwrite/byte_readwrite.h"
 
@@ -396,30 +398,6 @@ struct tests_of_traits {
 	static_assert(has_suitable_member_assign_v<std::vector<double>, std::unordered_set<int>>);
 	static_assert(!has_suitable_member_assign_v<std::unordered_set<int>, std::vector<double>>);
 };
-
-template <class F, class T>
-static void validate_fields_in(T& object, F condition) {
-	condition(object);
-
-	if constexpr(is_container_v<T>){
-		if constexpr(is_associative_v<T>) {
-			typename T::key_type k;
-			typename T::mapped_type m;
-
-			validate_fields_in(k, condition);
-			validate_fields_in(m, condition);
-		}
-		else {
-			typename T::value_type v;
-			validate_fields_in(v, condition);
-		}
-	}
-	else if constexpr(has_introspect_v<T>){
-		augs::introspect([&](auto, auto& m){
-			validate_fields_in(m, condition);
-		}, object);
-	}
-}
 
 template <class T>
 static void check_no_ids_in() {

@@ -7,9 +7,14 @@
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/misc/imgui/path_tree_structs.h"
 
+#include "game/organization/for_each_entity_type.h"
+
 #include "application/setups/editor/gui/editor_assets_gui.h"
 #include "application/setups/editor/editor_folder.h"
 #include "application/intercosm.h"
+
+#include "application/setups/editor/detail/format_struct_name.h"
+#include "augs/templates/introspection_utils/validate_fields_in.h"
 
 struct gfx_browser_client {
 
@@ -31,17 +36,29 @@ struct asset_gui_path_entry : public browsed_path_entry_base {
 	{}
 };
 
-template <class S, class O, class F>
+template <class T>
+constexpr bool is_whitelisted_container = 
+	is_one_of_v<T, wandering_pixels_frames>
+;
+
+template <class Se, class O, class F>
 void find_object_in_object(
-	const S& searched_object,
+	const Se& searched_object,
 	const O& in_object,
 	F location_callback
 ) {
-	augs::field_name_tracker fields;
+	using S = std::decay_t<Se>;
+
+	static_assert(std::is_same_v<S, decltype(invariants::sprite::tex)>);
+
+	thread_local augs::field_name_tracker fields;
+	fields.clear();
 
 	auto callback = augs::recursive(
-		[&searched_object, &location_callback, &fields](auto&& self, auto label, auto& field) {
+		[&searched_object, &location_callback](auto&& self, auto label, auto& field) {
 			using T = std::decay_t<decltype(field)>;
+
+			LOG_NVPS(fields.get_full_name(label));
 
 			if constexpr(
 				is_one_of_v<T, all_logical_assets, all_entity_flavours>
@@ -53,15 +70,36 @@ void find_object_in_object(
 					location_callback(fields.get_full_name(label));
 				}
 			}
-			else if constexpr(!is_introspective_leaf_v<T>) {
+			else if constexpr(is_introspective_leaf_v<T>) {
+				return;
+			}
+			else if constexpr(augs::has_dynamic_content_v<T>) {
+				if constexpr(!(is_container_v<T> && !is_whitelisted_container<T>)) {	
+					/* Is not a blacklisted container */
+
+					augs::on_dynamic_content(
+						[&](auto& dyn, auto... args) {
+							auto scope = fields.track(typesafe_sprintf("%x", args...));
+							self(self, "", dyn);
+						},
+						field
+					);
+				}
+				else {
+					validate_fields_in(field, [](const auto& m){
+						using M = std::decay_t<decltype(m)>;
+						static_assert(!std::is_same_v<M, S>, "A blacklisted container may contain the searched object.");
+					});
+				}
+			}
+			else {
 				auto scope = fields.track(label);
-				augs::introspect_with_containers(augs::recursive(self), field);
+				augs::introspect(augs::recursive(self), field);
 			}
 		}
 	);
 
-	augs::introspect_with_containers(callback, in_object);
-
+	augs::introspect(callback, in_object);
 }
 
 template <class F>
@@ -76,7 +114,34 @@ void find_locations_that_use(
 		});
 	};
 
-	traverse("Common: ", inter.world.get_common_significant());
+	const auto& common = inter.world.get_common_significant();
+
+	traverse("Common: ", common);
+
+	LOG("START");
+	for_each_entity_type([&](auto e){ 
+		using E = decltype(e);
+
+		common.get_flavours<E>().for_each([&](const auto, const auto& flavour) {
+			const auto& name = flavour.template get<invariants::name>().name;
+
+			auto for_each_through = [&](const auto& where) {
+				for_each_through_std_get(
+					where,
+					[&](const auto& c) {
+						find_object_in_object(id, c, [&](const auto& location) {
+							/* location_callback(format_struct_name(c) + "of " + name + ": " + location); */
+							location_callback(name + "." + format_struct_name(c) + "." + location);
+						});
+					}
+				);
+			};
+
+			for_each_through(flavour.initial_components);
+			for_each_through(flavour.invariants);
+		});
+	});
+
 	//traverse("Particle effects: ", inter.viewables.particle_effects);
 }
 
@@ -132,7 +197,8 @@ void editor_images_gui::perform(editor_command_input in) {
 
 			const auto id = path_entry.id;
 
-			std::vector<std::string> locations;
+			thread_local std::vector<std::string> locations;
+			locations.clear();
 
 			find_locations_that_use(id, work, [&](const std::string& location) {
 				locations.push_back(location);
