@@ -25,6 +25,11 @@ struct asset_gui_path_entry : public browsed_path_entry_base {
 	using base = browsed_path_entry_base;
 
 	id_type id;
+	std::vector<std::string> locations;
+
+	bool used() const {
+		return locations.size() > 0;
+	}
 
 	asset_gui_path_entry() = default;
 	asset_gui_path_entry(
@@ -128,7 +133,7 @@ void find_locations_that_use(
 					[&](const auto& c) {
 						find_object_in_object(id, c, [&](const auto& location) {
 							/* location_callback(format_struct_name(c) + "of " + name + ": " + location); */
-							location_callback(name + "." + format_struct_name(c) + "." + location);
+							location_callback("Flavour: " + name + " (" + format_struct_name(c) + "." + location + ")");
 						});
 					}
 				);
@@ -156,16 +161,24 @@ void editor_images_gui::perform(editor_command_input in) {
 
 	const auto& viewables = work.viewables;
 
-	thread_local std::vector<asset_gui_path_entry<assets::image_id>> all_paths;
+	using path_entry_type = asset_gui_path_entry<assets::image_id>;
+	thread_local std::vector<path_entry_type> all_paths;
+
 	all_paths.clear();
 
 	viewables.image_loadables.for_each_object_and_id(
-		[](const auto& object, const auto id) mutable {
+		[&](const auto& object, const auto id) mutable {
 			all_paths.emplace_back(object.source_image_path, id);
 		}
 	);
 
 	sort_range(all_paths);
+	
+	for (auto& p : all_paths) {
+		find_locations_that_use(p.id, work, [&](const auto& location) {
+			p.locations.push_back(location);
+		});
+	}
 
 	browser_settings.do_tweakers();
 
@@ -181,38 +194,22 @@ void editor_images_gui::perform(editor_command_input in) {
 	if (tree_settings.linear_view) {
 		ImGui::Columns(3);
 
-		tree_settings.do_name_location_columns();
+		int i = 0;
 
-		text_disabled("Used at");
-		ImGui::NextColumn();
+		auto do_path = [&](const auto& path_entry) {
+			auto scope = scoped_id(i++);
 
-		ImGui::Separator();
-
-		for (const auto& path_entry : all_paths) {
 			const auto displayed_name = tree_settings.get_prettified(path_entry.get_filename());
 			const auto displayed_dir = path_entry.get_displayed_directory();
 
 			const auto id = path_entry.id;
 
-			thread_local std::vector<std::string> locations;
-			locations.clear();
-
-			find_locations_that_use(id, work, [&](const std::string& location) {
-				locations.push_back(location);
-			});
-
 			if (!filter.PassFilter(displayed_name.c_str()) && !filter.PassFilter(displayed_dir.c_str())) {
-				continue;
-			}
-
-			if (!browser_settings.show_unused && locations.empty()) {
-				continue;
+				return;
 			}
 
 			{
-				const auto node_label = typesafe_sprintf("%x###%x", displayed_name, path_entry.get_full_path());
-
-				if (auto node = scoped_tree_node(node_label.c_str())) {
+				if (auto node = scoped_tree_node(displayed_name.c_str())) {
 
 				}
 			}
@@ -223,18 +220,62 @@ void editor_images_gui::perform(editor_command_input in) {
 
 			ImGui::NextColumn();
 
-			if (locations.empty()) {
-				text_disabled("Nowhere");
-			}
-			else {
-				if (auto node = scoped_tree_node(typesafe_sprintf("%x locations###%x", locations.size(), path_entry.id).c_str())) {
+			if (path_entry.used()) {
+				const auto& locations = path_entry.locations;
+
+				if (auto node = scoped_tree_node(typesafe_sprintf("%x locations###locations", locations.size()).c_str())) {
 					for (const auto& l : locations) {
 						text(l);
 					}
 				}
 			}
+			else {
+				const auto scoped_style = scoped_style_var(ImGuiStyleVar_FramePadding, ImVec2(3, 0));
+
+				if (ImGui::Button("Forget")) {
+
+				}
+			}
 
 			ImGui::NextColumn();
+		};
+
+		bool any_unused = false;
+
+		if (browser_settings.show_unused) {
+			for (const auto& u : all_paths) {
+				if (!any_unused) {
+					text_disabled("Unused images");
+					ImGui::NextColumn();
+					text_disabled("Location");
+					ImGui::NextColumn();
+					text_disabled("Operations");
+					ImGui::NextColumn();
+					ImGui::Separator();
+
+					any_unused = true;
+				}
+				if (!u.used()) {
+					do_path(u);
+				}
+			}
+		}
+
+		if (any_unused) {
+			ImGui::Separator();
+		}
+
+		tree_settings.do_name_location_columns();
+
+		text_disabled("Used at");
+		ImGui::NextColumn();
+
+		ImGui::Separator();
+
+		for (const auto& p : all_paths) {
+			if (p.used()) {
+				do_path(p);
+			}
 		}
 	}
 	else {
