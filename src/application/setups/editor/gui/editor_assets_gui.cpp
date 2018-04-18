@@ -161,7 +161,8 @@ void editor_images_gui::perform(editor_command_input in) {
 
 	const auto& viewables = work.viewables;
 
-	using path_entry_type = asset_gui_path_entry<assets::image_id>;
+	using asset_id_type = assets::image_id;
+	using path_entry_type = asset_gui_path_entry<asset_id_type>;
 	thread_local std::vector<path_entry_type> all_paths;
 
 	all_paths.clear();
@@ -233,7 +234,13 @@ void editor_images_gui::perform(editor_command_input in) {
 				const auto scoped_style = scoped_style_var(ImGuiStyleVar_FramePadding, ImVec2(3, 0));
 
 				if (ImGui::Button("Forget")) {
+					forget_asset_id_command<asset_id_type> cmd;
+					cmd.forgotten_id = path_entry.id;
+					cmd.built_description = 
+						typesafe_sprintf("Stopped tracking %x", augs::to_display_path(path_entry.get_full_path()))
+					;
 
+					in.folder.history.execute_new(std::move(cmd), in);
 				}
 			}
 

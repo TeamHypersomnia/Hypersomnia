@@ -21,7 +21,12 @@ namespace augs {
 	};
 
 	template <class size_type, class... keys>
+	struct pool_undo_free_input;
+
+	template <class size_type, class... keys>
 	struct pooled_object_id {
+		using undo_free_type = pool_undo_free_input<size_type, keys...>;
+
 		// GEN INTROSPECTOR struct augs::pooled_object_id class size_type class... keys
 		size_type version = 0;
 		size_type indirection_index = static_cast<size_type>(-1);
