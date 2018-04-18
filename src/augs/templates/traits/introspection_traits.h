@@ -1,5 +1,6 @@
 #pragma once
 #include <type_traits>
+#include "augs/filesystem/path_declaration.h"
 #include "augs/templates/identity_templates.h"
 
 namespace augs {
@@ -31,6 +32,9 @@ struct is_introspective_leaf :
 	std::bool_constant<
 		std::is_enum_v<T>
 		|| std::is_arithmetic_v<T>
+		|| std::is_same_v<T, std::string>
+		|| std::is_same_v<T, augs::path_type>
+		|| std::is_same_v<T, std::vector<std::byte>>
 	> 
 {
 };

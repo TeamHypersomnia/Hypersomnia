@@ -38,6 +38,7 @@ namespace augs {
 			std::forward<F>(callback), t, tn...
 		);
 	}
+
 	/*
 		Simple introspection with just one level of depth.
 		Will invoke a callback upon every top-level field of a struct.

@@ -35,14 +35,18 @@ public:
 	}
 };
 
-template <class F, class C>
+template <class F, class C, class... ColumnCallbacks>
 void browse_path_tree(
 	path_tree_settings& settings,
 	const C& all_paths,
 	F path_callback,
-	const path_tree_detail detail = {}
+	const path_tree_detail detail,
+	std::array<const char*, sizeof...(ColumnCallbacks)> column_names,
+	ColumnCallbacks... column_callbacks
 ) {
 	using namespace augs::imgui;
+
+	constexpr auto extra_columns = sizeof...(column_callbacks);
 
 	const auto prettify_filenames = settings.prettify_filenames;
 
@@ -60,14 +64,17 @@ void browse_path_tree(
 	auto files_view = scoped_child("Files view", detail.files_view_size);
 
 	if (settings.linear_view) {
-		ImGui::Columns(3);
+		ImGui::Columns(2 + extra_columns);
 
 		text_disabled(prettify_filenames ? "Name" : "Filename");
 		ImGui::NextColumn();
 		text_disabled("Location");
 		ImGui::NextColumn();
-		text_disabled("Details");
-		ImGui::NextColumn();
+
+		for (const auto& name : column_names) {
+			text_disabled(name);
+			ImGui::NextColumn();
+		}
 
 		ImGui::Separator();
 
@@ -85,10 +92,26 @@ void browse_path_tree(
 			text_disabled(displayed_dir);
 
 			ImGui::NextColumn();
-			ImGui::NextColumn();
+
+			auto col = [&](auto&& callback) {
+				callback(l);
+				ImGui::NextColumn();
+			};
+
+			(col(column_callbacks), ...);
 		}
 	}
 	else {
 
 	}
+}
+
+template <class F, class C>
+void browse_path_tree(
+	path_tree_settings& settings,
+	const C& all_paths,
+	F path_callback,
+	const path_tree_detail detail
+) {
+	browse_path_tree(settings, all_paths, path_callback, detail, {});
 }

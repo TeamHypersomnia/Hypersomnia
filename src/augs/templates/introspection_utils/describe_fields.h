@@ -6,6 +6,7 @@
 #include "augs/templates/recursive.h"
 #include "augs/templates/can_stream.h"
 #include "augs/string/typesafe_sprintf.h"
+#include "augs/templates/introspection_utils/field_name_tracker.h"
 
 template <class T>
 std::string conditional_to_string(const T& t) {
@@ -21,20 +22,10 @@ std::string conditional_to_string(const T& t) {
 template <class T>
 auto describe_fields(const T& object) {
 	std::string result;
-	std::vector<std::string> fields;
+	augs::field_name_tracker fields;
 
 	augs::introspect(
 		augs::recursive([&](auto&& self, const std::string& label, auto& field) {
-			auto make_full_field_name = [&]() {
-				std::string name;
-
-				for (const auto& d : fields) {
-					name += d + ".";
-				}
-
-				return name;
-			};
-
 			const auto this_offset = static_cast<std::size_t>(
 				reinterpret_cast<const std::byte*>(&field) 
 				- reinterpret_cast<const std::byte*>(&object)
@@ -42,13 +33,13 @@ auto describe_fields(const T& object) {
 
 			const auto type_name = get_type_name<decltype(field)>();
 
-			result += std::string(fields.size() * 4, ' ') + typesafe_sprintf("%x - %x (%x) (%x) %x",
+			result += fields.get_indent() + typesafe_sprintf("%x - %x (%x) (%x) %x",
 				this_offset,
 				this_offset + sizeof(field),
 				sizeof(field),
 				// print type name without the leading "struct ", "class " or "enum "
 				type_name,
-				make_full_field_name() + label
+				fields.get_full_name(label)
 			);
 
 			const auto value = conditional_to_string(field);
@@ -59,15 +50,13 @@ auto describe_fields(const T& object) {
 
 			result += "\n";
 
-			fields.push_back(label);
+			auto scope = fields.track(label);
 
 			using F = std::decay_t<decltype(field)>;
 
 			if constexpr(!is_container_v<F> && !is_introspective_leaf_v<F>) {
 				augs::introspect(augs::recursive(self), field);
 			}
-
-			fields.pop_back();
 		}), 
 		object
 	);
@@ -78,7 +67,7 @@ auto describe_fields(const T& object) {
 template <class T>
 auto determine_breaks_in_fields_continuity_by_introspection(const T& object) {
 	std::string result;
-	std::vector<std::string> fields;
+	augs::field_name_tracker fields;
 
 	std::size_t next_expected_offset = 0;
 	std::size_t total_size_of_leaves = 0;
@@ -89,16 +78,6 @@ auto determine_breaks_in_fields_continuity_by_introspection(const T& object) {
 				using F = std::decay_t<decltype(field)>;
 
 				if constexpr(is_container_v<F> || is_introspective_leaf_v<F>) {
-					auto make_full_field_name = [&]() {
-						std::string name;
-
-						for (const auto& d : fields) {
-							name += d + ".";
-						}
-
-						return name;
-					};
-
 					const auto this_offset = static_cast<std::size_t>(
 						reinterpret_cast<const std::byte*>(&field)
 						- reinterpret_cast<const std::byte*>(&object)
@@ -114,7 +93,7 @@ auto determine_breaks_in_fields_continuity_by_introspection(const T& object) {
 							this_offset + sizeof(field),
 							sizeof(field),
 							type_name,
-							make_full_field_name() + label
+							fields.get_full_name(label)
 						);
 
 						const auto value = conditional_to_string(field);
@@ -130,9 +109,8 @@ auto determine_breaks_in_fields_continuity_by_introspection(const T& object) {
 					total_size_of_leaves += sizeof(field);
 				}
 				else {
-					fields.push_back(label);
+					auto scope = fields.track(label);
 					augs::introspect(augs::recursive(self), field);
-					fields.pop_back();
 				}
 			}
 		),

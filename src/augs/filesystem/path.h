@@ -1,12 +1,10 @@
 #pragma once
-#include <experimental/filesystem>
+#include "augs/filesystem/path_declaration.h"
 #include "augs/readwrite/byte_readwrite_declaration.h"
 
 std::string to_forward_slashes(std::string);
 
 namespace augs {
-	using path_type = std::experimental::filesystem::path;
-
 #if READWRITE_OVERLOAD_TRAITS_INCLUDED
 #error "I/O traits were included BEFORE I/O overloads, which may cause them to be omitted under some compilers."
 #endif
