@@ -6,8 +6,50 @@
 #include "game/assets/ids/is_asset_id.h"
 #include "view/viewables/all_viewables_defs.h"
 
-#include "augs/misc/imgui/browse_path_tree.h"
+#include "augs/misc/imgui/path_tree_structs.h"
 #include "application/setups/editor/gui/asset_browser_settings.h"
+
+template <class F, class C>
+void simple_browse_path_tree(
+	path_tree_settings& settings,
+	const C& all_paths,
+	F path_callback,
+	const bool acquire_keyboard
+) {
+	using namespace augs::imgui;
+
+	thread_local ImGuiTextFilter filter;
+	filter.Draw();
+
+	if (acquire_keyboard) {
+		ImGui::SetKeyboardFocusHere();
+	}
+
+	auto files_view = scoped_child("Files view", ImVec2(0, 20 * ImGui::GetTextLineHeightWithSpacing()));
+
+	if (settings.linear_view) {
+		ImGui::Columns(2);
+		settings.do_name_location_columns();
+		ImGui::Separator();
+
+		for (const auto& l : all_paths) {
+			const auto prettified = settings.get_prettified(l.get_filename());
+			const auto displayed_dir = l.get_displayed_directory();
+
+			if (!filter.PassFilter(prettified.c_str()) && !filter.PassFilter(displayed_dir.c_str())) {
+				continue;
+			}
+
+			path_callback(l, prettified);
+			ImGui::NextColumn();
+			text_disabled(displayed_dir);
+			ImGui::NextColumn();
+		}
+	}
+	else {
+
+	}
+}
 
 struct asset_control_provider {
 	all_viewables_defs& defs;
@@ -52,7 +94,7 @@ struct asset_control_provider {
 			thread_local bool acquire_once = true;
 			thread_local int acquire_keyboard_times = 2;
 			thread_local std::vector<asset_control_path_entry> all_paths;
-			thread_local asset_browser_settings browser_settings;
+			thread_local path_tree_settings tree_settings;
 
 			if (auto combo = scoped_combo(label.c_str(), displayed_str.c_str(), ImGuiComboFlags_HeightLargest)) {
 				if (acquire_once) {
@@ -91,26 +133,24 @@ struct asset_control_provider {
 					acquire_keyboard_times = 2;
 				}
 
-				path_tree_detail detail;
-				detail.files_view_size = ImVec2(0, 20 * ImGui::GetTextLineHeightWithSpacing());
+				const bool acquire_keyboard = acquire_keyboard_times > 0;
 
 				if (acquire_keyboard_times > 0) {
-					detail.acquire_keyboard = true;
-					acquire_keyboard_times--;
+					--acquire_keyboard_times;
 				}
 
 				auto& loadables = defs.image_loadables;
 
-				browser_settings.do_tweakers();
+				tree_settings.do_tweakers();
 
-				browse_path_tree(
-					browser_settings.tree_settings,
+				simple_browse_path_tree(
+					tree_settings,
 					all_paths,
 					[&](const auto& path_entry, const auto displayed_name) {
 						const auto button_path = path_entry.get_full_path();
 						const bool is_current = button_path == current_source_path;
 
-						if (is_current && detail.acquire_keyboard) {
+						if (is_current && acquire_keyboard) {
 							ImGui::SetScrollHere();
 						}
 
@@ -137,7 +177,7 @@ struct asset_control_provider {
 							}
 						}
 					},
-					detail
+					acquire_keyboard
 				);
 			}
 			else {

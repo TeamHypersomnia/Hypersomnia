@@ -584,7 +584,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/augs/string/get_type_name.cpp"
 	"src/application/setups/editor/gui/editor_assets_gui.cpp"
 	"src/application/setups/editor/commands/asset_commands.cpp"
-	"src/augs/misc/imgui/path_tree_settings.cpp"
+	"src/augs/misc/imgui/path_tree_structs.cpp"
 	"src/application/setups/editor/gui/asset_browser_settings.cpp"
 )
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/misc/imgui/path_tree_settings.h"
+#include "augs/misc/imgui/path_tree_structs.h"
 
 struct asset_browser_settings {
 	// GEN INTROSPECTOR struct asset_browser_settings
