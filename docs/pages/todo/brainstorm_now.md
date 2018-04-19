@@ -5,6 +5,11 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- We should now handle the missing images, probably
+- Images GUI: make images selectable
+	- What about redirection?
+		- Just don't show "Redirect path" button in the mass-selection gui
+
 - editing containers in general edit properties
 	- add/remove yields change property to the complete container
 	- what about comparing?
