@@ -9,6 +9,7 @@
 #include "application/setups/editor/commands/change_common_state_command.h"
 #include "application/setups/editor/commands/change_grouping_command.h"
 #include "application/setups/editor/commands/change_property_command.h"
+#include "application/setups/editor/commands/asset_commands.h"
 
 #include "augs/readwrite/byte_readwrite.h"
 
@@ -122,3 +123,6 @@ template class change_property_command<change_flavour_property_command>;
 template class change_property_command<change_entity_property_command>;
 template class change_property_command<change_common_state_command>;
 template class change_property_command<change_group_property_command>;
+
+template class change_property_command<change_asset_property_command<assets::image_id, false>>;
+template class change_property_command<change_asset_property_command<assets::image_id, true>>;

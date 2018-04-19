@@ -41,8 +41,8 @@ inline void update_size_if_tex_changed(
 		auto cmd = in.command;
 
 		{
-			const auto& size = invariant.size;
-			cmd.property_id = flavour_property_id { in.invariant_id, make_field_address(size, invariant) };
+			const auto addr = make_field_address(&invariants::sprite::size);
+			cmd.property_id = flavour_property_id { in.invariant_id, addr };
 		}
 
 		{
@@ -65,7 +65,8 @@ inline void update_size_if_tex_changed(
 			invariants::shape_polygon shape_invariant;
 			const auto& shape = shape_invariant.shape;
 
-			cmd.property_id = flavour_property_id { *invariant_id, make_field_address(shape, shape_invariant) };
+			const auto addr = make_field_address(&invariants::shape_polygon::shape);
+			cmd.property_id = flavour_property_id { *invariant_id, addr };
 		}
 
 		{

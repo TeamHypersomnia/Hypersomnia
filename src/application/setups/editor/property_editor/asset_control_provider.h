@@ -10,13 +10,15 @@
 #include "application/setups/editor/gui/asset_browser_settings.h"
 #include "application/setups/editor/property_editor/simple_browse_path_tree.h"
 
-template <class F>
+template <class F, class A>
 void choose_asset_path(
 	const std::string& label, 
 	const augs::path_type& current_source_path,
 	const augs::path_type& project_path,
 	const std::string& suffix_folder,
-	F on_choice
+	F on_choice,
+	A allow_path_predicate,
+	const std::string& disallowed_paths_displayed_name = ""
 ) {
 	using namespace augs::imgui;
 
@@ -25,6 +27,7 @@ void choose_asset_path(
 	thread_local bool acquire_once = true;
 	thread_local int acquire_keyboard_times = 2;
 	thread_local std::vector<asset_control_path_entry> all_paths;
+	thread_local std::vector<asset_control_path_entry> disallowed_paths;
 	thread_local path_tree_settings tree_settings;
 
 	const auto displayed_str = 
@@ -37,10 +40,16 @@ void choose_asset_path(
 	if (auto combo = scoped_combo(label.c_str(), displayed_str.c_str(), ImGuiComboFlags_HeightLargest)) {
 		if (acquire_once) {
 			all_paths.clear();
+			disallowed_paths.clear();
 
-			auto path_adder = [](const auto& p) {
+			auto path_adder = [&allow_path_predicate](const auto& p) {
 				if (p.extension() == ".png") {
-					all_paths.emplace_back(p);
+					if (allow_path_predicate(p)) {
+						all_paths.emplace_back(p);
+					}
+					else {
+						disallowed_paths.emplace_back(p);
+					}
 				}
 			};
 
@@ -66,6 +75,7 @@ void choose_asset_path(
 			}
 
 			sort_range(all_paths);
+			sort_range(disallowed_paths);
 
 			acquire_once = false;
 			acquire_keyboard_times = 2;
@@ -96,7 +106,9 @@ void choose_asset_path(
 					on_choice(button_path);
 				}
 			},
-			acquire_keyboard
+			acquire_keyboard,
+			disallowed_paths_displayed_name.size() > 0 ? disallowed_paths : decltype(disallowed_paths)(),
+			disallowed_paths_displayed_name
 		);
 	}
 	else {
@@ -157,7 +169,7 @@ struct asset_control_provider {
 				}
 			};
 			
-			choose_asset_path(label, current_source_path, project_path, "gfx", on_choice);
+			choose_asset_path(label, current_source_path, project_path, "gfx", on_choice, true_returner());
 		}
 		else {
 			static_assert(!handles<T>, "Incomplete implementation!");

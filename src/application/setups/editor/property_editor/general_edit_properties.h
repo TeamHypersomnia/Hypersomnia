@@ -33,28 +33,37 @@ auto maybe_different_value_cols(
 	);
 };
 
-template <class M, class T>
-auto make_field_address(const M& original_member, const T& object) {
-	field_address result;
-
-	result.offset = static_cast<unsigned>(
-		reinterpret_cast<const std::byte*>(std::addressof(original_member))
-		- reinterpret_cast<const std::byte*>(std::addressof(object))
-	);
-
-	auto& id = result.type_id;
+template <class M>
+auto get_type_id_for_field() {
+	decltype(field_address::type_id) id;
 
 	if constexpr(std::is_trivially_copyable_v<M>) {
 		id.set<augs::trivial_type_marker>();
 	}
-	else if constexpr(is_container_v<M>) {
+	else {
 		id.set<M>();
 	}
-	else {
-		static_assert(has_introspect_v<M>);
-	}
+
+	return id;
+}
+
+template <class O, class M>
+auto make_field_address(const O& object, const M& member) {
+	field_address result;
+
+	result.type_id = get_type_id_for_field<M>();
+	result.offset = static_cast<unsigned>(
+		reinterpret_cast<const std::byte*>(std::addressof(member))
+		- reinterpret_cast<const std::byte*>(std::addressof(object))
+	);
 
 	return result;
+}
+
+template <class O, class M>
+auto make_field_address(const M O::* const member) {
+	static const O o;
+	return make_field_address(o, o.*member);
 }
 
 enum class tweaker_type {
@@ -186,7 +195,7 @@ void general_edit_properties(
 					return tweaker_input<M> {
 						type,
 						formatted_label,
-						::make_field_address(original, object),
+						::make_field_address(object, original),
 						original,
 						altered
 					};

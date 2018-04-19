@@ -135,3 +135,6 @@ void forget_asset_id_command<I>::undo(const editor_command_input in) {
 
 template struct create_asset_id_command<assets::image_id>;
 template struct forget_asset_id_command<assets::image_id>;
+
+template struct change_asset_property_command<assets::image_id, false>;
+template struct change_asset_property_command<assets::image_id, true>;

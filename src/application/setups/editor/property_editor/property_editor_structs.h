@@ -3,6 +3,7 @@
 
 #include "3rdparty/imgui/imgui.h"
 #include "augs/readwrite/memory_stream.h"
+#include "augs/filesystem/path_declaration.h"
 
 #include "game/transcendental/entity_id.h"
 
@@ -13,7 +14,8 @@ using edited_field_type_id = type_in_list_id<
 	type_list<
 		augs::trivial_type_marker,
 		std::string,
-		convex_partitioned_shape::poly_vector_type
+		convex_partitioned_shape::poly_vector_type,
+		augs::path_type
 	>
 >;
 

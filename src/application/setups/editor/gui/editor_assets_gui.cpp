@@ -15,6 +15,8 @@
 
 #include "application/setups/editor/detail/format_struct_name.h"
 #include "augs/templates/introspection_utils/validate_fields_in.h"
+#include "application/setups/editor/property_editor/asset_control_provider.h"
+#include "application/setups/editor/property_editor/general_edit_properties.h"
 
 template <class id_type>
 struct asset_gui_path_entry : public browsed_path_entry_base {
@@ -143,6 +145,23 @@ void find_locations_that_use(
 	//traverse("Particle effects: ", inter.viewables.particle_effects);
 }
 
+static std::string describe_moved_file(
+	augs::path_type from, 
+	augs::path_type to 
+) {
+	const auto f1 = from.filename();
+	const auto f2 = to.filename();
+
+	const auto d1 = augs::path_type(from).replace_filename("");
+	const auto d2 = augs::path_type(to).replace_filename("");
+
+	if (d1 == d2) {
+		return typesafe_sprintf("%x to %x (%x)", f1, f2, d1);
+	}
+
+	return typesafe_sprintf("%x to %x (%x -> %x)", f1, f2, d1, d2);
+}
+
 void editor_images_gui::perform(editor_command_input in) {
 	using namespace augs::imgui;
 
@@ -155,7 +174,7 @@ void editor_images_gui::perform(editor_command_input in) {
 	auto& work = *in.folder.work;
 	auto& cosm = work.world;
 
-	const auto& viewables = work.viewables;
+	auto& viewables = work.viewables;
 
 	using asset_id_type = assets::image_id;
 	using path_entry_type = asset_gui_path_entry<asset_id_type>;
@@ -163,7 +182,9 @@ void editor_images_gui::perform(editor_command_input in) {
 
 	all_paths.clear();
 
-	viewables.image_loadables.for_each_object_and_id(
+	auto& loadables = viewables.image_loadables;
+
+	loadables.for_each_object_and_id(
 		[&](const auto& object, const auto id) mutable {
 			all_paths.emplace_back(object.source_image_path, id);
 		}
@@ -188,6 +209,8 @@ void editor_images_gui::perform(editor_command_input in) {
 
 	auto& tree_settings = browser_settings.tree_settings;
 
+	auto& history = in.folder.history;
+
 	if (tree_settings.linear_view) {
 		ImGui::Columns(3);
 
@@ -206,8 +229,35 @@ void editor_images_gui::perform(editor_command_input in) {
 			}
 
 			{
-				if (auto node = scoped_tree_node(displayed_name.c_str())) {
+				const auto& project_path = in.folder.current_path;
 
+				if (auto node = scoped_tree_node(displayed_name.c_str())) {
+					choose_asset_path(
+						"Source image",
+						path_entry.get_full_path(),
+						project_path,
+						"gfx",
+						[&](const auto& chosen_path) {
+							auto& l = loadables[id];
+							change_asset_property_command<assets::image_id> cmd;
+
+							cmd.affected_assets = { id };
+
+							cmd.built_description = typesafe_sprintf("Changed image path from %x", describe_moved_file(l.source_image_path, chosen_path));
+							cmd.field = make_field_address(&image_loadables_def::source_image_path);
+							cmd.value_after_change = augs::to_bytes(chosen_path);
+
+							history.execute_new(std::move(cmd), in);
+						},
+						[&](const auto& candidate_path) {
+							if (const auto asset_id = ::find_asset_id_by_path(candidate_path, loadables)) {
+								return false;
+							}
+
+							return true;
+						},
+						"Already tracked paths"
+					);
 				}
 			}
 
@@ -236,7 +286,7 @@ void editor_images_gui::perform(editor_command_input in) {
 						typesafe_sprintf("Stopped tracking %x", augs::to_display_path(path_entry.get_full_path()))
 					;
 
-					in.folder.history.execute_new(std::move(cmd), in);
+					history.execute_new(std::move(cmd), in);
 				}
 			}
 
