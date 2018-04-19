@@ -30,9 +30,9 @@ struct entity_solvable : entity_solvable_meta {
 	using used_entity_type = E;
 	using components_type = make_components<E>;
 	using entity_solvable_meta::entity_solvable_meta;
+	using introspect_base = entity_solvable_meta;
 
 	// GEN INTROSPECTOR struct entity_solvable class E
-	// INTROSPECT BASE entity_solvable_meta
 	components_type components;	
 	// END GEN INTROSPECTOR
 

@@ -1,4 +1,4 @@
-#include "augs/templates/introspect.h"
+#include "augs/templates/introspection_utils/introspective_equal.h"
 #include "augs/templates/corresponding_field.h"
 
 #include "augs/misc/lua/lua_utils.h"

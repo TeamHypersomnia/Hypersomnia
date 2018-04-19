@@ -2,8 +2,6 @@ beginning-line:
 // GEN INTROSPECTOR 
 ending-line:
 // END GEN INTROSPECTOR
-introspect-base-line:
-// INTROSPECT BASE
 header-directories:
 header-files:
 @HYPERSOMNIA_HEADERS_WITH_INTROSPECTED_CLASSES_NEWLINE_SEPARATED@
@@ -11,8 +9,6 @@ generated-file-path:
 @GENERATED_SOURCES_PATH@/introspectors.h
 introspector-field-format:
 			FIELD(%x); /* %x */
-base-introspector-field-format:
-			introspect_body(static_cast<%x*>(nullptr), f, _t_...);
 introspector-body-format:
 		template <class F%x, class... Instances>
 		static void introspect_body(

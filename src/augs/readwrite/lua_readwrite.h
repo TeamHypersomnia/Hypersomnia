@@ -7,6 +7,7 @@
 #include "augs/string/get_type_name.h"
 #include "augs/templates/traits/is_variant.h"
 #include "augs/templates/traits/is_optional.h"
+#include "augs/templates/traits/is_pair.h"
 #include "augs/templates/exception_templates.h"
 #include "augs/templates/container_templates.h"
 #include "augs/templates/introspect.h"
@@ -21,18 +22,6 @@
 #include "augs/readwrite/lua_readwrite_declaration.h"
 #include "augs/readwrite/lua_readwrite_overload_traits.h"
 #include "augs/readwrite/lua_traits.h"
-
-template <typename T>
-struct is_pair : std::false_type {};
-
-template <typename T1, typename T2>
-struct is_pair<std::pair<T1, T2>> : std::true_type {};
-
-template <typename T1, typename T2>
-struct is_pair<augs::simple_pair<T1, T2>> : std::true_type {};
-
-template <typename T>
-static constexpr bool is_pair_v = is_pair<T>::value;
 
 namespace augs {
 	template <class... T>

@@ -1,7 +1,7 @@
 #include "view/viewables/image_structs.h"
 #include "view/viewables/regeneration/image_loadables_def.h"
 
-#include "augs/templates/introspect.h"
+#include "augs/templates/introspection_utils/introspective_equal.h"
 
 image_cache::image_cache(
 	const image_loadables_def& loadables,

@@ -3,7 +3,7 @@
 #include <tuple>
 #include <unordered_map>
 
-#include "augs/templates/introspect.h"
+#include "augs/templates/introspection_utils/introspective_equal.h"
 #include "augs/string/string_templates.h"
 #include "augs/misc/relinked_pool_id.h"
 
