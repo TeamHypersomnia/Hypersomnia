@@ -93,7 +93,7 @@ namespace augs {
 			const vec2i offset = { 0, 0 }
 		) const {
 			const auto rects = context.get_drawing_rects(id);
-			const auto tex_size = tex.get_size();
+			const auto tex_size = tex.get_original_size();
 
 			auto origin = ltrbi(vec2i(0, 0), tex_size).place_in_center_of(rects.absolute);
 			origin.set_position(origin.get_position() + offset);

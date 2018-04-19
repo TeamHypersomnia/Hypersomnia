@@ -137,7 +137,7 @@ augs::vertex_triangle_buffer draw_circular_bars_and_get_textual_info(const draw_
 				examine_item_slot(v.get_primary_hand(), starting_health_angle - 22.5f - 45.f, 45.f, true);
 			}
 
-			const int radius = in.circular_bar_tex.get_size().x / 2;
+			const int radius = in.circular_bar_tex.get_original_size().x / 2;
 			const auto empty_health_amount = static_cast<int>((1 - health.get_ratio()) * 90);
 
 			textual_infos.push_back({

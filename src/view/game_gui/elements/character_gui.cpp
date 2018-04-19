@@ -301,7 +301,7 @@ void character_gui::draw_cursor_with_tooltip(
 	const auto screen_size = context.screen_size;
 
 	auto get_tooltip_position = [&]() {
-		return get_gui_crosshair_position() + manager.at(gui_cursor).get_size();
+		return get_gui_crosshair_position() + manager.at(gui_cursor).get_original_size();
 	};
 
 	auto draw_cursor_hint = [&](const auto& hint_text, const vec2i cursor_position, const vec2i cursor_size) {
@@ -360,7 +360,7 @@ void character_gui::draw_cursor_with_tooltip(
 						gui_cursor = assets::necessary_image_id::GUI_CURSOR_MINUS;
 						gui_cursor_color = red;
 
-						gui_cursor_position = draw_cursor_hint("Clear assignment", get_gui_crosshair_position(), manager.at(gui_cursor).get_size());
+						gui_cursor_position = draw_cursor_hint("Clear assignment", get_gui_crosshair_position(), manager.at(gui_cursor).get_original_size());
 					}
 					else {
 						const auto drawn_pos = drag_amount;
@@ -372,7 +372,7 @@ void character_gui::draw_cursor_with_tooltip(
 					const auto item = context.get_cosmos()[dragged_item_button.get_location().item_id].get<components::item>();
 
 					if (item.get_charges() > 1) {
-						const auto gui_cursor_size = manager.at(gui_cursor).get_size();
+						const auto gui_cursor_size = manager.at(gui_cursor).get_original_size();
 
 						const auto charges_text = std::to_string(dragged_charges);
 
@@ -403,7 +403,7 @@ void character_gui::draw_cursor_with_tooltip(
 						gui_cursor_color = green;
 					}
 
-					gui_cursor_position = draw_cursor_hint(transfer_data.hint_text, get_gui_crosshair_position(), manager.at(gui_cursor).get_size());
+					gui_cursor_position = draw_cursor_hint(transfer_data.hint_text, get_gui_crosshair_position(), manager.at(gui_cursor).get_original_size());
 				}
 				else if constexpr (std::is_same_v<T, drop_for_item_slot_transfer>) {
 					const auto& dragged_item_button = context.dereference_location(item_button_in_item{ transfer_data.simulated_transfer.item });
@@ -440,7 +440,7 @@ void character_gui::draw_cursor_with_tooltip(
 						gui_cursor_color = red;
 					}
 
-					gui_cursor_position = draw_cursor_hint(transfer_data.hint_text, get_gui_crosshair_position(), manager.at(gui_cursor).get_size());
+					gui_cursor_position = draw_cursor_hint(transfer_data.hint_text, get_gui_crosshair_position(), manager.at(gui_cursor).get_original_size());
 				}
 				else {
 					static_assert(always_false_v<T>);

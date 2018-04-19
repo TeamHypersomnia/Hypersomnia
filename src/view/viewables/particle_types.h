@@ -130,7 +130,7 @@ struct animated_particle {
 
 		const auto target_id = animation.get_image_id(anims);
 
-		face.set(target_id, manager.at(target_id).get_size(), white);
+		face.set(target_id, manager.at(target_id).get_original_size(), white);
 
 		basic_input.renderable_transform = { pos, 0 };
 		face.color = color;
@@ -184,7 +184,7 @@ struct homing_animated_particle {
 
 		face.set(
 			target_id,
-			manager.at(target_id).get_size()
+			manager.at(target_id).get_original_size()
 		);
 
 		basic_input.renderable_transform = { pos, 0 };

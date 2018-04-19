@@ -169,7 +169,7 @@ void illuminated_rendering(
 							return;
 						}
 
-						const vec2 edge_size = static_cast<vec2>(laser_glow_edge.get_size());
+						const vec2 edge_size = static_cast<vec2>(laser_glow_edge.get_original_size());
 
 						output.line(laser_glow, from, to, edge_size.y / 3.f, col);
 

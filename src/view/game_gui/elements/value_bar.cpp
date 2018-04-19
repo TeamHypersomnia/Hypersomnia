@@ -217,7 +217,7 @@ ltrb value_bar::get_bar_rect_with_borders(
 	auto icon_rect = absolute;
 
 	auto icon_tex = get_bar_icon(context, this_id);
-	icon_rect.set_size(context.get_game_images().at(icon_tex).get_size());
+	icon_rect.set_size(context.get_game_images().at(icon_tex).get_original_size());
 
 	const auto max_value_caption_size = get_text_bbox({ "99999", context.get_gui_font() });
 
@@ -389,7 +389,7 @@ void value_bar::rebuild_layouts(
 	}
 
 	const auto screen_size = context.get_screen_size();
-	const auto icon_size = context.get_game_images().at(get_bar_icon(context, this_id)).get_size();
+	const auto icon_size = context.get_game_images().at(get_bar_icon(context, this_id)).get_original_size();
 	const auto with_bar_size = vec2i(icon_size.x + 4 + 180, icon_size.y);
 
 	const auto lt = vec2i(screen_size.x - 220, 20 + drawing_vertical_index * (icon_size.y + 4));

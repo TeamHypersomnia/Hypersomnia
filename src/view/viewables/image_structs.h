@@ -51,7 +51,7 @@ struct image_in_atlas {
 		return diffuse;
 	}
 
-	vec2u get_size() const {
+	vec2u get_original_size() const {
 		return diffuse.get_original_size();
 	}
 };

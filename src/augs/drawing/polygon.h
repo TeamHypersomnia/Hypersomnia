@@ -254,7 +254,7 @@ namespace augs {
 				neon_in.use_neon_map = true;
 
 				sprite_type neon_sprite;
-				neon_sprite.set(texture_map_id, texture.get_size());
+				neon_sprite.set(texture_map_id, texture.get_original_size());
 
 				neon_sprite.draw(manager, neon_in);
 

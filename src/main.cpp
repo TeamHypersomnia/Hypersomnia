@@ -1618,7 +1618,7 @@ int work(const int argc, const char* const * const argv) try {
 						[&](const auto typed_handle, const auto image_id, const components::transform world_transform, const rgba color){
 							const auto screen_space_pos = vec2i(on_screen(world_transform.pos));
 
-							const auto aabb = xywh::center_and_size(screen_space_pos, necessary_images_in_atlas[image_id].get_size());
+							const auto aabb = xywh::center_and_size(screen_space_pos, necessary_images_in_atlas[image_id].get_original_size());
 							const auto expanded_square = aabb.expand_to_square();
 
 							if (auto active_color = editor.find_highlight_color_of(typed_handle.get_id())) {

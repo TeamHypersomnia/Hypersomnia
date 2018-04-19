@@ -370,7 +370,7 @@ void game_gui_system::rebuild_layouts(
 		}
 
 		{
-			const auto action_button_size = context.get_necessary_images().at(assets::necessary_image_id::ACTION_BUTTON_BORDER).get_size();
+			const auto action_button_size = context.get_necessary_images().at(assets::necessary_image_id::ACTION_BUTTON_BORDER).get_original_size();
 
 			auto total_width = static_cast<int>(element.action_buttons.size()) * action_button_size.x;
 

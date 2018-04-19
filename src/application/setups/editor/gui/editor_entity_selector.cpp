@@ -168,7 +168,7 @@ void editor_entity_selector::do_mousemotion(
 	hovered = {};
 
 	auto get_world_xywh = [&](const auto icon_id, const components::transform where) {
-		return xywh::center_and_size(where.pos, vec2(sizes_for_icons.at(icon_id).get_size()) / current_cone.zoom).expand_to_square();
+		return xywh::center_and_size(where.pos, vec2(sizes_for_icons.at(icon_id).get_original_size()) / current_cone.zoom).expand_to_square();
 	};
 
 	{

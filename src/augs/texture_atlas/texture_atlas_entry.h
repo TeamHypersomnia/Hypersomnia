@@ -20,10 +20,6 @@ namespace augs {
 			return cached_original_size_pixels;
 		}
 
-		vec2u get_size() const {
-			return get_original_size();
-		}
-
 		vec2 get_atlas_space_uv(const vec2 entry_space) const;
 
 		bool exists() const;

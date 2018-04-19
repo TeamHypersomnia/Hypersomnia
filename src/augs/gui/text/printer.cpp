@@ -135,7 +135,7 @@ namespace augs {
 								/* add the resulting character taking bearings into account */
 								out.aabb_clipped(
 									g.in_atlas,
-									ltrb(xywhi({ sectors[i] + g.meta.bear_x, lines[l].top + lines[l].asc - g.meta.bear_y }, g.in_atlas.get_size()) + pos),
+									ltrb(xywhi({ sectors[i] + g.meta.bear_x, lines[l].top + lines[l].asc - g.meta.bear_y }, g.in_atlas.get_original_size()) + pos),
 									ltrb(clipper),
 									charcolor
 								);
@@ -216,7 +216,7 @@ namespace augs {
 
 								out.aabb_clipped(
 									g.in_atlas,
-									xywhi({ sectors[i] + g.meta.bear_x, lines[l].top + lines[l].asc - g.meta.bear_y }, g.in_atlas.get_size()) + pos,
+									xywhi({ sectors[i] + g.meta.bear_x, lines[l].top + lines[l].asc - g.meta.bear_y }, g.in_atlas.get_original_size()) + pos,
 									clipper,
 									charcolor
 								);

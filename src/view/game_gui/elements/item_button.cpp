@@ -420,7 +420,7 @@ void item_button::draw_proc(
 				container_icon = assets::necessary_image_id::CONTAINER_CLOSED_ICON;
 			}
 
-			const auto size = necessarys.at(container_icon).get_size();
+			const auto size = necessarys.at(container_icon).get_original_size();
 
 			output.aabb_lt(necessarys.at(container_icon), vec2(this_absolute_rect.r - size.x + 2, this_absolute_rect.t + 1), border_col);
 		}

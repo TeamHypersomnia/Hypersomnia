@@ -128,8 +128,8 @@ namespace augs {
 						maybe_neon_map,
 						transform_pos,
 						final_rotation,
-						vec2(maybe_neon_map.get_size())
-						/ manager.at(tex).get_size() * drawn_size
+						vec2(maybe_neon_map.get_original_size())
+						/ manager.at(tex).get_original_size() * drawn_size
 					);
 				}
 			}

@@ -166,7 +166,7 @@ struct basic_button_corners_info {
 
 	template <class M>
 	auto size_of(const M& manager, const button_corner_type t) const {
-		return manager.at(get_tex_for_type(t)).get_size();
+		return manager.at(get_tex_for_type(t)).get_original_size();
 	}
 
 	template <class M>
@@ -221,7 +221,7 @@ struct basic_button_corners_info {
 				continue;
 			}
 
-			const vec2 s = tex.get_size();
+			const vec2 s = tex.get_original_size();
 
 			ltrb target_rect;
 			

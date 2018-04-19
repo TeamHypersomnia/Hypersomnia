@@ -177,7 +177,7 @@ void main_menu_setup::draw_overlays(
 	const vec2i screen_size
 ) const {
 	const auto game_logo = necessarys.at(assets::necessary_image_id::MENU_GAME_LOGO);
-	const auto game_logo_size = game_logo.get_size();
+	const auto game_logo_size = game_logo.get_original_size();
 
 	ltrb game_logo_rect;
 	game_logo_rect.set_position({ screen_size.x / 2.f - game_logo_size.x / 2.f, 50.f });
