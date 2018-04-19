@@ -28,6 +28,24 @@ struct intro_test1 {
 	// END GEN INTROSPECTOR
 };
 
+struct intro_test3 {
+	// GEN INTROSPECTOR struct intro_test3
+	int a = 1;
+	int b = 2;
+	// END GEN INTROSPECTOR
+};
+
+struct intro_test4 {
+	// GEN INTROSPECTOR struct intro_test4
+	int c = 3;
+	int d = 4;
+	// END GEN INTROSPECTOR
+};
+
+struct intro_test5 : intro_test3, intro_test4 {
+	using introspect_bases = type_list<intro_test3, intro_test4>;
+};
+
 TEST_CASE("IntrospectionTest EqualityTest") {
 	{
 		intro_test2 t1;
@@ -46,6 +64,19 @@ TEST_CASE("IntrospectionTest EqualityTest") {
 
 		std::get<int>(t2.tp) = 5891;
 		REQUIRE(!augs::introspective_equal(t1, t2));
+	}
+
+	{
+		intro_test5 t1;
+		intro_test5 t2;
+
+		REQUIRE(augs::introspective_equal(t1, t2));
+
+		t1.a = 5;
+		REQUIRE(!augs::introspective_equal(t1, t2));
+
+		t2.a = 5;
+		REQUIRE(augs::introspective_equal(t1, t2));
 	}
 }
 

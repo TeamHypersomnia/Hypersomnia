@@ -225,8 +225,9 @@ namespace augs {
 	struct polygon_with_id : polygon<vertex_count, index_count> {
 		static constexpr bool reinfer_when_tweaking = true;
 
+		using introspect_base = polygon<vertex_count, index_count>;
+
 		// GEN INTROSPECTOR struct augs::polygon_with_id class id_type std::size_t vertex_count std::size_t index_count
-		// INTROSPECT BASE polygon<vertex_count, index_count>
 		id_type texture_map_id;
 		// END GEN INTROSPECTOR
 

@@ -9,6 +9,7 @@ struct editor_command_input;
 struct editor_common_state_gui : standard_window_mixin<editor_common_state_gui> {
 	using base = standard_window_mixin<editor_common_state_gui>;
 	using base::base;
+	using introspect_base = base;
 
 	void perform(const editor_settings&, editor_command_input);
 

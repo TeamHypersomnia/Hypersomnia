@@ -63,10 +63,9 @@ struct entity_property_id {
 using affected_entities_type = std::vector<entity_id_base>;
 
 struct change_entity_property_command : change_property_command<change_entity_property_command> {
-	friend augs::introspection_access;
+	using introspect_base = change_property_command<change_entity_property_command>;
 
 	// GEN INTROSPECTOR struct change_entity_property_command
-	// INTROSPECT BASE change_property_command<change_entity_property_command>
 	entity_type_id type_id;
 	affected_entities_type affected_entities;
 	entity_property_id property_id;

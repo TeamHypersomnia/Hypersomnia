@@ -28,10 +28,9 @@ struct change_grouping_command {
 };
 
 struct change_group_property_command : change_property_command<change_group_property_command> {
-	friend augs::introspection_access;
+	using introspect_base = change_property_command<change_group_property_command>;
 
 	// GEN INTROSPECTOR struct change_group_property_command
-	// INTROSPECT BASE change_property_command<change_group_property_command>
 	unsigned group_index = static_cast<unsigned>(-1);
 	// END GEN INTROSPECTOR
 

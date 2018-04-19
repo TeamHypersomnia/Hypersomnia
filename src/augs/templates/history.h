@@ -153,12 +153,12 @@ namespace augs {
 
 	public:
 		using index_type = typename base::index_type;
+		using introspect_base = base;
 
 	private:
 		friend augs::introspection_access;
 
 		// GEN INTROSPECTOR class history_with_marks class... CommandTypes
-		// INTROSPECT BASE augs::history<history_with_marks<CommandTypes...>, CommandTypes...>
 		std::optional<index_type> saved_at_revision;
 		bool modified_since_save = false;
 		// END GEN INTROSPECTOR

@@ -5,6 +5,16 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- editing containers in general edit properties
+	- add/remove yields change property to the complete container
+	- what about comparing?
+		- just use element index in field address, should be ez
+		- just don't call the comparator on non existing indices?
+		- a separate control in imgui utils for editing containers?
+			- could then be also used for settings
+			- good idea, it can be compartmenatlized well
+				- we'll really just add dup and remove buttons
+
 - the problem of tracking images
 	- By default, don't show unused images
 	- on missing, we have to relink manually anyway

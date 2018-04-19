@@ -136,14 +136,31 @@ static void gg() {
 	}
 	
 	(void)(typed_entity_id<controlled_character>() == typed_entity_id<controlled_character>());
+
+	using T = value_meter;
+	value_meter vvv;
+	static_cast<void (*)(const T*, true_returner, T&)>(augs::introspection_access::introspect_body)(nullptr, {}, vvv);
 }
 
 struct derivedintrotest : basic_ltrb<float> {
-
+	using introspect_base = basic_ltrb<float>;
 };
 
+
 struct tests_of_traits {
+	static_assert(has_introspect_base_v<entity_id>);
+	static_assert(has_introspect_base_v<child_entity_id>);
+
+	static_assert(!has_introspect_base_v<int>);
+	static_assert(!has_introspect_base_v<double>);
+	static_assert(!has_introspect_base_v<value_meter>);
+
+	static_assert(has_introspect_v<guid_mapped_entropy>);
+	static_assert(!has_introspect_body_v<guid_mapped_entropy>);
+	static_assert(has_introspect_base_v<guid_mapped_entropy>);
+
 	static_assert(has_introspect_v<derivedintrotest>, "Trait has failed");
+	static_assert(has_introspect_body_v<value_meter>, "Trait has failed");
 
 	static_assert(has_member_find_v<std::unordered_map<int*, int*>, int*>);
 	static_assert(!has_member_find_v<std::vector<int>, int>);

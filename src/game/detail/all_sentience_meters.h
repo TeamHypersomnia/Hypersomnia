@@ -34,21 +34,15 @@ struct sentience_meter_appearance {
 };
 
 struct health_meter_instance : value_meter {
-	// GEN INTROSPECTOR struct health_meter_instance
-	// INTROSPECT BASE value_meter
-	// END GEN INTROSPECTOR
+	using introspect_base = value_meter;
 };
 
 struct personal_electricity_meter_instance : value_meter {
-	// GEN INTROSPECTOR struct personal_electricity_meter_instance
-	// INTROSPECT BASE value_meter
-	// END GEN INTROSPECTOR
+	using introspect_base = value_meter;
 };
 
 struct consciousness_meter_instance : value_meter {
-	// GEN INTROSPECTOR struct consciousness_meter_instance
-	// INTROSPECT BASE value_meter
-	// END GEN INTROSPECTOR
+	using introspect_base = value_meter;
 };
 
 struct health_meter {

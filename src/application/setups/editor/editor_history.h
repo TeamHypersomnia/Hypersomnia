@@ -19,9 +19,7 @@
 #include "application/setups/editor/editor_history_declaration.h"
 
 struct editor_history : public editor_history_base {
-	// GEN INTROSPECTOR struct editor_history
-	// INTROSPECT BASE editor_history_base
-	// END GEN INTROSPECTOR
+	using introspect_base = editor_history_base;
 
 	using editor_history_base::editor_history_base;
 

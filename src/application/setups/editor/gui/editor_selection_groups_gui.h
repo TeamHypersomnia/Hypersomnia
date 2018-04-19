@@ -9,6 +9,7 @@ struct editor_command_input;
 struct editor_selection_groups_gui : standard_window_mixin<editor_selection_groups_gui> {
 	using base = standard_window_mixin<editor_selection_groups_gui>;
 	using base::base;
+	using introspect_base = base;
 
 	void perform(bool has_ctrl, editor_command_input);
 

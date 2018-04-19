@@ -18,6 +18,7 @@ struct editor_all_entities_gui_input {
 struct editor_all_entities_gui : standard_window_mixin<editor_all_entities_gui> {
 	using base = standard_window_mixin<editor_all_entities_gui>;
 	using base::base;
+	using introspect_base = base;
 
 	fae_tree_filter perform(editor_all_entities_gui_input);
 

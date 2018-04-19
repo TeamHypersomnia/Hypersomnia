@@ -4,11 +4,9 @@
 namespace augs {
 	template<class T, class _enum>
 	class enum_array : public std::array<T, static_cast<size_t>(_enum::COUNT)> {
-		typedef std::array<T, static_cast<size_t>(_enum::COUNT)> base;
+		using base = std::array<T, static_cast<size_t>(_enum::COUNT)>;
 	public:
-		// GEN INTROSPECTOR class augs::enum_array class T class _enum
-		// INTROSPECT BASE std::array<T, static_cast<size_t>(_enum::COUNT)>
-		// END GEN INTROSPECTOR
+		using introspect_base = base;
 
 		using base::max_size;
 		using base::base;

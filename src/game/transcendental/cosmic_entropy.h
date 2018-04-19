@@ -44,11 +44,8 @@ struct cosmic_entropy;
 
 struct guid_mapped_entropy : basic_cosmic_entropy<entity_guid> {
 	using base = basic_cosmic_entropy<entity_guid>;
+	using introspect_base = base;
 	
-	// GEN INTROSPECTOR struct guid_mapped_entropy
-	// INTROSPECT BASE basic_cosmic_entropy<entity_guid>
-	// END GEN INTROSPECTOR
-
 	guid_mapped_entropy() = default;
 	explicit guid_mapped_entropy(const cosmic_entropy&, const cosmos&);
 	
@@ -62,10 +59,7 @@ struct guid_mapped_entropy : basic_cosmic_entropy<entity_guid> {
 
 struct cosmic_entropy : basic_cosmic_entropy<entity_id> {
 	using base = basic_cosmic_entropy<entity_id>;
-
-	// GEN INTROSPECTOR struct cosmic_entropy
-	// INTROSPECT BASE basic_cosmic_entropy<entity_id>
-	// END GEN INTROSPECTOR
+	using introspect_base = base;
 
 	cosmic_entropy() = default;
 	

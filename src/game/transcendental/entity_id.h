@@ -41,8 +41,9 @@ struct entity_guid {
 
 struct unversioned_entity_id : unversioned_entity_id_base {
 	using base = unversioned_entity_id_base;
+	using introspect_base = base;
+
 	// GEN INTROSPECTOR struct unversioned_entity_id
-	// INTROSPECT BASE unversioned_entity_id_base
 	entity_type_id type_id;
 	// END GEN INTROSPECTOR
 
@@ -85,8 +86,9 @@ struct child_entity_id;
 
 struct entity_id : entity_id_base {
 	using base = entity_id_base;
+	using introspect_base = base;
+
 	// GEN INTROSPECTOR struct entity_id
-	// INTROSPECT BASE entity_id_base
 	entity_type_id type_id;
 	// END GEN INTROSPECTOR
 	entity_id() = default;
@@ -166,11 +168,9 @@ private:
 }; 
 
 struct child_entity_id : entity_id {
-	// GEN INTROSPECTOR struct child_entity_id
-	// INTROSPECT BASE entity_id
-	// END GEN INTROSPECTOR
-
 	using base = entity_id;
+	using introspect_base = base;
+
 	child_entity_id(const entity_id id = entity_id()) : entity_id(id) {}
 	using base::operator unversioned_entity_id;
 

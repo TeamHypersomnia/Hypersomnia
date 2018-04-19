@@ -8,6 +8,7 @@ class editor_setup;
 struct editor_summary_gui : standard_window_mixin<editor_summary_gui> {
 	using base = standard_window_mixin<editor_summary_gui>;
 	using base::base;
+	using introspect_base = base;
 
 	void perform(editor_setup&);
 };
@@ -15,6 +16,7 @@ struct editor_summary_gui : standard_window_mixin<editor_summary_gui> {
 struct editor_coordinates_gui : standard_window_mixin<editor_coordinates_gui> {
 	using base = standard_window_mixin<editor_coordinates_gui>;
 	using base::base;
+	using introspect_base = base;
 
 	void perform(
 		editor_setup&,

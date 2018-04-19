@@ -12,8 +12,9 @@
 struct change_common_state_command : change_property_command<change_common_state_command> {
 	friend augs::introspection_access;
 
+	using introspect_base = change_property_command<change_common_state_command>;
+
 	// GEN INTROSPECTOR struct change_common_state_command
-	// INTROSPECT BASE change_property_command<change_common_state_command>
 	field_address field;
 	// END GEN INTROSPECTOR
 

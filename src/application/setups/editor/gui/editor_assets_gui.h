@@ -7,8 +7,9 @@ struct editor_images_gui : standard_window_mixin<editor_images_gui> {
 	using base = standard_window_mixin<editor_images_gui>;
 	using base::base;
 
+	using introspect_base = base;
+
 	// GEN INTROSPECTOR struct editor_images_gui
-	// INTROSPECT BASE standard_window_mixin<editor_images_gui>
 	asset_browser_settings browser_settings;
 	// END GEN INTROSPECTOR
 
