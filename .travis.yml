@@ -7,12 +7,12 @@ addons:
     packages:
      - gdb
      - apport
-     - gcc-7
-     - g++-7
+     - gcc-8
      - cmake
      - ninja-build
     sources:
      - ubuntu-toolchain-r-test
+     - jonathonf
 
 python:
   - "3.6"
@@ -21,7 +21,7 @@ matrix:
   include:
   - env: c_compiler=clang cxx_compiler=clang++ config=Debug other_cmake_flags=""
     compiler: clang
-  - env: c_compiler=gcc-7 cxx_compiler=g++-7 config=Debug other_cmake_flags=""
+  - env: c_compiler=gcc-8 cxx_compiler=g++-8 config=Debug other_cmake_flags=""
     compiler: gcc
 
 before_install:

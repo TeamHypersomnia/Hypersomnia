@@ -173,7 +173,6 @@ void editor_images_gui::perform(editor_command_input in) {
 	}
 
 	auto& work = *in.folder.work;
-	auto& cosm = work.world;
 
 	auto& viewables = work.viewables;
 
