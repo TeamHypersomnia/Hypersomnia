@@ -65,6 +65,37 @@ void editor_folder::save_folder(const augs::path_type& to, const augs::path_type
 	}
 }
 
+std::optional<editor_warning> editor_folder::load_folder_maybe_autosave() {
+	const auto& real_path = current_path;
+
+	try {
+		/* First try to load from the neighbouring autosave folder. */
+		const auto autosave_path = get_autosave_path();
+		load_folder(autosave_path, ::get_project_name(real_path));
+
+		if (!augs::exists(real_path)) {
+			const auto display_autosave = augs::to_display_path(autosave_path);
+			const auto display_real = augs::to_display_path(real_path);
+
+			const auto message = typesafe_sprintf(
+				"Found the autosave file %x,\nbut there is no %x!\nSave the file immediately!",
+				display_autosave,
+				display_real
+			);
+
+			return editor_warning {"Warning", message, ""};
+		}
+	}
+	catch (editor_popup p) {
+		/* If no autosave folder was found, try the real path. */
+		*this = editor_folder(real_path);
+		load_folder();
+		history.mark_as_just_saved();
+	}
+
+	return std::nullopt;
+}
+
 void editor_folder::load_folder() {
 	return load_folder(current_path);
 }

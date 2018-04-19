@@ -196,7 +196,10 @@ void editor_setup::open_folder_in_new_tab(const path_operation op) {
 	try_to_open_new_folder(
 		[this, op](editor_folder& f) {
 			f.set_folder_path(op.lua, op.path, recent);
-			f.load_folder();
+
+			if (const auto warning = f.load_folder_maybe_autosave()) {
+				set_popup(*warning);
+			}
 			/* f.history.mark_as_just_saved(); */
 		}
 	);

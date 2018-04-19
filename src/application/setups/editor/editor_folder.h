@@ -10,6 +10,9 @@
 
 using folder_index = unsigned;
 
+struct editor_popup;
+using editor_warning = editor_popup;
+
 namespace sol {
 	class state;
 }
@@ -40,6 +43,8 @@ struct editor_folder {
 	void save_folder() const;
 	void save_folder(const augs::path_type& to) const;
 	void save_folder(const augs::path_type& to, const augs::path_type name) const;
+
+	std::optional<editor_warning> load_folder_maybe_autosave();
 
 	void load_folder();
 	void load_folder(const augs::path_type& from);

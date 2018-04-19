@@ -59,39 +59,16 @@ void open_last_folders(
 
 		for (const auto& real_path : opened_folders.paths) {
 			try {
-				try {
-					/* First try to load from the neighbouring autosave folder. */
+				auto new_folder = editor_folder(real_path);
 
-					auto new_folder = editor_folder(real_path);
-					const auto autosave_path = new_folder.get_autosave_path();
-					new_folder.load_folder(autosave_path, ::get_project_name(real_path));
-					signi.folders.emplace_back(std::move(new_folder));
-
-					if (!augs::exists(real_path)) {
-						const auto display_autosave = augs::to_display_path(autosave_path);
-						const auto display_real = augs::to_display_path(real_path);
-
-						const auto message = typesafe_sprintf(
-							"Found the autosave file %x,\nbut there is no %x!\nSave the file immediately!",
-							display_autosave,
-							display_real
-						);
-
-						failures.push_back({"Warning", message, ""});
-					}
+				if (const auto warning = new_folder.load_folder_maybe_autosave()) {
+					failures.push_back(*warning);
 				}
-				catch (editor_popup p) {
-					/* If no autosave folder was found, try the real path. */
 
-					auto new_folder = editor_folder(real_path);
-					new_folder.load_folder();
-					new_folder.history.mark_as_just_saved();
-					signi.folders.emplace_back(std::move(new_folder));
-				}
+				signi.folders.emplace_back(std::move(new_folder));
 			}
 			catch (editor_popup p) {
 				/* Could load neither from autosave nor the real path. Utter failure. */
-
 				failures.push_back(p);
 			}
 		}

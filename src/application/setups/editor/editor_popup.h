@@ -50,3 +50,5 @@ struct editor_popup {
 	bool details_expanded = false;
 	bool perform();
 };
+
+using editor_warning = editor_popup;
