@@ -188,7 +188,8 @@ void illuminated_rendering(
 				output,
 				interp,
 				cosmos,
-				global_time_seconds
+				global_time_seconds,
+				cast_highlight
 			});
 
 			renderer.set_active_texture(3);
