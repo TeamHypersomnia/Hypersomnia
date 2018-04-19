@@ -277,9 +277,7 @@ fae_tree_filter editor_all_entities_gui::perform(
 
 #else
 fae_tree_filter editor_all_entities_gui::perform(
-	const editor_settings& settings,
-	const std::unordered_set<entity_id>* only_match_entities,
-	editor_command_input command_in
+	const editor_all_entities_gui_input in
 ) {
 	return {};
 }

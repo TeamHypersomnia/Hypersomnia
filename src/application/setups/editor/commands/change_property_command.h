@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 #include "augs/templates/traits/component_traits.h"
 
 #include "game/organization/all_components_declaration.h"
