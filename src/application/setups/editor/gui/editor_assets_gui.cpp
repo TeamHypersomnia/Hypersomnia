@@ -182,16 +182,16 @@ void editor_images_gui::perform(editor_command_input in) {
 
 	thread_local std::unordered_set<augs::path_type> last_seen_missing_paths;
 
-	thread_local std::vector<path_entry_type> missing_unused_paths;
+	thread_local std::vector<path_entry_type> missing_orphaned_paths;
 	thread_local std::vector<path_entry_type> missing_paths;
 
-	thread_local std::vector<path_entry_type> unused_paths;
+	thread_local std::vector<path_entry_type> orphaned_paths;
 	thread_local std::vector<path_entry_type> used_paths;
 
-	missing_unused_paths.clear();
+	missing_orphaned_paths.clear();
 	missing_paths.clear();
 
-	unused_paths.clear();
+	orphaned_paths.clear();
 	used_paths.clear();
 
 	if (acquire_once) {
@@ -214,11 +214,11 @@ void editor_images_gui::perform(editor_command_input in) {
 			});
 
 			auto push_missing = [&]() {
-				(new_entry.used() ? missing_paths : missing_unused_paths).emplace_back(std::move(new_entry));
+				(new_entry.used() ? missing_paths : missing_orphaned_paths).emplace_back(std::move(new_entry));
 			};
 
 			auto push_existing = [&]() {
-				(new_entry.used() ? used_paths : unused_paths).emplace_back(std::move(new_entry));
+				(new_entry.used() ? used_paths : orphaned_paths).emplace_back(std::move(new_entry));
 			};
 
 			auto lazy_check_missing = [this](const auto& p) {
@@ -245,10 +245,10 @@ void editor_images_gui::perform(editor_command_input in) {
 
 	acquire_missing_paths = false;
 
-	sort_range(missing_unused_paths);
+	sort_range(missing_orphaned_paths);
 	sort_range(missing_paths);
 
-	sort_range(unused_paths);
+	sort_range(orphaned_paths);
 	sort_range(used_paths);
 	
 	browser_settings.do_tweakers();
@@ -382,10 +382,10 @@ void editor_images_gui::perform(editor_command_input in) {
 			ImGui::Separator();
 		};
 
-		if (browser_settings.show_unused) {
+		if (browser_settings.show_orphaned) {
 			do_section(
-				missing_unused_paths,
-				{ "Missing paths (unused)", "Last seen location", "Operations" },
+				missing_orphaned_paths,
+				{ "Missing paths (orphaned)", "Last seen location", "Operations" },
 				red
 			);
 		}
@@ -396,10 +396,10 @@ void editor_images_gui::perform(editor_command_input in) {
 			red
 		);
 
-		if (browser_settings.show_unused) {
+		if (browser_settings.show_orphaned) {
 			do_section(
-				unused_paths,
-				{ "Unused images", "Location", "Operations" }
+				orphaned_paths,
+				{ "Orphaned images", "Location", "Operations" }
 			);
 		}
 

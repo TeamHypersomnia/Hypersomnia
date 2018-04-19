@@ -4,7 +4,7 @@
 struct asset_browser_settings {
 	// GEN INTROSPECTOR struct asset_browser_settings
 	path_tree_settings tree_settings;
-	bool show_unused = false;
+	bool show_orphaned = false;
 	// END GEN INTROSPECTOR
 
 	void do_tweakers();

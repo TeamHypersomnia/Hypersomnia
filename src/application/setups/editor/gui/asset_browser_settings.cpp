@@ -6,7 +6,7 @@ void asset_browser_settings::do_tweakers() {
 
 	tree_settings.do_tweakers();
 	ImGui::SameLine();
-	checkbox("Show unused", show_unused);
+	checkbox("Show orphaned", show_orphaned);
 
 	ImGui::Separator();
 }
