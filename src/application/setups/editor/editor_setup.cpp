@@ -203,8 +203,13 @@ void editor_setup::open_folder_in_new_tab(const path_operation op) {
 }
 
 void editor_setup::save_current_folder() {
-	folder().save_folder();
-	folder().history.mark_as_just_saved();
+	try {
+		folder().save_folder();
+		folder().history.mark_as_just_saved();
+	}
+	catch (std::runtime_error what) {
+		set_popup({ "Error", "Failed to save the project.\nSome serious problem has occured.", what.what() });
+	}
 }
 
 void editor_setup::save_current_folder_to(const path_operation op) {

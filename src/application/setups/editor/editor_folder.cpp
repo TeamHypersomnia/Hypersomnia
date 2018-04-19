@@ -50,23 +50,18 @@ void editor_folder::save_folder(const augs::path_type& to) const {
 void editor_folder::save_folder(const augs::path_type& to, const augs::path_type name) const {
 	const auto paths = editor_paths(to, name);
 
-	bool everything_alright = true;
+	augs::create_directories(paths.int_file);
+
+	work->save_as_int(paths.int_file);
+	augs::save_as_bytes(view, paths.view_file);
+	augs::save_as_bytes(history, paths.hist_file);
 
 	try {
-		work->save_as_int(paths.int_file);
-		augs::save_as_bytes(view, paths.view_file);
-		augs::save_as_bytes(history, paths.hist_file);
+		const auto old_autosave_path = paths.autosave_path;
+		augs::remove_directory(old_autosave_path);
 	}
 	catch (...) {
-		everything_alright = false;
-	}
 
-	if (everything_alright) {
-		const auto old_autosave_path = paths.autosave_path;
-
-		if (augs::exists(old_autosave_path)) {
-			augs::remove_directory(old_autosave_path);
-		}
 	}
 }
 

@@ -31,7 +31,17 @@ void editor_autosave::save(
 		) {
 			auto autosave_path = f.get_autosave_path();
 			augs::create_directories(autosave_path += "/");
-			f.save_folder(autosave_path, ::get_project_name(f.current_path));
+
+			try {
+				f.save_folder(autosave_path, ::get_project_name(f.current_path));
+			}
+			catch (...) {
+				/* 
+					Uhh... that would suck, 
+					but at this point the user might be forcibly closing the app,
+					so there's no reason to try to communicate failure here.
+				*/
+			}
 		}
 	}
 }
