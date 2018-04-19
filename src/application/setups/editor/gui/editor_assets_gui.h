@@ -13,5 +13,7 @@ struct editor_images_gui : standard_window_mixin<editor_images_gui> {
 	asset_browser_settings browser_settings;
 	// END GEN INTROSPECTOR
 
+	bool acquire_missing_paths = true;
+
 	void perform(editor_command_input);
 };

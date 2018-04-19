@@ -62,7 +62,7 @@ void simple_browse_path_tree(
 					continue;
 				}
 
-				text_color(prettified, red);
+				text_disabled(prettified);
 
 				ImGui::NextColumn();
 				text_disabled(displayed_dir);

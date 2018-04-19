@@ -6,6 +6,17 @@ summary: That which we are brainstorming at the moment.
 ---
 
 - We should now handle the missing images, probably
+	- When should it catch up with the missing images?
+	- The setup (in this case, editor) might need to trigger the reloading of viewables
+		- Since it might get a clue of when the files stop being missing
+	- Even if we continuously stream, we won't waste time rebuilding the atlas if all viewables stay identical
+		- So triggering is still sort of needed
+	- In practice, will this ever be the case that we stop streaming new atlases?
+	- Not beautiful, but we could have a mutable bool last_seen_missing inside loadable
+		- ~~Then it will be the job of the atlas to set it if it was missing~~
+			- Actually... we should only ever do this inside the editor, because atlas might not always reload all viewables
+		- Actually why not just have an unordered map with missing flags, that is cleared on whenever we destroy an asset?
+
 - Images GUI: make images selectable
 	- What about redirection?
 		- Just don't show "Redirect path" button in the mass-selection gui

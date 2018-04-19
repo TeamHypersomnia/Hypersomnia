@@ -23,10 +23,11 @@ struct asset_gui_path_entry : public browsed_path_entry_base {
 	using base = browsed_path_entry_base;
 
 	id_type id;
-	std::vector<std::string> locations;
+	std::vector<std::string> using_locations;
+	bool missing = false;
 
 	bool used() const {
-		return locations.size() > 0;
+		return using_locations.size() > 0;
 	}
 
 	asset_gui_path_entry() = default;
@@ -178,27 +179,85 @@ void editor_images_gui::perform(editor_command_input in) {
 
 	using asset_id_type = assets::image_id;
 	using path_entry_type = asset_gui_path_entry<asset_id_type>;
-	thread_local std::vector<path_entry_type> all_paths;
 
-	all_paths.clear();
+	thread_local std::unordered_set<augs::path_type> last_seen_missing_paths;
+
+	thread_local std::vector<path_entry_type> missing_unused_paths;
+	thread_local std::vector<path_entry_type> missing_paths;
+
+	thread_local std::vector<path_entry_type> unused_paths;
+	thread_local std::vector<path_entry_type> used_paths;
+
+	missing_unused_paths.clear();
+	missing_paths.clear();
+
+	unused_paths.clear();
+	used_paths.clear();
+
+	if (acquire_once) {
+		acquire_missing_paths = true;
+	}
+
+	if (acquire_missing_paths) {
+		last_seen_missing_paths.clear();
+	}
 
 	auto& loadables = viewables.image_loadables;
 
 	loadables.for_each_object_and_id(
 		[&](const auto& object, const auto id) mutable {
-			all_paths.emplace_back(object.source_image_path, id);
+			const auto path = object.source_image_path;
+			auto new_entry = path_entry_type(path, id);
+
+			find_locations_that_use(id, work, [&](const auto& location) {
+				new_entry.using_locations.push_back(location);
+			});
+
+			auto push_missing = [&]() {
+				(new_entry.used() ? missing_paths : missing_unused_paths).emplace_back(std::move(new_entry));
+			};
+
+			auto push_existing = [&]() {
+				(new_entry.used() ? used_paths : unused_paths).emplace_back(std::move(new_entry));
+			};
+
+			auto lazy_check_missing = [this](const auto& p) {
+				if (acquire_missing_paths) {
+					if (!augs::exists(p)) {
+						last_seen_missing_paths.emplace(p);
+						return true;
+					}
+
+					return false;
+				}
+
+				return found_in(last_seen_missing_paths, p);
+			};
+
+			if (lazy_check_missing(path)) {
+				push_missing();
+			}
+			else {
+				push_existing();
+			}
 		}
 	);
 
-	sort_range(all_paths);
+	acquire_missing_paths = false;
+
+	sort_range(missing_unused_paths);
+	sort_range(missing_paths);
+
+	sort_range(unused_paths);
+	sort_range(used_paths);
 	
-	for (auto& p : all_paths) {
-		find_locations_that_use(p.id, work, [&](const auto& location) {
-			p.locations.push_back(location);
-		});
+	browser_settings.do_tweakers();
+
+	if (ImGui::Button("Re-check existence")) {
+		acquire_missing_paths = true;
 	}
 
-	browser_settings.do_tweakers();
+	ImGui::Separator();
 
 	thread_local ImGuiTextFilter filter;
 	filter.Draw();
@@ -268,10 +327,10 @@ void editor_images_gui::perform(editor_command_input in) {
 			ImGui::NextColumn();
 
 			if (path_entry.used()) {
-				const auto& locations = path_entry.locations;
+				const auto& using_locations = path_entry.using_locations;
 
-				if (auto node = scoped_tree_node(typesafe_sprintf("%x locations###locations", locations.size()).c_str())) {
-					for (const auto& l : locations) {
+				if (auto node = scoped_tree_node(typesafe_sprintf("%x locations###locations", using_locations.size()).c_str())) {
+					for (const auto& l : using_locations) {
 						text(l);
 					}
 				}
@@ -293,43 +352,61 @@ void editor_images_gui::perform(editor_command_input in) {
 			ImGui::NextColumn();
 		};
 
-		bool any_unused = false;
-
-		if (browser_settings.show_unused) {
-			for (const auto& u : all_paths) {
-				if (!any_unused) {
-					text_disabled("Unused images");
-					ImGui::NextColumn();
-					text_disabled("Location");
-					ImGui::NextColumn();
-					text_disabled("Operations");
-					ImGui::NextColumn();
-					ImGui::Separator();
-
-					any_unused = true;
-				}
-				if (!u.used()) {
-					do_path(u);
-				}
+		auto do_section = [&](
+			const auto& paths,
+			const std::array<std::string, 3> labels,
+			const std::optional<rgba> color = std::nullopt
+		) {
+			if (paths.empty()) {
+				return;
 			}
-		}
 
-		if (any_unused) {
+			if (color) {
+				text_color(labels[0], *color);
+			}
+			else {
+				text_disabled(labels[0]);
+			}
+
+			ImGui::NextColumn();
+			text_disabled(labels[1]);
+			ImGui::NextColumn();
+			text_disabled(labels[2]);
+			ImGui::NextColumn();
 			ImGui::Separator();
-		}
 
-		tree_settings.do_name_location_columns();
-
-		text_disabled("Used at");
-		ImGui::NextColumn();
-
-		ImGui::Separator();
-
-		for (const auto& p : all_paths) {
-			if (p.used()) {
+			for (const auto& p : paths) {
 				do_path(p);
 			}
+
+			ImGui::Separator();
+		};
+
+		if (browser_settings.show_unused) {
+			do_section(
+				missing_unused_paths,
+				{ "Missing paths (unused)", "Last seen location", "Operations" },
+				red
+			);
 		}
+
+		do_section(
+			missing_paths,
+			{ "Missing paths", "Last seen location", "Used at" },
+			red
+		);
+
+		if (browser_settings.show_unused) {
+			do_section(
+				unused_paths,
+				{ "Unused images", "Location", "Operations" }
+			);
+		}
+
+		do_section(
+			used_paths,
+			{ "Images", "Location", "Used at" }
+		);
 	}
 	else {
 
