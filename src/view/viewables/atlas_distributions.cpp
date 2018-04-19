@@ -14,18 +14,28 @@ augs::graphics::texture standard_atlas_distribution(const standard_atlas_distrib
 	}
 
 	for (const auto& def : in.image_loadables) {
-		def.regenerate_all_needed(in.settings.force_regenerate);
+		try {
+			def.regenerate_all_needed(in.settings.force_regenerate);
+		}
+		catch (...) {
+			try {
+				def.delete_regenerated_files();
+			}
+			catch (...) {
+
+			}
+		}
 
 		atlas_input.images.emplace_back(def.get_source_image_path());
 
-		auto add_if_exists = [&](const auto path) {
+		auto add_if_specified = [&](const auto path) {
 			if (path.has_value()) {
 				atlas_input.images.emplace_back(path.value());
 			}
 		};
 
-		add_if_exists(def.find_neon_map_path());
-		add_if_exists(def.find_desaturation_path());
+		add_if_specified(def.find_neon_map_path());
+		add_if_specified(def.find_desaturation_path());
 	}
 
 	atlas_input.fonts.emplace_back(in.gui_font_input);
@@ -53,14 +63,14 @@ augs::graphics::texture standard_atlas_distribution(const standard_atlas_distrib
 
 			maps.diffuse = baked.at(def.get_source_image_path());
 
-			auto set_if_exists = [&](auto& m, const auto path) {
+			auto set_if_specified = [&](auto& m, const auto path) {
 				if (path.has_value()) {
 					m = baked.at(path.value());
 				}
 			};
 
-			set_if_exists(maps.neon_map, def.find_neon_map_path());
-			set_if_exists(maps.desaturated, def.find_desaturation_path());
+			set_if_specified(maps.neon_map, def.find_neon_map_path());
+			set_if_specified(maps.desaturated, def.find_desaturation_path());
 		});
 	}
 

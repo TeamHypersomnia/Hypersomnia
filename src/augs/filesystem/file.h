@@ -43,12 +43,12 @@ namespace augs {
 		return std::experimental::filesystem::exists(path);
 	}
 
-	inline void remove_file(const path_type& path) {
-		std::experimental::filesystem::remove(path);
+	inline decltype(auto) remove_file(const path_type& path) {
+		return std::experimental::filesystem::remove(path);
 	}
 
-	inline void remove_directory(const path_type& path) {
-		std::experimental::filesystem::remove_all(path);
+	inline decltype(auto) remove_directory(const path_type& path) {
+		return std::experimental::filesystem::remove_all(path);
 	}
 
 	inline path_type first_free_path(const path_type path_template) {

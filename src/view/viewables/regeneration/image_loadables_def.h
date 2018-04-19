@@ -40,6 +40,7 @@ struct image_loadables_def {
 	}
 
 	void regenerate_all_needed(const bool force_regenerate) const;
+	void delete_regenerated_files() const;
 
 	augs::path_type get_source_image_path() const;
 	std::optional<augs::path_type> find_neon_map_path() const;

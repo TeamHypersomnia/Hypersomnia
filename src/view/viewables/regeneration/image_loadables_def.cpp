@@ -20,7 +20,7 @@ augs::path_type image_loadables_def::get_source_image_path() const {
 
 std::optional<augs::path_type> image_loadables_def::find_neon_map_path() const {
 	if (extras.custom_neon_map_path) {
-		return get_source_image_path().replace_filename(*extras.custom_neon_map_path);
+		return *extras.custom_neon_map_path;
 	}
 	else if (extras.neon_map) {
 		return ::get_neon_map_path(source_image_path);
@@ -64,6 +64,11 @@ void image_loadables_def::regenerate_all_needed(
 			force_regenerate
 		);
 	}
+}
+
+void image_loadables_def::delete_regenerated_files() const {
+	augs::remove_file(::get_neon_map_path(source_image_path));
+	augs::remove_file(::get_desaturation_path(source_image_path));
 }
 
 bool image_loadables_def::operator==(const image_loadables_def& b) const {

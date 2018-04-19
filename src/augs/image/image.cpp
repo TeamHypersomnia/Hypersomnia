@@ -60,9 +60,19 @@ static void Line(
 }
 
 namespace augs {
+	static void throw_if_zero_size(const path_type& path, const vec2u size) {
+		if (!size.x || !size.y) {
+			throw image_loading_error("Failed to load image %x:\nWidth or height is zero!", path);
+		}
+	}
+
 	vec2u image::get_size(const path_type& file_path) {
-		// TODO: optimize this
-		return image(file_path).get_size();
+		try {
+			return image(file_path).get_size();
+		}
+		catch (image_loading_error err) {
+			throw image_loading_error("Failed to read image size.\n%x", err.what());
+		}
 	}
 
 	image::image(const vec2u new_size) {
@@ -120,6 +130,8 @@ namespace augs {
 				);
 			}
 		}
+
+		throw_if_zero_size(path, size);
 	}
 
 	void image::from_binary_file(const path_type& path) try {
@@ -128,6 +140,8 @@ namespace augs {
 
 		augs::read_bytes(in, size);
 		augs::read_bytes(in, v);
+
+		throw_if_zero_size(path, size);
 	}
 	catch (const augs::file_open_error& err) {
 		throw image_loading_error(
@@ -150,6 +164,8 @@ namespace augs {
 
 		size.x = width;
 		size.y = height;
+
+		throw_if_zero_size(path, size);
 	}
 
 	void image::resize(const vec2u new_size) {

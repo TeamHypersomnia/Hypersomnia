@@ -32,13 +32,18 @@ regenerated_atlas::regenerated_atlas(
 	*/
 
 	if (!settings.skip_source_image_integrity_check) {
-		for (const auto& img_id : in.images) {
-			new_stamp.image_stamps[img_id] = augs::last_write_time(img_id);
-		}
+			for (const auto& img_id : in.images) {
+				try {
+					new_stamp.image_stamps[img_id] = augs::last_write_time(img_id);
+				}
+				catch (...) {
 
-		for (const auto& fnt_id : in.fonts) {
-			new_stamp.font_stamps[fnt_id] = augs::last_write_time(fnt_id.source_font_path);
-		}
+				}
+			}
+
+			for (const auto& fnt_id : in.fonts) {
+				new_stamp.font_stamps[fnt_id] = augs::last_write_time(fnt_id.source_font_path);
+			}
 
 		if (!augs::exists(atlas_image_path)) {
 			should_regenerate = true;
@@ -70,24 +75,27 @@ regenerated_atlas::regenerated_atlas(
 		std::vector<rect_xywhf> rects_for_packing_algorithm;
 
 		for (const auto& input_img_id : in.images) {
-			const auto it = loaded_images.try_emplace(input_img_id, input_img_id);
-			
-			{
-				const bool is_img_unique = it.second;
-				ensure(is_img_unique);
-			}
-			
-			const auto& img = (*it.first).second;
-
 			auto& out_entry = baked_images[input_img_id];
-			out_entry.cached_original_size_pixels = img.get_size();
 
-			rects_for_packing_algorithm.push_back({
-				0,
-				0,
-				static_cast<int>(img.get_size().x),
-				static_cast<int>(img.get_size().y)
-			});
+			try {
+				const auto it = loaded_images.try_emplace(input_img_id, input_img_id);
+
+				{
+					const bool is_img_unique = it.second;
+					ensure(is_img_unique);
+				}
+
+				const auto& img = (*it.first).second;
+
+				const auto u_size = img.get_size();
+				out_entry.cached_original_size_pixels = u_size;
+
+				const auto size = vec2i(u_size);
+				rects_for_packing_algorithm.push_back({0, 0, size.x, size.y});
+			}
+			catch (augs::image_loading_error err) {
+				out_entry.cached_original_size_pixels = vec2u::zero;
+			}
 		}
 
 		for (const auto& input_fnt_id : in.fonts) {
@@ -164,18 +172,29 @@ regenerated_atlas::regenerated_atlas(
 		size_t current_rect = 0u;
 
 		for (auto& input_img_id : in.images) {
-			auto& output_img = baked_images[input_img_id];
-
 			const auto packed_rect = rects_for_packing_algorithm[current_rect];
 
-			output_img.atlas_space.set(
-				static_cast<float>(packed_rect.x) / atlas_image_size.x,
-				static_cast<float>(packed_rect.y) / atlas_image_size.y,
-				static_cast<float>(packed_rect.w) / atlas_image_size.x,
-				static_cast<float>(packed_rect.h) / atlas_image_size.y
-			);
+			{
+				auto& output_entry = baked_images[input_img_id];
+				
+				if (output_entry.cached_original_size_pixels.non_zero()) {
+					output_entry.atlas_space.set(
+						static_cast<float>(packed_rect.x) / atlas_image_size.x,
+						static_cast<float>(packed_rect.y) / atlas_image_size.y,
+						static_cast<float>(packed_rect.w) / atlas_image_size.x,
+						static_cast<float>(packed_rect.h) / atlas_image_size.y
+					);
 
-			output_img.was_flipped = packed_rect.flipped;
+					output_entry.was_flipped = packed_rect.flipped;
+				}
+				else {
+					output_entry.atlas_space.set(0.f, 0.f, 1.f, 1.f);
+					output_entry.cached_original_size_pixels = atlas_image_size;
+					output_entry.was_flipped = false;
+
+					continue;
+				}
+			}
 
 			output_image.blit(
 				loaded_images[input_img_id],

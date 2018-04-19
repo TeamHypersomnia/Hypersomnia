@@ -7,7 +7,13 @@ image_cache::image_cache(
 	const image_loadables_def& loadables,
 	const image_meta& meta
 ) { 
-	original_image_size = loadables.read_source_image_size();
+	try {
+		original_image_size = loadables.read_source_image_size();
+	}
+	catch (...) {
+		original_image_size = { 32, 32 };
+	}
+
 	partitioned_shape.make_box(vec2(original_image_size));
 }
 
