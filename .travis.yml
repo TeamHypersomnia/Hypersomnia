@@ -11,8 +11,8 @@ addons:
      - cmake
      - ninja-build
     sources:
+     - sourceline: 'ppa:jonathonf/gcc-8.0'
      - ubuntu-toolchain-r-test
-     - jonathonf
 
 python:
   - "3.6"
