@@ -20,8 +20,7 @@ public:
 	}
 
 	auto get_displayed_directory() const {
-		auto dir = augs::path_type(p).replace_filename("").string();
-		return cut_preffix(dir, "content/");
+		return augs::path_type(p).replace_filename("").string();
 	}
 
 	const auto& get_full_path() const {

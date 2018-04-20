@@ -1,4 +1,5 @@
 #include "augs/image/image.h"
+#include "augs/string/string_templates.h"
 #include "augs/filesystem/file.h"
 
 #include "view/viewables/regeneration/image_loadables_def.h"
@@ -18,18 +19,20 @@ bool image_loadables_def::operator==(const image_loadables_def& b) const {
 	return augs::introspective_equal(*this, b);
 }
 
+static const auto official_dir = "content/official/gfx";
+
 static auto resolve_path(
 	const asset_location_context& project_dir,
 	const augs::path_type& p
 ) {
-	const auto official_dir = augs::path_type("content/official/gfx");
+	const auto official = augs::path_type(official_dir);
 
 	if (p.empty()) {
-		return official_dir / p;
+		return official / p;
 	}
 
 	return augs::switch_path(
-		official_dir / p,
+		official / p,
 		project_dir / "gfx" / p
 	);
 }
@@ -41,6 +44,10 @@ image_loadables_def_view::image_loadables_def_view(
 	def(d), 
 	resolved_source_image_path(resolve_path(project_dir, d.source_image_path))
 {
+}
+
+bool image_loadables_def_view::is_in_official_directory() const {
+	return begins_with(resolved_source_image_path, official_dir);
 }
 
 std::optional<augs::path_type> image_loadables_def_view::find_neon_map_path() const {

@@ -647,7 +647,6 @@ void editor_setup::mirror_selection(const vec2i direction) {
 		auto command = make_command_from_selections<duplicate_entities_command>(only_duplicating ? "Duplicated " : "Mirrored ");
 
 		if (!command.empty()) {
-			LOG_NVPS(direction);
 			command.mirror_direction = direction;
 			folder().history.execute_new(std::move(command), make_command_input());
 		}

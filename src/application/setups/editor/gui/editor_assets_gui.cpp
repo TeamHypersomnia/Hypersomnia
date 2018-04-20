@@ -24,6 +24,12 @@ struct asset_gui_path_entry : public browsed_path_entry_base {
 
 	id_type id;
 	std::vector<std::string> using_locations;
+	std::string displayed_dir;
+
+	const auto& get_displayed_directory() const {
+		return displayed_dir;
+	}
+
 	bool missing = false;
 
 	bool used() const {
@@ -172,7 +178,8 @@ void editor_images_gui::perform(editor_command_input in) {
 		return;
 	}
 
-	auto& work = *in.folder.work;
+	auto& folder = in.folder;
+	auto& work = *folder.work;
 
 	auto& viewables = work.viewables;
 
@@ -208,6 +215,9 @@ void editor_images_gui::perform(editor_command_input in) {
 			const auto path = object.source_image_path;
 			auto new_entry = path_entry_type(path, id);
 
+			const auto& view = image_loadables_def_view(folder.current_path, object);
+			new_entry.displayed_dir = augs::path_type(path).replace_filename("").string() + (view.is_in_official_directory() ? " (Official)" : " (Project)");
+
 			find_locations_that_use(id, work, [&](const auto& location) {
 				new_entry.using_locations.push_back(location);
 			});
@@ -233,7 +243,7 @@ void editor_images_gui::perform(editor_command_input in) {
 				return found_in(last_seen_missing_paths, p);
 			};
 
-			if (lazy_check_missing(path)) {
+			if (lazy_check_missing(view.get_source_image_path())) {
 				push_missing();
 			}
 			else {

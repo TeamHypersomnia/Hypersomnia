@@ -58,4 +58,6 @@ public:
 
 	augs::path_type get_source_image_path() const;
 	vec2u read_source_image_size() const;
+
+	bool is_in_official_directory() const;
 };
