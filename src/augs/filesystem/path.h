@@ -35,9 +35,16 @@ namespace augs {
 
 	inline auto to_display_path(path_type target_path) {
 		auto display_path = target_path.filename();
-		display_path += " (";
-		display_path += target_path.replace_filename("");
-		display_path += ")";
+
+
+		if (const auto directory = target_path.replace_filename("");
+			!directory.empty()
+		) {
+			display_path += " (";
+			display_path += directory;
+			display_path += ")";
+		}
+
 		return display_path;
 	}
 }

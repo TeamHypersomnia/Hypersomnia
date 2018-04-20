@@ -4,7 +4,7 @@
 template <class Archive>
 struct byte_type_for {
 	using type = std::conditional_t<
-		is_one_of_v<
+		is_derived_from_any_of_v<
 			Archive, 
 			std::ofstream, 
 			std::ifstream

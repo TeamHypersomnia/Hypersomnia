@@ -19,7 +19,7 @@ editor_paths editor_folder::get_paths() const {
 }
 
 augs::path_type editor_folder::get_autosave_path() const {
-	return augs::path_type(current_path) += "/autosave";
+	return current_path / "autosave";
 }
 
 void editor_folder::set_folder_path(

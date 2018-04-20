@@ -10,7 +10,7 @@ namespace augs {
 	class byte_counter_stream;
 
 	template <class Archive>
-	constexpr bool is_byte_stream_v = is_one_of_v<
+	constexpr bool is_byte_stream_v = is_derived_from_any_of_v<
 		std::decay_t<Archive>,
 		memory_stream,
 		ref_memory_stream,

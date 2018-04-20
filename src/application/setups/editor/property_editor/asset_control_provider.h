@@ -7,6 +7,7 @@
 #include "view/viewables/all_viewables_defs.h"
 
 #include "augs/misc/imgui/path_tree_structs.h"
+#include "augs/misc/imgui/browsed_path_entry_base.h"
 #include "application/setups/editor/gui/asset_browser_settings.h"
 #include "application/setups/editor/property_editor/simple_browse_path_tree.h"
 
@@ -55,7 +56,7 @@ void choose_asset_path(
 
 			{
 				const auto official_gfx_path = typesafe_sprintf("content/official/%x", suffix_folder);
-				const auto project_gfx_path = augs::path_type(project_path) += ("/" + suffix_folder);
+				const auto project_gfx_path = project_path / suffix_folder;
 
 				if (augs::exists(official_gfx_path)) {
 					augs::for_each_in_directory_recursive(

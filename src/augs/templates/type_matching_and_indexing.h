@@ -95,6 +95,15 @@ constexpr bool is_one_of_list_v = filter_types_in_list<bind_types<std::is_same, 
 template <class S, class... Types>
 constexpr bool is_one_of_v = is_one_of_list_v<S, type_list<Types...>>;
 
+template <class A, class B>
+using detail_derived_from = std::is_base_of<B, A>;
+
+template <class S, class List>
+constexpr bool is_derived_from_any_of_list_v = filter_types_in_list<bind_types<detail_derived_from, S>::template type, List>::found;
+
+template <class S, class... Types>
+constexpr bool is_derived_from_any_of_v = is_derived_from_any_of_list_v<S, type_list<Types...>>;
+
 template <class S, class List>
 constexpr size_t index_in_list_v = sequence_element_v<0, typename filter_types_in_list<bind_types<std::is_same, S>::template type, List>::indices>;
 

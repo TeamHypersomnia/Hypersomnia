@@ -87,7 +87,8 @@ namespace augs {
 		});
 	}
 
-	void write_object_lua(sol::table ar, const cosmos& cosm) {
+	template <class Archive>
+	void write_object_lua(Archive ar, const cosmos& cosm) {
 #if TODO
 		{
 			auto common_table = ar.create();
@@ -132,7 +133,8 @@ namespace augs {
 #endif
 	}
 
-	void read_object_lua(sol::table ar, cosmos& cosm) {
+	template <class Archive>
+	void read_object_lua(Archive ar, cosmos& cosm) {
 		ensure(cosm.empty());
 
 		ensure(false);
@@ -199,4 +201,7 @@ template void augs::read_object_bytes(augs::cref_memory_stream&, cosmos&);
 
 template void augs::write_object_bytes(std::ofstream&, const cosmos&);
 template void augs::read_object_bytes(std::ifstream&, cosmos&);
+
+template void augs::write_object_lua(sol::table, const cosmos&);
+template void augs::read_object_lua(sol::table, cosmos&);
 

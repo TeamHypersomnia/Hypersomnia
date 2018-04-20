@@ -5,12 +5,12 @@ editor_paths::editor_paths(
 	const std::string& project_name
 ) {
 	auto in_folder = [&](const auto ext) {
-		return augs::path_type(target_folder) += ("/" + project_name + ext);
+		return target_folder / (project_name + ext);
 	};
 
 	int_file = in_folder(".int");
 	view_file = in_folder(".view");
 	hist_file = in_folder(".hist");
-	autosave_path = augs::path_type(target_folder) += "/autosave";
+	autosave_path = target_folder / "autosave";
 }
 

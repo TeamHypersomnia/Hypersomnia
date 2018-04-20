@@ -1,6 +1,5 @@
 #pragma once
 #include <map>
-#include "3rdparty/sol2/sol/forward.hpp"
 
 #include "augs/build_settings/platform_defines.h"
 
@@ -276,6 +275,9 @@ namespace augs {
 	template <class Archive>
 	void read_object_bytes(Archive& ar, cosmos& cosm);
 
-	void write_object_lua(sol::table ar, const cosmos& cosm);
-	void read_object_lua(sol::table ar, cosmos& cosm);
+	template <class Archive>
+	void write_object_lua(Archive, const cosmos& cosm);
+
+	template <class Archive>
+	void read_object_lua(Archive, cosmos& cosm);
 }

@@ -1,5 +1,4 @@
 #pragma once
-#include "augs/misc/imgui/browsed_path_entry_base.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 
 struct path_tree_settings {

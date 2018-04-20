@@ -146,8 +146,19 @@ struct derivedintrotest : basic_ltrb<float> {
 	using introspect_base = basic_ltrb<float>;
 };
 
+struct derivedstreamtest : augs::cref_memory_stream {
+
+};
 
 struct tests_of_traits {
+	static_assert(augs::is_byte_stream_v<std::ifstream>);
+	static_assert(augs::is_byte_stream_v<std::ofstream>);
+	static_assert(augs::is_byte_stream_v<augs::memory_stream>);
+	static_assert(augs::is_byte_stream_v<augs::cref_memory_stream>);
+	static_assert(augs::is_byte_stream_v<derivedstreamtest>);
+
+	static_assert(!augs::is_byte_stream_v<derivedintrotest>);
+
 	static_assert(has_introspect_base_v<entity_id>);
 	static_assert(has_introspect_base_v<child_entity_id>);
 
