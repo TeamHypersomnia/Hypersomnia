@@ -5,6 +5,9 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- copy gfx and sfx folders on save as...
+	- For now on re-opening the newly saved project these resources will be missing
+
 - add this maybe? https://github.com/jpakkane/naturalsort
 - properly templatize entity_id_base, add entity type's key to it
 
