@@ -97,4 +97,8 @@ public:
 	std::optional<camera_cone> find_current_camera() const {
 		return std::nullopt;
 	}
+
+	augs::path_type get_unofficial_content_dir() const {
+		return {};
+	}
 };

@@ -10,6 +10,7 @@
 #include "game/components/shape_polygon_component.h"
 #include "game/components/sprite_component.h"
 #include "game/components/polygon_component.h"
+#include "view/asset_location_context.h"
 
 struct image_usage_as_button {
 	// GEN INTROSPECTOR struct image_usage_as_button
@@ -30,7 +31,7 @@ struct image_cache {
 	image_cache() = default;
 
 	image_cache(
-		const image_loadables_def&,
+		const image_loadables_def_view&,
 		const image_meta&
 	);
 
@@ -61,13 +62,6 @@ class loaded_image_caches_map {
 	map_type caches;
 
 public:
-	loaded_image_caches_map() = default;
-
-	explicit loaded_image_caches_map(
-		const image_loadables_map&,
-		const image_metas_map&
-	);
-
 	const image_cache* find(const assets::image_id id) const {
 		return mapped_or_nullptr(caches, id);
 	}

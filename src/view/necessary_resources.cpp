@@ -173,11 +173,10 @@ necessary_image_loadables_map::necessary_image_loadables_map(
 			}
 		}
 
-		if (
-			const auto source_image_path = typesafe_sprintf("%x/%x.png", directory, stem);
-			augs::exists(source_image_path)
+		if (const auto image_path = typesafe_sprintf("%x/%x.png", directory, stem);
+			augs::exists(image_path)
 		) {
-			definition_template.source_image_path = source_image_path;
+			definition_template.source_image_path = image_path;
 			emplace(id, definition_template);
 		}
 		else if (

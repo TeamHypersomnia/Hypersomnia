@@ -19,7 +19,15 @@ loaded_image_caches_map populate_test_scene_images_and_sounds(
 		LOG(err.what());
 	}
 
-	return loaded_image_caches_map(loadables, metas);
+	loaded_image_caches_map out;
+
+	loadables.for_each_object_and_id(
+		[&](const auto& object, const auto id) {
+			out.try_emplace(id, image_loadables_def_view({}, object), metas.at(id));
+		}
+	);
+
+	return out;
 }
 
 void populate_test_scene_logical_assets(

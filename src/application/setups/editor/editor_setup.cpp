@@ -1097,3 +1097,11 @@ std::optional<rgba> editor_setup::find_highlight_color_of(const entity_id id) co
 
 	return std::nullopt;
 }
+
+augs::path_type editor_setup::get_unofficial_content_dir() const {
+	if (anything_opened()) {
+		return folder().current_path;
+	}
+
+	return {};
+}

@@ -26,16 +26,18 @@ inline void update_size_if_tex_changed(
 	const auto& image_caches = fae_in.image_caches;
 	const auto& viewables = cpe_in.command_in.folder.work->viewables;
 
+	auto& folder = cpe_in.command_in.folder;
+
 	image_cache cache;
 
 	if (const auto c = mapped_or_nullptr(image_caches, id)) {
 		cache = *c;
 	}
 	else {
-		cache = { viewables.image_loadables[id], viewables.image_metas[id] };
+		cache = { image_loadables_def_view(folder.current_path, viewables.image_loadables[id]), viewables.image_metas[id] };
 	}
 
-	auto& history = cpe_in.command_in.folder.history;
+	auto& history = folder.history;
 
 	{
 		auto cmd = in.command;

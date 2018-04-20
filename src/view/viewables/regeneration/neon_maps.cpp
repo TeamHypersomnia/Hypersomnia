@@ -37,14 +37,14 @@ void resize_image(
 void cut_empty_edges(augs::image& source);
 
 void regenerate_neon_map(
-	const augs::path_type& source_image_path,
+	const augs::path_type& input_image_path,
 	const augs::path_type& output_image_path,
 	const neon_map_input in,
 	const bool force_regenerate
 ) {
 	neon_map_stamp new_stamp;
 	new_stamp.input = in;
-	new_stamp.last_write_time_of_source = augs::last_write_time(source_image_path);
+	new_stamp.last_write_time_of_source = augs::last_write_time(input_image_path);
 
 	const auto neon_map_path = output_image_path;
 	const auto neon_map_stamp_path = augs::path_type(neon_map_path).replace_extension(".stamp");
@@ -71,9 +71,9 @@ void regenerate_neon_map(
 	}
 
 	if (should_regenerate) {
-		LOG("Regenerating neon map for %x", source_image_path);
+		LOG("Regenerating neon map for %x", input_image_path);
 
-		auto source_image = augs::image(source_image_path);
+		auto source_image = augs::image(input_image_path);
 		make_neon(new_stamp.input, source_image);
 
 		source_image.save(neon_map_path);

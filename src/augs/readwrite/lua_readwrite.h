@@ -85,6 +85,8 @@ namespace augs {
 			"std::optional can only be serialized as a member object."
 		);
 
+		static_assert(!std::is_const_v<Serialized>, "Trying to read into a const object.");
+
 		if constexpr(has_lua_read_overload_v<Serialized>) {
 			static_assert(has_lua_write_overload_v<Serialized>, "Has read_object_lua overload, but no write_object_lua overload.");
 			

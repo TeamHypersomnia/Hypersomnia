@@ -7,13 +7,20 @@
 augs::graphics::texture standard_atlas_distribution(const standard_atlas_distribution_input in) {
 	thread_local auto atlas_input = atlas_regeneration_input();
 
+	auto make_view = [&in](const auto& def) {
+		return image_loadables_def_view(in.unofficial_project_dir, def);
+	};
+
 	atlas_input.clear();
 
 	for (const auto& r : in.necessary_image_loadables) {
-		atlas_input.images.emplace_back(r.second.get_source_image_path());
+		atlas_input.images.emplace_back(r.second.source_image_path);
 	}
 
-	for (const auto& def : in.image_loadables) {
+	for (const auto& d : in.image_loadables) {
+		const auto def = make_view(d);
+		LOG_NVPS(d.extras.neon_map.has_value());
+
 		try {
 			def.regenerate_all_needed(in.settings.force_regenerate);
 		}
@@ -54,10 +61,12 @@ augs::graphics::texture standard_atlas_distribution(const standard_atlas_distrib
 		const auto& baked = atlas.baked_images;
 
 		for (const auto& r : in.necessary_image_loadables) {
-			in.output_necessary_atlas_entries[r.first] = baked.at(r.second.get_source_image_path());
+			in.output_necessary_atlas_entries[r.first] = baked.at(r.second.source_image_path);
 		}
 
-		in.image_loadables.for_each_object_and_id([&](const auto& def, const auto id) {
+		in.image_loadables.for_each_object_and_id([&](const auto& d, const auto id) {
+			const auto def = make_view(d);
+
 			auto& output_viewable = in.output_atlas_entries[id];
 			auto& maps = output_viewable;
 

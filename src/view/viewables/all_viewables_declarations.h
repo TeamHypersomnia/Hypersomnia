@@ -12,6 +12,7 @@ namespace augs {
 
 struct image_in_atlas;
 struct image_loadables_def;
+class image_loadables_def_view;
 struct image_meta;
 struct image_cache;
 struct particle_effect;

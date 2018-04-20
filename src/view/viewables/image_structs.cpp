@@ -4,7 +4,7 @@
 #include "augs/templates/introspection_utils/introspective_equal.h"
 
 image_cache::image_cache(
-	const image_loadables_def& loadables,
+	const image_loadables_def_view& loadables,
 	const image_meta& meta
 ) { 
 	try {
@@ -15,17 +15,6 @@ image_cache::image_cache(
 	}
 
 	partitioned_shape.make_box(vec2(original_image_size));
-}
-
-loaded_image_caches_map::loaded_image_caches_map(
-	const image_loadables_map& loadables,
-	const image_metas_map& metas
-) { 
-	loadables.for_each_object_and_id(
-		[this, &metas](const auto& object, const auto id) {
-			try_emplace(id, object, metas.at(id));
-		}
-	);
 }
 
 bool image_meta::operator==(const image_meta& b) const {

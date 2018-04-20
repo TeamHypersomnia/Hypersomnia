@@ -293,6 +293,16 @@ int work(const int argc, const char* const * const argv) try {
 		}
 	};
 
+	static auto get_unofficial_gfx_dir = []() {
+		const auto result = visit_current_setup([](const auto& s) { return s.get_unofficial_content_dir(); });
+
+		if (result.empty()) {
+			return result;
+		}
+
+		return result / "gfx";
+	};
+
 	/* TODO: We need to have one game gui per cosmos. */
 	static game_gui_system game_gui;
 	static bool game_gui_mode = false;
@@ -333,7 +343,10 @@ int work(const int argc, const char* const * const argv) try {
 						const bool meta_changed = !(old_meta == new_meta);
 
 						if (loadables_changed || meta_changed) {
-							loaded_image_caches.at(key) = { *new_loadables, new_meta };
+							loaded_image_caches.at(key) = { 
+								image_loadables_def_view(get_unofficial_gfx_dir(), *new_loadables), 
+								new_meta 
+							};
 						}
 					}
 					else {
@@ -349,7 +362,7 @@ int work(const int argc, const char* const * const argv) try {
 						new_atlas_required = true;
 
 						const auto& new_meta = new_defs.image_metas.at(key);
-						loaded_image_caches.try_emplace(key, fresh, new_meta);
+						loaded_image_caches.try_emplace(key, image_loadables_def_view(get_unofficial_gfx_dir(), fresh), new_meta);
 					}
 					/* Otherwise it's already taken care of */
 				});
@@ -376,6 +389,7 @@ int work(const int argc, const char* const * const argv) try {
 						settings.regenerate_every_launch,
 						settings.skip_source_image_integrity_check
 					},
+					get_unofficial_gfx_dir(),
 					images_in_atlas,
 					necessary_images_in_atlas,
 					get_gui_font()
