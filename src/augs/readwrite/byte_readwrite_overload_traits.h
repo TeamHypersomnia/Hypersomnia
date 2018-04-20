@@ -7,51 +7,36 @@
 namespace augs {
 	class byte_counter_stream;
 	
-	template <class Archive, class Serialized, class = void>
+	template <class ArgsList, class = void>
 	struct has_byte_read_overload : std::false_type 
 	{};
 
-	template <class Archive, class Serialized>
+	template <class... Args>
 	struct has_byte_read_overload <
-		Archive,
-		Serialized,
-		decltype(
-			read_object_bytes(
-				std::declval<Archive&>(),
-				std::declval<Serialized&>()
-			),
-			void()
-		)
+		type_list<Args...>,
+		decltype(read_object_bytes(std::declval<Args&>()...), void())
 	> : std::true_type 
 	{};
 
-	template <class Archive, class Serialized, class = void>
+	template <class ArgsList, class = void>
 	struct has_byte_write_overload : std::false_type 
 	{};
 
-	template <class Archive, class Serialized>
+	template <class... Args>
 	struct has_byte_write_overload <
-		Archive,
-		Serialized,
-		decltype(
-			write_object_bytes(
-				std::declval<Archive&>(),
-				std::declval<const Serialized&>()
-			),
-			void()
-		)
+		type_list<Args...>,
+		decltype(write_object_bytes(std::declval<Args&>()...), void())
 	> : std::true_type 
 	{};
 
+	template <class... Args>
+	constexpr bool has_byte_read_overload_v = has_byte_read_overload<type_list<Args...>>::value;
 
-	template <class Archive, class Serialized>
-	constexpr bool has_byte_read_overload_v = has_byte_read_overload<Archive, Serialized>::value;
+	template <class... Args>
+	constexpr bool has_byte_write_overload_v = has_byte_write_overload<type_list<Args...>>::value;
 
-	template <class Archive, class Serialized>
-	constexpr bool has_byte_write_overload_v = has_byte_write_overload<Archive, Serialized>::value;
-
-	template <class Archive, class Serialized>
+	template <class... Args>
 	constexpr bool has_byte_readwrite_overloads_v = 
-		has_byte_read_overload_v<Archive, Serialized> && has_byte_write_overload_v<Archive, Serialized>
+		has_byte_read_overload_v<Args...> && has_byte_write_overload_v<Args...>
 	;
 }

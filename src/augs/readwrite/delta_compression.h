@@ -5,7 +5,6 @@
 #include "augs/templates/introspect_declaration.h"
 
 #include "augs/ensure.h"
-#include "augs/readwrite/memory_stream.h"
 
 namespace augs {
 	template <class offset_type>
@@ -79,8 +78,9 @@ namespace augs {
 			return changed_bytes.size() > 0;
 		}
 
+		template <class A>
 		bool write(
-			memory_stream& out,
+			A& out,
 			const bool write_changed_bit = false
 		) const {
 			const bool changed = has_changed();
@@ -97,8 +97,9 @@ namespace augs {
 			return changed;
 		}
 
+		template <class A>
 		object_delta(
-			memory_stream& in,
+			A& in,
 			const bool read_changed_bit = false
 		) {
 			bool changed = true;
@@ -172,8 +173,9 @@ namespace augs {
 			return new_content.size() > 0;
 		}
 
+		template <class A>
 		bool write(
-			memory_stream& out,
+			A& out,
 			const bool write_changed_bit = false
 		) const {
 			const bool changed = has_changed();
@@ -189,8 +191,9 @@ namespace augs {
 			return changed;
 		}
 
+		template <class A>
 		object_delta(
-			memory_stream& in,
+			A& in,
 			const bool read_changed_bit = false
 		) {
 			bool changed = true;
@@ -222,21 +225,21 @@ namespace augs {
 
 	/* shortcuts */
 
-	template <class T>
+	template <class T, class A>
 	bool write_delta(
 		const T& base,
 		const T& enco,
-		memory_stream& out,
+		A& out,
 		const bool write_changed_bit = false
 	) {
 		const auto dt = object_delta<T>(base, enco);
 		return dt.write(out, write_changed_bit);
 	}
 
-	template <class T>
+	template <class T, class A>
 	void read_delta(
 		T& into,
-		memory_stream& in,
+		A& in,
 		const bool read_changed_bit = false
 	) {
 		auto dt = object_delta<T>(in, read_changed_bit);

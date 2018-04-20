@@ -88,6 +88,7 @@ namespace augs {
 	}
 
 	void write_object_lua(sol::table ar, const cosmos& cosm) {
+#if TODO
 		{
 			auto common_table = ar.create();
 			ar["common"] = common_table;
@@ -96,7 +97,6 @@ namespace augs {
 		}
 		
 		ensure(false);
-#if TODO
 		// TODO: write completely separate tables per each entity type?
 
 		{

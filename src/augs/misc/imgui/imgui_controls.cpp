@@ -19,7 +19,7 @@ namespace ImGui {
 			PopStyleVar(4);
 			return false;
 		}
-		g.CurrentWindow->DC.MenuBarOffsetX += g.Style.DisplaySafeAreaPadding.x;
+		g.CurrentWindow->DC.MenuBarOffset.x += g.Style.DisplaySafeAreaPadding.x;
 		return true;
 	}
 
