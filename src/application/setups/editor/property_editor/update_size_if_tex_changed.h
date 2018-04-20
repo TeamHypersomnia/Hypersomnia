@@ -34,7 +34,7 @@ inline void update_size_if_tex_changed(
 		cache = *c;
 	}
 	else {
-		cache = { image_loadables_def_view(folder.current_path, viewables.image_loadables[id]), viewables.image_metas[id] };
+		cache = { image_loadables_def_view(folder.current_path / "gfx", viewables.image_loadables[id]), viewables.image_metas[id] };
 	}
 
 	auto& history = folder.history;

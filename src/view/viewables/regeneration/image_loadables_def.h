@@ -11,6 +11,7 @@
 
 #include "view/asset_location_context.h"
 #include "view/viewables/regeneration/neon_maps.h"
+#include "view/maybe_official_path.h"
 
 augs::path_type get_neon_map_path(augs::path_type from_source_image_path);
 augs::path_type get_desaturation_path(augs::path_type from_source_image_path);
@@ -25,7 +26,7 @@ struct image_extra_loadables {
 
 struct image_loadables_def {
 	// GEN INTROSPECTOR struct image_loadables_def
-	augs::path_type source_image_path;
+	maybe_official_path source_image;
 	image_extra_loadables extras;
 	// END GEN INTROSPECTOR
 
@@ -58,6 +59,4 @@ public:
 
 	augs::path_type get_source_image_path() const;
 	vec2u read_source_image_size() const;
-
-	bool is_in_official_directory() const;
 };

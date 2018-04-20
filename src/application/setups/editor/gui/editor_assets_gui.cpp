@@ -24,11 +24,6 @@ struct asset_gui_path_entry : public browsed_path_entry_base {
 
 	id_type id;
 	std::vector<std::string> using_locations;
-	std::string displayed_dir;
-
-	const auto& get_displayed_directory() const {
-		return displayed_dir;
-	}
 
 	bool missing = false;
 
@@ -38,7 +33,7 @@ struct asset_gui_path_entry : public browsed_path_entry_base {
 
 	asset_gui_path_entry() = default;
 	asset_gui_path_entry(
-		augs::path_type from,
+		const maybe_official_path& from,
 	   	const id_type id
 	) :
 		id(id),
@@ -212,11 +207,10 @@ void editor_images_gui::perform(editor_command_input in) {
 
 	loadables.for_each_object_and_id(
 		[&](const auto& object, const auto id) mutable {
-			const auto path = object.source_image_path;
+			const auto path = object.source_image;
 			auto new_entry = path_entry_type(path, id);
 
-			const auto& view = image_loadables_def_view(folder.current_path, object);
-			new_entry.displayed_dir = augs::path_type(path).replace_filename("").string() + (view.is_in_official_directory() ? " (Official)" : " (Project)");
+			const auto& view = image_loadables_def_view(folder.current_path / "gfx", object);
 
 			find_locations_that_use(id, work, [&](const auto& location) {
 				new_entry.using_locations.push_back(location);
@@ -311,8 +305,8 @@ void editor_images_gui::perform(editor_command_input in) {
 
 							cmd.affected_assets = { id };
 
-							cmd.built_description = typesafe_sprintf("Changed image path from %x", describe_moved_file(l.source_image_path, chosen_path));
-							cmd.field = make_field_address(&image_loadables_def::source_image_path);
+							cmd.built_description = typesafe_sprintf("Changed image path from %x", describe_moved_file(l.source_image.path, chosen_path.path));
+							cmd.field = make_field_address(&image_loadables_def::source_image);
 							cmd.value_after_change = augs::to_bytes(chosen_path);
 
 							history.execute_new(std::move(cmd), in);
@@ -351,7 +345,7 @@ void editor_images_gui::perform(editor_command_input in) {
 					forget_asset_id_command<asset_id_type> cmd;
 					cmd.forgotten_id = path_entry.id;
 					cmd.built_description = 
-						typesafe_sprintf("Stopped tracking %x", augs::to_display_path(path_entry.get_full_path()))
+						typesafe_sprintf("Stopped tracking %x", path_entry.get_full_path().to_display())
 					;
 
 					history.execute_new(std::move(cmd), in);

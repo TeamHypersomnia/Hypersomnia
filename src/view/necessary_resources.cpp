@@ -176,7 +176,7 @@ necessary_image_loadables_map::necessary_image_loadables_map(
 		if (const auto image_path = typesafe_sprintf("%x/%x.png", directory, stem);
 			augs::exists(image_path)
 		) {
-			definition_template.source_image_path = image_path;
+			definition_template.source_image.path = image_path;
 			emplace(id, definition_template);
 		}
 		else if (
@@ -229,7 +229,7 @@ necessary_image_loadables_map::necessary_image_loadables_map(
 				const auto first = id;
 
 				augs::for_each_enum_except_bounds([&](const button_corner_type type) {
-					definition_template.source_image_path = typesafe_sprintf(path_template.string(), get_filename_for(type));
+					definition_template.source_image.path = typesafe_sprintf(path_template.string(), get_filename_for(type));
 					
 					emplace(
 						static_cast<id_type>(
@@ -250,12 +250,12 @@ necessary_image_loadables_map::necessary_image_loadables_map(
 					force_regenerate
 				);
 		
-				definition_template.source_image_path = generated_image_path;
+				definition_template.source_image.path = generated_image_path;
 				emplace(id, definition_template);
 			}
 		}
 
-		if (/* nothing_loaded */ definition_template.source_image_path.empty()) {
+		if (/* nothing_loaded */ definition_template.source_image.path.empty()) {
 			throw necessary_resource_loading_error(
 				"Failed to load necessary image: %x.\n%x",
 				stem,

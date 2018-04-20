@@ -287,7 +287,7 @@ void editor_setup::perform_custom_imgui(
 						const auto recent_paths = recent.paths;
 
 						for (const auto& target_path : recent_paths) {
-							const auto str = augs::to_display_path(target_path).string();
+							const auto str = augs::to_display(target_path);
 
 							if (ImGui::MenuItem(str.c_str())) {
 								open_folder_in_new_tab(path_op(target_path));

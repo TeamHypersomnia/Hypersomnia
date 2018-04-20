@@ -1,8 +1,10 @@
 #pragma once
 #include "augs/filesystem/path_declaration.h"
 #include "augs/readwrite/byte_readwrite_declaration.h"
+#include "augs/string/string_templates.h"
 
 std::string to_forward_slashes(std::string);
+std::string format_field_name(std::string s);
 
 namespace augs {
 #if READWRITE_OVERLOAD_TRAITS_INCLUDED
@@ -33,19 +35,23 @@ namespace augs {
 	template <class Archive>
 	void read_object_bytes(Archive& ar, std::string& storage) = delete;
 
-	inline auto to_display_path(path_type target_path) {
-		auto display_path = target_path.filename();
-
-
-		if (const auto directory = target_path.replace_filename("");
+	inline std::string parenthesized_dir(path_type target_path) {
+		if (const auto directory = target_path.replace_filename("").string();
 			!directory.empty()
 		) {
-			display_path += " (";
-			display_path += directory;
-			display_path += ")";
+			return " (" + directory + ")";
 		}
 
-		return display_path;
+		return "";
+	}
+
+	inline std::string to_display(path_type target_path) {
+		return target_path.filename().string() + parenthesized_dir(target_path);
+
+	}
+
+	inline std::string to_display_prettified(path_type target_path) {
+		return format_field_name(target_path.stem().string()) + parenthesized_dir(target_path);
 	}
 }
 

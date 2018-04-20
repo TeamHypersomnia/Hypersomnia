@@ -6,6 +6,7 @@
 #include "application/setups/editor/commands/change_property_command.h"
 #include "application/setups/editor/property_editor/property_editor_structs.h"
 #include "view/viewables/all_viewables_declarations.h"
+#include "view/maybe_official_path.h"
 
 namespace augs {
 	struct introspection_access;
@@ -19,7 +20,7 @@ private:
 	friend augs::introspection_access;
 	id_type allocated_id;
 public:
-	std::string use_path;
+	maybe_official_path use_path;
 	// END GEN INTROSPECTOR
 
 	auto get_allocated_id() const {

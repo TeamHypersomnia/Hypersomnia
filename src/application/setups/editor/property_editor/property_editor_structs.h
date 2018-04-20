@@ -10,12 +10,15 @@
 #include "game/components/shape_polygon_component.h"
 #include "game/components/sentience_component.h"
 
+struct maybe_official_path;
+
 using edited_field_type_id = type_in_list_id<
 	type_list<
 		augs::trivial_type_marker,
 		std::string,
 		convex_partitioned_shape::poly_vector_type,
-		augs::path_type
+		augs::path_type,
+		maybe_official_path
 	>
 >;
 

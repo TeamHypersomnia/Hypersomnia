@@ -52,7 +52,8 @@ void load_test_scene_images(
 		image_loadables_def loadables_def;
 		image_meta meta;
 
-		loadables_def.source_image_path = stem + ".png";
+		loadables_def.source_image.path = stem + ".png";
+		loadables_def.source_image.is_official = true;
 
 		try {
 			try_load_lua_neighbors(image_loadables_def_view({}, loadables_def).get_source_image_path(), lua, loadables_def.extras, meta);

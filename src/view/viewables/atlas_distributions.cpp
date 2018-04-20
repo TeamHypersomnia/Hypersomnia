@@ -14,7 +14,7 @@ augs::graphics::texture standard_atlas_distribution(const standard_atlas_distrib
 	atlas_input.clear();
 
 	for (const auto& r : in.necessary_image_loadables) {
-		atlas_input.images.emplace_back(r.second.source_image_path);
+		atlas_input.images.emplace_back(r.second.source_image.path);
 	}
 
 	for (const auto& d : in.image_loadables) {
@@ -61,7 +61,7 @@ augs::graphics::texture standard_atlas_distribution(const standard_atlas_distrib
 		const auto& baked = atlas.baked_images;
 
 		for (const auto& r : in.necessary_image_loadables) {
-			in.output_necessary_atlas_entries[r.first] = baked.at(r.second.source_image_path);
+			in.output_necessary_atlas_entries[r.first] = baked.at(r.second.source_image.path);
 		}
 
 		in.image_loadables.for_each_object_and_id([&](const auto& d, const auto id) {

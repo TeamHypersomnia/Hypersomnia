@@ -21,33 +21,17 @@ bool image_loadables_def::operator==(const image_loadables_def& b) const {
 
 static const auto official_dir = "content/official/gfx";
 
-static auto resolve_path(
-	const asset_location_context& project_dir,
-	const augs::path_type& p
-) {
-	const auto official = augs::path_type(official_dir);
-
-	if (p.empty()) {
-		return official / p;
-	}
-
-	return augs::switch_path(
-		official / p,
-		project_dir / "gfx" / p
-	);
-}
-
 image_loadables_def_view::image_loadables_def_view(
 	const asset_location_context& project_dir,
 	const image_loadables_def& d
 ) : 
 	def(d), 
-	resolved_source_image_path(resolve_path(project_dir, d.source_image_path))
+	resolved_source_image_path(
+		d.source_image.is_official ? 
+		(augs::path_type(official_dir) / d.source_image.path)
+		: (project_dir / d.source_image.path)
+	)
 {
-}
-
-bool image_loadables_def_view::is_in_official_directory() const {
-	return begins_with(resolved_source_image_path, official_dir);
 }
 
 std::optional<augs::path_type> image_loadables_def_view::find_neon_map_path() const {

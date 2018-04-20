@@ -228,7 +228,7 @@ namespace augs {
 #endif
 
 			if (!augs::exists(in.source_font_path)) {
-				throw imgui_init_error("Failed to load %x for reading.", augs::to_display_path(in.source_font_path));
+				throw imgui_init_error("Failed to load %x for reading.", augs::to_display(in.source_font_path));
 			}
 
 			const auto str_path = in.source_font_path.string();
