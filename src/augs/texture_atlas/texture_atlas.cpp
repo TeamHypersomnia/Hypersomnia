@@ -33,8 +33,19 @@ regenerated_atlas::regenerated_atlas(
 
 	if (!settings.skip_source_image_integrity_check) {
 			for (const auto& img_id : in.images) {
+				/* 
+					Acquire the reference now, so that if last_write_time fails, 
+					we're at least left with the default value.
+
+					Otherwise if a new image was added, but it couldn't be found,
+					the stamp for this image would not be generated for proper comparison,
+					and the atlas would assume that it is up-to-date.
+				*/
+
+				auto& stamp = new_stamp.image_stamps[img_id];
+
 				try {
-					new_stamp.image_stamps[img_id] = augs::last_write_time(img_id);
+					stamp = augs::last_write_time(img_id);
 				}
 				catch (...) {
 
@@ -171,7 +182,7 @@ regenerated_atlas::regenerated_atlas(
 		
 		size_t current_rect = 0u;
 
-		for (auto& input_img_id : in.images) {
+		for (const auto& input_img_id : in.images) {
 			const auto packed_rect = rects_for_packing_algorithm[current_rect];
 
 			{
