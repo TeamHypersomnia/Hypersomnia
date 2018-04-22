@@ -2,6 +2,8 @@
 #include <type_traits>
 #include <tuple>
 #include <variant>
+
+#include "augs/templates/sequence_utils.h"
 #include "augs/misc/trivially_copyable_tuple.h"
 
 namespace templates_detail {

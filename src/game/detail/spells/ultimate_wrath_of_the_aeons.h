@@ -6,7 +6,11 @@
 
 struct spell_logic_input;
 
+struct ultimate_wrath_of_the_aeons;
+
 struct ultimate_wrath_of_the_aeons_instance {
+	using meta_type = ultimate_wrath_of_the_aeons;
+
 	// GEN INTROSPECTOR struct ultimate_wrath_of_the_aeons_instance
 	augs::stepped_cooldown cast_cooldown;
 	// END GEN INTROSPECTOR

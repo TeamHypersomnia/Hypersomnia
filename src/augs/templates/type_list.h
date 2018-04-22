@@ -7,6 +7,15 @@
 template <class...>
 struct type_list {};
 
+template <class T>
+struct is_type_list : std::false_type {};
+
+template <class... Types>
+struct is_type_list<type_list<Types...>> : std::true_type {};
+
+template <class T>
+static constexpr bool is_type_list_v = is_type_list<T>::value;
+
 namespace std {
 	template <std::size_t I, class... Types>
 	const auto& get(const type_list<Types...>& t) {

@@ -1,29 +1,6 @@
 #pragma once
 #include <type_traits>
 #include "augs/templates/type_list.h"
-#include "augs/templates/type_matching_and_indexing.h"
-
-template <class List>
-struct reverse_types_in_list;
-
-template <
-	template <class...> class List,
-	class T,
-	class... Args
->
-struct reverse_types_in_list<List<T, Args...>> {
-	using type = append_to_list_t<T, typename reverse_types_in_list<List<Args...>>::type>;
-};
-
-template <
-	template <class...> class List
->
-struct reverse_types_in_list<List<>> {
-	using type = List<>;
-};
-
-template <class List>
-using reverse_types_in_list_t = typename reverse_types_in_list<List>::type;
 
 template <
 	class List,

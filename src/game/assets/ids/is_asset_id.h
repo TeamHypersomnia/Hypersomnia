@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/templates/type_matching_and_indexing.h"
+#include "augs/templates/folded_finders.h"
 #include "game/assets/ids/asset_ids.h"
 
 template <class T>

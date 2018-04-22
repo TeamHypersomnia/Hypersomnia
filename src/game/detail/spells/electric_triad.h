@@ -6,7 +6,11 @@
 
 struct spell_logic_input;
 
+struct electric_triad;
+
 struct electric_triad_instance {
+	using meta_type = electric_triad;
+
 	// GEN INTROSPECTOR struct electric_triad_instance
 	augs::stepped_cooldown cast_cooldown;
 	// END GEN INTROSPECTOR

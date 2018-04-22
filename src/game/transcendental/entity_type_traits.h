@@ -5,6 +5,7 @@
 #include "augs/templates/list_utils.h"
 #include "augs/templates/type_mod_templates.h"
 #include "augs/templates/transform_types.h"
+#include "augs/templates/type_matching_and_indexing.h"
 
 #include "game/transcendental/pool_size_type.h"
 
@@ -26,7 +27,7 @@ using invariants_and_components_of = concatenate_lists_t<invariants_of<T>, compo
 template <class T>
 using make_invariants = 
 	std::conditional_t<
-		all_are_v<std::is_trivially_copyable, invariants_of<T>>,
+		all_in_list_are_v<std::is_trivially_copyable, invariants_of<T>>,
 		replace_list_type_t<invariants_of<T>, augs::trivially_copyable_tuple>,
 		replace_list_type_t<invariants_of<T>, std::tuple>
 	>
@@ -35,7 +36,7 @@ using make_invariants =
 template <class T>
 using make_components = 
 	std::conditional_t<
-		all_are_v<std::is_trivially_copyable, components_of<T>>,
+		all_in_list_are_v<std::is_trivially_copyable, components_of<T>>,
 		replace_list_type_t<components_of<T>, augs::trivially_copyable_tuple>,
 		replace_list_type_t<components_of<T>, std::tuple>
 	>

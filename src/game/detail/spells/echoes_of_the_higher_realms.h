@@ -6,7 +6,11 @@
 
 struct spell_logic_input;
 
+struct echoes_of_the_higher_realms;
+
 struct echoes_of_the_higher_realms_instance {
+	using meta_type = echoes_of_the_higher_realms;
+
 	// GEN INTROSPECTOR struct echoes_of_the_higher_realms_instance
 	augs::stepped_cooldown cast_cooldown;
 	// END GEN INTROSPECTOR

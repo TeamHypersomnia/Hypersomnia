@@ -33,16 +33,23 @@ struct sentience_meter_appearance {
 	}
 };
 
+struct health_meter;
+struct personal_electricity_meter;
+struct consciousness_meter;
+
 struct health_meter_instance : value_meter {
 	using introspect_base = value_meter;
+	using meta_type = health_meter;
 };
 
 struct personal_electricity_meter_instance : value_meter {
 	using introspect_base = value_meter;
+	using meta_type = personal_electricity_meter;
 };
 
 struct consciousness_meter_instance : value_meter {
 	using introspect_base = value_meter;
+	using meta_type = consciousness_meter;
 };
 
 struct health_meter {

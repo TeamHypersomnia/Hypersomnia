@@ -7,7 +7,7 @@
 
 #include "augs/templates/maybe_const.h"
 #include "augs/templates/traits/component_traits.h"
-#include "augs/templates/type_matching_and_indexing.h"
+#include "augs/templates/folded_finders.h"
 
 #include "game/detail/inventory/inventory_slot_handle_declaration.h"
 #include "game/transcendental/entity_handle_declaration.h"

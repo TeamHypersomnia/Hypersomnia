@@ -1,6 +1,7 @@
 #pragma once
 #include <limits>
 
+#include "augs/templates/predicate_templates.h"
 #include "augs/templates/type_matching_and_indexing.h"
 #include "augs/templates/type_list.h"
 

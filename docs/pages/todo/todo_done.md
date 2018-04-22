@@ -535,3 +535,12 @@ we consider whole type overrides too complex architeciturally:
 		- it won't hinder cache much as it's just pointer + size
 	- just stick to names in the assets themselves for now
 
+
+- Project files vs official files
+	- We should probably convert to local files only at the stage of i/o and upon displaying
+		- Less pain in the ass and more performant
+	- We could keep copy of the paths or just maps that were resolved?
+		- This could get out of date perhaps
+	- If we keep absolutes, caches will get regenerated on moving the project
+		- as they keep absolute paths
+		- Won't happen often, though

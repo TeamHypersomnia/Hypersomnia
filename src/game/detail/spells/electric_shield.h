@@ -5,7 +5,11 @@
 
 struct spell_logic_input;
 
+struct electric_shield;
+
 struct electric_shield_instance {
+	using meta_type = electric_shield;
+
 	// GEN INTROSPECTOR struct electric_shield_instance
 	augs::stepped_cooldown cast_cooldown;
 	// END GEN INTROSPECTOR

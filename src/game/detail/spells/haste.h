@@ -5,7 +5,11 @@
 
 struct spell_logic_input;
 
+struct haste;
+
 struct haste_instance {
+	using meta_type = haste;
+
 	// GEN INTROSPECTOR struct haste_instance
 	augs::stepped_cooldown cast_cooldown;
 	// END GEN INTROSPECTOR

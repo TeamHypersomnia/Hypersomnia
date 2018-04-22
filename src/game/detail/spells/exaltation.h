@@ -6,7 +6,10 @@
 
 struct spell_logic_input;
 
+struct exaltation;
+
 struct exaltation_instance {
+	using meta_type = exaltation;
 	// GEN INTROSPECTOR struct exaltation_instance
 	augs::stepped_cooldown cast_cooldown;
 	// END GEN INTROSPECTOR

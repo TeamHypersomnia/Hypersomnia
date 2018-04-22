@@ -3,7 +3,7 @@
 #include "augs/ensure.h"
 
 #include "augs/misc/simple_pair.h"
-#include "augs/templates/type_matching_and_indexing.h"
+#include "augs/templates/folded_finders.h"
 #include "augs/templates/algorithm_templates.h"
 #include "augs/templates/traits/is_comparable.h"
 

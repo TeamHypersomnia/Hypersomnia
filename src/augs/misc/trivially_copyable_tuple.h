@@ -1,7 +1,8 @@
 #pragma once
 #include "augs/templates/type_list.h"
 #include "augs/templates/constexpr_arithmetic.h"
-#include "augs/templates/type_matching_and_indexing.h"
+#include "augs/templates/folded_finders.h"
+#include "augs/templates/nth_type_in.h"
 
 namespace augs {
 	template <class... Types>

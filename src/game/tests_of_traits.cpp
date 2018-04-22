@@ -20,6 +20,7 @@
 #include "augs/pad_bytes.h"
 
 #include "augs/templates/introspection_utils/validate_fields_in.h"
+#include "augs/templates/type_matching_and_indexing.h"
 
 #include "augs/readwrite/lua_readwrite.h"
 #include "augs/readwrite/byte_readwrite.h"
@@ -258,9 +259,6 @@ struct tests_of_traits {
 	static_assert(has_introspect_v<augs::delta>, "Trait has failed");
 	static_assert(alignof(meter_instance_tuple) == 4, "Trait has failed");
 
-	static_assert(same<std::tuple<int, double, float>, reverse_types_in_list_t<std::tuple<float, double, int>>>, "Trait has failed");
-	static_assert(same<type_list<int, double, float>, reverse_types_in_list_t<type_list<float, double, int>>>, "Trait has failed");
-
 	static_assert(sum_sizes_until_nth_v<0, std::tuple<int, double, float>> == 0, "Trait has failed");
 	static_assert(sum_sizes_until_nth_v<1, std::tuple<int, double, float>> == 4, "Trait has failed");
 	static_assert(sum_sizes_until_nth_v<2, std::tuple<int, double, float>> == 12, "Trait has failed");
@@ -269,10 +267,6 @@ struct tests_of_traits {
 	static_assert(sum_sizes_of_types_in_list_v<std::tuple<int, double, float>> == 16, "Trait has failed");
 	static_assert(sum_sizes_of_types_in_list_v<std::tuple<int>> == 4, "Trait has failed");
 	static_assert(sum_sizes_of_types_in_list_v<std::tuple<>> == 0, "Trait has failed");
-
-	static_assert(count_occurences_in_v<int, int, double, float> == 1, "Trait has failed");
-	static_assert(count_occurences_in_list_v<int, std::tuple<int, double, float>> == 1, "Trait has failed");
-	static_assert(count_occurences_in_list_v<int, std::tuple<int, double, float, int>> == 2, "Trait has failed");
 
 	static_assert(!has_constexpr_size_v<std::vector<int>>, "Trait has failed");
 	static_assert(has_constexpr_size_v<std::array<int, 3>>, "Trait has failed");
@@ -306,7 +300,6 @@ struct tests_of_traits {
 
 	static_assert(bind_types<std::is_same, const int>::type<const int>::value, "Trait has failed");
 
-	static_assert(same<filter_types_in_list<std::is_integral, type_list<double, int, float>>::indices, std::index_sequence<1>>, "Trait has failed");
 	static_assert(same<filter_types_in_list<std::is_integral, type_list<double, int, float>>::types, type_list<int>>, "Trait has failed");
 	static_assert(same<filter_types_in_list<std::is_integral, type_list<double, int, float>>::get_type<0>, int>, "Trait has failed");
 	
@@ -336,15 +329,7 @@ struct tests_of_traits {
 		>, 
 		"Trait has failed"
 	);
-	
-	static_assert(
-		same<
-		filter_types_in_list<std::is_integral, type_list<int, double, float, unsigned>>::indices,
-			std::index_sequence<0, 3>
-		>, 
-		"Trait has failed"
-	);
-	
+
 	static_assert(
 		!same<
 		filter_types_in_list<std::is_floating_point, type_list<int, double, float, unsigned>>::types,

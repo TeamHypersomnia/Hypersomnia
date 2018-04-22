@@ -3,7 +3,7 @@
 
 #include "augs/pad_bytes.h"
 #include "augs/templates/introspect_declaration.h"
-#include "augs/templates/type_matching_and_indexing.h"
+#include "augs/templates/folded_finders.h"
 #include "augs/templates/maybe_const.h"
 #include "augs/templates/traits/component_traits.h"
 #include "game/transcendental/entity_flavour_id.h"

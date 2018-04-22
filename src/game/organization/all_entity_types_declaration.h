@@ -1,6 +1,6 @@
 #pragma once
 #include "augs/templates/type_in_list_id.h"
-#include "augs/templates/type_matching_and_indexing.h"
+#include "augs/templates/folded_finders.h"
 
 struct controlled_character;
 struct plain_invisible_body;

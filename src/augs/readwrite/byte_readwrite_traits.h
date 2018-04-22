@@ -3,7 +3,7 @@
 #include <type_traits>
 
 #include "augs/templates/introspect.h"
-#include "augs/templates/type_matching_and_indexing.h"
+#include "augs/templates/folded_finders.h"
 #include "augs/readwrite/memory_stream_declaration.h"
 
 namespace augs {

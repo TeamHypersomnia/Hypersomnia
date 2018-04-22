@@ -6,6 +6,7 @@
 #include "augs/ensure.h"
 #include "augs/templates/type_in_list_id.h"
 #include "augs/templates/type_list.h"
+#include "augs/templates/nth_type_in.h"
 
 template <
 	std::size_t current_candidate = 0,

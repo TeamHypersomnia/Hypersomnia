@@ -4,7 +4,7 @@
 
 #include "augs/templates/type_pair.h"
 #include "augs/templates/type_list.h"
-#include "augs/templates/type_matching_and_indexing.h"
+#include "augs/templates/folded_finders.h"
 
 #include "game/components/transform_component_declaration.h"
 #include "game/components/sprite_component_declaration.h"
