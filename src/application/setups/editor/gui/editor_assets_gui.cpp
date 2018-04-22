@@ -14,9 +14,11 @@
 #include "application/intercosm.h"
 
 #include "application/setups/editor/detail/format_struct_name.h"
-#include "augs/templates/introspection_utils/validate_fields_in.h"
 #include "application/setups/editor/property_editor/asset_control_provider.h"
 #include "application/setups/editor/property_editor/general_edit_properties.h"
+
+#include "augs/templates/introspection_utils/types_in.h"
+#include "augs/templates/list_utils.h"
 
 template <class id_type>
 struct asset_gui_path_entry : public browsed_path_entry_base {
@@ -41,11 +43,6 @@ struct asset_gui_path_entry : public browsed_path_entry_base {
 	{}
 };
 
-template <class T>
-constexpr bool is_whitelisted_container = 
-	is_one_of_v<T, wandering_pixels_frames>
-;
-
 template <class Se, class O, class F>
 void find_object_in_object(
 	const Se& searched_object,
@@ -54,7 +51,7 @@ void find_object_in_object(
 ) {
 	using S = std::decay_t<Se>;
 
-	static_assert(std::is_same_v<S, decltype(invariants::sprite::tex)>);
+	static_assert(can_type_contain_another_v<O, Se>, "This search will never find anything.");
 
 	thread_local augs::field_name_tracker fields;
 	fields.clear();
@@ -63,23 +60,21 @@ void find_object_in_object(
 		[&searched_object, &location_callback](auto&& self, const auto& label, auto& field) {
 			using T = std::decay_t<decltype(field)>;
 
-			if constexpr(
-				is_one_of_v<T, all_logical_assets, all_entity_flavours>
-			) {
-				/* This has a special logic */
-			}
-			else if constexpr(std::is_same_v<T, S>) {
-				if (searched_object == field) {
-					location_callback(fields.get_full_name(label));
+			if constexpr(can_type_contain_another_v<T, Se>) {
+				if constexpr(
+					is_one_of_v<T, all_logical_assets, all_entity_flavours>
+				) {
+					/* This has a special logic */
 				}
-			}
-			else if constexpr(is_introspective_leaf_v<T>) {
-				return;
-			}
-			else if constexpr(augs::has_dynamic_content_v<T>) {
-				if constexpr(!(is_container_v<T> && !is_whitelisted_container<T>)) {	
-					/* Is not a blacklisted container */
-
+				else if constexpr(std::is_same_v<T, S>) {
+					if (searched_object == field) {
+						location_callback(fields.get_full_name(label));
+					}
+				}
+				else if constexpr(is_introspective_leaf_v<T>) {
+					return;
+				}
+				else if constexpr(augs::has_dynamic_content_v<T>) {
 					augs::on_dynamic_content(
 						[&](auto& dyn, auto... args) {
 							auto scope = fields.track(typesafe_sprintf("%x", args...));
@@ -89,15 +84,9 @@ void find_object_in_object(
 					);
 				}
 				else {
-					validate_fields_in(field, [](const auto& m){
-						using M = std::decay_t<decltype(m)>;
-						static_assert(!std::is_same_v<M, S>, "A blacklisted container may contain the searched object.");
-					});
+					auto scope = fields.track(label);
+					augs::introspect(augs::recursive(self), field);
 				}
-			}
-			else {
-				auto scope = fields.track(label);
-				augs::introspect(augs::recursive(self), field);
 			}
 		}
 	);
@@ -123,25 +112,32 @@ void find_locations_that_use(
 
 	for_each_entity_type([&](auto e){ 
 		using E = decltype(e);
+		using Fl = entity_flavour<E>;
 
-		common.get_flavours<E>().for_each([&](const auto, const auto& flavour) {
-			const auto& name = flavour.template get<invariants::name>().name;
+		if constexpr(can_type_contain_another_v<Fl, assets::image_id>) {
+			common.get_flavours<E>().for_each([&](const auto, const auto& flavour) {
+				const auto& name = flavour.template get<invariants::name>().name;
 
-			auto for_each_through = [&](const auto& where) {
-				for_each_through_std_get(
-					where,
-					[&](const auto& c) {
-						find_object_in_object(id, c, [&](const auto& location) {
-							/* location_callback(format_struct_name(c) + "of " + name + ": " + location); */
-							location_callback("Flavour: " + name + " (" + format_struct_name(c) + "." + location + ")");
-						});
-					}
-				);
-			};
+				auto for_each_through = [&](const auto& where) {
+					for_each_through_std_get(
+						where,
+						[&](const auto& c) {
+							using C = std::decay_t<decltype(c)>;
 
-			for_each_through(flavour.initial_components);
-			for_each_through(flavour.invariants);
-		});
+							if constexpr(can_type_contain_another_v<C, assets::image_id>) {
+								find_object_in_object(id, c, [&](const auto& location) {
+									/* location_callback(format_struct_name(c) + "of " + name + ": " + location); */
+									location_callback("Flavour: " + name + " (" + format_struct_name(c) + "." + location + ")");
+								});
+							}
+						}
+					);
+				};
+
+				for_each_through(flavour.initial_components);
+				for_each_through(flavour.invariants);
+			});
+		}
 	});
 
 	//traverse("Particle effects: ", inter.viewables.particle_effects);

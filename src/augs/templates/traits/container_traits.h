@@ -27,6 +27,13 @@ struct is_associative<T, decltype(std::declval<typename T::key_type>(), std::dec
 
 
 template <class T, class = void>
+struct has_first_and_second_types : std::false_type {};
+
+template <class T>
+struct has_first_and_second_types<T, decltype(std::declval<typename T::first_type>(), std::declval<typename T::second_type>(), void())> : std::true_type {};
+
+
+template <class T, class = void>
 struct has_value_type : std::false_type {};
 
 template <class T>
@@ -105,6 +112,9 @@ constexpr bool can_emplace_back_v = can_emplace_back<T>::value;
 
 template <class T>
 constexpr bool is_associative_v = is_associative<T>::value;
+
+template <class T>
+constexpr bool has_first_and_second_types_v = has_first_and_second_types<T>::value;
 
 template <class T>
 constexpr bool has_value_type_v = has_value_type<T>::value;

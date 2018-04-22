@@ -18,6 +18,11 @@ introspector-body-format:
 		) {
 %x		}
 
+template <class __T%x>
+struct types_in<%x, __T>{
+	using types = type_list<%x>;
+};
+
 enum-field-format:
 		case T::%x: return "%x";
 enum-introspector-body-format:
@@ -61,6 +66,7 @@ generated-file-format:
 #include "application/setups/editor/editor_history_declaration.h"
 
 #define FIELD(x) f(#x, _t_.x...)
+#define TYPEOF(x) decltype(__T::x)
 
 // Forward declarations
 
@@ -89,6 +95,9 @@ struct ImVec4;
 
 	/* Generated introspectors begin here */
 %x	struct introspection_access {
+		template <class T, class B>
+		struct types_in;
+
 		/* Hand-written introspectors that do not fit into the standard schema begin here */
 
 		template <class F, class ElemType, size_t count, class... Instances>
@@ -111,6 +120,11 @@ struct ImVec4;
 			FIELD(first);
 			FIELD(second);
 		}
+
+		template <class __T, class A, class B>
+		struct types_in<std::pair<A, B>, __T> {
+			using types = type_list<A, B>;
+		};
 
 		template <class F, class... Types, class... Instances>
 		static void introspect_body(
@@ -144,6 +158,16 @@ struct ImVec4;
 			);
 		}
 
+		template <class __T, class... Args>
+		struct types_in<std::tuple<Args...>, __T> {
+			using types = type_list<Args...>;
+		};
+
+		template <class __T, class... Args>
+		struct types_in<augs::trivially_copyable_tuple<Args...>, __T> {
+			using types = type_list<Args...>;
+		};
+
 		template <class F, class... Instances>
 		static void introspect_body(
 			const ImVec2* const,
@@ -153,6 +177,11 @@ struct ImVec4;
 			FIELD(x);
 			FIELD(y);
 		}
+
+		template <class __T>
+		struct types_in<ImVec2, __T> {
+			using types = type_list<TYPEOF(x), TYPEOF(y)>;
+		};
 
 		template <class F, class... Instances>
 		static void introspect_body(
@@ -165,6 +194,11 @@ struct ImVec4;
 			FIELD(z);
 			FIELD(w);
 		}
+
+		template <class __T>
+		struct types_in<ImVec4, __T> {
+			using types = type_list<TYPEOF(x), TYPEOF(y), TYPEOF(z), TYPEOF(w)>;
+		};
 
 		template <class F, class... Instances>
 		static void introspect_body(
@@ -201,7 +235,7 @@ struct ImVec4;
 			FIELD(AntiAliasedLines);
 			FIELD(AntiAliasedFill);
 			FIELD(CurveTessellationTol);
-			
+
 #define imcol(x) f(#x, _t_.Colors[static_cast<std::size_t>(imguicol_helper::x)]...)
 			imcol(ImGuiCol_Text);
 			imcol(ImGuiCol_TextDisabled);
@@ -248,6 +282,42 @@ struct ImVec4;
 			imcol(ImGuiCol_NavWindowingHighlight);
 #undef imcol
 		}
+
+		template <class __T>
+		struct types_in<ImGuiStyle, __T> {
+			using types = type_list<
+				TYPEOF(Alpha),
+				TYPEOF(WindowPadding),
+				TYPEOF(WindowRounding),
+				TYPEOF(WindowBorderSize),
+				TYPEOF(WindowMinSize),
+				TYPEOF(WindowTitleAlign),
+				TYPEOF(ChildRounding),
+				TYPEOF(ChildBorderSize),
+				TYPEOF(PopupRounding),
+				TYPEOF(PopupBorderSize),
+				TYPEOF(FramePadding),
+				TYPEOF(FrameRounding),
+				TYPEOF(FrameBorderSize),
+				TYPEOF(ItemSpacing),
+				TYPEOF(ItemInnerSpacing),
+				TYPEOF(TouchExtraPadding),
+				TYPEOF(IndentSpacing),
+				TYPEOF(ColumnsMinSpacing),
+				TYPEOF(ScrollbarSize),
+				TYPEOF(ScrollbarRounding),
+				TYPEOF(GrabMinSize),
+				TYPEOF(GrabRounding),
+				TYPEOF(ButtonTextAlign),
+				TYPEOF(DisplayWindowPadding),
+				TYPEOF(DisplaySafeAreaPadding),
+				TYPEOF(MouseCursorScale),
+				TYPEOF(AntiAliasedLines),
+				TYPEOF(AntiAliasedFill),
+				TYPEOF(CurveTessellationTol),
+				TYPEOF(Colors)
+			>;
+		};
 
 		/* Generated introspectors begin here */
 

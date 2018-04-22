@@ -16,6 +16,8 @@ namespace augs {
 	template <class T, template <class> class make_container_type, class size_type, class... id_keys>
 	class pool {
 	public:
+		using value_type = T;
+
 		using mapped_type = T;
 		using key_type = pooled_object_id<size_type, id_keys...>;
 		using unversioned_id_type = unversioned_id<size_type, id_keys...>;

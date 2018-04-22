@@ -14,6 +14,8 @@ namespace augs {
 	public:
 		using key_type = Enum;
 		using mapped_type = T;
+		using value_type = std::pair<const Enum, T>;
+
 	protected:
 		using size_type = std::size_t;
 

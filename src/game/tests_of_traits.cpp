@@ -9,17 +9,17 @@
 #include "game/transcendental/cosmos.h"
 #include "game/organization/all_component_includes.h"
 
-#include "augs/templates/predicate_templates.h"
 #include "augs/templates/get_index_type_for_size_of.h"
 
 #include "game/assets/all_logical_assets.h"
 
 #include "augs/templates/traits/container_traits.h"
 #include "game/components/pathfinding_component.h"
+#include "game/organization/for_each_entity_type.h"
 
 #include "augs/pad_bytes.h"
 
-#include "augs/templates/introspection_utils/validate_fields_in.h"
+#include "augs/templates/introspection_utils/types_in.h"
 #include "augs/templates/filter_types.h"
 
 #include "augs/readwrite/lua_readwrite.h"
@@ -298,8 +298,6 @@ struct tests_of_traits {
 	static_assert(has_introspect_v<basic_ltrb<float>>, "Trait has failed");
 	static_assert(has_introspect_v<basic_ltrb<int>>, "Trait has failed");
 
-	static_assert(bind_types<std::is_same, const int>::type<const int>::value, "Trait has failed");
-
 	static_assert(same<filter_types_in_list<std::is_integral, type_list<double, int, float>>::types, type_list<int>>, "Trait has failed");
 	static_assert(same<filter_types_in_list<std::is_integral, type_list<double, int, float>>::get_type<0>, int>, "Trait has failed");
 	
@@ -414,27 +412,68 @@ struct tests_of_traits {
 	static_assert(!has_suitable_member_assign_v<std::unordered_set<int>, std::vector<double>>);
 };
 
-template <class T>
-static void check_no_ids_in() {
-	T object;
+struct blabla {};
 
-	validate_fields_in(object, [](auto m){
-		using M = decltype(m);
-		static_assert(!std::is_base_of_v<entity_id_base, M>, "No entity ids allowed here!");
+/* This will also fail if pointers or references are present */
+
+static_assert(!can_type_contain_another_v<cosmos_solvable_significant, blabla>);
+static_assert(!can_type_contain_another_v<cosmos_common_significant, blabla>);
+
+/* Invariants should not hold any ids because they are subject to invalidation */
+
+void validate_no_ids_in_flavours() {
+	for_each_entity_type([](auto e) {
+		using E = decltype(e);
+		using F = entity_flavour<E>;
+
+		static_assert(!can_type_contain_another_v<decltype(F::invariants), entity_id_base>);
+		static_assert(!can_type_contain_another_v<decltype(F::invariants), entity_guid>);
 	});
 }
 
-template <class T>
-static void check_no_pointers_in() {
-	T object;
+/* Type containment - tests of traits */
 
-	validate_fields_in(object, [](auto m){
-		using M = decltype(m);
-		static_assert(!std::is_pointer_v<M> && !std::is_reference_v<M>, "No pointers allowed here!");
-	});
-}
+static_assert(can_type_contain_another_v<std::vector<int>, int>);
+static_assert(can_type_contain_another_v<vec2, float>);
 
-template void check_no_ids_in<components::pathfinding>();
+static_assert(has_types_in_v<std::tuple<int, double>>);
+static_assert(has_types_in_v<augs::trivially_copyable_tuple<int, double>>);
 
-template void check_no_pointers_in<cosmos_solvable_significant>();
-template void check_no_pointers_in<cosmos_common_significant>();
+static_assert(has_types_in_v<vec2>);
+static_assert(has_types_in_v<augs::simple_pair<int, double>>);
+static_assert(has_types_in_v<std::pair<int, double>>);
+static_assert(!has_types_in_v<int>);
+
+static_assert(can_type_contain_another_v<std::pair<int, double>, int>);
+static_assert(!can_type_contain_another_v<std::pair<int, float>, double>);
+static_assert(!can_type_contain_another_v<std::pair<int, char>, double>);
+
+static_assert(can_type_contain_another_v<augs::simple_pair<int, double>, int>);
+static_assert(!can_type_contain_another_v<augs::simple_pair<int, float>, double>);
+static_assert(!can_type_contain_another_v<augs::simple_pair<int, char>, double>);
+
+static_assert(!can_type_contain_another_v<vec2, int>);
+static_assert(can_type_contain_another_v<std::vector<std::vector<double>>, double>);
+static_assert(can_type_contain_another_v<std::vector<std::vector<double>>, std::vector<double>>);
+
+static_assert(can_type_contain_another_v<std::optional<std::vector<double>>, std::vector<double>>);
+
+static_assert(can_type_contain_another_v<
+	std::map<int, std::vector<std::unordered_map<double, char>>>, 
+	char
+>);
+
+static_assert(can_type_contain_another_v<
+	std::map<int, std::vector<std::unordered_map<double, char>>>, 
+	std::unordered_map<double, char>
+>);
+
+static_assert(can_type_contain_another_v<
+	std::map<int, std::vector<std::unordered_map<double, char>>>, 
+	const int
+>);
+
+static_assert(can_type_contain_another_v<
+	std::map<int, std::vector<std::unordered_map<double, char>>>, 
+	int
+>);
