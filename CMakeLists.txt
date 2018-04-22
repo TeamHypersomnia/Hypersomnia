@@ -586,6 +586,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/application/setups/editor/commands/asset_commands.cpp"
 	"src/augs/misc/imgui/path_tree_structs.cpp"
 	"src/application/setups/editor/gui/asset_browser_settings.cpp"
+	"src/augs/filesystem/path.cpp"
 )
 
 # These cpps will be included as the first to speed up multithreaded build times.

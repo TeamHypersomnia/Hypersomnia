@@ -55,6 +55,11 @@ namespace augs {
 	}
 }
 
+std::string describe_moved_file(
+	augs::path_type from, 
+	augs::path_type to 
+);
+
 namespace std {
 	template <>
 	struct hash<augs::path_type> {

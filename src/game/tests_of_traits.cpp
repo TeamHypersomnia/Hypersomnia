@@ -28,48 +28,7 @@
 
 #include "3rdparty/imgui/imgui.h"
 
-static_assert(augs::constant_size_vector_base<int, 20>::capacity(), "Trait has failed");
-
-void validate_entity_types() {
-	for_each_through_std_get(
-		all_entity_types(), 
-		[](auto e) {
-			using E = decltype(e);
-			using List = invariants_and_components_of<E>;
-
-			for_each_through_std_get(
-				assert_always_together(),
-				[](auto constraint) {
-					using C = decltype(constraint);
-					using F = typename C::First;
-					using S = typename C::Second;
-
-					static_assert(
-						is_one_of_list_v<F, List> == is_one_of_list_v<S, List>,
-						"An entity type lacks a component/invariant to function properly."
-					);
-				}
-			);
-
-			for_each_through_std_get(
-				assert_never_together(),
-				[](auto constraint) {
-					using C = decltype(constraint);
-					using F = typename C::First;
-					using S = typename C::Second;
-
-					static_assert(
-						!is_one_of_list_v<F, List> || !is_one_of_list_v<S, List>,
-						"An entity type defines a redundant component/invariant."
-					);
-				}
-			);
-		}
-	);
-}
-// shortcut
-template <class A, class B>
-constexpr bool same = std::is_same_v<A, B>;
+/* Define several other traits which will validate properties of some other types. */
 
 template <class T, class = void>
 struct has_constexpr_size : std::false_type {};
@@ -90,69 +49,66 @@ namespace templates_detail {
 	using identity_t = typename identity<T>::type;
 }
 
-struct AAA {
-	int& czo;
-};
-
-static void ff() {
-	all_entity_types t;
-
-	auto okay = get_by_dynamic_index(t, std::size_t(0), [](auto a){
-		return 20.0;	
-	});
-
-	auto okay2 = get_by_dynamic_id(t, type_in_list_id<all_entity_types>(), [](auto a){
-		return 20.0;	
-	});
-
-	using candidates = type_list<plain_missile, explosive_missile>;
-
-	auto tester = [](auto a) -> decltype(auto) {
-		using T = std::decay_t<decltype(a)>;
-		static_assert(same<T, plain_missile> || same<T, explosive_missile>);
-		return 20.0;	
-	};
-
-	auto okay3 = conditional_get_by_dynamic_index<candidates>(t, std::size_t(0), tester);
-	auto okay4 = conditional_get_by_dynamic_id<candidates>(t, type_in_list_id<all_entity_types>(), tester);
-
-	static_assert(same<double, decltype(okay)>);
-	static_assert(same<double, decltype(okay2)>);
-	static_assert(same<double, decltype(okay3)>);
-	static_assert(same<double, decltype(okay4)>);
-}
-
-static void gg() {
-	{
-		using tp = type_map<
-			type_pair<int, double>,
-			type_pair<double, int>,
-			type_pair<float, const char*>,
-			type_pair<const int, std::string>
-		>;
-
-		static_assert(same<tp::at<int>, double>);
-		static_assert(same<tp::at<double>, int>);
-		static_assert(same<tp::at<float>, const char*>);
-		static_assert(same<tp::at<const int>, std::string>);
-	}
-	
-	(void)(typed_entity_id<controlled_character>() == typed_entity_id<controlled_character>());
-
-	using T = value_meter;
-	value_meter vvv;
-	static_cast<void (*)(const T*, true_returner, T&)>(augs::introspection_access::introspect_body)(nullptr, {}, vvv);
-}
+/* Define several other types which will be needed as input for some tested traits. */
 
 struct derivedintrotest : basic_ltrb<float> {
 	using introspect_base = basic_ltrb<float>;
 };
 
-struct derivedstreamtest : augs::cref_memory_stream {
+struct derivedstreamtest : augs::cref_memory_stream {};
 
-};
+using test_type_map = type_map<
+	type_pair<int, double>,
+	type_pair<double, int>,
+	type_pair<float, const char*>,
+	type_pair<const int, std::string>
+>;
+
+/* A shortcut which will be heavily used from now on */
+
+template <class A, class B>
+constexpr bool same = std::is_same_v<A, B>;
 
 struct tests_of_traits {
+	/* Functional tests. */
+
+	static void test_get_by_dynamic_id() {
+		all_entity_types t;
+
+		auto okay = get_by_dynamic_index(t, std::size_t(0), [](auto a){
+			return 20.0;	
+		});
+
+		auto okay2 = get_by_dynamic_id(t, type_in_list_id<all_entity_types>(), [](auto a){
+			return 20.0;	
+		});
+
+		using candidates = type_list<plain_missile, explosive_missile>;
+
+		auto tester = [](auto a) -> decltype(auto) {
+			using T = std::decay_t<decltype(a)>;
+			static_assert(same<T, plain_missile> || same<T, explosive_missile>);
+			return 20.0;	
+		};
+
+		auto okay3 = conditional_get_by_dynamic_index<candidates>(t, std::size_t(0), tester);
+		auto okay4 = conditional_get_by_dynamic_id<candidates>(t, type_in_list_id<all_entity_types>(), tester);
+
+		static_assert(same<double, decltype(okay)>);
+		static_assert(same<double, decltype(okay2)>);
+		static_assert(same<double, decltype(okay3)>);
+		static_assert(same<double, decltype(okay4)>);
+	}
+
+	/* One-shot asserts. */
+
+	static_assert(same<test_type_map::at<int>, double>);
+	static_assert(same<test_type_map::at<double>, int>);
+	static_assert(same<test_type_map::at<float>, const char*>);
+	static_assert(same<test_type_map::at<const int>, std::string>);
+
+	static_assert(augs::constant_size_vector_base<int, 20>::capacity(), "Trait has failed");
+
 	static_assert(augs::is_byte_stream_v<std::ifstream>);
 	static_assert(augs::is_byte_stream_v<std::ofstream>);
 	static_assert(augs::is_byte_stream_v<augs::memory_stream>);
@@ -352,36 +308,12 @@ struct tests_of_traits {
 		"Trait has failed."
 	);
 
-	struct A {
-		char a;
-	};
-
-	struct B {
-		char a[255];
-	};
-
-	struct C {
-		char a[256];
-	};
-
-	struct D {
-		char a[257];
-	};
-
-	struct E {
-		char a[65536];
-	};
-
-	struct F {
-		char a[65537];
-	};
-
-	static_assert(same<unsigned char, get_index_type_for_size_of_t<A>>, "Trait has failed");
-	static_assert(same<unsigned char, get_index_type_for_size_of_t<B>>, "Trait has failed");
-	static_assert(same<unsigned char, get_index_type_for_size_of_t<C>>, "Trait has failed");
-	static_assert(same<unsigned short, get_index_type_for_size_of_t<D>>, "Trait has failed");
-	static_assert(same<unsigned short, get_index_type_for_size_of_t<E>>, "Trait has failed");
-	static_assert(same<unsigned int, get_index_type_for_size_of_t<F>>, "Trait has failed");
+	static_assert(same<unsigned char, get_index_type_for_size_of_t<char>>, "Trait has failed");
+	static_assert(same<unsigned char, get_index_type_for_size_of_t<char[255]>>, "Trait has failed");
+	static_assert(same<unsigned char, get_index_type_for_size_of_t<char[256]>>, "Trait has failed");
+	static_assert(same<unsigned short, get_index_type_for_size_of_t<char[257]>>, "Trait has failed");
+	static_assert(same<unsigned short, get_index_type_for_size_of_t<char[65536]>>, "Trait has failed");
+	static_assert(same<unsigned int, get_index_type_for_size_of_t<char[65537]>>, "Trait has failed");
 
 	//static_assert(sizeof(cosmos) < 1000000, "Possible stack overflow due to cosmos on the stack");
 
@@ -411,70 +343,118 @@ struct tests_of_traits {
 	static_assert(has_suitable_member_assign_v<std::vector<int>, std::unordered_set<double>>);
 	static_assert(has_suitable_member_assign_v<std::vector<double>, std::unordered_set<int>>);
 	static_assert(!has_suitable_member_assign_v<std::unordered_set<int>, std::vector<double>>);
+
+	/* Type containment - tests of traits */
+
+	static_assert(can_type_contain_another_v<std::vector<int>, int>);
+	static_assert(can_type_contain_another_v<vec2, float>);
+
+	static_assert(has_types_in_v<std::tuple<int, double>>);
+	static_assert(has_types_in_v<augs::trivially_copyable_tuple<int, double>>);
+
+	static_assert(has_types_in_v<vec2>);
+	static_assert(has_types_in_v<augs::simple_pair<int, double>>);
+	static_assert(has_types_in_v<std::pair<int, double>>);
+	static_assert(!has_types_in_v<int>);
+
+	static_assert(can_type_contain_another_v<std::pair<int, double>, int>);
+	static_assert(!can_type_contain_another_v<std::pair<int, float>, double>);
+	static_assert(!can_type_contain_another_v<std::pair<int, char>, double>);
+
+	static_assert(can_type_contain_another_v<augs::simple_pair<int, double>, int>);
+	static_assert(!can_type_contain_another_v<augs::simple_pair<int, float>, double>);
+	static_assert(!can_type_contain_another_v<augs::simple_pair<int, char>, double>);
+
+	static_assert(!can_type_contain_another_v<vec2, int>);
+	static_assert(can_type_contain_another_v<std::vector<std::vector<double>>, double>);
+	static_assert(can_type_contain_another_v<std::vector<std::vector<double>>, std::vector<double>>);
+
+	static_assert(can_type_contain_another_v<std::optional<std::vector<double>>, std::vector<double>>);
+
+	static_assert(can_type_contain_another_v<
+		std::map<int, std::vector<std::unordered_map<double, char>>>, 
+		char
+	>);
+
+	static_assert(can_type_contain_another_v<
+		std::map<int, std::vector<std::unordered_map<double, char>>>, 
+		std::unordered_map<double, char>
+	>);
+
+	static_assert(can_type_contain_another_v<
+		std::map<int, std::vector<std::unordered_map<double, char>>>, 
+		const int
+	>);
+
+	static_assert(can_type_contain_another_v<
+		std::map<int, std::vector<std::unordered_map<double, char>>>, 
+		int
+	>);
 };
 
-struct blabla {};
+/* 
+	These checks will actually put the traits to use, in order to enforce some assumptions made in the code,
+	or to check for errors in their implementation.
 
-/* This will also fail if pointers or references are present */
+	For example, it will validate that the coder hasn't inserted 
+	some malicious member fields into structs important for the game to function.
+*/
 
-static_assert(!can_type_contain_another_v<cosmos_solvable_significant, blabla>);
-static_assert(!can_type_contain_another_v<cosmos_common_significant, blabla>);
+struct game_state_checks {
+	void validate_entity_types() {
+		for_each_through_std_get(
+			all_entity_types(), 
+			[](auto e) {
+				using E = decltype(e);
+				using List = invariants_and_components_of<E>;
 
-/* Invariants should not hold any ids because they are subject to invalidation */
+				for_each_through_std_get(
+					assert_always_together(),
+					[](auto constraint) {
+						using C = decltype(constraint);
+						using F = typename C::First;
+						using S = typename C::Second;
 
-void validate_no_ids_in_flavours() {
-	for_each_entity_type([](auto e) {
-		using E = decltype(e);
-		using F = entity_flavour<E>;
+						static_assert(
+							is_one_of_list_v<F, List> == is_one_of_list_v<S, List>,
+							"An entity type lacks a component/invariant to function properly."
+						);
+					}
+				);
 
-		static_assert(!can_type_contain_another_v<decltype(F::invariants), entity_id_base>);
-		static_assert(!can_type_contain_another_v<decltype(F::invariants), entity_guid>);
-	});
-}
+				for_each_through_std_get(
+					assert_never_together(),
+					[](auto constraint) {
+						using C = decltype(constraint);
+						using F = typename C::First;
+						using S = typename C::Second;
 
-/* Type containment - tests of traits */
+						static_assert(
+							!is_one_of_list_v<F, List> || !is_one_of_list_v<S, List>,
+							"An entity type defines a redundant component/invariant."
+						);
+					}
+				);
+			}
+		);
+	}
 
-static_assert(can_type_contain_another_v<std::vector<int>, int>);
-static_assert(can_type_contain_another_v<vec2, float>);
+	struct blabla {};
 
-static_assert(has_types_in_v<std::tuple<int, double>>);
-static_assert(has_types_in_v<augs::trivially_copyable_tuple<int, double>>);
+	/* This will also fail if pointers or references are present */
 
-static_assert(has_types_in_v<vec2>);
-static_assert(has_types_in_v<augs::simple_pair<int, double>>);
-static_assert(has_types_in_v<std::pair<int, double>>);
-static_assert(!has_types_in_v<int>);
+	static_assert(!can_type_contain_another_v<cosmos_solvable_significant, blabla>);
+	static_assert(!can_type_contain_another_v<cosmos_common_significant, blabla>);
 
-static_assert(can_type_contain_another_v<std::pair<int, double>, int>);
-static_assert(!can_type_contain_another_v<std::pair<int, float>, double>);
-static_assert(!can_type_contain_another_v<std::pair<int, char>, double>);
+	/* Invariants should not hold any ids because they are subject to invalidation */
 
-static_assert(can_type_contain_another_v<augs::simple_pair<int, double>, int>);
-static_assert(!can_type_contain_another_v<augs::simple_pair<int, float>, double>);
-static_assert(!can_type_contain_another_v<augs::simple_pair<int, char>, double>);
+	void validate_no_ids_in_flavours() {
+		for_each_entity_type([](auto e) {
+			using E = decltype(e);
+			using F = entity_flavour<E>;
 
-static_assert(!can_type_contain_another_v<vec2, int>);
-static_assert(can_type_contain_another_v<std::vector<std::vector<double>>, double>);
-static_assert(can_type_contain_another_v<std::vector<std::vector<double>>, std::vector<double>>);
-
-static_assert(can_type_contain_another_v<std::optional<std::vector<double>>, std::vector<double>>);
-
-static_assert(can_type_contain_another_v<
-	std::map<int, std::vector<std::unordered_map<double, char>>>, 
-	char
->);
-
-static_assert(can_type_contain_another_v<
-	std::map<int, std::vector<std::unordered_map<double, char>>>, 
-	std::unordered_map<double, char>
->);
-
-static_assert(can_type_contain_another_v<
-	std::map<int, std::vector<std::unordered_map<double, char>>>, 
-	const int
->);
-
-static_assert(can_type_contain_another_v<
-	std::map<int, std::vector<std::unordered_map<double, char>>>, 
-	int
->);
+			static_assert(!can_type_contain_another_v<decltype(F::invariants), entity_id_base>);
+			static_assert(!can_type_contain_another_v<decltype(F::invariants), entity_guid>);
+		});
+	}
+};

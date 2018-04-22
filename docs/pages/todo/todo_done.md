@@ -544,3 +544,31 @@ we consider whole type overrides too complex architeciturally:
 	- If we keep absolutes, caches will get regenerated on moving the project
 		- as they keep absolute paths
 		- Won't happen often, though
+
+- We should now handle the missing images, probably
+	- When should it catch up with the missing images?
+	- The setup (in this case, editor) might need to trigger the reloading of viewables
+		- Since it might get a clue of when the files stop being missing
+	- Even if we continuously stream, we won't waste time rebuilding the atlas if all viewables stay identical
+		- So triggering is still sort of needed
+	- In practice, will this ever be the case that we stop streaming new atlases?
+	- Not beautiful, but we could have a mutable bool last_seen_missing inside loadable
+		- ~~Then it will be the job of the atlas to set it if it was missing~~
+			- Actually... we should only ever do this inside the editor, because atlas might not always reload all viewables
+		- Actually why not just have an unordered map with missing flags, that is cleared on whenever we destroy an asset?
+
+- the problem of tracking images
+	- By default, don't show unused images
+	- on missing, we have to relink manually anyway
+	- simplest case: what if the image data consisted of just paths?
+		- Just like with sounds
+		- Then it would not make sense to have forget buttons, right?
+			- because it would only be about the path
+		- so it is only the case of what do we do with neon parameters
+			- it might be good to save a meta file so that on re-importing, we have that data again
+				- though we'll still to have to relink due to ids
+	- Images window
+		- It's fast enough so always recalculate missing files on opening Images
+		- First should show Missing files with red caption so that it catches attention
+			- Option to relink each path in particular
+		- Even earlier should go Missing custom neon maps
