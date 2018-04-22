@@ -2,7 +2,7 @@
 #include <limits>
 
 #include "augs/templates/predicate_templates.h"
-#include "augs/templates/type_matching_and_indexing.h"
+#include "augs/templates/filter_types.h"
 #include "augs/templates/type_list.h"
 
 template <class SizedType, class IndexType>

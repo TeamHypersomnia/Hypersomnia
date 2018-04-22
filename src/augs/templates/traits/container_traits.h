@@ -4,7 +4,7 @@
 #include <utility>
 
 #include "augs/templates/traits/is_std_array.h"
-#include "augs/templates/has_begin_and_end.h"
+#include "augs/templates/traits/has_begin_and_end.h"
 
 template <int t>
 struct constexpr_tester {};

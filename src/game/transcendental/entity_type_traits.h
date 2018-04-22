@@ -5,7 +5,7 @@
 #include "augs/templates/list_utils.h"
 #include "augs/templates/type_mod_templates.h"
 #include "augs/templates/transform_types.h"
-#include "augs/templates/type_matching_and_indexing.h"
+#include "augs/templates/filter_types.h"
 
 #include "game/transcendental/pool_size_type.h"
 

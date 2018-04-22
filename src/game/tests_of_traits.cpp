@@ -20,7 +20,7 @@
 #include "augs/pad_bytes.h"
 
 #include "augs/templates/introspection_utils/validate_fields_in.h"
-#include "augs/templates/type_matching_and_indexing.h"
+#include "augs/templates/filter_types.h"
 
 #include "augs/readwrite/lua_readwrite.h"
 #include "augs/readwrite/byte_readwrite.h"
