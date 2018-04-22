@@ -1,3 +1,5 @@
+#define INCLUDE_TYPES_IN 1
+
 #include "augs/string/string_templates.h"
 
 #include "augs/templates/introspection_utils/field_name_tracker.h"

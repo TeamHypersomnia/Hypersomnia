@@ -7,6 +7,8 @@ header-files:
 @HYPERSOMNIA_HEADERS_WITH_INTROSPECTED_CLASSES_NEWLINE_SEPARATED@
 generated-file-path:
 @GENERATED_SOURCES_PATH@/introspectors.h
+generated-specializations-path:
+@GENERATED_SOURCES_PATH@/specializations.h
 introspector-field-format:
 			FIELD(%x); /* %x */
 introspector-body-format:
@@ -18,6 +20,7 @@ introspector-body-format:
 		) {
 %x		}
 
+specialized-list-format:
 template <class __T%x>
 struct types_in<%x, __T>{
 	using types = type_list<%x>;
@@ -319,6 +322,9 @@ struct ImVec4;
 			>;
 		};
 
+#if INCLUDE_TYPES_IN
+#include "generated/specializations.h"
+#endif
 		/* Generated introspectors begin here */
 
 %x	};

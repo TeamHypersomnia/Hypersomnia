@@ -1,3 +1,4 @@
+#define INCLUDE_TYPES_IN 1
 #include "augs/filesystem/path.h"
 
 #include "augs/templates/traits/is_comparable.h"
