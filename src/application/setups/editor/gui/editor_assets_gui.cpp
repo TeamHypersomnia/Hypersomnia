@@ -22,6 +22,8 @@
 #include "augs/templates/introspection_utils/types_in.h"
 #include "augs/templates/list_utils.h"
 
+#include "augs/templates/introspection_utils/find_object_in_object.h"
+
 template <class id_type>
 struct asset_gui_path_entry : public browsed_path_entry_base {
 	using base = browsed_path_entry_base;
@@ -45,56 +47,10 @@ struct asset_gui_path_entry : public browsed_path_entry_base {
 	{}
 };
 
-template <class Se, class O, class F>
-void find_object_in_object(
-	const Se& searched_object,
-	const O& in_object,
-	F location_callback
-) {
-	using S = std::decay_t<Se>;
-
-	static_assert(can_type_contain_another_v<O, Se>, "This search will never find anything.");
-
-	thread_local augs::field_name_tracker fields;
-	fields.clear();
-
-	auto callback = augs::recursive(
-		[&searched_object, &location_callback](auto&& self, const auto& label, auto& field) {
-			using T = std::decay_t<decltype(field)>;
-
-			if constexpr(can_type_contain_another_v<T, Se>) {
-				if constexpr(
-					is_one_of_v<T, all_logical_assets, all_entity_flavours>
-				) {
-					/* This has a special logic */
-				}
-				else if constexpr(std::is_same_v<T, S>) {
-					if (searched_object == field) {
-						location_callback(fields.get_full_name(label));
-					}
-				}
-				else if constexpr(is_introspective_leaf_v<T>) {
-					return;
-				}
-				else if constexpr(augs::has_dynamic_content_v<T>) {
-					augs::on_dynamic_content(
-						[&](auto& dyn, auto... args) {
-							auto scope = fields.track(typesafe_sprintf("%x", args...));
-							self(self, "", dyn);
-						},
-						field
-					);
-				}
-				else {
-					auto scope = fields.track(label);
-					augs::introspect(augs::recursive(self), field);
-				}
-			}
-		}
-	);
-
-	augs::introspect(callback, in_object);
-}
+template <class T>
+struct ignore_while_looking_for_id : std::bool_constant<
+	is_one_of_v<T, all_logical_assets, all_entity_flavours>
+> {};
 
 template <class F>
 void find_locations_that_use(
@@ -103,7 +59,7 @@ void find_locations_that_use(
 	F location_callback
 ) {
 	auto traverse = [&](const std::string& preffix, const auto& object) {
-		find_object_in_object(id, object, [&](const auto& location) {
+		find_object_in_object<ignore_while_looking_for_id>(id, object, [&](const auto& location) {
 			location_callback(preffix + location);
 		});
 	};
