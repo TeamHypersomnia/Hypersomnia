@@ -34,12 +34,31 @@ image_loadables_def_view::image_loadables_def_view(
 {
 }
 
-std::optional<augs::path_type> image_loadables_def_view::find_neon_map_path() const {
-	if (def.extras.custom_neon_map_path) {
-		return *def.extras.custom_neon_map_path;
+augs::path_type image_loadables_def_view::calc_custom_neon_map_path() const {
+	return augs::path_type(resolved_source_image_path).replace_extension(".neon_map.png");
+}
+
+augs::path_type image_loadables_def_view::calc_generated_neon_map_path() const {
+	return ::get_neon_map_path(resolved_source_image_path);
+}
+
+augs::path_type image_loadables_def_view::calc_desaturation_path() const {
+	return ::get_desaturation_path(resolved_source_image_path);
+}
+
+std::optional<augs::path_type> image_loadables_def_view::find_custom_neon_map_path() const {
+	if (const auto p = calc_custom_neon_map_path();
+   		augs::exists(p)
+	) {
+		return p;
 	}
-	else if (def.extras.neon_map) {
-		return ::get_neon_map_path(resolved_source_image_path);
+
+	return std::nullopt;
+}
+
+std::optional<augs::path_type> image_loadables_def_view::find_generated_neon_map_path() const {
+	if (def.extras.generate_neon_map) {
+		return calc_generated_neon_map_path();
 	}
 
 	return std::nullopt;
@@ -47,7 +66,7 @@ std::optional<augs::path_type> image_loadables_def_view::find_neon_map_path() co
 
 std::optional<augs::path_type> image_loadables_def_view::find_desaturation_path() const {
 	if (def.should_generate_desaturation()) {
-		return ::get_desaturation_path(resolved_source_image_path);
+		return calc_desaturation_path();
 	}
 
 	return std::nullopt;
@@ -66,13 +85,11 @@ void image_loadables_def_view::regenerate_all_needed(
 ) const {
 	const auto diffuse_path = resolved_source_image_path;
 
-	if (def.extras.neon_map) {
-		ensure(!def.extras.custom_neon_map_path.has_value() && "neon_map can't be specified if custom_neon_map_path already is.");
-		
+	if (def.extras.generate_neon_map) {
 		regenerate_neon_map(
 			diffuse_path,
-			find_neon_map_path().value(),
-			def.extras.neon_map.value(),
+			find_generated_neon_map_path().value(),
+			def.extras.generate_neon_map.value(),
 			force_regenerate
 		);
 	}

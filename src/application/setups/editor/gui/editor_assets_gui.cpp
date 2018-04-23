@@ -18,11 +18,9 @@
 #include "application/setups/editor/detail/format_struct_name.h"
 #include "application/setups/editor/property_editor/asset_control_provider.h"
 #include "application/setups/editor/property_editor/general_edit_properties.h"
+#include "application/setups/editor/detail/find_locations_that_use.h"
 
-#include "augs/templates/introspection_utils/types_in.h"
 #include "augs/templates/list_utils.h"
-
-#include "augs/templates/introspection_utils/find_object_in_object.h"
 
 template <class id_type>
 struct asset_gui_path_entry : public browsed_path_entry_base {
@@ -46,60 +44,6 @@ struct asset_gui_path_entry : public browsed_path_entry_base {
 		base(from)
 	{}
 };
-
-template <class T>
-struct ignore_while_looking_for_id : std::bool_constant<
-	is_one_of_v<T, all_logical_assets, all_entity_flavours>
-> {};
-
-template <class F>
-void find_locations_that_use(
-	const assets::image_id id,
-	const intercosm& inter,
-	F location_callback
-) {
-	auto traverse = [&](const std::string& preffix, const auto& object) {
-		find_object_in_object<ignore_while_looking_for_id>(id, object, [&](const auto& location) {
-			location_callback(preffix + location);
-		});
-	};
-
-	const auto& common = inter.world.get_common_significant();
-
-	traverse("Common: ", common);
-
-	for_each_entity_type([&](auto e){ 
-		using E = decltype(e);
-		using Fl = entity_flavour<E>;
-
-		if constexpr(can_type_contain_another_v<Fl, assets::image_id>) {
-			common.get_flavours<E>().for_each([&](const auto, const auto& flavour) {
-				const auto& name = flavour.template get<invariants::name>().name;
-
-				auto for_each_through = [&](const auto& where) {
-					for_each_through_std_get(
-						where,
-						[&](const auto& c) {
-							using C = std::decay_t<decltype(c)>;
-
-							if constexpr(can_type_contain_another_v<C, assets::image_id>) {
-								find_object_in_object(id, c, [&](const auto& location) {
-									/* location_callback(format_struct_name(c) + "of " + name + ": " + location); */
-									location_callback("Flavour: " + name + " (" + format_struct_name(c) + "." + location + ")");
-								});
-							}
-						}
-					);
-				};
-
-				for_each_through(flavour.initial_components);
-				for_each_through(flavour.invariants);
-			});
-		}
-	});
-
-	//traverse("Particle effects: ", inter.viewables.particle_effects);
-}
 
 void editor_images_gui::perform(editor_command_input in) {
 	using namespace augs::imgui;
@@ -238,7 +182,7 @@ void editor_images_gui::perform(editor_command_input in) {
 						"gfx",
 						[&](const auto& chosen_path) {
 							auto& l = loadables[id];
-							change_asset_property_command<assets::image_id> cmd;
+							change_asset_property_command<asset_id_type> cmd;
 
 							cmd.affected_assets = { id };
 

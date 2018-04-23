@@ -572,3 +572,8 @@ we consider whole type overrides too complex architeciturally:
 		- First should show Missing files with red caption so that it catches attention
 			- Option to relink each path in particular
 		- Even earlier should go Missing custom neon maps
+
+- error: could not redo "create_asset_id" because "some.png" could not be found.
+	- we should just allow non-existing paths. **Ids should always be there.**
+		- if an image does not exist, we just load a fallback blank texture!
+

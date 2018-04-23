@@ -382,8 +382,13 @@ struct tests_of_traits {
 	>);
 
 	static_assert(can_type_contain_another_v<
-		std::map<int, std::vector<std::unordered_map<double, char>>>, 
-		const int
+		std::map<int, std::vector<std::unordered_map<double, std::optional<std::string>>>>, 
+		std::string
+	>);
+
+	static_assert(can_type_contain_another_v<
+		std::map<int, std::vector<std::unordered_map<double, std::optional<std::string>>>>, 
+		std::optional<std::string>
 	>);
 
 	static_assert(can_type_contain_another_v<

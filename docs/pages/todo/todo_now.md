@@ -7,6 +7,9 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
+- Fix glitch with flicker on the entire screen
+	- probably particles animation bug
+
 - use pools and pool ids for:
 	- all logical assets
 	- viewables

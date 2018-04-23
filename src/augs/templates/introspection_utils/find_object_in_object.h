@@ -3,6 +3,7 @@
 
 #include "augs/templates/introspect.h"
 #include "augs/templates/introspection_utils/field_name_tracker.h"
+#include "augs/templates/introspection_utils/types_in.h"
 
 template <template <class> class IgnorePredicate = always_false, class Se, class O, class F>
 void find_object_in_object(

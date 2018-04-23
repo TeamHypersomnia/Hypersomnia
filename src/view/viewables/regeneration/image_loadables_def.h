@@ -18,8 +18,7 @@ augs::path_type get_desaturation_path(augs::path_type from_source_image_path);
 
 struct image_extra_loadables {
 	// GEN INTROSPECTOR struct image_extra_loadables
-	std::optional<augs::path_type> custom_neon_map_path;
-	std::optional<neon_map_input> neon_map;
+	std::optional<neon_map_input> generate_neon_map;
 	bool generate_desaturation = false;
 	// END GEN INTROSPECTOR
 };
@@ -51,7 +50,12 @@ public:
 		const image_loadables_def& def
 	);
 	
-	std::optional<augs::path_type> find_neon_map_path() const;
+	augs::path_type calc_custom_neon_map_path() const;
+	augs::path_type calc_generated_neon_map_path() const;
+	augs::path_type calc_desaturation_path() const;
+
+	std::optional<augs::path_type> find_custom_neon_map_path() const;
+	std::optional<augs::path_type> find_generated_neon_map_path() const;
 	std::optional<augs::path_type> find_desaturation_path() const;
 
 	void regenerate_all_needed(const bool force_regenerate) const;

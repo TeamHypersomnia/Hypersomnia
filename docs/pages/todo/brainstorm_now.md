@@ -28,10 +28,6 @@ summary: That which we are brainstorming at the moment.
 	- a good test case for a pbo
 	- then send just image id to the imgui renderering routine
 
-- error: could not redo "create_asset_id" because "some.png" could not be found.
-	- we should just allow non-existing paths. **Ids should always be there.**
-		- if an image does not exist, we just load a fallback blank texture!
-
 - command: use_image_path
 	- won't be a standalone command really, just stored inside change flav prop command
 		- like grouping command is stored

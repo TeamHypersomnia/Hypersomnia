@@ -1,5 +1,5 @@
 return {
-	neon_map = {
+	generate_neon_map = {
       alpha_multiplier = 0.26,
       amplification = 800,
       light_colors = {
