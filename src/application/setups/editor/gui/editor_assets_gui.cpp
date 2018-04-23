@@ -22,6 +22,35 @@
 
 #include "augs/templates/list_utils.h"
 
+
+#if 0
+template <class asset_id_type>
+struct image_field_eq_predicate {
+	const all_viewables_def& defs;
+	const std::vector<asset_id_type>& ids;
+
+	template <class M>
+	bool compare(
+		const M& first,
+		const field_address field_id
+	) const {
+		if (ids.size() == 1) {
+			return true;
+		}
+
+		if constexpr(std::is_same_v<asset_id_type, assets::image_id>) {
+
+		}
+
+		flavour_property_id property_id;
+		property_id.invariant_id = invariant_id;
+		property_id.field = field_id;
+
+		return compare_all_fields_to(first, property_id, type_id, cosm, ids);
+	}
+};
+#endif
+
 template <class id_type>
 struct asset_gui_path_entry : public browsed_path_entry_base {
 	using base = browsed_path_entry_base;
@@ -45,7 +74,59 @@ struct asset_gui_path_entry : public browsed_path_entry_base {
 	{}
 };
 
-void editor_images_gui::perform(editor_command_input in) {
+template <class id_type>
+struct path_chooser_provider {
+	all_viewables_defs& defs;
+	const augs::path_type& project_path;
+
+	using handled_type = maybe_official_path;
+
+	template <class T>
+	static constexpr bool handles = std::is_same_v<T, handled_type>;
+
+	auto describe_changed(
+		const std::string& label,
+		const handled_type& from,
+		const handled_type& to
+	) const {
+		return description_pair {
+			"",
+			typesafe_sprintf("Changed image path from %x", describe_moved_file(from.path, to.path))
+		};
+	}
+
+	bool handle(const std::string& label, handled_type& object, const field_address& address) const {
+		auto& loadables = defs.image_loadables;
+
+		bool modified = false;
+
+		choose_asset_path(
+			"##Source-path",
+			object,
+			project_path,
+			"gfx",
+			[&](const auto& chosen_path) {
+				object = chosen_path;
+				modified = true;
+			},
+			[&](const auto& candidate_path) {
+				if (const auto asset_id = ::find_asset_id_by_path(candidate_path, loadables)) {
+					return false;
+				}
+
+				return true;
+			},
+			"Already tracked paths"
+		);
+
+		return modified;
+	}
+};
+
+void editor_images_gui::perform(
+	const property_editor_settings& settings,
+   	editor_command_input cmd_in
+) {
 	using namespace augs::imgui;
 
 	auto window = make_scoped_window();
@@ -54,7 +135,7 @@ void editor_images_gui::perform(editor_command_input in) {
 		return;
 	}
 
-	auto& folder = in.folder;
+	auto& folder = cmd_in.folder;
 	auto& work = *folder.work;
 
 	auto& viewables = work.viewables;
@@ -152,10 +233,10 @@ void editor_images_gui::perform(editor_command_input in) {
 
 	auto& tree_settings = browser_settings.tree_settings;
 
-	auto& history = in.folder.history;
+	auto& history = cmd_in.folder.history;
 
 	if (tree_settings.linear_view) {
-		ImGui::Columns(3);
+		ImGui::Columns(4);
 
 		int i = 0;
 
@@ -172,68 +253,97 @@ void editor_images_gui::perform(editor_command_input in) {
 			}
 
 			{
-				const auto& project_path = in.folder.current_path;
+				const auto& project_path = cmd_in.folder.current_path;
 
-				if (auto node = scoped_tree_node(displayed_name.c_str())) {
-					choose_asset_path(
-						"Source image",
-						path_entry.get_full_path(),
-						project_path,
-						"gfx",
-						[&](const auto& chosen_path) {
-							auto& l = loadables[id];
-							change_asset_property_command<asset_id_type> cmd;
+				const auto node = scoped_tree_node(displayed_name.c_str());
 
-							cmd.affected_assets = { id };
+				ImGui::NextColumn();
+				ImGui::NextColumn();
 
-							cmd.built_description = typesafe_sprintf("Changed image path from %x", describe_moved_file(l.source_image.path, chosen_path.path));
-							cmd.field = make_field_address(&image_loadables_def::source_image);
-							cmd.value_after_change = augs::to_bytes(chosen_path);
+				text_disabled(displayed_dir);
 
-							history.execute_new(std::move(cmd), in);
-						},
-						[&](const auto& candidate_path) {
-							if (const auto asset_id = ::find_asset_id_by_path(candidate_path, loadables)) {
-								return false;
-							}
+				ImGui::NextColumn();
 
-							return true;
-						},
-						"Already tracked paths"
-					);
+				if (path_entry.used()) {
+					const auto& using_locations = path_entry.using_locations;
+
+					if (auto node = scoped_tree_node(typesafe_sprintf("%x locations###locations", using_locations.size()).c_str())) {
+						for (const auto& l : using_locations) {
+							text(l);
+						}
+					}
 				}
-			}
+				else {
+					const auto scoped_style = scoped_style_var(ImGuiStyleVar_FramePadding, ImVec2(3, 0));
 
-			ImGui::NextColumn();
+					if (ImGui::Button("Forget")) {
+						forget_asset_id_command<asset_id_type> cmd;
+						cmd.forgotten_id = path_entry.id;
+						cmd.built_description = 
+							typesafe_sprintf("Stopped tracking %x", path_entry.get_full_path().to_display())
+						;
 
-			text_disabled(displayed_dir);
+						history.execute_new(std::move(cmd), cmd_in);
+					}
+				}
 
-			ImGui::NextColumn();
+				ImGui::NextColumn();
 
-			if (path_entry.used()) {
-				const auto& using_locations = path_entry.using_locations;
+				if (node) {
+					{
+						const auto property_location = typesafe_sprintf(" (in %x)", displayed_name);
 
-				if (auto node = scoped_tree_node(typesafe_sprintf("%x locations###locations", using_locations.size()).c_str())) {
-					for (const auto& l : using_locations) {
-						text(l);
+						auto& history = cmd_in.folder.history;
+						auto& defs = cmd_in.folder.work->viewables;
+
+						using command_type = change_asset_property_command<asset_id_type>;
+
+						auto post_new_change = [&](
+							const auto& description,
+							const auto field_id,
+							const auto& new_content
+						) {
+							command_type cmd;
+							cmd.affected_assets = { id };
+							cmd.field = field_id;
+							cmd.value_after_change = augs::to_bytes(new_content);
+							cmd.built_description = description + property_location;
+
+							history.execute_new(std::move(cmd), cmd_in);
+						};
+
+						auto rewrite_last_change = [&](
+							const auto& description,
+							const auto& new_content
+						) {
+							auto& last = history.last_command();
+
+							if (auto* const cmd = std::get_if<command_type>(std::addressof(last))) {
+								cmd->built_description = description + property_location;
+								cmd->rewrite_change(augs::to_bytes(new_content), cmd_in);
+							}
+							else {
+								LOG("WARNING! There was some problem with tracking activity of editor controls.");
+							}
+						};
+
+						const auto project_path = cmd_in.folder.current_path;
+
+						auto prop_in = property_editor_input { settings, property_editor_data };
+
+						general_edit_properties(
+							prop_in,
+							loadables[id],
+							post_new_change,
+							rewrite_last_change,
+							{},
+							path_chooser_provider<asset_id_type> { viewables, project_path },
+							2
+						);
 					}
 				}
 			}
-			else {
-				const auto scoped_style = scoped_style_var(ImGuiStyleVar_FramePadding, ImVec2(3, 0));
 
-				if (ImGui::Button("Forget")) {
-					forget_asset_id_command<asset_id_type> cmd;
-					cmd.forgotten_id = path_entry.id;
-					cmd.built_description = 
-						typesafe_sprintf("Stopped tracking %x", path_entry.get_full_path().to_display())
-					;
-
-					history.execute_new(std::move(cmd), in);
-				}
-			}
-
-			ImGui::NextColumn();
 		};
 
 		auto do_section = [&](
@@ -253,6 +363,9 @@ void editor_images_gui::perform(editor_command_input in) {
 			}
 
 			ImGui::NextColumn();
+			text_disabled("Properties");
+
+			ImGui::NextColumn();
 			text_disabled(labels[1]);
 			ImGui::NextColumn();
 			text_disabled(labels[2]);
@@ -269,27 +382,27 @@ void editor_images_gui::perform(editor_command_input in) {
 		if (browser_settings.show_orphaned) {
 			do_section(
 				missing_orphaned_paths,
-				{ "Missing paths (orphaned)", "Last seen location", "Operations" },
+				{ "Missing paths (orphaned)", "Last seen in", "Operations" },
 				red
 			);
 		}
 
 		do_section(
 			missing_paths,
-			{ "Missing paths", "Last seen location", "Used at" },
+			{ "Missing paths", "Last seen in", "Used at" },
 			red
 		);
 
 		if (browser_settings.show_orphaned) {
 			do_section(
 				orphaned_paths,
-				{ "Orphaned images", "Location", "Operations" }
+				{ "Orphaned images", "Folder", "Operations" }
 			);
 		}
 
 		do_section(
 			used_paths,
-			{ "Images", "Location", "Used at" }
+			{ "Images", "Folder", "Used at" }
 		);
 	}
 	else {

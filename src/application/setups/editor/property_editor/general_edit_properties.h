@@ -1,7 +1,7 @@
 #pragma once
 #include "augs/pad_bytes.h"
 #include "game/assets/ids/is_asset_id.h"
-#include "augs/templates/traits/is_tuple.h"
+#include "augs/templates/traits/is_value_with_flag.h"
 #include "augs/templates/folded_finders.h"
 #include "augs/string/string_templates_declaration.h"
 #include "augs/drawing/flip.h"
@@ -24,12 +24,25 @@ auto maybe_different_value_cols(
 ) {
 	using namespace augs::imgui;
 
-	const bool values_different = !pred.compare(first, field_id);
+	const bool values_different = !pred(first, field_id);
 
 	return std::make_tuple(
 		cond_scoped_style_color(values_different, ImGuiCol_FrameBg, settings.different_values_frame_bg),
 		cond_scoped_style_color(values_different, ImGuiCol_FrameBgHovered, settings.different_values_frame_hovered_bg),
 		cond_scoped_style_color(values_different, ImGuiCol_FrameBgActive, settings.different_values_frame_active_bg)
+	);
+};
+
+inline auto maybe_disabled_cols(
+	const property_editor_settings& settings,
+	const bool are_disabled
+) {
+	using namespace augs::imgui;
+
+	return std::make_tuple(
+		cond_scoped_style_color(are_disabled, ImGuiCol_FrameBg, rgba(settings.different_values_frame_bg).desaturate()),
+		cond_scoped_style_color(are_disabled, ImGuiCol_FrameBgHovered, rgba(settings.different_values_frame_hovered_bg).desaturate()),
+		cond_scoped_style_color(are_disabled, ImGuiCol_FrameBgActive, rgba(settings.different_values_frame_active_bg).desaturate())
 	);
 };
 
@@ -85,7 +98,7 @@ template <
    	class T,
    	class G,
    	class H,
-	class Eq,
+	class Eq = true_returner,
 	class S = default_control_provider
 >
 void general_edit_properties(
@@ -93,10 +106,16 @@ void general_edit_properties(
 	const T& object,
 	G post_new_change_impl,
 	H rewrite_last_change_impl,
-	Eq field_equality_predicate,
-	const S& special_control_provider = {}
+	Eq field_equality_predicate = {},
+	const S& special_control_provider = {},
+	const int extra_columns = 0
 ) {
 	using namespace augs::imgui;
+
+	auto do_extra_columns = [extra_columns]() { 
+		int n = extra_columns;
+		while (n--) { ImGui::NextColumn(); }
+	};
 
 	{
 		auto& last_active = prop_in.state.last_active;
@@ -177,10 +196,12 @@ void general_edit_properties(
 		}
 
 		ImGui::NextColumn();
+
+		do_extra_columns();
 	};
 
 	augs::introspect(
-		augs::recursive([&](auto self, const auto& label, const auto& original_member) {
+		augs::recursive([&](auto self, const auto& label, const auto& original_member, const bool nodify_introspected = true) {
 			using M = std::decay_t<decltype(original_member)>;
 
 			static constexpr bool should_skip = 
@@ -191,8 +212,10 @@ void general_edit_properties(
 			if constexpr(!should_skip) {
 				const auto formatted_label = format_field_name(label);
 
-				auto make_input = [&formatted_label, &object](const tweaker_type type, auto& original, auto& altered) {
-					return tweaker_input<M> {
+				auto make_input = [&formatted_label, &object](const tweaker_type type, const auto& original, const auto& altered) {
+					using MM = std::remove_const_t<std::remove_reference_t<decltype(original)>>;
+
+					return tweaker_input<MM> {
 						type,
 						formatted_label,
 						::make_field_address(object, original),
@@ -212,7 +235,8 @@ void general_edit_properties(
 					do_tweaker(in, [&]() { 
 						return special_control_provider.handle(
 							identity_label, 
-							altered
+							altered,
+							in.field_location
 						);
 					});
 				}
@@ -242,9 +266,6 @@ void general_edit_properties(
 					do_tweaker(in, [&]() { 
 						return checkbox(identity_label, altered);
 					});
-				}
-				else if constexpr(is_container_v<M>) {
-
 				}
 				else if constexpr(std::is_arithmetic_v<M>) {
 					auto in = make_input(tweaker_type::CONTINUOUS, original, altered);
@@ -295,20 +316,48 @@ void general_edit_properties(
 					/* next_column_text(); */
 				}
 				else {
-					const auto object_node = scoped_tree_node_ex(formatted_label);
+					if constexpr(is_value_with_flag_v<M>) {
+						{
+							auto in = make_input(
+								tweaker_type::DISCRETE,
+							   	original.is_enabled,
+								altered.is_enabled
+							);
 
-#if 0
-					if constexpr(is_tuple_v<M>) {
-						next_column_text("Tuple");
+							do_tweaker(in, [&]() {
+								if (checkbox(identity_label, altered.is_enabled)) {
+									return true;
+								}
+
+								return false;
+							});
+						}
+
+						auto cols = maybe_disabled_cols(prop_in.settings, !altered.is_enabled);
+
+						augs::recursive(self)(label, original_member.value, false);
+					}
+					else if constexpr(is_container_v<M>) {
+
 					}
 					else {
-						next_column_text(get_type_name<M>());
-					}
-#endif
-					next_column_text();
+						if (nodify_introspected) {
+							const auto object_node = scoped_tree_node_ex(formatted_label);
 
-					if (object_node) {
-						augs::introspect(augs::recursive(self), original);
+							ImGui::NextColumn();
+							ImGui::NextColumn();
+
+							do_extra_columns();
+
+							if (object_node) {
+								augs::introspect(augs::recursive(self), original);
+							}
+						}
+						else {
+							auto ind = scoped_indent();
+
+							augs::introspect(augs::recursive(self), original);
+						}
 					}
 				}
 			}

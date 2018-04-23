@@ -228,18 +228,15 @@ namespace augs {
 							if (sol::object enabled_field = input_table[std::string("enabled_") + label];
 								enabled_field.valid()
 							) {
-								typename T::value_type value;
-								read_lua(enabled_field, value);
-								field.emplace(std::move(value));
+								read_lua(enabled_field, field.value);
+								field.is_enabled = true;
 							}
 
 							if (sol::object disabled_field = input_table[std::string("disabled_") + label];
 								disabled_field.valid()
 							) {
-								typename T::value_type value;
-								read_lua(disabled_field, value);
-								field.emplace(std::move(value));
-								field.reset();
+								read_lua(disabled_field, field.value);
+								field.is_enabled = false;
 							}
 						}
 						else if constexpr(!is_padding_field_v<T>) {
@@ -403,10 +400,10 @@ namespace augs {
 					}
 					else if constexpr(is_value_with_flag_v<T>) {
 						if (field) {
-							write_table_or_field(output_table, field.value(), std::string("enabled_") + label);
+							write_table_or_field(output_table, field.value, std::string("enabled_") + label);
 						}
 						else {
-							write_table_or_field(output_table, field.value(), std::string("disabled_") + label);
+							write_table_or_field(output_table, field.value, std::string("disabled_") + label);
 						}
 					}
 					else if constexpr(!is_padding_field_v<T>) {

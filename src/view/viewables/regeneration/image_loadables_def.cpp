@@ -89,7 +89,7 @@ void image_loadables_def_view::regenerate_all_needed(
 		regenerate_neon_map(
 			diffuse_path,
 			find_generated_neon_map_path().value(),
-			def.extras.generate_neon_map.value(),
+			def.extras.generate_neon_map.value,
 			force_regenerate
 		);
 	}

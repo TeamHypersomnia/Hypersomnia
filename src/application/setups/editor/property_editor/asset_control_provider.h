@@ -145,7 +145,7 @@ struct asset_control_provider {
 	}
 
 	template <class T>
-	bool handle(const std::string& label, T& object) const {
+	bool handle(const std::string& label, T& object, const field_address&) const {
 		bool changed = false;
 
 		if constexpr(std::is_same_v<T, assets::image_id>) {

@@ -395,6 +395,8 @@ struct tests_of_traits {
 		std::map<int, std::vector<std::unordered_map<double, char>>>, 
 		int
 	>);
+
+	static_assert(std::is_trivially_copyable_v<augs::value_with_flag<int>>);
 };
 
 /* 

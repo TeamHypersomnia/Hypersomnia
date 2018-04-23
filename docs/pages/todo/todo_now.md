@@ -7,6 +7,10 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
+- sound buffer input should not hold path template to be typesafe_sprintfed
+	- rather, let it keep path to the first file. We'll alter check if ``_2``, ``_3`` etc. exist.
+	- We'll just check if it ends with ``_1.ext``
+
 - Fix glitch with flicker on the entire screen
 	- probably particles animation bug
 

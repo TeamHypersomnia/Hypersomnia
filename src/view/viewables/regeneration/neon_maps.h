@@ -8,8 +8,8 @@
 struct neon_map_input {
 	// GEN INTROSPECTOR struct neon_map_input
 	float standard_deviation = 0.f;
-	unsigned radius_towards_x_axis = 0xdeadbeef;
-	unsigned radius_towards_y_axis = 0xdeadbeef;
+	unsigned radius_towards_x_axis = 0;
+	unsigned radius_towards_y_axis = 0;
 	float amplification = 0.f;
 	float alpha_multiplier = 1.f;
 

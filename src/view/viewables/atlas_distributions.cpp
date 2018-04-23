@@ -19,7 +19,6 @@ augs::graphics::texture standard_atlas_distribution(const standard_atlas_distrib
 
 	for (const auto& d : in.image_loadables) {
 		const auto def = make_view(d);
-		LOG_NVPS(d.extras.generate_neon_map.has_value());
 
 		try {
 			def.regenerate_all_needed(in.settings.force_regenerate);

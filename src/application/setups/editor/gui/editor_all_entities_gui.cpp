@@ -7,7 +7,7 @@ void editor_all_entities_gui::interrupt_tweakers() {
 	property_editor_data.old_description.clear();
 }
 
-#if BUILD_PROPERTY_EDITOR
+#if 0//BUILD_PROPERTY_EDITOR
 
 #include "augs/templates/for_each_std_get.h"
 

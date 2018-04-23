@@ -28,13 +28,6 @@ struct should_skip_in_common : std::bool_constant<
 	is_one_of_v<T, all_logical_assets, all_entity_flavours>
 > {};
 
-struct common_field_eq_predicate {
-	template <class... Args>
-	bool compare(Args&&...) const {
-		return true;
-	}
-};
-
 static void edit_common(
 	const commanding_property_editor_input& in,
 	const cosmos_common_significant& signi
@@ -86,7 +79,7 @@ static void edit_common(
 		signi,
 		post_new_change,
 		rewrite_last_change,
-		common_field_eq_predicate(),
+		true_returner(),
 		asset_control_provider { defs, project_path, cmd_in }
 	);
 }

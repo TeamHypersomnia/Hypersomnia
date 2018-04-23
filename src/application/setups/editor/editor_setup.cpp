@@ -414,7 +414,7 @@ void editor_setup::perform_custom_imgui(
 
 		summary_gui.perform(*this);
 
-		images_gui.perform(make_command_input());
+		images_gui.perform(settings.property_editor, make_command_input());
 
 		const auto all_selected = [&]() -> decltype(get_all_selected_entities()) {
 			auto selections = get_all_selected_entities();

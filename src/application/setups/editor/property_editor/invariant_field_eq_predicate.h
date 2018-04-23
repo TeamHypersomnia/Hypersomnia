@@ -12,7 +12,7 @@ struct invariant_field_eq_predicate {
 	const affected_flavours_type& ids;
 	
 	template <class M>
-	bool compare(
+	bool operator()(
 		const M& first,
 	   	const field_address field_id
 	) const {
