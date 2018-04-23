@@ -7,6 +7,7 @@
 #include "augs/string/get_type_name.h"
 #include "augs/templates/traits/is_variant.h"
 #include "augs/templates/traits/is_optional.h"
+#include "augs/templates/traits/is_value_with_flag.h"
 #include "augs/templates/traits/is_pair.h"
 #include "augs/templates/exception_templates.h"
 #include "augs/templates/container_templates.h"
@@ -81,8 +82,8 @@ namespace augs {
 	template <class Serialized>
 	void read_lua(sol::object input_object, Serialized& into) {
 		static_assert(
-			!is_optional_v<Serialized>,
-			"std::optional can only be serialized as a member object."
+			!is_optional_v<Serialized> && !is_value_with_flag_v<Serialized>,
+			"std::optional and value_with_flag can only be serialized as a member object."
 		);
 
 		static_assert(!std::is_const_v<Serialized>, "Trying to read into a const object.");
@@ -219,8 +220,26 @@ namespace augs {
 							
 							if (maybe_field.valid()) {
 								typename T::value_type value;
-								read_lua(input_table[label], value);
+								read_lua(maybe_field, value);
 								field.emplace(std::move(value));
+							}
+						}
+						else if constexpr(is_value_with_flag_v<T>) {
+							if (sol::object enabled_field = input_table[std::string("enabled_") + label];
+								enabled_field.valid()
+							) {
+								typename T::value_type value;
+								read_lua(enabled_field, value);
+								field.emplace(std::move(value));
+							}
+
+							if (sol::object disabled_field = input_table[std::string("disabled_") + label];
+								disabled_field.valid()
+							) {
+								typename T::value_type value;
+								read_lua(disabled_field, value);
+								field.emplace(std::move(value));
+								field.reset();
 							}
 						}
 						else if constexpr(!is_padding_field_v<T>) {
@@ -299,7 +318,7 @@ namespace augs {
 		);
 
 		static_assert(
-			!is_optional_v<Serialized>, 
+			!is_optional_v<Serialized> && !is_value_with_flag_v<Serialized>,
 			"std::optional can only be serialized as a member object."
 		);
 
@@ -380,6 +399,14 @@ namespace augs {
 					if constexpr(is_optional_v<T>) {
 						if (field) {
 							write_table_or_field(output_table, field.value(), label);
+						}
+					}
+					else if constexpr(is_value_with_flag_v<T>) {
+						if (field) {
+							write_table_or_field(output_table, field.value(), std::string("enabled_") + label);
+						}
+						else {
+							write_table_or_field(output_table, field.value(), std::string("disabled_") + label);
 						}
 					}
 					else if constexpr(!is_padding_field_v<T>) {

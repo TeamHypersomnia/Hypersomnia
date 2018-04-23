@@ -3,6 +3,7 @@
 
 #include "augs/misc/enum/enum_array.h"
 #include "augs/misc/enum/enum_map.h"
+#include "augs/templates/value_with_flag.h"
 #include "augs/filesystem/path.h"
 
 #include "augs/drawing/flip.h"
@@ -18,7 +19,7 @@ augs::path_type get_desaturation_path(augs::path_type from_source_image_path);
 
 struct image_extra_loadables {
 	// GEN INTROSPECTOR struct image_extra_loadables
-	std::optional<neon_map_input> generate_neon_map;
+	augs::value_with_flag<neon_map_input> generate_neon_map;
 	bool generate_desaturation = false;
 	// END GEN INTROSPECTOR
 };
