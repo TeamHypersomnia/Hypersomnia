@@ -317,7 +317,7 @@ void editor_images_gui::perform(
 						history.execute_new(std::move(cmd), cmd_in);
 					};
 
-					if (current_selected) {
+					if (!current_selected) {
 						forget(path_entry, false);
 					}
 					else {

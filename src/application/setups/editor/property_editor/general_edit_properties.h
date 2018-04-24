@@ -64,111 +64,27 @@ struct tweaker_input {
 	const M& new_value;
 };
 
+template <class F, class S>
+struct detail_edit_properties_input {
+	const F tweaker_callback;
+	const S special_control_provider;
+	const property_editor_settings& settings;
+	const int extra_columns;
+};
+
 template <
 	template <class> class SkipPredicate = always_false,
-   	class T,
-   	class G,
-   	class H,
-	class Eq = true_returner,
-	class S = default_control_provider
+	class I,
+	class T
 >
-void general_edit_properties(
-	const property_editor_input prop_in,
-	const T& object,
-	G post_new_change_impl,
-	H rewrite_last_change_impl,
-	Eq field_equality_predicate = {},
-	const S& special_control_provider = {},
-	const int extra_columns = 0
+void detail_general_edit_properties(
+	const I input,
+	const T& object
 ) {
 	using namespace augs::imgui;
+	using S = std::decay_t<decltype(input.special_control_provider)>;
 
-	auto do_extra_columns = [extra_columns]() { 
-		int n = extra_columns;
-		while (n--) { ImGui::NextColumn(); }
-	};
-
-	{
-		auto& last_active = prop_in.state.last_active;
-
-		if (last_active && last_active.value() != ImGui::GetActiveID()) {
-			last_active.reset();
-		}
-	}
-
-	auto& old_description = prop_in.state.old_description;
-
-	auto post_new_change = [&](
-		const description_pair& description,
-		const auto field_id,
-		const auto& new_content
-	) {
-		old_description = description.of_old;
-		const auto new_description = old_description + description.of_new;
-
-		post_new_change_impl(new_description, field_id, new_content);
-	};
-
-	auto rewrite_last = [&](
-		const auto& description,
-		const auto& new_content
-	) {
-		rewrite_last_change_impl(old_description + description, new_content);
-	};
-
-	auto do_tweaker = [&](
-		const auto tw_in,
-		auto control_callback
-	) {
-		const auto type = tw_in.type;
-		const auto& field_name = tw_in.field_name;
-		const auto& field_location = tw_in.field_location;
-		const auto& old_value = tw_in.old_value;
-		const auto& new_value = tw_in.new_value;
-
-		ImGui::Bullet();
-		text(field_name);
-		ImGui::NextColumn();
-		auto scope = scoped_item_width(-1);
-
-
-		const auto colors = ::maybe_different_value_cols(
-			prop_in.settings,
-			!field_equality_predicate(old_value, field_location)
-		);
-
-		if (control_callback()) {
-			if (type == tweaker_type::DISCRETE) {
-				post_new_change(
-					::describe_changed(field_name, old_value, new_value, special_control_provider),
-					field_location,
-					new_value
-				);
-			}
-			else if (type == tweaker_type::CONTINUOUS) {
-				const auto this_id = ImGui::GetActiveID();
-				const auto description = ::describe_changed(field_name, old_value, new_value, special_control_provider);
-
-				auto& last_active = prop_in.state.last_active;
-
-				if (last_active != this_id) {
-					post_new_change(description, field_location, new_value);
-				}
-				else {
-					rewrite_last(description.of_new, new_value);
-				}
-
-				last_active = this_id;
-			}
-			else {
-
-			}
-		}
-
-		ImGui::NextColumn();
-
-		do_extra_columns();
-	};
+	const auto& do_tweaker = input.tweaker_callback;
 
 	augs::introspect(
 		augs::recursive([&](auto self, const auto& label, const auto& original_member, const bool nodify_introspected = true) {
@@ -203,7 +119,7 @@ void general_edit_properties(
 					auto in = make_input(tweaker_type::DISCRETE, original, altered);
 
 					do_tweaker(in, [&]() { 
-						return special_control_provider.handle(
+						return input.special_control_provider.handle(
 							identity_label, 
 							altered,
 							in.field_location
@@ -303,7 +219,7 @@ void general_edit_properties(
 							});
 						}
 
-						auto cols = maybe_disabled_cols(prop_in.settings, !altered.is_enabled);
+						auto cols = maybe_disabled_cols(input.settings, !altered.is_enabled);
 
 						augs::recursive(self)(label, original_member.value, false);
 					}
@@ -317,7 +233,7 @@ void general_edit_properties(
 							ImGui::NextColumn();
 							ImGui::NextColumn();
 
-							do_extra_columns();
+							next_columns(input.extra_columns);
 
 							if (object_node) {
 								augs::introspect(augs::recursive(self), original);
@@ -332,6 +248,115 @@ void general_edit_properties(
 				}
 			}
 		}),
+		object
+	);
+}
+
+template <
+	template <class> class SkipPredicate = always_false,
+   	class T,
+   	class G,
+   	class H,
+	class Eq = true_returner,
+	class S = default_control_provider
+>
+void general_edit_properties(
+	const property_editor_input prop_in,
+	const T& object,
+	G post_new_change_impl,
+	H rewrite_last_change_impl,
+	Eq field_equality_predicate = {},
+	const S special_control_provider = {},
+	const int extra_columns = 0
+) {
+	using namespace augs::imgui;
+
+	{
+		auto& last_active = prop_in.state.last_active;
+
+		if (last_active && last_active.value() != ImGui::GetActiveID()) {
+		last_active.reset();
+		}
+	}
+
+	auto& old_description = prop_in.state.old_description;
+
+	auto post_new_change = [&](
+		const description_pair& description,
+		const auto field_id,
+		const auto& new_content
+	) {
+		old_description = description.of_old;
+		const auto new_description = old_description + description.of_new;
+
+		post_new_change_impl(new_description, field_id, new_content);
+	};
+
+	auto rewrite_last = [&](
+		const auto& description,
+		const auto& new_content
+	) {
+		rewrite_last_change_impl(old_description + description, new_content);
+	};
+
+	auto do_tweaker = [&](
+		const auto tw_in,
+		auto control_callback
+	) {
+		const auto type = tw_in.type;
+		const auto& field_name = tw_in.field_name;
+		const auto& field_location = tw_in.field_location;
+		const auto& old_value = tw_in.old_value;
+		const auto& new_value = tw_in.new_value;
+
+		ImGui::Bullet();
+		text(field_name);
+		ImGui::NextColumn();
+		auto scope = scoped_item_width(-1);
+
+
+		const auto colors = ::maybe_different_value_cols(
+			prop_in.settings,
+			!field_equality_predicate(old_value, field_location)
+		);
+
+		if (control_callback()) {
+			if (type == tweaker_type::DISCRETE) {
+				post_new_change(
+					::describe_changed(field_name, old_value, new_value, special_control_provider),
+					field_location,
+					new_value
+				);
+			}
+			else if (type == tweaker_type::CONTINUOUS) {
+				const auto this_id = ImGui::GetActiveID();
+				const auto description = ::describe_changed(field_name, old_value, new_value, special_control_provider);
+
+				auto& last_active = prop_in.state.last_active;
+
+				if (last_active != this_id) {
+					post_new_change(description, field_location, new_value);
+				}
+				else {
+					rewrite_last(description.of_new, new_value);
+				}
+
+				last_active = this_id;
+			}
+		}
+
+		ImGui::NextColumn();
+
+		next_columns(extra_columns);
+	};
+
+	detail_general_edit_properties(
+		detail_edit_properties_input<decltype(do_tweaker), S> { 
+			do_tweaker, 
+			special_control_provider,
+			prop_in.settings,
+			extra_columns
+		},
 		object
 	);
 }

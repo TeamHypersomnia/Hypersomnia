@@ -36,6 +36,12 @@ namespace augs {
 			}
 		}
 
+		inline void next_columns(int times) {
+			while (times--) {
+				ImGui::NextColumn();
+			}
+		}
+
 		template <std::size_t buffer_size = 1000, class... Args>
 		bool input_text(const std::string& label, std::string& value, Args&&... args) {
 			std::array<char, buffer_size> buf;
