@@ -58,12 +58,7 @@ void editor_history_gui::perform(const editor_command_input in) {
 		if (command_index > current_revision) {
 			++colors;
 
-			auto header_hover_color = style.Colors[ImGuiCol_Button];
-
-			header_hover_color.x /= 1.3;
-			header_hover_color.y /= 1.3;
-			header_hover_color.z /= 1.3;
-
+			const auto header_hover_color = rgba(style.Colors[ImGuiCol_Button]).multiply_rgb(1 / 1.3f);
 			ImGui::PushStyleColor(ImGuiCol_HeaderHovered, header_hover_color);
 		}
 

@@ -577,3 +577,7 @@ we consider whole type overrides too complex architeciturally:
 	- we should just allow non-existing paths. **Ids should always be there.**
 		- if an image does not exist, we just load a fallback blank texture!
 
+- sound buffer input should not hold path template to be typesafe_sprintfed
+	- rather, let it keep path to the first file. We'll alter check if ``_2``, ``_3`` etc. exist.
+	- We'll just check if it ends with ``_1.ext``
+

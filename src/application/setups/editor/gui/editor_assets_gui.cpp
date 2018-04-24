@@ -208,12 +208,6 @@ void editor_images_gui::perform(
 	);
 
 	acquire_missing_paths = false;
-
-	sort_range(missing_orphaned_paths);
-	sort_range(missing_paths);
-
-	sort_range(orphaned_paths);
-	sort_range(used_paths);
 	
 	browser_settings.do_tweakers();
 
@@ -228,121 +222,169 @@ void editor_images_gui::perform(
 
 	acquire_keyboard_once();
 
-	auto files_view = scoped_child("Files view");
-
 	auto& tree_settings = browser_settings.tree_settings;
+
+	auto for_each_range = [](auto callback) {
+		callback(missing_orphaned_paths);
+		callback(missing_paths);
+
+		callback(orphaned_paths);
+		callback(used_paths);
+	};
+
+	auto prepare_range = [&](auto& r){
+		erase_if(r, [&](const auto& entry){
+			const auto displayed_name = tree_settings.get_prettified(entry.get_filename());
+			const auto displayed_dir = entry.get_displayed_directory();
+
+			if (!filter.PassFilter(displayed_name.c_str()) && !filter.PassFilter(displayed_dir.c_str())) {
+				return true;
+			}
+
+			return false;
+		});
+
+		sort_range(r);
+	};
+
+	for_each_range(prepare_range);
+
+	auto files_view = scoped_child("Files view");
 
 	auto& history = cmd_in.folder.history;
 
+	const auto num_cols = 4;
+
 	if (tree_settings.linear_view) {
-		ImGui::Columns(4);
+		ImGui::Columns(num_cols);
 
 		int i = 0;
 
 		auto do_path = [&](const auto& path_entry) {
 			auto scope = scoped_id(i++);
 
+			const auto id = path_entry.id;
+
 			const auto displayed_name = tree_settings.get_prettified(path_entry.get_filename());
 			const auto displayed_dir = path_entry.get_displayed_directory();
 
-			const auto id = path_entry.id;
+			auto scoped_style = scoped_style_var(ImGuiStyleVar_ItemSpacing, ImVec2(3, 1));
+			auto scoped_style2 = scoped_style_var(ImGuiStyleVar_FramePadding, ImVec2(1, 1));
 
-			if (!filter.PassFilter(displayed_name.c_str()) && !filter.PassFilter(displayed_dir.c_str())) {
-				return;
-			}
+			const auto is_selected = found_in(selected_images, id);
 
 			{
-				const auto& project_path = cmd_in.folder.current_path;
+				bool altered = is_selected;
 
-				const auto node = scoped_tree_node(displayed_name.c_str());
-
-				ImGui::NextColumn();
-				ImGui::NextColumn();
-
-				text_disabled(displayed_dir);
-
-				ImGui::NextColumn();
-
-				if (path_entry.used()) {
-					const auto& using_locations = path_entry.using_locations;
-
-					if (auto node = scoped_tree_node(typesafe_sprintf("%x locations###locations", using_locations.size()).c_str())) {
-						for (const auto& l : using_locations) {
-							text(l);
-						}
+				if (checkbox(typesafe_sprintf("###%x", i).c_str(), altered)) {
+					if (is_selected && !altered) {
+						erase_element(selected_images, id);
 					}
-				}
-				else {
-					const auto scoped_style = scoped_style_var(ImGuiStyleVar_FramePadding, ImVec2(3, 0));
-
-					if (ImGui::Button("Forget")) {
-						forget_asset_id_command<asset_id_type> cmd;
-						cmd.forgotten_id = path_entry.id;
-						cmd.built_description = 
-							typesafe_sprintf("Stopped tracking %x", path_entry.get_full_path().to_display())
-						;
-
-						history.execute_new(std::move(cmd), cmd_in);
-					}
-				}
-
-				ImGui::NextColumn();
-
-				if (node) {
-					{
-						const auto property_location = typesafe_sprintf(" (in %x)", displayed_name);
-
-						auto& history = cmd_in.folder.history;
-						auto& defs = cmd_in.folder.work->viewables;
-
-						using command_type = change_asset_property_command<asset_id_type>;
-
-						auto post_new_change = [&](
-							const auto& description,
-							const auto field_id,
-							const auto& new_content
-						) {
-							command_type cmd;
-							cmd.affected_assets = { id };
-							cmd.field = field_id;
-							cmd.value_after_change = augs::to_bytes(new_content);
-							cmd.built_description = description + property_location;
-
-							history.execute_new(std::move(cmd), cmd_in);
-						};
-
-						auto rewrite_last_change = [&](
-							const auto& description,
-							const auto& new_content
-						) {
-							auto& last = history.last_command();
-
-							if (auto* const cmd = std::get_if<command_type>(std::addressof(last))) {
-								cmd->built_description = description + property_location;
-								cmd->rewrite_change(augs::to_bytes(new_content), cmd_in);
-							}
-							else {
-								LOG("WARNING! There was some problem with tracking activity of editor controls.");
-							}
-						};
-
-						const auto project_path = cmd_in.folder.current_path;
-
-						auto prop_in = property_editor_input { settings, property_editor_data };
-
-						general_edit_properties(
-							prop_in,
-							definitions[id],
-							post_new_change,
-							rewrite_last_change,
-							{},
-							path_chooser_provider<asset_id_type> { viewables, project_path },
-							2
-						);
+					else if(!is_selected && altered) {
+						selected_images.emplace(id);
 					}
 				}
 			}
 
+			ImGuiTreeNodeFlags flags = 0;
+
+			if (is_selected) {
+				flags = ImGuiTreeNodeFlags_Selected;
+			}
+
+			ImGui::SameLine();
+			const auto node = scoped_tree_node_ex(displayed_name.c_str(), flags);
+
+			scoped_style.finish_scope();
+			scoped_style2.finish_scope();
+
+			ImGui::NextColumn();
+			ImGui::NextColumn();
+
+			const auto& project_path = cmd_in.folder.current_path;
+
+			text_disabled(displayed_dir);
+
+			ImGui::NextColumn();
+
+			if (path_entry.used()) {
+				const auto& using_locations = path_entry.using_locations;
+
+				if (auto node = scoped_tree_node(typesafe_sprintf("%x locations###locations", using_locations.size()).c_str())) {
+					for (const auto& l : using_locations) {
+						text(l);
+					}
+				}
+			}
+			else {
+				const auto scoped_style = scoped_style_var(ImGuiStyleVar_FramePadding, ImVec2(3, 0));
+
+				if (ImGui::Button("Forget")) {
+					forget_asset_id_command<asset_id_type> cmd;
+					cmd.forgotten_id = path_entry.id;
+					cmd.built_description = 
+						typesafe_sprintf("Stopped tracking %x", path_entry.get_full_path().to_display())
+					;
+
+					history.execute_new(std::move(cmd), cmd_in);
+				}
+			}
+
+			ImGui::NextColumn();
+
+			if (node) {
+				auto sc = scoped_indent();
+
+				const auto property_location = typesafe_sprintf(" (in %x)", displayed_name);
+
+				auto& history = cmd_in.folder.history;
+				auto& defs = cmd_in.folder.work->viewables;
+
+				using command_type = change_asset_property_command<asset_id_type>;
+
+				auto post_new_change = [&](
+					const auto& description,
+					const auto field_id,
+					const auto& new_content
+				) {
+					command_type cmd;
+					cmd.affected_assets = { id };
+					cmd.field = field_id;
+					cmd.value_after_change = augs::to_bytes(new_content);
+					cmd.built_description = description + property_location;
+
+					history.execute_new(std::move(cmd), cmd_in);
+				};
+
+				auto rewrite_last_change = [&](
+					const auto& description,
+					const auto& new_content
+				) {
+					auto& last = history.last_command();
+
+					if (auto* const cmd = std::get_if<command_type>(std::addressof(last))) {
+						cmd->built_description = description + property_location;
+						cmd->rewrite_change(augs::to_bytes(new_content), cmd_in);
+					}
+					else {
+						LOG("WARNING! There was some problem with tracking activity of editor controls.");
+					}
+				};
+
+				const auto project_path = cmd_in.folder.current_path;
+
+				auto prop_in = property_editor_input { settings, property_editor_data };
+
+				general_edit_properties(
+					prop_in,
+					definitions[id],
+					post_new_change,
+					rewrite_last_change,
+					{},
+					path_chooser_provider<asset_id_type> { viewables, project_path },
+					num_cols - 2
+				);
+			}
 		};
 
 		auto do_section = [&](
@@ -354,11 +396,52 @@ void editor_images_gui::perform(
 				return;
 			}
 
-			if (color) {
-				text_color(labels[0], *color);
-			}
-			else {
-				text_disabled(labels[0]);
+			{
+				bool all_selected = true;
+				bool any_selected = false;
+
+				for (const auto& e : paths) {
+					if (found_in(selected_images, e.id)) {
+						any_selected = true;
+					}
+					else {
+						all_selected = false;
+					}
+				}
+
+				const auto scoped_style = scoped_style_var(ImGuiStyleVar_ItemSpacing, ImVec2(3, 1));
+				const auto scoped_style2 = scoped_style_var(ImGuiStyleVar_FramePadding, ImVec2(1, 1));
+
+				bool altered = all_selected;
+
+				{
+					auto cols = ::maybe_different_value_cols(
+						settings,
+						any_selected && !all_selected
+					);
+					
+					if (checkbox(typesafe_sprintf("###%x", i).c_str(), altered)) {
+						if (all_selected && !altered) {
+							for (const auto& e : paths) {
+								erase_element(selected_images, e.id);
+							}
+						}
+						else if (!all_selected && altered) {
+							for (const auto& e : paths) {
+								selected_images.insert(e.id);
+							}
+						}
+					}
+				}
+
+				ImGui::SameLine();
+
+				if (color) {
+					text_color(labels[0], *color);
+				}
+				else {
+					text_disabled(labels[0]);
+				}
 			}
 
 			ImGui::NextColumn();

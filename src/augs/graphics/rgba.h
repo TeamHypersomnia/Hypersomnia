@@ -65,6 +65,7 @@ struct rgba {
 	void set(const rgba);
 
 	rgba& multiply_alpha(float);
+	rgba& multiply_rgb(float);
 
 	rgba operator*(const float) const;
 	rgba operator+(const rgba b) const;

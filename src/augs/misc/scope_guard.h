@@ -18,8 +18,13 @@ namespace augs {
 		}
 
 		~scope_guard() {
+			finish_scope();
+		}
+
+		void finish_scope() {
 			if (exit_function) {
 				(*exit_function)();
+				release();
 			}
 		}
 

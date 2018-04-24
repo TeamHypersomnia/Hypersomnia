@@ -15,36 +15,7 @@
 #include "augs/string/format_enum.h"
 #include "augs/misc/imgui/imgui_enum_combo.h"
 
-template <class F, class Eq>
-auto maybe_different_value_cols(
-	const property_editor_settings& settings,
-	const F& first,
-   	const field_address field_id,
-   	Eq& pred
-) {
-	using namespace augs::imgui;
-
-	const bool values_different = !pred(first, field_id);
-
-	return std::make_tuple(
-		cond_scoped_style_color(values_different, ImGuiCol_FrameBg, settings.different_values_frame_bg),
-		cond_scoped_style_color(values_different, ImGuiCol_FrameBgHovered, settings.different_values_frame_hovered_bg),
-		cond_scoped_style_color(values_different, ImGuiCol_FrameBgActive, settings.different_values_frame_active_bg)
-	);
-};
-
-inline auto maybe_disabled_cols(
-	const property_editor_settings& settings,
-	const bool are_disabled
-) {
-	using namespace augs::imgui;
-
-	return std::make_tuple(
-		cond_scoped_style_color(are_disabled, ImGuiCol_FrameBg, rgba(settings.different_values_frame_bg).desaturate()),
-		cond_scoped_style_color(are_disabled, ImGuiCol_FrameBgHovered, rgba(settings.different_values_frame_hovered_bg).desaturate()),
-		cond_scoped_style_color(are_disabled, ImGuiCol_FrameBgActive, rgba(settings.different_values_frame_active_bg).desaturate())
-	);
-};
+#include "application/setups/editor/detail/maybe_different_colors.h"
 
 template <class M>
 auto get_type_id_for_field() {
@@ -160,11 +131,10 @@ void general_edit_properties(
 		ImGui::NextColumn();
 		auto scope = scoped_item_width(-1);
 
+
 		const auto colors = ::maybe_different_value_cols(
 			prop_in.settings,
-			old_value, 
-			field_location, 
-			field_equality_predicate
+			!field_equality_predicate(old_value, field_location)
 		);
 
 		if (control_callback()) {
@@ -335,7 +305,7 @@ void general_edit_properties(
 
 						auto cols = maybe_disabled_cols(prop_in.settings, !altered.is_enabled);
 
-						augs::recursive(self)(label, original_member.value, false);
+						augs::recursive(self)(label, original_member.value);
 					}
 					else if constexpr(is_container_v<M>) {
 
