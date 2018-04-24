@@ -41,7 +41,7 @@ struct item_button : game_gui_rect_node {
 
 	static layout_with_attachments calc_button_layout(
 		const const_entity_handle component_owner,
-		const image_metas_map&,
+		const image_definitions_map&,
 		const bool include_attachments = true
 	);
 

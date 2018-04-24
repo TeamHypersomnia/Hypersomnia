@@ -124,5 +124,4 @@ template class change_property_command<change_entity_property_command>;
 template class change_property_command<change_common_state_command>;
 template class change_property_command<change_group_property_command>;
 
-template class change_property_command<change_asset_property_command<assets::image_id, false>>;
-template class change_property_command<change_asset_property_command<assets::image_id, true>>;
+template class change_property_command<change_asset_property_command<assets::image_id>>;

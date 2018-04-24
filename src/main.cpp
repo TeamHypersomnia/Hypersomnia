@@ -329,24 +329,23 @@ int work(const int argc, const char* const * const argv) try {
 
 			{
 				/* Check for unloaded and changed resources */
-				currently_loaded_defs.image_loadables.for_each_object_and_id([&](const auto& old_loadables, const auto key) {
-					if (const auto new_loadables = mapped_or_nullptr(new_defs.image_loadables, key)) {
-						const bool loadables_changed = !(*new_loadables == old_loadables);
+				currently_loaded_defs.image_definitions.for_each_object_and_id([&](const auto& old_definition, const auto key) {
+					if (const auto new_definition = mapped_or_nullptr(new_defs.image_definitions, key)) {
+						const bool loadables_changed = !(new_definition->loadables == old_definition.loadables);
 
 						if (loadables_changed) {
 							/* Changed, reload */
 							new_atlas_required = true;
 						}
 
-						const auto& new_meta = new_defs.image_metas.at(key);
-						const auto& old_meta = currently_loaded_defs.image_metas.at(key);
+						const auto& new_meta = new_definition->meta;
+						const auto& old_meta = old_definition.meta;
 
 						const bool meta_changed = !(old_meta == new_meta);
 
 						if (loadables_changed || meta_changed) {
 							loaded_image_caches.at(key) = { 
-								image_loadables_def_view(get_unofficial_gfx_dir(), *new_loadables), 
-								new_meta 
+								image_definition_view(get_unofficial_gfx_dir(), *new_definition)
 							};
 						}
 					}
@@ -358,12 +357,14 @@ int work(const int argc, const char* const * const argv) try {
 				});
 
 				/* Check for new resources */
-				new_defs.image_loadables.for_each_object_and_id([&](const auto& fresh, const auto key) {
-					if (nullptr == mapped_or_nullptr(currently_loaded_defs.image_loadables, key)) {
+				new_defs.image_definitions.for_each_object_and_id([&](const auto& fresh, const auto key) {
+					if (nullptr == mapped_or_nullptr(currently_loaded_defs.image_definitions, key)) {
 						new_atlas_required = true;
 
-						const auto& new_meta = new_defs.image_metas.at(key);
-						loaded_image_caches.try_emplace(key, image_loadables_def_view(get_unofficial_gfx_dir(), fresh), new_meta);
+						loaded_image_caches.try_emplace(
+							key, 
+							image_definition_view(get_unofficial_gfx_dir(), fresh)
+						);
 					}
 					/* Otherwise it's already taken care of */
 				});
@@ -380,7 +381,7 @@ int work(const int argc, const char* const * const argv) try {
 				necessary_images_in_atlas.clear();
 
 				game_world_atlas.emplace(standard_atlas_distribution({
-					new_defs.image_loadables,
+					new_defs.image_definitions,
 					necessary_image_loadables,
 					config.gui_font,
 					{
@@ -515,7 +516,7 @@ int work(const int argc, const char* const * const argv) try {
 
 	static auto create_game_gui_deps = []() {
 		return game_gui_context_dependencies{
-			get_viewable_defs().image_metas,
+			get_viewable_defs().image_definitions,
 			images_in_atlas,
 			necessary_images_in_atlas,
 			get_gui_font()

@@ -23,7 +23,7 @@ struct create_asset_id_command;
 template <class>
 struct forget_asset_id_command;
 
-template <class, bool>
+template <class>
 struct change_asset_property_command;
 
 using editor_history_base = augs::history_with_marks<
@@ -39,7 +39,6 @@ using editor_history_base = augs::history_with_marks<
 	change_group_property_command,
 	create_asset_id_command<assets::image_id>,
 	forget_asset_id_command<assets::image_id>,
-	change_asset_property_command<assets::image_id, false>,
-	change_asset_property_command<assets::image_id, true>
+	change_asset_property_command<assets::image_id>
 	/* forget_image_path_command */
 >;

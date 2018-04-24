@@ -1,13 +1,12 @@
 #include "view/viewables/image_cache.h"
 #include "view/viewables/image_meta.h"
-#include "view/viewables/regeneration/image_loadables_def.h"
+#include "view/viewables/regeneration/image_definition.h"
 
 image_cache::image_cache(
-	const image_loadables_def_view& loadables,
-	const image_meta& meta
+	const image_definition_view& definition
 ) { 
 	try {
-		original_image_size = loadables.read_source_image_size();
+		original_image_size = definition.read_source_image_size();
 	}
 	catch (...) {
 		original_image_size = { 32, 32 };

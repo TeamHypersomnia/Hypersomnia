@@ -2,6 +2,7 @@
 #include "application/setups/editor/editor_folder.h"
 #include "application/intercosm.h"
 #include "view/viewables/image_meta.h"
+#include "view/viewables/get_viewable_pool.h"
 
 #include "augs/readwrite/byte_readwrite.h"
 
@@ -22,27 +23,16 @@ void create_asset_id_command<I>::redo(const editor_command_input in) {
 		}
 	};
 
-	if constexpr(std::is_same_v<I, assets::image_id>) {
-		{
-			auto& loadables = work.viewables.image_loadables;
+	{
+		auto& loadables = get_viewable_pool<I>(work.viewables);
 
-			const auto allocation = loadables.allocate();
-			const auto new_id = allocation.key;
-			allocation.object.source_image = use_path;
+		const auto allocation = loadables.allocate();
+		const auto new_id = allocation.key;
+		allocation.object.set_source_path(use_path);
 
-			validate(new_id);
+		validate(new_id);
 
-			allocated_id = assets::image_id(new_id);
-		}
-
-		{
-			auto& metas = work.viewables.image_metas;
-			const auto new_id = metas.allocate().key;
-			validate(new_id);
-		}
-	}
-	else {
-		static_assert(always_false_v<I>, "Unsupported id type.");
+		allocated_id = assets::image_id(new_id);
 	}
 }
 
@@ -50,20 +40,8 @@ template <class I>
 void create_asset_id_command<I>::undo(const editor_command_input in) {
 	auto& work = *in.folder.work;
 
-	if constexpr(std::is_same_v<I, assets::image_id>) {
-		{
-			auto& loadables = work.viewables.image_loadables;
-			loadables.undo_last_allocate(allocated_id);
-		}
-
-		{
-			auto& metas = work.viewables.image_metas;
-			metas.undo_last_allocate(allocated_id);
-		}
-	}
-	else {
-		static_assert(always_false_v<I>, "Unsupported id type.");
-	}
+	auto& loadables = get_viewable_pool<I>(work.viewables);
+	loadables.undo_last_allocate(allocated_id);
 }
 
 template <class I>
@@ -78,28 +56,11 @@ void forget_asset_id_command<I>::redo(const editor_command_input in) {
 	ensure(forgotten_content.empty());
 
 	auto s = augs::ref_memory_stream(forgotten_content);
-	auto save = [&s](const auto& what) {
-		augs::write_bytes(s, what);
-	};
 
-	if constexpr(std::is_same_v<I, assets::image_id>) {
-		{
-			auto& loadables = work.viewables.image_loadables;
-			save(loadables[forgotten_id]);
-			undo_free_input = *loadables.free(forgotten_id);
-		}
+	auto& loadables = get_viewable_pool<I>(work.viewables);
 
-		{
-			auto& metas = work.viewables.image_metas;
-
-			auto s = augs::ref_memory_stream(forgotten_content);
-			save(metas[forgotten_id]);
-			metas.free(forgotten_id);
-		}
-	}
-	else {
-		static_assert(always_false_v<I>, "Unsupported id type.");
-	}
+	augs::write_bytes(s, loadables[forgotten_id]);
+	undo_free_input = *loadables.free(forgotten_id);
 }
 
 template <class I>
@@ -108,34 +69,15 @@ void forget_asset_id_command<I>::undo(const editor_command_input in) {
 
 	auto s = augs::cref_memory_stream(forgotten_content);
 
-	auto load = [&s](auto& to) {
-		augs::read_bytes(s, to);
-	};
+	auto& loadables = get_viewable_pool<I>(work.viewables);
 
-	if constexpr(std::is_same_v<I, assets::image_id>) {
-		{
-			auto& loadables = work.viewables.image_loadables;
-			image_loadables_def def;
-			load(def);
-			loadables.undo_free(undo_free_input, std::move(def));
-		}
-
-		{
-			auto& metas = work.viewables.image_metas;
-			image_meta def;
-			load(def);
-			metas.undo_free(undo_free_input, std::move(def));
-		}
-	}
-	else {
-		static_assert(always_false_v<I>, "Unsupported id type.");
-	}
+	typename std::decay_t<decltype(loadables)>::mapped_type def;
+	augs::read_bytes(s, def);
+	loadables.undo_free(undo_free_input, std::move(def));
 
 	forgotten_content.clear();
 }
 
 template struct create_asset_id_command<assets::image_id>;
 template struct forget_asset_id_command<assets::image_id>;
-
-template struct change_asset_property_command<assets::image_id, false>;
-template struct change_asset_property_command<assets::image_id, true>;
+template struct change_asset_property_command<assets::image_id>;

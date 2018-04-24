@@ -10,6 +10,8 @@
 
 #include "augs/texture_atlas/texture_atlas_entry.h"
 
+#include "view/viewables/image_meta.h"
+
 #include "view/asset_location_context.h"
 #include "view/viewables/regeneration/neon_maps.h"
 #include "view/maybe_official_path.h"
@@ -24,31 +26,46 @@ struct image_extra_loadables {
 	// END GEN INTROSPECTOR
 };
 
-struct image_loadables_def {
-	// GEN INTROSPECTOR struct image_loadables_def
+struct image_ldbl {
+	// GEN INTROSPECTOR struct image_ldbl
 	maybe_official_path source_image;
 	image_extra_loadables extras;
 	// END GEN INTROSPECTOR
 
+	bool operator==(const image_ldbl& b) const;
+
 	bool should_generate_desaturation() const {
 		return extras.generate_desaturation;
 	}
+};
 
-	bool operator==(const image_loadables_def&) const;
+struct image_definition {
+	// GEN INTROSPECTOR struct image_definition
+	image_ldbl loadables;
+	image_meta meta;
+	// END GEN INTROSPECTOR
+
+	void set_source_path(const maybe_official_path& p) {
+		loadables.source_image = p;
+	}
+
+	const auto& get_source_path() const {
+		return loadables.source_image;
+	}
 };
 
 namespace sol {
 	class state;
 }
 
-class image_loadables_def_view {
+class image_definition_view {
 	const augs::path_type resolved_source_image_path;
-	const image_loadables_def& def;
+	const image_definition& def;
 
 public:
-	image_loadables_def_view(
+	image_definition_view(
 		const asset_location_context& project_dir,
-		const image_loadables_def& def
+		const image_definition& def
 	);
 	
 	augs::path_type calc_custom_neon_map_path() const;

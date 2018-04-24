@@ -109,7 +109,7 @@ public:
 	}
 
 	const auto& get_image_metas() const {
-		return dependencies.image_metas;
+		return dependencies.image_definitions;
 	}
 };
 

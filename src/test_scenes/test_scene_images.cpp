@@ -3,7 +3,7 @@
 
 #include "view/viewables/image_in_atlas.h"
 #include "view/viewables/image_meta.h"
-#include "view/viewables/regeneration/image_loadables_def.h"
+#include "view/viewables/regeneration/image_definition.h"
 
 #include "test_scenes/test_scenes_content.h"
 #include "test_scenes/test_scene_images.h"
@@ -36,28 +36,27 @@ static void try_load_lua_neighbors(
 
 void load_test_scene_images(
 	sol::state& lua,
-	image_loadables_map& all_loadables,
-	image_metas_map& all_metas
+	image_definitions_map& all_definitions
 ) {
 	using id_type = assets::image_id;
 
 	augs::for_each_enum_except_bounds([&](const test_scene_image_id enum_id) {
 		const auto id = to_image_id(enum_id);
 
-		if (found_in(all_loadables, id) || found_in(all_metas, id)) {
+		if (found_in(all_definitions, id)) {
 			return;
 		}
 
 		const auto stem = to_lowercase(augs::enum_to_string(enum_id));
 
-		image_loadables_def loadables_def;
+		image_definition definition;
+		auto& loadables_def = definition.loadables;
 		image_meta meta;
 
-		loadables_def.source_image.path = stem + ".png";
-		loadables_def.source_image.is_official = true;
+		definition.set_source_path({ stem + ".png", true });
 
 		try {
-			try_load_lua_neighbors(image_loadables_def_view({}, loadables_def).get_source_image_path(), lua, loadables_def.extras, meta);
+			try_load_lua_neighbors(image_definition_view({}, definition).get_source_image_path(), lua, loadables_def.extras, meta);
 		}
 		catch (augs::lua_deserialization_error err) {
 			throw test_scene_asset_loading_error(
@@ -74,14 +73,7 @@ void load_test_scene_images(
 			);
 		}
 
-		{
-			const auto new_allocation = all_loadables.allocate(std::move(loadables_def));
-			ensure_eq(new_allocation.key, id);
-		}
-
-		{
-			const auto new_allocation = all_metas.allocate(std::move(meta));
-			ensure_eq(new_allocation.key, id);
-		}
+		const auto new_allocation = all_definitions.allocate(std::move(definition));
+		ensure_eq(new_allocation.key, id);
 	});
 }

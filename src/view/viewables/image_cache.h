@@ -5,15 +5,13 @@
 #include "game/components/shape_polygon_component.h"
 #include "augs/templates/container_templates.h"
 
-class image_loadables_def_view;
-struct image_meta;
+class image_definition_view;
 
 struct image_cache {
 	image_cache() = default;
 
 	image_cache(
-		const image_loadables_def_view&,
-		const image_meta&
+		const image_definition_view&
 	);
 
 	vec2u original_image_size;

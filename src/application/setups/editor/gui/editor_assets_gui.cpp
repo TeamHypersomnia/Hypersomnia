@@ -96,7 +96,7 @@ struct path_chooser_provider {
 	}
 
 	bool handle(const std::string& label, handled_type& object, const field_address& address) const {
-		auto& loadables = defs.image_loadables;
+		auto& loadables = defs.image_definitions;
 
 		bool modified = false;
 
@@ -165,14 +165,14 @@ void editor_images_gui::perform(
 		last_seen_missing_paths.clear();
 	}
 
-	auto& loadables = viewables.image_loadables;
+	auto& loadables = viewables.image_definitions;
 
 	loadables.for_each_object_and_id(
 		[&](const auto& object, const auto id) mutable {
-			const auto path = object.source_image;
+			const auto path = object.get_source_path();
 			auto new_entry = path_entry_type(path, id);
 
-			const auto& view = image_loadables_def_view(folder.current_path / "gfx", object);
+			const auto& view = image_definition_view(folder.current_path / "gfx", object);
 
 			find_locations_that_use(id, work, [&](const auto& location) {
 				new_entry.using_locations.push_back(location);

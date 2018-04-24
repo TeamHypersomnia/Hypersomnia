@@ -26,7 +26,7 @@ public:
 
 	vec2i get_bbox(
 		const necessary_images_in_atlas_map& necessarys,
-		const image_metas_map& defs,
+		const image_definitions_map& defs,
 		const const_entity_handle owner_transfer_capability
 	) const;
 

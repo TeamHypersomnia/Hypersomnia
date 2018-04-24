@@ -140,7 +140,7 @@ struct asset_control_provider {
 	) const {
 		return description_pair {
 			"",
-			typesafe_sprintf("Set %x to %x", label, augs::to_display(defs.image_loadables[to].source_image.path))
+			typesafe_sprintf("Set %x to %x", label, augs::to_display(defs.image_definitions[to].get_source_path().path))
 		};
 	}
 
@@ -152,7 +152,7 @@ struct asset_control_provider {
 			auto on_choice = [&](const auto& chosen_path) {
 				changed = true;
 
-				auto& loadables = defs.image_loadables;
+				auto& loadables = defs.image_definitions;
 
 				if (const auto asset_id = ::find_asset_id_by_path(chosen_path, loadables)) {
 					object = *asset_id;
@@ -173,7 +173,7 @@ struct asset_control_provider {
 				}
 			};
 			
-			const auto& current_source  = defs.image_loadables[object].source_image;
+			const auto& current_source  = defs.image_definitions[object].get_source_path();
 			choose_asset_path(label, current_source, project_path, "gfx", on_choice, true_returner());
 		}
 		else {

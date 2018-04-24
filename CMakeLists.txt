@@ -373,7 +373,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/stateless_systems/trace_system.cpp"
 	"src/game/stateless_systems/visibility_system.cpp"
 	"src/game/stateless_systems/physics_system.cpp"
-	"src/view/viewables/regeneration/image_loadables_def.cpp"
+	"src/view/viewables/regeneration/image_definition.cpp"
 	"src/view/viewables/particle_effect.cpp"
 	"src/view/audiovisual_state/aabb_highlighter.cpp"
 	"src/view/game_gui/elements/action_button.cpp"

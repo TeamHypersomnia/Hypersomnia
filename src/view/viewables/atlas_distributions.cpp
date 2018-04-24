@@ -2,22 +2,22 @@
 #include "view/viewables/image_in_atlas.h"
 
 #include "view/viewables/images_in_atlas_map.h"
-#include "view/viewables/regeneration/image_loadables_def.h"
+#include "view/viewables/regeneration/image_definition.h"
 
 augs::graphics::texture standard_atlas_distribution(const standard_atlas_distribution_input in) {
 	thread_local auto atlas_input = atlas_regeneration_input();
 
 	auto make_view = [&in](const auto& def) {
-		return image_loadables_def_view(in.unofficial_project_dir, def);
+		return image_definition_view(in.unofficial_project_dir, def);
 	};
 
 	atlas_input.clear();
 
 	for (const auto& r : in.necessary_image_loadables) {
-		atlas_input.images.emplace_back(r.second.source_image.path);
+		atlas_input.images.emplace_back(r.second.get_source_path().path);
 	}
 
-	for (const auto& d : in.image_loadables) {
+	for (const auto& d : in.image_definitions) {
 		const auto def = make_view(d);
 
 		try {
@@ -70,10 +70,10 @@ augs::graphics::texture standard_atlas_distribution(const standard_atlas_distrib
 		const auto& baked = atlas.baked_images;
 
 		for (const auto& r : in.necessary_image_loadables) {
-			in.output_necessary_atlas_entries[r.first] = baked.at(r.second.source_image.path);
+			in.output_necessary_atlas_entries[r.first] = baked.at(r.second.get_source_path().path);
 		}
 
-		in.image_loadables.for_each_object_and_id([&](const auto& d, const auto id) {
+		in.image_definitions.for_each_object_and_id([&](const auto& d, const auto id) {
 			const auto def = make_view(d);
 
 			auto& output_viewable = in.output_atlas_entries[id];

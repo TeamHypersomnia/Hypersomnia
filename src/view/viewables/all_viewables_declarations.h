@@ -11,8 +11,8 @@ namespace augs {
 }
 
 struct image_in_atlas;
-struct image_loadables_def;
-class image_loadables_def_view;
+struct image_definition;
+class image_definition_view;
 struct image_meta;
 struct image_cache;
 struct particle_effect;
@@ -29,7 +29,6 @@ using particle_effects_map = asset_map<
 	particle_effect
 >;
 
-using image_loadables_map = image_id_pool<image_loadables_def>;
-using image_metas_map = image_id_pool<image_meta>;
+using image_definitions_map = image_id_pool<image_definition>;
 
 class images_in_atlas_map;

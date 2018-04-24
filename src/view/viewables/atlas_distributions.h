@@ -15,7 +15,7 @@
 */
 
 struct standard_atlas_distribution_input {
-	const image_loadables_map& image_loadables;
+	const image_definitions_map& image_definitions;
 	const necessary_image_loadables_map& necessary_image_loadables;
 	const augs::font_loading_input& gui_font_input;
 	const atlas_regeneration_settings settings;

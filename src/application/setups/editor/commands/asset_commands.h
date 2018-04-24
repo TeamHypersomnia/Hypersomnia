@@ -6,6 +6,7 @@
 #include "application/setups/editor/commands/change_property_command.h"
 #include "application/setups/editor/property_editor/property_editor_structs.h"
 #include "view/viewables/all_viewables_declarations.h"
+#include "view/viewables/get_viewable_pool.h"
 #include "view/maybe_official_path.h"
 
 namespace augs {
@@ -51,11 +52,11 @@ public:
 	void undo(const editor_command_input in);
 };
 
-template <class id_type, bool of_meta = false>
-struct change_asset_property_command : change_property_command<change_asset_property_command<id_type, of_meta>> {
+template <class id_type>
+struct change_asset_property_command : change_property_command<change_asset_property_command<id_type>> {
 	using introspect_base = change_property_command<change_asset_property_command>;
 
-	// GEN INTROSPECTOR struct change_asset_property_command class id_type bool of_meta
+	// GEN INTROSPECTOR struct change_asset_property_command class id_type
 	editor_command_common common;
 
 	field_address field;
@@ -72,37 +73,16 @@ struct change_asset_property_command : change_property_command<change_asset_prop
 		F&& callback
 	) const {
 		auto& viewables = in.folder.work->viewables;
+		auto& loadables = get_viewable_pool<id_type>(viewables);
 
-		if constexpr(std::is_same_v<id_type, assets::image_id>) {
-			if constexpr(of_meta) {
-				auto& metas = viewables.image_metas;
-
-				for (const auto& id : affected_assets) {
-					on_field_address(
-						metas[id],
-						field,
-						[&](auto& resolved_field) {
-							callback(resolved_field);
-						}
-					);
+		for (const auto& id : affected_assets) {
+			on_field_address(
+				loadables[id],
+				field,
+				[&](auto& resolved_field) {
+					callback(resolved_field);
 				}
-			}
-			else {
-				auto& loadables = viewables.image_loadables;
-
-				for (const auto& id : affected_assets) {
-					on_field_address(
-						loadables[id],
-						field,
-						[&](auto& resolved_field) {
-							callback(resolved_field);
-						}
-					);
-				}
-			}
-		}
-		else {
-			static_assert(always_false_v<T>, "Unsupported id type.");
+			);
 		}
 	}
 };

@@ -9,7 +9,7 @@
 #include "game/assets/ids/particle_effect_id.h"
 #include "game/assets/animation.h"
 
-#include "view/viewables/regeneration/image_loadables_def.h"
+#include "view/viewables/regeneration/image_definition.h"
 #include "view/viewables/particle_types.h"
 #include "view/viewables/particle_effect.h"
 

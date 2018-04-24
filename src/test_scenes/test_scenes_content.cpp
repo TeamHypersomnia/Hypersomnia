@@ -9,11 +9,10 @@ loaded_image_caches_map populate_test_scene_images_and_sounds(
 	sol::state& lua,
 	all_viewables_defs& output_sources
 ) {
-	auto& loadables = output_sources.image_loadables;
-	auto& metas = output_sources.image_metas;
+	auto& loadables = output_sources.image_definitions;
 
 	try {
-		load_test_scene_images(lua, loadables, metas);
+		load_test_scene_images(lua, loadables);
 		load_test_scene_sound_buffers(output_sources.sounds);
 	}
 	catch (const test_scene_asset_loading_error err) {
@@ -24,7 +23,7 @@ loaded_image_caches_map populate_test_scene_images_and_sounds(
 
 	loadables.for_each_object_and_id(
 		[&](const auto& object, const auto id) {
-			out.try_emplace(id, image_loadables_def_view({}, object), metas.at(id));
+			out.try_emplace(id, image_definition_view({}, object));
 		}
 	);
 

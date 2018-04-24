@@ -30,8 +30,7 @@ namespace sol {
 
 void load_test_scene_images(
 	sol::state& lua,
-	image_loadables_map&,
-	image_metas_map&
+	image_definitions_map&
 );
 
 void load_test_scene_animations(animations_pool&);
