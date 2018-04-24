@@ -76,6 +76,15 @@ namespace augs {
 		}
 
 		template <class... T>
+		auto cond_scoped_item_flag(const bool do_it, T&&... args) {
+			return cond_scoped_op(
+				do_it,
+				[&](){ ImGui::PushItemFlag(std::forward<T>(args)...); },
+				[]() { ImGui::PopItemFlag(); }
+			);
+		}
+
+		template <class... T>
 		auto scoped_style_color(T&&... args) {
 			return cond_scoped_style_color(true, std::forward<T>(args)...);
 		}

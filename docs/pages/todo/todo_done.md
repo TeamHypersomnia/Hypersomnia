@@ -581,3 +581,12 @@ we consider whole type overrides too complex architeciturally:
 	- rather, let it keep path to the first file. We'll alter check if ``_2``, ``_3`` etc. exist.
 	- We'll just check if it ends with ``_1.ext``
 
+- Images GUI: make images selectable
+	- What about redirection?
+		- Just don't show "Redirect path" button in the mass-selection gui
+	- checkboxes would be better instead of ctrl+something
+		- perhaps similarly with selection groups
+		- separate column for checkboxes, simply
+			- if a checkbox is on, also highlight
+		- fae could use it as well but it will be a little harder to persist the state, so not for now
+

@@ -50,6 +50,8 @@ template <class id_type>
 struct path_chooser_provider {
 	all_viewables_defs& defs;
 	const augs::path_type& project_path;
+	const property_editor_settings& settings;
+	const bool disabled;
 
 	using handled_type = maybe_official_path;
 
@@ -71,6 +73,8 @@ struct path_chooser_provider {
 		auto& definitions = defs.image_definitions;
 
 		bool modified = false;
+
+		auto scope = ::maybe_disabled_cols(settings, disabled);
 
 		choose_asset_path(
 			"##Source-path",
@@ -385,6 +389,8 @@ void editor_images_gui::perform(
 
 				auto prop_in = property_editor_input { settings, property_editor_data };
 
+				const bool disable_path_chooser = current_selected && selected_ids.size() > 1;
+
 				general_edit_properties(
 					prop_in,
 					definitions[id],
@@ -402,7 +408,7 @@ void editor_images_gui::perform(
 							selected_ids
 						);
 					},
-					path_chooser_provider<asset_id_type> { viewables, project_path },
+					path_chooser_provider<asset_id_type> { viewables, project_path, settings, disable_path_chooser },
 					num_cols - 2
 				);
 			}

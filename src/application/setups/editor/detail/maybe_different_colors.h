@@ -22,6 +22,7 @@ inline auto maybe_disabled_cols(
 	using namespace augs::imgui;
 
 	return std::make_tuple(
+		cond_scoped_item_flag(are_disabled, ImGuiItemFlags_Disabled, true),
 		cond_scoped_style_color(are_disabled, ImGuiCol_FrameBg, rgba(settings.different_values_frame_bg).desaturate()),
 		cond_scoped_style_color(are_disabled, ImGuiCol_FrameBgHovered, rgba(settings.different_values_frame_hovered_bg).desaturate()),
 		cond_scoped_style_color(are_disabled, ImGuiCol_FrameBgActive, rgba(settings.different_values_frame_active_bg).desaturate())
