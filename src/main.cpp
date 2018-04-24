@@ -341,13 +341,13 @@ int work(const int argc, const char* const * const argv) try {
 						const auto& new_meta = new_definition->meta;
 						const auto& old_meta = old_definition.meta;
 
-						const bool meta_changed = !(old_meta == new_meta);
-
-						if (loadables_changed || meta_changed) {
+						if (loadables_changed) {
 							loaded_image_caches.at(key) = { 
 								image_definition_view(get_unofficial_gfx_dir(), *new_definition)
 							};
 						}
+
+						/* const bool meta_changed = !(old_meta == new_meta); */
 					}
 					else {
 						/* Missing, unload */

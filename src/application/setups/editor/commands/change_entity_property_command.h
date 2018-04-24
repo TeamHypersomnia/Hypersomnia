@@ -37,13 +37,15 @@ struct entity_property_id {
 						for (const auto& e : entity_ids) {
 							auto specific_handle = cosm[typed_entity_id<E>(e)];
 
-							if (callback_result::ABORT == on_field_address(
+							const auto result = on_field_address(
 								std::get<Component>(specific_handle.get({}).components),
 								field,
 								[&](auto& resolved_field) {
 									return callback(resolved_field);
 								}
-							)) {
+							);
+
+							if (callback_result::ABORT == result) {
 								break;
 							}
 						}

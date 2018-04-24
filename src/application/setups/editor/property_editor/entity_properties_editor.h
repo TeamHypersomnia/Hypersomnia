@@ -3,7 +3,6 @@
 
 #include "application/setups/editor/property_editor/property_editor_structs.h"
 #include "application/setups/editor/property_editor/general_edit_properties.h"
-#include "application/setups/editor/property_editor/component_field_eq_predicate.h"
 #include "application/setups/editor/detail/format_struct_name.h"
 
 template <class T>
@@ -64,8 +63,14 @@ void edit_component(
 		component,
 		post_new_change,
 		rewrite_last_change,
-		component_field_eq_predicate { 
-			cosm, component_id, command.type_id, command.affected_entities 
+		[&](const auto& first, const field_address field_id) {
+			return compare_all_fields_to(
+				first,
+				entity_property_id { component_id, field_id }, 
+				cosm, 
+				command.type_id, 
+				command.affected_entities
+			);
 		}
 	);
 }

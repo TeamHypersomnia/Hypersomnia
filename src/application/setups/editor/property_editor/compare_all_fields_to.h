@@ -8,50 +8,46 @@ namespace augs {
 	struct trivial_type_marker;
 };
 
+
 template <class M>
-struct comparator {
-	bool& equal;
-	const M& first;
+inline auto make_all_fields_comparator(const M& first, bool& equal) {
+	return [&](const auto& resolved) {
+		using T = std::decay_t<decltype(resolved)>;
+		
+		if constexpr(std::is_same_v<T, M>) {
+			if(!(first == resolved)) {
+				equal = false;
+				return callback_result::ABORT;
+			}
 
-	template <class... Args>
-	auto operator()(Args&&...) const {
-		return callback_result::CONTINUE;
-	}
+			return callback_result::CONTINUE;
+		}
+		else if constexpr(std::is_same_v<T, augs::trivial_type_marker>) {
+			if(!(first == *reinterpret_cast<const M*>(std::addressof(resolved)))) {
+				equal = false;
+				return callback_result::ABORT;
+			}
 
-	auto operator()(const M& resolved) const {
-		if(!(first == resolved)) {
-			equal = false;
+			return callback_result::CONTINUE;
+		}
+		else {
+			/* We should not static_assert here, because */
 			return callback_result::ABORT;
 		}
-
-		return callback_result::CONTINUE;
-	}
-
-	auto operator()(const augs::trivial_type_marker& resolved) const {
-		if(!(first == *reinterpret_cast<const M*>(std::addressof(resolved)))) {
-			equal = false;
-			return callback_result::ABORT;
-		}
-
-		return callback_result::CONTINUE;
-	}
+	};
 };
 
-template <class M, class id_type, class Container>
+template <class M, class id_type, class... Args>
 bool compare_all_fields_to(
 	const M& first,
 	const id_type& property_id,
-	const entity_type_id type_id,
-	const cosmos& cosm,
-	const Container& ids
+	Args&&... args
 ) {
 	bool equal = true;
 
 	property_id.access(
-		cosm, 
-		type_id, 
-		ids, 
-		comparator<M> { equal, first }
+		std::forward<Args>(args)...,
+		make_all_fields_comparator(first, equal)
 	);
 
 	return equal;

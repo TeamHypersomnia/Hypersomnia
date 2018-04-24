@@ -8,7 +8,6 @@
 #include "application/setups/editor/property_editor/property_editor_structs.h"
 
 #include "application/setups/editor/property_editor/asset_control_provider.h"
-#include "application/setups/editor/property_editor/invariant_field_eq_predicate.h"
 #include "application/setups/editor/property_editor/update_size_if_tex_changed.h"
 
 #include "application/setups/editor/detail/format_struct_name.h"
@@ -85,8 +84,14 @@ void edit_invariant(
 		invariant,
 		post_new_change,
 		rewrite_last_change,
-		invariant_field_eq_predicate { 
-			cosm, in.invariant_id, in.command.type_id, in.command.affected_flavours 
+		[&](const auto& first, const field_address field_id) {
+			return compare_all_fields_to(
+				first,
+				flavour_property_id { in.invariant_id, field_id }, 
+				cosm, 
+				in.command.type_id, 
+				in.command.affected_flavours
+			);
 		},
 		asset_control_provider { defs, project_path, cmd_in }
 	);

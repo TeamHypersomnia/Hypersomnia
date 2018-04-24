@@ -53,13 +53,41 @@ public:
 };
 
 template <class id_type>
+struct asset_property_id {
+	field_address field;
+
+	template <class C, class Container, class F>
+	void access(
+		C& viewables,
+		const Container& asset_ids,
+		F callback
+	) const {
+		auto& definitions = get_viewable_pool<id_type>(viewables);
+
+		for (const auto& id : asset_ids) {
+			const auto result = on_field_address(
+				definitions[id],
+				field,
+				[&](auto& resolved_field) {
+					return callback(resolved_field);
+				}
+			);
+
+			if (callback_result::ABORT == result) {
+				break;
+			}
+		}
+	}
+};
+
+template <class id_type>
 struct change_asset_property_command : change_property_command<change_asset_property_command<id_type>> {
 	using introspect_base = change_property_command<change_asset_property_command>;
 
 	// GEN INTROSPECTOR struct change_asset_property_command class id_type
 	editor_command_common common;
 
-	field_address field;
+	asset_property_id<id_type> property_id;
 	std::vector<id_type> affected_assets;
 	// END GEN INTROSPECTOR
 
@@ -72,18 +100,11 @@ struct change_asset_property_command : change_property_command<change_asset_prop
 		T in,
 		F&& callback
 	) const {
-		auto& viewables = in.folder.work->viewables;
-		auto& definitions = get_viewable_pool<id_type>(viewables);
-
-		for (const auto& id : affected_assets) {
-			on_field_address(
-			definitions[id],
-				field,
-				[&](auto& resolved_field) {
-					callback(resolved_field);
-				}
-			);
-		}
+		property_id.access(
+			in.folder.work->viewables,
+		   	affected_assets,
+		   	std::forward<F>(callback)
+		);
 	}
 };
 

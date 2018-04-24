@@ -37,14 +37,16 @@ struct flavour_property_id {
 						using Invariant = std::decay_t<decltype(i)>;
 
 						for (const auto& f : flavour_ids) {
-							if (callback_result::ABORT == on_field_address(
+							const auto result = on_field_address(
 								std::get<Invariant>(common_signi.template get_flavours<E>().get_flavour(f).invariants),
 								field,
 
 								[&](auto& resolved_field) {
 									return callback(resolved_field);
 								}
-							)) {
+							);
+
+							if (callback_result::ABORT == result) {
 								break;
 							}
 						}

@@ -250,7 +250,7 @@ void general_edit_properties(
 					auto in = make_input(tweaker_type::CONTINUOUS, original, altered);
 
 					do_tweaker(in, [&]() { 
-						return drag_vec2(identity_label, altered); 
+						return drag_vec2(identity_label, altered);
 					});
 
 					/* next_column_text(); */

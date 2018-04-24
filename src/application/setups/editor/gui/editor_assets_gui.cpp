@@ -19,36 +19,9 @@
 #include "application/setups/editor/property_editor/asset_control_provider.h"
 #include "application/setups/editor/property_editor/general_edit_properties.h"
 #include "application/setups/editor/detail/find_locations_that_use.h"
+#include "application/setups/editor/property_editor/compare_all_fields_to.h"
 
 #include "augs/templates/list_utils.h"
-
-#if 0
-template <class asset_id_type>
-struct image_field_eq_predicate {
-	const all_viewables_def& defs;
-	const std::vector<asset_id_type>& ids;
-
-	template <class M>
-	bool compare(
-		const M& first,
-		const field_address field_id
-	) const {
-		if (ids.size() == 1) {
-			return true;
-		}
-
-		if constexpr(std::is_same_v<asset_id_type, assets::image_id>) {
-
-		}
-
-		flavour_property_id property_id;
-		property_id.invariant_id = invariant_id;
-		property_id.field = field_id;
-
-		return compare_all_fields_to(first, property_id, type_id, cosm, ids);
-	}
-};
-#endif
 
 template <class id_type>
 struct asset_gui_path_entry : public browsed_path_entry_base {
@@ -150,12 +123,12 @@ void editor_images_gui::perform(
 	thread_local std::vector<path_entry_type> orphaned_paths;
 	thread_local std::vector<path_entry_type> used_paths;
 
-	auto is_selected = [this](const auto id) {
-		return found_in(selected_images, id);
+	auto is_selected = [this](const auto& p) {
+		return found_in(selected_images, p.id);
 	};
 
 	auto get_all_selected_and_existing = [&](auto in_range) {
-		erase_if(in_range, [&] (const auto candidate) { return !is_selected(candidate.id); } );
+		erase_if(in_range, [&] (const auto& candidate) { return !is_selected(candidate); } );
 		return in_range;
 	};
 
@@ -269,7 +242,7 @@ void editor_images_gui::perform(
 
 		int i = 0;
 
-		auto do_path = [&](const auto& path_entry, const auto& from_range) {
+		auto do_path = [&](const auto& path_entry, const auto& selected_in_range, const auto& selected_ids) {
 			auto scope = scoped_id(i++);
 
 			const auto id = path_entry.id;
@@ -280,16 +253,16 @@ void editor_images_gui::perform(
 			auto scoped_style = scoped_style_var(ImGuiStyleVar_ItemSpacing, ImVec2(3, 1));
 			auto scoped_style2 = scoped_style_var(ImGuiStyleVar_FramePadding, ImVec2(1, 1));
 
-			const auto selected = is_selected(id);
+			const auto current_selected = is_selected(path_entry);
 
 			{
-				bool altered = selected;
+				bool altered = current_selected;
 
 				if (checkbox(typesafe_sprintf("###%x", i).c_str(), altered)) {
-					if (selected && !altered) {
+					if (current_selected && !altered) {
 						erase_element(selected_images, id);
 					}
-					else if(!selected && altered) {
+					else if(!current_selected && altered) {
 						selected_images.emplace(id);
 					}
 				}
@@ -297,7 +270,7 @@ void editor_images_gui::perform(
 
 			ImGuiTreeNodeFlags flags = 0;
 
-			if (selected) {
+			if (current_selected) {
 				flags = ImGuiTreeNodeFlags_Selected;
 			}
 
@@ -340,19 +313,17 @@ void editor_images_gui::perform(
 						history.execute_new(std::move(cmd), cmd_in);
 					};
 
-					const auto& forgotten_path = path_entry;
-
-					if (is_selected(forgotten_path.id)) {
-						auto all = get_all_selected_and_existing(from_range);
+					if (current_selected) {
+						forget(path_entry, false);
+					}
+					else {
+						const auto& all = selected_in_range;
 
 						forget(all[0], false);
 
 						for (std::size_t i = 1; i < all.size(); ++i) {
 							forget(all[i], true);
 						}
-					}
-					else {
-						forget(forgotten_path, false);
 					}
 				}
 			}
@@ -380,10 +351,15 @@ void editor_images_gui::perform(
 						cmd.affected_assets = { id };
 					}
 					else {
-						cmd.affected_assets = { id };
+						if (current_selected) {
+							cmd.affected_assets = selected_ids;
+						}
+						else {
+							cmd.affected_assets = { id };
+						}
 					}
 
-					cmd.field = field_id;
+					cmd.property_id.field = field_id;
 					cmd.value_after_change = augs::to_bytes(new_content);
 					cmd.built_description = description + property_location;
 
@@ -414,7 +390,18 @@ void editor_images_gui::perform(
 					definitions[id],
 					post_new_change,
 					rewrite_last_change,
-					{},
+					[&](const auto& first, const field_address field_id) {
+						if (!current_selected) {
+							return true;
+						}
+
+						return compare_all_fields_to(
+							first,
+							asset_property_id<asset_id_type> { field_id }, 
+							viewables, 
+							selected_ids
+						);
+					},
 					path_chooser_provider<asset_id_type> { viewables, project_path },
 					num_cols - 2
 				);
@@ -435,7 +422,7 @@ void editor_images_gui::perform(
 				bool any_selected = false;
 
 				for (const auto& e : paths) {
-					if (is_selected(e.id)) {
+					if (is_selected(e)) {
 						any_selected = true;
 					}
 					else {
@@ -488,8 +475,17 @@ void editor_images_gui::perform(
 			ImGui::NextColumn();
 			ImGui::Separator();
 
+			const auto selected_and_existing = get_all_selected_and_existing(paths);
+
+			thread_local std::vector<asset_id_type> selected_ids;
+			selected_ids.clear();
+
+			for (const auto& p : selected_and_existing) {
+				selected_ids.push_back(p.id);
+			}
+
 			for (const auto& p : paths) {
-				do_path(p, paths);
+				do_path(p, selected_and_existing, selected_ids);
 			}
 
 			ImGui::Separator();
