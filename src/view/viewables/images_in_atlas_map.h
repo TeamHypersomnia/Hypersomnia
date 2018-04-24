@@ -1,7 +1,7 @@
 #pragma once
 #include "augs/templates/container_templates.h"
+#include "view/viewables/image_in_atlas.h"
 #include "game/assets/ids/asset_ids.h"
-#include "view/viewables/image_structs.h"
 
 class images_in_atlas_map {
 #if STATICALLY_ALLOCATE_ASSETS

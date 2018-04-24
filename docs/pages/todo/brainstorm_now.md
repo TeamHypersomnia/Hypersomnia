@@ -8,6 +8,11 @@ summary: That which we are brainstorming at the moment.
 - Images GUI: make images selectable
 	- What about redirection?
 		- Just don't show "Redirect path" button in the mass-selection gui
+	- checkboxes would be better instead of ctrl+something
+		- perhaps similarly with selection groups
+		- separate column for checkboxes, simply
+			- if a checkbox is on, also highlight
+		- fae could use it as well but it will be a little harder to persist the state, so not for now
 
 - editing containers in general edit properties
 	- add/remove yields change property to the complete container

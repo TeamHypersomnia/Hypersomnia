@@ -34,6 +34,7 @@
 #include "game/transcendental/data_living_one_step.h"
 #include "game/transcendental/cosmos.h"
 
+#include "view/viewables/image_cache.h"
 #include "view/viewables/loaded_sounds_map.h"
 #include "view/viewables/atlas_distributions.h"
 

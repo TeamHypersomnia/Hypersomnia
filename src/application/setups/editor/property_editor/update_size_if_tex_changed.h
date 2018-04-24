@@ -1,5 +1,6 @@
 #pragma once
 #include "game/assets/ids/asset_ids.h"
+#include "view/viewables/image_cache.h"
 
 #include "application/setups/editor/editor_history.h"
 #include "application/setups/editor/editor_command_input.h"

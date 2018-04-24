@@ -14,6 +14,7 @@
 #include "game/transcendental/logic_step.h"
 
 #include "game/detail/inventory/perform_transfer.h"
+#include "view/viewables/image_cache.h"
 
 namespace test_scenes {
 	void minimal_scene::populate(const loaded_image_caches_map& caches, cosmos_common_significant& common) const {

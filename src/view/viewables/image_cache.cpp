@@ -1,7 +1,6 @@
-#include "view/viewables/image_structs.h"
+#include "view/viewables/image_cache.h"
+#include "view/viewables/image_meta.h"
 #include "view/viewables/regeneration/image_loadables_def.h"
-
-#include "augs/templates/introspection_utils/introspective_equal.h"
 
 image_cache::image_cache(
 	const image_loadables_def_view& loadables,
@@ -15,8 +14,4 @@ image_cache::image_cache(
 	}
 
 	partitioned_shape.make_box(vec2(original_image_size));
-}
-
-bool image_meta::operator==(const image_meta& b) const {
-	return augs::introspective_equal(*this, b);
 }

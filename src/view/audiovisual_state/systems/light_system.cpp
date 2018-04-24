@@ -20,7 +20,7 @@
 #include "game/stateless_systems/visibility_system.h"
 
 #include "view/frame_profiler.h"
-#include "view/viewables/image_structs.h"
+#include "view/viewables/image_in_atlas.h"
 #include "view/viewables/images_in_atlas_map.h"
 #include "view/rendering_scripts/draw_entity.h"
 

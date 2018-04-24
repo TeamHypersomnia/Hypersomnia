@@ -26,6 +26,7 @@
 #include "game/messages/intent_message.h"
 #include "game/detail/inventory/perform_transfer.h"
 
+#include "view/viewables/image_cache.h"
 #include "game/transcendental/logic_step.h"
 #include "game/transcendental/cosmic_delta.h"
 

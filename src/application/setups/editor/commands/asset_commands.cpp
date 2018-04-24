@@ -1,6 +1,7 @@
 #include "application/setups/editor/commands/asset_commands.h"
 #include "application/setups/editor/editor_folder.h"
 #include "application/intercosm.h"
+#include "view/viewables/image_meta.h"
 
 #include "augs/readwrite/byte_readwrite.h"
 

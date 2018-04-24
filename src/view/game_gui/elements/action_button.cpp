@@ -12,7 +12,7 @@
 #include "view/viewables/images_in_atlas_map.h"
 
 #include "view/viewables/all_viewables_declarations.h"
-#include "view/viewables/image_structs.h"
+#include "view/viewables/image_in_atlas.h"
 
 using namespace augs::gui::text;
 

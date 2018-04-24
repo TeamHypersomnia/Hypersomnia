@@ -6,9 +6,11 @@
 
 #include "game/common_state/entity_flavours.h"
 
-#include "view/viewables/image_structs.h"
+#include "view/viewables/image_in_atlas.h"
 
 #include "augs/string/format_enum.h"
+
+#include "view/viewables/image_cache.h"
 
 enum class test_static_lights {
 	// GEN INTROSPECTOR enum class test_static_lights

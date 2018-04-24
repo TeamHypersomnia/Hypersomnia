@@ -15,7 +15,8 @@
 #include "game/stateless_systems/input_system.h"
 
 #include "view/viewables/all_viewables_declarations.h"
-#include "view/viewables/image_structs.h"
+#include "view/viewables/image_in_atlas.h"
+#include "view/viewables/image_meta.h"
 
 #include "view/game_gui/game_gui_context.h"
 #include "view/game_gui/game_gui_system.h"

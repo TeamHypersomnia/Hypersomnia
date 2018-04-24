@@ -1,5 +1,5 @@
 #include "view/viewables/atlas_distributions.h"
-#include "view/viewables/image_structs.h"
+#include "view/viewables/image_in_atlas.h"
 
 #include "view/viewables/images_in_atlas_map.h"
 #include "view/viewables/regeneration/image_loadables_def.h"

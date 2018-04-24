@@ -405,7 +405,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/view/viewables/atlas_distributions.cpp"
 	"src/view/viewables/all_viewables_defs.cpp"
 	"src/view/audiovisual_state/audiovisual_profiler.cpp"
-	"src/view/viewables/image_structs.cpp"
+	"src/view/viewables/image_cache.cpp"
 	"src/view/frame_profiler.cpp"
 	"src/view/viewables/regeneration/desaturations.cpp"
 	"src/view/viewables/regeneration/buttons_with_corners.cpp"
@@ -587,6 +587,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/augs/misc/imgui/path_tree_structs.cpp"
 	"src/application/setups/editor/gui/asset_browser_settings.cpp"
 	"src/augs/filesystem/path.cpp"
+	"src/view/viewables/image_meta.cpp"
 )
 
 # These cpps will be included as the first to speed up multithreaded build times.

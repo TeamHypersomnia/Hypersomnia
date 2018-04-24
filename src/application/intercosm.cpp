@@ -4,6 +4,7 @@
 
 #include "game/organization/all_messages_includes.h"
 #include "game/organization/all_component_includes.h"
+#include "view/viewables/image_cache.h"
 
 #include "test_scenes/test_scenes_content.h"
 
