@@ -305,7 +305,7 @@ void general_edit_properties(
 
 						auto cols = maybe_disabled_cols(prop_in.settings, !altered.is_enabled);
 
-						augs::recursive(self)(label, original_member.value);
+						augs::recursive(self)(label, original_member.value, false);
 					}
 					else if constexpr(is_container_v<M>) {
 

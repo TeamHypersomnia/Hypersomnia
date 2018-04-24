@@ -150,6 +150,15 @@ void editor_images_gui::perform(
 	thread_local std::vector<path_entry_type> orphaned_paths;
 	thread_local std::vector<path_entry_type> used_paths;
 
+	auto is_selected = [this](const auto id) {
+		return found_in(selected_images, id);
+	};
+
+	auto get_all_selected_and_existing = [&](auto in_range) {
+		erase_if(in_range, [&] (const auto candidate) { return !is_selected(candidate.id); } );
+		return in_range;
+	};
+
 	missing_orphaned_paths.clear();
 	missing_paths.clear();
 
@@ -260,7 +269,7 @@ void editor_images_gui::perform(
 
 		int i = 0;
 
-		auto do_path = [&](const auto& path_entry) {
+		auto do_path = [&](const auto& path_entry, const auto& from_range) {
 			auto scope = scoped_id(i++);
 
 			const auto id = path_entry.id;
@@ -271,16 +280,16 @@ void editor_images_gui::perform(
 			auto scoped_style = scoped_style_var(ImGuiStyleVar_ItemSpacing, ImVec2(3, 1));
 			auto scoped_style2 = scoped_style_var(ImGuiStyleVar_FramePadding, ImVec2(1, 1));
 
-			const auto is_selected = found_in(selected_images, id);
+			const auto selected = is_selected(id);
 
 			{
-				bool altered = is_selected;
+				bool altered = selected;
 
 				if (checkbox(typesafe_sprintf("###%x", i).c_str(), altered)) {
-					if (is_selected && !altered) {
+					if (selected && !altered) {
 						erase_element(selected_images, id);
 					}
-					else if(!is_selected && altered) {
+					else if(!selected && altered) {
 						selected_images.emplace(id);
 					}
 				}
@@ -288,7 +297,7 @@ void editor_images_gui::perform(
 
 			ImGuiTreeNodeFlags flags = 0;
 
-			if (is_selected) {
+			if (selected) {
 				flags = ImGuiTreeNodeFlags_Selected;
 			}
 
@@ -320,13 +329,31 @@ void editor_images_gui::perform(
 				const auto scoped_style = scoped_style_var(ImGuiStyleVar_FramePadding, ImVec2(3, 0));
 
 				if (ImGui::Button("Forget")) {
-					forget_asset_id_command<asset_id_type> cmd;
-					cmd.forgotten_id = path_entry.id;
-					cmd.built_description = 
-						typesafe_sprintf("Stopped tracking %x", path_entry.get_full_path().to_display())
-					;
+					auto forget = [&](const auto& which, const bool has_parent) {
+						forget_asset_id_command<asset_id_type> cmd;
+						cmd.forgotten_id = which.id;
+						cmd.built_description = 
+							typesafe_sprintf("Stopped tracking %x", which.get_full_path().to_display())
+						;
 
-					history.execute_new(std::move(cmd), cmd_in);
+						cmd.common.has_parent = has_parent;
+						history.execute_new(std::move(cmd), cmd_in);
+					};
+
+					const auto& forgotten_path = path_entry;
+
+					if (is_selected(forgotten_path.id)) {
+						auto all = get_all_selected_and_existing(from_range);
+
+						forget(all[0], false);
+
+						for (std::size_t i = 1; i < all.size(); ++i) {
+							forget(all[i], true);
+						}
+					}
+					else {
+						forget(forgotten_path, false);
+					}
 				}
 			}
 
@@ -348,7 +375,14 @@ void editor_images_gui::perform(
 					const auto& new_content
 				) {
 					command_type cmd;
-					cmd.affected_assets = { id };
+
+					if constexpr(std::is_same_v<decltype(new_content), const maybe_official_path&>) {
+						cmd.affected_assets = { id };
+					}
+					else {
+						cmd.affected_assets = { id };
+					}
+
 					cmd.field = field_id;
 					cmd.value_after_change = augs::to_bytes(new_content);
 					cmd.built_description = description + property_location;
@@ -401,7 +435,7 @@ void editor_images_gui::perform(
 				bool any_selected = false;
 
 				for (const auto& e : paths) {
-					if (found_in(selected_images, e.id)) {
+					if (is_selected(e.id)) {
 						any_selected = true;
 					}
 					else {
@@ -412,13 +446,13 @@ void editor_images_gui::perform(
 				const auto scoped_style = scoped_style_var(ImGuiStyleVar_ItemSpacing, ImVec2(3, 1));
 				const auto scoped_style2 = scoped_style_var(ImGuiStyleVar_FramePadding, ImVec2(1, 1));
 
-				bool altered = all_selected;
-
 				{
 					auto cols = ::maybe_different_value_cols(
 						settings,
 						any_selected && !all_selected
 					);
+
+					bool altered = all_selected;
 					
 					if (checkbox(typesafe_sprintf("###%x", i).c_str(), altered)) {
 						if (all_selected && !altered) {
@@ -455,7 +489,7 @@ void editor_images_gui::perform(
 			ImGui::Separator();
 
 			for (const auto& p : paths) {
-				do_path(p);
+				do_path(p, paths);
 			}
 
 			ImGui::Separator();
