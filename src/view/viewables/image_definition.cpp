@@ -2,7 +2,7 @@
 #include "augs/string/string_templates.h"
 #include "augs/filesystem/file.h"
 
-#include "view/viewables/regeneration/image_definition.h"
+#include "view/viewables/image_definition.h"
 #include "view/viewables/regeneration/desaturations.h"
 
 #include "augs/templates/introspection_utils/introspective_equal.h"
@@ -15,7 +15,7 @@ augs::path_type get_desaturation_path(augs::path_type from_source_path) {
 	return std::string(GENERATED_FILES_DIR) + from_source_path.replace_extension(".desaturation.png").string();
 }
 
-bool image_ldbl::operator==(const image_ldbl& b) const {
+bool image_loadables::operator==(const image_loadables& b) const {
 	return augs::introspective_equal(*this, b);
 }
 

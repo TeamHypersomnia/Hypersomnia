@@ -24,9 +24,9 @@ void create_asset_id_command<I>::redo(const editor_command_input in) {
 	};
 
 	{
-		auto& loadables = get_viewable_pool<I>(work.viewables);
+		auto& definitions = get_viewable_pool<I>(work.viewables);
 
-		const auto allocation = loadables.allocate();
+		const auto allocation = definitions.allocate();
 		const auto new_id = allocation.key;
 		allocation.object.set_source_path(use_path);
 
@@ -40,8 +40,8 @@ template <class I>
 void create_asset_id_command<I>::undo(const editor_command_input in) {
 	auto& work = *in.folder.work;
 
-	auto& loadables = get_viewable_pool<I>(work.viewables);
-	loadables.undo_last_allocate(allocated_id);
+	auto& definitions = get_viewable_pool<I>(work.viewables);
+	definitions.undo_last_allocate(allocated_id);
 }
 
 template <class I>
@@ -57,10 +57,10 @@ void forget_asset_id_command<I>::redo(const editor_command_input in) {
 
 	auto s = augs::ref_memory_stream(forgotten_content);
 
-	auto& loadables = get_viewable_pool<I>(work.viewables);
+	auto& definitions = get_viewable_pool<I>(work.viewables);
 
-	augs::write_bytes(s, loadables[forgotten_id]);
-	undo_free_input = *loadables.free(forgotten_id);
+	augs::write_bytes(s, definitions[forgotten_id]);
+	undo_free_input = *definitions.free(forgotten_id);
 }
 
 template <class I>
@@ -69,11 +69,11 @@ void forget_asset_id_command<I>::undo(const editor_command_input in) {
 
 	auto s = augs::cref_memory_stream(forgotten_content);
 
-	auto& loadables = get_viewable_pool<I>(work.viewables);
+	auto& definitions = get_viewable_pool<I>(work.viewables);
 
-	typename std::decay_t<decltype(loadables)>::mapped_type def;
+	typename std::decay_t<decltype(definitions)>::mapped_type def;
 	augs::read_bytes(s, def);
-	loadables.undo_free(undo_free_input, std::move(def));
+	definitions.undo_free(undo_free_input, std::move(def));
 
 	forgotten_content.clear();
 }

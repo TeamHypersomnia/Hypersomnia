@@ -1,6 +1,6 @@
 #include "view/viewables/image_cache.h"
 #include "view/viewables/image_meta.h"
-#include "view/viewables/regeneration/image_definition.h"
+#include "view/viewables/image_definition.h"
 
 image_cache::image_cache(
 	const image_definition_view& definition

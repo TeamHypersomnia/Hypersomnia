@@ -2,7 +2,7 @@
 #include "view/viewables/image_in_atlas.h"
 
 #include "view/viewables/images_in_atlas_map.h"
-#include "view/viewables/regeneration/image_definition.h"
+#include "view/viewables/image_definition.h"
 
 augs::graphics::texture standard_atlas_distribution(const standard_atlas_distribution_input in) {
 	thread_local auto atlas_input = atlas_regeneration_input();
@@ -13,7 +13,7 @@ augs::graphics::texture standard_atlas_distribution(const standard_atlas_distrib
 
 	atlas_input.clear();
 
-	for (const auto& r : in.necessary_image_loadables) {
+	for (const auto& r : in.necessary_image_definitions) {
 		atlas_input.images.emplace_back(r.second.get_source_path().path);
 	}
 
@@ -69,7 +69,7 @@ augs::graphics::texture standard_atlas_distribution(const standard_atlas_distrib
 	{
 		const auto& baked = atlas.baked_images;
 
-		for (const auto& r : in.necessary_image_loadables) {
+		for (const auto& r : in.necessary_image_definitions) {
 			in.output_necessary_atlas_entries[r.first] = baked.at(r.second.get_source_path().path);
 		}
 

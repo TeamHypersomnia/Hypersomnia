@@ -14,11 +14,11 @@ void all_viewables_defs::clear() {
 
 std::optional<assets::image_id> find_asset_id_by_path(
 	const maybe_official_path& p,
-	const image_definitions_map& loadables
+	const image_definitions_map& definitions
 ) {
 	std::optional<assets::image_id> result_id;
 
-	loadables.for_each_object_and_id(
+	definitions.for_each_object_and_id(
 		[&result_id, &p](const auto& l, const auto id) {
 			if (p == l.get_source_path()) {
 				result_id = assets::image_id(id);

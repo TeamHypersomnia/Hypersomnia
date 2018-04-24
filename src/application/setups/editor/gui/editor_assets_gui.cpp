@@ -96,7 +96,7 @@ struct path_chooser_provider {
 	}
 
 	bool handle(const std::string& label, handled_type& object, const field_address& address) const {
-		auto& loadables = defs.image_definitions;
+		auto& definitions = defs.image_definitions;
 
 		bool modified = false;
 
@@ -110,7 +110,7 @@ struct path_chooser_provider {
 				modified = true;
 			},
 			[&](const auto& candidate_path) {
-				if (const auto asset_id = ::find_asset_id_by_path(candidate_path, loadables)) {
+				if (const auto asset_id = ::find_asset_id_by_path(candidate_path, definitions)) {
 					return false;
 				}
 
@@ -165,9 +165,9 @@ void editor_images_gui::perform(
 		last_seen_missing_paths.clear();
 	}
 
-	auto& loadables = viewables.image_definitions;
+	auto& definitions = viewables.image_definitions;
 
-	loadables.for_each_object_and_id(
+	definitions.for_each_object_and_id(
 		[&](const auto& object, const auto id) mutable {
 			const auto path = object.get_source_path();
 			auto new_entry = path_entry_type(path, id);
@@ -333,7 +333,7 @@ void editor_images_gui::perform(
 
 						general_edit_properties(
 							prop_in,
-							loadables[id],
+							definitions[id],
 							post_new_change,
 							rewrite_last_change,
 							{},

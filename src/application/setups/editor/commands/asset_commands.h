@@ -73,11 +73,11 @@ struct change_asset_property_command : change_property_command<change_asset_prop
 		F&& callback
 	) const {
 		auto& viewables = in.folder.work->viewables;
-		auto& loadables = get_viewable_pool<id_type>(viewables);
+		auto& definitions = get_viewable_pool<id_type>(viewables);
 
 		for (const auto& id : affected_assets) {
 			on_field_address(
-				loadables[id],
+			definitions[id],
 				field,
 				[&](auto& resolved_field) {
 					callback(resolved_field);

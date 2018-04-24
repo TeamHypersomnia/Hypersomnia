@@ -3,7 +3,7 @@
 
 #include "view/viewables/image_in_atlas.h"
 #include "view/viewables/image_meta.h"
-#include "view/viewables/regeneration/image_definition.h"
+#include "view/viewables/image_definition.h"
 
 #include "test_scenes/test_scenes_content.h"
 #include "test_scenes/test_scene_images.h"

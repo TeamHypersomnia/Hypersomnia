@@ -9,7 +9,7 @@
 
 #include "augs/templates/exception_templates.h"
 
-#include "view/viewables/regeneration/image_definition.h"
+#include "view/viewables/image_definition.h"
 #include "view/necessary_image_id.h"
 
 /*
@@ -82,10 +82,10 @@ namespace sol {
 	class state;
 }
 
-struct necessary_image_loadables_map :
+struct necessary_image_definitions_map :
 	public augs::enum_map<assets::necessary_image_id, image_definition>
 {
-	necessary_image_loadables_map(
+	necessary_image_definitions_map(
 		sol::state& lua,
 		const augs::path_type& directory,
 		const bool force_regenerate

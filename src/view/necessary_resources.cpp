@@ -128,7 +128,7 @@ augs::path_type get_procedural_image_path(const augs::path_type& from_source_pat
 	return typesafe_sprintf(GENERATED_FILES_DIR "%x", from_source_path);
 }
 
-necessary_image_loadables_map::necessary_image_loadables_map(
+necessary_image_definitions_map::necessary_image_definitions_map(
 	sol::state& lua,
 	const augs::path_type& directory,
 	const bool force_regenerate

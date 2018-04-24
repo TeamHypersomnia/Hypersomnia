@@ -26,13 +26,13 @@ struct image_extra_loadables {
 	// END GEN INTROSPECTOR
 };
 
-struct image_ldbl {
-	// GEN INTROSPECTOR struct image_ldbl
+struct image_loadables {
+	// GEN INTROSPECTOR struct image_loadables
 	maybe_official_path source_image;
 	image_extra_loadables extras;
 	// END GEN INTROSPECTOR
 
-	bool operator==(const image_ldbl& b) const;
+	bool operator==(const image_loadables& b) const;
 
 	bool should_generate_desaturation() const {
 		return extras.generate_desaturation;
@@ -41,7 +41,7 @@ struct image_ldbl {
 
 struct image_definition {
 	// GEN INTROSPECTOR struct image_definition
-	image_ldbl loadables;
+	image_loadables loadables;
 	image_meta meta;
 	// END GEN INTROSPECTOR
 

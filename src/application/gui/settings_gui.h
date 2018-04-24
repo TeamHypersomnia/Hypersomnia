@@ -42,7 +42,7 @@ struct all_necessary_fbos;
 struct all_necessary_shaders;
 
 struct all_necessary_sounds;
-struct necessary_image_loadables_map;
+struct necessary_image_definitions_map;
 
 struct configuration_subscribers {
 	augs::window& window;
@@ -53,7 +53,7 @@ struct configuration_subscribers {
 	augs::renderer& renderer;
 	all_necessary_shaders& shaders;
 	const all_necessary_sounds& sounds;
-	const necessary_image_loadables_map& images;
+	const necessary_image_definitions_map& images;
 #endif
 
 	void apply(const config_lua_table&) const;

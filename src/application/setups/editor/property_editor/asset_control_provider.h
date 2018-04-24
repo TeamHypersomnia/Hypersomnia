@@ -152,9 +152,9 @@ struct asset_control_provider {
 			auto on_choice = [&](const auto& chosen_path) {
 				changed = true;
 
-				auto& loadables = defs.image_definitions;
+				auto& definitions = defs.image_definitions;
 
-				if (const auto asset_id = ::find_asset_id_by_path(chosen_path, loadables)) {
+				if (const auto asset_id = ::find_asset_id_by_path(chosen_path, definitions)) {
 					object = *asset_id;
 				}
 				else {

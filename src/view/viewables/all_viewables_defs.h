@@ -14,7 +14,7 @@
 #include "game/assets/physical_material.h"
 #include "game/assets/recoil_player.h"
 
-#include "view/viewables/regeneration/image_definition.h"
+#include "view/viewables/image_definition.h"
 #include "view/viewables/particle_effect.h"
 #include "view/viewables/image_in_atlas.h"
 #include "view/viewables/image_meta.h"
