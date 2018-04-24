@@ -33,9 +33,9 @@ struct change_common_state_command : change_property_command<change_common_state
 			on_field_address(
 				common_signi,
 				field,
-				[&](auto& resolved_field) {
-					callback(resolved_field);
-				}
+				continue_if_nullptr([&](auto& resolved_field) {
+					return callback(resolved_field);
+				})
 			);
 
 			return changer_callback_result::DONT_REFRESH;

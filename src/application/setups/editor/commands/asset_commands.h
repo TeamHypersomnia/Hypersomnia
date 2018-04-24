@@ -103,7 +103,7 @@ struct change_asset_property_command : change_property_command<change_asset_prop
 		property_id.access(
 			in.folder.work->viewables,
 		   	affected_assets,
-		   	std::forward<F>(callback)
+			continue_if_nullptr(std::forward<F>(callback))
 		);
 	}
 };

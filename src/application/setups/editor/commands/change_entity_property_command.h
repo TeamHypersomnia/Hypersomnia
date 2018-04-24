@@ -84,7 +84,7 @@ struct change_entity_property_command : change_property_command<change_entity_pr
 	) const {
 		auto& cosm = in.get_cosmos();
 
-		if (property_id.access(cosm, type_id, affected_entities, std::forward<F>(callback))) {
+		if (property_id.access(cosm, type_id, affected_entities, continue_if_nullptr(std::forward<F>(callback)))) {
 			cosmic::reinfer_all_entities(cosm);
 		}
 	}

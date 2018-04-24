@@ -2,6 +2,17 @@
 #include "augs/templates/get_by_dynamic_id.h"
 #include "application/setups/editor/property_editor/property_editor_structs.h"
 
+template <class F>
+auto continue_if_nullptr(F callback) {
+	return [callback](auto& resolved) -> callback_result {
+		if constexpr(!std::is_same_v<decltype(resolved), std::nullptr_t&>) {
+			return callback(resolved);
+		}
+
+		return callback_result::CONTINUE;
+	};
+}
+
 template <class O, class F>
 decltype(auto) on_field_address(
 	O& object,
@@ -21,7 +32,22 @@ decltype(auto) on_field_address(
 			const auto object_location = reinterpret_cast<byte_type>(std::addressof(object));
 			const auto field_location = reinterpret_cast<location_ptr_type>(object_location + address.offset);
 
-			return callback(*field_location);
+			if constexpr(can_access_data_v<T>) {
+				const auto index = address.element_index;
+				if (index == -1) {
+					return callback(*field_location);
+				}
+				else if (index < field_location->size()) {
+					return callback(field_location->operator[](index));
+				}
+				else {
+					std::nullptr_t t;
+					return callback(t);
+				}
+			}
+			else {
+				return callback(*field_location);
+			}
 		}
 	);
 }

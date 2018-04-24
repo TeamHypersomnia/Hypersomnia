@@ -59,14 +59,13 @@ template <class M>
 struct tweaker_input {
 	const tweaker_type type;
 	const std::string& field_name;
-	const field_address field_location;
+	field_address field_location;
 	const M& old_value;
 	const M& new_value;
 };
 
 template <class O, class F, class S>
 struct detail_edit_properties_input {
-	const O& parent_object;
 	const F tweaker_callback;
 	const S special_control_provider;
 	const property_editor_settings& settings;
@@ -74,14 +73,17 @@ struct detail_edit_properties_input {
 };
 
 template <
-	template <class> class SkipPredicate = always_false,
+	template <class> class SkipPredicate,
+	bool only_direct_controls = false,
+	class A,
 	class I,
 	class T
 >
 void detail_general_edit_properties(
 	const I input,
+	const A make_address,
 	const std::string& label,
-	const T& original_member,
+	const T& original,
 	const bool nodify_introspected = true
 ) {
 	using namespace augs::imgui;
@@ -99,21 +101,20 @@ void detail_general_edit_properties(
 	if constexpr(!should_skip) {
 		const auto formatted_label = format_field_name(label);
 
-		auto make_input = [&formatted_label, &input](const tweaker_type type, const auto& original, const auto& altered) {
-			using MM = std::remove_const_t<std::remove_reference_t<decltype(original)>>;
+		auto make_input = [&formatted_label, make_address](const tweaker_type type, const auto& source, const auto& altered) {
+			using MM = std::remove_const_t<std::remove_reference_t<decltype(source)>>;
 
 			return tweaker_input<MM> {
 				type,
 				formatted_label,
-				::make_field_address(input.parent_object, original),
-				original,
+				make_address(source),
+				source,
 				altered
 			};
 		};
 
 		const auto identity_label = "##" + label;
 
-		const auto& original = original_member;
 		auto altered = original;
 
 		if constexpr(S::template handles<M>) {
@@ -203,6 +204,17 @@ void detail_general_edit_properties(
 			/* next_column_text(); */
 		}
 		else {
+			auto node_and_columns = [&]() {
+				auto object_node = scoped_tree_node_ex(formatted_label);
+
+				ImGui::NextColumn();
+				ImGui::NextColumn();
+
+				next_columns(input.extra_columns);
+
+				return object_node;
+			};
+
 			if constexpr(is_value_with_flag_v<M>) {
 				{
 					auto in = make_input(
@@ -222,25 +234,33 @@ void detail_general_edit_properties(
 
 				auto cols = maybe_disabled_cols(input.settings, !altered.is_enabled);
 
-				detail_general_edit_properties(input, label, original_member.value, false);
+				detail_general_edit_properties<SkipPredicate>(input, make_address, label, original.value, false);
 			}
 			else if constexpr(is_container_v<M>) {
-
+				if constexpr(can_access_data_v<M>) {
+					if (auto node = node_and_columns()) {
+						for (unsigned i = 0; i < static_cast<unsigned>(original.size()); ++i) {
+							detail_general_edit_properties<SkipPredicate, true>(
+								input, 
+								[i, make_address, &original](const auto&){
+									auto addr = make_address(original);
+									addr.element_index = i;
+									return addr;
+								}, 
+								typesafe_sprintf("%x", i), 
+								original[i]
+							);
+						}
+					}
+				}
 			}
-			else {
-				auto further = [input](const std::string& l, const auto& m) {
-					detail_general_edit_properties(input, l, m);
+			else if constexpr(!only_direct_controls) {
+				auto further = [input, make_address](const std::string& l, const auto& m) {
+					detail_general_edit_properties<SkipPredicate>(input, make_address, l, m);
 				};
 
 				if (nodify_introspected) {
-					const auto object_node = scoped_tree_node_ex(formatted_label);
-
-					ImGui::NextColumn();
-					ImGui::NextColumn();
-
-					next_columns(input.extra_columns);
-
-					if (object_node) {
+					if (auto node = node_and_columns()) {
 						augs::introspect(further, original);
 					}
 				}
@@ -354,13 +374,15 @@ void general_edit_properties(
 
 	augs::introspect(
 		[&](const std::string& label, const auto& member) {
-			detail_general_edit_properties(
+			detail_general_edit_properties<SkipPredicate>(
 				detail_edit_properties_input<T, decltype(do_tweaker), S> { 
-					parent_object,
 					do_tweaker, 
 					special_control_provider,
 					prop_in.settings,
 					extra_columns
+				},
+				[&parent_object](const auto& original) {
+					return ::make_field_address(parent_object, original);
 				},
 				label,
 				member

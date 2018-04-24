@@ -23,8 +23,9 @@ inline auto maybe_disabled_cols(
 
 	return std::make_tuple(
 		cond_scoped_item_flag(are_disabled, ImGuiItemFlags_Disabled, true),
-		cond_scoped_style_color(are_disabled, ImGuiCol_FrameBg, rgba(settings.different_values_frame_bg).desaturate()),
-		cond_scoped_style_color(are_disabled, ImGuiCol_FrameBgHovered, rgba(settings.different_values_frame_hovered_bg).desaturate()),
-		cond_scoped_style_color(are_disabled, ImGuiCol_FrameBgActive, rgba(settings.different_values_frame_active_bg).desaturate())
+		cond_scoped_style_color(are_disabled, ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled)),
+		cond_scoped_style_color(are_disabled, ImGuiCol_FrameBg, rgba(10, 10, 10, 255)),
+		cond_scoped_style_color(are_disabled, ImGuiCol_FrameBgHovered, rgba(10, 10, 10, 255)),
+		cond_scoped_style_color(are_disabled, ImGuiCol_FrameBgActive, rgba(10, 10, 10, 255))
 	);
 };

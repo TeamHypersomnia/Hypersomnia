@@ -30,8 +30,12 @@ inline auto make_all_fields_comparator(const M& first, bool& equal) {
 
 			return callback_result::CONTINUE;
 		}
+		else if constexpr(std::is_same_v<T, std::nullopt_t>) {
+			/* Not found! */
+			equal = false;
+			return callback_result::ABORT;
+		}
 		else {
-			/* We should not static_assert here, because */
 			return callback_result::ABORT;
 		}
 	};

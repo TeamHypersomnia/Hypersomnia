@@ -18,7 +18,8 @@ using edited_field_type_id = type_in_list_id<
 		std::string,
 		convex_partitioned_shape::poly_vector_type,
 		augs::path_type,
-		maybe_official_path
+		maybe_official_path,
+		std::vector<rgba>
 	>
 >;
 
@@ -36,6 +37,8 @@ struct property_editor_state {
 
 struct field_address {
 	unsigned offset = static_cast<unsigned>(-1);
+	unsigned element_index = static_cast<unsigned>(-1);
+
 	edited_field_type_id type_id;
 };
 
