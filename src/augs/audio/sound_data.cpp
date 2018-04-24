@@ -27,6 +27,10 @@ namespace augs {
 	sound_data::sound_data(const path_type& path) {
 		channels = 1;
 
+		if (path.empty()) {
+			throw sound_decoding_error("Failed to decode a sound file: empty path was passed.");
+		}
+
 #if BUILD_SOUND_FORMAT_DECODERS
 		const auto extension = path.extension();
 		const auto path_str = path.string();
@@ -61,6 +65,10 @@ namespace augs {
 		}
 		else if (extension == ".wav") {
 			auto wav_file = fclosed_unique(fopen(path_str.c_str(), "rb"));
+
+			if (!wav_file) {
+				throw sound_decoding_error("Failed to decode %x: could not open the file for reading.", path);
+			}
 
 			typedef struct WAV_HEADER {
 				/* RIFF Chunk Descriptor */
@@ -107,6 +115,9 @@ namespace augs {
 				throw sound_decoding_error("Failed to decode %x as WAV file.", path);
 			}
 			//ensure_eq(wav_header.SamplesPerSec, 44100);
+		}
+		else {
+			throw sound_decoding_error("Failed to decode %x as a sound file: unknown extension.", path);
 		}
 
 #if LOG_AUDIO_BUFFERS

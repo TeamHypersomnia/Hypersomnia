@@ -22,7 +22,6 @@
 
 #include "augs/templates/list_utils.h"
 
-
 #if 0
 template <class asset_id_type>
 struct image_field_eq_predicate {

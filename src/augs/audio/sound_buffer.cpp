@@ -11,7 +11,7 @@
 #include "augs/audio/sound_data.h"
 #include "augs/audio/sound_buffer.h"
 
-
+#include "augs/string/string_templates.h"
 
 #define TRACE_CONSTRUCTORS_DESTRUCTORS 0
 
@@ -145,26 +145,25 @@ namespace augs {
 	}
 
 	void sound_buffer::from_file(const sound_buffer_loading_input input) {
-		const auto& path = input.path_template;
+		const auto& path = input.source_sound;
+		variations.emplace_back(path, input.generate_mono);
 
-		if (
-			const bool many_files = typesafe_sprintf(path.string(), 1) != path;
-			many_files
-		) {
-			for (size_t i = 1;; ++i) {
-				const auto target_path = augs::path_type(typesafe_sprintf(path.string(), i));
+		const auto ext = augs::path_type(path).extension();
+		const auto without_ext = augs::path_type(path).replace_extension("").string();
 
-				if (!augs::exists(target_path)) {
+		if (ends_with(without_ext, "_1")) {
+			const auto without_num = without_ext.substr(0, without_ext.size() - 2);
+
+			for (size_t i = 2;; ++i) {
+				const auto next_path = augs::path_type(typesafe_sprintf("%x_%x%x", without_num, i, ext));
+
+				try {
+					variations.emplace_back(next_path, input.generate_mono);
+				}
+				catch (...) {
 					break;
 				}
-
-				variations.emplace_back(target_path, input.generate_mono);
 			}
-
-			ensure(variations.size() > 0);
-		}
-		else {
-			variations.emplace_back(path, input.generate_mono);
 		}
 	}
 }

@@ -96,7 +96,14 @@ void main_menu_setup::query_latest_news(const std::string& url) {
 main_menu_setup::main_menu_setup(
 	sol::state& lua,
 	const main_menu_settings settings
-) : menu_theme(settings.menu_theme_path) {
+) {
+	try {
+		menu_theme.emplace(settings.menu_theme_path);
+	}
+	catch (std::runtime_error err) {
+		LOG("Warning: could not load the main menu theme:\n%x", err.what());
+	}
+
 	query_latest_news(settings.latest_news_url);
 
 	if (settings.skip_credits) {
@@ -119,8 +126,8 @@ main_menu_setup::main_menu_setup(
 		LOG("Failed to load %x:\n%x\nMenu will apply no patch to config.", menu_config_patch_path, err.what());
 	}
 
-	if (augs::exists(settings.menu_theme_path)) {
-		menu_theme_source.bind_buffer(menu_theme);
+	if (menu_theme) {
+		menu_theme_source.bind_buffer(*menu_theme);
 		menu_theme_source.set_direct_channels(true);
 		menu_theme_source.seek_to(static_cast<float>(settings.start_menu_music_at_secs));
 		menu_theme_source.set_gain(0.f);

@@ -20,22 +20,21 @@ void load_test_scene_sound_buffers(sound_buffer_inputs_map& sounds) {
 
 		augs::sound_buffer_loading_input def;
 
-		if (augs::exists(path(without_ext) += ".ogg")) {
-			def.generate_mono = false;
-			def.path_template = path(without_ext) += ".ogg";
-		}
-		else {
-			if (augs::exists(path(without_ext) += ".wav")) {
-				def.path_template = path(without_ext) += ".wav";
+		auto try_with = [&](const auto& p) {
+			if (augs::exists(path(p) += ".ogg")) {
+				def.generate_mono = false;
+				def.source_sound = path(p) += ".ogg";
 			}
-			else if (augs::exists(path(without_ext) += "_1.wav")) {
-				def.path_template = path(without_ext) += "_%x.wav";
+			else if (augs::exists(path(p) += ".wav")) {
+				def.source_sound = path(p) += ".wav";
+				def.generate_mono = true;
 			}
+		};
 
-			def.generate_mono = true;
-		}
+		try_with(without_ext);
+		try_with(path(without_ext) += "_1");
 
-		if (def.path_template.string().size() > 0) {
+		if (def.source_sound.string().size() > 0) {
 			sounds[id] = def;
 		}
 		else {

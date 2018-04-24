@@ -48,7 +48,7 @@ class main_menu_setup : public default_setup_settings {
 	sol::table menu_config_patch;
 
 	augs::sound_source menu_theme_source;
-	augs::single_sound_buffer menu_theme;
+	std::optional<augs::single_sound_buffer> menu_theme;
 
 	bool draw_menu_gui = false;
 	bool roll_news = false;
@@ -60,6 +60,7 @@ class main_menu_setup : public default_setup_settings {
 
 	augs::action_list intro_actions;
 	augs::action_list credits_actions;
+
 public:
 	main_menu_gui gui;
 

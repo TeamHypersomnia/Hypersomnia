@@ -38,13 +38,21 @@ namespace augs {
 
 	struct sound_buffer_loading_input {
 		// GEN INTROSPECTOR struct augs::sound_buffer_loading_input
-		augs::path_type path_template;
+		augs::path_type source_sound;
 		bool generate_mono = true;
 		// END GEN INTROSPECTOR
 
+		const auto& get_source_path() const {
+			return source_sound;
+		}
+
+		void set_source_path(const augs::path_type& p) {
+			source_sound = p;
+		}
+
 		bool operator==(const sound_buffer_loading_input& b) const {
 			return 
-				path_template == b.path_template 
+				source_sound == b.source_sound 
 				&& generate_mono == b.generate_mono
 			;
 		}

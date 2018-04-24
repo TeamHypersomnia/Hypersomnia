@@ -417,7 +417,13 @@ int work(const int argc, const char* const * const argv) try {
 					if (!(*fresh == old.second)) {
 						/* Different from the fresh one, reload */
 						unload();
-						loaded_sounds.try_emplace(key, *fresh);
+
+						try {
+							loaded_sounds.try_emplace(key, *fresh);
+						}
+						catch (...) {
+
+						}
 					}
 				}
 				else {
@@ -429,7 +435,12 @@ int work(const int argc, const char* const * const argv) try {
 			/* Check for new resources */
 			for (const auto& fresh : new_defs.sounds) {
 				if (nullptr == mapped_or_nullptr(currently_loaded_defs.sounds, fresh.first)) {
-					loaded_sounds.try_emplace(fresh.first, fresh.second);
+					try {
+						loaded_sounds.try_emplace(fresh.first, fresh.second);
+					}
+					catch (...) {
+
+					}
 				}
 				/* Otherwise it's already taken care of */
 			}
