@@ -3,6 +3,7 @@
 [![Build Status](https://travis-ci.org/TeamHypersomnia/Hypersomnia.svg?branch=master)](https://travis-ci.org/TeamHypersomnia/Hypersomnia)
 [![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/5aatwxv8hceaop56?svg=true)](https://ci.appveyor.com/project/geneotech/Hypersomnia)
 
+*([Our CI is due to be overhauled](https://github.com/TeamHypersomnia/Hypersomnia/issues/258). Currently, the game is only buildable under clang 6.0.1 or newer.)*
 - [Hypersomnia](#hypersomnia)
 - [Gallery](#gallery)
 - [How to build](#how-to-build)
@@ -88,9 +89,9 @@ Current platforms are actively supported:
 
 You can go with:
 
-- ``gcc 7.2`` and newer, or...
+- ``gcc 7.3`` or newer, or...
 - ...[``llvm``](http://llvm.org/) toolchain
-	- ``clang 5.0.1`` or newer
+	- ``clang 6.0.1`` or newer
 	- ``libc++``
 	- ``libc++abi``
 	- ``libc++experimental``
