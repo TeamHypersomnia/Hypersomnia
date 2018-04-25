@@ -40,7 +40,7 @@ struct entity_property_id {
 							const auto result = on_field_address(
 								std::get<Component>(specific_handle.get({}).components),
 								field,
-								[&](auto& resolved_field) {
+								[&](auto& resolved_field) -> callback_result {
 									return callback(resolved_field);
 								}
 							);

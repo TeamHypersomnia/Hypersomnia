@@ -2,20 +2,27 @@
 #include <memory>
 #include <type_traits>
 
+#include "augs/templates/traits/container_traits.h"
 #include "augs/enums/callback_result.h"
+#include "augs/templates/introspection_utils/introspective_equal.h"
 
 namespace augs {
 	struct trivial_type_marker;
 };
 
+template <class M, class id_type, class... Args>
+bool compare_all_fields_to(
+	const M& first,
+	const id_type& property_id,
+	Args&&... args
+) {
+	bool equal = true;
 
-template <class M>
-inline auto make_all_fields_comparator(const M& first, bool& equal) {
-	return [&](const auto& resolved) {
+	auto callback = [&](const auto& resolved) -> callback_result {
 		using T = std::decay_t<decltype(resolved)>;
 		
 		if constexpr(std::is_same_v<T, M>) {
-			if(!(first == resolved)) {
+			if (!augs::equal_or_introspective_equal(first, resolved)) {
 				equal = false;
 				return callback_result::ABORT;
 			}
@@ -23,7 +30,9 @@ inline auto make_all_fields_comparator(const M& first, bool& equal) {
 			return callback_result::CONTINUE;
 		}
 		else if constexpr(std::is_same_v<T, augs::trivial_type_marker>) {
-			if(!(first == *reinterpret_cast<const M*>(std::addressof(resolved)))) {
+			const auto& second = *reinterpret_cast<const M*>(std::addressof(resolved));
+
+			if (!augs::equal_or_introspective_equal(first, second)) {
 				equal = false;
 				return callback_result::ABORT;
 			}
@@ -36,22 +45,13 @@ inline auto make_all_fields_comparator(const M& first, bool& equal) {
 			return callback_result::ABORT;
 		}
 		else {
-			return callback_result::ABORT;
+			return callback_result::CONTINUE;
 		}
 	};
-};
-
-template <class M, class id_type, class... Args>
-bool compare_all_fields_to(
-	const M& first,
-	const id_type& property_id,
-	Args&&... args
-) {
-	bool equal = true;
 
 	property_id.access(
 		std::forward<Args>(args)...,
-		make_all_fields_comparator(first, equal)
+		callback
 	);
 
 	return equal;

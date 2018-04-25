@@ -12,7 +12,7 @@ void physics_world_cache::rechoose_owner_friction_body(const entity_handle entit
 		// purge of dead entities
 
 		erase_if(special_physics.owner_friction_grounds, [&cosmos](const auto subject) {
-			return cosmos[subject].dead();
+			return cosmos[subject.target].dead();
 		});
 
 		auto feasible_grounds = special_physics.owner_friction_grounds;
@@ -22,7 +22,7 @@ void physics_world_cache::rechoose_owner_friction_body(const entity_handle entit
 			// remove friction grounds whom I do own myself
 
 			erase_if(feasible_grounds, [this, entity, &cosmos](const auto subject) {
-				return are_connected_by_friction(cosmos[subject], entity);
+				return are_connected_by_friction(cosmos[subject.target], entity);
 			});
 		}
 
@@ -30,10 +30,10 @@ void physics_world_cache::rechoose_owner_friction_body(const entity_handle entit
 
 		if (!feasible_grounds.empty()) {
 			std::stable_sort(feasible_grounds.begin(), feasible_grounds.end(), [this, &cosmos](const auto a, const auto b) {
-				return are_connected_by_friction(cosmos[a], cosmos[b]);
+				return are_connected_by_friction(cosmos[a.target], cosmos[b.target]);
 			});
 
-			special_physics.owner_friction_ground = feasible_grounds[0];
+			special_physics.owner_friction_ground = feasible_grounds[0].target;
 			body->m_ownerFrictionGround = find_rigid_body_cache(cosmos[special_physics.owner_friction_ground])->body;
 
 			// make the new owner first in order in case it is later compared to the same ancestor-level parents

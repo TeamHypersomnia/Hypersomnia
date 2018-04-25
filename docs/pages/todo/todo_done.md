@@ -590,3 +590,34 @@ we consider whole type overrides too complex architeciturally:
 			- if a checkbox is on, also highlight
 		- fae could use it as well but it will be a little harder to persist the state, so not for now
 
+
+- importing & using images in editor
+	- Simply... keep track of whatever we actually use
+		- Images dialog would simply show all used images
+		- We will anyway need this logic of traversing all ids
+	- Invariants will look like they are picking file paths really
+	- Makes no sense to always automatically import all loadables recursively from the folder
+		- E.g. because we don't always want all official images imported
+	- Or does it?
+		- if we do, though, merely adding and removing an image may result in an error in editor
+	- Importer window
+		- Unimported on filesystem
+			- Import next to each folder and file
+		- Imported
+			- shows how many flavours use an image
+			- Un-importing requires to delete all using flavours
+				- Which in turn requires deletion of entities with that flavour
+	- What if an image for which we've set some neon map values becomes unused?
+		- We don't remove it from loadables list. We simply add a "Remove" button next to it.
+
+- how do we reload viewables that will be stored in pool?
+	- do we simply compare object vectors?
+		- if order changes, that accounts for a change as well because ids must point to correct things
+		- do we need to compare whole pools or just objects?
+			- I guess pools because identity might've changed
+	- what about sparse pools?
+		- it won't have indirectors, so object vector check will be enough
+- also would be nice to have those vectors for animation frames as well
+	- then it would be nice to at least be able to edit the introspected structs,
+		- but store their whole copies
+

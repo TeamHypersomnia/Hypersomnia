@@ -5,6 +5,10 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- rethink our roadmap
+
+- asynchronous texture transfers, especially when regenerating atlases
+
 - editing containers in general edit properties
 	- add/remove yields change property to the complete container
 	- what about comparing?
@@ -37,33 +41,6 @@ summary: That which we are brainstorming at the moment.
 	- contains the forgotten viewable's content
 
 - we'll generalize later once images work
-
-- importing & using images in editor
-	- Simply... keep track of whatever we actually use
-		- Images dialog would simply show all used images
-		- We will anyway need this logic of traversing all ids
-	- Invariants will look like they are picking file paths really
-	- Makes no sense to always automatically import all loadables recursively from the folder
-		- E.g. because we don't always want all official images imported
-	- Or does it?
-		- if we do, though, merely adding and removing an image may result in an error in editor
-	- Importer window
-		- Unimported on filesystem
-			- Import next to each folder and file
-		- Imported
-			- shows how many flavours use an image
-			- Un-importing requires to delete all using flavours
-				- Which in turn requires deletion of entities with that flavour
-	- What if an image for which we've set some neon map values becomes unused?
-		- We don't remove it from loadables list. We simply add a "Remove" button next to it.
-
-- how do we reload viewables that will be stored in pool?
-	- do we simply compare object vectors?
-		- if order changes, that accounts for a change as well because ids must point to correct things
-		- do we need to compare whole pools or just objects?
-			- I guess pools because identity might've changed
-	- what about sparse pools?
-		- it won't have indirectors, so object vector check will be enough
 
 - sparse_pool implementation that avoids indirection?
 	- can have IDENTICAL interface as the pool
@@ -361,5 +338,3 @@ summary: That which we are brainstorming at the moment.
 - check in editor if the saving/opening path is a valid folder?
 - make reveal in explorer work for both files and folders
 	- cause it also works for dirs
-
-- asynchronous texture transfers, especially when regenerating atlases

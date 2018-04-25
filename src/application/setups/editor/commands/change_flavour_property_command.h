@@ -41,7 +41,7 @@ struct flavour_property_id {
 								std::get<Invariant>(common_signi.template get_flavours<E>().get_flavour(f).invariants),
 								field,
 
-								[&](auto& resolved_field) {
+								[&](auto& resolved_field) -> callback_result {
 									return callback(resolved_field);
 								}
 							);

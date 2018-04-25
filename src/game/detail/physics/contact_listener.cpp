@@ -130,13 +130,14 @@ void contact_listener::BeginContact(b2Contact* contact) {
 					auto new_owner = subject.get_owner_of_colliders();
 					auto& grounds = collider_physics.owner_friction_grounds;
 					
-					friction_connection connection(new_owner);
+					friction_connection connection;
+					connection.target = new_owner;
 					connection.fixtures_connected = 1;
 
 					if (const auto found = find_in_if(
 							grounds, 
 							[new_owner](const auto candidate) { 
-								return new_owner == candidate; 
+								return new_owner == candidate.target; 
 							}
 						);
 						found != grounds.end()

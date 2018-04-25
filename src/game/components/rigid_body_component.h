@@ -27,19 +27,18 @@ struct friction_connection {
 	signi_entity_id target;
 	unsigned fixtures_connected = 0;
 	// END GEN INTROSPECTOR
-	friction_connection(signi_entity_id t = signi_entity_id()) : target(t) {}
-
-	operator signi_entity_id() const {
-		return target;
-	}
 };
+
+using friction_connection_vector = 
+	augs::constant_size_vector<friction_connection, OWNER_FRICTION_GROUNDS_COUNT>
+;
 
 struct special_physics {
 	// GEN INTROSPECTOR struct special_physics
 	augs::stepped_cooldown dropped_or_created_cooldown;
 	signi_entity_id during_cooldown_ignore_collision_with;
 	signi_entity_id owner_friction_ground;
-	augs::constant_size_vector<friction_connection, OWNER_FRICTION_GROUNDS_COUNT> owner_friction_grounds = {};
+	friction_connection_vector owner_friction_grounds = {};
 	// END GEN INTROSPECTOR
 
 	//float measured_carried_mass = 0.f;

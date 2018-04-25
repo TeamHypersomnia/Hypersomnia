@@ -4,6 +4,8 @@
 #include "augs/templates/traits/is_optional.h"
 #include "augs/templates/traits/is_comparable.h"
 #include "augs/templates/traits/is_tuple.h"
+#include "augs/templates/algorithm_templates.h"
+#include "augs/templates/traits/is_pair.h"
 
 namespace augs {
 	template <class A, class B>
@@ -25,11 +27,11 @@ namespace augs {
 				return true;
 			}
 		}
-		else if constexpr(
-			is_tuple_v<A>
-			|| is_std_array_v<A>
-		) {
+		else if constexpr(is_tuple_v<A> || is_pair_v<A>) {
 			return introspective_equal(a, b);
+		}
+		else if constexpr(has_begin_and_end_v<A> && can_access_size_v<A>) {
+			return ranges_equal(a, b, [](const auto& aa, const auto& bb) { return equal_or_introspective_equal(aa, bb); });
 		}
 		else if constexpr(is_comparable_v<A, B>) {
 			return a == b;

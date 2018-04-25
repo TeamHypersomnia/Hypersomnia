@@ -16,6 +16,7 @@
 #include "augs/misc/imgui/imgui_enum_combo.h"
 
 #include "application/setups/editor/detail/maybe_different_colors.h"
+#include "application/setups/editor/property_editor/tweaker_type.h"
 
 template <class M>
 auto get_type_id_for_field() {
@@ -50,10 +51,81 @@ auto make_field_address(const M O::* const member) {
 	return make_field_address(o, o.*member);
 }
 
-enum class tweaker_type {
-	CONTINUOUS,
-	DISCRETE
-};
+template <class T>
+static constexpr bool has_direct_control_v = 
+	is_one_of_v<T, std::string, bool, vec2, vec2i, rgba>
+	|| is_minmax_v<T>
+	|| std::is_arithmetic_v<T>
+	|| std::is_enum_v<T>
+;
+
+template <class T>
+static constexpr bool always_skip_in_properties =
+	is_padding_field_v<T>
+	// Yet unsupported:
+	|| std::is_same_v<T, b2Filter>
+	|| is_asset_id_v<T>
+;
+
+template <class M>
+std::optional<tweaker_type> detail_direct_edit(
+	const std::string& identity_label,
+	M& altered
+) {
+	using namespace augs::imgui;
+
+	if constexpr(std::is_same_v<M, std::string>) {
+		const auto result = [&]() { 
+			if (identity_label == "##description") {
+				return input_multiline_text<512>(identity_label, altered, 8);
+			}
+			else if (identity_label == "##name") {
+				return input_text<256>(identity_label, altered);
+			}
+
+			return input_text<256>(identity_label, altered);
+		}();
+		
+		if (result) {
+			return tweaker_type::CONTINUOUS;
+		}
+	}
+	else if constexpr(std::is_same_v<M, bool>) {
+		if (checkbox(identity_label, altered)) {
+			return tweaker_type::DISCRETE;
+		}
+	}
+	else if constexpr(std::is_arithmetic_v<M>) {
+		if (drag(identity_label, altered)) { 
+			return tweaker_type::CONTINUOUS;
+		}
+	}
+	else if constexpr(is_one_of_v<M, vec2, vec2i>) {
+		if (drag_vec2(identity_label, altered)) { 
+			return tweaker_type::CONTINUOUS;
+		}
+	}
+	else if constexpr(is_minmax_v<M>) {
+		if (drag_minmax(identity_label, altered)) { 
+			return tweaker_type::CONTINUOUS;
+		}
+	}
+	else if constexpr(std::is_enum_v<M>) {
+		if (enum_combo(identity_label, altered)) { 
+			return tweaker_type::DISCRETE;
+		}
+	}
+	else if constexpr(std::is_same_v<M, rgba>) {
+		if (color_edit(identity_label, altered)) { 
+			return tweaker_type::CONTINUOUS;
+		}
+	}
+	else {
+		static_assert(always_false_v<M>, "Unsupported control type.");
+	}
+
+	return std::nullopt;
+}
 
 template <class M>
 struct tweaker_input {
@@ -64,210 +136,176 @@ struct tweaker_input {
 	const M& new_value;
 };
 
-template <class O, class F, class S>
+template <class S>
 struct detail_edit_properties_input {
-	const F tweaker_callback;
 	const S special_control_provider;
 	const property_editor_settings& settings;
 	const int extra_columns;
 };
 
+inline auto bulleted_property_name(const std::string& name, const int extra_cols) {
+	using namespace augs::imgui;
+
+	ImGui::Bullet();
+	text(name);
+	ImGui::NextColumn();
+
+	return std::make_tuple(
+		augs::imgui::scoped_item_width(-1),
+		augs::scope_guard([extra_cols](){ next_columns(1 + extra_cols); })
+	);
+}
+
+template <class S, class T>
+constexpr bool do_handler_or_direct = 
+	S::template handles<T>
+	|| has_direct_control_v<T>
+;
+
+template <class S, class T>
+std::optional<tweaker_type> handler_or_direct(S provider, const std::string& identity_label, T& altered) {
+	if constexpr(S::template handles<T>) {
+		return provider.handle(identity_label, altered);
+	}
+	else if constexpr(has_direct_control_v<T>) {
+		return detail_direct_edit(identity_label, altered);
+	}
+}
+
+inline auto node_and_columns(
+	const std::string& formatted_label,
+	const int extra_columns
+) {
+	auto object_node = augs::imgui::scoped_tree_node_ex(formatted_label);
+	augs::imgui::next_columns(2 + extra_columns);
+	return object_node;
+};
+
 template <
 	template <class> class SkipPredicate,
-	bool only_direct_controls = false,
-	class A,
-	class I,
+	class S,
+	class Eq,
+	class F,
 	class T
 >
 void detail_general_edit_properties(
-	const I input,
-	const A make_address,
+	const detail_edit_properties_input<S> input,
+	Eq equality_predicate,
+	F notify_change_of,
 	const std::string& label,
-	const T& original,
+	T& altered,
+	const bool pass_notifier_through = false,
 	const bool nodify_introspected = true
 ) {
-	using namespace augs::imgui;
-	using S = std::decay_t<decltype(input.special_control_provider)>;
-
-	const auto& do_tweaker = input.tweaker_callback;
-
-	using M = T;
-
 	static constexpr bool should_skip = 
-		is_padding_field_v<M> 
-		|| SkipPredicate<M>::value
+		always_skip_in_properties<T> 
+		|| SkipPredicate<T>::value
 	;
 
 	if constexpr(!should_skip) {
 		const auto formatted_label = format_field_name(label);
-
-		auto make_input = [&formatted_label, make_address](const tweaker_type type, const auto& source, const auto& altered) {
-			using MM = std::remove_const_t<std::remove_reference_t<decltype(source)>>;
-
-			return tweaker_input<MM> {
-				type,
-				formatted_label,
-				make_address(source),
-				source,
-				altered
-			};
-		};
-
 		const auto identity_label = "##" + label;
 
-		auto altered = original;
+		if constexpr(do_handler_or_direct<S, T>) {
+			auto scope = bulleted_property_name(formatted_label, input.extra_columns);
+			auto colors = ::maybe_different_value_cols(input.settings, !equality_predicate(altered)); 
 
-		if constexpr(S::template handles<M>) {
-			auto in = make_input(tweaker_type::DISCRETE, original, altered);
-
-			do_tweaker(in, [&]() { 
-				return input.special_control_provider.handle(
-					identity_label, 
-					altered,
-					in.field_location
-				);
-			});
-		}
-		else if constexpr(std::is_same_v<M, b2Filter>) {
-			// TODO: checkbox matrix
-			return;
-		}
-		else if constexpr(std::is_same_v<M, std::string>) {
-			auto in = make_input(tweaker_type::CONTINUOUS, original, altered);
-
-			do_tweaker(in, [&]() { 
-				if (label == "description") {
-					return input_multiline_text<512>(identity_label, altered, 8);
-				}
-				else if (label == "name") {
-					return input_text<256>(identity_label, altered);
-				}
-
-				return input_text<256>(identity_label, altered);
-			});
-
-			/* next_column_text(); */
-		}
-		else if constexpr(std::is_same_v<M, bool>) {
-			auto in = make_input(tweaker_type::DISCRETE, original, altered);
-
-			do_tweaker(in, [&]() { 
-				return checkbox(identity_label, altered);
-			});
-		}
-		else if constexpr(std::is_arithmetic_v<M>) {
-			auto in = make_input(tweaker_type::CONTINUOUS, original, altered);
-
-			do_tweaker(in, [&]() { 
-				return drag(identity_label, altered); 
-			});
-
-			/* next_column_text(get_type_name<M>()); */
-		}
-		else if constexpr(is_one_of_v<M, vec2, vec2i>) {
-			auto in = make_input(tweaker_type::CONTINUOUS, original, altered);
-
-			do_tweaker(in, [&]() { 
-				return drag_vec2(identity_label, altered);
-			});
-
-			/* next_column_text(); */
-		}
-		else if constexpr(is_minmax_v<M>) {
-			auto in = make_input(tweaker_type::CONTINUOUS, original, altered);
-
-			do_tweaker(in, [&]() { 
-				return drag_minmax(identity_label, altered); 
-			});
-
-			/* next_column_text(get_type_name<typename M::first_type>() + " range"); */
-		}
-		else if constexpr(is_asset_id_v<M>) {
-
-		}
-		else if constexpr(std::is_enum_v<M>) {
-			auto in = make_input(tweaker_type::DISCRETE, original, altered);
-
-			do_tweaker(in, [&]() { 
-				return enum_combo(identity_label, altered);
-			});
-
-			/* next_column_text(); */
-		}
-		else if constexpr(std::is_same_v<M, rgba>) {
-			auto in = make_input(tweaker_type::CONTINUOUS, original, altered);
-
-			do_tweaker(in, [&]() { 
-				return color_edit(identity_label, altered);
-			});
-
-			/* next_column_text(); */
+			if (auto result = handler_or_direct(input.special_control_provider, identity_label, altered)) {
+				notify_change_of(formatted_label, *result, altered);
+			}
 		}
 		else {
-			auto node_and_columns = [&]() {
-				auto object_node = scoped_tree_node_ex(formatted_label);
+			if constexpr(is_value_with_flag_v<T>) {
+				const auto all_equal = equality_predicate(altered.is_enabled);
 
-				ImGui::NextColumn();
-				ImGui::NextColumn();
-
-				next_columns(input.extra_columns);
-
-				return object_node;
-			};
-
-			if constexpr(is_value_with_flag_v<M>) {
 				{
-					auto in = make_input(
-						tweaker_type::DISCRETE,
-						original.is_enabled,
-						altered.is_enabled
-					);
+					auto scope = bulleted_property_name(formatted_label, input.extra_columns);
+					auto colors = ::maybe_different_value_cols(input.settings, !all_equal); 
 
-					do_tweaker(in, [&]() {
-						if (checkbox(identity_label, altered.is_enabled)) {
-							return true;
-						}
-
-						return false;
-					});
+					if (const auto result = augs::imgui::checkbox(identity_label, altered.is_enabled)) {
+						notify_change_of(formatted_label, tweaker_type::DISCRETE, altered.is_enabled);
+					}
 				}
 
-				auto cols = maybe_disabled_cols(input.settings, !altered.is_enabled);
+				auto colors = maybe_disabled_cols(input.settings, !all_equal || !altered.is_enabled);
 
-				detail_general_edit_properties<SkipPredicate>(input, make_address, label, original.value, false);
+				detail_general_edit_properties<SkipPredicate>(input, equality_predicate, notify_change_of, label, altered.value, pass_notifier_through, false);
 			}
-			else if constexpr(is_container_v<M>) {
-				if constexpr(can_access_data_v<M>) {
-					if (auto node = node_and_columns()) {
-						for (unsigned i = 0; i < static_cast<unsigned>(original.size()); ++i) {
-							detail_general_edit_properties<SkipPredicate, true>(
+			else if constexpr(is_container_v<T>) {
+				if constexpr(can_access_data_v<T>) {
+					if (auto node = node_and_columns(formatted_label, input.extra_columns)) {
+						for (unsigned i = 0; i < static_cast<unsigned>(altered.size()); ++i) {
+							{
+								const auto button_label = typesafe_sprintf("D##%x", i);
+
+								if (ImGui::Button(button_label.c_str())) {
+									auto duplicated = altered[i];
+									altered.insert(altered.begin() + i + 1, std::move(duplicated));
+									notify_change_of(formatted_label, tweaker_type::DISCRETE, altered);
+									break;
+								}
+							}
+
+							ImGui::SameLine();
+
+							{
+								const auto button_label = typesafe_sprintf("-##%x", i);
+
+								if (ImGui::Button(button_label.c_str())) {
+									altered.erase(altered.begin() + i);
+									notify_change_of(formatted_label, tweaker_type::DISCRETE, altered);
+									break;
+								}
+							}
+
+							ImGui::SameLine();
+
+							auto notify_whole_element = [&](const auto& l, const tweaker_type t, auto&&... args) {
+								if (pass_notifier_through) {
+									notify_change_of(l, t, std::forward<decltype(args)>(args)...);
+								}
+								else {
+									notify_change_of(formatted_label, t, altered[i]);
+								}
+							};
+
+							const auto are_elements_equal = equality_predicate(altered, i);
+
+							detail_general_edit_properties<SkipPredicate>(
 								input, 
-								[i, make_address, &original](const auto&){
-									auto addr = make_address(original);
-									addr.element_index = i;
-									return addr;
-								}, 
+								[are_elements_equal](auto&&... args) {
+									return are_elements_equal;
+								},
+								notify_whole_element,
 								typesafe_sprintf("%x", i), 
-								original[i]
+								altered[i],
+								true
 							);
 						}
+
+						if (ImGui::Button("+")) {
+							altered.emplace_back();
+							notify_change_of(formatted_label, tweaker_type::DISCRETE, altered);
+						}
+
+						augs::imgui::next_columns(input.extra_columns + 2);
 					}
 				}
 			}
-			else if constexpr(!only_direct_controls) {
-				auto further = [input, make_address](const std::string& l, const auto& m) {
-					detail_general_edit_properties<SkipPredicate>(input, make_address, l, m);
+			else {
+				auto further = [&](const std::string& l, auto& m) {
+					detail_general_edit_properties<SkipPredicate>(input, equality_predicate, notify_change_of, l, m, pass_notifier_through);
 				};
 
 				if (nodify_introspected) {
-					if (auto node = node_and_columns()) {
-						augs::introspect(further, original);
+					if (auto node = node_and_columns(formatted_label, input.extra_columns)) {
+						augs::introspect(further, altered);
 					}
 				}
 				else {
-					auto ind = scoped_indent();
+					auto ind = augs::imgui::scoped_indent();
 
-					augs::introspect(further, original);
+					augs::introspect(further, altered);
 				}
 			}
 		}
@@ -284,7 +322,7 @@ template <
 >
 void general_edit_properties(
 	const property_editor_input prop_in,
-	const T& parent_object,
+	T parent_altered,
 	G post_new_change_impl,
 	H rewrite_last_change_impl,
 	Eq field_equality_predicate = {},
@@ -321,73 +359,61 @@ void general_edit_properties(
 		rewrite_last_change_impl(old_description + description, new_content);
 	};
 
-	auto do_tweaker = [&](
-		const auto tw_in,
-		auto control_callback
-	) {
+	auto do_tweaker = [&](const auto tw_in) {
 		const auto type = tw_in.type;
 		const auto& field_name = tw_in.field_name;
 		const auto& field_location = tw_in.field_location;
 		const auto& old_value = tw_in.old_value;
 		const auto& new_value = tw_in.new_value;
 
-		ImGui::Bullet();
-		text(field_name);
-		ImGui::NextColumn();
-		auto scope = scoped_item_width(-1);
-
-
-		const auto colors = ::maybe_different_value_cols(
-			prop_in.settings,
-			!field_equality_predicate(old_value, field_location)
-		);
-
-		if (control_callback()) {
-			if (type == tweaker_type::DISCRETE) {
-				post_new_change(
-					::describe_changed(field_name, old_value, new_value, special_control_provider),
-					field_location,
-					new_value
-				);
-			}
-			else if (type == tweaker_type::CONTINUOUS) {
-				const auto this_id = ImGui::GetActiveID();
-				const auto description = ::describe_changed(field_name, old_value, new_value, special_control_provider);
-
-				auto& last_active = prop_in.state.last_active;
-
-				if (last_active != this_id) {
-					post_new_change(description, field_location, new_value);
-				}
-				else {
-					rewrite_last(description.of_new, new_value);
-				}
-
-				last_active = this_id;
-			}
+		if (type == tweaker_type::DISCRETE) {
+			post_new_change(
+				::describe_changed(field_name, old_value, new_value, special_control_provider),
+				field_location,
+				new_value
+			);
 		}
+		else if (type == tweaker_type::CONTINUOUS) {
+			const auto this_id = ImGui::GetActiveID();
+			const auto description = ::describe_changed(field_name, old_value, new_value, special_control_provider);
 
-		ImGui::NextColumn();
+			auto& last_active = prop_in.state.last_active;
 
-		next_columns(extra_columns);
+			if (last_active != this_id) {
+				post_new_change(description, field_location, new_value);
+			}
+			else {
+				rewrite_last(description.of_new, new_value);
+			}
+
+			last_active = this_id;
+		}
 	};
 
-	augs::introspect(
-		[&](const std::string& label, const auto& member) {
-			detail_general_edit_properties<SkipPredicate>(
-				detail_edit_properties_input<T, decltype(do_tweaker), S> { 
-					do_tweaker, 
-					special_control_provider,
-					prop_in.settings,
-					extra_columns
-				},
-				[&parent_object](const auto& original) {
-					return ::make_field_address(parent_object, original);
-				},
-				label,
-				member
-			);
-		},
-		parent_object
-	);
+	auto traverse = [&](const std::string& member_label, auto& member) {
+		detail_general_edit_properties<SkipPredicate>(
+			detail_edit_properties_input<S> { 
+				special_control_provider,
+				prop_in.settings,
+				extra_columns
+			},
+			[&parent_altered, &field_equality_predicate](const auto& modified, const unsigned index = -1) {
+				auto addr = ::make_field_address(parent_altered, modified);
+				addr.element_index = index;
+
+				return field_equality_predicate(modified, addr);
+			},
+			[&parent_altered, &do_tweaker](const std::string& formatted_label, const tweaker_type t, const auto& modified) {
+				const auto addr = ::make_field_address(parent_altered, modified);
+
+				do_tweaker(tweaker_input<std::decay_t<decltype(modified)>>{
+					t, formatted_label, addr, modified, modified
+				});
+			},
+			member_label,
+			member
+		);
+	};
+
+	augs::introspect(traverse, parent_altered);
 }

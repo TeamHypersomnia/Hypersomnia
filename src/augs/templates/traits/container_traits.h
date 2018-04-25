@@ -48,6 +48,13 @@ struct has_member_find<T, K, decltype(std::declval<T&>().find(std::declval<const
 
 
 template <class T, class = void>
+struct can_access_size : std::false_type {};
+
+template <class T>
+struct can_access_size<T, decltype(std::declval<T&>().size(), void())> : std::true_type {};
+
+
+template <class T, class = void>
 struct can_access_data : std::false_type {};
 
 template <class T>
@@ -91,6 +98,9 @@ struct has_suitable_member_assign<A, B, decltype(std::declval<A&>().assign(std::
 
 template <class T>
 constexpr bool can_access_data_v = can_access_data<T>::value;
+
+template <class T>
+constexpr bool can_access_size_v = can_access_size<T>::value;
 
 template <class T, class K>
 constexpr bool has_member_find_v = has_member_find<T, K>::value;

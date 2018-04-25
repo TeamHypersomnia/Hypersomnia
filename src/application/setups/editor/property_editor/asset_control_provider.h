@@ -10,6 +10,7 @@
 #include "application/setups/editor/property_editor/browsed_path_entry_base.h"
 #include "application/setups/editor/gui/asset_browser_settings.h"
 #include "application/setups/editor/property_editor/simple_browse_path_tree.h"
+#include "application/setups/editor/property_editor/tweaker_type.h"
 
 template <class F, class A>
 void choose_asset_path(
@@ -134,18 +135,18 @@ struct asset_control_provider {
 	;
 
 	auto describe_changed(
-		const std::string& label,
+		const std::string& formatted_label,
 		const assets::image_id from,
 		const assets::image_id to
 	) const {
 		return description_pair {
 			"",
-			typesafe_sprintf("Set %x to %x", label, augs::to_display(defs.image_definitions[to].get_source_path().path))
+			typesafe_sprintf("Set %x to %x", formatted_label, augs::to_display(defs.image_definitions[to].get_source_path().path))
 		};
 	}
 
 	template <class T>
-	bool handle(const std::string& label, T& object, const field_address&) const {
+	std::optional<tweaker_type> handle(const std::string& identity_label, T& object) const {
 		bool changed = false;
 
 		if constexpr(std::is_same_v<T, assets::image_id>) {
@@ -174,12 +175,16 @@ struct asset_control_provider {
 			};
 			
 			const auto& current_source  = defs.image_definitions[object].get_source_path();
-			choose_asset_path(label, current_source, project_path, "gfx", on_choice, true_returner());
+			choose_asset_path(identity_label, current_source, project_path, "gfx", on_choice, true_returner());
 		}
 		else {
 			static_assert(!handles<T>, "Incomplete implementation!");
 		}
 
-		return changed;
+		if (changed) {
+			return tweaker_type::DISCRETE;
+		}
+
+		return std::nullopt;
 	}
 };

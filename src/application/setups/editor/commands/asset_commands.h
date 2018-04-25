@@ -8,6 +8,7 @@
 #include "view/viewables/all_viewables_declarations.h"
 #include "view/viewables/get_viewable_pool.h"
 #include "view/maybe_official_path.h"
+#include "augs/enums/callback_result.h"
 
 namespace augs {
 	struct introspection_access;
@@ -68,7 +69,7 @@ struct asset_property_id {
 			const auto result = on_field_address(
 				definitions[id],
 				field,
-				[&](auto& resolved_field) {
+				[&](auto& resolved_field) -> callback_result {
 					return callback(resolved_field);
 				}
 			);

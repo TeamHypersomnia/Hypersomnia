@@ -59,7 +59,7 @@ struct path_chooser_provider {
 	static constexpr bool handles = std::is_same_v<T, handled_type>;
 
 	auto describe_changed(
-		const std::string& label,
+		const std::string& formatted_label,
 		const handled_type& from,
 		const handled_type& to
 	) const {
@@ -69,7 +69,7 @@ struct path_chooser_provider {
 		};
 	}
 
-	bool handle(const std::string& label, handled_type& object, const field_address& address) const {
+	std::optional<tweaker_type> handle(const std::string& identity_label, handled_type& object) const {
 		auto& definitions = defs.image_definitions;
 
 		bool modified = false;
@@ -77,7 +77,7 @@ struct path_chooser_provider {
 		auto scope = ::maybe_disabled_cols(settings, disabled);
 
 		choose_asset_path(
-			"##Source-path",
+			identity_label,
 			object,
 			project_path,
 			"gfx",
@@ -95,7 +95,11 @@ struct path_chooser_provider {
 			"Already tracked paths"
 		);
 
-		return modified;
+		if (modified) {
+			return tweaker_type::DISCRETE;
+		}
+
+		return std::nullopt;
 	}
 };
 
