@@ -1,6 +1,6 @@
 #pragma once
 #include "augs/templates/get_by_dynamic_id.h"
-#include "application/setups/editor/property_editor/property_editor_structs.h"
+#include "application/setups/editor/detail/field_address.h"
 
 template <class F>
 auto continue_if_nullptr(F callback) {

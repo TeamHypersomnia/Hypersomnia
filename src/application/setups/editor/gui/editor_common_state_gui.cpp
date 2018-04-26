@@ -16,7 +16,7 @@
 #include "application/setups/editor/editor_folder.h"
 
 #include "application/setups/editor/property_editor/general_edit_properties.h"
-#include "application/setups/editor/property_editor/property_editor_structs.h"
+#include "application/setups/editor/detail/field_address.h"
 #include "application/setups/editor/property_editor/asset_control_provider.h"
 #include "application/setups/editor/property_editor/commanding_property_editor_input.h"
 

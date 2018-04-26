@@ -4,7 +4,7 @@
 #include "application/setups/editor/editor_command_input.h"
 #include "application/setups/editor/commands/editor_command_structs.h"
 #include "application/setups/editor/commands/change_property_command.h"
-#include "application/setups/editor/property_editor/property_editor_structs.h"
+#include "application/setups/editor/detail/field_address.h"
 #include "view/viewables/all_viewables_declarations.h"
 #include "view/viewables/get_viewable_pool.h"
 #include "view/maybe_official_path.h"

@@ -2,6 +2,8 @@
 #include <optional>
 #include <unordered_set>
 
+#include "game/transcendental/entity_id.h"
+#include "game/transcendental/entity_flavour_id.h"
 #include "application/setups/editor/property_editor/commanding_property_editor_input.h"
 
 struct fae_tree_state {

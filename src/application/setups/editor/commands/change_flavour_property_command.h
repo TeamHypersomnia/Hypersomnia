@@ -6,7 +6,7 @@
 #include "application/setups/editor/commands/editor_command_structs.h"
 #include "application/setups/editor/commands/change_property_command.h"
 
-#include "application/setups/editor/property_editor/property_editor_structs.h"
+#include "application/setups/editor/detail/field_address.h"
 #include "application/setups/editor/property_editor/on_field_address.h"
 
 struct flavour_property_id {

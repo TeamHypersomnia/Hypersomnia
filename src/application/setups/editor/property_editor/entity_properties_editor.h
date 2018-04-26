@@ -1,7 +1,7 @@
 #pragma once
 #include "application/setups/editor/property_editor/compare_all_fields_to.h"
 
-#include "application/setups/editor/property_editor/property_editor_structs.h"
+#include "application/setups/editor/detail/field_address.h"
 #include "application/setups/editor/property_editor/general_edit_properties.h"
 #include "application/setups/editor/detail/format_struct_name.h"
 

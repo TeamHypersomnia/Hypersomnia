@@ -17,39 +17,7 @@
 
 #include "application/setups/editor/detail/maybe_different_colors.h"
 #include "application/setups/editor/property_editor/tweaker_type.h"
-
-template <class M>
-auto get_type_id_for_field() {
-	decltype(field_address::type_id) id;
-
-	if constexpr(std::is_trivially_copyable_v<M>) {
-		id.set<augs::trivial_type_marker>();
-	}
-	else {
-		id.set<M>();
-	}
-
-	return id;
-}
-
-template <class O, class M>
-auto make_field_address(const O& object, const M& member) {
-	field_address result;
-
-	result.type_id = get_type_id_for_field<M>();
-	result.offset = static_cast<unsigned>(
-		reinterpret_cast<const std::byte*>(std::addressof(member))
-		- reinterpret_cast<const std::byte*>(std::addressof(object))
-	);
-
-	return result;
-}
-
-template <class O, class M>
-auto make_field_address(const M O::* const member) {
-	static const O o;
-	return make_field_address(o, o.*member);
-}
+#include "application/setups/editor/detail/field_address.h"
 
 template <class T>
 static constexpr bool has_direct_control_v = 
