@@ -151,13 +151,9 @@ struct asset_control_provider {
 
 	auto describe_changed(
 		const std::string& formatted_label,
-		const assets::image_id from,
 		const assets::image_id to
 	) const {
-		return description_pair {
-			"",
-			typesafe_sprintf("Set %x to %x", formatted_label, augs::to_display(defs.image_definitions[to].get_source_path().path))
-		};
+		return typesafe_sprintf("Set %x to %x", formatted_label, augs::to_display(defs.image_definitions[to].get_source_path().path));
 	}
 
 	template <class T>

@@ -26,6 +26,10 @@ struct field_address {
 	unsigned element_index = static_cast<unsigned>(-1);
 	edited_field_type_id type_id;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const field_address& b) const {
+		return offset == b.offset && element_index && b.element_index && type_id == b.type_id;
+	}
 };
 
 template <class M>

@@ -17,6 +17,19 @@ decltype(auto) get_name_of(const entity_flavour<T>& flavour) {
 	return flavour.template get<invariants::name>().name;
 }
 
+template <class C, class T, class N>
+void describe_if_rename(C& cmd, std::string& old, const field_address field, const T& invariant, const N& new_content) {
+	if constexpr(std::is_same_v<T, invariants::name> && std::is_same_v<N, std::string>) {
+		if (field == make_field_address(&invariants::name::name)) {
+			if (old.empty()) {
+				old = "Renamed " + invariant.name;
+			}
+
+			cmd.built_description = old + " to " + new_content;
+		}
+	}
+}
+
 template <class T>
 void edit_invariant(
 	const T& invariant,
@@ -41,6 +54,7 @@ void edit_invariant(
 	auto& history = cmd_in.folder.history;
 
 	auto& defs = cmd_in.folder.work->viewables;
+	auto& old_description = cpe_in.prop_in.state.old_description;
 
 	auto post_new_change = [&](
 		const auto& description,
@@ -53,6 +67,7 @@ void edit_invariant(
 			cmd.property_id = flavour_property_id { in.invariant_id, field_id };
 			cmd.value_after_change = augs::to_bytes(new_content);
 			cmd.built_description = description + property_location;
+			describe_if_rename(cmd, old_description, field_id, invariant, new_content);
 
 			history.execute_new(std::move(cmd), cmd_in);
 		}
@@ -68,6 +83,7 @@ void edit_invariant(
 
 		if (auto* const cmd = std::get_if<command_type>(std::addressof(last))) {
 			cmd->built_description = description + property_location;
+			describe_if_rename(*cmd, old_description, cmd->property_id.field, invariant, new_content);
 			cmd->rewrite_change(augs::to_bytes(new_content), cmd_in);
 		}
 		else {

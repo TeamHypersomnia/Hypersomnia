@@ -100,7 +100,6 @@ struct tweaker_input {
 	const tweaker_type type;
 	const std::string& field_name;
 	field_address field_location;
-	const M& old_value;
 	const M& new_value;
 };
 
@@ -296,8 +295,8 @@ template <
 void general_edit_properties(
 	const property_editor_input prop_in,
 	T parent_altered,
-	G post_new_change_impl,
-	H rewrite_last_change_impl,
+	G post_new_change,
+	H rewrite_last,
 	Eq field_equality_predicate = {},
 	const S special_control_provider = {},
 	const D sane_defaults = {},
@@ -310,46 +309,26 @@ void general_edit_properties(
 
 		if (last_active && last_active.value() != ImGui::GetActiveID()) {
 			last_active.reset();
+			prop_in.state.old_description = {};
 		}
 	}
-
-	auto& old_description = prop_in.state.old_description;
-
-	auto post_new_change = [&](
-		const description_pair& description,
-		const auto field_id,
-		const auto& new_content
-	) {
-		old_description = description.of_old;
-		const auto new_description = old_description + description.of_new;
-
-		post_new_change_impl(new_description, field_id, new_content);
-	};
-
-	auto rewrite_last = [&](
-		const auto& description,
-		const auto& new_content
-	) {
-		rewrite_last_change_impl(old_description + description, new_content);
-	};
 
 	auto do_tweaker = [&](const auto tw_in) {
 		const auto type = tw_in.type;
 		const auto& field_name = tw_in.field_name;
 		const auto& field_location = tw_in.field_location;
-		const auto& old_value = tw_in.old_value;
 		const auto& new_value = tw_in.new_value;
 
 		if (type == tweaker_type::DISCRETE) {
 			post_new_change(
-				::describe_changed(field_name, old_value, new_value, special_control_provider),
+				::describe_changed(field_name, new_value, special_control_provider),
 				field_location,
 				new_value
 			);
 		}
 		else if (type == tweaker_type::CONTINUOUS) {
 			const auto this_id = ImGui::GetActiveID();
-			const auto description = ::describe_changed(field_name, old_value, new_value, special_control_provider);
+			const auto description = ::describe_changed(field_name, new_value, special_control_provider);
 
 			auto& last_active = prop_in.state.last_active;
 
@@ -357,7 +336,7 @@ void general_edit_properties(
 				post_new_change(description, field_location, new_value);
 			}
 			else {
-				rewrite_last(description.of_new, new_value);
+				rewrite_last(description, new_value);
 			}
 
 			last_active = this_id;
@@ -382,7 +361,7 @@ void general_edit_properties(
 				const auto addr = ::make_field_address(parent_altered, modified);
 
 				do_tweaker(tweaker_input<std::decay_t<decltype(modified)>>{
-					t, formatted_label, addr, modified, modified
+					t, formatted_label, addr, modified
 				});
 			},
 			member_label,

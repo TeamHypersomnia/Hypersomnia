@@ -7,11 +7,6 @@
 struct maybe_official_path;
 struct property_editor_settings;
 
-struct description_pair {
-	std::string of_old;
-	std::string of_new;
-};
-
 struct property_editor_state {
 	std::optional<ImGuiID> last_active;
 	std::string old_description = "";

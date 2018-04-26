@@ -47,7 +47,7 @@ struct asset_gui_path_entry : public browsed_path_entry_base {
 };
 
 template <class id_type>
-struct path_chooser_provider {
+struct path_control_provider {
 	all_viewables_defs& defs;
 	const augs::path_type& project_path;
 	const property_editor_settings& settings;
@@ -60,13 +60,9 @@ struct path_chooser_provider {
 
 	auto describe_changed(
 		const std::string& formatted_label,
-		const handled_type& from,
 		const handled_type& to
 	) const {
-		return description_pair {
-			"",
-			typesafe_sprintf("Changed image path from %x", describe_moved_file(from.path, to.path))
-		};
+		return typesafe_sprintf("Changed image path to %x", to.path);
 	}
 
 	template <class T>
@@ -417,7 +413,7 @@ void editor_images_gui::perform(
 							selected_ids
 						);
 					},
-					path_chooser_provider<asset_id_type> { viewables, project_path, settings, disable_path_chooser },
+					path_control_provider<asset_id_type> { viewables, project_path, settings, disable_path_chooser },
 					default_sane_default_provider(),
 					num_cols - 2
 				);
