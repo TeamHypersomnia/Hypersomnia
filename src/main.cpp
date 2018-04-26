@@ -331,23 +331,14 @@ int work(const int argc, const char* const * const argv) try {
 				/* Check for unloaded and changed resources */
 				currently_loaded_defs.image_definitions.for_each_object_and_id([&](const auto& old_definition, const auto key) {
 					if (const auto new_definition = mapped_or_nullptr(new_defs.image_definitions, key)) {
-						const bool loadables_changed = !(new_definition->loadables == old_definition.loadables);
+						if (new_definition->loadables != old_definition.loadables) {
+							/* Loadables changed, so reload them. */
 
-						if (loadables_changed) {
-							/* Changed, reload */
 							new_atlas_required = true;
-						}
-
-						const auto& new_meta = new_definition->meta;
-						const auto& old_meta = old_definition.meta;
-
-						if (loadables_changed) {
 							loaded_image_caches.at(key) = { 
 								image_definition_view(get_unofficial_gfx_dir(), *new_definition)
 							};
 						}
-
-						/* const bool meta_changed = !(old_meta == new_meta); */
 					}
 					else {
 						/* Missing, unload */
@@ -370,7 +361,7 @@ int work(const int argc, const char* const * const argv) try {
 				});
 			}
 
-			if (!(config.gui_font == loaded_gui_font)) {
+			if (config.gui_font != loaded_gui_font) {
 				new_atlas_required = true;
 			}
 
@@ -405,16 +396,14 @@ int work(const int argc, const char* const * const argv) try {
 
 		{
 			/* Check for unloaded and changed resources */
-			for (const auto& old : currently_loaded_defs.sounds) {
-				const auto key = old.first;
-
+			currently_loaded_defs.sounds.for_each_object_and_id([&](const auto& now_loaded, const auto& key) {
 				auto unload = [&](){
 					audiovisuals.get<sound_system>().clear_sources_playing(key);
 					loaded_sounds.erase(key);
 				};
 
 				if (const auto fresh = mapped_or_nullptr(new_defs.sounds, key)) {
-					if (!(*fresh == old.second)) {
+					if (*fresh != now_loaded) {
 						/* Different from the fresh one, reload */
 						unload();
 
@@ -430,20 +419,20 @@ int work(const int argc, const char* const * const argv) try {
 					/* Missing, unload */
 					unload();
 				}
-			}
+			});
 
 			/* Check for new resources */
-			for (const auto& fresh : new_defs.sounds) {
-				if (nullptr == mapped_or_nullptr(currently_loaded_defs.sounds, fresh.first)) {
+			new_defs.sounds.for_each_object_and_id([&](const auto& fresh_def, const auto& fresh_key) {
+				if (nullptr == mapped_or_nullptr(currently_loaded_defs.sounds, fresh_key)) {
 					try {
-						loaded_sounds.try_emplace(fresh.first, fresh.second);
+						loaded_sounds.try_emplace(fresh_key, fresh_def);
 					}
 					catch (...) {
 
 					}
 				}
 				/* Otherwise it's already taken care of */
-			}
+			});
 		}
 
 		/* Done, overwrite */

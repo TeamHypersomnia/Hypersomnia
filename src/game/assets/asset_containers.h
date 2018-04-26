@@ -37,5 +37,8 @@ using make_asset_pool = augs::pool<
 template <class pooled_type>
 using image_id_pool = make_asset_pool<pooled_type, MAX_IMAGE_COUNT, assets::image_id_key>;
 
+template <class pooled_type>
+using sound_id_pool = make_asset_pool<pooled_type, MAX_SOUND_BUFFER_COUNT, assets::sound_buffer_id_key>;
+
 struct animation;
 using animations_pool = make_asset_pool<animation, MAX_ANIMATION_COUNT, assets::animation_id_key>;

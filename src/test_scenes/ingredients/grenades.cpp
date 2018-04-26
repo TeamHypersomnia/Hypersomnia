@@ -43,8 +43,8 @@ namespace test_flavours {
 			meta.set(item);
 
 			invariants::hand_fuse fuse; 
-			fuse.throw_sound.id = assets::sound_buffer_id::GRENADE_THROW;
-			fuse.unpin_sound.id = assets::sound_buffer_id::GRENADE_UNPIN;
+			fuse.throw_sound.id = to_sound_id(test_scene_sound_id::GRENADE_THROW);
+			fuse.unpin_sound.id = to_sound_id(test_scene_sound_id::GRENADE_UNPIN);
 			meta.set(fuse);
 
 			invariants::explosive explosive; 
@@ -57,7 +57,7 @@ namespace test_flavours {
 			in.effective_radius = 300.f;
 			in.impact_impulse = 550.f;
 			in.sound_gain = 1.8f;
-			in.sound_effect = assets::sound_buffer_id::GREAT_EXPLOSION;
+			in.sound_effect = to_sound_id(test_scene_sound_id::GREAT_EXPLOSION);
 
 			in.victim_shake.duration_ms = 500.f;
 			in.victim_shake.mult = 1.2f;
@@ -90,8 +90,8 @@ namespace test_flavours {
 			meta.set(item);
 
 			invariants::hand_fuse fuse; 
-			fuse.throw_sound.id = assets::sound_buffer_id::GRENADE_THROW;
-			fuse.unpin_sound.id = assets::sound_buffer_id::GRENADE_UNPIN;
+			fuse.throw_sound.id = to_sound_id(test_scene_sound_id::GRENADE_THROW);
+			fuse.unpin_sound.id = to_sound_id(test_scene_sound_id::GRENADE_UNPIN);
 			meta.set(fuse);
 
 			invariants::explosive explosive; 
@@ -104,7 +104,7 @@ namespace test_flavours {
 			in.effective_radius = 450.f;
 			in.impact_impulse = 2.f;
 			in.sound_gain = 2.2f;
-			in.sound_effect = assets::sound_buffer_id::INTERFERENCE_EXPLOSION;
+			in.sound_effect = to_sound_id(test_scene_sound_id::INTERFERENCE_EXPLOSION);
 			in.type = adverse_element_type::INTERFERENCE;
 
 			in.victim_shake.duration_ms = 800.f;
@@ -138,8 +138,8 @@ namespace test_flavours {
 			meta.set(item);
 
 			invariants::hand_fuse fuse; 
-			fuse.throw_sound.id = assets::sound_buffer_id::GRENADE_THROW;
-			fuse.unpin_sound.id = assets::sound_buffer_id::GRENADE_UNPIN;
+			fuse.throw_sound.id = to_sound_id(test_scene_sound_id::GRENADE_THROW);
+			fuse.unpin_sound.id = to_sound_id(test_scene_sound_id::GRENADE_UNPIN);
 			meta.set(fuse);
 
 			invariants::explosive explosive; 
@@ -151,7 +151,7 @@ namespace test_flavours {
 			in.effective_radius = 350.f;
 			in.impact_impulse = 2.f;
 			in.sound_gain = 2.2f;
-			in.sound_effect = assets::sound_buffer_id::PED_EXPLOSION;
+			in.sound_effect = to_sound_id(test_scene_sound_id::PED_EXPLOSION);
 			in.type = adverse_element_type::PED;
 			in.create_thunders_effect = true;
 

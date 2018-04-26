@@ -33,6 +33,9 @@ struct image_loadables {
 	// END GEN INTROSPECTOR
 
 	bool operator==(const image_loadables& b) const;
+	bool operator!=(const image_loadables& b) const {
+		return !operator==(b);
+	}
 
 	bool should_generate_desaturation() const {
 		return extras.generate_desaturation;

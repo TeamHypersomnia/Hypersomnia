@@ -621,3 +621,15 @@ we consider whole type overrides too complex architeciturally:
 	- then it would be nice to at least be able to edit the introspected structs,
 		- but store their whole copies
 
+
+- command: use_image_path
+	- won't be a standalone command really, just stored inside change flav prop command
+		- like grouping command is stored
+	- redo may create new entry in loadables
+	- undo may destroy that entry
+	- if the path exists by the time of redo, nothing is created/destroyed
+		- for statelessness, let it calculate existence on each redo/undo
+	- the command must store undo input and do undo allocate
+- editor command: forget_image_path
+	- won't check for usage, it will be the job of editor gui to not let it be called when something is in use
+	- contains the forgotten viewable's content

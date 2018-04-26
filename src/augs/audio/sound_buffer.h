@@ -56,6 +56,10 @@ namespace augs {
 				&& generate_mono == b.generate_mono
 			;
 		}
+
+		bool operator!=(const sound_buffer_loading_input& b) const {
+			return !operator==(b);
+		}
 	};
 
 	class sound_buffer {

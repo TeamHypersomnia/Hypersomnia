@@ -123,10 +123,10 @@ namespace test_flavours {
 
 			missile.muzzle_leave_particles.id = assets::particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION;
 			missile.muzzle_leave_particles.modifier.colorize = cyan;
-			missile.pass_through_held_item_sound.id = assets::sound_buffer_id::BULLET_PASSES_THROUGH_HELD_ITEM;
+			missile.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
 
-			missile.trace_sound.id = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;
-			missile.destruction_sound.id = assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION;
+			missile.trace_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_PROJECTILE_FLIGHT);
+			missile.destruction_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_DISCHARGE_EXPLOSION);
 
 			auto& trace_modifier = missile.trace_sound.modifier;
 
@@ -308,8 +308,8 @@ namespace test_flavours {
 			missile.muzzle_leave_particles.id = assets::particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION;
 			missile.muzzle_leave_particles.modifier.colorize = cyan;
 
-			missile.trace_sound.id = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;
-			missile.destruction_sound.id = assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION;
+			missile.trace_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_PROJECTILE_FLIGHT);
+			missile.destruction_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_DISCHARGE_EXPLOSION);
 
 			missile.homing_towards_hostile_strength = 1.0f;
 			missile.damage_amount = 42;
@@ -363,8 +363,8 @@ namespace test_flavours {
 			missile.muzzle_leave_particles.id = assets::particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION;
 			missile.muzzle_leave_particles.modifier.colorize = cyan;
 
-			missile.trace_sound.id = assets::sound_buffer_id::ELECTRIC_PROJECTILE_FLIGHT;
-			missile.destruction_sound.id = assets::sound_buffer_id::ELECTRIC_DISCHARGE_EXPLOSION;
+			missile.trace_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_PROJECTILE_FLIGHT);
+			missile.destruction_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_DISCHARGE_EXPLOSION);
 
 			missile.homing_towards_hostile_strength = 1.0f;
 			missile.damage_amount = 42;
@@ -395,7 +395,7 @@ namespace test_flavours {
 
 			invariants::gun gun_def;
 
-			gun_def.muzzle_shot_sound.id = assets::sound_buffer_id::ASSAULT_RIFLE_MUZZLE;
+			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::ASSAULT_RIFLE_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
 			gun_def.muzzle_velocity = {4000.f, 4000.f};
@@ -409,14 +409,14 @@ namespace test_flavours {
 			gun_def.shell_velocity = {300.f, 1700.f};
 			gun_def.damage_multiplier = 2.2f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 6;
-			gun_def.low_ammo_cue_sound.id = assets::sound_buffer_id::LOW_AMMO_CUE;
+			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 
 			gun_def.maximum_heat = 2.1f;
 			gun_def.gunshot_adds_heat = 0.052f;
 			gun_def.engine_sound_strength = 0.5f;
 
 			gun_def.recoil.id = assets::recoil_player_id::GENERIC;
-			gun_def.firing_engine_sound.id = assets::sound_buffer_id::FIREARM_ENGINE;
+			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
 
 			meta.set(gun_def);
 
@@ -438,7 +438,7 @@ namespace test_flavours {
 
 			invariants::gun gun_def;
 
-			gun_def.muzzle_shot_sound.id = assets::sound_buffer_id::KEK9_MUZZLE;
+			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::KEK9_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::SEMI_AUTOMATIC;
 			gun_def.muzzle_velocity = {3000.f, 3000.f};
@@ -452,12 +452,12 @@ namespace test_flavours {
 			gun_def.shell_velocity = {300.f, 1700.f};
 			gun_def.damage_multiplier = 1.4f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 6;
-			gun_def.low_ammo_cue_sound.id = assets::sound_buffer_id::LOW_AMMO_CUE;
+			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 
 			gun_def.maximum_heat = 2.1f;
 			gun_def.gunshot_adds_heat = 0.052f;
 			gun_def.engine_sound_strength = 0.5f;
-			gun_def.firing_engine_sound.id = assets::sound_buffer_id::FIREARM_ENGINE;
+			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
 
 			gun_def.recoil.id = assets::recoil_player_id::GENERIC;
 
@@ -481,7 +481,7 @@ namespace test_flavours {
 
 			invariants::gun gun_def;
 
-			gun_def.muzzle_shot_sound.id = assets::sound_buffer_id::ASSAULT_RIFLE_MUZZLE;
+			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::ASSAULT_RIFLE_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
 			gun_def.muzzle_velocity = {2000.f, 2000.f};

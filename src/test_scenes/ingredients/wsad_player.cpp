@@ -97,11 +97,11 @@ namespace test_flavours {
 			sentience.health_decrease_particles.modifier.colorize = red;
 			sentience.health_decrease_particles.modifier.scale_lifetimes = 1.5f;
 
-			sentience.health_decrease_sound.id = assets::sound_buffer_id::IMPACT;
-			sentience.death_sound.id = assets::sound_buffer_id::DEATH;
+			sentience.health_decrease_sound.id = to_sound_id(test_scene_sound_id::IMPACT);
+			sentience.death_sound.id = to_sound_id(test_scene_sound_id::DEATH);
 
-			sentience.loss_of_consciousness_sound.id = assets::sound_buffer_id::DEATH;
-			sentience.consciousness_decrease_sound.id = assets::sound_buffer_id::IMPACT;
+			sentience.loss_of_consciousness_sound.id = to_sound_id(test_scene_sound_id::DEATH);
+			sentience.consciousness_decrease_sound.id = to_sound_id(test_scene_sound_id::IMPACT);
 
 			sentience_inst.get<health_meter_instance>().set_value(100);
 			sentience_inst.get<health_meter_instance>().set_maximum_value(100);

@@ -35,10 +35,10 @@ namespace test_scenes {
 		populate_test_scene_flavours(caches, common.flavours);
 
 		auto& common_assets = common.assets;
-		common_assets.cast_unsuccessful_sound.id = assets::sound_buffer_id::CAST_UNSUCCESSFUL;
-		common_assets.ped_shield_impact_sound.id = assets::sound_buffer_id::EXPLOSION;
-		common_assets.ped_shield_destruction_sound.id = assets::sound_buffer_id::GREAT_EXPLOSION;
-		common_assets.item_throw_sound.id = assets::sound_buffer_id::ITEM_THROW;
+		common_assets.cast_unsuccessful_sound.id = to_sound_id(test_scene_sound_id::CAST_UNSUCCESSFUL);
+		common_assets.ped_shield_impact_sound.id = to_sound_id(test_scene_sound_id::EXPLOSION);
+		common_assets.ped_shield_destruction_sound.id = to_sound_id(test_scene_sound_id::GREAT_EXPLOSION);
+		common_assets.item_throw_sound.id = to_sound_id(test_scene_sound_id::ITEM_THROW);
 		common_assets.item_throw_sound.modifier.pitch = 1.15f;
 		common_assets.item_throw_sound.modifier.gain = 0.8f;
 

@@ -124,6 +124,10 @@ namespace augs {
 				&& add_japanese_ranges == b.add_japanese_ranges
 			;
 		}
+
+		bool operator!=(const font_loading_input& b) const {
+			return !operator==(b);
+		}
 	};
 
 	struct font {

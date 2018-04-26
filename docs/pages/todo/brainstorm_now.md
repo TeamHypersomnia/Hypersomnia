@@ -7,6 +7,13 @@ summary: That which we are brainstorming at the moment.
 
 - rethink our roadmap
 
+- might be cool to make container elements tickable and modifiable in bulk, in flavour
+	- might actually be done just inside the general edit under container constexpr, with help of notifies etc
+
+- always fill new workspace with some test scene essentials?
+	- so that e.g. no image ids in common state stay invalid
+	- can make those the first in test scene images so that we can stop importing images after some point
+
 - asynchronous texture transfers, especially when regenerating atlases
 
 - editing containers in general edit properties
@@ -27,18 +34,6 @@ summary: That which we are brainstorming at the moment.
 	- NO! Just store it inside editor so that it may be properly cleaned up
 	- a good test case for a pbo
 	- then send just image id to the imgui renderering routine
-
-- command: use_image_path
-	- won't be a standalone command really, just stored inside change flav prop command
-		- like grouping command is stored
-	- redo may create new entry in loadables
-	- undo may destroy that entry
-	- if the path exists by the time of redo, nothing is created/destroyed
-		- for statelessness, let it calculate existence on each redo/undo
-	- the command must store undo input and do undo allocate
-- editor command: forget_image_path
-	- won't check for usage, it will be the job of editor gui to not let it be called when something is in use
-	- contains the forgotten viewable's content
 
 - we'll generalize later once images work
 
@@ -65,11 +60,6 @@ summary: That which we are brainstorming at the moment.
 		- actually relinking still needed if after removing a flavour we allocate a new one
 	- could pool be rebuilt so that indirection indices are actually real indices?
 
-- always fill new workspace with some test scene essentials?
-	- so that e.g. no image ids in common state stay invalid
-	- can make those the first in test scene images so that we can stop importing images after some point
-
-- what do we do with invalid sprite ids?
 	- makes practically no sense to have an invalid image id
 		- invalid sound id could still signify a no-sound which may make sense
 	- if we disallow them, we need to somehow handle this in editor
@@ -82,7 +72,6 @@ summary: That which we are brainstorming at the moment.
 		- what if an image on disk gets deleted and an atlas is required to be regenerated?
 			- then stop displaying the cosmos and just be left with imgui
 			- we can check in main if the game world atlas exists
-	- for things that we guarantee validity of image ids (in sprites), just do always the call to at
 	- in stuff like gui however, we'll seriously need to check with mapped or nullptr
 
 - Creating new flavours

@@ -1,5 +1,6 @@
 #include "test_scenes/test_scenes_content.h"
 #include "game/detail/spells/spell_structs.h"
+#include "test_scenes/test_scene_sound_buffers.h"
 #include "game/transcendental/cosmos.h"
 
 #include "game/detail/spells/all_spells.h"
@@ -35,7 +36,7 @@ void load_test_scene_sentience_properties(
 
 		d.appearance.icon = to_image_id(test_scene_image_id::SPELL_HASTE_ICON);
 
-		d.common.cast_successful_sound.id = assets::sound_buffer_id::CAST_SUCCESSFUL;
+		d.common.cast_successful_sound.id = to_sound_id(test_scene_sound_id::CAST_SUCCESSFUL);
 		d.common.cast_sparkles.id = assets::particle_effect_id::CAST_SPARKLES;
 		d.common.cast_sparkles.modifier.colorize = d.common.associated_color;
 	}
@@ -56,7 +57,7 @@ void load_test_scene_sentience_properties(
 		d.appearance.icon = to_image_id(test_scene_image_id::SPELL_EXALTATION_ICON);
 		d.basic_healing_amount = 34;
 
-		d.common.cast_successful_sound.id = assets::sound_buffer_id::CAST_SUCCESSFUL;
+		d.common.cast_successful_sound.id = to_sound_id(test_scene_sound_id::CAST_SUCCESSFUL);
 		d.common.cast_sparkles.id = assets::particle_effect_id::CAST_SPARKLES;
 		d.common.cast_sparkles.modifier.colorize = d.common.associated_color;
 		d.common.cast_sparkles.modifier.scale_amounts = 1.3f;
@@ -79,7 +80,7 @@ void load_test_scene_sentience_properties(
 		d.appearance.icon = to_image_id(test_scene_image_id::SPELL_ECHOES_OF_THE_HIGHER_REALMS_ICON);
 		d.basic_healing_amount = 132;
 
-		d.common.cast_successful_sound.id = assets::sound_buffer_id::CAST_SUCCESSFUL;
+		d.common.cast_successful_sound.id = to_sound_id(test_scene_sound_id::CAST_SUCCESSFUL);
 		d.common.cast_sparkles.id = assets::particle_effect_id::CAST_SPARKLES;
 		d.common.cast_sparkles.modifier.colorize = d.common.associated_color;
 		d.common.cast_sparkles.modifier.scale_amounts = 1.3f;
@@ -101,7 +102,7 @@ void load_test_scene_sentience_properties(
 
 		d.appearance.icon = to_image_id(test_scene_image_id::SPELL_FURY_OF_THE_AEONS_ICON);
 
-		d.common.cast_successful_sound.id = assets::sound_buffer_id::CAST_SUCCESSFUL;
+		d.common.cast_successful_sound.id = to_sound_id(test_scene_sound_id::CAST_SUCCESSFUL);
 		d.common.cast_sparkles.id = assets::particle_effect_id::CAST_SPARKLES;
 		d.common.cast_sparkles.modifier.colorize = d.common.associated_color;
 
@@ -113,7 +114,7 @@ void load_test_scene_sentience_properties(
 			in.impact_impulse = 150.f;
 			in.inner_ring_color = cyan;
 			in.outer_ring_color = white;
-			in.sound_effect = assets::sound_buffer_id::EXPLOSION;
+			in.sound_effect = to_sound_id(test_scene_sound_id::EXPLOSION);
 			in.sound_gain = 1.2f;
 			in.type = adverse_element_type::FORCE;
 
@@ -138,7 +139,7 @@ void load_test_scene_sentience_properties(
 
 		d.appearance.icon = to_image_id(test_scene_image_id::SPELL_ELECTRIC_TRIAD_ICON);
 
-		d.common.cast_successful_sound.id = assets::sound_buffer_id::CAST_SUCCESSFUL;
+		d.common.cast_successful_sound.id = to_sound_id(test_scene_sound_id::CAST_SUCCESSFUL);
 		d.common.cast_sparkles.id = assets::particle_effect_id::CAST_SPARKLES;
 		d.common.cast_sparkles.modifier.colorize = d.common.associated_color;
 	}
@@ -158,13 +159,13 @@ void load_test_scene_sentience_properties(
 
 		d.appearance.icon = to_image_id(test_scene_image_id::SPELL_ULTIMATE_WRATH_OF_THE_AEONS_ICON);
 
-		d.common.cast_successful_sound.id = assets::sound_buffer_id::CAST_SUCCESSFUL;
+		d.common.cast_successful_sound.id = to_sound_id(test_scene_sound_id::CAST_SUCCESSFUL);
 		d.common.cast_sparkles.id = assets::particle_effect_id::CAST_SPARKLES;
 		d.common.cast_sparkles.modifier.colorize = d.common.associated_color;
 
 		d.charging_particles.id = assets::particle_effect_id::CAST_CHARGING;
 		d.charging_particles.modifier.scale_lifetimes = 1.3f;
-		d.charging_sound.id = assets::sound_buffer_id::CAST_CHARGING;
+		d.charging_sound.id = to_sound_id(test_scene_sound_id::CAST_CHARGING);
 
 		{
 			standard_explosion_input in;
@@ -177,7 +178,7 @@ void load_test_scene_sentience_properties(
 				in.effective_radius = 200.f;
 				in.impact_impulse = 150.f;
 				in.sound_gain = 1.2f;
-				in.sound_effect = assets::sound_buffer_id::EXPLOSION;
+				in.sound_effect = to_sound_id(test_scene_sound_id::EXPLOSION);
 
 				in.subject_shake.duration_ms = 400.f;
 				in.subject_shake.mult = 1.f;
@@ -190,7 +191,7 @@ void load_test_scene_sentience_properties(
 				in.effective_radius = 400.f;
 				in.impact_impulse = 200.f;
 				in.sound_gain = 1.0f;
-				in.sound_effect = assets::sound_buffer_id::GREAT_EXPLOSION;
+				in.sound_effect = to_sound_id(test_scene_sound_id::GREAT_EXPLOSION);
 
 				in.subject_shake.duration_ms = 500.f;
 				in.subject_shake.mult = 1.46f;
@@ -203,7 +204,7 @@ void load_test_scene_sentience_properties(
 				in.effective_radius = 600.f;
 				in.impact_impulse = 250.f;
 				in.sound_gain = 1.2f;
-				in.sound_effect = assets::sound_buffer_id::GREAT_EXPLOSION;
+				in.sound_effect = to_sound_id(test_scene_sound_id::GREAT_EXPLOSION);
 
 				in.subject_shake.duration_ms = 730.f;
 				in.subject_shake.mult = 2.f;
@@ -231,7 +232,7 @@ void load_test_scene_sentience_properties(
 
 		d.appearance.icon = to_image_id(test_scene_image_id::SPELL_ELECTRIC_SHIELD_ICON);
 
-		d.common.cast_successful_sound.id = assets::sound_buffer_id::CAST_SUCCESSFUL;
+		d.common.cast_successful_sound.id = to_sound_id(test_scene_sound_id::CAST_SUCCESSFUL);
 		d.common.cast_sparkles.id = assets::particle_effect_id::CAST_SPARKLES;
 		d.common.cast_sparkles.modifier.colorize = d.common.associated_color;
 	}

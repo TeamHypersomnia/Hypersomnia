@@ -628,6 +628,7 @@ file(GLOB_RECURSE HYPERSOMNIA_HEADERS_WITH_INTROSPECTED_CLASSES
 
 	"src/test_scenes/test_scene_images.h"
 	"src/test_scenes/test_scene_animations.h"
+	"src/test_scenes/test_scene_sound_buffers.h"
 
 	"src/game/tests_of_traits.cpp"
 	"src/augs/templates/introspect.cpp"

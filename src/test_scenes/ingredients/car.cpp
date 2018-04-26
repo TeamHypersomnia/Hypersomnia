@@ -252,7 +252,7 @@ namespace prefabs {
 
 			{
 				sound_existence_input in;
-				in.effect.id = assets::sound_buffer_id::ENGINE;
+				in.effect.id = to_sound_id(test_scene_sound_id::ENGINE);
 				in.delete_entity_after_effect_lifetime = false;
 
 				const auto engine_sound = in.create_sound_effect_entity(step, spawn_transform, front);
