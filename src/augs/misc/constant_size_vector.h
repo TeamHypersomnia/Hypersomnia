@@ -81,37 +81,37 @@ namespace augs {
 		}
 
 		void push_back(const value_type& obj) {
-			ensure(count < capacity());
+			ensure_less(count, capacity());
 			construct_at(count++, obj);
 		}
 
 		template <class... Args>
 		void emplace_back(Args&&... args) {
-			ensure(count < capacity());
+			ensure_less(count, capacity());
 			construct_at(count++, std::forward<Args>(args)...);
 		}
 
 		value_type& operator[](const std::size_t i) {
 #if !IS_PRODUCTION_BUILD
-			ensure(static_cast<size_type>(i) < count);
+			ensure_less(static_cast<size_type>(i), count);
 #endif
 			return nth(static_cast<size_type>(i));
 		}
 
 		const value_type& operator[](const std::size_t i) const {
 #if !IS_PRODUCTION_BUILD
-			ensure(static_cast<size_type>(i) < count);
+			ensure_less(static_cast<size_type>(i), count);
 #endif
 			return nth(static_cast<size_type>(i));
 		}
 
 		value_type& at(const std::size_t i) {
-			ensure(static_cast<size_type>(i) < count);
+			ensure_less(static_cast<size_type>(i), count);
 			return nth(static_cast<size_type>(i));
 		}
 
 		const value_type& at(const std::size_t i) const {
-			ensure(static_cast<size_type>(i) < count);
+			ensure_less(static_cast<size_type>(i), count);
 			return nth(static_cast<size_type>(i));
 		}
 
