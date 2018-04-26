@@ -15,6 +15,9 @@
 #include "test_scenes/test_scene_images.h"
 #include "test_scenes/test_scene_sounds.h"
 #include "test_scenes/test_scene_flavours.h"
+#include "test_scenes/test_scene_physical_materials.h"
+#include "test_scenes/test_scene_particle_effects.h"
+#include "test_scenes/test_scene_recoil_players.h"
 
 #include "test_scenes/ingredients/box_physics.h"
 #include "test_scenes/ingredients/sprite.h"

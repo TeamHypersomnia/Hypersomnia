@@ -1,3 +1,4 @@
+#include "test_scenes/test_scene_recoil_players.h"
 #include "test_scenes/test_scenes_content.h"
 
 #include "game/assets/recoil_player.h"
@@ -20,9 +21,16 @@ static void populate_with_uniform_offsets(
 	}
 }
 
-void load_test_scene_recoil_players(recoil_players_pool& assets) {
+void load_test_scene_recoil_players(recoil_players_pool& recoils) {
 	{
-		auto& generic_recoil = assets[assets::recoil_player_id::GENERIC];
-		populate_with_uniform_offsets(generic_recoil, 20);
+		recoil_player recoil;
+		populate_with_uniform_offsets(recoil, 20);
+
+		const auto test_id = test_scene_recoil_id::GENERIC;
+
+		const auto id = to_recoil_id(test_id);
+		const auto new_allocation = recoils.allocate(std::move(recoil));
+
+		ensure_eq(new_allocation.key, id);
 	}
 }

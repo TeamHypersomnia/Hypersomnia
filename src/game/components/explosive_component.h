@@ -10,7 +10,7 @@ namespace invariants {
 		// GEN INTROSPECTOR struct invariants::explosive
 		standard_explosion_input explosion;
 		assets::image_id released_image_id;
-		assets::physical_material_id released_physical_material = assets::physical_material_id::INVALID;
+		assets::physical_material_id released_physical_material;
 		// END GEN INTROSPECTOR
 	};
 }

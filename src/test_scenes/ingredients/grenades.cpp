@@ -63,7 +63,7 @@ namespace test_flavours {
 			in.victim_shake.mult = 1.2f;
 
 			explosive.released_image_id = to_image_id(test_scene_image_id::FORCE_GRENADE_RELEASED);
-			explosive.released_physical_material = assets::physical_material_id::GRENADE;
+			explosive.released_physical_material = to_physical_material_id(test_scene_physical_material_id::GRENADE);
 
 			meta.set(explosive);
 		}
@@ -111,7 +111,7 @@ namespace test_flavours {
 			in.victim_shake.mult = 1.5f;
 
 			explosive.released_image_id = to_image_id(test_scene_image_id::INTERFERENCE_GRENADE_RELEASED);
-			explosive.released_physical_material = assets::physical_material_id::GRENADE;
+			explosive.released_physical_material = to_physical_material_id(test_scene_physical_material_id::GRENADE);
 
 			meta.set(explosive);
 		}
@@ -156,7 +156,7 @@ namespace test_flavours {
 			in.create_thunders_effect = true;
 
 			explosive.released_image_id = to_image_id(test_scene_image_id::PED_GRENADE_RELEASED);
-			explosive.released_physical_material = assets::physical_material_id::GRENADE;
+			explosive.released_physical_material = to_physical_material_id(test_scene_physical_material_id::GRENADE);
 
 			meta.set(explosive);
 		}

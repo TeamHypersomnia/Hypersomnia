@@ -1,0 +1,30 @@
+#pragma once
+#include "test_scenes/test_id_to_pool_id.h"
+
+enum class test_scene_particle_effect_id {
+	// GEN INTROSPECTOR enum class test_scene_particle_effect_id
+	HEALTH_DAMAGE_SPARKLES,
+	ELECTRIC_PROJECTILE_DESTRUCTION,
+	PIXEL_PROJECTILE_TRACE,
+	PIXEL_MUZZLE_LEAVE_EXPLOSION,
+	ROUND_ROTATING_BLOOD_STREAM,
+	WANDERING_PIXELS_DIRECTED,
+	WANDERING_PIXELS_SPREAD,
+	CONCENTRATED_WANDERING_PIXELS,
+	PIXEL_METAL_SPARKLES,
+	WANDERING_SMOKE,
+	MUZZLE_SMOKE,
+	ENGINE_PARTICLES,
+	CAST_SPARKLES,
+	CAST_CHARGING,
+	EXHAUSTED_SMOKE,
+	THUNDER_REMNANTS,
+	MISSILE_SMOKE_TRAIL,
+	EXPLODING_RING_SMOKE,
+	EXPLODING_RING_SPARKLES
+	// END GEN INTROSPECTOR
+};
+
+inline auto to_particle_effect_id(const test_scene_recoil_id id) {
+	return to_pool_id<assets::recoil_player_id>(id);
+}

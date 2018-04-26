@@ -22,7 +22,7 @@ namespace test_flavours {
 
 			fixtures_def.restitution = 0.8f;
 			fixtures_def.density = 0.7f;
-			fixtures_def.material = assets::physical_material_id::WOOD;
+			fixtures_def.material = to_physical_material_id(test_scene_physical_material_id::WOOD);
 		}
 
 		{
@@ -43,7 +43,7 @@ namespace test_flavours {
 
 			fixtures_def.restitution = 0.0f;
 			fixtures_def.density = 100.f;
-			fixtures_def.material = assets::physical_material_id::WOOD;
+			fixtures_def.material = to_physical_material_id(test_scene_physical_material_id::WOOD);
 		}
 	}
 }

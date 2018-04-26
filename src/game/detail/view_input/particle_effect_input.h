@@ -46,7 +46,7 @@ struct particle_effect_start_input {
 
 struct particle_effect_input {
 	// GEN INTROSPECTOR struct particle_effect_input
-	assets::particle_effect_id id = assets::particle_effect_id::INVALID;
+	assets::particle_effect_id id;
 	particle_effect_modifier modifier;
 	// END GEN INTROSPECTOR
 

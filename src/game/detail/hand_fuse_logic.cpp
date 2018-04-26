@@ -96,7 +96,7 @@ void release_or_throw_fused_object(
 			new_def.density = 10.f;
 
 			const bool overwrite_physical_material = 
-				explosive.released_physical_material != assets::physical_material_id::INVALID
+				explosive.released_physical_material.is_set()
 			;
 
 			if (overwrite_physical_material) {

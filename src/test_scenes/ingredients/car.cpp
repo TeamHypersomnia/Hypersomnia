@@ -116,7 +116,7 @@ namespace prefabs {
 
 			fixtures_invariant.filter = filters::dynamic_object();
 			fixtures_invariant.density = 0.6f;
-			fixtures_invariant.material = assets::physical_material_id::METAL;
+			fixtures_invariant.material = to_physical_material_id(test_scene_physical_material_id::METAL);
 
 			front += fixtures_invariant;
 			front += physics_invariant;
@@ -135,7 +135,7 @@ namespace prefabs {
 			fixtures_invariant.density = 0.6f;
 			fixtures_invariant.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET].pos = offset;
 			fixtures_invariant.friction_ground = true;
-			fixtures_invariant.material = assets::physical_material_id::METAL;
+			fixtures_invariant.material = to_physical_material_id(test_scene_physical_material_id::METAL);
 
 			interior  += fixtures_invariant;
 
@@ -153,7 +153,7 @@ namespace prefabs {
 			fixtures_invariant.density = 0.6f;
 			fixtures_invariant.disable_standard_collision_resolution = true;
 			fixtures_invariant.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET].pos = offset;
-			fixtures_invariant.material = assets::physical_material_id::METAL;
+			fixtures_invariant.material = to_physical_material_id(test_scene_physical_material_id::METAL);
 
 			left_wheel  += fixtures_invariant;
 			left_wheel.get<components::fixtures>().set_owner_body(front);
@@ -191,7 +191,7 @@ namespace prefabs {
 					fixtures_invariant.density = 1.0f;
 					fixtures_invariant.sensor = true;
 					fixtures_invariant.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET] = offset;
-					fixtures_invariant.material = assets::physical_material_id::METAL;
+					fixtures_invariant.material = to_physical_material_id(test_scene_physical_material_id::METAL);
 
 					engine_physical  += fixtures_invariant;
 

@@ -415,7 +415,7 @@ namespace test_flavours {
 			gun_def.gunshot_adds_heat = 0.052f;
 			gun_def.engine_sound_strength = 0.5f;
 
-			gun_def.recoil.id = assets::recoil_player_id::GENERIC;
+			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
 
 			meta.set(gun_def);
@@ -459,7 +459,7 @@ namespace test_flavours {
 			gun_def.engine_sound_strength = 0.5f;
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
 
-			gun_def.recoil.id = assets::recoil_player_id::GENERIC;
+			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 
 			meta.set(gun_def);
 
@@ -490,7 +490,7 @@ namespace test_flavours {
 
 			gun_def.damage_multiplier = 1.f;
 
-			gun_def.recoil.id = assets::recoil_player_id::GENERIC;
+			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.magic_missile_flavour = to_entity_flavour_id(test_plain_missiles::AMPLIFIER_ARM_MISSILE);
 
 			meta.set(gun_def);

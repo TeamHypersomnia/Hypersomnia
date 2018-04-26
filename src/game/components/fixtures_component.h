@@ -40,7 +40,7 @@ namespace invariants {
 		pad_bytes<1> pad;
 		b2Filter filter;
 
-		assets::physical_material_id material = assets::physical_material_id::INVALID;
+		assets::physical_material_id material;
 
 		float collision_sound_gain_mult = 1.f;
 

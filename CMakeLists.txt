@@ -620,15 +620,10 @@ file(GLOB_RECURSE HYPERSOMNIA_HEADERS_WITH_INTROSPECTED_CLASSES
 	"src/augs/*.h"
 	"src/game/*.h"
 	"src/view/*.h"
+	"src/test_scenes/*.h"
 	"src/application/*.h"
 	"src/3rdparty/Box2D/Common/*.h"
 	"src/3rdparty/Box2D/Dynamics/*.h"
-	"src/test_scenes/test_scene_flavours.h"
-	"src/test_scenes/test_scene_settings.h"
-
-	"src/test_scenes/test_scene_images.h"
-	"src/test_scenes/test_scene_animations.h"
-	"src/test_scenes/test_scene_sounds.h"
 
 	"src/game/tests_of_traits.cpp"
 	"src/augs/templates/introspect.cpp"

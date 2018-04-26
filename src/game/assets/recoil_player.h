@@ -1,19 +1,18 @@
 #pragma once
+#include <vector>
 #include "augs/math/vec2.h"
-#include "augs/misc/constant_size_vector.h"
-#include "game/container_sizes.h"
 #include "game/assets/ids/asset_ids.h"
 
 struct recoil_player {
 	// GEN INTROSPECTOR struct recoil_player
-	augs::constant_size_vector<real32, RECOIL_OFFSET_COUNT> offsets = {};
+	std::vector<real32> offsets = {};
 	std::string name;
 	// END GEN INTROSPECTOR
 };
 
 struct recoil_player_instance_def {
 	// GEN INTROSPECTOR struct recoil_player_instance_def
-	assets::recoil_player_id id = assets::recoil_player_id::INVALID;
+	assets::recoil_player_id id;
 
 	real32 heat_per_shot = 1;
 	real32 heat_cooldown_per_ms = 0.01f;
