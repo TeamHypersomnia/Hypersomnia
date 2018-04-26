@@ -11,19 +11,18 @@
 #include "application/setups/editor/property_editor/simple_browse_path_tree.h"
 #include "application/setups/editor/property_editor/tweaker_type.h"
 
-template <class F, class A>
+template <class I, class F, class A>
 void choose_asset_path(
 	const std::string& label, 
-	const maybe_official_path& current_source,
+	const maybe_official_path<I>& current_source,
 	const augs::path_type& project_path,
-	const std::string& suffix_folder,
 	F on_choice,
 	A allow_path_predicate,
 	const std::string& disallowed_paths_displayed_name = ""
 ) {
 	using namespace augs::imgui;
 
-	using asset_control_path_entry = browsed_path_entry_base;
+	using asset_control_path_entry = browsed_path_entry_base<I>;
 
 	thread_local bool acquire_once = true;
 	thread_local int acquire_keyboard_times = 2;
@@ -40,10 +39,10 @@ void choose_asset_path(
 
 			auto make_path_adder = [&](const bool official, const auto& root) {
 				return [&](const auto& p) {
-					if (p.extension() == ".png") {
+					if (maybe_official_path<I>::is_supported_extension(p.extension())) {
 						auto cut_path = std::string(p.string());
-						cut_preffix(cut_path, root + "/");
-						maybe_official_path entry;
+						cut_preffix(cut_path, root.string() + "/");
+						maybe_official_path<I> entry;
 
 						entry.path = cut_path;
 						entry.is_official = official;
@@ -58,24 +57,24 @@ void choose_asset_path(
 				};
 			};
 
-
 			{
-				const auto official_gfx_path = typesafe_sprintf("content/official/%x", suffix_folder);
-				const auto project_gfx_path = (project_path / suffix_folder).string();
+				const auto in_official_path = current_source.get_in_official();
 
-				if (augs::exists(official_gfx_path)) {
+				if (augs::exists(in_official_path)) {
 					augs::for_each_in_directory_recursive(
-						official_gfx_path,
+						in_official_path,
 						[](const auto&) {},
-						make_path_adder(true, official_gfx_path)
+						make_path_adder(true, in_official_path)
 					);
 				}
 
-				if (augs::exists(project_gfx_path)) {
+				const auto in_project_path = project_path / current_source.get_content_suffix();
+
+				if (augs::exists(in_project_path)) {
 					augs::for_each_in_directory_recursive(
-						project_gfx_path,
+						in_project_path,
 						[](const auto&) {},
-						make_path_adder(false, project_gfx_path)
+						make_path_adder(false, in_project_path)
 					);
 				}
 			}
@@ -145,25 +144,26 @@ struct asset_control_provider {
 
 	template <class T>
 	static constexpr bool handles = 
-		is_one_of_v<T, assets::image_id>
+		is_one_of_v<T, assets::image_id, assets::sound_id>
 	;
 
+	template <class T>
 	auto describe_changed(
 		const std::string& formatted_label,
-		const assets::image_id to
+		const T to
 	) const {
-		return typesafe_sprintf("Set %x to %x", formatted_label, augs::to_display(defs.image_definitions[to].get_source_path().path));
+		return typesafe_sprintf("Set %x to %x", formatted_label, augs::to_display(get_viewable_pool<T>(defs)[to].get_source_path().path));
 	}
 
 	template <class T>
 	std::optional<tweaker_type> handle(const std::string& identity_label, T& object) const {
 		bool changed = false;
 
-		if constexpr(std::is_same_v<T, assets::image_id>) {
+		if constexpr(handles<T>) {
+			auto& definitions = get_viewable_pool<T>(defs);
+
 			auto on_choice = [&](const auto& chosen_path) {
 				changed = true;
-
-				auto& definitions = defs.image_definitions;
 
 				if (const auto asset_id = ::find_asset_id_by_path(chosen_path, definitions)) {
 					object = *asset_id;
@@ -172,20 +172,20 @@ struct asset_control_provider {
 					auto& history = in.folder.history;
 
 					{
-						create_asset_id_command<assets::image_id> cmd;
+						create_asset_id_command<T> cmd;
 						cmd.use_path = chosen_path;
 						history.execute_new(std::move(cmd), in);
 					}
 
 					const auto* const last_addr = std::addressof(history.last_command());
-					const auto* const cmd = std::get_if<create_asset_id_command<assets::image_id>>(last_addr);
+					const auto* const cmd = std::get_if<create_asset_id_command<T>>(last_addr);
 
 					object = cmd->get_allocated_id();
 				}
 			};
 			
-			const auto& current_source  = defs.image_definitions[object].get_source_path();
-			choose_asset_path(identity_label, current_source, project_path, "gfx", on_choice, true_returner());
+			const auto& current_source  = definitions[object].get_source_path();
+			choose_asset_path(identity_label, current_source, project_path, on_choice, true_returner());
 		}
 		else {
 			static_assert(!handles<T>, "Incomplete implementation!");

@@ -9,6 +9,19 @@ std::string to_uppercase(std::string s) {
 	return str_ops(s).to_uppercase().subject;
 }
 
+std::string& capitalize_first(std::string& value) {
+	if (value.size() > 0) {
+		value[0] = ::toupper(value[0]);
+	}
+
+	return value;
+}
+
+std::string&& capitalize_first(std::string&& value) {
+	capitalize_first(value);
+	return std::move(value);
+}
+
 std::string format_field_name(std::string s) {
 	s[0] = ::toupper(s[0]);
 	return str_ops(s).multi_replace_all({ "_", "." }, " ").subject;

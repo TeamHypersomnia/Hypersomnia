@@ -19,31 +19,16 @@ bool image_loadables::operator==(const image_loadables& b) const {
 	return augs::introspective_equal(*this, b);
 }
 
-static const auto official_dir = "content/official/gfx";
-
-image_definition_view::image_definition_view(
-	const asset_location_context& project_dir,
-	const image_definition& d
-) : 
-	def(d), 
-	resolved_source_image_path(
-		d.get_source_path().is_official ? 
-		(augs::path_type(official_dir) / d.get_source_path().path)
-		: (project_dir / d.get_source_path().path)
-	)
-{
-}
-
 augs::path_type image_definition_view::calc_custom_neon_map_path() const {
-	return augs::path_type(resolved_source_image_path).replace_extension(".neon_map.png");
+	return augs::path_type(resolved_source_path).replace_extension(".neon_map.png");
 }
 
 augs::path_type image_definition_view::calc_generated_neon_map_path() const {
-	return ::get_neon_map_path(resolved_source_image_path);
+	return ::get_neon_map_path(resolved_source_path);
 }
 
 augs::path_type image_definition_view::calc_desaturation_path() const {
-	return ::get_desaturation_path(resolved_source_image_path);
+	return ::get_desaturation_path(resolved_source_path);
 }
 
 std::optional<augs::path_type> image_definition_view::find_custom_neon_map_path() const {
@@ -73,17 +58,17 @@ std::optional<augs::path_type> image_definition_view::find_desaturation_path() c
 }
 
 augs::path_type image_definition_view::get_source_image_path() const {
-	return resolved_source_image_path;
+	return resolved_source_path;
 }
 
 vec2u image_definition_view::read_source_image_size() const {
-	return augs::image::get_size(resolved_source_image_path);
+	return augs::image::get_size(resolved_source_path);
 }
 
 void image_definition_view::regenerate_all_needed(
 	const bool force_regenerate
 ) const {
-	const auto diffuse_path = resolved_source_image_path;
+	const auto diffuse_path = resolved_source_path;
 
 	if (def.loadables.extras.generate_neon_map) {
 		regenerate_neon_map(
@@ -104,6 +89,6 @@ void image_definition_view::regenerate_all_needed(
 }
 
 void image_definition_view::delete_regenerated_files() const {
-	augs::remove_file(::get_neon_map_path(resolved_source_image_path));
-	augs::remove_file(::get_desaturation_path(resolved_source_image_path));
+	augs::remove_file(::get_neon_map_path(resolved_source_path));
+	augs::remove_file(::get_desaturation_path(resolved_source_path));
 }

@@ -124,6 +124,9 @@ inline auto str_ops(const char* const s) {
 
 std::string& cut_preffix(std::string& value, const std::string& preffix);
 
+std::string& capitalize_first(std::string& value);
+std::string&& capitalize_first(std::string&& value);
+
 bool begins_with(const std::string& value, const std::string& beginning);
 bool ends_with(const std::string& value, const std::string& ending);
 

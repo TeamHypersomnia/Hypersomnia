@@ -294,14 +294,8 @@ int work(const int argc, const char* const * const argv) try {
 		}
 	};
 
-	static auto get_unofficial_gfx_dir = []() {
-		const auto result = visit_current_setup([](const auto& s) { return s.get_unofficial_content_dir(); });
-
-		if (result.empty()) {
-			return result;
-		}
-
-		return result / "gfx";
+	static auto get_unofficial_content_dir = []() {
+		return visit_current_setup([](const auto& s) { return s.get_unofficial_content_dir(); });
 	};
 
 	/* TODO: We need to have one game gui per cosmos. */
@@ -336,7 +330,7 @@ int work(const int argc, const char* const * const argv) try {
 
 							new_atlas_required = true;
 							loaded_image_caches.at(key) = { 
-								image_definition_view(get_unofficial_gfx_dir(), *new_definition)
+								image_definition_view(get_unofficial_content_dir(), *new_definition)
 							};
 						}
 					}
@@ -354,7 +348,7 @@ int work(const int argc, const char* const * const argv) try {
 
 						loaded_image_caches.try_emplace(
 							key, 
-							image_definition_view(get_unofficial_gfx_dir(), fresh)
+							image_definition_view(get_unofficial_content_dir(), fresh)
 						);
 					}
 					/* Otherwise it's already taken care of */
@@ -382,7 +376,7 @@ int work(const int argc, const char* const * const argv) try {
 						settings.regenerate_every_launch,
 						settings.skip_source_image_integrity_check
 					},
-					get_unofficial_gfx_dir(),
+					get_unofficial_content_dir(),
 					images_in_atlas,
 					necessary_images_in_atlas,
 					get_gui_font()
@@ -395,6 +389,13 @@ int work(const int argc, const char* const * const argv) try {
 		/* Sounds pass */
 
 		{
+			auto make_sound_loading_input = [&](const sound_definition& def) {
+				const auto def_view = sound_definition_view(get_unofficial_content_dir(), def);
+				const auto input = def_view.make_sound_loading_input();
+
+				return input;
+			};
+
 			/* Check for unloaded and changed resources */
 			currently_loaded_defs.sounds.for_each_object_and_id([&](const auto& now_loaded, const auto& key) {
 				auto unload = [&](){
@@ -403,12 +404,12 @@ int work(const int argc, const char* const * const argv) try {
 				};
 
 				if (const auto fresh = mapped_or_nullptr(new_defs.sounds, key)) {
-					if (*fresh != now_loaded) {
+					if (fresh->loadables != now_loaded.loadables) {
 						/* Different from the fresh one, reload */
 						unload();
 
 						try {
-							loaded_sounds.try_emplace(key, *fresh);
+							loaded_sounds.try_emplace(key, make_sound_loading_input(*fresh));
 						}
 						catch (...) {
 
@@ -425,7 +426,7 @@ int work(const int argc, const char* const * const argv) try {
 			new_defs.sounds.for_each_object_and_id([&](const auto& fresh_def, const auto& fresh_key) {
 				if (nullptr == mapped_or_nullptr(currently_loaded_defs.sounds, fresh_key)) {
 					try {
-						loaded_sounds.try_emplace(fresh_key, fresh_def);
+						loaded_sounds.try_emplace(fresh_key, make_sound_loading_input(fresh_def));
 					}
 					catch (...) {
 

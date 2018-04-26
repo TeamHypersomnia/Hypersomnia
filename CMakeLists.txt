@@ -75,7 +75,11 @@ set(HYPERSOMNIA_EXE_RESOURCES_DIR "${PROJECT_SOURCE_DIR}/${HYPERSOMNIA_RESOURCES
 option(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE "Add command to archive builds in Release." ${DEFAULT_OPT})
 option(ADD_APPLICATION_ICON "Add application icon." ${DEFAULT_OPT})
 
-## Hardcoded, relative paths for directories that the executable might write some files to.
+## Hardcoded, relative paths for directories that the executable might use.
+
+# From where will the game pull its official resources.
+
+set(HYPERSOMNIA_OFFICIAL_CONTENT_DIR "content/official")
 
 # Where the game will save logs.
 # Deleting this folder will have no effect on the game.
@@ -1174,6 +1178,7 @@ add_definitions(-DSTATICALLY_ALLOCATE_ENTITY_FLAVOURS=${STATICALLY_ALLOCATE_ENTI
 add_definitions(-DSTATICALLY_ALLOCATE_BAKED_FONTS=${STATICALLY_ALLOCATE_BAKED_FONTS})
 add_definitions(-DBUILD_IN_CONSOLE_MODE=${BUILD_IN_CONSOLE_MODE})
 
+add_definitions(-DOFFICIAL_CONTENT_DIR="${HYPERSOMNIA_OFFICIAL_CONTENT_DIR}")
 add_definitions(-DGENERATED_FILES_DIR="${HYPERSOMNIA_GENERATED_FILES_DIR}")
 add_definitions(-DLOCAL_FILES_DIR="${HYPERSOMNIA_LOCAL_FILES_DIR}")
 add_definitions(-DLOG_FILES_DIR="${HYPERSOMNIA_LOG_FILES_DIR}")

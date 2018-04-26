@@ -28,7 +28,7 @@ void find_locations_that_use(
 		using E = decltype(e);
 		using Fl = entity_flavour<E>;
 
-		if constexpr(can_type_contain_another_v<Fl, assets::image_id>) {
+		if constexpr(can_type_contain_another_v<Fl, asset_id_type>) {
 			common.get_flavours<E>().for_each([&](const auto, const auto& flavour) {
 				const auto& name = flavour.template get<invariants::name>().name;
 
@@ -38,7 +38,7 @@ void find_locations_that_use(
 						[&](const auto& c) {
 							using C = std::decay_t<decltype(c)>;
 
-							if constexpr(can_type_contain_another_v<C, assets::image_id>) {
+							if constexpr(can_type_contain_another_v<C, asset_id_type>) {
 								find_object_in_object(id, c, [&](const auto& location) {
 									/* location_callback(format_struct_name(c) + "of " + name + ": " + location); */
 									location_callback("Flavour: " + name + " (" + format_struct_name(c) + "." + location + ")");

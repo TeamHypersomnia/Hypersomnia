@@ -124,14 +124,14 @@ namespace augs {
 		return mono ? *mono : *stereo;
 	}
 
-	sound_buffer::variation::variation(const sound_data& data, const bool generate_mono) {
+	sound_buffer::variation::variation(const sound_data& data, const sound_buffer_loading_settings settings) {
 		if (data.channels == 1) {
 			mono = data;
 		}
 		else if (data.channels == 2) {
 			stereo = data;
 
-			if (generate_mono) {
+			if (settings.generate_mono) {
 				mono = sound_data(data).to_mono();
 			}
 		}
@@ -146,7 +146,9 @@ namespace augs {
 
 	void sound_buffer::from_file(const sound_buffer_loading_input input) {
 		const auto& path = input.source_sound;
-		variations.emplace_back(path, input.generate_mono);
+		variations.emplace_back(path, input.settings);
+
+		LOG_NVPS(path);
 
 		const auto ext = augs::path_type(path).extension();
 		const auto without_ext = augs::path_type(path).replace_extension("").string();
@@ -158,7 +160,7 @@ namespace augs {
 				const auto next_path = augs::path_type(typesafe_sprintf("%x_%x%x", without_num, i, ext));
 
 				try {
-					variations.emplace_back(next_path, input.generate_mono);
+					variations.emplace_back(next_path, input.settings);
 				}
 				catch (...) {
 					break;

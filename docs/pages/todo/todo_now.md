@@ -7,6 +7,9 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
+- for_each_object_and_id -> for_each_id_and_object, and move it to some range templates
+- perhaps entity_flavours should just be a direct pool
+
 - Fix glitch with flicker on the entire screen
 	- probably particles animation bug
 

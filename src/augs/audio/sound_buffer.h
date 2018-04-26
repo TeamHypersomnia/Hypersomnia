@@ -2,7 +2,7 @@
 #include <vector>
 #include <optional>
 
-#include "augs/filesystem/path.h"
+#include "augs/audio/sound_buffer_structs.h"
 
 using ALuint = unsigned int;
 using ALenum = int;
@@ -36,32 +36,6 @@ namespace augs {
 		operator ALuint() const;
 	};
 
-	struct sound_buffer_loading_input {
-		// GEN INTROSPECTOR struct augs::sound_buffer_loading_input
-		augs::path_type source_sound;
-		bool generate_mono = true;
-		// END GEN INTROSPECTOR
-
-		const auto& get_source_path() const {
-			return source_sound;
-		}
-
-		void set_source_path(const augs::path_type& p) {
-			source_sound = p;
-		}
-
-		bool operator==(const sound_buffer_loading_input& b) const {
-			return 
-				source_sound == b.source_sound 
-				&& generate_mono == b.generate_mono
-			;
-		}
-
-		bool operator!=(const sound_buffer_loading_input& b) const {
-			return !operator==(b);
-		}
-	};
-
 	class sound_buffer {
 		void from_file(const sound_buffer_loading_input);
 
@@ -72,7 +46,7 @@ namespace augs {
 
 			variation(
 				const sound_data&, 
-				const bool generate_mono
+				const sound_buffer_loading_settings
 			);
 
 			const single_sound_buffer& stereo_or_mono() const;

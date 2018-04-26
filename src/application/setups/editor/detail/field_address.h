@@ -14,7 +14,8 @@ using edited_field_type_id = type_in_list_id<
 		std::string,
 		convex_partitioned_shape::poly_vector_type,
 		convex_partitioned_shape::convex_poly,
-		maybe_official_path,
+		maybe_official_sound_path,
+		maybe_official_image_path,
 		std::vector<rgba>,
 		friction_connection_vector
 	>

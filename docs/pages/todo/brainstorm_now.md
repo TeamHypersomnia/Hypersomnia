@@ -6,6 +6,24 @@ summary: That which we are brainstorming at the moment.
 ---
 
 - rethink our roadmap
+- crashfix with no images in atlas?
+	Regenerating texture atlas: cache/gen/atlases/game_world_atlas.bin
+	Loading font content/necessary/fonts/unifont.ttf
+	ensure_less(static_cast<size_type>(i), count) failed with expansion:
+	9 < 0
+	file: ../../src/augs/misc/constant_size_vector.h
+	line: 103
+
+	- is cosmos::zero involved?
+
+- fix broken file combos
+	- they break when two are visible at the same time
+	- so something with ids
+
+- animations tracking
+	- We've decided that they might be
+		- Named automatically after their first frame
+		- Uniquely identified by such
 
 - can flavours ever have invalid ids?
 	- Yes, then they may signify that no entity is to be spawned.

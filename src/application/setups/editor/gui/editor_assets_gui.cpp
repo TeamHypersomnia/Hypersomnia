@@ -24,8 +24,8 @@
 #include "augs/templates/list_utils.h"
 
 template <class id_type>
-struct asset_gui_path_entry : public browsed_path_entry_base {
-	using base = browsed_path_entry_base;
+struct asset_gui_path_entry : public browsed_path_entry_base<id_type> {
+	using base = browsed_path_entry_base<id_type>;
 
 	id_type id;
 	std::vector<std::string> using_locations;
@@ -38,7 +38,7 @@ struct asset_gui_path_entry : public browsed_path_entry_base {
 
 	asset_gui_path_entry() = default;
 	asset_gui_path_entry(
-		const maybe_official_path& from,
+		const maybe_official_path<id_type>& from,
 	   	const id_type id
 	) :
 		id(id),
@@ -46,21 +46,19 @@ struct asset_gui_path_entry : public browsed_path_entry_base {
 	{}
 };
 
-template <class id_type>
 struct path_control_provider {
 	all_viewables_defs& defs;
 	const augs::path_type& project_path;
 	const property_editor_settings& settings;
 	const bool disabled;
 
-	using handled_type = maybe_official_path;
+	template <class T>
+	static constexpr bool handles = is_maybe_official_path<T>::value;
 
 	template <class T>
-	static constexpr bool handles = std::is_same_v<T, handled_type>;
-
 	auto describe_changed(
 		const std::string& formatted_label,
-		const handled_type& to
+		const T& to
 	) const {
 		return typesafe_sprintf("Changed image path to %x", to.path);
 	}
@@ -70,8 +68,9 @@ struct path_control_provider {
 		return T();
 	}
 
-	std::optional<tweaker_type> handle(const std::string& identity_label, handled_type& object) const {
-		auto& definitions = defs.image_definitions;
+	template <class T>
+	std::optional<tweaker_type> handle(const std::string& identity_label, T& object) const {
+		auto& definitions = get_viewable_pool<typename T::id_type>(defs);
 
 		bool modified = false;
 
@@ -81,7 +80,6 @@ struct path_control_provider {
 			identity_label,
 			object,
 			project_path,
-			"gfx",
 			[&](const auto& chosen_path) {
 				object = chosen_path;
 				modified = true;
@@ -104,13 +102,14 @@ struct path_control_provider {
 	}
 };
 
-void editor_images_gui::perform(
+template <class asset_id_type>
+void editor_pathed_asset_gui<asset_id_type>::perform(
 	const property_editor_settings& settings,
    	editor_command_input cmd_in
 ) {
 	using namespace augs::imgui;
 
-	auto window = make_scoped_window();
+	auto window = base::make_scoped_window();
 
 	if (!window) {
 		return;
@@ -121,7 +120,6 @@ void editor_images_gui::perform(
 
 	auto& viewables = work.viewables;
 
-	using asset_id_type = assets::image_id;
 	using path_entry_type = asset_gui_path_entry<asset_id_type>;
 
 	thread_local std::unordered_set<augs::path_type> last_seen_missing_paths;
@@ -133,7 +131,7 @@ void editor_images_gui::perform(
 	thread_local std::vector<path_entry_type> used_paths;
 
 	auto is_selected = [this](const auto& p) {
-		return found_in(selected_images, p.id);
+		return found_in(selected_assets, p.id);
 	};
 
 	auto get_all_selected_and_existing = [&](auto in_range) {
@@ -147,7 +145,7 @@ void editor_images_gui::perform(
 	orphaned_paths.clear();
 	used_paths.clear();
 
-	if (acquire_once) {
+	if (base::acquire_once) {
 		acquire_missing_paths = true;
 	}
 
@@ -155,14 +153,17 @@ void editor_images_gui::perform(
 		last_seen_missing_paths.clear();
 	}
 
-	auto& definitions = viewables.image_definitions;
+	auto& definitions = get_viewable_pool<asset_id_type>(viewables);
+
+	const auto label = std::string(maybe_official_path<asset_id_type>::get_label());
 
 	definitions.for_each_object_and_id(
 		[&](const auto& object, const auto id) mutable {
 			const auto path = object.get_source_path();
 			auto new_entry = path_entry_type(path, id);
 
-			const auto& view = image_definition_view(folder.current_path / "gfx", object);
+			using def_type = std::decay_t<decltype(object)>;
+			const auto& view = asset_definition_view<def_type>(folder.current_path, object);
 
 			find_locations_that_use(id, work, [&](const auto& location) {
 				new_entry.using_locations.push_back(location);
@@ -189,7 +190,7 @@ void editor_images_gui::perform(
 				return found_in(last_seen_missing_paths, p);
 			};
 
-			if (lazy_check_missing(view.get_source_image_path())) {
+			if (lazy_check_missing(view.get_resolved_source_path())) {
 				push_missing();
 			}
 			else {
@@ -211,7 +212,7 @@ void editor_images_gui::perform(
 	thread_local ImGuiTextFilter filter;
 	filter.Draw();
 
-	acquire_keyboard_once();
+	base::acquire_keyboard_once();
 
 	auto& tree_settings = browser_settings.tree_settings;
 
@@ -269,10 +270,10 @@ void editor_images_gui::perform(
 
 				if (checkbox(typesafe_sprintf("###%x", i).c_str(), altered)) {
 					if (current_selected && !altered) {
-						erase_element(selected_images, id);
+						erase_element(selected_assets, id);
 					}
 					else if(!current_selected && altered) {
-						selected_images.emplace(id);
+						selected_assets.emplace(id);
 					}
 				}
 			}
@@ -356,7 +357,7 @@ void editor_images_gui::perform(
 				) {
 					command_type cmd;
 
-					if constexpr(std::is_same_v<decltype(new_content), const maybe_official_path&>) {
+					if constexpr(path_control_provider::handles<std::decay_t<decltype(new_content)>>) {
 						cmd.affected_assets = { id };
 					}
 					else {
@@ -413,7 +414,7 @@ void editor_images_gui::perform(
 							selected_ids
 						);
 					},
-					path_control_provider<asset_id_type> { viewables, project_path, settings, disable_path_chooser },
+					path_control_provider { viewables, project_path, settings, disable_path_chooser },
 					default_sane_default_provider(),
 					num_cols - 2
 				);
@@ -456,12 +457,12 @@ void editor_images_gui::perform(
 					if (checkbox(typesafe_sprintf("###%x", i).c_str(), altered)) {
 						if (all_selected && !altered) {
 							for (const auto& e : paths) {
-								erase_element(selected_images, e.id);
+								erase_element(selected_assets, e.id);
 							}
 						}
 						else if (!all_selected && altered) {
 							for (const auto& e : paths) {
-								selected_images.insert(e.id);
+								selected_assets.insert(e.id);
 							}
 						}
 					}
@@ -520,16 +521,19 @@ void editor_images_gui::perform(
 		if (browser_settings.show_orphaned) {
 			do_section(
 				orphaned_paths,
-				{ "Orphaned images", "Folder", "Operations" }
+				{ typesafe_sprintf("Orphaned %xs", label), "Folder", "Operations" }
 			);
 		}
 
 		do_section(
 			used_paths,
-			{ "Images", "Folder", "Used at" }
+			{ capitalize_first(std::string(label)) + "s", "Folder", "Used at" }
 		);
 	}
 	else {
 
 	}
 }
+
+template struct editor_pathed_asset_gui<assets::image_id>;
+template struct editor_pathed_asset_gui<assets::sound_id>;

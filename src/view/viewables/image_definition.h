@@ -14,6 +14,7 @@
 #include "view/asset_location_context.h"
 #include "view/viewables/regeneration/neon_maps.h"
 #include "view/maybe_official_path.h"
+#include "view/viewables/asset_definition_view.h"
 
 augs::path_type get_neon_map_path(augs::path_type from_source_image_path);
 augs::path_type get_desaturation_path(augs::path_type from_source_image_path);
@@ -27,7 +28,7 @@ struct image_extra_loadables {
 
 struct image_loadables {
 	// GEN INTROSPECTOR struct image_loadables
-	maybe_official_path source_image;
+	maybe_official_image_path source_image;
 	image_extra_loadables extras;
 	// END GEN INTROSPECTOR
 
@@ -47,7 +48,7 @@ struct image_definition {
 	image_meta meta;
 	// END GEN INTROSPECTOR
 
-	void set_source_path(const maybe_official_path& p) {
+	void set_source_path(const maybe_official_image_path& p) {
 		loadables.source_image = p;
 	}
 
@@ -56,20 +57,10 @@ struct image_definition {
 	}
 };
 
-namespace sol {
-	class state;
-}
+struct image_definition_view : asset_definition_view<image_definition> {
+	using base = asset_definition_view<image_definition>;
+	using base::base;
 
-class image_definition_view {
-	const augs::path_type resolved_source_image_path;
-	const image_definition& def;
-
-public:
-	image_definition_view(
-		const asset_location_context& project_dir,
-		const image_definition& def
-	);
-	
 	augs::path_type calc_custom_neon_map_path() const;
 	augs::path_type calc_generated_neon_map_path() const;
 	augs::path_type calc_desaturation_path() const;

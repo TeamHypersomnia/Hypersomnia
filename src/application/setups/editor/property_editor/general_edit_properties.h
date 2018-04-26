@@ -37,8 +37,7 @@ static constexpr bool always_skip_in_properties =
 		assets::recoil_player_id,
 		assets::physical_material_id,
 
-		assets::particle_effect_id,
-		assets::sound_id
+		assets::particle_effect_id
 	>
 ;
 

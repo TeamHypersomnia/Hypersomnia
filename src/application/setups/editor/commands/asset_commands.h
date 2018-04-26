@@ -22,7 +22,7 @@ private:
 	friend augs::introspection_access;
 	id_type allocated_id;
 public:
-	maybe_official_path use_path;
+	maybe_official_path<id_type> use_path;
 	// END GEN INTROSPECTOR
 
 	auto get_allocated_id() const {

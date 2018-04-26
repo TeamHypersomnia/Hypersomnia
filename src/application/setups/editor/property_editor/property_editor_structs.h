@@ -3,8 +3,8 @@
 
 #include "3rdparty/imgui/imgui.h"
 #include "augs/readwrite/memory_stream.h"
+#include "view/maybe_official_path_declaration.h"
 
-struct maybe_official_path;
 struct property_editor_settings;
 
 struct property_editor_state {

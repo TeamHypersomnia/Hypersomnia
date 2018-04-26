@@ -5,7 +5,7 @@
 #include "game/components/shape_polygon_component.h"
 #include "augs/templates/container_templates.h"
 
-class image_definition_view;
+struct image_definition_view;
 
 struct image_cache {
 	image_cache() = default;
