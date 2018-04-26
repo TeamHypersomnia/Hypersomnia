@@ -656,3 +656,24 @@ we consider whole type overrides too complex architeciturally:
 			- Buttons:
 				- Make 1:1
 				- Write to physics
+		- Images
+			- Is there a point in making separation of image ids and paths visible to the author?
+				- The question becomes if more than a single flavour is going to use the same image
+				- Flavours will very often share logical assets though, by their definition, so it makes sense to have them identified
+			- Architecturally, the flavours will store only identificators anyway.
+				- So in case if shit hits the fan, we can provide the user with a textbox to change the broken paths
+			- Proposition: the editor shall perform i/o upon the extras.lua and meta.lua
+				- Because if we consider the game image's path to be an identificator, what happens if it gets moved?
+				- It's a pain though because we will have duplicate state
+			- Behaviour in sprite invariant
+				- Should be displayed as simplified, instead of some mnemonic id?
+					- e.g. "corner (walls/1)"
+			- Automagic regeneration of shapes
+			- Is more than just an image path!
+				- We don't have a singular "game image" structure, though. It's divided into loadables and meta.
+				- So we'll need a special purpose GUI code that connects them all
+		- Sounds
+			- Same problem with paths as in the editor
+				- Sounds are more likely to be reused
+	- Viewables
+		- 

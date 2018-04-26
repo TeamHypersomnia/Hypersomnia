@@ -2,6 +2,7 @@
 #include <tuple>
 
 #include "augs/pad_bytes.h"
+#include "augs/misc/pool/pool.h"
 #include "augs/templates/introspect_declaration.h"
 #include "augs/templates/folded_finders.h"
 #include "augs/templates/maybe_const.h"
@@ -87,16 +88,28 @@ public:
 #include "augs/misc/constant_size_vector.h"
 
 template <class E>
-using entity_flavours_container = augs::constant_size_vector<
-	entity_flavour<E>, 
-	E::statically_allocated_flavours
->;
+using entity_flavours_container = 
+	augs::pool<
+		entity_flavour<E>, 
+		of_size<E::statically_allocated_flavours>::template make_constant_vector,
+		unsigned short,
+		raw_flavour_id_key
+	>
+;
 
 #else
 #include <vector>
 
 template <class E>
-using entity_flavours_container = std::vector<entity_flavour<E>>;
+using entity_flavours_container = 
+	augs::pool<
+		entity_flavour<E>, 
+		make_vector
+		unsigned short,
+		raw_flavour_id_key
+	>
+;
+
 #endif
 
 namespace augs {
@@ -113,10 +126,11 @@ class entity_flavours {
 
 	template <class S, class F>
 	static void for_each_impl(S& self, F callback) {
-		for (std::size_t i = 0; i < self.count(); ++i) {
-			const auto id = raw_entity_flavour_id(static_cast<unsigned>(i));
-			callback(typed_entity_flavour_id<entity_type>(id), self.get_flavour(id));
-		}
+		self.flavours.for_each_object_and_id(
+			[&](const auto& object, const auto& id) {
+				callback(typed_entity_flavour_id<entity_type>(id), object);
+			}
+		);
 	}
 
 public:
@@ -130,20 +144,30 @@ public:
 		for_each_impl(*this, std::forward<F>(callback));
 	}
 
-	void resize(const std::size_t n) {
-		flavours.resize(n);
-	}
-
 	auto count() const {
 		return flavours.size();
 	}
 
 	auto& get_flavour(const raw_entity_flavour_id id) {
-		return flavours[static_cast<unsigned>(id)];
+		return flavours[id];
 	}
 
 	const auto& get_flavour(const raw_entity_flavour_id id) const {
-		return flavours[static_cast<unsigned>(id)];
+		return flavours[id];
+	}
+	
+	auto capacity() const {
+		return flavours.capacity();
+	}
+
+	template <class... Args>
+	decltype(auto) allocate(Args&&... args) {
+		return flavours.allocate(std::forward<Args>(args)...);
+	}
+
+	template <class... Args>
+	void reserve(Args&&... args) {
+		flavours.reserve(std::forward<Args>(args)...);
 	}
 };
 

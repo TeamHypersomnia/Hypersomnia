@@ -5,14 +5,12 @@
 
 #include "augs/templates/introspection_utils/introspective_equal.h"
 #include "augs/string/string_templates.h"
-#include "augs/misc/relinked_pool_id.h"
 
 struct intro_test2 {
 	// GEN INTROSPECTOR struct intro_test2
 	std::unordered_map<int, float> it = { {1, 1.4f}, {2, 458.f} };
 	bool blabla = true;
 	char okay = 'A';
-	relinked_pool_id<char> nice;
 	// END GEN INTROSPECTOR
 };
 

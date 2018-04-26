@@ -212,7 +212,6 @@ struct tests_of_traits {
 	static_assert(!has_introspect_v<cosmos>, "Trait has failed");
 	static_assert(has_introspect_v<cosmos_clock>, "Trait has failed");
 	//static_assert(has_introspect_v<augs::constant_size_vector<int, 2>>, "Trait has failed");
-	static_assert(has_introspect_v<relinked_pool_id<unsigned int>>, "Trait has failed");
 	static_assert(has_introspect_v<augs::delta>, "Trait has failed");
 	static_assert(alignof(meter_instance_tuple) == 4, "Trait has failed");
 

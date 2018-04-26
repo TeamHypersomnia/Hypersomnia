@@ -7,6 +7,34 @@ summary: That which we are brainstorming at the moment.
 
 - rethink our roadmap
 
+- can flavours ever have invalid ids?
+	- Yes, then they may signify that no entity is to be spawned.
+	- However, if a flavour id is non-zero, it is guaranteed to point to a valid flavour.
+		- That is because once again we will not allow the editor to remove flavours of whom there are users!
+
+- flavour ids & allocation
+	- they are actually quite performance critical
+	- would id relinking pool actually be useful here?
+		- the for each id structure should be quite easy here
+			- literally just common and common/solvable signis
+	- they can be sparse though
+		- since we care about performance the flavours will be anyway statically allocated
+		- and allocation/deallocation speed won't be that important here
+			- could still iterate over all ids and serialize only existing
+		- we can always easily check if the flavour exists, so no relinking needed?
+		- actually relinking still needed if after removing a flavour we allocate a new one
+
+- sparse_pool implementation that avoids indirection?
+	- can have IDENTICAL interface as the pool
+		- even the pooled object ids can stay the same really
+			- just that the indirection index will actually be used as a real index
+	- existence of versioning determines whether we need to perform for_eaches
+	- versioning could still be there so we can easily undo/redo without for eaches
+		- we can let those several bytes slide
+	- **we should always be wary of pessimistic cases of memory usage, anyway**
+	- for now we can use pools for everything and incrementally introduce sparse_pool
+	- once we have sparse_pool, the loaded caches and images in atlas can just be sparse pools as well?
+		- though the effect is ultimately the same and it's more container agnostic
 - some prettifier for C++ errors? especially for formatting the template names
 
 - might be cool to make container elements tickable and modifiable in bulk, in flavour
@@ -39,36 +67,6 @@ summary: That which we are brainstorming at the moment.
 
 - we'll generalize later once images work
 
-- sparse_pool implementation that avoids indirection?
-	- can have IDENTICAL interface as the pool
-		- even the pooled object ids can stay the same really
-	- existence of versioning determines whether we need to perform for_eaches
-	- versioning could still be there so we can easily undo/redo without for eaches
-		- we can let those several bytes slide
-	- we should always be wary of pessimistic cases of memory usage, anyway
-	- for now we can use pools for everything and incrementally introduce sparse_pool
-
-- once we have sparse_pool, the loaded caches and images in atlas can just be sparse pools as well?
-	- though the effect is ultimately the same and it's more container agnostic
-
-- flavour ids & allocation
-	- they are actually quite performance critical
-	- would id relinking pool actually be useful here?
-		- the for each id structure should be quite easy here
-			- literally just common and common/solvable signis
-	- they can be sparse though
-		- allocation/deallocation speed won't be that important here
-		- we can always easily check if the flavour exists, so no relinking needed?
-		- actually relinking still needed if after removing a flavour we allocate a new one
-	- could pool be rebuilt so that indirection indices are actually real indices?
-		- realize...
-		- would only take to swap the elements properly
-			- allocation and deallocation would be hard
-			- but other than that we get all the benefits
-			- though the pool becomes sparse then
-			- since we care about performance the flavours will be anyway statically allocated
-			- so not much memory consumed
-
 - Creating new flavours
 	- Might want to specify the flavour right away or not?
 
@@ -80,27 +78,6 @@ summary: That which we are brainstorming at the moment.
 			- Name-able, linear combo box
 		- Physical materials
 			- Name-able, linear combo box
-		- Images
-			- Is there a point in making separation of image ids and paths visible to the author?
-				- The question becomes if more than a single flavour is going to use the same image
-				- Flavours will very often share logical assets though, by their definition, so it makes sense to have them identified
-			- Architecturally, the flavours will store only identificators anyway.
-				- So in case if shit hits the fan, we can provide the user with a textbox to change the broken paths
-			- Proposition: the editor shall perform i/o upon the extras.lua and meta.lua
-				- Because if we consider the game image's path to be an identificator, what happens if it gets moved?
-				- It's a pain though because we will have duplicate state
-			- Behaviour in sprite invariant
-				- Should be displayed as simplified, instead of some mnemonic id?
-					- e.g. "corner (walls/1)"
-			- Automagic regeneration of shapes
-			- Is more than just an image path!
-				- We don't have a singular "game image" structure, though. It's divided into loadables and meta.
-				- So we'll need a special purpose GUI code that connects them all
-		- Sounds
-			- Same problem with paths as in the editor
-				- Sounds are more likely to be reused
-	- Viewables
-		- 
 
 - Fix what happens when too many entities are created
 	- **Let the game work when a new entity cannot be created.**

@@ -57,6 +57,11 @@ namespace augs {
 			return indirector.version == key.version && indirector.real_index != static_cast<size_type>(-1);
 		}
 
+		static auto ensure_versions_match(const pool_indirector_type& indirector, const key_type key) {
+			ensure_eq(indirector.version, key.version);
+			ensure(indirector.real_index != static_cast<size_type>(-1));
+		}
+
 	public:
 		pool(const size_type slot_count = 0u) {
 			if constexpr(constexpr_capacity) {
@@ -309,7 +314,7 @@ namespace augs {
 
 			const auto& indirector = self.get_indirector(key);
 
-			ensure(versions_match(indirector, key));
+			ensure_versions_match(indirector, key);
 
 			return self.objects[indirector.real_index];
 		}

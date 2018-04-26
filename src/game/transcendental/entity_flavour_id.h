@@ -1,6 +1,5 @@
 #pragma once
 #include <string>
-#include "augs/misc/relinked_pool_id.h"
 #include "augs/templates/hash_templates.h"
 #include "augs/string/string_templates_declaration.h"
 #include "augs/string/get_current_type_name.h"
@@ -8,7 +7,9 @@
 #include "game/transcendental/entity_type_traits.h"
 #include "game/organization/all_entity_types_declaration.h"
 
-using raw_entity_flavour_id = relinked_pool_id<unsigned>;
+struct raw_flavour_id_key {};
+
+using raw_entity_flavour_id = augs::pooled_object_id<unsigned short, raw_flavour_id_key>;
 
 template <class...>
 struct constrained_entity_flavour_id; 
@@ -25,7 +26,7 @@ struct constrained_entity_flavour_id {
 	// END GEN INTROSPECTOR
 
 	explicit operator bool() const {
-		return raw.operator bool();
+		return raw.is_set();
 	}
 
 	bool operator==(const constrained_entity_flavour_id<C...> b) const {
@@ -54,7 +55,7 @@ struct typed_entity_flavour_id {
 	explicit typed_entity_flavour_id(const raw_entity_flavour_id raw) : raw(raw) {};
 
 	explicit operator bool() const {
-		return raw.operator bool();
+		return raw.is_set();
 	}
 
 	bool operator==(const typed_entity_flavour_id<E> b) const {

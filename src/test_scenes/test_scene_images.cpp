@@ -45,7 +45,6 @@ void load_test_scene_images(
 
 	augs::for_each_enum_except_bounds([&](const test_id_type enum_id) {
 		const auto id = to_image_id(enum_id);
-		LOG_NVPS(id);
 
 		if (found_in(all_definitions, id)) {
 			return;
@@ -78,7 +77,6 @@ void load_test_scene_images(
 		}
 
 		const auto new_allocation = all_definitions.allocate(std::move(definition));
-		LOG_NVPS(new_allocation.key);
 		ensure_eq(id, new_allocation.key);
 	});
 }
