@@ -1,7 +1,7 @@
 #include "test_scenes/test_scenes_content.h"
 
 #include "game/assets/recoil_player.h"
-#include "game/assets/ids/recoil_player_id.h"
+#include "game/assets/ids/asset_ids.h"
 #include "game/assets/all_logical_assets.h"
 
 #include "augs/misc/randomization.h"

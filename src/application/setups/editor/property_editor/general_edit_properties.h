@@ -1,6 +1,5 @@
 #pragma once
 #include "augs/pad_bytes.h"
-#include "game/assets/ids/is_asset_id.h"
 #include "augs/templates/traits/is_value_with_flag.h"
 #include "augs/templates/folded_finders.h"
 #include "augs/string/string_templates_declaration.h"
@@ -31,8 +30,16 @@ template <class T>
 static constexpr bool always_skip_in_properties =
 	is_padding_field_v<T>
 	// Yet unsupported:
+
 	|| std::is_same_v<T, b2Filter>
-	|| is_asset_id_v<T>
+	|| is_one_of_v<T,
+		assets::animation_id,
+		assets::recoil_player_id,
+		assets::physical_material_id,
+
+		assets::particle_effect_id,
+		assets::sound_id
+	>
 ;
 
 template <class M>

@@ -6,7 +6,7 @@
 
 #include "augs/misc/enum/enum_map.h"
 
-#include "game/assets/ids/particle_effect_id.h"
+#include "game/assets/ids/asset_ids.h"
 #include "game/assets/animation.h"
 
 #include "view/viewables/image_definition.h"

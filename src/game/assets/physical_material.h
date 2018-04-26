@@ -1,7 +1,7 @@
 #pragma once
 #include "augs/misc/enum/enum_map.h"
 
-#include "game/assets/ids/physical_material_id.h"
+#include "game/assets/ids/asset_ids.h"
 #include "game/assets/ids/asset_ids.h"
 
 struct physical_material {

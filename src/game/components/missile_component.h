@@ -9,7 +9,7 @@
 #include "augs/graphics/rgba.h"
 
 #include "game/assets/ids/asset_ids.h"
-#include "game/assets/ids/particle_effect_id.h"
+#include "game/assets/ids/asset_ids.h"
 
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"

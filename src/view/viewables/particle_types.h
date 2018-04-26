@@ -5,7 +5,7 @@
 #include "augs/graphics/rgba.h"
 #include "game/transcendental/entity_id.h"
 
-#include "game/assets/asset_containers.h"
+#include "game/assets/asset_pools.h"
 #include "game/assets/animation.h"
 
 struct general_particle {

@@ -3,7 +3,6 @@
 #include "augs/templates/identity_templates.h"
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
-#include "game/assets/ids/is_asset_id.h"
 #include "view/viewables/all_viewables_defs.h"
 
 #include "augs/misc/imgui/path_tree_structs.h"

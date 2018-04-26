@@ -12,7 +12,7 @@
 #include "game/transcendental/entity_id.h"
 
 #include "game/enums/colliders_offset_type.h"
-#include "game/assets/ids/physical_material_id.h"
+#include "game/assets/ids/asset_ids.h"
 #include "game/detail/physics/colliders_connection.h"
 
 #include "game/components/transform_component.h"

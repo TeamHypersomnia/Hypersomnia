@@ -3,7 +3,7 @@
 #include "augs/graphics/rgba.h"
 
 #include "game/assets/ids/asset_ids.h"
-#include "game/assets/ids/particle_effect_id.h"
+#include "game/assets/ids/asset_ids.h"
 #include "game/assets/ids/asset_ids.h"
 
 #include "game/detail/view_input/sound_effect_input.h"

@@ -2,7 +2,7 @@
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 
-#include "game/assets/ids/particle_effect_id.h"
+#include "game/assets/ids/asset_ids.h"
 
 #include "game/components/missile_component.h"
 #include "game/components/item_component.h"

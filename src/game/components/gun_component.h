@@ -13,7 +13,7 @@
 
 #include "game/components/render_component.h"
 
-#include "game/assets/ids/recoil_player_id.h"
+#include "game/assets/ids/asset_ids.h"
 #include "game/assets/ids/asset_ids.h"
 #include "game/assets/recoil_player.h"
 

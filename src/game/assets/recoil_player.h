@@ -2,7 +2,7 @@
 #include "augs/math/vec2.h"
 #include "augs/misc/constant_size_vector.h"
 #include "game/container_sizes.h"
-#include "game/assets/ids/recoil_player_id.h"
+#include "game/assets/ids/asset_ids.h"
 
 struct recoil_player {
 	// GEN INTROSPECTOR struct recoil_player

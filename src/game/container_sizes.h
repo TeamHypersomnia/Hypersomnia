@@ -19,10 +19,6 @@ constexpr std::size_t RECOIL_OFFSET_COUNT = 50;
 
 constexpr std::size_t MAX_IMAGES_IN_ATLAS_COUNT = 1000;
 
-constexpr std::size_t MAX_PHYSICAL_MATERIAL_COUNT = 15;
-constexpr std::size_t MAX_PARTICLE_EFFECT_COUNT = 100;
-constexpr std::size_t MAX_RECOIL_PLAYER_COUNT = 100;
-
 // TODO: this will be view-bound, not logic-bound
 constexpr std::size_t ONLY_PICK_THESE_ITEMS_COUNT = 20;
 
