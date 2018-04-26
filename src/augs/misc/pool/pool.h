@@ -484,6 +484,16 @@ namespace augs {
 			return objects.end();
 		}
 
+		auto get_nth_id(const size_type i) const {
+			key_type id;
+
+			const auto& s = slots[i];
+			id.indirection_index = s.pointing_indirector;
+			id.version = indirectors[s.pointing_indirector].version;
+
+			return id;
+		}
+
 		void clear() {
 			const auto c = capacity();
 

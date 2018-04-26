@@ -93,7 +93,8 @@ void edit_invariant(
 				in.command.affected_flavours
 			);
 		},
-		asset_control_provider { defs, project_path, cmd_in }
+		asset_control_provider { defs, project_path, cmd_in },
+		asset_sane_default_provider { defs }
 	);
 }
 

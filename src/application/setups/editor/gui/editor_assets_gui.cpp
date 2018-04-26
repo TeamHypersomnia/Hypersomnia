@@ -69,6 +69,11 @@ struct path_chooser_provider {
 		};
 	}
 
+	template <class T>
+	auto get_sane_default() const {
+		return T();
+	}
+
 	std::optional<tweaker_type> handle(const std::string& identity_label, handled_type& object) const {
 		auto& definitions = defs.image_definitions;
 
@@ -413,6 +418,7 @@ void editor_images_gui::perform(
 						);
 					},
 					path_chooser_provider<asset_id_type> { viewables, project_path, settings, disable_path_chooser },
+					default_sane_default_provider(),
 					num_cols - 2
 				);
 			}

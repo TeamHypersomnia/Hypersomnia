@@ -136,9 +136,10 @@ struct tweaker_input {
 	const M& new_value;
 };
 
-template <class S>
+template <class S, class D>
 struct detail_edit_properties_input {
 	const S special_control_provider;
+	const D sane_defaults;
 	const property_editor_settings& settings;
 	const int extra_columns;
 };
@@ -184,12 +185,13 @@ inline auto node_and_columns(
 template <
 	template <class> class SkipPredicate,
 	class S,
+	class D,
 	class Eq,
 	class F,
 	class T
 >
 void detail_general_edit_properties(
-	const detail_edit_properties_input<S> input,
+	const detail_edit_properties_input<S, D> input,
 	Eq equality_predicate,
 	F notify_change_of,
 	const std::string& label,
@@ -235,7 +237,7 @@ void detail_general_edit_properties(
 				if constexpr(can_access_data_v<T>) {
 					if (auto node = node_and_columns(formatted_label, input.extra_columns)) {
 						for (unsigned i = 0; i < static_cast<unsigned>(altered.size()); ++i) {
-							{
+							if (altered.size() < altered.max_size()) {
 								const auto button_label = typesafe_sprintf("D##%x", i);
 
 								if (ImGui::Button(button_label.c_str())) {
@@ -244,9 +246,9 @@ void detail_general_edit_properties(
 									notify_change_of(formatted_label, tweaker_type::DISCRETE, altered);
 									break;
 								}
-							}
 
-							ImGui::SameLine();
+								ImGui::SameLine();
+							}
 
 							{
 								const auto button_label = typesafe_sprintf("-##%x", i);
@@ -283,12 +285,14 @@ void detail_general_edit_properties(
 							);
 						}
 
-						if (ImGui::Button("+")) {
-							altered.emplace_back();
-							notify_change_of(formatted_label, tweaker_type::DISCRETE, altered);
-						}
+						if (altered.size() < altered.max_size()) {
+							if (ImGui::Button("+")) {
+								altered.emplace_back(input.sane_defaults.template construct<typename T::value_type>());
+								notify_change_of(formatted_label, tweaker_type::DISCRETE, altered);
+							}
 
-						augs::imgui::next_columns(input.extra_columns + 2);
+							augs::imgui::next_columns(input.extra_columns + 2);
+						}
 					}
 				}
 			}
@@ -318,7 +322,8 @@ template <
    	class G,
    	class H,
 	class Eq = true_returner,
-	class S = default_control_provider
+	class S = default_control_provider,
+	class D = default_sane_default_provider
 >
 void general_edit_properties(
 	const property_editor_input prop_in,
@@ -327,6 +332,7 @@ void general_edit_properties(
 	H rewrite_last_change_impl,
 	Eq field_equality_predicate = {},
 	const S special_control_provider = {},
+	const D sane_defaults = {},
 	const int extra_columns = 0
 ) {
 	using namespace augs::imgui;
@@ -392,8 +398,9 @@ void general_edit_properties(
 
 	auto traverse = [&](const std::string& member_label, auto& member) {
 		detail_general_edit_properties<SkipPredicate>(
-			detail_edit_properties_input<S> { 
+			detail_edit_properties_input<S, D> { 
 				special_control_provider,
+				sane_defaults,
 				prop_in.settings,
 				extra_columns
 			},

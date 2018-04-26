@@ -18,3 +18,10 @@ struct default_control_provider {
 		return "";
 	}
 };
+
+struct default_sane_default_provider {
+	template <class T>
+	auto construct() const {
+		return T();
+	}
+};
