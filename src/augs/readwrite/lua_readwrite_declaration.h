@@ -1,5 +1,5 @@
 #pragma once
-#include <sol2/sol/forward.hpp>
+#include <sol/forward.hpp>
 
 namespace augs {
 	template <class Serialized>
