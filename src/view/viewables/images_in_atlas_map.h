@@ -1,11 +1,13 @@
 #pragma once
 #include "augs/templates/container_templates.h"
-#include "view/viewables/image_in_atlas.h"
+#include "augs/misc/constant_size_vector.h"
+#include "game/container_sizes.h"
 #include "game/assets/ids/asset_ids.h"
+#include "view/viewables/image_in_atlas.h"
 
 class images_in_atlas_map {
 	using images_in_atlas_map_type = 
-		augs::constant_size_vector<image_in_atlas, MAX_IMAGES_IN_ATLAS_COUNT>
+		augs::constant_size_vector<image_in_atlas, MAX_IMAGES_AT_ONCE>
 	;
 
 	images_in_atlas_map_type entries;

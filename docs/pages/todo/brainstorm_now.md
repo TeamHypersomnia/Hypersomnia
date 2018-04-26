@@ -7,6 +7,8 @@ summary: That which we are brainstorming at the moment.
 
 - rethink our roadmap
 
+- some prettifier for C++ errors? especially for formatting the template names
+
 - might be cool to make container elements tickable and modifiable in bulk, in flavour
 	- might actually be done just inside the general edit under container constexpr, with help of notifies etc
 
@@ -59,31 +61,16 @@ summary: That which we are brainstorming at the moment.
 		- we can always easily check if the flavour exists, so no relinking needed?
 		- actually relinking still needed if after removing a flavour we allocate a new one
 	- could pool be rebuilt so that indirection indices are actually real indices?
-
-	- makes practically no sense to have an invalid image id
-		- invalid sound id could still signify a no-sound which may make sense
-	- if we disallow them, we need to somehow handle this in editor
-		- e.g. flavour could always choose the latest image id
-		- a popup saying "before you create this flavour, import at least one image"
-	- still, is there really no way that no invalid ids will take place in sprites?
-		- what if we want to un-import an image from the editor?
-			- do we have to delete the flavours that use it as well?
-			- or do we make a popup forbidding this?
-		- what if an image on disk gets deleted and an atlas is required to be regenerated?
-			- then stop displaying the cosmos and just be left with imgui
-			- we can check in main if the game world atlas exists
-	- in stuff like gui however, we'll seriously need to check with mapped or nullptr
+		- realize...
+		- would only take to swap the elements properly
+			- allocation and deallocation would be hard
+			- but other than that we get all the benefits
+			- though the pool becomes sparse then
+			- since we care about performance the flavours will be anyway statically allocated
+			- so not much memory consumed
 
 - Creating new flavours
 	- Might want to specify the flavour right away or not?
-	- What do we do about writing image size to sprite?
-		- add_shape_invariant_from_renderable can assume always found
-			- cause it will be called from editor only on existent ids 
-		- when switching from invalid to non-invalid, automatically write size information to both sprite and physics
-			- otherwise provide a button to update sizes
-			- Buttons:
-				- Make 1:1
-				- Write to physics
 
 - Complex ImGui controls in general property editor
 	- In fae tree:

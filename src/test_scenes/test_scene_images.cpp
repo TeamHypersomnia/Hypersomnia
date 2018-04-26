@@ -39,9 +39,13 @@ void load_test_scene_images(
 	image_definitions_map& all_definitions
 ) {
 	using id_type = assets::image_id;
+	using test_id_type = test_scene_image_id;
 
-	augs::for_each_enum_except_bounds([&](const test_scene_image_id enum_id) {
+	all_definitions.reserve(enum_count(test_id_type()));
+
+	augs::for_each_enum_except_bounds([&](const test_id_type enum_id) {
 		const auto id = to_image_id(enum_id);
+		LOG_NVPS(id);
 
 		if (found_in(all_definitions, id)) {
 			return;
@@ -74,6 +78,7 @@ void load_test_scene_images(
 		}
 
 		const auto new_allocation = all_definitions.allocate(std::move(definition));
-		ensure_eq(new_allocation.key, id);
+		LOG_NVPS(new_allocation.key);
+		ensure_eq(id, new_allocation.key);
 	});
 }

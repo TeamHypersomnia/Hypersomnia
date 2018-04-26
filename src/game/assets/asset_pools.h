@@ -24,4 +24,4 @@ template <class pooled_type>
 using physical_material_id_pool = make_asset_pool<pooled_type, assets::physical_material_id_key>;
 
 template <class pooled_type>
-using particle_effect_id_pool = make_asset_pool<pooled_type, assets::particle_effect_id>;
+using particle_effect_id_pool = make_asset_pool<pooled_type, assets::particle_effect_id_key>;

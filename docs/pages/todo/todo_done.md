@@ -633,3 +633,26 @@ we consider whole type overrides too complex architeciturally:
 - editor command: forget_image_path
 	- won't check for usage, it will be the job of editor gui to not let it be called when something is in use
 	- contains the forgotten viewable's content
+
+	- makes practically no sense to have an invalid image id
+		- invalid sound id could still signify a no-sound which may make sense
+	- if we disallow them, we need to somehow handle this in editor
+		- e.g. flavour could always choose the latest image id
+		- a popup saying "before you create this flavour, import at least one image"
+	- still, is there really no way that no invalid ids will take place in sprites?
+		- what if we want to un-import an image from the editor?
+			- do we have to delete the flavours that use it as well?
+			- or do we make a popup forbidding this?
+		- what if an image on disk gets deleted and an atlas is required to be regenerated?
+			- then stop displaying the cosmos and just be left with imgui
+			- we can check in main if the game world atlas exists
+	- in stuff like gui however, we'll seriously need to check with mapped or nullptr
+
+	- What do we do about writing image size to sprite?
+		- add_shape_invariant_from_renderable can assume always found
+			- cause it will be called from editor only on existent ids 
+		- when switching from invalid to non-invalid, automatically write size information to both sprite and physics
+			- otherwise provide a button to update sizes
+			- Buttons:
+				- Make 1:1
+				- Write to physics

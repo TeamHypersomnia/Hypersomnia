@@ -4,7 +4,8 @@
 
 enum class test_scene_animation_id {
 	// GEN INTROSPECTOR enum class test_scene_animation_id
-	CAST_BLINK_ANIMATION = 0
+	CAST_BLINK_ANIMATION,
+	COUNT
 	// END GEN INTROSPECTOR
 };
 

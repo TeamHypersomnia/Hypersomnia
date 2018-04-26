@@ -84,7 +84,7 @@ namespace augs {
 			indirectors.resize(new_capacity);
 			free_indirectors.reserve(new_capacity);
 
-			for (size_type i = old_capacity; i < new_capacity; ++i) {
+			for (size_type i = 0; i < (new_capacity - old_capacity); ++i) {
 				free_indirectors.push_back(new_capacity - i - 1);
 			}
 		}

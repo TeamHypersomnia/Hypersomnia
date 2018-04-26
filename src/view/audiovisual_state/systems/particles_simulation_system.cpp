@@ -74,7 +74,7 @@ void particles_simulation_system::update_effects_from_messages(
 				}
 
 #if MORE_LOGS
-				if (c.original_effect.id == assets::particle_effect_id::HEALTH_DAMAGE_SPARKLES) {
+				if (c.original_effect.id == to_particle_effect_id(test_scene_particle_effect_id::HEALTH_DAMAGE_SPARKLES)) {
 					LOG("Removing health sparkles");
 				}
 #endif
@@ -145,7 +145,7 @@ void particles_simulation_system::update_effects_from_messages(
 				orbital_emissions.push_back(c);
 
 #if MORE_LOGS
-				if (effect.id == assets::particle_effect_id::HEALTH_DAMAGE_SPARKLES) {
+				if (effect.id == to_particle_effect_id(test_scene_particle_effect_id::HEALTH_DAMAGE_SPARKLES)) {
 					LOG("Adding health sparkles");
 				}
 #endif

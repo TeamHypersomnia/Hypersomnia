@@ -83,10 +83,10 @@ void draw_debug_details(
 
 	}
 
-	total_details += { "Frame\n", category_style };
-	total_details += { frame_performance.summary(), text_style };
 	total_details += { "Session\n", category_style };
 	total_details += { session_performance.summary(), text_style };
+	total_details += { "Frame\n", category_style };
+	total_details += { frame_performance.summary(), text_style };
 	total_details += { "Audiovisual\n", category_style };
 	total_details += { audiovisual_performance.summary(), text_style };
 	total_details += { "Cosmos\n", category_style };

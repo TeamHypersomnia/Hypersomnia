@@ -140,9 +140,10 @@ void test_pool() {
 	T p;
 
 	readwrite_test_cycle(p);
-	p.allocate(1);
+	const auto a1 = p.allocate(1);
 	readwrite_test_cycle(p);
-	p.allocate(2);
+	const auto a2 = p.allocate(2);
+	REQUIRE(a1.key != a2.key);
 	readwrite_test_cycle(p);
 	p.allocate(33);
 	readwrite_test_cycle(p);

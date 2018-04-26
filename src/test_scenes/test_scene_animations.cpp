@@ -22,7 +22,11 @@ void create_frames(
 	}
 }
 
-void load_test_scene_animations(animations_pool& anims) {
+void load_test_scene_animations(animations_pool& all_definitions) {
+	using test_id_type = test_scene_animation_id;
+
+	all_definitions.reserve(enum_count(test_id_type()));
+
 	{
 		animation anim;
 		anim.loop_mode = animation::loop_type::NONE;
@@ -37,7 +41,7 @@ void load_test_scene_animations(animations_pool& anims) {
 		const auto test_id = test_scene_animation_id::CAST_BLINK_ANIMATION;
 
 		const auto id = to_animation_id(test_id);
-		const auto new_allocation = anims.allocate(std::move(anim));
+		const auto new_allocation = all_definitions.allocate(std::move(anim));
 
 		ensure_eq(new_allocation.key, id);
 	} 

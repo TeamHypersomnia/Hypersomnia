@@ -147,7 +147,6 @@ set(STATICALLY_ALLOCATE_ENTITY_FLAVOURS "1" CACHE STRING "Statically allocate en
 
 # Other self-explanatory static allocation switches. Possible values are one or zero.
 
-set(STATICALLY_ALLOCATE_ASSETS "1" CACHE STRING "Statically allocate assets using container_sizes.h")
 set(STATICALLY_ALLOCATE_BAKED_FONTS "1" CACHE STRING "Statically allocate fonts for faster rendering. One font weights 3 MB.")
 
 ## Internal build flags for programmers' use. 
@@ -1172,7 +1171,6 @@ endif()
 
 add_definitions(-DSTATICALLY_ALLOCATE_ENTITIES=${STATICALLY_ALLOCATE_ENTITIES})
 add_definitions(-DSTATICALLY_ALLOCATE_ENTITY_FLAVOURS=${STATICALLY_ALLOCATE_ENTITY_FLAVOURS})
-add_definitions(-DSTATICALLY_ALLOCATE_ASSETS=${STATICALLY_ALLOCATE_ASSETS})
 add_definitions(-DSTATICALLY_ALLOCATE_BAKED_FONTS=${STATICALLY_ALLOCATE_BAKED_FONTS})
 add_definitions(-DBUILD_IN_CONSOLE_MODE=${BUILD_IN_CONSOLE_MODE})
 

@@ -5,6 +5,7 @@
 #include "augs/graphics/rgba.h"
 #include "game/transcendental/entity_id.h"
 
+#include "game/assets/all_logical_assets.h"
 #include "game/assets/asset_pools.h"
 #include "game/assets/animation.h"
 

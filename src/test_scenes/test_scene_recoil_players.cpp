@@ -21,7 +21,11 @@ static void populate_with_uniform_offsets(
 	}
 }
 
-void load_test_scene_recoil_players(recoil_players_pool& recoils) {
+void load_test_scene_recoil_players(recoil_players_pool& all_definitions) {
+	using test_id_type = test_scene_recoil_id;
+
+	all_definitions.reserve(enum_count(test_id_type()));
+
 	{
 		recoil_player recoil;
 		populate_with_uniform_offsets(recoil, 20);
@@ -29,7 +33,7 @@ void load_test_scene_recoil_players(recoil_players_pool& recoils) {
 		const auto test_id = test_scene_recoil_id::GENERIC;
 
 		const auto id = to_recoil_id(test_id);
-		const auto new_allocation = recoils.allocate(std::move(recoil));
+		const auto new_allocation = all_definitions.allocate(std::move(recoil));
 
 		ensure_eq(new_allocation.key, id);
 	}

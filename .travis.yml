@@ -70,7 +70,7 @@ script:
   - export CXX=${cxx_compiler}
   - cmake/build.sh ${config} x64 ${c_compiler} ${cxx_compiler} "-DBUILD_IN_CONSOLE_MODE=1 -DBUILD_WINDOW_FRAMEWORK=0 ${other_cmake_flags}"
   - ulimit -c unlimited -S
-  - cd build/last
+  - cd build/current
   - ninja tests -k 0
   - ls -l
   - for i in $(find ./ -maxdepth 1 -name 'core*' -print); do gdb $(pwd)/../dev/${EXECUTABLE_NAME} core* -ex "thread apply all bt" -ex "set pagination 0" -batch; done;

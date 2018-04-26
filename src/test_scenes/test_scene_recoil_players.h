@@ -3,7 +3,8 @@
 
 enum class test_scene_recoil_id {
 	// GEN INTROSPECTOR enum class test_scene_recoil_id
-	GENERIC
+	GENERIC,
+	COUNT
 	// END GEN INTROSPECTOR
 };
 

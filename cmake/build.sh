@@ -43,6 +43,6 @@ cmake -DARCHITECTURE=$ARCHITECTURE -DCMAKE_BUILD_TYPE=$CONFIGURATION $ADDITIONAL
 
 pushd ../
 	# For simplicity of subsequent scripts, create a symlink to the last created build
-	rm -f last
-	ln -s $TARGET_FOLDER_NAME last
+	rm -f current
+	ln -s $TARGET_FOLDER_NAME current
 popd

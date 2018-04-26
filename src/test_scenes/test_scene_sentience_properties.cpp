@@ -2,6 +2,7 @@
 #include "game/detail/spells/spell_structs.h"
 #include "test_scenes/test_scene_sounds.h"
 #include "game/transcendental/cosmos.h"
+#include "test_scenes/test_scene_particle_effects.h"
 
 #include "game/detail/spells/all_spells.h"
 #include "game/detail/perks/all_perks.h"
@@ -37,7 +38,7 @@ void load_test_scene_sentience_properties(
 		d.appearance.icon = to_image_id(test_scene_image_id::SPELL_HASTE_ICON);
 
 		d.common.cast_successful_sound.id = to_sound_id(test_scene_sound_id::CAST_SUCCESSFUL);
-		d.common.cast_sparkles.id = assets::particle_effect_id::CAST_SPARKLES;
+		d.common.cast_sparkles.id = to_particle_effect_id(test_scene_particle_effect_id::CAST_SPARKLES);
 		d.common.cast_sparkles.modifier.colorize = d.common.associated_color;
 	}
 
@@ -58,7 +59,7 @@ void load_test_scene_sentience_properties(
 		d.basic_healing_amount = 34;
 
 		d.common.cast_successful_sound.id = to_sound_id(test_scene_sound_id::CAST_SUCCESSFUL);
-		d.common.cast_sparkles.id = assets::particle_effect_id::CAST_SPARKLES;
+		d.common.cast_sparkles.id = to_particle_effect_id(test_scene_particle_effect_id::CAST_SPARKLES);
 		d.common.cast_sparkles.modifier.colorize = d.common.associated_color;
 		d.common.cast_sparkles.modifier.scale_amounts = 1.3f;
 		d.common.cast_sparkles.modifier.scale_lifetimes = 1.3f;
@@ -81,7 +82,7 @@ void load_test_scene_sentience_properties(
 		d.basic_healing_amount = 132;
 
 		d.common.cast_successful_sound.id = to_sound_id(test_scene_sound_id::CAST_SUCCESSFUL);
-		d.common.cast_sparkles.id = assets::particle_effect_id::CAST_SPARKLES;
+		d.common.cast_sparkles.id = to_particle_effect_id(test_scene_particle_effect_id::CAST_SPARKLES);
 		d.common.cast_sparkles.modifier.colorize = d.common.associated_color;
 		d.common.cast_sparkles.modifier.scale_amounts = 1.3f;
 		d.common.cast_sparkles.modifier.scale_lifetimes = 1.3f;
@@ -103,7 +104,7 @@ void load_test_scene_sentience_properties(
 		d.appearance.icon = to_image_id(test_scene_image_id::SPELL_FURY_OF_THE_AEONS_ICON);
 
 		d.common.cast_successful_sound.id = to_sound_id(test_scene_sound_id::CAST_SUCCESSFUL);
-		d.common.cast_sparkles.id = assets::particle_effect_id::CAST_SPARKLES;
+		d.common.cast_sparkles.id = to_particle_effect_id(test_scene_particle_effect_id::CAST_SPARKLES);
 		d.common.cast_sparkles.modifier.colorize = d.common.associated_color;
 
 		{
@@ -140,7 +141,7 @@ void load_test_scene_sentience_properties(
 		d.appearance.icon = to_image_id(test_scene_image_id::SPELL_ELECTRIC_TRIAD_ICON);
 
 		d.common.cast_successful_sound.id = to_sound_id(test_scene_sound_id::CAST_SUCCESSFUL);
-		d.common.cast_sparkles.id = assets::particle_effect_id::CAST_SPARKLES;
+		d.common.cast_sparkles.id = to_particle_effect_id(test_scene_particle_effect_id::CAST_SPARKLES);
 		d.common.cast_sparkles.modifier.colorize = d.common.associated_color;
 	}
 
@@ -160,10 +161,10 @@ void load_test_scene_sentience_properties(
 		d.appearance.icon = to_image_id(test_scene_image_id::SPELL_ULTIMATE_WRATH_OF_THE_AEONS_ICON);
 
 		d.common.cast_successful_sound.id = to_sound_id(test_scene_sound_id::CAST_SUCCESSFUL);
-		d.common.cast_sparkles.id = assets::particle_effect_id::CAST_SPARKLES;
+		d.common.cast_sparkles.id = to_particle_effect_id(test_scene_particle_effect_id::CAST_SPARKLES);
 		d.common.cast_sparkles.modifier.colorize = d.common.associated_color;
 
-		d.charging_particles.id = assets::particle_effect_id::CAST_CHARGING;
+		d.charging_particles.id = to_particle_effect_id(test_scene_particle_effect_id::CAST_CHARGING);
 		d.charging_particles.modifier.scale_lifetimes = 1.3f;
 		d.charging_sound.id = to_sound_id(test_scene_sound_id::CAST_CHARGING);
 
@@ -233,7 +234,7 @@ void load_test_scene_sentience_properties(
 		d.appearance.icon = to_image_id(test_scene_image_id::SPELL_ELECTRIC_SHIELD_ICON);
 
 		d.common.cast_successful_sound.id = to_sound_id(test_scene_sound_id::CAST_SUCCESSFUL);
-		d.common.cast_sparkles.id = assets::particle_effect_id::CAST_SPARKLES;
+		d.common.cast_sparkles.id = to_particle_effect_id(test_scene_particle_effect_id::CAST_SPARKLES);
 		d.common.cast_sparkles.modifier.colorize = d.common.associated_color;
 	}
 

@@ -25,10 +25,10 @@ namespace test_scenes {
 		common_assets.cast_unsuccessful_sound.id = to_sound_id(test_scene_sound_id::CAST_UNSUCCESSFUL);
 		common_assets.ped_shield_impact_sound.id = to_sound_id(test_scene_sound_id::EXPLOSION);
 		common_assets.ped_shield_destruction_sound.id = to_sound_id(test_scene_sound_id::GREAT_EXPLOSION);
-		common_assets.exhausted_smoke_particles.id = assets::particle_effect_id::EXHAUSTED_SMOKE;
-		common_assets.exploding_ring_smoke = assets::particle_effect_id::EXPLODING_RING_SMOKE;
-		common_assets.exploding_ring_sparkles = assets::particle_effect_id::EXPLODING_RING_SPARKLES;
-		common_assets.thunder_remnants = assets::particle_effect_id::THUNDER_REMNANTS;
+		common_assets.exhausted_smoke_particles.id = to_particle_effect_id(test_scene_particle_effect_id::EXHAUSTED_SMOKE);
+		common_assets.exploding_ring_smoke = to_particle_effect_id(test_scene_particle_effect_id::EXPLODING_RING_SMOKE);
+		common_assets.exploding_ring_sparkles = to_particle_effect_id(test_scene_particle_effect_id::EXPLODING_RING_SPARKLES);
+		common_assets.thunder_remnants = to_particle_effect_id(test_scene_particle_effect_id::THUNDER_REMNANTS);
 
 		std::get<electric_triad>(common.spells).missile_flavour = to_entity_flavour_id(test_plain_missiles::ELECTRIC_MISSILE);
 	}

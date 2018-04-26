@@ -16,6 +16,7 @@
 #include "view/viewables/image_in_atlas.h"
 #include "view/viewables/image_cache.h"
 
+#include "test_scenes/test_scene_particle_effects.h"
 #include "test_scenes/test_scenes_content.h"
 #include "test_scenes/test_scene_animations.h"
 #include "test_scenes/test_scene_images.h"
@@ -34,13 +35,13 @@ auto float_range(const A a, const B b) {
 void load_test_scene_particle_effects(
 	const loaded_image_caches_map& images,
 	const animations_pool& anims,
-	particle_effects_map& manager
+	particle_effects_map& all_definitions
 ) {
 	auto set = [&images](auto& target, auto id, auto col) {
 		target.set_image(id, images.at(id).get_size(), col);
 	};
 
-	auto sets = [&manager](auto& target, auto id, auto sz, auto col) {
+	auto sets = [&all_definitions](auto& target, auto id, auto sz, auto col) {
 		target.set_image(id, sz, col);
 	};
 
@@ -52,8 +53,24 @@ void load_test_scene_particle_effects(
 		em.swing_spread_bound = { { 0.5f, 1.0f },{ 5.0f, 6.0f } };
 	};
 
+	using test_id_type = test_scene_particle_effect_id;
+
+	all_definitions.reserve(enum_count(test_id_type()));
+
+	auto acquire_effect = [&](const test_id_type test_id) -> particle_effect& {
+		const auto id = to_particle_effect_id(test_id);
+
+		if (auto p = mapped_or_nullptr(all_definitions, id)) {
+			return *p;
+		}
+
+		const auto new_allocation = all_definitions.allocate();
+		ensure_eq(new_allocation.key, id);
+		return new_allocation.object;
+	};
+
 	{
-		auto& effect = manager[assets::particle_effect_id::WANDERING_SMOKE];
+		auto& effect = acquire_effect(test_scene_particle_effect_id::WANDERING_SMOKE);
 
 		particles_emission em;
 		default_bounds(em);
@@ -92,7 +109,7 @@ void load_test_scene_particle_effects(
 	}
 
 	{
-		auto& effect = manager[assets::particle_effect_id::ENGINE_PARTICLES];
+		auto& effect = acquire_effect(test_scene_particle_effect_id::ENGINE_PARTICLES);
 
 		{
 			particles_emission em;
@@ -161,7 +178,7 @@ void load_test_scene_particle_effects(
 	}
 
 	{
-		auto& effect = manager[assets::particle_effect_id::MUZZLE_SMOKE];
+		auto& effect = acquire_effect(test_scene_particle_effect_id::MUZZLE_SMOKE);
 
 		{
 			particles_emission em; 
@@ -201,7 +218,7 @@ void load_test_scene_particle_effects(
 	}
 
 	{
-		auto& effect = manager[assets::particle_effect_id::EXHAUSTED_SMOKE];
+		auto& effect = acquire_effect(test_scene_particle_effect_id::EXHAUSTED_SMOKE);
 
 		{
 			particles_emission em;
@@ -243,7 +260,7 @@ void load_test_scene_particle_effects(
 
 
 	{
-		auto& effect = manager[assets::particle_effect_id::CAST_CHARGING];
+		auto& effect = acquire_effect(test_scene_particle_effect_id::CAST_CHARGING);
 
 		particles_emission em;
 		default_bounds(em);
@@ -321,7 +338,7 @@ void load_test_scene_particle_effects(
 	}
 
 	{
-		auto& effect = manager[assets::particle_effect_id::HEALTH_DAMAGE_SPARKLES];
+		auto& effect = acquire_effect(test_scene_particle_effect_id::HEALTH_DAMAGE_SPARKLES);
 
 		{
 			particles_emission em;
@@ -426,7 +443,7 @@ void load_test_scene_particle_effects(
 	}
 
 	{
-		auto& effect = manager[assets::particle_effect_id::CAST_SPARKLES];
+		auto& effect = acquire_effect(test_scene_particle_effect_id::CAST_SPARKLES);
 
 		{
 			particles_emission em;
@@ -536,7 +553,7 @@ void load_test_scene_particle_effects(
 	}
 
 	{
-		auto& effect = manager[assets::particle_effect_id::EXPLODING_RING_SMOKE];
+		auto& effect = acquire_effect(test_scene_particle_effect_id::EXPLODING_RING_SMOKE);
 
 		{
 			particles_emission em;
@@ -578,7 +595,7 @@ void load_test_scene_particle_effects(
 	}
 
 	{
-		auto& effect = manager[assets::particle_effect_id::EXPLODING_RING_SPARKLES];
+		auto& effect = acquire_effect(test_scene_particle_effect_id::EXPLODING_RING_SPARKLES);
 		
 		{
 			particles_emission em;
@@ -650,7 +667,7 @@ void load_test_scene_particle_effects(
 	}
 
 	{
-		auto& effect = manager[assets::particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION];
+		auto& effect = acquire_effect(test_scene_particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION);
 
 		{
 			particles_emission em;
@@ -721,7 +738,7 @@ void load_test_scene_particle_effects(
 	}
 
 	{
-		auto& effect = manager[assets::particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION];
+		auto& effect = acquire_effect(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION);
 
 		particles_emission em;
 		em.spread_degrees = float_range(150, 360);
@@ -788,7 +805,7 @@ void load_test_scene_particle_effects(
 	}
 
 	{
-		auto& effect = manager[assets::particle_effect_id::WANDERING_PIXELS_DIRECTED];
+		auto& effect = acquire_effect(test_scene_particle_effect_id::WANDERING_PIXELS_DIRECTED);
 
 		particles_emission em;
 		em.spread_degrees = float_range(0, 1);
@@ -840,7 +857,7 @@ void load_test_scene_particle_effects(
 	}
 
 	{
-		auto& effect = manager[assets::particle_effect_id::WANDERING_PIXELS_SPREAD];
+		auto& effect = acquire_effect(test_scene_particle_effect_id::WANDERING_PIXELS_SPREAD);
 
 		particles_emission em;
 		em.spread_degrees = float_range(0, 10);
@@ -871,14 +888,14 @@ void load_test_scene_particle_effects(
 		em.initial_rotation_variation = 0;
 
 		effect.emissions.push_back(em);
-		auto wandering = manager[assets::particle_effect_id::WANDERING_PIXELS_DIRECTED].emissions[0];
+		auto wandering = acquire_effect(test_scene_particle_effect_id::WANDERING_PIXELS_DIRECTED).emissions[0];
 		wandering.spread_degrees = float_range(10, 30);
 		wandering.base_speed = float_range(160, 330);
 		effect.emissions.push_back(wandering);
 	}
 
 	{
-		auto& effect = manager[assets::particle_effect_id::CONCENTRATED_WANDERING_PIXELS];
+		auto& effect = acquire_effect(test_scene_particle_effect_id::CONCENTRATED_WANDERING_PIXELS);
 
 		particles_emission em;
 		em.spread_degrees = float_range(0, 1);
@@ -913,7 +930,7 @@ void load_test_scene_particle_effects(
 	}
 
 	{
-		auto& effect = manager[assets::particle_effect_id::ROUND_ROTATING_BLOOD_STREAM];
+		auto& effect = acquire_effect(test_scene_particle_effect_id::ROUND_ROTATING_BLOOD_STREAM);
 
 		particles_emission em;
 		em.spread_degrees = float_range(180, 180);
@@ -950,7 +967,7 @@ void load_test_scene_particle_effects(
 	}
 
 	{
-		auto& effect = manager[assets::particle_effect_id::THUNDER_REMNANTS];
+		auto& effect = acquire_effect(test_scene_particle_effect_id::THUNDER_REMNANTS);
 
 		particles_emission em;
 		em.rotation_speed = float_range(0, 0);
@@ -982,7 +999,7 @@ void load_test_scene_particle_effects(
 	}
 
 	{
-		auto& effect = manager[assets::particle_effect_id::MISSILE_SMOKE_TRAIL];
+		auto& effect = acquire_effect(test_scene_particle_effect_id::MISSILE_SMOKE_TRAIL);
 
 		particles_emission em;
 		em.spread_degrees = float_range(7, 7);

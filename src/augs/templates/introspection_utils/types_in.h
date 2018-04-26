@@ -5,7 +5,7 @@
 
 namespace augs {
 	template <class T>
-	using types_in_t = typename augs::introspection_access::types_in<T, T>::types;
+	using types_in_t = typename augs::introspection_access::types_in<std::remove_const_t<T>, std::remove_const_t<T>>::types;
 }
 
 template <class T, class = void>

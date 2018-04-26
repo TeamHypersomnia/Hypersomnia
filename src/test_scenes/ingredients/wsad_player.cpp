@@ -93,7 +93,7 @@ namespace test_flavours {
 			invariants::sentience sentience; 
 			components::sentience sentience_inst;
 
-			sentience.health_decrease_particles.id = assets::particle_effect_id::HEALTH_DAMAGE_SPARKLES;
+			sentience.health_decrease_particles.id = to_particle_effect_id(test_scene_particle_effect_id::HEALTH_DAMAGE_SPARKLES);
 			sentience.health_decrease_particles.modifier.colorize = red;
 			sentience.health_decrease_particles.modifier.scale_lifetimes = 1.5f;
 

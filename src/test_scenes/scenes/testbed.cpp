@@ -42,10 +42,10 @@ namespace test_scenes {
 		common_assets.item_throw_sound.modifier.pitch = 1.15f;
 		common_assets.item_throw_sound.modifier.gain = 0.8f;
 
-		common_assets.exhausted_smoke_particles.id = assets::particle_effect_id::EXHAUSTED_SMOKE;
-		common_assets.exploding_ring_smoke = assets::particle_effect_id::EXPLODING_RING_SMOKE;
-		common_assets.exploding_ring_sparkles = assets::particle_effect_id::EXPLODING_RING_SPARKLES;
-		common_assets.thunder_remnants = assets::particle_effect_id::THUNDER_REMNANTS;
+		common_assets.exhausted_smoke_particles.id = to_particle_effect_id(test_scene_particle_effect_id::EXHAUSTED_SMOKE);
+		common_assets.exploding_ring_smoke = to_particle_effect_id(test_scene_particle_effect_id::EXPLODING_RING_SMOKE);
+		common_assets.exploding_ring_sparkles = to_particle_effect_id(test_scene_particle_effect_id::EXPLODING_RING_SPARKLES);
+		common_assets.thunder_remnants = to_particle_effect_id(test_scene_particle_effect_id::THUNDER_REMNANTS);
 
 		load_test_scene_sentience_properties(common);
 

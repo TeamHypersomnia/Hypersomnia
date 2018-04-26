@@ -206,7 +206,7 @@ namespace prefabs {
 				{
 					particles_existence_input input;
 					
-					input.effect.id = assets::particle_effect_id::ENGINE_PARTICLES;
+					input.effect.id = to_particle_effect_id(test_scene_particle_effect_id::ENGINE_PARTICLES);
 					input.effect.modifier.colorize = cyan;
 					input.effect.modifier.scale_amounts = 6.7f;
 					input.effect.modifier.scale_lifetimes = 0.45f;

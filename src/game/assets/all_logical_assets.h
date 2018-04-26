@@ -2,8 +2,6 @@
 #include "game/assets/asset_pools.h"
 
 #include "game/assets/ids/asset_ids.h"
-#include "game/assets/ids/asset_ids.h"
-#include "game/assets/ids/asset_ids.h"
 
 #include "game/assets/recoil_player.h"
 #include "game/assets/animation.h"
