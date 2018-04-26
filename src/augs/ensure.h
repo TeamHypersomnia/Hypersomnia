@@ -20,6 +20,21 @@ void save_log_and_terminate();
     LOG( "ensure_less(%x, %x) failed with expansion:\n%x < %x\nfile: %x\nline: %x", #actual, #from, actual, from, __FILE__, __LINE__ );\
 	save_log_and_terminate(); \
 }
+#define ensure_leq(actual, from) if(!(actual <= from))\
+{\
+    LOG( "ensure_leq(%x, %x) failed with expansion:\n%x <= %x\nfile: %x\nline: %x", #actual, #from, actual, from, __FILE__, __LINE__ );\
+	save_log_and_terminate(); \
+}
+#define ensure_greater(actual, from) if(!(actual > from))\
+{\
+	LOG( "ensure_greater(%x, %x) failed with expansion:\n%x > %x\nfile: %x\nline: %x", #actual, #from, actual, from, __FILE__, __LINE__ );\
+	save_log_and_terminate(); \
+}
+#define ensure_geq(actual, from) if(!(actual >= from))\
+{\
+	LOG( "ensure_geq(%x, %x) failed with expansion:\n%x >= %x\nfile: %x\nline: %x", #actual, #from, actual, from, __FILE__, __LINE__ );\
+	save_log_and_terminate(); \
+}
 #define should(x) if(!(x))\
 {\
     LOG( "should(%x) failed\nfile: %x\nline: %x", #x, __FILE__, __LINE__ );\

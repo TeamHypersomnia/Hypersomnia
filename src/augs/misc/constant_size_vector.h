@@ -132,14 +132,19 @@ namespace augs {
 		}
 
 		iterator erase(const iterator first, const iterator last) {
-			ensure(last >= first && first >= begin() && last <= end());
+			ensure_geq(last, first);
+			ensure_geq(first, begin());	
+			ensure_leq(last, end());
+
 			std::move(last, end(), first);
 			resize(size() - (last - first));
 			return first;
 		}
 
 		iterator erase(const iterator position) {
-			ensure(position >= begin() && position <= end());
+			ensure_geq(position, begin());
+		   	ensure_leq(position, end());
+
 			std::move(position + 1, end(), position);
 			resize(size() - 1);
 			return position;
@@ -148,8 +153,8 @@ namespace augs {
 		void insert(const iterator where, const value_type& obj) {
 			const auto new_elements_count = 1;
 
-			ensure(where >= begin());
-			ensure(count + new_elements_count <= capacity());
+			ensure_geq(where, begin());
+			ensure_leq(count + new_elements_count, capacity());
 
 			std::move(where, end(), where + 1);
 			construct_at(static_cast<size_type>(where - begin()), obj);
@@ -161,8 +166,8 @@ namespace augs {
 		void insert(iterator where, Iter first, const Iter last) {
 			const auto new_elements_count = static_cast<size_type>(last - first);
 			
-			ensure(where >= begin());
-			ensure(count + new_elements_count <= capacity());
+			ensure_geq(where, begin());
+			ensure_leq(count + new_elements_count, capacity());
 
 			std::move(where, end(), where + (last - first));
 			
@@ -177,7 +182,7 @@ namespace augs {
 		}
 
 		void resize(const std::size_t s) {
-			ensure(s <= capacity());
+			ensure_leq(s, capacity());
 			auto diff = static_cast<int>(s);
 			diff -= static_cast<int>(size());
 
@@ -236,12 +241,12 @@ namespace augs {
 		}
 
 		void reserve(const std::size_t s) {
-			ensure(s <= max_size());
+			ensure_leq(s, max_size());
 			// no-op
 		}
 
 		void pop_back() {
-			ensure(count > 0);
+			ensure_greater(count, 0);
 			
 			if constexpr(!is_trivially_copyable) {
 				nth(count - 1).~value_type();

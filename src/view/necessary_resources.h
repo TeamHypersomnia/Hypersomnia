@@ -7,6 +7,7 @@
 #include "augs/math/vec2.h"
 #include "augs/audio/sound_buffer.h"
 
+#include "augs/misc/enum/enum_map.h"
 #include "augs/templates/exception_templates.h"
 
 #include "view/viewables/image_definition.h"
