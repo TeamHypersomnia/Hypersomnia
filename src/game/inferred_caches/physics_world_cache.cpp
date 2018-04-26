@@ -118,7 +118,7 @@ void physics_world_cache::infer_cache_for_rigid_body(const const_entity_handle h
 	
 			const auto& def = handle.template get<invariants::rigid_body>();
 			const auto rigid_body = handle.template get<components::rigid_body>();
-			const auto damping = rigid_body.calc_damping_info(def);
+			const auto damping = rigid_body.calc_damping_mults(def);
 			const auto& data = rigid_body.get_raw_component();
 	
 			auto& body = *cache.body;
@@ -179,7 +179,7 @@ void physics_world_cache::infer_cache_for_rigid_body(const const_entity_handle h
 			default: ensure(false) break;
 		}
 
-		const auto damping = rigid_body.calc_damping_info(physics_def);
+		const auto damping = rigid_body.calc_damping_mults(physics_def);
 
 		def.userData = handle.get_id();
 

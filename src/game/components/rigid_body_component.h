@@ -183,7 +183,7 @@ public:
 		return get_raw_component({}).special;
 	}
 
-	damping_mults calc_damping_info(const invariants::rigid_body&) const;
+	damping_mults calc_damping_mults(const invariants::rigid_body&) const;
 
 	vec2 get_velocity() const;
 	float get_mass() const;
@@ -267,7 +267,7 @@ bool component_synchronizer<E, components::rigid_body>::is_constructed() const {
 }
 
 template <class E>
-damping_mults component_synchronizer<E, components::rigid_body>::calc_damping_info(const invariants::rigid_body& def) const {
+damping_mults component_synchronizer<E, components::rigid_body>::calc_damping_mults(const invariants::rigid_body& def) const {
 	damping_mults damping = def.damping;
 
 	handle.template dispatch_on_having<components::movement>([&damping](const auto typed_handle) {
@@ -304,7 +304,7 @@ damping_mults component_synchronizer<E, components::rigid_body>::calc_damping_in
 		}
 	});
 
-	return damping;
+	return damping.sanitize();
 }
 
 template <class E>

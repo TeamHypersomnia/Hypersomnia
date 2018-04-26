@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/math/declare_math.h"
+#include "augs/math/vec2.h"
 
 struct damping_mults {
 	// GEN INTROSPECTOR struct damping_mults
@@ -7,6 +7,17 @@ struct damping_mults {
 	vec2 linear_axis_aligned;
 	real32 angular = 0.f;
 	// END GEN INTROSPECTOR
+
+	auto& sanitize() {
+		auto s = [](real32& f){ f = std::max(0.f, f); };
+
+		s(linear);
+		s(angular);
+		s(linear_axis_aligned.x);
+		s(linear_axis_aligned.y);
+
+		return *this;
+	}
 };
 
 struct impulse_mults {
