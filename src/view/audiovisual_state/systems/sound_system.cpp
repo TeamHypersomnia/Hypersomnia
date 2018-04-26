@@ -21,7 +21,7 @@ void sound_system::clear() {
 	fading_sources.clear();
 }
 
-void sound_system::clear_sources_playing(const assets::sound_buffer_id id) {
+void sound_system::clear_sources_playing(const assets::sound_id id) {
 	erase_if(fading_sources, [id](fading_source& source) {
 		return id == source.id;
 	});

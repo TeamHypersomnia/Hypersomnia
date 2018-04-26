@@ -26,7 +26,7 @@
 
 #include "game/detail/physics/physics_scripts.h"
 
-#include "game/assets/ids/sound_buffer_id.h"
+#include "game/assets/ids/asset_ids.h"
 
 #include "game/enums/filters.h"
 

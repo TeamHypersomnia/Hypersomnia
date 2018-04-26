@@ -1,7 +1,7 @@
 #pragma once
 
 #include "augs/pad_bytes.h"
-#include "game/assets/ids/sound_buffer_id.h"
+#include "game/assets/ids/asset_ids.h"
 #include "augs/templates/hash_templates.h"
 #include "game/detail/view_input/sound_effect_input.h"
 #include "game/components/transform_component.h"
@@ -56,7 +56,7 @@ struct sound_effect_start_input {
 
 struct sound_effect_input {
 	// GEN INTROSPECTOR struct sound_effect_input
-	assets::sound_buffer_id id;
+	assets::sound_id id;
 	sound_effect_modifier modifier;
 	// END GEN INTROSPECTOR
 

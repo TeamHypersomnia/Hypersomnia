@@ -13,7 +13,7 @@ loaded_image_caches_map populate_test_scene_images_and_sounds(
 
 	try {
 		load_test_scene_images(lua, definitions);
-		load_test_scene_sound_buffers(output_sources.sounds);
+		load_test_scene_sounds(output_sources.sounds);
 	}
 	catch (const test_scene_asset_loading_error err) {
 		LOG(err.what());

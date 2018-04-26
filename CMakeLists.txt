@@ -310,7 +310,7 @@ set(HYPERSOMNIA_TEST_SCENES_CPPS
 	"src/test_scenes/test_scene_physical_materials.cpp"
 	"src/test_scenes/test_scene_sentience_properties.cpp"
 	"src/test_scenes/test_scene_animations.cpp"
-	"src/test_scenes/test_scene_sound_buffers.cpp"
+	"src/test_scenes/test_scene_sounds.cpp"
 	"src/test_scenes/test_scene_recoil_players.cpp"
 
 	"src/test_scenes/test_scene_flavours.cpp"
@@ -628,7 +628,7 @@ file(GLOB_RECURSE HYPERSOMNIA_HEADERS_WITH_INTROSPECTED_CLASSES
 
 	"src/test_scenes/test_scene_images.h"
 	"src/test_scenes/test_scene_animations.h"
-	"src/test_scenes/test_scene_sound_buffers.h"
+	"src/test_scenes/test_scene_sounds.h"
 
 	"src/game/tests_of_traits.cpp"
 	"src/augs/templates/introspect.cpp"

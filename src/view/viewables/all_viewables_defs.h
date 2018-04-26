@@ -6,7 +6,7 @@
 
 #include "game/assets/ids/asset_ids.h"
 #include "game/assets/ids/asset_ids.h"
-#include "game/assets/ids/sound_buffer_id.h"
+#include "game/assets/ids/asset_ids.h"
 #include "game/assets/ids/particle_effect_id.h"
 #include "game/assets/ids/physical_material_id.h"
 #include "game/assets/ids/recoil_player_id.h"

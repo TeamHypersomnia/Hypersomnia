@@ -11,7 +11,7 @@
 #include "augs/templates/constexpr_arithmetic.h"
 #include "augs/templates/identity_templates.h"
 
-#include "game/assets/ids/sound_buffer_id.h"
+#include "game/assets/ids/asset_ids.h"
 #include "game/assets/ids/particle_effect_id.h"
 
 #include "game/transcendental/entity_id.h"

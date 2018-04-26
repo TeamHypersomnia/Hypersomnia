@@ -17,7 +17,7 @@ struct test_scene_asset_loading_error : error_with_typesafe_sprintf {
 
 struct loaded_image_caches_map;
 
-void load_test_scene_sound_buffers(sound_buffer_inputs_map&);
+void load_test_scene_sounds(sound_buffer_inputs_map&);
 void load_test_scene_particle_effects(
 	const loaded_image_caches_map&,
 	const animations_pool& anims,

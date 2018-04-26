@@ -14,7 +14,7 @@
 #include "game/components/render_component.h"
 
 #include "game/assets/ids/recoil_player_id.h"
-#include "game/assets/ids/sound_buffer_id.h"
+#include "game/assets/ids/asset_ids.h"
 #include "game/assets/recoil_player.h"
 
 #include "game/detail/view_input/sound_effect_input.h"

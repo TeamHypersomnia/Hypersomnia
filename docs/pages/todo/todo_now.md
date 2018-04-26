@@ -7,8 +7,6 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
-- sound_buffer_id -> sound_id
-
 - Fix glitch with flicker on the entire screen
 	- probably particles animation bug
 

@@ -47,5 +47,5 @@ enum class test_scene_sound_id {
 };
 
 inline auto to_sound_id(const test_scene_sound_id id) {
-	return to_pool_id<assets::sound_buffer_id>(id);
+	return to_pool_id<assets::sound_id>(id);
 }

@@ -14,6 +14,6 @@ constexpr bool is_asset_id_v = is_one_of_v<
 	/* Viewables */
 	//assets::image_id,
 	assets::particle_effect_id,
-	assets::sound_buffer_id
+	assets::sound_id
 >;
 

@@ -7,7 +7,7 @@ auto& get_viewable_pool(T&& t) {
 	if constexpr(std::is_same_v<I, assets::image_id>) {
 		return t.image_definitions;
 	}
-	else if constexpr(std::is_same_v<I, assets::sound_buffer_id>) {
+	else if constexpr(std::is_same_v<I, assets::sound_id>) {
 		return t.sounds;
 	}
 	else if constexpr(std::is_same_v<I, assets::particle_effect_id>) {

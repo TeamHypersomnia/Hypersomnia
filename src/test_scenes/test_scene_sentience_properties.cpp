@@ -1,6 +1,6 @@
 #include "test_scenes/test_scenes_content.h"
 #include "game/detail/spells/spell_structs.h"
-#include "test_scenes/test_scene_sound_buffers.h"
+#include "test_scenes/test_scene_sounds.h"
 #include "game/transcendental/cosmos.h"
 
 #include "game/detail/spells/all_spells.h"

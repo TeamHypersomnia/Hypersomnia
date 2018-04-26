@@ -4,13 +4,13 @@
 #include "augs/filesystem/file.h"
 #include "augs/audio/sound_buffer.h"
 
-#include "game/assets/ids/sound_buffer_id.h"
+#include "game/assets/ids/asset_ids.h"
 
 #include "test_scenes/test_scenes_content.h"
-#include "test_scenes/test_scene_sound_buffers.h"
+#include "test_scenes/test_scene_sounds.h"
 
-void load_test_scene_sound_buffers(sound_buffer_inputs_map& all_definitions) {
-	using id_type = assets::sound_buffer_id;
+void load_test_scene_sounds(sound_buffer_inputs_map& all_definitions) {
+	using id_type = assets::sound_id;
 	const auto directory = "content/official/sfx/";
 
 	augs::for_each_enum_except_bounds([&](const test_scene_sound_id enum_id) {

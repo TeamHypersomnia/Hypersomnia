@@ -1,5 +1,5 @@
 #include "test_scenes/test_scenes_content.h"
-#include "test_scenes/test_scene_sound_buffers.h"
+#include "test_scenes/test_scene_sounds.h"
 
 #include "game/assets/physical_material.h"
 #include "game/assets/all_logical_assets.h"
@@ -8,7 +8,7 @@ void load_test_scene_physical_materials(physical_materials_pool& assets) {
 	const auto set_pair = [&](
 		const assets::physical_material_id a,
 		const assets::physical_material_id b,
-		const assets::sound_buffer_id c
+		const assets::sound_id c
 	) {
 		assets[a].collision_sound_matrix[b] = c;
 		assets[b].collision_sound_matrix[a] = c;

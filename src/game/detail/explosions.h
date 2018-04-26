@@ -4,7 +4,7 @@
 #include "augs/graphics/rgba.h"
 #include "augs/misc/value_meter.h"
 
-#include "game/assets/ids/sound_buffer_id.h"
+#include "game/assets/ids/asset_ids.h"
 #include "game/components/transform_component.h"
 #include "game/transcendental/step_declaration.h"
 #include "game/transcendental/entity_id_declaration.h"
@@ -22,7 +22,7 @@ struct standard_explosion_input {
 
 	rgba inner_ring_color = cyan;
 	rgba outer_ring_color = white;
-	assets::sound_buffer_id sound_effect;
+	assets::sound_id sound_effect;
 	float sound_gain = 1.f;
 	adverse_element_type type = adverse_element_type::INVALID;
 	bool create_thunders_effect = false;
