@@ -15,12 +15,11 @@ inline auto selection_checkbox_spacing() {
 }
 
 template <class C, class T>
-auto checkbox_and_node_facade(
+ImGuiTreeNodeFlags do_selection_checkbox(
 	C& current_selections, 
 	const typename C::value_type& current_id, 
 	const bool current_selected,
-	const T& checkbox_id,
-	const std::string& node_label
+	const T& checkbox_id
 ) {
 	using namespace augs::imgui;
 
@@ -39,18 +38,17 @@ auto checkbox_and_node_facade(
 		}
 	}
 
-	ImGuiTreeNodeFlags flags = 0;
+	ImGui::SameLine();
 
 	if (current_selected) {
-		flags = ImGuiTreeNodeFlags_Selected;
+		return ImGuiTreeNodeFlags_Selected;
 	}
 
-	ImGui::SameLine();
-	return scoped_tree_node_ex(node_label.c_str(), flags);
+	return 0;
 }
 
 template <class C, class A, class I>
-void do_select_all_checkbox(
+ImGuiTreeNodeFlags do_select_all_checkbox(
 	const property_editor_settings& settings,
 	C& current_selections, 
 	A for_each_item,
@@ -104,4 +102,10 @@ void do_select_all_checkbox(
 	}
 
 	ImGui::SameLine();
+
+	if (all_selected && any_exists) {
+		return ImGuiTreeNodeFlags_Selected;
+	}
+
+	return 0;
 }

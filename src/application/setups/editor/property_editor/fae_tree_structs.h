@@ -7,8 +7,8 @@
 #include "application/setups/editor/property_editor/commanding_property_editor_input.h"
 #include "game/transcendental/entity_type_templates.h"
 
-enum class fae_view_mode {
-	// GEN INTROSPECTOR enum class fae_view_mode
+enum class fae_view_type {
+	// GEN INTROSPECTOR enum class fae_view_type
 	FLAVOURS,
 	ENTITIES
 	// END GEN INTROSPECTOR
@@ -16,12 +16,16 @@ enum class fae_view_mode {
 
 struct fae_tree_state {
 	entity_guid hovered_guid;
-	fae_view_mode view_mode = fae_view_mode::FLAVOURS;
+	fae_view_type view_mode = fae_view_type::FLAVOURS;
 
 	template <class T>
 	using make_selected_flavours = std::unordered_set<typed_entity_flavour_id<T>>;
 
+	template <class T>
+	using make_selected_entities = std::unordered_set<typed_entity_id<T>>;
+
 	per_entity_type_container<make_selected_flavours> selected_flavours;
+	per_entity_type_container<make_selected_entities> selected_entities;
 };
 
 class loaded_image_caches_map;

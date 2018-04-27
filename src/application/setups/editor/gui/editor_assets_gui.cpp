@@ -263,7 +263,8 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 
 			const auto current_selected = is_selected(path_entry);
 
-			const auto node = checkbox_and_node_facade(selected_assets, id, current_selected, i, displayed_name);
+			const auto flags = do_selection_checkbox(selected_assets, id, current_selected, i);
+			const auto node = scoped_tree_node_ex(displayed_name, flags);
 
 			next_columns(2);
 
