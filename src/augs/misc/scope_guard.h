@@ -21,13 +21,6 @@ namespace augs {
 			finish_scope();
 		}
 
-		void finish_scope() {
-			if (exit_function) {
-				(*exit_function)();
-				release();
-			}
-		}
-
 		void release() {
 			exit_function.reset();
 		}
@@ -41,6 +34,13 @@ namespace augs {
 		scope_guard& operator=(scope_guard&&) = delete;
 
 	private:
+		void finish_scope() {
+			if (exit_function) {
+				(*exit_function)();
+				release();
+			}
+		}
+
 		std::optional<F> exit_function;
 	};
 }

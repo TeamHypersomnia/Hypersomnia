@@ -70,6 +70,12 @@ public:
 		return total;
 	};
 
+	void clear() {
+		for_each_through_std_get(all, [&](auto& v) {
+			v.clear();
+		});
+	};
+
 	template <class T>
 	auto& get() {
 		return std::get<T>(all);
@@ -78,6 +84,16 @@ public:
 	template <class T>
 	const auto& get() const {
 		return std::get<T>(all);
+	}
+
+	template <class E>
+	auto& get_for() {
+		return std::get<Mod<E>>(all);
+	}
+
+	template <class E>
+	const auto& get_for() const {
+		return std::get<Mod<E>>(all);
 	}
 
 	template <class F>

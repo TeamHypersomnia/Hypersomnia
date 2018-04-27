@@ -5,6 +5,11 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- animation metadata could have some very general structs like "character metrics"
+	- vec2i: hands position[2]
+		- positions of these could be even indicated in the previewed image
+	- bool: makes a step?
+
 - rethink our roadmap
 - crashfix with no images in atlas?
 	Regenerating texture atlas: cache/gen/atlases/game_world_atlas.bin

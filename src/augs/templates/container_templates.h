@@ -209,3 +209,8 @@ auto end(reversion_wrapper<T> w) { return rend(w.iterable); }
 
 template <typename T>
 reversion_wrapper<T> reverse(T&& iterable) { return { iterable }; }
+
+template <class T>
+auto vectorize(const T& container) {
+	return std::vector<typename T::value_type>(container.begin(), container.end());
+}

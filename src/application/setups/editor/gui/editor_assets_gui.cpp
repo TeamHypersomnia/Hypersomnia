@@ -19,6 +19,7 @@
 #include "application/setups/editor/property_editor/asset_control_provider.h"
 #include "application/setups/editor/property_editor/general_edit_properties.h"
 #include "application/setups/editor/detail/find_locations_that_use.h"
+#include "application/setups/editor/detail/checkbox_selection.h"
 #include "application/setups/editor/property_editor/compare_all_fields_to.h"
 
 #include "augs/templates/list_utils.h"
@@ -260,38 +261,11 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 			const auto displayed_name = tree_settings.get_prettified(path_entry.get_filename());
 			const auto displayed_dir = path_entry.get_displayed_directory();
 
-			auto scoped_style = scoped_style_var(ImGuiStyleVar_ItemSpacing, ImVec2(3, 1));
-			auto scoped_style2 = scoped_style_var(ImGuiStyleVar_FramePadding, ImVec2(1, 1));
-
 			const auto current_selected = is_selected(path_entry);
 
-			{
-				bool altered = current_selected;
+			const auto node = checkbox_and_node_facade(selected_assets, id, current_selected, i, displayed_name);
 
-				if (checkbox(typesafe_sprintf("###%x", i).c_str(), altered)) {
-					if (current_selected && !altered) {
-						erase_element(selected_assets, id);
-					}
-					else if(!current_selected && altered) {
-						selected_assets.emplace(id);
-					}
-				}
-			}
-
-			ImGuiTreeNodeFlags flags = 0;
-
-			if (current_selected) {
-				flags = ImGuiTreeNodeFlags_Selected;
-			}
-
-			ImGui::SameLine();
-			const auto node = scoped_tree_node_ex(displayed_name.c_str(), flags);
-
-			scoped_style.finish_scope();
-			scoped_style2.finish_scope();
-
-			ImGui::NextColumn();
-			ImGui::NextColumn();
+			next_columns(2);
 
 			const auto& project_path = cmd_in.folder.current_path;
 
@@ -421,6 +395,8 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 			}
 		};
 
+		int s = 0;
+		
 		auto do_section = [&](
 			const auto& paths,
 			const std::array<std::string, 3> labels,
@@ -431,44 +407,16 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 			}
 
 			{
-				bool all_selected = true;
-				bool any_selected = false;
-
-				for (const auto& e : paths) {
-					if (is_selected(e)) {
-						any_selected = true;
-					}
-					else {
-						all_selected = false;
-					}
-				}
-
-				const auto scoped_style = scoped_style_var(ImGuiStyleVar_ItemSpacing, ImVec2(3, 1));
-				const auto scoped_style2 = scoped_style_var(ImGuiStyleVar_FramePadding, ImVec2(1, 1));
-
-				{
-					auto cols = ::maybe_different_value_cols(
-						settings,
-						any_selected && !all_selected
-					);
-
-					bool altered = all_selected;
-					
-					if (checkbox(typesafe_sprintf("###%x", i).c_str(), altered)) {
-						if (all_selected && !altered) {
-							for (const auto& e : paths) {
-								erase_element(selected_assets, e.id);
-							}
+				do_select_all_checkbox(
+					settings,
+					selected_assets,
+					[&paths](auto callback) {
+						for (const auto& p : paths) {
+							callback(p.id);
 						}
-						else if (!all_selected && altered) {
-							for (const auto& e : paths) {
-								selected_assets.insert(e.id);
-							}
-						}
-					}
-				}
-
-				ImGui::SameLine();
+					},
+					s++
+				);
 
 				if (color) {
 					text_color(labels[0], *color);

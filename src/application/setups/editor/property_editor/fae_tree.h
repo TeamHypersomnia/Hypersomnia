@@ -7,6 +7,7 @@
 #include "application/setups/editor/property_editor/flavour_properties_editor.h"
 #include "application/setups/editor/property_editor/entity_properties_editor.h"
 
+#include "application/setups/editor/detail/checkbox_selection.h"
 #include "application/setups/editor/property_editor/fae_tree_structs.h"
 
 /*
@@ -17,11 +18,11 @@ template <class E>
 void do_edit_entities_gui(
 	const fae_property_editor_input in,
 	const const_typed_entity_handle<E>& entity,
-	const affected_entities_type& ids
+	std::vector<typed_entity_id<E>>&& ids
 ) {
 	change_entity_property_command cmd;
 	cmd.type_id.set<E>();
-	cmd.affected_entities = ids;
+	cmd.set_affected_entities(std::move(ids));
 
 	edit_entity(in, entity, cmd);
 
@@ -32,11 +33,11 @@ template <class E>
 void do_edit_flavours_gui(
 	const fae_property_editor_input in,
 	const entity_flavour<E>& flavour,
-	const affected_flavours_type& ids
+	std::vector<typed_entity_flavour_id<E>>&& ids
 ) {
 	change_flavour_property_command cmd;
 	cmd.type_id.set<E>();
-	cmd.affected_flavours = ids;
+	cmd.set_affected_flavours(std::move(ids));
 
 	edit_flavour(in, flavour, cmd);
 
@@ -54,32 +55,6 @@ auto fae_tree(
 	const auto prop_in = cpe_in.prop_in;
 
 	fae_tree_filter filter;
-
-	auto do_edit_entities = [&](const auto& entity, const auto& ids) {
-		thread_local affected_entities_type input;
-
-		if constexpr(is_container_v<std::decay_t<decltype(ids)>>) {
-			input.assign(ids.begin(), ids.end());
-		}
-		else {
-			input = { ids };
-		}
-
-		do_edit_entities_gui(fae_in, entity, input);	
-	};
-
-	auto do_edit_flavours = [&](const auto& flavour, const auto& ids) {
-		thread_local affected_flavours_type input;
-
-		if constexpr(is_container_v<std::decay_t<decltype(ids)>>) {
-			input.assign(ids.begin(), ids.end());
-		}
-		else {
-			input = { ids };
-		}
-
-		do_edit_flavours_gui(fae_in, flavour, input);	
-	};
 
 	auto& provider = flavours_and_entities_provider;
 
@@ -116,6 +91,21 @@ auto fae_tree(
 				return;
 			}
 
+			auto& selected_flavours = fae_in.state.selected_flavours.get_for<E>();
+
+			do_select_all_checkbox(
+				prop_in.settings,
+				selected_flavours,
+				[&provider](auto callback) {
+					provider.template for_each_flavour<E>(
+						[&](const flavour_id_type flavour_id, const flavour_type& flavour) {
+							callback(flavour_id);
+						}
+					);
+				},
+				entity_type_label
+			);
+
 			const auto node = scoped_tree_node_ex(entity_type_label);
 
 			ImGui::NextColumn();
@@ -145,59 +135,24 @@ auto fae_tree(
 			ImGui::NextColumn();
 
 			if (node) {
-				if (total_flavours > 1) {
-					/* Perform unified flavours view, with unified entities of all flavours */
-
-					const auto unified_flavours_node = scoped_tree_node_ex(typesafe_sprintf("%x Flavours (unified)", total_flavours));
-
-					next_column_text();
-
-					if (unified_flavours_node) {
-						const auto& all_flavour_ids = provider.template get_all_flavour_ids<E>();
-
-						{ 
-							const auto first_flavour_id = *all_flavour_ids.begin();
-							const auto& first_flavour = cosm.template get_flavour<E>(first_flavour_id);
-
-							do_edit_flavours(first_flavour, all_flavour_ids);
-						}
-
-						if (total_entities > 0) {
-							const auto unified_entities_node = scoped_tree_node_ex(typesafe_sprintf("%x Entities of %x Flavours (unified)", total_entities, all_flavour_ids.size()));
-
-							next_column_text();
-
-							if (unified_entities_node) {
-								thread_local std::vector<entity_id_base> all_having_flavours;	
-								all_having_flavours.clear();
-
-								/*
-									This could be done by just iterating over the pool and gathering all ids.
-									This however will be better solution if we filter per flavours.
-								*/
-
-								for (const auto id : all_flavour_ids) {
-									concatenate(
-										all_having_flavours,
-										provider.template get_entities_by_flavour_id<E>(id)
-									);
-								}
-
-								const auto first_handle = specific_handle(cosm, *all_having_flavours.begin());
-								do_edit_entities(first_handle, all_having_flavours);
-							}
-						}
-					}
-				}
-
 				provider.template for_each_flavour<E>(
 					[&](const flavour_id_type flavour_id, const flavour_type& flavour) {
 						const auto flavour_label = flavour.template get<invariants::name>().name;
 
-						const auto all_having_flavour = provider.template get_entities_by_flavour_id<E>(flavour_id.raw);
+						decltype(auto) all_having_flavour = provider.get_entities_by_flavour_id(flavour_id);
 
+						const auto this_type_id = entity_type_id::of<E>();
 						const auto node_label = typesafe_sprintf("%x###%x", flavour_label, flavour_id.raw);
-						const auto flavour_node = scoped_tree_node_ex(node_label);
+						const auto imgui_id = typesafe_sprintf("%x.%x", this_type_id.get_index(), flavour_id.raw);
+
+						const bool is_selected = found_in(selected_flavours, flavour_id);
+						const auto flavour_node = checkbox_and_node_facade(
+							selected_flavours,
+							flavour_id,
+							is_selected,
+							imgui_id, 
+							node_label
+						);
 
 						const auto num_entities_label = typesafe_sprintf("%x Entities", all_having_flavour.size());
 
@@ -205,10 +160,9 @@ auto fae_tree(
 
 						if (fae_in.show_filter_buttons) {
 							const auto scoped_style = scoped_style_var(ImGuiStyleVar_FramePadding, ImVec2(1, 1));
-							const auto this_type_id = entity_type_id::of<E>().get_index();
 
-							const auto ex_label = typesafe_sprintf("Ex##%x.%x", this_type_id, flavour_id.raw);
-							const auto on_label = typesafe_sprintf("On##%x.%x", this_type_id, flavour_id.raw);
+							const auto ex_label = "Ex##" + imgui_id;
+							const auto on_label = "On##" + imgui_id;
 
 							if (ImGui::Button(ex_label.c_str())) {
 								filter.close_flavour_id = flavour_id;
@@ -232,19 +186,11 @@ auto fae_tree(
 						if (flavour_node) {
 							ImGui::Separator();
 
-							do_edit_flavours(flavour, flavour_id.raw);
-
-							{
-								const auto unified_entities_node = scoped_tree_node_ex(num_entities_label + " (unified)");
-
-								next_column_text();
-
-								if (unified_entities_node) {
-									if (all_having_flavour.size() > 0) {
-										const auto first_handle = specific_handle(cosm, *all_having_flavour.begin());
-										do_edit_entities(first_handle, all_having_flavour);
-									}
-								}
+							if (is_selected) {
+								do_edit_flavours_gui(fae_in, flavour, vectorize(selected_flavours));
+							}
+							else {
+								do_edit_flavours_gui(fae_in, flavour, { flavour_id });
 							}
 
 							const auto entities_node = scoped_tree_node_ex(num_entities_label);
@@ -267,7 +213,7 @@ auto fae_tree(
 									next_column_text();
 
 									if (entity_node) {
-										do_edit_entities(typed_handle, e);
+										do_edit_entities_gui(fae_in, typed_handle, { e });
 									}
 								}
 							}

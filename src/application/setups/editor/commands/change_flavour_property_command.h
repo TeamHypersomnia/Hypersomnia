@@ -76,6 +76,12 @@ struct change_flavour_property_command : change_property_command<change_flavour_
 	flavour_property_id property_id;
 	// END GEN INTROSPECTOR
 
+	template <class E>
+	void set_affected_flavours(std::vector<typed_entity_flavour_id<E>>&& typed) {
+		/* YOLO */
+		reinterpret_cast<std::vector<typed_entity_flavour_id<E>>&>(affected_flavours) = std::move(typed);
+	}
+
 	auto count_affected() const {
 		return affected_flavours.size();
 	}

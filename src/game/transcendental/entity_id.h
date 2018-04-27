@@ -198,6 +198,13 @@ namespace std {
 		}
 	};
 
+	template <class E>
+	struct hash<typed_entity_id<E>> {
+		std::size_t operator()(const typed_entity_id<E> v) const {
+			return hash<entity_id_base>()(v.basic());
+		}
+	};
+
 	template <>
 	struct hash<unversioned_entity_id> {
 		std::size_t operator()(const unversioned_entity_id v) const {

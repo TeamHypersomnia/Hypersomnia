@@ -677,3 +677,7 @@ we consider whole type overrides too complex architeciturally:
 				- Sounds are more likely to be reused
 	- Viewables
 		- 
+- remove quadratic number of instantiations of field comparator
+	- just do augs::to_bytes on both elements to be compared
+	- have some reserved thread_local memory stream
+

@@ -5,9 +5,15 @@
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_flavour_id.h"
 #include "application/setups/editor/property_editor/commanding_property_editor_input.h"
+#include "game/transcendental/entity_type_templates.h"
 
 struct fae_tree_state {
 	entity_guid hovered_guid;
+
+	template <class T>
+	using make_selected_flavours = std::unordered_set<typed_entity_flavour_id<T>>;
+
+	per_entity_type_container<make_selected_flavours> selected_flavours;
 };
 
 class loaded_image_caches_map;

@@ -177,7 +177,8 @@ public:
 	template <template <class> class Deguidized, class source_id_type>
 	Deguidized<entity_id> deguidize(const Deguidized<source_id_type>& guid_source) const;
 
-	const auto& get_entities_by_flavour_id(const entity_flavour_id& id) const {
+	template <class E>
+	const auto& get_entities_by_flavour_id(const typed_entity_flavour_id<E>& id) const {
 		return inferred.name.get_entities_by_flavour_id(id);
 	}
 	

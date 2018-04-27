@@ -26,9 +26,9 @@ void editor_all_entities_gui::interrupt_tweakers() {
 #include "augs/readwrite/memory_stream.h"
 #include "augs/readwrite/byte_readwrite.h"
 
-using resolved_array_type = per_entity_type_array<
-	std::unordered_map<raw_entity_flavour_id, std::vector<entity_id_base>>
->;
+template <class E>
+using make_flavour_to_entities_map = std::unordered_map<typed_entity_flavour_id<E>, std::vector<typed_entity_id<E>>>;
+using resolved_container_type = per_entity_type_container<make_flavour_to_entities_map>;
 
 template <class C>
 void sort_flavours_by_name(const cosmos& cosm, C& ids) {
@@ -45,17 +45,17 @@ void sort_flavours_by_name(const cosmos& cosm, C& ids) {
 
 class in_selection_provider {
 	const cosmos& cosm;
-	const resolved_array_type& per_native_type;
+	const resolved_container_type& per_native_type;
 
 	template <class E>
 	const auto& get_map() const {
-		return per_native_type[entity_type_id::of<E>().get_index()];
+		return per_native_type.get_for<E>();
 	}
 
 public:
 	in_selection_provider(
 		const cosmos& cosm,
-		const resolved_array_type& per_native_type
+		const resolved_container_type& per_native_type
 	) : 
 		cosm(cosm),
 		per_native_type(per_native_type)
@@ -83,7 +83,7 @@ public:
 
 	template <class E>
 	const auto& get_all_flavour_ids() const {
-		thread_local std::vector<raw_entity_flavour_id> ids;
+		thread_local std::vector<typed_entity_flavour_id<E>> ids;
 		ids.clear();
 
 		for (const auto& p : get_map<E>()) {
@@ -94,15 +94,14 @@ public:
 	}
 
 	template <class E>
-	auto get_entities_by_flavour_id(const raw_entity_flavour_id raw) const {
-		thread_local std::vector<entity_id_base> ids;
-		ids.clear();
-		ids	= get_map<E>().at(raw);
+	auto get_entities_by_flavour_id(const typed_entity_flavour_id<E> id) const {
+		thread_local std::vector<typed_entity_id<E>> ids;
+		ids	= get_map<E>().at(id);
 
 		sort_range_by(
 			ids,
 			[&](const auto id) { 
-				return cosm[typed_entity_id<E>(id)].get_guid();
+				return cosm[id].get_guid();
 			}
 		);
 
@@ -156,24 +155,21 @@ public:
 
 	template <class E>
 	const auto& get_all_flavour_ids() const {
-		thread_local std::vector<raw_entity_flavour_id> all_flavour_ids;
+		thread_local std::vector<typed_entity_flavour_id<E>> all_flavour_ids;
 		all_flavour_ids.clear();
 
 		const auto& all_flavours = common().get_flavours<E>();
 
-		all_flavours.for_each([&](
-			const auto flavour_id,
-			const auto& flavour
-		) {
-			all_flavour_ids.push_back(flavour_id.raw);
+		all_flavours.for_each([&](const auto flavour_id, const auto& flavour) {
+			all_flavour_ids.push_back(flavour_id);
 		});
 
 		return all_flavour_ids;
 	}
 
 	template <class E>
-	const auto& get_entities_by_flavour_id(const raw_entity_flavour_id id) const {
-		return cosm.get_solvable_inferred().name.get_entities_by_flavour_id(typed_entity_flavour_id<E>(id));
+	const auto& get_entities_by_flavour_id(const typed_entity_flavour_id<E> id) const {
+		return cosm.get_solvable_inferred().name.get_entities_by_flavour_id(id);
 	}
 
 	template <class E, class F>
@@ -243,23 +239,23 @@ fae_tree_filter editor_all_entities_gui::perform(
 
 			if (const auto handle = cosm[id]) {
 				handle.dispatch([&](const auto typed_handle) {
-					do_edit_flavours_gui(fae_in, typed_handle.get_flavour(), { typed_handle.get_flavour_id().raw });
-					do_edit_entities_gui(fae_in, typed_handle, { id.basic() });
+					do_edit_flavours_gui(fae_in, typed_handle.get_flavour(), { typed_handle.get_flavour_id() });
+					do_edit_entities_gui(fae_in, typed_handle, { typed_handle.get_id() });
 				});
 			}
 
 			return {};
 		}
 
-		thread_local resolved_array_type per_native_type;
-
-		for (auto& p : per_native_type) {
-			p.clear();
-		}
+		thread_local resolved_container_type per_native_type;
+		per_native_type.clear();
 
 		for (const auto& e : matches) {
 			if (const auto handle = cosm[e]) {
-				per_native_type[e.type_id.get_index()][handle.get_flavour_id().raw].push_back(e);
+				handle.dispatch([](const auto typed_handle) {
+					using E = entity_type_of<decltype(typed_handle)>;
+					per_native_type.get_for<E>()[typed_handle.get_flavour_id()].push_back(typed_handle.get_id());
+				});
 			}
 		}
 
