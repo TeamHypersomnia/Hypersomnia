@@ -68,6 +68,9 @@ void illuminated_rendering(
 	const B& get_additional_border,
 	const H& for_each_additional_highlight
 ) {
+	auto& profiler = in.frame_performance;
+	auto scope = measure_scope(profiler.rendering_script);
+
 	auto& renderer = in.renderer;
 	
 	const auto viewed_character = in.eye.viewed_character;
@@ -80,7 +83,6 @@ void illuminated_rendering(
 	}();
 
 	const auto& cosmos = viewed_character.get_cosmos();
-	auto& profiler = in.frame_performance;
 	
 	const auto& anims = cosmos.get_logical_assets().animations;
 

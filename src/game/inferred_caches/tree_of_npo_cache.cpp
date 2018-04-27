@@ -52,7 +52,7 @@ void tree_of_npo_cache::destroy_cache_of(const const_entity_handle handle) {
 
 void tree_of_npo_cache::infer_cache_for(const const_entity_handle e) {
 	e.dispatch_on_having<invariants::render>([this](const auto handle) {
-		const auto it = per_entity_cache.try_emplace(handle.get_id());
+		const auto it = per_entity_cache.try_emplace(unversioned_entity_id(handle));
 
 		auto& cache = (*it.first).second;
 		const bool cache_existed = !it.second;
@@ -77,7 +77,7 @@ void tree_of_npo_cache::infer_cache_for(const const_entity_handle e) {
 				cache.recorded_aabb = new_aabb;
 
 				tree_of_npo_node new_node;
-				new_node.payload = handle.get_id().operator unversioned_entity_id();
+				new_node.payload = unversioned_entity_id(handle);
 
 				cache.tree_proxy_id = get_tree(cache).nodes.CreateProxy(new_b2AABB, new_node.bytes);
 			}

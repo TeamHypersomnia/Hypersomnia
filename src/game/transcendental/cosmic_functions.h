@@ -48,7 +48,7 @@ class cosmic {
 		P pre_construction
 	) {
 		const auto new_allocation = cosm.get_solvable({}).template allocate_next_entity<E>(flavour_id.raw);
-		const auto handle = typed_entity_handle<E> { new_allocation.object, cosm, new_allocation.key };
+		const auto handle = ref_typed_entity_handle<E> { cosm, { new_allocation.object, new_allocation.key } };
 
 		{
 			auto& object = new_allocation.object;
@@ -73,7 +73,7 @@ public:
 
 	static void clear(cosmos& cosm);
 
-	template <class E, class C>
+	template <class C, class E>
 	static auto specific_paste_entity(
 		C& cosm, 
 		const typed_entity_flavour_id<E> flavour_id,
@@ -87,7 +87,7 @@ public:
 		);
 	}
 
-	template <class E, class C, class P>
+	template <class C, class E, class P>
 	static auto specific_create_entity(
 		C& cosm, 
 		const typed_entity_flavour_id<E> flavour_id,
@@ -140,7 +140,7 @@ public:
 		const auto new_allocation = s.template undo_free_entity<E>(undo_delete_input, deleted_content);
 		new_allocation.object.components = deleted_content.components;
 		
-		const auto handle = typed_entity_handle<E> { new_allocation.object, cosm, new_allocation.key };
+		const auto handle = ref_typed_entity_handle<E> { cosm, { new_allocation.object, new_allocation.key } };
 
 		if (reinference == reinference_type::ONLY_AFFECTED) {
 			infer_caches_for(handle);
@@ -161,14 +161,14 @@ public:
 		}
 	}
 
-	template <class E, class P>
+	template <class handle_type, class P>
 	static auto specific_clone_entity(
-		const typed_entity_handle<E> source_entity,
+		const handle_type source_entity,
 		P&& pre_construction
 	) {
 		auto& cosmos = source_entity.get_cosmos();
 
-		return cosmic::specific_create_entity<E>(cosmos, source_entity.get_flavour_id(), [&](const auto new_entity) {
+		return cosmic::specific_create_entity(cosmos, source_entity.get_flavour_id(), [&](const auto new_entity) {
 			const auto& source_components = source_entity.get({}).components;
 			auto& new_solvable = new_entity.get({});
 			auto& new_components = new_solvable.components;
@@ -190,8 +190,8 @@ public:
 		});
 	}
 
-	template <class E>
-	static auto specific_clone_entity(const typed_entity_handle<E> source_entity) {
+	template <class handle_type>
+	static auto specific_clone_entity(const handle_type source_entity) {
 		return specific_clone_entity(source_entity, [](auto&&...) {});
 	}
 
@@ -227,7 +227,7 @@ public:
 				using E = typename std::decay_t<O>::used_entity_type;
 				using iterated_handle_type = basic_iterated_entity_handle<is_const_ref_v<O>, E>;
 				
-				callback(iterated_handle_type(object, self, iteration_index));
+				callback(iterated_handle_type(self, { object, iteration_index } ));
 			}
 		);
 	}

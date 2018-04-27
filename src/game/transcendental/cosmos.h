@@ -30,12 +30,23 @@ struct cosmos_loading_error : error_with_typesafe_sprintf {
 
 template <class C>
 auto subscript_handle_getter(C& cosm, const entity_id id) {
-	return basic_entity_handle<std::is_const_v<C>>{ cosm, id };
+	static constexpr bool is_const = std::is_const_v<C>;
+
+	const auto ptr = cosm.get_solvable({}).on_entity_meta(id, [&](auto* const agg) {
+		return reinterpret_cast<maybe_const_ptr_t<is_const, void>>(agg);	
+	});
+
+	return basic_entity_handle<is_const>{ ptr, cosm, id };
 }
 
 template <class C, class E>
 auto subscript_handle_getter(C& cosm, const typed_entity_id<E> id) {
-	return basic_typed_entity_handle<std::is_const_v<C>, E>{ cosm, id };
+	const auto ptr = cosm.get_solvable({}).dereference_entity(id);
+
+	return basic_typed_entity_handle<std::is_const_v<C>, E>{ 
+		cosm, 
+		{ ptr, id } 
+	};
 }
 
 template <class C>
@@ -45,7 +56,7 @@ auto subscript_handle_getter(C& cosm, const child_entity_id id) {
 
 template <class C>
 auto subscript_handle_getter(C& cosm, const unversioned_entity_id id) {
-	return basic_entity_handle<std::is_const_v<C>>{ cosm, cosm.to_versioned(id) };
+	return subscript_handle_getter(cosm, cosm.to_versioned(id));
 }
 
 template <class C>
@@ -195,15 +206,15 @@ public:
 		Shortcuts for heavily used functions for sanity
 	*/
 
-	auto& get_solvable(cosmos_solvable_access k) {
+	cosmos_solvable& get_solvable(cosmos_solvable_access k) {
 		return solvable.get_solvable(k);
 	}
 
-	const auto& get_solvable(cosmos_solvable_access k) const {
+	const cosmos_solvable& get_solvable(cosmos_solvable_access k) const {
 		return solvable.get_solvable(k);
 	}
 
-	const auto& get_solvable() const {
+	const cosmos_solvable& get_solvable() const {
 		return solvable.get_solvable();
 	}
 

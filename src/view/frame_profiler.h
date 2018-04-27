@@ -9,6 +9,7 @@ public:
 	augs::time_measurements total;
 	augs::amount_measurements<std::size_t> num_triangles;
 
+	augs::time_measurements rendering_script;
 	augs::time_measurements light_visibility;
 	augs::time_measurements light_rendering;
 	augs::amount_measurements<std::size_t> num_visible_lights;

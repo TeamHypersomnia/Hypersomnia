@@ -18,7 +18,7 @@
 template <class E>
 void do_edit_entities_gui(
 	const fae_property_editor_input in,
-	const const_typed_entity_handle<E>& entity,
+	const cref_typed_entity_handle<E>& entity,
 	std::vector<typed_entity_id<E>>&& ids
 ) {
 	change_entity_property_command cmd;
@@ -65,7 +65,7 @@ auto fae_tree(
 		}
 	});
 
-	auto& cosm = cpe_in.command_in.get_cosmos();
+	const auto& cosm = cpe_in.command_in.get_cosmos();
 	auto& state = fae_in.state;
 
 	const auto mode = state.view_mode;
@@ -83,7 +83,6 @@ auto fae_tree(
 
 				using Solvable = typename pool_type::mapped_type;
 				using E = typename Solvable::used_entity_type;
-				using specific_handle = const_typed_entity_handle<E>;
 
 				using flavour_id_type = typed_entity_flavour_id<E>;
 				using flavour_type = entity_flavour<E>;
@@ -269,7 +268,7 @@ auto fae_tree(
 								}
 								else if (mode == fae_view_type::ENTITIES) {
 									for (const auto& e : all_having_flavour) {
-										const auto typed_handle = specific_handle(cosm, e);
+										const auto typed_handle = *cosm[e];
 
 										const auto guid = typed_handle.get_guid();
 										const auto entity_label = typesafe_sprintf("%x", guid);

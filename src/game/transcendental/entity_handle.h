@@ -59,20 +59,6 @@ class basic_entity_handle :
 		static_assert(is_one_of_list_v<T, invariant_list_t<type_list>>, "Unknown invariant type!");
 	}
 
-	auto& pool_provider() const {
-		return owner.get_solvable({});
-	}
-
-	basic_entity_handle(
-		const entity_ptr ptr,
-		owner_reference owner,
-		const entity_id raw_id
-	) :
-		ptr(ptr),
-		owner(owner),
-		raw_id(raw_id)
-	{}
-
 	template <class T>
 	auto* find_invariant_ptr() const {
 		return dispatch([](const auto typed_handle) { 
@@ -87,15 +73,6 @@ class basic_entity_handle :
 		});
 	}
 
-	static auto dereference(
-		owner_reference owner, 
-		const entity_id raw_id
-	) {
-		return owner.get_solvable({}).on_entity_meta(raw_id, [&](auto* const agg) {
-			return reinterpret_cast<entity_ptr>(agg);	
-		});
-	}
-
 public:
 	using const_type = basic_entity_handle<!is_const>;
 	using misc_base::get_raw_flavour_id;
@@ -106,14 +83,14 @@ public:
 	}
 
 	basic_entity_handle(
-		owner_reference owner, 
+		const entity_ptr ptr,
+		owner_reference owner,
 		const entity_id raw_id
-	) : basic_entity_handle(
-		dereference(owner, raw_id),
-		owner, 
-		raw_id 
-	) {
-	}
+	) :
+		ptr(ptr),
+		owner(owner),
+		raw_id(raw_id)
+	{}
 
 	const auto& get_meta() const {
 		return *reinterpret_cast<const entity_solvable_meta*>(ptr);
@@ -195,17 +172,16 @@ public:
 
 	template <class E>
 	decltype(auto) get_specific() const {
-		using handle_type = basic_typed_entity_handle<is_const, E>;
+		using handle_type = basic_ref_typed_entity_handle<is_const, E>;
 		using specific_ptr_type = maybe_const_ptr_t<is_const, entity_solvable<E>>;
 
-		auto& specific_ref = *reinterpret_cast<specific_ptr_type>(ptr);
-		return handle_type(specific_ref, owner, get_id());
+		const auto specific_ptr = reinterpret_cast<specific_ptr_type>(ptr);
+		const auto stored_id = ref_stored_id_provider<handle_type>( *specific_ptr, typed_entity_id<E>(raw_id.basic()) );
+		return handle_type(owner, stored_id);
 	}
 
 	template <class List, class F>
 	void conditional_dispatch(F&& callback) const {
-		ensure(alive());
-
 		for_each_through_std_get(List(), [&](auto t) { 
 			using E = decltype(t);
 
@@ -222,8 +198,6 @@ public:
 
 	template <class F>
 	decltype(auto) dispatch(F&& callback) const {
-		ensure(alive());
-
 		return get_by_dynamic_id(
 			all_entity_types(),
 			raw_id.type_id,
@@ -259,9 +233,7 @@ public:
 	template<class T>
 	decltype(auto) get() const {
 		if constexpr(is_invariant_v<T>) {
-			const auto p = find_invariant_ptr<T>();
-			ensure(p != nullptr);
-			return *p;
+			return *find_invariant_ptr<T>();
 		}
 		else {
 			if constexpr(is_synchronized_v<T>) {

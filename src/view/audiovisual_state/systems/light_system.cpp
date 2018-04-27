@@ -128,7 +128,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 					return;
 				}
 
-				if (const auto cache = mapped_or_nullptr(per_entity_cache, light_entity.get_id())) {
+				if (const auto cache = mapped_or_nullptr(per_entity_cache, unversioned_entity_id(light_entity))) {
 					const auto light_displacement = vec2(cache->all_variation_values[6], cache->all_variation_values[7]);
 
 					messages::visibility_information_request request;

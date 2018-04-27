@@ -21,48 +21,203 @@ struct empty_id_provider {};
 
 template <class derived_handle_type>
 struct iterated_id_provider {
+private:
+	using E = entity_type_of<derived_handle_type>;
+	static constexpr auto is_const = is_handle_const_v<derived_handle_type>;
+
+	using subject_reference = maybe_const_ref_t<is_const, entity_solvable<E>>;
+
+	subject_reference subject;
 	const unsigned iteration_index;
 	
-	bool operator==(const iterated_id_provider b) const {
-		return iteration_index == b.iteration_index;
+protected:
+	auto& get_subject() const {
+		return subject;
 	}
 
-	iterated_id_provider(const unsigned iteration_index = static_cast<unsigned>(-1)) 
-		: iteration_index(iteration_index) 
+	auto* find_subject() const {
+		return &subject;
+	}
+
+public:
+	iterated_id_provider(
+		subject_reference subject,
+		const unsigned iteration_index = static_cast<unsigned>(-1)
+	) : 
+		subject(subject),
+		iteration_index(iteration_index) 
 	{}
 
-	entity_id get_id() const {
-		const auto h = *static_cast<const derived_handle_type*>(this);
-
-		return {
-			h.get_pool().to_id(iteration_index),
-			h.get_type_id()
-		};
+	template <class T>
+	iterated_id_provider(
+		const iterated_id_provider<T>& b
+	) : 
+		subject(b.subject),
+		iteration_index(b.iteration_index)
+	{
 	}
+
+	auto get_id() const {
+		const auto h = *static_cast<const derived_handle_type*>(this);
+		return typed_entity_id<E>(h.get_pool().to_id(iteration_index));
+	}
+
+	constexpr bool alive() const {
+		return true;
+	}
+
+	constexpr bool dead() const {
+		return false;
+	}
+
+	constexpr explicit operator bool() const {
+		return true;
+	}
+
+	auto& get(cosmos_solvable_access) const {
+		return subject;
+	}
+
+	const auto& get() const {
+		return subject;
+	}
+
+	void ensure_alive() const {}
 };
 
 template <class derived_handle_type>
 struct stored_id_provider {
-	const entity_id_base stored_id;
+private:
+	using E = entity_type_of<derived_handle_type>;
+	static constexpr auto is_const = is_handle_const_v<derived_handle_type>;
 
-	bool operator==(const stored_id_provider b) const {
-		return stored_id == b.stored_id;
+	using id_type = typed_entity_id<E>;
+	using subject_pointer = maybe_const_ptr_t<is_const, entity_solvable<E>>;
+
+protected:
+	const subject_pointer subject;
+	const id_type stored_id;
+
+	auto& get_subject() const {
+		return *subject;
 	}
 
-	stored_id_provider(const entity_id_base stored_id) 
-		: stored_id(stored_id) 
+	auto* find_subject() const {
+		return subject;
+	}
+
+public:
+	stored_id_provider(
+		const subject_pointer subject,
+		const id_type stored_id
+	) : 
+		subject(subject),
+		stored_id(stored_id)
 	{}
 
-	entity_id get_id() const {
-		const auto h = *static_cast<const derived_handle_type*>(this);
-		return { stored_id, h.get_type_id() };
+	template <class T>
+	stored_id_provider(
+		const stored_id_provider<T>& b
+	) : 
+		subject(b.subject),
+		stored_id(b.stored_id)
+	{
 	}
 
-	template <class C>
-	auto& dereference(C& owner, cosmos_solvable_access key) const {
-		using E = typename derived_handle_type::used_entity_type;
-		return *owner.get_solvable(key).dereference_entity(typed_entity_id<E>{ stored_id });
+	auto get_id() const {
+		return stored_id;
 	}
+
+	bool alive() const {
+		return subject != nullptr;
+	}
+
+	bool dead() const {
+		return subject == nullptr;
+	}
+
+	explicit operator bool() const {
+		return subject != nullptr;
+	}
+
+	auto& get(cosmos_solvable_access) const {
+		return *subject;
+	}
+
+	const auto& get() const {
+		return *subject;
+	}
+
+	void ensure_alive() const {
+		ensure(subject != nullptr);
+	}
+};
+
+template <class derived_handle_type>
+struct ref_stored_id_provider {
+private:
+	using E = entity_type_of<derived_handle_type>;
+	static constexpr auto is_const = is_handle_const_v<derived_handle_type>;
+
+	using id_type = typed_entity_id<E>;
+
+	using subject_reference = maybe_const_ref_t<is_const, entity_solvable<E>>;
+	const subject_reference subject;
+	
+	const id_type stored_id;
+
+protected:
+	auto& get_subject() const {
+		return subject;
+	}
+
+	auto* find_subject() const {
+		return &subject;
+	}
+
+public:
+	template <class T>
+	ref_stored_id_provider(
+		const ref_stored_id_provider<T>& b
+	) : 
+		subject(b.subject),
+		stored_id(b.stored_id)
+	{
+	}
+
+	ref_stored_id_provider(
+		const subject_reference subject,
+		const id_type stored_id
+	) : 
+		subject(subject),
+		stored_id(stored_id)
+	{}
+
+	auto get_id() const {
+		return stored_id;
+	}
+
+	constexpr bool alive() const {
+		return true;
+	}
+
+	constexpr bool dead() const {
+		return false;
+	}
+
+	constexpr explicit operator bool() const {
+		return true;
+	}
+
+	auto& get(cosmos_solvable_access) const {
+		return subject;
+	}
+
+	const auto& get() const {
+		return subject;
+	}
+
+	void ensure_alive() const {}
 };
 
 template <bool is_const, class entity_type, template <class> class identifier_provider>
@@ -84,7 +239,6 @@ class specific_entity_handle :
 	using subject_pool_type = make_entity_pool<entity_type>;
 
 	using subject_type = entity_solvable<entity_type>;
-	using subject_reference = maybe_const_ref_t<is_const, subject_type>;
 
 	using owner_reference = maybe_const_ref_t<is_const, cosmos>;
 
@@ -93,13 +247,30 @@ class specific_entity_handle :
 	friend specific_entity_handle<!is_const, entity_type, identifier_provider>;
 	friend used_identifier_provider;
 
-	subject_reference subject;
+	using used_identifier_provider::get_subject;
+	using used_identifier_provider::find_subject;
+
+public:
+	using const_type = specific_entity_handle<true, entity_type, identifier_provider>;
+	using misc_base::get_flavour;
+	using used_identifier_provider::get_id;
+	using used_identifier_provider::get;
+	using used_identifier_provider::alive;
+	using used_identifier_provider::dead;
+	using used_identifier_provider::ensure_alive;
+	using used_identifier_provider::operator bool;
+	using used_entity_type = entity_type;
+
+
+private:
 	owner_reference owner;
 
 	template <class T>
 	maybe_const_ptr_t<is_const, T> find_component_ptr() const {
 		if constexpr(subject_type::template has<T>()) {
-			return std::addressof(subject.template get<T>());
+			ensure_alive();
+
+			return std::addressof(get_subject().template get<T>());
 		}
 
 		return nullptr;
@@ -110,44 +281,17 @@ class specific_entity_handle :
 
 public:
 	specific_entity_handle(
-		subject_reference subject,
 		owner_reference owner,
 		const used_identifier_provider identifier
 	) :
-		subject(subject),
 		owner(owner),
 		used_identifier_provider(identifier)
 	{}
 
-	specific_entity_handle(
-		owner_reference owner,
-		const used_identifier_provider identifier
-	) :
-		specific_entity_handle(
-			identifier.dereference(owner, {}),
-			owner,
-			identifier
-		)
-	{}
-
-	using const_type = specific_entity_handle<true, entity_type, identifier_provider>;
-
-	using misc_base::get_flavour;
-	using used_identifier_provider::get_id;
-
-	using used_entity_type = entity_type;
-
 	const auto& get_meta() const {
-		return static_cast<const entity_solvable_meta&>(subject);
+		ensure_alive();
+		return static_cast<const entity_solvable_meta&>(get_subject());
 	};
-
-	auto& get(cosmos_solvable_access) const {
-		return subject;
-	}
-
-	const auto& get() const {
-		return subject;
-	}
 
 	const auto& get_pool() const {
 		return std::get<subject_pool_type>(get_cosmos().get_solvable().significant.entity_pools);
@@ -213,10 +357,11 @@ public:
 		return !operator==(id);
 	}
 
-	/* Enable non-const to const handle conversion */
-	template <bool C = !is_const, class = std::enable_if_t<C>>
-	operator specific_entity_handle<!is_const, entity_type, identifier_provider>() const {
-		return const_handle_type(subject, owner, get_id());
+	/* Return a handle with a reference instead of a pointer */
+	template <class T = used_identifier_provider, class = std::enable_if_t<std::is_same_v<T, stored_id_provider<this_handle_type>>>>
+	specific_entity_handle<is_const, entity_type, ref_stored_id_provider> operator*() const {
+		ensure_alive();
+		return { owner, { *this->subject, this->stored_id } };
 	}
 
 	auto get_type_id() const {
@@ -232,28 +377,13 @@ public:
 	}
 
 	operator unversioned_entity_id() const {
-		return get_id();
-	}
-
-	constexpr bool alive() const {
-#if TODO
-		return !used_identifier_provider::operator==(used_identifier_provider());
-#else
-		return true;
-#endif
-	}
-
-	constexpr bool dead() const {
-		return !alive();
-	}
-
-	constexpr explicit operator bool() const {
-		return alive();
+		return entity_id(get_id()).operator unversioned_entity_id();
 	}
 
 	template <class F>
 	void for_each_component(F&& callback) const {
-		const auto& immutable_subject = subject;
+		ensure_alive();
+		const auto& immutable_subject = get_subject();
 
 		for_each_through_std_get(
 			immutable_subject.components, 
@@ -288,7 +418,7 @@ public:
 		}
 
 		using void_entity_ptr = maybe_const_ptr_t<is_const, void>;
-		return { static_cast<void_entity_ptr>(std::addressof(subject)), owner, get_id() };
+		return { static_cast<void_entity_ptr>(find_subject()), owner, get_id() };
 	}
 };
 

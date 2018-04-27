@@ -34,7 +34,7 @@ using entities_with_renderables = entity_types_with_any_of<
 
 template <class E, class T>
 FORCE_INLINE void specific_entity_drawer(
-	const const_typed_entity_handle<E> typed_handle,
+	const cref_typed_entity_handle<E> typed_handle,
 	const draw_renderable_input in,
 	const interpolation_system& interp,
 	T render_visitor
@@ -88,7 +88,7 @@ FORCE_INLINE void specific_entity_drawer(
 
 template <class E>
 FORCE_INLINE void specific_draw_entity(
-	const const_typed_entity_handle<E> typed_handle,
+	const cref_typed_entity_handle<E> typed_handle,
 	const draw_renderable_input in,
 	const interpolation_system& interp
 ) {
@@ -101,7 +101,7 @@ FORCE_INLINE void specific_draw_entity(
 
 template <class E, class border_provider>
 FORCE_INLINE void specific_draw_border(
-	const const_typed_entity_handle<E> typed_handle,
+	const cref_typed_entity_handle<E> typed_handle,
 	const draw_renderable_input in,
 	const interpolation_system& interp,
 	const border_provider& borders
@@ -127,7 +127,7 @@ FORCE_INLINE void specific_draw_border(
 
 template <class E>
 FORCE_INLINE void specific_draw_color_highlight(
-	const const_typed_entity_handle<E> typed_handle,
+	const cref_typed_entity_handle<E> typed_handle,
 	const rgba color,
 	const draw_renderable_input in,
 	const interpolation_system& interp
@@ -142,7 +142,7 @@ FORCE_INLINE void specific_draw_color_highlight(
 
 template <class E>
 FORCE_INLINE void specific_draw_neon_map(
-	const const_typed_entity_handle<E> typed_handle,
+	const cref_typed_entity_handle<E> typed_handle,
 	const draw_renderable_input in,
 	const interpolation_system& interp
 ) {

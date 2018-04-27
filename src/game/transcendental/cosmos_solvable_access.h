@@ -1,12 +1,22 @@
 #pragma once
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/transcendental/specific_entity_handle_declaration.h"
+#include "game/transcendental/entity_id_declaration.h"
 
 class cosmic_delta;
 class cosmic;
 class move_entities_command;
 
 struct entity_property_id;
+
+template <class derived_handle_type>
+struct stored_id_provider;
+
+template <class C, class E>
+auto subscript_handle_getter(C& cosm, const typed_entity_id<E> id);
+
+template <class C>
+auto subscript_handle_getter(C& cosm, const entity_id id);
 
 class cosmos_solvable_access {
 	/*
@@ -20,11 +30,11 @@ class cosmos_solvable_access {
 	friend move_entities_command;
 	friend entity_property_id;
 
-	template <bool>
-	friend class basic_entity_handle;
+	template <class C, class E>
+	friend auto subscript_handle_getter(C& cosm, const typed_entity_id<E> id);
 
-	template <bool, class, template <class> class>
-	friend class specific_entity_handle;
+	template <class C>
+	friend auto subscript_handle_getter(C& cosm, const entity_id id);
 
 	cosmos_solvable_access() {}
 };

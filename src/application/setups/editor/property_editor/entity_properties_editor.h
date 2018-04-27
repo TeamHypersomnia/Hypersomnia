@@ -78,7 +78,7 @@ void edit_component(
 template <class E>
 void edit_entity(
 	const fae_property_editor_input in,
-	const const_typed_entity_handle<E> handle,
+	const cref_typed_entity_handle<E> handle,
 	const change_entity_property_command& command
 ) {
 	using namespace augs::imgui;

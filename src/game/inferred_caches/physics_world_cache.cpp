@@ -106,7 +106,7 @@ void physics_world_cache::destroy_cache_of(const const_entity_handle handle) {
 
 void physics_world_cache::infer_cache_for_rigid_body(const const_entity_handle h) {
 	h.dispatch_on_having<components::rigid_body>([this](const auto handle) {
-		const auto it = rigid_body_caches.try_emplace(handle.get_id());
+		const auto it = rigid_body_caches.try_emplace(unversioned_entity_id(handle));
 		auto& cache = (*it.first).second;
 	
 		if (/* cache_existed */ !it.second) {
@@ -181,7 +181,7 @@ void physics_world_cache::infer_cache_for_rigid_body(const const_entity_handle h
 
 		const auto damping = rigid_body.calc_damping_mults(physics_def);
 
-		def.userData = handle.get_id();
+		def.userData = unversioned_entity_id(handle);
 
 		def.bullet = physics_def.bullet;
 		def.allowSleep = physics_def.allow_sleep;
@@ -249,7 +249,7 @@ void physics_world_cache::infer_cache_for_colliders(const const_entity_handle h)
 			return *calculated_connection;
 		};
 	
-		const auto it = colliders_caches.try_emplace(handle.get_id());
+		const auto it = colliders_caches.try_emplace(handle);
 		auto& cache = (*it.first).second;
 	
 		if (/* cache_existed */ !it.second) {
@@ -333,7 +333,7 @@ void physics_world_cache::infer_cache_for_colliders(const const_entity_handle h)
 
 		b2FixtureDef fixdef;
 
-		fixdef.userData = handle.get_id();
+		fixdef.userData = handle;
 
 		fixdef.density = handle.calc_density(get_calculated_connection(), colliders_data);
 
