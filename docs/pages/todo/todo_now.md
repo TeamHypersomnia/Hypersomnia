@@ -7,6 +7,15 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
+- flavours and entities are concepts disparate enough to warrant separate trees completely
+	- same code can handle them, though
+	- or is one subset of another?
+	- all are the same, except that
+		- checkbox target differs
+			- actually for entities we may also make them selected?
+		- entities browser does not view the flavour properties
+		- flavour browser does not view its entities
+
 - for_each_object_and_id -> for_each_id_and_object, and move it to some range templates
 - perhaps entity_flavours should just be a direct pool
 

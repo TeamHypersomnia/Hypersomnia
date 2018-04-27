@@ -39,7 +39,7 @@
 
 #include "application/setups/editor/gui/editor_history_gui.h"
 #include "application/setups/editor/gui/editor_go_to_gui.h"
-#include "application/setups/editor/gui/editor_all_entities_gui.h"
+#include "application/setups/editor/gui/editor_fae_gui.h"
 #include "application/setups/editor/gui/editor_common_state_gui.h"
 #include "application/setups/editor/gui/editor_selection_groups_gui.h"
 #include "application/setups/editor/gui/editor_summary_gui.h"
@@ -88,8 +88,8 @@ class editor_setup : private current_access_cache<editor_setup> {
 
 	// GEN INTROSPECTOR class editor_setup
 	editor_history_gui history_gui = std::string("History");
-	editor_all_entities_gui all_entities_gui = std::string("All entities");
-	editor_all_entities_gui selected_entities_gui = std::string("Selected entities");
+	editor_fae_gui fae_gui = std::string("All entities");
+	editor_fae_gui selected_entities_gui = std::string("Selected entities");
 	editor_common_state_gui common_state_gui = std::string("Common state");
 	editor_selection_groups_gui selection_groups_gui = std::string("Selection groups");
 	editor_summary_gui summary_gui = std::string("Summary");
@@ -319,7 +319,7 @@ public:
 	editor_command_input make_command_input();
 	grouped_selector_op_input make_grouped_selector_op_input() const;
 
-	editor_all_entities_gui_input make_all_entities_gui_input(
+	editor_fae_gui_input make_fae_gui_input(
 		const std::unordered_set<entity_id>*,
 		const loaded_image_caches_map& image_caches
 	);
@@ -415,7 +415,7 @@ public:
 				callback(match.get_id(), settings.matched_entity_color);
 			}
 
-			if (const auto hovered_guid = all_entities_gui.get_hovered_guid()) {
+			if (const auto hovered_guid = fae_gui.get_hovered_guid()) {
 				if (const auto hovered = world[hovered_guid]) {
 					/* Hovering from GUI, so choose the stronger, held color for it */
 					callback(hovered.get_id(), settings.entity_selector.held_color);

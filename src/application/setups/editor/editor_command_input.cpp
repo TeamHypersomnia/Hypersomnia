@@ -6,14 +6,14 @@
 #include "application/setups/editor/gui/editor_entity_selector.h"
 #include "application/setups/editor/gui/editor_entity_mover.h"
 
-#include "application/setups/editor/gui/editor_all_entities_gui.h"
+#include "application/setups/editor/gui/editor_fae_gui.h"
 
 cosmos& editor_command_input::get_cosmos() const {
 	return folder.work->world;
 }
 
 void editor_command_input::interrupt_tweakers() const {
-	all_entities_gui.interrupt_tweakers();
+	fae_gui.interrupt_tweakers();
 }
 
 void editor_command_input::purge_selections() const {

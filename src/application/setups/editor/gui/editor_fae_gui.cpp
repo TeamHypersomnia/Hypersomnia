@@ -1,8 +1,8 @@
 #include "augs/misc/simple_pair.h"
-#include "application/setups/editor/gui/editor_all_entities_gui.h"
+#include "application/setups/editor/gui/editor_fae_gui.h"
 #include "application/setups/editor/editor_command_input.h"
 
-void editor_all_entities_gui::interrupt_tweakers() {
+void editor_fae_gui::interrupt_tweakers() {
 	property_editor_data.last_active.reset();
 	property_editor_data.old_description.clear();
 }
@@ -192,8 +192,8 @@ public:
 	}
 };
 
-fae_tree_filter editor_all_entities_gui::perform(
-	const editor_all_entities_gui_input in
+fae_tree_filter editor_fae_gui::perform(
+	const editor_fae_gui_input in
 ) {
 	using namespace augs::imgui;
 
@@ -272,8 +272,8 @@ fae_tree_filter editor_all_entities_gui::perform(
 }
 
 #else
-fae_tree_filter editor_all_entities_gui::perform(
-	const editor_all_entities_gui_input in
+fae_tree_filter editor_fae_gui::perform(
+	const editor_fae_gui_input in
 ) {
 	return {};
 }

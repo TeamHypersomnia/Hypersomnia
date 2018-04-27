@@ -8,19 +8,19 @@ struct editor_settings;
 struct editor_command_input;
 class loaded_image_caches_map;
 
-struct editor_all_entities_gui_input {
+struct editor_fae_gui_input {
 	const property_editor_settings& settings;
 	const std::unordered_set<entity_id>* const only_match_entities;
 	const editor_command_input command_in;
 	const loaded_image_caches_map& image_caches;
 };
 
-struct editor_all_entities_gui : standard_window_mixin<editor_all_entities_gui> {
-	using base = standard_window_mixin<editor_all_entities_gui>;
+struct editor_fae_gui : standard_window_mixin<editor_fae_gui> {
+	using base = standard_window_mixin<editor_fae_gui>;
 	using base::base;
 	using introspect_base = base;
 
-	fae_tree_filter perform(editor_all_entities_gui_input);
+	fae_tree_filter perform(editor_fae_gui_input);
 
 	void interrupt_tweakers();
 

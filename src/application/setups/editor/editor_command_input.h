@@ -8,7 +8,7 @@ namespace sol {
 }
 
 struct editor_entity_mover;
-struct editor_all_entities_gui;
+struct editor_fae_gui;
 
 struct editor_entity_mover;
 
@@ -21,7 +21,7 @@ struct editor_command_input {
 	editor_folder& folder;
 	editor_entity_selector& selector;
 
-	editor_all_entities_gui& all_entities_gui;
+	editor_fae_gui& fae_gui;
 	editor_entity_mover& mover;
 
 	cosmos& get_cosmos() const; 

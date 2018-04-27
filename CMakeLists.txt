@@ -599,7 +599,7 @@ set(HYPERSOMNIA_CPU_INTENSIVE_CPPS
 	# This should be the first one to build to catch errors early
 	"src/game/tests_of_traits.cpp"
 
-	"src/application/setups/editor/gui/editor_all_entities_gui.cpp"
+	"src/application/setups/editor/gui/editor_fae_gui.cpp"
 	"src/application/setups/editor/editor_setup.cpp"
 	"src/application/setups/editor/gui/editor_common_state_gui.cpp"
 	"src/application/setups/editor/commands/change_property_command.cpp"

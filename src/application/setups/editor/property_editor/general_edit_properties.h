@@ -51,7 +51,7 @@ std::optional<tweaker_type> detail_direct_edit(
 	if constexpr(std::is_same_v<M, std::string>) {
 		const auto result = [&]() { 
 			if (identity_label == "##description") {
-				return input_multiline_text<512>(identity_label, altered, 8);
+				return input_multiline_text<512>(identity_label, altered, 4);
 			}
 			else if (identity_label == "##name") {
 				return input_text<256>(identity_label, altered);

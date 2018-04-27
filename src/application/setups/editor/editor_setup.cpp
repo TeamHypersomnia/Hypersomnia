@@ -384,7 +384,7 @@ void editor_setup::perform_custom_imgui(
 					ImGui::MenuItem("(State)", NULL, false, false);
 
 					do_window_entry(common_state_gui);
-					do_window_entry(all_entities_gui);
+					do_window_entry(fae_gui);
 					do_window_entry(selected_entities_gui);
 
 					ImGui::Separator();
@@ -410,7 +410,7 @@ void editor_setup::perform_custom_imgui(
 		history_gui.perform(make_command_input());
 
 		common_state_gui.perform(settings, make_command_input());
-		all_entities_gui.perform(make_all_entities_gui_input(nullptr, image_caches));
+		fae_gui.perform(make_fae_gui_input(nullptr, image_caches));
 		selection_groups_gui.perform(ImGui::GetIO().KeyCtrl, make_command_input());
 
 		summary_gui.perform(*this);
@@ -437,7 +437,7 @@ void editor_setup::perform_custom_imgui(
 		}();
 
 		{
-			const auto in = make_all_entities_gui_input(std::addressof(all_selected), image_caches);
+			const auto in = make_fae_gui_input(std::addressof(all_selected), image_caches);
 			const auto filters = selected_entities_gui.perform(in);
 
 			const auto& cosm = work().world;
@@ -793,14 +793,14 @@ void editor_setup::close_folder() {
 
 
 editor_command_input editor_setup::make_command_input() {
-	return { destructor_input.lua, folder(), selector, all_entities_gui, mover };
+	return { destructor_input.lua, folder(), selector, fae_gui, mover };
 }
 
 grouped_selector_op_input editor_setup::make_grouped_selector_op_input() const {
 	return { view().selected_entities, view().selection_groups, view().ignore_groups };
 }
 
-editor_all_entities_gui_input editor_setup::make_all_entities_gui_input(
+editor_fae_gui_input editor_setup::make_fae_gui_input(
 	const std::unordered_set<entity_id>* selections,
 	const loaded_image_caches_map& image_caches
 ) {
@@ -848,7 +848,7 @@ bool editor_setup::handle_input_before_imgui(
 
 		if (has_alt) {
 			switch (k) {
-				case key::A: all_entities_gui.open(); return true;
+				case key::A: fae_gui.open(); return true;
 				case key::H: history_gui.open(); return true;
 				case key::S: selected_entities_gui.open(); return true;
 				case key::C: common_state_gui.open(); return true;
