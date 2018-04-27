@@ -100,7 +100,12 @@ auto fae_tree(
 				auto& selected_flavours = state.selected_flavours.get_for<E>();
 				auto& selected_entities = state.selected_entities.get_for<E>();
 
-				auto disabled = ::maybe_disabled_cols(prop_in.settings, total_flavours == 0);
+				const bool none_of_interest = 
+					(mode == fae_view_type::FLAVOURS && total_flavours == 0)
+					|| (mode == fae_view_type::ENTITIES && total_entities == 0)
+				;
+
+				auto disabled = ::maybe_disabled_cols(prop_in.settings, none_of_interest);
 
 				if (mode == fae_view_type::FLAVOURS) {
 					do_select_all_checkbox(
@@ -249,7 +254,13 @@ auto fae_tree(
 								if (mode == fae_view_type::FLAVOURS) {
 									ImGui::Separator();
 									if (is_flavour_selected) {
-										do_edit_flavours_gui(fae_in, flavour, vectorize(selected_flavours));
+										auto input = vectorize(selected_flavours);
+
+										erase_if(input, [&cosm](const auto id) {
+											return cosm.find_flavour(id) == nullptr;
+										});
+
+										do_edit_flavours_gui(fae_in, flavour, std::move(input));
 									}
 									else {
 										do_edit_flavours_gui(fae_in, flavour, { flavour_id });
@@ -286,7 +297,13 @@ auto fae_tree(
 											/* auto indent = scoped_indent(); */
 
 											if (is_entity_selected) {
-												do_edit_entities_gui(fae_in, typed_handle, vectorize(selected_entities));
+												auto input = vectorize(selected_entities);
+
+												erase_if(input, [&cosm](const auto id) {
+													return cosm[id].dead();
+												});
+
+												do_edit_entities_gui(fae_in, typed_handle, std::move(input));
 											}
 											else {
 												do_edit_entities_gui(fae_in, typed_handle, { e });

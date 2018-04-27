@@ -118,6 +118,9 @@ namespace augs {
 
 template <class entity_type>
 class entity_flavours {
+public:
+	using flavour_id_type = typed_entity_flavour_id<entity_type>;
+private:
 	friend augs::introspection_access;
 
 	// GEN INTROSPECTOR struct entity_flavours class entity_type
@@ -128,7 +131,7 @@ class entity_flavours {
 	static void for_each_impl(S& self, F callback) {
 		self.flavours.for_each_object_and_id(
 			[&](const auto& object, const auto& id) {
-				callback(typed_entity_flavour_id<entity_type>(id), object);
+				callback(flavour_id_type(id), object);
 			}
 		);
 	}
@@ -148,12 +151,20 @@ public:
 		return flavours.size();
 	}
 
-	auto& get_flavour(const raw_entity_flavour_id id) {
-		return flavours[id];
+	auto* find_flavour(const flavour_id_type id) {
+		return flavours.find(id.raw);
 	}
 
-	const auto& get_flavour(const raw_entity_flavour_id id) const {
-		return flavours[id];
+	const auto* find_flavour(const flavour_id_type id) const {
+		return flavours.find(id.raw);
+	}
+	
+	auto& get_flavour(const flavour_id_type id) {
+		return flavours.get(id.raw);
+	}
+
+	const auto& get_flavour(const flavour_id_type id) const {
+		return flavours.get(id.raw);
 	}
 	
 	auto capacity() const {

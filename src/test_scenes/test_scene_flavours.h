@@ -203,8 +203,8 @@ auto& get_test_flavour(all_entity_flavours& flavours, const T enum_id) {
 		});
 	}
 
-	const auto raw = to_raw_flavour_id(enum_id);
-	auto& new_flavour = into.get_flavour(raw);
+	const auto flavour_id = typed_entity_flavour_id<E>(to_raw_flavour_id(enum_id));
+	auto& new_flavour = into.get_flavour(flavour_id);
 	new_flavour.template get<invariants::name>().name = format_enum(enum_id);
 
 	return new_flavour;

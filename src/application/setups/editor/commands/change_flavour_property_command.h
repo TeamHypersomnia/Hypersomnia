@@ -38,7 +38,7 @@ struct flavour_property_id {
 
 						for (const auto& f : flavour_ids) {
 							const auto result = on_field_address(
-								std::get<Invariant>(common_signi.template get_flavours<E>().get_flavour(f).invariants),
+								std::get<Invariant>(common_signi.template get_flavours<E>().get_flavour(typed_entity_flavour_id<E>(f)).invariants),
 								field,
 
 								[&](auto& resolved_field) -> callback_result {

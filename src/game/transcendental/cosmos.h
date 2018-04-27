@@ -135,13 +135,13 @@ public:
 	const common_assets& get_common_assets() const;
 
 	template <class entity_type>
-	const auto& get_flavour(const raw_entity_flavour_id id) const {
+	const auto& get_flavour(const typed_entity_flavour_id<entity_type> id) const {
 		return get_common_significant().get_flavours<entity_type>().get_flavour(id);
 	}
 
 	template <class entity_type>
-	const auto& get_flavour(const typed_entity_flavour_id<entity_type> id) const {
-		return get_flavour<entity_type>(id.raw);
+	const auto* find_flavour(const typed_entity_flavour_id<entity_type> id) const {
+		return get_common_significant().get_flavours<entity_type>().find_flavour(id);
 	}
 
 	template <class... Args>

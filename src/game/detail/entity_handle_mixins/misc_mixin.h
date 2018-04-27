@@ -137,7 +137,7 @@ public:
 		if constexpr(has_specific_entity_type_v<E>) {
 			const auto self = *static_cast<const E*>(this);
 			auto& cosm = self.get_cosmos();
-			return cosm.template get_flavour<entity_type_of<E>>(get_raw_flavour_id());
+			return cosm.template get_flavour<entity_type_of<E>>(get_flavour_id());
 		}
 		else {
 			static_assert(always_false_v<E>, "You can't get a flavour out of a non-specific handle.");

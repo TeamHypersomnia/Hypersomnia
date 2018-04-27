@@ -66,8 +66,8 @@ private:
 			all_entity_types(),
 			flavour_id.type_id,
 			[&](auto t) -> decltype(auto) {
-				using flavour_type = decltype(t);
-				return callback(self.template get_flavours<flavour_type>().get_flavour(flavour_id.raw));
+				using E = decltype(t);
+				return callback(self.template get_flavours<E>().get_flavour(typed_entity_flavour_id<E>(flavour_id.raw)));
 			}
 		);
 	}
