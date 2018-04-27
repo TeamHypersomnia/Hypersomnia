@@ -87,11 +87,13 @@ auto fae_tree(
 			const auto total_entities = provider.template num_entities_of_type<E>();
 			const auto total_flavours = provider.template num_flavours_of_type<E>();
 
-			if (provider.skip_empty_nodes() && total_entities == 0) {
+			if (provider.skip_nodes_with_no_entities() && total_entities == 0) {
 				return;
 			}
 
 			auto& selected_flavours = fae_in.state.selected_flavours.get_for<E>();
+
+			auto disabled = ::maybe_disabled_cols(prop_in.settings, total_flavours == 0);
 
 			do_select_all_checkbox(
 				prop_in.settings,

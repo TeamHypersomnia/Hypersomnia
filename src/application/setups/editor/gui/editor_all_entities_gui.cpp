@@ -61,7 +61,7 @@ public:
 		per_native_type(per_native_type)
 	{}
 
-	bool skip_empty_nodes() const {
+	bool skip_nodes_with_no_entities() const {
 		return true;
 	}
 
@@ -139,7 +139,7 @@ class all_provider {
 public:
 	all_provider(const cosmos& cosm) : cosm(cosm) {}
 
-	bool skip_empty_nodes() const {
+	bool skip_nodes_with_no_entities() const {
 		return false;
 	}
 
