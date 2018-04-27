@@ -1,6 +1,7 @@
 #pragma once
 #include <optional>
 #include "augs/templates/traits/is_comparable.h"
+#include "augs/pad_bytes.h"
 
 namespace augs {
 	struct introspection_access;
@@ -10,6 +11,7 @@ namespace augs {
 		// GEN INTROSPECTOR struct augs::value_with_flag class T
 		T value;
 		bool is_enabled = false;
+		pad_bytes<3> pad;
 		// END GEN INTROSPECTOR
 
 		explicit operator bool() const {
