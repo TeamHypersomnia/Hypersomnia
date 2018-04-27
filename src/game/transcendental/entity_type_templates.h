@@ -36,6 +36,14 @@ class per_entity_type_container {
 	// END GEN INTROSPECTOR
 
 	template <class S, class F>
+	static void for_each_container_impl(S& self, F callback) {
+		for_each_through_std_get(
+			self.all,
+			callback
+		);
+	}
+
+	template <class S, class F>
 	static void for_each_impl(S& self, F callback) {
 		for_each_through_std_get(
 			self.all,
@@ -97,6 +105,16 @@ public:
 	}
 
 	template <class F>
+	void for_each_container(F&& callback) {
+		for_each_container_impl(*this, std::forward<F>(callback));
+	}
+
+	template <class F>
+	void for_each_container(F&& callback) const {
+		for_each_container_impl(*this, std::forward<F>(callback));
+	}
+
+	template <class F>
 	void for_each(F&& callback) {
 		for_each_impl(*this, std::forward<F>(callback));
 	}
@@ -116,6 +134,13 @@ public:
 		for_each_reverse_impl(*this, std::forward<F>(callback));
 	}
 };
+
+template <template <class> class Mod, class F>
+void erase_if(per_entity_type_container<Mod>& v, F&& f) {
+	v.for_each_container([&f](auto& v) { 
+		erase_if(v, std::forward<F>(f));
+	});
+}
 
 template <class T>
 using per_entity_type_array = std::array<T, num_types_in_list_v<all_entity_types>>;

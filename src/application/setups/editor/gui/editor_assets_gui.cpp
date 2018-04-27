@@ -131,12 +131,12 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 	thread_local std::vector<path_entry_type> orphaned_paths;
 	thread_local std::vector<path_entry_type> used_paths;
 
-	auto is_selected = [this](const auto& p) {
-		return found_in(selected_assets, p.id);
+	auto is_ticked = [this](const auto& p) {
+		return found_in(ticked_assets, p.id);
 	};
 
-	auto get_all_selected_and_existing = [&](auto in_range) {
-		erase_if(in_range, [&] (const auto& candidate) { return !is_selected(candidate); } );
+	auto get_all_ticked_and_existing = [&](auto in_range) {
+		erase_if(in_range, [&] (const auto& candidate) { return !is_ticked(candidate); } );
 		return in_range;
 	};
 
@@ -253,7 +253,7 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 
 		int i = 0;
 
-		auto do_path = [&](const auto& path_entry, const auto& selected_in_range, const auto& selected_ids) {
+		auto do_path = [&](const auto& path_entry, const auto& ticked_in_range, const auto& ticked_ids) {
 			auto scope = scoped_id(i++);
 
 			const auto id = path_entry.id;
@@ -261,9 +261,9 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 			const auto displayed_name = tree_settings.get_prettified(path_entry.get_filename());
 			const auto displayed_dir = path_entry.get_displayed_directory();
 
-			const auto current_selected = is_selected(path_entry);
+			const auto current_ticked = is_ticked(path_entry);
 
-			const auto flags = do_selection_checkbox(selected_assets, id, current_selected, i);
+			const auto flags = do_selection_checkbox(ticked_assets, id, current_ticked, i);
 			const auto node = scoped_tree_node_ex(displayed_name, flags);
 
 			next_columns(2);
@@ -298,11 +298,11 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 						history.execute_new(std::move(cmd), cmd_in);
 					};
 
-					if (!current_selected) {
+					if (!current_ticked) {
 						forget(path_entry, false);
 					}
 					else {
-						const auto& all = selected_in_range;
+						const auto& all = ticked_in_range;
 
 						forget(all[0], false);
 
@@ -336,8 +336,8 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 						cmd.affected_assets = { id };
 					}
 					else {
-						if (current_selected) {
-							cmd.affected_assets = selected_ids;
+						if (current_ticked) {
+							cmd.affected_assets = ticked_ids;
 						}
 						else {
 							cmd.affected_assets = { id };
@@ -370,7 +370,7 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 
 				auto prop_in = property_editor_input { settings, property_editor_data };
 
-				const bool disable_path_chooser = current_selected && selected_ids.size() > 1;
+				const bool disable_path_chooser = current_ticked && ticked_ids.size() > 1;
 
 				general_edit_properties(
 					prop_in,
@@ -378,7 +378,7 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 					post_new_change,
 					rewrite_last_change,
 					[&](const auto& first, const field_address field_id) {
-						if (!current_selected) {
+						if (!current_ticked) {
 							return true;
 						}
 
@@ -386,7 +386,7 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 							first,
 							asset_property_id<asset_id_type> { field_id }, 
 							viewables, 
-							selected_ids
+							ticked_ids
 						);
 					},
 					path_control_provider { viewables, project_path, settings, disable_path_chooser },
@@ -408,9 +408,9 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 			}
 
 			{
-				do_select_all_checkbox(
+				do_tick_all_checkbox(
 					settings,
-					selected_assets,
+					ticked_assets,
 					[&paths](auto callback) {
 						for (const auto& p : paths) {
 							callback(p.id);
@@ -437,17 +437,17 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 			ImGui::NextColumn();
 			ImGui::Separator();
 
-			const auto selected_and_existing = get_all_selected_and_existing(paths);
+			const auto ticked_and_existing = get_all_ticked_and_existing(paths);
 
-			thread_local std::vector<asset_id_type> selected_ids;
-			selected_ids.clear();
+			thread_local std::vector<asset_id_type> ticked_ids;
+			ticked_ids.clear();
 
-			for (const auto& p : selected_and_existing) {
-				selected_ids.push_back(p.id);
+			for (const auto& p : ticked_and_existing) {
+				ticked_ids.push_back(p.id);
 			}
 
 			for (const auto& p : paths) {
-				do_path(p, selected_and_existing, selected_ids);
+				do_path(p, ticked_and_existing, ticked_ids);
 			}
 
 			ImGui::Separator();

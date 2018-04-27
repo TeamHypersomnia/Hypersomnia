@@ -385,7 +385,7 @@ void editor_setup::perform_custom_imgui(
 
 					do_window_entry(common_state_gui);
 					do_window_entry(fae_gui);
-					do_window_entry(selected_entities_gui);
+					do_window_entry(selected_fae_gui);
 
 					ImGui::Separator();
 					ImGui::MenuItem("(Assets)", NULL, false, false);
@@ -438,7 +438,7 @@ void editor_setup::perform_custom_imgui(
 
 		{
 			const auto in = make_fae_gui_input(std::addressof(all_selected), image_caches);
-			const auto filters = selected_entities_gui.perform(in);
+			const auto filters = selected_fae_gui.perform(in);
 
 			const auto& cosm = work().world;
 			filters.perform(cosm, view().selected_entities);
@@ -850,7 +850,7 @@ bool editor_setup::handle_input_before_imgui(
 			switch (k) {
 				case key::A: fae_gui.open(); return true;
 				case key::H: history_gui.open(); return true;
-				case key::S: selected_entities_gui.open(); return true;
+				case key::S: selected_fae_gui.open(); return true;
 				case key::C: common_state_gui.open(); return true;
 				case key::G: selection_groups_gui.open(); return true;
 				case key::P: player.show = true; return true;

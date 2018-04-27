@@ -26,8 +26,8 @@ struct fae_tree_state {
 	template <class T>
 	using make_selected_entities = std::unordered_set<typed_entity_id<T>>;
 
-	per_entity_type_container<make_selected_flavours> selected_flavours;
-	per_entity_type_container<make_selected_entities> selected_entities;
+	per_entity_type_container<make_selected_flavours> ticked_flavours;
+	per_entity_type_container<make_selected_entities> ticked_entities;
 };
 
 class loaded_image_caches_map;

@@ -22,7 +22,7 @@ struct editor_pathed_asset_gui : standard_window_mixin<editor_pathed_asset_gui<a
 	void perform(const property_editor_settings&, editor_command_input);
 
 private:
-	std::unordered_set<asset_id_type> selected_assets;
+	std::unordered_set<asset_id_type> ticked_assets;
 
 	property_editor_state property_editor_data;
 };

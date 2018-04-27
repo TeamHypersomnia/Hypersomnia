@@ -228,6 +228,34 @@ fae_tree_filter editor_fae_gui::perform(
 		const auto& matches = *in.only_match_entities;
 		const auto num_matches = matches.size();
 
+		thread_local resolved_container_type per_native_type;
+		per_native_type.clear();
+
+		for (const auto& e : matches) {
+			if (const auto handle = cosm[e]) {
+				handle.dispatch([](const auto typed_handle) {
+					using E = entity_type_of<decltype(typed_handle)>;
+					per_native_type.get_for<E>()[typed_handle.get_flavour_id()].push_back(typed_handle.get_id());
+				});
+			}
+		}
+
+		const auto provider = in_selection_provider { cosm, per_native_type };
+
+		erase_if(fae_tree_data.ticked_entities, [&](const auto& id) {
+			return !found_in(*in.only_match_entities, entity_id(id));
+		});
+
+		for_each_entity_type([&](auto e) {
+			using E = decltype(e);
+			erase_if(
+				fae_tree_data.ticked_flavours.get_for<E>(),
+				[&](const auto& id) {
+					return !found_in(provider.get_all_flavour_ids<E>(), id);
+				}
+			);
+		});
+
 		if (num_matches == 0) {
 			return {};
 		}
@@ -245,23 +273,19 @@ fae_tree_filter editor_fae_gui::perform(
 			return {};
 		}
 
-		thread_local resolved_container_type per_native_type;
-		per_native_type.clear();
-
-		for (const auto& e : matches) {
-			if (const auto handle = cosm[e]) {
-				handle.dispatch([](const auto typed_handle) {
-					using E = entity_type_of<decltype(typed_handle)>;
-					per_native_type.get_for<E>()[typed_handle.get_flavour_id()].push_back(typed_handle.get_id());
-				});
-			}
-		}
-
 		return fae_tree(
 			fae_in,
-			in_selection_provider { cosm, per_native_type }
+			provider
 		);
 	}
+
+	erase_if(fae_tree_data.ticked_entities, [&](const auto& id) {
+		return cosm[id].dead();
+	});
+
+	erase_if(fae_tree_data.ticked_flavours, [&](const auto& id) {
+		return cosm.find_flavour(id) == nullptr;
+	});
 
 	return fae_tree(
 		fae_in,

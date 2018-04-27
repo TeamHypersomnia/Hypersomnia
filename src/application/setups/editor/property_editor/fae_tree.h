@@ -96,8 +96,8 @@ auto fae_tree(
 					return;
 				}
 
-				auto& selected_flavours = state.selected_flavours.get_for<E>();
-				auto& selected_entities = state.selected_entities.get_for<E>();
+				auto& ticked_flavours = state.ticked_flavours.get_for<E>();
+				auto& ticked_entities = state.ticked_entities.get_for<E>();
 
 				const bool none_of_interest = 
 					(mode == fae_view_type::FLAVOURS && total_flavours == 0)
@@ -107,9 +107,9 @@ auto fae_tree(
 				auto disabled = ::maybe_disabled_cols(prop_in.settings, none_of_interest);
 
 				if (mode == fae_view_type::FLAVOURS) {
-					do_select_all_checkbox(
+					do_tick_all_checkbox(
 						prop_in.settings,
-						selected_flavours,
+						ticked_flavours,
 						[&provider](auto callback) {
 							provider.template for_each_flavour<E>(
 								[&callback](const flavour_id_type flavour_id, const flavour_type& flavour) {
@@ -121,9 +121,9 @@ auto fae_tree(
 					);
 				}
 				else if (mode == fae_view_type::ENTITIES) {
-					do_select_all_checkbox(
+					do_tick_all_checkbox(
 						prop_in.settings,
-						selected_entities,
+						ticked_entities,
 						[&provider](auto callback) {
 							provider.template for_each_flavour<E>(
 								[&provider, callback](const flavour_id_type flavour_id, const flavour_type& flavour) {
@@ -184,7 +184,7 @@ auto fae_tree(
 							const auto node_label = typesafe_sprintf("%x###%x", flavour_label, flavour_id.raw);
 							const auto imgui_id = typesafe_sprintf("%x.%x", this_type_id.get_index(), flavour_id.raw);
 
-							const bool is_flavour_selected = found_in(selected_flavours, flavour_id);
+							const bool is_flavour_selected = found_in(ticked_flavours, flavour_id);
 
 							auto disabled = ::maybe_disabled_cols(
 								prop_in.settings, 
@@ -194,7 +194,7 @@ auto fae_tree(
 							const auto flags = [&]() {
 								if (mode == fae_view_type::FLAVOURS) {
 									return do_selection_checkbox(
-										selected_flavours,
+										ticked_flavours,
 										flavour_id,
 										is_flavour_selected,
 										imgui_id
@@ -203,9 +203,9 @@ auto fae_tree(
 								else {
 									ensure_eq(fae_view_type::ENTITIES, mode); 
 
-									return do_select_all_checkbox(
+									return do_tick_all_checkbox(
 										prop_in.settings,
-										selected_entities,
+										ticked_entities,
 										[&all_having_flavour](auto callback) {
 											for (const auto& e_id : all_having_flavour) {
 												callback(e_id);
@@ -253,13 +253,7 @@ auto fae_tree(
 								if (mode == fae_view_type::FLAVOURS) {
 									ImGui::Separator();
 									if (is_flavour_selected) {
-										auto input = vectorize(selected_flavours);
-
-										erase_if(input, [&cosm](const auto id) {
-											return cosm.find_flavour(id) == nullptr;
-										});
-
-										do_edit_flavours_gui(fae_in, flavour, std::move(input));
+										do_edit_flavours_gui(fae_in, flavour, vectorize(ticked_flavours));
 									}
 									else {
 										do_edit_flavours_gui(fae_in, flavour, { flavour_id });
@@ -273,10 +267,10 @@ auto fae_tree(
 										const auto guid = typed_handle.get_guid();
 										const auto entity_label = typesafe_sprintf("%x", guid);
 
-										const auto is_entity_selected = found_in(selected_entities, e);
+										const auto is_entity_selected = found_in(ticked_entities, e);
 
 										const auto flags = do_selection_checkbox(
-											selected_entities,
+											ticked_entities,
 											e,
 											is_entity_selected,
 											guid
@@ -296,13 +290,7 @@ auto fae_tree(
 											/* auto indent = scoped_indent(); */
 
 											if (is_entity_selected) {
-												auto input = vectorize(selected_entities);
-
-												erase_if(input, [&cosm](const auto id) {
-													return cosm[id].dead();
-												});
-
-												do_edit_entities_gui(fae_in, typed_handle, std::move(input));
+												do_edit_entities_gui(fae_in, typed_handle, vectorize(ticked_entities));
 											}
 											else {
 												do_edit_entities_gui(fae_in, typed_handle, { e });
