@@ -16,7 +16,9 @@ enum class fae_view_type {
 
 struct fae_tree_state {
 	entity_guid hovered_guid;
+	// GEN INTROSPECTOR struct fae_tree_state
 	fae_view_type view_mode = fae_view_type::FLAVOURS;
+	// END GEN INTROSPECTOR
 
 	template <class T>
 	using make_selected_flavours = std::unordered_set<typed_entity_flavour_id<T>>;

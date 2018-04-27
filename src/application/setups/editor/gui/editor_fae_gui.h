@@ -4,6 +4,10 @@
 
 #include "application/setups/editor/gui/standard_window_mixin.h"
 
+namespace augs {
+	struct introspection_access;
+}
+
 struct editor_settings;
 struct editor_command_input;
 class loaded_image_caches_map;
@@ -29,6 +33,9 @@ struct editor_fae_gui : standard_window_mixin<editor_fae_gui> {
 	}
 
 private:
+	friend augs::introspection_access;
+	// GEN INTROSPECTOR struct editor_fae_gui
 	fae_tree_state fae_tree_data;
+	// END GEN INTROSPECTOR
 	property_editor_state property_editor_data;
 };

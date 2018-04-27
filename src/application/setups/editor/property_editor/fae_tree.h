@@ -26,8 +26,6 @@ void do_edit_entities_gui(
 	cmd.set_affected_entities(std::move(ids));
 
 	edit_entity(in, entity, cmd);
-
-	ImGui::Separator();
 }
 
 template <class E>
@@ -41,8 +39,6 @@ void do_edit_flavours_gui(
 	cmd.set_affected_flavours(std::move(ids));
 
 	edit_flavour(in, flavour, cmd);
-
-	ImGui::Separator();
 }
 
 template <class F>
@@ -248,15 +244,17 @@ auto fae_tree(
 							ImGui::NextColumn();
 
 							if (flavour_node) {
-								ImGui::Separator();
+								/* auto indent = scoped_indent(); */
 
 								if (mode == fae_view_type::FLAVOURS) {
+									ImGui::Separator();
 									if (is_flavour_selected) {
 										do_edit_flavours_gui(fae_in, flavour, vectorize(selected_flavours));
 									}
 									else {
 										do_edit_flavours_gui(fae_in, flavour, { flavour_id });
 									}
+									ImGui::Separator();
 								}
 								else if (mode == fae_view_type::ENTITIES) {
 									for (const auto& e : all_having_flavour) {
@@ -283,12 +281,17 @@ auto fae_tree(
 										next_column_text();
 
 										if (entity_node) {
+											ImGui::Separator();
+
+											/* auto indent = scoped_indent(); */
+
 											if (is_entity_selected) {
 												do_edit_entities_gui(fae_in, typed_handle, vectorize(selected_entities));
 											}
 											else {
 												do_edit_entities_gui(fae_in, typed_handle, { e });
 											}
+											ImGui::Separator();
 										}
 									}
 								}
