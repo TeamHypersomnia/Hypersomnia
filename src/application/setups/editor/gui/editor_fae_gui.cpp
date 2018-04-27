@@ -203,9 +203,6 @@ fae_tree_filter editor_fae_gui::perform(
 		return {};
 	}
 
-	ImGui::Columns(2);
-	ImGui::Separator();
-
 	fae_tree_data.hovered_guid.unset();
 
 	const bool show_filter_buttons = in.only_match_entities != nullptr;

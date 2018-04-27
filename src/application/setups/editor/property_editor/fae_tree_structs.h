@@ -7,8 +7,16 @@
 #include "application/setups/editor/property_editor/commanding_property_editor_input.h"
 #include "game/transcendental/entity_type_templates.h"
 
+enum class fae_view_mode {
+	// GEN INTROSPECTOR enum class fae_view_mode
+	FLAVOURS,
+	ENTITIES
+	// END GEN INTROSPECTOR
+};
+
 struct fae_tree_state {
 	entity_guid hovered_guid;
+	fae_view_mode view_mode = fae_view_mode::FLAVOURS;
 
 	template <class T>
 	using make_selected_flavours = std::unordered_set<typed_entity_flavour_id<T>>;

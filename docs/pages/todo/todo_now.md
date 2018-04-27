@@ -15,6 +15,7 @@ summary: Just a hidden scratchpad.
 			- actually for entities we may also make them selected?
 		- entities browser does not view the flavour properties
 		- flavour browser does not view its entities
+	- we won't have separate windows, just a radio box at the bottom
 
 - for_each_object_and_id -> for_each_id_and_object, and move it to some range templates
 - perhaps entity_flavours should just be a direct pool
