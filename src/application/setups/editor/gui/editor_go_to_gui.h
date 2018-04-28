@@ -26,10 +26,10 @@ public:
 	std::optional<const_entity_handle> perform(
 		const editor_go_to_settings& settings,
 		const cosmos& cosm,
-		const vec2 dialog_pos
+		vec2 dialog_pos
 	);
 
 	const_entity_handle get_matching_go_to_entity(const cosmos&) const;
 };
 
-void standard_confirm_go_to(const_entity_handle, editor_view&);
+void standard_confirm_go_to(const_entity_handle, bool has_ctrl, editor_view&);

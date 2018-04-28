@@ -11,7 +11,7 @@
 #include "application/setups/editor/editor_settings.h"
 
 const_entity_handle editor_go_to_entity_gui::get_matching_go_to_entity(const cosmos& cosm) const {
-	if (show && matches.size() > 0) {
+	if (last_input.size() > 0 && show && matches.size() > 0) {
 		return cosm[matches[selected_index]];
 	}
 
@@ -28,11 +28,16 @@ void editor_go_to_entity_gui::open() {
 	ImGui::SetWindowFocus("Go to entity");
 }
 
-void standard_confirm_go_to(const const_entity_handle match, editor_view& view) {
+void standard_confirm_go_to(const const_entity_handle match, const bool has_ctrl, editor_view& view) {
 	/* Confirm selection with quick search */
 
 	if (match) {
-		view.selected_entities = { match };
+		if (has_ctrl) {
+			view.selected_entities.emplace(match);
+		}
+		else {
+			view.selected_entities = { match };
+		}
 
 		if (!view.panned_camera.has_value()) {
 			view.panned_camera = camera_cone();

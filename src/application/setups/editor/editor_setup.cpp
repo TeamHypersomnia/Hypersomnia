@@ -101,7 +101,7 @@ void editor_setup::set_popup(const editor_popup p) {
 
 void editor_setup::set_locally_viewed(const entity_id id) {
 	work().local_test_subject = id;
-	view().panned_camera = std::nullopt;
+	//view().panned_camera = std::nullopt;
 }
 
 editor_setup::editor_setup(
@@ -262,6 +262,8 @@ void editor_setup::perform_custom_imgui(
 	const auto& g = *ImGui::GetCurrentContext();
 	const auto menu_bar_size = ImVec2(g.IO.DisplaySize.x, g.FontBaseSize + g.Style.FramePadding.y * 2.0f);
 
+	const bool has_ctrl = ImGui::GetIO().KeyCtrl;
+
 	if (!in_direct_gameplay) {
 		{
 			/* We don't want ugly borders in our menu bar */
@@ -411,7 +413,7 @@ void editor_setup::perform_custom_imgui(
 
 		common_state_gui.perform(settings, make_command_input());
 		fae_gui.perform(make_fae_gui_input(nullptr, image_caches));
-		selection_groups_gui.perform(ImGui::GetIO().KeyCtrl, make_command_input());
+		selection_groups_gui.perform(has_ctrl, make_command_input());
 
 		summary_gui.perform(*this);
 
@@ -469,7 +471,7 @@ void editor_setup::perform_custom_imgui(
 		if (const auto confirmation = 
 			go_to_entity_gui.perform(settings.go_to, work().world, go_to_dialog_pos)
 		) {
-			::standard_confirm_go_to(*confirmation, view());
+			::standard_confirm_go_to(*confirmation, has_ctrl, view());
 		}
 
 		if (const auto rot = mover.current_mover_rot_delta(make_mover_input())) {
