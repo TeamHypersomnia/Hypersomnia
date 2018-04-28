@@ -38,6 +38,26 @@ inline auto& detail_bytes_of_candidate(M& candidate) {
 	return b;
 }
 
+template <class T>
+bool detail_compare(
+	const std::vector<std::byte>& first_bytes,
+	const T& resolved
+) {
+	if constexpr(std::is_same_v<T, std::nullptr_t>) {
+		/* Not found! */
+		return false;
+	}
+	else if constexpr(std::is_same_v<T, augs::trivial_type_marker>) {
+		const auto* const candidate_bytes = reinterpret_cast<const std::byte*>(std::addressof(resolved));
+		return !std::memcmp(first_bytes.data(), candidate_bytes, first_bytes.size());
+	}
+	else {
+		return first_bytes == detail_bytes_of_candidate(resolved);
+	}
+
+	return true;
+}
+
 template <class id_type, class... Args>
 bool compare_all_serialized_fields_to(
 	const std::vector<std::byte>& first_bytes,
@@ -48,31 +68,10 @@ bool compare_all_serialized_fields_to(
 
 	property_id.access(
 		std::forward<Args>(args)...,
-		[&](const auto& resolved) -> callback_result {
-			using T = std::decay_t<decltype(resolved)>;
-			
-			if constexpr(std::is_same_v<T, augs::trivial_type_marker>) {
-				const auto* const candidate_bytes = reinterpret_cast<const std::byte*>(std::addressof(resolved));
-
-				if (std::memcmp(first_bytes.data(), candidate_bytes, first_bytes.size())) {
-					equal = false;
-					return callback_result::ABORT;
-				}
-
-				return callback_result::CONTINUE;
-			}
-			else if constexpr(std::is_same_v<T, std::nullopt_t>) {
-				/* Not found! */
+		[&first_bytes, &equal](const auto& resolved) -> callback_result {
+			if (detail_compare(first_bytes, resolved)) {
 				equal = false;
 				return callback_result::ABORT;
-			}
-			else {
-				if (first_bytes != detail_bytes_of_candidate(resolved)) {
-					equal = false;
-					return callback_result::ABORT;
-				}
-
-				return callback_result::CONTINUE;
 			}
 
 			return callback_result::CONTINUE;

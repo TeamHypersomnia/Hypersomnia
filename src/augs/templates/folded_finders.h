@@ -45,17 +45,17 @@ struct index_in_list<i, Candidate, List<>> {
 
 template <std::size_t i, class Candidate, template <class...> class List, class T, class... Types>
 struct index_in_list<i, Candidate, List<T, Types...>> {
-	static constexpr auto value = index_in_list<i + 1, Candidate, List<Types...>>::value;
+	static constexpr std::size_t value = index_in_list<i + 1, Candidate, List<Types...>>::value;
 };
 
 template <std::size_t i, class Candidate, template <class...> class List, class... Types>
 struct index_in_list<i, Candidate, List<Candidate, Types...>> {
-	static constexpr auto value = i;
+	static constexpr std::size_t value = i;
 };
 
 template <class S, class List>
-constexpr auto index_in_list_v = index_in_list<0, S, List>::value;
+constexpr std::size_t index_in_list_v = index_in_list<0, S, List>::value;
 
 template <class S, class... Types>
-constexpr auto index_in_v = index_in_list_v<S, type_list<Types...>>;
+constexpr std::size_t index_in_v = index_in_list_v<S, type_list<Types...>>;
 

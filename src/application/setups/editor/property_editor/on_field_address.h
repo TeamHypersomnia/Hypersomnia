@@ -5,7 +5,7 @@
 template <class F>
 auto continue_if_nullptr(F callback) {
 	return [callback](auto& resolved) -> callback_result {
-		if constexpr(!std::is_same_v<decltype(resolved), std::nullptr_t&>) {
+		if constexpr(!std::is_same_v<std::nullptr_t, std::decay_t<decltype(resolved)>>) {
 			return callback(resolved);
 		}
 

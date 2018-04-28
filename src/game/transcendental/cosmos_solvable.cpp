@@ -12,6 +12,7 @@ void cosmos_solvable::clear() {
 	});
 
 	guid_to_id.clear();
+	significant.clock = {};
 }
 
 std::size_t cosmos_solvable::get_entities_count() const {

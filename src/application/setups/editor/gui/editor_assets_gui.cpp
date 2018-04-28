@@ -123,8 +123,9 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 
 	using path_entry_type = asset_gui_path_entry<asset_id_type>;
 
-	thread_local std::unordered_set<augs::path_type> last_seen_missing_paths;
-
+	thread_local std::unordered_set<augs::path_type> _last_seen_missing_paths;
+	/* Linker error fix */
+	auto& last_seen_missing_paths = _last_seen_missing_paths;
 	thread_local std::vector<path_entry_type> missing_orphaned_paths;
 	thread_local std::vector<path_entry_type> missing_paths;
 
@@ -178,7 +179,7 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 				(new_entry.used() ? used_paths : orphaned_paths).emplace_back(std::move(new_entry));
 			};
 
-			auto lazy_check_missing = [this](const auto& p) {
+			auto lazy_check_missing = [&](const auto& p) {
 				if (acquire_missing_paths) {
 					if (!augs::exists(p)) {
 						last_seen_missing_paths.emplace(p);
@@ -321,7 +322,6 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 				const auto property_location = typesafe_sprintf(" (in %x)", displayed_name);
 
 				auto& history = cmd_in.folder.history;
-				auto& defs = cmd_in.folder.work->viewables;
 
 				using command_type = change_asset_property_command<asset_id_type>;
 
@@ -365,8 +365,6 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 						LOG("WARNING! There was some problem with tracking activity of editor controls.");
 					}
 				};
-
-				const auto project_path = cmd_in.folder.current_path;
 
 				auto prop_in = property_editor_input { settings, property_editor_data };
 

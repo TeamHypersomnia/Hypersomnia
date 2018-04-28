@@ -253,7 +253,7 @@ auto fae_tree(
 								if (mode == fae_view_type::FLAVOURS) {
 									ImGui::Separator();
 									if (is_flavour_selected) {
-										do_edit_flavours_gui(fae_in, flavour, vectorize(ticked_flavours));
+										do_edit_flavours_gui(fae_in, flavour, { ticked_flavours.begin(), ticked_flavours.end() });
 									}
 									else {
 										do_edit_flavours_gui(fae_in, flavour, { flavour_id });
@@ -290,7 +290,7 @@ auto fae_tree(
 											/* auto indent = scoped_indent(); */
 
 											if (is_entity_selected) {
-												do_edit_entities_gui(fae_in, typed_handle, vectorize(ticked_entities));
+												do_edit_entities_gui(fae_in, typed_handle, { ticked_entities.begin(), ticked_entities.end() });
 											}
 											else {
 												do_edit_entities_gui(fae_in, typed_handle, { e });

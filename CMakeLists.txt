@@ -844,7 +844,7 @@ if(CLANG)
 	# Latest features of C++17 will be enabled.
 	# Looks like stdlib=libc++ is duplicated for the linker as well,
 	# so we only have to add it to CXX.
-	set(HYPERSOMNIA_CXX_FLAGS "-fcolor-diagnostics -std=gnu++1z -stdlib=libc++ ${CHOSEN_WARNINGS}")
+	set(HYPERSOMNIA_CXX_FLAGS "-ftemplate-backtrace-limit=0 -fcolor-diagnostics -std=gnu++1z -stdlib=libc++ ${CHOSEN_WARNINGS}")
 	set_source_files_properties(${HYPERSOMNIA_CODEBASE_CPPS} PROPERTIES COMPILE_FLAGS ${WARNINGS_FOR_OUR_CODE_ONLY})
 endif()
 

@@ -50,6 +50,7 @@ namespace augs {
 	void read_bytes(Archive& ar, Serialized& storage) {
 		static_assert(is_byte_stream_v<Archive>, "Trying to read from a non-byte stream.");
 		static_assert(!std::is_const_v<Serialized>, "Trying to read bytes to a const object.");
+		static_assert(!std::is_same_v<Serialized, std::nullptr_t> && !std::is_same_v<Serialized, std::nullopt_t> , "Trying to read bytes to a null object.");
 
 		if constexpr(has_byte_read_overload_v<Archive, Serialized>) {
 			static_assert(has_byte_write_overload_v<Archive, Serialized>, "Has read_object_bytes overload, but no write_object_bytes overload.");
@@ -112,6 +113,7 @@ namespace augs {
 	template <class Archive, class Serialized>
 	void write_bytes(Archive& ar, const Serialized& storage) {
 		static_assert(is_byte_stream_v<Archive>, "Trying to write to a non-byte stream.");
+		static_assert(!std::is_same_v<Serialized, std::nullptr_t> && !std::is_same_v<Serialized, std::nullopt_t> , "Trying to write bytes from a null object.");
 
 		if constexpr(has_byte_write_overload_v<Archive, Serialized>) {
 			static_assert(has_byte_read_overload_v<Archive, std::decay_t<Serialized>&>, "Has write_object_bytes overload, but no read_object_bytes overload.");
