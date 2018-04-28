@@ -41,7 +41,7 @@ auto describe_changed(
 	const A& field_name,
    	const B& new_value
 ) {
-	using F = std::decay_t<decltype(new_value)>;
+	using F = remove_cref<decltype(new_value)>;
 
 	if constexpr(std::is_same_v<F, bool>) {
 		return describe_changed_flag(field_name, new_value);

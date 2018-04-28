@@ -45,7 +45,7 @@ namespace augs {
 			}
 
 			commands.emplace_back(
-				std::in_place_type_t<std::decay_t<T>>(),
+				std::in_place_type_t<remove_cref<T>>(),
 				std::forward<T>(command)
 			); 
 

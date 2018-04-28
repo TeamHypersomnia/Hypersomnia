@@ -7,7 +7,7 @@ namespace augs {
 	template <class T>
 	void recursive_clear(T& object) {
 		introspect(recursive([](auto self, auto, auto& field) {
-			using Field = std::decay_t<decltype(field)>;
+			using Field = remove_cref<decltype(field)>;
 
 			if constexpr(can_clear_v<Field>) {
 				field.clear();

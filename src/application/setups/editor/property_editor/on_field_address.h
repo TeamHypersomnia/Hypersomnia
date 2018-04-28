@@ -5,7 +5,7 @@
 template <class F>
 auto continue_if_nullptr(F callback) {
 	return [callback](auto& resolved) -> callback_result {
-		if constexpr(!std::is_same_v<std::nullptr_t, std::decay_t<decltype(resolved)>>) {
+		if constexpr(!std::is_same_v<std::nullptr_t, remove_cref<decltype(resolved)>>) {
 			return callback(resolved);
 		}
 
@@ -23,7 +23,7 @@ decltype(auto) on_field_address(
 	using byte_type = maybe_const_ptr_t<is_const, std::byte>;
 
 	auto l = [&](const auto& typed_field) {
-		using T = std::decay_t<decltype(typed_field)>;
+		using T = remove_cref<decltype(typed_field)>;
 		using location_ptr_type = maybe_const_ptr_t<is_const, T>;
 
 		const auto object_location = reinterpret_cast<byte_type>(std::addressof(object));

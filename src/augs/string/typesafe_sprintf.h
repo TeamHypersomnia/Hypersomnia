@@ -6,6 +6,7 @@
 #include <limits>
 
 #include "augs/string/pretty_print.h"
+#include "augs/templates/remove_cref.h"
 
 inline void typesafe_sprintf_detail(std::size_t, std::string&) {}
 
@@ -38,7 +39,9 @@ void typesafe_sprintf_detail(std::size_t starting_pos, std::string& target_str, 
 					replacement.precision(opcode - '0');
 				}
 				else if (opcode == '*') {
-					replacement.precision(std::numeric_limits<std::decay_t<T>>::digits10);
+					if constexpr(std::is_floating_point_v<T>) {
+						replacement.precision(std::numeric_limits<remove_cref<T>>::digits10);
+					}
 				}
 				else {
 					understood_op = false;

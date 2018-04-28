@@ -48,7 +48,7 @@ struct editor_history : public editor_history_base {
 		if (has_last_command()) {
 			const auto should_make_child = std::visit(
 				[](auto& cmd) -> bool {
-					return is_create_asset_id_command_v<std::decay_t<decltype(cmd)>>;
+					return is_create_asset_id_command_v<remove_cref<decltype(cmd)>>;
 				},
 				last_command()
 			);

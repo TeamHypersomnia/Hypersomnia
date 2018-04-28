@@ -52,7 +52,7 @@ void editor_summary_gui::perform(editor_setup& setup) {
 		const auto& s = cosm.get_solvable();
 
 		s.for_each_pool([&](const auto& p){
-			using T = entity_type_of<typename std::decay_t<decltype(p)>::mapped_type>;
+			using T = entity_type_of<typename remove_cref<decltype(p)>::mapped_type>;
 
 			const auto si = p.size();
 			const auto ca = p.capacity();

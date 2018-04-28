@@ -44,7 +44,7 @@ T to_value(const std::string& s) {
 template <class StrSubject>
 struct str_ops_impl {
 	using self = str_ops_impl&;
-	using Str = std::decay_t<StrSubject>;
+	using Str = remove_cref<StrSubject>;
 
 	StrSubject subject;
 

@@ -30,7 +30,7 @@ namespace augs {
 		static_assert(has_introspect_body_v<T>, "No introspector found for the type.");
 
 		introspection_access::introspect_body(
-			static_cast<std::decay_t<Instance>*>(nullptr), 
+			static_cast<remove_cref<Instance>*>(nullptr), 
 			std::forward<F>(callback), t, tn...
 		);
 	}
@@ -55,7 +55,7 @@ namespace augs {
 			for_each_type_in_list<typename T::introspect_bases>([&](const auto& b){
 				introspect(
 					std::forward<F>(callback), 
-					static_cast<maybe_const_ref_t<C, std::decay_t<decltype(b)>>>(t),
+					static_cast<maybe_const_ref_t<C, remove_cref<decltype(b)>>>(t),
 					tn...
 				);
 			});

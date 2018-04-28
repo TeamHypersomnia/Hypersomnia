@@ -32,7 +32,7 @@ struct entity_property_id {
 					components_of<E> {},
 					component_id,
 					[&](const auto& c) {
-						using Component = std::decay_t<decltype(c)>;
+						using Component = remove_cref<decltype(c)>;
 
 						for (const auto& e : entity_ids) {
 							auto specific_handle = cosm[typed_entity_id<E>(e)];

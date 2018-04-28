@@ -366,7 +366,7 @@ void general_edit_properties(
 			[&parent_altered, &do_tweaker](const std::string& formatted_label, const tweaker_type t, const auto& modified) {
 				const auto addr = ::make_field_address(parent_altered, modified);
 
-				do_tweaker(tweaker_input<std::decay_t<decltype(modified)>>{
+				do_tweaker(tweaker_input<remove_cref<decltype(modified)>>{
 					t, formatted_label, addr, modified
 				});
 			},

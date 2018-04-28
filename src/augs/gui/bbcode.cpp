@@ -339,7 +339,7 @@ namespace augs {
 									// color
 									rgba color;
 									{
-										std::decay_t<decltype(current_token)> color_token_end;
+										remove_cref<decltype(current_token)> color_token_end;
 										std::tie(color, color_token_end) = parse_color(current_token, input_end);
 										if(color_token_end == current_token) {
 											continue;
@@ -401,7 +401,7 @@ namespace augs {
 					// tag parse success
 
 					std::visit([&] (const auto& variant) {
-						using variant_t = std::decay_t<decltype(variant)>;
+						using variant_t = remove_cref<decltype(variant)>;
 
 						if constexpr(std::is_same_v<variant_t, add_entry_action>) {
 							const auto& entry = variant.entry;

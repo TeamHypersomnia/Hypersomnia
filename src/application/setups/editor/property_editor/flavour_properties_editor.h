@@ -35,7 +35,7 @@ void edit_invariant(
 	const T& invariant,
 	edit_invariant_input in
 ) {
-	using command_type = std::decay_t<decltype(in.command)>;
+	using command_type = remove_cref<decltype(in.command)>;
 	using namespace augs::imgui;
 
 	const auto fae_in = in.fae_in;
@@ -124,7 +124,7 @@ void edit_flavour(
 	using namespace augs::imgui;
 
 	auto get_index = [](const auto& inv) {
-		return index_in_list_v<std::decay_t<decltype(inv)>, invariants_of<E>>;
+		return index_in_list_v<remove_cref<decltype(inv)>, invariants_of<E>>;
 	};
 
 	const auto& name_invariant = flavour.template get<invariants::name>();
@@ -156,7 +156,7 @@ void edit_flavour(
 	for_each_through_std_get(
 		flavour.invariants,
 		[&do_edit_invariant](auto& invariant) {
-			using T = std::decay_t<decltype(invariant)>;
+			using T = remove_cref<decltype(invariant)>;
 
 			if constexpr(std::is_same_v<T, invariants::name>) {
 				/* This one is handled already */

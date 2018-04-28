@@ -109,7 +109,7 @@ namespace augs {
 					const auto this_type_name = get_type_name_strip_namespace(specific_object);
 
 					if (this_type_name == variant_type) {
-						using T = std::decay_t<decltype(specific_object)>;
+						using T = remove_cref<decltype(specific_object)>;
 						T object{};
 						read_lua(variant_content, object);
 						into.template emplace<T>(std::move(object));
@@ -213,7 +213,7 @@ namespace augs {
 			else {
 				introspect(
 					[input_table](const auto& label, auto& field) {
-						using T = std::decay_t<decltype(field)>;
+						using T = remove_cref<decltype(field)>;
 
 						if constexpr(is_optional_v<T>) {
 							sol::object maybe_field = input_table[label];
@@ -327,7 +327,7 @@ namespace augs {
 		else if constexpr(is_variant_v<Serialized>) {
 			std::visit(
 				[output_table](const auto& resolved){
-					using T = std::decay_t<decltype(resolved)>;
+					using T = remove_cref<decltype(resolved)>;
 					
 					const auto variant_type_label = get_variant_type_label();
 					const auto variant_content_label = get_variant_content_label();
@@ -391,7 +391,7 @@ namespace augs {
 		else {
 			introspect(
 				[output_table](const auto& label, const auto& field) {
-					using T = std::decay_t<decltype(field)>;
+					using T = remove_cref<decltype(field)>;
 
 					if constexpr(is_optional_v<T>) {
 						if (field) {

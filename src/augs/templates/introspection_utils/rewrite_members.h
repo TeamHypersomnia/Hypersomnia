@@ -1,5 +1,6 @@
 #pragma once
 #include "augs/templates/introspect_declaration.h"
+#include "augs/templates/remove_cref.h"
 
 template <
 	class destination_type,
@@ -17,8 +18,8 @@ T<destination_type> rewrite_members_and_transform_templated_type_into(
 	augs::introspect(
 		augs::recursive(
 			[&](auto self, auto, auto& rewritten_to, const auto& rewritten_from) {
-				using To = std::decay_t<decltype(rewritten_to)>;
-				using From = std::decay_t<decltype(rewritten_from)>;
+				using To = remove_cref<decltype(rewritten_to)>;
+				using From = remove_cref<decltype(rewritten_from)>;
 
 				if constexpr(
 					std::is_same_v<To, destination_type>

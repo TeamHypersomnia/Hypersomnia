@@ -1,4 +1,5 @@
 #pragma once
+#include "augs/templates/remove_cref.h"
 
 template <class>
 struct empty_id_provider;
@@ -61,7 +62,7 @@ using const_noid_entity_handle = basic_noid_entity_handle<true, entity_type>;
 
 template <class T>
 struct detail_entity_type_of {
-	using type = typename std::decay_t<T>::used_entity_type;
+	using type = typename remove_cref<T>::used_entity_type;
 };
 
 template <bool A, class B, template <class> class C>

@@ -5,7 +5,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- replace decay_t usage with remove_cref, decay is overkill
 - animation metadata could have some very general structs like "character metrics"
 	- vec2i: hands position[2]
 		- positions of these could be even indicated in the previewed image

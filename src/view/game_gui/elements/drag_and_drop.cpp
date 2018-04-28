@@ -27,7 +27,7 @@ void drag_and_drop_callback(
 	}
 
 	std::visit([&](const auto& transfer_data) {
-		using T = std::decay_t<decltype(transfer_data)>;
+		using T = remove_cref<decltype(transfer_data)>;
 
 		if constexpr (std::is_same_v<T, drop_for_item_slot_transfer>) {
 			if (transfer_data.result.result >= item_transfer_result_type::SUCCESSFUL_TRANSFER) {

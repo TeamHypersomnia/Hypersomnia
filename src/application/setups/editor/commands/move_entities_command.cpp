@@ -60,7 +60,7 @@ static void move_entities(
 
 		auto rotator = 
 			[&](auto& tr, auto&) {
-				using T = std::decay_t<decltype(tr)>;
+				using T = remove_cref<decltype(tr)>;
 
 				if constexpr(std::is_same_v<T, physics_engine_transforms>) {
 					auto new_transform = tr.get();
@@ -89,7 +89,7 @@ static void move_entities(
 	else {
 		auto mover = 
 			[&](auto& tr, auto&) {
-				using T = std::decay_t<decltype(tr)>;
+				using T = remove_cref<decltype(tr)>;
 
 				if constexpr(std::is_same_v<T, physics_engine_transforms>) {
 					tr.set(tr.get() + dt_si);

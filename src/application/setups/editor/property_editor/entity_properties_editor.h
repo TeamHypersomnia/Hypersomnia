@@ -13,7 +13,7 @@ void edit_component(
 	const std::string& entity_name,
 	const change_entity_property_command& command
 ) {
-	using command_type = std::decay_t<decltype(command)>;
+	using command_type = remove_cref<decltype(command)>;
 	using namespace augs::imgui;
 
 	const auto property_location = [&]() {
@@ -84,13 +84,13 @@ void edit_entity(
 	using namespace augs::imgui;
 
 	auto get_index = [](const auto& comp) {
-		return index_in_list_v<std::decay_t<decltype(comp)>, components_of<E>>;
+		return index_in_list_v<remove_cref<decltype(comp)>, components_of<E>>;
 	};
 
 	for_each_through_std_get(
 		handle.get().components,
 		[&](const auto& component) {
-			using T = std::decay_t<decltype(component)>;
+			using T = remove_cref<decltype(component)>;
 
 			const auto component_label = format_struct_name(component) + " component";
 			const auto node = scoped_tree_node_ex(component_label);

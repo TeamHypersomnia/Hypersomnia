@@ -19,7 +19,7 @@ enum class uv_mapping_mode {
 template <class vertex_container>
 void map_uv(vertex_container& vertices, const uv_mapping_mode mapping_mode) {
 	static_assert(
-		std::is_same_v<std::decay_t<decltype(vertices[0])>, augs::vertex>,
+		std::is_same_v<typename vertex_container::value_type, augs::vertex>,
 		"Mapping only works for containers of augs::vertex!"	
 	);
 

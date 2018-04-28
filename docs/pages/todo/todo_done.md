@@ -693,3 +693,4 @@ we consider whole type overrides too complex architeciturally:
 	- it's actually because we are changing the cosmos while some particles are still there to be simulated
 		- and the default intercosm has no ids for the particles
 		- so we must reset the particles when we switch the cosmos
+- replace decay_t usage with remove_cref, decay is overkill

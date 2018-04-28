@@ -23,7 +23,7 @@ void audiovisual_state::clear() {
 
 void audiovisual_state::reserve_caches_for_entities(const std::size_t n) {
 	systems.for_each([n](auto& sys) {
-		using T = std::decay_t<decltype(sys)>;
+		using T = remove_cref<decltype(sys)>;
 
 		if constexpr(can_reserve_caches_v<T>) {
 			sys.reserve_caches_for_entities(n);

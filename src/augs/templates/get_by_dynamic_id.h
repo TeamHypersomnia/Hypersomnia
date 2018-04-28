@@ -18,7 +18,7 @@ decltype(auto) get_by_dynamic_index(
 	const std::size_t dynamic_type_index,
 	F&& generic_call
 ) {
-	static constexpr auto last_candidate = num_types_in_list_v<std::decay_t<T>> - 1;
+	static constexpr auto last_candidate = num_types_in_list_v<remove_cref<T>> - 1;
 	static constexpr bool is_last = current_candidate == last_candidate;
 
 	if constexpr(is_last) {
@@ -49,7 +49,7 @@ decltype(auto) conditional_get_by_dynamic_index(
 	const std::size_t dynamic_type_index,
 	F&& generic_call
 ) {
-	using list_type = std::decay_t<T>;
+	using list_type = remove_cref<T>;
 
 	static constexpr auto last_candidate = num_types_in_list_v<OnlyCandidates> - 1;
 	static constexpr bool is_last = candidate_space_current == last_candidate;
@@ -80,10 +80,10 @@ decltype(auto) conditional_get_by_dynamic_index(
 template <class T, class F>
 decltype(auto) get_by_dynamic_id(
 	T&& index_gettable_object,
-	const type_in_list_id<std::decay_t<T>> dynamic_type_index,
+	const type_in_list_id<remove_cref<T>> dynamic_type_index,
 	F&& generic_call
 ) {
-	static_assert(num_types_in_list_v<std::decay_t<T>> > 0, "Can't get from an empty list.");
+	static_assert(num_types_in_list_v<remove_cref<T>> > 0, "Can't get from an empty list.");
 
 	return get_by_dynamic_index<0>(
 		std::forward<T>(index_gettable_object), 
@@ -95,10 +95,10 @@ decltype(auto) get_by_dynamic_id(
 template <class OnlyCandidates, class T, class F>
 decltype(auto) conditional_get_by_dynamic_id(
 	T&& index_gettable_object,
-	const type_in_list_id<std::decay_t<T>> dynamic_type_index,
+	const type_in_list_id<remove_cref<T>> dynamic_type_index,
 	F&& generic_call
 ) {
-	static_assert(num_types_in_list_v<std::decay_t<T>> > 0, "Can't get from an empty list.");
+	static_assert(num_types_in_list_v<remove_cref<T>> > 0, "Can't get from an empty list.");
 	static_assert(num_types_in_list_v<OnlyCandidates> > 0, "Candidate list is empty.");
 
 	return conditional_get_by_dynamic_index<OnlyCandidates, 0>(

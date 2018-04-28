@@ -116,7 +116,7 @@ namespace augs {
 	
 			ent.for_each_component(
 				[&](const auto& comp) {
-					using component_type = std::decay_t<decltype(comp)>;
+					using component_type = remove_cref<decltype(comp)>;
 
 					const auto this_component_name = get_type_name_strip_namespace<component_type>();
 

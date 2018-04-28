@@ -36,7 +36,7 @@ void find_locations_that_use(
 					for_each_through_std_get(
 						where,
 						[&](const auto& c) {
-							using C = std::decay_t<decltype(c)>;
+							using C = remove_cref<decltype(c)>;
 
 							if constexpr(can_type_contain_another_v<C, asset_id_type>) {
 								find_object_in_object(id, c, [&](const auto& location) {

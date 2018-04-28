@@ -29,7 +29,7 @@ namespace augs {
 	
 			introspect(
 				[&](auto, auto& m){
-					using T = std::decay_t<decltype(m)>;
+					using T = remove_cref<decltype(m)>;
 					
 					if constexpr(std::is_same_v<T, time_measurements>) {
 						all_with_time.push_back(&m);

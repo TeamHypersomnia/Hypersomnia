@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 
+#include "augs/templates/remove_cref.h"
 #include "augs/templates/traits/is_std_array.h"
 
 std::string demangle(const char*);
@@ -56,5 +57,5 @@ const std::string& get_type_name(const T&) {
 
 template <class T>
 const std::string& get_type_name_strip_namespace(const T& t) {
-	return get_type_name_strip_namespace<std::decay_t<T>>();
+	return get_type_name_strip_namespace<remove_cref<T>>();
 }

@@ -278,7 +278,7 @@ int work(const int argc, const char* const * const argv) try {
 	};
 
 	static auto on_specific_setup = [](auto callback) -> decltype(auto) {
-		using T = std::decay_t<argument_t<decltype(callback), 0>>;
+		using T = remove_cref<argument_t<decltype(callback), 0>>;
 
 		if constexpr(std::is_same_v<T, main_menu_setup>) {
 			if (main_menu.has_value()) {
@@ -452,7 +452,7 @@ int work(const int argc, const char* const * const argv) try {
 		auto& _load_all = load_all;
 
 		visit_current_setup([&](const auto& setup) {
-			using T = std::decay_t<decltype(setup)>;
+			using T = remove_cref<decltype(setup)>;
 			
 			if constexpr(T::loading_strategy == viewables_loading_type::LOAD_ALL_ONLY_ONCE) {
 				_load_all(setup.get_viewable_defs());
@@ -1028,7 +1028,7 @@ int work(const int argc, const char* const * const argv) try {
 						auto& _window = window;
 
 						if (visit_current_setup([&](auto& setup) {
-							using T = std::decay_t<decltype(setup)>;
+							using T = remove_cref<decltype(setup)>;
 
 							if constexpr(T::handles_window_input) {
 								/* 
@@ -1088,7 +1088,7 @@ int work(const int argc, const char* const * const argv) try {
 					const bool in_direct_gameplay = !game_gui_mode;
 
 					visit_current_setup([&](auto& setup) {
-						using T = std::decay_t<decltype(setup)>;
+						using T = remove_cref<decltype(setup)>;
 
 						if constexpr(std::is_same_v<T, editor_setup>) {
 							/* Editor needs more goods */
@@ -1225,7 +1225,7 @@ int work(const int argc, const char* const * const argv) try {
 						ingame_menu.show = false;
 					}
 					else if (!visit_current_setup([&](auto& setup) {
-						using T = std::decay_t<decltype(setup)>;
+						using T = remove_cref<decltype(setup)>;
 
 						if constexpr(T::handles_escape) {
 							const auto result = setup.escape();
@@ -1325,7 +1325,7 @@ int work(const int argc, const char* const * const argv) try {
 					auto& _window = window;
 
 					if (visit_current_setup([&](auto& setup) {
-						using T = std::decay_t<decltype(setup)>;
+						using T = remove_cref<decltype(setup)>;
 
 						if constexpr(T::handles_window_input) {
 							if (!necessary_images_in_atlas.empty()) {
@@ -1426,7 +1426,7 @@ int work(const int argc, const char* const * const argv) try {
 
 		visit_current_setup(
 			[&](const auto& setup) {
-				using T = std::decay_t<decltype(setup)>;
+				using T = remove_cref<decltype(setup)>;
 				using S = viewables_loading_type;
 
 				constexpr auto s = T::loading_strategy;
@@ -1583,7 +1583,7 @@ int work(const int argc, const char* const * const argv) try {
 				[](const const_entity_handle handle) -> std::optional<rgba> { return std::nullopt; },
 				[&](auto callback) {
 					visit_current_setup([&](auto& setup) {
-						using T = std::decay_t<decltype(setup)>;
+						using T = remove_cref<decltype(setup)>;
 
 						if constexpr(T::has_additional_highlights) {
 							setup.for_each_highlight(callback);

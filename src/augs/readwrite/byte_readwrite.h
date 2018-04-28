@@ -77,7 +77,7 @@ namespace augs {
 			if (type_id != static_cast<unsigned>(-1)) {
 				for_each_type_in_list<Serialized>(
 					[&](const auto& dummy) {
-						using T = std::decay_t<decltype(dummy)>;
+						using T = remove_cref<decltype(dummy)>;
 
 						if (type_id == index_in_list_v<T, Serialized>) {
 							T object;
@@ -99,7 +99,7 @@ namespace augs {
 
 			introspect(
 				[&](auto, auto& member) {
-					using T = std::decay_t<decltype(member)>;
+					using T = remove_cref<decltype(member)>;
 					
 					if constexpr (!is_padding_field_v<T>) {
 						read_bytes(ar, member);
@@ -116,7 +116,7 @@ namespace augs {
 		static_assert(!std::is_same_v<Serialized, std::nullptr_t> && !std::is_same_v<Serialized, std::nullopt_t> , "Trying to write bytes from a null object.");
 
 		if constexpr(has_byte_write_overload_v<Archive, Serialized>) {
-			static_assert(has_byte_read_overload_v<Archive, std::decay_t<Serialized>&>, "Has write_object_bytes overload, but no read_object_bytes overload.");
+			static_assert(has_byte_read_overload_v<Archive, remove_cref<Serialized>&>, "Has write_object_bytes overload, but no read_object_bytes overload.");
 
 			write_object_bytes(ar, storage);
 		}
@@ -155,7 +155,7 @@ namespace augs {
 
 			introspect(
 				[&](auto, const auto& member) {
-					using T = std::decay_t<decltype(member)>;
+					using T = remove_cref<decltype(member)>;
 
 					if constexpr (!is_padding_field_v<T>) {
 						write_bytes(ar, member);

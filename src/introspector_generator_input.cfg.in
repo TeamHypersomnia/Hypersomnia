@@ -137,7 +137,7 @@ struct ImVec4;
 		) {
 			templates_detail::for_each_through_std_get(
 				[f](auto, auto&... args) {
-					using N = std::decay_t<nth_type_in_t<0, decltype(args)...>>;
+					using N = remove_cref<nth_type_in_t<0, decltype(args)...>>;
 					f(get_type_name_strip_namespace<N>(), args...);
 				},
 				std::index_sequence_for<Types...>{},
@@ -153,7 +153,7 @@ struct ImVec4;
 		) {
 			templates_detail::for_each_through_std_get(
 				[f](auto num, auto&... args) {
-					using N = std::decay_t<nth_type_in_t<0, decltype(args)...>>;
+					using N = remove_cref<nth_type_in_t<0, decltype(args)...>>;
 					f(get_type_name_strip_namespace<N>(), args...);
 				},
 				std::index_sequence_for<Types...>{},

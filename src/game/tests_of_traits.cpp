@@ -86,7 +86,7 @@ struct tests_of_traits {
 		using candidates = type_list<plain_missile, explosive_missile>;
 
 		auto tester = [](auto a) -> decltype(auto) {
-			using T = std::decay_t<decltype(a)>;
+			using T = remove_cref<decltype(a)>;
 			static_assert(same<T, plain_missile> || same<T, explosive_missile>);
 			return 20.0;	
 		};
@@ -298,7 +298,7 @@ struct tests_of_traits {
 	);
 	
 	static_assert(
-		same<type_list<int, double, float>, transform_types_in_list_t<type_list<const int&, double&&, float&>, std::decay_t>>,
+		same<type_list<int, double, float>, transform_types_in_list_t<type_list<const int&, double&&, float&>, remove_cref>>,
 		"Trait has failed."
 	);
 	

@@ -164,7 +164,7 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 			const auto path = object.get_source_path();
 			auto new_entry = path_entry_type(path, id);
 
-			using def_type = std::decay_t<decltype(object)>;
+			using def_type = remove_cref<decltype(object)>;
 			const auto& view = asset_definition_view<def_type>(folder.current_path, object);
 
 			find_locations_that_use(id, work, [&](const auto& location) {
@@ -332,7 +332,7 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 				) {
 					command_type cmd;
 
-					if constexpr(path_control_provider::handles<std::decay_t<decltype(new_content)>>) {
+					if constexpr(path_control_provider::handles<remove_cref<decltype(new_content)>>) {
 						cmd.affected_assets = { id };
 					}
 					else {

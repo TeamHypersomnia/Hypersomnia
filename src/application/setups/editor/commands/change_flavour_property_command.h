@@ -34,7 +34,7 @@ struct flavour_property_id {
 					invariants_of<E> {},
 					invariant_id,
 					[&](const auto& i) {
-						using Invariant = std::decay_t<decltype(i)>;
+						using Invariant = remove_cref<decltype(i)>;
 
 						for (const auto& f : flavour_ids) {
 							const auto result = on_field_address(

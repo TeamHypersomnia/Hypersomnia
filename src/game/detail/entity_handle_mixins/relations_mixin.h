@@ -51,7 +51,7 @@ public:
 			[&cosmos, &callback](const auto& subject_component) {
 				augs::introspect(
 					[&](auto, const auto& member) {
-						if constexpr(std::is_same_v<std::decay_t<decltype(member)>, child_entity_id>) {
+						if constexpr(std::is_same_v<remove_cref<decltype(member)>, child_entity_id>) {
 							const auto child_handle = cosmos[member];
 
 							if (child_handle.alive() && callback(child_handle) == callback_result::CONTINUE) {

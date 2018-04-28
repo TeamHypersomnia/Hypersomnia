@@ -140,7 +140,7 @@ void missile_system::detonate_expired_missiles(const logic_step step) {
 
 	cosmos.for_each_having<components::missile>(
 		[&](const auto it) {
-			using handle_type = std::decay_t<decltype(it)>;
+			using handle_type = remove_cref<decltype(it)>;
 
 			auto& missile = it.template get<components::missile>();
 			auto& missile_def = it.template get<invariants::missile>();

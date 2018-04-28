@@ -88,7 +88,7 @@ TEST_CASE("StateTest2 PaddingTest") {
 
 	auto padding_checker = [&](auto c, auto... args) {
 		using checked_type = decltype(c);
-		static_assert(std::is_same_v<std::decay_t<checked_type>, checked_type>, "Something's wrong with the types");
+		static_assert(std::is_same_v<remove_cref<checked_type>, checked_type>, "Something's wrong with the types");
 
 		if constexpr(!allows_nontriviality_v<checked_type>) {
 			constexpr size_t type_size = sizeof(checked_type);
@@ -193,7 +193,7 @@ TEST_CASE("StateTest2 PaddingTest") {
 
 	augs::introspect(
 		augs::recursive([padding_checker](auto self, auto, auto m) {
-			using T = std::decay_t<decltype(m)>;
+			using T = remove_cref<decltype(m)>;
 
 			if constexpr(std::is_same_v<T, augs::delta>) {
 				padding_checker(m, augs::delta::zero);

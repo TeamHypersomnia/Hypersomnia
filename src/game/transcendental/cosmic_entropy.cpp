@@ -89,7 +89,7 @@ template <class key>
 void basic_cosmic_entropy<key>::clear_dead_entities(const cosmos& cosm) {
 	augs::introspect(
 		[&cosm](auto, auto& member_container) {
-			using T = std::decay_t<decltype(member_container)>;
+			using T = remove_cref<decltype(member_container)>;
 			
 			if constexpr(!std::is_same_v<decltype(transfer_requests), T>) {
 				erase_if(

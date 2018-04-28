@@ -78,7 +78,7 @@ auto fae_tree(
 		cosm.get_solvable().for_each_pool(
 			[&](const auto& p){
 				using P = decltype(p);
-				using pool_type = std::decay_t<P>;
+				using pool_type = remove_cref<P>;
 
 				using Solvable = typename pool_type::mapped_type;
 				using E = entity_type_of<Solvable>;

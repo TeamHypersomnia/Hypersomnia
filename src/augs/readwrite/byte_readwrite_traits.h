@@ -11,7 +11,7 @@ namespace augs {
 
 	template <class Archive>
 	constexpr bool is_byte_stream_v = is_derived_from_any_of_v<
-		std::decay_t<Archive>,
+		remove_cref<Archive>,
 		memory_stream,
 		ref_memory_stream,
 		cref_memory_stream,

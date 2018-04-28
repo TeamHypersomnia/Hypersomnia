@@ -70,7 +70,7 @@ void forget_asset_id_command<I>::undo(const editor_command_input in) {
 
 	auto& definitions = get_viewable_pool<I>(work.viewables);
 
-	typename std::decay_t<decltype(definitions)>::mapped_type def;
+	typename remove_cref<decltype(definitions)>::mapped_type def;
 	augs::read_bytes(s, def);
 	definitions.undo_free(undo_free_input, std::move(def));
 

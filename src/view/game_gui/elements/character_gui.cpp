@@ -346,7 +346,7 @@ void character_gui::draw_cursor_with_tooltip(
 
 		if (drag_result.has_value()) {
 			std::visit([&](const auto& transfer_data) {
-				using T = std::decay_t<decltype(transfer_data)>;
+				using T = remove_cref<decltype(transfer_data)>;
 
 				if constexpr (std::is_same_v<T, unfinished_drag_of_item>) {
 					const auto& dragged_item_button = context.dereference_location(item_button_in_item{ transfer_data.item_id });

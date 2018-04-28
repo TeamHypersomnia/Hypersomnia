@@ -20,7 +20,7 @@ void find_object_in_object(
 
 	auto callback = augs::recursive(
 		[&searched_object, &location_callback](auto&& self, const auto& label, auto& field) {
-			using T = std::decay_t<decltype(field)>;
+			using T = remove_cref<decltype(field)>;
 
 			if constexpr(can_type_contain_another_v<T, Se>) {
 				if constexpr(IgnorePredicate<T>::value) {

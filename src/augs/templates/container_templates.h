@@ -157,7 +157,7 @@ auto mapped_or_nullptr(
 
 template <class Container>
 auto accumulate_mapped_values(Container& container) {
-	using M = typename std::decay_t<Container>::mapped_type;
+	using M = typename remove_cref<Container>::mapped_type;
 	M m {};
 
 	for (const auto& it : container) {
@@ -172,7 +172,7 @@ auto key_or_default(
 	const Container& container, 
 	const Value& searched_value
 ) {
-	using K = typename std::decay_t<Container>::key_type;
+	using K = typename remove_cref<Container>::key_type;
 
 	for (auto&& it : container) {
 		if (it.second == searched_value) {

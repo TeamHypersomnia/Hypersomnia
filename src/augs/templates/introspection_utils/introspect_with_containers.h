@@ -15,7 +15,7 @@ namespace augs {
 
 	template <class F, class O>
 	void on_dynamic_content(F callback, O& object) {
-		using T = std::decay_t<O>;
+		using T = remove_cref<O>;
 
 		if constexpr(is_optional_v<T>) {
 			if (object) {
