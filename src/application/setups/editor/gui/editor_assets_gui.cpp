@@ -21,11 +21,12 @@
 #include "application/setups/editor/detail/find_locations_that_use.h"
 #include "application/setups/editor/detail/checkbox_selection.h"
 #include "application/setups/editor/property_editor/compare_all_fields_to.h"
+#include "augs/readwrite/byte_readwrite.h"
 
 #include "augs/templates/list_utils.h"
 
 template <class id_type>
-struct asset_gui_path_entry : public browsed_path_entry_base<id_type> {
+struct pathed_asset_entry : public browsed_path_entry_base<id_type> {
 	using base = browsed_path_entry_base<id_type>;
 
 	id_type id;
@@ -37,8 +38,8 @@ struct asset_gui_path_entry : public browsed_path_entry_base<id_type> {
 		return using_locations.size() > 0;
 	}
 
-	asset_gui_path_entry() = default;
-	asset_gui_path_entry(
+	pathed_asset_entry() = default;
+	pathed_asset_entry(
 		const maybe_official_path<id_type>& from,
 	   	const id_type id
 	) :
@@ -121,7 +122,7 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 
 	auto& viewables = work.viewables;
 
-	using path_entry_type = asset_gui_path_entry<asset_id_type>;
+	using path_entry_type = pathed_asset_entry<asset_id_type>;
 
 	thread_local std::unordered_set<augs::path_type> _last_seen_missing_paths;
 	/* Linker error fix */
