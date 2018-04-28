@@ -24,16 +24,20 @@ void choose_asset_path(
 
 	using asset_control_path_entry = browsed_path_entry_base<I>;
 
-	thread_local bool acquire_once = true;
 	thread_local int acquire_keyboard_times = 2;
 	thread_local std::vector<asset_control_path_entry> all_paths;
 	thread_local std::vector<asset_control_path_entry> disallowed_paths;
 	thread_local path_tree_settings tree_settings;
+	thread_local std::optional<ImGuiID> currently_opened;
 
 	const auto displayed_str = current_source.to_display_prettified();
 
 	if (auto combo = scoped_combo(label.c_str(), displayed_str.c_str(), ImGuiComboFlags_HeightLargest)) {
-		if (acquire_once) {
+		const auto& g = *ImGui::GetCurrentContext();
+
+		if (currently_opened != g.OpenPopupStack[g.CurrentPopupStack.Size - 1].PopupId) {
+			currently_opened = g.OpenPopupStack[g.CurrentPopupStack.Size - 1].PopupId;
+
 			all_paths.clear();
 			disallowed_paths.clear();
 
@@ -82,7 +86,6 @@ void choose_asset_path(
 			sort_range(all_paths);
 			sort_range(disallowed_paths);
 
-			acquire_once = false;
 			acquire_keyboard_times = 2;
 		}
 
@@ -117,7 +120,9 @@ void choose_asset_path(
 		);
 	}
 	else {
-		acquire_once = true;
+		if (currently_opened && !ImGui::IsPopupOpen(*currently_opened)) {
+			currently_opened = std::nullopt;
+		}
 	}
 }
 
