@@ -270,17 +270,13 @@ void light_system::render_all_lights(const light_system_input in) const {
 	draw_neons(render_layer::NEON_CAPTIONS);
 	draw_neons(render_layer::ON_GROUND);
 
-	{
-		invariants::sprite::drawing_input basic(output);
-		basic.use_neon_map = true;
-
-		particles.draw_particles_as_sprites(
-			in.game_images,
-			in.animations,
-			basic,
-			render_layer::ILLUMINATING_PARTICLES
-		);
-	}
+	/* Draw neon maps */
+	particles.draw_particles(
+		in.game_images,
+		in.animations,
+		draw_particles_input { output, true },
+		render_layer::ILLUMINATING_PARTICLES
+	);
 
 	in.neon_callback();
 

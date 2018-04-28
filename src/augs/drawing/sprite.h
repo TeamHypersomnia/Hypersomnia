@@ -120,7 +120,8 @@ namespace augs {
 			const auto drawn_size = get_size();
 
 			if (in.use_neon_map) {
-				const auto& maybe_neon_map = manager.at(tex).neon_map;
+				const auto& entry = manager.at(tex);
+				const auto& maybe_neon_map = entry.neon_map;
 
 				if (maybe_neon_map.exists()) {
 					draw(
@@ -129,7 +130,7 @@ namespace augs {
 						transform_pos,
 						final_rotation,
 						vec2(maybe_neon_map.get_original_size())
-						/ manager.at(tex).get_original_size() * drawn_size
+						/ entry.diffuse.get_original_size() * drawn_size
 					);
 				}
 			}
@@ -149,9 +150,9 @@ namespace augs {
 			const texture_atlas_entry considered_texture,
 			const vec2 target_position,
 			const float target_rotation,
-			const vec2 considered_size
+			const vec2i considered_size
 		) const {
-			auto points = make_sprite_points(target_position, considered_size, target_rotation);
+			const auto points = make_sprite_points(target_position, considered_size, target_rotation);
 
 			/* rotate around the center of the screen */
 			//if (in.camera.transform.rotation != 0.f) {

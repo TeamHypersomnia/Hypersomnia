@@ -13,7 +13,6 @@
 #include "game/detail/view_input/particle_effect_input.h"
 
 #include "view/viewables/all_viewables_declarations.h"
-#include "view/viewables/particle_types_declaration.h"
 #include "view/viewables/particle_effect.h"
 
 class interpolation_system;
@@ -175,23 +174,23 @@ public:
 	);
 
 	template <class M>
-	void draw_particles_as_sprites(
+	void draw_particles(
 		const M& manager,
 		const animations_pool& anims,
-		const invariants::sprite::drawing_input basic_input,
+		const draw_particles_input input,
 		const render_layer layer
 	) const {
 		for (const auto& it : general_particles[layer]) {
-			it.draw_as_sprite(manager, basic_input);
+			it.draw_as_sprite(manager, input);
 		}
 
 		for (const auto& it : animated_particles[layer]) {
-			it.draw_as_sprite(manager, anims, basic_input);
+			it.draw_as_sprite(manager, anims, input);
 		}
 
 		for (const auto& cluster : homing_animated_particles[layer]) {
 			for (const auto& it : cluster.second) {
-				it.draw_as_sprite(manager, anims, basic_input);
+				it.draw_as_sprite(manager, anims, input);
 			}
 		}
 	}

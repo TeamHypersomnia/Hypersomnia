@@ -1,6 +1,6 @@
 #pragma once
+#include "augs/drawing/drawing.h"
 #include "augs/math/vec2.h"
-#include "game/components/sprite_component.h"
 #include "view/viewables/particle_types_declaration.h"
 #include "augs/graphics/rgba.h"
 #include "game/transcendental/entity_id.h"
@@ -8,6 +8,13 @@
 #include "game/assets/all_logical_assets.h"
 #include "game/assets/asset_pools.h"
 #include "game/assets/animation.h"
+
+#include "augs/drawing/sprite_helpers.h"
+
+struct draw_particles_input {
+	augs::drawer output;
+	bool use_neon_map = false;
+};
 
 struct general_particle {
 	// GEN INTROSPECTOR struct general_particle
@@ -34,7 +41,7 @@ struct general_particle {
 	template <class M>
 	void draw_as_sprite(
 		const M& manager,
-		invariants::sprite::drawing_input basic_input
+		const draw_particles_input in
 	) const {
 		float size_mult = 1.f;
 
@@ -59,11 +66,14 @@ struct general_particle {
 			size_mult *= std::min(1.f, (current_lifetime_ms / unshrinking_time_ms)*(current_lifetime_ms / unshrinking_time_ms));
 		}
 
-		invariants::sprite f;
-		f.set(image_id, size_mult * size, color);
-
-		basic_input.renderable_transform = { pos, rotation };
-		f.draw(manager, basic_input);
+		if (const auto drawn_size = vec2i(size_mult * size); drawn_size.area() > 1) {
+			if (in.use_neon_map) {
+				augs::detail_neon_sprite(in.output.output_buffer, manager, image_id, drawn_size, pos, rotation, color);
+			}
+			else {
+				augs::detail_sprite(in.output.output_buffer, manager, image_id, drawn_size, pos, rotation, color);
+			}
+		}
 	}
 
 	bool is_dead() const;
@@ -125,17 +135,16 @@ struct animated_particle {
 	void draw_as_sprite(
 		const M& manager,
 		const animations_pool& anims,
-		invariants::sprite::drawing_input basic_input
+		const draw_particles_input in
 	) const {
-		thread_local invariants::sprite face;
+		const auto image_id = animation.get_image_id(anims);
 
-		const auto target_id = animation.get_image_id(anims);
-
-		face.set(target_id, manager.at(target_id).get_original_size(), white);
-
-		basic_input.renderable_transform = { pos, 0 };
-		face.color = color;
-		face.draw(manager, basic_input);
+		if (in.use_neon_map) {
+			augs::detail_neon_sprite(in.output.output_buffer, manager, image_id, pos, 0, color);
+		}
+		else {
+			augs::detail_sprite(in.output.output_buffer, manager, image_id, pos, 0, color);
+		}
 	}
 
 	bool is_dead() const {
@@ -177,20 +186,16 @@ struct homing_animated_particle {
 	void draw_as_sprite(
 		const M& manager,
 		const animations_pool& anims,
-		invariants::sprite::drawing_input basic_input
+		const draw_particles_input in
 	) const {
-		thread_local invariants::sprite face;
+		const auto image_id = animation.get_image_id(anims);
 
-		const auto target_id = animation.get_image_id(anims);
-
-		face.set(
-			target_id,
-			manager.at(target_id).get_original_size()
-		);
-
-		basic_input.renderable_transform = { pos, 0 };
-		face.color = color;
-		face.draw(manager, basic_input);
+		if (in.use_neon_map) {
+			augs::detail_neon_sprite(in.output.output_buffer, manager, image_id, pos, 0, color);
+		}
+		else {
+			augs::detail_sprite(in.output.output_buffer, manager, image_id, pos, 0, color);
+		}
 	}
 
 	bool is_dead() const {

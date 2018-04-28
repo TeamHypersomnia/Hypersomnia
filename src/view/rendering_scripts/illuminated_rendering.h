@@ -121,13 +121,13 @@ void illuminated_rendering(
 	renderer.clear_current_fbo();
 	renderer.set_additive_blending();
 	
-	auto basic_sprite_input = invariants::sprite::drawing_input(output);
+	const auto draw_particles_in = draw_particles_input{ output, false };
 
 	auto draw_particles = [&](const render_layer layer) {
-		particles.draw_particles_as_sprites(
+		particles.draw_particles(
 			game_images,
 			anims,
-			basic_sprite_input,
+			draw_particles_in,
 			layer
 		);
 	};
@@ -352,7 +352,7 @@ void illuminated_rendering(
 	draw_particles(render_layer::ILLUMINATING_PARTICLES);
 
 	for (const auto e : visible.per_layer[render_layer::WANDERING_PIXELS_EFFECTS]) {
-		wandering_pixels.draw_wandering_pixels_as_sprites(cosmos[e], game_images, basic_sprite_input);
+		wandering_pixels.draw_wandering_pixels_as_sprites(cosmos[e], game_images, invariants::sprite::drawing_input(output));
 	}
 
 	renderer.call_and_clear_triangles();
