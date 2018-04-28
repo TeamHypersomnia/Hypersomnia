@@ -70,11 +70,11 @@ bool compare_all_serialized_fields_to(
 		std::forward<Args>(args)...,
 		[&first_bytes, &equal](const auto& resolved) -> callback_result {
 			if (detail_compare(first_bytes, resolved)) {
-				equal = false;
-				return callback_result::ABORT;
+				return callback_result::CONTINUE;
 			}
 
-			return callback_result::CONTINUE;
+			equal = false;
+			return callback_result::ABORT;
 		}
 	);
 
