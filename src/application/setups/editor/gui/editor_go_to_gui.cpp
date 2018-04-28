@@ -11,7 +11,11 @@
 #include "application/setups/editor/editor_settings.h"
 
 const_entity_handle editor_go_to_entity_gui::get_matching_go_to_entity(const cosmos& cosm) const {
-	if (last_input.size() > 0 && show && matches.size() > 0) {
+	if (last_input.empty() && !moved_since_opening) {
+		return cosm[entity_id()];
+	}
+
+	if (show && matches.size() > 0) {
 		return cosm[matches[selected_index]];
 	}
 
@@ -24,6 +28,7 @@ void editor_go_to_entity_gui::open() {
 	matches.clear();
 	last_input.clear();
 	selected_index = 0;
+	moved_since_opening = false;
 
 	ImGui::SetWindowFocus("Go to entity");
 }
@@ -116,6 +121,8 @@ std::optional<const_entity_handle> editor_go_to_entity_gui::perform(
 				}
 				
 				if (data->EventKey == ImGuiKey_UpArrow) {
+					self.moved_since_opening = true;
+
 					if (self.selected_index == 0) {
 						self.selected_index = max_index - 1;
 					}
@@ -124,6 +131,8 @@ std::optional<const_entity_handle> editor_go_to_entity_gui::perform(
 					}
 				}
 				else if (data->EventKey == ImGuiKey_DownArrow) {
+					self.moved_since_opening = true;
+
 					++self.selected_index; 	
 					self.selected_index %= max_index;
 				}
