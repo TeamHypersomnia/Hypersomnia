@@ -512,7 +512,7 @@ physics_world_cache& physics_world_cache::operator=(const physics_world_cache& b
 		already_migrated_pointers.insert(reinterpret_cast<void**>(&pointer_to_be_migrated));
 #endif
 
-		typedef std::remove_pointer_t<std::decay_t<decltype(pointer_to_be_migrated)>> type;
+		using type = std::remove_pointer_t<std::remove_reference_t<decltype(pointer_to_be_migrated)>>;
 		static_assert(!std::is_same_v<type, b2Joint>, "Can't migrate an abstract base class");
 
 		const auto void_ptr = reinterpret_cast<const void*>(pointer_to_be_migrated);

@@ -142,8 +142,7 @@ void editor_entity_selector::unhover() {
 
 static bool should_hover_standard_aabb(const cosmos& cosm, const entity_id id) {
 	return cosm[id].dispatch([](const auto typed_handle){
-		using T = std::decay_t<decltype(typed_handle)>;
-		using E = typename T::used_entity_type;
+		using E = entity_type_of<decltype(typed_handle)>;
 
 		if (std::is_same_v<E, wandering_pixels_decoration>) {
 			return false;

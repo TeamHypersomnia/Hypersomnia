@@ -24,6 +24,7 @@
 #include "game/organization/all_messages_declaration.h"
 #include "game/transcendental/cosmos_solvable_inferred.h"
 #include "game/transcendental/cosmos_solvable_significant.h"
+#include "game/transcendental/specific_entity_handle_declaration.h"
 #include "game/transcendental/entity_id.h"
 
 #include "game/assets/behaviour_tree.h"
@@ -100,7 +101,7 @@ class cosmos_solvable {
 				using pool_type = std::decay_t<P>;
 
 				using Solvable = typename pool_type::mapped_type;
-				using E = typename Solvable::used_entity_type;
+				using E = entity_type_of<Solvable>;
 
 				if constexpr(has_all_of_v<E, Constraints...>) {
 					using index_type = typename pool_type::used_size_type;

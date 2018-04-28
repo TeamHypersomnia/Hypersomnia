@@ -81,7 +81,7 @@ auto fae_tree(
 				using pool_type = std::decay_t<P>;
 
 				using Solvable = typename pool_type::mapped_type;
-				using E = typename Solvable::used_entity_type;
+				using E = entity_type_of<Solvable>;
 
 				using flavour_id_type = typed_entity_flavour_id<E>;
 				using flavour_type = entity_flavour<E>;

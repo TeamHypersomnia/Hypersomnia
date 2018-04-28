@@ -11,6 +11,7 @@
 #include "game/transcendental/specific_entity_handle.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/entity_construction.h"
+#include "game/transcendental/specific_entity_handle_declaration.h"
 
 #include "game/messages/will_soon_be_deleted.h"
 #include "game/messages/queue_destruction.h"
@@ -224,7 +225,7 @@ public:
 		self.get_solvable({}).template for_each_entity<Constraints...>(
 			[&](auto& object, const auto iteration_index) {
 				using O = decltype(object);
-				using E = typename std::decay_t<O>::used_entity_type;
+				using E = entity_type_of<O>;
 				using iterated_handle_type = basic_iterated_entity_handle<is_const_ref_v<O>, E>;
 				
 				callback(iterated_handle_type(self, { object, iteration_index } ));

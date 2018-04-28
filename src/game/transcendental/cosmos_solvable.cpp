@@ -1,6 +1,7 @@
 #include "game/transcendental/cosmos_solvable.h"
 
 #include "augs/templates/introspect.h"
+#include "game/transcendental/specific_entity_handle_declaration.h"
 
 const cosmos_solvable cosmos_solvable::zero;
 
@@ -65,7 +66,7 @@ void cosmos_solvable::remap_guids() {
 	guids.clear();
 
 	for_each_entity([&](auto& subject, const auto iteration_index) {
-		using E = typename std::decay_t<decltype(subject)>::used_entity_type;
+		using E = entity_type_of<decltype(subject)>;
 
 		const auto id = entity_id(
 			significant.template get_pool<E>().to_id(iteration_index),
