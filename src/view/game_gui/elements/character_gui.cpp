@@ -475,7 +475,7 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 			hovered,
 			[&](const auto dereferenced) {
 				const auto location = dereferenced.get_location();
-				using T = std::decay_t<decltype(location)>;
+				using T = std::remove_const_t<decltype(location)>;
 
 				if constexpr(std::is_same_v<T, item_button_in_item>) {
 					tooltip_text = text::from_bbcode(get_bbcoded_entity_details(cosmos[location.item_id]), description_style);

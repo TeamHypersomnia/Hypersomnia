@@ -6,6 +6,7 @@
 #include "augs/templates/sequence_utils.h"
 #include "augs/misc/trivially_copyable_tuple.h"
 #include "augs/templates/type_list.h"
+#include "augs/templates/remove_cref.h"
 
 namespace templates_detail {
 	template <class F, class... Instances>
@@ -32,7 +33,7 @@ void for_each_through_std_get(List&& t, F f) {
 		[f](auto num, auto&&... args) {
 			f(std::forward<decltype(args)>(args)...);
 		},
-		std::make_index_sequence<num_types_in_list_v<List>>(),
+		std::make_index_sequence<num_types_in_list_v<remove_cref<List>>>(),
 		std::forward<List>(t)
 	);
 }
@@ -45,7 +46,7 @@ void reverse_for_each_through_std_get(List&& t, F f) {
 		[f](auto num, auto&&... args) {
 			f(std::forward<decltype(args)>(args)...);
 		},
-		reverse_sequence_t<std::make_index_sequence<num_types_in_list_v<List>>>(),
+		reverse_sequence_t<std::make_index_sequence<num_types_in_list_v<remove_cref<List>>>>(),
 		std::forward<List>(t)
 	);
 }

@@ -44,7 +44,7 @@ void do_edit_flavours_gui(
 template <class F>
 auto fae_tree(
 	const fae_tree_input fae_in,
-	F&& flavours_and_entities_provider
+	F provider
 ) {
 	using namespace augs::imgui;
 
@@ -52,8 +52,6 @@ auto fae_tree(
 	const auto prop_in = cpe_in.prop_in;
 
 	fae_tree_filter filter;
-
-	auto& provider = flavours_and_entities_provider;
 
 	std::size_t total_types = 0;
 
@@ -68,7 +66,8 @@ auto fae_tree(
 	const auto& cosm = cpe_in.command_in.get_cosmos();
 	auto& state = fae_in.state;
 
-	const auto mode = state.view_mode;
+	const bool viewing_flavours = state.view_mode == fae_view_type::FLAVOURS;
+	const bool viewing_entities = state.view_mode == fae_view_type::ENTITIES;
 
 	{
 		auto child = scoped_child("fae-view", ImVec2(0, -(ImGui::GetFrameHeightWithSpacing() + 4)));
@@ -100,13 +99,13 @@ auto fae_tree(
 				auto& ticked_entities = state.ticked_entities.get_for<E>();
 
 				const bool none_of_interest = 
-					(mode == fae_view_type::FLAVOURS && total_flavours == 0)
-					|| (mode == fae_view_type::ENTITIES && total_entities == 0)
+					(viewing_flavours && total_flavours == 0)
+					|| (viewing_entities && total_entities == 0)
 				;
 
 				auto disabled = ::maybe_disabled_cols(prop_in.settings, none_of_interest);
 
-				if (mode == fae_view_type::FLAVOURS) {
+				if (viewing_flavours) {
 					do_tick_all_checkbox(
 						prop_in.settings,
 						ticked_flavours,
@@ -120,7 +119,7 @@ auto fae_tree(
 						entity_type_label
 					);
 				}
-				else if (mode == fae_view_type::ENTITIES) {
+				else if (viewing_entities) {
 					do_tick_all_checkbox(
 						prop_in.settings,
 						ticked_entities,
@@ -164,10 +163,10 @@ auto fae_tree(
 					ImGui::SameLine();
 				}
 
-				if (mode == fae_view_type::FLAVOURS) {
+				if (viewing_flavours) {
 					text_disabled(typesafe_sprintf("%x Flavours", total_flavours));
 				}
-				else if (mode == fae_view_type::ENTITIES) {
+				else if (viewing_entities) {
 					text_disabled(typesafe_sprintf("%x Entities", total_entities));
 				}
 
@@ -188,11 +187,11 @@ auto fae_tree(
 
 							auto disabled = ::maybe_disabled_cols(
 								prop_in.settings, 
-								(mode == fae_view_type::ENTITIES && all_having_flavour.size() == 0)
+								(viewing_entities && all_having_flavour.size() == 0)
 							);
 
 							const auto flags = [&]() {
-								if (mode == fae_view_type::FLAVOURS) {
+								if (viewing_flavours) {
 									return do_selection_checkbox(
 										ticked_flavours,
 										flavour_id,
@@ -201,7 +200,7 @@ auto fae_tree(
 									);
 								}
 								else {
-									ensure_eq(fae_view_type::ENTITIES, mode); 
+									ensure(viewing_entities);
 
 									return do_tick_all_checkbox(
 										prop_in.settings,
@@ -250,7 +249,7 @@ auto fae_tree(
 							if (flavour_node) {
 								/* auto indent = scoped_indent(); */
 
-								if (mode == fae_view_type::FLAVOURS) {
+								if (viewing_flavours) {
 									ImGui::Separator();
 									if (is_flavour_selected) {
 										do_edit_flavours_gui(fae_in, flavour, { ticked_flavours.begin(), ticked_flavours.end() });
@@ -260,7 +259,7 @@ auto fae_tree(
 									}
 									ImGui::Separator();
 								}
-								else if (mode == fae_view_type::ENTITIES) {
+								else if (viewing_entities) {
 									for (const auto& e : all_having_flavour) {
 										const auto typed_handle = *cosm[e];
 

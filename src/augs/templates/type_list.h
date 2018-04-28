@@ -32,9 +32,7 @@ namespace std {
 */
 
 template <class T>
-struct num_types_in_list {
-	static constexpr std::size_t value = 0;
-};
+struct num_types_in_list;
 
 template <template <class...> class T, class... Types>
 struct num_types_in_list<T<Types...>> : std::integral_constant<std::size_t, sizeof...(Types)> {};
