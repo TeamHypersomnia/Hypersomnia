@@ -5,6 +5,12 @@ permalink: reassurements
 summary: We don't need to do this yet, because...
 ---
 
+- We will keep the audiovisual state global for all setups.
+	- The cosmos address probably won't change in networked scenarions...
+	- ...we will just rewrite the solvable, really. That's the most that will happen
+		- we won't really juggle around the actual displayed cosmoi, I think
+			- even if we do, we can think about it when we get to it.
+
 - what do we do with invalid sprite ids?
 	- We guarantee the validity of the ids everywhere. Period.
 		- That is because the editor will forbid from settings invalid values.

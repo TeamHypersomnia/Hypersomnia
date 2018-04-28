@@ -681,3 +681,15 @@ we consider whole type overrides too complex architeciturally:
 	- just do augs::to_bytes on both elements to be compared
 	- have some reserved thread_local memory stream
 
+- crashfix with no images in atlas?
+	Regenerating texture atlas: cache/gen/atlases/game_world_atlas.bin
+	Loading font content/necessary/fonts/unifont.ttf
+	ensure_less(static_cast<size_type>(i), count) failed with expansion:
+	9 < 0
+	file: ../../src/augs/misc/constant_size_vector.h
+	line: 103
+
+	- is cosmos::zero involved?
+	- it's actually because we are changing the cosmos while some particles are still there to be simulated
+		- and the default intercosm has no ids for the particles
+		- so we must reset the particles when we switch the cosmos

@@ -767,7 +767,7 @@ int work(const int argc, const char* const * const argv) try {
 			profiler.num_visible_entities.measure(all_visible.all.size());
 		}
 
-		const audiovisual_advance_input in(
+		audiovisuals.advance({
 			frame_delta,
 			speed_multiplier,
 
@@ -780,9 +780,7 @@ int work(const int argc, const char* const * const argv) try {
 			loaded_sounds,
 
 			viewing_config.audio_volume
-		);
-
-		audiovisuals.advance(in);
+		});
 	};
 
 	static auto setup_post_solve = [](const const_logic_step step) {
@@ -820,6 +818,22 @@ int work(const int argc, const char* const * const argv) try {
 		const cosmic_entropy& new_game_entropy,
 		const config_lua_table& viewing_config
 	) {
+		if (const auto now_sampled = get_sampled_cosmos(setup);
+			now_sampled != last_sampled_cosmos
+		) {
+#if 0
+			audiovisuals.clear_dead_entities(*now_sampled);
+#endif
+			audiovisuals.clear();
+			all_visible.clear_dead_entities(*now_sampled);
+
+			/* TODO: We need to have one game gui per cosmos. */
+			game_gui.clear_dead_entities(*now_sampled);
+
+			last_sampled_cosmos = now_sampled;
+			audiovisual_step(augs::delta::zero, 0.0, viewing_config);
+		}
+
 		setup.control(new_game_entropy);
 		setup.accept_game_gui_events(game_gui.get_and_clear_pending_events());
 		
@@ -838,22 +852,6 @@ int work(const int argc, const char* const * const argv) try {
 			},
 			setup_post_cleanup
 		);
-
-		if (const auto now_sampled = get_sampled_cosmos(setup);
-			now_sampled != last_sampled_cosmos
-		) {
-#if 0
-			audiovisuals.clear_dead_entities(*now_sampled);
-#endif
-			audiovisuals.clear();
-			all_visible.clear_dead_entities(*now_sampled);
-
-			/* TODO: We need to have one game gui per cosmos. */
-			game_gui.clear_dead_entities(*now_sampled);
-
-			last_sampled_cosmos = now_sampled;
-			audiovisual_step(augs::delta::zero, 0.0, viewing_config);
-		}
 	};
 
 	static auto advance_current_setup = [](

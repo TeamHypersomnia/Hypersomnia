@@ -45,34 +45,6 @@ struct audiovisual_advance_input {
 
 	const loaded_sounds_map& sounds;
 	const augs::audio_volume_settings audio_volume;
-
-	// for now just to know whats going on
-	audiovisual_advance_input(
-		const augs::delta frame_delta,
-		const double speed_multiplier,
-
-		const viewer_eye eye,
-		const visible_entities& all_visible,
-
-		const particle_effects_map& particle_effects,
-		const animations_pool& animations,
-
-		const loaded_sounds_map& sounds,
-		const augs::audio_volume_settings audio_volume
-	) :
-		frame_delta(frame_delta),
-		speed_multiplier(speed_multiplier),
-
-		eye(eye),
-		all_visible(all_visible),
-		particle_effects(particle_effects),
-		animations(animations),
-
-		sounds(sounds),
-		audio_volume(audio_volume)
-	{
-
-	}
 };
 
 struct audiovisual_state {

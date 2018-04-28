@@ -22,6 +22,12 @@
 void particles_simulation_system::clear() {
 	orbital_emissions.clear();
 	fire_and_forget_emissions.clear();
+
+	auto clearer = [](auto& arr) { for(auto& v : arr) { v.clear(); } };
+
+	clearer(general_particles);
+	clearer(animated_particles);
+	clearer(homing_animated_particles);
 }
 
 void particles_simulation_system::clear_dead_entities(const cosmos& new_cosmos) {

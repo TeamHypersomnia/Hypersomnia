@@ -5,21 +5,13 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- replace decay_t usage with remove_cref, decay is overkill
 - animation metadata could have some very general structs like "character metrics"
 	- vec2i: hands position[2]
 		- positions of these could be even indicated in the previewed image
 	- bool: makes a step?
 
 - rethink our roadmap
-- crashfix with no images in atlas?
-	Regenerating texture atlas: cache/gen/atlases/game_world_atlas.bin
-	Loading font content/necessary/fonts/unifont.ttf
-	ensure_less(static_cast<size_type>(i), count) failed with expansion:
-	9 < 0
-	file: ../../src/augs/misc/constant_size_vector.h
-	line: 103
-
-	- is cosmos::zero involved?
 
 - fix broken file combos
 	- they break when two are visible at the same time
