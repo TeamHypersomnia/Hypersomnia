@@ -15,8 +15,6 @@ void load_test_scene_sounds(sound_definitions_map& all_definitions) {
 	using id_type = assets::sound_id;
 	using test_id_type = test_scene_sound_id;
 
-	const auto directory = "content/official/sfx/";
-
 	all_definitions.reserve(enum_count(test_id_type()));
 
 	augs::for_each_enum_except_bounds([&](const test_scene_sound_id enum_id) {

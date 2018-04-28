@@ -5,6 +5,7 @@
 
 #include "augs/templates/sequence_utils.h"
 #include "augs/misc/trivially_copyable_tuple.h"
+#include "augs/templates/type_list.h"
 
 namespace templates_detail {
 	template <class F, class... Instances>
@@ -21,17 +22,6 @@ namespace templates_detail {
 			std::forward<Instances>(instances)...
 		);
 	}
-
-	template <class>
-	struct index_sequence_for_list;
-
-	template <template <class...> class List, class... Args>
-	struct index_sequence_for_list<List<Args...>> {
-		using type = std::index_sequence_for<Args...>;
-	};
-
-	template <class T>
-	using index_sequence_for_list_t = typename index_sequence_for_list<T>::type;
 }
 
 template <class List, class F>
@@ -42,7 +32,7 @@ void for_each_through_std_get(List&& t, F f) {
 		[f](auto num, auto&&... args) {
 			f(std::forward<decltype(args)>(args)...);
 		},
-		templates_detail::index_sequence_for_list_t<std::decay_t<List>>{},
+		std::make_index_sequence<num_types_in_list_v<List>>(),
 		std::forward<List>(t)
 	);
 }
@@ -55,7 +45,7 @@ void reverse_for_each_through_std_get(List&& t, F f) {
 		[f](auto num, auto&&... args) {
 			f(std::forward<decltype(args)>(args)...);
 		},
-		reverse_sequence_t<templates_detail::index_sequence_for_list_t<std::decay_t<List>>>{},
+		reverse_sequence_t<std::make_index_sequence<num_types_in_list_v<List>>>(),
 		std::forward<List>(t)
 	);
 }
