@@ -2,7 +2,7 @@
 #include "application/setups/editor/gui/editor_fae_gui.h"
 #include "application/setups/editor/editor_command_input.h"
 
-void editor_fae_gui::interrupt_tweakers() {
+void editor_fae_gui_base::interrupt_tweakers() {
 	property_editor_data.last_active.reset();
 	property_editor_data.old_description.clear();
 }
@@ -26,9 +26,7 @@ void editor_fae_gui::interrupt_tweakers() {
 #include "augs/readwrite/memory_stream.h"
 #include "augs/readwrite/byte_readwrite.h"
 
-template <class E>
-using make_flavour_to_entities_map = std::unordered_map<typed_entity_flavour_id<E>, std::vector<typed_entity_id<E>>>;
-using resolved_container_type = per_entity_type_container<make_flavour_to_entities_map>;
+using resolved_container_type = editor_selected_fae_gui::resolved_container_type;
 
 template <class C>
 void sort_flavours_by_name(const cosmos& cosm, C& ids) {
@@ -192,7 +190,7 @@ public:
 	}
 };
 
-fae_tree_input editor_fae_gui::make_fae_input(
+fae_tree_input editor_fae_gui_base::make_fae_input(
 	const editor_fae_gui_input in,
 	const bool show_filter_buttons
 ) {
@@ -211,9 +209,9 @@ fae_tree_input editor_fae_gui::make_fae_input(
 	};
 }
 
-fae_tree_filter editor_fae_gui::perform(
+fae_tree_filter editor_selected_fae_gui::perform(
 	const editor_fae_gui_input in,
-	const std::unordered_set<entity_id>& matches
+	const fae_selections_type& matches
 ) {
 	using namespace augs::imgui;
 
@@ -246,12 +244,11 @@ fae_tree_filter editor_fae_gui::perform(
 		return {};
 	}
 
-	thread_local resolved_container_type per_native_type;
 	per_native_type.clear();
 
 	for (const auto& e : matches) {
 		if (const auto handle = cosm[e]) {
-			handle.dispatch([](const auto typed_handle) {
+			handle.dispatch([this](const auto typed_handle) {
 				using E = entity_type_of<decltype(typed_handle)>;
 				per_native_type.get_for<E>()[typed_handle.get_flavour_id()].push_back(typed_handle.get_id());
 			});
@@ -315,6 +312,13 @@ fae_tree_filter editor_fae_gui::perform(
 #else
 fae_tree_filter editor_fae_gui::perform(
 	const editor_fae_gui_input in
+) {
+	return {};
+}
+
+fae_tree_filter editor_selected_fae_gui::perform(
+	const editor_fae_gui_input in,
+	const fae_selections_type& matches
 ) {
 	return {};
 }

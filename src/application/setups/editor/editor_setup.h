@@ -89,7 +89,7 @@ class editor_setup : private current_access_cache<editor_setup> {
 	// GEN INTROSPECTOR class editor_setup
 	editor_history_gui history_gui = std::string("History");
 	editor_fae_gui fae_gui = std::string("Scene hierarchy");
-	editor_fae_gui selected_fae_gui = std::string("Selected entities");
+	editor_selected_fae_gui selected_fae_gui = std::string("Selection hierarchy");
 	editor_common_state_gui common_state_gui = std::string("Common state");
 	editor_selection_groups_gui selection_groups_gui = std::string("Selection groups");
 	editor_summary_gui summary_gui = std::string("Summary");

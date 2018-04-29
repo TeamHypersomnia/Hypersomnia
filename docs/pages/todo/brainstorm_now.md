@@ -13,6 +13,7 @@ summary: That which we are brainstorming at the moment.
 	
 - Rethinking FAE tree gui
 	- By default, the "all" view for Entities should always have selected entities ticked.
+	- Should fae tree abstract away the tick behaviour?
 	- In case someone wants to edit only several entities from the selection, 
 	alt+s will have tickable boxes that are not related to the current selection state.
 		- Implementation
