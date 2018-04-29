@@ -55,7 +55,7 @@ FORCE_INLINE void specific_entity_drawer(
 		input.global_time_seconds = in.global_time_seconds;
 
 		if (const auto trace = typed_handle.template find<components::trace>()) {
-			const auto tracified_size = sprite.size * trace->last_size_mult;
+			const auto tracified_size = vec2(sprite.size) * trace->last_size_mult;
 
 			if (const auto center_offset = tracified_size * trace->last_center_offset_mult;
 				center_offset.non_zero()

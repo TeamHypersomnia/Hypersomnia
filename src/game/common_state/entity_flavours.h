@@ -7,7 +7,9 @@
 #include "augs/templates/folded_finders.h"
 #include "augs/templates/maybe_const.h"
 #include "augs/templates/traits/component_traits.h"
+
 #include "game/transcendental/entity_flavour_id.h"
+#include "game/transcendental/per_entity_type.h"
 
 #include "game/organization/all_component_includes.h"
 #include "game/organization/all_entity_types_declaration.h"
@@ -184,13 +186,4 @@ public:
 
 template <class E>
 using make_entity_flavours = entity_flavours<E>;
-
-using all_entity_flavours = 
-	replace_list_type_t<
-		transform_types_in_list_t<
-			all_entity_types,
-			make_entity_flavours
-		>,
-		std::tuple
-	>
-;
+using all_entity_flavours = per_entity_type<make_entity_flavours>;

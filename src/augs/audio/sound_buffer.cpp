@@ -148,8 +148,6 @@ namespace augs {
 		const auto& path = input.source_sound;
 		variations.emplace_back(path, input.settings);
 
-		LOG_NVPS(path);
-
 		const auto ext = augs::path_type(path).extension();
 		const auto without_ext = augs::path_type(path).replace_extension("").string();
 
