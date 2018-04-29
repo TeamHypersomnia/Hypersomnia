@@ -705,3 +705,47 @@ we consider whole type overrides too complex architeciturally:
 		- flavour browser does not view its entities
 	- we won't have separate windows, just a radio box at the bottom
 
+	
+- Rethinking FAE tree gui
+	- By default, the "all" view for Entities should always have selected entities ticked.
+	- Should fae tree abstract away the tick behaviour?
+	- In case someone wants to edit only several entities from the selection, 
+	alt+s will have tickable boxes that are not related to the current selection state.
+		- Implementation
+			- Four cases of usage
+			- All entities and ticks = selection
+			- All flavours plus some manipulation options, ticks = edit selection
+			- Selected entities and ticks = edit selection
+			- Selected flavours plus some manipulation options, ticks = edit selection
+			- All can be filtered
+			- Therefore little sense to make a special case for all entities?
+			- Common elements
+				- All are structured like Type->Flavours->(different things)
+				- But the checkboxes differ in meaning
+	- When to
+		- Disable type
+			- All (flavours)
+				- Zero flavours => Zero entities
+			- All (entities)
+				- Zero entities
+			- Selected (flavours)
+				- Never
+			- Selected (entities)
+				- Never
+		- Skip type
+			- All (flavours)
+				- Filtered out
+			- All (entities)
+				- Filtered out
+			- Selected (flavours)
+				- Filtered out
+				- Zero entities <=> Zero flavours
+			- Selected (entities)
+				- Filtered out
+				- Zero entities <=> Zero flavours
+		- Skip flavour
+		- Disable flavour
+- fix broken file combos
+	- they break when two are visible at the same time
+	- so something with ids
+

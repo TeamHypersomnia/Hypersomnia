@@ -29,7 +29,7 @@ void construct_post_inference(const handle_type h) {
 	}
 
 	if (const auto trace = h.template find<components::trace>()) {
-		auto rng = cosmos.get_fast_rng_for(h.get_id());
+		auto rng = cosmos.get_rng_for(h.get_id());
 		trace->reset(*h.template find<invariants::trace>(), rng);
 	}
 }

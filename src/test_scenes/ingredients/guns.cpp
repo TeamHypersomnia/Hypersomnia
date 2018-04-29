@@ -78,7 +78,7 @@ namespace test_flavours {
 		};
 	
 		{
-			auto& meta = get_test_flavour(flavours, test_plain_missiles::CYAN_ROUND_DEFINITION);
+			auto& meta = get_test_flavour(flavours, test_plain_missiles::CYAN_ROUND);
 
 			{
 				invariants::render render_def;
@@ -101,9 +101,9 @@ namespace test_flavours {
 				{
 					invariants::trace trace_def;
 
-					trace_def.max_multiplier_x = {0.0f, 1.2f};
-					trace_def.max_multiplier_y = {0.f, 0.f};
-					trace_def.lengthening_duration_ms = {200.f, 250.f};
+					trace_def.max_multiplier_x = {0.670f, 1.8f};
+					trace_def.max_multiplier_y = {0.f, 0.09f};
+					trace_def.lengthening_duration_ms = {36.f, 466.f};
 					trace_def.additional_multiplier = vec2(1.f, 1.f);
 					trace_def.finishing_trace_flavour = to_entity_flavour_id(test_finishing_traces::CYAN_ROUND_FINISHING_TRACE);
 
@@ -127,6 +127,61 @@ namespace test_flavours {
 
 			missile.trace_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_PROJECTILE_FLIGHT);
 			missile.destruction_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_DISCHARGE_EXPLOSION);
+
+			auto& trace_modifier = missile.trace_sound.modifier;
+
+			trace_modifier.max_distance = 1020.f;
+			trace_modifier.reference_distance = 100.f;
+			trace_modifier.gain = 1.3f;
+			trace_modifier.fade_on_exit = false;
+
+			meta.set(missile);
+		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_plain_missiles::ELECTRIC_MISSILE);
+
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::FLYING_BULLETS;
+
+				meta.set(render_def);
+			}
+
+
+			test_flavours::add_sprite(meta, logicals, test_scene_image_id::ELECTRIC_MISSILE, cyan);
+			add_shape_invariant_from_renderable(meta, logicals);
+			{
+				invariants::trace trace_def;
+
+				trace_def.max_multiplier_x = {2.0f, 0.f};
+				trace_def.max_multiplier_y = {0.f, 0.f};
+				trace_def.lengthening_duration_ms = {300.f, 350.f};
+				trace_def.additional_multiplier = vec2(1.f, 1.f);
+
+				trace_def.finishing_trace_flavour = to_entity_flavour_id(test_finishing_traces::ELECTRIC_MISSILE_FINISHING_TRACE);
+
+				meta.set(trace_def);
+			}
+
+			test_flavours::add_bullet_round_physics(meta);
+
+			invariants::missile missile;
+
+			missile.destruction_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION);
+			missile.destruction_particles.modifier.colorize = cyan;
+
+			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::WANDERING_PIXELS_DIRECTED);
+			missile.trace_particles.modifier.colorize = cyan;
+
+			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION);
+			missile.muzzle_leave_particles.modifier.colorize = cyan;
+
+			missile.trace_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_PROJECTILE_FLIGHT);
+			missile.destruction_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_DISCHARGE_EXPLOSION);
+
+			missile.homing_towards_hostile_strength = 1.0f;
+			missile.damage_amount = 42;
 
 			auto& trace_modifier = missile.trace_sound.modifier;
 
@@ -185,7 +240,7 @@ namespace test_flavours {
 				catridge.shell_trace_particles.modifier.colorize = cyan;
 
 				catridge.shell_flavour = to_entity_flavour_id(test_plain_sprited_bodys::CYAN_SHELL_DEFINITION);
-				catridge.round_flavour = to_entity_flavour_id(test_plain_missiles::CYAN_ROUND_DEFINITION);
+				catridge.round_flavour = to_entity_flavour_id(test_plain_missiles::CYAN_ROUND);
 
 				meta.set(catridge);
 			}
@@ -235,149 +290,26 @@ namespace test_flavours {
 			}
 
 			{
-				invariants::trace trace_def;
-
-				trace_def.max_multiplier_x = {0.0f, 1.2f};
-				trace_def.max_multiplier_y = {0.f, 0.f};
-				trace_def.lengthening_duration_ms = {200.f, 250.f};
-				trace_def.additional_multiplier = vec2(1.f, 1.f);
-
-				meta.set(trace_def);
+				meta.set(get_test_flavour(flavours, test_plain_missiles::CYAN_ROUND).get<invariants::trace>());
 			}
 		}
 
 		{
-			auto& meta = get_test_flavour(flavours, test_finishing_traces::ENERGY_BALL_FINISHING_TRACE);
+			auto& meta = get_test_flavour(flavours, test_finishing_traces::ELECTRIC_MISSILE_FINISHING_TRACE);
 
 			{
 				invariants::render render_def;
 				render_def.layer = render_layer::FLYING_BULLETS;
 
 				meta.set(render_def);
-				test_flavours::add_sprite(meta, logicals, test_scene_image_id::ENERGY_BALL, cyan);
+				test_flavours::add_sprite(meta, logicals, test_scene_image_id::ELECTRIC_MISSILE, cyan);
 			}
 
 			{
-				invariants::trace trace_def;
-
-				trace_def.max_multiplier_x = {0.0f, 0.f};
-				trace_def.max_multiplier_y = {0.f, 0.f};
-				trace_def.lengthening_duration_ms = {200.f, 250.f};
-				trace_def.additional_multiplier = vec2(1.f, 1.f);
-
-				meta.set(trace_def);
+				meta.set(get_test_flavour(flavours, test_plain_missiles::ELECTRIC_MISSILE).get<invariants::trace>());
 			}
 		}
 
-		{
-			auto& meta = get_test_flavour(flavours, test_plain_missiles::ELECTRIC_MISSILE);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::FLYING_BULLETS;
-
-				meta.set(render_def);
-			}
-
-
-			test_flavours::add_sprite(meta, logicals, test_scene_image_id::ENERGY_BALL, cyan);
-			add_shape_invariant_from_renderable(meta, logicals);
-			{
-				invariants::trace trace_def;
-
-				trace_def.max_multiplier_x = {2.0f, 0.f};
-				trace_def.max_multiplier_y = {0.f, 0.f};
-				trace_def.lengthening_duration_ms = {300.f, 350.f};
-				trace_def.additional_multiplier = vec2(1.f, 1.f);
-
-				trace_def.finishing_trace_flavour = to_entity_flavour_id(test_finishing_traces::ENERGY_BALL_FINISHING_TRACE);
-
-				meta.set(trace_def);
-			}
-
-			test_flavours::add_bullet_round_physics(meta);
-
-			invariants::missile missile;
-
-			missile.destruction_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION);
-			missile.destruction_particles.modifier.colorize = cyan;
-
-			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::WANDERING_PIXELS_DIRECTED);
-			missile.trace_particles.modifier.colorize = cyan;
-
-			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION);
-			missile.muzzle_leave_particles.modifier.colorize = cyan;
-
-			missile.trace_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_PROJECTILE_FLIGHT);
-			missile.destruction_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_DISCHARGE_EXPLOSION);
-
-			missile.homing_towards_hostile_strength = 1.0f;
-			missile.damage_amount = 42;
-
-			auto& trace_modifier = missile.trace_sound.modifier;
-
-			trace_modifier.max_distance = 1020.f;
-			trace_modifier.reference_distance = 100.f;
-			trace_modifier.gain = 1.3f;
-			trace_modifier.fade_on_exit = false;
-
-			meta.set(missile);
-		}
-
-		{
-			auto& meta = get_test_flavour(flavours, test_plain_missiles::AMPLIFIER_ARM_MISSILE);
-			
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::FLYING_BULLETS;
-
-				meta.set(render_def);
-			}
-
-
-			test_flavours::add_sprite(meta, logicals, test_scene_image_id::ENERGY_BALL, cyan);
-			add_shape_invariant_from_renderable(meta, logicals);
-			{
-				invariants::trace trace_def;
-
-				trace_def.max_multiplier_x = {0.0f, 0.f};
-				trace_def.max_multiplier_y = {0.f, 0.f};
-				trace_def.lengthening_duration_ms = {200.f, 250.f};
-				trace_def.additional_multiplier = vec2(1.f, 1.f);
-
-				trace_def.finishing_trace_flavour = to_entity_flavour_id(test_finishing_traces::ENERGY_BALL_FINISHING_TRACE);
-
-				meta.set(trace_def);
-			}
-
-			test_flavours::add_bullet_round_physics(meta);
-
-			invariants::missile missile;
-
-			missile.destruction_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION);
-			missile.destruction_particles.modifier.colorize = cyan;
-
-			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::WANDERING_PIXELS_DIRECTED);
-			missile.trace_particles.modifier.colorize = cyan;
-
-			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION);
-			missile.muzzle_leave_particles.modifier.colorize = cyan;
-
-			missile.trace_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_PROJECTILE_FLIGHT);
-			missile.destruction_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_DISCHARGE_EXPLOSION);
-
-			missile.homing_towards_hostile_strength = 1.0f;
-			missile.damage_amount = 42;
-
-			auto& trace_modifier = missile.trace_sound.modifier;
-
-			trace_modifier.max_distance = 1020.f;
-			trace_modifier.reference_distance = 100.f;
-			trace_modifier.gain = 1.3f;
-			trace_modifier.fade_on_exit = false;
-
-			meta.set(missile);
-		}
 
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_weapons::SAMPLE_RIFLE);
@@ -491,7 +423,7 @@ namespace test_flavours {
 			gun_def.damage_multiplier = 1.f;
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
-			gun_def.magic_missile_flavour = to_entity_flavour_id(test_plain_missiles::AMPLIFIER_ARM_MISSILE);
+			gun_def.magic_missile_flavour = to_entity_flavour_id(test_plain_missiles::ELECTRIC_MISSILE);
 
 			meta.set(gun_def);
 

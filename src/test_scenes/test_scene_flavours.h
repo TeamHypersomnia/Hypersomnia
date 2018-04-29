@@ -96,8 +96,7 @@ enum class test_throwable_explosives {
 
 enum class test_plain_missiles {
 	// GEN INTROSPECTOR enum class test_plain_missiles
-	CYAN_ROUND_DEFINITION,
-	AMPLIFIER_ARM_MISSILE,
+	CYAN_ROUND,
 	ELECTRIC_MISSILE,
 
 	COUNT
@@ -107,7 +106,7 @@ enum class test_plain_missiles {
 enum class test_finishing_traces {
 	// GEN INTROSPECTOR enum class test_finishing_traces
 	CYAN_ROUND_FINISHING_TRACE,
-	ENERGY_BALL_FINISHING_TRACE,
+	ELECTRIC_MISSILE_FINISHING_TRACE,
 
 	COUNT
 	// END GEN INTROSPECTOR

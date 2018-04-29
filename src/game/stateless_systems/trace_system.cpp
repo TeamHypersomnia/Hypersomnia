@@ -95,9 +95,10 @@ void trace_system::spawn_finishing_traces_for_deleted_entities(const logic_step 
 			const auto finishing_trace = cosmic::create_entity(
 				cosmos, 
 				trace_def.finishing_trace_flavour,
-				[](const auto){},
-				[&](const auto typed_handle){
+				[&](const auto typed_handle) {
 					typed_handle.set_logic_transform(transform_of_finishing);
+				},
+				[&](const auto typed_handle) {
 
 					{
 						auto& interp = typed_handle.template get<components::interpolation>();
@@ -106,6 +107,7 @@ void trace_system::spawn_finishing_traces_for_deleted_entities(const logic_step 
 
 					{
 						auto& copied_trace = typed_handle.template get<components::trace>();
+						copied_trace = *trace;
 						copied_trace.lengthening_time_passed_ms = 0.f;
 						copied_trace.chosen_lengthening_duration_ms /= 4;
 						copied_trace.is_it_a_finishing_trace = true;

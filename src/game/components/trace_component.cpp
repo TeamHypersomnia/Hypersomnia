@@ -5,7 +5,7 @@
 namespace components {
 	void trace::reset(
 		const invariants::trace& def,
-		fast_randomization& p
+		randomization& p
 	) {
 		lengthening_time_passed_ms = 0.f;
 		chosen_multiplier.set(p.randval(def.max_multiplier_x), p.randval(def.max_multiplier_y));

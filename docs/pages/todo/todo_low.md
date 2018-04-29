@@ -67,8 +67,6 @@ permalink: todo_low
 	- maybe traces should be audiovisual?
 	- fix the feel of traces (maybe shrink them only horizontally?)
 		- **only do this after we have editor**, obviously
-	- fix interpolation issue or just customize it when editor is ready
-		- should really be done once we have that facility in editor because debugging will be a LOT easier when we have the internals to tweak and inspect
 	- should be fast enough
 	- otherwise make it a super quick cache?
 	- chosen_lengthening_duration_ms should be randomized statelessly with help of guid

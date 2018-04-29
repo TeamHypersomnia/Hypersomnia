@@ -6,7 +6,7 @@
 #include "game/transcendental/entity_flavour_id.h"
 #include "game/organization/all_entity_types.h"
 
-struct fast_randomization;
+struct randomization;
 
 namespace invariants {
 	struct trace;
@@ -28,7 +28,7 @@ namespace components {
 
 		void reset(
 			const invariants::trace&,
-			fast_randomization& p
+			randomization& p
 		);
 	};
 }
