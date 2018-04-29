@@ -262,7 +262,7 @@ namespace augs {
 		border_input in
 	) const {
 		augs::general_border(
-			bordered,
+			bordered.round_fract(),
 			in.get_total_expansion(),
 			in.width,
 			[this, tex, color](const ltrb line) {
