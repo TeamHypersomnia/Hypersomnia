@@ -149,14 +149,14 @@ auto fae_tree(
 					const auto id = scoped_id(this_type_id.get_index());
 
 					if (ImGui::Button("Ex")) {
-						filter.close_type_id = this_type_id;
+						filter.deselect_type_id = this_type_id;
 					}
 
 					if (total_types > 1) {
 						ImGui::SameLine();
 
 						if (ImGui::Button("On")) {
-							filter.only_type_id = this_type_id;
+							filter.select_only_type_id = this_type_id;
 						}
 					}
 
@@ -228,14 +228,14 @@ auto fae_tree(
 								const auto on_label = "On##" + imgui_id;
 
 								if (ImGui::Button(ex_label.c_str())) {
-									filter.close_flavour_id = flavour_id;
+									filter.deselect_flavour_id = flavour_id;
 								}
 
 								ImGui::SameLine();
 
 								if (!(total_flavours == 1 && total_types == 1)) {
 									if (ImGui::Button(on_label.c_str())) {
-										filter.only_flavour_id = flavour_id;
+										filter.select_only_flavour_id = flavour_id;
 									}
 
 									ImGui::SameLine();

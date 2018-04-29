@@ -13,7 +13,19 @@ summary: That which we are brainstorming at the moment.
 	
 - Rethinking FAE tree gui
 	- By default, the "all" view for Entities should always have selected entities ticked.
-	- In case someone wants to edit only several entities from the selection, alt+s will have tickable boxes that are not related to the current selection state.
+	- In case someone wants to edit only several entities from the selection, 
+	alt+s will have tickable boxes that are not related to the current selection state.
+		- Implementation
+			- Four cases of usage
+			- All entities and ticks = selection
+			- All flavours plus some manipulation options, ticks = edit selection
+			- Selected entities and ticks = edit selection
+			- Selected flavours plus some manipulation options, ticks = edit selection
+			- All can be filtered
+			- Therefore little sense to make a special case for all entities?
+			- Common elements
+				- All are structured like Type->Flavours->(different things)
+				- But the checkboxes differ in meaning
 
 - animation metadata could have some very general structs like "character metrics"
 	- vec2i: hands position[2]

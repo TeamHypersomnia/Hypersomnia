@@ -3,7 +3,7 @@
 #include "application/setups/editor/property_editor/fae_tree_structs.h"
 
 bool fae_tree_filter::any() const {
-	return close_type_id || close_flavour_id || only_type_id || only_flavour_id;
+	return deselect_type_id || deselect_flavour_id || select_only_type_id || select_only_flavour_id;
 }
 
 void fae_tree_filter::perform(
@@ -17,20 +17,20 @@ void fae_tree_filter::perform(
 	erase_if(
 		selections,
 		[&](const entity_id id) {
-			if (close_type_id) {
-				return id.type_id == *close_type_id;
+			if (deselect_type_id) {
+				return id.type_id == *deselect_type_id;
 			}
 
-			if (close_flavour_id) {
-				return cosm[id].get_flavour_id() == *close_flavour_id;
+			if (deselect_flavour_id) {
+				return cosm[id].get_flavour_id() == *deselect_flavour_id;
 			}
 
-			if (only_type_id) {
-				return id.type_id != *only_type_id;
+			if (select_only_type_id) {
+				return id.type_id != *select_only_type_id;
 			}
 
-			if (only_flavour_id) {
-				return cosm[id].get_flavour_id() != *only_flavour_id;
+			if (select_only_flavour_id) {
+				return cosm[id].get_flavour_id() != *select_only_flavour_id;
 			}
 
 			return true;
