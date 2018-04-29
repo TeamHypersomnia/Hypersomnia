@@ -16,7 +16,7 @@
 #include "application/intercosm.h"
 
 #include "application/setups/editor/detail/format_struct_name.h"
-#include "application/setups/editor/property_editor/asset_control_provider.h"
+#include "application/setups/editor/property_editor/assets/asset_path_chooser.h"
 #include "application/setups/editor/property_editor/general_edit_properties.h"
 #include "application/setups/editor/detail/find_locations_that_use.h"
 #include "application/setups/editor/detail/checkbox_selection.h"
@@ -72,13 +72,16 @@ struct path_control_provider {
 
 	template <class T>
 	std::optional<tweaker_type> handle(const std::string& identity_label, T& object) const {
-		auto& definitions = get_viewable_pool<typename T::id_type>(defs);
+		using id_type = typename T::id_type;
+		auto& definitions = get_viewable_pool<id_type>(defs);
 
 		bool modified = false;
 
 		auto scope = ::maybe_disabled_cols(settings, disabled);
 
-		choose_asset_path(
+		thread_local asset_path_chooser<id_type> chooser;
+
+		chooser.perform(
 			identity_label,
 			object,
 			project_path,

@@ -7,7 +7,7 @@
 #include "application/setups/editor/property_editor/general_edit_properties.h"
 #include "application/setups/editor/property_editor/property_editor_structs.h"
 
-#include "application/setups/editor/property_editor/asset_control_provider.h"
+#include "application/setups/editor/property_editor/assets/asset_control_provider.h"
 #include "application/setups/editor/property_editor/update_size_if_tex_changed.h"
 
 #include "application/setups/editor/detail/format_struct_name.h"
