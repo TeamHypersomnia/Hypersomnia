@@ -20,7 +20,7 @@ void thunder_system::clear() {
 }
 
 void thunder_system::thunder::create_root_branch() {
-	thread_local fast_randomization rng;
+	thread_local randomization rng;
 
 	thunder::branch b;
 	b.current_lifetime_ms = 0.f;
@@ -54,7 +54,7 @@ void thunder_system::advance(
 	const augs::delta dt,
 	particles_simulation_system& particles_output_for_effects
 ) {
-	thread_local fast_randomization rng;
+	thread_local randomization rng;
 
 	for (thunder& t : thunders) {
 		t.until_next_branching_ms -= dt.in_milliseconds();

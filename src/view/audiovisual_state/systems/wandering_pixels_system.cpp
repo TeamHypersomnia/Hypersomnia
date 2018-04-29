@@ -50,9 +50,12 @@ void wandering_pixels_system::advance_for(
 	const auto dt_secs = dt.in_seconds();
 	const auto dt_ms = dt.in_milliseconds();
 
+	thread_local randomization rng;
+
 	handle.dispatch_on_having<invariants::wandering_pixels>([&](const auto it) {
 		const auto& cosmos = it.get_cosmos();
 		auto& cache = get_cache(it);
+		auto& used_rng = rng;
 
 		const auto& wandering = it.template get<components::wandering_pixels>();
 		const auto& wandering_def = it.template get<invariants::wandering_pixels>();
@@ -66,15 +69,13 @@ void wandering_pixels_system::advance_for(
 
 		if (cache.recorded_component.get_reach() != new_reach) {
 			/* refresh_cache */ 
-			cache.rng = { cosmos.get_rng_seed_for(it) };
-
 			for (auto& p : cache.particles) {
 				p.pos.set(
-					new_reach.x + cache.rng.randval(0u, static_cast<unsigned>(new_reach.w)), 
-					new_reach.y + cache.rng.randval(0u, static_cast<unsigned>(new_reach.h))
+					new_reach.x + rng.randval(0u, static_cast<unsigned>(new_reach.w)), 
+					new_reach.y + rng.randval(0u, static_cast<unsigned>(new_reach.h))
 				);
 
-				p.current_lifetime_ms = cache.rng.randval(0.f, wandering_def.frame_duration_ms);
+				p.current_lifetime_ms = rng.randval(0.f, wandering_def.frame_duration_ms);
 			}
 
 			cache.recorded_component.set_reach(new_reach);
@@ -87,7 +88,7 @@ void wandering_pixels_system::advance_for(
 			p.current_lifetime_ms += dt_ms + dt_ms * (p.direction_ms_left / max_direction_time) + dt_ms * p.current_direction.radians();
 
 			if (p.direction_ms_left <= 0.f) {
-				p.direction_ms_left = static_cast<float>(cache.rng.randval(max_direction_time, max_direction_time + 800u));
+				p.direction_ms_left = static_cast<float>(rng.randval(max_direction_time, max_direction_time + 800u));
 
 				p.current_direction = p.current_direction.perpendicular_cw();
 
@@ -96,7 +97,7 @@ void wandering_pixels_system::advance_for(
 
 				float chance_to_flip = 0.f;
 
-				p.current_velocity = static_cast<float>(cache.rng.randval(3, 3 + 35));
+				p.current_velocity = static_cast<float>(rng.randval(3, 3 + 35));
 
 				if (dir.x > 0) {
 					chance_to_flip = (p.pos.x - reach.x) / reach.w;
@@ -119,7 +120,7 @@ void wandering_pixels_system::advance_for(
 					chance_to_flip = 1;
 				}
 
-				if (cache.rng.randval(0u, 100u) <= chance_to_flip * 100.f) {
+				if (rng.randval(0u, 100u) <= chance_to_flip * 100.f) {
 					p.current_direction = -p.current_direction;
 				}
 			}

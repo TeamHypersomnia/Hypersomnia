@@ -32,7 +32,6 @@ public:
 
 	struct cache {
 		components::wandering_pixels recorded_component;
-		fast_randomization rng;
 
 		std::vector<particle> particles;
 		bool constructed = false;
