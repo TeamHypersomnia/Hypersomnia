@@ -29,7 +29,7 @@ void editor_fae_gui_base::do_view_mode_switch() {
 #include "application/intercosm.h"
 #include "application/setups/editor/editor_folder.h"
 
-#include "application/setups/editor/property_editor/fae_tree.h"
+#include "application/setups/editor/property_editor/fae/fae_tree.h"
 #include "application/setups/editor/property_editor/commanding_property_editor_input.h"
 
 #include "augs/readwrite/memory_stream.h"

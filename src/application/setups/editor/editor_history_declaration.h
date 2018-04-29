@@ -43,5 +43,4 @@ using editor_history_base = augs::history_with_marks<
 	create_asset_id_command<assets::sound_id>,
 	forget_asset_id_command<assets::sound_id>,
 	change_asset_property_command<assets::sound_id>
-	/* forget_image_path_command */
 >;

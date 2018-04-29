@@ -1,5 +1,6 @@
 #pragma once
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
+#include "augs/misc/imgui/simple_browse_path_tree.h"
 #include "augs/templates/identity_templates.h"
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
@@ -8,7 +9,6 @@
 #include "augs/misc/imgui/path_tree_structs.h"
 #include "application/setups/editor/property_editor/browsed_path_entry_base.h"
 #include "application/setups/editor/gui/asset_browser_settings.h"
-#include "application/setups/editor/property_editor/simple_browse_path_tree.h"
 #include "application/setups/editor/property_editor/tweaker_type.h"
 
 template <class I, class F, class A>

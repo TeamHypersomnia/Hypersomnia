@@ -4,11 +4,11 @@
 #include "game/organization/for_each_entity_type.h"
 
 #include "application/setups/editor/property_editor/property_editor_structs.h"
-#include "application/setups/editor/property_editor/flavour_properties_editor.h"
-#include "application/setups/editor/property_editor/entity_properties_editor.h"
+#include "application/setups/editor/property_editor/fae/flavour_properties_editor.h"
+#include "application/setups/editor/property_editor/fae/entity_properties_editor.h"
 
 #include "application/setups/editor/detail/checkbox_selection.h"
-#include "application/setups/editor/property_editor/fae_tree_structs.h"
+#include "application/setups/editor/property_editor/fae/fae_tree_structs.h"
 
 /*
 	"fae tree" is a shorthand for "flavours and entities tree".
@@ -157,20 +157,23 @@ auto tree_of_flavours(
 				const auto entity_type_label = format_field_name(get_type_name<E>());
 
 				const auto total_flavours = provider.template num_flavours_of_type<E>();
-				auto disabled = ::maybe_disabled_cols(settings, total_flavours == 0);
 
-				const auto flags = do_tick_all_checkbox(
-					settings,
-					ticked_flavours,
-					[&provider](auto callback) {
-						provider.template for_each_flavour<E>(
-							[&callback](const flavour_id_type flavour_id, const flavour_type& flavour) {
-								callback(flavour_id);
-							}
-						);
-					},
-					entity_type_label
-				);
+				const auto flags = [&]() {
+					auto disabled = ::maybe_disabled_cols(settings, total_flavours == 0);
+
+					return do_tick_all_checkbox(
+						settings,
+						ticked_flavours,
+						[&provider](auto callback) {
+							provider.template for_each_flavour<E>(
+								[&callback](const flavour_id_type flavour_id, const flavour_type& flavour) {
+									callback(flavour_id);
+								}
+							);
+						},
+						entity_type_label
+					);
+				}();
 
 				auto node = scoped_tree_node_ex(entity_type_label, flags);
 

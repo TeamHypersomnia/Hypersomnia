@@ -1,6 +1,6 @@
 #include "game/transcendental/cosmos.h"
 
-#include "application/setups/editor/property_editor/fae_tree_structs.h"
+#include "application/setups/editor/property_editor/fae/fae_tree_structs.h"
 
 bool fae_tree_filter::any() const {
 	return deselect_type_id || deselect_flavour_id || select_only_type_id || select_only_flavour_id;

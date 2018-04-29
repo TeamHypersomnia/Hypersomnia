@@ -336,7 +336,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/application/setups/editor/commands/delete_entities_command.cpp"
 	"src/application/setups/editor/commands/move_entities_command.cpp"
 	"src/application/setups/editor/gui/editor_entity_selector.cpp"
-	"src/application/setups/editor/property_editor/fae_tree_structs.cpp"
+	"src/application/setups/editor/property_editor/fae/fae_tree_structs.cpp"
 	"src/application/setups/editor/commands/paste_entities_command.cpp"
 	"src/application/setups/editor/commands/duplicate_entities_command.cpp"
 	"src/application/setups/editor/commands/change_grouping_command.cpp"
