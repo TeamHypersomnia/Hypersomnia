@@ -55,6 +55,68 @@ auto detail_get_total_types(F& provider) {
 	return result;
 }
 
+template <class E>
+void ex_on_buttons(
+	const fae_tree_input fae_in,
+	const std::size_t total_types,
+	fae_tree_filter& filter
+) {
+	using namespace augs::imgui;
+
+	if (fae_in.show_filter_buttons) {
+		const auto scoped_style = scoped_style_var(ImGuiStyleVar_FramePadding, ImVec2(1, 1));
+		const auto this_type_id = entity_type_id::of<E>();
+
+		const auto id = scoped_id(this_type_id.get_index());
+
+		if (ImGui::Button("Ex")) {
+			filter.deselect_type_id = this_type_id;
+		}
+
+		if (total_types > 1) {
+			ImGui::SameLine();
+
+			if (ImGui::Button("On")) {
+				filter.select_only_type_id = this_type_id;
+			}
+		}
+
+		ImGui::SameLine();
+	}
+}
+
+inline void ex_on_buttons(
+	const fae_tree_input fae_in,
+	const entity_flavour_id flavour_id,
+	const std::size_t total_types,
+	const std::size_t total_flavours,
+	const std::string& imgui_id,
+	fae_tree_filter& filter
+) {
+	using namespace augs::imgui;
+
+	if (fae_in.show_filter_buttons) {
+		const auto scoped_style = scoped_style_var(ImGuiStyleVar_FramePadding, ImVec2(1, 1));
+
+		const auto ex_label = "Ex##" + imgui_id;
+		const auto on_label = "On##" + imgui_id;
+
+		if (ImGui::Button(ex_label.c_str())) {
+			filter.deselect_flavour_id = flavour_id;
+		}
+
+		ImGui::SameLine();
+
+		if (!(total_flavours == 1 && total_types == 1)) {
+			if (ImGui::Button(on_label.c_str())) {
+				filter.select_only_flavour_id = flavour_id;
+			}
+
+			ImGui::SameLine();
+		}
+	}
+}
+
 template <class F, class T>
 auto tree_of_flavours(
 	const fae_tree_input fae_in,
@@ -94,6 +156,9 @@ auto tree_of_flavours(
 
 				const auto entity_type_label = format_field_name(get_type_name<E>());
 
+				const auto total_flavours = provider.template num_flavours_of_type<E>();
+				auto disabled = ::maybe_disabled_cols(settings, total_flavours == 0);
+
 				const auto flags = do_tick_all_checkbox(
 					settings,
 					ticked_flavours,
@@ -107,12 +172,16 @@ auto tree_of_flavours(
 					entity_type_label
 				);
 
-				const auto total_flavours = provider.template num_flavours_of_type<E>();
-				auto disabled = ::maybe_disabled_cols(settings, total_flavours == 0);
-
 				auto node = scoped_tree_node_ex(entity_type_label, flags);
 
 				ImGui::NextColumn();
+
+				ex_on_buttons<E>(
+					fae_in,
+					total_types,
+					filter
+				);
+
 				text_disabled(typesafe_sprintf("%x Flavours", total_flavours));
 				ImGui::NextColumn();
 				
@@ -137,6 +206,16 @@ auto tree_of_flavours(
 							const auto flavour_node = scoped_tree_node_ex(node_label, flags);
 
 							ImGui::NextColumn();
+
+							ex_on_buttons(
+								fae_in,
+								flavour_id,
+								total_types,
+								total_flavours,
+								imgui_id,
+								filter
+							);
+
 							ImGui::NextColumn();
 
 							if (flavour_node) {
@@ -201,6 +280,9 @@ auto tree_of_entities(
 
 				const auto entity_type_label = format_field_name(get_type_name<E>());
 
+				const auto total_entities = provider.template num_entities_of_type<E>();
+				auto disabled = ::maybe_disabled_cols(settings, total_entities == 0);
+
 				const auto flags = do_tick_all_checkbox(
 					settings,
 					ticked_entities,
@@ -218,12 +300,16 @@ auto tree_of_entities(
 					entity_type_label
 				);
 
-				const auto total_entities = provider.template num_entities_of_type<E>();
-				auto disabled = ::maybe_disabled_cols(settings, total_entities == 0);
-
 				auto node = scoped_tree_node_ex(entity_type_label, flags);
 
 				ImGui::NextColumn();
+
+				ex_on_buttons<E>(
+					fae_in,
+					total_types,
+					filter
+				);
+
 				text_disabled(typesafe_sprintf("%x Entities", total_entities));
 				ImGui::NextColumn();
 
@@ -256,6 +342,16 @@ auto tree_of_entities(
 							const auto num_entities_label = typesafe_sprintf("%x Entities", all_having_flavour.size());
 
 							ImGui::NextColumn();
+
+							ex_on_buttons(
+								fae_in,
+								flavour_id,
+								total_types,
+								provider.template num_flavours_of_type<E>(),
+								imgui_id,
+								filter
+							);
+
 							text_disabled(num_entities_label);
 							ImGui::NextColumn();
 
