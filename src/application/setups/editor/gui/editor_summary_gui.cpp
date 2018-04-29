@@ -49,9 +49,9 @@ void editor_summary_gui::perform(editor_setup& setup) {
 			}
 		};
 
-		const auto& s = cosm.get_solvable();
+		const auto& s = cosm.get_solvable().significant;
 
-		s.for_each_pool([&](const auto& p){
+		s.for_each_entity_pool([&](const auto& p){
 			using T = entity_type_of<typename remove_cref<decltype(p)>::mapped_type>;
 
 			const auto si = p.size();

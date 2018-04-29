@@ -236,8 +236,6 @@ class specific_entity_handle :
 
 	using const_handle_type = specific_entity_handle<true, entity_type, identifier_provider>;
 
-	using subject_pool_type = make_entity_pool<entity_type>;
-
 	using subject_type = entity_solvable<entity_type>;
 
 	using owner_reference = maybe_const_ref_t<is_const, cosmos>;
@@ -294,7 +292,7 @@ public:
 	};
 
 	const auto& get_pool() const {
-		return std::get<subject_pool_type>(get_cosmos().get_solvable().significant.entity_pools);
+		return get_cosmos().get_solvable().significant.template get_pool<entity_type>();
 	}
 
 	template <class T>

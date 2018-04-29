@@ -80,9 +80,8 @@ class cosmos_solvable {
 		using meta_ptr = maybe_const_ptr_t<std::is_const_v<C>, entity_solvable_meta>;
 
 		if (id.type_id.is_set()) {
-			return get_by_dynamic_index(
-				self.significant.entity_pools,
-				id.type_id.get_index(),
+			return self.significant.entity_pools.visit(
+				id.type_id,
 				[&](auto& pool) -> decltype(auto) {	
 					return callback(static_cast<meta_ptr>(pool.find(id.basic())));
 				}
@@ -95,7 +94,7 @@ class cosmos_solvable {
 
 	template <class... Constraints, class S, class F>
 	static void for_each_entity_impl(S& self, F callback) {
-		self.for_each_pool(
+		self.significant.for_each_entity_pool(
 			[&](auto& p) {
 				using P = decltype(p);
 				using pool_type = remove_cref<P>;
@@ -207,22 +206,6 @@ public:
 
 	augs::delta get_fixed_delta() const;
 	unsigned get_steps_per_second() const;
-
-	template <class F>
-	void for_each_pool(F&& callback) {
-		for_each_through_std_get(
-			significant.entity_pools,
-			std::forward<F>(callback)
-		);
-	}
-
-	template <class F>
-	void for_each_pool(F&& callback) const {
-		for_each_through_std_get(
-			significant.entity_pools,
-			std::forward<F>(callback)
-		);
-	}
 
 	template <class... Constraints, class F>
 	void for_each_entity(F&& callback) {

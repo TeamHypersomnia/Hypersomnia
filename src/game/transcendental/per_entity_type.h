@@ -84,6 +84,13 @@ public:
 		});
 	};
 
+	template <class... Args>
+	void reserve(Args&&... args) {
+		for_each_through_std_get(all, [&](auto& v) {
+			v.reserve(std::forward<Args>(args)...);
+		});
+	};
+
 	template <class T>
 	auto& get() {
 		return std::get<T>(all);
@@ -132,6 +139,16 @@ public:
 	template <class F>
 	void for_each_reverse(F&& callback) const {
 		for_each_reverse_impl(*this, std::forward<F>(callback));
+	}
+
+	template <class F>
+	decltype(auto) visit(const entity_type_id id, F&& callback) {
+		return get_by_dynamic_index(all, id.get_index(), std::forward<F>(callback));
+	}
+
+	template <class F>
+	decltype(auto) visit(const entity_type_id id, F&& callback) const {
+		return get_by_dynamic_index(all, id.get_index(), std::forward<F>(callback));
 	}
 };
 

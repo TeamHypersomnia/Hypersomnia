@@ -6,7 +6,7 @@
 
 #include "game/transcendental/entity_id.h"
 #include "game/organization/all_components_declaration.h"
-#include "game/transcendental/entity_type_templates.h"
+#include "game/transcendental/per_entity_type.h"
 #include "game/transcendental/entity_handle_declaration.h"
 
 #include "application/setups/editor/commands/editor_command_structs.h"

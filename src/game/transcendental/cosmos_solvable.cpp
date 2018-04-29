@@ -7,19 +7,13 @@ const cosmos_solvable cosmos_solvable::zero;
 
 void cosmos_solvable::clear() {
 	destroy_all_caches();
-
-	for_each_pool([](auto& p){
-		p.clear();
-	});
-
+	significant.entity_pools.clear();
 	guid_to_id.clear();
 	significant.clock = {};
 }
 
 std::size_t cosmos_solvable::get_entities_count() const {
-	std::size_t total = 0u;
-
-	for_each_pool([&total](const auto& p) { total += p.size(); } );
+	std::size_t total = significant.entity_pools.size();
 	ensure_eq(guid_to_id.size(), total);
 	return total;
 }
@@ -43,10 +37,7 @@ static auto make_reserver(const std::size_t n) {
 }
 
 void cosmos_solvable::reserve_storage_for_entities(const cosmic_pool_size_type n) {
-	for_each_pool([n](auto& p){
-		p.reserve(n);
-	});
-
+	significant.entity_pools.reserve(n);
 	augs::introspect(make_reserver(n), inferred);
 }
 

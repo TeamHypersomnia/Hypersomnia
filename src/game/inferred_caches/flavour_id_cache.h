@@ -2,7 +2,7 @@
 #include <unordered_set>
 #include <unordered_map>
 
-#include "game/transcendental/entity_type_templates.h"
+#include "game/transcendental/per_entity_type.h"
 
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"

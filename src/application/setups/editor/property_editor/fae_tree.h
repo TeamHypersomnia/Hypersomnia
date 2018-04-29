@@ -75,7 +75,7 @@ auto fae_tree(
 		ImGui::Columns(2);
 		ImGui::Separator();
 
-		cosm.get_solvable().for_each_pool(
+		cosm.get_solvable().significant.for_each_entity_pool(
 			[&](const auto& p){
 				using P = decltype(p);
 				using pool_type = remove_cref<P>;

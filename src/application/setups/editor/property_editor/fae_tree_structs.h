@@ -5,7 +5,7 @@
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_flavour_id.h"
 #include "application/setups/editor/property_editor/commanding_property_editor_input.h"
-#include "game/transcendental/entity_type_templates.h"
+#include "game/transcendental/per_entity_type.h"
 
 enum class fae_view_type {
 	// GEN INTROSPECTOR enum class fae_view_type
