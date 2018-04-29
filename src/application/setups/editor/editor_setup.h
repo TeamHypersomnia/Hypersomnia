@@ -320,7 +320,6 @@ public:
 	grouped_selector_op_input make_grouped_selector_op_input() const;
 
 	editor_fae_gui_input make_fae_gui_input(
-		const std::unordered_set<entity_id>*,
 		const loaded_image_caches_map& image_caches
 	);
 

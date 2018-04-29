@@ -414,7 +414,7 @@ void editor_setup::perform_custom_imgui(
 		common_state_gui.perform(settings, make_command_input());
 
 		{
-			const auto filters = fae_gui.perform(make_fae_gui_input(nullptr, image_caches));
+			const auto filters = fae_gui.perform(make_fae_gui_input(image_caches));
 			const auto& cosm = work().world;
 			filters.perform(cosm, view().selected_entities);
 		}
@@ -445,8 +445,8 @@ void editor_setup::perform_custom_imgui(
 		}();
 
 		{
-			const auto in = make_fae_gui_input(std::addressof(all_selected), image_caches);
-			const auto filters = selected_fae_gui.perform(in);
+			const auto in = make_fae_gui_input(image_caches);
+			const auto filters = selected_fae_gui.perform(in, all_selected);
 
 			const auto& cosm = work().world;
 			filters.perform(cosm, view().selected_entities);
@@ -808,11 +808,8 @@ grouped_selector_op_input editor_setup::make_grouped_selector_op_input() const {
 	return { view().selected_entities, view().selection_groups, view().ignore_groups };
 }
 
-editor_fae_gui_input editor_setup::make_fae_gui_input(
-	const std::unordered_set<entity_id>* selections,
-	const loaded_image_caches_map& image_caches
-) {
-	return { settings.property_editor, selections, make_command_input(), image_caches };
+editor_fae_gui_input editor_setup::make_fae_gui_input(const loaded_image_caches_map& image_caches) {
+	return { settings.property_editor, make_command_input(), image_caches };
 }
 
 entity_mover_input editor_setup::make_mover_input() {

@@ -192,6 +192,95 @@ public:
 	}
 };
 
+fae_tree_input editor_fae_gui::make_fae_input(
+	const editor_fae_gui_input in,
+	const bool show_filter_buttons
+) {
+	const auto prop_in = property_editor_input { 
+		in.settings,
+		property_editor_data 
+	};
+
+	const auto command_in = in.command_in;
+	const auto cpe_in = commanding_property_editor_input {
+		prop_in, command_in
+	};
+
+	return fae_tree_input { 
+		fae_tree_data, cpe_in, show_filter_buttons, in.image_caches
+	};
+}
+
+fae_tree_filter editor_fae_gui::perform(
+	const editor_fae_gui_input in,
+	const std::unordered_set<entity_id>& matches
+) {
+	using namespace augs::imgui;
+
+	auto entities = make_scoped_window();
+
+	if (!entities) {
+		return {};
+	}
+
+	fae_tree_data.hovered_guid.unset();
+
+	const auto& cosm = in.command_in.get_cosmos();
+
+	const auto fae_in = make_fae_input(in, true);
+
+	if (matches.empty()) {
+		return {};
+	}
+	else if (matches.size() == 1) {
+		const auto id = *matches.begin();
+
+		if (const auto handle = cosm[id]) {
+			handle.dispatch([&](const auto typed_handle) {
+				do_edit_flavours_gui(fae_in, typed_handle.get_flavour(), { typed_handle.get_flavour_id() });
+				ImGui::Separator();
+				do_edit_entities_gui(fae_in, typed_handle, { typed_handle.get_id() });
+			});
+		}
+
+		return {};
+	}
+
+	thread_local resolved_container_type per_native_type;
+	per_native_type.clear();
+
+	for (const auto& e : matches) {
+		if (const auto handle = cosm[e]) {
+			handle.dispatch([](const auto typed_handle) {
+				using E = entity_type_of<decltype(typed_handle)>;
+				per_native_type.get_for<E>()[typed_handle.get_flavour_id()].push_back(typed_handle.get_id());
+			});
+		}
+	}
+
+	const auto provider = in_selection_provider { cosm, per_native_type };
+
+	erase_if(fae_tree_data.ticked_entities, [&](const auto& id) {
+		return !found_in(matches, entity_id(id));
+	});
+
+	for_each_entity_type([&](auto e) {
+		using E = decltype(e);
+		erase_if(
+			fae_tree_data.ticked_flavours.get_for<E>(),
+			[&](const auto& id) {
+				return !found_in(provider.get_all_flavour_ids<E>(), id);
+			}
+		);
+	});
+
+
+	return fae_tree(
+		fae_in,
+		provider
+	);
+}
+
 fae_tree_filter editor_fae_gui::perform(
 	const editor_fae_gui_input in
 ) {
@@ -205,79 +294,9 @@ fae_tree_filter editor_fae_gui::perform(
 
 	fae_tree_data.hovered_guid.unset();
 
-	const bool show_filter_buttons = in.only_match_entities != nullptr;
+	const auto fae_in = make_fae_input(in, false);
 
-	const auto prop_in = property_editor_input { 
-		in.settings,
-		property_editor_data 
-	};
-
-	const auto command_in = in.command_in;
-
-	const auto cpe_in = commanding_property_editor_input {
-		prop_in, command_in
-	};
-
-	const auto fae_in = fae_tree_input { 
-		fae_tree_data, cpe_in, show_filter_buttons, in.image_caches
-	};
-
-	const auto& cosm = command_in.get_cosmos();
-
-	if (in.only_match_entities != nullptr) {
-		const auto& matches = *in.only_match_entities;
-		const auto num_matches = matches.size();
-
-		thread_local resolved_container_type per_native_type;
-		per_native_type.clear();
-
-		for (const auto& e : matches) {
-			if (const auto handle = cosm[e]) {
-				handle.dispatch([](const auto typed_handle) {
-					using E = entity_type_of<decltype(typed_handle)>;
-					per_native_type.get_for<E>()[typed_handle.get_flavour_id()].push_back(typed_handle.get_id());
-				});
-			}
-		}
-
-		const auto provider = in_selection_provider { cosm, per_native_type };
-
-		erase_if(fae_tree_data.ticked_entities, [&](const auto& id) {
-			return !found_in(*in.only_match_entities, entity_id(id));
-		});
-
-		for_each_entity_type([&](auto e) {
-			using E = decltype(e);
-			erase_if(
-				fae_tree_data.ticked_flavours.get_for<E>(),
-				[&](const auto& id) {
-					return !found_in(provider.get_all_flavour_ids<E>(), id);
-				}
-			);
-		});
-
-		if (num_matches == 0) {
-			return {};
-		}
-		else if (num_matches == 1) {
-			const auto id = *matches.begin();
-
-			if (const auto handle = cosm[id]) {
-				handle.dispatch([&](const auto typed_handle) {
-					do_edit_flavours_gui(fae_in, typed_handle.get_flavour(), { typed_handle.get_flavour_id() });
-					ImGui::Separator();
-					do_edit_entities_gui(fae_in, typed_handle, { typed_handle.get_id() });
-				});
-			}
-
-			return {};
-		}
-
-		return fae_tree(
-			fae_in,
-			provider
-		);
-	}
+	const auto& cosm = in.command_in.get_cosmos();
 
 	erase_if(fae_tree_data.ticked_entities, [&](const auto& id) {
 		return cosm[id].dead();
