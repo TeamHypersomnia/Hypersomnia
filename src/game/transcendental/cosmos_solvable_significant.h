@@ -4,7 +4,7 @@
 
 #include "augs/templates/get_by_dynamic_id.h"
 
-#include "game/transcendental/pool_types.h"
+#include "game/transcendental/entity_pools.h"
 #include "game/transcendental/cosmos_clock.h"
 #include "game/transcendental/entity_solvable.h"
 

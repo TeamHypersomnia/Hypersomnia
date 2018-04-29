@@ -5,6 +5,16 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- particles and flavours
+	- std::unordered_map<particle_flavour_id, vector of particles>
+		- We will always simulate all particles that we have in memory.
+		- This will add a nice speedup, and also we will easily invalidate particles when particle flavour changes or is deleted.
+		- Particle types will also be pooled and will be a separate viewable.
+	
+- Rethinking FAE tree gui
+	- By default, the "all" view for Entities should always have selected entities ticked.
+	- In case someone wants to edit only several entities from the selection, alt+s will have tickable boxes that are not related to the current selection state.
+
 - animation metadata could have some very general structs like "character metrics"
 	- vec2i: hands position[2]
 		- positions of these could be even indicated in the previewed image

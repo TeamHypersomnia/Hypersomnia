@@ -694,3 +694,14 @@ we consider whole type overrides too complex architeciturally:
 		- and the default intercosm has no ids for the particles
 		- so we must reset the particles when we switch the cosmos
 - replace decay_t usage with remove_cref, decay is overkill
+
+- flavours and entities are concepts disparate enough to warrant separate trees completely
+	- same code can handle them, though
+	- or is one subset of another?
+	- all are the same, except that
+		- checkbox target differs
+			- actually for entities we may also make them selected?
+		- entities browser does not view the flavour properties
+		- flavour browser does not view its entities
+	- we won't have separate windows, just a radio box at the bottom
+

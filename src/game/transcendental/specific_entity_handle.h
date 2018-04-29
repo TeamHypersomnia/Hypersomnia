@@ -3,7 +3,7 @@
 #include "augs/templates/for_each_std_get.h"
 
 #include "game/transcendental/component_synchronizer.h"
-#include "game/transcendental/pool_types.h"
+#include "game/transcendental/entity_pools.h"
 
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/transcendental/specific_entity_handle_declaration.h"
