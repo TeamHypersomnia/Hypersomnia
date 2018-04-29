@@ -218,7 +218,8 @@ void illuminated_rendering(
 		particles,
 		anims,
 		visible.per_layer,
-		game_images
+		game_images,
+		global_time_seconds
 	});
 
 	set_shader_with_matrix(shaders.illuminated);

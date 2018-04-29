@@ -52,6 +52,7 @@ FORCE_INLINE void specific_entity_drawer(
 		}
 
 		input.renderable_transform = viewing_transform;
+		input.global_time_seconds = in.global_time_seconds;
 
 		if (const auto trace = typed_handle.template find<components::trace>()) {
 			const auto tracified_size = sprite.size * trace->last_size_mult;
@@ -65,8 +66,6 @@ FORCE_INLINE void specific_entity_drawer(
 
 			auto tracified_sprite = sprite;
 			tracified_sprite.size = tracified_size;
-
-			input.global_time_seconds = in.global_time_seconds;
 
 			render_visitor(tracified_sprite, in.manager, input);
 		}

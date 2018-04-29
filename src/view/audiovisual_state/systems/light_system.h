@@ -42,6 +42,7 @@ struct light_system_input {
 	const animations_pool& animations;
 	const visible_entities::per_layer_type& visible_per_layer;
 	const images_in_atlas_map& game_images;
+	const double global_time_seconds;
 };
 
 class light_system {

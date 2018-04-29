@@ -46,8 +46,6 @@ void light_system::advance_attenuation_variations(
 	const cosmos& cosmos,
 	const augs::delta dt
 ) {
-	global_time_seconds += dt.in_seconds();
-
 	cosmos.for_each_having<components::light>(
 		[&](const auto it) {
 			const auto& light = it.template get<invariants::light>();
@@ -73,6 +71,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 	auto& renderer = in.renderer;
 	auto& performance = in.profiler;
 	
+	const auto global_time_seconds = in.global_time_seconds;
 	const auto output = augs::drawer{ renderer.get_triangle_buffer() };
 	const auto& light_shader = in.light_shader;
 	const auto& standard_shader = in.standard_shader;
