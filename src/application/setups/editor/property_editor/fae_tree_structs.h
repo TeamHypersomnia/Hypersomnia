@@ -14,20 +14,8 @@ enum class fae_view_type {
 	// END GEN INTROSPECTOR
 };
 
-struct fae_tree_state {
+struct entities_tree_state {
 	entity_guid hovered_guid;
-	// GEN INTROSPECTOR struct fae_tree_state
-	fae_view_type view_mode = fae_view_type::FLAVOURS;
-	// END GEN INTROSPECTOR
-
-	template <class T>
-	using make_selected_flavours = std::unordered_set<typed_entity_flavour_id<T>>;
-
-	template <class T>
-	using make_selected_entities = std::unordered_set<typed_entity_id<T>>;
-
-	per_entity_type_container<make_selected_flavours> ticked_flavours;
-	per_entity_type_container<make_selected_entities> ticked_entities;
 };
 
 class loaded_image_caches_map;
@@ -38,7 +26,6 @@ struct fae_property_editor_input {
 };
 
 struct fae_tree_input {
-	fae_tree_state& state;
 	commanding_property_editor_input cpe_in;
 	const bool show_filter_buttons = false;
 	const loaded_image_caches_map& image_caches;

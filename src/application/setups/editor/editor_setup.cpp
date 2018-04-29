@@ -412,12 +412,7 @@ void editor_setup::perform_custom_imgui(
 		history_gui.perform(make_command_input());
 
 		common_state_gui.perform(settings, make_command_input());
-
-		{
-			const auto filters = fae_gui.perform(make_fae_gui_input(image_caches));
-			const auto& cosm = work().world;
-			filters.perform(cosm, view().selected_entities);
-		}
+		fae_gui.perform(make_fae_gui_input(image_caches), view().selected_entities);
 
 		selection_groups_gui.perform(has_ctrl, make_command_input());
 

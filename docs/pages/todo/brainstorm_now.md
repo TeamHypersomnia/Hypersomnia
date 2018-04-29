@@ -27,6 +27,29 @@ summary: That which we are brainstorming at the moment.
 			- Common elements
 				- All are structured like Type->Flavours->(different things)
 				- But the checkboxes differ in meaning
+	- When to
+		- Disable type
+			- All (flavours)
+				- Zero flavours => Zero entities
+			- All (entities)
+				- Zero entities
+			- Selected (flavours)
+				- Never
+			- Selected (entities)
+				- Never
+		- Skip type
+			- All (flavours)
+				- Filtered out
+			- All (entities)
+				- Filtered out
+			- Selected (flavours)
+				- Filtered out
+				- Zero entities <=> Zero flavours
+			- Selected (entities)
+				- Filtered out
+				- Zero entities <=> Zero flavours
+		- Skip flavour
+		- Disable flavour
 
 - animation metadata could have some very general structs like "character metrics"
 	- vec2i: hands position[2]

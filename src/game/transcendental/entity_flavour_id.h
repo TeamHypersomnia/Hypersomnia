@@ -49,6 +49,8 @@ std::ostream& operator<<(std::ostream& out, const constrained_entity_flavour_id<
 
 template <class E>
 struct typed_entity_flavour_id {
+	using used_entity_type = E;
+
 	raw_entity_flavour_id raw;
 
 	typed_entity_flavour_id() = default;

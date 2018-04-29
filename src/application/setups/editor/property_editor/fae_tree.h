@@ -1,6 +1,5 @@
 #pragma once
 #include "augs/misc/imgui/imgui_control_wrappers.h"
-#include "augs/misc/imgui/imgui_enum_radio.h"
 
 #include "game/organization/for_each_entity_type.h"
 
@@ -42,32 +41,35 @@ void do_edit_flavours_gui(
 }
 
 template <class F>
-auto fae_tree(
-	const fae_tree_input fae_in,
-	F provider
-) {
-	using namespace augs::imgui;
-
-	const auto cpe_in = fae_in.cpe_in;
-	const auto prop_in = cpe_in.prop_in;
-
-	fae_tree_filter filter;
-
-	std::size_t total_types = 0;
+auto detail_get_total_types(F& provider) {
+	std::size_t result = 0;
 
 	for_each_entity_type([&](auto e){
 		using E = decltype(e);
 
 		if (provider.template num_entities_of_type<E>() > 0) {
-			++total_types;
+			++result;
 		}
 	});
 
-	const auto& cosm = cpe_in.command_in.get_cosmos();
-	auto& state = fae_in.state;
+	return result;
+}
 
-	const bool viewing_flavours = state.view_mode == fae_view_type::FLAVOURS;
-	const bool viewing_entities = state.view_mode == fae_view_type::ENTITIES;
+template <class F, class T>
+auto tree_of_flavours(
+	const fae_tree_input fae_in,
+	F provider,
+	T& all_ticked_flavours
+) {
+	using namespace augs::imgui;
+
+	const auto cpe_in = fae_in.cpe_in;
+	const auto prop_in = cpe_in.prop_in;
+	const auto settings = prop_in.settings;
+
+	fae_tree_filter filter;
+
+	const auto total_types = detail_get_total_types(provider);
 
 	{
 		auto child = scoped_child("fae-view", ImVec2(0, -(ImGui::GetFrameHeightWithSpacing() + 4)));
@@ -75,101 +77,154 @@ auto fae_tree(
 		ImGui::Columns(2);
 		ImGui::Separator();
 
-		cosm.get_solvable().significant.for_each_entity_pool(
-			[&](const auto& p){
-				using P = decltype(p);
-				using pool_type = remove_cref<P>;
+		const auto& cosm = cpe_in.command_in.get_cosmos();
 
-				using Solvable = typename pool_type::mapped_type;
-				using E = entity_type_of<Solvable>;
+		for_each_entity_type(
+			[&](auto e) {
+				using E = decltype(e);
 
 				using flavour_id_type = typed_entity_flavour_id<E>;
 				using flavour_type = entity_flavour<E>;
 
-				const auto entity_type_label = format_field_name(get_type_name<E>());
-
-				const auto total_entities = provider.template num_entities_of_type<E>();
-				const auto total_flavours = provider.template num_flavours_of_type<E>();
-
-				if (provider.skip_nodes_with_no_entities() && total_entities == 0) {
+				if (provider.template should_skip_type<E>()) {
 					return;
 				}
 
-				auto& ticked_flavours = state.ticked_flavours.get_for<E>();
-				auto& ticked_entities = state.ticked_entities.get_for<E>();
+				auto& ticked_flavours = all_ticked_flavours.template get_for<E>();
 
-				const bool none_of_interest = 
-					(viewing_flavours && total_flavours == 0)
-					|| (viewing_entities && total_entities == 0)
-				;
+				const auto entity_type_label = format_field_name(get_type_name<E>());
 
-				auto disabled = ::maybe_disabled_cols(prop_in.settings, none_of_interest);
+				const auto flags = do_tick_all_checkbox(
+					settings,
+					ticked_flavours,
+					[&provider](auto callback) {
+						provider.template for_each_flavour<E>(
+							[&callback](const flavour_id_type flavour_id, const flavour_type& flavour) {
+								callback(flavour_id);
+							}
+						);
+					},
+					entity_type_label
+				);
 
-				if (viewing_flavours) {
-					do_tick_all_checkbox(
-						prop_in.settings,
-						ticked_flavours,
-						[&provider](auto callback) {
-							provider.template for_each_flavour<E>(
-								[&callback](const flavour_id_type flavour_id, const flavour_type& flavour) {
-									callback(flavour_id);
-								}
-							);
-						},
-						entity_type_label
-					);
-				}
-				else if (viewing_entities) {
-					do_tick_all_checkbox(
-						prop_in.settings,
-						ticked_entities,
-						[&provider](auto callback) {
-							provider.template for_each_flavour<E>(
-								[&provider, callback](const flavour_id_type flavour_id, const flavour_type& flavour) {
-									decltype(auto) all_having_flavour = provider.get_entities_by_flavour_id(flavour_id);
+				const auto total_flavours = provider.template num_flavours_of_type<E>();
+				auto disabled = ::maybe_disabled_cols(settings, total_flavours == 0);
 
-									for (const auto& e_id : all_having_flavour) {
-										callback(e_id);
-									}
-								}
-							);
-						},
-						entity_type_label
-					);
-				}
-
-				const auto node = scoped_tree_node_ex(entity_type_label);
+				auto node = scoped_tree_node_ex(entity_type_label, flags);
 
 				ImGui::NextColumn();
+				text_disabled(typesafe_sprintf("%x Flavours", total_flavours));
+				ImGui::NextColumn();
+				
+				if (node) {
+					provider.template for_each_flavour<E>(
+						[&](const flavour_id_type flavour_id, const flavour_type& flavour) {
+							const auto flavour_label = flavour.template get<invariants::name>().name;
 
-				if (fae_in.show_filter_buttons) {
-					const auto scoped_style = scoped_style_var(ImGuiStyleVar_FramePadding, ImVec2(1, 1));
-					const auto this_type_id = entity_type_id::of<E>();
+							const auto this_type_id = entity_type_id::of<E>();
+							const auto node_label = typesafe_sprintf("%x###%x", flavour_label, flavour_id.raw);
+							const auto imgui_id = typesafe_sprintf("%x.%x", this_type_id.get_index(), flavour_id.raw);
 
-					const auto id = scoped_id(this_type_id.get_index());
+							const bool is_flavour_selected = found_in(ticked_flavours, flavour_id);
 
-					if (ImGui::Button("Ex")) {
-						filter.deselect_type_id = this_type_id;
-					}
+							const auto flags = do_selection_checkbox(
+								ticked_flavours,
+								flavour_id,
+								is_flavour_selected,
+								imgui_id
+							);
 
-					if (total_types > 1) {
-						ImGui::SameLine();
+							const auto flavour_node = scoped_tree_node_ex(node_label, flags);
 
-						if (ImGui::Button("On")) {
-							filter.select_only_type_id = this_type_id;
+							ImGui::NextColumn();
+							ImGui::NextColumn();
+
+							if (flavour_node) {
+								ImGui::Separator();
+
+								if (is_flavour_selected) {
+									do_edit_flavours_gui(fae_in, flavour, { ticked_flavours.begin(), ticked_flavours.end() });
+								}
+								else {
+									do_edit_flavours_gui(fae_in, flavour, { flavour_id });
+								}
+
+								ImGui::Separator();
+							}
 						}
-					}
+					);
+				}
+			}	
+		);
+	}
 
-					ImGui::SameLine();
+	return filter;
+}
+
+template <class F, class T>
+auto tree_of_entities(
+	const fae_tree_input fae_in,
+	entities_tree_state& state,
+	F provider,
+	T& all_ticked_entities
+) {
+	using namespace augs::imgui;
+
+	const auto cpe_in = fae_in.cpe_in;
+	const auto prop_in = cpe_in.prop_in;
+	const auto settings = prop_in.settings;
+
+	fae_tree_filter filter;
+
+	const auto total_types = detail_get_total_types(provider);
+
+	{
+		auto child = scoped_child("fae-view", ImVec2(0, -(ImGui::GetFrameHeightWithSpacing() + 4)));
+
+		ImGui::Columns(2);
+		ImGui::Separator();
+
+		const auto& cosm = cpe_in.command_in.get_cosmos();
+
+		for_each_entity_type(
+			[&](auto e) {
+				using E = decltype(e);
+
+				using flavour_id_type = typed_entity_flavour_id<E>;
+				using flavour_type = entity_flavour<E>;
+
+				if (provider.template should_skip_type<E>()) {
+					return;
 				}
 
-				if (viewing_flavours) {
-					text_disabled(typesafe_sprintf("%x Flavours", total_flavours));
-				}
-				else if (viewing_entities) {
-					text_disabled(typesafe_sprintf("%x Entities", total_entities));
-				}
+				auto& ticked_entities = all_ticked_entities.template get_for<E>();
 
+				const auto entity_type_label = format_field_name(get_type_name<E>());
+
+				const auto flags = do_tick_all_checkbox(
+					settings,
+					ticked_entities,
+					[&provider](auto callback) {
+						provider.template for_each_flavour<E>(
+							[&provider, callback](const flavour_id_type flavour_id, const flavour_type& flavour) {
+								decltype(auto) all_having_flavour = provider.get_entities_by_flavour_id(flavour_id);
+
+								for (const auto& e_id : all_having_flavour) {
+									callback(e_id);
+								}
+							}
+						);
+					},
+					entity_type_label
+				);
+
+				const auto total_entities = provider.template num_entities_of_type<E>();
+				auto disabled = ::maybe_disabled_cols(settings, total_entities == 0);
+
+				auto node = scoped_tree_node_ex(entity_type_label, flags);
+
+				ImGui::NextColumn();
+				text_disabled(typesafe_sprintf("%x Entities", total_entities));
 				ImGui::NextColumn();
 
 				if (node) {
@@ -183,119 +238,62 @@ auto fae_tree(
 							const auto node_label = typesafe_sprintf("%x###%x", flavour_label, flavour_id.raw);
 							const auto imgui_id = typesafe_sprintf("%x.%x", this_type_id.get_index(), flavour_id.raw);
 
-							const bool is_flavour_selected = found_in(ticked_flavours, flavour_id);
+							auto disabled = ::maybe_disabled_cols(settings, all_having_flavour.empty());
 
-							auto disabled = ::maybe_disabled_cols(
-								prop_in.settings, 
-								(viewing_entities && all_having_flavour.size() == 0)
+							const auto flags = do_tick_all_checkbox(
+								settings,
+								ticked_entities,
+								[&all_having_flavour](auto callback) {
+									for (const auto& e_id : all_having_flavour) {
+										callback(e_id);
+									}
+								},
+								imgui_id
 							);
-
-							const auto flags = [&]() {
-								if (viewing_flavours) {
-									return do_selection_checkbox(
-										ticked_flavours,
-										flavour_id,
-										is_flavour_selected,
-										imgui_id
-									);
-								}
-								else {
-									ensure(viewing_entities);
-
-									return do_tick_all_checkbox(
-										prop_in.settings,
-										ticked_entities,
-										[&all_having_flavour](auto callback) {
-											for (const auto& e_id : all_having_flavour) {
-												callback(e_id);
-											}
-										},
-										imgui_id
-									);
-								}
-							}();
 
 							const auto flavour_node = scoped_tree_node_ex(node_label, flags);
 
 							const auto num_entities_label = typesafe_sprintf("%x Entities", all_having_flavour.size());
 
 							ImGui::NextColumn();
-
-							if (fae_in.show_filter_buttons) {
-								const auto scoped_style = scoped_style_var(ImGuiStyleVar_FramePadding, ImVec2(1, 1));
-
-								const auto ex_label = "Ex##" + imgui_id;
-								const auto on_label = "On##" + imgui_id;
-
-								if (ImGui::Button(ex_label.c_str())) {
-									filter.deselect_flavour_id = flavour_id;
-								}
-
-								ImGui::SameLine();
-
-								if (!(total_flavours == 1 && total_types == 1)) {
-									if (ImGui::Button(on_label.c_str())) {
-										filter.select_only_flavour_id = flavour_id;
-									}
-
-									ImGui::SameLine();
-								}
-							}
-
 							text_disabled(num_entities_label);
-
 							ImGui::NextColumn();
 
 							if (flavour_node) {
-								/* auto indent = scoped_indent(); */
+								for (const auto& e : all_having_flavour) {
+									const auto typed_handle = *cosm[e];
 
-								if (viewing_flavours) {
-									ImGui::Separator();
-									if (is_flavour_selected) {
-										do_edit_flavours_gui(fae_in, flavour, { ticked_flavours.begin(), ticked_flavours.end() });
+									const auto guid = typed_handle.get_guid();
+									const auto entity_label = typesafe_sprintf("%x", guid);
+
+									const auto is_entity_selected = found_in(ticked_entities, e);
+
+									const auto flags = do_selection_checkbox(
+										ticked_entities,
+										e,
+										is_entity_selected,
+										guid
+									);
+
+									const auto entity_node = scoped_tree_node_ex(entity_label, flags);
+
+									if (ImGui::IsItemHovered()) {
+										state.hovered_guid = guid; 
 									}
-									else {
-										do_edit_flavours_gui(fae_in, flavour, { flavour_id });
-									}
-									ImGui::Separator();
-								}
-								else if (viewing_entities) {
-									for (const auto& e : all_having_flavour) {
-										const auto typed_handle = *cosm[e];
 
-										const auto guid = typed_handle.get_guid();
-										const auto entity_label = typesafe_sprintf("%x", guid);
+									next_column_text();
 
-										const auto is_entity_selected = found_in(ticked_entities, e);
+									if (entity_node) {
+										ImGui::Separator();
 
-										const auto flags = do_selection_checkbox(
-											ticked_entities,
-											e,
-											is_entity_selected,
-											guid
-										);
-
-										const auto entity_node = scoped_tree_node_ex(entity_label, flags);
-
-										if (ImGui::IsItemHovered()) {
-											state.hovered_guid = guid; 
+										if (is_entity_selected) {
+											do_edit_entities_gui(fae_in, typed_handle, { ticked_entities.begin(), ticked_entities.end() });
+										}
+										else {
+											do_edit_entities_gui(fae_in, typed_handle, { e });
 										}
 
-										next_column_text();
-
-										if (entity_node) {
-											ImGui::Separator();
-
-											/* auto indent = scoped_indent(); */
-
-											if (is_entity_selected) {
-												do_edit_entities_gui(fae_in, typed_handle, { ticked_entities.begin(), ticked_entities.end() });
-											}
-											else {
-												do_edit_entities_gui(fae_in, typed_handle, { e });
-											}
-											ImGui::Separator();
-										}
+										ImGui::Separator();
 									}
 								}
 							}
@@ -304,12 +302,6 @@ auto fae_tree(
 				}
 			}	
 		);
-	}
-
-	{
-		auto child = scoped_child("fae-view-switch");
-		ImGui::Separator();
-		enum_radio(state.view_mode, true);
 	}
 
 	return filter;

@@ -1,5 +1,6 @@
 #pragma once
 #include "augs/templates/enum_introspect.h"
+#include "augs/string/format_enum.h"
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
 
 namespace augs {

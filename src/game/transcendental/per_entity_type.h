@@ -159,5 +159,10 @@ void erase_if(per_entity_type_container<Mod>& v, F&& f) {
 	});
 }
 
+template<template <class> class Mod, template <class> class ElemTemplate, class E>
+bool found_in(const per_entity_type_container<Mod>& v, const ElemTemplate<E>& l) {
+	return found_in(v.template get_for<E>(), l);
+}
+
 template <class T>
 using per_entity_type_array = std::array<T, num_types_in_list_v<all_entity_types>>;
