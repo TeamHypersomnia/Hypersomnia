@@ -342,6 +342,7 @@ namespace test_flavours {
 			gun_def.damage_multiplier = 2.2f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 6;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
+			gun_def.kickback_towards_wielder = 40.f;
 
 			gun_def.maximum_heat = 2.1f;
 			gun_def.gunshot_adds_heat = 0.052f;

@@ -216,6 +216,8 @@ fae_tree_filter editor_selected_fae_gui::perform(
 		return {};
 	}
 	else if (matches.size() == 1) {
+		ImGui::Columns(2);
+
 		const auto id = *matches.begin();
 
 		if (const auto handle = cosm[id]) {

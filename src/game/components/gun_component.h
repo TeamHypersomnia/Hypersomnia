@@ -84,6 +84,8 @@ namespace invariants {
 		sound_effect_input firing_engine_sound;
 		particle_effect_input muzzle_particles;
 
+		real32 kickback_towards_wielder = 0.f;
+
 		float cocking_handle_pull_duration_ms = 500.f;
 
 		constrained_entity_flavour_id<invariants::missile, components::sender> magic_missile_flavour;
