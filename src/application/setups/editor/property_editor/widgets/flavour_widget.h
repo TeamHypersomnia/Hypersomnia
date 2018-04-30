@@ -2,6 +2,7 @@
 #include "game/transcendental/cosmos.h"
 #include "application/setups/editor/property_editor/widgets/keyboard_acquiring_popup.h"
 #include "application/setups/editor/detail/maybe_different_colors.h"
+#include "application/setups/editor/property_editor/tweaker_type.h"
 
 struct flavour_widget {
 	const cosmos& cosm;
@@ -14,15 +15,15 @@ struct flavour_widget {
 	template <class T>
 	auto describe_changed(
 		const std::string& formatted_label,
-		const T& to
+		const T& flavour_id
 	) const {
 		static_assert(handles<T>);
 
-		if (to == T()) {
-			return typesafe_sprintf("Unset %x", formatted_label);
+		if (const auto n = cosm.find_flavour_name(flavour_id)) {
+			return typesafe_sprintf("Set %x to %x", formatted_label, *n);
 		}
 
-		return typesafe_sprintf("Set %x to %x", formatted_label, cosm.find_flavour_name(to));
+		return typesafe_sprintf("Unset %x", formatted_label);
 	}
 
 	template <class T>
@@ -38,21 +39,17 @@ struct flavour_widget {
 				return *n;
 			}
 
-			return std::string("No flavour selected");
+			return std::string("None");
 		}();
 
+		thread_local ImGuiTextFilter filter;
 		thread_local keyboard_acquiring_popup track;
 
-		if (auto combo = scoped_combo(identity_label.c_str(), displayed_str.c_str(), ImGuiComboFlags_HeightLargest)) {
-			auto id = scoped_id("Flavour selection");
+		auto id = scoped_id("Flavour selection");
 
-			thread_local ImGuiTextFilter filter;
-			filter.Draw();
-
-			track.check_opened_first_time();
-
-			if (const bool acquire_keyboard = track.pop_acquire_keyboard()) {
-				ImGui::SetKeyboardFocusHere();
+		if (auto combo = track.standard_combo_facade(filter, identity_label.c_str(), displayed_str.c_str())) {
+			if (detail_select_none(flavour_id)) {
+				return std::make_optional(tweaker_type::DISCRETE);
 			}
 
 			auto list_flavours_of_type = [&](auto e) {
@@ -93,9 +90,6 @@ struct flavour_widget {
 					list_flavours_of_type(e);
 				});
 			}
-		}
-		else {
-			track.mark_not_opened();
 		}
 
 		return result;

@@ -51,7 +51,7 @@ enum class test_plain_invisible_bodys {
 enum class test_plain_sprited_bodys {
 	// GEN INTROSPECTOR enum class test_plain_sprited_bodys
 	CRATE,
-	CYAN_SHELL_DEFINITION,
+	CYAN_SHELL,
 	BRICK_WALL,
 
 	COUNT

@@ -194,7 +194,7 @@ namespace test_flavours {
 		}
 
 		{
-			auto& meta = get_test_flavour(flavours, test_plain_sprited_bodys::CYAN_SHELL_DEFINITION);
+			auto& meta = get_test_flavour(flavours, test_plain_sprited_bodys::CYAN_SHELL);
 
 			{
 				invariants::render render_def;
@@ -239,7 +239,7 @@ namespace test_flavours {
 				catridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::CONCENTRATED_WANDERING_PIXELS);
 				catridge.shell_trace_particles.modifier.colorize = cyan;
 
-				catridge.shell_flavour = to_entity_flavour_id(test_plain_sprited_bodys::CYAN_SHELL_DEFINITION);
+				catridge.shell_flavour = to_entity_flavour_id(test_plain_sprited_bodys::CYAN_SHELL);
 				catridge.round_flavour = to_entity_flavour_id(test_plain_missiles::CYAN_ROUND);
 
 				meta.set(catridge);

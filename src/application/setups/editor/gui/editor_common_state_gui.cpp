@@ -19,6 +19,7 @@
 #include "application/setups/editor/detail/field_address.h"
 #include "application/setups/editor/property_editor/widgets/pathed_asset_widget.h"
 #include "application/setups/editor/property_editor/widgets/flavour_widget.h"
+#include "application/setups/editor/property_editor/widgets/unpathed_asset_widget.h"
 #include "application/setups/editor/property_editor/special_widgets.h"
 #include "application/setups/editor/property_editor/commanding_property_editor_input.h"
 
@@ -87,6 +88,7 @@ static void edit_common(
 		true_returner(),
 		special_widgets(
 			pathed_asset_widget { defs, project_path, cmd_in },
+			unpathed_asset_widget { defs, cosm.get_logical_assets() },
 			flavour_widget { cosm }
 		)
 	);

@@ -7,14 +7,6 @@
 
 #include "augs/pad_bytes.h"
 
-struct movement_subscribtion {
-	// GEN INTROSPECTOR struct movement_subscribtion
-	entity_id target;
-	bool stop_response_at_zero_speed = false;
-	pad_bytes<3> pad;
-	// END GEN INTROSPECTOR
-};
-
 namespace invariants {
 	struct movement;
 }

@@ -339,14 +339,14 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 						in.angular = total_recoil * recoil_value;
 						owning_capability.apply_crosshair_recoil(in);
 					}
+				}
 
-					if (owning_capability) {
-						if (const auto body = owning_capability.template find<components::rigid_body>()) {
-							const auto total_kickback = total_recoil * gun_def.kickback_towards_wielder;
-							body.apply_impulse(
-								total_kickback * vec2::from_degrees(gun_transform.rotation) * -1
-							);
-						}
+				if (owning_capability) {
+					if (const auto body = owning_capability.template find<components::rigid_body>()) {
+						const auto total_kickback = total_recoil * gun_def.kickback_towards_wielder;
+						body.apply_impulse(
+							total_kickback * vec2::from_degrees(gun_transform.rotation) * -1
+						);
 					}
 				}
 

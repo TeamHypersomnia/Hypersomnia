@@ -61,7 +61,6 @@ struct particles_emission {
 
 	tuple_of_particle_definitions_vectors particle_definitions;
 	render_layer target_render_layer = render_layer::ILLUMINATING_PARTICLES;
-
 	// END GEN INTROSPECTOR
 
 	template <class T>
@@ -85,5 +84,6 @@ struct particles_emission {
 struct particle_effect {
 	// GEN INTROSPECTOR struct particle_effect
 	std::vector<particles_emission> emissions;
+	std::string name;
 	// END GEN INTROSPECTOR
 };

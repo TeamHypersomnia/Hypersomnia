@@ -5,6 +5,7 @@
 #pragma warning(disable : 4267)
 
 #include "augs/misc/enum/enum_map.h"
+#include "augs/string/format_enum.h"
 
 #include "game/assets/ids/asset_ids.h"
 #include "game/assets/animation.h"
@@ -66,6 +67,7 @@ void load_test_scene_particle_effects(
 
 		const auto new_allocation = all_definitions.allocate();
 		ensure_eq(new_allocation.key, id);
+		new_allocation.object.name = format_enum(test_id);
 		return new_allocation.object;
 	};
 

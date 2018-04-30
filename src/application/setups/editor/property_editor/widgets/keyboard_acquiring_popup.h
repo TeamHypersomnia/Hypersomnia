@@ -1,6 +1,7 @@
 #pragma once
 #include <optional>
 #include "3rdparty/imgui/imgui.h"
+#include "application/setups/editor/property_editor/widgets/widget_common.h"
 
 struct keyboard_acquiring_popup {
 	int acquire_keyboard_times = 2;
@@ -31,5 +32,29 @@ struct keyboard_acquiring_popup {
 		if (currently_opened && !ImGui::IsPopupOpen(*currently_opened)) {
 			currently_opened = std::nullopt;
 		}
+	}
+
+	template <class... Args>
+	auto standard_combo_facade(
+		ImGuiTextFilter& filter,
+		Args&&... combo_args
+	) {
+		using namespace augs::imgui;
+
+		auto combo = scoped_combo(std::forward<Args>(combo_args)..., ImGuiComboFlags_HeightLargest);
+
+		if (combo) {
+			check_opened_first_time();
+			filter.Draw();
+
+			if (const bool acquire_keyboard = pop_acquire_keyboard()) {
+				ImGui::SetKeyboardFocusHere();
+			}
+		}
+		else {
+			mark_not_opened();
+		}
+
+		return combo;
 	}
 };

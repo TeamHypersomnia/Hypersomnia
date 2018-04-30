@@ -9,6 +9,7 @@
 
 #include "application/setups/editor/property_editor/widgets/pathed_asset_widget.h"
 #include "application/setups/editor/property_editor/widgets/flavour_widget.h"
+#include "application/setups/editor/property_editor/widgets/unpathed_asset_widget.h"
 #include "application/setups/editor/property_editor/update_size_if_tex_changed.h"
 
 #include "application/setups/editor/property_editor/special_widgets.h"
@@ -113,6 +114,7 @@ void edit_invariant(
 		},
 		special_widgets(
 			pathed_asset_widget { defs, project_path, cmd_in },
+			unpathed_asset_widget { defs, cosm.get_logical_assets() },
 			flavour_widget { cosm }
 		),
 		asset_sane_default_provider { defs }

@@ -14,7 +14,7 @@ auto& get_viewable_pool(T&& t) {
 		return t.particle_effects;
 	}
 	else {
-		static_assert(always_false_v<I>, "Unknown id type.");
+		static_assert(always_false_v<I>, "Unimplemented id type.");
 	}
 }
 

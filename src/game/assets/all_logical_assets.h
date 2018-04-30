@@ -18,3 +18,16 @@ struct all_logical_assets {
 	physical_materials_pool physical_materials;
 	// END GEN INTROSPECTOR
 };
+
+template <class I, class T>
+auto& get_logicals_pool(T&& t) {
+	if constexpr(std::is_same_v<I, assets::recoil_player_id>) {
+		return t.recoils;
+	}
+	else if constexpr(std::is_same_v<I, assets::physical_material_id>) {
+		return t.physical_materials;
+	}
+	else {
+		static_assert(always_false_v<I>, "Unimplemented id type.");
+	}
+}
