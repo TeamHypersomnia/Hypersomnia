@@ -8,7 +8,7 @@
 #include "application/setups/editor/editor_settings.h"
 #include "application/setups/editor/property_editor/property_editor_structs.h"
 #include "application/setups/editor/property_editor/property_editor_settings.h"
-#include "application/setups/editor/property_editor/default_control_provider.h"
+#include "application/setups/editor/property_editor/default_widget_provider.h"
 #include "application/setups/editor/property_editor/changes_describers.h"
 
 #include "augs/string/format_enum.h"
@@ -19,7 +19,7 @@
 #include "application/setups/editor/detail/field_address.h"
 
 template <class T>
-static constexpr bool has_direct_control_v = 
+static constexpr bool has_direct_widget_v = 
 	is_one_of_v<T, std::string, bool, vec2, vec2i, rgba>
 	|| is_minmax_v<T>
 	|| std::is_arithmetic_v<T>
@@ -95,7 +95,7 @@ std::optional<tweaker_type> detail_direct_edit(
 		}
 	}
 	else {
-		static_assert(always_false_v<M>, "Unsupported control type.");
+		static_assert(always_false_v<M>, "Unsupported widget type.");
 	}
 
 	return std::nullopt;
@@ -111,7 +111,7 @@ struct tweaker_input {
 
 template <class S, class D>
 struct detail_edit_properties_input {
-	const S special_control_provider;
+	const S special_widget_provider;
 	const D sane_defaults;
 	const property_editor_settings& settings;
 	const int extra_columns;
@@ -133,7 +133,7 @@ inline auto bulleted_property_name(const std::string& name, const int extra_cols
 template <class S, class T>
 constexpr bool do_handler_or_direct = 
 	S::template handles<T>
-	|| has_direct_control_v<T>
+	|| has_direct_widget_v<T>
 ;
 
 template <class S, class T>
@@ -141,7 +141,7 @@ std::optional<tweaker_type> handler_or_direct(S provider, const std::string& ide
 	if constexpr(S::template handles<T>) {
 		return provider.handle(identity_label, altered);
 	}
-	else if constexpr(has_direct_control_v<T>) {
+	else if constexpr(has_direct_widget_v<T>) {
 		return detail_direct_edit(identity_label, altered);
 	}
 }
@@ -185,7 +185,7 @@ void detail_general_edit_properties(
 			auto scope = bulleted_property_name(formatted_label, input.extra_columns);
 			auto colors = ::maybe_different_value_cols(input.settings, !equality_predicate(altered)); 
 
-			if (auto result = handler_or_direct(input.special_control_provider, identity_label, altered)) {
+			if (auto result = handler_or_direct(input.special_widget_provider, identity_label, altered)) {
 				notify_change_of(formatted_label, *result, altered);
 			}
 		}
@@ -295,7 +295,7 @@ template <
    	class G,
    	class H,
 	class Eq = true_returner,
-	class S = default_control_provider,
+	class S = default_widget_provider,
 	class D = default_sane_default_provider
 >
 void general_edit_properties(
@@ -304,7 +304,7 @@ void general_edit_properties(
 	G post_new_change,
 	H rewrite_last,
 	Eq field_equality_predicate = {},
-	const S special_control_provider = {},
+	const S special_widget_provider = {},
 	const D sane_defaults = {},
 	const int extra_columns = 0
 ) {
@@ -327,14 +327,14 @@ void general_edit_properties(
 
 		if (type == tweaker_type::DISCRETE) {
 			post_new_change(
-				::describe_changed(field_name, new_value, special_control_provider),
+				::describe_changed(field_name, new_value, special_widget_provider),
 				field_location,
 				new_value
 			);
 		}
 		else if (type == tweaker_type::CONTINUOUS) {
 			const auto this_id = ImGui::GetActiveID();
-			const auto description = ::describe_changed(field_name, new_value, special_control_provider);
+			const auto description = ::describe_changed(field_name, new_value, special_widget_provider);
 
 			auto& last_active = prop_in.state.last_active;
 
@@ -352,7 +352,7 @@ void general_edit_properties(
 	auto traverse = [&](const std::string& member_label, auto& member) {
 		detail_general_edit_properties<SkipPredicate>(
 			detail_edit_properties_input<S, D> { 
-				special_control_provider,
+				special_widget_provider,
 				sane_defaults,
 				prop_in.settings,
 				extra_columns

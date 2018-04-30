@@ -21,6 +21,7 @@
 #include "application/setups/editor/detail/find_locations_that_use.h"
 #include "application/setups/editor/detail/checkbox_selection.h"
 #include "application/setups/editor/property_editor/compare_all_fields_to.h"
+#include "application/setups/editor/property_editor/special_widgets.h"
 #include "augs/readwrite/byte_readwrite.h"
 
 #include "augs/templates/list_utils.h"
@@ -48,7 +49,7 @@ struct pathed_asset_entry : public browsed_path_entry_base<id_type> {
 	{}
 };
 
-struct path_control_provider {
+struct source_path_widget {
 	all_viewables_defs& defs;
 	const augs::path_type& project_path;
 	const property_editor_settings& settings;
@@ -336,7 +337,7 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 				) {
 					command_type cmd;
 
-					if constexpr(path_control_provider::handles<remove_cref<decltype(new_content)>>) {
+					if constexpr(source_path_widget::handles<remove_cref<decltype(new_content)>>) {
 						cmd.affected_assets = { id };
 					}
 					else {
@@ -391,7 +392,9 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 							ticked_ids
 						);
 					},
-					path_control_provider { viewables, project_path, settings, disable_path_chooser },
+					special_widgets(
+						source_path_widget { viewables, project_path, settings, disable_path_chooser }
+					),
 					default_sane_default_provider(),
 					num_cols - 2
 				);

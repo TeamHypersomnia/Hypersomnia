@@ -17,7 +17,7 @@
 
 #include "application/setups/editor/property_editor/general_edit_properties.h"
 #include "application/setups/editor/detail/field_address.h"
-#include "application/setups/editor/property_editor/assets/asset_control_provider.h"
+#include "application/setups/editor/property_editor/assets/pathed_asset_widget.h"
 #include "application/setups/editor/property_editor/commanding_property_editor_input.h"
 
 #include "augs/readwrite/memory_stream.h"
@@ -80,7 +80,7 @@ static void edit_common(
 		post_new_change,
 		rewrite_last_change,
 		true_returner(),
-		asset_control_provider { defs, project_path, cmd_in }
+		pathed_asset_widget { defs, project_path, cmd_in }
 	);
 }
 

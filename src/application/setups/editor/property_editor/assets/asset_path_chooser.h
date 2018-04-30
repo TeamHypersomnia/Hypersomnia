@@ -10,11 +10,11 @@
 
 template <class I>
 class asset_path_chooser {
-	using asset_control_path_entry = browsed_path_entry_base<I>;
+	using asset_widget_path_entry = browsed_path_entry_base<I>;
 
 	int acquire_keyboard_times = 2;
-	std::vector<asset_control_path_entry> all_paths;
-	std::vector<asset_control_path_entry> disallowed_paths;
+	std::vector<asset_widget_path_entry> all_paths;
+	std::vector<asset_widget_path_entry> disallowed_paths;
 	path_tree_settings tree_settings;
 	std::optional<ImGuiID> currently_opened;
 

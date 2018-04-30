@@ -1,4 +1,5 @@
 #pragma once
+#include "augs/templates/folded_finders.h"
 #include "augs/misc/pool/pooled_object_id.h"
 
 using asset_pool_id_size_type = unsigned short;
@@ -27,3 +28,10 @@ namespace assets {
 	using recoil_player_id = make_asset_pool_id<recoil_player_id_key>;
 	using physical_material_id = make_asset_pool_id<physical_material_id_key>;
 }
+
+template <class T>
+constexpr bool is_pathed_asset = is_one_of_v<
+	T, 
+	assets::image_id, 
+	assets::sound_id
+>;

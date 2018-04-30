@@ -26,62 +26,61 @@ struct asset_sane_default_provider {
 	}
 };
 
-struct asset_control_provider {
+struct pathed_asset_widget {
 	all_viewables_defs& defs;
 	const augs::path_type& project_path;
 	editor_command_input in;
 
 	template <class T>
-	static constexpr bool handles = 
-		is_one_of_v<T, assets::image_id, assets::sound_id>
+	static constexpr bool handles =
+		is_pathed_asset<T>
 	;
 
 	template <class T>
 	auto describe_changed(
 		const std::string& formatted_label,
-		const T to
+		const T& to
 	) const {
+		static_assert(is_pathed_asset<T>);
+
 		return typesafe_sprintf("Set %x to %x", formatted_label, augs::to_display(get_viewable_pool<T>(defs)[to].get_source_path().path));
 	}
 
 	template <class T>
 	std::optional<tweaker_type> handle(const std::string& identity_label, T& object) const {
+		static_assert(is_pathed_asset<T>);
+
 		bool changed = false;
 
-		if constexpr(handles<T>) {
-			auto& definitions = get_viewable_pool<T>(defs);
+		auto& definitions = get_viewable_pool<T>(defs);
 
-			auto on_choice = [&](const auto& chosen_path) {
-				changed = true;
+		auto on_choice = [&](const auto& chosen_path) {
+			changed = true;
 
-				if (const auto asset_id = ::find_asset_id_by_path(chosen_path, definitions)) {
-					object = *asset_id;
+			if (const auto asset_id = ::find_asset_id_by_path(chosen_path, definitions)) {
+				object = *asset_id;
+			}
+			else {
+				auto& history = in.folder.history;
+
+				{
+					create_asset_id_command<T> cmd;
+					cmd.use_path = chosen_path;
+					history.execute_new(std::move(cmd), in);
 				}
-				else {
-					auto& history = in.folder.history;
 
-					{
-						create_asset_id_command<T> cmd;
-						cmd.use_path = chosen_path;
-						history.execute_new(std::move(cmd), in);
-					}
+				const auto* const last_addr = std::addressof(history.last_command());
+				const auto* const cmd = std::get_if<create_asset_id_command<T>>(last_addr);
 
-					const auto* const last_addr = std::addressof(history.last_command());
-					const auto* const cmd = std::get_if<create_asset_id_command<T>>(last_addr);
+				object = cmd->get_allocated_id();
+			}
+		};
+		
+		const auto& current_source  = definitions[object].get_source_path();
 
-					object = cmd->get_allocated_id();
-				}
-			};
-			
-			const auto& current_source  = definitions[object].get_source_path();
+		thread_local asset_path_chooser<T> chooser;
 
-			thread_local asset_path_chooser<T> chooser;
-
-			chooser.perform(identity_label, current_source, project_path, on_choice, true_returner());
-		}
-		else {
-			static_assert(!handles<T>, "Incomplete implementation!");
-		}
+		chooser.perform(identity_label, current_source, project_path, on_choice, true_returner());
 
 		if (changed) {
 			return tweaker_type::DISCRETE;

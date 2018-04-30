@@ -40,7 +40,7 @@ void typesafe_sprintf_detail(std::size_t starting_pos, std::string& target_str, 
 				}
 				else if (opcode == '*') {
 					if constexpr(std::is_floating_point_v<T>) {
-						replacement.precision(std::numeric_limits<remove_cref<T>>::digits10);
+						replacement.precision(std::numeric_limits<std::decay_t<T>>::digits10);
 					}
 				}
 				else {

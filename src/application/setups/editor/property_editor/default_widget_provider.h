@@ -2,7 +2,7 @@
 #include <string>
 #include "augs/templates/identity_templates.h"
 
-struct default_control_provider {
+struct default_widget_provider {
 	template <class T>
 	static constexpr bool handles = always_false_v<T>;
 
