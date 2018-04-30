@@ -7,7 +7,8 @@
 #include "application/setups/editor/property_editor/general_edit_properties.h"
 #include "application/setups/editor/property_editor/property_editor_structs.h"
 
-#include "application/setups/editor/property_editor/assets/pathed_asset_widget.h"
+#include "application/setups/editor/property_editor/widgets/pathed_asset_widget.h"
+#include "application/setups/editor/property_editor/widgets/flavour_widget.h"
 #include "application/setups/editor/property_editor/update_size_if_tex_changed.h"
 
 #include "application/setups/editor/property_editor/special_widgets.h"
@@ -110,7 +111,10 @@ void edit_invariant(
 				in.command.affected_flavours
 			);
 		},
-		special_widgets(pathed_asset_widget { defs, project_path, cmd_in }),
+		special_widgets(
+			pathed_asset_widget { defs, project_path, cmd_in },
+			flavour_widget { cosm }
+		),
 		asset_sane_default_provider { defs }
 	);
 }

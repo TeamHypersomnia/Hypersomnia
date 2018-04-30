@@ -71,6 +71,17 @@ private:
 			}
 		);
 	}
+
+	template <class C, class E, class F>
+	static decltype(auto) on_flavour_impl(
+		C& self,
+		const typed_entity_flavour_id<E> flavour_id,
+		F callback	
+	) {
+		using candidate_types = typename decltype(flavour_id)::matching_types; 
+		return callback(self.template get_flavours<E>().get_flavour(flavour_id));
+	}
+
 public:
 	template <class T, class F>
 	decltype(auto) on_flavour(const T flavour_id, F&& callback) {

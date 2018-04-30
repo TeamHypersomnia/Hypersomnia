@@ -30,7 +30,7 @@ struct special_widgets {
 	decltype(auto) handle(
 		const std::string& identity_label, 
 		T& object
-	) const {
+	) {
 		using matching = find_matching_type_in_list<detail_handles<T>::template type, type_list<Args...>>;
 		return std::get<matching>(handlers).handle(identity_label, object);
 	}

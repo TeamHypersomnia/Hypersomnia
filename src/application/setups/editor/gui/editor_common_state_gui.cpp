@@ -17,7 +17,9 @@
 
 #include "application/setups/editor/property_editor/general_edit_properties.h"
 #include "application/setups/editor/detail/field_address.h"
-#include "application/setups/editor/property_editor/assets/pathed_asset_widget.h"
+#include "application/setups/editor/property_editor/widgets/pathed_asset_widget.h"
+#include "application/setups/editor/property_editor/widgets/flavour_widget.h"
+#include "application/setups/editor/property_editor/special_widgets.h"
 #include "application/setups/editor/property_editor/commanding_property_editor_input.h"
 
 #include "augs/readwrite/memory_stream.h"
@@ -74,13 +76,19 @@ static void edit_common(
 	auto& defs = cmd_in.folder.work->viewables;
 	const auto project_path = cmd_in.folder.current_path;
 
+	auto& work = *cmd_in.folder.work;
+	auto& cosm = work.world;
+
 	general_edit_properties<should_skip_in_common>(
 		in.prop_in, 
 		signi,
 		post_new_change,
 		rewrite_last_change,
 		true_returner(),
-		pathed_asset_widget { defs, project_path, cmd_in }
+		special_widgets(
+			pathed_asset_widget { defs, project_path, cmd_in },
+			flavour_widget { cosm }
+		)
 	);
 }
 

@@ -25,6 +25,10 @@ struct constrained_entity_flavour_id {
 	entity_type_id type_id;
 	// END GEN INTROSPECTOR
 
+	bool is_set() const {
+		return raw.is_set();
+	}
+
 	explicit operator bool() const {
 		return raw.is_set();
 	}
@@ -56,6 +60,10 @@ struct typed_entity_flavour_id {
 	typed_entity_flavour_id() = default;
 	explicit typed_entity_flavour_id(const raw_entity_flavour_id raw) : raw(raw) {};
 
+	bool is_set() const {
+		return raw.is_set();
+	}
+
 	explicit operator bool() const {
 		return raw.is_set();
 	}
@@ -76,6 +84,24 @@ struct typed_entity_flavour_id {
 		return { raw, entity_type_id::of<E>() };
 	}
 };
+
+template <class T>
+struct is_constrained_flavour_id : std::false_type {};
+
+template <class... Args>
+struct is_constrained_flavour_id<constrained_entity_flavour_id<Args...>> : std::true_type {};
+
+template <class T>
+struct is_typed_flavour_id : std::false_type {};
+
+template <class T>
+struct is_typed_flavour_id<typed_entity_flavour_id<T>> : std::true_type {};
+
+template <class T>
+constexpr bool is_typed_flavour_id_v = is_typed_flavour_id<T>::value;
+
+template <class T>
+constexpr bool is_constrained_flavour_id_v = is_constrained_flavour_id<T>::value;
 
 template <class T>
 std::ostream& operator<<(std::ostream& out, const typed_entity_flavour_id<T> x) {

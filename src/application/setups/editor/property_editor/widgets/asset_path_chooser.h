@@ -7,16 +7,16 @@
 #include "augs/misc/imgui/path_tree_structs.h"
 #include "view/maybe_official_path.h"
 #include "application/setups/editor/property_editor/browsed_path_entry_base.h"
+#include "application/setups/editor/property_editor/widgets/keyboard_acquiring_popup.h"
 
 template <class I>
-class asset_path_chooser {
+class asset_path_chooser : keyboard_acquiring_popup {
 	using asset_widget_path_entry = browsed_path_entry_base<I>;
+	using base = keyboard_acquiring_popup;
 
-	int acquire_keyboard_times = 2;
 	std::vector<asset_widget_path_entry> all_paths;
 	std::vector<asset_widget_path_entry> disallowed_paths;
 	path_tree_settings tree_settings;
-	std::optional<ImGuiID> currently_opened;
 
 public:
 	template <class F, class A>
@@ -33,11 +33,7 @@ public:
 		const auto displayed_str = current_source.to_display_prettified();
 
 		if (auto combo = scoped_combo(label.c_str(), displayed_str.c_str(), ImGuiComboFlags_HeightLargest)) {
-			const auto& g = *ImGui::GetCurrentContext();
-
-			if (currently_opened != g.OpenPopupStack[g.CurrentPopupStack.Size - 1].PopupId) {
-				currently_opened = g.OpenPopupStack[g.CurrentPopupStack.Size - 1].PopupId;
-
+			if (base::check_opened_first_time()) {
 				all_paths.clear();
 				disallowed_paths.clear();
 
@@ -85,15 +81,9 @@ public:
 
 				sort_range(all_paths);
 				sort_range(disallowed_paths);
-
-				acquire_keyboard_times = 2;
 			}
 
-			const bool acquire_keyboard = acquire_keyboard_times > 0;
-
-			if (acquire_keyboard_times > 0) {
-				--acquire_keyboard_times;
-			}
+			const bool acquire_keyboard = base::pop_acquire_keyboard();
 
 			tree_settings.do_tweakers();
 
@@ -120,9 +110,7 @@ public:
 			);
 		}
 		else {
-			if (currently_opened && !ImGui::IsPopupOpen(*currently_opened)) {
-				currently_opened = std::nullopt;
-			}
+			base::mark_not_opened();
 		}
 	}
 };

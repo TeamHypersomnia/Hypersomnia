@@ -145,19 +145,45 @@ public:
 
 	const common_assets& get_common_assets() const;
 
+	/* Shortcuts */
+
+	template <class entity_type>
+	const auto& get_flavours() const {
+		return get_common_significant().get_flavours<entity_type>();
+	}
+
 	template <class entity_type>
 	const auto& get_flavour(const typed_entity_flavour_id<entity_type> id) const {
-		return get_common_significant().get_flavours<entity_type>().get_flavour(id);
+		return get_flavours<entity_type>().get_flavour(id);
 	}
 
 	template <class entity_type>
 	const auto* find_flavour(const typed_entity_flavour_id<entity_type> id) const {
-		return get_common_significant().get_flavours<entity_type>().find_flavour(id);
+		return get_flavours<entity_type>().find_flavour(id);
 	}
 
 	template <class... Args>
 	decltype(auto) on_flavour(Args&&... args) const {
 		return get_common_significant().on_flavour(std::forward<Args>(args)...);
+	}
+
+	template <class E, class F>
+	void for_each_id_and_flavour(F&& callback) const {
+		get_flavours<E>().for_each(std::forward<F>(callback));
+	}
+
+	template <class E>
+	auto get_flavours_count() const {
+		return get_flavours<E>().count();
+	}
+
+	template <class T>
+	const std::string* find_flavour_name(const T& id) const {
+		if (id.is_set()) {
+			return on_flavour(id, [](const auto& f){ return std::addressof(f.get_name()); });
+		}
+
+		return nullptr;
 	}
 
 	template <class... Constraints, class F>

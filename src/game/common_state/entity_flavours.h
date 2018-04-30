@@ -56,6 +56,14 @@ public:
 		;
 	}
 
+	const auto& get_name() const {
+		return get<invariants::name>().name;
+	}
+
+	const auto& get_description() const {
+		return get<invariants::name>().description;
+	}
+
 	template <class D>
 	D* find() {
 		return find_impl<D>(*this);

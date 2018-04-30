@@ -111,8 +111,8 @@ struct tweaker_input {
 
 template <class S, class D>
 struct detail_edit_properties_input {
-	const S special_widget_provider;
-	const D sane_defaults;
+	S special_widget_provider;
+	D sane_defaults;
 	const property_editor_settings& settings;
 	const int extra_columns;
 };
@@ -304,8 +304,8 @@ void general_edit_properties(
 	G post_new_change,
 	H rewrite_last,
 	Eq field_equality_predicate = {},
-	const S special_widget_provider = {},
-	const D sane_defaults = {},
+	S special_widget_provider = {},
+	D sane_defaults = {},
 	const int extra_columns = 0
 ) {
 	using namespace augs::imgui;

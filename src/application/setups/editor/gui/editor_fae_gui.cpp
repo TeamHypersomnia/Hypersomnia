@@ -330,8 +330,10 @@ void editor_fae_gui::perform(
 	);
 
 	for_each_entity_type([&](auto e){
-		cosm.get_common_significant().template get_flavours<decltype(e)>().for_each([&](const auto id, const auto&) {
-			cached_flavour_to_entities.get_for<entity_type_of<decltype(id)>>().try_emplace(id);
+		cosm.for_each_id_and_flavour<decltype(e)>([&](const auto id, const auto& f) {
+			if (filter.PassFilter(f.get_name().c_str())) {
+				cached_flavour_to_entities.get_for<entity_type_of<decltype(id)>>().try_emplace(id);
+			}
 		});
 	});
 

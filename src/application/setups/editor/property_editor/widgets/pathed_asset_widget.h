@@ -8,7 +8,7 @@
 #include "augs/misc/imgui/path_tree_structs.h"
 #include "application/setups/editor/gui/asset_browser_settings.h"
 #include "application/setups/editor/property_editor/tweaker_type.h"
-#include "application/setups/editor/property_editor/assets/asset_path_chooser.h"
+#include "application/setups/editor/property_editor/widgets/asset_path_chooser.h"
 
 struct asset_sane_default_provider {
 	all_viewables_defs& defs;
@@ -41,14 +41,14 @@ struct pathed_asset_widget {
 		const std::string& formatted_label,
 		const T& to
 	) const {
-		static_assert(is_pathed_asset<T>);
+		static_assert(handles<T>);
 
 		return typesafe_sprintf("Set %x to %x", formatted_label, augs::to_display(get_viewable_pool<T>(defs)[to].get_source_path().path));
 	}
 
 	template <class T>
 	std::optional<tweaker_type> handle(const std::string& identity_label, T& object) const {
-		static_assert(is_pathed_asset<T>);
+		static_assert(handles<T>);
 
 		bool changed = false;
 

@@ -154,7 +154,7 @@ public:
 			return get_flavour().template get<invariants::name>().name;
 		}
 		else {
-			return cosm.on_flavour(get_flavour_id(), [](const auto& f) -> const auto& { return f.template get<invariants::name>().name; });
+			return cosm.on_flavour(get_flavour_id(), [](const auto& f) -> const auto& { return f.get_name(); });
 		}
 	}
 
@@ -167,7 +167,7 @@ public:
 			return get_flavour().template get<invariants::name>().description;
 		}
 		else {
-			return cosm.on_flavour(get_flavour_id(), [](const auto& f) -> const auto& { return f.template get<invariants::name>().description; });
+			return cosm.on_flavour(get_flavour_id(), [](const auto& f) -> const auto& { return f.get_description(); });
 		}
 	}
 

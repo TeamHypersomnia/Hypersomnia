@@ -16,7 +16,7 @@
 #include "application/intercosm.h"
 
 #include "application/setups/editor/detail/format_struct_name.h"
-#include "application/setups/editor/property_editor/assets/asset_path_chooser.h"
+#include "application/setups/editor/property_editor/widgets/asset_path_chooser.h"
 #include "application/setups/editor/property_editor/general_edit_properties.h"
 #include "application/setups/editor/detail/find_locations_that_use.h"
 #include "application/setups/editor/detail/checkbox_selection.h"
