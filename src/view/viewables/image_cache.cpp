@@ -8,7 +8,8 @@ image_cache::image_cache(
 	try {
 		original_image_size = definition.read_source_image_size();
 	}
-	catch (...) {
+	catch (std::runtime_error what) {
+		LOG(what.what());
 		original_image_size = { 32, 32 };
 	}
 

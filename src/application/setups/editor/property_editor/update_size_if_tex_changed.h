@@ -18,10 +18,8 @@ void update_size_if_tex_changed(
 inline void update_size_if_tex_changed(
 	const edit_invariant_input in,
 	const invariants::sprite& invariant,
-	const assets::image_id& new_content
+	const assets::image_id new_id
 ) {
-	const auto id = new_content;
-
 	const auto fae_in = in.fae_in;
 	const auto cpe_in = fae_in.cpe_in;
 	const auto& image_caches = fae_in.image_caches;
@@ -31,11 +29,11 @@ inline void update_size_if_tex_changed(
 
 	image_cache cache;
 
-	if (const auto c = mapped_or_nullptr(image_caches, id)) {
+	if (const auto c = mapped_or_nullptr(image_caches, new_id)) {
 		cache = *c;
 	}
 	else {
-		cache = { image_definition_view(folder.current_path / "gfx", viewables.image_definitions[id]) };
+		cache = { image_definition_view(folder.current_path, viewables.image_definitions[new_id]) };
 	}
 
 	auto& history = folder.history;
