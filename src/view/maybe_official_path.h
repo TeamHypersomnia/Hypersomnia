@@ -22,7 +22,7 @@ struct maybe_official_path {
 			return path < b.path;
 		}
 
-		return (is_official ? 0 : 1) < (b.is_official ? 0 : 1);
+		return (is_official ? 1 : 0) < (b.is_official ? 1 : 0);
 	}
 
 	auto suffixed(std::string p) const {

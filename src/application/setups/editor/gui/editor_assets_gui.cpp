@@ -260,7 +260,11 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 
 		int i = 0;
 
+		bool official_separator = false;
+
 		auto do_path = [&](const auto& path_entry, const auto& ticked_in_range, const auto& ticked_ids) {
+			separator_if_unofficials_ended(path_entry.get_full_path(), official_separator);
+
 			auto scope = scoped_id(i++);
 
 			const auto id = path_entry.id;
@@ -428,6 +432,8 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 			if (paths.empty()) {
 				return;
 			}
+
+			official_separator = false;
 
 			{
 				do_tick_all_checkbox(
