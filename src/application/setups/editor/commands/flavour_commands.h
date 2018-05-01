@@ -35,10 +35,33 @@ struct duplicate_flavour_command : create_flavour_command {
 	raw_entity_flavour_id duplicate_from;
 	// END GEN INTROSPECTOR
 
+	template <class T>
+	void set_duplicated_id(const typed_entity_flavour_id<T>& id) {
+		type_id.set<T>();
+		duplicate_from = id.raw;
+	}
+
 	void redo(const editor_command_input in);
 	void undo(const editor_command_input in);
 };
 
-struct delete_flavour_command {
+struct delete_flavour_command : id_freeing_command<raw_entity_flavour_id> {
+	using base = id_freeing_command<raw_entity_flavour_id>;
+	using introspect_base = base;
 
+	// GEN INTROSPECTOR struct delete_flavour_command
+	entity_type_id type_id;
+	std::string built_description;
+	// END GEN INTROSPECTOR
+
+	template <class T>
+	void set_deleted_id(const typed_entity_flavour_id<T>& id) {
+		type_id.set<T>();
+		freed_id = id.raw;
+	}
+
+	std::string describe() const;
+
+	void redo(const editor_command_input in);
+	void undo(const editor_command_input in);
 };

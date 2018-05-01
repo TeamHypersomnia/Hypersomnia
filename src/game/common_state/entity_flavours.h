@@ -147,6 +147,8 @@ private:
 	}
 
 public:
+	using mapped_type = typename decltype(flavours)::mapped_type;
+
 	template <class F>
 	void for_each(F&& callback) {
 		for_each_impl(*this, std::forward<F>(callback));
@@ -177,6 +179,10 @@ public:
 		return flavours.get(id.raw);
 	}
 	
+	const auto& get(const raw_entity_flavour_id id) const {
+		return flavours.get(id);
+	}
+
 	auto capacity() const {
 		return flavours.capacity();
 	}
@@ -193,7 +199,7 @@ public:
 
 	template <class... Args>
 	decltype(auto) free(Args&&... args) {
-		return flavours.undo_last_allocate(std::forward<Args>(args)...);
+		return flavours.free(std::forward<Args>(args)...);
 	}
 
 	template <class... Args>

@@ -12,8 +12,7 @@ std::string create_asset_id_command<I>::describe() const {
 
 template <class I>
 void create_asset_id_command<I>::redo(const editor_command_input in) {
-	auto& work = *in.folder.work;
-	auto& new_object = base::redo(get_viewable_pool<I>(work.viewables));
+	auto& new_object = base::redo(get_viewable_pool<I>(in.folder.work->viewables));
 	new_object.set_source_path(use_path);
 }
 
@@ -31,31 +30,12 @@ std::string forget_asset_id_command<I>::describe() const {
 
 template <class I>
 void forget_asset_id_command<I>::redo(const editor_command_input in) {
-	auto& work = *in.folder.work;
-
-	ensure(forgotten_content.empty());
-
-	auto s = augs::ref_memory_stream(forgotten_content);
-
-	auto& definitions = get_viewable_pool<I>(work.viewables);
-
-	augs::write_bytes(s, definitions[forgotten_id]);
-	undo_free_input = *definitions.free(forgotten_id);
+	base::redo(get_viewable_pool<I>(in.folder.work->viewables));
 }
 
 template <class I>
 void forget_asset_id_command<I>::undo(const editor_command_input in) {
-	auto& work = *in.folder.work;
-
-	auto s = augs::cref_memory_stream(forgotten_content);
-
-	auto& definitions = get_viewable_pool<I>(work.viewables);
-
-	typename remove_cref<decltype(definitions)>::mapped_type def;
-	augs::read_bytes(s, def);
-	definitions.undo_free(undo_free_input, std::move(def));
-
-	forgotten_content.clear();
+	base::undo(get_viewable_pool<I>(in.folder.work->viewables));
 }
 
 template struct create_asset_id_command<assets::image_id>;

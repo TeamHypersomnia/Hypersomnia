@@ -278,7 +278,7 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 				if (ImGui::Button("F")) {
 					auto forget = [&](const auto& which, const bool has_parent) {
 						forget_asset_id_command<asset_id_type> cmd;
-						cmd.forgotten_id = which.id;
+						cmd.freed_id = which.id;
 						cmd.built_description = 
 							typesafe_sprintf("Stopped tracking %x", which.get_full_path().to_display())
 						;

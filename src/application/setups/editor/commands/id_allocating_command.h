@@ -1,5 +1,7 @@
 #pragma once
 #include "application/setups/editor/editor_command_input.h"
+#include "augs/readwrite/memory_stream.h"
+#include "augs/misc/pool/pool_structs.h"
 
 namespace augs {
 	struct introspection_access;
@@ -43,5 +45,39 @@ public:
 	template <class P>
 	void undo(P& pool) {
 		pool.undo_last_allocate(allocated_id);
+	}
+};
+
+template <class id_type>
+struct id_freeing_command {
+	// GEN INTROSPECTOR struct id_freeing_command class id_type
+	editor_command_common common;
+
+	id_type freed_id;
+private:
+	friend augs::introspection_access;
+	typename id_type::undo_free_type undo_free_input;
+	std::vector<std::byte> forgotten_content;
+public:
+	// END GEN INTROSPECTOR
+
+	template <class P>
+	void redo(P& pool) {
+		ensure(forgotten_content.empty());
+
+		auto s = augs::ref_memory_stream(forgotten_content);
+		augs::write_bytes(s, pool.get(freed_id));
+		undo_free_input = *pool.free(freed_id);
+	}
+
+	template <class P>
+	void undo(P& pool) {
+		auto s = augs::cref_memory_stream(forgotten_content);
+
+		typename P::mapped_type def;
+		augs::read_bytes(s, def);
+		pool.undo_free(undo_free_input, std::move(def));
+
+		forgotten_content.clear();
 	}
 };

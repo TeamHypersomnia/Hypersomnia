@@ -30,17 +30,12 @@ struct create_asset_id_command : id_allocating_command<id_type> {
 };
 
 template <class id_type>
-struct forget_asset_id_command {
-	// GEN INTROSPECTOR struct forget_asset_id_command class id_type
-	editor_command_common common;
+struct forget_asset_id_command : id_freeing_command<id_type> {
+	using base = id_freeing_command<id_type>;
+	using introspect_base = base;
 
-	id_type forgotten_id;
+	// GEN INTROSPECTOR struct forget_asset_id_command class id_type
 	std::string built_description;
-private:
-	friend augs::introspection_access;
-	typename id_type::undo_free_type undo_free_input;
-	std::vector<std::byte> forgotten_content;
-public:
 	// END GEN INTROSPECTOR
 
 	std::string describe() const;

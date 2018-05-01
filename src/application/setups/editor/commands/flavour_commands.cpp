@@ -97,3 +97,37 @@ void duplicate_flavour_command::redo(const editor_command_input in) {
 void duplicate_flavour_command::undo(const editor_command_input in) {
 	base::undo(in);
 }
+
+void delete_flavour_command::redo(const editor_command_input in) {
+	type_id.dispatch(
+		[&](auto e) {
+			using E = decltype(e);
+
+			auto& work = *in.folder.work;
+			auto& cosm = work.world;
+
+			auto& flavours = cosm.get_common_significant({}).get_flavours<E>();
+			
+			base::redo(flavours);
+		}
+	);
+}
+
+void delete_flavour_command::undo(const editor_command_input in) {
+	type_id.dispatch(
+		[&](auto e) {
+			using E = decltype(e);
+
+			auto& work = *in.folder.work;
+			auto& cosm = work.world;
+
+			auto& flavours = cosm.get_common_significant({}).get_flavours<E>();
+			
+			base::undo(flavours);
+		}
+	);
+}
+
+std::string delete_flavour_command::describe() const {
+	return built_description;
+}

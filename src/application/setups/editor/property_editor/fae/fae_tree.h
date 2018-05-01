@@ -149,16 +149,35 @@ auto tree_of_flavours(
 
 							if (fae_in.show_flavour_control_buttons) {
 								const auto scoped_style = in_line_button_style();
-								const auto button_label = "D##" + imgui_id;
 
-								if (ImGui::Button(button_label.c_str())) {
-									const auto cmd_in = cpe_in.command_in;
-									auto& history = cmd_in.folder.history;
+								{
+									const auto button_label = "D##" + imgui_id;
 
-									duplicate_flavour_command cmd;
-									cmd.type_id = this_type_id;
-									cmd.duplicate_from = flavour_id.raw;
-									history.execute_new(std::move(cmd), cpe_in.command_in);
+									if (ImGui::Button(button_label.c_str())) {
+										const auto cmd_in = cpe_in.command_in;
+										auto& history = cmd_in.folder.history;
+
+										duplicate_flavour_command cmd;
+										cmd.set_duplicated_id(flavour_id);
+										history.execute_new(std::move(cmd), cpe_in.command_in);
+									}
+								}
+
+								ImGui::SameLine();
+
+								{
+									auto disabled_scope = ::maybe_disabled_cols(settings, false);
+
+									const auto button_label = "-##" + imgui_id;
+
+									if (ImGui::Button(button_label.c_str())) {
+										const auto cmd_in = cpe_in.command_in;
+										auto& history = cmd_in.folder.history;
+
+										delete_flavour_command cmd;
+										cmd.set_deleted_id(flavour_id);
+										history.execute_new(std::move(cmd), cpe_in.command_in);
+									}
 								}
 
 								ImGui::SameLine();
