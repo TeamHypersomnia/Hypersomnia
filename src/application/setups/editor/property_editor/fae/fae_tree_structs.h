@@ -28,6 +28,7 @@ struct fae_property_editor_input {
 struct fae_tree_input {
 	commanding_property_editor_input cpe_in;
 	const bool show_filter_buttons = false;
+	const bool show_flavour_control_buttons = false;
 	const loaded_image_caches_map& image_caches;
 
 	operator fae_property_editor_input() const {

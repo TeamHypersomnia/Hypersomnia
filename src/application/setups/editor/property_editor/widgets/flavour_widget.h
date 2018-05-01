@@ -55,7 +55,7 @@ struct flavour_widget {
 			auto list_flavours_of_type = [&](auto e) {
 				using E = decltype(e);
 
-				const auto entity_type_label = format_field_name(get_type_name<E>());
+				static const auto entity_type_label = format_field_name(get_type_name<E>());
 
 				if (cosm.get_flavours_count<E>()) {
 					text(entity_type_label);

@@ -146,7 +146,7 @@ public:
 
 fae_tree_input editor_fae_gui_base::make_fae_input(
 	const editor_fae_gui_input in,
-	const bool show_filter_buttons
+	const bool is_selection
 ) {
 	const auto prop_in = property_editor_input { 
 		in.settings,
@@ -159,7 +159,7 @@ fae_tree_input editor_fae_gui_base::make_fae_input(
 	};
 
 	return fae_tree_input { 
-		cpe_in, show_filter_buttons, in.image_caches
+		cpe_in, is_selection, !is_selection, in.image_caches
 	};
 }
 

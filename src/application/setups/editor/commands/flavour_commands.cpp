@@ -11,27 +11,46 @@ std::string create_flavour_command::describe() const {
 }
 
 void create_flavour_command::redo(const editor_command_input in) {
+	redo_and_copy(in, {});
+}
+
+void create_flavour_command::redo_and_copy(const editor_command_input in, const raw_entity_flavour_id source) {
 	type_id.dispatch(
 		[&](auto e) {
 			using E = decltype(e);
 			using flavour_type = entity_flavour<E>;
 
-			const auto entity_type_label = str_ops(format_field_name(get_type_name<E>())).replace_all(" ", "").subject;
+			static const auto entity_type_label = str_ops(format_field_name(get_type_name<E>())).replace_all(" ", "").subject;
 
 			auto& work = *in.folder.work;
 			auto& cosm = work.world;
 			auto& defs = work.viewables;
 
+			const auto source_flavour = cosm.find_flavour(typed_entity_flavour_id<E>(source));
+
+			const auto basic_name = [source_flavour]() {
+				if (source_flavour) {
+					return source_flavour->get_name();
+				}
+
+				return entity_type_label;
+			}();
+
 			auto& flavours = cosm.get_common_significant({}).get_flavours<E>();
 			auto& new_object = base::redo(flavours);
-			
-			if constexpr(flavour_type::template has<invariants::sprite>()) {
-				const auto provider = asset_sane_default_provider { defs };
-				new_object.set(provider.construct<invariants::sprite>());
+
+			if (source_flavour != nullptr) {
+				new_object = *source_flavour;
+			}
+			else {
+				if constexpr(flavour_type::template has<invariants::sprite>()) {
+					const auto provider = asset_sane_default_provider { defs };
+					new_object.set(provider.construct<invariants::sprite>());
+				}
 			}
 
 			auto make_new_flavour_name = [&](const auto i) {
-				return entity_type_label + "-" + std::to_string(i);
+				return basic_name + "-" + std::to_string(i);
 			};
 
 			for (int i = 1; ; ++i) {
@@ -69,4 +88,12 @@ void create_flavour_command::undo(const editor_command_input in) {
 			base::undo(flavours);
 		}
 	);
+}
+
+void duplicate_flavour_command::redo(const editor_command_input in) {
+	base::redo_and_copy(in, duplicate_from);
+}
+
+void duplicate_flavour_command::undo(const editor_command_input in) {
+	base::undo(in);
 }

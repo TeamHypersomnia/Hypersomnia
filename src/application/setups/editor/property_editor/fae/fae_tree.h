@@ -95,7 +95,7 @@ auto tree_of_flavours(
 
 				auto& ticked_flavours = all_ticked_flavours.template get_for<E>();
 
-				const auto entity_type_label = format_field_name(get_type_name<E>());
+				static const auto entity_type_label = format_field_name(get_type_name<E>());
 				const auto this_type_id = entity_type_id::of<E>();
 
 				const auto total_flavours = provider.template num_flavours_of_type<E>();
@@ -147,12 +147,18 @@ auto tree_of_flavours(
 								imgui_id
 							);
 
-							{
+							if (fae_in.show_flavour_control_buttons) {
 								const auto scoped_style = in_line_button_style();
-								const auto button_label = "D###" + imgui_id;
+								const auto button_label = "D##" + imgui_id;
 
 								if (ImGui::Button(button_label.c_str())) {
+									const auto cmd_in = cpe_in.command_in;
+									auto& history = cmd_in.folder.history;
 
+									duplicate_flavour_command cmd;
+									cmd.type_id = this_type_id;
+									cmd.duplicate_from = flavour_id.raw;
+									history.execute_new(std::move(cmd), cpe_in.command_in);
 								}
 
 								ImGui::SameLine();
@@ -188,15 +194,16 @@ auto tree_of_flavours(
 						}
 					);
 
-					{
+					if (fae_in.show_flavour_control_buttons) {
 						const auto scoped_style = in_line_button_style();
-						const auto button_label = "+###" + entity_type_label;
+						const auto button_label = "+##" + entity_type_label;
 
 						if (ImGui::Button(button_label.c_str())) {
-							create_flavour_command cmd;
-							cmd.type_id = this_type_id;
 							const auto cmd_in = cpe_in.command_in;
 							auto& history = cmd_in.folder.history;
+
+							create_flavour_command cmd;
+							cmd.type_id = this_type_id;
 							history.execute_new(std::move(cmd), cpe_in.command_in);
 						}
 					}
@@ -246,7 +253,7 @@ auto tree_of_entities(
 
 				auto& ticked_entities = all_ticked_entities.template get_for<E>();
 
-				const auto entity_type_label = format_field_name(get_type_name<E>());
+				static const auto entity_type_label = format_field_name(get_type_name<E>());
 
 				const auto total_entities = provider.template num_entities_of_type<E>();
 				auto disabled = ::maybe_disabled_cols(settings, total_entities == 0);

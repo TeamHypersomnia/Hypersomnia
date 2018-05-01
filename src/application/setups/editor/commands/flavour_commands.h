@@ -20,17 +20,21 @@ struct create_flavour_command : id_allocating_command<raw_entity_flavour_id> {
 	// END GEN INTROSPECTOR
 
 	std::string describe() const;
+
 	void redo(const editor_command_input in);
+	void redo_and_copy(const editor_command_input in, raw_entity_flavour_id);
+
 	void undo(const editor_command_input in);
 };
 
-struct duplicate_flavour_command {
+struct duplicate_flavour_command : create_flavour_command {
+	using base = create_flavour_command;
+	using introspect_base = base;
+
 	// GEN INTROSPECTOR struct duplicate_flavour_command
-	create_flavour_command subcommand;
-	entity_flavour_id copy_from;
+	raw_entity_flavour_id duplicate_from;
 	// END GEN INTROSPECTOR
 
-	std::string describe() const;
 	void redo(const editor_command_input in);
 	void undo(const editor_command_input in);
 };

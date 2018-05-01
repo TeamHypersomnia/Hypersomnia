@@ -42,7 +42,7 @@ using editor_history_base = augs::history_with_marks<
 	duplicate_entities_command,
 
 	create_flavour_command,
-	/* duplicate_flavour_command, */
+	duplicate_flavour_command,
 	/* delete_flavour_command, */
 	change_flavour_property_command,
 
