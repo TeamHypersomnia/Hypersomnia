@@ -309,18 +309,22 @@ auto tree_of_entities(
 							const auto node_label = typesafe_sprintf("%x###%x", flavour_label, flavour_id.raw);
 							const auto imgui_id = typesafe_sprintf("%x.%x", this_type_id.get_index(), flavour_id.raw);
 
-							auto disabled = ::maybe_disabled_cols(settings, all_having_flavour.empty());
+							const bool no_entities_here = all_having_flavour.empty();
 
-							const auto flags = do_tick_all_checkbox(
-								settings,
-								ticked_entities,
-								[&all_having_flavour](auto callback) {
-									for (const auto& e_id : all_having_flavour) {
-										callback(e_id);
-									}
-								},
-								imgui_id
-							);
+							const auto flags = [&]() {
+								auto disabled = ::maybe_disabled_cols(settings, no_entities_here);
+
+								return do_tick_all_checkbox(
+									settings,
+									ticked_entities,
+									[&all_having_flavour](auto callback) {
+										for (const auto& e_id : all_having_flavour) {
+											callback(e_id);
+										}
+									},
+									imgui_id
+								);
+							}();
 
 							/* if (fae_in.show_flavour_control_buttons) */ 
 							{
@@ -338,6 +342,8 @@ auto tree_of_entities(
 
 								ImGui::SameLine();
 							}
+
+							auto disabled = ::maybe_disabled_cols(settings, no_entities_here);
 
 							const auto flavour_node = scoped_tree_node_ex(node_label, flags);
 
