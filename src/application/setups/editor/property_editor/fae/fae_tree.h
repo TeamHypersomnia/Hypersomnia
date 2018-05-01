@@ -154,12 +154,9 @@ auto tree_of_flavours(
 									const auto button_label = "D##" + imgui_id;
 
 									if (ImGui::Button(button_label.c_str())) {
-										const auto cmd_in = cpe_in.command_in;
-										auto& history = cmd_in.folder.history;
-
 										duplicate_flavour_command cmd;
 										cmd.set_duplicated_id(flavour_id);
-										history.execute_new(std::move(cmd), cpe_in.command_in);
+										post_editor_command(cpe_in.command_in, std::move(cmd));
 									}
 								}
 
@@ -171,12 +168,9 @@ auto tree_of_flavours(
 									const auto button_label = "-##" + imgui_id;
 
 									if (ImGui::Button(button_label.c_str())) {
-										const auto cmd_in = cpe_in.command_in;
-										auto& history = cmd_in.folder.history;
-
 										delete_flavour_command cmd;
 										cmd.set_deleted_id(flavour_id);
-										history.execute_new(std::move(cmd), cpe_in.command_in);
+										post_editor_command(cpe_in.command_in, std::move(cmd));
 									}
 								}
 
@@ -218,12 +212,9 @@ auto tree_of_flavours(
 						const auto button_label = "+##" + entity_type_label;
 
 						if (ImGui::Button(button_label.c_str())) {
-							const auto cmd_in = cpe_in.command_in;
-							auto& history = cmd_in.folder.history;
-
 							create_flavour_command cmd;
 							cmd.type_id = this_type_id;
-							history.execute_new(std::move(cmd), cpe_in.command_in);
+							post_editor_command(cpe_in.command_in, std::move(cmd));
 						}
 					}
 				}
@@ -330,6 +321,23 @@ auto tree_of_entities(
 								},
 								imgui_id
 							);
+
+							/* if (fae_in.show_flavour_control_buttons) */ 
+							{
+								const auto scoped_style = in_line_button_style();
+
+								{
+									const auto button_label = "+##" + imgui_id;
+
+									if (ImGui::Button(button_label.c_str())) {
+										instantiate_flavour_command cmd;
+										cmd.instantiated_id = flavour_id;
+										post_editor_command(cpe_in.command_in, std::move(cmd));
+									}
+								}
+
+								ImGui::SameLine();
+							}
 
 							const auto flavour_node = scoped_tree_node_ex(node_label, flags);
 

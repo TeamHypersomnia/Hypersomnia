@@ -5,6 +5,7 @@
 #include "application/setups/editor/commands/editor_command_structs.h"
 #include "application/setups/editor/commands/id_allocating_command.h"
 #include "game/transcendental/entity_flavour_id.h"
+#include "game/transcendental/entity_id.h"
 
 namespace augs {
 	struct introspection_access;
@@ -16,7 +17,10 @@ struct create_flavour_command : id_allocating_command<raw_entity_flavour_id> {
 
 	// GEN INTROSPECTOR struct create_flavour_command
 	entity_type_id type_id;
+private:
+	friend augs::introspection_access;
 	std::string built_description;
+public:
 	// END GEN INTROSPECTOR
 
 	std::string describe() const;
@@ -51,7 +55,10 @@ struct delete_flavour_command : id_freeing_command<raw_entity_flavour_id> {
 
 	// GEN INTROSPECTOR struct delete_flavour_command
 	entity_type_id type_id;
+private:
+	friend augs::introspection_access;
 	std::string built_description;
+public:
 	// END GEN INTROSPECTOR
 
 	template <class T>
@@ -59,6 +66,23 @@ struct delete_flavour_command : id_freeing_command<raw_entity_flavour_id> {
 		type_id.set<T>();
 		freed_id = id.raw;
 	}
+
+	std::string describe() const;
+
+	void redo(const editor_command_input in);
+	void undo(const editor_command_input in);
+};
+
+struct instantiate_flavour_command {
+	// GEN INTROSPECTOR struct instantiate_flavour_command
+	editor_command_common common;
+	entity_flavour_id instantiated_id;
+private:
+	friend augs::introspection_access;
+	entity_id created_id;
+	std::string built_description;
+public:
+	// END GEN INTROSPECTOR
 
 	std::string describe() const;
 

@@ -67,7 +67,14 @@ void create_flavour_command::redo_and_copy(const editor_command_input in, const 
 
 				if (is_free) {
 					new_object.template get<invariants::name>().name = tried_name;
-					built_description = typesafe_sprintf("Created flavour: %x", tried_name);
+
+					if (source_flavour) {
+						built_description = typesafe_sprintf("Duplicated flavour: %x", source_flavour->get_name());
+					}
+					else {
+						built_description = typesafe_sprintf("Created flavour: %x", tried_name);
+					}
+
 					break;
 				}
 			}
@@ -108,6 +115,8 @@ void delete_flavour_command::redo(const editor_command_input in) {
 
 			auto& flavours = cosm.get_common_significant({}).get_flavours<E>();
 			
+			built_description = "Deleted flavour: " + flavours.get(freed_id).get_name();
+
 			base::redo(flavours);
 		}
 	);
@@ -130,4 +139,37 @@ void delete_flavour_command::undo(const editor_command_input in) {
 
 std::string delete_flavour_command::describe() const {
 	return built_description;
+}
+
+std::string instantiate_flavour_command::describe() const {
+	return built_description;
+}
+
+void instantiate_flavour_command::redo(const editor_command_input in) {
+	ensure(!created_id.is_set());
+
+	instantiated_id.type_id.dispatch(
+		[&](auto e) {
+			using E = decltype(e);
+
+			const auto flavour_id = typed_entity_flavour_id<E>(instantiated_id.raw);
+
+			auto& work = *in.folder.work;
+			auto& cosm = work.world;
+
+			const auto& flavour = cosm.get_flavour(flavour_id);
+
+			built_description = typesafe_sprintf("Instantiated flavour: %x", flavour.get_name());
+
+			created_id = cosmic::specific_create_entity(cosm, flavour_id, [](const auto){}).get_id();
+		}
+	);
+}
+
+void instantiate_flavour_command::undo(const editor_command_input in) {
+	auto& work = *in.folder.work;
+	auto& cosm = work.world;
+
+	cosmic::undo_last_create_entity(cosm[created_id]);
+	created_id = {};
 }
