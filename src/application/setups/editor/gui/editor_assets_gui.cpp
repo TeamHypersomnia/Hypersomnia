@@ -15,6 +15,7 @@
 #include "application/setups/editor/editor_folder.h"
 #include "application/intercosm.h"
 
+#include "application/setups/editor/detail/other_styles.h"
 #include "application/setups/editor/detail/format_struct_name.h"
 #include "application/setups/editor/property_editor/widgets/asset_path_chooser.h"
 #include "application/setups/editor/property_editor/general_edit_properties.h"
@@ -272,7 +273,7 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 			const auto flags = do_selection_checkbox(ticked_assets, id, current_ticked, i);
 
 			if (!path_entry.used()) {
-				const auto scoped_style = scoped_style_var(ImGuiStyleVar_FramePadding, ImVec2(3, 1));
+				const auto scoped_style = in_line_button_style();
 
 				if (ImGui::Button("F")) {
 					auto forget = [&](const auto& which, const bool has_parent) {

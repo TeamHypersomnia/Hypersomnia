@@ -5,6 +5,18 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- fix gui in images
+	- F next to name instead of forget far away
+		- tooltip showing how many will be forgotten
+
+- two atlases: one for neons and one for diffuse
+	- will rarely be switched anyway
+	- we might benchmark commit-wise
+	- implementation: actually make a struct called atlas_distribution
+	- IMGUI should preview atlases and tell how much space is left
+	- we might do this while making previews as it will be connected - will need to send texture ids to imgui
+	- maybe even on the occasion that we do asynchronous transfers
+
 - particles and flavours
 	- std::unordered_map<particle_flavour_id, vector of particles>
 		- We will always simulate all particles that we have in memory.

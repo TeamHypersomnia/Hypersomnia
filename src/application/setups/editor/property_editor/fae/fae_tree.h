@@ -3,10 +3,12 @@
 
 #include "game/organization/for_each_entity_type.h"
 
+#include "application/setups/editor/commands/flavour_commands.h"
 #include "application/setups/editor/property_editor/property_editor_structs.h"
 #include "application/setups/editor/property_editor/fae/flavour_properties_editor.h"
 #include "application/setups/editor/property_editor/fae/entity_properties_editor.h"
 
+#include "application/setups/editor/detail/other_styles.h"
 #include "application/setups/editor/detail/checkbox_selection.h"
 #include "application/setups/editor/property_editor/fae/fae_tree_structs.h"
 
@@ -94,6 +96,7 @@ auto tree_of_flavours(
 				auto& ticked_flavours = all_ticked_flavours.template get_for<E>();
 
 				const auto entity_type_label = format_field_name(get_type_name<E>());
+				const auto this_type_id = entity_type_id::of<E>();
 
 				const auto total_flavours = provider.template num_flavours_of_type<E>();
 
@@ -132,7 +135,6 @@ auto tree_of_flavours(
 						[&](const flavour_id_type flavour_id, const flavour_type& flavour) {
 							const auto flavour_label = flavour.template get<invariants::name>().name;
 
-							const auto this_type_id = entity_type_id::of<E>();
 							const auto node_label = typesafe_sprintf("%x###%x", flavour_label, flavour_id.raw);
 							const auto imgui_id = typesafe_sprintf("%x.%x", this_type_id.get_index(), flavour_id.raw);
 
@@ -144,6 +146,17 @@ auto tree_of_flavours(
 								is_flavour_selected,
 								imgui_id
 							);
+
+							{
+								const auto scoped_style = in_line_button_style();
+								const auto button_label = "D###" + imgui_id;
+
+								if (ImGui::Button(button_label.c_str())) {
+
+								}
+
+								ImGui::SameLine();
+							}
 
 							const auto flavour_node = scoped_tree_node_ex(node_label, flags);
 
@@ -174,6 +187,19 @@ auto tree_of_flavours(
 							}
 						}
 					);
+
+					{
+						const auto scoped_style = in_line_button_style();
+						const auto button_label = "+###" + entity_type_label;
+
+						if (ImGui::Button(button_label.c_str())) {
+							create_flavour_command cmd;
+							cmd.type_id = this_type_id;
+							const auto cmd_in = cpe_in.command_in;
+							auto& history = cmd_in.folder.history;
+							history.execute_new(std::move(cmd), cpe_in.command_in);
+						}
+					}
 				}
 			}	
 		);

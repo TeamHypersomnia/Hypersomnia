@@ -4,6 +4,7 @@
 #include "application/setups/editor/editor_command_input.h"
 #include "application/setups/editor/commands/editor_command_structs.h"
 #include "application/setups/editor/commands/change_property_command.h"
+#include "application/setups/editor/commands/id_allocating_command.h"
 #include "application/setups/editor/detail/field_address.h"
 #include "view/viewables/all_viewables_declarations.h"
 #include "view/viewables/get_viewable_pool.h"
@@ -15,19 +16,13 @@ namespace augs {
 }
 
 template <class id_type>
-struct create_asset_id_command {
+struct create_asset_id_command : id_allocating_command<id_type> {
+	using base = id_allocating_command<id_type>;
+	using introspect_base = base;
+
 	// GEN INTROSPECTOR struct create_asset_id_command class id_type
-	editor_command_common common;
-private:
-	friend augs::introspection_access;
-	id_type allocated_id;
-public:
 	maybe_official_path<id_type> use_path;
 	// END GEN INTROSPECTOR
-
-	auto get_allocated_id() const {
-		return allocated_id;
-	}
 
 	std::string describe() const;
 	void redo(const editor_command_input in);

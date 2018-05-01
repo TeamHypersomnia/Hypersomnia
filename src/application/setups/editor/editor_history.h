@@ -15,6 +15,7 @@
 #include "application/setups/editor/commands/change_grouping_command.h"
 
 #include "application/setups/editor/commands/asset_commands.h"
+#include "application/setups/editor/commands/flavour_commands.h"
 
 #include "application/setups/editor/editor_history_declaration.h"
 

@@ -3,10 +3,21 @@
 #include "augs/templates/folded_finders.h"
 #include "augs/templates/transform_types.h"
 #include "augs/templates/hash_fwd.h"
+#include "augs/templates/remove_cref.h"
 
 namespace augs {
 	struct introspection_access;
 }
+
+template <class List>
+class type_in_list_id;
+
+template <class T, class F>
+decltype(auto) get_by_dynamic_id(
+	T&& index_gettable_object,
+	const type_in_list_id<remove_cref<T>> dynamic_type_index,
+	F&& generic_call
+);
 
 template <class List>
 class type_in_list_id {
@@ -75,6 +86,15 @@ public:
 
 	bool operator!=(const type_in_list_id b) const{
 		return !operator==(b);
+	}
+
+	template <class F>
+	decltype(auto) dispatch(F&& callback) const {
+		return get_by_dynamic_id(
+			List(),
+			*this,
+			std::forward<F>(callback)
+		);
 	}
 };
 

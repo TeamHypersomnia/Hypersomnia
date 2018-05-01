@@ -187,6 +187,21 @@ public:
 	}
 
 	template <class... Args>
+	decltype(auto) undo_last_allocate(Args&&... args) {
+		return flavours.undo_last_allocate(std::forward<Args>(args)...);
+	}
+
+	template <class... Args>
+	decltype(auto) free(Args&&... args) {
+		return flavours.undo_last_allocate(std::forward<Args>(args)...);
+	}
+
+	template <class... Args>
+	decltype(auto) undo_free(Args&&... args) {
+		return flavours.undo_free(std::forward<Args>(args)...);
+	}
+
+	template <class... Args>
 	void reserve(Args&&... args) {
 		flavours.reserve(std::forward<Args>(args)...);
 	}

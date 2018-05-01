@@ -13,34 +13,15 @@ std::string create_asset_id_command<I>::describe() const {
 template <class I>
 void create_asset_id_command<I>::redo(const editor_command_input in) {
 	auto& work = *in.folder.work;
-
-	const auto previous_id = allocated_id;
-
-	auto validate = [previous_id](const auto new_id) {
-		if (previous_id.is_set()) {
-			ensure_eq(new_id, previous_id);
-		}
-	};
-
-	{
-		auto& definitions = get_viewable_pool<I>(work.viewables);
-
-		const auto allocation = definitions.allocate();
-		const auto new_id = allocation.key;
-		allocation.object.set_source_path(use_path);
-
-		validate(new_id);
-
-		allocated_id = new_id;
-	}
+	auto& new_object = base::redo(get_viewable_pool<I>(work.viewables));
+	new_object.set_source_path(use_path);
 }
 
 template <class I>
 void create_asset_id_command<I>::undo(const editor_command_input in) {
 	auto& work = *in.folder.work;
-
 	auto& definitions = get_viewable_pool<I>(work.viewables);
-	definitions.undo_last_allocate(allocated_id);
+	base::undo(definitions);
 }
 
 template <class I>
