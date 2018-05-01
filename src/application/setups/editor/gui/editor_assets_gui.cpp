@@ -270,29 +270,11 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 			const auto current_ticked = is_ticked(path_entry);
 
 			const auto flags = do_selection_checkbox(ticked_assets, id, current_ticked, i);
-			const auto node = scoped_tree_node_ex(displayed_name, flags);
 
-			next_columns(2);
+			if (!path_entry.used()) {
+				const auto scoped_style = scoped_style_var(ImGuiStyleVar_FramePadding, ImVec2(3, 1));
 
-			const auto& project_path = cmd_in.folder.current_path;
-
-			text_disabled(displayed_dir);
-
-			ImGui::NextColumn();
-
-			if (path_entry.used()) {
-				const auto& using_locations = path_entry.using_locations;
-
-				if (auto node = scoped_tree_node(typesafe_sprintf("%x locations###locations", using_locations.size()).c_str())) {
-					for (const auto& l : using_locations) {
-						text(l);
-					}
-				}
-			}
-			else {
-				const auto scoped_style = scoped_style_var(ImGuiStyleVar_FramePadding, ImVec2(3, 0));
-
-				if (ImGui::Button("Forget")) {
+				if (ImGui::Button("F")) {
 					auto forget = [&](const auto& which, const bool has_parent) {
 						forget_asset_id_command<asset_id_type> cmd;
 						cmd.forgotten_id = which.id;
@@ -317,6 +299,40 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 						}
 					}
 				}
+
+				if (ImGui::IsItemHovered()) {
+					if (current_ticked && ticked_in_range.size() > 1) {
+						text_tooltip("Forget %x images", ticked_in_range.size());
+					}
+					else {
+						text_tooltip("Forget %x", path_entry.get_full_path().to_display());
+					}
+				}
+
+				ImGui::SameLine();
+			}
+
+			const auto node = scoped_tree_node_ex(displayed_name, flags);
+
+			next_columns(2);
+
+			const auto& project_path = cmd_in.folder.current_path;
+
+			text_disabled(displayed_dir);
+
+			ImGui::NextColumn();
+
+			if (path_entry.used()) {
+				const auto& using_locations = path_entry.using_locations;
+
+				if (auto node = scoped_tree_node(typesafe_sprintf("%x locations###locations", using_locations.size()).c_str())) {
+					for (const auto& l : using_locations) {
+						text(l);
+					}
+				}
+			}
+			else {
+				text_disabled("(Nowhere)");
 			}
 
 			ImGui::NextColumn();
@@ -461,7 +477,7 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 		if (browser_settings.show_orphaned) {
 			do_section(
 				missing_orphaned_paths,
-				{ "Missing paths (orphaned)", "Last seen in", "Operations" },
+				{ "Missing paths (orphaned)", "Last seen in", "Used at" },
 				red
 			);
 		}
@@ -475,7 +491,7 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 		if (browser_settings.show_orphaned) {
 			do_section(
 				orphaned_paths,
-				{ typesafe_sprintf("Orphaned %xs", label), "Folder", "Operations" }
+				{ typesafe_sprintf("Orphaned %xs", label), "Folder", "Used at" }
 			);
 		}
 
