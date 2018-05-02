@@ -1,7 +1,7 @@
 #pragma once
 #include "augs/templates/identity_templates.h"
 
-#include "augs/templates/introspect.h"
+#include "augs/templates/introspection_utils/introspect_with_containers.h"
 #include "augs/templates/introspection_utils/field_name_tracker.h"
 #include "augs/templates/introspection_utils/types_in.h"
 
@@ -24,7 +24,7 @@ void find_object_in_object(
 
 			if constexpr(can_type_contain_another_v<T, Se>) {
 				if constexpr(IgnorePredicate<T>::value) {
-					/* This has a special logic */
+					/* Apparently, this has a special logic of finding */
 				}
 				else if constexpr(std::is_same_v<T, S>) {
 					if (searched_object == field) {

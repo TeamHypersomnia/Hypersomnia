@@ -769,3 +769,4 @@ we consider whole type overrides too complex architeciturally:
 - really make entity_flavours just a direct pool
 - for_each_container usage for ent pools
 
+- start moving instantiated entity right away

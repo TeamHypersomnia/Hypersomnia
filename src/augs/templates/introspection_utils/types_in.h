@@ -2,6 +2,7 @@
 #include <type_traits>
 #include "generated/introspectors.h"
 #include "augs/templates/traits/introspection_traits.h"
+#include "augs/templates/list_utils.h"
 
 namespace augs {
 	template <class T>

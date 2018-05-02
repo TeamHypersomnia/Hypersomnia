@@ -4,32 +4,48 @@
 #include "application/intercosm.h"
 
 template <class T>
-struct ignore_while_looking_for_id : std::bool_constant<
+struct ignore_in_common : std::bool_constant<
 	is_one_of_v<T, all_logical_assets, all_entity_flavours>
 > {};
 
-template <class asset_id_type, class F>
+template <class object_type, class F>
 void find_locations_that_use(
-	const asset_id_type id,
+	const object_type id,
 	const intercosm& inter,
 	F location_callback
 ) {
-	auto traverse = [&](const std::string& preffix, const auto& object) {
-		find_object_in_object<ignore_while_looking_for_id>(id, object, [&](const auto& location) {
-			location_callback(preffix + location);
-		});
-	};
-
 	const auto& cosm = inter.world;
-	const auto& common = cosm.get_common_significant();
 
-	traverse("Common: ", common);
+	/* If it is a flavour, include information about entities. */
 
-	for_each_entity_type([&](auto e){ 
+	if constexpr(is_typed_flavour_id_v<object_type>) {
+		const auto num_entities = cosm.get_solvable_inferred().name.get_entities_by_flavour_id(id).size();
+
+		if (num_entities > 0) {
+			location_callback(typesafe_sprintf("%x Entities", num_entities));
+		}
+	}
+
+	if constexpr(can_type_contain_another_v<cosmos_common_significant, object_type>) {
+		/* 
+			Scan the entire common state, 
+			except for flavours and assets.
+		*/
+
+		const auto& common = cosm.get_common_significant();
+
+		find_object_in_object<ignore_in_common>(id, common, [&](const auto& location) {
+			location_callback("Common: " + location);
+		});
+	}
+
+	/* Scan all flavours. */
+
+	for_each_entity_type([&](auto e) { 
 		using E = decltype(e);
 		using Fl = entity_flavour<E>;
 
-		if constexpr(can_type_contain_another_v<Fl, asset_id_type>) {
+		if constexpr(can_type_contain_another_v<Fl, object_type>) {
 			cosm.for_each_id_and_flavour<E>([&](const auto, const auto& flavour) {
 				const auto& name = flavour.template get<invariants::name>().name;
 
@@ -39,9 +55,8 @@ void find_locations_that_use(
 						[&](const auto& c) {
 							using C = remove_cref<decltype(c)>;
 
-							if constexpr(can_type_contain_another_v<C, asset_id_type>) {
+							if constexpr(can_type_contain_another_v<C, object_type>) {
 								find_object_in_object(id, c, [&](const auto& location) {
-									/* location_callback(format_struct_name(c) + "of " + name + ": " + location); */
 									location_callback("Flavour: " + name + " (" + format_struct_name(c) + "." + location + ")");
 								});
 							}
@@ -55,5 +70,25 @@ void find_locations_that_use(
 		}
 	});
 
-	//traverse("Particle effects: ", inter.viewables.particle_effects);
+	/* Scan all assets. */
+
+	const auto& viewables = inter.viewables;
+	const auto& logicals = cosm.get_logical_assets();
+
+	auto traverse_assets = [&](const auto preffix, const auto& p) {
+		if constexpr(can_type_contain_another_v<typename remove_cref<decltype(p)>::value_type, object_type>) {
+			for_each_id_and_object(
+				p, 
+				[&](const auto&, const auto& asset) {
+					find_object_in_object<ignore_in_common>(id, asset, [&](const auto& location) {
+						location_callback(preffix + location);
+					});
+				}
+			);
+		}
+	};
+
+	traverse_assets("Particle effects: ", viewables.particle_effects);
+	traverse_assets("Animations: ", logicals.animations);
+	traverse_assets("Physical materials: ", logicals.physical_materials);
 }

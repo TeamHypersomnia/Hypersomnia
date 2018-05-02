@@ -12,10 +12,8 @@
 #include "application/setups/editor/detail/checkbox_selection.h"
 #include "application/setups/editor/property_editor/fae/fae_tree_structs.h"
 
+#include "application/setups/editor/detail/find_locations_that_use.h"
 #include "application/setups/editor/property_editor/fae/ex_on_buttons.h"
-/*
-	"fae tree" is a shorthand for "flavours and entities tree".
-*/
 
 template <class E>
 void do_edit_entities_gui(
@@ -146,6 +144,17 @@ auto tree_of_flavours(
 								imgui_id
 							);
 
+							thread_local std::vector<std::string> locations;
+							locations.clear();
+
+							find_locations_that_use(
+								flavour_id,
+								*cpe_in.command_in.folder.work,
+								[](const std::string& location) {
+									locations.push_back(location);
+								}
+							);
+
 							if (fae_in.show_flavour_control_buttons) {
 								const auto scoped_style = in_line_button_style();
 
@@ -162,7 +171,7 @@ auto tree_of_flavours(
 								ImGui::SameLine();
 
 								{
-									auto disabled_scope = ::maybe_disabled_cols(settings, false);
+									auto disabled_scope = ::maybe_disabled_cols(settings, locations.size() > 0);
 
 									const auto button_label = "-##" + imgui_id;
 
@@ -180,14 +189,26 @@ auto tree_of_flavours(
 
 							ImGui::NextColumn();
 
-							ex_on_buttons(
-								fae_in,
-								flavour_id,
-								total_types,
-								total_flavours,
-								imgui_id,
-								filter
-							);
+							if (fae_in.show_locations_using_flavour) {
+								if (locations.empty()) {
+									text_disabled("(Used nowhere)");
+								}
+								else if (const auto locations_node = scoped_tree_node_ex(typesafe_sprintf("Locations that use##%x", imgui_id), flags)) {
+									for (const auto& l : locations) {
+										text(l);
+									}
+								}
+							}
+							else {
+								ex_on_buttons(
+									fae_in,
+									flavour_id,
+									total_types,
+									total_flavours,
+									imgui_id,
+									filter
+								);
+							}
 
 							ImGui::NextColumn();
 
@@ -337,7 +358,7 @@ auto tree_of_entities(
 								const auto scoped_style = in_line_button_style();
 
 								{
-									const auto button_label = "+##" + imgui_id;
+									const auto button_label = "I##" + imgui_id;
 
 									if (ImGui::Button(button_label.c_str())) {
 										output.instantiate_id = flavour_id;

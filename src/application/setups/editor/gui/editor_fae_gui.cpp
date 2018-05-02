@@ -1,3 +1,5 @@
+#define INCLUDE_TYPES_IN 1
+
 #include "augs/misc/simple_pair.h"
 #include "application/setups/editor/gui/editor_fae_gui.h"
 #include "application/setups/editor/editor_command_input.h"
@@ -159,7 +161,7 @@ fae_tree_input editor_fae_gui_base::make_fae_input(
 	};
 
 	return fae_tree_input { 
-		cpe_in, is_selection, !is_selection, in.image_caches
+		cpe_in, is_selection, !is_selection, !is_selection, in.image_caches
 	};
 }
 

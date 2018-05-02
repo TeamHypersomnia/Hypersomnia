@@ -28,6 +28,10 @@ template <class E>
 using make_flavour_to_entities_map = std::unordered_map<typed_entity_flavour_id<E>, std::vector<typed_entity_id<E>>>;
 using flavour_to_entities_type = per_entity_type_container<make_flavour_to_entities_map>;
 
+/*
+	"fae tree" is a shorthand for "flavours and entities tree".
+*/
+
 struct editor_fae_gui_base : standard_window_mixin<editor_fae_gui_base> {
 	using base = standard_window_mixin<editor_fae_gui_base>;
 	using base::base;
