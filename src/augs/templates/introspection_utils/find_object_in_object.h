@@ -5,36 +5,61 @@
 #include "augs/templates/introspection_utils/field_name_tracker.h"
 #include "augs/templates/introspection_utils/types_in.h"
 
-template <template <class> class IgnorePredicate = always_false, class Se, class O, class F>
+template <bool allow_conversion>
+struct detail_same_or_convertible;
+
+template <>
+struct detail_same_or_convertible<false> {
+	template <class A, class B>
+	static constexpr bool value = can_type_contain_v<A, B>;
+};
+
+template <>
+struct detail_same_or_convertible<true> {
+	template <class A, class B>
+	static constexpr bool value = can_type_contain_constructible_from_v<A, B>;
+};
+
+template <
+	template <class> class IgnorePredicate = always_false, 
+	bool allow_conversion = false,
+	class Searched, 
+	class O, 
+	class F
+>
 void find_object_in_object(
-	const Se& searched_object,
+	const Searched& searched_object,
 	const O& in_object,
 	F location_callback
 ) {
-	using S = std::remove_const_t<std::remove_reference_t<Se>>;
-
-	static_assert(can_type_contain_another_v<O, Se>, "This search will never find anything.");
+	using contains = detail_same_or_convertible<allow_conversion>;
+	static_assert(contains::template value<O, Searched>, "This search will never find anything.");
 
 	thread_local augs::field_name_tracker fields;
 	fields.clear();
 
 	auto callback = augs::recursive(
 		[&searched_object, &location_callback](auto&& self, const auto& label, auto& field) {
-			using T = remove_cref<decltype(field)>;
+			using Candidate = remove_cref<decltype(field)>;
 
-			if constexpr(can_type_contain_another_v<T, Se>) {
-				if constexpr(IgnorePredicate<T>::value) {
+			if constexpr(contains::template value<Candidate, Searched>) {
+				if constexpr(IgnorePredicate<Candidate>::value) {
 					/* Apparently, this has a special logic of finding */
 				}
-				else if constexpr(std::is_same_v<T, S>) {
+				else if constexpr(std::is_same_v<Candidate, Searched>) {
 					if (searched_object == field) {
 						location_callback(fields.get_full_name(label));
 					}
 				}
-				else if constexpr(is_introspective_leaf_v<T>) {
+				else if constexpr(allow_conversion && std::is_constructible_v<Candidate, Searched>) {
+					if (Candidate(searched_object) == field) {
+						location_callback(fields.get_full_name(label));
+					}
+				}
+				else if constexpr(is_introspective_leaf_v<Candidate>) {
 					return;
 				}
-				else if constexpr(augs::has_dynamic_content_v<T>) {
+				else if constexpr(augs::has_dynamic_content_v<Candidate>) {
 					augs::on_dynamic_content(
 						[&](auto& dyn, auto... args) {
 							auto scope = fields.track(typesafe_sprintf("%x", args...));

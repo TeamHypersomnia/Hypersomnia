@@ -370,9 +370,6 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 						}
 					}
 
-					LOG_NVPS(get_type_name(new_content));
-					LOG_NVPS(field_id.offset, field_id.element_index);
-
 					cmd.property_id.field = field_id;
 					cmd.value_after_change = augs::to_bytes(new_content);
 					cmd.built_description = description + property_location;

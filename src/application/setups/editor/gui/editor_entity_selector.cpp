@@ -70,7 +70,7 @@ current_selections_type editor_entity_selector::do_left_release(
 ) {
 	auto selections = in.signi_selections;
 
-	if (const auto clicked = held) {
+	if (const auto clicked = held; clicked.is_set()) {
 		selection_group_entries clicked_subjects;
 
 		if (in.ignore_groups) {
@@ -125,7 +125,7 @@ void editor_entity_selector::select_all(
 	cosmic::for_each_entity(cosm, [&](const auto handle) {
 		const auto id = handle.get_id();
 
-		if (compared_flavour && rect_select_mode == editor_rect_select_type::SAME_FLAVOUR) {
+		if (compared_flavour.is_set() && rect_select_mode == editor_rect_select_type::SAME_FLAVOUR) {
 			if (entity_flavour_id(handle.get_flavour_id()) == compared_flavour) {
 				current_selections.emplace(id);
 			}
@@ -235,7 +235,7 @@ void editor_entity_selector::do_mousemotion(
 			}
 		);
 
-		if (!hovered) {
+		if (!hovered.is_set()) {
 			hovered = get_hovered_world_entity(
 				cosm, 
 				world_cursor_pos, 
@@ -259,7 +259,7 @@ std::optional<ltrb> editor_entity_selector::find_selection_aabb(
 				in.signi_selections
 			);
 
-			if (held && cosm[held]) {
+			if (held.is_set() && cosm[held]) {
 				combiner(held);
 
 				if (!in.ignore_groups) {
@@ -278,7 +278,7 @@ std::optional<rgba> editor_entity_selector::find_highlight_color_of(
 	const grouped_selector_op_input in
 ) const {
 	auto held_or_hovered = [in, id](auto& checked, const auto result_col) -> std::optional<rgba> {
-		if (checked) {
+		if (checked.is_set()) {
 			if (checked == id) {
 				return result_col;
 			}

@@ -125,10 +125,6 @@ struct entity_id : entity_id_base {
 		return base::is_set() && type_id.is_set();
 	}
 
-	explicit operator bool() const {
-		return is_set();
-	}
-
 	operator unversioned_entity_id() const {
 		return { basic(), type_id };
 	}

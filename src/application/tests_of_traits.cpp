@@ -347,8 +347,8 @@ struct tests_of_traits {
 
 	/* Type containment - tests of traits */
 
-	static_assert(can_type_contain_another_v<std::vector<int>, int>);
-	static_assert(can_type_contain_another_v<vec2, float>);
+	static_assert(can_type_contain_v<std::vector<int>, int>);
+	static_assert(can_type_contain_v<vec2, float>);
 
 	static_assert(has_types_in_v<std::tuple<int, double>>);
 	static_assert(has_types_in_v<augs::trivially_copyable_tuple<int, double>>);
@@ -358,41 +358,41 @@ struct tests_of_traits {
 	static_assert(has_types_in_v<std::pair<int, double>>);
 	static_assert(!has_types_in_v<int>);
 
-	static_assert(can_type_contain_another_v<std::pair<int, double>, int>);
-	static_assert(!can_type_contain_another_v<std::pair<int, float>, double>);
-	static_assert(!can_type_contain_another_v<std::pair<int, char>, double>);
+	static_assert(can_type_contain_v<std::pair<int, double>, int>);
+	static_assert(!can_type_contain_v<std::pair<int, float>, double>);
+	static_assert(!can_type_contain_v<std::pair<int, char>, double>);
 
-	static_assert(can_type_contain_another_v<augs::simple_pair<int, double>, int>);
-	static_assert(!can_type_contain_another_v<augs::simple_pair<int, float>, double>);
-	static_assert(!can_type_contain_another_v<augs::simple_pair<int, char>, double>);
+	static_assert(can_type_contain_v<augs::simple_pair<int, double>, int>);
+	static_assert(!can_type_contain_v<augs::simple_pair<int, float>, double>);
+	static_assert(!can_type_contain_v<augs::simple_pair<int, char>, double>);
 
-	static_assert(!can_type_contain_another_v<vec2, int>);
-	static_assert(can_type_contain_another_v<std::vector<std::vector<double>>, double>);
-	static_assert(can_type_contain_another_v<std::vector<std::vector<double>>, std::vector<double>>);
+	static_assert(!can_type_contain_v<vec2, int>);
+	static_assert(can_type_contain_v<std::vector<std::vector<double>>, double>);
+	static_assert(can_type_contain_v<std::vector<std::vector<double>>, std::vector<double>>);
 
-	static_assert(can_type_contain_another_v<std::optional<std::vector<double>>, std::vector<double>>);
+	static_assert(can_type_contain_v<std::optional<std::vector<double>>, std::vector<double>>);
 
-	static_assert(can_type_contain_another_v<
+	static_assert(can_type_contain_v<
 		std::map<int, std::vector<std::unordered_map<double, char>>>, 
 		char
 	>);
 
-	static_assert(can_type_contain_another_v<
+	static_assert(can_type_contain_v<
 		std::map<int, std::vector<std::unordered_map<double, char>>>, 
 		std::unordered_map<double, char>
 	>);
 
-	static_assert(can_type_contain_another_v<
+	static_assert(can_type_contain_v<
 		std::map<int, std::vector<std::unordered_map<double, std::optional<std::string>>>>, 
 		std::string
 	>);
 
-	static_assert(can_type_contain_another_v<
+	static_assert(can_type_contain_v<
 		std::map<int, std::vector<std::unordered_map<double, std::optional<std::string>>>>, 
 		std::optional<std::string>
 	>);
 
-	static_assert(can_type_contain_another_v<
+	static_assert(can_type_contain_v<
 		std::map<int, std::vector<std::unordered_map<double, char>>>, 
 		int
 	>);
@@ -451,8 +451,8 @@ struct game_state_checks {
 
 	/* This will also fail if pointers or references are present */
 
-	static_assert(!can_type_contain_another_v<cosmos_solvable_significant, blabla>);
-	static_assert(!can_type_contain_another_v<cosmos_common_significant, blabla>);
+	static_assert(!can_type_contain_v<cosmos_solvable_significant, blabla>);
+	static_assert(!can_type_contain_v<cosmos_common_significant, blabla>);
 
 	/* Invariants should not hold any ids because they are subject to invalidation */
 
@@ -461,8 +461,8 @@ struct game_state_checks {
 			using E = decltype(e);
 			using F = entity_flavour<E>;
 
-			static_assert(!can_type_contain_another_v<decltype(F::invariants), entity_id_base>);
-			static_assert(!can_type_contain_another_v<decltype(F::invariants), entity_guid>);
+			static_assert(!can_type_contain_v<decltype(F::invariants), entity_id_base>);
+			static_assert(!can_type_contain_v<decltype(F::invariants), entity_guid>);
 		});
 	}
 
@@ -496,6 +496,13 @@ struct game_state_checks {
 
 	/* Other sanity checks. */
 
-	static_assert(!can_type_contain_another_v<all_logical_assets, entity_id_base>);
-	static_assert(!can_type_contain_another_v<all_viewables_defs, entity_guid>);
+	static_assert(!can_type_contain_v<all_logical_assets, entity_id_base>);
+	static_assert(!can_type_contain_v<all_viewables_defs, entity_guid>);
+
+	static_assert(can_type_contain_constructible_from_v<invariants::catridge, typed_entity_flavour_id<shootable_charge>>);
+	static_assert(can_type_contain_constructible_from_v<cosmos_common_significant, typed_entity_flavour_id<shootable_charge>>);
+	static_assert(!can_type_contain_constructible_from_v<invariants::catridge, typed_entity_flavour_id<static_light>>);
+
+	static_assert(!can_type_contain_constructible_from_v<invariants::fixtures, typed_entity_flavour_id<plain_missile>>);
+	static_assert(!can_type_contain_constructible_from_v<invariants::flags, typed_entity_flavour_id<plain_missile>>);
 };

@@ -160,7 +160,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 			/* For common aftermath */
 			float total_recoil = 0.f;
 
-			if (const auto magic_missile_flavour_id = gun_def.magic_missile_flavour) {
+			if (const auto magic_missile_flavour_id = gun_def.magic_missile_flavour; magic_missile_flavour_id.is_set()) {
 				const auto& missile = cosmos.on_flavour(
 					magic_missile_flavour_id,
 					[](const auto& f) -> decltype(auto) {
@@ -254,7 +254,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					int charges = single_bullet_or_pellet_stack.get<components::item>().get_charges();
 
 					while (charges--) {
-						if (const auto round_flavour = single_bullet_or_pellet_stack.get<invariants::catridge>().round_flavour) {
+						if (const auto round_flavour = single_bullet_or_pellet_stack.get<invariants::catridge>().round_flavour; round_flavour.is_set()) {
 							cosmic::create_entity(cosmos, round_flavour, [&](const auto round_entity){
 								auto& sender = round_entity.template get<components::sender>();
 								sender.set(gun_entity);
@@ -288,7 +288,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 						}
 					}
 
-					if (const auto shell_flavour = single_bullet_or_pellet_stack.get<invariants::catridge>().shell_flavour) {
+					if (const auto shell_flavour = single_bullet_or_pellet_stack.get<invariants::catridge>().shell_flavour; shell_flavour.is_set()) {
 						cosmic::create_entity(cosmos, shell_flavour, [&](const auto shell_entity){
 							auto rng = cosmos.get_rng_for(shell_entity);
 

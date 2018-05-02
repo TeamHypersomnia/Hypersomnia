@@ -96,7 +96,7 @@ entity_name_str get_bbcoded_entity_properties(const const_entity_handle id) {
 	}
 
 	if (gun) {
-		if (const auto flavour = gun_def->magic_missile_flavour) {
+		if (const auto flavour = gun_def->magic_missile_flavour; flavour.is_set()) {
 			result << typesafe_sprintf("Muzzle velocity: [color=vscyan]%x[/color]\nAmplification multiplier: [color=vscyan]%x[/color]\n", 
 				(gun_def->muzzle_velocity.first + gun_def->muzzle_velocity.second) / 2, gun_def->damage_multiplier);
 		}

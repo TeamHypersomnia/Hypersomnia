@@ -77,7 +77,7 @@ void trace_system::spawn_finishing_traces_for_deleted_entities(const logic_step 
 		) {
 			const auto& trace_def = deleted_entity.get<invariants::trace>();
 
-			if (!trace_def.finishing_trace_flavour) {
+			if (!trace_def.finishing_trace_flavour.is_set()) {
 				warning_unset_field(deleted_entity, "invariants::trace::finishing_trace_flavour");
 				continue;
 			}

@@ -29,10 +29,6 @@ struct constrained_entity_flavour_id {
 		return raw.is_set();
 	}
 
-	explicit operator bool() const {
-		return raw.is_set();
-	}
-
 	bool operator==(const constrained_entity_flavour_id<C...> b) const {
 		return raw == b.raw && type_id == b.type_id; 
 	}
@@ -48,6 +44,10 @@ struct constrained_entity_flavour_id {
 
 template <class... C>
 std::ostream& operator<<(std::ostream& out, const constrained_entity_flavour_id<C...> x) {
+	if (!x.is_set()) {
+		return out << "(unset)";
+	}
+
 	return out << "(" << get_current_type_name(x.type_id) << ": " << x.raw << ")";
 }
 
@@ -63,10 +63,6 @@ struct typed_entity_flavour_id {
 	explicit typed_entity_flavour_id(const raw_entity_flavour_id raw) : raw(raw) {};
 
 	bool is_set() const {
-		return raw.is_set();
-	}
-
-	explicit operator bool() const {
 		return raw.is_set();
 	}
 

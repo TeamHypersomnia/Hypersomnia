@@ -105,6 +105,19 @@ struct noconst_equal_to {
 	> {};
 };
 
+template <class T>
+struct noconst_constructible_from {
+	template <class C>
+	struct type : std::bool_constant<
+		std::is_constructible_v<std::remove_const_t<C>, std::remove_const_t<T>>
+	> {};
+};
+
 template <class A, class B>
-constexpr bool can_type_contain_another_v = sum_matching_in_v<noconst_equal_to<B>::template type, A> > 0;
+constexpr bool can_type_contain_v = sum_matching_in_v<noconst_equal_to<B>::template type, A> > 0;
+
+template <class A, class B>
+constexpr bool can_type_contain_constructible_from_v =
+   	sum_matching_in_v<noconst_constructible_from<B>::template type, A> > 0
+;
 

@@ -438,7 +438,7 @@ void editor_setup::perform_custom_imgui(
 		const auto all_selected = [&]() -> decltype(get_all_selected_entities()) {
 			auto selections = get_all_selected_entities();
 
-			if (const auto held = selector.get_held(); held && work().world[held]) {
+			if (const auto held = selector.get_held(); held.is_set() && work().world[held]) {
 				selections.emplace(held);
 
 				if (!view().ignore_groups) {

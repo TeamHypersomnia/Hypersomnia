@@ -7,6 +7,8 @@ summary: That which we are brainstorming at the moment.
 
 - finish stuff with flavours, disallow removing used ones
 
+- Wextra for gcc?
+
 - would really, really be cool to have a color picker inside the neon map light color chooser
 	- less pain in the ass
 	- look for imgui logic to acquire mouse positioning relative to the control

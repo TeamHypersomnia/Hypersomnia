@@ -35,7 +35,7 @@ void electric_triad_instance::perform_logic(const spell_logic_input in) {
 	const auto caster = subject;
 	auto& cosmos = caster.get_cosmos();
 
-	if (!spell_data.missile_flavour) {
+	if (!spell_data.missile_flavour.is_set()) {
 		return;
 	}
 	
