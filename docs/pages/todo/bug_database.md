@@ -5,6 +5,11 @@ permalink: bug_database
 summary: Notable bugs.
 ---
 
+- Make field address has first checked if the type is trivally copyable.
+	- It resulted in containers being always passed, element_index having never been considered.
+
+- Check out for always_skip_in_editor
+
 - Strangely disappearing finishing traces problem: transform was set in post construction which did not reinfer the npo node properly.
 	- Thus the traces disappeared when they were spawned far from the origin.
 

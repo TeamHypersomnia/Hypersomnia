@@ -202,11 +202,27 @@ void detail_general_edit_properties(
 
 				detail_general_edit_properties<SkipPredicate, pass_notifier_through>(input, equality_predicate, notify_change_of, label, altered.value, false);
 			}
+			else if constexpr(is_std_array_v<T>) {
+				// TODO
+			}
 			else if constexpr(is_container_v<T>) {
 				if constexpr(can_access_data_v<T>) {
-					if (auto node = node_and_columns(formatted_label, input.extra_columns)) {
+					auto displayed_container_label = formatted_label;
+
+					if constexpr(has_constexpr_capacity_v<T>) {
+						displayed_container_label = typesafe_sprintf(
+							"%x (%x/%x)###%x", 
+							formatted_label, 
+							altered.size(), 
+							altered.capacity(), 
+							formatted_label
+						);
+					}
+
+					if (auto node = node_and_columns(displayed_container_label, input.extra_columns)) {
 						for (unsigned i = 0; i < static_cast<unsigned>(altered.size()); ++i) {
-							if (altered.size() < altered.max_size()) {
+							{
+								auto colors = maybe_disabled_cols(input.settings, altered.size() >= altered.max_size());
 								const auto button_label = typesafe_sprintf("D##%x", i);
 
 								if (ImGui::Button(button_label.c_str())) {
