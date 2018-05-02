@@ -323,7 +323,7 @@ int work(const int argc, const char* const * const argv) try {
 
 			{
 				/* Check for unloaded and changed resources */
-				currently_loaded_defs.image_definitions.for_each_object_and_id([&](const auto& old_definition, const auto key) {
+				for_each_id_and_object(currently_loaded_defs.image_definitions, [&](const auto key, const auto& old_definition) {
 					if (const auto new_definition = mapped_or_nullptr(new_defs.image_definitions, key)) {
 						if (new_definition->loadables != old_definition.loadables) {
 							/* Loadables changed, so reload them. */
@@ -342,7 +342,7 @@ int work(const int argc, const char* const * const argv) try {
 				});
 
 				/* Check for new resources */
-				new_defs.image_definitions.for_each_object_and_id([&](const auto& fresh, const auto key) {
+				for_each_id_and_object(new_defs.image_definitions, [&](const auto key, const auto& fresh) {
 					if (nullptr == mapped_or_nullptr(currently_loaded_defs.image_definitions, key)) {
 						new_atlas_required = true;
 
@@ -397,7 +397,7 @@ int work(const int argc, const char* const * const argv) try {
 			};
 
 			/* Check for unloaded and changed resources */
-			currently_loaded_defs.sounds.for_each_object_and_id([&](const auto& now_loaded, const auto& key) {
+			for_each_id_and_object(currently_loaded_defs.sounds, [&](const auto& key, const auto& now_loaded) {
 				auto unload = [&](){
 					audiovisuals.get<sound_system>().clear_sources_playing(key);
 					loaded_sounds.erase(key);
@@ -423,7 +423,7 @@ int work(const int argc, const char* const * const argv) try {
 			});
 
 			/* Check for new resources */
-			new_defs.sounds.for_each_object_and_id([&](const auto& fresh_def, const auto& fresh_key) {
+			for_each_id_and_object(new_defs.sounds, [&](const auto& fresh_key, const auto& fresh_def) {
 				if (nullptr == mapped_or_nullptr(currently_loaded_defs.sounds, fresh_key)) {
 					try {
 						loaded_sounds.try_emplace(fresh_key, make_sound_loading_input(fresh_def));

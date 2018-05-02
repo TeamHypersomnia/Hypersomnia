@@ -7,19 +7,12 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
+- really make entity_flavours just a direct pool
+
 - for_each_container usage for ent pools
 
-- for_each_object_and_id -> for_each_id_and_object, and move it to some range templates
-- perhaps entity_flavours should just be a direct pool
-
-- Fix glitch with flicker on the entire screen
-	- probably particles animation bug
-
-- use pools and pool ids for:
-	- all logical assets
-	- viewables
-	- flavours
-		- later will be sparse pools where performance requires it
+- tests of traits: check no flavour ids in entities
+	- we could not possibly afford looking through all for usage checks
 
 - tests of traits: check no ids in invariants, at least
 	- screw initial components really

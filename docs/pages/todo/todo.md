@@ -5,6 +5,9 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- later print shortcuts in the menus for the windows
+	- e.g. History			Alt+H
+
 - copy gfx and sfx folders on save as...
 	- For now on re-opening the newly saved project these resources will be missing
 

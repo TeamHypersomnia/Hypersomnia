@@ -73,7 +73,7 @@ augs::graphics::texture standard_atlas_distribution(const standard_atlas_distrib
 			in.output_necessary_atlas_entries[r.first] = baked.at(r.second.get_source_path().path);
 		}
 
-		in.image_definitions.for_each_object_and_id([&](const auto& d, const auto id) {
+		for_each_id_and_object(in.image_definitions, [&](const auto id, const auto& d) {
 			const auto def = make_view(d);
 
 			auto& output_viewable = in.output_atlas_entries[id];

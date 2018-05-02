@@ -749,3 +749,17 @@ we consider whole type overrides too complex architeciturally:
 	- they break when two are visible at the same time
 	- so something with ids
 
+- fix gui in images
+	- F next to name instead of forget far away
+		- tooltip showing how many will be forgotten
+
+- for_each_id_and_object -> for_each_id_and_object, and move it to some range templates
+- Fix glitch with flicker on the entire screen
+	- probably particles animation bug
+
+- use pools and pool ids for:
+	- all logical assets
+	- viewables
+	- flavours
+		- later will be sparse pools where performance requires it
+

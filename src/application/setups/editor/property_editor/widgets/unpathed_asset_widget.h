@@ -68,8 +68,8 @@ public:
 			}
 
 			auto list_assets_in = [&](const auto& p) {
-				p.for_each_object_and_id(
-					[&asset_id, &result](const auto& object, const auto& new_id) {
+				for_each_id_and_object(p,
+					[&asset_id, &result](const auto& new_id, const auto& object) {
 						const auto& name = object.name;
 						if (!filter.PassFilter(name.c_str())) {
 							return;

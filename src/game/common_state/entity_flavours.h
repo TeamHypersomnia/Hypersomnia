@@ -139,8 +139,8 @@ private:
 
 	template <class S, class F>
 	static void for_each_impl(S& self, F callback) {
-		self.flavours.for_each_object_and_id(
-			[&](const auto& object, const auto& id) {
+		for_each_id_and_object(self.flavours,
+			[&](const auto& id, const auto& object) {
 				callback(flavour_id_type(id), object);
 			}
 		);

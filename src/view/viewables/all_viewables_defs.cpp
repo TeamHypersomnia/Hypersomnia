@@ -21,8 +21,8 @@ std::optional<I> find_asset_id_by_path(
 
 	std::optional<K> result_id;
 
-	definitions.for_each_object_and_id(
-		[&result_id, &searched_path](const auto& l, const auto id) {
+	for_each_id_and_object(definitions,
+		[&result_id, &searched_path](const auto id, const auto& l) {
 			if (searched_path == l.get_source_path()) {
 				result_id = id;
 			}

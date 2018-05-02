@@ -5,9 +5,22 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- fix gui in images
-	- F next to name instead of forget far away
-		- tooltip showing how many will be forgotten
+- REALLY enable these clang warnings
+	- fix crash when changin neon map color
+
+- would really, really be cool to have a color picker inside the neon map light color chooser
+	- less pain in the ass
+
+- create gfx and sfx folders for the project on saving
+
+- possibly rename the flavour on setting an image?
+	- if it is detected that it is yet unnamed?
+	- due to a filter, the node disappears during renaming
+- start moving instantiated entity right away
+
+- finish stuff with flavours, disallow removing used ones
+
+- Ctrl+I could open a quick go to gui that will instantiate a chosen flavour
 
 - two atlases: one for neons and one for diffuse
 	- will rarely be switched anyway

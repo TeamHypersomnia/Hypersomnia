@@ -165,8 +165,8 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 
 	const auto label = std::string(maybe_official_path<asset_id_type>::get_label());
 
-	definitions.for_each_object_and_id(
-		[&](const auto& object, const auto id) mutable {
+	for_each_id_and_object(definitions,
+		[&](const auto id, const auto& object) mutable {
 			const auto path = object.get_source_path();
 			auto new_entry = path_entry_type(path, id);
 

@@ -435,7 +435,7 @@ namespace augs {
 		}
 
 		template <class F>
-		void for_each_object_and_id(F f) {
+		void for_each_id_and_object(F f) {
 			key_type id;
 
 			for (size_type i = 0; i < size(); ++i) {
@@ -443,12 +443,12 @@ namespace augs {
 				id.indirection_index = s.pointing_indirector;
 				id.version = indirectors[s.pointing_indirector].version;
 
-				f(objects[i], id);
+				f(id, objects[i]);
 			}
 		}
 
 		template <class F>
-		void for_each_object_and_id(F f) const {
+		void for_each_id_and_object(F f) const {
 			for (size_type i = 0; i < size(); ++i) {
 				key_type id;
 
@@ -456,7 +456,7 @@ namespace augs {
 				id.indirection_index = s.pointing_indirector;
 				id.version = indirectors[s.pointing_indirector].version;
 
-				f(objects[i], id);
+				f(id, objects[i]);
 			}
 		}
 
@@ -600,4 +600,11 @@ namespace augs {
 	void write_object_lua(A ar, const pool<M, C, S, K...>& storage) {
 		storage.write_object_lua(ar);
 	}
+}
+
+/* A more generic approach just in case */
+
+template <class P, class F>
+void for_each_id_and_object(P& p, F&& callback) {
+	p.for_each_id_and_object(std::forward<F>(callback));
 }
