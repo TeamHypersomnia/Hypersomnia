@@ -8,6 +8,10 @@
 
 #include "augs/pad_bytes.h"
 
+using specific_hostile_entities_vector = 
+	augs::constant_size_vector<entity_id, SPECIFIC_HOSTILE_ENTITIES_COUNT>
+;
+
 namespace components {
 	struct attitude {
 		// GEN INTROSPECTOR struct components::attitude
@@ -16,7 +20,7 @@ namespace components {
 		unsigned parties = 0;
 		unsigned hostile_parties = 0;
 
-		augs::constant_size_vector<entity_id, SPECIFIC_HOSTILE_ENTITIES_COUNT> specific_hostile_entities = {};
+		specific_hostile_entities_vector specific_hostile_entities = {};
 		
 		entity_id currently_attacked_visible_entity;
 		attitude_type target_attitude = attitude_type::NEUTRAL;

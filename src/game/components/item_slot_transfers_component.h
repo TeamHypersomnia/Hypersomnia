@@ -17,12 +17,16 @@ struct item_slot_mounting_operation {
 	// END GEN INTROSPECTOR
 };
 
+using only_pick_these_items_vector = 
+	augs::constant_size_vector<entity_id, ONLY_PICK_THESE_ITEMS_COUNT>
+;
+
 namespace components {
 	struct item_slot_transfers {
 		// GEN INTROSPECTOR struct components::item_slot_transfers
 		augs::stepped_cooldown pickup_timeout = augs::stepped_cooldown(200);
 
-		augs::constant_size_vector<entity_id, ONLY_PICK_THESE_ITEMS_COUNT> only_pick_these_items = {};
+		only_pick_these_items_vector only_pick_these_items = {};
 		bool pick_all_touched_items_if_list_to_pick_empty = true;
 		bool picking_up_touching_items_enabled = false;
 		pad_bytes<2> pad;

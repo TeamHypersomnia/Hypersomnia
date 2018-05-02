@@ -764,3 +764,5 @@ we consider whole type overrides too complex architeciturally:
 		- later will be sparse pools where performance requires it
 
 - REALLY enable these clang warnings
+- fix crash when changin neon map color
+

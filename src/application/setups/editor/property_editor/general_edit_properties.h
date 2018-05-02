@@ -153,6 +153,7 @@ inline auto node_and_columns(
 
 template <
 	template <class> class SkipPredicate,
+	bool pass_notifier_through = false,
 	class S,
 	class D,
 	class Eq,
@@ -165,7 +166,6 @@ void detail_general_edit_properties(
 	F notify_change_of,
 	const std::string& label,
 	T& altered,
-	const bool pass_notifier_through = false,
 	const bool nodify_introspected = true
 ) {
 	static constexpr bool should_skip = 
@@ -200,7 +200,7 @@ void detail_general_edit_properties(
 
 				auto colors = maybe_disabled_cols(input.settings, !all_equal || !altered.is_enabled);
 
-				detail_general_edit_properties<SkipPredicate>(input, equality_predicate, notify_change_of, label, altered.value, pass_notifier_through, false);
+				detail_general_edit_properties<SkipPredicate, pass_notifier_through>(input, equality_predicate, notify_change_of, label, altered.value, false);
 			}
 			else if constexpr(is_container_v<T>) {
 				if constexpr(can_access_data_v<T>) {
@@ -231,27 +231,24 @@ void detail_general_edit_properties(
 
 							ImGui::SameLine();
 
-							auto notify_whole_element = [&](const auto& l, const tweaker_type t, auto&&... args) {
-								if (pass_notifier_through) {
-									notify_change_of(l, t, std::forward<decltype(args)>(args)...);
-								}
-								else {
-									notify_change_of(formatted_label, t, altered[i]);
-								}
-							};
-
-							const auto are_elements_equal = equality_predicate(altered, i);
-
-							detail_general_edit_properties<SkipPredicate>(
-								input, 
-								[are_elements_equal](auto&&...) {
-									return are_elements_equal;
-								},
-								notify_whole_element,
-								typesafe_sprintf("%x", i), 
-								altered[i],
-								true
-							);
+							if constexpr(pass_notifier_through) {
+								detail_general_edit_properties<SkipPredicate, true>(
+									input, 
+									equality_predicate,
+									notify_change_of,
+									typesafe_sprintf("%x", i), 
+									altered[i]
+								);
+							}
+							else {
+								detail_general_edit_properties<SkipPredicate, true>(
+									input, 
+									[&equality_predicate, i, &altered] (auto&&...) { return equality_predicate(altered, i); },
+									[&notify_change_of, i, &altered] (const auto& l, const tweaker_type t, auto&) { notify_change_of(l, t, altered, i); },
+									typesafe_sprintf("%x", i), 
+									altered[i]
+								);
+							}
 						}
 
 						if (altered.size() < altered.max_size()) {
@@ -267,7 +264,7 @@ void detail_general_edit_properties(
 			}
 			else {
 				auto further = [&](const std::string& l, auto& m) {
-					detail_general_edit_properties<SkipPredicate>(input, equality_predicate, notify_change_of, l, m, pass_notifier_through);
+					detail_general_edit_properties<SkipPredicate, pass_notifier_through>(input, equality_predicate, notify_change_of, l, m);
 				};
 
 				if (nodify_introspected) {
@@ -353,18 +350,41 @@ void general_edit_properties(
 				prop_in.settings,
 				extra_columns
 			},
-			[&parent_altered, &field_equality_predicate](const auto& modified, const unsigned index = -1) {
+			[&parent_altered, &field_equality_predicate](const auto& modified, const auto... index) {
 				auto addr = ::make_field_address(parent_altered, modified);
-				addr.element_index = index;
 
-				return field_equality_predicate(modified, addr);
+				/* A forceful approach to lambda overloading... */
+
+				if constexpr(1 == num_types_in_list_v<type_list<decltype(index)...>>) {
+					addr.element_index = (index, ...);
+
+					return field_equality_predicate(modified[(index, ...)], addr);
+				}
+				else {
+					static_assert(num_types_in_list_v<type_list<decltype(index)...>> == 0);
+
+					return field_equality_predicate(modified, addr);
+				}
 			},
-			[&parent_altered, &do_tweaker](const std::string& formatted_label, const tweaker_type t, const auto& modified) {
-				const auto addr = ::make_field_address(parent_altered, modified);
+			[&parent_altered, &do_tweaker](const std::string& formatted_label, const tweaker_type t, const auto& modified, const auto... index) {
+				auto addr = ::make_field_address(parent_altered, modified);
 
-				do_tweaker(tweaker_input<remove_cref<decltype(modified)>>{
-					t, formatted_label, addr, modified
-				});
+				/* A forceful approach to lambda overloading... */
+
+				if constexpr(1 == num_types_in_list_v<type_list<decltype(index)...>>) {
+					addr.element_index = (index, ...);
+
+					do_tweaker(tweaker_input<remove_cref<decltype(modified[(index, ...)])>>{
+						t, formatted_label, addr, modified[(index, ...)]
+					});
+				}
+				else {
+					static_assert(num_types_in_list_v<type_list<decltype(index)...>> == 0);
+
+					do_tweaker(tweaker_input<remove_cref<decltype(modified)>>{
+						t, formatted_label, addr, modified
+					});
+				}
 			},
 			member_label,
 			member

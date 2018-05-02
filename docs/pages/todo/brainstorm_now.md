@@ -5,7 +5,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- fix crash when changin neon map color
+- finish stuff with flavours, disallow removing used ones
+	- start moving instantiated entity right away
 
 - would really, really be cool to have a color picker inside the neon map light color chooser
 	- less pain in the ass
@@ -19,10 +20,6 @@ summary: That which we are brainstorming at the moment.
 	- due to a filter, the node disappears during renaming
 		- just when constructing a filter, save a name with which it was remembered in cached fae selections
 			- i guess we will still be able to do for eaches and all flav id getters even with changed state structure
-
-- start moving instantiated entity right away
-
-- finish stuff with flavours, disallow removing used ones
 
 - Ctrl+I could open a quick go to gui that will instantiate a chosen flavour
 

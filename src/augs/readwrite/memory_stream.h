@@ -114,11 +114,6 @@ namespace augs {
 		}
 
 		void write(const std::byte* const data, const size_t bytes) {
-#if 0
-			if (write_pos + bytes >= 2663) {
-				__debugbreak();
-			}
-#endif
 			if (write_pos + bytes > capacity()) {
 				reserve((write_pos + bytes) * 2);
 			}

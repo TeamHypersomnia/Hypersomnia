@@ -43,25 +43,25 @@ void change_property_command<D>::rewrite_change(
 	);
 }
 
-template <class M, class T>
-static void write_object_or_trivial_marker(M& to, const T& from, const std::size_t bytes_count) {
+template <class Archive, class T>
+static void write_object_or_trivial_marker(Archive& ar, const T& from, const std::size_t bytes_count) {
 	if constexpr(std::is_same_v<T, augs::trivial_type_marker>) {
 		const std::byte* location = reinterpret_cast<const std::byte*>(std::addressof(from));
-		to.write(location, bytes_count);
+		ar.write(location, bytes_count);
 	}
 	else {
-		augs::write_bytes(to, from);
+		augs::write_bytes(ar, from);
 	}
 }
 
-template <class M, class T>
-static void read_object_or_trivial_marker(M& from, T& to, const std::size_t bytes_count) {
+template <class Archive, class T>
+static void read_object_or_trivial_marker(Archive& ar, T& to, const std::size_t bytes_count) {
 	if constexpr(std::is_same_v<T, augs::trivial_type_marker>) {
 		std::byte* location = reinterpret_cast<std::byte*>(std::addressof(to));
-		from.read(location, bytes_count);
+		ar.read(location, bytes_count);
 	}
 	else {
-		augs::read_bytes(from, to);
+		augs::read_bytes(ar, to);
 	}
 }
 

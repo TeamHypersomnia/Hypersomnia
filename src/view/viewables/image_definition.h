@@ -23,6 +23,7 @@ struct image_extra_loadables {
 	// GEN INTROSPECTOR struct image_extra_loadables
 	augs::value_with_flag<neon_map_input> generate_neon_map;
 	bool generate_desaturation = false;
+	pad_bytes<3> pad;
 	// END GEN INTROSPECTOR
 };
 

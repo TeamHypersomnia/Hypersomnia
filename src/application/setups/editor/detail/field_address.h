@@ -5,6 +5,9 @@
 #include "game/components/shape_polygon_component.h"
 #include "game/components/rigid_body_component.h"
 #include "game/components/sentience_component.h"
+#include "game/components/wandering_pixels_component.h"
+#include "game/components/item_slot_transfers_component.h"
+#include "game/components/attitude_component.h"
 
 #include "application/setups/editor/property_editor/property_editor_structs.h"
 
@@ -17,6 +20,9 @@ using edited_field_type_id = type_in_list_id<
 		maybe_official_sound_path,
 		maybe_official_image_path,
 		std::vector<rgba>,
+		wandering_pixels_frames,
+		only_pick_these_items_vector,
+		specific_hostile_entities_vector,
 		friction_connection_vector
 	>
 >;
@@ -37,11 +43,15 @@ template <class M>
 auto get_type_id_for_field() {
 	edited_field_type_id id;
 
-	if constexpr(std::is_trivially_copyable_v<M>) {
-		id.set<augs::trivial_type_marker>();
+	if constexpr(can_access_data_v<M>) {
+		id.set<M>();
+	}
+	else if constexpr(is_one_of_list_v<M, edited_field_type_id::list_type>) {
+		id.set<M>();
 	}
 	else {
-		id.set<M>();
+		static_assert(std::is_trivially_copyable_v<M>);
+		id.set<augs::trivial_type_marker>();
 	}
 
 	return id;
