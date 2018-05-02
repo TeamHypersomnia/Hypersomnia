@@ -24,7 +24,6 @@ using namespace augs;
 
 void intent_contextualization_system::contextualize_use_button_intents(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
-	const auto delta = step.get_delta();
 	auto& intents = step.get_queue<messages::intent_message>();
 	
 	for (auto& e : intents) {

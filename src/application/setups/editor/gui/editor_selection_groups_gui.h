@@ -12,7 +12,4 @@ struct editor_selection_groups_gui : standard_window_mixin<editor_selection_grou
 	using introspect_base = base;
 
 	void perform(bool has_ctrl, editor_command_input);
-
-private:
-	unsigned currently_renaming = -1;
 };

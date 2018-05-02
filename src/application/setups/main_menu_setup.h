@@ -50,13 +50,15 @@ class main_menu_setup : public default_setup_settings {
 	augs::sound_source menu_theme_source;
 	std::optional<augs::single_sound_buffer> menu_theme;
 
+#if TODO
 	bool draw_menu_gui = false;
 	bool roll_news = false;
 
+	creators_screen creators;
+#endif
+
 	cosmic_movie_director director;
 	unsigned initial_step_number = 0xdeadbeef;
-
-	creators_screen creators;
 
 	augs::action_list intro_actions;
 	augs::action_list credits_actions;

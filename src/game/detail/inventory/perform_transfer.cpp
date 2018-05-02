@@ -52,10 +52,6 @@ perform_transfer_result perform_transfer(
 ) {
 	perform_transfer_result output;
 
-	auto guidize = [&](const auto s) {
-		return cosmos.get_solvable().guidize(s);
-	};
-
 	auto deguidize = [&](const auto s) {
 		return cosmos.get_solvable().deguidize(s);
 	};

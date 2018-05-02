@@ -27,7 +27,6 @@ namespace ImGui {
 		style.ItemSpacing.x = 0;
 		style.ItemSpacing.y = 0;
 		const ImVec4 colorSelectedTab = ImVec4(color.x, color.y, color.z, color.w*0.f);
-		const ImVec4 colorSelectedTabHovered = ImVec4(colorHover.x, colorHover.y, colorHover.z, colorHover.w*0.7f);
 		const ImVec4 colorSelectedTabText = colorText;
 
 		if (tabSize>0 && (tabIndex<0 || tabIndex >= tabSize)) {

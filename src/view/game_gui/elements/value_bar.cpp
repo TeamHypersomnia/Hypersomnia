@@ -367,11 +367,6 @@ void value_bar::rebuild_layouts(
 ) {
 	const auto vertical_index = this_id.get_location().vertical_index;
 
-	const auto& cosmos = context.get_cosmos();
-
-	const auto dt = cosmos.get_fixed_delta();
-	const auto now = cosmos.get_timestamp();
-
 	if (!is_enabled(context, vertical_index)) {
 		this_id->unset_flag(augs::gui::flag::ENABLE_DRAWING);
 		return;

@@ -1,6 +1,8 @@
+#pragma once
+
 class b2Contact;
-class b2Manifold;
-class b2ContactImpulse;
+struct b2Manifold;
+struct b2ContactImpulse;
 
 class physics_world_cache;
 class cosmos;

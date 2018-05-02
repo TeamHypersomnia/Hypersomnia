@@ -12,7 +12,7 @@ std::string editor_folder::get_display_path() const {
 	return ::get_project_name(current_path);
 }
 
-editor_folder::editor_folder(const augs::path_type& p) : work(std::make_unique<intercosm>()), current_path(p) {}
+editor_folder::editor_folder(const augs::path_type& p) : current_path(p), work(std::make_unique<intercosm>()) {}
 
 editor_paths editor_folder::get_paths() const {
 	return { current_path, ::get_project_name(current_path) };

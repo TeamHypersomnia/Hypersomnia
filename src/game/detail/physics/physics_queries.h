@@ -29,8 +29,8 @@ void for_each_in_aabb_meters(
 			F&& f, 
 			const b2Filter filter
 		) : 
-			call(f), 
-			filter(filter) 
+			filter(filter),
+			call(std::move(f)) 
 		{}
 
 		bool ReportFixture(b2Fixture* fixture) override {

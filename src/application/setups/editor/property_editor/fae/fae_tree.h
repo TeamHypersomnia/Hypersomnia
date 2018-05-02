@@ -80,8 +80,6 @@ auto tree_of_flavours(
 		ImGui::Columns(2);
 		ImGui::Separator();
 
-		const auto& cosm = cpe_in.command_in.get_cosmos();
-
 		for_each_entity_type(
 			[&](auto e) {
 				using E = decltype(e);

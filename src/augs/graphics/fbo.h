@@ -9,9 +9,9 @@ namespace augs {
 	namespace graphics {
 		class fbo : public settable_as_current_mixin<const fbo> {
 			bool created = false;
-			texture tex;
 			GLuint id = 0xdeadbeef;
 			vec2u size;
+			texture tex;
 
 			using settable_as_current_base = settable_as_current_mixin<const fbo>;
 			friend settable_as_current_base;

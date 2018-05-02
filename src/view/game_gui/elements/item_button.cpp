@@ -449,10 +449,7 @@ void item_button::rebuild_layouts(const game_gui_context context, const this_in_
 	this_id->set_flag(augs::gui::flag::ENABLE_DRAWING_OF_CHILDREN, this_id->is_container_open && !is_being_wholely_dragged_or_pending_finish(context, this_id));
 	this_id->set_flag(augs::gui::flag::DISABLE_HOVERING, is_being_wholely_dragged_or_pending_finish(context, this_id));
 
-	vec2i parent_position;
-
 	const auto* const sprite = item.find<invariants::sprite>();
-
 	const auto& manager = context.get_image_metas();
 
 	if (sprite) {

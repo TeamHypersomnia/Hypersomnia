@@ -90,8 +90,6 @@ void edit_entity(
 	for_each_through_std_get(
 		handle.get().components,
 		[&](const auto& component) {
-			using T = remove_cref<decltype(component)>;
-
 			const auto component_label = format_struct_name(component) + " component";
 			const auto node = scoped_tree_node_ex(component_label);
 

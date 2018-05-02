@@ -5,7 +5,7 @@
 #include "game/transcendental/standard_solver.h"
 
 class cosmos;
-struct loaded_image_caches_map;
+class loaded_image_caches_map;
 
 namespace test_scenes {
 	class minimal_scene {

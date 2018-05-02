@@ -17,22 +17,6 @@
 #include "application/config_lua_table.h"
 #include "application/gui/settings_gui.h"
 
-static void ShowHelpMarker(const char* const desc) {
-	ImGui::TextDisabled("(?)");
-
-	if (ImGui::IsItemHovered()) {
-		auto tooltip = augs::imgui::scoped_tooltip();
-
-		ImGui::PushTextWrapPos(450.0f);
-		ImGui::TextUnformatted(desc);
-		ImGui::PopTextWrapPos();
-	}
-}
-
-static bool operator==(const ImVec2 a, const ImVec2 b) {
-	return a.x == b.x && a.y == b.y;
-};
-
 void configuration_subscribers::sync_back_into(config_lua_table& into) const {
 	window.sync_back_into(into.window);
 }

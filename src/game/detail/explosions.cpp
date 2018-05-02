@@ -55,7 +55,6 @@ void standard_explosion_input::instantiate(
 
 	auto& cosmos = step.get_cosmos();
 
-	const auto delta = cosmos.get_fixed_delta();
 	const auto now = cosmos.get_timestamp();
 
 	const auto effective_radius_sq = effective_radius*effective_radius;

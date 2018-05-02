@@ -45,8 +45,8 @@ struct pathed_asset_entry : public browsed_path_entry_base<id_type> {
 		const maybe_official_path<id_type>& from,
 	   	const id_type id
 	) :
-		id(id),
-		base(from)
+		base(from),
+		id(id)
 	{}
 };
 

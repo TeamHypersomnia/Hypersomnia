@@ -13,7 +13,6 @@ std::string delete_entities_command::describe() const {
 void delete_entities_command::push_entry(const const_entity_handle handle) {
 	handle.dispatch([&](const auto typed_handle) {
 		using E = entity_type_of<decltype(typed_handle)>;
-		const auto id = typed_handle.get_id();
 		deleted_entities.get_for<E>().push_back({ typed_handle.get() });
 	});
 

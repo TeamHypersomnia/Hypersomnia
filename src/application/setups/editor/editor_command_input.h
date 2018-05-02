@@ -1,16 +1,14 @@
 #pragma once
 
-class editor_folder;
+struct editor_folder;
 class editor_entity_selector;
 
 namespace sol {
 	class state;
 }
 
-struct editor_entity_mover;
+class editor_entity_mover;
 struct editor_fae_gui;
-
-struct editor_entity_mover;
 
 class cosmos;
 

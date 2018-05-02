@@ -38,7 +38,6 @@ void load_test_scene_images(
 	sol::state& lua,
 	image_definitions_map& all_definitions
 ) {
-	using id_type = assets::image_id;
 	using test_id_type = test_scene_image_id;
 
 	all_definitions.reserve(enum_count(test_id_type()));

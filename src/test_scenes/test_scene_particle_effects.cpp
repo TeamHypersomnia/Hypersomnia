@@ -1,8 +1,10 @@
 /*
 	Disable float/int warnings, this is just a content script
 */
+#if PLATFORM_WINDOWS
 #pragma warning(disable : 4244)
 #pragma warning(disable : 4267)
+#endif
 
 #include "augs/misc/enum/enum_map.h"
 #include "augs/string/format_enum.h"
@@ -42,7 +44,7 @@ void load_test_scene_particle_effects(
 		target.set_image(id, images.at(id).get_size(), col);
 	};
 
-	auto sets = [&all_definitions](auto& target, auto id, auto sz, auto col) {
+	auto sets = [](auto& target, auto id, auto sz, auto col) {
 		target.set_image(id, sz, col);
 	};
 

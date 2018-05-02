@@ -1,7 +1,9 @@
 /*
 	Disable float/int warnings, this is just a content script
 */
+#if PLATFORM_WINDOWS
 #pragma warning(disable : 4244)
+#endif
 #include "augs/templates/algorithm_templates.h"
 #include "game/assets/ids/asset_ids.h"
 #include "game/assets/all_logical_assets.h"
@@ -192,8 +194,7 @@ namespace test_scenes {
 				}
 
 				{
-					const auto e = create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS, [&](const auto e){
-
+					create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS, [&](const auto e){
 						auto& w = e.template get<components::wandering_pixels>();
 
 						w.colorize = light_cyan;
@@ -229,7 +230,7 @@ namespace test_scenes {
 				const auto right_reach = xywh(1164.f - 8.f + 90.f - 600, 220 - 250, 1000, 600);
 
 				{
-					const auto e = create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS, [&](const auto e){
+					create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS, [&](const auto e){
 
 						auto& w = e.template get<components::wandering_pixels>();
 
@@ -240,7 +241,7 @@ namespace test_scenes {
 				}
 
 				{
-					const auto e = create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS, [&](const auto e){
+					create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS, [&](const auto e){
 
 						auto& w = e.template get<components::wandering_pixels>();
 
@@ -288,16 +289,12 @@ namespace test_scenes {
 					}
 				}
 
-				{
-					const vec2 size = caches.at(to_image_id(test_scene_image_id::ROAD_FRONT_DIRT)).get_size();
-
-					create_test_scene_entity(world, test_sprite_decorations::ROAD_DIRT, components::transform(vec2(468, 112)));
-				}
+				create_test_scene_entity(world, test_sprite_decorations::ROAD_DIRT, components::transform(vec2(468, 112)));
 
 				for (int r = 0; r < 38; ++r) {
 					const vec2 size = caches.at(to_image_id(test_scene_image_id::ROAD)).get_size();
 
-					auto road = create_test_scene_entity(world, test_sprite_decorations::ROAD, components::transform{ vec2(468, 832+ size.y * r ) });
+					create_test_scene_entity(world, test_sprite_decorations::ROAD, components::transform{ vec2(468, 832+ size.y * r ) });
 				}
 
 				{

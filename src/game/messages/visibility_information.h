@@ -50,8 +50,8 @@ namespace messages {
 		using triangle = std::array<vec2, 3>;
 
 		struct discontinuity {
-			int edge_index;
-			bool is_boundary;
+			int edge_index = 0;
+			bool is_boundary = false;
 			vec2 normal;
 
 			edge points;
@@ -60,12 +60,15 @@ namespace messages {
 			enum {
 				RIGHT,
 				LEFT
-			} winding;
+			} winding = RIGHT;
 
-			discontinuity(const edge& points = edge(),
-				const vec2 last_undiscovered_wall = vec2()) :
-				points(points), winding(RIGHT),
-				last_undiscovered_wall(last_undiscovered_wall), edge_index(0), is_boundary(false) {}
+			discontinuity(
+				const edge& points = edge(),
+				const vec2 last_undiscovered_wall = vec2()
+			) :
+				points(points), 
+				last_undiscovered_wall(last_undiscovered_wall)
+			{}
 		};
 
 		float source_square_side = 0.f;

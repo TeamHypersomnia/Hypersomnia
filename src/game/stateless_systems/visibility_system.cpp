@@ -820,7 +820,7 @@ void visibility_system::respond_to_visibility_information_requests(
 
 			/* for every discontinuity, remove if there exists any edge that is too close to the discontinuity's vertex */
 			discs_copy.erase(std::remove_if(discs_copy.begin(), discs_copy.end(),
-				[&request, edges_num, &transform, &wrap, &lines, &marked_holes, &settings, &response]
+				[&request, edges_num, &transform, &wrap, &lines, &marked_holes, &response]
 			(const discontinuity& d) {
 				std::vector<vec2> points_too_close;
 

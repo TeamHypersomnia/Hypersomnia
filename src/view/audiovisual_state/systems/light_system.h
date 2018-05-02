@@ -45,10 +45,7 @@ struct light_system_input {
 	const double global_time_seconds;
 };
 
-class light_system {
-	double global_time_seconds = 0.0;
-
-public:
+struct light_system {
 	struct cache {
 		std::array<float, 10> all_variation_values = {};
 	};

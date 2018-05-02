@@ -34,9 +34,9 @@ namespace augs {
 
 		fbo::fbo(fbo&& b) :
 			settable_as_current_base(static_cast<settable_as_current_base&&>(b)),
-			size(b.size),
-			id(b.id),
 			created(b.created),
+			id(b.id),
+			size(b.size),
 			tex(std::move(b.tex))
 		{
 			b.created = false;

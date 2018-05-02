@@ -19,8 +19,8 @@ struct entity_solvable_meta {
 		const entity_guid guid,
 		const raw_entity_flavour_id flavour_id
 	) :
-		guid(guid),
-		flavour_id(flavour_id)
+		flavour_id(flavour_id),
+		guid(guid)
 	{}
 };
 

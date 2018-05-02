@@ -68,7 +68,6 @@ private:
 		const typed_entity_flavour_id<E> flavour_id,
 		F callback	
 	) {
-		using candidate_types = typename decltype(flavour_id)::matching_types; 
 		return callback(self.flavours.template get_for<E>().get(flavour_id.raw));
 	}
 

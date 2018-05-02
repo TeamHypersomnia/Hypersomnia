@@ -27,7 +27,6 @@ void release_or_throw_fused_object(
 	const auto& metas = step.get_logical_assets();
 #endif
 	const auto now = cosmos.get_timestamp();
-	const auto delta = step.get_delta();
 	const auto thrower = cosmos[thrower_id];
 	const auto thrower_transform = thrower.get_logic_transform();
 	//const auto thrower_orientation = vec2::from_degrees(thrower_transform.rotation);
@@ -71,7 +70,7 @@ void release_or_throw_fused_object(
 				sound_effect_start_input::fire_and_forget(thrower_transform).set_listener(thrower)
 			);
 
-			const auto rigid_body = fused_entity.get<components::rigid_body>();
+			/* const auto rigid_body = fused_entity.get<components::rigid_body>(); */
 
 /* 			//ensure(rigid_body.get_velocity().is_epsilon()); */
 

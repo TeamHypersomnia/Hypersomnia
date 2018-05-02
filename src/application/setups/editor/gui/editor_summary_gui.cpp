@@ -21,7 +21,6 @@ void editor_summary_gui::perform(editor_setup& setup) {
 	auto& v = setup.view();
 	auto& f = setup.folder();
 	auto& cosm = setup.work().world;
-	const auto settings = setup.settings;
 
 	text(typesafe_sprintf("Folder path: %x", f.current_path));
 

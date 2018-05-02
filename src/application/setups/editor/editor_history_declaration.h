@@ -8,7 +8,7 @@ namespace augs {
 
 struct fill_with_test_scene_command;
 
-struct move_entities_command;
+class move_entities_command;
 struct paste_entities_command;
 struct delete_entities_command;
 struct duplicate_entities_command;

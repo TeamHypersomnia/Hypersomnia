@@ -107,8 +107,8 @@ void editor_setup::set_locally_viewed(const entity_id id) {
 editor_setup::editor_setup(
 	sol::state& lua
 ) : 
-	destructor_input{ lua },
-	recent(lua) 
+	recent(lua),
+	destructor_input{ lua }
 {
 	augs::create_directories(get_untitled_dir());
 
@@ -120,8 +120,8 @@ editor_setup::editor_setup(
 	sol::state& lua, 
 	const augs::path_type& intercosm_path
 ) : 
-	destructor_input{ lua },
-	recent(lua) 
+	recent(lua),
+	destructor_input{ lua }
 {
 	augs::create_directories(get_untitled_dir());
 

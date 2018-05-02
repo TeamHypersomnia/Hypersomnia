@@ -127,8 +127,6 @@ void duplicate_entities_command::redo(const editor_command_input in) {
 		};
 
 		if (const auto source_aabb = find_aabb_of(cosm, for_each_source_subject)) {
-			const auto target_aabb = *source_aabb + mirror_direction * source_aabb->get_size();
-
 			if (mirror_direction == vec2i(1, 0)) {
 				const auto vertical_axis_x = source_aabb->r;
 

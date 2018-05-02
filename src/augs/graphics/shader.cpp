@@ -76,8 +76,8 @@ namespace augs {
 		}
 
 		shader::shader(shader&& b) : 
-			built(b.built), 
-			id(b.id) 
+			id(b.id),
+			built(b.built)
 		{
 			b.built = false;
 		}
@@ -122,8 +122,8 @@ namespace augs {
 		
 		shader_program::shader_program(shader_program&& b) :
 			settable_as_current_base(static_cast<settable_as_current_base&&>(b)),
-			built(b.built),
-			id(b.id)
+			id(b.id),
+			built(b.built)
 #if STORE_SHADERS_IN_PROGRAM
 			, vertex(std::move(b.vertex)),
 			fragment(std::move(b.fragment))

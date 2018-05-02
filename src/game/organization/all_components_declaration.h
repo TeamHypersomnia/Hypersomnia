@@ -1,6 +1,8 @@
 #pragma once
 // disables the warning due to type name length exceeded
+#if PLATFORM_WINDOWS
 #pragma warning(disable : 4503)
+#endif
 
 #include "augs/templates/type_pair.h"
 #include "augs/templates/type_list.h"

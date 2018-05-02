@@ -68,10 +68,11 @@ void components::gun::load_next_round(
 	}
 
 	if (next_catridge_from.size() > 0) {
-		const item_slot_transfer_request into_chamber_transfer{ 
+		const auto into_chamber_transfer = item_slot_transfer_request { 
 			next_catridge_from[next_catridge_from.size() - 1], 
 			gun_entity[slot_function::GUN_CHAMBER], 
 			1, 
+			impulse_mults(),
 			true 
 		};
 

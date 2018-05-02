@@ -12,13 +12,13 @@ namespace augs {
 	template <class T>
 	class tween_value_action : public action {
 	public:
+		T& current;
+
 		T initial;
 		T to;
 		
 		float duration_ms;
 		float elapsed_ms;
-
-		T& current;
 
 		tween_value_action(T& val, const T to, const float duration_ms) 
 			: current(val), initial(to), to(to), duration_ms(duration_ms), elapsed_ms(0.f) {
@@ -45,8 +45,8 @@ namespace augs {
 	template <class T>
 	class set_value_action : public action {
 	public:
-		T to;
 		T& current;
+		T to;
 
 		set_value_action(T& val, const T to)
 			: current(val), to(to) {
@@ -90,19 +90,20 @@ namespace augs {
 	template <class T>
 	class populate_with_delays : public action {
 	public:
+		T& target_container;
+		T from_container;
+
 		float duration_ms;
-		float elapsed_ms;
 		float variation_multiplier;
 		rng_seed_type rng_seed;
+
+		float elapsed_ms = 0.f;
 		size_t current_interval = 0;
 
 		std::vector<float> intervals;
 
-		T from_container;
-		T& target_container;
-
 		populate_with_delays(T& target, const T from, const float duration_ms, const float variation_multiplier = 0.1f, const rng_seed_type rng_seed = 0) :
-			target_container(target), from_container(from), duration_ms(duration_ms), rng_seed(rng_seed), elapsed_ms(0.f), variation_multiplier(variation_multiplier) {
+		target_container(target), from_container(from), duration_ms(duration_ms), variation_multiplier(variation_multiplier), rng_seed(rng_seed) {
 		}
 
 		void on_enter() final {

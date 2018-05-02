@@ -25,7 +25,7 @@ namespace behaviours {
 		auto& cosmos = t.step.get_cosmos();
 		auto subject = t.get_subject();
 		const auto subject_transform = subject.get_logic_transform();
-		auto pos = subject_transform.pos;
+		const auto pos = subject_transform.pos;
 		auto& los = t.step.transient.calculated_line_of_sight.at(subject);
 		auto& attitude = subject.get<components::attitude>();
 
@@ -38,7 +38,7 @@ namespace behaviours {
 			const auto calculated_attitude = calc_attitude(s, subject);
 
 			if (is_hostile(calculated_attitude)) {
-				auto dist = (s.get_logic_transform().pos - subject_transform.pos).length_sq();
+				auto dist = (s.get_logic_transform().pos - pos).length_sq();
 
 				if (dist < min_distance) {
 					closest_hostile_raw = s;
@@ -75,13 +75,13 @@ namespace behaviours {
 				vec2 leaded;
 
 				if (closest_hostile_velocity.length_sq() > 1) {
-					leaded = closest_hostile_transform.pos + closest_hostile_velocity * (closest_hostile_transform.pos - subject_transform.pos).length_sq() / vel;// direct_solution(position(closest_hostile), velocity(closest_hostile), vel);
+					leaded = closest_hostile_transform.pos + closest_hostile_velocity * (closest_hostile_transform.pos - pos).length_sq() / vel;// direct_solution(position(closest_hostile), velocity(closest_hostile), vel);
 				}
 				else {
 					leaded = closest_hostile_transform.pos;
 				}
 
-				crosshair_offset = leaded - subject_transform.pos;
+				crosshair_offset = leaded - pos;
 			}
 			else if (subject.has<components::rigid_body>()) {
 				const auto subject_vel = subject.get_effective_velocity();

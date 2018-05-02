@@ -4,8 +4,8 @@
 template <class T>
 class asset_definition_view {
 protected:
-	const augs::path_type resolved_source_path;
 	const T& def;
+	const augs::path_type resolved_source_path;
 
 public:
 	asset_definition_view(

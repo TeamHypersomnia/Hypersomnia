@@ -194,7 +194,6 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 void sentience_system::consume_health_event(messages::health_event h, const logic_step step) const {
 	auto& cosmos = step.get_cosmos();
 	const auto subject = cosmos[h.subject];
-	const auto now = cosmos.get_timestamp();
 	auto& sentience = subject.get<components::sentience>();
 	auto& sentience_def = subject.get<invariants::sentience>();
 	auto& health = sentience.get<health_meter_instance>();
@@ -277,8 +276,6 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 			driver_system().release_car_ownership(subject);
 		}
 		
-		const auto subject_transform = subject.get_logic_transform();
-
 		impulse_input knockout_impulse;
 		knockout_impulse.linear = h.impact_velocity.normalize();
 		knockout_impulse.angular = 1.f;
@@ -459,8 +456,6 @@ void sentience_system::rotate_towards_crosshairs_and_driven_vehicles(const logic
 
 						barrel_center.rotate(-subject_transform.rotation, mc);
 						muzzle.rotate(-subject_transform.rotation, mc);
-
-						auto crosshair_vector = target_transform.pos - mc;
 
 						if (/* centers_apart */ !mc.compare_abs(barrel_center)) {
 							requested_angle = colinearize_AB_with_C(mc, barrel_center, muzzle, target_transform.pos, debug_line_drawer);

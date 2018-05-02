@@ -49,7 +49,7 @@ namespace augs {
 		}
 
 		void flush_queues() {
-			for_each_through_std_get(queues, [this](auto& q) { q.clear(); });
+			for_each_through_std_get(queues, [](auto& q) { q.clear(); });
 		}
 	};
 }

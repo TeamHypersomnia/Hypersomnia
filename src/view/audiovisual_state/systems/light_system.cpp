@@ -75,7 +75,6 @@ void light_system::render_all_lights(const light_system_input in) const {
 	const auto output = augs::drawer{ renderer.get_triangle_buffer() };
 	const auto& light_shader = in.light_shader;
 	const auto& standard_shader = in.standard_shader;
-	const auto projection_matrix = in.projection_matrix;
 
 	const auto& cosmos = in.cosm;
 

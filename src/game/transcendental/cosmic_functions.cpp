@@ -64,8 +64,6 @@ entity_handle cosmic::clone_entity(const entity_handle source_entity) {
 	}
 
 	return source_entity.dispatch([](const auto typed_handle){
-		using E = entity_type_of<decltype(typed_handle)>;
-
 		return entity_handle(cosmic::specific_clone_entity(typed_handle));
 	});
 }

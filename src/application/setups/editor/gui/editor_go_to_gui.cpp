@@ -161,7 +161,6 @@ std::optional<const_entity_handle> editor_go_to_entity_gui::perform(
 					
 				cosmic::for_each_entity(cosm, [&](const auto handle) {
 					const auto name = handle.get_name();
-					const auto id = handle.get_id();
 	
 					if (query.empty() || to_lowercase(name).find(query) != std::string::npos) {
 						++hits;

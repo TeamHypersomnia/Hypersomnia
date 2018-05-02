@@ -141,7 +141,7 @@ void character_gui::assign_item_to_first_free_hotbar_button(
 	const const_entity_handle gui_entity,
 	const const_entity_handle item_entity
 ) {
-	const auto categories = item_entity.get<invariants::item>().categories_for_slot_compatibility;
+	/* const auto categories = item_entity.get<invariants::item>().categories_for_slot_compatibility; */
 
 	clear_hotbar_selection_for_item(gui_entity, item_entity);
 
@@ -394,7 +394,7 @@ void character_gui::draw_cursor_with_tooltip(
 						dragged_item_button->draw_complete_dragged_ghost(context, dragged_item_button, drawn_pos);
 					}
 					else {
-						const auto drawn_pos = drag_amount;
+						/* TODO: Why was it left here? const auto drawn_pos = drag_amount; */
 						dragged_item_button->draw_complete_dragged_ghost(context, dragged_item_button, drag_amount);
 					}
 

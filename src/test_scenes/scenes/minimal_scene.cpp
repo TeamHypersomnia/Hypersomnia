@@ -34,16 +34,10 @@ namespace test_scenes {
 	}
 
 	entity_id minimal_scene::populate(const loaded_image_caches_map& metas, const logic_step step) const {
-		auto& world = step.get_cosmos();
-
 		const int num_characters = 1;
 
 		std::vector<entity_id> new_characters;
 		new_characters.resize(num_characters);
-
-		auto character = [&](const size_t i) {
-			return i < new_characters.size() ? world[new_characters.at(i)] : world[entity_id()];
-		};
 
 		for (int i = 0; i < num_characters; ++i) {
 			components::transform transform;
@@ -77,11 +71,9 @@ namespace test_scenes {
 			fill_range(sentience.learned_spells, true);
 		}
 
-		const auto rifle2 = 
-			prefabs::create_sample_rifle(step, vec2(100, -500 + 50),
+		prefabs::create_sample_rifle(step, vec2(100, -500 + 50),
 			prefabs::create_sample_magazine(step, vec2(100, -650),
-			prefabs::create_cyan_charge(step, vec2(0, 0))))
-		;
+				prefabs::create_cyan_charge(step, vec2(0, 0))));
 
 		prefabs::create_force_grenade(step, { 100, 100 });
 		prefabs::create_force_grenade(step, { 200, 100 });

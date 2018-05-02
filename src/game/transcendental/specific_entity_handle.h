@@ -282,8 +282,8 @@ public:
 		owner_reference owner,
 		const used_identifier_provider identifier
 	) :
-		owner(owner),
-		used_identifier_provider(identifier)
+		used_identifier_provider(identifier),
+		owner(owner)
 	{}
 
 	const auto& get_meta() const {

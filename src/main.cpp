@@ -533,12 +533,6 @@ int work(const int argc, const char* const * const argv) try {
 		};
 	};
 
-	static auto get_viewed_cosmos = []() -> const cosmos& {
-		return visit_current_setup([](auto& setup) -> const cosmos& {
-			return setup.get_viewed_cosmos();
-		});
-	};
-
 	static auto get_viewed_character = []() -> const_entity_handle {
 		const auto& viewed_cosmos = visit_current_setup([](auto& setup) -> const cosmos& {
 			return setup.get_viewed_cosmos();
@@ -1110,12 +1104,8 @@ int work(const int argc, const char* const * const argv) try {
 				in_direct_gameplay
 			);
 			
-			/* MSVC ICE workaround */
-
-			const auto& _config = config;
-
-			const auto viewing_config = visit_current_setup([&_config](auto& setup) {
-				auto config_copy = _config;
+			const auto viewing_config = visit_current_setup([&](auto& setup) {
+				auto config_copy = config;
 
 				/*
 					For example, the main menu might want to disable HUD or tune down the sound effects.
@@ -1501,10 +1491,6 @@ int work(const int argc, const char* const * const argv) try {
 				renderer.get_line_buffer(),
 				necessary_images_in_atlas[assets::necessary_image_id::BLANK]
 			};
-		};
-
-		auto get_gui_text_style = [&]() {
-			return augs::gui::text::style { get_gui_font(), cyan };
 		};
 
 		const auto interpolation_ratio = visit_current_setup([](auto& setup) {

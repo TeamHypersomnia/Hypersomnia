@@ -131,7 +131,6 @@ vec2 position_rectangle_around_a_circle(
 	};
 
 	const vec2 angle_norm = vec2::from_degrees(position_at_degrees);
-	const vec2 angle = angle_norm * circle_radius;
 
 	static const vec2 quadrant_multipliers[4] = { vec2(-1, -1), vec2(1, -1), vec2(1, 1), vec2(-1, 1), };
 	static const vec2 quadrants_on_circle[4] = { vec2(-1, 0), vec2(0, -1), vec2(1, 0), vec2(0, 1), };

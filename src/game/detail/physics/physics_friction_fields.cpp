@@ -21,16 +21,16 @@ void physics_world_cache::rechoose_owner_friction_body(const entity_handle entit
 			// cycle guard
 			// remove friction grounds whom I do own myself
 
-			erase_if(feasible_grounds, [this, entity, &cosmos](const auto subject) {
-				return are_connected_by_friction(cosmos[subject.target], entity);
+			erase_if(feasible_grounds, [entity, &cosmos](const auto subject) {
+				return ::are_connected_by_friction(cosmos[subject.target], entity);
 			});
 		}
 
 		const auto body = cache->body.get();
 
 		if (!feasible_grounds.empty()) {
-			std::stable_sort(feasible_grounds.begin(), feasible_grounds.end(), [this, &cosmos](const auto a, const auto b) {
-				return are_connected_by_friction(cosmos[a.target], cosmos[b.target]);
+			std::stable_sort(feasible_grounds.begin(), feasible_grounds.end(), [&cosmos](const auto a, const auto b) {
+				return ::are_connected_by_friction(cosmos[a.target], cosmos[b.target]);
 			});
 
 			special_physics.owner_friction_ground = feasible_grounds[0].target;

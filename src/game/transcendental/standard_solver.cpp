@@ -35,7 +35,6 @@
 
 void standard_solve(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
-	const auto delta = step.get_delta();
 	auto& performance = cosmos.profiler;
 
 	auto logic_scope = measure_scope(performance.logic);

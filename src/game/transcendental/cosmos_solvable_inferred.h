@@ -1,5 +1,7 @@
 #pragma once
+#if PLATFORM_WINDOWS
 #pragma warning(disable : 4503)
+#endif
 
 #include "game/inferred_caches/tree_of_npo_cache.h"
 #include "game/inferred_caches/physics_world_cache.h"

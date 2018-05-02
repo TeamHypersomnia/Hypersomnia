@@ -28,7 +28,6 @@ vec2 components::crosshair::get_bounds_in_this_look() const {
 
 void crosshair_system::generate_crosshair_intents(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
-	const auto delta = step.get_delta();
 
 	{
 		const auto& events = step.get_queue<messages::motion_message>();

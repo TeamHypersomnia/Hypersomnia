@@ -50,8 +50,8 @@ namespace augs {
 		}
 
 		texture::texture(texture&& b) :
-			built(b.built),
-			id(b.id)
+			id(b.id),
+			built(b.built)
 		{
 			b.built = false;
 		}
@@ -59,8 +59,8 @@ namespace augs {
 		texture& texture::operator=(texture&& b) {
 			destroy();
 
-			built = b.built;
 			id = b.id;
+			built = b.built;
 
 			b.built = false;
 

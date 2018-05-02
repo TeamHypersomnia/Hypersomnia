@@ -327,8 +327,6 @@ namespace augs {
 		else if constexpr(is_variant_v<Serialized>) {
 			std::visit(
 				[output_table](const auto& resolved){
-					using T = remove_cref<decltype(resolved)>;
-					
 					const auto variant_type_label = get_variant_type_label();
 					const auto variant_content_label = get_variant_content_label();
 					const auto this_type_name = get_type_name_strip_namespace(resolved);

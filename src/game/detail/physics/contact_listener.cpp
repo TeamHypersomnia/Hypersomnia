@@ -80,7 +80,9 @@ void contact_listener::BeginContact(b2Contact* contact) {
 		ensure(collider.alive());
 
 		const auto subject_fixtures = subject.get<invariants::fixtures>();
+#if FRICTION_FIELDS_COLLIDE
 		const auto collider_fixtures = collider.get<invariants::fixtures>();
+#endif
 
 		if (subject_fixtures.is_friction_ground()) {
 #if FRICTION_FIELDS_COLLIDE
@@ -192,7 +194,6 @@ void contact_listener::BeginContact(b2Contact* contact) {
 void contact_listener::EndContact(b2Contact* contact) {
 	auto& sys = get_sys();
 	auto& cosmos = cosm;
-	const auto si = cosmos.get_si();
 
 	for (int i = 0; i < 2; ++i) {
 		auto fix_a = contact->GetFixtureA();
@@ -218,7 +219,9 @@ void contact_listener::EndContact(b2Contact* contact) {
 		msg.collider = collider;
 
 		const auto subject_fixtures = subject.get<invariants::fixtures>();
+#if FRICTION_FIELDS_COLLIDE
 		const auto collider_fixtures = collider.get<invariants::fixtures>();
+#endif
 
 		auto& collider_physics = collider.get_owner_of_colliders().get_special_physics();
 

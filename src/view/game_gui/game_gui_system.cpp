@@ -135,7 +135,6 @@ bool game_gui_system::control_gui_world(
 	}
 
 	const auto& cosmos = root_entity.get_cosmos();
-	const auto state = context.get_input_state();
 	auto& element = context.get_character_gui();
 
 	if (root_entity.has<components::item_slot_transfers>()) {
