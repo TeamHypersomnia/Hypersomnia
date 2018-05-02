@@ -29,7 +29,7 @@ namespace augs {
 
 	public:
 		template <class T, class... RedoArgs>
-		void execute_new(T&& command, RedoArgs&&... redo_args) {
+		T& execute_new(T&& command, RedoArgs&&... redo_args) {
 			/* 
 				Remove all redoable entries past the current revision.
 				Later we might support branches. 
@@ -50,6 +50,8 @@ namespace augs {
 			); 
 
 			redo(std::forward<RedoArgs>(redo_args)...);
+
+			return std::get<remove_cref<T>>(last_command());
 		}
 
 		template <class... Args>

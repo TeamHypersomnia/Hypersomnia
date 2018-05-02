@@ -43,7 +43,7 @@ struct editor_history : public editor_history_base {
 	}
 
 	template <class T, class... RedoArgs>
-	void execute_new(T&& command, RedoArgs&&... redo_args) {
+	decltype(auto) execute_new(T&& command, RedoArgs&&... redo_args) {
 		command.common.reset_timestamp();
 
 		if (has_last_command()) {
@@ -59,7 +59,7 @@ struct editor_history : public editor_history_base {
 			}
 		}
 
-		editor_history_base::execute_new(
+		return editor_history_base::execute_new(
 			std::forward<T>(command),
 			std::forward<RedoArgs>(redo_args)...
 		);

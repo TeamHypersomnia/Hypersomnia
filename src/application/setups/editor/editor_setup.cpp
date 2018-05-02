@@ -412,7 +412,21 @@ void editor_setup::perform_custom_imgui(
 		history_gui.perform(make_command_input());
 
 		common_state_gui.perform(settings, make_command_input());
-		fae_gui.perform(make_fae_gui_input(image_caches), view().selected_entities);
+
+		{
+			const auto output = fae_gui.perform(make_fae_gui_input(image_caches), view().selected_entities);
+
+			if (const auto id = output.instantiate_id) {
+				instantiate_flavour_command cmd;
+				cmd.instantiated_id = *id;
+				cmd.where.pos = get_world_cursor_pos();
+
+				const auto& executed = post_editor_command(make_command_input(), std::move(cmd));
+				const auto created_id = executed.get_created_id();
+				view().selected_entities = { created_id };
+				mover.start_moving_selection(make_mover_input());
+			}
+		}
 
 		selection_groups_gui.perform(has_ctrl, make_command_input());
 
@@ -441,10 +455,10 @@ void editor_setup::perform_custom_imgui(
 
 		{
 			const auto in = make_fae_gui_input(image_caches);
-			const auto filters = selected_fae_gui.perform(in, all_selected);
+			const auto output = selected_fae_gui.perform(in, all_selected);
 
 			const auto& cosm = work().world;
-			filters.perform(cosm, view().selected_entities);
+			output.filter.perform(cosm, view().selected_entities);
 		}
 
 		coordinates_gui.perform(*this, screen_size, mouse_pos, all_selected);

@@ -30,6 +30,6 @@ struct editor_command_input {
 };
 
 template <class E, class T>
-void post_editor_command(const E& in, T&& cmd) {
-	in.folder.history.execute_new(std::forward<T>(cmd), in);
+decltype(auto) post_editor_command(const E& in, T&& cmd) {
+	return in.folder.history.execute_new(std::forward<T>(cmd), in);
 }

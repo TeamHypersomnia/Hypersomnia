@@ -194,7 +194,7 @@ void for_each_typed_handle_in(const cosmos& cosm, const C& container, F&& callba
 	}
 }
 
-fae_tree_filter editor_selected_fae_gui::perform(
+fae_tree_output editor_selected_fae_gui::perform(
 	const editor_fae_gui_input in,
 	const fae_selections_type& matches
 ) {
@@ -274,8 +274,6 @@ fae_tree_filter editor_selected_fae_gui::perform(
 
 	const auto provider = in_selection_provider { cosm, cached_flavour_to_entities, true };
 
-	auto view_switch = augs::scope_guard([&]() { do_view_mode_switch(); });
-
 	switch (view_mode) {
 		case fae_view_type::ENTITIES:
 			return tree_of_entities(fae_in, entities_tree_data, provider, ticked_entities);
@@ -287,7 +285,7 @@ fae_tree_filter editor_selected_fae_gui::perform(
 	}
 }
 
-void editor_fae_gui::perform(
+fae_tree_output editor_fae_gui::perform(
 	const editor_fae_gui_input in, 
 	fae_selections_type& all_selections
 ) {
@@ -296,7 +294,7 @@ void editor_fae_gui::perform(
 	auto entities = make_scoped_window();
 
 	if (!entities) {
-		return;
+		return {};
 	}
 
 	entities_tree_data.hovered_guid.unset();
@@ -346,36 +344,39 @@ void editor_fae_gui::perform(
 
 	const auto provider = in_selection_provider { cosm, cached_flavour_to_entities, !filter.Filters.empty() };
 
+	auto after_return = augs::scope_guard([&]() { 
+		all_selections.clear();
+
+		cached_ticked_entities.for_each([&all_selections](const auto id) {
+			all_selections.emplace(entity_id(id));
+		});
+
+		do_view_mode_switch(); 
+	});
+
 	switch (view_mode) {
 		case fae_view_type::ENTITIES:
-			tree_of_entities(fae_in, entities_tree_data, provider, cached_ticked_entities);
+			return tree_of_entities(fae_in, entities_tree_data, provider, cached_ticked_entities);
 		break;
 
 		case fae_view_type::FLAVOURS:
-			tree_of_flavours(fae_in, provider, ticked_flavours);
+			return tree_of_flavours(fae_in, provider, ticked_flavours);
 		break;
 
 		default: 
+			return {};
 		break;
 	}
-
-	all_selections.clear();
-
-	cached_ticked_entities.for_each([&all_selections](const auto id) {
-		all_selections.emplace(entity_id(id));
-	});
-
-	do_view_mode_switch();
 }
 
 #else
-fae_tree_filter editor_fae_gui::perform(
+fae_tree_output editor_fae_gui::perform(
 	const editor_fae_gui_input in
 ) {
 	return {};
 }
 
-fae_tree_filter editor_selected_fae_gui::perform(
+fae_tree_output editor_selected_fae_gui::perform(
 	const editor_fae_gui_input in,
 	const fae_selections_type& matches
 ) {

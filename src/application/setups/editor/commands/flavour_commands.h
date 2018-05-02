@@ -6,6 +6,7 @@
 #include "application/setups/editor/commands/id_allocating_command.h"
 #include "game/transcendental/entity_flavour_id.h"
 #include "game/transcendental/entity_id.h"
+#include "game/components/transform_component.h"
 
 namespace augs {
 	struct introspection_access;
@@ -77,12 +78,17 @@ struct instantiate_flavour_command {
 	// GEN INTROSPECTOR struct instantiate_flavour_command
 	editor_command_common common;
 	entity_flavour_id instantiated_id;
+	components::transform where;
 private:
 	friend augs::introspection_access;
 	entity_id created_id;
 	std::string built_description;
 public:
 	// END GEN INTROSPECTOR
+
+	auto get_created_id() const {
+		return created_id;
+	}
 
 	std::string describe() const;
 

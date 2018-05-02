@@ -63,12 +63,17 @@ protected:
 	fae_tree_input make_fae_input(editor_fae_gui_input, bool);
 };
 
+struct fae_tree_output {
+	fae_tree_filter filter;
+	std::optional<entity_flavour_id> instantiate_id;
+};
+
 struct editor_fae_gui : editor_fae_gui_base {
 	using base = editor_fae_gui_base;
 	using base::base;
 	using introspect_base = base;
 
-	void perform(
+	fae_tree_output perform(
 		editor_fae_gui_input, 
 		fae_selections_type& all_selections
 	);
@@ -83,7 +88,7 @@ struct editor_selected_fae_gui : editor_fae_gui_base {
 	using base::base;
 	using introspect_base = base;
 
-	fae_tree_filter perform(
+	fae_tree_output perform(
 		editor_fae_gui_input,
 		const fae_selections_type& only_match_entities
 	);

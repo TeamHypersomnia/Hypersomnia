@@ -70,7 +70,8 @@ auto tree_of_flavours(
 	const auto prop_in = cpe_in.prop_in;
 	const auto settings = prop_in.settings;
 
-	fae_tree_filter filter;
+	fae_tree_output output;
+	auto& filter = output.filter;
 
 	const auto total_types = detail_get_total_types(provider);
 
@@ -220,7 +221,7 @@ auto tree_of_flavours(
 		);
 	}
 
-	return filter;
+	return output;
 }
 
 template <class F, class T>
@@ -236,7 +237,8 @@ auto tree_of_entities(
 	const auto prop_in = cpe_in.prop_in;
 	const auto settings = prop_in.settings;
 
-	fae_tree_filter filter;
+	fae_tree_output output;
+	auto& filter = output.filter;
 
 	const auto total_types = detail_get_total_types(provider);
 
@@ -332,9 +334,7 @@ auto tree_of_entities(
 									const auto button_label = "+##" + imgui_id;
 
 									if (ImGui::Button(button_label.c_str())) {
-										instantiate_flavour_command cmd;
-										cmd.instantiated_id = flavour_id;
-										post_editor_command(cpe_in.command_in, std::move(cmd));
+										output.instantiate_id = flavour_id;
 									}
 								}
 
@@ -406,5 +406,5 @@ auto tree_of_entities(
 		);
 	}
 
-	return filter;
+	return output;
 }
