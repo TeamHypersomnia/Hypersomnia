@@ -43,16 +43,6 @@ struct cosmos_common_significant {
 	rgba ambient_light_color = { 25, 51, 51, 255 };
 	// END GEN INTROSPECTOR
 
-	template <class entity_type>
-	auto& get_flavours() {
-		return std::get<make_entity_flavours<entity_type>>(flavours);	
-	}
-
-	template <class entity_type>
-	const auto& get_flavours() const {
-		return std::get<make_entity_flavours<entity_type>>(flavours);	
-	}
-
 private:
 	template <class C, class... Types, class F>
 	static decltype(auto) on_flavour_impl(
@@ -67,7 +57,7 @@ private:
 			flavour_id.type_id,
 			[&](auto t) -> decltype(auto) {
 				using E = decltype(t);
-				return callback(self.template get_flavours<E>().get_flavour(typed_entity_flavour_id<E>(flavour_id.raw)));
+				return callback(self.flavours.template get_for<E>().get(flavour_id.raw));
 			}
 		);
 	}
@@ -79,7 +69,7 @@ private:
 		F callback	
 	) {
 		using candidate_types = typename decltype(flavour_id)::matching_types; 
-		return callback(self.template get_flavours<E>().get_flavour(flavour_id));
+		return callback(self.flavours.template get_for<E>().get(flavour_id.raw));
 	}
 
 public:

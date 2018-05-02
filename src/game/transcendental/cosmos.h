@@ -149,17 +149,37 @@ public:
 
 	template <class entity_type>
 	const auto& get_flavours() const {
-		return get_common_significant().get_flavours<entity_type>();
+		return get_common_significant().flavours.get_for<entity_type>();
+	}
+
+	template <class entity_type>
+	auto& get_flavours(cosmos_common_significant_access key) {
+		return get_common_significant(key).flavours.get_for<entity_type>();
+	}
+
+	template <class entity_type>
+	const auto& get_flavours(cosmos_common_significant_access key) const {
+		return get_common_significant(key).flavours.get_for<entity_type>();
 	}
 
 	template <class entity_type>
 	const auto& get_flavour(const typed_entity_flavour_id<entity_type> id) const {
-		return get_flavours<entity_type>().get_flavour(id);
+		return get_flavours<entity_type>().get(id.raw);
+	}
+
+	template <class entity_type>
+	auto& get_flavour(cosmos_common_significant_access key, const typed_entity_flavour_id<entity_type> id) {
+		return get_flavours<entity_type>(key).get(id.raw);
+	}
+
+	template <class entity_type>
+	const auto& get_flavour(cosmos_common_significant_access key, const typed_entity_flavour_id<entity_type> id) const {
+		return get_flavours<entity_type>(key).get(id.raw);
 	}
 
 	template <class entity_type>
 	const auto* find_flavour(const typed_entity_flavour_id<entity_type> id) const {
-		return get_flavours<entity_type>().find_flavour(id);
+		return get_flavours<entity_type>().find(id.raw);
 	}
 
 	template <class... Args>
@@ -169,12 +189,17 @@ public:
 
 	template <class E, class F>
 	void for_each_id_and_flavour(F&& callback) const {
-		get_flavours<E>().for_each(std::forward<F>(callback));
+		for_each_id_and_object(
+			get_flavours<E>(), 
+			[&callback](auto& id, auto& flavour) {
+				callback(typed_entity_flavour_id<E>(id), flavour);
+			}
+		);
 	}
 
 	template <class E>
 	auto get_flavours_count() const {
-		return get_flavours<E>().count();
+		return get_flavours<E>().size();
 	}
 
 	template <class T>

@@ -20,7 +20,8 @@ void find_locations_that_use(
 		});
 	};
 
-	const auto& common = inter.world.get_common_significant();
+	const auto& cosm = inter.world;
+	const auto& common = cosm.get_common_significant();
 
 	traverse("Common: ", common);
 
@@ -29,7 +30,7 @@ void find_locations_that_use(
 		using Fl = entity_flavour<E>;
 
 		if constexpr(can_type_contain_another_v<Fl, asset_id_type>) {
-			common.get_flavours<E>().for_each([&](const auto, const auto& flavour) {
+			cosm.for_each_id_and_flavour<E>([&](const auto, const auto& flavour) {
 				const auto& name = flavour.template get<invariants::name>().name;
 
 				auto for_each_through = [&](const auto& where) {

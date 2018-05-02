@@ -13,9 +13,14 @@ summary: That which we are brainstorming at the moment.
 
 - create gfx and sfx folders for the project on saving
 
+- how do we communicate the used locations?
+
 - possibly rename the flavour on setting an image?
 	- if it is detected that it is yet unnamed?
 	- due to a filter, the node disappears during renaming
+		- just when constructing a filter, save a name with which it was remembered in cached fae selections
+			- i guess we will still be able to do for eaches and all flav id getters even with changed state structure
+
 - start moving instantiated entity right away
 
 - finish stuff with flavours, disallow removing used ones

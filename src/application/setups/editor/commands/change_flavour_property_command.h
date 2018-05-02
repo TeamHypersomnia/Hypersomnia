@@ -22,8 +22,6 @@ struct flavour_property_id {
 	) const {
 		bool result = false;
 
-		auto& common_signi = cosm.get_common_significant({});
-
 		get_by_dynamic_id(
 			all_entity_types(),
 			type_id,
@@ -38,7 +36,7 @@ struct flavour_property_id {
 
 						for (const auto& f : flavour_ids) {
 							const auto result = on_field_address(
-								std::get<Invariant>(common_signi.template get_flavours<E>().get_flavour(typed_entity_flavour_id<E>(f)).invariants),
+								std::get<Invariant>(cosm.get_flavour({}, typed_entity_flavour_id<E>(f)).invariants),
 								field,
 
 								[&](auto& resolved_field) -> callback_result {

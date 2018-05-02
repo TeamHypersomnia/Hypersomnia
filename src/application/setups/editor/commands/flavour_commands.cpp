@@ -36,7 +36,7 @@ void create_flavour_command::redo_and_copy(const editor_command_input in, const 
 				return entity_type_label;
 			}();
 
-			auto& flavours = cosm.get_common_significant({}).get_flavours<E>();
+			auto& flavours = cosm.get_flavours<E>({});
 			auto& new_object = base::redo(flavours);
 
 			if (source_flavour != nullptr) {
@@ -57,7 +57,7 @@ void create_flavour_command::redo_and_copy(const editor_command_input in, const 
 				const auto tried_name = make_new_flavour_name(i);
 				bool is_free = true;
 
-				flavours.for_each(
+				for_each_id_and_object(flavours,
 					[&](const auto& id, const auto& flavour) {
 						if (flavour.get_name() == tried_name) {
 							is_free = false;
@@ -89,8 +89,7 @@ void create_flavour_command::undo(const editor_command_input in) {
 
 			auto& work = *in.folder.work;
 			auto& cosm = work.world;
-
-			auto& flavours = cosm.get_common_significant({}).get_flavours<E>();
+			auto& flavours = cosm.get_flavours<E>({});
 
 			base::undo(flavours);
 		}
@@ -113,7 +112,7 @@ void delete_flavour_command::redo(const editor_command_input in) {
 			auto& work = *in.folder.work;
 			auto& cosm = work.world;
 
-			auto& flavours = cosm.get_common_significant({}).get_flavours<E>();
+			auto& flavours = cosm.get_flavours<E>({});
 			
 			built_description = "Deleted flavour: " + flavours.get(freed_id).get_name();
 
@@ -130,7 +129,7 @@ void delete_flavour_command::undo(const editor_command_input in) {
 			auto& work = *in.folder.work;
 			auto& cosm = work.world;
 
-			auto& flavours = cosm.get_common_significant({}).get_flavours<E>();
+			auto& flavours = cosm.get_flavours<E>({});
 			
 			base::undo(flavours);
 		}
