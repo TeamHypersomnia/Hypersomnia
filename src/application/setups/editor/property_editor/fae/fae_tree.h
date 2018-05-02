@@ -266,24 +266,31 @@ auto tree_of_entities(
 				static const auto entity_type_label = format_field_name(get_type_name<E>());
 
 				const auto total_entities = provider.template num_entities_of_type<E>();
-				auto disabled = ::maybe_disabled_cols(settings, total_entities == 0);
 
-				const auto flags = do_tick_all_checkbox(
-					settings,
-					ticked_entities,
-					[&provider](auto callback) {
-						provider.template for_each_flavour<E>(
-							[&provider, callback](const flavour_id_type flavour_id, const flavour_type&) {
-								decltype(auto) all_having_flavour = provider.get_entities_by_flavour_id(flavour_id);
+				const auto flags = [&]() {
+					auto disabled = ::maybe_disabled_cols(settings, total_entities == 0);
 
-								for (const auto& e_id : all_having_flavour) {
-									callback(e_id);
+					return do_tick_all_checkbox(
+						settings,
+						ticked_entities,
+						[&provider](auto callback) {
+							provider.template for_each_flavour<E>(
+								[&provider, callback](const flavour_id_type flavour_id, const flavour_type&) {
+									decltype(auto) all_having_flavour = provider.get_entities_by_flavour_id(flavour_id);
+
+									for (const auto& e_id : all_having_flavour) {
+										callback(e_id);
+									}
 								}
-							}
-						);
-					},
-					entity_type_label
-				);
+							);
+						},
+						entity_type_label
+					);
+				}();
+
+				const auto total_flavours = provider.template num_flavours_of_type<E>();
+
+				auto disabled = ::maybe_disabled_cols(settings, !total_entities && !total_flavours);
 
 				auto node = scoped_tree_node_ex(entity_type_label, flags);
 
@@ -326,7 +333,6 @@ auto tree_of_entities(
 								);
 							}();
 
-							/* if (fae_in.show_flavour_control_buttons) */ 
 							{
 								const auto scoped_style = in_line_button_style();
 
