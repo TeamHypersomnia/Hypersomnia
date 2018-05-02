@@ -17,6 +17,7 @@
 #include "augs/templates/traits/container_traits.h"
 #include "game/components/pathfinding_component.h"
 #include "game/organization/for_each_entity_type.h"
+#include "game/organization/for_each_component_type.h"
 
 #include "augs/pad_bytes.h"
 
@@ -461,6 +462,22 @@ struct game_state_checks {
 
 			static_assert(!can_type_contain_another_v<decltype(F::invariants), entity_id_base>);
 			static_assert(!can_type_contain_another_v<decltype(F::invariants), entity_guid>);
+		});
+	}
+
+	/* Components should not hold any flavour ids because we could not afford to look at props of every entity, for now */
+
+	template <class T>
+	struct is_flavour_id : std::bool_constant<
+		is_constrained_flavour_id_v<T>
+		|| is_typed_flavour_id_v<T>
+	> {};
+	
+	void validate_no_flavour_ids_in_components() {
+		for_each_component_type([](auto c) {
+			using C = decltype(c);
+
+			static_assert(!sum_matching_in_v<is_flavour_id, C>);
 		});
 	}
 };

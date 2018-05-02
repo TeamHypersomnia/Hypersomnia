@@ -55,7 +55,9 @@ template <class E>
 struct typed_entity_flavour_id {
 	using used_entity_type = E;
 
+	// GEN INTROSPECTOR struct typed_entity_flavour_id class E
 	raw_entity_flavour_id raw;
+	// END GEN INTROSPECTOR
 
 	typed_entity_flavour_id() = default;
 	explicit typed_entity_flavour_id(const raw_entity_flavour_id raw) : raw(raw) {};

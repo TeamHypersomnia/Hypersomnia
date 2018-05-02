@@ -7,10 +7,6 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
-- really make entity_flavours just a direct pool
-
-- for_each_container usage for ent pools
-
 - tests of traits: check no flavour ids in entities
 	- we could not possibly afford looking through all for usage checks
 

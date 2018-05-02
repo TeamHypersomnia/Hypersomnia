@@ -766,3 +766,6 @@ we consider whole type overrides too complex architeciturally:
 - REALLY enable these clang warnings
 - fix crash when changin neon map color
 
+- really make entity_flavours just a direct pool
+- for_each_container usage for ent pools
+
