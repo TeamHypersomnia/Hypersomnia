@@ -43,6 +43,6 @@ void destruction_system::generate_damages_from_forceful_collisions(const logic_s
 	}
 }
 
-void destruction_system::apply_damages_and_split_fixtures(const logic_step step) const {
+void destruction_system::apply_damages_and_split_fixtures(const logic_step) const {
 
 }

@@ -61,7 +61,7 @@ struct source_path_widget {
 
 	template <class T>
 	auto describe_changed(
-		const std::string& formatted_label,
+		const std::string& /* formatted_label */,
 		const T& to
 	) const {
 		return typesafe_sprintf("Changed image path to %x", to.path);

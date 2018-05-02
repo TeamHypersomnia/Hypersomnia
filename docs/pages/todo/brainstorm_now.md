@@ -5,15 +5,14 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- REALLY enable these clang warnings
-	- fix crash when changin neon map color
+- fix crash when changin neon map color
 
 - would really, really be cool to have a color picker inside the neon map light color chooser
 	- less pain in the ass
 
 - create gfx and sfx folders for the project on saving
 
-- how do we communicate the used locations?
+- how do we communicate the used locations of flavours?
 
 - possibly rename the flavour on setting an image?
 	- if it is detected that it is yet unnamed?

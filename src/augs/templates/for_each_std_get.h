@@ -10,7 +10,7 @@
 
 namespace templates_detail {
 	template <class F, class... Instances>
-	void for_each_through_std_get(F&& f, std::index_sequence<>, Instances&&... instances)
+	void for_each_through_std_get(F&&, std::index_sequence<>, Instances&&...)
 	{}
 
 	template <class F, class... Instances, std::size_t N, std::size_t... Is>
@@ -30,7 +30,7 @@ void for_each_through_std_get(List&& t, F f) {
 	using namespace templates_detail;
 
 	for_each_through_std_get(
-		[f](auto num, auto&&... args) {
+		[f](auto, auto&&... args) {
 			f(std::forward<decltype(args)>(args)...);
 		},
 		std::make_index_sequence<num_types_in_list_v<remove_cref<List>>>(),
@@ -43,7 +43,7 @@ void reverse_for_each_through_std_get(List&& t, F f) {
 	using namespace templates_detail;
 
 	for_each_through_std_get(
-		[f](auto num, auto&&... args) {
+		[f](auto, auto&&... args) {
 			f(std::forward<decltype(args)>(args)...);
 		},
 		reverse_sequence_t<std::make_index_sequence<num_types_in_list_v<remove_cref<List>>>>(),

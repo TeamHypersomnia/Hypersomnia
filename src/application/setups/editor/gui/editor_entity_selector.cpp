@@ -206,7 +206,7 @@ void editor_entity_selector::do_mousemotion(
 			[&](const auto handle, 
 				const auto tex_id,
 			   	const auto where,
-				const auto color
+				const auto
 			) {
 				if (get_world_xywh(tex_id, where).hover(world_range)) {
 					in_rectangular_selection.all.push_back(handle.get_id());
@@ -227,7 +227,7 @@ void editor_entity_selector::do_mousemotion(
 			[&](const auto handle, 
 				const auto tex_id,
 			   	const auto where,
-				const auto color
+				const auto
 			) {
 				if (get_world_xywh(tex_id, where).hover(world_cursor_pos)) {
 					hovered = handle.get_id();

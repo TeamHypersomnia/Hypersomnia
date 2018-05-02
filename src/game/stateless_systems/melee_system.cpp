@@ -59,4 +59,4 @@ void melee_system::consume_melee_intents(const logic_step step) {
 	}
 }
 
-void melee_system::initiate_and_update_moves(const logic_step step) {}
+void melee_system::initiate_and_update_moves(const logic_step) {}

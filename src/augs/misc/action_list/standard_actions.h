@@ -54,7 +54,7 @@ namespace augs {
 
 		void on_enter() final {}
 
-		void on_update(const delta dt) final {
+		void on_update(const delta) final {
 			current = to;
 		}
 
@@ -132,7 +132,7 @@ namespace augs {
 
 		void on_enter() final {}
 
-		void on_update(const delta dt) final {
+		void on_update(const delta) final {
 			callback();
 		}
 

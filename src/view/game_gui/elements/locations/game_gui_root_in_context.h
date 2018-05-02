@@ -6,12 +6,12 @@ class game_gui_root_in_context {
 public:
 	using dereferenced_type = game_gui_root;
 
-	bool operator==(game_gui_root_in_context b) const {
+	bool operator==(game_gui_root_in_context) const {
 		return true;
 	}
 
 	template <class C>
-	bool alive(const C context) const {
+	bool alive(const C) const {
 		return true;
 	}
 
@@ -24,7 +24,7 @@ public:
 namespace std {
 	template <>
 	struct hash<game_gui_root_in_context> {
-		size_t operator()(const game_gui_root_in_context& k) const {
+		size_t operator()(const game_gui_root_in_context&) const {
 			return hash<size_t>()(typeid(game_gui_root_in_context).hash_code());
 		}
 	};

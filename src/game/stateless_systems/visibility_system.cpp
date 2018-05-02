@@ -53,7 +53,7 @@ size_t visibility_information_response::get_num_triangles() const {
 
 discontinuity* visibility_information_response::get_discontinuity_for_edge(const size_t n) {
 	for (auto& disc : discontinuities) {
-		if (disc.edge_index == n) {
+		if (disc.edge_index == static_cast<int>(n)) {
 			return &disc;
 		}
 	}
@@ -67,7 +67,7 @@ discontinuity* visibility_information_response::get_discontinuity(const size_t n
 
 const discontinuity* visibility_information_response::get_discontinuity_for_edge(const size_t n) const {
 	for (auto& disc : discontinuities) {
-		if (disc.edge_index == n) {
+		if (disc.edge_index == static_cast<int>(n)) {
 			return &disc;
 		}
 	}
@@ -595,12 +595,14 @@ void visibility_system::respond_to_visibility_information_requests(
 			physics_raycast_output ray_callbacks[2] = { all_ray_outputs[i].first, all_ray_outputs[i].second };
 			auto& vertex = all_vertices_transformed[i];
 
-			const b2Vec2* from_aabb = nullptr;
+			/* const b2Vec2* from_aabb = nullptr; */
 
 			/* if the vertex comes from bounding square, save it and remember about it */
-			for (const auto& aabb_vert : whole_vision)
-				if (vertex.pos == aabb_vert)
-					from_aabb = &aabb_vert;
+			/* for (const auto& aabb_vert : whole_vision) { */
+			/* 	if (vertex.pos == aabb_vert) { */
+			/* 		from_aabb = &aabb_vert; */
+			/* 	} */
+			/* } */
 
 			if (vertex.is_on_a_bound && (!ray_callbacks[0].hit || (ray_callbacks[0].intersection - vertex.pos).length_sq() < epsilon_distance_vertex_hit_sq)) {
 				/* if it is a vertex on the boundary, handle it accordingly - interpret it as a new discontinuity (e.g. for pathfinding) */

@@ -47,7 +47,6 @@ public:
 
 	void rewrite_change(
 		const delta_type& new_value,
-		std::optional<snapping_grid>,
 		const editor_command_input in
 	);
 	

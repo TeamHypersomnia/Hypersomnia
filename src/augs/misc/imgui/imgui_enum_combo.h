@@ -9,7 +9,7 @@ namespace augs {
 			const auto current_str = format_enum(into);
 			const auto current = into;
 
-			if (auto combo = scoped_combo(label.c_str(), current_str.c_str())) {
+			if (auto combo = scoped_combo(label.c_str(), current_str.c_str(), std::forward<Args>(args)...)) {
 				for_each_enum_except_bounds([&](const T e) {
 					const auto enum_label = format_enum(e);
 					bool is_selected = e == current;

@@ -33,7 +33,7 @@ std::string editor_selection_groups::get_free_group_name(const std::string& patt
 	for (std::size_t i = 1;; ++i) {
 		const auto resolved_name = typesafe_sprintf(pattern, i);
 
-		if (find_group_by(resolved_name) == -1) {
+		if (find_group_by(resolved_name) == static_cast<std::size_t>(-1)) {
 			return resolved_name;
 		}
 	}
@@ -54,7 +54,7 @@ std::size_t editor_selection_groups::find_group_by(const std::string& name) cons
 }
 
 std::size_t editor_selection_groups::get_group_by(const std::string& name) {
-	if (const auto id = find_group_by(name); id != -1) {
+	if (const auto id = find_group_by(name); id != static_cast<std::size_t>(-1)) {
 		return id;
 	}
 

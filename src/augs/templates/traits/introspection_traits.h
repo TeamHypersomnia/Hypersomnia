@@ -43,13 +43,13 @@ template <class T, class = void>
 struct has_introspect_base : std::false_type {};
 
 template <class T>
-struct has_introspect_base<T, decltype(std::declval<typename T::introspect_base>, void())> : std::true_type {};
+struct has_introspect_base<T, decltype(std::declval<typename T::introspect_base>(), void())> : std::true_type {};
 
 template <class T, class = void>
 struct has_introspect_bases : std::false_type {};
 
 template <class T>
-struct has_introspect_bases<T, decltype(std::declval<typename T::introspect_bases>, void())> : std::true_type {};
+struct has_introspect_bases<T, decltype(std::declval<typename T::introspect_bases>(), void())> : std::true_type {};
 
 template <class T>
 constexpr bool has_introspect_base_v = has_introspect_base<T>::value;

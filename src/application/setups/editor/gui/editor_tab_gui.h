@@ -44,7 +44,7 @@ void perform_editor_tab_gui(
 			std::vector<int> out;
 			out.resize(signi.folders.size());
 
-			for (int i = 0; i < out.size(); ++i) {
+			for (int i = 0; i < static_cast<int>(out.size()); ++i) {
 				out[i] = i;
 			}
 
@@ -94,7 +94,7 @@ void perform_editor_tab_gui(
 				bool changed_order = false;
 
 				for (std::size_t i = 0; i < ordering.size(); ++i) {
-					if (ordering[i] != i) {
+					if (ordering[i] != static_cast<int>(i)) {
 						changed_order = true;
 						break;
 					}

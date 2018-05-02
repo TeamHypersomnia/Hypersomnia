@@ -7,7 +7,7 @@ namespace augs {
 		return ((std::hash<A>()(a) ^ (std::hash<B>()(b) << 1)) >> 1);
 	}
 
-	inline void hash_combine(std::size_t& seed) { }
+	inline void hash_combine(std::size_t&) { }
 
 	/* Thanks to https://stackoverflow.com/a/38140932/503776 */
 

@@ -26,11 +26,11 @@ void ultimate_wrath_of_the_aeons_instance::perform_logic(const spell_logic_input
 	const auto third_at = augs::stepped_timestamp{ when_casted.step + static_cast<unsigned>(2.3f / dt.in_seconds()) };
 
 	if (now == when_casted) {
-		play_cast_successful_sound(spell_data, in.step, caster_transform, caster);
-		ignite_cast_sparkles(spell_data, in.step, caster_transform, caster);
-		ignite_charging_particles(spell_data, in.step, caster_transform, caster, cyan);
-		ignite_charging_particles(spell_data, in.step, caster_transform, caster, white);
-		play_cast_charging_sound(spell_data, in.step, caster_transform, caster);
+		play_cast_successful_sound(spell_data, in.step, caster);
+		ignite_cast_sparkles(spell_data, in.step, caster);
+		ignite_charging_particles(spell_data, in.step, caster, cyan);
+		ignite_charging_particles(spell_data, in.step, caster, white);
+		play_cast_charging_sound(spell_data, in.step, caster);
 	}
 	else if (now == first_at) {
 		spell_data.explosions[0].instantiate(step, caster_transform, caster);

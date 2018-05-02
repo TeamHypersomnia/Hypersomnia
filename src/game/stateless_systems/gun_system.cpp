@@ -68,14 +68,13 @@ void components::gun::load_next_round(
 	}
 
 	if (next_catridge_from.size() > 0) {
-		const auto into_chamber_transfer = item_slot_transfer_request { 
-			next_catridge_from[next_catridge_from.size() - 1], 
-			gun_entity[slot_function::GUN_CHAMBER], 
-			1, 
-			impulse_mults(),
-			true 
-		};
+		item_slot_transfer_request into_chamber_transfer;
 
+		into_chamber_transfer.item = next_catridge_from[next_catridge_from.size() - 1];
+		into_chamber_transfer.target_slot = gun_entity[slot_function::GUN_CHAMBER];
+		into_chamber_transfer.force_immediate_mount = true;
+		into_chamber_transfer.specified_quantity = 1;
+	   
 		perform_transfer(into_chamber_transfer, step);
 	}
 }

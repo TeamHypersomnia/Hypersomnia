@@ -77,7 +77,7 @@ void change_grouping_command::undo(const editor_command_input in) {
 
 	for (std::size_t i = 0; i < affected_entities.size(); ++i) {
 		if (const auto previous_group_index = group_indices_before[i];
-			previous_group_index != -1	
+			previous_group_index != static_cast<unsigned>(-1)
 		) {
 			const auto id = affected_entities[i];
 			groups.set_group(previous_group_index, id); 

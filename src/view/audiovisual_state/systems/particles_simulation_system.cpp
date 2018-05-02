@@ -52,7 +52,7 @@ void particles_simulation_system::add_particle(const render_layer l, const entit
 void particles_simulation_system::update_effects_from_messages(
 	const const_logic_step step,
 	const particle_effects_map& manager,
-	const interpolation_system& interp
+	const interpolation_system& 
 ) {
 	thread_local randomization rng;
 
@@ -222,7 +222,7 @@ void particles_simulation_system::advance_visible_streams(
 	const camera_cone current_cone, 
 	const vec2 screen_size,
 	const cosmos& cosmos,
-	const particle_effects_map& manager,
+	const particle_effects_map&,
 	const animations_pool& anims,
 	const augs::delta delta,
 	const interpolation_system& interp

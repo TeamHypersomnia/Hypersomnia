@@ -509,7 +509,7 @@ namespace augs {
 		}
 	}
 
-	void window::set_fullscreen_hint(const bool flag) {
+	void window::set_fullscreen_hint(const bool) {
 // TODO: actually implement fullscreen
 #if 0
 xcb_ewmh_connection_t EWMH;
@@ -625,21 +625,21 @@ xcb_ewmh_init_atoms_replies(&EWMH, EWMHCookie, NULL);
 	}
 
 	std::optional<std::string> window::open_file_dialog(
-		const std::vector<file_dialog_filter>& filters,
-		const std::string& custom_title
+		const std::vector<file_dialog_filter>& /* filters */,
+		const std::string& /* custom_title */
 	) const {
 		return choose_path("scripts/unix/open_file.local");
 	}
 
 	std::optional<std::string> window::save_file_dialog(
-		const std::vector<file_dialog_filter>& filters,
-		const std::string& custom_title
+		const std::vector<file_dialog_filter>& /* filters */,
+		const std::string& /* custom_title */
 	) const {
 		return choose_path("scripts/unix/save_file.local");
 	}
 
 	std::optional<std::string> window::choose_directory_dialog(
-		const std::string& custom_title
+		const std::string& /* custom_title */
 	) const {
 		return choose_path("scripts/unix/choose_directory.local");
 	}

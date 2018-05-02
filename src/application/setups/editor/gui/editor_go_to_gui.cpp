@@ -182,7 +182,7 @@ std::optional<const_entity_handle> editor_go_to_entity_gui::perform(
 				if (const auto match = self.get_matching_go_to_entity(cosm)) {
 					const auto name = match.get_name();
 
-					if (name.length() < data->BufSize) {
+					if (static_cast<int>(name.length()) < data->BufSize) {
 						std::copy(name.c_str(), name.c_str() + name.length() + 1, data->Buf);
 
 						data->BufTextLen = name.length();

@@ -4,7 +4,7 @@
 #include "augs/ensure.h"
 
 template <class Pointer, class F>
-void dynamic_cast_dispatch(Pointer* const o, F&& callback) {
+void dynamic_cast_dispatch(Pointer*, F&&) {
 	ensure(false && "failed to perform dynamic dispatch");
 }
 

@@ -394,7 +394,7 @@ void physics_world_cache::infer_cache_for_colliders(const const_entity_handle h)
 	});
 }
 
-void physics_world_cache::infer_cache_for_joint(const const_entity_handle handle) {
+void physics_world_cache::infer_cache_for_joint(const const_entity_handle /* handle */) {
 #if TODO
 	const auto& cosmos = handle.get_cosmos();
 

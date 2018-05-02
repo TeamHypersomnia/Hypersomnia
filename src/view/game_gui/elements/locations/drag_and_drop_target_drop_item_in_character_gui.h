@@ -6,12 +6,12 @@ struct drag_and_drop_target_drop_item_in_character_gui {
 public:
 	using dereferenced_type = drag_and_drop_target_drop_item;
 
-	bool operator==(const drag_and_drop_target_drop_item_in_character_gui b) const {
+	bool operator==(const drag_and_drop_target_drop_item_in_character_gui) const {
 		return true;
 	}
 
 	template <class C>
-	bool alive(const C context) const {
+	bool alive(const C&) const {
 		return true;
 	}
 
@@ -25,7 +25,7 @@ public:
 namespace std {
 	template <>
 	struct hash<drag_and_drop_target_drop_item_in_character_gui> {
-		size_t operator()(const drag_and_drop_target_drop_item_in_character_gui& k) const {
+		size_t operator()(const drag_and_drop_target_drop_item_in_character_gui&) const {
 			return hash<size_t>()(typeid(drag_and_drop_target_drop_item_in_character_gui).hash_code());
 		}
 	};

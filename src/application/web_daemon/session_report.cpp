@@ -141,14 +141,14 @@ void session_report::fetch_stats(const std::string new_stats) {
 }
 
 #else
-bool session_report::start_daemon(const config_lua_table& cfg) {
+bool session_report::start_daemon(const config_lua_table&) {
 	return false;
 }
 
 void session_report::stop_daemon() {
 }
 
-void session_report::fetch_stats(const std::string new_stats) {
+void session_report::fetch_stats(const std::string) {
 }
 
 #endif

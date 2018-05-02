@@ -28,7 +28,7 @@ template <class F, class E>
 void drop_from_all_slots(const invariants::container& container, const E handle, const impulse_mults impulse, F result_callback) {
 	for (const auto& s : container.slots) {
 		for (const auto item : get_items_inside(handle, s.first)) {
-			result_callback(perform_transfer( item_slot_transfer_request{ item, inventory_slot_id(), -1, impulse }, handle.get_cosmos()));
+			result_callback(perform_transfer(item_slot_transfer_request::drop(item, impulse), handle.get_cosmos()));
 		}
 	}
 }

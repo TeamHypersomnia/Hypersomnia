@@ -295,7 +295,7 @@ namespace augs {
 			static void unhover(
 				const C context, 
 				const gui_element_id this_id, 
-				gui::raw_input_traversal& inf, 
+				gui::raw_input_traversal&, 
 				gui_entropy& entropies
 			) {
 				auto& world = context.get_rect_world();

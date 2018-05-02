@@ -107,13 +107,13 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 	auto draw_layer = [&](const render_layer r) {
 		for (const auto e : visible_per_layer[r]) {
-			draw_entity(cosmos[e], { output, in.game_images, global_time_seconds }, in.interpolation);
+			draw_entity(cosmos[e], { output, in.game_images, global_time_seconds, flip_flags() }, in.interpolation);
 		}
 	};
 	
 	auto draw_neons = [&](const render_layer r) {
 		for (const auto e : visible_per_layer[r]) {
-			draw_neon_map(cosmos[e], { output, in.game_images, global_time_seconds }, in.interpolation);
+			draw_neon_map(cosmos[e], { output, in.game_images, global_time_seconds, flip_flags() }, in.interpolation);
 		}
 	};
 

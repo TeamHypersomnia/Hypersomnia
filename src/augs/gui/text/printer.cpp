@@ -187,8 +187,6 @@ namespace augs {
 				auto& sectors = d.sectors;
 				const bool clip = clipper.good();
 
-				auto caret_rect = xywhi(0, 0, 0, 0);
-
 				if (!lines.empty() && !sectors.empty()) {
 					simple_pair<int, int> visible;
 

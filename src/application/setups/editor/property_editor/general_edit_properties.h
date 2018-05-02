@@ -244,7 +244,7 @@ void detail_general_edit_properties(
 
 							detail_general_edit_properties<SkipPredicate>(
 								input, 
-								[are_elements_equal](auto&&... args) {
+								[are_elements_equal](auto&&...) {
 									return are_elements_equal;
 								},
 								notify_whole_element,

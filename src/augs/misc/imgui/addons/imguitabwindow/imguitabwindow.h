@@ -328,7 +328,7 @@ public:
     }
     inline bool copyLabelTo(char* buffer, int buffer_size) const {
         int len = modified ? ((int)strlen(label)-1) : (int)strlen(label);
-        if (len<0) len=0;bool ok = true;
+        if (len<0) { len=0; } bool ok = true;
         if (buffer_size<=len) {len = buffer_size-1;ok=false;}
         strncpy(buffer,label,len);
         buffer[len]='\0';
@@ -378,7 +378,7 @@ public:
         ImGui::TextWrapped("%s","to set a content for it, or extending TabWindowLabel and implement its render() method.");
     }
 
-    virtual bool saveAs(const char* savePath=NULL) {
+    virtual bool saveAs(const char* =NULL) {
         setModified(false);
         return true;
     }

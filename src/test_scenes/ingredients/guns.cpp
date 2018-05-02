@@ -29,7 +29,7 @@ namespace test_flavours {
 	void populate_gun_flavours(const loaded_image_caches_map& logicals, all_entity_flavours& flavours) {
 		/* Types for bullets etc. */
 
-		auto make_default_gun_container = [](auto& meta, const float mag_rotation = -90.f, const bool magazine_hidden = false){
+		auto make_default_gun_container = [](auto& meta, const float /* mag_rotation */ = -90.f, const bool magazine_hidden = false){
 			invariants::container container; 
 
 			{
@@ -447,10 +447,10 @@ namespace prefabs {
 		auto weapon = create_test_scene_entity(cosmos, test_shootable_weapons::SAMPLE_RIFLE, pos);
 
 		if (load_mag.alive()) {
-			perform_transfer({ load_mag, weapon[slot_function::GUN_DETACHABLE_MAGAZINE] }, step);
+			perform_transfer(item_slot_transfer_request::standard(load_mag, weapon[slot_function::GUN_DETACHABLE_MAGAZINE]), step);
 
 			if (load_mag[slot_function::ITEM_DEPOSIT].has_items()) {
-				perform_transfer({ load_mag[slot_function::ITEM_DEPOSIT].get_items_inside()[0], weapon[slot_function::GUN_CHAMBER], 1 }, step);
+				perform_transfer(item_slot_transfer_request::standard(load_mag[slot_function::ITEM_DEPOSIT].get_items_inside()[0], weapon[slot_function::GUN_CHAMBER], 1), step);
 			}
 		}
 
@@ -464,8 +464,11 @@ namespace prefabs {
 		auto weapon = create_test_scene_entity(cosmos, test_shootable_weapons::KEK9, pos);
 
 		if (load_mag.alive()) {
-			perform_transfer({ load_mag, weapon[slot_function::GUN_DETACHABLE_MAGAZINE] }, step);
-			perform_transfer({ load_mag[slot_function::ITEM_DEPOSIT].get_items_inside()[0], weapon[slot_function::GUN_CHAMBER], 1 }, step);
+			perform_transfer(item_slot_transfer_request::standard(load_mag, weapon[slot_function::GUN_DETACHABLE_MAGAZINE]), step);
+
+			if (load_mag[slot_function::ITEM_DEPOSIT].has_items()) {
+				perform_transfer(item_slot_transfer_request::standard(load_mag[slot_function::ITEM_DEPOSIT].get_items_inside()[0], weapon[slot_function::GUN_CHAMBER], 1), step);
+			}
 		}
 
 		return weapon;
@@ -490,7 +493,7 @@ namespace prefabs {
 		auto sample_magazine = create_test_scene_entity(cosmos, test_container_items::SAMPLE_MAGAZINE, pos);
 
 		if (charge_inside.alive()) {
-			item_slot_transfer_request load_charge{ charge_inside, sample_magazine[slot_function::ITEM_DEPOSIT] };
+			const auto load_charge = item_slot_transfer_request::standard(charge_inside, sample_magazine[slot_function::ITEM_DEPOSIT]);
 			perform_transfer(load_charge, step);
 
 			if (force_num_charges != -1) {

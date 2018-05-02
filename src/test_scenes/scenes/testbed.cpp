@@ -106,7 +106,7 @@ namespace test_scenes {
 		for (int i = 0; i < num_characters; ++i) {
 			auto transform = character_transforms[i];
 
-			const auto new_character = prefabs::create_sample_complete_character(step, transform, typesafe_sprintf("player%x", i), i ? 2 : 0);
+			const auto new_character = prefabs::create_sample_complete_character(step, transform, typesafe_sprintf("player%x", i));
 
 			new_characters[i] = new_character;
 
@@ -139,7 +139,7 @@ namespace test_scenes {
 					new_character.get<components::crosshair>().base_offset.x = -500;
 				}
 
-				perform_transfer({ rifle, new_character.get_primary_hand() }, step);
+				perform_transfer(item_slot_transfer_request::standard(rifle, new_character.get_primary_hand()), step);
 			}
 
 			if (i == 7 || i == 8 || i == 9) {
@@ -149,18 +149,18 @@ namespace test_scenes {
 						prefabs::create_sample_magazine(step, vec2(100, -650),
 							prefabs::create_cyan_charge(step, vec2(0, 0))));
 
-					perform_transfer({ rifle, new_character.get_primary_hand() }, step);
+					perform_transfer(item_slot_transfer_request::standard(rifle, new_character.get_primary_hand()), step);
 				}
 				else {
 					const auto rifle = (i == 7 ? prefabs::create_sample_rifle : prefabs::create_sample_rifle)(step, vec2(100, -500),
 						prefabs::create_sample_magazine(step, vec2(100, -650),
 							prefabs::create_cyan_charge(step, vec2(0, 0))));
 
-					perform_transfer({ rifle, new_character.get_primary_hand() }, step);
+					perform_transfer(item_slot_transfer_request::standard(rifle, new_character.get_primary_hand()), step);
 				}
 
 				const auto backpack = prefabs::create_sample_backpack(step, vec2(200, -650));
-				perform_transfer({ backpack, new_character[slot_function::SHOULDER] }, step);
+				perform_transfer(item_slot_transfer_request::standard(backpack, new_character[slot_function::SHOULDER]), step);
 			}
 
 			fill_range(sentience.learned_spells, true);
@@ -320,7 +320,7 @@ namespace test_scenes {
 
 		if (character(2).alive()) {
 			const auto second_machete = prefabs::create_cyan_urban_machete(step, vec2(0, 300));
-			perform_transfer({ second_machete, character(2).get_primary_hand() }, step);
+			perform_transfer(item_slot_transfer_request::standard(second_machete, character(2).get_primary_hand()), step);
 		}
 
 		return character(0);

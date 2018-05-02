@@ -95,7 +95,7 @@ public:
 	}
 
 	template <class C, class D, class L>
-	static void for_each_child(const C context, const D this_id, L generic_call) {
+	static void for_each_child(const C&, const D this_id, L generic_call) {
 		option_button_in_menu<Enum, option_button<Enum>> loc;
 
 		for (std::size_t i = 0; i < this_id->buttons.size(); ++i) {

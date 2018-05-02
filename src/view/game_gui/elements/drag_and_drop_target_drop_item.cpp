@@ -37,7 +37,7 @@ void drag_and_drop_target_drop_item::draw(const viewing_game_gui_context context
 	);
 }
 
-void drag_and_drop_target_drop_item::respond_to_events(const game_gui_context context, const this_pointer this_id, const gui_entropy& entropies) {
+void drag_and_drop_target_drop_item::respond_to_events(const game_gui_context, const this_pointer this_id, const gui_entropy& entropies) {
 	for (const auto& e : entropies.get_events_for(this_id)) {
 		this_id->detector.update_appearance(e);
 	}

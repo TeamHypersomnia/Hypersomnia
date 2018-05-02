@@ -67,7 +67,7 @@ void erase_from_to(
    	const std::size_t from,
 	std::size_t to = -1
 ) {
-	if (to == -1) {
+	if (to == static_cast<std::size_t>(-1)) {
 		to = v.size();
 	}
 
@@ -75,7 +75,7 @@ void erase_from_to(
 }
 
 template<class Container>
-void remove_duplicates_from_sorted(Container& v, std::enable_if_t<can_access_data_v<Container>>* dummy = nullptr) {
+void remove_duplicates_from_sorted(Container& v, std::enable_if_t<can_access_data_v<Container>>* = nullptr) {
 	v.erase(std::unique(v.begin(), v.end()), v.end());
 }
 

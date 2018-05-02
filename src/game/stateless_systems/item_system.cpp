@@ -99,8 +99,7 @@ void item_system::pick_up_touching_items(const logic_step step) {
 						const bool can_pick_already = transfers->pickup_timeout.try_to_fire_and_reset(cosmos.get_timestamp(), delta);
 
 						if (can_pick_already) {
-							const item_slot_transfer_request request{ item_to_pick, pickup_slot };
-							perform_transfer(request, step);
+							perform_transfer(item_slot_transfer_request::standard(item_to_pick, pickup_slot), step);
 						}
 					}
 				}
@@ -145,7 +144,7 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 					const auto item_inside = subject.get_hand_no(static_cast<size_t>(hand_index)).get_item_if_any();
 
 					if (item_inside.alive()) {
-						perform_transfer({ item_inside, inventory_slot_id() }, step);
+						perform_transfer(item_slot_transfer_request::drop(item_inside), step);
 					}
 				}
 			}

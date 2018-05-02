@@ -42,7 +42,7 @@ entity_name_str get_bbcoded_entity_details(const const_entity_handle);
 
 template <class entity_handle_type, class T>
 entity_name_str get_bbcoded_spell_description(
-	const entity_handle_type subject,
+	const entity_handle_type,
 	const T& spell
 ) {
 	const auto properties = typesafe_sprintf(

@@ -106,7 +106,7 @@ character_gui::hotbar_selection_setup character_gui::get_setup_from_button_indic
 }
 
 void character_gui::clear_hotbar_selection_for_item(
-	const const_entity_handle gui_entity,
+	const const_entity_handle /* gui_entity */,
 	const const_entity_handle item_entity
 ) {
 	for (auto& h : hotbar_buttons) {
@@ -118,7 +118,7 @@ void character_gui::clear_hotbar_selection_for_item(
 
 void character_gui::clear_hotbar_button_assignment(
 	const size_t button_index,
-	const const_entity_handle gui_entity
+	const const_entity_handle /* gui_entity */
 ) {
 	hotbar_buttons[button_index].last_assigned_entity.unset();
 }

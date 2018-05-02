@@ -7,13 +7,13 @@ struct default_widget_provider {
 	static constexpr bool handles = always_false_v<T>;
 
 	template <class T>
-	bool handle(const std::string& label, const T& object) {
+	bool handle(const std::string&, const T&) {
 		static_assert(handles<T>());
 		return false;
 	}
 
 	template <class T>
-	std::string describe_changed(const std::string& label, const T& from, const T& to) {
+	std::string describe_changed(const std::string&, const T&, const T&) {
 		static_assert(always_false_v<T>);
 		return "";
 	}

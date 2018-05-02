@@ -152,7 +152,7 @@ void sound_system::update_effects_from_messages(
 
 void sound_system::update_sound_properties(
 	const augs::audio_volume_settings& settings,
-	const loaded_sounds_map& manager,
+	const loaded_sounds_map&,
 	const interpolation_system& interp,
 	const viewer_eye ear,
 	const augs::delta dt

@@ -144,7 +144,7 @@ bool game_gui_system::control_gui_world(
 
 			if (change.was_pressed(augs::event::keys::key::RMOUSE)) {
 				if (world.held_rect_is_dragged) {
-					pending_transfers.push_back(item_slot_transfer_request { item_entity, cosmos[inventory_slot_id()], dragged_charges });
+					pending_transfers.push_back(item_slot_transfer_request::drop_some(item_entity, dragged_charges));
 					return true;
 				}
 			}

@@ -14,18 +14,18 @@ class images_in_atlas_map {
 
 public:
 	decltype(auto) operator[](const assets::image_id id) {
-		const auto idx = id.get_cache_index();
+		const auto idx = static_cast<std::size_t>(id.get_cache_index());
 		resize_for_index(entries, idx);
 		return entries[idx];
 	}
 
 	decltype(auto) at(const assets::image_id id) {
-		const auto idx = id.get_cache_index();
+		const auto idx = static_cast<std::size_t>(id.get_cache_index());
 		return entries[idx];
 	}
 
 	decltype(auto) at(const assets::image_id id) const {
-		const auto idx = id.get_cache_index();
+		const auto idx = static_cast<std::size_t>(id.get_cache_index());
 		return entries[idx];
 	}
 

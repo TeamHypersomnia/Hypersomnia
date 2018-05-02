@@ -23,14 +23,14 @@ all_necessary_fbos::all_necessary_fbos(
 
 void all_necessary_fbos::apply(
 	const vec2i screen_size,
-	const game_drawing_settings settings
+	const game_drawing_settings /* settings */
 ) {
 	if (/* just_minimized */ screen_size.is_zero()) {
 		return;
 	}
 
 	auto reset = [screen_size](auto& fbo) {
-		if (!fbo || fbo->get_size() != screen_size) {
+		if (!fbo || fbo->get_size() != static_cast<vec2u>(screen_size)) {
 			fbo.emplace(screen_size);
 		}
 	};
@@ -43,7 +43,7 @@ void all_necessary_fbos::apply(
 all_necessary_shaders::all_necessary_shaders(
 	const augs::path_type& canon_directory,
 	const augs::path_type& local_directory,
-	const game_drawing_settings settings
+	const game_drawing_settings /* settings */
 ) {
 	augs::introspect(
 		[&](const auto& label, auto& shader) {

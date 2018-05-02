@@ -16,8 +16,8 @@ void fury_of_the_aeons_instance::perform_logic(const spell_logic_input in) {
 	const auto& spell_data = std::get<fury_of_the_aeons>(subject.get_cosmos().get_common_significant().spells);
 	const auto caster_transform = subject.get_logic_transform();
 
-	ignite_cast_sparkles(spell_data, in.step, caster_transform, subject);
-	play_cast_successful_sound(spell_data, in.step, caster_transform, subject);
+	ignite_cast_sparkles(spell_data, in.step, subject);
+	play_cast_successful_sound(spell_data, in.step, subject);
 
 	spell_data.explosion.instantiate(in.step, caster_transform, subject);
 }

@@ -15,7 +15,7 @@ inline P to_pool_id(const T id) {
 }
 
 template <class T>
-auto enum_count(const T t) {
+auto enum_count(const T) {
 	static_assert(std::is_enum_v<T>);
 	return static_cast<std::size_t>(T::COUNT);
 }

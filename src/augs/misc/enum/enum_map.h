@@ -54,7 +54,7 @@ namespace augs {
 			new (&nth(index)) mapped_type(std::forward<Args>(args)...);
 		}
 
-		const size_type find_first_set_index(size_type from) const {
+		size_type find_first_set_index(size_type from) const {
 			while (from < max_n && !is_set(from)) {
 				++from;
 			}

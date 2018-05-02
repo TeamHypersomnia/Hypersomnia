@@ -28,8 +28,8 @@ void electric_triad_instance::perform_logic(const spell_logic_input in) {
 	const auto& spell_data = std::get<electric_triad>(subject.get_cosmos().get_common_significant().spells);
 	const auto caster_transform = subject.get_logic_transform();
 
-	ignite_cast_sparkles(spell_data, in.step, caster_transform, subject);
-	play_cast_successful_sound(spell_data, in.step, caster_transform, subject);
+	ignite_cast_sparkles(spell_data, in.step, subject);
+	play_cast_successful_sound(spell_data, in.step, subject);
 
 	constexpr float standard_triad_radius = 800.f;
 	const auto caster = subject;

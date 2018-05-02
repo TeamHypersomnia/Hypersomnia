@@ -226,13 +226,13 @@ void illuminated_rendering(
 
 	auto draw_layer = [&](const render_layer r) {
 		for (const auto e : visible.per_layer[r]) {
-			draw_entity(cosmos[e], { output, game_images, global_time_seconds }, interp);
+			draw_entity(cosmos[e], { output, game_images, global_time_seconds, flip_flags() }, interp);
 		}
 	};
 
 	auto draw_borders = [&](const render_layer r, auto provider) {
 		for (const auto e : visible.per_layer[r]) {
-			draw_border(cosmos[e], { output, game_images, global_time_seconds }, interp, provider);
+			draw_border(cosmos[e], { output, game_images, global_time_seconds, flip_flags() }, interp, provider);
 		}
 	};
 
@@ -442,7 +442,8 @@ void illuminated_rendering(
 			{
 				output,
 				game_images,
-				global_time_seconds
+				global_time_seconds,
+				flip_flags()
 			},
 			interp
 		);

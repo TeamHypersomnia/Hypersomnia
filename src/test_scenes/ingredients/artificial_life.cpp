@@ -10,7 +10,7 @@
 #include "game/transcendental/entity_handle.h"
 
 namespace ingredients {
-	void add_standard_pathfinding_capability(entity_handle e) {
+	void add_standard_pathfinding_capability(entity_handle) {
 		//auto& pathfinding = e += components::pathfinding();
 		//auto& visibility = e += components::visibility();
 		//
@@ -29,7 +29,7 @@ namespace ingredients {
 		//layer.filter = filters::pathfinding_query();
 	}
 
-	void add_soldier_intelligence(entity_handle e) {
+	void add_soldier_intelligence(entity_handle) {
 		// auto& los = e.get<components::visibility>().line_of_sight_layers[components::visibility::LINE_OF_SIGHT];
 		// los.test_sentiences = true;
 		// los.test_attitudes = true;

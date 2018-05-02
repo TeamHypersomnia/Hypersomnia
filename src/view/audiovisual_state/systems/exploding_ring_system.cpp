@@ -146,7 +146,7 @@ void exploding_ring_system::advance(
 void exploding_ring_system::draw_rings(
 	const augs::drawer_with_default output,
 	augs::special_buffer& specials,
-	const cosmos& cosmos,
+	const cosmos&,
 	const camera_cone cone,
 	const vec2 screen_size
 ) const {
@@ -209,9 +209,9 @@ void exploding_ring_system::draw_rings(
 void exploding_ring_system::draw_highlights_of_rings(
 	const augs::drawer output,
 	const augs::texture_atlas_entry highlight_tex,
-	const cosmos& cosmos,
+	const cosmos&,
 	const camera_cone cone,
-	const vec2 screen_size
+	const vec2 /* screen_size */
 ) const {
 	for (const auto& r : rings) {
 		const auto passed = global_time_seconds - r.time_of_occurence_seconds;

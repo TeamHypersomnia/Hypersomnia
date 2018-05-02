@@ -7,7 +7,7 @@
 #include "application/setups/editor/editor_command_input.h"
 
 template <class T>
-static constexpr bool should_reinfer_after_change(const T& invariant) {
+static constexpr bool should_reinfer_after_change(const T&) {
 	return 
 		should_reinfer_when_tweaking_v<T>
 		|| is_synchronized_v<T>

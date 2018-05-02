@@ -91,7 +91,7 @@ std::string value_bar::get_description_for_hover(
 			return typesafe_sprintf(meta.appearance.get_description(), meter.get_value(), meter.get_maximum_value());
 		},
 
-		[&](const auto& perk, const auto& meta){
+		[&](const auto& /* perk */, const auto& meta){
 			return typesafe_sprintf(meta.appearance.get_description());
 		}
 	);
@@ -279,7 +279,7 @@ void value_bar::advance_elements(
 }
 
 void value_bar::respond_to_events(
-	const game_gui_context context, 
+	const game_gui_context, 
 	const this_pointer this_id, 
 	const gui_entropy& entropies
 ) {
@@ -299,7 +299,7 @@ assets::image_id value_bar::get_bar_icon(
 		sentience,
 		cosmos,
 		this_id.get_location().vertical_index,
-		[](const auto& perk_or_meter, const auto& meta){
+		[](const auto& /* perk_or_meter */, const auto& meta){
 			return meta.appearance.get_icon();
 		}
 	);

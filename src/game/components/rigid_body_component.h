@@ -401,7 +401,7 @@ void component_synchronizer<E, components::rigid_body>::apply_impulse(
 		const vec2 force = to_meters(pixels);
 		const vec2 location = vec2(body->GetWorldCenter()) + to_meters(center_offset);
 
-		body->ApplyLinearImpulse(b2Vec2(force), b2Vec2(location), true);
+		body->ApplyLinearImpulse(b2Vec2(force), b2Vec2(location), wake);
 		data.angular_velocity = body->GetAngularVelocity();
 		data.velocity = body->GetLinearVelocity();
 

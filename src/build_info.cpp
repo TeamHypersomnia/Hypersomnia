@@ -53,16 +53,15 @@ void dump_detailed_sizeof_information(const augs::path_type& where) {
 
 	content += "\nEntity solvables:\n";
 
-	for_each_entity_solvable_type([&](auto s, auto e){
+	for_each_entity_solvable_type([&](auto s, auto){
 		using T = decltype(s);
-
 		lines.push_back(typesafe_sprintf("%x == %x\n", sizeof(T), get_type_name_strip_namespace<T>()));
 	});
 
 	add_sorted_lines();
 	lines.clear();
 
-	for_each_entity_solvable_type([&](auto s, auto e){
+	for_each_entity_solvable_type([&](auto s, auto){
 		using T = decltype(s);
 
 		const auto max_n = entity_type_of<T>::statically_allocated_entities;

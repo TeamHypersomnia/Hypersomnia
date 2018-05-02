@@ -152,12 +152,12 @@ namespace augs {
 
 			if constexpr(std::is_integral_v<T>) {
 				return direct_or_convert(into, [&](minmax<int>& input) {
-					return ImGui::DragIntRange2(label.c_str(), std::addressof(into.first), std::addressof(into.second), speed, v_min, v_max, std::forward<Args>(args)...);
+					return ImGui::DragIntRange2(label.c_str(), std::addressof(input.first), std::addressof(input.second), speed, v_min, v_max, std::forward<Args>(args)...);
 				});
 			}
 			else if constexpr(std::is_floating_point_v<T>) {
 				return direct_or_convert(into, [&](minmax<float>& input) {
-					return ImGui::DragFloatRange2(label.c_str(), std::addressof(into.first), std::addressof(into.second), speed, v_min, v_max, std::forward<Args>(args)...);
+					return ImGui::DragFloatRange2(label.c_str(), std::addressof(input.first), std::addressof(input.second), speed, v_min, v_max, std::forward<Args>(args)...);
 				});
 			}
 			else {

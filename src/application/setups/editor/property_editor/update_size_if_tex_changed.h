@@ -10,14 +10,14 @@
 
 template <class T, class C>
 void update_size_if_tex_changed(
-	const edit_invariant_input in,
-	const T& invariant,
-	const C& new_content
+	const edit_invariant_input,
+	const T&,
+	const C& 
 ) {}
 
 inline void update_size_if_tex_changed(
 	const edit_invariant_input in,
-	const invariants::sprite& invariant,
+	const invariants::sprite&,
 	const assets::image_id new_id
 ) {
 	const auto fae_in = in.fae_in;

@@ -45,8 +45,7 @@ namespace ImGui {
 		const bool isMouseDragging = ImGui::IsMouseDragging(0, 2.f);
 		int justClosedTabIndex = -1, newtabIndex = tabIndex;
 
-
-		bool selection_changed = false; bool noButtonDrawn = true;
+		bool selection_changed = false;
 		for (int j = 0, i; j < tabSize; j++)
 		{
 			i = tabOrder ? tabOrder[j] : j;
@@ -77,7 +76,6 @@ namespace ImGui {
 				style.Colors[ImGuiCol_ButtonHovered] = colorHover;
 				style.Colors[ImGuiCol_Text] = colorText;
 			}
-			noButtonDrawn = false;
 
 			if (sumX == 0.f) sumX = style.WindowPadding.x + ImGui::GetItemRectSize().x; // First element of a line
 

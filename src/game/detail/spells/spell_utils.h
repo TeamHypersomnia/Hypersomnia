@@ -7,7 +7,6 @@ template <class T>
 void ignite_cast_sparkles(
 	const T& spell_data,
 	const logic_step step, 
-	const components::transform caster_transform,
 	const entity_id subject
 ) {
 	const auto& effect = spell_data.common.cast_sparkles;
@@ -22,7 +21,6 @@ template <class T>
 void ignite_charging_particles(
 	const T& spell_data,
 	const logic_step step, 
-	const components::transform caster_transform,
 	const entity_id subject,
 	const rgba col
 ) {
@@ -39,7 +37,6 @@ template <class T>
 void play_cast_successful_sound(
 	const T& spell_data,
 	const logic_step step, 
-	const components::transform caster_transform,
 	const entity_id subject
 ) {
 	spell_data.common.cast_successful_sound.start(
@@ -52,7 +49,6 @@ template <class T>
 void play_cast_charging_sound(
 	const T& spell_data,
 	const logic_step step, 
-	const components::transform caster_transform,
 	const entity_id subject
 ) {
 	spell_data.charging_sound.start(

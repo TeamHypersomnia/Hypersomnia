@@ -9,11 +9,11 @@ namespace augs {
 			return false;
 		}
 
-		void paste_clipboard_formatted(text::formatted_string& out, text::formatted_char f) {
+		void paste_clipboard_formatted(text::formatted_string&, text::formatted_char) {
 			ensure(false);
 		}
 
-		void clipboard::copy_clipboard(const text::formatted_string& s) {
+		void clipboard::copy_clipboard(const text::formatted_string&) {
 			ensure(false);
 		}
 

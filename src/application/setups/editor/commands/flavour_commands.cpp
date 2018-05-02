@@ -58,7 +58,7 @@ void create_flavour_command::redo_and_copy(const editor_command_input in, const 
 				bool is_free = true;
 
 				for_each_id_and_object(flavours,
-					[&](const auto& id, const auto& flavour) {
+					[&](const auto&, const auto& flavour) {
 						if (flavour.get_name() == tried_name) {
 							is_free = false;
 						}

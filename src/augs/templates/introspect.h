@@ -42,7 +42,7 @@ namespace augs {
 		Instances&... tn
 	) {
 		using T = std::remove_reference_t<Instance>;
-		static constexpr auto C = std::is_const_v<T>;
+		static constexpr bool C = std::is_const_v<T>;
 
 		if constexpr(has_introspect_base_v<T>) {
 			introspect(

@@ -25,7 +25,7 @@ protected:
 	using inventory_slot_handle_type = basic_inventory_slot_handle<generic_handle_type>;
 
 	template <class F>
-	void on_id(const child_entity_name n, F callback) const {
+	void on_id(const child_entity_name n, F) const {
 		const auto& self = *static_cast<const entity_handle_type*>(this);
 
 		if (self.alive()) {

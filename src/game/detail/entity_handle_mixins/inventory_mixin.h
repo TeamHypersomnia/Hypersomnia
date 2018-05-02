@@ -67,7 +67,7 @@ public:
 
 			ensure_eq(slot->physical_behaviour, slot_physical_behaviour::CONNECT_AS_FIXTURE_OF_BODY); 
 
-			sum(result, { it.container_entity });
+			sum(result, { it.container_entity, {} });
 
 			it = slot.get_container().get_current_slot();
 		}
@@ -106,7 +106,7 @@ public:
 
 			ensure_eq(slot->physical_behaviour, slot_physical_behaviour::CONNECT_AS_FIXTURE_OF_BODY); 
 
-			sum(result, { it.container_entity });
+			sum(result, { it.container_entity, {} });
 
 			it = slot.get_container().get_current_slot();
 		} while(it.container_entity != until);
@@ -477,10 +477,10 @@ wielding_result inventory_mixin<E>::swap_wielded_items() const {
 			transfers = swap_slots_for_items(in_primary, in_secondary);
 		}
 		else if (in_primary.alive()) {
-			transfers.push_back({ in_primary, self.get_secondary_hand() });
+			transfers.push_back(item_slot_transfer_request::standard(in_primary, self.get_secondary_hand()));
 		}
 		else if (in_secondary.alive()) {
-			transfers.push_back({ in_secondary, self.get_primary_hand() });
+			transfers.push_back(item_slot_transfer_request::standard(in_secondary, self.get_primary_hand()));
 		}
 
 		result.result = wielding_result::type::SUCCESSFUL;
@@ -527,11 +527,11 @@ wielding_result inventory_mixin<E>::make_wielding_transfers_for(const hand_selec
 				break;
 			}
 
-			holsters.push_back({ item_in_hand, holstering_slot });
+			holsters.push_back(item_slot_transfer_request::standard(item_in_hand, holstering_slot));
 		}
 
 		if (item_for_hand.alive()) {
-			draws.push_back({ item_for_hand, hand });
+			draws.push_back(item_slot_transfer_request::standard(item_for_hand, hand));
 		}
 
 		result.result = wielding_result::type::SUCCESSFUL;

@@ -23,7 +23,7 @@
 #include "game/enums/filters.h"
 
 namespace test_flavours {
-	void populate_car_flavours(const loaded_image_caches_map& logicals, all_entity_flavours& flavours) {
+	void populate_car_flavours(const loaded_image_caches_map& /* logicals */, all_entity_flavours& /* flavours */) {
 #if TODO
 		{
 			auto& meta = get_test_flavour(flavours, test_scene_flavour::TRUCK_FRONT);

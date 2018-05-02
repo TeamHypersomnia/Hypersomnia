@@ -73,7 +73,7 @@ namespace augs {
 							current_token, tag_name_token_end,
 							corresp_entry.name.begin(), corresp_entry.name.end(),
 							[](const auto left, const auto right) -> bool {
-							return std::towlower(left) == right;
+							return std::tolower(left) == right;
 						}
 						)) {
 							result.type = corresp_entry.type;
@@ -104,7 +104,7 @@ namespace augs {
 							continue;
 						}
 
-						const auto lower_case_digit = std::towlower(digit);
+						const auto lower_case_digit = std::tolower(digit);
 
 						if(lower_case_digit < 'a' || lower_case_digit > 'f') {
 							return std::make_tuple(0, first);
@@ -167,7 +167,7 @@ namespace augs {
 								first, alpha_token_end,
 								corresp_entry.name.begin(), corresp_entry.name.end(),
 								[](const auto left, const auto right) -> bool {
-								return std::towlower(left) == right;
+								return std::tolower(left) == right;
 							}
 							);
 						}

@@ -71,8 +71,8 @@ void main_menu_setup::query_latest_news(const std::string& url) {
 		latest_news.wait();
 	}
 
-	latest_news = std::async(std::launch::async, []() noexcept {
-		auto html = augs::http_get_request("http://hypersomnia.xyz/latest_post/");
+	latest_news = std::async(std::launch::async, [&url]() noexcept {
+		auto html = augs::http_get_request(url);
 		const auto delimiter = std::string("newsbegin");
 
 		const auto it = html.find(delimiter);

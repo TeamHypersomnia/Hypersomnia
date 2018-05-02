@@ -214,7 +214,7 @@ std::optional<drag_and_drop_result> prepare_drag_and_drop_result(
 					const auto item_charges = dragged_item_handle.template get<components::item>().get_charges();
 
 					if (item_charges > 1) {
-						if (simulated_transfer.specified_quantity == drop.result.transferred_charges) {
+						if (simulated_transfer.specified_quantity == static_cast<int>(drop.result.transferred_charges)) {
 							charges_text = " all";
 						}
 						else {

@@ -402,14 +402,14 @@ void sentience_system::cooldown_aimpunches(const logic_step step) const {
 	const auto& cosmos = step.get_cosmos();
 
 	cosmos.for_each_having<components::sentience>(
-		[&](const auto t) {
+		[&](const auto) {
 
 		}
 	);
 }
 
 void sentience_system::rotate_towards_crosshairs_and_driven_vehicles(const logic_step step) const {
-	static auto debug_line_drawer = [](const rgba col, const vec2 a, const vec2 b){
+	auto debug_line_drawer = [](const rgba col, const vec2 a, const vec2 b){
 		DEBUG_LOGIC_STEP_LINES.emplace_back(col, a, b);
 	};
 

@@ -41,6 +41,7 @@ namespace augs {
 	/* For future opts */
 	struct font_settings {
 		// GEN INTROSPECTOR struct augs::font_settings
+		pad_bytes<4> pad;
 		// END GEN INTROSPECTOR
 	};
 

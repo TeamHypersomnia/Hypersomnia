@@ -43,9 +43,7 @@ namespace augs {
 
 			template <class C, class gui_element_id>
 			bool is_hovered(const C context, const gui_element_id& id) {
-				return context(id, [&](const auto& p) {
-					return context.get_tree_entry(id).get_absolute_clipped_rect().hover(context.get_input_state().mouse.pos);
-				});
+				return context.get_tree_entry(id).get_absolute_clipped_rect().hover(context.get_input_state().mouse.pos);
 			}
 
 			template <class gui_element_id>

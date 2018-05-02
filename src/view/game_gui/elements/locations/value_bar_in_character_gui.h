@@ -22,7 +22,7 @@ public:
 	}
 
 	template <class C>
-	bool alive(const C context) const {
+	bool alive(const C) const {
 		return vertical_index < value_bar_count;
 	}
 

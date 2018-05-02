@@ -114,7 +114,7 @@ struct animation_in_particle {
 	}
 
 	bool is_dead() const {
-		return starting_frame_num == -1;
+		return starting_frame_num == static_cast<unsigned>(-1);
 	}
 };
 

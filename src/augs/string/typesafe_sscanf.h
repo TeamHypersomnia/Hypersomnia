@@ -6,10 +6,10 @@
 #include <limits>
 
 inline bool typesafe_scanf_detail(
-	size_t source_pos,
-	size_t format_pos,
-	const std::string& source_string,
-	const std::string& format
+	size_t,
+	size_t,
+	const std::string&,
+	const std::string&
 ) {
 	return true;
 }

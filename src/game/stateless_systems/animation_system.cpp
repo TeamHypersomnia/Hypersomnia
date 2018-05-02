@@ -17,7 +17,7 @@ using namespace augs;
 
 using namespace messages;
 
-void animation_system::game_responses_to_animation_messages(const logic_step step) {}
+void animation_system::game_responses_to_animation_messages(const logic_step) {}
 
 void animation_system::handle_animation_messages(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
@@ -25,7 +25,12 @@ void animation_system::handle_animation_messages(const logic_step step) {
 
 	for (auto it : events) {
 		auto ptr = cosmos[it.subject].find<components::animation>();
-		if (!ptr) continue; auto& animation = *ptr;
+
+		if (nullptr == ptr) {
+			continue;
+		}
+		
+		auto& animation = *ptr;
 
 		if (it.animation_priority >= animation.priority || animation.state == animation_playing_state::PAUSED) {
 			if (it.change_speed)

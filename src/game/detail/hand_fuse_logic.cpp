@@ -60,10 +60,7 @@ void release_or_throw_fused_object(
 				return impulse;
 			}();
 
-			perform_transfer(
-				item_slot_transfer_request{ fused_entity, inventory_slot_id(), -1, total_impulse, false }, 
-				step
-			);
+			perform_transfer(item_slot_transfer_request::drop(fused_entity, total_impulse), step);
 			
 			fuse_def.throw_sound.start(
 				step,

@@ -56,6 +56,6 @@ const std::string& get_type_name(const T&) {
 }
 
 template <class T>
-const std::string& get_type_name_strip_namespace(const T& t) {
+const std::string& get_type_name_strip_namespace(const T&) {
 	return get_type_name_strip_namespace<remove_cref<T>>();
 }

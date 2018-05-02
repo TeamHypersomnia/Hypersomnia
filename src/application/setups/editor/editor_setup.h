@@ -161,8 +161,8 @@ class editor_setup : private current_access_cache<editor_setup> {
 	void save_current_folder();
 	void save_current_folder_to(path_operation);
 
-	void fill_with_minimal_scene(sol::state& lua);
-	void fill_with_test_scene(sol::state& lua);
+	void fill_with_minimal_scene();
+	void fill_with_test_scene();
 
 	void open_last_folders(sol::state& lua);
 
@@ -256,8 +256,7 @@ public:
 		const augs::event::state& common_input_state,
 		const augs::event::change change,
 
-		augs::window& window,
-		sol::state& lua
+		augs::window& window
 	);
 
 	bool handle_input_before_game(
@@ -266,15 +265,14 @@ public:
 		const augs::event::state& common_input_state,
 		const augs::event::change change,
 
-		augs::window& window,
-		sol::state& lua
+		augs::window& window
 	);
 
 	std::optional<setup_escape_result> escape();
 	bool confirm_modal_popup();
 
 	void open(const augs::window& owner);
-	void save(sol::state& lua, const augs::window& owner);
+	void save(const augs::window& owner);
 	void save_as(const augs::window& owner);
 	void undo();
 	void redo();
@@ -337,7 +335,7 @@ public:
 	std::unordered_set<entity_id> get_all_selected_entities() const;
 
 	template <class F>
-	void for_each_line(F callback) const {
+	void for_each_line(F) const {
 
 	}
 

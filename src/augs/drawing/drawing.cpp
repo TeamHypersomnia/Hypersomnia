@@ -399,7 +399,7 @@ namespace augs {
 		}();
 
 		const auto origin = screen_size / 2;
-		const auto maximum_unit = 1 << settings.maximum_power_of_two;
+		const auto maximum_unit = static_cast<unsigned>(1 << settings.maximum_power_of_two);
 
 		for (unsigned unit = maximum_unit, color_index = 0;
 		   	unit >= minimum_unit;

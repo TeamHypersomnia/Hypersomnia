@@ -105,7 +105,7 @@ perform_transfer_result perform_transfer(
 		}
 	}
 
-	const bool whole_item_grabbed = item.charges == result.transferred_charges;
+	const bool whole_item_grabbed = item.charges == static_cast<int>(result.transferred_charges);
 
 	components::transform previous_container_transform;
 

@@ -258,7 +258,7 @@ void contact_listener::EndContact(b2Contact* contact) {
 	}
 }
 
-void contact_listener::PreSolve(b2Contact* contact, const b2Manifold* oldManifold) {
+void contact_listener::PreSolve(b2Contact* contact, const b2Manifold* /* oldManifold */) {
 	auto& sys = get_sys();
 	auto& cosmos = cosm;
 

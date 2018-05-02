@@ -18,7 +18,7 @@ static constexpr bool is_type_list_v = is_type_list<T>::value;
 
 namespace std {
 	template <std::size_t I, class... Types>
-	const auto& get(const type_list<Types...>& t) {
+	const auto& get(const type_list<Types...>&) {
 		using type = nth_type_in_t<I, Types...>;
 
 		static const type instance = {};

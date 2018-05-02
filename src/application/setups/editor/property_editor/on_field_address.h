@@ -32,7 +32,7 @@ decltype(auto) on_field_address(
 		if constexpr(can_access_data_v<T>) {
 			const auto index = address.element_index;
 
-			if (index == -1) {
+			if (index == static_cast<unsigned>(-1)) {
 				return callback(*field_location);
 			}
 			else if (index < field_location->size()) {

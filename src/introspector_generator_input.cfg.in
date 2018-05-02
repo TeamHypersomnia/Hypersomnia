@@ -152,7 +152,7 @@ struct ImVec4;
 			Instances&... t
 		) {
 			templates_detail::for_each_through_std_get(
-				[f](auto num, auto&... args) {
+				[f](auto, auto&... args) {
 					using N = remove_cref<nth_type_in_t<0, decltype(args)...>>;
 					f(get_type_name_strip_namespace<N>(), args...);
 				},

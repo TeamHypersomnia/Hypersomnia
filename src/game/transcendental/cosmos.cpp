@@ -88,7 +88,7 @@ namespace augs {
 	}
 
 	template <class Archive>
-	void write_object_lua(Archive ar, const cosmos& cosm) {
+	void write_object_lua(Archive /* ar */, const cosmos& /* cosm */) {
 #if TODO
 		{
 			auto common_table = ar.create();
@@ -134,11 +134,11 @@ namespace augs {
 	}
 
 	template <class Archive>
-	void read_object_lua(Archive ar, cosmos& cosm) {
-		ensure(cosm.empty());
-
+	void read_object_lua(Archive /* ar */, cosmos& /* cosm */) {
 		ensure(false);
 #if TODO
+		ensure(cosm.empty());
+
 		/* TODO: Fix it to use tuples of initial values when creating entities */
 		/* TODO: Fix it to read guids properly instead of entity ids */
 		auto refresh_when_done = augs::scope_guard([&cosm]() {

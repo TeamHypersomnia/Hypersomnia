@@ -9,7 +9,7 @@ public:
 	template <class C, class gui_element_id, class L>
 	static void for_each_child(
 		const C context, 
-		const gui_element_id this_id, 
+		const gui_element_id, 
 		L generic_call
 	) {
 		const auto handle = context.get_subject_entity();

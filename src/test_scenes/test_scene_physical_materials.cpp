@@ -11,7 +11,7 @@ void load_test_scene_physical_materials(physical_materials_pool& all_definitions
 
 	all_definitions.reserve(enum_count(test_id_type()));
 
-	augs::for_each_enum_except_bounds([&](const test_id_type enum_id) {
+	augs::for_each_enum_except_bounds([&](const test_id_type) {
 		all_definitions.allocate();
 	});
 

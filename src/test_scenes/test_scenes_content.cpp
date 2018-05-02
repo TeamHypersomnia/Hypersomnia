@@ -39,7 +39,6 @@ void populate_test_scene_logical_assets(
 }
 
 void populate_test_scene_viewables(
-	sol::state& lua,
 	const loaded_image_caches_map& caches,
 	const animations_pool& anims,
 	all_viewables_defs& output_sources

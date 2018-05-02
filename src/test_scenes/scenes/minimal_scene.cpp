@@ -33,7 +33,7 @@ namespace test_scenes {
 		std::get<electric_triad>(common.spells).missile_flavour = to_entity_flavour_id(test_plain_missiles::ELECTRIC_MISSILE);
 	}
 
-	entity_id minimal_scene::populate(const loaded_image_caches_map& metas, const logic_step step) const {
+	entity_id minimal_scene::populate(const loaded_image_caches_map&, const logic_step step) const {
 		const int num_characters = 1;
 
 		std::vector<entity_id> new_characters;
@@ -48,7 +48,7 @@ namespace test_scenes {
 				transform.pos.x += 200;
 			}
 
-			const auto new_character = prefabs::create_sample_complete_character(step, transform, typesafe_sprintf("player%x", i), 1);
+			const auto new_character = prefabs::create_sample_complete_character(step, transform, typesafe_sprintf("player%x", i));
 
 			new_characters[i] = new_character;
 

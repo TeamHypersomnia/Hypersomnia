@@ -92,7 +92,7 @@ struct change_flavour_property_command : change_property_command<change_flavour_
 		auto& cosm = in.get_cosmos();
 
 		if (property_id.access(cosm, type_id, affected_flavours, continue_if_nullptr(std::forward<F>(callback)))) {
-			cosm.change_common_significant([&](auto& common_signi) { return changer_callback_result::REFRESH; });
+			cosm.change_common_significant([&](auto&) { return changer_callback_result::REFRESH; });
 		}
 	}
 };

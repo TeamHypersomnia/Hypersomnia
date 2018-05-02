@@ -91,7 +91,7 @@ TEST_CASE("StateTest2 PaddingTest") {
 		static_assert(std::is_same_v<remove_cref<checked_type>, checked_type>, "Something's wrong with the types");
 
 		if constexpr(!allows_nontriviality_v<checked_type>) {
-			constexpr size_t type_size = sizeof(checked_type);
+			constexpr std::size_t type_size = sizeof(checked_type);
 
 			std::array<char, type_size> buf1 {};
 			std::array<char, type_size> buf2 {};
@@ -107,7 +107,7 @@ TEST_CASE("StateTest2 PaddingTest") {
 			new (&buf1) checked_type(args...);
 			new (&buf2) checked_type(args...);
 
-			int iter = 0;
+			std::size_t iter = 0;
 			bool same = true;
 
 			for (; iter < type_size; ++iter) {

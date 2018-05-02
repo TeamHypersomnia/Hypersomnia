@@ -139,7 +139,7 @@ class b2RayCastCallback
 public:
 	virtual ~b2RayCastCallback() {}
 
-	virtual bool ShouldRaycast(b2Fixture* fixture) {
+	virtual bool ShouldRaycast(b2Fixture*) {
 		return true;
 	}
 

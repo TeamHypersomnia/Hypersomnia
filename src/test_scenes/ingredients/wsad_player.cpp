@@ -157,8 +157,7 @@ namespace prefabs {
 	entity_handle create_sample_complete_character(
 		const logic_step step, 
 		const components::transform spawn_transform, 
-		const std::string name,
-		const int create_arm_count
+		const std::string /* name */
 	) {
 		auto& world = step.get_cosmos();
 		return create_test_scene_entity(world, test_controlled_characters::PLAYER, spawn_transform);

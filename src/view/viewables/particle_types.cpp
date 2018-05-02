@@ -97,19 +97,19 @@ void animated_particle::set_acceleration(const vec2 new_acc) {
 	acc = new_acc;
 }
 
-void animated_particle::multiply_size(const float mult) {
+void animated_particle::multiply_size(const float /* mult */) {
 
 }
 
-void animated_particle::set_rotation(const float new_rotation) {
+void animated_particle::set_rotation(const float /* new_rotation */) {
 
 }
 
-void animated_particle::set_rotation_speed(const float new_rotation_speed) {
+void animated_particle::set_rotation_speed(const float /* new_rotation_speed */) {
 
 }
 
-void animated_particle::set_max_lifetime_ms(const float new_max_lifetime_ms) {
+void animated_particle::set_max_lifetime_ms(const float /* new_max_lifetime_ms */) {
 
 }
 
@@ -150,19 +150,19 @@ void homing_animated_particle::set_acceleration(const vec2 new_acc) {
 	acc = new_acc;
 }
 
-void homing_animated_particle::multiply_size(const float mult) {
+void homing_animated_particle::multiply_size(const float /* mult */) {
 
 }
 
-void homing_animated_particle::set_rotation(const float new_rotation) {
+void homing_animated_particle::set_rotation(const float /* new_rotation */) {
 
 }
 
-void homing_animated_particle::set_rotation_speed(const float new_rotation_speed) {
+void homing_animated_particle::set_rotation_speed(const float /* new_rotation_speed */) {
 
 }
 
-void homing_animated_particle::set_max_lifetime_ms(const float new_max_lifetime_ms) {
+void homing_animated_particle::set_max_lifetime_ms(const float /* new_max_lifetime_ms */) {
 
 }
 

@@ -145,7 +145,6 @@ void move_entities_command::reinfer_moved(cosmos& cosm) {
 
 void move_entities_command::rewrite_change(
 	const delta_type& new_value,
-	const std::optional<snapping_grid> grid,
 	const editor_command_input in
 ) {
 	/* 

@@ -14,7 +14,7 @@
 
 namespace behaviours {
 
-	tree::goal_availability target_closest_enemy::goal_resolution(tree::state_of_traversal& t) const {
+	tree::goal_availability target_closest_enemy::goal_resolution(tree::state_of_traversal&) const {
 		return tree::goal_availability::SHOULD_EXECUTE;
 	}
 

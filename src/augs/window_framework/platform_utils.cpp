@@ -58,7 +58,7 @@ namespace augs {
 #elif PLATFORM_UNIX
 
 namespace augs {
-	bool set_display(const vec2i v, const int bpp) {
+	bool set_display(const vec2i /* v */, const int /* bpp */) {
 		return true;
 	}
 

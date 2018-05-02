@@ -75,11 +75,11 @@ struct tests_of_traits {
 	static void test_get_by_dynamic_id() {
 		all_entity_types t;
 
-		auto okay = get_by_dynamic_index(t, std::size_t(0), [](auto a){
+		auto okay = get_by_dynamic_index(t, std::size_t(0), [](auto){
 			return 20.0;	
 		});
 
-		auto okay2 = get_by_dynamic_id(t, type_in_list_id<all_entity_types>(), [](auto a){
+		auto okay2 = get_by_dynamic_id(t, type_in_list_id<all_entity_types>(), [](auto){
 			return 20.0;	
 		});
 

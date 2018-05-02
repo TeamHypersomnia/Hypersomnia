@@ -37,7 +37,7 @@ template <class T, class = void>
 struct has_value_type : std::false_type {};
 
 template <class T>
-struct has_value_type<T, decltype(std::declval<typename T::value_type>, void())> : std::true_type {};
+struct has_value_type<T, decltype(std::declval<typename T::value_type>(), void())> : std::true_type {};
 
 
 template <class T, class K, class = void>

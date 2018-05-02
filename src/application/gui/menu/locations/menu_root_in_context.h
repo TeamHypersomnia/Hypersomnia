@@ -8,12 +8,12 @@ class menu_root_in_context {
 public:
 	using dereferenced_type = menu_root<E>;
 
-	bool operator==(menu_root_in_context b) const {
+	bool operator==(menu_root_in_context) const {
 		return true;
 	}
 
 	template <class C>
-	bool alive(const C context) const {
+	bool alive(const C) const {
 		return true;
 	}
 
@@ -26,7 +26,7 @@ public:
 namespace std {
 	template <class E>
 	struct hash<menu_root_in_context<E>> {
-		size_t operator()(const menu_root_in_context<E>& k) const {
+		size_t operator()(const menu_root_in_context<E>&) const {
 			return hash<size_t>()(typeid(menu_root_in_context<E>).hash_code());
 		}
 	};

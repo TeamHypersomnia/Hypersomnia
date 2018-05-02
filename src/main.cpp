@@ -880,7 +880,7 @@ int work(const int argc, const char* const * const argv) try {
 	/* MSVC ICE workaround */
 	auto& _common_input_state = common_input_state;
 
-	static auto make_create_game_gui_context = [&](const config_lua_table& cfg) {
+	static auto make_create_game_gui_context = [&](const config_lua_table&) {
 		return [&]() {
 			return game_gui.create_context(
 				window.get_screen_size(),
@@ -1018,7 +1018,6 @@ int work(const int argc, const char* const * const argv) try {
 					if (!ingame_menu.show) {
 						/* MSVC ICE workaround */
 						auto& _simulated_state = simulated_state;
-						auto& _lua = lua;
 						auto& _window = window;
 
 						if (visit_current_setup([&](auto& setup) {
@@ -1031,7 +1030,7 @@ int work(const int argc, const char* const * const argv) try {
 								*/
 
 								return setup.handle_input_before_imgui(
-									_simulated_state, e, _window, _lua
+									_simulated_state, e, _window
 								);
 							}
 
@@ -1311,7 +1310,6 @@ int work(const int argc, const char* const * const argv) try {
 				{
 					/* MSVC ICE workaround */
 					auto& _common_input_state = common_input_state;
-					auto& _lua = lua;
 					auto& _window = window;
 
 					if (visit_current_setup([&](auto& setup) {
@@ -1322,7 +1320,7 @@ int work(const int argc, const char* const * const argv) try {
 								/* Viewables reloading happens later so it might not be ready yet */
 
 								return setup.handle_input_before_game(
-									necessary_images_in_atlas, _common_input_state, e, _window, _lua
+									necessary_images_in_atlas, _common_input_state, e, _window
 								);
 							}
 						}
@@ -1566,7 +1564,7 @@ int work(const int argc, const char* const * const argv) try {
 					all_visible
 				},
 				false,
-				[](const const_entity_handle handle) -> std::optional<rgba> { return std::nullopt; },
+				[](const const_entity_handle) -> std::optional<rgba> { return std::nullopt; },
 				[&](auto callback) {
 					visit_current_setup([&](auto& setup) {
 						using T = remove_cref<decltype(setup)>;

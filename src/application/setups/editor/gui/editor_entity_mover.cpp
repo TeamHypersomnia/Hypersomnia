@@ -120,7 +120,7 @@ bool editor_entity_mover::do_mousemotion(const input_type in, vec2 world_cursor_
 					}
 
 					cmd->unmove_entities(cosm);
-					cmd->rewrite_change(new_delta, std::nullopt, s.make_command_input());
+					cmd->rewrite_change(new_delta, s.make_command_input());
 				}
 			}
 			else {
@@ -138,7 +138,7 @@ bool editor_entity_mover::do_mousemotion(const input_type in, vec2 world_cursor_
 					}
 				}
 
-				cmd->rewrite_change(new_delta, std::nullopt, s.make_command_input());
+				cmd->rewrite_change(new_delta, s.make_command_input());
 			}
 		}
 		else {

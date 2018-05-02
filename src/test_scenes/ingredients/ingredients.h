@@ -82,8 +82,7 @@ namespace prefabs {
 	entity_handle create_sample_complete_character(
 		const logic_step,
 		const components::transform pos, 
-		const std::string name = "character_unnamed",
-		const int create_arm_count = 2
+		const std::string name = "character_unnamed"
 	);
 
 	entity_handle create_crate(const logic_step, const components::transform pos);

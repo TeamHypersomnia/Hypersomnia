@@ -36,6 +36,7 @@ bool try_to_reload_with_file(T& v) {
 	augs::remove_file(path);
 
 	if constexpr(augs::is_pool_v<T>) {
+		(void)tmp;
 		return true;
 	}
 	else {
@@ -59,6 +60,7 @@ bool try_to_reload_with_bytes(T& v) {
 	augs::remove_file(path);
 
 	if constexpr(augs::is_pool_v<T>) {
+		(void)tmp;
 		return true;
 	}
 	else {
@@ -85,6 +87,7 @@ bool try_to_reload_with_memory_stream(T& v) {
 	augs::remove_file(path);
 
 	if constexpr(augs::is_pool_v<T>) {
+		(void)tmp;
 		return true;
 	}
 	else {

@@ -16,7 +16,7 @@ public:
 	}
 
 	template <class C>
-	bool alive(const C context) const {
+	bool alive(const C) const {
 		return type != Enum::COUNT;
 	}
 

@@ -166,8 +166,8 @@ slot_function get_slot_with_compatible_category(const const_entity_handle item, 
 containment_result query_containment_result(
 	const const_entity_handle item_entity,
 	const const_inventory_slot_handle target_slot,
-	int specified_quantity,
-	bool allow_replacement
+	const int specified_quantity,
+	const bool /* allow_replacement */
 ) {
 	const auto& cosmos = item_entity.get_cosmos();
 	const auto item = item_entity.get<components::item>();
@@ -321,11 +321,11 @@ augs::constant_size_vector<item_slot_transfer_request, 4> swap_slots_for_items(
 	ensure(first_handle.alive());
 	ensure(second_handle.alive());
 
-	output.push_back({ first_handle, inventory_slot_id() });
-	output.push_back({ second_handle, inventory_slot_id() });
+	output.push_back(item_slot_transfer_request::drop(first_handle));
+	output.push_back(item_slot_transfer_request::drop(second_handle));
 
-	output.push_back({ first_handle, second_slot });
-	output.push_back({ second_handle, first_slot });
+	output.push_back(item_slot_transfer_request::standard(first_handle, second_slot));
+	output.push_back(item_slot_transfer_request::standard(second_handle, first_slot));
 
 	return output;
 }

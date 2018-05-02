@@ -220,14 +220,14 @@ void editor_setup::save_current_folder_to(const path_operation op) {
 	save_current_folder();
 }
 
-void editor_setup::fill_with_minimal_scene(sol::state& lua) {
+void editor_setup::fill_with_minimal_scene() {
 	if (anything_opened()) {
 		clear_id_caches();
 		folder().history.execute_new(fill_with_test_scene_command(true), make_command_input());
 	}
 }
 
-void editor_setup::fill_with_test_scene(sol::state& lua) {
+void editor_setup::fill_with_test_scene() {
 	if (anything_opened()) {
 		clear_id_caches();
 		folder().history.execute_new(fill_with_test_scene_command(false), make_command_input());
@@ -306,7 +306,7 @@ void editor_setup::perform_custom_imgui(
 					ImGui::Separator();
 
 					if (item_if_tabs("Save", "CTRL+S")) {
-						save(lua, owner);
+						save(owner);
 					}
 
 					if (item_if_tabs("Save as", "F12")) {
@@ -351,11 +351,11 @@ void editor_setup::perform_custom_imgui(
 
 #if BUILD_TEST_SCENES
 					if (item_if_tabs("Fill with test scene", "SHIFT+F5")) {
-						fill_with_test_scene(lua);
+						fill_with_test_scene();
 					}
 
 					if (item_if_tabs("Fill with minimal scene", "CTRL+SHIFT+F5")) {
-						fill_with_minimal_scene(lua);
+						fill_with_minimal_scene();
 					}
 #else
 					if (item_if_tabs_and(false, "Fill with test scene", "SHIFT+F5")) {}
@@ -566,7 +566,7 @@ void editor_setup::open(const augs::window& owner) {
 	);
 }
 
-void editor_setup::save(sol::state& lua, const augs::window& owner) {
+void editor_setup::save(const augs::window& owner) {
 	if (!anything_opened()) {
 		return;
 	}
@@ -821,8 +821,7 @@ bool editor_setup::handle_input_before_imgui(
 	const augs::event::state& common_input_state,
 	const augs::event::change e,
 
-	augs::window& window,
-	sol::state& lua
+	augs::window& window
 ) {
 	using namespace augs::event;
 	using namespace keys;
@@ -871,13 +870,13 @@ bool editor_setup::handle_input_before_imgui(
 					switch (k) {
 						case key::E: reveal_in_explorer(window); return true;
 						case key::TAB: prev_tab(); return true;
-						case key::F5: fill_with_minimal_scene(lua); return true;
+						case key::F5: fill_with_minimal_scene(); return true;
 						default: break;
 					}
 				}
 
 				switch (k) {
-					case key::S: save(lua, window); return true;
+					case key::S: save(window); return true;
 					case key::O: open(window); return true;
 					case key::COMMA: go_to_all(); return true;
 					case key::N: new_tab(); return true;
@@ -889,7 +888,7 @@ bool editor_setup::handle_input_before_imgui(
 
 			if (has_shift) {
 				switch (k) {
-					case key::F5: fill_with_test_scene(lua); return true;
+					case key::F5: fill_with_test_scene(); return true;
 					default: break;
 				}
 			}
@@ -911,8 +910,7 @@ bool editor_setup::handle_input_before_game(
 	const augs::event::state& common_input_state,
 	const augs::event::change e,
 
-	augs::window& window,
-	sol::state& lua
+	augs::window&
 ) {
 	using namespace augs::event;
 	using namespace augs::event::keys;

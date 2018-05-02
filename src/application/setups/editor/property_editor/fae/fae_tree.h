@@ -106,7 +106,7 @@ auto tree_of_flavours(
 						ticked_flavours,
 						[&provider](auto callback) {
 							provider.template for_each_flavour<E>(
-								[&callback](const flavour_id_type flavour_id, const flavour_type& flavour) {
+								[&callback](const flavour_id_type flavour_id, const flavour_type&) {
 									callback(flavour_id);
 								}
 							);
@@ -271,7 +271,7 @@ auto tree_of_entities(
 					ticked_entities,
 					[&provider](auto callback) {
 						provider.template for_each_flavour<E>(
-							[&provider, callback](const flavour_id_type flavour_id, const flavour_type& flavour) {
+							[&provider, callback](const flavour_id_type flavour_id, const flavour_type&) {
 								decltype(auto) all_having_flavour = provider.get_entities_by_flavour_id(flavour_id);
 
 								for (const auto& e_id : all_having_flavour) {

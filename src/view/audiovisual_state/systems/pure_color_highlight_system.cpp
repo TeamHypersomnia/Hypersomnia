@@ -75,7 +75,8 @@ void pure_color_highlight_system::draw_highlights(
 			{
 				output,
 				game_images,
-				global_time_seconds
+				global_time_seconds,
+				flip_flags {}
 			},
 			interp
 		);

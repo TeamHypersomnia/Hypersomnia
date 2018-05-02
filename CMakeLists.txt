@@ -326,7 +326,22 @@ set(HYPERSOMNIA_TEST_SCENES_CPPS
 # Order is important inasmuch as multi-threaded builds are concerned.
 # Put intensive cpps to the very beginning.
 
+# These cpps will be included as the first to speed up multithreaded build times.
+
+set(HYPERSOMNIA_CPU_INTENSIVE_CPPS
+	# This should be the first one to build to catch errors early
+	"src/main.cpp"
+	"src/game/tests_of_traits.cpp"
+
+	"src/application/setups/editor/gui/editor_fae_gui.cpp"
+	"src/application/setups/editor/editor_setup.cpp"
+	"src/application/setups/editor/gui/editor_common_state_gui.cpp"
+	"src/application/setups/editor/commands/change_property_command.cpp"
+)
 set(HYPERSOMNIA_CODEBASE_CPPS
+	${HYPERSOMNIA_CPU_INTENSIVE_CPPS}
+
+	"src/help_section.cpp"
 	"src/application/setups/editor/gui/editor_history_gui.cpp"
 	"src/application/setups/editor/gui/editor_go_to_gui.cpp"
 	"src/application/setups/editor/editor_camera.cpp"
@@ -557,7 +572,6 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/debug_drawing_settings.cpp"
 	"src/application/session_profiler.cpp"
 	"src/application/intercosm.cpp"
-	"src/augs/misc/imgui/addons/imguitabwindow/imguitabwindow.cpp"
 	"src/augs/misc/imgui/imgui_controls.cpp"
 	"src/augs/readwrite/readwrite_tests.cpp"
 	"src/game/components/trace_component.cpp"
@@ -594,18 +608,6 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/application/setups/editor/commands/flavour_commands.cpp"
 )
 
-# These cpps will be included as the first to speed up multithreaded build times.
-
-set(HYPERSOMNIA_CPU_INTENSIVE_CPPS
-	# This should be the first one to build to catch errors early
-	"src/game/tests_of_traits.cpp"
-
-	"src/application/setups/editor/gui/editor_fae_gui.cpp"
-	"src/application/setups/editor/editor_setup.cpp"
-	"src/application/setups/editor/gui/editor_common_state_gui.cpp"
-	"src/application/setups/editor/commands/change_property_command.cpp"
-)
-
 # The rest of 3rdparty libraries with minimal amount of source files.
 
 set(HYPERSOMNIA_TRIVIAL_3RDPARTY_CPPS
@@ -615,6 +617,7 @@ set(HYPERSOMNIA_TRIVIAL_3RDPARTY_CPPS
 	"src/3rdparty/imgui/imgui.cpp"
 	"src/3rdparty/imgui/imgui_draw.cpp"
 	"src/3rdparty/imgui/imgui_demo.cpp"
+	"src/augs/misc/imgui/addons/imguitabwindow/imguitabwindow.cpp"
 )
 
 # These headers will be input to the Introspector-generator.
@@ -840,8 +843,10 @@ if(GCC OR CLANG)
 endif()
 
 if(CLANG)
-	set(CHOSEN_WARNINGS "-Werror -Wall")
-	set(WARNINGS_FOR_OUR_CODE_ONLY "-Werror -Wall")
+	set(CHOSEN_WARNINGS "-Werror -Wall -Wextra")
+
+	# -Wall and -Wextra cover everything already
+	set(WARNINGS_FOR_OUR_CODE_ONLY " ")
 
 	# Latest features of C++17 will be enabled.
 	# Looks like stdlib=libc++ is duplicated for the linker as well,
@@ -878,13 +883,9 @@ if(GCC)
 -Winit-self"
 	)
 
-	set(WARNINGS_FOR_OUR_CODE_ONLY 
-"-Wunused-variable \
--Wuninitialized \
--Wmaybe-uninitialized"
-	)
+	set(WARNINGS_FOR_OUR_CODE_ONLY "-Wall -Werror -Wno-unused-value")
 
-	set(HYPERSOMNIA_CXX_FLAGS "${CHOSEN_WARNINGS} -std=gnu++1z")
+	set(HYPERSOMNIA_CXX_FLAGS "${CHOSEN_WARNINGS} -ftemplate-backtrace-limit=0 -std=gnu++1z")
 	set_source_files_properties(${HYPERSOMNIA_CODEBASE_CPPS} PROPERTIES COMPILE_FLAGS ${WARNINGS_FOR_OUR_CODE_ONLY})
 endif()
 
@@ -1189,10 +1190,6 @@ add_definitions(-DLOG_FILES_DIR="${HYPERSOMNIA_LOG_FILES_DIR}")
 
 
 set(HYPERSOMNIA_CPPS
-	${HYPERSOMNIA_CPU_INTENSIVE_CPPS}
-	"src/main.cpp"
-	"src/help_section.cpp"
-	
 	${HYPERSOMNIA_CODEBASE_CPPS}
 	${HYPERSOMNIA_VERSION_FILE_CPP}
 	${HYPERSOMNIA_TRIVIAL_3RDPARTY_CPPS}

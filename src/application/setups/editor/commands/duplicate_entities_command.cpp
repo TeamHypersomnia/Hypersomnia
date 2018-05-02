@@ -16,7 +16,7 @@ std::string duplicate_entities_command::describe() const {
 void duplicate_entities_command::push_entry(const const_entity_handle handle) {
 	handle.dispatch([&](const auto typed_handle) {
 		using E = entity_type_of<decltype(typed_handle)>;
-		duplicated_entities.get_for<E>().push_back({ typed_handle.get_id() });
+		duplicated_entities.get_for<E>().push_back({ typed_handle.get_id(), {} });
 	});
 }
 
