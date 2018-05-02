@@ -331,7 +331,7 @@ set(HYPERSOMNIA_TEST_SCENES_CPPS
 set(HYPERSOMNIA_CPU_INTENSIVE_CPPS
 	# This should be the first one to build to catch errors early
 	"src/main.cpp"
-	"src/game/tests_of_traits.cpp"
+	"src/application/tests_of_traits.cpp"
 
 	"src/application/setups/editor/gui/editor_fae_gui.cpp"
 	"src/application/setups/editor/editor_setup.cpp"
@@ -632,7 +632,7 @@ file(GLOB_RECURSE HYPERSOMNIA_HEADERS_WITH_INTROSPECTED_CLASSES
 	"src/3rdparty/Box2D/Common/*.h"
 	"src/3rdparty/Box2D/Dynamics/*.h"
 
-	"src/game/tests_of_traits.cpp"
+	"src/application/tests_of_traits.cpp"
 	"src/augs/templates/introspect.cpp"
 )
 

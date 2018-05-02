@@ -26,6 +26,7 @@
 
 #include "augs/readwrite/lua_readwrite.h"
 #include "augs/readwrite/byte_readwrite.h"
+#include "view/viewables/all_viewables_defs.h"
 
 #include "3rdparty/imgui/imgui.h"
 
@@ -465,19 +466,36 @@ struct game_state_checks {
 		});
 	}
 
-	/* Components should not hold any flavour ids because we could not afford to look at props of every entity, for now */
-
 	template <class T>
-	struct is_flavour_id : std::bool_constant<
-		is_constrained_flavour_id_v<T>
-		|| is_typed_flavour_id_v<T>
-	> {};
+	struct is_flavour_id {
+		static constexpr bool value = is_constrained_flavour_id_v<T> || is_typed_flavour_id_v<T>;
+		static_assert(!value);
+	};
 	
-	void validate_no_flavour_ids_in_components() {
-		for_each_component_type([](auto c) {
-			using C = decltype(c);
+	template <class T>
+	struct is_asset_id {
+		static constexpr bool value = is_pathed_asset<T> || is_unpathed_asset<T>;
+		static_assert(!value);
+	};
 
-			static_assert(!sum_matching_in_v<is_flavour_id, C>);
-		});
-	}
+	/* Components should not hold any flavour/asset ids because we could not afford to look at props of every entity, for now */
+
+	static_assert(!sum_matching_in_v<is_flavour_id, cosmos_solvable_significant>);
+	static_assert(!sum_matching_in_v<is_asset_id, cosmos_solvable_significant>);
+
+	/* 
+		Assets should not hold any flavour id, because that would be stupid. 
+		Flavours, on the other hand, can obviously hold other flavour ids and other asset ids.
+
+		Notice that assets can hold other assets, e.g. animation can have image ids,
+		or particle effects can have even animations.
+	*/
+
+	static_assert(!sum_matching_in_v<is_flavour_id, all_logical_assets>);
+	static_assert(!sum_matching_in_v<is_flavour_id, all_viewables_defs>);
+
+	/* Other sanity checks. */
+
+	static_assert(!can_type_contain_another_v<all_logical_assets, entity_id_base>);
+	static_assert(!can_type_contain_another_v<all_viewables_defs, entity_guid>);
 };
