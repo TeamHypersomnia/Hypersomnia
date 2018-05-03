@@ -47,7 +47,15 @@ struct flavour_widget {
 
 		auto id = scoped_id("Flavour selection");
 
-		if (auto combo = track.standard_combo_facade(filter, identity_label.c_str(), displayed_str.c_str())) {
+		if (auto combo = track.standard_combo_facade(identity_label.c_str(), displayed_str.c_str())) {
+			filter.Draw();
+
+			const bool acquire_keyboard = track.pop_acquire_keyboard();
+
+			if (acquire_keyboard) {
+				ImGui::SetKeyboardFocusHere();
+			}
+
 			if (detail_select_none(flavour_id)) {
 				return std::make_optional(tweaker_type::DISCRETE);
 			}
@@ -67,14 +75,20 @@ struct flavour_widget {
 				auto scope = scoped_indent();
 
 				cosm.for_each_id_and_flavour<E>(
-					[&flavour_id, &result](const auto& new_id, const auto& flavour) {
+					[acquire_keyboard, &flavour_id, &result](const auto& new_id, const auto& flavour) {
 						const auto& name = flavour.get_name();
 
 						if (!filter.PassFilter(name.c_str())) {
 							return;
 						}
 
-						if (ImGui::Selectable(name.c_str())) {
+						const bool is_current = flavour_id == new_id;
+
+						if (is_current && acquire_keyboard) {
+							ImGui::SetScrollHere();
+						}
+
+						if (ImGui::Selectable(name.c_str(), is_current)) {
 							flavour_id = new_id;
 							result = tweaker_type::DISCRETE;
 						}

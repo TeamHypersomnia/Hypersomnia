@@ -1,5 +1,6 @@
 #pragma once
 #include "augs/misc/profiler_mixin.h"
+#include "augs/texture_atlas/texture_atlas_profiler.h"
 
 class session_profiler : public augs::profiler_mixin<session_profiler> {
 public:
@@ -8,7 +9,15 @@ public:
 	// GEN INTROSPECTOR class session_profiler
 	augs::time_measurements fps;
 	augs::time_measurements local_entropy;
-	augs::time_measurements reloading_viewables;
+
+	augs::time_measurements reloading_images;
+	augs::time_measurements reloading_sounds;
+
+	augs::time_measurements viewables_readback;
+
+	atlas_profiler atlas;
+	augs::time_measurements atlas_upload_to_gpu;
+
 	augs::time_measurements determining_viewables_to_preload;
 	augs::time_measurements camera_visibility_query;
 	augs::amount_measurements<std::size_t> num_visible_entities;

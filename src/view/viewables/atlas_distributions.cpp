@@ -5,16 +5,16 @@
 #include "view/viewables/image_definition.h"
 
 augs::graphics::texture standard_atlas_distribution(const standard_atlas_distribution_input in) {
-	thread_local auto atlas_input = atlas_regeneration_input();
+	thread_local auto atlas_subjects = atlas_regeneration_subjects();
 
 	auto make_view = [&in](const auto& def) {
 		return image_definition_view(in.unofficial_project_dir, def);
 	};
 
-	atlas_input.clear();
+	atlas_subjects.clear();
 
 	for (const auto& r : in.necessary_image_definitions) {
-		atlas_input.images.emplace_back(r.second.get_source_path().path);
+		atlas_subjects.images.emplace_back(r.second.get_source_path().path);
 	}
 
 	for (const auto& d : in.image_definitions) {
@@ -32,10 +32,10 @@ augs::graphics::texture standard_atlas_distribution(const standard_atlas_distrib
 			}
 		}
 
-		atlas_input.images.emplace_back(def.get_source_image_path());
+		atlas_subjects.images.emplace_back(def.get_source_image_path());
 
 		auto add = [&](const auto path) {
-			atlas_input.images.emplace_back(path);
+			atlas_subjects.images.emplace_back(path);
 		};
 
 		auto add_if = [&](const auto path) {
@@ -54,15 +54,16 @@ augs::graphics::texture standard_atlas_distribution(const standard_atlas_distrib
 		add_if(def.find_desaturation_path());
 	}
 
-	atlas_input.fonts.emplace_back(in.gui_font_input);
+	atlas_subjects.fonts.emplace_back(in.gui_font_input);
 
 	thread_local auto atlas_image = augs::image();
 
-	const auto atlas = regenerated_atlas(
-		atlas_input,
+	const auto atlas = regenerated_atlas({
+		atlas_subjects,
 		in.settings,
-		atlas_image
-	);
+		atlas_image,
+		in.profiler
+	});
 
 	in.output_gui_font.unpack_from(atlas.stored_baked_fonts.at(in.gui_font_input));
 
@@ -97,5 +98,9 @@ augs::graphics::texture standard_atlas_distribution(const standard_atlas_distrib
 		});
 	}
 
-	return atlas_image;
+
+	auto scope = measure_scope(in.atlas_upload_to_gpu);
+
+	auto output = augs::graphics::texture(atlas_image);
+	return output;
 }

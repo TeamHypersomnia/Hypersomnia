@@ -62,20 +62,34 @@ public:
 
 		auto id = scoped_id("Unpathed asset selection");
 
-		if (auto combo = track.standard_combo_facade(filter, identity_label.c_str(), displayed_str.c_str())) {
+		if (auto combo = track.standard_combo_facade(identity_label.c_str(), displayed_str.c_str())) {
+			filter.Draw();
+
+			const bool acquire_keyboard = track.pop_acquire_keyboard();
+
+			if (acquire_keyboard) {
+				ImGui::SetKeyboardFocusHere();
+			}
+
 			if (detail_select_none(asset_id)) {
 				return std::make_optional(tweaker_type::DISCRETE);
 			}
 
 			auto list_assets_in = [&](const auto& p) {
 				for_each_id_and_object(p,
-					[&asset_id, &result](const auto& new_id, const auto& object) {
+					[acquire_keyboard, &asset_id, &result](const auto& new_id, const auto& object) {
 						const auto& name = object.name;
 						if (!filter.PassFilter(name.c_str())) {
 							return;
 						}
 
-						if (ImGui::Selectable(name.c_str())) {
+						const bool is_current = asset_id == new_id;
+
+						if (is_current && acquire_keyboard) {
+							ImGui::SetScrollHere();
+						}
+
+						if (ImGui::Selectable(name.c_str(), is_current)) {
 							asset_id = new_id;
 							result = tweaker_type::DISCRETE;
 						}

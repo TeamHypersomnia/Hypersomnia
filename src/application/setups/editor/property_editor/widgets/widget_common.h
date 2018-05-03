@@ -3,7 +3,7 @@
 
 template <class T>
 bool detail_select_none(T& id) {
-	const bool result = ImGui::Selectable("(None)");
+	const bool result = ImGui::Selectable("(None)", id == T());
 
 	if (result) {
 		id = {};

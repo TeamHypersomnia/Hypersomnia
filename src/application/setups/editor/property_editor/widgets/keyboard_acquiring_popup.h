@@ -35,21 +35,13 @@ struct keyboard_acquiring_popup {
 	}
 
 	template <class... Args>
-	auto standard_combo_facade(
-		ImGuiTextFilter& filter,
-		Args&&... combo_args
-	) {
+	auto standard_combo_facade(Args&&... combo_args) {
 		using namespace augs::imgui;
 
 		auto combo = scoped_combo(std::forward<Args>(combo_args)..., ImGuiComboFlags_HeightLargest);
 
 		if (combo) {
 			check_opened_first_time();
-			filter.Draw();
-
-			if (const bool acquire_keyboard = pop_acquire_keyboard()) {
-				ImGui::SetKeyboardFocusHere();
-			}
 		}
 		else {
 			mark_not_opened();

@@ -4,6 +4,7 @@
 #include "augs/math/vec2.h"
 #include "augs/templates/algorithm_templates.h"
 #include "augs/misc/timing/timer.h"
+#include "augs/misc/scope_guard.h"
 
 namespace augs {
 	template <class derived, class T = double>
@@ -138,4 +139,21 @@ namespace augs {
 			measure(tm.get<std::chrono::seconds>());
 		}
 	};
+
+	template <class T, class = void>
+	struct has_title : std::false_type {};
+
+	template <class T>
+	struct has_title<T, decltype(std::declval<T>().title, void())> : std::true_type {};
+
+	template <class T>
+	constexpr bool has_title_v = has_title<T>::value;
+
+	static_assert(has_title_v<time_measurements>);
+	static_assert(has_title_v<amount_measurements<std::size_t>>);
+}
+
+inline auto measure_scope(augs::time_measurements& m) {
+	m.start();
+	return augs::scope_guard([&m]() { m.stop(); });
 }

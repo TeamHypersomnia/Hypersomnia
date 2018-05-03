@@ -5,14 +5,15 @@
 
 #include "game/assets/physical_material.h"
 #include "game/assets/all_logical_assets.h"
+#include "augs/string/format_enum.h"
 
 void load_test_scene_physical_materials(physical_materials_pool& all_definitions) {
 	using test_id_type = test_scene_physical_material_id;
 
 	all_definitions.reserve(enum_count(test_id_type()));
 
-	augs::for_each_enum_except_bounds([&](const test_id_type) {
-		all_definitions.allocate();
+	augs::for_each_enum_except_bounds([&](const test_id_type id) {
+		all_definitions.allocate().object.name = format_enum(id);
 	});
 
 	const auto set_pair = [&](

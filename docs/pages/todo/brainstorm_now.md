@@ -44,8 +44,6 @@ summary: That which we are brainstorming at the moment.
 
 - rethink our roadmap
 
-- add some warnings to clang
-
 - animations tracking
 	- We've decided that they might be
 		- Named automatically after their first frame

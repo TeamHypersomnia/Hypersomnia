@@ -4,6 +4,7 @@
 #include "3rdparty/rectpack2D/src/pack.h"
 
 #include "augs/ensure.h"
+#include "augs/misc/measurements.h"
 
 #include "augs/readwrite/memory_stream.h"
 
@@ -13,11 +14,11 @@
 #include "augs/readwrite/byte_file.h"
 #include "augs/filesystem/directory.h"
 
-regenerated_atlas::regenerated_atlas(
-	const atlas_regeneration_input& in,
-	const atlas_regeneration_settings settings,
-	augs::image& output_image
-) {
+regenerated_atlas::regenerated_atlas(regenerated_atlas_input in) {
+	const auto& settings = in.settings;
+	const auto& subjects = in.subjects;
+	auto& output_image = in.output_image;
+
 	const auto atlas_image_path = settings.regeneration_path;
 	const auto atlas_metadata_path = augs::path_type(atlas_image_path).replace_extension(".meta");
 	const auto atlas_stamp_path = augs::path_type(atlas_image_path).replace_extension(".stamp");
@@ -32,29 +33,29 @@ regenerated_atlas::regenerated_atlas(
 	*/
 
 	if (!settings.skip_source_image_integrity_check) {
-			for (const auto& img_id : in.images) {
-				/* 
-					Acquire the reference now, so that if last_write_time fails, 
-					we're at least left with the default value.
+		for (const auto& img_id : subjects.images) {
+			/* 
+				Acquire the reference now, so that if last_write_time fails, 
+				we're at least left with the default value.
 
-					Otherwise if a new image was added, but it couldn't be found,
-					the stamp for this image would not be generated for proper comparison,
-					and the atlas would assume that it is up-to-date.
-				*/
+				Otherwise if a new image was added, but it couldn't be found,
+				the stamp for this image would not be generated for proper comparison,
+				and the atlas would assume that it is up-to-date.
+			*/
 
-				auto& stamp = new_stamp.image_stamps[img_id];
+			auto& stamp = new_stamp.image_stamps[img_id];
 
-				try {
-					stamp = augs::last_write_time(img_id);
-				}
-				catch (...) {
-
-				}
+			try {
+				stamp = augs::last_write_time(img_id);
 			}
+			catch (...) {
 
-			for (const auto& fnt_id : in.fonts) {
-				new_stamp.font_stamps[fnt_id] = augs::last_write_time(fnt_id.source_font_path);
 			}
+		}
+
+		for (const auto& fnt_id : subjects.fonts) {
+			new_stamp.font_stamps[fnt_id] = augs::last_write_time(fnt_id.source_font_path);
+		}
 
 		if (!augs::exists(atlas_image_path)) {
 			should_regenerate = true;
@@ -85,159 +86,148 @@ regenerated_atlas::regenerated_atlas(
 
 		std::vector<rect_xywhf> rects_for_packing_algorithm;
 
-		for (const auto& input_img_id : in.images) {
-			auto& out_entry = baked_images[input_img_id];
+		{
+			auto scope = measure_scope(in.profiler.images.loading);
 
-			try {
-				const auto it = loaded_images.try_emplace(input_img_id, input_img_id);
+			for (const auto& input_img_id : subjects.images) {
+				auto& out_entry = baked_images[input_img_id];
 
-				{
-					const bool is_img_unique = it.second;
-					ensure(is_img_unique);
+				try {
+					const auto it = loaded_images.try_emplace(input_img_id, input_img_id);
+
+					{
+						const bool is_img_unique = it.second;
+						ensure(is_img_unique);
+					}
+
+					const auto& img = (*it.first).second;
+
+					const auto u_size = img.get_size();
+					out_entry.cached_original_size_pixels = u_size;
+
+					const auto size = vec2i(u_size);
+					rects_for_packing_algorithm.push_back({0, 0, size.x, size.y});
 				}
-
-				const auto& img = (*it.first).second;
-
-				const auto u_size = img.get_size();
-				out_entry.cached_original_size_pixels = u_size;
-
-				const auto size = vec2i(u_size);
-				rects_for_packing_algorithm.push_back({0, 0, size.x, size.y});
-			}
-			catch (augs::image_loading_error err) {
-				out_entry.cached_original_size_pixels = vec2u::zero;
+				catch (augs::image_loading_error err) {
+					out_entry.cached_original_size_pixels = vec2u::zero;
+				}
 			}
 		}
 
-		for (const auto& input_fnt_id : in.fonts) {
-			const auto it = loaded_fonts.try_emplace(input_fnt_id, input_fnt_id);
+		{
+			auto scope = measure_scope(in.profiler.fonts.loading);
 
-			{
-				const bool is_font_unique = it.second;
-				ensure(is_font_unique);
-			}
-			
-			const auto& fnt = (*it.first).second;
-			
-			auto& out_fnt = stored_baked_fonts[input_fnt_id];
-			out_fnt.meta = fnt.meta;
+			for (const auto& input_fnt_id : subjects.fonts) {
+				const auto it = loaded_fonts.try_emplace(input_fnt_id, input_fnt_id);
 
-			for (const auto& g : fnt.glyph_bitmaps) {
-				out_fnt.glyphs_in_atlas.push_back({});
+				{
+					const bool is_font_unique = it.second;
+					ensure(is_font_unique);
+				}
 
-				auto& out_entry = *out_fnt.glyphs_in_atlas.rbegin();
+				const auto& fnt = (*it.first).second;
 
-				out_entry.cached_original_size_pixels = g.get_size();
+				auto& out_fnt = stored_baked_fonts[input_fnt_id];
+				out_fnt.meta = fnt.meta;
 
-				rects_for_packing_algorithm.push_back({
-					0,
-					0,
-					static_cast<int>(g.get_size().x),
-					static_cast<int>(g.get_size().y)
-				});
+				for (const auto& g : fnt.glyph_bitmaps) {
+					out_fnt.glyphs_in_atlas.push_back({});
+
+					auto& out_entry = *out_fnt.glyphs_in_atlas.rbegin();
+
+					out_entry.cached_original_size_pixels = g.get_size();
+
+					rects_for_packing_algorithm.push_back({
+						0,
+						0,
+						static_cast<int>(g.get_size().x),
+						static_cast<int>(g.get_size().y)
+					});
+				}
 			}
 		}
 
 		std::vector<rect_xywhf*> input_for_packing_algorithm;
 
-		for (auto& r : rects_for_packing_algorithm) {
-			input_for_packing_algorithm.push_back(&r);
+		{
+			auto scope = measure_scope(in.profiler.packing);
+
+			for (auto& r : rects_for_packing_algorithm) {
+				input_for_packing_algorithm.push_back(&r);
+			}
+			std::vector<bin> packing_output;
+
+			const auto rect_padding_amount = 2;
+
+			for (auto& rr : rects_for_packing_algorithm) {
+				rr.w += rect_padding_amount;
+				rr.h += rect_padding_amount;
+			}
+
+			const bool result = pack(
+				input_for_packing_algorithm.data(), 
+				static_cast<int>(input_for_packing_algorithm.size()), 
+				static_cast<int>(settings.packer_detail_max_atlas_size),
+				true,
+				packing_output
+			);
+
+			for (auto& rr : rects_for_packing_algorithm) {
+				rr.w -= rect_padding_amount;
+				rr.h -= rect_padding_amount;
+			}
+
+			const bool textures_dont_fit_into_atlas = !result || packing_output.size() > 1;
+
+			ensure(!textures_dont_fit_into_atlas);
+			ensure_eq(packing_output[0].rects.size(), input_for_packing_algorithm.size());
+
+			atlas_image_size = {
+				static_cast<unsigned>(packing_output[0].size.w),
+				static_cast<unsigned>(packing_output[0].size.h)
+			};
 		}
-
-		std::vector<bin> packing_output;
-
-		const auto rect_padding_amount = 2;
-
-		for (auto& rr : rects_for_packing_algorithm) {
-			rr.w += rect_padding_amount;
-			rr.h += rect_padding_amount;
-		}
-
-		const bool result = pack(
-			input_for_packing_algorithm.data(), 
-			static_cast<int>(input_for_packing_algorithm.size()), 
-			static_cast<int>(settings.packer_detail_max_atlas_size),
-			true,
-			packing_output
-		);
-
-		for (auto& rr : rects_for_packing_algorithm) {
-			rr.w -= rect_padding_amount;
-			rr.h -= rect_padding_amount;
-		}
-
-		const bool textures_dont_fit_into_atlas = !result || packing_output.size() > 1;
-
-		ensure(!textures_dont_fit_into_atlas);
-		ensure_eq(packing_output[0].rects.size(), input_for_packing_algorithm.size());
-
-		atlas_image_size = {
-			static_cast<unsigned>(packing_output[0].size.w),
-			static_cast<unsigned>(packing_output[0].size.h)
-		};
 
 		// translate pixels into atlas space and render the image
 
-		output_image.resize(atlas_image_size);
+		{
+			auto scope = measure_scope(in.profiler.resizing_image);
+
+			output_image.resize(atlas_image_size);
+		}
 		
 		size_t current_rect = 0u;
 
-		for (const auto& input_img_id : in.images) {
-			const auto packed_rect = rects_for_packing_algorithm[current_rect];
+		{
+			auto scope = measure_scope(in.profiler.images.blitting);
 
-			{
-				auto& output_entry = baked_images[input_img_id];
-				
-				if (output_entry.cached_original_size_pixels.non_zero()) {
-					output_entry.atlas_space.set(
-						static_cast<float>(packed_rect.x) / atlas_image_size.x,
-						static_cast<float>(packed_rect.y) / atlas_image_size.y,
-						static_cast<float>(packed_rect.w) / atlas_image_size.x,
-						static_cast<float>(packed_rect.h) / atlas_image_size.y
-					);
+			for (const auto& input_img_id : subjects.images) {
+				const auto packed_rect = rects_for_packing_algorithm[current_rect];
 
-					output_entry.was_flipped = packed_rect.flipped;
-				}
-				else {
-					output_entry.atlas_space.set(0.f, 0.f, 1.f, 1.f);
-					output_entry.cached_original_size_pixels = atlas_image_size;
-					output_entry.was_flipped = false;
-
-					continue;
-				}
-			}
-
-			output_image.blit(
-				loaded_images[input_img_id],
 				{
-					static_cast<unsigned>(packed_rect.x),
-					static_cast<unsigned>(packed_rect.y)
-				},
-				packed_rect.flipped
-			);
+					auto& output_entry = baked_images[input_img_id];
 
-			++current_rect;
-		}
+					if (output_entry.cached_original_size_pixels.non_zero()) {
+						output_entry.atlas_space.set(
+							static_cast<float>(packed_rect.x) / atlas_image_size.x,
+							static_cast<float>(packed_rect.y) / atlas_image_size.y,
+							static_cast<float>(packed_rect.w) / atlas_image_size.x,
+							static_cast<float>(packed_rect.h) / atlas_image_size.y
+						);
 
-		for (auto& input_font_id : in.fonts) {
-			auto& output_font = stored_baked_fonts[input_font_id];
+						output_entry.was_flipped = packed_rect.flipped;
+					}
+					else {
+						output_entry.atlas_space.set(0.f, 0.f, 1.f, 1.f);
+						output_entry.cached_original_size_pixels = atlas_image_size;
+						output_entry.was_flipped = false;
 
-			for (size_t glyph_index = 0; glyph_index < output_font.glyphs_in_atlas.size(); ++glyph_index) {
-				const auto& packed_rect = rects_for_packing_algorithm[current_rect];
-
-				auto& g = output_font.glyphs_in_atlas[glyph_index];
-
-				g.atlas_space.set(
-					static_cast<float>(packed_rect.x) / atlas_image_size.x,
-					static_cast<float>(packed_rect.y) / atlas_image_size.y,
-					static_cast<float>(packed_rect.w) / atlas_image_size.x,
-					static_cast<float>(packed_rect.h) / atlas_image_size.y
-				);
-
-				g.was_flipped = packed_rect.flipped;
+						continue;
+					}
+				}
 
 				output_image.blit(
-					loaded_fonts.at(input_font_id).glyph_bitmaps[glyph_index],
+					loaded_images[input_img_id],
 					{
 						static_cast<unsigned>(packed_rect.x),
 						static_cast<unsigned>(packed_rect.y)
@@ -248,6 +238,42 @@ regenerated_atlas::regenerated_atlas(
 				++current_rect;
 			}
 		}
+
+		{
+			auto scope = measure_scope(in.profiler.fonts.blitting);
+
+			for (auto& input_font_id : subjects.fonts) {
+				auto& output_font = stored_baked_fonts[input_font_id];
+
+				for (size_t glyph_index = 0; glyph_index < output_font.glyphs_in_atlas.size(); ++glyph_index) {
+					const auto& packed_rect = rects_for_packing_algorithm[current_rect];
+
+					auto& g = output_font.glyphs_in_atlas[glyph_index];
+
+					g.atlas_space.set(
+						static_cast<float>(packed_rect.x) / atlas_image_size.x,
+						static_cast<float>(packed_rect.y) / atlas_image_size.y,
+						static_cast<float>(packed_rect.w) / atlas_image_size.x,
+						static_cast<float>(packed_rect.h) / atlas_image_size.y
+					);
+
+					g.was_flipped = packed_rect.flipped;
+
+					output_image.blit(
+						loaded_fonts.at(input_font_id).glyph_bitmaps[glyph_index],
+						{
+							static_cast<unsigned>(packed_rect.x),
+							static_cast<unsigned>(packed_rect.y)
+						},
+						packed_rect.flipped
+					);
+
+					++current_rect;
+				}
+			}
+		}
+
+		auto scope = measure_scope(in.profiler.saving);
 
 		output_image.save(atlas_image_path);
 		augs::save_as_bytes(new_stamp, atlas_stamp_path);

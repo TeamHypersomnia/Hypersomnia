@@ -14,6 +14,8 @@
 	such atlas distributions as needed, to this file.
 */
 
+struct atlas_profiler;
+
 struct standard_atlas_distribution_input {
 	const image_definitions_map& image_definitions;
 	const necessary_image_definitions_map& necessary_image_definitions;
@@ -24,6 +26,9 @@ struct standard_atlas_distribution_input {
 	images_in_atlas_map& output_atlas_entries;
 	necessary_images_in_atlas_map& output_necessary_atlas_entries;
 	augs::baked_font& output_gui_font;
+
+	atlas_profiler& profiler;
+	augs::time_measurements& atlas_upload_to_gpu;
 };
 
 augs::graphics::texture standard_atlas_distribution(const standard_atlas_distribution_input in);

@@ -4,11 +4,12 @@
 
 #include "augs/filesystem/path.h"
 #include "augs/image/font.h"
+#include "augs/texture_atlas/texture_atlas_profiler.h"
 
 using source_image_identifier = augs::path_type;
 using source_font_identifier = augs::font_loading_input;
 
-struct atlas_regeneration_input {
+struct atlas_regeneration_subjects {
 	std::vector<source_image_identifier> images;
 	std::vector<source_font_identifier> fonts;
 
@@ -36,6 +37,13 @@ struct texture_atlas_stamp {
 	// END GEN INTROSPECTOR
 };
 
+struct regenerated_atlas_input {
+	const atlas_regeneration_subjects& subjects;
+	const atlas_regeneration_settings settings;
+	augs::image& output_image;
+	atlas_profiler& profiler;
+};
+
 struct regenerated_atlas {
 	// GEN INTROSPECTOR struct regenerated_atlas
 	vec2u atlas_image_size;
@@ -44,9 +52,5 @@ struct regenerated_atlas {
 	std::unordered_map<source_font_identifier, augs::stored_baked_font> stored_baked_fonts;
 	// END GEN INTROSPECTOR
 
-	regenerated_atlas(
-		const atlas_regeneration_input&,
-		const atlas_regeneration_settings,
-		augs::image& output_image
-	);
+	regenerated_atlas(regenerated_atlas_input);
 };

@@ -306,57 +306,59 @@ int work(const int argc, const char* const * const argv) try {
 	static frame_profiler frame_performance;
 
 	static auto load_all = [](const all_viewables_defs& new_defs) {
-		auto scope = measure_scope(profiler.reloading_viewables);
-
 		/* Atlas/meta cache pass */
 
 		{
 			bool new_atlas_required = false;
-			
-			if (necessary_images_in_atlas.empty()) {
-				new_atlas_required = true;
-			}
-
-			if (!game_world_atlas.has_value()) {
-				new_atlas_required = true;
-			}
 
 			{
-				/* Check for unloaded and changed resources */
-				for_each_id_and_object(currently_loaded_defs.image_definitions, [&](const auto key, const auto& old_definition) {
-					if (const auto new_definition = mapped_or_nullptr(new_defs.image_definitions, key)) {
-						if (new_definition->loadables != old_definition.loadables) {
-							/* Loadables changed, so reload them. */
+				auto scope = measure_scope(profiler.reloading_images);
 
-							new_atlas_required = true;
-							loaded_image_caches.at(key) = { 
-								image_definition_view(get_unofficial_content_dir(), *new_definition)
-							};
+				if (necessary_images_in_atlas.empty()) {
+					new_atlas_required = true;
+				}
+
+				if (!game_world_atlas.has_value()) {
+					new_atlas_required = true;
+				}
+
+				{
+					/* Check for unloaded and changed resources */
+					for_each_id_and_object(currently_loaded_defs.image_definitions, [&](const auto key, const auto& old_definition) {
+						if (const auto new_definition = mapped_or_nullptr(new_defs.image_definitions, key)) {
+							if (new_definition->loadables != old_definition.loadables) {
+								/* Loadables changed, so reload them. */
+
+								new_atlas_required = true;
+								loaded_image_caches.at(key) = { 
+									image_definition_view(get_unofficial_content_dir(), *new_definition)
+								};
+							}
 						}
-					}
-					else {
-						/* Missing, unload */
-						new_atlas_required = true;
-						loaded_image_caches.erase(key);
-					}
-				});
+						else {
+							/* Missing, unload */
+							new_atlas_required = true;
+							loaded_image_caches.erase(key);
+						}
+					});
 
-				/* Check for new resources */
-				for_each_id_and_object(new_defs.image_definitions, [&](const auto key, const auto& fresh) {
-					if (nullptr == mapped_or_nullptr(currently_loaded_defs.image_definitions, key)) {
-						new_atlas_required = true;
+					/* Check for new resources */
+					for_each_id_and_object(new_defs.image_definitions, [&](const auto key, const auto& fresh) {
+						if (nullptr == mapped_or_nullptr(currently_loaded_defs.image_definitions, key)) {
+							new_atlas_required = true;
 
-						loaded_image_caches.try_emplace(
-							key, 
-							image_definition_view(get_unofficial_content_dir(), fresh)
-						);
-					}
-					/* Otherwise it's already taken care of */
-				});
-			}
+							loaded_image_caches.try_emplace(
+								key, 
+								image_definition_view(get_unofficial_content_dir(), fresh)
+							);
+						}
+						/* Otherwise it's already taken care of */
+					});
+				}
 
-			if (config.gui_font != loaded_gui_font) {
-				new_atlas_required = true;
+				if (config.gui_font != loaded_gui_font) {
+					new_atlas_required = true;
+				}
 			}
 
 			if (new_atlas_required) {
@@ -379,7 +381,9 @@ int work(const int argc, const char* const * const argv) try {
 					get_unofficial_content_dir(),
 					images_in_atlas,
 					necessary_images_in_atlas,
-					get_gui_font()
+					get_gui_font(),
+					profiler.atlas,
+					profiler.atlas_upload_to_gpu
 				}));
 
 				loaded_gui_font = config.gui_font;
@@ -389,6 +393,8 @@ int work(const int argc, const char* const * const argv) try {
 		/* Sounds pass */
 
 		{
+			auto scope = measure_scope(profiler.reloading_sounds);
+
 			auto make_sound_loading_input = [&](const sound_definition& def) {
 				const auto def_view = sound_definition_view(get_unofficial_content_dir(), def);
 				const auto input = def_view.make_sound_loading_input();
@@ -435,6 +441,8 @@ int work(const int argc, const char* const * const argv) try {
 				/* Otherwise it's already taken care of */
 			});
 		}
+
+		auto scope = measure_scope(profiler.viewables_readback);
 
 		/* Done, overwrite */
 		currently_loaded_defs = new_defs;

@@ -780,3 +780,5 @@ we consider whole type overrides too complex architeciturally:
 	- Yes, then they may signify that no entity is to be spawned.
 	- However, if a flavour id is non-zero, it is guaranteed to point to a valid flavour.
 		- That is because once again we will not allow the editor to remove flavours of whom there are users!
+
+- add some warnings to clang
