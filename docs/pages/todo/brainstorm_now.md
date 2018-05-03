@@ -5,6 +5,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- enable neon on charges shells etc
 - separate atlas profiler
 - always fill new workspace with some test scene essentials?
 	- so that e.g. no image ids in common state stay invalid

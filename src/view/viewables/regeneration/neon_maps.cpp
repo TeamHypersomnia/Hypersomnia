@@ -174,8 +174,8 @@ std::vector<std::vector<double>> generate_gauss_kernel(const neon_map_input& inp
 
 	index.resize(radius_towards_y_axis);
 
-	for (auto& vector : index) {
-		vector.resize(radius_towards_x_axis);
+	for (auto& vec : index) {
+		vec.resize(radius_towards_x_axis);
 	}
 
 	for (unsigned y = 0; y < index.size(); ++y) {
@@ -187,13 +187,13 @@ std::vector<std::vector<double>> generate_gauss_kernel(const neon_map_input& inp
 	std::vector<std::vector<double>> result;
 	result.resize(radius_towards_y_axis);
 
-	for (auto& vector : result) {
-		vector.resize(radius_towards_x_axis);
+	for (auto& vec : result) {
+		vec.resize(radius_towards_x_axis);
 	}
 
 	for (unsigned y = 0; y < result.size(); ++y) {
 		for (unsigned x = 0; x < result[y].size(); ++x) {
-			result[y][x] = exp(-1 * (pow(index[x][y].first, 2) + pow(index[x][y].second, 2)) / 2 / pow(input.standard_deviation, 2)) / PI<float> / 2 / pow(input.standard_deviation, 2);
+			result[y][x] = exp(-1 * (pow(index[y][x].first, 2) + pow(index[y][x].second, 2)) / 2 / pow(input.standard_deviation, 2)) / PI<float> / 2 / pow(input.standard_deviation, 2);
 		}
 	}
 
@@ -205,8 +205,8 @@ std::vector<std::vector<double>> generate_gauss_kernel(const neon_map_input& inp
 		}
 	}
 
-	for (auto& vector : result) {
-		for (auto& value : vector) {
+	for (auto& vec : result) {
+		for (auto& value : vec) {
 			value /= sum;
 		}
 	}
@@ -257,7 +257,7 @@ std::vector<vec2u> hide_undesired_pixels(
 		for (unsigned x = 0; x < original_image.get_columns(); ++x)
 		{
 			auto& pixel = original_image.pixel({ x, y });
-			auto found = find_if(color_whitelist.begin(), color_whitelist.end(), [pixel](const rgba& a) {
+			auto found = std::find_if(color_whitelist.begin(), color_whitelist.end(), [pixel](const rgba& a) {
 				return a == pixel;
 			});
 
