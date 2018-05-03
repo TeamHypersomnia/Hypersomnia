@@ -8,11 +8,11 @@
 #include "augs/templates/introspection_utils/introspective_equal.h"
 
 augs::path_type get_neon_map_path(augs::path_type from_source_path) {
-	return std::string(GENERATED_FILES_DIR) + from_source_path.replace_extension(".neon_map.png").string();
+	return augs::path_type(GENERATED_FILES_DIR) / from_source_path.replace_extension(".neon_map.png").string();
 }
 
 augs::path_type get_desaturation_path(augs::path_type from_source_path) {
-	return std::string(GENERATED_FILES_DIR) + from_source_path.replace_extension(".desaturation.png").string();
+	return augs::path_type(GENERATED_FILES_DIR) / from_source_path.replace_extension(".desaturation.png").string();
 }
 
 bool image_loadables::operator==(const image_loadables& b) const {

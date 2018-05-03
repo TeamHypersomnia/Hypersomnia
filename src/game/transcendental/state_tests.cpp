@@ -125,8 +125,8 @@ TEST_CASE("StateTest2 PaddingTest") {
 					iter
 				);
 
-				augs::save_as_text(LOG_FILES_DIR "object1.txt", describe_fields(*reinterpret_cast<checked_type*>(&buf1)));
-				augs::save_as_text(LOG_FILES_DIR "object2.txt", describe_fields(*reinterpret_cast<checked_type*>(&buf2)));
+				augs::save_as_text(LOG_FILES_DIR "/object1.txt", describe_fields(*reinterpret_cast<checked_type*>(&buf1)));
+				augs::save_as_text(LOG_FILES_DIR "/object2.txt", describe_fields(*reinterpret_cast<checked_type*>(&buf2)));
 
 				LOG(log_contents);
 				FAIL(log_contents);
@@ -147,8 +147,8 @@ TEST_CASE("StateTest2 PaddingTest") {
 						static_cast<int>(dt.get_first_divergence_pos())
 					);
 
-					augs::save_as_text(LOG_FILES_DIR "object1.txt", describe_fields(a));
-					augs::save_as_text(LOG_FILES_DIR "object2.txt", describe_fields(b));
+					augs::save_as_text(LOG_FILES_DIR "/object1.txt", describe_fields(a));
+					augs::save_as_text(LOG_FILES_DIR "/object2.txt", describe_fields(b));
 
 					LOG(log_contents);
 					FAIL(log_contents);

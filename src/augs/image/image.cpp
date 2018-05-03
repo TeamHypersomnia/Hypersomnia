@@ -334,7 +334,7 @@ namespace augs {
 	}
 
 	void image::save_as_png(const path_type& path) const {
-		augs::create_directories(path);
+		augs::create_directories_for(path);
 
 		if (
 			const auto lodepng_result = 
@@ -345,7 +345,7 @@ namespace augs {
 	}
 
 	void image::save_as_binary_file(const path_type& path) const {
-		augs::create_directories(path);
+		augs::create_directories_for(path);
 
 		std::ofstream out(path, std::ios::out | std::ios::binary);
 		augs::write_bytes(out, size);

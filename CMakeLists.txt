@@ -84,17 +84,17 @@ set(HYPERSOMNIA_OFFICIAL_CONTENT_DIR "content/official")
 # Where the game will save logs.
 # Deleting this folder will have no effect on the game.
 
-set(HYPERSOMNIA_LOG_FILES_DIR "cache/log/")
+set(HYPERSOMNIA_LOG_FILES_DIR "cache/log")
 
 # Where the game will save neon maps and other regenerable content.
 # Deleting this folder will have no effect on the game, except that some resources might take time to generate again.
 
-set(HYPERSOMNIA_GENERATED_FILES_DIR "cache/gen/")
+set(HYPERSOMNIA_GENERATED_FILES_DIR "cache/gen")
 
 # Where the game will save untitled works from editor, gui layouts, user config etc.
 # Deleting this folder might possibly result in data loss, e.g. the untitled works and some user settings.
 
-set(HYPERSOMNIA_LOCAL_FILES_DIR "cache/usr/")
+set(HYPERSOMNIA_LOCAL_FILES_DIR "cache/usr")
 
 ## Building switches for functionality using 3rdparty libraries.
 

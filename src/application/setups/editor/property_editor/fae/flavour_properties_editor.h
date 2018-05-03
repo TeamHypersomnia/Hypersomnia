@@ -32,7 +32,7 @@ void describe_if_rename(C& cmd, std::string& old, const field_address field, con
 		}
 	}
 	else {
-		(void)(cmd, old, field, invariant, new_content);
+		(void)cmd; (void)old; (void)field; (void)invariant; (void)new_content;
 	}
 }
 

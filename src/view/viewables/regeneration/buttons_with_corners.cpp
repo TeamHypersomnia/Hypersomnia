@@ -58,7 +58,7 @@ void regenerate_button_with_corners(
 		LOG("Regenerating button with corners: %x", untemplatized_path);
 		
 		/* stamp is in the same directory as all images */
-		augs::create_directories(button_with_corners_stamp_path);
+		augs::create_directories_for(button_with_corners_stamp_path);
 
 		create_and_save_button_with_corners(
 			output_path_template,

@@ -5,15 +5,15 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Wextra for gcc?
+- always fill new workspace with some test scene essentials?
+	- so that e.g. no image ids in common state stay invalid
+	- can make those the first in test scene images so that we can stop importing images after some point
+
+- asynchronous texture transfers, especially when regenerating atlases
 
 - would really, really be cool to have a color picker inside the neon map light color chooser
 	- less pain in the ass
 	- look for imgui logic to acquire mouse positioning relative to the control
-
-- create gfx and sfx folders for the project on saving
-
-- how do we communicate the used locations of flavours?
 
 - possibly rename the flavour on setting an image?
 	- if it is detected that it is yet unnamed?
@@ -51,11 +51,6 @@ summary: That which we are brainstorming at the moment.
 		- Named automatically after their first frame
 		- Uniquely identified by such
 
-- can flavours ever have invalid ids?
-	- Yes, then they may signify that no entity is to be spawned.
-	- However, if a flavour id is non-zero, it is guaranteed to point to a valid flavour.
-		- That is because once again we will not allow the editor to remove flavours of whom there are users!
-
 - flavour ids & allocation
 	- they are actually quite performance critical
 	- would id relinking pool actually be useful here?
@@ -83,12 +78,6 @@ summary: That which we are brainstorming at the moment.
 
 - might be cool to make container elements tickable and modifiable in bulk, in flavour
 	- might actually be done just inside the general edit under container constexpr, with help of notifies etc
-
-- always fill new workspace with some test scene essentials?
-	- so that e.g. no image ids in common state stay invalid
-	- can make those the first in test scene images so that we can stop importing images after some point
-
-- asynchronous texture transfers, especially when regenerating atlases
 
 - editing containers in general edit properties
 	- add/remove yields change property to the complete container

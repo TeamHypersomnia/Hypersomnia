@@ -8,7 +8,9 @@
 
 namespace augs {
 	bool create_directory(const path_type& dir_path);
-	bool create_directories(path_type dir_path);
+	bool create_directories(const path_type& dir_path);
+
+	bool create_directories_for(path_type path);
 
 	path_type get_current_working_directory();
 

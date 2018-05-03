@@ -96,7 +96,7 @@ void editor_setup::set_popup(const editor_popup p) {
 
 	LOG(logged);
 
-	augs::save_as_text(LOG_FILES_DIR "last_editor_message.txt", augs::date_time().get_readable() + '\n' + logged);
+	augs::save_as_text(LOG_FILES_DIR "/last_editor_message.txt", augs::date_time().get_readable() + '\n' + logged);
 }
 
 void editor_setup::set_locally_viewed(const entity_id id) {
@@ -759,9 +759,8 @@ void editor_setup::next() {
 
 void editor_setup::new_tab() {
 	try_to_open_new_folder([&](editor_folder& t) {
-		const auto new_path = get_first_free_untitled_path("Project%x");
-		augs::create_directories(augs::path_type(new_path) += "/");
-		t.current_path = new_path;
+		t.current_path = get_first_free_untitled_path("Project%x");
+		augs::create_directories(t.current_path);
 	});
 }
 

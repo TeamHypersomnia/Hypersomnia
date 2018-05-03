@@ -21,6 +21,17 @@ inline auto static_allocations_info() {
 	);
 }
 
+inline auto directories_info() {
+	return typesafe_sprintf(
+		"LOG_FILES_DIR=%x\n"
+		"GENERATED_FILES_DIR=%x\n"
+		"LOCAL_FILES_DIR=%x\n",
+		LOG_FILES_DIR,
+		GENERATED_FILES_DIR,
+		LOCAL_FILES_DIR
+	);
+}
+
 inline auto sizeofs_info() {
 	return typesafe_sprintf(
 		"cosmos=%x, entity_id=%x, unversioned=%x\n",
@@ -47,6 +58,8 @@ inline auto complete_build_info() {
 		+ sizeofs_info()
 		+ "\nAll entity types:\n"
 		+ entity_types_info()
+		+ "\nDirectories:\n"
+		+ directories_info()
 	;
 }
 

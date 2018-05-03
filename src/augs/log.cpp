@@ -52,7 +52,7 @@ void write_log_entry(const std::string& f) {
 #endif
 
 #if OUTPUT_LOG_TO_LIVE_FILE
-	std::ofstream recording_file(LOG_FILES_DIR "live_debug.txt", std::ios::out | std::ios::app);
+	std::ofstream recording_file(LOG_FILES_DIR "/live_debug.txt", std::ios::out | std::ios::app);
 	recording_file << f << std::endl;
 #endif
 #endif

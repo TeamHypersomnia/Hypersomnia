@@ -772,3 +772,11 @@ we consider whole type overrides too complex architeciturally:
 - start moving instantiated entity right away
 - finish stuff with flavours, disallow removing used ones
 
+- create gfx and sfx folders for the project on saving
+- Wextra for gcc?
+- how do we communicate the used locations of flavours?
+
+- can flavours ever have invalid ids?
+	- Yes, then they may signify that no entity is to be spawned.
+	- However, if a flavour id is non-zero, it is guaranteed to point to a valid flavour.
+		- That is because once again we will not allow the editor to remove flavours of whom there are users!

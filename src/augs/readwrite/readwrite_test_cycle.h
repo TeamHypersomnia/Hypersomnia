@@ -5,7 +5,7 @@
 #include "augs/readwrite/byte_file.h"
 #include "augs/templates/can_stream.h"
 
-const auto test_file_path = GENERATED_FILES_DIR "test_byte_readwrite.bin";
+const auto test_file_path = GENERATED_FILES_DIR "/test_byte_readwrite.bin";
 
 template <class T>
 void report(const T& v, const T& reloaded) {

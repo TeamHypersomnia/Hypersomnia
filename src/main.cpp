@@ -95,11 +95,11 @@ int main(const int argc, const char* const * const argv) {
 
 		switch (exit_code) {
 			case EXIT_SUCCESS: 
-				augs::save_as_text(LOG_FILES_DIR "exit_success_debug_log.txt", logs); 
+				augs::save_as_text(LOG_FILES_DIR "/exit_success_debug_log.txt", logs); 
 				break;
 			case EXIT_FAILURE: 
 				{
-					const auto failure_log_path = augs::path_type(LOG_FILES_DIR "exit_failure_debug_log.txt");
+					const auto failure_log_path = augs::path_type(LOG_FILES_DIR "/exit_failure_debug_log.txt");
 					augs::save_as_text(failure_log_path, logs);
 					
 					augs::open_text_editor(failure_log_path.string());
@@ -132,10 +132,10 @@ int work(const int argc, const char* const * const argv) try {
 	augs::create_directories(GENERATED_FILES_DIR);
 	augs::create_directories(LOCAL_FILES_DIR);
 
-	dump_detailed_sizeof_information(LOG_FILES_DIR "detailed_sizeofs.txt");
+	dump_detailed_sizeof_information(LOG_FILES_DIR "/detailed_sizeofs.txt");
 
 	static const auto canon_config_path = augs::path_type("config.lua");
-	static const auto local_config_path = augs::path_type(LOCAL_FILES_DIR "config.local.lua");
+	static const auto local_config_path = augs::path_type(LOCAL_FILES_DIR "/config.local.lua");
 
 	static auto lua = augs::create_lua_state();
 
@@ -148,8 +148,8 @@ int work(const int argc, const char* const * const argv) try {
 	};
 
 	augs::imgui::init(
-		LOCAL_FILES_DIR "imgui.ini",
-		LOG_FILES_DIR "imgui_log.txt",
+		LOCAL_FILES_DIR "/imgui.ini",
+		LOG_FILES_DIR "/imgui_log.txt",
 		config.gui_style
 	);
 
@@ -176,7 +176,7 @@ int work(const int argc, const char* const * const argv) try {
 	
 	static augs::window window(config.window);
 	static augs::audio_context audio(config.audio);
-	augs::log_all_audio_devices(LOG_FILES_DIR "audio_devices.txt");
+	augs::log_all_audio_devices(LOG_FILES_DIR "/audio_devices.txt");
 
 	static augs::renderer renderer;
 
@@ -371,7 +371,7 @@ int work(const int argc, const char* const * const argv) try {
 					config.gui_font,
 					{
 						static_cast<unsigned>(renderer.get_max_texture_size()),
-						augs::path_type(GENERATED_FILES_DIR "atlases/game_world_atlas") 
+						augs::path_type(GENERATED_FILES_DIR "/atlases/game_world_atlas") 
 							+= (settings.save_regenerated_atlases_as_binary ? ".bin" : ".png"),
 						settings.regenerate_every_launch,
 						settings.skip_source_image_integrity_check

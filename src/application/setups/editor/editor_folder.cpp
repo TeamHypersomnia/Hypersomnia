@@ -5,6 +5,7 @@
 #include "application/setups/editor/editor_paths.h"
 #include "application/setups/editor/editor_recent_paths.h"
 #include "application/setups/editor/editor_popup.h"
+#include "view/maybe_official_path.h"
 
 #include "augs/readwrite/byte_file.h"
 
@@ -50,7 +51,12 @@ void editor_folder::save_folder(const augs::path_type& to) const {
 void editor_folder::save_folder(const augs::path_type& to, const augs::path_type name) const {
 	const auto paths = editor_paths(to, name);
 
-	augs::create_directories(paths.int_file);
+	augs::create_directories_for(paths.int_file);
+
+	/* For convenience, create subdirectories for content */
+
+	augs::create_directory(to / maybe_official_path<assets::image_id>::get_content_suffix());
+	augs::create_directory(to / maybe_official_path<assets::sound_id>::get_content_suffix());
 
 	work->save_as_int(paths.int_file);
 	augs::save_as_bytes(view, paths.view_file);

@@ -602,7 +602,7 @@ xcb_ewmh_init_atoms_replies(&EWMH, EWMHCookie, NULL);
 	}
 
 	static std::optional<std::string> read_chosen_path(const augs::path_type& script_path) {
-		const auto& temp_result = GENERATED_FILES_DIR "last_file_path.txt";
+		const auto& temp_result = GENERATED_FILES_DIR "/last_file_path.txt";
 
 		try {
 			const auto result = file_to_string(temp_result);

@@ -30,7 +30,7 @@ void editor_autosave::save(
 			h.at_unsaved_revision() || h.was_modified()
 		) {
 			auto autosave_path = f.get_autosave_path();
-			augs::create_directories(autosave_path += "/");
+			augs::create_directories(autosave_path);
 
 			try {
 				f.save_folder(autosave_path, ::get_project_name(f.current_path));
