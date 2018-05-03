@@ -50,6 +50,7 @@ static void write_object_or_trivial_marker(Archive& ar, const T& from, const std
 		ar.write(location, bytes_count);
 	}
 	else {
+		(void)bytes_count;
 		augs::write_bytes(ar, from);
 	}
 }
@@ -61,6 +62,7 @@ static void read_object_or_trivial_marker(Archive& ar, T& to, const std::size_t 
 		ar.read(location, bytes_count);
 	}
 	else {
+		(void)bytes_count;
 		augs::read_bytes(ar, to);
 	}
 }

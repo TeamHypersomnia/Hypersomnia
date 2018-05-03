@@ -114,9 +114,9 @@ namespace augs {
 				std::string result;
 
 				switch (t) {
-				case shader::type::VERTEX: result = "a vertex shader";
-				case shader::type::FRAGMENT: result = "a fragment shader";
-				default: result = "an unknown shader";
+					case shader::type::VERTEX: result = "a vertex shader"; break;
+					case shader::type::FRAGMENT: result = "a fragment shader"; break;
+					default: result = "an unknown shader"; break;
 				}
 
 				return result;

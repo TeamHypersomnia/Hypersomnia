@@ -25,9 +25,11 @@ T<destination_type> rewrite_members_and_transform_templated_type_into(
 					std::is_same_v<To, destination_type>
 					&& std::is_same_v<From, source_type>
 				) {
+					(void)self;
 					transformator(rewritten_to, rewritten_from);
 				}
 				else if constexpr(std::is_assignable_v<To&, const From&>) {
+					(void)self;
 					rewritten_to = rewritten_from;
 				}
 				else {

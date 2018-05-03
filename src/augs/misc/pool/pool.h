@@ -65,6 +65,7 @@ namespace augs {
 	public:
 		pool(const size_type slot_count = 0u) {
 			if constexpr(constexpr_capacity) {
+				(void)slot_count;
 				reserve(objects.capacity());
 			}
 			else {

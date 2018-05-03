@@ -42,6 +42,8 @@ void find_object_in_object(
 		[&searched_object, &location_callback](auto&& self, const auto& label, auto& field) {
 			using Candidate = remove_cref<decltype(field)>;
 
+			(void)(self, label, field);
+
 			if constexpr(contains::template value<Candidate, Searched>) {
 				if constexpr(IgnorePredicate<Candidate>::value) {
 					/* Apparently, this has a special logic of finding */

@@ -304,7 +304,7 @@ namespace augs {
 
 		constant_size_vector() = default;
 
-		constant_size_vector(const constant_size_vector& b) {
+		constant_size_vector(const constant_size_vector& b) : base() {
 			insert(begin(), b.begin(), b.end());
 		}
 

@@ -82,6 +82,8 @@ void find_locations_that_use(
 	const auto& logicals = cosm.get_logical_assets();
 
 	auto traverse_assets = [&](const auto preffix, const auto& p) {
+		(void)preffix;
+
 		if constexpr(contains::template value<typename remove_cref<decltype(p)>::value_type, object_type>) {
 			for_each_id_and_object(
 				p, 

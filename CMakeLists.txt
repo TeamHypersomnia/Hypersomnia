@@ -883,7 +883,7 @@ if(GCC)
 -Winit-self"
 	)
 
-	set(WARNINGS_FOR_OUR_CODE_ONLY "-Wall -Werror -Wno-unused-value")
+	set(WARNINGS_FOR_OUR_CODE_ONLY "-Wall -Wextra -Werror -Wno-unused-value")
 
 	set(HYPERSOMNIA_CXX_FLAGS "${CHOSEN_WARNINGS} -ftemplate-backtrace-limit=0 -std=gnu++1z")
 	set_source_files_properties(${HYPERSOMNIA_CODEBASE_CPPS} PROPERTIES COMPILE_FLAGS ${WARNINGS_FOR_OUR_CODE_ONLY})

@@ -16,6 +16,7 @@ std::string conditional_to_string(const T& t) {
 		return out.str();
 	}
 
+	(void)t;
 	return {};
 }
 
@@ -58,6 +59,9 @@ auto describe_fields(const T& object) {
 
 			if constexpr(!is_container_v<F> && !is_introspective_leaf_v<F>) {
 				augs::introspect(augs::recursive(self), field);
+			}
+			else {
+				(void)self;
 			}
 		}), 
 		object
@@ -111,6 +115,7 @@ auto determine_breaks_in_fields_continuity_by_introspection(const T& object) {
 
 					next_expected_offset = this_offset + sizeof(field);
 					total_size_of_leaves += sizeof(field);
+					(void)self;
 				}
 				else {
 					auto scope = fields.track(label);

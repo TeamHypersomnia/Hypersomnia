@@ -31,6 +31,9 @@ void describe_if_rename(C& cmd, std::string& old, const field_address field, con
 			cmd.built_description = old + " to " + new_content;
 		}
 	}
+	else {
+		(void)(cmd, old, field, invariant, new_content);
+	}
 }
 
 template <class T>

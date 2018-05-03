@@ -770,3 +770,5 @@ we consider whole type overrides too complex architeciturally:
 - for_each_container usage for ent pools
 
 - start moving instantiated entity right away
+- finish stuff with flavours, disallow removing used ones
+

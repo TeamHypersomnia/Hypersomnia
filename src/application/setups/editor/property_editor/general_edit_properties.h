@@ -138,6 +138,7 @@ std::optional<tweaker_type> handler_or_direct(S provider, const std::string& ide
 		return provider.handle(identity_label, altered);
 	}
 	else if constexpr(has_direct_widget_v<T>) {
+		(void)provider;
 		return detail_direct_edit(identity_label, altered);
 	}
 }
@@ -168,6 +169,8 @@ void detail_general_edit_properties(
 	T& altered,
 	const bool nodify_introspected = true
 ) {
+	(void)(input, equality_predicate, notify_change_of, label, altered, nodify_introspected);
+
 	static constexpr bool should_skip = 
 		always_skip_in_properties<T> 
 		|| SkipPredicate<T>::value

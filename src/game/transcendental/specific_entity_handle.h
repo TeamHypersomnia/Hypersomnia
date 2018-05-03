@@ -397,6 +397,8 @@ public:
 				callback(*this);
 			}
 		}
+
+		(void)callback;
 	}
 
 	template <class... List, class F>

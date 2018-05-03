@@ -70,6 +70,7 @@ auto describe_changed(
 		return special_provider.describe_changed(field_name, new_value);
 	}
 	else {
+		(void)special_provider;
 		return describe_changed(field_name, new_value);
 	}
 }

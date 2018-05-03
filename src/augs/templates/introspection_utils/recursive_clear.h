@@ -10,10 +10,14 @@ namespace augs {
 			using Field = remove_cref<decltype(field)>;
 
 			if constexpr(can_clear_v<Field>) {
+				(void)self;
 				field.clear();
 			}
 			else if constexpr(!is_introspective_leaf_v<Field>) {
 				introspect(recursive(self), field);
+			}
+			else {
+				(void)self;
 			}
 		}), object);
 	}
