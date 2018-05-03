@@ -16,7 +16,7 @@ public:
 	augs::time_measurements viewables_readback;
 
 	atlas_profiler atlas;
-	augs::time_measurements atlas_upload_to_gpu;
+	augs::time_measurements atlas_upload_to_gpu = std::size_t(1);
 
 	augs::time_measurements determining_viewables_to_preload;
 	augs::time_measurements camera_visibility_query;

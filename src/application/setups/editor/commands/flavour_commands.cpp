@@ -3,6 +3,7 @@
 #include "application/setups/editor/editor_folder.h"
 #include "application/intercosm.h"
 #include "application/setups/editor/commands/asset_commands.h"
+#include "augs/readwrite/byte_readwrite.h"
 
 #include "application/setups/editor/property_editor/widgets/pathed_asset_widget.h"
 
