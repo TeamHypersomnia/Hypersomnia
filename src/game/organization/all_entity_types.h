@@ -123,7 +123,7 @@ struct shootable_charge {
 
 	using invariants = type_list<
 		invariants::item,
-		invariants::catridge,
+		invariants::cartridge,
 
 		invariants::rigid_body,
 		invariants::fixtures,

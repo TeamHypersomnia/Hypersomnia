@@ -6,7 +6,7 @@
 #include "game/components/trace_component.h"
 #include "game/detail/view_input/sound_effect_input.h"
 #include "game/components/fixtures_component.h"
-#include "game/components/catridge_component.h"
+#include "game/components/cartridge_component.h"
 #include "game/components/explosive_component.h"
 
 #include "game/messages/start_particle_effect.h"
@@ -234,15 +234,15 @@ namespace test_flavours {
 			meta.set(item_inst);
 
 			{
-				invariants::catridge catridge; 
+				invariants::cartridge cartridge; 
 
-				catridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::CONCENTRATED_WANDERING_PIXELS);
-				catridge.shell_trace_particles.modifier.colorize = cyan;
+				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::CONCENTRATED_WANDERING_PIXELS);
+				cartridge.shell_trace_particles.modifier.colorize = cyan;
 
-				catridge.shell_flavour = to_entity_flavour_id(test_plain_sprited_bodys::CYAN_SHELL);
-				catridge.round_flavour = to_entity_flavour_id(test_plain_missiles::CYAN_ROUND);
+				cartridge.shell_flavour = to_entity_flavour_id(test_plain_sprited_bodys::CYAN_SHELL);
+				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::CYAN_ROUND);
 
-				meta.set(catridge);
+				meta.set(cartridge);
 			}
 		}
 

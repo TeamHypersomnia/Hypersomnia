@@ -77,7 +77,7 @@ we consider whole type overrides too complex architeciturally:
 		- gun component 
 			- magic missile def is just a child entity to be cloned around as needed.
 				- thus it only becomes type id.
-		- catridge component
+		- cartridge component
 			- whole component should become invariants and its child entity id fields should just become type ids
 	- Get rid of component adders and deleters.
 		- That will be only possible once we invariantize practically everything in the test scenes.

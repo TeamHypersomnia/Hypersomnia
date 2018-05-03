@@ -49,13 +49,13 @@ void components::gun::load_next_round(
 	auto& cosmos = step.get_cosmos();
 	const auto gun_entity = step.get_cosmos()[subject];
 
-	thread_local std::vector<entity_id> next_catridge_from;
-	next_catridge_from.clear();
+	thread_local std::vector<entity_id> next_cartridge_from;
+	next_cartridge_from.clear();
 
 	const auto chamber_magazine_slot = gun_entity[slot_function::GUN_CHAMBER_MAGAZINE];
 
 	if (chamber_magazine_slot.alive()) {
-		next_catridge_from = chamber_magazine_slot.get_items_inside();
+		next_cartridge_from = chamber_magazine_slot.get_items_inside();
 	}
 	else {
 		const auto detachable_magazine_slot = gun_entity[slot_function::GUN_DETACHABLE_MAGAZINE];
@@ -63,14 +63,14 @@ void components::gun::load_next_round(
 		if (detachable_magazine_slot.alive() && detachable_magazine_slot.has_items()) {
 			const auto magazine = cosmos[detachable_magazine_slot.get_items_inside()[0]];
 
-			next_catridge_from = magazine[slot_function::ITEM_DEPOSIT].get_items_inside();
+			next_cartridge_from = magazine[slot_function::ITEM_DEPOSIT].get_items_inside();
 		}
 	}
 
-	if (next_catridge_from.size() > 0) {
+	if (next_cartridge_from.size() > 0) {
 		item_slot_transfer_request into_chamber_transfer;
 
-		into_chamber_transfer.item = next_catridge_from[next_catridge_from.size() - 1];
+		into_chamber_transfer.item = next_cartridge_from[next_cartridge_from.size() - 1];
 		into_chamber_transfer.target_slot = gun_entity[slot_function::GUN_CHAMBER];
 		into_chamber_transfer.force_immediate_mount = true;
 		into_chamber_transfer.specified_quantity = 1;
@@ -219,15 +219,15 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 			) {
 				/* This is a normal gun */
 				const auto chamber_slot = gun_entity[slot_function::GUN_CHAMBER];
-				const auto catridge_in_chamber = cosmos[chamber_slot.get_items_inside()[0]];
+				const auto cartridge_in_chamber = cosmos[chamber_slot.get_items_inside()[0]];
 
 				auto response = make_gunshot_response();
-				response.catridge_definition = catridge_in_chamber.template get<invariants::catridge>();
+				response.cartridge_definition = cartridge_in_chamber.template get<invariants::cartridge>();
 
 				thread_local std::vector<entity_id> bullet_stacks;
 				bullet_stacks.clear();
 
-				const auto pellets_slot = catridge_in_chamber[slot_function::ITEM_DEPOSIT];
+				const auto pellets_slot = cartridge_in_chamber[slot_function::ITEM_DEPOSIT];
 
 				thread_local destruction_queue destructions;
 				destructions.clear();
@@ -236,14 +236,14 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					bullet_stacks = pellets_slot.get_items_inside();
 
 					/* 
-						apart from the pellets stacks inside the catridge,
-						we must additionally queue the catridge itself
+						apart from the pellets stacks inside the cartridge,
+						we must additionally queue the cartridge itself
 					*/
 
-					destructions.emplace_back(catridge_in_chamber);
+					destructions.emplace_back(cartridge_in_chamber);
 				}
 				else {
-					bullet_stacks.push_back(catridge_in_chamber);
+					bullet_stacks.push_back(cartridge_in_chamber);
 				}
 
 				ensure(bullet_stacks.size() > 0);
@@ -254,7 +254,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					int charges = single_bullet_or_pellet_stack.get<components::item>().get_charges();
 
 					while (charges--) {
-						if (const auto round_flavour = single_bullet_or_pellet_stack.get<invariants::catridge>().round_flavour; round_flavour.is_set()) {
+						if (const auto round_flavour = single_bullet_or_pellet_stack.get<invariants::cartridge>().round_flavour; round_flavour.is_set()) {
 							cosmic::create_entity(cosmos, round_flavour, [&](const auto round_entity){
 								auto& sender = round_entity.template get<components::sender>();
 								sender.set(gun_entity);
@@ -288,7 +288,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 						}
 					}
 
-					if (const auto shell_flavour = single_bullet_or_pellet_stack.get<invariants::catridge>().shell_flavour; shell_flavour.is_set()) {
+					if (const auto shell_flavour = single_bullet_or_pellet_stack.get<invariants::cartridge>().shell_flavour; shell_flavour.is_set()) {
 						cosmic::create_entity(cosmos, shell_flavour, [&](const auto shell_entity){
 							auto rng = cosmos.get_rng_for(shell_entity);
 

@@ -3,7 +3,7 @@
 #include "game/transcendental/entity_flavour_id.h"
 
 namespace invariants {
-	struct catridge {
+	struct cartridge {
 		using round_flavour_type = constrained_entity_flavour_id<
 			invariants::rigid_body, 
 			invariants::missile, 
@@ -14,7 +14,7 @@ namespace invariants {
 			invariants::rigid_body
 		>;
 
-		// GEN INTROSPECTOR struct invariants::catridge
+		// GEN INTROSPECTOR struct invariants::cartridge
 
 		shell_flavour_type shell_flavour;
 		round_flavour_type round_flavour;

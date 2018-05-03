@@ -10,7 +10,7 @@
 #include "game/components/container_component.h"
 #include "game/components/sentience_component.h"
 #include "game/components/item_component.h"
-#include "game/components/catridge_component.h"
+#include "game/components/cartridge_component.h"
 #include "game/detail/inventory/perform_transfer.h"
 #include "game/detail/inventory/inventory_slot.h"
 #include "game/detail/inventory/inventory_slot_id.h"
@@ -140,7 +140,7 @@ entity_name_str get_bbcoded_entity_properties(const const_entity_handle id) {
 
 	entity_name_str out;
 
-	// TODO: describe catridge invariant and describe types inside
+	// TODO: describe cartridge invariant and describe types inside
 	
 	out = result.str();
 	return out.substr(0, out.length() - 1);

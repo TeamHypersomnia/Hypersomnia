@@ -28,7 +28,7 @@ namespace invariants {
 	struct missile;
 	struct sentience;
 	struct wandering_pixels;
-	struct catridge;
+	struct cartridge;
 	struct hand_fuse;
 	struct explosive;
 	struct movement;
@@ -141,7 +141,7 @@ using invariant_list_t = List<
 	invariants::sentience,
 	invariants::movement,
 	invariants::wandering_pixels,
-	invariants::catridge,
+	invariants::cartridge,
 	invariants::explosive,
 	invariants::hand_fuse,
 	invariants::crosshair,

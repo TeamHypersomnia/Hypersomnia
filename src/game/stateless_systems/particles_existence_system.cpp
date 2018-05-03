@@ -54,7 +54,7 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 		const auto shell = cosmos[g.spawned_shell];
 
 		if (shell.alive()) {
-			const auto& effect = g.catridge_definition.shell_trace_particles;
+			const auto& effect = g.cartridge_definition.shell_trace_particles;
 
 			effect.start(
 				step,
