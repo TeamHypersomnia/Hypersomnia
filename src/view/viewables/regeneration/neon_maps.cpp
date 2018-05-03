@@ -20,22 +20,6 @@ void make_neon(
 	augs::image& source
 );
 
-std::vector<std::vector<double>> generate_gauss_kernel(
-	const neon_map_input& input
-);
-
-std::vector<vec2u> hide_undesired_pixels(
-	augs::image& original_image,
-	const std::vector<rgba>& color_whitelist
-);
-
-void resize_image(
-	augs::image& image_to_resize,
-	const vec2u size
-);
-
-void cut_empty_edges(augs::image& source);
-
 void regenerate_neon_map(
 	const augs::path_type& input_image_path,
 	const augs::path_type& output_image_path,
@@ -83,47 +67,74 @@ void regenerate_neon_map(
 	}
 }
 
+void generate_gauss_kernel(
+	const neon_map_input& input,
+	std::vector<double>& result
+);
+
+void scan_and_hide_undesired_pixels(
+	augs::image& original_image,
+	const std::vector<rgba>& color_whitelist,
+	std::vector<vec2u>& target_positions
+);
+
+void resize_image(
+	augs::image& image_to_resize,
+	const vec2u size
+);
+
+void cut_empty_edges(augs::image& source);
+
+/* Thread local usage actually makes this slower, I have no idea why. */
+#define thread_local 
+
 void make_neon(
 	const neon_map_input& input,
 	augs::image& source
 ) {
-	resize_image(source, vec2u(input.radius_towards_x_axis, input.radius_towards_y_axis));
+	const auto radius = input.radius;
+	const auto rows = radius.y;
+	const auto cols = radius.x;
 
-	const auto pixel_list = hide_undesired_pixels(source, input.light_colors);
+	resize_image(source, radius);
 
-	const auto kernel = generate_gauss_kernel(input);
+	thread_local std::vector<double> kernel;
+	thread_local std::vector<vec2u> pixel_coordinates;
+	thread_local std::vector<rgba> pixels_original;
 
-	std::vector<rgba> pixel_colors;
+	pixel_coordinates.clear();
+	pixels_original.clear();
 
-	for (const auto& pixel : pixel_list) {
-		pixel_colors.push_back(source.pixel({ pixel.x, pixel.y }));
+	scan_and_hide_undesired_pixels(source, input.light_colors, pixel_coordinates);
+	generate_gauss_kernel(input, kernel);
+
+	for (const auto p : pixel_coordinates) {
+		pixels_original.emplace_back(source.pixel(p));
 	}
 
-	unsigned i = 0;
-
-	for (auto& pixel : pixel_list) {
-		rgba center_pixel = pixel_colors[i];
-		++i;
+	for (std::size_t i = 0; i < pixel_coordinates.size(); ++i) {
+		const auto coord = pixel_coordinates[i];
+		const auto center_pixel = pixels_original[i];
 
 		const auto center_pixel_rgba = rgba{ center_pixel[2], center_pixel[1], center_pixel[0], center_pixel[3] };
 
-		for (unsigned y = 0; y < kernel.size(); ++y) {
-			for (unsigned x = 0; x < kernel[y].size(); ++x) {
-				unsigned current_index_y = pixel.y + y - input.radius_towards_y_axis / 2;
+		for (unsigned y = 0; y < rows; ++y) {
+			for (unsigned x = 0; x < cols; ++x) {
+				const unsigned current_index_y = coord.y + y - radius.y / 2;
 
 				if (current_index_y >= source.get_rows()) {
 					continue;
 				}
 
-				unsigned current_index_x = pixel.x + x - input.radius_towards_x_axis / 2;
+				const unsigned current_index_x = coord.x + x - radius.x / 2;
 
 				if (current_index_x >= source.get_columns()) {
 					continue;
 				}
 
 				rgba& current_pixel = source.pixel({ current_index_x, current_index_y });
-				auto current_pixel_rgba = rgba{ current_pixel[2], current_pixel[1], current_pixel[0], current_pixel[3] };
-				auto alpha = static_cast<unsigned>(255 * kernel[y][x] * input.amplification);
+				const auto current_pixel_rgba = rgba{ current_pixel[2], current_pixel[1], current_pixel[0], current_pixel[3] };
+				auto alpha = static_cast<unsigned>(255 * kernel[y * cols + x] * input.amplification);
 				alpha = alpha > 255 ? 255 : alpha;
 
 				if (current_pixel_rgba == PIXEL_NONE && alpha) {
@@ -145,8 +156,8 @@ void make_neon(
 		}
 	}
 
-	for (std::size_t i = 0; i < pixel_list.size(); ++i) {
-		source.pixel(pixel_list[i]) = pixel_colors[i];
+	for (std::size_t i = 0; i < pixel_coordinates.size(); ++i) {
+		source.pixel(pixel_coordinates[i]) = pixels_original[i];
 	}
 
 	cut_empty_edges(source);
@@ -158,60 +169,46 @@ void make_neon(
 	}
 }
 
-std::vector<std::vector<double>> generate_gauss_kernel(const neon_map_input& input)
-{
-	const auto radius_towards_x_axis = input.radius_towards_x_axis;
-	auto radius_towards_y_axis = input.radius_towards_y_axis;
+void generate_gauss_kernel(const neon_map_input& input, std::vector<double>& result) {
+	const auto radius = input.radius;
+	const auto rows = radius.y;
+	const auto cols = radius.x;
+	const auto total_pixels = rows * cols;
 
-	if (!input.radius_towards_y_axis) {
-		radius_towards_y_axis = radius_towards_x_axis;
-	}
+	thread_local std::vector<augs::simple_pair<int, int>> index;
 
-	std::vector<std::vector<augs::simple_pair<int, int>>> index;
+	index.resize(total_pixels);
+	result.resize(total_pixels);
 
-	auto max_index_x = radius_towards_x_axis / 2;
-	auto max_index_y = radius_towards_y_axis / 2;
+	{
+		const auto max_index_x = radius.x / 2;
+		const auto max_index_y = radius.y / 2;
 
-	index.resize(radius_towards_y_axis);
-
-	for (auto& vec : index) {
-		vec.resize(radius_towards_x_axis);
-	}
-
-	for (unsigned y = 0; y < index.size(); ++y) {
-		for (unsigned x = 0; x < index[y].size(); ++x) {
-			index[y][x] = { static_cast<int>(x - max_index_x), static_cast<int>(y - max_index_y) };
+		for (unsigned y = 0; y < radius.y; ++y) {
+			for (unsigned x = 0; x < radius.x; ++x) {
+				index[y * cols + x] = { 
+					static_cast<int>(x - max_index_x),
+				   	static_cast<int>(y - max_index_y)
+				};
+			}
 		}
 	}
 
-	std::vector<std::vector<double>> result;
-	result.resize(radius_towards_y_axis);
-
-	for (auto& vec : result) {
-		vec.resize(radius_towards_x_axis);
-	}
-
-	for (unsigned y = 0; y < result.size(); ++y) {
-		for (unsigned x = 0; x < result[y].size(); ++x) {
-			result[y][x] = exp(-1 * (pow(index[y][x].first, 2) + pow(index[y][x].second, 2)) / 2 / pow(input.standard_deviation, 2)) / PI<float> / 2 / pow(input.standard_deviation, 2);
+	for (unsigned y = 0; y < rows; ++y) {
+		for (unsigned x = 0; x < cols; ++x) {
+			result[y * cols + x] = exp(-1 * (pow(index[y * cols + x].first, 2) + pow(index[y * cols + x].second, 2)) / 2 / pow(input.standard_deviation, 2)) / PI<float> / 2 / pow(input.standard_deviation, 2);
 		}
 	}
 
 	double sum = 0.f;
 
-	for (const auto& vec_2d : result) {
-		for (const auto& value : vec_2d) {
-			sum += value;
-		}
+	for (const auto& v : result) {
+		sum += v;
 	}
 
-	for (auto& vec : result) {
-		for (auto& value : vec) {
-			value /= sum;
-		}
+	for (auto& v : result) {
+		v /= sum;
 	}
-
-	return result;
 }
 
 
@@ -219,11 +216,12 @@ void resize_image(
 	augs::image& image_to_resize,
 	vec2u size
 ) {
-
 	size.x = image_to_resize.get_columns() + size.x * 2;
 	size.y = image_to_resize.get_rows() + size.y * 2;
 
-	auto copy_mat = augs::image(size);
+	thread_local augs::image copy_mat;
+
+	copy_mat.resize(size);
 
 	auto offset_x = static_cast<int>(size.x - image_to_resize.get_columns()) / 2;
 
@@ -238,8 +236,7 @@ void resize_image(
 	}
 
 	for (unsigned y = 0; y < image_to_resize.get_rows(); ++y) {
-		for (unsigned x = 0; x < image_to_resize.get_columns(); ++x)
-		{
+		for (unsigned x = 0; x < image_to_resize.get_columns(); ++x) {
 			copy_mat.pixel({ x + offset_x, y + offset_y }) = image_to_resize.pixel({ x, y });;
 		}
 	}
@@ -247,31 +244,23 @@ void resize_image(
 	image_to_resize = copy_mat;
 }
 
-std::vector<vec2u> hide_undesired_pixels(
+void scan_and_hide_undesired_pixels(
 	augs::image& original_image,
-	const std::vector<rgba>& color_whitelist
+	const std::vector<rgba>& color_whitelist,
+	std::vector<vec2u>& result
 ) {
-	std::vector<vec2u> result;
-
 	for (unsigned y = 0; y < original_image.get_rows(); ++y) {
-		for (unsigned x = 0; x < original_image.get_columns(); ++x)
-		{
-			auto& pixel = original_image.pixel({ x, y });
-			auto found = std::find_if(color_whitelist.begin(), color_whitelist.end(), [pixel](const rgba& a) {
-				return a == pixel;
-			});
+		for (unsigned x = 0; x < original_image.get_columns(); ++x) {
+			auto& current_pixel = original_image.pixel({ x, y });
 
-			if (found == color_whitelist.end())
-			{
-				pixel = PIXEL_NONE;
+			if (!found_in(color_whitelist, current_pixel)) {
+				current_pixel = PIXEL_NONE;
 			}
 			else {
-				result.push_back(vec2u{ x, y });
+				result.emplace_back(x, y);
 			}
 		}
 	}
-
-	return result;
 }
 
 void cut_empty_edges(augs::image& source) {
@@ -313,7 +302,9 @@ void cut_empty_edges(augs::image& source) {
 		return;
 	}
 
-	auto copy = augs::image(output_size);
+	thread_local augs::image copy;
+
+	copy.resize(output_size);
 
 	for (unsigned x = 0; x < copy.get_columns(); ++x) {
 		for (unsigned y = 0; y < copy.get_rows(); ++y) {

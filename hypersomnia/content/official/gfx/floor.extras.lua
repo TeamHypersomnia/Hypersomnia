@@ -5,8 +5,10 @@ return {
       light_colors = {
         "95 205 228 255"
       },
-      radius_towards_x_axis = 80,
-      radius_towards_y_axis = 80,
+      radius = {
+		  x = 80,
+		  y = 80
+	  },
       standard_deviation = 6
     }
 }

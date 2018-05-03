@@ -8,8 +8,10 @@ return {
         "0 78 255 255",
         "6 0 255 255",
       },
-      radius_towards_x_axis = 120,
-      radius_towards_y_axis = 120,
+      radius = {
+		  x = 120,
+		  y = 120
+	  },
       standard_deviation = 5
     }
 }

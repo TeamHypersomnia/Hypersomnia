@@ -42,7 +42,7 @@ std::optional<augs::path_type> image_definition_view::find_custom_neon_map_path(
 }
 
 std::optional<augs::path_type> image_definition_view::find_generated_neon_map_path() const {
-	if (def.loadables.extras.generate_neon_map) {
+	if (def.loadables.should_generate_neon_map()) {
 		return calc_generated_neon_map_path();
 	}
 
@@ -70,7 +70,7 @@ void image_definition_view::regenerate_all_needed(
 ) const {
 	const auto diffuse_path = resolved_source_path;
 
-	if (def.loadables.extras.generate_neon_map) {
+	if (def.loadables.should_generate_neon_map()) {
 		regenerate_neon_map(
 			diffuse_path,
 			find_generated_neon_map_path().value(),

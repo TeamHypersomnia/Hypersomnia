@@ -41,6 +41,10 @@ struct image_loadables {
 	bool should_generate_desaturation() const {
 		return extras.generate_desaturation;
 	}
+
+	bool should_generate_neon_map() const {
+		return extras.generate_neon_map && extras.generate_neon_map.value.valid();
+	}
 };
 
 struct image_definition {
