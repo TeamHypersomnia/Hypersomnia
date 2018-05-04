@@ -1454,7 +1454,6 @@ int work(const int argc, const char* const * const argv) try {
 
 			This also advances the audiovisual state, based on the cosmos returned by the setup.
 		*/
-
 		advance_current_setup(frame_delta, result.game_entropy, new_viewing_config);
 		
 		/*

@@ -86,7 +86,6 @@ void resize_image(
 void cut_empty_edges(augs::image& source);
 
 /* Thread local usage actually makes this slower, I have no idea why. */
-#define thread_local 
 
 void make_neon(
 	const neon_map_input& input,
@@ -98,9 +97,13 @@ void make_neon(
 
 	resize_image(source, radius);
 
-	thread_local std::vector<double> kernel;
-	thread_local std::vector<vec2u> pixel_coordinates;
-	thread_local std::vector<rgba> pixels_original;
+	thread_local std::vector<double> kernel_;
+	thread_local std::vector<vec2u> pixel_coordinates_;
+	thread_local std::vector<rgba> pixels_original_;
+
+	auto& kernel = kernel_;
+	auto& pixel_coordinates = pixel_coordinates_;
+	auto& pixels_original = pixels_original_; 
 
 	pixel_coordinates.clear();
 	pixels_original.clear();
@@ -175,7 +178,8 @@ void generate_gauss_kernel(const neon_map_input& input, std::vector<double>& res
 	const auto cols = radius.x;
 	const auto total_pixels = rows * cols;
 
-	thread_local std::vector<augs::simple_pair<int, int>> index;
+	thread_local std::vector<augs::simple_pair<int, int>> index_;
+	auto& index = index_;
 
 	index.resize(total_pixels);
 	result.resize(total_pixels);
@@ -212,6 +216,29 @@ void generate_gauss_kernel(const neon_map_input& input, std::vector<double>& res
 }
 
 
+void scan_and_hide_undesired_pixels(
+	augs::image& original_image,
+	const std::vector<rgba>& color_whitelist,
+	std::vector<vec2u>& result
+) {
+	for (unsigned y = 0; y < original_image.get_rows(); ++y) {
+		for (unsigned x = 0; x < original_image.get_columns(); ++x) {
+			auto& current_pixel = original_image.pixel({ x, y });
+
+			if (!found_in(color_whitelist, current_pixel)) {
+				current_pixel = PIXEL_NONE;
+			}
+			else {
+				result.emplace_back(x, y);
+			}
+		}
+	}
+}
+
+/* 
+	It appears that moving the result instead of copying it is faster.
+*/
+
 void resize_image(
 	augs::image& image_to_resize,
 	vec2u size
@@ -219,7 +246,7 @@ void resize_image(
 	size.x = image_to_resize.get_columns() + size.x * 2;
 	size.y = image_to_resize.get_rows() + size.y * 2;
 
-	thread_local augs::image copy_mat;
+	augs::image copy_mat;
 
 	copy_mat.resize(size);
 
@@ -241,26 +268,7 @@ void resize_image(
 		}
 	}
 
-	image_to_resize = copy_mat;
-}
-
-void scan_and_hide_undesired_pixels(
-	augs::image& original_image,
-	const std::vector<rgba>& color_whitelist,
-	std::vector<vec2u>& result
-) {
-	for (unsigned y = 0; y < original_image.get_rows(); ++y) {
-		for (unsigned x = 0; x < original_image.get_columns(); ++x) {
-			auto& current_pixel = original_image.pixel({ x, y });
-
-			if (!found_in(color_whitelist, current_pixel)) {
-				current_pixel = PIXEL_NONE;
-			}
-			else {
-				result.emplace_back(x, y);
-			}
-		}
-	}
+	image_to_resize = std::move(copy_mat);
 }
 
 void cut_empty_edges(augs::image& source) {
@@ -302,7 +310,7 @@ void cut_empty_edges(augs::image& source) {
 		return;
 	}
 
-	thread_local augs::image copy;
+	augs::image copy;
 
 	copy.resize(output_size);
 
@@ -312,5 +320,5 @@ void cut_empty_edges(augs::image& source) {
 		}
 	}
 
-	source = copy;
+	source = std::move(copy);
 }
