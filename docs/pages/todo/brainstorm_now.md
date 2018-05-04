@@ -5,8 +5,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- both neon maps and packer could be parallelized
-	- packer by having other thread perform other trial?
 - possibly rename the flavour on setting an image?
 	- if it is detected that it is yet unnamed?
 	- due to a filter, the node disappears during renaming

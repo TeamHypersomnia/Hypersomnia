@@ -14,6 +14,8 @@
 #include "augs/readwrite/byte_file.h"
 #include "augs/filesystem/directory.h"
 
+using namespace rectpack;
+
 regenerated_atlas::regenerated_atlas(regenerated_atlas_input in) {
 	const auto& settings = in.settings;
 	const auto& subjects = in.subjects;
@@ -147,29 +149,31 @@ regenerated_atlas::regenerated_atlas(regenerated_atlas_input in) {
 			}
 		}
 
-		std::vector<rect_xywhf*> input_for_packing_algorithm;
-
 		{
 			auto scope = measure_scope(in.profiler.packing);
+
+			const auto max_size = static_cast<int>(settings.packer_detail_max_atlas_size);
+			const auto rect_padding_amount = 2;
+
+#if 0
+			std::vector<rect_xywhf*> input_for_packing_algorithm;
 
 			for (auto& r : rects_for_packing_algorithm) {
 				input_for_packing_algorithm.push_back(&r);
 			}
-			std::vector<bin> packing_output;
-
-			const auto rect_padding_amount = 2;
 
 			for (auto& rr : rects_for_packing_algorithm) {
 				rr.w += rect_padding_amount;
 				rr.h += rect_padding_amount;
 			}
 
-			const bool result = pack(
-				input_for_packing_algorithm.data(), 
-				static_cast<int>(input_for_packing_algorithm.size()), 
-				static_cast<int>(settings.packer_detail_max_atlas_size),
+			const auto result_size = pack_rectangles(
+				input_for_packing_algorithm,
+				max_size,
 				true,
-				packing_output
+				[](auto){},
+				[](auto){},
+				128
 			);
 
 			for (auto& rr : rects_for_packing_algorithm) {
@@ -177,15 +181,30 @@ regenerated_atlas::regenerated_atlas(regenerated_atlas_input in) {
 				rr.h -= rect_padding_amount;
 			}
 
-			const bool textures_dont_fit_into_atlas = !result || packing_output.size() > 1;
+			atlas_image_size.set(result_size.w, result_size.h);
+#else
+			auto packing_root = rectpack::node::make_root({ max_size, max_size });
 
-			ensure(!textures_dont_fit_into_atlas);
-			ensure_eq(packing_output[0].rects.size(), input_for_packing_algorithm.size());
+			vec2i result_size;
+			
+			for (auto& rr : rects_for_packing_algorithm) {
+				rr.w += rect_padding_amount;
+				rr.h += rect_padding_amount;
 
-			atlas_image_size = {
-				static_cast<unsigned>(packing_output[0].size.w),
-				static_cast<unsigned>(packing_output[0].size.h)
-			};
+				if (const auto n = packing_root.insert(rr, true)) {
+					n->readback(rr, result_size);
+
+					rr.w -= rect_padding_amount;
+					rr.h -= rect_padding_amount;
+				}
+				else {
+					break;
+				}
+			}
+
+			atlas_image_size = static_cast<vec2u>(result_size);
+#endif
+
 		}
 
 		// translate pixels into atlas space and render the image

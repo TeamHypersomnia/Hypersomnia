@@ -5,6 +5,9 @@ permalink: todo_perf
 summary: Just a hidden scratchpad.
 ---
 
+- neon map generation could perhaps be parallelized
+	- but it's not really necessary for now
+
 - audiovisual/inferred caches and reservation
 	- if it so happens that std::unordered_map is too slow, we can always introduce constant-sized vectors/maps under STATICALLY_ALLOCATE_ENTITIES
 		- each type will specify how many to statically allocate 

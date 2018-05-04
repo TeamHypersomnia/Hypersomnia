@@ -612,7 +612,6 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 set(HYPERSOMNIA_TRIVIAL_3RDPARTY_CPPS
 	"src/3rdparty/lodepng/lodepng.cpp"
 	"src/3rdparty/polypartition/src/polypartition.cpp"
-	"src/3rdparty/rectpack2D/src/pack.cpp"
 	"src/3rdparty/imgui/imgui.cpp"
 	"src/3rdparty/imgui/imgui_draw.cpp"
 	"src/3rdparty/imgui/imgui_demo.cpp"
