@@ -5,6 +5,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- morning refactor: separate atlas profiler
+
 - possibly rename the flavour on setting an image?
 	- if it is detected that it is yet unnamed?
 	- due to a filter, the node disappears during renaming
@@ -12,11 +14,6 @@ summary: That which we are brainstorming at the moment.
 			- i guess we will still be able to do for eaches and all flav id getters even with changed state structure
 	- also when it is duplicated
 
-- perhaps optimize pack.cpp somehow?
-	- can't these nodes be linearly allocated?
-
-- enable neon on charges shells etc
-- separate atlas profiler
 - always fill new workspace with some test scene essentials?
 	- so that e.g. no image ids in common state stay invalid
 	- can make those the first in test scene images so that we can stop importing images after some point

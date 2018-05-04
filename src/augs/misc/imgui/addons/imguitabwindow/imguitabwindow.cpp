@@ -3218,7 +3218,6 @@ void TabWindow::GetDockPanelIconImageRGBA(ImVector<unsigned char>& rgba_buffer_o
     int idx;unsigned int pal;const unsigned char *pPal;unsigned char *pRGBA=(unsigned char *) &rgba_buffer_out[0];
     for (unsigned i=0,isz=w*h;i<isz;i++)    {
         idx = indices[i];
-        IM_ASSERT(idx<maxPaletteIdx);
         pal = palette[idx];
 
         pPal=(unsigned char*) &pal;

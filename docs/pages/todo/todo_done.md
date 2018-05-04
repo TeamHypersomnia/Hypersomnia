@@ -782,3 +782,7 @@ we consider whole type overrides too complex architeciturally:
 		- That is because once again we will not allow the editor to remove flavours of whom there are users!
 
 - add some warnings to clang
+- perhaps optimize pack.cpp somehow?
+	- can't these nodes be linearly allocated?
+
+- enable neon on charges shells etc
