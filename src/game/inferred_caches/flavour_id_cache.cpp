@@ -23,12 +23,12 @@ void flavour_id_cache::destroy_cache_of(const const_entity_handle h) {
 	}
 }
 
-const std::unordered_set<entity_id_base>& flavour_id_cache::detail_get_entities_by_flavour_id(const entity_flavour_id id) const {
-	thread_local std::unordered_set<entity_id_base> none;
+const std::unordered_set<entity_id_base> detail_none;
 
+const std::unordered_set<entity_id_base>& flavour_id_cache::detail_get_entities_by_flavour_id(const entity_flavour_id id) const {
 	if (const auto mapped = mapped_or_nullptr(get_entities_by_flavour_map(id), id.raw)) {
 		return *mapped;
 	}
 
-	return none;
+	return detail_none;
 }

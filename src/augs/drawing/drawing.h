@@ -8,25 +8,13 @@
 #include "augs/math/camera_cone.h"
 
 #include "augs/texture_atlas/texture_atlas_entry.h"
+#include "augs/drawing/make_sprite.h"
 #include "augs/drawing/flip.h"
 #include "augs/drawing/border.h"
 
 struct grid_render_settings;
 
 namespace augs {
-	std::array<vec2, 4> make_sprite_points(
-		const vec2 pos,
-		const vec2i size,
-		const float rotation_degrees
-	);
-
-	std::array<vertex_triangle, 2> make_sprite_triangles(
-		const texture_atlas_entry considered_texture,
-		const std::array<vec2, 4> points,
-		const rgba col = white,
-		const flip_flags = {}
-	);
-
 	struct drawer {
 		vertex_triangle_buffer& output_buffer;
 

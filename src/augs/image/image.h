@@ -98,8 +98,6 @@ namespace augs {
 		void swap_red_and_blue();
 		void resize(const vec2u image_size);
 
-		rgba& pixel(const vec2u at_coordinates);
-
 		void from_file(const path_type& path);
 		void from_png(const path_type& path);
 		void from_binary_file(const path_type& path);
@@ -109,13 +107,38 @@ namespace augs {
 
 		void save(const augs::path_type& path) const;
 		
-		vec2u get_size() const;
-		unsigned get_rows() const;
-		unsigned get_columns() const;
+		/* 
+			These are performance-critical functions,
+			so let them be inlined even in builds without link-time optimization enabled.
+		*/
 
-		bool in_bounds(const vec2u at_coordinates) const;
-		const rgba_channel* get_data() const;
-		const rgba& pixel(const vec2u at_coordinates) const;
+		const rgba_channel* get_data() const {
+			return reinterpret_cast<const rgba_channel*>(v.data());
+		}
+
+		vec2u get_size() const {
+			return size;
+		}
+
+		unsigned get_rows() const {
+			return size.y;
+		}
+
+		unsigned get_columns() const {
+			return size.x;
+		}
+
+		rgba& pixel(const vec2u pos) {
+			return v[pos.y * size.x + pos.x];
+		}
+
+		const rgba& pixel(const vec2u pos) const {
+			return v[pos.y * size.x + pos.x];
+		}
+
+		bool in_bounds(const vec2u p) const {
+			return p.x < size.x && p.y < size.y;
+		}
 
 		image& desaturate();
 	};

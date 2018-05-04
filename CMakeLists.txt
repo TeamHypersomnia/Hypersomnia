@@ -457,7 +457,6 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/augs/network/network_server.cpp"
 	"src/augs/network/enet_raii.cpp"
 	"src/augs/network/reliable_channel.cpp"
-	"src/augs/texture_atlas/texture_atlas_entry.cpp"
 	"src/augs/texture_atlas/texture_atlas.cpp"
 	"src/game/assets/animation.cpp"
 	"src/game/assets/behaviour_tree.cpp"

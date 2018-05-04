@@ -308,10 +308,6 @@ namespace augs {
 		});
 	}
 	
-	bool image::in_bounds(const vec2u p) const {
-		return p.x < size.x && p.y < size.y;
-	}
-
 	void image::swap_red_and_blue() {
 		for (auto& p : v) {
 			std::swap(p.r, p.b);
@@ -398,30 +394,6 @@ namespace augs {
 				}
 			}
 		}
-	}
-
-	const rgba_channel* image::get_data() const {
-		return reinterpret_cast<const rgba_channel*>(v.data());
-	}
-
-	rgba& image::pixel(const vec2u pos) {
-		return v[pos.y * size.x + pos.x];
-	}
-
-	const rgba& image::pixel(const vec2u pos) const {
-		return v[pos.y * size.x + pos.x];
-	}
-
-	vec2u image::get_size() const {
-		return size;
-	}
-
-	unsigned image::get_rows() const {
-		return size.y;
-	}
-
-	unsigned image::get_columns() const {
-		return size.x;
 	}
 
 	image& image::desaturate() {
