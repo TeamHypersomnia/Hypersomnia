@@ -37,7 +37,8 @@ void main()
     
     vec2 v = theTexcoord - texture_center;
     float aspect = float(textureSize(basic_texture, 0).x) / float(textureSize(basic_texture, 0).y);
-    v.y *= aspect;
+    v.y /= aspect;
+
     normalize(v);
 
     if(pixel.r > 0) {

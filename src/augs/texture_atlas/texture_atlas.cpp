@@ -198,6 +198,7 @@ regenerated_atlas::regenerated_atlas(regenerated_atlas_input in) {
 					rr.h -= rect_padding_amount;
 				}
 				else {
+					ensure(false);
 					break;
 				}
 			}
