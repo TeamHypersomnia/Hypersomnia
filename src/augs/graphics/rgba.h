@@ -1,6 +1,7 @@
 #pragma once
 #include <array>
 #include <sstream>
+#include "augs/build_settings/platform_defines.h"
 
 struct ImVec4;
 struct hsv;
@@ -142,48 +143,275 @@ inline auto to_0_255(const double c) {
 	return static_cast<rgba_channel>(c * 255);
 }
 
-extern const rgba maroon;
-extern const rgba red;
-extern const rgba orange;
-extern const rgba yellow;
-extern const rgba olive;
-extern const rgba purple;
-extern const rgba fuchsia;
-extern const rgba white;
-extern const rgba lime;
-extern const rgba green;
-extern const rgba navy;
-extern const rgba blue;
-extern const rgba aqua;
-extern const rgba teal;
-extern const rgba black;
-extern const rgba silver;
-extern const rgba gray;
+namespace rgba_detail {
+	struct rgb {
+		double r;       // percent
+		double g;       // percent
+		double b;       // percent
+	};
 
-extern const rgba ltblue;
-extern const rgba dark_green;
-extern const rgba violet;
-extern const rgba red_violet;
-extern const rgba pink;
-extern const rgba darkred;
-extern const rgba darkgray;
-extern const rgba gray1;
-extern const rgba gray2;
-extern const rgba gray3;
-extern const rgba gray4;
-extern const rgba slightly_visible_white;
-extern const rgba darkblue;
+	hsv rgb2hsv(const rgb in);
+	rgb hsv2rgb(const hsv in);
+}
 
-extern const rgba cyan;
+FORCE_INLINE hsv::operator rgba::rgb_type() const {
+	const auto res = rgba_detail::hsv2rgb({ h * 360, s, v });
+	
+	return { 
+		to_0_255(res.r), 
+		to_0_255(res.g), 
+		to_0_255(res.b) 
+	};
+}
 
-extern const rgba vsblue;
-extern const rgba vscyan;
+FORCE_INLINE rgba::rgb_type::rgb_type(
+	const rgba_channel red,
+	const rgba_channel green,
+	const rgba_channel blue
+) :
+	r(red),
+	g(green),
+	b(blue)
+{}
 
-extern const rgba vsgreen;
-extern const rgba vsdarkgreen;
+FORCE_INLINE rgba::rgb_type::rgb_type(const vec3& v) :
+	rgb_type(
+		to_0_255(v[0]),
+		to_0_255(v[1]),
+		to_0_255(v[2])
+	)
+{}
 
-extern const rgba vsyellow;
-extern const rgba vslightgray;
-extern const rgba vsdarkgray;
+FORCE_INLINE rgba::rgb_type::operator vec3() const {
+	return {
+		to_0_1(r),
+		to_0_1(g),
+		to_0_1(b)
+	};
+}
 
-extern const rgba turquoise;
+FORCE_INLINE rgba::rgba(const vec4& v) :
+	rgba(
+		to_0_255(v[0]),
+		to_0_255(v[1]),
+		to_0_255(v[2]),
+		to_0_255(v[3])
+	)
+{}
+
+FORCE_INLINE rgba::operator vec4() const {
+	return {
+		to_0_1(r),
+		to_0_1(g),
+		to_0_1(b),
+		to_0_1(a)
+	};
+}
+
+FORCE_INLINE rgba::rgba(
+	const rgba_channel red, 
+	const rgba_channel green, 
+	const rgba_channel blue, 
+	const rgba_channel alpha
+) : 
+	r(red), 
+	g(green), 
+	b(blue), 
+	a(alpha) 
+{}
+
+FORCE_INLINE rgba::rgba(
+	const rgb_type rgb,
+	const rgba_channel alpha
+) :
+	r(rgb.r),
+	g(rgb.g),
+	b(rgb.b),
+	a(alpha) 
+{}
+
+FORCE_INLINE rgba::rgba(
+	const hsv h,
+	const rgba_channel alpha
+) : rgba(rgb_type(h), alpha) 
+{}
+
+FORCE_INLINE hsv::hsv(
+	const double h, 
+	const double s, 
+	const double v
+) : 
+	h(h), 
+	s(s), 
+	v(v) 
+{}
+
+FORCE_INLINE hsv hsv::operator*(const float x) const {
+	return hsv(h * x, s * x, v * x);
+}
+
+FORCE_INLINE hsv hsv::operator+(const hsv b) const {
+	return hsv(h + b.h, s + b.s, v + b.v);
+}
+
+FORCE_INLINE void rgba::set(
+	const rgba_channel red, 
+	const rgba_channel green, 
+	const rgba_channel blue, 
+	const rgba_channel alpha
+) {
+	*this = rgba(
+		red, 
+		green, 
+		blue, 
+		alpha
+	);
+}
+
+FORCE_INLINE void rgba::set(const rgba col) {
+	*this = col;
+}
+
+FORCE_INLINE rgba& rgba::multiply_alpha(const float s) {
+	a = static_cast<rgba_channel>(s * a);
+	return *this;
+}
+
+FORCE_INLINE rgba& rgba::multiply_rgb(const float s) {
+	r = static_cast<rgba_channel>(s * r);
+	g =	static_cast<rgba_channel>(s * g);
+	b =	static_cast<rgba_channel>(s * b);
+
+	return *this;
+}
+
+FORCE_INLINE rgba rgba::operator*(const rgba s) const {
+	return rgba(
+		static_cast<rgba_channel>(to_0_1(s.r) * r),
+		static_cast<rgba_channel>(to_0_1(s.g) * g),
+		static_cast<rgba_channel>(to_0_1(s.b) * b),
+		static_cast<rgba_channel>(to_0_1(s.a) * a)
+	);
+}
+
+FORCE_INLINE rgba rgba::operator*(const float s) const {
+	return rgba(
+		static_cast<rgba_channel>(s * r),
+		static_cast<rgba_channel>(s * g),
+		static_cast<rgba_channel>(s * b),
+		static_cast<rgba_channel>(s * a)
+	);
+}
+
+FORCE_INLINE rgba rgba::operator+(const rgba s) const {
+	return rgba(
+		std::min(255u, static_cast<unsigned>(s.r) + r),
+		std::min(255u, static_cast<unsigned>(s.g) + g),
+		std::min(255u, static_cast<unsigned>(s.b) + b),
+		std::min(255u, static_cast<unsigned>(s.a) + a)
+	);
+}
+
+FORCE_INLINE rgba rgba::operator-(const rgba s) const {
+	return rgba(
+		std::max(0, static_cast<int>(r) - static_cast<int>(s.r)),
+		std::max(0, static_cast<int>(g) - static_cast<int>(s.g)),
+		std::max(0, static_cast<int>(b) - static_cast<int>(s.b)),
+		std::max(0, static_cast<int>(a) - static_cast<int>(s.a))
+	);
+}
+
+FORCE_INLINE rgba& rgba::operator*=(const rgba s) {
+	return (*this = *this * s);
+}
+
+FORCE_INLINE rgba& rgba::operator+=(const rgba s) {
+	return (*this = *this + s);
+}
+
+FORCE_INLINE bool rgba::operator==(const rgba v) const {
+	return r == v.r && g == v.g && b == v.b && a == v.a;
+}
+
+FORCE_INLINE bool rgba::operator!=(const rgba v) const {
+	return !operator==(v);
+}
+
+FORCE_INLINE hsv rgba::get_hsv() const {
+	auto res = rgba_detail::rgb2hsv({ r / 255.0, g / 255.0, b / 255.0 });
+	return{ res.h / 360.0, res.s, res.v };
+}
+
+FORCE_INLINE rgba& rgba::desaturate() {
+	const auto avg = static_cast<rgba_channel>((static_cast<unsigned>(r) + g + b) / 3u);
+	r = avg;
+	g = avg;
+	b = avg;
+	return *this;
+}
+
+FORCE_INLINE rgba_channel& rgba::operator[](const size_t index) {
+	return (&r)[index];
+}
+
+FORCE_INLINE const rgba_channel& rgba::operator[](const size_t index) const {
+	return (&r)[index];
+}
+
+FORCE_INLINE rgba::rgb_type& rgba::rgb() {
+	return *reinterpret_cast<rgb_type*>(this);
+}
+
+FORCE_INLINE const rgba::rgb_type& rgba::rgb() const {
+	return *reinterpret_cast<const rgb_type*>(this);
+}
+
+FORCE_INLINE rgba& rgba::set_hsv(const hsv hsv) {
+	rgb() = hsv;
+	return *this;
+}
+
+inline const rgba maroon(0x80, 0x00, 0x00, 0xff);
+inline const rgba red(0xff, 0x00, 0x00, 0xff);
+inline const rgba orange(0xff, 0xA5, 0x00, 0xff);
+inline const rgba yellow(0xff, 0xff, 0x00, 0xff);
+inline const rgba olive(0x80, 0x80, 0x00, 0xff);
+inline const rgba purple(0x80, 0x00, 0x80, 0xff);
+inline const rgba fuchsia(0xff, 0x00, 0xff, 0xff);
+inline const rgba white(0xff, 0xff, 0xff, 0xff);
+inline const rgba lime(0x00, 0xff, 0x00, 0xff);
+inline const rgba green(0, 255, 0, 255); //(0x00, 0x80, 0x00, 0xff);
+inline const rgba navy(0x00, 0x00, 0x80, 0xff);
+inline const rgba blue(0x00, 0x00, 0xff, 0xff);
+inline const rgba aqua(0x00, 0xff, 0xff, 0xff);
+inline const rgba teal(0x00, 0x80, 0x80, 0xff);
+inline const rgba black(0x00, 0x00, 0x00, 0xff);
+inline const rgba silver(0xc0, 0xc0, 0xc0, 0xff);
+inline const rgba gray(0x80, 0x80, 0x80, 0xff);
+
+inline const rgba ltblue(0, 122, 204, 255);
+inline const rgba dark_green(0, 144, 66, 255);
+inline const rgba pink(255, 0, 255, 255);
+inline const rgba violet(164, 68, 195, 255);
+inline const rgba red_violet(200, 68, 195, 255);
+inline const rgba darkred(122, 0, 0, 255);
+inline const rgba darkgray(30, 30, 30, 255);
+inline const rgba gray1(50, 50, 50, 255);
+inline const rgba gray2(62, 62, 62, 255);
+inline const rgba gray3(104, 104, 104, 255);
+inline const rgba gray4(180, 180, 180, 255);
+inline const rgba slightly_visible_white(255, 255, 255, 15);
+inline const rgba darkblue(6, 5, 20, 255);
+
+inline const rgba cyan(0, 255, 255, 255);
+
+inline const rgba vsgreen(87, 166, 74, 255);
+inline const rgba vsdarkgreen(0, 100, 0, 255);
+inline const rgba vscyan(78, 201, 176, 255);
+inline const rgba vsblue(86, 156, 214, 255);
+
+inline const rgba vsyellow(181, 206, 168, 255);
+inline const rgba vslightgray(220, 220, 220, 255);
+inline const rgba vsdarkgray(127, 127, 127, 255);
+
+inline const rgba turquoise(0, 146, 222, 255);
