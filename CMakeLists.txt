@@ -127,6 +127,11 @@ option(GENERATE_DEBUG_INFORMATION "Generate source-level debug information. If 0
 
 option(ENABLE_LINK_TIME_OPTIMIZATION "Some ultra extra optimizations for Release builds. Takes a lot longer to build." OFF)
 
+if (ULTRA_OPTS)
+	message("Enabling ultra optimizations.")
+	set(ENABLE_LINK_TIME_OPTIMIZATION ON)
+endif()
+
 # If this variable is nonzero, the cosmos will use a statically allocated number
 # of entities, drastically improving access performance. Might be very useful for a sever application.
 # Pros: 
