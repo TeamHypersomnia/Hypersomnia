@@ -13,6 +13,7 @@ struct atlas_profiler {
 	atlas_subjects_profiler images;
 	atlas_subjects_profiler fonts;
 
+	augs::amount_measurements<std::size_t> images_count = std::size_t(1);
 	augs::time_measurements packing = std::size_t(1);
 	augs::time_measurements saving = std::size_t(1);
 	augs::time_measurements resizing_image = std::size_t(1);

@@ -151,7 +151,7 @@ return {
       { 0x0100, 0x017F }  -- Latin Extended-A
     },
     size_in_pixels = 16,
-	add_japanese_ranges = false,
+	add_japanese_ranges = true,
     settings = {},
     source_font_path = "content/necessary/fonts/unifont.ttf"
   },

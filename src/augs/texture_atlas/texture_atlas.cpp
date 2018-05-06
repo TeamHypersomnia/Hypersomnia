@@ -155,47 +155,45 @@ regenerated_atlas::regenerated_atlas(regenerated_atlas_input in) {
 			const auto max_size = static_cast<int>(settings.packer_detail_max_atlas_size);
 			const auto rect_padding_amount = 2;
 
-#if 0
-			std::vector<rect_xywhf*> input_for_packing_algorithm;
+			in.profiler.images_count.measure(rects_for_packing_algorithm.size());
+
+			for (auto& rr : rects_for_packing_algorithm) {
+				rr.w += rect_padding_amount;
+				rr.h += rect_padding_amount;
+			}
+
+			constexpr bool allow_flip = true;
+
+			using root_type = rectpack::root_node<allow_flip, static_empty_spaces<20000>>;
+			using rect_ptr = root_type::output_rect_type*;
+
+			std::vector<rect_ptr> input_for_packing_algorithm;
 
 			for (auto& r : rects_for_packing_algorithm) {
 				input_for_packing_algorithm.push_back(&r);
 			}
+#if 1
 
-			for (auto& rr : rects_for_packing_algorithm) {
-				rr.w += rect_padding_amount;
-				rr.h += rect_padding_amount;
-			}
-
-			const auto result_size = pack_rectangles(
+			const auto result_size = find_best_packing_default<root_type>(
 				input_for_packing_algorithm,
 				max_size,
-				true,
-				[](auto){},
-				[](auto){},
+				[](auto){ return true; },
+				[](auto){ ensure(false); return false; },
 				128
 			);
 
-			for (auto& rr : rects_for_packing_algorithm) {
-				rr.w -= rect_padding_amount;
-				rr.h -= rect_padding_amount;
-			}
-
-			atlas_image_size.set(result_size.w, result_size.h);
 #else
-			auto packing_root = rectpack::node::make_root({ max_size, max_size });
+			auto packing_root = root_type({ 3500, 3500 });
 
-			vec2i result_size;
-			
-			for (auto& rr : rects_for_packing_algorithm) {
-				rr.w += rect_padding_amount;
-				rr.h += rect_padding_amount;
+			sort_range(input_for_packing_algorithm,[](const rect_ptr a, const rect_ptr b) {
+				//return std::max(a->w, a->h) > std::max(b->w, b->h);
+				return a->area() > b->area();
+				});
 
-				if (const auto n = packing_root.insert(rr, true)) {
-					n->readback(rr, result_size);
 
-					rr.w -= rect_padding_amount;
-					rr.h -= rect_padding_amount;
+			for (auto* rr : input_for_packing_algorithm) {
+				if (const auto n = packing_root.insert(*rr)) {
+					*rr = *n;
 				}
 				else {
 					ensure(false);
@@ -203,9 +201,15 @@ regenerated_atlas::regenerated_atlas(regenerated_atlas_input in) {
 				}
 			}
 
-			atlas_image_size = static_cast<vec2u>(result_size);
-#endif
+			const auto result_size = packing_root.get_rects_aabb();
 
+#endif
+			atlas_image_size = vec2u(result_size.w, result_size.h);
+
+			for (auto& rr : rects_for_packing_algorithm) {
+				rr.w -= rect_padding_amount;
+				rr.h -= rect_padding_amount;
+			}
 		}
 
 		// translate pixels into atlas space and render the image
@@ -214,6 +218,7 @@ regenerated_atlas::regenerated_atlas(regenerated_atlas_input in) {
 			auto scope = measure_scope(in.profiler.resizing_image);
 
 			output_image.resize(atlas_image_size);
+			output_image.fill({0, 0, 0, 0});
 		}
 		
 		size_t current_rect = 0u;

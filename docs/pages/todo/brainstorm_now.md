@@ -5,6 +5,12 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- thoughts about atlas
+	- we should just create separate free standing functions 
+		- separately for extracting subjects inputs for neon maps, desaturations, diffuses 
+			- from loadables map
+		- then we can concatenate them if we will
+
 - morning refactor: separate atlas profiler
 
 - possibly rename the flavour on setting an image?
