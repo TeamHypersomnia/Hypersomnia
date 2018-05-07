@@ -5,6 +5,19 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- don't dwell at rectpack2D for now.
+	- For what it's supposed to do, it is good enough for now..
+		- We'll make it pretty when we're done with Hypersomnia.
+	- firstly let's introduce the true usecase
+	- the unstaged changes can sit there really
+		- we don't often delete this folder and it's not critical
+
+- what about just resizing when there is no more space left?
+	- then iterate over all empty spaces and resize those that are touching the edge
+		- there might be none like this
+	- then we can screw iterating some orders
+	- we could then easily make it an on-line algorithm
+
 - thoughts about atlas
 	- we should just create separate free standing functions 
 		- separately for extracting subjects inputs for neon maps, desaturations, diffuses 

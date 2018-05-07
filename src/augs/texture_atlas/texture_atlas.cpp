@@ -14,7 +14,7 @@
 #include "augs/readwrite/byte_file.h"
 #include "augs/filesystem/directory.h"
 
-using namespace rectpack;
+using namespace rectpack2D;
 
 regenerated_atlas::regenerated_atlas(regenerated_atlas_input in) {
 	const auto& settings = in.settings;
@@ -108,7 +108,7 @@ regenerated_atlas::regenerated_atlas(regenerated_atlas_input in) {
 					out_entry.cached_original_size_pixels = u_size;
 
 					const auto size = vec2i(u_size);
-					rects_for_packing_algorithm.push_back({0, 0, size.x, size.y});
+					rects_for_packing_algorithm.push_back(rect_xywh(0, 0, size.x, size.y));
 				}
 				catch (augs::image_loading_error err) {
 					out_entry.cached_original_size_pixels = vec2u::zero;
@@ -139,12 +139,12 @@ regenerated_atlas::regenerated_atlas(regenerated_atlas_input in) {
 
 					out_entry.cached_original_size_pixels = g.get_size();
 
-					rects_for_packing_algorithm.push_back({
+					rects_for_packing_algorithm.push_back(rect_xywh(
 						0,
 						0,
 						static_cast<int>(g.get_size().x),
 						static_cast<int>(g.get_size().y)
-					});
+					));
 				}
 			}
 		}
@@ -164,25 +164,29 @@ regenerated_atlas::regenerated_atlas(regenerated_atlas_input in) {
 
 			constexpr bool allow_flip = true;
 
-			using root_type = rectpack::root_node<allow_flip, static_empty_spaces<20000>>;
-			using rect_ptr = root_type::output_rect_type*;
+			using root_type = rectpack2D::root_node<allow_flip>;
 
+#if 1
+			const auto result_size = find_best_packing<root_type>(
+				rects_for_packing_algorithm,
+				make_finder_input(
+					max_size,
+					1,
+					[](auto){ return true; },
+					[](auto){ ensure(false); return false; }
+				)
+				//
+			);
+
+#else
+			using rect_ptr = rect_xywhf*;
 			std::vector<rect_ptr> input_for_packing_algorithm;
 
 			for (auto& r : rects_for_packing_algorithm) {
 				input_for_packing_algorithm.push_back(&r);
 			}
-#if 1
 
-			const auto result_size = find_best_packing_default<root_type>(
-				input_for_packing_algorithm,
-				max_size,
-				[](auto){ return true; },
-				[](auto){ ensure(false); return false; },
-				128
-			);
-
-#else
+			(void)max_size;
 			auto packing_root = root_type({ 3500, 3500 });
 
 			sort_range(input_for_packing_algorithm,[](const rect_ptr a, const rect_ptr b) {
@@ -192,7 +196,7 @@ regenerated_atlas::regenerated_atlas(regenerated_atlas_input in) {
 
 
 			for (auto* rr : input_for_packing_algorithm) {
-				if (const auto n = packing_root.insert(*rr)) {
+				if (const auto n = packing_root.insert(rr->get_wh())) {
 					*rr = *n;
 				}
 				else {

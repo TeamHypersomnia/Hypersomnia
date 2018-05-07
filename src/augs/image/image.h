@@ -4,7 +4,6 @@
 
 #include "augs/pad_bytes.h"
 #include "augs/templates/exception_templates.h"
-#include "augs/templates/maybe_const.h"
 
 #include "augs/math/vec2.h"
 #include "augs/graphics/rgba.h"
