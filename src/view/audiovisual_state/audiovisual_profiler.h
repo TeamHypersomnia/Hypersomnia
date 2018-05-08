@@ -1,11 +1,10 @@
 #pragma once
 #include "augs/misc/profiler_mixin.h"
 
-class audiovisual_profiler : public augs::profiler_mixin<audiovisual_profiler> {
-public:
+struct audiovisual_profiler : public augs::profiler_mixin<audiovisual_profiler> {
 	audiovisual_profiler();
 
-	// GEN INTROSPECTOR class audiovisual_profiler
+	// GEN INTROSPECTOR struct audiovisual_profiler
 	augs::time_measurements advance;
 	augs::time_measurements interpolation;
 	augs::time_measurements integrate_particles;

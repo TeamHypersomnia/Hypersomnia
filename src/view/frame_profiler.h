@@ -1,11 +1,10 @@
 #pragma once
 #include "augs/misc/profiler_mixin.h"
 
-class frame_profiler : public augs::profiler_mixin<frame_profiler> {
-public:
+struct frame_profiler : public augs::profiler_mixin<frame_profiler> {
 	frame_profiler();
 
-	// GEN INTROSPECTOR class frame_profiler
+	// GEN INTROSPECTOR struct frame_profiler
 	augs::time_measurements total;
 	augs::amount_measurements<std::size_t> num_triangles;
 

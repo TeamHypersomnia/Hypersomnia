@@ -18,6 +18,7 @@ void draw_debug_details(
 	const vec2i screen_size,
 	const const_entity_handle viewed_character,
 	const frame_profiler& frame_performance,
+	const atlas_profiler& atlas_performance,
 	const session_profiler& session_performance,
 	const audiovisual_profiler& audiovisual_performance
 ) {
@@ -87,6 +88,8 @@ void draw_debug_details(
 	total_details += { session_performance.summary(), text_style };
 	total_details += { "Frame\n", category_style };
 	total_details += { frame_performance.summary(), text_style };
+	total_details += { "Atlases\n", category_style };
+	total_details += { atlas_performance.summary(), text_style };
 	total_details += { "Audiovisual\n", category_style };
 	total_details += { audiovisual_performance.summary(), text_style };
 	total_details += { "Cosmos\n", category_style };

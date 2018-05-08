@@ -5,12 +5,6 @@
 
 session_profiler::session_profiler() {
 	setup_names_of_measurements();
-
-	atlas.fonts.loading.title = "Loading fonts";
-	atlas.fonts.blitting.title = "Blitting fonts";
-
-	atlas.images.loading.title = "Loading images";
-	atlas.images.blitting.title = "Blitting images";
 }
 
 network_profiler::network_profiler() {

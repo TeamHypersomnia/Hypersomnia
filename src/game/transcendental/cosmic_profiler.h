@@ -1,11 +1,10 @@
 #pragma once
 #include "augs/misc/profiler_mixin.h"
 
-class cosmic_profiler : public augs::profiler_mixin<cosmic_profiler> {
-public:
+struct cosmic_profiler : public augs::profiler_mixin<cosmic_profiler> {
 	cosmic_profiler();
 
-	// GEN INTROSPECTOR class cosmic_profiler
+	// GEN INTROSPECTOR struct cosmic_profiler
 	augs::time_measurements reinferring_all_entities = 1;
 
 	augs::amount_measurements<std::size_t> raycasts;

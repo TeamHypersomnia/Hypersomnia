@@ -24,7 +24,7 @@
 
 class cosmos;
 struct visible_entities;
-class session_profiler;
+struct session_profiler;
 
 struct audiovisual_post_solve_input {
 	const particle_effects_map& particle_effects;
@@ -51,7 +51,7 @@ struct audiovisual_state {
 	aabb_highlighter world_hover_highlighter;
 	all_audiovisual_systems systems;
 
-	audiovisual_profiler profiler;
+	audiovisual_profiler performance;
 	
 	template <class T>
 	auto& get() {

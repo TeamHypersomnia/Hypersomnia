@@ -302,7 +302,8 @@ int work(const int argc, const char* const * const argv) try {
 	static game_gui_system game_gui;
 	static bool game_gui_mode = false;
 
-	static session_profiler profiler;
+	static session_profiler performance;
+	static atlas_profiler atlas_performance;
 	static frame_profiler frame_performance;
 
 	static auto load_all = [](const all_viewables_defs& new_defs) {
@@ -312,7 +313,7 @@ int work(const int argc, const char* const * const argv) try {
 			bool new_atlas_required = false;
 
 			{
-				auto scope = measure_scope(profiler.reloading_images);
+				auto scope = measure_scope(performance.reloading_images);
 
 				if (necessary_images_in_atlas.empty()) {
 					new_atlas_required = true;
@@ -382,8 +383,8 @@ int work(const int argc, const char* const * const argv) try {
 					images_in_atlas,
 					necessary_images_in_atlas,
 					get_gui_font(),
-					profiler.atlas,
-					profiler.atlas_upload_to_gpu
+					atlas_performance,
+					performance.atlas_upload_to_gpu
 				}));
 
 				loaded_gui_font = config.gui_font;
@@ -393,7 +394,7 @@ int work(const int argc, const char* const * const argv) try {
 		/* Sounds pass */
 
 		{
-			auto scope = measure_scope(profiler.reloading_sounds);
+			auto scope = measure_scope(performance.reloading_sounds);
 
 			auto make_sound_loading_input = [&](const sound_definition& def) {
 				const auto def_view = sound_definition_view(get_unofficial_content_dir(), def);
@@ -442,7 +443,7 @@ int work(const int argc, const char* const * const argv) try {
 			});
 		}
 
-		auto scope = measure_scope(profiler.viewables_readback);
+		auto scope = measure_scope(performance.viewables_readback);
 
 		/* Done, overwrite */
 		currently_loaded_defs = new_defs;
@@ -740,7 +741,7 @@ int work(const int argc, const char* const * const argv) try {
 		auto& interp = audiovisuals.get<interpolation_system>();
 
 		{
-			auto scope = measure_scope(audiovisuals.profiler.interpolation);
+			auto scope = measure_scope(audiovisuals.performance.interpolation);
 
 			interp.integrate_interpolated_transforms(
 				viewing_config.interpolation, 
@@ -759,14 +760,14 @@ int work(const int argc, const char* const * const argv) try {
 		);
 
 		{
-			auto scope = measure_scope(profiler.camera_visibility_query);
+			auto scope = measure_scope(performance.camera_visibility_query);
 
 			auto queried_camera = get_camera();
 			queried_camera.zoom /= viewing_config.session.camera_query_aabb_mult;
 
 			all_visible.reacquire_all_and_sort({ viewed_character.get_cosmos(), queried_camera, screen_size, false });
 
-			profiler.num_visible_entities.measure(all_visible.all.size());
+			performance.num_visible_entities.measure(all_visible.all.size());
 		}
 
 		audiovisuals.advance({
@@ -921,7 +922,7 @@ int work(const int argc, const char* const * const argv) try {
 	LOG("Entered the main loop.");
 
 	while (!should_quit) {
-		auto scope = measure_scope(profiler.fps);
+		auto scope = measure_scope(performance.fps);
 		
 #if PLATFORM_UNIX
 		if (signal_status != 0) {
@@ -991,7 +992,7 @@ int work(const int argc, const char* const * const argv) try {
 			;
 
 			{
-				auto scope = measure_scope(profiler.local_entropy);
+				auto scope = measure_scope(performance.local_entropy);
 				window.collect_entropy(new_window_entropy);
 			}
 
@@ -1792,8 +1793,9 @@ int work(const int argc, const char* const * const argv) try {
 				screen_size,
 				viewed_character,
 				frame_performance,
-				profiler,
-				audiovisuals.profiler
+				atlas_performance,
+				performance,
+				audiovisuals.performance
 			);
 		}
 

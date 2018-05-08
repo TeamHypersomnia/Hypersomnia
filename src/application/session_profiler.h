@@ -2,11 +2,10 @@
 #include "augs/misc/profiler_mixin.h"
 #include "augs/texture_atlas/texture_atlas_profiler.h"
 
-class session_profiler : public augs::profiler_mixin<session_profiler> {
-public:
+struct session_profiler : public augs::profiler_mixin<session_profiler> {
 	session_profiler();
 
-	// GEN INTROSPECTOR class session_profiler
+	// GEN INTROSPECTOR struct session_profiler
 	augs::time_measurements fps;
 	augs::time_measurements local_entropy;
 
@@ -15,7 +14,6 @@ public:
 
 	augs::time_measurements viewables_readback;
 
-	atlas_profiler atlas;
 	augs::time_measurements atlas_upload_to_gpu = std::size_t(1);
 
 	augs::time_measurements determining_viewables_to_preload;
@@ -24,11 +22,10 @@ public:
 	// END GEN INTROSPECTOR
 };
 
-class network_profiler : public augs::profiler_mixin<network_profiler> {
-public:
+struct network_profiler : public augs::profiler_mixin<network_profiler> {
 	network_profiler();
 
-	// GEN INTROSPECTOR class network_profiler
+	// GEN INTROSPECTOR struct network_profiler
 	augs::time_measurements unpack_remote_steps;
 	augs::time_measurements sending_commands_and_predict;
 	augs::time_measurements sending_packets;

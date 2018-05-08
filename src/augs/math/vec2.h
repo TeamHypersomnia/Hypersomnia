@@ -652,60 +652,25 @@ struct basic_vec2 {
 	basic_vec2& operator*=(const basic_vec2& p) { x *= p.x; y *= p.y; return *this; }
 	basic_vec2& operator/=(const basic_vec2& p) { x /= p.x; y /= p.y; return *this; }
 
-	basic_vec2& operator-=(const real64 d) { x -= d; y -= d; return *this; }
-	basic_vec2& operator+=(const real64 d) { x += d; y += d; return *this; }
-	basic_vec2& operator*=(const real64 d) { x *= d; y *= d; return *this; }
-	basic_vec2& operator/=(const real64 d) { x /= d; y /= d; return *this; }
-
-	basic_vec2& operator-=(const real32 d) { x -= d; y -= d; return *this; }
-	basic_vec2& operator+=(const real32 d) { x += d; y += d; return *this; }
-	basic_vec2& operator*=(const real32 d) { x *= d; y *= d; return *this; }
-	basic_vec2& operator/=(const real32 d) { x /= d; y /= d; return *this; }
-
-	basic_vec2& operator-=(const int d) { x -= d; y -= d; return *this; }
-	basic_vec2& operator+=(const int d) { x += d; y += d; return *this; }
-	basic_vec2& operator*=(const int d) { x *= d; y *= d; return *this; }
-	basic_vec2& operator/=(const int d) { x /= d; y /= d; return *this; }
-
-	basic_vec2& operator-=(const unsigned d) { x -= d; y -= d; return *this; }
-	basic_vec2& operator+=(const unsigned d) { x += d; y += d; return *this; }
-	basic_vec2& operator*=(const unsigned d) { x *= d; y *= d; return *this; }
-	basic_vec2& operator/=(const unsigned d) { x /= d; y /= d; return *this; }
+	template <class S, class = std::enable_if_t<std::is_arithmetic_v<S>>>
+	basic_vec2& operator-=(const S d) { x -= d; y -= d; return *this; }
+	template <class S, class = std::enable_if_t<std::is_arithmetic_v<S>>>
+	basic_vec2& operator+=(const S d) { x += d; y += d; return *this; }
+	template <class S, class = std::enable_if_t<std::is_arithmetic_v<S>>>
+	basic_vec2& operator*=(const S d) { x *= d; y *= d; return *this; }
+	template <class S, class = std::enable_if_t<std::is_arithmetic_v<S>>>
+	basic_vec2& operator/=(const S d) { x /= d; y /= d; return *this; }
 };
 
-template <class type> inline basic_vec2<type> operator-(const basic_vec2<type> t, const real64 d) { return { t.x - d, t.y - d }; }
-template <class type> inline basic_vec2<type> operator+(const basic_vec2<type> t, const real64 d) { return { t.x + d, t.y + d }; }
-template <class type> inline basic_vec2<type> operator*(const basic_vec2<type> t, const real64 d) { return { t.x * d, t.y * d }; }
-template <class type> inline basic_vec2<type> operator/(const basic_vec2<type> t, const real64 d) { return { t.x / d, t.y / d }; }
-template <class type> inline basic_vec2<type> operator-(const basic_vec2<type> t, const real32 d) { return { t.x - d, t.y - d }; }
-template <class type> inline basic_vec2<type> operator+(const basic_vec2<type> t, const real32 d) { return { t.x + d, t.y + d }; }
-template <class type> inline basic_vec2<type> operator*(const basic_vec2<type> t, const real32 d) { return { t.x * d, t.y * d }; }
-template <class type> inline basic_vec2<type> operator/(const basic_vec2<type> t, const real32 d) { return { t.x / d, t.y / d }; }
-template <class type> inline basic_vec2<type> operator-(const basic_vec2<type> t, const int d) { return { t.x - d, t.y - d }; }
-template <class type> inline basic_vec2<type> operator+(const basic_vec2<type> t, const int d) { return { t.x + d, t.y + d }; }
-template <class type> inline basic_vec2<type> operator*(const basic_vec2<type> t, const int d) { return { t.x * d, t.y * d }; }
-template <class type> inline basic_vec2<type> operator/(const basic_vec2<type> t, const int d) { return { t.x / d, t.y / d }; }
-template <class type> inline basic_vec2<type> operator-(const basic_vec2<type> t, const unsigned d) { return { t.x - d, t.y - d }; }
-template <class type> inline basic_vec2<type> operator+(const basic_vec2<type> t, const unsigned d) { return { t.x + d, t.y + d }; }
-template <class type> inline basic_vec2<type> operator*(const basic_vec2<type> t, const unsigned d) { return { t.x * d, t.y * d }; }
-template <class type> inline basic_vec2<type> operator/(const basic_vec2<type> t, const unsigned d) { return { t.x / d, t.y / d}; }
+template <class type, class S, class = std::enable_if_t<std::is_arithmetic_v<S>>> inline basic_vec2<type> operator-(const basic_vec2<type> t, const S d) { return { t.x - d, t.y - d }; }
+template <class type, class S, class = std::enable_if_t<std::is_arithmetic_v<S>>> inline basic_vec2<type> operator+(const basic_vec2<type> t, const S d) { return { t.x + d, t.y + d }; }
+template <class type, class S, class = std::enable_if_t<std::is_arithmetic_v<S>>> inline basic_vec2<type> operator*(const basic_vec2<type> t, const S d) { return { t.x * d, t.y * d }; }
+template <class type, class S, class = std::enable_if_t<std::is_arithmetic_v<S>>> inline basic_vec2<type> operator/(const basic_vec2<type> t, const S d) { return { t.x / d, t.y / d }; }
 
-template <class type> inline basic_vec2<type> operator-(const real64 d, const basic_vec2<type> t) { return { t.x - d, t.y - d }; }
-template <class type> inline basic_vec2<type> operator+(const real64 d, const basic_vec2<type> t) { return { t.x + d, t.y + d }; }
-template <class type> inline basic_vec2<type> operator*(const real64 d, const basic_vec2<type> t) { return { t.x * d, t.y * d }; }
-template <class type> inline basic_vec2<type> operator/(const real64 d, const basic_vec2<type> t) { return { t.x / d, t.y / d }; }
-template <class type> inline basic_vec2<type> operator-(const real32 d, const basic_vec2<type> t) { return { t.x - d, t.y - d }; }
-template <class type> inline basic_vec2<type> operator+(const real32 d, const basic_vec2<type> t) { return { t.x + d, t.y + d }; }
-template <class type> inline basic_vec2<type> operator*(const real32 d, const basic_vec2<type> t) { return { t.x * d, t.y * d }; }
-template <class type> inline basic_vec2<type> operator/(const real32 d, const basic_vec2<type> t) { return { t.x / d, t.y / d }; }
-template <class type> inline basic_vec2<type> operator-(const int d, const basic_vec2<type> t) { return { t.x - d, t.y - d }; }
-template <class type> inline basic_vec2<type> operator+(const int d, const basic_vec2<type> t) { return { t.x + d, t.y + d }; }
-template <class type> inline basic_vec2<type> operator*(const int d, const basic_vec2<type> t) { return { t.x * d, t.y * d }; }
-template <class type> inline basic_vec2<type> operator/(const int d, const basic_vec2<type> t) { return { t.x / d, t.y / d }; }
-template <class type> inline basic_vec2<type> operator-(const unsigned d, const basic_vec2<type> t) { return { t.x - d, t.y - d }; }
-template <class type> inline basic_vec2<type> operator+(const unsigned d, const basic_vec2<type> t) { return { t.x + d, t.y + d }; }
-template <class type> inline basic_vec2<type> operator*(const unsigned d, const basic_vec2<type> t) { return { t.x * d, t.y * d }; }
-template <class type> inline basic_vec2<type> operator/(const unsigned d, const basic_vec2<type> t) { return { t.x / d, t.y / d }; }
+template <class S, class type, class = std::enable_if_t<std::is_arithmetic_v<S>>> inline basic_vec2<type> operator-(const S d, const basic_vec2<type> t) { return { t.x - d, t.y - d }; }
+template <class S, class type, class = std::enable_if_t<std::is_arithmetic_v<S>>> inline basic_vec2<type> operator+(const S d, const basic_vec2<type> t) { return { t.x + d, t.y + d }; }
+template <class S, class type, class = std::enable_if_t<std::is_arithmetic_v<S>>> inline basic_vec2<type> operator*(const S d, const basic_vec2<type> t) { return { t.x * d, t.y * d }; }
+template <class S, class type, class = std::enable_if_t<std::is_arithmetic_v<S>>> inline basic_vec2<type> operator/(const S d, const basic_vec2<type> t) { return { t.x / d, t.y / d }; }
 
 template <class type>
 basic_vec2<type> basic_vec2<type>::zero = { static_cast<type>(0), static_cast<type>(0) };

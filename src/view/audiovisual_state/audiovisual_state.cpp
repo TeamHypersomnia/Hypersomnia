@@ -32,7 +32,7 @@ void audiovisual_state::reserve_caches_for_entities(const std::size_t n) {
 }
 
 void audiovisual_state::advance(const audiovisual_advance_input input) {
-	auto scope = measure_scope(profiler.advance);
+	auto scope = measure_scope(performance.advance);
 
 	const auto screen_size = input.eye.screen_size;
 	const auto viewed_character = input.eye.viewed_character;
@@ -57,7 +57,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 
 	{
 		{
-			auto scope = measure_scope(profiler.integrate_particles);
+			auto scope = measure_scope(performance.integrate_particles);
 
 			particles.integrate_all_particles(
 				cosm,
@@ -68,7 +68,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 		}
 
 		{
-			auto scope = measure_scope(profiler.advance_particle_streams);
+			auto scope = measure_scope(performance.advance_particle_streams);
 
 			particles.advance_visible_streams(
 				cone,
@@ -85,7 +85,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 	get<light_system>().advance_attenuation_variations(cosm, dt);
 
 	{
-		auto scope = measure_scope(profiler.wandering_pixels);
+		auto scope = measure_scope(performance.wandering_pixels);
 
 		get<wandering_pixels_system>().advance_for(
 			input.all_visible,
@@ -100,7 +100,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 	auto& sounds = get<sound_system>();
 
 	if (viewed_character) {
-		auto scope = measure_scope(profiler.sound_logic);
+		auto scope = measure_scope(performance.sound_logic);
 
 		auto ear = input.eye;
 		ear.cone.transform = viewed_character.get_viewing_transform(interp);
@@ -135,7 +135,7 @@ void audiovisual_state::spread_past_infection(const const_logic_step step) {
 }
 
 void audiovisual_state::standard_post_solve(const const_logic_step step, const audiovisual_post_solve_input input) {
-	auto scope = measure_scope(profiler.post_solve);
+	auto scope = measure_scope(performance.post_solve);
 
 	const auto& cosmos = step.get_cosmos();
 	//reserve_caches_for_entities(cosmos.get_solvable().get_entity_pool().capacity());
@@ -420,7 +420,7 @@ void audiovisual_state::standard_post_solve(const const_logic_step step, const a
 }
 
 void audiovisual_state::standard_post_cleanup(const const_logic_step step) {
-	auto scope = measure_scope(profiler.post_cleanup);
+	auto scope = measure_scope(performance.post_cleanup);
 
 	if (step.any_deletion_occured()) {
 		clear_dead_entities(step.get_cosmos());

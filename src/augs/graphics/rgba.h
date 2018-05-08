@@ -121,9 +121,9 @@ struct rgba {
 };
 
 struct hsv {
-	double h;       // angle in degrees
-	double s;       // percent
-	double v;       // percent
+	double h;       // 0-1
+	double s;       // 0-1
+	double v;       // 0-1
 	hsv(double = 0.0, double = 0.0, double = 0.0);
 	hsv operator*(float) const;
 	hsv operator+(hsv b) const;

@@ -23,7 +23,7 @@ namespace augs {
 	}
 }
 
-class frame_profiler;
+struct frame_profiler;
 
 struct light_system_input {
 	augs::renderer& renderer;

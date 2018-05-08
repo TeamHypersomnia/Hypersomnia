@@ -610,6 +610,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/augs/filesystem/path.cpp"
 	"src/view/viewables/image_meta.cpp"
 	"src/application/setups/editor/commands/flavour_commands.cpp"
+	"src/augs/texture_atlas/texture_atlas_profiler.cpp"
 )
 
 # The rest of 3rdparty libraries with minimal amount of source files.

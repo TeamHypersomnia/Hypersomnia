@@ -1,7 +1,7 @@
 #include <string>
 #include <sstream>
 
-#include "3rdparty/rectpack2D/src/pack.h"
+#include "3rdparty/rectpack2D/src/finders_interface.h"
 
 #include "augs/ensure.h"
 #include "augs/misc/measurements.h"
@@ -13,6 +13,12 @@
 
 #include "augs/readwrite/byte_file.h"
 #include "augs/filesystem/directory.h"
+
+#define DEBUG_FILL_IMGS_WITH_COLOR 0
+
+#if DEBUG_FILL_IMGS_WITH_COLOR
+#include "augs/misc/randomization.h"
+#endif
 
 using namespace rectpack2D;
 
@@ -86,10 +92,14 @@ regenerated_atlas::regenerated_atlas(regenerated_atlas_input in) {
 		std::unordered_map<source_image_identifier, augs::image> loaded_images;
 		std::unordered_map<source_font_identifier, augs::font> loaded_fonts;
 
-		std::vector<rect_xywhf> rects_for_packing_algorithm;
+		std::vector<rect_xywhf> rects_for_packer;
+
+#if DEBUG_FILL_IMGS_WITH_COLOR
+		thread_local randomization rng;
+#endif
 
 		{
-			auto scope = measure_scope(in.profiler.images.loading);
+			auto scope = measure_scope(in.profiler.loading_images);
 
 			for (const auto& input_img_id : subjects.images) {
 				auto& out_entry = baked_images[input_img_id];
@@ -102,13 +112,17 @@ regenerated_atlas::regenerated_atlas(regenerated_atlas_input in) {
 						ensure(is_img_unique);
 					}
 
-					const auto& img = (*it.first).second;
+					auto& img = (*it.first).second;
+
+#if DEBUG_FILL_IMGS_WITH_COLOR
+					img.fill(rgba().set_hsv({ rng.randval(0.0f, 1.0f), rng.randval(0.3f, 1.0f), rng.randval(0.3f, 1.0f) }));
+#endif
 
 					const auto u_size = img.get_size();
 					out_entry.cached_original_size_pixels = u_size;
 
 					const auto size = vec2i(u_size);
-					rects_for_packing_algorithm.push_back(rect_xywh(0, 0, size.x, size.y));
+					rects_for_packer.push_back(rect_xywh(0, 0, size.x, size.y));
 				}
 				catch (augs::image_loading_error err) {
 					out_entry.cached_original_size_pixels = vec2u::zero;
@@ -117,7 +131,7 @@ regenerated_atlas::regenerated_atlas(regenerated_atlas_input in) {
 		}
 
 		{
-			auto scope = measure_scope(in.profiler.fonts.loading);
+			auto scope = measure_scope(in.profiler.loading_fonts);
 
 			for (const auto& input_fnt_id : subjects.fonts) {
 				const auto it = loaded_fonts.try_emplace(input_fnt_id, input_fnt_id);
@@ -139,13 +153,19 @@ regenerated_atlas::regenerated_atlas(regenerated_atlas_input in) {
 
 					out_entry.cached_original_size_pixels = g.get_size();
 
-					rects_for_packing_algorithm.push_back(rect_xywh(
+					rects_for_packer.push_back(rect_xywh(
 						0,
 						0,
 						static_cast<int>(g.get_size().x),
 						static_cast<int>(g.get_size().y)
 					));
 				}
+
+#if DEBUG_FILL_IMGS_WITH_COLOR
+				for (auto& img : (*it.first).second.glyph_bitmaps) {
+					img.fill(rgba().set_hsv({ rng.randval(0.0f, 1.0f), rng.randval(0.3f, 1.0f), rng.randval(0.3f, 1.0f) }));
+				}
+#endif
 			}
 		}
 
@@ -153,49 +173,54 @@ regenerated_atlas::regenerated_atlas(regenerated_atlas_input in) {
 			auto scope = measure_scope(in.profiler.packing);
 
 			const auto max_size = static_cast<int>(settings.packer_detail_max_atlas_size);
-			const auto rect_padding_amount = 2;
+			const auto rect_padding_amount = 0;
 
-			in.profiler.images_count.measure(rects_for_packing_algorithm.size());
+			in.profiler.subjects_count.measure(rects_for_packer.size());
 
-			for (auto& rr : rects_for_packing_algorithm) {
+			for (auto& rr : rects_for_packer) {
 				rr.w += rect_padding_amount;
 				rr.h += rect_padding_amount;
 			}
 
 			constexpr bool allow_flip = true;
 
-			using root_type = rectpack2D::root_node<allow_flip>;
+			using spaces_type = rectpack2D::empty_spaces<allow_flip>;
+			using rect_ptr = rect_xywhf*;
+
+			auto pathology_sort = [](const rect_ptr a, const rect_ptr b) {
+				return a->get_wh().pathological_mult() > b->get_wh().pathological_mult();
+			};
 
 #if 1
-			const auto result_size = find_best_packing<root_type>(
-				rects_for_packing_algorithm,
+			const auto result_size = find_best_packing<spaces_type>(
+				rects_for_packer,
 				make_finder_input(
 					max_size,
 					1,
 					[](auto){ return true; },
 					[](auto){ ensure(false); return false; }
 				)
-				//
 			);
+			(void)pathology_sort;
 
 #else
-			using rect_ptr = rect_xywhf*;
-			std::vector<rect_ptr> input_for_packing_algorithm;
+			std::vector<rect_ptr> input_for_packer;
 
-			for (auto& r : rects_for_packing_algorithm) {
-				input_for_packing_algorithm.push_back(&r);
+			for (auto& r : rects_for_packer) {
+				input_for_packer.push_back(&r);
 			}
 
 			(void)max_size;
-			auto packing_root = root_type({ 3500, 3500 });
+			(void)pathology_sort;
+			auto packing_root = spaces_type({ 2432, 2432 });
 
-			sort_range(input_for_packing_algorithm,[](const rect_ptr a, const rect_ptr b) {
+			sort_range(input_for_packer,[](const rect_ptr a, const rect_ptr b) {
 				//return std::max(a->w, a->h) > std::max(b->w, b->h);
-				return a->area() > b->area();
+				return a->get_wh().pathological_mult() > b->get_wh().pathological_mult();
 				});
 
 
-			for (auto* rr : input_for_packing_algorithm) {
+			for (auto* rr : input_for_packer) {
 				if (const auto n = packing_root.insert(rr->get_wh())) {
 					*rr = *n;
 				}
@@ -210,10 +235,22 @@ regenerated_atlas::regenerated_atlas(regenerated_atlas_input in) {
 #endif
 			atlas_image_size = vec2u(result_size.w, result_size.h);
 
-			for (auto& rr : rects_for_packing_algorithm) {
+			std::size_t total_used_space = 0;
+
+			for (auto& rr : rects_for_packer) {
+				total_used_space += rr.area();
+			}
+
+			for (auto& rr : rects_for_packer) {
 				rr.w -= rect_padding_amount;
 				rr.h -= rect_padding_amount;
 			}
+
+			in.profiler.atlas_size.measure(atlas_image_size);
+			const auto wasted_space = atlas_image_size.area() - total_used_space;
+			in.profiler.wasted_space.measure(wasted_space);
+			in.profiler.wasted_space_percent.measure(100 * double(wasted_space) / atlas_image_size.area());
+			//in.profiler.atlas_width.measure(atlas_image_size.x);
 		}
 
 		// translate pixels into atlas space and render the image
@@ -222,16 +259,21 @@ regenerated_atlas::regenerated_atlas(regenerated_atlas_input in) {
 			auto scope = measure_scope(in.profiler.resizing_image);
 
 			output_image.resize(atlas_image_size);
+
+#if DEBUG_FILL_IMGS_WITH_COLOR
+			output_image.fill({0, 0, 0, 255});
+#else
 			output_image.fill({0, 0, 0, 0});
+#endif
 		}
 		
 		size_t current_rect = 0u;
 
 		{
-			auto scope = measure_scope(in.profiler.images.blitting);
+			auto scope = measure_scope(in.profiler.blitting_images);
 
 			for (const auto& input_img_id : subjects.images) {
-				const auto packed_rect = rects_for_packing_algorithm[current_rect];
+				const auto packed_rect = rects_for_packer[current_rect];
 
 				{
 					auto& output_entry = baked_images[input_img_id];
@@ -269,13 +311,13 @@ regenerated_atlas::regenerated_atlas(regenerated_atlas_input in) {
 		}
 
 		{
-			auto scope = measure_scope(in.profiler.fonts.blitting);
+			auto scope = measure_scope(in.profiler.blitting_fonts);
 
 			for (auto& input_font_id : subjects.fonts) {
 				auto& output_font = stored_baked_fonts[input_font_id];
 
 				for (size_t glyph_index = 0; glyph_index < output_font.glyphs_in_atlas.size(); ++glyph_index) {
-					const auto& packed_rect = rects_for_packing_algorithm[current_rect];
+					const auto& packed_rect = rects_for_packer[current_rect];
 
 					auto& g = output_font.glyphs_in_atlas[glyph_index];
 

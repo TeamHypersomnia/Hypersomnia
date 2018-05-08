@@ -1,10 +1,11 @@
 #include "augs/math/declare_math.h"
 #include "game/transcendental/entity_handle_declaration.h"
 
-class session_profiler;
-class cosmic_profiler;
-class audiovisual_profiler;
-class frame_profiler;
+struct session_profiler;
+struct cosmic_profiler;
+struct audiovisual_profiler;
+struct frame_profiler;
+struct atlas_profiler;
 
 namespace augs {
 	struct drawer;
@@ -17,6 +18,7 @@ void draw_debug_details(
 	const vec2i screen_size,
 	const const_entity_handle viewed_character,
 	const frame_profiler& frame_performance,
+	const atlas_profiler& atlas_performance,
 	const session_profiler& session_performance,
 	const audiovisual_profiler& audiovisual_performance
 );
