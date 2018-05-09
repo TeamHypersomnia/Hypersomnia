@@ -21,6 +21,8 @@ summary: That which we are brainstorming at the moment.
 			- Problem: to acquire GL_MAX_TEXTURE_SIZE, we must be on the GL context
 				- We'll just store the int on init. The delay won't matter that much.
 			- (In logic thread) acquire all assets in the neighborhood of the camera
+			- (In logic thread) send a copy of loadables definitions for the thread
+				- Actually the argument may just be a copy
 
 			- (Diffuse thread) load images and determine best possible packing for diffuses + rest
 				- Blit resultant images to a larger one

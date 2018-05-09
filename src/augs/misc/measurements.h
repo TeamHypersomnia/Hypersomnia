@@ -125,11 +125,10 @@ namespace augs {
 			}
 		}
 
-		using base::measure;
-
 	public:
 		using base::operator<;
 		using base::base;
+		using base::measure;
 
 		void start() {
 			tm.reset();
@@ -156,4 +155,9 @@ namespace augs {
 inline auto measure_scope(augs::time_measurements& m) {
 	m.start();
 	return augs::scope_guard([&m]() { m.stop(); });
+}
+
+inline auto add_scope_duration(double& into) {
+	augs::timer tm;
+	return augs::scope_guard([tm, &into](){ into += tm.get<std::chrono::seconds>(); });
 }
