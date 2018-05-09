@@ -7,11 +7,15 @@ struct atlas_profiler : public augs::profiler_mixin<atlas_profiler> {
 	atlas_profiler();
 
 	// GEN INTROSPECTOR struct atlas_profiler
-	augs::time_measurements loading_images;
-	augs::time_measurements loading_fonts;
+	augs::time_measurements whole_regeneration = std::size_t(1);
+	augs::time_measurements gathering_subjects = std::size_t(1);
+	augs::time_measurements unpacking_results = std::size_t(1);
 
-	augs::time_measurements blitting_images;
-	augs::time_measurements blitting_fonts;
+	augs::time_measurements loading_images = std::size_t(1);
+	augs::time_measurements loading_fonts = std::size_t(1);
+
+	augs::time_measurements blitting_images = std::size_t(1);
+	augs::time_measurements blitting_fonts = std::size_t(1);
 
 	augs::amount_measurements<vec2u> atlas_size = std::size_t(1);
 	augs::amount_measurements<unsigned> atlas_height = std::size_t(1);

@@ -167,7 +167,7 @@ void make_neon(
 
 	for (unsigned y = 0; y < source.get_rows(); ++y) {
 		for (unsigned x = 0; x < source.get_columns(); ++x) {
-			source.pixel({ x, y }).a = static_cast<rgba_channel>(source.pixel({ x, y }).a * input.alpha_multiplier);
+			source.pixel({ x, y }).a = std::min(rgba_channel(255), rgba_channel(source.pixel({ x, y }).a * input.alpha_multiplier));
 		}
 	}
 }

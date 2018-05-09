@@ -186,8 +186,7 @@ namespace augs {
 		unsigned width;
 		unsigned height;
 
-		if (
-			const auto lodepng_result =
+		if (const auto lodepng_result =
 			lodepng::decode(*reinterpret_cast<std::vector<unsigned char>*>(&v), width, height, path.string())
 		) {
 			throw image_loading_error(
