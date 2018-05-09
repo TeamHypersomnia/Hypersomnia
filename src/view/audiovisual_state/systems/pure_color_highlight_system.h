@@ -24,7 +24,7 @@ public:
 			float starting_alpha_ratio = 0.f;
 
 			entity_id target;
-			rgba color;
+			rgba color = white;
 		} in;
 		
 		double time_of_occurence_seconds = 0.0;

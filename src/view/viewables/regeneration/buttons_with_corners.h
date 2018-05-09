@@ -4,8 +4,8 @@
 
 struct button_with_corners_input {
 	// GEN INTROSPECTOR struct button_with_corners_input
-	rgba border_color;
-	rgba inside_color;
+	rgba border_color = white;
+	rgba inside_color = white;
 
 	unsigned lower_side = 0u;
 	unsigned upper_side = 0u;

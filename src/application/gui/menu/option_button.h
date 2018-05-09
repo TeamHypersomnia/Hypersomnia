@@ -30,7 +30,7 @@ public:
 	float hover_highlight_maximum_distance = 8.f;
 	float hover_highlight_duration_ms = 400.f;
 
-	rgba colorize;
+	rgba colorize = white;
 	bool click_callback_required = false;
 	pad_bytes<3> pad;
 

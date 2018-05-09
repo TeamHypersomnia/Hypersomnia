@@ -33,6 +33,7 @@ struct rgba {
 	rgba_channel a;
 	// END GEN INTROSPECTOR
 
+	rgba() {} /* Non-initializing constructor for performance */
 	rgba(const vec4&);
 	rgba(const ImVec4&);
 
@@ -47,20 +48,20 @@ struct rgba {
 	);
 
 	rgba(
-		const rgba_channel red = 255, 
-		const rgba_channel green = 255, 
-		const rgba_channel blue = 255, 
-		const rgba_channel alpha = 255
+		const rgba_channel red, 
+		const rgba_channel green, 
+		const rgba_channel blue, 
+		const rgba_channel alpha
 	);
 
 	operator ImVec4() const;
 	operator vec4() const;
 
 	void set(
-		const rgba_channel red = 255, 
-		const rgba_channel green = 255, 
-		const rgba_channel blue = 255, 
-		const rgba_channel alpha = 255
+		const rgba_channel red, 
+		const rgba_channel green, 
+		const rgba_channel blue, 
+		const rgba_channel alpha
 	);
 
 	void set(const rgba);

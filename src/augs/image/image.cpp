@@ -76,7 +76,7 @@ namespace augs {
 	}
 
 	image::image(const vec2u new_size) {
-		resize(new_size);
+		resize_fill(new_size);
 	}
 	
 	image::image(
@@ -85,7 +85,7 @@ namespace augs {
 		const unsigned pitch, 
 		const vec2u new_size
 	) {
-		resize(new_size);
+		resize_no_fill(new_size);
 
 		if (channels == 1) {
 			for (unsigned j = 0; j < new_size.y; ++j) {
@@ -168,11 +168,6 @@ namespace augs {
 		throw_if_zero_size(path, size);
 	}
 
-	void image::resize(const vec2u new_size) {
-		size = new_size;
-		v.resize(new_size.area(), rgba(0, 0, 0, 0));
-	}
-	
 	void image::execute(const paint_command_variant& in) {
 		std::visit([&](const auto& resolved) {
 			execute(resolved);
@@ -273,7 +268,7 @@ namespace augs {
 		const auto side = in.radius * 2 + 1;
 
 		if (v.empty()) {
-			resize({ side, side });
+			resize_fill({ side, side });
 		}
 		else {
 			ensure(size.x >= side);

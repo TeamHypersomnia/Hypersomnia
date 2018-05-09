@@ -17,5 +17,5 @@ struct thunder_input {
 	components::transform first_branch_root;
 	float branch_angle_spread = 0.f;
 
-	rgba color;
+	rgba color = cyan;
 };

@@ -258,12 +258,12 @@ regenerated_atlas::regenerated_atlas(regenerated_atlas_input in) {
 		{
 			auto scope = measure_scope(in.profiler.resizing_image);
 
-			output_image.resize(atlas_image_size);
+			output_image.resize_no_fill(atlas_image_size);
 
 #if DEBUG_FILL_IMGS_WITH_COLOR
 			output_image.fill({0, 0, 0, 255});
 #else
-			output_image.fill({0, 0, 0, 0});
+
 #endif
 		}
 		

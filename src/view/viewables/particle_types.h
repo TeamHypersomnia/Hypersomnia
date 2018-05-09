@@ -22,7 +22,7 @@ struct general_particle {
 	vec2 vel;
 	vec2 acc;
 	assets::image_id image_id;
-	rgba color;
+	rgba color = white;
 	vec2 size;
 	float rotation = 0.f;
 	float rotation_speed = 0.f;
@@ -126,7 +126,7 @@ struct animated_particle {
 	animation_in_particle animation;
 	float linear_damping = 0.f;
 
-	rgba color;
+	rgba color = white;
 	// END GEN INTROSPECTOR
 
 	void integrate(const float dt, const animations_pool& anims);
@@ -171,7 +171,7 @@ struct homing_animated_particle {
 	float homing_force = 3000.f;
 
 	animation_in_particle animation;
-	rgba color;
+	rgba color = white;
 
 	simple_animation_state animation_state;
 	// END GEN INTROSPECTOR

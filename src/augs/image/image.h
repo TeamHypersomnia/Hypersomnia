@@ -47,7 +47,7 @@ namespace augs {
 		// GEN INTROSPECTOR struct augs::paint_line_command
 		vec2u from;
 		vec2u to;
-		rgba filling;
+		rgba filling = white;
 		// END GEN INTROSPECTOR
 
 		static const char* get_custom_type_name() {
@@ -95,7 +95,16 @@ namespace augs {
 		void execute(const paint_line_command&);
 		
 		void swap_red_and_blue();
-		void resize(const vec2u image_size);
+
+		void resize_no_fill(const vec2u new_size) {
+			size = new_size;
+			v.resize(new_size.area());
+		}
+
+		void resize_fill(const vec2u new_size, const rgba col = rgba(0, 0, 0, 0)) {
+			size = new_size;
+			v.resize(new_size.area(), col);
+		}
 
 		void from_file(const path_type& path);
 		void from_png(const path_type& path);

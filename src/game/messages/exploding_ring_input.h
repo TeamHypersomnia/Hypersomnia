@@ -14,5 +14,5 @@ struct exploding_ring_input {
 	vec2 center;
 
 	messages::visibility_information_response visibility;
-	rgba color;
+	rgba color = white;
 };

@@ -16,13 +16,29 @@ summary: That which we are brainstorming at the moment.
 			- we'll also probably not care much about our game_gui systems for now
 				- it will mostly be for viewing state
 	- Asynchronous regeneration
-		- We might do this while making previews as it will be connected - will need to send texture ids to imgui
+		- We might block for the first time so that GUI doesn't glitch out
 		- Stages
 			- Problem: to acquire GL_MAX_TEXTURE_SIZE, we must be on the GL context
+				- We'll just store the int on init. The delay won't matter that much.
 			- (In logic thread) acquire all assets in the neighborhood of the camera
-			- (Separate thread) load and determine best possible packing
 
+			- (Diffuse thread) load images and determine best possible packing for diffuses + rest
+			- (Neon thread) load images and determine best possible packing for neons
+			- both threads will output an image
+			- upload can be done synchronously at first
+				- actually that's the bottleneck
+
+		- We might do this while making previews as it will be connected - will need to send texture ids to imgui
+		- Problem: viewable defs can change instantly in structure from intercosm to intercosm and GUI might glitch out
+			- We don't care. In practice, won't happen during gameplay.
+				- And test scene essentials will usually have same ids across all intercosms
+			- Just GUI should safely check for existence and zero sizes just in case
+			- That will be only a fraction of a second
+			- GUI could really use a separate texture
+				- And issue drawcalls
 	- Implementation details
+		- Do failures need be communicated?
+			- Just always make the cached vector with texture entries big enough
 		- Make a struct called atlas_distribution
 			- And keep there all atlases
 			- Because it will be passed around renderers

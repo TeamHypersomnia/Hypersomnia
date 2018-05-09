@@ -10,7 +10,7 @@
 
 struct particle_effect_modifier {
 	// GEN INTROSPECTOR struct particle_effect_modifier
-	rgba colorize;
+	rgba colorize = white;
 	real32 scale_amounts = 1.f;
 	real32 scale_lifetimes = 1.f;
 	// END GEN INTROSPECTOR

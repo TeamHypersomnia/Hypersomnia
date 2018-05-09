@@ -18,7 +18,7 @@ struct spell_common_data {
 
 	unsigned personal_electricity_required = 40u;
 	unsigned cooldown_ms = 5000u;
-	rgba associated_color;
+	rgba associated_color = white;
 	// END GEN INTROSPECTOR
 };
 
