@@ -23,7 +23,7 @@ template <class derived_handle_type>
 struct iterated_id_provider {
 private:
 	using E = entity_type_of<derived_handle_type>;
-	static constexpr auto is_const = is_handle_const_v<derived_handle_type>;
+	static constexpr bool is_const = is_handle_const_v<derived_handle_type>;
 
 	using subject_reference = maybe_const_ref_t<is_const, entity_solvable<E>>;
 
@@ -89,7 +89,7 @@ template <class derived_handle_type>
 struct stored_id_provider {
 private:
 	using E = entity_type_of<derived_handle_type>;
-	static constexpr auto is_const = is_handle_const_v<derived_handle_type>;
+	static constexpr bool is_const = is_handle_const_v<derived_handle_type>;
 
 	using id_type = typed_entity_id<E>;
 	using subject_pointer = maybe_const_ptr_t<is_const, entity_solvable<E>>;
@@ -157,7 +157,7 @@ template <class derived_handle_type>
 struct ref_stored_id_provider {
 private:
 	using E = entity_type_of<derived_handle_type>;
-	static constexpr auto is_const = is_handle_const_v<derived_handle_type>;
+	static constexpr bool is_const = is_handle_const_v<derived_handle_type>;
 
 	using id_type = typed_entity_id<E>;
 

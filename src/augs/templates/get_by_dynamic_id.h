@@ -18,7 +18,7 @@ decltype(auto) get_by_dynamic_index(
 	const std::size_t dynamic_type_index,
 	F&& generic_call
 ) {
-	static constexpr auto last_candidate = num_types_in_list_v<remove_cref<T>> - 1;
+	static constexpr std::size_t last_candidate = num_types_in_list_v<remove_cref<T>> - 1;
 	static constexpr bool is_last = current_candidate == last_candidate;
 
 	if constexpr(is_last) {
@@ -51,9 +51,9 @@ decltype(auto) conditional_get_by_dynamic_index(
 ) {
 	using list_type = remove_cref<T>;
 
-	static constexpr auto last_candidate = num_types_in_list_v<OnlyCandidates> - 1;
+	static constexpr std::size_t last_candidate = num_types_in_list_v<OnlyCandidates> - 1;
 	static constexpr bool is_last = candidate_space_current == last_candidate;
-	static constexpr auto list_space_current = 
+	static constexpr std::size_t list_space_current = 
 		index_in_list_v<
 			nth_type_in_list_t<candidate_space_current, OnlyCandidates>,
 			list_type

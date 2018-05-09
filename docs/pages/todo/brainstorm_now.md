@@ -23,7 +23,13 @@ summary: That which we are brainstorming at the moment.
 			- (In logic thread) acquire all assets in the neighborhood of the camera
 
 			- (Diffuse thread) load images and determine best possible packing for diffuses + rest
+				- Blit resultant images to a larger one
 			- (Neon thread) load images and determine best possible packing for neons
+				- Blit resultant images to a larger one
+			
+			- std::future with a moved-to image?
+				- read by the logic thread, which then initializes PBO DMA
+
 			- both threads will output an image
 			- upload can be done synchronously at first
 				- actually that's the bottleneck

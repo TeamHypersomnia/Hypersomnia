@@ -13,7 +13,7 @@ struct always_false {
 };
 
 template<class T>
-constexpr auto always_false_v = always_false<T>::value;
+constexpr bool always_false_v = always_false<T>::value;
 
 template <class T>
 struct always_true {
@@ -21,4 +21,4 @@ struct always_true {
 };
 
 template<class T>
-constexpr auto always_true_v = always_true<T>::value;
+constexpr bool always_true_v = always_true<T>::value;

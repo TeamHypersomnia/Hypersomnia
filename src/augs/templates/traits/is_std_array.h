@@ -11,7 +11,7 @@ struct is_std_array : std::false_type {};
 
 template <class T, std::size_t I>
 struct is_std_array<std::array<T, I>> : std::true_type {
-	static constexpr auto size = I;
+	static constexpr std::size_t size = I;
 };
 
 template <class T, class _enum>

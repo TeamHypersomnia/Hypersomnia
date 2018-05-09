@@ -64,35 +64,35 @@ struct sum_matching_in;
 
 template <template <class> class C, class... Args>
 struct sum_matching_in<C, type_list<Args...>> {
-	static constexpr auto value = (... + sum_matching_in<C, Args>::value);
+	static constexpr std::size_t value = (... + sum_matching_in<C, Args>::value);
 };
 
 template <template <class> class C, class... Args>
 struct sum_matching_in<C, std::variant<Args...>> {
-	static constexpr auto value = C<std::variant<Args...>>::value + (... + sum_matching_in<C, Args>::value);
+	static constexpr std::size_t value = C<std::variant<Args...>>::value + (... + sum_matching_in<C, Args>::value);
 };
 
 template <template <class> class C, class T>
 struct sum_matching_in<C, T, std::enable_if_t<is_tree_leaf_v<T>>> {
-	static constexpr auto value = C<T>::value;
+	static constexpr std::size_t value = C<T>::value;
 };
 
 template <template <class> class C, class T>
 struct sum_matching_in<C, T, std::enable_if_t<has_value_type_v<T>>> {
 	static_assert(!has_types_in_v<T>);
-	static constexpr auto value = C<T>::value + sum_matching_in<C, typename T::value_type>::value;
+	static constexpr std::size_t value = C<T>::value + sum_matching_in<C, typename T::value_type>::value;
 };
 
 template <template <class> class C, class T>
 struct sum_matching_in<C, T, std::enable_if_t<has_all_types_in_v<T>>> {
-	static constexpr auto value = 
+	static constexpr std::size_t value = 
 		C<T>::value 
 		+ sum_matching_in<C, augs::all_types_in_t<T>>::value
 	;
 };
 
 template <template <class> class C, class T>
-constexpr auto sum_matching_in_v = sum_matching_in<C, T>::value;
+constexpr std::size_t sum_matching_in_v = sum_matching_in<C, T>::value;
 
 template <class T>
 struct noconst_equal_to {

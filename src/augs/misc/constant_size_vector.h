@@ -236,7 +236,7 @@ namespace augs {
 			return size() == 0;
 		}
 
-		static constexpr auto capacity() {
+		static constexpr std::size_t capacity() {
 			return const_count;
 		}
 

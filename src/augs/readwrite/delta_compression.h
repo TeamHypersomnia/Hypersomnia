@@ -142,7 +142,7 @@ namespace augs {
 		void decode_into(T& decoded) const {
 			delta_unit* ptr = reinterpret_cast<delta_unit*>(std::addressof(decoded));
 
-			constexpr auto length = length_bytes / sizeof(delta_unit);
+			constexpr std::size_t length = length_bytes / sizeof(delta_unit);
 
 			const delta_unit * const original_location = ptr;
 

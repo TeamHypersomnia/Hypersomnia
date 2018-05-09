@@ -49,7 +49,7 @@ namespace augs {
 			return true;
 		}
 
-		constexpr auto size() const {
+		constexpr std::size_t size() const {
 			return flag_count;
 		}
 
