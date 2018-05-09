@@ -31,4 +31,8 @@ struct standard_atlas_distribution_input {
 	augs::time_measurements& atlas_upload_to_gpu;
 };
 
+struct standard_atlas_distribution {
+
+};
+
 augs::graphics::texture standard_atlas_distribution(const standard_atlas_distribution_input in);

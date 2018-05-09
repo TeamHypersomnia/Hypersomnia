@@ -5,26 +5,29 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- don't dwell at rectpack2D for now.
-	- For what it's supposed to do, it is good enough for now..
-		- We'll make it pretty when we're done with Hypersomnia.
-	- firstly let's introduce the true usecase
-	- the unstaged changes can sit there really
-		- we don't often delete this folder and it's not critical
-
-- what about just resizing when there is no more space left?
-	- then iterate over all empty spaces and resize those that are touching the edge
-		- there might be none like this
-	- then we can screw iterating some orders
-	- we could then easily make it an on-line algorithm
-
 - thoughts about atlas
-	- we should just create separate free standing functions 
-		- separately for extracting subjects inputs for neon maps, desaturations, diffuses 
-			- from loadables map
-		- then we can concatenate them if we will
+	- Separation
+		- First: just do neons maps and the rest distinction
+			- will rarely be switched anyway
+			- we'll probably stay with this at least until deathmatch is complete
+			- loading just proggyclean is really negliglible
+			- and it takes up tiny amount of atlas space
+			- so it does not matter even if we duplicate this also with imgui
+			- we'll also probably not care much about our game_gui systems for now
+				- it will mostly be for viewing state
+	- Asynchronous regeneration
+		- We might do this while making previews as it will be connected - will need to send texture ids to imgui
+		- Stages
+			- Problem: to acquire GL_MAX_TEXTURE_SIZE, we must be on the GL context
+			- (In logic thread) acquire all assets in the neighborhood of the camera
+			- (Separate thread) load and determine best possible packing
 
-- morning refactor: separate atlas profiler
+	- Implementation details
+		- Make a struct called atlas_distribution
+			- And keep there all atlases
+			- Because it will be passed around renderers
+	- Details
+		- IMGUI should preview atlases and tell how much space is left
 
 - possibly rename the flavour on setting an image?
 	- if it is detected that it is yet unnamed?
@@ -37,21 +40,11 @@ summary: That which we are brainstorming at the moment.
 	- so that e.g. no image ids in common state stay invalid
 	- can make those the first in test scene images so that we can stop importing images after some point
 
-- asynchronous texture transfers, especially when regenerating atlases
-
 - would really, really be cool to have a color picker inside the neon map light color chooser
 	- less pain in the ass
 	- look for imgui logic to acquire mouse positioning relative to the control
 
 - Ctrl+I could open a quick go to gui that will instantiate a chosen flavour
-
-- two atlases: one for neons and one for diffuse
-	- will rarely be switched anyway
-	- we might benchmark commit-wise
-	- implementation: actually make a struct called atlas_distribution
-	- IMGUI should preview atlases and tell how much space is left
-	- we might do this while making previews as it will be connected - will need to send texture ids to imgui
-	- maybe even on the occasion that we do asynchronous transfers
 
 - particles and flavours
 	- std::unordered_map<particle_flavour_id, vector of particles>

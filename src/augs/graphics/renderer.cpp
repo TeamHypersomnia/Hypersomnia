@@ -72,6 +72,14 @@ namespace augs {
 		GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, imgui_elements_id));
 		GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned) * 12000, nullptr, GL_STREAM_DRAW));
 #endif
+
+#if BUILD_OPENGL
+		GLint read_size;
+		GL_CHECK(glGetIntegerv(GL_MAX_TEXTURE_SIZE, &read_size));
+		max_texture_size = read_size;
+#else
+		max_texture_size = 0;
+#endif
 	}
 
 	void renderer::enable_special_vertex_attribute() {
@@ -129,10 +137,6 @@ namespace augs {
 		num_total_triangles_drawn += buffer.size();
 	}
 
-	void renderer::push_triangle(const vertex_triangle& tri) {
-		triangles.push_back(tri);
-	}
-
 	void renderer::call_lines() {
 		if (lines.empty()) return;
 
@@ -141,26 +145,9 @@ namespace augs {
 		GL_CHECK(glDrawArrays(GL_LINES, 0, static_cast<GLsizei>(lines.size()) * 2));
 	}
 
-	void renderer::push_line(const vertex_line& line) {
-		lines.push_back(line);
-	}
 
 	void renderer::set_viewport(const xywhi xywh) {
 		GL_CHECK(glViewport(xywh.x, xywh.y, xywh.w, xywh.h));
-	}
-
-	void renderer::push_triangles(const vertex_triangle_buffer& added) {
-		concatenate(triangles, added);
-	}
-
-	void renderer::push_special_vertex_triangle(
-		const augs::special s1,
-		const augs::special s2,
-		const augs::special s3
-	) {
-		specials.push_back(s1);
-		specials.push_back(s2);
-		specials.push_back(s3);
 	}
 
 	void renderer::clear_special_vertex_data() {
@@ -190,10 +177,6 @@ namespace augs {
 		return triangles.size();
 	}
 
-	vertex_triangle& renderer::get_triangle(int i) {
-		return triangles[i];
-	}
-
 	vertex_triangle_buffer& renderer::get_triangle_buffer() {
 		return triangles;
 	}
@@ -211,7 +194,7 @@ namespace augs {
 	}
 
 	void renderer::fullscreen_quad() {
-		static constexpr float vertices[] = {
+		constexpr float vertices[] = {
 			1.f, 1.f,
 			1.f, 0.f,
 			0.f, 0.f,
@@ -329,12 +312,6 @@ namespace augs {
 	}
 
 	int renderer::get_max_texture_size() const {
-#if BUILD_OPENGL
-		GLint tsize;
-		GL_CHECK(glGetIntegerv(GL_MAX_TEXTURE_SIZE, &tsize));
-		return tsize;
-#else
-		return 8192u;
-#endif
+		return max_texture_size;
 	}
 }

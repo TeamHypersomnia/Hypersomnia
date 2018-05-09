@@ -15,7 +15,7 @@ class interpolation_system;
 class particles_simulation_system;
 
 namespace augs {
-	struct renderer;
+	class renderer;
 
 	namespace graphics {
 		class fbo;

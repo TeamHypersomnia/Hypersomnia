@@ -72,3 +72,8 @@ summary: Just a hidden scratchpad.
 	- in any case, we can always iterate if we do not find an entry within the map,
 	- and the guids will nicely fit into the inferred cache scheme. 
 
+	- we should just create separate free standing functions 
+		- separately for extracting subjects inputs for neon maps, desaturations, diffuses 
+			- from loadables map
+		- then we can concatenate them if we will
+

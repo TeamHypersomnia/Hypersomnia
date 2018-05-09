@@ -786,3 +786,12 @@ we consider whole type overrides too complex architeciturally:
 	- can't these nodes be linearly allocated?
 
 - enable neon on charges shells etc
+- don't dwell at rectpack2D for now.
+	- For what it's supposed to do, it is good enough for now..
+		- We'll make it pretty when we're done with Hypersomnia.
+	- firstly let's introduce the true usecase
+	- the unstaged changes can sit there really
+		- we don't often delete this folder and it's not critical
+
+- morning refactor: separate atlas profiler
+

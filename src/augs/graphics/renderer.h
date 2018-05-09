@@ -17,20 +17,22 @@ namespace augs {
 		using error_with_typesafe_sprintf::error_with_typesafe_sprintf; 
 	};
 
-	struct renderer {
+	class renderer {
+		int max_texture_size = -1;
 		debug_lines prev_logic_step_lines;
-		
+
 		GLuint triangle_buffer_id = 0xdeadbeef;
 		GLuint special_buffer_id = 0xdeadbeef;
 		GLuint imgui_elements_id = 0xdeadbeef;
 
+		bool interpolate_debug_logic_step_lines = true;
+	public:
+		
 		vertex_triangle_buffer triangles;
 		vertex_line_buffer lines;
 		special_buffer specials;
 
 		std::size_t num_total_triangles_drawn = 0;
-
-		bool interpolate_debug_logic_step_lines = true;
 
 		renderer();
 
@@ -72,15 +74,28 @@ namespace augs {
 		void call_triangles(const vertex_triangle_buffer&);
 		void call_lines();
 		void set_viewport(const xywhi);
-		void push_line(const vertex_line&);
-		void push_triangle(const vertex_triangle&);
-		void push_triangles(const vertex_triangle_buffer&);
-		
+
+		void push_line(const augs::vertex_line& line) {
+			lines.push_back(line);
+		}
+
+		void push_triangle(const augs::vertex_triangle& tri) {
+			triangles.push_back(tri);
+		}
+
+		void push_triangles(const augs::vertex_triangle_buffer& added) {
+			triangles.insert(triangles.end(), added.begin(), added.end());
+		}
+
 		void push_special_vertex_triangle(
-			const augs::special, 
-			const augs::special, 
-			const augs::special
-		);
+			const augs::special s1,
+			const augs::special s2,
+			const augs::special s3
+		) {
+			specials.push_back(s1);
+			specials.push_back(s2);
+			specials.push_back(s3);
+		}
 
 		void clear_special_vertex_data();
 		void clear_triangles();
@@ -92,7 +107,6 @@ namespace augs {
 		int get_max_texture_size() const;
 
 		std::size_t get_triangle_count() const;
-		vertex_triangle& get_triangle(const int i);
 
 		vertex_triangle_buffer& get_triangle_buffer();
 		vertex_line_buffer& get_line_buffer();

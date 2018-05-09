@@ -34,7 +34,7 @@
 #include "view/audiovisual_state/audiovisual_state.h"
 
 namespace augs {
-	struct renderer;
+	class renderer;
 }
 
 struct all_necessary_shaders;
