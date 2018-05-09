@@ -8,6 +8,12 @@
 #include "augs/filesystem/file.h"
 #include "augs/readwrite/byte_readwrite.h"
 
+#if PLATFORM_UNIX
+#include <arpa/inet.h>
+#else
+#include <winsock.h>
+#endif
+
 template<class C>
 static void Line(
 	int x1, 
@@ -68,10 +74,37 @@ namespace augs {
 
 	vec2u image::get_size(const path_type& file_path) {
 		try {
-			return image(file_path).get_size();
+			const auto extension = file_path.extension();
+			auto in = with_exceptions<std::ifstream>(file_path);
+
+			if (extension == ".png") {
+				unsigned int width, height;
+
+				in.seekg(16);
+				in.read((char*)&width, 4);
+				in.read((char*)&height, 4);
+
+				width = ntohl(width);
+				height = ntohl(height);
+
+				return { width, height };
+			}
+			else if (extension == ".bin") {
+				vec2u s;
+				augs::read_bytes(in, s);
+				return s;
+			}
+			else {
+				throw image_loading_error(
+					"Failed to read size of %x:\nUnknown image extension: %x!", file_path, extension
+				);
+			}
 		}
 		catch (image_loading_error err) {
-			throw image_loading_error("Failed to read image size.\n%x", err.what());
+			throw;
+		}
+		catch (std::exception err) {
+			throw image_loading_error("Failed to read size of %x:\n%x", file_path, err.what());
 		}
 	}
 
