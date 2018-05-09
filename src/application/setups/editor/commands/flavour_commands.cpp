@@ -67,7 +67,7 @@ void create_flavour_command::redo_and_copy(const editor_command_input in, const 
 				);
 
 				if (is_free) {
-					new_object.template get<invariants::name>().name = tried_name;
+					new_object.template get<invariants::text_details>().name = tried_name;
 
 					if (source_flavour) {
 						built_description = typesafe_sprintf("Duplicated flavour: %x", source_flavour->get_name());

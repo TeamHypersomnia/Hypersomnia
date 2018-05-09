@@ -36,4 +36,4 @@
 #include "game/components/motor_joint_component.h"
 #include "game/components/hand_fuse_component.h"
 #include "game/components/sender_component.h"
-#include "game/components/name_component.h"
+#include "game/components/text_details_component.h"

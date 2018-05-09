@@ -321,7 +321,7 @@ namespace test_flavours {
 				meta.set(render_def);
 			}
 
-			meta.get<invariants::name>().description =
+			meta.get<invariants::text_details>().description =
 				"Standard issue sample rifle."
 			;
 

@@ -53,7 +53,7 @@ void find_locations_that_use(
 
 		if constexpr(contains::template value<Fl, object_type>) {
 			cosm.for_each_id_and_flavour<E>([&](const auto, const auto& flavour) {
-				const auto& name = flavour.template get<invariants::name>().name;
+				const auto& name = flavour.template get<invariants::text_details>().name;
 
 				auto for_each_through = [&](const auto& where) {
 					for_each_through_std_get(

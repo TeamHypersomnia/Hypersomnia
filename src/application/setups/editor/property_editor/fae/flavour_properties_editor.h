@@ -17,13 +17,13 @@
 
 template <class T>
 decltype(auto) get_name_of(const entity_flavour<T>& flavour) {
-	return flavour.template get<invariants::name>().name;
+	return flavour.template get<invariants::text_details>().name;
 }
 
 template <class C, class T, class N>
 void describe_if_rename(C& cmd, std::string& old, const field_address field, const T& invariant, const N& new_content) {
-	if constexpr(std::is_same_v<T, invariants::name> && std::is_same_v<N, std::string>) {
-		if (field == make_field_address(&invariants::name::name)) {
+	if constexpr(std::is_same_v<T, invariants::text_details> && std::is_same_v<N, std::string>) {
+		if (field == make_field_address(&invariants::text_details::name)) {
 			if (old.empty()) {
 				old = "Renamed " + invariant.name;
 			}
@@ -137,7 +137,7 @@ void edit_flavour(
 		return index_in_list_v<remove_cref<decltype(inv)>, invariants_of<E>>;
 	};
 
-	const auto& name_invariant = flavour.template get<invariants::name>();
+	const auto& name_invariant = flavour.template get<invariants::text_details>();
 	const auto source_flavour_name = name_invariant.name;
 
 	/*
@@ -168,7 +168,7 @@ void edit_flavour(
 		[&do_edit_invariant](auto& invariant) {
 			using T = remove_cref<decltype(invariant)>;
 
-			if constexpr(std::is_same_v<T, invariants::name>) {
+			if constexpr(std::is_same_v<T, invariants::text_details>) {
 				/* This one is handled already */
 				return;
 			}

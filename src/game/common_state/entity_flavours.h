@@ -57,11 +57,11 @@ public:
 	}
 
 	const auto& get_name() const {
-		return get<invariants::name>().name;
+		return get<invariants::text_details>().name;
 	}
 
 	const auto& get_description() const {
-		return get<invariants::name>().description;
+		return get<invariants::text_details>().description;
 	}
 
 	template <class D>

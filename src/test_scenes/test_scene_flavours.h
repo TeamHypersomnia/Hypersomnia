@@ -204,7 +204,7 @@ auto& get_test_flavour(all_entity_flavours& flavours, const T enum_id) {
 
 	const auto flavour_id = to_raw_flavour_id(enum_id);
 	auto& new_flavour = into[flavour_id];
-	new_flavour.template get<invariants::name>().name = format_enum(enum_id);
+	new_flavour.template get<invariants::text_details>().name = format_enum(enum_id);
 
 	return new_flavour;
 }

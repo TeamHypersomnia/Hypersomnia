@@ -130,7 +130,7 @@ auto tree_of_flavours(
 				if (node) {
 					provider.template for_each_flavour<E>(
 						[&](const flavour_id_type flavour_id, const flavour_type& flavour) {
-							const auto flavour_label = flavour.template get<invariants::name>().name;
+							const auto flavour_label = flavour.template get<invariants::text_details>().name;
 
 							const auto node_label = typesafe_sprintf("%x###%x", flavour_label, flavour_id.raw);
 							const auto imgui_id = typesafe_sprintf("%x.%x", this_type_id.get_index(), flavour_id.raw);
@@ -329,7 +329,7 @@ auto tree_of_entities(
 				if (node) {
 					provider.template for_each_flavour<E>(
 						[&](const flavour_id_type flavour_id, const flavour_type& flavour) {
-							const auto flavour_label = flavour.template get<invariants::name>().name;
+							const auto flavour_label = flavour.template get<invariants::text_details>().name;
 
 							decltype(auto) all_having_flavour = provider.get_entities_by_flavour_id(flavour_id);
 

@@ -23,7 +23,7 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_throwable_explosives::FORCE_GRENADE);
 
-			meta.get<invariants::name>().description =
+			meta.get<invariants::text_details>().description =
 				"Throwable explosive with a three seconds delay.\nDeals damage to [color=red]Health[/color]."
 			;
 
@@ -71,7 +71,7 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_throwable_explosives::INTERFERENCE_GRENADE);
 
-			meta.get<invariants::name>().description =
+			meta.get<invariants::text_details>().description =
 				"Throwable explosive with a three seconds delay.\nDeals damage to [color=orange]Consciousness[/color].\nCauses massive aimpunch."
 			;
 
@@ -119,7 +119,7 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_throwable_explosives::PED_GRENADE);
 
-			meta.get<invariants::name>().description =
+			meta.get<invariants::text_details>().description =
 				"Throwable explosive with a three seconds delay.\nDrains [color=cyan]Personal Electricity[/color].\nIf the subject has [color=turquoise]Electric Shield[/color] enabled,\nthe effect is doubled."
 			;
 
