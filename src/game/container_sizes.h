@@ -21,4 +21,4 @@ constexpr std::size_t ONLY_PICK_THESE_ITEMS_COUNT = 20;
 // TODO: this will be logic-bound, but still variable-sized (because in an inferred system)
 constexpr std::size_t ITEMS_INSIDE_COUNT = 20;
 
-constexpr std::size_t MAX_IMAGES_AT_ONCE = 5000;
+constexpr std::size_t MAX_IMAGES_IN_INTERCOSM = 5000;

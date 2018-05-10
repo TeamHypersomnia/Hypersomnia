@@ -14,7 +14,11 @@ namespace augs {
 			even though it could be calculated via multiplying atlas_space by the real atlas size.
 		*/
 
-		vec2u cached_original_size_pixels = vec2u(0xdeadbeef, 0xdeadbeef);
+		/*
+			Initialize with some sensible size in case a glitch is inevitable
+			for a fraction of a second.
+		*/
+		vec2u cached_original_size_pixels = vec2u(32, 32);
 
 		vec2u get_original_size() const {
 			return cached_original_size_pixels;
