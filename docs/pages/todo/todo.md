@@ -5,6 +5,7 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- settable_as_mixin should have push_bind and pop_bind?
 - later print shortcuts in the menus for the windows
 	- e.g. History			Alt+H
 

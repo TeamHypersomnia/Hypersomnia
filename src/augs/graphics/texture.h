@@ -11,7 +11,7 @@ namespace augs {
 			GLuint id = 0xdeadbeef;
 			bool built = false;
 			
-			void create(const vec2u size, const unsigned char* source = nullptr);
+			void create();
 			void destroy();
 		
 		public:
@@ -25,6 +25,8 @@ namespace augs {
 			
 			texture(const texture&) = delete;
 			texture& operator=(const texture&) = delete;
+
+			void texImage2D(const vec2u size, const unsigned char* const source);
 
 			void bind() const;
 			static void unbind();

@@ -12,23 +12,16 @@ namespace augs {
 		}
 
 		texture::texture(const vec2u size) {
-			create(size, nullptr);
+			create();
+			texImage2D(size, nullptr);
 		}
 
 		texture::texture(const image& source) {
-			create(source.get_size(), source.get_data());
+			create();
+			texImage2D(source.get_size(), source.get_data());
 		}
 
-		void texture::create(const vec2u size, const unsigned char* const source) {
-			GL_CHECK(glGenTextures(1, &id));
-
-			bind();
-
-			GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
-			GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
-			GL_CHECK(glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
-			GL_CHECK(glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
-
+		void texture::texImage2D(const vec2u size, const unsigned char* const source) {
 			GL_CHECK(glTexImage2D(
 				GL_TEXTURE_2D,
 				0,
@@ -40,8 +33,18 @@ namespace augs {
 				GL_UNSIGNED_BYTE,
 				source
 			));
+		}
 
-			unbind();
+		void texture::create() {
+			GL_CHECK(glGenTextures(1, &id));
+
+			bind();
+
+			GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
+			GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
+			GL_CHECK(glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
+			GL_CHECK(glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
+
 			built = true;
 		}
 

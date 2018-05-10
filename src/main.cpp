@@ -63,6 +63,7 @@
 
 #include "cmd_line_params.h"
 #include "build_info.h"
+#include "augs/graphics/pbo.h"
 
 extern std::string help_contents;
 
