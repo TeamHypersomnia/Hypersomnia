@@ -9,7 +9,7 @@
 #include "augs/readwrite/memory_stream.h"
 
 #include "augs/image/image.h"
-#include "augs/texture_atlas/texture_atlas.h"
+#include "augs/texture_atlas/atlas_generation.h"
 
 #include "augs/readwrite/byte_file.h"
 #include "augs/filesystem/directory.h"

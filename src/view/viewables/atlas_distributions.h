@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/texture_atlas/texture_atlas.h"
+#include "augs/texture_atlas/atlas_generation.h"
 
 #include "view/necessary_resources.h"
 #include "view/viewables/all_viewables_declarations.h"
