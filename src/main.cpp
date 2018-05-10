@@ -198,7 +198,7 @@ int work(const int argc, const char* const * const argv) try {
 	static necessary_image_definitions_map necessary_image_definitions(
 		lua,
 		"content/necessary/gfx",
-		config.content_regeneration.regenerate_every_launch
+		config.content_regeneration.regenerate_every_time
 	);
 	
 	static const auto imgui_atlas = augs::imgui::create_atlas(config.gui_font);
@@ -378,24 +378,27 @@ int work(const int argc, const char* const * const argv) try {
 				images_in_atlas.clear();
 				necessary_images_in_atlas.clear();
 
-				game_world_atlas.emplace(standard_atlas_distribution({
-					new_defs.image_definitions,
-					necessary_image_definitions,
-					config.gui_font,
+				auto in = standard_atlas_distribution_input {
 					{
-						static_cast<unsigned>(renderer.get_max_texture_size()),
-						augs::path_type(GENERATED_FILES_DIR "/atlases/game_world_atlas") 
-							+= (settings.save_regenerated_atlases_as_binary ? ".bin" : ".png"),
-						settings.regenerate_every_launch,
-						settings.skip_source_image_integrity_check
+						settings,
+						necessary_image_definitions,
+						new_defs.image_definitions,
+						config.gui_font,
+						get_unofficial_content_dir()
 					},
-					get_unofficial_content_dir(),
+
+					static_cast<unsigned>(renderer.get_max_texture_size())
+				};
+
+				auto out = standard_atlas_distribution_output {
 					images_in_atlas,
 					necessary_images_in_atlas,
 					get_gui_font(),
 					atlas_performance,
 					performance.atlas_upload_to_gpu
-				}));
+				};
+
+				game_world_atlas.emplace(standard_atlas_distribution(in, out));
 
 				loaded_gui_font = config.gui_font;
 			}

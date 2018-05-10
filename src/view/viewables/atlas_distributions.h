@@ -1,8 +1,9 @@
 #pragma once
-#include "augs/texture_atlas/atlas_generation.h"
+#include "augs/texture_atlas/bake_fresh_atlas.h"
 
 #include "view/necessary_resources.h"
 #include "view/viewables/all_viewables_declarations.h"
+#include "view/viewables/regeneration/content_regeneration_settings.h"
 
 /* 
 	The standard atlas distribution is the simplest one where
@@ -16,23 +17,36 @@
 
 struct atlas_profiler;
 
-struct standard_atlas_distribution_input {
-	const image_definitions_map& image_definitions;
+struct subjects_gathering_input {
+	const content_regeneration_settings settings;
 	const necessary_image_definitions_map& necessary_image_definitions;
+	const image_definitions_map& image_definitions;
 	const augs::font_loading_input& gui_font_input;
-	const atlas_regeneration_settings settings;
 	const augs::path_type unofficial_project_dir;
+};
 
-	images_in_atlas_map& output_atlas_entries;
-	necessary_images_in_atlas_map& output_necessary_atlas_entries;
-	augs::baked_font& output_gui_font;
+struct standard_atlas_distribution_input {
+	subjects_gathering_input subjects;
+	const unsigned max_atlas_size;
+};
+
+struct standard_atlas_distribution_output {
+	images_in_atlas_map& atlas_entries;
+	necessary_images_in_atlas_map& necessary_atlas_entries;
+	augs::baked_font& gui_font;
 
 	atlas_profiler& profiler;
 	augs::time_measurements& atlas_upload_to_gpu;
 };
 
-struct standard_atlas_distribution {
+struct atlas_input_subjects;
 
-};
+void regenerate_and_gather_subjects(
+	subjects_gathering_input,
+	atlas_input_subjects& output
+);
 
-augs::graphics::texture standard_atlas_distribution(const standard_atlas_distribution_input in);
+augs::graphics::texture standard_atlas_distribution(
+	standard_atlas_distribution_input in,
+	standard_atlas_distribution_output out
+);

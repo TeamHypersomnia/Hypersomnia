@@ -19,13 +19,12 @@ struct atlas_profiler : public augs::profiler_mixin<atlas_profiler> {
 
 	augs::amount_measurements<vec2u> atlas_size = std::size_t(1);
 	augs::amount_measurements<unsigned> atlas_height = std::size_t(1);
+	augs::time_measurements resizing_image = std::size_t(1);
+
+	augs::time_measurements packing = std::size_t(1);
+	augs::amount_measurements<std::size_t> subjects_count = std::size_t(1);
 	augs::amount_measurements<std::size_t> wasted_space = std::size_t(1);
 	augs::amount_measurements<double> wasted_space_percent = std::size_t(1);
-
-	augs::amount_measurements<std::size_t> subjects_count = std::size_t(1);
-	augs::time_measurements packing = std::size_t(1);
-	augs::time_measurements saving = std::size_t(1);
-	augs::time_measurements resizing_image = std::size_t(1);
 	// END GEN INTROSPECTOR
 };
 
