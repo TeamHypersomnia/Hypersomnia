@@ -3,6 +3,7 @@
 
 #include "view/necessary_resources.h"
 #include "view/viewables/all_viewables_declarations.h"
+#include "view/viewables/images_in_atlas_map.h"
 #include "view/viewables/regeneration/content_regeneration_settings.h"
 
 /* 
@@ -19,24 +20,27 @@ struct atlas_profiler;
 
 struct subjects_gathering_input {
 	const content_regeneration_settings settings;
+
+	/* Necessary definitions are initialized once, and never modified later on. */
 	const necessary_image_definitions_map& necessary_image_definitions;
-	const image_definitions_map& image_definitions;
+
+	const image_definitions_map image_definitions;
 	const augs::font_loading_input& gui_font_input;
 	const augs::path_type unofficial_project_dir;
 };
 
-struct standard_atlas_distribution_input {
+struct general_atlas_input {
 	subjects_gathering_input subjects;
 	const unsigned max_atlas_size;
+
+	rgba* const atlas_image_output;
 };
 
-struct standard_atlas_distribution_output {
-	images_in_atlas_map& atlas_entries;
-	necessary_images_in_atlas_map& necessary_atlas_entries;
-	augs::baked_font& gui_font;
-
-	atlas_profiler& profiler;
-	augs::time_measurements& atlas_upload_to_gpu;
+struct general_atlas_output {
+	images_in_atlas_map atlas_entries;
+	necessary_images_in_atlas_map necessary_atlas_entries;
+	augs::baked_font gui_font;
+	vec2u atlas_size;
 };
 
 struct atlas_input_subjects;
@@ -46,12 +50,7 @@ void regenerate_and_gather_subjects(
 	atlas_input_subjects& output
 );
 
-struct standard_atlas_distribution {
-	augs::graphics::texture general;
-	// augs::graphics::texture neon_maps;
-};
-
-standard_atlas_distribution create_standard_atlas_distribution(
-	standard_atlas_distribution_input in,
-	standard_atlas_distribution_output out
+general_atlas_output create_general_atlas(
+	general_atlas_input in,
+	atlas_profiler&
 );

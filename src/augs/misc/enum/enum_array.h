@@ -11,6 +11,15 @@ namespace augs {
 		using base::max_size;
 		using base::base;
 		using base::operator[];
+		using base::at;
+
+		decltype(auto) at(const _enum e) {
+			return base::at(static_cast<size_t>(e));
+		};
+
+		decltype(auto) at(const _enum e) const {
+			return base::at(static_cast<size_t>(e));
+		};
 
 		decltype(auto) operator[](const _enum e) {
 			return base::operator[](static_cast<size_t>(e));

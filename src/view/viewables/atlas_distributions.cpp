@@ -60,78 +60,75 @@ void regenerate_and_gather_subjects(
 	}
 }
 
-standard_atlas_distribution create_standard_atlas_distribution(
-	const standard_atlas_distribution_input in,
-	const standard_atlas_distribution_output out
+general_atlas_output create_general_atlas(
+	const general_atlas_input in,
+	atlas_profiler& performance
 ) {
-	auto total = measure_scope(out.profiler.whole_regeneration);
+	auto total = measure_scope(performance.whole_regeneration);
 
 	thread_local auto atlas_subjects = atlas_input_subjects();
-	thread_local auto atlas_image = augs::image();
 
 	{
-		auto scope = measure_scope(out.profiler.gathering_subjects);
+		auto scope = measure_scope(performance.gathering_subjects);
 		regenerate_and_gather_subjects(in.subjects, atlas_subjects);
 	}
 
-	{
-		thread_local baked_atlas baked;
-		baked.clear();
+	thread_local baked_atlas baked;
+	baked.clear();
 
-		bake_fresh_atlas(
-			{
-				atlas_subjects,
-				in.max_atlas_size,
-			},
-			{
-				atlas_image,
-				baked,
-				out.profiler
-			}
-		);
-
-		auto scope = measure_scope(out.profiler.unpacking_results);
-
-		auto& subjects = in.subjects;
-
-		out.gui_font.unpack_from(baked.fonts.at(subjects.gui_font_input));
-
+	bake_fresh_atlas(
 		{
-			for (const auto& r : subjects.necessary_image_definitions) {
-				out.necessary_atlas_entries[r.first] = baked.images.at(r.second.get_source_path().path);
-			}
+			atlas_subjects,
+			in.max_atlas_size,
+		},
+		{
+			in.atlas_image_output,
+			baked,
+			performance
+		}
+	);
 
-			auto make_view = [&subjects](const auto& def) {
-				return image_definition_view(subjects.unofficial_project_dir, def);
+	auto scope = measure_scope(performance.unpacking_results);
+
+	auto& subjects = in.subjects;
+
+	general_atlas_output out;
+
+	out.atlas_size = baked.atlas_image_size;
+	out.gui_font.unpack_from(baked.fonts.at(subjects.gui_font_input));
+
+	{
+		for (const auto& r : subjects.necessary_image_definitions) {
+			out.necessary_atlas_entries[r.first] = baked.images.at(r.second.get_source_path().path);
+		}
+
+		auto make_view = [&subjects](const auto& def) {
+			return image_definition_view(subjects.unofficial_project_dir, def);
+		};
+
+		for_each_id_and_object(subjects.image_definitions, [&](const auto id, const auto& d) {
+			const auto def = make_view(d);
+
+			auto& output_viewable = out.atlas_entries[id];
+			auto& maps = output_viewable;
+
+			maps.diffuse = baked.images.at(def.get_source_image_path());
+
+			auto set_if_baked = [&](auto& m, const auto path) {
+				if (auto found = mapped_or_nullptr(baked.images, path)) {
+					m = *found;
+					return true;
+				}
+
+				return false;
 			};
 
-			for_each_id_and_object(subjects.image_definitions, [&](const auto id, const auto& d) {
-				const auto def = make_view(d);
+			set_if_baked(maps.neon_map, def.calc_generated_neon_map_path());
+			set_if_baked(maps.neon_map, def.calc_custom_neon_map_path());
 
-				auto& output_viewable = out.atlas_entries[id];
-				auto& maps = output_viewable;
-
-				maps.diffuse = baked.images.at(def.get_source_image_path());
-
-				auto set_if_baked = [&](auto& m, const auto path) {
-					if (auto found = mapped_or_nullptr(baked.images, path)) {
-						m = *found;
-						return true;
-					}
-
-					return false;
-				};
-
-				set_if_baked(maps.neon_map, def.calc_generated_neon_map_path());
-				set_if_baked(maps.neon_map, def.calc_custom_neon_map_path());
-
-				set_if_baked(maps.desaturated, def.calc_desaturation_path());
-			});
-		}
+			set_if_baked(maps.desaturated, def.calc_desaturation_path());
+		});
 	}
 
-	auto scope = measure_scope(out.atlas_upload_to_gpu);
-
-	auto output = augs::graphics::texture(atlas_image);
-	return { std::move(output) };
+	return out;
 }

@@ -20,8 +20,6 @@ namespace augs {
 
 			void destroy();
 		public:
-			static void start_upload(vec2u size);
-
 			pbo();
 			~pbo();
 
@@ -32,9 +30,10 @@ namespace augs {
 			pbo& operator=(const pbo&) = delete;
 
 			void reserve(std::size_t);
+			void reserve_for_texture_square(std::size_t);
 
-			void* map_pointer();
-			bool unmap_pointer();
+			void* map_buffer();
+			bool unmap_buffer();
 
 			std::size_t get_size() const;
 		};

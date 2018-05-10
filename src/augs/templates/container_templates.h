@@ -141,6 +141,8 @@ auto mapped_or_nullptr(
 	Container& container,
 	Key&& key
 ) {
+	static_assert(has_member_find_v<Container, Key>, "Calling mapped_or_nullptr on a container that has no find member.");
+
 	if constexpr (member_find_returns_ptr_v<Container, Key>) {
 		return container.find(std::forward<Key>(key));
 	}

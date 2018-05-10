@@ -82,15 +82,6 @@ namespace augs {
 
 		std::unordered_map<utf32_point, internal_glyph> glyphs;
 
-		/* 
-			Enforce mindful lifetime management. 
-			Copies could cause stack overflow.
-		*/
-
-		baked_font() = default;
-		baked_font(const baked_font&) = delete;
-		baked_font& operator=(const baked_font&) = delete;
-
 		void unpack_from(const stored_baked_font& store) {
 			metrics = store.meta.metrics;
 			settings = store.meta.settings;

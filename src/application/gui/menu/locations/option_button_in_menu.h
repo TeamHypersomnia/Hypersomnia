@@ -22,7 +22,7 @@ public:
 
 	template <class C>
 	decltype(auto) dereference(const C context) const {
-		return &context.get_root().buttons.at(static_cast<size_t>(type));
+		return &context.get_root().buttons.at(static_cast<std::size_t>(type));
 	}
 };
 

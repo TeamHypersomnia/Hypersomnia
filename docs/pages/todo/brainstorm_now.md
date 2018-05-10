@@ -5,6 +5,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- refactor image_view to use common funcs?
 - thoughts about atlas
 	- Remove atlas saving for now.
 	- Separation

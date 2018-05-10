@@ -50,7 +50,7 @@ namespace augs {
 
 		void draw_call_imgui(
 			const graphics::texture& imgui_atlas,
-			const graphics::texture& game_world_atlas
+			const graphics::texture* game_world_atlas
 		);
 
 		void draw_debug_lines(

@@ -385,11 +385,64 @@ namespace augs {
 		const image& source_image, 
 		const vec2u dst,
 		const bool flip_source,
-		const bool add_rgba_values
+		const bool additive
 	) {
 		const auto source_size = source_image.get_size();
 
-		if (!add_rgba_values) {
+		if (!additive) {
+			if (flip_source) {
+				for (auto y = 0u; y < source_size.y; ++y) {
+					for (auto x = 0u; x < source_size.x; ++x) {
+						pixel(dst + vec2u{ y, x }) = source_image.pixel(vec2u{ x, y });
+					}
+				}
+			}
+			else {
+				for (auto y = 0u; y < source_size.y; ++y) {
+					for (auto x = 0u; x < source_size.x; ++x) {
+						pixel(dst + vec2u{ x, y }) = source_image.pixel(vec2u{ x, y });
+					}
+				}
+			}
+		}
+		else {
+			if (flip_source) {
+				for (auto y = 0u; y < source_size.y; ++y) {
+					for (auto x = 0u; x < source_size.x; ++x) {
+						pixel(dst + vec2u{ y, x }) += source_image.pixel(vec2u{ x, y });
+					}
+				}
+			}
+			else {
+				for (auto y = 0u; y < source_size.y; ++y) {
+					for (auto x = 0u; x < source_size.x; ++x) {
+						pixel(dst + vec2u{ x, y }) += source_image.pixel(vec2u{ x, y });
+					}
+				}
+			}
+		}
+	}
+
+	image_view::image_view(rgba* v, vec2u size) : v(v), size(size) {}
+	 
+
+	void image_view::fill(const rgba fill_color) {
+		for (auto y = 0u; y < size.y; ++y) {
+			for (auto x = 0u; x < size.x; ++x) {
+				pixel(vec2u{ y, x }) = fill_color;
+			}
+		}
+	}
+
+	void image_view::blit(
+		const image& source_image, 
+		const vec2u dst,
+		const bool flip_source,
+		const bool additive
+	) {
+		const auto source_size = source_image.get_size();
+
+		if (!additive) {
 			if (flip_source) {
 				for (auto y = 0u; y < source_size.y; ++y) {
 					for (auto x = 0u; x < source_size.x; ++x) {

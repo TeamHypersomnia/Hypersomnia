@@ -85,7 +85,7 @@ namespace augs {
 			const image& source,
 			const vec2u destination,
 			const bool flip_source = false,
-			const bool add_rgba_values = false
+			const bool additive = false
 		);
 
 		void execute(const paint_command_variant&);
@@ -149,5 +149,30 @@ namespace augs {
 		}
 
 		image& desaturate();
+	};
+
+	class image_view {
+		rgba* const v;
+		const vec2u size;
+
+	public:
+		image_view(rgba* v, vec2u size);
+
+		rgba& pixel(const vec2u pos) {
+			return v[pos.y * size.x + pos.x];
+		}
+
+		const rgba& pixel(const vec2u pos) const {
+			return v[pos.y * size.x + pos.x];
+		}
+
+		void fill(const rgba fill_color);
+
+		void blit(
+			const image& source,
+			const vec2u destination,
+			const bool flip_source = false,
+			const bool additive = false
+		);
 	};
 }

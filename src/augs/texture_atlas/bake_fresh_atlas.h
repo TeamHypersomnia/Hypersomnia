@@ -38,7 +38,7 @@ struct bake_fresh_atlas_input {
 };
 
 struct bake_fresh_atlas_output {
-	augs::image& whole_image;
+	rgba* const whole_image;
 	baked_atlas& baked;
 
 	atlas_profiler& profiler;

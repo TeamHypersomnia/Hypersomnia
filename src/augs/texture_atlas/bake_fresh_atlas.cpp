@@ -29,7 +29,6 @@ void bake_fresh_atlas(
 	const auto& subjects = in.subjects;
 
 	auto& baked = out.baked;
-	auto& output_image = out.whole_image;
 	auto& output_image_size = out.baked.atlas_image_size;
 
 	std::unordered_map<source_image_identifier, augs::image> loaded_images;
@@ -198,17 +197,11 @@ void bake_fresh_atlas(
 
 	// translate pixels into atlas space and render the image
 
-	{
-		auto scope = measure_scope(out.profiler.resizing_image);
-
-		output_image.resize_no_fill(output_image_size);
+	auto output_image = augs::image_view(out.whole_image, output_image_size);
 
 #if DEBUG_FILL_IMGS_WITH_COLOR
-		output_image.fill({0, 0, 0, 255});
-#else
-
+	output_image.fill({0, 0, 0, 255});
 #endif
-	}
 	
 	std::size_t current_rect = 0u;
 

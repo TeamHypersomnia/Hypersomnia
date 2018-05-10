@@ -231,7 +231,7 @@ namespace augs {
 
 	void renderer::draw_call_imgui(
 		const graphics::texture& imgui_atlas,
-		const graphics::texture& game_world_atlas
+		const graphics::texture* game_world_atlas
 	) {
 		const auto* const draw_data = ImGui::GetDrawData();
 
@@ -273,7 +273,9 @@ namespace augs {
 			GL_CHECK(glDisable(GL_SCISSOR_TEST));
 		}
 
-		game_world_atlas.bind();
+		if (game_world_atlas != nullptr) {
+			game_world_atlas->bind();
+		}
 	}
 
 	void renderer::draw_debug_lines(

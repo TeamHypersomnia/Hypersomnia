@@ -57,7 +57,7 @@ struct illuminated_rendering_input {
 	const double interpolation_ratio = 0.0;
 	augs::renderer& renderer;
 	frame_profiler& frame_performance;
-	const standard_atlas_distribution& atlases;
+	const std::optional<augs::graphics::texture>& general_atlas;
 	const illuminated_rendering_fbos& fbos;
 	const illuminated_rendering_shaders& shaders;
 	const visible_entities& all_visible;
@@ -109,7 +109,9 @@ void illuminated_rendering(
 	const auto output = augs::drawer_with_default{ renderer.get_triangle_buffer(), blank };
 	const auto line_output = augs::line_drawer_with_default{ renderer.get_line_buffer(), blank };
 
-	in.atlases.general.bind();
+	if (in.general_atlas) {
+		in.general_atlas->bind();
+	}
 
 	auto set_shader_with_matrix = [&](auto& shader) {
 		shader->set_as_current();
@@ -470,5 +472,7 @@ void illuminated_rendering(
 	renderer.call_and_clear_triangles();
 	renderer.call_and_clear_lines();
 
-	in.atlases.general.bind();
+	if (in.general_atlas) {
+		in.general_atlas->bind();
+	}
 }

@@ -1,19 +1,13 @@
 #include "pbo.h"
 #include "augs/log.h"
 #include "augs/graphics/OpenGL_includes.h"
+#include "augs/graphics/rgba.h"
 
 namespace augs {
 	namespace graphics {
 		pbo::pbo() {
 			GL_CHECK(glGenBuffers(1, &id));
 			created = true;
-			
-			set_as_current();
-
-#if BUILD_OPENGL
-
-#endif
-			set_current_to_none();
 		}
 
 		pbo::pbo(pbo&& b) :
@@ -38,10 +32,6 @@ namespace augs {
 			return *this;
 		}
 
-		void pbo::start_upload(const vec2u size) {
-			glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, size.x, size.y, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-		}
-
 		bool pbo::set_as_current_impl() const {
 			GL_CHECK(glBindBuffer(GL_PIXEL_UNPACK_BUFFER, id));
 			return true;
@@ -51,13 +41,21 @@ namespace augs {
 			GL_CHECK(glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0));
 		}
 
+		void pbo::reserve_for_texture_square(const std::size_t side) {
+			reserve(
+				side * side * sizeof(rgba)
+			);
+		}
+
 		void pbo::reserve(const std::size_t new_size) {
 			if (new_size > size) {
+				set_as_current();
 				GL_CHECK(glBufferData(GL_PIXEL_UNPACK_BUFFER, new_size, 0, GL_STREAM_DRAW));
+				size = new_size;
 			}
 		}
 
-		void* pbo::map_pointer() {
+		void* pbo::map_buffer() {
 #if BUILD_OPENGL
 			return glMapBuffer(GL_PIXEL_UNPACK_BUFFER, GL_WRITE_ONLY);
 #else
@@ -65,7 +63,7 @@ namespace augs {
 #endif
 		}
 
-		bool pbo::unmap_pointer() {
+		bool pbo::unmap_buffer() {
 #if BUILD_OPENGL
 			return glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
 #else

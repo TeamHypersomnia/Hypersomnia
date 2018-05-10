@@ -1,10 +1,11 @@
-#include <iostream>
-#include <clocale>
-#include <thread>
-
 #if PLATFORM_UNIX
 #include <csignal>
 #endif
+
+#include <iostream>
+#include <clocale>
+#include <thread>
+#include "augs/templates/thread_templates.h"
 
 #include "augs/unit_tests.h"
 #include "augs/global_libraries.h"
@@ -197,7 +198,7 @@ int work(const int argc, const char* const * const argv) try {
 		"content/necessary/sfx"
 	);
 
-	static necessary_image_definitions_map necessary_image_definitions(
+	static const necessary_image_definitions_map necessary_image_definitions(
 		lua,
 		"content/necessary/gfx",
 		config.content_regeneration.regenerate_every_time
@@ -210,6 +211,10 @@ int work(const int argc, const char* const * const argv) try {
 		necessary_fbos,
 		audio
 	};
+
+	static session_profiler performance;
+	static atlas_profiler atlas_performance;
+	static frame_profiler frame_performance;
 
 	/* 
 		Main menu setup state may be preserved, 
@@ -256,7 +261,23 @@ int work(const int argc, const char* const * const argv) try {
 	};
 #endif
 	
-	static std::optional<standard_atlas_distribution> loaded_atlases;
+	static augs::graphics::pbo uploading_pbo;
+
+	static image_definitions_map future_image_definitions;
+	static augs::font_loading_input future_gui_font;
+
+	static std::future<general_atlas_output> future_general_atlas;
+
+	static std::optional<augs::graphics::texture> uploading_texture;
+	static std::optional<augs::graphics::texture> general_atlas;
+	
+	{
+		auto scope = measure_scope(performance.pbo_allocation);
+
+		uploading_pbo.reserve_for_texture_square(
+			renderer.get_max_texture_size()
+		);
+	}
 
 	static world_camera gameplay_camera;
 	static audiovisual_state audiovisuals;
@@ -304,10 +325,6 @@ int work(const int argc, const char* const * const argv) try {
 	static game_gui_system game_gui;
 	static bool game_gui_mode = false;
 
-	static session_profiler performance;
-	static atlas_profiler atlas_performance;
-	static frame_profiler frame_performance;
-
 	static auto load_all = [](const all_viewables_defs& new_defs) {
 		/* Atlas/meta cache pass */
 
@@ -316,14 +333,6 @@ int work(const int argc, const char* const * const argv) try {
 
 			{
 				double total_reloading_time = 0.0;
-
-				if (necessary_images_in_atlas.empty()) {
-					new_atlas_required = true;
-				}
-
-				if (!loaded_atlases.has_value()) {
-					new_atlas_required = true;
-				}
 
 				{
 					/* Check for unloaded and changed resources */
@@ -374,13 +383,20 @@ int work(const int argc, const char* const * const argv) try {
 				}
 			}
 
-			if (new_atlas_required) {
+			if (necessary_images_in_atlas.empty()) {
+				new_atlas_required = true;
+			}
+
+			if (!general_atlas.has_value()) {
+				new_atlas_required = true;
+			}
+
+			if (new_atlas_required && !future_general_atlas.valid()) {
 				const auto settings = config.content_regeneration;
 
-				images_in_atlas.clear();
-				necessary_images_in_atlas.clear();
+				uploading_pbo.set_as_current();
 
-				auto in = standard_atlas_distribution_input {
+				auto in = general_atlas_input {
 					{
 						settings,
 						necessary_image_definitions,
@@ -389,20 +405,20 @@ int work(const int argc, const char* const * const argv) try {
 						get_unofficial_content_dir()
 					},
 
-					static_cast<unsigned>(renderer.get_max_texture_size())
+					static_cast<unsigned>(renderer.get_max_texture_size()),
+					reinterpret_cast<rgba*>(uploading_pbo.map_buffer())
 				};
 
-				auto out = standard_atlas_distribution_output {
-					images_in_atlas,
-					necessary_images_in_atlas,
-					get_loaded_gui_font(),
-					atlas_performance,
-					performance.atlas_upload_to_gpu
-				};
+				future_general_atlas = std::async(
+					std::launch::async,
+				   	[in]() { 
+						return create_general_atlas(in, atlas_performance);
+					}
+				);
 
-				loaded_atlases.emplace(create_standard_atlas_distribution(in, out));
-
-				now_loaded_gui_font_def = config.gui_font;
+				future_image_definitions = new_defs.image_definitions;
+				future_gui_font = config.gui_font;
+				uploading_pbo.set_current_to_none();
 			}
 		}
 
@@ -456,12 +472,12 @@ int work(const int argc, const char* const * const argv) try {
 				}
 				/* Otherwise it's already taken care of */
 			});
+
+			/* Done, overwrite */
+			now_loaded_viewables_defs.sounds = new_defs.sounds;
 		}
 
-		auto scope = measure_scope(performance.viewables_readback);
-
-		/* Done, overwrite */
-		now_loaded_viewables_defs = new_defs;
+		//auto scope = measure_scope(performance.viewables_readback);
 	};
 
 	static auto setup_launcher = [](auto&& setup_init_callback) {
@@ -1458,6 +1474,29 @@ int work(const int argc, const char* const * const argv) try {
 			}
 		);
 
+		/* Unpack asynchronous asset loading results */
+
+		if (future_general_atlas.valid() && is_ready(future_general_atlas)) {
+			uploading_pbo.set_as_current();
+			uploading_pbo.unmap_buffer();
+
+			auto result = future_general_atlas.get();
+
+			images_in_atlas = std::move(result.atlas_entries);
+			necessary_images_in_atlas = std::move(result.necessary_atlas_entries);
+			get_loaded_gui_font() = std::move(result.gui_font);
+
+			now_loaded_gui_font_def = future_gui_font;
+			now_loaded_viewables_defs.image_definitions = future_image_definitions;
+
+			const auto atlas_size = result.atlas_size;
+
+			general_atlas.emplace(atlas_size);
+			general_atlas->start_upload_from(uploading_pbo);
+
+			augs::graphics::pbo::set_current_to_none();
+		}
+
 		const auto screen_size = window.get_screen_size();
 
 		auto create_menu_context = make_create_menu_context(new_viewing_config);
@@ -1581,7 +1620,7 @@ int work(const int argc, const char* const * const argv) try {
 					interpolation_ratio,
 					renderer,
 					frame_performance,
-					*loaded_atlases,
+					general_atlas,
 					necessary_fbos,
 					necessary_shaders,
 					all_visible
@@ -1719,7 +1758,7 @@ int work(const int argc, const char* const * const argv) try {
 			}
 		}
 		else {
-			loaded_atlases->general.bind();
+			general_atlas->bind();
 			necessary_shaders.standard->set_as_current();
 			necessary_shaders.standard->set_projection(augs::orthographic_projection(vec2(screen_size)));
 
@@ -1760,10 +1799,12 @@ int work(const int argc, const char* const * const argv) try {
 		renderer.call_and_clear_triangles();
 
 		/* #5 */
-		renderer.draw_call_imgui(
-			imgui_atlas,
-			loaded_atlases->general
-		);
+		if (general_atlas.has_value()) {
+			renderer.draw_call_imgui(imgui_atlas, std::addressof(general_atlas.value()));
+		}
+		else {
+			renderer.draw_call_imgui(imgui_atlas, nullptr);
+		}
 
 		/* #6 */
 		const bool should_draw_our_cursor = new_viewing_config.window.raw_mouse_input && !window.is_mouse_pos_paused();

@@ -19,3 +19,6 @@ summary: Just a hidden scratchpad.
 	- less noise in the cosmos indeed
 
 - introduce cosmos::retick function that can change delta while preserving timings by updating all stepped timestamps according to lifetimes found in other places
+
+- circular bars might be useful to be specifiable per-cosmos
+	- unlikely, though
