@@ -30,6 +30,10 @@ struct standard_atlas_distribution_input {
 	const unsigned max_atlas_size;
 };
 
+struct standard_atlas_distribution {
+
+};
+
 struct standard_atlas_distribution_output {
 	images_in_atlas_map& atlas_entries;
 	necessary_images_in_atlas_map& necessary_atlas_entries;

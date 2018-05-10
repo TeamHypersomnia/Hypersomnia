@@ -225,7 +225,8 @@ int work(const int argc, const char* const * const argv) try {
 	static settings_gui_state settings_gui;
 	static ingame_menu_gui ingame_menu;
 
-	static all_viewables_defs currently_loaded_defs;
+	static all_viewables_defs now_loaded_viewables_defs;
+	static augs::font_loading_input now_loaded_gui_font_def;
 
 	/*
 		Runtime representations of viewables,
@@ -240,19 +241,18 @@ int work(const int argc, const char* const * const argv) try {
 	static necessary_images_in_atlas_map necessary_images_in_atlas;
 	
 #if STATICALLY_ALLOCATE_BAKED_FONTS
-	static augs::baked_font gui_font;
+	static augs::baked_font loaded_gui_font;
 
-	static auto get_gui_font = []() -> augs::baked_font& {
-		return gui_font;
+	static auto get_loaded_gui_font = []() -> augs::baked_font& {
+		return loaded_gui_font;
 	};
 #else
-	static auto gui_font = std::make_unique<augs::baked_font>();
+	static auto loaded_gui_font = std::make_unique<augs::baked_font>();
 
-	static auto get_gui_font = []() -> augs::baked_font& {
-		return *gui_font;
+	static auto get_loaded_gui_font = []() -> augs::baked_font& {
+		return *loaded_gui_font;
 	};
 #endif
-	static augs::font_loading_input loaded_gui_font;
 	
 	static std::optional<augs::graphics::texture> game_world_atlas;
 
@@ -325,7 +325,7 @@ int work(const int argc, const char* const * const argv) try {
 
 				{
 					/* Check for unloaded and changed resources */
-					for_each_id_and_object(currently_loaded_defs.image_definitions, [&](const auto key, const auto& old_definition) {
+					for_each_id_and_object(now_loaded_viewables_defs.image_definitions, [&](const auto key, const auto& old_definition) {
 						if (const auto new_definition = mapped_or_nullptr(new_defs.image_definitions, key)) {
 							if (new_definition->loadables != old_definition.loadables) {
 								/* Loadables changed, so reload them. */
@@ -349,7 +349,7 @@ int work(const int argc, const char* const * const argv) try {
 
 					/* Check for new resources */
 					for_each_id_and_object(new_defs.image_definitions, [&](const auto key, const auto& fresh) {
-						if (nullptr == mapped_or_nullptr(currently_loaded_defs.image_definitions, key)) {
+						if (nullptr == mapped_or_nullptr(now_loaded_viewables_defs.image_definitions, key)) {
 							auto scope = add_scope_duration(total_reloading_time);
 
 							new_atlas_required = true;
@@ -363,7 +363,7 @@ int work(const int argc, const char* const * const argv) try {
 					});
 				}
 
-				if (config.gui_font != loaded_gui_font) {
+				if (config.gui_font != now_loaded_gui_font_def) {
 					new_atlas_required = true;
 				}
 
@@ -393,14 +393,14 @@ int work(const int argc, const char* const * const argv) try {
 				auto out = standard_atlas_distribution_output {
 					images_in_atlas,
 					necessary_images_in_atlas,
-					get_gui_font(),
+					get_loaded_gui_font(),
 					atlas_performance,
 					performance.atlas_upload_to_gpu
 				};
 
 				game_world_atlas.emplace(standard_atlas_distribution(in, out));
 
-				loaded_gui_font = config.gui_font;
+				now_loaded_gui_font_def = config.gui_font;
 			}
 		}
 
@@ -417,7 +417,7 @@ int work(const int argc, const char* const * const argv) try {
 			};
 
 			/* Check for unloaded and changed resources */
-			for_each_id_and_object(currently_loaded_defs.sounds, [&](const auto& key, const auto& now_loaded) {
+			for_each_id_and_object(now_loaded_viewables_defs.sounds, [&](const auto& key, const auto& now_loaded) {
 				auto unload = [&](){
 					audiovisuals.get<sound_system>().clear_sources_playing(key);
 					loaded_sounds.erase(key);
@@ -444,7 +444,7 @@ int work(const int argc, const char* const * const argv) try {
 
 			/* Check for new resources */
 			for_each_id_and_object(new_defs.sounds, [&](const auto& fresh_key, const auto& fresh_def) {
-				if (nullptr == mapped_or_nullptr(currently_loaded_defs.sounds, fresh_key)) {
+				if (nullptr == mapped_or_nullptr(now_loaded_viewables_defs.sounds, fresh_key)) {
 					try {
 						loaded_sounds.try_emplace(fresh_key, make_sound_loading_input(fresh_def));
 					}
@@ -459,7 +459,7 @@ int work(const int argc, const char* const * const argv) try {
 		auto scope = measure_scope(performance.viewables_readback);
 
 		/* Done, overwrite */
-		currently_loaded_defs = new_defs;
+		now_loaded_viewables_defs = new_defs;
 	};
 
 	static auto setup_launcher = [](auto&& setup_init_callback) {
@@ -542,14 +542,14 @@ int work(const int argc, const char* const * const argv) try {
 			get_viewable_defs().image_definitions,
 			images_in_atlas,
 			necessary_images_in_atlas,
-			get_gui_font()
+			get_loaded_gui_font()
 		};
 	};
 
 	static auto create_menu_context_deps = [](const auto& viewing_config) {
 		return menu_context_dependencies{
 			necessary_images_in_atlas,
-			get_gui_font(),
+			get_loaded_gui_font(),
 			necessary_sounds,
 			viewing_config.audio_volume
 		};
@@ -1574,7 +1574,7 @@ int work(const int argc, const char* const * const argv) try {
 					audiovisuals,
 					new_viewing_config.drawing,
 					necessary_images_in_atlas,
-					get_gui_font(),
+					get_loaded_gui_font(),
 					images_in_atlas,
 					interpolation_ratio,
 					renderer,
@@ -1747,7 +1747,7 @@ int work(const int argc, const char* const * const argv) try {
 				main_menu.value().draw_overlays(
 					get_drawer(),
 					necessary_images_in_atlas,
-					get_gui_font(),
+					get_loaded_gui_font(),
 					screen_size
 				);
 
@@ -1802,7 +1802,7 @@ int work(const int argc, const char* const * const argv) try {
 		if (new_viewing_config.session.show_developer_console) {
 			draw_debug_details(
 				get_drawer(),
-				get_gui_font(),
+				get_loaded_gui_font(),
 				screen_size,
 				viewed_character,
 				frame_performance,
