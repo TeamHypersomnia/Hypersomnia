@@ -1,5 +1,6 @@
 #include <iostream>
 #include <clocale>
+#include <thread>
 
 #if PLATFORM_UNIX
 #include <csignal>
@@ -254,7 +255,7 @@ int work(const int argc, const char* const * const argv) try {
 	};
 #endif
 	
-	static std::optional<augs::graphics::texture> game_world_atlas;
+	static std::optional<standard_atlas_distribution> loaded_atlases;
 
 	static world_camera gameplay_camera;
 	static audiovisual_state audiovisuals;
@@ -319,7 +320,7 @@ int work(const int argc, const char* const * const argv) try {
 					new_atlas_required = true;
 				}
 
-				if (!game_world_atlas.has_value()) {
+				if (!loaded_atlases.has_value()) {
 					new_atlas_required = true;
 				}
 
@@ -398,7 +399,7 @@ int work(const int argc, const char* const * const argv) try {
 					performance.atlas_upload_to_gpu
 				};
 
-				game_world_atlas.emplace(standard_atlas_distribution(in, out));
+				loaded_atlases.emplace(create_standard_atlas_distribution(in, out));
 
 				now_loaded_gui_font_def = config.gui_font;
 			}
@@ -1579,7 +1580,7 @@ int work(const int argc, const char* const * const argv) try {
 					interpolation_ratio,
 					renderer,
 					frame_performance,
-					*game_world_atlas,
+					*loaded_atlases,
 					necessary_fbos,
 					necessary_shaders,
 					all_visible
@@ -1717,7 +1718,7 @@ int work(const int argc, const char* const * const argv) try {
 			}
 		}
 		else {
-			game_world_atlas->bind();
+			loaded_atlases->general.bind();
 			necessary_shaders.standard->set_as_current();
 			necessary_shaders.standard->set_projection(augs::orthographic_projection(vec2(screen_size)));
 
@@ -1760,7 +1761,7 @@ int work(const int argc, const char* const * const argv) try {
 		/* #5 */
 		renderer.draw_call_imgui(
 			imgui_atlas,
-			*game_world_atlas
+			loaded_atlases->general
 		);
 
 		/* #6 */

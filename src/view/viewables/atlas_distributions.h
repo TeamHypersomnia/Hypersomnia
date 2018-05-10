@@ -30,10 +30,6 @@ struct standard_atlas_distribution_input {
 	const unsigned max_atlas_size;
 };
 
-struct standard_atlas_distribution {
-
-};
-
 struct standard_atlas_distribution_output {
 	images_in_atlas_map& atlas_entries;
 	necessary_images_in_atlas_map& necessary_atlas_entries;
@@ -50,7 +46,12 @@ void regenerate_and_gather_subjects(
 	atlas_input_subjects& output
 );
 
-augs::graphics::texture standard_atlas_distribution(
+struct standard_atlas_distribution {
+	augs::graphics::texture general;
+	// augs::graphics::texture neon_maps;
+};
+
+standard_atlas_distribution create_standard_atlas_distribution(
 	standard_atlas_distribution_input in,
 	standard_atlas_distribution_output out
 );

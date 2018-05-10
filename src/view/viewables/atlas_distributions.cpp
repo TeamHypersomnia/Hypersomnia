@@ -60,7 +60,7 @@ void regenerate_and_gather_subjects(
 	}
 }
 
-augs::graphics::texture standard_atlas_distribution(
+standard_atlas_distribution create_standard_atlas_distribution(
 	const standard_atlas_distribution_input in,
 	const standard_atlas_distribution_output out
 ) {
@@ -133,5 +133,5 @@ augs::graphics::texture standard_atlas_distribution(
 	auto scope = measure_scope(out.atlas_upload_to_gpu);
 
 	auto output = augs::graphics::texture(atlas_image);
-	return output;
+	return { std::move(output) };
 }
