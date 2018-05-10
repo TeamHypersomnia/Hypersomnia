@@ -6,7 +6,7 @@
 #include "augs/misc/simple_pair.h"
 #include "augs/filesystem/path.h"
 #include "augs/image/image.h"
-#include "augs/texture_atlas/texture_atlas_entry.h"
+#include "augs/texture_atlas/atlas_entry.h"
 #include "augs/utf32_point.h"
 #include "augs/misc/minmax.h"
 
@@ -67,14 +67,14 @@ namespace augs {
 	struct stored_baked_font {
 		// GEN INTROSPECTOR struct augs::stored_baked_font
 		stored_font_metadata meta;
-		std::vector<augs::texture_atlas_entry> glyphs_in_atlas;
+		std::vector<augs::atlas_entry> glyphs_in_atlas;
 		// END GEN INTROSPECTOR
 	};
 
 	struct baked_font {
 		struct internal_glyph {
 			font_glyph_metadata meta;
-			augs::texture_atlas_entry in_atlas;
+			augs::atlas_entry in_atlas;
 		};
 
 		font_metrics metrics;

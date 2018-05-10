@@ -5,7 +5,7 @@
 #include "augs/drawing//drawing.h"
 #include "augs/misc/constant_size_vector.h"
 #include "augs/gui/gui_traversal_structs.h"
-#include "augs/texture_atlas/texture_atlas_entry.h"
+#include "augs/texture_atlas/atlas_entry.h"
 
 augs::constant_size_vector<std::array<vec2, 2>, 2> get_connecting_pixel_lines(
 	const ltrb& origin, 

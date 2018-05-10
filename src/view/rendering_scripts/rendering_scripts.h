@@ -5,7 +5,7 @@
 #include "game/detail/visible_entities.h"
 #include "game/components/sentience_component.h"
 #include "game/transcendental/entity_handle.h"
-#include "augs/texture_atlas/texture_atlas_entry.h"
+#include "augs/texture_atlas/atlas_entry.h"
 
 namespace augs {
 	struct baked_font;
@@ -26,7 +26,7 @@ struct draw_circular_bars_input {
 	const double global_time_seconds;
 
 	const augs::baked_font& gui_font;
-	const augs::texture_atlas_entry circular_bar_tex;
+	const augs::atlas_entry circular_bar_tex;
 };
 
 struct draw_cast_spells_highlights_input {
@@ -34,7 +34,7 @@ struct draw_cast_spells_highlights_input {
 	const interpolation_system& interpolation;
 	const cosmos& cosm;
 	const double global_time_seconds;
-	const augs::texture_atlas_entry cast_highlight_tex;
+	const augs::atlas_entry cast_highlight_tex;
 };
 
 struct draw_hud_for_released_explosives_input {
@@ -44,7 +44,7 @@ struct draw_hud_for_released_explosives_input {
 	const interpolation_system& interpolation;
 	const cosmos& cosm;
 	const double global_time_seconds;
-	const augs::texture_atlas_entry circular_bar_tex;
+	const augs::atlas_entry circular_bar_tex;
 };
 
 struct draw_crosshair_lasers_input {

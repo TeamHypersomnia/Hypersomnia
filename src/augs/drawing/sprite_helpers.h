@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/texture_atlas/texture_atlas_entry.h"
+#include "augs/texture_atlas/atlas_entry.h"
 #include "augs/math/vec2.h"
 #include "augs/graphics/vertex.h"
 #include "augs/graphics/rgba.h"

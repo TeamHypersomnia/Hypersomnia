@@ -58,7 +58,7 @@ namespace augs {
 			const debug_lines& persistent_lines,
 			const debug_lines& frame_lines,
 
-			const augs::texture_atlas_entry line_texture, 
+			const augs::atlas_entry line_texture, 
 			const float interpolation_ratio
 		);
 

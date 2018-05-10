@@ -7,7 +7,7 @@
 
 #include "augs/drawing/flip.h"
 
-#include "augs/texture_atlas/texture_atlas_entry.h"
+#include "augs/texture_atlas/atlas_entry.h"
 
 #include "view/viewables/image_meta.h"
 

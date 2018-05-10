@@ -33,7 +33,7 @@ namespace augs {
 	}
 
 	FORCE_INLINE std::array<vertex_triangle, 2> make_sprite_triangles(
-		const augs::texture_atlas_entry considered_texture,
+		const augs::atlas_entry considered_texture,
 		const std::array<vec2, 4> v,
 		const rgba col = white,
 		const flip_flags flip = flip_flags()

@@ -1,6 +1,6 @@
 #pragma once
 #include "augs/misc/profiler_mixin.h"
-#include "augs/texture_atlas/texture_atlas_profiler.h"
+#include "augs/texture_atlas/atlas_profiler.h"
 
 struct session_profiler : public augs::profiler_mixin<session_profiler> {
 	session_profiler();

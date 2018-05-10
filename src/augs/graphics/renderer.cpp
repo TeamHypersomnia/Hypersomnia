@@ -7,7 +7,7 @@
 
 #include "augs/drawing/drawing.h"
 
-#include "augs/texture_atlas/texture_atlas_entry.h"
+#include "augs/texture_atlas/atlas_entry.h"
 
 #if PLATFORM_UNIX
 #define USE_BUFFER_SUB_DATA 0
@@ -281,7 +281,7 @@ namespace augs {
 		const debug_lines& persistent_lines,
 		const debug_lines& frame_lines,
 
-		const augs::texture_atlas_entry tex,
+		const augs::atlas_entry tex,
 		const float interpolation_ratio
 	) {
 		const auto output = augs::line_drawer_with_default({ get_line_buffer(), tex });

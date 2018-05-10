@@ -7,7 +7,7 @@
 #include "augs/math/snapping_grid.h"
 #include "augs/math/camera_cone.h"
 
-#include "augs/texture_atlas/texture_atlas_entry.h"
+#include "augs/texture_atlas/atlas_entry.h"
 #include "augs/drawing/make_sprite.h"
 #include "augs/drawing/flip.h"
 #include "augs/drawing/border.h"
@@ -25,39 +25,39 @@ namespace augs {
 		using self = const drawer&;
 
 		self color_overlay(
-			const texture_atlas_entry,
+			const atlas_entry,
 			const vec2i screen_size,
 			const rgba color
 		) const;
 
 		self aabb(
-			const texture_atlas_entry,
+			const atlas_entry,
 			const ltrb origin,
 			const rgba color = white,
 			const flip_flags = {}
 		) const;
 
 		self aabb_lt(
-			const texture_atlas_entry,
+			const atlas_entry,
 			const vec2 left_top,
 			const rgba color = white
 		) const;
 
 		self aabb_centered(
-			const texture_atlas_entry,
+			const atlas_entry,
 			const vec2 center,
 			const rgba color
 		) const;
 
 		self aabb_centered(
-			const texture_atlas_entry,
+			const atlas_entry,
 			const vec2 center,
 			const vec2i size,
 			const rgba color
 		) const;
 
 		self aabb_lt_clipped(
-			const texture_atlas_entry,
+			const atlas_entry,
 			const vec2 left_top,
 			ltrb clipper,
 			const rgba color,
@@ -65,7 +65,7 @@ namespace augs {
 		) const;
 
 		self aabb_clipped(
-			const texture_atlas_entry,
+			const atlas_entry,
 			const ltrb origin,
 			ltrb clipper,
 			const rgba colorize,
@@ -74,7 +74,7 @@ namespace augs {
 
 		template <class C, class I>
 		self gui_box_center_tex(
-			const texture_atlas_entry tex,
+			const atlas_entry tex,
 			const C context,
 			const I id,
 			const rgba colorize = white,
@@ -91,7 +91,7 @@ namespace augs {
 
 		template <class C, class I>
 		self gui_box_stretch_tex(
-			const texture_atlas_entry tex,
+			const atlas_entry tex,
 			const C context,
 			const I id,
 			const rgba colorize = white
@@ -102,14 +102,14 @@ namespace augs {
 		}
 
 		self border(
-			const texture_atlas_entry,
+			const atlas_entry,
 			ltrb origin,
 			const rgba color,
 			const border_input = border_input()
 		) const;
 
 		self aabb_with_border(
-			const texture_atlas_entry,
+			const atlas_entry,
 			const ltrb origin,
 			const rgba inside_color,
 			const rgba border_color,
@@ -117,14 +117,14 @@ namespace augs {
 		) const;
 
 		self rect(
-			const texture_atlas_entry,
+			const atlas_entry,
 			const transform center,
 			const vec2 size,
 			const rgba color = white
 		) const;
 
 		self rectangular_clock(
-			const texture_atlas_entry,
+			const atlas_entry,
 			const ltrb origin,
 			const rgba color,
 			const float ratio
@@ -141,7 +141,7 @@ namespace augs {
 		}
 
 		self line(
-			const texture_atlas_entry,
+			const atlas_entry,
 			const vec2 from,
 			const vec2 to,
 			const float line_width, 
@@ -150,7 +150,7 @@ namespace augs {
 		) const;
 
 		self grid(
-			texture_atlas_entry,
+			atlas_entry,
 			vec2i screen_size,
 			unsigned unit,
 			camera_cone,
@@ -168,11 +168,11 @@ namespace augs {
 		using base = drawer;
 		using self = const drawer_with_default&;
 
-		const texture_atlas_entry default_texture;
+		const atlas_entry default_texture;
 
 		drawer_with_default(
 			vertex_triangle_buffer& output_buffer,
-			const texture_atlas_entry default_texture
+			const atlas_entry default_texture
 		) :
 			base({ output_buffer }),
 			default_texture(default_texture)
@@ -269,14 +269,14 @@ namespace augs {
 		vertex_line_buffer& output_buffer;
 
 		self line(
-			texture_atlas_entry,
+			atlas_entry,
 			vec2 from,
 			vec2 to,
 			rgba color
 		) const;
 
 		self dashed_line(
-			texture_atlas_entry,
+			atlas_entry,
 			vec2 from,
 			vec2 to,
 			rgba color,
@@ -290,11 +290,11 @@ namespace augs {
 		using base = line_drawer;
 		using self = const line_drawer_with_default&;
 
-		const texture_atlas_entry default_texture;
+		const atlas_entry default_texture;
 
 		line_drawer_with_default(
 			vertex_line_buffer& output_buffer,
-			const texture_atlas_entry default_texture
+			const atlas_entry default_texture
 		) : 
 			base({ output_buffer }), 
 			default_texture(default_texture) 

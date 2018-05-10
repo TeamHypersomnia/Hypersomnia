@@ -19,31 +19,32 @@ template <class T>
 constexpr bool has_types_in_v = has_types_in<T>::value;
 
 namespace augs {
-	template <class T, class = void>
-	struct all_types_in {
-		static constexpr auto get_list_t() {
-			if constexpr(has_introspect_base_v<T>) {
-				if constexpr(has_types_in_v<T>) {
-					return prepend_to_list_t<typename T::introspect_base, types_in_t<T>>();
-				}
-				else {
-					return type_list<typename T::introspect_base>();
-				}
-			}
-			else if constexpr(has_introspect_bases_v<T>) {
-				if constexpr(has_types_in_v<T>) {
-					return concatenate_lists_t<typename T::introspect_bases, types_in_t<T>>();
-				}
-				else {
-					return typename T::introspect_bases();
-				}
+	template <class T>
+	auto detail_get_list_t() {
+		if constexpr(has_introspect_base_v<T>) {
+			if constexpr(has_types_in_v<T>) {
+				return prepend_to_list_t<typename T::introspect_base, types_in_t<T>>();
 			}
 			else {
-				return types_in_t<T>();
+				return type_list<typename T::introspect_base>();
 			}
 		}
+		else if constexpr(has_introspect_bases_v<T>) {
+			if constexpr(has_types_in_v<T>) {
+				return concatenate_lists_t<typename T::introspect_bases, types_in_t<T>>();
+			}
+			else {
+				return typename T::introspect_bases();
+			}
+		}
+		else {
+			return types_in_t<T>();
+		}
+	}
 
-		using type = decltype(get_list_t());
+	template <class T, class = void>
+	struct all_types_in {
+		using type = decltype(detail_get_list_t<T>());
 	};
 
 	template <class T>

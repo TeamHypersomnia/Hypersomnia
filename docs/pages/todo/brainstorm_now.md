@@ -6,6 +6,7 @@ summary: That which we are brainstorming at the moment.
 ---
 
 - thoughts about atlas
+	- Remove atlas saving for now.
 	- Separation
 		- First: just do neons maps and the rest distinction
 			- will rarely be switched anyway

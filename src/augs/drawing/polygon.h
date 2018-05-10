@@ -10,7 +10,7 @@
 
 #include "augs/drawing/sprite.h"
 
-#include "augs/texture_atlas/texture_atlas_entry.h"
+#include "augs/texture_atlas/atlas_entry.h"
 
 enum class uv_mapping_mode {
 	STRETCH
@@ -172,7 +172,7 @@ namespace augs {
 		
 		void draw(
 			const augs::drawer output,
-			const texture_atlas_entry texture,
+			const atlas_entry texture,
 			const transform target_transform
 		) const {
 			vertex_triangle new_tri;

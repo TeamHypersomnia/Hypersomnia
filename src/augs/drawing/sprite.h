@@ -12,7 +12,7 @@
 #include "augs/drawing/drawing_input_base.h"
 #include "augs/drawing/drawing.h"
 
-#include "augs/texture_atlas/texture_atlas_entry.h"
+#include "augs/texture_atlas/atlas_entry.h"
 #include "augs/build_settings/platform_defines.h"
 
 namespace augs {
@@ -147,7 +147,7 @@ namespace augs {
 		
 		FORCE_INLINE void draw(
 			const drawing_input in,
-			const texture_atlas_entry considered_texture,
+			const atlas_entry considered_texture,
 			const vec2 target_position,
 			const float target_rotation,
 			const vec2i considered_size

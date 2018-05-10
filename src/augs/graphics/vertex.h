@@ -10,7 +10,7 @@ enum class vertex_attribute {
 };
 
 namespace augs {
-	struct texture_atlas_entry;
+	struct atlas_entry;
 
 	struct vertex {
 		// GEN INTROSPECTOR struct augs::vertex
@@ -19,7 +19,7 @@ namespace augs {
 		rgba color;
 		// END GEN INTROSPECTOR
 
-		void set_texcoord(vec2, const augs::texture_atlas_entry& tex);
+		void set_texcoord(vec2, const augs::atlas_entry& tex);
 	};
 
 	struct vertex_triangle {

@@ -3,7 +3,7 @@
 #include "augs/pad_bytes.h"
 
 namespace augs {
-	struct texture_atlas_entry {
+	struct atlas_entry {
 		xywh atlas_space;
 		bool was_flipped = false;
 		pad_bytes<3> pad;

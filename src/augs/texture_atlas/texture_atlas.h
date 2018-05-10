@@ -4,7 +4,7 @@
 
 #include "augs/filesystem/path.h"
 #include "augs/image/font.h"
-#include "augs/texture_atlas/texture_atlas_profiler.h"
+#include "augs/texture_atlas/atlas_profiler.h"
 
 using source_image_identifier = augs::path_type;
 using source_font_identifier = augs::font_loading_input;
@@ -44,13 +44,13 @@ struct regenerated_atlas_input {
 	atlas_profiler& profiler;
 };
 
-struct regenerated_atlas {
-	// GEN INTROSPECTOR struct regenerated_atlas
+struct baked_atlas {
+	// GEN INTROSPECTOR struct baked_atlas
 	vec2u atlas_image_size;
 
-	std::unordered_map<source_image_identifier, augs::texture_atlas_entry> baked_images;
+	std::unordered_map<source_image_identifier, augs::atlas_entry> baked_images;
 	std::unordered_map<source_font_identifier, augs::stored_baked_font> stored_baked_fonts;
 	// END GEN INTROSPECTOR
 
-	regenerated_atlas(regenerated_atlas_input);
+	baked_atlas(regenerated_atlas_input);
 };

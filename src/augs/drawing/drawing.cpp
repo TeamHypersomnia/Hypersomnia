@@ -3,7 +3,7 @@
 #include "augs/math/math.h"
 #include "augs/drawing/drawing.h"
 #include "augs/drawing/grid_render_settings.h"
-#include "augs/texture_atlas/texture_atlas_entry.h"
+#include "augs/texture_atlas/atlas_entry.h"
 #include "augs/drawing/polygon.h"
 #include "augs/drawing/general_border.h"
 #include "augs/misc/constant_size_vector.h"
@@ -11,7 +11,7 @@
 namespace augs {
 
 	const drawer& drawer::color_overlay(
-		const texture_atlas_entry tex,
+		const atlas_entry tex,
 		const vec2i screen_size,
 		const rgba color
 	) const {
@@ -19,7 +19,7 @@ namespace augs {
 	}
 
 	const drawer& drawer::aabb(
-		const texture_atlas_entry tex,
+		const atlas_entry tex,
 		const ltrb origin,
 		const rgba color,
 		const flip_flags flip
@@ -75,7 +75,7 @@ namespace augs {
 	}
 
 	const drawer& drawer::aabb_lt(
-		const texture_atlas_entry tex,
+		const atlas_entry tex,
 		const vec2 left_top,
 		const rgba color
 	) const {
@@ -83,7 +83,7 @@ namespace augs {
 	}
 
 	const drawer& drawer::aabb_centered(
-		const texture_atlas_entry tex,
+		const atlas_entry tex,
 		const vec2 center,
 		const vec2i size,
 		const rgba color
@@ -92,7 +92,7 @@ namespace augs {
 	}
 
 	const drawer& drawer::aabb_centered(
-		const texture_atlas_entry tex,
+		const atlas_entry tex,
 		const vec2 center,
 		const rgba color
 	) const {
@@ -100,7 +100,7 @@ namespace augs {
 	}
 
 	const drawer& drawer::aabb_lt_clipped(
-		const texture_atlas_entry tex,
+		const atlas_entry tex,
 		const vec2 left_top,
 		ltrb clipper,
 		const rgba color,
@@ -110,7 +110,7 @@ namespace augs {
 	}
 
 	const drawer& drawer::aabb_clipped(
-		const texture_atlas_entry tex,
+		const atlas_entry tex,
 		const ltrb origin,
 		ltrb clipper,
 		const rgba color,
@@ -183,7 +183,7 @@ namespace augs {
 
 
 	const drawer& drawer::border(
-		const texture_atlas_entry tex,
+		const atlas_entry tex,
 		ltrb bordered,
 		const rgba color,
 		border_input in
@@ -201,7 +201,7 @@ namespace augs {
 	}
 
 	const drawer& drawer::aabb_with_border(
-		const texture_atlas_entry tex,
+		const atlas_entry tex,
 		const ltrb origin,
 		const rgba inside_color,
 		const rgba border_color,
@@ -214,7 +214,7 @@ namespace augs {
 	}
 
 	const drawer& drawer::rectangular_clock(
-		const texture_atlas_entry tex,
+		const atlas_entry tex,
 		const ltrb origin,
 		const rgba color,
 		const float ratio
@@ -288,7 +288,7 @@ namespace augs {
 	}
 
 	const drawer& drawer::line(
-		const texture_atlas_entry tex,
+		const atlas_entry tex,
 		const vec2 from,
 		const vec2 to,
 		const float line_width,
@@ -309,7 +309,7 @@ namespace augs {
 	}
 	
 	const drawer& drawer::grid(
-		const texture_atlas_entry tex,
+		const atlas_entry tex,
 		const vec2i screen_size,
 		const unsigned minimum_unit,
 		const camera_cone cone,
@@ -433,7 +433,7 @@ namespace augs {
 	}
 
 	const line_drawer& line_drawer::line(
-		const texture_atlas_entry tex, 
+		const atlas_entry tex, 
 		const vec2 from, 
 		const vec2 to, 
 		const rgba color
@@ -451,7 +451,7 @@ namespace augs {
 	}
 
 	const line_drawer& line_drawer::dashed_line(
-		const texture_atlas_entry tex,
+		const atlas_entry tex,
 		const vec2 from,
 		const vec2 to,
 		const rgba color,

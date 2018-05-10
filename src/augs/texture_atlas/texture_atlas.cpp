@@ -22,7 +22,7 @@
 
 using namespace rectpack2D;
 
-regenerated_atlas::regenerated_atlas(regenerated_atlas_input in) {
+baked_atlas::baked_atlas(regenerated_atlas_input in) {
 	const auto& settings = in.settings;
 	const auto& subjects = in.subjects;
 	auto& output_image = in.output_image;

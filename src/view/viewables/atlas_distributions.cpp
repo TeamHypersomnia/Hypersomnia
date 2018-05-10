@@ -65,7 +65,7 @@ augs::graphics::texture standard_atlas_distribution(const standard_atlas_distrib
 	thread_local auto atlas_image = augs::image();
 
 	{
-		const auto atlas = regenerated_atlas({
+		const auto atlas = baked_atlas({
 			atlas_subjects,
 			in.settings,
 			atlas_image,

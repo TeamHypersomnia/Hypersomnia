@@ -1,6 +1,6 @@
 #pragma once
 #include "augs/graphics/renderer.h"
-#include "augs/texture_atlas/texture_atlas_entry.h"
+#include "augs/texture_atlas/atlas_entry.h"
 
 #include "game/debug_drawing_settings.h"
 #include "game/transcendental/cosmos.h"
@@ -9,7 +9,7 @@ inline void draw_debug_lines(
 	const cosmos& viewed_cosmos,
 	augs::renderer& renderer,
 	const real32 interpolation_ratio,
-	const augs::texture_atlas_entry default_texture
+	const augs::atlas_entry default_texture
 ) {
 	if (DEBUG_DRAWING.enabled) {
 		if (DEBUG_DRAWING.draw_npo_tree_nodes) {
