@@ -9,21 +9,31 @@
 
 #include "augs/readwrite/lua_file.h"
 
+static void save_last_folders(
+	sol::state& lua,
+	const editor_significant& signi
+) {
+	editor_last_folders last_folders;
+	last_folders.current_index = signi.current_index;
+	last_folders.paths.reserve(signi.folders.size());
+
+	for (const auto& f : signi.folders) {
+		if (const auto& h = f.history; h.empty()) {
+			/* Drop empty projects without any changes */
+			continue;
+		}
+
+		last_folders.paths.push_back(f.current_path);
+	}
+
+	augs::save_as_lua_table(lua, last_folders, get_last_folders_path());
+}
+
 void editor_autosave::save(
 	sol::state& lua,
 	const editor_significant& signi
 ) const {
-	{
-		editor_last_folders last_folders;
-		last_folders.current_index = signi.current_index;
-		last_folders.paths.reserve(signi.folders.size());
-
-		for (const auto& f : signi.folders) {
-			last_folders.paths.push_back(f.current_path);
-		}
-
-		augs::save_as_lua_table(lua, last_folders, get_last_folders_path());
-	}
+	save_last_folders(lua, signi);
 
 	for (const auto& f : signi.folders) {
 		if (const auto& h = f.history;
