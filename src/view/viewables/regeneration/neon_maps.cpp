@@ -95,8 +95,6 @@ void make_neon(
 	augs::image& source
 ) {
 	const auto radius = input.radius;
-	const auto rows = radius.y;
-	const auto cols = radius.x;
 
 	resize_image(source, radius);
 
@@ -118,45 +116,46 @@ void make_neon(
 		pixels_original.emplace_back(source.pixel(p));
 	}
 
+	const auto radius_rows = radius.y;
+	const auto radius_cols = radius.x;
+	const auto source_rows = source.get_rows();
+	const auto source_cols = source.get_columns();
+
 	for (std::size_t i = 0; i < pixel_coordinates.size(); ++i) {
 		const auto coord = pixel_coordinates[i];
-		const auto center_pixel = pixels_original[i];
+		const auto current_light_pixel = pixels_original[i];
 
-		const auto center_pixel_rgba = rgba{ center_pixel[2], center_pixel[1], center_pixel[0], center_pixel[3] };
-
-		for (unsigned y = 0; y < rows; ++y) {
-			for (unsigned x = 0; x < cols; ++x) {
+		for (unsigned y = 0; y < radius_rows; ++y) {
+			for (unsigned x = 0; x < radius_cols; ++x) {
 				const unsigned current_index_y = coord.y + y - radius.y / 2;
 
-				if (current_index_y >= source.get_rows()) {
+				if (current_index_y >= source_rows) {
 					continue;
 				}
 
 				const unsigned current_index_x = coord.x + x - radius.x / 2;
 
-				if (current_index_x >= source.get_columns()) {
+				if (current_index_x >= source_cols) {
 					continue;
 				}
 
-				rgba& current_pixel = source.pixel({ current_index_x, current_index_y });
-				const auto current_pixel_rgba = rgba{ current_pixel[2], current_pixel[1], current_pixel[0], current_pixel[3] };
-				auto alpha = static_cast<unsigned>(255 * kernel[y * cols + x] * input.amplification);
-				alpha = alpha > 255 ? 255 : alpha;
+				auto& drawn_pixel = source.pixel({ current_index_x, current_index_y });
+				const auto alpha = std::min(255u, static_cast<unsigned>(255 * kernel[y * radius_cols + x] * input.amplification));
 
-				if (current_pixel_rgba == PIXEL_NONE && alpha) {
-					current_pixel[2] = center_pixel[2];
-					current_pixel[1] = center_pixel[1];
-					current_pixel[0] = center_pixel[0];
+				if (drawn_pixel == PIXEL_NONE && alpha) {
+					drawn_pixel[2] = current_light_pixel[2];
+					drawn_pixel[1] = current_light_pixel[1];
+					drawn_pixel[0] = current_light_pixel[0];
 				}
 
-				else if (current_pixel_rgba != center_pixel_rgba && alpha) {
-					current_pixel[2] = static_cast<rgba_channel>((alpha * center_pixel[2] + current_pixel[3] * current_pixel[2]) / (alpha + current_pixel[3]));
-					current_pixel[1] = static_cast<rgba_channel>((alpha * center_pixel[1] + current_pixel[3] * current_pixel[1]) / (alpha + current_pixel[3]));
-					current_pixel[0] = static_cast<rgba_channel>((alpha * center_pixel[0] + current_pixel[3] * current_pixel[0]) / (alpha + current_pixel[3]));
+				else if (drawn_pixel != current_light_pixel && alpha) {
+					drawn_pixel[2] = static_cast<rgba_channel>((alpha * current_light_pixel[2] + drawn_pixel[3] * drawn_pixel[2]) / (alpha + drawn_pixel[3]));
+					drawn_pixel[1] = static_cast<rgba_channel>((alpha * current_light_pixel[1] + drawn_pixel[3] * drawn_pixel[1]) / (alpha + drawn_pixel[3]));
+					drawn_pixel[0] = static_cast<rgba_channel>((alpha * current_light_pixel[0] + drawn_pixel[3] * drawn_pixel[0]) / (alpha + drawn_pixel[3]));
 				}
 
-				if (alpha > current_pixel[3]) {
-					current_pixel[3] = static_cast<rgba_channel>(alpha);
+				if (alpha > drawn_pixel[3]) {
+					drawn_pixel[3] = static_cast<rgba_channel>(alpha);
 				}
 			}
 		}
@@ -222,12 +221,12 @@ void scan_and_hide_undesired_pixels(
 ) {
 	for (unsigned y = 0; y < original_image.get_rows(); ++y) {
 		for (unsigned x = 0; x < original_image.get_columns(); ++x) {
-			auto& current_pixel = original_image.pixel({ x, y });
+			auto& drawn_pixel = original_image.pixel({ x, y });
 
-		if (!found_in(color_whitelist, current_pixel)) {
-			current_pixel = PIXEL_NONE;
-		}
-		else {
+			if (!found_in(color_whitelist, drawn_pixel)) {
+				drawn_pixel = PIXEL_NONE;
+			}
+			else {
 				result.emplace_back(x, y);
 			}
 		}
