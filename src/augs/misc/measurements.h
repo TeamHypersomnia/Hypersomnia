@@ -166,7 +166,9 @@ struct additive_time_scope {
 	additive_time_scope(const additive_time_scope& b) = delete;
 
 	~additive_time_scope() {
-		into.measure(total);
+		if (total > 0.0) {
+			into.measure(total);
+		}
 	}
 };
 

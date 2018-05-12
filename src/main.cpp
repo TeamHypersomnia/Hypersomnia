@@ -327,51 +327,32 @@ int work(const int argc, const char* const * const argv) try {
 	static bool game_gui_mode = false;
 
 	static auto load_all = [](const all_viewables_defs& new_defs) {
-		/* Atlas/meta cache pass */
+		/* Atlas pass */
 
 		{
 			bool new_atlas_required = false;
 
 			{
-				auto total_reloading = measure_scope_additive(performance.reloading_image_caches);
-
 				{
 					/* Check for unloaded and changed resources */
 					for_each_id_and_object(now_loaded_viewables_defs.image_definitions, [&](const auto key, const auto& old_definition) {
 						if (const auto new_definition = mapped_or_nullptr(new_defs.image_definitions, key)) {
 							if (new_definition->loadables != old_definition.loadables) {
-								/* Loadables changed, so reload them. */
-								
-								auto scope = measure_scope(total_reloading);
-
+								/* Changed, so reload. */
 								new_atlas_required = true;
-								loaded_image_caches.at(key) = { 
-									image_definition_view(get_unofficial_content_dir(), *new_definition)
-								};
 							}
 						}
 						else {
-							auto scope = measure_scope(total_reloading);
-
 							/* Missing, unload */
 							new_atlas_required = true;
-							loaded_image_caches.erase(key);
 						}
 					});
 
-					/* Check for new resources */
-					for_each_id_and_object(new_defs.image_definitions, [&](const auto key, const auto& fresh) {
+					for_each_id_and_object(new_defs.image_definitions, [&](const auto key, const auto&) {
 						if (nullptr == mapped_or_nullptr(now_loaded_viewables_defs.image_definitions, key)) {
-							auto scope = measure_scope(total_reloading);
-
+							/* New one, include. */
 							new_atlas_required = true;
-
-							loaded_image_caches.try_emplace(
-								key, 
-								image_definition_view(get_unofficial_content_dir(), fresh)
-							);
 						}
-						/* Otherwise it's already taken care of */
 					});
 				}
 
@@ -1484,7 +1465,45 @@ int work(const int argc, const char* const * const argv) try {
 			get_loaded_gui_font() = std::move(result.gui_font);
 
 			now_loaded_gui_font_def = future_gui_font;
-			now_loaded_viewables_defs.image_definitions = future_image_definitions;
+
+			auto& now_loaded_defs = now_loaded_viewables_defs.image_definitions;
+			auto& new_loaded_defs = future_image_definitions;
+
+			{
+				auto total_reloading = measure_scope(performance.reloading_image_caches);
+
+				{
+					/* Check for unloaded and changed resources */
+					for_each_id_and_object(now_loaded_defs, [&](const auto key, const auto& old_definition) {
+						if (const auto new_definition = mapped_or_nullptr(new_loaded_defs, key)) {
+							if (new_definition->loadables != old_definition.loadables) {
+								/* Loadables changed, so reload them. */
+								
+								loaded_image_caches.at(key) = { 
+									image_definition_view(get_unofficial_content_dir(), *new_definition)
+								};
+							}
+						}
+						else {
+							/* Missing, unload */
+							loaded_image_caches.erase(key);
+						}
+					});
+
+					/* Check for new resources */
+					for_each_id_and_object(new_loaded_defs, [&](const auto key, const auto& fresh) {
+						if (nullptr == mapped_or_nullptr(now_loaded_defs, key)) {
+							loaded_image_caches.try_emplace(
+								key, 
+								image_definition_view(get_unofficial_content_dir(), fresh)
+							);
+						}
+						/* Otherwise it's already taken care of */
+					});
+				}
+			}
+			
+			now_loaded_defs = new_loaded_defs;
 
 			const auto atlas_size = result.atlas_size;
 

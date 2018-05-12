@@ -1,5 +1,6 @@
 #include <string>
 #include <sstream>
+#include <numeric>
 
 #include "3rdparty/rectpack2D/src/finders_interface.h"
 
@@ -40,27 +41,29 @@ void bake_fresh_atlas(
 	std::unordered_map<source_image_identifier, vec2u> loaded_image_sizes;
 	std::unordered_map<source_font_identifier, augs::font> loaded_fonts;
 
-	std::vector<rect_xywhf> rects_for_packer;
+	static std::vector<rect_xywhf> rects_for_packer;
+	rects_for_packer.clear();
+	rects_for_packer.reserve(subjects.images.size());
 
 #if DEBUG_FILL_IMGS_WITH_COLOR
 	thread_local randomization rng;
 #endif
 
 	{
-		auto scope = measure_scope(out.profiler.loading_images);
+		auto scope = measure_scope_additive(out.profiler.loading_image_sizes);
 
 		for (const auto& input_img_id : subjects.images) {
 			auto& out_entry = baked.images[input_img_id];
 
 			try {
-				const auto it = loaded_image_sizes.try_emplace(input_img_id, augs::image::get_size(input_img_id));
+				const auto u_size = [&]() { auto sc = measure_scope(scope); return augs::image::get_size(input_img_id); }();
+				const auto it = loaded_image_sizes.try_emplace(input_img_id, u_size);
 
 				{
 					const bool is_img_unique = it.second;
 					ensure(is_img_unique);
 				}
 
-				const auto u_size = (*it.first).second;
 				out_entry.cached_original_size_pixels = u_size;
 
 				const auto size = vec2i(u_size);
@@ -203,12 +206,22 @@ void bake_fresh_atlas(
 	output_image.fill({0, 0, 0, 255});
 #endif
 	
+	struct ttestt {
+		ttestt() {
+			LOG("ttestt");
+		}
+
+		~ttestt() {
+			LOG("~ttestt");
+		}
+	};
+
 	{
 		auto& blitting_scope = out.profiler.blitting_images;
 		auto loading_scope = measure_scope_additive(out.profiler.loading_images);
 		//auto decoding_scope = measure_scope_additive(out.profiler.decoding_images);
 
-		thread_local std::vector<std::vector<std::byte>> _all_loaded_bytes;
+		static std::vector<std::vector<std::byte>> _all_loaded_bytes;
 		auto& all_loaded_bytes = _all_loaded_bytes;
 
 		{
@@ -222,15 +235,15 @@ void bake_fresh_atlas(
 
 			for (const auto& input_img_id : subjects.images) {
 				const auto current_rect = index_in(subjects.images, input_img_id);
-
-				auto scope = measure_scope(loading_scope);
 				augs::file_to_bytes(input_img_id, all_loaded_bytes[current_rect]);
 			}
 		}
 
 		auto scope = measure_scope(blitting_scope);
 
-		auto worker = [&all_loaded_bytes, &output_image, &subjects, &rects_for_packer, &baked, output_image_size](const augs::path_type& input_img_id) {
+		auto worker = [&output_image, &subjects, &baked, output_image_size](const augs::path_type& input_img_id) {
+			thread_local ttestt t;
+
 			const auto current_rect = index_in(subjects.images, input_img_id);
 			const auto packed_rect = rects_for_packer[current_rect];
 
@@ -277,8 +290,8 @@ void bake_fresh_atlas(
 			worker(r);
 		}
 #else
-		augs::range_workers<decltype(worker)> workers;
-		workers.process(std::move(worker), subjects.images);
+		static augs::range_workers<decltype(worker)> workers;
+		workers.process(worker, subjects.images);
 #endif
 	}
 

@@ -2,64 +2,106 @@
 #include <vector>
 #include <thread>
 
-#include "3rdparty/concurrentqueue/concurrentqueue.h"
 #include "augs/templates/traits/function_traits.h"
 
 namespace augs {
 	template <class Callback>
-	struct range_workers {
+	class range_workers {
 		using element_type = std::remove_reference_t<argument_t<Callback, 0>>;
 		using Item = element_type*;
 
-		moodycamel::ConcurrentQueue<Item> q;
+		int count = 0;
+		element_type* arr = nullptr;
 
 		std::optional<Callback> callback;
-
 		std::vector<std::thread> workers;
-		std::atomic<int> doneConsumers = 0;
+		std::atomic<int> it = 0;
+		std::atomic<int> working_threads = 0;
+
+		std::mutex m;
+		std::condition_variable cv;
+
+		std::atomic<bool> shall_quit = false;
+
+	public:
+		auto process_tasks() {
+			working_threads.fetch_add(1);
+
+			while (true) {
+				const auto i = it.fetch_add(1, std::memory_order_relaxed);
+
+				if (i < count) {
+					(*callback)(arr[i]);
+				}
+				else {
+					break;
+				}
+			}
+
+			working_threads.fetch_sub(1);
+		}
 
 		auto make_worker_function() {
 			return [&]() {
-				Item item;
-
-				do {
-					while (q.try_dequeue(item)) {
-						(*callback)(*item);
+				while (true) {
+					{
+						std::unique_lock<std::mutex> lk(m);
+						cv.wait(lk, [this]{ return shall_quit || count; });
 					}
 
-					// Loop again one last time if we're the last producer (with the acquired
-					// memory effects of the other producers):
-				} while (doneConsumers.fetch_add(1, std::memory_order_acq_rel) + 1 == static_cast<int>(workers.size()));
+					if (shall_quit.load()) {
+						return;
+					}
+
+					process_tasks();
+				}
 			};
 		}
 
 		range_workers() {
-		
-		}
-
-		template <class C, class R>
-		void process(C&& call, R& range) {
-			callback.emplace(std::forward<C>(call));
-			doneConsumers = 0;
-
-			for (auto& r : range) {
-				q.enqueue(std::addressof(r));
-			}
-
-			const auto n = std::thread::hardware_concurrency() * 2;
+			const auto n = std::thread::hardware_concurrency();
 			workers.reserve(n);
 
 			for (unsigned i = 0; i < n; ++i) {
 				workers.emplace_back(make_worker_function());
 			}
+		}
 
-			make_worker_function()();
-			
-			for (auto& t : workers) {
-				t.join();
+		void join_all() {
+			for (auto& w : workers) {
+				w.join();
+			}
+		}
+
+		~range_workers() {
+			shall_quit.store(true);
+			cv.notify_all();
+
+			join_all();
+		}
+
+		void wait_complete() {
+			process_tasks();
+
+			while (working_threads.load()) {
+				std::this_thread::yield();
+			}
+		}
+
+		template <class C, class R>
+		void process(C&& call, R& range) {
+			{
+				std::unique_lock<std::mutex> lk(m);
+
+				it = 0;
+				count = range.size();
+				arr = std::addressof(range[0]);
+
+				callback.emplace(std::forward<C>(call));
 			}
 
-			callback.reset();
+			cv.notify_all();
+			wait_complete();
 		}
 	};
 }
