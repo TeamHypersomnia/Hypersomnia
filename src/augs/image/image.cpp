@@ -182,6 +182,36 @@ namespace augs {
 		);
 	}
 
+
+	void image::from_png(
+		const std::vector<std::byte>& from, 
+		const path_type& reported_path
+	) {
+		v.clear();
+
+		unsigned width;
+		unsigned height;
+		using lodepng_vec = std::vector<unsigned char>;
+
+		if (const auto lodepng_result =
+			lodepng::decode(
+				reinterpret_cast<lodepng_vec&>(v), 
+				width, 
+				height, 
+				reinterpret_cast<const lodepng_vec&>(from)
+			)
+		) {
+			throw image_loading_error(
+				"Failed to load image %x (earlier loaded into memory):\nlodepng returned %x", reported_path, lodepng_result
+			);
+		}
+
+		size.x = width;
+		size.y = height;
+
+		throw_if_zero_size(reported_path, size);
+	}
+
 	void image::from_png(const path_type& path) {
 		v.clear();
 

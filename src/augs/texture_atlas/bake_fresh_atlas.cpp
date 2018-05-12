@@ -13,6 +13,7 @@
 
 #include "augs/readwrite/byte_file.h"
 #include "augs/filesystem/directory.h"
+#include "augs/templates/range_workers.h"
 
 #define DEBUG_FILL_IMGS_WITH_COLOR 0
 
@@ -203,10 +204,33 @@ void bake_fresh_atlas(
 #endif
 	
 	{
-		auto blitting_scope = measure_scope_additive(out.profiler.blitting_images);
+		auto& blitting_scope = out.profiler.blitting_images;
 		auto loading_scope = measure_scope_additive(out.profiler.loading_images);
+		//auto decoding_scope = measure_scope_additive(out.profiler.decoding_images);
 
-		for (const auto& input_img_id : subjects.images) {
+		thread_local std::vector<std::vector<std::byte>> _all_loaded_bytes;
+		auto& all_loaded_bytes = _all_loaded_bytes;
+
+		{
+			auto scope = measure_scope(loading_scope);
+
+			const auto images_n = subjects.images.size();
+
+			if (images_n > all_loaded_bytes.size()) {
+				all_loaded_bytes.resize(images_n);
+			}
+
+			for (const auto& input_img_id : subjects.images) {
+				const auto current_rect = index_in(subjects.images, input_img_id);
+
+				auto scope = measure_scope(loading_scope);
+				augs::file_to_bytes(input_img_id, all_loaded_bytes[current_rect]);
+			}
+		}
+
+		auto scope = measure_scope(blitting_scope);
+
+		auto worker = [&all_loaded_bytes, &output_image, &subjects, &rects_for_packer, &baked, output_image_size](const augs::path_type& input_img_id) {
 			const auto current_rect = index_in(subjects.images, input_img_id);
 			const auto packed_rect = rects_for_packer[current_rect];
 
@@ -228,23 +252,16 @@ void bake_fresh_atlas(
 					output_entry.cached_original_size_pixels = output_image_size;
 					output_entry.was_flipped = false;
 
-					continue;
+					return;
 				}
 			}
 
 			thread_local augs::image loaded_image;
-
-			{
-				auto scope = measure_scope(loading_scope);
-				loaded_image.from_file(input_img_id);
-			}
+			loaded_image.from_png(all_loaded_bytes[current_rect], input_img_id);
 
 #if DEBUG_FILL_IMGS_WITH_COLOR
 			loaded_image.fill(rgba().set_hsv({ rng.randval(0.0f, 1.0f), rng.randval(0.3f, 1.0f), rng.randval(0.3f, 1.0f) }));
 #endif
-
-			auto scope = measure_scope(blitting_scope);
-
 			output_image.blit(
 				loaded_image,
 				{
@@ -253,7 +270,16 @@ void bake_fresh_atlas(
 				},
 				packed_rect.flipped
 			);
+		};
+
+#if 0
+		for (auto& r : subjects.images) {
+			worker(r);
 		}
+#else
+		augs::range_workers<decltype(worker)> workers;
+		workers.process(std::move(worker), subjects.images);
+#endif
 	}
 
 	{

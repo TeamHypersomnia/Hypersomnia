@@ -113,6 +113,12 @@ namespace augs {
 
 		void from_file(const path_type& path);
 		void from_png(const path_type& path);
+
+		void from_png(
+			const std::vector<std::byte>& from, 
+			const path_type& reported_path
+		);
+
 		void from_binary_file(const path_type& path);
 
 		void save_as_png(const path_type& path) const;
