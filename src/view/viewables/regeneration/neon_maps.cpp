@@ -57,7 +57,9 @@ void regenerate_neon_map(
 	if (should_regenerate) {
 		LOG("Regenerating neon map for %x", input_image_path);
 
-		auto source_image = augs::image(input_image_path);
+		thread_local augs::image source_image;
+		source_image.from_file(input_image_path);
+
 		make_neon(new_stamp.input, source_image);
 
 		source_image.save(neon_map_path);

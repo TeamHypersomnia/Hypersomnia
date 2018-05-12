@@ -1476,7 +1476,7 @@ int work(const int argc, const char* const * const argv) try {
 
 		/* Unpack asynchronous asset loading results */
 
-		if (future_general_atlas.valid() && is_ready(future_general_atlas)) {
+		if (valid_and_is_ready(future_general_atlas)) {
 			uploading_pbo.set_as_current();
 			uploading_pbo.unmap_buffer();
 
