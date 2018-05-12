@@ -14,6 +14,7 @@
 #include "augs/readwrite/byte_readwrite_declaration.h"
 #include "augs/readwrite/byte_readwrite_overload_traits.h"
 #include "augs/readwrite/byte_readwrite_traits.h"
+#include "augs/templates/resize_no_init.h"
 
 namespace augs {
 	namespace detail {	
@@ -216,7 +217,7 @@ namespace augs {
 		}
 
 		if constexpr(can_access_data_v<Container>) {
-			storage.resize(s);
+			resize_no_init(storage, s);
 			detail::read_bytes_n(ar, storage.data(), storage.size());
 		}
 		else {

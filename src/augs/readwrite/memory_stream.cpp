@@ -35,10 +35,6 @@ namespace augs {
 		return *this;
 	}
 
-	void byte_counter_stream::write(const std::byte* const, const std::size_t bytes) {
-		write_pos += bytes;
-	}
-
 	memory_stream byte_counter_stream::create_reserved_stream() {
 		memory_stream reserved;
 		reserved.reserve(write_pos);

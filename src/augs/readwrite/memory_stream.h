@@ -5,6 +5,7 @@
 #include "augs/readwrite/byte_readwrite_declaration.h"
 #include "augs/templates/maybe_const.h"
 #include "augs/templates/exception_templates.h"
+#include "augs/templates/resize_no_init.h"
 
 namespace augs {
 	class byte_counter_stream;
@@ -51,7 +52,10 @@ namespace augs {
 	public:
 		memory_stream create_reserved_stream();
 
-		void write(const std::byte* const data, const std::size_t bytes);
+		void write(const std::byte* const data, const std::size_t bytes) {
+			write_pos += bytes;
+			(void)data;
+		}
 	};
 
 	template <class derived>
@@ -127,7 +131,7 @@ namespace augs {
 		}
 
 		void reserve(const std::size_t bytes) {
-			buffer().resize(bytes);
+			resize_no_init(buffer(), bytes);
 		}
 
 		void reserve(const byte_counter_stream& r) {
@@ -164,7 +168,7 @@ namespace augs {
 		memory_stream() = default;
 
 		operator std::vector<std::byte>&&() && {
-			buffer.resize(get_write_pos());
+			resize_no_init(buffer, get_write_pos());
 			return std::move(buffer);
 		}
 

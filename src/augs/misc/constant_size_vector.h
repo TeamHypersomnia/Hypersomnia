@@ -61,6 +61,14 @@ namespace augs {
 			new (&nth(n)) value_type(std::forward<Args>(args)...);
 		}
 
+		void _pop_back() {
+			if constexpr(!is_trivially_copyable) {
+				nth(count - 1).~value_type();
+			}
+
+			--count;
+		}
+
 	public:
 		using iterator = typename value_array::iterator;
 		using const_iterator = typename value_array::const_iterator;
@@ -183,20 +191,18 @@ namespace augs {
 
 		void resize(const std::size_t s) {
 			ensure_leq(s, capacity());
-			auto diff = static_cast<int>(s);
-			diff -= static_cast<int>(size());
 
-			if (diff > 0) {
-				while (diff--) {
-					push_back(value_type());
+			while (count < s) {
+				new (std::addressof(nth(count++))) value_type;
+			}
+
+			if constexpr(!is_trivially_copyable) {
+				while (count > s) {
+					_pop_back();
 				}
 			}
-			else if (diff < 0) {
-				diff = -diff;
-				
-				while (diff--) {
-					pop_back();
-				}
+			else {
+				count = s;
 			}
 		}
 
@@ -247,18 +253,13 @@ namespace augs {
 
 		void pop_back() {
 			ensure_greater(count, 0);
-			
-			if constexpr(!is_trivially_copyable) {
-				nth(count - 1).~value_type();
-			}
-
-			--count;
+			_pop_back();	
 		}
 
 		void clear() {
 			if constexpr(!is_trivially_copyable) {
 				while (count) {
-					pop_back();
+					_pop_back();
 				}
 			}
 			else {
