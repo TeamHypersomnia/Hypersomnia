@@ -58,6 +58,7 @@ void regenerate_neon_map(
 		LOG("Regenerating neon map for %x", input_image_path);
 
 		thread_local augs::image source_image;
+		source_image.clear();
 		source_image.from_file(input_image_path);
 
 		make_neon(new_stamp.input, source_image);
@@ -167,10 +168,8 @@ void make_neon(
 
 	cut_empty_edges(source);
 
-	for (unsigned y = 0; y < source.get_rows(); ++y) {
-		for (unsigned x = 0; x < source.get_columns(); ++x) {
-			source.pixel({ x, y }).a = std::min(rgba_channel(255), rgba_channel(source.pixel({ x, y }).a * input.alpha_multiplier));
-		}
+	for (auto& p : source) {
+		p.multiply_alpha(input.alpha_multiplier);
 	}
 }
 
@@ -200,10 +199,8 @@ void generate_gauss_kernel(const neon_map_input& input, std::vector<double>& res
 		}
 	}
 
-	for (unsigned y = 0; y < rows; ++y) {
-		for (unsigned x = 0; x < cols; ++x) {
-			result[y * cols + x] = exp(-1 * (pow(index[y * cols + x].first, 2) + pow(index[y * cols + x].second, 2)) / 2 / pow(input.standard_deviation, 2)) / PI<float> / 2 / pow(input.standard_deviation, 2);
-		}
+	for (unsigned i = 0; i < total_pixels; ++i) {
+		result[i] = exp(-1 * (pow(index[i].first, 2) + pow(index[i].second, 2)) / 2 / pow(input.standard_deviation, 2)) / PI<float> / 2 / pow(input.standard_deviation, 2);
 	}
 
 	double sum = 0.f;
@@ -227,10 +224,10 @@ void scan_and_hide_undesired_pixels(
 		for (unsigned x = 0; x < original_image.get_columns(); ++x) {
 			auto& current_pixel = original_image.pixel({ x, y });
 
-			if (!found_in(color_whitelist, current_pixel)) {
-				current_pixel = PIXEL_NONE;
-			}
-			else {
+		if (!found_in(color_whitelist, current_pixel)) {
+			current_pixel = PIXEL_NONE;
+		}
+		else {
 				result.emplace_back(x, y);
 			}
 		}

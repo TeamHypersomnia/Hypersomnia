@@ -106,6 +106,11 @@ namespace augs {
 			v.resize(new_size.area(), col);
 		}
 
+		void clear() {
+			v.clear();
+			size = {};
+		}
+
 		void from_file(const path_type& path);
 		void from_png(const path_type& path);
 		void from_binary_file(const path_type& path);
@@ -136,6 +141,14 @@ namespace augs {
 			return size.x;
 		}
 
+		rgba& pixel(const unsigned pos) {
+			return v[pos];
+		}
+
+		const rgba& pixel(const unsigned pos) const {
+			return v[pos];
+		}
+
 		rgba& pixel(const vec2u pos) {
 			return v[pos.y * size.x + pos.x];
 		}
@@ -144,11 +157,34 @@ namespace augs {
 			return v[pos.y * size.x + pos.x];
 		}
 
+		auto to_pixel_coord(const unsigned pos) const {
+			const auto y = pos / size.x;
+			const auto x = pos - y * size.x;
+
+			return vec2u(x, y);
+		}
+
 		bool in_bounds(const vec2u p) const {
 			return p.x < size.x && p.y < size.y;
 		}
 
 		image& desaturate();
+
+		auto begin() {
+			return v.begin();
+		}
+
+		auto begin() const {
+			return v.begin();
+		}
+
+		auto end() {
+			return v.end();
+		}
+
+		auto end() const {
+			return v.end();
+		}
 	};
 
 	class image_view {
