@@ -152,12 +152,34 @@ namespace augs {
 	static_assert(has_title_v<amount_measurements<std::size_t>>);
 }
 
+
+inline auto add_scope_duration(double& total) {
+	augs::timer tm;
+	return augs::scope_guard([tm, &total](){ total += tm.get<std::chrono::seconds>(); });
+}
+
+struct additive_time_scope {
+	double total = 0.0;
+	augs::time_measurements& into;
+
+	additive_time_scope(additive_time_scope&&) = delete;
+	additive_time_scope(const additive_time_scope& b) = delete;
+
+	~additive_time_scope() {
+		into.measure(total);
+	}
+};
+
 inline auto measure_scope(augs::time_measurements& m) {
 	m.start();
 	return augs::scope_guard([&m]() { m.stop(); });
 }
 
-inline auto add_scope_duration(double& into) {
+inline auto measure_scope(additive_time_scope& m) {
 	augs::timer tm;
-	return augs::scope_guard([tm, &into](){ into += tm.get<std::chrono::seconds>(); });
+	return augs::scope_guard([tm, &m](){ m.total += tm.get<std::chrono::seconds>(); });
+}
+
+inline auto measure_scope_additive(augs::time_measurements& into) {
+	return additive_time_scope { 0.0, into };
 }

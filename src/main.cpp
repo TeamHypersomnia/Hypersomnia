@@ -332,7 +332,7 @@ int work(const int argc, const char* const * const argv) try {
 			bool new_atlas_required = false;
 
 			{
-				double total_reloading_time = 0.0;
+				auto total_reloading = measure_scope_additive(performance.reloading_image_caches);
 
 				{
 					/* Check for unloaded and changed resources */
@@ -341,7 +341,7 @@ int work(const int argc, const char* const * const argv) try {
 							if (new_definition->loadables != old_definition.loadables) {
 								/* Loadables changed, so reload them. */
 								
-								auto scope = add_scope_duration(total_reloading_time);
+								auto scope = measure_scope(total_reloading);
 
 								new_atlas_required = true;
 								loaded_image_caches.at(key) = { 
@@ -350,7 +350,7 @@ int work(const int argc, const char* const * const argv) try {
 							}
 						}
 						else {
-							auto scope = add_scope_duration(total_reloading_time);
+							auto scope = measure_scope(total_reloading);
 
 							/* Missing, unload */
 							new_atlas_required = true;
@@ -361,7 +361,7 @@ int work(const int argc, const char* const * const argv) try {
 					/* Check for new resources */
 					for_each_id_and_object(new_defs.image_definitions, [&](const auto key, const auto& fresh) {
 						if (nullptr == mapped_or_nullptr(now_loaded_viewables_defs.image_definitions, key)) {
-							auto scope = add_scope_duration(total_reloading_time);
+							auto scope = measure_scope(total_reloading);
 
 							new_atlas_required = true;
 
@@ -376,10 +376,6 @@ int work(const int argc, const char* const * const argv) try {
 
 				if (config.gui_font != now_loaded_gui_font_def) {
 					new_atlas_required = true;
-				}
-
-				if (total_reloading_time > 0.0) {
-					performance.reloading_image_caches.measure(total_reloading_time);
 				}
 			}
 

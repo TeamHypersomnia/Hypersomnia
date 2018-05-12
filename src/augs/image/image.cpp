@@ -183,6 +183,8 @@ namespace augs {
 	}
 
 	void image::from_png(const path_type& path) {
+		v.clear();
+
 		unsigned width;
 		unsigned height;
 

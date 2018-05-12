@@ -22,6 +22,11 @@
 
 using namespace rectpack2D;
 
+template <class T, class C>
+std::size_t index_in(C& container, T& object) {
+	return std::addressof(object) - std::addressof(container[0]);
+}
+
 void bake_fresh_atlas(
 	const bake_fresh_atlas_input in,
 	const bake_fresh_atlas_output out
@@ -31,7 +36,7 @@ void bake_fresh_atlas(
 	auto& baked = out.baked;
 	auto& output_image_size = out.baked.atlas_image_size;
 
-	std::unordered_map<source_image_identifier, augs::image> loaded_images;
+	std::unordered_map<source_image_identifier, vec2u> loaded_image_sizes;
 	std::unordered_map<source_font_identifier, augs::font> loaded_fonts;
 
 	std::vector<rect_xywhf> rects_for_packer;
@@ -47,20 +52,14 @@ void bake_fresh_atlas(
 			auto& out_entry = baked.images[input_img_id];
 
 			try {
-				const auto it = loaded_images.try_emplace(input_img_id, input_img_id);
+				const auto it = loaded_image_sizes.try_emplace(input_img_id, augs::image::get_size(input_img_id));
 
 				{
 					const bool is_img_unique = it.second;
 					ensure(is_img_unique);
 				}
 
-				auto& img = (*it.first).second;
-
-#if DEBUG_FILL_IMGS_WITH_COLOR
-				img.fill(rgba().set_hsv({ rng.randval(0.0f, 1.0f), rng.randval(0.3f, 1.0f), rng.randval(0.3f, 1.0f) }));
-#endif
-
-				const auto u_size = img.get_size();
+				const auto u_size = (*it.first).second;
 				out_entry.cached_original_size_pixels = u_size;
 
 				const auto size = vec2i(u_size);
@@ -203,12 +202,12 @@ void bake_fresh_atlas(
 	output_image.fill({0, 0, 0, 255});
 #endif
 	
-	std::size_t current_rect = 0u;
-
 	{
-		auto scope = measure_scope(out.profiler.blitting_images);
+		auto blitting_scope = measure_scope_additive(out.profiler.blitting_images);
+		auto loading_scope = measure_scope_additive(out.profiler.loading_images);
 
 		for (const auto& input_img_id : subjects.images) {
+			const auto current_rect = index_in(subjects.images, input_img_id);
 			const auto packed_rect = rects_for_packer[current_rect];
 
 			{
@@ -233,29 +232,43 @@ void bake_fresh_atlas(
 				}
 			}
 
+			thread_local augs::image loaded_image;
+
+			{
+				auto scope = measure_scope(loading_scope);
+				loaded_image.from_file(input_img_id);
+			}
+
+#if DEBUG_FILL_IMGS_WITH_COLOR
+			loaded_image.fill(rgba().set_hsv({ rng.randval(0.0f, 1.0f), rng.randval(0.3f, 1.0f), rng.randval(0.3f, 1.0f) }));
+#endif
+
+			auto scope = measure_scope(blitting_scope);
+
 			output_image.blit(
-				loaded_images[input_img_id],
+				loaded_image,
 				{
 					static_cast<unsigned>(packed_rect.x),
 					static_cast<unsigned>(packed_rect.y)
 				},
 				packed_rect.flipped
 			);
-
-			++current_rect;
 		}
 	}
 
 	{
 		auto scope = measure_scope(out.profiler.blitting_fonts);
 
+		std::size_t current_rect = subjects.images.size();
+
 		for (auto& input_font_id : subjects.fonts) {
 			auto& output_font = baked.fonts[input_font_id];
 
-			for (size_t glyph_index = 0; glyph_index < output_font.glyphs_in_atlas.size(); ++glyph_index) {
-				const auto& packed_rect = rects_for_packer[current_rect];
+			const auto n = output_font.glyphs_in_atlas.size();
 
-				auto& g = output_font.glyphs_in_atlas[glyph_index];
+			for (auto& g : output_font.glyphs_in_atlas) {
+				const auto glyph_index = index_in(output_font.glyphs_in_atlas, g);
+				const auto& packed_rect = rects_for_packer[current_rect + glyph_index];
 
 				g.atlas_space.set(
 					static_cast<float>(packed_rect.x) / output_image_size.x,
@@ -274,9 +287,9 @@ void bake_fresh_atlas(
 					},
 					packed_rect.flipped
 				);
-
-				++current_rect;
 			}
+
+			current_rect += n;
 		}
 	}
 }
