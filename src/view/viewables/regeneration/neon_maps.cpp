@@ -139,23 +139,22 @@ void make_neon(
 					continue;
 				}
 
-				auto& drawn_pixel = source.pixel({ current_index_x, current_index_y });
-				const auto alpha = std::min(255u, static_cast<unsigned>(255 * kernel[y * radius_cols + x] * input.amplification));
+				if (const auto alpha = std::min(255u, static_cast<unsigned>(255 * kernel[y * radius_cols + x] * input.amplification))) {
+					auto& drawn_pixel = source.pixel({ current_index_x, current_index_y });
 
-				if (drawn_pixel == PIXEL_NONE && alpha) {
-					drawn_pixel[2] = current_light_pixel[2];
-					drawn_pixel[1] = current_light_pixel[1];
-					drawn_pixel[0] = current_light_pixel[0];
-				}
+					if (drawn_pixel == PIXEL_NONE) {
+						drawn_pixel[2] = current_light_pixel[2];
+						drawn_pixel[1] = current_light_pixel[1];
+						drawn_pixel[0] = current_light_pixel[0];
+					}
 
-				else if (drawn_pixel != current_light_pixel && alpha) {
-					drawn_pixel[2] = static_cast<rgba_channel>((alpha * current_light_pixel[2] + drawn_pixel[3] * drawn_pixel[2]) / (alpha + drawn_pixel[3]));
-					drawn_pixel[1] = static_cast<rgba_channel>((alpha * current_light_pixel[1] + drawn_pixel[3] * drawn_pixel[1]) / (alpha + drawn_pixel[3]));
-					drawn_pixel[0] = static_cast<rgba_channel>((alpha * current_light_pixel[0] + drawn_pixel[3] * drawn_pixel[0]) / (alpha + drawn_pixel[3]));
-				}
+					else if (drawn_pixel != current_light_pixel) {
+						drawn_pixel[2] = static_cast<rgba_channel>((alpha * current_light_pixel[2] + drawn_pixel[3] * drawn_pixel[2]) / (alpha + drawn_pixel[3]));
+						drawn_pixel[1] = static_cast<rgba_channel>((alpha * current_light_pixel[1] + drawn_pixel[3] * drawn_pixel[1]) / (alpha + drawn_pixel[3]));
+						drawn_pixel[0] = static_cast<rgba_channel>((alpha * current_light_pixel[0] + drawn_pixel[3] * drawn_pixel[0]) / (alpha + drawn_pixel[3]));
+					}
 
-				if (alpha > drawn_pixel[3]) {
-					drawn_pixel[3] = static_cast<rgba_channel>(alpha);
+					drawn_pixel[3] = std::max(drawn_pixel[3], static_cast<rgba_channel>(alpha));
 				}
 			}
 		}
