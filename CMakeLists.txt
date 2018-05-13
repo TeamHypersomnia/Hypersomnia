@@ -132,6 +132,8 @@ if (ULTRA_OPTS)
 	set(ENABLE_LINK_TIME_OPTIMIZATION ON)
 endif()
 
+# Other self-explanatory static allocation switches. Possible values are one or zero.
+
 # If this variable is nonzero, the cosmos will use a statically allocated number
 # of entities, drastically improving access performance. Might be very useful for a sever application.
 # Pros: 
@@ -153,10 +155,6 @@ set(STATICALLY_ALLOCATE_ENTITIES "1" CACHE STRING "Statically allocate entities 
 #	- Even empty game worlds occupy as much space as those filled to the maximum
 
 set(STATICALLY_ALLOCATE_ENTITY_FLAVOURS "1" CACHE STRING "Statically allocate entity flavours in the cosmos common")
-
-# Other self-explanatory static allocation switches. Possible values are one or zero.
-
-set(STATICALLY_ALLOCATE_BAKED_FONTS "1" CACHE STRING "Statically allocate fonts for faster rendering. One font weights 3 MB.")
 
 ## Internal build flags for programmers' use. 
 ## Don't set them manually without a good reason.
@@ -612,6 +610,8 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/application/setups/editor/commands/flavour_commands.cpp"
 	"src/augs/texture_atlas/atlas_profiler.cpp"
 	"src/augs/graphics/pbo.cpp"
+	"src/view/viewables/streaming/viewables_streaming.cpp"
+	"src/view/viewables/streaming/viewables_streaming_profiler.cpp"
 )
 
 # The rest of 3rdparty libraries with minimal amount of source files.
@@ -1183,7 +1183,6 @@ endif()
 
 add_definitions(-DSTATICALLY_ALLOCATE_ENTITIES=${STATICALLY_ALLOCATE_ENTITIES})
 add_definitions(-DSTATICALLY_ALLOCATE_ENTITY_FLAVOURS=${STATICALLY_ALLOCATE_ENTITY_FLAVOURS})
-add_definitions(-DSTATICALLY_ALLOCATE_BAKED_FONTS=${STATICALLY_ALLOCATE_BAKED_FONTS})
 add_definitions(-DBUILD_IN_CONSOLE_MODE=${BUILD_IN_CONSOLE_MODE})
 
 add_definitions(-DOFFICIAL_CONTENT_DIR="${HYPERSOMNIA_OFFICIAL_CONTENT_DIR}")

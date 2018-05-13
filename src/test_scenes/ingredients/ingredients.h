@@ -37,7 +37,7 @@ void add_shape_invariant_from_renderable(
 
 		invariants::shape_polygon shape_polygon_def;
 
-		shape_polygon_def.shape = caches.at(sprite->tex).partitioned_shape;
+		shape_polygon_def.shape = caches.at(sprite->tex).make_box();
 		shape_polygon_def.shape.scale(scale);
 
 		into.template set(shape_polygon_def);

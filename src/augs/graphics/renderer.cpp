@@ -74,11 +74,12 @@ namespace augs {
 #endif
 
 #if BUILD_OPENGL
-		GLint read_size;
+		GLint read_size = 0;
 		GL_CHECK(glGetIntegerv(GL_MAX_TEXTURE_SIZE, &read_size));
-		max_texture_size = read_size;
+		ensure(read_size >= 0);
+		max_texture_size = static_cast<unsigned>(read_size);
 #else
-		max_texture_size = 0;
+		max_texture_size = 0u;
 #endif
 	}
 
@@ -313,7 +314,7 @@ namespace augs {
 		for_each_in(frame_lines, line_lambda);
 	}
 
-	int renderer::get_max_texture_size() const {
+	unsigned renderer::get_max_texture_size() const {
 		return max_texture_size;
 	}
 

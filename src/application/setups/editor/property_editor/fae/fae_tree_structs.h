@@ -18,10 +18,7 @@ struct entities_tree_state {
 	entity_guid hovered_guid;
 };
 
-class loaded_image_caches_map;
-
 struct fae_property_editor_input {
-	const loaded_image_caches_map& image_caches;
 	commanding_property_editor_input cpe_in;
 };
 
@@ -30,10 +27,9 @@ struct fae_tree_input {
 	const bool show_filter_buttons = false;
 	const bool show_flavour_control_buttons = false;
 	const bool show_locations_using_flavour = false;
-	const loaded_image_caches_map& image_caches;
 
 	operator fae_property_editor_input() const {
-		return { image_caches, cpe_in };
+		return { cpe_in };
 	}
 };
 

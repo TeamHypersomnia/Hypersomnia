@@ -34,7 +34,8 @@ namespace test_flavours {
 			meta.set(render_def);
 
 			invariants::polygon poly;
-			poly.add_convex_polygons(logicals.at(to_image_id(test_scene_image_id::TRUCK_FRONT)).partitioned_shape.convex_polys);
+			const auto b = logicals.at(to_image_id(test_scene_image_id::TRUCK_FRONT)).make_box();
+			poly.add_convex_polygons(b.convex_polys);
 			poly.texture_map_id = to_image_id(test_scene_image_id::TRUCK_FRONT);
 
 			meta.set(poly);

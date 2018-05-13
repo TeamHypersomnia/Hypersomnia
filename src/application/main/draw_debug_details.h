@@ -18,7 +18,8 @@ void draw_debug_details(
 	const vec2i screen_size,
 	const const_entity_handle viewed_character,
 	const frame_profiler& frame_performance,
-	const atlas_profiler& atlas_performance,
+	const viewables_streaming_profiler& streaming_performance,
+	const atlas_profiler& general_atlas_performance,
 	const session_profiler& session_performance,
 	const audiovisual_profiler& audiovisual_performance
 );

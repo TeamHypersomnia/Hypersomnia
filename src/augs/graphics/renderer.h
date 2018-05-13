@@ -18,7 +18,7 @@ namespace augs {
 	};
 
 	class renderer {
-		int max_texture_size = -1;
+		unsigned max_texture_size = static_cast<unsigned>(-1);
 		debug_lines prev_logic_step_lines;
 
 		GLuint triangle_buffer_id = 0xdeadbeef;
@@ -106,7 +106,7 @@ namespace augs {
 		void call_and_clear_lines();
 		void call_and_clear_triangles();
 
-		int get_max_texture_size() const;
+		unsigned get_max_texture_size() const;
 
 		std::size_t get_triangle_count() const;
 

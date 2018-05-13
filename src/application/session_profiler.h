@@ -9,16 +9,7 @@ struct session_profiler : public augs::profiler_mixin<session_profiler> {
 	augs::time_measurements fps;
 	augs::time_measurements local_entropy;
 
-	augs::time_measurements reloading_image_caches = std::size_t(1);
-	augs::time_measurements reloading_sounds = std::size_t(1);
-
-	augs::time_measurements viewables_readback;
-
-	augs::time_measurements atlas_upload_to_gpu = std::size_t(1);
-	augs::time_measurements neon_regeneration = std::size_t(1);
-
 	augs::time_measurements camera_visibility_query;
-	augs::time_measurements pbo_allocation;
 	augs::amount_measurements<std::size_t> num_visible_entities;
 	// END GEN INTROSPECTOR
 };

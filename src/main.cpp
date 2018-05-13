@@ -4,8 +4,6 @@
 
 #include <iostream>
 #include <clocale>
-#include <thread>
-#include "augs/templates/thread_templates.h"
 
 #include "augs/unit_tests.h"
 #include "augs/global_libraries.h"
@@ -16,11 +14,8 @@
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
 
-#include "augs/math/matrix.h"
-
 #include "augs/misc/time_utils.h"
 #include "augs/misc/imgui/imgui_utils.h"
-#include "augs/misc/machine_entropy.h"
 #include "augs/misc/lua/lua_utils.h"
 
 #include "augs/graphics/renderer.h"
@@ -36,16 +31,13 @@
 #include "game/transcendental/data_living_one_step.h"
 #include "game/transcendental/cosmos.h"
 
-#include "view/viewables/image_cache.h"
-#include "view/viewables/loaded_sounds_map.h"
-#include "view/viewables/atlas_distributions.h"
-
 #include "view/game_gui/game_gui_system.h"
 
 #include "view/audiovisual_state/world_camera.h"
 #include "view/audiovisual_state/audiovisual_state.h"
 #include "view/rendering_scripts/illuminated_rendering.h"
 #include "view/viewables/images_in_atlas_map.h"
+#include "view/viewables/streaming/viewables_streaming.h"
 
 #include "application/session_profiler.h"
 #include "application/config_lua_table.h"
@@ -64,7 +56,6 @@
 
 #include "cmd_line_params.h"
 #include "build_info.h"
-#include "augs/graphics/pbo.h"
 
 extern std::string help_contents;
 
@@ -128,7 +119,6 @@ int main(const int argc, const char* const * const argv) {
 int work(const int argc, const char* const * const argv) try {
 	LOG("Started at %x", augs::date_time().get_readable());
 	LOG("Working directory: %x", augs::get_current_working_directory());
-	LOG_NVPS(std::thread::hardware_concurrency());
 
 	static const auto params = cmd_line_params(argc, argv);
 
@@ -234,9 +224,6 @@ int work(const int argc, const char* const * const argv) try {
 	static settings_gui_state settings_gui;
 	static ingame_menu_gui ingame_menu;
 
-	static all_viewables_defs now_loaded_viewables_defs;
-	static augs::font_loading_input now_loaded_gui_font_def;
-
 	/*
 		Runtime representations of viewables,
 		loaded from the definitions provided by the current setup.
@@ -244,51 +231,7 @@ int work(const int argc, const char* const * const argv) try {
 		loaded just once or if they are for example continuously streamed.
 	*/
 
-	static loaded_sounds_map loaded_sounds;
-	static images_in_atlas_map images_in_atlas;
-	static loaded_image_caches_map loaded_image_caches;
-	static necessary_images_in_atlas_map necessary_images_in_atlas;
-	
-#if STATICALLY_ALLOCATE_BAKED_FONTS
-	static augs::baked_font loaded_gui_font;
-
-	static auto get_loaded_gui_font = []() -> augs::baked_font& {
-		return loaded_gui_font;
-	};
-#else
-	static auto loaded_gui_font = std::make_unique<augs::baked_font>();
-
-	static auto get_loaded_gui_font = []() -> augs::baked_font& {
-		return *loaded_gui_font;
-	};
-#endif
-	
-#define USE_PBO 1
-
-#if USE_PBO
-	static augs::graphics::pbo uploading_pbo;
-#else
-	static std::vector<rgba> no_pbo;
-	no_pbo.resize(renderer.get_max_texture_size() * renderer.get_max_texture_size());
-#endif
-
-	static image_definitions_map future_image_definitions;
-	static augs::font_loading_input future_gui_font;
-
-	static std::future<general_atlas_output> future_general_atlas;
-
-	static std::optional<augs::graphics::texture> uploading_texture;
-	static std::optional<augs::graphics::texture> general_atlas;
-	
-#if USE_PBO
-	{
-		auto scope = measure_scope(performance.pbo_allocation);
-
-		uploading_pbo.reserve_for_texture_square(
-			renderer.get_max_texture_size()
-		);
-	}
-#endif
+	static viewables_streaming streaming(renderer.get_max_texture_size());
 
 	static world_camera gameplay_camera;
 	static audiovisual_state audiovisuals;
@@ -337,141 +280,15 @@ int work(const int argc, const char* const * const argv) try {
 	static bool game_gui_mode = false;
 
 	static auto load_all = [](const all_viewables_defs& new_defs) {
-		/* Atlas pass */
-
-		{
-			bool new_atlas_required = false;
-
-			{
-				{
-					/* Check for unloaded and changed resources */
-					for_each_id_and_object(now_loaded_viewables_defs.image_definitions, [&](const auto key, const auto& old_definition) {
-						if (const auto new_definition = mapped_or_nullptr(new_defs.image_definitions, key)) {
-							if (new_definition->loadables != old_definition.loadables) {
-								/* Changed, so reload. */
-								new_atlas_required = true;
-							}
-						}
-						else {
-							/* Missing, unload */
-							new_atlas_required = true;
-						}
-					});
-
-					for_each_id_and_object(new_defs.image_definitions, [&](const auto key, const auto&) {
-						if (nullptr == mapped_or_nullptr(now_loaded_viewables_defs.image_definitions, key)) {
-							/* New one, include. */
-							new_atlas_required = true;
-						}
-					});
-				}
-
-				if (config.gui_font != now_loaded_gui_font_def) {
-					new_atlas_required = true;
-				}
-			}
-
-			if (necessary_images_in_atlas.empty()) {
-				new_atlas_required = true;
-			}
-
-			if (!general_atlas.has_value()) {
-				new_atlas_required = true;
-			}
-
-			if (new_atlas_required && !future_general_atlas.valid()) {
-				const auto settings = config.content_regeneration;
-
-#if USE_PBO
-				uploading_pbo.set_as_current();
-				auto* const buffer_for_atlas = reinterpret_cast<rgba*>(uploading_pbo.map_buffer());
-
-				auto unset_scope = augs::scope_guard([]() { uploading_pbo.set_current_to_none(); });
-#else
-				auto* const buffer_for_atlas = no_pbo.data();
-#endif
-
-				auto in = general_atlas_input {
-					{
-						settings,
-						necessary_image_definitions,
-						new_defs.image_definitions,
-						config.gui_font,
-						get_unofficial_content_dir()
-					},
-
-					static_cast<unsigned>(renderer.get_max_texture_size()),
-					buffer_for_atlas
-				};
-
-				future_general_atlas = std::async(
-					std::launch::async,
-				   	[in]() { 
-						return create_general_atlas(in, atlas_performance, performance.neon_regeneration);
-					}
-				);
-
-				future_image_definitions = new_defs.image_definitions;
-				future_gui_font = config.gui_font;
-			}
-		}
-
-		/* Sounds pass */
-
-		{
-			auto scope = measure_scope(performance.reloading_sounds);
-
-			auto make_sound_loading_input = [&](const sound_definition& def) {
-				const auto def_view = sound_definition_view(get_unofficial_content_dir(), def);
-				const auto input = def_view.make_sound_loading_input();
-
-				return input;
-			};
-
-			/* Check for unloaded and changed resources */
-			for_each_id_and_object(now_loaded_viewables_defs.sounds, [&](const auto& key, const auto& now_loaded) {
-				auto unload = [&](){
-					audiovisuals.get<sound_system>().clear_sources_playing(key);
-					loaded_sounds.erase(key);
-				};
-
-				if (const auto fresh = mapped_or_nullptr(new_defs.sounds, key)) {
-					if (fresh->loadables != now_loaded.loadables) {
-						/* Different from the fresh one, reload */
-						unload();
-
-						try {
-							loaded_sounds.try_emplace(key, make_sound_loading_input(*fresh));
-						}
-						catch (...) {
-
-						}
-					}
-				}
-				else {
-					/* Missing, unload */
-					unload();
-				}
-			});
-
-			/* Check for new resources */
-			for_each_id_and_object(new_defs.sounds, [&](const auto& fresh_key, const auto& fresh_def) {
-				if (nullptr == mapped_or_nullptr(now_loaded_viewables_defs.sounds, fresh_key)) {
-					try {
-						loaded_sounds.try_emplace(fresh_key, make_sound_loading_input(fresh_def));
-					}
-					catch (...) {
-
-					}
-				}
-				/* Otherwise it's already taken care of */
-			});
-
-			/* Done, overwrite */
-			now_loaded_viewables_defs.sounds = new_defs.sounds;
-		}
-
-		//auto scope = measure_scope(performance.viewables_readback);
+		streaming.load_all({
+			new_defs,
+			necessary_image_definitions,
+			config.gui_font,
+			config.content_regeneration,
+			get_unofficial_content_dir(),
+			renderer.get_max_texture_size(),
+			audiovisuals.get<sound_system>()
+		});
 	};
 
 	static auto setup_launcher = [](auto&& setup_init_callback) {
@@ -552,16 +369,16 @@ int work(const int argc, const char* const * const argv) try {
 	static auto create_game_gui_deps = []() {
 		return game_gui_context_dependencies{
 			get_viewable_defs().image_definitions,
-			images_in_atlas,
-			necessary_images_in_atlas,
-			get_loaded_gui_font()
+			streaming.images_in_atlas,
+			streaming.necessary_images_in_atlas,
+			streaming.get_loaded_gui_font()
 		};
 	};
 
 	static auto create_menu_context_deps = [](const auto& viewing_config) {
 		return menu_context_dependencies{
-			necessary_images_in_atlas,
-			get_loaded_gui_font(),
+			streaming.necessary_images_in_atlas,
+			streaming.get_loaded_gui_font(),
 			necessary_sounds,
 			viewing_config.audio_volume
 		};
@@ -805,7 +622,7 @@ int work(const int argc, const char* const * const argv) try {
 			get_viewable_defs().particle_effects,
 			cosmos.get_logical_assets().animations,
 
-			loaded_sounds,
+			streaming.loaded_sounds,
 
 			viewing_config.audio_volume
 		});
@@ -817,7 +634,7 @@ int work(const int argc, const char* const * const argv) try {
 
 			audiovisuals.standard_post_solve(step, { 
 				defs.particle_effects, 
-				loaded_sounds,
+				streaming.loaded_sounds,
 				get_viewer_eye() 
 			});
 		}
@@ -1120,7 +937,7 @@ int work(const int argc, const char* const * const argv) try {
 						if constexpr(std::is_same_v<T, editor_setup>) {
 							/* Editor needs more goods */
 							setup.perform_custom_imgui(
-								_lua, _window, in_direct_gameplay, loaded_image_caches
+								_lua, _window, in_direct_gameplay
 							);
 						}
 						else {
@@ -1350,11 +1167,11 @@ int work(const int argc, const char* const * const argv) try {
 						using T = remove_cref<decltype(setup)>;
 
 						if constexpr(T::handles_window_input) {
-							if (!necessary_images_in_atlas.empty()) {
+							if (!streaming.necessary_images_in_atlas.empty()) {
 								/* Viewables reloading happens later so it might not be ready yet */
 
 								return setup.handle_input_before_game(
-									necessary_images_in_atlas, _common_input_state, e, _window
+									streaming.necessary_images_in_atlas, _common_input_state, e, _window
 								);
 							}
 						}
@@ -1468,83 +1285,10 @@ int work(const int argc, const char* const * const argv) try {
 			}
 		);
 
-		/* Unpack asynchronous asset loading results */
-
-		if (valid_and_is_ready(future_general_atlas)) {
-			const bool measure_atlas_uploading = new_viewing_config.debug.measure_atlas_uploading;
-
-			if (measure_atlas_uploading) {
-				renderer.finish();
-			}
-
-			auto scope = cond_measure_scope(measure_atlas_uploading, performance.atlas_upload_to_gpu);
-
-#if USE_PBO
-			uploading_pbo.set_as_current();
-			uploading_pbo.unmap_buffer();
-#endif
-
-			auto result = future_general_atlas.get();
-
-			images_in_atlas = std::move(result.atlas_entries);
-			necessary_images_in_atlas = std::move(result.necessary_atlas_entries);
-			get_loaded_gui_font() = std::move(result.gui_font);
-
-			now_loaded_gui_font_def = future_gui_font;
-
-			auto& now_loaded_defs = now_loaded_viewables_defs.image_definitions;
-			auto& new_loaded_defs = future_image_definitions;
-
-			{
-				auto total_reloading = measure_scope(performance.reloading_image_caches);
-
-				{
-					/* Check for unloaded and changed resources */
-					for_each_id_and_object(now_loaded_defs, [&](const auto key, const auto& old_definition) {
-						if (const auto new_definition = mapped_or_nullptr(new_loaded_defs, key)) {
-							if (new_definition->loadables != old_definition.loadables) {
-								/* Loadables changed, so reload them. */
-								
-								loaded_image_caches.at(key) = { 
-									image_definition_view(get_unofficial_content_dir(), *new_definition)
-								};
-							}
-						}
-						else {
-							/* Missing, unload */
-							loaded_image_caches.erase(key);
-						}
-					});
-
-					/* Check for new resources */
-					for_each_id_and_object(new_loaded_defs, [&](const auto key, const auto& fresh) {
-						if (nullptr == mapped_or_nullptr(now_loaded_defs, key)) {
-							loaded_image_caches.try_emplace(
-								key, 
-								image_definition_view(get_unofficial_content_dir(), fresh)
-							);
-						}
-						/* Otherwise it's already taken care of */
-					});
-				}
-			}
-			
-			now_loaded_defs = new_loaded_defs;
-
-			const auto atlas_size = result.atlas_size;
-
-#if USE_PBO
-			general_atlas.emplace(atlas_size);
-			general_atlas->start_upload_from(uploading_pbo);
-
-			augs::graphics::pbo::set_current_to_none();
-#else
-			general_atlas.emplace(atlas_size, no_pbo.data());
-#endif
-			if (measure_atlas_uploading) {
-				renderer.finish();
-			}
-		}
+		streaming.finalize_load({
+			new_viewing_config.debug.measure_atlas_uploading,
+			renderer
+		});
 
 		const auto screen_size = window.get_screen_size();
 
@@ -1591,14 +1335,14 @@ int work(const int argc, const char* const * const argv) try {
 		auto get_drawer = [&]() { 
 			return augs::drawer_with_default {
 				renderer.get_triangle_buffer(),
-				necessary_images_in_atlas[assets::necessary_image_id::BLANK]
+				streaming.necessary_images_in_atlas[assets::necessary_image_id::BLANK]
 			};
 		};
 
 		auto get_line_drawer = [&]() { 
 			return augs::line_drawer_with_default {
 				renderer.get_line_buffer(),
-				necessary_images_in_atlas[assets::necessary_image_id::BLANK]
+				streaming.necessary_images_in_atlas[assets::necessary_image_id::BLANK]
 			};
 		};
 
@@ -1663,13 +1407,13 @@ int work(const int argc, const char* const * const argv) try {
 					{ viewed_character, get_camera(), screen_size },
 					audiovisuals,
 					new_viewing_config.drawing,
-					necessary_images_in_atlas,
-					get_loaded_gui_font(),
-					images_in_atlas,
+					streaming.necessary_images_in_atlas,
+					streaming.get_loaded_gui_font(),
+					streaming.images_in_atlas,
 					interpolation_ratio,
 					renderer,
 					frame_performance,
-					general_atlas,
+					streaming.general_atlas,
 					necessary_fbos,
 					necessary_shaders,
 					all_visible
@@ -1728,7 +1472,7 @@ int work(const int argc, const char* const * const argv) try {
 						[&](const auto typed_handle, const auto image_id, const components::transform world_transform, const rgba color){
 							const auto screen_space_pos = vec2i(on_screen(world_transform.pos));
 
-							const auto aabb = xywh::center_and_size(screen_space_pos, necessary_images_in_atlas[image_id].get_original_size());
+							const auto aabb = xywh::center_and_size(screen_space_pos, streaming.necessary_images_in_atlas[image_id].get_original_size());
 							const auto expanded_square = aabb.expand_to_square();
 
 							if (auto active_color = editor.find_highlight_color_of(typed_handle.get_id())) {
@@ -1751,7 +1495,7 @@ int work(const int argc, const char* const * const argv) try {
 							}
 
 							drawer.base::aabb_centered(
-								necessary_images_in_atlas[image_id],
+								streaming.necessary_images_in_atlas[image_id],
 								screen_space_pos,
 								color
 							);
@@ -1807,7 +1551,7 @@ int work(const int argc, const char* const * const argv) try {
 			}
 		}
 		else {
-			general_atlas->bind();
+			streaming.general_atlas->bind();
 			necessary_shaders.standard->set_as_current();
 			necessary_shaders.standard->set_projection(augs::orthographic_projection(vec2(screen_size)));
 
@@ -1836,8 +1580,8 @@ int work(const int argc, const char* const * const argv) try {
 
 				main_menu.value().draw_overlays(
 					get_drawer(),
-					necessary_images_in_atlas,
-					get_loaded_gui_font(),
+					streaming.necessary_images_in_atlas,
+					streaming.get_loaded_gui_font(),
 					screen_size
 				);
 
@@ -1848,8 +1592,8 @@ int work(const int argc, const char* const * const argv) try {
 		renderer.call_and_clear_triangles();
 
 		/* #5 */
-		if (general_atlas.has_value()) {
-			renderer.draw_call_imgui(imgui_atlas, std::addressof(general_atlas.value()));
+		if (streaming.general_atlas.has_value()) {
+			renderer.draw_call_imgui(imgui_atlas, std::addressof(streaming.general_atlas.value()));
 		}
 		else {
 			renderer.draw_call_imgui(imgui_atlas, nullptr);
@@ -1863,14 +1607,14 @@ int work(const int argc, const char* const * const argv) try {
 
 			if (ImGui::GetIO().WantCaptureMouse) {
 				if (should_draw_our_cursor) {
-					get_drawer().cursor(necessary_images_in_atlas, augs::imgui::get_cursor<assets::necessary_image_id>(), cursor_drawing_pos, white);
+					get_drawer().cursor(streaming.necessary_images_in_atlas, augs::imgui::get_cursor<assets::necessary_image_id>(), cursor_drawing_pos, white);
 				}
 			}
 			else if (menu_chosen_cursor != assets::necessary_image_id::INVALID) {
 				/* We must have drawn some menu */
 
 				if (should_draw_our_cursor) {
-					get_drawer().cursor(necessary_images_in_atlas, menu_chosen_cursor, cursor_drawing_pos, white);
+					get_drawer().cursor(streaming.necessary_images_in_atlas, menu_chosen_cursor, cursor_drawing_pos, white);
 				}
 			}
 			else if (game_gui_mode && should_draw_game_gui()) {
@@ -1884,7 +1628,7 @@ int work(const int argc, const char* const * const argv) try {
 				if (should_draw_our_cursor) {
 					on_specific_setup([&](editor_setup& setup) {
 						if (setup.is_editing_mode()) {
-							get_drawer().cursor(necessary_images_in_atlas, assets::necessary_image_id::GUI_CURSOR, cursor_drawing_pos, white);
+							get_drawer().cursor(streaming.necessary_images_in_atlas, assets::necessary_image_id::GUI_CURSOR, cursor_drawing_pos, white);
 						}
 					});
 				}
@@ -1894,11 +1638,12 @@ int work(const int argc, const char* const * const argv) try {
 		if (new_viewing_config.session.show_developer_console) {
 			draw_debug_details(
 				get_drawer(),
-				get_loaded_gui_font(),
+				streaming.get_loaded_gui_font(),
 				screen_size,
 				viewed_character,
 				frame_performance,
-				atlas_performance,
+				streaming.performance,
+				streaming.general_atlas_performance,
 				performance,
 				audiovisuals.performance
 			);

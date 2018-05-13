@@ -14,12 +14,10 @@ namespace augs {
 
 struct editor_settings;
 struct editor_command_input;
-class loaded_image_caches_map;
 
 struct editor_fae_gui_input {
 	const property_editor_settings& settings;
 	const editor_command_input command_in;
-	const loaded_image_caches_map& image_caches;
 };
 
 using fae_selections_type = std::unordered_set<entity_id>;

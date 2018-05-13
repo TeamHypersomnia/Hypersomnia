@@ -15,7 +15,12 @@ struct image_cache {
 	);
 
 	vec2u original_image_size;
-	convex_partitioned_shape partitioned_shape;
+
+	auto make_box() const {
+		convex_partitioned_shape box;
+		box.make_box(vec2(original_image_size));
+		return box;
+	}
 
 	vec2u get_size() const {
 		return original_image_size;

@@ -22,19 +22,11 @@ inline void update_size_if_tex_changed(
 ) {
 	const auto fae_in = in.fae_in;
 	const auto cpe_in = fae_in.cpe_in;
-	const auto& image_caches = fae_in.image_caches;
 	const auto& viewables = cpe_in.command_in.folder.work->viewables;
 
 	auto& folder = cpe_in.command_in.folder;
 
-	image_cache cache;
-
-	if (const auto c = mapped_or_nullptr(image_caches, new_id)) {
-		cache = *c;
-	}
-	else {
-		cache = { image_definition_view(folder.current_path, viewables.image_definitions[new_id]) };
-	}
+	const auto cache = image_cache(image_definition_view(folder.current_path, viewables.image_definitions[new_id]));
 
 	auto& history = folder.history;
 
@@ -70,7 +62,7 @@ inline void update_size_if_tex_changed(
 		{
 			using T = decltype(invariants::shape_polygon::shape);
 
-			const auto original_shape = T(cache.partitioned_shape);
+			const auto original_shape = T(cache.make_box());
 			cmd.value_after_change = augs::to_bytes(original_shape);
 		}
 

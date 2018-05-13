@@ -237,8 +237,7 @@ void editor_setup::fill_with_test_scene() {
 void editor_setup::perform_custom_imgui(
 	sol::state& lua,
 	augs::window& owner,
-	const bool in_direct_gameplay,
-	const loaded_image_caches_map& image_caches
+	const bool in_direct_gameplay
 ) {
 	using namespace augs::imgui;
 
@@ -414,7 +413,7 @@ void editor_setup::perform_custom_imgui(
 		common_state_gui.perform(settings, make_command_input());
 
 		{
-			const auto output = fae_gui.perform(make_fae_gui_input(image_caches), view().selected_entities);
+			const auto output = fae_gui.perform(make_fae_gui_input(), view().selected_entities);
 
 			if (const auto id = output.instantiate_id) {
 				instantiate_flavour_command cmd;
@@ -454,7 +453,7 @@ void editor_setup::perform_custom_imgui(
 		}();
 
 		{
-			const auto in = make_fae_gui_input(image_caches);
+			const auto in = make_fae_gui_input();
 			const auto output = selected_fae_gui.perform(in, all_selected);
 
 			const auto& cosm = work().world;
@@ -816,8 +815,8 @@ grouped_selector_op_input editor_setup::make_grouped_selector_op_input() const {
 	return { view().selected_entities, view().selection_groups, view().ignore_groups };
 }
 
-editor_fae_gui_input editor_setup::make_fae_gui_input(const loaded_image_caches_map& image_caches) {
-	return { settings.property_editor, make_command_input(), image_caches };
+editor_fae_gui_input editor_setup::make_fae_gui_input() {
+	return { settings.property_editor, make_command_input() };
 }
 
 entity_mover_input editor_setup::make_mover_input() {

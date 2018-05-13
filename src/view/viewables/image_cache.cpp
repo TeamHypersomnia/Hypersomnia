@@ -12,6 +12,4 @@ image_cache::image_cache(
 		LOG(what.what());
 		original_image_size = { 32, 32 };
 	}
-
-	partitioned_shape.make_box(vec2(original_image_size));
 }

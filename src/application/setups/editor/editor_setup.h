@@ -217,8 +217,7 @@ public:
 	void perform_custom_imgui(
 		sol::state& lua,
 		augs::window& owner,
-		const bool in_direct_gameplay,
-		const loaded_image_caches_map& image_caches
+		const bool in_direct_gameplay
 	);
 
 	void customize_for_viewing(config_lua_table& cfg) const;
@@ -317,9 +316,7 @@ public:
 	editor_command_input make_command_input();
 	grouped_selector_op_input make_grouped_selector_op_input() const;
 
-	editor_fae_gui_input make_fae_gui_input(
-		const loaded_image_caches_map& image_caches
-	);
+	editor_fae_gui_input make_fae_gui_input();
 
 	entity_mover_input make_mover_input();
 
