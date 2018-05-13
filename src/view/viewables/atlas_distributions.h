@@ -34,6 +34,7 @@ struct general_atlas_input {
 	const unsigned max_atlas_size;
 
 	rgba* const atlas_image_output;
+	std::vector<rgba>& fallback_output;
 };
 
 struct general_atlas_output {

@@ -40,11 +40,10 @@ struct viewables_finalize_input {
 };
 
 class viewables_streaming {
-#if USE_PBO
 	augs::graphics::pbo uploading_pbo;
-#else
-	std::vector<rgba> no_pbo;
-#endif
+	std::vector<rgba> pbo_fallback;
+	bool pbo_allocation_complete = false;
+
 	augs::baked_font loaded_gui_font;
 
 	image_definitions_map future_image_definitions;

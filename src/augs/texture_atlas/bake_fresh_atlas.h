@@ -40,6 +40,8 @@ struct bake_fresh_atlas_input {
 
 struct bake_fresh_atlas_output {
 	rgba* const whole_image;
+	std::vector<rgba>& fallback_output;
+
 	baked_atlas& baked;
 
 	atlas_profiler& profiler;

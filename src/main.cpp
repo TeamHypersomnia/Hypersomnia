@@ -117,6 +117,9 @@ int main(const int argc, const char* const * const argv) {
 */
 
 int work(const int argc, const char* const * const argv) try {
+	static session_profiler performance;
+	performance.until_first_swap.start();
+
 	LOG("Started at %x", augs::date_time().get_readable());
 	LOG("Working directory: %x", augs::get_current_working_directory());
 
@@ -204,7 +207,6 @@ int work(const int argc, const char* const * const argv) try {
 		audio
 	};
 
-	static session_profiler performance;
 	static atlas_profiler atlas_performance;
 	static frame_profiler frame_performance;
 
@@ -1653,6 +1655,10 @@ int work(const int argc, const char* const * const argv) try {
 
 		frame_performance.num_triangles.measure(renderer.num_total_triangles_drawn);
 		renderer.num_total_triangles_drawn = 0u;
+
+		if (!performance.until_first_swap.was_measured()) {
+			performance.until_first_swap.stop();
+		}
 
 		window.swap_buffers();
 	}

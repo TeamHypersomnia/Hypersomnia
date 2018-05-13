@@ -99,6 +99,7 @@ general_atlas_output create_general_atlas(
 		},
 		{
 			in.atlas_image_output,
+			in.fallback_output,
 			baked,
 			performance
 		}

@@ -82,7 +82,7 @@ namespace augs {
 			destroy();
 		}
 
-		std::size_t pbo::get_size() const {
+		std::size_t pbo::capacity() const {
 			return size;
 		}
 	}

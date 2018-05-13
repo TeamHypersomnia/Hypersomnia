@@ -187,7 +187,15 @@ void bake_fresh_atlas(
 
 	// translate pixels into atlas space and render the image
 
-	auto output_image = augs::image_view(out.whole_image, output_image_size);
+	auto output_image = [&out, output_image_size]() {
+		if (out.whole_image != nullptr) {
+			return augs::image_view(out.whole_image, output_image_size);
+		}
+		else {
+			out.fallback_output.resize(output_image_size.area());
+			return augs::image_view(out.fallback_output.data(), output_image_size);
+		}
+	}();
 
 #if DEBUG_FILL_IMGS_WITH_COLOR
 	output_image.fill({0, 0, 0, 255});

@@ -7,11 +7,9 @@ viewables_streaming::viewables_streaming(const unsigned max_texture_size) {
 	LOG_NVPS(std::thread::hardware_concurrency());
 
 	auto scope = measure_scope(performance.pbo_allocation);
-#if USE_PBO
-	uploading_pbo.reserve_for_texture_square(max_texture_size);
-#else
-	no_pbo.resize(max_texture_size * max_texture_size);
-#endif
+
+	uploading_pbo.reserve_for_texture_square(max_texture_size / 2);
+	uploading_pbo.set_current_to_none();
 }
 
 void viewables_streaming::load_all(const viewables_load_input in) {
@@ -72,14 +70,19 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 		if (new_atlas_required) {
 			auto scope = measure_scope(performance.launching_atlas_reload);
 
-#if USE_PBO
-			uploading_pbo.set_as_current();
-			auto* const buffer_for_atlas = reinterpret_cast<rgba*>(uploading_pbo.map_buffer());
+			const auto pbo_buffer = [this]() -> rgba* {
+				if (pbo_allocation_complete) {
+					uploading_pbo.set_as_current();
+					return reinterpret_cast<rgba*>(uploading_pbo.map_buffer());
+				}
 
-			auto unset_scope = augs::scope_guard([&]() { uploading_pbo.set_current_to_none(); });
-#else
-			auto* const buffer_for_atlas = no_pbo.data();
-#endif
+				return nullptr;
+			}();
+
+			if (pbo_buffer == nullptr) {
+				/* Prepare fallback */
+				pbo_fallback.clear();
+			}
 
 			auto general_atlas_in = general_atlas_input {
 				{
@@ -91,18 +94,29 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 				},
 
 				max_atlas_size,
-				buffer_for_atlas
+
+				pbo_buffer,
+				pbo_fallback
 			};
 
 			future_general_atlas = std::async(
 				std::launch::async,
 				[general_atlas_in, this]() { 
+					if (pbo_allocation_complete) {
+						pbo_fallback.clear();
+						pbo_fallback.shrink_to_fit();
+					}
+
 					return create_general_atlas(general_atlas_in, general_atlas_performance, performance.neon_maps_regeneration);
 				}
 			);
 
 			future_image_definitions = new_defs;
 			future_gui_font = gui_font;
+
+			if (pbo_buffer != nullptr) {
+				uploading_pbo.set_current_to_none(); 
+			}
 		}
 	}
 
@@ -147,7 +161,6 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 		});
 
 		if (sound_requests.size() > 0) {
-			LOG("LAUNCHING!");
 			future_loaded_buffers = std::async(std::launch::async,
 				[&](){
 					using value_type = decltype(future_loaded_buffers.get());
@@ -188,17 +201,18 @@ void viewables_streaming::finalize_load(viewables_finalize_input in) {
 
 	if (valid_and_is_ready(future_general_atlas)) {
 		const bool measure_atlas_uploading = in.measure_atlas_upload;
+		const bool was_written_to_pbo = pbo_allocation_complete;
 
 		if (measure_atlas_uploading) {
 			in.renderer.finish();
 		}
 
-		auto scope = cond_measure_scope(measure_atlas_uploading, performance.atlas_upload_to_gpu);
+		auto scope = measure_scope(performance.atlas_upload_to_gpu);
 
-#if USE_PBO
-		uploading_pbo.set_as_current();
-		uploading_pbo.unmap_buffer();
-#endif
+		if (was_written_to_pbo) {
+			uploading_pbo.set_as_current();
+			uploading_pbo.unmap_buffer();
+		}
 
 		auto result = future_general_atlas.get();
 
@@ -216,14 +230,16 @@ void viewables_streaming::finalize_load(viewables_finalize_input in) {
 
 		const auto atlas_size = result.atlas_size;
 
-#if USE_PBO
-		general_atlas.emplace(atlas_size);
-		general_atlas->start_upload_from(uploading_pbo);
+		if (was_written_to_pbo) {
+			general_atlas.emplace(atlas_size);
+			general_atlas->start_upload_from(uploading_pbo);
 
-		augs::graphics::pbo::set_current_to_none();
-#else
-		general_atlas.emplace(atlas_size, no_pbo.data());
-#endif
+			augs::graphics::pbo::set_current_to_none();
+		}
+		else {
+			general_atlas.emplace(atlas_size, pbo_fallback.data());
+		}
+
 		if (measure_atlas_uploading) {
 			in.renderer.finish();
 		}
@@ -260,5 +276,4 @@ void viewables_streaming::finalize_load(viewables_finalize_input in) {
 		now_loaded_defs = new_loaded_defs;
 		sound_requests.clear();
 	}
-	LOG_NVPS(loaded_sounds.size());
 }

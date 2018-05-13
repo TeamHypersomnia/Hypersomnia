@@ -35,7 +35,7 @@ namespace augs {
 			void* map_buffer();
 			bool unmap_buffer();
 
-			std::size_t get_size() const;
+			std::size_t capacity() const;
 		};
 	}
 }
