@@ -12,7 +12,7 @@ enum class settings_pane {
 	GAMEPLAY,
 	EDITOR,
 	GUI_STYLES,
-	DEBUG,
+	ADVANCED,
 
 	COUNT
 	// END GEN INTROSPECTOR

@@ -41,7 +41,9 @@ void regenerate_and_gather_subjects(
 			auto scope = measure_scope(neon_regeneration_performance);
 
 #if 1
-			static augs::range_workers<decltype(worker)> workers;
+			const auto num_workers = std::size_t(in.settings.neon_regeneration_threads);
+			static augs::range_workers<decltype(worker)> workers = num_workers;
+			workers.resize_workers(num_workers);
 			workers.process(worker, in.image_definitions);
 #else
 			for (const auto& d : in.image_definitions) {
@@ -100,6 +102,7 @@ general_atlas_output create_general_atlas(
 		{
 			atlas_subjects,
 			in.max_atlas_size,
+			in.subjects.settings.atlas_blitting_threads
 		},
 		{
 			in.atlas_image_output,

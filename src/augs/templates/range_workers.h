@@ -16,30 +16,12 @@ namespace augs {
 		std::optional<Callback> callback;
 		std::vector<std::thread> workers;
 		std::atomic<int> it = 0;
-		std::atomic<int> working_threads = 0;
+		std::atomic<int> num_busy_workers = 0;
 
 		std::mutex m;
 		std::condition_variable cv;
 
 		std::atomic<bool> shall_quit = false;
-
-	public:
-		auto process_tasks() {
-			working_threads.fetch_add(1);
-
-			while (true) {
-				const auto i = it.fetch_add(1, std::memory_order_relaxed);
-
-				if (i < count) {
-					(*callback)(arr[i]);
-				}
-				else {
-					break;
-				}
-			}
-
-			working_threads.fetch_sub(1);
-		}
 
 		auto make_worker_function() {
 			return [&]() {
@@ -58,12 +40,11 @@ namespace augs {
 			};
 		}
 
-		range_workers() {
-			const auto n = std::thread::hardware_concurrency() - 2;
-
+		void init_workers(const std::size_t n) {
+			shall_quit.store(false);
 			workers.reserve(n);
 
-			for (unsigned i = 0; i < n; ++i) {
+			for (std::size_t i = 0; i < n; ++i) {
 				workers.emplace_back(make_worker_function());
 			}
 		}
@@ -74,19 +55,58 @@ namespace augs {
 			}
 		}
 
-		~range_workers() {
+		void quit_workers() {
 			shall_quit.store(true);
 			cv.notify_all();
-
 			join_all();
+			workers.clear();
 		}
 
 		void wait_complete() {
 			process_tasks();
 
-			while (working_threads.load()) {
+			while (num_busy_workers.load()) {
 				std::this_thread::yield();
 			}
+		}
+
+	public:
+		range_workers(const std::size_t n) {
+			init_workers(n);
+		}
+
+		range_workers() : range_workers(std::thread::hardware_concurrency() - 1) {}
+
+		range_workers(const range_workers&) = delete;
+		range_workers& operator=(const range_workers&) = delete;
+
+		range_workers(range_workers&&) = delete;
+		range_workers& operator=(range_workers&&) = delete;
+
+		auto process_tasks() {
+			num_busy_workers.fetch_add(1);
+
+			while (true) {
+				const auto i = it.fetch_add(1, std::memory_order_relaxed);
+
+				if (i < count) {
+					(*callback)(arr[i]);
+				}
+				else {
+					break;
+				}
+			}
+
+			num_busy_workers.fetch_sub(1);
+		}
+
+		void resize_workers(const std::size_t num) {
+			if (num == workers.size()) {
+				return;
+			}
+
+			quit_workers();
+			init_workers(num);
 		}
 
 		template <class C, class R>
@@ -105,6 +125,10 @@ namespace augs {
 			wait_complete();
 
 			count = 0;
+		}
+
+		~range_workers() {
+			quit_workers();
 		}
 	};
 }

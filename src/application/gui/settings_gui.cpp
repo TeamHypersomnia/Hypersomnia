@@ -1,4 +1,5 @@
 #include <cstring>
+#include <thread>
 
 #include "augs/templates/introspect.h"
 #include "augs/templates/enum_introspect.h"
@@ -315,7 +316,7 @@ void settings_gui_state::perform(
 
 				break;
 			}
-			case settings_pane::DEBUG: {
+			case settings_pane::ADVANCED: {
 				text(u8"Test: いい товарищ żółćńźś");
 
 				revertable_checkbox("Show developer console", config.session.show_developer_console);
@@ -346,9 +347,29 @@ void settings_gui_state::perform(
 					revertable_slider("Tickrate", config.test_scene.scene_tickrate, 10.f, 300.f);
 				}
 
-				auto& scope_cfg = config.debug;
+				{
+					auto& scope_cfg = config.debug;
+					revertable_checkbox(SCOPE_CFG_NVP(measure_atlas_uploading));
+				}
 
-				revertable_checkbox(SCOPE_CFG_NVP(measure_atlas_uploading));
+				text("Content regeneration");
+
+				{
+					auto indent = scoped_indent();
+					auto& scope_cfg = config.content_regeneration;
+
+					revertable_checkbox(SCOPE_CFG_NVP(regenerate_every_time));
+
+					const auto concurrency = std::thread::hardware_concurrency();
+					const auto t_max = concurrency * 2;
+
+					text_disabled("(Value of 0 tells regenerators to not spawn any additional workers)");
+					text_disabled(typesafe_sprintf("(std::thread::hardware_concurrency() = %x)", concurrency));
+
+					revertable_slider(SCOPE_CFG_NVP(atlas_blitting_threads), 0u, t_max);
+					revertable_slider(SCOPE_CFG_NVP(neon_regeneration_threads), 0u, t_max);
+				}
+
 
 				break;
 			}

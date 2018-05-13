@@ -35,6 +35,7 @@ struct baked_atlas {
 struct bake_fresh_atlas_input {
 	const atlas_input_subjects& subjects;
 	const unsigned max_atlas_size;
+	const unsigned blitting_threads;
 };
 
 struct bake_fresh_atlas_output {

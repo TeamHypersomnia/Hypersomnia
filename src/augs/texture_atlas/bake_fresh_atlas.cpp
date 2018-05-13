@@ -38,7 +38,6 @@ void bake_fresh_atlas(
 	auto& baked = out.baked;
 	auto& output_image_size = out.baked.atlas_image_size;
 
-	std::unordered_map<source_image_identifier, vec2u> loaded_image_sizes;
 	std::unordered_map<source_font_identifier, augs::font> loaded_fonts;
 
 	static std::vector<rect_xywhf> rects_for_packer;
@@ -57,13 +56,6 @@ void bake_fresh_atlas(
 
 			try {
 				const auto u_size = [&]() { auto sc = measure_scope(scope); return augs::image::get_size(input_img_id); }();
-				const auto it = loaded_image_sizes.try_emplace(input_img_id, u_size);
-
-				{
-					const bool is_img_unique = it.second;
-					ensure(is_img_unique);
-				}
-
 				out_entry.cached_original_size_pixels = u_size;
 
 				const auto size = vec2i(u_size);
@@ -207,15 +199,11 @@ void bake_fresh_atlas(
 #endif
 	
 	{
-		auto& blitting_scope = out.profiler.blitting_images;
-		auto loading_scope = measure_scope_additive(out.profiler.loading_images);
-		//auto decoding_scope = measure_scope_additive(out.profiler.decoding_images);
-
 		static std::vector<std::vector<std::byte>> _all_loaded_bytes;
 		auto& all_loaded_bytes = _all_loaded_bytes;
 
 		{
-			auto scope = measure_scope(loading_scope);
+			auto scope = measure_scope(out.profiler.loading_images);
 
 			const auto images_n = subjects.images.size();
 
@@ -229,10 +217,40 @@ void bake_fresh_atlas(
 			}
 		}
 
-		auto scope = measure_scope(blitting_scope);
+		struct worker_input {
+			unsigned image_area;
+			unsigned original_index;
 
-		auto worker = [&output_image, &subjects, &baked, output_image_size](const augs::path_type& input_img_id) {
-			const auto current_rect = index_in(subjects.images, input_img_id);
+			worker_input() {}
+
+			bool operator<(const worker_input& b) const {
+				/* Biggest go first */
+				return image_area > b.image_area;
+			}
+		};
+
+		static std::vector<worker_input> worker_inputs;
+
+		{
+			auto scope = measure_scope(out.profiler.making_worker_inputs);
+			worker_inputs.resize(subjects.images.size());
+
+			for (auto& r : subjects.images) {
+				const auto current_rect = static_cast<unsigned>(index_in(subjects.images, r));
+				const auto area = static_cast<unsigned>(rects_for_packer[current_rect].area());
+
+				worker_inputs[current_rect].image_area = area;
+				worker_inputs[current_rect].original_index = current_rect;
+			}
+
+			sort_range(worker_inputs);
+		}
+
+		auto scope = measure_scope(out.profiler.blitting_images);
+
+		auto worker = [&output_image, &subjects, &baked, output_image_size](const worker_input& input) {
+			const auto current_rect = input.original_index;
+			const auto& input_img_id = subjects.images[current_rect];
 			const auto packed_rect = rects_for_packer[current_rect];
 
 			{
@@ -278,8 +296,11 @@ void bake_fresh_atlas(
 			worker(r);
 		}
 #else
-		static augs::range_workers<decltype(worker)> workers;
-		workers.process(worker, subjects.images);
+		const auto num_workers = std::size_t(in.blitting_threads);
+
+		static augs::range_workers<decltype(worker)> workers = num_workers;
+		workers.resize_workers(num_workers);
+		workers.process(worker, worker_inputs);
 #endif
 	}
 
