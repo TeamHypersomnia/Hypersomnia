@@ -40,7 +40,7 @@ void regenerate_and_gather_subjects(
 		{
 			auto scope = measure_scope(neon_regeneration_performance);
 
-#if 0
+#if 1
 			static augs::range_workers<decltype(worker)> workers;
 			workers.process(worker, in.image_definitions);
 #else

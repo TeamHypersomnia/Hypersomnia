@@ -172,6 +172,14 @@ struct additive_time_scope {
 	}
 };
 
+inline auto cond_measure_scope(const bool do_it, augs::time_measurements& m) {
+	if (do_it) {
+		m.start();
+	}
+
+	return augs::scope_guard([do_it, &m]() { if (do_it) { m.stop(); } });
+}
+
 inline auto measure_scope(augs::time_measurements& m) {
 	m.start();
 	return augs::scope_guard([&m]() { m.stop(); });

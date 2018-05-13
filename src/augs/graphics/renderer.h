@@ -75,6 +75,8 @@ namespace augs {
 		void call_lines();
 		void set_viewport(const xywhi);
 
+		void finish();
+
 		void push_line(const augs::vertex_line& line) {
 			lines.push_back(line);
 		}

@@ -316,4 +316,8 @@ namespace augs {
 	int renderer::get_max_texture_size() const {
 		return max_texture_size;
 	}
+
+	void renderer::finish() {
+		GL_CHECK(glFinish());
+	}
 }

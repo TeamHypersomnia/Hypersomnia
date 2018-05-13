@@ -183,6 +183,7 @@ int work(const int argc, const char* const * const argv) try {
 	augs::log_all_audio_devices(LOG_FILES_DIR "/audio_devices.txt");
 
 	static augs::renderer renderer;
+	LOG_NVPS(renderer.get_max_texture_size());
 
 	static all_necessary_fbos necessary_fbos(
 		window.get_screen_size(),
@@ -262,7 +263,14 @@ int work(const int argc, const char* const * const argv) try {
 	};
 #endif
 	
+#define USE_PBO 1
+
+#if USE_PBO
 	static augs::graphics::pbo uploading_pbo;
+#else
+	static std::vector<rgba> no_pbo;
+	no_pbo.resize(renderer.get_max_texture_size() * renderer.get_max_texture_size());
+#endif
 
 	static image_definitions_map future_image_definitions;
 	static augs::font_loading_input future_gui_font;
@@ -272,6 +280,7 @@ int work(const int argc, const char* const * const argv) try {
 	static std::optional<augs::graphics::texture> uploading_texture;
 	static std::optional<augs::graphics::texture> general_atlas;
 	
+#if USE_PBO
 	{
 		auto scope = measure_scope(performance.pbo_allocation);
 
@@ -279,6 +288,7 @@ int work(const int argc, const char* const * const argv) try {
 			renderer.get_max_texture_size()
 		);
 	}
+#endif
 
 	static world_camera gameplay_camera;
 	static audiovisual_state audiovisuals;
@@ -372,7 +382,14 @@ int work(const int argc, const char* const * const argv) try {
 			if (new_atlas_required && !future_general_atlas.valid()) {
 				const auto settings = config.content_regeneration;
 
+#if USE_PBO
 				uploading_pbo.set_as_current();
+				auto* const buffer_for_atlas = reinterpret_cast<rgba*>(uploading_pbo.map_buffer());
+
+				auto unset_scope = augs::scope_guard([]() { uploading_pbo.set_current_to_none(); });
+#else
+				auto* const buffer_for_atlas = no_pbo.data();
+#endif
 
 				auto in = general_atlas_input {
 					{
@@ -384,7 +401,7 @@ int work(const int argc, const char* const * const argv) try {
 					},
 
 					static_cast<unsigned>(renderer.get_max_texture_size()),
-					reinterpret_cast<rgba*>(uploading_pbo.map_buffer())
+					buffer_for_atlas
 				};
 
 				future_general_atlas = std::async(
@@ -396,7 +413,6 @@ int work(const int argc, const char* const * const argv) try {
 
 				future_image_definitions = new_defs.image_definitions;
 				future_gui_font = config.gui_font;
-				uploading_pbo.set_current_to_none();
 			}
 		}
 
@@ -1455,8 +1471,18 @@ int work(const int argc, const char* const * const argv) try {
 		/* Unpack asynchronous asset loading results */
 
 		if (valid_and_is_ready(future_general_atlas)) {
+			const bool measure_atlas_uploading = new_viewing_config.debug.measure_atlas_uploading;
+
+			if (measure_atlas_uploading) {
+				renderer.finish();
+			}
+
+			auto scope = cond_measure_scope(measure_atlas_uploading, performance.atlas_upload_to_gpu);
+
+#if USE_PBO
 			uploading_pbo.set_as_current();
 			uploading_pbo.unmap_buffer();
+#endif
 
 			auto result = future_general_atlas.get();
 
@@ -1507,10 +1533,17 @@ int work(const int argc, const char* const * const argv) try {
 
 			const auto atlas_size = result.atlas_size;
 
+#if USE_PBO
 			general_atlas.emplace(atlas_size);
 			general_atlas->start_upload_from(uploading_pbo);
 
 			augs::graphics::pbo::set_current_to_none();
+#else
+			general_atlas.emplace(atlas_size, no_pbo.data());
+#endif
+			if (measure_atlas_uploading) {
+				renderer.finish();
+			}
 		}
 
 		const auto screen_size = window.get_screen_size();

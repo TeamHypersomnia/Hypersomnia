@@ -346,6 +346,10 @@ void settings_gui_state::perform(
 					revertable_slider("Tickrate", config.test_scene.scene_tickrate, 10.f, 300.f);
 				}
 
+				auto& scope_cfg = config.debug;
+
+				revertable_checkbox(SCOPE_CFG_NVP(measure_atlas_uploading));
+
 				break;
 			}
 			default: {

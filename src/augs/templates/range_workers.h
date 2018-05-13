@@ -59,7 +59,8 @@ namespace augs {
 		}
 
 		range_workers() {
-			const auto n = std::thread::hardware_concurrency();
+			const auto n = std::thread::hardware_concurrency() - 2;
+
 			workers.reserve(n);
 
 			for (unsigned i = 0; i < n; ++i) {
