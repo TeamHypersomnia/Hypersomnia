@@ -74,8 +74,8 @@ struct image_definition_view : asset_definition_view<image_definition> {
 	std::optional<augs::path_type> find_generated_neon_map_path() const;
 	std::optional<augs::path_type> find_desaturation_path() const;
 
-	void regenerate_all_needed(const bool force_regenerate) const;
-	void delete_regenerated_files() const;
+	void regenerate_desaturation(const bool force_regenerate) const;
+	void regenerate_neon_map(const bool force_regenerate) const;
 
 	augs::path_type get_source_image_path() const;
 	vec2u read_source_image_size() const;

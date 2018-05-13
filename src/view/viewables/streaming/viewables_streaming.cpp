@@ -25,7 +25,7 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 	/* Atlas pass */
 
 	{
-		bool new_atlas_required = true;
+		bool new_atlas_required = false;
 
 		{
 			{

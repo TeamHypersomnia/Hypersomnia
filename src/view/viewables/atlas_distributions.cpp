@@ -24,17 +24,10 @@ void regenerate_and_gather_subjects(
 		auto worker = [make_view, in](const image_definition& d) {
 			const auto def = make_view(d);
 
-			try {
-				def.regenerate_all_needed(in.settings.regenerate_every_time);
-			}
-			catch (...) {
-				try {
-					def.delete_regenerated_files();
-				}
-				catch (...) {
+			const bool force = in.settings.regenerate_every_time;
 
-				}
-			}
+			def.regenerate_desaturation(force);
+			def.regenerate_neon_map(force);
 		};
 
 		{

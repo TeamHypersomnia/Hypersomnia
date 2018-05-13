@@ -15,7 +15,7 @@ void regenerate_desaturation(
 	const augs::path_type& source_path,
 	const augs::path_type& output_path,
 	const bool force_regenerate
-) {
+) try {
 	desaturation_stamp new_stamp;
 	new_stamp.last_write_time_of_source = last_write_time(source_path);
 
@@ -50,4 +50,7 @@ void regenerate_desaturation(
 		augs::create_directories_for(desaturation_stamp_path);
 		augs::save_as_bytes(new_stamp_bytes, desaturation_stamp_path);
 	}
+}
+catch (...) {
+	augs::remove_file(output_path);
 }

@@ -25,7 +25,7 @@ void regenerate_neon_map(
 	const augs::path_type& output_image_path,
 	const neon_map_input in,
 	const bool force_regenerate
-) {
+) try {
 	neon_map_stamp new_stamp;
 	new_stamp.input = in;
 	new_stamp.last_write_time_of_source = augs::last_write_time(input_image_path);
@@ -70,6 +70,9 @@ void regenerate_neon_map(
 		augs::create_directories_for(neon_map_stamp_path);
 		augs::save_as_bytes(new_stamp_bytes, neon_map_stamp_path);
 	}
+}
+catch (...) {
+	augs::remove_file(output_image_path);
 }
 
 void generate_gauss_kernel(

@@ -65,30 +65,31 @@ vec2u image_definition_view::read_source_image_size() const {
 	return augs::image::get_size(resolved_source_path);
 }
 
-void image_definition_view::regenerate_all_needed(
+void image_definition_view::regenerate_neon_map(
 	const bool force_regenerate
 ) const {
 	const auto diffuse_path = resolved_source_path;
 
 	if (def.loadables.should_generate_neon_map()) {
-		regenerate_neon_map(
+		::regenerate_neon_map(
 			diffuse_path,
 			find_generated_neon_map_path().value(),
 			def.loadables.extras.generate_neon_map.value,
 			force_regenerate
 		);
 	}
-	
+}
+
+void image_definition_view::regenerate_desaturation(
+	const bool force_regenerate
+) const {
+	const auto diffuse_path = resolved_source_path;
+
 	if (def.loadables.should_generate_desaturation()) {
-		regenerate_desaturation(
+		::regenerate_desaturation(
 			diffuse_path,
 			find_desaturation_path().value(),
 			force_regenerate
 		);
 	}
-}
-
-void image_definition_view::delete_regenerated_files() const {
-	augs::remove_file(::get_neon_map_path(resolved_source_path));
-	augs::remove_file(::get_desaturation_path(resolved_source_path));
 }
