@@ -5,6 +5,9 @@ permalink: reassurements
 summary: We don't need to do this yet, because...
 ---
 
+- Further parallelizing the neon maps is not quite worth the effort.
+	- Ultimately, we won't have such giants anyway.
+
 - We will keep the audiovisual state global for all setups.
 	- The cosmos address probably won't change in networked scenarions...
 	- ...we will just rewrite the solvable, really. That's the most that will happen

@@ -5,12 +5,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- there is no point in having a convex partitioned shape inside an image cache
-	- that is because these shapes will be edited in editor, possibly per-flavour
-	- 
-
-- sort images for multiprocessing; biggest go first
-
 - refactor augs::image_view to use common funcs?
 
 - thoughts about atlas

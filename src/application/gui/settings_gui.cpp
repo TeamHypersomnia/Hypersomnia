@@ -359,6 +359,9 @@ void settings_gui_state::perform(
 					auto& scope_cfg = config.content_regeneration;
 
 					revertable_checkbox(SCOPE_CFG_NVP(regenerate_every_time));
+					ImGui::SameLine();
+
+					text_disabled("(for benchmarking)");
 
 					const auto concurrency = std::thread::hardware_concurrency();
 					const auto t_max = concurrency * 2;
