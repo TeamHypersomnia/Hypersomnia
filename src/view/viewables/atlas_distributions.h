@@ -47,10 +47,12 @@ struct atlas_input_subjects;
 
 void regenerate_and_gather_subjects(
 	subjects_gathering_input,
-	atlas_input_subjects& output
+	atlas_input_subjects& output,
+	augs::time_measurements& neon_regeneration_performance
 );
 
 general_atlas_output create_general_atlas(
 	general_atlas_input in,
-	atlas_profiler&
+	atlas_profiler&,
+	augs::time_measurements& neon_regeneration_performance
 );

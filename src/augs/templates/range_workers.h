@@ -95,13 +95,15 @@ namespace augs {
 
 				it = 0;
 				count = range.size();
-				arr = std::addressof(range[0]);
+				arr = range.data();
 
 				callback.emplace(std::forward<C>(call));
 			}
 
 			cv.notify_all();
 			wait_complete();
+
+			count = 0;
 		}
 	};
 }

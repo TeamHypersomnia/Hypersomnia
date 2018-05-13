@@ -390,7 +390,7 @@ int work(const int argc, const char* const * const argv) try {
 				future_general_atlas = std::async(
 					std::launch::async,
 				   	[in]() { 
-						return create_general_atlas(in, atlas_performance);
+						return create_general_atlas(in, atlas_performance, performance.neon_regeneration);
 					}
 				);
 

@@ -15,6 +15,7 @@ struct session_profiler : public augs::profiler_mixin<session_profiler> {
 	augs::time_measurements viewables_readback;
 
 	augs::time_measurements atlas_upload_to_gpu = std::size_t(1);
+	augs::time_measurements neon_regeneration = std::size_t(1);
 
 	augs::time_measurements camera_visibility_query;
 	augs::time_measurements pbo_allocation;

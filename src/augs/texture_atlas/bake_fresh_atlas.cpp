@@ -206,16 +206,6 @@ void bake_fresh_atlas(
 	output_image.fill({0, 0, 0, 255});
 #endif
 	
-	struct ttestt {
-		ttestt() {
-			LOG("ttestt");
-		}
-
-		~ttestt() {
-			LOG("~ttestt");
-		}
-	};
-
 	{
 		auto& blitting_scope = out.profiler.blitting_images;
 		auto loading_scope = measure_scope_additive(out.profiler.loading_images);
@@ -242,8 +232,6 @@ void bake_fresh_atlas(
 		auto scope = measure_scope(blitting_scope);
 
 		auto worker = [&output_image, &subjects, &baked, output_image_size](const augs::path_type& input_img_id) {
-			thread_local ttestt t;
-
 			const auto current_rect = index_in(subjects.images, input_img_id);
 			const auto packed_rect = rects_for_packer[current_rect];
 

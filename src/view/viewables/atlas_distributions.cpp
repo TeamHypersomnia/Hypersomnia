@@ -3,10 +3,12 @@
 
 #include "view/viewables/images_in_atlas_map.h"
 #include "view/viewables/image_definition.h"
+#include "augs/templates/range_workers.h"
 
 void regenerate_and_gather_subjects(
 	const subjects_gathering_input in,
-	atlas_input_subjects& output
+	atlas_input_subjects& output,
+	augs::time_measurements& neon_regeneration_performance
 ) {
 	auto make_view = [&in](const auto& def) {
 		return image_definition_view(in.unofficial_project_dir, def);
@@ -19,7 +21,7 @@ void regenerate_and_gather_subjects(
 			output.images.emplace_back(r.second.get_source_path().path);
 		}
 
-		for (const auto& d : in.image_definitions) {
+		auto worker = [make_view, in](const image_definition& d) {
 			const auto def = make_view(d);
 
 			try {
@@ -33,6 +35,23 @@ void regenerate_and_gather_subjects(
 
 				}
 			}
+		};
+
+		{
+			auto scope = measure_scope(neon_regeneration_performance);
+
+#if 0
+			static augs::range_workers<decltype(worker)> workers;
+			workers.process(worker, in.image_definitions);
+#else
+			for (const auto& d : in.image_definitions) {
+				worker(d);
+			}
+#endif
+		}
+
+		for (const auto& d : in.image_definitions) {
+			const auto def = make_view(d);
 
 			output.images.emplace_back(def.get_source_image_path());
 
@@ -62,7 +81,8 @@ void regenerate_and_gather_subjects(
 
 general_atlas_output create_general_atlas(
 	const general_atlas_input in,
-	atlas_profiler& performance
+	atlas_profiler& performance,
+	augs::time_measurements& neon_regeneration_performance
 ) {
 	auto total = measure_scope(performance.whole_regeneration);
 
@@ -70,7 +90,7 @@ general_atlas_output create_general_atlas(
 
 	{
 		auto scope = measure_scope(performance.gathering_subjects);
-		regenerate_and_gather_subjects(in.subjects, atlas_subjects);
+		regenerate_and_gather_subjects(in.subjects, atlas_subjects, neon_regeneration_performance);
 	}
 
 	thread_local baked_atlas baked;
