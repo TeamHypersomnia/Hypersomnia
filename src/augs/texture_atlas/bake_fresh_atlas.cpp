@@ -24,11 +24,6 @@
 
 using namespace rectpack2D;
 
-template <class T, class C>
-std::size_t index_in(C& container, T& object) {
-	return std::addressof(object) - std::addressof(container[0]);
-}
-
 void bake_fresh_atlas(
 	const bake_fresh_atlas_input in,
 	const bake_fresh_atlas_output out

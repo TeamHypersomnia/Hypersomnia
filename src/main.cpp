@@ -286,8 +286,7 @@ int work(const int argc, const char* const * const argv) try {
 			config.gui_font,
 			config.content_regeneration,
 			get_unofficial_content_dir(),
-			renderer.get_max_texture_size(),
-			audiovisuals.get<sound_system>()
+			renderer.get_max_texture_size()
 		});
 	};
 
@@ -1287,7 +1286,8 @@ int work(const int argc, const char* const * const argv) try {
 
 		streaming.finalize_load({
 			new_viewing_config.debug.measure_atlas_uploading,
-			renderer
+			renderer,
+			audiovisuals.get<sound_system>()
 		});
 
 		const auto screen_size = window.get_screen_size();

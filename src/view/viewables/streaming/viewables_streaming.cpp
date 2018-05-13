@@ -15,7 +15,9 @@ viewables_streaming::viewables_streaming(const unsigned max_texture_size) {
 }
 
 void viewables_streaming::load_all(const viewables_load_input in) {
-	const auto& new_defs = in.new_defs;
+	const auto& new_all_defs = in.new_defs;
+	auto& now_all_defs = now_loaded_viewables_defs;
+
 	const auto& gui_font = in.gui_font;
 	const auto& necessary_image_definitions = in.necessary_image_definitions;
 	const auto settings = in.settings;
@@ -24,15 +26,18 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 
 	/* Atlas pass */
 
-	{
+	if (!future_general_atlas.valid()) {
 		bool new_atlas_required = settings.regenerate_every_time;
+
+		auto& now_defs = now_all_defs.image_definitions;
+		auto& new_defs = new_all_defs.image_definitions;
 
 		{
 			{
 				/* Check for unloaded and changed resources */
-				for_each_id_and_object(now_loaded_viewables_defs.image_definitions, [&](const auto key, const auto& old_definition) {
-					if (const auto new_definition = mapped_or_nullptr(new_defs.image_definitions, key)) {
-						if (new_definition->loadables != old_definition.loadables) {
+				for_each_id_and_object(now_defs, [&](const auto key, const auto& old_def) {
+					if (const auto new_def = mapped_or_nullptr(new_defs, key)) {
+						if (new_def->loadables != old_def.loadables) {
 							/* Changed, so reload. */
 							new_atlas_required = true;
 						}
@@ -43,8 +48,8 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 					}
 				});
 
-				for_each_id_and_object(new_defs.image_definitions, [&](const auto key, const auto&) {
-					if (nullptr == mapped_or_nullptr(now_loaded_viewables_defs.image_definitions, key)) {
+				for_each_id_and_object(new_defs, [&](const auto key, const auto&) {
+					if (nullptr == mapped_or_nullptr(now_defs, key)) {
 						/* New one, include. */
 						new_atlas_required = true;
 					}
@@ -64,7 +69,9 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 			new_atlas_required = true;
 		}
 
-		if (new_atlas_required && !future_general_atlas.valid()) {
+		if (new_atlas_required) {
+			auto scope = measure_scope(performance.launching_atlas_reload);
+
 #if USE_PBO
 			uploading_pbo.set_as_current();
 			auto* const buffer_for_atlas = reinterpret_cast<rgba*>(uploading_pbo.map_buffer());
@@ -78,7 +85,7 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 				{
 					settings,
 					necessary_image_definitions,
-					new_defs.image_definitions,
+					new_defs,
 					gui_font,
 					unofficial_content_dir
 				},
@@ -90,19 +97,19 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 			future_general_atlas = std::async(
 				std::launch::async,
 				[general_atlas_in, this]() { 
-					return create_general_atlas(general_atlas_in, general_atlas_performance, performance.neon_regeneration);
+					return create_general_atlas(general_atlas_in, general_atlas_performance, performance.neon_maps_regeneration);
 				}
 			);
 
-			future_image_definitions = new_defs.image_definitions;
+			future_image_definitions = new_defs;
 			future_gui_font = gui_font;
 		}
 	}
 
 	/* Sounds pass */
 
-	{
-		auto total = measure_scope_additive(performance.reloading_sounds);
+	if (!future_loaded_buffers.valid()) {
+		auto total = measure_scope(performance.launching_sounds_reload);
 
 		auto make_sound_loading_input = [&](const sound_definition& def) {
 			const auto def_view = sound_definition_view(unofficial_content_dir, def);
@@ -111,57 +118,72 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 			return input;
 		};
 
-		/* Check for unloaded and changed resources */
-		for_each_id_and_object(now_loaded_viewables_defs.sounds, [&](const auto& key, const auto& now_loaded) {
-			auto unload = [&](){
-				in.sounds.clear_sources_playing(key);
-				loaded_sounds.erase(key);
+		auto& now_defs = now_all_defs.sounds;
+		auto& new_defs = new_all_defs.sounds;
+
+		/* Request to, on finalization, unload no longer existent sounds. */
+		for_each_id_and_object(now_defs, [&](const auto& key, const auto&) {
+			if (nullptr == mapped_or_nullptr(new_defs, key)) {
+				sound_requests.emplace_back(key, augs::sound_buffer_loading_input{ {}, {} });
+			}
+		});
+
+		/* Gather loading requests for new and changed definitions. */
+		for_each_id_and_object(new_defs, [&](const auto& fresh_key, const auto& new_def) {
+			auto request_new = [&]() {
+				sound_requests.emplace_back(fresh_key, make_sound_loading_input(new_def));
 			};
 
-			if (const auto fresh = mapped_or_nullptr(new_defs.sounds, key)) {
-				if (fresh->loadables != now_loaded.loadables) {
-					auto scope = measure_scope(total);
-					/* Different from the fresh one, reload */
-					unload();
-
-					try {
-						loaded_sounds.try_emplace(key, make_sound_loading_input(*fresh));
-					}
-					catch (...) {
-
-					}
+			if (const auto now_def = mapped_or_nullptr(now_defs, fresh_key)) {
+				if (new_def.loadables != now_def->loadables) {
+					/* Found, but a different one. Reload. */
+					request_new();
 				}
 			}
 			else {
-				auto scope = measure_scope(total);
-				/* Missing, unload */
-				unload();
+				/* Not found, load it then. */
+				request_new();
 			}
 		});
 
-		/* Check for new resources */
-		for_each_id_and_object(new_defs.sounds, [&](const auto& fresh_key, const auto& fresh_def) {
-			if (nullptr == mapped_or_nullptr(now_loaded_viewables_defs.sounds, fresh_key)) {
-				auto scope = measure_scope(total);
+		if (sound_requests.size() > 0) {
+			LOG("LAUNCHING!");
+			future_loaded_buffers = std::async(std::launch::async,
+				[&](){
+					using value_type = decltype(future_loaded_buffers.get());
 
-				try {
-					loaded_sounds.try_emplace(fresh_key, make_sound_loading_input(fresh_def));
+					auto scope = measure_scope(performance.reloading_sounds);
+
+					value_type result;
+
+					for (const auto& r : sound_requests) {
+						if (r.second.source_sound.empty()) {
+							/* A request to unload. */
+							result.push_back(std::nullopt);
+							continue;
+						}
+
+						try {
+							augs::sound_buffer b = r.second;
+							result.emplace_back(std::move(b));
+						}
+						catch (...) {
+							result.push_back(std::nullopt);
+						}
+					}
+
+					return result;
 				}
-				catch (...) {
+			);
 
-				}
-			}
-			/* Otherwise it's already taken care of */
-		});
-
-		/* Done, overwrite */
-		now_loaded_viewables_defs.sounds = new_defs.sounds;
+			future_sound_definitions = new_all_defs.sounds;
+		}
 	}
-
-	//auto scope = measure_scope(performance.viewables_readback);
 }
 
 void viewables_streaming::finalize_load(viewables_finalize_input in) {
+	auto& now_all_defs = now_loaded_viewables_defs;
+
 	/* Unpack asynchronous asset loading results */
 
 	if (valid_and_is_ready(future_general_atlas)) {
@@ -186,9 +208,10 @@ void viewables_streaming::finalize_load(viewables_finalize_input in) {
 
 		now_loaded_gui_font_def = future_gui_font;
 
-		auto& now_loaded_defs = now_loaded_viewables_defs.image_definitions;
+		auto& now_loaded_defs = now_all_defs.image_definitions;
 		auto& new_loaded_defs = future_image_definitions;
 
+		/* Done, overwrite */
 		now_loaded_defs = new_loaded_defs;
 
 		const auto atlas_size = result.atlas_size;
@@ -205,4 +228,37 @@ void viewables_streaming::finalize_load(viewables_finalize_input in) {
 			in.renderer.finish();
 		}
 	}
+
+	if (valid_and_is_ready(future_loaded_buffers)) {
+		auto& now_loaded_defs = now_all_defs.sounds;
+		auto& new_loaded_defs = future_sound_definitions;
+
+		auto unload = [&](const assets::sound_id key){
+			in.sounds.clear_sources_playing(key);
+			loaded_sounds.erase(key);
+		};
+
+		/* Reload the sounds that at the time of launch were found to be new or changed. */
+
+		{
+			auto loaded = future_loaded_buffers.get();
+
+			for (const auto& r : sound_requests) {
+				const auto id = r.first;
+				unload(id);
+
+				const auto i = index_in(sound_requests, r);
+
+				if (auto& loaded_sound = loaded[i]) {
+					/* Loading was successful. */
+					loaded_sounds.try_emplace(id, std::move(loaded_sound.value()));
+				}
+			}
+		}
+
+		/* Done, overwrite */
+		now_loaded_defs = new_loaded_defs;
+		sound_requests.clear();
+	}
+	LOG_NVPS(loaded_sounds.size());
 }

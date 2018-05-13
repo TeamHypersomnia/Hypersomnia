@@ -30,13 +30,13 @@ struct viewables_load_input {
 	const augs::path_type& unofficial_content_dir;
 
 	const unsigned max_atlas_size;
-
-	sound_system& sounds;
 };
 
 struct viewables_finalize_input {
 	const bool measure_atlas_upload;
 	augs::renderer& renderer;
+
+	sound_system& sounds;
 };
 
 class viewables_streaming {
@@ -54,6 +54,10 @@ class viewables_streaming {
 
 	all_viewables_defs now_loaded_viewables_defs;
 	augs::font_loading_input now_loaded_gui_font_def;
+
+	sound_definitions_map future_sound_definitions;
+	std::vector<std::pair<assets::sound_id, augs::sound_buffer_loading_input>> sound_requests;
+	std::future<std::vector<std::optional<augs::sound_buffer>>> future_loaded_buffers;
 
 public:
 	std::optional<augs::graphics::texture> general_atlas;

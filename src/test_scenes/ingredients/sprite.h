@@ -1,5 +1,4 @@
-#include "test_scenes/ingredients/ingredients.h"
-
+#pragma once
 #include "game/assets/all_logical_assets.h"
 
 #include "game/components/sprite_component.h"

@@ -211,3 +211,9 @@ auto end(reversion_wrapper<T> w) { return rend(w.iterable); }
 
 template <typename T>
 reversion_wrapper<T> reverse(T&& iterable) { return { iterable }; }
+
+template <class T, class C>
+std::size_t index_in(C& container, T& object) {
+	return std::addressof(object) - std::addressof(container[0]);
+}
+
