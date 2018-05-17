@@ -12,6 +12,11 @@ viewables_streaming::viewables_streaming(augs::renderer& renderer) {
 	}
 
 	uploading_pbo.set_current_to_none();
+
+#if IS_PRODUCTION_BUILD
+	/* Always warm up the PBO on startup, to avoid freezes later */
+	pbo_ready_to_use = true;
+#endif	
 }
 
 void viewables_streaming::load_all(const viewables_load_input in) {

@@ -5,6 +5,11 @@ permalink: reassurements
 summary: We don't need to do this yet, because...
 ---
 
+- For now don't worry about maximum size, it's enough until DM
+	- In production, we will always reserve max used ever on startup
+		- we'll reserve the maximum (which will probably be half the maximum texture GPU size)
+	- In debug builds, we'll really do whatever
+
 - Further parallelizing the neon maps is not quite worth the effort.
 	- Ultimately, we won't have such giants anyway.
 

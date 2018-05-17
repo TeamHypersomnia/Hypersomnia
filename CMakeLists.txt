@@ -1,3 +1,8 @@
+# Note: Release builds are treated as production builds
+# and will take a lot longer to build due to link-time optimizations.
+#
+# Unless you are indeed releasing a binary, use Debug or RelWithDebInfo.
+
 cmake_minimum_required(VERSION 3.2)
 
 project(Hypersomnia)
@@ -119,18 +124,6 @@ set(BUILD_IN_CONSOLE_MODE OFF CACHE STRING "0")
 ## These may speed up build times.
 
 option(GENERATE_DEBUG_INFORMATION "Generate source-level debug information. If 0, -g flag will be removed to speed up the build." ${DEFAULT_OPT})
-
-## Runtime optimization switches.
-
-# Don't happily turn everything ON because optimizations take a lot of build time,
-# and you probably don't need the runtime to be as fast as light, at least for now.
-
-option(ENABLE_LINK_TIME_OPTIMIZATION "Some ultra extra optimizations for Release builds. Takes a lot longer to build." OFF)
-
-if (ULTRA_OPTS)
-	message("Enabling ultra optimizations.")
-	set(ENABLE_LINK_TIME_OPTIMIZATION ON)
-endif()
 
 # Other self-explanatory static allocation switches. Possible values are one or zero.
 
@@ -902,14 +895,12 @@ if(MSVC)
 	# Latest features of C++17 will be enabled.
 	set(HYPERSOMNIA_CXX_FLAGS "/std:c++latest /MP /Gm- /fp:strict /bigobj /permissive-")
 	set(HYPERSOMNIA_CXX_DEBUG_FLAGS " ")
-	set(HYPERSOMNIA_CXX_RELEASE_FLAGS "/Ob2 /GL /Oi")
 	set(HYPERSOMNIA_CXX_RELWITHDEBINFO_FLAGS "/Ob2 /GL /Oi")
+	set(HYPERSOMNIA_CXX_RELEASE_FLAGS ${HYPERSOMNIA_CXX_RELWITHDEBINFO_FLAGS})
 endif()
 
 if(CLANG)
-	if(ENABLE_LINK_TIME_OPTIMIZATION)
-		set(HYPERSOMNIA_CXX_RELEASE_FLAGS "-flto -fwhole-program-vtables")
-	endif()
+	set(HYPERSOMNIA_CXX_RELEASE_FLAGS "-flto -fwhole-program-vtables")
 endif()
 
 if(ADD_MCMODEL_LARGE_FLAG)
@@ -931,14 +922,12 @@ set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
 set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
 
 if(CLANG)
-	if(ENABLE_LINK_TIME_OPTIMIZATION)
-		set(HYPERSOMNIA_LINKER_RELEASE_FLAGS "-flto -fwhole-program-vtables")
-	endif()
+	set(HYPERSOMNIA_LINKER_RELEASE_FLAGS "-flto -fwhole-program-vtables")
 elseif(MSVC)
 	set(HYPERSOMNIA_LINKER_RELEASE_FLAGS "/LTCG /INCREMENTAL:NO /OPT:REF")
 
-	# We enable incremental LTCG for at least one release configuration,
-	# because LTCG takes very long even with just a single source file modified.
+	# Incremental LTCG is enough for RelWithDebInfo.
+	# It will drastically reduce rebuild times.
 
 	set(HYPERSOMNIA_LINKER_RELWITHDEBINFO_FLAGS "/LTCG:incremental /INCREMENTAL:NO")
 endif()
@@ -1030,10 +1019,13 @@ endif()
 
 message("All CXX flags: ${CMAKE_CXX_FLAGS}")
 message("Debug CXX flags: ${CMAKE_CXX_FLAGS_DEBUG}")
+message("RelWithDebInfo CXX flags: ${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
 message("Release CXX flags: ${CMAKE_CXX_FLAGS_RELEASE}")
+
 message("ALl linker flags: ${CMAKE_EXE_LINKER_FLAGS}")
-message("Linker debug flags: ${CMAKE_EXE_LINKER_FLAGS_DEBUG}")
-message("Linker release flags: ${CMAKE_EXE_LINKER_FLAGS_RELEASE}")
+message("Linker Debug flags: ${CMAKE_EXE_LINKER_FLAGS_DEBUG}")
+message("Linker RelWithDebInfo flags: ${CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO}")
+message("Linker Release flags: ${CMAKE_EXE_LINKER_FLAGS_RELEASE}")
 
 # We configure MSVC to use static runtime libraries ("/MT" switch),
 # instead of DLL ones.
@@ -1296,12 +1288,6 @@ set_target_properties(Hypersomnia PROPERTIES DEBUG_POSTFIX "")
 
 if(MSVC)
 	set_target_properties(Hypersomnia PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${HYPERSOMNIA_EXE_RESOURCES_DIR}")
-	
-#	set_target_properties(Hypersomnia PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG "${HYPERSOMNIA_EXE_RESOURCES_DIR}")
-#	set_target_properties(Hypersomnia PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE "${HYPERSOMNIA_EXE_RESOURCES_DIR}")
-#	set_target_properties(Hypersomnia PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${HYPERSOMNIA_EXE_RESOURCES_DIR}")
-#	set_target_properties(Hypersomnia PROPERTIES RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${HYPERSOMNIA_EXE_RESOURCES_DIR}")
-	
 	set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Hypersomnia)
 endif()
 
