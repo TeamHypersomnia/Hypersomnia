@@ -81,13 +81,6 @@ namespace augs {
 
 		void fill(const rgba fill_color);
 
-		void blit(
-			const image& source,
-			const vec2u destination,
-			const bool flip_source = false,
-			const bool additive = false
-		);
-
 		void execute(const paint_command_variant&);
 
 		void execute(const paint_circle_midpoint_command&);
@@ -209,12 +202,5 @@ namespace augs {
 		}
 
 		void fill(const rgba fill_color);
-
-		void blit(
-			const image& source,
-			const vec2u destination,
-			const bool flip_source = false,
-			const bool additive = false
-		);
 	};
 }

@@ -10,6 +10,7 @@
 #include "augs/readwrite/memory_stream.h"
 
 #include "augs/image/image.h"
+#include "augs/image/blit.h"
 #include "augs/texture_atlas/bake_fresh_atlas.h"
 
 #include "augs/readwrite/byte_file.h"
@@ -284,7 +285,8 @@ void bake_fresh_atlas(
 #if DEBUG_FILL_IMGS_WITH_COLOR
 			loaded_image.fill(rgba().set_hsv({ rng.randval(0.0f, 1.0f), rng.randval(0.3f, 1.0f), rng.randval(0.3f, 1.0f) }));
 #endif
-			output_image.blit(
+			augs::blit(
+				output_image,
 				loaded_image,
 				{
 					static_cast<unsigned>(packed_rect.x),
@@ -330,7 +332,8 @@ void bake_fresh_atlas(
 
 				g.was_flipped = packed_rect.flipped;
 
-				output_image.blit(
+				augs::blit(
+					output_image,
 					loaded_fonts.at(input_font_id).glyph_bitmaps[glyph_index],
 					{
 						static_cast<unsigned>(packed_rect.x),

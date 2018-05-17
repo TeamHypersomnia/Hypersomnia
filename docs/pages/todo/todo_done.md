@@ -800,3 +800,5 @@ we consider whole type overrides too complex architeciturally:
 
 - sort images for multiprocessing; biggest go first
 
+- refactor augs::image_view to use common funcs?
+

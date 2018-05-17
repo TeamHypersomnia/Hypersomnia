@@ -5,7 +5,17 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- refactor augs::image_view to use common funcs?
+- rethink our roadmap
+
+- animations tracking
+	- We've decided that they might be
+		- Named automatically after their first frame
+		- Uniquely identified by such
+
+- animation metadata could have some very general structs like "character metrics"
+	- vec2i: hands position[2]
+		- positions of these could be even indicated in the previewed image
+	- bool: makes a step?
 
 - thoughts about atlas
 	- Remove atlas saving for now.
@@ -79,19 +89,8 @@ summary: That which we are brainstorming at the moment.
 		- This will add a nice speedup, and also we will easily invalidate particles when particle flavour changes or is deleted.
 		- Particle types will also be pooled and will be a separate viewable.
 
-- animation metadata could have some very general structs like "character metrics"
-	- vec2i: hands position[2]
-		- positions of these could be even indicated in the previewed image
-	- bool: makes a step?
-
-- rethink our roadmap
-
-- animations tracking
-	- We've decided that they might be
-		- Named automatically after their first frame
-		- Uniquely identified by such
-
-- flavour ids & allocation
+- Performance of flavour ids
+	- right now they are just regular pool ids
 	- they are actually quite performance critical
 	- would id relinking pool actually be useful here?
 		- the for each id structure should be quite easy here
