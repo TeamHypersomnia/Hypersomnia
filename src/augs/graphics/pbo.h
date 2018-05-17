@@ -11,6 +11,7 @@ namespace augs {
 			bool created = false;
 			GLuint id = 0xdeadbeef;
 			std::size_t size = 0;
+			void* persistent_ptr = nullptr;
 
 			using settable_as_current_base = settable_as_current_mixin<const pbo>;
 			friend settable_as_current_base;
@@ -31,6 +32,8 @@ namespace augs {
 
 			void reserve(std::size_t);
 			void reserve_for_texture_square(std::size_t);
+
+			void dummy_sub_data();
 
 			void* map_buffer();
 			bool unmap_buffer();

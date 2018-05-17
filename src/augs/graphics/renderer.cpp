@@ -40,6 +40,22 @@ namespace augs {
 		set_standard_blending();
 		set_clear_color(black);
 
+
+		glDisable(GL_DITHER);
+		glDisable(GL_POINT_SMOOTH);
+		glDisable(GL_LINE_SMOOTH);
+		glDisable(GL_POLYGON_SMOOTH);
+		glDisable(GL_MULTISAMPLE);
+
+		glHint(GL_POINT_SMOOTH, GL_FASTEST);
+		glHint(GL_LINE_SMOOTH, GL_FASTEST);
+		glHint(GL_POLYGON_SMOOTH_HINT, GL_FASTEST);
+		glHint(GL_TEXTURE_COMPRESSION_HINT, GL_FASTEST);
+		glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
+		glHint(GL_GENERATE_MIPMAP_HINT, GL_FASTEST);
+
+		GL_CHECK(glShadeModel(GL_FLAT));
+
 		GL_CHECK(glGenBuffers(1, &imgui_elements_id));
 
 		GL_CHECK(glGenBuffers(1, &triangle_buffer_id));
@@ -320,5 +336,23 @@ namespace augs {
 
 	void renderer::finish() {
 		GL_CHECK(glFinish());
+	}
+
+	GLsync renderer::fence() const {
+#if BUILD_OPENGL
+		const auto s = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+		return s;
+#else
+		return 0;
+#endif
+	}
+
+	bool renderer::wait_sync(const GLsync sync, const GLuint64 timeout) const {
+#if BUILD_OPENGL
+		const auto result = glClientWaitSync(sync, GL_SYNC_FLUSH_COMMANDS_BIT, timeout);
+		return !(result == GL_TIMEOUT_EXPIRED || result == GL_WAIT_FAILED);
+#else
+		return false;
+#endif
 	}
 }

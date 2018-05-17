@@ -35,6 +35,9 @@ void typesafe_sprintf_detail(std::size_t starting_pos, std::string& target_str, 
 				if (opcode == 'f') {
 					replacement << std::fixed;
 				}
+				else if (opcode == 'h') {
+					replacement << std::hex;
+				}
 				else if (opcode >= '0' && opcode <= '9') {
 					replacement.precision(opcode - '0');
 				}

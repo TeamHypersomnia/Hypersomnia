@@ -1,4 +1,7 @@
-#version 330
+#version 320 es
+precision mediump int;
+precision mediump float;
+
 
 uniform mat4 projection_matrix;
 layout(location = 0) in vec2 position;

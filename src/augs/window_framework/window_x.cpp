@@ -11,6 +11,7 @@
 #include <GL/glx.h>
 #include <GL/gl.h>
 
+#include "augs/templates/container_templates.h"
 #include "augs/filesystem/file.h"
 
 #include "augs/window_framework/translate_x_enums.h"
@@ -22,6 +23,11 @@ int ImTextCharFromUtf8(unsigned int* out_char, const char* in_text, const char* 
 template <class T>
 auto freed_unique(T* const ptr) {
 	return std::unique_ptr<T, decltype(free)*>(ptr, free);
+}
+
+template <class T>
+auto xfreed_unique(T* const ptr) {
+	return std::unique_ptr<T, decltype(XFree)*>(ptr, XFree);
 }
 
 namespace augs {
@@ -80,23 +86,114 @@ namespace augs {
 		screen = screen_iter.data;
 
 		auto setup_and_run = [this, settings](int default_screen, xcb_screen_t *screen) {
-			int visualID = 0;
+			auto fb_config = [&]() {
+				thread_local auto disp = display; disp = display;
 
-			/* Query framebuffer configurations */
-			GLXFBConfig *fb_configs = 0;
-			int num_fb_configs = 0;
-			fb_configs = glXGetFBConfigs(display, default_screen, &num_fb_configs);
+				struct total_config {
+					int	depth = -1;
+					int visual_id = 0;
 
-			if (!fb_configs || num_fb_configs == 0) {
-				throw window_error("glXGetFBConfigs failed");
-			}
+					int samp_buf = -1; 
+					int samples = -1;
+					int	depth_size = -1;
 
-			/* Select first framebuffer config and query visualID */
-			GLXFBConfig fb_config = fb_configs[0];
-			glXGetFBConfigAttrib(display, fb_config, GLX_VISUAL_ID , &visualID);
+					GLXFBConfig fb;
+
+					total_config(const GLXFBConfig& fb) : fb(fb) {
+						auto vi = xfreed_unique(glXGetVisualFromFBConfig(disp, fb));
+
+						if (vi) {
+							depth = vi->depth;
+							visual_id = vi->visualid;
+						}
+
+						glXGetFBConfigAttrib(disp, fb, GLX_SAMPLE_BUFFERS, &samp_buf);
+						glXGetFBConfigAttrib(disp, fb, GLX_SAMPLES       , &samples);
+						glXGetFBConfigAttrib(disp, fb, GLX_DEPTH_SIZE    , &depth_size);
+					}
+
+					auto make_tup() const {
+						return std::make_tuple(samp_buf, samples, depth_size);
+					}
+
+					bool preferred_to(const total_config& b) const {
+						return make_tup() < b.make_tup();
+					}
+
+					bool operator<(const total_config& b) const {
+						return preferred_to(b);
+					}
+
+					void report(const int i) const {
+						LOG("  Matching fbconfig %x, visual ID %h: SAMPLE_BUFFERS = %x, SAMPLES = %x, DEPTH_SIZE = %x\n", i, visual_id, samp_buf, samples, depth_size);
+					}
+				};
+
+				auto fbc = [&]() {
+					static int visual_attribs[] =
+						{
+							GLX_DEPTH_SIZE      , 0,
+							GLX_X_RENDERABLE    , True,
+							GLX_DRAWABLE_TYPE   , GLX_WINDOW_BIT,
+							GLX_RENDER_TYPE     , GLX_RGBA_BIT,
+							GLX_X_VISUAL_TYPE   , GLX_TRUE_COLOR,
+							GLX_RED_SIZE        , 8,
+							GLX_GREEN_SIZE      , 8,
+							GLX_BLUE_SIZE       , 8,
+							GLX_ALPHA_SIZE      , 8,
+							GLX_STENCIL_SIZE    , 0,
+							GLX_DOUBLEBUFFER    , True,
+							GLX_SAMPLE_BUFFERS  , 0,
+							GLX_SAMPLES         , 0,
+							GLX_AUX_BUFFERS, 0,
+							GLX_CONFIG_CAVEAT, GLX_NONE,
+							GLX_TRANSPARENT_TYPE, GLX_NONE,
+							GLX_ACCUM_RED_SIZE, 0,
+							GLX_ACCUM_GREEN_SIZE, 0,
+							GLX_ACCUM_BLUE_SIZE, 0,
+							GLX_ACCUM_ALPHA_SIZE, 0,
+							None
+						}
+					;
+
+					int fbcount;
+
+					auto fbc = xfreed_unique(glXChooseFBConfig(
+						display, 
+						default_screen, 
+						visual_attribs, 
+						&fbcount
+					));
+
+					if (!fbc) {
+						throw window_error( "Failed to retrieve a framebuffer config\n" );
+					}
+
+					return std::vector<total_config>(fbc.get(), fbc.get() + fbcount);
+				}();
+
+				LOG("Found %d matching FB configs.\n", fbc.size());
+
+				erase_if (fbc, [](const auto& f) {
+					return f.depth != 24;
+				});
+
+				LOG("Found %d matching FB configs after filtering for depth.\n", fbc.size());
+
+				sort_range(fbc);
+
+				LOG("Sorted configs: ");
+
+				for (const auto& f : fbc) {
+					f.report(index_in(fbc, f));
+				}
+
+				LOG("Choosing the first fb config in list.");
+				return fbc.front();
+			}();
 
 			/* Create OpenGL context */
-			context = glXCreateNewContext(display, fb_config, GLX_RGBA_TYPE, 0, True);
+			context = glXCreateNewContext(display, fb_config.fb, GLX_RGBA_TYPE, 0, True);
 
 			if (!context) {
 				throw window_error("glXCreateNewContext failed");
@@ -112,7 +209,7 @@ namespace augs {
 				XCB_COLORMAP_ALLOC_NONE,
 				colormap,
 				screen->root,
-				visualID
+				fb_config.visual_id
 			);
 
 			/* Create window */
@@ -138,7 +235,7 @@ namespace augs {
 				settings.size.x, settings.size.y,
 				settings.border ? 1 : 0,
 				XCB_WINDOW_CLASS_INPUT_OUTPUT,
-				visualID,
+				fb_config.visual_id,
 				valuemask,
 				valuelist
 			);
@@ -159,9 +256,9 @@ namespace augs {
 				wm_delete_window_atom = { reply2->atom };
 			}
 
-			glxwindow = glXCreateWindow(display, fb_config, window_id, 0);
+			glxwindow = glXCreateWindow(display, fb_config.fb, window_id, 0);
 
-			if(!window_id) {
+			if (!window_id) {
 				xcb_destroy_window(connection, window_id);
 				glXDestroyContext(display, context);
 

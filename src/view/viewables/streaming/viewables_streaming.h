@@ -6,6 +6,7 @@
 #include "augs/graphics/pbo.h"
 #include "augs/image/font.h"
 #include "augs/texture_atlas/atlas_profiler.h"
+#include "augs/graphics/renderer.h"
 #include "view/viewables/streaming/viewables_streaming_profiler.h"
 #include "view/viewables/all_viewables_defs.h"
 #include "view/viewables/image_cache.h"
@@ -29,6 +30,7 @@ struct viewables_load_input {
 	const content_regeneration_settings settings;
 	const augs::path_type& unofficial_content_dir;
 
+	augs::renderer& renderer;
 	const unsigned max_atlas_size;
 };
 
@@ -42,7 +44,7 @@ struct viewables_finalize_input {
 class viewables_streaming {
 	augs::graphics::pbo uploading_pbo;
 	std::vector<rgba> pbo_fallback;
-	bool pbo_allocation_complete = false;
+	bool pbo_ready_to_use = false;
 
 	augs::baked_font loaded_gui_font;
 
@@ -69,7 +71,7 @@ public:
 	atlas_profiler general_atlas_performance;
 	atlas_profiler neon_map_atlas_performance;
 
-	viewables_streaming(unsigned max_texture_size);
+	viewables_streaming(augs::renderer& renderer);
 
 	void load_all(viewables_load_input);
 	void finalize_load(viewables_finalize_input);

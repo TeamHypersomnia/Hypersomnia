@@ -70,6 +70,7 @@ all_necessary_shaders::all_necessary_shaders(
 				);
 
 				LOG(err.what());
+				throw;
 			}
 		},
 		*this

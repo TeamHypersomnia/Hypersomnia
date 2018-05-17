@@ -1,4 +1,7 @@
-#version 330
+#version 320 es
+precision mediump int;
+precision mediump float;
+
 
 uniform mat4 projection_matrix;
 layout(location = 0) in vec2 position;
@@ -13,7 +16,7 @@ out vec2 startingAngleInsideVec;
 out vec2 endingAngleInsideVec;
 out vec2 theTexcoord;
 
-#define SPECIAL_TO_RADIANS 180*0.0174532925
+#define SPECIAL_TO_RADIANS 180.0f*0.0174532925f
 
 void main() 
 {

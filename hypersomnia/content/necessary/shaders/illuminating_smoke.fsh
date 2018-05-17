@@ -1,4 +1,7 @@
-#version 330
+#version 320 es
+precision mediump int;
+precision mediump float;
+
 in vec2 theTexcoord;
 out vec4 outputColor;
 

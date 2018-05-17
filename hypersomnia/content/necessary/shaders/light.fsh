@@ -1,4 +1,7 @@
-#version 330
+#version 320 es
+precision mediump int;
+precision mediump float;
+
 smooth in vec4 theColor;
 in vec2 theTexcoord;
 
@@ -8,7 +11,6 @@ uniform vec2 light_pos;
 uniform vec3 light_attenuation;
 uniform vec3 multiply_color;
 uniform float distance_mult;
-layout(origin_upper_left) in vec4 gl_FragCoord;
 
 void main() 
 {	

@@ -161,6 +161,10 @@ set(STATICALLY_ALLOCATE_ENTITY_FLAVOURS "1" CACHE STRING "Statically allocate en
 
 set (BUILD_LUA_AS_CPP OFF)
 
+if (UNIX)
+	set(OpenGL_GL_PREFERENCE "GLVND")
+endif()
+
 ### ALL CUSTOMIZABLE BUILD SWITCHES END HERE ###
 ################################################
 

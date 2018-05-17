@@ -1,4 +1,7 @@
-#version 330
+#version 320 es
+precision mediump int;
+precision mediump float;
+
 smooth in vec4 theColor;
 in vec2 theTexcoord;
 

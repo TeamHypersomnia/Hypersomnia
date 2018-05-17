@@ -163,6 +163,7 @@ void exploding_ring_system::draw_rings(
 
 		augs::special sp;
 		sp.v1 = cone.to_screen_space(screen_size, world_explosion_center);
+		sp.v1.y = screen_size.y - sp.v1.y;
 
 		sp.v2.x = inner_radius_now * cone.zoom * cone.zoom;
 		sp.v2.y = outer_radius_now * cone.zoom * cone.zoom;

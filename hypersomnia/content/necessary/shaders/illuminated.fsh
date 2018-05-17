@@ -1,4 +1,7 @@
-#version 330
+#version 320 es
+precision mediump int;
+precision mediump float;
+
 smooth in vec4 theColor;
 in vec2 theTexcoord;
 
@@ -13,8 +16,8 @@ const int light_step = 255/light_levels;
 void main() 
 {
 	vec2 texcoord = gl_FragCoord.xy;
-	texcoord.x /= textureSize(light_texture, 0).x; 
-	texcoord.y /= textureSize(light_texture, 0).y;
+	texcoord.x /= float(textureSize(light_texture, 0).x);
+	texcoord.y /= float(textureSize(light_texture, 0).y);
 
 	vec4 light = texture(light_texture, texcoord);
 

@@ -8,6 +8,9 @@
 #include "augs/graphics/texture.h"
 #include "augs/graphics/debug_line.h"
 
+typedef struct __GLsync *GLsync;
+typedef uint64_t GLuint64;
+
 namespace augs {
 	namespace graphics {
 		class texture;
@@ -109,6 +112,9 @@ namespace augs {
 		unsigned get_max_texture_size() const;
 
 		std::size_t get_triangle_count() const;
+
+		GLsync fence() const;
+		bool wait_sync(GLsync, GLuint64 timeout = 0) const;
 
 		vertex_triangle_buffer& get_triangle_buffer();
 		vertex_line_buffer& get_line_buffer();

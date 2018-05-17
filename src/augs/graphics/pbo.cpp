@@ -3,6 +3,8 @@
 #include "augs/graphics/OpenGL_includes.h"
 #include "augs/graphics/rgba.h"
 
+#define PERSISTENT 0
+
 namespace augs {
 	namespace graphics {
 		pbo::pbo() {
@@ -14,7 +16,8 @@ namespace augs {
 			settable_as_current_base(static_cast<settable_as_current_base&&>(b)),
 			created(b.created),
 			id(b.id),
-			size(b.size)
+			size(b.size),
+			persistent_ptr(b.persistent_ptr)
 		{
 			b.created = false;
 		}
@@ -27,7 +30,10 @@ namespace augs {
 			size = b.size;
 			id = b.id;
 			created = b.created;
+			persistent_ptr = b.persistent_ptr;
+
 			b.created = false;
+			b.persistent_ptr = nullptr;
 
 			return *this;
 		}
@@ -50,14 +56,37 @@ namespace augs {
 		void pbo::reserve(const std::size_t new_size) {
 			if (new_size > size) {
 				set_as_current();
-				GL_CHECK(glBufferData(GL_PIXEL_UNPACK_BUFFER, new_size, 0, GL_STREAM_DRAW));
+
+#if PERSISTENT
+				GL_CHECK(glBufferStorage(
+					GL_PIXEL_UNPACK_BUFFER,
+					new_size, 
+					nullptr, 
+					GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT
+				));
+#else
+				glBufferData(GL_PIXEL_UNPACK_BUFFER, new_size, 0, GL_STREAM_DRAW);
+#endif
 				size = new_size;
 			}
 		}
 
 		void* pbo::map_buffer() {
 #if BUILD_OPENGL
+#if PERSISTENT
+			if (!persistent_ptr) {
+				persistent_ptr = glMapBufferRange(
+					GL_PIXEL_UNPACK_BUFFER, 
+					0,
+					size,
+					GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT | GL_MAP_INVALIDATE_RANGE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT | GL_MAP_UNSYNCHRONIZED_BIT
+				);
+			}
+
+			return persistent_ptr;
+#else
 			return glMapBuffer(GL_PIXEL_UNPACK_BUFFER, GL_WRITE_ONLY);
+#endif
 #else
 			return nullptr;
 #endif
@@ -65,7 +94,11 @@ namespace augs {
 
 		bool pbo::unmap_buffer() {
 #if BUILD_OPENGL
+#if PERSISTENT
+			return true;
+#else
 			return glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
+#endif
 #else
 			return true;
 #endif
@@ -75,6 +108,7 @@ namespace augs {
 			if (created) {
 				GL_CHECK(glDeleteBuffers(1, &id));
 				created = false;
+				persistent_ptr = nullptr;
 			}
 		}
 

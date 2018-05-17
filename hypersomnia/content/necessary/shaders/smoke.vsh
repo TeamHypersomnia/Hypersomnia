@@ -1,4 +1,7 @@
-#version 410
+#version 320 es
+precision mediump int;
+precision mediump float;
+
 layout(location = 0) in vec2 position;
 
 out vec2 theTexcoord;

@@ -211,7 +211,8 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 		const auto& cache = per_entity_cache.at(light_entity);
 
-		const auto light_frag_pos = in.camera.to_screen_space(in.screen_size, world_light_pos);
+		auto light_frag_pos = in.camera.to_screen_space(in.screen_size, world_light_pos);
+		light_frag_pos.y = in.screen_size.y - light_frag_pos.y;
 
 		light_shader.set_uniform(light_pos_uniform, light_frag_pos);
 		

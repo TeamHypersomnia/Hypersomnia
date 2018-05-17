@@ -233,7 +233,7 @@ int work(const int argc, const char* const * const argv) try {
 		loaded just once or if they are for example continuously streamed.
 	*/
 
-	static viewables_streaming streaming(renderer.get_max_texture_size());
+	static viewables_streaming streaming(renderer);
 
 	static world_camera gameplay_camera;
 	static audiovisual_state audiovisuals;
@@ -288,6 +288,7 @@ int work(const int argc, const char* const * const argv) try {
 			config.gui_font,
 			config.content_regeneration,
 			get_unofficial_content_dir(),
+			renderer,
 			renderer.get_max_texture_size()
 		});
 	};
@@ -1660,7 +1661,10 @@ int work(const int argc, const char* const * const argv) try {
 			performance.until_first_swap.stop();
 		}
 
-		window.swap_buffers();
+		{
+			auto scope = measure_scope(performance.swap_buffers);
+			window.swap_buffers();
+		}
 	}
 
 	return EXIT_SUCCESS;

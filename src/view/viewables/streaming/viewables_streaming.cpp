@@ -3,12 +3,14 @@
 #include "view/viewables/streaming/viewables_streaming.h"
 #include "view/audiovisual_state/systems/sound_system.h"
 
-viewables_streaming::viewables_streaming(const unsigned max_texture_size) {
+viewables_streaming::viewables_streaming(augs::renderer& renderer) {
 	LOG_NVPS(std::thread::hardware_concurrency());
 
-	auto scope = measure_scope(performance.pbo_allocation);
+	{
+		auto scope = measure_scope(performance.pbo_allocation);
+		uploading_pbo.reserve_for_texture_square(renderer.get_max_texture_size() / 2);
+	}
 
-	uploading_pbo.reserve_for_texture_square(max_texture_size / 2);
 	uploading_pbo.set_current_to_none();
 }
 
@@ -71,7 +73,8 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 			auto scope = measure_scope(performance.launching_atlas_reload);
 
 			const auto pbo_buffer = [this]() -> rgba* {
-				if (pbo_allocation_complete) {
+				if (pbo_ready_to_use) {
+					auto scope = measure_scope(performance.pbo_map_buffer);
 					uploading_pbo.set_as_current();
 					return reinterpret_cast<rgba*>(uploading_pbo.map_buffer());
 				}
@@ -101,8 +104,9 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 
 			future_general_atlas = std::async(
 				std::launch::async,
-				[general_atlas_in, this]() { 
-					if (pbo_allocation_complete) {
+				[general_atlas_in, pbo_buffer, this]() { 
+					if (pbo_buffer != nullptr) {
+						/* Asynchronously clear the pbo_fallback if we will no longer use it */
 						pbo_fallback.clear();
 						pbo_fallback.shrink_to_fit();
 					}
@@ -201,7 +205,7 @@ void viewables_streaming::finalize_load(viewables_finalize_input in) {
 
 	if (valid_and_is_ready(future_general_atlas)) {
 		const bool measure_atlas_uploading = in.measure_atlas_upload;
-		const bool was_written_to_pbo = pbo_allocation_complete;
+		const bool was_written_to_pbo = pbo_ready_to_use;
 
 		if (measure_atlas_uploading) {
 			in.renderer.finish();
@@ -210,6 +214,8 @@ void viewables_streaming::finalize_load(viewables_finalize_input in) {
 		auto scope = measure_scope(performance.atlas_upload_to_gpu);
 
 		if (was_written_to_pbo) {
+			auto scope = measure_scope(performance.pbo_unmap_buffer);
+
 			uploading_pbo.set_as_current();
 			uploading_pbo.unmap_buffer();
 		}
@@ -243,6 +249,8 @@ void viewables_streaming::finalize_load(viewables_finalize_input in) {
 		if (measure_atlas_uploading) {
 			in.renderer.finish();
 		}
+
+		pbo_ready_to_use = true;
 	}
 
 	if (valid_and_is_ready(future_loaded_buffers)) {

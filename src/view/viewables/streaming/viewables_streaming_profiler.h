@@ -12,6 +12,9 @@ struct viewables_streaming_profiler : public augs::profiler_mixin<viewables_stre
 	augs::time_measurements neon_maps_regeneration = std::size_t(1);
 	augs::time_measurements pbo_allocation = std::size_t(1);
 
+	augs::time_measurements pbo_map_buffer = std::size_t(1);
+	augs::time_measurements pbo_unmap_buffer = std::size_t(1);
+
 	augs::time_measurements launching_atlas_reload = std::size_t(1);
 	augs::time_measurements launching_sounds_reload = std::size_t(1);
 	// END GEN INTROSPECTOR
