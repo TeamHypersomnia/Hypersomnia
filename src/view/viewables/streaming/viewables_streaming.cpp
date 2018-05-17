@@ -8,7 +8,7 @@ viewables_streaming::viewables_streaming(augs::renderer& renderer) {
 
 	{
 		auto scope = measure_scope(performance.pbo_allocation);
-		uploading_pbo.reserve_for_texture_square(renderer.get_max_texture_size() / 2);
+		uploading_pbo.reserve_for_texture_square(renderer.get_max_texture_size() / 4);
 	}
 
 	uploading_pbo.set_current_to_none();

@@ -39,22 +39,17 @@ namespace augs {
 
 		set_standard_blending();
 		set_clear_color(black);
+		 
+		GL_CHECK(glDisable(GL_DITHER));
+		GL_CHECK(glDisable(GL_POINT_SMOOTH));
+		GL_CHECK(glDisable(GL_LINE_SMOOTH));
+		GL_CHECK(glDisable(GL_POLYGON_SMOOTH));
+		GL_CHECK(glDisable(GL_MULTISAMPLE));
 
-
-		glDisable(GL_DITHER);
-		glDisable(GL_POINT_SMOOTH);
-		glDisable(GL_LINE_SMOOTH);
-		glDisable(GL_POLYGON_SMOOTH);
-		glDisable(GL_MULTISAMPLE);
-
-		glHint(GL_POINT_SMOOTH, GL_FASTEST);
-		glHint(GL_LINE_SMOOTH, GL_FASTEST);
-		glHint(GL_POLYGON_SMOOTH_HINT, GL_FASTEST);
-		glHint(GL_TEXTURE_COMPRESSION_HINT, GL_FASTEST);
-		glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
-		glHint(GL_GENERATE_MIPMAP_HINT, GL_FASTEST);
-
-		GL_CHECK(glShadeModel(GL_FLAT));
+		GL_CHECK(glHint(GL_POLYGON_SMOOTH_HINT, GL_FASTEST));
+		GL_CHECK(glHint(GL_TEXTURE_COMPRESSION_HINT, GL_FASTEST));
+		GL_CHECK(glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST));
+		GL_CHECK(glHint(GL_GENERATE_MIPMAP_HINT, GL_FASTEST));
 
 		GL_CHECK(glGenBuffers(1, &imgui_elements_id));
 

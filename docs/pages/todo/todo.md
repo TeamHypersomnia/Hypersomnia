@@ -5,6 +5,9 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- use non-multisampling fb configs on Windows
+	- proven to improve performance twofold, on linux
+
 - settable_as_mixin should have push_bind and pop_bind?
 - later print shortcuts in the menus for the windows
 	- e.g. History			Alt+H
