@@ -49,7 +49,7 @@ namespace augs {
 		sprite(
 			const id_type tex,
 			const M& manager,
-			const rgba color = rgba()
+			const rgba color = white
 		) {
 			set(tex, manager, color);
 		}
@@ -58,7 +58,7 @@ namespace augs {
 		void set(
 			const id_type tex,
 			const M& manager,
-			const rgba color = rgba()
+			const rgba color = white
 		) {
 			this->tex = tex;
 			this->size = manager.at(tex).get_size();
@@ -69,7 +69,7 @@ namespace augs {
 		void set(
 			const id_type tex,
 			const basic_vec2<T> size,
-			const rgba color = rgba()
+			const rgba color = white
 		) {
 			this->tex = tex;
 			this->size = size;

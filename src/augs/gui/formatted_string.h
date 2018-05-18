@@ -16,7 +16,7 @@ namespace augs {
 				const baked_font* font;
 				rgba color;
 				
-				style(const baked_font&, rgba = rgba());
+				style(const baked_font&, rgba = white);
 				style(const formatted_char&);
 				style(const formatted_utf32_char&);
 				operator formatted_char();

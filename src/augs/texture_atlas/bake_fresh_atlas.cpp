@@ -96,7 +96,7 @@ void bake_fresh_atlas(
 
 #if DEBUG_FILL_IMGS_WITH_COLOR
 			for (auto& img : (*it.first).second.glyph_bitmaps) {
-				img.fill(rgba().set_hsv({ rng.randval(0.0f, 1.0f), rng.randval(0.3f, 1.0f), rng.randval(0.3f, 1.0f) }));
+				img.fill(white.set_hsv({ rng.randval(0.0f, 1.0f), rng.randval(0.3f, 1.0f), rng.randval(0.3f, 1.0f) }));
 			}
 #endif
 		}
@@ -283,7 +283,7 @@ void bake_fresh_atlas(
 			loaded_image.from_png(all_loaded_bytes[current_rect], input_img_id);
 
 #if DEBUG_FILL_IMGS_WITH_COLOR
-			loaded_image.fill(rgba().set_hsv({ rng.randval(0.0f, 1.0f), rng.randval(0.3f, 1.0f), rng.randval(0.3f, 1.0f) }));
+			loaded_image.fill(white.set_hsv({ rng.randval(0.0f, 1.0f), rng.randval(0.3f, 1.0f), rng.randval(0.3f, 1.0f) }));
 #endif
 			augs::blit(
 				output_image,
