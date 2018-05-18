@@ -12,7 +12,6 @@
 #include "game/stateless_systems/movement_system.h"
 #include "game/stateless_systems/visibility_system.h"
 #include "game/stateless_systems/pathfinding_system.h"
-#include "game/stateless_systems/animation_system.h"
 #include "game/stateless_systems/input_system.h"
 #include "game/stateless_systems/gun_system.h"
 #include "game/stateless_systems/crosshair_system.h"
@@ -136,11 +135,6 @@ void standard_solve(const logic_step step) {
 	trace_system().spawn_finishing_traces_for_deleted_entities(step);
 
 	listener.~contact_listener();
-
-	animation_system().game_responses_to_animation_messages(step);
-
-	animation_system().handle_animation_messages(step);
-	animation_system().progress_animation_states(step);
 
 	performance.raycasts.measure(cosmos.get_solvable_inferred().physics.ray_casts_since_last_step);
 

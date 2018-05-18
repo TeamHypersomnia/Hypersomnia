@@ -5,7 +5,6 @@
 #include "game/messages/damage_message.h"
 #include "game/messages/queue_destruction.h"
 #include "game/messages/will_soon_be_deleted.h"
-#include "game/messages/animation_message.h"
 #include "game/messages/collision_message.h"
 #include "game/messages/start_particle_effect.h"
 #include "game/messages/start_sound_effect.h"

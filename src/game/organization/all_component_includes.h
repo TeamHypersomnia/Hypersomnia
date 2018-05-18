@@ -1,7 +1,6 @@
 #pragma once
 #include "game/components/behaviour_tree_component.h"
 #include "game/components/pathfinding_component.h"
-#include "game/components/animation_component.h"
 #include "game/components/crosshair_component.h"
 #include "game/components/missile_component.h"
 #include "game/components/gun_component.h"

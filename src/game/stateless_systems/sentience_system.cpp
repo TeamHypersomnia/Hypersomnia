@@ -20,7 +20,6 @@
 #include "game/components/fixtures_component.h"
 #include "game/components/sentience_component.h"
 #include "game/components/render_component.h"
-#include "game/components/animation_component.h"
 #include "game/components/movement_component.h"
 #include "game/components/driver_component.h"
 

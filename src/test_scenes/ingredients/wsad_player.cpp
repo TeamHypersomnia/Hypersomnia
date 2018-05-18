@@ -7,7 +7,6 @@
 #include "game/components/crosshair_component.h"
 #include "game/components/sprite_component.h"
 #include "game/components/movement_component.h"
-#include "game/components/animation_component.h"
 #include "game/components/fixtures_component.h"
 #include "game/components/rigid_body_component.h"
 #include "game/components/driver_component.h"

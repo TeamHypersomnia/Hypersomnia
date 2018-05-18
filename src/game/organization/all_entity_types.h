@@ -35,7 +35,6 @@ struct controlled_character {
 		components::crosshair,
 		components::sentience,
 
-		components::animation,
 		components::driver,
 		components::attitude,
 
