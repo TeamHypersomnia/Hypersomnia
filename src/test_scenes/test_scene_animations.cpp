@@ -8,7 +8,7 @@
 #include "augs/string/format_enum.h"
 
 void create_frames(
-	animation& anim,
+	plain_animation& anim,
 	const test_scene_image_id first_frame,
 	const test_scene_image_id last_frame,
 	const float frame_duration_ms
@@ -28,8 +28,7 @@ void load_test_scene_animations(animations_pool& all_definitions) {
 	all_definitions.reserve(enum_count(test_id_type()));
 
 	{
-		animation anim;
-		anim.loop_mode = animation::loop_type::NONE;
+		plain_animation anim;
 
 		create_frames(
 			anim,

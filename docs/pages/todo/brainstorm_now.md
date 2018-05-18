@@ -7,15 +7,33 @@ summary: That which we are brainstorming at the moment.
 
 - rethink our roadmap
 
-- animations tracking
-	- We've decided that they might be
-		- Named automatically after their first frame
-		- Uniquely identified by such
-
-- animation metadata could have some very general structs like "character metrics"
-	- vec2i: hands position[2]
-		- positions of these could be even indicated in the previewed image
-	- bool: makes a step?
+- Animation architecture
+	- Animation asset
+		- In editor, name is immutable - always the name of the first frame
+		- We will have several distinct types of animation
+			- Movement animation
+				- Will only have base speed ms
+			- Legs animation
+				- Will specify leg offsets per frame
+			- What if we want to mass-set across animations (only of the same types)
+		- An animation frame will only have image id guaranteed to exist
+		- Metadata
+			- Per frame
+				- Don't even think of storing it elsewhere, code would suck and it would buy us nothing
+			- Variant of metric types?
+				- Torso metrics
+					- vec2i: hand position[2]
+						- positions of these could be even indicated in the previewed image
+				- Leg metrics
+					- value_with_flag<vec2i> foot_position[2]
+		- Metadatas may be in this case important for game state
+			- E.g. hand metrics could determine swing trajectories
+			- E.g. foot metrics could determine sound events
+		- Thus we make animations logical assets
+			- Nothing wrong with it, is there?
+				- It will anyway stay immutable. The only practical difference is in which code can access what.
+				- Later, we might introduce mutable states for these animations as well, and they will act like flavours
+					- Though it will be discouraged for the sake of statelessness
 
 - thoughts about atlas
 	- Remove atlas saving for now.

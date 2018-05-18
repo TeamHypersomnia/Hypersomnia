@@ -61,16 +61,9 @@ struct simple_animation_state {
 	);
 };
 
-struct animation {
-	enum class loop_type {
-		REPEAT,
-		INVERSE,
-		NONE
-	};
-
-	// GEN INTROSPECTOR struct animation
+struct plain_animation {
+	// GEN INTROSPECTOR struct plain_animation
 	animation_frames_type frames = {};
-	loop_type loop_mode = loop_type::REPEAT;
 	// END GEN INTROSPECTOR
 
 	auto get_image_id(const unsigned index) const {

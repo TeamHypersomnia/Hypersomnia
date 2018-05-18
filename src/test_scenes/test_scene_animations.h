@@ -12,7 +12,7 @@ enum class test_scene_animation_id {
 struct animation;
 
 void create_frames(
-	animation& output,
+	plain_animation& output,
 	const test_scene_image_id first_frame,
 	const test_scene_image_id last_frame,
 	const float frame_duration_ms

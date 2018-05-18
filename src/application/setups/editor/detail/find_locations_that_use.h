@@ -89,7 +89,7 @@ void find_locations_that_use(
 				p, 
 				[&](const auto&, const auto& asset) {
 					find_object_in_object<always_false, allow_conversion>(id, asset, [&](const auto& location) {
-						if constexpr(std::is_same_v<animation, remove_cref<decltype(asset)>>) {
+						if constexpr(std::is_same_v<plain_animation, remove_cref<decltype(asset)>>) {
 							// TODO: animation view?
 						}
 						else {
