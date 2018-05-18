@@ -152,6 +152,9 @@ void instantiate_flavour_command::redo(const editor_command_input in) {
 		[&](auto e) {
 			using E = decltype(e);
 
+			in.purge_selections();
+			in.interrupt_tweakers();
+
 			const auto flavour_id = typed_entity_flavour_id<E>(instantiated_id.raw);
 
 			auto& work = *in.folder.work;
@@ -168,6 +171,9 @@ void instantiate_flavour_command::redo(const editor_command_input in) {
 					typed_handle.set_logic_transform(components::transform(where));
 				}
 			).get_id();
+
+			auto& selections = in.folder.view.selected_entities;
+			selections = { created_id };
 		}
 	);
 }
@@ -176,6 +182,7 @@ void instantiate_flavour_command::undo(const editor_command_input in) {
 	auto& work = *in.folder.work;
 	auto& cosm = work.world;
 
+	in.clear_selection_of(created_id);
 	cosmic::undo_last_create_entity(cosm[created_id]);
 	created_id = {};
 }

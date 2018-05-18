@@ -176,6 +176,7 @@ public:
 		using specific_ptr_type = maybe_const_ptr_t<is_const, entity_solvable<E>>;
 
 		const auto specific_ptr = reinterpret_cast<specific_ptr_type>(ptr);
+		ensure(specific_ptr != nullptr);
 		const auto stored_id = ref_stored_id_provider<handle_type>( *specific_ptr, typed_entity_id<E>(raw_id.basic()) );
 		return handle_type(owner, stored_id);
 	}

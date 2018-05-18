@@ -802,3 +802,5 @@ we consider whole type overrides too complex architeciturally:
 
 - refactor augs::image_view to use common funcs?
 
+- test out gdbgui with clang build as well
+
