@@ -93,74 +93,14 @@ summary: That which we are brainstorming at the moment.
 		- corner case: delete while move?
 		- should work anyway and yeah, deactivate it then
 
-- cutting/copying/pasting/duplicating entities
-	- duplication can happen during either moving or rotation, or just selection
-		- actually there's no purpose in facilitating duplication when moving
-		- always launch translation on duplication, and connect them in GUI
-	- duplication can be implemented in terms of "paste entities" command
-		- we'd just gather the content instantly, not from an earlier Ctrl+C
-	- if we get to arbitrary pastes, the editor itself will have to construct the command tree, like
-		- paste_flavours + paste_entities, if no requisite flavours are found inside the project at the time of pasting
-			- the clipboard will have both the entity and flavour
-		- the editor's clipboard can actually become...
-			- paste entity flavour + paste entity command, stored, waiting to be executed!
-				- the move itself won't need to be stored
-	- cut = copy + delete
-
-- about grenades and changing of their shape
-	- let hand fuse invariant have an optional radius for the thrown grenade
-		- reinfer when tweaking also?
+- Grenades shall change shape to circle so that throws can be precise
+	- Let hand fuse invariant have an optional radius for the thrown grenade
+		- should we reinfer when tweaking?
 	- the physics world cache will simply take into consideration if the hand fuse was released, when calculating shape
 		- so hand fuse component might want to become a synchronizable
 
-- separate component/invariant: sentience_animation
-	- Animations for the character will be complicated enough to warrant a separate component
-
-	- add rotations
-	- in property editor, make transforms always show some special imgui control?
-		- **Prefer contextual moving with t on selection**
-	- transform setting should always preview the changes as if by applying set_logic_transform
-	- some entities don't have their own transforms
-		- a warning should appear?
-		- actually, there's always a context by which a transform could be set
-			- e.g. if an item is held, it might just get its attachment offset moved	
-
-- sometimes floor is not selectable but it's because it has the same layer as road
-	- some warning perhaps could be in order?
-			
-- status bar
-	- check how it works in vim
-		- changing a mode to normal clears the last message
-
-- Perhaps something to let us select and manipulate entities in gameplay mode?
-	- will it be useful?
-
-- handle bitsets properly, e.g. parties and hostile parties
-- handle slot categories properly, as well
-
-- Selection tabs
-	- Enter on selection opens relevant selection group in tabs
-	- switching tabs with entities should always refocus on the same kind of property
-
-- Ctrl+Home should center on the whole scene
-
-- determine what to do with b2Filters
-	- for now sensible filters will be provided by the testbed
-		- we can add a combo for now?
-		- matrix could be cool though, even for debugging
-	- it appears that filters aren't really given any special roles.
-		- thus it makes sense that they be completely customizable in editor.
-		- we will perhaps make amount of categories limited so as to fit b2Filter.
-			- max: 16
-		- a simple matrix of checkboxes like in unity.
-	- enums will just have combos for all values
-	- assets will need to have their proper names displayed, unavailable in normal editing (test scene enums are unapplicable obviously)
-
-- generalize editor_tab_gui to be also able to handle the entities/flavours windows
-- implement ctrl+tab for tabs, either in settings or anywhere. It should just handle the current window
-	- shortcuts shall always focus relevant window
-
-- Also check that there are no guids in common state
+- Contextual moving of entities: attachment offsets
+	- Will actually be useful yet before the deathmatch
 
 - game mode property is a part of game mode definition
 - game mode definition = all game mode properties
@@ -245,12 +185,6 @@ summary: That which we are brainstorming at the moment.
 		- In lua format only.
 		- Will be named like ``ProjectName.compat.lua``
 			- Contains the intercosm and rulesets, all important things.
-- all paths for sound and files look first inside:
-	- content/ folder
-		- e.g. a path could be "official/gfx/assault_rifle.png"
-	- local directory of the map
-		- e.g. "gfx/my_rifle.png"
-	- makes work testbed out of the box
 
 - check in editor if the saving/opening path is a valid folder?
 - make reveal in explorer work for both files and folders

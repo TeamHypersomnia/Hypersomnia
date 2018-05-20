@@ -4,10 +4,14 @@ hide_sidebar: true
 permalink: todo_low
 ---
 
+- Implement ctrl+tab for settings window
+	- shortcuts for first letter shall always focus relevant window
+
 - Add a flag to build editor or not
 	- Because it builds really long
 
 - use per_entity_type_container widely
+
 - add dialog asking if we want to leave changes?
 	- for now we overwrite
 

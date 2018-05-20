@@ -5,6 +5,51 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- Bugfix: sometimes floor is not selectable but it's because it has the same layer as road
+	- some warning perhaps could be in order?
+
+- Property editor: Checkbox matrix for b2Filter
+	- for now sensible filters will be provided by the testbed
+		- we can add a combo for now?
+		- matrix could be cool though, even for debugging
+	- it appears that filters aren't really given any special roles.
+		- thus it makes sense that they be completely customizable in editor.
+		- we will perhaps make amount of categories limited so as to fit b2Filter.
+			- max: 16
+		- a simple matrix of checkboxes like in Unity.
+
+- Selection tabs
+	- Generalize editor_tab_gui to be also able to handle the selection tabs window
+	- Enter on selection opens relevant selection group in tabs
+	- Switching tabs with entities should always refocus on the same kind of property
+		- Low priority
+
+- Ctrl+Home should center on the whole scene
+
+- Parties and hostile parties are currently integers; use bitsets properly
+	- Won't matter until after we have AI
+	- although, handle slot categories properly as well
+
+- Perhaps something to let us select and manipulate entities in gameplay mode?
+	- Won't matter until after deathmatch stage
+	- will it be useful?
+
+- Arbitrary pasting of entities
+	- Won't matter until after deathmatch stage
+	- The editor will have to construct the command tree, like
+		- paste_flavours + paste_entities, if no requisite flavours are found inside the project at the time of pasting
+			- the clipboard will have both the entity and flavour
+		- the editor's clipboard can actually become...
+			- paste entity flavour + paste entity command, stored, waiting to be executed!
+				- the move itself won't need to be stored
+	- Cut is just copy + delete
+
+- Editor status bar
+	- Won't matter until after deathmatch stage
+	- Check how it works in vim
+		- Changing a mode to normal clears the last message
+	- Will be useful for the author to know what is going on
+
 - Image preview in Images GUI
 	- Store the image and texture inside editor structure so that it may be properly cleaned up
 	- Then send just image id to the imgui renderering routine

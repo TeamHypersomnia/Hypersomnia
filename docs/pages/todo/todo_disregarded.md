@@ -135,3 +135,6 @@ summary: Just a hidden scratchpad.
 			- good idea, it can be compartmenatlized well
 				- we'll really just add dup and remove buttons
 
+
+- Also check that there are no guids in common state
+	- No: this might fail if we decide to use guids for components (then they will be present in initial components)
