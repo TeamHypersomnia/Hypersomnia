@@ -5,6 +5,31 @@ permalink: todo_perf
 summary: Just a hidden scratchpad.
 ---
 
+- Performance of flavour ids
+	- right now they are just regular pool ids
+	- they are actually quite performance critical
+	- would id relinking pool actually be useful here?
+		- the for each id structure should be quite easy here
+			- literally just common and common/solvable signis
+	- they can be sparse though
+		- since we care about performance the flavours will be anyway statically allocated
+		- and allocation/deallocation speed won't be that important here
+			- could still iterate over all ids and serialize only existing
+		- we can always easily check if the flavour exists, so no relinking needed?
+		- actually relinking still needed if after removing a flavour we allocate a new one
+
+- sparse_pool implementation that avoids indirection?
+	- can have IDENTICAL interface as the pool
+		- even the pooled object ids can stay the same really
+			- just that the indirection index will actually be used as a real index
+	- existence of versioning determines whether we need to perform for_eaches
+	- versioning could still be there so we can easily undo/redo without for eaches
+		- we can let those several bytes slide
+	- **we should always be wary of pessimistic cases of memory usage, anyway**
+	- for now we can use pools for everything and incrementally introduce sparse_pool
+	- once we have sparse_pool, the loaded caches and images in atlas can just be sparse pools as well?
+		- though the effect is ultimately the same and it's more container agnostic
+
 - neon map generation could perhaps be parallelized
 	- but it's not really necessary for now
 

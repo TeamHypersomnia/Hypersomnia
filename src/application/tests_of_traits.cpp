@@ -454,7 +454,7 @@ struct game_state_checks {
 	static_assert(!can_type_contain_v<cosmos_solvable_significant, blabla>);
 	static_assert(!can_type_contain_v<cosmos_common_significant, blabla>);
 
-	/* Invariants should not hold any ids because they are subject to invalidation */
+	/* Invariants should not hold any ids because ids are subject to invalidation */
 
 	void validate_no_ids_in_flavours() {
 		for_each_entity_type([](auto e) {
@@ -484,7 +484,7 @@ struct game_state_checks {
 	static_assert(!sum_matching_in_v<is_asset_id, cosmos_solvable_significant>);
 
 	/* 
-		Assets should not hold any flavour id, because that would be stupid. 
+		Assets should not hold any flavour id, because flavours are conceptually higher-level than assets. 
 		Flavours, on the other hand, can obviously hold other flavour ids and other asset ids.
 
 		Notice that assets can hold other assets, e.g. animation can have image ids,

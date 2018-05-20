@@ -5,10 +5,45 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- Image preview in Images GUI
+	- Store the image and texture inside editor structure so that it may be properly cleaned up
+	- Then send just image id to the imgui renderering routine
+
+- Property editor: make container elements tickable and modifiable in bulk
+
+- Editing vertices in editor
+	- A generic "unmap_entity_vertices" and "map_entity_vertices" that depend on the context
+		- Will be important later, once we want some crazy irregular maps.
+		- e.g. setting reach for wandering pixels
+		- if fixture, change shape
+
+- Fill new workspace with test scene essentials
+	- This would prevent image ids in common state from being invalid
+		- Probably less checks to make, in GUI as well
+	- Can make those the first in test scene image enums so that we can stop importing images after some point
+
+- Implement a color picker inside the neon map light color chooser
+	- less pain in the ass
+	- look for imgui logic to acquire mouse positioning relative to the control
+
+- Ctrl+I shall open a quick go to gui that will instantiate a chosen flavour
+
+- Fix this: due to a filter, the node disappears during renaming
+	- just when constructing a filter, save a name with which it was remembered in cached fae selections
+		- i guess we will still be able to do for eaches and all flav id getters even with changed state structure
+	- also when it is duplicated
+
+- finish work with atlas and sound regeneration
+	- regenerate only seen assets
+	- always load diffuse map with the corresponding neon map to avoid unilluminated objects near the camera...
+		- ...even though many diffuse maps nearby have been loaded
+		- perhaps we won't really need the separation between diffuse and neon, because maximum atlases will be huge anyway
+
 - use non-multisampling fb configs on Windows
 	- proven to improve performance twofold, on linux
 
 - settable_as_mixin should have push_bind and pop_bind?
+
 - later print shortcuts in the menus for the windows
 	- e.g. History			Alt+H
 

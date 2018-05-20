@@ -804,3 +804,8 @@ we consider whole type overrides too complex architeciturally:
 
 - test out gdbgui with clang build as well
 
+- tests of traits: check no flavour ids in entities
+	- we could not possibly afford looking through all for usage checks
+
+- tests of traits: check no ids in invariants, at least
+	- screw initial components really

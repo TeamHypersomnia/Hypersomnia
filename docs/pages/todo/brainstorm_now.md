@@ -9,12 +9,20 @@ summary: That which we are brainstorming at the moment.
 
 - Animation architecture
 	- Animation asset
+		- Several distinct types of animations
+			- A pool for each
+			- Then we will never std::visit contextually, because we will always contextually know what kind of animation we are after
+			- Unified editor window for all animations of all types
+				- Mass selection just like anything else
+			- Might be a little pain in the ass to setup
+			- Types
+				- Movement animation
+					- Will only have base speed ms
+				- Legs animation
+					- Each frame specifies leg offset per frame
+					- Then the sentience invariant specifies particle effect to play on step
+				- We shall begin with movement animation and then repeat the code for the rest of types?
 		- In editor, name is immutable - always the name of the first frame
-		- We will have several distinct types of animation
-			- Movement animation
-				- Will only have base speed ms
-			- Legs animation
-				- Will specify leg offsets per frame
 			- What if we want to mass-set across animations (only of the same types)
 		- An animation frame will only have image id guaranteed to exist
 		- Metadata
@@ -35,130 +43,11 @@ summary: That which we are brainstorming at the moment.
 				- Later, we might introduce mutable states for these animations as well, and they will act like flavours
 					- Though it will be discouraged for the sake of statelessness
 
-- thoughts about atlas
-	- Remove atlas saving for now.
-	- Separation
-		- First: just do neons maps and the rest distinction
-			- will rarely be switched anyway
-			- we'll probably stay with this at least until deathmatch is complete
-			- loading just proggyclean is really negliglible
-			- and it takes up tiny amount of atlas space
-			- so it does not matter even if we duplicate this also with imgui
-			- we'll also probably not care much about our game_gui systems for now
-				- it will mostly be for viewing state
-	- Asynchronous regeneration
-		- We might block for the first time so that GUI doesn't glitch out
-		- Stages
-			- Problem: to acquire GL_MAX_TEXTURE_SIZE, we must be on the GL context
-				- We'll just store the int on init. The delay won't matter that much.
-			- (In logic thread) acquire all assets in the neighborhood of the camera
-			- (In logic thread) send a copy of loadables definitions for the thread
-				- Actually the argument may just be a copy
-
-			- (Diffuse thread) load images and determine best possible packing for diffuses + rest
-				- Blit resultant images to a larger one
-			- (Neon thread) load images and determine best possible packing for neons
-				- Blit resultant images to a larger one
-			
-			- std::future with a moved-to image?
-				- read by the logic thread, which then initializes PBO DMA
-
-			- both threads will output an image
-			- upload can be done synchronously at first
-				- actually that's the bottleneck
-
-		- We might do this while making previews as it will be connected - will need to send texture ids to imgui
-		- Problem: viewable defs can change instantly in structure from intercosm to intercosm and GUI might glitch out
-			- We don't care. In practice, won't happen during gameplay.
-				- And test scene essentials will usually have same ids across all intercosms
-			- Just GUI should safely check for existence and zero sizes just in case
-			- That will be only a fraction of a second
-			- GUI could really use a separate texture
-				- And issue drawcalls
-	- Implementation details
-		- Do failures need be communicated?
-			- Just always make the cached vector with texture entries big enough
-		- Make a struct called atlas_distribution
-			- And keep there all atlases
-			- Because it will be passed around renderers
-	- Details
-		- IMGUI should preview atlases and tell how much space is left
-
-- possibly rename the flavour on setting an image?
-	- if it is detected that it is yet unnamed?
-	- due to a filter, the node disappears during renaming
-		- just when constructing a filter, save a name with which it was remembered in cached fae selections
-			- i guess we will still be able to do for eaches and all flav id getters even with changed state structure
-	- also when it is duplicated
-
-- always fill new workspace with some test scene essentials?
-	- so that e.g. no image ids in common state stay invalid
-	- can make those the first in test scene images so that we can stop importing images after some point
-
-- would really, really be cool to have a color picker inside the neon map light color chooser
-	- less pain in the ass
-	- look for imgui logic to acquire mouse positioning relative to the control
-
-- Ctrl+I could open a quick go to gui that will instantiate a chosen flavour
-
-- particles and flavours
+- Particles and flavours
 	- std::unordered_map<particle_flavour_id, vector of particles>
 		- We will always simulate all particles that we have in memory.
 		- This will add a nice speedup, and also we will easily invalidate particles when particle flavour changes or is deleted.
 		- Particle types will also be pooled and will be a separate viewable.
-
-- Performance of flavour ids
-	- right now they are just regular pool ids
-	- they are actually quite performance critical
-	- would id relinking pool actually be useful here?
-		- the for each id structure should be quite easy here
-			- literally just common and common/solvable signis
-	- they can be sparse though
-		- since we care about performance the flavours will be anyway statically allocated
-		- and allocation/deallocation speed won't be that important here
-			- could still iterate over all ids and serialize only existing
-		- we can always easily check if the flavour exists, so no relinking needed?
-		- actually relinking still needed if after removing a flavour we allocate a new one
-
-- sparse_pool implementation that avoids indirection?
-	- can have IDENTICAL interface as the pool
-		- even the pooled object ids can stay the same really
-			- just that the indirection index will actually be used as a real index
-	- existence of versioning determines whether we need to perform for_eaches
-	- versioning could still be there so we can easily undo/redo without for eaches
-		- we can let those several bytes slide
-	- **we should always be wary of pessimistic cases of memory usage, anyway**
-	- for now we can use pools for everything and incrementally introduce sparse_pool
-	- once we have sparse_pool, the loaded caches and images in atlas can just be sparse pools as well?
-		- though the effect is ultimately the same and it's more container agnostic
-- some prettifier for C++ errors? especially for formatting the template names
-
-- might be cool to make container elements tickable and modifiable in bulk, in flavour
-	- might actually be done just inside the general edit under container constexpr, with help of notifies etc
-
-- editing containers in general edit properties
-	- add/remove yields change property to the complete container
-	- what about comparing?
-		- just use element index in field address, should be ez
-		- just don't call the comparator on non existing indices?
-		- a separate control in imgui utils for editing containers?
-			- could then be also used for settings
-			- good idea, it can be compartmenatlized well
-				- we'll really just add dup and remove buttons
-
-- Notice: the set of all assets used by all existent entities in the scene...
-	- ...does NOT equal the set of all USED images
-		- because flavours might have some set
-
-- preview could be done by a thread_local image & texture
-	- NO! Just store it inside editor so that it may be properly cleaned up
-	- a good test case for a pbo
-	- then send just image id to the imgui renderering routine
-
-- we'll generalize later once images work
-
-- Creating new flavours
-	- Might want to specify the flavour right away or not?
 
 - Complex ImGui controls in general property editor
 	- In fae tree:
@@ -171,20 +60,10 @@ summary: That which we are brainstorming at the moment.
 
 - Fix what happens when too many entities are created
 	- **Let the game work when a new entity cannot be created.**
-		- just return a dead handle.
-<!--
-	- for now let's just have many more, and throw when shit hits the fan
-		- just ensure that the author's work is saved and undoable
-			- actually it gets corrupt
-			- prevent creation of new entities?
-				- funny thing could arise, but that's perhaps the best solution that doesn't break the game fatally
-				- and the work is safe
-				- some dire consequences include no bullets possible to be shot
-				- but otherwise it should be fine
-		- now that we can have shapes in flavours let's increase the amount of components by lots
--->
+		- Just return a dead handle.
 
 - Probably somehow disallow arbitrary inferring of relational cache?
+	- There was some unresolved crash problem with this.
 
 - Persistence of entity ids in editor and clearing them
 	- Cases of storage:
@@ -213,11 +92,6 @@ summary: That which we are brainstorming at the moment.
 	- mover should be deactivated when?
 		- corner case: delete while move?
 		- should work anyway and yeah, deactivate it then
-
-- Editing vertices in editor
-	- a generic "unmap_entity_vertices" and "map_entity_vertices that depend on the context
-		- e.g. setting reach for wandering pixels
-		- if fixture, change shape
 
 - cutting/copying/pasting/duplicating entities
 	- duplication can happen during either moving or rotation, or just selection

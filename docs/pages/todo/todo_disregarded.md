@@ -5,6 +5,54 @@ permalink: todo_disregarded
 summary: Just a hidden scratchpad.
 ---
 
+- Old thoughts about atlas
+	- Remove atlas saving for now.
+	- Separation
+		- First: just do neons maps and the rest distinction
+			- will rarely be switched anyway
+			- we'll probably stay with this at least until deathmatch is complete
+			- loading just proggyclean is really negliglible
+			- and it takes up tiny amount of atlas space
+			- so it does not matter even if we duplicate this also with imgui
+			- we'll also probably not care much about our game_gui systems for now
+				- it will mostly be for viewing state
+	- Asynchronous regeneration
+		- We might block for the first time so that GUI doesn't glitch out
+		- Stages
+			- Problem: to acquire GL_MAX_TEXTURE_SIZE, we must be on the GL context
+				- We'll just store the int on init. The delay won't matter that much.
+			- (In logic thread) acquire all assets in the neighborhood of the camera
+			- (In logic thread) send a copy of loadables definitions for the thread
+				- Actually the argument may just be a copy
+
+			- (Diffuse thread) load images and determine best possible packing for diffuses + rest
+				- Blit resultant images to a larger one
+			- (Neon thread) load images and determine best possible packing for neons
+				- Blit resultant images to a larger one
+			
+			- std::future with a moved-to image?
+				- read by the logic thread, which then initializes PBO DMA
+
+			- both threads will output an image
+			- upload can be done synchronously at first
+				- actually that's the bottleneck
+
+		- Problem: viewable defs can change instantly in structure from intercosm to intercosm and GUI might glitch out
+			- We don't care. In practice, won't happen during gameplay.
+				- And test scene essentials will usually have same ids across all intercosms
+			- Just GUI should safely check for existence and zero sizes just in case
+			- That will be only a fraction of a second
+			- GUI could really use a separate texture
+				- And issue drawcalls
+	- Implementation details
+		- Do failures need be communicated?
+			- Just always make the cached vector with texture entries big enough
+		- Make a struct called atlas_distribution
+			- And keep there all atlases
+			- Because it will be passed around renderers
+	- Details
+		- IMGUI should preview atlases and tell how much space is left
+
 - let "in rectangular selection" just have "eaten" vector so we don't have to recalculate for each selected entities
 	- the state would be ugly, we'd have to save on beginning of drag the state of signi
 
@@ -76,4 +124,14 @@ summary: Just a hidden scratchpad.
 		- separately for extracting subjects inputs for neon maps, desaturations, diffuses 
 			- from loadables map
 		- then we can concatenate them if we will
+
+- Editing containers in general edit properties
+	- add/remove yields change property to the complete container
+	- what about comparing?
+		- just use element index in field address, should be ez
+		- just don't call the comparator on non existing indices?
+		- a separate control in imgui utils for editing containers?
+			- could then be also used for settings
+			- good idea, it can be compartmenatlized well
+				- we'll really just add dup and remove buttons
 
