@@ -10,38 +10,56 @@ summary: That which we are brainstorming at the moment.
 - Animation architecture
 	- Animation asset
 		- Several distinct types of animations
-			- A pool for each
-			- Then we will never std::visit contextually, because we will always contextually know what kind of animation we are after
-			- Unified editor window for all animations of all types
+			- Each animation will be treated as a completely different asset
+				- Then we will never std::visit contextually, because we will always contextually know what kind of animation we are after
 				- Mass selection just like anything else
+				- Just the editor's window for animations will just hold all types separated
+			- assets::animation_id -> assets::plain_animation_id
 			- Might be a little pain in the ass to setup
-			- Types
+			- Actual types
+				- Plain animation
+					- Just list of frames w/durations
+					- Suitable for decorations or for particles
 				- Movement animation
-					- Will only have base speed ms
+					- Will only have base speed ms, as game will determine pacing for each frame
+					- Frame state: 
+						- torso metrics
+							- vec2i hand position[2]
+							- positions of these could be even indicated in the previewed image
 				- Legs animation
-					- Each frame specifies leg offset per frame
+					- Will only have base speed ms, as game will determine pacing for each frame
+					- Frame state
+						- We won't implement these just yet. Won't matter until after deathmatch stage
+						- leg metrics
+							- value_with_flag<vec2i> foot_position[2]
+						- is step, or just assume that the last frame denotes a step
 					- Then the sentience invariant specifies particle effect to play on step
-				- We shall begin with movement animation and then repeat the code for the rest of types?
-		- In editor, name is immutable - always the name of the first frame
-			- What if we want to mass-set across animations (only of the same types)
-		- An animation frame will only have image id guaranteed to exist
-		- Metadata
-			- Per frame
-				- Don't even think of storing it elsewhere, code would suck and it would buy us nothing
-			- Variant of metric types?
-				- Torso metrics
-					- vec2i: hand position[2]
-						- positions of these could be even indicated in the previewed image
-				- Leg metrics
-					- value_with_flag<vec2i> foot_position[2]
-		- Metadatas may be in this case important for game state
+						- Or the common state holds a map of ground material types to step sounds
+							- This could be an asset as well
+				- Implementation
+					- We shall begin with movement animation and then repeat the code for the rest of types?
+		- Identification in editor
+			- Architecturally, animation is an unpathed asset
+			- Visibly, it is always tied to some path designating the first animation frame
+				- Screw that. Animation will have enough state to warrant just picking what is created already.
+			- Do we open a path dialog when choosing an animation?
+				- No.
+			- Displayed name is immutable either way - always the name of the first frame.
+				- We don't care for now that displayed names can be duplicated.
+		- An animation frame of any type will guarantee only the image id to exist
+		- Animation asset state may be in this case important for game state
 			- E.g. hand metrics could determine swing trajectories
 			- E.g. foot metrics could determine sound events
-		- Thus we make animations logical assets
-			- Nothing wrong with it, is there?
-				- It will anyway stay immutable. The only practical difference is in which code can access what.
-				- Later, we might introduce mutable states for these animations as well, and they will act like flavours
-					- Though it will be discouraged for the sake of statelessness
+			- Thus we make animations logical assets
+				- Nothing wrong with it, is there?
+					- It will anyway stay immutable. The only practical difference is in which code can access what.
+					- Later, we might introduce mutable states for these animations as well, and they will act like flavours
+						- Though it will be discouraged for the sake of statelessness
+	- In solvable
+		- Sentience invariant
+			- Contains basic torso set and basic legs set
+				- This will also be true of the MMO setup
+			- Later the animations will depend on what we are wearing in the armour slot
 
 - Particles and flavours
 	- std::unordered_map<particle_flavour_id, vector of particles>

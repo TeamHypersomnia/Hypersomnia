@@ -103,13 +103,13 @@ struct animation_in_particle {
 	simple_animation_state state;
 	// END GEN INTROSPECTOR
 
-	void advance(const real32 dt, const animations_pool& anims) {
+	void advance(const real32 dt, const plain_animations_pool& anims) {
 		if (state.advance(dt * speed_factor, anims[id].frames, starting_frame_num)) {
 			starting_frame_num = -1;
 		}
 	}
 
-	auto get_image_id(const animations_pool& anims) const {
+	auto get_image_id(const plain_animations_pool& anims) const {
 		return anims[id].get_image_id(state, starting_frame_num);
 	}
 
@@ -129,12 +129,12 @@ struct animated_particle {
 	rgba color = white;
 	// END GEN INTROSPECTOR
 
-	void integrate(const float dt, const animations_pool& anims);
+	void integrate(const float dt, const plain_animations_pool& anims);
 
 	template <class M>
 	void draw_as_sprite(
 		const M& manager,
-		const animations_pool& anims,
+		const plain_animations_pool& anims,
 		const draw_particles_input in
 	) const {
 		const auto image_id = animation.get_image_id(anims);
@@ -179,13 +179,13 @@ struct homing_animated_particle {
 	void integrate(
 		const float dt, 
 		const vec2 homing_target,
-		const animations_pool& anims
+		const plain_animations_pool& anims
 	);
 
 	template <class M>
 	void draw_as_sprite(
 		const M& manager,
-		const animations_pool& anims,
+		const plain_animations_pool& anims,
 		const draw_particles_input in
 	) const {
 		const auto image_id = animation.get_image_id(anims);

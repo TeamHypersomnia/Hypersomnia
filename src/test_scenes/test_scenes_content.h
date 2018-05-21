@@ -20,7 +20,7 @@ class loaded_image_caches_map;
 void load_test_scene_sounds(sound_definitions_map&);
 void load_test_scene_particle_effects(
 	const loaded_image_caches_map&,
-	const animations_pool& anims,
+	const plain_animations_pool& anims,
 	particle_effects_map&
 );
 
@@ -33,7 +33,7 @@ void load_test_scene_images(
 	image_definitions_map&
 );
 
-void load_test_scene_animations(animations_pool&);
+void load_test_scene_animations(plain_animations_pool&);
 void load_test_scene_physical_materials(physical_materials_pool&);
 void load_test_scene_recoil_players(recoil_players_pool&);
 
@@ -52,7 +52,7 @@ void populate_test_scene_logical_assets(
 
 void populate_test_scene_viewables(
 	const loaded_image_caches_map& caches,
-	const animations_pool& anims,
+	const plain_animations_pool& anims,
 	all_viewables_defs& output_sources
 );
 

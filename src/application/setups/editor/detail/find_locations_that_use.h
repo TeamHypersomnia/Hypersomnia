@@ -102,6 +102,6 @@ void find_locations_that_use(
 	};
 
 	traverse_assets("Particle effect: ", viewables.particle_effects);
-	traverse_assets("Animation: ", logicals.animations);
+	traverse_assets("Animation: ", logicals.plain_animations);
 	traverse_assets("Physical material: ", logicals.physical_materials);
 }

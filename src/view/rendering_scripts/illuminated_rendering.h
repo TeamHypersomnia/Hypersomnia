@@ -86,7 +86,7 @@ void illuminated_rendering(
 
 	const auto& cosmos = viewed_character.get_cosmos();
 	
-	const auto& anims = cosmos.get_logical_assets().animations;
+	const auto& anims = cosmos.get_logical_assets().plain_animations;
 
 	const auto& interp = in.audiovisuals.get<interpolation_system>();
 	const auto& particles = in.audiovisuals.get<particles_simulation_system>();

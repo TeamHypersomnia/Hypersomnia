@@ -79,7 +79,7 @@ void general_particle::set_image(
 	color = col;
 }
 
-void animated_particle::integrate(const float dt, const animations_pool& anims) {
+void animated_particle::integrate(const float dt, const plain_animations_pool& anims) {
 	generic_integrate_particle(*this, dt);
 
 	animation.advance(dt * 1000, anims);
@@ -120,7 +120,7 @@ void animated_particle::colorize(const rgba mult) {
 void homing_animated_particle::integrate(
 	const float dt, 
 	const vec2 homing_target,
-	const animations_pool& anims
+	const plain_animations_pool& anims
 ) {
 	vel += (homing_target - pos) * 10 * dt;
 	

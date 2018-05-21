@@ -2,14 +2,14 @@
 #include "test_scenes/test_id_to_pool_id.h"
 #include "test_scenes/test_scene_images.h"
 
-enum class test_scene_animation_id {
-	// GEN INTROSPECTOR enum class test_scene_animation_id
+enum class test_scene_plain_animation_id {
+	// GEN INTROSPECTOR enum class test_scene_plain_animation_id
 	CAST_BLINK_ANIMATION,
 	COUNT
 	// END GEN INTROSPECTOR
 };
 
-struct animation;
+struct plain_animation;
 
 void create_frames(
 	plain_animation& output,
@@ -18,6 +18,6 @@ void create_frames(
 	const float frame_duration_ms
 );
 
-inline auto to_animation_id(const test_scene_animation_id id) {
+inline auto to_plain_animation_id(const test_scene_plain_animation_id id) {
 	return to_pool_id<assets::animation_id>(id);
 }

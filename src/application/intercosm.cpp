@@ -40,7 +40,7 @@ void intercosm::make_test_scene(
 
 	all_logical_assets logicals;
 	populate_test_scene_logical_assets(logicals);
-	populate_test_scene_viewables(caches, logicals.animations, viewables);
+	populate_test_scene_viewables(caches, logicals.plain_animations, viewables);
 
 	auto reloader = [&](auto populator){
 		world.change_common_significant([&](cosmos_common_significant& common){

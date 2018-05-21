@@ -41,7 +41,7 @@ struct audiovisual_advance_input {
 
 	const visible_entities& all_visible;
 	const particle_effects_map& particle_effects;
-	const animations_pool& animations;
+	const plain_animations_pool& plain_animations;
 
 	const loaded_sounds_map& sounds;
 	const augs::audio_volume_settings audio_volume;

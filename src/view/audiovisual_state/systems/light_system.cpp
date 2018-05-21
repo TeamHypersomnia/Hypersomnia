@@ -272,7 +272,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 	/* Draw neon maps */
 	particles.draw_particles(
 		in.game_images,
-		in.animations,
+		in.plain_animations,
 		draw_particles_input { output, true },
 		render_layer::ILLUMINATING_PARTICLES
 	);

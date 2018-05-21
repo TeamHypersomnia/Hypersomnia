@@ -7,13 +7,13 @@
 #include "game/assets/animation.h"
 #include "game/assets/physical_material.h"
 
-using animations_pool = animation_id_pool<plain_animation>;
+using plain_animations_pool = animation_id_pool<plain_animation>;
 using recoil_players_pool = recoil_id_pool<recoil_player>;
 using physical_materials_pool = physical_material_id_pool<physical_material>;
 
 struct all_logical_assets {
 	// GEN INTROSPECTOR struct all_logical_assets
-	animations_pool animations;
+	plain_animations_pool plain_animations;
 	recoil_players_pool recoils;
 	physical_materials_pool physical_materials;
 	// END GEN INTROSPECTOR

@@ -33,14 +33,14 @@ loaded_image_caches_map populate_test_scene_images_and_sounds(
 void populate_test_scene_logical_assets(
 	all_logical_assets& output_logicals
 ) {
-	load_test_scene_animations(output_logicals.animations);
+	load_test_scene_animations(output_logicals.plain_animations);
 	load_test_scene_physical_materials(output_logicals.physical_materials);
 	load_test_scene_recoil_players(output_logicals.recoils);
 }
 
 void populate_test_scene_viewables(
 	const loaded_image_caches_map& caches,
-	const animations_pool& anims,
+	const plain_animations_pool& anims,
 	all_viewables_defs& output_sources
 ) {
 	try {

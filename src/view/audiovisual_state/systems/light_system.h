@@ -39,7 +39,7 @@ struct light_system_input {
 	const vec2 screen_size;
 	const interpolation_system& interpolation;
 	const particles_simulation_system& particles;
-	const animations_pool& animations;
+	const plain_animations_pool& plain_animations;
 	const visible_entities::per_layer_type& visible_per_layer;
 	const images_in_atlas_map& game_images;
 	const double global_time_seconds;

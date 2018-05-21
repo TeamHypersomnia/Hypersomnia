@@ -37,7 +37,7 @@ auto float_range(const A a, const B b) {
 
 void load_test_scene_particle_effects(
 	const loaded_image_caches_map& images,
-	const animations_pool& anims,
+	const plain_animations_pool& anims,
 	particle_effects_map& all_definitions
 ) {
 	auto set = [&images](auto& target, auto id, auto col) {
@@ -48,8 +48,8 @@ void load_test_scene_particle_effects(
 		target.set_image(id, sz, col);
 	};
 
-	const auto animation_id = to_animation_id(test_scene_animation_id::CAST_BLINK_ANIMATION);
-	const auto& anim = anims[animation_id];
+	const auto cast_blink_id = to_plain_animation_id(test_scene_plain_animation_id::CAST_BLINK_ANIMATION);
+	const auto& anim = anims[cast_blink_id];
 
 	auto default_bounds = [](particles_emission& em) {
 		em.swings_per_sec_bound = { { 0.15f, 0.25f },{ 0.30f, 0.50f } };
@@ -299,7 +299,7 @@ void load_test_scene_particle_effects(
 
 			particle_definition.linear_damping = 0;
 			particle_definition.animation.starting_frame_num = i;
-			particle_definition.animation.id = animation_id;
+			particle_definition.animation.id = cast_blink_id;
 			particle_definition.animation.speed_factor = 4.f;
 			particle_definition.color = white;
 
@@ -313,7 +313,7 @@ void load_test_scene_particle_effects(
 			particle_definition.linear_damping = 0;
 			particle_definition.animation.starting_frame_num = i;
 			particle_definition.animation.speed_factor = 4.f;
-			particle_definition.animation.id = animation_id;
+			particle_definition.animation.id = cast_blink_id;
 			particle_definition.color = white;
 
 			em.add_particle_definition(particle_definition);
@@ -326,7 +326,7 @@ void load_test_scene_particle_effects(
 			particle_definition.linear_damping = 0;
 			particle_definition.animation.starting_frame_num = 2;
 			particle_definition.animation.speed_factor = 4.f;
-			particle_definition.animation.id = animation_id;
+			particle_definition.animation.id = cast_blink_id;
 			particle_definition.color = white;
 
 			em.add_particle_definition(particle_definition);
@@ -376,7 +376,7 @@ void load_test_scene_particle_effects(
 					particle_definition.linear_damping = 300;
 					particle_definition.animation.starting_frame_num = i;
 					particle_definition.animation.speed_factor = 2.f;
-					particle_definition.animation.id = animation_id;
+					particle_definition.animation.id = cast_blink_id;
 					particle_definition.color = white;
 
 					em.add_particle_definition(particle_definition);
@@ -391,7 +391,7 @@ void load_test_scene_particle_effects(
 					particle_definition.linear_damping = 300;
 					particle_definition.animation.starting_frame_num = i;
 					particle_definition.animation.speed_factor = 2.f;
-					particle_definition.animation.id = animation_id;
+					particle_definition.animation.id = cast_blink_id;
 					particle_definition.color = white;
 
 					em.add_particle_definition(particle_definition);
@@ -512,7 +512,7 @@ void load_test_scene_particle_effects(
 				particle_definition.linear_damping = 1000;
 				particle_definition.animation.starting_frame_num = i;
 				particle_definition.animation.speed_factor = 2.f;
-				particle_definition.animation.id = animation_id;
+				particle_definition.animation.id = cast_blink_id;
 				particle_definition.acc.set(900, -900);
 				particle_definition.color = white;
 
@@ -626,7 +626,7 @@ void load_test_scene_particle_effects(
 				particle_definition.linear_damping = 1000;
 				particle_definition.animation.starting_frame_num = i;
 				particle_definition.animation.speed_factor = 2.f;
-				particle_definition.animation.id = animation_id;
+				particle_definition.animation.id = cast_blink_id;
 				particle_definition.acc.set(900, -900);
 				particle_definition.color = white;
 
@@ -848,7 +848,7 @@ void load_test_scene_particle_effects(
 			particle_definition.linear_damping = 0;
 			particle_definition.animation.starting_frame_num = i;
 			particle_definition.animation.speed_factor = 3.f;
-			particle_definition.animation.id = animation_id;
+			particle_definition.animation.id = cast_blink_id;
 			particle_definition.color = white;
 
 			em.add_particle_definition(particle_definition);

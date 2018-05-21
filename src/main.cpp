@@ -622,7 +622,7 @@ int work(const int argc, const char* const * const argv) try {
 			all_visible,
 
 			get_viewable_defs().particle_effects,
-			cosmos.get_logical_assets().animations,
+			cosmos.get_logical_assets().plain_animations,
 
 			streaming.loaded_sounds,
 
