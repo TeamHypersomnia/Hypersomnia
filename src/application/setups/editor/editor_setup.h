@@ -44,7 +44,7 @@
 #include "application/setups/editor/gui/editor_selection_groups_gui.h"
 #include "application/setups/editor/gui/editor_summary_gui.h"
 
-#include "application/setups/editor/gui/editor_assets_gui.h"
+#include "application/setups/editor/gui/editor_pathed_asset_gui.h"
 
 #include "application/setups/editor/detail/current_access_cache.h"
 #include "application/setups/editor/detail/make_command_from_selections.h"

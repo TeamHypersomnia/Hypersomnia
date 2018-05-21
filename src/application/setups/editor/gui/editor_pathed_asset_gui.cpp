@@ -11,7 +11,7 @@
 
 #include "game/organization/for_each_entity_type.h"
 
-#include "application/setups/editor/gui/editor_assets_gui.h"
+#include "application/setups/editor/gui/editor_pathed_asset_gui.h"
 #include "application/setups/editor/editor_folder.h"
 #include "application/intercosm.h"
 
