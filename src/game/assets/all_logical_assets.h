@@ -7,7 +7,7 @@
 #include "game/assets/animation.h"
 #include "game/assets/physical_material.h"
 
-using plain_animations_pool = animation_id_pool<plain_animation>;
+using plain_animations_pool = plain_animation_pool<plain_animation>;
 using recoil_players_pool = recoil_id_pool<recoil_player>;
 using physical_materials_pool = physical_material_id_pool<physical_material>;
 

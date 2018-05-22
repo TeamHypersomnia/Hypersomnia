@@ -15,7 +15,7 @@ template <class pooled_type>
 using sound_id_pool = make_asset_pool<pooled_type, assets::sound_id_key>;
 
 template <class pooled_type>
-using animation_id_pool = make_asset_pool<pooled_type, assets::animation_id_key>;
+using plain_animation_pool = make_asset_pool<pooled_type, assets::plain_animation_id_key>;
 
 template <class pooled_type>
 using recoil_id_pool = make_asset_pool<pooled_type, assets::recoil_player_id_key>;

@@ -19,5 +19,5 @@ void create_frames(
 );
 
 inline auto to_plain_animation_id(const test_scene_plain_animation_id id) {
-	return to_pool_id<assets::animation_id>(id);
+	return to_pool_id<assets::plain_animation_id>(id);
 }

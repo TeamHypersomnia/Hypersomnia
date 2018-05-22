@@ -33,7 +33,7 @@ static constexpr bool always_skip_in_properties =
 
 	|| std::is_same_v<T, b2Filter>
 	|| is_one_of_v<T,
-		assets::animation_id
+		assets::plain_animation_id
 	>
 ;
 

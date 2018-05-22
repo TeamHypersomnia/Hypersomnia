@@ -99,7 +99,7 @@ struct animation_in_particle {
 	unsigned starting_frame_num = 0;
 	float speed_factor = 1.f;
 
-	assets::animation_id id;
+	assets::plain_animation_id id;
 	simple_animation_state state;
 	// END GEN INTROSPECTOR
 

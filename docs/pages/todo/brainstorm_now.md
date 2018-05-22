@@ -14,7 +14,6 @@ summary: That which we are brainstorming at the moment.
 				- Then we will never std::visit contextually, because we will always contextually know what kind of animation we are after
 				- Mass selection just like anything else
 				- Just the editor's window for animations will just hold all types separated
-			- assets::animation_id -> assets::plain_animation_id
 			- Might be a little pain in the ass to setup
 			- Actual types
 				- Plain animation
@@ -60,6 +59,7 @@ summary: That which we are brainstorming at the moment.
 			- Contains basic torso set and basic legs set
 				- This will also be true of the MMO setup
 			- Later the animations will depend on what we are wearing in the armour slot
+		- Movement component shall expose "movement amount" from whose the frame number will be calculated statelessly
 
 - Particles and flavours
 	- std::unordered_map<particle_flavour_id, vector of particles>
