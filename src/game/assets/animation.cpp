@@ -2,7 +2,7 @@
 
 bool simple_animation_state::advance(
 	const real32 dt,
-	const animation_frames_type& source,
+	const plain_animation_frames_type& source,
 	const unsigned frame_offset
 ) {
 	advance({ dt, static_cast<unsigned>(source.size()) - frame_offset }, [&](const auto i) { 

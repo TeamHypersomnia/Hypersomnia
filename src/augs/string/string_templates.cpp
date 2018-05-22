@@ -9,6 +9,19 @@ std::string to_uppercase(std::string s) {
 	return str_ops(s).to_uppercase().subject;
 }
 
+std::string& uncapitalize_first(std::string& value) {
+	if (value.size() > 0) {
+		value[0] = ::tolower(value[0]);
+	}
+
+	return value;
+}
+
+std::string&& uncapitalize_first(std::string&& value) {
+	uncapitalize_first(value);
+	return std::move(value);
+}
+
 std::string& capitalize_first(std::string& value) {
 	if (value.size() > 0) {
 		value[0] = ::toupper(value[0]);

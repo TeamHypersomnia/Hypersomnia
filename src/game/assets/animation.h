@@ -11,7 +11,7 @@ struct animation_frame {
 	// END GEN INTROSPECTOR
 };
 
-using animation_frames_type = augs::constant_size_vector<animation_frame, ANIMATION_FRAME_COUNT>;
+using plain_animation_frames_type = augs::constant_size_vector<animation_frame, ANIMATION_FRAME_COUNT>;
 
 struct simple_animation_advance {
 	const real32 delta_ms;
@@ -56,14 +56,14 @@ struct simple_animation_state {
 
 	bool advance(
 		const real32 dt,
-		const animation_frames_type& source,
+		const plain_animation_frames_type& source,
 		const unsigned frame_offset = 0
 	);
 };
 
 struct plain_animation {
 	// GEN INTROSPECTOR struct plain_animation
-	animation_frames_type frames = {};
+	plain_animation_frames_type frames = {};
 	// END GEN INTROSPECTOR
 
 	auto get_image_id(const unsigned index) const {
@@ -77,3 +77,12 @@ struct plain_animation {
 		return get_image_id(std::min(static_cast<unsigned>(frames.size() - 1), state.frame_num + frame_offset));
 	}
 };
+
+template <class T, class = void>
+struct has_frames : std::false_type {};
+
+template <class T>
+struct has_frames<T, decltype(std::declval<T&>().frames, void())> : std::true_type {};
+
+template <class T>
+constexpr bool has_frames_v = has_frames<T>::value; 

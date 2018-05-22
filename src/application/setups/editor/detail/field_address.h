@@ -1,6 +1,7 @@
 #pragma once
 #include <cstddef>
 #include "augs/filesystem/path_declaration.h"
+#include "game/assets/animation.h"
 
 #include "game/components/shape_polygon_component.h"
 #include "game/components/rigid_body_component.h"
@@ -23,7 +24,8 @@ using edited_field_type_id = type_in_list_id<
 		wandering_pixels_frames,
 		only_pick_these_items_vector,
 		specific_hostile_entities_vector,
-		friction_connection_vector
+		friction_connection_vector,
+		plain_animation_frames_type
 	>
 >;
 

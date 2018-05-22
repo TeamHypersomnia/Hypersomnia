@@ -16,13 +16,23 @@ namespace augs {
 }
 
 template <class id_type>
-struct create_asset_id_command : id_allocating_command<id_type> {
+struct create_pathed_asset_id_command : id_allocating_command<id_type> {
 	using base = id_allocating_command<id_type>;
 	using introspect_base = base;
 
-	// GEN INTROSPECTOR struct create_asset_id_command class id_type
+	// GEN INTROSPECTOR struct create_pathed_asset_id_command class id_type
 	maybe_official_path<id_type> use_path;
 	// END GEN INTROSPECTOR
+
+	std::string describe() const;
+	void redo(const editor_command_input in);
+	void undo(const editor_command_input in);
+};
+
+template <class id_type>
+struct create_unpathed_asset_id_command : id_allocating_command<id_type> {
+	using base = id_allocating_command<id_type>;
+	using introspect_base = base;
 
 	std::string describe() const;
 	void redo(const editor_command_input in);
@@ -53,7 +63,7 @@ struct asset_property_id {
 		const Container& asset_ids,
 		F callback
 	) const {
-		auto& definitions = get_asset_pool<id_type>(in);
+		auto& definitions = access_asset_pool<id_type>(in, {});
 
 		for (const auto& id : asset_ids) {
 			const auto result = on_field_address(
@@ -103,7 +113,10 @@ template <class T>
 struct is_create_asset_id_command : std::false_type {};
 
 template <class T>
-struct is_create_asset_id_command<create_asset_id_command<T>> : std::true_type {};
+struct is_create_asset_id_command<create_pathed_asset_id_command<T>> : std::true_type {};
+
+template <class T>
+struct is_create_asset_id_command<create_unpathed_asset_id_command<T>> : std::true_type {};
 
 template <class T>
 constexpr bool is_create_asset_id_command_v = is_create_asset_id_command<T>::value;

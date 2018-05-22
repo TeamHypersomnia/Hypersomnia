@@ -6,7 +6,7 @@
 #include "view/viewables/all_viewables_defs.h"
 
 #include "augs/misc/imgui/path_tree_structs.h"
-#include "application/setups/editor/gui/asset_browser_settings.h"
+#include "application/setups/editor/gui/asset_path_browser_settings.h"
 #include "application/setups/editor/property_editor/tweaker_type.h"
 #include "application/setups/editor/property_editor/widgets/asset_path_chooser.h"
 
@@ -64,13 +64,13 @@ struct pathed_asset_widget {
 				auto& history = in.folder.history;
 
 				{
-					create_asset_id_command<T> cmd;
+					create_pathed_asset_id_command<T> cmd;
 					cmd.use_path = chosen_path;
 					history.execute_new(std::move(cmd), in);
 				}
 
 				const auto* const last_addr = std::addressof(history.last_command());
-				const auto* const cmd = std::get_if<create_asset_id_command<T>>(last_addr);
+				const auto* const cmd = std::get_if<create_pathed_asset_id_command<T>>(last_addr);
 
 				object = cmd->get_allocated_id();
 			}

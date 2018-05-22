@@ -599,7 +599,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/application/setups/editor/gui/editor_pathed_asset_gui.cpp"
 	"src/application/setups/editor/commands/asset_commands.cpp"
 	"src/augs/misc/imgui/path_tree_structs.cpp"
-	"src/application/setups/editor/gui/asset_browser_settings.cpp"
+	"src/application/setups/editor/gui/asset_path_browser_settings.cpp"
 	"src/augs/filesystem/path.cpp"
 	"src/view/viewables/image_meta.cpp"
 	"src/application/setups/editor/commands/flavour_commands.cpp"
@@ -607,6 +607,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/augs/graphics/pbo.cpp"
 	"src/view/viewables/streaming/viewables_streaming.cpp"
 	"src/view/viewables/streaming/viewables_streaming_profiler.cpp"
+	"src/application/setups/editor/gui/editor_unpathed_asset_gui.cpp"
 )
 
 # The rest of 3rdparty libraries with minimal amount of source files.

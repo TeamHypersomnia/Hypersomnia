@@ -64,7 +64,7 @@ struct source_path_widget {
 		const std::string& /* formatted_label */,
 		const T& to
 	) const {
-		return typesafe_sprintf("Changed image path to %x", to.path);
+		return typesafe_sprintf("Changed %x path to %x", to.get_label(), to.path);
 	}
 
 	template <class T>
@@ -127,16 +127,22 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 
 	auto& viewables = work.viewables;
 
-	using path_entry_type = pathed_asset_entry<asset_id_type>;
+	using asset_entry_type = pathed_asset_entry<asset_id_type>;
 
 	thread_local std::unordered_set<augs::path_type> _last_seen_missing_paths;
 	/* Linker error fix */
 	auto& last_seen_missing_paths = _last_seen_missing_paths;
-	thread_local std::vector<path_entry_type> missing_orphaned_paths;
-	thread_local std::vector<path_entry_type> missing_paths;
+	thread_local std::vector<asset_entry_type> missing_orphaned_paths;
+	thread_local std::vector<asset_entry_type> missing_paths;
 
-	thread_local std::vector<path_entry_type> orphaned_paths;
-	thread_local std::vector<path_entry_type> used_paths;
+	thread_local std::vector<asset_entry_type> orphaned_paths;
+	thread_local std::vector<asset_entry_type> used_paths;
+
+	missing_orphaned_paths.clear();
+	missing_paths.clear();
+
+	orphaned_paths.clear();
+	used_paths.clear();
 
 	auto is_ticked = [this](const auto& p) {
 		return found_in(ticked_assets, p.id);
@@ -147,11 +153,6 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 		return in_range;
 	};
 
-	missing_orphaned_paths.clear();
-	missing_paths.clear();
-
-	orphaned_paths.clear();
-	used_paths.clear();
 
 	if (base::acquire_once) {
 		acquire_missing_paths = true;
@@ -168,10 +169,7 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 	for_each_id_and_object(definitions,
 		[&](const auto id, const auto& object) mutable {
 			const auto path = object.get_source_path();
-			auto new_entry = path_entry_type(path, id);
-
-			using def_type = remove_cref<decltype(object)>;
-			const auto& view = asset_definition_view<def_type>(folder.current_path, object);
+			auto new_entry = asset_entry_type(path, id);
 
 			find_locations_that_use(id, work, [&](const auto& location) {
 				new_entry.using_locations.push_back(location);
@@ -198,6 +196,9 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 				return found_in(last_seen_missing_paths, p);
 			};
 
+			using def_type = remove_cref<decltype(object)>;
+			const auto& view = asset_definition_view<def_type>(folder.current_path, object);
+
 			if (lazy_check_missing(view.get_resolved_source_path())) {
 				push_missing();
 			}
@@ -209,7 +210,7 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 
 	acquire_missing_paths = false;
 	
-	browser_settings.do_tweakers();
+	path_browser_settings.do_tweakers();
 
 	if (ImGui::Button("Re-check existence")) {
 		acquire_missing_paths = true;
@@ -222,7 +223,7 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 
 	base::acquire_keyboard_once();
 
-	auto& tree_settings = browser_settings.tree_settings;
+	auto& tree_settings = path_browser_settings.tree_settings;
 
 	auto for_each_range = [](auto callback) {
 		callback(missing_orphaned_paths);
@@ -232,8 +233,8 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 		callback(used_paths);
 	};
 
-	auto prepare_range = [&](auto& r){
-		erase_if(r, [&](const auto& entry){
+	auto prepare = [&](auto& range){
+		erase_if(range, [&](const auto& entry){
 			const auto displayed_name = tree_settings.get_prettified(entry.get_filename());
 			const auto displayed_dir = entry.get_displayed_directory();
 
@@ -244,14 +245,12 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 			return false;
 		});
 
-		sort_range(r);
+		sort_range(range);
 	};
 
-	for_each_range(prepare_range);
+	for_each_range(prepare);
 
 	auto files_view = scoped_child("Files view");
-
-	auto& history = cmd_in.folder.history;
 
 	const auto num_cols = 4;
 
@@ -288,7 +287,7 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 						;
 
 						cmd.common.has_parent = has_parent;
-						history.execute_new(std::move(cmd), cmd_in);
+						post_editor_command(cmd_in, std::move(cmd));
 					};
 
 					if (!current_ticked) {
@@ -307,7 +306,7 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 
 				if (ImGui::IsItemHovered()) {
 					if (current_ticked && ticked_in_range.size() > 1) {
-						text_tooltip("Forget %x images", ticked_in_range.size());
+						text_tooltip("Forget %x %xs", label, ticked_in_range.size());
 					}
 					else {
 						text_tooltip("Forget %x", path_entry.get_full_path().to_display());
@@ -320,8 +319,6 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 			const auto node = scoped_tree_node_ex(displayed_name, flags);
 
 			next_columns(2);
-
-			const auto& project_path = cmd_in.folder.current_path;
 
 			text_disabled(displayed_dir);
 
@@ -347,8 +344,6 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 
 				const auto property_location = typesafe_sprintf(" (in %x)", displayed_name);
 
-				auto& history = cmd_in.folder.history;
-
 				using command_type = change_asset_property_command<asset_id_type>;
 
 				auto post_new_change = [&](
@@ -359,6 +354,12 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 					command_type cmd;
 
 					if constexpr(source_path_widget::handles<remove_cref<decltype(new_content)>>) {
+						/* 
+							If we are changing the source path inside an asset that is ticked,
+							don't propagate the change throughout the rest of ticks
+							because we uniquely identify exactly by the source path.
+						*/
+
 						cmd.affected_assets = { id };
 					}
 					else {
@@ -374,14 +375,14 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 					cmd.value_after_change = augs::to_bytes(new_content);
 					cmd.built_description = description + property_location;
 
-					history.execute_new(std::move(cmd), cmd_in);
+					post_editor_command(cmd_in, std::move(cmd));
 				};
 
 				auto rewrite_last_change = [&](
 					const auto& description,
 					const auto& new_content
 				) {
-					auto& last = history.last_command();
+					auto& last = cmd_in.folder.history.last_command();
 
 					if (auto* const cmd = std::get_if<command_type>(std::addressof(last))) {
 						cmd->built_description = description + property_location;
@@ -394,6 +395,7 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 
 				auto prop_in = property_editor_input { settings, property_editor_data };
 
+				const auto& project_path = cmd_in.folder.current_path;
 				const bool disable_path_chooser = current_ticked && ticked_ids.size() > 1;
 
 				general_edit_properties(
@@ -481,7 +483,7 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 			ImGui::Separator();
 		};
 
-		if (browser_settings.show_orphaned) {
+		if (path_browser_settings.show_orphaned) {
 			do_section(
 				missing_orphaned_paths,
 				{ "Missing paths (orphaned)", "Last seen in", "Used at" },
@@ -495,7 +497,7 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 			red
 		);
 
-		if (browser_settings.show_orphaned) {
+		if (path_browser_settings.show_orphaned) {
 			do_section(
 				orphaned_paths,
 				{ typesafe_sprintf("Orphaned %xs", label), "Folder", "Used at" }

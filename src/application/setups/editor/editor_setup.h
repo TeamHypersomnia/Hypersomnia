@@ -45,6 +45,7 @@
 #include "application/setups/editor/gui/editor_summary_gui.h"
 
 #include "application/setups/editor/gui/editor_pathed_asset_gui.h"
+#include "application/setups/editor/gui/editor_unpathed_asset_gui.h"
 
 #include "application/setups/editor/detail/current_access_cache.h"
 #include "application/setups/editor/detail/make_command_from_selections.h"
@@ -97,6 +98,8 @@ class editor_setup : private current_access_cache<editor_setup> {
 
 	editor_images_gui images_gui = std::string("Images");
 	editor_sounds_gui sounds_gui = std::string("Sounds");
+
+	editor_animations_gui animations_gui = std::string("Animations");
 	// END GEN INTROSPECTOR
 
 	std::optional<editor_popup> ok_only_popup;

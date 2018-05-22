@@ -309,8 +309,16 @@ public:
 		return get_solvable().to_versioned(id);
 	}
 	
+	auto& get_logical_assets(cosmos_common_significant_access k) {
+		return get_common_significant(k).logical_assets;
+	}
+
 	const auto& get_logical_assets() const {
 		return get_common_significant().logical_assets;
+	}
+
+	const auto& get_logical_assets(cosmos_common_significant_access k) const {
+		return get_common_significant(k).logical_assets;
 	}
 };
 

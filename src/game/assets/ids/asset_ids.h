@@ -41,6 +41,7 @@ constexpr bool is_unpathed_asset = is_one_of_v<
 	T, 
 	assets::particle_effect_id, 
 	assets::recoil_player_id,
+	assets::plain_animation_id,
 	assets::physical_material_id
 >;
 
@@ -56,9 +57,4 @@ constexpr bool is_viewable_asset_v = is_pathed_asset<T> || is_one_of_v<
 >;
 
 template <class T>
-constexpr bool is_logical_asset_v = is_one_of_v<
-	T,
-	assets::recoil_player_id,
-	assets::physical_material_id
->;
-
+constexpr bool is_logical_asset_v = is_unpathed_asset<T> && !is_viewable_asset_v<T>;

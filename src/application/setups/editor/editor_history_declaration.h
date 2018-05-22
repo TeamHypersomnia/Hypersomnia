@@ -26,7 +26,10 @@ struct change_grouping_command;
 struct change_group_property_command;
 
 template <class>
-struct create_asset_id_command;
+struct create_pathed_asset_id_command;
+
+template <class>
+struct create_unpathed_asset_id_command;
 
 template <class>
 struct forget_asset_id_command;
@@ -54,11 +57,15 @@ using editor_history_base = augs::history_with_marks<
 	change_grouping_command,
 	change_group_property_command,
 
-	create_asset_id_command<assets::image_id>,
+	create_pathed_asset_id_command<assets::image_id>,
 	forget_asset_id_command<assets::image_id>,
 	change_asset_property_command<assets::image_id>,
 
-	create_asset_id_command<assets::sound_id>,
+	create_pathed_asset_id_command<assets::sound_id>,
 	forget_asset_id_command<assets::sound_id>,
-	change_asset_property_command<assets::sound_id>
+	change_asset_property_command<assets::sound_id>,
+
+	create_unpathed_asset_id_command<assets::plain_animation_id>,
+	forget_asset_id_command<assets::plain_animation_id>,
+	change_asset_property_command<assets::plain_animation_id>
 >;

@@ -3,18 +3,17 @@
 
 #include "application/setups/editor/editor_command_input.h"
 #include "application/setups/editor/gui/standard_window_mixin.h"
-#include "application/setups/editor/gui/asset_path_browser_settings.h"
 #include "application/setups/editor/property_editor/property_editor_structs.h"
 
 template <class asset_id_type>
-struct editor_pathed_asset_gui : standard_window_mixin<editor_pathed_asset_gui<asset_id_type>> {
-	using base = standard_window_mixin<editor_pathed_asset_gui<asset_id_type>>;
+struct editor_unpathed_asset_gui : standard_window_mixin<editor_unpathed_asset_gui<asset_id_type>> {
+	using base = standard_window_mixin<editor_unpathed_asset_gui<asset_id_type>>;
 	using base::base;
 
 	using introspect_base = base;
 
-	// GEN INTROSPECTOR struct editor_pathed_asset_gui class asset_id_type
-	asset_path_browser_settings path_browser_settings;
+	// GEN INTROSPECTOR struct editor_unpathed_asset_gui class asset_id_type
+	bool show_orphaned = false;
 	// END GEN INTROSPECTOR
 
 	bool acquire_missing_paths = true;
@@ -27,5 +26,4 @@ private:
 	property_editor_state property_editor_data;
 };
 
-using editor_images_gui = editor_pathed_asset_gui<assets::image_id>;
-using editor_sounds_gui = editor_pathed_asset_gui<assets::sound_id>;
+using editor_animations_gui = editor_unpathed_asset_gui<assets::plain_animation_id>;

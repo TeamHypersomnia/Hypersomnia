@@ -1,6 +1,7 @@
 #pragma once
 #include "augs/templates/identity_templates.h"
 #include "game/assets/ids/asset_ids.h"
+#include "game/transcendental/cosmos_common_significant_access.h"
 
 template <class I, class T>
 decltype(auto) get_logicals_pool(T&& t) {
@@ -9,6 +10,9 @@ decltype(auto) get_logicals_pool(T&& t) {
 	}
 	else if constexpr(std::is_same_v<I, assets::physical_material_id>) {
 		return (t.physical_materials);
+	}
+	else if constexpr(std::is_same_v<I, assets::plain_animation_id>) {
+		return (t.plain_animations);
 	}
 	else {
 		return always_false<I>();
@@ -44,4 +48,9 @@ auto& get_asset_pool(V&& viewables, L&& logicals) {
 template <class T, class E>
 auto& get_asset_pool(E&& cmd_in) {
 	return get_asset_pool<T>(cmd_in.folder.work->viewables, cmd_in.folder.work->world.get_logical_assets());
+}
+
+template <class T, class E>
+auto& access_asset_pool(E&& cmd_in, cosmos_common_significant_access access) {
+	return get_asset_pool<T>(cmd_in.folder.work->viewables, cmd_in.folder.work->world.get_logical_assets(access));
 }
