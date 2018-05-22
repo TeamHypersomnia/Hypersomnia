@@ -409,7 +409,7 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 						return compare_all_fields_to(
 							first,
 							asset_property_id<asset_id_type> { field_id }, 
-							viewables, 
+							cmd_in, 
 							ticked_ids
 						);
 					},

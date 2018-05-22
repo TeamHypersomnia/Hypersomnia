@@ -10,15 +10,7 @@ struct unpathed_asset_widget {
 private:
 	template <class T>
 	auto find(const T& id) const {
-		if constexpr(is_viewable_asset_v<T>) {
-			return get_viewable_pool<T>(viewables).find(id);
-		}
-		else if constexpr(is_logical_asset_v<T>) {
-			return get_logicals_pool<T>(logicals).find(id);
-		}
-		else {
-			static_assert(always_false_v<T>);
-		}
+		return get_asset_pool<T>(viewables, logicals).find(id);
 	}
 public:
 
@@ -75,37 +67,25 @@ public:
 				return std::make_optional(tweaker_type::DISCRETE);
 			}
 
-			auto list_assets_in = [&](const auto& p) {
-				for_each_id_and_object(p,
-					[acquire_keyboard, &asset_id, &result](const auto& new_id, const auto& object) {
-						const auto& name = object.name;
-						if (!filter.PassFilter(name.c_str())) {
-							return;
-						}
-
-						const bool is_current = asset_id == new_id;
-
-						if (is_current && acquire_keyboard) {
-							ImGui::SetScrollHere();
-						}
-
-						if (ImGui::Selectable(name.c_str(), is_current)) {
-							asset_id = new_id;
-							result = tweaker_type::DISCRETE;
-						}
+			for_each_id_and_object(get_asset_pool<T>(viewables, logicals),
+				[acquire_keyboard, &asset_id, &result](const auto& new_id, const auto& object) {
+					const auto& name = object.name;
+					if (!filter.PassFilter(name.c_str())) {
+						return;
 					}
-				);
-			};
 
-			if constexpr(is_viewable_asset_v<T>) {
-				list_assets_in(get_viewable_pool<T>(viewables));
-			}
-			else if constexpr(is_logical_asset_v<T>) {
-				list_assets_in(get_logicals_pool<T>(logicals));
-			}
-			else {
-				static_assert(always_false_v<T>);
-			}
+					const bool is_current = asset_id == new_id;
+
+					if (is_current && acquire_keyboard) {
+						ImGui::SetScrollHere();
+					}
+
+					if (ImGui::Selectable(name.c_str(), is_current)) {
+						asset_id = new_id;
+						result = tweaker_type::DISCRETE;
+					}
+				}
+			);
 		}
 
 		return result;

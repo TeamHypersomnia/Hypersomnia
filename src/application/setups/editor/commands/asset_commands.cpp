@@ -1,7 +1,7 @@
 #include "application/setups/editor/commands/asset_commands.h"
 #include "application/setups/editor/editor_folder.h"
+#include "application/setups/editor/detail/get_asset_pool.h"
 #include "application/intercosm.h"
-#include "view/viewables/get_viewable_pool.h"
 
 #include "augs/readwrite/byte_readwrite.h"
 
@@ -12,15 +12,13 @@ std::string create_asset_id_command<I>::describe() const {
 
 template <class I>
 void create_asset_id_command<I>::redo(const editor_command_input in) {
-	auto& new_object = base::redo(get_viewable_pool<I>(in.folder.work->viewables));
+	auto& new_object = base::redo(get_asset_pool<I>(in));
 	new_object.set_source_path(use_path);
 }
 
 template <class I>
 void create_asset_id_command<I>::undo(const editor_command_input in) {
-	auto& work = *in.folder.work;
-	auto& definitions = get_viewable_pool<I>(work.viewables);
-	base::undo(definitions);
+	base::undo(get_asset_pool<I>(in));
 }
 
 template <class I>
@@ -30,12 +28,12 @@ std::string forget_asset_id_command<I>::describe() const {
 
 template <class I>
 void forget_asset_id_command<I>::redo(const editor_command_input in) {
-	base::redo(get_viewable_pool<I>(in.folder.work->viewables));
+	base::redo(get_asset_pool<I>(in));
 }
 
 template <class I>
 void forget_asset_id_command<I>::undo(const editor_command_input in) {
-	base::undo(get_viewable_pool<I>(in.folder.work->viewables));
+	base::undo(get_asset_pool<I>(in));
 }
 
 template struct create_asset_id_command<assets::image_id>;

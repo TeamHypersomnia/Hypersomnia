@@ -15,7 +15,6 @@
 #include "view/viewables/image_meta.h"
 #include "game/assets/ids/asset_ids.h"
 
-#include "view/viewables/get_viewable_pool.h"
 #include "view/viewables/all_viewables_declarations.h"
 #include "view/maybe_official_path.h"
 

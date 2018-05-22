@@ -6,8 +6,8 @@
 #include "application/setups/editor/commands/change_property_command.h"
 #include "application/setups/editor/commands/id_allocating_command.h"
 #include "application/setups/editor/detail/field_address.h"
+#include "application/setups/editor/detail/get_asset_pool.h"
 #include "view/viewables/all_viewables_declarations.h"
-#include "view/viewables/get_viewable_pool.h"
 #include "view/maybe_official_path.h"
 #include "augs/enums/callback_result.h"
 
@@ -49,11 +49,11 @@ struct asset_property_id {
 
 	template <class C, class Container, class F>
 	void access(
-		C& viewables,
+		C& in,
 		const Container& asset_ids,
 		F callback
 	) const {
-		auto& definitions = get_viewable_pool<id_type>(viewables);
+		auto& definitions = get_asset_pool<id_type>(in);
 
 		for (const auto& id : asset_ids) {
 			const auto result = on_field_address(
@@ -92,7 +92,7 @@ struct change_asset_property_command : change_property_command<change_asset_prop
 		F&& callback
 	) const {
 		property_id.access(
-			in.folder.work->viewables,
+			in,
 		   	affected_assets,
 			continue_if_nullptr(std::forward<F>(callback))
 		);
