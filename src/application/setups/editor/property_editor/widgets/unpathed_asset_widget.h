@@ -12,6 +12,11 @@ private:
 	auto find(const T& id) const {
 		return get_asset_pool<T>(viewables, logicals).find(id);
 	}
+
+	template <class T>
+	decltype(auto) get_name(const T& of) const {
+		return get_displayed_name(of, viewables.image_definitions);
+	}
 public:
 
 	template <class T>
@@ -27,7 +32,7 @@ public:
 		static_assert(handles<T>);
 
 		if (const auto a = find(asset_id)) {
-			return typesafe_sprintf("Set %x to %x", formatted_label, a->name);
+			return typesafe_sprintf("Set %x to %x", formatted_label, get_name(*a));
 		}
 
 		return typesafe_sprintf("Unset %x", formatted_label);
@@ -43,7 +48,7 @@ public:
 
 		const auto displayed_str = [&]() {
 			if (const auto n = find(asset_id)) {
-				return n->name;
+				return get_name(*n);
 			}
 
 			return std::string("None");
@@ -68,8 +73,9 @@ public:
 			}
 
 			for_each_id_and_object(get_asset_pool<T>(viewables, logicals),
-				[acquire_keyboard, &asset_id, &result](const auto& new_id, const auto& object) {
-					const auto& name = object.name;
+				[this, acquire_keyboard, &asset_id, &result](const auto& new_id, const auto& object) {
+					const auto& name = this->get_name(object);
+
 					if (!filter.PassFilter(name.c_str())) {
 						return;
 					}

@@ -16,6 +16,7 @@
 #include "game/components/flags_component.h"
 #include "game/components/shape_polygon_component.h"
 #include "game/stateless_systems/particles_existence_system.h"
+#include "test_scenes/test_scene_animations.h"
 
 #include "game/enums/filters.h"
 #include "game/enums/party_category.h"
@@ -35,7 +36,26 @@ namespace test_flavours {
 				meta.set(render_def);
 			}
 
-			add_sprite(meta, logicals, test_scene_image_id::STANDARD_HEAD);
+			{
+				invariants::torso torso_def;
+
+				torso_def.forward_legs = to_animation_id(test_scene_legs_animation_id::SILVER_TROUSERS);
+
+				torso_def.bare_walk = to_animation_id(test_scene_torso_animation_id::METROPOLIS_CHARACTER_BARE);
+
+				torso_def.rifle_carry = to_animation_id(test_scene_torso_animation_id::METROPOLIS_CHARACTER_BARE);
+				torso_def.rifle_shoot = to_animation_id(test_scene_torso_animation_id::METROPOLIS_CHARACTER_BARE);
+
+				torso_def.pistol_carry = to_animation_id(test_scene_torso_animation_id::METROPOLIS_CHARACTER_BARE);
+				torso_def.pistol_shoot = to_animation_id(test_scene_torso_animation_id::METROPOLIS_CHARACTER_BARE);
+
+				torso_def.akimbo_carry = to_animation_id(test_scene_torso_animation_id::METROPOLIS_CHARACTER_BARE);
+				torso_def.akimbo_shoot = to_animation_id(test_scene_torso_animation_id::METROPOLIS_CHARACTER_BARE);
+
+				meta.set(torso_def);
+			}
+
+			add_sprite(meta, logicals, test_scene_image_id::METROPOLIS_CHARACTER_BARE_1);
 			add_shape_invariant_from_renderable(meta, logicals);
 
 			{

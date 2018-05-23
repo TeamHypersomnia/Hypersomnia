@@ -90,18 +90,7 @@ void editor_unpathed_asset_gui<asset_id_type>::perform(
 		[&](const auto id, const def_type& object) mutable {
 			asset_entry_type new_entry;
 			new_entry.id = id;
-
-			if constexpr(has_frames_v<def_type>) {
-				/* If it is an animation, identify it by name of its first frame */
-
-				const auto image_id = object.frames[0].image_id;
-				const auto& image_defs = get_asset_pool<assets::image_id>(cmd_in);
-
-				new_entry.name = format_field_name(image_defs[image_id].get_source_path().path.stem());
-			}
-			else {
-				new_entry.name = object.name;
-			}
+			new_entry.name = get_displayed_name(object, get_asset_pool<assets::image_id>(cmd_in));
 
 			find_locations_that_use(id, *folder.work, [&](const auto& location) {
 				new_entry.using_locations.push_back(location);

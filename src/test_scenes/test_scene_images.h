@@ -14,8 +14,6 @@ enum class test_scene_image_id {
 
 	TEST_CROSSHAIR,
 
-	STANDARD_HEAD,
-
 	SMOKE_1,
 	SMOKE_2,
 	SMOKE_3,

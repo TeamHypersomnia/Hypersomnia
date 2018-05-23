@@ -25,6 +25,7 @@ namespace components {
 		pad_bytes<1> pad;
 
 		float make_inert_for_ms = 0.f;
+		float animation_amount = 0.f;
 		// END GEN INTROSPECTOR
 
 		void reset_movement_flags();
@@ -46,6 +47,8 @@ namespace invariants {
 		float standard_linear_damping = 0.f;
 		float non_braking_damping = 0.f;
 		float braking_damping = 0.f;
+
+		float max_speed_for_animation = 700.f;
 		// END GEN INTROSPECTOR
 	};
 }

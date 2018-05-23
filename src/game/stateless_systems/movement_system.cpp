@@ -158,6 +158,9 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 				);
 			}
 
+			const auto max_speed = std::max(1.f, movement_def.max_speed_for_animation);
+			movement.animation_amount += rigid_body.get_velocity().length() / max_speed;
+
 			rigid_body.infer_caches();
 		}
 	);

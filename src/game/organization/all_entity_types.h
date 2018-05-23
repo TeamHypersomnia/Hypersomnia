@@ -23,6 +23,7 @@ struct controlled_character {
 
 		invariants::sprite,
 		invariants::render,
+		invariants::torso,
 
 		invariants::interpolation
 	>;
