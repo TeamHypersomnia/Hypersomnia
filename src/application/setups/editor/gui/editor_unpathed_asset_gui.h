@@ -13,7 +13,7 @@ struct editor_unpathed_asset_gui : standard_window_mixin<editor_unpathed_asset_g
 	using introspect_base = base;
 
 	// GEN INTROSPECTOR struct editor_unpathed_asset_gui class asset_id_type
-	bool show_orphaned = false;
+	bool show_orphaned = true;
 	// END GEN INTROSPECTOR
 
 	bool acquire_missing_paths = true;

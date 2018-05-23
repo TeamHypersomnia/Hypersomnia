@@ -6,6 +6,7 @@
 
 #include "augs/graphics/rgba.h"
 #include "augs/misc/scope_guard.h"
+#include "augs/misc/pool/pooled_object_id.h"
 
 namespace augs {
 	namespace imgui {
@@ -161,6 +162,14 @@ namespace augs {
 			ImGui::PushItemWidth(v);
 		
 			return scope_guard([]() { ImGui::PopItemWidth(); });
+		}
+
+		template <class size_type, class... keys>
+		auto scoped_id(const pooled_object_id<size_type, keys...> id) {
+			ImGui::PushID(id.indirection_index);
+			ImGui::PushID(id.version);
+
+			return scope_guard([]() { ImGui::PopID(); ImGui::PopID(); });
 		}
 
 		inline auto scoped_id(const int v) {

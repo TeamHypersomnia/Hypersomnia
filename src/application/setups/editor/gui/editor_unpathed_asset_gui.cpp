@@ -110,10 +110,8 @@ void editor_unpathed_asset_gui<asset_id_type>::perform(
 		}
 	);
 
-	ImGui::SameLine();
 	checkbox("Show orphaned", show_orphaned);
 
-	ImGui::Separator();
 	ImGui::Separator();
 
 	thread_local ImGuiTextFilter filter;
@@ -148,18 +146,16 @@ void editor_unpathed_asset_gui<asset_id_type>::perform(
 
 	ImGui::Columns(num_cols);
 
-	int i = 0;
-
 	auto do_asset = [&](const auto& asset_entry, const auto& ticked_in_range, const auto& ticked_ids) {
-		auto scope = scoped_id(i++);
 		(void)ticked_in_range;
 
 		const auto id = asset_entry.id;
+		auto scope = scoped_id(id);
 		const auto& displayed_name = asset_entry.name;
 
 		const auto current_ticked = is_ticked(asset_entry);
 
-		const auto flags = do_selection_checkbox(ticked_assets, id, current_ticked, i);
+		const auto flags = do_selection_checkbox(ticked_assets, id, current_ticked, id);
 
 		duplicate_delete_buttons<
 			duplicate_asset_command<asset_id_type>,
@@ -172,7 +168,7 @@ void editor_unpathed_asset_gui<asset_id_type>::perform(
 			!asset_entry.used()
 		);
 
-		const auto node = scoped_tree_node_ex(displayed_name, flags);
+		const auto node = scoped_tree_node_ex(displayed_name + "###Node", flags);
 
 		next_columns(2);
 

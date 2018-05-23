@@ -257,23 +257,20 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 	if (tree_settings.linear_view) {
 		ImGui::Columns(num_cols);
 
-		int i = 0;
-
 		bool official_separator = false;
 
 		auto do_path = [&](const auto& path_entry, const auto& ticked_in_range, const auto& ticked_ids) {
 			separator_if_unofficials_ended(path_entry.get_full_path(), official_separator);
 
-			auto scope = scoped_id(i++);
-
 			const auto id = path_entry.id;
+			auto scope = scoped_id(id);
 
 			const auto displayed_name = tree_settings.get_prettified(path_entry.get_filename());
 			const auto displayed_dir = path_entry.get_displayed_directory();
 
 			const auto current_ticked = is_ticked(path_entry);
 
-			const auto flags = do_selection_checkbox(ticked_assets, id, current_ticked, i);
+			const auto flags = do_selection_checkbox(ticked_assets, id, current_ticked, id);
 
 			if (!path_entry.used()) {
 				const auto scoped_style = in_line_button_style();
@@ -316,7 +313,7 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 				ImGui::SameLine();
 			}
 
-			const auto node = scoped_tree_node_ex(displayed_name, flags);
+			const auto node = scoped_tree_node_ex(displayed_name + "###Node", flags);
 
 			next_columns(2);
 
