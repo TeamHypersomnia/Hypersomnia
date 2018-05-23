@@ -37,6 +37,9 @@ struct forget_asset_id_command;
 template <class>
 struct change_asset_property_command;
 
+template <class>
+struct duplicate_asset_command;
+
 using editor_history_base = augs::history_with_marks<
 	fill_with_test_scene_command,
 
@@ -67,5 +70,6 @@ using editor_history_base = augs::history_with_marks<
 
 	create_unpathed_asset_id_command<assets::plain_animation_id>,
 	forget_asset_id_command<assets::plain_animation_id>,
+	duplicate_asset_command<assets::plain_animation_id>,
 	change_asset_property_command<assets::plain_animation_id>
 >;

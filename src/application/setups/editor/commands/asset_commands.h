@@ -40,8 +40,27 @@ struct create_unpathed_asset_id_command : id_allocating_command<id_type> {
 };
 
 template <class id_type>
+struct duplicate_asset_command : create_unpathed_asset_id_command<id_type> {
+	using base = create_unpathed_asset_id_command<id_type>;
+	using introspect_base = base;
+
+	// GEN INTROSPECTOR struct duplicate_asset_command class id_type
+	id_type duplicate_from;
+	// END GEN INTROSPECTOR
+
+	duplicate_asset_command() = default;
+	duplicate_asset_command(const id_type duplicate_from) : duplicate_from(duplicate_from) {}
+
+	std::string describe() const;
+	void redo(const editor_command_input in);
+	using base::undo;
+};
+
+template <class id_type>
 struct forget_asset_id_command : id_freeing_command<id_type> {
 	using base = id_freeing_command<id_type>;
+	using base::base;
+
 	using introspect_base = base;
 
 	// GEN INTROSPECTOR struct forget_asset_id_command class id_type

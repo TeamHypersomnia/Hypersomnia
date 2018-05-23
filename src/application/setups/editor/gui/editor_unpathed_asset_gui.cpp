@@ -20,6 +20,7 @@
 #include "application/setups/editor/property_editor/general_edit_properties.h"
 #include "application/setups/editor/detail/find_locations_that_use.h"
 #include "application/setups/editor/detail/checkbox_selection.h"
+#include "application/setups/editor/detail/duplicate_delete_buttons.h"
 #include "application/setups/editor/property_editor/compare_all_fields_to.h"
 #include "application/setups/editor/property_editor/special_widgets.h"
 #include "application/setups/editor/property_editor/widgets/pathed_asset_widget.h"
@@ -151,6 +152,7 @@ void editor_unpathed_asset_gui<asset_id_type>::perform(
 
 	auto do_asset = [&](const auto& asset_entry, const auto& ticked_in_range, const auto& ticked_ids) {
 		auto scope = scoped_id(i++);
+		(void)ticked_in_range;
 
 		const auto id = asset_entry.id;
 		const auto& displayed_name = asset_entry.name;
@@ -159,46 +161,16 @@ void editor_unpathed_asset_gui<asset_id_type>::perform(
 
 		const auto flags = do_selection_checkbox(ticked_assets, id, current_ticked, i);
 
-		if (!asset_entry.used()) {
-			const auto scoped_style = in_line_button_style();
-
-			if (ImGui::Button("F")) {
-				auto forget = [&](const auto& which, const bool has_parent) {
-					forget_asset_id_command<asset_id_type> cmd;
-					cmd.freed_id = which.id;
-					cmd.built_description = 
-						typesafe_sprintf("Forgot %x", displayed_name)
-					;
-
-					cmd.common.has_parent = has_parent;
-					post_editor_command(cmd_in, std::move(cmd));
-				};
-
-				if (!current_ticked) {
-					forget(asset_entry, false);
-				}
-				else {
-					const auto& all = ticked_in_range;
-
-					forget(all[0], false);
-
-					for (std::size_t i = 1; i < all.size(); ++i) {
-						forget(all[i], true);
-					}
-				}
-			}
-
-			if (ImGui::IsItemHovered()) {
-				if (current_ticked && ticked_in_range.size() > 1) {
-					text_tooltip("Forget %x %xs", label, ticked_in_range.size());
-				}
-				else {
-					text_tooltip("Forget %x", displayed_name);
-				}
-			}
-
-			ImGui::SameLine();
-		}
+		duplicate_delete_buttons<
+			duplicate_asset_command<asset_id_type>,
+			forget_asset_id_command<asset_id_type>
+		> (
+			cmd_in,
+			asset_entry.id,
+			settings,
+			"",
+			!asset_entry.used()
+		);
 
 		const auto node = scoped_tree_node_ex(displayed_name, flags);
 

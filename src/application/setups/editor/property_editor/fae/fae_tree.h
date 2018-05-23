@@ -13,6 +13,7 @@
 #include "application/setups/editor/property_editor/fae/fae_tree_structs.h"
 
 #include "application/setups/editor/detail/find_locations_that_use.h"
+#include "application/setups/editor/detail/duplicate_delete_buttons.h"
 #include "application/setups/editor/property_editor/fae/ex_on_buttons.h"
 
 template <class E>
@@ -156,33 +157,16 @@ auto tree_of_flavours(
 							);
 
 							if (fae_in.show_flavour_control_buttons) {
-								const auto scoped_style = in_line_button_style();
-
-								{
-									const auto button_label = "D##" + imgui_id;
-
-									if (ImGui::Button(button_label.c_str())) {
-										duplicate_flavour_command cmd;
-										cmd.set_duplicated_id(flavour_id);
-										post_editor_command(cpe_in.command_in, std::move(cmd));
-									}
-								}
-
-								ImGui::SameLine();
-
-								{
-									auto disabled_scope = ::maybe_disabled_cols(settings, locations.size() > 0);
-
-									const auto button_label = "-##" + imgui_id;
-
-									if (ImGui::Button(button_label.c_str())) {
-										delete_flavour_command cmd;
-										cmd.set_deleted_id(flavour_id);
-										post_editor_command(cpe_in.command_in, std::move(cmd));
-									}
-								}
-
-								ImGui::SameLine();
+								duplicate_delete_buttons<
+									duplicate_flavour_command,
+									delete_flavour_command
+								> (
+									cpe_in.command_in,
+									flavour_id,
+									settings,
+									imgui_id,
+									locations.empty()
+								);
 							}
 
 							const auto flavour_node = scoped_tree_node_ex(node_label, flags);

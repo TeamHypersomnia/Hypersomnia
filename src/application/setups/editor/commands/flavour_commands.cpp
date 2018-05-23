@@ -101,10 +101,6 @@ void duplicate_flavour_command::redo(const editor_command_input in) {
 	base::redo_and_copy(in, duplicate_from);
 }
 
-void duplicate_flavour_command::undo(const editor_command_input in) {
-	base::undo(in);
-}
-
 void delete_flavour_command::redo(const editor_command_input in) {
 	type_id.dispatch(
 		[&](auto e) {

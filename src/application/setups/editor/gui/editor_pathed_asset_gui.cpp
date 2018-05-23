@@ -306,7 +306,7 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 
 				if (ImGui::IsItemHovered()) {
 					if (current_ticked && ticked_in_range.size() > 1) {
-						text_tooltip("Forget %x %xs", label, ticked_in_range.size());
+						text_tooltip("Forget %x %xs", ticked_in_range.size(), label);
 					}
 					else {
 						text_tooltip("Forget %x", path_entry.get_full_path().to_display());

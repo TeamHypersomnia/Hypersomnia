@@ -27,9 +27,10 @@ public:
 	std::string describe() const;
 
 	void redo(const editor_command_input in);
-	void redo_and_copy(const editor_command_input in, raw_entity_flavour_id);
-
 	void undo(const editor_command_input in);
+
+protected:
+	void redo_and_copy(const editor_command_input in, raw_entity_flavour_id);
 };
 
 struct duplicate_flavour_command : create_flavour_command {
@@ -40,14 +41,16 @@ struct duplicate_flavour_command : create_flavour_command {
 	raw_entity_flavour_id duplicate_from;
 	// END GEN INTROSPECTOR
 
+	duplicate_flavour_command() = default;
+
 	template <class T>
-	void set_duplicated_id(const typed_entity_flavour_id<T>& id) {
+	duplicate_flavour_command(const typed_entity_flavour_id<T>& id) {
 		type_id.set<T>();
 		duplicate_from = id.raw;
 	}
 
 	void redo(const editor_command_input in);
-	void undo(const editor_command_input in);
+	using base::undo;
 };
 
 struct delete_flavour_command : id_freeing_command<raw_entity_flavour_id> {
@@ -62,8 +65,10 @@ private:
 public:
 	// END GEN INTROSPECTOR
 
+	delete_flavour_command() = default;
+
 	template <class T>
-	void set_deleted_id(const typed_entity_flavour_id<T>& id) {
+	delete_flavour_command(const typed_entity_flavour_id<T>& id) {
 		type_id.set<T>();
 		freed_id = id.raw;
 	}

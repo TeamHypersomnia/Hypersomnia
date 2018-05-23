@@ -51,6 +51,16 @@ void forget_asset_id_command<I>::undo(const editor_command_input in) {
 	base::undo(access_asset_pool<I>(in, {}));
 }
 
+template <class I>
+std::string duplicate_asset_command<I>::describe() const {
+	return typesafe_sprintf("Duplicated %x", uncapitalize_first(format_field_name(get_type_name_strip_namespace<I>())));
+}
+
+template <class I>
+void duplicate_asset_command<I>::redo(const editor_command_input in) {
+	base::redo_and_copy(access_asset_pool<I>(in, {}), duplicate_from);
+}
+
 template struct create_pathed_asset_id_command<assets::image_id>;
 template struct forget_asset_id_command<assets::image_id>;
 template struct change_asset_property_command<assets::image_id>;
@@ -61,4 +71,5 @@ template struct change_asset_property_command<assets::sound_id>;
 
 template struct create_unpathed_asset_id_command<assets::plain_animation_id>;
 template struct forget_asset_id_command<assets::plain_animation_id>;
+template struct duplicate_asset_command<assets::plain_animation_id>;
 template struct change_asset_property_command<assets::plain_animation_id>;

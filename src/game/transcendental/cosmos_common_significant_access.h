@@ -14,6 +14,9 @@ struct forget_asset_id_command;
 template <class id_type>
 struct create_unpathed_asset_id_command;
 
+template <class id_type>
+struct duplicate_asset_command;
+
 class cosmos_common_significant_access {
 	friend flavour_property_id;
 
@@ -29,6 +32,9 @@ class cosmos_common_significant_access {
 
 	template <class id_type>
 	friend struct create_unpathed_asset_id_command;
+
+	template <class id_type>
+	friend struct duplicate_asset_command;
 
 	cosmos_common_significant_access() {}
 };

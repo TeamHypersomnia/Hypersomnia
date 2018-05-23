@@ -43,6 +43,13 @@ public:
 	}
 
 	template <class P>
+	auto& redo_and_copy(P& pool, const id_type& source) {
+		auto& obj = redo(pool);
+		obj = pool[source];
+		return obj;
+	}
+
+	template <class P>
 	void undo(P& pool) {
 		pool.undo_last_allocate(allocated_id);
 	}
@@ -54,12 +61,16 @@ struct id_freeing_command {
 	editor_command_common common;
 
 	id_type freed_id;
+
 private:
 	friend augs::introspection_access;
 	typename id_type::undo_free_type undo_free_input;
 	std::vector<std::byte> forgotten_content;
 public:
 	// END GEN INTROSPECTOR
+
+	id_freeing_command() = default;
+	id_freeing_command(const id_type freed_id) : freed_id(freed_id) {}
 
 	template <class P>
 	void redo(P& pool) {

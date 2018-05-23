@@ -26,10 +26,10 @@
 #include "augs/readwrite/memory_stream.h"
 #include "augs/readwrite/byte_readwrite.h"
 
-template <class T>
-struct should_skip_in_common : std::bool_constant<
-	is_one_of_v<T, all_logical_assets, all_entity_flavours>
-> {};
+struct common_state_editor_behaviour {
+	template <class T>
+	static constexpr bool should_skip = is_one_of_v<T, all_logical_assets, all_entity_flavours>;
+};
 
 static void edit_common(
 	const commanding_property_editor_input& in,
@@ -80,7 +80,7 @@ static void edit_common(
 	auto& work = *cmd_in.folder.work;
 	auto& cosm = work.world;
 
-	general_edit_properties<should_skip_in_common>(
+	general_edit_properties<common_state_editor_behaviour>(
 		in.prop_in, 
 		signi,
 		post_new_change,

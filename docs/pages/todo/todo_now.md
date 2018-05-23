@@ -7,6 +7,10 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
+- Special buttons for animation entries
+	- Enum "Import"
+	- Button inside each animation entry - Reread frames and durations
+
 - rename the flavour on setting an image
 	- if it is detected that it is yet unnamed
 

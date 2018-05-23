@@ -150,7 +150,7 @@ inline auto node_and_columns(
 };
 
 template <
-	template <class> class SkipPredicate,
+	class Behaviour,
 	bool pass_notifier_through = false,
 	class S,
 	class D,
@@ -170,7 +170,7 @@ void detail_general_edit_properties(
 
 	static constexpr bool should_skip = 
 		always_skip_in_properties<T> 
-		|| SkipPredicate<T>::value
+		|| Behaviour::template should_skip<T>
 	;
 
 	if constexpr(!should_skip) {
@@ -200,7 +200,7 @@ void detail_general_edit_properties(
 
 				auto colors = maybe_disabled_cols(input.settings, !all_equal || !altered.is_enabled);
 
-				detail_general_edit_properties<SkipPredicate, pass_notifier_through>(input, equality_predicate, notify_change_of, label, altered.value, false);
+				detail_general_edit_properties<Behaviour, pass_notifier_through>(input, equality_predicate, notify_change_of, label, altered.value, false);
 			}
 			else if constexpr(is_std_array_v<T>) {
 				// TODO
@@ -248,7 +248,7 @@ void detail_general_edit_properties(
 							ImGui::SameLine();
 
 							if constexpr(pass_notifier_through) {
-								detail_general_edit_properties<SkipPredicate, true>(
+								detail_general_edit_properties<Behaviour, true>(
 									input, 
 									equality_predicate,
 									notify_change_of,
@@ -257,7 +257,7 @@ void detail_general_edit_properties(
 								);
 							}
 							else {
-								detail_general_edit_properties<SkipPredicate, true>(
+								detail_general_edit_properties<Behaviour, true>(
 									input, 
 									[&equality_predicate, i, &altered] (auto&&...) { return equality_predicate(altered, i); },
 									[&notify_change_of, i, &altered] (const auto& l, const tweaker_type t, auto&) { notify_change_of(l, t, altered, i); },
@@ -280,7 +280,7 @@ void detail_general_edit_properties(
 			}
 			else {
 				auto further = [&](const std::string& l, auto& m) {
-					detail_general_edit_properties<SkipPredicate, pass_notifier_through>(input, equality_predicate, notify_change_of, l, m);
+					detail_general_edit_properties<Behaviour, pass_notifier_through>(input, equality_predicate, notify_change_of, l, m);
 				};
 
 				if (nodify_introspected) {
@@ -298,8 +298,13 @@ void detail_general_edit_properties(
 	}
 }
 
+struct default_edit_properties_behaviour {
+	template <class T>
+	static constexpr bool should_skip = false;
+};
+
 template <
-	template <class> class SkipPredicate = always_false,
+	class Behaviour = default_edit_properties_behaviour,
    	class T,
    	class G,
    	class H,
@@ -359,7 +364,7 @@ void general_edit_properties(
 	};
 
 	auto traverse = [&](const std::string& member_label, auto& member) {
-		detail_general_edit_properties<SkipPredicate>(
+		detail_general_edit_properties<Behaviour>(
 			detail_edit_properties_input<S, D> { 
 				special_widget_provider,
 				sane_defaults,
