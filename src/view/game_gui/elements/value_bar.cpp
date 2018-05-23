@@ -188,7 +188,7 @@ void value_bar::draw(
 				const auto particle_col = bar_col + rgba(30, 30, 30, 0);
 			
 				output.aabb_lt_clipped(
-					necessarys.at(p.tex),
+					necessarys.at(p.image_id),
 					value_bar_rect.get_position() - vec2(6, 6) + p.relative_pos,
 					current_value_bar_rect,
 					particle_col
@@ -409,7 +409,7 @@ void value_bar::rebuild_layouts(
 
 			effect_particle new_part;
 			new_part.relative_pos = rng.randval(vec2(0, 0), value_bar_size);
-			new_part.tex = mats[rng.randval(0, 2)];
+			new_part.image_id = mats[rng.randval(0, 2)];
 
 			this_id->particles.push_back(new_part);
 		}

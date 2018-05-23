@@ -23,4 +23,5 @@ using xywhu = basic_xywh<unsigned>;
 using xywh = basic_xywh<real32>;
 using xywhd = basic_xywh<real64>;
 
-using transform = basic_transform<real32>;
+using transformr = basic_transform<real32>;
+using transformi = basic_transform<int>;

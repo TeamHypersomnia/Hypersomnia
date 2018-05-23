@@ -74,8 +74,8 @@ TEST_CASE("Byte readwrite Trivial types") {
 
 TEST_CASE("Byte readwrite Classes") {
 	vec2 ab;
-	transform tr;
-	std::vector<transform> v;
+	transformr tr;
+	std::vector<transformr> v;
 	v.resize(3);
 
 	readwrite_test_cycle(ab);

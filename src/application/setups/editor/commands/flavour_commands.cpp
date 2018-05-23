@@ -5,6 +5,7 @@
 #include "application/setups/editor/commands/asset_commands.h"
 #include "augs/readwrite/byte_readwrite.h"
 
+#include "application/setups/editor/property_editor/widgets/asset_sane_default_provider.h"
 #include "application/setups/editor/property_editor/widgets/pathed_asset_widget.h"
 
 std::string create_flavour_command::describe() const {

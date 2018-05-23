@@ -48,7 +48,7 @@ void load_test_scene_particle_effects(
 		target.set_image(id, sz, col);
 	};
 
-	const auto cast_blink_id = to_plain_animation_id(test_scene_plain_animation_id::CAST_BLINK_ANIMATION);
+	const auto cast_blink_id = to_animation_id(test_scene_plain_animation_id::CAST_BLINK_ANIMATION);
 	const auto& anim = anims[cast_blink_id];
 
 	auto default_bounds = [](particles_emission& em) {

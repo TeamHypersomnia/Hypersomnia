@@ -4,17 +4,20 @@
 #include "game/assets/ids/asset_ids.h"
 #include "game/assets/all_logical_assets.h"
 
+#include "view/get_asset_pool.h"
+
 #include "test_scenes/test_scene_images.h"
 #include "augs/string/format_enum.h"
 
+template <class T>
 void create_frames(
-	plain_animation& anim,
+	T& anim,
 	const test_scene_image_id first_frame,
 	const test_scene_image_id last_frame,
 	const float frame_duration_ms
 ) {
-	for (auto i = int(first_frame); i < int(last_frame); ++i) {
-		animation_frame frame;
+	for (auto i = int(first_frame); i <= int(last_frame); ++i) {
+		typename decltype(anim.frames)::value_type frame;
 		frame.duration_milliseconds = frame_duration_ms;
 		frame.image_id = to_image_id(test_scene_image_id(i));
 
@@ -22,26 +25,82 @@ void create_frames(
 	}
 }
 
-void load_test_scene_animations(plain_animations_pool& all_definitions) {
-	using test_id_type = test_scene_plain_animation_id;
+void load_test_scene_animations(all_logical_assets& logicals) {
+	{
+		using test_id_type = test_scene_plain_animation_id;
+		using id_type = decltype(to_animation_id(test_id_type()));
 
-	all_definitions.reserve(enum_count(test_id_type()));
+		auto& defs = get_logicals_pool<id_type>(logicals);
+		defs.reserve(enum_count(test_id_type()));
+
+		{
+			plain_animation anim;
+
+			create_frames(
+				anim,
+				test_scene_image_id::CAST_BLINK_1,
+				test_scene_image_id::CAST_BLINK_19,
+				50.0f
+			);
+
+			const auto test_id = test_id_type::CAST_BLINK_ANIMATION;
+
+			const auto id = to_animation_id(test_id);
+			const auto new_allocation = defs.allocate(std::move(anim));
+
+			ensure_eq(new_allocation.key, id);
+		} 
+	}
 
 	{
-		plain_animation anim;
+		using test_id_type = test_scene_torso_animation_id;
+		using id_type = decltype(to_animation_id(test_id_type()));
 
-		create_frames(
-			anim,
-			test_scene_image_id::CAST_BLINK_1,
-			test_scene_image_id::CAST_BLINK_19,
-			50.0f
-		);
+		auto& defs = get_logicals_pool<id_type>(logicals);
+		defs.reserve(enum_count(test_id_type()));
 
-		const auto test_id = test_scene_plain_animation_id::CAST_BLINK_ANIMATION;
+		{
+			torso_animation anim;
 
-		const auto id = to_plain_animation_id(test_id);
-		const auto new_allocation = all_definitions.allocate(std::move(anim));
+			create_frames(
+				anim,
+				test_scene_image_id::METROPOLIS_CHARACTER_BARE_1,
+				test_scene_image_id::METROPOLIS_CHARACTER_BARE_5,
+				50.0f
+			);
 
-		ensure_eq(new_allocation.key, id);
-	} 
+			const auto test_id = test_id_type::METROPOLIS_CHARACTER_BARE;
+
+			const auto id = to_animation_id(test_id);
+			const auto new_allocation = defs.allocate(std::move(anim));
+
+			ensure_eq(new_allocation.key, id);
+		} 
+	}
+
+	{
+		using test_id_type = test_scene_legs_animation_id;
+		using id_type = decltype(to_animation_id(test_id_type()));
+
+		auto& defs = get_logicals_pool<id_type>(logicals);
+		defs.reserve(enum_count(test_id_type()));
+
+		{
+			legs_animation anim;
+
+			create_frames(
+				anim,
+				test_scene_image_id::SILVER_TROUSERS_1,
+				test_scene_image_id::SILVER_TROUSERS_12,
+				50.0f
+			);
+
+			const auto test_id = test_id_type::SILVER_TROUSERS;
+
+			const auto id = to_animation_id(test_id);
+			const auto new_allocation = defs.allocate(std::move(anim));
+
+			ensure_eq(new_allocation.key, id);
+		} 
+	}
 }

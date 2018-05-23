@@ -1,17 +1,9 @@
 #pragma once
 #include "augs/math/declare_math.h"
 #include "augs/misc/constant_size_vector.h"
+#include "augs/math/transform.h"
 #include "game/assets/ids/asset_ids.h"
 #include "game/container_sizes.h"
-
-struct animation_frame {
-	// GEN INTROSPECTOR struct animation_frame
-	assets::image_id image_id;
-	float duration_milliseconds = 0.f;
-	// END GEN INTROSPECTOR
-};
-
-using plain_animation_frames_type = augs::constant_size_vector<animation_frame, ANIMATION_FRAME_COUNT>;
 
 struct simple_animation_advance {
 	const real32 delta_ms;
@@ -54,28 +46,81 @@ struct simple_animation_state {
 		advance(in, std::forward<F>(nth_frame_duration_ms), [](auto){});
 	}
 
+	template <class T>
 	bool advance(
 		const real32 dt,
-		const plain_animation_frames_type& source,
+		const T& source_frames,
 		const unsigned frame_offset = 0
-	);
+	) {
+		advance({ dt, static_cast<unsigned>(source_frames.size()) - frame_offset }, [&](const auto i) { 
+			return source_frames[i].duration_milliseconds; 
+		});
+
+		return frame_offset + frame_num >= source_frames.size();
+	}
 };
 
-struct plain_animation {
-	// GEN INTROSPECTOR struct plain_animation
-	plain_animation_frames_type frames = {};
-	// END GEN INTROSPECTOR
-
+template <class D>
+struct animation_mixin {
 	auto get_image_id(const unsigned index) const {
-		return frames[index].image_id;
+		return reinterpret_cast<const D*>(this)->frames[index].image_id;
 	}
 
 	auto get_image_id(
 		const simple_animation_state& state,
 	   	const unsigned frame_offset
 	) const {
+		const auto& frames = reinterpret_cast<const D*>(this)->frames;
 		return get_image_id(std::min(static_cast<unsigned>(frames.size() - 1), state.frame_num + frame_offset));
 	}
+};
+
+struct plain_animation_frame {
+	// GEN INTROSPECTOR struct plain_animation_frame
+	assets::image_id image_id;
+	float duration_milliseconds = 0.f;
+	// END GEN INTROSPECTOR
+};
+
+struct torso_animation_frame {
+	// GEN INTROSPECTOR struct torso_animation_frame
+	assets::image_id image_id;
+	float duration_milliseconds = 0.f;
+	transformi hand_offset;
+	// END GEN INTROSPECTOR
+};
+
+struct legs_animation_frame {
+	// GEN INTROSPECTOR struct legs_animation_frame
+	assets::image_id image_id;
+	float duration_milliseconds = 0.f;
+	vec2i leg_offset;
+	// END GEN INTROSPECTOR
+};
+
+template <class T>
+using make_animation_frames = augs::constant_size_vector<T, ANIMATION_FRAME_COUNT>;
+
+using plain_animation_frames_type = make_animation_frames<plain_animation_frame>;
+using torso_animation_frames_type = make_animation_frames<torso_animation_frame>;
+using legs_animation_frames_type = make_animation_frames<legs_animation_frame>;
+
+struct plain_animation : animation_mixin<plain_animation> {
+	// GEN INTROSPECTOR struct plain_animation
+	plain_animation_frames_type frames = {};
+	// END GEN INTROSPECTOR
+};
+
+struct torso_animation : animation_mixin<torso_animation> {
+	// GEN INTROSPECTOR struct torso_animation
+	torso_animation_frames_type frames = {};
+	// END GEN INTROSPECTOR
+};
+
+struct legs_animation : animation_mixin<legs_animation> {
+	// GEN INTROSPECTOR struct legs_animation
+	legs_animation_frames_type frames = {};
+	// END GEN INTROSPECTOR
 };
 
 template <class T, class = void>

@@ -151,7 +151,7 @@ item_button::layout_with_attachments item_button::calc_button_layout(
 		b += -origin;
 	}
 
-	const auto flip = defs.at(component_owner.get<invariants::sprite>().tex).meta.usage_as_button.flip;
+	const auto flip = defs.at(component_owner.get<invariants::sprite>().image_id).meta.usage_as_button.flip;
 
 	if (flip.horizontally) {
 		for (auto& b : output.boxes) {
@@ -247,7 +247,7 @@ void item_button::draw_proc(
 		{
 			const bool draw_attachments = !this_id->is_container_open || f.draw_attachments_even_if_open;
 			auto item_sprite = item.get<invariants::sprite>();
-			const auto gui_def = context.get_image_metas().at(item_sprite.tex).meta.usage_as_button;
+			const auto gui_def = context.get_image_metas().at(item_sprite.image_id).meta.usage_as_button;
 
 			const auto layout = calc_button_layout(item, context.get_image_metas(), draw_attachments);
 			
@@ -454,7 +454,7 @@ void item_button::rebuild_layouts(const game_gui_context context, const this_in_
 
 	if (sprite) {
 		vec2i rounded_size = calc_button_layout(item, manager, !this_id->is_container_open).aabb.get_size();
-		rounded_size = griddify_size(rounded_size, manager.at(item.get<invariants::sprite>().tex).meta.usage_as_button.bbox_expander);
+		rounded_size = griddify_size(rounded_size, manager.at(item.get<invariants::sprite>().image_id).meta.usage_as_button.bbox_expander);
 		this_id->rc.set_size(rounded_size);
 	}
 

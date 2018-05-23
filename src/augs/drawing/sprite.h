@@ -36,42 +36,42 @@ namespace augs {
 		};
 
 		sprite(
-			const id_type tex = {},
+			const id_type image_id = {},
 			const size_type size = size_type(),
 			const rgba color = white
 		) :
-			tex(tex),
+			image_id(image_id),
 			size(size),
 			color(color)
 		{}
 
 		template <class M>
 		sprite(
-			const id_type tex,
+			const id_type image_id,
 			const M& manager,
 			const rgba color = white
 		) {
-			set(tex, manager, color);
+			set(image_id, manager, color);
 		}
 
 		template <class M>
 		void set(
-			const id_type tex,
+			const id_type image_id,
 			const M& manager,
 			const rgba color = white
 		) {
-			this->tex = tex;
-			this->size = manager.at(tex).get_size();
+			this->image_id = image_id;
+			this->size = manager.at(image_id).get_size();
 			this->color = color;
 		}
 
 		template <class T>
 		void set(
-			const id_type tex,
+			const id_type image_id,
 			const basic_vec2<T> size,
 			const rgba color = white
 		) {
-			this->tex = tex;
+			this->image_id = image_id;
 			this->size = size;
 			this->color = color;
 		}
@@ -81,7 +81,7 @@ namespace augs {
 		}
 
 		// GEN INTROSPECTOR struct augs::sprite class id_type
-		id_type tex;
+		id_type image_id;
 		size_type size;
 		rgba color = white;
 		sprite_special_effect effect = sprite_special_effect::NONE;
@@ -95,7 +95,7 @@ namespace augs {
 			return size;
 		}
 
-		ltrb get_aabb(const transform transform) const {
+		ltrb get_aabb(const transformr transform) const {
 			return augs::get_aabb(
 				make_sprite_points(
 					transform.pos, 
@@ -120,7 +120,7 @@ namespace augs {
 			const auto drawn_size = get_size();
 
 			if (in.use_neon_map) {
-				const auto& entry = manager.at(tex);
+				const auto& entry = manager.at(image_id);
 				const auto& maybe_neon_map = entry.neon_map;
 
 				if (maybe_neon_map.exists()) {
@@ -137,7 +137,7 @@ namespace augs {
 			else {
 				draw(
 					in,
-					manager.at(tex).diffuse,
+					manager.at(image_id).diffuse,
 					transform_pos,
 					final_rotation,
 					drawn_size

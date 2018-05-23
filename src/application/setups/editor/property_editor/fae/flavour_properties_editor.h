@@ -10,6 +10,7 @@
 #include "application/setups/editor/property_editor/widgets/pathed_asset_widget.h"
 #include "application/setups/editor/property_editor/widgets/flavour_widget.h"
 #include "application/setups/editor/property_editor/widgets/unpathed_asset_widget.h"
+#include "application/setups/editor/property_editor/widgets/asset_sane_default_provider.h"
 #include "application/setups/editor/property_editor/update_size_if_tex_changed.h"
 
 #include "application/setups/editor/property_editor/special_widgets.h"

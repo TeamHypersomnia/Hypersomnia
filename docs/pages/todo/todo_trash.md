@@ -637,3 +637,7 @@ Memory is somewhat safe because it can only grow as far as the children grow.
 		- pain in the ass when calculating rendering rect
 			- perf might take a hit even
 		- let's just have a button under sprite and later polygon invariant to "sync" with physics
+
+
+					- ~~this and the shoot animation should always be positioned so that the attachment offsets for rifles don't have to be rotated~~
+						- ~~we can trivially make detailed fixture shape around the first animation frame, and we'll be good~~

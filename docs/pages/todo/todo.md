@@ -5,6 +5,14 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- Support for animation import
+	- Not important until deathmatch as we will probably setup testbed animations for both parties, programatically
+	- Combo with text "Import..."
+	- Button inside each animation entry - Reread frames and durations
+	- Deleting and names
+		- Also delete automatically when last frame is removed?
+			- Would make sense if the name itself was not a datum
+
 - Bugfix: sometimes floor is not selectable but it's because it has the same layer as road
 	- some warning perhaps could be in order?
 

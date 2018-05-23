@@ -14,7 +14,7 @@ bool editor_entity_mover::escape() {
 void editor_entity_mover::transform_selection(
 	const input_type in,
 	const std::optional<vec2> rotation_center,
-	const std::optional<transform> one_shot_delta
+	const std::optional<transformr> one_shot_delta
 ) {
 	auto& s = in.setup;
 

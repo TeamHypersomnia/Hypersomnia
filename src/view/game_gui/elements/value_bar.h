@@ -15,7 +15,7 @@ struct value_bar : game_gui_rect_node {
 	
 	struct effect_particle {
 		vec2i relative_pos;
-		assets::necessary_image_id tex;
+		assets::necessary_image_id image_id;
 	};
 
 	border_input border = { 1, 1 };

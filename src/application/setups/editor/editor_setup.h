@@ -99,7 +99,9 @@ class editor_setup : private current_access_cache<editor_setup> {
 	editor_images_gui images_gui = std::string("Images");
 	editor_sounds_gui sounds_gui = std::string("Sounds");
 
-	editor_animations_gui animations_gui = std::string("Animations");
+	editor_plain_animations_gui plain_animations_gui = std::string("Plain animations");
+	editor_torso_animations_gui torso_animations_gui = std::string("Torso animations");
+	editor_legs_animations_gui legs_animations_gui = std::string("Legs animations");
 	// END GEN INTROSPECTOR
 
 	std::optional<editor_popup> ok_only_popup;

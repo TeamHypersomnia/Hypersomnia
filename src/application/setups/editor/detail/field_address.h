@@ -25,7 +25,10 @@ using edited_field_type_id = type_in_list_id<
 		only_pick_these_items_vector,
 		specific_hostile_entities_vector,
 		friction_connection_vector,
-		plain_animation_frames_type
+
+		plain_animation_frames_type,
+		torso_animation_frames_type,
+		legs_animation_frames_type
 	>
 >;
 

@@ -173,7 +173,7 @@ namespace augs {
 		void draw(
 			const augs::drawer output,
 			const atlas_entry texture,
-			const transform target_transform
+			const transformr target_transform
 		) const {
 			vertex_triangle new_tri;
 
@@ -201,7 +201,7 @@ namespace augs {
 			}
 		}
 		
-		ltrb get_aabb(const transform transform) const {
+		ltrb get_aabb(const transformr transform) const {
 			auto model_transformed = vertices;
 
 			for (auto& v : model_transformed) {

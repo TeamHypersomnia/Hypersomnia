@@ -21,6 +21,7 @@
 #include "application/setups/editor/detail/find_locations_that_use.h"
 #include "application/setups/editor/detail/checkbox_selection.h"
 #include "application/setups/editor/detail/duplicate_delete_buttons.h"
+#include "application/setups/editor/property_editor/widgets/asset_sane_default_provider.h"
 #include "application/setups/editor/property_editor/compare_all_fields_to.h"
 #include "application/setups/editor/property_editor/special_widgets.h"
 #include "application/setups/editor/property_editor/widgets/pathed_asset_widget.h"
@@ -254,7 +255,7 @@ void editor_unpathed_asset_gui<asset_id_type>::perform(
 				special_widgets(
 					pathed_asset_widget { viewables, project_path, cmd_in }
 				),
-				default_sane_default_provider(),
+				asset_sane_default_provider { viewables },
 				num_cols - 2
 			);
 		}
@@ -329,3 +330,5 @@ void editor_unpathed_asset_gui<asset_id_type>::perform(
 }
 
 template struct editor_unpathed_asset_gui<assets::plain_animation_id>;
+template struct editor_unpathed_asset_gui<assets::torso_animation_id>;
+template struct editor_unpathed_asset_gui<assets::legs_animation_id>;

@@ -33,7 +33,7 @@ void load_test_scene_images(
 	image_definitions_map&
 );
 
-void load_test_scene_animations(plain_animations_pool&);
+void load_test_scene_animations(all_logical_assets&);
 void load_test_scene_physical_materials(physical_materials_pool&);
 void load_test_scene_recoil_players(recoil_players_pool&);
 

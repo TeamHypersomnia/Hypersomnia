@@ -35,7 +35,7 @@ struct basic_convex_partitioned_shape {
 		convex_polys.push_back(new_poly);
 	}
 
-	void offset_vertices(const transform transform) {
+	void offset_vertices(const transformr transform) {
 		for (auto& c : convex_polys) {
 			for (auto& v : c) {
 				v.rotate(transform.rotation, vec2(0, 0));

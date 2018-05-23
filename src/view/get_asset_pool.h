@@ -14,6 +14,12 @@ decltype(auto) get_logicals_pool(T&& t) {
 	else if constexpr(std::is_same_v<I, assets::plain_animation_id>) {
 		return (t.plain_animations);
 	}
+	else if constexpr(std::is_same_v<I, assets::torso_animation_id>) {
+		return (t.torso_animations);
+	}
+	else if constexpr(std::is_same_v<I, assets::legs_animation_id>) {
+		return (t.legs_animations);
+	}
 	else {
 		return always_false<I>();
 	}

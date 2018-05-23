@@ -9,15 +9,28 @@ enum class test_scene_plain_animation_id {
 	// END GEN INTROSPECTOR
 };
 
-struct plain_animation;
+enum class test_scene_torso_animation_id {
+	// GEN INTROSPECTOR enum class test_scene_torso_animation_id
+	METROPOLIS_CHARACTER_BARE,
+	COUNT
+	// END GEN INTROSPECTOR
+};
 
-void create_frames(
-	plain_animation& output,
-	const test_scene_image_id first_frame,
-	const test_scene_image_id last_frame,
-	const float frame_duration_ms
-);
+enum class test_scene_legs_animation_id {
+	// GEN INTROSPECTOR enum class test_scene_legs_animation_id
+	SILVER_TROUSERS,
+	COUNT
+	// END GEN INTROSPECTOR
+};
 
-inline auto to_plain_animation_id(const test_scene_plain_animation_id id) {
+inline auto to_animation_id(const test_scene_plain_animation_id id) {
 	return to_pool_id<assets::plain_animation_id>(id);
+}
+
+inline auto to_animation_id(const test_scene_torso_animation_id id) {
+	return to_pool_id<assets::torso_animation_id>(id);
+}
+
+inline auto to_animation_id(const test_scene_legs_animation_id id) {
+	return to_pool_id<assets::legs_animation_id>(id);
 }

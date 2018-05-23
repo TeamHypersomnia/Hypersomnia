@@ -7,6 +7,22 @@ summary: That which we are brainstorming at the moment.
 
 - rethink our roadmap
 
+- Rethinking attachment offsets
+	- Don't use a matrix. It will introduce shitload of redundancy
+	- Solution:
+		- In item invariant, store the holding offset (from center)
+			- Maybe also the back holding offset, for backpacks
+		- Each torso animation specifies hand positions
+			- Maybe also the back positions, for carrying backpacks
+		- Do the math
+		- Make it very specific, not per slot type
+	- Contextual positioning - still useful?
+		- Probably not if we have good previews in animation
+	- We will need reinference when modifying animation state,
+		- as we will probably read the offsets from the relevant torso invariants
+			- for now, we'll always just take the first frame and be done with it.
+			- we'll also reinfer upon switching the armour
+
 - Animation architecture
 	- Animation asset
 		- Several distinct types of animations
@@ -19,13 +35,25 @@ summary: That which we are brainstorming at the moment.
 				- Plain animation
 					- Just list of frames w/durations
 					- Suitable for decorations or for particles
-				- Movement animation
+				- Animation for the gun being shot
+					- Can actually be a plain animation, can't it?
+					- The sprite chosen for the gun will be the gun in its idle state
+					- Later maybe an animation for being idle?
+						- Gun would hold both ids
+						- Rendering routine could just see if these ids are set
+				- General: Torso animation
 					- Will only have base speed ms, as game will determine pacing for each frame
 					- Frame state: 
 						- torso metrics
 							- vec2i hand position[2]
 							- positions of these could be even indicated in the previewed image
-				- Legs animation
+				- Shooting torso animation
+					- Can have duration per frame, no problem
+					- Frame state: 
+						- torso metrics
+							- vec2i hand position[2]
+							- positions of these could be even indicated in the previewed image
+				- Moving legs animation
 					- Will only have base speed ms, as game will determine pacing for each frame
 					- Frame state
 						- We won't implement these just yet. Won't matter until after deathmatch stage
@@ -55,11 +83,31 @@ summary: That which we are brainstorming at the moment.
 					- Later, we might introduce mutable states for these animations as well, and they will act like flavours
 						- Though it will be discouraged for the sake of statelessness
 	- In solvable
-		- Sentience invariant
-			- Contains basic torso set and basic legs set
-				- This will also be true of the MMO setup
-			- Later the animations will depend on what we are wearing in the armour slot
-		- Movement component shall expose "movement amount" from whose the frame number will be calculated statelessly
+		- Each torso specifies a set of animations that it uses
+			- Torso invariant
+				- forward legs animation id
+				- strafing legs animation id (later)
+				- walk animation id
+				- punch animation id (later)
+				- rifle carry animation id
+					- No problem with hand offset being rotated a little.
+				- rifle shoot animation id
+				- pistol carry animation id
+				- pistol shoot animation id
+				- akimbo carry animation id
+					- Will be same both for pistols and rifles
+				- akimbo shoot - only a half
+					- after shot animation is complete, we should return to akimbo carry animation with 0 offset
+				- how many animation types do we actually need?
+					- handed_movement_animation
+					- simplicity: limbed_animation
+						- let's just always say that the first frame will contain the reference duration
+			- Character flavour will have its own torso invariant, which would denote the basic armour - when nothing else is worn
+				- The animations shall depend on the torso invariant of the item in the armour slot
+			- draw_entity finds the relevant armour invariant
+		- Movement component shall expose "movement amount" from whose the torso frame number will be calculated statelessly
+	- Interaction with item attachment offsets
+		- item invariant should specify hand offset, which will determine relative positioning to the hand
 
 - Particles and flavours
 	- std::unordered_map<particle_flavour_id, vector of particles>
@@ -116,9 +164,6 @@ summary: That which we are brainstorming at the moment.
 		- should we reinfer when tweaking?
 	- the physics world cache will simply take into consideration if the hand fuse was released, when calculating shape
 		- so hand fuse component might want to become a synchronizable
-
-- Contextual moving of entities: attachment offsets
-	- Will actually be useful yet before the deathmatch
 
 - game mode property is a part of game mode definition
 - game mode definition = all game mode properties

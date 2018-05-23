@@ -118,7 +118,7 @@ namespace augs {
 
 		self rect(
 			const atlas_entry,
-			const transform center,
+			const transformr center,
 			const vec2 size,
 			const rgba color = white
 		) const;

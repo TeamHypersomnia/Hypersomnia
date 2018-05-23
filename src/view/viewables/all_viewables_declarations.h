@@ -15,10 +15,9 @@ struct particle_effect;
 
 struct sound_definition;
 
-using particle_effects_map = particle_effect_id_pool<particle_effect>;
-
-using image_definitions_map = image_id_pool<image_definition>;
-using sound_definitions_map = sound_id_pool<sound_definition>;
+using image_definitions_map = make_asset_pool<image_definition, assets::image_id_key>;
+using sound_definitions_map = make_asset_pool<sound_definition, assets::sound_id_key>;
+using particle_effects_map = make_asset_pool<particle_effect, assets::particle_effect_id_key>;
 
 class images_in_atlas_map;
 struct image_definition_view;

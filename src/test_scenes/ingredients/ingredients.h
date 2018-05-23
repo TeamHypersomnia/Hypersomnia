@@ -32,12 +32,12 @@ void add_shape_invariant_from_renderable(
 	static_assert(E::template has<invariants::shape_polygon>());
 
 	if (const auto sprite = into.template find<invariants::sprite>()) {
-		const auto image_size = caches.at(sprite->tex).get_size();
+		const auto image_size = caches.at(sprite->image_id).get_size();
 		vec2 scale = sprite->get_size() / image_size;
 
 		invariants::shape_polygon shape_polygon_def;
 
-		shape_polygon_def.shape = caches.at(sprite->tex).make_box();
+		shape_polygon_def.shape = caches.at(sprite->image_id).make_box();
 		shape_polygon_def.shape.scale(scale);
 
 		into.template set(shape_polygon_def);

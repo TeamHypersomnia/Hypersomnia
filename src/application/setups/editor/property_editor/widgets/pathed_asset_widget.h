@@ -10,22 +10,6 @@
 #include "application/setups/editor/property_editor/tweaker_type.h"
 #include "application/setups/editor/property_editor/widgets/asset_path_chooser.h"
 
-struct asset_sane_default_provider {
-	all_viewables_defs& defs;
-
-	template <class T>
-	auto construct() const {
-		if constexpr(std::is_same_v<T, invariants::sprite>) {
-			auto& definitions = defs.image_definitions;
-			invariants::sprite t;
-			t.tex = definitions.get_nth_id(0);
-			return t;
-		}
-
-		return T();
-	}
-};
-
 struct pathed_asset_widget {
 	all_viewables_defs& defs;
 	const augs::path_type& project_path;
