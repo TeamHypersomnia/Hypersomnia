@@ -161,13 +161,12 @@ void editor_unpathed_asset_gui<asset_id_type>::perform(
 		duplicate_delete_buttons<
 			duplicate_asset_command<asset_id_type>,
 			forget_asset_id_command<asset_id_type>
-		> (
-			cmd_in,
-			asset_entry.id,
-			settings,
-			"",
-			!asset_entry.used()
-		);
+		> (cmd_in, id, settings, "", !asset_entry.used());
+
+		if (nullptr == mapped_or_nullptr(definitions, id)) {
+			/* It has just been deleted. */
+			return;
+		}
 
 		const auto node = scoped_tree_node_ex(displayed_name + "###Node", flags);
 

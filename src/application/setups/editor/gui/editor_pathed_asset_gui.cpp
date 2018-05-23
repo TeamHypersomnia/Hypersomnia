@@ -313,6 +313,11 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 				ImGui::SameLine();
 			}
 
+			if (nullptr == mapped_or_nullptr(definitions, id)) {
+				/* It has just been forgotten. */
+				return;
+			}
+
 			const auto node = scoped_tree_node_ex(displayed_name + "###Node", flags);
 
 			next_columns(2);
