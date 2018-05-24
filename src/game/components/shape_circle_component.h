@@ -1,6 +1,5 @@
 #pragma once
-#include "augs/misc/enum/enum_array.h"
-
+#include "augs/math/declare_math.h"
 #include "game/container_sizes.h"
 
 namespace invariants {

@@ -79,7 +79,13 @@ namespace prefabs {
 
 	entity_handle create_sample_backpack(const logic_step, vec2 pos);
 	
-	entity_handle create_sample_complete_character(
+	entity_handle create_metropolis_soldier(
+		const logic_step,
+		const components::transform pos, 
+		const std::string name = "character_unnamed"
+	);
+
+	entity_handle create_resistance_soldier(
 		const logic_step,
 		const components::transform pos, 
 		const std::string name = "character_unnamed"

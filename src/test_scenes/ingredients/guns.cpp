@@ -29,7 +29,7 @@ namespace test_flavours {
 	void populate_gun_flavours(const loaded_image_caches_map& caches, all_entity_flavours& flavours) {
 		/* Types for bullets etc. */
 
-		auto make_default_gun_container = [](auto& meta, const float /* mag_rotation */ = -90.f, const bool magazine_hidden = false){
+		auto make_default_gun_container = [](auto& meta, const item_holding_stance stance, const float /* mag_rotation */ = -90.f, const bool magazine_hidden = false){
 			invariants::container container; 
 
 			{
@@ -74,6 +74,7 @@ namespace test_flavours {
 
 			invariants::item item;
 			item.space_occupied_per_charge = to_space_units("3.5");
+			item.holding_stance = stance;
 			meta.set(item);
 		};
 	
@@ -356,7 +357,7 @@ namespace test_flavours {
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::ASSAULT_RIFLE, white);
 			add_shape_invariant_from_renderable(meta, caches);
 			test_flavours::add_see_through_dynamic_body(meta);
-			make_default_gun_container(meta);
+			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE);
 		}
 
 		{
@@ -399,7 +400,7 @@ namespace test_flavours {
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::KEK9, white);
 			add_shape_invariant_from_renderable(meta, caches);
 			test_flavours::add_see_through_dynamic_body(meta);
-			make_default_gun_container(meta, 0.f, true);
+			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 0.f, true);
 		}
 
 		{
@@ -434,6 +435,7 @@ namespace test_flavours {
 
 			invariants::item item;
 			item.space_occupied_per_charge = to_space_units("3.0");
+			item.holding_stance = item_holding_stance::PISTOL_LIKE;
 			meta.set(item);
 		}
 	}

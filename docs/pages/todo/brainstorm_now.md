@@ -22,6 +22,8 @@ summary: That which we are brainstorming at the moment.
 		- as we will probably read the offsets from the relevant torso invariants
 			- for now, we'll always just take the first frame and be done with it.
 			- we'll also reinfer upon switching the armour
+	- Drawing problems
+		- 
 
 - Animation architecture
 	- Animation asset

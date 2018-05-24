@@ -127,7 +127,12 @@ namespace augs {
 			if constexpr(is_container_v<Serialized>) {
 				using Container = Serialized;
 			
-				ensure(into.empty());
+				if constexpr(can_clear_v<Container>) {
+					into.clear();
+				}
+				else {
+					into = {};
+				}
 
 				/*
 					If container is associative and the keys are representable as lua values,
@@ -155,6 +160,16 @@ namespace augs {
 						read_lua(key_value_pair.second, mapped);
 
 						into.emplace(std::move(key), std::move(mapped));
+					}
+				}
+				else if constexpr(is_enum_array_v<Container>) {
+					augs::for_each_enum_except_bounds([&](typename Container::enum_type e) {
+						read_lua(input_table[augs::enum_to_string(e)], into[e]);
+					});
+				}
+				else if constexpr(is_std_array_v<Container>) {
+					for (std::size_t i = 0; i < into.size(); ++i) {
+						read_lua(input_table[static_cast<int>(i + 1)], into[i]);
 					}
 				}
 				else {
@@ -360,6 +375,16 @@ namespace augs {
 			if constexpr(is_associative_v<Container> && key_representable_as_lua_value_v<Container>) {
 				for (const auto& element : from) {
 					write_table_or_field(output_table, element.second, general_to_lua_value(element.first));
+				}
+			}
+			else if constexpr(is_enum_array_v<Container>) {
+				augs::for_each_enum_except_bounds([&](typename Container::enum_type e) {
+					write_table_or_field(output_table, from[e], general_to_lua_value(e));
+				});
+			}
+			else if constexpr(is_std_array_v<Container>) {
+				for (std::size_t i = 0; i < from.size(); ++i) {
+					write_table_or_field(output_table, from[i], static_cast<int>(i + 1));
 				}
 			}
 			else {

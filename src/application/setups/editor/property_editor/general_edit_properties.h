@@ -202,14 +202,40 @@ void detail_general_edit_properties(
 
 				detail_general_edit_properties<Behaviour, pass_notifier_through>(input, equality_predicate, notify_change_of, label, altered.value, false);
 			}
-			else if constexpr(is_std_array_v<T>) {
-				// TODO
+			else if constexpr(is_std_array_v<T> || is_enum_array_v<T>) {
+				auto further = [&]() {
+					for (unsigned i = 0; i < static_cast<unsigned>(altered.size()); ++i) {
+						std::string element_label;
+
+						if constexpr(is_enum_array_v<T>) {
+							element_label = format_enum(static_cast<typename T::enum_type>(i));
+						}
+						else {
+							element_label = std::to_string(i);
+						}
+
+						detail_general_edit_properties<Behaviour, pass_notifier_through>(input, equality_predicate, notify_change_of, element_label, altered[i]);
+					}
+				};
+
+				if (nodify_introspected) {
+					if (auto node = node_and_columns(formatted_label, input.extra_columns)) {
+						further();
+					}
+				}
+				else {
+					auto ind = augs::imgui::scoped_indent();
+					further();
+				}
 			}
 			else if constexpr(is_container_v<T>) {
+				constexpr bool expandable = !has_constexpr_size_v<T>;
+				constexpr bool has_size_limit = has_constexpr_max_size_v<T>;
+
 				if constexpr(can_access_data_v<T>) {
 					auto displayed_container_label = formatted_label;
 
-					if constexpr(has_constexpr_capacity_v<T>) {
+					if constexpr(expandable && has_size_limit) {
 						displayed_container_label = typesafe_sprintf(
 							"%x (%x/%x)###%x", 
 							formatted_label, 
@@ -221,38 +247,43 @@ void detail_general_edit_properties(
 
 					if (auto node = node_and_columns(displayed_container_label, input.extra_columns)) {
 						for (unsigned i = 0; i < static_cast<unsigned>(altered.size()); ++i) {
-							{
-								auto colors = maybe_disabled_cols(input.settings, altered.size() >= altered.max_size());
-								const auto button_label = typesafe_sprintf("D##%x", i);
+							if constexpr(expandable) {
+								{
+									auto colors = maybe_disabled_cols(input.settings, altered.size() >= altered.max_size());
+									const auto button_label = typesafe_sprintf("D##%x", i);
 
-								if (ImGui::Button(button_label.c_str())) {
-									auto duplicated = altered[i];
-									altered.insert(altered.begin() + i + 1, std::move(duplicated));
-									notify_change_of(formatted_label, tweaker_type::DISCRETE, altered);
-									break;
+									if (ImGui::Button(button_label.c_str())) {
+										auto duplicated = altered[i];
+										altered.insert(altered.begin() + i + 1, std::move(duplicated));
+										notify_change_of(formatted_label, tweaker_type::DISCRETE, altered);
+										break;
+									}
+
+									ImGui::SameLine();
+
 								}
 
-								ImGui::SameLine();
-							}
+								{
+									const auto button_label = typesafe_sprintf("-##%x", i);
 
-							{
-								const auto button_label = typesafe_sprintf("-##%x", i);
-
-								if (ImGui::Button(button_label.c_str())) {
-									altered.erase(altered.begin() + i);
-									notify_change_of(formatted_label, tweaker_type::DISCRETE, altered);
-									break;
+									if (ImGui::Button(button_label.c_str())) {
+										altered.erase(altered.begin() + i);
+										notify_change_of(formatted_label, tweaker_type::DISCRETE, altered);
+										break;
+									}
 								}
 							}
 
 							ImGui::SameLine();
+
+							const auto element_label = std::to_string(i);
 
 							if constexpr(pass_notifier_through) {
 								detail_general_edit_properties<Behaviour, true>(
 									input, 
 									equality_predicate,
 									notify_change_of,
-									typesafe_sprintf("%x", i), 
+									element_label,
 									altered[i]
 								);
 							}
@@ -261,19 +292,21 @@ void detail_general_edit_properties(
 									input, 
 									[&equality_predicate, i, &altered] (auto&&...) { return equality_predicate(altered, i); },
 									[&notify_change_of, i, &altered] (const auto& l, const tweaker_type t, auto&) { notify_change_of(l, t, altered, i); },
-									typesafe_sprintf("%x", i), 
+									element_label,
 									altered[i]
 								);
 							}
 						}
 
-						if (altered.size() < altered.max_size()) {
-							if (ImGui::Button("+")) {
-								altered.emplace_back(input.sane_defaults.template construct<typename T::value_type>());
-								notify_change_of(formatted_label, tweaker_type::DISCRETE, altered);
-							}
+						if constexpr (expandable) {
+							if (altered.size() < altered.max_size()) {
+								if (ImGui::Button("+")) {
+									altered.emplace_back(input.sane_defaults.template construct<typename T::value_type>());
+									notify_change_of(formatted_label, tweaker_type::DISCRETE, altered);
+								}
 
-							augs::imgui::next_columns(input.extra_columns + 2);
+								augs::imgui::next_columns(input.extra_columns + 2);
+							}
 						}
 					}
 				}

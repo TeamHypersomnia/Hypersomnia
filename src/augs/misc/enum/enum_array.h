@@ -6,12 +6,17 @@ namespace augs {
 	class enum_array : public std::array<T, static_cast<size_t>(_enum::COUNT)> {
 		using base = std::array<T, static_cast<size_t>(_enum::COUNT)>;
 	public:
-		using introspect_base = base;
+		using enum_type = _enum;
+		using typename base::value_type;
 
 		using base::max_size;
 		using base::base;
 		using base::operator[];
 		using base::at;
+		using base::data;
+		using base::begin;
+		using base::end;
+		using base::size;
 
 		decltype(auto) at(const _enum e) {
 			return base::at(static_cast<size_t>(e));

@@ -3,7 +3,6 @@
 #include <array>
 
 #include "augs/ensure.h"
-#include "augs/misc/enum/enum_array.h"
 
 #include "augs/gui/rect.h"
 #include "augs/gui/rect_world.h"

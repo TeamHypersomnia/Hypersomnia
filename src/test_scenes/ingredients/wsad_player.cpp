@@ -25,7 +25,7 @@
 namespace test_flavours {
 	void populate_character_flavours(const loaded_image_caches_map& logicals, all_entity_flavours& flavours) {
 		{
-			auto& meta = get_test_flavour(flavours, test_controlled_characters::PLAYER);
+			auto& meta = get_test_flavour(flavours, test_controlled_characters::METROPOLIS_SOLDIER);
 
 			meta.get<invariants::text_details>().description = "Member of Atlantic nations.";
 
@@ -42,16 +42,17 @@ namespace test_flavours {
 				torso_def.forward_legs = to_animation_id(test_scene_legs_animation_id::SILVER_TROUSERS);
 				torso_def.strafe_legs = to_animation_id(test_scene_legs_animation_id::SILVER_TROUSERS_STRAFE);
 
-				torso_def.bare_walk = to_animation_id(test_scene_torso_animation_id::METROPOLIS_CHARACTER_BARE);
+				torso_def.stances[item_holding_stance::BARE_LIKE].carry = to_animation_id(test_scene_torso_animation_id::METROPOLIS_CHARACTER_BARE);
+				torso_def.stances[item_holding_stance::BARE_LIKE].shoot = to_animation_id(test_scene_torso_animation_id::METROPOLIS_CHARACTER_BARE);
 
-				torso_def.rifle_carry = to_animation_id(test_scene_torso_animation_id::METROPOLIS_CHARACTER_BARE);
-				torso_def.rifle_shoot = to_animation_id(test_scene_torso_animation_id::METROPOLIS_CHARACTER_BARE);
+				torso_def.stances[item_holding_stance::RIFLE_LIKE].carry = to_animation_id(test_scene_torso_animation_id::METROPOLIS_CHARACTER_BARE);
+				torso_def.stances[item_holding_stance::RIFLE_LIKE].shoot = to_animation_id(test_scene_torso_animation_id::METROPOLIS_CHARACTER_BARE);
 
-				torso_def.pistol_carry = to_animation_id(test_scene_torso_animation_id::METROPOLIS_CHARACTER_BARE);
-				torso_def.pistol_shoot = to_animation_id(test_scene_torso_animation_id::METROPOLIS_CHARACTER_BARE);
+				torso_def.stances[item_holding_stance::PISTOL_LIKE].carry = to_animation_id(test_scene_torso_animation_id::METROPOLIS_CHARACTER_BARE);
+				torso_def.stances[item_holding_stance::PISTOL_LIKE].shoot = to_animation_id(test_scene_torso_animation_id::METROPOLIS_CHARACTER_BARE);
 
-				torso_def.akimbo_carry = to_animation_id(test_scene_torso_animation_id::METROPOLIS_CHARACTER_BARE);
-				torso_def.akimbo_shoot = to_animation_id(test_scene_torso_animation_id::METROPOLIS_CHARACTER_BARE);
+				torso_def.akimbo.carry = to_animation_id(test_scene_torso_animation_id::METROPOLIS_CHARACTER_BARE);
+				torso_def.akimbo.shoot = to_animation_id(test_scene_torso_animation_id::METROPOLIS_CHARACTER_BARE);
 
 				meta.set(torso_def);
 			}
@@ -170,16 +171,61 @@ namespace test_flavours {
 				meta.set(transfers);
 			}
 		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_controlled_characters::RESISTANCE_SOLDIER);
+			meta = get_test_flavour(flavours, test_controlled_characters::METROPOLIS_SOLDIER);
+			meta.get<invariants::text_details>().name = format_enum(test_controlled_characters::RESISTANCE_SOLDIER);
+
+			{
+				invariants::torso torso_def;
+
+				torso_def.forward_legs = to_animation_id(test_scene_legs_animation_id::SILVER_TROUSERS);
+				torso_def.strafe_legs = to_animation_id(test_scene_legs_animation_id::SILVER_TROUSERS_STRAFE);
+
+				torso_def.stances[item_holding_stance::BARE_LIKE].carry = to_animation_id(test_scene_torso_animation_id::RESISTANCE_CHARACTER_BARE);
+				torso_def.stances[item_holding_stance::BARE_LIKE].shoot = to_animation_id(test_scene_torso_animation_id::RESISTANCE_CHARACTER_BARE);
+
+				torso_def.stances[item_holding_stance::RIFLE_LIKE].carry = to_animation_id(test_scene_torso_animation_id::RESISTANCE_CHARACTER_BARE);
+				torso_def.stances[item_holding_stance::RIFLE_LIKE].shoot = to_animation_id(test_scene_torso_animation_id::RESISTANCE_CHARACTER_BARE);
+
+				torso_def.stances[item_holding_stance::PISTOL_LIKE].carry = to_animation_id(test_scene_torso_animation_id::RESISTANCE_CHARACTER_BARE);
+				torso_def.stances[item_holding_stance::PISTOL_LIKE].shoot = to_animation_id(test_scene_torso_animation_id::RESISTANCE_CHARACTER_BARE);
+
+				torso_def.akimbo.carry = to_animation_id(test_scene_torso_animation_id::RESISTANCE_CHARACTER_BARE);
+				torso_def.akimbo.shoot = to_animation_id(test_scene_torso_animation_id::RESISTANCE_CHARACTER_BARE);
+
+				meta.set(torso_def);
+			}
+
+			{
+				components::attitude attitude;
+
+				attitude.parties = party_category::RESISTANCE_CITIZEN;
+				attitude.hostile_parties = party_category::METROPOLIS_CITIZEN;
+
+				meta.set(attitude);
+			}
+		}
 	}
 }
 
 namespace prefabs {
-	entity_handle create_sample_complete_character(
+	entity_handle create_metropolis_soldier(
 		const logic_step step, 
 		const components::transform spawn_transform, 
 		const std::string /* name */
 	) {
 		auto& world = step.get_cosmos();
-		return create_test_scene_entity(world, test_controlled_characters::PLAYER, spawn_transform);
+		return create_test_scene_entity(world, test_controlled_characters::METROPOLIS_SOLDIER, spawn_transform);
+	}
+
+	entity_handle create_resistance_soldier(
+		const logic_step step, 
+		const components::transform spawn_transform, 
+		const std::string /* name */
+	) {
+		auto& world = step.get_cosmos();
+		return create_test_scene_entity(world, test_controlled_characters::RESISTANCE_SOLDIER, spawn_transform);
 	}
 }

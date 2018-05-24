@@ -38,7 +38,8 @@ enum class test_sprite_decorations {
 
 enum class test_controlled_characters {
 	// GEN INTROSPECTOR enum class test_controlled_characters
-	PLAYER,
+	METROPOLIS_SOLDIER,
+	RESISTANCE_SOLDIER,
 
 	COUNT
 	// END GEN INTROSPECTOR

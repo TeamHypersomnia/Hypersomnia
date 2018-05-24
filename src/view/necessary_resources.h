@@ -5,6 +5,7 @@
 #include "augs/graphics/texture.h"
 #include "augs/graphics/shader.h"
 #include "augs/math/vec2.h"
+#include "augs/misc/enum/enum_array.h"
 #include "augs/audio/sound_buffer.h"
 
 #include "augs/misc/enum/enum_map.h"

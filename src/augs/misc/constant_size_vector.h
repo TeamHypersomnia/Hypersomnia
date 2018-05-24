@@ -238,12 +238,12 @@ namespace augs {
 			return const_count;
 		}
 
-		bool empty() const {
-			return size() == 0;
-		}
-
 		static constexpr std::size_t capacity() {
 			return const_count;
+		}
+
+		bool empty() const {
+			return size() == 0;
 		}
 
 		void reserve(const std::size_t s) {

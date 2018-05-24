@@ -108,7 +108,7 @@ namespace test_scenes {
 		for (int i = 0; i < num_characters; ++i) {
 			auto transform = character_transforms[i];
 
-			const auto new_character = prefabs::create_sample_complete_character(step, transform, typesafe_sprintf("player%x", i));
+			const auto new_character = (i % 2 == 0 ? prefabs::create_metropolis_soldier : prefabs::create_resistance_soldier)(step, transform, typesafe_sprintf("player%x", i));
 
 			new_characters[i] = new_character;
 
@@ -129,9 +129,6 @@ namespace test_scenes {
 
 				sentience.get<personal_electricity_meter_instance>().set_value(10000);
 				sentience.get<personal_electricity_meter_instance>().set_maximum_value(10000);
-
-				new_character.get<components::attitude>().parties = party_category::RESISTANCE_CITIZEN;
-				new_character.get<components::attitude>().hostile_parties = party_category::METROPOLIS_CITIZEN;
 
 				const auto rifle = prefabs::create_sample_rifle(
 					step, vec2(100, -500), prefabs::create_sample_magazine(step, vec2(100, -650), prefabs::create_cyan_charge(step, vec2(0, 0)), 3000)

@@ -17,6 +17,7 @@
 #include "game/detail/inventory/item_slot_transfer_request_declaration.h"
 
 #include "game/enums/item_category.h"
+#include "game/enums/item_holding_stance.h"
 
 #include "game/detail/view_input/sound_effect_input.h"
 
@@ -121,6 +122,8 @@ namespace invariants {
 		// GEN INTROSPECTOR struct invariants::item
 		bool stackable = false;
 		pad_bytes<3> pad;
+
+		item_holding_stance holding_stance = item_holding_stance::PISTOL_LIKE;
 
 		unsigned space_occupied_per_charge = 1;
 

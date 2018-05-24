@@ -32,15 +32,6 @@
 
 /* Define several other traits which will validate properties of some other types. */
 
-template <class T, class = void>
-struct has_constexpr_size : std::false_type {};
-
-template <class T>
-struct has_constexpr_size<T, decltype(constexpr_tester<T().size()>(), void())> : std::true_type {};
-
-template <class T>
-constexpr bool has_constexpr_size_v = has_constexpr_size<T>::value;
-
 namespace templates_detail {
 	template <class T>
 	struct identity {
@@ -228,15 +219,21 @@ struct tests_of_traits {
 
 	static_assert(!has_constexpr_size_v<std::vector<int>>, "Trait has failed");
 	static_assert(has_constexpr_size_v<std::array<int, 3>>, "Trait has failed");
+	static_assert(has_constexpr_max_size_v<augs::enum_array<int, item_holding_stance>>, "Trait has failed");
+	static_assert(has_constexpr_max_size_v<std::array<int, 3>>, "Trait has failed");
+	static_assert(has_constexpr_max_size_v<augs::constant_size_vector<int, 20>>, "Trait has failed");
 	static_assert(has_constexpr_size_v<std::array<vec2, 3>>, "Trait has failed");
 	static_assert(has_constexpr_size_v<decltype(pad_bytes<3>::pad)>, "Trait has failed");
 
-	static_assert(has_constexpr_capacity_v<augs::constant_size_vector<int, 20>>, "Trait has failed");
-	static_assert(!has_constexpr_capacity_v<std::vector<int>>, "Trait has failed");
+	static_assert(!has_constexpr_max_size_v<std::vector<int>>, "Trait has failed");
 
-	static_assert(!is_container_v<decltype(pad_bytes<3>::pad)>, "Trait has failed");
+	static_assert(is_std_array_v<decltype(pad_bytes<3>::pad)>, "Trait has failed");
 	static_assert(is_container_v<augs::enum_map<game_intent_type, vec2>>, "Trait has failed");
-	static_assert(!is_container_v<augs::enum_array<basic_transform<float>, colliders_offset_type>>, "Trait has failed");
+	static_assert(is_container_v<augs::enum_array<basic_transform<float>, colliders_offset_type>>, "Trait has failed");
+	static_assert(is_container_v<augs::enum_array<basic_transform<float>, colliders_offset_type>>, "Trait has failed");
+	static_assert(!is_container_v<int>, "Trait has failed");
+	static_assert(is_container_v<std::string>, "Trait has failed");
+	static_assert(is_enum_array_v<augs::enum_array<std::string, item_holding_stance>>, "Trait has failed");
 
 	static_assert(is_container_v<augs::constant_size_vector<vec2, 20>>, "Trait has failed");
 	static_assert(augs::is_byte_readwrite_appropriate_v<augs::memory_stream, augs::constant_size_vector<vec2, 20>>, "Trait has failed");

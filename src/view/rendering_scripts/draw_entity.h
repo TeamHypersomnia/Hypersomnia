@@ -43,7 +43,8 @@ FORCE_INLINE void specific_entity_drawer(
 
 	if (const auto maybe_torso = typed_handle.template find<invariants::torso>()) {
 		if (const auto maybe_movement = typed_handle.template find<components::movement>()) {
-			const auto& logicals = typed_handle.get_cosmos().get_logical_assets();
+			const auto& cosm = typed_handle.get_cosmos();
+			const auto& logicals = cosm.get_logical_assets();
 
 			const auto vel = typed_handle.get_effective_velocity();
 			const auto speed = vel.length();
@@ -104,8 +105,24 @@ FORCE_INLINE void specific_entity_drawer(
 				);
 			}
 
+			const auto& chosen_stance = [&]() -> const stance_animations& {
+				const auto wielded = typed_handle.get_wielded_items();
+				const auto n = wielded.size();
+
+				if (n == 0) {
+					return maybe_torso->stances[item_holding_stance::BARE_LIKE];
+				}
+
+				if (n == 2) {
+					return maybe_torso->akimbo;
+				}
+
+				const auto w = cosm[wielded[0]];
+				return maybe_torso->stances[w.template get<invariants::item>().holding_stance];
+			}();
+
 			do_animation(
-				mapped_or_nullptr(logicals.torso_animations, maybe_torso->bare_walk),
+				mapped_or_nullptr(logicals.torso_animations, chosen_stance.carry),
 				[](const unsigned index, const unsigned n) {
 					return augs::ping_pong_4_flip_inverse(index, n);
 				},

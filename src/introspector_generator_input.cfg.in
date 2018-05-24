@@ -55,7 +55,6 @@ enum-to-args-body-format:
 generated-file-format:
 #pragma once
 #include <tuple>
-#include <array>
 #include <string>
 
 #include "augs/drawing/flip.h"
@@ -102,17 +101,6 @@ struct ImVec4;
 		struct types_in;
 
 		/* Hand-written introspectors that do not fit into the standard schema begin here */
-
-		template <class F, class ElemType, size_t count, class... Instances>
-		static void introspect_body(
-			const std::array<ElemType, count>* const,
-			F f,
-			Instances&... t
-		) {
-			for (size_t i = 0; i < count; ++i) {
-				f(std::to_string(i), t[i]...);
-			}
-		}
 
 		template <class F, class First, class Second, class... Instances>
 		static void introspect_body(

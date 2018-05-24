@@ -30,7 +30,7 @@ namespace augs {
 		using pool_indirector_type = pool_indirector<size_type>;
 
 		using object_pool_type = make_container_type<mapped_type>;
-		static constexpr bool constexpr_capacity = has_constexpr_capacity_v<object_pool_type>;
+		static constexpr bool constexpr_max_size = has_constexpr_max_size_v<object_pool_type>;
 
 		make_container_type<pool_slot_type> slots;
 		object_pool_type objects;
@@ -64,9 +64,9 @@ namespace augs {
 
 	public:
 		pool(const size_type slot_count = 0u) {
-			if constexpr(constexpr_capacity) {
+			if constexpr(constexpr_max_size) {
 				(void)slot_count;
-				reserve(objects.capacity());
+				reserve(objects.max_size());
 			}
 			else {
 				reserve(slot_count);
@@ -111,7 +111,7 @@ namespace augs {
 		>
 		allocation_result allocate(Args&&... args) {
 			if (full_capacity()) {
-				if constexpr(constexpr_capacity) {
+				if constexpr(constexpr_max_size) {
 					throw std::runtime_error("This static pool cannot be further expanded.");
 				}
 				else {

@@ -48,7 +48,7 @@ namespace test_scenes {
 				transform.pos.x += 200;
 			}
 
-			const auto new_character = prefabs::create_sample_complete_character(step, transform, typesafe_sprintf("player%x", i));
+			const auto new_character = prefabs::create_metropolis_soldier(step, transform, typesafe_sprintf("player%x", i));
 
 			new_characters[i] = new_character;
 

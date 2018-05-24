@@ -76,6 +76,24 @@ void load_test_scene_animations(all_logical_assets& logicals) {
 
 			ensure_eq(new_allocation.key, id);
 		} 
+
+		{
+			torso_animation anim;
+
+			create_frames(
+				anim,
+				test_scene_image_id::RESISTANCE_CHARACTER_BARE_1,
+				test_scene_image_id::RESISTANCE_CHARACTER_BARE_5,
+				30.0f
+			);
+
+			const auto test_id = test_id_type::RESISTANCE_CHARACTER_BARE;
+
+			const auto id = to_animation_id(test_id);
+			const auto new_allocation = defs.allocate(std::move(anim));
+
+			ensure_eq(new_allocation.key, id);
+		}
 	}
 
 	{

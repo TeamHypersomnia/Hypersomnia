@@ -12,6 +12,7 @@ enum class test_scene_plain_animation_id {
 enum class test_scene_torso_animation_id {
 	// GEN INTROSPECTOR enum class test_scene_torso_animation_id
 	METROPOLIS_CHARACTER_BARE,
+	RESISTANCE_CHARACTER_BARE,
 	COUNT
 	// END GEN INTROSPECTOR
 };
