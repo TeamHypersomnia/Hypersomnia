@@ -13,6 +13,11 @@ enum class test_scene_torso_animation_id {
 	// GEN INTROSPECTOR enum class test_scene_torso_animation_id
 	METROPOLIS_CHARACTER_BARE,
 	RESISTANCE_CHARACTER_BARE,
+
+	METROPOLIS_CHARACTER_AKIMBO,
+
+	RESISTANCE_CHARACTER_RIFLE,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

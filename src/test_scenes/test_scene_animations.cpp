@@ -33,6 +33,13 @@ void load_test_scene_animations(all_logical_assets& logicals) {
 		auto& defs = get_logicals_pool<id_type>(logicals);
 		defs.reserve(enum_count(test_id_type()));
 
+		auto alloc = [&](auto test_id, auto& anim) {
+			const auto id = to_animation_id(test_id);
+			const auto new_allocation = defs.allocate(std::move(anim));
+
+			ensure_eq(new_allocation.key, id);
+		};
+
 		{
 			plain_animation anim;
 
@@ -43,12 +50,7 @@ void load_test_scene_animations(all_logical_assets& logicals) {
 				50.0f
 			);
 
-			const auto test_id = test_id_type::CAST_BLINK_ANIMATION;
-
-			const auto id = to_animation_id(test_id);
-			const auto new_allocation = defs.allocate(std::move(anim));
-
-			ensure_eq(new_allocation.key, id);
+			alloc(test_id_type::CAST_BLINK_ANIMATION, anim);
 		} 
 	}
 
@@ -58,6 +60,13 @@ void load_test_scene_animations(all_logical_assets& logicals) {
 
 		auto& defs = get_logicals_pool<id_type>(logicals);
 		defs.reserve(enum_count(test_id_type()));
+
+		auto alloc = [&](auto test_id, auto& anim) {
+			const auto id = to_animation_id(test_id);
+			const auto new_allocation = defs.allocate(std::move(anim));
+
+			ensure_eq(new_allocation.key, id);
+		};
 
 		{
 			torso_animation anim;
@@ -69,12 +78,7 @@ void load_test_scene_animations(all_logical_assets& logicals) {
 				30.0f
 			);
 
-			const auto test_id = test_id_type::METROPOLIS_CHARACTER_BARE;
-
-			const auto id = to_animation_id(test_id);
-			const auto new_allocation = defs.allocate(std::move(anim));
-
-			ensure_eq(new_allocation.key, id);
+			alloc(test_id_type::METROPOLIS_CHARACTER_BARE, anim);
 		} 
 
 		{
@@ -87,12 +91,33 @@ void load_test_scene_animations(all_logical_assets& logicals) {
 				30.0f
 			);
 
-			const auto test_id = test_id_type::RESISTANCE_CHARACTER_BARE;
+			alloc(test_id_type::RESISTANCE_CHARACTER_BARE, anim);
+		}
 
-			const auto id = to_animation_id(test_id);
-			const auto new_allocation = defs.allocate(std::move(anim));
+		{
+			torso_animation anim;
 
-			ensure_eq(new_allocation.key, id);
+			create_frames(
+				anim,
+				test_scene_image_id::METROPOLIS_CHARACTER_AKIMBO_1,
+				test_scene_image_id::METROPOLIS_CHARACTER_AKIMBO_5,
+				30.0f
+			);
+
+			alloc(test_id_type::METROPOLIS_CHARACTER_AKIMBO, anim);
+		}
+
+		{
+			torso_animation anim;
+
+			create_frames(
+				anim,
+				test_scene_image_id::RESISTANCE_CHARACTER_RIFLE_1,
+				test_scene_image_id::RESISTANCE_CHARACTER_RIFLE_5,
+				30.0f
+			);
+
+			alloc(test_id_type::RESISTANCE_CHARACTER_RIFLE, anim);
 		}
 	}
 
@@ -102,6 +127,13 @@ void load_test_scene_animations(all_logical_assets& logicals) {
 
 		auto& defs = get_logicals_pool<id_type>(logicals);
 		defs.reserve(enum_count(test_id_type()));
+
+		auto alloc = [&](auto test_id, auto& anim) {
+			const auto id = to_animation_id(test_id);
+			const auto new_allocation = defs.allocate(std::move(anim));
+
+			ensure_eq(new_allocation.key, id);
+		};
 
 		{
 			legs_animation anim;
@@ -120,12 +152,7 @@ void load_test_scene_animations(all_logical_assets& logicals) {
 				30.0f
 			);
 
-			const auto test_id = test_id_type::SILVER_TROUSERS;
-
-			const auto id = to_animation_id(test_id);
-			const auto new_allocation = defs.allocate(std::move(anim));
-
-			ensure_eq(new_allocation.key, id);
+			alloc(test_id_type::SILVER_TROUSERS, anim);
 		} 
 
 		{
@@ -152,12 +179,7 @@ void load_test_scene_animations(all_logical_assets& logicals) {
 				anim.frames.push_back(f);
 			}
 
-			const auto test_id = test_id_type::SILVER_TROUSERS_STRAFE;
-
-			const auto id = to_animation_id(test_id);
-			const auto new_allocation = defs.allocate(std::move(anim));
-
-			ensure_eq(new_allocation.key, id);
+			alloc(test_id_type::SILVER_TROUSERS_STRAFE, anim);
 		} 
 	}
 }

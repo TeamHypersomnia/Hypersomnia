@@ -105,12 +105,14 @@ FORCE_INLINE void specific_entity_drawer(
 				);
 			}
 
+			const auto& bare_stance = maybe_torso->stances[item_holding_stance::BARE_LIKE];
+
 			const auto& chosen_stance = [&]() -> const stance_animations& {
 				const auto wielded = typed_handle.get_wielded_items();
 				const auto n = wielded.size();
 
 				if (n == 0) {
-					return maybe_torso->stances[item_holding_stance::BARE_LIKE];
+					return bare_stance;
 				}
 
 				if (n == 2) {
@@ -121,10 +123,17 @@ FORCE_INLINE void specific_entity_drawer(
 				return maybe_torso->stances[w.template get<invariants::item>().holding_stance];
 			}();
 
+			const bool four_ways = std::addressof(chosen_stance) == std::addressof(bare_stance);
+
 			do_animation(
 				mapped_or_nullptr(logicals.torso_animations, chosen_stance.carry),
-				[](const unsigned index, const unsigned n) {
-					return augs::ping_pong_4_flip_inverse(index, n);
+				[&](const unsigned index, const unsigned n) {
+					if (four_ways) {
+						return augs::ping_pong_4_flip_inverse(index, n);
+					}
+					else {
+						return augs::simple_pair(augs::ping_pong_2_inverse(index, n), false);
+					}
 				},
 				viewing_transform.rotation
 			);

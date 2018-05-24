@@ -45,11 +45,11 @@ namespace test_flavours {
 				torso_def.stances[item_holding_stance::BARE_LIKE].carry = to_animation_id(test_scene_torso_animation_id::METROPOLIS_CHARACTER_BARE);
 				torso_def.stances[item_holding_stance::BARE_LIKE].shoot = to_animation_id(test_scene_torso_animation_id::METROPOLIS_CHARACTER_BARE);
 
-				torso_def.stances[item_holding_stance::RIFLE_LIKE].carry = to_animation_id(test_scene_torso_animation_id::METROPOLIS_CHARACTER_BARE);
-				torso_def.stances[item_holding_stance::RIFLE_LIKE].shoot = to_animation_id(test_scene_torso_animation_id::METROPOLIS_CHARACTER_BARE);
+				torso_def.stances[item_holding_stance::RIFLE_LIKE].carry = to_animation_id(test_scene_torso_animation_id::METROPOLIS_CHARACTER_AKIMBO);
+				torso_def.stances[item_holding_stance::RIFLE_LIKE].shoot = to_animation_id(test_scene_torso_animation_id::METROPOLIS_CHARACTER_AKIMBO);
 
-				torso_def.stances[item_holding_stance::PISTOL_LIKE].carry = to_animation_id(test_scene_torso_animation_id::METROPOLIS_CHARACTER_BARE);
-				torso_def.stances[item_holding_stance::PISTOL_LIKE].shoot = to_animation_id(test_scene_torso_animation_id::METROPOLIS_CHARACTER_BARE);
+				torso_def.stances[item_holding_stance::PISTOL_LIKE].carry = to_animation_id(test_scene_torso_animation_id::METROPOLIS_CHARACTER_AKIMBO);
+				torso_def.stances[item_holding_stance::PISTOL_LIKE].shoot = to_animation_id(test_scene_torso_animation_id::METROPOLIS_CHARACTER_AKIMBO);
 
 				torso_def.akimbo.carry = to_animation_id(test_scene_torso_animation_id::METROPOLIS_CHARACTER_BARE);
 				torso_def.akimbo.shoot = to_animation_id(test_scene_torso_animation_id::METROPOLIS_CHARACTER_BARE);
@@ -186,8 +186,8 @@ namespace test_flavours {
 				torso_def.stances[item_holding_stance::BARE_LIKE].carry = to_animation_id(test_scene_torso_animation_id::RESISTANCE_CHARACTER_BARE);
 				torso_def.stances[item_holding_stance::BARE_LIKE].shoot = to_animation_id(test_scene_torso_animation_id::RESISTANCE_CHARACTER_BARE);
 
-				torso_def.stances[item_holding_stance::RIFLE_LIKE].carry = to_animation_id(test_scene_torso_animation_id::RESISTANCE_CHARACTER_BARE);
-				torso_def.stances[item_holding_stance::RIFLE_LIKE].shoot = to_animation_id(test_scene_torso_animation_id::RESISTANCE_CHARACTER_BARE);
+				torso_def.stances[item_holding_stance::RIFLE_LIKE].carry = to_animation_id(test_scene_torso_animation_id::RESISTANCE_CHARACTER_RIFLE);
+				torso_def.stances[item_holding_stance::RIFLE_LIKE].shoot = to_animation_id(test_scene_torso_animation_id::RESISTANCE_CHARACTER_RIFLE);
 
 				torso_def.stances[item_holding_stance::PISTOL_LIKE].carry = to_animation_id(test_scene_torso_animation_id::RESISTANCE_CHARACTER_BARE);
 				torso_def.stances[item_holding_stance::PISTOL_LIKE].shoot = to_animation_id(test_scene_torso_animation_id::RESISTANCE_CHARACTER_BARE);
