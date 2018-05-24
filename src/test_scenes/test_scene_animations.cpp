@@ -109,5 +109,37 @@ void load_test_scene_animations(all_logical_assets& logicals) {
 
 			ensure_eq(new_allocation.key, id);
 		} 
+
+		{
+			legs_animation anim;
+
+			{
+				legs_animation_frame f;
+				f.image_id = to_image_id(test_scene_image_id::CAST_BLINK_1);
+				f.duration_milliseconds = 30.f;
+				anim.frames.push_back(f);
+			}
+
+			create_frames(
+				anim,
+				test_scene_image_id::SILVER_TROUSERS_STRAFE_1,
+				test_scene_image_id::SILVER_TROUSERS_STRAFE_8,
+				30.0f
+			);
+
+			{
+				legs_animation_frame f;
+				f.image_id = to_image_id(test_scene_image_id::CAST_BLINK_1);
+				f.duration_milliseconds = 30.f;
+				anim.frames.push_back(f);
+			}
+
+			const auto test_id = test_id_type::SILVER_TROUSERS_STRAFE;
+
+			const auto id = to_animation_id(test_id);
+			const auto new_allocation = defs.allocate(std::move(anim));
+
+			ensure_eq(new_allocation.key, id);
+		} 
 	}
 }

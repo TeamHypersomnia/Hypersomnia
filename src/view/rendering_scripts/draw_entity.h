@@ -45,55 +45,72 @@ FORCE_INLINE void specific_entity_drawer(
 		if (const auto maybe_movement = typed_handle.template find<components::movement>()) {
 			const auto& logicals = typed_handle.get_cosmos().get_logical_assets();
 
-			const auto chosen_leg_animation_id = maybe_torso->forward_legs;
+			const auto vel = typed_handle.get_effective_velocity();
+			const auto speed = vel.length();
+			const auto degrees = vel.degrees();
 
-			if (const auto* chosen_animation = mapped_or_nullptr(logicals.legs_animations, chosen_leg_animation_id)) {
-				const auto duration_ms = chosen_animation->frames[0].duration_milliseconds;
-				const auto amount = maybe_movement->animation_amount * 1000.f;
-				const auto index = static_cast<unsigned>(amount / duration_ms);
+			constexpr auto max_speed_for_easing = 300;
 
-				const auto vel = typed_handle.get_effective_velocity();
-				const auto speed = vel.length();
+			const auto facing = vel.degrees_between(vec2::from_degrees(viewing_transform.rotation));
 
-				auto i = augs::ping_pong_with_flip(index, static_cast<unsigned>(chosen_animation->frames.size()));
+			auto do_animation = [&](
+				const auto* const chosen_animation,
+				auto choose_index,
+				const auto rotation 
+			) {
+				if (chosen_animation != nullptr) {
+					const auto duration_ms = chosen_animation->frames[0].duration_milliseconds;
+					const auto amount = maybe_movement->animation_amount * 1000.f;
+					const auto index = static_cast<unsigned>(amount / duration_ms);
 
-				if (speed < 200 && !maybe_movement->any_moving_requested()) {
-					i.first = augs::interp(0u, i.first, speed / 200);
+					auto i = choose_index(index, static_cast<unsigned>(chosen_animation->frames.size()));
+
+					if (speed < max_speed_for_easing) {
+						i.first = augs::interp(0u, i.first, speed / max_speed_for_easing);
+					}
+
+					const auto frame_id = chosen_animation->get_image_id(i.first);
+
+					invariants::sprite sprite;
+					sprite.set(frame_id, in.manager);
+
+					using input_type = invariants::sprite::drawing_input;
+
+					auto input = input_type(in.drawer);
+					input.renderable_transform = viewing_transform;
+					input.renderable_transform.rotation = rotation;
+
+					input.flip.vertically = i.second;
+					render_visitor(sprite, in.manager, input);
 				}
+			};
 
-				const auto frame_id = chosen_animation->get_image_id(i.first);
-
-				invariants::sprite sprite;
-				sprite.set(frame_id, in.manager);
-
-				using input_type = invariants::sprite::drawing_input;
-
-				auto input = input_type(in.drawer);
-				input.renderable_transform = viewing_transform;
-				input.renderable_transform.rotation = vel.degrees();
-				input.flip.vertically = i.second;
-				render_visitor(sprite, in.manager, input);
+			if (facing <= 30 || facing >= 150) {
+				do_animation(
+					mapped_or_nullptr(logicals.legs_animations, maybe_torso->forward_legs),
+					[](const unsigned index, const unsigned n) {
+						return augs::ping_pong_4_flip_inverse(index, n);
+					},
+					degrees
+				);
+			}
+			else {
+				do_animation(
+					mapped_or_nullptr(logicals.legs_animations, maybe_torso->strafe_legs),
+					[](const unsigned index, const unsigned n) {
+						return augs::simple_pair(index % n, !((index / n) % 2));
+					},
+					degrees - 90
+				);
 			}
 
-			const auto chosen_animation_id = maybe_torso->bare_walk;
-
-			if (const auto* chosen_animation = mapped_or_nullptr(logicals.torso_animations, chosen_animation_id)) {
-				const auto duration_ms = chosen_animation->frames[0].duration_milliseconds;
-				const auto amount = maybe_movement->animation_amount * 1000.f;
-				const auto index = static_cast<unsigned>(amount / duration_ms);
-
-				const auto frame_id = chosen_animation->get_image_id_ping_pong_with_flip(index);
-
-				invariants::sprite sprite;
-				sprite.set(frame_id.first, in.manager);
-
-				using input_type = invariants::sprite::drawing_input;
-
-				auto input = input_type(in.drawer);
-				input.renderable_transform = viewing_transform;
-				input.flip.vertically = frame_id.second;
-				render_visitor(sprite, in.manager, input);
-			}
+			do_animation(
+				mapped_or_nullptr(logicals.torso_animations, maybe_torso->bare_walk),
+				[](const unsigned index, const unsigned n) {
+					return augs::ping_pong_4_flip_inverse(index, n);
+				},
+				viewing_transform.rotation
+			);
 		}
 	}
 	else if (const auto maybe_sprite = typed_handle.template find<invariants::sprite>()) {

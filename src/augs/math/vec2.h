@@ -50,7 +50,7 @@ namespace augs {
 	}
 
 	template <class T>
-	auto ping_pong(const T current, const T cycle) {
+	auto ping_pong_2_inverse(const T current, const T cycle) {
 		static_assert(std::is_integral_v<T>);
 
 		const auto m = current / cycle;
@@ -60,7 +60,17 @@ namespace augs {
 	}
 
 	template <class T>
-	auto ping_pong_with_flip(const T current, const T cycle) {
+	auto ping_pong_2_flip(const T current, const T cycle) {
+		static_assert(std::is_integral_v<T>);
+
+		const auto m = current / cycle;
+		const auto rest = current % cycle;
+
+		return augs::simple_pair(rest, m % 2);
+	}
+
+	template <class T>
+	auto ping_pong_4_flip_inverse(const T current, const T cycle) {
 		static_assert(std::is_integral_v<T>);
 
 		const auto m = current / cycle;

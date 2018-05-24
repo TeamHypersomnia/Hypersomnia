@@ -36,6 +36,8 @@ namespace test_scenes {
 	void testbed::populate(const loaded_image_caches_map& caches, cosmos_common_significant& common) const {
 		populate_test_scene_flavours(caches, common.flavours);
 
+		common.ambient_light_color = { 53, 97, 102, 255 }; // Brighten it up a little
+
 		auto& common_assets = common.assets;
 		common_assets.cast_unsuccessful_sound.id = to_sound_id(test_scene_sound_id::CAST_UNSUCCESSFUL);
 		common_assets.ped_shield_impact_sound.id = to_sound_id(test_scene_sound_id::EXPLOSION);

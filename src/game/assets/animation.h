@@ -66,20 +66,6 @@ struct animation_mixin {
 		return reinterpret_cast<const D*>(this)->frames[index].image_id;
 	}
 
-	auto get_image_id_ping_pong(const unsigned index) const {
-		const auto& frames = reinterpret_cast<const D*>(this)->frames;
-
-		const auto i = augs::ping_pong(index, static_cast<unsigned>(frames.size()));
-		return frames[i].image_id;
-	}
-
-	auto get_image_id_ping_pong_with_flip(const unsigned index) const {
-		const auto& frames = reinterpret_cast<const D*>(this)->frames;
-
-		const auto i = augs::ping_pong_with_flip(index, static_cast<unsigned>(frames.size()));
-		return augs::simple_pair(frames[i.first].image_id, i.second);
-	}
-
 	auto get_image_id(
 		const simple_animation_state& state,
 	   	const unsigned frame_offset

@@ -19,6 +19,7 @@ enum class test_scene_torso_animation_id {
 enum class test_scene_legs_animation_id {
 	// GEN INTROSPECTOR enum class test_scene_legs_animation_id
 	SILVER_TROUSERS,
+	SILVER_TROUSERS_STRAFE,
 	COUNT
 	// END GEN INTROSPECTOR
 };

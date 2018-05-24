@@ -40,6 +40,7 @@ namespace test_flavours {
 				invariants::torso torso_def;
 
 				torso_def.forward_legs = to_animation_id(test_scene_legs_animation_id::SILVER_TROUSERS);
+				torso_def.strafe_legs = to_animation_id(test_scene_legs_animation_id::SILVER_TROUSERS_STRAFE);
 
 				torso_def.bare_walk = to_animation_id(test_scene_torso_animation_id::METROPOLIS_CHARACTER_BARE);
 
