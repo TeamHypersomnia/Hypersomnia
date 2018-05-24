@@ -120,7 +120,7 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 				movement.make_inert_for_ms -= static_cast<float>(delta.in_milliseconds());
 			}
 
-			const auto requested_by_input = movement.get_force_requested_by_input(movement_def);
+			const auto requested_by_input = movement.get_force_requested_by_input(movement_def.input_acceleration_axes);
 
 			if (requested_by_input.non_zero()) {
 				if (movement.was_sprint_effective) {
@@ -159,7 +159,9 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 			}
 
 			const auto max_speed = std::max(1.f, movement_def.max_speed_for_animation);
-			movement.animation_amount += rigid_body.get_velocity().length() / max_speed;
+			const auto animation_dt = delta.in_seconds() * rigid_body.get_velocity().length() / max_speed;
+
+			movement.animation_amount += animation_dt;
 
 			rigid_body.infer_caches();
 		}

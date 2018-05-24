@@ -22,7 +22,7 @@ struct image_cache {
 		return box;
 	}
 
-	vec2u get_size() const {
+	vec2u get_original_size() const {
 		return original_image_size;
 	}
 };

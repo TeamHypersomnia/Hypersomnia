@@ -26,7 +26,7 @@
 #include "game/detail/inventory/perform_transfer.h"
 
 namespace test_flavours {
-	void populate_gun_flavours(const loaded_image_caches_map& logicals, all_entity_flavours& flavours) {
+	void populate_gun_flavours(const loaded_image_caches_map& caches, all_entity_flavours& flavours) {
 		/* Types for bullets etc. */
 
 		auto make_default_gun_container = [](auto& meta, const float /* mag_rotation */ = -90.f, const bool magazine_hidden = false){
@@ -94,8 +94,8 @@ namespace test_flavours {
 				meta.set(flags_def);
 			}
 
-			test_flavours::add_sprite(meta, logicals, test_scene_image_id::ROUND_TRACE, cyan);
-			add_shape_invariant_from_renderable(meta, logicals);
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::ROUND_TRACE, cyan);
+			add_shape_invariant_from_renderable(meta, caches);
 
 			{
 				{
@@ -149,8 +149,8 @@ namespace test_flavours {
 			}
 
 
-			test_flavours::add_sprite(meta, logicals, test_scene_image_id::ELECTRIC_MISSILE, cyan);
-			add_shape_invariant_from_renderable(meta, logicals);
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::ELECTRIC_MISSILE, cyan);
+			add_shape_invariant_from_renderable(meta, caches);
 			{
 				invariants::trace trace_def;
 
@@ -203,8 +203,8 @@ namespace test_flavours {
 				meta.set(render_def);
 			}
 
-			test_flavours::add_sprite(meta, logicals, test_scene_image_id::CYAN_SHELL, white);
-			add_shape_invariant_from_renderable(meta, logicals);
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::CYAN_SHELL, white);
+			add_shape_invariant_from_renderable(meta, caches);
 			test_flavours::add_shell_dynamic_body(meta);
 		}
 
@@ -218,8 +218,8 @@ namespace test_flavours {
 				meta.set(render_def);
 			}
 
-			test_flavours::add_sprite(meta, logicals, test_scene_image_id::CYAN_CHARGE, white);
-			add_shape_invariant_from_renderable(meta, logicals);
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::CYAN_CHARGE, white);
+			add_shape_invariant_from_renderable(meta, caches);
 			test_flavours::add_see_through_dynamic_body(meta);
 
 			invariants::item item;
@@ -256,8 +256,8 @@ namespace test_flavours {
 				meta.set(render_def);
 			}
 
-			test_flavours::add_sprite(meta, logicals, test_scene_image_id::SAMPLE_MAGAZINE, white);
-			add_shape_invariant_from_renderable(meta, logicals);
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::SAMPLE_MAGAZINE, white);
+			add_shape_invariant_from_renderable(meta, caches);
 			test_flavours::add_see_through_dynamic_body(meta);
 
 			invariants::container container; 
@@ -286,7 +286,7 @@ namespace test_flavours {
 				render_def.layer = render_layer::FLYING_BULLETS;
 
 				meta.set(render_def);
-				test_flavours::add_sprite(meta, logicals, test_scene_image_id::ROUND_TRACE, cyan);
+				test_flavours::add_sprite(meta, caches, test_scene_image_id::ROUND_TRACE, cyan);
 			}
 
 			{
@@ -302,7 +302,7 @@ namespace test_flavours {
 				render_def.layer = render_layer::FLYING_BULLETS;
 
 				meta.set(render_def);
-				test_flavours::add_sprite(meta, logicals, test_scene_image_id::ELECTRIC_MISSILE, cyan);
+				test_flavours::add_sprite(meta, caches, test_scene_image_id::ELECTRIC_MISSILE, cyan);
 			}
 
 			{
@@ -332,7 +332,7 @@ namespace test_flavours {
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
 			gun_def.muzzle_velocity = {4000.f, 4000.f};
 			gun_def.shot_cooldown_ms = 100.f;
-			gun_def.bullet_spawn_offset.set(logicals.at(to_image_id(test_scene_image_id::ASSAULT_RIFLE)).get_size().x / 2, 0);
+			gun_def.bullet_spawn_offset.set(caches.at(to_image_id(test_scene_image_id::ASSAULT_RIFLE)).get_original_size().x / 2, 0);
 
 			gun_def.shell_spawn_offset.pos.set(0, 10);
 			gun_def.shell_spawn_offset.rotation = 45;
@@ -353,8 +353,8 @@ namespace test_flavours {
 
 			meta.set(gun_def);
 
-			test_flavours::add_sprite(meta, logicals, test_scene_image_id::ASSAULT_RIFLE, white);
-			add_shape_invariant_from_renderable(meta, logicals);
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::ASSAULT_RIFLE, white);
+			add_shape_invariant_from_renderable(meta, caches);
 			test_flavours::add_see_through_dynamic_body(meta);
 			make_default_gun_container(meta);
 		}
@@ -376,7 +376,7 @@ namespace test_flavours {
 			gun_def.action_mode = gun_action_type::SEMI_AUTOMATIC;
 			gun_def.muzzle_velocity = {3000.f, 3000.f};
 			gun_def.shot_cooldown_ms = 100.f;
-			gun_def.bullet_spawn_offset.set(logicals.at(to_image_id(test_scene_image_id::KEK9)).get_size().x / 2, -7);
+			gun_def.bullet_spawn_offset.set(caches.at(to_image_id(test_scene_image_id::KEK9)).get_original_size().x / 2, -7);
 
 			gun_def.shell_spawn_offset.pos.set(0, 10);
 			gun_def.shell_spawn_offset.rotation = 45;
@@ -396,8 +396,8 @@ namespace test_flavours {
 
 			meta.set(gun_def);
 
-			test_flavours::add_sprite(meta, logicals, test_scene_image_id::KEK9, white);
-			add_shape_invariant_from_renderable(meta, logicals);
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::KEK9, white);
+			add_shape_invariant_from_renderable(meta, caches);
 			test_flavours::add_see_through_dynamic_body(meta);
 			make_default_gun_container(meta, 0.f, true);
 		}
@@ -419,7 +419,7 @@ namespace test_flavours {
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
 			gun_def.muzzle_velocity = {2000.f, 2000.f};
 			gun_def.shot_cooldown_ms = 300.f;
-			gun_def.bullet_spawn_offset.set(logicals.at(to_image_id(test_scene_image_id::AMPLIFIER_ARM)).get_size().x / 2, 0);
+			gun_def.bullet_spawn_offset.set(caches.at(to_image_id(test_scene_image_id::AMPLIFIER_ARM)).get_original_size().x / 2, 0);
 
 			gun_def.damage_multiplier = 1.f;
 
@@ -428,8 +428,8 @@ namespace test_flavours {
 
 			meta.set(gun_def);
 
-			test_flavours::add_sprite(meta, logicals, test_scene_image_id::AMPLIFIER_ARM, white);
-			add_shape_invariant_from_renderable(meta, logicals);
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::AMPLIFIER_ARM, white);
+			add_shape_invariant_from_renderable(meta, caches);
 			test_flavours::add_see_through_dynamic_body(meta);
 
 			invariants::item item;

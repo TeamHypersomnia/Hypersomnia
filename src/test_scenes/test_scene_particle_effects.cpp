@@ -41,7 +41,7 @@ void load_test_scene_particle_effects(
 	particle_effects_map& all_definitions
 ) {
 	auto set = [&images](auto& target, auto id, auto col) {
-		target.set_image(id, images.at(id).get_size(), col);
+		target.set_image(id, images.at(id).get_original_size(), col);
 	};
 
 	auto sets = [](auto& target, auto id, auto sz, auto col) {

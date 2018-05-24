@@ -66,7 +66,7 @@ void load_test_scene_animations(all_logical_assets& logicals) {
 				anim,
 				test_scene_image_id::METROPOLIS_CHARACTER_BARE_1,
 				test_scene_image_id::METROPOLIS_CHARACTER_BARE_5,
-				50.0f
+				30.0f
 			);
 
 			const auto test_id = test_id_type::METROPOLIS_CHARACTER_BARE;
@@ -88,11 +88,18 @@ void load_test_scene_animations(all_logical_assets& logicals) {
 		{
 			legs_animation anim;
 
+			{
+				legs_animation_frame f;
+				f.image_id = to_image_id(test_scene_image_id::CAST_BLINK_1);
+				f.duration_milliseconds = 30.f;
+				anim.frames.push_back(f);
+			}
+
 			create_frames(
 				anim,
 				test_scene_image_id::SILVER_TROUSERS_1,
-				test_scene_image_id::SILVER_TROUSERS_12,
-				50.0f
+				test_scene_image_id::SILVER_TROUSERS_4,
+				30.0f
 			);
 
 			const auto test_id = test_id_type::SILVER_TROUSERS;

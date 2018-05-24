@@ -41,7 +41,62 @@ FORCE_INLINE void specific_entity_drawer(
 ) {
 	const auto viewing_transform = typed_handle.get_viewing_transform(interp);
 
-	if (const auto maybe_sprite = typed_handle.template find<invariants::sprite>()) {
+	if (const auto maybe_torso = typed_handle.template find<invariants::torso>()) {
+		if (const auto maybe_movement = typed_handle.template find<components::movement>()) {
+			const auto& logicals = typed_handle.get_cosmos().get_logical_assets();
+
+			const auto chosen_leg_animation_id = maybe_torso->forward_legs;
+
+			if (const auto* chosen_animation = mapped_or_nullptr(logicals.legs_animations, chosen_leg_animation_id)) {
+				const auto duration_ms = chosen_animation->frames[0].duration_milliseconds;
+				const auto amount = maybe_movement->animation_amount * 1000.f;
+				const auto index = static_cast<unsigned>(amount / duration_ms);
+
+				const auto vel = typed_handle.get_effective_velocity();
+				const auto speed = vel.length();
+
+				auto i = augs::ping_pong_with_flip(index, static_cast<unsigned>(chosen_animation->frames.size()));
+
+				if (speed < 200 && !maybe_movement->any_moving_requested()) {
+					i.first = augs::interp(0u, i.first, speed / 200);
+				}
+
+				const auto frame_id = chosen_animation->get_image_id(i.first);
+
+				invariants::sprite sprite;
+				sprite.set(frame_id, in.manager);
+
+				using input_type = invariants::sprite::drawing_input;
+
+				auto input = input_type(in.drawer);
+				input.renderable_transform = viewing_transform;
+				input.renderable_transform.rotation = vel.degrees();
+				input.flip.vertically = i.second;
+				render_visitor(sprite, in.manager, input);
+			}
+
+			const auto chosen_animation_id = maybe_torso->bare_walk;
+
+			if (const auto* chosen_animation = mapped_or_nullptr(logicals.torso_animations, chosen_animation_id)) {
+				const auto duration_ms = chosen_animation->frames[0].duration_milliseconds;
+				const auto amount = maybe_movement->animation_amount * 1000.f;
+				const auto index = static_cast<unsigned>(amount / duration_ms);
+
+				const auto frame_id = chosen_animation->get_image_id_ping_pong_with_flip(index);
+
+				invariants::sprite sprite;
+				sprite.set(frame_id.first, in.manager);
+
+				using input_type = invariants::sprite::drawing_input;
+
+				auto input = input_type(in.drawer);
+				input.renderable_transform = viewing_transform;
+				input.flip.vertically = frame_id.second;
+				render_visitor(sprite, in.manager, input);
+			}
+		}
+	}
+	else if (const auto maybe_sprite = typed_handle.template find<invariants::sprite>()) {
 		const auto& sprite = *maybe_sprite;
 		using input_type = invariants::sprite::drawing_input;
 

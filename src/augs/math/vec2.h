@@ -6,6 +6,7 @@
 #include "augs/math/rects.h"
 #include "augs/math/declare_math.h"
 
+#include "augs/misc/simple_pair.h"
 #include "augs/templates/algorithm_templates.h"
 #include "augs/templates/hash_templates.h"
 
@@ -41,10 +42,36 @@ namespace augs {
 
 	template <class T>
 	auto zigzag(const T current_time, const T cycle) {
+		static_assert(std::is_floating_point_v<T>);
 		const auto m = current_time / cycle;
-		const auto i = int(m);
+		const auto i = static_cast<int>(m);
 
 		return i % 2 ? (1 - (m - i)) : (m - i);
+	}
+
+	template <class T>
+	auto ping_pong(const T current, const T cycle) {
+		static_assert(std::is_integral_v<T>);
+
+		const auto m = current / cycle;
+		const auto rest = current % cycle;
+
+		return m % 2 ? (cycle - rest - 1) : rest;
+	}
+
+	template <class T>
+	auto ping_pong_with_flip(const T current, const T cycle) {
+		static_assert(std::is_integral_v<T>);
+
+		const auto m = current / cycle;
+		const auto rest = current % cycle;
+
+		switch (m % 4) {
+			case 0: return augs::simple_pair(rest, false);
+			case 1: return augs::simple_pair(cycle - rest - 1, false);
+			case 2: return augs::simple_pair(rest, true);
+			default: return augs::simple_pair(cycle - rest - 1, true);
+		}
 	}
 
 	template <typename T> 
@@ -59,7 +86,7 @@ namespace augs {
 
 	template <class T, class A>
 	T interp(const T a, const T b, const A alpha) {
-		return static_cast<T>(a * (static_cast<A>(1) - alpha) + b * (alpha));
+		return static_cast<T>(a * (static_cast<A>(1) - alpha) + b * alpha);
 	}
 
 	template <class C, class Xp, class Yp>

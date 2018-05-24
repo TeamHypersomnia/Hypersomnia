@@ -28,8 +28,17 @@ namespace components {
 		float animation_amount = 0.f;
 		// END GEN INTROSPECTOR
 
+		bool any_moving_requested() const {
+			return 
+				moving_left
+				|| moving_right
+				|| moving_forward
+				|| moving_backward
+			;
+		}
+
 		void reset_movement_flags();
-		vec2 get_force_requested_by_input(const invariants::movement&) const;
+		vec2 get_force_requested_by_input(const vec2& axes) const;
 		void set_flags_from_target_direction(vec2 d);
 		void set_flags_from_closest_direction(vec2 d);
 	};

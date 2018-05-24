@@ -61,7 +61,7 @@ namespace augs {
 			const rgba color = white
 		) {
 			this->image_id = image_id;
-			this->size = manager.at(image_id).get_size();
+			this->size = manager.at(image_id).get_original_size();
 			this->color = color;
 		}
 

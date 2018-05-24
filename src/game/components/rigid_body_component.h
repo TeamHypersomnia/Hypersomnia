@@ -283,7 +283,7 @@ damping_mults component_synchronizer<E, components::rigid_body>::calc_damping_mu
 			damping.linear = movement_def.standard_linear_damping;
 		}
 
-		const auto requested_by_input = movement.get_force_requested_by_input(movement_def);
+		const auto requested_by_input = movement.get_force_requested_by_input(movement_def.input_acceleration_axes);
 
 		if (requested_by_input.non_zero()) {
 			if (movement.was_sprint_effective) {
