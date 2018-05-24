@@ -261,12 +261,16 @@ void illuminated_rendering(
 
 	const auto timestamp_ms = static_cast<unsigned>(global_time_seconds * 1000);
 	
-	auto standard_border_provider = [timestamp_ms](const const_entity_handle sentience) -> std::optional<rgba> {
-		if (const auto s = sentience.find<components::sentience>()) {
-			return s->find_low_health_border(timestamp_ms);
-		}
+	auto standard_border_provider = [timestamp_ms](const const_entity_handle sentience) {
+		std::optional<rgba> result;
 
-		return std::nullopt;
+		sentience.dispatch_on_having<components::sentience>(
+			[&](const auto typed_handle) {
+				result = typed_handle.template get<components::sentience>().find_low_health_border(timestamp_ms);
+			}
+		);
+
+		return result;
 	};
 
 	if (has_additional_borders) {
@@ -282,7 +286,7 @@ void illuminated_rendering(
 		);
 	}
 	else {
-		draw_borders(render_layer::SMALL_DYNAMIC_BODY, standard_border_provider);
+		draw_borders(render_layer::SENTIENCES, standard_border_provider);
 	}
 
 	renderer.call_and_clear_triangles();
@@ -291,6 +295,7 @@ void illuminated_rendering(
 	
 	draw_layer(render_layer::DYNAMIC_BODY);
 	draw_layer(render_layer::SMALL_DYNAMIC_BODY);
+	draw_layer(render_layer::SENTIENCES);
 	
 	renderer.call_and_clear_triangles();
 

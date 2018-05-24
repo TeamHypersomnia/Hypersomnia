@@ -31,7 +31,7 @@ namespace test_flavours {
 
 			{
 				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
+				render_def.layer = render_layer::SENTIENCES;
 
 				meta.set(render_def);
 			}

@@ -41,6 +41,13 @@ FORCE_INLINE void specific_entity_drawer(
 ) {
 	const auto viewing_transform = typed_handle.get_viewing_transform(interp);
 
+	if (typed_handle.template has<invariants::item>()) {
+		if (typed_handle.get_owning_transfer_capability().alive()) {
+			/* Will be drawn when the capability itself is drawn. */
+			return;
+		}
+	}
+
 	if (const auto maybe_torso = typed_handle.template find<invariants::torso>()) {
 		if (const auto maybe_movement = typed_handle.template find<components::movement>()) {
 			const auto& cosm = typed_handle.get_cosmos();

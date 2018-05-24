@@ -22,8 +22,13 @@ summary: That which we are brainstorming at the moment.
 		- as we will probably read the offsets from the relevant torso invariants
 			- for now, we'll always just take the first frame and be done with it.
 			- we'll also reinfer upon switching the armour
-	- Drawing problems
-		- 
+	- Drawing considerations
+		- What about viewing transforms?
+		- If we draw held item sprites separately, we must calculate the torso frame twice
+			- We'd go bottom-up everytime... for each attachment, etc.
+			- That sort of sucks
+			- Instead we might draw the entire character if we determine that it has torso
+			- And avoid drawing anything if the owner capability has a torso
 
 - Animation architecture
 	- Animation asset
