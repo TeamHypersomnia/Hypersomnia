@@ -329,6 +329,10 @@ void audiovisual_state::standard_post_solve(const const_logic_step step, const a
 					new_rings.push_back(ring);
 				}
 			}
+			else {
+				number_col = cyan;
+				highlight_col = cyan;
+			}
 		}
 		else if (h.target == messages::health_event::target_type::CONSCIOUSNESS) {
 			const bool destroyed = h.special_result == messages::health_event::result_type::LOSS_OF_CONSCIOUSNESS;
@@ -385,6 +389,10 @@ void audiovisual_state::standard_post_solve(const const_logic_step step, const a
 
 					new_rings.push_back(ring);
 				}
+			}
+			else {
+				number_col = yellow;
+				highlight_col = yellow;
 			}
 		}
 		else {
