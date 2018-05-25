@@ -158,7 +158,7 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 			};
 
 			if (const auto now_def = mapped_or_nullptr(now_defs, fresh_key)) {
-				if (new_def.loadables != now_def->loadables) {
+				if (new_def.loadables_differ(*now_def)) {
 					/* Found, but a different one. Reload. */
 					request_new();
 				}

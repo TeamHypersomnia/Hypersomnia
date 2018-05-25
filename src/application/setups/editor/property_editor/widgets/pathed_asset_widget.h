@@ -10,6 +10,8 @@
 #include "application/setups/editor/property_editor/tweaker_type.h"
 #include "application/setups/editor/property_editor/widgets/asset_path_chooser.h"
 
+#include "view/try_load_meta_lua.h"
+
 struct pathed_asset_widget {
 	all_viewables_defs& defs;
 	const augs::path_type& project_path;
@@ -37,6 +39,7 @@ struct pathed_asset_widget {
 		bool changed = false;
 
 		auto& definitions = get_viewable_pool<T>(defs);
+		using def_type = typename remove_cref<decltype(definitions)>::mapped_type;
 
 		auto on_choice = [&](const auto& chosen_path) {
 			changed = true;
@@ -48,15 +51,20 @@ struct pathed_asset_widget {
 				auto& history = in.folder.history;
 
 				{
-					create_pathed_asset_id_command<T> cmd;
-					cmd.use_path = chosen_path;
-					history.execute_new(std::move(cmd), in);
+					def_type def;
+					def.set_source_path(chosen_path);
+
+					const auto resolved = def.get_source_path().resolve(project_path);
+
+					try_load_meta_lua(in.lua, def.meta, resolved);
+
+					history.execute_new(create_pathed_asset_id_command<T>(std::move(def)), in);
 				}
 
-				const auto* const last_addr = std::addressof(history.last_command());
-				const auto* const cmd = std::get_if<create_pathed_asset_id_command<T>>(last_addr);
+				const auto& last_cmd = history.last_command();
+				const auto& cmd = std::get<create_pathed_asset_id_command<T>>(last_cmd);
 
-				object = cmd->get_allocated_id();
+				object = cmd.get_allocated_id();
 			}
 		};
 		

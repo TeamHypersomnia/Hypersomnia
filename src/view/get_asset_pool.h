@@ -26,15 +26,19 @@ decltype(auto) get_logicals_pool(T&& t) {
 	}
 }
 
+struct image_definition;
+struct sound_definition;
+struct particle_effect;
+
 template <class I, class T>
 decltype(auto) get_viewable_pool(T&& t) {
-	if constexpr(std::is_same_v<I, assets::image_id>) {
+	if constexpr(is_one_of_v<I, assets::image_id, image_definition>) {
 		return (t.image_definitions);
 	}
-	else if constexpr(std::is_same_v<I, assets::sound_id>) {
+	else if constexpr(is_one_of_v<I, assets::sound_id, sound_definition>) {
 		return (t.sounds);
 	}
-	else if constexpr(std::is_same_v<I, assets::particle_effect_id>) {
+	else if constexpr(is_one_of_v<I, assets::particle_effect_id, particle_effect>) {
 		return (t.particle_effects);
 	}
 	else {

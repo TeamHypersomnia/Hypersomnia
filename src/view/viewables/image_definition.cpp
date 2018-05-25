@@ -1,6 +1,7 @@
 #include "augs/image/image.h"
 #include "augs/string/string_templates.h"
 #include "augs/filesystem/file.h"
+#include "augs/readwrite/lua_file.h"
 
 #include "view/viewables/image_definition.h"
 #include "view/viewables/regeneration/desaturations.h"
@@ -38,7 +39,7 @@ std::optional<augs::path_type> image_definition_view::find_custom_neon_map_path(
 }
 
 std::optional<augs::path_type> image_definition_view::find_generated_neon_map_path() const {
-	if (def.meta.extra_loadables.should_generate_neon_map()) {
+	if (get_def().meta.extra_loadables.should_generate_neon_map()) {
 		return calc_generated_neon_map_path();
 	}
 
@@ -46,7 +47,7 @@ std::optional<augs::path_type> image_definition_view::find_generated_neon_map_pa
 }
 
 std::optional<augs::path_type> image_definition_view::find_desaturation_path() const {
-	if (def.meta.extra_loadables.should_generate_desaturation()) {
+	if (get_def().meta.extra_loadables.should_generate_desaturation()) {
 		return calc_desaturation_path();
 	}
 
@@ -66,11 +67,11 @@ void image_definition_view::regenerate_neon_map(
 ) const {
 	const auto diffuse_path = resolved_source_path;
 
-	if (def.meta.extra_loadables.should_generate_neon_map()) {
+	if (get_def().meta.extra_loadables.should_generate_neon_map()) {
 		::regenerate_neon_map(
 			diffuse_path,
 			find_generated_neon_map_path().value(),
-			def.meta.extra_loadables.generate_neon_map.value,
+			get_def().meta.extra_loadables.generate_neon_map.value,
 			force_regenerate
 		);
 	}
@@ -81,7 +82,7 @@ void image_definition_view::regenerate_desaturation(
 ) const {
 	const auto diffuse_path = resolved_source_path;
 
-	if (def.meta.extra_loadables.should_generate_desaturation()) {
+	if (get_def().meta.extra_loadables.should_generate_desaturation()) {
 		::regenerate_desaturation(
 			diffuse_path,
 			find_desaturation_path().value(),

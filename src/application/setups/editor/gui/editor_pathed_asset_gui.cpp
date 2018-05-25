@@ -196,7 +196,7 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 				return found_in(last_seen_missing_paths, p);
 			};
 
-			using def_type = remove_cref<decltype(object)>;
+			using def_type = std::remove_reference_t<decltype(object)>;
 			const auto& view = asset_definition_view<def_type>(folder.current_path, object);
 
 			if (lazy_check_missing(view.get_resolved_source_path())) {

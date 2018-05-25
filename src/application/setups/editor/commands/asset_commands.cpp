@@ -22,13 +22,12 @@ void create_unpathed_asset_id_command<I>::undo(const editor_command_input in) {
 
 template <class I>
 std::string create_pathed_asset_id_command<I>::describe() const {
-	return typesafe_sprintf("Started tracking asset file: %x", use_path.to_display());
+	return typesafe_sprintf("Started tracking asset file: %x", construct_from.get_source_path().to_display());
 }
 
 template <class I>
 void create_pathed_asset_id_command<I>::redo(const editor_command_input in) {
-	auto& new_object = base::redo(get_asset_pool<I>(in));
-	new_object.set_source_path(use_path);
+	base::redo(get_asset_pool<I>(in), construct_from);
 }
 
 template <class I>

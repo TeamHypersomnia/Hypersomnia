@@ -21,8 +21,8 @@ public:
 		return allocated_id;
 	}
 
-	template <class P>
-	auto& redo(P& pool) {
+	template <class P, class... Args>
+	auto& redo(P& pool, Args&&... args) {
 		const auto previous_id = allocated_id;
 
 		auto validate = [previous_id](const auto new_id) {
@@ -31,7 +31,7 @@ public:
 			}
 		};
 
-		const auto allocation = pool.allocate();
+		const auto allocation = pool.allocate(std::forward<Args>(args)...);
 
 		{
 			const auto new_id = allocation.key;

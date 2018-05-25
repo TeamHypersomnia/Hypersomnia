@@ -8,24 +8,9 @@
 #include "test_scenes/test_scenes_content.h"
 #include "test_scenes/test_scene_images.h"
 
-#include "augs/readwrite/lua_file.h"
 #include "augs/templates/enum_introspect.h"
-
-static void try_load_lua_neighbors(
-	const augs::path_type& resolved,
-   	sol::state& lua,
-	image_meta& meta
-) {
-	const auto with_ext = [&](const auto ext) {
-		return augs::path_type(resolved).replace_extension(ext);
-	};
-
-	if (const auto meta_path = with_ext(".meta.lua");
-		augs::exists(meta_path)
-	) {
-		augs::load_from_lua_table(lua, meta, meta_path);
-	}
-}
+#include "augs/readwrite/lua_readwrite_errors.h"
+#include "view/try_load_meta_lua.h"
 
 void load_test_scene_images(
 	sol::state& lua,
@@ -48,7 +33,11 @@ void load_test_scene_images(
 		definition.set_source_path({ stem + ".png", true });
 
 		try {
-			try_load_lua_neighbors(image_definition_view({}, definition).get_source_image_path(), lua, definition.meta);
+			try_load_meta_lua(
+				lua, 
+				definition.meta, 
+				image_definition_view({}, definition).get_source_image_path()
+			);
 		}
 		catch (augs::lua_deserialization_error err) {
 			throw test_scene_asset_loading_error(

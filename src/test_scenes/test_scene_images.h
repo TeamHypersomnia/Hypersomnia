@@ -30,7 +30,6 @@ enum class test_scene_image_id {
 	ASSAULT_RIFLE,
 	BILMER2000,
 	KEK9,
-	SUBMACHINE,
 	URBAN_CYAN_MACHETE,
 	ROCKET_LAUNCHER,
 

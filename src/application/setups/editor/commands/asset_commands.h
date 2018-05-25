@@ -7,7 +7,9 @@
 #include "application/setups/editor/commands/id_allocating_command.h"
 #include "application/setups/editor/detail/field_address.h"
 
+#include "view/viewables/all_viewables_defs.h"
 #include "view/get_asset_pool.h"
+
 #include "view/viewables/all_viewables_declarations.h"
 #include "view/maybe_official_path.h"
 #include "augs/enums/callback_result.h"
@@ -20,9 +22,13 @@ template <class id_type>
 struct create_pathed_asset_id_command : id_allocating_command<id_type> {
 	using base = id_allocating_command<id_type>;
 	using introspect_base = base;
+	using stored_type = typename remove_cref<decltype(get_viewable_pool<id_type>(std::declval<all_viewables_defs&>()))>::mapped_type;
+
+	create_pathed_asset_id_command() = default;
+	create_pathed_asset_id_command(stored_type&& from) : construct_from(std::move(from)) {}
 
 	// GEN INTROSPECTOR struct create_pathed_asset_id_command class id_type
-	maybe_official_path<id_type> use_path;
+	stored_type construct_from;
 	// END GEN INTROSPECTOR
 
 	std::string describe() const;

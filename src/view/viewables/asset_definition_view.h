@@ -3,14 +3,23 @@
 
 template <class T>
 class asset_definition_view {
+	T& def;
+
 protected:
-	const T& def;
+	auto& get_def() {
+		return def;
+	}
+
+	const auto& get_def() const {
+		return def;
+	}
+
 	const augs::path_type resolved_source_path;
 
 public:
 	asset_definition_view(
 		const asset_location_context& project_dir,
-		const T& d
+		T& d
 	) : 
 		def(d), 
 		resolved_source_path(d.get_source_path().resolve(project_dir))

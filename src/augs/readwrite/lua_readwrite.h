@@ -9,7 +9,7 @@
 #include "augs/templates/traits/is_optional.h"
 #include "augs/templates/traits/is_value_with_flag.h"
 #include "augs/templates/traits/is_pair.h"
-#include "augs/templates/exception_templates.h"
+#include "augs/readwrite/lua_readwrite_errors.h"
 #include "augs/templates/container_templates.h"
 #include "augs/templates/introspect.h"
 #include "augs/templates/for_each_type.h"
@@ -34,10 +34,6 @@ namespace augs {
 	inline const char* get_variant_content_label(T&&...) {
 		return "fields";
 	}
-
-	struct lua_deserialization_error : error_with_typesafe_sprintf {
-		using error_with_typesafe_sprintf::error_with_typesafe_sprintf;
-	};
 
 	template <class T>
 	void general_from_lua_value(sol::object object, T& into) {

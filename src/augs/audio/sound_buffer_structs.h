@@ -10,6 +10,10 @@ namespace augs {
 		bool operator==(const sound_buffer_loading_settings& b) const {
 			return generate_mono == b.generate_mono;
 		}
+
+		bool operator!=(const sound_buffer_loading_settings& b) const {
+			return !operator==(b);
+		}
 	};
 
 	struct sound_buffer_loading_input {

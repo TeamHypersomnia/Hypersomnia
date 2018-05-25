@@ -17,6 +17,10 @@
 augs::path_type get_neon_map_path(augs::path_type from_source_image_path);
 augs::path_type get_desaturation_path(augs::path_type from_source_image_path);
 
+namespace sol {
+	class state;
+}
+
 struct image_definition {
 	// GEN INTROSPECTOR struct image_definition
 	maybe_official_image_path source_image;
@@ -39,8 +43,8 @@ struct image_definition {
 	}
 };
 
-struct image_definition_view : asset_definition_view<image_definition> {
-	using base = asset_definition_view<image_definition>;
+struct image_definition_view : asset_definition_view<const image_definition> {
+	using base = asset_definition_view<const image_definition>;
 	using base::base;
 
 	augs::path_type calc_custom_neon_map_path() const;

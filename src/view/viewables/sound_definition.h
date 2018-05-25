@@ -3,40 +3,33 @@
 #include "view/maybe_official_path.h"
 #include "view/viewables/asset_definition_view.h"
 
-struct sound_loadables {
-	// GEN INTROSPECTOR struct sound_loadables
-	maybe_official_sound_path source_sound;
-	augs::sound_buffer_loading_settings settings;
+struct sound_meta {
+	// GEN INTROSPECTOR struct sound_meta
+	augs::sound_buffer_loading_settings loading_settings;
 	// END GEN INTROSPECTOR
-
-	bool operator==(const sound_loadables& b) const {
-		return 
-			source_sound == b.source_sound 
-			&& settings == b.settings
-		;
-	}
-
-	bool operator!=(const sound_loadables& b) const {
-		return !operator==(b);
-	}
 };
 
 struct sound_definition {
 	// GEN INTROSPECTOR struct sound_definition
-	sound_loadables loadables;
+	maybe_official_sound_path source_sound;
+	sound_meta meta;
 	// END GEN INTROSPECTOR
 
+	bool loadables_differ(const sound_definition& b) const {
+		return source_sound != b.source_sound || meta.loading_settings != b.meta.loading_settings;
+	}
+
 	void set_source_path(const maybe_official_sound_path& p) {
-		loadables.source_sound = p;
+		source_sound = p;
 	}
 
 	const auto& get_source_path() const {
-		return loadables.source_sound;
+		return source_sound;
 	}
 };
 
-struct sound_definition_view : asset_definition_view<sound_definition> {
-	using base = asset_definition_view<sound_definition>;
+struct sound_definition_view : asset_definition_view<const sound_definition> {
+	using base = asset_definition_view<const sound_definition>;
 	using base::base;
 
 	augs::path_type get_source_sound_path() const {
@@ -46,7 +39,7 @@ struct sound_definition_view : asset_definition_view<sound_definition> {
 	auto make_sound_loading_input() const {
 		return augs::sound_buffer_loading_input {
 			resolved_source_path,
-			def.loadables.settings
+			get_def().meta.loading_settings
 		};
 	}
 };
