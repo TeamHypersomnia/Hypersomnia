@@ -16,6 +16,16 @@ public:
 	bool has_independent_transform() const;
 	void set_logic_transform(const components::transform t) const;
 
+	std::optional<real32> find_logical_width() const {
+		const auto handle = *static_cast<const entity_handle_type*>(this);
+
+		if (const auto* const sprite = handle.template find<invariants::sprite>()) {
+			return static_cast<real32>(sprite->size.x);
+		}
+
+		return std::nullopt;
+	}
+
 	template <class F, class... K>
 	void access_independent_transform(
 		F callback,

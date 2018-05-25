@@ -44,7 +44,7 @@ FORCE_INLINE void specific_entity_drawer(
 	if (typed_handle.template has<invariants::item>()) {
 		if (typed_handle.get_owning_transfer_capability().alive()) {
 			/* Will be drawn when the capability itself is drawn. */
-			return;
+			//return;
 		}
 	}
 

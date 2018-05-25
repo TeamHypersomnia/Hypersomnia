@@ -450,7 +450,7 @@ void sentience_system::rotate_towards_crosshairs_and_driven_vehicles(const logic
 
 						const auto rifle_transform = subject_item.get_logic_transform();
 						auto barrel_center = gun_def.calc_barrel_center(rifle_transform);
-						auto muzzle = gun_def.calc_muzzle_position(rifle_transform);
+						auto muzzle = gun_def.calc_muzzle_position(rifle_transform, *subject_item.find_logical_width());
 						const auto mc = subject_transform.pos;
 
 						barrel_center.rotate(-subject_transform.rotation, mc);

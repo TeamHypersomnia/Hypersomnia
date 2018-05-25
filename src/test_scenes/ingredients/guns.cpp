@@ -333,7 +333,6 @@ namespace test_flavours {
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
 			gun_def.muzzle_velocity = {4000.f, 4000.f};
 			gun_def.shot_cooldown_ms = 100.f;
-			gun_def.bullet_spawn_offset.set(caches.at(to_image_id(test_scene_image_id::ASSAULT_RIFLE)).get_original_size().x / 2, 0);
 
 			gun_def.shell_spawn_offset.pos.set(0, 10);
 			gun_def.shell_spawn_offset.rotation = 45;
@@ -377,7 +376,7 @@ namespace test_flavours {
 			gun_def.action_mode = gun_action_type::SEMI_AUTOMATIC;
 			gun_def.muzzle_velocity = {3000.f, 3000.f};
 			gun_def.shot_cooldown_ms = 100.f;
-			gun_def.bullet_spawn_offset.set(caches.at(to_image_id(test_scene_image_id::KEK9)).get_original_size().x / 2, -7);
+			gun_def.bullet_spawn_offset.set(0, -7);
 
 			gun_def.shell_spawn_offset.pos.set(0, 10);
 			gun_def.shell_spawn_offset.rotation = 45;
@@ -420,7 +419,6 @@ namespace test_flavours {
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
 			gun_def.muzzle_velocity = {2000.f, 2000.f};
 			gun_def.shot_cooldown_ms = 300.f;
-			gun_def.bullet_spawn_offset.set(caches.at(to_image_id(test_scene_image_id::AMPLIFIER_ARM)).get_original_size().x / 2, 0);
 
 			gun_def.damage_multiplier = 1.f;
 

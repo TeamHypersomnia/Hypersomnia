@@ -102,8 +102,8 @@ void gun_system::consume_gun_intents(const logic_step step) {
 	}
 }
 
-vec2 invariants::gun::calc_muzzle_position(const components::transform gun_transform) const {
-	return (gun_transform * components::transform(bullet_spawn_offset)).pos;
+vec2 invariants::gun::calc_muzzle_position(const components::transform gun_transform, float gun_width) const {
+	return (gun_transform * components::transform(bullet_spawn_offset + vec2(gun_width / 2, 0))).pos;
 }
 
 vec2 invariants::gun::calc_barrel_center(const components::transform gun_transform) const {
@@ -125,7 +125,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 			auto& gun = gun_entity.template get<components::gun>();
 			const auto& gun_def = gun_entity.template get<invariants::gun>();
 
-			const auto muzzle_transform = components::transform { gun_def.calc_muzzle_position(gun_transform), gun_transform.rotation };
+			const auto muzzle_transform = components::transform { gun_def.calc_muzzle_position(gun_transform, *gun_entity.find_logical_width()), gun_transform.rotation };
 
 			auto make_gunshot_response = [&](){
 				messages::gunshot_response response;

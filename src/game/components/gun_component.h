@@ -92,7 +92,7 @@ namespace invariants {
 		recoil_player_instance_def recoil;
 		// END GEN INTROSPECTOR
 
-		vec2 calc_muzzle_position(components::transform gun_transform) const;
+		vec2 calc_muzzle_position(components::transform gun_transform, float gun_width) const;
 		vec2 calc_barrel_center(components::transform gun_transform) const;
 	};
 }
